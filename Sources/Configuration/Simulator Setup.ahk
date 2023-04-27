@@ -607,9 +607,9 @@ class SetupWizard extends ConfiguratorPanel {
 		wizardGui.Add("Text", "w684 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(wizardGui, "Simulator Setup"))
 
 		wizardGui.SetFont("s9 Norm", "Arial")
-		wizardGui.SetFont("Italic Underline", "Arial")
 
-		wizardGui.Add("Text", "x258 YP+20 w184 H:Center cBlue Center", translate("Setup && Configuration")).OnEvent("Click", openDocumentation.Bind(wizardGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#setup"))
+		wizardGui.Add("Documentation", "x258 YP+20 w184 H:Center Center", translate("Setup && Configuration")
+					, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#setup")
 
 		wizardGui.Add("Text", "x8 yp+20 w700 0x10 W:Grow")
 

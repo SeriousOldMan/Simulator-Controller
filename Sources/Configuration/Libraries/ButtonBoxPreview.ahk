@@ -118,7 +118,7 @@ class ButtonBoxPreview extends ControllerPreview {
 		buttonBoxGui.SetFont("s10 cSilver")
 		buttonBoxGui.Add("Text", "x0 y28 w" . width . " h23 +0x200 +0x1 BackgroundTrans", this.Name)
 		buttonBoxGui.BackColor := "0x000000"
-		buttonBoxGui.SetFont("s8 Norm", "Arial")
+		buttonBoxGui.SetFont("s8 Norm c" . buttonBoxGui.Theme.TextColor, "Arial")
 
 		vertical := ButtonBoxPreview.kHeaderHeight
 
@@ -185,7 +185,7 @@ class ButtonBoxPreview extends ControllerPreview {
 					buttonBoxGui.Add("Picture", "x" . x . " y" . y . " w" . imageWidth . " h" . imageHeight . " BackgroundTrans", image).OnEvent("Click", controlClick.Bind(buttonBoxGui))
 
 					if ((labelWidth > 0) && (labelHeight > 0)) {
-						buttonBoxGui.SetFont("s8 Norm cBlack")
+						buttonBoxGui.SetFont("s8 Norm")
 
 						x := horizontal + Round((columnWidth - labelWidth) / 2)
 						y := vertical + rowHeight - labelHeight

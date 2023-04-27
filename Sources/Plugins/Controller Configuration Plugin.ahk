@@ -325,7 +325,7 @@ class FunctionsList extends ConfigurationItemList {
 
 		window.SetFont("Underline", "Arial")
 
-		window.Add("Text", "x24 y420 w83 h23 Y:Move +0x200 cBlue", translate("Hotkey(s)")).OnEvent("Click", openHotkeysDocumentation)
+		window.Add("Text", "x24 y420 w83 h23 Y:Move +0x200 c" . window.Theme.LinkColor, translate("Hotkey(s)")).OnEvent("Click", openHotkeysDocumentation)
 
 		window.SetFont("Norm", "Arial")
 
@@ -334,7 +334,7 @@ class FunctionsList extends ConfigurationItemList {
 
 		window.SetFont("Underline", "Arial")
 
-		window.Add("Text", "x24 y442 w95 h27 Y:Move cBlue", translate("Action(s) (optional)")).OnEvent("Click", openActionsDocumentation)
+		window.Add("Text", "x24 y442 w95 h27 Y:Move c" . window.Theme.LinkColor, translate("Action(s) (optional)")).OnEvent("Click", openActionsDocumentation)
 
 		window.SetFont("Norm", "Arial")
 

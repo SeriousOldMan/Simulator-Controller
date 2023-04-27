@@ -177,9 +177,9 @@ class ControllerEditor extends ConfiguratorPanel {
 		controllerGui.Add("Text", "x0 w432 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(controllerGui, "Controller Editor"))
 
 		controllerGui.SetFont("Norm", "Arial")
-		controllerGui.SetFont("Italic Underline", "Arial")
 
-		controllerGui.Add("Text", "x160 YP+20 w112 H:Center cBlue Center", translate("Controller Layouts")).OnEvent("Click", openDocumentation.Bind(controllerGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#controller-layouts"))
+		controllerGui.Add("Documentation", "x160 YP+20 w112 H:Center Center", translate("Controller Layouts")
+						, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#controller-layouts")
 
 		this.ControlsList.createGui(this, buttonBoxConfiguration)
 		this.LabelsList.createGui(this, buttonBoxConfiguration)
@@ -765,9 +765,7 @@ class LayoutsList extends ConfigurationItemList {
 
 		bbWidget3 := window.Add("Text", "x8 y493 w86 h23 +0x200", translate("Layout"))
 
-		window.SetFont("c505050 s7")
-
-		bbWidget4 := window.Add("Text", "x16 y516 w133 h20", translate("(R x C, Margins)"))
+		bbWidget4 := window.Add("Text", "x16 y516 w133 h20 c" . window.Theme.TextColor["Disabled"], translate("(R x C, Margins)"))
 
 		window.SetFont()
 
@@ -781,12 +779,12 @@ class LayoutsList extends ConfigurationItemList {
 		bbWidget8.OnEvent("Change", updateLayoutRowEditor)
 		bbWidget9 := window.Add("UpDown", "x195 y493 w17 h21 Range1-99", 0)
 
-		window.SetFont("c505050 s7")
+		window.SetFont("s7")
 
-		bbWidget10 := window.Add("Text", "x215 y474 w40 h23 X:Move(0.2) +0x200 Center", translate("Row"))
-		bbWidget11 := window.Add("Text", "x265 y474 w40 h23 X:Move(0.2) +0x200 Center", translate("Column"))
-		bbWidget12 := window.Add("Text", "x315 y474 w40 h23 X:Move(0.2) +0x200 Center", translate("Sides"))
-		bbWidget13 := window.Add("Text", "x365 y474 w40 h23 X:Move(0.2) +0x200 Center", translate("Bottom"))
+		bbWidget10 := window.Add("Text", "x215 y474 w40 h23 X:Move(0.2) +0x200 Center c" . window.Theme.TextColor["Disabled"], translate("Row"))
+		bbWidget11 := window.Add("Text", "x265 y474 w40 h23 X:Move(0.2) +0x200 Center c" . window.Theme.TextColor["Disabled"], translate("Column"))
+		bbWidget12 := window.Add("Text", "x315 y474 w40 h23 X:Move(0.2) +0x200 Center c" . window.Theme.TextColor["Disabled"], translate("Sides"))
+		bbWidget13 := window.Add("Text", "x365 y474 w40 h23 X:Move(0.2) +0x200 Center c" . window.Theme.TextColor["Disabled"], translate("Bottom"))
 
 		window.SetFont()
 
@@ -1773,9 +1771,9 @@ class DisplayRulesEditor extends ConfiguratorPanel {
 		rulesGui.Add("Text", "w316 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(rulesGui, "Controller Editor.Display Rules"))
 
 		rulesGui.SetFont("Norm", "Arial")
-		rulesGui.SetFont("Italic Underline", "Arial")
 
-		rulesGui.Add("Text", "x110 YP+20 w112 H:Center cBlue Center", translate("Display Rules")).OnEvent("Click", openDocumentation.Bind(rulesGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#display-rules"))
+		rulesGui.Add("Documentation", "x110 YP+20 w112 H:Center Center", translate("Display Rules")
+				   , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#display-rules")
 
 		rulesGui.SetFont("Norm", "Arial")
 

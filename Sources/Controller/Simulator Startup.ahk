@@ -568,17 +568,17 @@ launchPad(command := false, arguments*) {
 
 		launchPadGui.Add("Text", "x560 YP w30 Section Right", string2Values("-", kVersion)[1])
 
-		launchPadGui.SetFont("c606060 s6")
+		launchPadGui.SetFont("s6")
 
 		try {
 			if (string2Values("-", kVersion)[2] != "release")
-				launchPadGui.Add("Text", "x562 YP+12 w30 BackgroundTrans Right", StrUpper(string2Values("-", kVersion)[2]))
+				launchPadGui.Add("Text", "x562 YP+12 w30 BackgroundTrans Right c" . launchPadGui.Theme.TextColor["Disabled"], StrUpper(string2Values("-", kVersion)[2]))
 		}
 
-		launchPadGui.SetFont("s9 Norm cBlack", "Arial")
-		launchPadGui.SetFont("Italic Underline", "Arial")
+		launchPadGui.SetFont("s9 Norm", "Arial")
 
-		launchPadGui.Add("Text", "x233 YS+20 w140 cBlue Center", translate("Applications")).OnEvent("Click", openDocumentation.Bind(launchPadGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller"))
+		launchPadGui.Add("Documentation", "x233 YS+20 w140 Center", translate("Applications")
+					   , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller")
 
 		launchPadGui.SetFont("s8 Norm", "Arial")
 

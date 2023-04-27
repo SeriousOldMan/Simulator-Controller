@@ -139,9 +139,9 @@ class PressuresEditor {
 		pressuresEditorGui.Add("Text", "w388 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(pressuresEditorGui, "Session Database.Pressures Editor"))
 
 		pressuresEditorGui.SetFont("s9 Norm", "Arial")
-		pressuresEditorGui.SetFont("Italic Underline", "Arial")
 
-		pressuresEditorGui.Add("Text", "x158 YP+20 w88 cBlue Center", translate("Tyre Pressures")).OnEvent("Click", openDocumentation.Bind(pressuresEditorGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#browsing-and-editing-tyre-pressures"))
+		pressuresEditorGui.Add("Documentation", "x158 YP+20 w88 Center", translate("Tyre Pressures")
+							 , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#browsing-and-editing-tyre-pressures")
 
 		pressuresEditorGui.SetFont("s8 Norm", "Arial")
 
@@ -516,15 +516,19 @@ class PressuresEditor {
 				<meta charset='utf-8'>
 				<head>
 					<style>
-						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #FFFFFF; }
+						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
+						.rowStyle { font-size: 11px; background-color: #%evenRowBackColor%; }
+						.oddRowStyle { font-size: 11px; background-color: #%oddRowBackColor%; }
 						.cellStyle { text-align: right; }
-						.rowStyle { font-size: 11px; background-color: #E0E0E0; }
-						.oddRowStyle { font-size: 11px; background-color: #E8E0E0; }
 					</style>
 					<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 					<script type="text/javascript">
 						google.charts.load('current', {'packages':['corechart', 'bar', 'table']}).then(drawChart);
 			)"
+				
+			before := substituteVariables(before, {headerBackColor: this.Window.Theme.ListBackColor["Header"]
+												 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
+												 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
 
 			after := "
 			(
@@ -619,18 +623,18 @@ class PressuresEditor {
 		text := "
 		(
 		var options = {
-			backgroundColor: 'D8D8D8', chartArea: { left: '10%', top: '5%', right: '5%', bottom: '20%' },
+			backgroundColor: '//backColor//', chartArea: { left: '10%', top: '5%', right: '5%', bottom: '20%' },
 			legend: { position: 'none' },
 		)"
 
-		drawChartFunction .= text
+		drawChartFunction .= StrReplace(text, "//backColor//", this.Window.AltBackColor)
 
 		text := "
 		(
 			hAxis: { title: '%tyres%', gridlines: {count: 0} },
 			vAxis: { title: '%pressures%', gridlines: {count: 0} },
 			lineWidth: 0,
-			series: [ { 'color': 'D8D8D8' } ],
+			series: [ { 'color': '%backColor%' } ],
 			intervals: { barWidth: 1, boxWidth: 1, lineWidth: 2, style: 'boxes' },
 			interval: { max: { style: 'bars', fillOpacity: 1, color: '#777' },
 						min: { style: 'bars', fillOpacity: 1, color: '#777' },
@@ -638,7 +642,8 @@ class PressuresEditor {
 		};
 		)"
 
-		drawChartFunction .= ("`n" . substituteVariables(text, {tyres: translate("Tyres"), pressures: translate("Pressure")}))
+		drawChartFunction .= ("`n" . substituteVariables(text, {tyres: translate("Tyres"), pressures: translate("Pressure")
+															  , backColor: this.Window.AltBackColor}))
 
 		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_id')); chart.draw(data, options); }")
 

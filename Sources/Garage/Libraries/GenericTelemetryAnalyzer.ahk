@@ -676,10 +676,10 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		analyzerGui.Add("Text", "w324 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(analyzerGui, "Setup Workbench.Analyzer"))
 
 		analyzerGui.SetFont("s9 Norm", "Arial")
-		analyzerGui.SetFont("Italic Underline", "Arial")
 
-		analyzerGui.Add("Text", "x78 YP+20 w184 cBlue Center", translate("Telemetry Analyzer")).OnEvent("Click", openDocumentation.Bind(analyzerGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-telemetry-analyzer"))
-
+		analyzerGui.Add("Documentation", "x78 YP+20 w184 Center", translate("Telemetry Analyzer")
+					  , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-telemetry-analyzer")
+					  
 		analyzerGui.SetFont("s8 Norm", "Arial")
 
 		analyzerGui.Add("Text", "x16 yp+30 w130 h23 +0x200", translate("Simulator"))
@@ -953,9 +953,9 @@ runCalibrator(commandOrAnalyzer, *) {
 		calibratorGui.Add("Text", "w324 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(calibratorGui, "Setup Workbench.Calibrator"))
 
 		calibratorGui.SetFont("s9 Norm", "Arial")
-		calibratorGui.SetFont("Italic Underline", "Arial")
 
-		calibratorGui.Add("Text", "x78 YP+20 w184 cBlue Center", translate("Telemetry Analyzer")).OnEvent("Click", openDocumentation.Bind(calibratorGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-telemetry-analyzer"))
+		calibratorGui.Add("Documentation", "x78 YP+20 w184 Center", translate("Telemetry Analyzer")
+						, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-telemetry-analyzer")
 
 		calibratorGui.SetFont("Norm s14", "Arial")
 

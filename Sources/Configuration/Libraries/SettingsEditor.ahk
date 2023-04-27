@@ -147,9 +147,9 @@ editModes(&settingsOrCommand, arguments*) {
 		modesEditorGui.Add("Text", "w330 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(modesEditorGui, "Simulator Settings.Automation"))
 
 		modesEditorGui.SetFont("Norm", "Arial")
-		modesEditorGui.SetFont("Italic Underline", "Arial")
 
-		modesEditorGui.Add("Text", "x108 YP+20 w130 cBlue Center", translate("Controller Automation")).OnEvent("Click", openDocumentation.Bind(modesEditorGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--settings"))
+		modesEditorGui.Add("Documentation", "x108 YP+20 w130 Center", translate("Controller Automation")
+						 , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--settings")
 
 		modesEditorGui.SetFont("Norm", "Arial")
 
@@ -417,9 +417,9 @@ editSettings(&settingsOrCommand, withContinue := false, fromSetup := false, x :=
 		settingsEditorGui.Add("Text", "w220 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(settingsEditorGui, "Simulator Settings"))
 
 		settingsEditorGui.SetFont("Norm", "Arial")
-		settingsEditorGui.SetFont("Italic Underline", "Arial")
 
-		settingsEditorGui.Add("Text", "x68 YP+20 w100 cBlue Center", translate("Settings")).OnEvent("Click", openDocumentation.Bind(settingsEditorGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--settings"))
+		settingsEditorGui.Add("Documentation", "x68 YP+20 w100 Center", translate("Settings")
+							, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--settings")
 
 		coreSettings := [["Simulator Controller", true, false], ["System Monitor", getMultiMapValue(settingsOrCommand, "Core", "System Monitor", false), true]]
 		feedbackSettings := []

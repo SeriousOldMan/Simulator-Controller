@@ -99,15 +99,19 @@ class RaceReportViewer extends RaceReportReader {
 					<meta charset='utf-8'>
 					<head>
 						<style>
-							.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #FFFFFF; }
+							.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
 							.cellStyle { text-align: right; }
-							.rowStyle { font-size: 11px; background-color: #E0E0E0; }
-							.oddRowStyle { font-size: 11px; background-color: #E8E8E8; }
+							.rowStyle { font-size: 11px; background-color: #%evenRowBackColor%; }
+							.oddRowStyle { font-size: 11px; background-color: #%oddRowBackColor%; }
 						</style>
 						<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 						<script type="text/javascript">
 							google.charts.load('current', {'packages':['corechart', 'bar', 'table']}).then(drawChart);
 				)"
+				
+				before := substituteVariables(before, {headerBackColor: this.Window.Theme.ListBackColor["Header"]
+													 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
+													 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
 
 				after := "
 				(
@@ -119,7 +123,9 @@ class RaceReportViewer extends RaceReportReader {
 				</html>
 				)"
 
-				html := (before . drawChartFunction . substituteVariables(after, {width: this.ChartViewer.getWidth() - 2 - margin, height: this.ChartViewer.getHeight() - 2 - margin, backColor: this.Window.AltBackColor}))
+				html := (before . drawChartFunction . substituteVariables(after, {width: this.ChartViewer.getWidth() - 2 - margin
+																				, height: this.ChartViewer.getHeight() - 2 - margin
+																				, backColor: this.Window.AltBackColor}))
 
 				this.ChartViewer.document.write(html)
 			}
@@ -565,7 +571,7 @@ class RaceReportViewer extends RaceReportReader {
 
 				drawChartFunction .= "`n]);"
 
-				drawChartFunction := drawChartFunction . "`nvar options = { bars: 'horizontal', backgroundColor: 'D8D8D8', chartArea: { left: '20%', top: '5%', right: '30%', bottom: '10%' }, hAxis: {gridlines: {count: 0}}, vAxis: {gridlines: {count: 0}} };"
+				drawChartFunction := drawChartFunction . "`nvar options = { bars: 'horizontal', backgroundColor: '" . this.Window.AltBackColor . "', chartArea: { left: '20%', top: '5%', right: '30%', bottom: '10%' }, hAxis: {gridlines: {count: 0}}, vAxis: {gridlines: {count: 0}} };"
 				drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.BarChart(document.getElementById('chart_id')); chart.draw(data, options); }"
 			}
 			else
@@ -696,7 +702,7 @@ class RaceReportViewer extends RaceReportReader {
 
 			if hasData {
 				drawChartFunction := drawChartFunction . ("]);`nvar options = { legend: { position: 'right' }, chartArea: { left: '5%', top: '5%', right: '20%', bottom: '10%' }, ")
-				drawChartFunction := drawChartFunction . ("hAxis: { title: '" . translate("Laps") . "', gridlines: {count: 0} }, vAxis: { viewWindow: {min: " . (minPosition - 1) . ", max: " . (maxPosition + 1) . "}, direction: -1, ticks: [], title: '" . translate("Cars") . "', baselineColor: 'D0D0D0', gridlines: {count: 0} }, backgroundColor: 'D8D8D8' };`n")
+				drawChartFunction := drawChartFunction . ("hAxis: { title: '" . translate("Laps") . "', gridlines: {count: 0} }, vAxis: { viewWindow: {min: " . (minPosition - 1) . ", max: " . (maxPosition + 1) . "}, direction: -1, ticks: [], title: '" . translate("Cars") . "', baselineColor: 'D0D0D0', gridlines: {count: 0} }, backgroundColor: '" . this.Window.AltBackColor . "' };`n")
 
 				drawChartFunction := drawChartFunction . "var chart = new google.visualization.LineChart(document.getElementById('chart_id')); chart.draw(data, options); }"
 			}
@@ -1033,18 +1039,18 @@ class RaceReportViewer extends RaceReportReader {
 			text := "
 			(
 			var options = {
-				backgroundColor: 'D8D8D8', chartArea: { left: '10%', top: '5%', right: '5%', bottom: '20%' },
+				backgroundColor: '//backColor//', chartArea: { left: '10%', top: '5%', right: '5%', bottom: '20%' },
 				legend: { position: 'none' },
 			)"
 
-			drawChartFunction .= text
+			drawChartFunction .= StrReplace(text, "//backColor//", this.Window.AltBackColor)
 
 			text := "
 			(
 				hAxis: { title: '%cars%', gridlines: {count: 0} },
 				vAxis: { title: '%seconds%', gridlines: {count: 0} },
 				lineWidth: 0,
-				series: [ { 'color': 'D8D8D8' } ],
+				series: [ { 'color': '%backColor%' } ],
 				intervals: { barWidth: 1, boxWidth: 1, lineWidth: 2, style: 'boxes' },
 				interval: { max: { style: 'bars', fillOpacity: 1, color: '#777' },
 							min: { style: 'bars', fillOpacity: 1, color: '#777' },
@@ -1052,7 +1058,8 @@ class RaceReportViewer extends RaceReportReader {
 			};
 			)"
 
-			drawChartFunction .= ("`n" . substituteVariables(text, {cars: translate("Cars"), seconds: translate("Seconds")}))
+			drawChartFunction .= ("`n" . substituteVariables(text, {cars: translate("Cars"), seconds: translate("Seconds")
+																  , backColor: this.Window.AltBackColor}))
 
 			drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_id')); chart.draw(data, options); }")
 
@@ -1146,11 +1153,11 @@ class RaceReportViewer extends RaceReportReader {
 			text := "
 			(
 			var options = {
-				backgroundColor: 'D8D8D8', chartArea: { left: '10%', top: '5%', right: '20%', bottom: '20%' },
+				backgroundColor: '//backColor//', chartArea: { left: '10%', top: '5%', right: '20%', bottom: '20%' },
 				legend: { position: 'right' }, curveType: 'function',
 			)"
 
-			drawChartFunction .= "`n" . text
+			drawChartFunction .= "`n" . StrReplace(text, "//backColor//", this.Window.AltBackColor)
 
 			text := "
 			(
@@ -1434,9 +1441,9 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 		reportSettingsGui.Add("Text", "w351 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(reportSettingsGui, "Race Reports.Settings"))
 
 		reportSettingsGui.SetFont("s9 Norm", "Arial")
-		reportSettingsGui.SetFont("Italic Underline", "Arial")
 
-		reportSettingsGui.Add("Text", "x106 YP+20 w164 cBlue Center", translate("Report Settings")).OnEvent("Click", openDocumentation.Bind(reportSettingsGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-reports"))
+		reportSettingsGui.Add("Documentation", "x106 YP+20 w164 Center", translate("Report Settings")
+							, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-reports")
 
 		reportSettingsGui.SetFont("s8 Norm", "Arial")
 

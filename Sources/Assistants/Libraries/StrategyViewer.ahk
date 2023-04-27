@@ -261,7 +261,7 @@ class StrategyViewer {
 		}
 
 		drawChartFunction .= ("]);`nvar options = { curveType: 'function', legend: { position: 'Right' }, chartArea: { left: '10%', top: '5%', right: '25%', bottom: '20%' }, hAxis: { title: '"
-							. (durationSession ? translate("Lap") : translate("Minute")) . "' }, vAxis: { viewWindow: { min: 0 } }, backgroundColor: 'D8D8D8' };`n")
+							. (durationSession ? translate("Lap") : translate("Minute")) . "' }, vAxis: { viewWindow: { min: 0 } }, backgroundColor: '" . this.Window.AltBackColor . "' };`n")
 
 		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_" . chartID . "')); chart.draw(data, options); }")
 
@@ -310,22 +310,25 @@ class StrategyViewer {
 				<meta charset='utf-8'>
 				<head>
 					<style>
-						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #FFFFFF; }
-						.rowStyle { font-size: 11px; background-color: #E0E0E0; }
-						.oddRowStyle { font-size: 11px; background-color: #E8E0E0; }
+						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
+						.rowStyle { font-size: 11px; background-color: #%evenRowBackColor%; }
+						.oddRowStyle { font-size: 11px; background-color: #%oddRowBackColor%; }
 					</style>
 					<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 					<script type="text/javascript">
 						google.charts.load('current', {'packages':['corechart', 'table', 'scatter']}).then(drawChart%chartID%);
 			)"
 
+			before := substituteVariables(before, {headerBackColor: this.Window.Theme.ListBackColor["Header"]
+												 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
+												 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]
+												 , chartID: chartID})
+
 			after := "
 			(
 					</script>
 				</head>
 			)"
-
-			before := substituteVariables(before, {chartID: chartID})
 		}
 		else {
 			before := ""

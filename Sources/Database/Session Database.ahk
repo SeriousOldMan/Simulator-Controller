@@ -1174,9 +1174,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.Add("Text", "w664 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(editorGui, "Session Database"))
 
 		editorGui.SetFont("s9 Norm", "Arial")
-		editorGui.SetFont("Italic Underline", "Arial")
 
-		editorGui.Add("Text", "x258 YP+20 w164 H:Center cBlue Center", translate("Session Database")).OnEvent("Click", openDocumentation.Bind(editorGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database"))
+		editorGui.Add("Documentation", "x258 YP+20 w164 H:Center Center", translate("Session Database")
+					, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database")
 
 		editorGui.Add("Text", "x8 yp+30 w670 W:Grow 0x10")
 
@@ -1256,7 +1256,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.Add("Text", "x16 yp+32 w267 0x10")
 
 		editorGui.SetFont("Norm")
-		editorGui.SetFont("s10 Bold cGray", "Arial")
+		editorGui.SetFont("s10 Bold", "Arial")
 
 		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg2", kIconsDirectory . "Strategy.ico").OnEvent("Click", chooseTab.Bind("Strategies"))
 		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab2", translate("Strategies")).OnEvent("Click", chooseTab.Bind("Strategies"))
@@ -1264,7 +1264,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.Add("Text", "x16 yp+32 w267 0x10")
 
 		editorGui.SetFont("Norm")
-		editorGui.SetFont("s10 Bold cGray", "Arial")
+		editorGui.SetFont("s10 Bold", "Arial")
 
 		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg3", kIconsDirectory . "Tools BW.ico").OnEvent("Click", chooseTab.Bind("Setups"))
 		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab3", translate("Setups")).OnEvent("Click", chooseTab.Bind("Setups"))
@@ -1272,7 +1272,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.Add("Text", "x16 yp+32 w267 0x10")
 
 		editorGui.SetFont("Norm")
-		editorGui.SetFont("s10 Bold cGray", "Arial")
+		editorGui.SetFont("s10 Bold", "Arial")
 
 		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg4", kIconsDirectory . "Pressure.ico").OnEvent("Click", chooseTab.Bind("Pressures"))
 		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab4", translate("Tyre Pressures")).OnEvent("Click", chooseTab.Bind("Pressures"))
@@ -1280,7 +1280,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.Add("Text", "x16 yp+32 w267 0x10")
 
 		editorGui.SetFont("Norm")
-		editorGui.SetFont("s10 Bold cGray", "Arial")
+		editorGui.SetFont("s10 Bold", "Arial")
 
 		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg5", kIconsDirectory . "Road.ico").OnEvent("Click", chooseTab.Bind("Automation"))
 		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab5", translate("Automations")).OnEvent("Click", chooseTab.Bind("Automation"))
@@ -1288,14 +1288,14 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.Add("Text", "x16 yp+32 w267 0x10")
 
 		editorGui.SetFont("Norm")
-		editorGui.SetFont("s10 Bold cGray", "Arial")
+		editorGui.SetFont("s10 Bold", "Arial")
 
 		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg6", kIconsDirectory . "Sensor.ico").OnEvent("Click", chooseTab.Bind("Data"))
 		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab6", translate("Administration")).OnEvent("Click", chooseTab.Bind("Data"))
 
 		editorGui.Add("Text", "x16 yp+32 w267 0x10")
 
-		editorGui.SetFont("s8 Norm cBlack", "Arial")
+		editorGui.SetFont("s8 Norm", "Arial")
 
 		editorGui.Add("Picture", "x280 ys-2 w390 h470 Border W:Grow H:Grow")
 
@@ -1653,84 +1653,84 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		if this.moduleAvailable("Settings") {
 			window["settingsImg1"].Enabled := true
 			window["settingsImg1"].Value := kIconsDirectory . "General Settings.ico"
-			window["settingsTab1"].SetFont("s10 Bold cGray", "Arial")
+			window["settingsTab1"].SetFont("s10 Bold c" . window.Theme.TextColor["Disabled"], "Arial")
 		}
 		else {
 			window["settingsImg1"].Enabled := false
 			window["settingsImg1"].Value := kIconsDirectory . "General Settings Gray.ico"
-			window["settingsTab1"].SetFont("s10 Bold cSilver", "Arial")
+			window["settingsTab1"].SetFont("s10 Bold c" . window.Theme.TextColor["Unavailable"], "Arial")
 		}
 
 		if this.moduleAvailable("Strategies") {
 			window["settingsImg2"].Enabled := true
 			window["settingsImg2"].Value := kIconsDirectory . "Strategy.ico"
-			window["settingsTab2"].SetFont("s10 Bold cGray", "Arial")
+			window["settingsTab2"].SetFont("s10 Bold c" . window.Theme.TextColor["Disabled"], "Arial")
 		}
 		else {
 			window["settingsImg2"].Enabled := false
 			window["settingsImg2"].Value := kIconsDirectory . "Strategy Gray.ico"
-			window["settingsTab2"].SetFont("s10 Bold cSilver", "Arial")
+			window["settingsTab2"].SetFont("s10 Bold c" . window.Theme.TextColor["Unavailable"], "Arial")
 		}
 
 		if this.moduleAvailable("Setups") {
 			window["settingsImg3"].Enabled := true
 			window["settingsImg3"].Value := kIconsDirectory . "Tools BW.ico"
-			window["settingsTab3"].SetFont("s10 Bold cGray", "Arial")
+			window["settingsTab3"].SetFont("s10 Bold c" . window.Theme.TextColor["Disabled"], "Arial")
 		}
 		else {
 			window["settingsImg3"].Enabled := false
 			window["settingsImg3"].Value := kIconsDirectory . "Tools Gray.ico"
-			window["settingsTab3"].SetFont("s10 Bold cSilver", "Arial")
+			window["settingsTab3"].SetFont("s10 Bold c" . window.Theme.TextColor["Unavailable"], "Arial")
 		}
 
 		if this.moduleAvailable("Pressures") {
 			window["settingsImg4"].Enabled := true
 			window["settingsImg4"].Value := kIconsDirectory . "Pressure.ico"
-			window["settingsTab4"].SetFont("s10 Bold cGray", "Arial")
+			window["settingsTab4"].SetFont("s10 Bold c" . window.Theme.TextColor["Disabled"], "Arial")
 		}
 		else {
 			window["settingsImg4"].Enabled := false
 			window["settingsImg4"].Value := kIconsDirectory . "Pressure Gray.ico"
-			window["settingsTab4"].SetFont("s10 Bold cSilver", "Arial")
+			window["settingsTab4"].SetFont("s10 Bold c" . window.Theme.TextColor["Unavailable"], "Arial")
 		}
 
 		if this.moduleAvailable("Automation") {
 			window["settingsImg5"].Enabled := true
 			window["settingsImg5"].Value := kIconsDirectory . "Road.ico"
-			window["settingsTab5"].SetFont("s10 Bold cGray", "Arial")
+			window["settingsTab5"].SetFont("s10 Bold c" . window.Theme.TextColor["Disabled"], "Arial")
 		}
 		else {
 			window["settingsImg5"].Enabled := false
 			window["settingsImg5"].Value := kIconsDirectory . "Road Gray.ico"
-			window["settingsTab5"].SetFont("s10 Bold cSilver", "Arial")
+			window["settingsTab5"].SetFont("s10 Bold c" . window.Theme.TextColor["Unavailable"], "Arial")
 		}
 
 		if this.moduleAvailable("Data") {
 			window["settingsImg6"].Enabled := true
 			window["settingsImg6"].Value := kIconsDirectory . "Sensor.ico"
-			window["settingsTab6"].SetFont("s10 Bold cGray", "Arial")
+			window["settingsTab6"].SetFont("s10 Bold c" . window.Theme.TextColor["Disabled"], "Arial")
 		}
 		else {
 			window["settingsImg6"].Enabled := false
 			window["settingsImg6"].Value := kIconsDirectory . "Sensor Gray.ico"
-			window["settingsTab6"].SetFont("s10 Bold cSilver", "Arial")
+			window["settingsTab6"].SetFont("s10 Bold c" . window.Theme.TextColor["Unavailable"], "Arial")
 		}
 
 		switch this.SelectedModule, false {
 			case "Settings":
-				window["settingsTab1"].SetFont("s10 Bold cBlack", "Arial")
+				window["settingsTab1"].SetFont("s10 Bold c" . window.Theme.TextColor, "Arial")
 
 				window["settingsTab"].Choose(1)
 			case "Strategies":
-				window["settingsTab2"].SetFont("s10 Bold cBlack", "Arial")
+				window["settingsTab2"].SetFont("s10 Bold c" . window.Theme.TextColor, "Arial")
 
 				window["settingsTab"].Choose(2)
 			case "Setups":
-				window["settingsTab3"].SetFont("s10 Bold cBlack", "Arial")
+				window["settingsTab3"].SetFont("s10 Bold c" . window.Theme.TextColor, "Arial")
 
 				window["settingsTab"].Choose(3)
 			case "Pressures":
-				window["settingsTab4"].SetFont("s10 Bold cBlack", "Arial")
+				window["settingsTab4"].SetFont("s10 Bold c" . window.Theme.TextColor, "Arial")
 
 				window["settingsTab"].Choose(4)
 
@@ -1745,11 +1745,11 @@ class SessionDatabaseEditor extends ConfigurationItem {
 							break
 						}
 			case "Automation":
-				window["settingsTab5"].SetFont("s10 Bold cBlack", "Arial")
+				window["settingsTab5"].SetFont("s10 Bold c" . window.Theme.TextColor, "Arial")
 
 				window["settingsTab"].Choose(5)
 			case "Data":
-				window["settingsTab6"].SetFont("s10 Bold cBlack", "Arial")
+				window["settingsTab6"].SetFont("s10 Bold c" . window.Theme.TextColor, "Arial")
 
 				window["settingsTab"].Choose(6)
 		}
@@ -4464,9 +4464,9 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := fa
 		importDataGui.Add("Text", "w394 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(importDataGui, "Session Database.Import"))
 
 		importDataGui.SetFont("s9 Norm", "Arial")
-		importDataGui.SetFont("Italic Underline", "Arial")
 
-		importDataGui.Add("Text", "x153 YP+20 w104 H:Center cBlue Center", translate("Import")).OnEvent("Click", openDocumentation.Bind(importDataGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database"))
+		importDataGui.Add("Documentation", "x153 YP+20 w104 H:Center Center", translate("Import")
+						, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database")
 
 		importDataGui.SetFont("s8 Norm", "Arial")
 
@@ -5043,9 +5043,9 @@ editSettings(editorOrCommand, arguments*) {
 		settingsEditorGui.Add("Text", "w394 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(settingsEditorGui, "Session Database.Settings"))
 
 		settingsEditorGui.SetFont("s9 Norm", "Arial")
-		settingsEditorGui.SetFont("Italic Underline", "Arial")
 
-		settingsEditorGui.Add("Text", "x133 YP+20 w144 cBlue Center", translate("Database Settings")).OnEvent("Click", openDocumentation.Bind(settingsEditorGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#database-configuration"))
+		settingsEditorGui.Add("Documentation", "x133 YP+20 w144 Center", translate("Database Settings")
+							, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#database-configuration")
 
 		settingsEditorGui.SetFont("s8 Norm", "Arial")
 

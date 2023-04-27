@@ -238,11 +238,9 @@ installOptions(options, *) {
 		installGui.Add("Text", "w330 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(installGui, "Install"))
 
 		installGui.SetFont("Norm", "Arial")
-		installGui.SetFont("Italic Underline", "Arial")
 
-		installGui.Add("Text", "x108 YP+20 w130 cBlue Center", translate("Install")).OnEvent("Click", openDocumentation.Bind(installGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration"))
-
-		installGui.SetFont("Norm", "Arial")
+		installGui.Add("Documentation", "x108 YP+20 w130 Center", translate("Install")
+					 , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration")
 
 		installGui.Add("Text", "x8 yp+20 w330 0x10")
 
@@ -332,11 +330,9 @@ uninstallOptions(options, *) {
 		uninstallGui.Add("Text", "w330 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(uninstallGui, "Uninstall"))
 
 		uninstallGui.SetFont("Norm", "Arial")
-		uninstallGui.SetFont("Italic Underline", "Arial")
 
-		uninstallGui.Add("Text", "x108 YP+20 w130 cBlue Center", translate("Uninstall")).OnEvent("Click", openDocumentation.Bind(uninstallGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration"))
-
-		uninstallGui.SetFont("Norm", "Arial")
+		uninstallGui.Add("Documentation", "x108 YP+20 w130 Center", translate("Uninstall")
+					   , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration")
 
 		uninstallGui.Add("Text", "x8 yp+20 w330 0x10")
 

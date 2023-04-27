@@ -260,10 +260,10 @@ class RaceReports extends ConfigurationItem {
 		raceReportsGui.Add("Text", "w1184 Center H:Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(raceReportsGui, "Race Reports"))
 
 		raceReportsGui.SetFont("s9 Norm", "Arial")
-		raceReportsGui.SetFont("Italic Underline", "Arial")
 
-		raceReportsGui.Add("Text", "x508 YP+20 w184 cBlue Center H:Center", translate("Race Reports")).OnEvent("Click", openDocumentation.Bind(raceReportsGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-reports"))
-
+		raceReportsGui.Add("Documentation", "x508 YP+20 w184 Center H:Center", translate("Race Reports")
+						 , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-reports")
+						 
 		raceReportsGui.Add("Text", "x8 yp+30 w1200 0x10 W:Grow")
 
 		raceReportsGui.SetFont("s8 Norm", "Arial")

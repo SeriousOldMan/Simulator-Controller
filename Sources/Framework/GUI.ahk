@@ -76,7 +76,7 @@ class Theme {
 
 	WindowBackColor {
 		Get {
-			return Format("{:06X}", Theme.GetSystemColor("WinBackColor"))
+			return Theme.GetSystemColor("WinBackColor")
 		}
 	}
 
@@ -92,15 +92,16 @@ class Theme {
 		}
 	}
 
-	CompositeBackColor {
+	ListBackColor[type := "Header"] {
 		Get {
-			return this.WindowBackColor
-		}
-	}
-
-	HeaderBackColor {
-		Get {
-			return this.WindowBackColor
+			switch type, false {
+				case "Background":
+					return this.AlternateBackColor
+				case "Header":
+					return this.FieldBackColor
+				case "EvenRow", "OddRow":
+					return this.AlternateBackColor
+			}
 		}
 	}
 
@@ -112,19 +113,26 @@ class Theme {
 
 	TextColor[mode := "Normal"] {
 		Get {
-			return Format("{:06X}", Theme.GetSystemColor((mode = "Normal") ? "NormalTextColor" : ((mode = "Disabled") ? "DisabledTextColor" : false)))
+			switch mode, false {
+				case "Normal":
+					return Theme.GetSystemColor("NormalTextColor")
+				case "Disabled":
+					return Theme.GetSystemColor("DisabledTextColor")
+				case "Unavailable":
+					return "Silver"
+			}
 		}
 	}
 
 	LinkColor {
 		Get {
-			return Format("{:06X}", Theme.GetSystemColor("LinkTextColor"))
+			return Theme.GetSystemColor("LinkTextColor")
 		}
 	}
 
 	ButtonColor {
 		Get {
-			return Format("{:06X}", Theme.GetSystemColor("ButtonTextColor"))
+			return Theme.GetSystemColor("ButtonTextColor")
 		}
 	}
 
@@ -154,18 +162,19 @@ class Theme {
 		if !InStr(options, "Background") {
 			switch type, false {
 				case "ListView", "ListBox":
-					options .= (" Background" . this.CompositeBackColor)
+					options .= (" Background" . this.ListBackColor["Background"])
 				case "Edit":
 					options .= (" Background" . this.FieldBackColor)
 				case "Button":
 					options .= (" Background" . this.ButtonBackColor)
+				default:
+					if ((type != "UpDown") && (type != "DateTime") && (type != "MonthCal") && (type != "DropDownList") && (type != "ComboBox"))
+						options .= (" Background" . this.WindowBackColor)
 			}
 		}
 
-		/*
-		if !RegExMatch(options, "c[0-9a-fA-F]{6}")
+		if (!RegExMatch(options, "c[0-9a-fA-F]{6}") && !InStr(options, "c" . this.LinkColor))
 			options .= (" c" . this.TextColor)
-		*/
 
 		return options
 	}
@@ -273,7 +282,10 @@ class UserTheme extends ConfigurationItem {
 }
 */
 
-class DefaultTheme extends Theme {
+class SystemTheme extends Theme {
+}
+
+class LightTheme extends Theme {
 	WindowBackColor {
 		Get {
 			return "D0D0D0"
@@ -292,9 +304,18 @@ class DefaultTheme extends Theme {
 		}
 	}
 
-	CompositeBackColor {
+	ListBackColor[type := "Header"] {
 		Get {
-			return this.AlternateBackColor
+			switch type, false {
+				case "Background":
+					return this.AlternateBackColor
+				case "Header":
+					return "FFFFFF"
+				case "EvenRow":
+					return "E0E0E0"
+				case "OddRow":
+					return "E8E8E8"
+			}
 		}
 	}
 
@@ -306,13 +327,27 @@ class DefaultTheme extends Theme {
 
 	TextColor[mode := "Normal"] {
 		Get {
-			return ((mode = "Normal") ? "000000" : "444444")
+			return ((mode = "Normal") ? "000000" : ((mode = "Disabled") ? "505050" : "808080"))
 		}
 	}
 
 	LinkColor {
 		Get {
 			return "Blue"
+		}
+	}
+}
+
+class DarkTheme extends LightTheme {
+	WindowBackColor {
+		Get {
+			return "9F9F90"
+		}
+	}
+
+	AlternateBackColor {
+		Get {
+			return "AFAFA0"
 		}
 	}
 }
@@ -1293,17 +1328,20 @@ getControllerActionIcons() {
 ;;;-------------------------------------------------------------------------;;;
 
 initializeGUI() {
-	createDocumentation(window, options, label, link) {
+	createDocumentation(window, options, label?, link?) {
 		local curFontOptions := window.CurrentFontOptions
 		local control
 
 		window.SetFont("Italic Underline")
 
-		control := window.Add("Text", "c" . window.Theme.LinkColor . A_Space . options, label)
+		control := window.Add("Text", "c" . window.Theme.LinkColor . A_Space
+									. StrReplace(options, "c" . window.Theme.TextColor, "")
+									, label?)
 
 		window.SetFont(curFontOptions)
 
-		control.Link := link
+		if isSet(link)
+			control.Link := link
 
 		control.OnEvent("Click", (*) => openDocumentation(window, control.Link))
 
@@ -1312,7 +1350,7 @@ initializeGUI() {
 
 	Window.DefineCustomControl("Documentation", createDocumentation)
 
-	Theme.CurrentTheme := DefaultTheme()
+	Theme.CurrentTheme := %getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini"), "General", "UI Theme", "Light") . "Theme"%()
 
 	; DllCall("User32\SetProcessDpiAwarenessContext", "UInt" , -1)
 	; DllCall("User32\SetThreadDpiAwarenessContext", "UInt" , -1)

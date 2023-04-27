@@ -104,7 +104,7 @@ class PluginsConfigurator extends ConfigurationItemList {
 
 		window.SetFont("Underline", "Arial")
 
-		window.Add("Text", "x16 y368 w86 h23 +0x200 Y:Move cBlue", translate("Arguments")).OnEvent("Click", openPluginsModesDocumentation)
+		window.Add("Text", "x16 y368 w86 h23 +0x200 Y:Move c" . window.Theme.LinkColor, translate("Arguments")).OnEvent("Click", openPluginsModesDocumentation)
 
 		window.SetFont("Norm", "Arial")
 

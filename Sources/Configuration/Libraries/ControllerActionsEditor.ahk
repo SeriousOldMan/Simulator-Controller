@@ -151,9 +151,9 @@ class ControllerActionsEditor extends ConfiguratorPanel {
 		actionsGui.Add("Text", "w388 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(actionsGui, "Plugin Actions Editor"))
 
 		actionsGui.SetFont("Norm", "Arial")
-		actionsGui.SetFont("Italic Underline", "Arial")
 
-		actionsGui.Add("Text", "x128 YP+20 w148 H:Center cBlue Center", translate("Labels && Icons")).OnEvent("Click", openDocumentation.Bind(actionsGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#plugin-actions-editor"))
+		actionsGui.Add("Documentation", "x128 YP+20 w148 H:Center Center", translate("Labels && Icons")
+					 , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#plugin-actions-editor")
 
 		actionsGui.SetFont("Norm", "Arial")
 
@@ -462,9 +462,7 @@ class PluginActionsList extends ConfigurationItemList {
 		window.Add("Edit", "x100 yp w110 h45 Y:Move W:Grow(0.2) VlabelEdit")
 		window.Add("Picture", "Border x215 yp w45 h45 Y:Move X:Move(0.2) ViconEdit").OnEvent("Click", clickIcon)
 
-		window.SetFont("c505050 s8")
-
-		window.Add("Text", "x263 yp w120 r2 Y:Move X:Move(0.2)", translate("1. Click = Edit`n2. Ctrl-Click = Clear"))
+		window.Add("Text", "x263 yp w120 r2 Y:Move X:Move(0.2) c" . window.Theme.TextColor["Disabled"], translate("1. Click = Edit`n2. Ctrl-Click = Clear"))
 
 		window.SetFont()
 

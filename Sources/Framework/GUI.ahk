@@ -352,13 +352,13 @@ class LightTheme extends Theme {
 class DarkTheme extends LightTheme {
 	WindowBackColor {
 		Get {
-			return "9F9F90"
+			return "909090"
 		}
 	}
 
 	AlternateBackColor {
 		Get {
-			return "AFAFA0"
+			return "A0A0A0"
 		}
 	}
 }

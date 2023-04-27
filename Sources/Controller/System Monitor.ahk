@@ -829,7 +829,7 @@ systemMonitor(command := false, arguments*) {
 
 		monitorTabView.UseTab(2)
 
-		stateListView := systemMonitorGui.Add("ListView", "x24 ys+28 w756 h336 -Multi -LV0x10 BackgroundD0D0D0 AltSubmit NoSort NoSortHdr", collect(["Module", "Information"], translate))
+		stateListView := systemMonitorGui.Add("ListView", "x24 ys+28 w756 h336 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Module", "Information"], translate))
 		stateListView.OnEvent("Click", noSelect.Bind(stateListView))
 		stateListView.OnEvent("DoubleClick", noSelect.Bind(stateListView))
 
@@ -869,7 +869,7 @@ systemMonitor(command := false, arguments*) {
 
 		systemMonitorGui.SetFont("Norm", "Arial")
 
-		driversListView := systemMonitorGui.Add("ListView", "x24 yp+21 w375 h120 -Multi -LV0x10 BackgroundD0D0D0 AltSubmit NoSort NoSortHdr", collect(["Driver", "Active"], translate))
+		driversListView := systemMonitorGui.Add("ListView", "x24 yp+21 w375 h120 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Driver", "Active"], translate))
 		driversListView.OnEvent("Click", noSelect.Bind(stateListView))
 		driversListView.OnEvent("DoubleClick", noSelect.Bind(stateListView))
 
@@ -892,7 +892,7 @@ systemMonitor(command := false, arguments*) {
 
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
-		logMessageListView := systemMonitorGui.Add("ListView", "x24 ys+28 w756 h312 -Multi -LV0x10 BackgroundD0D0D0 AltSubmit NoSort NoSortHdr", collect(["Application", "Time", "Category", "Message"], translate))
+		logMessageListView := systemMonitorGui.Add("ListView", "x24 ys+28 w756 h312 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Application", "Time", "Category", "Message"], translate))
 		logMessageListView.OnEvent("Click", noSelect.Bind(logMessageListView))
 		logMessageListView.OnEvent("DoubleClick", noSelect.Bind(logMessageListView))
 

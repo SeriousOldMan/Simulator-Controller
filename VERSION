@@ -1,9 +1,9 @@
 [Development]
-Version=5.0.1.0-dev
+Version=5.0.1.0-beta
 Target=5.0.1.0-release
-Date=04/26/2023
-Download=
-Changes=Full implementation of WebView2 as a substitute for the IE Com Object, New car models for "Setup Workbench", Internal implementation of a Gui theming engine
+Date=04/27/2023
+Download=https://www.dropbox.com/s/2ny15avgczq04ud/Simulator%20Controller%205.0.1.0-beta.zip?dl=1
+Changes=Full implementation of WebView2 as a substitute for the IE Com Object, New car models for "Setup Workbench", Initial implementation of a Gui theming engine
 [Release]
 Version=5.0.0.1-beta
 Date=04/23/2023
@@ -13,4 +13,4 @@ Changes=Fixed "Race Center" coming to the front of the window stack all 10 secon
 Type=Development
 [Version]
 Release=5.0.0.1-beta
-Development=5.0.1.0-dev
+Development=5.0.1.0-beta

@@ -50,6 +50,11 @@ This release implements an integration of the WebView2 HTML rendering engine. It
 	[General}
 	HTML Engine=WebView2
 
+Very similar it is possible to select one of the predefined UI themes (one of "System", "Light", "Dark", with "Light" beeing the default):
+
+	[General}
+	UI Theme=System
+
 ***
 
 ## Release 5.0.0

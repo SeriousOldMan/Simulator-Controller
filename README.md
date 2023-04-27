@@ -47,7 +47,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[5.0.1.0-beta](https://www.dropbox.com/s/2ny15avgczq04ud/Simulator%20Controller%205.0.1.0-beta.zip?dl=1) (Test build for 5.0.1. Changes: Full implementation of WebView2 as a substitute for the IE Com Object, New car models for "Setup Workbench", Initial implementation of a Gui theming engine.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-501) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

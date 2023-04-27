@@ -962,9 +962,9 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		settingsGui.Add("Text", "w388 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(settingsGui, "Race Settings"))
 
 		settingsGui.SetFont("Norm", "Arial")
-		settingsGui.SetFont("Italic Underline", "Arial")
 
-		settingsGui.Add("Text", "x118 YP+20 w168 cBlue Center", translate("Race Settings")).OnEvent("Click", openDocumentation.Bind(settingsGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings"))
+		settingsGui.Add("Documentation", "x118 YP+20 w168 Center", translate("Race Settings")
+					  , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings")
 
 		settingsGui.SetFont("Norm", "Arial")
 

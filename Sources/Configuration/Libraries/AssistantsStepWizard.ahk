@@ -212,14 +212,13 @@ class AssistantsStepWizard extends ActionsStepWizard {
 			this.iActionsListViews.Push(widget)
 
 			info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Assistants", "Assistants.Actions.Info." . getLanguage()))
-			info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='border-width:1pt;border-color:#AAAAAA;color:#AAAAAA;width: 90%'>" . info . "</div>"
+			info := "<div style='font-family: Arial, Helvetica, sans-serif; font-size: 11px'><hr style='border-width:1pt;border-color:#AAAAAA;color:#AAAAAA;width: 90%'>" . info . "</div>"
 
-			widget := window.Add("ActiveX", "x" . x . " yp+352 w" . width . " h58 Y:Move(0.66) W:Grow H:Grow(0.33) VactionsInfoText" . page . " Hidden", "shell.explorer")
+			widget := window.Add("HTMLViewer", "x" . x . " yp+352 w" . width . " h58 Y:Move(0.66) W:Grow H:Grow(0.33) VactionsInfoText" . page . " Hidden")
 
 			html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
-			widget.Value.navigate("about:blank")
-			widget.Value.document.write(html)
+			widget.document.write(html)
 
 			widgets.Push(widget)
 

@@ -1724,10 +1724,10 @@ class RaceStrategist extends GridRaceAssistant {
 				speaker.beginTalk()
 
 				try {
-					if ((options == true) || (options.HasOwnProp("Strategy") && options.Strategy))
+					if ((options == true) || (options.HasProp("Strategy") && options.Strategy))
 						speaker.speakPhrase("Strategy")
 
-					if ((options == true) || (options.HasOwnProp("Pitstops") && options.Pitstops)) {
+					if ((options == true) || (options.HasProp("Pitstops") && options.Pitstops)) {
 						speaker.speakPhrase("Pitstops", {pitstops: knowledgeBase.getValue("Strategy.Pitstop.Count")})
 
 						reported := true
@@ -1736,26 +1736,26 @@ class RaceStrategist extends GridRaceAssistant {
 					nextPitstop := knowledgeBase.getValue("Strategy.Pitstop.Next", false)
 
 					if nextPitstop {
-						if ((options == true) || (options.HasOwnProp("NextPitstop") && options.NextPitstop)) {
+						if ((options == true) || (options.HasProp("NextPitstop") && options.NextPitstop)) {
 							lap := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Lap")
 							refuel := Round(knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Fuel.Amount"))
 							tyreChange := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Change")
 
 							speaker.speakPhrase("NextPitstop", {pitstopLap: lap})
 
-							if ((options == true) || (options.HasOwnProp("Refuel") && options.Refuel))
+							if ((options == true) || (options.HasProp("Refuel") && options.Refuel))
 								speaker.speakPhrase((refuel > 0) ? "Refuel" : "NoRefuel"
 												  , {fuel: displayValue("Float", convertUnit("Volume", refuel)), unit: speaker.Fragments[getUnit("Volume")]})
 
-							if ((options == true) || (options.HasOwnProp("TyreChange") && options.TyreChange))
+							if ((options == true) || (options.HasProp("TyreChange") && options.TyreChange))
 								speaker.speakPhrase(tyreChange ? "TyreChange" : "NoTyreChange")
 						}
 					}
-					else if ((options == true) || (options.HasOwnProp("NextPitstop") && options.NextPitstop))
+					else if ((options == true) || (options.HasProp("NextPitstop") && options.NextPitstop))
 						if !reported
 							speaker.speakPhrase("NoNextPitstop")
 
-					if ((options == true) || (options.HasOwnProp("Map") && options.Map)) {
+					if ((options == true) || (options.HasProp("Map") && options.Map)) {
 						map := knowledgeBase.getValue("Strategy.Map")
 
 						if ((map != "n/a") && (map != knowledgeBase.getValue("Lap." . knowledgeBase.getValue("Lap") . ".Map", "n/a")))

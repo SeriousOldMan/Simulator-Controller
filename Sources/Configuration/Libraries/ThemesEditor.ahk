@@ -88,9 +88,9 @@ class ThemesEditor extends ConfiguratorPanel {
 		themesGui.Add("Text", "w388 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(themesGui, "Themes Editor"))
 
 		themesGui.SetFont("Norm", "Arial")
-		themesGui.SetFont("Italic Underline", "Arial")
 
-		themesGui.Add("Text", "x158 YP+20 w88 H:Center cBlue Center", translate("Themes")).OnEvent("Click", openDocumentation.Bind(themesGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#themes-editor"))
+		themesGui.Add("Documentation", "x158 YP+20 w88 H:Center Center", translate("Themes")
+					, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#themes-editor")
 
 		themesGui.SetFont("Norm", "Arial")
 

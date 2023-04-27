@@ -397,11 +397,8 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 
 		widget13 := window.Add("Text", "x" . x0 . " yp+26 w90 h23 +0x200 Hidden", translate("Contingent"))
 
-		window.SetFont("cGray")
-
-		widget14 := window.Add("Text", "x" . x1 . " yp+4 w" . w1 . " h21 VteamServerTimeText Hidden", translate("Please Login for actual data..."))
-
-		window.SetFont("cBlack Norm", "Arial")
+		widget14 := window.Add("Text", "x" . x1 . " yp+4 w" . w1 . " h21 VteamServerTimeText Hidden c" . this.Window.Theme.TextColor["Disabled"]
+							 , translate("Please Login for actual data..."))
 
 		widget15 := window.Add("Text", "x" . x0 . " yp+31 w90 h23 +0x200 Hidden", translate("Session Token"))
 
@@ -419,7 +416,7 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 		widget21.OnEvent("Click", renewDataToken)
 		setButtonIcon(widget21, kIconsDirectory . "Renew.ico", 1, "L4 T4 R4 B4")
 
-		window.SetFont("cBlack Norm", "Arial")
+		window.SetFont("Norm", "Arial")
 
 		window.SetFont("Italic", "Arial")
 
@@ -570,7 +567,7 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 				availableMinutes := connector.GetAvailableMinutes()
 
 				this.Control["teamServerTimeText"].Text := (availableMinutes . translate(" Minutes"))
-				this.Control["teamServerTimeText"].Opt("+cBlack")
+				this.Control["teamServerTimeText"].Opt("+c" . this.Window.Theme.TextColor["Normal"])
 
 				try {
 					this.Control["teamServerSessionTokenEdit"].Text := connector.GetSessionToken()
@@ -607,7 +604,7 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 			catch Any as exception {
 				this.Control["teamServerSessionTokenEdit"].Text := ""
 				this.Control["teamServerDataTokenEdit"].Text := ""
-				this.Control["teamServerTimeText"].Opt("+cGray")
+				this.Control["teamServerTimeText"].Opt("+c" . this.Window.Theme.TextColor["Disabled"])
 				this.Control["teamServerTimeText"].Text := translate("Please Login for actual data...")
 
 				if message {
@@ -622,7 +619,7 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 		else {
 			this.Control["teamServerSessionTokenEdit"].Text := ""
 			this.Control["teamServerDataTokenEdit"].Text := ""
-			this.Control["teamServerTimeText"].Opt("+cGray")
+			this.Control["teamServerTimeText"].Opt("+c" . this.Window.Theme.TextColor["Disabled"])
 			this.Control["teamServerTimeText"].Text := translate("Please Login for actual data...")
 
 			this.iToken := false
@@ -1030,7 +1027,7 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 		catch Any as exception {
 			local message := exception
 
-			if message.HasOwnProp("Message")
+			if message.HasProp("Message")
 				message := message.Message
 
 			OnMessage(0x44, translateOkButton)

@@ -63,9 +63,9 @@ class FormatsEditor extends ConfiguratorPanel {
 		formatsGui.Add("Text", "w238 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(formatsGui, "Formats Editor"))
 
 		formatsGui.SetFont("Norm", "Arial")
-		formatsGui.SetFont("Italic Underline", "Arial")
 
-		formatsGui.Add("Text", "x63 YP+20 w128 cBlue Center", translate("Units && Formats")).OnEvent("Click", openDocumentation.Bind(formatsGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#units-and-formats"))
+		formatsGui.Add("Documentation", "x63 YP+20 w128 Center", translate("Units && Formats")
+					 , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#units-and-formats")
 
 		formatsGui.SetFont("Norm", "Arial")
 

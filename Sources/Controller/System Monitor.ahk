@@ -32,6 +32,7 @@
 ;;;                          Local Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include "..\Libraries\HTMLViewer.ahk"
 #Include "..\Libraries\Task.ahk"
 #Include "..\Libraries\Messages.ahk"
 #Include "..\Database\Libraries\SessionDatabase.ahk"
@@ -124,17 +125,20 @@ updateDashboard(window, viewer, html := "") {
 		<meta charset='utf-8'>
 		<head>
 			<style>
-				.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: 'FFFFFF'; }
-				.rowStyle { font-size: 11px; background-color: 'E0E0E0'; }
-				.oddRowStyle { font-size: 11px; background-color: 'E8E8E8'; }
+				.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
+				.rowStyle { font-size: 11px; background-color: #%evenRowBackColor%; }
+				.oddRowStyle { font-size: 11px; background-color: #%oddRowBackColor%; }
 				%tableCSS%
 			</style>
 		</head>
 	)"
 
-	script := substituteVariables(script, {tableCSS: getTableCSS(window)})
+	script := substituteVariables(script, {tableCSS: getTableCSS(window)
+										 , headerBackColor: window.Theme.ListBackColor["Header"]
+										 , evenRowBackColor: window.Theme.ListBackColor["EvenRow"]
+										 , oddRowBackColor: window.Theme.ListBackColor["OddRow"]})
 
-	html := ("<html>" . script . "<body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 10px }</style><style> #header { font-size: 12px; } </style><div>" . html . "</div></body></html>")
+	html := ("<html>" . script . "<body style='background-color: #" . window.BackColor . "; overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 10px }</style><style> #header { font-size: 12px; } </style><div>" . html . "</div></body></html>")
 
 	viewer.document.open()
 	viewer.document.write(html)
@@ -761,9 +765,9 @@ systemMonitor(command := false, arguments*) {
 		systemMonitorGui.Add("Text", "w780 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(systemMonitorGui, "System Monitor"))
 
 		systemMonitorGui.SetFont("s9 Norm", "Arial")
-		systemMonitorGui.SetFont("Italic Underline", "Arial")
 
-		systemMonitorGui.Add("Text", "x333 YP+20 w140 cBlue Center", translate("Monitoring")).OnEvent("Click", openDocumentation.Bind(systemMonitorGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#monitoring-health-and-activities"))
+		systemMonitorGui.Add("Documentation", "x333 YP+20 w140 Center", translate("Monitoring")
+						   , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#monitoring-health-and-activities")
 
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
@@ -781,8 +785,7 @@ systemMonitor(command := false, arguments*) {
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
 		simulationState := systemMonitorGui.Add("Picture", "x34 ys+73 w32 h32", kIconsDirectory . "Black.ico")
-		simulationDashboard := systemMonitorGui.Add("ActiveX", "x94 ys+46 w300 h90", "shell.explorer").Value
-		simulationDashboard.navigate("about:blank")
+		simulationDashboard := systemMonitorGui.Add("HTMLViewer", "x94 ys+46 w300 h95")
 
 		systemMonitorGui.SetFont("Italic", "Arial")
 		systemMonitorGui.Add("GroupBox", "x405 ys+28 w375 h9", translate("Race Assistants"))
@@ -790,8 +793,7 @@ systemMonitor(command := false, arguments*) {
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
 		assistantsState := systemMonitorGui.Add("Picture", "x415 ys+73 w32 h32", kIconsDirectory . "Black.ico")
-		assistantsDashboard := systemMonitorGui.Add("ActiveX", "x475 ys+46 w300 h90", "shell.explorer").Value
-		assistantsDashboard.navigate("about:blank")
+		assistantsDashboard := systemMonitorGui.Add("HTMLViewer", "x475 ys+46 w300 h95")
 
 		systemMonitorGui.SetFont("Italic", "Arial")
 		systemMonitorGui.Add("GroupBox", "x24 ys+138 w375 h9", translate("Team Session"))
@@ -799,8 +801,7 @@ systemMonitor(command := false, arguments*) {
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
 		sessionState := systemMonitorGui.Add("Picture", "x34 ys+183 w32 h32 vsessionState", kIconsDirectory . "Black.ico")
-		sessionDashboard := systemMonitorGui.Add("ActiveX", "x94 ys+156 w300 h90", "shell.explorer").Value
-		sessionDashboard.navigate("about:blank")
+		sessionDashboard := systemMonitorGui.Add("HTMLViewer", "x94 ys+156 w300 h95")
 
 		systemMonitorGui.SetFont("Italic", "Arial")
 		systemMonitorGui.Add("GroupBox", "x405 ys+138 w375 h9", translate("Data Synchronization"))
@@ -808,8 +809,7 @@ systemMonitor(command := false, arguments*) {
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
 		dataState := systemMonitorGui.Add("Picture", "x415 ys+183 w32 h32 vdataState", kIconsDirectory . "Black.ico")
-		dataDashboard := systemMonitorGui.Add("ActiveX", "x475 ys+156 w300 h90", "shell.explorer").Value
-		dataDashboard.navigate("about:blank")
+		dataDashboard := systemMonitorGui.Add("HTMLViewer", "x475 ys+156 w300 h95")
 
 		systemMonitorGui.SetFont("Italic", "Arial")
 		systemMonitorGui.Add("GroupBox", "x24 ys+248 w375 h9", translate("Track Automation"))
@@ -817,8 +817,7 @@ systemMonitor(command := false, arguments*) {
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
 		automationState := systemMonitorGui.Add("Picture", "x34 ys+293 w32 h32 vautomationState", kIconsDirectory . "Black.ico")
-		automationDashboard := systemMonitorGui.Add("ActiveX", "x94 ys+266 w300 h90", "shell.explorer").Value
-		automationDashboard.navigate("about:blank")
+		automationDashboard := systemMonitorGui.Add("HTMLViewer", "x94 ys+266 w300 h95")
 
 		systemMonitorGui.SetFont("Italic", "Arial")
 		systemMonitorGui.Add("GroupBox", "x405 ys+248 w375 h9", translate("Track Mapping"))
@@ -826,8 +825,7 @@ systemMonitor(command := false, arguments*) {
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
 		mapperState := systemMonitorGui.Add("Picture", "x415 ys+293 w32 h32 vmapperState", kIconsDirectory . "Black.ico")
-		mapperDashboard := systemMonitorGui.Add("ActiveX", "x475 ys+266 w300 h90", "shell.explorer").Value
-		mapperDashboard.navigate("about:blank")
+		mapperDashboard := systemMonitorGui.Add("HTMLViewer", "x475 ys+266 w300 h95")
 
 		monitorTabView.UseTab(2)
 
@@ -939,14 +937,6 @@ systemMonitor(command := false, arguments*) {
 		PeriodicTask(systemMonitor.Bind("UpdateServer"), 5000, kLowPriority).start()
 
 		gStartupFinished := true
-
-		loop
-			Sleep(100)
-		until result
-
-		systemMonitorGui.Destroy()
-
-		return ((result = kClose) ? false : true)
 	}
 }
 
@@ -978,8 +968,6 @@ startSystemMonitor() {
 	TraySetIcon(icon, "1")
 	A_IconTip := "System Monitor"
 
-	fixIE(11)
-
 	registerMessageHandler("Monitoring", monitoringMessageHandler)
 
 	deleteFile(kTempDirectory . "Simulator Controller.state")
@@ -989,8 +977,6 @@ startSystemMonitor() {
 	PeriodicTask(clearOrphaneStateFiles, 60000, kLowPriority).start()
 
 	systemMonitor()
-
-	ExitApp(0)
 }
 
 ;;;-------------------------------------------------------------------------;;;

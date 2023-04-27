@@ -32,6 +32,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include "..\Libraries\HTMLViewer.ahk"
 #Include "..\Libraries\Task.ahk"
 #Include "..\Libraries\Math.ahk"
 #Include "..\Libraries\RuleEngine.ahk"
@@ -117,11 +118,14 @@ class SetupWorkbench extends ConfigurationItem {
 		}
 	}
 
-	class AdivisorResizer extends Window.Resizer {
+	class WorkbenchResizer extends Window.Resizer {
+		iSettingsViewer := false
 		iRedraw := false
 
-		__New(arguments*) {
-			super.__New(arguments*)
+		__New(window, settingsViewer, arguments*) {
+			this.iSettingsViewer := settingsViewer
+
+			super.__New(window, arguments*)
 
 			Task.startTask(ObjBindMethod(this, "RedrawHTMLViwer"), 500, kLowPriority)
 		}
@@ -139,6 +143,8 @@ class SetupWorkbench extends ConfigurationItem {
 						return Task.CurrentTask
 
 				this.iRedraw := false
+
+				this.iSettingsViewer.Resized()
 
 				try
 					this.Window.Workbench.updateRecommendations(true, false)
@@ -417,10 +423,10 @@ class SetupWorkbench extends ConfigurationItem {
 		workbenchGui.Add("Text", "w1184 Center H:Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(workbenchGui, "Setup Workbench"))
 
 		workbenchGui.SetFont("s9 Norm", "Arial")
-		workbenchGui.SetFont("Italic Underline", "Arial")
 
-		workbenchGui.Add("Text", "x508 YP+20 w184 cBlue Center H:Center", translate("Setup Workbench")).OnEvent("Click", openDocumentation.Bind(workbenchGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench"))
-
+		workbenchGui.Add("Documentation", "x508 YP+20 w184 Center H:Center", translate("Setup Workbench")
+					   , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench")
+					   
 		workbenchGui.Add("Text", "x8 yp+30 w1200 W:Grow 0x10 Section")
 
 		workbenchGui.SetFont("Norm")
@@ -505,9 +511,8 @@ class SetupWorkbench extends ConfigurationItem {
 
 		workbenchGui.SetFont("s8 Norm", "Arial")
 
-		this.iSettingsViewer := workbenchGui.Add("ActiveX", "x420 yp+30 w775 h621 W:Grow H:Grow Border vsettingsViewer", "shell.explorer").Value
-		this.SettingsViewer.navigate("about:blank")
-
+		this.iSettingsViewer := workbenchGui.Add("HTMLViewer", "x420 yp+30 w775 h621 W:Grow H:Grow Border vsettingsViewer")
+		
 		this.showSettingsChart(false)
 
 		/*
@@ -521,7 +526,7 @@ class SetupWorkbench extends ConfigurationItem {
 		workbenchGui.Add("Button", "x574 y738 w80 h23 Y:Move H:Center", translate("Close")).OnEvent("Click", closeSetupWorkbench)
 		*/
 
-		workbenchGui.Add(SetupWorkbench.AdivisorResizer(workbenchGui))
+		workbenchGui.Add(SetupWorkbench.WorkbenchResizer(workbenchGui, this.iSettingsViewer))
 	}
 
 	show() {
@@ -665,17 +670,21 @@ class SetupWorkbench extends ConfigurationItem {
 						<meta charset='utf-8'>
 						<head>
 							<style>
-								.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: 'FFFFFF'; }
-								.rowStyle { font-size: 11px; background-color: 'E0E0E0'; }
-								.oddRowStyle { font-size: 11px; background-color: 'E8E8E8'; }
+								.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
+								.rowStyle { font-size: 11px; background-color: #%evenRowBackColor%; }
+								.oddRowStyle { font-size: 11px; background-color: #%oddRowBackColor%; }
 							</style>
 							<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 							<script type="text/javascript">
 								google.charts.load('current', {'packages':['corechart', 'table', 'bar']}).then(drawChart);
 					)"
+				
+					before := substituteVariables(before, {headerBackColor: this.Window.Theme.ListBackColor["Header"]
+														 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
+														 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
 
-					width := this.SettingsViewer.Width
-					height := (this.SettingsViewer.Height - 110 - 1)
+					width := this.SettingsViewer.getWidth() - 4
+					height := (this.SettingsViewer.getHeight() - 110 - 4)
 
 					info := getMultiMapValue(this.Definition, "Setup.Info", "ChangeWarning", "")
 
@@ -704,8 +713,8 @@ class SetupWorkbench extends ConfigurationItem {
 					this.SettingsViewer.document.write(before . content . after)
 				}
 				else {
-					width := this.SettingsViewer.Width
-					height := (this.SettingsViewer.Height - 1)
+					width := this.SettingsViewer.getWidth() - 4
+					height := (this.SettingsViewer.getHeight() - 4)
 
 					html := ""
 
@@ -786,7 +795,7 @@ class SetupWorkbench extends ConfigurationItem {
 
 					drawChartFunction .= "`n]);"
 
-					drawChartFunction := drawChartFunction . "`nvar options = { legend: 'none', vAxis: { textPosition: 'none', baseline: 'none' }, bars: 'horizontal', backgroundColor: 'D8D8D8', chartArea: { left: '5%', top: '5%', right: '5%', bottom: '5%' } };"
+					drawChartFunction := drawChartFunction . "`nvar options = { legend: 'none', vAxis: { textPosition: 'none', baseline: 'none' }, bars: 'horizontal', backgroundColor: '" . this.Window.AltBackColor . "', chartArea: { left: '5%', top: '5%', right: '5%', bottom: '5%' } };"
 				}
 				else {
 					drawChartFunction .= "`n['" . values2String("', '", names*) . "'],"
@@ -795,7 +804,7 @@ class SetupWorkbench extends ConfigurationItem {
 
 					drawChartFunction .= "`n]);"
 
-					drawChartFunction := drawChartFunction . "`nvar options = { bar: { groupWidth: " . (settings.Length * 16) . " }, vAxis: { textPosition: 'none', baseline: 'none' }, hAxis: {maxValue: 1, minValue: -1}, bars: 'horizontal', backgroundColor: 'D8D8D8', chartArea: { left: '5%', top: '5%', right: '40%', bottom: '5%' } };"
+					drawChartFunction := drawChartFunction . "`nvar options = { bar: { groupWidth: " . (settings.Length * 16) . " }, vAxis: { textPosition: 'none', baseline: 'none' }, hAxis: {maxValue: 1, minValue: -1}, bars: 'horizontal', backgroundColor: '" . this.Window.AltBackColor . "', chartArea: { left: '5%', top: '5%', right: '40%', bottom: '5%' } };"
 				}
 
 				drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.BarChart(document.getElementById('chart_id')); chart.draw(data, options); }"
@@ -2127,9 +2136,9 @@ class SetupEditor extends ConfigurationItem {
 		editorGui.Add("Text", "w784 Center H:Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(editorGui, "Setup Workbench.Setup Editor"))
 
 		editorGui.SetFont("s9 Norm", "Arial")
-		editorGui.SetFont("Italic Underline", "Arial")
 
-		editorGui.Add("Text", "x308 YP+20 w184 cBlue Center H:Center", translate("Setup Editor")).OnEvent("Click", openDocumentation.Bind(editorGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#managing-car-setups"))
+		editorGui.Add("Documentation", "x308 YP+20 w184 Center H:Center", translate("Setup Editor")
+					, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#managing-car-setups")
 
 		editorGui.SetFont("s8 Norm", "Arial")
 
@@ -2746,9 +2755,9 @@ class SetupComparator extends ConfigurationItem {
 		comparatorGui.Add("Text", "w784 Center H:Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(comparatorGui, "Setup Workbench.Setup Comparator"))
 
 		comparatorGui.SetFont("s9 Norm", "Arial")
-		comparatorGui.SetFont("Italic Underline", "Arial")
 
-		comparatorGui.Add("Text", "x308 YP+20 w184 cBlue Center H:Center", translate("Setup Comparator")).OnEvent("Click", openDocumentation.Bind(comparatorGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#comparing-car-setups"))
+		comparatorGui.Add("Documentation", "x308 YP+20 w184 Center H:Center", translate("Setup Comparator")
+						, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#comparing-car-setups")
 
 		comparatorGui.SetFont("s8 Norm", "Arial")
 
@@ -3174,8 +3183,6 @@ runSetupWorkbench() {
 				index += 1
 		}
 	}
-
-	fixIE(11)
 
 	if car
 		car := SessionDatabase.getCarName(simulator, car)

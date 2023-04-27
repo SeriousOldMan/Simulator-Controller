@@ -100,9 +100,7 @@ class ApplicationsConfigurator extends ConfigurationItemList {
 
 		window.Add("Text", "x16 y367 w140 h23 Y:Move +0x200", translate("Window Title (optional)"))
 
-		window.SetFont("c505050 s8")
-
-		window.Add("Text", "x24 y385 w133 h23 Y:Move", translate("(Use AHK WinTitle Syntax)"))
+		window.Add("Text", "x24 y385 w133 h23 Y:Move c" . window.Theme.TextColor["Disabled"], translate("(Use AHK WinTitle Syntax)"))
 
 		window.SetFont()
 
@@ -195,7 +193,7 @@ class ApplicationsConfigurator extends ConfigurationItemList {
 			this.Control["applicationUpdateButton"].Enabled := false
 		}
 
-		if (isSet(LaunchpadConfigurator) && LaunchpadConfigurator.hasOwnProp("Instance"))
+		if (isSet(LaunchpadConfigurator) && LaunchpadConfigurator.hasProp("Instance"))
 			try
 				LaunchpadConfigurator.Instance.loadApplicationChoices(true)
 	}

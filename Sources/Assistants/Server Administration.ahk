@@ -632,9 +632,9 @@ administrationEditor(configurationOrCommand, arguments*) {
 		administrationGui.Add("Text", "w388 Center H:Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(administrationGui, "Server Administration"))
 
 		administrationGui.SetFont("Norm", "Arial")
-		administrationGui.SetFont("Italic Underline", "Arial")
 
-		administrationGui.Add("Text", "x118 YP+20 w168 cBlue Center H:Center", translate("Server Administration")).OnEvent("Click", openDocumentation.Bind(administrationGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#server-administration"))
+		administrationGui.Add("Documentation", "x118 YP+20 w168 Center H:Center", translate("Server Administration")
+							, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#server-administration")
 
 		administrationGui.SetFont("Norm", "Arial")
 

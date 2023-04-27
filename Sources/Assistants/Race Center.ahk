@@ -34,6 +34,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include "..\Libraries\HTMLViewer.ahk"
 #Include "..\Libraries\Messages.ahk"
 #Include "..\Libraries\Math.ahk"
 #Include "..\Libraries\CLR.ahk"
@@ -303,6 +304,7 @@ class RaceCenter extends ConfigurationItem {
 
 		RedrawHTMLViwer() {
 			if this.iRedraw {
+				local center := RaceCenter.Instance
 				local ignore, button
 
 				for ignore, button in ["LButton", "MButton", "RButton"]
@@ -311,7 +313,10 @@ class RaceCenter extends ConfigurationItem {
 
 				this.iRedraw := false
 
-				RaceCenter.Instance.pushTask(ObjBindMethod(RaceCenter.Instance, "updateReports", true))
+				center.ChartViewer.Resized()
+				center.DetailsViewer.Resized()
+
+				center.pushTask(ObjBindMethod(RaceCenter.Instance, "updateReports", true))
 			}
 
 			return Task.CurrentTask
@@ -1827,9 +1832,9 @@ class RaceCenter extends ConfigurationItem {
 		centerGui.Add("Text", "w1334 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(centerGui, "Race Center"))
 
 		centerGui.SetFont("s9 Norm", "Arial")
-		centerGui.SetFont("Italic Underline", "Arial")
 
-		centerGui.Add("Text", "x608 YP+20 w134 H:Center cBlue Center", translate("Race Center")).OnEvent("Click", openDocumentation.Bind(centerGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#race-center"))
+		centerGui.Add("Documentation", "x608 YP+20 w134 H:Center Center", translate("Race Center")
+					, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#race-center")
 
 		centerGui.Add("Text", "x8 yp+30 w1350 W:Grow 0x10")
 
@@ -1917,24 +1922,26 @@ class RaceCenter extends ConfigurationItem {
 		centerGui.Add("Button", "x1327 yp w23 h23 X:Move vreportSettingsButton").OnEvent("Click", reportSettings)
 		setButtonIcon(centerGui["reportSettingsButton"], kIconsDirectory . "General Settings.ico", 1)
 
-		this.iChartViewer := centerGui.Add("ActiveX", "x400 yp+24 w950 h343 W:Grow H:Grow(0.2) Border vchartViewer", "shell.explorer").Value
-		this.iChartViewer.navigate("about:blank")
+		this.iChartViewer := centerGui.Add("HTMLViewer", "x400 yp+24 w950 h343 W:Grow H:Grow(0.2) Border vchartViewer")
 
 		centerGui.Rules := "Y:Move(0.2)"
 
 		centerGui.Add("Text", "x8 yp+351 w1350 W:Grow 0x10")
 
-		centerGui.SetFont("s8 Norm cBlack", "Arial")
+		centerGui.SetFont("s8 Norm", "Arial")
 
 		centerGui.Add("Picture", "x16 yp+10 w30 h30 Section", kIconsDirectory . "Tools BW.ico")
 		centerGui.Add("Text", "x50 yp+5 w80 h26", translate("Session"))
 
 		centerGui.Add("Text", "x935 yp+8 w381 0x2 X:Move vmessageField")
 
-		this.iWaitViewer := centerGui.Add("ActiveX", "x1323 yp-8 w30 h30 X:Move vwaitViewer", "shell.explorer").Value
-		this.iWaitViewer.navigate("about:blank")
+		this.iWaitViewer := centerGui.Add("HTMLViewer", "x1323 yp-8 w30 h30 X:Move vwaitViewer Hidden")
 
-		centerGui.SetFont("s8 Norm cBlack", "Arial")
+		this.iWaitViewer.document.open()
+		this.iWaitViewer.document.write("<html><body style='background-color: #" . this.Window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><img src='" . (kResourcesDirectory . "Wait.gif") . "' width=28 height=28 border=0 padding=0></body></html>")
+		this.iWaitViewer.document.close()
+
+		centerGui.SetFont("s8 Norm", "Arial")
 
 		centerGui.Add("DropDownList", "x195 yp-2 w180 Choose1 +0x200 vsessionMenuDropDown").OnEvent("Change", sessionMenu)
 
@@ -1952,8 +1959,7 @@ class RaceCenter extends ConfigurationItem {
 		centerGui.Add("Text", "x619 ys+39 w80 h21", translate("Output"))
 		centerGui.Add("Text", "x700 yp+7 w651 0x10 W:Grow")
 
-		this.iDetailsViewer := centerGui.Add("ActiveX", "x619 yp+14 w732 h293 W:Grow H:Grow(0.8) Border vdetailsViewer", "shell.explorer").Value
-		this.iDetailsViewer.navigate("about:blank")
+		this.iDetailsViewer := centerGui.Add("HTMLViewer", "x619 yp+14 w732 h293 W:Grow H:Grow(0.8) Border vdetailsViewer")
 
 		this.iStrategyViewer := StrategyViewer(centerGui, this.iDetailsViewer)
 
@@ -5269,24 +5275,25 @@ class RaceCenter extends ConfigurationItem {
 				this.iWorking := 0
 		}
 
-		curAutoActivate := this.Window.AutoActivate
+		if state {
+			this.Window.Opt("+Disabled")
 
-		try {
-			this.Window.AutoActivate := false
-
-			this.Window.Opt(state ? "+Disabled" : "-Disabled")
+			this.WaitViewer.Show()
 		}
-		finally {
-			this.Window.AutoActivate := curAutoActivate
+		else {
+			this.WaitViewer.Hide()
+
+			curAutoActivate := this.Window.AutoActivate
+
+			try {
+				this.Window.AutoActivate := false
+
+				this.Window.Opt("-Disabled")
+			}
+			finally {
+				this.Window.AutoActivate := curAutoActivate
+			}
 		}
-
-		document.open()
-
-		html := (state ? ("<img src='" . (kResourcesDirectory . "Wait.gif") . "' width=28 height=28 border=0 padding=0></body></html>") : "")
-		html := ("<html><body style='background-color: #" . this.Window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . html . "</body></html>")
-
-		document.write(html)
-		document.close()
 
 		return (start || (this.iWorking == 0))
 	}
@@ -6000,7 +6007,7 @@ class RaceCenter extends ConfigurationItem {
 					this.iAirTemperature := lastLap.AirTemperature
 					this.iTrackTemperature := lastLap.TrackTemperature
 
-					if lastLap.HasOwnProp("Weather10Min") {
+					if lastLap.HasProp("Weather10Min") {
 						this.iWeather10Min := lastLap.Weather10Min
 						this.iWeather30Min := lastLap.Weather30Min
 					}
@@ -7464,7 +7471,7 @@ class RaceCenter extends ConfigurationItem {
 	computeDuration(stint) {
 		local duration, duration, ignore, lap
 
-		if stint.HasOwnProp("Duration")
+		if stint.HasProp("Duration")
 			return stint.Duration
 		else {
 			duration := 0
@@ -7482,7 +7489,7 @@ class RaceCenter extends ConfigurationItem {
 	computeEndTime(stint, update := false) {
 		local time, duration
 
-		if stint.HasOwnProp("EndTime")
+		if stint.HasProp("EndTime")
 			return stint.EndTime
 		else {
 			time := this.computeStartTime(stint)
@@ -7500,7 +7507,7 @@ class RaceCenter extends ConfigurationItem {
 	computeStartTime(stint) {
 		local time
 
-		if stint.HasOwnProp("StartTime")
+		if stint.HasProp("StartTime")
 			return stint.StartTime
 		else {
 			if (stint.Nr = 1) {
@@ -8305,7 +8312,7 @@ class RaceCenter extends ConfigurationItem {
 							this.iAirTemperature := lastLap.AirTemperature
 							this.iTrackTemperature := lastLap.TrackTemperature
 
-							if lastLap.HasOwnProp("Weather10Min") {
+							if lastLap.HasProp("Weather10Min") {
 								this.iWeather10Min := lastLap.Weather10Min
 								this.iWeather30Min := lastLap.Weather30Min
 							}
@@ -8347,26 +8354,40 @@ class RaceCenter extends ConfigurationItem {
 			    <meta charset='utf-8'>
 				<head>
 					<style>
-						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: 'FFFFFF'; }
-						.rowStyle { font-size: 11px; background-color: 'E0E0E0'; }
-						.oddRowStyle { font-size: 11px; background-color: 'E8E8E8'; }
+						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
+						.rowStyle { font-size: 11px; background-color: #%evenRowBackColor%; }
+						.oddRowStyle { font-size: 11px; background-color: #%oddRowBackColor%; }
 					</style>
 					<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 					<script type="text/javascript">
 						google.charts.load('current', {'packages':['corechart', 'table', 'scatter']}).then(drawChart);
 			)"
 
+			before := substituteVariables(before, {headerBackColor: this.Window.Theme.ListBackColor["Header"]
+												 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
+												 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
+
 			after := "
 			(
 					</script>
 				</head>
 				<body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
+					<style>
+						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
+						.rowStyle { font-size: 11px; background-color: #%evenRowBackColor%; }
+						.oddRowStyle { font-size: 11px; background-color: #%oddRowBackColor%; }
+					</style>
 					<div id="chart_id" style="width: %width%px; height: %height%px"></div>
 				</body>
 			</html>
 			)"
 
-			html := (before . drawChartFunction . substituteVariables(after, {width: (this.ChartViewer.Width - 5), height: (this.ChartViewer.Height - 5), backColor: this.Window.AltBackColor}))
+			html := (before . drawChartFunction . substituteVariables(after, {width: (this.ChartViewer.getWidth() - 5)
+																			, height: (this.ChartViewer.getHeight() - 5)
+																			, backColor: this.Window.AltBackColor
+																			, headerBackColor: this.Window.Theme.ListBackColor["Header"]
+																			, evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
+																			, oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]}))
 
 			this.ChartViewer.document.write(html)
 		}
@@ -8514,9 +8535,9 @@ class RaceCenter extends ConfigurationItem {
 				<meta charset='utf-8'>
 				<head>
 					<style>
-						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: 'FFFFFF'; }
-						.rowStyle { font-size: 11px; background-color: 'E0E0E0'; }
-						.oddRowStyle { font-size: 11px; background-color: 'E8E8E8'; }
+						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
+						.rowStyle { font-size: 11px; background-color: #%evenRowBackColor%; }
+						.oddRowStyle { font-size: 11px; background-color: #%oddRowBackColor%; }
 						%tableCSS%
 					</style>
 					<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
@@ -8526,7 +8547,10 @@ class RaceCenter extends ConfigurationItem {
 						function drawCharts() {
 			)"
 
-			script := substituteVariables(script, {tableCSS: this.StrategyViewer.getTableCSS()})
+			script := substituteVariables(script, {tableCSS: this.StrategyViewer.getTableCSS()
+												 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
+												 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
+												 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
 
 			for ignore, chart in charts
 				script .= (A_Space . "drawChart" . chart[1] . "();")
@@ -8545,7 +8569,7 @@ class RaceCenter extends ConfigurationItem {
 		else
 			script := ""
 
-		html := ("<html>" . script . "<body style='background-color: #" . this.Window.AltBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { font-size: 12px; } </style><div>" . html . "</div></body></html>")
+		html := ("<html>" . script . "<body style='background-color: #" . this.Window.AltBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { font-size: 12px; }</style><div>" . html . "</div></body></html>")
 
 		this.iSelectedDetailHTML := html
 
@@ -8720,8 +8744,8 @@ class RaceCenter extends ConfigurationItem {
 			fileName := sessionDB.getTrackImage(this.Simulator, this.Track)
 
 			if (trackMap && fileName) {
-				width := this.ChartViewer.Width
-				height := this.ChartViewer.Height
+				width := this.ChartViewer.getWidth()
+				height := this.ChartViewer.getHeight()
 
 				scale := getMultiMapValue(trackMap, "Map", "Scale")
 
@@ -8902,15 +8926,18 @@ class RaceCenter extends ConfigurationItem {
 					<style>
 						.lbox { float: left; text-align: center; width: %hWidth%; }
 						.rbox { float: right; }
-						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: 'FFFFFF'; }
-						.rowStyle { font-size: 11px; background-color: 'E0E0E0'; }
-						.oddRowStyle { font-size: 11px; background-color: 'E8E8E8'; }
+						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
+						.rowStyle { font-size: 11px; background-color: #%evenRowBackColor%; }
+						.oddRowStyle { font-size: 11px; background-color: #%oddRowBackColor%; }
 						%tableCSS%
 					</style>
 				</head>
 			)"
 
-			script := substituteVariables(script, {tableCSS: this.StrategyViewer.getTableCSS(), hWidth: Round(width / 2.5)})
+			script := substituteVariables(script, {tableCSS: this.StrategyViewer.getTableCSS(), hWidth: Round(width / 2.5)
+												 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
+												 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
+												 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
 
 			html := ("<html>" . script . "<body style='background-color: #" . this.Window.AltBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { font-size: 12px; } </style><div>" . html . "</div></body></html>")
 
@@ -9801,7 +9828,7 @@ class RaceCenter extends ConfigurationItem {
 								. "]")
 		}
 
-		drawChartFunction .= ("]);`nvar options = { legend: { position: 'Right' }, chartArea: { left: '10%', top: '5%', right: '25%', bottom: '20%' }, hAxis: { title: '" . translate("Lap") . "', gridlines: {count: 0} }, vAxis: { viewWindow: { min: 0 }, gridlines: {count: 0} }, backgroundColor: 'D8D8D8' };`n")
+		drawChartFunction .= ("]);`nvar options = { legend: { position: 'Right' }, chartArea: { left: '10%', top: '5%', right: '25%', bottom: '20%' }, hAxis: { title: '" . translate("Lap") . "', gridlines: {count: 0} }, vAxis: { viewWindow: { min: 0 }, gridlines: {count: 0} }, backgroundColor: '" . this.Window.AltBackColor . "' };`n")
 
 		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_" . chartID . "')); chart.draw(data, options); }")
 
@@ -9829,7 +9856,7 @@ class RaceCenter extends ConfigurationItem {
 		minValue := Min(0, stint.Potential, stint.RaceCraft, stint.Speed, stint.Consistency, stint.CarControl)
 		maxValue := Max(stint.Potential, stint.RaceCraft, stint.Speed, stint.Consistency, stint.CarControl)
 
-		drawChartFunction := drawChartFunction . "`nvar options = { bars: 'horizontal', legend: 'none', backgroundColor: 'D8D8D8', chartArea: { left: '20%', top: '5%', right: '10%', bottom: '10%' }, hAxis: {viewWindowMode: 'explicit', viewWindow: {min: " . minValue . ", max: " . maxValue . "}, gridlines: {count: 0} }, vAxis: {gridlines: {count: 0}} };"
+		drawChartFunction := drawChartFunction . "`nvar options = { bars: 'horizontal', legend: 'none', backgroundColor: '" . this.Window.AltBackColor . "', chartArea: { left: '20%', top: '5%', right: '10%', bottom: '10%' }, hAxis: {viewWindowMode: 'explicit', viewWindow: {min: " . minValue . ", max: " . maxValue . "}, gridlines: {count: 0} }, vAxis: {gridlines: {count: 0}} };"
 		drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.BarChart(document.getElementById('chart_" . chartID . "')); chart.draw(data, options); }"
 
 		return drawChartFunction
@@ -9992,7 +10019,7 @@ class RaceCenter extends ConfigurationItem {
 				temperatures.Push(lapTable[lap.Nr]["Tyre.Temperature.Average"])
 			}
 
-			width := (this.DetailsViewer.Width - 20)
+			width := (this.DetailsViewer.getWidth() - 20)
 
 			chart1 := this.createLapDetailsChart(1, width, 248, laps, positions, lapTimes, fuelConsumptions, temperatures)
 
@@ -10930,18 +10957,18 @@ class RaceCenter extends ConfigurationItem {
 		text := "
 		(
 		var options = {
-			backgroundColor: 'D8D8D8', chartArea: { left: '10`%', top: '5`%', right: '5`%', bottom: '20`%' },
+			backgroundColor: '//backColor//', chartArea: { left: '10`%', top: '5`%', right: '5`%', bottom: '20`%' },
 			legend: { position: 'none' },
 		)"
 
-		drawChartFunction .= text
+		drawChartFunction .= StrReplace(text, "//backColor//", this.Window.AltBackColor)
 
 		text := "
 		(
 			hAxis: { title: '%drivers%', gridlines: {count: 0} },
 			vAxis: { title: '%seconds%', gridlines: {count: 0} },
 			lineWidth: 0,
-			series: [ { 'color': 'D8D8D8' } ],
+			series: [ { 'color': '%backColor%' } ],
 			intervals: { barWidth: 1, boxWidth: 1, lineWidth: 2, style: 'boxes' },
 			interval: { max: { style: 'bars', fillOpacity: 1, color: '#777' },
 						min: { style: 'bars', fillOpacity: 1, color: '#777' },
@@ -10949,7 +10976,8 @@ class RaceCenter extends ConfigurationItem {
 		};
 		)"
 
-		drawChartFunction .= ("`n" . substituteVariables(text, {drivers: translate("Drivers"), seconds: translate("Seconds")}))
+		drawChartFunction .= ("`n" . substituteVariables(text, {drivers: translate("Drivers"), seconds: translate("Seconds")
+															  , backColor: this.Window.AltBackColor}))
 
 		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_" . chartID . "')); chart.draw(data, options); }")
 
@@ -10988,7 +11016,7 @@ class RaceCenter extends ConfigurationItem {
 		minValue := Min(0, minimum(potentialsData), minimum(raceCraftsData), minimum(speedsData), minimum(consistenciesData), minimum(carControlsData))
 		maxValue := Max(maximum(potentialsData), maximum(raceCraftsData), maximum(speedsData), maximum(consistenciesData), maximum(carControlsData))
 
-		drawChartFunction .= "`nvar options = { bars: 'horizontal', backgroundColor: 'D8D8D8', chartArea: { left: '15%', top: '5%', right: '30%', bottom: '10%' }, hAxis: {viewWindowMode: 'explicit', viewWindow: {min: " . minValue . ", max: " . maxValue . "}, gridlines: {count: 0} }, vAxis: {gridlines: {count: 0}} };"
+		drawChartFunction .= "`nvar options = { bars: 'horizontal', backgroundColor: '" . this.Window.AltBackColor . "', chartArea: { left: '15%', top: '5%', right: '30%', bottom: '10%' }, hAxis: {viewWindowMode: 'explicit', viewWindow: {min: " . minValue . ", max: " . maxValue . "}, gridlines: {count: 0} }, vAxis: {gridlines: {count: 0}} };"
 		drawChartFunction .= ("`nvar chart = new google.visualization.BarChart(document.getElementById('chart_" . chartID . "')); chart.draw(data, options); }")
 
 		return drawChartFunction
@@ -11005,7 +11033,7 @@ class RaceCenter extends ConfigurationItem {
 
 		html .= ("<br>" . this.createDriverDetails(this.Drivers))
 
-		width := (this.DetailsViewer.Width - 20)
+		width := (this.DetailsViewer.getWidth() - 20)
 
 		html .= ("<br><br><div id=`"header`"><i>" . translate("Pace") . "</i></div>")
 
@@ -11049,7 +11077,7 @@ class RaceCenter extends ConfigurationItem {
 								. "]")
 		}
 
-		drawChartFunction .= ("]);`nvar options = { legend: { position: 'Right' }, chartArea: { left: '10%', top: '5%', right: '25%', bottom: '20%' }, hAxis: { title: '" . translate("Lap") . "', gridlines: {count: 0} }, vAxis: { viewWindow: { min: 0 }, gridlines: {count: 0} }, backgroundColor: 'D8D8D8' };`n")
+		drawChartFunction .= ("]);`nvar options = { legend: { position: 'Right' }, chartArea: { left: '10%', top: '5%', right: '25%', bottom: '20%' }, hAxis: { title: '" . translate("Lap") . "', gridlines: {count: 0} }, vAxis: { viewWindow: { min: 0 }, gridlines: {count: 0} }, backgroundColor: '" . this.Window.AltBackColor . "' };`n")
 
 		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_" . chartID . "')); chart.draw(data, options); }")
 
@@ -11184,7 +11212,7 @@ class RaceCenter extends ConfigurationItem {
 					tyreLaps.Push(kNull)
 			}
 
-		width := (this.DetailsViewer.Width - 20)
+		width := (this.DetailsViewer.getWidth() - 20)
 
 		chart1 := this.createSessionSummaryChart(1, width, 248, laps, positions, remainingFuels, tyreLaps)
 
@@ -11496,9 +11524,9 @@ manageTeam(raceCenterOrCommand, teamDrivers := false, arguments*) {
 		teamGui.Add("Text", "w392 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(teamGui, "Race Center.Team Manager"))
 
 		teamGui.SetFont("s9 Norm", "Arial")
-		teamGui.SetFont("Italic Underline", "Arial")
 
-		teamGui.Add("Text", "x148 YP+20 w112 cBlue Center", translate("Team Selection")).OnEvent("Click", openDocumentation.Bind(teamGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#session--stint-planning"))
+		teamGui.Add("Documentation", "x148 YP+20 w112 Center", translate("Team Selection")
+				  , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#session--stint-planning")
 
 		teamGui.SetFont("s8 Norm", "Arial")
 
@@ -11663,9 +11691,9 @@ pitstopSettings(raceCenterOrCommand := false, arguments*) {
 			settingsGui.Add("Text", "w292 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(settingsGui, "Race Center.Pitstop Settings"))
 
 			settingsGui.SetFont("s9 Norm", "Arial")
-			settingsGui.SetFont("Italic Underline", "Arial")
 
-			settingsGui.Add("Text", "x68 YP+20 w172 cBlue Center", translate("Pitstop Settings")).OnEvent("Click", openDocumentation.Bind(settingsGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#initiating-a-pitstop-for-the-current-driver"))
+			settingsGui.Add("Documentation", "x68 YP+20 w172 Center", translate("Pitstop Settings")
+						  , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#initiating-a-pitstop-for-the-current-driver")
 
 			settingsGui.SetFont("s8 Norm", "Arial")
 
@@ -11856,8 +11884,6 @@ startupRaceCenter() {
 
 	TraySetIcon(icon, "1")
 	A_IconTip := "Race Center"
-
-	fixIE(11)
 
 	rCenter := RaceCenter(kSimulatorConfiguration, readMultiMap(kUserConfigDirectory . "Race.settings"))
 

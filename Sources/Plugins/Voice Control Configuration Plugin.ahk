@@ -256,9 +256,9 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		widget13 := window.Add("Text", "x" . x . " yp+26 w110 h23 +0x200 VsoXPathLabel1 Hidden", translate("SoX Folder (optional)"))
 
-		window.SetFont("c505050 s8")
+		window.SetFont("s8")
 
-		widget14 := window.Add("Text", "x" . x0 . " yp+18 w110 h23 VsoXPathLabel2 Hidden", translate("(Post Processing)"))
+		widget14 := window.Add("Text", "x" . x0 . " yp+18 w110 h23 VsoXPathLabel2 Hidden c" . window.Theme.TextColor["Disabled"], translate("(Post Processing)"))
 
 		window.SetFont()
 

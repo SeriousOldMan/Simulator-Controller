@@ -350,9 +350,9 @@ class ConfigurationEditor extends ConfigurationItem {
 		editorGui.Add("Text", "w478 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(editorGui, "Simulator Configuration"))
 
 		editorGui.SetFont("Norm", "Arial")
-		editorGui.SetFont("Italic Underline", "Arial")
 
-		editorGui.Add("Text", "x178 YP+20 w138 H:Center cBlue Center", translate("Configuration")).OnEvent("Click", openDocumentation.Bind(editorGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration"))
+		editorGui.Add("Documentation", "x178 YP+20 w138 H:Center Center", translate("Configuration")
+					, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration")
 
 		editorGui.SetFont("Norm", "Arial")
 

@@ -116,9 +116,9 @@ class TranslationsEditor extends ConfiguratorPanel {
 		translationGui.Add("Text", "w388 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(translationGui, "Translations Editor"))
 
 		translationGui.SetFont("Norm", "Arial")
-		translationGui.SetFont("Italic Underline", "Arial")
 
-		translationGui.Add("Text", "x158 YP+20 w88 H:Center cBlue Center", translate("Translations")).OnEvent("Click", openDocumentation.Bind(translationGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#translations-editor"))
+		translationGui.Add("Documentation", "x158 YP+20 w88 H:Center Center", translate("Translations")
+						 , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#translations-editor")
 
 		translationGui.SetFont("Norm", "Arial")
 

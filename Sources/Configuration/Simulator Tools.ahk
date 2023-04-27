@@ -93,6 +93,46 @@ global gProgressCount := 0
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+fixIE(version := 0, exeName := "") {
+	local previousValue := ""
+
+	static key := "Software\Microsoft\Internet Explorer\MAIN\FeatureControl\FEATURE_BROWSER_EMULATION"
+	static versions := Map(7, 7000, 8, 8888, 9, 9999, 10, 10001, 11, 11001)
+
+	if versions.Has(version)
+		version := versions[version]
+
+	if !exeName {
+		if A_IsCompiled
+			exeName := A_ScriptName
+		else
+			SplitPath(A_AhkPath, &exeName)
+	}
+
+	try {
+		previousValue := RegRead("HKCU\" . key, exeName, "")
+	}
+	catch Any as exception {
+		logError(exception, false, false)
+	}
+
+	try {
+		if (version = "") {
+			RegDelete("HKCU\" . key, exeName)
+			RegDelete("HKLM\" . key, exeName)
+		}
+		else {
+			RegWrite(version, "REG_DWORD", "HKCU\" . key, exeName)
+			RegWrite(version, "REG_DWORD", "HKLM\" . key, exeName)
+		}
+	}
+	catch Any as exception {
+		logError(exception, false, false)
+	}
+
+	return previousValue
+}
+
 installOptions(options, *) {
 	local directory, valid, empty, title, innerWidth, chosen, disabled, checked
 
@@ -198,11 +238,9 @@ installOptions(options, *) {
 		installGui.Add("Text", "w330 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(installGui, "Install"))
 
 		installGui.SetFont("Norm", "Arial")
-		installGui.SetFont("Italic Underline", "Arial")
 
-		installGui.Add("Text", "x108 YP+20 w130 cBlue Center", translate("Install")).OnEvent("Click", openDocumentation.Bind(installGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration"))
-
-		installGui.SetFont("Norm", "Arial")
+		installGui.Add("Documentation", "x108 YP+20 w130 Center", translate("Install")
+					 , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration")
 
 		installGui.Add("Text", "x8 yp+20 w330 0x10")
 
@@ -292,11 +330,9 @@ uninstallOptions(options, *) {
 		uninstallGui.Add("Text", "w330 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(uninstallGui, "Uninstall"))
 
 		uninstallGui.SetFont("Norm", "Arial")
-		uninstallGui.SetFont("Italic Underline", "Arial")
 
-		uninstallGui.Add("Text", "x108 YP+20 w130 cBlue Center", translate("Uninstall")).OnEvent("Click", openDocumentation.Bind(uninstallGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration"))
-
-		uninstallGui.SetFont("Norm", "Arial")
+		uninstallGui.Add("Documentation", "x108 YP+20 w130 Center", translate("Uninstall")
+					   , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration")
 
 		uninstallGui.Add("Text", "x8 yp+20 w330 0x10")
 

@@ -220,14 +220,13 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		widget17.OnEvent("ContextMenu", motionFeedbackActionFunctionMenu)
 
 		info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Motion Feedback", "Motion Feedback.Actions.Info." . getLanguage()))
-		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='border-width:1pt;border-color:#AAAAAA;color:#AAAAAA;width: 90%'>" . info . "</div>"
+		info := "<div style='font-family: Arial, Helvetica, sans-serif; font-size: 11px'><hr style='border-width:1pt;border-color:#AAAAAA;color:#AAAAAA;width: 90%'>" . info . "</div>"
 
-		widget18 := window.Add("ActiveX", "x" . x . " yp+275 w" . width . " h135 Y:Move(0.66) W:Grow H:Grow(0.33) VmotionFeedbackInfoText Hidden", "shell.explorer")
+		widget18 := window.Add("HTMLViewer", "x" . x . " yp+275 w" . width . " h135 Y:Move(0.66) W:Grow H:Grow(0.33) VmotionFeedbackInfoText Hidden")
 
 		html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
-		widget18.Value.navigate("about:blank")
-		widget18.Value.document.write(html)
+		widget18.document.write(html)
 
 		this.setActionsListView(widget17)
 

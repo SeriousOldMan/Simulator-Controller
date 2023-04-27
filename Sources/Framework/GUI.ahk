@@ -167,10 +167,8 @@ class Theme {
 					options .= (" Background" . this.FieldBackColor)
 				case "Button":
 					options .= (" Background" . this.ButtonBackColor)
-				default:
-					if ((type != "UpDown") && (type != "DateTime") && (type != "MonthCal") && (type != "DropDownList")
-					 && (type != "ComboBox") && (type != "ActiveX") && (type != "HTMLViewer") && (type != "GIFViewer"))
-						options .= (" Background" . this.WindowBackColor)
+				case "Text", "Picture", "GroupBox", "Radio", "Slider", "Link":
+					options .= (" Background" . this.WindowBackColor)
 			}
 		}
 

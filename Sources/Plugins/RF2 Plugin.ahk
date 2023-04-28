@@ -61,6 +61,9 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 		selectActions := []
 	}
 
+	activateWindow() {
+	}
+
 	sendPitstopCommand(command, operation := false, message := false, arguments*) {
 		local simulator, exePath
 

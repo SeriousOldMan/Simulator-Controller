@@ -167,14 +167,13 @@ class Theme {
 					options .= (" Background" . this.FieldBackColor)
 				case "Button":
 					options .= (" Background" . this.ButtonBackColor)
-				default:
-					if ((type != "UpDown") && (type != "DateTime") && (type != "MonthCal") && (type != "DropDownList") && (type != "ComboBox"))
-						options .= (" Background" . this.WindowBackColor)
+				case "Text", "Picture", "GroupBox", "Radio", "Slider", "Link":
+					options .= (" Background" . this.WindowBackColor)
 			}
 		}
 
-		if (!RegExMatch(options, "c[0-9a-fA-F]{6}") && !InStr(options, "c" . this.LinkColor))
-			options .= (" c" . this.TextColor)
+		; if (!RegExMatch(options, "c[0-9a-fA-F]{6}") && !InStr(options, "c" . this.LinkColor))
+		;	options .= (" c" . this.TextColor)
 
 		return options
 	}
@@ -283,6 +282,17 @@ class UserTheme extends ConfigurationItem {
 */
 
 class SystemTheme extends Theme {
+	InitializeWindow(window) {
+	}
+
+	ComputeControlOptions(window, type, options) {
+		options := StrReplace(options, "-Theme", "")
+
+		if ((type = "Text") && (InStr(options, "0x10") && !InStr(options, "0x100")))
+			options := StrReplace(options, "0x10", "h1 Border")
+
+		return options
+	}
 }
 
 class LightTheme extends Theme {
@@ -341,13 +351,13 @@ class LightTheme extends Theme {
 class DarkTheme extends LightTheme {
 	WindowBackColor {
 		Get {
-			return "9F9F90"
+			return "909090"
 		}
 	}
 
 	AlternateBackColor {
 		Get {
-			return "AFAFA0"
+			return "A0A0A0"
 		}
 	}
 }

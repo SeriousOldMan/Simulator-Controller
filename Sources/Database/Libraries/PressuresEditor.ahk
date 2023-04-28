@@ -525,7 +525,7 @@ class PressuresEditor {
 					<script type="text/javascript">
 						google.charts.load('current', {'packages':['corechart', 'bar', 'table']}).then(drawChart);
 			)"
-				
+
 			before := substituteVariables(before, {headerBackColor: this.Window.Theme.ListBackColor["Header"]
 												 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
 												 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})

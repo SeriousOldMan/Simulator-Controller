@@ -793,7 +793,7 @@ class Window extends Gui {
 		}
 	}
 
-	__New(options := {}, name := Strsplit(A_ScriptName, ".")[1], arguments*) {
+	__New(options := {}, title := Strsplit(A_ScriptName, ".")[1], arguments*) {
 		local ignore, argument
 
 		for name, argument in options.OwnProps()
@@ -813,7 +813,7 @@ class Window extends Gui {
 					options := argument
 			}
 
-		super.__New("", name, arguments*)
+		super.__New("", title, arguments*)
 
 		if !this.Theme
 			this.iTheme := Theme.CurrentTheme

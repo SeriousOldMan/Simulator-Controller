@@ -662,7 +662,7 @@ startupExited() {
 execute(command) {
 	local thePlugin := false
 
-	SimulatorController.Instance.runninSimulator(thePlugin)
+	SimulatorController.Instance.runningSimulator(&thePlugin)
 
 	if thePlugin
 		thePlugin.activateWindow()
@@ -679,7 +679,7 @@ trigger(hotkeys, method := "Event") {
 	local thePlugin := false
 	local ignore, theHotkey
 
-	SimulatorController.Instance.runninSimulator(thePlugin)
+	SimulatorController.Instance.runningSimulator(&thePlugin)
 
 	if thePlugin
 		thePlugin.activateWindow()

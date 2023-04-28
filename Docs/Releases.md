@@ -1,4 +1,4 @@
-## 5.0.1.0-release 03/28/23 (planned)
+## 5.0.1.0-release 04/28/23
   1. Minor bugfixes, as always
   2. Documentation updates, as always
   3. Full integration of the WebView2 HTML rendering engine as a substitute for the old Internet Explorer plugin, since the support for Internet Explorer has been canceled by Microsoft. The implementation is not activated by default, but you can take a testflight by following the instructions in the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-501).
@@ -11,7 +11,7 @@
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-501) for instructions on how to enable the WebView2 HTML rendering engine or switch between UI themes.
 
-## 5.0.0.2-beta 03/26/23
+## 5.0.0.2-beta 04/26/23
   1. A couple of small bugfixes here and there.
   2. Fixed the startup of the Race Assistants to create a short flicker in various simulators.
   3. Fixed a rare connection issue between Stream Deck and Simulator Controller.

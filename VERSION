@@ -1,16 +1,16 @@
 [Development]
-Version=5.0.1.0-beta
+Version=5.0.1.0-release
 Target=5.0.1.0-release
-Date=04/27/2023
-Download=https://www.dropbox.com/s/2ny15avgczq04ud/Simulator%20Controller%205.0.1.0-beta.zip?dl=1
+Date=04/28/2023
+Download=https://cutt.ly/Y5YhoX7;https://www.dropbox.com/s/i4qjqxen33m2pv4/Simulator%20Controller%205.0.1.0-release.zip?dl=1
 Changes=Full implementation of WebView2 as a substitute for the IE Com Object, New car models for "Setup Workbench", Initial implementation of a Gui theming engine
 [Release]
-Version=5.0.0.2-beta
-Date=04/26/2023
-Download=https://cutt.ly/S5bqe68;https://www.dropbox.com/s/spjj4gk4tie5d9a/Simulator%20Controller%205.0.0.2-beta.zip?dl=1
-Changes=Eliminated short flicker when the Assistants start up, Fixed Stream Deck connectio to Simulator Controller, Fixed "Server Administration" not selecting an account, Fixed enabling of Team Server with the Tray menu, Fixed planning of pitstops w/o tyre swaps in "Race Center"
+Version=5.0.1.0-release
+Date=04/28/2023
+Download=https://cutt.ly/Y5YhoX7;https://www.dropbox.com/s/i4qjqxen33m2pv4/Simulator%20Controller%205.0.1.0-release.zip?dl=1
+Changes=Full implementation of WebView2 as a substitute for the IE Com Object, New car models for "Setup Workbench", Initial implementation of a Gui theming engine
 [Current]
-Type=Development
+Type=Release
 [Version]
-Release=5.0.0.2-beta
-Development=5.0.1.0-beta
+Release=5.0.1.0-release
+Development=5.0.1.0-release

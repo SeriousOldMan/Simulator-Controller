@@ -971,9 +971,9 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		this.showStrategyInfo(false)
 
-		/*
 		workbenchGui.SetFont("Norm", "Arial")
 
+		/*
 		workbenchGui.Add("Text", "x8 y816 w1350 0x10 Y:Move W:Grow")
 
 		workbenchGui.Add("Button", "x649 y824 w80 h23 Y:Move H:Center", translate("Close")).OnEvent("Click", closeWorkbench)

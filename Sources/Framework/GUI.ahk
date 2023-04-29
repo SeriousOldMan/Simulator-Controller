@@ -360,6 +360,12 @@ class DarkTheme extends LightTheme {
 			return "A0A0A0"
 		}
 	}
+
+	ButtonBackColor {
+		Get {
+			return "959595"
+		}
+	}
 }
 
 class Window extends Gui {

@@ -6546,10 +6546,11 @@ class RaceCenter extends ConfigurationItem {
 		local nextStop := (this.PitstopsListView.GetCount() + 1)
 		local wasEmpty := (nextStop == 1)
 		local newData := false
+		local currentDriver := false
+		local nextDriver := false
 		local session, lap, fuel, tyreCompound, tyreCompoundColor, tyreSet
 		local pressureFL, pressureFR, pressureRL, pressureRR, repairBodywork, repairSuspension, repairEngine
-		local pressures, displayPressures, displayFuel, driverRequest, currentDriver, nextDriver, tries
-		local pitstopNr, stint
+		local pressures, displayPressures, displayFuel, driverRequest, tries, pitstopNr, stint
 
 		loop this.PitstopsListView.GetCount()
 			if (this.PitstopsListView.GetNext(A_Index - 1, "C") != A_Index) {
@@ -6626,17 +6627,20 @@ class RaceCenter extends ConfigurationItem {
 						}
 						else {
 							if (lap > 1) {
-								currentDriver := this.Laps[lap - 1].Stint.Driver.FullName
+								if this.Laps.Has(lap - 1) {
+									currentDriver := this.Laps[lap - 1].Stint.Driver.FullName
 
-								if this.Laps.Has(lap + 1)
-									nextDriver := this.Laps[lap + 1].Stint.Driver.FullName
-								else if this.CurrentStint
-									nextDriver := this.CurrentStint.Driver.FullName
-								else
-									nextDriver := false
+									if this.Laps.Has(lap + 1)
+										nextDriver := this.Laps[lap + 1].Stint.Driver.FullName
+									else if this.CurrentStint
+										nextDriver := this.CurrentStint.Driver.FullName
+									else
+										nextDriver := false
+								}
 							}
 							else {
-								currentDriver := this.Laps[1].Stint.Driver.FullName
+								if this.Laps.Has(1)
+									currentDriver := this.Laps[1].Stint.Driver.FullName
 
 								if this.Laps.Has(2)
 									nextDriver := this.Laps[2].Stint.Driver.FullName
@@ -6669,7 +6673,10 @@ class RaceCenter extends ConfigurationItem {
 
 						sessionStore.remove("Pitstop.Data", {Status: "Planned"}, always.Bind(true))
 
-						stint := this.Laps[lap].Stint
+						if this.Laps.Has(lap)
+							stint := this.Laps[lap].Stint
+						else
+							stint := this.CurrentStint
 
 						sessionStore.add("Pitstop.Data"
 									   , Database.Row("Lap", lap, "Fuel", fuel, "Tyre.Compound", tyreCompound, "Tyre.Compound.Color", tyreCompoundColor, "Tyre.Set", tyreSet
@@ -6762,7 +6769,8 @@ class RaceCenter extends ConfigurationItem {
 							nextDriver := string2Values(":", driverRequest[2])[1]
 						}
 						else {
-							currentDriver := this.Laps[this.LastLap.Nr].Stint.Driver.FullName
+							if this.Laps.Has(this.LastLap.Nr)
+								currentDriver := this.Laps[this.LastLap.Nr].Stint.Driver.FullName
 
 							if !currentDriver
 								currentDriver := kNull

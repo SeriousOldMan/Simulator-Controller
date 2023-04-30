@@ -48,6 +48,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 global kClose := "Close"
+global kRestart := "Restart"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -408,16 +409,23 @@ launchPad(command := false, arguments*) {
 
 	modifySettings(launchPadGui, *) {
 		local settings := readMultiMap(kSimulatorSettingsFile)
+		local restart := false
 
 		launchPadGui.Opt("+Disabled")
 
 		try {
-			if (editSettings(&settings) == kSave)
+			if (editSettings(&settings) == kSave) {
 				writeMultiMap(kSimulatorSettingsFile, settings)
+
+				restart := true
+			}
 		}
 		finally {
 			launchPadGui.Opt("-Disabled")
 		}
+
+		if restart
+			launchPad(kRestart)
 	}
 
 	launchSimulatorDownload(*) {
@@ -461,6 +469,8 @@ launchPad(command := false, arguments*) {
 
 		result := kClose
 	}
+	else if (command = kRestart)
+		result := kRestart
 	else if (command = "Close All") {
 		broadcastMessage(concatenate(kBackgroundApps, remove(kForegroundApps, "Simulator Startup")), "exitApplication")
 
@@ -714,7 +724,7 @@ startupSimulator() {
 
 startSimulator() {
 	local icon := kIconsDirectory . "Startup.ico"
-	local noLaunch
+	local noLaunch, ignore
 
 	Hotkey("Escape", cancelStartup, "Off")
 
@@ -726,7 +736,8 @@ startSimulator() {
 	if ((noLaunch && !GetKeyState("Shift")) || (!noLaunch && GetKeyState("Shift")))
 		startupSimulator()
 	else
-		launchPad()
+		while launchPad()
+			ignore := 1
 
 	if (!SimulatorStartup.Instance || SimulatorStartup.Instance.Finished)
 		ExitApp(0)

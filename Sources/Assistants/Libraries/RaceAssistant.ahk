@@ -1017,11 +1017,14 @@ class RaceAssistant extends ConfigurationItem {
 		this.updateSessionValues({SessionDuration: duration * 1000, SessionLaps: laps, TeamSession: (getMultiMapValue(data, "Session Data", "Mode", "Solo") = "Team")})
 	}
 
-	readSettings(&settings) {
+	readSettings(simulator, car, track, &settings) {
 		if !isObject(settings)
 			settings := readMultiMap(settings)
 
-		return CaseInsenseMap("Session.Settings.Lap.Formation", getDeprecatedValue(settings, "Session Settings", "Race Settings", "Lap.Formation", true)
+		return CaseInsenseMap("Session.Simulator", simulator
+							, "Session.Car", car
+							, "Session.Track", track
+							, "Session.Settings.Lap.Formation", getDeprecatedValue(settings, "Session Settings", "Race Settings", "Lap.Formation", true)
 						    , "Session.Settings.Lap.PostRace", getDeprecatedValue(settings, "Session Settings", "Race Settings", "Lap.PostRace", true)
 						    , "Session.Settings.Lap.AvgTime", getDeprecatedValue(settings, "Session Settings", "Race Settings", "Lap.AvgTime", 0)
 						    , "Session.Settings.Lap.PitstopWarning", getDeprecatedValue(settings, "Session Settings", "Race Settings", "Lap.PitstopWarning", 5)
@@ -1034,7 +1037,8 @@ class RaceAssistant extends ConfigurationItem {
 		local facts, key, value
 
 		if knowledgeBase
-			for key, value in this.readSettings(&settings)
+			for key, value in this.readSettings(knowledgeBase.getValue("Session.Simulator"), knowledgeBase.getValue("Session.Car")
+											  , knowledgeBase.getValue("Session.Track"), &settings)
 				knowledgeBase.setFact(key, value)
 	}
 
@@ -1084,11 +1088,8 @@ class RaceAssistant extends ConfigurationItem {
 				lapTime := settingsLapTime
 		}
 
-		facts := combine(this.readSettings(&settings)
-					   , CaseInsenseMap("Session.Simulator", simulator
-									  , "Session.Car", getMultiMapValue(data, "Session Data", "Car", "")
-									  , "Session.Track", getMultiMapValue(data, "Session Data", "Track", "")
-									  , "Session.Type", this.Session
+		facts := combine(this.readSettings(simulator, getMultiMapValue(data, "Session Data", "Car", ""), getMultiMapValue(data, "Session Data", "Track", ""), &settings)
+					   , CaseInsenseMap("Session.Type", this.Session
 									  , "Session.Time.Remaining", getDeprecatedValue(data, "Session Data", "Stint Data", "SessionTimeRemaining", 0)
 									  , "Session.Lap.Remaining", getDeprecatedValue(data, "Session Data", "Stint Data", "SessionLapsRemaining", 0)
 									  , "Session.Settings.Lap.Time.Adjust", this.AdjustLapTime

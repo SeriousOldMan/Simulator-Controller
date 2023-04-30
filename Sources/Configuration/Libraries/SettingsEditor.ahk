@@ -377,6 +377,8 @@ editSettings(&settingsOrCommand, withContinue := false, fromSetup := false, x :=
 
 					writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 
+					Theme.CurrentTheme := theTheme
+
 					break
 				}
 

@@ -745,6 +745,22 @@ priority: 20, [?Pitstop.Plan = true] =>
 priority: 10, [?Pitstop.Plan] => (Prove: planPitstop())
 
 {All: [?Pitstop.Plan], {None: [?Pitstop.Plan.Fuel.Amount]},
+	  [?Session.Settings.Pitstop.Service.Refuel = false]} => (Set: Pitstop.Planned.Fuel, 0)
+{All: [?Pitstop.Plan], {None: [?Pitstop.Plan.Tyre.Change]},
+	  [?Session.Settings.Pitstop.Service.Tyres = false]} => (Set: Pitstop.Planned.Tyre.Compound, false),
+															(Set: Pitstop.Planned.Tyre.Compound.Color, false),
+															(Set: Pitstop.Planned.Tyre.Pressure.FL, false),
+															(Set: Pitstop.Planned.Tyre.Pressure.FR, false),
+															(Set: Pitstop.Planned.Tyre.Pressure.RL, false),
+															(Set: Pitstop.Planned.Tyre.Pressure.RR, false)
+{All: [?Pitstop.Plan], {None: [?Pitstop.Plan.Repair.Suspension]},
+	  [?Session.Settings.Pitstop.Service.Repairs = false]} => (Set: Pitstop.Planned.Repair.Suspension, false)
+{All: [?Pitstop.Plan], {None: [?Pitstop.Plan.Repair.Bodywork]},
+	  [?Session.Settings.Pitstop.Service.Repairs = false]} => (Set: Pitstop.Planned.Repair.Bodywork, false)
+{All: [?Pitstop.Plan], {None: [?Pitstop.Plan.Repair.Engine]},
+	  [?Session.Settings.Pitstop.Service.Repairs = false]} => (Set: Pitstop.Planned.Repair.Engine, false)
+
+{All: [?Pitstop.Plan], {None: [?Pitstop.Plan.Fuel.Amount]},
 	  [?Fuel.Amount.Target], {None: [?Pitstop.Planned.Fuel]}} => (Set: Pitstop.Planned.Fuel, ?Fuel.Amount.Target)
 {All: [?Pitstop.Plan], [?Pitstop.Plan.Fuel.Amount], {None: [?Pitstop.Planned.Fuel]}} => (Set: Pitstop.Planned.Fuel, ?Pitstop.Plan.Fuel.Amount)
 {All: [?Pitstop.Plan], [?Pitstop.Plan.Tyre.Change = false]} => (Set: Pitstop.Planned.Tyre.Compound, false),

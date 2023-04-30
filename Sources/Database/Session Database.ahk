@@ -502,6 +502,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			for ignore, setting in settings
 				labels.Push(editor.getSettingLabel(setting[1], setting[2]))
 
+			bubbleSort(&labels)
+
 			editorGui["settingDropDown"].Enabled := true
 
 			editorGui["settingDropDown"].Delete()

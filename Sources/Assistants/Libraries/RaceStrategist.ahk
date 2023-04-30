@@ -1216,8 +1216,8 @@ class RaceStrategist extends GridRaceAssistant {
 		return facts
 	}
 
-	readSettings(&settings) {
-		return combine(super.readSettings(&settings)
+	readSettings(simulator, car, track, &settings) {
+		return combine(super.readSettings(simulator, car, track, &settings)
 					 , CaseInsenseMap("Session.Settings.Pitstop.Delta", getMultiMapValue(settings, "Strategy Settings", "Pitstop.Delta"
 																								 , getMultiMapValue(settings, "Session Settings"
 																															, "Pitstop.Delta", 30))

@@ -1394,7 +1394,14 @@ initializeGUI() {
 
 	Window.DefineCustomControl("Documentation", createDocumentation)
 
-	Theme.CurrentTheme := %getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini"), "General", "UI Theme", "Classic") . "Theme"%()
+	try {
+		Theme.CurrentTheme := %getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini"), "General", "UI Theme", "Classic") . "Theme"%()
+	}
+	catch Any as exception {
+		logError(exception)
+
+		Theme.CurrentTheme := ClassicTheme()
+	}
 
 	; DllCall("User32\SetProcessDpiAwarenessContext", "UInt" , -1)
 	; DllCall("User32\SetThreadDpiAwarenessContext", "UInt" , -1)

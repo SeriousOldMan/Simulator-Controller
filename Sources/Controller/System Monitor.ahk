@@ -703,7 +703,7 @@ systemMonitor(command := false, arguments*) {
 			driversListView.Delete()
 
 			for ignore, driver in drivers
-				driversListView.Add("", driver, (driver = stintDriver) ? translate("x") : "")
+				driversListView.Add("", driver, (driver = stintDriver.Text) ? translate("x") : "")
 
 			driversListView.ModifyCol()
 			driversListView.ModifyCol(1, "AutoHdr")

@@ -456,7 +456,7 @@ launchPad(command := false, arguments*) {
 					return
 
 				SetTimer () => ToolTip(Text), -1000
-				SetTimer () => ToolTip(), -4000
+				SetTimer () => ToolTip(), -8000
 			}
 
 			PrevHwnd := hwnd
@@ -620,7 +620,7 @@ launchPad(command := false, arguments*) {
 		launchPadGui.Add("Picture", "xp+90 yp w60 h60 vRaceSettings", kIconsDirectory . "Race Settings.ico").OnEvent("Click", launchApplication.Bind("RaceSettings"))
 		launchPadGui.Add("Picture", "xp+74 yp w60 h60 vSessionDatabase", kIconsDirectory . "Session Database.ico").OnEvent("Click", launchApplication.Bind("SessionDatabase"))
 
-		launchPadGui.Add("Picture", "xp+110 yp w60 h60 vSimulatorStartup", kIconsDirectory . "Configuration Wand.ico").OnEvent("Click", launchApplication.Bind("SimulatorSetup"))
+		launchPadGui.Add("Picture", "xp+110 yp w60 h60 vSimulatorSetup", kIconsDirectory . "Configuration Wand.ico").OnEvent("Click", launchApplication.Bind("SimulatorSetup"))
 		launchPadGui.Add("Picture", "xp+74 yp w60 h60 vSimulatorConfiguration", kIconsDirectory . "Configuration.ico").OnEvent("Click", launchApplication.Bind("SimulatorConfiguration"))
 		launchPadGui.Add("Picture", "xp+150 yp w60 h60 vSimulatorDownload", kIconsDirectory . "Installer.ico").OnEvent("Click", launchSimulatorDownload.Bind("SimulatorDownload"))
 

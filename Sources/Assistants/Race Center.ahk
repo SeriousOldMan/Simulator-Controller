@@ -5619,12 +5619,6 @@ class RaceCenter extends ConfigurationItem {
 				}
 			}
 
-			if (stint.Laps.Length == 0)
-				stint.Lap := lap.Nr
-
-			stint.Laps.Push(lap)
-			stint.Driver.Laps.Push(lap)
-
 			data := parseMultiMap(rawData)
 
 			lap.Telemetry := rawData
@@ -5738,6 +5732,12 @@ class RaceCenter extends ConfigurationItem {
 				else
 					lap.Position := "-"
 			}
+
+			if (stint.Laps.Length == 0)
+				stint.Lap := lap.Nr
+
+			stint.Laps.Push(lap)
+			stint.Driver.Laps.Push(lap)
 
 			this.Laps[identifier] := lap
 			this.Laps[lap.Nr] := lap
@@ -7469,7 +7469,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	computeDuration(stint) {
-		local duration, duration, ignore, lap
+		local duration, ignore, lap
 
 		if stint.HasProp("Duration")
 			return stint.Duration

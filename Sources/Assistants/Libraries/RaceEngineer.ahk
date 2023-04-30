@@ -1435,42 +1435,46 @@ class RaceEngineer extends RaceAssistant {
 				else
 					prefix := false
 
-				if prefix {
-					coldPressures := values2String(",", Round(knowledgeBase.getValue(prefix . "FL"), 1)
-													  , Round(knowledgeBase.getValue(prefix . "FR"), 1)
-													  , Round(knowledgeBase.getValue(prefix . "RL"), 1)
-													  , Round(knowledgeBase.getValue(prefix . "RR"), 1))
+				if prefix
+					try {
+						coldPressures := values2String(",", Round(knowledgeBase.getValue(prefix . "FL"), 1)
+														  , Round(knowledgeBase.getValue(prefix . "FR"), 1)
+														  , Round(knowledgeBase.getValue(prefix . "RL"), 1)
+														  , Round(knowledgeBase.getValue(prefix . "RR"), 1))
 
-					hotPressures := values2String(",", Round(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Pressure.FL"), 1)
-													 , Round(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Pressure.FR"), 1)
-													 , Round(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Pressure.RL"), 1)
-													 , Round(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Pressure.RR"), 1))
+						hotPressures := values2String(",", Round(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Pressure.FL"), 1)
+														 , Round(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Pressure.FR"), 1)
+														 , Round(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Pressure.RL"), 1)
+														 , Round(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Pressure.RR"), 1))
 
-					prefix := "Tyre.Pressure.Loss."
+						prefix := "Tyre.Pressure.Loss."
 
-					pressuresLosses := values2String(",", Round(knowledgeBase.getValue(prefix . "FL", 0), 1)
-														, Round(knowledgeBase.getValue(prefix . "FR", 0), 1)
-														, Round(knowledgeBase.getValue(prefix . "RL", 0), 1)
-														, Round(knowledgeBase.getValue(prefix . "RR", 0), 1))
+						pressuresLosses := values2String(",", Round(knowledgeBase.getValue(prefix . "FL", 0), 1)
+															, Round(knowledgeBase.getValue(prefix . "FR", 0), 1)
+															, Round(knowledgeBase.getValue(prefix . "RL", 0), 1)
+															, Round(knowledgeBase.getValue(prefix . "RR", 0), 1))
 
-					airTemperature := Round(getMultiMapValue(data, "Weather Data", "Temperature", 0))
-					trackTemperature := Round(getMultiMapValue(data, "Track Data", "Temperature", 0))
+						airTemperature := Round(getMultiMapValue(data, "Weather Data", "Temperature", 0))
+						trackTemperature := Round(getMultiMapValue(data, "Track Data", "Temperature", 0))
 
-					if (airTemperature = 0)
-						airTemperature := Round(getMultiMapValue(data, "Car Data", "AirTemperature", 0))
+						if (airTemperature = 0)
+							airTemperature := Round(getMultiMapValue(data, "Car Data", "AirTemperature", 0))
 
-					if (trackTemperature = 0)
-						trackTemperature := Round(getMultiMapValue(data, "Car Data", "RoadTemperature", 0))
+						if (trackTemperature = 0)
+							trackTemperature := Round(getMultiMapValue(data, "Car Data", "RoadTemperature", 0))
 
-					weatherNow := getMultiMapValue(data, "Weather Data", "Weather", "Dry")
+						weatherNow := getMultiMapValue(data, "Weather Data", "Weather", "Dry")
 
-					logMessage(kLogDebug, "Saving pressures for " . lapNumber)
+						logMessage(kLogDebug, "Saving pressures for " . lapNumber)
 
-					this.savePressureData(lapNumber, knowledgeBase.getValue("Session.Simulator")
-												   , knowledgeBase.getValue("Session.Car"), knowledgeBase.getValue("Session.Track")
-												   , weatherNow, airTemperature, trackTemperature
-												   , currentCompound, currentCompoundColor, coldPressures, hotPressures, pressuresLosses)
-				}
+						this.savePressureData(lapNumber, knowledgeBase.getValue("Session.Simulator")
+													   , knowledgeBase.getValue("Session.Car"), knowledgeBase.getValue("Session.Track")
+													   , weatherNow, airTemperature, trackTemperature
+													   , currentCompound, currentCompoundColor, coldPressures, hotPressures, pressuresLosses)
+					}
+					catch Any as exception {
+						logError(exception)
+					}
 			}
 		}
 

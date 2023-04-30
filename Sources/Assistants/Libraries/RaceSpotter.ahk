@@ -1827,25 +1827,29 @@ class RaceSpotter extends GridRaceAssistant {
 		if ((penalty != this.iLastPenalty) || (penalty != lastPenalty)) {
 			this.iLastPenalty := penalty
 
-			if (penalty = "DSQ")
-				speaker.speakPhrase("Disqualified")
-			else {
-				if (InStr(penalty, "SG") = 1) {
-					penalty := ((StrLen(penalty) > 2) ? (A_Space . SubStr(penalty, 3)) : "")
+			if penalty {
+				if (penalty = "DSQ")
+					speaker.speakPhrase("Disqualified")
+				else {
+					if (InStr(penalty, "SG") = 1) {
+						penalty := ((StrLen(penalty) > 2) ? (A_Space . SubStr(penalty, 3)) : "")
 
-					penalty := (speaker.Fragments["SG"] . penalty)
+						penalty := (speaker.Fragments["SG"] . penalty)
+					}
+					else if (penalty = "Time")
+						penalty := speaker.Fragments["Time"]
+					else if (penalty = "DT")
+						penalty := speaker.Fragments["DT"]
+					else if (penalty == true)
+						penalty := ""
+
+					this.getSpeaker().speakPhrase("Penalty", {penalty: penalty})
 				}
-				else if (penalty = "Time")
-					penalty := speaker.Fragments["Time"]
-				else if (penalty = "DT")
-					penalty := speaker.Fragments["DT"]
-				else if (penalty == true)
-					penalty := ""
 
-				this.getSpeaker().speakPhrase("Penalty", {penalty: penalty})
+				return true
 			}
-
-			return true
+			else
+				return false
 		}
 		else
 			return false

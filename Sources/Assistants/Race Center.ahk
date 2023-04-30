@@ -11684,7 +11684,7 @@ pitstopSettings(raceCenterOrCommand := false, arguments*) {
 			isOpen := true
 		}
 		else {
-			settingsGui := Window()
+			settingsGui := Window({Options: "0x400000"}, "")
 
 			settingsGui.SetFont("s10 Bold", "Arial")
 

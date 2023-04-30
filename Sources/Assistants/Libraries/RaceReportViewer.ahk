@@ -108,7 +108,7 @@ class RaceReportViewer extends RaceReportReader {
 						<script type="text/javascript">
 							google.charts.load('current', {'packages':['corechart', 'bar', 'table']}).then(drawChart);
 				)"
-				
+
 				before := substituteVariables(before, {headerBackColor: this.Window.Theme.ListBackColor["Header"]
 													 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
 													 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
@@ -1429,11 +1429,10 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 			}
 		}
 
-		reportSettingsGui := Window()
+		reportSettingsGui := Window({Options: "0x400000"}, "")
 
 		reportSettingsGui.Opt("+Owner" . raceReport.Window.Hwnd)
 
-		reportSettingsGui.Opt("-Border -Caption +0x800000")
 		reportSettingsGui.BackColor := "D0D0D0"
 
 		reportSettingsGui.SetFont("s10 Bold", "Arial")

@@ -111,7 +111,7 @@ If you want to become a part of the small and very young Community for Simulator
     - Code your own functions to be called by the controller buttons and switches using the simple, object-oriented scripting language
   - Configure all additional [applications](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications) to your taste, including the simulation games used for your virtual races
     - Start and stop applications from your controller hardware or automatically upon configurable events
-    - Add splash screens and title melodies using a themes editor for a more emotional startup experience
+    - Add splash screens and title melodies using a spedial editor for a more emotional startup experience
     - Full support for sophisticated application automation - for example, start your favorite voice chat software like TeamSpeak and automatically switch to your standard channel 
   - Several plugins are supplied out of the box:
     - Support for *Assetto Corsa*, *Assetto Corsa Competizione*, *rFactor 2*, *iRacing*, *Automobilista 2*, *RaceRoom Racing Experience* and *Project CARS 2* is already builtin, other simulation games will follow

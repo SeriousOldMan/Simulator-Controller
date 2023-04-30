@@ -58,7 +58,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		super.saveToConfiguration(configuration)
 
 		setMultiMapValues(configuration, "Splash Window", getMultiMapValues(this.SetupWizard.Definition, "Splash Window"))
-		setMultiMapValues(configuration, "Splash Themes", getMultiMapValues(this.SetupWizard.Definition, "Splash Themes"))
+		setMultiMapValues(configuration, "Splash Screens", getMultiMapValues(this.SetupWizard.Definition, "Splash Screens"))
 
 		wizard.getGeneralConfiguration(&language, &startWithWindows, &silentMode)
 

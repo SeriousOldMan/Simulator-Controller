@@ -229,8 +229,8 @@ editSettings(&settingsOrCommand, withContinue := false, fromSetup := false, x :=
 	global kSave, kCancel, kContinue, kUpdate, kEditModes
 
 	local index, coreDescriptor, coreVariable, feedbackDescriptor, feedbackVariable, positions
-	local descriptor, value, simulators, margin, choices, chosen, themes
-	local descriptor, applicationName, enabled, coreHeight, index, coreDescriptor
+	local descriptor, value, simulators, margin, choices, chosen, splashScreens, uiThemes
+	local applicationName, enabled, coreHeight, index, coreDescriptor, ignore, theTheme
 	local coreOption, coreLabel, checked, feedbackHeight, feedbackDescriptor, feedbackOption, feedbackLabel
 	local applicationSettings
 
@@ -265,7 +265,8 @@ editSettings(&settingsOrCommand, withContinue := false, fromSetup := false, x :=
 	static startup
 	static startupOption
 
-	static splashTheme
+	static splashScreen
+	static uiTheme
 
 	static coreSettings
 	static feedbackSettings
@@ -366,7 +367,19 @@ editSettings(&settingsOrCommand, withContinue := false, fromSetup := false, x :=
 			for descriptor, value in lastPositions
 				setMultiMapValue(newSettings, "Button Box", descriptor, value)
 
-			setMultiMapValue(newSettings, "Startup", "Splash Theme", (splashTheme.Text = translate("None")) ? false : splashTheme.Text)
+			setMultiMapValue(newSettings, "Startup", "Splash Screen", (splashScreen.Text = translate("None")) ? false : splashScreen.Text)
+
+			for ignore, theTheme in getAllUIThemes(configuration)
+				if (translate(theTheme.Descriptor) = uiTheme.Text) {
+					settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+					setMultiMapValue(settings, "General", "UI Theme", theTheme.Descriptor)
+
+					writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+
+					break
+				}
+
 			setMultiMapValue(newSettings, "Startup", "Simulator", (startup.Value ? startupOption.Text : false))
 
 			settingsEditorGui.Destroy()
@@ -556,14 +569,26 @@ editSettings(&settingsOrCommand, withContinue := false, fromSetup := false, x :=
 		else
 			settingsEditorGui.Add("Button", "X10 Y+15 w220", translate("Controller Automation...")).OnEvent("Click", editSettings.Bind(&kEditModes))
 
-		splashTheme := getMultiMapValue(settingsOrCommand, "Startup", "Splash Theme", false)
+		uiTheme := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini"), "General", "UI Theme", Theme.CurrentTheme.Descriptor)
 
-		themes := getAllThemes(configuration)
-		chosen := (splashTheme ? inList(themes, splashTheme) + 1 : 1)
-		themes := concatenate([translate("None")], themes)
+		splashScreen := getMultiMapValue(settingsOrCommand, "Startup", "Splash Screen", false)
+		splashScreens := getAllSplashScreens(configuration)
 
-		settingsEditorGui.Add("Text", "X10 Y+20", translate("Theme"))
-		splashTheme := settingsEditorGui.Add("DropDownList", "X90 YP-5 w140 Choose" . chosen, themes)
+		uiThemes := []
+
+		for ignore, theTheme in getAllUIThemes(configuration)
+			uiThemes.Push(theTheme.Descriptor)
+
+		chosen := inList(uiThemes, uiTheme)
+
+		settingsEditorGui.Add("Text", "X10 Y+20", translate("Color Scheme"))
+		uiTheme := settingsEditorGui.Add("DropDownList", "X90 YP-5 w140 Choose" . chosen, collect(uiThemes, translate))
+
+		chosen := (splashScreen ? inList(splashScreens, splashScreen) + 1 : 1)
+		splashScreens := concatenate([translate("None")], splashScreens)
+
+		settingsEditorGui.Add("Text", "X10", translate("Splash Screen"))
+		splashScreen := settingsEditorGui.Add("DropDownList", "X90 YP-5 w140 Choose" . chosen, splashScreens)
 
 		startupOption := getMultiMapValue(settingsOrCommand, "Startup", "Simulator", false)
 		startup := (startupOption != false)

@@ -1,5 +1,5 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Themes Editor                   ;;;
+;;;   Modular Simulator Controller System - Splash Screen Editor            ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2023) Creative Commons - BY-NC-SA                        ;;;
@@ -25,20 +25,20 @@
 ;;;-------------------------------------------------------------------------;;;
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; ThemesEditor                                                            ;;;
+;;; SplashScreenEditor                                                      ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class ThemesEditor extends ConfiguratorPanel {
+class SplashScreenEditor extends ConfiguratorPanel {
 	iClosed := false
-	iThemesList := false
+	iSplashScreensList := false
 
-	class ThemesWindow extends Window {
+	class SplashScreensWindow extends Window {
 		iEditor := false
 
 		__New(editor) {
 			this.iEditor := editor
 
-			super.__New({Descriptor: "Themes Editor", Closeable: true, Resizeable: true, Options: "-MaximizeBox"})
+			super.__New({Descriptor: "Splash Screens Editor", Closeable: true, Resizeable: true, Options: "-MaximizeBox"})
 		}
 
 		Close(*) {
@@ -47,17 +47,17 @@ class ThemesEditor extends ConfiguratorPanel {
 	}
 
 	__New(configuration) {
-		this.iThemesList := ThemesList(configuration)
+		this.iSplashScreensList := SplashScreensList(configuration)
 
 		super.__New(configuration)
 
-		ThemesEditor.Instance := this
+		SplashScreenEditor.Instance := this
 	}
 
-	createGui(configuration) {
-		local themesGui
+	createGui() {
+		local splashScreensGui, chosen
 
-		saveThemesEditor(*) {
+		saveSplashScreenEditor(*) {
 			protectionOn()
 
 			try {
@@ -68,7 +68,7 @@ class ThemesEditor extends ConfiguratorPanel {
 			}
 		}
 
-		cancelThemesEditor(*) {
+		cancelSplashScreenEditor(*) {
 			protectionOn()
 
 			try {
@@ -79,35 +79,37 @@ class ThemesEditor extends ConfiguratorPanel {
 			}
 		}
 
-		themesGui := ThemesEditor.ThemesWindow(this)
+		splashScreensGui := SplashScreenEditor.SplashScreensWindow(this)
 
-		this.Window := themesGui
+		this.Window := splashScreensGui
 
-		themesGui.SetFont("Bold", "Arial")
+		splashScreensGui.SetFont("Bold", "Arial")
 
-		themesGui.Add("Text", "w388 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(themesGui, "Themes Editor"))
+		splashScreensGui.Add("Text", "w388 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(splashScreensGui, "Splash Screens"))
 
-		themesGui.SetFont("Norm", "Arial")
+		splashScreensGui.SetFont("Norm", "Arial")
 
-		themesGui.Add("Documentation", "x158 YP+20 w88 H:Center Center", translate("Themes")
-					, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#themes-editor")
+		splashScreensGui.Add("Documentation", "x158 YP+20 w88 H:Center Center", translate("Splash Screens")
+						   , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#splash-screen-editor")
 
-		themesGui.SetFont("Norm", "Arial")
+		splashScreensGui.Add("Text", "x50 yp+30 w310 W:Grow 0x10")
 
-		themesGui.Add("Text", "x16 y48 w160 h23 +0x200", translate("Upper Title"))
-		themesGui.Add("Edit", "x110 y48 w284 h21 W:Grow VwindowTitleEdit", this.Value["windowTitle"])
+		splashScreensGui.SetFont("Norm", "Arial")
 
-		themesGui.Add("Text", "x16 y72 w160 h23 +0x200", translate("Lower Title"))
-		themesGui.Add("Edit", "x110 y72 w284 h21 W:Grow VwindowSubtitleEdit", this.Value["windowSubtitle"])
+		splashScreensGui.Add("Text", "x16 yp+10 w160 h23 +0x200", translate("Upper Title"))
+		splashScreensGui.Add("Edit", "x110 yp w284 h21 W:Grow VwindowTitleEdit", this.Value["windowTitle"])
 
-		themesGui.Add("Text", "x50 y106 w310 W:Grow 0x10")
+		splashScreensGui.Add("Text", "x16 yp+24 w160 h23 +0x200", translate("Lower Title"))
+		splashScreensGui.Add("Edit", "x110 yp w284 h21 W:Grow VwindowSubtitleEdit", this.Value["windowSubtitle"])
 
-		this.iThemesList.createGui(this, configuration)
+		splashScreensGui.Add("Text", "x50 yp+30 w310 W:Grow 0x10")
 
-		themesGui.Add("Text", "x50 y+10 w310 Y:Move W:Grow 0x10")
+		this.iSplashScreensList.createGui(this)
 
-		themesGui.Add("Button", "x126 yp+10 w80 h23 Y:Move X:Move(0.5) Default", translate("Save")).OnEvent("Click", saveThemesEditor)
-		themesGui.Add("Button", "x214 yp w80 h23 Y:Move X:Move(0.5)", translate("&Cancel")).OnEvent("Click", cancelThemesEditor)
+		splashScreensGui.Add("Text", "x50 y+10 w310 Y:Move W:Grow 0x10")
+
+		splashScreensGui.Add("Button", "x126 yp+10 w80 h23 Y:Move X:Move(0.5) Default", translate("Save")).OnEvent("Click", saveSplashScreenEditor)
+		splashScreensGui.Add("Button", "x214 yp w80 h23 Y:Move X:Move(0.5)", translate("&Cancel")).OnEvent("Click", cancelSplashScreenEditor)
 	}
 
 	loadFromConfiguration(configuration) {
@@ -123,27 +125,27 @@ class ThemesEditor extends ConfiguratorPanel {
 		setMultiMapValue(configuration, "Splash Window", "Title", this.Control["windowTitleEdit"].Text)
 		setMultiMapValue(configuration, "Splash Window", "Subtitle", this.Control["windowSubtitleEdit"].Text)
 
-		this.iThemesList.saveToConfiguration(configuration)
+		this.iSplashScreensList.saveToConfiguration(configuration)
 	}
 
-	editThemes(owner := false) {
+	editSplashScreens(owner := false) {
 		local x, y, configuration, window
 
-		this.createGui(this.Configuration)
+		this.createGui()
 
 		window := this.Window
 
 		if owner
 			window.Opt("+Owner" . owner.Hwnd)
 
-		this.iThemesList.clearEditor()
+		this.iSplashScreensList.clearEditor()
 
-		if getWindowPosition("Themes Editor", &x, &y)
+		if getWindowPosition("Splash Screens Editor", &x, &y)
 			window.Show("x" . x . " y" . y)
 		else
 			window.Show()
 
-		if getWindowSize("Themes Editor", &w, &h)
+		if getWindowSize("Splash Screens Editor", &w, &h)
 			window.Resize("Initialize", w, h)
 
 		loop
@@ -167,17 +169,17 @@ class ThemesEditor extends ConfiguratorPanel {
 	}
 
 	closeEditor(save) {
-		this.iThemesList.togglePlaySoundFile(true)
+		this.iSplashScreensList.togglePlaySoundFile(true)
 
 		this.iClosed := (save ? kOk : kCancel)
 	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; ThemesList                                                              ;;;
+;;; SplashScreensList                                                       ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class ThemesList extends ConfigurationItemList {
+class SplashScreensList extends ConfigurationItemList {
 	iSoundIsPlaying := false
 	iPicturesList := false
 
@@ -190,13 +192,13 @@ class ThemesList extends ConfigurationItemList {
 	__New(configuration) {
 		super.__New(configuration)
 
-		ThemesList.Instance := this
+		SplashScreensList.Instance := this
 	}
 
-	createGui(editor, configuration) {
+	createGui(editor) {
 		local window := editor.Window
 
-		updateThemesEditorState(*) {
+		updateSplashScreenEditorState(*) {
 			protectionOn()
 
 			try {
@@ -218,7 +220,7 @@ class ThemesList extends ConfigurationItemList {
 			}
 		}
 
-		addThemePicture(*) {
+		addSplashScreenPicture(*) {
 			local pictureFile
 
 			protectionOn()
@@ -299,105 +301,105 @@ class ThemesList extends ConfigurationItemList {
 			}
 		}
 
-		window.Add("ListView", "x16 y120 w377 h140 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr VthemesListView", collect(["Theme", "Media", "Sound File"], translate))
-		window.Add("Text", "x16 y270 w86 h23 +0x200 Y:Move", translate("Theme"))
-		window.Add("Edit", "x110 y270 w140 h21 Y:Move W:Grow(0.5) VthemeNameEdit")
+		window.Add("ListView", "x16 yp+24 w377 h140 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr VsplashScreensListView", collect(["Splash Screen", "Media", "Sound File"], translate))
+		window.Add("Text", "x16 yp+150 w86 h23 +0x200 Y:Move", translate("Splash Screen"))
+		window.Add("Edit", "x110 yp w140 h21 Y:Move W:Grow(0.5) VsplashScreenNameEdit")
 
-		window.Add("Text", "x16 y294 w86 h23 +0x200 Y:Move", translate("Type"))
-		window.Add("DropDownList", "x110 y294 w140 Y:Move W:Grow(0.5) VthemeTypeDropDown", [translate("Picture Carousel"), translate("Video")]).OnEvent("Change", updateThemesEditorState)
+		window.Add("Text", "x16 yp+24 w86 h23 +0x200 Y:Move", translate("Type"))
+		window.Add("DropDownList", "x110 yp w140 Y:Move W:Grow(0.5) VsplashScreenTypeDropDown", [translate("Picture Carousel"), translate("Video")]).OnEvent("Change", updateSplashScreenEditorState)
 
-		window.Add("Text", "x16 y318 w160 h23 Y:Move +0x200", translate("Sound File"))
-		window.Add("Button", "x85 y317 w23 h23 Y:Move vplaySoundFileButton").OnEvent("Click", togglePlaySoundFile)
+		window.Add("Text", "x16 yp+24 w160 h23 Y:Move +0x200", translate("Sound File"))
+		window.Add("Button", "x85 yp-1 w23 h23 Y:Move vplaySoundFileButton").OnEvent("Click", togglePlaySoundFile)
 		setButtonIcon(window["playSoundFileButton"], kIconsDirectory . "Start.ico", 1, "L2 T2 R2 B2")
-		window.Add("Edit", "x110 y318 w259 h21 Y:Move W:Grow VsoundFilePathEdit")
-		window.Add("Button", "x371 y317 w23 h23 Y:Move X:Move", translate("...")).OnEvent("Click", chooseSoundFilePath)
+		window.Add("Edit", "x110 yp+1 w259 h21 Y:Move W:Grow VsoundFilePathEdit")
+		window.Add("Button", "x371 yp-1 w23 h23 Y:Move X:Move", translate("...")).OnEvent("Click", chooseSoundFilePath)
 
-		window.Add("Text", "x16 y342 w80 h23 +0x200 Y:Move VvideoFilePathLabel", translate("Video"))
-		window.Add("Edit", "x110 y342 w259 h21 Y:Move W:Grow VvideoFilePathEdit")
-		window.Add("Button", "x371 y341 w23 h23 Y:Move X:Move VvideoFilePathButton", translate("...")).OnEvent("Click", chooseVideoFilePath)
+		window.Add("Text", "x16 yp+25 w80 h23 +0x200 Y:Move VvideoFilePathLabel", translate("Video"))
+		window.Add("Edit", "x110 yp w259 h21 Y:Move W:Grow VvideoFilePathEdit")
+		window.Add("Button", "x371 yp-1 w23 h23 Y:Move X:Move VvideoFilePathButton", translate("...")).OnEvent("Click", chooseVideoFilePath)
 
-		window.Add("Text", "x16 y342 w80 h23 +0x200 Y:Move VpicturesListLabel", translate("Pictures"))
-		window.Add("Button", "x85 y342 w23 h23 Y:Move VaddPictureButton").OnEvent("Click", addThemePicture)
+		window.Add("Text", "x16 yp+1 w80 h23 +0x200 Y:Move VpicturesListLabel", translate("Pictures"))
+		window.Add("Button", "x85 yp w23 h23 Y:Move VaddPictureButton").OnEvent("Click", addSplashScreenPicture)
 		setButtonIcon(window["addPictureButton"], kIconsDirectory . "Plus.ico", 1)
 
-		window.Add("ListView", "x110 y342 w284 h112 Y:Move W:Grow -Multi -LV0x10 Checked -Hdr NoSort NoSortHdr VpicturesListView", [translate("Picture")])
+		window.Add("ListView", "x110 yp w284 h112 Y:Move W:Grow -Multi -LV0x10 Checked -Hdr NoSort NoSortHdr VpicturesListView", [translate("Picture")])
 
-		window.Add("Text", "x16 y456 w80 h23 +0x200 Y:Move VpicturesDurationLabel", translate("Display Duration"))
-		window.Add("Edit", "x110 y456 w40 h21 Y:Move Limit5 Number VpicturesDurationEdit")
+		window.Add("Text", "x16 yp+114 w80 h23 +0x200 Y:Move VpicturesDurationLabel", translate("Display Duration"))
+		window.Add("Edit", "x110 yp w40 h21 Y:Move Limit5 Number VpicturesDurationEdit")
 
 		window.SetFont("Norm", "Arial")
 
-		window.Add("Text", "x154 y459 w40 h23 Y:Move VpicturesDurationPostfix", translate("ms"))
+		window.Add("Text", "x154 yp+3 w40 h23 Y:Move VpicturesDurationPostfix", translate("ms"))
 
-		window.Add("Button", "x184 y490 w46 h23 Y:Move X:Move VthemeAddButton", translate("Add"))
-		window.Add("Button", "x232 y490 w50 h23 Y:Move X:Move Disabled VthemeDeleteButton", translate("Delete"))
-		window.Add("Button", "x340 y490 w55 h23 Y:Move X:Move Disabled VthemeUpdateButton", translate("&Save"))
+		window.Add("Button", "x184 yp+31 w46 h23 Y:Move X:Move VsplashScreenAddButton", translate("Add"))
+		window.Add("Button", "x232 yp w50 h23 Y:Move X:Move Disabled VsplashScreenDeleteButton", translate("Delete"))
+		window.Add("Button", "x340 yp w55 h23 Y:Move X:Move Disabled VsplashScreenUpdateButton", translate("&Save"))
 
-		this.initializeList(editor, window["themesListView"], window["themeAddButton"], window["themeDeleteButton"], window["themeUpdateButton"])
+		this.initializeList(editor, window["splashScreensListView"], window["splashScreenAddButton"], window["splashScreenDeleteButton"], window["splashScreenUpdateButton"])
 	}
 
 	loadFromConfiguration(configuration) {
-		local splashThemes := getMultiMapValues(configuration, "Splash Themes")
-		local themes := CaseInsenseMap()
-		local descriptor, value, theme, type, media, duration, songFile
+		local definition := getMultiMapValues(configuration, "Splash Screens")
+		local splashScreens := CaseInsenseMap()
+		local descriptor, value, splashScreen, type, media, duration, songFile
 
 		super.loadFromConfiguration(configuration)
 
-		for descriptor, value in splashThemes {
-			theme := StrSplit(descriptor, ".")[1]
+		for descriptor, value in definition {
+			splashScreen := StrSplit(descriptor, ".")[1]
 
-			if !themes.Has(theme) {
-				type := splashThemes[theme . ".Type"]
-				media := ((type == ("Picture Carousel")) ? splashThemes[theme . ".Images"] : splashThemes[theme . ".Video"])
-				duration := ((type == ("Picture Carousel")) ? splashThemes[theme . ".Duration"] : false)
-				songFile := (splashThemes.Has(theme . ".Song") ? splashThemes[theme . ".Song"] : false)
+			if !splashScreens.Has(splashScreen) {
+				type := definition[splashScreen . ".Type"]
+				media := ((type == ("Picture Carousel")) ? definition[splashScreen . ".Images"] : definition[splashScreen . ".Video"])
+				duration := ((type == ("Picture Carousel")) ? definition[splashScreen . ".Duration"] : false)
+				songFile := (definition.Has(splashScreen . ".Song") ? definition[splashScreen . ".Song"] : false)
 
 				if !songFile
 					songFile := ""
 
-				themes[theme] := theme
+				splashScreens[splashScreen] := true
 
-				this.ItemList.Push([type, theme, media, songFile, duration])
+				this.ItemList.Push([type, splashScreen, media, songFile, duration])
 			}
 		}
 	}
 
 	saveToConfiguration(configuration) {
-		local index, theme, name, type, songFile
+		local index, splashScreen, name, type, songFile
 
 		super.saveToConfiguration(configuration)
 
-		for index, theme in this.ItemList {
-			name := theme[2]
-			type := theme[1]
-			songFile := theme[4]
+		for index, splashScreen in this.ItemList {
+			name := splashScreen[2]
+			type := splashScreen[1]
+			songFile := splashScreen[4]
 
-			setMultiMapValue(configuration, "Splash Themes", name . ".Type", type)
+			setMultiMapValue(configuration, "Splash Screens", name . ".Type", type)
 
 			if (songFile && (songFile != ""))
-				setMultiMapValue(configuration, "Splash Themes", name . ".Song", songFile)
+				setMultiMapValue(configuration, "Splash Screens", name . ".Song", songFile)
 
 			if (type == "Picture Carousel") {
-				setMultiMapValue(configuration, "Splash Themes", name . ".Images", theme[3])
-				setMultiMapValue(configuration, "Splash Themes", name . ".Duration", theme[5])
+				setMultiMapValue(configuration, "Splash Screens", name . ".Images", splashScreen[3])
+				setMultiMapValue(configuration, "Splash Screens", name . ".Duration", splashScreen[5])
 			}
 			else
-				setMultiMapValue(configuration, "Splash Themes", name . ".Video", theme[3])
+				setMultiMapValue(configuration, "Splash Screens", name . ".Video", splashScreen[3])
 		}
 	}
 
 	loadList(items) {
-		local ignore, theme, songFile, nameNoExt, mediaFiles, mediaFile
+		local ignore, splashScreen, songFile, nameNoExt, mediaFiles, mediaFile
 
 		static first := true
 
-		if (first != this.Control["themesListView"])
+		if (first != this.Control["splashScreensListView"])
 			first := true
 
-		this.Control["themesListView"].Delete()
+		this.Control["splashScreensListView"].Delete()
 
-		for ignore, theme in items {
-			songFile := theme[4]
+		for ignore, splashScreen in items {
+			songFile := splashScreen[4]
 
 			if (songFile != "") {
 				SplitPath(songFile, , , , &nameNoExt)
@@ -407,28 +409,28 @@ class ThemesList extends ConfigurationItemList {
 
 			mediaFiles := []
 
-			for ignore, mediaFile in string2Values(",", theme[3]) {
+			for ignore, mediaFile in string2Values(",", splashScreen[3]) {
 				SplitPath(mediaFile, , , , &nameNoExt)
 
 				mediaFiles.Push(nameNoExt)
 			}
 
-			this.Control["themesListView"].Add("", theme[2], values2String(", ", mediaFiles*), songFile)
+			this.Control["splashScreensListView"].Add("", splashScreen[2], values2String(", ", mediaFiles*), songFile)
 		}
 
 		if first {
-			this.Control["themesListView"].ModifyCol(1, 100)
-			this.Control["themesListView"].ModifyCol(2, 180)
-			this.Control["themesListView"].ModifyCol(3, 100)
+			this.Control["splashScreensListView"].ModifyCol(1, 100)
+			this.Control["splashScreensListView"].ModifyCol(2, 180)
+			this.Control["splashScreensListView"].ModifyCol(3, 100)
 
-			first := this.Control["themesListView"]
+			first := this.Control["splashScreensListView"]
 		}
 	}
 
 	updateState() {
 		super.updateState()
 
-		if (this.Control["themeTypeDropDown"].Value == 1) {
+		if (this.Control["splashScreenTypeDropDown"].Value == 1) {
 			this.Control["picturesListLabel"].Visible := true
 			this.Control["addPictureButton"].Visible := true
 			this.Control["picturesListView"].Visible := true
@@ -445,7 +447,7 @@ class ThemesList extends ConfigurationItemList {
 			this.Control["picturesDurationPostfix"].Visible := false
 		}
 
-		if (this.Control["themeTypeDropDown"].Value == 2) {
+		if (this.Control["splashScreenTypeDropDown"].Value == 2) {
 			this.Control["videoFilePathLabel"].Visible := true
 			this.Control["videoFilePathEdit"].Visible := true
 			this.Control["videoFilePathButton"].Visible := true
@@ -480,8 +482,8 @@ class ThemesList extends ConfigurationItemList {
 	loadEditor(item) {
 		local chosen := ((item[1] == "Picture Carousel") ? 1 : 2)
 
-		this.Control["themeTypeDropDown"].Choose(chosen)
-		this.Control["themeNameEdit"].Text := item[2]
+		this.Control["splashScreenTypeDropDown"].Choose(chosen)
+		this.Control["splashScreenNameEdit"].Text := item[2]
 		this.Control["soundFilePathEdit"].Text := item[4]
 
 		if (chosen == 2)
@@ -501,8 +503,8 @@ class ThemesList extends ConfigurationItemList {
 	}
 
 	clearEditor() {
-		this.Control["themeTypeDropDown"].Choose(0)
-		this.Control["themeNameEdit"].Text := ""
+		this.Control["splashScreenTypeDropDown"].Choose(0)
+		this.Control["splashScreenNameEdit"].Text := ""
 		this.Control["soundFilePathEdit"].Text := ""
 		this.Control["videoFilePathEdit"].Text := ""
 		this.Control["picturesDurationEdit"].Text := 3000
@@ -515,7 +517,7 @@ class ThemesList extends ConfigurationItemList {
 	buildItemFromEditor(isNew := false) {
 		local type, media, pictures, rowNumber, fileName
 
-		if (this.Control["themeTypeDropDown"].Value == 1) {
+		if (this.Control["splashScreenTypeDropDown"].Value == 1) {
 			type := "Picture Carousel"
 			pictures := []
 
@@ -534,7 +536,7 @@ class ThemesList extends ConfigurationItemList {
 
 			media := values2String(", ", pictures*)
 		}
-		else if (this.Control["themeTypeDropDown"].Value == 2) {
+		else if (this.Control["splashScreenTypeDropDown"].Value == 2) {
 			type := "Video"
 			media := this.Control["videoFilePathEdit"].Text
 		}
@@ -546,7 +548,7 @@ class ThemesList extends ConfigurationItemList {
 			return false
 		}
 
-		return Array(type, this.Control["themeNameEdit"].Text, media, this.Control["soundFilePathEdit"].Text, this.Control["picturesDurationEdit"].Text)
+		return Array(type, this.Control["splashScreenNameEdit"].Text, media, this.Control["soundFilePathEdit"].Text, this.Control["picturesDurationEdit"].Text)
 	}
 
 	togglePlaySoundFile(stop := false) {

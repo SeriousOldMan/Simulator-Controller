@@ -2617,7 +2617,7 @@ initializeSimulatorSetup() {
 						setMultiMapValue(definition, section, key, value)
 
 	setMultiMapValues(kSimulatorConfiguration, "Splash Window", getMultiMapValues(definition, "Splash Window"))
-	setMultiMapValues(kSimulatorConfiguration, "Splash Themes", getMultiMapValues(definition, "Splash Themes"))
+	setMultiMapValues(kSimulatorConfiguration, "Splash Screens", getMultiMapValues(definition, "Splash Screens"))
 
 	setMultiMapValue(kSimulatorConfiguration, "Splash Window", "Title"
 											, translate("Modular Simulator Controller System") . translate(" - ") . translate("Setup && Configuration"))
@@ -2641,7 +2641,7 @@ initializeSimulatorSetup() {
 	if wizard.Debug[kDebugKnowledgeBase]
 		SupportMenu.Check(label)
 
-	showSplashTheme("Rotating Brain")
+	showSplashScreen("Rotating Brain")
 
 	wizard.ProgressCount := 0
 
@@ -2676,7 +2676,7 @@ startupSimulatorSetup() {
 
 		Sleep(1000)
 
-		hideSplashTheme()
+		hideSplashScreen()
 		hideProgress()
 
 		wizard.show()
@@ -2703,7 +2703,7 @@ startupSimulatorSetup() {
 
 			wizard.ProgressCount := 0
 
-			showSplashTheme("Rotating Brain")
+			showSplashScreen("Rotating Brain")
 			showProgress({color: "Blue", title: translate("Initializing Setup Wizard"), message: translate("")})
 		}
 		else

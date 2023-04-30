@@ -34,7 +34,7 @@
 
 #Include "Libraries\ConfigurationItemList.ahk"
 #Include "Libraries\ConfigurationEditor.ahk"
-#Include "Libraries\ThemesEditor.ahk"
+#Include "Libraries\SplashScreenEditor.ahk"
 #Include "Libraries\FormatsEditor.ahk"
 #Include "Libraries\TranslationsEditor.ahk"
 
@@ -50,7 +50,7 @@
 class GeneralTab extends ConfiguratorPanel {
 	iSimulatorsList := false
 	iDevelopment := false
-	iSplashThemesConfiguration := false
+	iSplashSplashScreensConfiguration := false
 	iFormatsConfiguration := false
 
 	__New(development, configuration) {
@@ -165,8 +165,8 @@ class GeneralTab extends ConfiguratorPanel {
 			this.openFormatsEditor()
 		}
 
-		openThemesEditor(*) {
-			this.openThemesEditor()
+		openSplashScreenEditor(*) {
+			this.openSplashScreenEditor()
 		}
 
 		this.Editor := editor
@@ -216,7 +216,7 @@ class GeneralTab extends ConfiguratorPanel {
 		window.Add("CheckBox", "x24 y200 w242 h23 Checked" . this.Value["startWithWindows"] . " VstartWithWindowsCheck", translate("Start with Windows"))
 		window.Add("CheckBox", "x24 y224 w242 h23 Checked" . this.Value["silentMode"] . " VsilentModeCheck", translate("Silent mode (no splash screen, no sound)"))
 
-		window.Add("Button", "x363 y224 w100 h23 X:Move", translate("Themes Editor...")).OnEvent("Click", openThemesEditor)
+		window.Add("Button", "x333 y224 w130 h23 X:Move", translate("Splash Screens...")).OnEvent("Click", openSplashScreenEditor)
 
 		window.SetFont("Norm", "Arial")
 		window.SetFont("Italic", "Arial")
@@ -298,11 +298,11 @@ class GeneralTab extends ConfiguratorPanel {
 		setMultiMapValue(configuration, "Configuration", "Start With Windows", this.Control["startWithWindowsCheck"].Value)
 		setMultiMapValue(configuration, "Configuration", "Silent Mode", this.Control["silentModeCheck"].Value)
 
-		if this.iSplashThemesConfiguration
-			addMultiMapValues(configuration, this.iSplashThemesConfiguration)
+		if this.iSplashSplashScreensConfiguration
+			addMultiMapValues(configuration, this.iSplashSplashScreensConfiguration)
 		else {
 			setMultiMapValues(configuration, "Splash Window", getMultiMapValues(this.Configuration, "Splash Window"))
-			setMultiMapValues(configuration, "Splash Themes", getMultiMapValues(this.Configuration, "Splash Themes"))
+			setMultiMapValues(configuration, "Splash Screens", getMultiMapValues(this.Configuration, "Splash Screens"))
 		}
 
 		if this.iFormatsConfiguration
@@ -372,17 +372,17 @@ class GeneralTab extends ConfiguratorPanel {
 		}
 	}
 
-	openThemesEditor() {
+	openSplashScreenEditor() {
 		local window := this.Window
 		local configuration
 
 		window.Opt("+Disabled")
 
 		try {
-			configuration := (ThemesEditor(this.iSplashThemesConfiguration ? this.iSplashThemesConfiguration : this.Configuration)).editThemes(window)
+			configuration := (SplashScreenEditor(this.iSplashSplashScreensConfiguration ? this.iSplashSplashScreensConfiguration : this.Configuration)).editSplashScreens(window)
 
 			if configuration
-				this.iSplashThemesConfiguration := configuration
+				this.iSplashSplashScreensConfiguration := configuration
 		}
 		finally {
 			window.Opt("-Disabled")

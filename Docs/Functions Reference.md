@@ -321,7 +321,7 @@ As you can see, this dialog will show three buttons which will be labeled "Yes",
 ***
 
 ## Splash Screens ([Splash.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Splash.ahk))
-Several applications of Simulator Controller uses a splash window to entertain the user while performing their operations. The splash screen shows different pictures or even an animation using a GIF. All required resources, that are part of the Simulator Controller distribution, are normally loacated in the *Resources/Splash Media* folder. An additional location for user supplied media exists in the *Simulator Controller\Splash Media* folder in the user *Documents* folder. The user can define several themes with rotating pictures or a GIF animation with the help of the [themes editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#themes-editor).
+Several applications of Simulator Controller uses a splash window to entertain the user while performing their operations. The splash screen shows different pictures or even an animation using a GIF. All required resources, that are part of the Simulator Controller distribution, are normally loacated in the *Resources/Splash Media* folder. An additional location for user supplied media exists in the *Simulator Controller\Splash Media* folder in the user *Documents* folder. The user can define several splash screens with rotating pictures or a GIF animation with the help of the [splash screen editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#splash-screen-editor).
 
 #### *showSplash(image :: String, alwaysOnTop :: Boolean := true)*
 *showSplash* opens the splash screen showing a picture. *image* must either be a partial path for a JPG or GIF file relative to [kSplashMediaDirectory](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#ksplashmediadirectory-kbuttonboximagesdirectory-kiconsdirectory), for example "Simulator Splash Images\ACC Splash.jpg", or a partial path relative to the *Simulator Controller\Splash Media* folder, which is located in the *Documents* folder of the current user, or an absolute path.
@@ -329,16 +329,16 @@ Several applications of Simulator Controller uses a splash window to entertain t
 #### *rotateSplash(alwaysOnTop :: Boolean := true)*
 Uses all JPG files available in [kSplashMediaDirectory](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#ksplashmediadirectory-kbuttonboximagesdirectory-kiconsdirectory) and in the *Simulator Controller\Splash Media* folder, which is located in the *Documents* folder of the current user, as a kind of picture carousel. Every call to *rotateSplash* will show the next picture.
 
-Important: This function is deprecated and will be removed in a future version of Simulator Controller. Use *showPlashTheme* instead.
+Important: This function is deprecated and will be removed in a future version of Simulator Controller. Use *showSplashScreen* instead.
 
 #### *hideSplash()*
-Closes the current splash window. Note: If the splash window had been opened using *showSplashTheme*, use *hideSplashTheme* instead.
+Closes the current splash window. Note: If the splash window had been opened using *showSplashScreen*, use *hideSplashScreen* instead.
 
-#### *showSplashTheme(theme :: String, songHandler :: TypeUnion(String, FuncObj) := false, alwaysOnTop :: Boolean := true)*
-Themes are a collection of pictures or a GIF animation possibly combined with a sound file. Themes are maintained by the [themes editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#themes-editor). *showSplashTheme* opens a splash window according to the themes definition. If *songHandler* is not provided, a default handler will be used, but the song will stop playing, if the current splash window is closed.
+#### *showSplashScreen(splashScreen :: String, songHandler :: TypeUnion(String, FuncObj) := false, alwaysOnTop :: Boolean := true)*
+Splash Screens are a collection of pictures or a GIF animation possibly combined with a sound file. They are maintained by the [themes editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#themes-editor). *showSplashScreen* opens a splash window according to the themes definition. If *songHandler* is not provided, a default handler will be used, but the song will stop playing, if the current splash window is closed.
 
-#### *hideSplashTheme()*
-Closes the current theme based splash window.
+#### *hideSplashScreen()*
+Closes the current splash window.
  
 ***
 

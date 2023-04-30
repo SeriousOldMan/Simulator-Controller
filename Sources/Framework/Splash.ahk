@@ -1,5 +1,5 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Themes && Splash                ;;;
+;;;   Modular Simulator Controller System - Splash Screens                  ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2023) Creative Commons - BY-NC-SA                        ;;;
@@ -30,7 +30,7 @@
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-playThemeSong(songFile) {
+playSplashScreenSong(songFile) {
 	songFile := getFileName(songFile, kUserSplashMediaDirectory, kSplashMediaDirectory)
 
 	if FileExist(songFile)
@@ -135,7 +135,7 @@ rotateSplash(alwaysOnTop := true) {
 		showSplash(images[number++], alwaysOnTop)
 }
 
-showSplashTheme(theme := unset, songHandler := false, alwaysOnTop := true) {
+showSplashScreen(splashScreen := unset, songHandler := false, alwaysOnTop := true) {
 	local song, video, duration, type
 
 	static images := false
@@ -144,9 +144,9 @@ showSplashTheme(theme := unset, songHandler := false, alwaysOnTop := true) {
 	static onTop := false
 
 	if !songHandler
-		songHandler := playThemeSong
+		songHandler := playSplashScreenSong
 
-	if !isSet(theme) {
+	if !isSet(splashScreen) {
 		if (number > numImages)
 			number := 1
 
@@ -158,11 +158,11 @@ showSplashTheme(theme := unset, songHandler := false, alwaysOnTop := true) {
 
 	song := false
 	duration := 3000
-	type := getMultiMapValue(kSimulatorConfiguration, "Splash Themes", theme . ".Type", false)
+	type := getMultiMapValue(kSimulatorConfiguration, "Splash Screens", splashScreen . ".Type", false)
 
 	if (type == "Video") {
-		song := getMultiMapValue(kSimulatorConfiguration, "Splash Themes", theme . ".Song", false)
-		video := getMultiMapValue(kSimulatorConfiguration, "Splash Themes", theme . ".Video")
+		song := getMultiMapValue(kSimulatorConfiguration, "Splash Screens", splashScreen . ".Song", false)
+		video := getMultiMapValue(kSimulatorConfiguration, "Splash Screens", splashScreen . ".Video")
 
 		showSplash(video, true)
 
@@ -172,12 +172,12 @@ showSplashTheme(theme := unset, songHandler := false, alwaysOnTop := true) {
 		return
 	}
 	else if (type == "Picture Carousel") {
-		duration := getMultiMapValue(kSimulatorConfiguration, "Splash Themes", theme . ".Duration", 5000)
-		song := getMultiMapValue(kSimulatorConfiguration, "Splash Themes", theme . ".Song", false)
-		images := string2Values(",", getMultiMapValue(kSimulatorConfiguration, "Splash Themes", theme . ".Images", false))
+		duration := getMultiMapValue(kSimulatorConfiguration, "Splash Screens", splashScreen . ".Duration", 5000)
+		song := getMultiMapValue(kSimulatorConfiguration, "Splash Screens", splashScreen . ".Song", false)
+		images := string2Values(",", getMultiMapValue(kSimulatorConfiguration, "Splash Screens", splashScreen . ".Images", false))
 	}
 	else {
-		logMessage(kLogCritical, translate("Theme `"") . theme . translate("`" not found - please check the configuration"))
+		logMessage(kLogCritical, translate("SplashScreen `"") . splashScreen . translate("`" not found - please check the configuration"))
 
 		images := getFileNames("*.jpg", kUserSplashMediaDirectory, kSplashMediaDirectory)
 	}
@@ -185,9 +185,9 @@ showSplashTheme(theme := unset, songHandler := false, alwaysOnTop := true) {
 	numImages := images.Length
 	onTop := alwaysOnTop
 
-	showSplashTheme()
+	showSplashScreen()
 
-	SetTimer(showSplashTheme, duration)
+	SetTimer(showSplashScreen, duration)
 
 	if song {
 		vSongIsPlaying := true
@@ -196,8 +196,8 @@ showSplashTheme(theme := unset, songHandler := false, alwaysOnTop := true) {
 	}
 }
 
-hideSplashTheme() {
-	SetTimer(showSplashTheme, 0)
+hideSplashScreen() {
+	SetTimer(showSplashScreen, 0)
 
 	try
 		SoundPlay("NonExistent.avi")
@@ -205,18 +205,18 @@ hideSplashTheme() {
 	hideSplash()
 }
 
-getAllThemes(configuration := false) {
-	local descriptor, value, theme
+getAllSplashScreens(configuration := false) {
+	local descriptor, value, splashScreen
 	local result := []
 
 	if !configuration
 		configuration := kSimulatorConfiguration
 
-	for descriptor, value in getMultiMapValues(configuration, "Splash Themes") {
-		theme := StrSplit(descriptor, ".")[1]
+	for descriptor, value in getMultiMapValues(configuration, "Splash Screens") {
+		splashScreen := StrSplit(descriptor, ".")[1]
 
-		if !inList(result, theme)
-			result.Push(theme)
+		if !inList(result, splashScreen)
+			result.Push(splashScreen)
 	}
 
 	return result

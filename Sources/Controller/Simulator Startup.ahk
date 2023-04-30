@@ -73,7 +73,7 @@ class SimulatorStartup extends ConfigurationItem {
 	iFeedbackComponents := []
 	iSettings := false
 	iSimulators := false
-	iSplashTheme := false
+	iSplashScreen := false
 	iStartupOption := false
 
 	iFinished := false
@@ -131,7 +131,7 @@ class SimulatorStartup extends ConfigurationItem {
 		super.loadFromConfiguration(configuration)
 
 		this.iSimulators := string2Values("|", getMultiMapValue(configuration, "Configuration", "Simulators", ""))
-		this.iSplashTheme := getMultiMapValue(this.Settings, "Startup", "Splash Theme", false)
+		this.iSplashScreen := getMultiMapValue(this.Settings, "Startup", "Splash Screen", false)
 		this.iStartupOption := getMultiMapValue(this.Settings, "Startup", "Simulator", false)
 
 		this.iCoreComponents := []
@@ -268,7 +268,7 @@ class SimulatorStartup extends ConfigurationItem {
 	}
 
 	startup() {
-		local startSimulator, runningIndex, hidden, hasSplashTheme
+		local startSimulator, runningIndex, hidden, hasSplashScreen
 
 		playSong(songFile) {
 			if (songFile && FileExist(getFileName(songFile, kUserSplashMediaDirectory, kSplashMediaDirectory)))
@@ -283,8 +283,8 @@ class SimulatorStartup extends ConfigurationItem {
 			if (this.ControllerPID == 0)
 				exitStartup(true)
 
-			if (!kSilentMode && this.iSplashTheme)
-				showSplashTheme(this.iSplashTheme, playSong)
+			if (!kSilentMode && this.iSplashScreen)
+				showSplashScreen(this.iSplashScreen, playSong)
 
 			if !kSilentMode
 				showProgress({color: "Blue", message: translate("Start: Simulator Controller"), title: translate("Initialize Core System")})
@@ -312,11 +312,11 @@ class SimulatorStartup extends ConfigurationItem {
 			this.iFinished := true
 
 			hidden := false
-			hasSplashTheme := this.iSplashTheme
+			hasSplashScreen := this.iSplashScreen
 
 			if (startSimulator || (GetKeyState("Ctrl") || GetKeyState("MButton"))) {
-				if (!kSilentMode && hasSplashTheme) {
-					this.hideSplashTheme()
+				if (!kSilentMode && hasSplashScreen) {
+					this.hideSplashScreen()
 
 					hidden := true
 				}
@@ -328,30 +328,30 @@ class SimulatorStartup extends ConfigurationItem {
 				hideProgress()
 
 			if (kSilentMode || this.Canceled) {
-				if (!hidden && !kSilentMode && hasSplashTheme)
-					this.hideSplashTheme()
+				if (!hidden && !kSilentMode && hasSplashScreen)
+					this.hideSplashScreen()
 
 				exitStartup(true)
 			}
 			else {
-				if !hasSplashTheme
+				if !hasSplashScreen
 					exitStartup(true)
 			}
 		}
 	}
 
-	hideSplashTheme() {
-		if this.iSplashTheme {
-			this.iSplashTheme := false
+	hideSplashScreen() {
+		if this.iSplashScreen {
+			this.iSplashScreen := false
 
-			hideSplashTheme()
+			hideSplashScreen()
 		}
 	}
 
 	cancelStartup() {
 		this.iCanceled := true
 
-		this.hideSplashTheme()
+		this.hideSplashScreen()
 	}
 }
 
@@ -677,7 +677,7 @@ startupSimulator() {
 				exitStartup()
 			else
 				try {
-					hideSplashTheme()
+					hideSplashScreen()
 				}
 				catch Any as exception {
 					logError(exception)
@@ -742,7 +742,7 @@ cancelStartup(*) {
 
 	try {
 		if startupManager {
-			startupManager.hideSplashTheme()
+			startupManager.hideSplashScreen()
 
 			if !startupManager.Finished {
 				SoundPlay("*32")
@@ -761,7 +761,7 @@ cancelStartup(*) {
 				if (startupManager.ControllerPID != 0)
 					messageSend(kFileMessage, "Startup", "stopStartupSong", startupManager.ControllerPID)
 
-				startupManager.hideSplashTheme()
+				startupManager.hideSplashScreen()
 
 				exitStartup(true)
 			}

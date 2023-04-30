@@ -822,7 +822,7 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	startSimulator(application, splashImage := false) {
-		local theme, songFile, name, started
+		local splashScreen, songFile, name, started
 
 		if !application.isRunning()
 			if (application.startup(false))
@@ -832,8 +832,8 @@ class SimulatorController extends ConfigurationItem {
 					try {
 						showSplash(splashImage)
 
-						theme := getMultiMapValue(this.Settings, "Startup", "Splash Theme", false)
-						songFile := (theme ? getMultiMapValue(this.Configuration, "Splash Themes", theme . ".Song", false) : false)
+						splashScreen := getMultiMapValue(this.Settings, "Startup", "Splash Screen", false)
+						songFile := (splashScreen ? getMultiMapValue(this.Configuration, "Splash Screens", splashScreen . ".Song", false) : false)
 
 						if (songFile && FileExist(getFileName(songFile, kUserSplashMediaDirectory, kSplashMediaDirectory)))
 							messageSend(kLocalMessage, "Startup", "playStartupSong:" . songFile)

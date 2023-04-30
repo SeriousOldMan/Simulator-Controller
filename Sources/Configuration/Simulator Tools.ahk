@@ -77,7 +77,7 @@ global gCopyTargets := []
 global gBuildTargets := []
 global gSpecialTargets := []
 
-global gSplashTheme := false
+global gSplashScreen := false
 
 global gTargetsCount := 0
 
@@ -463,7 +463,7 @@ checkInstallation() {
 				  , DeleteUserFiles: false}
 
 		if (quiet || uninstallOptions(options)) {
-			showSplashTheme("McLaren 720s GT3 Pictures")
+			showSplashScreen("McLaren 720s GT3 Pictures")
 
 			gProgressCount := 0
 
@@ -507,7 +507,7 @@ checkInstallation() {
 
 			Sleep(1000)
 
-			hideSplashTheme()
+			hideSplashScreen()
 			hideProgress()
 
 			ExitApp(0)
@@ -990,7 +990,7 @@ deleteUninstallerInfo() {
 }
 
 readToolsConfiguration(&updateSettings, &cleanupSettings, &copySettings, &buildSettings
-					 , &splashTheme, &targetConfiguration) {
+					 , &splashScreen, &targetConfiguration) {
 	local targets := readMultiMap(kToolsTargetsFile)
 	local configuration := readMultiMap(kToolsConfigurationFile)
 	local updateConfiguration := readMultiMap(getFileName("UPDATES", kUserConfigDirectory))
@@ -1024,14 +1024,14 @@ readToolsConfiguration(&updateSettings, &cleanupSettings, &copySettings, &buildS
 		buildSettings[target] := getMultiMapValue(configuration, "Build", target, true)
 	}
 
-	splashTheme := getMultiMapValue(configuration, "General", "Splash Theme", false)
+	splashScreen := getMultiMapValue(configuration, "General", "Splash Screen", false)
 	targetConfiguration := getMultiMapValue(configuration, "Compile", "TargetConfiguration", "Development")
 
 	if A_IsCompiled
 		buildSettings["Simulator Tools"] := false
 }
 
-writeToolsConfiguration(updateSettings, cleanupSettings, copySettings, buildSettings, splashTheme, targetConfiguration) {
+writeToolsConfiguration(updateSettings, cleanupSettings, copySettings, buildSettings, splashScreen, targetConfiguration) {
 	local configuration := newMultiMap()
 	local target, setting
 
@@ -1044,7 +1044,7 @@ writeToolsConfiguration(updateSettings, cleanupSettings, copySettings, buildSett
 	for target, setting in buildSettings
 		setMultiMapValue(configuration, "Build", target, setting)
 
-	setMultiMapValue(configuration, "General", "Splash Theme", splashTheme)
+	setMultiMapValue(configuration, "General", "Splash Screen", splashScreen)
 	setMultiMapValue(configuration, "Compile", "TargetConfiguration", targetConfiguration)
 
 	writeMultiMap(kToolsConfigurationFile, configuration)
@@ -1116,10 +1116,10 @@ viewBuildLog(fileName, title := "", x := "Center", y := "Center", width := 800, 
 }
 
 editTargets(command := "", *) {
-	global gSplashTheme, gTargetConfiguration, gTargetConfigurationChanged
+	global gSplashScreen, gTargetConfiguration, gTargetConfigurationChanged
 
 	local target, setting, updateVariable, cleanupVariable, copyVariable, buildVariable, updateHeight, cleanupHeight
-	local cleanupPosOption, option, copyHeight, buildHeight, themes, chosen, yPos, x, y, targetConfiguration
+	local cleanupPosOption, option, copyHeight, buildHeight, splashScreens, chosen, yPos, x, y, targetConfiguration
 
 	static targetsGui
 
@@ -1138,7 +1138,7 @@ editTargets(command := "", *) {
 		for target, setting in gBuildSettings
 			gBuildSettings[target] := targetsGui["buildVariable" . A_Index].Value
 
-		gSplashTheme := ((targetsGui["splashTheme"].Text == translate("None")) ? false : targetsGui["splashTheme"].Text)
+		gSplashScreen := ((targetsGui["splashScreen"].Text == translate("None")) ? false : targetsGui["splashScreen"].Text)
 
 		targetConfiguration := ["Development", "Production"][targetsGui["targetConfiguration"].Value]
 
@@ -1147,7 +1147,7 @@ editTargets(command := "", *) {
 
 		gTargetConfiguration := targetConfiguration
 
-		writeToolsConfiguration(gUpdateSettings, gCleanupSettings, gCopySettings, gBuildSettings, gSplashTheme, gTargetConfiguration)
+		writeToolsConfiguration(gUpdateSettings, gCleanupSettings, gCopySettings, gBuildSettings, gSplashScreen, gTargetConfiguration)
 
 		result := 1
 	}
@@ -1299,11 +1299,11 @@ editTargets(command := "", *) {
 		targetsGui.Add("Text", "X10 Y" . yPos, translate("Target"))
 		targetsGui.Add("DropDownList", "X110 YP-5 w310 Choose" . chosen . " vtargetConfiguration", collect(["Development", "Production"], translate))
 
-		themes := getAllThemes()
-		chosen := (gSplashTheme ? inList(themes, gSplashTheme) + 1 : 1)
+		splashScreens := getAllSplashScreens()
+		chosen := (gSplashScreen ? inList(splashScreens, gSplashScreen) + 1 : 1)
 
-		targetsGui.Add("Text", "X10 YP+30", translate("Theme"))
-		targetsGui.Add("DropDownList", "X110 YP-5 w310 Choose" . chosen . " vsplashTheme", concatenate([translate("None")], themes))
+		targetsGui.Add("Text", "X10 YP+30", translate("Splash Screen"))
+		targetsGui.Add("DropDownList", "X110 YP-5 w310 Choose" . chosen . " vsplashScreen", concatenate([translate("None")], splashScreens))
 
 		targetsGui.Add("Button", "Default X110 y+20 w100", translate("Run")).OnEvent("Click", editTargets.Bind(kSave))
 		targetsGui.Add("Button", "X+10 w100", translate("&Cancel")).OnEvent("Click", editTargets.Bind(kCancel))
@@ -2995,7 +2995,7 @@ prepareTargets(&buildProgress, updateOnly) {
 }
 
 startSimulatorTools() {
-	global gUpdateSettings, gCleanupSettings, gCopySettings, gBuildSettings, gSplashTheme, gTargetConfiguration, gTargetsCount
+	global gUpdateSettings, gCleanupSettings, gCopySettings, gBuildSettings, gSplashScreen, gTargetConfiguration, gTargetsCount
 
 	local exitProcesses := GetKeyState("Shift")
 	local updateOnly := false
@@ -3007,7 +3007,7 @@ startSimulatorTools() {
 
 	checkInstallation()
 
-	readToolsConfiguration(&gUpdateSettings, &gCleanupSettings, &gCopySettings, &gBuildSettings, &gSplashTheme, &gTargetConfiguration)
+	readToolsConfiguration(&gUpdateSettings, &gCleanupSettings, &gCopySettings, &gBuildSettings, &gSplashScreen, &gTargetConfiguration)
 
 	if (A_Args.Length > 0)
 		if (A_Args[1] = "-Update")
@@ -3027,8 +3027,8 @@ startSimulatorTools() {
 				ExitApp(0)
 	}
 
-	if (!kSilentMode && gSplashTheme)
-		showSplashTheme(gSplashTheme, false, false)
+	if (!kSilentMode && gSplashScreen)
+		showSplashScreen(gSplashScreen, false, false)
 
 	Sleep(500)
 
@@ -3068,8 +3068,8 @@ startSimulatorTools() {
 	if !kSilentMode {
 		hideProgress()
 
-		if gSplashTheme
-			hideSplashTheme()
+		if gSplashScreen
+			hideSplashScreen()
 	}
 
 	ExitApp(0)

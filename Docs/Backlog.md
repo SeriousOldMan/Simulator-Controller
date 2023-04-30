@@ -33,5 +33,5 @@
   1. Definition of motion feedback settings for different tracks and cars, selectable by the touch of a button
   
 #### General
-  1. Choosing a specific theme depending on the selected simulation game
+  1. Choosing a specific color scheme and splash screen depending on the selected simulation game
   2. Further simplification of the overall configuration process. Overhaul of "Race Settings", "Simulator Settings" and "Simulator Configuration"

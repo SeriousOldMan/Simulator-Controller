@@ -74,6 +74,12 @@ class Theme {
 		}
 	}
 
+	Descriptor {
+		Get {
+			throw "Virtual property Theme.Descriptor must be implemented in a subclass"
+		}
+	}
+
 	WindowBackColor {
 		Get {
 			return Theme.GetSystemColor("WinBackColor")
@@ -281,7 +287,13 @@ class UserTheme extends ConfigurationItem {
 }
 */
 
-class SystemTheme extends Theme {
+class WindowsTheme extends Theme {
+	Descriptor {
+		Get {
+			return "Windows"
+		}
+	}
+
 	InitializeWindow(window) {
 	}
 
@@ -295,7 +307,13 @@ class SystemTheme extends Theme {
 	}
 }
 
-class LightTheme extends Theme {
+class ClassicTheme extends Theme {
+	Descriptor {
+		Get {
+			return "Classic"
+		}
+	}
+
 	WindowBackColor {
 		Get {
 			return "D0D0D0"
@@ -348,7 +366,13 @@ class LightTheme extends Theme {
 	}
 }
 
-class DarkTheme extends LightTheme {
+class DarkTheme extends ClassicTheme {
+	Descriptor {
+		Get {
+			return "Dark"
+		}
+	}
+
 	WindowBackColor {
 		Get {
 			return "909090"
@@ -1157,6 +1181,10 @@ class Window extends Gui {
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+getAllUIThemes(configuration) {
+	return [WindowsTheme(), ClassicTheme(), DarkTheme()]
+}
+
 setButtonIcon(buttonHandle, file, index := 1, options := "") {
 	local ptrSize, button_il, normal_il, L, T, R, B, A, W, H, S, DW, PTR
 	local BCM_SETIMAGELIST
@@ -1366,7 +1394,7 @@ initializeGUI() {
 
 	Window.DefineCustomControl("Documentation", createDocumentation)
 
-	Theme.CurrentTheme := %getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini"), "General", "UI Theme", "Light") . "Theme"%()
+	Theme.CurrentTheme := %getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini"), "General", "UI Theme", "Classic") . "Theme"%()
 
 	; DllCall("User32\SetProcessDpiAwarenessContext", "UInt" , -1)
 	; DllCall("User32\SetThreadDpiAwarenessContext", "UInt" , -1)

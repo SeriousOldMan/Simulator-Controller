@@ -1,5 +1,9 @@
 The following table will give you an overview over all settings, which are available in the session database. As described [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings-1), this settings can be defined precisely for a given simulator / car / track / weather combo and will overwrite the settings you have chosen in the "Race Settings" dialog. This allows you to automate most of the settings required for an upcoming session.
 
+### General settings
+
+This settings are generally available, although you can and have to define them specific for a given simulator / car / track / weather combo as described. Further down below you can find additional settings, which are not generally available, but are specific for a selected simulator. 
+
 | Category   | Setting                                  | Type    | Default                         | Available in "Race Settings" dialog| Description  |
 |------------|------------------------------------------|---------|---------------------------------|------------------------------------|--------------|
 | Data       | Collect Telemetry during Practice        | Boolean | True                            | No  | If *True*, general telemetry data is collected by the Strategist during practice sessions. |
@@ -85,3 +89,31 @@ The following table will give you an overview over all settings, which are avail
 | Engineer   | Damage warning during Race               | Boolean | True                            | No  | If *True*, the Engineer will issue damage warnings during race sessions. |
 | Engineer   | Pressure warning during Race             | Boolean | True                            | No  | If *True*, the Engineer will issue pressure loss warnings during race sessions. |
 | Strategist | Late Join                                | Boolean | False                           | No  | If *True*, the Strategist will also become active, when you join mid-session. Attention: This can lead to funny results in almost all calculations. |
+
+### Simulator specific settings
+
+The following settings are only available, if you have selected the corresponding simulator.
+
+1. *Assetto Corsa*
+
+| Category   | Setting                                  | Type    | Default                         | Description  |
+|------------|------------------------------------------|---------|---------------------------------|--------------|
+| Pitstop    | Key Delay                                | Integer | 20                              | The time in ms to wait between each virtual key press, when controlling the pitstop dialog of *Assetto Corsa*. Increase this, if your computer can't keep up with the speed of the virtual input. |
+| Pitstop    | # Car Specific Settings                  | Integer | 0                               | Some cars of *Assetto Corsa* provide car specific settings, which can be changed during pitstop. You can specify them using this setting, so that the setting navigation for these cars is correct. Only necessary for cars not already known in the meta data set for *Assetto Corsa* in Simulator Controller. |
+| Pitstop    | Minimum Pressure Front Left              | Integer | 15                              | Minimum pressure for the front left tyre allowed for a given car in *Assetto Corsa*. Only necessary for cars not already known in the meta data set for *Assetto Corsa* in Simulator Controller. |
+| Pitstop    | Minimum Pressure Front Right              | Integer | 15                             | Minimum pressure for the front right tyre allowed for a given car in *Assetto Corsa*. Only necessary for cars not already known in the meta data set for *Assetto Corsa* in Simulator Controller. |
+| Pitstop    | Minimum Pressure Rear Left              | Integer | 15                              | Minimum pressure for the rear left tyre allowed for a given car in *Assetto Corsa*. Only necessary for cars not already known in the meta data set for *Assetto Corsa* in Simulator Controller. |
+| Pitstop    | Minimum Pressure Rear Right              | Integer | 15                             | Minimum pressure for the rear right tyre allowed for a given car in *Assetto Corsa*. Only necessary for cars not already known in the meta data set for *Assetto Corsa* in Simulator Controller. |
+
+2. *Assetto Corsa Competizione*
+
+| Category   | Setting                                  | Type    | Default                         | Description  |
+|------------|------------------------------------------|---------|---------------------------------|--------------|
+| Pitstop    | Key Delay                                | Integer | 20                              | The time in ms to wait between each virtual key press, when controlling the pitstop dialog of *Assetto Corsa Competizione*. Increase this, if your computer can't keep up with the speed of the virtual input. |
+| Pitstop    | Image Search                             | Boolean | False                           | If *True*, the [image search method](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#important-preparation-for-the-pitstop-mfd-handling) is used, when controlling the Pitstop MFD of *Assetto Corsa Competizione*. If you enable this, because the default option walk disturbs you while driving, you have to provide the search images as described in the [documentation] for the ["ACC" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-acc). |
+
+3. *Automobilista 2*, *Project Cars 2*, *iRacing* and *RaceRoom Racing Experience*
+
+| Category   | Setting                                  | Type    | Default                         | Description  |
+|------------|------------------------------------------|---------|---------------------------------|--------------|
+| Pitstop    | Key Delay                                | Integer | 20                              | The time in ms to wait between each virtual key press, when controlling the pitstop settings of the simulator. Increase this, if your computer can't keep up with the speed of the virtual input. |

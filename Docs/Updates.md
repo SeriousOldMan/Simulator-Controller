@@ -45,7 +45,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 5.0.2
 
-Due to error by the stupid developer, the Team Server found in the *Binaries* folder of the distribution package was still a build for .NET Core 3.1, which has been taken out of service by Microsoft quite a while ago. I have updated the Team Server on all Azure instances already, but I forgot to update the build rule for the local Team Server. This has been fixed with this release. So, if you are running a local Team Serer for testing purposes, or if you are hosting a Team Server anyhwere not on Azure, you might want to update your instance. You need the .NET Core 6.0 runtime environment incl. hosting bundle to do this.
+Due to error by the stupid developer, the Team Server found in the *Binaries* folder of the distribution package was still a build for .NET Core 3.1, which has been taken out of service by Microsoft quite a while ago. I have updated the Team Server on all Azure instances already, but I forgot to update the build rule for the local Team Server. This has been fixed with this release. So, if you are running a local Team Serer for testing purposes, or if you are hosting a Team Server anyhwere not on Azure, you might want to update your instance. You need the .NET Core 6.0 runtime environment incl. hosting bundle to do this. As always, you can keep your database file, so no data will be lost.
 
 ***
 

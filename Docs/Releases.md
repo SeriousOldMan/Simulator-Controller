@@ -7,7 +7,7 @@
   6. All new [documentation of each and every setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database".
   7. Fixed penalty announcement by the Spotter after penalty has been cleared (hopefully for the last time).
   8. Fixed Team Server build rule, thereby updating it to .NET Core 6.0. Please see the [Update Notes](*), if you are using the Team Server locally, or if you are hosting a Team Server outside Azure.
-  9. {Developer] All functions formerly named ...Theme have been renamed to ...SplashScreen. For example *getAllThemes()* => *getAllSplashScreens()*.
+  9. {Developer] All functions formerly named xxxTheme have been renamed to xxxSplashScreen. For example *getAllThemes()* => *getAllSplashScreens()*.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-502) when you are using your own Team Server and you are not running it on Azure.
 

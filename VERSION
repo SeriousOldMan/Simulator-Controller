@@ -1,16 +1,16 @@
 [Development]
-Version=5.0.1.0-release
-Target=5.0.1.0-release
-Date=04/28/2023
-Download=https://cutt.ly/Y5YhoX7;https://www.dropbox.com/s/i4qjqxen33m2pv4/Simulator%20Controller%205.0.1.0-release.zip?dl=1
-Changes=Full implementation of WebView2 as a substitute for the IE Com Object, New car models for "Setup Workbench", Initial implementation of a Gui theming engine
+Version=5.0.2.0-dev
+Target=5.0.2.0-release
+Date=05/02/2023
+Download=
+Changes=UI themes selection in "Simulator Settings", Fixed Team Server build rule
 [Release]
 Version=5.0.1.0-release
 Date=04/28/2023
 Download=https://cutt.ly/Y5YhoX7;https://www.dropbox.com/s/i4qjqxen33m2pv4/Simulator%20Controller%205.0.1.0-release.zip?dl=1
 Changes=Full implementation of WebView2 as a substitute for the IE Com Object, New car models for "Setup Workbench", Initial implementation of a Gui theming engine
 [Current]
-Type=Release
+Type=Development
 [Version]
 Release=5.0.1.0-release
-Development=5.0.1.0-release
+Development=5.0.2.0-dev

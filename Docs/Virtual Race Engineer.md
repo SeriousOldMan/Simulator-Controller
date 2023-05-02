@@ -563,6 +563,8 @@ Important note: Some values underly a transformation between internal and extern
 
 The default values for all these settings may not only be used to initialize the race settings for an upcoming session, but they may also be used in the "Strategy Workbench" to provide values for many [settings for strategy simulation & planning](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#rules--settings).
 
+A detailed overview and description for all available settings and their usage can be found [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings).
+
 #### Strategies
 
 This tab shows you a list of race stratagies, which are stored in the database. Note: Race strategies can be created and stored in the session database using the "Strategy Workbench".

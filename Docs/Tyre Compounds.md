@@ -112,7 +112,7 @@ In the most likely case, that your preffered cars are not available in the prede
 
 #### *Tyre Data* files
 
-You can create your own "Tyre Data.ini" files. Use the above examples as a guide line to create your own mappings and store them as "Tyre Data.ini" file in the special *Simulator Controller\Simulator Data\\[Simulator]* folder which resides in your user *Documents* folder, with *[Simulator]* substitued by the short code of the given simulator. When the subfolder for the given simulator does not exist, simply create it. Use the short codes "AMS2", "RF2", "R3E", "IRC", "AC", "PCARS" and so on.
+You can create your own "Tyre Data.ini" files. Use the above examples as a guide line to create your own mappings and store them as "Tyre Data.ini" file in the special *Simulator Controller\Simulator Data\\[Simulator]* folder which resides in your user *Documents* folder, with *[Simulator]* substitued by the short code of the given simulator. When the subfolder for the given simulator does not exist, simply create it. Use the short codes "AMS2", "RF2", "R3E", "IRC", "AC", "PCARS2" and so on.
 
 Please make sure, that you use unique identifiers in the "[Compounds]" section, otherwise you will *overwrite* predefined compounds from the standard files. By the way, this is a possibility to substitute definitions from *standard*, but this is a different story.
 

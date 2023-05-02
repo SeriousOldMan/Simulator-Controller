@@ -115,6 +115,7 @@
     - [How it works](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#how-it-works)
   - [Session Database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--session-database)
     - [Race Settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings-1)
+	  - [Settings Overview](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings)
     - [Strategies](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#strategies)
     - [Setups](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#setups)
     - [Tyre Pressures](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tyre-pressures)

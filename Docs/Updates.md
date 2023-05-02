@@ -43,6 +43,12 @@ Although the code, that handles all the update tasks, is integrated into *Simula
 
 Note: Some of you might want to have more control. No problem. All the files in the *Simulator Controller\Config*, *Simulator Controller\Translations*, *Simulator Controller\Grammars* and *Simulator Controller\Rules* folders are human readable and using a text editor and some *Diff* tool, you can do everything the automated procedure does on your own. But be sure to make a backup copy of all the files, just for peace of mind. Attention: These files use a two-byte character set, so be sure to use an editor that can handle this.
 
+## Release 5.0.2
+
+Due to error by the stupid developer, the Team Server found in the *Binaries* folder of the distribution package was still a build for .NET Core 3.1, which has been taken out of service by Microsoft quite a while ago. I have updated the Team Server on all Azure instances already, but I forgot to update the build rule for the local Team Server. This has been fixed with this release. So, if you are running a local Team Serer for testing purposes, or if you are hosting a Team Server anyhwere not on Azure, you might want to update your instance. You need the .NET Core 6.0 runtime environment incl. hosting bundle to do this.
+
+***
+
 ## Release 5.0.1
 
 This release implements an integration of the WebView2 HTML rendering engine. It is not activated by default, since it uses quite a lot of system resources. It will be enabled unconditionally, when Microsoft finally disables the Internet Explorer plugin. If you want to use WebView2 now, you can enable it by inserting the following lines in [Documents]\Simulator Controller\Config\Application Settings.ini:

@@ -1,3 +1,16 @@
+## 5.0.2.0-release 05/05/23
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. A lot of fixes for the "Race Center" in situations with incomplete data. These errors have occured after the rewrite for Release 5.0 and there are still might bugs in there in situations where not all drivers deliver correct data to the central Team Server. If you encounter such problems, please let me know together with a ZIP of the log files.
+  4. UI themes (color schemes) are now available for selection in the [settings dialog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--settings) of "Simulator Startup".
+  5. New settings in the "Session Database" to enable or disable parts or all of the automatic pitstop servicing specifically for a given simulator. This can be helpful, when a simulator, for example *iRacing* for tyre pressures, does not deliver correct data through the API and the calculations of the Engineer will be therefore wrong. See also next topic.
+  6. All new [documentation of each and every setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database".
+  7. Fixed penalty announcement by the Spotter after penalty has been cleared (hopefully for the last time).
+  8. Fixed Team Server build rule, thereby updating it to .NET Core 6.0. Please see the [Update Notes](*), if you are using the Team Server locally, or if you are hosting a Team Server outside Azure.
+  9. {Developer] All functions formerly named ...Theme have been renamed to ...SplashScreen. For example *getAllThemes()* => *getAllSplashScreens()*.
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-502) when you are using your own Team Server and you are not running it on Azure.
+
 ## 5.0.1.0-release 04/28/23
   1. Minor bugfixes, as always
   2. Documentation updates, as always

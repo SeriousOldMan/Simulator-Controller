@@ -5648,7 +5648,7 @@ class RaceCenter extends ConfigurationItem {
 
 			lap.FuelRemaining := Round(getMultiMapValue(data, "Car Data", "FuelRemaining"), 1)
 
-			if ((lap.Nr == 1) || (stint.Laps[1] == lap))
+			if ((lap.Nr == 1) || ((stint.Laps.Length > 0) && (stint.Laps[1] == lap)))
 				lap.FuelConsumption := "-"
 			else {
 				fuelConsumption := (this.getPreviousLap(lap).FuelRemaining - lap.FuelRemaining)
@@ -7169,6 +7169,8 @@ class RaceCenter extends ConfigurationItem {
 					}
 				}
 				catch Any as exception {
+					logError(exception)
+
 					lastLap := false
 				}
 
@@ -11897,11 +11899,11 @@ startupRaceCenter() {
 
 	rCenter.createGui(rCenter.Configuration)
 
+	rCenter.show()
+
 	rCenter.connect(true)
 
 	registerMessageHandler("Setup", functionMessageHandler)
-
-	rCenter.show()
 }
 
 

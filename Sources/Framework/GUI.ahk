@@ -1398,8 +1398,6 @@ initializeGUI() {
 		Theme.CurrentTheme := %getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini"), "General", "UI Theme", "Classic") . "Theme"%()
 	}
 	catch Any as exception {
-		logError(exception)
-
 		Theme.CurrentTheme := ClassicTheme()
 	}
 

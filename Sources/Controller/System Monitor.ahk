@@ -78,14 +78,14 @@ getTableCSS(window) {
 		}
 
 		.th-std, .caption-std {
-			background-color: #BBB;
-			color: #000;
-			border: thin solid #BBB;
+			background-color: #%headerBackColor%;
+			color: #%textColor%;
+			border: thin solid #%frameColor%;
 		}
 
 		.td-std {
-			border-left: thin solid #BBB;
-			border-right: thin solid #BBB;
+			border-left: thin solid #%frameColor%;
+			border-right: thin solid #%frameColor%;
 		}
 
 		.th-left {
@@ -93,7 +93,7 @@ getTableCSS(window) {
 		}
 
 		tfoot {
-			border-bottom: thin solid #BBB;
+			border-bottom: thin solid #%frameColor%;
 		}
 
 		.caption-std {
@@ -111,7 +111,9 @@ getTableCSS(window) {
 		}
 	)"
 
-	return substituteVariables(script, {altBackColor: window.AltBackColor, backColor: window.BackColor})
+	return substituteVariables(script, {altBackColor: window.AltBackColor, backColor: window.BackColor
+									  , textColor: this.Window.Theme.TextColor
+									  , headerBackColor: this.Window.Theme.TableColor["Header"], frameColor: this.Window.Theme.TableColor["Frame"]})
 }
 
 updateDashboard(window, viewer, html := "") {

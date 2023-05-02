@@ -1433,8 +1433,6 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 
 		reportSettingsGui.Opt("+Owner" . raceReport.Window.Hwnd)
 
-		reportSettingsGui.BackColor := "D0D0D0"
-
 		reportSettingsGui.SetFont("s10 Bold", "Arial")
 
 		reportSettingsGui.Add("Text", "w351 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(reportSettingsGui, "Race Reports.Settings"))

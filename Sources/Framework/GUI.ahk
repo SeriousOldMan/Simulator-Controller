@@ -94,7 +94,7 @@ class Theme {
 
 	FieldBackColor {
 		Get {
-			return this.WindowBackColor
+			return this.AlternateBackColor
 		}
 	}
 
@@ -107,6 +107,21 @@ class Theme {
 					return this.FieldBackColor
 				case "EvenRow", "OddRow":
 					return this.AlternateBackColor
+			}
+		}
+	}
+
+	TableColor[type := "Header"] {
+		Get {
+			switch type, false {
+				case "Background":
+					return this.AlternateBackColor
+				case "Header":
+					return this.FieldBackColor
+				case "EvenRow", "OddRow":
+					return this.AlternateBackColor
+				case "Frame":
+					return "000000"
 			}
 		}
 	}
@@ -294,6 +309,35 @@ class WindowsTheme extends Theme {
 		}
 	}
 
+	WindowBackColor {
+		Get {
+			return "F0F0F0"
+		}
+	}
+
+	AlternateBackColor {
+		Get {
+			return "FFFFFF"
+		}
+	}
+
+	TableColor[type := "Header"] {
+		Get {
+			switch type, false {
+				case "Background":
+					return this.AlternateBackColor
+				case "Header":
+					return this.WindowBackColor
+				case "EvenRow":
+					return this.AlternateBackColor
+				case "OddRow":
+					return this.WindowBackColor
+				case "Frame":
+					return this.WindowBackColor
+			}
+		}
+	}
+
 	InitializeWindow(window) {
 	}
 
@@ -347,6 +391,23 @@ class ClassicTheme extends Theme {
 		}
 	}
 
+	TableColor[type := "Header"] {
+		Get {
+			switch type, false {
+				case "Background":
+					return this.AlternateBackColor
+				case "Header":
+					return "B0B0B0"
+				case "EvenRow":
+					return "E0E0E0"
+				case "OddRow":
+					return "E8E8E8"
+				case "Frame":
+					return "B0B0B0"
+			}
+		}
+	}
+
 	ButtonBackColor {
 		Get {
 			return "CCCCCC"
@@ -388,6 +449,17 @@ class DarkTheme extends ClassicTheme {
 	ButtonBackColor {
 		Get {
 			return "959595"
+		}
+	}
+
+	TableColor[type := "Header"] {
+		Get {
+			switch type, false {
+				case "OddRow", "Header", "Frame":
+					return "E8E8E8"
+				default:
+					return super.TableColor[type]
+			}
 		}
 	}
 }

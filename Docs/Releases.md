@@ -1,4 +1,4 @@
-## 5.0.2.0-release 05/05/23
+## 5.0.2.0-release 05/05/23 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. A lot of fixes for the "Race Center" in situations with incomplete data. These errors have occured after the rewrite for Release 5.0 and there are still might bugs in there in situations where not all drivers deliver correct data to the central Team Server. If you encounter such problems, please let me know together with a ZIP of the log files.

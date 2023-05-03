@@ -1961,7 +1961,9 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	loadDriver(driver, force := false) {
-		if (force || (((driver == true) || (driver == false)) && (this.SelectedDrivers && !inList(this.SelectedDrivers, driver)))) {
+		if (force || (((driver == true) || (driver == false)) && this.SelectedDrivers)
+				  || (driver && !this.SelectedDrivers)
+				  || (driver && (this.SelectedDrivers && !inList(this.SelectedDrivers, driver)))) {
 			if driver {
 				this.Control["driverDropDown"].Choose(((driver = true) ? 1 : (inList(this.AvailableDrivers, driver) + 1)))
 

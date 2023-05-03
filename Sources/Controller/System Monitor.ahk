@@ -63,84 +63,13 @@ global gStartupFinished := false
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-getTableCSS(window) {
-	local script
-
-	script := "
-	(
-		.table-std, .th-std, .td-std {
-			border-collapse: collapse;
-			padding: .3em .5em;
-		}
-
-		.th-std, .td-std {
-			text-align: center;
-		}
-
-		.th-std, .caption-std {
-			background-color: #%headerBackColor%;
-			color: #%textColor%;
-			border: thin solid #%frameColor%;
-		}
-
-		.td-std {
-			border-left: thin solid #%frameColor%;
-			border-right: thin solid #%frameColor%;
-		}
-
-		.th-left {
-			text-align: left;
-		}
-
-		tfoot {
-			border-bottom: thin solid #%frameColor%;
-		}
-
-		.caption-std {
-			font-size: 1.5em;
-			border-radius: .5em .5em 0 0;
-			padding: .5em 0 0 0
-		}
-
-		.table-std tbody tr:nth-child(even) {
-			background-color: #%altBackColor%;
-		}
-
-		.table-std tbody tr:nth-child(odd) {
-			background-color: #%backColor%;
-		}
-	)"
-
-	return substituteVariables(script, {altBackColor: window.AltBackColor, backColor: window.BackColor
-									  , textColor: this.Window.Theme.TextColor
-									  , headerBackColor: this.Window.Theme.TableColor["Header"], frameColor: this.Window.Theme.TableColor["Frame"]})
-}
-
 updateDashboard(window, viewer, html := "") {
 	local script, ignore, chart
 
 	if (html == false)
 		html := ""
-
-	script := "
-	(
-		<meta charset='utf-8'>
-		<head>
-			<style>
-				.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
-				.rowStyle { font-size: 11px; background-color: #%evenRowBackColor%; }
-				.oddRowStyle { font-size: 11px; background-color: #%oddRowBackColor%; }
-				%tableCSS%
-			</style>
-		</head>
-	)"
-
-	script := substituteVariables(script, {tableCSS: getTableCSS(window)
-										 , headerBackColor: window.Theme.ListBackColor["Header"]
-										 , evenRowBackColor: window.Theme.ListBackColor["EvenRow"]
-										 , oddRowBackColor: window.Theme.ListBackColor["OddRow"]})
-
-	html := ("<html>" . script . "<body style='background-color: #" . window.BackColor . "; overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 10px }</style><style> #header { font-size: 12px; } </style><div>" . html . "</div></body></html>")
+		
+	html := ("<html><meta charset='utf-8'><body style='background-color: #" . window.BackColor . "; overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 10px }</style><style> #header { font-size: 12px; } </style><div>" . html . "</div></body></html>")
 
 	viewer.document.open()
 	viewer.document.write(html)

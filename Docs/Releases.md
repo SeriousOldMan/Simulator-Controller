@@ -5,9 +5,10 @@
   4. UI themes (color schemes) are now available for selection in the [settings dialog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--settings) of "Simulator Startup".
   5. New settings in the "Session Database" to enable or disable parts or all of the automatic pitstop servicing specifically for a given simulator. This can be helpful, when a simulator, for example *iRacing* for tyre pressures, does not deliver correct data through the API and the calculations of the Engineer will be therefore wrong. See also next topic. Please note, that the tyre service is now disabled by default for *iRacing*. Please take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-502), if you want to enable it again.
   6. All new [documentation of each and every setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database".
-  7. Fixed penalty announcement by the Spotter after penalty has been cleared (hopefully for the last time).
-  8. Fixed Team Server build rule, thereby updating it to .NET Core 6.0. Please see the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-502), if you are using the Team Server locally, or if you are hosting a Team Server outside Azure.
-  9. {Developer] All functions formerly named xxxTheme have been renamed to xxxSplashScreen. For example *getAllThemes()* => *getAllSplashScreens()*.
+  7. Fixed driver selection for telemetry browser in the "Strategy Workbench".
+  8. Fixed penalty announcement by the Spotter after penalty has been cleared (hopefully for the last time).
+  9. Fixed Team Server build rule, thereby updating it to .NET Core 6.0. Please see the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-502), if you are using the Team Server locally, or if you are hosting a Team Server outside Azure.
+  10. [Developer] All functions formerly named xxxTheme have been renamed to xxxSplashScreen. For example *getAllThemes()* => *getAllSplashScreens()*.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-502) when you are using your own Team Server and you are not running it on Azure.
 

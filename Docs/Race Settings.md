@@ -73,7 +73,7 @@ This settings are generally available, although you can and have to define them 
 | Spotter    | Threshold for Gained on car behind       | Float | 1.5                               | No  | Specifies the time in seconds, you must have gained to the car behind you, until the Spotter will give you updated information about the gap and the laptime difference. |
 | Engineer   | Late Join                                | Boolean | False                           | No  | If *True*, the Engineer will also become active, when you join mid-session. Attention: This can lead to funny results in almost all calculations. |
 | Engineer   | Refuel Service                           | Boolean | True                            | No  | If *True*, the Engineer will consider refueling during pitstop servicing. You won't want to change this. |
-| Engineer   | Tyre Service                             | Boolean | True                            | No  | If *True*, the Engineer will consider tyre changing during pitstop servicing. You may want to disable this for simulators without correct pressure information available in the API, like *iRacing*. In this case you will have to manage the tyres on your own. |
+| Engineer   | Tyre Service                             | Boolean | True (1)                        | No  | If *True*, the Engineer will consider tyre changing during pitstop servicing. You may want to disable this for simulators without correct pressure information available in the API, like *iRacing*. In this case you will have to manage the tyres on your own. |
 | Engineer   | Repair Service                           | Boolean | True                            | No  | If *True*, the Engineer will consider repairing during pitstop servicing. You can disable this and manage the repair settings on your own, but why you want to do this? |
 | Engineer   | Pitstop Service during Practice          | Boolean | False                           | No  | If *True*, pitstop service handling will be available during practice. Normally disabled, but practical, if you want to test this stuff. |
 | Engineer   | Pitstop Service during Qualifying        | Boolean | False                           | No  | If *True*, pitstop service handling will be available during practice. You typically won't want to enable this. |
@@ -89,6 +89,10 @@ This settings are generally available, although you can and have to define them 
 | Engineer   | Damage warning during Race               | Boolean | True                            | No  | If *True*, the Engineer will issue damage warnings during race sessions. |
 | Engineer   | Pressure warning during Race             | Boolean | True                            | No  | If *True*, the Engineer will issue pressure loss warnings during race sessions. |
 | Strategist | Late Join                                | Boolean | False                           | No  | If *True*, the Strategist will also become active, when you join mid-session. Attention: This can lead to funny results in almost all calculations. |
+
+##### Notes
+
+(1) The default for *iRacing* is *False*, since the simulator does not provide correct tyre pressure information while driving. This will lead to setup pressure values, which are way off, when tyres are changed at the pitstop. Therefore it might be better to manage tyre change manually. Up 2 u...
 
 ### Simulator specific settings
 

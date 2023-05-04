@@ -2896,17 +2896,56 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 	}
 
-	addLap(lapNumber, &data) {
+	adjustGaps(data, &gapAhead := false, &gapBehind := false) {
 		local knowledgeBase := this.KnowledgeBase
-		local lastPenalty := false
-		local wasValid := true
-		local lastWarnings := 0
-		local gapAhead, gapBehind, lap, lastPitstop, result
 
 		static adjustGaps := true
 		static lastGapAhead := kUndefined
 		static lastGapBehind := kUndefined
 		static sameGapCount := 0
+
+		gapAhead := getMultiMapValue(data, "Stint Data", "GapAhead", kUndefined)
+		gapBehind := getMultiMapValue(data, "Stint Data", "GapBehind", kUndefined)
+
+		if ((gapAhead = lastGapAhead) && (gapBehind = lastGapBehind)) {
+			if (adjustGaps && (sameGapCount++ > 3))
+				adjustGaps := false
+		}
+		else {
+			adjustGaps := true
+			sameGapCount := 0
+
+			lastGapAhead := gapAhead
+			lastGapBehind := gapBehind
+		}
+
+		if (adjustGaps && (gapAhead != kUndefined) && (gapBehind != kUndefined)) {
+			if gapAhead {
+				knowledgeBase.setFact("Position.Standings.Class.Ahead.Delta", gapAhead)
+
+				if (knowledgeBase.getValue("Position.Track.Ahead.Car", -1) = knowledgeBase.getValue("Position.Standings.Class.Ahead.Car", 0))
+					knowledgeBase.setFact("Position.Track.Ahead.Delta", gapAhead)
+			}
+
+			if gapBehind {
+				knowledgeBase.setFact("Position.Standings.Class.Behind.Delta", gapBehind)
+
+				if (knowledgeBase.getValue("Position.Track.Behind.Car", -1) = knowledgeBase.getValue("Position.Standings.Class.Behind.Car", 0))
+					knowledgeBase.setFact("Position.Track.Behind.Delta", gapBehind)
+			}
+
+			return true
+		}
+		else
+			return false
+	}
+
+	addLap(lapNumber, &data) {
+		local knowledgeBase := this.KnowledgeBase
+		local lastPenalty := false
+		local wasValid := true
+		local lastWarnings := 0
+		local lap, lastPitstop, result
 
 		if knowledgeBase {
 			lastPenalty := knowledgeBase.getValue("Lap.Penalty", false)
@@ -2916,38 +2955,8 @@ class RaceSpotter extends GridRaceAssistant {
 
 		result := super.addLap(lapNumber, &data)
 
-		if !this.MultiClass {
-			gapAhead := getMultiMapValue(data, "Stint Data", "GapAhead", kUndefined)
-			gapBehind := getMultiMapValue(data, "Stint Data", "GapBehind", kUndefined)
-
-			if ((gapAhead = lastGapAhead) && (gapBehind = lastGapBehind)) {
-				if (adjustGaps && (sameGapCount++ > 3))
-					adjustGaps := false
-			}
-			else {
-				adjustGaps := true
-				sameGapCount := 0
-
-				lastGapAhead := gapAhead
-				lastGapBehind := gapBehind
-			}
-
-			if adjustGaps {
-				if ((gapAhead != kUndefined) && (gapAhead != 0)) {
-					knowledgeBase.setFact("Position.Standings.Class.Ahead.Delta", gapAhead)
-
-					if (knowledgeBase.getValue("Position.Track.Ahead.Car", -1) = knowledgeBase.getValue("Position.Standings.Class.Ahead.Car", 0))
-						knowledgeBase.setFact("Position.Track.Ahead.Delta", gapAhead)
-				}
-
-				if ((gapBehind != kUndefined) && (gapBehind != 0)) {
-					knowledgeBase.setFact("Position.Standings.Class.Behind.Delta", gapBehind)
-
-					if (knowledgeBase.getValue("Position.Track.Behind.Car", -1) = knowledgeBase.getValue("Position.Standings.Class.Behind.Car", 0))
-						knowledgeBase.setFact("Position.Track.Behind.Delta", gapBehind)
-				}
-			}
-		}
+		if !this.MultiClass
+			this.adjustGaps(data)
 
 		loop knowledgeBase.getValue("Car.Count") {
 			lap := knowledgeBase.getValue("Car." . A_Index . ".Lap", 0)
@@ -2991,7 +3000,8 @@ class RaceSpotter extends GridRaceAssistant {
 		local wasValid := knowledgeBase.getValue("Lap.Valid", true)
 		local lastWarnings := knowledgeBase.getValue("Lap.Warnings", 0)
 		local newSector := false
-		local sector, gapAhead, gapBehind, result, valid
+		local hasGaps := false
+		local sector, result, valid, gapAhead, gapBehind
 
 		static lastLap := 0
 		static lastSector := 1
@@ -3021,18 +3031,11 @@ class RaceSpotter extends GridRaceAssistant {
 
 		sector := (sector . "." . sectorIndex++)
 
-		if this.MultiClass {
-			gapAhead := kUndefined
-			gapBehind := kUndefined
-		}
-		else {
-			gapAhead := getMultiMapValue(data, "Stint Data", "GapAhead", kUndefined)
-			gapBehind := getMultiMapValue(data, "Stint Data", "GapBehind", kUndefined)
-		}
+		if !this.MultiClass
+			hasGaps := this.adjustGaps(data, &gapAhead, &gapBehind)
 
 		if (lapNumber = this.LastLap) {
-			this.iPositions := this.computePositions(data, (gapAhead != kUndefined) ? gapAhead : false
-														 , (gapBehind != kUndefined) ? gapBehind : false)
+			this.iPositions := this.computePositions(data, hasGaps ? gapAhead : false, hasGaps ? gapBehind : false)
 
 			this.updateDriver(lapNumber, sector, newSector, this.Positions)
 		}
@@ -3050,20 +3053,6 @@ class RaceSpotter extends GridRaceAssistant {
 			if (!this.Announcements["PenaltyInformation"] || !this.penaltyInformation(lapNumber, getMultiMapValue(data, "Stint Data", "Sector", 0), lastPenalty))
 				if (this.Announcements["CutWarnings"] && this.hasEnoughData(false))
 					this.cutWarning(lapNumber, getMultiMapValue(data, "Stint Data", "Sector", 0), wasValid, lastWarnings)
-
-		if (gapAhead != kUndefined) {
-			knowledgeBase.setFact("Position.Standings.Class.Ahead.Delta", gapAhead)
-
-			if (knowledgeBase.getValue("Position.Track.Ahead.Car", -1) = knowledgeBase.getValue("Position.Standings.Class.Ahead.Car", 0))
-				knowledgeBase.setFact("Position.Track.Ahead.Delta", gapAhead)
-		}
-
-		if (gapBehind != kUndefined) {
-			knowledgeBase.setFact("Position.Standings.Class.Behind.Delta", gapBehind)
-
-			if (knowledgeBase.getValue("Position.Track.Behind.Car", -1) = knowledgeBase.getValue("Position.Standings.Class.Behind.Car", 0))
-				knowledgeBase.setFact("Position.Track.Behind.Delta", gapBehind)
-		}
 
 		this.updatePitstops(lapNumber, data)
 

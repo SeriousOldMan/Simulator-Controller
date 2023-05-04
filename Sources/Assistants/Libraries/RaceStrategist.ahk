@@ -1511,7 +1511,7 @@ class RaceStrategist extends GridRaceAssistant {
 					knowledgeBase.setFact("Position.Track.Behind.Delta", gapBehind)
 			}
 
-			return true
+			return (gapAhead || gapBehind)
 		}
 		else
 			return false

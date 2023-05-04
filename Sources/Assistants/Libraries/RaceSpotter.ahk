@@ -2934,7 +2934,7 @@ class RaceSpotter extends GridRaceAssistant {
 					knowledgeBase.setFact("Position.Track.Behind.Delta", gapBehind)
 			}
 
-			return true
+			return (gapAhead || gapBehind)
 		}
 		else
 			return false
@@ -3005,14 +3005,14 @@ class RaceSpotter extends GridRaceAssistant {
 
 		static lastLap := 0
 		static lastSector := 1
-		static lastSectorIndex := 1
+		static sectorIndex := 1
 
 		if (lapNumber > this.LastLap)
 			this.updateDynamicValues({EnoughData: false})
 		else if (lapNumber < lastLap) {
 			lastLap := 0
 			lastSector := 1
-			lastSectorIndex := 1
+			sectorIndex := 1
 		}
 
 		if !isObject(data)
@@ -3022,12 +3022,12 @@ class RaceSpotter extends GridRaceAssistant {
 
 		if (sector != lastSector) {
 			lastSector := sector
-			lastSectorIndex := 1
-
-			knowledgeBase.addFact("Sector", sector)
+			sectorIndex := 1
 
 			newSector := true
 		}
+
+		knowledgeBase.setFact("Sector", sector)
 
 		sector := (sector . "." . sectorIndex++)
 

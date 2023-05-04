@@ -1,15 +1,20 @@
-## 5.0.2.0-release 05/05/23
+## 5.0.2.0-release 05/05/23 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
-  3. A lot of fixes for the "Race Center" in situations with incomplete data. These errors have occured after the rewrite for Release 5.0 and there are still might bugs in there in situations where not all drivers deliver correct data to the central Team Server. If you encounter such problems, please let me know together with a ZIP of the log files.
+  3. A lot of fixes for the "Race Center" in situations with incomplete data. These errors have occured after the rewrite for Release 5.0 and there still might bugs be in there in situations where not all drivers deliver correct data to the central Team Server. If you encounter such problems, please let me know together with a ZIP of the log files.
   4. UI themes (color schemes) are now available for selection in the [settings dialog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--settings) of "Simulator Startup".
   5. New settings in the "Session Database" to enable or disable parts or all of the automatic pitstop servicing specifically for a given simulator. This can be helpful, when a simulator, for example *iRacing* for tyre pressures, does not deliver correct data through the API and the calculations of the Engineer will be therefore wrong. See also next topic. Please note, that the tyre service is now disabled by default for *iRacing*. Please take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-502), if you want to enable it again.
   6. All new [documentation of each and every setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database".
-  7. Fixed penalty announcement by the Spotter after penalty has been cleared (hopefully for the last time).
-  8. Fixed Team Server build rule, thereby updating it to .NET Core 6.0. Please see the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-502), if you are using the Team Server locally, or if you are hosting a Team Server outside Azure.
-  9. {Developer] All functions formerly named xxxTheme have been renamed to xxxSplashScreen. For example *getAllThemes()* => *getAllSplashScreens()*.
+  7. Fixed driver selection for telemetry browser in the "Strategy Workbench".
+  8. Fixed penalty announcement by the Spotter after penalty has been cleared (hopefully for the last time).
+  9. Fixed handling of tyre pressure settings for all cars in "Setup Workbench".
+  11. Fixed Team Server build rule, thereby updating it to .NET Core 6.0. Please see the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-502), if you are using the Team Server locally, or if you are hosting a Team Server outside Azure.
+  12. [Developer] All functions formerly named xxxTheme have been renamed to xxxSplashScreen. For example *getAllThemes()* => *getAllSplashScreens()*.
+  13. New car models for "Setup Workbench":
+      - Assetto Corsa
+	    - Porsche 911 GT1-98
 
-Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-502) when you are using your own Team Server and you are not running it on Azure.
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-502) if you are using your own Team Server and you are not running it on Azure.
 
 ## 5.0.1.0-release 04/28/23
   1. Minor bugfixes, as always
@@ -17,10 +22,10 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   3. Full integration of the WebView2 HTML rendering engine as a substitute for the old Internet Explorer plugin, since the support for Internet Explorer has been canceled by Microsoft. The implementation is not activated by default, but you can take a testflight by following the instructions in the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-501).
   4. Initial implementation of a UI theming engine. Not fully implemented yet, but you can choose one of the predefined themes by following the instructions in the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-501).
   5. New car models for "Setup Workbench"
-      - Assetto Corsa Competizione
-	    - Ferrari 296 GT3
-	    - Porsche 992 GT3 R
-		- Lamborghini Huracan GT3 Evo2 
+     - Assetto Corsa Competizione
+	   - Ferrari 296 GT3
+	   - Porsche 992 GT3 R
+	   - Lamborghini Huracan GT3 Evo2 
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-501) for instructions on how to enable the WebView2 HTML rendering engine or switch between UI themes.
 

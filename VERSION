@@ -1,9 +1,9 @@
 [Development]
-Version=5.0.2.0-dev
+Version=5.0.2.0-beta
 Target=5.0.2.0-release
-Date=05/03/2023
+Date=05/04/2023
 Download=
-Changes=UI themes selection in "Simulator Settings", Fixed Team Server build rule, New settings for pitstop service configuration, New documentation of all race settings
+Changes=UI themes selection in "Simulator Settings", Fixed Team Server build rule, New settings for pitstop service configuration, New documentation of all race settings, New car models for "Setup Workbench"
 [Release]
 Version=5.0.1.0-release
 Date=04/28/2023
@@ -13,4 +13,4 @@ Changes=Full implementation of WebView2 as a substitute for the IE Com Object, N
 Type=Development
 [Version]
 Release=5.0.1.0-release
-Development=5.0.2.0-dev
+Development=5.0.2.0-beta

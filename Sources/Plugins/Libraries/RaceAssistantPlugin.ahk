@@ -961,7 +961,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 	static requireAssistants(simulator, car, track, weather) {
 		local activeAssistant := false
-		local ignore, assistant
+		local ignore, assistant, wait
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
 			if assistant.requireRaceAssistant()
@@ -974,7 +974,9 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			RaceAssistantPlugin.CollectorTask.Priority := kLowPriority
 
 			try {
-				RaceAssistantPlugin.CollectorTask.Sleep := (SettingsDatabase().readSettingValue(simulator, car, track, weather, "Assistant", "Session.Data.Frequency", 10) * 1000)
+				wait := SettingsDatabase().readSettingValue(simulator, car, track, weather, "Assistant", "Session.Data.Frequency", 10)
+
+				RaceAssistantPlugin.CollectorTask.Sleep := (wait * 1000)
 			}
 			catch Any as exception {
 				logError(exception)

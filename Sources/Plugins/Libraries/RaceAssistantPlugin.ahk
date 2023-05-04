@@ -1718,6 +1718,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		local finished := false
 		local joinedSession := false
 		local teamSessionActive := false
+		local startTime := A_TickCount
 		local telemetryData, positionsData, data, dataLastLap
 		local testData, message, key, value, session, teamServer
 		local newLap, firstLap, ignore, assistant, hasAssistant
@@ -1982,6 +1983,9 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		}
 		else if (RaceAssistantPlugin.Session != kSessionFinished)
 			RaceAssistantPlugin.finishAssistantsSession()
+
+		if isDebug()
+			logMessage(kLogInfo, "Collecting session data took " . (A_TickCount - startTime) . " ms...")
 	}
 }
 

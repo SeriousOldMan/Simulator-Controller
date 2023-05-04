@@ -3,7 +3,7 @@ Version=5.0.2.0-dev
 Target=5.0.2.0-release
 Date=05/03/2023
 Download=
-Changes=UI themes selection in "Simulator Settings", Fixed Team Server build rule, New settings for pitstop service configuration, New documentation of all race settings
+Changes=UI themes selection in "Simulator Settings", Fixed Team Server build rule, New settings for pitstop service configuration, New documentation of all race settings, New car models for "Setup Workbench"
 [Release]
 Version=5.0.1.0-release
 Date=04/28/2023

@@ -2995,14 +2995,14 @@ class RaceSpotter extends GridRaceAssistant {
 
 		static lastLap := 0
 		static lastSector := 1
-		static lastSectorIndex := 1
+		static sectorIndex := 1
 
 		if (lapNumber > this.LastLap)
 			this.updateDynamicValues({EnoughData: false})
 		else if (lapNumber < lastLap) {
 			lastLap := 0
 			lastSector := 1
-			lastSectorIndex := 1
+			sectorIndex := 1
 		}
 
 		if !isObject(data)
@@ -3012,12 +3012,12 @@ class RaceSpotter extends GridRaceAssistant {
 
 		if (sector != lastSector) {
 			lastSector := sector
-			lastSectorIndex := 1
-
-			knowledgeBase.addFact("Sector", sector)
+			sectorIndex := 1
 
 			newSector := true
 		}
+
+		knowledgeBase.setFact("Sector", sector)
 
 		sector := (sector . "." . sectorIndex++)
 
@@ -3051,14 +3051,14 @@ class RaceSpotter extends GridRaceAssistant {
 				if (this.Announcements["CutWarnings"] && this.hasEnoughData(false))
 					this.cutWarning(lapNumber, getMultiMapValue(data, "Stint Data", "Sector", 0), wasValid, lastWarnings)
 
-		if (gapAhead != kUndefined) {
+		if ((gapAhead != kUndefined) && (gapAhead != 0)) {
 			knowledgeBase.setFact("Position.Standings.Class.Ahead.Delta", gapAhead)
 
 			if (knowledgeBase.getValue("Position.Track.Ahead.Car", -1) = knowledgeBase.getValue("Position.Standings.Class.Ahead.Car", 0))
 				knowledgeBase.setFact("Position.Track.Ahead.Delta", gapAhead)
 		}
 
-		if (gapBehind != kUndefined) {
+		if ((gapBehind != kUndefined) && (gapBehind != 0)) {
 			knowledgeBase.setFact("Position.Standings.Class.Behind.Delta", gapBehind)
 
 			if (knowledgeBase.getValue("Position.Track.Behind.Car", -1) = knowledgeBase.getValue("Position.Standings.Class.Behind.Car", 0))

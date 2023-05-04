@@ -1656,7 +1656,7 @@ class RaceStrategist extends GridRaceAssistant {
 		if !this.MultiClass {
 			gapAhead := getMultiMapValue(data, "Stint Data", "GapAhead", kUndefined)
 
-			if (gapAhead != kUndefined) {
+			if ((gapAhead != kUndefined) && (gapAhead != 0)) {
 				knowledgeBase.setFact("Position.Standings.Class.Ahead.Delta", gapAhead)
 
 				if (knowledgeBase.getValue("Position.Track.Ahead.Car", -1) = knowledgeBase.getValue("Position.Standings.Class.Ahead.Car", 0))
@@ -1665,7 +1665,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 			gapBehind := getMultiMapValue(data, "Stint Data", "GapBehind", kUndefined)
 
-			if (gapBehind != kUndefined) {
+			if ((gapBehind != kUndefined) && (gapBehind != 0)) {
 				knowledgeBase.setFact("Position.Standings.Class.Behind.Delta", gapBehind)
 
 				if (knowledgeBase.getValue("Position.Track.Behind.Car", -1) = knowledgeBase.getValue("Position.Standings.Class.Behind.Car", 0))

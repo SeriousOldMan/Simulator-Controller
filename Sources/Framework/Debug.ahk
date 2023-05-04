@@ -183,7 +183,7 @@ logError(exception, unhandled := false, report := true) {
 	local debug := (isDevelopment() && isDebug())
 	local handle, message, settings
 
-	static verbose := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory)), "Development", "Debug.Verbose", debug && !A_IsCompiled)
+	static verbose := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory)), "Debug", "Verbose", debug && !A_IsCompiled)
 
 	if isObject(exception) {
 		message := exception.Message

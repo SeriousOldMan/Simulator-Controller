@@ -8,6 +8,7 @@
   7. Fixed driver selection for telemetry browser in the "Strategy Workbench".
   8. Fixed penalty announcement by the Spotter after penalty has been cleared (hopefully for the last time).
   9. Fixed handling of tyre pressure settings for all cars in "Setup Workbench".
+  10. Fixed a critical bug, which prevented settings from the "Session Database" to be actually used (falling back to default value in this case).
   11. Fixed Team Server build rule, thereby updating it to .NET Core 6.0. Please see the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-502), if you are using the Team Server locally, or if you are hosting a Team Server outside Azure.
   12. [Developer] All functions formerly named xxxTheme have been renamed to xxxSplashScreen. For example *getAllThemes()* => *getAllSplashScreens()*.
   13. New car models for "Setup Workbench":

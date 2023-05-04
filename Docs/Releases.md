@@ -14,7 +14,7 @@
       - Assetto Corsa
 	    - Porsche 911 GT1-98
 
-Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-502) when you are using your own Team Server and you are not running it on Azure.
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-502) if you are using your own Team Server and you are not running it on Azure.
 
 ## 5.0.1.0-release 04/28/23
   1. Minor bugfixes, as always

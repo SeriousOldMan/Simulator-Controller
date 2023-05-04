@@ -6,6 +6,7 @@ This settings are generally available, although you can and have to define them 
 
 | Category   | Setting                                  | Type    | Default                         | Available in "Race Settings" dialog| Description  |
 |------------|------------------------------------------|---------|---------------------------------|------------------------------------|--------------|
+| Data       | Update Frequency                         | Integer | 10                              | No  | Specifies the number of seconds to wait between each update of the data acquired from the currently running simulator. This data is used mainly by the Race Assistants, but will also be used to detect session state changes in general by other modules. Lower values will increase responsiveness of the Assistants, but may impose increasing system load. With an up-to-date computer system values as low as 2 seconds may be possible wthout negative effects. |
 | Data       | Collect Telemetry during Practice        | Boolean | True                            | No  | If *True*, general telemetry data is collected by the Strategist during practice sessions. |
 | Data       | Collect Telemetry during Qualifying      | Boolean | False                           | No  | If *True*, general telemetry data is collected by the Strategist during qualifying sessions. |
 | Data       | Collect Telemetry during Race            | Boolean | True                            | No  | If *True*, general telemetry data is collected by the Strategist during race sessions. |

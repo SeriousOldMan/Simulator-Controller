@@ -31,10 +31,10 @@ global kInterruptPriority := 4
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class Task {
-	static sInterrupt := -50
-	static sHigh := -200
-	static sNormal := -500
-	static sLow := -2000
+	static sInterrupt := (getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory)), "Task", "Schedule.Interrupt", 50) * -1)
+	static sHigh := (getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory)), "Task", "Schedule.High", 200) * -1)
+	static sNormal := (getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory)), "Task", "Schedule.Normal", 500) * -1)
+	static sLow := (getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory)), "Task", "Schedule.Low", 2000) * -1)
 
 	static sBlocked := false
 

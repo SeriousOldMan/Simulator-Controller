@@ -2288,7 +2288,7 @@ class RaceSpotter extends GridRaceAssistant {
 		return spoken
 	}
 
-	updateDriver(lastLap, sector, positions) {
+	updateDriver(lastLap, sector, newSector, positions) {
 		local raceInfo := (this.hasEnoughData(false) && (this.Session = kSessionRace) && (lastLap > 2))
 		local hadInfo := false
 		local deltaInformation, rnd
@@ -2297,7 +2297,7 @@ class RaceSpotter extends GridRaceAssistant {
 			if (lastLap > 1)
 				this.updatePositionInfos(lastLap, sector, positions)
 
-			if (!this.SpotterSpeaking && this.DriverCar && !this.DriverCar.InPit) {
+			if (!this.SpotterSpeaking && this.DriverCar && !this.DriverCar.InPit && newSector) {
 				this.SpotterSpeaking := true
 
 				try {
@@ -2990,14 +2990,20 @@ class RaceSpotter extends GridRaceAssistant {
 		local lastPenalty := knowledgeBase.getValue("Lap.Penalty", false)
 		local wasValid := knowledgeBase.getValue("Lap.Valid", true)
 		local lastWarnings := knowledgeBase.getValue("Lap.Warnings", 0)
-		local update, sector, gapAhead, gapBehind, result, valid
+		local newSector := false
+		local sector, gapAhead, gapBehind, result, valid
 
+		static lastLap := 0
 		static lastSector := 1
+		static lastSectorIndex := 1
 
 		if (lapNumber > this.LastLap)
 			this.updateDynamicValues({EnoughData: false})
-
-		update := false
+		else if (lapNumber < lastLap) {
+			lastLap := 0
+			lastSector := 1
+			lastSectorIndex := 1
+		}
 
 		if !isObject(data)
 			data := readMultiMap(data)
@@ -3006,11 +3012,14 @@ class RaceSpotter extends GridRaceAssistant {
 
 		if (sector != lastSector) {
 			lastSector := sector
-
-			update := true
+			lastSectorIndex := 1
 
 			knowledgeBase.addFact("Sector", sector)
+
+			newSector := true
 		}
+
+		sector := (sector . "." . sectorIndex++)
 
 		if this.MultiClass {
 			gapAhead := kUndefined
@@ -3021,11 +3030,11 @@ class RaceSpotter extends GridRaceAssistant {
 			gapBehind := getMultiMapValue(data, "Stint Data", "GapBehind", kUndefined)
 		}
 
-		if (update && (lapNumber = this.LastLap)) {
+		if (lapNumber = this.LastLap) {
 			this.iPositions := this.computePositions(data, (gapAhead != kUndefined) ? gapAhead : false
 														 , (gapBehind != kUndefined) ? gapBehind : false)
 
-			this.updateDriver(lapNumber, sector, this.Positions)
+			this.updateDriver(lapNumber, sector, newSector, this.Positions)
 		}
 
 		result := super.updateLap(lapNumber, &data)

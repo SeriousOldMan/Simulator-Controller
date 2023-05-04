@@ -2,7 +2,7 @@
 Version=5.0.2.0-beta
 Target=5.0.2.0-release
 Date=05/04/2023
-Download=
+Download=https://www.dropbox.com/s/84bwi4ihc6iyicp/Simulator%20Controller%205.0.2.0-beta.zip?dl=1
 Changes=UI themes selection in "Simulator Settings", Fixed Team Server build rule, New settings for pitstop service configuration, New documentation of all race settings, New car models for "Setup Workbench"
 [Release]
 Version=5.0.1.0-release

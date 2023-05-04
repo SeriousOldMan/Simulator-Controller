@@ -45,7 +45,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[5.0.2.0-dev](https://www.dropbox.com/s/xckod3hx6w3qi32/Simulator%20Controller%205.0.2.0-dev.zip?dl=1) (Early build for 5.0.2. Changes: UI themes selection in "Simulator Settings", Fixed Team Server build rule, New settings for pitstop service configuration, New documentation of all race settings.)
+[5.0.2.0-beta](https://www.dropbox.com/s/84bwi4ihc6iyicp/Simulator%20Controller%205.0.2.0-beta.zip?dl=1) (Test build for 5.0.2. Changes: UI themes selection in "Simulator Settings", Fixed Team Server build rule, New settings for pitstop service configuration, New documentation of all race settings, New car models for "Setup Workbench".)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-502) of this version and all the versions you might have skipped, before installing and using this version.
 

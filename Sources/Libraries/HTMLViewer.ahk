@@ -2249,7 +2249,7 @@ initializeHTMLViewer() {
 
 	fixIE(kExplorerVersions[Strsplit(A_ScriptName, ".")[1]])
 
-	if ((getMultiMapValue(kSimulatorConfiguration, "General", "HTML Viewer", "IE11") = "WebView2") ||
+	if ((getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory)), "HTML", "Viewer", "IE11") = "WebView2") ||
 		(getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 						, "General", "HTML Viewer", "IE11") = "WebView2")) {
 		deleteDirectory(kTempDirectory . "HTML\" . Strsplit(A_ScriptName, ".")[1])

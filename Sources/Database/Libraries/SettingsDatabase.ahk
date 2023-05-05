@@ -53,7 +53,7 @@ class SettingsDatabase extends SessionDatabase {
 		local result, ignore, setting
 
 		car := this.getCarCode(simulator, car)
-		track := this.getCarCode(simulator, track)
+		track := this.getTrackCode(simulator, track)
 
 		if userSettings {
 			result := CaseInsenseMap()
@@ -98,7 +98,7 @@ class SettingsDatabase extends SessionDatabase {
 		this.querySettings(simulator, car, track, weather, &userSettings, &communitySettings)
 
 		car := this.getCarCode(simulator, car)
-		track := this.getCarCode(simulator, track)
+		track := this.getTrackCode(simulator, track)
 
 		if userSettings
 			for ignore, setting in userSettings
@@ -118,7 +118,7 @@ class SettingsDatabase extends SessionDatabase {
 			community := this.UseCommunity
 
 		car := this.getCarCode(simulator, car)
-		track := this.getCarCode(simulator, track)
+		track := this.getTrackCode(simulator, track)
 
 		dryPressure := this.optimalTyrePressure(simulator, car, "Dry")
 		wetPressure := this.optimalTyrePressure(simulator, car, "Wet")
@@ -153,7 +153,7 @@ class SettingsDatabase extends SessionDatabase {
 			community := this.UseCommunity
 
 		car := this.getCarCode(simulator, car)
-		track := this.getCarCode(simulator, track)
+		track := this.getTrackCode(simulator, track)
 
 		if inherited {
 			readSettings(this, simulator, result, id, true, community, "*", "*", "*")
@@ -182,7 +182,7 @@ class SettingsDatabase extends SessionDatabase {
 			community := this.UseCommunity
 
 		car := this.getCarCode(simulator, car)
-		track := this.getCarCode(simulator, track)
+		track := this.getTrackCode(simulator, track)
 
 		value := readSetting(this, simulator, id, true, community
 						   , car, track, weather, section, key, kUndefined)
@@ -226,7 +226,7 @@ class SettingsDatabase extends SessionDatabase {
 		local rows
 
 		car := this.getCarCode(simulator, car)
-		track := this.getCarCode(simulator, track)
+		track := this.getTrackCode(simulator, track)
 
 		while (tries-- > 0) {
 			if database.lock("Settings", false)
@@ -235,7 +235,7 @@ class SettingsDatabase extends SessionDatabase {
 															  , Car: car, Track: track, Weather: weather
 															  , Section: section, Key: key}})
 
-					return ((rows.Length > 0) ? rows[1].Value : default)
+					return ((rows.Length > 0) ? rows[1]["Value"] : default)
 				}
 				catch Any as exception {
 					return default
@@ -257,7 +257,7 @@ class SettingsDatabase extends SessionDatabase {
 		local entry
 
 		car := this.getCarCode(simulator, car)
-		track := this.getCarCode(simulator, track)
+		track := this.getTrackCode(simulator, track)
 
 		while (tries-- > 0) {
 			if database.lock("Settings", false)
@@ -292,7 +292,7 @@ class SettingsDatabase extends SessionDatabase {
 		local tries := 5
 
 		car := this.getCarCode(simulator, car)
-		track := this.getCarCode(simulator, track)
+		track := this.getTrackCode(simulator, track)
 
 		while (tries-- > 0) {
 			if database.lock("Settings")
@@ -344,7 +344,7 @@ readSetting(database, simulator, owner, user, community, car, track, weather
 														, Owner: owner}})
 
 			if (rows.Length > 0)
-				return rows[1].Value
+				return rows[1]["Value"]
 		}
 		catch Any {
 		}

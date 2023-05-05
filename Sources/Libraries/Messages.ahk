@@ -38,6 +38,8 @@ global kFileMessage := 3
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class MessageManager extends PeriodicTask {
+	static sPriority := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory)), "Messages", "Schedule", 200)
+
 	static sMessageHandlers := false
 	static sOutgoingMessages := []
 
@@ -112,12 +114,14 @@ class MessageManager extends PeriodicTask {
 	}
 
 	class MessagesDispatcher extends Task {
+		static sPriority := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory)), "Messages", "Dispatch", 100)
+
 		iMessages := false
 
 		__New(messages) {
 			this.iMessages := messages
 
-			super.__New()
+			super.__New(false, MessageManager.MessagesDispatcher.sPriority)
 		}
 
 		run() {
@@ -353,7 +357,7 @@ class MessageManager extends PeriodicTask {
 			}
 		}
 
-		this.Sleep := 200
+		this.Sleep := MessageManager.sPriority
 	}
 
 	messageSend(messageType, category, data, target := false, request := "NORM") {

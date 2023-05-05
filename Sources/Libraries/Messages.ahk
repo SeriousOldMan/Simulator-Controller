@@ -539,7 +539,12 @@ receiveWindowMessage(wParam, lParam, *) {
 	callable := ObjBindMethod(messageHandler, "call", category, data[2])
 
 	if ((request = "RS") || (request = "INTR"))
-		withProtection(callable)
+		try {
+			withProtection(callable)
+		}
+		catch Any as exception {
+			logError(exception)
+		}
 	else
 		Task.startTask(callable)
 }

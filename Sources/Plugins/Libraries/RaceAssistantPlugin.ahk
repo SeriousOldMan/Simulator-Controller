@@ -21,6 +21,9 @@
 ;;;-------------------------------------------------------------------------;;;
 
 class RaceAssistantPlugin extends ControllerPlugin  {
+	static sAssistantCooldown := kUndefined
+	static sTeamServerCooldown := kUndefined
+
 	static sCollectorTask := false
 
 	static sAssistants := []
@@ -441,10 +444,18 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		}
 
 		Set {
-			if teamServer
-				RaceAssistantPlugin.sTeamServerWaitForShutdown := (value ? (A_TickCount + 600000) : 0)
-			else
-				RaceAssistantPlugin.sAssistantWaitForShutdown := (value ? (A_TickCount + 90000) : 0)
+			if teamServer {
+				if (RaceAssistantPlugin.sTeamServerCooldown = kUndefined)
+					RaceAssistantPlugin.sTeamServerCooldown := 600000
+
+				RaceAssistantPlugin.sTeamServerWaitForShutdown := (value ? (A_TickCount + TeamServer.sTeamServerCooldown) : 0)
+			}
+			else {
+				if (RaceAssistantPlugin.sAssistantCooldown = kUndefined)
+					RaceAssistantPlugin.sAssistantCooldown := 90000
+
+				RaceAssistantPlugin.sAssistantWaitForShutdown := (value ? (A_TickCount + TeamServer.sAssistantCooldown) : 0)
+			}
 
 			return value
 		}
@@ -961,20 +972,39 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 	static requireAssistants(simulator, car, track, weather) {
 		local activeAssistant := false
-		local ignore, assistant, wait
+		local ignore, assistant, wait, settingsDB
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
 			if assistant.requireRaceAssistant()
 				activeAssistant := true
 
-		if activeAssistant
+		if activeAssistant {
 			Sleep(1500)
 
-		if activeAssistant {
 			RaceAssistantPlugin.CollectorTask.Priority := kLowPriority
 
+			settingsDB := SettingsDatabase()
+
 			try {
-				wait := SettingsDatabase().readSettingValue(simulator, car, track, weather, "Assistant", "Session.Data.Frequency", 10)
+				RaceAssistantPlugin.sAssistantCooldown := (settingsDB.readSettingValue(simulator, car, track, weather, "Assistant", "Shutdown.Assistant.Cooldown", 90) * 1000)
+			}
+			catch Any as exception {
+				logError(exception)
+
+				RaceAssistantPlugin.sAssistantCooldown := 90000
+			}
+
+			try {
+				RaceAssistantPlugin.sTeamServerCooldown := (settingsDB.readSettingValue(simulator, car, track, weather, "Assistant", "Shutdown.TeamServer.Cooldown", 600) * 1000)
+			}
+			catch Any as exception {
+				logError(exception)
+
+				RaceAssistantPlugin.sTeamServerCooldown := 600000
+			}
+
+			try {
+				wait := settingsDB.readSettingValue(simulator, car, track, weather, "Assistant", "Session.Data.Frequency", 10)
 
 				RaceAssistantPlugin.CollectorTask.Sleep := (wait * 1000)
 			}

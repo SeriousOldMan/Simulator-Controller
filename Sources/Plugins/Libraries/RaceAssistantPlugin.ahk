@@ -1058,13 +1058,14 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	static finishAssistantsSession(shutdownAssistant := true, shutdownTeamSession := true) {
+		local restart := (GetKeyState("Shift", "P") && GetKeyState("Ctrl", "P"))
 		local session := this.Session
 		local finalizeAssistant := shutdownAssistant
 		local ignore, assistant
 
 		RaceAssistantPlugin.initializeAssistantsState()
 
-		if shutdownAssistant
+		if (shutdownAssistant && !restart)
 			for ignore, assistant in RaceAssistantPlugin.Assistants
 				if (assistant.RaceAssistantEnabled && assistant.RaceAssistant) {
 					RaceAssistantPlugin.WaitForShutdown := true
@@ -1072,7 +1073,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					break
 				}
 
-		if (finalizeAssistant && GetKeyState("Shift", "P") && GetKeyState("Ctrl", "P"))
+		if (finalizeAssistant && restart)
 			finalizeAssistant := false
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
@@ -1084,7 +1085,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 			RaceAssistantPlugin.disconnectTeamSession()
 
-			if (session == kSessionRace)
+			if ((session == kSessionRace) && !restart)
 				RaceAssistantPlugin.WaitForShutdown[true] := true
 		}
 

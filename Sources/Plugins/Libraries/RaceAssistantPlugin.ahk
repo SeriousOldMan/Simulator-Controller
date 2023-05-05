@@ -448,13 +448,13 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				if (RaceAssistantPlugin.sTeamServerCooldown = kUndefined)
 					RaceAssistantPlugin.sTeamServerCooldown := 600000
 
-				RaceAssistantPlugin.sTeamServerWaitForShutdown := (value ? (A_TickCount + TeamServer.sTeamServerCooldown) : 0)
+				RaceAssistantPlugin.sTeamServerWaitForShutdown := (value ? (A_TickCount + RaceAssistantPlugin.sTeamServerCooldown) : 0)
 			}
 			else {
 				if (RaceAssistantPlugin.sAssistantCooldown = kUndefined)
 					RaceAssistantPlugin.sAssistantCooldown := 90000
 
-				RaceAssistantPlugin.sAssistantWaitForShutdown := (value ? (A_TickCount + TeamServer.sAssistantCooldown) : 0)
+				RaceAssistantPlugin.sAssistantWaitForShutdown := (value ? (A_TickCount + RaceAssistantPlugin.sAssistantCooldown) : 0)
 			}
 
 			return value

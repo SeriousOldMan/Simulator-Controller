@@ -1,16 +1,16 @@
 [Development]
-Version=5.0.3.0-dev
-Target=5.0.3.0-release
+Version=5.0.2.1-release
+Target=5.0.2.1-release
 Date=05/05/2023
-Download=
-Changes=Configurable update frequency for all Assistants, Configurable cooldown time for Assistants and Team Session, New configurable core settings
+Download=https://cutt.ly/p55DuXl;https://www.dropbox.com/s/ko821ok20q3vslc/Simulator%20Controller%205.0.2.1-release.zip?dl=1
+Changes=Fixed deadlock in session database
 [Release]
-Version=5.0.2.0-release
-Date=06/05/2023
-Download=https://cutt.ly/q54aTcz;https://www.dropbox.com/s/0fmm652p1a6btz5/Simulator%20Controller%205.0.2.0-release.zip?dl=1
-Changes=UI themes selection in "Simulator Settings", Fixed Team Server build rule, New settings for pitstop service configuration, New documentation of all race settings, New car models for "Setup Workbench"
+Version=5.0.2.1-release
+Date=05/05/2023
+Download=https://cutt.ly/p55DuXl;https://www.dropbox.com/s/ko821ok20q3vslc/Simulator%20Controller%205.0.2.1-release.zip?dl=1
+Changes=Fixed deadlock in session database
 [Current]
-Type=Development
+Type=Release
 [Version]
-Release=5.0.2.0-release
-Development=5.0.3.0-dev
+Release=5.0.2.1-release
+Development=5.0.2.1-release

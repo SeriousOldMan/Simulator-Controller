@@ -21,6 +21,9 @@
 ;;;-------------------------------------------------------------------------;;;
 
 class RaceAssistantPlugin extends ControllerPlugin  {
+	static sAssistantCooldown := kUndefined
+	static sTeamServerCooldown := kUndefined
+
 	static sCollectorTask := false
 
 	static sAssistants := []
@@ -441,10 +444,18 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		}
 
 		Set {
-			if teamServer
-				RaceAssistantPlugin.sTeamServerWaitForShutdown := (value ? (A_TickCount + 600000) : 0)
-			else
-				RaceAssistantPlugin.sAssistantWaitForShutdown := (value ? (A_TickCount + 90000) : 0)
+			if teamServer {
+				if (RaceAssistantPlugin.sTeamServerCooldown = kUndefined)
+					RaceAssistantPlugin.sTeamServerCooldown := 600000
+
+				RaceAssistantPlugin.sTeamServerWaitForShutdown := (value ? (A_TickCount + TeamServer.sTeamServerCooldown) : 0)
+			}
+			else {
+				if (RaceAssistantPlugin.sAssistantCooldown = kUndefined)
+					RaceAssistantPlugin.sAssistantCooldown := 90000
+
+				RaceAssistantPlugin.sAssistantWaitForShutdown := (value ? (A_TickCount + TeamServer.sAssistantCooldown) : 0)
+			}
 
 			return value
 		}
@@ -959,19 +970,50 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		RaceAssistantPlugin.sFinished := false
 	}
 
-	static requireAssistants() {
+	static requireAssistants(simulator, car, track, weather) {
 		local activeAssistant := false
-		local ignore, assistant
+		local ignore, assistant, wait, settingsDB
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
 			if assistant.requireRaceAssistant()
 				activeAssistant := true
 
-		if activeAssistant
+		if activeAssistant {
 			Sleep(1500)
 
-		RaceAssistantPlugin.CollectorTask.Priority := kLowPriority
-		RaceAssistantPlugin.CollectorTask.Sleep := 10000
+			RaceAssistantPlugin.CollectorTask.Priority := kLowPriority
+
+			settingsDB := SettingsDatabase()
+
+			try {
+				RaceAssistantPlugin.sAssistantCooldown := (settingsDB.readSettingValue(simulator, car, track, weather, "Assistant", "Shutdown.Assistant.Cooldown", 90) * 1000)
+			}
+			catch Any as exception {
+				logError(exception)
+
+				RaceAssistantPlugin.sAssistantCooldown := 90000
+			}
+
+			try {
+				RaceAssistantPlugin.sTeamServerCooldown := (settingsDB.readSettingValue(simulator, car, track, weather, "Assistant", "Shutdown.TeamServer.Cooldown", 600) * 1000)
+			}
+			catch Any as exception {
+				logError(exception)
+
+				RaceAssistantPlugin.sTeamServerCooldown := 600000
+			}
+
+			try {
+				wait := settingsDB.readSettingValue(simulator, car, track, weather, "Assistant", "Session.Data.Frequency", 10)
+
+				RaceAssistantPlugin.CollectorTask.Sleep := (wait * 1000)
+			}
+			catch Any as exception {
+				logError(exception)
+
+				RaceAssistantPlugin.CollectorTask.Sleep := 10000
+			}
+		}
 
 		return activeAssistant
 	}
@@ -1442,7 +1484,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		local track := getMultiMapValue(data, "Session Data", "Track")
 		local simulatorName := settingsDB.getSimulatorName(simulator)
 		local settings := readMultiMap(getFileName("Race.settings", kUserConfigDirectory))
-		local  loadSettings := getMultiMapValue(this.Configuration, this.Plugin . " Startup", simulatorName . ".LoadSettings", "Default")
+		local loadSettings := getMultiMapValue(this.Configuration, this.Plugin . " Startup", simulatorName . ".LoadSettings", "Default")
 		local section, values, key, value
 
 		loadSettings := getMultiMapValue(this.Configuration, "Race Assistant Startup", simulatorName . ".LoadSettings", loadSettings)
@@ -1714,6 +1756,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		local testData, message, key, value, session, teamServer
 		local newLap, firstLap, ignore, assistant, hasAssistant
 		local sessionTimeRemaining, sessionLapsRemaining
+		local simulator, car, track, weather
 
 		if (RaceAssistantPlugin.Finished = "Finished")
 			RaceAssistantPlugin.finishAssistantsSession()
@@ -1801,7 +1844,12 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					}
 				}
 
-				if RaceAssistantPlugin.requireAssistants() {
+				simulator := getMultiMapValue(data, "Session Data", "Simulator", "Unknown")
+				car := getMultiMapValue(data, "Session Data", "Car", "Unknown")
+				track := getMultiMapValue(data, "Session Data", "Track", "Unknown")
+				weather := getMultiMapValue(data, "Weather Data", "Weather", "Dry")
+
+				if RaceAssistantPlugin.requireAssistants(simulator, car, track, weather) {
 					; Car is on the track
 
 					if getMultiMapValue(data, "Stint Data", "InPit", false) {

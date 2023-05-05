@@ -220,41 +220,40 @@ class PressuresEditor {
 
 		database.reload("Tyres.Pressures.Distribution", false)
 
-		database.lock("Tyres.Pressures.Distribution")
+		if database.lock("Tyres.Pressures.Distribution", false)
+			try {
+				for ignore, update in this.iModifications
+					switch update[1], false {
+						case "Update":
+							entry := database.query("Tyres.Pressures.Distribution", {Where: update[2]})
 
-		try {
-			for ignore, update in this.iModifications
-				switch update[1], false {
-					case "Update":
-						entry := database.query("Tyres.Pressures.Distribution", {Where: update[2]})
+							if (entry.Length > 0) {
+								entry := entry[1]
 
-						if (entry.Length > 0) {
-							entry := entry[1]
+								entry["Count"] := update[3]
+								entry["Synchronized"] := kNull
 
-							entry["Count"] := update[3]
-							entry["Synchronized"] := kNull
-
-							database.changed("Tyres.Pressures.Distribution")
-						}
-					case "Add":
-						database.add(update[2])
-					case "Remove":
-						for ignore, connector in connectors
-							try {
-								for ignore, row in database.query("Tyres.Pressures.Distribution", {Where: update[2]})
-									if (row["Identifier"] != kNull)
-										connector.DeleteData("TyresPressuresDistribution", row["Identifier"])
+								database.changed("Tyres.Pressures.Distribution")
 							}
-							catch Any as exception {
-								logError(exception, true)
-							}
+						case "Add":
+							database.add(update[2])
+						case "Remove":
+							for ignore, connector in connectors
+								try {
+									for ignore, row in database.query("Tyres.Pressures.Distribution", {Where: update[2]})
+										if (row["Identifier"] != kNull)
+											connector.DeleteData("TyresPressuresDistribution", row["Identifier"])
+								}
+								catch Any as exception {
+									logError(exception, true)
+								}
 
-						database.remove("Tyres.Pressures.Distribution", update[2], always.Bind(true))
-				}
-		}
-		finally {
-			database.unlock("Tyres.Pressures.Distribution")
-		}
+							database.remove("Tyres.Pressures.Distribution", update[2], always.Bind(true))
+					}
+			}
+			finally {
+				database.unlock("Tyres.Pressures.Distribution")
+			}
 	}
 
 	editPressures() {

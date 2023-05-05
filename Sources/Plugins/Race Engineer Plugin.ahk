@@ -474,9 +474,13 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 							tyresDB.registerDriver(lapPressures[1], driverID, teamServer.getStintDriverName(stint))
 
 						if first {
+							if !tyresDB.lock(lapPressures[1], lapPressures[2], lapPressures[3], false) {
+								Sleep(200)
+								
+								continue
+							}
+								
 							first := false
-
-							tyresDB.lock(lapPressures[1], lapPressures[2], lapPressures[3])
 						}
 
 						coldPressures := string2Values(",", lapPressures[9])
@@ -498,9 +502,13 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 				try {
 					for ignore, lapData in this.LapDatabase.Tables["Pressures"] {
 						if first {
+							if tyresDB.lock(lapData["Simulator"], lapData["Car"], lapData["Track"]) {
+								Sleep(200)
+								
+								continue
+							}
+							
 							first := false
-
-							tyresDB.lock(lapData["Simulator"], lapData["Car"], lapData["Track"])
 						}
 
 						coldPressures := string2Values(",", lapData["Pressures.Cold"])

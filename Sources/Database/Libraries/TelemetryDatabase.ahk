@@ -242,7 +242,7 @@ class TelemetryDatabase extends SessionDatabase {
 			cAvg := false
 			cStdDev := false
 
-			if (!this.Shared || database.lock("Electronics"))
+			if (!this.Shared || database.lock("Electronics", false))
 				try {
 					if this.Shared
 						database.reload("Electronics")
@@ -285,7 +285,7 @@ class TelemetryDatabase extends SessionDatabase {
 			cAvg := false
 			cStdDev := false
 
-			if (!this.Shared || database.lock("Tyres"))
+			if (!this.Shared || database.lock("Tyres", false))
 				try {
 					if this.Shared
 						database.reload("Tyres")

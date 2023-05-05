@@ -295,7 +295,7 @@ class SettingsDatabase extends SessionDatabase {
 		track := this.getTrackCode(simulator, track)
 
 		while (tries-- > 0) {
-			if database.lock("Settings")
+			if database.lock("Settings", false)
 				try {
 					database.remove("Settings", {Owner: this.ID, Car: car, Track: track, Weather: weather, Section: section, Key: key}
 											   , always.Bind(true), true)
@@ -335,22 +335,21 @@ readSetting(database, simulator, owner, user, community, car, track, weather
 	if user {
 		settingsDB := database.getSettingsDatabase(simulator, "User")
 
-		settingsDB.lock("Settings")
+		if settingsDB.lock("Settings", false)
+			try {
+				rows := settingsDB.query("Settings", {Where: {Car: car, Track: track
+															, Weather: weather
+															, Section: section, Key: key
+															, Owner: owner}})
 
-		try {
-			rows := settingsDB.query("Settings", {Where: {Car: car, Track: track
-														, Weather: weather
-														, Section: section, Key: key
-														, Owner: owner}})
-
-			if (rows.Length > 0)
-				return rows[1]["Value"]
-		}
-		catch Any {
-		}
-		finally {
-			settingsDB.unlock("Settings")
-		}
+				if (rows.Length > 0)
+					return rows[1]["Value"]
+			}
+			catch Any {
+			}
+			finally {
+				settingsDB.unlock("Settings")
+			}
 	}
 
 	if community
@@ -378,16 +377,15 @@ readSettings(database, simulator, settings, owner, user, community, car, track, 
 	if user {
 		settingsDB := database.getSettingsDatabase(simulator, "User")
 
-		settingsDB.lock("Settings")
-
-		try {
-			for ignore, row in settingsDB.query("Settings", {Where: {Car: car, Track: track
-																   , Weather: weather, Owner: owner}})
-				result.Push(row)
-		}
-		finally {
-			settingsDB.lock("Settings")
-		}
+		if settingsDB.lock("Settings", false)
+			try {
+				for ignore, row in settingsDB.query("Settings", {Where: {Car: car, Track: track
+																	   , Weather: weather, Owner: owner}})
+					result.Push(row)
+			}
+			finally {
+				settingsDB.unlock("Settings")
+			}
 	}
 
 	filtered := []

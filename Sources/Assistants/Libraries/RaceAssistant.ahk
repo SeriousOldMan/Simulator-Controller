@@ -1174,12 +1174,17 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	callAddLap(lapNumber, data) {
+		local startTime := A_TickCount
+
 		if this.KnowledgeBase {
 			if !isObject(data)
 				data := readMultiMap(data)
 
 			this.addLap(lapNumber, &data)
 		}
+
+		if isDebug()
+			logMessage(kLogInfo, "Adding lap for " . this.AssistantType . " took " . (A_TickCount - startTime) . " ms...")
 	}
 
 	addLap(lapNumber, &data, dump := true, lapValid := kUndefined, lapPenalty := kUndefined) {
@@ -1413,12 +1418,17 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	callUpdateLap(lapNumber, data) {
+		local startTime := A_TickCount
+
 		if this.KnowledgeBase {
 			if !isObject(data)
 				data := readMultiMap(data)
 
 			this.updateLap(lapNumber, &data)
 		}
+
+		if isDebug()
+			logMessage(kLogInfo, "Updating lap for " . this.AssistantType . " took " . (A_TickCount - startTime) . " ms...")
 	}
 
 	updateLap(lapNumber, &data, dump := true, lapValid := kUndefined, lapPenalty := kUndefined) {

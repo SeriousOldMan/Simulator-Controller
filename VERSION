@@ -1,16 +1,16 @@
 [Development]
-Version=5.0.2.0-beta
+Version=5.0.2.0-release
 Target=5.0.2.0-release
-Date=05/04/2023
-Download=https://www.dropbox.com/s/84bwi4ihc6iyicp/Simulator%20Controller%205.0.2.0-beta.zip?dl=1
+Date=05/05/2023
+Download=https://cutt.ly/q54aTcz;https://www.dropbox.com/s/0fmm652p1a6btz5/Simulator%20Controller%205.0.2.0-release.zip?dl=1
 Changes=UI themes selection in "Simulator Settings", Fixed Team Server build rule, New settings for pitstop service configuration, New documentation of all race settings, New car models for "Setup Workbench"
 [Release]
-Version=5.0.1.0-release
-Date=04/28/2023
-Download=https://cutt.ly/Y5YhoX7;https://www.dropbox.com/s/i4qjqxen33m2pv4/Simulator%20Controller%205.0.1.0-release.zip?dl=1
-Changes=Full implementation of WebView2 as a substitute for the IE Com Object, New car models for "Setup Workbench", Initial implementation of a Gui theming engine
+Version=5.0.2.0-release
+Date=06/05/2023
+Download=https://cutt.ly/q54aTcz;https://www.dropbox.com/s/0fmm652p1a6btz5/Simulator%20Controller%205.0.2.0-release.zip?dl=1
+Changes=UI themes selection in "Simulator Settings", Fixed Team Server build rule, New settings for pitstop service configuration, New documentation of all race settings, New car models for "Setup Workbench"
 [Current]
-Type=Development
+Type=Release
 [Version]
-Release=5.0.1.0-release
-Development=5.0.2.0-beta
+Release=5.0.2.0-release
+Development=5.0.2.0-release

@@ -583,6 +583,9 @@ editSettings(&settingsOrCommand, withContinue := false, fromSetup := false, x :=
 
 		chosen := inList(uiThemes, uiTheme)
 
+		if (!chosen && (uiThemes.Length > 0))
+			chosen := 1
+
 		settingsEditorGui.Add("Text", "X10 Y+20", translate("Color Scheme"))
 		uiTheme := settingsEditorGui.Add("DropDownList", "X90 YP-5 w140 Choose" . chosen, collect(uiThemes, translate))
 

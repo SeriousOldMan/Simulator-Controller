@@ -1929,7 +1929,7 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 
 		if (regular && trackAhead && trackAhead.inRange(sector, true) && !trackAhead.isFaster(sector)
-		 && standingsBehind && (standingsBehind == trackBehind)
+		 && standingsBehind && (standingsBehind == trackBehind) && !trackAhead.Car.InPit
 		 && standingsBehind.hasGap(sector) && trackAhead.hasGap(sector)
 		 && standingsBehind.inDelta(sector) && standingsBehind.isFaster(sector)) {
 			situation := ("ProtectSlower " . trackAhead.Car.Nr . A_Space . trackBehind.Car.Nr)
@@ -1946,7 +1946,7 @@ class RaceSpotter extends GridRaceAssistant {
 		if (sector > 1) {
 			opponentType := (trackBehind ? trackBehind.OpponentType[sector] : false)
 
-			if (regular && trackBehind && trackBehind.hasGap(sector)
+			if (regular && trackBehind && trackBehind.hasGap(sector) && !trackBehind.Car.InPit
 			 && trackBehind.isFaster(sector) && trackBehind.inRange(sector, true)) {
 				if (standingsBehind && (trackBehind != standingsBehind)
 				 && standingsBehind.hasGap(sector) && standingsBehind.inDelta(sector, 4.0)
@@ -2060,7 +2060,7 @@ class RaceSpotter extends GridRaceAssistant {
 			opponentType := (trackAhead ? trackAhead.OpponentType[sector] : false)
 
 			if ((sector > 1) && trackAhead && (trackAhead != standingsAhead) && trackAhead.hasGap(sector)
-			 && (opponentType != "Position")
+			 && (opponentType != "Position") && !trackAhead.Car.InPit
 			 && trackAhead.inRange(sector, true, (opponentType = "LapDown") ? lapDownRangeThreshold : lapUpRangeThreshold)
 			 && !trackAhead.isFaster(sector) && !trackAhead.runningAway(sector, frontGainThreshold)
 			 && !trackAhead.Reported) {
@@ -3108,7 +3108,7 @@ class RaceSpotter extends GridRaceAssistant {
 		local standingsBehind := false
 		local leader := false
 		local hasDriver := false
-		local index, car, prefix, lapTime, driverLaps, driverRunning, carIndex, carLaps, carRunning
+		local index, car, prefix, inPit, lapTime, driverLaps, driverRunning, carIndex, carLaps, carRunning
 		local driverClassPosition, carOverallPosition, carClassPosition, carDelta, carAheadDelta, carBehindDelta
 		local classes, class, carClassPositions, ignore
 
@@ -3178,6 +3178,9 @@ class RaceSpotter extends GridRaceAssistant {
 						carBehindDelta := ((driverRunning - carRunning) * lapTime * -1)
 					}
 
+					inPit := (getMultiMapValue(data, "Position Data", prefix . ".InPitlane", false)
+						   || getMultiMapValue(data, "Position Data", prefix . ".InPit", false))
+
 					positions[carIndex] := Array(getMultiMapValue(data, "Position Data", prefix . ".Nr")
 											   , getMultiMapValue(data, "Position Data", prefix . ".Car", "Unknown")
 											   , this.getClass(carIndex, data)
@@ -3192,8 +3195,7 @@ class RaceSpotter extends GridRaceAssistant {
 																	  , getMultiMapValue(data, "Position Data", prefix . ".Lap.Running.Valid", true))
 											  , knowledgeBase.getValue(prefix . ".Valid.Laps", carLaps)
 											  , getMultiMapValue(data, "Position Data", prefix . ".Incidents", 0)
-											  , (getMultiMapValue(data, "Position Data", prefix . ".InPitlane", false)
-											  || getMultiMapValue(data, "Position Data", prefix . ".InPit", false)))
+											  , inPit)
 
 					if (class = this.getClass(carIndex, data)) {
 						if (carClassPosition = 1)

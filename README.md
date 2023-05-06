@@ -35,7 +35,7 @@ An automated update mechanism for local configuration databases exists since Rel
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-501) of this version and all the versions you might have skipped, before installing and using this version.
 
-[5.0.2.0-release](https://cutt.ly/q54aTcz) (Changes: UI themes selection in "Simulator Settings", Fixed Team Server build rule, New settings for pitstop service configuration, New documentation of all race settings, New car models for "Setup Workbench".)
+[5.0.2.1-release](https://cutt.ly/p55DuXl) (Changes: UI themes selection in "Simulator Settings", Fixed Team Server build rule, New settings for pitstop service configuration, New documentation of all race settings, New car models for "Setup Workbench".)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-502) of this version and all the versions you might have skipped, before installing and using this version.
 

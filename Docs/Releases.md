@@ -1,3 +1,6 @@
+## 5.0.2.1-release 05/05/23
+  1. Citical bugfix for a potential deadlock situation in the session database, which could cause all applications to freeze up.
+
 ## 5.0.2.0-release 05/05/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

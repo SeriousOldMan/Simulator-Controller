@@ -484,13 +484,6 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 		}
 	}
 
-	updateLap(lap, running, data) {
-		super.updateLap(lap, running, data)
-
-		if this.TeamSessionActive
-			this.TeamServer.setLapValue(lap, "Telemetry Update", printMultiMap(data))
-	}
-
 	createTrackMap(simulator, track, dataFile) {
 		local pid := this.iMapperPID
 

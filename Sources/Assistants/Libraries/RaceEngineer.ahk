@@ -1494,8 +1494,9 @@ class RaceEngineer extends RaceAssistant {
 		for index, tyreType in ["FL", "FR", "RL", "RR"] {
 			newValue := Round(tyrePressures[index], 2)
 			fact := ("Lap." . lapNumber . ".Tyre.Pressure." . tyreType)
+			oldValue := knowledgeBase.getValue(fact, false)
 
-			if (Abs(knowledgeBase.getValue(fact) - newValue) > threshold) {
+			if (oldValue && (Abs(oldValue - newValue) > threshold)) {
 				knowledgeBase.setValue(fact, newValue)
 
 				changed := true
@@ -1511,7 +1512,7 @@ class RaceEngineer extends RaceAssistant {
 		tyreTemperatures := string2Values(",", getMultiMapValue(data, "Car Data", "TyreTemperature", ""))
 
 		for index, tyreType in ["FL", "FR", "RL", "RR"]
-			knowledgeBase.setValue("Lap." . lapNumber . ".Tyre.Temperature." . tyreType, Round(tyreTemperatures[index], 2))
+			knowledgeBase.setFact("Lap." . lapNumber . ".Tyre.Temperature." . tyreType, Round(tyreTemperatures[index], 2))
 
 		bodyworkDamage := string2Values(",", getMultiMapValue(data, "Car Data", "BodyworkDamage", ""))
 		changed := false
@@ -1522,7 +1523,7 @@ class RaceEngineer extends RaceAssistant {
 			oldValue := knowledgeBase.getValue(fact, 0)
 
 			if (oldValue < newValue)
-				knowledgeBase.setValue(fact, newValue)
+				knowledgeBase.setFact(fact, newValue)
 
 			changed := (changed || (Round(oldValue) < Round(newValue)))
 		}
@@ -1542,7 +1543,7 @@ class RaceEngineer extends RaceAssistant {
 			oldValue := knowledgeBase.getValue(fact, 0)
 
 			if (oldValue < newValue)
-				knowledgeBase.setValue(fact, newValue)
+				knowledgeBase.setFact(fact, newValue)
 
 			changed := (changed || (Round(oldValue) < Round(newValue)))
 		}
@@ -1557,7 +1558,7 @@ class RaceEngineer extends RaceAssistant {
 		fact := ("Lap." . lapNumber . ".Damage.Engine")
 
 		if (knowledgeBase.getValue(fact, 0) < newValue) {
-			knowledgeBase.setValue(fact, newValue)
+			knowledgeBase.setFact(fact, newValue)
 
 			knowledgeBase.addFact("Damage.Update.Suspension", lapNumber)
 

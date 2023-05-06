@@ -1382,6 +1382,11 @@ class TeamServerPlugin extends ControllerPlugin {
 		}
 	}
 
+	updateLap(lapNumber, running, data, telemetryData, positionsData) {
+		if this.TeamServerActive
+			this.setLapValue(lapNumber, "Telemetry Update", printMultiMap(data))
+	}
+
 	keepAlive(start := false) {
 		local nextPing := 10000
 		local invalid := false

@@ -4645,13 +4645,15 @@ class RaceCenter extends ConfigurationItem {
 	getPreviousLap(lap) {
 		local laps := this.Laps
 
-		lap := (lap.Nr - 1)
+		if lap {
+			lap := (lap.Nr - 1)
 
-		while (lap > 0)
-			if laps.Has(lap)
-				return laps[lap]
-			else
-				lap -= 1
+			while (lap > 0)
+				if laps.Has(lap)
+					return laps[lap]
+				else
+					lap -= 1
+		}
 
 		return false
 	}
@@ -7145,7 +7147,7 @@ class RaceCenter extends ConfigurationItem {
 
 	syncSession() {
 		local initial := !this.LastLap
-		local strategy, session, lastLap, simulator, car, track, newLaps, newData, newReports, finished, message, forcePitstopUpdate
+		local strategy, session, lastLap, simulator, car, track, newLaps, newData, newReports, newTrackMap, finished, message, forcePitstopUpdate
 		local selectedLap, selectedStint, currentStint, driverSwapRequest
 
 		static hadLastLap := false
@@ -7206,6 +7208,7 @@ class RaceCenter extends ConfigurationItem {
 
 				newLaps := false
 				newData := false
+				newTrackMap := false
 
 				selectedLap := this.LapsListView.GetNext()
 
@@ -7252,21 +7255,21 @@ class RaceCenter extends ConfigurationItem {
 
 				if (this.LastLap && (this.SelectedReport == "Track"))
 					if this.syncTrackMap()
-						newData := true
+						newTrackMap := true
 
 				if newLaps
 					this.syncSessionStore()
 
-				if (newData || newLaps)
+				if (newData || newLaps || newTrackMap)
 					this.updateReports()
 
+				if ((newData || newLaps) && selectedLap && (this.SelectedDetailReport = "Lap")) {
+					this.LapsListView.Modify(this.LapsListView.GetCount(), "Select Vis")
+
+					this.showLapDetails(this.LastLap)
+				}
+
 				if newLaps {
-					if (selectedLap && (this.SelectedDetailReport = "Lap")) {
-						this.LapsListView.Modify(this.LapsListView.GetCount(), "Select Vis")
-
-						this.showLapDetails(this.LastLap)
-					}
-
 					if (selectedStint && (this.SelectedDetailReport = "Stint")) {
 						this.StintsListView.Modify(this.StintsListView.GetCount(), "Select Vis")
 

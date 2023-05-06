@@ -49,7 +49,7 @@ updateProgress(max) {
 
 downloadSimulatorController() {
 	local icon := kIconsDirectory . "Installer.ico"
-	local options, index, cState, sState, devVersion, release, version, package, updateTask
+	local options, index, cState, devVersion, release, version, package, updateTask
 	local directory, currentDirectory, start, ignore, url, error
 
 	TraySetIcon(icon, "1")
@@ -88,8 +88,7 @@ downloadSimulatorController() {
 	}
 
 	cState := GetKeyState("Control", "P")
-	sState := GetKeyState("Shift", "P")
-
+	
 	devVersion := (cState != false)
 
 	try {

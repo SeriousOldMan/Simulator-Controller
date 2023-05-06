@@ -139,7 +139,7 @@ class Database {
 	lock(name := false, wait := true) {
 		local done := false
 		local locked := []
-		local directory, file, ignore, result
+		local directory, file, ignore, result, counter
 
 		if (!name && !wait)
 			throw "Inconsistent parameters detected in Database.lock..."
@@ -161,8 +161,18 @@ class Database {
 						file := false
 					}
 
-					if (!file && wait)
+					if (!file && wait) {
+						if !isSet(counter)
+							counter := 0
+
+						if (isDebug() && (counter++ > 20)) {
+							counter := 0
+
+							logMessage(kLogInfo, "Waiting for file `"" . name "`"...")
+						}
+
 						Sleep(100)
+					}
 					else
 						done := true
 				}

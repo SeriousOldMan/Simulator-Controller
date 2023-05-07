@@ -2698,6 +2698,7 @@ class RaceCenter extends ConfigurationItem {
 		}
 
 		this.updateSessionMenu()
+		this.updatePlanMenu()
 		this.updateStrategyMenu()
 		this.updatePitstopMenu()
 
@@ -2869,6 +2870,10 @@ class RaceCenter extends ConfigurationItem {
 		this.Control["sessionMenuDropDown"].Add(collect(["Session", "---------------------------------------------", "Connect", "Clear...", "---------------------------------------------", synchronize, "---------------------------------------------", "Select Team...", "---------------------------------------------", "Load Session...", "Save Session", "Save a Copy...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Race Summary", "Driver Statistics"], translate))
 
 		this.Control["sessionMenuDropDown"].Choose(1)
+	}
+
+	updatePlanMenu() {
+		this.Control["planMenuDropDown"].Choose(1)
 	}
 
 	updateStrategyMenu() {

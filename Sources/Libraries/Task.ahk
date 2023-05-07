@@ -225,6 +225,32 @@ class Task {
 		Task.stopTask(this)
 	}
 
+	static getPriority(priority) {
+		if isInteger(priority) {
+			switch priority, false {
+				case kLowPriority:
+					return "Low"
+				case kHighPriority:
+					return "High"
+				case kInterruptPriority:
+					return "Interrupt"
+				default:
+					return "Normal"
+			}
+		}
+		else
+			switch priority, false {
+				case "Low":
+					return kLowPriority
+				case "High":
+					return kHighPriority
+				case "Interrupt":
+					return kInterruptPriority
+				default:
+					return kNormalPriority
+			}
+	}
+
 	static getNextTask(priority, remove := true) {
 		local index, candidate
 

@@ -182,35 +182,7 @@ Similar to the output settings shown above, you only have to enter those audio d
 
 ## Keyboard shortcuts & modifiers
 
-Many applications of Simulator Controller provide a couple of modifier keys for several functions. Find a list of all those modifiers and their functionalities below. All modifiers will also be mentioned in the respective documentation, but here you have a complete overview.
-
-| Application   | Function | Modifier | Description |
-|---------------|----------|----------|-------------|
-| Race Center   | Login    | Control  | If you hold down the Control key while pressing on the button with a small key to connect to a session, a login dialog pops up and you can use the team manager account name and password instead of a token to connect to a team session. |
-| Race Settings | Login    | Control  | If you hold down the Control key while pressing on the button with a small key to connect to a session, a login dialog pops up and you can use the team manager account name and password instead of a token to configure to a team session. |
-| Sesion Database | Login    | Control  | If you hold down the Control key while pressing on the button with a small key to connect to a session in the settings dialog, a login dialog pops up and you can use the team manager account name and password instead of a token to the chosen Team Server. |
-| Strategy Workbench | Simulate    | Control  | If you hold down the Control key while starting a strategy simulation, the result will automatically selected as the current strategy, if the simulation was successful. |
-| Strategy Workbench | Load Settings    | Control  | If you hold down the Control key while choosing the menu command "Load from Settings..." from the "Settings" menu, you can locate a settings file on your hard drives rather than loading the standard "Race.settings" file from "Config" folder. |
-| Strategy Workbench | Select a Validator    | Control  | Holding down the Control key let you edit the contents of the validator rules file rather than than selecting it as the active validator. |
-| Simulator Setup, Simulator Configuration | Clicking on a function | Control | While configuring a Button Box or Stream Deck, this shortcut will open the input dialog to enter the function number directly, rather than open the context menu, when you click on a function with the Control key pressed. |
-| Simulator Setup, Simulator Configuration | Searching for trigger | Escape | When you have activated the trigger search mode to identify a hardware control on a Button Box or your steering wheel (a small tooltip will follow your mouse in this mode), you can press Escape to cancel the detection mode. |
-| Simulator Setup, Simulator Configuration | Modifying Icons | Control | When working on icons for the Stream Deck in the "Labels & Icons" editor, you can delete the current icon by holding down the Control key and clicking on it. |
-| Simulator Setup | Connecting actions and functions | Escape | When connecting an action to a function, or vice versa (a small tooltip will follow your mouse in this mode), you can cancel the connection by pressing the Escape key. |
-| Simulator Setup, Simulator Configuration | Creating a fresh configuration | Control + Shift | If you hold down Control together with the Shift key while starting either "Simulator Setup" or "Simulator Configuration" you will be asked whether you want to clear your current configuration and start with a new one. Be careful here. |
-| Simulator Configuration | Developer configuration | Control | If you hold down the Control key alone while starting "Simulator Configuration", additional configuration options will appear on the first tab, especially for developers. |
-| Simulator Setup | Sound volume fading | Control | When leaving the first page of "Simulator Setup", which shows the splash video, you can hold down the control key to supress the fading of the sound volume and speed up things a little bit. |
-| Simulator Download | Downloading installation package | Control | If you hold down the Control key when starting "Simulator Download", you will download and install the latest development version (if there is any), rather than the current release version. |
-| Simulator Startup | Simulator auto startup | Middle Mouse Button | When starting "Simulator Startup" with the Middle Mouse Button pressed, the first simulator from the list of configured simulators will be started automatically. |
-| Simulator Startup | Simulator startup | Shift | When pressing *Startup* (green triangle) in "Simulator Startup" while holding the Shift key, the choice of "Close on startup" will be temporarily toggled for this one startup. |
-| Simulator Startup | Exiting | Control | When closing "Simulator Startup" and the Control key is pressed, you will be asked, whether you want to exit all other applications of "Simulator Controller" as well. |
-| Session Database | Data scope selection | Control | Normally, the choice of the "Available Data" drop down menu only affects the data shownn in the session database and all other applications, for example the Race Assistants will use only your personal data. If you hold down the Control key, while changing the selection, you will be asked, whether the change should be reflected for all applications. |
-| Session Database | Managing track automations | Control | Clicking on an automations point with the Control key down will delete this automation point. |
-| Setup Workbench | Loading problems and issues | Control | Holding down the Control key while loading problem descriptions from a file, will **not** clear the current issue list but will add to it instead. |
-| Setup Workbench | Starting and Exiting | Control | Holding down the Control when exiting will save the current issue list to a temporary file and holding down the Control key when starting "Setup Workbench" will load those saved issues, so that you can continue your work. |
-| Simulator Controller | Finishing a session | Control + Shift | Normally, the Race Assistants will wait for a specific cooldown time, before they startup again. While in training sessions against AI racers, you can skip this cooldown period with holding the Control together with the Shift key in the moment, when the Assistants detect a session change. |
-
-
-
+Many applications of Simulator Controller provide modifier keys for several functions. You can find a list of all modifiers and their functionalities [here](*).
    
 ## Monitoring health and activities
 

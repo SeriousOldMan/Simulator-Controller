@@ -4645,15 +4645,13 @@ class RaceCenter extends ConfigurationItem {
 	getPreviousLap(lap) {
 		local laps := this.Laps
 
-		if lap {
-			lap := (lap.Nr - 1)
+		lap := (lap.Nr - 1)
 
-			while (lap > 0)
-				if laps.Has(lap)
-					return laps[lap]
-				else
-					lap -= 1
-		}
+		while (lap > 0)
+			if laps.Has(lap)
+				return laps[lap]
+			else
+				lap -= 1
 
 		return false
 	}
@@ -5639,10 +5637,14 @@ class RaceCenter extends ConfigurationItem {
 
 			if ((lap.Nr == 1) && (damage > 0))
 				lap.Accident := true
-			else if ((lap.Nr > 1) && (damage > this.getPreviousLap(lap).Damage))
-				lap.Accident := true
-			else
-				lap.Accident := false
+			else {
+				pLap := this.getPreviousLap(lap)
+
+				if ((lap.Nr > 1) && pLap && (damage > pLap.Damage))
+					lap.Accident := true
+				else
+					lap.Accident := false
+			}
 
 			lap.Penalty := getMultiMapValue(data, "Stint Data", "Penalty", false)
 
@@ -5653,7 +5655,9 @@ class RaceCenter extends ConfigurationItem {
 			if ((lap.Nr == 1) || ((stint.Laps.Length > 0) && (stint.Laps[1] == lap)))
 				lap.FuelConsumption := "-"
 			else {
-				fuelConsumption := (this.getPreviousLap(lap).FuelRemaining - lap.FuelRemaining)
+				pLap := this.getPreviousLap(lap)
+
+				fuelConsumption := (pLap ? (pLap.FuelRemaining - lap.FuelRemaining) : 0)
 
 				lap.FuelConsumption := ((fuelConsumption > 0) ? Round(fuelConsumption, 2) : "-")
 			}
@@ -5728,8 +5732,14 @@ class RaceCenter extends ConfigurationItem {
 				if (lap.Nr > 1) {
 					pLap := this.getPreviousLap(lap)
 
-					lap.Positions := pLap.Positions
-					lap.Position := pLap.Position
+					if pLap {
+						lap.Positions := pLap.Positions
+						lap.Position := pLap.Position
+					}
+					else {
+						lap.Positions := ""
+						lap.Position := "-"
+					}
 				}
 				else
 					lap.Position := "-"
@@ -6372,7 +6382,7 @@ class RaceCenter extends ConfigurationItem {
 									   , telemetryData[7], telemetryData[8], telemetryData[9]
 									   , driverID)
 
-				lapPressures := this.LapsListView.GetText(lap, 10)
+				lapPressures := this.LapsListView.GetText(this.Laps[lap].Row, 10)
 
 				if (lapPressures = "-, -, -, -")
 					this.LapsListView.Modify(this.Laps[lap].Row, "Col10", values2String(", ", collect(pressures, p => isNumber(p) ? displayValue("Float", convertUnit("Pressure", p)) : "-")*))
@@ -7147,7 +7157,7 @@ class RaceCenter extends ConfigurationItem {
 
 	syncSession() {
 		local initial := !this.LastLap
-		local strategy, session, lastLap, simulator, car, track, newLaps, newData, newReports, newTrackMap, finished, message, forcePitstopUpdate
+		local strategy, session, lastLap, simulator, car, track, newLaps, newData, newReports, finished, message, forcePitstopUpdate
 		local selectedLap, selectedStint, currentStint, driverSwapRequest
 
 		static hadLastLap := false
@@ -7208,7 +7218,6 @@ class RaceCenter extends ConfigurationItem {
 
 				newLaps := false
 				newData := false
-				newTrackMap := false
 
 				selectedLap := this.LapsListView.GetNext()
 
@@ -7255,21 +7264,21 @@ class RaceCenter extends ConfigurationItem {
 
 				if (this.LastLap && (this.SelectedReport == "Track"))
 					if this.syncTrackMap()
-						newTrackMap := true
+						newData := true
 
 				if newLaps
 					this.syncSessionStore()
 
-				if (newData || newLaps || newTrackMap)
+				if (newData || newLaps)
 					this.updateReports()
 
-				if ((newData || newLaps) && selectedLap && (this.SelectedDetailReport = "Lap")) {
-					this.LapsListView.Modify(this.LapsListView.GetCount(), "Select Vis")
-
-					this.showLapDetails(this.LastLap)
-				}
-
 				if newLaps {
+					if (selectedLap && (this.SelectedDetailReport = "Lap")) {
+						this.LapsListView.Modify(this.LapsListView.GetCount(), "Select Vis")
+
+						this.showLapDetails(this.LastLap)
+					}
+
 					if (selectedStint && (this.SelectedDetailReport = "Stint")) {
 						this.StintsListView.Modify(this.StintsListView.GetCount(), "Select Vis")
 

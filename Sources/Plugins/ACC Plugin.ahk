@@ -317,13 +317,14 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		static lastLap := 0
 
 		lap := getMultiMapValue(telemetryData, "Stint Data", "Laps", 0)
-		restart := false
 
 		if ((lastLap > lap) && (this.iSessionID = sessionID)) {
 			sessionID += 1
 
 			restart := true
 		}
+		else
+			restart := false
 
 		this.iSessionID := sessionID
 
@@ -386,7 +387,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				setMultiMapValue(telemetryData, "Session Data", "Session", session)
 			}
 
-			if (lap <= 1)
+			if ((lap <= 1) || restart)
 				lastDriverCar := false
 
 			driverForname := getMultiMapValue(telemetryData, "Stint Data", "DriverForname", "John")
@@ -411,9 +412,20 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 					setMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Car", car)
 
-					if !driverCar
-						if ((getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Forname") = driverForname)
+					if !driverCar {
+						if (carID = getMultiMapValue(telemetryData, "Session Data", "ID", kUndefined)) {
+							driverCar := A_Index
+
+							lastDriverCar := driverCar
+						}
+						else if ((getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Forname") = driverForname)
 						 && (getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Surname") = driverSurname)) {
+							driverCar := A_Index
+
+							lastDriverCar := driverCar
+						}
+						else if (getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Position")
+							   = getMultiMapValue(telemetryData, "Stint Data", "Position", kUndefined)) {
 							driverCar := A_Index
 
 							lastDriverCar := driverCar

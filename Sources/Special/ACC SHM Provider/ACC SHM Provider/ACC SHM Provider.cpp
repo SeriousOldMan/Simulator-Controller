@@ -306,6 +306,8 @@ int main(int argc, char* argv[])
 		printData("LapLastTime", gf->iLastTime);
 		printData("LapBestTime", gf->iBestTime);
 
+		wcout << "Position=" << gf->position << endl;
+		
 		string penalty = getPenalty(gf->penalty);
 
 		if (penalty.length() != 0)
@@ -385,6 +387,7 @@ int main(int argc, char* argv[])
 		printData("Active", ((gf->status == AC_LIVE) || (gf->status == AC_PAUSE) || (gf->status == AC_REPLAY)) ? "true" : "false");
 		printData("Paused", ((gf->status == AC_PAUSE) || (gf->status == AC_REPLAY)) ? "true" : "false");
 		printData("Session", getSession(gf->session));
+		wcout << "ID=" << gf->playerCarID << endl;
 		wcout << "Car=" << sf->carModel << endl;
 		wcout << "Track=" << sf->track << endl;
 		wcout << "SessionFormat=Time" << endl;

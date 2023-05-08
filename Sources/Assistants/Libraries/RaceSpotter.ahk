@@ -2011,7 +2011,7 @@ class RaceSpotter extends GridRaceAssistant {
 	deltaInformation(lastLap, sector, positions, regular, method) {
 		local knowledgeBase := this.KnowledgeBase
 		local spoken := false
-		local standingsAhead, standingsBehind, trackAhead, trackBehind, leader, info, informed
+		local standingsAhead, standingsBehind, trackAhead, trackBehind, leader, info, informed, settings
 		local opponentType, delta, deltaDifference, lapDifference, lapTimeDifference, car, remaining, speaker, rnd
 		local unsafe, driverPitstops, carPitstops
 
@@ -2023,16 +2023,26 @@ class RaceSpotter extends GridRaceAssistant {
 		static behindAttackThreshold := false
 		static behindGainThreshold := false
 		static behindLostThreshold := false
+		static frontGapMin := false
+		static frontGapMax := false
+		static behindGapMin := false
+		static behindGapMax := false
 
 		if (lapUpRangeThreshold = kUndefined) {
-			lapUpRangeThreshold := getDeprecatedValue(this.Settings, "Assistant.Spotter", "Spotter Settings", "LapUp.Range.Threshold", 1.0)
-			lapDownRangeThreshold := getDeprecatedValue(this.Settings, "Assistant.Spotter", "Spotter Settings", "LapDown.Range.Threshold", 2.0)
-			frontAttackThreshold := getDeprecatedValue(this.Settings, "Assistant.Spotter", "Spotter Settings", "Front.Attack.Threshold", 0.8)
-			frontGainThreshold := getDeprecatedValue(this.Settings, "Assistant.Spotter", "Spotter Settings", "Front.Gain.Threshold", 0.3)
-			frontLostThreshold := getDeprecatedValue(this.Settings, "Assistant.Spotter", "Spotter Settings", "Front.Lost.Threshold", 1.0)
-			behindAttackThreshold := getDeprecatedValue(this.Settings, "Assistant.Spotter", "Spotter Settings", "Behind.Attack.Threshold", 0.8)
-			behindLostThreshold := getDeprecatedValue(this.Settings, "Assistant.Spotter", "Spotter Settings", "Behind.Lost.Threshold", 0.3)
-			behindGainThreshold := getDeprecatedValue(this.Settings, "Assistant.Spotter", "Spotter Settings", "Behind.Gain.Threshold", 1.5)
+			settings := this.Settings
+
+			lapUpRangeThreshold := getDeprecatedValue(settings, "Assistant.Spotter", "Spotter Settings", "LapUp.Range.Threshold", 1.0)
+			lapDownRangeThreshold := getDeprecatedValue(settings, "Assistant.Spotter", "Spotter Settings", "LapDown.Range.Threshold", 2.0)
+			frontAttackThreshold := getDeprecatedValue(settings, "Assistant.Spotter", "Spotter Settings", "Front.Attack.Threshold", 0.8)
+			frontGainThreshold := getDeprecatedValue(settings, "Assistant.Spotter", "Spotter Settings", "Front.Gain.Threshold", 0.3)
+			frontLostThreshold := getDeprecatedValue(settings, "Assistant.Spotter", "Spotter Settings", "Front.Lost.Threshold", 1.0)
+			behindAttackThreshold := getDeprecatedValue(settings, "Assistant.Spotter", "Spotter Settings", "Behind.Attack.Threshold", 0.8)
+			behindLostThreshold := getDeprecatedValue(settings, "Assistant.Spotter", "Spotter Settings", "Behind.Lost.Threshold", 0.3)
+			behindGainThreshold := getDeprecatedValue(settings, "Assistant.Spotter", "Spotter Settings", "Behind.Gain.Threshold", 1.5)
+			frontGapMin := getMultiMapValue(settings, "Assistant.Spotter", "Front.Observe.Range.Min", 2)
+			frontGapMax := getMultiMapValue(settings, "Assistant.Spotter", "Front.Observe.Range.Max", 3600)
+			behindGapMin := getMultiMapValue(settings, "Assistant.Spotter", "Behind.Observe.Range.Min", 2)
+			behindGapMax := getMultiMapValue(settings, "Assistant.Spotter", "Behind.Observe.Range.Max", 3600)
 		}
 
 		standingsAhead := false
@@ -2143,7 +2153,7 @@ class RaceSpotter extends GridRaceAssistant {
 				else if regular {
 					lapDifference := standingsAhead.LapDifference[sector]
 
-					if (lapDifference > 0) {
+					if ((lapDifference > 0) && (delta > frontGapMin) && (delta <= frontGapMax)) {
 						if (standingsAhead.closingIn(sector, frontGainThreshold) && !standingsAhead.Reported) {
 							speaker.speakPhrase("GainedFront", {delta: (delta > 5) ? Round(delta) : speaker.number2Speech(delta, 1)
 															  , gained: speaker.number2Speech(deltaDifference, 1)
@@ -2235,7 +2245,7 @@ class RaceSpotter extends GridRaceAssistant {
 				else if regular {
 					lapDifference := standingsBehind.LapDifference[sector]
 
-					if (lapDifference > 0) {
+					if ((lapDifference > 0) && (delta > behindGapMin) && (delta <= behindGapMax)) {
 						if (standingsBehind.closingIn(sector, behindLostThreshold) && !standingsBehind.Reported) {
 							speaker.speakPhrase("LostBehind", {delta: (delta > 5) ? Round(delta) : speaker.number2Speech(delta, 1)
 															 , lost: speaker.number2Speech(deltaDifference, 1)

@@ -3,14 +3,14 @@ Version=5.0.3.0-dev
 Target=5.0.3.0-release
 Date=05/08/2023
 Download=
-Changes=Fixed calculation of tyre laps in "Race Center", Fixed identification of drivers car for ACC in rare situations after a race restart with entry lists carried over form previous event, Fixed rare spotter information for lapped cars, that are actually in the pit, Fixed a couple of deadlock situations in the session database, Documentation for all modifier keys, Documentation for internal configuration parameters
+Changes=Fixed calculation of tyre laps in "Race Center", Fixed identification of drivers car for ACC in rare situations after a race restart with entry lists carried over form previous event, Fixed rare spotter information for lapped cars, that are actually in the pit, Fixed a couple of deadlock situations in the session database, Documentation for all modifier keys, Documentation for internal configuration parameters, New settings in the "Session Database" to control the frequency of the telemetry updates for all Assistants, New settings in the "Session Database" to control the cooldown time of the Race Assistants
 [Release]
 Version=5.0.2.1-release
 Date=05/05/2023
 Download=https://cutt.ly/p55DuXl;https://www.dropbox.com/s/ko821ok20q3vslc/Simulator%20Controller%205.0.2.1-release.zip?dl=1
 Changes=Fixed deadlock in session database
 [Current]
-Type=Release
+Type=Development
 [Version]
 Release=5.0.2.1-release
-Development=5.0.2.1-release
+Development=5.0.3.0-dev

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -236,6 +237,24 @@ namespace ACCUDPProvider {
 			
 			trackMeters = 0;
 		}
+        
+        public string GetCup(int cupCategory)
+        {
+            switch (cupCategory) {
+                case 0:
+                    return "Pro";
+                case 1:
+                    return "Pro-AM";
+                case 2:
+                    return "AM";
+                case 3:
+                    return "Silver";
+                case 4:
+                    return "National";
+                default:
+                    return "Overall";
+            }
+        }
 
 		public void ReadStandings(string ip, int port, string displayName, string connectionPassword, string commandPassword) {
             TextWriterTraceListener listener = new TextWriterTraceListener(this.outFileName + ".Trace");
@@ -321,6 +340,8 @@ namespace ACCUDPProvider {
 
                                         outStream.Write("Car."); outStream.Write(index); outStream.Write(".Lap.Valid="); outStream.WriteLine(lastLap != null ? (lastLap.IsValid ? "true" : "false") : "true");
                                         outStream.Write("Car."); outStream.Write(index); outStream.Write(".Lap.Running.Valid="); outStream.WriteLine(currentLap != null ? (currentLap.IsValid ? "true" : "false") : "true");
+                                        outStream.Write("Car."); outStream.Write(index); outStream.Write(".CupRaw="); outStream.WriteLine(car.CupCategoryEnum);
+                                        outStream.Write("Car."); outStream.Write(index); outStream.Write(".Cup="); outStream.WriteLine(GetCup(car.CupCategoryEnum));
 
                                         if (lastLap != null)
                                         {

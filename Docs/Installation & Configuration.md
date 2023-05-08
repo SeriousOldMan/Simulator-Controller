@@ -501,6 +501,10 @@ The elements on this tab allows you to connect to any currently running *Team Se
 
 The details about the installation, configuration and usage of the *Team Server*, and also about the team administration task in general can be found in the [dedicated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server) for the *Team Server*.
 
+### Special configuration options for optimizing overall performance
+
+The underlying runtime environment of the Simulator Controller applications provide a couple of configuration settings which can be used to optimize everything for the performance of the used PC. You can find specific documentation for this in this [special overview](*), but be carefull when changing any of the settings.
+
 ## Splash Screen Editor
 
 This special editor, which can be opened from the *General* tab of the configuration tool, allows you to define a combination of pictures or animation files together with a sound file. This can be used to display a splash screen during the startup sequence. You may have a Rallye splash screen for your favorite Rallye session, or an F1 splash screen, or even some cinematic impressions from various airplanes in the sky, while waiting for your flight simulator to startup.

@@ -26,3 +26,5 @@ copy "Race Engineer Commands (DE).md" ..\..\Controller.Wiki\Race-Engineer-Comman
 copy "Race Strategist Commands (DE).md" ..\..\Controller.Wiki\Race-Strategist-Commands-(DE).md
 copy "Race Spotter Commands (DE).md" ..\..\Controller.Wiki\Race-Spotter-Commands-(DE).md
 copy "Race Settings.md" ..\..\Controller.Wiki\Race-Settings.md
+copy "Application Modifier Keys.md" ..\..\Controller.Wiki\Application-Modifier-Keys.md
+copy "Core Configuration.md" ..\..\Controller.Wiki\Core-Configuration.md

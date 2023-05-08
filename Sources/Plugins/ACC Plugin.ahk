@@ -413,7 +413,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 					setMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Car", car)
 
 					if !driverCar
-						if (carID = getMultiMapValue(telemetryData, "Session Data", "ID", kUndefined)) {
+						if (getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".ID", false) = getMultiMapValue(telemetryData, "Session Data", "ID", kUndefined)) {
 							driverCar := A_Index
 
 							lastDriverCar := driverCar

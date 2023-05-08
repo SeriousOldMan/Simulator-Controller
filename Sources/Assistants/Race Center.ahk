@@ -1728,7 +1728,7 @@ class RaceCenter extends ConfigurationItem {
 			if this.Laps.Has(1) {
 				lap := this.Laps[1]
 
-				this.getStintSetup(1, &fuel, &tyreCompound, &tyreCompoundColor, &tyreSet, &pressures)
+				this.getStintSetup(1, true, &fuel, &tyreCompound, &tyreCompoundColor, &tyreSet, &pressures)
 
 				if pressures {
 					driver := lap.Stint.Driver.FullName
@@ -4656,7 +4656,7 @@ class RaceCenter extends ConfigurationItem {
 		return false
 	}
 
-	getStintSetup(stintNr, &fuel, &tyreCompound, &tyreCompoundColor, &tyreSet, &tyrePressures) {
+	getStintSetup(stintNr, carryOver, &fuel, &tyreCompound, &tyreCompoundColor, &tyreSet, &tyrePressures) {
 		local sessionStore := this.SessionStore
 		local lap := this.Stints[stintNr].Laps[1]
 		local pressureTable, pressures, pressure, theCompound, pitstop
@@ -4711,6 +4711,14 @@ class RaceCenter extends ConfigurationItem {
 
 						break
 					}
+					else if !carryOver {
+						tyreCompound := false
+						tyreCompoundColor := false
+						tyreSet := false
+						tyrePressures := false
+
+						break
+					}
 				}
 				else {
 					if (this.PitstopsListView.GetCount() >= (stintNr - 1)) {
@@ -4734,6 +4742,14 @@ class RaceCenter extends ConfigurationItem {
 								if isNumber(pressure)
 									tyrePressures[A_Index] := convertUnit("Pressure", internalValue("Float", pressure), false)
 							}
+
+							break
+						}
+						else if !carryOver {
+							tyreCompound := false
+							tyreCompoundColor := false
+							tyreSet := false
+							tyrePressures := false
 
 							break
 						}
@@ -6230,8 +6246,25 @@ class RaceCenter extends ConfigurationItem {
 
 	syncTelemetry(load := false) {
 		local lastLap := this.LastLap
-		local newData, message, session, telemetryDB, tyresTable, lap, runningLap, driverID, pitstop
-		local telemetryData, state, pressures, temperatures, wear, lapPressures, pressure
+		local tyreChange := true
+		local newData, message, session, telemetryDB, tyresTable, lap, runningLap, driverID
+		local telemetryData, pressures, temperatures, wear, lapPressures, pressure
+
+		wasPitstop(lap, &tyreChange := false) {
+			local fuel, tyreCompound, tyreCompoundColor, tyreSet, tyrePressures
+
+			lap := this.Laps[lap]
+
+			if (Abs(lap.Stint.Lap - lap.Nr) <= 1) {
+				this.getStintSetup(lap.Stint.Nr, false, &fuel, &tyreCompound, &tyreCompoundColor, &tyreSet, &tyrePressures)
+
+				tyreChange := (tyreCompound != false)
+
+				return true
+			}
+			else
+				return false
+		}
 
 		if lastLap
 			lastLap := lastLap.Nr
@@ -6298,46 +6331,7 @@ class RaceCenter extends ConfigurationItem {
 					else
 						fails := 0
 
-					try {
-						state := this.Connector.GetSessionValue(session, "Race Engineer State")
-					}
-					catch Any as exception {
-						logError(exception)
-
-						state := false
-					}
-
-					try {
-						pitstop := this.Connector.GetSessionLapValue(session, lap, "Race Center Pitstop")
-
-						if (pitstop = "")
-							pitstop := false
-					}
-					catch Any as exception {
-						logError(exception)
-
-						pitstop := false
-					}
-
-					if (!pitstop && (state && (state != ""))) {
-						state := parseMultiMap(state)
-
-						pitstop := getMultiMapValue(state, "Session State", "Pitstop.Last", false)
-
-						if pitstop {
-							pitstop := (Abs(lap - (getMultiMapValue(state, "Session State", "Pitstop." . pitstop . ".Lap"))) <= 2)
-
-							if pitstop
-								try {
-									this.Connector.SetSessionLapValue(session, lap, "Race Center Pitstop", pitstop)
-								}
-								catch Any as exception {
-									logError(exception)
-								}
-						}
-					}
-
-					telemetryData := values2String(";", "-", "-", "-", "-", "-", "-", "-", "-", "-", pitstop, "n/a", "n/a", "n/a", "-", "-", ",,,", ",,,", "null,null,null,null")
+					telemetryData := values2String(";", "-", "-", "-", "-", "-", "-", "-", "-", "-", wasPitstop(lap), "n/a", "n/a", "n/a", "-", "-", ",,,", ",,,", "null,null,null,null")
 				}
 
 				telemetryData := string2Values(";", telemetryData)
@@ -6351,15 +6345,16 @@ class RaceCenter extends ConfigurationItem {
 				if (telemetryData.Length = 17)
 					telemetryData.Push("null,null,null,null")
 
-				if !pitstop {
-					pitstop := telemetryData[10]
+				if telemetryData[10] {
+					telemetryData := ["-", "-", "-", "-", "-", "-", "-", "-", "-", true, "n/a", "n/a", "n/a", "-", "-", ",,,", ",,,", "null,null,null,null"]
 
-					if pitstop
-						telemetryData := ["-", "-", "-", "-", "-", "-", "-", "-", "-", pitstop, "n/a", "n/a", "n/a", "-", "-", ",,,", ",,,", "null,null,null,null"]
+					if (runningLap > 2) {
+						wasPitstop(lap, &tyreChange)
+
+						if tyreChange
+							runningLap := 0
+					}
 				}
-
-				if ((runningLap > 2) && pitstop)
-					runningLap := 0
 
 				runningLap += 1
 
@@ -7240,17 +7235,17 @@ class RaceCenter extends ConfigurationItem {
 				else
 					newReports := false
 
-				if this.syncTelemetry()
-					newData := true
-
-				if this.syncTyrePressures()
-					newData := true
-
 				if this.syncPitstops(newLaps) {
 					newData := true
 
 					nextPitstopUpdate := (this.LastLap.Nr + 2)
 				}
+
+				if this.syncTelemetry()
+					newData := true
+
+				if this.syncTyrePressures()
+					newData := true
 
 				this.updatePitstops()
 
@@ -7266,8 +7261,11 @@ class RaceCenter extends ConfigurationItem {
 					if this.syncTrackMap()
 						newData := true
 
-				if newLaps
+				if newLaps {
+					this.showMessage(translate("Saving session"))
+
 					this.syncSessionStore()
+				}
 
 				if (newData || newLaps)
 					this.updateReports()
@@ -10087,7 +10085,7 @@ class RaceCenter extends ConfigurationItem {
 				coldPressures := [displayNullValue(pressures["Tyre.Pressure.Cold.Front.Left"]), displayNullValue(pressures["Tyre.Pressure.Cold.Front.Right"])
 								, displayNullValue(pressures["Tyre.Pressure.Cold.Rear.Left"]), displayNullValue(pressures["Tyre.Pressure.Cold.Rear.Right"])]
 
-				this.getStintSetup(lap.Stint.Nr, &fuel, &tyreCompound, &tyreCompoundColor, &tyreSet, &tyrePressures)
+				this.getStintSetup(lap.Stint.Nr, true, &fuel, &tyreCompound, &tyreCompoundColor, &tyreSet, &tyrePressures)
 
 				if tyrePressures {
 					loop 4 {

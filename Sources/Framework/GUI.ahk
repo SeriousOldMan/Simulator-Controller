@@ -1094,7 +1094,7 @@ class Window extends Gui {
 			y := screen2Window(y)
 
 			if (x && y) {
-				if (this.iLastX && ((this.iLastX != x) || (this.iLastY != y))) {
+				if ((this.iLastX != x) || (this.iLastY != y)) {
 					settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
 					setMultiMapValue(settings, "Window Positions", descriptor . ".X", x)

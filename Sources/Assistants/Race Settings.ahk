@@ -568,21 +568,39 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 			field.ValidText := field.Text
 	}
 
-	updateStrategyRecalculation(type, *) {
+	updateStrategyLaps(type, *) {
 		if (type = "Check") {
-			if settingsGui["strategyRecalculationCheck"].Value {
-				settingsGui["strategyRecalculationEdit"].Enabled := true
+			if settingsGui["strategyUpdateLapsCheck"].Value {
+				settingsGui["strategyUpdateLapsEdit"].Enabled := true
 
-				if (settingsGui["strategyRecalculationEdit"].Text = "0")
-					settingsGui["strategyRecalculationEdit"].Text := 1
+				if (settingsGui["strategyUpdateLapsEdit"].Text = "0")
+					settingsGui["strategyUpdateLapsEdit"].Text := 1
 			}
 			else {
-				settingsGui["strategyRecalculationEdit"].Enabled := false
-				settingsGui["strategyRecalculationEdit"].Text := 1
+				settingsGui["strategyUpdateLapsEdit"].Enabled := false
+				settingsGui["strategyUpdateLapsEdit"].Text := 1
 			}
 		}
 		else
-			settingsGui["strategyRecalculationCheck"].Enabled := (settingsGui["strategyRecalculationEdit"].Text > 0)
+			settingsGui["strategyUpdateLapsCheck"].Enabled := (settingsGui["strategyUpdateLapsEdit"].Text > 0)
+
+	}
+
+	updateStrategyPitstop(type, *) {
+		if (type = "Check") {
+			if settingsGui["strategyUpdatePitstopCheck"].Value {
+				settingsGui["strategyUpdatePitstopEdit"].Enabled := true
+
+				if (settingsGui["strategyUpdatePitstopEdit"].Text = "0")
+					settingsGui["strategyUpdatePitstopEdit"].Text := 4
+			}
+			else {
+				settingsGui["strategyUpdatePitstopEdit"].Enabled := false
+				settingsGui["strategyUpdatePitstopEdit"].Text := 4
+			}
+		}
+		else
+			settingsGui["strategyUpdatePitstopCheck"].Enabled := (settingsGui["strategyUpdatePitstopEdit"].Text > 0)
 
 	}
 
@@ -905,8 +923,11 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		setMultiMapValue(newSettings, "Strategy Settings", "Traffic.Considered", settingsGui["trafficConsideredEdit"].Text)
 		setMultiMapValue(newSettings, "Strategy Settings", "Strategy.Window.Considered", settingsGui["pitstopStrategyWindowEdit"].Text)
 
-		setMultiMapValue(newSettings, "Strategy Settings", "Recalculation"
-									, settingsGui["strategyRecalculationCheck"].Value ? settingsGui["strategyRecalculationEdit"].Text : false)
+		setMultiMapValue(newSettings, "Strategy Settings", "Strategy.Update.Laps"
+									, settingsGui["strategyUpdateLapsCheck"].Value ? settingsGui["strategyUpdateLapsEdit"].Text : false)
+
+		setMultiMapValue(newSettings, "Strategy Settings", "Strategy.Update.Pitstop"
+									, settingsGui["strategyUpdatePitstopCheck"].Value ? settingsGui["strategyUpdatePitstopEdit"].Text : false)
 
 		if gTeamMode {
 			setMultiMapValue(newSettings, "Team Settings", "Server.URL", settingsGui["serverURLEdit"].Text)
@@ -1296,16 +1317,25 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		settingsGui.Add("UpDown", "x158 yp-2 w18 h20 Range1-100 0x80", value)
 		settingsGui.Add("Text", "x184 yp+4 w290 h20", translate("% track length"))
 
-		value := getMultiMapValue(settingsOrCommand, "Strategy Settings", "Recalculation", false)
+		value := getMultiMapValue(settingsOrCommand, "Strategy Settings", "Strategy.Update.Laps", false)
 
-		settingsGui.Add("CheckBox", "x16 YP+30 Checked" . (value > 0) . " VstrategyRecalculationCheck", translate("Update every")).OnEvent("Click", updateStrategyRecalculation.Bind("Check"))
-		settingsGui.Add("Edit", "x126 yp-3 w50 h20 Limit2 Number VstrategyRecalculationEdit", value ? value : 1).OnEvent("Change", updateStrategyRecalculation.Bind("Edit"))
+		settingsGui.Add("CheckBox", "x16 YP+30 Checked" . (value > 0) . " VstrategyUpdateLapsCheck", translate("Update every")).OnEvent("Click", updateStrategyLaps.Bind("Check"))
+		settingsGui.Add("Edit", "x126 yp-3 w50 h20 Limit2 Number VstrategyUpdateLapsEdit", value ? value : 1).OnEvent("Change", updateStrategyLaps.Bind("Edit"))
+		settingsGui.Add("UpDown", "x158 yp-2 w18 h20 Range1-99 0x80", value ? value : 1)
+		settingsGui.Add("Text", "x184 yp+2 w290 h20", translate("Laps"))
 
 		if !value
-			settingsGui["strategyRecalculationEdit"].Enabled := false
+			settingsGui["strategyUpdateLapsEdit"].Enabled := false
 
-		settingsGui.Add("UpDown", "x158 yp-2 w18 h20 Range1-99 0x80", value)
-		settingsGui.Add("Text", "x184 yp+3 w290 h20", translate("Laps"))
+		value := getMultiMapValue(settingsOrCommand, "Strategy Settings", "Strategy.Update.Pitstop", false)
+
+		settingsGui.Add("CheckBox", "x16 YP+26 Checked" . (value > 0) . " VstrategyUpdatePitstopCheck", translate("Update when")).OnEvent("Click", updateStrategyPitstop.Bind("Check"))
+		settingsGui.Add("Edit", "x126 yp-3 w50 h20 Limit1 Number VstrategyUpdatePitstopEdit", value ? value : 4).OnEvent("Change", updateStrategyPitstop.Bind("Edit"))
+		settingsGui.Add("UpDown", "x158 yp-2 w18 h20 Range1-9 0x80", value ? value : 4)
+		settingsGui.Add("Text", "x184 yp+2 w290 h20", translate("Laps difference from Strategy Pitstop"))
+
+		if !value
+			settingsGui["strategyUpdatePitstopEdit"].Enabled := false
 
 		settingsGui.Add("Text", "x66 yp+28 w270 0x10")
 

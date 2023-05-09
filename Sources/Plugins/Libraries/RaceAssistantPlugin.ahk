@@ -1114,7 +1114,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		local ignore, assistant
 
 		if RaceAssistantPlugin.TeamSessionActive
-			RaceAssistantPlugin.TeamServer.updateLap(RaceAssistantPlugin.LastLap, RaceAssistantPlugin.LapRunning, telemetryData, positionsData)
+			RaceAssistantPlugin.TeamServer.updateLap(RaceAssistantPlugin.LastLap, RaceAssistantPlugin.LapRunning, data, telemetryData, positionsData)
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
 			if (assistant.requireRaceAssistant() && assistant.RaceAssistantActive)

@@ -433,7 +433,6 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 						}
 						else if (getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Time") = lapTime)
 							driverCarCandidate := A_Index
-					}
 				}
 			}
 

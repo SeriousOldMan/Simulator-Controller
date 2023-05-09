@@ -2245,7 +2245,7 @@ class RaceEngineer extends RaceAssistant {
 		}
 	}
 
-	requestPitstopHistory(callbackCategory, callbackMessage, callbackPID) {
+	requestPitstopHistory(callbackCategory, callbackMessage, callbackPID, arguments*) {
 		local knowledgeBase := this.KnowledgeBase
 		local pitstopHistory := newMultiMap()
 		local numPitstops := 0
@@ -2308,7 +2308,7 @@ class RaceEngineer extends RaceAssistant {
 
 		writeMultiMap(filename, pitstopHistory)
 
-		messageSend(kFileMessage, callbackCategory, callbackMessage . ":" . fileName, callbackPID)
+		messageSend(kFileMessage, callbackCategory, callbackMessage . ":" . values2String(";", fileName, arguments*), callbackPID)
 	}
 
 	lowFuelWarning(remainingLaps) {

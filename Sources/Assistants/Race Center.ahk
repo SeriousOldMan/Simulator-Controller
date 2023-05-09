@@ -2535,7 +2535,7 @@ class RaceCenter extends ConfigurationItem {
 		local class
 
 		loop getMultiMapValue(data, "Position Data", "Car.Count") {
-			class := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Class", kUnknown)
+			class := this.getClass(data, A_Index)
 
 			if !classes.Has(class)
 				classes[class] := true
@@ -2545,10 +2545,15 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	getClass(data, car := false) {
+		local carClass, carCategory
+
 		if !car
 			car := getMultiMapValue(data, "Position Data", "Driver.Car")
 
-		return getMultiMapValue(data, "Position Data", "Car." . car . ".Class", kUnknown)
+		carClass := getMultiMapValue(data, "Position Data", "Car." . car . ".Class", kUnknown)
+		carCategory := getMultiMapValue(data, "Position Data", "Car." . car . ".Category", kUndefined)
+
+		return ((carCategory != kUndefined) ? (carClass . translate(" (") . carCategory . translate(")")) : carClass)
 	}
 
 	getCars(data, class := "Overall", sorted := false) {
@@ -2577,7 +2582,7 @@ class RaceCenter extends ConfigurationItem {
 			positions := []
 
 			loop getMultiMapValue(data, "Position Data", "Car.Count")
-				if (!class || (class = getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Class", kUnknown)))
+				if (!class || (class = this.getClass(data, A_Index)))
 					positions.Push(Array(A_Index, getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Position")))
 
 			bubbleSort(&positions, compareClassPositions)
@@ -2587,7 +2592,7 @@ class RaceCenter extends ConfigurationItem {
 		}
 		else
 			loop getMultiMapValue(data, "Position Data", "Car.Count")
-				if (!class || (class = getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Class", kUnknown)))
+				if (!class || (class = this.getClass(data, A_Index)))
 					classGrid.Push(A_Index)
 
 		return classGrid
@@ -2603,7 +2608,7 @@ class RaceCenter extends ConfigurationItem {
 				car := getMultiMapValue(data, "Position Data", "Driver.Car")
 
 		if (type != "Overall")
-			for position, candidate in this.getCars(data, getMultiMapValue(data, "Position Data", "Car." . car . ".Class", kUnknown), true)
+			for position, candidate in this.getCars(data, this.getClass(data, car), true)
 				if (candidate = car)
 					return position
 
@@ -2698,6 +2703,7 @@ class RaceCenter extends ConfigurationItem {
 		}
 
 		this.updateSessionMenu()
+		this.updatePlanMenu()
 		this.updateStrategyMenu()
 		this.updatePitstopMenu()
 
@@ -2869,6 +2875,10 @@ class RaceCenter extends ConfigurationItem {
 		this.Control["sessionMenuDropDown"].Add(collect(["Session", "---------------------------------------------", "Connect", "Clear...", "---------------------------------------------", synchronize, "---------------------------------------------", "Select Team...", "---------------------------------------------", "Load Session...", "Save Session", "Save a Copy...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Race Summary", "Driver Statistics"], translate))
 
 		this.Control["sessionMenuDropDown"].Choose(1)
+	}
+
+	updatePlanMenu() {
+		this.Control["planMenuDropDown"].Choose(1)
 	}
 
 	updateStrategyMenu() {

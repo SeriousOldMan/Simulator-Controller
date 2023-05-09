@@ -114,6 +114,8 @@ class TeamServerPlugin extends ControllerPlugin {
 				Run("`"" . exePath . "`"", kBinariesDirectory)
 			}
 			catch Any as exception {
+				logError(exception)
+				
 				logMessage(kLogCritical, translate("Cannot start the Race Settings tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (")
 									   . kBinariesDirectory . translate(")"))
 
@@ -145,6 +147,8 @@ class TeamServerPlugin extends ControllerPlugin {
 				Run("`"" . exePath . "`"", kBinariesDirectory)
 			}
 			catch Any as exception {
+				logError(exception)
+				
 				logMessage(kLogCritical, translate("Cannot start the Race Center tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (")
 									   . kBinariesDirectory . translate(")"))
 
@@ -308,6 +312,8 @@ class TeamServerPlugin extends ControllerPlugin {
 			this.iConnector := CLR_LoadLibrary(dllFile).CreateInstance("TeamServer.TeamServerConnector")
 		}
 		catch Any as exception {
+			logError(exception)
+			
 			logMessage(kLogCritical, translate("Error while initializing Team Server Connector - please rebuild the applications"))
 
 			showMessage(translate("Error while initializing Team Server Connector - please rebuild the applications") . translate("...")
@@ -701,6 +707,8 @@ class TeamServerPlugin extends ControllerPlugin {
 				return computeDriverName(driver.ForName, driver.SurName, driver.NickName)
 			}
 			catch Any as exception {
+				logError(exception)
+				
 				this.LastMessage := (translate("Error while fetching stint data (Session: ") . session . translate(", Stint: ") . stint
 								   . translate("), Exception: ") . (isObject(exception) ? exception.Message : exception))
 
@@ -729,6 +737,8 @@ class TeamServerPlugin extends ControllerPlugin {
 					logMessage(kLogInfo, translate("Fetching Driver (Driver: ") . this.Driver . translate(", Name: ") . driver["ForName"] . A_Space . driver["SurName"] . translate(")"))
 			}
 			catch Any as exception {
+				logError(exception)
+				
 				if !ignore {
 					this.LastMessage := (translate("Error while fetching driver names (Driver: ") . this.Driver
 									   . translate("), Exception: ") . (isObject(exception) ? exception.Message : exception))
@@ -791,6 +801,8 @@ class TeamServerPlugin extends ControllerPlugin {
 					}
 			}
 			catch Any as exception {
+				logError(exception)
+				
 				this.iSessionActive := false
 
 				this.LastMessage := (translate("Error while starting session (Session: ") . this.Session . translate(", Car: ") . car
@@ -818,6 +830,8 @@ class TeamServerPlugin extends ControllerPlugin {
 				}
 			}
 			catch Any as exception {
+				logError(exception)
+				
 				this.LastMessage := (translate("Error while finishing session (Session: ") . this.Session
 								   . translate("), Exception: ") . (isObject(exception) ? exception.Message : exception))
 
@@ -899,6 +913,8 @@ class TeamServerPlugin extends ControllerPlugin {
 					}
 			}
 			catch Any as exception {
+				logError(exception)
+				
 				this.LastMessage := (translate("Error while requesting current driver session (Session: ") . this.Session
 								   . translate("), Exception: ") . (isObject(exception) ? exception.Message : exception))
 
@@ -936,6 +952,8 @@ class TeamServerPlugin extends ControllerPlugin {
 					}
 			}
 			catch Any as exception {
+				logError(exception)
+				
 				this.LastMessage := (translate("Error while fetching session data (Session: ") . this.Session . translate(", Name: ") . name
 								   . translate("), Exception: ") . (isObject(exception) ? exception.Message : exception))
 
@@ -977,6 +995,8 @@ class TeamServerPlugin extends ControllerPlugin {
 					}
 			}
 			catch Any as exception {
+				logError(exception)
+				
 				this.LastMessage := (translate("Error while storing session data (Session: ") . this.Session . translate(", Name: ") . name
 								   . translate("), Exception: ") . (isObject(exception) ? exception.Message : exception))
 
@@ -1016,6 +1036,8 @@ class TeamServerPlugin extends ControllerPlugin {
 					}
 			}
 			catch Any as exception {
+				logError(exception)
+				
 				this.LastMessage := (translate("Error while fetching stint data (Session: ") . session . translate(", Stint: ") . stint
 								   . translate(", Name: ") . name . translate("), Exception: ") . (isObject(exception) ? exception.Message : exception))
 
@@ -1063,6 +1085,8 @@ class TeamServerPlugin extends ControllerPlugin {
 					}
 			}
 			catch Any as exception {
+				logError(exception)
+				
 				this.LastMessage := (translate("Error while storing stint data (Session: ") . session . translate(", Stint: ") . stint
 								   . translate(", Name: ") . name . translate("), Exception: ") . (isObject(exception) ? exception.Message : exception))
 
@@ -1092,6 +1116,8 @@ class TeamServerPlugin extends ControllerPlugin {
 					}
 			}
 			catch Any as exception {
+				logError(exception)
+				
 				this.LastMessage := (translate("Error while fetching stint data (Session: ") . session . translate(", Stint: ") . stint
 								   . translate("), Exception: ") . (isObject(exception) ? exception.Message : exception))
 
@@ -1136,6 +1162,8 @@ class TeamServerPlugin extends ControllerPlugin {
 					}
 			}
 			catch Any as exception {
+				logError(exception)
+				
 				this.LastMessage := (translate("Error while fetching lap data (Session: ") . session
 								   . translate("), Exception: ") . (isObject(exception) ? exception.Message : exception))
 
@@ -1167,6 +1195,8 @@ class TeamServerPlugin extends ControllerPlugin {
 					}
 			}
 			catch Any as exception {
+				logError(exception)
+				
 				this.LastMessage := (translate("Error while fetching lap data (Session: ") . session . translate(", Lap: ") . lap
 								   . translate("), Exception: ") . (isObject(exception) ? exception.Message : exception))
 
@@ -1208,6 +1238,8 @@ class TeamServerPlugin extends ControllerPlugin {
 					}
 			}
 			catch Any as exception {
+				logError(exception)
+				
 				this.LastMessage := (translate("Error while fetching lap data (Session: ") . session . translate(", Lap: ") . lap
 								   . translate(", Name: ") . name . translate("), Exception: ") . (isObject(exception) ? exception.Message : exception))
 
@@ -1258,6 +1290,8 @@ class TeamServerPlugin extends ControllerPlugin {
 					}
 			}
 			catch Any as exception {
+				logError(exception)
+				
 				this.LastMessage := (translate("Error while storing lap data (Session: ") . session . translate(", Lap: ") . lap
 								   . translate(", Name: ") . name . translate("), Exception: ") . (isObject(exception) ? exception.Message : exception))
 
@@ -1296,6 +1330,8 @@ class TeamServerPlugin extends ControllerPlugin {
 				return stint
 			}
 			catch Any as exception {
+				logError(exception)
+				
 				this.LastMessage := (translate("Error while starting stint (Session: ") . this.Session . translate(", Driver: ") . this.Driver
 								   . translate(", Lap: ") . lapNumber . translate("), Exception: ") . (isObject(exception) ? exception.Message :  exception))
 
@@ -1374,6 +1410,8 @@ class TeamServerPlugin extends ControllerPlugin {
 				}
 			}
 			catch Any as exception {
+				logError(exception)
+				
 				this.LastMessage := (translate("Error while updating a lap (Session: ") . this.Session . translate(", Lap: ") . lapNumber
 								   . translate("), Exception: ") . (isObject(exception) ? exception.Message : exception))
 
@@ -1482,6 +1520,8 @@ class TeamServerPlugin extends ControllerPlugin {
 				this.iTeamName := ""
 				this.iSessionName := ""
 
+				logError(exception)
+				
 				this.LastMessage := (translate("Cannot connect to the Team Server (URL: ") . this.ServerURL
 								   . translate(", Token: ") . this.ServerToken
 								   . translate("), Exception: ") . (isObject(exception) ? exception.Message : exception))

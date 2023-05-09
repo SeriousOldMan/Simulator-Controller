@@ -364,7 +364,7 @@ class RaceReportViewer extends RaceReportReader {
 				nr := cars[A_Index][1]
 
 				if (getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Car", kNotInitialized) != kNotInitialized) {
-					class := getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Class", kUnknown)
+					class := this.getClass(raceData, A_Index)
 
 					if !classes.Has(class)
 						classes[class] := [Array(A_Index, result)]
@@ -543,7 +543,7 @@ class RaceReportViewer extends RaceReportReader {
 			cars := []
 
 			for ignore, car in this.Settings["Drivers"]
-				if (allDrivers.Has(car) && inList(classes, getMultiMapValue(raceData, "Cars", "Car." . car . ".Class", kUnknown)))
+				if (allDrivers.Has(car) && inList(classes, this.getClass(raceData, car)))
 					cars.Push(car)
 
 			drivers := []
@@ -618,7 +618,7 @@ class RaceReportViewer extends RaceReportReader {
 			loop carsCount {
 				car := A_Index
 
-				if inList(selectedClasses, getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Class", kUnknown)) {
+				if inList(selectedClasses, this.getClass(raceData, A_Index)) {
 					valid := false
 
 					newMinPosition := minPosition
@@ -746,7 +746,7 @@ class RaceReportViewer extends RaceReportReader {
 				lapTimes := []
 
 				for ignore, car in selectedCars
-					if inList(selectedClasses, getMultiMapValue(raceData, "Cars", "Car." . car . ".Class", kUnknown))
+					if inList(selectedClasses, this.getClass(raceData, car))
 						if times.Has(lap) {
 							time := (times[lap].Has(car) ? times[lap][car] : 0)
 							time := (extendedIsNull(time) ? 0 : Round(time / 1000, 1))
@@ -818,7 +818,7 @@ class RaceReportViewer extends RaceReportReader {
 				lapTimes := []
 
 				for ignore, car in selectedCars
-					if inList(selectedClasses, getMultiMapValue(raceData, "Cars", "Car." . car . ".Class", kUnknown))
+					if inList(selectedClasses, this.getClass(raceData, car))
 						if times.Has(lap) {
 							time := (times[lap].Has(car) ? times[lap][car] : 0)
 							time := (extendedIsNull(time) ? 0 : Round(time / 1000, 1))
@@ -869,7 +869,7 @@ class RaceReportViewer extends RaceReportReader {
 			offset := 0
 
 			for index, car in selectedCars
-				if inList(selectedClasses, getMultiMapValue(raceData, "Cars", "Car." . car . ".Class", kUnknown))
+				if inList(selectedClasses, this.getClass(raceData, car))
 					if inList(invalidCars, car) {
 						for ignore, lap in laps
 							driverTimes[lap].RemoveAt(index - offset)
@@ -985,7 +985,7 @@ class RaceReportViewer extends RaceReportReader {
 			length := 20000
 
 			for ignore, car in selectedCars
-				if inList(selectedClasses, getMultiMapValue(raceData, "Cars", "Car." . car . ".Class", kUnknown)) {
+				if inList(selectedClasses, this.getClass(raceData, car)) {
 					carTimes := this.getDriverTimes(raceData, times, car)
 
 					if (carTimes.Length > 0) {
@@ -999,7 +999,7 @@ class RaceReportViewer extends RaceReportReader {
 				length := false
 
 			for index, car in selectedCars
-				if inList(selectedClasses, getMultiMapValue(raceData, "Cars", "Car." . car . ".Class", kUnknown))
+				if inList(selectedClasses, this.getClass(raceData, car))
 					if driverTimes.Has(car) {
 						carTimes := Array("'#" . getMultiMapValue(raceData, "Cars", "Car." . car . ".Nr") . "'")
 
@@ -1102,7 +1102,7 @@ class RaceReportViewer extends RaceReportReader {
 			length := 20000
 
 			for ignore, car in selectedCars
-				if inList(selectedClasses, getMultiMapValue(raceData, "Cars", "Car." . car . ".Class", kUnknown)) {
+				if inList(selectedClasses, this.getClass(raceData, car)) {
 					carTimes := this.getDriverTimes(raceData, times, car)
 
 					if (carTimes.Length > 0) {
@@ -1119,7 +1119,7 @@ class RaceReportViewer extends RaceReportReader {
 			columns := ["'" . translate("Lap") . "'"]
 
 			for index, car in selectedCars
-				if inList(selectedClasses, getMultiMapValue(raceData, "Cars", "Car." . car . ".Class", kUnknown))
+				if inList(selectedClasses, this.getClass(raceData, car))
 					if driverTimes.Has(car) {
 						columns.Push("'#" . getMultiMapValue(raceData, "Cars", "Car." . car . ".Nr") . A_Space
 										  . StrReplace(SessionDatabase.getCarName(simulator, getMultiMapValue(raceData, "Cars", "Car." . car . ".Car")), "'", "\'") . "'")
@@ -1373,7 +1373,7 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 			driversListView.Delete()
 
 			for ignore, driver in allDrivers
-				if (!selectedClass || (selectedClass = getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Class", kUnknown)))
+				if (!selectedClass || (selectedClass = this.getClass(raceData, A_Index)))
 					if (getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Car", kNotInitialized) != kNotInitialized) {
 						if inList(options, "Cars")
 							column1 := getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Nr")
@@ -1624,7 +1624,7 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 					selectedClass := false
 
 				for ignore, driver in allDrivers
-					if (!selectedClass || (selectedClass = getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Class", kUnknown)))
+					if (!selectedClass || (selectedClass = this.getClass(raceData, A_Index)))
 						selectedDrivers[inList(options, "Cars") ? getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Nr") : driver] := A_Index
 
 				newDrivers := []

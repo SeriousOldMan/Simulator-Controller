@@ -582,7 +582,7 @@ class StrategySimulation {
 		}
 	}
 
-	evaluateScenarios(scenarios, verbose, &progress) {
+	evaluateScenarios(scenarios, verbose, &progress := 0) {
 		local candidate := false
 		local name, strategy, message
 

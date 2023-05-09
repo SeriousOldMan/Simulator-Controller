@@ -38,6 +38,8 @@ global kPSMutatingOptions := ["Strategy", "Change Tyres", "Tyre Compound", "Chan
 ;;;-------------------------------------------------------------------------;;;
 
 class ACCPlugin extends RaceAssistantSimulatorPlugin {
+	static kUnknown := false
+
 	iUDPClient := false
 	iUDPConnection := false
 
@@ -155,6 +157,9 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	__New(controller, name, simulator, configuration := false) {
+		if !ACCPlugin.kUnknown
+			ACCPlugin.kUnknown := translate("Unknown")
+
 		super.__New(controller, name, simulator, configuration)
 
 		if (this.Active || isDebug()) {
@@ -308,7 +313,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	acquirePositionsData(telemetryData) {
 		local positionsData, session
 		local lap, restart, fileName, tries
-		local driverForname, driverSurname, driverNickname, lapTime, driverCar, driverCarCandidate, carID, car
+		local driverID, driverForname, driverSurname, driverNickname, lapTime, driverCar, driverCarCandidate, carID, car
 
 		static carIDs := false
 		static lastDriverCar := false
@@ -393,6 +398,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			driverForname := getMultiMapValue(telemetryData, "Stint Data", "DriverForname", "John")
 			driverSurname := getMultiMapValue(telemetryData, "Stint Data", "DriverSurname", "Doe")
 			driverNickname := getMultiMapValue(telemetryData, "Stint Data", "DriverNickname", "JDO")
+			driverID := getMultiMapValue(telemetryData, "Session Data", "ID", kUndefined)
 
 			lapTime := getMultiMapValue(telemetryData, "Stint Data", "LapLastTime", 0)
 
@@ -405,15 +411,15 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				if (carID == kUndefined)
 					break
 				else {
-					car := (carIDs.Has(carID) ? carIDs[carID] : "Unknown")
+					car := (carIDs.Has(carID) ? carIDs[carID] : ACCPlugin.kUnknown)
 
-					if ((car = "Unknown") && isDebug())
+					if ((car = ACCPlugin.kUnknown) && isDebug())
 						showMessage("Unknown car with ID " . carID . " detected...")
 
 					setMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Car", car)
 
-					if !driverCar {
-						if (carID = getMultiMapValue(telemetryData, "Session Data", "ID", kUndefined)) {
+					if !driverCar
+						if (getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".ID", false) = driverID) {
 							driverCar := A_Index
 
 							lastDriverCar := driverCar
@@ -432,7 +438,6 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 						}
 						else if (getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Time") = lapTime)
 							driverCarCandidate := A_Index
-					}
 				}
 			}
 
@@ -474,7 +479,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	updatePositionsData(data) {
-		local car
+		local car, carCategory, cupCategory
 
 		static carCategories := false
 
@@ -489,7 +494,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			if (car == kUndefined)
 				break
 			else
-				setMultiMapValue(data, "Position Data", "Car." . A_Index . ".Class", carCategories.Has(car) ? carCategories[car] : "Unknown")
+				setMultiMapValue(data, "Position Data", "Car." . A_Index . ".Class", carCategories.Has(car) ? carCategories[car] : ACCPlugin.kUnknown)
 		}
 	}
 

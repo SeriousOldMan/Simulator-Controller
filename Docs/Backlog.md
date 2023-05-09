@@ -18,7 +18,6 @@
   5. Multi-category awareness (Pro, Pro-AM, ...)
   6. Graphical Editor for Vocalics Settings inkl. Test-Modus...
   7. Better answers by the Strategist, when a pitstop cannot be recommended
-  8. Recalculating the strategy by the Strategist (once per lap, configurable)
 
 #### Race Center
   1. Multi-category awareness (Pro, Pro-AM, ...)

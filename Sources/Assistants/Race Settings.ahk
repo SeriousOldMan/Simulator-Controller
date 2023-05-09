@@ -1332,7 +1332,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		settingsGui.Add("CheckBox", "x16 YP+26 Checked" . (value > 0) . " VstrategyUpdatePitstopCheck", translate("Update when")).OnEvent("Click", updateStrategyPitstop.Bind("Check"))
 		settingsGui.Add("Edit", "x126 yp-3 w50 h20 Limit1 Number VstrategyUpdatePitstopEdit", value ? value : 4).OnEvent("Change", updateStrategyPitstop.Bind("Edit"))
 		settingsGui.Add("UpDown", "x158 yp-2 w18 h20 Range1-9 0x80", value ? value : 4)
-		settingsGui.Add("Text", "x184 yp+2 w290 h20", translate("Laps difference from Strategy Pitstop"))
+		settingsGui.Add("Text", "x184 yp+2 w290 h20", translate("Laps difference to Strategy"))
 
 		if !value
 			settingsGui["strategyUpdatePitstopEdit"].Enabled := false

@@ -56,19 +56,28 @@ class RaceReportReader {
 		return laps
 	}
 
+	getClass(raceData, car) {
+		local carClass, carCategory
+
+		carClass := getMultiMapValue(raceData, "Cars", "Car." . car . ".Class", kUnknown)
+		carCategory := getMultiMapValue(raceData, "Cars", "Car." . car . ".Category", kUndefined)
+
+		return ((carCategory != kUndefined) ? (carClass . translate(" (") . carCategory . translate(")")) : carClass)
+	}
+
 	getClasses(raceData) {
 		local classes := []
-		local unknown := translate("Unknown")
 		local carClass
-
 
 		loop getMultiMapValue(raceData, "Cars", "Count")
 			if (getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Car", kNotInitialized) != kNotInitialized) {
-				carClass := getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Class", unknown)
+				carClass := this.getClass(raceData, A_Index)
 
 				if !inList(classes, carClass)
 					classes.Push(carClass)
 			}
+
+		bubbleSort(&classes)
 
 		return classes
 	}
@@ -202,7 +211,7 @@ class RaceReportReader {
 						if overallPositions
 							overallPositions.Push(position)
 
-						carClass := getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Class", kUnknown)
+						carClass := this.getClass(raceData, A_Index)
 
 						if !classes.Has(carClass)
 							classes[carClass] := [Array(A_Index, position)]

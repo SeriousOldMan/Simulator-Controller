@@ -1588,8 +1588,7 @@ class GridRaceAssistant extends RaceAssistant {
 
 			loop (data ? getMultiMapValue(data, "Position Data", "Car.Count") : knowledgeBase.getValue("Car.Count"))
 				if (data || knowledgeBase.getValue("Car." . A_Index . ".Car", false)) {
-					class := (data ? getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Class", kUnknown)
-								   : knowledgeBase.getValue("Car." . A_Index . ".Class", kUnknown))
+					class := this.getClass(A_Index, data)
 
 					if !classes.Has(class)
 						classes[class] := true
@@ -1604,13 +1603,21 @@ class GridRaceAssistant extends RaceAssistant {
 	}
 
 	getClass(car := false, data := false) {
+		local carClass, carCategory
+
 		if !car
 			car := (data ? getMultiMapValue(data, "Position Data", "Driver.Car") : this.KnowledgeBase.getValue("Driver.Car", false))
 
-		if data
-			return getMultiMapValue(data, "Position Data", "Car." . car . ".Class", kUnknown)
-		else
-			return this.KnowledgeBase.getValue("Car." . car . ".Class", kUnknown)
+		if data {
+			carClass := getMultiMapValue(data, "Position Data", "Car." . car . ".Class", kUnknown)
+			carCategory := getMultiMapValue(data, "Position Data", "Car." . car . ".Category", kUndefined)
+		}
+		else {
+			carClass := this.KnowledgeBase.getValue("Car." . A_Index . ".Class", kUnknown)
+			carCategory := this.KnowledgeBase.getValue("Car." . A_Index . ".Category", kUndefined)
+		}
+
+		return ((carCategory != kUndefined) ? (carClass . translate(" (") . carCategory . translate(")")) : carClass)
 	}
 
 	getCars(class := "Overall", data := false, sorted := false) {
@@ -1634,12 +1641,12 @@ class GridRaceAssistant extends RaceAssistant {
 
 				if data {
 					loop getMultiMapValue(data, "Position Data", "Car.Count")
-						if (!class || (class = getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Class", kUnknown)))
+						if (!class || (class = this.getClass(A_Index, data)))
 							positions.Push(Array(A_Index, getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Position")))
 				}
 				else
 					loop knowledgeBase.getValue("Car.Count")
-						if (!class || (class = knowledgeBase.getValue("Car." . A_Index . ".Class", kUnknown)))
+						if (!class || (class = this.getClass(A_Index)))
 							if knowledgeBase.getValue("Car." . A_Index . ".Car", false)
 								positions.Push(Array(A_Index, knowledgeBase.getValue("Car." . A_Index . ".Position")))
 
@@ -1651,12 +1658,12 @@ class GridRaceAssistant extends RaceAssistant {
 			else {
 				if data {
 					loop getMultiMapValue(data, "Position Data", "Car.Count")
-						if (!class || (class = getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Class", kUnknown)))
+						if (!class || (class = this.getClass(A_Index, data)))
 							classGrid.Push(A_Index)
 				}
 				else
 					loop knowledgeBase.getValue("Car.Count")
-						if (!class || (class = knowledgeBase.getValue("Car." . A_Index . ".Class", kUnknown)))
+						if (!class || (class = this.getClass(A_Index)))
 							if knowledgeBase.getValue("Car." . A_Index . ".Car", false)
 								classGrid.Push(A_Index)
 			}
@@ -1690,9 +1697,7 @@ class GridRaceAssistant extends RaceAssistant {
 		}
 
 		if ((type != "Overall") && this.MultiClass[data]) {
-			for position, candidate in this.getCars(data ? getMultiMapValue(data, "Position Data", "Car." . car . ".Class", kUnknown)
-														 : knowledgeBase.getValue("Car." . car . ".Class", kUnknown)
-												  , data, true)
+			for position, candidate in this.getCars(this.getClass(car, data), data, true)
 				if (candidate = car)
 					return position
 		}

@@ -340,8 +340,7 @@ namespace ACCUDPProvider {
 
                                         outStream.Write("Car."); outStream.Write(index); outStream.Write(".Lap.Valid="); outStream.WriteLine(lastLap != null ? (lastLap.IsValid ? "true" : "false") : "true");
                                         outStream.Write("Car."); outStream.Write(index); outStream.Write(".Lap.Running.Valid="); outStream.WriteLine(currentLap != null ? (currentLap.IsValid ? "true" : "false") : "true");
-                                        outStream.Write("Car."); outStream.Write(index); outStream.Write(".CupRaw="); outStream.WriteLine(car.CupCategoryEnum);
-                                        outStream.Write("Car."); outStream.Write(index); outStream.Write(".Cup="); outStream.WriteLine(GetCup(car.CupCategoryEnum));
+                                        outStream.Write("Car."); outStream.Write(index); outStream.Write(".Category="); outStream.WriteLine(GetCup(car.CupCategoryEnum));
 
                                         if (lastLap != null)
                                         {

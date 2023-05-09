@@ -38,6 +38,8 @@ global kPSMutatingOptions := ["Strategy", "Change Tyres", "Tyre Compound", "Chan
 ;;;-------------------------------------------------------------------------;;;
 
 class ACCPlugin extends RaceAssistantSimulatorPlugin {
+	static kUnknown := false
+
 	iUDPClient := false
 	iUDPConnection := false
 
@@ -155,6 +157,9 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	__New(controller, name, simulator, configuration := false) {
+		if !ACCPlugin.kUnknown
+			ACCPlugin.kUnknown := translate("Unknown")
+
 		super.__New(controller, name, simulator, configuration)
 
 		if (this.Active || isDebug()) {
@@ -406,9 +411,9 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				if (carID == kUndefined)
 					break
 				else {
-					car := (carIDs.Has(carID) ? carIDs[carID] : "Unknown")
+					car := (carIDs.Has(carID) ? carIDs[carID] : ACCPlugin.kUnknown)
 
-					if ((car = "Unknown") && isDebug())
+					if ((car = ACCPlugin.kUnknown) && isDebug())
 						showMessage("Unknown car with ID " . carID . " detected...")
 
 					setMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Car", car)
@@ -474,7 +479,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	updatePositionsData(data) {
-		local car
+		local car, carCategory, cupCategory
 
 		static carCategories := false
 
@@ -489,7 +494,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			if (car == kUndefined)
 				break
 			else
-				setMultiMapValue(data, "Position Data", "Car." . A_Index . ".Class", carCategories.Has(car) ? carCategories[car] : "Unknown")
+				setMultiMapValue(data, "Position Data", "Car." . A_Index . ".Class", carCategories.Has(car) ? carCategories[car] : ACCPlugin.kUnknown)
 		}
 	}
 

@@ -308,7 +308,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	acquirePositionsData(telemetryData) {
 		local positionsData, session
 		local lap, restart, fileName, tries
-		local driverForname, driverSurname, driverNickname, lapTime, driverCar, driverCarCandidate, carID, car
+		local driverID, driverForname, driverSurname, driverNickname, lapTime, driverCar, driverCarCandidate, carID, car
 
 		static carIDs := false
 		static lastDriverCar := false
@@ -393,6 +393,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			driverForname := getMultiMapValue(telemetryData, "Stint Data", "DriverForname", "John")
 			driverSurname := getMultiMapValue(telemetryData, "Stint Data", "DriverSurname", "Doe")
 			driverNickname := getMultiMapValue(telemetryData, "Stint Data", "DriverNickname", "JDO")
+			driverID := getMultiMapValue(telemetryData, "Session Data", "ID", kUndefined)
 
 			lapTime := getMultiMapValue(telemetryData, "Stint Data", "LapLastTime", 0)
 
@@ -413,7 +414,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 					setMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Car", car)
 
 					if !driverCar
-						if (getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".ID", false) = getMultiMapValue(telemetryData, "Session Data", "ID", kUndefined)) {
+						if (getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".ID", false) = driverID) {
 							driverCar := A_Index
 
 							lastDriverCar := driverCar

@@ -5,9 +5,10 @@
   4. Fixed the identification of the car of the driver for *Assetto Corsa Competizione* when a server has been restarted with the result positions of the previous server.
   5. The Spotter no longer informs about lapped cars that are actually in the pit.
   6. Fixed a few more possible deadlock situations in the session database, which could cause all applications to freeze up.
-  7. Integrated many changes for the English version of the Assistant grammars. Many thanks to out community member *Wayne Wortley* for the great work.
-  8. All new [documentation of each and every modifier key](*) available in the applications of Simulator Controller.
-  9. [Experts only] All new [documentation of internal configuration options of the runtime environment](*).
+  7. Fixed the initialization of the race settings from the defaults in the session database (critical bug).
+  8. Integrated many changes for the English version of the Assistant grammars. Many thanks to out community member *Wayne Wortley* for the great work.
+  9. All new [documentation of each and every modifier key](*) available in the applications of Simulator Controller.
+  10. [Experts only] All new [documentation of internal configuration options of the runtime environment](*).
 
 ## 5.0.2.1-release 05/05/23
   1. Citical bugfix for a potential deadlock situation in the session database, which could cause all applications to freeze up.

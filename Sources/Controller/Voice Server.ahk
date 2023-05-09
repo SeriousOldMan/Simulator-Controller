@@ -469,6 +469,8 @@ class VoiceServer extends ConfigurationItem {
 					throw "Recognizer not running..."
 			}
 			catch Any as exception {
+				logError(exception)
+				
 				logMessage(kLogCritical, translate("Error while registering voice command `"") . command . translate("`" - please check the configuration"))
 
 				showMessage(substituteVariables(translate("Cannot register voice command `"%command%`" - please check the configuration..."), {command: command})
@@ -991,6 +993,8 @@ class VoiceServer extends ConfigurationItem {
 					throw "Recognizer not running..."
 			}
 			catch Any as exception {
+				logError(exception)
+				
 				logMessage(kLogCritical, translate("Error while registering voice command `"") . activationCommand . translate("`" - please check the configuration"))
 
 				showMessage(substituteVariables(translate("Cannot register voice command `"%command%`" - please check the configuration..."), {command: activationCommand})

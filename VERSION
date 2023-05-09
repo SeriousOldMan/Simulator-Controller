@@ -1,9 +1,9 @@
 [Development]
-Version=5.0.3.0-dev
-Target=5.0.3.0-release
+Version=5.0.5.0-dev
+Target=5.0.5.0-release
 Date=05/09/2023
 Download=
-Changes=Fixed calculation of tyre laps in "Race Center", Fixed identification of drivers car for ACC in rare situations after a race restart with entry lists carried over form previous event, Fixed rare spotter information for lapped cars, that are actually in the pit, Fixed a couple of deadlock situations in the session database, Documentation for all modifier keys, Documentation for internal configuration parameters, Fixed data inheritance from session database
+Changes=New observation range settings for opponent information given by the Spotter, Automatic updates of the strategy handled by the Strategist, Support for Cup categories in addition to class in multi-class races
 [Release]
 Version=5.0.2.1-release
 Date=05/05/2023
@@ -13,4 +13,4 @@ Changes=Fixed deadlock in session database
 Type=Development
 [Version]
 Release=5.0.2.1-release
-Development=5.0.3.0-dev
+Development=5.0.5.0-dev

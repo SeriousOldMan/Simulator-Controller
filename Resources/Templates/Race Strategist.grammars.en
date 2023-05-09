@@ -260,6 +260,12 @@ StrategyCanceled.1=Okay, I have rejected the strategy. You are now on your own.
 StrategyCanceled.2=Strategy is canceled. We have to plan the stops spontaneously now.
 PitstopAhead.1=%driver%, this is %name%. The next pit stop is due in %laps% laps.
 PitstopAhead.2 =%name% here. The next stop is planned for lap %lap%.
+NoBetterStrategy.1=I cannot find a better strategy at the moment. We will stay with it.
+NoBetterStrategy.2=Our current strategy looks like the best currently. We will stick to it.
+NoBetterStrategy.3=Looks like I cannot find a better strategy currently.
+ConfirmUpdateStrategy.1=%driver%, this is %name%. It looks like, we need to change our strategy. Confirm please.
+ConfirmUpdateStrategy.2=%driver%, I can come up with a better strategy. Do you agree?
+ConfirmUpdateStrategy.3=%driver%, we could adjust our strategy, okay?
 // Session Settings Handling //
 ConfirmSaveSettings.1=Shall I note all the settings for the next race?
 ConfirmSaveSettings.2=Oh, %driver%, shall I note all the settings?

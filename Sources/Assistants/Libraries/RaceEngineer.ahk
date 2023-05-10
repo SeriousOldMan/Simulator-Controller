@@ -720,7 +720,7 @@ class RaceEngineer extends RaceAssistant {
 					pressureValue := words[pointPosition - 1]
 					tenthPressureValue := words[pointPosition + 1]
 
-					found := (this.isNumber(pressureValue, &pressureValue) && this.isNumber(tenthPressureValue, tenthPressureValue))
+					found := (this.isNumber(pressureValue, &pressureValue) && this.isNumber(tenthPressureValue, &tenthPressureValue))
 				}
 				else
 					for ignore, word in words {
@@ -737,7 +737,7 @@ class RaceEngineer extends RaceAssistant {
 
 							if isInteger(startChar)
 								if (StrLen(word) = 2) {
-									found := (this.isNumber(startChar, &pressureValue) && this.isNumber(SubStr(word, 2, 1), tenthPressureValue))
+									found := (this.isNumber(startChar, &pressureValue) && this.isNumber(SubStr(word, 2, 1), &tenthPressureValue))
 
 									if found
 										break

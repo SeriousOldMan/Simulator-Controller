@@ -42,7 +42,7 @@ Yes=[Yes {please, of course}, {Yes, Perfect} go on, {Go, Okay go} {on, on please
 No=[No {thank you, not now, I will call you later}, Not at the moment, Not right now, Negative]
 Joke=[(CanYou) tell me a joke, Do you have a joke for me]
 Deactivate=[Shut up, Silence please, Be quiet please, I must concentrate, I {need to, must} focus now]
-Activate=[Okay you can talk, I can listen {now, again}, You can talk {now, again}]
+Activate=[Okay you can talk, I can listen {now, again}, You can talk {now, again}, Keep me {informed, updated, up to date}]
 AnnouncementsOff=[Please no more (Announcements), No more (Announcements), No more (Announcements) please]
 AnnouncementsOn=[Please give me (Announcements), Can you give me (Announcements), Can you give me (Announcements) please, Give me (Announcements), Give me (Announcements) please]
 // Information //

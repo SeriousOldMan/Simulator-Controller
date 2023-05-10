@@ -1,4 +1,4 @@
-Below you will find a complete list of all voice commands recognized by Cat, the Virtual Race Strategist together with a short introduction into the syntax of the phrase grammars.
+Below you will find a complete list of all voice commands recognized by Cato, the Virtual Race Strategist together with a short introduction into the syntax of the phrase grammars.
 
 ## Syntax
 
@@ -59,17 +59,17 @@ Announcements=weather warnings
 
 1.  Conversation
 
-	[{Hi, Hey} %name%, %name% do you hear me, %name% I need you, Hey %name% where are you]
+	[{Hi, Hey} %name%, %name% do you hear me, %name% I need you, %name% where are you, %name% come in please]
 
-	[Yes please, Yes go on, Perfect go on, Go on please, Head on please, Okay let's go on, I agree, Right]
+	[Yes {please, of course}, {Yes, Perfect} go on, {Go, Okay go} {on, on please, ahead, ahead please}, I agree, Right, Correct, Confirmed, I confirm, Affirmative]]
 
-	[No {thank you, not now, I will call you later}, Not at the moment]
+	[No {thank you, not now, I will call you later}, Not at the moment, Negative]
 
 	[(CanYou) tell me a joke, Do you have a joke for me]
 
-	[Shut up, Silence please, Be quiet please, I must concentrate]
+	[Shut up, Silence please, Be quiet please, I must concentrate, I {need to, must} focus now]
 
-	[Okay you can talk, I can listen {now, again}, You can talk {now, again}]
+	[Okay you can talk, I can listen {now, again}, You can talk {now, again}, Keep me {informed, updated, up to date}]
 
 	[Please no more (Announcements), No more (Announcements), No more (Announcements) please]
 
@@ -79,11 +79,11 @@ Announcements=weather warnings
 
 	[(TellMe) the time, What time is it, What is the {current time, time}]
 
-	[(TellMe) the remaining laps, How many laps are remaining, How many laps are left, How many laps to go]
+	[(TellMe) the remaining laps, How many laps are remaining, How many laps are left, How many laps to go, How long to go]
 
 	[What about the weather, Is rain ahead, {Any, Are} weather changes in sight, (CanYou) check the {weather, weather please}]
 
-	[Simulate the {race, standings} in (Number) laps, (CanYou) simulate the {race, standings} in (Number) laps, What will be my position in (Number) laps, What is my position in (Number) laps]
+	[Simulate the {race, standings} in (Number) laps, (CanYou) simulate the {race, standings} in (Number) laps, What will my position be in (Number) laps, What is my position in (Number) laps]
 
 	[(WhatIs) {my, my race, my current race} position, (TellMe) {my, my race, my current race} position]
 
@@ -101,11 +101,11 @@ Announcements=weather warnings
 
 	[(WhatIs) the best {lap, option} for the next pitstop, When do you recommend the next pitstop, (CanYou) recommend the next pitstop, In what lap should I come to the pit]
 
-	[(CanYou) simulate the {next pitstop, pitstop} {around, in} lap (Number), Plan the {next pitstop, pitstop} {around, in} lap (Number), (CanYou) plan the {next pitstop, pitstop} {around, in} lap (Number)]
+	[(CanYou) simulate the {next pitstop, pitstop} {around, in, on} lap (Number), Plan the {next pitstop, pitstop} {around, in, on} lap (Number), (CanYou) plan the {next pitstop, pitstop} {around, in, on} lap (Number)]
 
 4. Strategy
 
-	[How is our strategy for {today, the race}, Can you give me a summary of {the, our} strategy, How is our strategy, Give me {please} {the, our} strategy]
+	[How is our strategy for {today, the race}, Can you give me a summary of {the, our} strategy, How is our strategy, {Please give me, Give me} {the, our} strategy]
 
 	[(CanYou) {suspend, cancel} the strategy, {Suspend, Cancel} the strategy, The strategy no longer makes sense, The strategy makes no sense anymore]
 

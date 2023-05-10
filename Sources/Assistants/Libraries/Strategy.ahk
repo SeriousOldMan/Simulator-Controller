@@ -548,7 +548,7 @@ class StrategySimulation {
 					return scenario1
 				else if (scenario2.Pitstops.Length < scenario1.Pitstops.Length)
 					return scenario2
-				if (scenario2.getRemainingFuel() > scenario1.getRemainingFuel())
+				else if (scenario2.getRemainingFuel() > scenario1.getRemainingFuel())
 					return scenario1
 				else if (scenario2.getRemainingFuel() < scenario1.getRemainingFuel())
 					return scenario2
@@ -615,7 +615,7 @@ class StrategySimulation {
 	}
 
 	runSimulation(verbose := true) {
-		local window := (verbose ? this.StrategyManager.Window : false)
+		local window := ((verbose && this.StrategyManager.HasProp("Window")) ? this.StrategyManager.Window : false)
 		local progress := 0
 		local electronicsData := false
 		local tyresData := false
@@ -626,6 +626,7 @@ class StrategySimulation {
 
 			if window {
 				progressWindow.Opt("+Owner" . window.Hwnd)
+
 				window.Opt("+Disabled")
 			}
 		}

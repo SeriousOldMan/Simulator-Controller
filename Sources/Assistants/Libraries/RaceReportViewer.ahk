@@ -268,7 +268,8 @@ class RaceReportViewer extends RaceReportReader {
 		local invalids := 0
 		local raceData, drivers, positions, times, cars, carsCount, lapsCount, simulator, car
 		local class, hasClasses, classResults, valid, carClasses
-		local ignore, lap, rows, hasDNF, result, lapTimes, hasNull, lapTime, min, avg, filteredLapTimes, nr, row
+		local ignore, lap, rows, rowClasses, classRows, hasDNF, result, lapTimes, hasNull, lapTime
+		local min, avg, filteredLapTimes, nr, row
 
 		comparePositions(c1, c2) {
 			local pos1 := c1[2]
@@ -332,68 +333,66 @@ class RaceReportViewer extends RaceReportReader {
 			carsCount := cars.Length
 
 			rows := []
+			rowClasses := []
 			hasDNF := false
 
 			loop carsCount {
 				car := A_Index
 				class := this.getClass(raceData, car)
 
-				if inList(carClasses, class) {
-					if positions[lapsCount].Has(car)
-						result := (extendedIsNull(positions[lapsCount][car]) ? "DNF" : positions[lapsCount][car])
-					else
-						result := "DNF"
+				if positions[lapsCount].Has(car)
+					result := (extendedIsNull(positions[lapsCount][car]) ? "DNF" : positions[lapsCount][car])
+				else
+					result := "DNF"
 
-					lapTimes := []
-					hasNull := false
+				lapTimes := []
+				hasNull := false
 
-					loop lapsCount {
-						lapTime := (times[A_Index].Has(car) ? times[A_Index][car] : 0)
+				loop lapsCount {
+					lapTime := (times[A_Index].Has(car) ? times[A_Index][car] : 0)
 
-						if (!extendedIsNull(lapTime, A_Index < 2) && (lapTime > 0))
-							lapTimes.Push(lapTime)
-						else {
-							if (A_Index == lapsCount)
-								result := "DNF"
-						}
+					if (!extendedIsNull(lapTime, A_Index < 2) && (lapTime > 0))
+						lapTimes.Push(lapTime)
+					else {
+						if (A_Index == lapsCount)
+							result := "DNF"
 					}
+				}
 
-					min := minimum(lapTimes)
-					avg := average(lapTimes)
+				min := minimum(lapTimes)
+				avg := average(lapTimes)
 
-					filteredLapTimes := lapTimes
-					lapTimes := []
+				filteredLapTimes := lapTimes
+				lapTimes := []
 
-					for ignore, lapTime in filteredLapTimes
-						if (lapTime < (avg + (avg - min)))
-							lapTimes.Push(lapTime)
+				for ignore, lapTime in filteredLapTimes
+					if (lapTime < (avg + (avg - min)))
+						lapTimes.Push(lapTime)
 
-					min := Round(minimum(lapTimes) / 1000, 1)
-					avg := Round(average(lapTimes) / 1000, 1)
+				min := Round(minimum(lapTimes) / 1000, 1)
+				avg := Round(average(lapTimes) / 1000, 1)
 
-					hasDNF := (hasDNF || (result = "DNF"))
+				hasDNF := (hasDNF || (result = "DNF"))
 
-					nr := cars[A_Index][1]
+				nr := cars[A_Index][1]
 
-					if (getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Car", kNotInitialized) != kNotInitialized) {
-						if !classes.Has(class)
-							classes[class] := [Array(A_Index, result)]
-						else
-							classes[class].Push(Array(A_Index, result))
-
-						rows.Push(Array("'" . class . "'", "'" . nr . "'"
-									  , "'" . StrReplace(SessionDatabase.getCarName(simulator, cars[A_Index][2]), "'", "\'") . "'", "'" . StrReplace(drivers[1][A_Index], "'", "\'") . "'"
-									  , "'" . RaceReportViewer.lapTimeDisplayValue(min) . "'"
-									  , "'" . RaceReportViewer.lapTimeDisplayValue(avg) . "'", result, result))
-					}
+				if (getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Car", kNotInitialized) != kNotInitialized) {
+					if !classes.Has(class)
+						classes[class] := [Array(A_Index, result)]
 					else
-						invalids += 1
+						classes[class].Push(Array(A_Index, result))
+
+					rows.Push(Array("'" . class . "'", "'" . nr . "'"
+								  , "'" . StrReplace(SessionDatabase.getCarName(simulator, cars[A_Index][2]), "'", "\'") . "'", "'" . StrReplace(drivers[1][A_Index], "'", "\'") . "'"
+								  , "'" . RaceReportViewer.lapTimeDisplayValue(min) . "'"
+								  , "'" . RaceReportViewer.lapTimeDisplayValue(avg) . "'", result, result))
+					rowClasses.Push(class)
 				}
 				else
 					invalids += 1
 			}
 
-			hasClasses := (classes.Count > 1)
+			hasClasses := ((classes.Count > 1) || (this.getReportClasses(raceData, true, ["Class", "Cup"]).Length > 1))
 
 			if hasClasses {
 				classResults := CaseInsenseMap()
@@ -409,27 +408,32 @@ class RaceReportViewer extends RaceReportReader {
 				}
 			}
 
+			classRows := []
+
 			loop carsCount - invalids {
-				row := rows[A_Index]
+				if inList(carClasses, rowClasses[A_Index]) {
+					row := rows[A_Index]
 
-				if hasClasses
-					row[8] := classResults[A_Index]
+					if hasClasses
+						row[8] := classResults[A_Index]
 
-				if hasDNF {
-					row[7] := ("'" . row[7] . "'")
-					row[8] := ("'" . row[8] . "'")
+					if hasDNF {
+						row[7] := ("'" . row[7] . "'")
+						row[8] := ("'" . row[8] . "'")
+					}
+
+					if !hasClasses {
+						row.RemoveAt(1)
+						row.RemoveAt(row.Length)
+					}
+
+					classRows.Push("[" . values2String(", ", row*) . "]")
 				}
-
-				if (!hasClasses && (this.getReportClasses(raceData, true, ["Class", "Cup"]).Length = 1))
-					row.RemoveAt(1)
-
-				if !hasClasses
-					row.RemoveAt(row.Length)
-
-				rows[A_Index] := ("[" . values2String(", ", row*) . "]")
 			}
 
-			if (hasClasses || (this.getReportClasses(raceData, true, ["Class", "Cup"]).Length > 1))
+			rows := classRows
+
+			if hasClasses
 				drawChartFunction .= "`ndata.addColumn('string', '" . translate("Class") . "');"
 
 			drawChartFunction .= "`ndata.addColumn('string', '" . translate("#") . "');"
@@ -437,7 +441,7 @@ class RaceReportViewer extends RaceReportReader {
 			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Driver (Start)") . "');"
 			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Best Lap Time") . "');"
 			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Avg Lap Time") . "');"
-			drawChartFunction .= "`ndata.addColumn('" . (hasDNF ? "string" : "number") . "', '" . translate((hasClasses || (this.getReportClasses(raceData, true, ["Class", "Cup"]).Length > 1)) ? "Result (Overall)" : "Result") . "');"
+			drawChartFunction .= "`ndata.addColumn('" . (hasDNF ? "string" : "number") . "', '" . translate(hasClasses ? "Result (Overall)" : "Result") . "');"
 
 			if hasClasses
 				drawChartFunction .= "`ndata.addColumn('" . (hasDNF ? "string" : "number") . "', '" . translate("Result (Class)") . "');"

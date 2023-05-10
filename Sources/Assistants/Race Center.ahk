@@ -2545,15 +2545,25 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	getClass(data, car := false) {
+		local categories := (this.ReportViewer.Settings.Has("Categories") ? this.ReportViewer.Settings["Categories"] : ["Class"])
 		local carClass, carCategory
 
 		if !car
 			car := getMultiMapValue(data, "Position Data", "Driver.Car")
 
-		carClass := getMultiMapValue(data, "Position Data", "Car." . car . ".Class", kUnknown)
-		carCategory := getMultiMapValue(data, "Position Data", "Car." . car . ".Category", kUndefined)
+		if inList(categories, "Class") {
+			carClass := getMultiMapValue(data, "Position Data", "Car." . car . ".Class", kUnknown)
 
-		return ((carCategory != kUndefined) ? (carClass . translate(" (") . carCategory . translate(")")) : carClass)
+			if inList(categories, "Cup") {
+				carCategory := getMultiMapValue(data, "Position Data", "Car." . car . ".Category", kUndefined)
+
+				return ((carCategory != kUndefined) ? (carClass . translate(" (") . carCategory . translate(")")) : carClass)
+			}
+			else
+				return carClass
+		}
+		else
+			return getMultiMapValue(data, "Position Data", "Car." . car . ".Category", kUnknown)
 	}
 
 	getCars(data, class := "Overall", sorted := false) {

@@ -56,22 +56,31 @@ class RaceReportReader {
 		return laps
 	}
 
-	getClass(raceData, car) {
+	getClass(raceData, car, categories := ["Class"]) {
 		local carClass, carCategory
 
-		carClass := getMultiMapValue(raceData, "Cars", "Car." . car . ".Class", kUnknown)
-		carCategory := getMultiMapValue(raceData, "Cars", "Car." . car . ".Category", kUndefined)
+		if inList(categories, "Class") {
+			carClass := getMultiMapValue(raceData, "Cars", "Car." . car . ".Class", kUnknown)
 
-		return ((carCategory != kUndefined) ? (carClass . translate(" (") . carCategory . translate(")")) : carClass)
+			if inList(categories, "Cup") {
+				carCategory := getMultiMapValue(raceData, "Cars", "Car." . car . ".Category", kUndefined)
+
+				return ((carCategory != kUndefined) ? (carClass . translate(" (") . carCategory . translate(")")) : carClass)
+			}
+			else
+				return carClass
+		}
+		else
+			return getMultiMapValue(raceData, "Cars", "Car." . car . ".Category", kUnknown)
 	}
 
-	getClasses(raceData) {
+	getClasses(raceData, categories?) {
 		local classes := []
 		local carClass
 
 		loop getMultiMapValue(raceData, "Cars", "Count")
 			if (getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Car", kNotInitialized) != kNotInitialized) {
-				carClass := this.getClass(raceData, A_Index)
+				carClass := this.getClass(raceData, A_Index, categories?)
 
 				if !inList(classes, carClass)
 					classes.Push(carClass)

@@ -263,7 +263,7 @@ class RaceReports extends ConfigurationItem {
 
 		raceReportsGui.Add("Documentation", "x508 YP+20 w184 Center H:Center", translate("Race Reports")
 						 , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-reports")
-						 
+
 		raceReportsGui.Add("Text", "x8 yp+30 w1200 0x10 W:Grow")
 
 		raceReportsGui.SetFont("s8 Norm", "Arial")
@@ -337,6 +337,7 @@ class RaceReports extends ConfigurationItem {
 
 	showOverviewReport(reportDirectory) {
 		if reportDirectory {
+			this.Control["reportSettingsButton"].Enabled := true
 			this.Control["reportsDropDown"].Choose(inList(kRaceReports, "Overview"))
 
 			this.iSelectedReport := "Overview"
@@ -349,6 +350,19 @@ class RaceReports extends ConfigurationItem {
 
 		this.ReportViewer.setReport(reportDirectory)
 		this.ReportViewer.showOverviewReport()
+	}
+
+	editOverviewReportSettings(reportDirectory) {
+		this.ReportViewer.setReport(reportDirectory)
+
+		this.Window.Opt("+Disabled")
+
+		try {
+			return this.ReportViewer.editReportSettings("Classes")
+		}
+		finally {
+			this.Window.Opt("-Disabled")
+		}
 	}
 
 	showCarReport(reportDirectory) {
@@ -853,6 +867,9 @@ class RaceReports extends ConfigurationItem {
 		local reportDirectory := (this.Database . "\" . simulator . "\" . car . "\" . track . "\" . this.AvailableRaces[this.SelectedRace])
 
 		switch report, false {
+			case "Overview":
+				if this.editOverviewReportSettings(reportDirectory)
+					this.showOverviewReport(reportDirectory)
 			case "Drivers":
 				if this.editDriverReportSettings(reportDirectory)
 					this.showDriverReport(reportDirectory)

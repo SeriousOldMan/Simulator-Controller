@@ -1676,7 +1676,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 		if (frequency && this.hasEnoughData(false)) {
 			if (lapNumber > (lastStrategyUpdate + frequency))
-				knowledgeBase.setFact("Strategy.Invalid", "Regular")
+				knowledgeBase.setFact("Strategy.Recalculate", "Regular")
 		}
 		else
 			lastStrategyUpdate := lapNumber
@@ -1703,7 +1703,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 			knowledgeBase.addFact("Sector", sector)
 
-			updateStrategy := knowledgeBase.getValue("Strategy.Invalid", false)
+			updateStrategy := knowledgeBase.getValue("Strategy.Recalculate", false)
 		}
 
 		result := super.updateLap(lapNumber, &data)
@@ -1719,7 +1719,7 @@ class RaceStrategist extends GridRaceAssistant {
 			this.adjustGaps(data)
 
 		if updateStrategy {
-			knowledgeBase.clearFact("Strategy.Invalid")
+			knowledgeBase.clearFact("Strategy.Recalculate")
 
 			this.recommendStrategy({Silent: true, Confirm: true, Request: updateStrategy})
 		}
@@ -2508,7 +2508,7 @@ class RaceStrategist extends GridRaceAssistant {
 					this.getSpeaker().speakPhrase("StintMap", {map: map})
 			}
 			else
-				knowledgeBase.setFact("Strategy.Invalid", "Pitstop")
+				knowledgeBase.setFact("Strategy.Recalculate", "Pitstop")
 
 		return result
 	}
@@ -2566,7 +2566,7 @@ class RaceStrategist extends GridRaceAssistant {
 																												  : "WeatherDryChange"
 									  , {minutes: minutes, compound: fragments[recommendedCompound . "Tyre"]})
 
-					if this.Strategy {
+					if (this.Strategy && !getMultiMapValue(this.Settings, "Strategy Settings", "Strategy.Update.Laps", false)) {
 						speaker.speakPhrase("ConfirmUpdateStrategy", false, true)
 
 						this.setContinuation(RaceStrategist.TyreChangeContinuation(this, ObjBindMethod(this, "recommendStrategy")

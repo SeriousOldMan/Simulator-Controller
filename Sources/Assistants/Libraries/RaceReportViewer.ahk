@@ -1373,7 +1373,7 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 			driversListView.Delete()
 
 			for ignore, driver in allDrivers
-				if (!selectedClass || (selectedClass = this.getClass(raceData, A_Index)))
+				if (!selectedClass || (selectedClass = reportViewer.getClass(raceData, A_Index)))
 					if (getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Car", kNotInitialized) != kNotInitialized) {
 						if inList(options, "Cars")
 							column1 := getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Nr")
@@ -1609,14 +1609,14 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 					result["Classes"] := [raceReport.getReportClasses(raceData, true)[classesDropDownMenu.Value - 1]]
 
 			if (inList(options, "Drivers") || inList(options, "Cars")) {
-				allDrivers := reportViewer.getReportDrivers(raceData, drivers)
+				allDrivers := raceReport.getReportDrivers(raceData, drivers)
 				selectedDrivers := CaseInsenseMap()
 
 				simulator := getMultiMapValue(raceData, "Session", "Simulator")
 
 				if inList(options, "Classes") {
 					if (classesDropDownMenu.Value > 1)
-						selectedClass := reportViewer.getReportClasses(raceData, true)[classesDropDownMenu.Value - 1]
+						selectedClass := raceReport.getReportClasses(raceData, true)[classesDropDownMenu.Value - 1]
 					else
 						selectedClass := false
 				}
@@ -1624,7 +1624,7 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 					selectedClass := false
 
 				for ignore, driver in allDrivers
-					if (!selectedClass || (selectedClass = this.getClass(raceData, A_Index)))
+					if (!selectedClass || (selectedClass = raceReport.getClass(raceData, A_Index)))
 						selectedDrivers[inList(options, "Cars") ? getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Nr") : driver] := A_Index
 
 				newDrivers := []

@@ -1602,19 +1602,32 @@ class GridRaceAssistant extends RaceAssistant {
 		return classes
 	}
 
-	getClass(car := false, data := false) {
-		local carClass, carCategory
+	getClass(car := false, data := false, categories := ["Class"]) {
+		local carCategory := kUndefined
+		local carClass
 
 		if !car
 			car := (data ? getMultiMapValue(data, "Position Data", "Driver.Car") : this.KnowledgeBase.getValue("Driver.Car", false))
 
 		if data {
-			carClass := getMultiMapValue(data, "Position Data", "Car." . car . ".Class", kUnknown)
-			carCategory := getMultiMapValue(data, "Position Data", "Car." . car . ".Category", kUndefined)
+			if inList(categories, "Class") {
+				carClass := getMultiMapValue(data, "Position Data", "Car." . car . ".Class", kUnknown)
+
+				if inList(categories, "Cup")
+					carCategory := getMultiMapValue(data, "Position Data", "Car." . car . ".Category", kUndefined)
+			}
+			else
+				carClass := getMultiMapValue(data, "Position Data", "Car." . car . ".Category", kUnknown)
 		}
 		else {
-			carClass := this.KnowledgeBase.getValue("Car." . A_Index . ".Class", kUnknown)
-			carCategory := this.KnowledgeBase.getValue("Car." . A_Index . ".Category", kUndefined)
+			if inList(categories, "Class") {
+				carClass := this.KnowledgeBase.getValue("Car." . A_Index . ".Class", kUnknown)
+
+				if inList(categories, "Cup")
+					carCategory := this.KnowledgeBase.getValue("Car." . A_Index . ".Category", kUndefined)
+			}
+			else
+				carClass := this.KnowledgeBase.getValue("Car." . A_Index . ".Category", kUnknown)
 		}
 
 		return ((carCategory != kUndefined) ? (carClass . translate(" (") . carCategory . translate(")")) : carClass)

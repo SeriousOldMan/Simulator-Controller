@@ -569,6 +569,28 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 	}
 
+	getClass(car := false, data := false, categories?) {
+		static strategistCategories := false
+
+		if isSet(categories)
+			return super.getClass(car, data, categories)
+		else {
+			if !strategistCategories
+				switch getMultiMapValue(this.Settings, "Assistant.Strategist", "CarCategories", "Classes") {
+					case "All":
+						strategistCategories := ["Class", "Cup"]
+					case "Classes":
+						strategistCategories := ["Class"]
+					case "Cups":
+						strategistCategories := ["Cup"]
+					default:
+						strategistCategories := ["Class"]
+				}
+
+			return super.getClass(car, data, strategistCategories)
+		}
+	}
+
 	handleVoiceCommand(grammar, words) {
 		switch grammar, false {
 			case "LapsRemaining":

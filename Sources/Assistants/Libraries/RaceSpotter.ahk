@@ -992,6 +992,28 @@ class RaceSpotter extends GridRaceAssistant {
 		super.updateDynamicValues(values)
 	}
 
+	getClass(car := false, data := false, categories?) {
+		static spotterCategories := false
+
+		if isSet(categories)
+			return super.getClass(car, data, categories)
+		else {
+			if !spotterCategories
+				switch getMultiMapValue(this.Settings, "Assistant.Spotter", "CarCategories", "Classes") {
+					case "All":
+						spotterCategories := ["Class", "Cup"]
+					case "Classes":
+						spotterCategories := ["Class"]
+					case "Cups":
+						spotterCategories := ["Cup"]
+					default:
+						strategistCategories := ["Class"]
+				}
+
+			return super.getClass(car, data, spotterCategories)
+		}
+	}
+
 	handleVoiceCommand(grammar, words) {
 		switch grammar, false {
 			case "Position":

@@ -15,15 +15,8 @@
   2. Support for Full Course Yellow rules in the Assistants
   3. More (configurable) verbosity for the Spotter, for example earlier announcements of cars approaching from behind (depending on the distance of the car behind)
   4. Controller action and voice command to enable/disable data collection
-  5. Multi-category awareness (Pro, Pro-AM, ...)
-  6. Graphical Editor for Vocalics Settings inkl. Test-Modus...
-  7. Better answers by the Strategist, when a pitstop cannot be recommended
-
-#### Race Center
-  1. Multi-category awareness (Pro, Pro-AM, ...)
-
-#### Race Reports
-  1. Multi-category awareness (Pro, Pro-AM, ...)
+  5. Graphical Editor for Vocalics Settings inkl. Test-Modus...
+  6. Better answers by the Strategist, when a pitstop cannot be recommended
 
 #### Setup Workbench
   1. General detection of counter steering in the telemetry analyzer

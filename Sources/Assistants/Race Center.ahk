@@ -2655,7 +2655,7 @@ class RaceCenter extends ConfigurationItem {
 		window["dataY6DropDown"].Enabled := false
 
 		if this.HasData {
-			if inList(["Drivers", "Positions", "Lap Times", "Performance", "Consistency", "Pace", "Pressures", "Brakes", "Temperatures", "Free"], this.SelectedReport)
+			if inList(["Overview", "Drivers", "Positions", "Lap Times", "Performance", "Consistency", "Pace", "Pressures", "Brakes", "Temperatures", "Free"], this.SelectedReport)
 				window["reportSettingsButton"].Enabled := true
 			else
 				window["reportSettingsButton"].Enabled := false
@@ -8640,6 +8640,17 @@ class RaceCenter extends ConfigurationItem {
 		this.updateState()
 	}
 
+	editOverviewReportSettings() {
+		this.Window.Opt("+Disabled")
+
+		try {
+			return this.ReportViewer.editReportSettings("Classes")
+		}
+		finally {
+			this.Window.Opt("-Disabled")
+		}
+	}
+
 	showCarReport() {
 		this.selectReport("Car")
 
@@ -9733,6 +9744,9 @@ class RaceCenter extends ConfigurationItem {
 
 	reportSettings(report) {
 		switch report, false {
+			case "Overvier":
+				if this.editOverviewReportSettings()
+					this.showOverviewReport()
 			case "Drivers":
 				if this.editDriverReportSettings()
 					this.showDriverReport()

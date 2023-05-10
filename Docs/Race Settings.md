@@ -68,6 +68,9 @@ This settings are generally available, although you can and have to define them 
 | Team Session| Cooldown                                | Integer | 600                             | No  | Number of seconds that will be waited after a finished session before a new connection to a Team Server session will be opened. |
 | Assistants | Cooldown                                 | Integer | 90                              | No  | Number of seconds that the Assistants will wait after a finished session before they will become active again. |
 | Spotter    | Late Join                                | Boolean | True                            | No  | If *True* (which is the default), the Spotter will also become active, when you join mid-session. |
+| Spotter    | Car Categories                                | All, Classes, Cups | Classes         | No  | Specifies which cars and drivers will be considered to be in different categories or classes by the Spotter for the purpose of position and gap information. *Classes* stands for the different car classes like "GT3" or "GT4" and *Cups* stands for different race ratings like "Pro", "Pro-AM" and so on. The default let the Strategist differentiate between the different car classes. |
+
+
 | Spotter    | Threshold for Lap Up car in range        | Float | 1.0                               | No  | Specifies the gap in seconds, before the Spotter will analyzes a situation with a car which is at least one lap ahead of you. |
 | Spotter    | Threshold for Lap Down car in range      | Float | 2.0                               | No  | Specifies the gap in seconds, before the Spotter will analyzes a situation with a car which is at least one lap behind you. |
 | Spotter    | Minimum gap for observation of car in front      | Integer | 2                       | No  | The minimum gap in seconds, for which the Spotter gives you gap and delta information about the car in front of you. |
@@ -98,6 +101,7 @@ This settings are generally available, although you can and have to define them 
 | Engineer   | Damage warning during Race               | Boolean | True                            | No  | If *True*, the Engineer will issue damage warnings during race sessions. |
 | Engineer   | Pressure warning during Race             | Boolean | True                            | No  | If *True*, the Engineer will issue pressure loss warnings during race sessions. |
 | Strategist | Late Join                                | Boolean | False                           | No  | If *True*, the Strategist will also become active, when you join mid-session. Attention: This can lead to funny results in almost all calculations. |
+| Strategist | Car Categories                                | All, Classes, Cups | Classes         | No  | Specifies which cars and drivers will be considered to be in different categories or classes by the Strategiest for the purpose of position and gap information. *Classes* stands for the different car classes like "GT3" or "GT4" and *Cups* stands for different race ratings like "Pro", "Pro-AM" and so on. The default let the Strategist differentiate between the different car classes. |
 
 ##### Notes
 

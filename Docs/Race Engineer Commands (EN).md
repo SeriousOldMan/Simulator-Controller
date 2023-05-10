@@ -61,17 +61,17 @@ Announcements=fuel warnings, damage warnings, damage analysis, weather warnings,
 
 1.  Conversation
 
-	[{Hi, Hey} %name%, %name% do you hear me, %name% I need you, Hey %name% where are you]
+	[{Hi, Hey} %name%, %name% do you hear me, %name% I need you, %name% where are you, %name% come in please]
 
-	[Yes please, Yes of course, Yes go on, Perfect go on, Go on please, Head on please, Okay let's go on, I agree, Right]
+	[Yes {please, of course}, {Yes, Perfect} go on, {Go, Okay go} {on, on please, ahead, ahead please}, I agree, Right, Correct, Confirmed, I confirm, Affirmative]
 
-	[No {thank you, not now, I will call you later}, Not at the moment]
+	[No {thank you, not now, I will call you later}, Not at the moment, Negative]
 
 	[(CanYou) tell me a joke, Do you have a joke for me]
 
-	[Shut up, Silence please, Be quiet please, I must concentrate]
+	[Shut up, Silence please, Be quiet please, I must concentrate, I {must, need to} focus now, Please be quiet]
 
-	[Okay you can talk, I can listen {now, again}, You can talk {now, again}]
+	[Okay you can talk, I can listen {now, again}, You can talk {now, again}, Keep me {informed, updated, up to date}]
 
 	[Please no more (Announcements), No more (Announcements), No more (Announcements) please]
 
@@ -91,7 +91,7 @@ Announcements=fuel warnings, damage warnings, damage analysis, weather warnings,
 
 	[{Check, Please check} {the brake wear, the brake wear at the moment}, (TellMe) {the brake wear, the brake wear at the moment}]
 
-	[(TellMe) the remaining laps, How many laps are remaining, How many laps are left, How many laps to go]
+	[(TellMe) the remaining laps, How many laps are remaining, How many laps are left, How many laps to go, How long to go]
 
 	[How much {gas, fuel} is left, How much {gas, fuel} is {left in the tank, still there}, (TellMe) the remaining {gas, fuel}, (WhatIs) the remaining {gas, fuel}]
 
@@ -107,7 +107,7 @@ Announcements=fuel warnings, damage warnings, damage analysis, weather warnings,
 
 	[(CanWe) refuel (Number) {liters, gallons}, We need to refuel (Number) {liters, gallons}]
 
-	[(CanWe) {use, switch to} wet tires, {Can we, Please} {use, switch to} dry tires, {Can we, Please} {use, switch to} intemediate tires]
+	[(CanWe) {use, switch to} wet tires, {Can we, Please} {use, switch to} dry tires, {Can we, Please} {use, switch to} intermediate tires]
 
 	[(CanWe) increase {front left, front right, rear left, rear right, all} by (Digit) {point, comma} (Digit), (Digit) {point, comma} (Digit) more pressure for {the front left, the front right, the rear left, the rear right, all} {tire, tires}]
 	
@@ -115,7 +115,7 @@ Announcements=fuel warnings, damage warnings, damage analysis, weather warnings,
 	
 	[(CanWe) leave the {tire pressure, pressure} unchanged, (CanWe) leave the {tire pressure, pressure} as it is, (CanWe) leave the {tire pressures, pressures} unchanged, (CanWe) {leave, keep} the {tire pressures, pressures} as they are]
 
-	[(CanWe) {leave, keep} the tires on the car, {Please} do not change the tires, (CanWe) {leave, keep} the tires unchanged]
+	[(CanWe) {leave, keep} the tires on the car, {Please} do not change the tires, (CanWe) {leave, keep} the tires unchanged, No tire change please]
 
 	[(CanWe) repair the suspension, {Please} do not repair the suspension]
 

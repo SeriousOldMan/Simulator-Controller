@@ -1494,10 +1494,23 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	finishSessionWithReview(shutdown) {
+		local categories
+
 		if this.RemoteHandler {
 			this.setContinuation(RaceStrategist.RaceReviewContinuation(this, ObjBindMethod(this, "finishSession", shutdown, false)))
 
-			this.RemoteHandler.reviewRace()
+			switch getMultiMapValue(this.Settings, "Assistant.Strategist", "CarCategories", "Classes") {
+				case "All":
+					categories := ["Class", "Cup"]
+				case "Classes":
+					categories := ["Class"]
+				case "Cups":
+					categories := ["Cup"]
+				default:
+					categories := ["Class"]
+			}
+
+			this.RemoteHandler.reviewRace(values2String("|", categories*))
 		}
 		else
 			this.finishSession(shutdown, false)

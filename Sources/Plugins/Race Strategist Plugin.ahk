@@ -641,13 +641,14 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		}
 	}
 
-	reviewRace() {
+	reviewRace(categories) {
 		local multiClass := false
 		local report, reader, raceData, drivers, positions, times, cars, driver, laps, position
 		local class, classCars, classPositions
 		local leader, car, candidate, min, max, leaderAvgLapTime, stdDev
 		local driverMinLapTime, driverMaxLapTime, driverAvgLapTime, driverLapTimeStdDev
 
+		categories := string2Values("|", categories)
 		report := temporaryFileName(this.Plugin . " Race", "report")
 
 		this.createRaceReport(report)
@@ -680,15 +681,15 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 				driver := getMultiMapValue(raceData, "Cars", "Driver", 0)
 				laps := getMultiMapValue(raceData, "Laps", "Count", 0)
 
-				if (reader.getClasses(raceData).Length > 1) {
-					class := getMultiMapValue(raceData, "Cars", "Car." . driver . ".Class", false)
+				if (reader.getClasses(raceData, categories).Length > 1) {
+					class := reader.getClass(raceData, driver, categories)
 
 					if class {
 						classCars := 0
 						classPositions := []
 
 						loop cars
-							if (getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Class") = class) {
+							if (reader.getClass(raceData, A_Index, categories) = class) {
 								classCars += 1
 
 								if laps

@@ -1,7 +1,7 @@
 [Development]
 Version=5.0.5.0-dev
 Target=5.0.5.0-release
-Date=05/09/2023
+Date=05/11/2023
 Download=
 Changes=New observation range settings for opponent information given by the Spotter, Automatic updates of the strategy handled by the Strategist, Support for Cup categories in addition to class in multi-class races
 [Release]

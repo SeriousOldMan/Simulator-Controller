@@ -11,6 +11,9 @@
   10. New settings in the "Session Database" to [control the cooldown time](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) of the Race Assistants and the connection to the Team Server.
   11. All new [documentation of each and every modifier key](*) available in the applications of Simulator Controller.
   12. [Experts only] All new [documentation of internal configuration options of the runtime environment](*).
+  13. New car models for "Setup Workbench":
+      - Assetto Corsa
+	    - Praga R1
 
 ## 5.0.2.1-release 05/05/23
   1. Critical bugfix for a potential deadlock situation in the session database, which could cause all applications to freeze up.

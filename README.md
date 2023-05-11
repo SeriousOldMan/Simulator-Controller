@@ -173,7 +173,7 @@ You will also find a lot of C#, C++ and even C code for the low-level stuff like
 
 ### Included plugins
 
-These plugins are part of the Simulator Controller distribution. Beside providing functionality to the core, they may be used as templates for building your own plugins. They range from very simple functional additions with only a small number of lines of code up to very complex, multi-class behemoths controlling external software such as SimHub.
+These plugins are part of the Simulator Controller distribution. Beside providing functionality to the core, they may be used as templates for building your own plugins. They range from very simple functional additions with only a small number of lines of code up to very complex behemoths controlling external software such as SimHub.
 
 | Plugin | Description |
 | ------ | ------ |

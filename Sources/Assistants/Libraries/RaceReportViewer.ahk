@@ -1680,7 +1680,7 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 
 			if (inList(options, "Drivers") || inList(options, "Cars")) {
 				allDrivers := raceReport.getReportDrivers(raceData, drivers)
-				selectedDrivers := CaseInsenseMap()
+				selectedDrivers := CaseInsenseWeakMap()
 
 				simulator := getMultiMapValue(raceData, "Session", "Simulator")
 

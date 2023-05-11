@@ -1,8 +1,8 @@
 [Development]
-Version=5.0.3.0-dev
+Version=5.0.3.0-beta
 Target=5.0.3.0-release
 Date=05/09/2023
-Download=
+Download=https://www.dropbox.com/s/ccirse41hkq3skk/Simulator%20Controller%205.0.3.0-beta.zip?dl=1
 Changes=Fixed calculation of tyre laps in "Race Center", Fixed identification of drivers car for ACC in rare situations after a race restart with entry lists carried over form previous event, Fixed rare spotter information for lapped cars, that are actually in the pit, Fixed a couple of deadlock situations in the session database, Documentation for all modifier keys, Documentation for internal configuration parameters, New settings in the "Session Database" to control the frequency of the telemetry updates for all Assistants, New settings in the "Session Database" to control the cooldown time of the Race Assistants, Fixed data inheritance from session database, New car models for "Setup Workbench"
 [Release]
 Version=5.0.2.1-release
@@ -13,4 +13,4 @@ Changes=Fixed deadlock in session database
 Type=Development
 [Version]
 Release=5.0.2.1-release
-Development=5.0.3.0-dev
+Development=5.0.3.0-beta

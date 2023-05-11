@@ -1,4 +1,4 @@
-## 5.0.3.0-release 05/13/23 (planned)
+## 5.0.3.0-release 05/12/23 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed the calculation of tyre laps in "Race Center", when an unplanned pitstop without tyre change has happened.

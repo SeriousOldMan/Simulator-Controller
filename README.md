@@ -47,7 +47,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[5.0.3.0-beta](https://www.dropbox.com/s/ccirse41hkq3skk/Simulator%20Controller%205.0.3.0-beta.zip?dl=1) (Test build for 5.0.3. Changes: Fixed calculation of tyre laps in "Race Center", Fixed identification of drivers car for ACC in rare situations after a race restart with entry lists carried over form previous event, Fixed rare spotter information for lapped cars, that are actually in the pit, Fixed a couple of deadlock situations in the session database, Documentation for all modifier keys, Documentation for internal configuration parameters, New settings in the "Session Database" to control the frequency of the telemetry updates for all Assistants, New settings in the "Session Database" to control the cooldown time of the Race Assistants, Fixed data inheritance from session database, New car models for "Setup Workbench".)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-503) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

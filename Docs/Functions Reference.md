@@ -112,7 +112,7 @@ Returns a list of all values in the given map in the order of their keys.
 Returns a freshly allocated map containing all the key/value pairs of all supplied maps. The maps are processed from left to right, which is important in case of duplicate keys.
 
 #### *bubbleSort(ByRef array :: Array, comparator :: Function := numberGreater)*
-Sorts the given array in place, using *comparator* to define the order of the elements. This function will receive two objects and must return *true*, if the first one is considered larger or of the same order than the other. Stable sorting rules apply. The default for *comparator* compares numbers. A function named *strGreater* exists, which can be used for string arrays.
+Sorts the given array in place, using *comparator* to define the order of the elements. This function will receive two objects and must return *true*, if the first one is considered larger or of the same order than the other. Stable sorting rules apply. The default for *comparator* can handle simple numbers numbers and strings.
 
 ***
 

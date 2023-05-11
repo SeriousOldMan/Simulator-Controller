@@ -383,7 +383,7 @@ readSettings(database, simulator, settings, owner, user, community, car, track, 
 	if user {
 		settingsDB := database.getSettingsDatabase(simulator, "User")
 
-		while (tries-- > 5) {
+		while (tries-- > 0) {
 			if settingsDB.lock("Settings", false)
 				try {
 					for ignore, row in settingsDB.query("Settings", {Where: {Car: car, Track: track

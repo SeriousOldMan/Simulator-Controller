@@ -564,7 +564,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		}
 
 		validateFuelCapacity(*) {
-			validateFloat("fuelCapacityEdit", 60.0)
+			validateFloat("fuelCapacityEdit", 5.0)
 		}
 
 		chooseSimDriver(listView, line, *) {

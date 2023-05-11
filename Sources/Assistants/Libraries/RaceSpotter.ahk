@@ -2175,7 +2175,7 @@ class RaceSpotter extends GridRaceAssistant {
 				else if regular {
 					lapDifference := standingsAhead.LapDifference[sector]
 
-					if ((lapDifference > 0) && (delta > frontGapMin) && (delta <= frontGapMax)) {
+					if ((lapDifference > 0) && (delta >= frontGapMin) && (delta <= frontGapMax)) {
 						if (standingsAhead.closingIn(sector, frontGainThreshold) && !standingsAhead.Reported) {
 							speaker.speakPhrase("GainedFront", {delta: (delta > 5) ? Round(delta) : speaker.number2Speech(delta, 1)
 															  , gained: speaker.number2Speech(deltaDifference, 1)
@@ -2267,7 +2267,7 @@ class RaceSpotter extends GridRaceAssistant {
 				else if regular {
 					lapDifference := standingsBehind.LapDifference[sector]
 
-					if ((lapDifference > 0) && (delta > behindGapMin) && (delta <= behindGapMax)) {
+					if ((lapDifference > 0) && (delta >= behindGapMin) && (delta <= behindGapMax)) {
 						if (standingsBehind.closingIn(sector, behindLostThreshold) && !standingsBehind.Reported) {
 							speaker.speakPhrase("LostBehind", {delta: (delta > 5) ? Round(delta) : speaker.number2Speech(delta, 1)
 															 , lost: speaker.number2Speech(deltaDifference, 1)

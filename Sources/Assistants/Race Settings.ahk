@@ -562,8 +562,12 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 	validateNumber(field, *) {
 		field := settingsGui[field]
 
-		if !isNumber(internalValue("Float", field.Text))
+		if !isNumber(internalValue("Float", field.Text)) {
 			field.Text := (field.HasProp("ValidText") ? field.ValidText : "")
+				
+			loop 10
+				SendInput("{Right}")
+		}
 		else
 			field.ValidText := field.Text
 	}
@@ -1319,7 +1323,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		value := getMultiMapValue(settingsOrCommand, "Strategy Settings", "Strategy.Update.Laps", false)
 
-		settingsGui.Add("CheckBox", "x16 YP+30 w108 Checked" . (value > 0) . " VstrategyUpdateLapsCheck", translate("Update every")).OnEvent("Click", updateStrategyLaps.Bind("Check"))
+		settingsGui.Add("CheckBox", "x16 YP+30 w108 Checked" . (value > 0) . " VstrategyUpdateLapsCheck", translate("Revise every")).OnEvent("Click", updateStrategyLaps.Bind("Check"))
 		settingsGui.Add("Edit", "x126 yp+2 w50 h20 Limit2 Number VstrategyUpdateLapsEdit", value ? value : 1).OnEvent("Change", updateStrategyLaps.Bind("Edit"))
 		settingsGui.Add("UpDown", "x158 yp w18 h20 Range1-99 0x80", value ? value : 1)
 		settingsGui.Add("Text", "x184 yp+2 w290 h20", translate("Laps"))
@@ -1329,7 +1333,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		value := getMultiMapValue(settingsOrCommand, "Strategy Settings", "Strategy.Update.Pitstop", false)
 
-		settingsGui.Add("CheckBox", "x16 YP+24 w108 Checked" . (value > 0) . " VstrategyUpdatePitstopCheck", translate("Update when")).OnEvent("Click", updateStrategyPitstop.Bind("Check"))
+		settingsGui.Add("CheckBox", "x16 YP+24 w108 Checked" . (value > 0) . " VstrategyUpdatePitstopCheck", translate("Revise when")).OnEvent("Click", updateStrategyPitstop.Bind("Check"))
 		settingsGui.Add("Edit", "x126 yp-3 w50 h20 Limit1 Number VstrategyUpdatePitstopEdit", value ? value : 4).OnEvent("Change", updateStrategyPitstop.Bind("Edit"))
 		settingsGui.Add("UpDown", "x158 yp-2 w18 h20 Range1-9 0x80", value ? value : 4)
 		settingsGui.Add("Text", "x184 yp+2 w290 h20", translate("Laps difference to Strategy"))

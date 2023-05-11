@@ -331,25 +331,32 @@ constraintSettings(constraints, row) {
 readSetting(database, simulator, owner, user, community, car, track, weather
 		  , section, key, default := false) {
 	local rows, ignore, row, settingsDB
+	local tries := 5
 
 	if user {
 		settingsDB := database.getSettingsDatabase(simulator, "User")
 
-		if settingsDB.lock("Settings", false)
-			try {
-				rows := settingsDB.query("Settings", {Where: {Car: car, Track: track
-															, Weather: weather
-															, Section: section, Key: key
-															, Owner: owner}})
+		while (tries-- > 0) {
+			if settingsDB.lock("Settings", false)
+				try {
+					rows := settingsDB.query("Settings", {Where: {Car: car, Track: track
+																, Weather: weather
+																, Section: section, Key: key
+																, Owner: owner}})
 
-				if (rows.Length > 0)
-					return rows[1]["Value"]
-			}
-			catch Any {
-			}
-			finally {
-				settingsDB.unlock("Settings")
-			}
+					if (rows.Length > 0)
+						return rows[1]["Value"]
+					else
+						break
+				}
+				catch Any {
+				}
+				finally {
+					settingsDB.unlock("Settings")
+				}
+
+			Sleep(200)
+		}
 	}
 
 	if community
@@ -365,6 +372,7 @@ readSetting(database, simulator, owner, user, community, car, track, weather
 
 readSettings(database, simulator, settings, owner, user, community, car, track, weather) {
 	local result := []
+	local tries := 5
 	local ignore, row, filtered, visited, key
 	local settingsDB
 
@@ -377,15 +385,23 @@ readSettings(database, simulator, settings, owner, user, community, car, track, 
 	if user {
 		settingsDB := database.getSettingsDatabase(simulator, "User")
 
-		if settingsDB.lock("Settings", false)
-			try {
-				for ignore, row in settingsDB.query("Settings", {Where: {Car: car, Track: track
-																	   , Weather: weather, Owner: owner}})
-					result.Push(row)
-			}
-			finally {
-				settingsDB.unlock("Settings")
-			}
+		while (tries-- > 0) {
+			if settingsDB.lock("Settings", false)
+				try {
+					for ignore, row in settingsDB.query("Settings", {Where: {Car: car, Track: track
+																		   , Weather: weather, Owner: owner}})
+						result.Push(row)
+
+					break
+				}
+				catch Any {
+				}
+				finally {
+					settingsDB.unlock("Settings")
+				}
+
+			Sleep(200)
+		}
 	}
 
 	filtered := []

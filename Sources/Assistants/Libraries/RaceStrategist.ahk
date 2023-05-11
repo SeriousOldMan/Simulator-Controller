@@ -2380,27 +2380,33 @@ class RaceStrategist extends GridRaceAssistant {
 		if !isSet(confirm) {
 			request := Task.CurrentTask.Request
 
-			if (request = "Regular") {
-				if !this.betterScenario(strategy)
-					return
-			}
-			else if (request = "User") {
-				if !this.betterScenario(strategy) {
+			if (request = "User") {
+				if strategy && !this.betterScenario(strategy) {
 					if this.Speaker
 						this.getSpeaker().speakPhrase("NoBetterStrategy")
 
 					return
 				}
+
+				confirm := true
 			}
+			else {
+				if strategy {
+					if !this.betterScenario(strategy)
+						return
 
-			confirm := Task.CurrentTask.Confirm
+					confirm := Task.CurrentTask.Confirm
 
-			if (confirm && this.Speaker) {
-				this.getSpeaker().speakPhrase("ConfirmUpdateStrategy", false, true)
+					if (confirm && this.Speaker) {
+						this.getSpeaker().speakPhrase("ConfirmUpdateStrategy", false, true)
 
-				this.setContinuation(ObjBindMethod(this, "chooseScenario", strategy, false))
+						this.setContinuation(ObjBindMethod(this, "chooseScenario", strategy, false))
 
-				return
+						return
+					}
+				}
+				else
+					return
 			}
 		}
 
@@ -2440,13 +2446,25 @@ class RaceStrategist extends GridRaceAssistant {
 			}
 		}
 		else {
-			Task.startTask(ObjBindMethod(this, "cancelStrategy", false), 1000)
+			cancelStrategy() {
+				Task.startTask(ObjBindMethod(this, "cancelStrategy", false), 1000)
 
-			if isDebug()
-				deleteFile(kTempDirectory . "Race Strategist.strategy")
+				if isDebug()
+					deleteFile(kTempDirectory . "Race Strategist.strategy")
 
-			if this.RemoteHandler
-				this.RemoteHandler.updateStrategy(false)
+				if this.RemoteHandler
+					this.RemoteHandler.updateStrategy(false)
+			}
+
+			if (confirm && this.Speaker) {
+				this.getSpeaker().speakPhrase("NoValidStrategy")
+
+				this.getSpeaker().speakPhrase("ConfirmCancelStrategy", false, true)
+
+				this.setContinuation(cancelStrategy)
+			}
+			else
+				cancelStrategy()
 		}
 	}
 

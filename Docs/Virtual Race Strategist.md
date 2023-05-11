@@ -116,7 +116,7 @@ Important: In the default configuration, Cato will be activated in the first lap
 
 ### Multi-class support
 
-Cato *understands* multi-class races. Position evaluation and gap and lap time information will be always focused on your own class. Where it is necessary to mention, for example, the overall position, Cato will phrase it in a way, so that you understand, that information is related to the whole grid. Support tools like "Race Reports" also *understand* multi-class races and will give you related information with a class-specific focus as well, or you can choose, at which class you want to look, for example in a report.
+Cato *understands* multi-class and multi-category races. Position evaluation and gap and lap time information will be always focused on your own class. Where it is necessary to mention, for example, the overall position, Cato will phrase it in a way, so that you understand, that information is related to the whole grid. Support tools like "Race Reports" also *understand* multi-class races and will give you related information with a class-specific focus as well, or you can choose, at which class you want to look, for example in a report. You can configure in the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database", in what way Cato uses the information about the car classes and cup categories to partition the grid.
 
 ### Race Settings
 
@@ -131,7 +131,7 @@ You will find settings for the race strategy analysis and simulation in the thir
 Using the fields in the first group, you can customize the projection of current race positions into a model of future race standings. Cato will calculate this model each lap and will store the future standings for a given number of laps in the working memory and use them for strategy decisions. You can control the number of laps calculated for future standings by changing the value in the field *Race positions*. Greater numbers will yield better predictions, but take care, it might cost a lot of computing power.
 With the second field, *Overtake Delta*, you specify the number of seconds as time discount for each overtake for the passing and for the passed car, whereas you specify the percentage of track length in front of the car, which will be taken into account for traffic density analysis.
 
-You can also activate an automatic recalculation of a [predefined strategy](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-handling) on behalf of the current race situation. If a better strategy can be derived Cato will inform you and you might decide to activate the new strategy. Please note, that you can also ask the Strategist anytime to recalculate the strategy during a race, if you don't want to enable this automatic recalculation. Two different triggers can be defined for the recalculation, either automatic after a number of laps has been driven, or when an unplanned pitstop was neccessary.
+You can also activate an automatic revision of a the [currently chosen strategy](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-handling) with respect to the current race situation and current and maybe upcoming weather conditions. If a better strategy can be derived (depending on available data in the session database), Cato will inform you and you might decide to activate the new strategy. Please note, that you can also ask the Strategist anytime to revise the strategy during a race, if you don't want to enable this automatism. Two different triggers can be defined for the recalculation, either automatic after a number of laps has been driven, or when an unplanned pitstop was neccessary. Please note, that the Strategist will never cancel the current strategy, if he cannot come up with a valid new one. Cancelling the current strategy must always be actively requested.
 
 The second group of fields specify the time required for several pitstop activities, as well as the pitstop window, in which the best pitstop lap will be derived. With the value of *Pitstop Delta*, you supply the difference time needed for a normal pitstop (time for pit in and pit out but without any service time minus the time to pass the pit area on the track, i.e. Drive through vs. Drive by), The fields below specify the time required for the various pit services, like changing tyres, refueling, and so on, as well as these times are combined into an overall pitstop service time.
 
@@ -243,7 +243,13 @@ Some reports allow you to control the amount and type of data, which will be inc
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Report%20Settings.JPG)
 
-Beside restricting the laps which will be included in the report, you can also choose the drivers / cars for which data will be shown, or you can even restrict the report to a given class in a multi-class race.
+Beside restricting the laps which will be included in the report, you can also choose the drivers / cars for which data will be shown, or you can even restrict the report to a given class or category in a multi-class race. When you select "All" for the categories as well as "All" for the car classes, the display data will split the grid into car classes and each car classes according to the different cup categories, if any. This will look like this:
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Reports%2010.JPG)
+
+On the other side, you can restrict a report only to a given class or cup category, which then will present the information like this:
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Reports%2011.JPG)
 
 ## Strategy Development
 

@@ -152,7 +152,7 @@ A public test server is available for your first test ride with "Race Center". U
 
 ### Multi-class support
 
-The "Race Center" *understands* multi-class races. Please see in the sections below, where information is shown differently, when you are in a multi-class race. For the most part, class-specific information will be shon in the different reports.
+The "Race Center" *understands* multi-class and/or multi-category races. Please see in the sections below, how information is shown differently, when you are in a multi-class race. For the most part, class-specific information will be shon in the different reports. Please note, that it depends on your choice the [settings for the race reports](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-reports), how the information about the different classes and categories are interpreted and displayed.
 
 ### Data Analysis
 

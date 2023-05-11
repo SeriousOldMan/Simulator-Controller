@@ -503,7 +503,7 @@ The details about the installation, configuration and usage of the *Team Server*
 
 ### Special configuration options for optimizing overall performance
 
-The underlying runtime environment of the Simulator Controller applications provide a couple of configuration settings which can be used to optimize everything for the performance of the used PC. You can find specific documentation for this in this [special overview](*), but be carefull when changing any of the settings.
+The underlying runtime environment of the Simulator Controller applications provide a couple of configuration settings which can be used to optimize everything for the performance of the used PC. You can find specific documentation for this in this [special overview](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration), but be cautious when changing any of the settings.
 
 ## Splash Screen Editor
 

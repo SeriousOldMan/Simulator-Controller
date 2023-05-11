@@ -40,7 +40,7 @@ These commands are also available as "Mute" and "Unmute" plugin actions, which c
 
 ### Multi-class support
 
-Elisa *understands* multi-class races. Position evaluation and gap and lap time information will be always focused on your own class. Where it is necessary to mention, for example, the overall position, Elisa will phrase it in a way, so that you understand, that information is related to the whole grid.
+Elisa *understands* multi-class and multi-category races. Position evaluation and gap and lap time information will be always focused on your own class. Where it is necessary to mention, for example, the overall position, Elisa will phrase it in a way, so that you understand, that information is related to the whole grid. You can configure in the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database", in what way Elisa uses the information about the car classes and cup categories to partition the grid.
 
 ## Alerts & Information
 

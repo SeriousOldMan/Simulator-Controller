@@ -47,7 +47,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[5.0.3.0-beta](https://www.dropbox.com/s/ccirse41hkq3skk/Simulator%20Controller%205.0.3.0-beta.zip?dl=1) (Test build for 5.0.3. Changes: Fixed calculation of tyre laps in "Race Center", Fixed identification of drivers car for ACC in rare situations after a race restart with entry lists carried over form previous event, Fixed rare spotter information for lapped cars, that are actually in the pit, Fixed a couple of deadlock situations in the session database, Documentation for all modifier keys, Documentation for internal configuration parameters, New settings in the "Session Database" to control the frequency of the telemetry updates for all Assistants, New settings in the "Session Database" to control the cooldown time of the Race Assistants, Fixed data inheritance from session database, New car models for "Setup Workbench".)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-503) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 
@@ -57,7 +59,7 @@ The markdown files, the so to say source code of this documentation Wiki, can be
 
 ### Video Tutorials
 
-Beside the quite extensive documentation (I know, nobody reads documentation these days), we also have a list of video tutorials, which are recordings of live coaching session in our Discord community.
+Beside the quite extensive documentation (more than 500 pages - I know, nobody reads documentation these days), we also have a list of video tutorials, which are recordings of live coaching session in our Discord community.
 
 1. [Setup and Configuration](https://youtu.be/1XFvWhg2cPw) - You will learn a lot about the general setup and configuration of the Simulator Controller suite. The Setup Wizard "Simulator Setup" is introduced, but we will also take a look at the low level configuration tool "Simulator Configuration".
 
@@ -173,7 +175,7 @@ You will also find a lot of C#, C++ and even C code for the low-level stuff like
 
 ### Included plugins
 
-These plugins are part of the Simulator Controller distribution. Beside providing functionality to the core, they may be used as templates for building your own plugins. They range from very simple functional additions with only a small number of lines of code up to very complex, multi-class behemoths controlling external software such as SimHub.
+These plugins are part of the Simulator Controller distribution. Beside providing functionality to the core, they may be used as templates for building your own plugins. They range from very simple functional additions with only a small number of lines of code up to very complex behemoths controlling external software such as SimHub.
 
 | Plugin | Description |
 | ------ | ------ |

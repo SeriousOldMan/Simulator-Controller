@@ -1651,7 +1651,7 @@ class RaceSpotter extends GridRaceAssistant {
 				}
 			}
 
-			if (sector = 1) {
+			if (InStr(sector, "1") = 1) {
 				stintLaps := Floor(remainingStintLaps)
 
 				if ((this.Session = kSessionRace) && (stintLaps < 5) && (Abs(remainingStintLaps - remainingSessionLaps) > 2)) {
@@ -1754,7 +1754,7 @@ class RaceSpotter extends GridRaceAssistant {
 				}
 			}
 
-			if ((sector = 1) && (lastLap > 2)) {
+			if ((InStr(sector, "1") = 1) && (lastLap > 2)) {
 				this.getPositionInfos(&standingsAhead, &standingsBehind, &trackAhead, &trackBehind, &leader)
 
 				lapTime := false
@@ -1943,7 +1943,7 @@ class RaceSpotter extends GridRaceAssistant {
 			}
 		}
 
-		if (sector > 1) {
+		if (InStr(sector, "1") != 1) {
 			opponentType := (trackBehind ? trackBehind.OpponentType[sector] : false)
 
 			if (regular && trackBehind && trackBehind.hasGap(sector) && !trackBehind.Car.InPit
@@ -2059,7 +2059,7 @@ class RaceSpotter extends GridRaceAssistant {
 			driverPitstops := this.DriverCar.Pitstops.Length
 			opponentType := (trackAhead ? trackAhead.OpponentType[sector] : false)
 
-			if ((sector > 1) && trackAhead && (trackAhead != standingsAhead) && trackAhead.hasGap(sector)
+			if ((InStr(sector, "1") != 1) && trackAhead && (trackAhead != standingsAhead) && trackAhead.hasGap(sector)
 			 && (opponentType != "Position") && !trackAhead.Car.InPit
 			 && trackAhead.inRange(sector, true, (opponentType = "LapDown") ? lapDownRangeThreshold : lapUpRangeThreshold)
 			 && !trackAhead.isFaster(sector) && !trackAhead.runningAway(sector, frontGainThreshold)
@@ -3004,14 +3004,19 @@ class RaceSpotter extends GridRaceAssistant {
 		local sector, result, valid, gapAhead, gapBehind
 
 		static lastLap := 0
-		static lastSector := 1
+		static lastSector := -1
 		static sectorIndex := 1
 
-		if (lapNumber > this.LastLap)
+		if (lapNumber > this.LastLap) {
 			this.updateDynamicValues({EnoughData: false})
+
+			lastLap := 0
+			lastSector := -1
+			sectorIndex := 1
+		}
 		else if (lapNumber < lastLap) {
 			lastLap := 0
-			lastSector := 1
+			lastSector := -1
 			sectorIndex := 1
 		}
 

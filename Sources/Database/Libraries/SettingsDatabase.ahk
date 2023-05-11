@@ -346,6 +346,8 @@ readSetting(database, simulator, owner, user, community, car, track, weather
 
 					if (rows.Length > 0)
 						return rows[1]["Value"]
+					else
+						break
 				}
 				catch Any {
 				}
@@ -389,6 +391,8 @@ readSettings(database, simulator, settings, owner, user, community, car, track, 
 					for ignore, row in settingsDB.query("Settings", {Where: {Car: car, Track: track
 																		   , Weather: weather, Owner: owner}})
 						result.Push(row)
+
+					break
 				}
 				catch Any {
 				}

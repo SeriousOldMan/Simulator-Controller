@@ -530,8 +530,12 @@ class StrategyWorkbench extends ConfigurationItem {
 
 			if (isNumber(value) && (value >= minValue))
 				field.ValidText := field.Text
-			else
+			else {
 				field.Text := (field.HasProp("ValidText") ? field.ValidText : minValue)
+				
+				loop 10
+					SendInput("{Right}")
+			}
 		}
 
 		validateInteger(field, minValue := 0) {
@@ -539,8 +543,12 @@ class StrategyWorkbench extends ConfigurationItem {
 
 			if (isInteger(field.Text) && (field.Text >= minValue))
 				field.ValidText := field.Text
-			else
+			else {
 				field.Text := (field.HasProp("ValidText") ? field.ValidText : minValue)
+				
+				loop 10
+					SendInput("{Right}")
+			}
 		}
 
 		validateSimMaxTyreLaps(*) {

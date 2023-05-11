@@ -5,7 +5,7 @@
   4. It is now possible to let the Strategist recalculate the currently chosen strategy in the background, while you are in a race. Whenever a better strategy can be found (also, when no valid strategy is available anymore), you will be informed and can decide what to do. You can find the corresponding [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database", as well as on the [*Strategy* tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#tab-strategy) in "Race Settings". This settings allow you to specify, in what situations the current strategy should revised.
   5. Support for cup categories has been added to the multi-class management. It is now possible to create reports with cars splitted in cup categories and you can also configure the assistants to understand cup categories to give you gap and delta information with regards to your own category. You can also find the corresponding [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database". In all interactive reports as well as in the "Race Center", you can use the [settings for the race reports](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-reports) to specify, how the information about the different car classes and cup categories should be displayed.
 
-## 5.0.3.0-release 05/13/23 (planned)
+## 5.0.3.0-release 05/12/23 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed the calculation of tyre laps in "Race Center", when an unplanned pitstop without tyre change has happened.
@@ -13,12 +13,13 @@
   5. The Spotter no longer informs about lapped cars that are actually in the pit.
   6. Fixed a few more possible deadlock situations in the session database, which could cause all applications to freeze up.
   7. Fixed the initialization of the race settings from the defaults in the session database (critical bug).
-  8. Integrated many changes for the English version of the Assistant grammars. Many thanks to our community member *Wayne Wortley* for the great work.
-  9. New settings in the "Session Database" to [control the frequency of the telemetry updates](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) for all Assistants. Use with caution.
-  10. New settings in the "Session Database" to [control the cooldown time](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) of the Race Assistants and the connection to the Team Server.
-  11. All new [documentation of each and every modifier key](*) available in the applications of Simulator Controller.
-  12. [Experts only] All new [documentation of internal configuration options of the runtime environment](*).
-  13. New car models for "Setup Workbench":
+  8. Fixed cursor jumping to the left of an input field, when an incorrect character was entered.
+  9. Integrated many changes for the English version of the Assistant grammars. Many thanks to our community member *Wayne Wortley* for the great work.
+  10. New settings in the "Session Database" to [control the frequency of the telemetry updates](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) for all Assistants. Use with caution.
+  11. New settings in the "Session Database" to [control the cooldown time](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) of the Race Assistants and the connection to the Team Server.
+  12. All new [documentation of each and every modifier key](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Keyboard-Modifiers) available in the applications of Simulator Controller.
+  13. [Experts only] All new [documentation of internal configuration options of the runtime environment](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration). Use with caution.
+  14. New car models for "Setup Workbench":
       - Assetto Corsa
 	    - Praga R1
 

@@ -562,8 +562,12 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 	validateNumber(field, *) {
 		field := settingsGui[field]
 
-		if !isNumber(internalValue("Float", field.Text))
+		if !isNumber(internalValue("Float", field.Text)) {
 			field.Text := (field.HasProp("ValidText") ? field.ValidText : "")
+				
+			loop 10
+				SendInput("{Right}")
+		}
 		else
 			field.ValidText := field.Text
 	}

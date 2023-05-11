@@ -6,12 +6,13 @@
   5. The Spotter no longer informs about lapped cars that are actually in the pit.
   6. Fixed a few more possible deadlock situations in the session database, which could cause all applications to freeze up.
   7. Fixed the initialization of the race settings from the defaults in the session database (critical bug).
-  8. Integrated many changes for the English version of the Assistant grammars. Many thanks to our community member *Wayne Wortley* for the great work.
-  9. New settings in the "Session Database" to [control the frequency of the telemetry updates](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) for all Assistants. Use with caution.
-  10. New settings in the "Session Database" to [control the cooldown time](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) of the Race Assistants and the connection to the Team Server.
-  11. All new [documentation of each and every modifier key](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Keyboard-Modifiers) available in the applications of Simulator Controller.
-  12. [Experts only] All new [documentation of internal configuration options of the runtime environment](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration). Use with caution.
-  13. New car models for "Setup Workbench":
+  8. Fixed cursor jumping to the left of an input field, when an incorrect character was entered.
+  9. Integrated many changes for the English version of the Assistant grammars. Many thanks to our community member *Wayne Wortley* for the great work.
+  10. New settings in the "Session Database" to [control the frequency of the telemetry updates](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) for all Assistants. Use with caution.
+  11. New settings in the "Session Database" to [control the cooldown time](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) of the Race Assistants and the connection to the Team Server.
+  12. All new [documentation of each and every modifier key](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Keyboard-Modifiers) available in the applications of Simulator Controller.
+  13. [Experts only] All new [documentation of internal configuration options of the runtime environment](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration). Use with caution.
+  14. New car models for "Setup Workbench":
       - Assetto Corsa
 	    - Praga R1
 

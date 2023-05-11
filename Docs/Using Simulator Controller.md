@@ -182,7 +182,7 @@ Similar to the output settings shown above, you only have to enter those audio d
 
 ## Keyboard shortcuts & modifiers
 
-Many applications of Simulator Controller provide modifier keys for several functions. You can find a list of all modifiers and their functionalities [here](*).
+Many applications of Simulator Controller provide modifier keys for several functions. You can find a list of all modifiers and their functionalities [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Keyboard-Modifiers).
    
 ## Monitoring health and activities
 

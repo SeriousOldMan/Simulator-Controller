@@ -9,8 +9,8 @@
   8. Integrated many changes for the English version of the Assistant grammars. Many thanks to our community member *Wayne Wortley* for the great work.
   9. New settings in the "Session Database" to [control the frequency of the telemetry updates](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) for all Assistants. Use with caution.
   10. New settings in the "Session Database" to [control the cooldown time](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) of the Race Assistants and the connection to the Team Server.
-  11. All new [documentation of each and every modifier key](*) available in the applications of Simulator Controller.
-  12. [Experts only] All new [documentation of internal configuration options of the runtime environment](*).
+  11. All new [documentation of each and every modifier key](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Keyboard-Modifiers) available in the applications of Simulator Controller.
+  12. [Experts only] All new [documentation of internal configuration options of the runtime environment](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration). Use with caution.
   13. New car models for "Setup Workbench":
       - Assetto Corsa
 	    - Praga R1

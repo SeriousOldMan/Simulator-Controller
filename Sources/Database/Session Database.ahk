@@ -2074,6 +2074,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		this.StrategyListView.ModifyCol()
 
 		loop 2
+			this.StrategyListView.ModifyCol(A_Index, 10)
+
+		loop 2
 			this.StrategyListView.ModifyCol(A_Index, "AutoHdr")
 
 		if select
@@ -2129,6 +2132,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			this.SetupListView.ModifyCol()
 
 			loop 2
+				this.SetupListView.ModifyCol(A_Index, 10)
+
+			loop 2
 				this.SetupListView.ModifyCol(A_Index, "AutoHdr")
 
 			if select
@@ -2168,6 +2174,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 
 		this.SettingsListView.ModifyCol()
+
+		loop 3
+			this.SettingsListView.ModifyCol(A_Index, 10)
 
 		loop 3
 			this.SettingsListView.ModifyCol(A_Index, "AutoHdr")
@@ -2229,6 +2238,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			}
 
 		this.DataListView.ModifyCol()
+
+		loop 2
+			this.DataListView.ModifyCol(A_Index, 10)
 
 		loop 2
 			this.DataListView.ModifyCol(A_Index, "AutoHdr")
@@ -2467,6 +2479,11 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			this.TrackAutomationsListView.Modify(this.TrackAutomationsListView.Add("Select", trackAutomation.Name, trackAutomation.Actions.Length), "Vis")
 		}
 
+		this.TrackAutomationsListView.ModifyCol()
+
+		loop 2
+			this.TrackAutomationsListView.ModifyCol(A_Index, 10)
+
 		loop 2
 			this.TrackAutomationsListView.ModifyCol(A_Index, "AutoHdr")
 
@@ -2501,6 +2518,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 
 		this.TrackAutomationsListView.ModifyCol()
+
+		loop 2
+			this.TrackAutomationsListView.ModifyCol(A_Index, 10)
 
 		loop 2
 			this.TrackAutomationsListView.ModifyCol(A_Index, "AutoHdr")
@@ -2657,6 +2677,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		this.DataListView.Add("", translate("Automations: "), this.TrackAutomations.Length)
 
 		this.DataListView.ModifyCol()
+
+		loop 2
+			this.DataListView.ModifyCol(A_Index, 10)
 
 		loop 2
 			this.DataListView.ModifyCol(A_Index, "AutoHdr")
@@ -3317,6 +3340,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			this.AdministrationListView.ModifyCol()
 
 			loop 4
+				this.AdministrationListView.ModifyCol(A_Index, 10)
+
+			loop 4
 				this.AdministrationListView.ModifyCol(A_Index, "AutoHdr")
 
 			this.updateState()
@@ -3465,6 +3491,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		this.DataListView.ModifyCol()
 
 		loop 2
+			this.DataListView.ModifyCol(A_Index, 10)
+
+		loop 2
 			this.DataListView.ModifyCol(A_Index, "AutoHdr")
 
 		this.loadStrategies()
@@ -3494,6 +3523,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			this.DataListView.Add("", translate("Community"), translate(kSetupNames[type]), setups.Length)
 
 		this.DataListView.ModifyCol()
+
+		loop 3
+			this.DataListView.ModifyCol(A_Index, 10)
 
 		loop 3
 			this.DataListView.ModifyCol(A_Index, "AutoHdr")
@@ -3532,6 +3564,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 
 		this.DataListView.ModifyCol()
+
+		loop 6
+			this.DataListView.ModifyCol(A_Index, 10)
 
 		loop 6
 			this.DataListView.ModifyCol(A_Index, "AutoHdr")
@@ -4587,6 +4622,9 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := fa
 		importSelectCheck.Value := ((importListView.GetCount() > 0) ? 1 : 0)
 
 		importListView.ModifyCol()
+
+		loop 4
+			importListView.ModifyCol(A_Index, 10)
 
 		loop 4
 			importListView.ModifyCol(A_Index, "AutoHdr")

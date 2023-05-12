@@ -730,6 +730,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 								settingValue := oldValue
 
 								editorGui["settingValueEdit"].Text := oldValue
+
+								loop 10
+									SendEvent("{Right}")
 							}
 
 							value := settingValue
@@ -741,6 +744,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 								editorGui["settingValueEdit"].Text := oldValue
 
 								value := internalValue("Float", oldValue)
+
+								loop 10
+									SendEvent("{Right}")
 							}
 						}
 					}

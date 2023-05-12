@@ -1208,7 +1208,7 @@ class RaceCenter extends ConfigurationItem {
 
 			if !isNumber(internalValue("Float", field.Text)) {
 				field.Text := (field.HasProp("ValidText") ? field.ValidText : "")
-				
+
 				loop 10
 					SendInput("{Right}")
 			}
@@ -9748,7 +9748,7 @@ class RaceCenter extends ConfigurationItem {
 
 	reportSettings(report) {
 		switch report, false {
-			case "Overvier":
+			case "Overview":
 				if this.editOverviewReportSettings()
 					this.showOverviewReport()
 			case "Drivers":

@@ -193,9 +193,14 @@ initializeEnvironment() {
 	if !newID {
 		idFileName := kUserConfigDirectory . "ID"
 
-		ID := StrSplit(FileRead(idFileName), "`n", "`r")[1]
+		try {
+			ID := StrSplit(FileRead(idFileName), "`n", "`r")[1]
 
-		newID := ((ID = false) || (Trim(ID) = ""))
+			newID := ((ID = false) || (Trim(ID) = ""))
+		}
+		catch Any {
+			newID := true
+		}
 	}
 
 	if newID {

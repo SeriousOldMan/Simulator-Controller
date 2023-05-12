@@ -1,16 +1,16 @@
 [Development]
-Version=5.0.3.0-beta
+Version=5.0.3.0-release
 Target=5.0.3.0-release
-Date=05/09/2023
-Download=https://www.dropbox.com/s/ccirse41hkq3skk/Simulator%20Controller%205.0.3.0-beta.zip?dl=1
+Date=05/12/2023
+Download=https://cutt.ly/t6cQUJ3;https://www.dropbox.com/s/64s03os4fmkwh92/Simulator%20Controller%205.0.3.0-release.zip?dl=1
 Changes=Fixed calculation of tyre laps in "Race Center", Fixed identification of drivers car for ACC in rare situations after a race restart with entry lists carried over form previous event, Fixed rare spotter information for lapped cars, that are actually in the pit, Fixed a couple of deadlock situations in the session database, Documentation for all modifier keys, Documentation for internal configuration parameters, New settings in the "Session Database" to control the frequency of the telemetry updates for all Assistants, New settings in the "Session Database" to control the cooldown time of the Race Assistants, Fixed data inheritance from session database, New car models for "Setup Workbench"
 [Release]
-Version=5.0.2.1-release
-Date=05/05/2023
-Download=https://cutt.ly/p55DuXl;https://www.dropbox.com/s/ko821ok20q3vslc/Simulator%20Controller%205.0.2.1-release.zip?dl=1
-Changes=Fixed deadlock in session database
+Version=5.0.3.0-release
+Date=05/12/2023
+Download=https://cutt.ly/t6cQUJ3;https://www.dropbox.com/s/64s03os4fmkwh92/Simulator%20Controller%205.0.3.0-release.zip?dl=1
+Changes=Fixed calculation of tyre laps in "Race Center", Fixed identification of drivers car for ACC in rare situations after a race restart with entry lists carried over form previous event, Fixed rare spotter information for lapped cars, that are actually in the pit, Fixed a couple of deadlock situations in the session database, Documentation for all modifier keys, Documentation for internal configuration parameters, New settings in the "Session Database" to control the frequency of the telemetry updates for all Assistants, New settings in the "Session Database" to control the cooldown time of the Race Assistants, Fixed data inheritance from session database, New car models for "Setup Workbench"
 [Current]
-Type=Development
+Type=Release
 [Version]
-Release=5.0.2.1-release
-Development=5.0.3.0-beta
+Release=5.0.3.0-release
+Development=5.0.3.0-release

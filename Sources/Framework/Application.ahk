@@ -471,6 +471,3 @@ if (!isDetachedInstallation() && !isDebug()) {
 	startDatabaseSynchronizer()
 	checkForNews()
 }
-
-
-

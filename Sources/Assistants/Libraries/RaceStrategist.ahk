@@ -510,7 +510,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 		deleteDirectory(kTempDirectory . "Race Strategist")
 
-		DirCreate(kTempDirectory "Race . Strategist")
+		DirCreate(kTempDirectory "Race Strategist")
 
 		this.iTelemetryDatabaseDirectory := (kTempDirectory . "Race Strategist\")
 	}

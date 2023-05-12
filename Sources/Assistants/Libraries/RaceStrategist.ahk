@@ -35,6 +35,7 @@ class RaceStrategist extends GridRaceAssistant {
 	iOriginalStrategy := false
 	iStrategy := false
 	iStrategyReported := false
+	iLastStrategyUpdate := 0
 
 	iSaveTelemetry := kAlways
 	iSaveRaceReport := false
@@ -528,6 +529,11 @@ class RaceStrategist extends GridRaceAssistant {
 
 		if values.HasProp("RaceReview")
 			this.iRaceReview := values.RaceReview
+
+		if (values.HasProp("Session") && (this.Session == kSessionFinished)) {
+			this.iStrategyReported := false
+			this.iLastStrategyUpdate := 0
+		}
 	}
 
 	updateSessionValues(values) {
@@ -1600,18 +1606,17 @@ class RaceStrategist extends GridRaceAssistant {
 		local fuelConsumption, fuelRemaining, lapTime, map, tc, antiBS, pressures, temperatures, wear, multiClass
 
 		static lastLap := 0
-		static lastStrategyUpdate := 0
 
 		if (lapNumber <= lastLap) {
 			lastLap := 0
-			lastStrategyUpdate := lapNumber
+			this.iLastStrategyUpdate := lapNumber
 		}
 		else if ((lastLap == 0) && (lapNumber > 1)) {
 			lastLap := (lapNumber - 1)
-			lastStrategyUpdate := lapNumber
+			this.iLastStrategyUpdate := lapNumber
 		}
 		else if (lastLap < (lapNumber - 1))
-			lastStrategyUpdate := lapNumber
+			this.iLastStrategyUpdate := lapNumber
 
 		if (this.Speaker && (lapNumber > 1)) {
 			driverForname := knowledgeBase.getValue("Driver.Forname", "John")
@@ -1719,11 +1724,11 @@ class RaceStrategist extends GridRaceAssistant {
 		frequency := getMultiMapValue(this.Settings, "Strategy Settings", "Strategy.Update.Laps", false)
 
 		if (frequency && this.hasEnoughData(false)) {
-			if (lapNumber > (lastStrategyUpdate + frequency))
+			if (lapNumber > (this.iLastStrategyUpdate + frequency))
 				knowledgeBase.setFact("Strategy.Recalculate", "Regular")
 		}
 		else
-			lastStrategyUpdate := lapNumber
+			this.iLastStrategyUpdate := lapNumber
 
 		this.saveStandingsData(lapNumber, simulator, car, track)
 
@@ -1762,11 +1767,8 @@ class RaceStrategist extends GridRaceAssistant {
 		if !this.MultiClass
 			this.adjustGaps(data)
 
-		if (updateStrategy && this.hasEnoughData(false)) {
-			knowledgeBase.clearFact("Strategy.Recalculate")
-
+		if (updateStrategy && this.hasEnoughData(false))
 			this.recommendStrategy({Silent: true, Confirm: true, Request: updateStrategy})
-		}
 
 		return result
 	}
@@ -1924,6 +1926,10 @@ class RaceStrategist extends GridRaceAssistant {
 
 		if !this.hasEnoughData()
 			return
+
+		knowledgeBase.clearFact("Strategy.Recalculate")
+
+		this.iLastStrategyUpdate := (knowledgeBase.getValue("Lap") + 1)
 
 		if this.Strategy {
 			engineerPID := ProcessExist("Race Engineer.exe")

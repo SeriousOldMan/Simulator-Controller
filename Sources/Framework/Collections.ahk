@@ -1,6 +1,9 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Collection Functions            ;;;
 ;;;                                                                         ;;;
+;;;   quickSort derived from the woirk of nnik - see the AutoHotkey forum   ;;;
+;;;   https://www.autohotkey.com/boards/viewtopic.php?t=46260               ;;;
+;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2023) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -295,4 +298,123 @@ bubbleSort(&array, comparator := (a, b) => (isNumber(a) && isNumber(b)) ? (a > b
 
 		n := newN
 	}
+}
+
+quickSort(&array, comparator?) {
+	quickSort(firstIndex, lastIndex) {
+		local layer := 0
+		local leftIndex, rightIndex, pivotIndex, pivotValue
+
+		if lastIndex - firstIndex < 100
+			return insertSort(firstIndex, lastIndex)
+
+		leftIndex  := firstIndex
+		rightIndex := lastIndex
+
+		pivotIndex := (Floor((rightIndex - leftIndex) / 2) + leftIndex)
+		pivotValue := array[pivotIndex]
+
+		loop {
+			while((leftIndex < pivotIndex) && (comparator.Call(array[leftIndex], pivotValue) <= 0))
+				leftIndex++
+
+			if (pivotIndex <= leftIndex) {
+				pivotIndex := leftIndex
+
+				break
+			}
+
+			while((rightIndex > pivotIndex) && (comparator.Call(array[rightIndex], pivotValue) >= 0))
+				rightIndex--
+
+			if (pivotIndex >= rightIndex) {
+				pivotIndex := rightIndex
+
+				break
+			}
+
+			swap(leftIndex, rightIndex)
+
+			leftIndex += 1
+			rightIndex -= 1
+		}
+
+		if (leftIndex = pivotIndex) {
+			if (rightIndex > pivotIndex)
+				while (rightIndex > pivotIndex)
+					if (comparator.Call(array[rightIndex], pivotValue) < 0) {
+						move(rightindex, pivotIndex)
+
+						pivotIndex += 1
+					}
+					else
+						rightIndex -= 1
+		}
+		else if (rightIndex = pivotIndex)
+			while (leftIndex < pivotIndex)
+				if (comparator.Call(array[leftIndex], pivotValue) > 0) {
+					move(leftIndex, pivotIndex)
+
+					pivotIndex -= 1
+				}
+				else
+					leftIndex += 1
+
+		quickSort(firstIndex, pivotIndex - 1)
+		quickSort(pivotIndex + 1, lastIndex)
+	}
+
+	insertSort(firstIndex, lastIndex) {
+		local currentCompareIndex, currentIndex, currentValue
+
+		loop lastIndex - firstIndex {
+			currentIndex := (firstIndex + A_Index)
+
+			currentValue := array[currentIndex]
+
+			loop
+				currentCompareIndex := currentIndex - A_Index
+			until ((currentCompareIndex < firstIndex) || (comparator.Call(currentValue, array[currentCompareIndex]) >= 0))
+
+			move(currentIndex, currentCompareIndex + 1)
+		}
+	}
+
+	stdCompare(compareVal1, compareVal2) {
+		local minStrLen, compareChr1, compareChr2
+
+		if (compareVal1 = compareVal2)
+			return 0
+		else if (isNumber(compareVal1) && isNumber(compareVal2))
+			return ((compareVal1 < compareVal2) ? -1 : 1)
+
+		minStrLen := Min(compareLen1 := StrLen(compareVal1), StrLen(compareVal2))
+
+		loop minStrLen {
+			compareChr1 := Ord(SubStr(compareVal1, A_Index, 1))
+			compareChr2 := Ord(SubStr(compareVal2, A_Index, 1))
+
+			if (compareChr1 != compareChr2)
+				return (compareChr1 - compareChr2)
+		}
+
+		return ((compareLen1 = minStrLen) && -1)
+	}
+
+	swap(index1, index2) {
+		local temp := array[index1]
+
+		array[index1] := array[index2]
+		array[index2] := temp
+	}
+
+	move(srcIndex, targetIndex) {
+		if (srcIndex != targetIndex)
+			array.InsertAt(targetIndex, Array.RemoveAt(srcIndex))
+	}
+
+	if !isSet(comparator)
+		comparator := stdCompare
+
+	quickSort(array.MinIndex(), array.MaxIndex())
 }

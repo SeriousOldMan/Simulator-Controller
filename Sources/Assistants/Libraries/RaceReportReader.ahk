@@ -155,13 +155,14 @@ class RaceReportReader {
 	}
 
 	getStandings(lap, &cars, &ids, &overallPositions, &classPositions, &carNumbers, &carNames
-					, &driverFornames, &driverSurnames, &driverNicknames) {
+					, &driverFornames, &driverSurnames, &driverNicknames, &driverCategories) {
 		local raceData := true
 		local drivers := true
 		local tPositions := true
+		local tCategories := driverCategories
 		local tTimes := true
 		local classes := CaseInsenseMap()
-		local forName, surName, nickName, position, carClass
+		local driver, category, forName, surName, nickName, position, carClass
 
 		comparePositions(c1, c2) {
 			local pos1 := c1[2]
@@ -176,7 +177,7 @@ class RaceReportReader {
 			return (pos1 > pos2)
 		}
 
-		this.loadData(Array(lap), &raceData, &drivers, &tPositions, &tTimes)
+		this.loadData(Array(lap), &raceData, &drivers, &tPositions, &tTimes, &tCategories)
 
 		if cars
 			cars := []
@@ -204,6 +205,9 @@ class RaceReportReader {
 
 		if driverNicknames
 			driverNicknames := []
+
+		if driverCategories
+			driverCategories := []
 
 		if (cars && (tPositions.Length > 0) && (drivers.Length > 0)) {
 			loop getMultiMapValue(raceData, "Cars", "Count", 0)
@@ -247,6 +251,9 @@ class RaceReportReader {
 
 						if driverNicknames
 							driverNicknames.Push(nickName)
+
+						if driverCategories
+							driverCategories.Push(tCategories[1][A_Index])
 					}
 
 			if (classes.Count > 1) {
@@ -493,8 +500,8 @@ class RaceReportReader {
 		return true
 	}
 
-	loadData(laps, &raceData, &drivers, &positions, &times) {
-		local report, oldEncoding
+	loadData(laps, &raceData, &drivers, &positions, &times, &categories := false) {
+		local report, oldEncoding, driverLine, categoryLine
 
 		if drivers
 			drivers := []
@@ -504,6 +511,9 @@ class RaceReportReader {
 
 		if times
 			times := []
+
+		if categories
+			categories := []
 
 		report := this.Report
 
@@ -519,14 +529,38 @@ class RaceReportReader {
 				if drivers {
 					try {
 						loop Read, report . "\Drivers.CSV"
-							if (!laps || inList(laps, A_Index))
-								drivers.Push(string2Values(";", A_LoopReadLine))
+							if (!laps || inList(laps, A_Index)) {
+								driverLine := string2Values(";", A_LoopReadLine)
+
+								if categories
+									categoryLine := []
+
+								loop driverLine.Length
+									if InStr(driverLine[A_Index], "|||") {
+										driver := string2Values("|||", driverLine[A_Index])
+
+										driverLine[A_Index] := driver[1]
+
+										if categories
+											categoryLine.Push(driver[2])
+									}
+									else if categories
+										categoryLine.Push("Unknown")
+
+								drivers.Push(driverLine)
+
+								if categories
+									categories.Push(categoryLine)
+							}
 					}
 					catch Any as exception {
 						logError(exception)
 					}
 
 					drivers := correctEmptyValues(drivers, "")
+
+					if categories
+						categories := correctEmptyValues(categories, "Unknown")
 				}
 
 				if positions {

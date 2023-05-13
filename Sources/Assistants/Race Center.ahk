@@ -101,7 +101,7 @@ global kSessionDataSchemas := CaseInsenseMap("Stint.Data", ["Nr", "Lap", "Driver
 										   , "Pitstop.Tyre.Data", ["Pitstop", "Driver", "Laps", "Compound", "Compound.Color", "Set"
 																 , "Tyre", "Tread", "Wear", "Grain", "Blister", "FlatSpot"]
 										   , "Delta.Data", ["Lap", "Car", "Type", "Delta", "Distance", "ID"]
-										   , "Standings.Data", ["Lap", "Car", "Driver", "Position", "Time", "Laps", "Delta", "ID"]
+										   , "Standings.Data", ["Lap", "Car", "Driver", "Position", "Time", "Laps", "Delta", "ID", "Category"]
 										   , "Plan.Data", ["Stint", "Driver", "Time.Planned", "Time.Actual", "Lap.Planned", "Lap.Actual"
 														 , "Fuel.Amount", "Tyre.Change"]
 										   , "Setups.Data", ["Driver", "Weather", "Temperature.Air", "Temperature.Track"
@@ -7418,7 +7418,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	getStandings(lap, &cars, &ids, &overallPositions, &classPositions, &carNumbers, &carNames
-					, &driverFornames, &driverSurnames, &driverNicknames) {
+					, &driverFornames, &driverSurnames, &driverNicknames, &driverCategories) {
 		local tCars := true
 		local tIDs := true
 		local tOPositions := true
@@ -7428,10 +7428,11 @@ class RaceCenter extends ConfigurationItem {
 		local tDriverFornames := driverFornames
 		local tDriverSurnames := driverSurnames
 		local tDriverNicknames := driverNicknames
+		local tDriverCategories := driverNicknames
 		local index, multiClass
 
 		multiClass := this.ReportViewer.getStandings(lap.Nr, &tCars, &tIDs, &tOPositions, &tCPositions, &tCarNumbers, &tCarNames
-														   , &tDriverFornames, &tDriverSurnames, &tDriverNicknames)
+														   , &tDriverFornames, &tDriverSurnames, &tDriverNicknames, &tDriverCategories)
 
 		if cars
 			cars := []
@@ -7459,6 +7460,9 @@ class RaceCenter extends ConfigurationItem {
 
 		if driverNicknames
 			driverNicknames := []
+
+		if driverCategories
+			driverCategories := []
 
 		if (tCars.Length > 0)
 			loop tOPositions.Length {
@@ -7491,6 +7495,9 @@ class RaceCenter extends ConfigurationItem {
 
 					if driverNicknames
 						driverNicknames.Push(tDriverNicknames[index])
+
+					if driverCategories
+						driverCategories.Push(tDriverCategories[index])
 				}
 			}
 
@@ -9396,7 +9403,7 @@ class RaceCenter extends ConfigurationItem {
 		local temperatureFL, temperatureFR, temperatureRL, temperatureRR
 		local wearFL, wearFR, wearRL, wearRR
 		local telemetry, brakeTemperatures, ignore, field, brakeWears
-		local currentListView, lapPressures, entry, standingsData, prefix, driver
+		local currentListView, lapPressures, entry, standingsData, prefix, driver, category
 		local currentStint, newStint, stint, stintData, tries, carIDs, positions
 
 		if lastLap
@@ -9690,9 +9697,13 @@ class RaceCenter extends ConfigurationItem {
 								driver := computeDriverName(getMultiMapValue(standingsData, "Standings", prefix . A_Index . ".Driver.Forname")
 														  , getMultiMapValue(standingsData, "Standings", prefix . A_Index . ".Driver.Surname")
 														  , getMultiMapValue(standingsData, "Standings", prefix . A_Index . ".Driver.Nickname"))
+								category := getMultiMapValue(standingsData, "Standings", prefix . A_Index . ".Driver.Category", "Unknown")
+
+								if (category = "Unknown")
+									category := kNull
 
 								sessionStore.add("Standings.Data"
-											   , Database.Row("Lap", lap, "Car", A_Index, "ID", carIDs[A_Index], "Driver", driver
+											   , Database.Row("Lap", lap, "Car", A_Index, "ID", carIDs[A_Index], "Driver", driver, "Category", category
 															, "Position", getMultiMapValue(standingsData, "Standings", prefix . A_Index . ".Position")
 															, "Time", Round(getMultiMapValue(standingsData, "Standings", prefix . A_Index . ".Time") / 1000, 1)
 															, "Laps", Round(getMultiMapValue(standingsData, "Standings", prefix . A_Index . ".Laps"), 1)
@@ -10337,9 +10348,11 @@ class RaceCenter extends ConfigurationItem {
 		local driverFornames := true
 		local driverSurnames := true
 		local driverNicknames := true
+		local driverCategories := true
 		local index, position, lapTime, laps, delta, result, multiClass, numPitstops, ignore, pitstop, pitstops, pitstopLaps
 
-		multiClass := this.getStandings(lap, &cars, &carIDs, &overallPositions, &classPositions, &carNumbers, &carNames, &driverFornames, &driverSurnames, &driverNicknames)
+		multiClass := this.getStandings(lap, &cars, &carIDs, &overallPositions, &classPositions, &carNumbers, &carNames
+										   , &driverFornames, &driverSurnames, &driverNicknames, &driverCategories)
 
 		html .= ("<tr><th class=`"th-std`">" . translate("#") . "</th>"
 				   . "<th class=`"th-std`">" . translate("Nr.") . "</th>"
@@ -10372,9 +10385,13 @@ class RaceCenter extends ConfigurationItem {
 					delta := Round(result[1]["Delta"], 1)
 				}
 
+				driver := computeDriverName(driverFornames[index] , driverSurnames[index], driverNickNames[index])
+
+				if (driverCategories[index] != "Unknown")
+					driver .= (translate(" [") . translate(driverCategories[index]) . translate("]"))
+
 				html .= ("<tr><th class=`"th-std`">" . position . "</th>")
-				html .= ("<td class=`"td-std`">" . values2String("</td><td class=`"td-std`">", carNumbers[index]
-																							 , computeDriverName(driverFornames[index] , driverSurnames[index], driverNickNames[index])
+				html .= ("<td class=`"td-std`">" . values2String("</td><td class=`"td-std`">", carNumbers[index], driver
 																							 , telemetryDB.getCarName(this.Simulator, carNames[index]))
 					   . "</td>")
 

@@ -225,37 +225,27 @@ class RaceReportViewer extends RaceReportReader {
 	}
 
 	getReportDrivers(raceData, drivers, &categories := false) {
-		local result := []
+		local resultDrivers := []
+		local resultCategories := []
 		local driver, category
-
-		if categories
-			categories := []
 
 		loop getMultiMapValue(raceData, "Cars", "Count")
 			if (getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Car", kNotInitialized) != kNotInitialized)
 				if drivers[1].Has(A_Index) {
-					driver := drivers[1][A_Index]
-
-					if InStr(driver, "|||") {
-						driver := string2Values("|||", driver)
-
-						category := driver[2]
-						driver := driver[1]
-					}
-					else
-						category := "Unknown"
-
-					result.Push(driver)
+					resultDrivers.Push(drivers[1][A_Index])
 
 					if categories
-						categories.Push(category)
+						resultCategories.Push(categories[1][A_Index])
 				}
 
-		return result
+		if categories
+			categories := resultCategories
+
+		return resultDrivers
 	}
 
-	loadReportData(laps, &raceData, &drivers, &positions, &times) {
-		return this.loadData(laps, &raceData, &drivers, &positions, &times)
+	loadReportData(laps, &raceData, &drivers, &positions, &times, &categories := false) {
+		return this.loadData(laps, &raceData, &drivers, &positions, &times, &categories)
 	}
 
 	editReportSettings(settings*) {
@@ -283,7 +273,7 @@ class RaceReportViewer extends RaceReportReader {
 		local report := this.Report
 		local classes := CaseInsenseMap()
 		local invalids := 0
-		local raceData, drivers, driver, category, positions, times, cars, carsCount, lapsCount, simulator, car
+		local raceData, drivers, categories, driver, category, positions, times, cars, carsCount, lapsCount, simulator, car
 		local class, hasClasses, classResults, valid, carClasses
 		local ignore, lap, rows, rowClasses, classRows, hasDNF, result, lapTimes, hasNull, lapTime
 		local min, avg, filteredLapTimes, nr, row
@@ -304,10 +294,11 @@ class RaceReportViewer extends RaceReportReader {
 		if report {
 			raceData := true
 			drivers := true
+			categories := true
 			positions := true
 			times := true
 
-			this.loadReportData(false, &raceData, &drivers, &positions, &times)
+			this.loadReportData(false, &raceData, &drivers, &positions, &times, &categories)
 
 			cars := []
 
@@ -401,16 +392,14 @@ class RaceReportViewer extends RaceReportReader {
 
 					driver := StrReplace(drivers[1][A_Index], "'", "\'")
 
-					if InStr(driver, "|||") {
-						driver := string2Values("|||", driver)
-
-						driver := (driver[1] . translate(" [") . translate(driver[2]) . translate("]"))
-					}
+					if (categories[1][A_Index] != "Unknown")
+						driver .= (translate(" [") . translate(categories[1][A_Index]) . translate("]"))
 
 					rows.Push(Array("'" . class . "'", "'" . nr . "'"
 								  , "'" . StrReplace(SessionDatabase.getCarName(simulator, cars[A_Index][2]), "'", "\'") . "'", "'" . driver . "'"
 								  , "'" . RaceReportViewer.lapTimeDisplayValue(min) . "'"
 								  , "'" . RaceReportViewer.lapTimeDisplayValue(avg) . "'", result, result))
+
 					rowClasses.Push(class)
 				}
 				else
@@ -578,14 +567,14 @@ class RaceReportViewer extends RaceReportReader {
 		if report {
 			raceData := true
 			drivers := true
+			categories := true
 			positions := true
 			times := true
 
-			this.loadReportData(false, &raceData, &drivers, &positions, &times)
+			this.loadReportData(false, &raceData, &drivers, &positions, &times, &categories)
 
 			classes := this.getReportClasses(raceData)
 
-			categories := true
 			allDrivers := this.getReportDrivers(raceData, drivers, &categories)
 
 			cars := []
@@ -601,7 +590,7 @@ class RaceReportViewer extends RaceReportReader {
 				category := categories[car]
 
 				if (category != "Unknown")
-					driver .= (driver . translate(" [") . translate(category) . translate("]"))
+					driver .= (translate(" [") . translate(category) . translate("]"))
 
 				drivers.Push(driver)
 			}

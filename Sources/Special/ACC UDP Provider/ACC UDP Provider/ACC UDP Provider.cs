@@ -238,7 +238,7 @@ namespace ACCUDPProvider {
 			trackMeters = 0;
 		}
         
-        public string GetCup(int cupCategory)
+        public string GetCupCategory(int cupCategory)
         {
             switch (cupCategory) {
                 case 0:
@@ -256,7 +256,24 @@ namespace ACCUDPProvider {
             }
         }
 
-		public void ReadStandings(string ip, int port, string displayName, string connectionPassword, string commandPassword) {
+        public string GetDriverCategory(DriverCategory driverCategory)
+        {
+            switch (driverCategory)
+            {
+                case DriverCategory.Bronze:
+                    return "Bronze";
+                case DriverCategory.Silver:
+                    return "Silver";
+                case DriverCategory.Gold:
+                    return "Gold";
+                case DriverCategory.Platinum:
+                    return "Platinum";
+                default:
+                    return "Unknown";
+            }
+        }
+
+        public void ReadStandings(string ip, int port, string displayName, string connectionPassword, string commandPassword) {
             TextWriterTraceListener listener = new TextWriterTraceListener(this.outFileName + ".Trace");
             Debug.Listeners.Add(listener);
 
@@ -340,7 +357,7 @@ namespace ACCUDPProvider {
 
                                         outStream.Write("Car."); outStream.Write(index); outStream.Write(".Lap.Valid="); outStream.WriteLine(lastLap != null ? (lastLap.IsValid ? "true" : "false") : "true");
                                         outStream.Write("Car."); outStream.Write(index); outStream.Write(".Lap.Running.Valid="); outStream.WriteLine(currentLap != null ? (currentLap.IsValid ? "true" : "false") : "true");
-                                        outStream.Write("Car."); outStream.Write(index); outStream.Write(".Category="); outStream.WriteLine(GetCup(car.CupCategoryEnum));
+                                        outStream.Write("Car."); outStream.Write(index); outStream.Write(".Category="); outStream.WriteLine(GetCupCategory(car.CupCategoryEnum));
 
                                         if (lastLap != null)
                                         {
@@ -389,6 +406,7 @@ namespace ACCUDPProvider {
                                             outStream.Write("Car."); outStream.Write(index); outStream.Write(".Driver.Forname="); outStream.WriteLine(currentDriver.FirstName);
                                             outStream.Write("Car."); outStream.Write(index); outStream.Write(".Driver.Surname="); outStream.WriteLine(currentDriver.LastName);
                                             outStream.Write("Car."); outStream.Write(index); outStream.Write(".Driver.Nickname="); outStream.WriteLine(currentDriver.ShortName);
+                                            outStream.Write("Car."); outStream.Write(index); outStream.Write(".Driver.Category="); outStream.WriteLine(GetDriverCategory(currentDriver.Category));
                                         }
 
                                         outStream.Write("Car."); outStream.Write(index); outStream.Write(".InPitlane=");

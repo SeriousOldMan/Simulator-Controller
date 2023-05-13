@@ -2863,7 +2863,7 @@ class RaceStrategist extends GridRaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local driver, carCount, data, raceInfo, slots, grid, carNr, carID, key, fileName, slotsString
 		local data, pitstop, pitstops, prefix, times, positions, drivers, laps, carPrefix, carIndex
-		local driverForname, driverSurname, driverNickname, carCar, carCategory
+		local driverForname, driverSurname, driverNickname, driverCategory, carCar, carCategory
 
 		if this.RemoteHandler {
 			driver := knowledgeBase.getValue("Driver.Car", 0)
@@ -3052,6 +3052,11 @@ class RaceStrategist extends GridRaceAssistant {
 					driverNickname := knowledgeBase.getValue(carPrefix . ".Driver.Nickname")
 
 					drivers[carIndex] := computeDriverName(driverForname, driverSurname, driverNickname)
+
+					driverCategory := knowledgeBase.getValue(carPrefix . ".Driver.Category", "Unknown")
+
+					if (driverCategory != "Unknown")
+						drivers[carIndex] .= ("|||" . driverCategory)
 				}
 			}
 

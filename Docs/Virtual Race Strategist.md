@@ -185,7 +185,7 @@ After a given race report has been selected, the "Race Reports" tool offers you 
 	 
 	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Reports%203.JPG)
 	 
-	 For multi-class sessions, two result columns with the overall result and the class-specific result will be available.
+	 For multi-class sessions, two result columns with the overall result and the class-specific result will be available. If available, driver categories are shown here as well for the starting driver.
 
   2. Car Report
   
@@ -204,6 +204,8 @@ After a given race report has been selected, the "Race Reports" tool offers you 
 	 - Car Control: Based on an analysis of all laps slower than (average lap time + standard deviation).
 	 
 	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Reports%205.JPG)
+	 
+	 Due to technical reasons, the driver names are always the names of the starting driver, even if you are in a team race and have selected a lap range, that had been driven by another driver.
 
   4. Positions Report
   

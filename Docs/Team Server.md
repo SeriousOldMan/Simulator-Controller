@@ -196,9 +196,9 @@ Beside all that, you can request several context specific data, which will be sh
 	 
 	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%209.JPG)
 	 
-	 If the current race is a multi-class race, the report will also show the class specific positions of all cars, additionally to their overall position in the race. In a multi-class race, the gaps shown in the first table will always be specific for the own class.
+	 If the current race is a multi-class race, the report will also show the class specific positions of all cars, additionally to their overall position in the race. In a multi-class race, the gaps shown in the gap table at the top of the report will always be specific for the own class. Additionaly, if driver categories are available, the category label of a given driver will be added to his name.
 	 
-	 Last, but not least, you will find informations about the past pitstops of each car. The overall number of pitstops, as well as the lap (in reference to your own laps) of the last stop are shown. Please keep in mind, that due to restrictions in the data provided by the various simulators, it cannot be differentiated in many cases, whether a car has been in the pits for a penalty, an regualr pitstop or even an unplanned stop due to repairs.
+	 Last, but not least, you will find informations about the past pitstops of each car. The overall number of pitstops, as well as the lap (in reference to your own laps) of the last stop are shown. Please keep in mind, that due to restrictions in the data provided by the various simulators, it cannot be differentiated in many cases, whether a car has been in the pits for a penalty, an regular pitstop or even an unplanned stop due to repairs. It is also possible, that the number of pitstops are not correct at all, since not all stops may be correctly reported by the simulator.
 	 
 	 Some basic data is shown in the header of the lap details as well. Important are here the ambient temperatures and the tyre pressure information. You can see the current hot pressures, recommend cold pressures (incl. a potential correction factor compared to the pressure setup at the beginning of the stint) and information about tyre pressure losses, if there are any.
 

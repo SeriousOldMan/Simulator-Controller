@@ -23,6 +23,8 @@ carCategory(?car, false)
 carDriverForname(?car, ?forname) <= Get(Car, ?car, Driver.Forname, ?forname)
 carDriverSurname(?car, ?surname) <= Get(Car, ?car, Driver.Surname, ?surname)
 carDriverNickname(?car, ?nickname) <= Get(Car, ?car, Driver.Nickname, ?nickname)
+carDriverCategory(?car, ?category) <= Get(Car, ?car, Driver.Category, ?category)
+carDriverCategory(?car, Unknown)
 
 carModel(?car, ?model) <= Get(Car, ?car, Car, ?model)
 

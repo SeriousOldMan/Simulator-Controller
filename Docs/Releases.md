@@ -1,4 +1,4 @@
-## 5.0.5.0-release 05/20/23 (planned)
+## 5.0.5.0-release 05/19/23 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. You can now set the range of interest for the gap (in seconds) for opponent information given by the Spotter. For example, you can ask the Spotter to give you only information about an opponent, which as at least a minute behind you, but you want no more information, when he is 5 seconds or less behind you, since you then will have visual information in the mirrors. You can find the corresponding [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database".

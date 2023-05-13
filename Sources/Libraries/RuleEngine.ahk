@@ -4259,9 +4259,11 @@ class ConditionParser extends Parser {
 class PredicateParser extends Parser {
 	parse(expressions) {
 		if (expressions.Length == 3)
-			return Predicate(this.Compiler.createPrimaryParser(expressions[1], this.Variables).parse(expressions[1])
-																									   , expressions[2]
-																									   , this.Compiler.createPrimaryParser(expressions[3], this.Variables).parse(expressions[3]))
+			return Predicate(this.Compiler.createPrimaryParser(expressions[1]
+															 , this.Variables).parse(expressions[1])
+																				   , expressions[2]
+																				   , this.Compiler.createPrimaryParser(expressions[3]
+																													 , this.Variables).parse(expressions[3]))
 		else
 			return Predicate(this.Compiler.createPrimaryParser(expressions[1], this.Variables).parse(expressions[1]))
 	}

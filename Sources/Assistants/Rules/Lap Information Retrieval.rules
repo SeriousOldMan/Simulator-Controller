@@ -154,7 +154,7 @@ recentLapWeathers(?lap, ?offset, [?weather | ?weathers]) <=
 		?tLap = ?lap - ?offset, lapWeather(?tLap, ?tWeather), ?nOffset = ?offset + 1, recentLapWeathers(?lap, ?nOffset, ?weathers)
 
 clearLap(?lap) <= Append(Lap., ?lap, .Driver.Forname, ?fact), fact?(?fact), !,
-				  clearLap(?lap, [Driver.Forname, Driver.Surname, Driver.Nickname,
+				  clearLap(?lap, [Driver.Forname, Driver.Surname, Driver.Nickname, Driver.Category,
 								  Map, TC, ABS, Tyre.Compound, Tyre.Compound.Color, Tyre.Set, Valid,
 								  Time, Time.Average, Time.Start, Time.End, Fuel.Remaining, Fuel.Consumption, Fuel.AvgConsumption,
 								  Tyre.Pressure.FL, Tyre.Pressure.FR, Tyre.Pressure.RL, Tyre.Pressure.RR,

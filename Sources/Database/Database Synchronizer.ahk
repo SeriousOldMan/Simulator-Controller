@@ -327,7 +327,7 @@ synchronizeSessionDatabase(minutes) {
 		synchronizeDatabase()
 	}
 	catch Any as exception {
-		logError(exception)
+		logError(exception, true)
 	}
 
 	Task.CurrentTask.Sleep := (minutes * 60000)

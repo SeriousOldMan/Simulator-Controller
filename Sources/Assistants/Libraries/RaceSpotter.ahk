@@ -1527,8 +1527,8 @@ class RaceSpotter extends GridRaceAssistant {
 			speaker := this.getSpeaker(true)
 
 			knowledgeBase := this.KnowledgeBase
-			remainingSessionLaps := knowledgeBase.getValue("Lap.Remaining.Session")
-			remainingStintLaps := knowledgeBase.getValue("Lap.Remaining.Stint")
+			remainingSessionLaps := knowledgeBase.getValue("Lap.Remaining.Session", 0)
+			remainingStintLaps := knowledgeBase.getValue("Lap.Remaining.Stint", 0)
 			remainingSessionTime := Round(knowledgeBase.getValue("Session.Time.Remaining") / 60000)
 			remainingStintTime := Round(knowledgeBase.getValue("Driver.Time.Stint.Remaining") / 60000)
 
@@ -2894,6 +2894,9 @@ class RaceSpotter extends GridRaceAssistant {
 			loop getMultiMapValue(state, "Pitstop State", "Pitstop." . carNr . ".Count", 0)
 				pitstops.Push(RaceSpotter.Pitstop(carNr, string2Values(";", getMultiMapValue(state, "Pitstop State", "Pitstop." . carNr . "." . A_Index))*))
 		}
+
+		this.KnowledgeBase.clearFact("Lap.Remaining.Session")
+		this.KnowledgeBase.clearFact("Lap.Remaining.Stint")
 	}
 
 	adjustGaps(data, &gapAhead := false, &gapBehind := false) {

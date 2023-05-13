@@ -2067,65 +2067,63 @@ parseData(properties) {
 synchronizeDrivers(groups, sessionDB, connector, simulators, timestamp, lastSynchronization, force, &counter) {
 	local ignore, simulator, db, modified, identifier, driver, drivers
 
-	try {
-		for ignore, simulator in simulators {
-			simulator := sessionDB.getSimulatorCode(simulator)
+	for ignore, simulator in simulators {
+		simulator := sessionDB.getSimulatorCode(simulator)
 
-			db := Database(kDatabaseDirectory . "User\" . simulator . "\", kSessionSchemas)
+		db := Database(kDatabaseDirectory . "User\" . simulator . "\", kSessionSchemas)
 
-			if db.lock("Drivers", false)
-				try {
-					modified := false
+		if db.lock("Drivers", false)
+			try {
+				modified := false
 
-					drivers := connector.QueryData("License", "Simulator = '" . simulator . "' And Modified > " . lastSynchronization)
+				drivers := connector.QueryData("License", "Simulator = '" . simulator . "' And Modified > " . lastSynchronization)
 
-					for ignore, identifier in string2Values(";", drivers) {
-						modified := true
+				for ignore, identifier in string2Values(";", drivers) {
+					modified := true
 
-						driver := parseData(connector.GetData("License", identifier))
-						driver["ID"] := ((driver["Driver"] = "") ? kNull : driver["Driver"])
-						driver["Synchronized"] := timestamp
+					driver := parseData(connector.GetData("License", identifier))
+					driver["ID"] := ((driver["Driver"] = "") ? kNull : driver["Driver"])
+					driver["Synchronized"] := timestamp
 
-						drivers := db.query("Drivers", {Where: {ID: driver["ID"], Forname: driver["Forname"], Surname: driver["Surname"], Nickname: driver["Nickname"]}})
+					drivers := db.query("Drivers", {Where: {ID: driver["ID"], Forname: driver["Forname"], Surname: driver["Surname"], Nickname: driver["Nickname"]}})
 
-						if (drivers.Length = 0) {
-							db.add("Drivers", driver)
+					if (drivers.Length = 0) {
+						db.add("Drivers", driver)
 
-							counter += 1
-						}
-						else {
-							drivers[1]["Identifier"] := driver["Identifier"]
-							drivers[1]["Synchronized"] := timestamp
-						}
+						counter += 1
 					}
-
-					for ignore, driver in db.query("Drivers", {Where: force ? {ID: sessionDB.ID} : {Synchronized: kNull, ID: sessionDB.ID} }) {
-						if (driver["Identifier"] = kNull)
-							driver["Identifier"] := createGUID()
-
-						driver["Synchronized"] := timestamp
-
-						db.changed("Drivers")
-						modified := true
-
-						if (connector.CountData("License", "Identifier = '" . driver["Identifier"] . "'") = 0) {
-							connector.CreateData("License"
-											   , substituteVariables("Identifier=%Identifier%`nSimulator=%Simulator%`n"
-																   . "Driver=%Driver%`nForname=%Forname%`nSurname=%Surname%`nNickname=%Nickname%"
-																   , {Identifier: driver["Identifier"], Simulator: simulator
-																	, Driver: driver["ID"], Forname: driver["Forname"]
-																	, Surname: driver["Surname"], Nickname: driver["Nickname"]}))
-							counter += 1
-						}
+					else {
+						drivers[1]["Identifier"] := driver["Identifier"]
+						drivers[1]["Synchronized"] := timestamp
 					}
 				}
-				finally {
-					if modified
-						db.flush("Drivers")
 
-					db.unlock("Drivers")
+				for ignore, driver in db.query("Drivers", {Where: force ? {ID: sessionDB.ID} : {Synchronized: kNull, ID: sessionDB.ID} }) {
+					if (driver["Identifier"] = kNull)
+						driver["Identifier"] := createGUID()
+
+					driver["Synchronized"] := timestamp
+
+					db.changed("Drivers")
+					modified := true
+
+					if (connector.CountData("License", "Identifier = '" . driver["Identifier"] . "'") = 0) {
+						connector.CreateData("License"
+										   , substituteVariables("Identifier=%Identifier%`nSimulator=%Simulator%`n"
+															   . "Driver=%Driver%`nForname=%Forname%`nSurname=%Surname%`nNickname=%Nickname%"
+															   , {Identifier: driver["Identifier"], Simulator: simulator
+																, Driver: driver["ID"], Forname: driver["Forname"]
+																, Surname: driver["Surname"], Nickname: driver["Nickname"]}))
+						counter += 1
+					}
 				}
-		}
+			}
+			finally {
+				if modified
+					db.flush("Drivers")
+
+				db.unlock("Drivers")
+			}
 	}
 }
 
@@ -2340,7 +2338,12 @@ synchronizeStrategies(groups, sessionDB, connector, simulators, timestamp, lastS
 }
 
 keepAlive(identifier, connector, connection) {
-	SessionDatabase.Connected[identifier] := connector.KeepAlive(connection)
+	try {
+		SessionDatabase.Connected[identifier] := connector.KeepAlive(connection)
+	}
+	catch Any {
+		SessionDatabase.Connected[identifier] := false
+	}
 }
 
 initializeSessionDatabase() {

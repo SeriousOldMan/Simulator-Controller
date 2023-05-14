@@ -6,6 +6,7 @@
   5. Support for cup categories has been added to the multi-class management. It is now possible to create reports with cars splitted in cup categories and you can also configure the assistants to understand cup categories to give you gap and delta information with regards to your own category. You can also find the corresponding [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database". In all interactive reports as well as in the "Race Center", you can use the [settings for the race reports](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-reports) to specify, how the information about the different car classes and cup categories should be displayed.
   6. If driver categories are available in the simulator (Platinum, Gold, ...), they will be included in various reports (depending on [setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings).
   7. Fixed handling of *No tyre change* in pitstop preparation in "Race Center".
+  8. Fixed handling of pitstop preparation in "Race Center", when no strategy has been selected.
 
 ## 5.0.3.0-release 05/12/23
   1. Minor bugfixes, as always

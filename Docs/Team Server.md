@@ -268,6 +268,8 @@ You then may choose the settings for the upcoming strategy simulation using the 
 
 After you dialed the options, you can select "Adjust Strategy (Simulation)" from the "Strategy" menu, to create a new strategy baseed on a simulation. The result strategy summary will be displayed in the output area. Please note, that when you are typically late into the race, any pitstop rules of the base strategy might be ignored, when conflicting with the current race situation, so please double check, whether the resulting strategy is in accordance with the rules.
 
+IMPORTANT: Once you have created a new strategy, the Stint Plan (see below) must be updated as well, so that the information for refuel amount, tyre changes and so on, will be correct, when it comes to the next pitstop.
+
 #### Monte-Carlo traffic model
 
 If you have selected the *Analyze Traffic* option before running the strategy simulation, you can dial further options for the simulation on the "Strategy" tab.
@@ -281,6 +283,8 @@ In the lower area, you can fine-control the traffic model generation by choosing
 #### Altering the current race strategy
 
 You can run as many strategy simulations, with or without traffic anaylsis as you like. You can even go back to the "Strategy Workbench" and create a complete new strategy after a severe weather change, for example, and the adopt this base strategy in the "Race Center" to the current race situation. Once you are satisfied with the new strategy, you can update the strategy on the Team Server with the command "Release Strategy", thereby also updating it on every currently connected "Race Center", or you can even send it to the Virtual Race Strategist of the currently active driver using the "Instruct Strategist" command. If you think, that a predefined strategy will no longer fit the requirements of the session, you can cancel the strategy completely using the "Discard Strategy" command and handle all upcoming pitstops manually using the functions described in the next section. In both cases, the selected strategy will be updated in the "Race Center"s of all team members as well.
+
+IMPORTANT: Once you have created a new strategy, the Stint Plan (see below) must be updated as well, so that the information for refuel amount, tyre changes and so on, will be correct, when it comes to the next pitstop.
 
 ### Session & Stint Planning
 

@@ -3544,8 +3544,12 @@ class RaceCenter extends ConfigurationItem {
 					refuelAmount := this.PlanListView.GetText(A_Index, 7)
 					tyreChange := this.PlanListView.GetText(A_Index, 8)
 
-					lap := plannedLap
-					refuel := convertUnit("Volume", internalValue("Float", refuelAmount), false)
+					lap := (isInteger(plannedLap) ? plannedLap : 0)
+
+					if isNumber(internalValue("Float", refuelAmount))
+						refuel := convertUnit("Volume", internalValue("Float", refuelAmount), false)
+					else
+						refuel := 0
 
 					if (tyreChange != "x") {
 						tyreCompound := false
@@ -4557,7 +4561,7 @@ class RaceCenter extends ConfigurationItem {
 			return function.Call(arguments*)
 		}
 		catch Any as exception {
-			logError(exception)
+			logError(exception, false)
 
 			OnMessage(0x44, translateOkButton)
 			MsgBox((translate("Error while executing command.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)

@@ -3228,8 +3228,11 @@ class RaceSpotter extends GridRaceAssistant {
 					}
 				}
 
-				trackAhead := carPositions[trackAhead][1]
-				trackBehind := carPositions[trackBehind][1]
+				if trackAhead
+					trackAhead := carPositions[trackAhead][1]
+
+				if trackBehind
+					trackBehind := carPositions[trackBehind][1]
 
 				if (gapAhead && standingsAhead) {
 					positions[standingsAhead][10] := gapAhead

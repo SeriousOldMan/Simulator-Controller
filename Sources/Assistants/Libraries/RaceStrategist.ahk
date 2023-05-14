@@ -2386,16 +2386,8 @@ class RaceStrategist extends GridRaceAssistant {
 		if !isSet(confirm) {
 			request := Task.CurrentTask.Request
 
-			if (request = "User") {
-				if strategy && !this.betterScenario(strategy) {
-					if this.Speaker
-						this.getSpeaker().speakPhrase("NoBetterStrategy")
-
-					return
-				}
-
+			if (request = "User")
 				confirm := true
-			}
 			else {
 				if strategy {
 					if !this.betterScenario(strategy)

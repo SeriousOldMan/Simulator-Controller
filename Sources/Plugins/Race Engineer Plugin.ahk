@@ -444,6 +444,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 		local teamServer := this.TeamServer
 		local session := this.TeamSession
 		local first := true
+		local tries := 10
 		local stint, lastStint, newStint, driverID, lapPressures, ignore, lapData
 		local coldPressures, pressureLosses
 
@@ -476,10 +477,13 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 						if first {
 							if !tyresDB.lock(lapPressures[1], lapPressures[2], lapPressures[3], false) {
 								Sleep(200)
-								
-								continue
+
+								if (tries-- <= 0)
+									return
+								else
+									continue
 							}
-								
+
 							first := false
 						}
 
@@ -502,12 +506,15 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 				try {
 					for ignore, lapData in this.LapDatabase.Tables["Pressures"] {
 						if first {
-							if tyresDB.lock(lapData["Simulator"], lapData["Car"], lapData["Track"]) {
+							if !tyresDB.lock(lapData["Simulator"], lapData["Car"], lapData["Track"], false) {
 								Sleep(200)
-								
-								continue
+
+								if (tries-- <= 0)
+									return
+								else
+									continue
 							}
-							
+
 							first := false
 						}
 

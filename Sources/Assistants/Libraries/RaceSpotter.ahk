@@ -1549,8 +1549,8 @@ class RaceSpotter extends GridRaceAssistant {
 			speaker := this.getSpeaker(true)
 
 			knowledgeBase := this.KnowledgeBase
-			remainingSessionLaps := knowledgeBase.getValue("Lap.Remaining.Session")
-			remainingStintLaps := knowledgeBase.getValue("Lap.Remaining.Stint")
+			remainingSessionLaps := knowledgeBase.getValue("Lap.Remaining.Session", 0)
+			remainingStintLaps := knowledgeBase.getValue("Lap.Remaining.Stint", 0)
 			remainingSessionTime := Round(knowledgeBase.getValue("Session.Time.Remaining") / 60000)
 			remainingStintTime := Round(knowledgeBase.getValue("Driver.Time.Stint.Remaining") / 60000)
 
@@ -1660,7 +1660,7 @@ class RaceSpotter extends GridRaceAssistant {
 				}
 			}
 
-		if enoughData {
+		if (enoughData && (lastLap > (this.BaseLap + 2))) {
 			if ((remainingSessionLaps <= 3) && (Floor(remainingSessionLaps) > 1) && (this.Session = kSessionRace)) {
 				situation := "FinalLaps"
 
@@ -3260,8 +3260,11 @@ class RaceSpotter extends GridRaceAssistant {
 					}
 				}
 
-				trackAhead := carPositions[trackAhead][1]
-				trackBehind := carPositions[trackBehind][1]
+				if trackAhead
+					trackAhead := carPositions[trackAhead][1]
+
+				if trackBehind
+					trackBehind := carPositions[trackBehind][1]
 
 				if (gapAhead && standingsAhead) {
 					positions[standingsAhead][10] := gapAhead

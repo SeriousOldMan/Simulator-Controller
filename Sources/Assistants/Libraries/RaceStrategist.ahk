@@ -2861,6 +2861,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 	saveStandingsData(lapNumber, simulator, car, track) {
 		local knowledgeBase := this.KnowledgeBase
+		local hasDriverCategories := getMultiMapValue(this.Settings, "Assistant", "DriverCategories", false)
 		local driver, carCount, data, raceInfo, slots, grid, carNr, carID, key, fileName, slotsString
 		local data, pitstop, pitstops, prefix, times, positions, drivers, laps, carPrefix, carIndex
 		local driverForname, driverSurname, driverNickname, driverCategory, carCar, carCategory
@@ -3053,10 +3054,12 @@ class RaceStrategist extends GridRaceAssistant {
 
 					drivers[carIndex] := computeDriverName(driverForname, driverSurname, driverNickname)
 
-					driverCategory := knowledgeBase.getValue(carPrefix . ".Driver.Category", "Unknown")
+					if hasDriverCategories {
+						driverCategory := knowledgeBase.getValue(carPrefix . ".Driver.Category", "Unknown")
 
-					if (driverCategory != "Unknown")
-						drivers[carIndex] .= ("|||" . driverCategory)
+						if (driverCategory != "Unknown")
+							drivers[carIndex] .= ("|||" . driverCategory)
+					}
 				}
 			}
 

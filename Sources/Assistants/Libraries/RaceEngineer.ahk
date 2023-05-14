@@ -1400,9 +1400,6 @@ class RaceEngineer extends RaceAssistant {
 
 		result := super.addLap(lapNumber, &data)
 
-		if !result
-			return false
-
 		if (this.Speaker && (lastLap < (lapNumber - 2)) && (computeDriverName(driverForname, driverSurname, driverNickname) != this.DriverFullName))
 			this.getSpeaker().speakPhrase("WelcomeBack")
 

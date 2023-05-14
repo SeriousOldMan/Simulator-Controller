@@ -1626,11 +1626,6 @@ class RaceStrategist extends GridRaceAssistant {
 
 		result := super.addLap(lapNumber, &data)
 
-		if !result
-			return false
-
-		knowledgeBase := this.KnowledgeBase
-
 		if (this.Speaker && (lastLap < (lapNumber - 2))
 		 && (computeDriverName(driverForname, driverSurname, driverNickname) != this.DriverFullName))
 			this.getSpeaker().speakPhrase(ProcessExist("Race Engineer.exe") ? "" : "WelcomeBack")
@@ -2338,11 +2333,7 @@ class RaceStrategist extends GridRaceAssistant {
 					return false
 				else if (cPitstops < sPitstops)
 					return true
-				else if (scenario.getRemainingFuel() > strategy.getRemainingFuel())
-					return false
-				else if (scenario.getRemainingFuel() < strategy.getRemainingFuel())
-					return true
-				else if ((scenario.FuelConsumption[true] > strategy.FuelConsumption[true]))
+				else if ((scenario.FuelConsumption[true] >= strategy.FuelConsumption[true]))
 					return false
 				else
 					return true
@@ -2709,7 +2700,7 @@ class RaceStrategist extends GridRaceAssistant {
 																												  : "WeatherDryChange"
 									  , {minutes: minutes, compound: fragments[recommendedCompound . "Tyre"]})
 
-					if (this.Strategy && !getMultiMapValue(this.Settings, "Strategy Settings", "Strategy.Update.Laps", false)) {
+					if this.Strategy {
 						speaker.speakPhrase("ConfirmUpdateStrategy", false, true)
 
 						this.setContinuation(RaceStrategist.TyreChangeContinuation(this, ObjBindMethod(this, "recommendStrategy")

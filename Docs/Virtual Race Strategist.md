@@ -255,6 +255,8 @@ On the other side, you can restrict a report only to a given class or cup catego
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Reports%2011.JPG)
 
+Last, but not least, you can choose to display driver categories (i.e. Platinum, Gold, and so on), when they are supplied by the simulator.
+
 ## Strategy Development
 
 Another valuable tool, which is supported by Cato is the "Strategy Workbench". With the help of this tool, you can develop a pitstop and tyre strategy for an upcoming race. Simple sprint races with a single required pitstop are supported as well as endurance races with multiple stints and complex tyre and fuel saving strategies. An important feature of this tool is the ability to analyze telemetry data of past stints, that have been collected by Cato. This telemetry information is stored in the local database at the end of a session, as long as thiis has been activated in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-strategist) for the given simulator.

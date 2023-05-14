@@ -1638,7 +1638,7 @@ class RaceSpotter extends GridRaceAssistant {
 				}
 			}
 
-		if enoughData {
+		if (enoughData && (lastLap > (this.BaseLap + 2))) {
 			if ((remainingSessionLaps <= 3) && (Floor(remainingSessionLaps) > 1) && (this.Session = kSessionRace)) {
 				situation := "FinalLaps"
 
@@ -2894,9 +2894,6 @@ class RaceSpotter extends GridRaceAssistant {
 			loop getMultiMapValue(state, "Pitstop State", "Pitstop." . carNr . ".Count", 0)
 				pitstops.Push(RaceSpotter.Pitstop(carNr, string2Values(";", getMultiMapValue(state, "Pitstop State", "Pitstop." . carNr . "." . A_Index))*))
 		}
-
-		this.KnowledgeBase.clearFact("Lap.Remaining.Session")
-		this.KnowledgeBase.clearFact("Lap.Remaining.Stint")
 	}
 
 	adjustGaps(data, &gapAhead := false, &gapBehind := false) {

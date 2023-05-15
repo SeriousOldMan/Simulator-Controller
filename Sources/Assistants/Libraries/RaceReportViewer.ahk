@@ -1415,6 +1415,8 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 		classesDropDownMenu.Add(concatenate([translate("All")], classes))
 		classesDropDownMenu.Choose(1)
 
+		; classesDropDownMenu.Enabled := (categoriesDropDownMenu.Value > 1)
+
 		editReportSettings("UpdateDrivers")
 	}
 	else if (raceReport = "UpdateDrivers") {
@@ -1584,19 +1586,25 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 				chosen := 2
 
 			reportSettingsGui.Add("Text", "x16 " . yOption . " w70 h23 +0x200", translate("Categories"))
-			categoriesDropDownMenu := reportSettingsGui.Add("DropDownList", "x90 yp w160 Choose" . chosen, collect(["All", "Classes", "Cups"], translate))
+			categoriesDropDownMenu := reportSettingsGui.Add("DropDownList", "x90 yp w130 Choose" . chosen, collect(["All", "Classes", "Cups"], translate))
 			categoriesDropDownMenu.OnEvent("Change", editReportSettings.Bind("UpdateCategory"))
 
 			classes := raceReport.getReportClasses(raceData, true)
 
-			reportSettingsGui.Add("Text", "x16 yp+24 w70 h23 +0x200", translate("Class"))
-			classesDropDownMenu := reportSettingsGui.Add("DropDownList", "x90 yp w160", concatenate([translate("All")], classes))
+			; reportSettingsGui.Add("Text", "x16 yp+24 w70 h23 +0x200", translate("Class"))
+			classesDropDownMenu := reportSettingsGui.Add("DropDownList", "x224 yp w130", concatenate([translate("All")], classes))
 			classesDropDownMenu.OnEvent("Change", editReportSettings.Bind("UpdateDrivers"))
 
-			if raceReport.Settings.Has("Classes")
-				classesDropDownMenu.Choose(1 + inList(classes, raceReport.Settings["Classes"][1]))
-			else
+			if (chosen = 1) {
 				classesDropDownMenu.Choose(1)
+				; classesDropDownMenu.Enabled := false
+			}
+			else {
+				if raceReport.Settings.Has("Classes")
+					classesDropDownMenu.Choose(1 + inList(classes, raceReport.Settings["Classes"][1]))
+				else
+					classesDropDownMenu.Choose(1)
+			}
 
 			reportSettingsGui.Add("Text", "x16 yp+24 w70 h23 +0x200 Section", translate("Drivers"))
 			driverCategoriesCheck := reportSettingsGui.Add("CheckBox", "x90 yp+4", translate("Categories?"))

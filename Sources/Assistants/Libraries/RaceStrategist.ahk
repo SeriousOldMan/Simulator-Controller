@@ -1716,14 +1716,16 @@ class RaceStrategist extends GridRaceAssistant {
 			}
 		}
 
-		frequency := getMultiMapValue(this.Settings, "Strategy Settings", "Strategy.Update.Laps", false)
+		if this.Strategy {
+			frequency := getMultiMapValue(this.Settings, "Strategy Settings", "Strategy.Update.Laps", false)
 
-		if (frequency && this.hasEnoughData(false)) {
-			if (lapNumber > (this.iLastStrategyUpdate + frequency))
-				knowledgeBase.setFact("Strategy.Recalculate", "Regular")
+			if (frequency && this.hasEnoughData(false)) {
+				if (lapNumber > (this.iLastStrategyUpdate + frequency))
+					knowledgeBase.setFact("Strategy.Recalculate", "Regular")
+			}
+			else
+				this.iLastStrategyUpdate := lapNumber
 		}
-		else
-			this.iLastStrategyUpdate := lapNumber
 
 		this.saveStandingsData(lapNumber, simulator, car, track)
 

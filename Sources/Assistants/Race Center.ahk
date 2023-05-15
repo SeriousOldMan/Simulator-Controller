@@ -2549,7 +2549,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	getClass(data, car := false) {
-		local categories := (this.ReportViewer.Settings.Has("Categories") ? this.ReportViewer.Settings["Categories"] : ["Class"])
+		local categories := (this.ReportViewer.Settings.Has("CarCategories") ? this.ReportViewer.Settings["CarCategories"] : ["Class"])
 		local carClass, carCategory
 
 		if !car
@@ -10352,7 +10352,7 @@ class RaceCenter extends ConfigurationItem {
 		local driverFornames := true
 		local driverSurnames := true
 		local driverNicknames := true
-		local driverCategories := true
+		local driverCategories := (this.ReportViewer.Settings.Has("DriverCategories") && this.ReportViewer.Settings["DriverCategories"])
 		local index, position, lapTime, laps, delta, result, multiClass, numPitstops, ignore, pitstop, pitstops, pitstopLaps
 
 		multiClass := this.getStandings(lap, &cars, &carIDs, &overallPositions, &classPositions, &carNumbers, &carNames
@@ -10391,7 +10391,7 @@ class RaceCenter extends ConfigurationItem {
 
 				driver := computeDriverName(driverFornames[index] , driverSurnames[index], driverNickNames[index])
 
-				if (driverCategories[index] != "Unknown")
+				if (driverCategories && (driverCategories[index] != "Unknown"))
 					driver .= (translate(" [") . translate(driverCategories[index]) . translate("]"))
 
 				html .= ("<tr><th class=`"th-std`">" . position . "</th>")

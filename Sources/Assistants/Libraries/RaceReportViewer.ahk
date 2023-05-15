@@ -192,8 +192,8 @@ class RaceReportViewer extends RaceReportReader {
 	getClass(raceData, car, categories?) {
 		if isSet(categories)
 			return super.getClass(raceData, car, categories)
-		else if this.Settings.Has("Categories")
-			return super.getClass(raceData, car, this.Settings["Categories"])
+		else if this.Settings.Has("CarCategories")
+			return super.getClass(raceData, car, this.Settings["CarCategories"])
 		else
 			return super.getClass(raceData, car)
 	}
@@ -294,7 +294,7 @@ class RaceReportViewer extends RaceReportReader {
 		if report {
 			raceData := true
 			drivers := true
-			categories := true
+			categories := (this.Settings.Has("DriverCategories") && this.Settings["DriverCategories"])
 			positions := true
 			times := true
 
@@ -392,7 +392,7 @@ class RaceReportViewer extends RaceReportReader {
 
 					driver := StrReplace(drivers[1][A_Index], "'", "\'")
 
-					if (categories[1][A_Index] != "Unknown")
+					if (categories && (categories[1][A_Index] != "Unknown"))
 						driver .= (translate(" [") . translate(categories[1][A_Index]) . translate("]"))
 
 					rows.Push(Array("'" . class . "'", "'" . nr . "'"
@@ -567,7 +567,7 @@ class RaceReportViewer extends RaceReportReader {
 		if report {
 			raceData := true
 			drivers := true
-			categories := true
+			categories := (this.Settings.Has("DriverCategories") && this.Settings["DriverCategories"])
 			positions := true
 			times := true
 
@@ -587,10 +587,13 @@ class RaceReportViewer extends RaceReportReader {
 
 			for ignore, car in cars {
 				driver := StrReplace(allDrivers[car], "'", "\'")
-				category := categories[car]
 
-				if (category != "Unknown")
-					driver .= (translate(" [") . translate(category) . translate("]"))
+				if categories {
+					category := categories[car]
+
+					if (category != "Unknown")
+						driver .= (translate(" [") . translate(category) . translate("]"))
+				}
 
 				drivers.Push(driver)
 			}
@@ -1338,6 +1341,7 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 	static driverSelectCheck
 	static categoriesDropDownMenu
 	static classesDropDownMenu
+	static driverCategoriesCheck
 	static allLapsRadio
 	static rangeLapsRadio
 	static driversListView
@@ -1564,8 +1568,8 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 		if inList(options, "Classes") {
 			yOption := (inList(options, "Laps") ? "yp+30" : "yp+10")
 
-			if raceReport.Settings.Has("Categories") {
-				categories := raceReport.Settings["Categories"]
+			if raceReport.Settings.Has("CarCategories") {
+				categories := raceReport.Settings["CarCategories"]
 
 				if (inList(categories, "Class") && inList(categories, "Cup"))
 					chosen := 1
@@ -1579,13 +1583,13 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 			else
 				chosen := 2
 
-			reportSettingsGui.Add("Text", "x16 " . yOption . " w70 h23 +0x200 Section", translate("Categories"))
+			reportSettingsGui.Add("Text", "x16 " . yOption . " w70 h23 +0x200", translate("CarCategories"))
 			categoriesDropDownMenu := reportSettingsGui.Add("DropDownList", "x90 yp w160 Choose" . chosen, collect(["All", "Classes", "Cups"], translate))
 			categoriesDropDownMenu.OnEvent("Change", editReportSettings.Bind("UpdateCategory"))
 
 			classes := raceReport.getReportClasses(raceData, true)
 
-			reportSettingsGui.Add("Text", "x16 yp+24 w70 h23 +0x200 Section", translate("Class"))
+			reportSettingsGui.Add("Text", "x16 yp+24 w70 h23 +0x200", translate("Class"))
 			classesDropDownMenu := reportSettingsGui.Add("DropDownList", "x90 yp w160", concatenate([translate("All")], classes))
 			classesDropDownMenu.OnEvent("Change", editReportSettings.Bind("UpdateDrivers"))
 
@@ -1593,6 +1597,12 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 				classesDropDownMenu.Choose(1 + inList(classes, raceReport.Settings["Classes"][1]))
 			else
 				classesDropDownMenu.Choose(1)
+
+			reportSettingsGui.Add("Text", "x16 yp+24 w70 h23 +0x200 Section", translate("Drivers"))
+			driverCategoriesCheck := reportSettingsGui.Add("CheckBox", "x90 yp+4", "Categories?")
+
+			if raceReport.Settings.Has("DriverCategories")
+				driverCategoriesCheck.Value := raceReport.Settings["DriverCategories"]
 		}
 
 		if (inList(options, "Drivers") || inList(options, "Cars")) {
@@ -1692,10 +1702,12 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 			if inList(options, "Classes") {
 				categories := getCategories()
 
-				result["Categories"] := categories
+				result["CarCategories"] := categories
 
 				if (classesDropDownMenu.Value > 1)
 					result["Classes"] := [raceReport.getReportClasses(raceData, true, categories)[classesDropDownMenu.Value - 1]]
+
+				result["DriverCategories"] := driverCategoriesCheck.Value
 			}
 			else
 				categories := ["Class"]

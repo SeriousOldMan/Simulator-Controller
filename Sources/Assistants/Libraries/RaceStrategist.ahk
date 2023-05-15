@@ -2357,11 +2357,7 @@ class RaceStrategist extends GridRaceAssistant {
 					return false
 				else if (cPitstops < sPitstops)
 					return true
-				else if (scenario.getRemainingFuel() > strategy.getRemainingFuel())
-					return false
-				else if (scenario.getRemainingFuel() < strategy.getRemainingFuel())
-					return true
-				else if ((scenario.FuelConsumption[true] > strategy.FuelConsumption[true]))
+				else if ((scenario.FuelConsumption[true] >= strategy.FuelConsumption[true]))
 					return false
 				else
 					return true

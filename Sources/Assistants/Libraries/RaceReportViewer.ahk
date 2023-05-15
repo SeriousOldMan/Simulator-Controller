@@ -263,6 +263,9 @@ class RaceReportViewer extends RaceReportReader {
 
 			if (!result.Has("Classes") && this.Settings.Has("Classes"))
 				this.Settings.Delete("Classes")
+
+			if (!result.Has("Categories") && this.Settings.Has("Categories"))
+				this.Settings.Delete("Categories")
 		}
 
 		return (result != false)
@@ -1570,6 +1573,8 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 		if inList(options, "Classes") {
 			yOption := (inList(options, "Laps") ? "yp+30" : "yp+10")
 
+			categories := false
+
 			if raceReport.Settings.Has("CarCategories") {
 				categories := raceReport.Settings["CarCategories"]
 
@@ -1589,22 +1594,16 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 			categoriesDropDownMenu := reportSettingsGui.Add("DropDownList", "x90 yp w130 Choose" . chosen, collect(["All", "Classes", "Cups"], translate))
 			categoriesDropDownMenu.OnEvent("Change", editReportSettings.Bind("UpdateCategory"))
 
-			classes := raceReport.getReportClasses(raceData, true)
+			classes := (categories ? raceReport.getReportClasses(raceData, true, categories) : raceReport.getReportClasses(raceData, true))
 
 			; reportSettingsGui.Add("Text", "x16 yp+24 w70 h23 +0x200", translate("Class"))
 			classesDropDownMenu := reportSettingsGui.Add("DropDownList", "x224 yp w130", concatenate([translate("All")], classes))
 			classesDropDownMenu.OnEvent("Change", editReportSettings.Bind("UpdateDrivers"))
 
-			if (chosen = 1) {
+			if raceReport.Settings.Has("Classes")
+				classesDropDownMenu.Choose(1 + inList(classes, raceReport.Settings["Classes"][1]))
+			else
 				classesDropDownMenu.Choose(1)
-				; classesDropDownMenu.Enabled := false
-			}
-			else {
-				if raceReport.Settings.Has("Classes")
-					classesDropDownMenu.Choose(1 + inList(classes, raceReport.Settings["Classes"][1]))
-				else
-					classesDropDownMenu.Choose(1)
-			}
 
 			reportSettingsGui.Add("Text", "x16 yp+24 w70 h23 +0x200 Section", translate("Drivers"))
 			driverCategoriesCheck := reportSettingsGui.Add("CheckBox", "x90 yp+4", translate("Categories?"))

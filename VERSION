@@ -1,8 +1,8 @@
 [Development]
-Version=5.0.5.0-dev
+Version=5.0.5.0-preview
 Target=5.0.5.0-release
 Date=05/14/2023
-Download=
+Download=https://www.dropbox.com/s/c6zwxhyjuvyg1va/Simulator%20Controller%205.0.5.0-preview.zip?dl=1
 Changes=New observation range settings for opponent information given by the Spotter, Automatic updates of the strategy handled by the Strategist, Support for Cup categories in addition to class in multi-class races, Driver categories (if available) shown in "Race Reports" and "Race Center", Fixed handling of *No tyre change* in "Race Center", New stint optimizations in "Strategy Workbench"
 [Release]
 Version=5.0.3.0-release
@@ -13,4 +13,4 @@ Changes=Fixed calculation of tyre laps in "Race Center", Fixed identification of
 Type=Development
 [Version]
 Release=5.0.3.0-release
-Development=5.0.5.0-dev
+Development=5.0.5.0-preview

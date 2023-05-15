@@ -1583,7 +1583,7 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 			else
 				chosen := 2
 
-			reportSettingsGui.Add("Text", "x16 " . yOption . " w70 h23 +0x200", translate("CarCategories"))
+			reportSettingsGui.Add("Text", "x16 " . yOption . " w70 h23 +0x200", translate("Categories"))
 			categoriesDropDownMenu := reportSettingsGui.Add("DropDownList", "x90 yp w160 Choose" . chosen, collect(["All", "Classes", "Cups"], translate))
 			categoriesDropDownMenu.OnEvent("Change", editReportSettings.Bind("UpdateCategory"))
 
@@ -1599,7 +1599,7 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 				classesDropDownMenu.Choose(1)
 
 			reportSettingsGui.Add("Text", "x16 yp+24 w70 h23 +0x200 Section", translate("Drivers"))
-			driverCategoriesCheck := reportSettingsGui.Add("CheckBox", "x90 yp+4", "Categories?")
+			driverCategoriesCheck := reportSettingsGui.Add("CheckBox", "x90 yp+4", translate("Categories?"))
 
 			if raceReport.Settings.Has("DriverCategories")
 				driverCategoriesCheck.Value := raceReport.Settings["DriverCategories"]

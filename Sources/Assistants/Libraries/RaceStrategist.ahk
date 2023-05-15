@@ -2310,6 +2310,15 @@ class RaceStrategist extends GridRaceAssistant {
 		local cPitstops := scenario.Pitstops.Length
 		local sLaps, cLaps, sTime, cTime
 
+		pitstopLaps(strategy) {
+			local laps := 0
+
+			for ignore, pitstop in strategy.Pitstops
+				laps += pitstop.Lap
+
+			return laps
+		}
+
 		if isDebug() {
 			logMessage(kLogDebug, "Session Format: " . knowledgeBase.getValue("Session.Format", "Time"))
 
@@ -2332,6 +2341,8 @@ class RaceStrategist extends GridRaceAssistant {
 				if (cPitstops > sPitstops)
 					return false
 				else if (cPitstops < sPitstops)
+					return true
+				else if (pitstopLaps(scenario) > pitstopLaps(strategy))
 					return true
 				else if ((scenario.FuelConsumption[true] >= strategy.FuelConsumption[true]))
 					return false
@@ -2357,9 +2368,7 @@ class RaceStrategist extends GridRaceAssistant {
 					return false
 				else if (cPitstops < sPitstops)
 					return true
-				else if (scenario.getRemainingFuel() > strategy.getRemainingFuel())
-					return false
-				else if (scenario.getRemainingFuel() < strategy.getRemainingFuel())
+				else if (pitstopLaps(scenario) > pitstopLaps(strategy))
 					return true
 				else if ((scenario.FuelConsumption[true] > strategy.FuelConsumption[true]))
 					return false

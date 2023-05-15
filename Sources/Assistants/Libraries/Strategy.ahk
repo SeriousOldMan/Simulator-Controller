@@ -533,6 +533,15 @@ class StrategySimulation {
 	compareScenarios(scenario1, scenario2) {
 		local sLaps, cLaps, sTime, cTime
 
+		pitstopLaps(strategy) {
+			local laps := 0
+
+			for ignore, pitstop in strategy.Pitstops
+				laps += pitstop.Lap
+
+			return laps
+		}
+
 		if (this.SessionType = "Duration") {
 			sLaps := scenario1.getSessionLaps()
 			cLaps := scenario2.getSessionLaps()
@@ -548,6 +557,10 @@ class StrategySimulation {
 					return scenario1
 				else if (scenario2.Pitstops.Length < scenario1.Pitstops.Length)
 					return scenario2
+				else if (pitstopLaps(scenario2) > pitstopLaps(scenario1))
+					return scenario2
+				else if (pitstopLaps(scenario2) < pitstopLaps(scenario1))
+					return scenario1
 				else if (scenario2.getRemainingFuel() > scenario1.getRemainingFuel())
 					return scenario1
 				else if (scenario2.getRemainingFuel() < scenario1.getRemainingFuel())
@@ -568,6 +581,10 @@ class StrategySimulation {
 					return scenario1
 				else if (scenario2.Pitstops.Length < scenario1.Pitstops.Length)
 					return scenario2
+				else if (pitstopLaps(scenario2) > pitstopLaps(scenario1))
+					return scenario2
+				else if (pitstopLaps(scenario2) < pitstopLaps(scenario1))
+					return scenario1
 				if (scenario2.getRemainingFuel() > scenario1.getRemainingFuel())
 					return scenario1
 				else if (scenario2.getRemainingFuel() < scenario1.getRemainingFuel())

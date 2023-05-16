@@ -1015,6 +1015,8 @@ class RaceSpotter extends GridRaceAssistant {
 	}
 
 	handleVoiceCommand(grammar, words) {
+		local reset := true
+
 		switch grammar, false {
 			case "Position":
 				this.positionRecognized(words)
@@ -1029,8 +1031,13 @@ class RaceSpotter extends GridRaceAssistant {
 			case "GapToLeader":
 				this.gapToLeaderRecognized(words)
 			default:
+				reset := false
+
 				super.handleVoiceCommand(grammar, words)
 		}
+
+		if reset
+			this.clearContinuation()
 	}
 
 	positionRecognized(words) {
@@ -3304,6 +3311,8 @@ class RaceSpotter extends GridRaceAssistant {
 	}
 
 	requestInformation(category, arguments*) {
+		this.clearContinuation()
+
 		switch category, false {
 			case "Time":
 				this.timeRecognized([])

@@ -598,6 +598,8 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	handleVoiceCommand(grammar, words) {
+		local reset := true
+
 		switch grammar, false {
 			case "LapsRemaining":
 				this.lapsRemainingRecognized(words)
@@ -624,6 +626,8 @@ class RaceStrategist extends GridRaceAssistant {
 			case "NextPitstop":
 				this.nextPitstopRecognized(words)
 			case "StrategyRecommend":
+				reset := false
+
 				this.clearContinuation()
 
 				if !this.hasEnoughData()
@@ -638,6 +642,8 @@ class RaceStrategist extends GridRaceAssistant {
 
 				this.recommendStrategyRecognized(words)
 			case "PitstopRecommend":
+				reset := false
+
 				this.clearContinuation()
 
 				if !this.hasEnoughData()
@@ -652,6 +658,8 @@ class RaceStrategist extends GridRaceAssistant {
 
 				this.recommendPitstopRecognized(words)
 			case "PitstopSimulate":
+				reset := false
+
 				this.clearContinuation()
 
 				if !this.hasEnoughData()
@@ -666,8 +674,13 @@ class RaceStrategist extends GridRaceAssistant {
 
 				this.simulatePitstopRecognized(words)
 			default:
+				reset := false
+
 				super.handleVoiceCommand(grammar, words)
 		}
+
+		if reset
+			this.clearContinuation()
 	}
 
 	lapsRemainingRecognized(words) {
@@ -1771,6 +1784,8 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	requestInformation(category, arguments*) {
+		this.clearContinuation()
+
 		switch category, false {
 			case "Time":
 				this.timeRecognized([])
@@ -1920,6 +1935,8 @@ class RaceStrategist extends GridRaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local request := (options.HasProp("Request") ? options.Request : "User")
 		local engineerPID
+
+		this.clearContinuation()
 
 		if !this.hasEnoughData()
 			return
@@ -2477,6 +2494,8 @@ class RaceStrategist extends GridRaceAssistant {
 		local tyreCompoundColor := kUndefined
 		local strategyLap := false
 		local lastLap, plannedLap, position, traffic, hasEngineer, nextPitstop, pitstopOptions
+
+		this.clearContinuation()
 
 		if !this.hasEnoughData()
 			return
@@ -3177,18 +3196,24 @@ updatePositions(context, futureLap) {
 }
 
 weatherChangeNotification(context, change, minutes) {
+	context.KnowledgeBase.RaceAssistant.clearContinuation()
+
 	context.KnowledgeBase.RaceAssistant.weatherChangeNotification(change, minutes)
 
 	return true
 }
 
 weatherTyreChangeRecommendation(context, minutes, recommendedCompound) {
+	context.KnowledgeBase.RaceAssistant.clearContinuation()
+
 	context.KnowledgeBase.RaceAssistant.weatherTyreChangeRecommendation(minutes, recommendedCompound)
 
 	return true
 }
 
 reportUpcomingPitstop(context, lap) {
+	context.KnowledgeBase.RaceAssistant.clearContinuation()
+
 	context.KnowledgeBase.RaceAssistant.reportUpcomingPitstop(lap)
 
 	return true

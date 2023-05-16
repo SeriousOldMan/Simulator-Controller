@@ -532,7 +532,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				field.ValidText := field.Text
 			else {
 				field.Text := (field.HasProp("ValidText") ? field.ValidText : minValue)
-				
+
 				loop 10
 					SendInput("{Right}")
 			}
@@ -545,7 +545,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				field.ValidText := field.Text
 			else {
 				field.Text := (field.HasProp("ValidText") ? field.ValidText : minValue)
-				
+
 				loop 10
 					SendInput("{Right}")
 			}
@@ -2551,11 +2551,11 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		switch line {
 			case 3: ; "Run Simulation"
-				selectStrategy := GetKeyState("Ctrl")
+				selectStrategy := GetKeyState("Ctrl", "P")
 
 				this.runSimulation()
 
-				if selectStrategy
+				if (selectStrategy && !GetKeyState("Escape", "P"))
 					this.chooseSimulationMenu(5)
 			case 5: ; "Use as Strategy..."
 				strategy := this.SelectedScenario

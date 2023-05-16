@@ -849,7 +849,7 @@ class VariationSimulation extends StrategySimulation {
 		this.getSimulationSettings(&useInitialConditions, &useTelemetryData, &consumption, &initialFuel, &tyreUsage, &tyreCompoundVariation)
 
 		consumptionSteps := 1
-		tyreUsageSteps := tyreUsage
+		tyreUsageSteps := tyreUsage * 2
 		tyreCompoundVariationSteps := tyreCompoundVariation / 4
 		initialFuelSteps := initialFuel / 10
 
@@ -1204,7 +1204,7 @@ class TrafficSimulation extends StrategySimulation {
 		this.getSimulationSettings(&useInitialConditions, &useTelemetryData, &consumption, &initialFuel, &tyreUsage, &tyreCompoundVariation)
 
 		consumptionSteps := 1
-		tyreUsageSteps := tyreUsage
+		tyreUsageSteps := tyreUsage * 2
 		tyreCompoundVariationSteps := tyreCompoundVariation / 4
 		initialFuelSteps := initialFuel / 10
 

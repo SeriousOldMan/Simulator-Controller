@@ -164,7 +164,7 @@ class SyncSessionTask extends RaceCenterTask {
 	run() {
 		super.run()
 
-		this.NextExecution := (A_TickCount + 10000)
+		this.Sleep := (RaceCenter.Instance.Synchronize * 1000)
 
 		return this
 	}
@@ -208,7 +208,7 @@ class RaceCenter extends ConfigurationItem {
 	iSessionIdentifier := false
 	iSessionName := false
 
-	iSynchronize := true
+	iSynchronize := 10
 
 	iSessionLoaded := false
 	iSessionFinished := false
@@ -4242,7 +4242,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	chooseSessionMenu(line) {
-		local msgResult
+		local msgResult, synchronizeMenu, ignore, seconds
 
 		switch line {
 			case 3: ; Connect...
@@ -4267,7 +4267,33 @@ class RaceCenter extends ConfigurationItem {
 					OnMessage(0x44, translateOkButton, 0)
 				}
 			case 6: ; Synchronize
-				this.iSynchronize := !this.Synchronize
+				if GetKeyState("Ctrl", "P") {
+					synchronizeMenu := Menu()
+
+					synchronizeMenu.Add(translate("Synchronize each..."), (*) => {})
+					synchronizeMenu.Disable(translate("Synchronize each..."))
+
+					synchronizeMenu.Add()
+
+					synchronizeMenu.Add(translate("Off"), (*) => (this.iSynchronize := false))
+
+					for ignore, seconds in [4, 5, 6, 8, 10, 12, 14, 16, 20, 25, 30, 40, 50, 60] {
+						setSynchronize(seconds, *) {
+							this.iSynchronize := seconds
+						}
+
+						synchronizeMenu.Add(seconds . translate(" seconds"), setSynchronize.Bind(seconds))
+
+						if (seconds = this.Synchronize)
+							synchronizeMenu.Check(seconds . translate(" seconds"))
+					}
+
+					synchronizeMenu.Show()
+				}
+				else if this.Synchronize
+					this.iSynchronize := false
+				else
+					this.iSynchronize := 10
 
 				this.updateState()
 			case 8:

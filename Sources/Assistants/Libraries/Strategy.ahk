@@ -535,6 +535,7 @@ class StrategySimulation {
 
 		pitstopLaps(strategy) {
 			local laps := 0
+			local ignore, pitstop
 
 			for ignore, pitstop in strategy.Pitstops
 				laps += pitstop.Lap

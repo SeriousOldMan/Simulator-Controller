@@ -262,8 +262,8 @@ class StrategySimulation {
 					tyreCompoundColor := false
 				}
 
-				knowledgeBase.addRule(compiler.compileRule("pitstop(" . number . "," . Round(pitstop.RefuelAmount) . ","
-																	  . tyreCompound . "," . tyreCompoundColor . ")"))
+				knowledgeBase.addRule(compiler.compileRule("pitstop(" . number . "," . pitstop.Lap . "," . pitstop.Time / 60000 . ","
+																	  . Round(pitstop.RefuelAmount) . "," . tyreCompound . "," . tyreCompoundColor . ")"))
 			}
 
 			if isDebug()

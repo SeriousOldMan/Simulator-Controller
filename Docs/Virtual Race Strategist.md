@@ -430,6 +430,32 @@ Although the logical predicates in *Prolog* look like function calls, the semant
   8. *tyreCompounds(?tyreSets, ?tyreCompound, ?tyreCompoundColors)*
   
      Use this predicate to query the different mixtures (colors) for a given tyre compound. *?tyreSets* is a list of tyre sets as *returned* for example by the *tyreSets* predicate. *?tyreCompound* is identified with the base compound, for example "Dry", "Wet" and so on. For each base compound the list of unique tyre compound colors is unified with *?tyreCompoundColors*. Take a look at the "Formula 1" example, to see how this predicate can be used.
+
+The above predicates will give you summarized information about all pitstops, which will be sufficient in most cases. But you can also acquire informations about each individual pitstop.
+
+  1. *pitstops(?count)*
+
+     *?count* will be unified with the overall number of pitstops.
+	 
+  2. *pitstopLap(?nr, ?lap)*
+  
+     This predicate will give you access to the planned lap for each pitstop.
+	 
+  3. *pitstopTime(?nr, ?minute)*
+  
+     This predicate will give you access to the planned time (minute into the race) for each pitstop.
+	 
+  4. *pitstopFuel(?nr, ?fuelAmount)*
+  
+     *?fuelAmount* will be unifed with the amount of fuel (in liters), which should be added at the pitstop with *?nr*.
+	 
+  5. *pitstopTyreCompound(?nr, ?tyreCompound, ?tyreCompoundColor)*
+  
+     Gives you access to the tyre compound and mixture to be mounted at the pitstop with *?nr*. When no tyre change is planned, *?tyreCompound* will be unified with false.
+
+  6. *pitstop(?nr, ?lap, ?minute, ?fuelAmount, ?tyreCompound, ?tyreCompoundColor)*
+  
+     This predicate combines all indivdual ones from above like *pitstopLap* into one single predicate which gives you access too all aspects of the pitstop with *?nr* at once.
   
 Beside these predicates, which access the data of the current scenario, you have a set of additional predicates, which you can use to implement your validation rules.
 

@@ -47,7 +47,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[5.0.5.0-beta]() (Test version for 5.0.5. Changes: New observation range settings for opponent information given by the Spotter, Automatic updates of the strategy handled by the Strategist, Support for Cup categories in addition to class in multi-class races, Driver categories (if available) shown in "Race Reports" and "Race Center", Fixed handling of *No tyre change* in "Race Center", New stint optimizations in "Strategy Workbench", Cancel running strategy simulations, Configurable data refresh for "Race Center".)
+[5.0.5.0-beta](https://www.dropbox.com/s/19iafnpyek3og6v/Simulator%20Controller%205.0.5.0-beta.zip?dl=1) (Test version for 5.0.5. Changes: New observation range settings for opponent information given by the Spotter, Automatic updates of the strategy handled by the Strategist, Support for Cup categories in addition to class in multi-class races, Driver categories (if available) shown in "Race Reports" and "Race Center", Fixed handling of *No tyre change* in "Race Center", New stint optimizations in "Strategy Workbench", Cancel running strategy simulations, Configurable data refresh for "Race Center", New car models for "Setup Workbench".)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-505) of this version and all the versions you might have skipped, before installing and using this version.
 

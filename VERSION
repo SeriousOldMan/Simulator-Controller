@@ -3,7 +3,7 @@ Version=5.0.5.0-beta
 Target=5.0.5.0-release
 Date=05/17/2023
 Download=
-Changes=New observation range settings for opponent information given by the Spotter, Automatic updates of the strategy handled by the Strategist, Support for Cup categories in addition to class in multi-class races, Driver categories (if available) shown in "Race Reports" and "Race Center", Fixed handling of *No tyre change* in "Race Center", New stint optimizations in "Strategy Workbench", Cancel running strategy simulations, Configurable data refresh for "Race Center"
+Changes=New observation range settings for opponent information given by the Spotter, Automatic updates of the strategy handled by the Strategist, Support for Cup categories in addition to class in multi-class races, Driver categories (if available) shown in "Race Reports" and "Race Center", Fixed handling of *No tyre change* in "Race Center", New stint optimizations in "Strategy Workbench", Cancel running strategy simulations, Configurable data refresh for "Race Center", New car models for "Setup Workbench"
 [Release]
 Version=5.0.3.0-release
 Date=05/12/2023

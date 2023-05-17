@@ -1723,7 +1723,7 @@ class RaceStrategist extends GridRaceAssistant {
 		if this.Strategy {
 			frequency := getMultiMapValue(this.Settings, "Strategy Settings", "Strategy.Update.Laps", false)
 
-			if (frequency && this.hasEnoughData(false) && (lapNumber >= this.BaseLap + knowledgeBase("Session.Settings.Lap.History.Considered", 5))) {
+			if (frequency && this.hasEnoughData(false) && (lapNumber >= this.BaseLap + knowledgeBase.getValue("Session.Settings.Lap.History.Considered", 5))) {
 				if (lapNumber > (this.iLastStrategyUpdate + frequency))
 					knowledgeBase.setFact("Strategy.Recalculate", "Regular")
 			}

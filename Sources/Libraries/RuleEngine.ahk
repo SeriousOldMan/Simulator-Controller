@@ -2741,6 +2741,10 @@ class KnowledgeBase {
 		this.Facts.setFact(fact, value, propagate)
 	}
 
+	getFact(fact, default := kNotInitialized) {
+		return this.Facts.getValue(fact, default)
+	}
+
 	clearFact(fact) {
 		this.Facts.clearFact(fact)
 	}

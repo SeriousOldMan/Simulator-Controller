@@ -13,6 +13,10 @@
   10. Fixed handling of *No tyre change* in pitstop preparation in "Race Center".
   11. Fixed handling of pitstop preparation in "Race Center", when no strategy has been selected.
   12. Fixed saving of tyre pressure data at the end of a solo session.
+  13. New car models for "Setup Workbench":
+      - Assetto Corsa
+	    - Nissan 370Z NISMO 2016
+		- Nissan GT-R NISMO
 
 ## 5.0.3.0-release 05/12/23
   1. Minor bugfixes, as always

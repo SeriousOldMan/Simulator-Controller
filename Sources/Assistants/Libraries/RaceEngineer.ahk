@@ -1184,12 +1184,6 @@ class RaceEngineer extends RaceAssistant {
 		local configuration := this.Configuration
 		local simulatorName := this.SettingsDatabase.getSimulatorName(facts["Session.Simulator"])
 
-		facts["Session.Settings.Lap.Learning.Laps"]
-			:= getMultiMapValue(configuration, "Race Engineer Analysis", simulatorName . ".LearningLaps", 1)
-		facts["Session.Settings.Lap.History.Considered"]
-			:= getMultiMapValue(configuration, "Race Engineer Analysis", simulatorName . ".ConsideredHistoryLaps", 5)
-		facts["Session.Settings.Lap.History.Damping"]
-			:= getMultiMapValue(configuration, "Race Engineer Analysis", simulatorName . ".HistoryLapsDamping", 0.2)
 		facts["Session.Settings.Damage.Analysis.Laps"]
 			:= getMultiMapValue(configuration, "Race Engineer Analysis", simulatorName . ".DamageAnalysisLaps", 1)
 

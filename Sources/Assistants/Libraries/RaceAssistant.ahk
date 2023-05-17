@@ -1093,7 +1093,10 @@ class RaceAssistant extends ConfigurationItem {
 									  , "Session.Time.Remaining", getDeprecatedValue(data, "Session Data", "Stint Data", "SessionTimeRemaining", 0)
 									  , "Session.Lap.Remaining", getDeprecatedValue(data, "Session Data", "Stint Data", "SessionLapsRemaining", 0)
 									  , "Session.Settings.Lap.Time.Adjust", this.AdjustLapTime
-									  , "Session.Settings.Fuel.Max", getMultiMapValue(data, "Session Data", "FuelAmount", 0)))
+									  , "Session.Settings.Fuel.Max", getMultiMapValue(data, "Session Data", "FuelAmount", 0)
+									  , "Session.Settings.Lap.Learning.Laps", getMultiMapValue(configuration, this.AssistantType . " Analysis", simulatorName . ".LearningLaps", 1)
+									  , "Session.Settings.Lap.History.Considered", getMultiMapValue(configuration, this.AssistantType . " Analysis", simulatorName . ".ConsideredHistoryLaps", 5)
+									  , "Session.Settings.Lap.History.Damping", getMultiMapValue(configuration, this.AssistantType . " Analysis", simulatorName . ".HistoryLapsDamping", 0.2)))
 
 		this.initializeSessionFormat(facts, settings, data, lapTime)
 

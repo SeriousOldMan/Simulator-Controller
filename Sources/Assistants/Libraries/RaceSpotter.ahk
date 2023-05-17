@@ -2663,21 +2663,6 @@ class RaceSpotter extends GridRaceAssistant {
 		return false
 	}
 
-	createSession(&settings, &data) {
-		local facts := super.createSession(&settings, &data)
-		local simulatorName := this.SettingsDatabase.getSimulatorName(facts["Session.Simulator"])
-		local configuration := this.Configuration
-
-		facts["Session.Settings.Lap.Learning.Laps"]
-			:= getMultiMapValue(configuration, "Race Spotter Analysis", simulatorName . ".LearningLaps", 1)
-		facts["Session.Settings.Lap.History.Considered"]
-			:= getMultiMapValue(configuration, "Race Spotter Analysis", simulatorName . ".ConsideredHistoryLaps", 5)
-		facts["Session.Settings.Lap.History.Damping"]
-			:= getMultiMapValue(configuration, "Race Spotter Analysis", simulatorName . ".HistoryLapsDamping", 0.2)
-
-		return facts
-	}
-
 	initializeAnnouncements(data) {
 		local simulator := getMultiMapValue(data, "Session Data", "Simulator", "Unknown")
 		local simulatorName := this.SettingsDatabase.getSimulatorName(simulator)

@@ -1333,7 +1333,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		value := getMultiMapValue(settingsOrCommand, "Strategy Settings", "Strategy.Update.Pitstop", false)
 
-		settingsGui.Add("CheckBox", "x16 YP+25 w108 Checked" . (value > 0) . " VstrategyUpdatePitstopCheck", translate("Revise when")).OnEvent("Click", updateStrategyPitstop.Bind("Check"))
+		settingsGui.Add("CheckBox", "x16 YP+25 w108 Checked" . (value > 0) . " VstrategyUpdatePitstopCheck", translate("Revise if")).OnEvent("Click", updateStrategyPitstop.Bind("Check"))
 		settingsGui.Add("Edit", "x126 yp-3 w50 h20 Limit1 Number VstrategyUpdatePitstopEdit", value ? value : 4).OnEvent("Change", updateStrategyPitstop.Bind("Edit"))
 		settingsGui.Add("UpDown", "x158 yp-2 w18 h20 Range1-9 0x80", value ? value : 4)
 		settingsGui.Add("Text", "x184 yp+2 w290 h20", translate("Laps difference to Strategy"))

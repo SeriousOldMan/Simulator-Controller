@@ -1352,7 +1352,7 @@ class RaceStrategist extends GridRaceAssistant {
 		local facts := super.createSession(&settings, &data)
 		local simulatorName := this.SettingsDatabase.getSimulatorName(facts["Session.Simulator"])
 		local theStrategy, applicableStrategy, simulator, car, track
-		local sessionType, sessionLength, duration, laps, configuration
+		local sessionType, sessionLength, duration, laps
 
 		if ((this.Session == kSessionRace) && FileExist(kUserConfigDirectory . "Race.strategy")) {
 			theStrategy := Strategy(this, readMultiMap(kUserConfigDirectory . "Race.strategy"))
@@ -1390,15 +1390,6 @@ class RaceStrategist extends GridRaceAssistant {
 				}
 			}
 		}
-
-		configuration := this.Configuration
-
-		facts["Session.Settings.Lap.Learning.Laps"]
-			:= getMultiMapValue(configuration, "Race Strategist Analysis", simulatorName . ".LearningLaps", 1)
-		facts["Session.Settings.Lap.History.Considered"]
-			:= getMultiMapValue(configuration, "Race Strategist Analysis", simulatorName . ".ConsideredHistoryLaps", 5)
-		facts["Session.Settings.Lap.History.Damping"]
-			:= getMultiMapValue(configuration, "Race Strategist Analysis", simulatorName . ".HistoryLapsDamping", 0.2)
 
 		return facts
 	}
@@ -1732,7 +1723,7 @@ class RaceStrategist extends GridRaceAssistant {
 		if this.Strategy {
 			frequency := getMultiMapValue(this.Settings, "Strategy Settings", "Strategy.Update.Laps", false)
 
-			if (frequency && this.hasEnoughData(false)) {
+			if (frequency && this.hasEnoughData(false) && (lapNumber >= this.BaseLap + knowledgeBase("Session.Settings.Lap.History.Considered", 5))) {
 				if (lapNumber > (this.iLastStrategyUpdate + frequency))
 					knowledgeBase.setFact("Strategy.Recalculate", "Regular")
 			}
@@ -2410,7 +2401,7 @@ class RaceStrategist extends GridRaceAssistant {
 				confirm := true
 			else {
 				if strategy {
-					if !this.betterScenario(strategy)
+					if ((this.Strategy != this.Strategy[true]) && !this.betterScenario(strategy))
 						return
 
 					confirm := Task.CurrentTask.Confirm

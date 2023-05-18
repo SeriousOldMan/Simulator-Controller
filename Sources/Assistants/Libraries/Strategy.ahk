@@ -537,7 +537,7 @@ class StrategySimulation {
 	}
 
 	compareScenarios(scenario1, scenario2) {
-		local sLaps, cLaps, sTime, cTime, tSLaps, tCLaps, tSSets, tCSets
+		local sLaps, cLaps, sTime, cTime, sFuel, cFuel, tSLaps, tCLaps, tSSets, tCSets
 
 		pitstopLaps(scenario) {
 			local laps := 0
@@ -547,6 +547,16 @@ class StrategySimulation {
 				laps += pitstop.Lap
 
 			return laps
+		}
+
+		fuelLevel(scenario) {
+			local fuelLevel := scenario.RemainingFuel
+			local ignore, pitstop
+
+			for ignore, pitstop in scenario.Pitstops
+				fuelLevel := Max(fuelLevel, pitstop.RemainingFuel)
+
+			return fuelLevel
 		}
 
 		tyreLaps(scenario, &tyreSets := 0) {
@@ -588,12 +598,14 @@ class StrategySimulation {
 			cTime := scenario2.getSessionDuration()
 			tSLaps := tyreLaps(scenario1, &tSSets)
 			tCLaps := tyreLaps(scenario2, &tCSets)
+			sFuel := fuelLevel(scenario1)
+			cFuel := fuelLevel(scenario2)
 
 			if (sLaps > cLaps)
 				return scenario1
-			else if ((sLaps = cLaps) && ((sTime < cTime) && (tSSets = tSSets)))
+			else if ((sLaps = cLaps) && ((sFuel < cFuel) || ((sTime < cTime) && (tSSets = tSSets))))
 				return scenario1
-			else if ((sLaps = cLaps) && ((sTime = cTime) || (tSSets != tSSets))) {
+			else if ((sLaps = cLaps) && ((sTime = cTime) || (sFuel < cFuel) || (tSSets != tSSets))) {
 				if ((tSLaps < tCLaps) && (tSSets = tSSets))
 					return scenario1
 				else if ((tSLaps > tCLaps) && (tSSets = tSSets))
@@ -609,6 +621,10 @@ class StrategySimulation {
 				else if (scenario2.Pitstops.Length > scenario1.Pitstops.Length)
 					return scenario1
 				else if (scenario2.Pitstops.Length < scenario1.Pitstops.Length)
+					return scenario2
+				else if (sFuel < cFuel)
+					return scenario1
+				else if (sFuel > cFuel)
 					return scenario2
 				else if (pitstopLaps(scenario2) > pitstopLaps(scenario1))
 					return scenario2
@@ -631,6 +647,8 @@ class StrategySimulation {
 			cTime := scenario2.getSessionDuration()
 			tSLaps := tyreLaps(scenario1, &tSSets)
 			tCLaps := tyreLaps(scenario2, &tCSets)
+			sFuel := fuelLevel(scenario1)
+			cFuel := fuelLevel(scenario2)
 
 			if (sTime < cTime)
 				return scenario1
@@ -646,6 +664,10 @@ class StrategySimulation {
 				else if (scenario2.Pitstops.Length > scenario1.Pitstops.Length)
 					return scenario1
 				else if (scenario2.Pitstops.Length < scenario1.Pitstops.Length)
+					return scenario2
+				else if (sFuel < cFuel)
+					return scenario1
+				else if (sFuel > cFuel)
 					return scenario2
 				else if (pitstopLaps(scenario2) > pitstopLaps(scenario1))
 					return scenario2

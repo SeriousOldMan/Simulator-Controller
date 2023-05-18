@@ -27,7 +27,7 @@ tyreCompounds([], ?, [])
 tyreCompounds([[?compound | ?compoundColor] | ?tyreSets], ?compound, [?compoundColor | ?result]) <=
 		tyreCompounds(?tyreSets, ?compound, ?result)
 
-pitstops(?count) <= pitstopCounts(1, ?count), !
+pitstops(?count) <= pitstopCounts(1, ?temp), ?temp = ?count, !
 pitstops(0)
 
 pitstopLap(?nr, ?lap) <= pitstop(?nr, ?lap, ?, ?, ?, ?)

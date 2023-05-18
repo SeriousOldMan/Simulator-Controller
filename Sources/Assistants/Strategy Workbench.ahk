@@ -334,6 +334,8 @@ class StrategyWorkbench extends ConfigurationItem {
 		super.__New(kSimulatorConfiguration)
 
 		StrategyWorkbench.Instance := this
+
+		PeriodicTask(ObjBindMethod(this, "updateSettingsMenu"), 10000, kLowPriority).start()
 	}
 
 	createGui(configuration) {
@@ -2501,7 +2503,9 @@ class StrategyWorkbench extends ConfigurationItem {
 						OnMessage(0x44, translateOkButton, 0)
 					}
 				default:
-					if (line > 9) {
+					if (line = 9)
+						Run(kUserHomeDirectory . "Validators")
+					else if (line > 9) {
 						validators := []
 
 						if GetKeyState("Ctrl", "P") {

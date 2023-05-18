@@ -238,15 +238,17 @@ class StrategySimulation {
 				this.loadRules(compiler, validator, &productions, &reductions)
 
 				knowledgeBase := this.createKnowledgeBase(productions, reductions)
+				rules := knowledgeBase.Rules
 			}
+			else {
+				rules := knowledgeBase.Rules
 
-			rules := knowledgeBase.Rules
+				for ignore, rule in rules.Reductions["setup", 3].clone()
+					rules.removeRule(rule)
 
-			for ignore, rule in rules.Reductions["setup", 3].clone()
-				rules.removeRule(rule)
-
-			for ignore, rule in rules.Reductions["pitstop", 4].clone()
-				rules.removeRule(rule)
+				for ignore, rule in rules.Reductions["pitstop", 4].clone()
+					rules.removeRule(rule)
+			}
 
 			knowledgeBase.addRule(compiler.compileRule("setup(" . strategy.RemainingFuel . ","
 																. StrReplace(strategy.TyreCompound, A_Space, "\ ") . ","
@@ -262,7 +264,7 @@ class StrategySimulation {
 					tyreCompoundColor := false
 				}
 
-				knowledgeBase.addRule(compiler.compileRule("pitstop(" . number . "," . pitstop.Lap . "," . Round(pitstop.Time / 60000) . ","
+				knowledgeBase.addRule(compiler.compileRule("pitstop(" . number . "," . pitstop.Lap . "," . Round(pitstop.Time / 60) . ","
 																	  . Round(pitstop.RefuelAmount) . "," . tyreCompound . "," . tyreCompoundColor . ")"))
 			}
 

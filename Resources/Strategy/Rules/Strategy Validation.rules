@@ -43,6 +43,9 @@ pitstopTyreCompound(?nr, ?tyreCompound, ?tyreCompoundColor) <= pitstop(?nr, ?, ?
 ;;;                             Internal Rules                              ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+pitstopCounts(?nr, ?count) <= pitstop(?nr, ?, ?, ?, ?, ?), ?nextNr = ?nr + 1, pitstopCounts(?nextNr, ?count)
+pitstopCounts(?nr, ?count) <= ?count = ?nr - 1
+ 
 pitstopRefuels(?pitstop, ?refuelAmount, ?numRefuels) <=
 		pitstop(?pitstop, ?, ?, ?pitstopRefuelAmount, ?, ?), ?pitstopRefuelAmount > 0, !,
 		?nextPitstop = ?pitstop + 1, pitstopRefuels(?nextPitstop, ?nextRefuelAmount, ?nextNumRefuels),

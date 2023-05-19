@@ -1605,7 +1605,7 @@ class RaceStrategist extends GridRaceAssistant {
 		local driverForname := ""
 		local driverSurname := ""
 		local driverNickname := ""
-		local compound, result, lap, simulator, car, track, frequency
+		local compound, result, lap, simulator, car, track, frequency, curContinuation
 		local pitstop, prefix, validLap, weather, airTemperature, trackTemperature, compound, compoundColor
 		local fuelConsumption, fuelRemaining, lapTime, map, tc, antiBS, pressures, temperatures, wear, multiClass
 
@@ -1627,6 +1627,8 @@ class RaceStrategist extends GridRaceAssistant {
 			driverSurname := knowledgeBase.getValue("Driver.Surname", "Doe")
 			driverNickname := knowledgeBase.getValue("Driver.Nickname", "JDO")
 		}
+
+		curContinuation := this.Continuation
 
 		result := super.addLap(lapNumber, &data)
 
@@ -1725,7 +1727,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 			if (frequency && this.hasEnoughData(false)
 						  && (lapNumber >= this.BaseLap + knowledgeBase.getValue("Session.Settings.Lap.History.Considered", 5))) {
-				if (lapNumber > (this.iLastStrategyUpdate + frequency))
+				if ((lapNumber > (this.iLastStrategyUpdate + frequency)) && (curContinuation = this.Continuation))
 					knowledgeBase.setFact("Strategy.Recalculate", "Regular")
 			}
 			else

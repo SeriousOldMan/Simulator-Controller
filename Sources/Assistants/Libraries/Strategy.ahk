@@ -537,7 +537,22 @@ class StrategySimulation {
 	}
 
 	compareScenarios(scenario1, scenario2) {
-		local sLaps, cLaps, sTime, cTime, sFuel, cFuel, tSLaps, tCLaps, tSSets, tCSets
+		local sLaps, cLaps, sDuration, cDuration, sFuel, cFuel, sTLaps, cTLaps, sTSets, cTSets
+		local sPLaps, cPLaps
+
+		coefficient(cfs, value, step) {
+			static coefficients := [[-0.81, -0.31, 0, 0.31, 0.81], 				; Laps / Duration
+									[-0.34, -0.22, 0, 0.22, 0.34], 				; Fuel
+									[-0.46, -0.18, 0, 0.18, 0.46], 				; Tyre Sets
+									[-0.76, -0.38, -0.24, 0, 0.24, 0.38, 0.76], ; Tyre Laps
+									[-0.33, -0.15, 0, 0.15, 0.33], 				; # Pitstops
+									[-0.43, -0.25, 0, 0.25, 0.43], 				; Pitstop Lateness
+									[-0.13, 0, 0.13]]			   				; Duration
+
+			cfs := coefficients[cfs]
+
+			return cfs[Min(cfs.Length, Max(1, Round(value / step) + ((cfs.Length - 1) >> 1) + 1))]
+		}
 
 		pitstopLaps(scenario) {
 			local laps := 0
@@ -591,100 +606,44 @@ class StrategySimulation {
 			}
 		}
 
+		sTLaps := tyreLaps(scenario1, &sTSets)
+		cTLaps := tyreLaps(scenario2, &cTSets)
+		sFuel := fuelLevel(scenario1)
+		cFuel := fuelLevel(scenario2)
+		sPLaps := pitstopLaps(scenario1)
+		cPLaps := pitstopLaps(scenario2)
+		sDuration := scenario1.getSessionDuration()
+		cDuration := scenario2.getSessionDuration()
+
+		; Negative => 2, Positive => 1
+
+		result := (coefficient(5, scenario1.Pitstops.Length - scenario2.Pitstops.Length, 1)
+				 + coefficient(2, cFuel - sFuel, 10)
+				 + coefficient(3, sTSets - cTSets, 1)
+				 + coefficient(4, cTLaps - sTLaps, 10)
+				 + coefficient(6, sPLaps - cPLaps, 10))
+
 		if (this.SessionType = "Duration") {
 			sLaps := scenario1.getSessionLaps()
 			cLaps := scenario2.getSessionLaps()
-			sTime := scenario1.getSessionDuration()
-			cTime := scenario2.getSessionDuration()
-			tSLaps := tyreLaps(scenario1, &tSSets)
-			tCLaps := tyreLaps(scenario2, &tCSets)
-			sFuel := fuelLevel(scenario1)
-			cFuel := fuelLevel(scenario2)
 
-			if (sLaps > cLaps)
-				return scenario1
-			else if ((sLaps = cLaps) && ((sFuel < cFuel) || ((sTime < cTime) && (tSSets = tSSets))))
-				return scenario1
-			else if ((sLaps = cLaps) && ((sTime = cTime) || (sFuel < cFuel) || (tSSets != tSSets))) {
-				if ((tSLaps < tCLaps) && (tSSets = tSSets))
-					return scenario1
-				else if ((tSLaps > tCLaps) && (tSSets = tSSets))
-					return scenario2
-				else if (tSLaps < tCLaps)
-					return scenario1
-				else if (tSLaps > tCLaps)
-					return scenario2
-				else if (tSSets > tCSets)
-					return scenario1
-				else if (tSSets < tCSets)
-					return scenario2
-				else if (scenario2.Pitstops.Length > scenario1.Pitstops.Length)
-					return scenario1
-				else if (scenario2.Pitstops.Length < scenario1.Pitstops.Length)
-					return scenario2
-				else if (sFuel < cFuel)
-					return scenario1
-				else if (sFuel > cFuel)
-					return scenario2
-				else if (pitstopLaps(scenario2) > pitstopLaps(scenario1))
-					return scenario2
-				else if (pitstopLaps(scenario2) < pitstopLaps(scenario1))
-					return scenario1
-				else if (scenario2.getRemainingFuel() > scenario1.getRemainingFuel())
-					return scenario1
-				else if (scenario2.getRemainingFuel() < scenario1.getRemainingFuel())
-					return scenario2
-				else if ((scenario2.FuelConsumption[true] > scenario1.FuelConsumption[true]))
-					return scenario1
-				else
-					return scenario2
-			}
-			else
-				return scenario2
+			result += (coefficient(1, sLaps - cLaps, 1) + coefficient(7, cDuration - sDuration, 1))
 		}
-		else {
-			sTime := scenario1.getSessionDuration()
-			cTime := scenario2.getSessionDuration()
-			tSLaps := tyreLaps(scenario1, &tSSets)
-			tCLaps := tyreLaps(scenario2, &tCSets)
-			sFuel := fuelLevel(scenario1)
-			cFuel := fuelLevel(scenario2)
+		else
+			result += coefficient(1, cDuration - sDuration, (scenario1.AvgLapTime + scenario2.AvgLapTime) / 2)
 
-			if (sTime < cTime)
-				return scenario1
-			else if (sTime = cTime) {
-				if (tSLaps < tCLaps)
-					return scenario1
-				else if (tSLaps > tCLaps)
-					return scenario2
-				else if (tSSets > tCSets)
-					return scenario1
-				else if (tSSets < tCSets)
-					return scenario2
-				else if (scenario2.Pitstops.Length > scenario1.Pitstops.Length)
-					return scenario1
-				else if (scenario2.Pitstops.Length < scenario1.Pitstops.Length)
-					return scenario2
-				else if (sFuel < cFuel)
-					return scenario1
-				else if (sFuel > cFuel)
-					return scenario2
-				else if (pitstopLaps(scenario2) > pitstopLaps(scenario1))
-					return scenario2
-				else if (pitstopLaps(scenario2) < pitstopLaps(scenario1))
-					return scenario1
-				else if (scenario2.getRemainingFuel() > scenario1.getRemainingFuel())
-					return scenario1
-				else if (scenario2.getRemainingFuel() < scenario1.getRemainingFuel())
-					return scenario2
-				else if ((scenario2.FuelConsumption[true] > scenario1.FuelConsumption[true]))
-					return scenario1
-				else
-					return scenario2
-			}
-			else
-				return scenario2
-		}
+		if (result > 0)
+			return scenario1
+		else if (result < 0)
+			return scenario2
+		else if (scenario2.getRemainingFuel() > scenario1.getRemainingFuel())
+			return scenario1
+		else if (scenario2.getRemainingFuel() < scenario1.getRemainingFuel())
+			return scenario2
+		else if ((scenario2.FuelConsumption[true] > scenario1.FuelConsumption[true]))
+			return scenario1
+		else
+			return scenario2
 	}
 
 	evaluateScenarios(scenarios, verbose, &progress := 0) {
@@ -1725,7 +1684,7 @@ class Strategy extends ConfigurationItem {
 
 			remainingTyreLaps := (strategy.RemainingTyreLaps[true] - lastStintLaps)
 
-			freshTyreLaps := (strategy.MaxTyreLaps + (strategy.TyreLapsVariation / 100 * Min(100 - Sqrt(Random(0, 10000)), 100)))
+			freshTyreLaps := (strategy.MaxTyreLaps + (strategy.MaxTyreLaps * strategy.TyreLapsVariation / 100 * (Min(100 - Sqrt(Random(0, 10000)), 100) / 100)))
 
 			if (tyreChangeRule = "Always") {
 				this.iTyreChange := true
@@ -3043,7 +3002,7 @@ class Strategy extends ConfigurationItem {
 		this.iMaxTyreLaps := maxTyreLaps
 		this.iTyreLapsVariation := tyreLapsVariation
 
-		this.iTyreLaps := Max((maxTyreLaps + (tyreLapsVariation / 100 * Min(100 - Sqrt(Random(0, 10000)), 100))) - currentTyreLaps, 0)
+		this.iTyreLaps := Max((maxTyreLaps + (maxTyreLaps * tyreLapsVariation / 100 * (Min(100 - Sqrt(Random(0, 10000)), 100) / 100))) - currentTyreLaps, 0)
 
 		this.iMap := ecuMap
 		this.iFuelConsumption := fuelConsumption

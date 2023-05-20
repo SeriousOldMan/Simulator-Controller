@@ -518,6 +518,11 @@ class TyresDatabase extends SessionDatabase {
 	}
 }
 
+
+;;;-------------------------------------------------------------------------;;;
+;;;                   Private Function Declaration Section                  ;;;
+;;;-------------------------------------------------------------------------;;;
+
 synchronizeTyresPressures(groups, sessionDB, connector, simulators, timestamp, lastSynchronization, force, &counter) {
 	local lastSimulator := false
 	local lastCar := false

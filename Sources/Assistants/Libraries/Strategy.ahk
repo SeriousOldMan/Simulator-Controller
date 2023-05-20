@@ -424,7 +424,7 @@ class StrategySimulation {
 						 , weather, tyreCompound, tyreCompoundColor) {
 		local driverID := false
 		local driverName := false
-		local strategy, currentConsumption, startFuel, startFuelAmount, fuelAmount, lapTime
+		local strategy, currentConsumption, startFuelAmount, fuelAmount, lapTime
 
 		this.getStintDriver(initialStint, &driverID, &driverName)
 
@@ -434,12 +434,7 @@ class StrategySimulation {
 
 		currentConsumption := (fuelConsumption - ((fuelConsumption / 100) * consumptionVariation))
 
-		if (Round(Random(0, 1)) = 1)
-			startFuel := initialFuelAmount + (initialFuelVariation / 100 * fuelCapacity)
-		else
-			startFuel := initialFuelAmount - (initialFuelVariation / 100 * fuelCapacity)
-
-		startFuelAmount := Min(fuelCapacity, Max(startFuel, initialFuelAmount / 2))
+		startFuelAmount := Min(fuelCapacity, initialFuelAmount + (Random(0.0, 1.0) * initialFuelVariation / 100 * fuelCapacity))
 
 		if formationLap
 			fuelAmount := (startFuelAmount - currentConsumption)
@@ -545,7 +540,7 @@ class StrategySimulation {
 									[-0.34, -0.22, 0, 0.22, 0.34], 				; Fuel
 									[-0.46, -0.18, 0, 0.18, 0.46], 				; Tyre Sets
 									[-0.76, -0.38, -0.24, 0, 0.24, 0.38, 0.76], ; Tyre Laps
-									[-0.33, -0.15, 0, 0.15, 0.33], 				; # Pitstops
+									[-0.78, -0.52, 0, 0.52, 0.78], 				; # Pitstops
 									[-0.43, -0.25, 0, 0.25, 0.43], 				; Pitstop Lateness
 									[-0.13, 0, 0.13]]			   				; Duration
 
@@ -617,7 +612,7 @@ class StrategySimulation {
 
 		; Negative => 2, Positive => 1
 
-		result := (coefficient(5, scenario1.Pitstops.Length - scenario2.Pitstops.Length, 1)
+		result := (coefficient(5, scenario2.Pitstops.Length - scenario1.Pitstops.Length, 1)
 				 + coefficient(2, cFuel - sFuel, 10)
 				 + coefficient(3, sTSets - cTSets, 1)
 				 + coefficient(4, cTLaps - sTLaps, 10)
@@ -834,7 +829,7 @@ class VariationSimulation extends StrategySimulation {
 		consumptionSteps := 1
 		tyreUsageSteps := tyreUsage * 2
 		tyreCompoundVariationSteps := tyreCompoundVariation / 4
-		initialFuelSteps := initialFuel / 10
+		initialFuelSteps := initialFuel / 5
 
 		scenarios := CaseInsenseMap()
 		variation := 1
@@ -1189,7 +1184,7 @@ class TrafficSimulation extends StrategySimulation {
 		consumptionSteps := 1
 		tyreUsageSteps := tyreUsage * 2
 		tyreCompoundVariationSteps := tyreCompoundVariation / 4
-		initialFuelSteps := initialFuel / 10
+		initialFuelSteps := initialFuel / 5
 
 		scenarios := CaseInsenseMap()
 		variation := 0

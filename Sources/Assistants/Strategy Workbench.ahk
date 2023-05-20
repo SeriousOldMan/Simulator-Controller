@@ -558,7 +558,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		}
 
 		validateSimInitialFuelAmount(*) {
-			validateInteger("simInitialFuelAmountEdit", 10)
+			validateInteger("simInitialFuelAmountEdit", 0)
 		}
 
 		validateSimAvgLapTime(*) {
@@ -1209,7 +1209,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.Add("Text", "x" . x . " yp+21 w70 h20 +0x200", translate("Initial Fuel"))
 		workbenchGui.Add("Edit", "x" . x1 . " yp-1 w45 h20 Number Limit3 VsimInitialFuelAmountEdit", displayValue("Float", convertUnit("Volume", 90), 0)).OnEvent("Change", validateSimInitialFuelAmount)
-		workbenchGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range1-999", displayValue("Float", convertUnit("Volume", 90), 0))
+		workbenchGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range0-999", displayValue("Float", convertUnit("Volume", 90), 0))
 		workbenchGui.Add("Text", "x" . x3 . " yp+4 w45 r1", getUnit("Volume", true))
 
 		workbenchGui.Add("Text", "x" . x . " yp+21 w70 h20 +0x200", translate("Map"))

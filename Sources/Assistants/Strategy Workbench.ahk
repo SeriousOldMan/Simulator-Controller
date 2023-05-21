@@ -1254,7 +1254,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		choices := collect(["Initial Conditions", "Telemetry Data", "Initial Cond. + Telemetry"], translate)
 
-		workbenchGui.Add("DropDownList", "x250 yp w138 Choose3 VsimInputDropDown", choices)
+		workbenchGui.Add("DropDownList", "x250 yp w138 Choose2 VsimInputDropDown", choices).OnEvent("Change", (*) => this.updateState())
 
 		workbenchGui.Add("Button", "x214 yp+26 w174 h20", translate("Simulate!")).OnEvent("Click", runSimulation)
 
@@ -1484,6 +1484,17 @@ class StrategyWorkbench extends ConfigurationItem {
 
 	updateState() {
 		local oldTChoice, oldFChoice
+
+		if ((this.Control["simInputDropDown"].Value = 1) || (this.Control["simInputDropDown"].Value = 3)) {
+			this.Control["simMapEdit"].Enabled := true
+			this.Control["simAvgLapTimeEdit"].Enabled := true
+			this.Control["simFuelConsumptionEdit"].Enabled := true
+		}
+		else {
+			this.Control["simMapEdit"].Enabled := false
+			this.Control["simAvgLapTimeEdit"].Enabled := false
+			this.Control["simFuelConsumptionEdit"].Enabled := false
+		}
 
 		if (this.TyreSetListView.GetNext(0) > 0) {
 			this.Control["tyreSetDropDown"].Enabled := true

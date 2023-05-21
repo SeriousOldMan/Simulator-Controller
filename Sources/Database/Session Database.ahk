@@ -5260,7 +5260,7 @@ editSettings(editorOrCommand, arguments*) {
 						hideProgress()
 					}
 
-					sessionDB.DatabasePath := (normalizeDirectoryPath(databaseLocationEdit.Text) . "\")
+					SessionDatabase.DatabasePath := (normalizeDirectoryPath(databaseLocationEdit.Text) . "\")
 
 					changed := true
 					restart := true

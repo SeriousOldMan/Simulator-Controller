@@ -157,7 +157,7 @@ class StrategyViewer {
 				laps.Push("<td class=`"td-std`">" . Max(pitstopLap, 0) . "</td>")
 				lapTimes.Push("<td class=`"td-std`">" . StrategyViewer.lapTimeDisplayValue(Round(lastLapTime, 1)) . "</td>")
 				fuelConsumptions.Push("<td class=`"td-std`">" . (isNumber(lastFuelConsumption) ? displayValue("Float", convertUnit("Volume", lastFuelConsumption)) : "") . "</td>")
-				pitstopInfos.Push("<td class=`"td-std`">" . lastPitstopInfo . "</td>")
+				pitstopInfos.Push("<td class=`"td-std td-right`">" . lastPitstopInfo . "</td>")
 				weathers.Push("<td class=`"td-std`">" . lastWeather . "</td>")
 				refuels.Push("<td class=`"td-std`">" . (isNumber(lastRefuel) ? displayValue("Float", convertUnit("Volume", lastRefuel)) : "") . "</td>")
 				tyreChanges.Push("<td class=`"td-std`">" . lastTyreChange . "</td>")
@@ -174,7 +174,7 @@ class StrategyViewer {
 				lastLapTime := pitstop.AvgLapTime
 				lastWeather := (translate(pitstop.Weather) . translate(" (") . displayValue("Float", convertUnit("Temperature", pitstop.AirTemperature)) . translate(" / ") . displayValue("Float", convertUnit("Temperature", pitstop.TrackTemperature), 1) . translate(")"))
 				lastRefuel := pitstop.RefuelAmount
-				lastPitstopInfo := (pitstop.Lap . translate(" - ") . displayValue("Time", pitstop.Time, true, false, false))
+				lastPitstopInfo := (Format("{1:3}", pitstop.Lap) . translate(" - ") . displayValue("Time", pitstop.Time, true, false, false))
 				lastTyreChange := (pitstop.TyreChange ? translate(compound(pitstop.TyreCompound, pitstop.TyreCompoundColor)) : translate("No"))
 				lastTyreLaps := pitstop.RemainingTyreLaps
 
@@ -379,6 +379,14 @@ class StrategyViewer {
 
 			.td-left {
 				text-align: left;
+			}
+
+			.th-right {
+				text-align: right;
+			}
+
+			.td-right {
+				text-align: right;
 			}
 
 			tfoot {

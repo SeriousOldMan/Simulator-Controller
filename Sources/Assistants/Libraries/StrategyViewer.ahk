@@ -101,8 +101,8 @@ class StrategyViewer {
 	createStintsInfo(strategy, &timeSeries, &lapSeries, &fuelSeries, &tyreSeries) {
 		local startStint := strategy.StartStint
 		local html := "<table class=`"table-std`">"
-		local stints, drivers, maps, laps, lapTimes, fuelConsumptions, pitstopLaps, refuels, tyreChanges, weathers
-		local lastDriver, lastMap, lastLap, lastLapTime, lastFuelConsumption, lastRefuel, lastPitstopLap
+		local stints, drivers, maps, laps, lapTimes, fuelConsumptions, pitstopInfos, refuels, tyreChanges, weathers
+		local lastDriver, lastMap, lastLap, lastLapTime, lastFuelConsumption, lastRefuel, lastPitstopInfo
 		local lastWeather, lastTyreChange, lastTyreLaps, ignore, pitstop, pitstopLap
 
 		timeSeries := [strategy.SessionStartTime / 60]
@@ -131,7 +131,7 @@ class StrategyViewer {
 			laps := []
 			lapTimes := []
 			fuelConsumptions := []
-			pitstopLaps := []
+			pitstopInfos := []
 			refuels := []
 			tyreChanges := []
 			weathers := []
@@ -142,7 +142,7 @@ class StrategyViewer {
 			lastLapTime := strategy.AvgLapTime
 			lastFuelConsumption := strategy.FuelConsumption
 			lastRefuel := ""
-			lastPitstopLap := ""
+			lastPitstopInfo := ""
 			lastWeather := (translate(strategy.Weather) . translate(" (") . displayValue("Float", convertUnit("Temperature", strategy.AirTemperature)) . translate(" / ") . displayValue("Float", convertUnit("Temperature", strategy.TrackTemperature), 1) . translate(")"))
 			lastTrackTemperature := strategy.TrackTemperature
 			lastTyreChange := ""
@@ -157,7 +157,7 @@ class StrategyViewer {
 				laps.Push("<td class=`"td-std`">" . Max(pitstopLap, 0) . "</td>")
 				lapTimes.Push("<td class=`"td-std`">" . StrategyViewer.lapTimeDisplayValue(Round(lastLapTime, 1)) . "</td>")
 				fuelConsumptions.Push("<td class=`"td-std`">" . (isNumber(lastFuelConsumption) ? displayValue("Float", convertUnit("Volume", lastFuelConsumption)) : "") . "</td>")
-				pitstopLaps.Push("<td class=`"td-std`">" . lastPitstopLap . "</td>")
+				pitstopInfos.Push("<td class=`"td-std`">" . lastPitstopInfo . "</td>")
 				weathers.Push("<td class=`"td-std`">" . lastWeather . "</td>")
 				refuels.Push("<td class=`"td-std`">" . (isNumber(lastRefuel) ? displayValue("Float", convertUnit("Volume", lastRefuel)) : "") . "</td>")
 				tyreChanges.Push("<td class=`"td-std`">" . lastTyreChange . "</td>")
@@ -174,7 +174,7 @@ class StrategyViewer {
 				lastLapTime := pitstop.AvgLapTime
 				lastWeather := (translate(pitstop.Weather) . translate(" (") . displayValue("Float", convertUnit("Temperature", pitstop.AirTemperature)) . translate(" / ") . displayValue("Float", convertUnit("Temperature", pitstop.TrackTemperature), 1) . translate(")"))
 				lastRefuel := pitstop.RefuelAmount
-				lastPitstopLap := pitstop.Lap
+				lastPitstopInfo := (pitstop.Lap . translate(" - ") . displayValue("Time", pitstop.Time, true, false, false))
 				lastTyreChange := (pitstop.TyreChange ? translate(compound(pitstop.TyreCompound, pitstop.TyreCompoundColor)) : translate("No"))
 				lastTyreLaps := pitstop.RemainingTyreLaps
 
@@ -190,7 +190,7 @@ class StrategyViewer {
 			laps.Push("<td class=`"td-std`">" . strategy.LastPitstop.StintLaps . "</td>")
 			lapTimes.Push("<td class=`"td-std`">" . StrategyViewer.lapTimeDisplayValue(Round(lastLapTime, 1)) . "</td>")
 			fuelConsumptions.Push("<td class=`"td-std`">" . displayValue("Float", convertUnit("Volume", lastFuelConsumption)) . "</td>")
-			pitstopLaps.Push("<td class=`"td-std`">" . lastPitstopLap . "</td>")
+			pitstopInfos.Push("<td class=`"td-std`">" . lastPitstopInfo . "</td>")
 			weathers.Push("<td class=`"td-std`">" . lastWeather . "</td>")
 			refuels.Push("<td class=`"td-std`">" . displayValue("Float", convertUnit("Volume", lastRefuel)) . "</td>")
 			tyreChanges.Push("<td class=`"td-std`">" . lastTyreChange . "</td>")
@@ -209,7 +209,7 @@ class StrategyViewer {
 					   . "<th class=`"th-std`">" . translate("Map") . "</th>"
 					   . "<th class=`"th-std`">" . translate("Lap Time") . "</th>"
 					   . "<th class=`"th-std`">" . translate("Consumption") . "</th>"
-					   . "<th class=`"th-std`">" . translate("Pitstop Lap") . "</th>"
+					   . "<th class=`"th-std`">" . translate("Pitstop") . "</th>"
 					   . "<th class=`"th-std`">" . translate("Refuel Amount") . "</th>"
 					   . "<th class=`"th-std`">" . translate("Tyre Change") . "</th>"
 				   . "</tr>")
@@ -222,7 +222,7 @@ class StrategyViewer {
 								. maps[A_Index]
 								. lapTimes[A_Index]
 								. fuelConsumptions[A_Index]
-								. pitstopLaps[A_Index]
+								. pitstopInfos[A_Index]
 								. refuels[A_Index]
 								. tyreChanges[A_Index]
 					   . "</tr>")

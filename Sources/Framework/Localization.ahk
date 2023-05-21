@@ -197,7 +197,7 @@ displayFloatValue(float, precision := kUndefined) {
 		return StrReplace(Round(float, precision), ".", getFloatSeparator())
 }
 
-displayTimeValue(time, arguments*) {
+displayTimeValue(time, fillHours := false, withSeconds := true, withFractions := true, arguments*) {
 	global gTimeFormat
 
 	local hours, seconds, fraction, minutes
@@ -205,10 +205,13 @@ displayTimeValue(time, arguments*) {
 	if ((gTimeFormat = "S.##") || (gTimeFormat = "S,##"))
 		return StrReplace(time, ".", (gTimeFormat = "S.##") ? "." : ",")
 	else {
+		sleep 10
 		seconds := Floor(time)
 		fraction := (time - seconds)
 		minutes := Floor(seconds / 60)
-		hours := Floor(seconds / 3600)
+		hours := Floor(minutes / 60)
+
+		minutes -= (hours * 60)
 
 		fraction := Round(fraction * 10)
 
@@ -217,7 +220,14 @@ displayTimeValue(time, arguments*) {
 		if (StrLen(seconds) = 1)
 			seconds := ("0" . seconds)
 
-		return (((hours > 0) ? (hours . ":") : "") . minutes . ":" . seconds . ((gTimeFormat = "[H:]M:S.##") ? "." : ",") . fraction)
+		if fillHours {
+			hours := (Format("{1:02}", hours) . ":")
+			minutes := Format("{1:02}", minutes)
+		}
+		else
+			hours := ((hours > 0) ? (hours . ":") : "")
+
+		return (hours . minutes . (withSeconds ? (":" . seconds . (withFractions ? (((gTimeFormat = "[H:]M:S.##") ? "." : ",") . fraction) : "")) : ""))
 	}
 }
 

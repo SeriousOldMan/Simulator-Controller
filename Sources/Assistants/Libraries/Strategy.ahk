@@ -432,9 +432,11 @@ class StrategySimulation {
 
 		strategy := this.createStrategy(name, driverID)
 
+		strategy.AvgLapTime["Fixed"] := this.iFixedLapTime
+
 		currentConsumption := (fuelConsumption - ((fuelConsumption / 100) * consumptionVariation))
 
-		startFuelAmount := Min(fuelCapacity, initialFuelAmount + (Random(0.0, 1.0) * initialFuelVariation / 100 * fuelCapacity))
+		startFuelAmount := Min(fuelCapacity, initialFuelAmount + (initialFuelVariation / 100 * fuelCapacity))
 
 		if formationLap
 			fuelAmount := (startFuelAmount - currentConsumption)
@@ -900,7 +902,7 @@ class VariationSimulation extends StrategySimulation {
 																 , initialTyreLaps, maxTyreLaps, tyreLapsVariation
 																 , stintLaps, formationLap, avgLapTime
 																 , ecuMap, fuelConsumption, consumption
-																 , initialFuelAmount, initialFuel, fuelCapacity
+																 , initialFuelAmount, initialFuelRound * 5, fuelCapacity
 																 , weather, tyreCompound, tyreCompoundColor)
 							}
 							finally {
@@ -940,7 +942,7 @@ class VariationSimulation extends StrategySimulation {
 																 , initialTyreLaps, maxTyreLaps, tyreLapsVariation
 																 , stintLaps, formationLap, scenarioAvgLapTime
 																 , scenarioMap, scenarioFuelConsumption, consumption
-																 , initialFuelAmount, initialFuel, fuelCapacity
+																 , initialFuelAmount, initialFuelRound * 5, fuelCapacity
 																 , weather, tyreCompound, tyreCompoundColor)
 
 								if verbose
@@ -1270,7 +1272,7 @@ class TrafficSimulation extends StrategySimulation {
 																	 , initialTyreLaps, maxTyreLaps, tyreLapsVariation
 																	 , stintLaps, formationLap, avgLapTime
 																	 , ecuMap, fuelConsumption, consumption
-																	 , initialFuelAmount, initialFuel, fuelCapacity
+																	 , initialFuelAmount, initialFuelRound * 5, fuelCapacity
 																	 , weather, tyreCompound, tyreCompoundColor)
 								}
 								finally {
@@ -1314,7 +1316,7 @@ class TrafficSimulation extends StrategySimulation {
 																	 , initialTyreLaps, maxTyreLaps, tyreLapsVariation
 																	 , stintLaps, formationLap, scenarioAvgLapTime
 																	 , scenarioMap, scenarioFuelConsumption, consumption
-																	 , initialFuelAmount, initialFuel, fuelCapacity
+																	 , initialFuelAmount, initialFuelRound * 5, fuelCapacity
 																	 , weather, tyreCompound, tyreCompoundColor)
 
 									if verbose
@@ -1412,6 +1414,7 @@ class Strategy extends ConfigurationItem {
 	iTyreLapsVariation := 0
 
 	iAvgLapTime := 0
+	iFixedLapTime := false
 	iFuelConsumption := 0
 	iTyreLaps := 0
 
@@ -2180,7 +2183,9 @@ class Strategy extends ConfigurationItem {
 			local lastPitstop := this.LastPitstop
 			local avgLapTime, ignore, pitstop
 
-			if (lastStint && lastPitstop)
+			if (lastStint = "Fixed")
+				return this.iFixedLapTime
+			else if (lastStint && lastPitstop)
 				return lastPitstop.AvgLapTime
 			else if (lastStint = "Session") {
 				avgLapTime := 0
@@ -2195,6 +2200,13 @@ class Strategy extends ConfigurationItem {
 			}
 			else
 				return this.iAvgLapTime
+		}
+
+		Set {
+			if (lastStint = "Fixed")
+				return (this.iFixedLapTime := value)
+			else
+				throw "Invalid arguments detected in Strategy.AvgLapTime..."
 		}
 	}
 
@@ -3188,7 +3200,7 @@ class Strategy extends ConfigurationItem {
 	adjustLastPitstopRefuelAmount() {
 		local pitstops := this.Pitstops
 		local numPitstops := pitstops.Length
-		local remainingSessionLaps, refuelAmount, stintLaps, adjustments, adjustment, ignore, pitstop, key, value, pitstopNr
+		local remainingSessionLaps, refuelAmount, stintLaps, adjustments, adjustment, ignore, pitstop, key, value, pitstopNr, fixedLapTime
 
 		if ((numPitstops > 1) && !pitstops[numPitstops].Fixed && !this.ConsumptionVariation && !this.InitialFuelVariation
 															  && !this.TyreUsageVariation && !this.TyreCompoundVariation) {
@@ -3228,10 +3240,21 @@ class Strategy extends ConfigurationItem {
 
 			this.initializeAvailableTyreSets()
 
-			this.createStints(this.StartStint, this.StartLap, this.StintStartTime, this.SessionStartTime
-							, Max(this.MaxTyreLaps - this.RemainingTyreLaps, 0), this.StartFuel, this.InitialFuelVariation, this.RemainingFuel
-							, this.StintLaps, this.MaxTyreLaps, this.TyreLapsVariation, this.Map, this.FuelConsumption
-							, this.AvgLapTime, adjustments)
+			fixedLapTime := this.AvgLapTime["Fixed"]
+
+			if fixedLapTime
+				this.StrategyManager.setFixedLapTime(fixedLapTime)
+
+			try {
+				this.createStints(this.StartStint, this.StartLap, this.StintStartTime, this.SessionStartTime
+								, Max(this.MaxTyreLaps - this.RemainingTyreLaps, 0), this.StartFuel, this.InitialFuelVariation, this.RemainingFuel
+								, this.StintLaps, this.MaxTyreLaps, this.TyreLapsVariation, this.Map, this.FuelConsumption
+								, this.AvgLapTime, adjustments)
+			}
+			finally {
+				if fixedLapTime
+					this.StrategyManager.setFixedLapTime(false)
+			}
 		}
 	}
 

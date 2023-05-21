@@ -10440,8 +10440,10 @@ class RaceCenter extends ConfigurationItem {
 						if (pitstop.Lap <= lapNr) {
 							numPitstops += 1
 
-							if (numPitstops <= 3)
-								pitstopLaps.Push(pitstop.Lap)
+							pitstopLaps.Push(pitstop.Lap)
+
+							if (pitstopLaps.Length > 3)
+								pitstopLaps.RemoveAt(1)
 						}
 
 					if (numPitstops > 0) {

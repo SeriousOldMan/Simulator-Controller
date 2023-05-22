@@ -5023,15 +5023,15 @@ class RaceCenter extends ConfigurationItem {
 		useInitialConditions := false
 		useTelemetryData := true
 
+		initialFuelVariation := 0
+
 		if strategy {
 			consumptionVariation := strategy.ConsumptionVariation
-			initialFuelVariation := strategy.InitialFuelVariation
 			tyreUsageVariation := strategy.TyreUsageVariation
 			tyreCompoundVariation := strategy.TyreCompoundVariation
 		}
 		else {
 			consumptionVariation := 0
-			initialFuelVariation := 0
 			tyreUsageVariation := 0
 			tyreCompoundVariation := 0
 		}

@@ -142,6 +142,24 @@ class StrategySimulation {
 		knowledgeBase.dumpRules()
 	}
 
+	static scenarioCoefficient(cfs, value, step) {
+		static coefficients := CaseInsenseMap("ResultMajor", 		[-0.81, -0.31, 0, 0.31, 0.81]
+											, "ResultMinor",		[-0.13, 0, 0.13]
+											, "FuelMax",			[-0.34, -0.22, 0, 0.22, 0.34]
+											, "TyreSetsCount", 		[-0.46, -0.18, 0, 0.18, 0.46]
+											, "TyreLapsMax",		[-0.76, -0.38, -0.24, 0, 0.24, 0.38, 0.76]
+											, "PitstopsCount",		[-0.78, -0.52, 0, 0.52, 0.78]
+											, "PitstopsPostLaps",	[-0.43, -0.25, 0, 0.25, 0.43])
+
+		cfs := coefficients[cfs]
+
+		return cfs[Min(cfs.Length, Max(1, Round(value / step) + ((cfs.Length - 1) >> 1) + 1))]
+	}
+
+	scenarioCoefficient(cfs, value, step) {
+		return StrategySimulation.scenarioCoefficient(cfs, value, step)
+	}
+
 	scenarioValid(strategy, validator) {
 		local reqPitstops := strategy.PitstopRule
 		local knowledgeBase, rules, rule, resultSet, refuelRule, valid, ignore, pitstop, tyreChangeRule
@@ -534,20 +552,6 @@ class StrategySimulation {
 		}
 
 		return (valid && this.scenarioValid(strategy, strategy.Validator))
-	}
-
-	scenarioCoefficient(cfs, value, step) {
-		static coefficients := CaseInsenseMap("ResultMajor", 		[-0.81, -0.31, 0, 0.31, 0.81]
-											, "ResultMinor",		[-0.13, 0, 0.13]
-											, "FuelMax",			[-0.34, -0.22, 0, 0.22, 0.34]
-											, "TyreSetsCount", 		[-0.46, -0.18, 0, 0.18, 0.46]
-											, "TyreLapsMax",		[-0.76, -0.38, -0.24, 0, 0.24, 0.38, 0.76]
-											, "PitstopsCount",		[-0.78, -0.52, 0, 0.52, 0.78]
-											, "PitstopsPostLaps",	[-0.43, -0.25, 0, 0.25, 0.43])
-
-		cfs := coefficients[cfs]
-
-		return cfs[Min(cfs.Length, Max(1, Round(value / step) + ((cfs.Length - 1) >> 1) + 1))]
 	}
 
 	compareScenarios(scenario1, scenario2) {

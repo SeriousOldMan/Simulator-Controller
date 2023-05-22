@@ -1401,6 +1401,8 @@ class RaceStrategist extends GridRaceAssistant {
 					if ((Abs(sessionLength - laps) / laps) >  0.05)
 						applicableStrategy := false
 				}
+				else
+					applicableStrategy := false
 
 				if applicableStrategy {
 					this.loadStrategy(facts, theStrategy)
@@ -2224,15 +2226,15 @@ class RaceStrategist extends GridRaceAssistant {
 		useInitialConditions := false
 		useTelemetryData := true
 
+		initialFuelVariation := 0
+
 		if strategy {
 			consumptionVariation := strategy.ConsumptionVariation
-			initialFuelVariation := strategy.InitialFuelVariation
 			tyreUsageVariation := strategy.TyreUsageVariation
 			tyreCompoundVariation := strategy.TyreCompoundVariation
 		}
 		else {
 			consumptionVariation := 0
-			initialFuelVariation := 0
 			tyreUsageVariation := 0
 			tyreCompoundVariation := 0
 		}
@@ -2336,7 +2338,7 @@ class RaceStrategist extends GridRaceAssistant {
 		strategy.AvailableTyreSets := this.computeAvailableTyreSets(strategy.AvailableTyreSets, Task.CurrentTask.UsedTyreSets)
 	}
 
-	betterScenario(scenario, strategy := false) {
+	betterScenario(strategy, scenario) {
 		local knowledgeBase := this.KnowledgeBase
 		local sPitstops, cPitstops, sLaps, cLaps, sDuration, cDuration, sFuel, cFuel, sPLaps, cPLaps, sTLaps, cTLaps, sTSets, cTSets
 		local result
@@ -2396,9 +2398,6 @@ class RaceStrategist extends GridRaceAssistant {
 			}
 		}
 
-		if !strategy
-			strategy := this.Strategy
-
 		sLaps := strategy.getSessionLaps()
 		cLaps := scenario.getSessionLaps()
 		sDuration := strategy.getSessionDuration()
@@ -2435,17 +2434,17 @@ class RaceStrategist extends GridRaceAssistant {
 
 		; Negative => Better, Positive => Worse
 
-		result := (this.scenarioCoefficient("PitstopsCount", cPitstops - sPitstops, 1)
-				 + this.scenarioCoefficient("FuelMax", cFuel - sFuel, 10)
-				 + this.scenarioCoefficient("TyreSetsCount", sTSets - cTSets, 1)
-				 + this.scenarioCoefficient("TyreLapsMax", cTLaps - sTLaps, 10)
-				 + this.scenarioCoefficient("PitstopsPostLaps", sPLaps - cPLaps, 10))
+		result := (StrategySimulation.scenarioCoefficient("PitstopsCount", cPitstops - sPitstops, 1)
+				 + StrategySimulation.scenarioCoefficient("FuelMax", cFuel - sFuel, 10)
+				 + StrategySimulation.scenarioCoefficient("TyreSetsCount", sTSets - cTSets, 1)
+				 + StrategySimulation.scenarioCoefficient("TyreLapsMax", cTLaps - sTLaps, 10)
+				 + StrategySimulation.scenarioCoefficient("PitstopsPostLaps", sPLaps - cPLaps, 10))
 
-		if (this.SessionType = "Duration")
-			result += (this.scenarioCoefficient("ResultMajor", sLaps - cLaps, 1)
-					 + this.scenarioCoefficient("ResultMinor", cDuration - sDuration, (strategy.AvgLapTime + scenario.AvgLapTime) / 4))
+		if (scenario.SessionType = "Duration")
+			result += (StrategySimulation.scenarioCoefficient("ResultMajor", sLaps - cLaps, 1)
+					 + StrategySimulation.scenarioCoefficient("ResultMinor", cDuration - sDuration, (strategy.AvgLapTime + scenario.AvgLapTime) / 4))
 		else
-			result += this.scenarioCoefficient("ResultMajor", cDuration - sDuration, (strategy.AvgLapTime + scenario.AvgLapTime) / 4)
+			result += StrategySimulation.scenarioCoefficient("ResultMajor", cDuration - sDuration, (strategy.AvgLapTime + scenario.AvgLapTime) / 4)
 
 		if (result > 0)
 			return false
@@ -2471,9 +2470,9 @@ class RaceStrategist extends GridRaceAssistant {
 				confirm := true
 			else {
 				if strategy {
-					if (this.Strategy["Rejected"] && !this.betterScenario(strategy, this.Strategy["Rejected"]))
+					if (this.Strategy["Rejected"] && !this.betterScenario(this.Strategy["Rejected"], strategy))
 						return
-					else if ((this.Strategy != this.Strategy[true]) && !this.betterScenario(strategy))
+					else if ((this.Strategy != this.Strategy[true]) && !this.betterScenario(this.Strategy, strategy))
 						return
 
 					confirm := Task.CurrentTask.Confirm

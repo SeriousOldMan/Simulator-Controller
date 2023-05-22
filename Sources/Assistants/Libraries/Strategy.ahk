@@ -501,6 +501,9 @@ class StrategySimulation {
 
 							break
 						}
+
+					if !isNumber(reqPitstops)
+						reqPitstops := false
 				}
 
 				if (superfluousLaps > 0)
@@ -533,23 +536,23 @@ class StrategySimulation {
 		return (valid && this.scenarioValid(strategy, strategy.Validator))
 	}
 
+	scenarioCoefficient(cfs, value, step) {
+		static coefficients := CaseInsenseMap("ResultMajor", 		[-0.81, -0.31, 0, 0.31, 0.81]
+											, "ResultMinor",		[-0.13, 0, 0.13]
+											, "FuelMax",			[-0.34, -0.22, 0, 0.22, 0.34]
+											, "TyreSetsCount", 		[-0.46, -0.18, 0, 0.18, 0.46]
+											, "TyreLapsMax",		[-0.76, -0.38, -0.24, 0, 0.24, 0.38, 0.76]
+											, "PitstopsCount",		[-0.78, -0.52, 0, 0.52, 0.78]
+											, "PitstopsPostLaps",	[-0.43, -0.25, 0, 0.25, 0.43])
+
+		cfs := coefficients[cfs]
+
+		return cfs[Min(cfs.Length, Max(1, Round(value / step) + ((cfs.Length - 1) >> 1) + 1))]
+	}
+
 	compareScenarios(scenario1, scenario2) {
 		local sLaps, cLaps, sDuration, cDuration, sFuel, cFuel, sTLaps, cTLaps, sTSets, cTSets
 		local sPLaps, cPLaps
-
-		coefficient(cfs, value, step) {
-			static coefficients := [[-0.81, -0.31, 0, 0.31, 0.81], 				; Laps / Duration
-									[-0.34, -0.22, 0, 0.22, 0.34], 				; Fuel
-									[-0.46, -0.18, 0, 0.18, 0.46], 				; Tyre Sets
-									[-0.76, -0.38, -0.24, 0, 0.24, 0.38, 0.76], ; Tyre Laps
-									[-0.78, -0.52, 0, 0.52, 0.78], 				; # Pitstops
-									[-0.43, -0.25, 0, 0.25, 0.43], 				; Pitstop Lateness
-									[-0.13, 0, 0.13]]			   				; Duration
-
-			cfs := coefficients[cfs]
-
-			return cfs[Min(cfs.Length, Max(1, Round(value / step) + ((cfs.Length - 1) >> 1) + 1))]
-		}
 
 		pitstopLaps(scenario) {
 			local laps := 0
@@ -571,7 +574,7 @@ class StrategySimulation {
 			return fuelLevel
 		}
 
-		tyreLaps(scenario, &tyreSets := 0) {
+		tyreLaps(scenario, &tyreSets) {
 			local tyreLaps, tyreRunningLaps, lastLap, ignore, pitstop, stintLaps
 
 			tyreSets := 1
@@ -614,20 +617,20 @@ class StrategySimulation {
 
 		; Negative => 2, Positive => 1
 
-		result := (coefficient(5, scenario2.Pitstops.Length - scenario1.Pitstops.Length, 1)
-				 + coefficient(2, cFuel - sFuel, 10)
-				 + coefficient(3, sTSets - cTSets, 1)
-				 + coefficient(4, cTLaps - sTLaps, 10)
-				 + coefficient(6, sPLaps - cPLaps, 10))
+		result := (this.scenarioCoefficient("PitstopsCount", scenario2.Pitstops.Length - scenario1.Pitstops.Length, 1)
+				 + this.scenarioCoefficient("FuelMax", cFuel - sFuel, 10)
+				 + this.scenarioCoefficient("TyreSetsCount", sTSets - cTSets, 1)
+				 + this.scenarioCoefficient("TyreLapsMax", cTLaps - sTLaps, 10)
+				 + this.scenarioCoefficient("PitstopsPostLaps", sPLaps - cPLaps, 10))
 
 		if (this.SessionType = "Duration") {
 			sLaps := scenario1.getSessionLaps()
 			cLaps := scenario2.getSessionLaps()
 
-			result += (coefficient(1, sLaps - cLaps, 1) + coefficient(7, cDuration - sDuration, 1))
+			result += (this.scenarioCoefficient("ResultMajor", sLaps - cLaps, 1) + this.scenarioCoefficient("ResultMinor", cDuration - sDuration, 1))
 		}
 		else
-			result += coefficient(1, cDuration - sDuration, (scenario1.AvgLapTime + scenario2.AvgLapTime) / 2)
+			result += this.scenarioCoefficient("ResultMajor", cDuration - sDuration, (scenario1.AvgLapTime + scenario2.AvgLapTime) / 2)
 
 		if (result > 0)
 			return scenario1
@@ -2995,7 +2998,7 @@ class Strategy extends ConfigurationItem {
 		local pitstops, lastPitstops, ignore
 		local sessionLaps, numPitstops, fuelLaps, canonicalStintLaps, remainingFuel
 		local tyreChange, tyreCompound, tyreCompoundColor, driverID, driverName, pitstop, telemetryDB, candidate
-		local time, weather, airTemperature, trackTemperature, pitstopRule, adjusted, lastPitstop
+		local time, weather, airTemperature, trackTemperature, pitstopRule, adjusted, lastPitstop, missed
 
 		this.iStartStint := currentStint
 		this.iStartLap := currentLap
@@ -3048,9 +3051,15 @@ class Strategy extends ConfigurationItem {
 			if (adjustments && (A_Index > (adjustments.Count)))
 				break
 
+			missed := false
+
 			if !valid
-				if isObject(pitstopRule)
+				if isObject(pitstopRule) {
 					valid := ((pitstopLap >= (pitstopRule[1] * 60 / avgLapTime)) && (pitstopLap <= (pitstopRule[2] * 60 / avgLapTime)))
+
+					if !valid
+						missed := (pitstopLap > (pitstopRule[2] * 60 / avgLapTime))
+				}
 				else
 					valid := (pitstopNr >= numPitstops)
 
@@ -3061,7 +3070,7 @@ class Strategy extends ConfigurationItem {
 
 			remainingFuel := this.RemainingFuel[true]
 
-			if valid
+			if (valid || missed)
 				if (this.SessionType = "Duration") {
 					if (this.RemainingSessionTime[true] <= 0)
 						break
@@ -3134,7 +3143,7 @@ class Strategy extends ConfigurationItem {
 
 			pitstop := this.createPitstop(pitstopNr, pitstopLap, driverID, tyreCompound, tyreCompoundColor, false, adjustments)
 
-			if (valid && !adjustments)
+			if ((valid || missed) && !adjustments)
 				if (this.SessionType = "Duration") {
 					if (pitStop.RemainingSessionTime <= 0)
 						break
@@ -3274,7 +3283,7 @@ class Strategy extends ConfigurationItem {
 		if pitstop
 			return (pitstop.Lap + pitstop.StintLaps)
 		else
-			return this.RemainingSessionLaps
+			return (this.RemainingSessionLaps + this.StartLap)
 	}
 
 	getSessionDuration() {
@@ -3283,7 +3292,7 @@ class Strategy extends ConfigurationItem {
 		if pitstop
 			return (pitstop.Time + pitstop.Duration + (pitstop.StintLaps * pitstop.AvgLapTime))
 		else
-			return this.RemainingSessionTime
+			return (this.RemainingSessionTime + this.SessionStartTime)
 	}
 
 	getRemainingFuel() {

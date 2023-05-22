@@ -2321,77 +2321,121 @@ class RaceStrategist extends GridRaceAssistant {
 		local strategy := this.Strategy
 		local sPitstops := strategy.Pitstops.Length - strategy.RunningPitstops
 		local cPitstops := scenario.Pitstops.Length
-		local sLaps, cLaps, sTime, cTime
+		local sLaps, cLaps, sDuration, cDuration, sFuel, cFuel, sPLaps, cPLaps, sTLaps, cTLaps, sTSets, cTSets
+		local result
 
-		pitstopLaps(strategy) {
+		pitstopLaps(strategy, skip := 0) {
 			local laps := 0
-			local ignore, pitstop
+			local nr, pitstop
 
-			for ignore, pitstop in strategy.Pitstops
-				laps += pitstop.Lap
+			for nr, pitstop in strategy.Pitstops
+				if (nr > skip)
+					laps += pitstop.Lap
 
 			return laps
 		}
 
+		fuelLevel(strategy, skip := 0) {
+			local fuelLevel := strategy.RemainingFuel
+			local nr, pitstop
+
+			for nr, pitstop in strategy.Pitstops
+				if (nr > skip)
+					fuelLevel := Max(fuelLevel, pitstop.RemainingFuel)
+
+			return fuelLevel
+		}
+
+		tyreLaps(strategy, &tyreSets, skip := 0) {
+			local tyreLaps, tyreRunningLaps, lastLap, nr, pitstop, stintLaps
+
+			tyreSets := 1
+
+			if !strategy.LastPitstop
+				return strategy.getSessionLaps()
+			else {
+				tyreLaps := 0
+				tyreRunningLaps := 0
+				lastLap := 0
+
+				for nr, pitstop in strategy.Pitstops
+					if (nr > skip) {
+						stintLaps := (pitstop.Lap - lastLap)
+						tyreRunningLaps += stintLaps
+
+						if pitstop.TyreChange {
+							tyreLaps := Max(tyreLaps, tyreRunningLaps)
+							tyreSets += 1
+
+							tyreRunningLaps := 0
+						}
+
+						lastLap := pitstop.Lap
+					}
+
+				tyreLaps := Max(tyreLaps, tyreRunningLaps + strategy.LastPitstop.StintLaps)
+
+				return tyreLaps
+			}
+		}
+
+		sLaps := strategy.getSessionLaps()
+		cLaps := scenario.getSessionLaps()
+		sDuration := strategy.getSessionDuration()
+		cDuration := scenario.getSessionDuration()
+
+		cTLaps := tyreLaps(scenario, &cTSets)
+		sTLaps := tyreLaps(strategy, &sTSets, strategy.RunningPitstops)
+		cFuel := fuelLevel(scenario)
+		sFuel := fuelLevel(strategy, strategy.RunningPitstops)
+		cPLaps := pitstopLaps(scenario)
+		sPLaps := pitstopLaps(strategy, strategy.RunningPitstops)
+
 		if isDebug() {
 			logMessage(kLogDebug, "Session Format: " . knowledgeBase.getValue("Session.Format", "Time"))
 
+			logMessage(kLogDebug, "Strategy Laps: " . sLaps)
+			logMessage(kLogDebug, "Strategy Duration: " . sDuration)
 			logMessage(kLogDebug, "Strategy Pitstops: " . sPitstops)
+			logMessage(kLogDebug, "Strategy Fuel: " . sFuel)
+			logMessage(kLogDebug, "Strategy Tyre Laps: " . sTLaps)
+			logMessage(kLogDebug, "Strategy Tyre Sets: " . sTSets)
+			logMessage(kLogDebug, "Strategy Pitstop Laps: " . sPLaps)
+
+			logMessage(kLogDebug, "Candidate Laps: " . cLaps)
+			logMessage(kLogDebug, "Candidate Duration: " . cDuration)
 			logMessage(kLogDebug, "Candidate Pitstops: " . cPitstops)
+			logMessage(kLogDebug, "Candidate Fuel: " . cFuel)
+			logMessage(kLogDebug, "Candidate Tyre Laps: " . cTLaps)
+			logMessage(kLogDebug, "Candidate Tyre Sets: " . cTSets)
+			logMessage(kLogDebug, "Candidate Pitstop Laps: " . cPLaps)
 		}
 
-		if (knowledgeBase.getValue("Session.Format", "Time") = "Time") {
-			sLaps := (strategy.getSessionLaps() - strategy.RunningLaps)
-			cLaps := scenario.getSessionLaps()
+		; Negative => Better, Positive => Worse
 
-			if isDebug() {
-				logMessage(kLogDebug, "Strategy Laps: " . sLaps)
-				logMessage(kLogDebug, "Candidate Laps: " . cLaps)
-			}
+		result := (this.scenarioCoefficient("PitstopsCount", cPitstops - sPitstops, 1)
+				 + this.scenarioCoefficient("FuelMax", cFuel - sFuel, 10)
+				 + this.scenarioCoefficient("TyreSetsCount", sTSets - cTSets, 1)
+				 + this.scenarioCoefficient("TyreLapsMax", cTLaps - sTLaps, 10)
+				 + this.scenarioCoefficient("PitstopsPostLaps", sPLaps - cPLaps, 10))
 
-			if (sLaps > cLaps)
-				return false
-			else if (sLaps = cLaps) {
-				if (cPitstops > sPitstops)
-					return false
-				else if (cPitstops < sPitstops)
-					return true
-				else if (pitstopLaps(scenario) > pitstopLaps(strategy))
-					return true
-				else if ((scenario.FuelConsumption[true] >= strategy.FuelConsumption[true]))
-					return false
-				else
-					return true
-			}
-			else
-				return true
-		}
-		else {
-			sTime := (strategy.getSessionDuration() - strategy.RunningTime)
-			cTime := scenario.getSessionDuration()
+		if (this.SessionType = "Duration")
+			result += (this.scenarioCoefficient("ResultMajor", sLaps - cLaps, 1) + this.scenarioCoefficient("ResultMinor", cDuration - sDuration, 1))
+		else
+			result += this.scenarioCoefficient("ResultMajor", cDuration - sDuration, (strategy.AvgLapTime + scenario.AvgLapTime) / 2)
 
-			if isDebug() {
-				logMessage(kLogDebug, "Strategy Duration: " . sTime)
-				logMessage(kLogDebug, "Candidate Duration: " . cTime)
-			}
-
-			if (sTime < cTime)
-				return false
-			else if (sTime = cTime) {
-				if (cPitstops > sPitstops)
-					return false
-				else if (cPitstops < sPitstops)
-					return true
-				else if (pitstopLaps(scenario) > pitstopLaps(strategy))
-					return true
-				else if ((scenario.FuelConsumption[true] > strategy.FuelConsumption[true]))
-					return false
-				else
-					return true
-			}
-			else
-				return true
-		}
+		if (result > 0)
+			return false
+		else if (result < 0)
+			return true
+		else if (scenario.getRemainingFuel() > strategy.getRemainingFuel())
+			return false
+		else if (scenario.getRemainingFuel() < strategy.getRemainingFuel())
+			return true
+		else if ((scenario.FuelConsumption[true] > strategy.FuelConsumption[true]))
+			return false
+		else
+			return true
 	}
 
 	chooseScenario(strategy, confirm?) {

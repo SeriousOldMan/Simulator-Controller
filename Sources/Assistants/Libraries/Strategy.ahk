@@ -627,10 +627,11 @@ class StrategySimulation {
 			sLaps := scenario1.getSessionLaps()
 			cLaps := scenario2.getSessionLaps()
 
-			result += (this.scenarioCoefficient("ResultMajor", sLaps - cLaps, 1) + this.scenarioCoefficient("ResultMinor", cDuration - sDuration, 1))
+			result += (this.scenarioCoefficient("ResultMajor", sLaps - cLaps, 1)
+					 + this.scenarioCoefficient("ResultMinor", cDuration - sDuration, (scenario1.AvgLapTime + scenario2.AvgLapTime) / 4))
 		}
 		else
-			result += this.scenarioCoefficient("ResultMajor", cDuration - sDuration, (scenario1.AvgLapTime + scenario2.AvgLapTime) / 2)
+			result += this.scenarioCoefficient("ResultMajor", cDuration - sDuration, (scenario1.AvgLapTime + scenario2.AvgLapTime) / 4)
 
 		if (result > 0)
 			return scenario1

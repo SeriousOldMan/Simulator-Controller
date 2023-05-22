@@ -36,6 +36,7 @@ class RaceStrategist extends GridRaceAssistant {
 	iStrategy := false
 	iStrategyReported := false
 	iLastStrategyUpdate := 0
+	iRejectedStrategy := false
 
 	iSaveTelemetry := kAlways
 	iSaveRaceReport := false
@@ -85,6 +86,20 @@ class RaceStrategist extends GridRaceAssistant {
 
 		reviewRace(arguments*) {
 			this.callRemote("reviewRace", arguments*)
+		}
+	}
+
+	class ConfirmStrategyUpdateContinuation extends VoiceManager.ReplyContinuation {
+		iStrategy := false
+
+		__New(strategist, strategy) {
+			this.iStrategy := strategy
+
+			super.__New(strategist, ObjBindMethod(strategist, "chooseScenario", strategy, false), "Roger", "Okay")
+		}
+
+		cancel() {
+			this.Manager.updateDynamicValues({RejectedStrategy: this.iStrategy})
 		}
 	}
 
@@ -444,7 +459,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 	Strategy[original := false] {
 		Get {
-			return (original ? this.iOriginalStrategy : this.iStrategy)
+			return (original ? ((original = "Rejected") ? this.iRejectedStrategy : this.iOriginalStrategy) : this.iStrategy)
 		}
 	}
 
@@ -533,6 +548,7 @@ class RaceStrategist extends GridRaceAssistant {
 		if (values.HasProp("Session") && (this.Session == kSessionFinished)) {
 			this.iStrategyReported := false
 			this.iLastStrategyUpdate := 0
+			this.iRejectedStrategy := false
 		}
 	}
 
@@ -560,6 +576,9 @@ class RaceStrategist extends GridRaceAssistant {
 
 		if values.HasProp("StrategyReported")
 			this.iStrategyReported := values.StrategyReported
+
+		if values.HasProp("RejectedStrategy")
+			this.iRejectedStrategy := values.RejectedStrategy
 	}
 
 	hasEnoughData(inform := true) {
@@ -1484,7 +1503,7 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 
 		this.updateDynamicValues({OverallTime: 0, BestLapTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false
-								, StrategyReported: false, HasTelemetryData: false})
+								, StrategyReported: false, RejectedStrategy: false, HasTelemetryData: false})
 		this.updateSessionValues({Simulator: "", Session: kSessionFinished, OriginalStrategy: false, Strategy: false, SessionTime: false})
 	}
 
@@ -1900,6 +1919,7 @@ class RaceStrategist extends GridRaceAssistant {
 				this.getSpeaker().speakPhrase("StrategyCanceled")
 
 			this.updateSessionValues({OriginalStrategy: false, Strategy: false})
+			this.updateDynamicValues({RejectedStrategy: false})
 		}
 	}
 
@@ -1956,7 +1976,7 @@ class RaceStrategist extends GridRaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local fact, value
 
-		this.updateDynamicValues({StrategyReported: true})
+		this.updateDynamicValues({StrategyReported: true, RejectedStrategy: false})
 
 		if strategy {
 			if (this.Session == kSessionRace) {
@@ -2316,12 +2336,9 @@ class RaceStrategist extends GridRaceAssistant {
 		strategy.AvailableTyreSets := this.computeAvailableTyreSets(strategy.AvailableTyreSets, Task.CurrentTask.UsedTyreSets)
 	}
 
-	betterScenario(scenario) {
+	betterScenario(scenario, strategy := false) {
 		local knowledgeBase := this.KnowledgeBase
-		local strategy := this.Strategy
-		local sPitstops := strategy.Pitstops.Length - strategy.RunningPitstops
-		local cPitstops := scenario.Pitstops.Length
-		local sLaps, cLaps, sDuration, cDuration, sFuel, cFuel, sPLaps, cPLaps, sTLaps, cTLaps, sTSets, cTSets
+		local sPitstops, cPitstops, sLaps, cLaps, sDuration, cDuration, sFuel, cFuel, sPLaps, cPLaps, sTLaps, cTLaps, sTSets, cTSets
 		local result
 
 		pitstopLaps(strategy, skip := 0) {
@@ -2379,11 +2396,16 @@ class RaceStrategist extends GridRaceAssistant {
 			}
 		}
 
+		if !strategy
+			strategy := this.Strategy
+
 		sLaps := strategy.getSessionLaps()
 		cLaps := scenario.getSessionLaps()
 		sDuration := strategy.getSessionDuration()
 		cDuration := scenario.getSessionDuration()
 
+		cPitstops := scenario.Pitstops.Length
+		sPitstops := (strategy.Pitstops.Length - strategy.RunningPitstops)
 		cTLaps := tyreLaps(scenario, &cTSets)
 		sTLaps := tyreLaps(strategy, &sTSets, strategy.RunningPitstops)
 		cFuel := fuelLevel(scenario)
@@ -2420,9 +2442,10 @@ class RaceStrategist extends GridRaceAssistant {
 				 + this.scenarioCoefficient("PitstopsPostLaps", sPLaps - cPLaps, 10))
 
 		if (this.SessionType = "Duration")
-			result += (this.scenarioCoefficient("ResultMajor", sLaps - cLaps, 1) + this.scenarioCoefficient("ResultMinor", cDuration - sDuration, 1))
+			result += (this.scenarioCoefficient("ResultMajor", sLaps - cLaps, 1)
+					 + this.scenarioCoefficient("ResultMinor", cDuration - sDuration, (strategy.AvgLapTime + scenario.AvgLapTime) / 4))
 		else
-			result += this.scenarioCoefficient("ResultMajor", cDuration - sDuration, (strategy.AvgLapTime + scenario.AvgLapTime) / 2)
+			result += this.scenarioCoefficient("ResultMajor", cDuration - sDuration, (strategy.AvgLapTime + scenario.AvgLapTime) / 4)
 
 		if (result > 0)
 			return false
@@ -2448,7 +2471,9 @@ class RaceStrategist extends GridRaceAssistant {
 				confirm := true
 			else {
 				if strategy {
-					if ((this.Strategy != this.Strategy[true]) && !this.betterScenario(strategy))
+					if (this.Strategy["Rejected"] && !this.betterScenario(strategy, this.Strategy["Rejected"]))
+						return
+					else if ((this.Strategy != this.Strategy[true]) && !this.betterScenario(strategy))
 						return
 
 					confirm := Task.CurrentTask.Confirm
@@ -2456,7 +2481,7 @@ class RaceStrategist extends GridRaceAssistant {
 					if (confirm && this.Speaker) {
 						this.getSpeaker().speakPhrase("ConfirmUpdateStrategy", false, true)
 
-						this.setContinuation(ObjBindMethod(this, "chooseScenario", strategy, false))
+						this.setContinuation(RaceStrategist.ConfirmStrategyUpdateContinuation(this, strategy))
 
 						return
 					}

@@ -1533,9 +1533,6 @@ class StrategyWorkbench extends ConfigurationItem {
 			this.Control["pitstopWindowLabel"].Visible := false
 		}
 
-		tyreChangeRequirementsDropDown := this.Control["tyreChangeRequirementsDropDown"].Text
-		refuelRequirementsDropDown := this.Control["refuelRequirementsDropDown"].Text
-
 		oldTChoice := ["Optional", "Required", "Always", "Disallowed"][this.Control["tyreChangeRequirementsDropDown"].Value]
 		oldFChoice := ["Optional", "Required", "Always", "Disallowed"][this.Control["refuelRequirementsDropDown"].Value]
 

@@ -164,7 +164,7 @@ class SyncSessionTask extends RaceCenterTask {
 	run() {
 		super.run()
 
-		this.Sleep := (RaceCenter.Instance.Synchronize ? (RaceCenter.Instance.Synchronize * 1000) : 1000)
+		this.Sleep := (RaceCenter.Instance.Synchronize ? (RaceCenter.Instance.Synchronize * 1000) : 10000)
 
 		return this
 	}

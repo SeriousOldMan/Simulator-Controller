@@ -3055,7 +3055,7 @@ class RaceCenter extends ConfigurationItem {
 			}
 
 			for ignore, entry in Database(directory . "\", kSessionDataSchemas).Tables["Setups.Data"] {
-				if !inList(this.SessionDrivers, entry["Driver"]) {
+				if !inList(getKeys(this.SessionDrivers), entry["Driver"]) {
 					entry.Clone()
 
 					entry["Driver"] := "John Doe (JD)"

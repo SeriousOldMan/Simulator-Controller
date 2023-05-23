@@ -2559,6 +2559,8 @@ class StrategyWorkbench extends ConfigurationItem {
 		finally {
 			protectionOff(true, true)
 		}
+
+		this.updateSettingsMenu()
 	}
 
 	chooseSimulationMenu(line) {

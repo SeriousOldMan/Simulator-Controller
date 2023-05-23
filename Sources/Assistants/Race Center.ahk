@@ -164,7 +164,7 @@ class SyncSessionTask extends RaceCenterTask {
 	run() {
 		super.run()
 
-		this.Sleep := (RaceCenter.Instance.Synchronize * 1000)
+		this.Sleep := (RaceCenter.Instance.Synchronize ? (RaceCenter.Instance.Synchronize * 1000) : 1000)
 
 		return this
 	}
@@ -4277,6 +4277,9 @@ class RaceCenter extends ConfigurationItem {
 
 					synchronizeMenu.Add(translate("Off"), (*) => (this.iSynchronize := false))
 
+					if !this.Synchronize
+						synchronizeMenu.Check(translate("Off"))
+
 					for ignore, seconds in [4, 5, 6, 8, 10, 12, 14, 16, 20, 25, 30, 40, 50, 60] {
 						setSynchronize(seconds, *) {
 							this.iSynchronize := seconds
@@ -4330,6 +4333,8 @@ class RaceCenter extends ConfigurationItem {
 			case 17: ; Driver Statistics
 				this.showDriverStatistics()
 		}
+
+		this.updateSessionMenu()
 	}
 
 	chooseStrategyMenu(line) {
@@ -4498,6 +4503,8 @@ class RaceCenter extends ConfigurationItem {
 					OnMessage(0x44, translateOkButton, 0)
 				}
 		}
+
+		this.updateStrategyMenu()
 	}
 
 	choosePlanMenu(line) {
@@ -4519,6 +4526,8 @@ class RaceCenter extends ConfigurationItem {
 					OnMessage(0x44, translateOkButton, 0)
 				}
 		}
+
+		this.updatePlanMenu()
 	}
 
 	choosePitstopMenu(line) {
@@ -4580,6 +4589,8 @@ class RaceCenter extends ConfigurationItem {
 			case 16:
 				this.planPitstop()
 		}
+
+		this.updatePitstopMenu()
 	}
 
 	withExceptionHandler(function, arguments*) {

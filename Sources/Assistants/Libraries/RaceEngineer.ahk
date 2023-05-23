@@ -316,7 +316,7 @@ class RaceEngineer extends RaceAssistant {
 
 	lapInfoRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
-		local speaker, remainingFuelLaps, remainingSessionLaps, remainingStintLaps
+		local lap, speaker, remainingFuelLaps, remainingSessionLaps, remainingStintLaps
 
 		if !this.hasEnoughData()
 			return
@@ -330,6 +330,8 @@ class RaceEngineer extends RaceAssistant {
 			speaker.beginTalk()
 
 			try {
+				speaker.speakPhrase("LapsAlready", {laps: knowledgeBase.getValue("Lap", 0) - this.BaseLap + 1})
+
 				speaker.speakPhrase("LapsFuel", {laps: remainingFuelLaps})
 
 				remainingSessionLaps := Round(knowledgeBase.getValue("Lap.Remaining.Session"))

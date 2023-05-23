@@ -9,8 +9,9 @@
   8. It was possible that the Strategist asks two questions about pending pitstops at the same time. This has been fixed.
   9. Tweaked strategy comparison and selection by the Strategist, when using background strategy revision.
   10. The Strategist will remember, if the user rejects a strategy update, and will not ask again for the same strategy.
-  11. Fixed relocation of session database (broken since 5.0).
-  12. Optimized the calculation and display of other cars pitstops in "Race Center".
+  11. Both the Engineer and the Strategist will tell you as well the number of laps driven, when you ask for the remaining laps.
+  12. Fixed relocation of session database (broken since 5.0).
+  13. Optimized the calculation and display of other cars pitstops in "Race Center".
 
 ## 5.0.5.0-release 05/19/23
   1. Minor bugfixes, as always

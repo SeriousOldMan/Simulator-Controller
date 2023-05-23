@@ -969,15 +969,9 @@ class RaceSpotter extends GridRaceAssistant {
 			this.iRunning := values.Running
 
 		if (values.HasProp("Session") && (values.Session == kSessionFinished)) {
-			this.iLastDeltaInformationLap := 0
-			this.iLastPenalty := false
-
 			this.iRunning := false
-			this.iDriverCar := false
-			this.OtherCars := CaseInsenseMap()
-			this.PositionInfos := CaseInsenseMap()
-			this.TacticalAdvices := CaseInsenseMap()
-			this.SessionInfos := CaseInsenseMap()
+
+			this.initializeHistory()
 
 			this.iPitstops := CaseInsenseMap()
 			this.iLastPitstopUpdate := false
@@ -2686,6 +2680,16 @@ class RaceSpotter extends GridRaceAssistant {
 		this.updateConfigurationValues({Announcements: announcements})
 	}
 
+	initializeHistory() {
+		this.iDriverCar := false
+		this.OtherCars := CaseInsenseMap()
+		this.PositionInfos := CaseInsenseMap()
+		this.TacticalAdvices := CaseInsenseMap()
+		this.SessionInfos := CaseInsenseMap()
+		this.iLastDeltaInformationLap := 0
+		this.iLastPenalty := false
+	}
+
 	initializeGridPosition(data, force := false) {
 		local driver := getMultiMapValue(data, "Position Data", "Driver.Car", false)
 
@@ -2818,14 +2822,7 @@ class RaceSpotter extends GridRaceAssistant {
 								, BestLapTime: 0, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0
 								, EnoughData: false})
 
-		this.iDriverCar := false
-		this.OtherCars := CaseInsenseMap()
-		this.PositionInfos := CaseInsenseMap()
-		this.TacticalAdvices := CaseInsenseMap()
-		this.SessionInfos := CaseInsenseMap()
-		this.iLastDeltaInformationLap := 0
-		this.iLastPenalty := false
-
+		this.initializeHistory()
 		this.initializeGridPosition(data)
 
 		this.startupSpotter()
@@ -2998,13 +2995,8 @@ class RaceSpotter extends GridRaceAssistant {
 
 		lastPitstop := knowledgeBase.getValue("Pitstop.Last", false)
 
-		if (lastPitstop && (Abs(lapNumber - lastPitstop) <= 2)) {
-			this.PositionInfos := CaseInsenseMap()
-			this.TacticalAdvices := CaseInsenseMap()
-			this.SessionInfos := CaseInsenseMap()
-			this.iLastDeltaInformationLap := 0
-			this.iLastPenalty := false
-		}
+		if (lastPitstop && (Abs(lapNumber - lastPitstop) <= 2))
+			this.initializeHistory()
 
 		this.initializeGridPosition(data)
 
@@ -3286,11 +3278,7 @@ class RaceSpotter extends GridRaceAssistant {
 	}
 
 	executePitstop(lapNumber) {
-		this.PositionInfos := CaseInsenseMap()
-		this.TacticalAdvices := CaseInsenseMap()
-		this.SessionInfos := CaseInsenseMap()
-		this.iLastDeltaInformationLap := 0
-		this.iLastPenalty := false
+		this.initializeHistory()
 
 		return super.executePitstop(lapNumber)
 	}

@@ -718,6 +718,8 @@ class RaceStrategist extends GridRaceAssistant {
 			speaker.beginTalk()
 
 			try {
+				speaker.speakPhrase("LapsAlready", {laps: knowledgeBase.getValue("Lap", 0) - this.BaseLap + 1})
+
 				speaker.speakPhrase("LapsFuel", {laps: remainingFuelLaps})
 
 				remainingSessionLaps := Round(knowledgeBase.getValue("Lap.Remaining.Session"))

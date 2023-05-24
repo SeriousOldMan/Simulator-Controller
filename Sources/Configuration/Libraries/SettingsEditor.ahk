@@ -556,7 +556,7 @@ editSettings(&settingsOrCommand, withContinue := false, fromSetup := false, x :=
 
 		buttonBoxPosition := settingsEditorGui.Add("DropDownList", "X120 YP-5 w100 Choose" . chosen, collect(choices, translate))
 
-		settingsEditorGui.Add("Text", "XS YP+30", translate("Overlay Position"))
+		settingsEditorGui.Add("Text", "XS YP+30", translate("Info Position"))
 
 		choices := ["Top", "Bottom", "2nd Screen Top", "2nd Screen Bottom"]
 		chosen := inList(choices, popupPosition)

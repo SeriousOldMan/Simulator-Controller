@@ -10,10 +10,14 @@
   9. Tweaked strategy comparison and selection by the Strategist, when using background strategy revision.
   10. The Strategist will remember, if the user has rejected a strategy update, and will not ask again for the same strategy.
   11. Both the Engineer and the Strategist will tell you now the number of laps already driven, when you ask for the remaining laps.
-  12. Fixed relocation of session database (broken since 5.0).
-  13. Fixed data cleanup in "Strategy Workbench" (broken since 5.0).
-  14. Optimized the calculation and display of other cars pitstops in "Race Center".
-
+  12. Optimized the calculation and display of other cars pitstops in "Race Center".
+  13. Fixed relocation of session database (broken since 5.0).
+  14. Fixed data cleanup in "Strategy Workbench" (broken since 5.0).
+  15. New car models for "Setup Workbench":
+      - Assetto Corsa
+	    - Audi Sport Quattro
+	    - Ford Escort RS1600
+		
 ## 5.0.5.0-release 05/19/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

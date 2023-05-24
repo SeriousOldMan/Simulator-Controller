@@ -232,7 +232,7 @@ class TelemetryDatabase extends SessionDatabase {
 
 	cleanupData(weather, compound, compoundColor, drivers := kUndefined) {
 		local database := this.Database
-		local where, ltAvg, ltStdDev, cAvg, cStdDev, rows, identifiers, filter, ignore, row, ignore, connector
+		local where, ltAvg, ltStdDev, cAvg, cStdDev, rows, identifiers, filter, ignore, row, identifier, connector
 
 		if database {
 			where := Map("Weather", weather, "Tyre.Compound", compound, "Tyre.Compound.Color", compoundColor)
@@ -266,10 +266,8 @@ class TelemetryDatabase extends SessionDatabase {
 					if this.Shared
 						for ignore, connector in this.Connectors
 							try {
-								if isObject(identifiers)
-									identifiers := values2String(";", identifiers*)
-
-								connector.DeleteData("Electronics", identifiers)
+								for ignore, identifier in identifiers
+									connector.DeleteData("Electronics", identifier)
 							}
 							catch Any as exception {
 								logError(exception, true)
@@ -309,10 +307,8 @@ class TelemetryDatabase extends SessionDatabase {
 					if this.Shared
 						for ignore, connector in this.Connectors
 							try {
-								if isObject(identifiers)
-									identifiers := values2String(";", identifiers*)
-
-								connector.DeleteData("Tyres", identifiers)
+								for ignore, identifier in identifiers
+									connector.DeleteData("Tyres", identifier)
 							}
 							catch Any as exception {
 								logError(exception, true)
@@ -512,7 +508,7 @@ validLap(ltAvg, ltStdDev, cAvg, cStdDev, row) {
 		return false
 }
 
-invalidLap(ltAvg, ltStdDev, cAvg, cStdDev, row, drivers := kUndefined) {
+invalidLap(ltAvg, ltStdDev, cAvg, cStdDev, drivers, row) {
 	local driver := row["Driver"]
 
 	if ((drivers = kUndefined)

@@ -391,13 +391,20 @@ class StrategyWorkbench extends ConfigurationItem {
 					OnMessage(0x44, translateYesNoButtons, 0)
 
 					if (msgResult = "Yes") {
-						TelemetryDatabase(workbench.SelectedSimulator , workbench.SelectedCar, workbench.SelectedTrack
-										, workbench.SelectedDrivers).cleanupData(workbench.SelectedWeather, workbench.SelectedCompound
-																			   , workbench.SelectedCompoundColor, workbench.SelectedDrivers)
+						this.Window.Opt("+Disabled")
 
-						workbench.loadDataType(workbench.SelectedDataType, true, true)
+						try {
+							TelemetryDatabase(workbench.SelectedSimulator , workbench.SelectedCar, workbench.SelectedTrack
+											, workbench.SelectedDrivers).cleanupData(workbench.SelectedWeather, workbench.SelectedCompound
+																				   , workbench.SelectedCompoundColor, workbench.SelectedDrivers ? workbench.SelectedDrivers : true)
 
-						workbench.loadCompound(workbench.AvailableCompounds[workbenchGui["compoundDropDown"].Value], true)
+							workbench.loadDataType(workbench.SelectedDataType, true)
+
+							workbench.loadCompound(workbench.AvailableCompounds[workbenchGui["compoundDropDown"].Value], true)
+						}
+						finally {
+							this.Window.Opt("-Disabled")
+						}
 					}
 				}
 
@@ -1533,9 +1540,6 @@ class StrategyWorkbench extends ConfigurationItem {
 			this.Control["pitstopWindowLabel"].Visible := false
 		}
 
-		tyreChangeRequirementsDropDown := this.Control["tyreChangeRequirementsDropDown"].Text
-		refuelRequirementsDropDown := this.Control["refuelRequirementsDropDown"].Text
-
 		oldTChoice := ["Optional", "Required", "Always", "Disallowed"][this.Control["tyreChangeRequirementsDropDown"].Value]
 		oldFChoice := ["Optional", "Required", "Always", "Disallowed"][this.Control["refuelRequirementsDropDown"].Value]
 
@@ -1882,7 +1886,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		}
 	}
 
-	loadDataType(dataType, force := false, reload := false) {
+	loadDataType(dataType, force := false) {
 		local tyreCompound, telemetryDB, ignore, column, categories, field, category, value
 		local driverNames, index, names, schema, availableCompounds
 
@@ -1946,7 +1950,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			this.Control["dataY2DropDown"].Delete()
 			this.Control["dataY3DropDown"].Delete()
 
-			if ((availableCompounds.Length > 0) && !reload) {
+			if (availableCompounds.Length > 0) {
 				driverNames := SessionDatabase.getAllDrivers(this.SelectedSimulator, true)
 
 				for index, names in driverNames
@@ -2559,6 +2563,8 @@ class StrategyWorkbench extends ConfigurationItem {
 		finally {
 			protectionOff(true, true)
 		}
+
+		this.updateSettingsMenu()
 	}
 
 	chooseSimulationMenu(line) {

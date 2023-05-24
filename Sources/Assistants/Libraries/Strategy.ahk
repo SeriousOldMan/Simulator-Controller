@@ -456,8 +456,11 @@ class StrategySimulation {
 
 		startFuelAmount := Min(fuelCapacity, initialFuelAmount + (initialFuelVariation / 100 * fuelCapacity))
 
-		if formationLap
+		if formationLap {
+			startFuelAmount := Max(startFuelAmount, currentConsumption * 2)
+
 			fuelAmount := (startFuelAmount - currentConsumption)
+		}
 		else
 			fuelAmount := startFuelAmount
 
@@ -2809,7 +2812,7 @@ class Strategy extends ConfigurationItem {
 	}
 
 	getMaxFuelLaps(remainingFuel, fuelConsumption, withSafety := true) {
-		return Floor((remainingFuel - (withSafety ? this.SafetyFuel : 0)) / fuelConsumption)
+		return Max(0, Floor((remainingFuel - (withSafety ? this.SafetyFuel : 0)) / fuelConsumption))
 	}
 
 	calcSessionLaps(avgLapTime := false, formationLap := true, postRaceLap := true) {
@@ -2999,6 +3002,7 @@ class Strategy extends ConfigurationItem {
 			   , ecuMap, fuelConsumption, avgLapTime, adjustments := false) {
 		local valid := true
 		local pitstopLap := 0
+		local lastPitstopLap := 0
 		local pitstopNr := 0
 		local pitstops, lastPitstops, ignore
 		local sessionLaps, numPitstops, fuelLaps, canonicalStintLaps, remainingFuel
@@ -3104,6 +3108,11 @@ class Strategy extends ConfigurationItem {
 						pitstops.Push(lastPitstop)
 					}
 			}
+
+			if (pitstopLap = lastPitstopLap)
+				break
+			else
+				lastPitstopLap := pitstopLap
 
 			if adjustments {
 				if (adjustments.Has(pitstopNr) && adjustments[pitstopNr].HasProp("TyreChange")) {

@@ -8,7 +8,7 @@
   7. Default for strategy simulations is now "Telemetry Data" and the entry fields, which are only available in *initial conditions* simulations, are now disabled.
   8. It was possible that the Strategist asks two questions about pending pitstops at the same time. This has been fixed.
   9. Tweaked strategy comparison and selection by the Strategist, when using background strategy revision.
-  10. The Strategist will remember, if the user has rejected a strategy update, and will not ask again for the same strategy.
+  10. The Strategist will remember, if the user has rejected a strategy update, and will not ask again for a revised strategy, which is considered to be similar.
   11. Both the Engineer and the Strategist will tell you now the number of laps already driven, when you ask for the remaining laps.
   12. Optimized the calculation and display of other cars pitstops in "Race Center".
   13. Fixed relocation of session database (broken since 5.0).

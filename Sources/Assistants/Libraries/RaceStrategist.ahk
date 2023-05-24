@@ -1976,7 +1976,7 @@ class RaceStrategist extends GridRaceAssistant {
 			this.getSpeaker().speakPhrase("NoStrategy")
 	}
 
-	updateStrategy(strategy, original := true) {
+	updateStrategy(strategy, original := true, fullInfo := false) {
 		local knowledgeBase := this.KnowledgeBase
 		local fact, value
 
@@ -1999,7 +1999,7 @@ class RaceStrategist extends GridRaceAssistant {
 				else {
 					this.updateSessionValues({Strategy: strategy})
 
-					this.reportStrategy({Strategy: true, Pitstops: false, NextPitstop: true, TyreChange: true, Refuel: true, Map: true})
+					this.reportStrategy(fullInfo ? true : {Strategy: true, Pitstops: false, NextPitstop: true, TyreChange: true, Refuel: true, Map: true})
 				}
 			}
 		}
@@ -2506,7 +2506,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 			strategy.setVersion(A_Now . "")
 
-			Task.startTask(ObjBindMethod(this, "updateStrategy", strategy, false), 1000)
+			Task.startTask(ObjBindMethod(this, "updateStrategy", strategy, false, true), 1000)
 
 			if this.RemoteHandler {
 				fileName := temporaryFileName("Race Strategy", "update")

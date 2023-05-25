@@ -710,7 +710,7 @@ class RaceStrategist extends GridRaceAssistant {
 			return
 
 		speaker := this.getSpeaker()
-		remainingFuelLaps := Round(knowledgeBase.getValue("Lap.Remaining.Fuel", 0))
+		remainingFuelLaps := Floor(knowledgeBase.getValue("Lap.Remaining.Fuel", 0))
 
 		if (remainingFuelLaps == 0)
 			speaker.speakPhrase("Later")
@@ -722,8 +722,8 @@ class RaceStrategist extends GridRaceAssistant {
 
 				speaker.speakPhrase("LapsFuel", {laps: remainingFuelLaps})
 
-				remainingSessionLaps := Round(knowledgeBase.getValue("Lap.Remaining.Session"))
-				remainingStintLaps := Round(knowledgeBase.getValue("Lap.Remaining.Stint"))
+				remainingSessionLaps := Ceil(knowledgeBase.getValue("Lap.Remaining.Session", 0))
+				remainingStintLaps := Floor(knowledgeBase.getValue("Lap.Remaining.Stint", 0))
 
 				if ((remainingStintLaps < remainingFuelLaps) && (remainingStintLaps < remainingSessionLaps))
 					speaker.speakPhrase("LapsStint", {laps: remainingSessionLaps})
@@ -1631,7 +1631,9 @@ class RaceStrategist extends GridRaceAssistant {
 		local compound, result, lap, simulator, car, track, frequency, curContinuation
 		local pitstop, prefix, validLap, weather, airTemperature, trackTemperature, compound, compoundColor
 		local fuelConsumption, fuelRemaining, lapTime, map, tc, antiBS, pressures, temperatures, wear, multiClass
+		local sessionInfo, validLap, driverCar
 
+		static sessionTypes := Map(kSessionPractice, "Practice", kSessionQualification, "Qualification", kSessionRace, "Race", kSessionOther, "Other")
 		static lastLap := 0
 
 		if (lapNumber <= lastLap) {
@@ -1679,6 +1681,9 @@ class RaceStrategist extends GridRaceAssistant {
 		if !this.MultiClass
 			this.adjustGaps(data)
 
+		driverCar := knowledgeBase.getValue("Driver.Car", 0)
+		validLap := true
+
 		loop knowledgeBase.getValue("Car.Count") {
 			lap := knowledgeBase.getValue("Car." . A_Index . ".Lap", 0)
 
@@ -1689,7 +1694,10 @@ class RaceStrategist extends GridRaceAssistant {
 					knowledgeBase.addFact("Car." . A_Index . ".Lap.Valid", knowledgeBase.getValue("Car." . A_Index . ".Valid.Running", true))
 
 				if knowledgeBase.getValue("Car." . A_Index . ".Lap.Valid", true)
-					knowledgeBase.setFact("Car." . A_Index . ".Valid.Laps", knowledgeBase.getValue("Car." . A_Index . ".Valid.Laps", 0) +  1)
+					knowledgeBase.setFact("Car." . A_Index . ".Valid.Laps", knowledgeBase.getValue("Car." . A_Index . ".Valid.Laps", 0) + 1)
+
+				if (A_Index = driverCar)
+					validLap := knowledgeBase.getValue("Car." . A_Index . ".Lap.Valid")
 			}
 		}
 
@@ -1758,6 +1766,57 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 
 		this.saveStandingsData(lapNumber, simulator, car, track)
+
+		createSessionInfo() {
+			sessionInfo := newMultiMap()
+
+			setMultiMapValue(sessionInfo, "Session", "Simulator", this.SettingsDatabase.getSimulatorName(simulator))
+			setMultiMapValue(sessionInfo, "Session", "Car", this.SettingsDatabase.getCarName(simulator, car))
+			setMultiMapValue(sessionInfo, "Session", "Track", this.SettingsDatabase.getCarName(simulator, track))
+			setMultiMapValue(sessionInfo, "Session", "Type", sessionTypes[this.Session])
+			setMultiMapValue(sessionInfo, "Session", "Format", knowledgeBase.getValue("Session.Format", "Time"))
+			setMultiMapValue(sessionInfo, "Session", "Laps", lapNumber)
+			setMultiMapValue(sessionInfo, "Session", "Laps.Remaining", Ceil(knowledgeBase.getValue("Lap.Remaining.Session", 0)))
+			setMultiMapValue(sessionInfo, "Session", "Time.Remaining", getMultiMapValue(data, "Session Data", "SessionTimeRemaining") / 1000)
+
+			setMultiMapValue(sessionInfo, "Stint", "Driver", computeDriverName(getMultiMapValue(data, "Stint Data", "DriverForname", this.DriverForName)
+																			 , getMultiMapValue(data, "Stint Data", "DriverSurname", "Doe")
+																			 , getMultiMapValue(data, "Stint Data", "DriverNickname", "JDO")))
+			setMultiMapValue(sessionInfo, "Stint", "Lap", lapNumber)
+			setMultiMapValue(sessionInfo, "Stint", "Position", knowledgeBase.getValue("Position", 0))
+			setMultiMapValue(sessionInfo, "Stint", "Valid", validLap)
+			setMultiMapValue(sessionInfo, "Stint", "Fuel.AvgConsumption", knowledgeBase.getValue("Lap." . lapNumber . ".Fuel.AvgConsumption"))
+			setMultiMapValue(sessionInfo, "Stint", "Fuel.Consumption", knowledgeBase.getValue("Lap." . lapNumber . ".Fuel.Consumption"))
+			setMultiMapValue(sessionInfo, "Stint", "Fuel.Remaining", getMultiMapValue(data, "Car Data", "FuelRemaining", 0))
+			setMultiMapValue(sessionInfo, "Stint", "Laps", lapNumber - this.BaseLap + 1)
+			setMultiMapValue(sessionInfo, "Stint", "Laps.Remaining.Fuel", Floor(knowledgeBase.getValue("Lap.Remaining.Fuel", 0)))
+			setMultiMapValue(sessionInfo, "Stint", "Laps.Remaining.Stint", Floor(knowledgeBase.getValue("Lap.Remaining.Stint", 0)))
+			setMultiMapValue(sessionInfo, "Stint", "Time.Remaining.Stint", getMultiMapValue(data, "Stint Data", "StintTimeRemaining"))
+			setMultiMapValue(sessionInfo, "Stint", "Time.Remaining.Driver", getMultiMapValue(data, "Stint Data", "DriverTimeRemaining"))
+			setMultiMapValue(sessionInfo, "Stint", "Lap.Time.Last", getMultiMapValue(data, "Stint Data", "LapLastTime"))
+			setMultiMapValue(sessionInfo, "Stint", "Lap.Time.Best", getMultiMapValue(data, "Stint Data", "LapBestTime"))
+
+			setMultiMapValue(sessionInfo, "Weather", "Now", getMultiMapValue(data, "Weather Data", "Weather", "Dry"))
+			setMultiMapValue(sessionInfo, "Weather", "10Min", getMultiMapValue(data, "Weather Data", "Weather10Min", "Dry"))
+			setMultiMapValue(sessionInfo, "Weather", "30Min", getMultiMapValue(data, "Weather Data", "Weather30Min", "Dry"))
+			setMultiMapValue(sessionInfo, "Weather", "Temperature", getMultiMapValue(data, "Weather Data", "Temperature", 0))
+
+			setMultiMapValue(sessionInfo, "Track", "Temperature", getMultiMapValue(data, "Track Data", "Temperature", 0))
+			setMultiMapValue(sessionInfo, "Track", "Grip", getMultiMapValue(data, "Track Data", "Grip", "Optimum"))
+
+			setMultiMapValue(sessionInfo, "Tyres", "Pressures", values2String(",", knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Pressure.FL")
+																				 , knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Pressure.FR")
+																				 , knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Pressure.RL")
+																				 , knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Pressure.RR")))
+			setMultiMapValue(sessionInfo, "Tyres", "Temperatures", values2String(",", knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Temperature.FL")
+																					, knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Temperature.FR")
+																					, knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Temperature.RL")
+																					, knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Temperature.RR")))
+
+			this.saveSessionInfo(lapNumber, simulator, car, track, sessionInfo)
+		}
+
+		Task.startTask(createSessionInfo, 1000, kLowPriority)
 
 		return result
 	}
@@ -3151,6 +3210,18 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 
 		this.saveLapStandings(lapNumber, simulator, car, track)
+	}
+
+	saveSessionInfo(lapNumber, simulator, car, track, sessionInfo) {
+		local fileName
+
+		if this.RemoteHandler {
+			fileName := temporaryFileName("Session." . lapNumber, "info")
+
+			writeMultiMap(fileName, sessionInfo)
+
+			this.RemoteHandler.saveSessionInfo(lapNumber, fileName)
+		}
 	}
 
 	restoreRaceInfo(raceInfoFile) {

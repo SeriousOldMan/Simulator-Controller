@@ -133,6 +133,44 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		return RaceStrategistPlugin.RemoteRaceStrategist(this, pid)
 	}
 
+	writePluginState(configuration) {
+		local tries := 10
+		local state
+
+		static nextUpdate := 0
+
+		if (this.Active && this.TeamSessionActive && this.TeamSessionActive && (A_TickCount > nextUpdate))
+			try {
+				nextUpdate := (A_TickCount + 30000)
+
+				state := this.TeamServer.getSessionValue(this.Plugin . " Session Info", false)
+
+				if (state && (state != ""))
+					loop
+						try {
+							if !deleteFile(kTempDirectory . "Session.state")
+								throw "Cannot delete file..."
+
+							FileAppend(state, kTempDirectory . "Session.state")
+
+							break
+						}
+						catch Any as exception {
+							logError(exception)
+
+							if (tries-- <= 0)
+								break
+							else
+								Sleep(200)
+						}
+			}
+			catch Any as exception {
+				logError(exception)
+			}
+
+		super.writePluginState(configuration)
+	}
+
 	startSession(settings, data) {
 		super.startSession(settings, data)
 
@@ -392,23 +430,6 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		deleteFile(fileName)
 	}
 
-	saveRaceInfo(lapNumber, fileName) {
-		local teamServer := this.TeamServer
-
-		if (teamServer && teamServer.SessionActive) {
-			this.setLapValue(lapNumber, this.Plugin . " Race Info", fileName)
-
-			deleteFile(fileName)
-		}
-		else {
-			deleteDirectory(kTempDirectory . "Race Report")
-
-			DirCreate(kTempDirectory . "Race Report")
-
-			FileMove(fileName, kTempDirectory . "Race Report\Race.data")
-		}
-	}
-
 	saveRaceLap(lapNumber, fileName) {
 		local teamServer := this.TeamServer
 
@@ -433,6 +454,23 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		}
 	}
 
+	saveRaceInfo(lapNumber, fileName) {
+		local teamServer := this.TeamServer
+
+		if (teamServer && teamServer.SessionActive) {
+			this.setLapValue(lapNumber, this.Plugin . " Race Info", fileName)
+
+			deleteFile(fileName)
+		}
+		else {
+			deleteDirectory(kTempDirectory . "Race Report")
+
+			DirCreate(kTempDirectory . "Race Report")
+
+			FileMove(fileName, kTempDirectory . "Race Report\Race.data")
+		}
+	}
+
 	restoreRaceInfo(data) {
 		local teamServer := this.TeamServer
 		local raceInfo, fileName
@@ -453,6 +491,35 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 			catch Any as exception {
 				return
 			}
+		}
+	}
+
+	saveSessionInfo(lapNumber, fileName) {
+		local teamServer := this.TeamServer
+		local tries := 10
+
+		if (teamServer && teamServer.SessionActive && this.TeamSessionActive) {
+			this.setSessionValue(this.Plugin . " Session Info", fileName)
+
+			deleteFile(fileName)
+		}
+		else {
+			deleteFile(kTempDirectory . "Session.state")
+
+			loop
+				try {
+					FileMove(fileName, kTempDirectory . "Session.state")
+
+					break
+				}
+				catch Any as exception {
+					logError(exception)
+
+					if (tries-- <= 0)
+						break
+					else
+						Sleep(200)
+				}
 		}
 	}
 

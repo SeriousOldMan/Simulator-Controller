@@ -152,7 +152,7 @@ systemMonitor(command := false, arguments*) {
 			}
 			*/
 
-			html := "<style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 12px }</style><style> #header { font-size: 16px; } td {vertical-align: top } </style><table>"
+			html := "<style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 12px }</style><style> #header { text-align: center; font-size: 16px; background-color: #" . systemMonitorGui.Theme.TableColor["Header"] . "; } td {vertical-align: top } </style><table>"
 
 			html .= "<tr><td style=`"padding-right: 50px`">"
 
@@ -967,7 +967,7 @@ systemMonitor(command := false, arguments*) {
 
 		monitorTabView.UseTab(4)
 
-		sessionStateViewer := systemMonitorGui.Add("HTMLViewer", "x24 ys+28 w756 h336 Border")
+		sessionStateViewer := systemMonitorGui.Add("HTMLViewer", "x24 ys+28 w756 h336")
 
 		monitorTabView.UseTab(5)
 

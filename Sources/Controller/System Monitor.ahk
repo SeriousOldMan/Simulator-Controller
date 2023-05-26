@@ -198,11 +198,10 @@ systemMonitor(command := false, arguments*) {
 	static logLevelDropDown
 
 	updateSessionInfo(sessionState) {
-		local tableCSS := getTableCSS(systemMonitorGui)
 		local section, keyValues, key, value, pressures, temperatures
 
-		if (true || sessionState.Count > 0) {
-			html := "<style>" . tableCSS . "</style><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 12px }</style><style> #header { text-align: center; font-size: 12px; background-color: #" . systemMonitorGui.Theme.TableColor["Header"] . "; } td {vertical-align: top } </style><table>"
+		if (sessionState.Count > 0) {
+			html := "<style>" . getTableCSS(systemMonitorGui) . " div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { text-align: center; font-size: 12px; background-color: #" . systemMonitorGui.Theme.TableColor["Header"] . "; } td {vertical-align: top } </style><table>"
 
 			html .= "<tr><td style=`"padding-right: 50px`">"
 
@@ -301,7 +300,7 @@ systemMonitor(command := false, arguments*) {
 			updateDashboard(systemMonitorGui, sessionStateViewer, html)
 		}
 		else
-			updateDashboard(systemMonitorGui, sessionStateViewer)
+			updateDashboard(systemMonitorGui, sessionStateViewer, "<div style=`"text-align: center; font-size: 14px`"><br><br><br>" . translate("No data available") . "</div>")
 	}
 
 	updateSimulationState(controllerState) {
@@ -1042,7 +1041,7 @@ systemMonitor(command := false, arguments*) {
 		updateDashboard(systemMonitorGui, dataDashboard)
 		updateDashboard(systemMonitorGui, automationDashboard)
 		updateDashboard(systemMonitorGui, mapperDashboard)
-		updateDashboard(systemMonitorGui, sessionStateViewer)
+		updateDashboard(systemMonitorGui, sessionStateViewer, "<div style=`"text-align: center; font-size: 14px`"><br><br><br>" . translate("No data available") . "</div>")
 
 		PeriodicTask(systemMonitor.Bind("UpdateDashboard"), 2000, kLowPriority).start()
 		PeriodicTask(systemMonitor.Bind("UpdateModules"), 2000, kLowPriority).start()

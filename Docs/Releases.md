@@ -1,4 +1,4 @@
-## 5.0.6.0-release 05/26/23 (planned)
+## 5.0.6.0-release 05/26/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Optimized fuel level simulation in "Strategy Workbench".

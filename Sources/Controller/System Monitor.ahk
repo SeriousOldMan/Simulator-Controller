@@ -203,7 +203,7 @@ systemMonitor(command := false, arguments*) {
 		if (sessionState.Count > 0) {
 			html := "<style>" . getTableCSS(systemMonitorGui) . " div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { text-align: center; font-size: 12px; background-color: #" . systemMonitorGui.Theme.TableColor["Header"] . "; } td {vertical-align: top } </style><table>"
 
-			html .= "<tr><td style=`"padding-right: 50px`">"
+			html .= "<tr><td style=`"padding-right: 25px`">"
 
 			html .= "<table class=`"table-std`">"
 			html .= ("<tr><th class=`"th-std th-left`" colspan=`"2`"><div id=`"header`"><i>" . translate("Session") . "</i></div></th></tr>")
@@ -213,29 +213,29 @@ systemMonitor(command := false, arguments*) {
 			html .= ("<tr><th class=`"th-std th-left`">" . translate("Session") . "</th><td>" . translate(getMultiMapValue(sessionState, "Session", "Type")) . "</td></tr>")
 			html .= "</table>"
 
-			html .= "</td><td style=`"padding-right: 50px`">"
+			html .= "</td><td style=`"padding-right: 25px`">"
 
 			html .= "<table class=`"table-std`">"
 			html .= ("<tr><th class=`"th-std th-left`" colspan=`"2`"><div id=`"header`"><i>" . translate("Duration") . "</i></div></th></tr>")
 			html .= ("<tr><th class=`"th-std th-left`">" . translate("Format") . "</th><td>" . translate(getMultiMapValue(sessionState, "Session", "Format")) . "</td></tr>")
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Time Left (Session)") . "</th><td>" . getMultiMapValue(sessionState, "Session", "Time.Remaining") . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Time Left (Session)") . "</th><td>" . displayValue("Time", getMultiMapValue(sessionState, "Session", "Time.Remaining")) . "</td></tr>")
 			html .= ("<tr><th class=`"th-std th-left`">" . translate("Laps Left (Session)") . "</th><td>" . getMultiMapValue(sessionState, "Session", "Laps.Remaining") . "</td></tr>")
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Time Left (Stint)") . "</th><td>" . getMultiMapValue(sessionState, "Stint", "Time.Remaining.Stint") . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Time Left (Stint)") . "</th><td>" . displayValue("Time", getMultiMapValue(sessionState, "Stint", "Time.Remaining.Stint")) . "</td></tr>")
 			html .= ("<tr><th class=`"th-std th-left`">" . translate("Laps Left (Stint)") . "</th><td>" . getMultiMapValue(sessionState, "Stint", "Laps.Remaining.Stint") . "</td></tr>")
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Time Left (Driver)") . "</th><td>" . getMultiMapValue(sessionState, "Stint", "Time.Remaining.Driver") . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Time Left (Driver)") . "</th><td>" . displayValue("Time", getMultiMapValue(sessionState, "Stint", "Time.Remaining.Driver")) . "</td></tr>")
 
 			html .= "</table>"
 
-			html .= "</td><td style=`"padding-right: 50px`">"
+			html .= "</td><td>"
 
 			html .= "<table class=`"table-std`">"
 			html .= ("<tr><th class=`"th-std th-left`" colspan=`"2`"><div id=`"header`"><i>" . translate("Conditions") . "</i></div></th></tr>")
 			html .= ("<tr><th class=`"th-std th-left`">" . translate("Weather") . "</th><td>" . translate(getMultiMapValue(sessionState, "Weather", "Now")) . "</td></tr>")
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Temperature (Air)") . "</th><td>" . getMultiMapValue(sessionState, "Weather", "Temperature") . "</td></tr>")
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Temperature (Track)") . "</th><td>" . getMultiMapValue(sessionState, "Track", "Temperature") . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Temperature (Air)") . "</th><td>" . displayValue("Float", convertUnit("Temperature", getMultiMapValue(sessionState, "Weather", "Temperature"))) . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Temperature (Track)") . "</th><td>" . displayValue("Float", convertUnit("Temperature", getMultiMapValue(sessionState, "Track", "Temperature"))) . "</td></tr>")
 			html .= ("<tr><th class=`"th-std th-left`">" . translate("Grip") . "</th><td>" . translate(getMultiMapValue(sessionState, "Track", "Grip")) . "</td></tr>")
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Outlook (10 minutes)") . "</th><td>" . getMultiMapValue(sessionState, "Weather", "10Min") . "</td></tr>")
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Outlook (30 minutes)") . "</th><td>" . getMultiMapValue(sessionState, "Weather", "30Min") . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Outlook (10 minutes)") . "</th><td>" . translate(getMultiMapValue(sessionState, "Weather", "10Min")) . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Outlook (30 minutes)") . "</th><td>" . translate(getMultiMapValue(sessionState, "Weather", "30Min")) . "</td></tr>")
 			html .= "</table>"
 
 			html .= "</td></tr>"
@@ -243,52 +243,72 @@ systemMonitor(command := false, arguments*) {
 			html .= "<tr><td> </td><td> </td><td> </td></tr>"
 			html .= "<tr><td> </td><td> </td><td> </td></tr>"
 
-			html .= "<tr><td style=`"padding-right: 50px`">"
+			html .= "<tr><td style=`"padding-right: 25px`">"
 
 			html .= "<table class=`"table-std`">"
 			html .= ("<tr><th class=`"th-std th-left`" colspan=`"2`"><div id=`"header`"><i>" . translate("Stint") . "</i></div></th></tr>")
 			html .= ("<tr><th class=`"th-std th-left`">" . translate("Driver") . "</th><td>" . getMultiMapValue(sessionState, "Stint", "Driver") . "</td></tr>")
 			html .= ("<tr><th class=`"th-std th-left`">" . translate("Lap") . "</th><td>" . getMultiMapValue(sessionState, "Stint", "Lap"))
-			if !getMultiMapValue(sessionState, "Stint", "Valid")
+			if !getMultiMapValue(sessionState, "Stint", "Valid", true)
 				html .= (translate(" [") . translate("Invalid") . translate("]"))
 			html .= ("<tr><th class=`"th-std th-left`">" . translate("Position") . "</th><td>" . getMultiMapValue(sessionState, "Stint", "Position") . "</td></tr>")
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Lap Time (Last / Best)") . "</th><td>" . getMultiMapValue(sessionState, "Stint", "Lap.Time.Last") . translate(" / ") . getMultiMapValue(sessionState, "Stint", "Lap.Time.Best") . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Lap Time (Last / Best)") . "</th><td>" . displayValue("Time", getMultiMapValue(sessionState, "Stint", "Lap.Time.Last")) . translate(" / ") . displayValue("Time", getMultiMapValue(sessionState, "Stint", "Lap.Time.Best")) . "</td></tr>")
 			if (getMultiMapValue(sessionState, "Stint", "Laps") = getMultiMapValue(sessionState, "Session", "Laps"))
-				html .= ("<tr><th class=`"th-std th-left`">" . translate("Laps") . "</th><td>" . getMultiMapValue(sessionState, "Stint", "Laps") . "</td></tr>")
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Laps") . "</th><td>" . Floor(getMultiMapValue(sessionState, "Stint", "Laps")) . "</td></tr>")
 			else {
-				html .= ("<tr><th class=`"th-std th-left`">" . translate("Laps (Stint)") . "</th><td>" . getMultiMapValue(sessionState, "Stint", "Laps") . "</td></tr>")
-				html .= ("<tr><th class=`"th-std th-left`">" . translate("Laps (Session)") . "</th><td>" . getMultiMapValue(sessionState, "Session", "Laps") . "</td></tr>")
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Laps (Stint)") . "</th><td>" . Floor(getMultiMapValue(sessionState, "Stint", "Laps")) . "</td></tr>")
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Laps (Session)") . "</th><td>" . Floor(getMultiMapValue(sessionState, "Session", "Laps")) . "</td></tr>")
 			}
 			html .= "</table>"
 
-			html .= "</td><td style=`"padding-right: 50px`">"
+			html .= "</td><td style=`"padding-right: 25px`">"
 
 			html .= "<table class=`"table-std`">"
 			html .= ("<tr><th class=`"th-std th-left`" colspan=`"2`"><div id=`"header`"><i>" . translate("Consumption") . "</i></div></th></tr>")
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Consumption (Lap)") . "</th><td>" . getMultiMapValue(sessionState, "Stint", "Fuel.Consumption") . "</td></tr>")
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Consumption (Avg.)") . "</th><td>" . getMultiMapValue(sessionState, "Stint", "Fuel.AvgConsumption") . "</td></tr>")
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Remaining Fuel") . "</th><td>" . getMultiMapValue(sessionState, "Stint", "Fuel.Remaining") . "</td></tr>")
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Remaining Laps") . "</th><td>" . getMultiMapValue(sessionState, "Stint", "Laps.Remaining.Fuel") . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Consumption (Lap)") . "</th><td>" . displayValue("Float", convertUnit("Volume", getMultiMapValue(sessionState, "Stint", "Fuel.Consumption"))) . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Consumption (Avg.)") . "</th><td>" . displayValue("Float", convertUnit("Volume", getMultiMapValue(sessionState, "Stint", "Fuel.AvgConsumption"))) . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Remaining Fuel") . "</th><td>" . displayValue("Float", convertUnit("Volume", getMultiMapValue(sessionState, "Stint", "Fuel.Remaining"))) . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Remaining Laps") . "</th><td>" . Floor(getMultiMapValue(sessionState, "Stint", "Laps.Remaining.Fuel")) . "</td></tr>")
 			html .= "</table>"
 
-			html .= "</td><td style=`"padding-right: 50px`">"
+			html .= "</td><td>"
 
 			html .= "<table class=`"table-std`">"
 			html .= ("<tr><th class=`"th-std th-left`" colspan=`"3`"><div id=`"header`"><i>" . translate("Tyres") . "</i></div></th></tr>")
-			pressures := string2Values(",", getMultiMapValue(sessionState, "Tyres", "Pressures", "26.7,26.7,26.7,26.7"))
-			html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Pressures") . "</th><td style=`"padding-right: 10px; text-align: right`">"
-				   . displayValue("Float", convertUnit("Pressure", pressures[1])) . "</td><td style=`"text-align: right`">"
-				   . displayValue("Float", convertUnit("Pressure", pressures[2])) . "</td></tr>")
-			html .= ("<tr><td style=`"padding-right: 10px; text-align: right`">"
-				   . displayValue("Float", convertUnit("Pressure", pressures[3])) . "</td><td style=`"text-align: right`">"
-				   . displayValue("Float", convertUnit("Pressure", pressures[4])) . "</td></tr>")
-			temperatures := string2Values(",", getMultiMapValue(sessionState, "Tyres", "Temperatures", "90,90,90,90"))
-			html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Temperatures") . "</th><td style=`"padding-right: 10px; text-align: right`">"
-				   . displayValue("Float", convertUnit("Temperature", temperatures[1])) . "</td><td style=`"text-align: right`">"
-				   . displayValue("Float", convertUnit("Temperature", temperatures[2])) . "</td></tr>")
-			html .= ("<tr><td style=`"padding-right: 10px; text-align: right`">"
-				   . displayValue("Float", convertUnit("Temperature", temperatures[3])) . "</td><td style=`"text-align: right`">"
-				   . displayValue("Float", convertUnit("Temperature", temperatures[4])) . "</td></tr>")
+			pressures := string2Values(",", getMultiMapValue(sessionState, "Tyres", "Pressures", ""))
+			if (pressures.Length = 4) {
+				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Pressures") . "</th><td style=`"padding-right: 10px; text-align: right`">"
+					   . displayValue("Float", convertUnit("Pressure", pressures[1])) . "</td><td style=`"text-align: right`">"
+					   . displayValue("Float", convertUnit("Pressure", pressures[2])) . "</td></tr>")
+				html .= ("<tr><td style=`"padding-right: 10px; text-align: right`">"
+					   . displayValue("Float", convertUnit("Pressure", pressures[3])) . "</td><td style=`"text-align: right`">"
+					   . displayValue("Float", convertUnit("Pressure", pressures[4])) . "</td></tr>")
+			}
+			else {
+				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Pressures") . "</th><td style=`"padding-right: 10px; text-align: right`">"
+					   . "-" . "</td><td style=`"text-align: right`">"
+					   . "-" . "</td></tr>")
+				html .= ("<tr><td style=`"padding-right: 10px; text-align: right`">"
+					   . "-" . "</td><td style=`"text-align: right`">"
+					   . "-" . "</td></tr>")
+			}
+			temperatures := string2Values(",", getMultiMapValue(sessionState, "Tyres", "Temperatures", ""))
+			if (temperatures.Length = 4) {
+				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Temperatures") . "</th><td style=`"padding-right: 10px; text-align: right`">"
+					   . displayValue("Float", convertUnit("Temperature", temperatures[1])) . "</td><td style=`"text-align: right`">"
+					   . displayValue("Float", convertUnit("Temperature", temperatures[2])) . "</td></tr>")
+				html .= ("<tr><td style=`"padding-right: 10px; text-align: right`">"
+					   . displayValue("Float", convertUnit("Temperature", temperatures[3])) . "</td><td style=`"text-align: right`">"
+					   . displayValue("Float", convertUnit("Temperature", temperatures[4])) . "</td></tr>")
+			}
+			else {
+				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Temperatures") . "</th><td style=`"padding-right: 10px; text-align: right`">"
+					   . "-" . "</td><td style=`"text-align: right`">"
+					   . "-" . "</td></tr>")
+				html .= ("<tr><td style=`"padding-right: 10px; text-align: right`">"
+					   . "-" . "</td><td style=`"text-align: right`">"
+					   . "-" . "</td></tr>")
+			}
 			html .= "</table>"
 
 			html .= "</td>"

@@ -76,6 +76,10 @@ class RaceStrategist extends GridRaceAssistant {
 			this.callRemote("saveRaceLap", arguments*)
 		}
 
+		saveSessionInfo(arguments*) {
+			this.callRemote("saveSessionInfo", arguments*)
+		}
+
 		createRaceReport(arguments*) {
 			this.callRemote("createRaceReport", arguments*)
 		}
@@ -1639,7 +1643,7 @@ class RaceStrategist extends GridRaceAssistant {
 		setMultiMapValue(sessionInfo, "Session", "Format", knowledgeBase.getValue("Session.Format", "Time"))
 		setMultiMapValue(sessionInfo, "Session", "Laps", lapNumber)
 		setMultiMapValue(sessionInfo, "Session", "Laps.Remaining", Ceil(knowledgeBase.getValue("Lap.Remaining.Session", 0)))
-		setMultiMapValue(sessionInfo, "Session", "Time.Remaining", getMultiMapValue(data, "Session Data", "SessionTimeRemaining") / 1000)
+		setMultiMapValue(sessionInfo, "Session", "Time.Remaining", Ceil(getMultiMapValue(data, "Session Data", "SessionTimeRemaining", 0) / 1000))
 
 		setMultiMapValue(sessionInfo, "Stint", "Driver", computeDriverName(getMultiMapValue(data, "Stint Data", "DriverForname", this.DriverForName)
 																		 , getMultiMapValue(data, "Stint Data", "DriverSurname", "Doe")
@@ -1647,23 +1651,23 @@ class RaceStrategist extends GridRaceAssistant {
 		setMultiMapValue(sessionInfo, "Stint", "Lap", lapNumber)
 		setMultiMapValue(sessionInfo, "Stint", "Position", knowledgeBase.getValue("Position", 0))
 		setMultiMapValue(sessionInfo, "Stint", "Valid", valid)
-		setMultiMapValue(sessionInfo, "Stint", "Fuel.AvgConsumption", knowledgeBase.getValue("Lap." . lapNumber . ".Fuel.AvgConsumption"))
-		setMultiMapValue(sessionInfo, "Stint", "Fuel.Consumption", knowledgeBase.getValue("Lap." . lapNumber . ".Fuel.Consumption"))
-		setMultiMapValue(sessionInfo, "Stint", "Fuel.Remaining", getMultiMapValue(data, "Car Data", "FuelRemaining", 0))
+		setMultiMapValue(sessionInfo, "Stint", "Fuel.AvgConsumption", Round(knowledgeBase.getValue("Lap." . lapNumber . ".Fuel.AvgConsumption", 0), 1))
+		setMultiMapValue(sessionInfo, "Stint", "Fuel.Consumption", Round(knowledgeBase.getValue("Lap." . lapNumber . ".Fuel.Consumption", 0), 1))
+		setMultiMapValue(sessionInfo, "Stint", "Fuel.Remaining", Round(getMultiMapValue(data, "Car Data", "FuelRemaining", 0), 1))
 		setMultiMapValue(sessionInfo, "Stint", "Laps", lapNumber - this.BaseLap + 1)
 		setMultiMapValue(sessionInfo, "Stint", "Laps.Remaining.Fuel", Floor(knowledgeBase.getValue("Lap.Remaining.Fuel", 0)))
 		setMultiMapValue(sessionInfo, "Stint", "Laps.Remaining.Stint", Floor(knowledgeBase.getValue("Lap.Remaining.Stint", 0)))
-		setMultiMapValue(sessionInfo, "Stint", "Time.Remaining.Stint", getMultiMapValue(data, "Stint Data", "StintTimeRemaining"))
-		setMultiMapValue(sessionInfo, "Stint", "Time.Remaining.Driver", getMultiMapValue(data, "Stint Data", "DriverTimeRemaining"))
-		setMultiMapValue(sessionInfo, "Stint", "Lap.Time.Last", getMultiMapValue(data, "Stint Data", "LapLastTime"))
-		setMultiMapValue(sessionInfo, "Stint", "Lap.Time.Best", getMultiMapValue(data, "Stint Data", "LapBestTime"))
+		setMultiMapValue(sessionInfo, "Stint", "Time.Remaining.Stint", Floor(getMultiMapValue(data, "Stint Data", "StintTimeRemaining") / 1000))
+		setMultiMapValue(sessionInfo, "Stint", "Time.Remaining.Driver", Floor(getMultiMapValue(data, "Stint Data", "DriverTimeRemaining") / 1000))
+		setMultiMapValue(sessionInfo, "Stint", "Lap.Time.Last", Round(getMultiMapValue(data, "Stint Data", "LapLastTime", 0) / 1000, 1))
+		setMultiMapValue(sessionInfo, "Stint", "Lap.Time.Best", Round(getMultiMapValue(data, "Stint Data", "LapBestTime", 0) / 1000, 1))
 
 		setMultiMapValue(sessionInfo, "Weather", "Now", getMultiMapValue(data, "Weather Data", "Weather", "Dry"))
 		setMultiMapValue(sessionInfo, "Weather", "10Min", getMultiMapValue(data, "Weather Data", "Weather10Min", "Dry"))
 		setMultiMapValue(sessionInfo, "Weather", "30Min", getMultiMapValue(data, "Weather Data", "Weather30Min", "Dry"))
-		setMultiMapValue(sessionInfo, "Weather", "Temperature", getMultiMapValue(data, "Weather Data", "Temperature", 0))
+		setMultiMapValue(sessionInfo, "Weather", "Temperature", Round(getMultiMapValue(data, "Weather Data", "Temperature", 0), 1))
 
-		setMultiMapValue(sessionInfo, "Track", "Temperature", getMultiMapValue(data, "Track Data", "Temperature", 0))
+		setMultiMapValue(sessionInfo, "Track", "Temperature", Round(getMultiMapValue(data, "Track Data", "Temperature", 0), 1))
 		setMultiMapValue(sessionInfo, "Track", "Grip", getMultiMapValue(data, "Track Data", "Grip", "Optimum"))
 
 		setMultiMapValue(sessionInfo, "Tyres", "Pressures", getMultiMapValue(data, "Car Data", "TyrePressure", ""))
@@ -1921,7 +1925,7 @@ class RaceStrategist extends GridRaceAssistant {
 						reported := true
 					}
 
-					nextPitstop := ((strategy.Pitstops.Count > 0) ? strategy.Pitstops[1] : false)
+					nextPitstop := ((strategy.Pitstops.Length > 0) ? strategy.Pitstops[1] : false)
 
 					if nextPitstop {
 						if ((options == true) || (options.HasProp("NextPitstop") && options.NextPitstop)) {

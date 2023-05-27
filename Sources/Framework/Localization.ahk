@@ -205,7 +205,6 @@ displayTimeValue(time, fillHours := false, withSeconds := true, withFractions :=
 	if ((gTimeFormat = "S.##") || (gTimeFormat = "S,##"))
 		return StrReplace(time, ".", (gTimeFormat = "S.##") ? "." : ",")
 	else {
-		sleep 10
 		seconds := Floor(time)
 		fraction := (time - seconds)
 		minutes := Floor(seconds / 60)
@@ -215,7 +214,7 @@ displayTimeValue(time, fillHours := false, withSeconds := true, withFractions :=
 
 		fraction := Round(fraction * 10)
 
-		seconds := ((seconds - (minutes * 60)) . "")
+		seconds := ((seconds - (minutes * 60) - (hours * 3600)) . "")
 
 		if (StrLen(seconds) = 1)
 			seconds := ("0" . seconds)

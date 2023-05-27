@@ -322,7 +322,7 @@ class RaceEngineer extends RaceAssistant {
 			return
 
 		speaker := this.getSpeaker()
-		remainingFuelLaps := Round(knowledgeBase.getValue("Lap.Remaining.Fuel", 0))
+		remainingFuelLaps := Floor(knowledgeBase.getValue("Lap.Remaining.Fuel", 0))
 
 		if (remainingFuelLaps == 0)
 			speaker.speakPhrase("Later")
@@ -334,8 +334,8 @@ class RaceEngineer extends RaceAssistant {
 
 				speaker.speakPhrase("LapsFuel", {laps: remainingFuelLaps})
 
-				remainingSessionLaps := Round(knowledgeBase.getValue("Lap.Remaining.Session"))
-				remainingStintLaps := Round(knowledgeBase.getValue("Lap.Remaining.Stint"))
+				remainingSessionLaps := Ceil(knowledgeBase.getValue("Lap.Remaining.Session", 0))
+				remainingStintLaps := Floor(knowledgeBase.getValue("Lap.Remaining.Stint", 0))
 
 				if ((remainingStintLaps < remainingFuelLaps) && (remainingStintLaps < remainingSessionLaps))
 					speaker.speakPhrase("LapsStint", {laps: remainingSessionLaps})

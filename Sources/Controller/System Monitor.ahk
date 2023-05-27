@@ -68,12 +68,77 @@ updateDashboard(window, viewer, html := "") {
 
 	if (html == false)
 		html := ""
-		
-	html := ("<html><meta charset='utf-8'><body style='background-color: #" . window.BackColor . "; overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 10px }</style><style> #header { font-size: 12px; } </style><div>" . html . "</div></body></html>")
+
+	html := ("<html><meta charset='utf-8'><body style='background-color: #" . window.BackColor . "; overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 10px }</style><style> #header { font-size: 12px; } td {vertical-align: top } </style><div>" . html . "</div></body></html>")
 
 	viewer.document.open()
 	viewer.document.write(html)
 	viewer.document.close()
+}
+
+getTableCSS(window) {
+	local script
+
+	script := "
+	(
+		.table-std, .th-std, .td-std {
+			border-collapse: collapse;
+			padding: .3em .5em;
+		}
+
+		.th-std, .td-std {
+			text-align: center;
+		}
+
+		.th-std, .caption-std {
+			background-color: #%headerBackColor%;
+			color: #%textColor%;
+			border: thin solid #%frameColor%;
+		}
+
+		.td-std {
+			border-left: thin solid #%frameColor%;
+			border-right: thin solid #%frameColor%;
+		}
+
+		.th-left {
+			text-align: left;
+		}
+
+		.td-left {
+			text-align: left;
+		}
+
+		.th-right {
+			text-align: right;
+		}
+
+		.td-right {
+			text-align: right;
+		}
+
+		tfoot {
+			border-bottom: thin solid #%frameColor%;
+		}
+
+		.caption-std {
+			font-size: 1.5em;
+			border-radius: .5em .5em 0 0;
+			padding: .5em 0 0 0
+		}
+
+		.table-std tbody tr:nth-child(even) {
+			background-color: #%altBackColor%;
+		}
+
+		.table-std tbody tr:nth-child(odd) {
+			background-color: #%backColor%;
+		}
+	)"
+
+	return substituteVariables(script, {altBackColor: window.AltBackColor, backColor: window.BackColor
+									  , textColor: window.Theme.TextColor
+									  , headerBackColor: window.Theme.TableColor["Header"], frameColor: window.Theme.TableColor["Frame"]})
 }
 
 systemMonitor(command := false, arguments*) {
@@ -128,7 +193,160 @@ systemMonitor(command := false, arguments*) {
 	static automationState
 	static mapperState
 
+	static sessionStateViewer
+
 	static logLevelDropDown
+
+	updateSessionInfo(sessionState) {
+		local sessionTime, stintTime, driverTime, sessionLaps, stintLaps, fuelLow, weatherNow, weather10Min, weather30Min
+		local lastTime, bestTime, lastLap, lastValid, pressures, temperatures
+
+		if (sessionState.Count > 0) {
+			html := "<style>" . getTableCSS(systemMonitorGui) . " div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { text-align: center; font-size: 12px; background-color: #" . systemMonitorGui.Theme.TableColor["Header"] . "; } td {vertical-align: top } </style><table>"
+
+			sessionTime := getMultiMapValue(sessionState, "Session", "Time.Remaining")
+			stintTime := getMultiMapValue(sessionState, "Stint", "Time.Remaining.Stint")
+			driverTime := getMultiMapValue(sessionState, "Stint", "Time.Remaining.Driver")
+
+			sessionLaps := getMultiMapValue(sessionState, "Session", "Laps.Remaining")
+			stintLaps := getMultiMapValue(sessionState, "Stint", "Laps.Remaining.Stint")
+
+			lastLap := getMultiMapValue(sessionState, "Stint", "Lap")
+			lastValid := getMultiMapValue(sessionState, "Stint", "Valid", true)
+
+			lastTime := getMultiMapValue(sessionState, "Stint", "Lap.Time.Last")
+			lastTime := ((lastTime < 3600) ? displayValue("Time", lastTime) : "-")
+
+			bestTime := getMultiMapValue(sessionState, "Stint", "Lap.Time.Best")
+			bestTime := ((bestTime < 3600) ? displayValue("Time", bestTime) : "-")
+
+			fuelLow := (Floor(getMultiMapValue(sessionState, "Stint", "Laps.Remaining.Fuel")) < 4)
+
+			weatherNow := getMultiMapValue(sessionState, "Weather", "Now")
+			weather10Min := getMultiMapValue(sessionState, "Weather", "10Min")
+			weather30Min := getMultiMapValue(sessionState, "Weather", "30Min")
+
+			html .= "<tr><td style=`"padding-right: 25px`">"
+
+			html .= "<table class=`"table-std`">"
+			html .= ("<tr><th class=`"th-std th-left`" colspan=`"2`"><div id=`"header`"><i>" . translate("Session") . "</i></div></th></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Simulator") . "</th><td>" . getMultiMapValue(sessionState, "Session", "Simulator") . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Car") . "</th><td>" . getMultiMapValue(sessionState, "Session", "Car") . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Track") . "</th><td>" . getMultiMapValue(sessionState, "Session", "Track") . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Session") . "</th><td>" . translate(getMultiMapValue(sessionState, "Session", "Type")) . "</td></tr>")
+			html .= "</table>"
+
+			html .= "</td><td style=`"padding-right: 25px`">"
+
+			html .= "<table class=`"table-std`">"
+			html .= ("<tr><th class=`"th-std th-left`" colspan=`"2`"><div id=`"header`"><i>" . translate("Duration") . "</i></div></th></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Format") . "</th><td>" . translate(getMultiMapValue(sessionState, "Session", "Format")) . "</td></tr>")
+			if (sessionTime != stintTime) {
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Time Left (Session)") . "</th><td>" . displayValue("Time", sessionTime) . "</td></tr>")
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Time Left (Stint)") . "</th><td>" . (((stintTime / lastTime) < 4) ? "<font color=`"red`">" : "") . displayValue("Time", stintTime) . (((stintTime / lastTime) < 4) ? "</font>" : "") . "</td></tr>")
+				if (driverTime != stintTime)
+					html .= ("<tr><th class=`"th-std th-left`">" . translate("Time Left (Driver)") . "</th><td>" . (((driverTime / lastTime) < 4) ? "<font color=`"red`">" : "") . displayValue("Time", driverTime) . (((driverTime / lastTime) < 4) ? "</font>" : "") . "</td></tr>")
+			}
+			else
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Time Left") . "</th><td>" . displayValue("Time", sessionTime) . "</td></tr>")
+			if (sessionLaps != stintLaps) {
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Laps Left (Session)") . "</th><td>" . sessionLaps . "</td></tr>")
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Laps Left (Stint)") . "</th><td>" . ((stintLaps < 4) ? "<font color=`"red`">" : "") . stintLaps . ((stintLaps < 4) ? "</font>" : "") . "</td></tr>")
+			}
+			else
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Laps Left") . "</th><td>" . sessionLaps . "</td></tr>")
+			html .= "</table>"
+
+			html .= "</td><td>"
+
+			html .= "<table class=`"table-std`">"
+			html .= ("<tr><th class=`"th-std th-left`" colspan=`"2`"><div id=`"header`"><i>" . translate("Conditions") . "</i></div></th></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Weather") . "</th><td>" . translate(weatherNow) . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Temperature (Air)") . "</th><td>" . displayValue("Float", convertUnit("Temperature", getMultiMapValue(sessionState, "Weather", "Temperature"))) . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Temperature (Track)") . "</th><td>" . displayValue("Float", convertUnit("Temperature", getMultiMapValue(sessionState, "Track", "Temperature"))) . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Grip") . "</th><td>" . translate(getMultiMapValue(sessionState, "Track", "Grip")) . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Outlook (10 minutes)") . "</th><td>" . ((weather10Min != weatherNow) ? "<font color=`"red`">" : "") . translate(weather10Min) . ((weather10Min != weatherNow) ? "</font>" : "") . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Outlook (30 minutes)") . "</th><td>" . ((weather30Min != weatherNow) ? "<font color=`"red`">" : "") . translate(weather30Min) . ((weather30Min != weatherNow) ? "</font>" : "") . "</td></tr>")
+			html .= "</table>"
+
+			html .= "</td></tr>"
+
+			html .= "<tr><td> </td><td> </td><td> </td></tr>"
+			html .= "<tr><td> </td><td> </td><td> </td></tr>"
+
+			html .= "<tr><td style=`"padding-right: 25px`">"
+
+			html .= "<table class=`"table-std`">"
+			html .= ("<tr><th class=`"th-std th-left`" colspan=`"2`"><div id=`"header`"><i>" . translate("Stint") . "</i></div></th></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Driver") . "</th><td>" . getMultiMapValue(sessionState, "Stint", "Driver") . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Lap") . "</th><td>" . lastLap . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Position") . "</th><td>" . getMultiMapValue(sessionState, "Stint", "Position") . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Lap Time (Last / Best)") . "</th><td>" . (!lastValid ? "<font color=`"red`">" : "") . lastTime . (!lastValid ? "</font>" : "") . translate(" / ") . bestTime . "</td></tr>")
+			if (lastLap != getMultiMapValue(sessionState, "Stint", "Laps"))
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Laps (Stint)") . "</th><td>" . getMultiMapValue(sessionState, "Stint", "Laps") . "</td></tr>")
+			html .= "</table>"
+
+			html .= "</td><td style=`"padding-right: 25px`">"
+
+			html .= "<table class=`"table-std`">"
+			html .= ("<tr><th class=`"th-std th-left`" colspan=`"2`"><div id=`"header`"><i>" . translate("Fuel") . "</i></div></th></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Consumption (Lap)") . "</th><td>" . displayValue("Float", convertUnit("Volume", getMultiMapValue(sessionState, "Stint", "Fuel.Consumption"))) . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Consumption (Avg.)") . "</th><td>" . displayValue("Float", convertUnit("Volume", getMultiMapValue(sessionState, "Stint", "Fuel.AvgConsumption"))) . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Remaining Fuel") . "</th><td>" . displayValue("Float", convertUnit("Volume", getMultiMapValue(sessionState, "Stint", "Fuel.Remaining"))) . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Remaining Laps") . "</th><td>" . (fuelLow ? "<font color=`"red`">" : "") . Floor(getMultiMapValue(sessionState, "Stint", "Laps.Remaining.Fuel")) . (fuelLow ? "</font>" : "") . "</td></tr>")
+			html .= "</table>"
+
+			html .= "</td><td>"
+
+			html .= "<table class=`"table-std`">"
+			html .= ("<tr><th class=`"th-std th-left`" colspan=`"3`"><div id=`"header`"><i>" . translate("Tyres") . "</i></div></th></tr>")
+			pressures := string2Values(",", getMultiMapValue(sessionState, "Tyres", "Pressures", ""))
+			if (pressures.Length = 4) {
+				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Pressures") . "</th><td style=`"padding-right: 15px; text-align: right`">"
+					   . displayValue("Float", convertUnit("Pressure", pressures[1])) . "</td><td style=`"text-align: right`">"
+					   . displayValue("Float", convertUnit("Pressure", pressures[2])) . "</td></tr>")
+				html .= ("<tr><td style=`"padding-right: 15px; text-align: right`">"
+					   . displayValue("Float", convertUnit("Pressure", pressures[3])) . "</td><td style=`"text-align: right`">"
+					   . displayValue("Float", convertUnit("Pressure", pressures[4])) . "</td></tr>")
+			}
+			else {
+				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Pressures") . "</th><td style=`"padding-right: 15px; text-align: right`">"
+					   . "-" . "</td><td style=`"text-align: right`">"
+					   . "-" . "</td></tr>")
+				html .= ("<tr><td style=`"padding-right: 15px; text-align: right`">"
+					   . "-" . "</td><td style=`"text-align: right`">"
+					   . "-" . "</td></tr>")
+			}
+			temperatures := string2Values(",", getMultiMapValue(sessionState, "Tyres", "Temperatures", ""))
+			if (temperatures.Length = 4) {
+				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Temperatures") . "</th><td style=`"padding-right: 15px; text-align: right`">"
+					   . displayValue("Float", convertUnit("Temperature", temperatures[1])) . "</td><td style=`"text-align: right`">"
+					   . displayValue("Float", convertUnit("Temperature", temperatures[2])) . "</td></tr>")
+				html .= ("<tr><td style=`"padding-right: 15px; text-align: right`">"
+					   . displayValue("Float", convertUnit("Temperature", temperatures[3])) . "</td><td style=`"text-align: right`">"
+					   . displayValue("Float", convertUnit("Temperature", temperatures[4])) . "</td></tr>")
+			}
+			else {
+				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Temperatures") . "</th><td style=`"padding-right: 15px; text-align: right`">"
+					   . "-" . "</td><td style=`"text-align: right`">"
+					   . "-" . "</td></tr>")
+				html .= ("<tr><td style=`"padding-right: 15px; text-align: right`">"
+					   . "-" . "</td><td style=`"text-align: right`">"
+					   . "-" . "</td></tr>")
+			}
+			html .= "</table>"
+
+			html .= "</td>"
+
+			html .= "</tr>"
+
+			html .= "</table>"
+
+			updateDashboard(systemMonitorGui, sessionStateViewer, html)
+		}
+		else
+			updateDashboard(systemMonitorGui, sessionStateViewer, "<div style=`"text-align: center; font-size: 14px`"><br><br><br>" . translate("No data available") . "</div>")
+	}
 
 	updateSimulationState(controllerState) {
 		local state := getMultiMapValue(controllerState, "Simulation", "State", "Disabled")
@@ -641,6 +859,8 @@ systemMonitor(command := false, arguments*) {
 			driversListView.ModifyCol(2, "AutoHdr")
 		}
 	}
+	else if (command = "UpdateSession")
+		updateSessionInfo(readMultiMap(kTempDirectory . "Session.state"))
 	else if (command = "LogMessage") {
 		try {
 			logLevel := arguments[3]
@@ -704,7 +924,7 @@ systemMonitor(command := false, arguments*) {
 
 		systemMonitorGui.Add("Text", "x8 yp+26 w790 0x10")
 
-		monitorTabView := systemMonitorGui.Add("Tab3", "x16 yp+14 w773 h375 AltSubmit -Wrap Section", collect(["Dashboard", "Modules", "Team Session", "Logs"], translate))
+		monitorTabView := systemMonitorGui.Add("Tab3", "x16 yp+14 w773 h375 AltSubmit -Wrap Section", collect(["Dashboard", "Modules", "Team", "Session", "Logs"], translate))
 
 		monitorTabView.UseTab(1)
 
@@ -821,6 +1041,10 @@ systemMonitor(command := false, arguments*) {
 
 		monitorTabView.UseTab(4)
 
+		sessionStateViewer := systemMonitorGui.Add("HTMLViewer", "x24 ys+28 w756 h336")
+
+		monitorTabView.UseTab(5)
+
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
 		logMessageListView := systemMonitorGui.Add("ListView", "x24 ys+28 w756 h312 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Application", "Time", "Category", "Message"], translate))
@@ -862,10 +1086,12 @@ systemMonitor(command := false, arguments*) {
 		updateDashboard(systemMonitorGui, dataDashboard)
 		updateDashboard(systemMonitorGui, automationDashboard)
 		updateDashboard(systemMonitorGui, mapperDashboard)
+		updateDashboard(systemMonitorGui, sessionStateViewer, "<div style=`"text-align: center; font-size: 14px`"><br><br><br>" . translate("No data available") . "</div>")
 
 		PeriodicTask(systemMonitor.Bind("UpdateDashboard"), 2000, kLowPriority).start()
 		PeriodicTask(systemMonitor.Bind("UpdateModules"), 2000, kLowPriority).start()
 		PeriodicTask(systemMonitor.Bind("UpdateServer"), 5000, kLowPriority).start()
+		PeriodicTask(systemMonitor.Bind("UpdateSession"), 10000, kLowPriority).start()
 
 		gStartupFinished := true
 	}
@@ -902,6 +1128,7 @@ startSystemMonitor() {
 	registerMessageHandler("Monitoring", monitoringMessageHandler)
 
 	deleteFile(kTempDirectory . "Simulator Controller.state")
+	deleteFile(kTempDirectory . "Session.state")
 	deleteFile(kTempDirectory . "Database Synchronizer.state")
 	deleteFile(kTempDirectory . "Track Mapper.state")
 

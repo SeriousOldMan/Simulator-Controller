@@ -94,6 +94,10 @@ class RaceStrategist extends GridRaceAssistant {
 		reviewRace(arguments*) {
 			this.callRemote("reviewRace", arguments*)
 		}
+
+		computeCarStatistics(arguments*) {
+			this.callRemote("computeCarStatistics", arguments*)
+		}
 	}
 
 	class ConfirmStrategyUpdateContinuation extends VoiceManager.ReplyContinuation {
@@ -337,6 +341,34 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 	}
 
+	class RaceStrategySimulationContinuation extends VoiceManager.VoiceContinuation {
+		iData := false
+		iConfirm := false
+		iRequest := false
+
+		Statistics {
+			Get {
+				return this.iStatistics
+			}
+
+			Set {
+				return (this.iStatistics := value)
+			}
+		}
+
+		__New(manager, data, confirm, request) {
+			this.iData := data
+			this.iConfirm := confirm
+			this.iRequest := request
+
+			super.__New(manager)
+		}
+
+		next(statistics) {
+			RaceStrategist.RaceStrategySimulationTask(this, this.iData, this.iConfirm, this.iRequest, statistics).start()
+		}
+	}
+
 	class RaceStrategySimulationTask extends Task {
 		iConfirm := false
 		iRequest := "User"
@@ -348,6 +380,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 		iLap := false
 
+		iStatistics := false
 		iPitstops := []
 		iUsedTyreSets := []
 
@@ -387,6 +420,12 @@ class RaceStrategist extends GridRaceAssistant {
 			}
 		}
 
+		Statistics {
+			Get {
+				return this.iStatistics
+			}
+		}
+
 		Pitstops[key?] {
 			Get {
 				return (isSet(key) ? this.iPitstops[key] : this.iPitstops)
@@ -399,13 +438,14 @@ class RaceStrategist extends GridRaceAssistant {
 			}
 		}
 
-		__New(strategist, configuration, confirm := false, request := "User") {
+		__New(strategist, configuration, confirm := false, request := "User", statistics := false) {
 			local knowledgeBase := strategist.KnowledgeBase
 
 			super.__New(false, 0, kLowPriority)
 
 			this.iConfirm := confirm
 			this.iRequest := request
+			this.iStatistics := statistics
 			this.iRaceStrategist := strategist
 			this.iLap := knowledgeBase.getValue("Lap")
 			this.iTelemetryDatabase
@@ -1325,6 +1365,26 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 	}
 
+	updateCarStatistics(statistics) {
+		local continuation := this.Continuation
+		local fileName
+
+		if !isObject(statistics) {
+			fileName := statistics
+
+			statistics := readMultiMap(fileName)
+
+			if !isDebug()
+				deleteFile(fileName)
+		}
+
+		if isInstance(continuation, RaceStrategist.RaceStrategySimulationContinuation) {
+			this.clearContinuation()
+
+			continuation.next(statistics)
+		}
+	}
+
 	collectTelemetryData() {
 		local session := "Other"
 		local default := false
@@ -2016,7 +2076,7 @@ class RaceStrategist extends GridRaceAssistant {
 					if ((pitstop.Time - pitstop.Duration - (delta + 20)) < this.iLastPitstopUpdate)
 						pitstop.Duration := (pitstop.Duration + delta)
 					else
-						pitstops.Push(RaceSpotter.Pitstop(carNr, this.iLastPitstopUpdate, lap))
+						pitstops.Push(RaceStrategist.Pitstop(carNr, this.iLastPitstopUpdate, lap))
 				}
 			}
 		}
@@ -2280,7 +2340,8 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	runSimulation(pitstopHistory, confirm := false, request := "User") {
-		local data
+		local knowledgeBase := this.KnowledgeBase
+		local data, lap
 
 		if !isObject(pitstopHistory) {
 			data := readMultiMap(pitstopHistory)
@@ -2289,7 +2350,15 @@ class RaceStrategist extends GridRaceAssistant {
 				deleteFile(pitstopHistory)
 		}
 
-		RaceStrategist.RaceStrategySimulationTask(this, data, confirm, request).start()
+		if (getMultiMapValue(this.Settings, "Strategy Settings", "Traffic.Simulation", false) && this.RemoteHandler) {
+			this.setContinuation(RaceStrategist.RaceStrategySimulationContinuation(this, data, confirm, request))
+
+			lap := knowledgeBase.getValue("Lap")
+
+			this.RemoteHandler.computeCarStatistics(Max(1, lap - 10), lap)
+		}
+		else
+			RaceStrategist.RaceStrategySimulationTask(this, data, confirm, request).start()
 	}
 
 	createStrategy(nameOrConfiguration, driver := false) {
@@ -2634,9 +2703,20 @@ class RaceStrategist extends GridRaceAssistant {
 		local goal, resultSet
 		local startLap, endLap, avgLapTime, driver, stintLength, formationLap, postRaceLap
 		local fuelCapacity, safetyFuel, pitstopDelta, pitstopFuelService, pitstopTyreService, pitstopServiceOrder
-		local lastPositions, lastRunnings, count, laps, consideredLaps, curLap, carPositions, nextRunnings
+		local lastPositions, lastRunnings, count, laps, curLap, carPositions, nextRunnings
 		local lapTime, potential, raceCraft, speed, consistency, carControl
 		local rnd, delta, running, nr, position, ignore, nextPositions, runnings, car
+
+		getCarStatistics(car, &lapTime, &potential, &raceCraft, &speed, &consistency, &carControl) {
+			local statistics := Task.CurrentTask.Statistics
+
+			lapTime := getMultiMapValue(statistics, "Statistics", "Car." . car . ".LapTime", 0)
+			potential := getMultiMapValue(statistics, "Statistics", "Car." . A_Index . ".Potential")
+			raceCraft := getMultiMapValue(statistics, "Statistics", "Car." . A_Index . ".RaceCraft")
+			speed := getMultiMapValue(statistics, "Statistics", "Car." . A_Index . ".Speed")
+			consistency := getMultiMapValue(statistics, "Statistics", "Car." . A_Index . ".Consistency")
+			carControl := getMultiMapValue(statistics, "Statistics", "Car." . A_Index . ".CarControl")
+		}
 
 		startLap := knowledgeBase.getValue("Lap")
 		endLap := targetLap
@@ -2645,9 +2725,9 @@ class RaceStrategist extends GridRaceAssistant {
 		resultSet := knowledgeBase.prove(goal)
 
 		if resultSet
-			initialAvgLapTime := ((resultSet.getValue(goal.Arguments[2]).toString() + 0) / 1000)
+			avgLapTime := ((resultSet.getValue(goal.Arguments[2]).toString() + 0) / 1000)
 		else
-			initialAvgLapTime := (knowledgeBase.getValue("Lap." . startLap . ".Time") / 1000)
+			avgLapTime := (knowledgeBase.getValue("Lap." . startLap . ".Time") / 1000)
 
 		driver := knowledgeBase.getValue("Driver.Car")
 
@@ -2677,11 +2757,6 @@ class RaceStrategist extends GridRaceAssistant {
 
 		laps := CaseInsenseWeakMap()
 
-		consideredLaps := []
-
-		loop Min(startLap, 10)
-			consideredLaps.Push(startLap - (A_Index - 1))
-
 		loop (endLap - startLap) {
 			curLap := A_Index
 
@@ -2696,7 +2771,7 @@ class RaceStrategist extends GridRaceAssistant {
 				consistency := true
 				carControl := true
 
-				this.computeCarStatistics(A_Index, consideredLaps, &lapTime, &potential, &raceCraft, &speed, &consistency, carControl)
+				getCarStatistics(A_Index, &lapTime, &potential, &raceCraft, &speed, &consistency, &carControl)
 
 				if useLapTimeVariation {
 					rnd := Random(-1.0, 1.0)

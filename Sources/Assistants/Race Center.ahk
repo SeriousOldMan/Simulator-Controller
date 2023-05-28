@@ -5223,7 +5223,7 @@ class RaceCenter extends ConfigurationItem {
 						consistency := true
 						carControl := true
 
-						this.computeCarStatistics(A_Index, consideredLaps, lapTime, potential, raceCraft, speed, consistency, carControl)
+						this.computeCarStatistics(A_Index, consideredLaps, &lapTime, &potential, &raceCraft, &speed, &consistency, &carControl)
 
 						if useLapTimeVariation {
 							rnd := Random(-1.0, 1.0)

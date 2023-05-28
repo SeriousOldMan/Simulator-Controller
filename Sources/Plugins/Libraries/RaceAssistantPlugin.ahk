@@ -668,21 +668,19 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 		super.__New(controller, name, configuration, register)
 
-		if (this.Active || isDebug()) {
-			first := (RaceAssistantPlugin.Assistants.Length = 0)
+		if !RaceAssistantPlugin.sTeamServer {
+			teamServer := this.Controller.findPlugin(kTeamServerPlugin)
 
-			RaceAssistantPlugin.Assistants.Push(this)
-
-			if first {
-				teamServer := this.Controller.findPlugin(kTeamServerPlugin)
-
-				if (teamServer && this.Controller.isActive(teamServer))
-					RaceAssistantPlugin.sTeamServer := teamServer
-				else
-					teamServer := false
-			}
+			if (teamServer && this.Controller.isActive(teamServer))
+				RaceAssistantPlugin.sTeamServer := teamServer
 			else
-				teamServer := RaceAssistantPlugin.TeamServer
+				teamServer := false
+		}
+		else
+			teamServer := RaceAssistantPlugin.TeamServer
+
+		if (this.Active || isDebug()) {
+			RaceAssistantPlugin.Assistants.Push(this)
 
 			this.iRaceAssistantName := this.getArgumentValue("raceAssistantName", false)
 			this.iRaceAssistantLogo := this.getArgumentValue("raceAssistantLogo", false)
@@ -787,13 +785,13 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				this.enableRaceAssistant(false, true)
 			else
 				this.disableRaceAssistant(false, true)
+		}
 
-			if first {
-				RaceAssistantPlugin.sCollectorTask
-					:= PeriodicTask(ObjBindMethod(RaceAssistantPlugin, "collectSessionData"), 1000, kHighPriority)
+		if !RaceAssistantPlugin.sCollectorTask {
+			RaceAssistantPlugin.sCollectorTask
+				:= PeriodicTask(ObjBindMethod(RaceAssistantPlugin, "collectSessionData"), 1000, kHighPriority)
 
-				RaceAssistantPlugin.CollectorTask.start()
-			}
+			RaceAssistantPlugin.CollectorTask.start()
 		}
 	}
 

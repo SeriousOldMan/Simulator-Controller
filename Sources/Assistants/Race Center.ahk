@@ -2097,13 +2097,13 @@ class RaceCenter extends ConfigurationItem {
 
 		centerGui.Add("Text", "x32 yp+24 w85 h23 +0x200", translate("Overtake"))
 		centerGui.Add("Text", "x132 yp w28 h23 +0x200", translate("Abs("))
-		centerGui.Add("Edit", "x162 yp w50 h20 Limit2 Number Limit2 VovertakeDeltaEdit", 2)
-		centerGui.Add("UpDown", "x194 yp-2 w18 h20 Range1-99 0x80", 2)
+		centerGui.Add("Edit", "x162 yp w50 h20 Limit2 Number Limit2 VovertakeDeltaEdit", 1)
+		centerGui.Add("UpDown", "x194 yp-2 w18 h20 Range1-99 0x80", 1)
 		centerGui.Add("Text", "x220 yp+4 w340 h20", translate("/ laptime difference) = additional seconds for each passed car"))
 
 		centerGui.Add("Text", "x32 yp+20 w85 h23 +0x200", translate("Traffic"))
-		centerGui.Add("Edit", "x162 yp w50 h20 Limit2 Number Limit2 VtrafficConsideredEdit", 7)
-		centerGui.Add("UpDown", "x194 yp-2 w18 h20 Range1-99 0x80", 7)
+		centerGui.Add("Edit", "x162 yp w50 h20 Limit2 Number Limit2 VtrafficConsideredEdit", 5)
+		centerGui.Add("UpDown", "x194 yp-2 w18 h20 Range1-99 0x80", 5)
 		centerGui.Add("Text", "x220 yp+4 w290 h20", translate("% track length"))
 
 		centerTab.UseTab(5)
@@ -4951,6 +4951,8 @@ class RaceCenter extends ConfigurationItem {
 		usePitstops := (window["pitstopsDropDown"].Value == 1)
 		overTakeDelta := window["overtakeDeltaEdit"].Text
 		consideredTraffic := window["trafficConsideredEdit"].Text
+
+		return true
 	}
 
 	getStartConditions(&initialStint, &initialLap, &initialStintTime, &initialSessionTime

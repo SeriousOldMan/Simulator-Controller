@@ -2556,8 +2556,12 @@ class RaceStrategist extends GridRaceAssistant {
 		strategy.AvailableTyreSets := this.computeAvailableTyreSets(strategy.AvailableTyreSets, Task.CurrentTask.UsedTyreSets)
 	}
 
-	getTrafficScenario(strategy, targetLap, randomFactor, numScenarios, useLapTimeVariation, useDriverErrors, usePitstops, overTakeDelta) {
+	getTrafficScenario(strategy, targetPitstop, randomFactor, numScenarios, useLapTimeVariation, useDriverErrors, usePitstops, overTakeDelta) {
+		local targetLap := targetPitstop.Lap + 1
 		local knowledgeBase := this.KnowledgeBase
+		local pitstopWindow := knowledgeBase.getValue("Session.Settings.Pitstop.Strategy.Window.Considered")
+		local pitstops := CaseInsenseMap()
+		local carStatistics := CaseInsenseMap()
 		local goal, resultSet
 		local startLap, endLap, avgLapTime, driver, stintLength, formationLap, postRaceLap
 		local fuelCapacity, safetyFuel, pitstopDelta, pitstopFuelService, pitstopTyreService, pitstopServiceOrder
@@ -2574,6 +2578,37 @@ class RaceStrategist extends GridRaceAssistant {
 			speed := getMultiMapValue(statistics, "Statistics", "Car." . A_Index . ".Speed")
 			consistency := getMultiMapValue(statistics, "Statistics", "Car." . A_Index . ".Consistency")
 			carControl := getMultiMapValue(statistics, "Statistics", "Car." . A_Index . ".CarControl")
+		}
+
+		carPitstop(car, lap) {
+			local stintLength := 0
+			local carPitstops
+
+			if !pitstops.Has(car) {
+				carPitstops := this.Pitstops[knowledgeBase.getValue("Car." . car . ".Nr", 0)]
+
+				if (carPitstops.Length > 0) {
+					loop carPitstops.Length
+						stintLength += (carPitstops[A_Index].Lap - ((A_Index > 1) ? carPitstops[A_Index - 1].Lap : 0))
+
+					if (Abs(carPitstops[carPitstops.Length].Lap + Round(stintLength / carPitstops.Length) - lap) < pitstopWindow) {
+						pitstops[car] := true
+
+						return true
+					}
+				}
+				else {
+					rnd := Random(0.0, 1.0)
+
+					if (rnd < (randomFactor / 100)) {
+						pitstops[car] := true
+
+						return true
+					}
+				}
+			}
+
+			return false
 		}
 
 		startLap := knowledgeBase.getValue("Lap")
@@ -2608,6 +2643,10 @@ class RaceStrategist extends GridRaceAssistant {
 		count := knowledgeBase.getValue("Car.Count")
 
 		loop count {
+			getCarStatistics(A_Index, &lapTime, &potential, &raceCraft, &speed, &consistency, &carControl)
+
+			carStatistics[A_Index] := [lapTime, potential, raceCraft, speed, consistency, carControl]
+
 			lastPositions.Push(knowledgeBase.getValue("Car." . A_Index . ".Position", 0))
 			lastRunnings.Push(knowledgeBase.getValue("Car." . A_Index . ".Lap", 0)
 							+ knowledgeBase.getValue("Car." . A_Index . ".Lap.Running", 0))
@@ -2629,7 +2668,12 @@ class RaceStrategist extends GridRaceAssistant {
 				consistency := true
 				carControl := true
 
-				getCarStatistics(A_Index, &lapTime, &potential, &raceCraft, &speed, &consistency, &carControl)
+				lapTime := carStatistics[A_Index][1]
+				potential := carStatistics[A_Index][2]
+				raceCraft := carStatistics[A_Index][3]
+				speed := carStatistics[A_Index][4]
+				consistency := carStatistics[A_Index][5]
+				carControl := carStatistics[A_Index][6]
 
 				if useLapTimeVariation {
 					rnd := Random(-1.0, 1.0)
@@ -2643,20 +2687,11 @@ class RaceStrategist extends GridRaceAssistant {
 					lapTime += (rnd * ((5 - carControl) / 5) * (randomFactor / 100))
 				}
 
-				if (usePitstops && ((startLap + curLap) == targetLap) && (A_Index != driver)) {
-					rnd := Random(0.0, 1.0)
+				if (usePitstops && (A_Index != driver) && carPitstop(A_Index, (startLap + curLap)))
+					lapTime += strategy.calcPitstopDuration(fuelCapacity, true)
 
-					if (rnd < (randomFactor / 100))
-						lapTime += strategy.calcPitstopDuration(fuelCapacity, true)
-				}
-				else if ((A_Index == driver) && ((startLap + curLap) == targetLap)) {
-					if isNumber(pitstopFuelService)
-						lapTime += (pitstopDelta + (pitstopFuelService * fuelCapacity) + pitstopTyreService)
-					else if (pitstopFuelService[1] = "Fixed")
-						lapTime += (pitstopDelta + pitstopFuelService[2] + pitstopTyreService)
-					else
-						lapTime += (pitstopDelta + (pitstopFuelService[2] * fuelCapacity) + pitstopTyreService)
-				}
+				if ((A_Index == driver) && ((startLap + curLap) == targetLap))
+					lapTime += strategy.calcPitstopDuration(targetPitstop.RefuelAmount, targetPitstop.TyreChange)
 
 				if lapTime
 					delta := (((avgLapTime + lapTime) / lapTime) - 1)

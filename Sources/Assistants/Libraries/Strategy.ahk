@@ -1066,7 +1066,7 @@ class TrafficSimulation extends StrategySimulation {
 	}
 
 	getTrafficScenario(strategy, pitstop) {
-		return this.StrategyManager.getTrafficScenario(strategy, pitstop.Lap + 1, this.RandomFactor, this.NumScenarios
+		return this.StrategyManager.getTrafficScenario(strategy, pitstop, this.RandomFactor, this.NumScenarios
 													 , this.UseLapTimeVariation, this.UseDriverErrors, this.UsePitstops
 													 , this.OverTakeDelta)
 	}

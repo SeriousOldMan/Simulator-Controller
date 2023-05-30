@@ -2918,6 +2918,9 @@ class RaceStrategist extends GridRaceAssistant {
 				if strategy {
 					this.reportStrategy({Strategy: false, Pitstops: true, NextPitstop: true, TyreChange: true, Refuel: true, Map: true}, strategy)
 
+					if (this.Strategy != this.Strategy[true])
+						this.explainStrategyRecommendation(strategy)
+
 					if this.Speaker {
 						this.getSpeaker().speakPhrase("ConfirmUpdateStrategy", false, true)
 
@@ -3087,6 +3090,38 @@ class RaceStrategist extends GridRaceAssistant {
 																				 , false, "Okay"))
 				else
 					this.setContinuation(ObjBindMethod(this, "explainPitstopRecommendation", plannedLap))
+			}
+			finally {
+				speaker.endTalk()
+			}
+		}
+	}
+
+	explainStrategyRecommendation(strategy) {
+		local knowledgeBase := this.KnowledgeBase
+		local pitstopWindow := knowledgeBase.getValue("Session.Settings.Pitstop.Strategy.Window.Considered")
+		local speaker, pitstop, pitstopLap, position, carsAhead
+
+		if (isInstance(strategy, TrafficStrategy) && strategy.Pitstops.Length > 0) {
+			speaker := this.getSpeaker()
+
+			pitstop := strategy.Pitstops[1]
+			pitstopLap := pitstop.Lap
+			position := pitstop.getPosition()
+
+			pitstop.getTrafficDensity(&carsAhead)
+
+			speaker.beginTalk()
+
+			try {
+				speaker.speakPhrase("EvaluatedLaps", {laps: pitstopWindow + 1, first: pitstopLap - pitstopWindow, last: pitstopLap + pitstopWindow})
+
+				speaker.speakPhrase("EvaluatedBestPosition", {lap: pitstopLap, position: position})
+
+				if (carsAhead > 0)
+					speaker.speakPhrase("EvaluatedTraffic", {traffic: carsAhead})
+				else
+					speaker.speakPhrase("EvaluatedNoTraffic")
 			}
 			finally {
 				speaker.endTalk()

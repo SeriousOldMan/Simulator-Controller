@@ -717,9 +717,6 @@ class RaceSpotter extends GridRaceAssistant {
 	iOtherCars := CaseInsenseMap()
 	iPositions := CaseInsenseWeakMap()
 
-	iPitstops := CaseInsenseMap()
-	iLastPitstopUpdate := false
-
 	iPendingAlerts := []
 
 	iLastPenalty := false
@@ -788,49 +785,6 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 	}
 
-	class Pitstop {
-		iNr := false
-
-		iTime := false
-		iLap := 0
-		iDuration := 0
-
-		Nr {
-			Get {
-				return this.iNr
-			}
-		}
-
-		Time {
-			Get {
-				return this.iTime
-			}
-		}
-
-		Lap {
-			Get {
-				return this.iLap
-			}
-		}
-
-		Duration {
-			Get {
-				return this.iDuration
-			}
-
-			Set {
-				return (this.iDuration := value)
-			}
-		}
-
-		__New(nr, time, lap, duration := 0) {
-			this.iNr := nr
-			this.iTime := time
-			this.iLap := lap
-			this.iDuration := duration
-		}
-	}
-
 	Running {
 		Get {
 			return this.iRunning
@@ -888,19 +842,6 @@ class RaceSpotter extends GridRaceAssistant {
 
 		Set {
 			return (isSet(key) ? (this.iPositionInfos[key] := value) : (this.iPositionInfos := value))
-		}
-	}
-
-	Pitstops[nr?] {
-		Get {
-			if isSet(nr) {
-				if !this.iPitstops.Has(nr)
-					this.iPitstops[nr] := []
-
-				return this.iPitstops[nr]
-			}
-			else
-				return this.iPitstops
 		}
 	}
 
@@ -971,10 +912,7 @@ class RaceSpotter extends GridRaceAssistant {
 		if (values.HasProp("Session") && (values.Session == kSessionFinished)) {
 			this.iRunning := false
 
-			this.initializeHistory()
-
-			this.iPitstops := CaseInsenseMap()
-			this.iLastPitstopUpdate := false
+			this.initializeHistory
 		}
 	}
 
@@ -2878,45 +2816,6 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 	}
 
-	createSessionState() {
-		local state := super.createSessionState()
-		local data := CaseInsenseMap()
-		local nr, pitstops, index, pitstop
-
-		for nr, pitstops in this.Pitstops {
-			setMultiMapValue(state, "Pitstop State", "Pitstop." . A_Index . ".Nr", nr)
-
-			for index, pitstop in pitstops
-				setMultiMapValue(state, "Pitstop State", "Pitstop." . nr . "." . index
-							   , values2String(";", pitstop.Time, pitstop.Lap, pitstop.Duration))
-
-			setMultiMapValue(state, "Pitstop State", "Pitstop." . nr . ".Count", pitstops.Length)
-		}
-
-		setMultiMapValue(state, "Pitstop State", "Pitstop.Count", this.Pitstops.Count)
-
-		if isDevelopment()
-			writeMultiMap(temporaryFileName("Race Spotter", "pitstops"), state)
-
-		return state
-	}
-
-	loadSessionState(state) {
-		local carNr
-
-		super.loadSessionState(state)
-
-		this.iPitstops := CaseInsenseMap()
-
-		loop getMultiMapValue(state, "Pitstop State", "Pitstop.Count", 0) {
-			carNr := getMultiMapValue(state, "Pitstop State", "Pitstop." . A_Index . ".Nr")
-			pitstops := this.Pitstops[carNr]
-
-			loop getMultiMapValue(state, "Pitstop State", "Pitstop." . carNr . ".Count", 0)
-				pitstops.Push(RaceSpotter.Pitstop(carNr, string2Values(";", getMultiMapValue(state, "Pitstop State", "Pitstop." . carNr . "." . A_Index))*))
-		}
-	}
-
 	adjustGaps(data, &gapAhead := false, &gapBehind := false) {
 		local knowledgeBase := this.KnowledgeBase
 
@@ -3005,8 +2904,6 @@ class RaceSpotter extends GridRaceAssistant {
 				if (this.Announcements["CutWarnings"] && this.hasEnoughData(false))
 					this.cutWarning(lapNumber, getMultiMapValue(data, "Stint Data", "Sector", 0), wasValid, lastWarnings)
 
-		this.updatePitstops(lapNumber, data)
-
 		return result
 	}
 
@@ -3075,44 +2972,7 @@ class RaceSpotter extends GridRaceAssistant {
 				if (this.Announcements["CutWarnings"] && this.hasEnoughData(false))
 					this.cutWarning(lapNumber, getMultiMapValue(data, "Stint Data", "Sector", 0), wasValid, lastWarnings)
 
-		this.updatePitstops(lapNumber, data)
-
 		return result
-	}
-
-	updatePitstops(lap, data) {
-		local carNr, delta, pitstops, pitstop
-
-		if !this.iLastPitstopUpdate {
-			this.iLastPitstopUpdate := Round(getMultiMapValue(data, "Session Data", "SessionTimeRemaining", 0) / 1000)
-
-			delta := 0
-		}
-		else {
-			delta := (this.iLastPitstopUpdate - Round(getMultiMapValue(data, "Session Data", "SessionTimeRemaining", 0) / 1000))
-
-			this.iLastPitstopUpdate -= delta
-		}
-
-		loop getMultiMapValue(data, "Position Data", "Car.Count", 0) {
-			if (getMultiMapValue(data, "Position Data", "Car." . A_Index . ".InPitlane", false)
-			 || getMultiMapValue(data, "Position Data", "Car." . A_Index . ".InPit", false)) {
-				carNr := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Nr", A_Index)
-
-				pitstops := this.Pitstops[carNr]
-
-				if (pitstops.Length = 0)
-					pitstops.Push(RaceSpotter.Pitstop(carNr, this.iLastPitstopUpdate, lap))
-				else {
-					pitstop := pitstops[pitstops.Length]
-
-					if ((pitstop.Time - pitstop.Duration - (delta + 20)) < this.iLastPitstopUpdate)
-						pitstop.Duration := (pitstop.Duration + delta)
-					else
-						pitstops.Push(RaceSpotter.Pitstop(carNr, this.iLastPitstopUpdate, lap))
-				}
-			}
-		}
 	}
 
 	computePositions(data, gapAhead, gapBehind) {

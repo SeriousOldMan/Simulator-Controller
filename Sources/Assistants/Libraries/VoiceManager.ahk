@@ -62,6 +62,7 @@ class VoiceManager {
 
 	iSpeechSynthesizer := false
 	iSpeechRecognizer := false
+	iUseTalking := true
 	iIsSpeaking := false
 	iIsListening := false
 
@@ -95,6 +96,16 @@ class VoiceManager {
 			}
 		}
 
+		UseTalking {
+			Get {
+				return this.VoiceManager.UseTalking
+			}
+
+			Set {
+				return (this.VoiceManager.UseTalking := value)
+			}
+		}
+
 		Talking {
 			Get {
 				return this.iIsTalking
@@ -124,7 +135,8 @@ class VoiceManager {
 		}
 
 		beginTalk() {
-			this.iIsTalking := true
+			if this.UseTalking
+				this.iIsTalking := true
 		}
 
 		endTalk() {
@@ -218,6 +230,16 @@ class VoiceManager {
 			}
 		}
 
+		UseTalking {
+			Get {
+				return this.VoiceManager.UseTalking
+			}
+
+			Set {
+				return (this.VoiceManager.UseTalking := value)
+			}
+		}
+
 		Talking {
 			Get {
 				return this.iIsTalking
@@ -245,7 +267,8 @@ class VoiceManager {
 		}
 
 		beginTalk() {
-			this.iIsTalking := true
+			if this.UseTalking
+				this.iIsTalking := true
 		}
 
 		endTalk() {
@@ -472,6 +495,16 @@ class VoiceManager {
 		}
 	}
 
+	UseTalking {
+		Get {
+			return this.iUseTalking
+		}
+
+		Set {
+			return (this.iUseTalking := value)
+		}
+	}
+
 	Speaking {
 		Get {
 			return this.iIsSpeaking
@@ -587,6 +620,9 @@ class VoiceManager {
 
 		if options.Has("Synthesizer")
 			this.iSynthesizer := options["Synthesizer"]
+
+		if options.Has("UseTalking")
+			this.iUseTalking := options["UseTalking"]
 
 		if options.Has("Speaker")
 			this.iSpeaker := options["Speaker"]
@@ -828,7 +864,7 @@ class VoiceManager {
 				}
 				catch Any as exception {
 					logError(exception)
-					
+
 					logMessage(kLogCritical, translate("Error while registering voice command `"") . definition . translate("`" - please check the configuration"))
 
 					showMessage(substituteVariables(translate("Cannot register voice command `"%command%`" - please check the configuration..."), {command: definition})

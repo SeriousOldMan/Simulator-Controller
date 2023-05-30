@@ -38,6 +38,8 @@ class RaceStrategist extends GridRaceAssistant {
 	iLastStrategyUpdate := 0
 	iRejectedStrategy := false
 
+	iUseTraffic := false
+
 	iSaveTelemetry := kAlways
 	iSaveRaceReport := false
 	iRaceReview := false
@@ -50,9 +52,6 @@ class RaceStrategist extends GridRaceAssistant {
 
 	iSessionReportsDatabase := false
 	iSessionDataActive := false
-
-	iPitstops := CaseInsenseMap()
-	iLastPitstopUpdate := false
 
 	class RaceStrategistRemoteHandler extends RaceAssistant.RaceAssistantRemoteHandler {
 		__New(remotePID) {
@@ -93,6 +92,10 @@ class RaceStrategist extends GridRaceAssistant {
 
 		reviewRace(arguments*) {
 			this.callRemote("reviewRace", arguments*)
+		}
+
+		computeCarStatistics(arguments*) {
+			this.callRemote("computeCarStatistics", arguments*)
 		}
 	}
 
@@ -337,6 +340,34 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 	}
 
+	class RaceStrategySimulationContinuation extends VoiceManager.VoiceContinuation {
+		iData := false
+		iConfirm := false
+		iRequest := false
+
+		Statistics {
+			Get {
+				return this.iStatistics
+			}
+
+			Set {
+				return (this.iStatistics := value)
+			}
+		}
+
+		__New(manager, data, confirm, request) {
+			this.iData := data
+			this.iConfirm := confirm
+			this.iRequest := request
+
+			super.__New(manager)
+		}
+
+		next(statistics) {
+			RaceStrategist.RaceStrategySimulationTask(this.Manager, this.iData, this.iConfirm, this.iRequest, statistics).start()
+		}
+	}
+
 	class RaceStrategySimulationTask extends Task {
 		iConfirm := false
 		iRequest := "User"
@@ -348,6 +379,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 		iLap := false
 
+		iStatistics := false
 		iPitstops := []
 		iUsedTyreSets := []
 
@@ -387,6 +419,12 @@ class RaceStrategist extends GridRaceAssistant {
 			}
 		}
 
+		Statistics {
+			Get {
+				return this.iStatistics
+			}
+		}
+
 		Pitstops[key?] {
 			Get {
 				return (isSet(key) ? this.iPitstops[key] : this.iPitstops)
@@ -399,13 +437,14 @@ class RaceStrategist extends GridRaceAssistant {
 			}
 		}
 
-		__New(strategist, configuration, confirm := false, request := "User") {
+		__New(strategist, configuration, confirm := false, request := "User", statistics := false) {
 			local knowledgeBase := strategist.KnowledgeBase
 
 			super.__New(false, 0, kLowPriority)
 
 			this.iConfirm := confirm
 			this.iRequest := request
+			this.iStatistics := statistics
 			this.iRaceStrategist := strategist
 			this.iLap := knowledgeBase.getValue("Lap")
 			this.iTelemetryDatabase
@@ -443,7 +482,7 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 
 		run() {
-			if getMultiMapValue(this.Settings, "Strategy Settings", "Traffic.Simulation", false)
+			if this.RaceStrategist.UseTraffic
 				this.iSimulation := TrafficSimulation(this.RaceStrategist
 												    , (this.RaceStrategist.KnowledgeBase.getValue("Session.Format") = "Time") ? "Duration" : "Laps"
 												    , this.TelemetryDatabase)
@@ -474,49 +513,6 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 	}
 
-	class Pitstop {
-		iNr := false
-
-		iTime := false
-		iLap := 0
-		iDuration := 0
-
-		Nr {
-			Get {
-				return this.iNr
-			}
-		}
-
-		Time {
-			Get {
-				return this.iTime
-			}
-		}
-
-		Lap {
-			Get {
-				return this.iLap
-			}
-		}
-
-		Duration {
-			Get {
-				return this.iDuration
-			}
-
-			Set {
-				return (this.iDuration := value)
-			}
-		}
-
-		__New(nr, time, lap, duration := 0) {
-			this.iNr := nr
-			this.iTime := time
-			this.iLap := lap
-			this.iDuration := duration
-		}
-	}
-
 	RaceInfo[key?] {
 		Get {
 			return (isSet(key) ? this.iRaceInfo[key] : this.iRaceInfo)
@@ -529,22 +525,15 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 	}
 
-	Pitstops[nr?] {
-		Get {
-			if isSet(nr) {
-				if !this.iPitstops.Has(nr)
-					this.iPitstops[nr] := []
-
-				return this.iPitstops[nr]
-			}
-			else
-				return this.iPitstops
-		}
-	}
-
 	StrategyReported {
 		Get {
 			return this.iStrategyReported
+		}
+	}
+
+	UseTraffic {
+		Get {
+			return this.iUseTraffic
 		}
 	}
 
@@ -624,6 +613,9 @@ class RaceStrategist extends GridRaceAssistant {
 		if values.HasProp("RaceReview")
 			this.iRaceReview := values.RaceReview
 
+		if values.HasProp("UseTraffic")
+			this.iUseTraffic := values.UseTraffic
+
 		if (values.HasProp("Session") && (this.Session == kSessionFinished)) {
 			this.iStrategyReported := false
 			this.iLastStrategyUpdate := 0
@@ -645,11 +637,6 @@ class RaceStrategist extends GridRaceAssistant {
 
 		if values.HasProp("RaceInfo")
 			this.iRaceInfo := values.RaceInfo
-
-		if (values.HasProp("Session") && (values.Session == kSessionFinished)) {
-			this.iPitstops := CaseInsenseMap()
-			this.iLastPitstopUpdate := false
-		}
 	}
 
 	updateDynamicValues(values) {
@@ -1325,6 +1312,26 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 	}
 
+	updateCarStatistics(statistics) {
+		local continuation := this.Continuation
+		local fileName
+
+		if !isObject(statistics) {
+			fileName := statistics
+
+			statistics := readMultiMap(fileName)
+
+			if !isDebug()
+				deleteFile(fileName)
+		}
+
+		if isInstance(continuation, RaceStrategist.RaceStrategySimulationContinuation) {
+			this.clearContinuation()
+
+			continuation.next(statistics)
+		}
+	}
+
 	collectTelemetryData() {
 		local session := "Other"
 		local default := false
@@ -1426,6 +1433,10 @@ class RaceStrategist extends GridRaceAssistant {
 
 		super.prepareSession(&settings, &data)
 
+		if settings
+			this.updateConfigurationValues({UseTalking: getMultiMapValue(settings, "Assistant.Strategist", "Voice.UseTalking", true)
+										  , UseTraffic: getMultiMapValue(settings, "Strategy Settings", "Traffic.Simulation", false)})
+
 		raceData := newMultiMap()
 
 		carCount := getMultiMapValue(data, "Position Data", "Car.Count")
@@ -1458,6 +1469,10 @@ class RaceStrategist extends GridRaceAssistant {
 		local simulatorName := this.SettingsDatabase.getSimulatorName(facts["Session.Simulator"])
 		local theStrategy, applicableStrategy, simulator, car, track
 		local sessionType, sessionLength, duration, laps
+
+		if settings
+			this.updateConfigurationValues({UseTalking: getMultiMapValue(settings, "Assistant.Strategist", "Voice.UseTalking", true)
+										  , UseTraffic: getMultiMapValue(settings, "Strategy Settings", "Traffic.Simulation", false)})
 
 		if ((this.Session == kSessionRace) && FileExist(kUserConfigDirectory . "Race.strategy")) {
 			theStrategy := Strategy(this, readMultiMap(kUserConfigDirectory . "Race.strategy"))
@@ -1660,45 +1675,6 @@ class RaceStrategist extends GridRaceAssistant {
 			this.updateDynamicValues({KnowledgeBase: false, HasTelemetryData: false})
 
 			this.finishSession()
-		}
-	}
-
-	createSessionState() {
-		local state := super.createSessionState()
-		local data := CaseInsenseMap()
-		local nr, pitstops, index, pitstop
-
-		for nr, pitstops in this.Pitstops {
-			setMultiMapValue(state, "Pitstop State", "Pitstop." . A_Index . ".Nr", nr)
-
-			for index, pitstop in pitstops
-				setMultiMapValue(state, "Pitstop State", "Pitstop." . nr . "." . index
-							   , values2String(";", pitstop.Time, pitstop.Lap, pitstop.Duration))
-
-			setMultiMapValue(state, "Pitstop State", "Pitstop." . nr . ".Count", pitstops.Length)
-		}
-
-		setMultiMapValue(state, "Pitstop State", "Pitstop.Count", this.Pitstops.Count)
-
-		if isDevelopment()
-			writeMultiMap(temporaryFileName("Race Strategist", "pitstops"), state)
-
-		return state
-	}
-
-	loadSessionState(state) {
-		local carNr
-
-		super.loadSessionState(state)
-
-		this.iPitstops := CaseInsenseMap()
-
-		loop getMultiMapValue(state, "Pitstop State", "Pitstop.Count", 0) {
-			carNr := getMultiMapValue(state, "Pitstop State", "Pitstop." . A_Index . ".Nr")
-			pitstops := this.Pitstops[carNr]
-
-			loop getMultiMapValue(state, "Pitstop State", "Pitstop." . carNr . ".Count", 0)
-				pitstops.Push(RaceStrategist.Pitstop(carNr, string2Values(";", getMultiMapValue(state, "Pitstop State", "Pitstop." . carNr . "." . A_Index))*))
 		}
 	}
 
@@ -1937,8 +1913,6 @@ class RaceStrategist extends GridRaceAssistant {
 
 		Task.startTask(ObjBindMethod(this, "createSessionInfo", lapNumber, validLap, data, simulator, car, track), 1000, kLowPriority)
 
-		this.updatePitstops(lapNumber, data)
-
 		return result
 	}
 
@@ -1982,44 +1956,7 @@ class RaceStrategist extends GridRaceAssistant {
 															  , knowledgeBase.getValue("Session.Car")
 															  , knowledgeBase.getValue("Session.Track")), 1000, kLowPriority)
 
-		this.updatePitstops(lapNumber, data)
-
 		return result
-	}
-
-	updatePitstops(lap, data) {
-		local carNr, delta, pitstops, pitstop
-
-		if !this.iLastPitstopUpdate {
-			this.iLastPitstopUpdate := Round(getMultiMapValue(data, "Session Data", "SessionTimeRemaining", 0) / 1000)
-
-			delta := 0
-		}
-		else {
-			delta := (this.iLastPitstopUpdate - Round(getMultiMapValue(data, "Session Data", "SessionTimeRemaining", 0) / 1000))
-
-			this.iLastPitstopUpdate -= delta
-		}
-
-		loop getMultiMapValue(data, "Position Data", "Car.Count", 0) {
-			if (getMultiMapValue(data, "Position Data", "Car." . A_Index . ".InPitlane", false)
-			 || getMultiMapValue(data, "Position Data", "Car." . A_Index . ".InPit", false)) {
-				carNr := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Nr", A_Index)
-
-				pitstops := this.Pitstops[carNr]
-
-				if (pitstops.Length = 0)
-					pitstops.Push(RaceStrategist.Pitstop(carNr, this.iLastPitstopUpdate, lap))
-				else {
-					pitstop := pitstops[pitstops.Length]
-
-					if ((pitstop.Time - pitstop.Duration - (delta + 20)) < this.iLastPitstopUpdate)
-						pitstop.Duration := (pitstop.Duration + delta)
-					else
-						pitstops.Push(RaceSpotter.Pitstop(carNr, this.iLastPitstopUpdate, lap))
-				}
-			}
-		}
 	}
 
 	requestInformation(category, arguments*) {
@@ -2280,7 +2217,8 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	runSimulation(pitstopHistory, confirm := false, request := "User") {
-		local data
+		local knowledgeBase := this.KnowledgeBase
+		local data, lap
 
 		if !isObject(pitstopHistory) {
 			data := readMultiMap(pitstopHistory)
@@ -2289,7 +2227,15 @@ class RaceStrategist extends GridRaceAssistant {
 				deleteFile(pitstopHistory)
 		}
 
-		RaceStrategist.RaceStrategySimulationTask(this, data, confirm, request).start()
+		if (this.UseTraffic && this.RemoteHandler) {
+			this.setContinuation(RaceStrategist.RaceStrategySimulationContinuation(this, data, confirm, request))
+
+			lap := knowledgeBase.getValue("Lap")
+
+			this.RemoteHandler.computeCarStatistics(Max(1, lap - 10), lap)
+		}
+		else
+			RaceStrategist.RaceStrategySimulationTask(this, data, confirm, request).start()
 	}
 
 	createStrategy(nameOrConfiguration, driver := false) {
@@ -2299,7 +2245,8 @@ class RaceStrategist extends GridRaceAssistant {
 		if !isObject(nameOrConfiguration)
 			nameOrConfiguration := false
 
-		theStrategy := RaceStrategist.RaceStrategy(this, nameOrConfiguration, driver)
+		theStrategy := (this.UseTraffic ? RaceStrategist.TrafficRaceStrategy(this, nameOrConfiguration, driver)
+										: RaceStrategist.RaceStrategy(this, nameOrConfiguration, driver))
 
 		if (name && !isObject(name))
 			theStrategy.setName(name)
@@ -2629,14 +2576,60 @@ class RaceStrategist extends GridRaceAssistant {
 		strategy.AvailableTyreSets := this.computeAvailableTyreSets(strategy.AvailableTyreSets, Task.CurrentTask.UsedTyreSets)
 	}
 
-	getTrafficScenario(strategy, targetLap, randomFactor, numScenarios, useLapTimeVariation, useDriverErrors, usePitstops, overTakeDelta) {
+	getTrafficScenario(strategy, targetPitstop, randomFactor, numScenarios, useLapTimeVariation, useDriverErrors, usePitstops, overTakeDelta) {
+		local targetLap := targetPitstop.Lap + 1
 		local knowledgeBase := this.KnowledgeBase
+		local pitstopWindow := knowledgeBase.getValue("Session.Settings.Pitstop.Strategy.Window.Considered")
+		local pitstops := CaseInsenseMap()
+		local carStatistics := CaseInsenseMap()
 		local goal, resultSet
 		local startLap, endLap, avgLapTime, driver, stintLength, formationLap, postRaceLap
 		local fuelCapacity, safetyFuel, pitstopDelta, pitstopFuelService, pitstopTyreService, pitstopServiceOrder
-		local lastPositions, lastRunnings, count, laps, consideredLaps, curLap, carPositions, nextRunnings
+		local lastPositions, lastRunnings, count, laps, curLap, carPositions, nextRunnings
 		local lapTime, potential, raceCraft, speed, consistency, carControl
 		local rnd, delta, running, nr, position, ignore, nextPositions, runnings, car
+
+		getCarStatistics(car, &lapTime, &potential, &raceCraft, &speed, &consistency, &carControl) {
+			local statistics := Task.CurrentTask.Statistics
+
+			lapTime := getMultiMapValue(statistics, "Statistics", "Car." . car . ".LapTime", 0)
+			potential := getMultiMapValue(statistics, "Statistics", "Car." . A_Index . ".Potential")
+			raceCraft := getMultiMapValue(statistics, "Statistics", "Car." . A_Index . ".RaceCraft")
+			speed := getMultiMapValue(statistics, "Statistics", "Car." . A_Index . ".Speed")
+			consistency := getMultiMapValue(statistics, "Statistics", "Car." . A_Index . ".Consistency")
+			carControl := getMultiMapValue(statistics, "Statistics", "Car." . A_Index . ".CarControl")
+		}
+
+		carPitstop(car, lap) {
+			local stintLength := 0
+			local carPitstops
+
+			if !pitstops.Has(car) {
+				carPitstops := this.Pitstops[knowledgeBase.getValue("Car." . car . ".Nr", 0)]
+
+				if (carPitstops.Length > 0) {
+					loop carPitstops.Length
+						stintLength += (carPitstops[A_Index].Lap - ((A_Index > 1) ? carPitstops[A_Index - 1].Lap : 0))
+
+					if (Abs(carPitstops[carPitstops.Length].Lap + Round(stintLength / carPitstops.Length) - lap) < pitstopWindow) {
+						pitstops[car] := true
+
+						return true
+					}
+				}
+				else {
+					rnd := Random(0.0, 1.0)
+
+					if (rnd < (randomFactor / 100)) {
+						pitstops[car] := true
+
+						return true
+					}
+				}
+			}
+
+			return false
+		}
 
 		startLap := knowledgeBase.getValue("Lap")
 		endLap := targetLap
@@ -2645,9 +2638,9 @@ class RaceStrategist extends GridRaceAssistant {
 		resultSet := knowledgeBase.prove(goal)
 
 		if resultSet
-			initialAvgLapTime := ((resultSet.getValue(goal.Arguments[2]).toString() + 0) / 1000)
+			avgLapTime := ((resultSet.getValue(goal.Arguments[2]).toString() + 0) / 1000)
 		else
-			initialAvgLapTime := (knowledgeBase.getValue("Lap." . startLap . ".Time") / 1000)
+			avgLapTime := (knowledgeBase.getValue("Lap." . startLap . ".Time") / 1000)
 
 		driver := knowledgeBase.getValue("Driver.Car")
 
@@ -2670,17 +2663,16 @@ class RaceStrategist extends GridRaceAssistant {
 		count := knowledgeBase.getValue("Car.Count")
 
 		loop count {
+			getCarStatistics(A_Index, &lapTime, &potential, &raceCraft, &speed, &consistency, &carControl)
+
+			carStatistics[A_Index] := [lapTime, potential, raceCraft, speed, consistency, carControl]
+
 			lastPositions.Push(knowledgeBase.getValue("Car." . A_Index . ".Position", 0))
 			lastRunnings.Push(knowledgeBase.getValue("Car." . A_Index . ".Lap", 0)
 							+ knowledgeBase.getValue("Car." . A_Index . ".Lap.Running", 0))
 		}
 
 		laps := CaseInsenseWeakMap()
-
-		consideredLaps := []
-
-		loop Min(startLap, 10)
-			consideredLaps.Push(startLap - (A_Index - 1))
 
 		loop (endLap - startLap) {
 			curLap := A_Index
@@ -2696,7 +2688,12 @@ class RaceStrategist extends GridRaceAssistant {
 				consistency := true
 				carControl := true
 
-				this.computeCarStatistics(A_Index, consideredLaps, &lapTime, &potential, &raceCraft, &speed, &consistency, carControl)
+				lapTime := carStatistics[A_Index][1]
+				potential := carStatistics[A_Index][2]
+				raceCraft := carStatistics[A_Index][3]
+				speed := carStatistics[A_Index][4]
+				consistency := carStatistics[A_Index][5]
+				carControl := carStatistics[A_Index][6]
 
 				if useLapTimeVariation {
 					rnd := Random(-1.0, 1.0)
@@ -2710,20 +2707,11 @@ class RaceStrategist extends GridRaceAssistant {
 					lapTime += (rnd * ((5 - carControl) / 5) * (randomFactor / 100))
 				}
 
-				if (usePitstops && ((startLap + curLap) == targetLap) && (A_Index != driver)) {
-					rnd := Random(0.0, 1.0)
+				if (usePitstops && (A_Index != driver) && carPitstop(A_Index, (startLap + curLap)))
+					lapTime += strategy.calcPitstopDuration(fuelCapacity, true)
 
-					if (rnd < (randomFactor / 100))
-						lapTime += strategy.calcPitstopDuration(fuelCapacity, true)
-				}
-				else if ((A_Index == driver) && ((startLap + curLap) == targetLap)) {
-					if isNumber(pitstopFuelService)
-						lapTime += (pitstopDelta + (pitstopFuelService * fuelCapacity) + pitstopTyreService)
-					else if (pitstopFuelService[1] = "Fixed")
-						lapTime += (pitstopDelta + pitstopFuelService[2] + pitstopTyreService)
-					else
-						lapTime += (pitstopDelta + (pitstopFuelService[2] * fuelCapacity) + pitstopTyreService)
-				}
+				if ((A_Index == driver) && ((startLap + curLap) == targetLap))
+					lapTime += strategy.calcPitstopDuration(targetPitstop.RefuelAmount, targetPitstop.TyreChange)
 
 				if lapTime
 					delta := (((avgLapTime + lapTime) / lapTime) - 1)

@@ -924,7 +924,7 @@ systemMonitor(command := false, arguments*) {
 
 		systemMonitorGui.Add("Text", "x8 yp+26 w790 0x10")
 
-		monitorTabView := systemMonitorGui.Add("Tab3", "x16 yp+14 w773 h375 AltSubmit -Wrap Section", collect(["Dashboard", "Modules", "Team", "Session", "Logs"], translate))
+		monitorTabView := systemMonitorGui.Add("Tab3", "x16 yp+14 w773 h375 AltSubmit -Wrap Section", collect(["Dashboard", "Session", "Team", "Modules", "Logs"], translate))
 
 		monitorTabView.UseTab(1)
 
@@ -980,9 +980,7 @@ systemMonitor(command := false, arguments*) {
 
 		monitorTabView.UseTab(2)
 
-		stateListView := systemMonitorGui.Add("ListView", "x24 ys+28 w756 h336 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Module", "Information"], translate))
-		stateListView.OnEvent("Click", noSelect.Bind(stateListView))
-		stateListView.OnEvent("DoubleClick", noSelect.Bind(stateListView))
+		sessionStateViewer := systemMonitorGui.Add("HTMLViewer", "x24 ys+28 w756 h336")
 
 		monitorTabView.UseTab(3)
 
@@ -1021,8 +1019,8 @@ systemMonitor(command := false, arguments*) {
 		systemMonitorGui.SetFont("Norm", "Arial")
 
 		driversListView := systemMonitorGui.Add("ListView", "x24 yp+21 w375 h120 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Driver", "Active"], translate))
-		driversListView.OnEvent("Click", noSelect.Bind(stateListView))
-		driversListView.OnEvent("DoubleClick", noSelect.Bind(stateListView))
+		driversListView.OnEvent("Click", noSelect.Bind(driversListView))
+		driversListView.OnEvent("DoubleClick", noSelect.Bind(driversListView))
 
 		systemMonitorGui.SetFont("Italic", "Arial")
 
@@ -1041,7 +1039,9 @@ systemMonitor(command := false, arguments*) {
 
 		monitorTabView.UseTab(4)
 
-		sessionStateViewer := systemMonitorGui.Add("HTMLViewer", "x24 ys+28 w756 h336")
+		stateListView := systemMonitorGui.Add("ListView", "x24 ys+28 w756 h336 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Module", "Information"], translate))
+		stateListView.OnEvent("Click", noSelect.Bind(stateListView))
+		stateListView.OnEvent("DoubleClick", noSelect.Bind(stateListView))
 
 		monitorTabView.UseTab(5)
 

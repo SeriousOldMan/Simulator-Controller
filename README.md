@@ -89,6 +89,8 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 
 16. [Create your own voice commands](https://youtu.be/QJtKu3I75Vs) - In this video you will learn how to define your own voice commands to control not only any part of Simulator Controller, but also all functionalities of  your simulation games.
 
+17. [Strategy Development Revisited](https://youtu.be/nEmH_RbX8hg) - This video covers a couple of new capabilities for strategy development and handling during the race including a demonstration in ACC.
+
 This list will be extended from time to time to cover new functionalities.
 
 ### Discord Community

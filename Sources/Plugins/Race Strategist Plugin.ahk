@@ -845,7 +845,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		local cars := []
 		local statistics := newMultiMap()
 		local potentials, raceCrafts, speeds, consistencies, carControls
-		local report, fileName
+		local car, lapTime, count, report, fileName
 
 		report := temporaryFileName(this.Plugin . " Race", "report")
 
@@ -866,6 +866,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 				reader.getDriverStatistics(raceData, cars, positions, times, &potentials, &raceCrafts, &speeds, &consistencies, &carControls)
 
 				loop getMultiMapValue(raceData, "Cars", "Count") {
+					car := A_Index
 					lapTime := 0
 					count := 0
 

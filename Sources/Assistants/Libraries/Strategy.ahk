@@ -3409,17 +3409,19 @@ class TrafficStrategy extends Strategy {
 		local targetLap := super.calcNextPitstopLap(pitstopNr, currentLap, remainingStintLaps, remainingSessionLaps
 												  , remainingTyreLaps, remainingFuel, &adjusted)
 		local pitstopRule := this.PitstopRule
-		local variationWindow, moreLaps, rnd, avgLapTime, openingLap, closingLap
+		local variationWindow, moreLaps, rnd, avgLapTime, openingLap, closingLap, fuelConsumption
 
 		if !adjusted {
+			fuelConsumption := this.FuelConsumption[true]
 			variationWindow := this.StrategyManager.VariationWindow
-			moreLaps := Min(variationWindow, (remainingFuel / this.FuelConsumption[true]))
 
 			adjusted := true
 
 			rnd := Random(-1.0, 1.0)
 
-			return Round(Max(currentLap, targetLap + ((rnd > 0) ? Floor(rnd * moreLaps) : (rnd * variationWindow))))
+			return Floor(Max(currentLap, targetLap + ((rnd > 0) ? Floor(rnd * Max(0, Min(variationWindow
+																					   , ((remainingFuel - ((targetLap - currentLap) * fuelConsumption)) / fuelConsumption))))
+																: (rnd * variationWindow))))
 		}
 		else
 			return targetLap

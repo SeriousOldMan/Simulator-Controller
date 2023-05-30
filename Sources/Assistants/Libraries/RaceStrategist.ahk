@@ -2918,7 +2918,7 @@ class RaceStrategist extends GridRaceAssistant {
 				if strategy {
 					this.reportStrategy({Strategy: false, Pitstops: true, NextPitstop: true, TyreChange: true, Refuel: true, Map: true}, strategy)
 
-					if (this.Strategy != this.Strategy[true])
+					if ((this.Strategy != this.Strategy[true]) || isDebug())
 						this.explainStrategyRecommendation(strategy)
 
 					if this.Speaker {
@@ -2941,6 +2941,9 @@ class RaceStrategist extends GridRaceAssistant {
 						this.getSpeaker().speakPhrase("StrategyUpdate")
 
 						this.reportStrategy({Strategy: false, Pitstops: true, NextPitstop: true, TyreChange: true, Refuel: true, Map: true}, strategy)
+
+						if ((this.Strategy != this.Strategy[true]) || isDebug())
+							this.explainStrategyRecommendation(strategy)
 
 						if Task.CurrentTask.Confirm {
 							this.getSpeaker().speakPhrase("ConfirmUpdateStrategy", false, true)
@@ -3098,11 +3101,10 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	explainStrategyRecommendation(strategy) {
-		local knowledgeBase := this.KnowledgeBase
-		local pitstopWindow := knowledgeBase.getValue("Session.Settings.Pitstop.Strategy.Window.Considered")
+		local pitstopWindow := this.KnowledgeBase.getValue("Session.Settings.Pitstop.Strategy.Window.Considered")
 		local speaker, pitstop, pitstopLap, position, carsAhead
 
-		if (isInstance(strategy, TrafficStrategy) && strategy.Pitstops.Length > 0) {
+		if (isInstance(strategy, RaceStrategist.TrafficRaceStrategy) && (strategy.Pitstops.Length > 0)) {
 			speaker := this.getSpeaker()
 
 			pitstop := strategy.Pitstops[1]
@@ -3114,7 +3116,7 @@ class RaceStrategist extends GridRaceAssistant {
 			speaker.beginTalk()
 
 			try {
-				speaker.speakPhrase("EvaluatedLaps", {laps: pitstopWindow + 1, first: pitstopLap - pitstopWindow, last: pitstopLap + pitstopWindow})
+				speaker.speakPhrase("EvaluatedLaps", {laps: (pitstopWindow * 2) + 1, first: pitstopLap - pitstopWindow, last: pitstopLap + pitstopWindow})
 
 				speaker.speakPhrase("EvaluatedBestPosition", {lap: pitstopLap, position: position})
 

@@ -100,10 +100,6 @@ class VoiceManager {
 			Get {
 				return this.VoiceManager.UseTalking
 			}
-
-			Set {
-				return (this.VoiceManager.UseTalking := value)
-			}
 		}
 
 		Talking {
@@ -233,10 +229,6 @@ class VoiceManager {
 		UseTalking {
 			Get {
 				return this.VoiceManager.UseTalking
-			}
-
-			Set {
-				return (this.VoiceManager.UseTalking := value)
 			}
 		}
 

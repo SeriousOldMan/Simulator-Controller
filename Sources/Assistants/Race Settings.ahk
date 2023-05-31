@@ -933,6 +933,8 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		setMultiMapValue(newSettings, "Strategy Settings", "Strategy.Update.Pitstop"
 									, settingsGui["strategyUpdatePitstopCheck"].Value ? settingsGui["strategyUpdatePitstopEdit"].Text : false)
 
+		setMultiMapValue(newSettings, "Strategy Settings", "Traffic.Simulation", settingsGui["trafficSimulationCheck"].Value)
+
 		if gTeamMode {
 			setMultiMapValue(newSettings, "Team Settings", "Server.URL", settingsGui["serverURLEdit"].Text)
 			setMultiMapValue(newSettings, "Team Settings", "Server.Token", settingsGui["serverTokenEdit"].Text)
@@ -1340,6 +1342,12 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		if !value
 			settingsGui["strategyUpdatePitstopEdit"].Enabled := false
+
+		chosen := getMultiMapValue(settingsOrCommand, "Strategy Settings", "Traffic.Simulation", false)
+
+		settingsGui.Add("Text", "x16 yp+30 w105 h20", translate("Dynamic Traffic"))
+		settingsGui.Add("CheckBox", "x126 yp-4 w17 h23 Checked" . chosen . " VtrafficSimulationCheck", chosen)
+		settingsGui.Add("Text", "x184 yp+2 w290 h20", translate("using Monte Carlo simulation"))
 
 		settingsGui.Add("Text", "x66 yp+28 w270 0x10")
 

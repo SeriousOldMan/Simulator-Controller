@@ -5049,10 +5049,11 @@ class RaceCenter extends ConfigurationItem {
 			tyreCompoundVariation := 0
 		}
 
-		if !this.UseTraffic {
+		if (tyreUsageVariation = 0)
 			tyreUsageVariation := this.Control["randomFactorEdit"].Text
-			tyreCompoundVariation := tyreUsageVariation
-		}
+
+		if (tyreCompoundVariation = 0)
+			tyreCompoundVariation := this.Control["randomFactorEdit"].Text
 
 		return (strategy != false)
 	}

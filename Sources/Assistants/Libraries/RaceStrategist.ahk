@@ -38,6 +38,8 @@ class RaceStrategist extends GridRaceAssistant {
 	iLastStrategyUpdate := 0
 	iRejectedStrategy := false
 
+	iUseTraffic := false
+
 	iSaveTelemetry := kAlways
 	iSaveRaceReport := false
 	iRaceReview := false
@@ -362,7 +364,7 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 
 		next(statistics) {
-			RaceStrategist.RaceStrategySimulationTask(this, this.iData, this.iConfirm, this.iRequest, statistics).start()
+			RaceStrategist.RaceStrategySimulationTask(this.Manager, this.iData, this.iConfirm, this.iRequest, statistics).start()
 		}
 	}
 
@@ -480,7 +482,7 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 
 		run() {
-			if getMultiMapValue(this.Settings, "Strategy Settings", "Traffic.Simulation", false)
+			if this.RaceStrategist.UseTraffic
 				this.iSimulation := TrafficSimulation(this.RaceStrategist
 												    , (this.RaceStrategist.KnowledgeBase.getValue("Session.Format") = "Time") ? "Duration" : "Laps"
 												    , this.TelemetryDatabase)
@@ -526,6 +528,12 @@ class RaceStrategist extends GridRaceAssistant {
 	StrategyReported {
 		Get {
 			return this.iStrategyReported
+		}
+	}
+
+	UseTraffic {
+		Get {
+			return this.iUseTraffic
 		}
 	}
 
@@ -604,6 +612,9 @@ class RaceStrategist extends GridRaceAssistant {
 
 		if values.HasProp("RaceReview")
 			this.iRaceReview := values.RaceReview
+
+		if values.HasProp("UseTraffic")
+			this.iUseTraffic := values.UseTraffic
 
 		if (values.HasProp("Session") && (this.Session == kSessionFinished)) {
 			this.iStrategyReported := false
@@ -1422,6 +1433,10 @@ class RaceStrategist extends GridRaceAssistant {
 
 		super.prepareSession(&settings, &data)
 
+		if settings
+			this.updateConfigurationValues({UseTalking: getMultiMapValue(settings, "Assistant.Strategist", "Voice.UseTalking", true)
+										  , UseTraffic: getMultiMapValue(settings, "Strategy Settings", "Traffic.Simulation", false)})
+
 		raceData := newMultiMap()
 
 		carCount := getMultiMapValue(data, "Position Data", "Car.Count")
@@ -1454,6 +1469,10 @@ class RaceStrategist extends GridRaceAssistant {
 		local simulatorName := this.SettingsDatabase.getSimulatorName(facts["Session.Simulator"])
 		local theStrategy, applicableStrategy, simulator, car, track
 		local sessionType, sessionLength, duration, laps
+
+		if settings
+			this.updateConfigurationValues({UseTalking: getMultiMapValue(settings, "Assistant.Strategist", "Voice.UseTalking", true)
+										  , UseTraffic: getMultiMapValue(settings, "Strategy Settings", "Traffic.Simulation", false)})
 
 		if ((this.Session == kSessionRace) && FileExist(kUserConfigDirectory . "Race.strategy")) {
 			theStrategy := Strategy(this, readMultiMap(kUserConfigDirectory . "Race.strategy"))
@@ -2208,7 +2227,7 @@ class RaceStrategist extends GridRaceAssistant {
 				deleteFile(pitstopHistory)
 		}
 
-		if (getMultiMapValue(this.Settings, "Strategy Settings", "Traffic.Simulation", false) && this.RemoteHandler) {
+		if (this.UseTraffic && this.RemoteHandler) {
 			this.setContinuation(RaceStrategist.RaceStrategySimulationContinuation(this, data, confirm, request))
 
 			lap := knowledgeBase.getValue("Lap")
@@ -2226,7 +2245,8 @@ class RaceStrategist extends GridRaceAssistant {
 		if !isObject(nameOrConfiguration)
 			nameOrConfiguration := false
 
-		theStrategy := RaceStrategist.RaceStrategy(this, nameOrConfiguration, driver)
+		theStrategy := (this.UseTraffic ? RaceStrategist.TrafficRaceStrategy(this, nameOrConfiguration, driver)
+										: RaceStrategist.RaceStrategy(this, nameOrConfiguration, driver))
 
 		if (name && !isObject(name))
 			theStrategy.setName(name)
@@ -2898,6 +2918,9 @@ class RaceStrategist extends GridRaceAssistant {
 				if strategy {
 					this.reportStrategy({Strategy: false, Pitstops: true, NextPitstop: true, TyreChange: true, Refuel: true, Map: true}, strategy)
 
+					if ((this.Strategy != this.Strategy[true]) || isDebug())
+						this.explainStrategyRecommendation(strategy)
+
 					if this.Speaker {
 						this.getSpeaker().speakPhrase("ConfirmUpdateStrategy", false, true)
 
@@ -2918,6 +2941,9 @@ class RaceStrategist extends GridRaceAssistant {
 						this.getSpeaker().speakPhrase("StrategyUpdate")
 
 						this.reportStrategy({Strategy: false, Pitstops: true, NextPitstop: true, TyreChange: true, Refuel: true, Map: true}, strategy)
+
+						if ((this.Strategy != this.Strategy[true]) || isDebug())
+							this.explainStrategyRecommendation(strategy)
 
 						if Task.CurrentTask.Confirm {
 							this.getSpeaker().speakPhrase("ConfirmUpdateStrategy", false, true)
@@ -3067,6 +3093,37 @@ class RaceStrategist extends GridRaceAssistant {
 																				 , false, "Okay"))
 				else
 					this.setContinuation(ObjBindMethod(this, "explainPitstopRecommendation", plannedLap))
+			}
+			finally {
+				speaker.endTalk()
+			}
+		}
+	}
+
+	explainStrategyRecommendation(strategy) {
+		local pitstopWindow := this.KnowledgeBase.getValue("Session.Settings.Pitstop.Strategy.Window.Considered")
+		local speaker, pitstop, pitstopLap, position, carsAhead
+
+		if (isInstance(strategy, RaceStrategist.TrafficRaceStrategy) && (strategy.Pitstops.Length > 0)) {
+			speaker := this.getSpeaker()
+
+			pitstop := strategy.Pitstops[1]
+			pitstopLap := pitstop.Lap
+			position := pitstop.getPosition()
+
+			pitstop.getTrafficDensity(&carsAhead)
+
+			speaker.beginTalk()
+
+			try {
+				speaker.speakPhrase("EvaluatedLaps", {laps: (pitstopWindow * 2) + 1, first: pitstopLap - pitstopWindow, last: pitstopLap + pitstopWindow})
+
+				speaker.speakPhrase("EvaluatedBestPosition", {lap: pitstopLap, position: position})
+
+				if (carsAhead > 0)
+					speaker.speakPhrase("EvaluatedTraffic", {traffic: carsAhead})
+				else
+					speaker.speakPhrase("EvaluatedNoTraffic")
 			}
 			finally {
 				speaker.endTalk()

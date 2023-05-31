@@ -1181,10 +1181,20 @@ class RaceEngineer extends RaceAssistant {
 																									   , "Tyre.Wet.Pressure.RR", 28.2)))
 	}
 
+	prepareSession(&settings, &data) {
+		super.prepareSession(&settings, &data)
+
+		if settings
+			this.updateConfigurationValues({UseTalking: getMultiMapValue(settings, "Assistant.Engineer", "Voice.UseTalking", true)})
+	}
+
 	createSession(&settings, &data) {
 		local facts := super.createSession(&settings, &data)
 		local configuration := this.Configuration
 		local simulatorName := this.SettingsDatabase.getSimulatorName(facts["Session.Simulator"])
+
+		if settings
+			this.updateConfigurationValues({UseTalking: getMultiMapValue(settings, "Assistant.Engineer", "Voice.UseTalking", true)})
 
 		facts["Session.Settings.Damage.Analysis.Laps"]
 			:= getMultiMapValue(configuration, "Race Engineer Analysis", simulatorName . ".DamageAnalysisLaps", 1)

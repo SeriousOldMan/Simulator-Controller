@@ -954,7 +954,7 @@ class RaceAssistant extends ConfigurationItem {
 		local simulator, simulatorName, session, driverForname, driverSurname, driverNickname
 
 		if settings
-			this.updateConfigurationValues({Settings: settings, UseTalking: getMultiMapValue(settings, this.AssistantType, "Voice.UseTalking", true)})
+			this.updateConfigurationValues({Settings: settings})
 
 		settings := this.Settings
 
@@ -1056,7 +1056,7 @@ class RaceAssistant extends ConfigurationItem {
 			data := readMultiMap(data)
 
 		if settings
-			this.updateConfigurationValues({Settings: settings, UseTalking: getMultiMapValue(settings, this.AssistantType, "Voice.UseTalking", true)})
+			this.updateConfigurationValues({Settings: settings})
 
 		configuration := this.Configuration
 		settings := this.Settings

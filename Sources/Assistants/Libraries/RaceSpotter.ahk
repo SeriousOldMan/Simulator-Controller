@@ -2645,6 +2645,9 @@ class RaceSpotter extends GridRaceAssistant {
 
 		super.prepareSession(&settings, &data)
 
+		if settings
+			this.updateConfigurationValues({UseTalking: getMultiMapValue(settings, "Assistant.Spotter", "Voice.UseTalking", true)})
+
 		this.iWasStartDriver := true
 
 		this.initializeAnnouncements(data)
@@ -2723,6 +2726,15 @@ class RaceSpotter extends GridRaceAssistant {
 
 		Task.startTask(ObjBindMethod(this, "startupSpotter", true), 1000)
 		Task.startTask(ObjBindMethod(this, "updateSessionValues", {Running: true}), 25000)
+	}
+
+	createSession(&settings, &data) {
+		local facts := super.createSession(&settings, &data)
+
+		if settings
+			this.updateConfigurationValues({UseTalking: getMultiMapValue(settings, "Assistant.Spotter", "Voice.UseTalking", true)})
+
+		return facts
 	}
 
 	startSession(settings, data) {

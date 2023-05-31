@@ -3358,11 +3358,11 @@ class TrafficStrategy extends Strategy {
 				return false
 		}
 
-		getTrafficDensity() {
+		getTrafficDensity(&numCars := false) {
 			local driver := true
 			local positions := true
 			local runnings := true
-			local begin, end, wrap, numCars
+			local begin, end, wrap
 
 			if this.Strategy.StrategyManager.getTrafficPositions(this.Strategy.TrafficScenario, this.Lap + 1
 															   , &driver, &positions, &runnings) {
@@ -3388,8 +3388,11 @@ class TrafficStrategy extends Strategy {
 
 				return (numCars / runnings.Length)
 			}
-			else
+			else {
+				numCars := 0
+
 				return 0.0
+			}
 		}
 	}
 

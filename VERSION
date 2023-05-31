@@ -3,7 +3,7 @@ Version=5.0.7.0-dev
 Target=5.0.7.0-release
 Date=05/31/2023
 Download=
-Changes=New "Session" info page in "System Monitor", Strategist now explains revised strategy before activation, New car meta data for *Assetto Corsa Competizione* 720s Evo, Updated car meta data for *RaceRoom Racing Experience*, New car models for "Setup Workbench", Talking groups for voice output interruption can be disabled, Fixed Monte Carlo simulation in "Race Center", Monte Carlo traffic simulation can be enabled optionally for strategy revision by the Strategist, Real pitstop history will be used in all Monte Carlo simulations
+Changes=New "Session" info page in "System Monitor", Strategist now explains revised strategy before activation, New car meta data for *Assetto Corsa Competizione* 720s Evo, Updated car meta data for *RaceRoom Racing Experience*, New car models for "Setup Workbench", Talking groups for voice output interruption can be disabled, Fixed Monte Carlo simulation in "Race Center", Monte Carlo traffic simulation can be enabled optionally for strategy revision by the Strategist, Real pitstop history will be used in all Monte Carlo simulations, New setting in "Race Settings" to enable Monte-Carlo simulation
 [Release]
 Version=5.0.6.0-release
 Date=05/26/2023

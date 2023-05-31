@@ -45,7 +45,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[5.0.7.0-dev](https://www.dropbox.com/s/miq7cr5xo7zsk1c/Simulator%20Controller%205.0.7.0-dev.zip?dl=1) (Early build for 5.0.7. Changes: New "Session" info page in "System Monitor", Strategist now explains revised strategy before activation, New car meta data for *Assetto Corsa Competizione* 720s Evo, Updated car meta data for *RaceRoom Racing Experience*, New car models for "Setup Workbench", Talking groups for voice output interruption can be disabled, Fixed Monte Carlo simulation in "Race Center", Monte Carlo traffic simulation can be enabled optionally for strategy revision by the Strategist, Real pitstop history will be used in all Monte Carlo simulations.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-507) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

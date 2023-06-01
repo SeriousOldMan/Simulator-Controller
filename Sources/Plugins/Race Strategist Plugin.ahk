@@ -65,6 +65,10 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		reviewRace(arguments*) {
 			this.callRemote("reviewRace", arguments*)
 		}
+
+		updateCarStatistics(arguments*) {
+			this.callRemote("updateCarStatistics", arguments*)
+		}
 	}
 
 	class RaceStrategistAction extends RaceAssistantPlugin.RaceAssistantAction {
@@ -758,6 +762,76 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 				logError(exception)
 
 				this.RaceAssistant["Ghost"].reviewRace(false, 0, 0, 0, 0, 0, 0, 0, 0)
+			}
+		}
+		finally {
+			deleteDirectory(report)
+		}
+	}
+
+	computeCarStatistics(startLap, endLap) {
+		local raceData := true
+		local drivers := false
+		local positions := true
+		local times := true
+		local laps := [startLap]
+		local cars := []
+		local statistics := newMultiMap()
+		local potentials, raceCrafts, speeds, consistencies, carControls
+		local car, lapTime, count, report, fileName
+
+		report := temporaryFileName(this.Plugin . " Race", "report")
+
+		this.createRaceReport(report)
+
+		try {
+			try {
+				reader := RaceReportReader(report)
+
+				loop (endLap - startLap)
+					laps.Push(startLap + A_Index)
+
+				reader.loadData(laps, &raceData, &drivers, &positions, &times)
+
+				loop getMultiMapValue(raceData, "Cars", "Count")
+					cars.Push(A_Index)
+
+				reader.getDriverStatistics(raceData, cars, positions, times, &potentials, &raceCrafts, &speeds, &consistencies, &carControls)
+
+				loop getMultiMapValue(raceData, "Cars", "Count") {
+					car := A_Index
+					lapTime := 0
+					count := 0
+
+					loop laps.Length
+						if times[A_Index].Has(car) {
+							lapTime += times[A_Index][car]
+							count += 1
+						}
+
+					if (count > 0)
+						lapTime := ((lapTime / count) / 1000)
+
+					setMultiMapValue(statistics, "Statistics", "Car." . A_Index . ".LapTime", lapTime)
+					setMultiMapValue(statistics, "Statistics", "Car." . A_Index . ".Potential", Round(potentials[car], 2))
+					setMultiMapValue(statistics, "Statistics", "Car." . A_Index . ".RaceCraft", Round(raceCrafts[car], 2))
+					setMultiMapValue(statistics, "Statistics", "Car." . A_Index . ".Speed", Round(speeds[car], 2))
+					setMultiMapValue(statistics, "Statistics", "Car." . A_Index . ".Consistency", Round(consistencies[car], 2))
+					setMultiMapValue(statistics, "Statistics", "Car." . A_Index . ".CarControl", Round(carControls[car], 2))
+				}
+
+				setMultiMapValue(statistics, "Statistics", "Car.Count", getMultiMapValue(raceData, "Cars", "Count"))
+
+				fileName := temporaryFileName(this.Plugin . " Race", "statistics")
+
+				writeMultiMap(fileName, statistics)
+
+				this.RaceAssistant["Ghost"].updateCarStatistics(fileName)
+			}
+			catch Any as exception {
+				logError(exception)
+
+				this.RaceAssistant["Ghost"].updateCarStatistics(false)
 			}
 		}
 		finally {

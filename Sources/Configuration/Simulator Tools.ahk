@@ -2997,7 +2997,7 @@ prepareTargets(&buildProgress, updateOnly) {
 startSimulatorTools() {
 	global gUpdateSettings, gCleanupSettings, gCopySettings, gBuildSettings, gSplashScreen, gTargetConfiguration, gTargetsCount
 
-	local exitProcesses := GetKeyState("Shift")
+	local forceExit := GetKeyState("Shift")
 	local updateOnly := false
 	local icon := kIconsDirectory . "Tools.ico"
 	local buildProgress
@@ -3048,7 +3048,7 @@ startSimulatorTools() {
 	runUpdateTargets(&buildProgress)
 
 	if !updateOnly {
-		if exitProcesses
+		if forceExit
 			exitProcesses(true, true)
 
 		runCleanTargets(&buildProgress)

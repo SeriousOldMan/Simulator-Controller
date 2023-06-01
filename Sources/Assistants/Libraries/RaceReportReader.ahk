@@ -263,7 +263,8 @@ class RaceReportReader {
 					bubbleSort(&carClass, comparePositions)
 
 					for position, car in carClass
-						classPositions[car[1]] := position
+						if classPositions.Has(car[1])
+							classPositions[car[1]] := position
 				}
 
 				return true

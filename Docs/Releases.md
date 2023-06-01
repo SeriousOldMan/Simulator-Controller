@@ -1,4 +1,22 @@
-## 5.0.6.0-release 05/26/23 (planned)
+## 5.0.7.0-release 06/06/23 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. A new page has been added to the "System Monitor", where important [information about the current session](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#monitoring-health-and-activities) is displayed. The next release will introduce more widgets for this session dashboard and the possibility to create your own set to be displayed according to your personal preferences and needs.
+  4. When automatic strategy revision is enabled for the Strategist and a new strategy is available, you will get an overview about the key facts of the new strategy before you can decide, whether you want to activate it.
+  5. It is now possible to enable the [Monte Carlo traffic simulation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#adjusting-the-strategy-during-a-race) method, which has been [available in the "Race Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#strategy-handling) for quite some time, for the strategy simulation by the Virtual Race Strategist as well.
+     - New option in ["Race Settings"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#tab-strategy) let you enable / disable the Monte Carlo method.
+	 - A couple of [new settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database" allow you to fine tune the behaviour of the probabilistic algorithm.
+     Important: Use with caution, since it imposes additional load on the CPU.
+  6. A couple of bugs in the Monte Carlo simulation of the "Race Center" has been fixed, which were introduced with version 5.0.
+  7. The pitstop history of all opponent cars will be considered to predict future pitstops in traffic simulations both in the "Race Center" as well as now with the Race Strategist. During the first stint, where no pitstop history is available, a probabilistic model is used as before.
+  8. A new setting is available in the "Session Database" for each Assistant, to enable or disable grouping of voice output. When an Assistant voice output is interrupted, it tries to repeat its message. With the new setting you can choose, whether the whole message with all sentences which belong together or only the last sentence will be repeated.
+  9. The meta data for *RaceRoom Racing Experience* has been updated to the latest version.
+  10. The meta data for *Assetto Corsa Competizione* has been updated to 1.9.3, incl. the new McLaren 720s GT3 Evo car model.
+  11. New car models for "Setup Workbench":
+      - Assetto Corsa Competizione
+	    - McLaren 720s GT3 Evo
+
+## 5.0.6.0-release 05/26/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Optimized fuel level simulation in "Strategy Workbench".
@@ -8,7 +26,7 @@
   7. Default for strategy simulations is now "Telemetry Data" and the entry fields, which are only available in *initial conditions* simulations, are now disabled.
   8. It was possible that the Strategist asks two questions about pending pitstops at the same time. This has been fixed.
   9. Tweaked strategy comparison and selection by the Strategist, when using background strategy revision.
-  10. The Strategist will remember, if the user has rejected a strategy update, and will not ask again for the same strategy.
+  10. The Strategist will remember, if the user has rejected a strategy update, and will not ask again for a revised strategy, which is considered to be similar.
   11. Both the Engineer and the Strategist will tell you now the number of laps already driven, when you ask for the remaining laps.
   12. Optimized the calculation and display of other cars pitstops in "Race Center".
   13. Fixed relocation of session database (broken since 5.0).

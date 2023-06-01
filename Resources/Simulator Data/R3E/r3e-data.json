@@ -50572,9 +50572,9 @@
 					"TeamName": "Raceroom",
 					"drivers": [
 						{
-							"Forename": "Marcel",
-							"Surname": "Löcken",
-							"Id": 11506
+							"Forename": "Felix",
+							"Surname": "Paradius",
+							"Id": 12119
 						}
 					]
 				},
@@ -51065,6 +51065,331 @@
 							"Forename": "Daniel D",
 							"Surname": "Finney",
 							"Id": 11398
+						}
+					]
+				}
+			]
+		},
+		"11536": {
+			"Name": "BMW M4 GT3",
+			"BrandName": "BMW",
+			"CarManufacturer": 2550,
+			"DefaultLivery": 11538,
+			"Id": 11536,
+			"Class": 1703,
+			"liveries": [
+				{
+					"Name": "#1",
+					"Team": 11537,
+					"Car": 11536,
+					"Id": 11538,
+					"Class": 1703,
+					"TeamName": "BMW Motorsport",
+					"drivers": [
+						{
+							"Forename": "Henri",
+							"Surname": "Latour",
+							"Id": 7605
+						}
+					]
+				},
+				{
+					"Name": "#20",
+					"Team": 11912,
+					"Car": 11536,
+					"Id": 11910,
+					"Class": 1703,
+					"TeamName": "Schubert Motorsport",
+					"drivers": [
+						{
+							"Forename": "Jesse",
+							"Surname": "Krohn",
+							"Id": 5982
+						}
+					]
+				},
+				{
+					"Name": "#10",
+					"Team": 11912,
+					"Car": 11536,
+					"Id": 11911,
+					"Class": 1703,
+					"TeamName": "Schubert Motorsport",
+					"drivers": [
+						{
+							"Forename": "Ben",
+							"Surname": "Green",
+							"Id": 10204
+						}
+					]
+				},
+				{
+					"Name": "#7",
+					"Team": 12081,
+					"Car": 11536,
+					"Id": 12082,
+					"Class": 1703,
+					"TeamName": "Team WRT",
+					"drivers": [
+						{
+							"Forename": "Mohammed Saud",
+							"Surname": "Fahad",
+							"Id": 9522
+						}
+					]
+				},
+				{
+					"Name": "#01",
+					"Team": 12083,
+					"Car": 11536,
+					"Id": 12085,
+					"Class": 1703,
+					"TeamName": "Paul Miller Racing",
+					"drivers": [
+						{
+							"Forename": "Bryan",
+							"Surname": "Sellers",
+							"Id": 2657
+						}
+					]
+				},
+				{
+					"Name": "#96",
+					"Team": 12084,
+					"Car": 11536,
+					"Id": 12086,
+					"Class": 1703,
+					"TeamName": "Turner Motorsport",
+					"drivers": [
+						{
+							"Forename": "Robby",
+							"Surname": "Foley",
+							"Id": 10390
+						}
+					]
+				},
+				{
+					"Name": "#46",
+					"Team": 12081,
+					"Car": 11536,
+					"Id": 12102,
+					"Class": 1703,
+					"TeamName": "Team WRT",
+					"drivers": [
+						{
+							"Forename": "Valentino",
+							"Surname": "Rossi",
+							"Id": 11356
+						}
+					]
+				},
+				{
+					"Name": "#14",
+					"Team": 12105,
+					"Car": 11536,
+					"Id": 12106,
+					"Class": 1703,
+					"TeamName": "Poulsen Motorsport",
+					"drivers": [
+						{
+							"Forename": "Roland",
+							"Surname": "Poulsen",
+							"Id": 12104
+						}
+					]
+				},
+				{
+					"Name": "#35",
+					"Team": 12120,
+					"Car": 11536,
+					"Id": 12121,
+					"Class": 1703,
+					"TeamName": "Walkenhorst Motorsport",
+					"drivers": [
+						{
+							"Forename": "Jörg",
+							"Surname": "Müller",
+							"Id": 2716
+						}
+					]
+				},
+				{
+					"Name": "#95",
+					"Team": 12084,
+					"Car": 11536,
+					"Id": 12122,
+					"Class": 1703,
+					"TeamName": "Turner Motorsport",
+					"drivers": [
+						{
+							"Forename": "Bill",
+							"Surname": "Auberlen",
+							"Id": 5983
+						}
+					]
+				},
+				{
+					"Name": "#44",
+					"Team": 12131,
+					"Car": 11536,
+					"Id": 12132,
+					"Class": 1703,
+					"TeamName": "BMW Junior Team",
+					"drivers": [
+						{
+							"Forename": "Daniel",
+							"Surname": "Harper",
+							"Id": 12130
+						}
+					]
+				},
+				{
+					"Name": "#99",
+					"Team": 12136,
+					"Car": 11536,
+					"Id": 12137,
+					"Class": 1703,
+					"TeamName": "Rowe Racing",
+					"drivers": [
+						{
+							"Forename": "Maxime",
+							"Surname": "Martin",
+							"Id": 5581
+						}
+					]
+				},
+				{
+					"Name": "#020",
+					"Team": 11912,
+					"Car": 11536,
+					"Id": 12145,
+					"Class": 1703,
+					"TeamName": "Schubert Motorsport",
+					"drivers": [
+						{
+							"Forename": "Alexander",
+							"Surname": "Sims",
+							"Id": 5979
+						}
+					]
+				},
+				{
+					"Name": "#34",
+					"Team": 12120,
+					"Car": 11536,
+					"Id": 12149,
+					"Class": 1703,
+					"TeamName": "Walkenhorst Motorsport",
+					"drivers": [
+						{
+							"Forename": "Jakub",
+							"Surname": "Giermaziak",
+							"Id": 12148
+						}
+					]
+				},
+				{
+					"Name": "#50",
+					"Team": 11537,
+					"Car": 11536,
+					"Id": 12150,
+					"Class": 1703,
+					"TeamName": "BMW Motorsport",
+					"drivers": [
+						{
+							"Forename": "Jens",
+							"Surname": "Klingmann",
+							"Id": 9704
+						}
+					]
+				},
+				{
+					"Name": "#24",
+					"Team": 12173,
+					"Car": 11536,
+					"Id": 12159,
+					"Class": 1703,
+					"TeamName": "Rahal Letterman Lanigan Racing",
+					"drivers": [
+						{
+							"Forename": "Philipp",
+							"Surname": "Eng",
+							"Id": 9142
+						}
+					]
+				},
+				{
+					"Name": "#25",
+					"Team": 12173,
+					"Car": 11536,
+					"Id": 12160,
+					"Class": 1703,
+					"TeamName": "Rahal Letterman Lanigan Racing",
+					"drivers": [
+						{
+							"Forename": "Augusto",
+							"Surname": "Farfus",
+							"Id": 7934
+						}
+					]
+				},
+				{
+					"Name": "#36",
+					"Team": 12120,
+					"Car": 11536,
+					"Id": 12162,
+					"Class": 1703,
+					"TeamName": "Walkenhorst Motorsport",
+					"drivers": [
+						{
+							"Forename": "Henry",
+							"Surname": "Walkenhorst",
+							"Id": 12161
+						}
+					]
+				},
+				{
+					"Name": "#035",
+					"Team": 12120,
+					"Car": 11536,
+					"Id": 12172,
+					"Class": 1703,
+					"TeamName": "Walkenhorst Motorsport",
+					"drivers": [
+						{
+							"Forename": "Jörg",
+							"Surname": "Breuer",
+							"Id": 12171
+						}
+					]
+				},
+				{
+					"Name": "#096",
+					"Team": 12084,
+					"Car": 11536,
+					"Id": 12174,
+					"Class": 1703,
+					"TeamName": "Turner Motorsport",
+					"drivers": [
+						{
+							"Forename": "Bill",
+							"Surname": "Auberlen",
+							"Id": 5983
+						}
+					]
+				},
+				{
+					"Name": "#101",
+					"Team": 12120,
+					"Car": 11536,
+					"Id": 12175,
+					"Class": 1703,
+					"TeamName": "Walkenhorst Motorsport",
+					"drivers": [
+						{
+							"Forename": "Christian",
+							"Surname": "Krognes",
+							"Id": 8475
 						}
 					]
 				}
@@ -97997,6 +98322,21 @@
 				}
 			]
 		},
+		"11538": {
+			"Name": "#1",
+			"Team": 11537,
+			"Car": 11536,
+			"Id": 11538,
+			"Class": 1703,
+			"TeamName": "BMW Motorsport",
+			"drivers": [
+				{
+					"Forename": "Henri",
+					"Surname": "Latour",
+					"Id": 7605
+				}
+			]
+		},
 		"11575": {
 			"Name": "#3",
 			"Team": 11568,
@@ -99737,6 +100077,36 @@
 				}
 			]
 		},
+		"11910": {
+			"Name": "#20",
+			"Team": 11912,
+			"Car": 11536,
+			"Id": 11910,
+			"Class": 1703,
+			"TeamName": "Schubert Motorsport",
+			"drivers": [
+				{
+					"Forename": "Jesse",
+					"Surname": "Krohn",
+					"Id": 5982
+				}
+			]
+		},
+		"11911": {
+			"Name": "#10",
+			"Team": 11912,
+			"Car": 11536,
+			"Id": 11911,
+			"Class": 1703,
+			"TeamName": "Schubert Motorsport",
+			"drivers": [
+				{
+					"Forename": "Ben",
+					"Surname": "Green",
+					"Id": 10204
+				}
+			]
+		},
 		"11924": {
 			"Name": "#1",
 			"Team": 11919,
@@ -100136,9 +100506,9 @@
 			"TeamName": "Raceroom",
 			"drivers": [
 				{
-					"Forename": "Marcel",
-					"Surname": "Löcken",
-					"Id": 11506
+					"Forename": "Felix",
+					"Surname": "Paradius",
+					"Id": 12119
 				}
 			]
 		},
@@ -100727,6 +101097,51 @@
 				}
 			]
 		},
+		"12082": {
+			"Name": "#7",
+			"Team": 12081,
+			"Car": 11536,
+			"Id": 12082,
+			"Class": 1703,
+			"TeamName": "Team WRT",
+			"drivers": [
+				{
+					"Forename": "Mohammed Saud",
+					"Surname": "Fahad",
+					"Id": 9522
+				}
+			]
+		},
+		"12085": {
+			"Name": "#01",
+			"Team": 12083,
+			"Car": 11536,
+			"Id": 12085,
+			"Class": 1703,
+			"TeamName": "Paul Miller Racing",
+			"drivers": [
+				{
+					"Forename": "Bryan",
+					"Surname": "Sellers",
+					"Id": 2657
+				}
+			]
+		},
+		"12086": {
+			"Name": "#96",
+			"Team": 12084,
+			"Car": 11536,
+			"Id": 12086,
+			"Class": 1703,
+			"TeamName": "Turner Motorsport",
+			"drivers": [
+				{
+					"Forename": "Robby",
+					"Surname": "Foley",
+					"Id": 10390
+				}
+			]
+		},
 		"12087": {
 			"Name": "#19",
 			"Team": 12088,
@@ -100739,6 +101154,231 @@
 					"Forename": "Marcus",
 					"Surname": "Dempwolf",
 					"Id": 9456
+				}
+			]
+		},
+		"12102": {
+			"Name": "#46",
+			"Team": 12081,
+			"Car": 11536,
+			"Id": 12102,
+			"Class": 1703,
+			"TeamName": "Team WRT",
+			"drivers": [
+				{
+					"Forename": "Valentino",
+					"Surname": "Rossi",
+					"Id": 11356
+				}
+			]
+		},
+		"12106": {
+			"Name": "#14",
+			"Team": 12105,
+			"Car": 11536,
+			"Id": 12106,
+			"Class": 1703,
+			"TeamName": "Poulsen Motorsport",
+			"drivers": [
+				{
+					"Forename": "Roland",
+					"Surname": "Poulsen",
+					"Id": 12104
+				}
+			]
+		},
+		"12121": {
+			"Name": "#35",
+			"Team": 12120,
+			"Car": 11536,
+			"Id": 12121,
+			"Class": 1703,
+			"TeamName": "Walkenhorst Motorsport",
+			"drivers": [
+				{
+					"Forename": "Jörg",
+					"Surname": "Müller",
+					"Id": 2716
+				}
+			]
+		},
+		"12122": {
+			"Name": "#95",
+			"Team": 12084,
+			"Car": 11536,
+			"Id": 12122,
+			"Class": 1703,
+			"TeamName": "Turner Motorsport",
+			"drivers": [
+				{
+					"Forename": "Bill",
+					"Surname": "Auberlen",
+					"Id": 5983
+				}
+			]
+		},
+		"12132": {
+			"Name": "#44",
+			"Team": 12131,
+			"Car": 11536,
+			"Id": 12132,
+			"Class": 1703,
+			"TeamName": "BMW Junior Team",
+			"drivers": [
+				{
+					"Forename": "Daniel",
+					"Surname": "Harper",
+					"Id": 12130
+				}
+			]
+		},
+		"12137": {
+			"Name": "#99",
+			"Team": 12136,
+			"Car": 11536,
+			"Id": 12137,
+			"Class": 1703,
+			"TeamName": "Rowe Racing",
+			"drivers": [
+				{
+					"Forename": "Maxime",
+					"Surname": "Martin",
+					"Id": 5581
+				}
+			]
+		},
+		"12145": {
+			"Name": "#020",
+			"Team": 11912,
+			"Car": 11536,
+			"Id": 12145,
+			"Class": 1703,
+			"TeamName": "Schubert Motorsport",
+			"drivers": [
+				{
+					"Forename": "Alexander",
+					"Surname": "Sims",
+					"Id": 5979
+				}
+			]
+		},
+		"12149": {
+			"Name": "#34",
+			"Team": 12120,
+			"Car": 11536,
+			"Id": 12149,
+			"Class": 1703,
+			"TeamName": "Walkenhorst Motorsport",
+			"drivers": [
+				{
+					"Forename": "Jakub",
+					"Surname": "Giermaziak",
+					"Id": 12148
+				}
+			]
+		},
+		"12150": {
+			"Name": "#50",
+			"Team": 11537,
+			"Car": 11536,
+			"Id": 12150,
+			"Class": 1703,
+			"TeamName": "BMW Motorsport",
+			"drivers": [
+				{
+					"Forename": "Jens",
+					"Surname": "Klingmann",
+					"Id": 9704
+				}
+			]
+		},
+		"12159": {
+			"Name": "#24",
+			"Team": 12173,
+			"Car": 11536,
+			"Id": 12159,
+			"Class": 1703,
+			"TeamName": "Rahal Letterman Lanigan Racing",
+			"drivers": [
+				{
+					"Forename": "Philipp",
+					"Surname": "Eng",
+					"Id": 9142
+				}
+			]
+		},
+		"12160": {
+			"Name": "#25",
+			"Team": 12173,
+			"Car": 11536,
+			"Id": 12160,
+			"Class": 1703,
+			"TeamName": "Rahal Letterman Lanigan Racing",
+			"drivers": [
+				{
+					"Forename": "Augusto",
+					"Surname": "Farfus",
+					"Id": 7934
+				}
+			]
+		},
+		"12162": {
+			"Name": "#36",
+			"Team": 12120,
+			"Car": 11536,
+			"Id": 12162,
+			"Class": 1703,
+			"TeamName": "Walkenhorst Motorsport",
+			"drivers": [
+				{
+					"Forename": "Henry",
+					"Surname": "Walkenhorst",
+					"Id": 12161
+				}
+			]
+		},
+		"12172": {
+			"Name": "#035",
+			"Team": 12120,
+			"Car": 11536,
+			"Id": 12172,
+			"Class": 1703,
+			"TeamName": "Walkenhorst Motorsport",
+			"drivers": [
+				{
+					"Forename": "Jörg",
+					"Surname": "Breuer",
+					"Id": 12171
+				}
+			]
+		},
+		"12174": {
+			"Name": "#096",
+			"Team": 12084,
+			"Car": 11536,
+			"Id": 12174,
+			"Class": 1703,
+			"TeamName": "Turner Motorsport",
+			"drivers": [
+				{
+					"Forename": "Bill",
+					"Surname": "Auberlen",
+					"Id": 5983
+				}
+			]
+		},
+		"12175": {
+			"Name": "#101",
+			"Team": 12120,
+			"Car": 11536,
+			"Id": 12175,
+			"Class": 1703,
+			"TeamName": "Walkenhorst Motorsport",
+			"drivers": [
+				{
+					"Forename": "Christian",
+					"Surname": "Krognes",
+					"Id": 8475
 				}
 			]
 		}
@@ -103009,6 +103649,9 @@
 				},
 				{
 					"Id": 1695
+				},
+				{
+					"Id": 11536
 				},
 				{
 					"Id": 5818
@@ -113820,6 +114463,11 @@
 			"Name": "unnamed team",
 			"Id": 11535
 		},
+		"11537": {
+			"Type": "CarTeam",
+			"Name": "BMW Motorsport",
+			"Id": 11537
+		},
 		"11565": {
 			"Type": "CarTeam",
 			"Name": "Hauke Racing",
@@ -114050,6 +114698,11 @@
 			"Name": "Motus One",
 			"Id": 11856
 		},
+		"11912": {
+			"Type": "CarTeam",
+			"Name": "Schubert Motorsport",
+			"Id": 11912
+		},
 		"11918": {
 			"Type": "CarTeam",
 			"Name": "Dörr Esports",
@@ -114185,15 +114838,55 @@
 			"Name": "Team Rocket RJN",
 			"Id": 12051
 		},
+		"12081": {
+			"Type": "CarTeam",
+			"Name": "Team WRT",
+			"Id": 12081
+		},
+		"12083": {
+			"Type": "CarTeam",
+			"Name": "Paul Miller Racing",
+			"Id": 12083
+		},
+		"12084": {
+			"Type": "CarTeam",
+			"Name": "Turner Motorsport",
+			"Id": 12084
+		},
 		"12088": {
 			"Type": "CarTeam",
 			"Name": "SAKURAGEAR",
 			"Id": 12088
 		},
+		"12105": {
+			"Type": "CarTeam",
+			"Name": "Poulsen Motorsport",
+			"Id": 12105
+		},
 		"12108": {
 			"Type": "CarTeam",
 			"Name": "SAKURAGEAR",
 			"Id": 12108
+		},
+		"12120": {
+			"Type": "CarTeam",
+			"Name": "Walkenhorst Motorsport",
+			"Id": 12120
+		},
+		"12131": {
+			"Type": "CarTeam",
+			"Name": "BMW Junior Team",
+			"Id": 12131
+		},
+		"12136": {
+			"Type": "CarTeam",
+			"Name": "Rowe Racing",
+			"Id": 12136
+		},
+		"12173": {
+			"Type": "CarTeam",
+			"Name": "Rahal Letterman Lanigan Racing",
+			"Id": 12173
 		}
 	}
 }

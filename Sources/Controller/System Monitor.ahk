@@ -982,9 +982,7 @@ systemMonitor(command := false, arguments*) {
 
 		monitorTabView.UseTab(4)
 
-		stateListView := systemMonitorGui.Add("ListView", "x24 ys+28 w756 h336 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Module", "Information"], translate))
-		stateListView.OnEvent("Click", noSelect.Bind(stateListView))
-		stateListView.OnEvent("DoubleClick", noSelect.Bind(stateListView))
+		sessionStateViewer := systemMonitorGui.Add("HTMLViewer", "x24 ys+28 w756 h336")
 
 		monitorTabView.UseTab(3)
 
@@ -1023,8 +1021,8 @@ systemMonitor(command := false, arguments*) {
 		systemMonitorGui.SetFont("Norm", "Arial")
 
 		driversListView := systemMonitorGui.Add("ListView", "x24 yp+21 w375 h120 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Driver", "Active"], translate))
-		driversListView.OnEvent("Click", noSelect.Bind(stateListView))
-		driversListView.OnEvent("DoubleClick", noSelect.Bind(stateListView))
+		driversListView.OnEvent("Click", noSelect.Bind(driversListView))
+		driversListView.OnEvent("DoubleClick", noSelect.Bind(driversListView))
 
 		systemMonitorGui.SetFont("Italic", "Arial")
 
@@ -1043,7 +1041,9 @@ systemMonitor(command := false, arguments*) {
 
 		monitorTabView.UseTab(2)
 
-		sessionStateViewer := systemMonitorGui.Add("HTMLViewer", "x24 ys+28 w756 h336")
+		stateListView := systemMonitorGui.Add("ListView", "x24 ys+28 w756 h336 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Module", "Information"], translate))
+		stateListView.OnEvent("Click", noSelect.Bind(stateListView))
+		stateListView.OnEvent("DoubleClick", noSelect.Bind(stateListView))
 
 		monitorTabView.UseTab(5)
 

@@ -2097,13 +2097,13 @@ class RaceCenter extends ConfigurationItem {
 
 		centerGui.Add("Text", "x32 yp+24 w85 h23 +0x200", translate("Overtake"))
 		centerGui.Add("Text", "x132 yp w28 h23 +0x200", translate("Abs("))
-		centerGui.Add("Edit", "x162 yp w50 h20 Limit2 Number Limit2 VovertakeDeltaEdit", 2)
-		centerGui.Add("UpDown", "x194 yp-2 w18 h20 Range1-99 0x80", 2)
+		centerGui.Add("Edit", "x162 yp w50 h20 Limit2 Number Limit2 VovertakeDeltaEdit", 1)
+		centerGui.Add("UpDown", "x194 yp-2 w18 h20 Range1-99 0x80", 1)
 		centerGui.Add("Text", "x220 yp+4 w340 h20", translate("/ laptime difference) = additional seconds for each passed car"))
 
 		centerGui.Add("Text", "x32 yp+20 w85 h23 +0x200", translate("Traffic"))
-		centerGui.Add("Edit", "x162 yp w50 h20 Limit2 Number Limit2 VtrafficConsideredEdit", 7)
-		centerGui.Add("UpDown", "x194 yp-2 w18 h20 Range1-99 0x80", 7)
+		centerGui.Add("Edit", "x162 yp w50 h20 Limit2 Number Limit2 VtrafficConsideredEdit", 5)
+		centerGui.Add("UpDown", "x194 yp-2 w18 h20 Range1-99 0x80", 5)
 		centerGui.Add("Text", "x220 yp+4 w290 h20", translate("% track length"))
 
 		centerTab.UseTab(5)
@@ -4951,6 +4951,8 @@ class RaceCenter extends ConfigurationItem {
 		usePitstops := (window["pitstopsDropDown"].Value == 1)
 		overTakeDelta := window["overtakeDeltaEdit"].Text
 		consideredTraffic := window["trafficConsideredEdit"].Text
+
+		return true
 	}
 
 	getStartConditions(&initialStint, &initialLap, &initialStintTime, &initialSessionTime
@@ -5047,10 +5049,11 @@ class RaceCenter extends ConfigurationItem {
 			tyreCompoundVariation := 0
 		}
 
-		if !this.UseTraffic {
+		if (tyreUsageVariation = 0)
 			tyreUsageVariation := this.Control["randomFactorEdit"].Text
-			tyreCompoundVariation := tyreUsageVariation
-		}
+
+		if (tyreCompoundVariation = 0)
+			tyreCompoundVariation := this.Control["randomFactorEdit"].Text
 
 		return (strategy != false)
 	}
@@ -5156,13 +5159,48 @@ class RaceCenter extends ConfigurationItem {
 		strategy.AvailableTyreSets := this.computeAvailableTyreSets(strategy.AvailableTyreSets)
 	}
 
-	getTrafficScenario(strategy, targetLap, randomFactor, numScenarios, useLapTimeVariation, useDriverErrors, usePitstops, overTakeDelta) {
+	getTrafficScenario(strategy, targetPitstop, randomFactor, numScenarios, useLapTimeVariation, useDriverErrors, usePitstops, overTakeDelta) {
 		local lastLap := this.LastLap
+		local targetLap := targetPitstop.Lap + 1
+		local pitstopWindow := this.Window["variationWindowEdit"].Text
+		local pitstops := CaseInsenseMap()
+		local carStatistics := CaseInsenseMap()
 		local positions, startLap, endLap, avgLapTime, driver, stintLength, formationLap, postRaceLap
 		local fuelCapacity, safetyFuel, pitstopDelta, pitstopFuelService, pitstopTyreService, pitstopServiceOrder
 		local lastPositions, lastRunnings, count, laps, consideredLaps, curLap, carPositions, nextRunnings
 		local lapTime, potential, raceCraft, speed, consistency, carControl
 		local rnd, delta, running, nr, position, ignore, nextPositions, runnings, car
+
+		carPitstop(car, lap) {
+			local stintLength := 0
+			local carPitstops
+
+			if !pitstops.Has(car) {
+				carPitstops := this.Pitstops[getMultiMapValue(positions, "Position Data", "Car." . A_Index . ".ID", 0)]
+
+				if (carPitstops.Length > 0) {
+					loop carPitstops.Length
+						stintLength += (carPitstops[A_Index].Lap - ((A_Index > 1) ? carPitstops[A_Index - 1].Lap : 0))
+
+					if (Abs(carPitstops[carPitstops.Length].Lap + Round(stintLength / carPitstops.Length) - lap) < pitstopWindow) {
+						pitstops[car] := true
+
+						return true
+					}
+				}
+				else {
+					rnd := Random(0.0, 1.0)
+
+					if (rnd < (randomFactor / 100)) {
+						pitstops[car] := true
+
+						return true
+					}
+				}
+			}
+
+			return false
+		}
 
 		if (this.SessionActive && lastLap) {
 			positions := lastLap.Positions
@@ -5207,6 +5245,12 @@ class RaceCenter extends ConfigurationItem {
 				loop Min(startLap, 10)
 					consideredLaps.Push(startLap - (A_Index - 1))
 
+				loop count {
+					this.computeCarStatistics(A_Index, consideredLaps, &lapTime, &potential, &raceCraft, &speed, &consistency, &carControl)
+
+					carStatistics[A_Index] := [lapTime, potential, raceCraft, speed, consistency, carControl]
+				}
+
 				loop (endLap - startLap) {
 					curLap := A_Index
 
@@ -5221,7 +5265,12 @@ class RaceCenter extends ConfigurationItem {
 						consistency := true
 						carControl := true
 
-						this.computeCarStatistics(A_Index, consideredLaps, lapTime, potential, raceCraft, speed, consistency, carControl)
+						lapTime := carStatistics[A_Index][1]
+						potential := carStatistics[A_Index][2]
+						raceCraft := carStatistics[A_Index][3]
+						speed := carStatistics[A_Index][4]
+						consistency := carStatistics[A_Index][5]
+						carControl := carStatistics[A_Index][6]
 
 						if useLapTimeVariation {
 							rnd := Random(-1.0, 1.0)
@@ -5235,20 +5284,11 @@ class RaceCenter extends ConfigurationItem {
 							lapTime += (rnd * ((5 - carControl) / 5) * (randomFactor / 100))
 						}
 
-						if (usePitstops && ((startLap + curLap) == targetLap) && (A_Index != driver)) {
-							rnd := Random(0.0, 1.0)
+						if (usePitstops && (A_Index != driver) && carPitstop(A_Index, (startLap + curLap)))
+							lapTime += strategy.calcPitstopDuration(fuelCapacity, true)
 
-							if (rnd < (randomFactor / 100))
-								lapTime += strategy.calcPitstopDuration(fuelCapacity, true)
-						}
-						else if ((A_Index == driver) && ((startLap + curLap) == targetLap)) {
-							if isNumber(pitstopFuelService)
-								lapTime += (pitstopDelta + (pitstopFuelService * fuelCapacity) + pitstopTyreService)
-							else if (pitstopFuelService[1] = "Fixed")
-								lapTime += (pitstopDelta + pitstopFuelService[2] + pitstopTyreService)
-							else
-								lapTime += (pitstopDelta + (pitstopFuelService[2] * fuelCapacity) + pitstopTyreService)
-						}
+						if ((A_Index == driver) && ((startLap + curLap) == targetLap))
+							lapTime += strategy.calcPitstopDuration(targetPitstop.RefuelAmount, targetPitstop.TyreChange)
 
 						if lapTime
 							delta := (((avgLapTime + lapTime) / lapTime) - 1)

@@ -17,14 +17,20 @@
   4. Controller action and voice command to enable/disable data collection
   5. Graphical Editor for Vocalics Settings inkl. Test-Modus...
   6. Better answers by the Strategist, when a pitstop cannot be recommended
-  7. Strategist explains the reason why a strategy revision is of benefit
+  7. Strategist explains the reason why a strategy revision is of benefit (as a comparison betwwen old and new)
 
 #### Setup Workbench
   1. General detection of counter steering in the telemetry analyzer
   2. Collect telemetry data from multiple drivers and generate combined setup recommendations
 
+#### Strategy Workbench
+  1. Introduce data groups (for example all data belonging to a complete weekend w. practice, qualiy and race) and make this group usable for future strategy calculation
+
 #### Plugins
   1. Definition of motion feedback settings for different tracks and cars, selectable by the touch of a button
+
+#### Session Database
+  1. Active validation of value ranges in settings definitions
   
 #### General
   1. Choosing a specific color scheme and splash screen depending on the selected simulation game

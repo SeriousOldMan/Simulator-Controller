@@ -38,6 +38,8 @@ class RaceStrategist extends GridRaceAssistant {
 	iLastStrategyUpdate := 0
 	iRejectedStrategy := false
 
+	iUseTraffic := false
+
 	iSaveTelemetry := kAlways
 	iSaveRaceReport := false
 	iRaceReview := false
@@ -86,6 +88,10 @@ class RaceStrategist extends GridRaceAssistant {
 
 		reviewRace(arguments*) {
 			this.callRemote("reviewRace", arguments*)
+		}
+
+		computeCarStatistics(arguments*) {
+			this.callRemote("computeCarStatistics", arguments*)
 		}
 	}
 
@@ -330,6 +336,34 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 	}
 
+	class RaceStrategySimulationContinuation extends VoiceManager.VoiceContinuation {
+		iData := false
+		iConfirm := false
+		iRequest := false
+
+		Statistics {
+			Get {
+				return this.iStatistics
+			}
+
+			Set {
+				return (this.iStatistics := value)
+			}
+		}
+
+		__New(manager, data, confirm, request) {
+			this.iData := data
+			this.iConfirm := confirm
+			this.iRequest := request
+
+			super.__New(manager)
+		}
+
+		next(statistics) {
+			RaceStrategist.RaceStrategySimulationTask(this.Manager, this.iData, this.iConfirm, this.iRequest, statistics).start()
+		}
+	}
+
 	class RaceStrategySimulationTask extends Task {
 		iConfirm := false
 		iRequest := "User"
@@ -341,6 +375,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 		iLap := false
 
+		iStatistics := false
 		iPitstops := []
 		iUsedTyreSets := []
 
@@ -380,6 +415,12 @@ class RaceStrategist extends GridRaceAssistant {
 			}
 		}
 
+		Statistics {
+			Get {
+				return this.iStatistics
+			}
+		}
+
 		Pitstops[key?] {
 			Get {
 				return (isSet(key) ? this.iPitstops[key] : this.iPitstops)
@@ -392,13 +433,14 @@ class RaceStrategist extends GridRaceAssistant {
 			}
 		}
 
-		__New(strategist, configuration, confirm := false, request := "User") {
+		__New(strategist, configuration, confirm := false, request := "User", statistics := false) {
 			local knowledgeBase := strategist.KnowledgeBase
 
 			super.__New(false, 0, kLowPriority)
 
 			this.iConfirm := confirm
 			this.iRequest := request
+			this.iStatistics := statistics
 			this.iRaceStrategist := strategist
 			this.iLap := knowledgeBase.getValue("Lap")
 			this.iTelemetryDatabase
@@ -436,9 +478,14 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 
 		run() {
-			this.iSimulation := VariationSimulation(this.RaceStrategist
-												  , (this.RaceStrategist.KnowledgeBase.getValue("Session.Format") = "Time") ? "Duration" : "Laps"
-												  , this.TelemetryDatabase)
+			if this.RaceStrategist.UseTraffic
+				this.iSimulation := TrafficSimulation(this.RaceStrategist
+												    , (this.RaceStrategist.KnowledgeBase.getValue("Session.Format") = "Time") ? "Duration" : "Laps"
+												    , this.TelemetryDatabase)
+			else
+				this.iSimulation := VariationSimulation(this.RaceStrategist
+													  , (this.RaceStrategist.KnowledgeBase.getValue("Session.Format") = "Time") ? "Duration" : "Laps"
+													  , this.TelemetryDatabase)
 
 			this.Simulation.runSimulation(isDebug())
 
@@ -447,6 +494,14 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	class RaceStrategy extends Strategy {
+		initializeAvailableTyreSets() {
+			super.initializeAvailableTyreSets()
+
+			this.StrategyManager.StrategyManager.initializeAvailableTyreSets(this)
+		}
+	}
+
+	class TrafficRaceStrategy extends TrafficStrategy {
 		initializeAvailableTyreSets() {
 			super.initializeAvailableTyreSets()
 
@@ -469,6 +524,12 @@ class RaceStrategist extends GridRaceAssistant {
 	StrategyReported {
 		Get {
 			return this.iStrategyReported
+		}
+	}
+
+	UseTraffic {
+		Get {
+			return this.iUseTraffic
 		}
 	}
 
@@ -547,6 +608,9 @@ class RaceStrategist extends GridRaceAssistant {
 
 		if values.HasProp("RaceReview")
 			this.iRaceReview := values.RaceReview
+
+		if values.HasProp("UseTraffic")
+			this.iUseTraffic := values.UseTraffic
 
 		if (values.HasProp("Session") && (this.Session == kSessionFinished)) {
 			this.iStrategyReported := false
@@ -1244,6 +1308,26 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 	}
 
+	updateCarStatistics(statistics) {
+		local continuation := this.Continuation
+		local fileName
+
+		if !isObject(statistics) {
+			fileName := statistics
+
+			statistics := readMultiMap(fileName)
+
+			if !isDebug()
+				deleteFile(fileName)
+		}
+
+		if isInstance(continuation, RaceStrategist.RaceStrategySimulationContinuation) {
+			this.clearContinuation()
+
+			continuation.next(statistics)
+		}
+	}
+
 	collectTelemetryData() {
 		local session := "Other"
 		local default := false
@@ -1345,6 +1429,10 @@ class RaceStrategist extends GridRaceAssistant {
 
 		super.prepareSession(&settings, &data)
 
+		if settings
+			this.updateConfigurationValues({UseTalking: getMultiMapValue(settings, "Assistant.Strategist", "Voice.UseTalking", true)
+										  , UseTraffic: getMultiMapValue(settings, "Strategy Settings", "Traffic.Simulation", false)})
+
 		raceData := newMultiMap()
 
 		carCount := getMultiMapValue(data, "Position Data", "Car.Count")
@@ -1377,6 +1465,10 @@ class RaceStrategist extends GridRaceAssistant {
 		local simulatorName := this.SettingsDatabase.getSimulatorName(facts["Session.Simulator"])
 		local theStrategy, applicableStrategy, simulator, car, track
 		local sessionType, sessionLength, duration, laps
+
+		if settings
+			this.updateConfigurationValues({UseTalking: getMultiMapValue(settings, "Assistant.Strategist", "Voice.UseTalking", true)
+										  , UseTraffic: getMultiMapValue(settings, "Strategy Settings", "Traffic.Simulation", false)})
 
 		if ((this.Session == kSessionRace) && FileExist(kUserConfigDirectory . "Race.strategy")) {
 			theStrategy := Strategy(this, readMultiMap(kUserConfigDirectory . "Race.strategy"))
@@ -2165,7 +2257,8 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	runSimulation(pitstopHistory, confirm := false, request := "User") {
-		local data
+		local knowledgeBase := this.KnowledgeBase
+		local data, lap
 
 		if !isObject(pitstopHistory) {
 			data := readMultiMap(pitstopHistory)
@@ -2174,7 +2267,15 @@ class RaceStrategist extends GridRaceAssistant {
 				deleteFile(pitstopHistory)
 		}
 
-		RaceStrategist.RaceStrategySimulationTask(this, data, confirm, request).start()
+		if (this.UseTraffic && this.RemoteHandler) {
+			this.setContinuation(RaceStrategist.RaceStrategySimulationContinuation(this, data, confirm, request))
+
+			lap := knowledgeBase.getValue("Lap")
+
+			this.RemoteHandler.computeCarStatistics(Max(1, lap - 10), lap)
+		}
+		else
+			RaceStrategist.RaceStrategySimulationTask(this, data, confirm, request).start()
 	}
 
 	createStrategy(nameOrConfiguration, driver := false) {
@@ -2184,7 +2285,8 @@ class RaceStrategist extends GridRaceAssistant {
 		if !isObject(nameOrConfiguration)
 			nameOrConfiguration := false
 
-		theStrategy := RaceStrategist.RaceStrategy(this, nameOrConfiguration, driver)
+		theStrategy := (this.UseTraffic ? RaceStrategist.TrafficRaceStrategy(this, nameOrConfiguration, driver)
+										: RaceStrategist.RaceStrategy(this, nameOrConfiguration, driver))
 
 		if (name && !isObject(name))
 			theStrategy.setName(name)
@@ -2325,6 +2427,23 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 		else
 			return false
+	}
+
+	getTrafficSettings(&randomFactor, &numScenarios, &variationWindow
+					 , &useLapTimeVariation, &useDriverErrors, &usePitstops
+					 , &overTakeDelta, &consideredTraffic) {
+		randomFactor := getMultiMapValue(this.Settings, "Strategy Settings", "Traffic.Randomness", 5)
+		numScenarios := getMultiMapValue(this.Settings, "Strategy Settings", "Traffic.Scenarios", 20)
+		variationWindow := getMultiMapValue(this.Settings, "Strategy Settings", "Traffic.Variation", 3)
+
+		useLapTimeVariation := getMultiMapValue(this.Settings, "Strategy Settings", "Traffic.Variation.LapTime", true)
+		useDriverErrors := getMultiMapValue(this.Settings, "Strategy Settings", "Traffic.Variation.Errors", true)
+		usePitstops := getMultiMapValue(this.Settings, "Strategy Settings", "Traffic.Variation.Pitstops", true)
+
+		overTakeDelta := getMultiMapValue(this.Settings, "Strategy Settings", "Overtake.Delta", 1)
+		consideredTraffic := getMultiMapValue(this.Settings, "Strategy Settings", "Traffic.Considered", 5)
+
+		return true
 	}
 
 	getStartConditions(&initialStint, &initialLap, &initialStintTime, &initialSessionTime
@@ -2497,6 +2616,214 @@ class RaceStrategist extends GridRaceAssistant {
 		strategy.AvailableTyreSets := this.computeAvailableTyreSets(strategy.AvailableTyreSets, Task.CurrentTask.UsedTyreSets)
 	}
 
+	getTrafficScenario(strategy, targetPitstop, randomFactor, numScenarios, useLapTimeVariation, useDriverErrors, usePitstops, overTakeDelta) {
+		local targetLap := targetPitstop.Lap + 1
+		local knowledgeBase := this.KnowledgeBase
+		local pitstopWindow := knowledgeBase.getValue("Session.Settings.Pitstop.Strategy.Window.Considered")
+		local pitstops := CaseInsenseMap()
+		local carStatistics := CaseInsenseMap()
+		local goal, resultSet
+		local startLap, endLap, avgLapTime, driver, stintLength, formationLap, postRaceLap
+		local fuelCapacity, safetyFuel, pitstopDelta, pitstopFuelService, pitstopTyreService, pitstopServiceOrder
+		local lastPositions, lastRunnings, count, laps, curLap, carPositions, nextRunnings
+		local lapTime, potential, raceCraft, speed, consistency, carControl
+		local rnd, delta, running, nr, position, ignore, nextPositions, runnings, car
+
+		getCarStatistics(car, &lapTime, &potential, &raceCraft, &speed, &consistency, &carControl) {
+			local statistics := Task.CurrentTask.Statistics
+
+			lapTime := getMultiMapValue(statistics, "Statistics", "Car." . car . ".LapTime", 0)
+			potential := getMultiMapValue(statistics, "Statistics", "Car." . A_Index . ".Potential")
+			raceCraft := getMultiMapValue(statistics, "Statistics", "Car." . A_Index . ".RaceCraft")
+			speed := getMultiMapValue(statistics, "Statistics", "Car." . A_Index . ".Speed")
+			consistency := getMultiMapValue(statistics, "Statistics", "Car." . A_Index . ".Consistency")
+			carControl := getMultiMapValue(statistics, "Statistics", "Car." . A_Index . ".CarControl")
+		}
+
+		carPitstop(car, lap) {
+			local stintLength := 0
+			local carPitstops
+
+			if !pitstops.Has(car) {
+				carPitstops := this.Pitstops[knowledgeBase.getValue("Car." . car . ".Nr", 0)]
+
+				if (carPitstops.Length > 0) {
+					loop carPitstops.Length
+						stintLength += (carPitstops[A_Index].Lap - ((A_Index > 1) ? carPitstops[A_Index - 1].Lap : 0))
+
+					if (Abs(carPitstops[carPitstops.Length].Lap + Round(stintLength / carPitstops.Length) - lap) < pitstopWindow) {
+						pitstops[car] := true
+
+						return true
+					}
+				}
+				else {
+					rnd := Random(0.0, 1.0)
+
+					if (rnd < (randomFactor / 100)) {
+						pitstops[car] := true
+
+						return true
+					}
+				}
+			}
+
+			return false
+		}
+
+		startLap := knowledgeBase.getValue("Lap")
+		endLap := targetLap
+
+		goal := RuleCompiler().compileGoal("lapAvgTime(" . startLap . ", ?lapTime)")
+		resultSet := knowledgeBase.prove(goal)
+
+		if resultSet
+			avgLapTime := ((resultSet.getValue(goal.Arguments[2]).toString() + 0) / 1000)
+		else
+			avgLapTime := (knowledgeBase.getValue("Lap." . startLap . ".Time") / 1000)
+
+		driver := knowledgeBase.getValue("Driver.Car")
+
+		stintLength := false
+		formationLap := false
+		postRaceLap := false
+		fuelCapacity := false
+		safetyFuel := false
+		pitstopDelta := false
+		pitstopFuelService := false
+		pitstopTyreService := false
+		pitstopServiceOrder := "Simultaneous"
+
+		this.getSessionSettings(&stintLength, &formationLap, &postRaceLap, &fuelCapacity, &safetyFuel
+							  , &pitstopDelta, &pitstopFuelService, &pitstopTyreService, &pitstopServiceOrder)
+
+		lastPositions := []
+		lastRunnings := []
+
+		count := knowledgeBase.getValue("Car.Count")
+
+		loop count {
+			getCarStatistics(A_Index, &lapTime, &potential, &raceCraft, &speed, &consistency, &carControl)
+
+			carStatistics[A_Index] := [lapTime, potential, raceCraft, speed, consistency, carControl]
+
+			lastPositions.Push(knowledgeBase.getValue("Car." . A_Index . ".Position", 0))
+			lastRunnings.Push(knowledgeBase.getValue("Car." . A_Index . ".Lap", 0)
+							+ knowledgeBase.getValue("Car." . A_Index . ".Lap.Running", 0))
+		}
+
+		laps := CaseInsenseWeakMap()
+
+		loop (endLap - startLap) {
+			curLap := A_Index
+
+			carPositions := []
+			nextRunnings := []
+
+			loop count {
+				lapTime := true
+				potential := true
+				raceCraft := true
+				speed := true
+				consistency := true
+				carControl := true
+
+				lapTime := carStatistics[A_Index][1]
+				potential := carStatistics[A_Index][2]
+				raceCraft := carStatistics[A_Index][3]
+				speed := carStatistics[A_Index][4]
+				consistency := carStatistics[A_Index][5]
+				carControl := carStatistics[A_Index][6]
+
+				if useLapTimeVariation {
+					rnd := Random(-1.0, 1.0)
+
+					lapTime += (rnd * ((5 - consistency) / 5) * (randomFactor / 100))
+				}
+
+				if useDriverErrors {
+					rnd := Random(0.0, 1.0)
+
+					lapTime += (rnd * ((5 - carControl) / 5) * (randomFactor / 100))
+				}
+
+				if (usePitstops && (A_Index != driver) && carPitstop(A_Index, (startLap + curLap)))
+					lapTime += strategy.calcPitstopDuration(fuelCapacity, true)
+
+				if ((A_Index == driver) && ((startLap + curLap) == targetLap))
+					lapTime += strategy.calcPitstopDuration(targetPitstop.RefuelAmount, targetPitstop.TyreChange)
+
+				if lapTime
+					delta := (((avgLapTime + lapTime) / lapTime) - 1)
+				else
+					delta := 0
+
+				running := (lastRunnings[A_Index] + delta)
+
+				nextRunnings.Push(running)
+				carPositions.Push(Array(A_Index, lapTime, running))
+			}
+
+			bubbleSort(&carPositions, (a, b) => a[3] < b[3])
+
+			for nr, position in carPositions
+				position[3] += ((lastPositions[position[1]] - nr) * (overTakeDelta / (position[2] ? position[2] : 0.01)))
+
+			bubbleSort(&carPositions, (a, b) => a[3] < b[3])
+
+			nextPositions := []
+
+			loop count
+				nextPositions.Push(false)
+
+			for nr, position in carPositions {
+				car := position[1]
+
+				nextPositions[car] := nr
+				nextRunnings[car] := position[3]
+			}
+
+			runnings := []
+
+			for ignore, running in nextRunnings
+				runnings.Push(running - Floor(running))
+
+			laps[startLap + A_Index] := {Positions: nextPositions, Runnings: runnings}
+
+			lastPositions := nextPositions
+			lastRunnings := nextRunnings
+		}
+
+		return {Driver: driver, Laps: laps}
+	}
+
+	getTrafficPositions(trafficScenario, targetLap, &driver, &positions, &runnings) {
+		if (trafficScenario && trafficScenario.Laps.Has(targetLap)) {
+			if driver
+				driver := trafficScenario.Driver
+
+			if positions
+				positions := trafficScenario.Laps[targetLap].Positions
+
+			if runnings
+				runnings := trafficScenario.Laps[targetLap].Runnings
+
+			return true
+		}
+		else {
+			if driver
+				driver := false
+
+			if positions
+				positions := []
+
+			if runnings
+				runnings := []
+
+			return false
+		}
+	}
+
 	betterScenario(strategy, scenario) {
 		local knowledgeBase := this.KnowledgeBase
 		local sPitstops, cPitstops, sLaps, cLaps, sDuration, cDuration, sFuel, cFuel, sPLaps, cPLaps, sTLaps, cTLaps, sTSets, cTSets
@@ -2631,6 +2958,9 @@ class RaceStrategist extends GridRaceAssistant {
 				if strategy {
 					this.reportStrategy({Strategy: false, Pitstops: true, NextPitstop: true, TyreChange: true, Refuel: true, Map: true}, strategy)
 
+					if ((this.Strategy != this.Strategy[true]) || isDebug())
+						this.explainStrategyRecommendation(strategy)
+
 					if this.Speaker {
 						this.getSpeaker().speakPhrase("ConfirmUpdateStrategy", false, true)
 
@@ -2651,6 +2981,9 @@ class RaceStrategist extends GridRaceAssistant {
 						this.getSpeaker().speakPhrase("StrategyUpdate")
 
 						this.reportStrategy({Strategy: false, Pitstops: true, NextPitstop: true, TyreChange: true, Refuel: true, Map: true}, strategy)
+
+						if ((this.Strategy != this.Strategy[true]) || isDebug())
+							this.explainStrategyRecommendation(strategy)
 
 						if Task.CurrentTask.Confirm {
 							this.getSpeaker().speakPhrase("ConfirmUpdateStrategy", false, true)
@@ -2800,6 +3133,37 @@ class RaceStrategist extends GridRaceAssistant {
 																				 , false, "Okay"))
 				else
 					this.setContinuation(ObjBindMethod(this, "explainPitstopRecommendation", plannedLap))
+			}
+			finally {
+				speaker.endTalk()
+			}
+		}
+	}
+
+	explainStrategyRecommendation(strategy) {
+		local pitstopWindow := this.KnowledgeBase.getValue("Session.Settings.Pitstop.Strategy.Window.Considered")
+		local speaker, pitstop, pitstopLap, position, carsAhead
+
+		if (isInstance(strategy, RaceStrategist.TrafficRaceStrategy) && (strategy.Pitstops.Length > 0)) {
+			speaker := this.getSpeaker()
+
+			pitstop := strategy.Pitstops[1]
+			pitstopLap := pitstop.Lap
+			position := pitstop.getPosition()
+
+			pitstop.getTrafficDensity(&carsAhead)
+
+			speaker.beginTalk()
+
+			try {
+				speaker.speakPhrase("EvaluatedLaps", {laps: (pitstopWindow * 2) + 1, first: pitstopLap - pitstopWindow, last: pitstopLap + pitstopWindow})
+
+				speaker.speakPhrase("EvaluatedBestPosition", {lap: pitstopLap, position: position})
+
+				if (carsAhead > 0)
+					speaker.speakPhrase("EvaluatedTraffic", {traffic: carsAhead})
+				else
+					speaker.speakPhrase("EvaluatedNoTraffic")
 			}
 			finally {
 				speaker.endTalk()

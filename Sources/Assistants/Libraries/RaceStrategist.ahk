@@ -76,10 +76,6 @@ class RaceStrategist extends GridRaceAssistant {
 			this.callRemote("saveRaceLap", arguments*)
 		}
 
-		saveSessionInfo(arguments*) {
-			this.callRemote("saveSessionInfo", arguments*)
-		}
-
 		createRaceReport(arguments*) {
 			this.callRemote("createRaceReport", arguments*)
 		}
@@ -757,7 +753,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 	positionRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
-		local speaker, overallPosition, classPosition
+		local speaker, position, classPosition
 
 		if !this.hasEnoughData()
 			return
@@ -1026,42 +1022,42 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 	}
 
-	reportLapTime(phrase, driverLapTime, car) {
-		local lapTime := this.KnowledgeBase.getValue("Car." . car . ".Time", false)
-		local speaker, fragments, minute, seconds, delta
-
-		if !this.hasEnoughData()
-			return
-
-		if lapTime {
-			lapTime /= 1000
-
-			speaker := this.getSpeaker()
-
-			speaker.beginTalk()
-			fragments := speaker.Fragments
-
-			minute := Floor(lapTime / 60)
-			seconds := (lapTime - (minute * 60))
-
-			try {
-				speaker.speakPhrase(phrase, {time: speaker.number2Speech(lapTime, 1), minute: minute, seconds: speaker.number2Speech(seconds, 1)})
-
-				delta := (driverLapTime - lapTime)
-
-				if (Abs(delta) > 0.5)
-					speaker.speakPhrase("LapTimeDelta", {delta: speaker.number2Speech(Abs(delta), 1)
-													   , difference: (delta > 0) ? fragments["Faster"] : fragments["Slower"]})
-			}
-			finally {
-				speaker.endTalk()
-			}
-		}
-	}
-
 	lapTimesRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
 		local car, lap, position, cars, driverLapTime, speaker, minute, seconds
+
+		reportLapTime(phrase, driverLapTime, car) {
+			local lapTime := this.KnowledgeBase.getValue("Car." . car . ".Time", false)
+			local speaker, fragments, minute, seconds, delta
+
+			if !this.hasEnoughData()
+				return
+
+			if lapTime {
+				lapTime /= 1000
+
+				speaker := this.getSpeaker()
+
+				speaker.beginTalk()
+				fragments := speaker.Fragments
+
+				minute := Floor(lapTime / 60)
+				seconds := (lapTime - (minute * 60))
+
+				try {
+					speaker.speakPhrase(phrase, {time: speaker.number2Speech(lapTime, 1), minute: minute, seconds: speaker.number2Speech(seconds, 1)})
+
+					delta := (driverLapTime - lapTime)
+
+					if (Abs(delta) > 0.5)
+						speaker.speakPhrase("LapTimeDelta", {delta: speaker.number2Speech(Abs(delta), 1)
+														   , difference: (delta > 0) ? fragments["Faster"] : fragments["Slower"]})
+				}
+				finally {
+					speaker.endTalk()
+				}
+			}
+		}
 
 		if !this.hasEnoughData()
 			return
@@ -1087,13 +1083,13 @@ class RaceStrategist extends GridRaceAssistant {
 				speaker.speakPhrase("LapTime", {time: speaker.number2Speech(driverLapTime, 1), minute: minute, seconds: speaker.number2Speech(seconds, 1)})
 
 				if (position > 2)
-					this.reportLapTime("LapTimeFront", driverLapTime, knowledgeBase.getValue("Position.Standings.Class.Ahead.Car", 0))
+					reportLapTime("LapTimeFront", driverLapTime, knowledgeBase.getValue("Position.Standings.Class.Ahead.Car", 0))
 
 				if (position < cars)
-					this.reportLapTime("LapTimeBehind", driverLapTime, knowledgeBase.getValue("Position.Standings.Class.Behind.Car", 0))
+					reportLapTime("LapTimeBehind", driverLapTime, knowledgeBase.getValue("Position.Standings.Class.Behind.Car", 0))
 
 				if (position > 1)
-					this.reportLapTime("LapTimeLeader", driverLapTime, knowledgeBase.getValue("Position.Standings.Class.Leader.Car", 0))
+					reportLapTime("LapTimeLeader", driverLapTime, knowledgeBase.getValue("Position.Standings.Class.Leader.Car", 0))
 			}
 			finally {
 				speaker.endTalk()
@@ -1633,6 +1629,7 @@ class RaceStrategist extends GridRaceAssistant {
 	createSessionInfo(lapNumber, valid, data, simulator, car, track) {
 		local knowledgeBase := this.KnowledgeBase
 		local sessionInfo := newMultiMap()
+		local nextPitstop, position, classPosition
 
 		static sessionTypes := Map(kSessionPractice, "Practice", kSessionQualification, "Qualification", kSessionRace, "Race", kSessionOther, "Other")
 
@@ -1672,6 +1669,49 @@ class RaceStrategist extends GridRaceAssistant {
 
 		setMultiMapValue(sessionInfo, "Tyres", "Pressures", getMultiMapValue(data, "Car Data", "TyrePressure", ""))
 		setMultiMapValue(sessionInfo, "Tyres", "Temperatures", getMultiMapValue(data, "Car Data", "TyreTemperature", ""))
+
+		if knowledgeBase.getValue("Strategy.Name", false) {
+			setMultiMapValue(sessionInfo, "Strategy", "Pitstops", knowledgeBase.getValue("Strategy.Pitstop.Count"))
+			setMultiMapValue(sessionInfo, "Strategy", "Pitstop", nextPitstop)
+
+			nextPitstop := knowledgeBase.getValue("Strategy.Pitstop.Next", false)
+
+			if nextPitstop {
+				setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Lap", knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Lap"))
+				setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Refuel", Round(knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Fuel.Amount")))
+
+				if knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Change", false) {
+					setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Tyre.Compound", knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Compound"))
+					setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Tyre.Compound", knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Compound.Color"))
+				}
+				else {
+					setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Tyre.Compound", false)
+					setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Tyre.Compound", false)
+				}
+			}
+		}
+
+		position := this.getPosition()
+		classPosition := (this.MultiClass ? this.getPosition(false, "Class") : position)
+
+		setMultiMapValue(sessionInfo, "Standings", "Position.Overall", position)
+		setMultiMapValue(sessionInfo, "Standings", "Position.Class", classPosition)
+
+		if (classPosition != 1) {
+			setMultiMapValue(sessionInfo, "Standings", "Ahead.Lap.Time", knowledgeBase.getValue("Car." . car . ".Time", false))
+			setMultiMapValue(sessionInfo, "Standings", "Ahead.Lap", knowledgeBase.getValue("Car." . car . ".Lap"))
+			setMultiMapValue(sessionInfo, "Standings", "Ahead.Delta", knowledgeBase.getValue("Position.Standings.Class.Ahead.Delta", 0) / 1000)
+			setMultiMapValue(sessionInfo, "Standings", "Ahead.InPit", (knowledgeBase.getValue("Car." . car . ".InPitLane", false)
+																	|| knowledgeBase.getValue("Car." . car . ".InPit", false)))
+		}
+
+		if (this.getPosition(false, "Class") != this.getCars("Class").Length) {
+			setMultiMapValue(sessionInfo, "Standings", "Behind.Lap.Time", knowledgeBase.getValue("Car." . car . ".Time", false))
+			setMultiMapValue(sessionInfo, "Standings", "Behind.Lap", knowledgeBase.getValue("Car." . car . ".Lap"))
+			setMultiMapValue(sessionInfo, "Standings", "Behind.Delta", knowledgeBase.getValue("Position.Standings.Class.Behind.Delta", 0) / 1000)
+			setMultiMapValue(sessionInfo, "Standings", "Behind.InPit", (knowledgeBase.getValue("Car." . car . ".InPitLane", false)
+																	 || knowledgeBase.getValue("Car." . car . ".InPit", false)))
+		}
 
 		this.saveSessionInfo(lapNumber, simulator, car, track, sessionInfo)
 	}
@@ -3285,18 +3325,6 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 
 		this.saveLapStandings(lapNumber, simulator, car, track)
-	}
-
-	saveSessionInfo(lapNumber, simulator, car, track, sessionInfo) {
-		local fileName
-
-		if this.RemoteHandler {
-			fileName := temporaryFileName("Session." . lapNumber, "info")
-
-			writeMultiMap(fileName, sessionInfo)
-
-			this.RemoteHandler.saveSessionInfo(lapNumber, fileName)
-		}
 	}
 
 	restoreRaceInfo(raceInfoFile) {

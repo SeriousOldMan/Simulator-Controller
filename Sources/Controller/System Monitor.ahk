@@ -690,7 +690,7 @@ systemMonitor(command := false, arguments*) {
 	}
 	else if (command = "UpdateModules") {
 		try {
-			if (monitorTabView.Value = 2) {
+			if (monitorTabView.Value = 4) {
 				controllerState := getControllerState(false)
 				databaseState := readMultiMap(kTempDirectory . "Database Synchronizer.state")
 				trackMapperState := readMultiMap(kTempDirectory . "Track Mapper.state")
@@ -859,8 +859,10 @@ systemMonitor(command := false, arguments*) {
 			driversListView.ModifyCol(2, "AutoHdr")
 		}
 	}
-	else if (command = "UpdateSession")
-		updateSessionInfo(readMultiMap(kTempDirectory . "Session.state"))
+	else if (command = "UpdateSession") {
+		if (monitorTabView.Value = 2)
+			updateSessionInfo(readMultiMap(kTempDirectory . "Session.state"))
+	}
 	else if (command = "LogMessage") {
 		try {
 			logLevel := arguments[3]
@@ -924,7 +926,7 @@ systemMonitor(command := false, arguments*) {
 
 		systemMonitorGui.Add("Text", "x8 yp+26 w790 0x10")
 
-		monitorTabView := systemMonitorGui.Add("Tab3", "x16 yp+14 w773 h375 AltSubmit -Wrap Section", collect(["Dashboard", "Modules", "Team", "Session", "Logs"], translate))
+		monitorTabView := systemMonitorGui.Add("Tab3", "x16 yp+14 w773 h375 AltSubmit -Wrap Section", collect(["Dashboard", "Session", "Team", "Modules", "Logs"], translate))
 
 		monitorTabView.UseTab(1)
 
@@ -978,7 +980,7 @@ systemMonitor(command := false, arguments*) {
 		mapperState := systemMonitorGui.Add("Picture", "x415 ys+293 w32 h32 vmapperState", kIconsDirectory . "Black.ico")
 		mapperDashboard := systemMonitorGui.Add("HTMLViewer", "x475 ys+266 w300 h95")
 
-		monitorTabView.UseTab(2)
+		monitorTabView.UseTab(4)
 
 		stateListView := systemMonitorGui.Add("ListView", "x24 ys+28 w756 h336 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Module", "Information"], translate))
 		stateListView.OnEvent("Click", noSelect.Bind(stateListView))
@@ -1039,7 +1041,7 @@ systemMonitor(command := false, arguments*) {
 		systemMonitorGui.Add("Text", "x413 yp+24 w120", translate("Driver"))
 		stintDriver := systemMonitorGui.Add("Text", "x528 yp w230")
 
-		monitorTabView.UseTab(4)
+		monitorTabView.UseTab(2)
 
 		sessionStateViewer := systemMonitorGui.Add("HTMLViewer", "x24 ys+28 w756 h336")
 

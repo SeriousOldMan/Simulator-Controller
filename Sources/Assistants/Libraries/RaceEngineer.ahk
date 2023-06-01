@@ -1383,6 +1383,13 @@ class RaceEngineer extends RaceAssistant {
 		return data
 	}
 
+	createSessionInfo(lapNumber, data, simulator, car, track) {
+		local knowledgeBase := this.KnowledgeBase
+		local sessionInfo := newMultiMap()
+
+		this.saveSessionInfo(lapNumber, simulator, car, track, sessionInfo)
+	}
+
 	addLap(lapNumber, &data) {
 		local knowledgeBase := this.KnowledgeBase
 		local driverForname := ""
@@ -1427,6 +1434,10 @@ class RaceEngineer extends RaceAssistant {
 			this.getSpeaker().speakPhrase("WelcomeBack")
 
 		lastLap := lapNumber
+
+		simulator := knowledgeBase.getValue("Session.Simulator")
+		car := knowledgeBase.getValue("Session.Car")
+		track := knowledgeBase.getValue("Session.Track")
 
 		if (this.SaveTyrePressures != kNever) {
 			knowledgeBase := this.KnowledgeBase
@@ -1487,9 +1498,7 @@ class RaceEngineer extends RaceAssistant {
 
 						logMessage(kLogDebug, "Saving pressures for " . lapNumber)
 
-						this.savePressureData(lapNumber, knowledgeBase.getValue("Session.Simulator")
-													   , knowledgeBase.getValue("Session.Car"), knowledgeBase.getValue("Session.Track")
-													   , weatherNow, airTemperature, trackTemperature
+						this.savePressureData(lapNumber, simulator, car, track, weatherNow, airTemperature, trackTemperature
 													   , currentCompound, currentCompoundColor, coldPressures, hotPressures, pressuresLosses)
 					}
 					catch Any as exception {
@@ -1497,6 +1506,12 @@ class RaceEngineer extends RaceAssistant {
 					}
 			}
 		}
+
+		simulator := knowledgeBase.getValue("Session.Simulator")
+		car := knowledgeBase.getValue("Session.Car")
+		track := knowledgeBase.getValue("Session.Track")
+
+		Task.startTask(ObjBindMethod(this, "createSessionInfo", lapNumber, data, simulator, car, track), 1000, kLowPriority)
 
 		return result
 	}
@@ -1592,6 +1607,11 @@ class RaceEngineer extends RaceAssistant {
 			if this.Debug[kDebugKnowledgeBase]
 				this.dumpKnowledgeBase(this.KnowledgeBase)
 		}
+
+		Task.startTask(ObjBindMethod(this, "createSessionInfo", lapNumber, data,
+															  , knowledgeBase.getValue("Session.Simulator")
+															  , knowledgeBase.getValue("Session.Car")
+															  , knowledgeBase.getValue("Session.Track")), 1000, kLowPriority)
 
 		return result
 	}

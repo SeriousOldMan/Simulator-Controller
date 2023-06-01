@@ -1721,7 +1721,7 @@ class RaceStrategist extends GridRaceAssistant {
 	createSessionInfo(lapNumber, valid, data, simulator, car, track) {
 		local knowledgeBase := this.KnowledgeBase
 		local sessionInfo := newMultiMap()
-		local nextPitstop, position, classPosition
+		local nextPitstop, position, classPosition, tyreWear, brakeWear, brakeTemperatures
 
 		static sessionTypes := Map(kSessionPractice, "Practice", kSessionQualification, "Qualification", kSessionRace, "Race", kSessionOther, "Other")
 
@@ -1761,6 +1761,23 @@ class RaceStrategist extends GridRaceAssistant {
 
 		setMultiMapValue(sessionInfo, "Tyres", "Pressures", getMultiMapValue(data, "Car Data", "TyrePressure", ""))
 		setMultiMapValue(sessionInfo, "Tyres", "Temperatures", getMultiMapValue(data, "Car Data", "TyreTemperature", ""))
+		tyreWear := getMultiMapValue(data, "Car Data", "TyreWear", "")
+
+		if (tyreWear != "") {
+			tyreWear := string2Values(",", tyreWear)
+
+			setMultiMapValue(sessionInfo, "Tyres", "Wear", values2String(",", Round(tyreWear[1]), Round(tyreWear[2]), Round(tyreWear[3]), Round(tyreWear[4])))
+		}
+
+		setMultiMapValue(sessionInfo, "Brakes", "Temperatures", getMultiMapValue(data, "Car Data", "BrakeTemperature", ""))
+
+		brakeWear := getMultiMapValue(data, "Car Data", "BrakeWear", "")
+
+		if (brakeWear != "") {
+			brakeWear := string2Values(",", tyreWear)
+
+			setMultiMapValue(sessionInfo, "Brakes", "Wear", values2String(",", Round(brakeWear[1]), Round(brakeWear[2]), Round(brakeWear[3]), Round(brakeWear[4])))
+		}
 
 		if knowledgeBase.getValue("Strategy.Name", false) {
 			setMultiMapValue(sessionInfo, "Strategy", "Pitstops", knowledgeBase.getValue("Strategy.Pitstop.Count"))

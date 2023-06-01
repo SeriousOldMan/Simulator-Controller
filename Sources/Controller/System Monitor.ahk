@@ -592,9 +592,7 @@ systemMonitor(command := false, arguments*) {
 
 			html .= createTyresWidget(sessionState)
 
-			html .= "</td>"
-
-			html .= "</tr>"
+			html .= "</td></tr>"
 
 			html .= "</table>"
 

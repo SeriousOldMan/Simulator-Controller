@@ -267,11 +267,11 @@ setMultiMapValues(multiMap, section, values, clear := true) {
 		setMultiMapValue(multiMap, section, key, value)
 }
 
-addMultiMapValues(multiMap, otherMultiMap) {
+addMultiMapValues(multiMap, otherMultiMap, clear := false) {
 	local section, values
 
 	for section, values in otherMultiMap
-		setMultiMapValues(multiMap, section, values, false)
+		setMultiMapValues(multiMap, section, values, clear)
 }
 
 removeMultiMapValue(multiMap, section, key) {

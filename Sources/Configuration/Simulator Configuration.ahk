@@ -299,14 +299,14 @@ class GeneralTab extends ConfiguratorPanel {
 		setMultiMapValue(configuration, "Configuration", "Silent Mode", this.Control["silentModeCheck"].Value)
 
 		if this.iSplashSplashScreensConfiguration
-			addMultiMapValues(configuration, this.iSplashSplashScreensConfiguration)
+			addMultiMapValues(configuration, this.iSplashSplashScreensConfiguration, true)
 		else {
 			setMultiMapValues(configuration, "Splash Window", getMultiMapValues(this.Configuration, "Splash Window"))
 			setMultiMapValues(configuration, "Splash Screens", getMultiMapValues(this.Configuration, "Splash Screens"))
 		}
 
 		if this.iFormatsConfiguration
-			addMultiMapValues(configuration, this.iFormatsConfiguration)
+			addMultiMapValues(configuration, this.iFormatsConfiguration, true)
 		else
 			setMultiMapValues(configuration, "Localization", getMultiMapValues(this.Configuration, "Localization"))
 

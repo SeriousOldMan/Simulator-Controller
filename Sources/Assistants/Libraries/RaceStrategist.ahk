@@ -1781,21 +1781,21 @@ class RaceStrategist extends GridRaceAssistant {
 
 		if knowledgeBase.getValue("Strategy.Name", false) {
 			setMultiMapValue(sessionInfo, "Strategy", "Pitstops", knowledgeBase.getValue("Strategy.Pitstop.Count"))
-			setMultiMapValue(sessionInfo, "Strategy", "Pitstop", nextPitstop)
+			setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next", nextPitstop)
 
 			nextPitstop := knowledgeBase.getValue("Strategy.Pitstop.Next", false)
 
 			if nextPitstop {
-				setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Lap", knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Lap"))
-				setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Refuel", Round(knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Fuel.Amount")))
+				setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Lap", knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Lap"))
+				setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Refuel", Round(knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Fuel.Amount")))
 
 				if knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Change", false) {
-					setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Tyre.Compound", knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Compound"))
-					setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Tyre.Compound", knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Compound.Color"))
+					setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound", knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Compound"))
+					setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound", knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Compound.Color"))
 				}
 				else {
-					setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Tyre.Compound", false)
-					setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Tyre.Compound", false)
+					setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound", false)
+					setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound", false)
 				}
 			}
 		}

@@ -1790,19 +1790,37 @@ class RaceStrategist extends GridRaceAssistant {
 		setMultiMapValue(sessionInfo, "Standings", "Position.Class", classPosition)
 
 		if (classPosition != 1) {
-			setMultiMapValue(sessionInfo, "Standings", "Ahead.Lap.Time", knowledgeBase.getValue("Car." . car . ".Time", false))
-			setMultiMapValue(sessionInfo, "Standings", "Ahead.Lap", knowledgeBase.getValue("Car." . car . ".Lap"))
-			setMultiMapValue(sessionInfo, "Standings", "Ahead.Delta", knowledgeBase.getValue("Position.Standings.Class.Ahead.Delta", 0) / 1000)
-			setMultiMapValue(sessionInfo, "Standings", "Ahead.InPit", (knowledgeBase.getValue("Car." . car . ".InPitLane", false)
-																	|| knowledgeBase.getValue("Car." . car . ".InPit", false)))
+			car := knowledgeBase.getValue("Position.Standings.Class.Leader.Car", 0)
+
+			if car {
+				setMultiMapValue(sessionInfo, "Standings", "Leader.Lap.Time", knowledgeBase.getValue("Car." . car . ".Time", false))
+				setMultiMapValue(sessionInfo, "Standings", "Leader.Lap", knowledgeBase.getValue("Car." . car . ".Lap"))
+				setMultiMapValue(sessionInfo, "Standings", "Leader.Delta", knowledgeBase.getValue("Position.Standings.Class.Leader.Delta", 0) / 1000)
+				setMultiMapValue(sessionInfo, "Standings", "Leader.InPit", (knowledgeBase.getValue("Car." . car . ".InPitLane", false)
+																		 || knowledgeBase.getValue("Car." . car . ".InPit", false)))
+			}
+
+			car := knowledgeBase.getValue("Position.Standings.Class.Ahead.Car", false)
+
+			if car {
+				setMultiMapValue(sessionInfo, "Standings", "Ahead.Lap.Time", knowledgeBase.getValue("Car." . car . ".Time", false))
+				setMultiMapValue(sessionInfo, "Standings", "Ahead.Lap", knowledgeBase.getValue("Car." . car . ".Lap"))
+				setMultiMapValue(sessionInfo, "Standings", "Ahead.Delta", knowledgeBase.getValue("Position.Standings.Class.Ahead.Delta", 0) / 1000)
+				setMultiMapValue(sessionInfo, "Standings", "Ahead.InPit", (knowledgeBase.getValue("Car." . car . ".InPitLane", false)
+																		|| knowledgeBase.getValue("Car." . car . ".InPit", false)))
+			}
 		}
 
 		if (this.getPosition(false, "Class") != this.getCars("Class").Length) {
-			setMultiMapValue(sessionInfo, "Standings", "Behind.Lap.Time", knowledgeBase.getValue("Car." . car . ".Time", false))
-			setMultiMapValue(sessionInfo, "Standings", "Behind.Lap", knowledgeBase.getValue("Car." . car . ".Lap"))
-			setMultiMapValue(sessionInfo, "Standings", "Behind.Delta", knowledgeBase.getValue("Position.Standings.Class.Behind.Delta", 0) / 1000)
-			setMultiMapValue(sessionInfo, "Standings", "Behind.InPit", (knowledgeBase.getValue("Car." . car . ".InPitLane", false)
-																	 || knowledgeBase.getValue("Car." . car . ".InPit", false)))
+			car := knowledgeBase.getValue("Position.Standings.Class.Behind.Car")
+
+			if car {
+				setMultiMapValue(sessionInfo, "Standings", "Behind.Lap.Time", knowledgeBase.getValue("Car." . car . ".Time", false))
+				setMultiMapValue(sessionInfo, "Standings", "Behind.Lap", knowledgeBase.getValue("Car." . car . ".Lap"))
+				setMultiMapValue(sessionInfo, "Standings", "Behind.Delta", knowledgeBase.getValue("Position.Standings.Class.Behind.Delta", 0) / 1000)
+				setMultiMapValue(sessionInfo, "Standings", "Behind.InPit", (knowledgeBase.getValue("Car." . car . ".InPitLane", false)
+																		 || knowledgeBase.getValue("Car." . car . ".InPit", false)))
+			}
 		}
 
 		this.saveSessionInfo(lapNumber, simulator, car, track, sessionInfo)

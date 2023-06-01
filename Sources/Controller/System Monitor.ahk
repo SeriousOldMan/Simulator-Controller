@@ -145,7 +145,7 @@ systemMonitor(command := false, arguments*) {
 	global gStartupFinished
 
 	local x, y, time, logLevel
-	local controllerState, databaseState, trackMapperState, ignore, plugin, icons, modules, key, value
+	local controllerState, databaseState, trackMapperState, sessionInfo, ignore, assistant, plugin, icons, modules, key, value
 	local icon, state, property, drivers, choices, chosen
 
 	local serverURLValue, serverTokenValue, serverDriverValue, serverTeamValue, serverSessionValue
@@ -860,8 +860,14 @@ systemMonitor(command := false, arguments*) {
 		}
 	}
 	else if (command = "UpdateSession") {
-		if (monitorTabView.Value = 2)
-			updateSessionInfo(readMultiMap(kTempDirectory . "Session.state"))
+		if (monitorTabView.Value = 2) {
+			sessionInfo := newMultiMap()
+
+			for ignore, assistant in ["Race Engineer", "Race Strategist", "Race Spotter"]
+				addMultiMapValues(sessionInfo, readMultiMap(kTempDirectory . assistant . " Session.state"))
+
+			updateSessionInfo(sessionInfo)
+		}
 	}
 	else if (command = "LogMessage") {
 		try {

@@ -1761,6 +1761,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 		setMultiMapValue(sessionInfo, "Tyres", "Pressures", getMultiMapValue(data, "Car Data", "TyrePressure", ""))
 		setMultiMapValue(sessionInfo, "Tyres", "Temperatures", getMultiMapValue(data, "Car Data", "TyreTemperature", ""))
+
 		tyreWear := getMultiMapValue(data, "Car Data", "TyreWear", "")
 
 		if (tyreWear != "") {
@@ -1774,18 +1775,19 @@ class RaceStrategist extends GridRaceAssistant {
 		brakeWear := getMultiMapValue(data, "Car Data", "BrakeWear", "")
 
 		if (brakeWear != "") {
-			brakeWear := string2Values(",", tyreWear)
+			brakeWear := string2Values(",", brakeWear)
 
 			setMultiMapValue(sessionInfo, "Brakes", "Wear", values2String(",", Round(brakeWear[1]), Round(brakeWear[2]), Round(brakeWear[3]), Round(brakeWear[4])))
 		}
 
 		if knowledgeBase.getValue("Strategy.Name", false) {
 			setMultiMapValue(sessionInfo, "Strategy", "Pitstops", knowledgeBase.getValue("Strategy.Pitstop.Count"))
-			setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next", nextPitstop)
 
 			nextPitstop := knowledgeBase.getValue("Strategy.Pitstop.Next", false)
 
 			if nextPitstop {
+				setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next", nextPitstop)
+
 				setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Lap", knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Lap"))
 				setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Refuel", Round(knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Fuel.Amount")))
 
@@ -1810,9 +1812,9 @@ class RaceStrategist extends GridRaceAssistant {
 			car := knowledgeBase.getValue("Position.Standings.Class.Leader.Car", 0)
 
 			if car {
-				setMultiMapValue(sessionInfo, "Standings", "Leader.Lap.Time", knowledgeBase.getValue("Car." . car . ".Time", false))
-				setMultiMapValue(sessionInfo, "Standings", "Leader.Lap", knowledgeBase.getValue("Car." . car . ".Lap"))
-				setMultiMapValue(sessionInfo, "Standings", "Leader.Delta", knowledgeBase.getValue("Position.Standings.Class.Leader.Delta", 0) / 1000)
+				setMultiMapValue(sessionInfo, "Standings", "Leader.Lap.Time", Round(knowledgeBase.getValue("Car." . car . ".Time", 0) / 1000, 1))
+				setMultiMapValue(sessionInfo, "Standings", "Leader.Lap", knowledgeBase.getValue("Car." . car . ".Lap", 0))
+				setMultiMapValue(sessionInfo, "Standings", "Leader.Delta", Round(knowledgeBase.getValue("Position.Standings.Class.Leader.Delta", 0) / 1000, 1))
 				setMultiMapValue(sessionInfo, "Standings", "Leader.InPit", (knowledgeBase.getValue("Car." . car . ".InPitLane", false)
 																		 || knowledgeBase.getValue("Car." . car . ".InPit", false)))
 			}
@@ -1820,9 +1822,9 @@ class RaceStrategist extends GridRaceAssistant {
 			car := knowledgeBase.getValue("Position.Standings.Class.Ahead.Car", false)
 
 			if car {
-				setMultiMapValue(sessionInfo, "Standings", "Ahead.Lap.Time", knowledgeBase.getValue("Car." . car . ".Time", false))
-				setMultiMapValue(sessionInfo, "Standings", "Ahead.Lap", knowledgeBase.getValue("Car." . car . ".Lap"))
-				setMultiMapValue(sessionInfo, "Standings", "Ahead.Delta", knowledgeBase.getValue("Position.Standings.Class.Ahead.Delta", 0) / 1000)
+				setMultiMapValue(sessionInfo, "Standings", "Ahead.Lap.Time", Round(knowledgeBase.getValue("Car." . car . ".Time", 0) / 1000, 1))
+				setMultiMapValue(sessionInfo, "Standings", "Ahead.Lap", knowledgeBase.getValue("Car." . car . ".Lap", 0))
+				setMultiMapValue(sessionInfo, "Standings", "Ahead.Delta", Round(knowledgeBase.getValue("Position.Standings.Class.Ahead.Delta", 0) / 1000, 1))
 				setMultiMapValue(sessionInfo, "Standings", "Ahead.InPit", (knowledgeBase.getValue("Car." . car . ".InPitLane", false)
 																		|| knowledgeBase.getValue("Car." . car . ".InPit", false)))
 			}
@@ -1832,9 +1834,9 @@ class RaceStrategist extends GridRaceAssistant {
 			car := knowledgeBase.getValue("Position.Standings.Class.Behind.Car")
 
 			if car {
-				setMultiMapValue(sessionInfo, "Standings", "Behind.Lap.Time", knowledgeBase.getValue("Car." . car . ".Time", false))
-				setMultiMapValue(sessionInfo, "Standings", "Behind.Lap", knowledgeBase.getValue("Car." . car . ".Lap"))
-				setMultiMapValue(sessionInfo, "Standings", "Behind.Delta", knowledgeBase.getValue("Position.Standings.Class.Behind.Delta", 0) / 1000)
+				setMultiMapValue(sessionInfo, "Standings", "Behind.Lap.Time", Round(knowledgeBase.getValue("Car." . car . ".Time", 0) / 1000, 1))
+				setMultiMapValue(sessionInfo, "Standings", "Behind.Lap", knowledgeBase.getValue("Car." . car . ".Lap", 0))
+				setMultiMapValue(sessionInfo, "Standings", "Behind.Delta", Round(knowledgeBase.getValue("Position.Standings.Class.Behind.Delta", 0) / 1000, 1))
 				setMultiMapValue(sessionInfo, "Standings", "Behind.InPit", (knowledgeBase.getValue("Car." . car . ".InPitLane", false)
 																		 || knowledgeBase.getValue("Car." . car . ".InPit", false)))
 			}

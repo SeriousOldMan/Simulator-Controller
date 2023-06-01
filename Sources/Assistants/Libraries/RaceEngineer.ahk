@@ -1546,10 +1546,6 @@ class RaceEngineer extends RaceAssistant {
 			}
 		}
 
-		simulator := knowledgeBase.getValue("Session.Simulator")
-		car := knowledgeBase.getValue("Session.Car")
-		track := knowledgeBase.getValue("Session.Track")
-
 		Task.startTask(ObjBindMethod(this, "createSessionInfo", lapNumber, data, simulator, car, track), 1000, kLowPriority)
 
 		return result
@@ -1647,7 +1643,7 @@ class RaceEngineer extends RaceAssistant {
 				this.dumpKnowledgeBase(this.KnowledgeBase)
 		}
 
-		Task.startTask(ObjBindMethod(this, "createSessionInfo", lapNumber, data,
+		Task.startTask(ObjBindMethod(this, "createSessionInfo", lapNumber, data
 															  , knowledgeBase.getValue("Session.Simulator")
 															  , knowledgeBase.getValue("Session.Car")
 															  , knowledgeBase.getValue("Session.Track")), 1000, kLowPriority)

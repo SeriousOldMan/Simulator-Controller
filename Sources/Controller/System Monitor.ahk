@@ -690,7 +690,7 @@ systemMonitor(command := false, arguments*) {
 	}
 	else if (command = "UpdateModules") {
 		try {
-			if (monitorTabView.Value = 2) {
+			if (monitorTabView.Value = 4) {
 				controllerState := getControllerState(false)
 				databaseState := readMultiMap(kTempDirectory . "Database Synchronizer.state")
 				trackMapperState := readMultiMap(kTempDirectory . "Track Mapper.state")
@@ -859,8 +859,10 @@ systemMonitor(command := false, arguments*) {
 			driversListView.ModifyCol(2, "AutoHdr")
 		}
 	}
-	else if (command = "UpdateSession")
-		updateSessionInfo(readMultiMap(kTempDirectory . "Session.state"))
+	else if (command = "UpdateSession") {
+		if (monitorTabView.Value = 2)
+			updateSessionInfo(readMultiMap(kTempDirectory . "Session.state"))
+	}
 	else if (command = "LogMessage") {
 		try {
 			logLevel := arguments[3]

@@ -565,13 +565,13 @@ class SessionDatabase extends ConfigurationItem {
 
 			parseDriverName(name, &forName, &surName, &nickName)
 
-			if (sessionDB.query("Drivers", {Where: {ID: id, Forname: forName, Surname: surName}}).Length = 0)
-				try {
+			try {
+				if (sessionDB.query("Drivers", {Where: {ID: id, Forname: forName, Surname: surName}}).Length = 0)
 					sessionDB.add("Drivers", Database.Row("ID", id, "Forname", forName, "Surname", surName, "Nickname", nickName), true)
-				}
-				catch Any as exception {
-					logError(exception)
-				}
+			}
+			catch Any as exception {
+				logError(exception)
+			}
 		}
 	}
 

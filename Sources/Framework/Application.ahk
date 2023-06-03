@@ -243,7 +243,14 @@ startDatabaseSynchronizer() {
 
 		dbIDFileName := kDatabaseDirectory . "ID"
 
-		dbID := StrSplit(FileRead(dbIDFileName),"`n","`r")[1]
+		try {
+			dbID := StrSplit(FileRead(dbIDFileName),"`n","`r")[1]
+		}
+		catch Any as exception {
+			logError(exception, true)
+			
+			dbID := false
+		}
 
 		if (ID = dbID) {
 			consent := readMultiMap(kUserConfigDirectory . "CONSENT")

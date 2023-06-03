@@ -503,7 +503,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		local tries := 10
 
 		if (teamServer && teamServer.SessionActive && this.TeamSessionActive) {
-			this.setSessionValue(this.Plugin . " Session Info", fileName)
+			teamServer.setSessionValue(this.Plugin . " Session Info", fileName)
 
 			deleteFile(fileName)
 		}

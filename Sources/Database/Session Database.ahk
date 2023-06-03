@@ -5004,9 +5004,7 @@ editSettings(editorOrCommand, arguments*) {
 			validateTokenButton.Enabled := true
 			rebuildButton.Enabled := true
 
-			serverUpdateEdit := serverUpdateEdit.Text
-
-			if (serverUpdateEdit = "")
+			if (serverUpdateEdit.Text = "")
 				serverUpdateEdit.Value := 10
 		}
 		else {

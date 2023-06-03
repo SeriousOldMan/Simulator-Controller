@@ -446,12 +446,16 @@ class SessionDatabase extends ConfigurationItem {
 		this.iUseCommunity := getMultiMapValue(configuration, "Scope", "Community", false)
 	}
 
-	reloadConfiguration() {
+	static reloadConfiguration() {
 		SessionDatabase.sConnectors := CaseInsenseMap()
 		SessionDatabase.sServerURLs := CaseInsenseMap()
 		SessionDatabase.sServerTokens := CaseInsenseMap()
 
 		SessionDatabase.sConfiguration := readMultiMap(kUserConfigDirectory . "Session Database.ini")
+	}
+
+	reloadConfiguration() {
+		SessionDatabase.reloadConfiguration()
 	}
 
 	static prepareDatabase(simulator, car, track, data := false) {

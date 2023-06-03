@@ -494,6 +494,40 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	class RaceStrategy extends Strategy {
+		iRunningPitstops := 0
+		iRunningLaps := 0
+		iRunningTime := 0
+
+		RunningPitstops {
+			Get {
+				return this.iRunningPitstops
+			}
+
+			Set {
+				return (this.iRunningPitstops := value)
+			}
+		}
+
+		RunningLaps {
+			Get {
+				return this.iRunningLaps
+			}
+
+			Set {
+				return (this.iRunningLaps := value)
+			}
+		}
+
+		RunningTime {
+			Get {
+				return this.iRunningTime
+			}
+
+			Set {
+				return (this.iRunningTime := value)
+			}
+		}
+
 		initializeAvailableTyreSets() {
 			super.initializeAvailableTyreSets()
 
@@ -502,6 +536,40 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	class TrafficRaceStrategy extends TrafficStrategy {
+		iRunningPitstops := 0
+		iRunningLaps := 0
+		iRunningTime := 0
+
+		RunningPitstops {
+			Get {
+				return this.iRunningPitstops
+			}
+
+			Set {
+				return (this.iRunningPitstops := value)
+			}
+		}
+
+		RunningLaps {
+			Get {
+				return this.iRunningLaps
+			}
+
+			Set {
+				return (this.iRunningLaps := value)
+			}
+		}
+
+		RunningTime {
+			Get {
+				return this.iRunningTime
+			}
+
+			Set {
+				return (this.iRunningTime := value)
+			}
+		}
+
 		initializeAvailableTyreSets() {
 			super.initializeAvailableTyreSets()
 
@@ -1853,7 +1921,7 @@ class RaceStrategist extends GridRaceAssistant {
 		local compound, result, lap, simulator, car, track, frequency, curContinuation
 		local pitstop, prefix, validLap, weather, airTemperature, trackTemperature, compound, compoundColor
 		local fuelConsumption, fuelRemaining, lapTime, map, tc, antiBS, pressures, temperatures, wear, multiClass
-		local sessionInfo, driverCar
+		local sessionInfo, driverCar, lastTime
 
 		static lastLap := 0
 
@@ -1885,8 +1953,15 @@ class RaceStrategist extends GridRaceAssistant {
 		lastLap := lapNumber
 
 		if this.Strategy {
+			lastTime := (getMultiMapValue(data, "Stint Data", "LapLastTime", 0) / 1000)
+
 			this.Strategy.RunningLaps += 1
-			this.Strategy.RunningTime += (getMultiMapValue(data, "Stint Data", "LapLastTime", 0) / 1000)
+			this.Strategy.RunningTime += lastTime
+
+			if this.Strategy["Rejected"] {
+				this.Strategy["Rejected"].RunningLaps += 1
+				this.Strategy["Rejected"].RunningTime += lastTime
+			}
 
 			if (!this.StrategyReported && this.hasEnoughData(false) && (this.Strategy == this.Strategy[true])) {
 				if this.Speaker[false] {
@@ -3296,6 +3371,9 @@ class RaceStrategist extends GridRaceAssistant {
 		if nextPitstop {
 			this.Strategy.RunningPitstops += 1
 
+			if this.Strategy["Rejected"]
+				this.Strategy["Rejected"].RunningPitstops += 1
+
 			if (nextPitstop != knowledgeBase.getValue("Strategy.Pitstop.Next", false)) {
 				map := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Map", "n/a")
 
@@ -3305,6 +3383,8 @@ class RaceStrategist extends GridRaceAssistant {
 			else
 				knowledgeBase.setFact("Strategy.Recalculate", "Pitstop")
 		}
+
+		this.updateDynamicValues({RejectedStrategy: false})
 
 		return result
 	}

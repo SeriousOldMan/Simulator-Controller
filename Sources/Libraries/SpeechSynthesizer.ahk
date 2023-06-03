@@ -487,8 +487,36 @@ class SpeechSynthesizer {
 			overdriveColor := getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Speaker.Color", 20)
 			filterHighpass := getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Speaker.HighPass", 800)
 			filterLowpass := getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Speaker.LowPass", 1800)
-			noiseVolume := Round(0.3 * getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Speaker.NoiseVolume", 66) / 100, 2)
-			clickVolume := Round(0.6 * getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Speaker.ClickVolume", 80) / 100, 2)
+
+			try {
+				noiseVolume := Round(0.3 * getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Speaker.NoiseVolume", 66) / 100, 2)
+			}
+			catch Any as exception {
+				logError(exception, true)
+
+				noiseVolume := Round(0.3 * 66 / 100, 2)
+			}
+
+			try {
+				clickVolume := Round(0.6 * getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Speaker.ClickVolume", 80) / 100, 2)
+			}
+			catch Any as exception {
+				logError(exception, true)
+
+				clickVolume := Round(0.6 * 66 / 100, 2)
+			}
+
+			if !isInteger(overDriveGain)
+				overDriveGain := 20
+
+			if !isInteger(overDriveColor)
+				overDriveColor := 20
+
+			if !isInteger(filterHighpass)
+				filterHighpass := 800
+
+			if !isInteger(filterLowpass)
+				filterLowpass := 1800
 
 			try {
 				try {

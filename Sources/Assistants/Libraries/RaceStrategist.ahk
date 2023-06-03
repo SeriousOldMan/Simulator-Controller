@@ -113,6 +113,8 @@ class RaceStrategist extends GridRaceAssistant {
 		cancel() {
 			if this.iRemember
 				this.Manager.updateDynamicValues({RejectedStrategy: this.iStrategy})
+
+				super.cancel()
 		}
 	}
 

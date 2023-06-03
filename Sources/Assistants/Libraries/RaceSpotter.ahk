@@ -1063,38 +1063,43 @@ class RaceSpotter extends GridRaceAssistant {
 			try {
 				lap := knowledgeBase.getValue("Lap")
 				car := knowledgeBase.getValue("Position.Standings.Class.Ahead.Car")
-				delta := Abs(knowledgeBase.getValue("Position.Standings.Class.Ahead.Delta", 0) / 1000)
-				inPit := (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false))
 
-				if ((delta = 0) || (inPit && (Abs(delta) < 30))) {
-					if standard {
-						speaker.speakPhrase(inPit ? "AheadCarInPit" : "NoTrackGap")
+				if car {
+					delta := Abs(knowledgeBase.getValue("Position.Standings.Class.Ahead.Delta", 0) / 1000)
+					inPit := (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false))
 
-						return true
+					if ((delta = 0) || (inPit && (Abs(delta) < 30))) {
+						if standard {
+							speaker.speakPhrase(inPit ? "AheadCarInPit" : "NoTrackGap")
+
+							return true
+						}
+						else
+							return false
 					}
-					else
-						return false
-				}
-				else if ((knowledgeBase.getValue("Car." . car . ".Lap") > lap)
-					  && (Abs(delta) > (knowledgeBase.getValue("Lap." . lap . ".Time") / 1000))) {
-					if standard {
+					else if ((knowledgeBase.getValue("Car." . car . ".Lap", 0) > lap)
+						  && (Abs(delta) > (knowledgeBase.getValue("Lap." . lap . ".Time", 0) / 1000))) {
+						if standard {
+							speaker.beginTalk()
+
+							speaker.speakPhrase("StandingsAheadLapped")
+						}
+						else
+							return false
+					}
+					else {
 						speaker.beginTalk()
 
-						speaker.speakPhrase("StandingsAheadLapped")
+						speaker.speakPhrase("StandingsGapToAhead", {delta: speaker.number2Speech(delta, 1)})
 					}
-					else
-						return false
+
+					talking := true
+
+					if inPit
+						speaker.speakPhrase("GapCarInPit")
 				}
-				else {
-					speaker.beginTalk()
-
-					speaker.speakPhrase("StandingsGapToAhead", {delta: speaker.number2Speech(delta, 1)})
-				}
-
-				talking := true
-
-				if inPit
-					speaker.speakPhrase("GapCarInPit")
+				else
+					return false
 			}
 			finally {
 				if talking
@@ -1160,41 +1165,46 @@ class RaceSpotter extends GridRaceAssistant {
 			try {
 				lap := knowledgeBase.getValue("Lap")
 				car := knowledgeBase.getValue("Position.Standings.Class.Behind.Car")
-				delta := Abs(knowledgeBase.getValue("Position.Standings.Class.Behind.Delta", 0) / 1000)
-				inPit := (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false))
-				lapped := false
 
-				if ((delta = 0) || (inPit && (Abs(delta) < 30))) {
-					if standard {
-						speaker.speakPhrase(inPit ? "BehindCarInPit" : "NoTrackGap")
+				if car {
+					delta := Abs(knowledgeBase.getValue("Position.Standings.Class.Behind.Delta", 0) / 1000)
+					inPit := (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false))
+					lapped := false
 
-						return true
+					if ((delta = 0) || (inPit && (Abs(delta) < 30))) {
+						if standard {
+							speaker.speakPhrase(inPit ? "BehindCarInPit" : "NoTrackGap")
+
+							return true
+						}
+						else
+							return false
 					}
-					else
-						return false
-				}
-				else if ((knowledgeBase.getValue("Car." . car . ".Lap") < lap)
-					  && (Abs(delta) > (knowledgeBase.getValue("Lap." . lap . ".Time") / 1000))) {
-					if standard {
+					else if ((knowledgeBase.getValue("Car." . car . ".Lap", 0) < lap)
+						  && (Abs(delta) > (knowledgeBase.getValue("Lap." . lap . ".Time", 0) / 1000))) {
+						if standard {
+							speaker.beginTalk()
+
+							speaker.speakPhrase("StandingsBehindLapped")
+
+							lapped := true
+						}
+						else
+							return false
+					}
+					else {
 						speaker.beginTalk()
 
-						speaker.speakPhrase("StandingsBehindLapped")
-
-						lapped := true
+						speaker.speakPhrase("StandingsGapToBehind", {delta: speaker.number2Speech(delta, 1)})
 					}
-					else
-						return false
+
+					talking := true
+
+					if (!lapped && inPit)
+						speaker.speakPhrase("GapCarInPit")
 				}
-				else {
-					speaker.beginTalk()
-
-					speaker.speakPhrase("StandingsGapToBehind", {delta: speaker.number2Speech(delta, 1)})
-				}
-
-				talking := true
-
-				if (!lapped && inPit)
-					speaker.speakPhrase("GapCarInPit")
+				else
+					return false
 			}
 			finally {
 				if talking

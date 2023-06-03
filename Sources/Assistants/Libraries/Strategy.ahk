@@ -2936,7 +2936,7 @@ class Strategy extends ConfigurationItem {
 			closingLap := (pitstopRule[2] * 60 / avgLapTime)
 
 			if ((targetLap >= openingLap) && (currentLap <= closingLap))
-				if ((pitstopNr = 1) || (this.LastPitstop.Lap < openingLap)) {
+				if ((pitstopNr = 1) || (this.LastPitstop && (this.LastPitstop.Lap < openingLap))) {
 					targetLap := Min(targetLap, Floor((pitstopRule[1] + ((pitstopRule[2] - pitstopRule[1]) / 2)) * 60 / avgLapTime))
 
 					adjusted := true

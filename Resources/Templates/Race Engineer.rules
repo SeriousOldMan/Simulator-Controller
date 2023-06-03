@@ -913,8 +913,11 @@ requestDriver(?pitstopNumber) <= Call(requestPitstopDriver, ?pitstopNumber, !Pit
 
 [?Pitstop.Lap] => (ProveAll: pitstopPerformed(?Pitstop.Lap)), (Set: Cleanup, Laps)
 [?Pitstop.Lap] => (Prove: clearPressureLossCalibration(?Pitstop.Lap))
-[?Pitstop.Lap] => (Set: Damage.Reported, ?Pitstop.Lap), (Set: Damage.Analysis.Reported, ?Pitstop.Lap),
-				  (Set: Damage.Suspension.Reported, ?Pitstop.Lap), (Set: Damage.Bodywork.Reported, ?Pitstop.Lap), (Set: Damage.Engine.Reported, ?Pitstop.Lap)
+[?Pitstop.Lap] => (Prove: updateDamageReported(?Pitstop.Lap)),
+				  (Set: Damage.Suspension.Reported, ?Pitstop.Lap), (Set: Damage.Bodywork.Reported, ?Pitstop.Lap),
+				  (Set: Damage.Engine.Reported, ?Pitstop.Lap)
+				  
+updateDamageReported(?lap) <= ?lastLap = ?lap - 1, Set(Damage.Reported, ?lastLap), Set(Damage.Analysis.Reported, ?lap)
 
 priority: -10, [?Pitstop.Lap] => (Clear: Pitstop.Planned.Lap),
 								 (Clear: Pitstop.Planned.Fuel),

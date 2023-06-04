@@ -97,6 +97,12 @@ class StrategySimulation {
 		}
 	}
 
+	FixedLapTime {
+		Get {
+			return this.iFixedLapTime
+		}
+	}
+
 	__New(strategyManager, sessionType, telemetryDatabase) {
 		this.iStrategyManager := strategyManager
 		this.iSessionType := sessionType
@@ -418,8 +424,8 @@ class StrategySimulation {
 	}
 
 	getAvgLapTime(numLaps, ecuMap, remainingFuel, fuelConsumption, weather, tyreCompound, tyreCompoundColor, tyreLaps, default := false) {
-		if this.iFixedLapTime
-			return this.iFixedLapTime
+		if this.FixedLapTime
+			return this.FixedLapTime
 		else
 			return this.StrategyManager.getAvgLapTime(numLaps, ecuMap, remainingFuel, fuelConsumption, weather, tyreCompound, tyreCompoundColor, tyreLaps, default)
 	}
@@ -516,7 +522,7 @@ class StrategySimulation {
 
 		strategy := this.createStrategy(name, driverID)
 
-		strategy.AvgLapTime["Fixed"] := this.iFixedLapTime
+		strategy.AvgLapTime["Fixed"] := this.FixedLapTime
 
 		currentConsumption := (fuelConsumption - ((fuelConsumption / 100) * consumptionVariation))
 

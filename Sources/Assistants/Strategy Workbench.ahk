@@ -3092,13 +3092,10 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	getAvgLapTime(numLaps, map, remainingFuel, fuelConsumption, weather, tyreCompound, tyreCompoundColor, tyreLaps, default := false) {
-		if (this.Control["simInputDropDown"].Value > 1)
-			return this.Simulation.calcAvgLapTime(numLaps, map, remainingFuel, fuelConsumption, weather
-												, tyreCompound, tyreCompoundColor, tyreLaps
-												, default ? default : internalValue("Float", this.Control["simAvgLapTimeEdit"].Text)
-												, this.TelemetryDatabase)
-		else
-			return (default ? default : internalValue("Float", this.Control["simAvgLapTimeEdit"].Text))
+		return this.Simulation.calcAvgLapTime(numLaps, map, remainingFuel, fuelConsumption, weather
+											, tyreCompound, tyreCompoundColor, tyreLaps
+											, default ? default : internalValue("Float", this.Control["simAvgLapTimeEdit"].Text)
+											, this.TelemetryDatabase)
 	}
 
 	runSimulation() {

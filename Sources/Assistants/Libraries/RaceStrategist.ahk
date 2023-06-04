@@ -493,7 +493,12 @@ class RaceStrategist extends GridRaceAssistant {
 													  , (this.RaceStrategist.KnowledgeBase.getValue("Session.Format") = "Time") ? "Duration" : "Laps"
 													  , this.TelemetryDatabase)
 
-			this.Simulation.runSimulation(isDebug())
+			try {
+				this.Simulation.runSimulation(isDebug())
+			}
+			finally {
+				this.iSimulation := false
+			}
 
 			return false
 		}
@@ -2578,54 +2583,10 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	getAvgLapTime(numLaps, map, remainingFuel, fuelConsumption, weather, tyreCompound, tyreCompoundColor, tyreLaps, default := false) {
-		local knowledgeBase := this.KnowledgeBase
-		local telemetryDB := Task.CurrentTask.TelemetryDatabase
-		local lapTimes := telemetryDB.getMapLapTimes(weather, tyreCompound, tyreCompoundColor)
-		local tyreLapTimes := telemetryDB.getTyreLapTimes(weather, tyreCompound, tyreCompoundColor)
-		local a := false
-		local b := false
-		local xValues, yValues, ignore, entry, baseLapTime, count, avgLapTime, lapTime, candidate
-
-		if (tyreLapTimes.Length > 1) {
-			xValues := []
-			yValues := []
-
-			for ignore, entry in tyreLapTimes {
-				xValues.Push(entry["Tyre.Laps"])
-				yValues.Push(entry["Lap.Time"])
-			}
-
-			linRegression(xValues, yValues, &a, &b)
-		}
-
-		baseLapTime := ((a && b) ? (a + (tyreLaps * b)) : false)
-
-		count := 0
-		avgLapTime := 0
-		lapTime := false
-
-		loop numLaps {
-			candidate := lookupLapTime(lapTimes, map, remainingFuel - (fuelConsumption * (A_Index - 1)))
-
-			if (!lapTime || !baseLapTime)
-				lapTime := candidate
-			else if (candidate < lapTime)
-				lapTime := candidate
-
-			if lapTime {
-				if baseLapTime
-					avgLapTime += (lapTime + ((a + (b * (tyreLaps + A_Index))) - baseLapTime))
-				else
-					avgLapTime += lapTime
-
-				count += 1
-			}
-		}
-
-		if (avgLapTime > 0)
-			avgLapTime := (avgLapTime / count)
-
-		return avgLapTime ? avgLapTime : (default ? default : this.Strategy.AvgLapTime)
+		return Task.CurrentTask.Simulation.calcAvgLapTime(numLaps, map, remainingFuel, fuelConsumption, weather
+														, tyreCompound, tyreCompoundColor, tyreLaps
+														, default ? default : this.Strategy.AvgLapTime
+														, Task.CurrentTask.TelemetryDatabase)
 	}
 
 	computeAvailableTyreSets(availableTyreSets, usedTyreSets) {

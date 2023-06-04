@@ -351,6 +351,72 @@ class StrategySimulation {
 		this.TelemetryDatabase.setDrivers(driverID)
 	}
 
+	calcAvgLapTime(numLaps, map, remainingFuel, fuelConsumption, weather, tyreCompound, tyreCompoundColor, tyreLaps
+				 , default := false, telemetryDB := false) {
+		local theMin := false
+		local theMax := false
+		local a, b, lapTimes, tyreLapTimes, xValues, yValues, ignore, entry
+		local baseLapTime, count, avgLapTime, lapTime, candidate
+
+		a := false
+		b := false
+
+		if !telemetryDB
+			telemetryDB := this.StrategyManager.TelemetryDatabase
+
+		lapTimes := telemetryDB.getMapLapTimes(weather, tyreCompound, tyreCompoundColor)
+		tyreLapTimes := telemetryDB.getTyreLapTimes(weather, tyreCompound, tyreCompoundColor)
+
+		if (tyreLapTimes.Length > 1) {
+			xValues := []
+			yValues := []
+
+			for ignore, entry in tyreLapTimes {
+				lapTime := entry["Lap.Time"]
+
+				xValues.Push(entry["Tyre.Laps"])
+				yValues.Push(lapTime)
+
+				theMin := (theMin ? Min(theMin, lapTime) : lapTime)
+				theMax := (theMax ? Max(theMax, lapTime) : lapTime)
+			}
+
+			linRegression(xValues, yValues, &a, &b)
+		}
+
+		baseLapTime := ((a && b) ? (a + (b * tyreLaps)) : false)
+
+		count := 0
+		avgLapTime := 0
+		lapTime := false
+
+		loop numLaps {
+			candidate := lookupLapTime(lapTimes, map, remainingFuel - (fuelConsumption * (A_Index - 1)))
+
+			if (!lapTime || !baseLapTime)
+				lapTime := candidate
+			else if (candidate < lapTime)
+				lapTime := candidate
+
+			if lapTime {
+				if baseLapTime
+					avgLapTime += (lapTime + ((a + (b * (tyreLaps + A_Index))) - baseLapTime))
+				else
+					avgLapTime += lapTime
+
+				count += 1
+			}
+		}
+
+		if (avgLapTime > 0)
+			avgLapTime := (avgLapTime / count)
+
+		if (theMin && theMax)
+			avgLapTime := Max(theMin, Min(theMax, avgLapTime))
+
+		return avgLapTime ? avgLapTime : default
+	}
+
 	getAvgLapTime(numLaps, ecuMap, remainingFuel, fuelConsumption, weather, tyreCompound, tyreCompoundColor, tyreLaps, default := false) {
 		if this.iFixedLapTime
 			return this.iFixedLapTime

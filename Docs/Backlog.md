@@ -18,6 +18,7 @@
   5. Graphical Editor for Vocalics Settings inkl. Test-Modus...
   6. Better answers by the Strategist, when a pitstop cannot be recommended
   7. Strategist explains the reason why a strategy revision is of benefit (as a comparison betwwen old and new)
+  8. Create and manage a kind of training plan by the Strategist to gather data for strategy calculation
 
 #### Setup Workbench
   1. General detection of counter steering in the telemetry analyzer

@@ -97,6 +97,7 @@ class StrategyWorkbench extends ConfigurationItem {
 	iChartViewer := false
 	iStrategyViewer := false
 
+	iSimulation := false
 	iTelemetryDatabase := false
 
 	class WorkbenchResizer extends Window.Resizer {
@@ -310,6 +311,12 @@ class StrategyWorkbench extends ConfigurationItem {
 	StrategyViewer {
 		Get {
 			return this.iStrategyViewer
+		}
+	}
+
+	Simulation {
+		Get {
+			return this.iSimulation
 		}
 	}
 
@@ -3085,83 +3092,31 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	getAvgLapTime(numLaps, map, remainingFuel, fuelConsumption, weather, tyreCompound, tyreCompoundColor, tyreLaps, default := false) {
-		local theMin := false
-		local theMax := false
-		local a, b, telemetryDB, lapTimes, tyreLapTimes, xValues, yValues, ignore, entry
-		local baseLapTime, count, avgLapTime, lapTime, candidate
-
-		a := false
-		b := false
-
-		if (this.Control["simInputDropDown"].Value > 1) {
-			telemetryDB := this.TelemetryDatabase
-
-			lapTimes := telemetryDB.getMapLapTimes(weather, tyreCompound, tyreCompoundColor)
-			tyreLapTimes := telemetryDB.getTyreLapTimes(weather, tyreCompound, tyreCompoundColor)
-
-			if (tyreLapTimes.Length > 1) {
-				xValues := []
-				yValues := []
-
-				for ignore, entry in tyreLapTimes {
-					lapTime := entry["Lap.Time"]
-
-					xValues.Push(entry["Tyre.Laps"])
-					yValues.Push(lapTime)
-
-					theMin := (theMin ? Min(theMin, lapTime) : lapTime)
-					theMax := (theMax ? Min(theMax, lapTime) : lapTime)
-				}
-
-				linRegression(xValues, yValues, &a, &b)
-			}
-		}
+		if (this.Control["simInputDropDown"].Value > 1)
+			return this.Simulation.calcAvgLapTime(numLaps, map, remainingFuel, fuelConsumption, weather
+												, tyreCompound, tyreCompoundColor, tyreLaps
+												, default ? default : internalValue("Float", this.Control["simAvgLapTimeEdit"].Text)
+												, this.TelemetryDatabase)
 		else
-			lapTimes := []
-
-		baseLapTime := ((a && b) ? (a + (b * tyreLaps)) : false)
-
-		count := 0
-		avgLapTime := 0
-		lapTime := false
-
-		loop numLaps {
-			candidate := lookupLapTime(lapTimes, map, remainingFuel - (fuelConsumption * (A_Index - 1)))
-
-			if (!lapTime || !baseLapTime)
-				lapTime := candidate
-			else if (candidate < lapTime)
-				lapTime := candidate
-
-			if lapTime {
-				if baseLapTime
-					avgLapTime += (lapTime + ((a + (b * (tyreLaps + A_Index))) - baseLapTime))
-				else
-					avgLapTime += lapTime
-
-				count += 1
-			}
-		}
-
-		if (avgLapTime > 0)
-			avgLapTime := (avgLapTime / count)
-
-		if (theMin && theMax)
-			avgLapTime := Max(theMin, Min(theMax, avgLapTime))
-
-		return avgLapTime ? avgLapTime : (default ? default : internalValue("Float", this.Control["simAvgLapTimeEdit"].Text))
+			return (default ? default : internalValue("Float", this.Control["simAvgLapTimeEdit"].Text))
 	}
 
 	runSimulation() {
 		local telemetryDB := TelemetryDatabase(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
+		local simulation
 
 		this.iTelemetryDatabase := telemetryDB
 
 		try {
-			VariationSimulation(this, this.SelectedSessionType, telemetryDB).runSimulation(true)
+			simulation := VariationSimulation(this, this.SelectedSessionType, telemetryDB)
+
+			this.iSimulation := simulation
+
+			simulation.runSimulation(true)
 		}
 		finally {
 			this.iTelemetryDatabase := false
+			this.iSimulation := false
 		}
 	}
 

@@ -197,6 +197,17 @@ systemMonitor(command := false, arguments*) {
 
 	static logLevelDropDown
 
+	static infoWidgets := CaseInsenseMap("Session", createSessionWidget,
+										 "Duration", createDurationWidget,
+										 "Conditions", createConditionsWidget,
+										 "Stint", createStintWidget,
+										 "Fuel", createFuelWidget,
+										 "Tyres", createTyresWidget,
+										 "Brakes", createBrakesWidget,
+										 "Pitstop", createPitstopWidget,
+										 "Strategy", createStrategyWidget,
+										 "Standings", createStandingsWidget)
+
 	createSessionWidget(sessionState) {
 		local html := ""
 
@@ -248,7 +259,7 @@ systemMonitor(command := false, arguments*) {
 		return html
 	}
 
-	createConditonsWidget(sessionState) {
+	createConditionsWidget(sessionState) {
 		local weatherNow := getMultiMapValue(sessionState, "Weather", "Now")
 		local weather10Min := getMultiMapValue(sessionState, "Weather", "10Min")
 		local weather30Min := getMultiMapValue(sessionState, "Weather", "30Min")
@@ -558,67 +569,59 @@ systemMonitor(command := false, arguments*) {
 	}
 
 	updateSessionInfo(sessionState) {
+		local row := 1
+		local column := 1
+		local widgets := []
 		local html
+
+		static descriptors := getKeys(infoWidgets)
+		static index := 0
+
+		addInfoWidget(descriptor, fixedDescriptors := []) {
+			if (descriptor = "Cycle") {
+				loop {
+					if (++index > descriptors.Length)
+						index := 1
+
+					if !inList(fixedDescriptors, descriptors[index])
+						break
+				}
+
+				descriptor := descriptors[index]
+			}
+
+			if (row <= 2) {
+				if (column > 3) {
+					row += 1
+					column := 1
+
+					html .= "<tr><td> </td><td> </td><td> </td></tr>"
+					html .= "<tr><td> </td><td> </td><td> </td></tr>"
+				}
+
+				if (column = 1)
+					html .= "<tr><td style=`"padding-right: 25px`">"
+				else if (column = 2)
+					html .= "</td><td style=`"padding-right: 25px`">"
+				else
+					html .= "</td><td>"
+
+				html .= infoWidgets[descriptor](sessionState)
+
+				widgets.Push(descriptor)
+
+				if (column = 3)
+					html .= "</td></tr>"
+
+				column += 1
+			}
+		}
 
 		if (sessionState.Count > 0) {
 			html := "<style>" . getTableCSS(systemMonitorGui) . " div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { text-align: center; font-size: 12px; background-color: #" . systemMonitorGui.Theme.TableColor["Header"] . "; } td {vertical-align: top } </style><table>"
 
-			html .= "<tr><td style=`"padding-right: 25px`">"
-
-			html .= createSessionWidget(sessionState)
-
-			html .= "</td><td style=`"padding-right: 25px`">"
-
-			html .= createDurationWidget(sessionState)
-
-			html .= "</td><td>"
-
-			html .= createConditonsWidget(sessionState)
-
-			html .= "</td></tr>"
-
-			html .= "<tr><td> </td><td> </td><td> </td></tr>"
-			html .= "<tr><td> </td><td> </td><td> </td></tr>"
-
-			html .= "<tr><td style=`"padding-right: 25px`">"
-
-			html .= createStintWidget(sessionState)
-
-			html .= "</td><td style=`"padding-right: 25px`">"
-
-			html .= createFuelWidget(sessionState)
-
-			html .= "</td><td>"
-
-			html .= createTyresWidget(sessionState)
-
-			html .= "</td></tr>"
-
-			html .= "<tr><td> </td><td> </td><td> </td></tr>"
-			html .= "<tr><td> </td><td> </td><td> </td></tr>"
-
-			html .= "<tr><td style=`"padding-right: 25px`">"
-
-			html .= createBrakesWidget(sessionState)
-
-			html .= "</td><td style=`"padding-right: 25px`">"
-
-			html .= createPitstopWidget(sessionState)
-
-			html .= "</td><td>"
-
-			html .= createStandingsWidget(sessionState)
-
-			html .= "</td></tr>"
-
-			html .= "<tr><td> </td><td> </td><td> </td></tr>"
-			html .= "<tr><td> </td><td> </td><td> </td></tr>"
-
-			html .= "<tr><td style=`"padding-right: 25px`">"
-
-			html .= createStrategyWidget(sessionState)
-
-			html .= "</td></tr>"
+			for ignore, descriptor in ["Session", "Duration", "Conditions", "Stint", "Cycle", "Cycle"]
+				addInfoWidget(descriptor, ["Session", "Duration", "Conditions", "Stint"])
 
 			html .= "</table>"
 

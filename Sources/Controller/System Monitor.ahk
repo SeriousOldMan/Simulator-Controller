@@ -411,7 +411,7 @@ systemMonitor(command := false, arguments*) {
 	}
 
 	createStrategyWidget(sessionState) {
-		local pitstopsCount := getMultiMapValue(sessionState, "Strategy", "Pitstops.Count", 0)
+		local pitstopsCount := getMultiMapValue(sessionState, "Strategy", "Pitstops", 0)
 		local nextPitstop := getMultiMapValue(sessionState, "Strategy", "Pitstop.Next", 0)
 		local html := ""
 		local remainingPitstops := 0
@@ -436,7 +436,7 @@ systemMonitor(command := false, arguments*) {
 			else
 				tyreCompound := translate("No")
 
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Change Tyres") . "</th><td>" . tyreCompound . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyres") . "</th><td>" . tyreCompound . "</td></tr>")
 		}
 
 		html .= "</table>"
@@ -489,7 +489,7 @@ systemMonitor(command := false, arguments*) {
 			if tyreCompound {
 				tyreCompound := translate(compound(tyreCompound, getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Compound.Color")))
 
-				html .= ("<tr><th class=`"th-std th-left`">" . translate("Change Tyres") . "</th><td>" . tyreCompound . "</td></tr>")
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyres") . "</th><td>" . tyreCompound . "</td></tr>")
 
 				tyreSet := getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Set")
 
@@ -512,7 +512,7 @@ systemMonitor(command := false, arguments*) {
 																							  . "</td></tr>")
 		}
 		else
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Pitstop") . "</th><td>" . translate("-") . "</td></tr>")
+			html .= ("<tr><td colspan=`"2`">" . translate("No planned pitstop") . "</td></tr>")
 
 		html .= "</table>"
 
@@ -536,19 +536,19 @@ systemMonitor(command := false, arguments*) {
 
 		if (getMultiMapValue(sessionState, "Standings", "Leader.Lap.Time", kUndefined) != kUndefined) {
 			html .= ("<tr><th class=`"th-std th-left`">" . translate("Leader (Laps)") . "</th><td>" . getMultiMapValue(sessionState, "Standings", "Leader.Lap") . "</td></tr>")
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Leader (Delta)") . "</th><td>" . getMultiMapValue(sessionState, "Standings", "Leader.Delta") . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Leader (Delta)") . "</th><td>" . displayValue("Time", getMultiMapValue(sessionState, "Standings", "Leader.Delta")) . "</td></tr>")
 			html .= ("<tr><th class=`"th-std th-left`">" . translate("Leader (Lap Time)") . "</th><td>" . displayValue("Time", getMultiMapValue(sessionState, "Standings", "Leader.Lap.Time")) . "</td></tr>")
 		}
 
 		if (getMultiMapValue(sessionState, "Standings", "Ahead.Lap.Time", kUndefined) != kUndefined) {
 			html .= ("<tr><th class=`"th-std th-left`">" . translate("Ahead (Laps)") . "</th><td>" . getMultiMapValue(sessionState, "Standings", "Ahead.Lap") . "</td></tr>")
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Ahead (Delta)") . "</th><td>" . getMultiMapValue(sessionState, "Standings", "Ahead.Delta") . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Ahead (Delta)") . "</th><td>" . displayValue("Time", getMultiMapValue(sessionState, "Standings", "Ahead.Delta")) . "</td></tr>")
 			html .= ("<tr><th class=`"th-std th-left`">" . translate("Ahead (Lap Time)") . "</th><td>" . displayValue("Time", getMultiMapValue(sessionState, "Standings", "Ahead.Lap.Time")) . "</td></tr>")
 		}
 
 		if (getMultiMapValue(sessionState, "Standings", "Behind.Lap.Time", kUndefined) != kUndefined) {
 			html .= ("<tr><th class=`"th-std th-left`">" . translate("Behind (Laps)") . "</th><td>" . getMultiMapValue(sessionState, "Standings", "Behind.Lap") . "</td></tr>")
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Behind (Delta)") . "</th><td>" . getMultiMapValue(sessionState, "Standings", "Behind.Delta") . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Behind (Delta)") . "</th><td>" . displayValue("Time", getMultiMapValue(sessionState, "Standings", "Behind.Delta")) . "</td></tr>")
 			html .= ("<tr><th class=`"th-std th-left`">" . translate("Behind (Lap Time)") . "</th><td>" . displayValue("Time", getMultiMapValue(sessionState, "Standings", "Behind.Lap.Time")) . "</td></tr>")
 		}
 
@@ -591,6 +591,32 @@ systemMonitor(command := false, arguments*) {
 			html .= "</td><td>"
 
 			html .= createTyresWidget(sessionState)
+
+			html .= "</td></tr>"
+
+			html .= "<tr><td> </td><td> </td><td> </td></tr>"
+			html .= "<tr><td> </td><td> </td><td> </td></tr>"
+
+			html .= "<tr><td style=`"padding-right: 25px`">"
+
+			html .= createBrakesWidget(sessionState)
+
+			html .= "</td><td style=`"padding-right: 25px`">"
+
+			html .= createPitstopWidget(sessionState)
+
+			html .= "</td><td>"
+
+			html .= createStandingsWidget(sessionState)
+
+			html .= "</td></tr>"
+
+			html .= "<tr><td> </td><td> </td><td> </td></tr>"
+			html .= "<tr><td> </td><td> </td><td> </td></tr>"
+
+			html .= "<tr><td style=`"padding-right: 25px`">"
+
+			html .= createStrategyWidget(sessionState)
 
 			html .= "</td></tr>"
 
@@ -1382,7 +1408,7 @@ clearOrphaneStateFiles() {
 
 startSystemMonitor() {
 	local icon := kIconsDirectory . "Monitoring.ico"
-	local noLaunch
+	local noLaunch, ignore, assistant
 
 	TraySetIcon(icon, "1")
 	A_IconTip := "System Monitor"
@@ -1390,9 +1416,11 @@ startSystemMonitor() {
 	registerMessageHandler("Monitoring", monitoringMessageHandler)
 
 	deleteFile(kTempDirectory . "Simulator Controller.state")
-	deleteFile(kTempDirectory . "Session.state")
 	deleteFile(kTempDirectory . "Database Synchronizer.state")
 	deleteFile(kTempDirectory . "Track Mapper.state")
+
+	for ignore, assistant in ["Race Engineer", "Race Strategist", "Race Spotter"]
+		deleteFile(kTempDirectory . assistant . " Session.state")
 
 	PeriodicTask(clearOrphaneStateFiles, 60000, kLowPriority).start()
 

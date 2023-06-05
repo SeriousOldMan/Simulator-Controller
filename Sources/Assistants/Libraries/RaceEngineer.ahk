@@ -1546,10 +1546,6 @@ class RaceEngineer extends RaceAssistant {
 			}
 		}
 
-		simulator := knowledgeBase.getValue("Session.Simulator")
-		car := knowledgeBase.getValue("Session.Car")
-		track := knowledgeBase.getValue("Session.Track")
-
 		Task.startTask(ObjBindMethod(this, "createSessionInfo", lapNumber, data, simulator, car, track), 1000, kLowPriority)
 
 		return result
@@ -1560,72 +1556,77 @@ class RaceEngineer extends RaceAssistant {
 		local result := super.updateLap(lapNumber, &data)
 		local needProduce := false
 		local tyrePressures := string2Values(",", getMultiMapValue(data, "Car Data", "TyrePressure", ""))
+		local tyreTemperatures := string2Values(",", getMultiMapValue(data, "Car Data", "TyreTemperature", ""))
+		local bodyworkDamage := string2Values(",", getMultiMapValue(data, "Car Data", "BodyworkDamage", ""))
+		local suspensionDamage := string2Values(",", getMultiMapValue(data, "Car Data", "SuspensionDamage", ""))
 		local threshold := knowledgeBase.getValue("Session.Settings.Tyre.Pressure.Deviation")
 		local changed := false
-		local fact, index, tyreType, oldValue, newValue, tyreTemperatures
-		local bodyworkDamage, suspensionDamage, position
+		local fact, index, tyreType, oldValue, newValue, position
 
-		for index, tyreType in ["FL", "FR", "RL", "RR"] {
-			newValue := Round(tyrePressures[index], 2)
-			fact := ("Lap." . lapNumber . ".Tyre.Pressure." . tyreType)
-			oldValue := knowledgeBase.getValue(fact, false)
+		if (tyrePressures.Length >= 4) {
+			for index, tyreType in ["FL", "FR", "RL", "RR"] {
+				newValue := Round(tyrePressures[index], 2)
+				fact := ("Lap." . lapNumber . ".Tyre.Pressure." . tyreType)
+				oldValue := knowledgeBase.getValue(fact, false)
 
-			if (oldValue && (Abs(oldValue - newValue) > threshold)) {
-				knowledgeBase.setValue(fact, newValue)
+				if (oldValue && (Abs(oldValue - newValue) > threshold)) {
+					knowledgeBase.setValue(fact, newValue)
 
-				changed := true
+					changed := true
+				}
+			}
+
+			if changed {
+				knowledgeBase.addFact("Tyre.Update.Pressure", true)
+
+				needProduce := true
 			}
 		}
 
-		if changed {
-			knowledgeBase.addFact("Tyre.Update.Pressure", true)
+		if (tyreTemperatures.Length >= 4)
+			for index, tyreType in ["FL", "FR", "RL", "RR"]
+				knowledgeBase.setFact("Lap." . lapNumber . ".Tyre.Temperature." . tyreType, Round(tyreTemperatures[index], 2))
 
-			needProduce := true
+		if (bodyWorkDamage.Length >= 5) {
+			changed := false
+
+			for index, position in ["Front", "Rear", "Left", "Right", "Center"] {
+				newValue := Round(bodyworkDamage[index], 2)
+				fact := ("Lap." . lapNumber . ".Damage.Bodywork." . position)
+				oldValue := knowledgeBase.getValue(fact, 0)
+
+				if (oldValue < newValue)
+					knowledgeBase.setFact(fact, newValue)
+
+				changed := (changed || (Round(oldValue) < Round(newValue)))
+			}
+
+			if changed {
+				knowledgeBase.addFact("Damage.Update.Bodywork", lapNumber)
+
+				needProduce := true
+			}
 		}
 
-		tyreTemperatures := string2Values(",", getMultiMapValue(data, "Car Data", "TyreTemperature", ""))
+		if (suspensionDamage >= 4) {
+			changed := false
 
-		for index, tyreType in ["FL", "FR", "RL", "RR"]
-			knowledgeBase.setFact("Lap." . lapNumber . ".Tyre.Temperature." . tyreType, Round(tyreTemperatures[index], 2))
+			for index, position in ["FL", "FR", "RL", "RR"] {
+				newValue := Round(suspensionDamage[index], 2)
+				fact := ("Lap." . lapNumber . ".Damage.Suspension." . position)
+				oldValue := knowledgeBase.getValue(fact, 0)
 
-		bodyworkDamage := string2Values(",", getMultiMapValue(data, "Car Data", "BodyworkDamage", ""))
-		changed := false
+				if (oldValue < newValue)
+					knowledgeBase.setFact(fact, newValue)
 
-		for index, position in ["Front", "Rear", "Left", "Right", "Center"] {
-			newValue := Round(bodyworkDamage[index], 2)
-			fact := ("Lap." . lapNumber . ".Damage.Bodywork." . position)
-			oldValue := knowledgeBase.getValue(fact, 0)
+				changed := (changed || (Round(oldValue) < Round(newValue)))
+			}
 
-			if (oldValue < newValue)
-				knowledgeBase.setFact(fact, newValue)
+			if changed {
+				knowledgeBase.addFact("Damage.Update.Suspension", lapNumber)
 
-			changed := (changed || (Round(oldValue) < Round(newValue)))
-		}
-
-		if changed {
-			knowledgeBase.addFact("Damage.Update.Bodywork", lapNumber)
-
-			needProduce := true
-		}
-
-		suspensionDamage := string2Values(",", getMultiMapValue(data, "Car Data", "SuspensionDamage", ""))
-		changed := false
-
-		for index, position in ["FL", "FR", "RL", "RR"] {
-			newValue := Round(suspensionDamage[index], 2)
-			fact := ("Lap." . lapNumber . ".Damage.Suspension." . position)
-			oldValue := knowledgeBase.getValue(fact, 0)
-
-			if (oldValue < newValue)
-				knowledgeBase.setFact(fact, newValue)
-
-			changed := (changed || (Round(oldValue) < Round(newValue)))
-		}
-
-		if changed {
-			knowledgeBase.addFact("Damage.Update.Suspension", lapNumber)
-
-			needProduce := true
+				needProduce := true
+			}
 		}
 
 		newValue := Round(getMultiMapValue(data, "Car Data", "EngineDamage", 0), 1)
@@ -1634,7 +1635,7 @@ class RaceEngineer extends RaceAssistant {
 		if (knowledgeBase.getValue(fact, 0) < newValue) {
 			knowledgeBase.setFact(fact, newValue)
 
-			knowledgeBase.addFact("Damage.Update.Suspension", lapNumber)
+			knowledgeBase.addFact("Damage.Update.Engine", lapNumber)
 
 			needProduce := true
 		}
@@ -1647,7 +1648,7 @@ class RaceEngineer extends RaceAssistant {
 				this.dumpKnowledgeBase(this.KnowledgeBase)
 		}
 
-		Task.startTask(ObjBindMethod(this, "createSessionInfo", lapNumber, data,
+		Task.startTask(ObjBindMethod(this, "createSessionInfo", lapNumber, data
 															  , knowledgeBase.getValue("Session.Simulator")
 															  , knowledgeBase.getValue("Session.Car")
 															  , knowledgeBase.getValue("Session.Track")), 1000, kLowPriority)

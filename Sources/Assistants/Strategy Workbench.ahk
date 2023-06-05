@@ -2094,16 +2094,23 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		schema := filterSchema(telemetryDB.getSchema(this.SelectedDataType, true))
 
-		xAxis := schema[this.Control["dataXDropDown"].Value]
-		yAxises := Array(schema[this.Control["dataY1DropDown"].Value])
+		try {
+			xAxis := schema[this.Control["dataXDropDown"].Value]
+			yAxises := Array(schema[this.Control["dataY1DropDown"].Value])
 
-		if (this.Control["dataY2DropDown"].Value > 1)
-			yAxises.Push(schema[this.Control["dataY2DropDown"].Value - 1])
+			if (this.Control["dataY2DropDown"].Value > 1)
+				yAxises.Push(schema[this.Control["dataY2DropDown"].Value - 1])
 
-		if (this.Control["dataY3DropDown"].Value > 1)
-			yAxises.Push(schema[this.Control["dataY3DropDown"].Value - 1])
+			if (this.Control["dataY3DropDown"].Value > 1)
+				yAxises.Push(schema[this.Control["dataY3DropDown"].Value - 1])
 
-		this.showDataPlot(records, xAxis, yAxises)
+			this.showDataPlot(records, xAxis, yAxises)
+		}
+		catch Any as exception {
+			logError(exception)
+
+			this.showTelemetryChart(false)
+		}
 
 		this.updateState()
 	}

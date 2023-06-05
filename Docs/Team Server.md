@@ -264,23 +264,25 @@ You then may choose the settings for the upcoming strategy simulation using the 
 
   4. Analyze Traffic
   
-     Selecting this option will run a probalistic traffic analysis based on a stochiastic model using the Monte-Carlo analysis method. It will result in a pitstop strategy with the greatest benefit regarding the probable future traffic development, thus giving you the maximum possible clean air track time. See the [dedicated section](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#monte-carlo-traffic-model) for more information.
+     Selecting this option will run a probalistic traffic analysis based on a stochiastic model using the Monte Carlo analysis method. It will result in a pitstop strategy with the greatest benefit regarding the probable future traffic development, thus giving you the maximum possible clean air track time. See the [dedicated section](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#monte-carlo-traffic-model) for more information.
 
 After you dialed the options, you can select "Adjust Strategy (Simulation)" from the "Strategy" menu, to create a new strategy baseed on a simulation. The result strategy summary will be displayed in the output area. Please note, that when you are typically late into the race, any pitstop rules of the base strategy might be ignored, when conflicting with the current race situation, so please double check, whether the resulting strategy is in accordance with the rules.
 
 IMPORTANT: Once you have created a new strategy, the Stint Plan (see below) must be updated as well, so that the information for refuel amount, tyre changes and so on, will be correct, when it comes to the next pitstop.
 
-#### Monte-Carlo traffic model
+#### Monte Carlo traffic model
 
 If you have selected the *Analyze Traffic* option before running the strategy simulation, you can dial further options for the simulation on the "Strategy" tab.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2014.JPG)
 
-The Monte-Carlo simulation is based on a stochiastic approach, where the future development of the race is predicted using the capabilities (laptime, consistency, error rate, recent typeical stint length before a pitstop) of the different drivers on the one hand and by introducing random events like a premature pitstop or an accident of one of the opponents on the other hand. You can choose the number of traffic models generated for each strategy candidate using the "# Scenarios" input field and the random impact with "Random Factor" field. The number of possible strategy candidates is derived implicitly by the "Variation" field, wich determines up to which extent the strategy for the upcoming next pitstop (+/- lap) might be altered compared to the "ideal" strategy without traffic. When altering the in-lap for the upcoming pitstop, remaining fuel as well as the pitstop rules of the current race are taken into account.
+The Monte Carlo simulation is based on a stochiastic approach, where the future development of the race is predicted using the capabilities (laptime, consistency, error rate, recent typeical stint length before a pitstop) of the different drivers on the one hand and by introducing random events like a premature pitstop or an accident of one of the opponents on the other hand. You can choose the number of traffic models generated for each strategy candidate using the "# Scenarios" input field and the random impact with "Random Factor" field. The number of possible strategy candidates is derived implicitly by the "Variation" field, wich determines up to which extent the strategy for the upcoming next pitstop (+/- lap) might be altered compared to the "ideal" strategy without traffic. When altering the in-lap for the upcoming pitstop, remaining fuel as well as the pitstop rules of the current race are taken into account.
 
 In the lower area, you can fine-control the traffic model generation by choosing which type of variations are generated and how these will impact the evaluation score of the resulting scenario. You can choose different aspects of your opponents, like driver errors, lap time variations, and so on, to be varied according to the statistical knowledge gathered in the recent laps of the race about each driver. At the end, the resulting strategy with the best score regarding 1. gained position, 2. least amount of traffic after the next pitstop and 3. the least overall amount of pitstops will be chosen as the future strategy.
 
 Please note, that the same algorithm is also available in solo races, when using the [Virtual Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#adjusting-the-strategy-during-a-race).
+
+If you are interested in the theoretical background for this very exciting approach, you can take a look at the [research paper](https://www.mdpi.com/2076-3417/10/12/4229).
 
 #### Altering the current race strategy
 

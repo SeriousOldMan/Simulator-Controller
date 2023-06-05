@@ -1066,9 +1066,9 @@ editSoundProcessing(editorOrCommand := false, settings := false, *) {
 			if (result == kCancel)
 				return false
 			else if (result == kOk)
-				return [editorGui["clickVolume"], editorGui["noiseVolume"]
-					  , editorGui["distortionGain"], editorGui["distortionHarmonics"]
-					  , editorGui["highpassFrequency"], editorGui["lowpassFrequency"]]
+				return [editorGui["clickVolume"].Value, editorGui["noiseVolume"].Value
+					  , editorGui["distortionGain"].Value, editorGui["distortionHarmonics"].Value
+					  , editorGui["highpassFrequency"].Value, editorGui["lowpassFrequency"].Value]
 		}
 		finally {
 			editorGui.Destroy()

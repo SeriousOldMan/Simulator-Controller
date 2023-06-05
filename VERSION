@@ -1,9 +1,9 @@
 [Development]
-Version=5.0.7.0-dev
+Version=5.0.7.0-rc1
 Target=5.0.7.0-release
-Date=06/04/2023
-Download=
-Changes=New "Session" info page in "System Monitor", Strategist now explains revised strategy before activation, New car meta data for *Assetto Corsa Competizione* 720s Evo, Updated car meta data for *RaceRoom Racing Experience*, New car models for "Setup Workbench", Talking groups for voice output interruption can be disabled, Fixed Monte Carlo simulation in "Race Center", Monte Carlo traffic simulation can be enabled optionally for strategy revision by the Strategist, Real pitstop history will be used in all Monte Carlo simulations, New setting in "Race Settings" to enable Monte-Carlo simulation, Fixed wrong map selection during strategy simulation in rare cases
+Date=06/05/2023
+Download=https://www.dropbox.com/s/x02go2nqbph4vvd/Simulator%20Controller%205.0.7.0-rc1.zip?dl=1
+Changes=New "Session" info page in "System Monitor", Strategist now explains revised strategy before activation, New car meta data for *Assetto Corsa Competizione* 720s Evo, Updated car meta data for *RaceRoom Racing Experience*, New car models for "Setup Workbench", Talking groups for voice output interruption can be disabled, Fixed Monte Carlo simulation in "Race Center", Monte Carlo traffic simulation can be enabled optionally for strategy revision by the Strategist, Real pitstop history will be used in all Monte Carlo simulations, New setting in "Race Settings" to enable Monte-Carlo simulation, Fixed wrong map selection during strategy simulation in rare cases, Better handling of corrupt stint data in "Race Center"
 [Release]
 Version=5.0.6.0-release
 Date=05/26/2023
@@ -13,4 +13,4 @@ Changes=Optimized fuel level simulation in "Strategy Workbench", Allow **0** aga
 Type=Development
 [Version]
 Release=5.0.6.0-release
-Development=5.0.7.0-dev
+Development=5.0.7.0-rc1

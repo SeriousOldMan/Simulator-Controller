@@ -11,9 +11,10 @@
   7. Fixed a rare bug, when the wrong map was selected during strategy simulation.
   8. The pitstop history of all opponent cars will be considered to predict future pitstops in traffic simulations both in the "Race Center" as well as now with the Race Strategist. During the first stint, where no pitstop history is available, a probabilistic model is used as before.
   9. A new setting is available in the "Session Database" for each Assistant, to enable or disable grouping of voice output. When an Assistant voice output is interrupted, it tries to repeat its message. With the new setting you can choose, whether the whole message with all sentences which belong together or only the last sentence will be repeated.
-  10. The meta data for *RaceRoom Racing Experience* has been updated to the latest version.
-  11. The meta data for *Assetto Corsa Competizione* has been updated to 1.9.3, incl. the new McLaren 720s GT3 Evo car model.
-  12. New car models for "Setup Workbench":
+  10. Handling of missing stint data (due to drivers not connected by intent or unintentionally) in the "Race Center" has been improved.
+  11. The meta data for *RaceRoom Racing Experience* has been updated to the latest version.
+  12. The meta data for *Assetto Corsa Competizione* has been updated to 1.9.3, incl. the new McLaren 720s GT3 Evo car model.
+  13. New car models for "Setup Workbench":
       - Assetto Corsa Competizione
 	    - McLaren 720s GT3 Evo
 

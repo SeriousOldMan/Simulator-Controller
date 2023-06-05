@@ -1608,7 +1608,7 @@ class RaceEngineer extends RaceAssistant {
 			}
 		}
 
-		if (suspensionDamage >= 4) {
+		if (suspensionDamage.Length >= 4) {
 			changed := false
 
 			for index, position in ["FL", "FR", "RL", "RR"] {

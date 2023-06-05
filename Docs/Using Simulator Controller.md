@@ -213,6 +213,34 @@ The "System Monitor" is divided into several pages of information:
      On this page you will find important information about the currently running session, be it the remaining stint time and remaining laps or the tyre temperatures, and so on.
 	 
 	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/System%20Monitor%206.JPG)
+	 
+	 The following information widgets are available:
+	 
+	 - Session
+	 
+	   Shows you information about the car, track and session mode. Not so important.
+	   
+	 - Duration
+	 
+	   Gives information about session length, remaining session, stint and driver time, and so on.
+	   
+	 - Conditions
+	 
+	   Shows the current weather and temperatures as well as an outlook for the next 30 minutes.
+	   
+	 - Stint
+	 
+	   Information about the current driver, the position, the current lap, lap times and the number of laps driven in this stint so far.
+	   
+	 - Fuel
+	 
+	   Detailed information about fuel consumption, remaining fuel and remaining possible laps.
+	   
+	 - Tyres
+	 
+	   Shows the current pressures and tyre temperatures.
+	 
+	 In most cases, redundant information is suppressed. For example, if the remaining session, stint and driver time are identical, only the remaining time is shown.
 
   3. Team
   

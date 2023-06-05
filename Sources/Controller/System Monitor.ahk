@@ -499,27 +499,27 @@ systemMonitor(command := false, arguments*) {
 		}
 
 		html .= "<table class=`"table-std`">"
-		html .= ("<tr><th class=`"th-std th-left`" colspan=`"2`"><div id=`"header`"><i>" . translate("Pitstop") . "</i></div></th></tr>")
+		html .= ("<tr><th class=`"th-std th-left`" colspan=`"3`"><div id=`"header`"><i>" . translate("Pitstop") . "</i></div></th></tr>")
 
 		if pitstopNr {
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Pitstop") . "</th><td class=`"td-wdg`">" . pitstopNr . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Pitstop") . "</th><td class=`"td-wdg`" colspan=`"2`">" . pitstopNr . "</td></tr>")
 
 			if pitstopLap
-				html .= ("<tr><th class=`"th-std th-left`">" . translate("Lap") . "</th><td class=`"td-wdg`">" . pitstopLap . "</td></tr>")
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Lap") . "</th><td class=`"td-wdg`" colspan=`"2`">" . pitstopLap . "</td></tr>")
 
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Fuel") . "</th><td class=`"td-wdg`">" . displayValue("Float", convertUnit("Volume", getMultiMapValue(sessionState, "Pitstop", "Planned.Refuel"))) . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Fuel") . "</th><td class=`"td-wdg`" colspan=`"2`">" . displayValue("Float", convertUnit("Volume", getMultiMapValue(sessionState, "Pitstop", "Planned.Refuel"))) . "</td></tr>")
 
 			tyreCompound := getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Compound")
 
 			if tyreCompound {
 				tyreCompound := translate(compound(tyreCompound, getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Compound.Color")))
 
-				html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyres") . "</th><td class=`"td-wdg`">" . tyreCompound . "</td></tr>")
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyres") . "</th><td class=`"td-wdg`" colspan=`"2`">" . tyreCompound . "</td></tr>")
 
 				tyreSet := getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Set")
 
 				if tyreSet
-					html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyre Set") . "</th><td class=`"td-wdg`">" . tyreSet . "</td></tr>")
+					html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyre Set") . "</th><td class=`"td-wdg`" colspan=`"2`">" . tyreSet . "</td></tr>")
 
 				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Pressures") . "</th><td class=`"td-wdg`" text-align: right`">"
 					   . displayValue("Float", convertUnit("Pressure", getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Pressure.FL"))) . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
@@ -531,14 +531,18 @@ systemMonitor(command := false, arguments*) {
 			else
 				html .= ("<tr><th class=`"th-std th-left`">" . translate("Change Tyres") . "</th><td class=`"td-wdg`">" . translate("No") . "</td></tr>")
 
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Repairs") . "</th><td class=`"td-wdg`">"
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Repairs") . "</th><td class=`"td-wdg`" colspan=`"2`">"
 														 . computeRepairs(getMultiMapValue(sessionState, "Pitstop", "Planned.Repair.Bodywork")
 																	    , getMultiMapValue(sessionState, "Pitstop", "Planned.Repair.Suspension")
 																	    , getMultiMapValue(sessionState, "Pitstop", "Planned.Repair.Engine"))
-																							  . "</td></tr>")
+														 . "</td></tr>")
+
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Prepared") . "</th><td class=`"td-wdg`" colspan=`"2`">"
+														 . (getMultiMapValue(sessionState, "Pitstop", "Prepared") ? translate("Yes") : translate("No"))
+														 . "</td></tr>")
 		}
 		else
-			html .= ("<tr><td class=`"td-wdg`" colspan=`"2`">" . translate("No planned pitstop") . "</td></tr>")
+			html .= ("<tr><td class=`"td-wdg`" colspan=`"3`">" . translate("No planned pitstop") . "</td></tr>")
 
 		html .= "</table>"
 
@@ -648,7 +652,7 @@ systemMonitor(command := false, arguments*) {
 			if (--shows <= 0) {
 				widgets := []
 
-				for ignore, descriptor in ["Session", "Duration", "Conditions", "Stint", "Cycle", "Cycle"]
+				for ignore, descriptor in ["Session", "Duration", "Stint", "Conditions", "Cycle", "Cycle"]
 					addInfoWidget(widgets, descriptor, ["Session", "Duration", "Conditions", "Stint"])
 
 				shows := 3

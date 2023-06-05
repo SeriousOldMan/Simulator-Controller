@@ -151,6 +151,24 @@ class RaceCenterTask extends Task {
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; Class                        RaceCenterSimulationTask                   ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class RaceCenterSimulationTask extends RaceCenterTask {
+	iSimulation := false
+
+	Simulation {
+		Get {
+			return this.iSimulation
+		}
+
+		Set {
+			return (this.iSimulation := value)
+		}
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; Class                       SyncSessionTask                             ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
@@ -4678,11 +4696,11 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	runSimulation(sessionType) {
-		this.pushTask(ObjBindMethod(this, "runSimulationAsync", sessionType))
+		RaceCenterSimulationTask(ObjBindMethod(this, "runSimulationAsync", sessionType)).start()
 	}
 
 	runSimulationAsync(sessionType) {
-		local telemetryDB
+		local telemetryDB, simulation
 
 		this.showMessage(translate("Saving session"))
 
@@ -4696,9 +4714,13 @@ class RaceCenter extends ConfigurationItem {
 
 		try {
 			if this.UseTraffic
-				TrafficSimulation(this, sessionType, telemetryDB).runSimulation(true)
+				simulation := TrafficSimulation(this, sessionType, telemetryDB)
 			else
-				VariationSimulation(this, sessionType, telemetryDB).runSimulation(true)
+				simulation := VariationSimulation(this, sessionType, telemetryDB)
+
+			Task.CurrentTask.Simulation := simulation
+
+			simulation.runSimulation(true)
 		}
 		finally {
 			this.iSimulationTelemetryDatabase := false
@@ -5079,53 +5101,9 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	getAvgLapTime(numLaps, map, remainingFuel, fuelConsumption, weather, tyreCompound, tyreCompoundColor, tyreLaps, default := false) {
-		local telemetryDB := this.SimulationTelemetryDatabase
-		local lapTimes := telemetryDB.getMapLapTimes(weather, tyreCompound, tyreCompoundColor)
-		local tyreLapTimes := telemetryDB.getTyreLapTimes(weather, tyreCompound, tyreCompoundColor)
-		local a := false
-		local b := false
-		local xValues, yValues, ignore, entry, baseLapTime, count, avgLapTime, lapTime, candidate
-
-		if (tyreLapTimes.Length > 1) {
-			xValues := []
-			yValues := []
-
-			for ignore, entry in tyreLapTimes {
-				xValues.Push(entry["Tyre.Laps"])
-				yValues.Push(entry["Lap.Time"])
-			}
-
-			linRegression(xValues, yValues, &a, &b)
-		}
-
-		baseLapTime := ((a && b) ? (a + (tyreLaps * b)) : false)
-
-		count := 0
-		avgLapTime := 0
-		lapTime := false
-
-		loop numLaps {
-			candidate := lookupLapTime(lapTimes, map, remainingFuel - (fuelConsumption * (A_Index - 1)))
-
-			if (!lapTime || !baseLapTime)
-				lapTime := candidate
-			else if (candidate < lapTime)
-				lapTime := candidate
-
-			if lapTime {
-				if baseLapTime
-					avgLapTime += (lapTime + ((a + (b * (tyreLaps + A_Index))) - baseLapTime))
-				else
-					avgLapTime += lapTime
-
-				count += 1
-			}
-		}
-
-		if (avgLapTime > 0)
-			avgLapTime := (avgLapTime / count)
-
-		return avgLapTime ? avgLapTime : (default ? default : this.Strategy.AvgLapTime)
+		return Task.CurrentTask.Simulation.calcAvgLapTime(numLaps, map, remainingFuel, fuelConsumption, weather
+														, tyreCompound, tyreCompoundColor, tyreLaps
+														, default ? default : this.Strategy.AvgLapTime, this.SimulationTelemetryDatabase)
 	}
 
 	computeAvailableTyreSets(availableTyreSets) {

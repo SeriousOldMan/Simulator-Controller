@@ -584,15 +584,49 @@ systemMonitor(command := false, arguments*) {
 	}
 
 	updateSessionInfo(sessionState) {
-		local row := 1
-		local column := 1
-		local widgets := []
 		local html
 
-		static descriptors := getKeys(infoWidgets)
-		static index := 0
+		static widgets := []
+		static shows := 0
 
-		addInfoWidget(descriptor, fixedDescriptors := []) {
+		renderInfoWidgets(widgets) {
+			local html := "<table>"
+			local row := 1
+			local column := 1
+			local ignore, widget
+
+			for ignore, widget in widgets
+				if (row <= 2) {
+					if (column > 3) {
+						row += 1
+						column := 1
+
+						html .= "<tr><td> </td><td> </td><td> </td></tr>"
+						html .= "<tr><td> </td><td> </td><td> </td></tr>"
+					}
+
+					if (column = 1)
+						html .= "<tr><td style=`"padding-right: 25px`">"
+					else if (column = 2)
+						html .= "</td><td style=`"padding-right: 25px`">"
+					else
+						html .= "</td><td>"
+
+					html .= widget(sessionState)
+
+					if (column = 3)
+						html .= "</td></tr>"
+
+					column += 1
+				}
+
+			return (html . "</table")
+		}
+
+		addInfoWidget(widgets, descriptor, fixedDescriptors := []) {
+			static descriptors := getKeys(infoWidgets)
+			static index := 0
+
 			if (descriptor = "Cycle") {
 				loop {
 					if (++index > descriptors.Length)
@@ -605,40 +639,22 @@ systemMonitor(command := false, arguments*) {
 				descriptor := descriptors[index]
 			}
 
-			if (row <= 2) {
-				if (column > 3) {
-					row += 1
-					column := 1
-
-					html .= "<tr><td> </td><td> </td><td> </td></tr>"
-					html .= "<tr><td> </td><td> </td><td> </td></tr>"
-				}
-
-				if (column = 1)
-					html .= "<tr><td style=`"padding-right: 25px`">"
-				else if (column = 2)
-					html .= "</td><td style=`"padding-right: 25px`">"
-				else
-					html .= "</td><td>"
-
-				html .= infoWidgets[descriptor](sessionState)
-
-				widgets.Push(descriptor)
-
-				if (column = 3)
-					html .= "</td></tr>"
-
-				column += 1
-			}
+			widgets.Push(infoWidgets[descriptor])
 		}
 
-		if (sessionState.Count > 0) {
+		if (true || sessionState.Count > 0) {
 			html := "<style>" . getTableCSS(systemMonitorGui) . " div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { text-align: center; font-size: 12px; background-color: #" . systemMonitorGui.Theme.TableColor["Header"] . "; } td {vertical-align: top } </style><table>"
 
-			for ignore, descriptor in ["Session", "Duration", "Conditions", "Stint", "Cycle", "Cycle"]
-				addInfoWidget(descriptor, ["Session", "Duration", "Conditions", "Stint"])
+			if (--shows <= 0) {
+				widgets := []
 
-			html .= "</table>"
+				for ignore, descriptor in ["Session", "Duration", "Conditions", "Stint", "Cycle", "Cycle"]
+					addInfoWidget(widgets, descriptor, ["Session", "Duration", "Conditions", "Stint"])
+
+				shows := 3
+			}
+
+			html .= renderInfoWidgets(widgets)
 
 			updateDashboard(systemMonitorGui, sessionStateViewer, html)
 		}

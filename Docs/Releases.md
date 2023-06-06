@@ -1,4 +1,4 @@
-## 5.0.7.0-release 06/06/23 (planned)
+## 5.0.7.0-release 06/06/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. A new page has been added to the "System Monitor", where important [information about the current session](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#monitoring-health-and-activities) is displayed. The next release will introduce more widgets for this session dashboard and the possibility to create your own set to be displayed according to your personal preferences and needs.

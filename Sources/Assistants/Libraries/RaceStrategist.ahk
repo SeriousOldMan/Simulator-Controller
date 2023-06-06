@@ -1802,7 +1802,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 		setMultiMapValue(sessionInfo, "Session", "Simulator", this.SettingsDatabase.getSimulatorName(simulator))
 		setMultiMapValue(sessionInfo, "Session", "Car", this.SettingsDatabase.getCarName(simulator, car))
-		setMultiMapValue(sessionInfo, "Session", "Track", this.SettingsDatabase.getCarName(simulator, track))
+		setMultiMapValue(sessionInfo, "Session", "Track", this.SettingsDatabase.getTrackName(simulator, track))
 		setMultiMapValue(sessionInfo, "Session", "Type", sessionTypes[this.Session])
 		setMultiMapValue(sessionInfo, "Session", "Format", knowledgeBase.getValue("Session.Format", "Time"))
 		setMultiMapValue(sessionInfo, "Session", "Laps", lapNumber)

@@ -42,6 +42,8 @@
 ;;;                        Private Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+global kOk := "Ok"
+global kCancel := "Cancel"
 global kClose := "Close"
 
 global kStateIcons := CaseInsenseMap("Disabled", kIconsDirectory . "Black.ico"
@@ -149,18 +151,125 @@ getTableCSS(window) {
 									  , headerBackColor: window.Theme.TableColor["Header"], frameColor: window.Theme.TableColor["Frame"]})
 }
 
+editSettings(settingsOrCommand, arguments*) {
+	local settingsGui, x, y, row, column
+
+	static infoWidgets := []
+	static result := false
+	static settings := false
+	static widgets := []
+	static cycle := 5
+
+	getChoice(descriptor) {
+		if (descriptor = "Cycle")
+			return 1
+		else
+			return (inList(infoWidgets, descriptor) + 2)
+	}
+
+	updateWidget(dropDown, *) {
+		if (dropDown.Value = 2)
+			dropDown.Value := 1
+	}
+
+	if (settingsOrCommand == kOk)
+		result := kOk
+	else if (settingsOrCommand == kCancel)
+		result := kCancel
+	else {
+		infoWidgets := getKeys(arguments[1])
+		settings := settingsOrCommand
+		widgets := string2Values(",", getMultiMapValue(settings, "System Monitor", "Session Widgets", "Session,Stint,Duration,Conditions,Cycle,Cycle"))
+		cycle := getMultiMapValue(settings, "System Monitor", "Session Cycle", 30)
+
+		result := false
+
+		settingsGui := Window({Descriptor: "System Monitor.Settings", Options: "0x400000"}, "")
+
+		settingsGui.SetFont("s10 Bold", "Arial")
+
+		settingsGui.Add("Text", "w438 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(settingsGui, "System Monitor.Settings"))
+
+		settingsGui.SetFont("s9 Norm", "Arial")
+
+		settingsGui.Add("Documentation", "x148 YP+20 w164 H:Center Center", translate("Session Information")
+					  , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#monitoring-health-and-activities")
+
+		settingsGui.SetFont("s8 Norm", "Arial")
+
+		settingsGui.Add("Text", "x8 yp+30 w428 W:Grow 0x10")
+
+		settingsGui.Add("Text", "x16 yp+16 w100", translate("Update each"))
+		settingsGui.Add("DropDownList", "x120 yp-4 w100 vcycleDropDown Choose" . inList([5, 10, 15, 30], cycle), collect(["5 seconds", "10 seconds", "15 seconds", "30 seconds"], translate))
+
+		settingsGui.Add("Text", "x16 yp+30 w100", translate("Components"))
+
+		settingsGui.Add("DropDownList", "x120 yp-4 w100 vwidget11 Choose" . getChoice(widgets[1]), concatenate([translate("Cycle"), translate("------------------------")], collect(infoWidgets, translate))).OnEvent("Change", updateWidget)
+		settingsGui.Add("DropDownList", "x224 yp w100 vwidget12 Choose" . getChoice(widgets[2]), concatenate([translate("Cycle"), translate("------------------------")], collect(infoWidgets, translate))).OnEvent("Change", updateWidget)
+		settingsGui.Add("DropDownList", "x328 yp w100 vwidget13 Choose" . getChoice(widgets[3]), concatenate([translate("Cycle"), translate("------------------------")], collect(infoWidgets, translate))).OnEvent("Change", updateWidget)
+
+		settingsGui.Add("DropDownList", "x120 yp+24 w100 vwidget21 Choose" . getChoice(widgets[4]), concatenate([translate("Cycle"), translate("------------------------")], collect(infoWidgets, translate))).OnEvent("Change", updateWidget)
+		settingsGui.Add("DropDownList", "x224 yp w100 vwidget22 Choose" . getChoice(widgets[5]), concatenate([translate("Cycle"), translate("------------------------")], collect(infoWidgets, translate))).OnEvent("Change", updateWidget)
+		settingsGui.Add("DropDownList", "x328 yp w100 vwidget23 Choose" . getChoice(widgets[6]), concatenate([translate("Cycle"), translate("------------------------")], collect(infoWidgets, translate))).OnEvent("Change", updateWidget)
+
+		settingsGui.Add("Text", "x8 yp+30 w428 W:Grow 0x10")
+
+		settingsGui.Add("Button", "x142 yp+10 w80 h23 Default", translate("Ok")).OnEvent("Click", editSettings.Bind(kOk))
+		settingsGui.Add("Button", "x228 yp w80 h23", translate("&Cancel")).OnEvent("Click", editSettings.Bind(kCancel))
+
+		settingsGui.Opt("+Owner" . arguments[2].Hwnd)
+
+		if getWindowPosition("System Monitor.Settings", &x, &y)
+			settingsGui.Show("x" . x . " y" . y)
+		else
+			settingsGui.Show("AutoSize Center")
+
+		while !result
+			Sleep(100)
+
+		try {
+			if (result == kCancel)
+				return false
+			else if (result == kOk) {
+				setMultiMapValue(settings, "System Monitor", "Session Cycle", [5, 10, 15, 30][settingsGui["cycleDropDown"].Value])
+
+				loop 2 {
+					row := A_Index
+
+					loop 3 {
+						column := A_Index
+
+						widgets[((row - 1) * 3) + column]
+							:= ((settingsGui["widget" . row . column].Value = 1) ? "Cycle"
+																				 : infoWidgets[settingsGui["widget" . row . column].Value - 2])
+					}
+				}
+
+				setMultiMapValue(settings, "System Monitor", "Session Widgets", values2String(",", widgets*))
+
+				return true
+			}
+		}
+		finally {
+			settingsGui.Destroy()
+		}
+	}
+}
+
 systemMonitor(command := false, arguments*) {
 	global gStartupFinished
 
 	local x, y, time, logLevel
 	local controllerState, databaseState, trackMapperState, sessionInfo, ignore, assistant, plugin, icons, modules, key, value
-	local icon, state, property, drivers, choices, chosen
+	local icon, state, property, drivers, choices, chosen, settings
 
 	local serverURLValue, serverTokenValue, serverDriverValue, serverTeamValue, serverSessionValue
 	local stintNrValue, stintLapValue, stintDriverValue
 
 	static systemMonitorGui
 	static monitorTabView
+
+	static settingsButton
 
 	static stateIconsList := false
 	static stateIcons := false
@@ -215,6 +324,35 @@ systemMonitor(command := false, arguments*) {
 										 "Pitstop", createPitstopWidget,
 										 "Strategy", createStrategyWidget,
 										 "Standings", createStandingsWidget)
+
+	static sessionInfoWidgets := []
+	static sessionInfoSleep := 30000
+	static nextSessionUpdate := A_TickCount
+
+	modifySettings(systemMonitorGui, *) {
+		local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+		systemMonitorGui.Opt("+Disabled")
+
+		try {
+			if editSettings(settings, infoWidgets, systemMonitorGui) {
+				sessionInfoWidgets := string2Values(",", getMultiMapValue(settings, "System Monitor", "Session Widgets", "Session,Stint,Duration,Conditions,Cycle,Cycle"))
+				sessionInfoSleep := (getMultiMapValue(settings, "System Monitor", "Session Cycle", 30) * 1000)
+
+				settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+				setMultiMapValue(settings, "System Monitor", "Session Widgets", values2String(",", sessionInfoWidgets*))
+				setMultiMapValue(settings, "System Monitor", "Session Cycle", Round(sessionInfoSleep / 1000))
+
+				writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+
+				nextSessionUpdate := A_TickCount
+			}
+		}
+		finally {
+			systemMonitorGui.Opt("-Disabled")
+		}
+	}
 
 	createSessionWidget(sessionState) {
 		local html := ""
@@ -444,7 +582,7 @@ systemMonitor(command := false, arguments*) {
 			if (nextPitstop && pitstopsCount)
 				remainingPitstops := (pitstopsCount - nextPitstop + 1)
 
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Pitstops (Overall)") . "</th><td class=`"td-wdg`">" . pitstopsCount . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Pitstops (Planned)") . "</th><td class=`"td-wdg`">" . pitstopsCount . "</td></tr>")
 			html .= ("<tr><th class=`"th-std th-left`">" . translate("Pitstops (Remaining)") . "</th><td class=`"td-wdg`">" . remainingPitstops . "</td></tr>")
 
 			if nextPitstop {
@@ -502,7 +640,7 @@ systemMonitor(command := false, arguments*) {
 		html .= ("<tr><th class=`"th-std th-left`" colspan=`"3`"><div id=`"header`"><i>" . translate("Pitstop") . "</i></div></th></tr>")
 
 		if pitstopNr {
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Pitstop") . "</th><td class=`"td-wdg`" colspan=`"2`">" . pitstopNr . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Nr.") . "</th><td class=`"td-wdg`" colspan=`"2`">" . pitstopNr . "</td></tr>")
 
 			if pitstopLap
 				html .= ("<tr><th class=`"th-std th-left`">" . translate("Lap") . "</th><td class=`"td-wdg`" colspan=`"2`">" . pitstopLap . "</td></tr>")
@@ -529,7 +667,7 @@ systemMonitor(command := false, arguments*) {
 					   . displayValue("Float", convertUnit("Pressure", getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Pressure.RR"))) . "</td></tr>")
 			}
 			else
-				html .= ("<tr><th class=`"th-std th-left`">" . translate("Change Tyres") . "</th><td class=`"td-wdg`">" . translate("No") . "</td></tr>")
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyres") . "</th><td class=`"td-wdg`">" . translate("No") . "</td></tr>")
 
 			html .= ("<tr><th class=`"th-std th-left`">" . translate("Repairs") . "</th><td class=`"td-wdg`" colspan=`"2`">"
 														 . computeRepairs(getMultiMapValue(sessionState, "Pitstop", "Planned.Repair.Bodywork")
@@ -587,7 +725,8 @@ systemMonitor(command := false, arguments*) {
 		return html
 	}
 
-	updateSessionInfo(sessionState) {
+	updateSessionInfo(sessionState, sessionInfoWidgets) {
+		local staticWidgets := remove(sessionInfoWidgets, "Cycle")
 		local html
 
 		static widgets := []
@@ -646,17 +785,13 @@ systemMonitor(command := false, arguments*) {
 			widgets.Push(infoWidgets[descriptor])
 		}
 
-		if (true || sessionState.Count > 0) {
+		if (sessionState.Count > 0) {
 			html := "<style>" . getTableCSS(systemMonitorGui) . " div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { text-align: center; font-size: 12px; background-color: #" . systemMonitorGui.Theme.TableColor["Header"] . "; } td {vertical-align: top } </style><table>"
 
-			if (--shows <= 0) {
-				widgets := []
+			widgets := []
 
-				for ignore, descriptor in ["Session", "Duration", "Stint", "Conditions", "Cycle", "Cycle"]
-					addInfoWidget(widgets, descriptor, ["Session", "Duration", "Conditions", "Stint"])
-
-				shows := 3
-			}
+			for ignore, descriptor in sessionInfoWidgets
+				addInfoWidget(widgets, descriptor, staticWidgets)
 
 			html .= renderInfoWidgets(widgets)
 
@@ -1189,17 +1324,26 @@ systemMonitor(command := false, arguments*) {
 	}
 	else if (command = "UpdateSession") {
 		if (monitorTabView.Value = 2) {
-			sessionStateViewer.Show()
+			settingsButton.Enabled := true
 
+			sessionStateViewer.Show()
+		}
+		else {
+			settingsButton.Enabled := false
+
+			sessionStateViewer.Hide()
+		}
+
+		if (A_TickCount > nextSessionUpdate) {
 			sessionInfo := newMultiMap()
 
 			for ignore, assistant in ["Race Engineer", "Race Strategist", "Race Spotter"]
 				addMultiMapValues(sessionInfo, readMultiMap(kTempDirectory . assistant . " Session.state"))
 
-			updateSessionInfo(sessionInfo)
+			updateSessionInfo(sessionInfo, sessionInfoWidgets)
+
+			nextSessionUpdate := (A_TickCount + sessionInfoSleep)
 		}
-		else
-			sessionStateViewer.Hide()
 	}
 	else if (command = "LogMessage") {
 		try {
@@ -1261,6 +1405,10 @@ systemMonitor(command := false, arguments*) {
 						   , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#monitoring-health-and-activities")
 
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
+
+		settingsButton := systemMonitorGui.Add("Button", "x773 yp+4 w23 h23")
+		settingsButton.OnEvent("Click", modifySettings.Bind(systemMonitorGui))
+		setButtonIcon(settingsButton, kIconsDirectory . "General Settings.ico", 1)
 
 		systemMonitorGui.Add("Text", "x8 yp+26 w790 0x10")
 
@@ -1428,10 +1576,15 @@ systemMonitor(command := false, arguments*) {
 		updateDashboard(systemMonitorGui, mapperDashboard)
 		updateDashboard(systemMonitorGui, sessionStateViewer, "<div style=`"text-align: center; font-size: 14px`"><br><br><br>" . translate("No data available") . "</div>")
 
+		settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+		sessionInfoWidgets := string2Values(",", getMultiMapValue(settings, "System Monitor", "Session Widgets", "Session,Stint,Duration,Conditions,Cycle,Cycle"))
+		sessionInfoSleep := (getMultiMapValue(settings, "System Monitor", "Session Cycle", 30) * 1000)
+
 		PeriodicTask(systemMonitor.Bind("UpdateDashboard"), 2000, kLowPriority).start()
 		PeriodicTask(systemMonitor.Bind("UpdateModules"), 2000, kLowPriority).start()
 		PeriodicTask(systemMonitor.Bind("UpdateServer"), 5000, kLowPriority).start()
-		PeriodicTask(systemMonitor.Bind("UpdateSession"), 10000, kLowPriority).start()
+		PeriodicTask(systemMonitor.Bind("UpdateSession"), 1000, kLowPriority).start()
 
 		gStartupFinished := true
 	}

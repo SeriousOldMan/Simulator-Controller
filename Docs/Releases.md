@@ -1,3 +1,9 @@
+## 5.0.8.0-release 06/16/23 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. Four new widgets are available for the *Session* info page of the "System Monitor". The [corresponding documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#monitoring-health-and-activities) has been extended.
+  4. The widgets, that will be shown on then *Session* info page of the "System Monitor", can now be [configured individually](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#monitoring-health-and-activities).
+
 ## 5.0.7.0-release 06/06/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

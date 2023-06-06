@@ -238,9 +238,29 @@ The "System Monitor" is divided into several pages of information:
 	   
 	 - Tyres
 	 
-	   Shows the current pressures and tyre temperatures.
+	   Shows the current pressures and tyre temperatures, and tyre wear, if available.
+	   
+	 - Brakes
+	 
+	   Shows the current brake temperatures, and brake wear, if available.
+	   
+	 - Standings
+	 
+	   Gives you detailed information about your most important opponents, the leader, the car in front of you and the car behind you. For each opponent, the number of laps, the gap in seconds and the lap time is shown.
+	   
+	 - Strategy
+	 
+	   This widget give you a summary about the active strategy, if any. Most important is the summary about the next pending pitstop.
+	 
+	 - Pitstop
+	 
+	   When an upcoming pitstop has been planned, this widget will show you all relevant settings like fuel amount, tyre compound and pressures, as well as selected repairs.
 	 
 	 In most cases, redundant information is suppressed. For example, if the remaining session, stint and driver time are identical, only the remaining time is shown.
+	 
+	 The widgets, that will be shown, as well as the update frequency of the information can be configured by clicking on the settings button in the upper right corner of the "System Monitor" window.
+
+	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/System%20Monitor%207.JPG)
 
   3. Team
   

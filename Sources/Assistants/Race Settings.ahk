@@ -1370,7 +1370,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		settingsGui.Add("Text", "x66 yp+28 w270 0x10")
 
-		value := getMultiMapValue(settingsOrCommand, "Strategy Settings", "Strategy.Window.Considered", 2)
+		value := getMultiMapValue(settingsOrCommand, "Strategy Settings", "Strategy.Window.Considered", 3)
 
 		settingsGui.Add("Text", "x16 yp+15 w105 h23 +0x200", translate("Pitstop Window"))
 		settingsGui.Add("Edit", "x126 yp w50 h20 Limit1 Number VpitstopStrategyWindowEdit", value)

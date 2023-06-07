@@ -1494,7 +1494,7 @@ class RaceStrategist extends GridRaceAssistant {
 									, "Session.Settings.Pitstop.Service.Order", getMultiMapValue(settings, "Strategy Settings"
 																										 , "Service.Order", "Simultaneous")
 									, "Session.Settings.Pitstop.Strategy.Window.Considered", getMultiMapValue(settings, "Strategy Settings"
-																													  , "Strategy.Window.Considered", 2)))
+																													  , "Strategy.Window.Considered", 3)))
 	}
 
 	prepareSession(&settings, &data) {
@@ -2553,7 +2553,7 @@ class RaceStrategist extends GridRaceAssistant {
 					 , &overTakeDelta, &consideredTraffic) {
 		randomFactor := getMultiMapValue(this.Settings, "Strategy Settings", "Traffic.Randomness", 5)
 		numScenarios := getMultiMapValue(this.Settings, "Strategy Settings", "Traffic.Scenarios", 20)
-		variationWindow := getMultiMapValue(this.Settings, "Strategy Settings", "Traffic.Variation", 3)
+		variationWindow := this.KnowledgeBase.getValue("Session.Settings.Pitstop.Strategy.Window.Considered")
 
 		useLapTimeVariation := getMultiMapValue(this.Settings, "Strategy Settings", "Traffic.Variation.LapTime", true)
 		useDriverErrors := getMultiMapValue(this.Settings, "Strategy Settings", "Traffic.Variation.Errors", true)

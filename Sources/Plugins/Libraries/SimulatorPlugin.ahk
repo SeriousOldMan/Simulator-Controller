@@ -383,8 +383,7 @@ class SimulatorPlugin extends ControllerPlugin {
 		local function, decreaseFunction, mode, label, icon, actions, selectActions, descriptor
 
 		this.getPitstopActions(&actions, &selectActions)
-if action = "Strategy"
-	msgbox "here"
+
 		if actions.Has(action) {
 			decreaseFunction := false
 

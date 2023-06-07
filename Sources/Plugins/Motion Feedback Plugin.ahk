@@ -424,9 +424,9 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 				kSimFeedbackConnector := false
 			}
 
-			motionArguments := string2Values(A_Space, this.getArgumentValue("motion", ""))
+			motionArguments := string2Values(A_Space, substituteString(this.getArgumentValue("motion", ""), "  ", A_Space))
 			motionEffectsArguments := string2Values(",", this.getArgumentValue("motionEffects", ""))
-			motionEffectIntensityArguments := string2Values(A_Space, this.getArgumentValue("motionEffectIntensity", ""))
+			motionEffectIntensityArguments := string2Values(A_Space, substituteString(this.getArgumentValue("motionEffectIntensity", ""), "  ", A_Space))
 
 			if (motionArguments.Length == 4) {
 				initialIntensity := motionArguments[4]

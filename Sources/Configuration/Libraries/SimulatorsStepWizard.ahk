@@ -315,6 +315,28 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 			this.loadSimulatorActions(this.iCurrentSimulator, load)
 	}
 
+	validateActions() {
+		local wizard := this.SetupWizard
+		local ignore, simulator, mode, action, function, index
+
+		for ignore, simulator in this.Definition
+			if wizard.isApplicationSelected(simulator)
+				for ignore, mode in ["Pitstop", "Assistant"]
+					for ignore, action in this.getActions(mode, simulator)
+						if wizard.simulatorActionAvailable(simulator, mode, action) {
+							function := wizard.getSimulatorActionFunction(simulator, mode, action)
+
+							if isObject(function) {
+								index := inList(function, "")
+
+								if (index && (index < function.Length))
+									return false
+							}
+						}
+
+		return true
+	}
+
 	saveActions() {
 		if (this.iCurrentSimulator && this.SetupWizard.isModuleSelected("Controller"))
 			this.saveSimulatorActions(this.iCurrentSimulator)

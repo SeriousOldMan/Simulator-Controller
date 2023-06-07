@@ -9,6 +9,19 @@
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+substituteString(text, pattern, replacement) {
+	local result := text
+
+	loop {
+		text := result
+
+		result := StrReplace(text, pattern, replacement)
+	}
+	until (result = text)
+
+	return result
+}
+
 substituteVariables(text, values := false) {
 	local result := text
 	local variable, startPos, endPos, value

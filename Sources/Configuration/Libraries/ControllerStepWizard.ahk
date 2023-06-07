@@ -769,7 +769,7 @@ class ControllerPreviewStepWizard extends StepWizard {
 			moveByMouse(window)
 
 			WinGetPos(&x, &y, &width, &height, window)
-			
+
 			x := screen2Window(x)
 			y := screen2Window(y)
 
@@ -1040,6 +1040,20 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 	}
 
 	hidePage(page) {
+		local msgResult
+
+		if this.SetupWizard.isModuleSelected("Controller")
+			this.saveActions()
+
+		if !this.validateActions() {
+			OnMessage(0x44, translateYesNoButtons)
+			msgResult := MsgBox(translate("Not all chosen functions has been completely configured. Do you really want to proceed?"), translate("Warning"), 262436)
+			OnMessage(0x44, translateYesNoButtons, 0)
+
+			if (msgResult = "No")
+				return false
+		}
+
 		if super.hidePage(page) {
 			ActionsStepWizard.sCurrentActionsStep := false
 
@@ -1057,6 +1071,10 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 
 	loadActions(load := false) {
 		throw "Virtual method ActionsStepWizard.loadActions must be implemented in a subclass..."
+	}
+
+	validateActions() {
+		return true
 	}
 
 	saveActions() {

@@ -703,8 +703,12 @@ class RaceStrategist extends GridRaceAssistant {
 		if values.HasProp("OriginalStrategy")
 			this.iOriginalStrategy := values.OriginalStrategy
 
-		if values.HasProp("Strategy")
+		if values.HasProp("Strategy") {
+			if (this.iRejectedStrategy && (this.iRejectedStrategy != values.RejectedStrategy))
+				this.iRejectedStrategy.dispose()
+
 			this.iStrategy := values.Strategy
+		}
 
 		if values.HasProp("RaceInfo")
 			this.iRaceInfo := values.RaceInfo
@@ -719,8 +723,12 @@ class RaceStrategist extends GridRaceAssistant {
 		if values.HasProp("StrategyReported")
 			this.iStrategyReported := values.StrategyReported
 
-		if values.HasProp("RejectedStrategy")
+		if values.HasProp("RejectedStrategy") {
+			if (this.iRejectedStrategy && (this.iRejectedStrategy != values.RejectedStrategy))
+				this.iRejectedStrategy.dispose()
+
 			this.iRejectedStrategy := values.RejectedStrategy
+		}
 	}
 
 	hasEnoughData(inform := true) {
@@ -2899,7 +2907,7 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 	}
 
-	betterScenario(strategy, scenario) {
+	betterScenario(strategy, scenario, &report := true) {
 		local knowledgeBase := this.KnowledgeBase
 		local sPitstops, cPitstops, sLaps, cLaps, sDuration, cDuration, sFuel, cFuel, sPLaps, cPLaps, sTLaps, cTLaps, sTSets, cTSets
 		local result
@@ -3008,127 +3016,162 @@ class RaceStrategist extends GridRaceAssistant {
 			result += StrategySimulation.scenarioCoefficient("ResultMajor", cDuration - sDuration, (strategy.AvgLapTime + scenario.AvgLapTime) / 4)
 
 		if (result > 0)
-			return false
+			result := false
 		else if (result < 0)
-			return true
+			result := true
 		else if (scenario.getRemainingFuel() > strategy.getRemainingFuel())
-			return false
+			result := false
 		else if (scenario.getRemainingFuel() < strategy.getRemainingFuel())
-			return true
+			result := true
 		else if ((scenario.FuelConsumption[true] > strategy.FuelConsumption[true]))
-			return false
+			result := false
 		else
-			return true
+			result := true
+
+		if result {
+			if (sPitstops != cPitstops)
+				report := true
+			else if (cPitstops.Length != 0) {
+				sPitstop := strategy.Pitstops[strategy.RunningPitstops + 1]
+				cPitstop := scenario.Pitstops[1]
+
+				report := ((sPitstop.Lap != cPitstop.Lap)
+						|| (Abs(sPitstop.RefuelAmount - cPitstop.RefuelAmount) > 2)
+						|| (sPitstop.TyreChange != sPitstop.TyreChange)
+						|| (sPitstop.TyreChange && ((sPitstop.TyreCompound != cPitstop.TyreCompound)
+												 || (sPitstop.TyreCompoundColor != cPitstop.TyreCompoundColor))))
+			}
+			else
+				report := false
+		}
+
+		return result
 	}
 
 	chooseScenario(strategy, confirm?) {
-		local configuration, fileName, request
+		local dispose := true
+		local configuration, fileName, request, report
 
-		if !isSet(confirm) {
-			request := Task.CurrentTask.Request
+		try {
+			if !isSet(confirm) {
+				request := Task.CurrentTask.Request
 
-			if (request = "User") {
-				confirm := true
+				if (request = "User") {
+					confirm := true
 
-				if strategy {
-					this.reportStrategy({Strategy: false, Pitstops: true, NextPitstop: true, TyreChange: true, Refuel: true, Map: true}, strategy)
-
-					if ((this.Strategy != this.Strategy[true]) || isDebug())
-						this.explainStrategyRecommendation(strategy)
-
-					if this.Speaker {
-						this.getSpeaker().speakPhrase("ConfirmUpdateStrategy", false, true)
-
-						this.setContinuation(RaceStrategist.ConfirmStrategyUpdateContinuation(this, strategy, false))
-
-						return
-					}
-				}
-			}
-			else {
-				if strategy {
-					if (this.Strategy["Rejected"] && !this.betterScenario(this.Strategy["Rejected"], strategy))
-						return
-					else if ((this.Strategy != this.Strategy[true]) && !this.betterScenario(this.Strategy, strategy))
-						return
-
-					if this.Speaker {
-						this.getSpeaker().speakPhrase("StrategyUpdate")
-
+					if strategy {
 						this.reportStrategy({Strategy: false, Pitstops: true, NextPitstop: true, TyreChange: true, Refuel: true, Map: true}, strategy)
 
 						if ((this.Strategy != this.Strategy[true]) || isDebug())
 							this.explainStrategyRecommendation(strategy)
 
-						if Task.CurrentTask.Confirm {
+						if this.Speaker {
 							this.getSpeaker().speakPhrase("ConfirmUpdateStrategy", false, true)
 
-							this.setContinuation(RaceStrategist.ConfirmStrategyUpdateContinuation(this, strategy, true))
+							this.setContinuation(RaceStrategist.ConfirmStrategyUpdateContinuation(this, strategy, false))
+
+							dispose := false
 
 							return
 						}
 					}
 				}
+				else {
+					if strategy {
+						report := true
+
+						if (request != "Pitstop")
+							if (this.Strategy["Rejected"] && !this.betterScenario(this.Strategy["Rejected"], strategy, report))
+								return
+							else if ((this.Strategy != this.Strategy[true]) && !this.betterScenario(this.Strategy, strategy, report))
+								return
+
+						if (report && this.Speaker) {
+							this.getSpeaker().speakPhrase("StrategyUpdate")
+
+							this.reportStrategy({Strategy: false, Pitstops: true, NextPitstop: true, TyreChange: true, Refuel: true, Map: true}, strategy)
+
+							if ((this.Strategy != this.Strategy[true]) || isDebug())
+								this.explainStrategyRecommendation(strategy)
+
+							if Task.CurrentTask.Confirm {
+								this.getSpeaker().speakPhrase("ConfirmUpdateStrategy", false, true)
+
+								this.setContinuation(RaceStrategist.ConfirmStrategyUpdateContinuation(this, strategy, true))
+
+								dispose := false
+
+								return
+							}
+						}
+					}
+					else
+						return
+				}
+			}
+
+			if strategy {
+				if this.Strategy[true]
+					strategy.PitstopRule := this.Strategy[true].PitstopRule
+
+				if (isDebug() && !this.RemoteHandler) {
+					configuration := newMultiMap()
+
+					strategy.saveToConfiguration(configuration)
+
+					writeMultiMap(kTempDirectory . "Race Strategist.strategy", configuration)
+				}
+
+				dispose := false
+
+				strategy.setVersion(A_Now . "")
+
+				Task.startTask(ObjBindMethod(this, "updateStrategy", strategy, false, false), 1000)
+
+				if this.RemoteHandler {
+					fileName := temporaryFileName("Race Strategy", "update")
+					configuration := newMultiMap()
+
+					strategy.saveToConfiguration(configuration)
+
+					writeMultiMap(fileName, configuration)
+
+					if isDebug()
+						try {
+							FileCopy(fileName, kTempDirectory . "Race Strategist.strategy", 1)
+						}
+						catch Any as exception {
+							logError(exception)
+						}
+
+					this.RemoteHandler.updateStrategy(fileName)
+				}
+			}
+			else {
+				cancelStrategy() {
+					Task.startTask(ObjBindMethod(this, "cancelStrategy", false), 1000)
+
+					if isDebug()
+						deleteFile(kTempDirectory . "Race Strategist.strategy")
+
+					if this.RemoteHandler
+						this.RemoteHandler.updateStrategy(false)
+				}
+
+				if (confirm && this.Speaker) {
+					this.getSpeaker().speakPhrase("NoValidStrategy")
+
+					this.getSpeaker().speakPhrase("ConfirmCancelStrategy", false, true)
+
+					this.setContinuation(cancelStrategy)
+				}
 				else
-					return
+					cancelStrategy()
 			}
 		}
-
-		if strategy {
-			if this.Strategy[true]
-				strategy.PitstopRule := this.Strategy[true].PitstopRule
-
-			if (isDebug() && !this.RemoteHandler) {
-				configuration := newMultiMap()
-
-				strategy.saveToConfiguration(configuration)
-
-				writeMultiMap(kTempDirectory . "Race Strategist.strategy", configuration)
-			}
-
-			strategy.setVersion(A_Now . "")
-
-			Task.startTask(ObjBindMethod(this, "updateStrategy", strategy, false, false), 1000)
-
-			if this.RemoteHandler {
-				fileName := temporaryFileName("Race Strategy", "update")
-				configuration := newMultiMap()
-
-				strategy.saveToConfiguration(configuration)
-
-				writeMultiMap(fileName, configuration)
-
-				if isDebug()
-					try {
-						FileCopy(fileName, kTempDirectory . "Race Strategist.strategy", 1)
-					}
-					catch Any as exception {
-						logError(exception)
-					}
-
-				this.RemoteHandler.updateStrategy(fileName)
-			}
-		}
-		else {
-			cancelStrategy() {
-				Task.startTask(ObjBindMethod(this, "cancelStrategy", false), 1000)
-
-				if isDebug()
-					deleteFile(kTempDirectory . "Race Strategist.strategy")
-
-				if this.RemoteHandler
-					this.RemoteHandler.updateStrategy(false)
-			}
-
-			if (confirm && this.Speaker) {
-				this.getSpeaker().speakPhrase("NoValidStrategy")
-
-				this.getSpeaker().speakPhrase("ConfirmCancelStrategy", false, true)
-
-				this.setContinuation(cancelStrategy)
-			}
-			else
-				cancelStrategy()
+		finally {
+			if (dispose && strategy)
+				strategy.dispose()
 		}
 	}
 

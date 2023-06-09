@@ -2166,7 +2166,8 @@ class RaceStrategist extends GridRaceAssistant {
 	reportStrategy(options := true, strategy := false) {
 		local knowledgeBase := this.KnowledgeBase
 		local reported := false
-		local strategyName, speaker, nextPitstop, lap, refuel, tyreChange, map
+		local activeStrategy, activePitstop, strategyName, speaker, nextPitstop, lap, refuel, tyreChange, map
+		local fragments
 
 		if this.Speaker {
 			speaker := this.getSpeaker()
@@ -2175,11 +2176,21 @@ class RaceStrategist extends GridRaceAssistant {
 				speaker.beginTalk()
 
 				try {
+					fragments := speaker.Fragments
+					activeStrategy := (isObject(options) && options.HasProp("Active") && options.Active)
+
 					if ((options == true) || (options.HasProp("Strategy") && options.Strategy))
 						speaker.speakPhrase("Strategy")
 
 					if ((options == true) || (options.HasProp("Pitstops") && options.Pitstops)) {
 						speaker.speakPhrase("Pitstops", {pitstops: strategy.Pitstops.Length})
+
+						if activeStrategy {
+							difference := (strategy.Pitstops.Length - (activeStrategy.Pitstops.Length - activeStrategy.RunningPitstops))
+
+							if (difference != 0)
+								speaker.speakPhrase("PitstopsDifference", {pitstops: Abs(difference), difference: (difference < 0) ? fragments["Less"] : fragments["More"]})
+						}
 
 						reported := true
 					}
@@ -2188,18 +2199,52 @@ class RaceStrategist extends GridRaceAssistant {
 
 					if nextPitstop {
 						if ((options == true) || (options.HasProp("NextPitstop") && options.NextPitstop)) {
+							activePitstop := false
 							lap := nextPitstop.Lap
 							refuel := Round(nextPitstop.RefuelAmount)
 							tyreChange := nextPitstop.TyreChange
 
+							if activeStrategy
+								if ((activeStrategy.Pitstops.Length - activeStrategy.RunningPitstops) > 0)
+									activePitstop := activeStrategy.Pitstops[strategy.RunningPitstops + 1]
+
 							speaker.speakPhrase("NextPitstop", {pitstopLap: lap})
 
-							if ((options == true) || (options.HasProp("Refuel") && options.Refuel))
+							if (activeStrategy && activePitstop) {
+								difference := (lap - activePitstop.Lap)
+
+								if (difference != 0)
+									speaker.speakPhrase("LapsDifference", {laps: Abs(difference)
+																		 , label: (Abs(difference) = 1) ? fragments["Lap"] : fragments["Laps"]
+																		 , difference: (difference < 0) ? fragments["Earlier"] : fragments["Later"]})
+							}
+
+							if ((options == true) || (options.HasProp("Refuel") && options.Refuel)) {
 								speaker.speakPhrase((refuel > 0) ? "Refuel" : "NoRefuel"
 												  , {fuel: displayValue("Float", convertUnit("Volume", refuel)), unit: speaker.Fragments[getUnit("Volume")]})
 
-							if ((options == true) || (options.HasProp("TyreChange") && options.TyreChange))
+								if activePitstop {
+									difference := (refuel - Round(activePitstop.RefuelAmount))
+
+									if (difference != 0)
+										speaker.speakPhrase("RefuelDifference", {refuel: Abs(difference), unit: Fragments[getUnit("Volume")], difference: (difference < 0) ? fragments["Less"] : fragments["More"]})
+								}
+							}
+
+							if ((options == true) || (options.HasProp("TyreChange") && options.TyreChange)) {
 								speaker.speakPhrase(tyreChange ? "TyreChange" : "NoTyreChange")
+
+								if activePitstop {
+									if (nextPitstop.TyreChange && !activePitstop.TyreChange)
+										speaker.speakPhrase("TyreChangeDifference")
+									else if (!nextPitstop.TyreChange && activePitstop.TyreChange)
+										speaker.speakPhrase("NoTyreChangeDifference")
+									else if (nextPitstop.TyreChange
+										  && (nextPitstop.TyreCompound != activePitstop.TyreCompound)
+										  && (nextPitstop.TyreCompoundColor != activePitstop.TyreCompoundColor))
+										speaker.speakPhrase("TyreCompoundDifference")
+								}
+							}
 						}
 					}
 					else if ((options == true) || (options.HasProp("NextPitstop") && options.NextPitstop))
@@ -3089,7 +3134,7 @@ class RaceStrategist extends GridRaceAssistant {
 						if (report && this.Speaker) {
 							this.getSpeaker().speakPhrase("StrategyUpdate")
 
-							this.reportStrategy({Strategy: false, Pitstops: true, NextPitstop: true, TyreChange: true, Refuel: true, Map: true}, strategy)
+							this.reportStrategy({Strategy: false, Pitstops: true, NextPitstop: true, TyreChange: true, Refuel: true, Map: true, Active: this.Strategy}, strategy)
 
 							if ((this.Strategy != this.Strategy[true]) || isDebug())
 								this.explainStrategyRecommendation(strategy)

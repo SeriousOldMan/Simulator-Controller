@@ -257,20 +257,21 @@ setMultiMapValue(multiMap, section, key, value) {
 	multiMap[section][key] := value
 }
 
-setMultiMapValues(multiMap, section, values) {
+setMultiMapValues(multiMap, section, values, clear := true) {
 	local key, value
 
-	removeMultiMapValues(multiMap, section)
+	if clear
+		removeMultiMapValues(multiMap, section)
 
 	for key, value in values
 		setMultiMapValue(multiMap, section, key, value)
 }
 
-addMultiMapValues(multiMap, otherMultiMap) {
+addMultiMapValues(multiMap, otherMultiMap, clear := false) {
 	local section, values
 
 	for section, values in otherMultiMap
-		setMultiMapValues(multiMap, section, values)
+		setMultiMapValues(multiMap, section, values, clear)
 }
 
 removeMultiMapValue(multiMap, section, key) {

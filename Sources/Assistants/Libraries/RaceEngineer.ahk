@@ -1393,6 +1393,42 @@ class RaceEngineer extends RaceAssistant {
 		return data
 	}
 
+	createSessionInfo(lapNumber, data, simulator, car, track) {
+		local knowledgeBase := this.KnowledgeBase
+		local sessionInfo := newMultiMap()
+		local prepared, tyreCompound
+
+		prepared := this.hasPreparedPitstop()
+
+		if (this.hasPlannedPitstop() || prepared) {
+			setMultiMapValue(sessionInfo, "Pitstop", "Planned.Nr", knowledgeBase.getValue("Pitstop.Planned.Nr"))
+			setMultiMapValue(sessionInfo, "Pitstop", "Planned.Lap", knowledgeBase.getValue("Pitstop.Planned.Lap", false))
+			setMultiMapValue(sessionInfo, "Pitstop", "Planned.Refuel", knowledgeBase.getValue("Pitstop.Planned.Fuel", 0))
+
+			tyreCompound := knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound", false)
+
+			setMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Compound", tyreCompound)
+
+			if tyreCompound {
+				setMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Compound.Color", knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound.Color", false))
+				setMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Set", knowledgeBase.getValue("Pitstop.Planned.Tyre.Set", 0))
+
+				setMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Pressure.FL", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL", 0), 1))
+				setMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Pressure.FR", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR", 0), 1))
+				setMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Pressure.RL", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL", 0), 1))
+				setMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Pressure.RR", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR", 0), 1))
+			}
+
+			setMultiMapValue(sessionInfo, "Pitstop", "Planned.Repair.Bodywork", knowledgeBase.getValue("Pitstop.Planned.Repair.Bodywork", false))
+			setMultiMapValue(sessionInfo, "Pitstop", "Planned.Repair.Suspension", knowledgeBase.getValue("Pitstop.Planned.Repair.Suspension", false))
+			setMultiMapValue(sessionInfo, "Pitstop", "Planned.Repair.Engine", knowledgeBase.getValue("Pitstop.Planned.Repair.Engine", false))
+
+			setMultiMapValue(sessionInfo, "Pitstop", "Prepared", prepared)
+		}
+
+		this.saveSessionInfo(lapNumber, simulator, car, track, sessionInfo)
+	}
+
 	addLap(lapNumber, &data) {
 		local knowledgeBase := this.KnowledgeBase
 		local driverForname := ""
@@ -1437,6 +1473,10 @@ class RaceEngineer extends RaceAssistant {
 			this.getSpeaker().speakPhrase("WelcomeBack")
 
 		lastLap := lapNumber
+
+		simulator := knowledgeBase.getValue("Session.Simulator")
+		car := knowledgeBase.getValue("Session.Car")
+		track := knowledgeBase.getValue("Session.Track")
 
 		if (this.SaveTyrePressures != kNever) {
 			knowledgeBase := this.KnowledgeBase
@@ -1497,9 +1537,7 @@ class RaceEngineer extends RaceAssistant {
 
 						logMessage(kLogDebug, "Saving pressures for " . lapNumber)
 
-						this.savePressureData(lapNumber, knowledgeBase.getValue("Session.Simulator")
-													   , knowledgeBase.getValue("Session.Car"), knowledgeBase.getValue("Session.Track")
-													   , weatherNow, airTemperature, trackTemperature
+						this.savePressureData(lapNumber, simulator, car, track, weatherNow, airTemperature, trackTemperature
 													   , currentCompound, currentCompoundColor, coldPressures, hotPressures, pressuresLosses)
 					}
 					catch Any as exception {
@@ -1507,6 +1545,8 @@ class RaceEngineer extends RaceAssistant {
 					}
 			}
 		}
+
+		Task.startTask(ObjBindMethod(this, "createSessionInfo", lapNumber, data, simulator, car, track), 1000, kLowPriority)
 
 		return result
 	}
@@ -1607,6 +1647,11 @@ class RaceEngineer extends RaceAssistant {
 			if this.Debug[kDebugKnowledgeBase]
 				this.dumpKnowledgeBase(this.KnowledgeBase)
 		}
+
+		Task.startTask(ObjBindMethod(this, "createSessionInfo", lapNumber, data
+															  , knowledgeBase.getValue("Session.Simulator")
+															  , knowledgeBase.getValue("Session.Car")
+															  , knowledgeBase.getValue("Session.Track")), 1000, kLowPriority)
 
 		return result
 	}

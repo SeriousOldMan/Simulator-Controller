@@ -689,7 +689,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			raceAssistantToggle := this.getArgumentValue("raceAssistant", false)
 
 			if raceAssistantToggle {
-				arguments := string2Values(A_Space, raceAssistantToggle)
+				arguments := string2Values(A_Space, substituteString(raceAssistantToggle, "  ", A_Space))
 
 				if (arguments.Length == 0)
 					arguments := ["On"]
@@ -708,7 +708,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			teamServerToggle := this.getArgumentValue("teamServer", false)
 
 			if (teamServerToggle && teamServer && teamServer.Active) {
-				arguments := string2Values(A_Space, teamServerToggle)
+				arguments := string2Values(A_Space, substituteString(teamServerToggle, "  ", A_Space))
 
 				if (arguments.Length == 0)
 					arguments := ["Off"]
@@ -756,7 +756,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				this.createRaceAssistantAction(controller, "RaceCenterOpen", openRaceCenter)
 
 			for ignore, theAction in string2Values(",", this.getArgumentValue("assistantCommands", ""))
-				this.createRaceAssistantAction(controller, string2Values(A_Space, theAction)*)
+				this.createRaceAssistantAction(controller, string2Values(A_Space, substituteString(theAction, "  ", A_Space))*)
 
 			this.iRaceAssistantSynthesizer := this.getArgumentValue("raceAssistantSynthesizer", false)
 
@@ -843,9 +843,41 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	writePluginState(configuration) {
-		local session, information
+		local tries := 10
+		local session, information, state
+
+		static nextUpdate := 0
 
 		if this.Active {
+			if (this.TeamSessionActive && this.TeamSessionActive && (A_TickCount > nextUpdate))
+				try {
+					nextUpdate := (A_TickCount + 30000)
+
+					state := this.TeamServer.getSessionValue(this.Plugin . " Session Info", false)
+
+					if (state && (state != ""))
+						loop
+							try {
+								if !deleteFile(kTempDirectory . this.Plugin . " Session.state")
+									throw "Cannot delete file..."
+
+								FileAppend(state, kTempDirectory . this.Plugin . " Session.state")
+
+								break
+							}
+							catch Any as exception {
+								logError(exception)
+
+								if (tries-- <= 0)
+									break
+								else
+									Sleep(200)
+							}
+				}
+				catch Any as exception {
+					logError(exception)
+				}
+
 			if this.RaceAssistantEnabled {
 				if (this.RaceAssistant && !this.RaceAssistantActive && !this.WaitForShutdown) {
 					setMultiMapValue(configuration, "Race Assistants", this.Plugin, "Waiting")
@@ -1746,6 +1778,35 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	restoreSessionState(data) {
 		if (this.RaceAssistant && this.TeamSessionActive)
 			RaceAssistantPlugin.RestoreSessionStateTask(this, data).start()
+	}
+
+	saveSessionInfo(lapNumber, fileName) {
+		local teamServer := this.TeamServer
+		local tries := 10
+
+		if (teamServer && teamServer.SessionActive && this.TeamSessionActive) {
+			teamServer.setSessionValue(this.Plugin . " Session Info", fileName)
+
+			deleteFile(fileName)
+		}
+		else {
+			deleteFile(kTempDirectory . this.Plugin . " Session.state")
+
+			loop
+				try {
+					FileMove(fileName, kTempDirectory . this.Plugin . " Session.state")
+
+					break
+				}
+				catch Any as exception {
+					logError(exception)
+
+					if (tries-- <= 0)
+						break
+					else
+						Sleep(200)
+				}
+		}
 	}
 
 	static collectSessionData() {

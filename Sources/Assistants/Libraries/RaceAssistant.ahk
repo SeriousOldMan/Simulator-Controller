@@ -123,6 +123,10 @@ class RaceAssistant extends ConfigurationItem {
 		saveLapState(arguments*) {
 			this.callRemote("callSaveLapState", arguments*)
 		}
+
+		saveSessionInfo(arguments*) {
+			this.callRemote("saveSessionInfo", arguments*)
+		}
 	}
 
 	class RaceVoiceManager extends VoiceManager {
@@ -1554,6 +1558,18 @@ class RaceAssistant extends ConfigurationItem {
 
 				writeMultiMap(fileName, settings)
 			}
+		}
+	}
+
+	saveSessionInfo(lapNumber, simulator, car, track, sessionInfo) {
+		local fileName
+
+		if this.RemoteHandler {
+			fileName := temporaryFileName("Session." . lapNumber, "info")
+
+			writeMultiMap(fileName, sessionInfo)
+
+			this.RemoteHandler.saveSessionInfo(lapNumber, fileName)
 		}
 	}
 

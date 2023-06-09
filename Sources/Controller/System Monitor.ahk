@@ -42,6 +42,8 @@
 ;;;                        Private Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+global kOk := "Ok"
+global kCancel := "Cancel"
 global kClose := "Close"
 
 global kStateIcons := CaseInsenseMap("Disabled", kIconsDirectory . "Black.ico"
@@ -99,6 +101,14 @@ getTableCSS(window) {
 		.td-std {
 			border-left: thin solid #%frameColor%;
 			border-right: thin solid #%frameColor%;
+			margin-left: 5px;
+		}
+
+		.td-wdg {
+			border-left: thin solid #%frameColor%;
+			border-right: thin solid #%frameColor%;
+			padding-left: 5px;
+			padding-right: 5px;
 		}
 
 		.th-left {
@@ -141,18 +151,125 @@ getTableCSS(window) {
 									  , headerBackColor: window.Theme.TableColor["Header"], frameColor: window.Theme.TableColor["Frame"]})
 }
 
+editSettings(settingsOrCommand, arguments*) {
+	local settingsGui, x, y, row, column
+
+	static infoWidgets := []
+	static result := false
+	static settings := false
+	static widgets := []
+	static cycle := 5
+
+	getChoice(descriptor) {
+		if (descriptor = "Cycle")
+			return 1
+		else
+			return (inList(infoWidgets, descriptor) + 2)
+	}
+
+	updateWidget(dropDown, *) {
+		if (dropDown.Value = 2)
+			dropDown.Value := 1
+	}
+
+	if (settingsOrCommand == kOk)
+		result := kOk
+	else if (settingsOrCommand == kCancel)
+		result := kCancel
+	else {
+		infoWidgets := getKeys(arguments[1])
+		settings := settingsOrCommand
+		widgets := string2Values(",", getMultiMapValue(settings, "System Monitor", "Session Widgets", "Session,Stint,Duration,Conditions,Cycle,Cycle"))
+		cycle := getMultiMapValue(settings, "System Monitor", "Session Cycle", 30)
+
+		result := false
+
+		settingsGui := Window({Descriptor: "System Monitor.Settings", Options: "0x400000"}, "")
+
+		settingsGui.SetFont("s10 Bold", "Arial")
+
+		settingsGui.Add("Text", "w438 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(settingsGui, "System Monitor.Settings"))
+
+		settingsGui.SetFont("s9 Norm", "Arial")
+
+		settingsGui.Add("Documentation", "x148 YP+20 w164 H:Center Center", translate("Session Information")
+					  , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#monitoring-health-and-activities")
+
+		settingsGui.SetFont("s8 Norm", "Arial")
+
+		settingsGui.Add("Text", "x8 yp+30 w428 W:Grow 0x10")
+
+		settingsGui.Add("Text", "x16 yp+16 w100", translate("Update each"))
+		settingsGui.Add("DropDownList", "x120 yp-4 w100 vcycleDropDown Choose" . inList([5, 10, 15, 30], cycle), collect(["5 seconds", "10 seconds", "15 seconds", "30 seconds"], translate))
+
+		settingsGui.Add("Text", "x16 yp+30 w100", translate("Components"))
+
+		settingsGui.Add("DropDownList", "x120 yp-4 w100 vwidget11 Choose" . getChoice(widgets[1]), concatenate([translate("Cycle"), translate("------------------------")], collect(infoWidgets, translate))).OnEvent("Change", updateWidget)
+		settingsGui.Add("DropDownList", "x224 yp w100 vwidget12 Choose" . getChoice(widgets[2]), concatenate([translate("Cycle"), translate("------------------------")], collect(infoWidgets, translate))).OnEvent("Change", updateWidget)
+		settingsGui.Add("DropDownList", "x328 yp w100 vwidget13 Choose" . getChoice(widgets[3]), concatenate([translate("Cycle"), translate("------------------------")], collect(infoWidgets, translate))).OnEvent("Change", updateWidget)
+
+		settingsGui.Add("DropDownList", "x120 yp+24 w100 vwidget21 Choose" . getChoice(widgets[4]), concatenate([translate("Cycle"), translate("------------------------")], collect(infoWidgets, translate))).OnEvent("Change", updateWidget)
+		settingsGui.Add("DropDownList", "x224 yp w100 vwidget22 Choose" . getChoice(widgets[5]), concatenate([translate("Cycle"), translate("------------------------")], collect(infoWidgets, translate))).OnEvent("Change", updateWidget)
+		settingsGui.Add("DropDownList", "x328 yp w100 vwidget23 Choose" . getChoice(widgets[6]), concatenate([translate("Cycle"), translate("------------------------")], collect(infoWidgets, translate))).OnEvent("Change", updateWidget)
+
+		settingsGui.Add("Text", "x8 yp+30 w428 W:Grow 0x10")
+
+		settingsGui.Add("Button", "x142 yp+10 w80 h23 Default", translate("Ok")).OnEvent("Click", editSettings.Bind(kOk))
+		settingsGui.Add("Button", "x228 yp w80 h23", translate("&Cancel")).OnEvent("Click", editSettings.Bind(kCancel))
+
+		settingsGui.Opt("+Owner" . arguments[2].Hwnd)
+
+		if getWindowPosition("System Monitor.Settings", &x, &y)
+			settingsGui.Show("x" . x . " y" . y)
+		else
+			settingsGui.Show("AutoSize Center")
+
+		while !result
+			Sleep(100)
+
+		try {
+			if (result == kCancel)
+				return false
+			else if (result == kOk) {
+				setMultiMapValue(settings, "System Monitor", "Session Cycle", [5, 10, 15, 30][settingsGui["cycleDropDown"].Value])
+
+				loop 2 {
+					row := A_Index
+
+					loop 3 {
+						column := A_Index
+
+						widgets[((row - 1) * 3) + column]
+							:= ((settingsGui["widget" . row . column].Value = 1) ? "Cycle"
+																				 : infoWidgets[settingsGui["widget" . row . column].Value - 2])
+					}
+				}
+
+				setMultiMapValue(settings, "System Monitor", "Session Widgets", values2String(",", widgets*))
+
+				return true
+			}
+		}
+		finally {
+			settingsGui.Destroy()
+		}
+	}
+}
+
 systemMonitor(command := false, arguments*) {
 	global gStartupFinished
 
 	local x, y, time, logLevel
-	local controllerState, databaseState, trackMapperState, ignore, plugin, icons, modules, key, value
-	local icon, state, property, drivers, choices, chosen
+	local controllerState, databaseState, trackMapperState, sessionInfo, ignore, assistant, plugin, icons, modules, key, value
+	local icon, state, property, drivers, choices, chosen, settings
 
 	local serverURLValue, serverTokenValue, serverDriverValue, serverTeamValue, serverSessionValue
 	local stintNrValue, stintLapValue, stintDriverValue
 
 	static systemMonitorGui
 	static monitorTabView
+
+	static settingsButton
 
 	static stateIconsList := false
 	static stateIcons := false
@@ -197,150 +314,486 @@ systemMonitor(command := false, arguments*) {
 
 	static logLevelDropDown
 
-	updateSessionInfo(sessionState) {
-		local sessionTime, stintTime, driverTime, sessionLaps, stintLaps, fuelLow, weatherNow, weather10Min, weather30Min
-		local lastTime, bestTime, lastLap, lastValid, pressures, temperatures
+	static infoWidgets := CaseInsenseMap("Session", createSessionWidget,
+										 "Duration", createDurationWidget,
+										 "Conditions", createConditionsWidget,
+										 "Stint", createStintWidget,
+										 "Fuel", createFuelWidget,
+										 "Tyres", createTyresWidget,
+										 "Brakes", createBrakesWidget,
+										 "Pitstop", createPitstopWidget,
+										 "Strategy", createStrategyWidget,
+										 "Standings", createStandingsWidget)
+
+	static sessionInfoWidgets := []
+	static sessionInfoSleep := 30000
+	static nextSessionUpdate := A_TickCount
+
+	modifySettings(systemMonitorGui, *) {
+		local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+		systemMonitorGui.Opt("+Disabled")
+
+		try {
+			if editSettings(settings, infoWidgets, systemMonitorGui) {
+				sessionInfoWidgets := string2Values(",", getMultiMapValue(settings, "System Monitor", "Session Widgets", "Session,Stint,Duration,Conditions,Cycle,Cycle"))
+				sessionInfoSleep := (getMultiMapValue(settings, "System Monitor", "Session Cycle", 30) * 1000)
+
+				settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+				setMultiMapValue(settings, "System Monitor", "Session Widgets", values2String(",", sessionInfoWidgets*))
+				setMultiMapValue(settings, "System Monitor", "Session Cycle", Round(sessionInfoSleep / 1000))
+
+				writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+
+				nextSessionUpdate := A_TickCount
+			}
+		}
+		finally {
+			systemMonitorGui.Opt("-Disabled")
+		}
+	}
+
+	createSessionWidget(sessionState) {
+		local html := ""
+
+		html .= "<table class=`"table-std`">"
+		html .= ("<tr><th class=`"th-std th-left`" colspan=`"2`"><div id=`"header`"><i>" . translate("Session") . "</i></div></th></tr>")
+		html .= ("<tr><th class=`"th-std th-left`">" . translate("Simulator") . "</th><td class=`"td-wdg`">" . getMultiMapValue(sessionState, "Session", "Simulator") . "</td></tr>")
+		html .= ("<tr><th class=`"th-std th-left`">" . translate("Car") . "</th><td class=`"td-wdg`">" . getMultiMapValue(sessionState, "Session", "Car") . "</td></tr>")
+		html .= ("<tr><th class=`"th-std th-left`">" . translate("Track") . "</th><td class=`"td-wdg`">" . getMultiMapValue(sessionState, "Session", "Track") . "</td></tr>")
+		html .= ("<tr><th class=`"th-std th-left`">" . translate("Session") . "</th><td class=`"td-wdg`">" . translate(getMultiMapValue(sessionState, "Session", "Type")) . "</td></tr>")
+		html .= "</table>"
+
+		return html
+	}
+
+	createDurationWidget(sessionState) {
+		local sessionTime := getMultiMapValue(sessionState, "Session", "Time.Remaining")
+		local stintTime := getMultiMapValue(sessionState, "Stint", "Time.Remaining.Stint")
+		local driverTime := getMultiMapValue(sessionState, "Stint", "Time.Remaining.Driver")
+		local sessionLaps := getMultiMapValue(sessionState, "Session", "Laps.Remaining")
+		local stintLaps := getMultiMapValue(sessionState, "Stint", "Laps.Remaining.Stint")
+		local lastValid := getMultiMapValue(sessionState, "Stint", "Valid", true)
+		local lastTime := getMultiMapValue(sessionState, "Stint", "Lap.Time.Last")
+		local html := ""
+
+		lastTime := ((lastTime < 3600) ? displayValue("Time", lastTime) : "-")
+
+		html .= "<table class=`"table-std`">"
+		html .= ("<tr><th class=`"th-std th-left`" colspan=`"2`"><div id=`"header`"><i>" . translate("Duration") . "</i></div></th></tr>")
+		html .= ("<tr><th class=`"th-std th-left`">" . translate("Format") . "</th><td class=`"td-wdg`">" . translate(getMultiMapValue(sessionState, "Session", "Format")) . "</td></tr>")
+
+		if (sessionTime != stintTime) {
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Time Left (Session)") . "</th><td class=`"td-wdg`">" . displayValue("Time", sessionTime) . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Time Left (Stint)") . "</th><td class=`"td-wdg`">" . (((stintTime / lastTime) < 4) ? "<font color=`"red`">" : "") . displayValue("Time", stintTime) . (((stintTime / lastTime) < 4) ? "</font>" : "") . "</td></tr>")
+			if (driverTime != stintTime)
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Time Left (Driver)") . "</th><td class=`"td-wdg`">" . (((driverTime / lastTime) < 4) ? "<font color=`"red`">" : "") . displayValue("Time", driverTime) . (((driverTime / lastTime) < 4) ? "</font>" : "") . "</td></tr>")
+		}
+		else
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Time Left") . "</th><td class=`"td-wdg`">" . displayValue("Time", sessionTime) . "</td></tr>")
+
+		if (sessionLaps != stintLaps) {
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Laps Left (Session)") . "</th><td class=`"td-wdg`">" . sessionLaps . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Laps Left (Stint)") . "</th><td class=`"td-wdg`">" . ((stintLaps < 4) ? "<font color=`"red`">" : "") . stintLaps . ((stintLaps < 4) ? "</font>" : "") . "</td></tr>")
+		}
+		else
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Laps Left") . "</th><td class=`"td-wdg`">" . sessionLaps . "</td></tr>")
+
+		html .= "</table>"
+
+		return html
+	}
+
+	createConditionsWidget(sessionState) {
+		local weatherNow := getMultiMapValue(sessionState, "Weather", "Now")
+		local weather10Min := getMultiMapValue(sessionState, "Weather", "10Min")
+		local weather30Min := getMultiMapValue(sessionState, "Weather", "30Min")
+		local html := ""
+
+		html .= "<table class=`"table-std`">"
+		html .= ("<tr><th class=`"th-std th-left`" colspan=`"2`"><div id=`"header`"><i>" . translate("Conditions") . "</i></div></th></tr>")
+		html .= ("<tr><th class=`"th-std th-left`">" . translate("Weather") . "</th><td class=`"td-wdg`">" . translate(weatherNow) . "</td></tr>")
+		html .= ("<tr><th class=`"th-std th-left`">" . translate("Temperature (Air)") . "</th><td class=`"td-wdg`">" . displayValue("Float", convertUnit("Temperature", getMultiMapValue(sessionState, "Weather", "Temperature"))) . "</td></tr>")
+		html .= ("<tr><th class=`"th-std th-left`">" . translate("Temperature (Track)") . "</th><td class=`"td-wdg`">" . displayValue("Float", convertUnit("Temperature", getMultiMapValue(sessionState, "Track", "Temperature"))) . "</td></tr>")
+		html .= ("<tr><th class=`"th-std th-left`">" . translate("Grip") . "</th><td class=`"td-wdg`">" . translate(getMultiMapValue(sessionState, "Track", "Grip")) . "</td></tr>")
+		html .= ("<tr><th class=`"th-std th-left`">" . translate("Outlook (10 minutes)") . "</th><td class=`"td-wdg`">" . ((weather10Min != weatherNow) ? "<font color=`"red`">" : "") . translate(weather10Min) . ((weather10Min != weatherNow) ? "</font>" : "") . "</td></tr>")
+		html .= ("<tr><th class=`"th-std th-left`">" . translate("Outlook (30 minutes)") . "</th><td class=`"td-wdg`">" . ((weather30Min != weatherNow) ? "<font color=`"red`">" : "") . translate(weather30Min) . ((weather30Min != weatherNow) ? "</font>" : "") . "</td></tr>")
+		html .= "</table>"
+
+		return html
+	}
+
+	createStintWidget(sessionState) {
+		local lastLap := getMultiMapValue(sessionState, "Stint", "Lap")
+		local lastValid := getMultiMapValue(sessionState, "Stint", "Valid", true)
+		local lastTime := getMultiMapValue(sessionState, "Stint", "Lap.Time.Last")
+		local bestTime := getMultiMapValue(sessionState, "Stint", "Lap.Time.Best")
+		local html := ""
+
+		lastTime := ((lastTime < 3600) ? displayValue("Time", lastTime) : "-")
+		bestTime := ((bestTime < 3600) ? displayValue("Time", bestTime) : "-")
+
+		html .= "<table class=`"table-std`">"
+		html .= ("<tr><th class=`"th-std th-left`" colspan=`"2`"><div id=`"header`"><i>" . translate("Stint") . "</i></div></th></tr>")
+		html .= ("<tr><th class=`"th-std th-left`">" . translate("Driver") . "</th><td class=`"td-wdg`">" . getMultiMapValue(sessionState, "Stint", "Driver") . "</td></tr>")
+		html .= ("<tr><th class=`"th-std th-left`">" . translate("Lap") . "</th><td class=`"td-wdg`">" . lastLap . "</td></tr>")
+		html .= ("<tr><th class=`"th-std th-left`">" . translate("Position") . "</th><td class=`"td-wdg`">" . getMultiMapValue(sessionState, "Stint", "Position") . "</td></tr>")
+		html .= ("<tr><th class=`"th-std th-left`">" . translate("Lap Time (Last / Best)") . "</th><td class=`"td-wdg`">" . (!lastValid ? "<font color=`"red`">" : "") . lastTime . (!lastValid ? "</font>" : "") . translate(" / ") . bestTime . "</td></tr>")
+
+		if (lastLap != getMultiMapValue(sessionState, "Stint", "Laps"))
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Laps (Stint)") . "</th><td class=`"td-wdg`">" . getMultiMapValue(sessionState, "Stint", "Laps") . "</td></tr>")
+
+		html .= "</table>"
+
+		return html
+	}
+
+	createFuelWidget(sessionState) {
+		local fuelLow := (Floor(getMultiMapValue(sessionState, "Stint", "Laps.Remaining.Fuel")) < 4)
+		local html := ""
+
+		html .= "<table class=`"table-std`">"
+		html .= ("<tr><th class=`"th-std th-left`" colspan=`"2`"><div id=`"header`"><i>" . translate("Fuel") . "</i></div></th></tr>")
+		html .= ("<tr><th class=`"th-std th-left`">" . translate("Consumption (Lap)") . "</th><td class=`"td-wdg`">" . displayValue("Float", convertUnit("Volume", getMultiMapValue(sessionState, "Stint", "Fuel.Consumption"))) . "</td></tr>")
+		html .= ("<tr><th class=`"th-std th-left`">" . translate("Consumption (Avg.)") . "</th><td class=`"td-wdg`">" . displayValue("Float", convertUnit("Volume", getMultiMapValue(sessionState, "Stint", "Fuel.AvgConsumption"))) . "</td></tr>")
+		html .= ("<tr><th class=`"th-std th-left`">" . translate("Remaining Fuel") . "</th><td class=`"td-wdg`">" . displayValue("Float", convertUnit("Volume", getMultiMapValue(sessionState, "Stint", "Fuel.Remaining"))) . "</td></tr>")
+		html .= ("<tr><th class=`"th-std th-left`">" . translate("Remaining Laps") . "</th><td class=`"td-wdg`">" . (fuelLow ? "<font color=`"red`">" : "") . Floor(getMultiMapValue(sessionState, "Stint", "Laps.Remaining.Fuel")) . (fuelLow ? "</font>" : "") . "</td></tr>")
+		html .= "</table>"
+
+		return html
+	}
+
+	createTyresWidget(sessionState) {
+		local html := ""
+		local pressures, temperatures, wear
+
+		html .= "<table class=`"table-std`">"
+		html .= ("<tr><th class=`"th-std th-left`" colspan=`"3`"><div id=`"header`"><i>" . translate("Tyres") . "</i></div></th></tr>")
+
+		pressures := string2Values(",", getMultiMapValue(sessionState, "Tyres", "Pressures", ""))
+
+		if (pressures.Length = 4) {
+			html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Pressures") . "</th><td class=`"td-wdg`" text-align: right`">"
+				   . displayValue("Float", convertUnit("Pressure", pressures[1])) . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
+				   . displayValue("Float", convertUnit("Pressure", pressures[2])) . "</td></tr>")
+			html .= ("<tr><td class=`"td-wdg`" text-align: right`">"
+				   . displayValue("Float", convertUnit("Pressure", pressures[3])) . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
+				   . displayValue("Float", convertUnit("Pressure", pressures[4])) . "</td></tr>")
+		}
+		else {
+			html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Pressures") . "</th><td class=`"td-wdg`" text-align: right`">"
+				   . "-" . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
+				   . "-" . "</td></tr>")
+			html .= ("<tr><td class=`"td-wdg`" text-align: right`">"
+				   . "-" . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
+				   . "-" . "</td></tr>")
+		}
+
+		temperatures := string2Values(",", getMultiMapValue(sessionState, "Tyres", "Temperatures", ""))
+
+		if (temperatures.Length = 4) {
+			html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Temperatures") . "</th><td class=`"td-wdg`" text-align: right`">"
+				   . displayValue("Float", convertUnit("Temperature", temperatures[1])) . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
+				   . displayValue("Float", convertUnit("Temperature", temperatures[2])) . "</td></tr>")
+			html .= ("<tr><td class=`"td-wdg`" text-align: right`">"
+				   . displayValue("Float", convertUnit("Temperature", temperatures[3])) . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
+				   . displayValue("Float", convertUnit("Temperature", temperatures[4])) . "</td></tr>")
+		}
+		else {
+			html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Temperatures") . "</th><td class=`"td-wdg`" text-align: right`">"
+				   . "-" . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
+				   . "-" . "</td></tr>")
+			html .= ("<tr><td class=`"td-wdg`" text-align: right`">"
+				   . "-" . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
+				   . "-" . "</td></tr>")
+		}
+
+		wear := string2Values(",", getMultiMapValue(sessionState, "Tyres", "Wear", ""))
+
+		if (wear.Length = 4) {
+			html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Wear") . "</th><td class=`"td-wdg`" text-align: right`">"
+				   . displayValue("Float", convertUnit("Temperature", wear[1])) . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
+				   . displayValue("Float", convertUnit("Temperature", wear[2])) . "</td></tr>")
+			html .= ("<tr><td class=`"td-wdg`" text-align: right`">"
+				   . displayValue("Float", convertUnit("Temperature", wear[3])) . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
+				   . displayValue("Float", convertUnit("Temperature", wear[4])) . "</td></tr>")
+		}
+
+		html .= "</table>"
+
+		return html
+	}
+
+	createBrakesWidget(sessionState) {
+		local html := ""
+		local temperatures, wear
+
+		html .= "<table class=`"table-std`">"
+		html .= ("<tr><th class=`"th-std th-left`" colspan=`"3`"><div id=`"header`"><i>" . translate("Brakes") . "</i></div></th></tr>")
+
+		temperatures := string2Values(",", getMultiMapValue(sessionState, "Brakes", "Temperatures", ""))
+
+		if (temperatures.Length = 4) {
+			html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Temperatures") . "</th><td class=`"td-wdg`" text-align: right`">"
+				   . displayValue("Float", convertUnit("Temperature", temperatures[1])) . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
+				   . displayValue("Float", convertUnit("Temperature", temperatures[2])) . "</td></tr>")
+			html .= ("<tr><td class=`"td-wdg`" text-align: right`">"
+				   . displayValue("Float", convertUnit("Temperature", temperatures[3])) . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
+				   . displayValue("Float", convertUnit("Temperature", temperatures[4])) . "</td></tr>")
+		}
+		else {
+			html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Temperatures") . "</th><td class=`"td-wdg`" text-align: right`">"
+				   . "-" . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
+				   . "-" . "</td></tr>")
+			html .= ("<tr><td class=`"td-wdg`" text-align: right`">"
+				   . "-" . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
+				   . "-" . "</td></tr>")
+		}
+
+		wear := string2Values(",", getMultiMapValue(sessionState, "Brakes", "Wear", ""))
+
+		if (wear.Length = 4) {
+			html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Wear") . "</th><td class=`"td-wdg`" text-align: right`">"
+				   . displayValue("Float", convertUnit("Temperature", wear[1])) . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
+				   . displayValue("Float", convertUnit("Temperature", wear[2])) . "</td></tr>")
+			html .= ("<tr><td class=`"td-wdg`" text-align: right`">"
+				   . displayValue("Float", convertUnit("Temperature", wear[3])) . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
+				   . displayValue("Float", convertUnit("Temperature", wear[4])) . "</td></tr>")
+		}
+
+		html .= "</table>"
+
+		return html
+	}
+
+	createStrategyWidget(sessionState) {
+		local pitstopsCount := getMultiMapValue(sessionState, "Strategy", "Pitstops", kUndefined)
+		local html := ""
+		local remainingPitstops := 0
+		local nextPitstop, tyreCompound
+
+		html .= "<table class=`"table-std`">"
+		html .= ("<tr><th class=`"th-std th-left`" colspan=`"2`"><div id=`"header`"><i>" . translate("Strategy") . "</i></div></th></tr>")
+
+		if (pitstopsCount != kUndefined) {
+			nextPitstop := getMultiMapValue(sessionState, "Strategy", "Pitstop.Next", 0)
+
+			if (nextPitstop && pitstopsCount)
+				remainingPitstops := (pitstopsCount - nextPitstop + 1)
+
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Pitstops (Planned)") . "</th><td class=`"td-wdg`">" . pitstopsCount . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Pitstops (Remaining)") . "</th><td class=`"td-wdg`">" . remainingPitstops . "</td></tr>")
+
+			if nextPitstop {
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Next Pitstop (Lap)") . "</th><td class=`"td-wdg`">" . getMultiMapValue(sessionState, "Strategy", "Pitstop.Next.Lap") . "</td></tr>")
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Fuel") . "</th><td class=`"td-wdg`">" . displayValue("Float", convertUnit("Volume", getMultiMapValue(sessionState, "Strategy", "Pitstop.Next.Refuel"))) . "</td></tr>")
+
+				tyreCompound := getMultiMapValue(sessionState, "Strategy", "Pitstop.Next.Tyre.Compound")
+
+				if tyreCompound
+					tyreCompound := translate(compound(tyreCompound, getMultiMapValue(sessionState, "Strategy", "Pitstop.Next.Tyre.Compound.Color")))
+				else
+					tyreCompound := translate("No")
+
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyres") . "</th><td class=`"td-wdg`">" . tyreCompound . "</td></tr>")
+			}
+		}
+		else
+			html .= ("<tr><td class=`"td-wdg`" colspan=`"2`">" . translate("No active strategy") . "</td></tr>")
+
+		html .= "</table>"
+
+		return html
+	}
+
+	createPitstopWidget(sessionState) {
+		local pitstopNr := getMultiMapValue(sessionState, "Pitstop", "Planned.Nr", false)
+		local pitstopLap := getMultiMapValue(sessionState, "Pitstop", "Planned.Lap", 0)
+		local html := ""
+		local tyreCompound, tyreSet, tyrePressures
+
+		computeRepairs(bodywork, suspension, engine) {
+			local repairs := ""
+
+			if bodywork
+				repairs := translate("Bodywork")
+
+			if suspension {
+				if (StrLen(repairs) > 0)
+					repairs .= ", "
+
+				repairs .= translate("Suspension")
+			}
+
+			if engine {
+				if (StrLen(repairs) > 0)
+					repairs .= ", "
+
+				repairs .= translate("Engine")
+			}
+
+			return ((StrLen(repairs) > 0) ? repairs : "-")
+		}
+
+		html .= "<table class=`"table-std`">"
+		html .= ("<tr><th class=`"th-std th-left`" colspan=`"3`"><div id=`"header`"><i>" . translate("Pitstop") . "</i></div></th></tr>")
+
+		if pitstopNr {
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Nr.") . "</th><td class=`"td-wdg`" colspan=`"2`">" . pitstopNr . "</td></tr>")
+
+			if pitstopLap
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Lap") . "</th><td class=`"td-wdg`" colspan=`"2`">" . pitstopLap . "</td></tr>")
+
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Fuel") . "</th><td class=`"td-wdg`" colspan=`"2`">" . displayValue("Float", convertUnit("Volume", getMultiMapValue(sessionState, "Pitstop", "Planned.Refuel"))) . "</td></tr>")
+
+			tyreCompound := getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Compound")
+
+			if tyreCompound {
+				tyreCompound := translate(compound(tyreCompound, getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Compound.Color")))
+
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyres") . "</th><td class=`"td-wdg`" colspan=`"2`">" . tyreCompound . "</td></tr>")
+
+				tyreSet := getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Set")
+
+				if tyreSet
+					html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyre Set") . "</th><td class=`"td-wdg`" colspan=`"2`">" . tyreSet . "</td></tr>")
+
+				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Pressures") . "</th><td class=`"td-wdg`" text-align: right`">"
+					   . displayValue("Float", convertUnit("Pressure", getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Pressure.FL"))) . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
+					   . displayValue("Float", convertUnit("Pressure", getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Pressure.FR"))) . "</td></tr>")
+				html .= ("<tr><td class=`"td-wdg`" text-align: right`">"
+					   . displayValue("Float", convertUnit("Pressure", getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Pressure.RL"))) . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
+					   . displayValue("Float", convertUnit("Pressure", getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Pressure.RR"))) . "</td></tr>")
+			}
+			else
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyres") . "</th><td class=`"td-wdg`">" . translate("No") . "</td></tr>")
+
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Repairs") . "</th><td class=`"td-wdg`" colspan=`"2`">"
+														 . computeRepairs(getMultiMapValue(sessionState, "Pitstop", "Planned.Repair.Bodywork")
+																	    , getMultiMapValue(sessionState, "Pitstop", "Planned.Repair.Suspension")
+																	    , getMultiMapValue(sessionState, "Pitstop", "Planned.Repair.Engine"))
+														 . "</td></tr>")
+
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Prepared") . "</th><td class=`"td-wdg`" colspan=`"2`">"
+														 . (getMultiMapValue(sessionState, "Pitstop", "Prepared") ? translate("Yes") : translate("No"))
+														 . "</td></tr>")
+		}
+		else
+			html .= ("<tr><td class=`"td-wdg`" colspan=`"3`">" . translate("No planned pitstop") . "</td></tr>")
+
+		html .= "</table>"
+
+		return html
+	}
+
+	createStandingsWidget(sessionState) {
+		local positionOverall := getMultiMapValue(sessionState, "Standings", "Position.Overall")
+		local positionClass := getMultiMapValue(sessionState, "Standings", "Position.Class")
+		local html := ""
+
+		html .= "<table class=`"table-std`">"
+		html .= ("<tr><th class=`"th-std th-left`" colspan=`"2`"><div id=`"header`"><i>" . translate("Standings") . "</i></div></th></tr>")
+
+		if (positionOverall != positionClass) {
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Position (Overall)") . "</th><td class=`"td-wdg`">" . positionOverall . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Position (Class)") . "</th><td class=`"td-wdg`">" . positionClass . "</td></tr>")
+		}
+		else
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Position") . "</th><td class=`"td-wdg`">" . positionOverall . "</td></tr>")
+
+		if (getMultiMapValue(sessionState, "Standings", "Leader.Lap.Time", kUndefined) != kUndefined) {
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Leader (Laps)") . "</th><td class=`"td-wdg`">" . getMultiMapValue(sessionState, "Standings", "Leader.Lap") . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Leader (Delta)") . "</th><td class=`"td-wdg`">" . displayValue("Time", getMultiMapValue(sessionState, "Standings", "Leader.Delta")) . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Leader (Lap Time)") . "</th><td class=`"td-wdg`">" . displayValue("Time", getMultiMapValue(sessionState, "Standings", "Leader.Lap.Time")) . "</td></tr>")
+		}
+
+		if (getMultiMapValue(sessionState, "Standings", "Ahead.Lap.Time", kUndefined) != kUndefined) {
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Ahead (Laps)") . "</th><td class=`"td-wdg`">" . getMultiMapValue(sessionState, "Standings", "Ahead.Lap") . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Ahead (Delta)") . "</th><td class=`"td-wdg`">" . displayValue("Time", getMultiMapValue(sessionState, "Standings", "Ahead.Delta")) . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Ahead (Lap Time)") . "</th><td class=`"td-wdg`">" . displayValue("Time", getMultiMapValue(sessionState, "Standings", "Ahead.Lap.Time")) . "</td></tr>")
+		}
+
+		if (getMultiMapValue(sessionState, "Standings", "Behind.Lap.Time", kUndefined) != kUndefined) {
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Behind (Laps)") . "</th><td class=`"td-wdg`">" . getMultiMapValue(sessionState, "Standings", "Behind.Lap") . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Behind (Delta)") . "</th><td class=`"td-wdg`">" . displayValue("Time", getMultiMapValue(sessionState, "Standings", "Behind.Delta")) . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Behind (Lap Time)") . "</th><td class=`"td-wdg`">" . displayValue("Time", getMultiMapValue(sessionState, "Standings", "Behind.Lap.Time")) . "</td></tr>")
+		}
+
+		html .= "</table>"
+
+		return html
+	}
+
+	updateSessionInfo(sessionState, sessionInfoWidgets) {
+		local staticWidgets := remove(sessionInfoWidgets, "Cycle")
+		local html
+
+		static widgets := []
+		static shows := 0
+
+		renderInfoWidgets(widgets) {
+			local html := "<table>"
+			local row := 1
+			local column := 1
+			local ignore, widget
+
+			for ignore, widget in widgets
+				if (row <= 2) {
+					if (column > 3) {
+						row += 1
+						column := 1
+
+						html .= "<tr><td> </td><td> </td><td> </td></tr>"
+						html .= "<tr><td> </td><td> </td><td> </td></tr>"
+					}
+
+					if (column = 1)
+						html .= "<tr><td style=`"padding-right: 25px`">"
+					else if (column = 2)
+						html .= "</td><td style=`"padding-right: 25px`">"
+					else
+						html .= "</td><td>"
+
+					html .= widget(sessionState)
+
+					if (column = 3)
+						html .= "</td></tr>"
+
+					column += 1
+				}
+
+			return (html . "</table")
+		}
+
+		addInfoWidget(widgets, descriptor, fixedDescriptors := []) {
+			static descriptors := getKeys(infoWidgets)
+			static index := 0
+
+			if (descriptor = "Cycle") {
+				loop {
+					if (++index > descriptors.Length)
+						index := 1
+
+					if !inList(fixedDescriptors, descriptors[index])
+						break
+				}
+
+				descriptor := descriptors[index]
+			}
+
+			widgets.Push(infoWidgets[descriptor])
+		}
 
 		if (sessionState.Count > 0) {
 			html := "<style>" . getTableCSS(systemMonitorGui) . " div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { text-align: center; font-size: 12px; background-color: #" . systemMonitorGui.Theme.TableColor["Header"] . "; } td {vertical-align: top } </style><table>"
 
-			sessionTime := getMultiMapValue(sessionState, "Session", "Time.Remaining")
-			stintTime := getMultiMapValue(sessionState, "Stint", "Time.Remaining.Stint")
-			driverTime := getMultiMapValue(sessionState, "Stint", "Time.Remaining.Driver")
+			widgets := []
 
-			sessionLaps := getMultiMapValue(sessionState, "Session", "Laps.Remaining")
-			stintLaps := getMultiMapValue(sessionState, "Stint", "Laps.Remaining.Stint")
+			for ignore, descriptor in sessionInfoWidgets
+				addInfoWidget(widgets, descriptor, staticWidgets)
 
-			lastLap := getMultiMapValue(sessionState, "Stint", "Lap")
-			lastValid := getMultiMapValue(sessionState, "Stint", "Valid", true)
-
-			lastTime := getMultiMapValue(sessionState, "Stint", "Lap.Time.Last")
-			lastTime := ((lastTime < 3600) ? displayValue("Time", lastTime) : "-")
-
-			bestTime := getMultiMapValue(sessionState, "Stint", "Lap.Time.Best")
-			bestTime := ((bestTime < 3600) ? displayValue("Time", bestTime) : "-")
-
-			fuelLow := (Floor(getMultiMapValue(sessionState, "Stint", "Laps.Remaining.Fuel")) < 4)
-
-			weatherNow := getMultiMapValue(sessionState, "Weather", "Now")
-			weather10Min := getMultiMapValue(sessionState, "Weather", "10Min")
-			weather30Min := getMultiMapValue(sessionState, "Weather", "30Min")
-
-			html .= "<tr><td style=`"padding-right: 25px`">"
-
-			html .= "<table class=`"table-std`">"
-			html .= ("<tr><th class=`"th-std th-left`" colspan=`"2`"><div id=`"header`"><i>" . translate("Session") . "</i></div></th></tr>")
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Simulator") . "</th><td>" . getMultiMapValue(sessionState, "Session", "Simulator") . "</td></tr>")
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Car") . "</th><td>" . getMultiMapValue(sessionState, "Session", "Car") . "</td></tr>")
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Track") . "</th><td>" . getMultiMapValue(sessionState, "Session", "Track") . "</td></tr>")
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Session") . "</th><td>" . translate(getMultiMapValue(sessionState, "Session", "Type")) . "</td></tr>")
-			html .= "</table>"
-
-			html .= "</td><td style=`"padding-right: 25px`">"
-
-			html .= "<table class=`"table-std`">"
-			html .= ("<tr><th class=`"th-std th-left`" colspan=`"2`"><div id=`"header`"><i>" . translate("Duration") . "</i></div></th></tr>")
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Format") . "</th><td>" . translate(getMultiMapValue(sessionState, "Session", "Format")) . "</td></tr>")
-			if (sessionTime != stintTime) {
-				html .= ("<tr><th class=`"th-std th-left`">" . translate("Time Left (Session)") . "</th><td>" . displayValue("Time", sessionTime) . "</td></tr>")
-				html .= ("<tr><th class=`"th-std th-left`">" . translate("Time Left (Stint)") . "</th><td>" . (((stintTime / lastTime) < 4) ? "<font color=`"red`">" : "") . displayValue("Time", stintTime) . (((stintTime / lastTime) < 4) ? "</font>" : "") . "</td></tr>")
-				if (driverTime != stintTime)
-					html .= ("<tr><th class=`"th-std th-left`">" . translate("Time Left (Driver)") . "</th><td>" . (((driverTime / lastTime) < 4) ? "<font color=`"red`">" : "") . displayValue("Time", driverTime) . (((driverTime / lastTime) < 4) ? "</font>" : "") . "</td></tr>")
-			}
-			else
-				html .= ("<tr><th class=`"th-std th-left`">" . translate("Time Left") . "</th><td>" . displayValue("Time", sessionTime) . "</td></tr>")
-			if (sessionLaps != stintLaps) {
-				html .= ("<tr><th class=`"th-std th-left`">" . translate("Laps Left (Session)") . "</th><td>" . sessionLaps . "</td></tr>")
-				html .= ("<tr><th class=`"th-std th-left`">" . translate("Laps Left (Stint)") . "</th><td>" . ((stintLaps < 4) ? "<font color=`"red`">" : "") . stintLaps . ((stintLaps < 4) ? "</font>" : "") . "</td></tr>")
-			}
-			else
-				html .= ("<tr><th class=`"th-std th-left`">" . translate("Laps Left") . "</th><td>" . sessionLaps . "</td></tr>")
-			html .= "</table>"
-
-			html .= "</td><td>"
-
-			html .= "<table class=`"table-std`">"
-			html .= ("<tr><th class=`"th-std th-left`" colspan=`"2`"><div id=`"header`"><i>" . translate("Conditions") . "</i></div></th></tr>")
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Weather") . "</th><td>" . translate(weatherNow) . "</td></tr>")
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Temperature (Air)") . "</th><td>" . displayValue("Float", convertUnit("Temperature", getMultiMapValue(sessionState, "Weather", "Temperature"))) . "</td></tr>")
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Temperature (Track)") . "</th><td>" . displayValue("Float", convertUnit("Temperature", getMultiMapValue(sessionState, "Track", "Temperature"))) . "</td></tr>")
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Grip") . "</th><td>" . translate(getMultiMapValue(sessionState, "Track", "Grip")) . "</td></tr>")
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Outlook (10 minutes)") . "</th><td>" . ((weather10Min != weatherNow) ? "<font color=`"red`">" : "") . translate(weather10Min) . ((weather10Min != weatherNow) ? "</font>" : "") . "</td></tr>")
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Outlook (30 minutes)") . "</th><td>" . ((weather30Min != weatherNow) ? "<font color=`"red`">" : "") . translate(weather30Min) . ((weather30Min != weatherNow) ? "</font>" : "") . "</td></tr>")
-			html .= "</table>"
-
-			html .= "</td></tr>"
-
-			html .= "<tr><td> </td><td> </td><td> </td></tr>"
-			html .= "<tr><td> </td><td> </td><td> </td></tr>"
-
-			html .= "<tr><td style=`"padding-right: 25px`">"
-
-			html .= "<table class=`"table-std`">"
-			html .= ("<tr><th class=`"th-std th-left`" colspan=`"2`"><div id=`"header`"><i>" . translate("Stint") . "</i></div></th></tr>")
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Driver") . "</th><td>" . getMultiMapValue(sessionState, "Stint", "Driver") . "</td></tr>")
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Lap") . "</th><td>" . lastLap . "</td></tr>")
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Position") . "</th><td>" . getMultiMapValue(sessionState, "Stint", "Position") . "</td></tr>")
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Lap Time (Last / Best)") . "</th><td>" . (!lastValid ? "<font color=`"red`">" : "") . lastTime . (!lastValid ? "</font>" : "") . translate(" / ") . bestTime . "</td></tr>")
-			if (lastLap != getMultiMapValue(sessionState, "Stint", "Laps"))
-				html .= ("<tr><th class=`"th-std th-left`">" . translate("Laps (Stint)") . "</th><td>" . getMultiMapValue(sessionState, "Stint", "Laps") . "</td></tr>")
-			html .= "</table>"
-
-			html .= "</td><td style=`"padding-right: 25px`">"
-
-			html .= "<table class=`"table-std`">"
-			html .= ("<tr><th class=`"th-std th-left`" colspan=`"2`"><div id=`"header`"><i>" . translate("Fuel") . "</i></div></th></tr>")
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Consumption (Lap)") . "</th><td>" . displayValue("Float", convertUnit("Volume", getMultiMapValue(sessionState, "Stint", "Fuel.Consumption"))) . "</td></tr>")
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Consumption (Avg.)") . "</th><td>" . displayValue("Float", convertUnit("Volume", getMultiMapValue(sessionState, "Stint", "Fuel.AvgConsumption"))) . "</td></tr>")
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Remaining Fuel") . "</th><td>" . displayValue("Float", convertUnit("Volume", getMultiMapValue(sessionState, "Stint", "Fuel.Remaining"))) . "</td></tr>")
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Remaining Laps") . "</th><td>" . (fuelLow ? "<font color=`"red`">" : "") . Floor(getMultiMapValue(sessionState, "Stint", "Laps.Remaining.Fuel")) . (fuelLow ? "</font>" : "") . "</td></tr>")
-			html .= "</table>"
-
-			html .= "</td><td>"
-
-			html .= "<table class=`"table-std`">"
-			html .= ("<tr><th class=`"th-std th-left`" colspan=`"3`"><div id=`"header`"><i>" . translate("Tyres") . "</i></div></th></tr>")
-			pressures := string2Values(",", getMultiMapValue(sessionState, "Tyres", "Pressures", ""))
-			if (pressures.Length = 4) {
-				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Pressures") . "</th><td style=`"padding-right: 15px; text-align: right`">"
-					   . displayValue("Float", convertUnit("Pressure", pressures[1])) . "</td><td style=`"text-align: right`">"
-					   . displayValue("Float", convertUnit("Pressure", pressures[2])) . "</td></tr>")
-				html .= ("<tr><td style=`"padding-right: 15px; text-align: right`">"
-					   . displayValue("Float", convertUnit("Pressure", pressures[3])) . "</td><td style=`"text-align: right`">"
-					   . displayValue("Float", convertUnit("Pressure", pressures[4])) . "</td></tr>")
-			}
-			else {
-				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Pressures") . "</th><td style=`"padding-right: 15px; text-align: right`">"
-					   . "-" . "</td><td style=`"text-align: right`">"
-					   . "-" . "</td></tr>")
-				html .= ("<tr><td style=`"padding-right: 15px; text-align: right`">"
-					   . "-" . "</td><td style=`"text-align: right`">"
-					   . "-" . "</td></tr>")
-			}
-			temperatures := string2Values(",", getMultiMapValue(sessionState, "Tyres", "Temperatures", ""))
-			if (temperatures.Length = 4) {
-				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Temperatures") . "</th><td style=`"padding-right: 15px; text-align: right`">"
-					   . displayValue("Float", convertUnit("Temperature", temperatures[1])) . "</td><td style=`"text-align: right`">"
-					   . displayValue("Float", convertUnit("Temperature", temperatures[2])) . "</td></tr>")
-				html .= ("<tr><td style=`"padding-right: 15px; text-align: right`">"
-					   . displayValue("Float", convertUnit("Temperature", temperatures[3])) . "</td><td style=`"text-align: right`">"
-					   . displayValue("Float", convertUnit("Temperature", temperatures[4])) . "</td></tr>")
-			}
-			else {
-				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Temperatures") . "</th><td style=`"padding-right: 15px; text-align: right`">"
-					   . "-" . "</td><td style=`"text-align: right`">"
-					   . "-" . "</td></tr>")
-				html .= ("<tr><td style=`"padding-right: 15px; text-align: right`">"
-					   . "-" . "</td><td style=`"text-align: right`">"
-					   . "-" . "</td></tr>")
-			}
-			html .= "</table>"
-
-			html .= "</td>"
-
-			html .= "</tr>"
-
-			html .= "</table>"
+			html .= renderInfoWidgets(widgets)
 
 			updateDashboard(systemMonitorGui, sessionStateViewer, html)
 		}
@@ -670,8 +1123,14 @@ systemMonitor(command := false, arguments*) {
 	if (command = kClose)
 		result := kClose
 	else if (command = "UpdateDashboard") {
+		local ignore, viewer
+
 		try {
 			if (monitorTabView.Value = 1) {
+				for igore, viewer in [simulationDashboard, assistantsDashboard, sessionDashboard
+									, dataDashboard, automationDashboard, mapperDashboard]
+					viewer.Show()
+
 				controllerState := getControllerState(false)
 				databaseState := readMultiMap(kTempDirectory . "Database Synchronizer.state")
 				trackMapperState := readMultiMap(kTempDirectory . "Track Mapper.state")
@@ -683,6 +1142,10 @@ systemMonitor(command := false, arguments*) {
 				updateAutomationState(controllerState)
 				updateMapperState(trackMapperState)
 			}
+			else
+				for igore, viewer in [simulationDashboard, assistantsDashboard, sessionDashboard
+									, dataDashboard, automationDashboard, mapperDashboard]
+					viewer.Hide()
 		}
 		catch Any as exception {
 			logError(exception)
@@ -860,8 +1323,27 @@ systemMonitor(command := false, arguments*) {
 		}
 	}
 	else if (command = "UpdateSession") {
-		if (monitorTabView.Value = 2)
-			updateSessionInfo(readMultiMap(kTempDirectory . "Session.state"))
+		if (monitorTabView.Value = 2) {
+			settingsButton.Enabled := true
+
+			sessionStateViewer.Show()
+		}
+		else {
+			settingsButton.Enabled := false
+
+			sessionStateViewer.Hide()
+		}
+
+		if (A_TickCount > nextSessionUpdate) {
+			sessionInfo := newMultiMap()
+
+			for ignore, assistant in ["Race Engineer", "Race Strategist", "Race Spotter"]
+				addMultiMapValues(sessionInfo, readMultiMap(kTempDirectory . assistant . " Session.state"))
+
+			updateSessionInfo(sessionInfo, sessionInfoWidgets)
+
+			nextSessionUpdate := (A_TickCount + sessionInfoSleep)
+		}
 	}
 	else if (command = "LogMessage") {
 		try {
@@ -924,6 +1406,10 @@ systemMonitor(command := false, arguments*) {
 
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
+		settingsButton := systemMonitorGui.Add("Button", "x773 yp+4 w23 h23")
+		settingsButton.OnEvent("Click", modifySettings.Bind(systemMonitorGui))
+		setButtonIcon(settingsButton, kIconsDirectory . "General Settings.ico", 1)
+
 		systemMonitorGui.Add("Text", "x8 yp+26 w790 0x10")
 
 		monitorTabView := systemMonitorGui.Add("Tab3", "x16 yp+14 w773 h375 AltSubmit -Wrap Section", collect(["Dashboard", "Session", "Team", "Modules", "Logs"], translate))
@@ -938,7 +1424,7 @@ systemMonitor(command := false, arguments*) {
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
 		simulationState := systemMonitorGui.Add("Picture", "x34 ys+73 w32 h32", kIconsDirectory . "Black.ico")
-		simulationDashboard := systemMonitorGui.Add("HTMLViewer", "x94 ys+46 w300 h95")
+		simulationDashboard := systemMonitorGui.Add("HTMLViewer", "x94 ys+46 w300 h95 Hidden")
 
 		systemMonitorGui.SetFont("Italic", "Arial")
 		systemMonitorGui.Add("GroupBox", "x405 ys+28 w375 h9", translate("Race Assistants"))
@@ -946,7 +1432,7 @@ systemMonitor(command := false, arguments*) {
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
 		assistantsState := systemMonitorGui.Add("Picture", "x415 ys+73 w32 h32", kIconsDirectory . "Black.ico")
-		assistantsDashboard := systemMonitorGui.Add("HTMLViewer", "x475 ys+46 w300 h95")
+		assistantsDashboard := systemMonitorGui.Add("HTMLViewer", "x475 ys+46 w300 h95 Hidden")
 
 		systemMonitorGui.SetFont("Italic", "Arial")
 		systemMonitorGui.Add("GroupBox", "x24 ys+138 w375 h9", translate("Team Session"))
@@ -954,7 +1440,7 @@ systemMonitor(command := false, arguments*) {
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
 		sessionState := systemMonitorGui.Add("Picture", "x34 ys+183 w32 h32 vsessionState", kIconsDirectory . "Black.ico")
-		sessionDashboard := systemMonitorGui.Add("HTMLViewer", "x94 ys+156 w300 h95")
+		sessionDashboard := systemMonitorGui.Add("HTMLViewer", "x94 ys+156 w300 h95 Hidden")
 
 		systemMonitorGui.SetFont("Italic", "Arial")
 		systemMonitorGui.Add("GroupBox", "x405 ys+138 w375 h9", translate("Data Synchronization"))
@@ -962,7 +1448,7 @@ systemMonitor(command := false, arguments*) {
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
 		dataState := systemMonitorGui.Add("Picture", "x415 ys+183 w32 h32 vdataState", kIconsDirectory . "Black.ico")
-		dataDashboard := systemMonitorGui.Add("HTMLViewer", "x475 ys+156 w300 h95")
+		dataDashboard := systemMonitorGui.Add("HTMLViewer", "x475 ys+156 w300 h95 Hidden")
 
 		systemMonitorGui.SetFont("Italic", "Arial")
 		systemMonitorGui.Add("GroupBox", "x24 ys+248 w375 h9", translate("Track Automation"))
@@ -970,7 +1456,7 @@ systemMonitor(command := false, arguments*) {
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
 		automationState := systemMonitorGui.Add("Picture", "x34 ys+293 w32 h32 vautomationState", kIconsDirectory . "Black.ico")
-		automationDashboard := systemMonitorGui.Add("HTMLViewer", "x94 ys+266 w300 h95")
+		automationDashboard := systemMonitorGui.Add("HTMLViewer", "x94 ys+266 w300 h95 Hidden")
 
 		systemMonitorGui.SetFont("Italic", "Arial")
 		systemMonitorGui.Add("GroupBox", "x405 ys+248 w375 h9", translate("Track Mapping"))
@@ -978,11 +1464,11 @@ systemMonitor(command := false, arguments*) {
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
 		mapperState := systemMonitorGui.Add("Picture", "x415 ys+293 w32 h32 vmapperState", kIconsDirectory . "Black.ico")
-		mapperDashboard := systemMonitorGui.Add("HTMLViewer", "x475 ys+266 w300 h95")
+		mapperDashboard := systemMonitorGui.Add("HTMLViewer", "x475 ys+266 w300 h95 Hidden")
 
 		monitorTabView.UseTab(2)
 
-		sessionStateViewer := systemMonitorGui.Add("HTMLViewer", "x24 ys+28 w756 h336")
+		sessionStateViewer := systemMonitorGui.Add("HTMLViewer", "x24 ys+28 w756 h336 Hidden")
 
 		monitorTabView.UseTab(3)
 
@@ -1090,10 +1576,15 @@ systemMonitor(command := false, arguments*) {
 		updateDashboard(systemMonitorGui, mapperDashboard)
 		updateDashboard(systemMonitorGui, sessionStateViewer, "<div style=`"text-align: center; font-size: 14px`"><br><br><br>" . translate("No data available") . "</div>")
 
+		settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+		sessionInfoWidgets := string2Values(",", getMultiMapValue(settings, "System Monitor", "Session Widgets", "Session,Stint,Duration,Conditions,Cycle,Cycle"))
+		sessionInfoSleep := (getMultiMapValue(settings, "System Monitor", "Session Cycle", 30) * 1000)
+
 		PeriodicTask(systemMonitor.Bind("UpdateDashboard"), 2000, kLowPriority).start()
 		PeriodicTask(systemMonitor.Bind("UpdateModules"), 2000, kLowPriority).start()
 		PeriodicTask(systemMonitor.Bind("UpdateServer"), 5000, kLowPriority).start()
-		PeriodicTask(systemMonitor.Bind("UpdateSession"), 10000, kLowPriority).start()
+		PeriodicTask(systemMonitor.Bind("UpdateSession"), 1000, kLowPriority).start()
 
 		gStartupFinished := true
 	}
@@ -1122,7 +1613,7 @@ clearOrphaneStateFiles() {
 
 startSystemMonitor() {
 	local icon := kIconsDirectory . "Monitoring.ico"
-	local noLaunch
+	local noLaunch, ignore, assistant
 
 	TraySetIcon(icon, "1")
 	A_IconTip := "System Monitor"
@@ -1130,9 +1621,11 @@ startSystemMonitor() {
 	registerMessageHandler("Monitoring", monitoringMessageHandler)
 
 	deleteFile(kTempDirectory . "Simulator Controller.state")
-	deleteFile(kTempDirectory . "Session.state")
 	deleteFile(kTempDirectory . "Database Synchronizer.state")
 	deleteFile(kTempDirectory . "Track Mapper.state")
+
+	for ignore, assistant in ["Race Engineer", "Race Strategist", "Race Spotter"]
+		deleteFile(kTempDirectory . assistant . " Session.state")
 
 	PeriodicTask(clearOrphaneStateFiles, 60000, kLowPriority).start()
 

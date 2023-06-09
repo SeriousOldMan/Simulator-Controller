@@ -365,7 +365,7 @@ class SimulatorPlugin extends ControllerPlugin {
 			this.iCommandMode := this.getArgumentValue("pitstopMFDMode", "Event")
 
 			for ignore, theAction in string2Values(",", this.getArgumentValue("pitstopCommands", "")) {
-				arguments := string2Values(A_Space, theAction)
+				arguments := string2Values(A_Space, substituteString(theAction, "  ", A_Space))
 
 				theAction := arguments[1]
 
@@ -770,7 +770,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 			this.iActionMode := kAssistantMode
 
 			for ignore, theAction in string2Values(",", this.getArgumentValue("assistantCommands", ""))
-				this.createRaceAssistantAction(controller, string2Values(A_Space, theAction)*)
+				this.createRaceAssistantAction(controller, string2Values(A_Space, substituteString(theAction, "  ", A_Space))*)
 
 			controller.registerPlugin(this)
 		}

@@ -78,10 +78,6 @@ class RaceStrategist extends GridRaceAssistant {
 			this.callRemote("saveRaceLap", arguments*)
 		}
 
-		saveSessionInfo(arguments*) {
-			this.callRemote("saveSessionInfo", arguments*)
-		}
-
 		createRaceReport(arguments*) {
 			this.callRemote("createRaceReport", arguments*)
 		}
@@ -707,8 +703,12 @@ class RaceStrategist extends GridRaceAssistant {
 		if values.HasProp("OriginalStrategy")
 			this.iOriginalStrategy := values.OriginalStrategy
 
-		if values.HasProp("Strategy")
+		if values.HasProp("Strategy") {
+			if (this.iRejectedStrategy && (this.iRejectedStrategy != values.RejectedStrategy))
+				this.iRejectedStrategy.dispose()
+
 			this.iStrategy := values.Strategy
+		}
 
 		if values.HasProp("RaceInfo")
 			this.iRaceInfo := values.RaceInfo
@@ -723,8 +723,12 @@ class RaceStrategist extends GridRaceAssistant {
 		if values.HasProp("StrategyReported")
 			this.iStrategyReported := values.StrategyReported
 
-		if values.HasProp("RejectedStrategy")
+		if values.HasProp("RejectedStrategy") {
+			if (this.iRejectedStrategy && (this.iRejectedStrategy != values.RejectedStrategy))
+				this.iRejectedStrategy.dispose()
+
 			this.iRejectedStrategy := values.RejectedStrategy
+		}
 	}
 
 	hasEnoughData(inform := true) {
@@ -896,7 +900,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 	positionRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
-		local speaker, overallPosition, classPosition
+		local speaker, position, classPosition
 
 		if !this.hasEnoughData()
 			return
@@ -1165,42 +1169,42 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 	}
 
-	reportLapTime(phrase, driverLapTime, car) {
-		local lapTime := this.KnowledgeBase.getValue("Car." . car . ".Time", false)
-		local speaker, fragments, minute, seconds, delta
-
-		if !this.hasEnoughData()
-			return
-
-		if lapTime {
-			lapTime /= 1000
-
-			speaker := this.getSpeaker()
-
-			speaker.beginTalk()
-			fragments := speaker.Fragments
-
-			minute := Floor(lapTime / 60)
-			seconds := (lapTime - (minute * 60))
-
-			try {
-				speaker.speakPhrase(phrase, {time: speaker.number2Speech(lapTime, 1), minute: minute, seconds: speaker.number2Speech(seconds, 1)})
-
-				delta := (driverLapTime - lapTime)
-
-				if (Abs(delta) > 0.5)
-					speaker.speakPhrase("LapTimeDelta", {delta: speaker.number2Speech(Abs(delta), 1)
-													   , difference: (delta > 0) ? fragments["Faster"] : fragments["Slower"]})
-			}
-			finally {
-				speaker.endTalk()
-			}
-		}
-	}
-
 	lapTimesRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
 		local car, lap, position, cars, driverLapTime, speaker, minute, seconds
+
+		reportLapTime(phrase, driverLapTime, car) {
+			local lapTime := this.KnowledgeBase.getValue("Car." . car . ".Time", false)
+			local speaker, fragments, minute, seconds, delta
+
+			if !this.hasEnoughData()
+				return
+
+			if lapTime {
+				lapTime /= 1000
+
+				speaker := this.getSpeaker()
+
+				speaker.beginTalk()
+				fragments := speaker.Fragments
+
+				minute := Floor(lapTime / 60)
+				seconds := (lapTime - (minute * 60))
+
+				try {
+					speaker.speakPhrase(phrase, {time: speaker.number2Speech(lapTime, 1), minute: minute, seconds: speaker.number2Speech(seconds, 1)})
+
+					delta := (driverLapTime - lapTime)
+
+					if (Abs(delta) > 0.5)
+						speaker.speakPhrase("LapTimeDelta", {delta: speaker.number2Speech(Abs(delta), 1)
+														   , difference: (delta > 0) ? fragments["Faster"] : fragments["Slower"]})
+				}
+				finally {
+					speaker.endTalk()
+				}
+			}
+		}
 
 		if !this.hasEnoughData()
 			return
@@ -1226,13 +1230,13 @@ class RaceStrategist extends GridRaceAssistant {
 				speaker.speakPhrase("LapTime", {time: speaker.number2Speech(driverLapTime, 1), minute: minute, seconds: speaker.number2Speech(seconds, 1)})
 
 				if (position > 2)
-					this.reportLapTime("LapTimeFront", driverLapTime, knowledgeBase.getValue("Position.Standings.Class.Ahead.Car", 0))
+					reportLapTime("LapTimeFront", driverLapTime, knowledgeBase.getValue("Position.Standings.Class.Ahead.Car", 0))
 
 				if (position < cars)
-					this.reportLapTime("LapTimeBehind", driverLapTime, knowledgeBase.getValue("Position.Standings.Class.Behind.Car", 0))
+					reportLapTime("LapTimeBehind", driverLapTime, knowledgeBase.getValue("Position.Standings.Class.Behind.Car", 0))
 
 				if (position > 1)
-					this.reportLapTime("LapTimeLeader", driverLapTime, knowledgeBase.getValue("Position.Standings.Class.Leader.Car", 0))
+					reportLapTime("LapTimeLeader", driverLapTime, knowledgeBase.getValue("Position.Standings.Class.Leader.Car", 0))
 			}
 			finally {
 				speaker.endTalk()
@@ -1498,7 +1502,7 @@ class RaceStrategist extends GridRaceAssistant {
 									, "Session.Settings.Pitstop.Service.Order", getMultiMapValue(settings, "Strategy Settings"
 																										 , "Service.Order", "Simultaneous")
 									, "Session.Settings.Pitstop.Strategy.Window.Considered", getMultiMapValue(settings, "Strategy Settings"
-																													  , "Strategy.Window.Considered", 2)))
+																													  , "Strategy.Window.Considered", 3)))
 	}
 
 	prepareSession(&settings, &data) {
@@ -1800,12 +1804,13 @@ class RaceStrategist extends GridRaceAssistant {
 	createSessionInfo(lapNumber, valid, data, simulator, car, track) {
 		local knowledgeBase := this.KnowledgeBase
 		local sessionInfo := newMultiMap()
+		local nextPitstop, position, classPosition, tyreWear, brakeWear, brakeTemperatures
 
 		static sessionTypes := Map(kSessionPractice, "Practice", kSessionQualification, "Qualification", kSessionRace, "Race", kSessionOther, "Other")
 
 		setMultiMapValue(sessionInfo, "Session", "Simulator", this.SettingsDatabase.getSimulatorName(simulator))
 		setMultiMapValue(sessionInfo, "Session", "Car", this.SettingsDatabase.getCarName(simulator, car))
-		setMultiMapValue(sessionInfo, "Session", "Track", this.SettingsDatabase.getCarName(simulator, track))
+		setMultiMapValue(sessionInfo, "Session", "Track", this.SettingsDatabase.getTrackName(simulator, track))
 		setMultiMapValue(sessionInfo, "Session", "Type", sessionTypes[this.Session])
 		setMultiMapValue(sessionInfo, "Session", "Format", knowledgeBase.getValue("Session.Format", "Time"))
 		setMultiMapValue(sessionInfo, "Session", "Laps", lapNumber)
@@ -1839,6 +1844,86 @@ class RaceStrategist extends GridRaceAssistant {
 
 		setMultiMapValue(sessionInfo, "Tyres", "Pressures", getMultiMapValue(data, "Car Data", "TyrePressure", ""))
 		setMultiMapValue(sessionInfo, "Tyres", "Temperatures", getMultiMapValue(data, "Car Data", "TyreTemperature", ""))
+
+		tyreWear := getMultiMapValue(data, "Car Data", "TyreWear", "")
+
+		if (tyreWear != "") {
+			tyreWear := string2Values(",", tyreWear)
+
+			setMultiMapValue(sessionInfo, "Tyres", "Wear", values2String(",", Round(tyreWear[1]), Round(tyreWear[2]), Round(tyreWear[3]), Round(tyreWear[4])))
+		}
+
+		setMultiMapValue(sessionInfo, "Brakes", "Temperatures", getMultiMapValue(data, "Car Data", "BrakeTemperature", ""))
+
+		brakeWear := getMultiMapValue(data, "Car Data", "BrakeWear", "")
+
+		if (brakeWear != "") {
+			brakeWear := string2Values(",", brakeWear)
+
+			setMultiMapValue(sessionInfo, "Brakes", "Wear", values2String(",", Round(brakeWear[1]), Round(brakeWear[2]), Round(brakeWear[3]), Round(brakeWear[4])))
+		}
+
+		if knowledgeBase.getValue("Strategy.Name", false) {
+			setMultiMapValue(sessionInfo, "Strategy", "Pitstops", knowledgeBase.getValue("Strategy.Pitstop.Count"))
+
+			nextPitstop := knowledgeBase.getValue("Strategy.Pitstop.Next", false)
+
+			if nextPitstop {
+				setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next", nextPitstop)
+
+				setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Lap", knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Lap"))
+				setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Refuel", Round(knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Fuel.Amount")))
+
+				if knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Change", false) {
+					setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound", knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Compound"))
+					setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound", knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Compound.Color"))
+				}
+				else {
+					setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound", false)
+					setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound", false)
+				}
+			}
+		}
+
+		position := this.getPosition()
+		classPosition := (this.MultiClass ? this.getPosition(false, "Class") : position)
+
+		setMultiMapValue(sessionInfo, "Standings", "Position.Overall", position)
+		setMultiMapValue(sessionInfo, "Standings", "Position.Class", classPosition)
+
+		if (classPosition != 1) {
+			car := knowledgeBase.getValue("Position.Standings.Class.Leader.Car", 0)
+
+			if car {
+				setMultiMapValue(sessionInfo, "Standings", "Leader.Lap.Time", Round(knowledgeBase.getValue("Car." . car . ".Time", 0) / 1000, 1))
+				setMultiMapValue(sessionInfo, "Standings", "Leader.Lap", knowledgeBase.getValue("Car." . car . ".Lap", 0))
+				setMultiMapValue(sessionInfo, "Standings", "Leader.Delta", Round(knowledgeBase.getValue("Position.Standings.Class.Leader.Delta", 0) / 1000, 1))
+				setMultiMapValue(sessionInfo, "Standings", "Leader.InPit", (knowledgeBase.getValue("Car." . car . ".InPitLane", false)
+																		 || knowledgeBase.getValue("Car." . car . ".InPit", false)))
+			}
+
+			car := knowledgeBase.getValue("Position.Standings.Class.Ahead.Car", false)
+
+			if car {
+				setMultiMapValue(sessionInfo, "Standings", "Ahead.Lap.Time", Round(knowledgeBase.getValue("Car." . car . ".Time", 0) / 1000, 1))
+				setMultiMapValue(sessionInfo, "Standings", "Ahead.Lap", knowledgeBase.getValue("Car." . car . ".Lap", 0))
+				setMultiMapValue(sessionInfo, "Standings", "Ahead.Delta", Round(knowledgeBase.getValue("Position.Standings.Class.Ahead.Delta", 0) / 1000, 1))
+				setMultiMapValue(sessionInfo, "Standings", "Ahead.InPit", (knowledgeBase.getValue("Car." . car . ".InPitLane", false)
+																		|| knowledgeBase.getValue("Car." . car . ".InPit", false)))
+			}
+		}
+
+		if (this.getPosition(false, "Class") != this.getCars("Class").Length) {
+			car := knowledgeBase.getValue("Position.Standings.Class.Behind.Car")
+
+			if car {
+				setMultiMapValue(sessionInfo, "Standings", "Behind.Lap.Time", Round(knowledgeBase.getValue("Car." . car . ".Time", 0) / 1000, 1))
+				setMultiMapValue(sessionInfo, "Standings", "Behind.Lap", knowledgeBase.getValue("Car." . car . ".Lap", 0))
+				setMultiMapValue(sessionInfo, "Standings", "Behind.Delta", Round(knowledgeBase.getValue("Position.Standings.Class.Behind.Delta", 0) / 1000, 1))
+				setMultiMapValue(sessionInfo, "Standings", "Behind.InPit", (knowledgeBase.getValue("Car." . car . ".InPitLane", false)
+																		 || knowledgeBase.getValue("Car." . car . ".InPit", false)))
+			}
+		}
 
 		this.saveSessionInfo(lapNumber, simulator, car, track, sessionInfo)
 	}
@@ -2476,7 +2561,7 @@ class RaceStrategist extends GridRaceAssistant {
 					 , &overTakeDelta, &consideredTraffic) {
 		randomFactor := getMultiMapValue(this.Settings, "Strategy Settings", "Traffic.Randomness", 5)
 		numScenarios := getMultiMapValue(this.Settings, "Strategy Settings", "Traffic.Scenarios", 20)
-		variationWindow := getMultiMapValue(this.Settings, "Strategy Settings", "Traffic.Variation", 3)
+		variationWindow := this.KnowledgeBase.getValue("Session.Settings.Pitstop.Strategy.Window.Considered")
 
 		useLapTimeVariation := getMultiMapValue(this.Settings, "Strategy Settings", "Traffic.Variation.LapTime", true)
 		useDriverErrors := getMultiMapValue(this.Settings, "Strategy Settings", "Traffic.Variation.Errors", true)
@@ -2822,7 +2907,7 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 	}
 
-	betterScenario(strategy, scenario) {
+	betterScenario(strategy, scenario, &report := true) {
 		local knowledgeBase := this.KnowledgeBase
 		local sPitstops, cPitstops, sLaps, cLaps, sDuration, cDuration, sFuel, cFuel, sPLaps, cPLaps, sTLaps, cTLaps, sTSets, cTSets
 		local result
@@ -2931,127 +3016,162 @@ class RaceStrategist extends GridRaceAssistant {
 			result += StrategySimulation.scenarioCoefficient("ResultMajor", cDuration - sDuration, (strategy.AvgLapTime + scenario.AvgLapTime) / 4)
 
 		if (result > 0)
-			return false
+			result := false
 		else if (result < 0)
-			return true
+			result := true
 		else if (scenario.getRemainingFuel() > strategy.getRemainingFuel())
-			return false
+			result := false
 		else if (scenario.getRemainingFuel() < strategy.getRemainingFuel())
-			return true
+			result := true
 		else if ((scenario.FuelConsumption[true] > strategy.FuelConsumption[true]))
-			return false
+			result := false
 		else
-			return true
+			result := true
+
+		if result {
+			if (sPitstops != cPitstops)
+				report := true
+			else if (cPitstops.Length != 0) {
+				sPitstop := strategy.Pitstops[strategy.RunningPitstops + 1]
+				cPitstop := scenario.Pitstops[1]
+
+				report := ((sPitstop.Lap != cPitstop.Lap)
+						|| (Abs(sPitstop.RefuelAmount - cPitstop.RefuelAmount) > (Max(strategy.SafetyFuel, scenario.SafetyFuel) / 2))
+						|| (sPitstop.TyreChange != sPitstop.TyreChange)
+						|| (sPitstop.TyreChange && ((sPitstop.TyreCompound != cPitstop.TyreCompound)
+												 || (sPitstop.TyreCompoundColor != cPitstop.TyreCompoundColor))))
+			}
+			else
+				report := false
+		}
+
+		return result
 	}
 
 	chooseScenario(strategy, confirm?) {
-		local configuration, fileName, request
+		local dispose := true
+		local configuration, fileName, request, report
 
-		if !isSet(confirm) {
-			request := Task.CurrentTask.Request
+		try {
+			if !isSet(confirm) {
+				request := Task.CurrentTask.Request
 
-			if (request = "User") {
-				confirm := true
+				if (request = "User") {
+					confirm := true
 
-				if strategy {
-					this.reportStrategy({Strategy: false, Pitstops: true, NextPitstop: true, TyreChange: true, Refuel: true, Map: true}, strategy)
-
-					if ((this.Strategy != this.Strategy[true]) || isDebug())
-						this.explainStrategyRecommendation(strategy)
-
-					if this.Speaker {
-						this.getSpeaker().speakPhrase("ConfirmUpdateStrategy", false, true)
-
-						this.setContinuation(RaceStrategist.ConfirmStrategyUpdateContinuation(this, strategy, false))
-
-						return
-					}
-				}
-			}
-			else {
-				if strategy {
-					if (this.Strategy["Rejected"] && !this.betterScenario(this.Strategy["Rejected"], strategy))
-						return
-					else if ((this.Strategy != this.Strategy[true]) && !this.betterScenario(this.Strategy, strategy))
-						return
-
-					if this.Speaker {
-						this.getSpeaker().speakPhrase("StrategyUpdate")
-
+					if strategy {
 						this.reportStrategy({Strategy: false, Pitstops: true, NextPitstop: true, TyreChange: true, Refuel: true, Map: true}, strategy)
 
 						if ((this.Strategy != this.Strategy[true]) || isDebug())
 							this.explainStrategyRecommendation(strategy)
 
-						if Task.CurrentTask.Confirm {
+						if this.Speaker {
 							this.getSpeaker().speakPhrase("ConfirmUpdateStrategy", false, true)
 
-							this.setContinuation(RaceStrategist.ConfirmStrategyUpdateContinuation(this, strategy, true))
+							this.setContinuation(RaceStrategist.ConfirmStrategyUpdateContinuation(this, strategy, false))
+
+							dispose := false
 
 							return
 						}
 					}
 				}
+				else {
+					if strategy {
+						report := true
+
+						if (request != "Pitstop")
+							if (this.Strategy["Rejected"] && !this.betterScenario(this.Strategy["Rejected"], strategy, report))
+								return
+							else if ((this.Strategy != this.Strategy[true]) && !this.betterScenario(this.Strategy, strategy, report))
+								return
+
+						if (report && this.Speaker) {
+							this.getSpeaker().speakPhrase("StrategyUpdate")
+
+							this.reportStrategy({Strategy: false, Pitstops: true, NextPitstop: true, TyreChange: true, Refuel: true, Map: true}, strategy)
+
+							if ((this.Strategy != this.Strategy[true]) || isDebug())
+								this.explainStrategyRecommendation(strategy)
+
+							if Task.CurrentTask.Confirm {
+								this.getSpeaker().speakPhrase("ConfirmUpdateStrategy", false, true)
+
+								this.setContinuation(RaceStrategist.ConfirmStrategyUpdateContinuation(this, strategy, true))
+
+								dispose := false
+
+								return
+							}
+						}
+					}
+					else
+						return
+				}
+			}
+
+			if strategy {
+				if this.Strategy[true]
+					strategy.PitstopRule := this.Strategy[true].PitstopRule
+
+				if (isDebug() && !this.RemoteHandler) {
+					configuration := newMultiMap()
+
+					strategy.saveToConfiguration(configuration)
+
+					writeMultiMap(kTempDirectory . "Race Strategist.strategy", configuration)
+				}
+
+				dispose := false
+
+				strategy.setVersion(A_Now . "")
+
+				Task.startTask(ObjBindMethod(this, "updateStrategy", strategy, false, false), 1000)
+
+				if this.RemoteHandler {
+					fileName := temporaryFileName("Race Strategy", "update")
+					configuration := newMultiMap()
+
+					strategy.saveToConfiguration(configuration)
+
+					writeMultiMap(fileName, configuration)
+
+					if isDebug()
+						try {
+							FileCopy(fileName, kTempDirectory . "Race Strategist.strategy", 1)
+						}
+						catch Any as exception {
+							logError(exception)
+						}
+
+					this.RemoteHandler.updateStrategy(fileName)
+				}
+			}
+			else {
+				cancelStrategy() {
+					Task.startTask(ObjBindMethod(this, "cancelStrategy", false), 1000)
+
+					if isDebug()
+						deleteFile(kTempDirectory . "Race Strategist.strategy")
+
+					if this.RemoteHandler
+						this.RemoteHandler.updateStrategy(false)
+				}
+
+				if (confirm && this.Speaker) {
+					this.getSpeaker().speakPhrase("NoValidStrategy")
+
+					this.getSpeaker().speakPhrase("ConfirmCancelStrategy", false, true)
+
+					this.setContinuation(cancelStrategy)
+				}
 				else
-					return
+					cancelStrategy()
 			}
 		}
-
-		if strategy {
-			if this.Strategy[true]
-				strategy.PitstopRule := this.Strategy[true].PitstopRule
-
-			if (isDebug() && !this.RemoteHandler) {
-				configuration := newMultiMap()
-
-				strategy.saveToConfiguration(configuration)
-
-				writeMultiMap(kTempDirectory . "Race Strategist.strategy", configuration)
-			}
-
-			strategy.setVersion(A_Now . "")
-
-			Task.startTask(ObjBindMethod(this, "updateStrategy", strategy, false, false), 1000)
-
-			if this.RemoteHandler {
-				fileName := temporaryFileName("Race Strategy", "update")
-				configuration := newMultiMap()
-
-				strategy.saveToConfiguration(configuration)
-
-				writeMultiMap(fileName, configuration)
-
-				if isDebug()
-					try {
-						FileCopy(fileName, kTempDirectory . "Race Strategist.strategy", 1)
-					}
-					catch Any as exception {
-						logError(exception)
-					}
-
-				this.RemoteHandler.updateStrategy(fileName)
-			}
-		}
-		else {
-			cancelStrategy() {
-				Task.startTask(ObjBindMethod(this, "cancelStrategy", false), 1000)
-
-				if isDebug()
-					deleteFile(kTempDirectory . "Race Strategist.strategy")
-
-				if this.RemoteHandler
-					this.RemoteHandler.updateStrategy(false)
-			}
-
-			if (confirm && this.Speaker) {
-				this.getSpeaker().speakPhrase("NoValidStrategy")
-
-				this.getSpeaker().speakPhrase("ConfirmCancelStrategy", false, true)
-
-				this.setContinuation(cancelStrategy)
-			}
-			else
-				cancelStrategy()
+		finally {
+			if (dispose && strategy)
+				strategy.dispose()
 		}
 	}
 
@@ -3692,18 +3812,6 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 
 		this.saveLapStandings(lapNumber, simulator, car, track)
-	}
-
-	saveSessionInfo(lapNumber, simulator, car, track, sessionInfo) {
-		local fileName
-
-		if this.RemoteHandler {
-			fileName := temporaryFileName("Session." . lapNumber, "info")
-
-			writeMultiMap(fileName, sessionInfo)
-
-			this.RemoteHandler.saveSessionInfo(lapNumber, fileName)
-		}
 	}
 
 	restoreRaceInfo(raceInfoFile) {

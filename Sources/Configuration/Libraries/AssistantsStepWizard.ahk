@@ -400,6 +400,27 @@ class AssistantsStepWizard extends ActionsStepWizard {
 			this.loadAssistantActions(this.iCurrentAssistant, load)
 	}
 
+	validateActions() {
+		local wizard := this.SetupWizard
+		local ignore, assistant, action, function, index
+
+		for ignore, assistant in this.Definition
+			if wizard.isModuleSelected(assistant)
+				for ignore, action in string2Values(",", getMultiMapValue(wizard.Definition, "Setup.Assistants", "Assistants.Actions"))
+					if wizard.assistantActionAvailable(assistant, action) {
+						function := wizard.getAssistantActionFunction(assistant, action)
+
+						if isObject(function) {
+							index := inList(function, "")
+
+							if (index && (index < function.Length))
+								return false
+						}
+					}
+
+		return true
+	}
+
 	saveActions() {
 		if (this.iCurrentAssistant && this.SetupWizard.isModuleSelected(this.iCurrentAssistant))
 			this.saveAssistantActions(this.iCurrentAssistant)

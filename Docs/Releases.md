@@ -5,7 +5,7 @@
   4. The widgets, that will be shown on then *Session* info page of the "System Monitor", can now be [configured individually](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#monitoring-health-and-activities).
   5. A couple of new sanity checks has been integrated in "Simulator Setup" to ensure that only correct configurations can be created.
   6. Removed duplicate setting named "Strategy: Pitstop Window" has been removed from the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) and joined with "Strategy: Pitstop Variation Window (+/- Lap)". Please check your settings in the "Session Database", when you have used these settings.
-  7. The Strategist will only report strategy changes worth to be mentioned. New strategies, where only a small amount of fuel changed, will be adopted silently.
+  7. The Strategist will only report strategy changes worth to be mentioned. New strategies, where only a small amount of fuel changed (up to half of the safety fuel), will be adopted silently.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-508) if you have used the *Pitstop Window* setting (see item 6 from the list above).
 

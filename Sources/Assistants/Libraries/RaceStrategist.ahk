@@ -3036,7 +3036,7 @@ class RaceStrategist extends GridRaceAssistant {
 				cPitstop := scenario.Pitstops[1]
 
 				report := ((sPitstop.Lap != cPitstop.Lap)
-						|| (Abs(sPitstop.RefuelAmount - cPitstop.RefuelAmount) > 2)
+						|| (Abs(sPitstop.RefuelAmount - cPitstop.RefuelAmount) > (Max(strategy.SafetyFuel, scenario.SafetyFuel) / 2))
 						|| (sPitstop.TyreChange != sPitstop.TyreChange)
 						|| (sPitstop.TyreChange && ((sPitstop.TyreCompound != cPitstop.TyreCompound)
 												 || (sPitstop.TyreCompoundColor != cPitstop.TyreCompoundColor))))

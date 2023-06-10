@@ -197,7 +197,7 @@ class VoiceManager {
 
 	class LocalSpeaker extends SpeechSynthesizer {
 		iVoiceManager := false
-		iFragments := CaseInsenseMap()
+		iFragments := CaseInsenseWeakMap()
 		iPhrases := CaseInsenseMap()
 
 		iIsTalking := false

@@ -1449,7 +1449,9 @@ class RaceStrategist extends GridRaceAssistant {
 		facts["Strategy.TC"] := strategy.TC
 		facts["Strategy.ABS"] := strategy.ABS
 
-		facts["Strategy.Pitstop.Deviation"] := getMultiMapValue(this.Settings, "Strategy Settings", "Strategy.Update.Pitstop", 5)
+		facts["Strategy.Pitstop.Deviation"]
+			:= getMultiMapValue(this.Settings, "Strategy Settings", "Strategy.Update.Pitstop"
+							  , getMultiMapValue(this.Settings, "Strategy Settings", "Strategy.Window.Considered", 3))
 
 		count := 0
 
@@ -2189,7 +2191,8 @@ class RaceStrategist extends GridRaceAssistant {
 							difference := (strategy.Pitstops.Length - (activeStrategy.Pitstops.Length - activeStrategy.RunningPitstops))
 
 							if (difference != 0)
-								speaker.speakPhrase("PitstopsDifference", {pitstops: Abs(difference), difference: (difference < 0) ? fragments["Less"] : fragments["More"]})
+								speaker.speakPhrase("PitstopsDifference", {pitstops: Abs(difference)
+																		 , difference: (difference < 0) ? fragments["Less"] : fragments["More"]})
 						}
 
 						reported := true
@@ -2204,13 +2207,12 @@ class RaceStrategist extends GridRaceAssistant {
 							refuel := Round(nextPitstop.RefuelAmount)
 							tyreChange := nextPitstop.TyreChange
 
-							if activeStrategy
-								if ((activeStrategy.Pitstops.Length - activeStrategy.RunningPitstops) > 0)
-									activePitstop := activeStrategy.Pitstops[strategy.RunningPitstops + 1]
+							if (activeStrategy && ((activeStrategy.Pitstops.Length - activeStrategy.RunningPitstops) > 0))
+								activePitstop := activeStrategy.Pitstops[strategy.RunningPitstops + 1]
 
 							speaker.speakPhrase("NextPitstop", {pitstopLap: lap})
 
-							if (activeStrategy && activePitstop) {
+							if activePitstop {
 								difference := (lap - activePitstop.Lap)
 
 								if (difference != 0)
@@ -2227,23 +2229,23 @@ class RaceStrategist extends GridRaceAssistant {
 									difference := (refuel - Round(activePitstop.RefuelAmount))
 
 									if (difference != 0)
-										speaker.speakPhrase("RefuelDifference", {refuel: Abs(difference), unit: Fragments[getUnit("Volume")], difference: (difference < 0) ? fragments["Less"] : fragments["More"]})
+										speaker.speakPhrase("RefuelDifference", {refuel: Abs(difference), unit: fragments[getUnit("Volume")]
+																			   , difference: (difference < 0) ? fragments["Less"] : fragments["More"]})
 								}
 							}
 
 							if ((options == true) || (options.HasProp("TyreChange") && options.TyreChange)) {
 								speaker.speakPhrase(tyreChange ? "TyreChange" : "NoTyreChange")
 
-								if activePitstop {
+								if activePitstop
 									if (nextPitstop.TyreChange && !activePitstop.TyreChange)
 										speaker.speakPhrase("TyreChangeDifference")
 									else if (!nextPitstop.TyreChange && activePitstop.TyreChange)
 										speaker.speakPhrase("NoTyreChangeDifference")
 									else if (nextPitstop.TyreChange
-										  && (nextPitstop.TyreCompound != activePitstop.TyreCompound)
-										  && (nextPitstop.TyreCompoundColor != activePitstop.TyreCompoundColor))
+										  && ((nextPitstop.TyreCompound != activePitstop.TyreCompound)
+										   || (nextPitstop.TyreCompoundColor != activePitstop.TyreCompoundColor)))
 										speaker.speakPhrase("TyreCompoundDifference")
-								}
 							}
 						}
 					}

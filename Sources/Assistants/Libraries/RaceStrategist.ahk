@@ -3107,7 +3107,7 @@ class RaceStrategist extends GridRaceAssistant {
 					confirm := true
 
 					if strategy {
-						this.reportStrategy({Strategy: false, Pitstops: true, NextPitstop: true, TyreChange: true, Refuel: true, Map: true}, strategy)
+						this.reportStrategy({Strategy: false, Pitstops: true, NextPitstop: true, TyreChange: true, Refuel: true, Map: true, Active: this.Strategy}, strategy)
 
 						if ((this.Strategy != this.Strategy[true]) || isDebug())
 							this.explainStrategyRecommendation(strategy)

@@ -1396,13 +1396,18 @@ class RaceEngineer extends RaceAssistant {
 	createSessionInfo(lapNumber, data, simulator, car, track) {
 		local knowledgeBase := this.KnowledgeBase
 		local sessionInfo := newMultiMap()
-		local prepared, tyreCompound
+		local prepared, tyreCompound, lap
 
 		prepared := this.hasPreparedPitstop()
 
 		if (this.hasPlannedPitstop() || prepared) {
+			lap := knowledgeBase.getValue("Pitstop.Planned.Lap", false)
+
+			if lap
+				lap += 1
+
 			setMultiMapValue(sessionInfo, "Pitstop", "Planned.Nr", knowledgeBase.getValue("Pitstop.Planned.Nr"))
-			setMultiMapValue(sessionInfo, "Pitstop", "Planned.Lap", knowledgeBase.getValue("Pitstop.Planned.Lap", false))
+			setMultiMapValue(sessionInfo, "Pitstop", "Planned.Lap", lap)
 			setMultiMapValue(sessionInfo, "Pitstop", "Planned.Refuel", knowledgeBase.getValue("Pitstop.Planned.Fuel", 0))
 
 			tyreCompound := knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound", false)

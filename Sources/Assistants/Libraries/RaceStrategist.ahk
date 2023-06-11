@@ -1873,7 +1873,7 @@ class RaceStrategist extends GridRaceAssistant {
 			if nextPitstop {
 				setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next", nextPitstop)
 
-				setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Lap", knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Lap"))
+				setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Lap", knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Lap") + 1)
 				setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Refuel", Round(knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Fuel.Amount")))
 
 				if knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Change", false) {
@@ -2210,13 +2210,13 @@ class RaceStrategist extends GridRaceAssistant {
 							if (activeStrategy && ((activeStrategy.Pitstops.Length - activeStrategy.RunningPitstops) > 0))
 								activePitstop := activeStrategy.Pitstops[strategy.RunningPitstops + 1]
 
-							speaker.speakPhrase("NextPitstop", {pitstopLap: lap})
+							speaker.speakPhrase("NextPitstop", {pitstopLap: lap + 1})
 
 							if activePitstop {
 								difference := (lap - activePitstop.Lap)
 
 								if (difference != 0)
-									speaker.speakPhrase("LapsDifference", {difference: Abs(difference), lap: activePitstop.Lap
+									speaker.speakPhrase("LapsDifference", {difference: Abs(difference), lap: activePitstop.Lap + 1
 																		 , label: (Abs(difference) = 1) ? fragments["Lap"] : fragments["Laps"]
 																		 , direction: (difference < 0) ? fragments["Earlier"] : fragments["Later"]})
 							}
@@ -3269,7 +3269,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 		if (plannedLap == kUndefined) {
 			if (hasEngineer && strategyLap) {
-				speaker.speakPhrase("PitstopLap", {lap: Max(strategyLap, lastLap + 1)})
+				speaker.speakPhrase("PitstopLap", {lap: Max(strategyLap + 1, lastLap + 1)})
 
 				speaker.speakPhrase("ConfirmInformEngineer", false, true)
 
@@ -3289,7 +3289,7 @@ class RaceStrategist extends GridRaceAssistant {
 			speaker.beginTalk()
 
 			try {
-				speaker.speakPhrase("PitstopLap", {lap: plannedLap})
+				speaker.speakPhrase("PitstopLap", {lap: plannedLap + 1})
 
 				speaker.speakPhrase("Explain", false, true)
 
@@ -3355,12 +3355,12 @@ class RaceStrategist extends GridRaceAssistant {
 			speaker.beginTalk()
 
 			try {
-				speaker.speakPhrase("EvaluatedLaps", {laps: laps.Length, first: laps[1], last: laps[laps.Length]})
+				speaker.speakPhrase("EvaluatedLaps", {laps: laps.Length, first: laps[1] + 1, last: laps[laps.Length] + 1})
 
 				if (position = Min(positions*))
 					speaker.speakPhrase("EvaluatedSimilarPosition", {position: position})
 				else
-					speaker.speakPhrase("EvaluatedBestPosition", {lap: plannedLap, position: position})
+					speaker.speakPhrase("EvaluatedBestPosition", {lap: plannedLap + 1, position: position})
 
 				if (traffic.Length > 0) {
 					speaker.speakPhrase("EvaluatedTraffic", {traffic: traffic.Length})

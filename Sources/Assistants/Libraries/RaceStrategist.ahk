@@ -2168,8 +2168,8 @@ class RaceStrategist extends GridRaceAssistant {
 	reportStrategy(options := true, strategy := false) {
 		local knowledgeBase := this.KnowledgeBase
 		local reported := false
-		local activeStrategy, activePitstop, strategyName, speaker, nextPitstop, lap, refuel, tyreChange, map
-		local fragments
+		local activeStrategy, activePitstop, strategyName, nextPitstop, lap, refuel, tyreChange, map
+		local speaker, fragments
 
 		if this.Speaker {
 			speaker := this.getSpeaker()
@@ -2191,8 +2191,8 @@ class RaceStrategist extends GridRaceAssistant {
 							difference := (strategy.Pitstops.Length - (activeStrategy.Pitstops.Length - activeStrategy.RunningPitstops))
 
 							if (difference != 0)
-								speaker.speakPhrase("PitstopsDifference", {pitstops: Abs(difference)
-																		 , difference: (difference < 0) ? fragments["Less"] : fragments["More"]})
+								speaker.speakPhrase("PitstopsDifference", {difference: Abs(difference), pitstops: strategy.Pitstops.Length - difference
+																		 , direction: (difference < 0) ? fragments["Less"] : fragments["More"]})
 						}
 
 						reported := true
@@ -2216,9 +2216,9 @@ class RaceStrategist extends GridRaceAssistant {
 								difference := (lap - activePitstop.Lap)
 
 								if (difference != 0)
-									speaker.speakPhrase("LapsDifference", {laps: Abs(difference)
+									speaker.speakPhrase("LapsDifference", {difference: Abs(difference), lap: activePitstop.Lap
 																		 , label: (Abs(difference) = 1) ? fragments["Lap"] : fragments["Laps"]
-																		 , difference: (difference < 0) ? fragments["Earlier"] : fragments["Later"]})
+																		 , direction: (difference < 0) ? fragments["Earlier"] : fragments["Later"]})
 							}
 
 							if ((options == true) || (options.HasProp("Refuel") && options.Refuel)) {
@@ -2229,8 +2229,9 @@ class RaceStrategist extends GridRaceAssistant {
 									difference := (refuel - Round(activePitstop.RefuelAmount))
 
 									if (difference != 0)
-										speaker.speakPhrase("RefuelDifference", {refuel: Abs(difference), unit: fragments[getUnit("Volume")]
-																			   , difference: (difference < 0) ? fragments["Less"] : fragments["More"]})
+										speaker.speakPhrase("RefuelDifference", {difference: Abs(difference), refuel: Round(activePitstop.RefuelAmount)
+																			   , unit: fragments[getUnit("Volume")]
+																			   , direction: (difference < 0) ? fragments["Less"] : fragments["More"]})
 								}
 							}
 

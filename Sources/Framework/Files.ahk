@@ -99,10 +99,13 @@ deleteFile(fileName, backup := false) {
 		return true
 	}
 	catch Any as exception {
-		if FileExist(fileName)
+		if FileExist(fileName) {
 			logError(exception, false, true)
 
-		return false
+			return false
+		}
+		else
+			return true
 	}
 }
 
@@ -118,10 +121,13 @@ deleteDirectory(directoryName, includeDirectory := true, recurse := true) {
 			return true
 		}
 		catch Any as exception {
-			if FileExist(directoryName)
+			if FileExist(directoryName) {
 				logError(exception, false, true)
 
-			return false
+				return false
+			}
+			else
+				return true
 		}
 	}
 	else {

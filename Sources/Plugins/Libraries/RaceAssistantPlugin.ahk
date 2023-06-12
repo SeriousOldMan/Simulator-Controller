@@ -58,6 +58,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 	iRaceAssistantActive := false
 
+	iNextSessionUpdate := false
+
 	class RemoteRaceAssistant {
 		iPlugin := false
 		iRemoteEvent := false
@@ -846,12 +848,10 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		local tries := 10
 		local session, information, state
 
-		static nextUpdate := 0
-
 		if this.Active {
-			if (this.TeamSessionActive && this.TeamSessionActive && (A_TickCount > nextUpdate))
+			if (this.TeamSessionActive && this.TeamSessionActive && (A_TickCount > this.iNextSessionUpdate))
 				try {
-					nextUpdate := (A_TickCount + 30000)
+					this.iNextSessionUpdate := (A_TickCount + 30000)
 
 					state := this.TeamServer.getSessionValue(this.Plugin . " Session Info", false)
 
@@ -1786,7 +1786,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 		if FileExist(fileName)
 			if (teamServer && teamServer.SessionActive && this.TeamSessionActive) {
-				teamServer.setSessionValue(this.Plugin . " Session Info", fileName)
+				teamServer.setSessionValue(this.Plugin . " Session Info", FileRead(fileName))
 
 				deleteFile(fileName)
 			}

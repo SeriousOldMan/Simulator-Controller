@@ -2406,7 +2406,7 @@ class RaceStrategist extends GridRaceAssistant {
 			this.getSpeaker().speakPhrase("NoStrategy")
 	}
 
-	updateStrategy(strategy, original := true, report := true, version := false, origin := "Assistant", remote := true) {
+	updateStrategy(newStrategy, original := true, report := true, version := false, origin := "Assistant", remote := true) {
 		local knowledgeBase := this.KnowledgeBase
 		local fact, value, fileName, configuration
 
@@ -2416,32 +2416,31 @@ class RaceStrategist extends GridRaceAssistant {
 			else if (this.Strategy[true] && (this.Strategy[true].Version = version))
 				return
 
-		if strategy {
+		if newStrategy {
 			if (this.Session == kSessionRace) {
-				if !isObject(strategy)
-					strategy := Strategy(this, readMultiMap(strategy))
+				if !isObject(newStrategy)
+					newStrategy := Strategy(this, readMultiMap(newStrategy))
 
 				this.clearStrategy()
 
-				for fact, value in this.loadStrategy(CaseInsenseMap(), strategy, knowledgeBase.getValue("Pitstop.Last", false))
+				for fact, value in this.loadStrategy(CaseInsenseMap(), newStrategy, knowledgeBase.getValue("Pitstop.Last", false))
 					knowledgeBase.setFact(fact, value)
 
 				this.dumpKnowledgeBase(knowledgeBase)
 
 				if original
-					this.updateSessionValues({OriginalStrategy: strategy, Strategy: strategy})
-				else {
-					this.updateSessionValues({Strategy: strategy})
+					this.updateSessionValues({OriginalStrategy: newStrategy, Strategy: newStrategy})
+				else
+					this.updateSessionValues({Strategy: newStrategy})
 
-					if report
-						this.reportStrategy({Strategy: true, Pitstops: false, NextPitstop: true, TyreChange: true, Refuel: true, Map: true})
-				}
+				if report
+					this.reportStrategy({Strategy: true, Pitstops: false, NextPitstop: true, TyreChange: true, Refuel: true, Map: true})
 
 				if (remote && this.RemoteHandler) {
 					fileName := temporaryFileName("Race Strategy", "update")
 					configuration := newMultiMap()
 
-					strategy.saveToConfiguration(configuration)
+					newStrategy.saveToConfiguration(configuration)
 
 					writeMultiMap(fileName, configuration)
 
@@ -2453,12 +2452,12 @@ class RaceStrategist extends GridRaceAssistant {
 							logError(exception)
 						}
 
-					this.RemoteHandler.updateStrategy(fileName, strategy.Version)
+					this.RemoteHandler.updateStrategy(fileName, newStrategy.Version)
 				}
 				else if isDebug() {
 					configuration := newMultiMap()
 
-					strategy.saveToConfiguration(configuration)
+					newStrategy.saveToConfiguration(configuration)
 
 					writeMultiMap(kTempDirectory . "Race Strategist.strategy", configuration)
 				}

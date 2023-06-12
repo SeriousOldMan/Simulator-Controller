@@ -662,18 +662,25 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 	else if (settingsOrCommand == kUpdate) {
 		if connected
 			if (arguments[1] == "Team") {
-				teamName := getKeys(teams)[settingsGui["teamDropDownMenu"].Value]
-				teamIdentifier := teams[teamName]
+				if ((teams.Count > 0) || (settingsGui["teamDropDownMenu"].Value = 0)) {
+					teamName := getKeys(teams)[settingsGui["teamDropDownMenu"].Value]
+					teamIdentifier := teams[teamName]
 
-				exception := false
+					exception := false
 
-				try {
-					drivers := loadDrivers(connector, teamIdentifier)
+					try {
+						drivers := loadDrivers(connector, teamIdentifier)
+					}
+					catch Any as e {
+						drivers := CaseInsenseMap()
+
+						exception := e
+					}
 				}
-				catch Any as e {
+				else {
+					teamName := ""
+					teamIdentifier := false
 					drivers := CaseInsenseMap()
-
-					exception := e
 				}
 
 				names := getKeys(drivers)
@@ -727,12 +734,24 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 					throw exception
 			}
 			else if (arguments[1] == "Driver") {
-				driverName := getKeys(drivers)[settingsGui["driverDropDownMenu"].Value]
-				driverIdentifier := drivers[driverName]
+				if ((drivers.Count > 0) || (settingsGui["driverDropDownMenu"].Value = 0)) {
+					driverName := getKeys(drivers)[settingsGui["driverDropDownMenu"].Value]
+					driverIdentifier := drivers[driverName]
+				}
+				else {
+					driverName := ""
+					driverIdentifier := false
+				}
 			}
 			else if (arguments[1] == "Session") {
-				sessionName := getKeys(sessions)[settingsGui["sessionDropDownMenu"].Value]
-				sessionIdentifier := sessions[sessionName]
+				if ((sessions.Count > 0) || (settingsGui["sessionDropDownMenu"].Value = 0)) {
+					sessionName := getKeys(sessions)[settingsGui["sessionDropDownMenu"].Value]
+					sessionIdentifier := sessions[sessionName]
+				}
+				else {
+					sessionName := ""
+					sessionIdentifier := false
+				}
 			}
 	}
 	else if (settingsOrCommand == kConnect) {
@@ -1351,7 +1370,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		settingsGui.Add("Text", "x66 yp+28 w270 0x10")
 
-		value := getMultiMapValue(settingsOrCommand, "Strategy Settings", "Strategy.Window.Considered", 2)
+		value := getMultiMapValue(settingsOrCommand, "Strategy Settings", "Strategy.Window.Considered", 3)
 
 		settingsGui.Add("Text", "x16 yp+15 w105 h23 +0x200", translate("Pitstop Window"))
 		settingsGui.Add("Edit", "x126 yp w50 h20 Limit1 Number VpitstopStrategyWindowEdit", value)

@@ -279,6 +279,24 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 		this.ActionsListView.ModifyCol(4, "AutoHdr")
 	}
 
+	validateActions() {
+		local wizard := this.SetupWizard
+		local ignore, action, function, index
+
+		for ignore, action in this.getActions() {
+			function := wizard.getModuleActionFunction("Pedal Calibration", "Pedal Calibration", action)
+
+			if isObject(function) {
+				index := inList(function, "")
+
+				if (index && (index < function.Length))
+					return false
+			}
+		}
+
+		return true
+	}
+
 	saveActions() {
 		local wizard := this.SetupWizard
 		local modeFunctions := CaseInsenseMap()

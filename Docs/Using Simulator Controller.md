@@ -214,7 +214,7 @@ The "System Monitor" is divided into several pages of information:
 	 
 	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/System%20Monitor%206.JPG)
 	 
-	 The following information widgets are available:
+	 The following information components are available:
 	 
 	 - Session
 	 
@@ -250,15 +250,15 @@ The "System Monitor" is divided into several pages of information:
 	   
 	 - Strategy
 	 
-	   This widget give you a summary about the active strategy, if any. Most important is the summary about the next pending pitstop.
+	   This component give you a summary about the active strategy, if any. Most important is the summary about the next pending pitstop.
 	 
 	 - Pitstop
 	 
-	   When an upcoming pitstop has been planned, this widget will show you all relevant settings like fuel amount, tyre compound and pressures, as well as selected repairs.
+	   When an upcoming pitstop has been planned, this component will show you all relevant settings like fuel amount, tyre compound and pressures, as well as selected repairs.
 	 
 	 In most cases, redundant information is suppressed. For example, if the remaining session, stint and driver time are identical, only the remaining time is shown.
 	 
-	 The widgets, that will be shown, as well as the update frequency of the information can be configured by clicking on the settings button in the upper right corner of the "System Monitor" window.
+	 The components, that will be shown, as well as the update frequency of the information can be configured by clicking on the settings button in the upper right corner of the "System Monitor" window.
 
 	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/System%20Monitor%207.JPG)
 

@@ -829,7 +829,7 @@ class StrategySimulation {
 
 			for ignore, disposable in scenarios
 				if (disposable != scenario)
-				disposable.dispose()
+					disposable.dispose()
 		}
 		catch StrategySimulation.CancelSimulation {
 			return

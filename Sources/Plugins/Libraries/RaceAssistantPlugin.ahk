@@ -689,7 +689,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			raceAssistantToggle := this.getArgumentValue("raceAssistant", false)
 
 			if raceAssistantToggle {
-				arguments := string2Values(A_Space, raceAssistantToggle)
+				arguments := string2Values(A_Space, substituteString(raceAssistantToggle, "  ", A_Space))
 
 				if (arguments.Length == 0)
 					arguments := ["On"]
@@ -708,7 +708,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			teamServerToggle := this.getArgumentValue("teamServer", false)
 
 			if (teamServerToggle && teamServer && teamServer.Active) {
-				arguments := string2Values(A_Space, teamServerToggle)
+				arguments := string2Values(A_Space, substituteString(teamServerToggle, "  ", A_Space))
 
 				if (arguments.Length == 0)
 					arguments := ["Off"]
@@ -756,7 +756,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				this.createRaceAssistantAction(controller, "RaceCenterOpen", openRaceCenter)
 
 			for ignore, theAction in string2Values(",", this.getArgumentValue("assistantCommands", ""))
-				this.createRaceAssistantAction(controller, string2Values(A_Space, theAction)*)
+				this.createRaceAssistantAction(controller, string2Values(A_Space, substituteString(theAction, "  ", A_Space))*)
 
 			this.iRaceAssistantSynthesizer := this.getArgumentValue("raceAssistantSynthesizer", false)
 

@@ -371,6 +371,25 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 		this.ActionsListView.ModifyCol(4, "AutoHdr")
 	}
 
+	validateActions() {
+		local wizard := this.SetupWizard
+		local ignore, mode, action, function, index
+
+		for ignore, mode in this.Definition
+			for ignore, action in this.getActions(mode) {
+				function := wizard.getModuleActionFunction("Tactile Feedback", mode, action)
+
+				if isObject(function) {
+					index := inList(function, "")
+
+					if (index && (index < function.Length))
+						return false
+				}
+			}
+
+		return true
+	}
+
 	saveActions() {
 		local wizard := this.SetupWizard
 		local function, action, ignore, mode, modeFunctions

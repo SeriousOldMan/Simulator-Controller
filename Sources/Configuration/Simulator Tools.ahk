@@ -1936,7 +1936,7 @@ updateConfigurationForV424() {
 						targetName := fileName
 
 						while FileExist(targetDirectory . "\" . targetName) {
-							SplitPath(targetName, , , , &name)
+							SplitPath(fileName, , , , &name)
 
 							targetName := (name . " (" . (A_Index + 1) . ").strategy")
 						}

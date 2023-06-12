@@ -170,8 +170,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 					if (strategyUpdate = "CANCEL")
 						this.RaceStrategist.updateStrategy(false, true
-														 , origin != "Assistant", strategyVersion, origin = "Assistant"
-														 , false)
+														 , origin != "Assistant", strategyVersion, origin, false)
 					else {
 						try {
 							if FileExist(kTempDirectory . "Race Strategy.update")
@@ -180,8 +179,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 							FileAppend(strategyUpdate, kTempDirectory . "Race Strategy.update")
 
 							this.RaceStrategist.updateStrategy(kTempDirectory . "Race Strategy.update", true
-															 , origin != "Assistant", strategyVersion, origin = "Assistant"
-															 , false)
+															 , origin != "Assistant", strategyVersion, origin, false)
 						}
 						catch Any as exception {
 							logError(exception)

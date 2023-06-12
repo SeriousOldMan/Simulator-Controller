@@ -1429,9 +1429,9 @@ class RaceStrategist extends GridRaceAssistant {
 		return getMultiMapValue(this.Settings, "Session Settings", "Telemetry." . session, default)
 	}
 
-	loadStrategy(facts, strategy, lap := false, filter := false) {
+	loadStrategy(facts, strategy, lastPitstop := false) {
 		local pitstopWindow := getMultiMapValue(this.Settings, "Strategy Settings", "Strategy.Window.Considered", 3)
-		local pitstop, count, ignore, pitstopLap, first
+		local pitstop, count, ignore, pitstopLap, first, rootStrategy
 
 		strategy.RunningPitstops := 0
 		strategy.RunningLaps := 0
@@ -1455,10 +1455,10 @@ class RaceStrategist extends GridRaceAssistant {
 		count := 0
 
 		for ignore, pitstop in strategy.Pitstops {
-			pitstopLap := pitstop.Lap
-
-			if (filter && lap && ((pitstopLap < lap) || ((pitstopLap - lap) <= pitstopWindow)))
+			if (lastPitstop && (pitstop.Nr <= lastPitstop))
 				continue
+
+			pitstopLap := pitstop.Lap
 
 			count += 1
 
@@ -2406,7 +2406,7 @@ class RaceStrategist extends GridRaceAssistant {
 			this.getSpeaker().speakPhrase("NoStrategy")
 	}
 
-	updateStrategy(strategy, original := true, report := true, version := false, filter := false, remote := true) {
+	updateStrategy(strategy, original := true, report := true, version := false, origin := "Assistant", remote := true) {
 		local knowledgeBase := this.KnowledgeBase
 		local fact, value, fileName, configuration
 
@@ -2423,7 +2423,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 				this.clearStrategy()
 
-				for fact, value in this.loadStrategy(CaseInsenseMap(), strategy, knowledgeBase.getValue("Lap") + 1, filter)
+				for fact, value in this.loadStrategy(CaseInsenseMap(), strategy, knowledgeBase.getValue("Pitstop.Last", false))
 					knowledgeBase.setFact(fact, value)
 
 				this.dumpKnowledgeBase(knowledgeBase)

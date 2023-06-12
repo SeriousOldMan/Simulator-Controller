@@ -37,6 +37,8 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 	iRaceStrategist := false
 
+	iLastStrategyVersion := false
+
 	class RemoteRaceStrategist extends RaceAssistantPlugin.RemoteRaceAssistant {
 		__New(plugin, remotePID) {
 			super.__New(plugin, "Race Strategist", remotePID)
@@ -143,38 +145,58 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		this.iLapDatabase := false
 	}
 
-	checkStrategy() {
-		local strategyUpdate
+	checkStrategy(lap := false) {
+		local strategyUpdate, strategyVersion
+
+		static lastLap := 0
 
 		if (this.TeamSession && this.RaceStrategist) {
-			strategyUpdate := this.TeamServer.getSessionValue("Strategy Update", false)
+			if lap {
+				if ((lap = 1) || (Abs(lap - lastLap) > 1))
+					this.iLastStrategyVersion := false
 
-			if (strategyUpdate && (strategyUpdate != "")) {
-				this.TeamServer.setSessionValue("Strategy Update", "")
+				lastLap := lap
+			}
 
-				strategyUpdate := this.TeamServer.getLapValue(strategyUpdate, "Strategy Update")
+			strategyVersion := this.TeamServer.getSessionValue("Strategy Update Version", false)
 
-				if (strategyUpdate && (strategyUpdate != ""))
-					if (strategyUpdate = "CANCEL")
-						this.RaceStrategist.updateStrategy(false)
-					else {
-						try {
-							if FileExist(kTempDirectory . "Race Strategy.update")
-								deleteFile(kTempDirectory . "Race Strategy.update")
+			if (strategyVersion && (strategyVersion != "") && (this.iLastStrategyVersion != strategyVersion)) {
+				this.iLastStrategyVersion := strategyVersion
 
-							FileAppend(strategyUpdate, kTempDirectory . "Race Strategy.update")
+				strategyUpdate := this.TeamServer.getSessionValue("Strategy Update", false)
+
+				if (strategyUpdate && (strategyUpdate != "")) {
+					; this.TeamServer.setSessionValue("Strategy Update", "")
+
+					if isInteger(strategyUpdate)
+						strategyUpdate := this.TeamServer.getLapValue(strategyUpdate, "Strategy Update")
+
+					if (strategyUpdate && (strategyUpdate != ""))
+						if (strategyUpdate = "CANCEL")
+							this.RaceStrategist.updateStrategy(false, true
+															 , this.TeamServer.getSessionValue("Strategy Update Origin", "Driver") != "Driver"
+															 , strategyVersion)
+						else {
+							try {
+								if FileExist(kTempDirectory . "Race Strategy.update")
+									deleteFile(kTempDirectory . "Race Strategy.update")
+
+								FileAppend(strategyUpdate, kTempDirectory . "Race Strategy.update")
+
+								this.RaceStrategist.updateStrategy(kTempDirectory . "Race Strategy.update", true
+																 , this.TeamServer.getSessionValue("Strategy Update Origin", "Driver") != "Driver"
+																 , strategyVersion)
+							}
+							catch Any as exception {
+								logError(exception)
+							}
 						}
-						catch Any as exception {
-							logError(exception)
-						}
-
-						this.RaceStrategist.updateStrategy(kTempDirectory . "Race Strategy.update")
-					}
+				}
 			}
 		}
 	}
 
-	updateStrategy(strategy) {
+	updateStrategy(strategy, version) {
 		local teamServer := this.TeamServer
 		local text
 
@@ -184,13 +206,23 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 				deleteFile(strategy)
 
+				teamServer.setSessionValue("Strategy Update", text)
+				teamServer.setSessionValue("Strategy Update Version", version)
+				teamServer.setSessionValue("Strategy Update Origin", "Driver")
+
 				teamServer.setSessionValue("Race Strategy", text)
-				teamServer.setSessionValue("Race Strategy Version", A_Now)
+				teamServer.setSessionValue("Race Strategy Version", version)
 			}
 			else {
+				teamServer.setSessionValue("Strategy Update", "CANCEL")
+				teamServer.setSessionValue("Strategy Update Version", version)
+				teamServer.setSessionValue("Strategy Update Origin", "Driver")
+
 				teamServer.setSessionValue("Race Strategy", "CANCEL")
-				teamServer.setSessionValue("Race Strategy Version", A_Now)
+				teamServer.setSessionValue("Race Strategy Version", version)
 			}
+
+			this.iLastStrategyVersion := version
 		}
 		else
 			deleteFile(strategy)
@@ -204,7 +236,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	addLap(lap, running, data) {
 		super.addLap(lap, running, data)
 
-		this.checkStrategy()
+		this.checkStrategy(lap)
 	}
 
 	updateLap(lap, running, data) {

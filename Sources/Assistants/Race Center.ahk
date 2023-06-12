@@ -3945,11 +3945,13 @@ class RaceCenter extends ConfigurationItem {
 					showMessage(translate("Strategy has been saved for this Session."))
 
 				if instruct {
-					lap := this.Connector.GetSessionLastLap(session)
+					; lap := this.Connector.GetSessionLastLap(session)
 
-					this.Connector.SetLapValue(lap, "Race Strategy", strategy)
-					this.Connector.SetLapValue(lap, "Strategy Update", strategy)
-					this.Connector.SetSessionValue(session, "Strategy Update", lap)
+					; this.Connector.SetLapValue(lap, "Race Strategy", strategy)
+					; this.Connector.SetLapValue(lap, "Strategy Update", strategy)
+					this.Connector.SetSessionValue(session, "Strategy Update", strategy)
+					this.Connector.SetSessionValue(session, "Strategy Update Version", this.Strategy.Version)
+					this.Connector.SetSessionValue(session, "Strategy Update Origin", "Race Center")
 
 					if verbose
 						showMessage(translate("Race Strategist will be instructed as fast as possible."))
@@ -3970,12 +3972,14 @@ class RaceCenter extends ConfigurationItem {
 				session := this.SelectedSession[true]
 
 				this.Connector.SetSessionValue(session, "Race Strategy", "CANCEL")
-				this.Connector.SetSessionValue(session, "Race Strategy Version", A_Now . "")
+				this.Connector.SetSessionValue(session, "Race Strategy Version", A_Now)
 
-				lap := this.Connector.GetSessionLastLap(session)
+				; lap := this.Connector.GetSessionLastLap(session)
 
-				this.Connector.SetLapValue(lap, "Strategy Update", "CANCEL")
-				this.Connector.SetSessionValue(session, "Strategy Update", lap)
+				; this.Connector.SetLapValue(lap, "Strategy Update", "CANCEL")
+				this.Connector.SetSessionValue(session, "Strategy Update", "CANCEL")
+				this.Connector.SetSessionValue(session, "Strategy Update Version", A_Now)
+					this.Connector.SetSessionValue(session, "Strategy Update Origin", "Race Center")
 
 				showMessage(translate("Race Strategist will be instructed as fast as possible."))
 			}

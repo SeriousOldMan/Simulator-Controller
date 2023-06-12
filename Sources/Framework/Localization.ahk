@@ -17,6 +17,13 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                         Local Include Section                           ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include "..\Libraries\Math.ahk"
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                        Public Constants Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -200,11 +207,14 @@ displayFloatValue(float, precision := kUndefined) {
 displayTimeValue(time, fillHours := false, withSeconds := true, withFractions := true, arguments*) {
 	global gTimeFormat
 
+	local sign := (signum(time) < 0)
 	local hours, seconds, fraction, minutes
 
 	if ((gTimeFormat = "S.##") || (gTimeFormat = "S,##"))
 		return StrReplace(time, ".", (gTimeFormat = "S.##") ? "." : ",")
 	else {
+		time := Abs(time)
+
 		seconds := Floor(time)
 		fraction := (time - seconds)
 		minutes := Floor(seconds / 60)
@@ -226,7 +236,7 @@ displayTimeValue(time, fillHours := false, withSeconds := true, withFractions :=
 		else
 			hours := ((hours > 0) ? (hours . ":") : "")
 
-		return (hours . minutes . (withSeconds ? (":" . seconds . (withFractions ? (((gTimeFormat = "[H:]M:S.##") ? "." : ",") . fraction) : "")) : ""))
+		return ((sign ? "-" : "") . (hours . minutes . (withSeconds ? (":" . seconds . (withFractions ? (((gTimeFormat = "[H:]M:S.##") ? "." : ",") . fraction) : "")) : "")))
 	}
 }
 

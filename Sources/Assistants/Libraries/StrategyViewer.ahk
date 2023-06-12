@@ -103,7 +103,7 @@ class StrategyViewer {
 		local html := "<table class=`"table-std`">"
 		local stints, drivers, maps, laps, lapTimes, fuelConsumptions, pitstopInfos, refuels, tyreChanges, weathers
 		local lastDriver, lastMap, lastLap, lastLapTime, lastFuelConsumption, lastRefuel, lastPitstopInfo
-		local lastWeather, lastTyreChange, lastTyreLaps, ignore, pitstop, pitstopLap
+		local lastWeather, lastTyreChange, lastTyreLaps, ignore, pitstop
 
 		timeSeries := [strategy.SessionStartTime / 60]
 		lapSeries := [strategy.StartLap]
@@ -149,12 +149,10 @@ class StrategyViewer {
 			lastTyreLaps := strategy.RemainingTyreLaps
 
 			for ignore, pitstop in strategy.Pitstops {
-				pitstopLap := (pitstop.Lap - lastLap)
-
 				stints.Push("<th class=`"th-std`">" . (startStint + A_Index - 1) . "</th>")
 				drivers.Push("<td class=`"td-std`">" . lastDriver . "</td>")
 				maps.Push("<td class=`"td-std`">" . lastMap . "</td>")
-				laps.Push("<td class=`"td-std`">" . Max(pitstopLap, 0) . "</td>")
+				laps.Push("<td class=`"td-std`">" . Max(pitstop.Lap - lastLap, 0) . "</td>")
 				lapTimes.Push("<td class=`"td-std`">" . StrategyViewer.lapTimeDisplayValue(Round(lastLapTime, 1)) . "</td>")
 				fuelConsumptions.Push("<td class=`"td-std`">" . (isNumber(lastFuelConsumption) ? displayValue("Float", convertUnit("Volume", lastFuelConsumption)) : "") . "</td>")
 				pitstopInfos.Push("<td class=`"td-std td-right`">" . lastPitstopInfo . "</td>")
@@ -163,7 +161,7 @@ class StrategyViewer {
 				tyreChanges.Push("<td class=`"td-std`">" . lastTyreChange . "</td>")
 
 				timeSeries.Push(pitstop.Time / 60)
-				lapSeries.Push(pitstop.Lap)
+				lapSeries.Push(pitstop.Lap + 1)
 				fuelSeries.Push(pitstop.RemainingFuel - pitstop.RefuelAmount)
 				tyreSeries.Push(lastTyreLaps - (pitstop.Lap - lastLap))
 
@@ -174,12 +172,12 @@ class StrategyViewer {
 				lastLapTime := pitstop.AvgLapTime
 				lastWeather := (translate(pitstop.Weather) . translate(" (") . displayValue("Float", convertUnit("Temperature", pitstop.AirTemperature)) . translate(" / ") . displayValue("Float", convertUnit("Temperature", pitstop.TrackTemperature), 1) . translate(")"))
 				lastRefuel := pitstop.RefuelAmount
-				lastPitstopInfo := (Format("{1:3}", pitstop.Lap) . translate(" - ") . displayValue("Time", pitstop.Time, true, false, false))
+				lastPitstopInfo := (Format("{1:3}", pitstop.Lap + 1) . translate(" - ") . displayValue("Time", pitstop.Time, true, false, false))
 				lastTyreChange := (pitstop.TyreChange ? translate(compound(pitstop.TyreCompound, pitstop.TyreCompoundColor)) : translate("No"))
 				lastTyreLaps := pitstop.RemainingTyreLaps
 
 				timeSeries.Push((pitstop.Time + pitStop.Duration) / 60)
-				lapSeries.Push(pitstop.Lap)
+				lapSeries.Push(pitstop.Lap + 1)
 				fuelSeries.Push(pitstop.RemainingFuel)
 				tyreSeries.Push(lastTyreLaps)
 			}

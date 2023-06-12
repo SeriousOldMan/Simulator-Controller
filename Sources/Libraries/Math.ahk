@@ -9,6 +9,10 @@
 ;;;                     Public Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+signum(number) {
+	return ((number < 0) ? -1 : 1)
+}
+
 minimum(numbers) {
 	local theMin := kUndefined
 	local ignore, value

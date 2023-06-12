@@ -1784,29 +1784,30 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		local teamServer := this.TeamServer
 		local tries := 10
 
-		if (teamServer && teamServer.SessionActive && this.TeamSessionActive) {
-			teamServer.setSessionValue(this.Plugin . " Session Info", fileName)
+		if FileExist(fileName)
+			if (teamServer && teamServer.SessionActive && this.TeamSessionActive) {
+				teamServer.setSessionValue(this.Plugin . " Session Info", fileName)
 
-			deleteFile(fileName)
-		}
-		else {
-			deleteFile(kTempDirectory . this.Plugin . " Session.state")
+				deleteFile(fileName)
+			}
+			else {
+				deleteFile(kTempDirectory . this.Plugin . " Session.state")
 
-			loop
-				try {
-					FileMove(fileName, kTempDirectory . this.Plugin . " Session.state")
+				loop
+					try {
+						FileMove(fileName, kTempDirectory . this.Plugin . " Session.state")
 
-					break
-				}
-				catch Any as exception {
-					logError(exception)
-
-					if (tries-- <= 0)
 						break
-					else
-						Sleep(200)
-				}
-		}
+					}
+					catch Any as exception {
+						logError(exception)
+
+						if (tries-- <= 0)
+							break
+						else
+							Sleep(200)
+					}
+			}
 	}
 
 	static collectSessionData() {

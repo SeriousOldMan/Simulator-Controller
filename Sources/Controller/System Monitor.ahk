@@ -1406,7 +1406,7 @@ systemMonitor(command := false, arguments*) {
 
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
-		settingsButton := systemMonitorGui.Add("Button", "x773 yp+4 w23 h23")
+		settingsButton := systemMonitorGui.Add("Button", "x773 yp+4 w23 h23 Disabled")
 		settingsButton.OnEvent("Click", modifySettings.Bind(systemMonitorGui))
 		setButtonIcon(settingsButton, kIconsDirectory . "General Settings.ico", 1)
 

@@ -2399,11 +2399,15 @@ class RaceStrategist extends GridRaceAssistant {
 			this.getSpeaker().speakPhrase("NoStrategy")
 	}
 
-	updateStrategy(strategy, original := true, report := true) {
+	updateStrategy(strategy, original := true, report := true, version := false) {
 		local knowledgeBase := this.KnowledgeBase
 		local fact, value
 
-		this.updateDynamicValues({StrategyReported: true, RejectedStrategy: false})
+		if version
+			if (this.Strategy && (this.Strategy.Version = version))
+				return
+			else if (this.Strategy[true] && (this.Strategy[true].Version = version))
+				return
 
 		if strategy {
 			if (this.Session == kSessionRace) {
@@ -2429,6 +2433,8 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 		else
 			this.cancelStrategy(false)
+
+		this.updateDynamicValues({StrategyReported: true, RejectedStrategy: false})
 	}
 
 	runSimulation(pitstopHistory, confirm := false, request := "User") {
@@ -3137,7 +3143,8 @@ class RaceStrategist extends GridRaceAssistant {
 						if (report && this.Speaker) {
 							this.getSpeaker().speakPhrase("StrategyUpdate")
 
-							this.reportStrategy({Strategy: false, Pitstops: true, NextPitstop: true, TyreChange: true, Refuel: true, Map: true, Active: this.Strategy}, strategy)
+							this.reportStrategy({Strategy: false, Pitstops: true, NextPitstop: true
+											   , TyreChange: true, Refuel: true, Map: true, Active: this.Strategy}, strategy)
 
 							if ((this.Strategy != this.Strategy[true]) || isDebug())
 								this.explainStrategyRecommendation(strategy)
@@ -3172,7 +3179,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 				dispose := false
 
-				strategy.setVersion(A_Now . "")
+				strategy.setVersion(A_Now)
 
 				Task.startTask(ObjBindMethod(this, "updateStrategy", strategy, false, false), 1000)
 
@@ -3192,7 +3199,7 @@ class RaceStrategist extends GridRaceAssistant {
 							logError(exception)
 						}
 
-					this.RemoteHandler.updateStrategy(fileName)
+					this.RemoteHandler.updateStrategy(fileName, strategy.Version)
 				}
 			}
 			else {
@@ -3203,7 +3210,7 @@ class RaceStrategist extends GridRaceAssistant {
 						deleteFile(kTempDirectory . "Race Strategist.strategy")
 
 					if this.RemoteHandler
-						this.RemoteHandler.updateStrategy(false)
+						this.RemoteHandler.updateStrategy(false, A_Now)
 				}
 
 				if (confirm && this.Speaker) {

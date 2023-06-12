@@ -146,7 +146,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	}
 
 	checkStrategy(lap := false) {
-		local strategyUpdate, strategyVersion
+		local strategyUpdate, strategyVersion, origin
 
 		static lastLap := 0
 
@@ -158,39 +158,35 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 				lastLap := lap
 			}
 
-			strategyVersion := this.TeamServer.getSessionValue("Strategy Update Version", false)
+			strategyVersion := this.TeamServer.getSessionValue("Race Strategy Update Version", false)
 
 			if (strategyVersion && (strategyVersion != "") && (this.iLastStrategyVersion != strategyVersion)) {
 				this.iLastStrategyVersion := strategyVersion
 
-				strategyUpdate := this.TeamServer.getSessionValue("Strategy Update", false)
+				strategyUpdate := this.TeamServer.getSessionValue("Race Strategy Update", false)
 
 				if (strategyUpdate && (strategyUpdate != "")) {
-					; this.TeamServer.setSessionValue("Strategy Update", "")
+					origin := this.TeamServer.getSessionValue("Race Strategy Update Origin", "Assistant")
 
-					if isInteger(strategyUpdate)
-						strategyUpdate := this.TeamServer.getLapValue(strategyUpdate, "Strategy Update")
+					if (strategyUpdate = "CANCEL")
+						this.RaceStrategist.updateStrategy(false, true
+														 , origin != "Assistant", strategyVersion, origin = "Assistant"
+														 , false)
+					else {
+						try {
+							if FileExist(kTempDirectory . "Race Strategy.update")
+								deleteFile(kTempDirectory . "Race Strategy.update")
 
-					if (strategyUpdate && (strategyUpdate != ""))
-						if (strategyUpdate = "CANCEL")
-							this.RaceStrategist.updateStrategy(false, true
-															 , this.TeamServer.getSessionValue("Strategy Update Origin", "Driver") != "Driver"
-															 , strategyVersion)
-						else {
-							try {
-								if FileExist(kTempDirectory . "Race Strategy.update")
-									deleteFile(kTempDirectory . "Race Strategy.update")
+							FileAppend(strategyUpdate, kTempDirectory . "Race Strategy.update")
 
-								FileAppend(strategyUpdate, kTempDirectory . "Race Strategy.update")
-
-								this.RaceStrategist.updateStrategy(kTempDirectory . "Race Strategy.update", true
-																 , this.TeamServer.getSessionValue("Strategy Update Origin", "Driver") != "Driver"
-																 , strategyVersion)
-							}
-							catch Any as exception {
-								logError(exception)
-							}
+							this.RaceStrategist.updateStrategy(kTempDirectory . "Race Strategy.update", true
+															 , origin != "Assistant", strategyVersion, origin = "Assistant"
+															 , false)
 						}
+						catch Any as exception {
+							logError(exception)
+						}
+					}
 				}
 			}
 		}
@@ -205,22 +201,16 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 				text := FileRead(strategy)
 
 				deleteFile(strategy)
-
-				teamServer.setSessionValue("Strategy Update", text)
-				teamServer.setSessionValue("Strategy Update Version", version)
-				teamServer.setSessionValue("Strategy Update Origin", "Driver")
-
-				teamServer.setSessionValue("Race Strategy", text)
-				teamServer.setSessionValue("Race Strategy Version", version)
 			}
-			else {
-				teamServer.setSessionValue("Strategy Update", "CANCEL")
-				teamServer.setSessionValue("Strategy Update Version", version)
-				teamServer.setSessionValue("Strategy Update Origin", "Driver")
+			else
+				text := "CANCEL"
 
-				teamServer.setSessionValue("Race Strategy", "CANCEL")
-				teamServer.setSessionValue("Race Strategy Version", version)
-			}
+			teamServer.setSessionValue("Race Strategy Update", text)
+			teamServer.setSessionValue("Race Strategy Update Version", version)
+			teamServer.setSessionValue("Race Strategy Update Origin", "Assistant")
+
+			teamServer.setSessionValue("Race Strategy", text)
+			teamServer.setSessionValue("Race Strategy Version", version)
 
 			this.iLastStrategyVersion := version
 		}

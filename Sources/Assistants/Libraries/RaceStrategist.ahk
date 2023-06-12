@@ -1429,7 +1429,8 @@ class RaceStrategist extends GridRaceAssistant {
 		return getMultiMapValue(this.Settings, "Session Settings", "Telemetry." . session, default)
 	}
 
-	loadStrategy(facts, strategy, lap := false) {
+	loadStrategy(facts, strategy, lap := false, filter := false) {
+		local pitstopWindow := getMultiMapValue(this.Settings, "Strategy Settings", "Strategy.Window.Considered", 3)
 		local pitstop, count, ignore, pitstopLap, first
 
 		strategy.RunningPitstops := 0
@@ -1449,16 +1450,14 @@ class RaceStrategist extends GridRaceAssistant {
 		facts["Strategy.TC"] := strategy.TC
 		facts["Strategy.ABS"] := strategy.ABS
 
-		facts["Strategy.Pitstop.Deviation"]
-			:= getMultiMapValue(this.Settings, "Strategy Settings", "Strategy.Update.Pitstop"
-							  , getMultiMapValue(this.Settings, "Strategy Settings", "Strategy.Window.Considered", 3))
+		facts["Strategy.Pitstop.Deviation"] := getMultiMapValue(this.Settings, "Strategy Settings", "Strategy.Update.Pitstop", pitstopWindow)
 
 		count := 0
 
 		for ignore, pitstop in strategy.Pitstops {
 			pitstopLap := pitstop.Lap
 
-			if (lap && (pitstopLap < lap))
+			if (filter && lap && ((pitstopLap < lap) || ((pitstopLap - lap) <= pitstopWindow)))
 				continue
 
 			count += 1
@@ -2322,16 +2321,15 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 	}
 
-	cancelStrategy(confirm := true) {
+	cancelStrategy(confirm := true, report := true, remote := true) {
 		local knowledgeBase := this.KnowledgeBase
 		local hasStrategy := knowledgeBase.getValue("Strategy.Name", false)
-		local fact
 
 		if (this.Speaker && confirm) {
 			if hasStrategy {
 				this.getSpeaker().speakPhrase("ConfirmCancelStrategy", false, true)
 
-				this.setContinuation(ObjBindMethod(this, "cancelStrategy", false))
+				this.setContinuation(ObjBindMethod(this, "cancelStrategy", false, report, remote))
 			}
 			else
 				this.getSpeaker().speakPhrase("NoStrategy")
@@ -2342,7 +2340,15 @@ class RaceStrategist extends GridRaceAssistant {
 		if hasStrategy {
 			this.clearStrategy()
 
-			if this.Speaker
+			if remote {
+				if isDebug()
+					deleteFile(kTempDirectory . "Race Strategist.strategy")
+
+				if this.RemoteHandler
+					this.RemoteHandler.updateStrategy(false, A_Now)
+			}
+
+			if (this.Speaker && report)
 				this.getSpeaker().speakPhrase("StrategyCanceled")
 
 			this.updateSessionValues({OriginalStrategy: false, Strategy: false})
@@ -2391,7 +2397,8 @@ class RaceStrategist extends GridRaceAssistant {
 
 			if engineerPID
 				messageSend(kFileMessage, "Race Engineer", "requestPitstopHistory:Race Strategist;runSimulation;"
-														 . values2String(";", ProcessExist(), options.HasProp("Confirm") && options.Confirm, request), engineerPID)
+														 . values2String(";", ProcessExist(), options.HasProp("Confirm") && options.Confirm, request)
+										, engineerPID)
 			else if (this.Speaker && (!options.HasProp("Silent") || !options.Silent))
 				this.getSpeaker().speakPhrase("NoStrategyRecommendation")
 		}
@@ -2399,9 +2406,9 @@ class RaceStrategist extends GridRaceAssistant {
 			this.getSpeaker().speakPhrase("NoStrategy")
 	}
 
-	updateStrategy(strategy, original := true, report := true, version := false) {
+	updateStrategy(strategy, original := true, report := true, version := false, filter := false, remote := true) {
 		local knowledgeBase := this.KnowledgeBase
-		local fact, value
+		local fact, value, fileName, configuration
 
 		if version
 			if (this.Strategy && (this.Strategy.Version = version))
@@ -2416,7 +2423,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 				this.clearStrategy()
 
-				for fact, value in this.loadStrategy(CaseInsenseMap(), strategy, knowledgeBase.getValue("Lap") + 1)
+				for fact, value in this.loadStrategy(CaseInsenseMap(), strategy, knowledgeBase.getValue("Lap") + 1, filter)
 					knowledgeBase.setFact(fact, value)
 
 				this.dumpKnowledgeBase(knowledgeBase)
@@ -2429,10 +2436,36 @@ class RaceStrategist extends GridRaceAssistant {
 					if report
 						this.reportStrategy({Strategy: true, Pitstops: false, NextPitstop: true, TyreChange: true, Refuel: true, Map: true})
 				}
+
+				if (remote && this.RemoteHandler) {
+					fileName := temporaryFileName("Race Strategy", "update")
+					configuration := newMultiMap()
+
+					strategy.saveToConfiguration(configuration)
+
+					writeMultiMap(fileName, configuration)
+
+					if isDebug()
+						try {
+							FileCopy(fileName, kTempDirectory . "Race Strategist.strategy", 1)
+						}
+						catch Any as exception {
+							logError(exception)
+						}
+
+					this.RemoteHandler.updateStrategy(fileName, strategy.Version)
+				}
+				else if isDebug() {
+					configuration := newMultiMap()
+
+					strategy.saveToConfiguration(configuration)
+
+					writeMultiMap(kTempDirectory . "Race Strategist.strategy", configuration)
+				}
 			}
 		}
 		else
-			this.cancelStrategy(false)
+			this.cancelStrategy(false, report, remote)
 
 		this.updateDynamicValues({StrategyReported: true, RejectedStrategy: false})
 	}
@@ -3104,7 +3137,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 	chooseScenario(strategy, confirm?) {
 		local dispose := true
-		local configuration, fileName, request, report
+		local request, report
 
 		try {
 			if !isSet(confirm) {
@@ -3114,7 +3147,8 @@ class RaceStrategist extends GridRaceAssistant {
 					confirm := true
 
 					if strategy {
-						this.reportStrategy({Strategy: false, Pitstops: true, NextPitstop: true, TyreChange: true, Refuel: true, Map: true, Active: this.Strategy}, strategy)
+						this.reportStrategy({Strategy: false, Pitstops: true, NextPitstop: true
+										   , TyreChange: true, Refuel: true, Map: true, Active: this.Strategy}, strategy)
 
 						if ((this.Strategy != this.Strategy[true]) || isDebug())
 							this.explainStrategyRecommendation(strategy)
@@ -3169,59 +3203,17 @@ class RaceStrategist extends GridRaceAssistant {
 				if this.Strategy[true]
 					strategy.PitstopRule := this.Strategy[true].PitstopRule
 
-				if (isDebug() && !this.RemoteHandler) {
-					configuration := newMultiMap()
-
-					strategy.saveToConfiguration(configuration)
-
-					writeMultiMap(kTempDirectory . "Race Strategist.strategy", configuration)
-				}
+				strategy.setVersion(A_Now)
 
 				dispose := false
 
-				strategy.setVersion(A_Now)
-
-				Task.startTask(ObjBindMethod(this, "updateStrategy", strategy, false, false), 1000)
-
-				if this.RemoteHandler {
-					fileName := temporaryFileName("Race Strategy", "update")
-					configuration := newMultiMap()
-
-					strategy.saveToConfiguration(configuration)
-
-					writeMultiMap(fileName, configuration)
-
-					if isDebug()
-						try {
-							FileCopy(fileName, kTempDirectory . "Race Strategist.strategy", 1)
-						}
-						catch Any as exception {
-							logError(exception)
-						}
-
-					this.RemoteHandler.updateStrategy(fileName, strategy.Version)
-				}
+				Task.startTask(ObjBindMethod(this, "updateStrategy", strategy, false, false, strategy.Version), 1000)
 			}
 			else {
-				cancelStrategy() {
-					Task.startTask(ObjBindMethod(this, "cancelStrategy", false), 1000)
-
-					if isDebug()
-						deleteFile(kTempDirectory . "Race Strategist.strategy")
-
-					if this.RemoteHandler
-						this.RemoteHandler.updateStrategy(false, A_Now)
-				}
-
-				if (confirm && this.Speaker) {
+				if (confirm && this.Speaker)
 					this.getSpeaker().speakPhrase("NoValidStrategy")
 
-					this.getSpeaker().speakPhrase("ConfirmCancelStrategy", false, true)
-
-					this.setContinuation(cancelStrategy)
-				}
-				else
-					cancelStrategy()
+				Task.startTask(ObjBindMethod(this, "cancelStrategy", confirm), 1000)
 			}
 		}
 		finally {

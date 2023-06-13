@@ -3,7 +3,7 @@ Version=5.0.8.0-dev
 Target=5.0.8.0-release
 Date=06/13/2023
 Download=https://www.dropbox.com/s/85toymfb2y1uver/Simulator%20Controller%205.0.8.0-dev.zip?dl=1
-Changes=New widgets for the session dashboard in "System Monitor", Full customizaton of the displayed widgets for the session dashboard in "System Monitor", Added mor configuration sanity checks to "Simulator Setup", Consiolidated duplicate race setting, Only report strategy changes worth mentioning by the Strategist, Even more detailed explanation by the Strategist for strategy differences
+Changes=New widgets for the session dashboard in "System Monitor", Full customizaton of the displayed widgets for the session dashboard in "System Monitor", Added mor configuration sanity checks to "Simulator Setup", Consiolidated duplicate race setting, Only report strategy changes worth mentioning by the Strategist, Even more detailed explanation by the Strategist for strategy differences, "Race Center" prefers strategy over stint plan for pitstop preparation
 [Release]
 Version=5.0.7.0-release
 Date=06/06/2023

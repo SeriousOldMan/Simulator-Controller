@@ -3552,6 +3552,20 @@ class RaceCenter extends ConfigurationItem {
 		currentStint := this.CurrentStint
 
 		if currentStint {
+			if this.Strategy
+				for index, pitstop in this.Strategy.Pitstops
+					if (pitstop.Nr = currentStint.Nr) {
+						lap := (pitstop.Lap + 1)
+						refuel := pitstop.RefuelAmount
+
+						if !pitstop.TyreChange {
+							tyreCompound := false
+							tyreCompoundColor := false
+						}
+
+						return
+					}
+
 			nextStint := (currentStint.Nr + 1)
 
 			loop this.PlanListView.GetCount() {
@@ -3577,20 +3591,6 @@ class RaceCenter extends ConfigurationItem {
 					return
 				}
 			}
-
-			if this.Strategy
-				for index, pitstop in this.Strategy.Pitstops
-					if (pitstop.Nr = currentStint.Nr) {
-						lap := (pitstop.Lap + 1)
-						refuel := pitstop.RefuelAmount
-
-						if !pitstop.TyreChange {
-							tyreCompound := false
-							tyreCompoundColor := false
-						}
-
-						return
-					}
 
 			lastLap := this.LastLap
 

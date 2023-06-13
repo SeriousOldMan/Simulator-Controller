@@ -136,7 +136,7 @@ You can reload the data stored on the server for the currently selected session 
 
 If you have connected to a session that has already been used in a previous race and there is still data stored in the session, it might take a while, before all data have been loaded. The window controls will be blocked during this time and you will see a small mark rotating on the right side of the window to show you that data is being requested from the server.
 
-It is no problem, to reuse a session for many races, because the old data (except the stint plan and the associated strategy, if any) will be automatically cleared, when the new race is started. But you can also use the command "Clear" from the "Session" menu beforehand to erase all current data, if you whish.
+It is no problem, to reuse a session for many races, because the old data (except the stint plan, the associated strategy, and the tyre setups, if any) will be automatically cleared, when the new race is started. But you can also use the command "Clear" from the "Session" menu beforehand to erase all current data, if you whish.
 
 It is obvious, that it is **not** a good idea to use the same session in more than one race at the same time.
 
@@ -182,7 +182,7 @@ Beside all that, you can request several context specific data, which will be sh
 
   2. Plan Summary
 
-     The Plan Summary show the details of the stint plan, which had been derived from the strategy or was entered manually. See the section [Session & Stint planning](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#session--stint-planning) for the details.
+     The Plan Summary show the details of the stint plan, which had been derived from the strategy or was entered manually. See the section [Session & stint planning](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#session--stint-planning) for the details.
 
   3. Details of a selected stint
   
@@ -268,7 +268,7 @@ You then may choose the settings for the upcoming strategy simulation using the 
 
 After you dialed the options, you can select "Adjust Strategy (Simulation)" from the "Strategy" menu, to create a new strategy baseed on a simulation. The result strategy summary will be displayed in the output area. Please note, that when you are typically late into the race, any pitstop rules of the base strategy might be ignored, when conflicting with the current race situation, so please double check, whether the resulting strategy is in accordance with the rules.
 
-IMPORTANT: Once you have created a new strategy, the Stint Plan (see below) must be updated as well, so that the information for refuel amount, tyre changes and so on, will be correct, when it comes to the next pitstop.
+IMPORTANT: Once you have created a new strategy, the stint plan (see below) must be updated as well, so that the information for refuel amount, tyre changes and so on, will be correct, when it comes to the next pitstop.
 
 #### Monte Carlo traffic model
 
@@ -290,7 +290,7 @@ You can run as many strategy simulations, with or without traffic anaylsis as yo
 
 IMPORTANT: Once you have created a new strategy, the Stint Plan (see below) must be updated as well, so that the information for refuel amount, tyre changes and so on, will reflect the latest strategy, when it comes to the next pitstop.
 
-### Session & Stint Planning
+### Session & stint planning
 
 It is quite common for long endurance races to create some kind of stint plan before the race, so that each driver knows, when he has to be on the track. A stint plan is tightly coupled to the race strategy and indeed, you can create a stint plan by using the command "Load From Strategy" from the "Plan" menu. But you can also create a plan manually, as we will see below.
 
@@ -328,7 +328,7 @@ Using the elements on the "Pitstops" tab, any team member can prepare the next p
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%206.JPG)
 
-Especially before selecting the tyre pressures, you might want to analyze the data as described above. But you may also use the "Initialize from Session" command from the "Pitstop" menu, which will use the values, that are currently recommended by Jona, the Virtual Race Engineer, for tyre pressures. Also, the recommended pitstop lap and the amount of fuel to be added, will be taken from the stint plan, or from the stratetgy, in that order. In situations, where the conditions change dramatically, for example an upcoming thunderstorm, you can also load the tyre data from the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--session-database) using the "Load from Database..." command, when you think that you might have cold pressure information available from previous sessions in comparable conditions.
+Especially before selecting the tyre pressures, you might want to analyze the data as described above. But you may also use the "Initialize from Session" command from the "Pitstop" menu, which will use the values, that are currently recommended by Jona, the Virtual Race Engineer, for tyre pressures. Also, the recommended pitstop lap and the amount of fuel to be added, will be taken from the strategy, or from the stint plan, in that order. In situations, where the conditions change dramatically, for example an upcoming thunderstorm, you can also load the tyre data from the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--session-database) using the "Load from Database..." command, when you think that you might have cold pressure information available from previous sessions in comparable conditions.
 
 You can also choose between two different methods to further adjust tyre pressures, when swapping drivers, as described in the previous section:
 
@@ -389,13 +389,13 @@ This floating window, which can be left open all the time, will be updated once 
 
 #### Planning and preparing pitstops in a team race using the Race Assistants
 
-You probably might have used the Race Engineer to plan and prepare a pitstop during solo races or even have used the Race Strategist to run a full race with a pre-selected strategy. Although in most cases these duties will be taken by your team mates in a team race, it is still possible to use the Assistants as additional support as well. The following applies:
+You probably already have used the Race Engineer to plan and prepare a pitstop during solo races or even have used the Race Strategist to run a full race with a pre-selected strategy. Although in most cases these duties will be taken by your team mates in a team race, it is still possible to use the Assistants as additional support as well. The following applies:
 
 1. Planning and preparing a pitstop using the Race Engineer
 
-   You can use the Race Engineer to plan and prepare a pitstop even during a team race. Doing it the same way as in a solo race might be the perfect method, when you are running a double stint, since you will be selected as the next driver. You initiate this process by issuing the voice command "Can you plan a pitstop?" or using the controller action ["PitstopPlan"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer). A pitstop planned and performed this way will also recorded in the list of pitstops in the "Race Center" as well.
+   You can use the Race Engineer to plan and prepare a pitstop even during a team race. Doing it the same way as in a solo race might be the perfect method, when you are running a double stint, since you will be selected as the next driver. You initiate this process by issuing the voice command "Can you plan a pitstop?" or using the controller action ["PitstopPlan"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer). A pitstop planned and performed this way will also recorded in the list of pitstops in the "Race Center" as well. But be aware, that the Race Engineer has no knowledge about your stint plan and race schedule. Therefore it is possible, that you may end up with too much fuel in the tank after the pitstop.
    
-   But this might not be the best way when another driver will take the seat, since the tyre pressures calculated for you might not be perfect for your team mate. Therefore a second command exist to initiate a pitstop including a driver swap. Ask the Engineer "Can you plan a driver swap?" or use the controller action ["DriverSwapPlan"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer). When you initiate the process in this way, the Race Engineer will consult the Team Server to lookup the planned lap for the service, the next driver and the refuel amount from the Stint Plan and to calculate the best possible tyre pressures for the next stint. Therefore, at least one instance of the "Race Center" must be running (not necessarily on the same PC as the current driver) for this method to be used. Please note, that the above mentioned adjustments for the tyre pressures will be apllied as well in this case, so be careful that the desired settings have been chosen in the "Pitstop" menu.
+   And this might also not be the best way when another driver will take the seat, since the tyre pressures calculated for you will not be perfect for your team mate in most cases. Therefore a second command exist to initiate a pitstop including a driver swap. Ask the Engineer "Can you plan a driver swap?" or use the controller action ["DriverSwapPlan"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer). When you initiate the process in this way, the Race Engineer will consult the Team Server to lookup the planned lap for the service, the next driver and the refuel amount from the Strategy or the stint plan and will also take a look at the driver specific tyre pressures to calculate the best possible tyre pressures for the next stint. Therefore, at least one instance of the "Race Center" must be running (not necessarily on the same PC as the current driver) for this method to be used. Please note, that the above mentioned adjustments for the tyre pressures will be apllied as well in this case, so be careful that the desired settings have been chosen in the "Pitstop" menu.
 
 2. Strategy handling using the Race Strategist
 

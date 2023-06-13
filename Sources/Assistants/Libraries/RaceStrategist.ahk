@@ -2430,11 +2430,13 @@ class RaceStrategist extends GridRaceAssistant {
 
 				if original
 					this.updateSessionValues({OriginalStrategy: strategy, Strategy: strategy})
-				else {
+				else
 					this.updateSessionValues({Strategy: strategy})
 
-					if report
-						this.reportStrategy({Strategy: true, Pitstops: false, NextPitstop: true, TyreChange: true, Refuel: true, Map: true})
+				if (report && (this.StrategyReported || this.hasEnoughData(false) || !original)) {
+					this.reportStrategy({Strategy: true, Pitstops: false, NextPitstop: true, TyreChange: true, Refuel: true, Map: true})
+
+					this.updateDynamicValues({StrategyReported: true})
 				}
 
 				if (remote && this.RemoteHandler) {
@@ -2464,10 +2466,13 @@ class RaceStrategist extends GridRaceAssistant {
 				}
 			}
 		}
-		else
+		else {
 			this.cancelStrategy(false, report, remote)
 
-		this.updateDynamicValues({StrategyReported: true, RejectedStrategy: false})
+			this.updateDynamicValues({StrategyReported: true})
+		}
+
+		this.updateDynamicValues({RejectedStrategy: false})
 	}
 
 	runSimulation(pitstopHistory, confirm := false, request := "User") {

@@ -330,7 +330,7 @@ class RaceEngineer extends RaceAssistant {
 			speaker.beginTalk()
 
 			try {
-				speaker.speakPhrase("LapsAlready", {laps: knowledgeBase.getValue("Lap", 0) - this.BaseLap + 1})
+				speaker.speakPhrase("LapsAlready", {laps: (knowledgeBase.getValue("Lap", 0) - this.BaseLap + 1)})
 
 				speaker.speakPhrase("LapsFuel", {laps: remainingFuelLaps})
 

@@ -868,7 +868,7 @@ class RaceStrategist extends GridRaceAssistant {
 			speaker.beginTalk()
 
 			try {
-				speaker.speakPhrase("LapsAlready", {laps: knowledgeBase.getValue("Lap", 0) - this.BaseLap + 1})
+				speaker.speakPhrase("LapsAlready", {laps: (knowledgeBase.getValue("Lap", 0) - this.BaseLap + 1)})
 
 				speaker.speakPhrase("LapsFuel", {laps: remainingFuelLaps})
 
@@ -2209,7 +2209,7 @@ class RaceStrategist extends GridRaceAssistant {
 							if (activeStrategy && ((activeStrategy.Pitstops.Length - activeStrategy.RunningPitstops) > 0))
 								activePitstop := activeStrategy.Pitstops[strategy.RunningPitstops + 1]
 
-							speaker.speakPhrase("NextPitstop", {pitstopLap: lap + 1})
+							speaker.speakPhrase("NextPitstop", {pitstopLap: (lap + 1)})
 
 							if activePitstop {
 								difference := (lap - activePitstop.Lap)
@@ -2288,7 +2288,7 @@ class RaceStrategist extends GridRaceAssistant {
 								refuel := Round(knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Fuel.Amount"))
 								tyreChange := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Change")
 
-								speaker.speakPhrase("NextPitstop", {pitstopLap: lap})
+								speaker.speakPhrase("NextPitstop", {pitstopLap: (lap + 1)})
 
 								if ((options == true) || (options.HasProp("Refuel") && options.Refuel))
 									speaker.speakPhrase((refuel > 0) ? "Refuel" : "NoRefuel"
@@ -2406,7 +2406,7 @@ class RaceStrategist extends GridRaceAssistant {
 			this.getSpeaker().speakPhrase("NoStrategy")
 	}
 
-	updateStrategy(strategy, original := true, report := true, version := false, origin := "Assistant", remote := true) {
+	updateStrategy(newStrategy, original := true, report := true, version := false, origin := "Assistant", remote := true) {
 		local knowledgeBase := this.KnowledgeBase
 		local fact, value, fileName, configuration
 
@@ -2416,14 +2416,14 @@ class RaceStrategist extends GridRaceAssistant {
 			else if (this.Strategy[true] && (this.Strategy[true].Version = version))
 				return
 
-		if strategy {
+		if newStrategy {
 			if (this.Session == kSessionRace) {
-				if !isObject(strategy)
-					strategy := Strategy(this, readMultiMap(strategy))
+				if !isObject(newStrategy)
+					newStrategy := Strategy(this, readMultiMap(newStrategy))
 
 				this.clearStrategy()
 
-				for fact, value in this.loadStrategy(CaseInsenseMap(), strategy, knowledgeBase.getValue("Pitstop.Last", false))
+				for fact, value in this.loadStrategy(CaseInsenseMap(), newStrategy, knowledgeBase.getValue("Pitstop.Last", false))
 					knowledgeBase.setFact(fact, value)
 
 				this.dumpKnowledgeBase(knowledgeBase)
@@ -2443,7 +2443,7 @@ class RaceStrategist extends GridRaceAssistant {
 					fileName := temporaryFileName("Race Strategy", "update")
 					configuration := newMultiMap()
 
-					strategy.saveToConfiguration(configuration)
+					newStrategy.saveToConfiguration(configuration)
 
 					writeMultiMap(fileName, configuration)
 
@@ -2455,12 +2455,12 @@ class RaceStrategist extends GridRaceAssistant {
 							logError(exception)
 						}
 
-					this.RemoteHandler.updateStrategy(fileName, strategy.Version)
+					this.RemoteHandler.updateStrategy(fileName, newStrategy.Version)
 				}
 				else if isDebug() {
 					configuration := newMultiMap()
 
-					strategy.saveToConfiguration(configuration)
+					newStrategy.saveToConfiguration(configuration)
 
 					writeMultiMap(kTempDirectory . "Race Strategist.strategy", configuration)
 				}
@@ -3273,7 +3273,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 		if (plannedLap == kUndefined) {
 			if (hasEngineer && strategyLap) {
-				speaker.speakPhrase("PitstopLap", {lap: Max(strategyLap + 1, lastLap + 1)})
+				speaker.speakPhrase("PitstopLap", {lap: (Max(strategyLap, lastLap) + 1)})
 
 				speaker.speakPhrase("ConfirmInformEngineer", false, true)
 
@@ -3285,7 +3285,7 @@ class RaceStrategist extends GridRaceAssistant {
 		else if !plannedLap
 			speaker.speakPhrase("NoPitstopNeeded")
 		else {
-			if (strategyLap && (Abs(strategyLap - plannedLap) < 6))
+			if (strategyLap && (Abs(strategyLap - plannedLap) <= knowledgeBase.getValue("Session.Settings.Pitstop.Strategy.Window.Considered")))
 				pitstopOptions := Array(refuel, tyreChange, tyreCompound, tyreCompoundColor)
 			else
 				pitstopOptions := []
@@ -3293,7 +3293,7 @@ class RaceStrategist extends GridRaceAssistant {
 			speaker.beginTalk()
 
 			try {
-				speaker.speakPhrase("PitstopLap", {lap: plannedLap + 1})
+				speaker.speakPhrase("PitstopLap", {lap: plannedLap})
 
 				speaker.speakPhrase("Explain", false, true)
 
@@ -3326,9 +3326,9 @@ class RaceStrategist extends GridRaceAssistant {
 			speaker.beginTalk()
 
 			try {
-				speaker.speakPhrase("EvaluatedLaps", {laps: (pitstopWindow * 2) + 1, first: pitstopLap - pitstopWindow, last: pitstopLap + pitstopWindow})
+				speaker.speakPhrase("EvaluatedLaps", {laps: ((pitstopWindow * 2) + 1), first: (pitstopLap - pitstopWindow + 1), last: (pitstopLap + pitstopWindow + 1)})
 
-				speaker.speakPhrase("EvaluatedBestPosition", {lap: pitstopLap, position: position})
+				speaker.speakPhrase("EvaluatedBestPosition", {lap: (pitstopLap + 1), position: position})
 
 				if (carsAhead > 0)
 					speaker.speakPhrase("EvaluatedTraffic", {traffic: carsAhead})
@@ -3359,12 +3359,12 @@ class RaceStrategist extends GridRaceAssistant {
 			speaker.beginTalk()
 
 			try {
-				speaker.speakPhrase("EvaluatedLaps", {laps: laps.Length, first: laps[1] + 1, last: laps[laps.Length] + 1})
+				speaker.speakPhrase("EvaluatedLaps", {laps: laps.Length, first: laps[1], last: laps[laps.Length]})
 
 				if (position = Min(positions*))
 					speaker.speakPhrase("EvaluatedSimilarPosition", {position: position})
 				else
-					speaker.speakPhrase("EvaluatedBestPosition", {lap: plannedLap + 1, position: position})
+					speaker.speakPhrase("EvaluatedBestPosition", {lap: plannedLap, position: position})
 
 				if (traffic.Length > 0) {
 					speaker.speakPhrase("EvaluatedTraffic", {traffic: traffic.Length})

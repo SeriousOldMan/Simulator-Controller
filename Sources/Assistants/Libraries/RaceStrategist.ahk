@@ -1429,7 +1429,7 @@ class RaceStrategist extends GridRaceAssistant {
 		return getMultiMapValue(this.Settings, "Session Settings", "Telemetry." . session, default)
 	}
 
-	loadStrategy(facts, strategy, lastPitstop := false) {
+	loadStrategy(facts, strategy, lastPitstop := false, lastLap := false) {
 		local pitstopWindow := getMultiMapValue(this.Settings, "Strategy Settings", "Strategy.Window.Considered", 3)
 		local pitstop, count, ignore, pitstopLap, first, rootStrategy
 
@@ -1455,7 +1455,7 @@ class RaceStrategist extends GridRaceAssistant {
 		count := 0
 
 		for ignore, pitstop in strategy.Pitstops {
-			if (lastPitstop && (pitstop.Nr <= lastPitstop))
+			if ((lastPitstop && (pitstop.Nr <= lastPitstop)) || (lastLap && (Abs(pitstop.Lap - lastLap) <= pitstopWindow)))
 				continue
 
 			pitstopLap := pitstop.Lap
@@ -2423,7 +2423,9 @@ class RaceStrategist extends GridRaceAssistant {
 
 				this.clearStrategy()
 
-				for fact, value in this.loadStrategy(CaseInsenseMap(), newStrategy, knowledgeBase.getValue("Pitstop.Last", false))
+				for fact, value in this.loadStrategy(CaseInsenseMap(), newStrategy
+												   , knowledgeBase.getValue("Pitstop.Last", false)
+												   , knowledgeBase.getValue("Lap", false))
 					knowledgeBase.setFact(fact, value)
 
 				this.dumpKnowledgeBase(knowledgeBase)

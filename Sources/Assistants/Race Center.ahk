@@ -3308,7 +3308,7 @@ class RaceCenter extends ConfigurationItem {
 					time := FormatTime(currentTime, "HH:mm")
 
 					this.PlanListView.Modify(A_Index, "Col3", time)
-					this.PlanListView.Modify(A_Index, "Col5", pitstop.Lap)
+					this.PlanListView.Modify(A_Index, "Col5", pitstop.Lap + 1)
 					this.PlanListView.Modify(A_Index, "Col7", (pitstop.RefuelAmount == 0) ? "-" : displayValue("Float", convertUnit("Volume", pitstop.RefuelAmount), 0))
 					this.PlanListView.Modify(A_Index, "Col8", pitstop.TyreChange ? "x" : "")
 				}
@@ -3380,7 +3380,7 @@ class RaceCenter extends ConfigurationItem {
 						this.PlanListView.Modify(A_Index, "Col4", time)
 
 						if (stintNr != 1)
-							this.PlanListView.Modify(A_Index, "Col6", minutesOrStint.Lap)
+							this.PlanListView.Modify(A_Index, "Col6", minutesOrStint.Lap + 1)
 					}
 				}
 			}
@@ -3581,7 +3581,7 @@ class RaceCenter extends ConfigurationItem {
 			if this.Strategy
 				for index, pitstop in this.Strategy.Pitstops
 					if (pitstop.Nr = currentStint.Nr) {
-						lap := pitstop.Lap
+						lap := (pitstop.Lap + 1)
 						refuel := pitstop.RefuelAmount
 
 						if !pitstop.TyreChange {
@@ -3602,7 +3602,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	initializePitstopFromSession(targetLap := false, remote := false
-							   , &pitStopLap := false, &pitstopDriver := false, &pitstopRefuel := false, &pitstopTyreSetup := false) {
+							   , &pitstopLap := false, &pitstopDriver := false, &pitstopRefuel := false, &pitstopTyreSetup := false) {
 		local stint := this.CurrentStint
 		local drivers, index, key, pressuresDB, pressuresTable, last, pressures, coldPressures, pressuresLosses
 		local lap, refuel, tyreCompound, tyreCompoundColor, flPressure, frPressure, rlPressure, rrPressure
@@ -4041,7 +4041,7 @@ class RaceCenter extends ConfigurationItem {
 		}
 
 		if ((pitstopLap = "") || (pitstopLap <= 0))
-			pitstopLap := (this.LastLap ? this.LastLap.Nr : 1)
+			pitstopLap := (this.LastLap ? (this.LastLap.Nr + 1) : 1)
 
 		if (pitstopRefuel = "")
 			pitstopRefuel := 0
@@ -4237,7 +4237,7 @@ class RaceCenter extends ConfigurationItem {
 				if repairEngine
 					pitstopRepairs.Push("Engine")
 
-				this.initializePitstopFromSession(lap, true, &pitStopLap, &pitstopDriver, &pitstopRefuel, &pitstopTyreSetup)
+				this.initializePitstopFromSession(lap, true, &pitstopLap, &pitstopDriver, &pitstopRefuel, &pitstopTyreSetup)
 
 				pitstopPlan := this.createPitstopPlan(true, pitstopLap, pitstopDriver, pitstopRefuel,
 															pitstopTyreSetup[1], pitstopTyreSetup[2], false
@@ -8258,7 +8258,8 @@ class RaceCenter extends ConfigurationItem {
 			timeActual := ""
 			lapActual := ""
 
-			this.PlanListView.Add("", plan["Stint"], plan["Driver"], plan["Time.Planned"], timeActual, plan["Lap.Planned"], lapActual, (refuel = 0) ? "-" : refuel, plan["Tyre.Change"])
+			this.PlanListView.Add("", plan["Stint"], plan["Driver"], plan["Time.Planned"], timeActual
+									, plan["Lap.Planned"], lapActual, (refuel = 0) ? "-" : refuel, plan["Tyre.Change"])
 		}
 
 		this.PlanListView.ModifyCol()

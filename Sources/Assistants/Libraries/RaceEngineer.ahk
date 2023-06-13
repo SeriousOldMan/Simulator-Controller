@@ -2006,10 +2006,13 @@ class RaceEngineer extends RaceAssistant {
 		local repairBodywork, repairSuspension, repairEngine, speaker
 
 		static lastRequest := []
+		static forcedLap := false
 
 		this.clearContinuation()
 
 		if (arguments.Length == 0) {
+			forcedLap := false
+
 			if this.RemoteHandler {
 				repairBodywork := knowledgeBase.getValue("Damage.Repair.Bodywork.Target", false)
 				repairSuspension := knowledgeBase.getValue("Damage.Repair.Suspension.Target", false)
@@ -2021,6 +2024,12 @@ class RaceEngineer extends RaceAssistant {
 					this.RemoteHandler.planDriverSwap(false, repairBodywork, repairSuspension, repairEngine)
 				}
 				else {
+					if (InStr(lap, "!") = 1) {
+						lap := SubStr(lap, 2)
+
+						forcedLap := lap
+					}
+
 					lastRequest := Array(lap)
 
 					this.RemoteHandler.planDriverSwap(lap, repairBodywork, repairSuspension, repairEngine)
@@ -2028,6 +2037,8 @@ class RaceEngineer extends RaceAssistant {
 			}
 		}
 		else if (lap == false) {
+			forcedLap := false
+
 			if this.Speaker {
 				speaker := this.getSpeaker()
 
@@ -2040,11 +2051,13 @@ class RaceEngineer extends RaceAssistant {
 				}
 			}
 
+			forcedLap := false
 			lastRequest := []
 		}
 		else if (InStr(lap, "!") = 1) {
 			lap := SubStr(lap, 2)
 
+			forcedLap := lap
 			lastRequest := concatenate(Array(lap), arguments)
 
 			if this.RemoteHandler {
@@ -2056,9 +2069,10 @@ class RaceEngineer extends RaceAssistant {
 			}
 		}
 		else {
-			lastRequest := []
+			this.planPitstop(forcedLap ? forcedLap : lap, arguments*)
 
-			this.planPitstop(lap, arguments*)
+			forcedLap := false
+			lastRequest := []
 		}
 	}
 

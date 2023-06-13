@@ -1784,7 +1784,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		local teamServer := this.TeamServer
 		local tries := 10
 
-		if FileExist(fileName)
+		if FileExist(fileName) {
 			if (teamServer && teamServer.SessionActive && this.TeamSessionActive) {
 				teamServer.setSessionValue(this.Plugin . " Session Info", FileRead(fileName))
 
@@ -1808,6 +1808,16 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 							Sleep(200)
 					}
 			}
+		}
+		else {
+			if (teamServer && teamServer.SessionActive && this.TeamSessionActive) {
+				teamServer.setSessionValue(this.Plugin . " Session Info", "")
+
+				deleteFile(fileName)
+			}
+			else
+				deleteFile(kTempDirectory . this.Plugin . " Session.state")
+		}
 	}
 
 	static collectSessionData() {

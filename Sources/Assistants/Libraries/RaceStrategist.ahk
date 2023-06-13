@@ -1438,6 +1438,7 @@ class RaceStrategist extends GridRaceAssistant {
 		strategy.RunningTime := 0
 
 		facts["Strategy.Name"] := strategy.Name
+		facts["Strategy.Version"] := strategy.Version
 
 		facts["Strategy.Weather"] := strategy.Weather
 		facts["Strategy.Weather.Temperature.Air"] := strategy.AirTemperature
@@ -1877,7 +1878,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 				if knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Change", false) {
 					setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound", knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Compound"))
-					setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound", knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Compound.Color"))
+					setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound.Color", knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Compound.Color"))
 				}
 				else {
 					setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound", false)
@@ -2360,7 +2361,7 @@ class RaceStrategist extends GridRaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local ignore, pitstop, theFact
 
-		for ignore, theFact in ["Name", "Weather", "Weather.Temperature.Air", "Weather.Temperature.Track"
+		for ignore, theFact in ["Name", "Version", "Weather", "Weather.Temperature.Air", "Weather.Temperature.Track"
 							  , "Tyre.Compound", "Tyre.Compound.Color", "Map", "TC", "ABS"
 							  , "Pitstop.Count", "Pitstop.Next", "Pitstop.Lap", "Pitstop.Lap.Warning"]
 			knowledgeBase.clearFact("Strategy." . theFact)
@@ -2415,6 +2416,8 @@ class RaceStrategist extends GridRaceAssistant {
 				return
 			else if (this.Strategy[true] && (this.Strategy[true].Version = version))
 				return
+			else if (knowledgeBase.getValue("Strategy.Version", false) = version)
+				report := false
 
 		if newStrategy {
 			if (this.Session == kSessionRace) {
@@ -2431,9 +2434,9 @@ class RaceStrategist extends GridRaceAssistant {
 				this.dumpKnowledgeBase(knowledgeBase)
 
 				if original
-					this.updateSessionValues({OriginalStrategy: strategy, Strategy: strategy})
+					this.updateSessionValues({OriginalStrategy: newStrategy, Strategy: newStrategy})
 				else
-					this.updateSessionValues({Strategy: strategy})
+					this.updateSessionValues({Strategy: newStrategy})
 
 				if (report && (this.StrategyReported || this.hasEnoughData(false) || !original)) {
 					this.reportStrategy({Strategy: true, Pitstops: false, NextPitstop: true, TyreChange: true, Refuel: true, Map: true})
@@ -3411,7 +3414,7 @@ class RaceStrategist extends GridRaceAssistant {
 															 . values2String(";", "!" . plannedLap, refuel, tyreChange, kUndefined
 																				, tyreCompound, tyreCompoundColor), engineerPID)
 				else
-					messageSend(kFileMessage, "Race Engineer", (this.TeamSession ? "planDriverSwap:" : "planPitstop:") . plannedLap, engineerPID)
+					messageSend(kFileMessage, "Race Engineer", (this.TeamSession ? "planDriverSwap:" : "planPitstop:") . "!" . plannedLap, engineerPID)
 			}
 			else
 				messageSend(kFileMessage, "Race Engineer", this.TeamSession ? "planDriverSwap" : "planPitstop:Now", engineerPID)

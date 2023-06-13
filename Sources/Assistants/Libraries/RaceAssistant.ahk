@@ -1564,7 +1564,7 @@ class RaceAssistant extends ConfigurationItem {
 	saveSessionInfo(lapNumber, simulator, car, track, sessionInfo) {
 		local fileName
 
-		if ((sessionInfo.Count > 0) && this.RemoteHandler) {
+		if this.RemoteHandler {
 			fileName := temporaryFileName("Session." . lapNumber, "info")
 
 			writeMultiMap(fileName, sessionInfo)

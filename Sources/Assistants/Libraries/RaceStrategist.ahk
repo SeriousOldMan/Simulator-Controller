@@ -2195,7 +2195,7 @@ class RaceStrategist extends GridRaceAssistant {
 																		 , direction: (difference < 0) ? fragments["Less"] : fragments["More"]})
 						}
 
-						reported := true
+						reported := (strategy.Pitstops.Length = 0)
 					}
 
 					nextPitstop := ((strategy.Pitstops.Length > 0) ? strategy.Pitstops[1] : false)
@@ -2278,7 +2278,7 @@ class RaceStrategist extends GridRaceAssistant {
 						if ((options == true) || (options.HasProp("Pitstops") && options.Pitstops)) {
 							speaker.speakPhrase("Pitstops", {pitstops: knowledgeBase.getValue("Strategy.Pitstop.Count")})
 
-							reported := true
+							reported := (knowledgeBase.getValue("Strategy.Pitstop.Count") = 0)
 						}
 
 						nextPitstop := knowledgeBase.getValue("Strategy.Pitstop.Next", false)

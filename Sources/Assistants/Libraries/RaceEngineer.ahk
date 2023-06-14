@@ -1393,9 +1393,9 @@ class RaceEngineer extends RaceAssistant {
 		return data
 	}
 
-	createSessionInfo(lapNumber, data, simulator, car, track) {
+	createSessionInfo(lapNumber, valid, data, simulator, car, track) {
 		local knowledgeBase := this.KnowledgeBase
-		local sessionInfo := super.createSessionInfo(lapNumber, data, simulator, car, track)
+		local sessionInfo := super.createSessionInfo(lapNumber, valid, data, simulator, car, track)
 		local prepared, tyreCompound, lap
 
 		prepared := this.hasPreparedPitstop()

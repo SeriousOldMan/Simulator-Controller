@@ -363,7 +363,7 @@ class RaceEngineer extends RaceAssistant {
 			if (fuel == 0)
 				speaker.speakPhrase("Later")
 			else
-				speaker.speakPhrase("Fuel", {fuel: floor(speaker.number2Speech(convertUnit("Volume", fuel))), unit: speaker.Fragments[getUnit("Volume")]})
+				speaker.speakPhrase("Fuel", {fuel: Floor(speaker.number2Speech(convertUnit("Volume", fuel), 1)), unit: speaker.Fragments[getUnit("Volume")]})
 		}
 	}
 
@@ -1887,7 +1887,7 @@ class RaceEngineer extends RaceAssistant {
 					speaker.speakPhrase("Pitstop", {number: pitstopNumber})
 
 				if ((options == true) || (options.HasProp("Fuel") && options.Fuel)) {
-					fuel := Round(knowledgeBase.getValue("Pitstop.Planned.Fuel", 0))
+					fuel := Round(knowledgeBase.getValue("Pitstop.Planned.Fuel", 1))
 
 					if (fuel == 0)
 						speaker.speakPhrase("NoRefuel")

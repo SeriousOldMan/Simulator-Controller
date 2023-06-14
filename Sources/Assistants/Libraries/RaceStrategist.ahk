@@ -2114,7 +2114,7 @@ class RaceStrategist extends GridRaceAssistant {
 						if ((options == true) || (options.HasProp("NextPitstop") && options.NextPitstop)) {
 							activePitstop := false
 							lap := nextPitstop.Lap
-							refuel := Round(nextPitstop.RefuelAmount)
+							refuel := nextPitstop.RefuelAmount
 							tyreChange := nextPitstop.TyreChange
 
 							if (activeStrategy && ((activeStrategy.Pitstops.Length - activeStrategy.RunningPitstops) > 0))
@@ -2133,13 +2133,14 @@ class RaceStrategist extends GridRaceAssistant {
 
 							if ((options == true) || (options.HasProp("Refuel") && options.Refuel)) {
 								speaker.speakPhrase((refuel > 0) ? "Refuel" : "NoRefuel"
-												  , {fuel: displayValue("Float", convertUnit("Volume", refuel)), unit: speaker.Fragments[getUnit("Volume")]})
+												  , {fuel: speaker.number2Speech(convertUnit("Volume", refuel), 1), unit: speaker.Fragments[getUnit("Volume")]})
 
 								if activePitstop {
-									difference := (refuel - Round(activePitstop.RefuelAmount))
+									difference := (Round(refuel) - Round(activePitstop.RefuelAmount))
 
 									if (difference != 0)
-										speaker.speakPhrase("RefuelDifference", {difference: Abs(difference), refuel: Round(activePitstop.RefuelAmount)
+										speaker.speakPhrase("RefuelDifference", {difference: Abs(difference)
+																			   , refuel: speaker.number2Speech(convertUnit("Volume", activePitstop.RefuelAmount), 1)
 																			   , unit: fragments[getUnit("Volume")]
 																			   , direction: (difference < 0) ? fragments["Less"] : fragments["More"]})
 								}
@@ -2196,14 +2197,14 @@ class RaceStrategist extends GridRaceAssistant {
 						if nextPitstop {
 							if ((options == true) || (options.HasProp("NextPitstop") && options.NextPitstop)) {
 								lap := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Lap")
-								refuel := Round(knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Fuel.Amount"))
+								refuel := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Fuel.Amount")
 								tyreChange := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Change")
 
 								speaker.speakPhrase("NextPitstop", {pitstopLap: (lap + 1)})
 
 								if ((options == true) || (options.HasProp("Refuel") && options.Refuel))
 									speaker.speakPhrase((refuel > 0) ? "Refuel" : "NoRefuel"
-													  , {fuel: displayValue("Float", convertUnit("Volume", refuel)), unit: speaker.Fragments[getUnit("Volume")]})
+													  , {fuel: speaker.number2Speech(convertUnit("Volume", refuel), 1), unit: speaker.Fragments[getUnit("Volume")]})
 
 								if ((options == true) || (options.HasProp("TyreChange") && options.TyreChange))
 									speaker.speakPhrase(tyreChange ? "TyreChange" : "NoTyreChange")

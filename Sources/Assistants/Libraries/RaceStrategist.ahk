@@ -1817,7 +1817,7 @@ class RaceStrategist extends GridRaceAssistant {
 				setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next", nextPitstop)
 
 				setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Lap", knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Lap") + 1)
-				setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Refuel", Round(knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Fuel.Amount")))
+				setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Refuel", Round(knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Fuel.Amount"), 1))
 
 				if knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Change", false) {
 					setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound", knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Compound"))

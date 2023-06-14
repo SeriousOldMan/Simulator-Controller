@@ -1395,7 +1395,7 @@ class RaceEngineer extends RaceAssistant {
 
 	createSessionInfo(lapNumber, data, simulator, car, track) {
 		local knowledgeBase := this.KnowledgeBase
-		local sessionInfo := newMultiMap()
+		local sessionInfo := super.createSessionInfo(lapNumber, data, simulator, car, track)
 		local prepared, tyreCompound, lap
 
 		prepared := this.hasPreparedPitstop()
@@ -1431,7 +1431,7 @@ class RaceEngineer extends RaceAssistant {
 			setMultiMapValue(sessionInfo, "Pitstop", "Prepared", prepared)
 		}
 
-		this.saveSessionInfo(lapNumber, simulator, car, track, sessionInfo)
+		return sessionInfo
 	}
 
 	addLap(lapNumber, &data) {
@@ -1442,6 +1442,7 @@ class RaceEngineer extends RaceAssistant {
 		local result, currentCompound, currentCompoundColor, targetCompound, targetCompoundColor, prefix
 		local coldPressures, hotPressures, pressuresLosses, airTemperature, trackTemperature, weatherNow
 		local savedKnowledgeBase, stateFile, key, value
+		local simulator, car, track
 
 		static lastLap := 0
 
@@ -1551,7 +1552,10 @@ class RaceEngineer extends RaceAssistant {
 			}
 		}
 
-		Task.startTask(ObjBindMethod(this, "createSessionInfo", lapNumber, data, simulator, car, track), 1000, kLowPriority)
+		Task.startTask((*) => this.saveSessionInfo(lapNumber, simulator, car, track
+												 , this.createSessionInfo(lapNumber, knowledgeBase.getValue("Lap." . lapNumber . ".Valid", true)
+																		, data, simulator, car, track))
+					 , 1000, kLowPriority)
 
 		return result
 	}
@@ -1567,6 +1571,7 @@ class RaceEngineer extends RaceAssistant {
 		local threshold := knowledgeBase.getValue("Session.Settings.Tyre.Pressure.Deviation")
 		local changed := false
 		local fact, index, tyreType, oldValue, newValue, position
+		local simulator, car, track
 
 		if (tyrePressures.Length >= 4) {
 			for index, tyreType in ["FL", "FR", "RL", "RR"] {
@@ -1653,10 +1658,14 @@ class RaceEngineer extends RaceAssistant {
 				this.dumpKnowledgeBase(this.KnowledgeBase)
 		}
 
-		Task.startTask(ObjBindMethod(this, "createSessionInfo", lapNumber, data
-															  , knowledgeBase.getValue("Session.Simulator")
-															  , knowledgeBase.getValue("Session.Car")
-															  , knowledgeBase.getValue("Session.Track")), 1000, kLowPriority)
+		simulator := knowledgeBase.getValue("Session.Simulator")
+		car := knowledgeBase.getValue("Session.Car")
+		track := knowledgeBase.getValue("Session.Track")
+
+		Task.startTask((*) => this.saveSessionInfo(lapNumber, simulator, car, track
+												 , this.createSessionInfo(lapNumber, knowledgeBase.getValue("Lap." . lapNumber . ".Valid", true)
+																		, data, simulator, car, track))
+					 , 1000, kLowPriority)
 
 		return result
 	}

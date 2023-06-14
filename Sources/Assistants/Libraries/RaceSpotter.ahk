@@ -2882,60 +2882,13 @@ class RaceSpotter extends GridRaceAssistant {
 			return false
 	}
 
-	createSessionInfo(lapNumber, data, simulator, car, track) {
-		local knowledgeBase := this.KnowledgeBase
-		local sessionInfo := newMultiMap()
-		local position, classPosition
-
-		position := this.getPosition()
-		classPosition := (this.MultiClass ? this.getPosition(false, "Class") : position)
-
-		setMultiMapValue(sessionInfo, "Standings", "Position.Overall", position)
-		setMultiMapValue(sessionInfo, "Standings", "Position.Class", classPosition)
-
-		if (classPosition != 1) {
-			car := knowledgeBase.getValue("Position.Standings.Class.Leader.Car", 0)
-
-			if car {
-				setMultiMapValue(sessionInfo, "Standings", "Leader.Lap.Time", Round(knowledgeBase.getValue("Car." . car . ".Time", 0) / 1000, 1))
-				setMultiMapValue(sessionInfo, "Standings", "Leader.Lap", knowledgeBase.getValue("Car." . car . ".Lap", 0))
-				setMultiMapValue(sessionInfo, "Standings", "Leader.Delta", Round(knowledgeBase.getValue("Position.Standings.Class.Leader.Delta", 0) / 1000, 1))
-				setMultiMapValue(sessionInfo, "Standings", "Leader.InPit", (knowledgeBase.getValue("Car." . car . ".InPitLane", false)
-																		 || knowledgeBase.getValue("Car." . car . ".InPit", false)))
-			}
-
-			car := knowledgeBase.getValue("Position.Standings.Class.Ahead.Car", false)
-
-			if car {
-				setMultiMapValue(sessionInfo, "Standings", "Ahead.Lap.Time", Round(knowledgeBase.getValue("Car." . car . ".Time", 0) / 1000, 1))
-				setMultiMapValue(sessionInfo, "Standings", "Ahead.Lap", knowledgeBase.getValue("Car." . car . ".Lap", 0))
-				setMultiMapValue(sessionInfo, "Standings", "Ahead.Delta", Round(knowledgeBase.getValue("Position.Standings.Class.Ahead.Delta", 0) / 1000, 1))
-				setMultiMapValue(sessionInfo, "Standings", "Ahead.InPit", (knowledgeBase.getValue("Car." . car . ".InPitLane", false)
-																		|| knowledgeBase.getValue("Car." . car . ".InPit", false)))
-			}
-		}
-
-		if (this.getPosition(false, "Class") != this.getCars("Class").Length) {
-			car := knowledgeBase.getValue("Position.Standings.Class.Behind.Car")
-
-			if car {
-				setMultiMapValue(sessionInfo, "Standings", "Behind.Lap.Time", Round(knowledgeBase.getValue("Car." . car . ".Time", 0) / 1000, 1))
-				setMultiMapValue(sessionInfo, "Standings", "Behind.Lap", knowledgeBase.getValue("Car." . car . ".Lap", 0))
-				setMultiMapValue(sessionInfo, "Standings", "Behind.Delta", Round(knowledgeBase.getValue("Position.Standings.Class.Behind.Delta", 0) / 1000, 1))
-				setMultiMapValue(sessionInfo, "Standings", "Behind.InPit", (knowledgeBase.getValue("Car." . car . ".InPitLane", false)
-																		 || knowledgeBase.getValue("Car." . car . ".InPit", false)))
-			}
-		}
-
-		this.saveSessionInfo(lapNumber, simulator, car, track, sessionInfo)
-	}
-
 	addLap(lapNumber, &data) {
 		local knowledgeBase := this.KnowledgeBase
 		local lastPenalty := false
 		local wasValid := true
 		local lastWarnings := 0
 		local lap, lastPitstop, result
+		local simulator, car, track
 
 		if knowledgeBase {
 			lastPenalty := knowledgeBase.getValue("Lap.Penalty", false)
@@ -2974,10 +2927,14 @@ class RaceSpotter extends GridRaceAssistant {
 				if (this.Announcements["CutWarnings"] && this.hasEnoughData(false))
 					this.cutWarning(lapNumber, getMultiMapValue(data, "Stint Data", "Sector", 0), wasValid, lastWarnings)
 
-		Task.startTask(ObjBindMethod(this, "createSessionInfo", lapNumber, data
-															  , knowledgeBase.getValue("Session.Simulator")
-															  , knowledgeBase.getValue("Session.Car")
-															  , knowledgeBase.getValue("Session.Track")), 1000, kLowPriority)
+		simulator := knowledgeBase.getValue("Session.Simulator")
+		car := knowledgeBase.getValue("Session.Car")
+		track := knowledgeBase.getValue("Session.Track")
+
+		Task.startTask((*) => this.saveSessionInfo(lapNumber, simulator, car, track
+												 , this.createSessionInfo(lapNumber, knowledgeBase.getValue("Lap." . lapNumber . ".Valid", true)
+																		, data, simulator, car, track))
+					 , 1000, kLowPriority)
 
 		return result
 	}
@@ -2990,6 +2947,7 @@ class RaceSpotter extends GridRaceAssistant {
 		local newSector := false
 		local hasGaps := false
 		local sector, result, valid, gapAhead, gapBehind
+		local simulator, car, track
 
 		static lastLap := 0
 		static lastSector := -1
@@ -3047,10 +3005,14 @@ class RaceSpotter extends GridRaceAssistant {
 				if (this.Announcements["CutWarnings"] && this.hasEnoughData(false))
 					this.cutWarning(lapNumber, getMultiMapValue(data, "Stint Data", "Sector", 0), wasValid, lastWarnings)
 
-		Task.startTask(ObjBindMethod(this, "createSessionInfo", lapNumber, data
-															  , knowledgeBase.getValue("Session.Simulator")
-															  , knowledgeBase.getValue("Session.Car")
-															  , knowledgeBase.getValue("Session.Track")), 1000, kLowPriority)
+		simulator := knowledgeBase.getValue("Session.Simulator")
+		car := knowledgeBase.getValue("Session.Car")
+		track := knowledgeBase.getValue("Session.Track")
+
+		Task.startTask((*) => this.saveSessionInfo(lapNumber, simulator, car, track
+												 , this.createSessionInfo(lapNumber, knowledgeBase.getValue("Lap." . lapNumber . ".Valid", true)
+																		, data, simulator, car, track))
+					 , 1000, kLowPriority)
 
 		return result
 	}

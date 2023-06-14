@@ -1887,12 +1887,12 @@ class RaceEngineer extends RaceAssistant {
 					speaker.speakPhrase("Pitstop", {number: pitstopNumber})
 
 				if ((options == true) || (options.HasProp("Fuel") && options.Fuel)) {
-					fuel := Round(knowledgeBase.getValue("Pitstop.Planned.Fuel", 1))
+					fuel := knowledgeBase.getValue("Pitstop.Planned.Fuel", 0)
 
 					if (fuel == 0)
 						speaker.speakPhrase("NoRefuel")
 					else
-						speaker.speakPhrase("Refuel", {fuel: speaker.number2Speech(convertUnit("Volume", fuel), 0), unit: fragments[getUnit("Volume")]})
+						speaker.speakPhrase("Refuel", {fuel: speaker.number2Speech(convertUnit("Volume", fuel), 1), unit: fragments[getUnit("Volume")]})
 
 					if correctedFuel
 						speaker.speakPhrase("RefuelAdjusted")

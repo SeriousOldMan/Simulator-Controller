@@ -744,12 +744,14 @@ showLaunchHint() {
 	local hint
 
 	if (GetKeyState("Esc", "P") || !GeneralStepWizard.CurrentGeneralStep) {
-		SetTimer(showSelectorHint,0)
+		SetTimer(showSelectorHint, 0)
 
-		GeneralStepWizard.CurrentGeneralStep.iPendingApplicationRegistration := false
-		GeneralStepWizard.CurrentGeneralStep.iPendingFunctionRegistration := false
+		if GeneralStepWizard.CurrentGeneralStep {
+			GeneralStepWizard.CurrentGeneralStep.iPendingApplicationRegistration := false
+			GeneralStepWizard.CurrentGeneralStep.iPendingFunctionRegistration := false
+		}
 
-		ToolTip(, , 1)
+		ToolTip( , , 1)
 	}
 	else if GeneralStepWizard.CurrentGeneralStep.iPendingFunctionRegistration {
 		hint := translate("Click on a controller function...")

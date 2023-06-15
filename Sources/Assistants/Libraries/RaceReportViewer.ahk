@@ -520,7 +520,7 @@ class RaceReportViewer extends RaceReportReader {
 					if (lapTime != "-")
 						lapTime := Round(lapTime / 1000, 1)
 
-					pitstop := ((pitstops.Length > 0) ? inList(pitstops, lap) : (getMultiMapValue(raceData, "Laps", "Lap." . lap . ".Pitstop", false)))
+					pitstop := ((pitstops.Length > 0) ? inList(pitstops, lap - 1) : (getMultiMapValue(raceData, "Laps", "Lap." . (lap - 1) . ".Pitstop", false)))
 
 					row := values2String(", ", lap
 											 , "'" . weather . "'"

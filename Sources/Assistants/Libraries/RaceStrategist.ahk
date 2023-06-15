@@ -110,7 +110,15 @@ class RaceStrategist extends GridRaceAssistant {
 			if this.iRemember
 				this.Manager.updateDynamicValues({RejectedStrategy: this.iStrategy})
 
-				super.cancel()
+			super.cancel()
+		}
+	}
+
+	class ConfirmStrategyCancelContinuation extends VoiceManager.ReplyContinuation {
+		cancel() {
+			this.Manager.updateDynamicValues({RejectedStrategy: "CANCEL"})
+
+			super.cancel()
 		}
 	}
 
@@ -705,7 +713,8 @@ class RaceStrategist extends GridRaceAssistant {
 
 		if values.HasProp("Strategy") {
 			if (this.iRejectedStrategy && (this.iRejectedStrategy != values.RejectedStrategy))
-				this.iRejectedStrategy.dispose()
+				if isInstance(this.iRejectedStrategy, Strategy)
+					this.iRejectedStrategy.dispose()
 
 			this.iStrategy := values.Strategy
 		}
@@ -725,7 +734,8 @@ class RaceStrategist extends GridRaceAssistant {
 
 		if values.HasProp("RejectedStrategy") {
 			if (this.iRejectedStrategy && (this.iRejectedStrategy != values.RejectedStrategy))
-				this.iRejectedStrategy.dispose()
+				if isInstance(this.iRejectedStrategy, Strategy)
+					this.iRejectedStrategy.dispose()
 
 			this.iRejectedStrategy := values.RejectedStrategy
 		}
@@ -1878,7 +1888,7 @@ class RaceStrategist extends GridRaceAssistant {
 			this.Strategy.RunningLaps += 1
 			this.Strategy.RunningTime += lastTime
 
-			if this.Strategy["Rejected"] {
+			if (this.Strategy["Rejected"] && isInstance(this.Strategy["Rejected"], Strategy)) {
 				this.Strategy["Rejected"].RunningLaps += 1
 				this.Strategy["Rejected"].RunningTime += lastTime
 			}
@@ -2233,7 +2243,7 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 	}
 
-	cancelStrategy(confirm := true, report := true, remote := true) {
+	cancelStrategy(confirm := true, report := true, remote := true, reject := false) {
 		local knowledgeBase := this.KnowledgeBase
 		local hasStrategy := knowledgeBase.getValue("Strategy.Name", false)
 
@@ -2241,7 +2251,12 @@ class RaceStrategist extends GridRaceAssistant {
 			if hasStrategy {
 				this.getSpeaker().speakPhrase("ConfirmCancelStrategy", false, true)
 
-				this.setContinuation(ObjBindMethod(this, "cancelStrategy", false, report, remote))
+				if reject
+					this.setContinuation(RaceStrategist.ConfirmStrategyCancelContinuation(this
+																						, ObjBindMethod(this, "cancelStrategy", false, report, remote)
+																						, "Confirm", "Okay"))
+				else
+					this.setContinuation(ObjBindMethod(this, "cancelStrategy", false, report, remote))
 			}
 			else
 				this.getSpeaker().speakPhrase("NoStrategy")
@@ -3056,7 +3071,7 @@ class RaceStrategist extends GridRaceAssistant {
 		return result
 	}
 
-	chooseScenario(strategy, confirm?) {
+	chooseScenario(scenario, confirm?) {
 		local dispose := true
 		local request, report
 
@@ -3067,17 +3082,17 @@ class RaceStrategist extends GridRaceAssistant {
 				if (request = "User") {
 					confirm := true
 
-					if strategy {
+					if scenario {
 						this.reportStrategy({Strategy: false, Pitstops: true, NextPitstop: true
-										   , TyreChange: true, Refuel: true, Map: true, Active: this.Strategy}, strategy)
+										   , TyreChange: true, Refuel: true, Map: true, Active: this.Strategy}, scenario)
 
 						if ((this.Strategy != this.Strategy[true]) || isDebug())
-							this.explainStrategyRecommendation(strategy)
+							this.explainStrategyRecommendation(scenario)
 
 						if this.Speaker {
 							this.getSpeaker().speakPhrase("ConfirmUpdateStrategy", false, true)
 
-							this.setContinuation(RaceStrategist.ConfirmStrategyUpdateContinuation(this, strategy, false))
+							this.setContinuation(RaceStrategist.ConfirmStrategyUpdateContinuation(this, scenario, false))
 
 							dispose := false
 
@@ -3086,28 +3101,28 @@ class RaceStrategist extends GridRaceAssistant {
 					}
 				}
 				else {
-					if strategy {
+					if scenario {
 						report := true
 
 						if (request != "Pitstop")
-							if (this.Strategy["Rejected"] && !this.betterScenario(this.Strategy["Rejected"], strategy, report))
+							if (this.Strategy["Rejected"] && isInstance(this.Strategy["Rejected"], Strategy) && !this.betterScenario(this.Strategy["Rejected"], scenario, report))
 								return
-							else if ((this.Strategy != this.Strategy[true]) && !this.betterScenario(this.Strategy, strategy, report))
+							else if ((this.Strategy != this.Strategy[true]) && !this.betterScenario(this.Strategy, scenario, report))
 								return
 
 						if (report && this.Speaker) {
 							this.getSpeaker().speakPhrase("StrategyUpdate")
 
 							this.reportStrategy({Strategy: false, Pitstops: true, NextPitstop: true
-											   , TyreChange: true, Refuel: true, Map: true, Active: this.Strategy}, strategy)
+											   , TyreChange: true, Refuel: true, Map: true, Active: this.Strategy}, scenario)
 
 							if ((this.Strategy != this.Strategy[true]) || isDebug())
-								this.explainStrategyRecommendation(strategy)
+								this.explainStrategyRecommendation(scenario)
 
 							if Task.CurrentTask.Confirm {
 								this.getSpeaker().speakPhrase("ConfirmUpdateStrategy", false, true)
 
-								this.setContinuation(RaceStrategist.ConfirmStrategyUpdateContinuation(this, strategy, true))
+								this.setContinuation(RaceStrategist.ConfirmStrategyUpdateContinuation(this, scenario, true))
 
 								dispose := false
 
@@ -3115,31 +3130,31 @@ class RaceStrategist extends GridRaceAssistant {
 							}
 						}
 					}
-					else
+					else if ((request != "Pitstop") || (this.Strategy["Rejected"] = "CANCEL"))
 						return
 				}
 			}
 
-			if strategy {
+			if scenario {
 				if this.Strategy[true]
-					strategy.PitstopRule := this.Strategy[true].PitstopRule
+					scenario.PitstopRule := this.Strategy[true].PitstopRule
 
-				strategy.setVersion(A_Now)
+				scenario.setVersion(A_Now)
 
 				dispose := false
 
-				Task.startTask(ObjBindMethod(this, "updateStrategy", strategy, false, false, strategy.Version), 1000)
+				Task.startTask(ObjBindMethod(this, "updateStrategy", scenario, false, false, scenario.Version), 1000)
 			}
 			else {
 				if (confirm && this.Speaker)
 					this.getSpeaker().speakPhrase("NoValidStrategy")
 
-				Task.startTask(ObjBindMethod(this, "cancelStrategy", confirm), 1000)
+				Task.startTask(ObjBindMethod(this, "cancelStrategy", confirm, true, true, true), 1000)
 			}
 		}
 		finally {
-			if (dispose && strategy)
-				strategy.dispose()
+			if (dispose && scenario)
+				scenario.dispose()
 		}
 	}
 
@@ -3344,9 +3359,6 @@ class RaceStrategist extends GridRaceAssistant {
 
 		if nextPitstop {
 			this.Strategy.RunningPitstops += 1
-
-			if this.Strategy["Rejected"]
-				this.Strategy["Rejected"].RunningPitstops += 1
 
 			if (nextPitstop != knowledgeBase.getValue("Strategy.Pitstop.Next", false)) {
 				map := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Map", "n/a")

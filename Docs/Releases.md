@@ -8,7 +8,8 @@
   7. The Strategist will now only report strategy changes worth to be mentioned. New strategies, where only a small amount of fuel changed (up to half of the safety fuel), will be adopted silently.
   8. The Strategist will give you an even more detailed explanation of strategy differences when a change of strategy is recommended.
   9. The "Race Center" will from now on use values from the current strategy (if any) before taking values from the stint plan into account.
-  10. Connecting to the Team Server using the Ctrl key works again.
+  10. It is now possible to fully control a team race by the AI based Race Strategist running a predefined strategy. Please take a look at the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#planning-and-preparing-pitstops-in-a-team-race-using-the-race-assistants) for more information.
+  11. Connecting to the Team Server using the Ctrl key works again.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-508) if you have used the *Pitstop Window* setting (see item 6 from the list above).
 

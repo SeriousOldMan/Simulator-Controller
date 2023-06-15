@@ -93,6 +93,8 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 
 17. [Strategy Development Revisited](https://youtu.be/nEmH_RbX8hg) - This video covers a couple of new capabilities for strategy development and handling during the race including a demonstration in ACC.
 
+18. [Race handled fully by AI](https://youtu.be/MlbAESpzg7Q) - This video gives you a full demonstration of a race under complete control of the AI Assistants. No driver interaction was necessary during this 3-stint race. Fully supported in solo as well as in multi player team races.
+
 This list will be extended from time to time to cover new functionalities.
 
 ### Discord Community

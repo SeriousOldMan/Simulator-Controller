@@ -45,7 +45,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[5.0.8.0-beta](https://www.dropbox.com/s/9ycwyqtgqn9nhxm/Simulator%20Controller%205.0.8.0-beta.zip?dl=1) (Test build for 5.0.8. Changes: New widgets for the session dashboard in "System Monitor", Full customizaton of the displayed widgets for the session dashboard in "System Monitor", Added mor configuration sanity checks to "Simulator Setup", Consiolidated duplicate race setting, Only report strategy changes worth mentioning by the Strategist, Even more detailed explanation by the Strategist for strategy differences, "Race Center" prefers strategy over stint plan for pitstop preparation.)
+[5.0.8.0-beta](https://www.dropbox.com/s/9ycwyqtgqn9nhxm/Simulator%20Controller%205.0.8.0-beta.zip?dl=1) (Test build for 5.0.8. Changes: New widgets for the session dashboard in "System Monitor", Full customizaton of the displayed widgets for the session dashboard in "System Monitor", Added mor configuration sanity checks to "Simulator Setup", Consiolidated duplicate race setting, Only report strategy changes worth mentioning by the Strategist, Even more detailed explanation by the Strategist for strategy differences, "Race Center" prefers strategy over stint plan for pitstop preparation, Optimized Spotter speech handling.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-508) of this version and all the versions you might have skipped, before installing and using this version.
 

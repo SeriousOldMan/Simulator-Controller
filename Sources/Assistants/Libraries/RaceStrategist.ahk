@@ -1430,7 +1430,7 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	loadStrategy(facts, strategy, lastPitstop := false, lastLap := false) {
-		local pitstopWindow := getMultiMapValue(this.Settings, "Strategy Settings", "Strategy.Window.Considered", 3)
+		local pitstopWindow := (this.Settings ? getMultiMapValue(this.Settings, "Strategy Settings", "Strategy.Window.Considered", 3) : 3)
 		local pitstop, count, ignore, pitstopLap, first, rootStrategy
 
 		strategy.RunningPitstops := 0
@@ -2136,10 +2136,10 @@ class RaceStrategist extends GridRaceAssistant {
 												  , {fuel: speaker.number2Speech(convertUnit("Volume", refuel), 1), unit: speaker.Fragments[getUnit("Volume")]})
 
 								if activePitstop {
-									difference := (Round(refuel) - Round(activePitstop.RefuelAmount))
+									difference := (refuel - activePitstop.RefuelAmount)
 
 									if (difference != 0)
-										speaker.speakPhrase("RefuelDifference", {difference: Abs(difference)
+										speaker.speakPhrase("RefuelDifference", {difference: speaker.number2Speech(convertUnit("Volume", Abs(difference)), 1)
 																			   , refuel: speaker.number2Speech(convertUnit("Volume", activePitstop.RefuelAmount), 1)
 																			   , unit: fragments[getUnit("Volume")]
 																			   , direction: (difference < 0) ? fragments["Less"] : fragments["More"]})

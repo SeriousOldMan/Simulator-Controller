@@ -3596,7 +3596,7 @@ class RaceCenter extends ConfigurationItem {
 
 			if lastLap {
 				lap := (lastLap.Nr + 2)
-				refuel := Round(this.CurrentStint.FuelConsumption + (lastLap.FuelConsumption * 2))
+				refuel := Round(this.CurrentStint.FuelConsumption + (lastLap.FuelConsumption * 2), 1)
 			}
 		}
 	}

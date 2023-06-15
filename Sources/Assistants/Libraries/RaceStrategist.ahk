@@ -1430,7 +1430,7 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	loadStrategy(facts, strategy, lastPitstop := false, lastLap := false) {
-		local pitstopWindow := getMultiMapValue(this.Settings, "Strategy Settings", "Strategy.Window.Considered", 3)
+		local pitstopWindow := (this.Settings ? getMultiMapValue(this.Settings, "Strategy Settings", "Strategy.Window.Considered", 3) : 3)
 		local pitstop, count, ignore, pitstopLap, first, rootStrategy
 
 		strategy.RunningPitstops := 0

@@ -363,7 +363,7 @@ class RaceEngineer extends RaceAssistant {
 			if (fuel == 0)
 				speaker.speakPhrase("Later")
 			else
-				speaker.speakPhrase("Fuel", {fuel: floor(speaker.number2Speech(convertUnit("Volume", fuel))), unit: speaker.Fragments[getUnit("Volume")]})
+				speaker.speakPhrase("Fuel", {fuel: Floor(speaker.number2Speech(convertUnit("Volume", fuel), 1)), unit: speaker.Fragments[getUnit("Volume")]})
 		}
 	}
 
@@ -1393,9 +1393,9 @@ class RaceEngineer extends RaceAssistant {
 		return data
 	}
 
-	createSessionInfo(lapNumber, data, simulator, car, track) {
+	createSessionInfo(lapNumber, valid, data, simulator, car, track) {
 		local knowledgeBase := this.KnowledgeBase
-		local sessionInfo := newMultiMap()
+		local sessionInfo := super.createSessionInfo(lapNumber, valid, data, simulator, car, track)
 		local prepared, tyreCompound, lap
 
 		prepared := this.hasPreparedPitstop()
@@ -1431,7 +1431,7 @@ class RaceEngineer extends RaceAssistant {
 			setMultiMapValue(sessionInfo, "Pitstop", "Prepared", prepared)
 		}
 
-		this.saveSessionInfo(lapNumber, simulator, car, track, sessionInfo)
+		return sessionInfo
 	}
 
 	addLap(lapNumber, &data) {
@@ -1442,6 +1442,7 @@ class RaceEngineer extends RaceAssistant {
 		local result, currentCompound, currentCompoundColor, targetCompound, targetCompoundColor, prefix
 		local coldPressures, hotPressures, pressuresLosses, airTemperature, trackTemperature, weatherNow
 		local savedKnowledgeBase, stateFile, key, value
+		local simulator, car, track
 
 		static lastLap := 0
 
@@ -1551,7 +1552,10 @@ class RaceEngineer extends RaceAssistant {
 			}
 		}
 
-		Task.startTask(ObjBindMethod(this, "createSessionInfo", lapNumber, data, simulator, car, track), 1000, kLowPriority)
+		Task.startTask((*) => this.saveSessionInfo(lapNumber, simulator, car, track
+												 , this.createSessionInfo(lapNumber, knowledgeBase.getValue("Lap." . lapNumber . ".Valid", true)
+																		, data, simulator, car, track))
+					 , 1000, kLowPriority)
 
 		return result
 	}
@@ -1567,6 +1571,7 @@ class RaceEngineer extends RaceAssistant {
 		local threshold := knowledgeBase.getValue("Session.Settings.Tyre.Pressure.Deviation")
 		local changed := false
 		local fact, index, tyreType, oldValue, newValue, position
+		local simulator, car, track
 
 		if (tyrePressures.Length >= 4) {
 			for index, tyreType in ["FL", "FR", "RL", "RR"] {
@@ -1653,10 +1658,14 @@ class RaceEngineer extends RaceAssistant {
 				this.dumpKnowledgeBase(this.KnowledgeBase)
 		}
 
-		Task.startTask(ObjBindMethod(this, "createSessionInfo", lapNumber, data
-															  , knowledgeBase.getValue("Session.Simulator")
-															  , knowledgeBase.getValue("Session.Car")
-															  , knowledgeBase.getValue("Session.Track")), 1000, kLowPriority)
+		simulator := knowledgeBase.getValue("Session.Simulator")
+		car := knowledgeBase.getValue("Session.Car")
+		track := knowledgeBase.getValue("Session.Track")
+
+		Task.startTask((*) => this.saveSessionInfo(lapNumber, simulator, car, track
+												 , this.createSessionInfo(lapNumber, knowledgeBase.getValue("Lap." . lapNumber . ".Valid", true)
+																		, data, simulator, car, track))
+					 , 1000, kLowPriority)
 
 		return result
 	}
@@ -1878,12 +1887,12 @@ class RaceEngineer extends RaceAssistant {
 					speaker.speakPhrase("Pitstop", {number: pitstopNumber})
 
 				if ((options == true) || (options.HasProp("Fuel") && options.Fuel)) {
-					fuel := Round(knowledgeBase.getValue("Pitstop.Planned.Fuel", 0))
+					fuel := knowledgeBase.getValue("Pitstop.Planned.Fuel", 0)
 
 					if (fuel == 0)
 						speaker.speakPhrase("NoRefuel")
 					else
-						speaker.speakPhrase("Refuel", {fuel: speaker.number2Speech(convertUnit("Volume", fuel), 0), unit: fragments[getUnit("Volume")]})
+						speaker.speakPhrase("Refuel", {fuel: speaker.number2Speech(convertUnit("Volume", fuel), 1), unit: fragments[getUnit("Volume")]})
 
 					if correctedFuel
 						speaker.speakPhrase("RefuelAdjusted")
@@ -2006,10 +2015,13 @@ class RaceEngineer extends RaceAssistant {
 		local repairBodywork, repairSuspension, repairEngine, speaker
 
 		static lastRequest := []
+		static forcedLap := false
 
 		this.clearContinuation()
 
 		if (arguments.Length == 0) {
+			forcedLap := false
+
 			if this.RemoteHandler {
 				repairBodywork := knowledgeBase.getValue("Damage.Repair.Bodywork.Target", false)
 				repairSuspension := knowledgeBase.getValue("Damage.Repair.Suspension.Target", false)
@@ -2021,6 +2033,12 @@ class RaceEngineer extends RaceAssistant {
 					this.RemoteHandler.planDriverSwap(false, repairBodywork, repairSuspension, repairEngine)
 				}
 				else {
+					if (InStr(lap, "!") = 1) {
+						lap := SubStr(lap, 2)
+
+						forcedLap := lap
+					}
+
 					lastRequest := Array(lap)
 
 					this.RemoteHandler.planDriverSwap(lap, repairBodywork, repairSuspension, repairEngine)
@@ -2028,6 +2046,8 @@ class RaceEngineer extends RaceAssistant {
 			}
 		}
 		else if (lap == false) {
+			forcedLap := false
+
 			if this.Speaker {
 				speaker := this.getSpeaker()
 
@@ -2040,11 +2060,13 @@ class RaceEngineer extends RaceAssistant {
 				}
 			}
 
+			forcedLap := false
 			lastRequest := []
 		}
 		else if (InStr(lap, "!") = 1) {
 			lap := SubStr(lap, 2)
 
+			forcedLap := lap
 			lastRequest := concatenate(Array(lap), arguments)
 
 			if this.RemoteHandler {
@@ -2056,9 +2078,10 @@ class RaceEngineer extends RaceAssistant {
 			}
 		}
 		else {
-			lastRequest := []
+			this.planPitstop(forcedLap ? forcedLap : lap, arguments*)
 
-			this.planPitstop(lap, arguments*)
+			forcedLap := false
+			lastRequest := []
 		}
 	}
 

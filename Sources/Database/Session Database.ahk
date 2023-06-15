@@ -5385,8 +5385,8 @@ loginDialog(connectorOrCommand := false, teamServerURL := false, owner := false,
 			if (result == kCancel)
 				return false
 			else if (result == kOk) {
-				name := loginGui["nameEdit"]
-				password := loginGui["passwordEdit"]
+				name := nameEdit.Text
+				password := passwordEdit.Text
 
 				try {
 					connectorOrCommand.Initialize(teamServerURL)

@@ -725,9 +725,31 @@ class RaceSpotter extends GridRaceAssistant {
 		iFastSpeechSynthesizer := false
 
 		class FastSpeaker extends VoiceManager.LocalSpeaker {
+			iSpotter := false
+
+			Spotter {
+				Get {
+					return this.iSpotter
+				}
+			}
+
 			speak(arguments*) {
-				if (this.VoiceManager.RaceAssistant.Session >= kSessionPractice)
-					super.speak(arguments*)
+				static pendingSpeeches := []
+
+				if (this.Spotter.Session >= kSessionPractice)
+					if this.Speaking
+						pendingSpeeches.Push((*) => this.speak(arguments*))
+					else {
+						super.speak(arguments*)
+
+						try {
+							while (pendingSpeeches.Length > 0)
+								pendingSpeeches.RemoveAt(1).Call()
+						}
+						catch Any as exception {
+							logError(exception)
+						}
+					}
 			}
 
 			speakPhrase(phrase, arguments*) {
@@ -738,6 +760,12 @@ class RaceSpotter extends GridRaceAssistant {
 					this.wait()
 
 				super.speakPhrase(phrase, arguments*)
+			}
+
+			__New(voiceManager, synthesizer, speaker, language, fragments, phrases) {
+				this.iSpotter := voiceManager.RaceAssistant
+
+				super.__New(voiceManager, synthesizer, speaker, language, fragments, phrases)
 			}
 		}
 
@@ -794,16 +822,6 @@ class RaceSpotter extends GridRaceAssistant {
 	SessionDataActive {
 		Get {
 			return this.iSessionDataActive
-		}
-	}
-
-	SpotterSpeaking {
-		Get {
-			return this.getSpeaker(true).Speaking
-		}
-
-		Set {
-			return (this.getSpeaker(true).Speaking := value)
 		}
 	}
 
@@ -2278,37 +2296,30 @@ class RaceSpotter extends GridRaceAssistant {
 			if (lastLap > 1)
 				this.updatePositionInfos(lastLap, sector, positions)
 
-			if (!this.SpotterSpeaking && this.DriverCar && !this.DriverCar.InPit && newSector) {
-				this.SpotterSpeaking := true
+			if (this.DriverCar && !this.DriverCar.InPit && newSector) {
+				if raceInfo {
+					deltaInformation := this.Announcements["DeltaInformation"]
 
-				try {
-					if raceInfo {
-						deltaInformation := this.Announcements["DeltaInformation"]
+					if ((deltaInformation != "S") && (lastLap >= (this.iLastDeltaInformationLap + deltaInformation)))
+						this.iLastDeltaInformationLap := lastLap
 
-						if ((deltaInformation != "S") && (lastLap >= (this.iLastDeltaInformationLap + deltaInformation)))
-							this.iLastDeltaInformationLap := lastLap
+					hadInfo := this.deltaInformation(lastLap, sector, positions
+												   , (deltaInformation = "S") || (lastLap = this.iLastDeltaInformationLap)
+												   , this.Announcements["DeltaInformationMethod"])
 
-						hadInfo := this.deltaInformation(lastLap, sector, positions
-													   , (deltaInformation = "S") || (lastLap = this.iLastDeltaInformationLap)
-													   , this.Announcements["DeltaInformationMethod"])
+					if hadInfo {
+						rnd := Random(1, 10)
 
-						if hadInfo {
-							rnd := Random(1, 10)
-
-							if (rnd < 5)
-								hadInfo := false
-						}
+						if (rnd < 5)
+							hadInfo := false
 					}
-
-					if (!hadInfo && this.Announcements["SessionInformation"])
-						hadInfo := this.sessionInformation(lastLap, sector, positions, true)
-
-					if (!hadInfo && raceInfo && this.Announcements["TacticalAdvices"])
-						hadInfo := this.tacticalAdvice(lastLap, sector, positions, true)
 				}
-				finally {
-					this.SpotterSpeaking := false
-				}
+
+				if (!hadInfo && this.Announcements["SessionInformation"])
+					hadInfo := this.sessionInformation(lastLap, sector, positions, true)
+
+				if (!hadInfo && raceInfo && this.Announcements["TacticalAdvices"])
+					hadInfo := this.tacticalAdvice(lastLap, sector, positions, true)
 			}
 		}
 	}
@@ -2425,18 +2436,9 @@ class RaceSpotter extends GridRaceAssistant {
 						type := alert
 
 					if (((type != "Behind") && this.Announcements["SideProximity"])
-					 || ((type = "Behind") && this.Announcements["RearProximity"])) {
-						if (!this.SpotterSpeaking || (type != "Hold")) {
-							this.SpotterSpeaking := true
-
-							try {
-								speaker.speakPhrase(alert, false, false, alert)
-							}
-							finally {
-								this.SpotterSpeaking := false
-							}
-						}
-					}
+					 || ((type = "Behind") && this.Announcements["RearProximity"]))
+						if (!speaker.Speaking || (type != "Hold"))
+							speaker.speakPhrase(alert, false, false, alert)
 				}
 			}
 			finally {
@@ -2452,46 +2454,29 @@ class RaceSpotter extends GridRaceAssistant {
 	greenFlag(arguments*) {
 		local speaker
 
-		if (this.Speaker[false] && (this.Session = kSessionRace) && this.Running) {
-			this.SpotterSpeaking := true
-
-			try {
-				speaker := this.getSpeaker(true)
-
-				speaker.speakPhrase("Green", false, false, "Green")
-			}
-			finally {
-				this.SpotterSpeaking := false
-			}
-		}
+		if (this.Speaker[false] && (this.Session = kSessionRace) && this.Running)
+			this.getSpeaker(true).speakPhrase("Green", false, false, "Green")
 	}
 
 	yellowFlag(alert, arguments*) {
 		local speaker, sectors
 
 		if (this.Announcements["YellowFlags"] && this.Speaker[false] && this.Running) {
-			this.SpotterSpeaking := true
+			speaker := this.getSpeaker(true)
+			sectors := string2Values(",", speaker.Fragments["Sectors"])
 
-			try {
-				speaker := this.getSpeaker(true)
-				sectors := string2Values(",", speaker.Fragments["Sectors"])
-
-				switch alert, false {
-					case "All":
-						speaker.speakPhrase("YellowAll", false, false, "YellowAll")
-					case "Sector":
-						if (arguments.Length > 1)
-							speaker.speakPhrase("YellowDistance", {sector: sectors[arguments[1]], distance: arguments[2]})
-						else
-							speaker.speakPhrase("YellowSector", {sector: sectors[arguments[1]]})
-					case "Clear":
-						speaker.speakPhrase("YellowClear", false, false, "YellowClear")
-					case "Ahead":
-						speaker.speakPhrase("YellowAhead", false, false, "YellowAhead")
-				}
-			}
-			finally {
-				this.SpotterSpeaking := false
+			switch alert, false {
+				case "All":
+					speaker.speakPhrase("YellowAll", false, false, "YellowAll")
+				case "Sector":
+					if (arguments.Length > 1)
+						speaker.speakPhrase("YellowDistance", {sector: sectors[arguments[1]], distance: arguments[2]})
+					else
+						speaker.speakPhrase("YellowSector", {sector: sectors[arguments[1]]})
+				case "Clear":
+					speaker.speakPhrase("YellowClear", false, false, "YellowClear")
+				case "Ahead":
+					speaker.speakPhrase("YellowAhead", false, false, "YellowAhead")
 			}
 		}
 	}
@@ -2501,41 +2486,25 @@ class RaceSpotter extends GridRaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local delta
 
-		if (this.Announcements["BlueFlags"] && this.Speaker[false] && this.Running) {
-			this.SpotterSpeaking := true
+		if (this.Announcements["BlueFlags"] && this.Speaker[false] && this.Running)
+			if (positions.Has("StandingsBehind") && positions.Has(positions["StandingsBehind"])) {
+				delta := Abs(positions[positions["StandingsBehind"]][10])
 
-			try {
-				if (positions.Has("StandingsBehind") && positions.Has(positions["StandingsBehind"])) {
-					delta := Abs(positions[positions["StandingsBehind"]][10])
-
-					if (delta && (delta < 2000))
-						this.getSpeaker(true).speakPhrase("BlueForPosition", false, false, "BlueForPosition")
-					else
-						this.getSpeaker(true).speakPhrase("Blue", false, false, "Blue")
-				}
+				if (delta && (delta < 2000))
+					this.getSpeaker(true).speakPhrase("BlueForPosition", false, false, "BlueForPosition")
 				else
 					this.getSpeaker(true).speakPhrase("Blue", false, false, "Blue")
 			}
-			finally {
-				this.SpotterSpeaking := false
-			}
-		}
+			else
+				this.getSpeaker(true).speakPhrase("Blue", false, false, "Blue")
 	}
 
 	pitWindow(state) {
-		if (this.Announcements["PitWindow"] && this.Speaker[false] && (this.Session = kSessionRace) && this.Running) {
-			this.SpotterSpeaking := true
-
-			try {
-				if (state = "Open")
-					this.getSpeaker(true).speakPhrase("PitWindowOpen", false, false, "PitWindowOpen")
-				else if (state = "Closed")
-					this.getSpeaker(true).speakPhrase("PitWindowClosed", false, false, "PitWindowClosed")
-			}
-			finally {
-				this.SpotterSpeaking := false
-			}
-		}
+		if (this.Announcements["PitWindow"] && this.Speaker[false] && (this.Session = kSessionRace) && this.Running)
+			if (state = "Open")
+				this.getSpeaker(true).speakPhrase("PitWindowOpen", false, false, "PitWindowOpen")
+			else if (state = "Closed")
+				this.getSpeaker(true).speakPhrase("PitWindowClosed", false, false, "PitWindowClosed")
 	}
 
 	startupSpotter(forceShutdown := false) {

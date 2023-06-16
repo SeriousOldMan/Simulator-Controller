@@ -2110,7 +2110,7 @@ class RaceStrategist extends GridRaceAssistant {
 						if activeStrategy {
 							difference := (strategy.Pitstops.Length - (activeStrategy.Pitstops.Length - activeStrategy.RunningPitstops))
 
-							if (difference != 0)
+							if ((difference != 0) && ((difference > 0) || (strategy.Pitstops.Length > 0)))
 								speaker.speakPhrase("PitstopsDifference", {difference: Abs(difference), pitstops: strategy.Pitstops.Length - difference
 																		 , direction: (difference < 0) ? fragments["Less"] : fragments["More"]})
 						}
@@ -3105,9 +3105,9 @@ class RaceStrategist extends GridRaceAssistant {
 						report := true
 
 						if (request != "Pitstop")
-							if (this.Strategy["Rejected"] && isInstance(this.Strategy["Rejected"], Strategy) && !this.betterScenario(this.Strategy["Rejected"], scenario, report))
+							if (this.Strategy["Rejected"] && isInstance(this.Strategy["Rejected"], Strategy) && !this.betterScenario(this.Strategy["Rejected"], scenario, &report))
 								return
-							else if ((this.Strategy != this.Strategy[true]) && !this.betterScenario(this.Strategy, scenario, report))
+							else if ((this.Strategy != this.Strategy[true]) && !this.betterScenario(this.Strategy, scenario, &report))
 								return
 
 						if (report && this.Speaker) {

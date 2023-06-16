@@ -470,7 +470,7 @@ class VoiceServer extends ConfigurationItem {
 			}
 			catch Any as exception {
 				logError(exception)
-				
+
 				logMessage(kLogCritical, translate("Error while registering voice command `"") . command . translate("`" - please check the configuration"))
 
 				showMessage(substituteVariables(translate("Cannot register voice command `"%command%`" - please check the configuration..."), {command: command})
@@ -601,7 +601,10 @@ class VoiceServer extends ConfigurationItem {
 			if (create && this.Listener && !this.iSpeechRecognizer) {
 				try {
 					try {
-						this.iSpeechRecognizer := VoiceServer.ActivationSpeechRecognizer("Server", true, this.Language, true)
+						this.iSpeechRecognizer := VoiceServer.ActivationSpeechRecognizer(getMultiMapValue(readMultiMap(getFileName("Core Settings.ini"
+																																 , kUserConfigDirectory, kConfigDirectory))
+																										, "Voice", "ActivationRecognizer", "Server")
+																					   , true, this.Language, true)
 
 						if (this.iSpeechRecognizer.Recognizers.Length = 0)
 							throw "Server speech recognizer engine not installed..."
@@ -994,7 +997,7 @@ class VoiceServer extends ConfigurationItem {
 			}
 			catch Any as exception {
 				logError(exception)
-				
+
 				logMessage(kLogCritical, translate("Error while registering voice command `"") . activationCommand . translate("`" - please check the configuration"))
 
 				showMessage(substituteVariables(translate("Cannot register voice command `"%command%`" - please check the configuration..."), {command: activationCommand})

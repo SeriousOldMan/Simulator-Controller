@@ -317,6 +317,8 @@ class SpeechRecognizer {
 			this.initialize(recognizer)
 		}
 		catch Any as exception {
+			logError(exception, true)
+
 			logMessage(kLogCritical, translate("Error while initializing speech recognition module - please install the speech recognition software"))
 
 			if !silent
@@ -1301,6 +1303,8 @@ matchWords(string1, string2) {
 			recognizer := CLR_LoadLibrary(dllFile).CreateInstance("Speech.SpeechRecognizer")
 		}
 		catch Any as exception {
+			logError(exception, true)
+
 			logMessage(kLogCritical, translate("Error while initializing speech recognition module - please install the speech recognition software"))
 
 			showMessage(translate("Error while initializing speech recognition module - please install the speech recognition software") . translate("...")

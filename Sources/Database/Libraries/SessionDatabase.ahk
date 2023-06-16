@@ -2218,7 +2218,7 @@ synchronizeSetups(groups, sessionDB, connector, simulators, timestamp, lastSynch
 
 										counter += 1
 
-										connector.SetDataValue("Document", identifier, "Setup", setup)
+										connector.SetDataValue("Document", identifier, "Setup", StrGet(setup, "UTF-8"))
 
 										setMultiMapValue(info, "Setup", "Synchronized", true)
 

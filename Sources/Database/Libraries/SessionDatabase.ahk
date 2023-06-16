@@ -2040,7 +2040,7 @@ synchronizeDatabase(command := false) {
 			}
 		}
 		catch Any as exception {
-			logError(exception)
+			logError(exception, true)
 
 			sessionDB.writeDatabaseState(identifier, "Error", exception)
 

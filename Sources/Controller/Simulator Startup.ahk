@@ -440,26 +440,26 @@ launchPad(command := false, arguments*) {
 	}
 
 	showApplicationInfo(wParam, lParam, msg, hwnd) {
-		local Text, CurrControl
+		local text
 
-		static PrevHwnd := 0
+		static prevHwnd := 0
 
-		if (Hwnd != PrevHwnd) {
-			Text := "", ToolTip()
+		if (WinActive(launchPadGui) && (hwnd != prevHwnd)) {
+			text := "", ToolTip()
 
-			CurrControl := GuiCtrlFromHwnd(hwnd)
+			curControl := GuiCtrlFromHwnd(hwnd)
 
-			if CurrControl {
-				Text := launchPad("ToolTip", CurrControl)
+			if curControl {
+				text := launchPad("ToolTip", curControl)
 
 				if !text
 					return
 
-				SetTimer () => ToolTip(Text), -1000
+				SetTimer () => ToolTip(text), -1000
 				SetTimer () => ToolTip(), -8000
 			}
 
-			PrevHwnd := hwnd
+			prevHwnd := hwnd
 		}
 	}
 

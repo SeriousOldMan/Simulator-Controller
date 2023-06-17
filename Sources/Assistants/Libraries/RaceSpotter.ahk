@@ -753,13 +753,26 @@ class RaceSpotter extends GridRaceAssistant {
 			}
 
 			speakPhrase(phrase, arguments*) {
-				if this.VoiceManager.RaceAssistant.skipAlert(phrase)
-					return
+				static pendingSpeeches := []
 
-				if this.Awaitable
-					this.wait()
+				if this.Speaking
+					pendingSpeeches.Push((*) => this.speakPhrase(phrase, arguments*))
+				else {
+					if !this.VoiceManager.RaceAssistant.skipAlert(phrase) {
+						if this.Awaitable
+							this.wait()
 
-				super.speakPhrase(phrase, arguments*)
+						super.speakPhrase(phrase, arguments*)
+					}
+
+					try {
+						while (pendingSpeeches.Length > 0)
+							pendingSpeeches.RemoveAt(1).Call()
+					}
+					catch Any as exception {
+						logError(exception)
+					}
+				}
 			}
 
 			__New(voiceManager, synthesizer, speaker, language, fragments, phrases) {

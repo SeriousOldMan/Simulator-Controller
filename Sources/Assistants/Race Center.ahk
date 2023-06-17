@@ -6410,7 +6410,7 @@ class RaceCenter extends ConfigurationItem {
 					if (exception != "No data...")
 						logError(exception)
 
-					if ((lap = lastLap) && (fails++ < 3))
+					if ((lap = lastLap) && (fails++ < 6))
 						return false
 					else
 						fails := 0
@@ -6582,7 +6582,7 @@ class RaceCenter extends ConfigurationItem {
 					if (exception != "No data...")
 						logError(exception)
 
-					if ((lap = lastLap) && (fails++ < 3))
+					if ((lap = lastLap) && (fails++ < 6))
 						return false
 					else
 						fails := 0
@@ -11817,12 +11817,12 @@ pitstopSettings(raceCenterOrCommand := false, arguments*) {
 			}
 		}
 		else if (settingsListView && !isOpen) {
-			settingsGui.Show({Descriptor: "Race Center.Pitstop Settings", Options: "0x400000"})
+			settingsGui.Show()
 
 			isOpen := true
 		}
 		else {
-			settingsGui := Window({Options: "0x400000"}, "")
+			settingsGui := Window({Descriptor: "Race Center.Pitstop Settings", Options: "0x400000"}, "")
 
 			settingsGui.SetFont("s10 Bold", "Arial")
 

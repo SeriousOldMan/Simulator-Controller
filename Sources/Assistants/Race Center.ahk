@@ -11816,10 +11816,14 @@ pitstopSettings(raceCenterOrCommand := false, arguments*) {
 				settingsListView.ModifyCol(2, "AutoHdr")
 			}
 		}
-		else if (settingsListView && !isOpen) {
-			settingsGui.Show()
+		else if settingsGui {
+			if !isOpen {
+				settingsGui.Show()
 
-			isOpen := true
+				isOpen := true
+			}
+			else
+				WinActivate(settingsGui)
 		}
 		else {
 			settingsGui := Window({Descriptor: "Race Center.Pitstop Settings", Options: "0x400000"}, "")

@@ -734,45 +734,18 @@ class RaceSpotter extends GridRaceAssistant {
 			}
 
 			speak(arguments*) {
-				static pendingSpeeches := []
-
-				if (this.Spotter.Session >= kSessionPractice)
-					if this.Speaking
-						pendingSpeeches.Push((*) => this.speak(arguments*))
-					else {
-						super.speak(arguments*)
-
-						try {
-							while (pendingSpeeches.Length > 0)
-								pendingSpeeches.RemoveAt(1).Call()
-						}
-						catch Any as exception {
-							logError(exception)
-						}
-					}
+				if (this.VoiceManager.RaceAssistant.Session >= kSessionPractice)
+					super.speak(arguments*)
 			}
 
 			speakPhrase(phrase, arguments*) {
-				static pendingSpeeches := []
+				if this.VoiceManager.RaceAssistant.skipAlert(phrase)
+					return
 
-				if this.Speaking
-					pendingSpeeches.Push((*) => this.speakPhrase(phrase, arguments*))
-				else {
-					if !this.VoiceManager.RaceAssistant.skipAlert(phrase) {
-						if this.Awaitable
-							this.wait()
+				if this.Awaitable
+					this.wait()
 
-						super.speakPhrase(phrase, arguments*)
-					}
-
-					try {
-						while (pendingSpeeches.Length > 0)
-							pendingSpeeches.RemoveAt(1).Call()
-					}
-					catch Any as exception {
-						logError(exception)
-					}
-				}
+				super.speakPhrase(phrase, arguments*)
 			}
 
 			__New(voiceManager, synthesizer, speaker, language, fragments, phrases) {
@@ -1823,7 +1796,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 	penaltyInformation(lastLap, sector, lastPenalty) {
 		local knowledgeBase := this.KnowledgeBase
-		local speaker := this.getSpeaker()
+		local speaker := this.getSpeaker(true)
 		local penalty := knowledgeBase.getValue("Lap.Penalty", false)
 
 		if ((penalty != this.iLastPenalty) || (penalty != lastPenalty)) {
@@ -1845,7 +1818,7 @@ class RaceSpotter extends GridRaceAssistant {
 					else if (penalty == true)
 						penalty := ""
 
-					this.getSpeaker().speakPhrase("Penalty", {penalty: penalty})
+					this.getSpeaker(true).speakPhrase("Penalty", {penalty: penalty})
 				}
 
 				return true
@@ -1861,7 +1834,7 @@ class RaceSpotter extends GridRaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 
 		if ((this.Session = kSessionRace) && ((wasValid && !knowledgeBase.getValue("Lap.Valid", true)) || (lastWarnings < knowledgeBase.getValue("Lap.Warnings", 0)))) {
-			this.getSpeaker().speakPhrase(((knowledgeBase.getValue("Lap.Warnings", 0) > 1) || (this.DriverCar.InvalidLaps > 3)) ? "RepeatedCut" : "Cut")
+			this.getSpeaker(true).speakPhrase(((knowledgeBase.getValue("Lap.Warnings", 0) > 1) || (this.DriverCar.InvalidLaps > 3)) ? "RepeatedCut" : "Cut")
 
 			return true
 		}
@@ -2415,14 +2388,14 @@ class RaceSpotter extends GridRaceAssistant {
 				else
 					this.iPendingAlerts.Push(alert)
 
-				if (alerting || speaker.isSpeaking()) {
+				if (alerting || speaker.Speaking) {
 					if (this.iPendingAlerts.Length == 1)
 						Task.startTask(ObjBindMethod(this, "proximityAlert", false), 500, kHighPriority)
 
 					return
 				}
 			}
-			else if (alerting || speaker.isSpeaking())
+			else if (alerting || speaker.Speaking)
 				if (this.iPendingAlerts.Length > 0) {
 					Task.CurrentTask.Sleep := 200
 
@@ -2437,21 +2410,22 @@ class RaceSpotter extends GridRaceAssistant {
 			alerting := true
 
 			try {
-				loop {
-					if (this.iPendingAlerts.Length > 0)
-						alert := this.iPendingAlerts.RemoveAt(1)
-					else
-						break
+				if (this.iPendingAlerts.Length > 0) {
+					alert := this.iPendingAlerts.RemoveAt(1)
 
 					if (InStr(alert, "Behind") == 1)
 						type := "Behind"
 					else
 						type := alert
 
-					if (((type != "Behind") && this.Announcements["SideProximity"])
-					 || ((type = "Behind") && this.Announcements["RearProximity"]))
-						if (!speaker.Speaking || (type != "Hold"))
-							speaker.speakPhrase(alert, false, false, alert)
+					if (((type != "Behind") && this.Announcements["SideProximity"]) || ((type = "Behind") && this.Announcements["RearProximity"]))
+						speaker.speakPhrase(alert, false, false, alert)
+				}
+
+				if (this.iPendingAlerts.Length > 0) {
+					Task.CurrentTask.Sleep := 0
+
+					return Task.CurrentTask
 				}
 			}
 			finally {

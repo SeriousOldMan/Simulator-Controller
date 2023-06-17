@@ -2142,7 +2142,7 @@ synchronizeSetups(groups, sessionDB, connector, simulators, timestamp, lastSynch
 	local start, lastRun, ignore, identifier, document, name, type, info, simulator, car, track, setup, size
 
 	if inList(groups, "Setups") {
-		lastRun := getMultiMapValue(readMultiMap(kDatabaseDirectory . "SYNCHRONIZE"), "Setups", "Synchronization", "")
+		lastRun := getMultiMapValue(readMultiMap(kDatabaseDirectory . "SYNCHRONIZE"), "Setups", "Synchronization", 0)
 		start := A_Now
 
 		for ignore, identifier in string2Values(";", connector.QueryData("Document", "Type = 'Setup' And Modified > " . lastSynchronization)) {
@@ -2190,7 +2190,7 @@ synchronizeSetups(groups, sessionDB, connector, simulators, timestamp, lastSynch
 						loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Car Setups\" . type . "\*.info", "F" {
 							lastModified := FileGetTime(A_LoopFilePath, "M")
 
-							if (lastModified > lastRun) {
+							if (StrCompare(lastModified, lastRun) > 0) {
 								info := readMultiMap(A_LoopFilePath)
 
 								if ((getMultiMapValue(info, "Origin", "Driver", false) = sessionDB.ID)
@@ -2299,7 +2299,7 @@ synchronizeStrategies(groups, sessionDB, connector, simulators, timestamp, lastS
 						loop Files, directory . "*.info", "F" {
 							lastModified := FileGetTime(A_LoopFilePath, "M")
 
-							if (lastModified > lastRun) {
+							if (StrCompare(lastModified, lastRun) > 0) {
 								SplitPath(A_LoopFileName, , , , &name)
 
 								info := sessionDB.readStrategyInfo(simulator, car, track, name)

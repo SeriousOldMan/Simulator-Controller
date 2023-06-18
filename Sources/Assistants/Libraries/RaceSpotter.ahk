@@ -725,6 +725,7 @@ class RaceSpotter extends GridRaceAssistant {
 		iFastSpeechSynthesizer := false
 
 		class FastSpeaker extends VoiceManager.LocalSpeaker {
+			iIsSpeaking := false
 			iSpotter := false
 
 			Spotter {
@@ -733,17 +734,41 @@ class RaceSpotter extends GridRaceAssistant {
 				}
 			}
 
+			Speaking {
+				Get {
+					return (this.iIsSpeaking || super.Speaking)
+				}
+
+				Set {
+					return (this.iIsSpeaking := value)
+				}
+			}
+
 			speak(arguments*) {
-				if (this.VoiceManager.RaceAssistant.Session >= kSessionPractice)
-					super.speak(arguments*)
+				if (this.VoiceManager.RaceAssistant.Session >= kSessionPractice) {
+					this.Speaking := true
+
+					try {
+						super.speak(arguments*)
+					}
+					finally {
+						this.Speaking := false
+					}
+				}
 			}
 
 			speakPhrase(phrase, arguments*) {
-				if this.VoiceManager.RaceAssistant.skipAlert(phrase)
+				local assistant := this.VoiceManager.RaceAssistant
+
+				if assistant.skipAlert(phrase)
 					return
 
-				if this.Awaitable
+				if this.Awaitable {
 					this.wait()
+
+					if assistant.skipAlert(phrase)
+						return
+				}
 
 				super.speakPhrase(phrase, arguments*)
 			}
@@ -2409,8 +2434,10 @@ class RaceSpotter extends GridRaceAssistant {
 
 			alerting := true
 
+			speaker.Speaking := true
+
 			try {
-				if (this.iPendingAlerts.Length > 0) {
+				while (this.iPendingAlerts.Length > 0) {
 					alert := this.iPendingAlerts.RemoveAt(1)
 
 					if (InStr(alert, "Behind") == 1)
@@ -2421,14 +2448,10 @@ class RaceSpotter extends GridRaceAssistant {
 					if (((type != "Behind") && this.Announcements["SideProximity"]) || ((type = "Behind") && this.Announcements["RearProximity"]))
 						speaker.speakPhrase(alert, false, false, alert)
 				}
-
-				if (this.iPendingAlerts.Length > 0) {
-					Task.CurrentTask.Sleep := 0
-
-					return Task.CurrentTask
-				}
 			}
 			finally {
+				speaker.Speaking := false
+
 				alerting := oldAlerting
 
 				Task.unblock(oldPriority)

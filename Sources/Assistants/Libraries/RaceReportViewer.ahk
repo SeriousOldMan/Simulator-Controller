@@ -279,7 +279,7 @@ class RaceReportViewer extends RaceReportReader {
 		local raceData, drivers, categories, driver, category, positions, times, cars, carsCount, lapsCount, simulator, car
 		local class, hasClasses, classResults, valid, carClasses
 		local ignore, lap, rows, rowClasses, classRows, hasDNF, result, lapTimes, hasNull, lapTime
-		local min, avg, filteredLapTimes, nr, row
+		local min, avg, filteredLapTimes, nr, row, settings
 
 		comparePositions(c1, c2) {
 			local pos1 := c1[2]
@@ -409,7 +409,12 @@ class RaceReportViewer extends RaceReportReader {
 					invalids += 1
 			}
 
-			hasClasses := ((classes.Count > 1) || (this.getReportClasses(raceData, true, ["Class", "Cup"]).Length > 1))
+			settings := (this.Settings.Has("CarCategories") ? this.Settings["CarCategories"] : false)
+
+			if settings
+				hasClasses := ((classes.Count > 1) || (this.getReportClasses(raceData, true, settings).Length > 1))
+			else
+				hasClasses := ((classes.Count > 1) || (this.getReportClasses(raceData, true).Length > 1))
 
 			if hasClasses {
 				classResults := CaseInsenseMap()

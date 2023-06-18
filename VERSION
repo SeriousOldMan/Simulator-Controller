@@ -1,9 +1,9 @@
 [Development]
 Version=5.0.9.0-dev
 Target=5.0.8.0-release
-Date=06/16/2023
+Date=06/18/2023
 Download=
-Changes=Ctrl modified for "Load current Race Strategy" in "Race Center", New core setting to choose the activation recognizer for the "Voice Server"
+Changes=Ctrl modified for "Load current Race Strategy" in "Race Center", New core setting to choose the activation recognizer for the "Voice Server", New "Empty" option for session info layout in "System Monitor"
 [Release]
 Version=5.0.8.0-release
 Date=06/16/2023

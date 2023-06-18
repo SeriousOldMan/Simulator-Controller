@@ -152,7 +152,7 @@ getTableCSS(window) {
 }
 
 editSettings(settingsOrCommand, arguments*) {
-	local settingsGui, x, y, row, column
+	local settingsGui, x, y, row, column, value
 
 	static infoWidgets := []
 	static result := false
@@ -161,14 +161,19 @@ editSettings(settingsOrCommand, arguments*) {
 	static cycle := 5
 
 	getChoice(descriptor) {
-		if (descriptor = "Cycle")
+		if !descriptor
 			return 1
-		else
-			return (inList(infoWidgets, descriptor) + 2)
+		else if (descriptor = "Cycle")
+			return 2
+		else {
+			index := inList(infoWidgets, descriptor)
+
+			return (index ? (index + 3) : 1)
+		}
 	}
 
 	updateWidget(dropDown, *) {
-		if (dropDown.Value = 2)
+		if (dropDown.Value = 3)
 			dropDown.Value := 1
 	}
 
@@ -204,13 +209,13 @@ editSettings(settingsOrCommand, arguments*) {
 
 		settingsGui.Add("Text", "x16 yp+30 w100", translate("Components"))
 
-		settingsGui.Add("DropDownList", "x120 yp-4 w100 vwidget11 Choose" . getChoice(widgets[1]), concatenate([translate("Cycle"), translate("------------------------")], collect(infoWidgets, translate))).OnEvent("Change", updateWidget)
-		settingsGui.Add("DropDownList", "x224 yp w100 vwidget12 Choose" . getChoice(widgets[2]), concatenate([translate("Cycle"), translate("------------------------")], collect(infoWidgets, translate))).OnEvent("Change", updateWidget)
-		settingsGui.Add("DropDownList", "x328 yp w100 vwidget13 Choose" . getChoice(widgets[3]), concatenate([translate("Cycle"), translate("------------------------")], collect(infoWidgets, translate))).OnEvent("Change", updateWidget)
+		settingsGui.Add("DropDownList", "x120 yp-4 w100 vwidget11 Choose" . getChoice(widgets[1]), concatenate([translate("Empty"), translate("Cycle"), translate("------------------------")], collect(infoWidgets, translate))).OnEvent("Change", updateWidget)
+		settingsGui.Add("DropDownList", "x224 yp w100 vwidget12 Choose" . getChoice(widgets[2]), concatenate([translate("Empty"), translate("Cycle"), translate("------------------------")], collect(infoWidgets, translate))).OnEvent("Change", updateWidget)
+		settingsGui.Add("DropDownList", "x328 yp w100 vwidget13 Choose" . getChoice(widgets[3]), concatenate([translate("Empty"), translate("Cycle"), translate("------------------------")], collect(infoWidgets, translate))).OnEvent("Change", updateWidget)
 
-		settingsGui.Add("DropDownList", "x120 yp+24 w100 vwidget21 Choose" . getChoice(widgets[4]), concatenate([translate("Cycle"), translate("------------------------")], collect(infoWidgets, translate))).OnEvent("Change", updateWidget)
-		settingsGui.Add("DropDownList", "x224 yp w100 vwidget22 Choose" . getChoice(widgets[5]), concatenate([translate("Cycle"), translate("------------------------")], collect(infoWidgets, translate))).OnEvent("Change", updateWidget)
-		settingsGui.Add("DropDownList", "x328 yp w100 vwidget23 Choose" . getChoice(widgets[6]), concatenate([translate("Cycle"), translate("------------------------")], collect(infoWidgets, translate))).OnEvent("Change", updateWidget)
+		settingsGui.Add("DropDownList", "x120 yp+24 w100 vwidget21 Choose" . getChoice(widgets[4]), concatenate([translate("Empty"), translate("Cycle"), translate("------------------------")], collect(infoWidgets, translate))).OnEvent("Change", updateWidget)
+		settingsGui.Add("DropDownList", "x224 yp w100 vwidget22 Choose" . getChoice(widgets[5]), concatenate([translate("Empty"), translate("Cycle"), translate("------------------------")], collect(infoWidgets, translate))).OnEvent("Change", updateWidget)
+		settingsGui.Add("DropDownList", "x328 yp w100 vwidget23 Choose" . getChoice(widgets[6]), concatenate([translate("Empty"), translate("Cycle"), translate("------------------------")], collect(infoWidgets, translate))).OnEvent("Change", updateWidget)
 
 		settingsGui.Add("Text", "x8 yp+30 w428 W:Grow 0x10")
 
@@ -239,9 +244,9 @@ editSettings(settingsOrCommand, arguments*) {
 					loop 3 {
 						column := A_Index
 
-						widgets[((row - 1) * 3) + column]
-							:= ((settingsGui["widget" . row . column].Value = 1) ? "Cycle"
-																				 : infoWidgets[settingsGui["widget" . row . column].Value - 2])
+						value := settingsGui["widget" . row . column].Value
+
+						widgets[((row - 1) * 3) + column] := ((value = 1) ? false : ((value = 2) ? "Cycle" : infoWidgets[value - 3]))
 					}
 				}
 
@@ -864,7 +869,8 @@ systemMonitor(command := false, arguments*) {
 					else
 						html .= "</td><td>"
 
-					html .= widget(sessionState)
+					if widget
+						html .= widget(sessionState)
 
 					if (column = 3)
 						html .= "</td></tr>"
@@ -879,19 +885,23 @@ systemMonitor(command := false, arguments*) {
 			static descriptors := getKeys(infoWidgets)
 			static index := 0
 
-			if (descriptor = "Cycle") {
-				loop {
-					if (++index > descriptors.Length)
-						index := 1
+			if descriptor {
+				if (descriptor = "Cycle") {
+					loop {
+						if (++index > descriptors.Length)
+							index := 1
 
-					if !inList(fixedDescriptors, descriptors[index])
-						break
+						if !inList(fixedDescriptors, descriptors[index])
+							break
+					}
+
+					descriptor := descriptors[index]
 				}
 
-				descriptor := descriptors[index]
+				widgets.Push(infoWidgets[descriptor])
 			}
-
-			widgets.Push(infoWidgets[descriptor])
+			else
+				widgets.Push(false)
 		}
 
 		if (sessionState.Count > 0) {

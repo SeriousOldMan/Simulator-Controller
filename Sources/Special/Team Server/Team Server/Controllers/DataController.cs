@@ -448,7 +448,7 @@ namespace TeamServer.Controllers
         [HttpDelete("document/{identifier}")]
         public string DeleteDocument([FromQuery(Name = "token")] string token, string identifier)
         {
-            return DeleteTable(token, "license", identifier);
+            return DeleteTable(token, "document", identifier);
         }
 
         [HttpDelete("license/{identifier}")]
@@ -496,6 +496,9 @@ namespace TeamServer.Controllers
             {
                 switch (table.ToLower())
                 {
+                    case "document":
+                        dataManager.DeleteDocument(dataManager.LookupDocument(identifier));
+                        break;
                     case "license":
                         dataManager.DeleteLicense(dataManager.LookupLicense(identifier));
                         break;
@@ -579,7 +582,6 @@ namespace TeamServer.Controllers
                 {
                     case "document":
                         dataObject = dataManager.LookupDocument(identifier);
-                        break;
                         break;
                     case "electronics":
                         dataObject = dataManager.LookupElectronics(identifier);
@@ -666,7 +668,6 @@ namespace TeamServer.Controllers
                 {
                     case "document":
                         dataObject = dataManager.LookupDocument(identifier);
-                        break;
                         break;
                     case "electronics":
                         dataObject = dataManager.LookupElectronics(identifier);
@@ -755,7 +756,6 @@ namespace TeamServer.Controllers
                 {
                     case "document":
                         dataObject = dataManager.LookupDocument(identifier);
-                        break;
                         break;
                     case "electronics":
                         dataObject = dataManager.LookupElectronics(identifier);

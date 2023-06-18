@@ -6410,7 +6410,7 @@ class RaceCenter extends ConfigurationItem {
 					if (exception != "No data...")
 						logError(exception)
 
-					if ((lap = lastLap) && (fails++ < 3))
+					if ((lap = lastLap) && (fails++ < 6))
 						return false
 					else
 						fails := 0
@@ -6582,7 +6582,7 @@ class RaceCenter extends ConfigurationItem {
 					if (exception != "No data...")
 						logError(exception)
 
-					if ((lap = lastLap) && (fails++ < 3))
+					if ((lap = lastLap) && (fails++ < 6))
 						return false
 					else
 						fails := 0
@@ -11816,13 +11816,17 @@ pitstopSettings(raceCenterOrCommand := false, arguments*) {
 				settingsListView.ModifyCol(2, "AutoHdr")
 			}
 		}
-		else if (settingsListView && !isOpen) {
-			settingsGui.Show({Descriptor: "Race Center.Pitstop Settings", Options: "0x400000"})
+		else if settingsGui {
+			if !isOpen {
+				settingsGui.Show()
 
-			isOpen := true
+				isOpen := true
+			}
+			else
+				WinActivate(settingsGui)
 		}
 		else {
-			settingsGui := Window({Options: "0x400000"}, "")
+			settingsGui := Window({Descriptor: "Race Center.Pitstop Settings", Options: "0x400000"}, "")
 
 			settingsGui.SetFont("s10 Bold", "Arial")
 

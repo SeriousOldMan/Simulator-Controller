@@ -4377,18 +4377,22 @@ class RaceCenter extends ConfigurationItem {
 
 		switch line {
 			case 3:
-				fileName := kUserConfigDirectory . "Race.strategy"
-
-				if FileExist(fileName) {
-					configuration := readMultiMap(fileName)
-
-					if (configuration.Count > 0)
-						this.selectStrategy(this.createStrategy(configuration, false, false), true)
-				}
+				if GetKeyState("Ctrl", "P")
+					this.selectStrategy(false)
 				else {
-					OnMessage(0x44, translateOkButton)
-					MsgBox(translate("There is no active Race Strategy."), translate("Information"), 262192)
-					OnMessage(0x44, translateOkButton, 0)
+					fileName := kUserConfigDirectory . "Race.strategy"
+
+					if FileExist(fileName) {
+						configuration := readMultiMap(fileName)
+
+						if (configuration.Count > 0)
+							this.selectStrategy(this.createStrategy(configuration, false, false), true)
+					}
+					else {
+						OnMessage(0x44, translateOkButton)
+						MsgBox(translate("There is no active Race Strategy."), translate("Information"), 262192)
+						OnMessage(0x44, translateOkButton, 0)
+					}
 				}
 			case 4:
 				this.Window.Opt("+OwnDialogs")
@@ -11812,10 +11816,14 @@ pitstopSettings(raceCenterOrCommand := false, arguments*) {
 				settingsListView.ModifyCol(2, "AutoHdr")
 			}
 		}
-		else if (settingsListView && !isOpen) {
-			settingsGui.Show()
+		else if settingsGui {
+			if !isOpen {
+				settingsGui.Show()
 
-			isOpen := true
+				isOpen := true
+			}
+			else
+				WinActivate(settingsGui)
 		}
 		else {
 			settingsGui := Window({Descriptor: "Race Center.Pitstop Settings", Options: "0x400000"}, "")

@@ -140,7 +140,7 @@ initializeEnvironment() {
 			install := (installLocation && (installLocation != "") && (InStr(kHomeDirectory, installLocation) != 1))
 			install := (install || !installLocation || (installLocation = ""))
 
-			if (install && !inList(["Simulator Tools", "Simulator Download", "Database Update"], StrSplit(A_ScriptName, ".")[1])) {
+			if (install && !inList(["Simulator Tools", "Simulator Download", "Database Synchronizer"], StrSplit(A_ScriptName, ".")[1])) {
 				kSimulatorConfiguration := readMultiMap(kSimulatorConfigurationFile)
 
 				if !FileExist(getFileName(kSimulatorConfigurationFile, kUserConfigDirectory))

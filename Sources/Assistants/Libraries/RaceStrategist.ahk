@@ -2290,7 +2290,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 		for ignore, theFact in ["Name", "Version", "Weather", "Weather.Temperature.Air", "Weather.Temperature.Track"
 							  , "Tyre.Compound", "Tyre.Compound.Color", "Map", "TC", "ABS"
-							  , "Pitstop.Count", "Pitstop.Next", "Pitstop.Lap", "Pitstop.Lap.Warning"]
+							  , "Pitstop.Next", "Pitstop.Lap", "Pitstop.Lap.Warning", "Pitstop.Deviation"]
 			knowledgeBase.clearFact("Strategy." . theFact)
 
 		loop knowledgeBase.getValue("Strategy.Pitstop.Count", 0) {
@@ -2301,7 +2301,6 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 
 		knowledgeBase.clearFact("Strategy.Pitstop.Count")
-		knowledgeBase.clearFact("Strategy.Pitstop.Deviation")
 
 		this.iStrategy := false
 	}
@@ -3055,7 +3054,7 @@ class RaceStrategist extends GridRaceAssistant {
 		if result {
 			if (sPitstops != cPitstops)
 				report := true
-			else if (cPitstops.Length != 0) {
+			else if (cPitstops != 0) {
 				sPitstop := strategy.Pitstops[strategy.RunningPitstops + 1]
 				cPitstop := scenario.Pitstops[1]
 

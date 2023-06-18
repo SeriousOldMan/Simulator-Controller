@@ -3493,7 +3493,8 @@ class RaceCenter extends ConfigurationItem {
 
 			if (selected <= this.PlanListView.GetCount())
 				loop this.PlanListView.GetCount()
-					this.PlanListView.Modify(A_Index, "", stintNr++)
+					if (A_Index >= stintNr)
+						this.PlanListView.Modify(A_Index, "", stintNr++)
 		}
 
 		if (this.SelectedDetailReport = "Plan")

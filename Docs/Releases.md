@@ -1,3 +1,7 @@
+## 5.0.8.1-release 06/18/23
+  1. Fixed a rare bug in the Spotter issuing a long of proximity warnings in a row.
+  2. Fixed strategy cancellation in team races.
+
 ## 5.0.8.0-release 06/16/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

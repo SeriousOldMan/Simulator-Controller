@@ -1837,10 +1837,16 @@ class RaceCenter extends ConfigurationItem {
 					loop center.PitstopsListView.GetCount()
 						center.PitstopsListView.Modify(line, "-Select")
 				}
-				else {
+				else if (isInteger(pitstop) && pitstops.Has(pitstop)) {
 					center.PitstopsListView.Modify(line, "Check")
 
 					center.withExceptionhandler(ObjBindMethod(center, "showPitstopDetails", pitstop))
+				}
+				else {
+					center.PitstopsListView.Modify(line, "Check")
+
+					loop center.PitstopsListView.GetCount()
+						center.PitstopsListView.Modify(line, "-Select")
 				}
 			}
 		}
@@ -2332,6 +2338,8 @@ class RaceCenter extends ConfigurationItem {
 					throw "Cannot connect to Team Server..."
 			}
 			catch Any as exception {
+				logError(exception, true)
+
 				this.iServerToken := RaceCenter.kInvalidToken
 				this.iConnection := false
 
@@ -6685,6 +6693,9 @@ class RaceCenter extends ConfigurationItem {
 						driverRequest := getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Driver.Request", false)
 
 						if (tyreCompound && (tyreCompound != "-")) {
+							if this.Laps.Has(lap + 1)
+								splitCompound(this.Laps[lap + 1].Stint.Compound, &tyreCompound, &tyreCompoundColor)
+
 							pressures := values2String(", ", Round(pressureFL, 1), Round(pressureFR, 1)
 														   , Round(pressureRL, 1), Round(pressureRR, 1))
 
@@ -7397,14 +7408,12 @@ class RaceCenter extends ConfigurationItem {
 				this.updateState()
 			}
 			catch Any as exception {
-				logError(exception)
-
 				message := (isObject(exception) ? exception.Message : exception)
 
 				this.showMessage(translate("Cannot connect to the Team Server.") . A_Space . translate("Retry in 10 seconds."), translate("Error: ") . message)
 
-				if (getLogLevel() <= kLogWarn)
-					logMessage(kLogWarn, message)
+				logMessage(kLogWarn, message)
+				logError(exception, true)
 
 				Sleep(2000)
 			}
@@ -7419,7 +7428,7 @@ class RaceCenter extends ConfigurationItem {
 				}
 			}
 			catch Any as exception {
-				logError(exception)
+				logError(exception, true)
 			}
 
 			this.showMessage(false)
@@ -10588,7 +10597,7 @@ class RaceCenter extends ConfigurationItem {
 		local repairEngine := pitstopData["Repair.Engine"]
 		local repairs := this.computeRepairs(repairBodyWork, repairSuspension, repairEngine)
 		local serviceData := this.SessionStore.query("Pitstop.Service.Data", {Where: {Pitstop: pitstopNr}})
-		local tyreCompound, tyreSet, name, key, pressure
+		local tyreCompound, tyreSet, name, key, pressure, fuel
 
 		if (serviceData.Length > 0) {
 			loop 4 {
@@ -10614,8 +10623,14 @@ class RaceCenter extends ConfigurationItem {
 			if serviceData["Driver.Next"]
 				html .= ("<tr><td><b>" . translate("Next Driver:") . "</b></div></td><td>" . serviceData["Driver.Next"] . "</td></tr>")
 
-			if (pitstopData["Fuel"] > 0)
-				html .= ("<tr><td><b>" . translate("Refuel:") . "</b></div></td><td>" . displayValue("Float", convertUnit("Volume", pitstopData["Fuel"])) . "</td></tr>")
+			if (serviceData["Fuel"] > 0)
+				fuel := displayValue("Float", convertUnit("Volume", serviceData["Fuel"]))
+			else if (pitstopData["Fuel"] > 0)
+				fuel := displayValue("Float", convertUnit("Volume", pitstopData["Fuel"]))
+			else
+				fuel := "-"
+
+			html .= ("<tr><td><b>" . translate("Refuel:") . "</b></div></td><td>" . fuel  . "</td></tr>")
 
 			tyreCompound := translate(compound(pitstopData["Tyre.Compound"], pitstopData["Tyre.Compound.Color"]))
 
@@ -10667,11 +10682,10 @@ class RaceCenter extends ConfigurationItem {
 			return "bgcolor=`"DarkRed`" style=`"color:#FFFFFF`""
 	}
 
-	createTyreWearDetails(pitstopNr) {
+	createTyreWearDetails(pitstopNr, tyreCompound := false) {
 		local html := "<table>"
 		local driver := false
 		local laps := false
-		local tyreCompound := false
 		local tyreSet := false
 		local tyreNames := []
 		local treadData := []
@@ -10779,7 +10793,7 @@ class RaceCenter extends ConfigurationItem {
 	showPitstopDetails(pitstopNr) {
 		showPitstopDetailsAsync(pitstopNr) {
 			local pitstopData := this.SessionStore.Tables["Pitstop.Data"][pitstopNr]
-			local html
+			local html, tyreCompound, tyreCompoundColor
 
 			if (pitstopData["Lap"] != "-") {
 				html := ("<div id=`"header`"><b>" . translate("Pitstop: ") . pitstopNr . "</b></div>")
@@ -10793,7 +10807,12 @@ class RaceCenter extends ConfigurationItem {
 				if (this.SessionStore.query("Pitstop.Tyre.Data", {Where: {Pitstop: pitstopNr}}).Length > 0) {
 					html .= ("<br><br><div id=`"header`"><i>" . translate("Tyre Wear") . "</i></div>")
 
-					html .= ("<br>" . this.createTyreWearDetails(pitstopNr))
+					if this.Stints.Has(pitstopData["Stint"] - 1)
+						tyreCompound := this.Stints[pitstopData["Stint"] - 1].Compound
+					else
+						tyreCompound := false
+
+					html .= ("<br>" . this.createTyreWearDetails(pitstopNr, tyreCompound))
 				}
 
 				this.showDetails("Pitstop", html)
@@ -10821,7 +10840,7 @@ class RaceCenter extends ConfigurationItem {
 		local tyreSetData := []
 		local tyrePressuresData := []
 		local repairsData := []
-		local tyreCompound, tyreSet, index, pitstopData, serviceData, pressures, repairBodywork, repairSuspension, repairs
+		local tyreCompound, tyreSet, index, pitstopData, serviceData, pressures, repairBodywork, repairSuspension, repairs, fuel
 		local name, key, tyrePressures, header, repairEngine
 
 		for index, pitstopData in this.SessionStore.Tables["Pitstop.Data"] {
@@ -10855,6 +10874,7 @@ class RaceCenter extends ConfigurationItem {
 				repairsData.Push("<td class=`"td-std`">" . repairs . "</td>")
 
 				lapData.Push("<td class=`"td-std`">" . (!isNumber(pitstopData["Lap"]) ? "-" : (pitstopData["Lap"] + 1)) . "</td>")
+
 				refuelData.Push("<td class=`"td-std`">" . (isNumber(pitstopData["Fuel"]) ? ((pitstopData["Fuel"] != 0) ? displayValue("Float", convertUnit("Volume", pitstopData["Fuel"])) : "-") : "-") . "</td>")
 
 				tyreCompound := translate(compound(pitstopData["Tyre.Compound"], pitstopData["Tyre.Compound.Color"]))
@@ -10884,7 +10904,15 @@ class RaceCenter extends ConfigurationItem {
 				timeData.Push("<td class=`"td-std`">" . (serviceData["Time"] ? displayValue("Float", serviceData["Time"], 1) : "-") . "</td>")
 				previousDriverData.Push("<td class=`"td-std`">" . (serviceData["Driver.Previous"] ? serviceData["Driver.Previous"] : "-") . "</td>")
 				nextDriverData.Push("<td class=`"td-std`">" . (serviceData["Driver.Next"] ? serviceData["Driver.Next"] : "-") . "</td>")
-				refuelData.Push("<td class=`"td-std`">" . (serviceData["Fuel"] ? ((isInteger(pitstopData["Fuel"]) && (pitstopData["Fuel"] != 0)) ? displayValue("Float", convertUnit("Volume", pitstopData["Fuel"])) : "-") : "-") . "</td>")
+
+				if (serviceData["Fuel"] > 0)
+					fuel := displayValue("Float", convertUnit("Volume", serviceData["Fuel"]))
+				else if (pitstopData["Fuel"] > 0)
+					fuel := displayValue("Float", convertUnit("Volume", pitstopData["Fuel"]))
+				else
+					fuel := "-"
+
+				refuelData.Push("<td class=`"td-std`">" . fuel . "</td>")
 
 				tyreCompound := translate(compound(serviceData["Tyre.Compound"], serviceData["Tyre.Compound.Color"]))
 
@@ -10935,6 +10963,7 @@ class RaceCenter extends ConfigurationItem {
 	showPitstopsDetails() {
 		showPitstopsDetailsAsync() {
 			local html := ("<div id=`"header`"><b>" . translate("Pitstops Summary") . "</b></div>")
+			local pitstopData, tyreCompound
 
 			html .= ("<br><br><div id=`"header`"><i>" . translate("Service") . "</i></div>")
 
@@ -10943,9 +10972,16 @@ class RaceCenter extends ConfigurationItem {
 			if (this.SessionStore.Tables["Pitstop.Tyre.Data"].Length > 0)
 				loop this.SessionStore.Tables["Pitstop.Data"].Length
 					if (this.SessionStore.query("Pitstop.Tyre.Data", {Where: {Pitstop: A_Index}}).Length > 0) {
+						pitstopData := this.SessionStore.Tables["Pitstop.Data"][A_Index]
+
 						html .= ("<br><br><div id=`"header`"><i>" . translate("Tyre Wear (Pitstop: ") . A_Index . translate(")") . "</i></div>")
 
-						html .= ("<br>" . this.createTyreWearDetails(A_Index))
+						if this.Stints.Has(pitstopData["Stint"] - 1)
+							tyreCompound := this.Stints[pitstopData["Stint"] - 1].Compound
+						else
+							tyreCompound := false
+
+						html .= ("<br>" . this.createTyreWearDetails(A_Index, tyreCompound))
 					}
 
 			this.showDetails("Pitstops", html)
@@ -11920,6 +11956,8 @@ loginDialog(connectorOrCommand := false, teamServerURL := false, owner := false,
 					return connectorOrCommand.GetSessionToken()
 				}
 				catch Any as exception {
+					logError(exception, true)
+
 					OnMessage(0x44, translateOkButton)
 					MsgBox((translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
 					OnMessage(0x44, translateOkButton, 0)

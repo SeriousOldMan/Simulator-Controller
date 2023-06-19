@@ -1119,7 +1119,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				RaceAssistantPlugin.WaitForShutdown[true] := true
 		}
 
-		RaceAssistantPlugin.Simulator.finishSession()
+		if RaceAssistantPlugin.Simulator
+			RaceAssistantPlugin.Simulator.finishSession()
 
 		RaceAssistantPlugin.updateAssistantsSession(kSessionFinished)
 
@@ -1172,6 +1173,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		for ignore, assistant in RaceAssistantPlugin.Assistants
 			if (assistant.requireRaceAssistant() && assistant.RaceAssistantActive)
 				assistant.restoreSessionState(data)
+			else if !assistant.RaceAssistantEnabled
+				assistant.clearSessionState(data)
 	}
 
 	static updateAssistantsSession(session := kUndefined) {
@@ -1230,7 +1233,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			}
 		}
 
-		RaceAssistantPlugin.Simulator.updateTelemetryData(data)
+		if RaceAssistantPlugin.Simulator
+			RaceAssistantPlugin.Simulator.updateTelemetryData(data)
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
 			if assistant.RaceAssistantEnabled
@@ -1240,7 +1244,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	static updateAssistantsPositionsData(data) {
 		local ignore, assistant
 
-		RaceAssistantPlugin.Simulator.updatePositionsData(data)
+		if RaceAssistantPlugin.Simulator
+			RaceAssistantPlugin.Simulator.updatePositionsData(data)
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
 			if assistant.RaceAssistantEnabled
@@ -1273,8 +1278,12 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	static driverActive(data) {
 		local teamServer := RaceAssistantPlugin.TeamServer
 
-		if RaceAssistantPlugin.TeamSessionActive
-			return RaceAssistantPlugin.Simulator.driverActive(data, teamServer.DriverForName, teamServer.DriverSurName)
+		if RaceAssistantPlugin.TeamSessionActive {
+			if RaceAssistantPlugin.Simulator
+				return RaceAssistantPlugin.Simulator.driverActive(data, teamServer.DriverForName, teamServer.DriverSurName)
+			else
+				return false
+		}
 		else
 			return true
 	}
@@ -1778,6 +1787,13 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	restoreSessionState(data) {
 		if (this.RaceAssistant && this.TeamSessionActive)
 			RaceAssistantPlugin.RestoreSessionStateTask(this, data).start()
+	}
+
+	clearSessionState(data) {
+		local teamServer := this.TeamServer
+
+		if (teamServer && teamServer.SessionActive && this.TeamSessionActive)
+			teamServer.setSessionValue(this.Plugin . " Session Info", false)
 	}
 
 	saveSessionInfo(lapNumber, fileName) {

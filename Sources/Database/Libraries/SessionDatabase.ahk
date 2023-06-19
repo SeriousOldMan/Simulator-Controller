@@ -1978,7 +1978,7 @@ updateSynchronizationState(sessionDB, rebuild) {
 synchronizeDatabase(command := false) {
 	local sessionDB := SessionDatabase()
 	local rebuild := (command = "Rebuild")
-	local timestamp, simulators, ignore, connector, synchronizer, synchronizeTask
+	local timestamp, simulators, ignore, connector, synchronizer, synchronizeTask, id
 
 	static stateTask := false
 	static counter := 0
@@ -2019,24 +2019,28 @@ synchronizeDatabase(command := false) {
 			synchronizeTask := PeriodicTask(updateSynchronizationState.Bind(sessionDB, rebuild), 1000, kInterruptPriority)
 
 			try {
-				for identifier, connector in sessionDB.Connectors {
+				for id, connector in sessionDB.Connectors {
+					identifier := id
+
 					if (A_Index = 1)
 						synchronizeTask.start()
 
-					lastSynchronization := (!rebuild ? sessionDB.Synchronization[identifier] : false)
+					lastSynchronization := (!rebuild ? sessionDB.Synchronization[id] : false)
 					simulators := sessionDB.getSimulators(!lastSynchronization)
 					timestamp := connector.GetServerTimestamp()
 
 					for ignore, synchronizer in sessionDB.Synchronizers
-						synchronizer.Call(sessionDB.Groups[identifier], sessionDB, connector, simulators, timestamp, lastSynchronization, !lastSynchronization, &counter)
+						synchronizer.Call(sessionDB.Groups[id], sessionDB, connector, simulators, timestamp, lastSynchronization, !lastSynchronization, &counter)
 
-					sessionDB.Synchronization[identifier] := timestamp
+					sessionDB.Synchronization[id] := timestamp
 				}
+
+				sessionDB.writeDatabaseState(identifier, "Success")
+
+				Task.startTask(ObjBindMethod(stateTask, "resume"), 10000)
 			}
 			finally {
 				synchronizeTask.stop()
-
-				Task.startTask(ObjBindMethod(stateTask, "resume"), 10000)
 			}
 		}
 		catch Any as exception {
@@ -2044,10 +2048,10 @@ synchronizeDatabase(command := false) {
 
 			sessionDB.writeDatabaseState(identifier, "Error", exception)
 
+			Task.startTask(ObjBindMethod(stateTask, "resume"), 30000)
+
 			return false
 		}
-
-		sessionDB.writeDatabaseState(identifier, "Success")
 
 		return true
 	}

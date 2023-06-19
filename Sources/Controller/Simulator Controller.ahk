@@ -1375,7 +1375,7 @@ class ControllerFunction {
 				try {
 					if (SubStr(theHotkey, 1, 1) = "?") {
 						if !handler
-							throw "Action " . this.Actions[trigger, true] . " cannot be found..."
+							throw "Action " . this.Function.Actions[trigger, true] . " cannot be found..."
 
 						command := SubStr(theHotkey, 2)
 
@@ -1394,7 +1394,7 @@ class ControllerFunction {
 				}
 				catch Any as exception {
 					logError(exception)
-					
+
 					logMessage(kLogCritical, translate("Error while registering hotkey ") . theHotkey . translate(" - please check the configuration"))
 
 					showMessage(substituteVariables(translate("Cannot register hotkey %hotkey% - please check the configuration..."), {hotKey: theHotKey})
@@ -1881,7 +1881,7 @@ setHotkeyEnabled(function, trigger, enabled) {
 			}
 			catch Any as exception {
 				logError(exception)
-				
+
 				logMessage(kLogCritical, translate("Error while registering hotkey ") . theHotkey . translate(" - please check the configuration"))
 
 				showMessage(substituteVariables(translate("Cannot register hotkey %hotkey% - please check the configuration..."), {hotKey: theHotKey})

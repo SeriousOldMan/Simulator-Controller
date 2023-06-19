@@ -445,7 +445,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 		local session := this.TeamSession
 		local first := true
 		local tries := 10
-		local stint, lastStint, newStint, driverID, lapPressures, ignore, lapData
+		local stint, lastStint, newStint, driverID, lapPressures, ignore, lapData, driverName
 		local coldPressures, pressureLosses
 
 		try {
@@ -471,8 +471,12 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 
 						lapPressures := string2Values(";", lapPressures)
 
-						if (newStint && driverID)
-							tyresDB.registerDriver(lapPressures[1], driverID, teamServer.getStintDriverName(stint))
+						if (newStint && driverID) {
+							driverName := teamServer.getStintDriverName(stint)
+							
+							if driverName
+								tyresDB.registerDriver(lapPressures[1], driverID, driverName)
+						}
 
 						if first {
 							if !tyresDB.lock(lapPressures[1], lapPressures[2], lapPressures[3], false) {

@@ -197,15 +197,17 @@ class Task {
 		this.iRunning := true
 
 		try {
-			return this.run()
+			try {
+				return this.run()
+			}
+			finally {
+				this.iRunning := false
+			}
 		}
 		catch Any as exception {
 			logError(exception, true)
 
 			return false
-		}
-		finally {
-			this.iRunning := false
 		}
 	}
 

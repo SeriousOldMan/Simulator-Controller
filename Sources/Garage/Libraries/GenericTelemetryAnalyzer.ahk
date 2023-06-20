@@ -679,7 +679,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		analyzerGui.Add("Documentation", "x78 YP+20 w184 Center", translate("Telemetry Analyzer")
 					  , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-telemetry-analyzer")
-					  
+
 		analyzerGui.SetFont("s8 Norm", "Arial")
 
 		analyzerGui.Add("Text", "x16 yp+30 w130 h23 +0x200", translate("Simulator"))
@@ -702,6 +702,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		widget27 := analyzerGui.Add("Text", "x16 yp+30 w130 h23 +0x200", translate("Wheelbase / Track Width"))
 		wheelbaseEdit := analyzerGui.Add("Edit", "x158 yp w45 h23 +0x200 Number Limit3", analyzer.Wheelbase)
+		widget28 := wheelbaseEdit
 		widget29 := analyzerGui.Add("UpDown", "x188 yp w18 h23 Range1-999", analyzer.Wheelbase)
 		trackWidthEdit := analyzerGui.Add("Edit", "x208 yp w45 h23 +0x200 Number Limit3", analyzer.TrackWidth)
 		widget30 := trackWidthEdit
@@ -812,8 +813,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		}
 
 		loop 33
-			if (A_Index != 28)
-				prepareWidgets.Push(%"widget" . A_Index%)
+			prepareWidgets.Push(%"widget" . A_Index%)
 
 		widget1 := analyzerGui.Add("ListView", "x16 ys w320 h190 -Multi -LV0x10 NoSort NoSortHdr  Hidden", collect(["Characteristic", "Intensity", "Frequency (%)"], translate))
 		widget1.OnEvent("Click", noSelect)

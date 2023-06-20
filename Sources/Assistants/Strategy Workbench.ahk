@@ -2145,248 +2145,192 @@ class StrategyWorkbench extends ConfigurationItem {
 		local telemetryDB, fastestLapTime, row, lapTime, prefix, data, fuelCapacity, initialFuelAmount, map
 		local validators, index, fileName, validator, index, forecast, time, hour, minute, value
 
-		protectionOn(true, true)
+		switch line {
+			case 3: ; "Load from Strategy"
+				if (simulator && car && track) {
+					strategy := this.SelectedStrategy
 
-		try {
-			switch line {
-				case 3: ; "Load from Strategy"
-					if (simulator && car && track) {
-						strategy := this.SelectedStrategy
+					if strategy {
+						this.Control["pitstopDeltaEdit"].Text := strategy.PitstopDelta
+						this.Control["pitstopTyreServiceEdit"].Value := strategy.PitstopTyreService
 
-						if strategy {
-							this.Control["pitstopDeltaEdit"].Text := strategy.PitstopDelta
-							this.Control["pitstopTyreServiceEdit"].Value := strategy.PitstopTyreService
+						value := strategy.PitstopFuelService
 
-							value := strategy.PitstopFuelService
+						if isObject(value) {
+							this.Control["pitstopFuelServiceRuleDropDown"].Choose(1 + (value[1] != "Fixed"))
 
-							if isObject(value) {
-								this.Control["pitstopFuelServiceRuleDropDown"].Choose(1 + (value[1] != "Fixed"))
+							this.Control["pitstopFuelServiceLabel"].Text := translate(["Seconds", "Seconds (Refuel of 10 liters)"][1 + (value[1] != "Fixed")])
 
-								this.Control["pitstopFuelServiceLabel"].Text := translate(["Seconds", "Seconds (Refuel of 10 liters)"][1 + (value[1] != "Fixed")])
-
-								value := value[2]
-							}
-							else {
-								this.Control["pitstopFuelServiceRuleDropDown"].Choose(2)
-								this.Control["pitstopFuelServiceLabel"].Text := translate("Seconds (Refuel of 10 liters)")
-							}
-
-							this.Control["pitstopFuelServiceEdit"].Text := displayValue("Float", value)
-							this.Control["pitstopServiceDropDown"].Choose((strategy.PitstopServiceOrder = "Simultaneous") ? 1 : 2)
-							this.Control["safetyFuelEdit"].Text := displayValue("Float", convertUnit("Volume", strategy.SafetyFuel), 0)
-							this.Control["fuelCapacityEdit"].Text := displayValue("Float", convertUnit("Volume", strategy.FuelCapacity))
-
-							this.iSelectedValidator := strategy.Validator
-
-							pitstopRule := strategy.PitstopRule
-
-							if !pitstopRule {
-								this.Control["pitstopRequirementsDropDown"].Choose(1)
-
-								value := ""
-							}
-							else if isObject(pitstopRule) {
-								this.Control["pitstopRequirementsDropDown"].Choose(3)
-
-								value := values2String("-", pitstopRule*)
-							}
-							else {
-								this.Control["pitstopRequirementsDropDown"].Choose(2)
-
-								value := pitstopRule
-							}
-
-							this.Control["pitstopWindowEdit"].Text := value
-
-							if pitstopRule {
-								this.Control["refuelRequirementsDropDown"].Choose(inList(["Optional", "Required", "Always", "Disallowed"], strategy.RefuelRule))
-								this.Control["tyreChangeRequirementsDropDown"].Choose(inList(["Optional", "Required", "Always", "Disallowed"], strategy.TyreChangeRule))
-							}
-							else {
-								this.Control["refuelRequirementsDropDown"].Choose(inList(["Optional", "Always", "Disallowed"], strategy.RefuelRule))
-								this.Control["tyreChangeRequirementsDropDown"].Choose(inList(["Optional", "Always", "Disallowed"], strategy.TyreChangeRule))
-							}
-
-							this.TyreSetListView.Delete()
-
-							for ignore, descriptor in strategy.TyreSets
-								this.TyreSetListView.Add("", translate(compound(descriptor[1], descriptor[2])), descriptor[3])
-
-							this.TyreSetListView.ModifyCol()
-
-							this.iStintDrivers := []
-
-							numPitstops := strategy.Pitstops.Length
-
-							name := SessionDatabase.getDriverName(simulator, strategy.Driver)
-
-							this.DriversListView.Delete()
-
-							this.DriversListView.Add("", (numPitstops = 0) ? "1+" : 1, name)
-
-							this.StintDrivers.Push((name = "John Doe (JD)") ? false : strategy.Driver)
-
-							for ignore, pitstop in strategy.Pitstops {
-								name := SessionDatabase.getDriverName(simulator, pitstop.Driver)
-
-								this.DriversListView.Add("", (numPitstops = A_Index) ? ((A_Index + 1) . "+") : (A_Index + 1), name)
-
-								this.StintDrivers.Push((name = "John Doe (JD)") ? false : pitstop.Driver)
-							}
-
-							this.DriversListView.ModifyCol()
-
-							loop 2
-								this.DriversListView.ModifyCol(A_Index, "AutoHdr")
-
-							this.WeatherListView.Delete()
-
-							for ignore, forecast in strategy.WeatherForecast {
-								time := "20200101000000"
-								hour := Floor(forecast[1] / 60)
-								minute := (forecast[1] - (hour * 60))
-
-								time := DateAdd(time, hour, "Hours")
-								time := DateAdd(time, minute, "Minutes")
-
-								time := FormatTime(time, "HH:mm")
-
-								this.WeatherListView.Add("", time, translate(forecast[2]), forecast[3], forecast[4])
-							}
-
-							this.WeatherListView.ModifyCol()
-
-							loop 4
-								this.WeatherListView.ModifyCol(A_Index, "AutoHdr")
-
-							if (strategy.SessionType = "Duration") {
-								this.Control["sessionTypeDropDown"].Value := 1
-								this.Control["sessionLengthLabel"].Text := translate("Minutes")
-							}
-							else {
-								this.Control["sessionTypeDropDown"].Value := 2
-								this.Control["sessionLengthLabel"].Text := translate("Laps")
-							}
-
-							this.Control["sessionLengthEdit"].Text := Round(strategy.SessionLength)
-
-							this.Control["stintLengthEdit"].Text := strategy.StintLength
-							this.Control["formationLapCheck"].Value := strategy.FormationLap
-							this.Control["postRaceLapCheck"].Value := strategy.PostRaceLap
-
-							tyreCompound := strategy.TyreCompound
-							tyreCompoundColor := strategy.TyreCompoundColor
-
-							this.Control["simCompoundDropDown"].Choose(inList(this.TyreCompounds, compound(tyreCompound, tyreCompoundColor)))
-
-							this.Control["simAvgLapTimeEdit"].Text := displayValue("Float", strategy.AvgLapTime, 1)
-							this.Control["simFuelConsumptionEdit"].Text := displayValue("Float", convertUnit("Volume", strategy.FuelConsumption))
-							this.Control["simMaxTyreLapsEdit"].Text := Round(strategy.MaxTyreLaps)
-							this.Control["simInitialFuelAmountEdit"].Text := displayValue("Float", convertUnit("Volume", strategy.StartFuel), 0)
-							this.Control["simMapEdit"].Text := strategy.Map
-
-							this.Control["simConsumptionVariation"].Value := strategy.ConsumptionVariation
-							this.Control["simTyreUsageVariation"].Value := strategy.TyreUsageVariation
-							this.Control["simtyreCompoundVariation"].Value := strategy.TyreCompoundVariation
-							this.Control["simInitialFuelVariation"].Value := strategy.InitialFuelVariation
-
-							if (strategy.UseInitialConditions && strategy.UseTelemetryData)
-								value := 3
-							else if strategy.UseTelemetryData
-								value := 2
-							else
-								value := 1
-
-							this.Control["simInputDropDown"].Choose(value)
-
-							this.updateState()
-							this.updateSettingsMenu()
+							value := value[2]
 						}
 						else {
-							OnMessage(0x44, translateOkButton)
-							MsgBox(translate("There is no current Strategy."), translate("Information"), 262192)
-							OnMessage(0x44, translateOkButton, 0)
+							this.Control["pitstopFuelServiceRuleDropDown"].Choose(2)
+							this.Control["pitstopFuelServiceLabel"].Text := translate("Seconds (Refuel of 10 liters)")
 						}
-					}
-					else {
-						OnMessage(0x44, translateOkButton)
-						MsgBox(translate("You must first select a car and a track."), translate("Information"), 262192)
-						OnMessage(0x44, translateOkButton, 0)
-					}
-				case 4: ; "Load from Settings..."
-					if (simulator && car && track) {
-						if GetKeyState("Ctrl", "P") {
-							directory := SessionDatabase.DatabasePath
-							simulatorCode := SessionDatabase.getSimulatorCode(simulator)
 
-							dirName := directory . "User\" . simulatorCode . "\" . car . "\" . track . "\Race Settings"
+						this.Control["pitstopFuelServiceEdit"].Text := displayValue("Float", value)
+						this.Control["pitstopServiceDropDown"].Choose((strategy.PitstopServiceOrder = "Simultaneous") ? 1 : 2)
+						this.Control["safetyFuelEdit"].Text := displayValue("Float", convertUnit("Volume", strategy.SafetyFuel), 0)
+						this.Control["fuelCapacityEdit"].Text := displayValue("Float", convertUnit("Volume", strategy.FuelCapacity))
 
-							DirCreate(dirName)
+						this.iSelectedValidator := strategy.Validator
 
-							this.Window.Opt("+OwnDialogs")
+						pitstopRule := strategy.PitstopRule
 
-							OnMessage(0x44, translateLoadCancelButtons)
-							file := FileSelect(1, dirName, translate("Load Race Settings..."), "Settings (*.settings)")
-							OnMessage(0x44, translateLoadCancelButtons, 0)
+						if !pitstopRule {
+							this.Control["pitstopRequirementsDropDown"].Choose(1)
+
+							value := ""
 						}
+						else if isObject(pitstopRule) {
+							this.Control["pitstopRequirementsDropDown"].Choose(3)
+
+							value := values2String("-", pitstopRule*)
+						}
+						else {
+							this.Control["pitstopRequirementsDropDown"].Choose(2)
+
+							value := pitstopRule
+						}
+
+						this.Control["pitstopWindowEdit"].Text := value
+
+						if pitstopRule {
+							this.Control["refuelRequirementsDropDown"].Choose(inList(["Optional", "Required", "Always", "Disallowed"], strategy.RefuelRule))
+							this.Control["tyreChangeRequirementsDropDown"].Choose(inList(["Optional", "Required", "Always", "Disallowed"], strategy.TyreChangeRule))
+						}
+						else {
+							this.Control["refuelRequirementsDropDown"].Choose(inList(["Optional", "Always", "Disallowed"], strategy.RefuelRule))
+							this.Control["tyreChangeRequirementsDropDown"].Choose(inList(["Optional", "Always", "Disallowed"], strategy.TyreChangeRule))
+						}
+
+						this.TyreSetListView.Delete()
+
+						for ignore, descriptor in strategy.TyreSets
+							this.TyreSetListView.Add("", translate(compound(descriptor[1], descriptor[2])), descriptor[3])
+
+						this.TyreSetListView.ModifyCol()
+
+						this.iStintDrivers := []
+
+						numPitstops := strategy.Pitstops.Length
+
+						name := SessionDatabase.getDriverName(simulator, strategy.Driver)
+
+						this.DriversListView.Delete()
+
+						this.DriversListView.Add("", (numPitstops = 0) ? "1+" : 1, name)
+
+						this.StintDrivers.Push((name = "John Doe (JD)") ? false : strategy.Driver)
+
+						for ignore, pitstop in strategy.Pitstops {
+							name := SessionDatabase.getDriverName(simulator, pitstop.Driver)
+
+							this.DriversListView.Add("", (numPitstops = A_Index) ? ((A_Index + 1) . "+") : (A_Index + 1), name)
+
+							this.StintDrivers.Push((name = "John Doe (JD)") ? false : pitstop.Driver)
+						}
+
+						this.DriversListView.ModifyCol()
+
+						loop 2
+							this.DriversListView.ModifyCol(A_Index, "AutoHdr")
+
+						this.WeatherListView.Delete()
+
+						for ignore, forecast in strategy.WeatherForecast {
+							time := "20200101000000"
+							hour := Floor(forecast[1] / 60)
+							minute := (forecast[1] - (hour * 60))
+
+							time := DateAdd(time, hour, "Hours")
+							time := DateAdd(time, minute, "Minutes")
+
+							time := FormatTime(time, "HH:mm")
+
+							this.WeatherListView.Add("", time, translate(forecast[2]), forecast[3], forecast[4])
+						}
+
+						this.WeatherListView.ModifyCol()
+
+						loop 4
+							this.WeatherListView.ModifyCol(A_Index, "AutoHdr")
+
+						if (strategy.SessionType = "Duration") {
+							this.Control["sessionTypeDropDown"].Value := 1
+							this.Control["sessionLengthLabel"].Text := translate("Minutes")
+						}
+						else {
+							this.Control["sessionTypeDropDown"].Value := 2
+							this.Control["sessionLengthLabel"].Text := translate("Laps")
+						}
+
+						this.Control["sessionLengthEdit"].Text := Round(strategy.SessionLength)
+
+						this.Control["stintLengthEdit"].Text := strategy.StintLength
+						this.Control["formationLapCheck"].Value := strategy.FormationLap
+						this.Control["postRaceLapCheck"].Value := strategy.PostRaceLap
+
+						tyreCompound := strategy.TyreCompound
+						tyreCompoundColor := strategy.TyreCompoundColor
+
+						this.Control["simCompoundDropDown"].Choose(inList(this.TyreCompounds, compound(tyreCompound, tyreCompoundColor)))
+
+						this.Control["simAvgLapTimeEdit"].Text := displayValue("Float", strategy.AvgLapTime, 1)
+						this.Control["simFuelConsumptionEdit"].Text := displayValue("Float", convertUnit("Volume", strategy.FuelConsumption))
+						this.Control["simMaxTyreLapsEdit"].Text := Round(strategy.MaxTyreLaps)
+						this.Control["simInitialFuelAmountEdit"].Text := displayValue("Float", convertUnit("Volume", strategy.StartFuel), 0)
+						this.Control["simMapEdit"].Text := strategy.Map
+
+						this.Control["simConsumptionVariation"].Value := strategy.ConsumptionVariation
+						this.Control["simTyreUsageVariation"].Value := strategy.TyreUsageVariation
+						this.Control["simtyreCompoundVariation"].Value := strategy.TyreCompoundVariation
+						this.Control["simInitialFuelVariation"].Value := strategy.InitialFuelVariation
+
+						if (strategy.UseInitialConditions && strategy.UseTelemetryData)
+							value := 3
+						else if strategy.UseTelemetryData
+							value := 2
 						else
-							file := getFileName("Race.settings", kUserConfigDirectory)
+							value := 1
 
-						if (file != "") {
-							settings := readMultiMap(file)
+						this.Control["simInputDropDown"].Choose(value)
 
-							if (settings.Count > 0) {
-								if (getMultiMapValue(settings, "Session Settings", "Duration", kUndefined) != kUndefined) {
-									this.Control["sessionTypeDropDown"].Choose(1)
-									this.Control["sessionLengthEdit"].Text := Round(getMultiMapValue(settings, "Session Settings", "Duration") / 60)
-									this.Control["sessionLengthlabel"].Text := translate("Minutes")
-								}
-
-								this.Control["formationLapCheck"].Value := getMultiMapValue(settings, "Session Settings", "Lap.Formation", false)
-								this.Control["postRaceLapCheck"].Value := getMultiMapValue(settings, "Session Settings", "Lap.PostRace", false)
-
-								this.Control["pitstopDeltaEdit"].Text := getMultiMapValue(settings, "Strategy Settings", "Pitstop.Delta", 60)
-								this.Control["pitstopTyreServiceEdit"].Text := getMultiMapValue(settings, "Strategy Settings", "Service.Tyres", 30)
-
-								value := string2Values(":", getMultiMapValue(settings, "Strategy Settings", "Service.Refuel", 1.5))
-
-								if (value.Length = 1) {
-									value := value[1]
-
-									this.Control["pitstopFuelServiceRuleDropDown"].Choose(2)
-									this.Control["pitstopFuelServiceLabel"].Text := translate("Seconds (Refuel of 10 liters)")
-								}
-								else {
-									this.Control["pitstopFuelServiceRuleDropDown"].Choose(1 + (value[1] != "Fixed"))
-									this.Control["pitstopFuelServiceLabel"].Text := translate(["Seconds", "Seconds (Refuel of 10 liters)"][1 + (value[1] != "Fixed")])
-
-									value := value[2]
-								}
-
-								this.Control["pitstopFuelServiceEdit"].Text := displayValue("Float", value)
-								this.Control["pitstopServiceDropDown"].Choose((getMultiMapValue(settings, "Strategy Settings", "Service.Order", "Simultaneous") = "Simultaneous") ? 1 : 2)
-								this.Control["safetyFuelEdit"].Text := displayValue("Float", convertUnit("Volume", getMultiMapValue(settings, "Session Settings", "Fuel.SafetyMargin", 3)), 0)
-
-								tyreCompound := getMultiMapValue(settings, "Session Setup", "Tyre.Compound", "Dry")
-								tyreCompoundColor := getMultiMapValue(settings, "Session Setup", "Tyre.Compound.Color", "Black")
-
-								this.Control["simCompoundDropDown"].Choose(inList(this.TyreCompounds, compound(tyreCompound, tyreCompoundColor)))
-
-								this.Control["simAvgLapTimeEdit"].Text := displayValue("Float", getMultiMapValue(settings, "Session Settings", "Lap.AvgTime", 120), 1)
-								this.Control["simFuelConsumptionEdit"].Text := displayValue("Float", convertUnit("Volume", getMultiMapValue(settings, "Session Settings", "Fuel.AvgConsumption", 3.0)))
-							}
-						}
+						this.updateState()
+						this.updateSettingsMenu()
 					}
 					else {
 						OnMessage(0x44, translateOkButton)
-						MsgBox(translate("You must first select a car and a track."), translate("Information"), 262192)
+						MsgBox(translate("There is no current Strategy."), translate("Information"), 262192)
 						OnMessage(0x44, translateOkButton, 0)
 					}
-				case 5:
-					if (simulator && car && track) {
-						settingsDB := SettingsDatabase()
+				}
+				else {
+					OnMessage(0x44, translateOkButton)
+					MsgBox(translate("You must first select a car and a track."), translate("Information"), 262192)
+					OnMessage(0x44, translateOkButton, 0)
+				}
+			case 4: ; "Load from Settings..."
+				if (simulator && car && track) {
+					if GetKeyState("Ctrl", "P") {
+						directory := SessionDatabase.DatabasePath
+						simulatorCode := SessionDatabase.getSimulatorCode(simulator)
 
-						settings := SettingsDatabase().loadSettings(simulator, car, track, this.SelectedWeather)
+						dirName := directory . "User\" . simulatorCode . "\" . car . "\" . track . "\Race Settings"
+
+						DirCreate(dirName)
+
+						this.Window.Opt("+OwnDialogs")
+
+						OnMessage(0x44, translateLoadCancelButtons)
+						file := FileSelect(1, dirName, translate("Load Race Settings..."), "Settings (*.settings)")
+						OnMessage(0x44, translateLoadCancelButtons, 0)
+					}
+					else
+						file := getFileName("Race.settings", kUserConfigDirectory)
+
+					if (file != "") {
+						settings := readMultiMap(file)
 
 						if (settings.Count > 0) {
 							if (getMultiMapValue(settings, "Session Settings", "Duration", kUndefined) != kUndefined) {
@@ -2395,187 +2339,236 @@ class StrategyWorkbench extends ConfigurationItem {
 								this.Control["sessionLengthlabel"].Text := translate("Minutes")
 							}
 
-							if (getMultiMapValue(settings, "Session Settings", "Lap.Formation", kUndefined) != kUndefined)
-								this.Control["formationLapCheck"].Value := getMultiMapValue(settings, "Session Settings", "Lap.Formation")
+							this.Control["formationLapCheck"].Value := getMultiMapValue(settings, "Session Settings", "Lap.Formation", false)
+							this.Control["postRaceLapCheck"].Value := getMultiMapValue(settings, "Session Settings", "Lap.PostRace", false)
 
-							if (getMultiMapValue(settings, "Session Settings", "Lap.PostRace", kUndefined) != kUndefined)
-								this.Control["postRaceLapCheck"].Value := getMultiMapValue(settings, "Session Settings", "Lap.PostRace")
+							this.Control["pitstopDeltaEdit"].Text := getMultiMapValue(settings, "Strategy Settings", "Pitstop.Delta", 60)
+							this.Control["pitstopTyreServiceEdit"].Text := getMultiMapValue(settings, "Strategy Settings", "Service.Tyres", 30)
 
-							if (getMultiMapValue(settings, "Strategy Settings", "Pitstop.Delta", kUndefined) != kUndefined)
-								this.Control["pitstopDeltaEdit"].Text := getMultiMapValue(settings, "Strategy Settings", "Pitstop.Delta")
+							value := string2Values(":", getMultiMapValue(settings, "Strategy Settings", "Service.Refuel", 1.5))
 
-							if (getMultiMapValue(settings, "Strategy Settings", "Service.Tyres", kUndefined) != kUndefined)
-								this.Control["pitstopTyreServiceEdit"].Text := getMultiMapValue(settings, "Strategy Settings", "Service.Tyres")
+							if (value.Length = 1) {
+								value := value[1]
 
-							if (getMultiMapValue(settings, "Strategy Settings", "Service.Refuel", kUndefined) != kUndefined) {
-								if (getMultiMapValue(settings, "Strategy Settings", "Service.Refuel.Rule", false) = "Fixed") {
-									this.Control["pitstopFuelServiceRuleDropDown"].Choose(1)
-									this.Control["pitstopFuelServiceLabel"].Text := translate("Seconds")
-								}
-								else {
-									this.Control["pitstopFuelServiceRuleDropDown"].Choose(2)
-									this.Control["pitstopFuelServiceLabel"].Text := translate("Seconds (Refuel of 10 liters)")
-								}
+								this.Control["pitstopFuelServiceRuleDropDown"].Choose(2)
+								this.Control["pitstopFuelServiceLabel"].Text := translate("Seconds (Refuel of 10 liters)")
+							}
+							else {
+								this.Control["pitstopFuelServiceRuleDropDown"].Choose(1 + (value[1] != "Fixed"))
+								this.Control["pitstopFuelServiceLabel"].Text := translate(["Seconds", "Seconds (Refuel of 10 liters)"][1 + (value[1] != "Fixed")])
 
-								this.Control["pitstopFuelServiceEdit"].Text := displayValue("Float", getMultiMapValue(settings, "Strategy Settings", "Service.Refuel"))
+								value := value[2]
 							}
 
-							if (getMultiMapValue(settings, "Strategy Settings", "Service.Order", kUndefined) != kUndefined)
-								this.Control["pitstopServiceDropDown"].Choose((getMultiMapValue(settings, "Strategy Settings", "Service.Order") = "Simultaneous") ? 1 : 2)
+							this.Control["pitstopFuelServiceEdit"].Text := displayValue("Float", value)
+							this.Control["pitstopServiceDropDown"].Choose((getMultiMapValue(settings, "Strategy Settings", "Service.Order", "Simultaneous") = "Simultaneous") ? 1 : 2)
+							this.Control["safetyFuelEdit"].Text := displayValue("Float", convertUnit("Volume", getMultiMapValue(settings, "Session Settings", "Fuel.SafetyMargin", 3)), 0)
 
-							if (getMultiMapValue(settings, "Strategy Settings", "Fuel.SafetyMargin", kUndefined) != kUndefined)
-								this.Control["safetyFuelEdit"].Text := displayValue("Float", convertUnit("Volume", getMultiMapValue(settings, "Session Settings", "Fuel.SafetyMargin")), 0)
+							tyreCompound := getMultiMapValue(settings, "Session Setup", "Tyre.Compound", "Dry")
+							tyreCompoundColor := getMultiMapValue(settings, "Session Setup", "Tyre.Compound.Color", "Black")
 
-							if (getMultiMapValue(settings, "Session Settings", "Fuel.Amount", kUndefined) != kUndefined)
-								this.Control["fuelCapacityEdit"].Text := displayValue("Float", convertUnit("Volume", getMultiMapValue(settings, "Session Settings", "Fuel.Amount")))
+							this.Control["simCompoundDropDown"].Choose(inList(this.TyreCompounds, compound(tyreCompound, tyreCompoundColor)))
 
-							if ((getMultiMapValue(settings, "Session Settings", "Tyre.Compound", kUndefined) != kUndefined)
-							 && (getMultiMapValue(settings, "Session Settings", "Tyre.Compound.Color", kUndefined) != kUndefined)) {
-								tyreCompound := getMultiMapValue(settings, "Session Setup", "Tyre.Compound")
-								tyreCompoundColor := getMultiMapValue(settings, "Session Setup", "Tyre.Compound.Color")
-
-								this.Control["simCompoundDropDown"].Choose(inList(this.TyreCompounds, compound(tyreCompound, tyreCompoundColor)))
-							}
-
-							if (getMultiMapValue(settings, "Session Settings", "Lap.AvgTime", kUndefined) != kUndefined)
-								this.Control["simAvgLapTimeEdit"].Text := displayValue("Float", getMultiMapValue(settings, "Session Settings", "Lap.AvgTime"), 1)
-
-							if (getMultiMapValue(settings, "Session Settings", "Fuel.AvgConsumption", kUndefined) != kUndefined)
-								this.Control["simFuelConsumptionEdit"].Text := displayValue("Float", convertUnit("Volume", getMultiMapValue(settings, "Session Settings", "Fuel.AvgConsumption")))
+							this.Control["simAvgLapTimeEdit"].Text := displayValue("Float", getMultiMapValue(settings, "Session Settings", "Lap.AvgTime", 120), 1)
+							this.Control["simFuelConsumptionEdit"].Text := displayValue("Float", convertUnit("Volume", getMultiMapValue(settings, "Session Settings", "Fuel.AvgConsumption", 3.0)))
 						}
 					}
-					else {
+				}
+				else {
+					OnMessage(0x44, translateOkButton)
+					MsgBox(translate("You must first select a car and a track."), translate("Information"), 262192)
+					OnMessage(0x44, translateOkButton, 0)
+				}
+			case 5:
+				if (simulator && car && track) {
+					settingsDB := SettingsDatabase()
+
+					settings := SettingsDatabase().loadSettings(simulator, car, track, this.SelectedWeather)
+
+					if (settings.Count > 0) {
+						if (getMultiMapValue(settings, "Session Settings", "Duration", kUndefined) != kUndefined) {
+							this.Control["sessionTypeDropDown"].Choose(1)
+							this.Control["sessionLengthEdit"].Text := Round(getMultiMapValue(settings, "Session Settings", "Duration") / 60)
+							this.Control["sessionLengthlabel"].Text := translate("Minutes")
+						}
+
+						if (getMultiMapValue(settings, "Session Settings", "Lap.Formation", kUndefined) != kUndefined)
+							this.Control["formationLapCheck"].Value := getMultiMapValue(settings, "Session Settings", "Lap.Formation")
+
+						if (getMultiMapValue(settings, "Session Settings", "Lap.PostRace", kUndefined) != kUndefined)
+							this.Control["postRaceLapCheck"].Value := getMultiMapValue(settings, "Session Settings", "Lap.PostRace")
+
+						if (getMultiMapValue(settings, "Strategy Settings", "Pitstop.Delta", kUndefined) != kUndefined)
+							this.Control["pitstopDeltaEdit"].Text := getMultiMapValue(settings, "Strategy Settings", "Pitstop.Delta")
+
+						if (getMultiMapValue(settings, "Strategy Settings", "Service.Tyres", kUndefined) != kUndefined)
+							this.Control["pitstopTyreServiceEdit"].Text := getMultiMapValue(settings, "Strategy Settings", "Service.Tyres")
+
+						if (getMultiMapValue(settings, "Strategy Settings", "Service.Refuel", kUndefined) != kUndefined) {
+							if (getMultiMapValue(settings, "Strategy Settings", "Service.Refuel.Rule", false) = "Fixed") {
+								this.Control["pitstopFuelServiceRuleDropDown"].Choose(1)
+								this.Control["pitstopFuelServiceLabel"].Text := translate("Seconds")
+							}
+							else {
+								this.Control["pitstopFuelServiceRuleDropDown"].Choose(2)
+								this.Control["pitstopFuelServiceLabel"].Text := translate("Seconds (Refuel of 10 liters)")
+							}
+
+							this.Control["pitstopFuelServiceEdit"].Text := displayValue("Float", getMultiMapValue(settings, "Strategy Settings", "Service.Refuel"))
+						}
+
+						if (getMultiMapValue(settings, "Strategy Settings", "Service.Order", kUndefined) != kUndefined)
+							this.Control["pitstopServiceDropDown"].Choose((getMultiMapValue(settings, "Strategy Settings", "Service.Order") = "Simultaneous") ? 1 : 2)
+
+						if (getMultiMapValue(settings, "Strategy Settings", "Fuel.SafetyMargin", kUndefined) != kUndefined)
+							this.Control["safetyFuelEdit"].Text := displayValue("Float", convertUnit("Volume", getMultiMapValue(settings, "Session Settings", "Fuel.SafetyMargin")), 0)
+
+						if (getMultiMapValue(settings, "Session Settings", "Fuel.Amount", kUndefined) != kUndefined)
+							this.Control["fuelCapacityEdit"].Text := displayValue("Float", convertUnit("Volume", getMultiMapValue(settings, "Session Settings", "Fuel.Amount")))
+
+						if ((getMultiMapValue(settings, "Session Settings", "Tyre.Compound", kUndefined) != kUndefined)
+						 && (getMultiMapValue(settings, "Session Settings", "Tyre.Compound.Color", kUndefined) != kUndefined)) {
+							tyreCompound := getMultiMapValue(settings, "Session Setup", "Tyre.Compound")
+							tyreCompoundColor := getMultiMapValue(settings, "Session Setup", "Tyre.Compound.Color")
+
+							this.Control["simCompoundDropDown"].Choose(inList(this.TyreCompounds, compound(tyreCompound, tyreCompoundColor)))
+						}
+
+						if (getMultiMapValue(settings, "Session Settings", "Lap.AvgTime", kUndefined) != kUndefined)
+							this.Control["simAvgLapTimeEdit"].Text := displayValue("Float", getMultiMapValue(settings, "Session Settings", "Lap.AvgTime"), 1)
+
+						if (getMultiMapValue(settings, "Session Settings", "Fuel.AvgConsumption", kUndefined) != kUndefined)
+							this.Control["simFuelConsumptionEdit"].Text := displayValue("Float", convertUnit("Volume", getMultiMapValue(settings, "Session Settings", "Fuel.AvgConsumption")))
+					}
+				}
+				else {
+					OnMessage(0x44, translateOkButton)
+					MsgBox(translate("You must first select a car and a track."), translate("Information"), 262192)
+					OnMessage(0x44, translateOkButton, 0)
+				}
+			case 6: ; "Update from Telemetry..."
+				if (simulator && car && track) {
+					telemetryDB := TelemetryDatabase(simulator, car, track, this.SelectedDrivers)
+
+					fastestLapTime := false
+
+					for ignore, row in telemetryDB.getMapData(this.SelectedWeather
+															, this.SelectedCompound
+															, this.SelectedCompoundColor) {
+						lapTime := row["Lap.Time"]
+
+						if (!fastestLapTime || (lapTime < fastestLapTime)) {
+							fastestLapTime := lapTime
+
+							this.Control["simMapEdit"].Text := row["Map"]
+							this.Control["simAvgLapTimeEdit"].Text := displayValue("Float", lapTime, 1)
+							this.Control["simFuelConsumptionEdit"].Text := displayValue("Float", convertUnit("Volume", row["Fuel.Consumption"]))
+						}
+					}
+				}
+				else {
+					OnMessage(0x44, translateOkButton)
+					MsgBox(translate("You must first select a car and a track."), translate("Information"), 262192)
+					OnMessage(0x44, translateOkButton, 0)
+				}
+			case 7: ; "Import from Simulation..."
+				if simulator {
+					prefix := SessionDatabase.getSimulatorCode(simulator)
+
+					if !prefix {
 						OnMessage(0x44, translateOkButton)
-						MsgBox(translate("You must first select a car and a track."), translate("Information"), 262192)
+						MsgBox(translate("This is not supported for the selected simulator..."), translate("Warning"), 262192)
 						OnMessage(0x44, translateOkButton, 0)
+
+						return
 					}
-				case 6: ; "Update from Telemetry..."
-					if (simulator && car && track) {
-						telemetryDB := TelemetryDatabase(simulator, car, track, this.SelectedDrivers)
 
-						fastestLapTime := false
+					data := readSimulatorData(prefix)
 
-						for ignore, row in telemetryDB.getMapData(this.SelectedWeather
-																, this.SelectedCompound
-																, this.SelectedCompoundColor) {
-							lapTime := row["Lap.Time"]
-
-							if (!fastestLapTime || (lapTime < fastestLapTime)) {
-								fastestLapTime := lapTime
-
-								this.Control["simMapEdit"].Text := row["Map"]
-								this.Control["simAvgLapTimeEdit"].Text := displayValue("Float", lapTime, 1)
-								this.Control["simFuelConsumptionEdit"].Text := displayValue("Float", convertUnit("Volume", row["Fuel.Consumption"]))
-							}
-						}
-					}
+					if ((getMultiMapValue(data, "Session Data", "Car") != this.SelectedCar)
+					 || (getMultiMapValue(data, "Session Data", "Track") != this.SelectedTrack))
+						return
 					else {
-						OnMessage(0x44, translateOkButton)
-						MsgBox(translate("You must first select a car and a track."), translate("Information"), 262192)
-						OnMessage(0x44, translateOkButton, 0)
-					}
-				case 7: ; "Import from Simulation..."
-					if simulator {
-						prefix := SessionDatabase.getSimulatorCode(simulator)
+						fuelCapacity := getMultiMapValue(data, "Session Data", "FuelAmount", kUndefined)
+						initialFuelAmount := getMultiMapValue(data, "Car Data", "FuelRemaining", kUndefined)
 
-						if !prefix {
-							OnMessage(0x44, translateOkButton)
-							MsgBox(translate("This is not supported for the selected simulator..."), translate("Warning"), 262192)
-							OnMessage(0x44, translateOkButton, 0)
+						if (fuelCapacity != kUndefined)
+							this.Control["fuelCapacityEdit"].Text := displayValue("Float", convertUnit("Volume", fuelCapacity))
 
-							return
-						}
+						if (initialFuelAmount != kUndefined)
+							this.Control["simInitialFuelAmountEdit"].Text := displayValue("Float", convertUnit("Volume", initialFuelAmount), 0)
 
-						data := readSimulatorData(prefix)
+						tyreCompound := getMultiMapValue(data, "Car Data", "TyreCompound", kUndefined)
+						tyreCompoundColor := getMultiMapValue(data, "Car Data", "TyreCompoundColor", kUndefined)
 
-						if ((getMultiMapValue(data, "Session Data", "Car") != this.SelectedCar)
-						 || (getMultiMapValue(data, "Session Data", "Track") != this.SelectedTrack))
-							return
-						else {
-							fuelCapacity := getMultiMapValue(data, "Session Data", "FuelAmount", kUndefined)
-							initialFuelAmount := getMultiMapValue(data, "Car Data", "FuelRemaining", kUndefined)
+						if (tyreCompound = kUndefined) {
+							tyreCompound := getMultiMapValue(data, "Car Data", "TyreCompoundRaw", kUndefined)
 
-							if (fuelCapacity != kUndefined)
-								this.Control["fuelCapacityEdit"].Text := displayValue("Float", convertUnit("Volume", fuelCapacity))
+							if (tyreCompound && (tyreCompound != kUndefined)) {
+								tyreCompound := SessionDatabase.getTyreCompoundName(simulator, car, track, tyreCompound, false)
 
-							if (initialFuelAmount != kUndefined)
-								this.Control["simInitialFuelAmountEdit"].Text := displayValue("Float", convertUnit("Volume", initialFuelAmount), 0)
-
-							tyreCompound := getMultiMapValue(data, "Car Data", "TyreCompound", kUndefined)
-							tyreCompoundColor := getMultiMapValue(data, "Car Data", "TyreCompoundColor", kUndefined)
-
-							if (tyreCompound = kUndefined) {
-								tyreCompound := getMultiMapValue(data, "Car Data", "TyreCompoundRaw", kUndefined)
-
-								if (tyreCompound && (tyreCompound != kUndefined)) {
-									tyreCompound := SessionDatabase.getTyreCompoundName(simulator, car, track, tyreCompound, false)
-
-									if tyreCompound
-										splitCompound(tyreCompound, &tyreCompound, &tyreCompoundColor)
-									else
-										tyreCompound := kUndefined
-								}
-							}
-
-							if ((tyreCompound != kUndefined) && (tyreCompoundColor != kUndefined))
-								this.Control["simCompoundDropDown"].Choose(inList(this.TyreCompounds, compound(tyreCompound, tyreCompoundColor)))
-
-							map := getMultiMapValue(data, "Car Data", "Map", kUndefined)
-
-							if (map != kUndefined)
-								this.Control["simMapEdit"].Text := (isNumber(map) ? Round(map) : map)
-						}
-					}
-					else {
-						OnMessage(0x44, translateOkButton)
-						MsgBox(translate("You must first select a simulation."), translate("Information"), 262192)
-						OnMessage(0x44, translateOkButton, 0)
-					}
-				default:
-					if (line = 9)
-						Run(kUserHomeDirectory . "Validators")
-					else if (line > 9) {
-						validators := []
-
-						if GetKeyState("Ctrl", "P") {
-							index := 0
-
-							for ignore, fileName in getFileNames("*.rules", kResourcesDirectory . "Strategy\Validators\", kUserHomeDirectory . "Validators\") {
-								SplitPath(fileName, , , , &validator)
-
-								if !inList(validators, validator) {
-									if ((++index = (line - 9)) && !InStr(fileName, kResourcesDirectory)) {
-										Run("notepad " fileName)
-
-										break
-									}
-								}
+								if tyreCompound
+									splitCompound(tyreCompound, &tyreCompound, &tyreCompoundColor)
 								else
-									validators.Push(validator)
+									tyreCompound := kUndefined
 							}
 						}
-						else {
-							for ignore, fileName in getFileNames("*.rules", kResourcesDirectory . "Strategy\Validators\", kUserHomeDirectory . "Validators\") {
-								SplitPath(fileName, , , , &validator)
 
-								if !inList(validators, validator)
-									validators.Push(validator)
+						if ((tyreCompound != kUndefined) && (tyreCompoundColor != kUndefined))
+							this.Control["simCompoundDropDown"].Choose(inList(this.TyreCompounds, compound(tyreCompound, tyreCompoundColor)))
+
+						map := getMultiMapValue(data, "Car Data", "Map", kUndefined)
+
+						if (map != kUndefined)
+							this.Control["simMapEdit"].Text := (isNumber(map) ? Round(map) : map)
+					}
+				}
+				else {
+					OnMessage(0x44, translateOkButton)
+					MsgBox(translate("You must first select a simulation."), translate("Information"), 262192)
+					OnMessage(0x44, translateOkButton, 0)
+				}
+			default:
+				if (line = 9)
+					Run(kUserHomeDirectory . "Validators")
+				else if (line > 9) {
+					validators := []
+
+					if GetKeyState("Ctrl", "P") {
+						index := 0
+
+						for ignore, fileName in getFileNames("*.rules", kResourcesDirectory . "Strategy\Validators\", kUserHomeDirectory . "Validators\") {
+							SplitPath(fileName, , , , &validator)
+
+							if !inList(validators, validator) {
+								if ((++index = (line - 9)) && !InStr(fileName, kResourcesDirectory)) {
+									Run("notepad " fileName)
+
+									break
+								}
 							}
-
-							validator := validators[line - 9]
-
-							if (this.iSelectedValidator = validator)
-								this.iSelectedValidator := false
 							else
-								this.iSelectedValidator := validator
-
-							this.updateSettingsMenu()
+								validators.Push(validator)
 						}
 					}
-			}
-		}
-		finally {
-			protectionOff(true, true)
+					else {
+						for ignore, fileName in getFileNames("*.rules", kResourcesDirectory . "Strategy\Validators\", kUserHomeDirectory . "Validators\") {
+							SplitPath(fileName, , , , &validator)
+
+							if !inList(validators, validator)
+								validators.Push(validator)
+						}
+
+						validator := validators[line - 9]
+
+						if (this.iSelectedValidator = validator)
+							this.iSelectedValidator := false
+						else
+							this.iSelectedValidator := validator
+
+						this.updateSettingsMenu()
+					}
+				}
 		}
 
 		this.updateSettingsMenu()

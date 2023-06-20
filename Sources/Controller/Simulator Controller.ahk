@@ -1901,39 +1901,13 @@ functionActionCallable(function, trigger, action) {
 }
 
 fireControllerActions(function, trigger, fromTask := false) {
-	local callable
+	if fromTask {
+		function.Controller.fireActions(function, trigger)
 
-	static pending := false
-
-	protectionOn(true, true)
-
-	try {
-		if pending
-			pending.Push(ObjBindMethod(function.Controller, "fireActions", function, trigger))
-		else if fromTask {
-			pending := []
-
-			try {
-				function.Controller.fireActions(function, trigger)
-
-				while (pending.Length > 0) {
-					callable := pending.RemoveAt(1)
-
-					callable.Call()
-				}
-			}
-			finally {
-				pending := false
-			}
-		}
-		else
-			Task.startTask(fireControllerActions.Bind(function, trigger, true), 0, kLowPriority)
+		return false
 	}
-	finally {
-		protectionOff(true, true)
-	}
-
-	return false
+	else
+		Task.startTask(fireControllerActions.Bind(function, trigger, true))
 }
 
 getLabelForLogMessage(action) {

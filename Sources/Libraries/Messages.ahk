@@ -114,14 +114,14 @@ class MessageManager extends PeriodicTask {
 	}
 
 	class MessagesDispatcher extends Task {
-		static sPriority := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory)), "Messages", "Dispatch", 100)
+		static sWait := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory)), "Messages", "Dispatch", 100)
 
 		iMessages := false
 
 		__New(messages) {
 			this.iMessages := messages
 
-			super.__New(false, MessageManager.MessagesDispatcher.sPriority)
+			super.__New(false, MessageManager.MessagesDispatcher.sWait)
 		}
 
 		run() {

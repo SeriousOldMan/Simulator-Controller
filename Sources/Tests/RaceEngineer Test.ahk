@@ -223,6 +223,9 @@ class TestPitstopHandler {
 
 	saveLapState(*) {
 	}
+
+	saveSessionInfo(*) {
+	}
 }
 
 

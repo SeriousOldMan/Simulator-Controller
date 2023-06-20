@@ -900,7 +900,7 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	positionRecognized(words) {
-		if inList(words, speaker.Fragments["Laps"])
+		if inList(words, this.getSpeaker().Fragments["Laps"])
 			this.futurePositionRecognized(words)
 		else
 			super.positionRecognized(words)
@@ -1513,7 +1513,7 @@ class RaceStrategist extends GridRaceAssistant {
 		local sessionInfo := super.createSessionInfo(lapNumber, valid, data, simulator, car, track)
 		local nextPitstop
 
-		if knowledgeBase.getValue("Strategy.Name", false) {
+		if (knowledgeBase && knowledgeBase.getValue("Strategy.Name", false)) {
 			setMultiMapValue(sessionInfo, "Strategy", "Pitstops", knowledgeBase.getValue("Strategy.Pitstop.Count"))
 
 			nextPitstop := knowledgeBase.getValue("Strategy.Pitstop.Next", false)
@@ -1539,11 +1539,10 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	addLap(lapNumber, &data) {
-		local knowledgeBase := this.KnowledgeBase
 		local driverForname := ""
 		local driverSurname := ""
 		local driverNickname := ""
-		local compound, result, lap, simulator, car, track, frequency, curContinuation
+		local knowledgeBase, compound, result, lap, simulator, car, track, frequency, curContinuation
 		local pitstop, prefix, validLap, weather, airTemperature, trackTemperature, compound, compoundColor
 		local fuelConsumption, fuelRemaining, lapTime, map, tc, antiBS, pressures, temperatures, wear, multiClass
 		local sessionInfo, driverCar, lastTime
@@ -1561,15 +1560,17 @@ class RaceStrategist extends GridRaceAssistant {
 		else if (lastLap < (lapNumber - 1))
 			this.iLastStrategyUpdate := lapNumber
 
+		curContinuation := this.Continuation
+
+		result := super.addLap(lapNumber, &data)
+
+		knowledgeBase := this.KnowledgeBase
+
 		if (this.Speaker && (lapNumber > 1)) {
 			driverForname := knowledgeBase.getValue("Driver.Forname", "John")
 			driverSurname := knowledgeBase.getValue("Driver.Surname", "Doe")
 			driverNickname := knowledgeBase.getValue("Driver.Nickname", "JDO")
 		}
-
-		curContinuation := this.Continuation
-
-		result := super.addLap(lapNumber, &data)
 
 		if (this.Speaker && (lastLap < (lapNumber - 2))
 		 && (computeDriverName(driverForname, driverSurname, driverNickname) != this.DriverFullName))

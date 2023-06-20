@@ -1413,37 +1413,39 @@ class RaceEngineer extends RaceAssistant {
 		local sessionInfo := super.createSessionInfo(lapNumber, valid, data, simulator, car, track)
 		local prepared, tyreCompound, lap
 
-		prepared := this.hasPreparedPitstop()
+		if knowledgeBase {
+			prepared := this.hasPreparedPitstop()
 
-		if (this.hasPlannedPitstop() || prepared) {
-			lap := knowledgeBase.getValue("Pitstop.Planned.Lap", false)
+			if (this.hasPlannedPitstop() || prepared) {
+				lap := knowledgeBase.getValue("Pitstop.Planned.Lap", false)
 
-			if lap
-				lap += 1
+				if lap
+					lap += 1
 
-			setMultiMapValue(sessionInfo, "Pitstop", "Planned.Nr", knowledgeBase.getValue("Pitstop.Planned.Nr"))
-			setMultiMapValue(sessionInfo, "Pitstop", "Planned.Lap", lap)
-			setMultiMapValue(sessionInfo, "Pitstop", "Planned.Refuel", knowledgeBase.getValue("Pitstop.Planned.Fuel", 0))
+				setMultiMapValue(sessionInfo, "Pitstop", "Planned.Nr", knowledgeBase.getValue("Pitstop.Planned.Nr"))
+				setMultiMapValue(sessionInfo, "Pitstop", "Planned.Lap", lap)
+				setMultiMapValue(sessionInfo, "Pitstop", "Planned.Refuel", knowledgeBase.getValue("Pitstop.Planned.Fuel", 0))
 
-			tyreCompound := knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound", false)
+				tyreCompound := knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound", false)
 
-			setMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Compound", tyreCompound)
+				setMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Compound", tyreCompound)
 
-			if tyreCompound {
-				setMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Compound.Color", knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound.Color", false))
-				setMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Set", knowledgeBase.getValue("Pitstop.Planned.Tyre.Set", 0))
+				if tyreCompound {
+					setMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Compound.Color", knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound.Color", false))
+					setMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Set", knowledgeBase.getValue("Pitstop.Planned.Tyre.Set", 0))
 
-				setMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Pressure.FL", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL", 0), 1))
-				setMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Pressure.FR", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR", 0), 1))
-				setMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Pressure.RL", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL", 0), 1))
-				setMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Pressure.RR", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR", 0), 1))
+					setMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Pressure.FL", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL", 0), 1))
+					setMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Pressure.FR", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR", 0), 1))
+					setMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Pressure.RL", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL", 0), 1))
+					setMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Pressure.RR", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR", 0), 1))
+				}
+
+				setMultiMapValue(sessionInfo, "Pitstop", "Planned.Repair.Bodywork", knowledgeBase.getValue("Pitstop.Planned.Repair.Bodywork", false))
+				setMultiMapValue(sessionInfo, "Pitstop", "Planned.Repair.Suspension", knowledgeBase.getValue("Pitstop.Planned.Repair.Suspension", false))
+				setMultiMapValue(sessionInfo, "Pitstop", "Planned.Repair.Engine", knowledgeBase.getValue("Pitstop.Planned.Repair.Engine", false))
+
+				setMultiMapValue(sessionInfo, "Pitstop", "Prepared", prepared)
 			}
-
-			setMultiMapValue(sessionInfo, "Pitstop", "Planned.Repair.Bodywork", knowledgeBase.getValue("Pitstop.Planned.Repair.Bodywork", false))
-			setMultiMapValue(sessionInfo, "Pitstop", "Planned.Repair.Suspension", knowledgeBase.getValue("Pitstop.Planned.Repair.Suspension", false))
-			setMultiMapValue(sessionInfo, "Pitstop", "Planned.Repair.Engine", knowledgeBase.getValue("Pitstop.Planned.Repair.Engine", false))
-
-			setMultiMapValue(sessionInfo, "Pitstop", "Prepared", prepared)
 		}
 
 		return sessionInfo
@@ -1489,6 +1491,8 @@ class RaceEngineer extends RaceAssistant {
 		}
 
 		result := super.addLap(lapNumber, &data)
+
+		knowledgeBase := this.KnowledgeBase
 
 		if (this.Speaker && (lastLap < (lapNumber - 2)) && (computeDriverName(driverForname, driverSurname, driverNickname) != this.DriverFullName))
 			this.getSpeaker().speakPhrase("WelcomeBack")

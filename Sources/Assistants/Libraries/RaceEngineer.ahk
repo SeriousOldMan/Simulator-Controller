@@ -314,6 +314,33 @@ class RaceEngineer extends RaceAssistant {
 			this.clearContinuation()
 	}
 
+	requestInformation(category, arguments*) {
+		this.clearContinuation()
+
+		switch category, false {
+			case "LapsRemaining":
+				this.lapInfoRecognized([])
+			case "FuelRemaining":
+				this.fuelInfoRecognized([])
+			case "Weather":
+				this.weatherRecognized([])
+			case "TyrePressures":
+				this.tyreInfoRecognized(Array(this.getSpeaker().Fragments["Pressures"]))
+			case "TyrePressuresCold":
+				this.tyreInfoRecognized(Array(this.getSpeaker().Fragments["Pressures"], this.getSpeaker().Fragments["Cold"]))
+			case "TyrePressuresSetup":
+				this.tyreInfoRecognized(Array(this.getSpeaker().Fragments["Pressures"], this.getSpeaker().Fragments["Setup"]))
+			case "TyreTemperatures":
+				this.tyreInfoRecognized(Array(this.getSpeaker().Fragments["Temperatures"]))
+			case "TyreWear":
+				this.tyreWearRecognized([])
+			case "BrakeTemperatures":
+				this.brakeTemperaturesRecognized([])
+			case "BrakeWear":
+				this.brakeWearRecognized([])
+		}
+	}
+
 	lapInfoRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
 		local lap, speaker, remainingFuelLaps, remainingSessionLaps, remainingStintLaps
@@ -539,18 +566,6 @@ class RaceEngineer extends RaceAssistant {
 				speaker.endTalk()
 			}
 		}
-	}
-
-	weatherRecognized(words) {
-		local knowledgeBase := this.KnowledgeBase
-		local weather10Min := (knowledgeBase ? knowledgeBase.getValue("Weather.Weather.10Min", false) : false)
-
-		if !weather10Min
-			this.getSpeaker().speakPhrase("Later")
-		else if (weather10Min = "Dry")
-			this.getSpeaker().speakPhrase("WeatherGood")
-		else
-			this.getSpeaker().speakPhrase("WeatherRain")
 	}
 
 	planPitstopRecognized(words) {
@@ -1717,35 +1732,6 @@ class RaceEngineer extends RaceAssistant {
 		}
 		else
 			return false
-	}
-
-	requestInformation(category, arguments*) {
-		this.clearContinuation()
-
-		switch category, false {
-			case "Time":
-				this.timeRecognized([])
-			case "LapsRemaining":
-				this.lapInfoRecognized([])
-			case "FuelRemaining":
-				this.fuelInfoRecognized([])
-			case "Weather":
-				this.weatherRecognized([])
-			case "TyrePressures":
-				this.tyreInfoRecognized(Array(this.getSpeaker().Fragments["Pressures"]))
-			case "TyrePressuresCold":
-				this.tyreInfoRecognized(Array(this.getSpeaker().Fragments["Pressures"], this.getSpeaker().Fragments["Cold"]))
-			case "TyrePressuresSetup":
-				this.tyreInfoRecognized(Array(this.getSpeaker().Fragments["Pressures"], this.getSpeaker().Fragments["Setup"]))
-			case "TyreTemperatures":
-				this.tyreInfoRecognized(Array(this.getSpeaker().Fragments["Temperatures"]))
-			case "TyreWear":
-				this.tyreWearRecognized([])
-			case "BrakeTemperatures":
-				this.brakeTemperaturesRecognized([])
-			case "BrakeWear":
-				this.brakeWearRecognized([])
-		}
 	}
 
 	planPitstop(optionsOrLap := kUndefined, refuelAmount := kUndefined

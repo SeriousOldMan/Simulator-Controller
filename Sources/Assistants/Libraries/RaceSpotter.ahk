@@ -975,374 +975,6 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 	}
 
-	handleVoiceCommand(grammar, words) {
-		local reset := true
-
-		switch grammar, false {
-			case "Position":
-				this.positionRecognized(words)
-			case "LapTimes":
-				this.lapTimesRecognized(words)
-			case "ActiveCars":
-				this.activeCarsRecognized(words)
-			case "GapToAhead":
-				this.gapToAheadRecognized(words)
-			case "GapToBehind":
-				this.gapToBehindRecognized(words)
-			case "GapToLeader":
-				this.gapToLeaderRecognized(words)
-			default:
-				reset := false
-
-				super.handleVoiceCommand(grammar, words)
-		}
-
-		if reset
-			this.clearContinuation()
-	}
-
-	positionRecognized(words) {
-		local knowledgeBase := this.KnowledgeBase
-		local speaker := this.getSpeaker()
-		local position := this.getPosition()
-		local positionClass
-
-		if (position == 0)
-			speaker.speakPhrase("Later")
-		else if inList(words, speaker.Fragments["Laps"])
-			this.futurePositionRecognized(words)
-		else {
-			speaker.beginTalk()
-
-			try {
-				if this.MultiClass {
-					positionClass := this.getPosition(false, "Class")
-
-					if (position != positionClass) {
-						speaker.speakPhrase("PositionClass", {positionOverall: position, positionClass: positionClass})
-
-						position := positionClass
-					}
-					else
-						speaker.speakPhrase("Position", {position: position})
-				}
-				else
-					speaker.speakPhrase("Position", {position: position})
-
-				if (position <= 3)
-					speaker.speakPhrase("Great")
-			}
-			finally {
-				speaker.endTalk()
-			}
-		}
-	}
-
-	gapToAheadRecognized(words) {
-		local knowledgeBase := this.KnowledgeBase
-
-		if !this.hasEnoughData()
-			return
-
-		if inList(words, this.getSpeaker().Fragments["Car"])
-			this.trackGapToAheadRecognized(words)
-		else
-			this.standingsGapToAheadRecognized(words)
-	}
-
-	trackGapToAheadRecognized(words) {
-		local knowledgeBase := this.KnowledgeBase
-		local speaker := this.getSpeaker()
-		local car := knowledgeBase.getValue("Position.Track.Ahead.Car")
-		local delta := Abs(knowledgeBase.getValue("Position.Track.Ahead.Delta", 0))
-		local lap, driverLap, otherLap
-
-		if (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false))
-			speaker.speakPhrase("AheadCarInPit")
-		else if (delta != 0) {
-			speaker.beginTalk()
-
-			try {
-				speaker.speakPhrase("TrackGapToAhead", {delta: speaker.number2Speech(delta / 1000, 1)})
-
-				lap := knowledgeBase.getValue("Lap")
-				driverLap := Floor(knowledgeBase.getValue("Standings.Lap." . lap . ".Car." . knowledgeBase.getValue("Driver.Car") . ".Laps"))
-				otherLap := Floor(knowledgeBase.getValue("Standings.Lap." . lap . ".Car." . knowledgeBase.getValue("Position.Track.Ahead.Car") . ".Laps"))
-
-				if (driverLap != otherLap)
-				  speaker.speakPhrase("NotTheSameLap")
-			}
-			finally {
-				speaker.endTalk()
-			}
-		}
-		else
-			speaker.speakPhrase("NoTrackGap")
-	}
-
-	standingsGapToAheadRecognized(words, standard := true) {
-		local knowledgeBase := this.KnowledgeBase
-		local speaker := this.getSpeaker()
-		local talking := false
-		local delta, lap, car, inPit, speaker
-
-		if (this.getPosition(false, "Class") = 1)
-			speaker.speakPhrase("NoGapToAhead")
-		else
-			try {
-				lap := knowledgeBase.getValue("Lap")
-				car := knowledgeBase.getValue("Position.Standings.Class.Ahead.Car")
-
-				if car {
-					delta := Abs(knowledgeBase.getValue("Position.Standings.Class.Ahead.Delta", 0) / 1000)
-					inPit := (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false))
-
-					if ((delta = 0) || (inPit && (Abs(delta) < 30))) {
-						if standard {
-							speaker.speakPhrase(inPit ? "AheadCarInPit" : "NoTrackGap")
-
-							return true
-						}
-						else
-							return false
-					}
-					else if ((knowledgeBase.getValue("Car." . car . ".Lap", 0) > lap)
-						  && (Abs(delta) > (knowledgeBase.getValue("Lap." . lap . ".Time", 0) / 1000))) {
-						if standard {
-							speaker.beginTalk()
-
-							speaker.speakPhrase("StandingsAheadLapped")
-						}
-						else
-							return false
-					}
-					else {
-						speaker.beginTalk()
-
-						speaker.speakPhrase("StandingsGapToAhead", {delta: speaker.number2Speech(delta, 1)})
-					}
-
-					talking := true
-
-					if inPit
-						speaker.speakPhrase("GapCarInPit")
-				}
-				else
-					return false
-			}
-			finally {
-				if talking
-					speaker.endTalk()
-			}
-
-		return true
-	}
-
-	gapToBehindRecognized(words) {
-		local knowledgeBase := this.KnowledgeBase
-
-		if !this.hasEnoughData()
-			return
-
-		if inList(words, this.getSpeaker().Fragments["Car"])
-			this.trackGapToBehindRecognized(words)
-		else
-			this.standingsGapToBehindRecognized(words)
-	}
-
-	trackGapToBehindRecognized(words) {
-		local knowledgeBase := this.KnowledgeBase
-		local speaker := this.getSpeaker()
-		local car := knowledgeBase.getValue("Position.Track.Behind.Car")
-		local delta := Abs(knowledgeBase.getValue("Position.Track.Behind.Delta", 0))
-		local lap, driverLap, otherLap
-
-		if (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false))
-			speaker.speakPhrase("BehindCarInPit")
-		else if (delta != 0) {
-			speaker.beginTalk()
-
-			try {
-				speaker.speakPhrase("TrackGapToBehind", {delta: speaker.number2Speech(delta / 1000, 1)})
-
-				lap := knowledgeBase.getValue("Lap")
-				driverLap := Floor(knowledgeBase.getValue("Standings.Lap." . lap . ".Car." . knowledgeBase.getValue("Driver.Car") . ".Laps"))
-				otherLap := Floor(knowledgeBase.getValue("Standings.Lap." . lap . ".Car." . knowledgeBase.getValue("Position.Track.Behind.Car") . ".Laps"))
-
-				if (driverLap != otherLap)
-				  speaker.speakPhrase("NotTheSameLap")
-			}
-			finally {
-				speaker.endTalk()
-			}
-		}
-		else
-			speaker.speakPhrase("NoTrackGap")
-	}
-
-	standingsGapToBehindRecognized(words, standard := true) {
-		local knowledgeBase := this.KnowledgeBase
-		local speaker := this.getSpeaker()
-		local talking := false
-		local delta, car, speaker, driver, inPit, lap, lapped
-
-		if (this.getPosition(false, "Class") = this.getCars("Class").Length)
-			speaker.speakPhrase("NoGapToBehind")
-		else {
-			speaker := this.getSpeaker()
-
-			try {
-				lap := knowledgeBase.getValue("Lap")
-				car := knowledgeBase.getValue("Position.Standings.Class.Behind.Car")
-
-				if car {
-					delta := Abs(knowledgeBase.getValue("Position.Standings.Class.Behind.Delta", 0) / 1000)
-					inPit := (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false))
-					lapped := false
-
-					if ((delta = 0) || (inPit && (Abs(delta) < 30))) {
-						if standard {
-							speaker.speakPhrase(inPit ? "BehindCarInPit" : "NoTrackGap")
-
-							return true
-						}
-						else
-							return false
-					}
-					else if ((knowledgeBase.getValue("Car." . car . ".Lap", 0) < lap)
-						  && (Abs(delta) > (knowledgeBase.getValue("Lap." . lap . ".Time", 0) / 1000))) {
-						if standard {
-							speaker.beginTalk()
-
-							speaker.speakPhrase("StandingsBehindLapped")
-
-							lapped := true
-						}
-						else
-							return false
-					}
-					else {
-						speaker.beginTalk()
-
-						speaker.speakPhrase("StandingsGapToBehind", {delta: speaker.number2Speech(delta, 1)})
-					}
-
-					talking := true
-
-					if (!lapped && inPit)
-						speaker.speakPhrase("GapCarInPit")
-				}
-				else
-					return false
-			}
-			finally {
-				if talking
-					speaker.endTalk()
-			}
-		}
-
-		return true
-	}
-
-	gapToLeaderRecognized(words) {
-		local knowledgeBase := this.KnowledgeBase
-		local speaker := this.getSpeaker()
-		local delta
-
-		if !this.hasEnoughData()
-			return
-
-		if (this.getPosition(false, "Class") = 1)
-			speaker.speakPhrase("NoGapToAhead")
-		else {
-			delta := Abs(knowledgeBase.getValue("Position.Standings.Class.Leader.Delta", 0) / 1000)
-
-			speaker.speakPhrase("GapToLeader", {delta: speaker.number2Speech(delta, 1)})
-		}
-	}
-
-	reportLapTime(phrase, driverLapTime, car) {
-		local lapTime := this.KnowledgeBase.getValue("Car." . car . ".Time", false)
-		local speaker, fragments, minute, seconds, delta
-
-		if lapTime {
-			lapTime /= 1000
-
-			speaker := this.getSpeaker()
-			fragments := speaker.Fragments
-
-			minute := Floor(lapTime / 60)
-			seconds := (lapTime - (minute * 60))
-
-			speaker.beginTalk()
-
-			try {
-				speaker.speakPhrase(phrase, {time: speaker.number2Speech(lapTime, 1), minute: minute, seconds: speaker.number2Speech(seconds, 1)})
-
-				delta := (driverLapTime - lapTime)
-
-				if (Abs(delta) > 0.5)
-					speaker.speakPhrase("LapTimeDelta", {delta: speaker.number2Speech(Abs(delta), 1)
-													   , difference: (delta > 0) ? fragments["Faster"] : fragments["Slower"]})
-			}
-			finally {
-				speaker.endTalk()
-			}
-		}
-	}
-
-	lapTimesRecognized(words) {
-		local knowledgeBase := this.KnowledgeBase
-		local car, lap, position, cars, driverLapTime, speaker, minute, seconds
-
-		if !this.hasEnoughData()
-			return
-
-		car := knowledgeBase.getValue("Driver.Car")
-		lap := knowledgeBase.getValue("Lap")
-		position := this.getPosition(false, "Class")
-		cars := knowledgeBase.getValue("Car.Count")
-
-		driverLapTime := (knowledgeBase.getValue("Car." . car . ".Time") / 1000)
-		speaker := this.getSpeaker()
-
-		if (lap == 0)
-			speaker.speakPhrase("Later")
-		else {
-			speaker.beginTalk()
-
-			try {
-				minute := Floor(driverLapTime / 60)
-				seconds := (driverLapTime - (minute * 60))
-
-				speaker.speakPhrase("LapTime", {time: speaker.number2Speech(driverLapTime, 1), minute: minute, seconds: speaker.number2Speech(seconds, 1)})
-
-				if (position > 2)
-					this.reportLapTime("LapTimeFront", driverLapTime, knowledgeBase.getValue("Position.Standings.Class.Ahead.Car", 0))
-
-				if (position < cars)
-					this.reportLapTime("LapTimeBehind", driverLapTime, knowledgeBase.getValue("Position.Standings.Class.Behind.Car", 0))
-
-				if (position > 1)
-					this.reportLapTime("LapTimeLeader", driverLapTime, knowledgeBase.getValue("Position.Standings.Class.Leader.Car", 0))
-			}
-			finally {
-				speaker.endTalk()
-			}
-		}
-	}
-
-	activeCarsRecognized(words) {
-		if !this.Knowledgebase
-			this.getSpeaker().speakPhrase("Later")
-		else {
-			if this.MultiClass
-				this.getSpeaker().speakPhrase("ActiveCarsClass", {overallCars: this.getCars().Length, classCars: this.getCars("Class").Length})
-			else
-				this.getSpeaker().speakPhrase("ActiveCars", {cars: this.getCars().Length})
-		}
-	}
-
 	updateAnnouncement(announcement, value) {
 		if (value && (announcement = "DeltaInformation")) {
 			value := getMultiMapValue(this.Configuration, "Race Spotter Announcements", this.Simulator . ".PerformanceUpdates", 2)
@@ -2008,6 +1640,100 @@ class RaceSpotter extends GridRaceAssistant {
 		return false
 	}
 
+	standingsGapToAhead() {
+		local knowledgeBase := this.KnowledgeBase
+		local speaker := this.getSpeaker()
+		local talking := false
+		local delta, lap, car, inPit
+
+		if (this.getPosition(false, "Class") = 1)
+			return false
+		else
+			try {
+				lap := knowledgeBase.getValue("Lap", 0)
+				car := knowledgeBase.getValue("Position.Standings.Class.Ahead.Car", false)
+
+				if (car && (lap > 0)) {
+					delta := Abs(knowledgeBase.getValue("Position.Standings.Class.Ahead.Delta", 0) / 1000)
+					inPit := (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false))
+
+					if ((delta = 0) || (inPit && (Abs(delta) < 30)))
+						return false
+					else if ((knowledgeBase.getValue("Car." . car . ".Lap", 0) > lap)
+						  && (Abs(delta) > (knowledgeBase.getValue("Lap." . lap . ".Time", 0) / 1000)))
+						return false
+					else {
+						speaker.beginTalk()
+
+						speaker.speakPhrase("StandingsGapToAhead", {delta: speaker.number2Speech(delta, 1)})
+
+						talking := true
+					}
+
+					if inPit {
+						speaker.speakPhrase("GapCarInPit")
+
+						return true
+					}
+					else
+						return talking
+				}
+				else
+					return false
+			}
+			finally {
+				if talking
+					speaker.endTalk()
+			}
+	}
+
+	standingsGapToBehind() {
+		local knowledgeBase := this.KnowledgeBase
+		local speaker := this.getSpeaker()
+		local talking := false
+		local delta, car, driver, inPit, lap
+
+		if (this.getPosition(false, "Class") = this.getCars("Class").Length)
+			return false
+		else
+			try {
+				lap := knowledgeBase.getValue("Lap", 0)
+				car := knowledgeBase.getValue("Position.Standings.Class.Behind.Car", false)
+
+				if (car && (lap > 0)) {
+					delta := Abs(knowledgeBase.getValue("Position.Standings.Class.Behind.Delta", 0) / 1000)
+					inPit := (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false))
+
+					if ((delta = 0) || (inPit && (Abs(delta) < 30)))
+						return false
+					else if ((knowledgeBase.getValue("Car." . car . ".Lap", 0) < lap)
+						  && (Abs(delta) > (knowledgeBase.getValue("Lap." . lap . ".Time", 0) / 1000)))
+						return false
+					else {
+						speaker.beginTalk()
+
+						speaker.speakPhrase("StandingsGapToBehind", {delta: speaker.number2Speech(delta, 1)})
+
+						talking := true
+					}
+
+					if inPit {
+						speaker.speakPhrase("GapCarInPit")
+
+						return true
+					}
+					else
+						return talking
+				}
+				else
+					return false
+			}
+			finally {
+				if talking
+					speaker.endTalk()
+			}
+	}
+
 	deltaInformation(lastLap, sector, positions, regular, method) {
 		local knowledgeBase := this.KnowledgeBase
 		local spoken := false
@@ -2289,9 +2015,9 @@ class RaceSpotter extends GridRaceAssistant {
 				rnd := Random(1, 10)
 
 				if (standingsAhead && (rnd > 3))
-					spoken := this.standingsGapToAheadRecognized([], false)
+					spoken := this.standingsGapToAhead()
 				else if (standingsBehind && (rnd <= 3))
-					spoken := this.standingsGapToBehindRecognized([], false)
+					spoken := this.standingsGapToBehind()
 			}
 		}
 
@@ -3162,35 +2888,6 @@ class RaceSpotter extends GridRaceAssistant {
 		this.initializeHistory()
 
 		return super.executePitstop(lapNumber)
-	}
-
-	requestInformation(category, arguments*) {
-		this.clearContinuation()
-
-		switch category, false {
-			case "Time":
-				this.timeRecognized([])
-			case "Position":
-				this.positionRecognized([])
-			case "LapTimes":
-				this.lapTimesRecognized([])
-			case "ActiveCars":
-				this.activeCarsRecognized([])
-			case "GapToAheadStandings", "GapToFrontStandings":
-				this.gapToAheadRecognized([])
-			case "GapToAheadTrack", "GapToFrontTrack":
-				this.gapToAheadRecognized(Array(this.getSpeaker().Fragments["Car"]))
-			case "GapToAhead", "GapToAhead":
-				this.gapToAheadRecognized(inList(arguments, "Track") ? Array(this.getSpeaker().Fragments["Car"]) : [])
-			case "GapToBehindStandings":
-				this.gapToBehindRecognized([])
-			case "GapToBehindTrack":
-				this.gapToBehindRecognized(Array(this.getSpeaker().Fragments["Car"]))
-			case "GapToBehind":
-				this.gapToBehindRecognized(inList(arguments, "Track") ? Array(this.getSpeaker().Fragments["Car"]) : [])
-			case "GapToLeader":
-				this.gapToLeaderRecognized([])
-		}
 	}
 
 	shutdownSession(phase) {

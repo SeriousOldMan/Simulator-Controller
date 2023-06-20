@@ -187,6 +187,9 @@ editSettings(settingsOrCommand, arguments*) {
 		widgets := string2Values(",", getMultiMapValue(settings, "System Monitor", "Session Widgets", "Session,Stint,Duration,Conditions,Cycle,Cycle"))
 		cycle := getMultiMapValue(settings, "System Monitor", "Session Cycle", 30)
 
+		while (widgets.Length < 9)
+			widgets.Push(false)
+
 		result := false
 
 		settingsGui := Window({Descriptor: "System Monitor.Settings", Options: "0x400000"}, "")
@@ -217,6 +220,10 @@ editSettings(settingsOrCommand, arguments*) {
 		settingsGui.Add("DropDownList", "x224 yp w100 vwidget22 Choose" . getChoice(widgets[5]), concatenate([translate("Empty"), translate("Cycle"), translate("------------------------")], collect(infoWidgets, translate))).OnEvent("Change", updateWidget)
 		settingsGui.Add("DropDownList", "x328 yp w100 vwidget23 Choose" . getChoice(widgets[6]), concatenate([translate("Empty"), translate("Cycle"), translate("------------------------")], collect(infoWidgets, translate))).OnEvent("Change", updateWidget)
 
+		settingsGui.Add("DropDownList", "x120 yp+24 w100 vwidget31 Choose" . getChoice(widgets[7]), concatenate([translate("Empty"), translate("Cycle"), translate("------------------------")], collect(infoWidgets, translate))).OnEvent("Change", updateWidget)
+		settingsGui.Add("DropDownList", "x224 yp w100 vwidget32 Choose" . getChoice(widgets[8]), concatenate([translate("Empty"), translate("Cycle"), translate("------------------------")], collect(infoWidgets, translate))).OnEvent("Change", updateWidget)
+		settingsGui.Add("DropDownList", "x328 yp w100 vwidget33 Choose" . getChoice(widgets[9]), concatenate([translate("Empty"), translate("Cycle"), translate("------------------------")], collect(infoWidgets, translate))).OnEvent("Change", updateWidget)
+
 		settingsGui.Add("Text", "x8 yp+30 w428 W:Grow 0x10")
 
 		settingsGui.Add("Button", "x142 yp+10 w80 h23 Default", translate("Ok")).OnEvent("Click", editSettings.Bind(kOk))
@@ -238,7 +245,7 @@ editSettings(settingsOrCommand, arguments*) {
 			else if (result == kOk) {
 				setMultiMapValue(settings, "System Monitor", "Session Cycle", [5, 10, 15, 30][settingsGui["cycleDropDown"].Value])
 
-				loop 2 {
+				loop 3 {
 					row := A_Index
 
 					loop 3 {
@@ -847,41 +854,6 @@ systemMonitor(command := false, arguments*) {
 		static shows := 0
 
 		renderInfoWidgets(widgets) {
-			/*
-			local html := "<table>"
-			local row := 1
-			local column := 1
-			local ignore, widget
-
-			for ignore, widget in widgets
-				if (row <= 2) {
-					if (column > 3) {
-						row += 1
-						column := 1
-
-						html .= "<tr><td> </td><td> </td><td> </td></tr>"
-						html .= "<tr><td> </td><td> </td><td> </td></tr>"
-					}
-
-					if (column = 1)
-						html .= "<tr><td style=`"padding-right: 25px`">"
-					else if (column = 2)
-						html .= "</td><td style=`"padding-right: 25px`">"
-					else
-						html .= "</td><td>"
-
-					if widget
-						html .= widget(sessionState)
-
-					if (column = 3)
-						html .= "</td></tr>"
-
-					column += 1
-				}
-
-			return (html . "</table")
-			*/
-
 			local html := "<table>"
 			local row := 1
 			local column := 1
@@ -889,7 +861,7 @@ systemMonitor(command := false, arguments*) {
 			local columns := [[], [], []]
 
 			for ignore, widget in widgets
-				if (row <= 2) {
+				if (row <= 3) {
 					if (column > 3) {
 						row += 1
 						column := 1

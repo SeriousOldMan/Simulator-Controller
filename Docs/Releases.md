@@ -6,12 +6,13 @@
   5. Fixed data synchronization of setups and strategies in the "Session Database". Also a bug has been fixed in the Team Server, that causes a setup or strategy not to be deleted on the Team Server, when it gets deleted locally. If you are running your own Team Server, you should update your instance(s).
   6. New "Empty" option for session info layout in "System Monitor".
   7. New floating layout for session info page in "System Monitor".
-  8. Fixed the *Overview* report in "Race Reports" and "Race Center" to show only one position when no classes or cups are selected for grid partitioning.
-  9. Increased stability of Team Server connections in case of connection loss events.
-  10. Fixed team data management in cases where one or more assistants are disabled.
-  11. Fixed a couple of bugs in the post pitstop report of "Race Center".
-  12. More intelligent detection of unplanned pitstops for the Race Strategist.
-  13. Migrated the sources to AHK 2.03
+  8. Support for 3 more info widgets on the session info page in "System Monitor".
+  9. Fixed the *Overview* report in "Race Reports" and "Race Center" to show only one position when no classes or cups are selected for grid partitioning.
+  10. Increased stability of Team Server connections in case of connection loss events.
+  11. Fixed team data management in cases where one or more assistants are disabled.
+  12. Fixed a couple of bugs in the post pitstop report of "Race Center".
+  13. More intelligent detection of unplanned pitstops for the Race Strategist.
+  14. Migrated the sources to AHK 2.03
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-509) if you are running your own Team Server.
   

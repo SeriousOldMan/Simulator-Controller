@@ -374,13 +374,13 @@ systemMonitor(command := false, arguments*) {
 	}
 
 	createDurationWidget(sessionState) {
-		local sessionTime := getMultiMapValue(sessionState, "Session", "Time.Remaining")
-		local stintTime := getMultiMapValue(sessionState, "Stint", "Time.Remaining.Stint")
-		local driverTime := getMultiMapValue(sessionState, "Stint", "Time.Remaining.Driver")
-		local sessionLaps := getMultiMapValue(sessionState, "Session", "Laps.Remaining")
-		local stintLaps := getMultiMapValue(sessionState, "Stint", "Laps.Remaining.Stint")
+		local sessionTime := getMultiMapValue(sessionState, "Session", "Time.Remaining", kUndefined)
+		local stintTime := getMultiMapValue(sessionState, "Stint", "Time.Remaining.Stint", kUndefined)
+		local driverTime := getMultiMapValue(sessionState, "Stint", "Time.Remaining.Driver", kUndefined)
+		local sessionLaps := getMultiMapValue(sessionState, "Session", "Laps.Remaining", 0)
+		local stintLaps := getMultiMapValue(sessionState, "Stint", "Laps.Remaining.Stint", 0)
 		local lastValid := getMultiMapValue(sessionState, "Stint", "Valid", true)
-		local lastTime := getMultiMapValue(sessionState, "Stint", "Lap.Time.Last")
+		local lastTime := getMultiMapValue(sessionState, "Stint", "Lap.Time.Last", kUndefined)
 		local html := ""
 		local remainingStintTime, remainingSessionTime, remainingDriverTime
 
@@ -847,6 +847,7 @@ systemMonitor(command := false, arguments*) {
 		static shows := 0
 
 		renderInfoWidgets(widgets) {
+			/*
 			local html := "<table>"
 			local row := 1
 			local column := 1
@@ -877,6 +878,33 @@ systemMonitor(command := false, arguments*) {
 
 					column += 1
 				}
+
+			return (html . "</table")
+			*/
+
+			local html := "<table>"
+			local row := 1
+			local column := 1
+			local ignore, widget
+			local columns := [[], [], []]
+
+			for ignore, widget in widgets
+				if (row <= 2) {
+					if (column > 3) {
+						row += 1
+						column := 1
+					}
+
+					if widget
+						columns[column].Push(widget(sessionState))
+
+					column += 1
+				}
+
+			loop 3
+				columns[A_Index] := values2String("<br>", columns[A_Index]*)
+
+			html .= ("<tr><td style=`"padding-right: 25px`">" . values2String("</td><td style=`"padding-right: 25px`">", columns*) . "</td></tr>")
 
 			return (html . "</table")
 		}

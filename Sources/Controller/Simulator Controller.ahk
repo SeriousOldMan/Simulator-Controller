@@ -1375,7 +1375,7 @@ class ControllerFunction {
 				try {
 					if (SubStr(theHotkey, 1, 1) = "?") {
 						if !handler
-							throw "Action " . this.Actions[trigger, true] . " cannot be found..."
+							throw "Action " . this.Function.Actions[trigger, true] . " cannot be found..."
 
 						command := SubStr(theHotkey, 2)
 

@@ -288,7 +288,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		local teamServer := this.TeamServer
 		local session := this.TeamSession
 		local runningLap := 0
-		local stint, newStint, lastStint, driverID, ignore, telemetryData, pitstop, pressures, temperatures, wear
+		local stint, newStint, lastStint, driverID, driverName, ignore, telemetryData, pitstop, pressures, temperatures, wear
 
 		if (teamServer && teamServer.Active && session) {
 			lastStint := false
@@ -315,8 +315,12 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 					if !telemetryDB
 						telemetryDB := TelemetryDatabase(telemetryData[1], telemetryData[2], telemetryData[3])
 
-					if (newStint && driverID)
-						telemetryDB.registerDriver(telemetryData[1], driverID, teamServer.getStintDriverName(stint))
+					if (newStint && driverID) {
+						driverName := teamServer.getStintDriverName(stint)
+							
+						if driverName
+							telemetryDB.registerDriver(telemetryData[1], driverID, driverName)
+					}
 
 					pitstop := telemetryData[10]
 

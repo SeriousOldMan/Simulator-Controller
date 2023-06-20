@@ -1,9 +1,9 @@
 [Development]
 Version=5.0.9.0-dev
 Target=5.0.8.0-release
-Date=06/19/2023
+Date=06/20/2023
 Download=
-Changes=Ctrl modifier for "Load current Race Strategy" in "Race Center", New core setting to choose the activation recognizer for the "Voice Server", Fixed data synchronization of setups and strategies, New "Empty" option for session info layout in "System Monitor", Fixed single class view in Overview report in "Race Reports" and "Race Center", Floating layout for session info page in "System Monitor", Increased stability of Team Server connections in case of connection loss events, Fixed team data management in cases where one or more assistants are disabled, Fixed a couple of bugs in the post pitstop report of "Race Center", More intelligent detection of unplanned pitstops for the Race Strategist
+Changes=Ctrl modifier for "Load current Race Strategy" in "Race Center", New core setting to choose the activation recognizer for the "Voice Server", Fixed data synchronization of setups and strategies, New "Empty" option for session info layout in "System Monitor", Fixed single class view in Overview report in "Race Reports" and "Race Center", Floating layout for session info page in "System Monitor", Increased stability of Team Server connections in case of connection loss events, Fixed team data management in cases where one or more assistants are disabled, Fixed a couple of bugs in the post pitstop report of "Race Center", More intelligent detection of unplanned pitstops for the Race Strategist, Migrated to AHK 2.03
 [Release]
 Version=5.0.8.0-release
 Date=06/16/2023

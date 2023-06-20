@@ -1394,7 +1394,7 @@ class ControllerFunction {
 				}
 				catch Any as exception {
 					logError(exception)
-					
+
 					logMessage(kLogCritical, translate("Error while registering hotkey ") . theHotkey . translate(" - please check the configuration"))
 
 					showMessage(substituteVariables(translate("Cannot register hotkey %hotkey% - please check the configuration..."), {hotKey: theHotKey})
@@ -1881,7 +1881,7 @@ setHotkeyEnabled(function, trigger, enabled) {
 			}
 			catch Any as exception {
 				logError(exception)
-				
+
 				logMessage(kLogCritical, translate("Error while registering hotkey ") . theHotkey . translate(" - please check the configuration"))
 
 				showMessage(substituteVariables(translate("Cannot register hotkey %hotkey% - please check the configuration..."), {hotKey: theHotKey})
@@ -1901,8 +1901,6 @@ functionActionCallable(function, trigger, action) {
 }
 
 fireControllerActions(function, trigger, fromTask := false) {
-	local callable
-
 	static pending := false
 
 	protectionOn(true, true)
@@ -1914,13 +1912,20 @@ fireControllerActions(function, trigger, fromTask := false) {
 			pending := []
 
 			try {
-				function.Controller.fireActions(function, trigger)
-
-				while (pending.Length > 0) {
-					callable := pending.RemoveAt(1)
-
-					callable.Call()
+				try {
+					function.Controller.fireActions(function, trigger)
 				}
+				catch Any as exception {
+					logError(exception, true)
+				}
+
+				while (pending.Length > 0)
+					try {
+						pending.RemoveAt(1).Call()
+					}
+					catch Any as exception {
+						logError(exception, true)
+					}
 			}
 			finally {
 				pending := false

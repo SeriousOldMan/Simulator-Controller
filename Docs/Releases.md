@@ -11,11 +11,12 @@
   10. Increased stability of Team Server connections in case of connection loss events.
   11. Fixed team data management in cases where one or more assistants are disabled.
   12. Fixed a couple of bugs in the post pitstop report of "Race Center".
-  13. More intelligent detection of unplanned pitstops for the Race Strategist.
-  14. If you ask the Strategist for the next pitstop, it will give you the option to inform the Engineer right away. Helpful, if you missed the upcoming pitstop warning.
-  15. Fixed spurios input field appearing in Telemetry Analyzer, when running a recording.
-  16. Migrated the sources to AHK 2.03
-  17. New car models for "Setup Workbench":
+  13. More intelligent detection of unplanned pitstops and stops for penalties by the Race Strategist.
+  14. The collaboration between the Strategist and the Engineer, when running a prepared strategy, has become more inteligent, especially for the last stint. The [documentation on strategy handliing](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-handling) has been revised.
+  15. If you ask the Strategist for the next pitstop, it will give you the option to inform the Engineer right away. Helpful, if you missed the upcoming pitstop warning.
+  16. Fixed spurios input field appearing in Telemetry Analyzer, when running a recording.
+  17. Migrated the sources to AHK 2.03
+  18. New car models for "Setup Workbench":
       - Assetto Corsa
 	    - Alfa Romeo 155 V6 TI
 		

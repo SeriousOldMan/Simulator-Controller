@@ -790,7 +790,12 @@ class CallAction extends Action {
 		if (knowledgeBase.RuleEngine.TraceLevel <= kTraceMedium)
 			knowledgeBase.RuleEngine.trace(kTraceMedium, "Call " . function . "(" . values2String(", ", arguments*) . ")")
 
-		%function%(knowledgeBase, arguments*)
+		try {
+			%function%(knowledgeBase, arguments*)
+		}
+		catch Any as exception {
+			logError(exception, true)
+		}
 	}
 
 	getValues(facts) {
@@ -2496,7 +2501,14 @@ class CallChoicePoint extends ChoicePoint {
 		if builtin
 			function := kBuiltinFunctions[inList(kBuiltinFunctors, function)]
 
-		return %function%(this, values*)
+		try {
+			return %function%(this, values*)
+		}
+		catch Any as exception {
+			logError(exception, true)
+
+			return false
+		}
 	}
 
 	builtinCall() {
@@ -2519,7 +2531,14 @@ class CallChoicePoint extends ChoicePoint {
 
 		function := kBuiltinFunctions[inList(kBuiltinFunctors, function)]
 
-		return %function%(this, values*)
+		try {
+			return %function%(this, values*)
+		}
+		catch Any as exception {
+			logError(exception, true)
+
+			return false
+		}
 	}
 }
 

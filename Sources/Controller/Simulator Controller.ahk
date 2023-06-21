@@ -1907,7 +1907,7 @@ fireControllerActions(function, trigger, fromTask := false) {
 		return false
 	}
 	else
-		Task.startTask(fireControllerActions.Bind(function, trigger, true))
+		Task.startTask(fireControllerActions.Bind(function, trigger, true), 0, kLowPriority)
 }
 
 getLabelForLogMessage(action) {

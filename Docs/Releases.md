@@ -12,9 +12,10 @@
   11. Fixed team data management in cases where one or more assistants are disabled.
   12. Fixed a couple of bugs in the post pitstop report of "Race Center".
   13. More intelligent detection of unplanned pitstops for the Race Strategist.
-  14. Fixed spurios input field appearing in Telemetry Analyzer, when running a recording.
-  15. Migrated the sources to AHK 2.03
-  16. New car models for "Setup Workbench":
+  14. If you ask the Strategist for the next pitstop, it will give you the option to inform the Engineer right away. Helpful, if you missed the upcoming pitstop warning.
+  15. Fixed spurios input field appearing in Telemetry Analyzer, when running a recording.
+  16. Migrated the sources to AHK 2.03
+  17. New car models for "Setup Workbench":
       - Assetto Corsa
 	    - Alfa Romeo 155 V6 TI
 		

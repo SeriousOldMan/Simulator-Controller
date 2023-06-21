@@ -153,8 +153,6 @@ class RaceEngineer extends RaceAssistant {
 	}
 
 	handleVoiceCommand(grammar, words) {
-		local reset := true
-
 		switch grammar, false {
 			case "LapsRemaining":
 				this.lapInfoRecognized(words)
@@ -173,8 +171,6 @@ class RaceEngineer extends RaceAssistant {
 			case "Weather":
 				this.weatherRecognized(words)
 			case "PitstopPlan":
-				reset := false
-
 				this.clearContinuation()
 
 				if !this.supportsPitstop()
@@ -195,8 +191,6 @@ class RaceEngineer extends RaceAssistant {
 					this.planPitstopRecognized(words)
 				}
 			case "DriverSwapPlan":
-				reset := false
-
 				this.clearContinuation()
 
 				if !this.supportsPitstop()
@@ -226,8 +220,6 @@ class RaceEngineer extends RaceAssistant {
 					this.driverSwapRecognized(words)
 				}
 			case "PitstopPrepare":
-				reset := false
-
 				this.clearContinuation()
 
 				if !this.supportsPitstop()
@@ -235,8 +227,6 @@ class RaceEngineer extends RaceAssistant {
 				else
 					this.preparePitstopRecognized(words)
 			case "PitstopAdjustFuel":
-				reset := false
-
 				this.clearContinuation()
 
 				if !this.supportsPitstop()
@@ -244,8 +234,6 @@ class RaceEngineer extends RaceAssistant {
 				else
 					this.pitstopAdjustFuelRecognized(words)
 			case "PitstopAdjustCompound":
-				reset := false
-
 				this.clearContinuation()
 
 				if !this.supportsPitstop()
@@ -253,8 +241,6 @@ class RaceEngineer extends RaceAssistant {
 				else
 					this.pitstopAdjustCompoundRecognized(words)
 			case "PitstopAdjustPressureUp", "PitstopAdjustPressureDown":
-				reset := false
-
 				this.clearContinuation()
 
 				if !this.supportsPitstop()
@@ -262,8 +248,6 @@ class RaceEngineer extends RaceAssistant {
 				else
 					this.pitstopAdjustPressureRecognized(words)
 			case "PitstopNoPressureChange":
-				reset := false
-
 				this.clearContinuation()
 
 				if !this.supportsPitstop()
@@ -280,8 +264,6 @@ class RaceEngineer extends RaceAssistant {
 				else
 					this.pitstopAdjustNoTyreRecognized(words)
 			case "PitstopAdjustRepairSuspension":
-				reset := false
-
 				this.clearContinuation()
 
 				if !this.supportsPitstop()
@@ -289,8 +271,6 @@ class RaceEngineer extends RaceAssistant {
 				else
 					this.pitstopAdjustRepairRecognized("Suspension", words)
 			case "PitstopAdjustRepairBodywork":
-				reset := false
-
 				this.clearContinuation()
 
 				if !this.supportsPitstop()
@@ -298,8 +278,6 @@ class RaceEngineer extends RaceAssistant {
 				else
 					this.pitstopAdjustRepairRecognized("Bodywork", words)
 			case "PitstopAdjustRepairEngine":
-				reset := false
-
 				this.clearContinuation()
 
 				if !this.supportsPitstop()
@@ -309,14 +287,9 @@ class RaceEngineer extends RaceAssistant {
 			default:
 				super.handleVoiceCommand(grammar, words)
 		}
-
-		if reset
-			this.clearContinuation()
 	}
 
 	requestInformation(category, arguments*) {
-		this.clearContinuation()
-
 		switch category, false {
 			case "LapsRemaining":
 				this.lapInfoRecognized([])
@@ -338,6 +311,8 @@ class RaceEngineer extends RaceAssistant {
 				this.brakeTemperaturesRecognized([])
 			case "BrakeWear":
 				this.brakeWearRecognized([])
+			default:
+				super.requestInformation(category, arguments*)
 		}
 	}
 
@@ -2640,8 +2615,6 @@ lowFuelWarning(context, remainingLaps) {
 }
 
 damageWarning(context, newSuspensionDamage, newBodyworkDamage, newEngineDamage) {
-	context.KnowledgeBase.RaceAssistant.clearContinuation()
-
 	context.KnowledgeBase.RaceAssistant.damageWarning(newSuspensionDamage, newBodyworkDamage, newEngineDamage)
 
 	return true
@@ -2656,16 +2629,12 @@ reportDamageAnalysis(context, repair, stintLaps, delta) {
 }
 
 pressureLossWarning(context, tyre, lostPressure) {
-	context.KnowledgeBase.RaceAssistant.clearContinuation()
-
 	context.KnowledgeBase.RaceAssistant.pressureLossWarning(tyre, lostPressure)
 
 	return true
 }
 
 weatherChangeNotification(context, change, minutes) {
-	context.KnowledgeBase.RaceAssistant.clearContinuation()
-
 	context.KnowledgeBase.RaceAssistant.weatherChangeNotification(change, minutes)
 
 	return true

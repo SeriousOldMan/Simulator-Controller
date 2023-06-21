@@ -466,7 +466,7 @@ systemMonitor(command := false, arguments*) {
 	}
 
 	createStintWidget(sessionState) {
-		local lastLap := getMultiMapValue(sessionState, "Stint", "Lap")
+		local lastLap := getMultiMapValue(sessionState, "Stint", "Lap", 0)
 		local lastValid := getMultiMapValue(sessionState, "Stint", "Valid", true)
 		local lastTime := getMultiMapValue(sessionState, "Stint", "Lap.Time.Last")
 		local bestTime := getMultiMapValue(sessionState, "Stint", "Lap.Time.Best")
@@ -479,7 +479,7 @@ systemMonitor(command := false, arguments*) {
 			html .= "<table class=`"table-std`">"
 			html .= ("<tr><th class=`"th-std th-left`" colspan=`"2`"><div id=`"header`"><i>" . translate("Stint") . "</i></div></th></tr>")
 			html .= ("<tr><th class=`"th-std th-left`">" . translate("Driver") . "</th><td class=`"td-wdg`">" . getMultiMapValue(sessionState, "Stint", "Driver") . "</td></tr>")
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Lap") . "</th><td class=`"td-wdg`">" . lastLap . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Lap") . "</th><td class=`"td-wdg`">" . (lastLap + 1) . "</td></tr>")
 			html .= ("<tr><th class=`"th-std th-left`">" . translate("Position") . "</th><td class=`"td-wdg`">" . getMultiMapValue(sessionState, "Stint", "Position") . "</td></tr>")
 			html .= ("<tr><th class=`"th-std th-left`">" . translate("Lap Time (Last / Best)") . "</th><td class=`"td-wdg`">" . (!lastValid ? "<font color=`"red`">" : "") . lastTime . (!lastValid ? "</font>" : "") . translate(" / ") . bestTime . "</td></tr>")
 

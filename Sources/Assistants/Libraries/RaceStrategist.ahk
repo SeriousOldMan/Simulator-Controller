@@ -1150,7 +1150,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 	loadStrategy(facts, strategy, lastPitstop := false, lastLap := false) {
 		local pitstopWindow := (this.Settings ? getMultiMapValue(this.Settings, "Strategy Settings", "Strategy.Window.Considered", 3) : 3)
-		local pitstop, count, ignore, pitstopLap, first, rootStrategy
+		local pitstop, count, ignore, pitstopLap, first, rootStrategy, pitstopDeviation
 
 		strategy.RunningPitstops := 0
 		strategy.RunningLaps := 0
@@ -1170,7 +1170,9 @@ class RaceStrategist extends GridRaceAssistant {
 		facts["Strategy.TC"] := strategy.TC
 		facts["Strategy.ABS"] := strategy.ABS
 
-		facts["Strategy.Pitstop.Deviation"] := getMultiMapValue(this.Settings, "Strategy Settings", "Strategy.Update.Pitstop", pitstopWindow)
+		pitstopDeviation := getMultiMapValue(this.Settings, "Strategy Settings", "Strategy.Update.Pitstop", 0)
+
+		facts["Strategy.Pitstop.Deviation"] := Max(3, pitstopDeviation, pitstopWindow)
 
 		count := 0
 
@@ -3039,7 +3041,7 @@ class RaceStrategist extends GridRaceAssistant {
 				if ((map != "n/a") && (map != knowledgeBase.getValue("Lap." . knowledgeBase.getValue("Lap") . ".Map", "n/a")))
 					this.getSpeaker().speakPhrase("StintMap", {map: map})
 			}
-			else
+			else if getMultiMapValue(this.Settings, "Strategy Settings", "Strategy.Update.Pitstop", false)
 				knowledgeBase.setFact("Strategy.Recalculate", "Pitstop")
 
 		this.updateDynamicValues({RejectedStrategy: false})

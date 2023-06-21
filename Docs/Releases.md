@@ -12,8 +12,9 @@
   11. Fixed team data management in cases where one or more assistants are disabled.
   12. Fixed a couple of bugs in the post pitstop report of "Race Center".
   13. More intelligent detection of unplanned pitstops for the Race Strategist.
-  14. Fixed spurios input field appearing in Telemetry Analyzer, when running a recording.
-  15. Migrated the sources to AHK 2.03
+  14. If you ask the Strategist for the next pitstop, it will give you the option to inform the Engineer right away. Helpful, if you missed the upcoming pitstop warning.
+  15. Fixed spurios input field appearing in Telemetry Analyzer, when running a recording.
+  16. Migrated the sources to AHK 2.03
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-509) if you are running your own Team Server.
   

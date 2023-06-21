@@ -448,18 +448,22 @@ updatePitWarningLap(?pitstopLap, ?warningLaps) <= ?warningLap = ?pitstopLap - ?w
 pitstopPerformed(?) <= unbound?(!Strategy.Pitstop.Next), !
 pitstopPerformed(?pitstopLap) <= validPitstopLap(?pitstopLap), !Strategy.Pitstop.Next < !Strategy.Pitstop.Count, !,
 								 ?nextPitstop = !Strategy.Pitstop.Next + 1, Get(Strategy.Pitstop, ?nextPitstop, Lap, ?nextPitstopLap),
+								 Call(pitstopPerformed, !Strategy.Pitstop.Next),
 								 Get(Strategy.Pitstop, !Strategy.Pitstop.Next, Map, ?map), Set(Strategy.Map, ?map),
 								 Set(Strategy.Pitstop.Next, ?nextPitstop), Set(Strategy.Pitstop.Lap, ?nextPitstopLap)
 pitstopPerformed(?pitstopLap) <= validPitstopLap(?pitstopLap), !Strategy.Pitstop.Next = !Strategy.Pitstop.Count, !,
+								 Call(pitstopPerformed, !Strategy.Pitstop.Next),
 								 Get(Strategy.Pitstop, !Strategy.Pitstop.Next, Map, ?map), Set(Strategy.Map, ?map),
 								 Clear(Strategy.Pitstop.Next), Clear(Strategy.Pitstop.Lap)
-pitstopPerformed(?pitstopLap) <= ?pitstopLap < !Strategy.Pitstop.Lap, !
+pitstopPerformed(?pitstopLap) <= ?pitstopLap < !Strategy.Pitstop.Lap, !, Call(invalidPitstop)
 pitstopPerformed(?pitstopLap) <= !Strategy.Pitstop.Next < !Strategy.Pitstop.Count, !,
 								 ?nextPitstop = !Strategy.Pitstop.Next + 1, Get(Strategy.Pitstop, ?nextPitstop, Lap, ?nextPitstopLap),
+								 Call(pitstopPerformed, !Strategy.Pitstop.Next),
 								 Get(Strategy.Pitstop, !Strategy.Pitstop.Next, Map, ?map), Set(Strategy.Map, ?map),
 								 Set(Strategy.Pitstop.Next, ?nextPitstop), Set(Strategy.Pitstop.Lap, ?nextPitstopLap),
 								 pitstopPerformed(?pitstopLap)
 pitstopPerformed(?pitstopLap) <= !Strategy.Pitstop.Next = !Strategy.Pitstop.Count, !,
+								 Call(pitstopPerformed, !Strategy.Pitstop.Next),
 								 Get(Strategy.Pitstop, !Strategy.Pitstop.Next, Map, ?map), Set(Strategy.Map, ?map),
 								 Clear(Strategy.Pitstop.Next), Clear(Strategy.Pitstop.Lap)
 

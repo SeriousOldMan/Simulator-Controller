@@ -1163,9 +1163,9 @@ class TrafficSimulation extends StrategySimulation {
 				position1 := pitstop1.getPosition()
 				position2 := pitstop2.getPosition()
 
-				if (position1 < position2)
+				if (position1 && position2 && (position1 < position2))
 					return scenario1
-				else if (position1 > position2)
+				else if (position1 && position2 && (position1 > position2))
 					return scenario2
 				else if (pitstop1.Lap < pitstop2.Lap)
 					return scenario1

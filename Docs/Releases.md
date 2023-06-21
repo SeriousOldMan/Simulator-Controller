@@ -14,7 +14,10 @@
   13. More intelligent detection of unplanned pitstops for the Race Strategist.
   14. Fixed spurios input field appearing in Telemetry Analyzer, when running a recording.
   15. Migrated the sources to AHK 2.03
-
+  16. New car models for "Setup Workbench":
+      - Assetto Corsa
+	    - Alfa Romeo 155 V6 TI
+		
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-509) if you are running your own Team Server.
   
 ## 5.0.8.1-release 06/18/23

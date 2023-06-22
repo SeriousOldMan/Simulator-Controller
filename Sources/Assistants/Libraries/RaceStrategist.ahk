@@ -2778,6 +2778,8 @@ class RaceStrategist extends GridRaceAssistant {
 					}
 				}
 				else {
+					confirm := false
+
 					if scenario {
 						report := true
 
@@ -2805,14 +2807,14 @@ class RaceStrategist extends GridRaceAssistant {
 
 								return
 							}
-							else
-								confirm := false
 						}
 					}
-					else if ((request != "Pitstop") || (this.Strategy["Rejected"] = "CANCEL"))
-						return
-					else
-						confirm := true
+					else {
+						if ((request != "Pitstop") || (this.Strategy["Rejected"] = "CANCEL"))
+							return
+						else
+							confirm := true
+					}
 				}
 			}
 

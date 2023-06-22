@@ -1209,61 +1209,69 @@ class RaceAssistant extends ConfigurationItem {
 		local sessionInfo := newMultiMap()
 		local tyreWear, brakeWear
 
-		static sessionTypes := Map(kSessionPractice, "Practice", kSessionQualification, "Qualification", kSessionRace, "Race", kSessionOther, "Other")
+		static sessionTypes
 
-		setMultiMapValue(sessionInfo, "Session", "Simulator", this.SettingsDatabase.getSimulatorName(simulator))
-		setMultiMapValue(sessionInfo, "Session", "Car", this.SettingsDatabase.getCarName(simulator, car))
-		setMultiMapValue(sessionInfo, "Session", "Track", this.SettingsDatabase.getTrackName(simulator, track))
-		setMultiMapValue(sessionInfo, "Session", "Type", sessionTypes[this.Session])
-		setMultiMapValue(sessionInfo, "Session", "Format", knowledgeBase.getValue("Session.Format", "Time"))
-		setMultiMapValue(sessionInfo, "Session", "Laps", lapNumber)
-		setMultiMapValue(sessionInfo, "Session", "Laps.Remaining", Ceil(knowledgeBase.getValue("Lap.Remaining.Session", 0)))
-		setMultiMapValue(sessionInfo, "Session", "Time.Remaining", Round(getMultiMapValue(data, "Session Data", "SessionTimeRemaining", 0) / 1000))
+		if !isSet(sessionTypes) {
+			sessionTypes := Map(kSessionPractice, "Practice", kSessionQualification, "Qualification", kSessionRace, "Race", kSessionOther, "Other")
 
-		setMultiMapValue(sessionInfo, "Stint", "Driver", computeDriverName(getMultiMapValue(data, "Stint Data", "DriverForname", this.DriverForName)
-																		 , getMultiMapValue(data, "Stint Data", "DriverSurname", "Doe")
-																		 , getMultiMapValue(data, "Stint Data", "DriverNickname", "JDO")))
-		setMultiMapValue(sessionInfo, "Stint", "Lap", lapNumber)
-		setMultiMapValue(sessionInfo, "Stint", "Position", knowledgeBase.getValue("Position", 0))
-		setMultiMapValue(sessionInfo, "Stint", "Valid", valid)
-		setMultiMapValue(sessionInfo, "Stint", "Fuel.AvgConsumption", Round(knowledgeBase.getValue("Lap." . lapNumber . ".Fuel.AvgConsumption", 0), 1))
-		setMultiMapValue(sessionInfo, "Stint", "Fuel.Consumption", Round(knowledgeBase.getValue("Lap." . lapNumber . ".Fuel.Consumption", 0), 1))
-		setMultiMapValue(sessionInfo, "Stint", "Fuel.Remaining", Round(getMultiMapValue(data, "Car Data", "FuelRemaining", 0), 1))
-		setMultiMapValue(sessionInfo, "Stint", "Laps", lapNumber - this.BaseLap + 1)
-		setMultiMapValue(sessionInfo, "Stint", "Laps.Remaining.Fuel", Floor(knowledgeBase.getValue("Lap.Remaining.Fuel", 0)))
-		setMultiMapValue(sessionInfo, "Stint", "Laps.Remaining.Stint", Floor(knowledgeBase.getValue("Lap.Remaining.Stint", 0)))
-		setMultiMapValue(sessionInfo, "Stint", "Time.Remaining.Stint", Round(getMultiMapValue(data, "Stint Data", "StintTimeRemaining") / 1000))
-		setMultiMapValue(sessionInfo, "Stint", "Time.Remaining.Driver", Round(getMultiMapValue(data, "Stint Data", "DriverTimeRemaining") / 1000))
-		setMultiMapValue(sessionInfo, "Stint", "Lap.Time.Last", Round(getMultiMapValue(data, "Stint Data", "LapLastTime", 0) / 1000, 1))
-		setMultiMapValue(sessionInfo, "Stint", "Lap.Time.Best", Round(getMultiMapValue(data, "Stint Data", "LapBestTime", 0) / 1000, 1))
-
-		setMultiMapValue(sessionInfo, "Weather", "Now", getMultiMapValue(data, "Weather Data", "Weather", "Dry"))
-		setMultiMapValue(sessionInfo, "Weather", "10Min", getMultiMapValue(data, "Weather Data", "Weather10Min", "Dry"))
-		setMultiMapValue(sessionInfo, "Weather", "30Min", getMultiMapValue(data, "Weather Data", "Weather30Min", "Dry"))
-		setMultiMapValue(sessionInfo, "Weather", "Temperature", Round(getMultiMapValue(data, "Weather Data", "Temperature", 0), 1))
-
-		setMultiMapValue(sessionInfo, "Track", "Temperature", Round(getMultiMapValue(data, "Track Data", "Temperature", 0), 1))
-		setMultiMapValue(sessionInfo, "Track", "Grip", getMultiMapValue(data, "Track Data", "Grip", "Optimum"))
-
-		setMultiMapValue(sessionInfo, "Tyres", "Pressures", getMultiMapValue(data, "Car Data", "TyrePressure", ""))
-		setMultiMapValue(sessionInfo, "Tyres", "Temperatures", getMultiMapValue(data, "Car Data", "TyreTemperature", ""))
-
-		tyreWear := getMultiMapValue(data, "Car Data", "TyreWear", "")
-
-		if (tyreWear != "") {
-			tyreWear := string2Values(",", tyreWear)
-
-			setMultiMapValue(sessionInfo, "Tyres", "Wear", values2String(",", Round(tyreWear[1]), Round(tyreWear[2]), Round(tyreWear[3]), Round(tyreWear[4])))
+			sessionTypes.Default := "Other"
 		}
 
-		setMultiMapValue(sessionInfo, "Brakes", "Temperatures", getMultiMapValue(data, "Car Data", "BrakeTemperature", ""))
+		if knowledgebase {
+			setMultiMapValue(sessionInfo, "Session", "Simulator", this.SettingsDatabase.getSimulatorName(simulator))
+			setMultiMapValue(sessionInfo, "Session", "Car", this.SettingsDatabase.getCarName(simulator, car))
+			setMultiMapValue(sessionInfo, "Session", "Track", this.SettingsDatabase.getTrackName(simulator, track))
+			setMultiMapValue(sessionInfo, "Session", "Type", sessionTypes[this.Session])
+			setMultiMapValue(sessionInfo, "Session", "Format", knowledgeBase.getValue("Session.Format", "Time"))
+			setMultiMapValue(sessionInfo, "Session", "Laps", lapNumber)
+			setMultiMapValue(sessionInfo, "Session", "Laps.Remaining", Ceil(knowledgeBase.getValue("Lap.Remaining.Session", 0)))
+			setMultiMapValue(sessionInfo, "Session", "Time.Remaining", Round(getMultiMapValue(data, "Session Data", "SessionTimeRemaining", 0) / 1000))
 
-		brakeWear := getMultiMapValue(data, "Car Data", "BrakeWear", "")
+			setMultiMapValue(sessionInfo, "Stint", "Driver", computeDriverName(getMultiMapValue(data, "Stint Data", "DriverForname", this.DriverForName)
+																			 , getMultiMapValue(data, "Stint Data", "DriverSurname", "Doe")
+																			 , getMultiMapValue(data, "Stint Data", "DriverNickname", "JDO")))
+			setMultiMapValue(sessionInfo, "Stint", "Lap", lapNumber)
+			setMultiMapValue(sessionInfo, "Stint", "Position", knowledgeBase.getValue("Position", 0))
+			setMultiMapValue(sessionInfo, "Stint", "Valid", valid)
+			setMultiMapValue(sessionInfo, "Stint", "Fuel.AvgConsumption", Round(knowledgeBase.getValue("Lap." . lapNumber . ".Fuel.AvgConsumption", 0), 1))
+			setMultiMapValue(sessionInfo, "Stint", "Fuel.Consumption", Round(knowledgeBase.getValue("Lap." . lapNumber . ".Fuel.Consumption", 0), 1))
+			setMultiMapValue(sessionInfo, "Stint", "Fuel.Remaining", Round(getMultiMapValue(data, "Car Data", "FuelRemaining", 0), 1))
+			setMultiMapValue(sessionInfo, "Stint", "Laps", lapNumber - this.BaseLap + 1)
+			setMultiMapValue(sessionInfo, "Stint", "Laps.Remaining.Fuel", Floor(knowledgeBase.getValue("Lap.Remaining.Fuel", 0)))
+			setMultiMapValue(sessionInfo, "Stint", "Laps.Remaining.Stint", Floor(knowledgeBase.getValue("Lap.Remaining.Stint", 0)))
+			setMultiMapValue(sessionInfo, "Stint", "Time.Remaining.Stint", Round(getMultiMapValue(data, "Stint Data", "StintTimeRemaining") / 1000))
+			setMultiMapValue(sessionInfo, "Stint", "Time.Remaining.Driver", Round(getMultiMapValue(data, "Stint Data", "DriverTimeRemaining") / 1000))
+			setMultiMapValue(sessionInfo, "Stint", "Lap.Time.Last", Round(getMultiMapValue(data, "Stint Data", "LapLastTime", 0) / 1000, 1))
+			setMultiMapValue(sessionInfo, "Stint", "Lap.Time.Best", Round(getMultiMapValue(data, "Stint Data", "LapBestTime", 0) / 1000, 1))
 
-		if (brakeWear != "") {
-			brakeWear := string2Values(",", brakeWear)
+			setMultiMapValue(sessionInfo, "Weather", "Now", getMultiMapValue(data, "Weather Data", "Weather", "Dry"))
+			setMultiMapValue(sessionInfo, "Weather", "10Min", getMultiMapValue(data, "Weather Data", "Weather10Min", "Dry"))
+			setMultiMapValue(sessionInfo, "Weather", "30Min", getMultiMapValue(data, "Weather Data", "Weather30Min", "Dry"))
+			setMultiMapValue(sessionInfo, "Weather", "Temperature", Round(getMultiMapValue(data, "Weather Data", "Temperature", 0), 1))
 
-			setMultiMapValue(sessionInfo, "Brakes", "Wear", values2String(",", Round(brakeWear[1]), Round(brakeWear[2]), Round(brakeWear[3]), Round(brakeWear[4])))
+			setMultiMapValue(sessionInfo, "Track", "Temperature", Round(getMultiMapValue(data, "Track Data", "Temperature", 0), 1))
+			setMultiMapValue(sessionInfo, "Track", "Grip", getMultiMapValue(data, "Track Data", "Grip", "Optimum"))
+
+			setMultiMapValue(sessionInfo, "Tyres", "Pressures", getMultiMapValue(data, "Car Data", "TyrePressure", ""))
+			setMultiMapValue(sessionInfo, "Tyres", "Temperatures", getMultiMapValue(data, "Car Data", "TyreTemperature", ""))
+
+			tyreWear := getMultiMapValue(data, "Car Data", "TyreWear", "")
+
+			if (tyreWear != "") {
+				tyreWear := string2Values(",", tyreWear)
+
+				setMultiMapValue(sessionInfo, "Tyres", "Wear", values2String(",", Round(tyreWear[1]), Round(tyreWear[2]), Round(tyreWear[3]), Round(tyreWear[4])))
+			}
+
+			setMultiMapValue(sessionInfo, "Brakes", "Temperatures", getMultiMapValue(data, "Car Data", "BrakeTemperature", ""))
+
+			brakeWear := getMultiMapValue(data, "Car Data", "BrakeWear", "")
+
+			if (brakeWear != "") {
+				brakeWear := string2Values(",", brakeWear)
+
+				setMultiMapValue(sessionInfo, "Brakes", "Wear", values2String(",", Round(brakeWear[1]), Round(brakeWear[2]), Round(brakeWear[3]), Round(brakeWear[4])))
+			}
 		}
 
 		return sessionInfo
@@ -2164,7 +2172,7 @@ class GridRaceAssistant extends RaceAssistant {
 		if (data || !lastKnowledgeBase || (lastKnowledgebase != knowledgeBase) || !classes) {
 			classes := CaseInsenseMap()
 
-			loop (data ? getMultiMapValue(data, "Position Data", "Car.Count") : knowledgeBase.getValue("Car.Count"))
+			loop (data ? getMultiMapValue(data, "Position Data", "Car.Count") : (knowledgeBase ? knowledgeBase.getValue("Car.Count") : 0))
 				if (data || knowledgeBase.getValue("Car." . A_Index . ".Car", false)) {
 					class := this.getClass(A_Index, data)
 
@@ -2273,7 +2281,7 @@ class GridRaceAssistant extends RaceAssistant {
 	}
 
 	getPosition(car := false, type := "Overall", data := false) {
-		local knowledgebase := this.Knowledgebase
+		local knowledgeBase := this.KnowledgeBase
 		local position, candidate
 
 		if !car {
@@ -2281,7 +2289,7 @@ class GridRaceAssistant extends RaceAssistant {
 				if data
 					return getMultiMapValue(data, "Position Data", "Car." . getMultiMapValue(data, "Position Data", "Driver.Car") . ".Position", false)
 				else
-					return knowledgeBase.getValue("Position", 0)
+					return (knowledgeBase ? knowledgeBase.getValue("Position", 0) : 0)
 			}
 			else
 				car := (data ? getMultiMapValue(data, "Position Data", "Driver.Car") : knowledgeBase.getValue("Driver.Car", false))
@@ -2296,7 +2304,7 @@ class GridRaceAssistant extends RaceAssistant {
 		if data
 			return getMultiMapValue(data, "Position Data", "Car." . car . ".Position", car)
 		else
-			return knowledgeBase.getValue("Car." . car . ".Position", car)
+			return (knowledgeBase ? knowledgeBase.getValue("Car." . car . ".Position", car) : 0)
 	}
 
 	prepareData(lapNumber, data) {
@@ -2352,43 +2360,45 @@ class GridRaceAssistant extends RaceAssistant {
 		local sessionInfo := super.createSessionInfo(lapNumber, valid, data, simulator, car, track)
 		local position, classPosition
 
-		position := this.getPosition()
-		classPosition := (this.MultiClass ? this.getPosition(false, "Class") : position)
+		if knowledgeBase {
+			position := this.getPosition()
+			classPosition := (this.MultiClass ? this.getPosition(false, "Class") : position)
 
-		setMultiMapValue(sessionInfo, "Standings", "Position.Overall", position)
-		setMultiMapValue(sessionInfo, "Standings", "Position.Class", classPosition)
+			setMultiMapValue(sessionInfo, "Standings", "Position.Overall", position)
+			setMultiMapValue(sessionInfo, "Standings", "Position.Class", classPosition)
 
-		if (classPosition != 1) {
-			car := knowledgeBase.getValue("Position.Standings.Class.Leader.Car", 0)
+			if (classPosition != 1) {
+				car := knowledgeBase.getValue("Position.Standings.Class.Leader.Car", 0)
 
-			if car {
-				setMultiMapValue(sessionInfo, "Standings", "Leader.Lap.Time", Round(knowledgeBase.getValue("Car." . car . ".Time", 0) / 1000, 1))
-				setMultiMapValue(sessionInfo, "Standings", "Leader.Lap", knowledgeBase.getValue("Car." . car . ".Lap", 0))
-				setMultiMapValue(sessionInfo, "Standings", "Leader.Delta", Round(knowledgeBase.getValue("Position.Standings.Class.Leader.Delta", 0) / 1000, 1))
-				setMultiMapValue(sessionInfo, "Standings", "Leader.InPit", (knowledgeBase.getValue("Car." . car . ".InPitLane", false)
-																		 || knowledgeBase.getValue("Car." . car . ".InPit", false)))
+				if car {
+					setMultiMapValue(sessionInfo, "Standings", "Leader.Lap.Time", Round(knowledgeBase.getValue("Car." . car . ".Time", 0) / 1000, 1))
+					setMultiMapValue(sessionInfo, "Standings", "Leader.Lap", knowledgeBase.getValue("Car." . car . ".Lap", 0))
+					setMultiMapValue(sessionInfo, "Standings", "Leader.Delta", Round(knowledgeBase.getValue("Position.Standings.Class.Leader.Delta", 0) / 1000, 1))
+					setMultiMapValue(sessionInfo, "Standings", "Leader.InPit", (knowledgeBase.getValue("Car." . car . ".InPitLane", false)
+																			 || knowledgeBase.getValue("Car." . car . ".InPit", false)))
+				}
+
+				car := knowledgeBase.getValue("Position.Standings.Class.Ahead.Car", false)
+
+				if car {
+					setMultiMapValue(sessionInfo, "Standings", "Ahead.Lap.Time", Round(knowledgeBase.getValue("Car." . car . ".Time", 0) / 1000, 1))
+					setMultiMapValue(sessionInfo, "Standings", "Ahead.Lap", knowledgeBase.getValue("Car." . car . ".Lap", 0))
+					setMultiMapValue(sessionInfo, "Standings", "Ahead.Delta", Round(knowledgeBase.getValue("Position.Standings.Class.Ahead.Delta", 0) / 1000, 1))
+					setMultiMapValue(sessionInfo, "Standings", "Ahead.InPit", (knowledgeBase.getValue("Car." . car . ".InPitLane", false)
+																			|| knowledgeBase.getValue("Car." . car . ".InPit", false)))
+				}
 			}
 
-			car := knowledgeBase.getValue("Position.Standings.Class.Ahead.Car", false)
+			if (this.getPosition(false, "Class") != this.getCars("Class").Length) {
+				car := knowledgeBase.getValue("Position.Standings.Class.Behind.Car")
 
-			if car {
-				setMultiMapValue(sessionInfo, "Standings", "Ahead.Lap.Time", Round(knowledgeBase.getValue("Car." . car . ".Time", 0) / 1000, 1))
-				setMultiMapValue(sessionInfo, "Standings", "Ahead.Lap", knowledgeBase.getValue("Car." . car . ".Lap", 0))
-				setMultiMapValue(sessionInfo, "Standings", "Ahead.Delta", Round(knowledgeBase.getValue("Position.Standings.Class.Ahead.Delta", 0) / 1000, 1))
-				setMultiMapValue(sessionInfo, "Standings", "Ahead.InPit", (knowledgeBase.getValue("Car." . car . ".InPitLane", false)
-																		|| knowledgeBase.getValue("Car." . car . ".InPit", false)))
-			}
-		}
-
-		if (this.getPosition(false, "Class") != this.getCars("Class").Length) {
-			car := knowledgeBase.getValue("Position.Standings.Class.Behind.Car")
-
-			if car {
-				setMultiMapValue(sessionInfo, "Standings", "Behind.Lap.Time", Round(knowledgeBase.getValue("Car." . car . ".Time", 0) / 1000, 1))
-				setMultiMapValue(sessionInfo, "Standings", "Behind.Lap", knowledgeBase.getValue("Car." . car . ".Lap", 0))
-				setMultiMapValue(sessionInfo, "Standings", "Behind.Delta", Round(knowledgeBase.getValue("Position.Standings.Class.Behind.Delta", 0) / 1000, 1))
-				setMultiMapValue(sessionInfo, "Standings", "Behind.InPit", (knowledgeBase.getValue("Car." . car . ".InPitLane", false)
-																		 || knowledgeBase.getValue("Car." . car . ".InPit", false)))
+				if car {
+					setMultiMapValue(sessionInfo, "Standings", "Behind.Lap.Time", Round(knowledgeBase.getValue("Car." . car . ".Time", 0) / 1000, 1))
+					setMultiMapValue(sessionInfo, "Standings", "Behind.Lap", knowledgeBase.getValue("Car." . car . ".Lap", 0))
+					setMultiMapValue(sessionInfo, "Standings", "Behind.Delta", Round(knowledgeBase.getValue("Position.Standings.Class.Behind.Delta", 0) / 1000, 1))
+					setMultiMapValue(sessionInfo, "Standings", "Behind.InPit", (knowledgeBase.getValue("Car." . car . ".InPitLane", false)
+																			 || knowledgeBase.getValue("Car." . car . ".InPit", false)))
+				}
 			}
 		}
 

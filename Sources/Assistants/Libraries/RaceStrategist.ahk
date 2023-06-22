@@ -779,8 +779,6 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	handleVoiceCommand(grammar, words) {
-		local reset := true
-
 		switch grammar, false {
 			case "LapsRemaining":
 				this.lapsRemainingRecognized(words)
@@ -795,8 +793,6 @@ class RaceStrategist extends GridRaceAssistant {
 			case "NextPitstop":
 				this.nextPitstopRecognized(words)
 			case "StrategyRecommend":
-				reset := false
-
 				this.clearContinuation()
 
 				if !this.hasEnoughData()
@@ -811,8 +807,6 @@ class RaceStrategist extends GridRaceAssistant {
 
 				this.recommendStrategyRecognized(words)
 			case "PitstopRecommend":
-				reset := false
-
 				this.clearContinuation()
 
 				if !this.hasEnoughData()
@@ -827,8 +821,6 @@ class RaceStrategist extends GridRaceAssistant {
 
 				this.recommendPitstopRecognized(words)
 			case "PitstopSimulate":
-				reset := false
-
 				this.clearContinuation()
 
 				if !this.hasEnoughData()
@@ -843,18 +835,11 @@ class RaceStrategist extends GridRaceAssistant {
 
 				this.simulatePitstopRecognized(words)
 			default:
-				reset := false
-
 				super.handleVoiceCommand(grammar, words)
 		}
-
-		if reset
-			this.clearContinuation()
 	}
 
 	requestInformation(category, arguments*) {
-		this.clearContinuation()
-
 		switch category, false {
 			case "LapsRemaining":
 				this.lapsRemainingRecognized([])
@@ -864,6 +849,8 @@ class RaceStrategist extends GridRaceAssistant {
 				this.strategyOverviewRecognized([])
 			case "NextPitstop":
 				this.nextPitstopRecognized([])
+			default:
+				super.requestInformation(category, arguments*)
 		}
 	}
 
@@ -902,7 +889,7 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	positionRecognized(words) {
-		if inList(words, speaker.Fragments["Laps"])
+		if inList(words, this.getSpeaker().Fragments["Laps"])
 			this.futurePositionRecognized(words)
 		else
 			super.positionRecognized(words)
@@ -976,10 +963,17 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	nextPitstopRecognized(words) {
+		local pitstopLap
+
 		if !this.hasEnoughData()
 			return
 
 		this.reportStrategy({Strategy: false, Pitstops: false, NextPitstop: true})
+
+		pitstopLap := this.KnowledgeBase.getValue("Strategy.Pitstop.Lap", false)
+
+		if (pitstopLap && ProcessExist("Race Engineer.exe"))
+			this.confirmNextPitstop(pitstopLap)
 	}
 
 	recommendStrategyRecognized(words) {
@@ -1020,6 +1014,27 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 
 		this.recommendPitstop(lap)
+	}
+
+	confirmNextPitstop(pitstopLap) {
+		local knowledgeBase := this.KnowledgeBase
+		local nextPitstop, refuel, tyreChange, tyreCompound, tyreCompoundColor
+
+		if ProcessExist("Race Engineer.exe") {
+			this.getSpeaker().speakPhrase("ConfirmInformEngineer", false, true)
+
+			nextPitstop := knowledgeBase.getValue("Strategy.Pitstop.Next")
+
+			refuel := Round(knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Fuel.Amount"), 1)
+			tyreChange := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Change")
+			tyreCompound := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Compound")
+			tyreCompoundColor := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Compound.Color")
+
+			if (knowledgeBase.getValue("Strategy.Pitstop.Count") > nextPitstop)
+				refuel := ("!" . refuel)
+
+			this.setContinuation(ObjBindMethod(this, "planPitstop", pitstopLap, refuel, "!" . tyreChange, tyreCompound, tyreCompoundColor))
+		}
 	}
 
 	reviewRace(multiClass, cars, laps, position, leaderAvgLapTime
@@ -1137,7 +1152,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 	loadStrategy(facts, strategy, lastPitstop := false, lastLap := false) {
 		local pitstopWindow := (this.Settings ? getMultiMapValue(this.Settings, "Strategy Settings", "Strategy.Window.Considered", 3) : 3)
-		local pitstop, count, ignore, pitstopLap, first, rootStrategy
+		local pitstop, count, ignore, pitstopLap, first, rootStrategy, pitstopDeviation
 
 		strategy.RunningPitstops := 0
 		strategy.RunningLaps := 0
@@ -1157,7 +1172,9 @@ class RaceStrategist extends GridRaceAssistant {
 		facts["Strategy.TC"] := strategy.TC
 		facts["Strategy.ABS"] := strategy.ABS
 
-		facts["Strategy.Pitstop.Deviation"] := getMultiMapValue(this.Settings, "Strategy Settings", "Strategy.Update.Pitstop", pitstopWindow)
+		pitstopDeviation := getMultiMapValue(this.Settings, "Strategy Settings", "Strategy.Update.Pitstop", 0)
+
+		facts["Strategy.Pitstop.Deviation"] := Max(3, pitstopDeviation, pitstopWindow)
 
 		count := 0
 
@@ -1515,7 +1532,7 @@ class RaceStrategist extends GridRaceAssistant {
 		local sessionInfo := super.createSessionInfo(lapNumber, valid, data, simulator, car, track)
 		local nextPitstop
 
-		if knowledgeBase.getValue("Strategy.Name", false) {
+		if (knowledgeBase && knowledgeBase.getValue("Strategy.Name", false)) {
 			setMultiMapValue(sessionInfo, "Strategy", "Pitstops", knowledgeBase.getValue("Strategy.Pitstop.Count"))
 
 			nextPitstop := knowledgeBase.getValue("Strategy.Pitstop.Next", false)
@@ -1541,11 +1558,10 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	addLap(lapNumber, &data) {
-		local knowledgeBase := this.KnowledgeBase
 		local driverForname := ""
 		local driverSurname := ""
 		local driverNickname := ""
-		local compound, result, lap, simulator, car, track, frequency, curContinuation
+		local knowledgeBase, compound, result, lap, simulator, car, track, frequency, curContinuation
 		local pitstop, prefix, validLap, weather, airTemperature, trackTemperature, compound, compoundColor
 		local fuelConsumption, fuelRemaining, lapTime, map, tc, antiBS, pressures, temperatures, wear, multiClass
 		local sessionInfo, driverCar, lastTime
@@ -1563,15 +1579,17 @@ class RaceStrategist extends GridRaceAssistant {
 		else if (lastLap < (lapNumber - 1))
 			this.iLastStrategyUpdate := lapNumber
 
+		curContinuation := this.Continuation
+
+		result := super.addLap(lapNumber, &data)
+
+		knowledgeBase := this.KnowledgeBase
+
 		if (this.Speaker && (lapNumber > 1)) {
 			driverForname := knowledgeBase.getValue("Driver.Forname", "John")
 			driverSurname := knowledgeBase.getValue("Driver.Surname", "Doe")
 			driverNickname := knowledgeBase.getValue("Driver.Nickname", "JDO")
 		}
-
-		curContinuation := this.Continuation
-
-		result := super.addLap(lapNumber, &data)
 
 		if (this.Speaker && (lastLap < (lapNumber - 2))
 		 && (computeDriverName(driverForname, driverSurname, driverNickname) != this.DriverFullName))
@@ -2922,7 +2940,8 @@ class RaceStrategist extends GridRaceAssistant {
 			try {
 				speaker.speakPhrase("EvaluatedLaps", {laps: ((pitstopWindow * 2) + 1), first: (pitstopLap - pitstopWindow + 1), last: (pitstopLap + pitstopWindow + 1)})
 
-				speaker.speakPhrase("EvaluatedBestPosition", {lap: (pitstopLap + 1), position: position})
+				if position
+					speaker.speakPhrase("EvaluatedBestPosition", {lap: (pitstopLap + 1), position: position})
 
 				if (carsAhead > 0)
 					speaker.speakPhrase("EvaluatedTraffic", {traffic: carsAhead})
@@ -2955,10 +2974,11 @@ class RaceStrategist extends GridRaceAssistant {
 			try {
 				speaker.speakPhrase("EvaluatedLaps", {laps: laps.Length, first: laps[1], last: laps[laps.Length]})
 
-				if (position = Min(positions*))
-					speaker.speakPhrase("EvaluatedSimilarPosition", {position: position})
-				else
-					speaker.speakPhrase("EvaluatedBestPosition", {lap: plannedLap, position: position})
+				if position
+					if (position = Min(positions*))
+						speaker.speakPhrase("EvaluatedSimilarPosition", {position: position})
+					else
+						speaker.speakPhrase("EvaluatedBestPosition", {lap: plannedLap, position: position})
 
 				if (traffic.Length > 0) {
 					speaker.speakPhrase("EvaluatedTraffic", {traffic: traffic.Length})
@@ -3020,22 +3040,24 @@ class RaceStrategist extends GridRaceAssistant {
 
 		result := super.executePitstop(lapNumber)
 
-		if nextPitstop {
-			this.Strategy.RunningPitstops += 1
-
+		if nextPitstop
 			if (nextPitstop != knowledgeBase.getValue("Strategy.Pitstop.Next", false)) {
 				map := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Map", "n/a")
 
 				if ((map != "n/a") && (map != knowledgeBase.getValue("Lap." . knowledgeBase.getValue("Lap") . ".Map", "n/a")))
 					this.getSpeaker().speakPhrase("StintMap", {map: map})
 			}
-			else
+			else if getMultiMapValue(this.Settings, "Strategy Settings", "Strategy.Update.Pitstop", false)
 				knowledgeBase.setFact("Strategy.Recalculate", "Pitstop")
-		}
 
 		this.updateDynamicValues({RejectedStrategy: false})
 
 		return result
+	}
+
+	pitstopPerformed(pitstopNr) {
+		if this.Strategy
+			this.Strategy.RunningPitstops += 1
 	}
 
 	callRecommendPitstop(lapNumber := false) {
@@ -3113,7 +3135,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 	reportUpcomingPitstop(plannedPitstopLap) {
 		local knowledgeBase := this.KnowledgeBase
-		local speaker, plannedLap, laps, nextPitstop, refuel, tyreChange, tyreCompound, tyreCompoundColor
+		local speaker, plannedLap, nextPitstop, refuel, tyreChange, tyreCompound, tyreCompoundColor
 
 		if (this.Speaker[false]) {
 			speaker := this.getSpeaker()
@@ -3130,29 +3152,14 @@ class RaceStrategist extends GridRaceAssistant {
 			if (plannedLap && (plannedLap != kUndefined))
 				plannedPitstopLap := plannedLap
 
-			laps := (plannedPitstopLap - knowledgeBase.getValue("Lap"))
-
 			speaker.beginTalk()
 
 			try {
-				speaker.speakPhrase("PitstopAhead", {lap: plannedPitstopLap, laps: laps})
+				speaker.speakPhrase("PitstopAhead", {lap: plannedPitstopLap
+												   , laps: (plannedPitstopLap - knowledgeBase.getValue("Lap"))})
 
-				if ProcessExist("Race Engineer.exe") {
-					speaker.speakPhrase("ConfirmInformEngineer", false, true)
-
-					nextPitstop := knowledgeBase.getValue("Strategy.Pitstop.Next")
-
-					refuel := Round(knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Fuel.Amount"), 1)
-					tyreChange := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Change")
-					tyreCompound := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Compound")
-					tyreCompoundColor := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Compound.Color")
-
-					if (knowledgeBase.getValue("Strategy.Pitstop.Count") > nextPitstop)
-						refuel := ("!" . refuel)
-
-					this.setContinuation(ObjBindMethod(this, "planPitstop", plannedPitstopLap
-																		  , refuel, "!" . tyreChange, tyreCompound, tyreCompoundColor))
-				}
+				if ProcessExist("Race Engineer.exe")
+					this.confirmNextPitstop(plannedPitstopLap)
 			}
 			finally {
 				speaker.endTalk()
@@ -3565,8 +3572,6 @@ updatePositions(context, futureLap) {
 }
 
 weatherChangeNotification(context, change, minutes) {
-	context.KnowledgeBase.RaceAssistant.clearContinuation()
-
 	context.KnowledgeBase.RaceAssistant.weatherChangeNotification(change, minutes)
 
 	return true
@@ -3584,6 +3589,12 @@ reportUpcomingPitstop(context, lap) {
 	context.KnowledgeBase.RaceAssistant.clearContinuation()
 
 	context.KnowledgeBase.RaceAssistant.reportUpcomingPitstop(lap)
+
+	return true
+}
+
+pitstopPerformed(context, pitstopNr) {
+	context.KnowledgeBase.RaceAssistant.pitstopPerformed(pitstopNr)
 
 	return true
 }

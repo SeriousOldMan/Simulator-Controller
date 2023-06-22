@@ -3,17 +3,23 @@
   2. Documentation updates here and there, as always
   3. New Control key modifier for "Load current Race Strategy" in "Race Center" allows you to go back to the strategy, that is associated with the current session. Helpful, after you have run a strategy simulation, but you want to go *back*.
   4. New [core setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration) to choose the activation recognizer for the "Voice Server". Normally, the "Server" recognition engine will be used, but you can use this setting to change to a recognizer run on Azure, for example.
-  5. Fixed data synchronization of setups and strategies in the "Session Database". Also a bug has been fixed in the Team Server, that causes a setup or strategy not to be deleted on the Team Server, when it gets deleted locally. If you are running your own Team Server, you should update your instance(s).
-  6. New "Empty" option for session info layout in "System Monitor".
+  5. Fixed data synchronization of setups and strategies in the "Session Database". Also a bug has been fixed in the Team Server, that causes a setup or strategy not to be deleted on the Team Server, when it gets deleted locally. **If you are running your own Team Server, you should update your instance(s).
+  6. New "Empty" option for session info layout in "System Monitor".**
   7. New floating layout for session info page in "System Monitor".
   8. Support for 3 more info widgets on the session info page in "System Monitor".
   9. Fixed the *Overview* report in "Race Reports" and "Race Center" to show only one position when no classes or cups are selected for grid partitioning.
   10. Increased stability of Team Server connections in case of connection loss events.
   11. Fixed team data management in cases where one or more assistants are disabled.
   12. Fixed a couple of bugs in the post pitstop report of "Race Center".
-  13. More intelligent detection of unplanned pitstops for the Race Strategist.
-  14. Migrated the sources to AHK 2.03
-
+  13. More intelligent detection of unplanned pitstops and stops for penalties by the Race Strategist.
+  14. The collaboration between the Strategist and the Engineer, when running a prepared strategy, has become more inteligent, especially for the last stint. The [documentation on strategy handliing](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-handling) has been revised.
+  15. If you ask the Strategist for the next pitstop, it will give you the option to inform the Engineer right away. Helpful, if you missed the upcoming pitstop warning.
+  16. Fixed spurios input field appearing in Telemetry Analyzer, when running a recording.
+  17. Migrated the sources to AHK 2.03
+  18. New car models for "Setup Workbench":
+      - Assetto Corsa
+	    - Alfa Romeo 155 V6 TI
+		
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-509) if you are running your own Team Server.
   
 ## 5.0.8.1-release 06/18/23

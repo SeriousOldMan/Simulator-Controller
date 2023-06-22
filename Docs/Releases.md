@@ -3,8 +3,8 @@
   2. Documentation updates here and there, as always
   3. New Control key modifier for "Load current Race Strategy" in "Race Center" allows you to go back to the strategy, that is associated with the current session. Helpful, after you have run a strategy simulation, but you want to go *back*.
   4. New [core setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration) to choose the activation recognizer for the "Voice Server". Normally, the "Server" recognition engine will be used, but you can use this setting to change to a recognizer run on Azure, for example.
-  5. Fixed data synchronization of setups and strategies in the "Session Database". Also a bug has been fixed in the Team Server, that causes a setup or strategy not to be deleted on the Team Server, when it gets deleted locally. **If you are running your own Team Server, you should update your instance(s).
-  6. New "Empty" option for session info layout in "System Monitor".**
+  5. Fixed data synchronization of setups and strategies in the "Session Database". Also a bug has been fixed in the Team Server, that causes a setup or strategy not to be deleted on the Team Server, when it gets deleted locally. **If you are running your own Team Server, you should update your instance(s).**
+  6. New "Empty" option for session info layout in "System Monitor".
   7. New floating layout for session info page in "System Monitor".
   8. Support for 3 more info widgets on the session info page in "System Monitor".
   9. Fixed the *Overview* report in "Race Reports" and "Race Center" to show only one position when no classes or cups are selected for grid partitioning.

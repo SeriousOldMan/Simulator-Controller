@@ -187,8 +187,6 @@ class SessionDatabase extends ConfigurationItem {
 					if connector {
 						connector.Initialize(SessionDatabase.ServerURL[identifier], SessionDatabase.ServerToken[identifier])
 
-						temp := connector.Token
-
 						try {
 							connection := connector.Connect(SessionDatabase.ServerToken[identifier], SessionDatabase.ID, SessionDatabase.getUserName())
 
@@ -2354,10 +2352,24 @@ synchronizeStrategies(groups, sessionDB, connector, simulators, timestamp, lastS
 
 keepAlive(identifier, connector, connection) {
 	try {
+		if !connection {
+			connection := connector.Connect(SessionDatabase.ServerToken[identifier], SessionDatabase.ID, SessionDatabase.getUserName())
+
+			if (connection && (connection != "")) {
+				Task.CurrentTask.stop()
+
+				PeriodicTask(keepAlive.Bind(identifier, connector, connection), 10000, kInterruptPriority).start()
+			}
+		}
+
 		SessionDatabase.Connected[identifier] := connector.KeepAlive(connection)
 	}
-	catch Any {
+	catch Any as exception {
 		SessionDatabase.Connected[identifier] := false
+
+		Task.CurrentTask.stop()
+
+		PeriodicTask(keepAlive.Bind(identifier, connector, false), 10000, kInterruptPriority).start()
 	}
 }
 

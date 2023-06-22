@@ -2361,8 +2361,14 @@ class RaceCenter extends ConfigurationItem {
 	keepAlive() {
 		local connection := this.Connection
 
-		if connection
-			this.Connector.KeepAlive(connection)
+		try {
+			if (connection && !this.Connector.KeepAlive(connection))
+				throw "Detected dead connection..."
+		}
+		catch Any as exception {
+			try
+				this.iConnection := this.Connector.Connect(this.ServerToken, SessionDatabase.ID, SessionDatabase.getUserName(), "Internal", this.SelectedSession[true])
+		}
 	}
 
 	loadTeams() {
@@ -3963,6 +3969,8 @@ class RaceCenter extends ConfigurationItem {
 				}
 			}
 			catch Any as exception {
+				logError(exception, true)
+
 				showMessage(translate("Session has not been started yet."))
 			}
 	}
@@ -3986,6 +3994,8 @@ class RaceCenter extends ConfigurationItem {
 				showMessage(translate("Race Strategist will be instructed as fast as possible."))
 			}
 			catch Any as exception {
+				logError(exception, true)
+
 				showMessage(translate("Session has not been started yet."))
 			}
 	}
@@ -4219,7 +4229,8 @@ class RaceCenter extends ConfigurationItem {
 				throw "No active session..."
 		}
 		catch Any as exception {
-			logError(exception)
+			if (exception != "No active session...")
+				logError(exception, true)
 
 			OnMessage(0x44, translateOkButton)
 			MsgBox(translate("You must be connected to an active session to plan a pitstop."), translate("Error"), 262192)
@@ -6010,16 +6021,11 @@ class RaceCenter extends ConfigurationItem {
 		if (getLogLevel() <= kLogInfo)
 			logMessage(kLogInfo, message)
 
-		try {
-			currentStint := this.Connector.GetSessionCurrentStint(session)
+		currentStint := this.Connector.GetSessionCurrentStint(session)
 
-			if currentStint {
-				currentStint := parseObject(this.Connector.GetStint(currentStint))
-				currentStint.Nr := (currentStint.Nr + 0)
-			}
-		}
-		catch Any as exception {
-			currentStint := false
+		if currentStint {
+			currentStint := parseObject(this.Connector.GetStint(currentStint))
+			currentStint.Nr := (currentStint.Nr + 0)
 		}
 
 		first := (!this.CurrentStint || !this.LastLap)
@@ -7263,18 +7269,11 @@ class RaceCenter extends ConfigurationItem {
 				if (getLogLevel() <= kLogInfo)
 					logMessage(kLogInfo, translate("Syncing session"))
 
-				try {
-					lastLap := this.Connector.GetSessionLastLap(session)
+				lastLap := this.Connector.GetSessionLastLap(session)
 
-					if lastLap {
-						lastLap := parseObject(this.Connector.GetLap(lastLap))
-						lastLap.Nr := (lastLap.Nr + 0)
-					}
-				}
-				catch Any as exception {
-					logError(exception)
-
-					lastLap := false
+				if lastLap {
+					lastLap := parseObject(this.Connector.GetLap(lastLap))
+					lastLap.Nr := (lastLap.Nr + 0)
 				}
 
 				if (hadLastLap && !lastLap) {
@@ -7410,7 +7409,7 @@ class RaceCenter extends ConfigurationItem {
 			catch Any as exception {
 				message := (isObject(exception) ? exception.Message : exception)
 
-				this.showMessage(translate("Cannot connect to the Team Server.") . A_Space . translate("Retry in 10 seconds."), translate("Error: ") . message)
+				this.showMessage(translate("Cannot connect to the Team Server.") . A_Space . translate("Retry in 10 seconds."), translate("Error: "))
 
 				logMessage(kLogWarn, message)
 				logError(exception, true)

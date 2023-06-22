@@ -1439,22 +1439,29 @@ class TeamServerPlugin extends ControllerPlugin {
 	keepAlive(start := false) {
 		local nextPing := 10000
 		local invalid := false
+		local connection := false
 		local driverObject
 
 		static keepAliveTask := false
+		static initialized := false
 
 		if (this.Connector && this.ServerURL && this.ServerToken) {
 			try {
 				if this.Connection
 					this.State["Stalled"] := !this.Connector.KeepAlive(this.Connection)
-				else {
+
+				if (!this.Connection || this.State["Stalled"]) {
+					if (!initialized && this.ServerURL && this.ServerToken) {
+						this.Connector.Initialize(this.ServerURL, this.ServerToken)
+
+						initialized := true
+					}
+
 					if !this.State.Has("ServerURL")
 						this.State["ServerURL"] := "Invalid"
 
 					if !this.State.Has("SessionToken")
 						this.State["SessionToken"] := "Invalid"
-
-					this.Connector.Initialize(this.ServerURL, this.ServerToken)
 
 					if !this.State.Has("Team")
 						this.State["Team"] := "Invalid"
@@ -1465,14 +1472,15 @@ class TeamServerPlugin extends ControllerPlugin {
 					if !this.State.Has("Session")
 						this.State["Session"] := "Invalid"
 
-					if (this.Driver && this.Session) {
-						this.iConnection := this.Connector.Connect(this.ServerToken
-																 , SessionDatabase().ID
-																 , computeDriverName(this.DriverForName[true]
-																 , this.DriverSurName[true]
-																 , this.DriverNickName[true])
-																 , "Driver", this.Session)
+					if (this.Driver && this.Session)
+						connection := this.Connector.Connect(this.ServerToken
+														   , SessionDatabase().ID
+														   , computeDriverName(this.DriverForName[true]
+														   , this.DriverSurName[true]
+														   , this.DriverNickName[true])
+														   , "Driver", this.Session)
 
+					if connection {
 						this.State["ServerURL"] := this.ServerURL
 						this.State["SessionToken"] := this.ServerToken
 
@@ -1521,8 +1529,11 @@ class TeamServerPlugin extends ControllerPlugin {
 
 						if invalid
 							throw invalid
-						else
+						else {
 							A_IconTip := (string2Values(".", A_ScriptName)[1] . translate(" (Team: ") . this.Team[true] . translate(")"))
+
+							this.iConnection := connection
+						}
 					}
 					else {
 						this.State["ServerURL"] := this.ServerURL

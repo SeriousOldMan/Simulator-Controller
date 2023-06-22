@@ -712,9 +712,11 @@ class RaceStrategist extends GridRaceAssistant {
 			this.iOriginalStrategy := values.OriginalStrategy
 
 		if values.HasProp("Strategy") {
-			if (this.iRejectedStrategy && (this.iRejectedStrategy != values.RejectedStrategy))
-				if isInstance(this.iRejectedStrategy, Strategy)
-					this.iRejectedStrategy.dispose()
+			if this.iRejectedStrategy {
+				this.iRejectedStrategy.dispose()
+
+				this.iRejectedStrategy := false
+			}
 
 			this.iStrategy := values.Strategy
 		}
@@ -2785,10 +2787,14 @@ class RaceStrategist extends GridRaceAssistant {
 
 								return
 							}
+							else
+								confirm := false
 						}
 					}
 					else if ((request != "Pitstop") || (this.Strategy["Rejected"] = "CANCEL"))
 						return
+					else
+						confirm := true
 				}
 			}
 

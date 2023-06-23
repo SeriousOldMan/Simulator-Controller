@@ -1,4 +1,4 @@
-## 5.0.9.0-release 06/23/23 (planned)
+## 5.0.9.0-release 06/23/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. New Control key modifier for "Load current Race Strategy" in "Race Center" allows you to go back to the strategy, that is associated with the current session. Helpful, after you have run a strategy simulation, but you want to go *back*.

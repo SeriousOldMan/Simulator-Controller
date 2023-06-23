@@ -1,16 +1,16 @@
 [Development]
-Version=5.0.9.0-rc1
+Version=5.0.9.0-release
 Target=5.0.9.0-release
-Date=06/22/2023
-Download=https://www.dropbox.com/s/mmdre96zvdolkqz/Simulator%20Controller%205.0.9.0-rc1.zip?dl=1
+Date=06/23/2023
+Download=https://cutt.ly/ZwtCJMfd;https://www.dropbox.com/s/bs612t4se6vutvg/Simulator%20Controller%205.0.9.0-release.zip?dl=1
 Changes=Ctrl modifier for "Load current Race Strategy" in "Race Center", New core setting to choose the activation recognizer for the "Voice Server", Fixed data synchronization of setups and strategies, New "Empty" option for session info layout in "System Monitor", Fixed single class view in Overview report in "Race Reports" and "Race Center", Floating layout for session info page in "System Monitor", Increased stability of Team Server connections in case of connection loss events, Fixed team data management in cases where one or more assistants are disabled, Fixed a couple of bugs in the post pitstop report of "Race Center", More intelligent detection of unplanned pitstops for the Race Strategist, Migrated to AHK 2.03, Fixed visibility of wheelbase input field in Telemetry Analyzer, New car models for "Setup Workbench"
 [Release]
-Version=5.0.8.1-release
-Date=06/18/2023
-Download=https://cutt.ly/Kwr4Ixn4;https://www.dropbox.com/s/242fqqvv3jn6ns3/Simulator%20Controller%205.0.8.1-release.zip?dl=1
-Changes=Fixed Spotter endless announcement loop, Fixed a couple of bugs with strategy handling in multiplayer races
+Version=5.0.9.0-release
+Date=06/23/2023
+Download=https://cutt.ly/ZwtCJMfd;https://www.dropbox.com/s/bs612t4se6vutvg/Simulator%20Controller%205.0.9.0-release.zip?dl=1
+Changes=Ctrl modifier for "Load current Race Strategy" in "Race Center", New core setting to choose the activation recognizer for the "Voice Server", Fixed data synchronization of setups and strategies, New "Empty" option for session info layout in "System Monitor", Fixed single class view in Overview report in "Race Reports" and "Race Center", Floating layout for session info page in "System Monitor", Increased stability of Team Server connections in case of connection loss events, Fixed team data management in cases where one or more assistants are disabled, Fixed a couple of bugs in the post pitstop report of "Race Center", More intelligent detection of unplanned pitstops for the Race Strategist, Migrated to AHK 2.03, Fixed visibility of wheelbase input field in Telemetry Analyzer, New car models for "Setup Workbench"
 [Current]
-Type=Development
+Type=Release
 [Version]
-Release=5.0.8.1-release
-Development=5.0.9.0-rc1
+Release=5.0.9.0-release
+Development=5.0.9.0-release

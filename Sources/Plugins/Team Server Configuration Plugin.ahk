@@ -229,7 +229,14 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 		}
 
 		renewDataToken(*) {
-			this.renewDataToken()
+			local msgResult
+
+			OnMessage(0x44, translateYesNoButtons)
+			msgResult := MsgBox(translate("Do you really want to renew the data token? The current token will become invalid for all users."), translate("Renew"), 262436)
+			OnMessage(0x44, translateYesNoButtons, 0)
+
+			if (msgResult = "Yes")
+				this.renewDataToken()
 		}
 
 		selectTeam(*) {

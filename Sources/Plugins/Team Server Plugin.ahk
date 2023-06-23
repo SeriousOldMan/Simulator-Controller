@@ -397,58 +397,79 @@ class TeamServerPlugin extends ControllerPlugin {
 		local connectedDrivers := []
 		local ignore, connection
 
-		try {
-			if this.Session {
-				for ignore, connection in string2Values(";", this.Connector.GetSessionConnections(this.Session)) {
-					if !this.iCachedObjects.Has(connection)
-						this.iCachedObjects[connection] := this.parseObject(this.Connector.GetConnection(connection))
+		static nextUpdate := 0
+		static lastDrivers := false
 
-					connection := this.iCachedObjects[connection]
+		if this.Session
+			try {
+				if (A_TickCount > nextUpdate) {
+					for ignore, connection in string2Values(";", this.Connector.GetSessionConnections(this.Session)) {
+						if !this.iCachedObjects.Has(connection)
+							this.iCachedObjects[connection] := this.parseObject(this.Connector.GetConnection(connection))
 
-					if (connection["Name"] && (connection["Name"] != "") && (connection["Type"] = "Driver")
-										   && !inList(connectedDrivers, connection["Name"]))
-						connectedDrivers.Push(connection["Name"])
+						connection := this.iCachedObjects[connection]
+
+						if (connection["Name"] && (connection["Name"] != "") && (connection["Type"] = "Driver")
+											   && !inList(connectedDrivers, connection["Name"]))
+							connectedDrivers.Push(connection["Name"])
+					}
+
+					lastDrivers := values2String("|", connectedDrivers*)
+
+					nextUpdate := (A_TickCount + 30000)
 				}
 
-				state.Push("Drivers: " . values2String("|", connectedDrivers*))
+				state.Push("Drivers: " . lastDrivers)
 			}
-		}
-		catch Any as exception {
-			logError(exception)
+			catch Any as exception {
+				logError(exception)
 
-			this.keepAlive()
-		}
+				this.keepAlive()
+			}
 	}
 
 	writeStintState(state) {
 		local stint, lap, driver
 
+		static nextUpdate := 0
+		static lastStintInfo := false
+
 		if (this.Connected && this.Session)
 			try {
-				stint := this.Connector.GetSessionCurrentStint(this.Session)
+				if (A_TickCount > nextUpdate) {
+					stint := this.Connector.GetSessionCurrentStint(this.Session)
 
-				if (stint && (stint != "") && (stint != kNull)) {
-					if !this.iCachedObjects.Has(stint)
-						this.iCachedObjects[stint] := this.parseObject(this.Connector.GetStint(stint))
+					if (stint && (stint != "") && (stint != kNull)) {
+						if !this.iCachedObjects.Has(stint)
+							this.iCachedObjects[stint] := this.parseObject(this.Connector.GetStint(stint))
 
-					lap := this.Connector.GetSessionLastLap(this.Session)
+						lap := this.Connector.GetSessionLastLap(this.Session)
 
-					if (lap && (lap != "") && (lap != kNull)) {
-						if !this.iCachedObjects.Has(lap)
-							this.iCachedObjects[lap] := this.parseObject(this.Connector.GetLap(lap))
+						if (lap && (lap != "") && (lap != kNull)) {
+							if !this.iCachedObjects.Has(lap)
+								this.iCachedObjects[lap] := this.parseObject(this.Connector.GetLap(lap))
 
-						driver := this.Connector.GetStintDriver(stint)
+							driver := this.Connector.GetStintDriver(stint)
 
-						if !this.iCachedObjects.Has(driver)
-							this.iCachedObjects[driver] := this.parseObject(this.Connector.GetDriver(driver))
+							if !this.iCachedObjects.Has(driver)
+								this.iCachedObjects[driver] := this.parseObject(this.Connector.GetDriver(driver))
 
-						state.Push("StintNr: " . this.iCachedObjects[stint]["Nr"])
-						state.Push("StintLap: " . this.iCachedObjects[lap]["Nr"])
+							driver := this.iCachedObjects[driver]
 
-						driver := this.iCachedObjects[driver]
+							lastStintInfo := [this.iCachedObjects[stint]["Nr"], this.iCachedObjects[lap]["Nr"]
+											, computeDriverName(driver["ForName"], driver["SurName"], driver["NickName"])]
 
-						state.Push("StintDriver: " . computeDriverName(driver["ForName"], driver["SurName"], driver["NickName"]))
+							nextUpdate := (A_TickCount + 60000)
+						}
 					}
+					else
+						lastStintInfo := false
+				}
+
+				if lastStintInfo {
+					state.Push("StintNr: " . lastStintInfo[1])
+					state.Push("StintLap: " . lastStintInfo[2])
+					state.Push("StintDriver: " . lastStintInfo[3])
 				}
 			}
 			catch Any as exception {

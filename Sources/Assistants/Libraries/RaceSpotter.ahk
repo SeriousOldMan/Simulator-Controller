@@ -666,7 +666,6 @@ class PositionInfo {
 		else if (newObserved != oldObserved) {
 			this.reset(sector, true, true)
 
-			this.Reported := false
 			this.iObserved := newObserved
 
 			/*

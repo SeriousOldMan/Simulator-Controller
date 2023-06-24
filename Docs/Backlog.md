@@ -18,6 +18,7 @@
   5. Graphical Editor for Vocalics Settings inkl. Test-Modus...
   6. Better answers by the Strategist, when a pitstop cannot be recommended
   7. Create and manage a kind of training plan (Run Sheet) by the Strategist to gather data for strategy calculation
+  8. "Leader on final lap" announcement for the Spotter.
 
 #### Setup Workbench
   1. General detection of counter steering in the telemetry analyzer

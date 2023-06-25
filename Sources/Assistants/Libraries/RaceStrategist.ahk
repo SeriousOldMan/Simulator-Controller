@@ -1150,7 +1150,7 @@ class RaceStrategist extends GridRaceAssistant {
 		return getMultiMapValue(this.Settings, "Session Settings", "Telemetry." . session, default)
 	}
 
-	loadStrategy(facts, strategy, lastPitstop := false, lastLap := false) {
+	loadStrategy(facts, strategy, lastLap := false, lastPitstop := false, lastPitstopLap := false) {
 		local pitstopWindow := (this.Settings ? getMultiMapValue(this.Settings, "Strategy Settings", "Strategy.Window.Considered", 3) : 3)
 		local pitstop, count, ignore, pitstopLap, pitstopMaxLap, first, rootStrategy, pitstopDeviation
 
@@ -1181,7 +1181,8 @@ class RaceStrategist extends GridRaceAssistant {
 		count := 0
 
 		for ignore, pitstop in strategy.Pitstops {
-			if ((lastPitstop && (pitstop.Nr <= lastPitstop)) || (lastLap && (Abs(pitstop.Lap - lastLap) <= pitstopWindow)))
+			if ((lastPitstop && (pitstop.Nr <= lastPitstop)) || (lastPitstopLap && (Abs(pitstop.Lap - lastPitstopLap) <= pitstopWindow))
+															 || (lastLap && (pitstop.Lap < lastLap)))
 				continue
 
 			pitstopLap := pitstop.Lap
@@ -2017,7 +2018,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 	updateStrategy(newStrategy, original := true, report := true, version := false, origin := "Assistant", remote := true) {
 		local knowledgeBase := this.KnowledgeBase
-		local fact, value, fileName, configuration
+		local fact, value, fileName, configuration, lastPitstop
 
 		if version
 			if (this.Strategy && (this.Strategy.Version = version))
@@ -2034,9 +2035,11 @@ class RaceStrategist extends GridRaceAssistant {
 
 				this.clearStrategy()
 
+				lastPitstop := knowledgeBase.getValue("Pitstop.Last", false)
+
 				for fact, value in this.loadStrategy(CaseInsenseMap(), newStrategy
-												   , knowledgeBase.getValue("Pitstop.Last", false)
-												   , knowledgeBase.getValue("Lap", false))
+												   , knowledgeBase.getValue("Lap", false)
+												   , lastPitstop, lastPitstop ? knowledgeBase.getValue("Pitstop." . lastPitstop . ".Lap") : false)
 					knowledgeBase.setFact(fact, value)
 
 				this.dumpKnowledgeBase(knowledgeBase)

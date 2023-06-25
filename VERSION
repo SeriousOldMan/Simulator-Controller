@@ -1,9 +1,9 @@
 [Development]
 Version=5.0.9.1-dev
 Target=5.0.9.1-release
-Date=06/23/2023
+Date=06/25/2023
 Download=
-Changes=Security question when renewing the data token
+Changes=Security question when renewing the data token, Traffic simulation respects the pitstop timer when computing a pitstop lap, Further reduce idiotic Spotter gap announcements
 [Release]
 Version=5.0.9.0-release
 Date=06/23/2023

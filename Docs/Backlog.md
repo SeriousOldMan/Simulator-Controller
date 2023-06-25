@@ -20,6 +20,9 @@
   7. Create and manage a kind of training plan (Run Sheet) by the Strategist to gather data for strategy calculation
   8. "Leader on final lap" announcement for the Spotter.
 
+#### Race Center
+  1. Change hot target pressures for the next pitstop.
+
 #### Setup Workbench
   1. General detection of counter steering in the telemetry analyzer
   2. Collect telemetry data from multiple drivers and generate combined setup recommendations

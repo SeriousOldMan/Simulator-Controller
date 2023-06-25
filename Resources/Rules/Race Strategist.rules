@@ -287,14 +287,16 @@ currentTyreCompound() <= currentTyreCompound(?compound, ?color), Set(Tyre.Compou
 ;;; This rule set will compute the best possible pitstop strategy.          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-priority: 5, [?Pitstop.Strategy.Plan] => (Clear: Pitstop.Strategy.Lap)
+priority: 5, [?Pitstop.Strategy.Plan] => (Clear: Pitstop.Strategy.Lap), (Prove: setMaxLap())
+
+setMaxLap() <= unbound(!Pitstop.Strategy.Lap.Max), Set(Pitstop.Strategy.Lap.Max, 99999)
 
 {All: [?Pitstop.Strategy.Plan = true], {Prove: pitstopRequired(!Lap)}} => (Prove: updatePitstopStrategy(!Lap))
 {All: [?Pitstop.Strategy.Plan > 1], {Prove: pitstopRequired(!Lap)}} => (Prove: updatePitstopStrategy(!Pitstop.Strategy.Plan))
 
 {All: {None: [?Pitstop.Strategy.Lap]}, [?Lap.Remaining.Session < ?Lap.Remaining.Fuel]} => (Set: Pitstop.Strategy.Lap, false)
 
-priority: -5, [?Pitstop.Strategy.Plan] => (Clear: Pitstop.Strategy.Plan)
+priority: -5, [?Pitstop.Strategy.Plan] => (Clear: Pitstop.Strategy.Plan), (Clear: Pitstop.Strategy.Lap.Max)
 
 pitstopRequired(?lap) <= Get(Strategy.Pitstop.Lap, ?strategyLap)
 pitstopRequired(?lap) <= plannedPitstopLap(?pitstopLap), ?pitstopLap =< !Lap.Remaining.Session
@@ -321,7 +323,8 @@ updatePitstopStrategy(?targetLap, ?remainingLaps) <= pitstopWindow(!Lap, ?target
 pitstopWindow(?lap, ?targetLap, ?remainingLaps, ?fromLap, ?toLap) <=
 		?temp = ?targetLap + ?remainingLaps, ?maxLap = ?temp - 1,
 		?tempSL = ?targetLap - !Session.Settings.Pitstop.Strategy.Window.Considered, max(?lap, ?tempSL, ?fromLap),
-		?tempTL = ?targetLap + !Session.Settings.Pitstop.Strategy.Window.Considered, min(?maxLap, ?tempTL, ?toLap)
+		?tempTL1 = ?targetLap + !Session.Settings.Pitstop.Strategy.Window.Considered, min(?maxLap, ?tempTL1, ?tempTL2),
+		min(!Pitstop.Strategy.Lap.Max, ?tempTL2, ?toLap)
 
 choosePitstopStrategy(?lap, ?fromLap, ?fromLap) <= !, Set(Pitstop.Strategy.Lap, ?fromLap)
 choosePitstopStrategy(?lap, ?fromLap, ?toLap) <= createPitstopScenarios(?lap, ?fromLap, ?toLap,

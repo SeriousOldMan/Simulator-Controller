@@ -1150,9 +1150,9 @@ class RaceStrategist extends GridRaceAssistant {
 		return getMultiMapValue(this.Settings, "Session Settings", "Telemetry." . session, default)
 	}
 
-	loadStrategy(facts, strategy, lastPitstop := false, lastLap := false) {
+	loadStrategy(facts, strategy, lastLap := false, lastPitstop := false, lastPitstopLap := false) {
 		local pitstopWindow := (this.Settings ? getMultiMapValue(this.Settings, "Strategy Settings", "Strategy.Window.Considered", 3) : 3)
-		local pitstop, count, ignore, pitstopLap, first, rootStrategy, pitstopDeviation
+		local pitstop, count, ignore, pitstopLap, pitstopMaxLap, first, rootStrategy, pitstopDeviation
 
 		strategy.RunningPitstops := 0
 		strategy.RunningLaps := 0
@@ -1176,10 +1176,13 @@ class RaceStrategist extends GridRaceAssistant {
 
 		facts["Strategy.Pitstop.Deviation"] := Max(3, pitstopDeviation, pitstopWindow)
 
+		pitstopMaxLap := (strategy.StartLap + strategy.StintLaps["Max"])
+
 		count := 0
 
 		for ignore, pitstop in strategy.Pitstops {
-			if ((lastPitstop && (pitstop.Nr <= lastPitstop)) || (lastLap && (Abs(pitstop.Lap - lastLap) <= pitstopWindow)))
+			if ((lastPitstop && (pitstop.Nr <= lastPitstop)) || (lastPitstopLap && (Abs(pitstop.Lap - lastPitstopLap) <= pitstopWindow))
+															 || (lastLap && (pitstop.Lap < lastLap)))
 				continue
 
 			pitstopLap := pitstop.Lap
@@ -1194,11 +1197,14 @@ class RaceStrategist extends GridRaceAssistant {
 			}
 
 			facts["Strategy.Pitstop." . A_Index . ".Lap"] := pitstopLap
+			facts["Strategy.Pitstop." . A_Index . ".Lap.Max"] := pitstopMaxLap
 			facts["Strategy.Pitstop." . A_Index . ".Fuel.Amount"] := pitstop.RefuelAmount
 			facts["Strategy.Pitstop." . A_Index . ".Tyre.Change"] := pitstop.TyreChange
 			facts["Strategy.Pitstop." . A_Index . ".Tyre.Compound"] := pitstop.TyreCompound
 			facts["Strategy.Pitstop." . A_Index . ".Tyre.Compound.Color"] := pitstop.TyreCompoundColor
 			facts["Strategy.Pitstop." . A_Index . ".Map"] := pitstop.Map
+
+			pitstopMaxLap := (pitstopLap + pitstop.StintLaps["Max"])
 		}
 
 		facts["Strategy.Pitstop.Count"] := count
@@ -1973,7 +1979,7 @@ class RaceStrategist extends GridRaceAssistant {
 		loop knowledgeBase.getValue("Strategy.Pitstop.Count", 0) {
 			pitstop := A_Index
 
-			for ignore, theFact in [".Lap", ".Fuel.Amount", ".Tyre.Change", ".Tyre.Compound", ".Tyre.Compound.Color", ".Map"]
+			for ignore, theFact in [".Lap", ".Lap.Max", ".Fuel.Amount", ".Tyre.Change", ".Tyre.Compound", ".Tyre.Compound.Color", ".Map"]
 				knowledgeBase.clearFact("Strategy.Pitstop." . pitstop . theFact)
 		}
 
@@ -2012,7 +2018,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 	updateStrategy(newStrategy, original := true, report := true, version := false, origin := "Assistant", remote := true) {
 		local knowledgeBase := this.KnowledgeBase
-		local fact, value, fileName, configuration
+		local fact, value, fileName, configuration, lastPitstop
 
 		if version
 			if (this.Strategy && (this.Strategy.Version = version))
@@ -2029,9 +2035,11 @@ class RaceStrategist extends GridRaceAssistant {
 
 				this.clearStrategy()
 
+				lastPitstop := knowledgeBase.getValue("Pitstop.Last", false)
+
 				for fact, value in this.loadStrategy(CaseInsenseMap(), newStrategy
-												   , knowledgeBase.getValue("Pitstop.Last", false)
-												   , knowledgeBase.getValue("Lap", false))
+												   , knowledgeBase.getValue("Lap", false)
+												   , lastPitstop, lastPitstop ? knowledgeBase.getValue("Pitstop." . lastPitstop . ".Lap") : false)
 					knowledgeBase.setFact(fact, value)
 
 				this.dumpKnowledgeBase(knowledgeBase)
@@ -2849,6 +2857,7 @@ class RaceStrategist extends GridRaceAssistant {
 		local tyreCompound := kUndefined
 		local tyreCompoundColor := kUndefined
 		local strategyLap := false
+		local maxLap := false
 		local lastLap, plannedLap, position, traffic, hasEngineer, nextPitstop, pitstopOptions
 
 		this.clearContinuation()
@@ -2862,6 +2871,7 @@ class RaceStrategist extends GridRaceAssistant {
 		if strategyLap {
 			nextPitstop := knowledgeBase.getValue("Strategy.Pitstop.Next")
 
+			maxLap := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Lap.Max", false)
 			refuel := Round(knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Fuel.Amount"))
 			tyreChange := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Change")
 			tyreCompound := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Compound")
@@ -2875,6 +2885,9 @@ class RaceStrategist extends GridRaceAssistant {
 			lap := strategyLap
 
 		knowledgeBase.setFact("Pitstop.Strategy.Plan", lap ? lap : true)
+
+		if maxLap
+			knowledgeBase.setFact("Pitstop.Strategy.Lap.Max", maxLap)
 
 		knowledgeBase.produce()
 
@@ -3137,12 +3150,18 @@ class RaceStrategist extends GridRaceAssistant {
 
 	reportUpcomingPitstop(plannedPitstopLap) {
 		local knowledgeBase := this.KnowledgeBase
-		local speaker, plannedLap, nextPitstop, refuel, tyreChange, tyreCompound, tyreCompoundColor
+		local speaker, plannedLap, nextPitstop, maxLap
 
 		if (this.Speaker[false]) {
 			speaker := this.getSpeaker()
 
 			knowledgeBase.setFact("Pitstop.Strategy.Plan", plannedPitstopLap)
+
+			nextPitstop := knowledgeBase.getValue("Strategy.Pitstop.Next")
+			maxLap := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Lap.Max", false)
+
+			if maxLap
+				knowledgeBase.setFact("Pitstop.Strategy.Lap.Max", maxLap)
 
 			knowledgeBase.produce()
 

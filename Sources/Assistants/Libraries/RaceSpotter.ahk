@@ -652,18 +652,23 @@ class PositionInfo {
 		local newObserved := ((this.isLeader() ? "L" : "") . (trackAhead ? "TA" : "") . (trackBehind ? "TB" : "")
 							. (standingsAhead ? "SA" : "") . (standingsBehind ? "SB" : ""))
 
-		if this.Car.InPit {
+		if this.Spotter.DriverCar.InPit {
+			this.reset(sector, true, true)
+
+			this.iObserved := newObserved
+		}
+		else if this.Car.InPit {
 			if !InStr(this.iObserved, "P")
 				this.iObserved .= "P"
 
 			this.reset(sector, true, true)
 		}
-		else if this.Spotter.DriverCar.InPit {
+		else if (newObserved != oldObserved) {
 			this.reset(sector, true, true)
 
 			this.iObserved := newObserved
-		}
-		else if (newObserved != oldObserved) {
+
+			/*
 			if (((trackAhead && standingsBehind) || (trackBehind && standingsAhead))
 			 && (this.Car.LastLap = this.Spotter.DriverCar.LastLap)) {
 				; Can happen in ACC due to asynchronous position updating
@@ -691,6 +696,7 @@ class PositionInfo {
 
 				this.iObserved := newObserved
 			}
+			*/
 		}
 		else if ((newObserved = "") || (newObserved = "L"))
 			this.rebase(sector)

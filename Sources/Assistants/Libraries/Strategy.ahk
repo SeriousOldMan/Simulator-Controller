@@ -1630,9 +1630,12 @@ class Strategy extends ConfigurationItem {
 			}
 		}
 
-		StintLaps {
+		StintLaps[max := false] {
 			Get {
-				return this.iStintLaps
+				if (max = "Max")
+					return Floor((this.Strategy.StintLength * 60) / this.AvgLapTime)
+				else
+					return this.iStintLaps
 			}
 		}
 
@@ -2205,7 +2208,9 @@ class Strategy extends ConfigurationItem {
 
 	StintLaps[lastStint := false] {
 		Get {
-			if (lastStint && this.LastPitstop)
+			if (lastStint = "Max")
+				return Floor(((this.StintLength * 60) - this.StintStartTime) / this.AvgLapTime)
+			else if (lastStint && this.LastPitstop)
 				return this.LastPitstop.StintLaps
 			else
 				return this.iStintLaps
@@ -3494,9 +3499,10 @@ class TrafficStrategy extends Strategy {
 
 			rnd := Random(-1.0, 1.0)
 
-			return Floor(Max(currentLap, targetLap + ((rnd > 0) ? Floor(rnd * Max(0, Min(variationWindow
-																					   , ((remainingFuel - ((targetLap - currentLap) * fuelConsumption)) / fuelConsumption))))
-																: (rnd * variationWindow))))
+			return Min(currentLap + remainingStintLaps
+					 , Floor(Max(currentLap, targetLap + ((rnd > 0) ? Floor(rnd * Max(0, Min(variationWindow
+																						   , ((remainingFuel - ((targetLap - currentLap) * fuelConsumption)) / fuelConsumption))))
+																	: (rnd * variationWindow)))))
 		}
 		else
 			return targetLap

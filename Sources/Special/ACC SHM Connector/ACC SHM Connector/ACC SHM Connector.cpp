@@ -77,6 +77,12 @@ void dismiss(SMElement element)
 	CloseHandle(element.hMapFile);
 }
 
+inline string getString(wchar_t* str) {
+	wstring s(str);
+
+	return string(s.begin(), s.end());
+}
+
 void printNAData(ostringstream* output, string name, long value)
 {
 	if (value == -1)
@@ -268,9 +274,7 @@ extern "C" __declspec(dllexport) int __stdcall dispose() {
 extern "C" __declspec(dllexport) int __stdcall collect(char* request, char* result, int size)
 {
 	ostringstream output;
-	int cmp = strcmp(request, "Full");
-	int len = strlen(request);
-
+	
 	if (strcmp(request, "Car Data") == 0 || strcmp(request, "Full") == 0)
 	{
 		output << "[Car Data]" << endl;
@@ -288,7 +292,7 @@ extern "C" __declspec(dllexport) int __stdcall collect(char* request, char* resu
 		printData(&output, "Ignition", pf->ignitionOn ? "true" : "false");
 		printData(&output, "HeadLights", (gf->lightsStage == 0) ? "Off" : (gf->lightsStage == 1) ? "Low" : "High");
 		printData(&output, "RainLights", gf->rainLights ? "true" : "false");
-		printData(&output, "PitLimiter=", (pf->pitLimiterOn == 0) ? "false" : "true");
+		printData(&output, "PitLimiter", (pf->pitLimiterOn == 0) ? "false" : "true");
 
 		printData(&output, "BodyworkDamage", pf->carDamage);
 		printData(&output, "SuspensionDamage", pf->suspensionDamage);
@@ -312,10 +316,10 @@ extern "C" __declspec(dllexport) int __stdcall collect(char* request, char* resu
 
 		SPageFileStatic* sf = (SPageFileStatic*)m_static.mapFileBuffer;
 		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
-
-		output << "DriverForname=" << sf->playerName << endl;
-		output << "DriverSurname=" << sf->playerSurname << endl;
-		output << "DriverNickname=" << sf->playerNick << endl;
+		
+		output << "DriverForname=" << getString(sf->playerName) << endl;
+		output << "DriverSurname=" << getString(sf->playerSurname) << endl;
+		output << "DriverNickname=" << getString(sf->playerNick) << endl;
 		printData(&output, "Sector", gf->currentSectorIndex + 1);
 		printData(&output, "Laps", gf->completedLaps);
 
@@ -388,8 +392,8 @@ extern "C" __declspec(dllexport) int __stdcall collect(char* request, char* resu
 		printData(&output, "Paused", ((gf->status == AC_PAUSE) || (gf->status == AC_REPLAY)) ? "true" : "false");
 		printData(&output, "Session", getSession(gf->session));
 		output << "ID=" << gf->playerCarID << endl;
-		output << "Car=" << sf->carModel << endl;
-		output << "Track=" << sf->track << endl;
+		output << "Car=" << getString(sf->carModel) << endl;
+		output << "Track=" << getString(sf->track) << endl;
 		output << "SessionFormat=Time" << endl;
 		printData(&output, "FuelAmount", sf->maxFuel);
 
@@ -437,7 +441,7 @@ extern "C" __declspec(dllexport) int __stdcall collect(char* request, char* resu
 	}
 
 	strcpy_s(result, size, output.str().c_str());
-
+	
 	return 0;
 }
 

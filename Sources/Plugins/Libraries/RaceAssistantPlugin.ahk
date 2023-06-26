@@ -1259,7 +1259,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 		if RaceAssistantPlugin.Simulator {
 			if !data
-				data := readSimulatorData(RaceAssistantPlugin.Simulator.Code)
+				data := RaceAssistantPlugin.Simulator.readSessionData()
 
 			return getDataSession(data, &ignore)
 		}
@@ -2185,7 +2185,7 @@ getSimulatorOptions(plugin := false) {
 	plugin := findActivePlugin(plugin)
 
 	if (plugin && plugin.Simulator) {
-		data := readSimulatorData(plugin.Simulator.Code)
+		data := plugin.Simulator.readSessionData()
 
 		if getMultiMapValue(data, "Session Data", "Active", false) {
 			options := "-Simulator `"" . SessionDatabase.getSimulatorName(plugin.Simulator.runningSimulator()) . "`""

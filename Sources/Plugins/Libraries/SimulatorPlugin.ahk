@@ -1152,17 +1152,16 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	acquireTelemetryData() {
-		local code, trackData, data
+		local trackData, data
 
 		static sessionDB := false
 
 		if !sessionDB
 			sessionDB := SessionDatabase()
 
-		code := this.Code
-		trackData := sessionDB.getTrackData(code, this.Track)
+		trackData := sessionDB.getTrackData(this.Code, this.Track)
 
-		return (trackData ? readSimulatorData(code, "-Track `"" . trackData . "`"") : readSimulatorData(code))
+		return (trackData ? this.readSessionData("-Track `"" . trackData . "`"") : this.readSessionData())
 	}
 
 	acquirePositionsData(telemetryData) {
@@ -1177,7 +1176,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 			setMultiMapValues(positionsData, "Position Data", getMultiMapValues(telemetryData, "Position Data"))
 		}
 		else
-			positionsData := readSimulatorData(this.Code, "-Standings")
+			positionsData := this.readSessionData("-Standings")
 
 		count := getMultiMapValue(positionsData, "Position Data", "Car.Count", 0)
 
@@ -1246,6 +1245,10 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		}
 
 		return data
+	}
+
+	readSessionData(options := "") {
+		return readSimulatorData(this.Code, options)
 	}
 }
 

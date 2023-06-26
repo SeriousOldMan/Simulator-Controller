@@ -356,3 +356,4 @@ struct SPageFileStatic
 
 
 #pragma pack(pop)
+#pragma once

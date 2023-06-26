@@ -5,6 +5,7 @@
 #include <tchar.h>
 #include <comdef.h>
 #include <iostream>
+#include <sstream>
 #include "SharedFileOut.h"
 #pragma optimize("",off)
 using namespace std;
@@ -21,9 +22,9 @@ struct SMElement
 	unsigned char* mapFileBuffer;
 };
 
-SMElement m_graphics;
-SMElement m_physics;
-SMElement m_static;
+static SMElement m_graphics;
+static SMElement m_physics;
+static SMElement m_static;
 
 void initPhysics()
 {
@@ -76,78 +77,77 @@ void dismiss(SMElement element)
 	CloseHandle(element.hMapFile);
 }
 
-void printNAData(string name, long value)
+void printNAData(ostringstream* output, string name, long value)
 {
 	if (value == -1)
-		wcout << name.c_str() << "=" << "n/a" << endl;
+		(*output) << name.c_str() << "=" << "n/a" << endl;
 	else {
-		wcout << name.c_str() << "=" << fixed << value << endl;
+		(*output) << name.c_str() << "=" << fixed << value << endl;
 
-		wcout.setf(0, ios::floatfield);
+		(*output).setf(0, ios::floatfield);
 	}
 }
 
-void printData(string name, float value)
+void printData(ostringstream* output, string name, float value)
 {
 	if (round(value) == value) {
-		int old_precision = wcout.precision();
-		
-		wcout.precision(0);
+		int old_precision = (*output).precision();
 
-		wcout << name.c_str() << "=" << fixed << value << endl;
+		(*output).precision(0);
 
-		wcout.setf(0, ios::floatfield);
+		(*output) << name.c_str() << "=" << fixed << value << endl;
 
-		wcout.precision(old_precision);
+		(*output).setf(0, ios::floatfield);
+
+		(*output).precision(old_precision);
 	}
 	else
-		wcout << name.c_str() << "=" << value << endl;
+		(*output) << name.c_str() << "=" << value << endl;
 }
 
-void printData(string name, string value)
+void printData(ostringstream* output, string name, string value)
 {
-	wcout << name.c_str() << "=" << value.c_str() << endl;
+	(*output) << name.c_str() << "=" << value.c_str() << endl;
 }
 
 template <typename T, unsigned S>
-inline void printData(const string name, const T(&v)[S])
+inline void printData(ostringstream* output, const string name, const T(&v)[S])
 {
-	wcout << name.c_str() << "=";
-    
-    for (int i = 0; i < S; i++)
-    {
-        wcout << v[i];
+	(*output) << name.c_str() << "=";
 
-        if (i < S - 1)
-			wcout << ", ";
-    }
+	for (int i = 0; i < S; i++)
+	{
+		(*output) << v[i];
 
-	wcout << endl;
+		if (i < S - 1)
+			(*output) << ", ";
+	}
+
+	(*output) << endl;
 }
 
 template <typename T, unsigned S, unsigned S2>
-inline void printData2(const string name, const T(&v)[S][S2])
+inline void printData2(ostringstream* output, const string name, const T(&v)[S][S2])
 {
-    wcout << name.c_str() << "=";
+	(*output) << name.c_str() << "=";
 
-    for (int i = 0; i < S; i++)
-    {
-        wcout << i << ": ";
-    
+	for (int i = 0; i < S; i++)
+	{
+		(*output) << i << ": ";
+
 		for (int j = 0; j < S2; j++) {
-            wcout << v[i][j];
-        
+			(*output) << v[i][j];
+
 			if (j < S2 - 1)
-                wcout << ", ";
-        }
+				(*output) << ", ";
+		}
 
 		if (i < (S - 1))
-			wcout << "; ";
-       
-    }
+			(*output) << "; ";
 
-	wcout << endl;
+	}
 
+	(*output) << endl;
 }
 
 inline const string getGrip(ACC_TRACK_GRIP_STATUS gripStatus) {
@@ -249,23 +249,31 @@ inline const string getPenalty(PenaltyShortcut penalty) {
 	}
 }
 
-void startup() {
+extern "C" __declspec(dllexport) int __stdcall initialize() {
 	initPhysics();
 	initGraphics();
 	initStatic();
+
+	return 0;
 }
 
-void shutdown() {
+extern "C" __declspec(dllexport) int __stdcall dispose() {
 	dismiss(m_graphics);
 	dismiss(m_physics);
 	dismiss(m_static);
+
+	return 0;
 }
 
-int collect(int argc, char* argv[])
+extern "C" __declspec(dllexport) int __stdcall collect(char* request, char* result, int size)
 {
-	if ((argc == 1) || strchr(argv[1], 'C'))
+	ostringstream output;
+	int cmp = strcmp(request, "Full");
+	int len = strlen(request);
+
+	if (strcmp(request, "Car Data") == 0 || strcmp(request, "Full") == 0)
 	{
-		wcout << "[Car Data]" << endl;
+		output << "[Car Data]" << endl;
 
 		SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
 		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
@@ -273,73 +281,57 @@ int collect(int argc, char* argv[])
 		_bstr_t tc(gf->tyreCompound);
 		std::string tyreCompound(tc);
 
-		printNAData("MAP", gf->EngineMap + 1);
-		printNAData("TC", gf->TC);
-		printNAData("ABS", gf->ABS);
+		printNAData(&output, "MAP", gf->EngineMap + 1);
+		printNAData(&output, "TC", gf->TC);
+		printNAData(&output, "ABS", gf->ABS);
 
-		printData("Ignition", pf->ignitionOn ? "true" : "false");
-		printData("HeadLights", (gf->lightsStage == 0) ? "Off" : (gf->lightsStage == 1) ? "Low" : "High");
-		printData("RainLights", gf->rainLights ? "true" : "false");
+		printData(&output, "Ignition", pf->ignitionOn ? "true" : "false");
+		printData(&output, "HeadLights", (gf->lightsStage == 0) ? "Off" : (gf->lightsStage == 1) ? "Low" : "High");
+		printData(&output, "RainLights", gf->rainLights ? "true" : "false");
+		printData(&output, "PitLimiter=", (pf->pitLimiterOn == 0) ? "false" : "true");
 
-		printData("BodyworkDamage", pf->carDamage);
-		printData("SuspensionDamage", pf->suspensionDamage);
-		printData("EngineDamage", 0);
-		printData("FuelRemaining", pf->fuel);
-		wcout << "TyreCompound=" << ((tyreCompound.compare("dry_compound") == 0) ? "Dry" : "Wet") << endl;
-		wcout << "TyreCompoundColor=Black" << endl;
-		printData("TyreSet", gf->currentTyreSet);
-		printData("TyreTemperature", pf->tyreCoreTemperature);
-		printData("TyrePressure", pf->wheelsPressure);
-		printData("BrakeTemperature", pf->brakeTemp);
-		printData("BrakePadLifeRaw", pf->padLife);
-		printData("BrakeDiscLifeRaw", pf->discLife);
-		printData("FrontBrakePadCompoundRaw", pf->frontBrakeCompound + 1);
-		printData("RearBrakePadCompoundRaw", pf->rearBrakeCompound + 1);
+		printData(&output, "BodyworkDamage", pf->carDamage);
+		printData(&output, "SuspensionDamage", pf->suspensionDamage);
+		printData(&output, "EngineDamage", 0);
+		printData(&output, "FuelRemaining", pf->fuel);
+		output << "TyreCompound=" << ((tyreCompound.compare("dry_compound") == 0) ? "Dry" : "Wet") << endl;
+		output << "TyreCompoundColor=Black" << endl;
+		printData(&output, "TyreSet", gf->currentTyreSet);
+		printData(&output, "TyreTemperature", pf->tyreCoreTemperature);
+		printData(&output, "TyrePressure", pf->wheelsPressure);
+		printData(&output, "BrakeTemperature", pf->brakeTemp);
+		printData(&output, "BrakePadLifeRaw", pf->padLife);
+		printData(&output, "BrakeDiscLifeRaw", pf->discLife);
+		printData(&output, "FrontBrakePadCompoundRaw", pf->frontBrakeCompound + 1);
+		printData(&output, "RearBrakePadCompoundRaw", pf->rearBrakeCompound + 1);
 	}
 
-	if ((argc == 1) || (argv[1][0] == 'D'))
+	if (strcmp(request, "Stint Data") == 0 || strcmp(request, "Full") == 0)
 	{
-		wcout << "[Stint Data]" << endl;
+		output << "[Stint Data]" << endl;
 
 		SPageFileStatic* sf = (SPageFileStatic*)m_static.mapFileBuffer;
 		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
-		
-		wcout << "DriverForname=" << sf->playerName << endl;
-		wcout << "DriverSurname=" << sf->playerSurname << endl;
-		wcout << "DriverNickname=" << sf->playerNick << endl;
-		printData("Sector", gf->currentSectorIndex + 1);
-		printData("Laps", gf->completedLaps);
-		
-		printData("LapValid", gf->isValidLap ? "true" : "false");
-		printData("LapLastTime", gf->iLastTime);
-		printData("LapBestTime", gf->iBestTime);
 
-		wcout << "Position=" << gf->position << endl;
-		
+		output << "DriverForname=" << sf->playerName << endl;
+		output << "DriverSurname=" << sf->playerSurname << endl;
+		output << "DriverNickname=" << sf->playerNick << endl;
+		printData(&output, "Sector", gf->currentSectorIndex + 1);
+		printData(&output, "Laps", gf->completedLaps);
+
+		printData(&output, "LapValid", gf->isValidLap ? "true" : "false");
+		printData(&output, "LapLastTime", gf->iLastTime);
+		printData(&output, "LapBestTime", gf->iBestTime);
+
+		output << "Position=" << gf->position << endl;
+
 		string penalty = getPenalty(gf->penalty);
 
 		if (penalty.length() != 0)
-			printData("Penalty", penalty);
+			printData(&output, "Penalty", penalty);
 
-		printData("GapAhead", gf->gapAhead);
-		printData("GapBehind", gf->gapBehind);
-
-		/*
-		if (gf->session == AC_PRACTICE) {
-			printData("StintTimeRemaining", 3600000);
-			printData("DriverTimeRemaining", 3600000);
-		}
-		else {
-			double timeLeft = gf->sessionTimeLeft;
-
-			if (timeLeft < 0) {
-				timeLeft = 3600.0 * 1000;
-			}
-
-			printData("StintTimeRemaining", gf->DriverStintTimeLeft < 0 ? timeLeft : gf->DriverStintTimeLeft);
-			printData("DriverTimeRemaining", gf->DriverStintTotalTimeLeft < 0 ? timeLeft : gf->DriverStintTotalTimeLeft);
-		}
-		*/
+		printData(&output, "GapAhead", gf->gapAhead);
+		printData(&output, "GapBehind", gf->gapBehind);
 
 		long timeLeft = (long)gf->sessionTimeLeft;
 
@@ -349,57 +341,57 @@ int collect(int argc, char* argv[])
 			else
 				timeLeft = 0.0;
 
-		printData("StintTimeRemaining", gf->DriverStintTimeLeft < 0 ? timeLeft : gf->DriverStintTimeLeft);
-		printData("DriverTimeRemaining", gf->DriverStintTotalTimeLeft < 0 ? timeLeft : gf->DriverStintTotalTimeLeft);
+		printData(&output, "StintTimeRemaining", gf->DriverStintTimeLeft < 0 ? timeLeft : gf->DriverStintTimeLeft);
+		printData(&output, "DriverTimeRemaining", gf->DriverStintTotalTimeLeft < 0 ? timeLeft : gf->DriverStintTotalTimeLeft);
 
-		printData("InPitLane", gf->isInPit ? "true" : "false");
-		printData("InPit", gf->isInPit ? "true" : "false");
+		printData(&output, "InPitLane", gf->isInPit ? "true" : "false");
+		printData(&output, "InPit", gf->isInPit ? "true" : "false");
 	}
 
-	if ((argc == 1) || strchr(argv[1], 'T'))
+	if (strcmp(request, "Track Data") == 0 || strcmp(request, "Full") == 0)
 	{
-		wcout << "[Track Data]" << endl;
+		output << "[Track Data]" << endl;
 
 		SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
 		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
-		printData("Temperature", pf->roadTemp);
-		printData("Grip", getGrip(gf->trackGripStatus));
+		printData(&output, "Temperature", pf->roadTemp);
+		printData(&output, "Grip", getGrip(gf->trackGripStatus));
 
 		for (int id = 0; id < gf->activeCars; id++) {
-			wcout << "Car." << id + 1 << ".ID=" << gf->carID[id] << endl;
-			wcout << "Car." << id + 1 << ".Position=" << gf->carCoordinates[id][0] << "," << gf->carCoordinates[id][2] << endl;
+			output << "Car." << id + 1 << ".ID=" << gf->carID[id] << endl;
+			output << "Car." << id + 1 << ".Position=" << gf->carCoordinates[id][0] << "," << gf->carCoordinates[id][2] << endl;
 		}
 	}
-	
-	if ((argc == 1) || (argv[1][0] == 'W'))
+
+	if (strcmp(request, "Weather Data") == 0 || strcmp(request, "Full") == 0)
 	{
-		wcout << "[Weather Data]" << endl;
+		output << "[Weather Data]" << endl;
 
 		SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
 		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
-		printData("Temperature", pf->airTemp);
-		printData("Weather", getWeather(gf->rainIntensity));
-		printData("Weather10min", getWeather(gf->rainIntensityIn10min));
-		printData("Weather30min", getWeather(gf->rainIntensityIn30min));
+		printData(&output, "Temperature", pf->airTemp);
+		printData(&output, "Weather", getWeather(gf->rainIntensity));
+		printData(&output, "Weather10min", getWeather(gf->rainIntensityIn10min));
+		printData(&output, "Weather30min", getWeather(gf->rainIntensityIn30min));
 	}
 
-	if ((argc == 1) || (argv[1][0] == 'S'))
+	if (strcmp(request, "Session Data") == 0 || strcmp(request, "Full") == 0)
 	{
-		wcout << "[Session Data]" << endl;
+		output << "[Session Data]" << endl;
 
 		SPageFileStatic* sf = (SPageFileStatic*)m_static.mapFileBuffer;
 		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
-		printData("Active", ((gf->status == AC_LIVE) || (gf->status == AC_PAUSE) || (gf->status == AC_REPLAY)) ? "true" : "false");
-		printData("Paused", ((gf->status == AC_PAUSE) || (gf->status == AC_REPLAY)) ? "true" : "false");
-		printData("Session", getSession(gf->session));
-		wcout << "ID=" << gf->playerCarID << endl;
-		wcout << "Car=" << sf->carModel << endl;
-		wcout << "Track=" << sf->track << endl;
-		wcout << "SessionFormat=Time" << endl;
-		printData("FuelAmount", sf->maxFuel);
+		printData(&output, "Active", ((gf->status == AC_LIVE) || (gf->status == AC_PAUSE) || (gf->status == AC_REPLAY)) ? "true" : "false");
+		printData(&output, "Paused", ((gf->status == AC_PAUSE) || (gf->status == AC_REPLAY)) ? "true" : "false");
+		printData(&output, "Session", getSession(gf->session));
+		output << "ID=" << gf->playerCarID << endl;
+		output << "Car=" << sf->carModel << endl;
+		output << "Track=" << sf->track << endl;
+		output << "SessionFormat=Time" << endl;
+		printData(&output, "FuelAmount", sf->maxFuel);
 
 		long timeLeft = gf->sessionTimeLeft;
 
@@ -409,17 +401,17 @@ int collect(int argc, char* argv[])
 			else
 				timeLeft = 0.0;
 
-		printData("SessionTimeRemaining", timeLeft);
+		printData(&output, "SessionTimeRemaining", timeLeft);
 
 		if (gf->session == AC_PRACTICE)
-			printData("SessionLapsRemaining", 1000);
+			printData(&output, "SessionLapsRemaining", 1000);
 		else
-			printData("SessionLapsRemaining", (gf->iLastTime > 0) ? timeLeft / gf->iLastTime : 99);
+			printData(&output, "SessionLapsRemaining", (gf->iLastTime > 0) ? timeLeft / gf->iLastTime : 99);
 	}
 
-	if ((argc == 1) || ((argc == 2) && (strcmp(argv[1], "-Setup") == 0)))
+	if (strcmp(request, "Setup Data") == 0 || strcmp(request, "Full") == 0)
 	{
-		wcout << "[Setup Data]" << endl;
+		output << "[Setup Data]" << endl;
 
 		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 		SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
@@ -428,26 +420,39 @@ int collect(int argc, char* argv[])
 		std::string tyreCompound(tc);
 
 		if ((gf->trackGripStatus >= ACC_DAMP) || (gf->rainIntensityIn10min >= ACC_LIGHT_RAIN))
-			wcout << "TyreCompound=Wet" << endl;
+			output << "TyreCompound=Wet" << endl;
 		else
-			wcout << "TyreCompound=" << ((tyreCompound.compare("dry_compound") == 0) ? "Dry" : "Wet") << endl;
+			output << "TyreCompound=" << ((tyreCompound.compare("dry_compound") == 0) ? "Dry" : "Wet") << endl;
 
-		wcout << "TyreCompoundColor=Black" << endl;
-		
-		printData("TyreSet", gf->mfdTyreSet + 1);
-		printData("TyreSetCurrent", gf->currentTyreSet + 1);
-		printData("TyreSetStrategy", gf->strategyTyreSet + 1);
-		printData("FuelAmount", gf->mfdFuelToAdd);
-		printData("TyrePressureFL", gf->mfdTyrePressureFL);
-		printData("TyrePressureFR", gf->mfdTyrePressureFR);
-		printData("TyrePressureRL", gf->mfdTyrePressureRL);
-		printData("TyrePressureRR", gf->mfdTyrePressureRR);
-		
-		if (argc == 2) {
-			wcout << "[Car Data]" << endl;
-			wcout << "PitLimiter=" << ((pf->pitLimiterOn == 0) ? "false" : "true") << endl;
-		}
+		output << "TyreCompoundColor=Black" << endl;
+
+		printData(&output, "TyreSet", gf->mfdTyreSet + 1);
+		printData(&output, "TyreSetCurrent", gf->currentTyreSet + 1);
+		printData(&output, "TyreSetStrategy", gf->strategyTyreSet + 1);
+		printData(&output, "FuelAmount", gf->mfdFuelToAdd);
+		printData(&output, "TyrePressureFL", gf->mfdTyrePressureFL);
+		printData(&output, "TyrePressureFR", gf->mfdTyrePressureFR);
+		printData(&output, "TyrePressureRL", gf->mfdTyrePressureRL);
+		printData(&output, "TyrePressureRR", gf->mfdTyrePressureRR);
 	}
 
+	strcpy_s(result, size, output.str().c_str());
+
 	return 0;
+}
+
+BOOL APIENTRY DllMain(HMODULE hModule,
+	DWORD  ul_reason_for_call,
+	LPVOID lpReserved
+)
+{
+	switch (ul_reason_for_call)
+	{
+	case DLL_PROCESS_ATTACH:
+	case DLL_THREAD_ATTACH:
+	case DLL_THREAD_DETACH:
+	case DLL_PROCESS_DETACH:
+		break;
+	}
+	return TRUE;
 }

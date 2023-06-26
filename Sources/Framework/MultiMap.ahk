@@ -75,16 +75,13 @@ newMultiMap(arguments*) {
 }
 
 newSectionMap(arguments*) {
-	return MultiMap(arguments*)
+	return CaseInsenseWeakMap(arguments*)
 }
 
 readMultiMap(multiMapFile) {
-	local multiMap := newMultiMap()
-	local section := false
 	local file := false
 	local tries := 20
 	local data := false
-	local currentLine, firstChar, keyValue, key, value
 
 	multiMapFile := getFileName(multiMapFile, kUserConfigDirectory, kConfigDirectory)
 
@@ -105,55 +102,51 @@ readMultiMap(multiMapFile) {
 			}
 			catch Any as exception {
 				if (tries-- <= 0)
-					return multiMap
+					return newMultiMap()
 				else
 					Sleep(10)
 			}
 
-		if (data && (data != "")) {
-			loop Parse, data, "`n", "`r" {
-				currentLine := LTrim(A_LoopField)
-
-				if (StrLen(currentLine) == 0)
-					continue
-
-				firstChar := SubStr(currentLine, 1, 1)
-
-				if (firstChar = ";")
-					continue
-				else if (firstChar = "[") {
-					section := StrReplace(StrReplace(RTrim(currentLine), "[", ""), "]", "")
-
-					multiMap[section] := newSectionMap()
-				}
-				else if section {
-					keyValue := LTrim(currentLine)
-
-					if ((SubStr(keyValue, 1, 2) != "//") && (SubStr(keyValue, 1, 1) != ";")) {
-						keyValue := StrSplit(StrReplace(StrReplace(StrReplace(keyValue, "\=", "_#_EQ-#_"), "\\", "_#_AC-#_"), "\n", "_#_CR-#_"), "=", "", 2)
-
-						key := StrReplace(StrReplace(StrReplace(keyValue[1], "_#_EQ-#_", "="), "_#_AC-#_", "\\"), "_#_CR-#_", "`n")
-						value := ((keyValue.Length > 1) ? StrReplace(StrReplace(StrReplace(keyValue[2], "_#_EQ-#_", "="), "_#_AC-#_", "\"), "_#_CR-#_", "`n") : "")
-
-						multiMap[section][key] := ((value = kTrue) ? true : ((value = kFalse) ? false : value))
-					}
-				}
-			}
-		}
+		if (data && (data != ""))
+			return parseMultiMap(data)
 	}
 
-	return multiMap
+	return newMultiMap()
 }
 
 parseMultiMap(text) {
-	local fileName := temporaryFileName("Config", "ini")
-	local multiMap
+	local multiMap := newMultiMap()
+	local section := false
+	local currentLine, firstChar, keyValue, key, value
 
-	FileAppend(text, fileName, "UTF-16")
+	loop Parse, text, "`n", "`r" {
+		currentLine := LTrim(A_LoopField)
 
-	multiMap := readMultiMap(fileName)
+		if (StrLen(currentLine) == 0)
+			continue
 
-	deleteFile(fileName)
+		firstChar := SubStr(currentLine, 1, 1)
+
+		if (firstChar = ";")
+			continue
+		else if (firstChar = "[") {
+			section := StrReplace(StrReplace(RTrim(currentLine), "[", ""), "]", "")
+
+			multiMap[section] := newSectionMap()
+		}
+		else if section {
+			keyValue := LTrim(currentLine)
+
+			if ((SubStr(keyValue, 1, 2) != "//") && (SubStr(keyValue, 1, 1) != ";")) {
+				keyValue := StrSplit(StrReplace(StrReplace(StrReplace(keyValue, "\=", "_#_EQ-#_"), "\\", "_#_AC-#_"), "\n", "_#_CR-#_"), "=", "", 2)
+
+				key := StrReplace(StrReplace(StrReplace(keyValue[1], "_#_EQ-#_", "="), "_#_AC-#_", "\\"), "_#_CR-#_", "`n")
+				value := ((keyValue.Length > 1) ? StrReplace(StrReplace(StrReplace(keyValue[2], "_#_EQ-#_", "="), "_#_AC-#_", "\"), "_#_CR-#_", "`n") : "")
+
+				multiMap[section][key] := ((value = kTrue) ? true : ((value = kFalse) ? false : value))
+			}
+		}
+	}
 
 	return multiMap
 }
@@ -216,21 +209,24 @@ writeMultiMap(multiMapFile, multiMap, symbolic := true) {
 }
 
 printMultiMap(multiMap, symbolic := true) {
-	local fileName := temporaryFileName("Config", "ini")
-	local text
+	local result := ""
+	local pairs
 
-	writeMultiMap(fileName, multiMap, symbolic)
+	for section, keyValues in multiMap {
+		pairs := ""
 
-	try {
-		text := FileRead(fileName)
+		for key, value in keyValues {
+			value := StrReplace(value, "\", "\\")
+			value := StrReplace(value, "=", "\=")
+			value := StrReplace(value, "`n", "\n")
+
+			pairs .= ("`n" . key . "=" . (symbolic ? ((value == true) ? kTrue : ((value == false) ? kFalse : value)) : value))
+		}
+
+		result .= ("[" . section . "]" . pairs . "`n")
 	}
-	catch Any as exception {
-		text := ""
-	}
 
-	deleteFile(fileName)
-
-	return text
+	return result
 }
 
 getMultiMapValue(multiMap, section, key, default := false) {

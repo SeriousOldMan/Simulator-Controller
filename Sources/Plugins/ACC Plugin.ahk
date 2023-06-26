@@ -667,94 +667,109 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			return true
 	}
 
+	checkRestart() {
+		if GetKeyState("Esc", "P")
+			throw "Restart"
+	}
+
 	initializePitstopMFD() {
 		local repairBodyworkChosen := this.iRepairBodyworkChosen
 		local repairSuspensionChosen := this.iRepairSuspensionChosen
 		local availableOptions, currentPressures, tyreChange
 
-		protectionOn(true, true)
+		loop {
+			protectionOn(true, true)
 
-		try {
-			this.sendCommand(this.OpenPitstopMFDHotkey)
-
-			Sleep(200)
-
-			this.sendCommand(this.OpenPitstopMFDHotkey)
-
-			availableOptions := ["Pit Limiter", "Strategy", "Refuel"
-							   , "Change Tyres", "Tyre Set", "Tyre Compound", "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right"
-							   , "Change Brakes", "Front Brake", "Rear Brake", "Driver", "Repair Suspension", "Repair Bodywork"]
-
-			currentPressures := this.getPitstopOptionValues("Tyre Pressures")
-
-			if !this.isStrategyAvailable(availableOptions, currentPressures)
-				availableOptions.RemoveAt(inList(availableOptions, "Strategy"))
-
-			tyreChange := this.isTyreChangeSelected(availableOptions, currentPressures)
-
-			if !tyreChange {
+			try {
 				this.sendCommand(this.OpenPitstopMFDHotkey)
 
-				this.sendCommand("{Down}", inList(availableOptions, "Change Tyres") - 1)
+				Sleep(200)
 
-				this.sendCommand("{Right}")
-			}
-
-			this.iPSChangeTyres := true
-
-			if this.isWetTyreSelected(availableOptions, currentPressures) {
-				this.iPSTyreOptions := 6
-
-				availableOptions.RemoveAt(inList(availableOptions, "Tyre Set"))
-			}
-			else
-				this.iPSTyreOptions := 7
-
-			if this.isBrakeChangeSelected(availableOptions, currentPressures)
-				this.iPSChangeBrakes := true
-			else
-				this.iPSChangeBrakes := false
-
-			if !this.isDriverAvailable(availableOptions, currentPressures)
-				availableOptions.RemoveAt(inList(availableOptions, "Driver"))
-
-			if !tyreChange {
 				this.sendCommand(this.OpenPitstopMFDHotkey)
 
-				this.sendCommand("{Down}", inList(availableOptions, "Change Tyres") - 1)
+				availableOptions := ["Pit Limiter", "Strategy", "Refuel"
+								   , "Change Tyres", "Tyre Set", "Tyre Compound", "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right"
+								   , "Change Brakes", "Front Brake", "Rear Brake", "Driver", "Repair Suspension", "Repair Bodywork"]
 
-				this.sendCommand("{Left}")
+				currentPressures := this.getPitstopOptionValues("Tyre Pressures")
 
-				this.iPSChangeTyres := false
-			}
+				if !this.isStrategyAvailable(availableOptions, currentPressures)
+					availableOptions.RemoveAt(inList(availableOptions, "Strategy"))
 
-			this.iPSOptions := availableOptions
+				tyreChange := this.isTyreChangeSelected(availableOptions, currentPressures)
 
-			this.iPSTyreOptionPosition := inList(this.iPSOptions, "Change Tyres")
-			this.iPSBrakeOptionPosition := inList(this.iPSOptions, "Change Brakes")
+				if !tyreChange {
+					this.sendCommand(this.OpenPitstopMFDHotkey)
 
-			this.sendCommand(this.OpenPitstopMFDHotkey)
+					this.sendCommand("{Down}", inList(availableOptions, "Change Tyres") - 1)
 
-			this.toggleActivity("Repair Suspension")
-			this.toggleActivity("Repair Suspension")
-			this.toggleActivity("Repair Bodywork")
+					this.sendCommand("{Right}")
+				}
 
-			if repairBodyworkChosen
+				this.iPSChangeTyres := true
+
+				if this.isWetTyreSelected(availableOptions, currentPressures) {
+					this.iPSTyreOptions := 6
+
+					availableOptions.RemoveAt(inList(availableOptions, "Tyre Set"))
+				}
+				else
+					this.iPSTyreOptions := 7
+
+				if this.isBrakeChangeSelected(availableOptions, currentPressures)
+					this.iPSChangeBrakes := true
+				else
+					this.iPSChangeBrakes := false
+
+				if !this.isDriverAvailable(availableOptions, currentPressures)
+					availableOptions.RemoveAt(inList(availableOptions, "Driver"))
+
+				if !tyreChange {
+					this.sendCommand(this.OpenPitstopMFDHotkey)
+
+					this.sendCommand("{Down}", inList(availableOptions, "Change Tyres") - 1)
+
+					this.sendCommand("{Left}")
+
+					this.iPSChangeTyres := false
+				}
+
+				this.iPSOptions := availableOptions
+
+				this.iPSTyreOptionPosition := inList(this.iPSOptions, "Change Tyres")
+				this.iPSBrakeOptionPosition := inList(this.iPSOptions, "Change Brakes")
+
+				this.sendCommand(this.OpenPitstopMFDHotkey)
+
+				this.toggleActivity("Repair Suspension")
+				this.toggleActivity("Repair Suspension")
 				this.toggleActivity("Repair Bodywork")
 
-			if repairSuspensionChosen
-				this.toggleActivity("Repair Suspension")
+				if repairBodyworkChosen
+					this.toggleActivity("Repair Bodywork")
 
-			this.iRepairSuspensionChosen := repairSuspensionChosen
-			this.iRepairBodyworkChosen := (repairBodyworkChosen || repairSuspensionChosen)
-		}
-		finally {
-			protectionOff(true, true)
+				if repairSuspensionChosen
+					this.toggleActivity("Repair Suspension")
+
+				this.iRepairSuspensionChosen := repairSuspensionChosen
+				this.iRepairBodyworkChosen := (repairBodyworkChosen || repairSuspensionChosen)
+
+				break
+			}
+			catch Any as exception {
+				if (exception != "Restart")
+					throw exception
+			}
+			finally {
+				protectionOff(true, true)
+			}
 		}
 	}
 
 	isStrategyAvailable(options, currentPressures) {
 		local modifiedPressures
+
+		this.checkRestart()
 
 		this.sendCommand(this.OpenPitstopMFDHotkey)
 
@@ -795,6 +810,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	isTyreChangeSelected(options, currentPressures) {
 		local modifiedPressures
 
+		this.checkRestart()
+
 		this.sendCommand(this.OpenPitstopMFDHotkey)
 
 		this.sendCommand("{Down}", inList(options, "Change Tyres") - 1 + 3)
@@ -810,6 +827,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 	isWetTyreSelected(options, currentPressures) {
 		local index, modifiedPressures, pressure
+
+		this.checkRestart()
 
 		if this.iPSChangeTyres {
 			this.sendCommand(this.OpenPitstopMFDHotkey)
@@ -832,6 +851,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 	isBrakeChangeSelected(options, currentPressures) {
 		local index, modifiedPressures, pressure
+
+		this.checkRestart()
 
 		this.sendCommand(this.OpenPitstopMFDHotkey)
 
@@ -856,10 +877,14 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	isDriverAvailable(options, currentPressures) {
 		local modifiedPressures
 
+		this.checkRestart()
+
 		this.sendCommand(this.OpenPitstopMFDHotkey)
 
 		this.sendCommand("{Down}", inList(options, "Change Brakes") - 1 + 12 + (this.iPSChangeBrakes ? this.iPSBrakeOptions : 0)
 																	+ (inList(options, "Strategy") ? 1 : 0) - (7 - this.iPSTyreOptions))
+
+		this.checkRestart()
 
 		this.sendCommand("{Right}")
 

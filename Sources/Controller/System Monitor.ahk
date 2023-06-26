@@ -271,7 +271,7 @@ editSettings(settingsOrCommand, arguments*) {
 systemMonitor(command := false, arguments*) {
 	global gStartupFinished
 
-	local x, y, time, logLevel
+	local x, y, w, h, time, logLevel
 	local controllerState, databaseState, trackMapperState, sessionInfo, ignore, assistant, plugin, icons, modules, key, value
 	local icon, state, property, drivers, choices, chosen, settings
 
@@ -1512,7 +1512,7 @@ systemMonitor(command := false, arguments*) {
 	else {
 		result := false
 
-		systemMonitorGui := Window({Descriptor: "System Monitor", Closeable: true, Options: "+SysMenu +Caption"})
+		systemMonitorGui := Window({Descriptor: "System Monitor", Resizeable: true, Closeable: true, Options: "+SysMenu +Caption"})
 
 		systemMonitorGui.SetFont("s10 Bold", "Arial")
 
@@ -1531,7 +1531,7 @@ systemMonitor(command := false, arguments*) {
 
 		systemMonitorGui.Add("Text", "x8 yp+26 w790 0x10")
 
-		monitorTabView := systemMonitorGui.Add("Tab3", "x16 yp+14 w773 h375 AltSubmit -Wrap Section", collect(["Dashboard", "Session", "Team", "Modules", "Logs"], translate))
+		monitorTabView := systemMonitorGui.Add("Tab3", "x16 yp+14 w773 h375 H:Grow AltSubmit -Wrap Section", collect(["Dashboard", "Session", "Team", "Modules", "Logs"], translate))
 
 		monitorTabView.UseTab(1)
 
@@ -1587,7 +1587,7 @@ systemMonitor(command := false, arguments*) {
 
 		monitorTabView.UseTab(2)
 
-		sessionStateViewer := systemMonitorGui.Add("HTMLViewer", "x24 ys+28 w756 h336 Hidden")
+		sessionStateViewer := systemMonitorGui.Add("HTMLViewer", "x24 ys+28 w756 h336 H:Grow Hidden")
 
 		monitorTabView.UseTab(3)
 
@@ -1646,7 +1646,7 @@ systemMonitor(command := false, arguments*) {
 
 		monitorTabView.UseTab(4)
 
-		stateListView := systemMonitorGui.Add("ListView", "x24 ys+28 w756 h336 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Module", "Information"], translate))
+		stateListView := systemMonitorGui.Add("ListView", "x24 ys+28 w756 h336 H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Module", "Information"], translate))
 		stateListView.OnEvent("Click", noSelect.Bind(stateListView))
 		stateListView.OnEvent("DoubleClick", noSelect.Bind(stateListView))
 
@@ -1654,20 +1654,20 @@ systemMonitor(command := false, arguments*) {
 
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
-		logMessageListView := systemMonitorGui.Add("ListView", "x24 ys+28 w756 h312 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Application", "Time", "Category", "Message"], translate))
+		logMessageListView := systemMonitorGui.Add("ListView", "x24 ys+28 w756 h312 H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Application", "Time", "Category", "Message"], translate))
 		logMessageListView.OnEvent("Click", noSelect.Bind(logMessageListView))
 		logMessageListView.OnEvent("DoubleClick", noSelect.Bind(logMessageListView))
 
-		systemMonitorGui.Add("Text", "x24 yp+320 w95 h20", translate("Log Buffer"))
-		logBufferEdit := systemMonitorGui.Add("Edit", "x120 yp-2 w50 h20 Limit3 Number", "999")
-		systemMonitorGui.Add("UpDown", "x158 yp w18 h20 Range100-999", "999")
+		systemMonitorGui.Add("Text", "x24 yp+320 w95 h20 Y:Move", translate("Log Buffer"))
+		logBufferEdit := systemMonitorGui.Add("Edit", "x120 yp-2 w50 h20 Y:Move Limit3 Number", "999")
+		systemMonitorGui.Add("UpDown", "x158 yp w18 h20 Y:Move Range100-999", "999")
 
-		systemMonitorGui.Add("Text", "x590 yp w95 h23 +0x200", translate("Log Level"))
+		systemMonitorGui.Add("Text", "x590 yp w95 h23 Y:Move +0x200", translate("Log Level"))
 
 		choices := kLogLevelNames
 		chosen := getLogLevel()
 
-		logLevelDropDown := systemMonitorGui.Add("DropDownList", "x689 yp-1 w91 Choose" . chosen, collect(choices, translate))
+		logLevelDropDown := systemMonitorGui.Add("DropDownList", "x689 yp-1 w91 Y:Move Choose" . chosen, collect(choices, translate))
 		logLevelDropDown.OnEvent("Change", chooseLogLevel)
 
 		/*
@@ -1686,6 +1686,11 @@ systemMonitor(command := false, arguments*) {
 			systemMonitorGui.Show("x" . x . " y" . y)
 		else
 			systemMonitorGui.Show()
+
+		systemMonitorGui.MaxWidth := systemMonitorGui.MinWidth
+
+		if getWindowSize("System Monitor", &w, &h)
+			systemMonitorGui.Resize("Initialize", w, h)
 
 		updateDashboard(systemMonitorGui, simulationDashboard)
 		updateDashboard(systemMonitorGui, assistantsDashboard)

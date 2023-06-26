@@ -1849,25 +1849,25 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			switch option, false {
 				case "Pit Limiter":
-					data := this.readSessionData("-Setup")
+					data := this.readSessionData("Setup Data")
 
 					return [getMultiMapValue(data, "Car Data", "PitLimiter", false)]
 				case "Refuel":
-					data := this.readSessionData("-Setup")
+					data := this.readSessionData("Setup Data")
 
 					return [getMultiMapValue(data, "Setup Data", "FuelAmount", 0)]
 				case "Tyre Pressures":
-					data := this.readSessionData("-Setup")
+					data := this.readSessionData("Setup Data")
 
 					return [getMultiMapValue(data, "Setup Data", "TyrePressureFL", 26.1), getMultiMapValue(data, "Setup Data", "TyrePressureFR", 26.1)
 						  , getMultiMapValue(data, "Setup Data", "TyrePressureRL", 26.1), getMultiMapValue(data, "Setup Data", "TyrePressureRR", 26.1)]
 				case "Tyre Set":
-					data := this.readSessionData("-Setup")
+					data := this.readSessionData("Setup Data")
 
 					return [getMultiMapValue(data, "Setup Data", "TyreSet", 0)]
 				case "Tyre Compound":
 					if this.iPSChangeTyres {
-						data := this.readSessionData("-Setup")
+						data := this.readSessionData("Setup Data")
 
 						return [getMultiMapValue(data, "Setup Data", "TyreCompound", false), getMultiMapValue(data, "Setup Data", "TyreCompoundColor", false)]
 					}

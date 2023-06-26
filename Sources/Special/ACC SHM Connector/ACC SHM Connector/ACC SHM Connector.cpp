@@ -413,7 +413,7 @@ extern "C" __declspec(dllexport) int __stdcall collect(char* request, char* resu
 			printData(&output, "SessionLapsRemaining", (gf->iLastTime > 0) ? timeLeft / gf->iLastTime : 99);
 	}
 
-	if (strcmp(request, "Setup Data") == 0 || strcmp(request, "Full") == 0)
+	if (strcmp(request, "Setup Data") == 0 || strcmp(request, "-Setup") == 0)
 	{
 		output << "[Setup Data]" << endl;
 

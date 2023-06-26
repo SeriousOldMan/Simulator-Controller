@@ -275,7 +275,7 @@ extern "C" __declspec(dllexport) int __stdcall collect(char* request, char* resu
 {
 	ostringstream output;
 	
-	if (strcmp(request, "Car Data") == 0 || strcmp(request, "Full") == 0)
+	if (strlen(request) == 0)
 	{
 		output << "[Car Data]" << endl;
 
@@ -308,10 +308,7 @@ extern "C" __declspec(dllexport) int __stdcall collect(char* request, char* resu
 		printData(&output, "BrakeDiscLifeRaw", pf->discLife);
 		printData(&output, "FrontBrakePadCompoundRaw", pf->frontBrakeCompound + 1);
 		printData(&output, "RearBrakePadCompoundRaw", pf->rearBrakeCompound + 1);
-	}
-
-	if (strcmp(request, "Stint Data") == 0 || strcmp(request, "Full") == 0)
-	{
+	
 		output << "[Stint Data]" << endl;
 
 		SPageFileStatic* sf = (SPageFileStatic*)m_static.mapFileBuffer;
@@ -350,10 +347,7 @@ extern "C" __declspec(dllexport) int __stdcall collect(char* request, char* resu
 
 		printData(&output, "InPitLane", gf->isInPit ? "true" : "false");
 		printData(&output, "InPit", gf->isInPit ? "true" : "false");
-	}
-
-	if (strcmp(request, "Track Data") == 0 || strcmp(request, "Full") == 0)
-	{
+	
 		output << "[Track Data]" << endl;
 
 		SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
@@ -366,10 +360,7 @@ extern "C" __declspec(dllexport) int __stdcall collect(char* request, char* resu
 			output << "Car." << id + 1 << ".ID=" << gf->carID[id] << endl;
 			output << "Car." << id + 1 << ".Position=" << gf->carCoordinates[id][0] << "," << gf->carCoordinates[id][2] << endl;
 		}
-	}
-
-	if (strcmp(request, "Weather Data") == 0 || strcmp(request, "Full") == 0)
-	{
+	
 		output << "[Weather Data]" << endl;
 
 		SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
@@ -379,10 +370,7 @@ extern "C" __declspec(dllexport) int __stdcall collect(char* request, char* resu
 		printData(&output, "Weather", getWeather(gf->rainIntensity));
 		printData(&output, "Weather10min", getWeather(gf->rainIntensityIn10min));
 		printData(&output, "Weather30min", getWeather(gf->rainIntensityIn30min));
-	}
-
-	if (strcmp(request, "Session Data") == 0 || strcmp(request, "Full") == 0)
-	{
+	
 		output << "[Session Data]" << endl;
 
 		SPageFileStatic* sf = (SPageFileStatic*)m_static.mapFileBuffer;
@@ -412,8 +400,8 @@ extern "C" __declspec(dllexport) int __stdcall collect(char* request, char* resu
 		else
 			printData(&output, "SessionLapsRemaining", (gf->iLastTime > 0) ? timeLeft / gf->iLastTime : 99);
 	}
-
-	if (strcmp(request, "Setup Data") == 0 || strcmp(request, "-Setup") == 0)
+	
+	if (strcmp(request, "Setup") == 0 || strcmp(request, "-Setup") == 0)
 	{
 		output << "[Setup Data]" << endl;
 

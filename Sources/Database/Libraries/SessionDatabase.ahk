@@ -791,7 +791,7 @@ class SessionDatabase extends ConfigurationItem {
 		local fileName := (kDatabaseDirectory . "User\Tracks\" . this.getSimulatorCode(simulator) . "\" . this.getTrackCode(simulator, track) . ".data")
 
 		if FileExist(fileName)
-			return (fileName)
+			return fileName
 		else
 			return false
 	}

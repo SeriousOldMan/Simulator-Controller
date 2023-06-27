@@ -1161,7 +1161,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 
 		trackData := sessionDB.getTrackData(this.Code, this.Track)
 
-		return (trackData ? this.readSessionData("-Track `"" . trackData . "`"") : this.readSessionData())
+		return this.readSessionData(trackData ? ("Track=" . trackData) : "")
 	}
 
 	acquirePositionsData(telemetryData) {
@@ -1176,7 +1176,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 			setMultiMapValues(positionsData, "Position Data", getMultiMapValues(telemetryData, "Position Data"))
 		}
 		else
-			positionsData := this.readSessionData("-Standings")
+			positionsData := this.readSessionData("Standings")
 
 		count := getMultiMapValue(positionsData, "Position Data", "Car.Count", 0)
 
@@ -1247,8 +1247,8 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		return data
 	}
 
-	readSessionData(options := "") {
-		return readSimulatorData(this.Code, options)
+	readSessionData(options := "", protocol?) {
+		return callSimulator(this.Code, options, protocol?)
 	}
 }
 
@@ -1257,36 +1257,88 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-readSimulatorData(simulator, options := "", protocol := "SHM") {
-	local exePath := kBinariesDirectory . simulator . A_Space . protocol . " Provider.exe"
-	local dataFile, data
+callSimulator(simulator, options := "", protocol := "Provider") {
+	local data := false
 
-	DirCreate(kTempDirectory . simulator . " Data")
+	if (protocol = "Provider") {
+		local exePath := kBinariesDirectory . simulator . A_Space . protocol . " Provider.exe"
+		local dataFile, data
 
-	dataFile := temporaryFileName(simulator . " Data\" . protocol, "data")
+		DirCreate(kTempDirectory . simulator . " Data")
 
-	try {
-		RunWait(A_ComSpec . " /c `"`"" . exePath . "`" " . options . " > `"" . dataFile . "`"`"", , "Hide")
+		dataFile := temporaryFileName(simulator . " Data\" . protocol, "data")
+
+		try {
+			RunWait(A_ComSpec . " /c `"`"" . exePath . "`" " . options . " > `"" . dataFile . "`"`"", , "Hide")
+		}
+		catch Any as exception {
+			logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider (")
+													   , {simulator: simulator, protocol: protocol})
+								   . exePath . translate(") - please rebuild the applications in the binaries folder (")
+								   . kBinariesDirectory . translate(")"))
+
+			showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration...")
+										  , {exePath: exePath, simulator: simulator, protocol: protocol})
+					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+		}
+
+		data := readMultiMap(dataFile)
+
+		deleteFile(dataFile)
 	}
-	catch Any as exception {
-		logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider (")
-												   , {simulator: simulator, protocol: protocol})
-							   . exePath . translate(") - please rebuild the applications in the binaries folder (")
-							   . kBinariesDirectory . translate(")"))
+	else {
+		local library, curWorkingDir, buf
 
-		showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration...")
-									  , {exePath: exePath, simulator: simulator, protocol: protocol})
-				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+		static libraries := CaseInsenseMap()
+
+		if libraries.Has(simulator)
+			library := libraries[simulator]
+		else {
+			curWorkingDir := A_WorkingDir
+
+			SetWorkingDir(kBinariesDirectory)
+
+			try {
+				library := DllCall("LoadLibrary", "Str", simulator . " SHM Connector.dll", "Ptr")
+
+				DLLCall(simulator . " SHM Connector\initialize")
+			}
+			catch Any as exception {
+				logError(exception)
+
+				library := false
+			}
+			finally {
+				SetWorkingDir(curWorkingDir)
+			}
+
+			if library
+				libraries[simulator] := library
+		}
+
+		if library {
+			try {
+				buf := Buffer(1024 * 1024)
+
+				DllCall(simulator . " SHM Connector\collect", "AStr", options, "Ptr", buf, "Int", buf.Size)
+
+				data := parseMultiMap(StrGet(buf, "UTF-8"))
+			}
+			catch Any as exception {
+				logError(exception)
+
+				data := newMultiMap()
+			}
+		}
+		else
+			return callSimulator(simulator, options)
 	}
-
-	data := readMultiMap(dataFile)
-
-	deleteFile(dataFile)
 
 	setMultiMapValue(data, "Session Data", "Simulator", simulator)
 
 	return data
 }
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Private Function Declaration Section                 ;;;

@@ -197,16 +197,16 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			switch option, false {
 				case "Refuel":
-					data := readSimulatorData(this.Code, "-Setup")
+					data := callSimulator(this.Code, "-Setup")
 
 					return [getMultiMapValue(data, "Setup Data", "FuelAmount", 0)]
 				case "Tyre Pressures":
-					data := readSimulatorData(this.Code, "-Setup")
+					data := callSimulator(this.Code, "-Setup")
 
 					return [getMultiMapValue(data, "Setup Data", "TyrePressureFL", 26.1), getMultiMapValue(data, "Setup Data", "TyrePressureFR", 26.1)
 						  , getMultiMapValue(data, "Setup Data", "TyrePressureRL", 26.1), getMultiMapValue(data, "Setup Data", "TyrePressureRR", 26.1)]
 				case "Tyre Compound":
-					data := readSimulatorData(this.Code, "-Setup")
+					data := callSimulator(this.Code, "-Setup")
 
 					compound := getMultiMapValue(data, "Setup Data", "TyreCompoundRaw")
 					compound := SessionDatabase.getTyreCompoundName(this.Simulator[true], this.Car, this.Track, compound, kUndefined)
@@ -221,11 +221,11 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 
 					return [compound, compoundColor]
 				case "Repair Suspension":
-					data := readSimulatorData(this.Code, "-Setup")
+					data := callSimulator(this.Code, "-Setup")
 
 					return [getMultiMapValue(data, "Setup Data", "RepairSuspension", false)]
 				case "Repair Bodywork":
-					data := readSimulatorData(this.Code, "-Setup")
+					data := callSimulator(this.Code, "-Setup")
 
 					return [getMultiMapValue(data, "Setup Data", "RepairBodywork", false)]
 				default:

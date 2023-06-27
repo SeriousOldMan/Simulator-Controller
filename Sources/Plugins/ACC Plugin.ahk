@@ -453,49 +453,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	readSessionData(options := "") {
-		local curWorkingDir, buf
-
-		static library := false
-
-		if !library {
-			curWorkingDir := A_WorkingDir
-
-			SetWorkingDir(kBinariesDirectory)
-
-			try {
-				library := DllCall("LoadLibrary", "Str", "ACC SHM Connector.dll", "Ptr")
-
-				DLLCall("ACC SHM Connector\initialize")
-			}
-			catch Any as exception {
-				logError(exception)
-
-				library := false
-			}
-			finally {
-				SetWorkingDir(curWorkingDir)
-			}
-		}
-
-		if library {
-			try {
-				buf := Buffer(1024 * 1024)
-
-				DllCall("ACC SHM Connector\collect", "AStr", options, "Ptr", buf, "Int", buf.Size)
-
-				data := StrGet(buf, "UTF-8")
-				data := parseMultiMap(data)
-
-				setMultiMapValue(data, "Session Data", "Simulator", "ACC")
-
-				return data
-			}
-			catch Any as exception {
-				logError(exception)
-			}
-		}
-
-		return super.readSessionData(options)
+		return super.readSessionData(options, "Connector")
 	}
 
 	computeBrakePadWear(location, compound, thickness) {

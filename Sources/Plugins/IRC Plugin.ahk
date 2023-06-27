@@ -61,19 +61,10 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 		selectActions := []
 	}
 
-	sendPitstopCommand(command, operation := false, message := false, arguments*) {
-		local simulator, exePath
-
-		if this.iCurrentPitstopMFD {
-			simulator := this.Code
-			arguments := values2String(";", arguments*)
-			exePath := kBinariesDirectory . simulator . " SHM Provider.exe"
-
+	sendPitstopCommand(command, operation, message, arguments*) {
+		if this.iCurrentPitstopMFD
 			try {
-				if operation
-					RunWait(A_ComSpec . " /c `"`"" . exePath . "`" -" . command . A_Space . operation . " `"" . message . ":" . arguments . "`"`"", , "Hide")
-				else
-					RunWait(A_ComSpec . " /c `"`"" . exePath . "`" -" . command . "`"", , "Hide")
+				callSimulator(this.Code, command . "=" . operation . "=" . message . ":" . values2String(";", arguments*), "Connector")
 			}
 			catch Any as exception {
 				logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider ("), {simulator: simulator, protocol: "SHM"})
@@ -84,7 +75,6 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 											  , {exePath: exePath, simulator: simulator, protocol: "SHM"})
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
-		}
 	}
 
 	openPitstopMFD(descriptor := false) {

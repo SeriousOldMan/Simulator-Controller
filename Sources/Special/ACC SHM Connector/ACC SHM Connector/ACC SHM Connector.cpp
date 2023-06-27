@@ -255,6 +255,17 @@ inline const string getPenalty(PenaltyShortcut penalty) {
 	}
 }
 
+std::string getArgument(std::string request, std::string key) {
+	if (request.rfind(key + "=") == 0)
+		return request.substr(key.length() + 1, request.length() - (key.length() + 1)).c_str();
+	else
+		return "";
+}
+
+std::string getArgument(char* request, std::string key) {
+	return getArgument(std::string(request), key);
+}
+
 extern "C" __declspec(dllexport) int __stdcall initialize() {
 	initPhysics();
 	initGraphics();
@@ -387,7 +398,7 @@ extern "C" __declspec(dllexport) int __stdcall collect(char* request, char* resu
 			printData(&output, "SessionLapsRemaining", (gf->iLastTime > 0) ? timeLeft / gf->iLastTime : 99);
 	}
 	
-	if (strcmp(request, "Setup") == 0 || strcmp(request, "-Setup") == 0)
+	if (getArgument(request, "Setup") != "")
 	{
 		output << "[Setup Data]" << endl;
 

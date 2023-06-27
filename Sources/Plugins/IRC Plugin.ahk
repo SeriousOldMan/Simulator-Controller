@@ -256,6 +256,10 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 
 		this.sendPitstopCommand("Pitstop", "Set", "Repair", (repairBodywork || repairSuspension) ? "true" : "false")
 	}
+
+	readSessionData(options := "") {
+		return super.readSessionData(options, "Connector")
+	}
 }
 
 

@@ -1176,7 +1176,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 			setMultiMapValues(positionsData, "Position Data", getMultiMapValues(telemetryData, "Position Data"))
 		}
 		else
-			positionsData := this.readSessionData("Standings")
+			positionsData := this.readSessionData("Standings=true")
 
 		count := getMultiMapValue(positionsData, "Position Data", "Car.Count", 0)
 

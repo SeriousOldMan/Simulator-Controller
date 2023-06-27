@@ -46,7 +46,8 @@ Tools Settings.ini=%kUserConfigDirectory%Simulator Tools.ini
 *.bak Files=%kHomeDirectory%, *.ahk.bak, R
 [Copy]
 Data Connector.1=%kBinariesDirectory%ACC SHM Connector.dll <- %kSourcesDirectory%Special\ACC SHM Connector\x64\Release\ACC SHM Connector.dll
-Data Connector.1=%kBinariesDirectory%IRC SHM Connector.dll <- %kSourcesDirectory%Special\IRC SHM Connector\x64\Release\IRC SHM Connector.dll
+Data Connector.2=%kBinariesDirectory%IRC SHM Connector.dll <- %kSourcesDirectory%Special\IRC SHM Connector\x64\Release\IRC SHM Connector.dll
+Data Connector.3=%kBinariesDirectory%R3E SHM Connector.dll <- %kSourcesDirectory%Special\R3E SHM Connector\x64\Release\R3E SHM Connector.dll
 Data Provider.1=%kBinariesDirectory%ACC SHM Provider.exe <- %kSourcesDirectory%Special\ACC SHM Provider\Release\ACC SHM Provider.exe
 Data Provider.2=%kBinariesDirectory%R3E SHM Provider.exe <- %kSourcesDirectory%Special\R3E SHM Provider\Release\R3E SHM Provider.exe
 Data Provider.3=%kBinariesDirectory%RF2 SHM Provider.exe <- %kSourcesDirectory%Special\RF2 SHM Provider\Release\RF2 SHM Provider.exe

@@ -853,7 +853,7 @@ void writeData(std::ostringstream * output, const irsdk_header *header, const ch
 			
 			printLine(output, "SessionLapsRemaining=" + std::to_string(lapsRemaining));
 
-			printLine(output, "[Car Data]\n");
+			printLine(output, "[Car Data]");
 
 			print(output, "MAP="); printDataNAFloat(output, header, data, "dcEnginePower"); printLine(output, "");
 			print(output, "TC="); printDataNAFloat(output, header, data, "dcTractionControl"); printLine(output, "");
@@ -1123,8 +1123,8 @@ extern "C" __declspec(dllexport) int __stdcall collect(char* request, char* resu
 					else {
 						if (getArgument(request, "Standings") != "")
 							writePositions(&output, pHeader, g_data);
-
-						writeData(&output, pHeader, g_data, false);
+						else
+							writeData(&output, pHeader, g_data, false);
 					}
 				}
 

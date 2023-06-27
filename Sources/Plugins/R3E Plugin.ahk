@@ -642,6 +642,10 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
+	readSessionData(options := "") {
+		return super.readSessionData(options, "Connector")
+	}
+
 	getCarName(carID) {
 		local carDB := R3EPlugin.sCarDB
 

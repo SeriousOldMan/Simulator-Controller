@@ -273,14 +273,14 @@ extern "C" __declspec(dllexport) int __stdcall dispose() {
 
 extern "C" __declspec(dllexport) int __stdcall collect(char* request, char* result, int size)
 {
+	SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
+	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
+	SPageFileStatic* sf = (SPageFileStatic*)m_static.mapFileBuffer;
 	ostringstream output;
 	
 	if (strlen(request) == 0)
 	{
 		output << "[Car Data]" << endl;
-
-		SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
-		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
 		_bstr_t tc(gf->tyreCompound);
 		std::string tyreCompound(tc);
@@ -310,9 +310,6 @@ extern "C" __declspec(dllexport) int __stdcall collect(char* request, char* resu
 		printData(&output, "RearBrakePadCompoundRaw", pf->rearBrakeCompound + 1);
 	
 		output << "[Stint Data]" << endl;
-
-		SPageFileStatic* sf = (SPageFileStatic*)m_static.mapFileBuffer;
-		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 		
 		output << "DriverForname=" << getString(sf->playerName) << endl;
 		output << "DriverSurname=" << getString(sf->playerSurname) << endl;
@@ -350,9 +347,6 @@ extern "C" __declspec(dllexport) int __stdcall collect(char* request, char* resu
 	
 		output << "[Track Data]" << endl;
 
-		SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
-		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
-
 		printData(&output, "Temperature", pf->roadTemp);
 		printData(&output, "Grip", getGrip(gf->trackGripStatus));
 
@@ -363,18 +357,12 @@ extern "C" __declspec(dllexport) int __stdcall collect(char* request, char* resu
 	
 		output << "[Weather Data]" << endl;
 
-		SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
-		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
-
 		printData(&output, "Temperature", pf->airTemp);
 		printData(&output, "Weather", getWeather(gf->rainIntensity));
 		printData(&output, "Weather10min", getWeather(gf->rainIntensityIn10min));
 		printData(&output, "Weather30min", getWeather(gf->rainIntensityIn30min));
 	
 		output << "[Session Data]" << endl;
-
-		SPageFileStatic* sf = (SPageFileStatic*)m_static.mapFileBuffer;
-		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
 		printData(&output, "Active", ((gf->status == AC_LIVE) || (gf->status == AC_PAUSE) || (gf->status == AC_REPLAY)) ? "true" : "false");
 		printData(&output, "Paused", ((gf->status == AC_PAUSE) || (gf->status == AC_REPLAY)) ? "true" : "false");
@@ -384,8 +372,6 @@ extern "C" __declspec(dllexport) int __stdcall collect(char* request, char* resu
 		output << "Track=" << getString(sf->track) << endl;
 		output << "SessionFormat=Time" << endl;
 		printData(&output, "FuelAmount", sf->maxFuel);
-
-		long timeLeft = gf->sessionTimeLeft;
 
 		if (timeLeft < 0)
 			if (gf->session == AC_PRACTICE)
@@ -404,9 +390,6 @@ extern "C" __declspec(dllexport) int __stdcall collect(char* request, char* resu
 	if (strcmp(request, "Setup") == 0 || strcmp(request, "-Setup") == 0)
 	{
 		output << "[Setup Data]" << endl;
-
-		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
-		SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
 
 		_bstr_t tc(gf->tyreCompound);
 		std::string tyreCompound(tc);

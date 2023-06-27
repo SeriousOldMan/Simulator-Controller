@@ -1061,8 +1061,6 @@ void loadTrackCoordinates(char* fileName) {
 
 int main(int argc, char* argv[])
 {
-	loadTrackCoordinates("D:\\Dateien\\Dokumente\\Simulator Controller\\Database\\User\\Tracks\\IRC\\oulton international.data");
-	hasTrackCoordinates = true;
 	if (argc > 1) {
 		if (strcmp(argv[1], "-Track") == 0) {
 			loadTrackCoordinates(argv[2]);

@@ -3055,6 +3055,10 @@ class RaceStrategist extends GridRaceAssistant {
 
 		result := super.executePitstop(lapNumber)
 
+		knowledgeBase.clearFact("Strategy.Recalculate")
+
+		this.iLastStrategyUpdate := lapNumber
+
 		if nextPitstop
 			if (nextPitstop != knowledgeBase.getValue("Strategy.Pitstop.Next", false)) {
 				map := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Map", "n/a")
@@ -3172,6 +3176,10 @@ class RaceStrategist extends GridRaceAssistant {
 
 			if (plannedLap && (plannedLap != kUndefined))
 				plannedPitstopLap := plannedLap
+
+			knowledgeBase.clearFact("Strategy.Recalculate")
+
+			this.iLastStrategyUpdate := plannedPitstopLap
 
 			speaker.beginTalk()
 

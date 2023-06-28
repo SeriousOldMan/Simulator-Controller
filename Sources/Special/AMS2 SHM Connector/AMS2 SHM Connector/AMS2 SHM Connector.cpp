@@ -228,6 +228,8 @@ extern "C" __declspec(dllexport) int __stdcall collect(char* request, char* resu
 		if (fileHandle == NULL) {
 			printLine(&output, "Active=false");
 
+			strcpy_s(result, size, output.str().c_str());
+
 			return 1;
 		}
 
@@ -291,7 +293,9 @@ extern "C" __declspec(dllexport) int __stdcall collect(char* request, char* resu
 		if (fileHandle == NULL) {
 			printLine(&output, "Active=false");
 
-			return 1;
+			strcpy_s(result, size, output.str().c_str());
+
+			return -1;
 		}
 
 		printLine(&output, "Active=true");

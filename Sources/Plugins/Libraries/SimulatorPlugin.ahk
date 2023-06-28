@@ -1161,7 +1161,11 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 
 		trackData := sessionDB.getTrackData(this.Code, this.Track)
 
-		return this.readSessionData(trackData ? ("Track=" . trackData) : "")
+		data := this.readSessionData(trackData ? ("Track=" . trackData) : "")
+
+		setMultiMapValue(data, "Session Data", "Simulator", this.Code)
+
+		return data
 	}
 
 	acquirePositionsData(telemetryData) {
@@ -1210,6 +1214,8 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 				loop count
 					setMultiMapValue(positionsData, "Position Data", "Car." . cars[A_Index][1] . ".Position", A_Index)
 		}
+
+		setMultiMapValue(positionsData, "Position Data", "Simulator", this.Code)
 
 		return positionsData
 	}
@@ -1333,8 +1339,6 @@ callSimulator(simulator, options := "", protocol := "Provider") {
 		else
 			return callSimulator(simulator, options)
 	}
-
-	setMultiMapValue(data, "Session Data", "Simulator", simulator)
 
 	return data
 }

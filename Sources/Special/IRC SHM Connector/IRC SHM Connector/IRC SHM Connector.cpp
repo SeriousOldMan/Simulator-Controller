@@ -1114,7 +1114,7 @@ extern "C" __declspec(dllexport) int __stdcall collect(char* request, char* resu
 					if (argument != "")
 						pitstopSetValues(pHeader, g_data, argument.c_str());
 					else {
-						argument = getArgument(argument, "Change");
+						argument = getArgument(getArgument(request, "Pitstop"), "Change");
 
 						if (argument != "")
 							pitstopChangeValues(pHeader, g_data, argument.c_str());

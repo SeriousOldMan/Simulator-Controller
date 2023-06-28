@@ -3,7 +3,7 @@ Version=5.0.9.1-dev
 Target=5.0.9.1-release
 Date=06/26/2023
 Download=
-Changes=Security question when renewing the data token, Traffic simulation respects the pitstop timer when computing a pitstop lap, Further reduce idiotic Spotter gap announcements, Fixed session info not updating when not having run the first stint in team sessions, "System Monitor" can now be resized vertically, Performance improvements in process communication, Pressing ESC restarts the ACC pitstop option walk
+Changes=Security question when renewing the data token, Traffic simulation respects the pitstop timer when computing a pitstop lap, Further reduce idiotic Spotter gap announcements, Fixed session info not updating when not having run the first stint in team sessions, "System Monitor" can now be resized vertically, Performance improvements in process communication, Pressing Ctrl+Alt+Shift restarts the ACC pitstop option walk
 [Release]
 Version=5.0.9.0-release
 Date=06/23/2023

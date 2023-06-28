@@ -668,7 +668,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	checkRestart() {
-		if GetKeyState("Esc", "P")
+		if (GetKeyState("Ctrl", "P") && GetKeyState("Alt", "P") && GetKeyState("Shift", "P"))
 			throw "Restart"
 	}
 
@@ -775,16 +775,22 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 		this.sendCommand("{Down}", inList(options, "Change Tyres") - 1 + 3)
 
+		this.checkRestart()
+
 		this.sendCommand("{Right}")
 
 		modifiedPressures := this.getPitstopOptionValues("Tyre Pressures")
 
 		this.sendCommand("{Left}")
 
+		this.checkRestart()
+
 		if listEqual(currentPressures, modifiedPressures) {
 			this.sendCommand(this.OpenPitstopMFDHotkey)
 
 			this.sendCommand("{Down}", inList(options, "Change Tyres") - 1)
+
+			this.checkRestart()
 
 			this.sendCommand("{Right}")
 
@@ -816,6 +822,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 		this.sendCommand("{Down}", inList(options, "Change Tyres") - 1 + 3)
 
+		this.checkRestart()
+
 		this.sendCommand("{Right}")
 
 		modifiedPressures := this.getPitstopOptionValues("Tyre Pressures")
@@ -834,6 +842,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			this.sendCommand(this.OpenPitstopMFDHotkey)
 
 			this.sendCommand("{Down}", inList(options, "Change Tyres") - 1 + 4)
+
+			this.checkRestart()
 
 			this.sendCommand("{Right}")
 
@@ -859,6 +869,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		this.sendCommand("{Down}", inList(options, "Change Brakes") - 1)
 
 		this.sendCommand("{Down}", 13 - (inList(options, "Strategy") ? 0 : 1) - (7 - this.iPSTyreOptions))
+
+		this.checkRestart()
 
 		this.sendCommand("{Right}")
 

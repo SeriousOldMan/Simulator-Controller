@@ -554,14 +554,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		imgSearch := (this.iImageSearch && !this.iNoImageSearch)
 
 		if (update = kUndefined)
-			if imgSearch
-				update := true
-			else {
-				if (A_TickCount > this.iNextPitstopMFDOptionsUpdate)
-					update := true
-				else
-					update := false
-			}
+			update := (imgSearch ? true : (A_TickCount > this.iNextPitstopMFDOptionsUpdate))
 
 		this.iNextPitstopMFDOptionsUpdate := (A_TickCount + 60000)
 

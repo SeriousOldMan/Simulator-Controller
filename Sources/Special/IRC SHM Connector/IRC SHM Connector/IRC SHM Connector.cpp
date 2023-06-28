@@ -902,7 +902,10 @@ void writeData(std::ostringstream * output, const irsdk_header *header, const ch
 
 			if (getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct")) 
 				printLine(output, "Sector=" + std::to_string((int)max(3, 1 + floor(3 * ((float*)trackPositions)[atoi(playerCarIdx)]))));
-			
+
+			if (getDataValue(result, header, data, "PlayerCarPosition"))
+				printLine(output, "Position=" + std::string(result));
+
 			printLine(output, "Laps=" + std::string(itoa(laps, result, 10)));
 
 			bool valid = true;

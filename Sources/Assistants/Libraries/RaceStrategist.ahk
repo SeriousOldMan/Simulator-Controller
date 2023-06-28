@@ -1042,7 +1042,7 @@ class RaceStrategist extends GridRaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local split, class, speaker, continuation, only, driver, goodPace
 
-		if ((this.Session = kSessionRace) && this.hasEnoughData(false) && (position != 0)) {
+		if ((this.Session = kSessionRace) && this.hasEnoughData(false) && (position != 0) && isInteger(position)) {
 			speaker := this.getSpeaker()
 
 			speaker.beginTalk()

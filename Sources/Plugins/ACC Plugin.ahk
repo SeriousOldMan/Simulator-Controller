@@ -668,7 +668,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	checkRestart() {
-		if (GetKeyState("Ctrl", "P") && GetKeyState("Alt", "P") && GetKeyState("Shift", "P"))
+		if GetKeyState("Ctrl", "P")
 			throw "Restart"
 	}
 

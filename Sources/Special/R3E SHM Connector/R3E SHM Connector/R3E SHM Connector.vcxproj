@@ -140,7 +140,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="R3E SHM Provider.c" />
+    <ClCompile Include="R3E SHM Connector.c" />
     <ClCompile Include="utils.c" />
   </ItemGroup>
   <ItemGroup>

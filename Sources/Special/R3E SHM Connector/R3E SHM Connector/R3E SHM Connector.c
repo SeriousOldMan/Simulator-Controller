@@ -141,7 +141,7 @@ inline void writeString(char* output, char* str, int* pos) {
 	for (int i = 0; i < strlen(str); i++) {
 		output[*pos] = str[i];
 
-		pos += 1;
+		(*pos) += 1;
 	}
 }
 

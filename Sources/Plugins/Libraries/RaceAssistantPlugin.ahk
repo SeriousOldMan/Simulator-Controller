@@ -1878,7 +1878,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			if (RaceAssistantPlugin.runningSession(data) && (RaceAssistantPlugin.LastLap == 0))
 				prepareSessionDatabase(data)
 
-			if false && isDebug() {
+			if (false && isDebug()) {
 				testData := getMultiMapValues(data, "Test Data")
 
 				if (testData.Count > 0) {

@@ -62,17 +62,19 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	sendPitstopCommand(command, operation, message, arguments*) {
+		local exePath := (kBinariesDirectory . "IRC SHM Connector.dll")
+
 		if this.iCurrentPitstopMFD
 			try {
 				callSimulator(this.Code, command . "=" . operation . "=" . message . ":" . values2String(";", arguments*), "Connector")
 			}
 			catch Any as exception {
-				logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider ("), {simulator: simulator, protocol: "SHM"})
+				logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider ("), {simulator: this.Code, protocol: "SHM"})
 									   . exePath . translate(") - please rebuild the applications in the binaries folder (")
 									   . kBinariesDirectory . translate(")"))
 
 				showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration...")
-											  , {exePath: exePath, simulator: simulator, protocol: "SHM"})
+											  , {exePath: exePath, simulator: this.Code, protocol: "SHM"})
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
 	}

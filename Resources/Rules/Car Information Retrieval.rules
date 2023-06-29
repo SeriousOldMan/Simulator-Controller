@@ -31,7 +31,8 @@ carModel(?car, ?model) <= Get(Car, ?car, Car, ?model)
 carLaps(?car, COMPLETED, ?laps) <= Get(Car, ?car, Laps, ?laps), !
 carLaps(?car, COMPLETED, ?laps) <= Get(Car, ?car, Lap, ?laps)
 carLaps(?car, RUNNING, ?runningLap) <= Get(Car, ?car, Lap.Running, ?runningLap)
-carLaps(?car, FULL, ?laps) <= carLaps(?car, COMPLETED, ?completedLaps), Get(Car, ?car, Lap.Running, ?runningLap), ?laps = ?completedLaps + ?runningLap
+carLaps(?car, FULL, ?laps) <= carLaps(?car, COMPLETED, ?completedLaps), carLaps(?car, RUNNING, ?runningLap),
+							  ?laps = ?completedLaps + ?runningLap
 
 carPosition(?car, ?position) <= Get(Car, ?car, Position, ?position)
 

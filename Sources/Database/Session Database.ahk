@@ -3965,19 +3965,19 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					if selectedDriver {
 						window["driverDropDown"].Choose(inList(sessionDB.getAllDrivers(this.SelectedSimulator), selectedDriver) + 1)
 
-						driver := [[selectedDriver]]
+						driver := [selectedDriver]
 					}
 					else {
 						window["driverDropDown"].Choose(1)
 
-						driver := [true]
+						driver := true
 					}
 				}
 				else {
 					if (window["driverDropDown"].Text = translate("All"))
-						driver := [true]
+						driver := true
 					else
-						driver := [[sessionDB.getDriverID(this.SelectedSimulator, window["driverDropDown"].Text)]]
+						driver := [sessionDB.getDriverID(this.SelectedSimulator, window["driverDropDown"].Text)]
 				}
 
 				lastSimulator := this.SelectedSimulator
@@ -3998,7 +3998,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 																							, this.SelectedTrack, this.SelectedWeather
 																							, convertUnit("Temperature", window["airTemperatureEdit"].Value, false)
 																							, convertUnit("Temperature", window["trackTemperatureEdit"].Value, false)
-																							, tyreCompound, tyreCompoundColor, driver*)
+																							, tyreCompound, tyreCompoundColor, driver)
 				}
 				else
 					pressureInfos := []
@@ -4053,7 +4053,6 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				}
 			}
 			catch Any as exception {
-				msgbox(exception.Stack)
 				logError(exception)
 			}
 

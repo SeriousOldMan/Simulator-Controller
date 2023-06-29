@@ -556,12 +556,14 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	static registerDriver(simulator, id, name) {
-		local sessionDB, forName, surName, nickName
+		local sessionDB, forName, surName, nickName, key
 
 		static knownDrivers := CaseInsenseMap()
 
-		if (simulator && id && name && (name != "John Doe (JD)"))
-			if !knownDrivers.Has(id . name) {
+		if (simulator && id && name && (name != "John Doe (JD)")) {
+			key := (simulator . id . name)
+
+			if !knownDrivers.Has(key) {
 				sessionDB := Database(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\", kSessionSchemas)
 
 				forName := false
@@ -574,12 +576,13 @@ class SessionDatabase extends ConfigurationItem {
 					if (sessionDB.query("Drivers", {Where: {ID: id, Forname: forName, Surname: surName}}).Length = 0)
 						sessionDB.add("Drivers", Database.Row("ID", id, "Forname", forName, "Surname", surName, "Nickname", nickName), true)
 
-					knownDrivers[id . name] := true
+					knownDrivers[key] := true
 				}
 				catch Any as exception {
 					logError(exception)
 				}
 			}
+		}
 	}
 
 	registerDriver(simulator, id, name) {

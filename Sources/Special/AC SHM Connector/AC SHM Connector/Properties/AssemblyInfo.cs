@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("RF2SHMConnector")]
+[assembly: AssemblyTitle("ACSHMConnector")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("RF2SHMConnector")]
+[assembly: AssemblyProduct("ACSHMConnector")]
 [assembly: AssemblyCopyright("Copyright ©  2023")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("17fc2626-ea21-43ed-bc84-be0b8545fc2d")]
+[assembly: Guid("0f2a83a0-92ee-4bdb-a723-e7defb7b914e")]
 
 // Version information for an assembly consists of the following four values:
 //

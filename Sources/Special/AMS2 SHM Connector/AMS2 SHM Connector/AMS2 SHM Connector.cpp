@@ -234,6 +234,7 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 		}
 
 		if (fileHandle == NULL) {
+			printLine(&output, "Active=false");
 			printLine(&output, "Car.Count=0");
 			printLine(&output, "Driver.Car=0");
 		}

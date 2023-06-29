@@ -169,6 +169,7 @@ int main(int argc, char* argv[])
 		wprintf_s(L"[Position Data]\n");
 		
 		if (!mapped_r3e) {
+			wprintf_s(L"Active=false\n");
 			wprintf_s(L"Car.Count=%d\n", 0);
 			wprintf_s(L"Driver.Car=%d\n", 0);
 		}

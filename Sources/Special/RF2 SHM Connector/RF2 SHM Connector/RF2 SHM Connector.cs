@@ -55,7 +55,7 @@ namespace SHMConnector {
 			
 		}
 
-		bool Open()
+		public bool Open()
 		{
 			if (!this.connected)
 				this.Connect();
@@ -81,16 +81,14 @@ namespace SHMConnector {
 			}
 		}
 
-        void Close()
+        public void Close()
 		{
 			this.Disconnect();
 		}
 
-        string Call(string request)
+        public string Call(string request)
         {
             Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("en-US");
-
-            SHMConnector provider = new SHMConnector();
 
             if (request.StartsWith("Pitstop"))
             {
@@ -99,18 +97,18 @@ namespace SHMConnector {
                 string[] arguments = request.Split('=');
 
                 if (arguments[0] == "Set")
-                    provider.ExecutePitstopSetCommand(arguments[1], arguments[2].Split(';'));
+                    this.ExecutePitstopSetCommand(arguments[1], arguments[2].Split(';'));
                 else if ((arguments[0] == "Increase") || (arguments[0] == "Decrease"))
-                    provider.ExecutePitstopChangeCommand(arguments[1], arguments[0], arguments[2].Split(';'));
+                    this.ExecutePitstopChangeCommand(arguments[1], arguments[0], arguments[2].Split(';'));
 
 				return "";
             }
             else if (request.StartsWith("Setup"))
-                return provider.ReadSetup();
+                return this.ReadSetup();
             else if (request.StartsWith("Standings"))
-                return provider.ReadStandings();
+                return this.ReadStandings();
             else
-                return provider.ReadData();
+                return this.ReadData();
         }
 
         public string GetForname(byte[] name) {
@@ -237,9 +235,13 @@ namespace SHMConnector {
 				}
 			}
 			else
+			{
 				strWriter.WriteLine("Active=false");
+				strWriter.WriteLine("Car.Count=0");
+				strWriter.WriteLine("Driver.Car=0");
+			}
 
-			return strWriter.ToString();
+                return strWriter.ToString();
 		}
 
 		public string ReadData() {

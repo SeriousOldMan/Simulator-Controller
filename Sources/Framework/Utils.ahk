@@ -97,12 +97,17 @@ createGUID() {
     return ""
 }
 
-callSimulator(simulator, options := "", protocol := "Provider") {
+callSimulator(simulator, options := "", protocol?) {
 	local exePath, dataFile, data
 	local library, curWorkingDir, buf
 	local dllName, dllFile
 
+	static protocols := CaseInsenseMap("AC", "CLR", "ACC", "DLL", "R3E", "DLL", "IRC", "DLL"
+									 , "AMS2", "DLL", "PCARS2", "DLL", "RF2", "CLR")
 	static libraries := CaseInsenseMap()
+
+	if (!isSet(protocol) && protocols.Has(simulator))
+		protocol := protocols[simulator]
 
 	try {
 		if (protocol = "DLL") {
@@ -185,6 +190,6 @@ callSimulator(simulator, options := "", protocol := "Provider") {
 			return newMultiMap()
 		}
 		else
-			return callSimulator(simulator, options)
+			return callSimulator(simulator, options, "Provider")
 	}
 }

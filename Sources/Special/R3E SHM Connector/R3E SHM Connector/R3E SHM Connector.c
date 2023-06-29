@@ -238,6 +238,7 @@ extern __declspec(dllexport) int __stdcall call(char* request, char* result, int
 		writeString(result, "[Position Data]\n", &pos);
 
 		if (!mapped_r3e) {
+			writeString(result, "Active=false\n", &pos);
 			writeString(result, "Car.Count=0\n", &pos);
 			writeString(result, "Driver.Car=0\n", &pos);
 		}

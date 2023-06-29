@@ -152,6 +152,7 @@ int main(int argc, char* argv[]) {
 		}
 
 		if (fileHandle == NULL) {
+			printf("Active=false\n");
 			printf("Car.Count=0\n");
 			printf("Driver.Car=0\n");
 		}

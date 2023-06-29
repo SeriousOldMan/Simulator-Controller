@@ -1114,7 +1114,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			local tyrePressures, compounds, compound, compoundColor, ignore, pressureInfo, driver
 
 			if (editorGui["driverDropDown"].Text = translate("All"))
-				driver := [true]
+				driver := true
 			else
 				driver := [sessionDB.getDriverID(editor.SelectedSimulator, editorGui["driverDropDown"].Text)]
 
@@ -1131,7 +1131,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 																							   , editor.SelectedTrack, editor.SelectedWeather
 																							   , convertUnit("Temperature", editorGui["airTemperatureEdit"].Value, false)
 																							   , convertUnit("Temperature", editorGui["trackTemperatureEdit"].Value, false)
-																							   , compound, compoundColor, driver*)
+																							   , compound, compoundColor, driver)
 				tyrePressures.Push(pressureInfo["Pressure"] + ((pressureInfo["Delta Air"] + Round(pressureInfo["Delta Track"] * 0.49)) * 0.1))
 
 			messageSend(kFileMessage, "Setup", "setTyrePressures:" . values2String(";", compound, compoundColor, tyrePressures*), editor.RequestorPID)

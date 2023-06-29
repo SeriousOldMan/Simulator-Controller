@@ -3,7 +3,7 @@
   2. Documentation updates here and there, as always
   3. When you press the renew button for the data token, you are now asked, if you really want to renew the token, before it is actually renewed.
   4. Traffic simulation now respects the pitstop window rule when calculating the lap for the next pitstop.
-  5. Unbelievable Spotter gap announcements are further reduced.
+  5. Imprecise Spotter gap announcements are further reduced.
   6. Fixed session info in "System Monitor" not updating when not having run the first stint in team sessions.
   7. "System Monitor" can now be resized vertically.
   8. Performance improvements in process communication.

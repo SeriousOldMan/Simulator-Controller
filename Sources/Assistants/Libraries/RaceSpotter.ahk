@@ -1665,7 +1665,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 					if ((delta = 0) || (inPit && (Abs(delta) < 30)))
 						return false
-					else if ((knowledgeBase.getValue("Car." . car . ".Lap", 0) > lap)
+					else if ((knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap", 0)) > lap)
 						  && (Abs(delta) > (knowledgeBase.getValue("Lap." . lap . ".Time", 0) / 1000)))
 						return false
 					else {
@@ -1712,7 +1712,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 					if ((delta = 0) || (inPit && (Abs(delta) < 30)))
 						return false
-					else if ((knowledgeBase.getValue("Car." . car . ".Lap", 0) < lap)
+					else if ((knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap", 0)) < lap)
 						  && (Abs(delta) > (knowledgeBase.getValue("Lap." . lap . ".Time", 0) / 1000)))
 						return false
 					else {
@@ -2598,7 +2598,7 @@ class RaceSpotter extends GridRaceAssistant {
 		local lastPenalty := false
 		local wasValid := true
 		local lastWarnings := 0
-		local lap, lastPitstop, result
+		local laps, lastPitstop, result
 		local simulator, car, track
 
 		if knowledgeBase {
@@ -2613,10 +2613,10 @@ class RaceSpotter extends GridRaceAssistant {
 			this.adjustGaps(data)
 
 		loop knowledgeBase.getValue("Car.Count") {
-			lap := knowledgeBase.getValue("Car." . A_Index . ".Lap", 0)
+			laps := knowledgeBase.getValue("Car." . A_Index . ".Laps", knowledgeBase.getValue("Car." . A_Index . ".Lap", 0))
 
-			if (lap != knowledgeBase.getValue("Car." . A_Index . ".Valid.LastLap", 0)) {
-				knowledgeBase.setFact("Car." . A_Index . ".Valid.LastLap", lap)
+			if (laps != knowledgeBase.getValue("Car." . A_Index . ".Valid.LastLap", 0)) {
+				knowledgeBase.setFact("Car." . A_Index . ".Valid.LastLap", laps)
 
 				if (knowledgeBase.getValue("Car." . A_Index . ".Lap.Valid", kUndefined) == kUndefined)
 					knowledgeBase.setFact("Car." . A_Index . ".Lap.Valid", knowledgeBase.getValue("Car." . A_Index . ".Valid.Running", true))
@@ -2769,7 +2769,7 @@ class RaceSpotter extends GridRaceAssistant {
 			}
 
 			loop count {
-				carLaps := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Lap")
+				carLaps := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Laps", getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Lap"))
 				carRunning := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Lap.Running")
 
 				if (A_Index = driver) {

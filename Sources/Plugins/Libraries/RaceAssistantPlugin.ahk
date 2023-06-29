@@ -1322,7 +1322,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		if (RaceAssistantPlugin.Session == kSessionRace)
 			loop getMultiMapValue(data, "Position Data", "Car.Count")
 				if (getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Position") = 1)
-					return getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Lap")
+					return getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Laps", getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Lap"))
 
 		return getMultiMapValue(data, "Stint Data", "Laps", 0)
 	}

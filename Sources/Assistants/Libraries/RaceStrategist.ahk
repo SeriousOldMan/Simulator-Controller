@@ -1632,7 +1632,7 @@ class RaceStrategist extends GridRaceAssistant {
 		validLap := true
 
 		loop knowledgeBase.getValue("Car.Count") {
-			lap := knowledgeBase.getValue("Car." . A_Index . ".Lap", 0)
+			lap := knowledgeBase.getValue("Car." . A_Index . ".Laps", knowledgeBase.getValue("Car." . A_Index . ".Lap", 0))
 
 			if (lap != knowledgeBase.getValue("Car." . A_Index . ".Valid.LastLap", 0)) {
 				knowledgeBase.setFact("Car." . A_Index . ".Valid.LastLap", lap)
@@ -2499,7 +2499,7 @@ class RaceStrategist extends GridRaceAssistant {
 			carStatistics[A_Index] := [lapTime, potential, raceCraft, speed, consistency, carControl]
 
 			lastPositions.Push(knowledgeBase.getValue("Car." . A_Index . ".Position", 0))
-			lastRunnings.Push(knowledgeBase.getValue("Car." . A_Index . ".Lap", 0)
+			lastRunnings.Push(knowledgeBase.getValue("Car." . A_Index . ".Laps", knowledgeBase.getValue("Car." . A_Index . ".Lap", 0))
 							+ knowledgeBase.getValue("Car." . A_Index . ".Lap.Running", 0))
 		}
 

@@ -66,7 +66,7 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 
 		if this.iCurrentPitstopMFD
 			try {
-				callSimulator(this.Code, command . "=" . operation . "=" . message . ":" . values2String(";", arguments*), "Connector")
+				callSimulator(this.Code, command . "=" . operation . "=" . message . ":" . values2String(";", arguments*), "DLL")
 			}
 			catch Any as exception {
 				logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider ("), {simulator: this.Code, protocol: "SHM"})
@@ -260,7 +260,7 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	readSessionData(options := "") {
-		return super.readSessionData(options, "Connector")
+		return super.readSessionData(options, "DLL")
 	}
 }
 

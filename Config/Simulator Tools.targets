@@ -66,6 +66,7 @@ Data Provider.18=%kBinariesDirectory%IRC SHM Connector.dll <- %kSourcesDirectory
 Data Provider.19=%kBinariesDirectory%R3E SHM Connector.dll <- %kSourcesDirectory%Special\R3E SHM Connector\x64\Release\R3E SHM Connector.dll
 Data Provider.20=%kBinariesDirectory%AMS2 SHM Connector.dll <- %kSourcesDirectory%Special\AMS2 SHM Connector\x64\Release\AMS2 SHM Connector.dll
 Data Provider.21=%kBinariesDirectory%PCARS2 SHM Connector.dll <- %kSourcesDirectory%Special\AMS2 SHM Connector\x64\Release\AMS2 SHM Connector.dll
+Data Provider.22=%kBinariesDirectory%RF2 SHM Connector.dll <- %kSourcesDirectory%Special\RF2 SHM Connector\Release\RF2 SHM Connector.dll
 Speech Interface.1=%kBinariesDirectory%Speech.Recognizer.dll <- %kSourcesDirectory%Special\Speech Recognizer\Release\x64\Speech Recognizer.dll
 Speech Interface.2=%kBinariesDirectory%Microsoft.Speech.dll <- %kSourcesDirectory%Special\Speech Recognizer\Release\x64\Microsoft.Speech.dll
 Speech Interface.3=%kBinariesDirectory%Speech.Synthesizer.dll <- %kSourcesDirectory%Special\Speech Synthesizer\Release\x64\Speech Synthesizer.dll

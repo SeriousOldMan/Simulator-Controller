@@ -64,19 +64,15 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 	activateWindow() {
 	}
 
-	sendPitstopCommand(command, operation := false, message := false, arguments*) {
+	sendPitstopCommand(command, operation, message, arguments*) {
 		local simulator, exePath
 
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			simulator := this.Code
-			arguments := values2String(";", arguments*)
-			exePath := kBinariesDirectory . simulator . " SHM Provider.exe"
+			exePath := (kBinariesDirectory . simulator . " SHM Connector.dll")
 
 			try {
-				if operation
-					RunWait(A_ComSpec . " /c `"`"" . exePath . "`" -" . command . " `"" . operation . ":" . message . ":" . arguments . "`"`"", , "Hide")
-				else
-					RunWait(A_ComSpec . " /c `"`"" . exePath . "`" -" . command . "`"", , "Hide")
+				callSimulator(simulator, command . "=" . operation . "=" . message . ":" . values2String(";", arguments*), "CLR")
 			}
 			catch Any as exception {
 				logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider ("), {simulator: simulator, protocol: "SHM"})
@@ -306,6 +302,10 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 
 			this.iSelectedDriver := nextDriver[2]
 		}
+	}
+
+	readSessionData(options := "") {
+		return super.readSessionData(options, "CLR")
 	}
 
 	updateTelemetryData(data) {

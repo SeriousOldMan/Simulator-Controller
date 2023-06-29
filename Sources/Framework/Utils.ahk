@@ -17,6 +17,13 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                         Local Include Section                           ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include "..\Libraries\CLR.ahk"
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -88,4 +95,96 @@ createGUID() {
     }
 
     return ""
+}
+
+callSimulator(simulator, options := "", protocol := "Provider") {
+	local exePath, dataFile, data
+	local library, curWorkingDir, buf
+	local dllName, dllFile
+
+	static libraries := CaseInsenseMap()
+
+	try {
+		if (protocol = "DLL") {
+			if libraries.Has(simulator . ".DLL")
+				library := libraries[simulator . ".DLL"]
+			else {
+				curWorkingDir := A_WorkingDir
+
+				SetWorkingDir(kBinariesDirectory)
+
+				try {
+					library := DllCall("LoadLibrary", "Str", simulator . " SHM Connector.dll", "Ptr")
+
+					DLLCall(simulator . " SHM Connector\open")
+
+					libraries[simulator . ".DLL"] := library
+				}
+				finally {
+					SetWorkingDir(curWorkingDir)
+				}
+			}
+
+			buf := Buffer(1024 * 1024)
+
+			DllCall(simulator . " SHM Connector\call", "AStr", options, "Ptr", buf, "Int", buf.Size)
+
+			data := parseMultiMap(StrGet(buf, "UTF-8"))
+		}
+		else if (protocol = "CLR") {
+			if libraries.Has(simulator . ".CLR")
+				library := libraries[simulator . ".CLR"]
+			else {
+				dllName := (simulator . " SHM Connector.dll")
+				dllFile := (kBinariesDirectory . dllName)
+
+				if (!FileExist(dllFile))
+					throw "Unable to find " . dllName . " in " . kBinariesDirectory . "..."
+
+				library := CLR_LoadLibrary(dllFile).CreateInstance("SHMConnector.SHMConnector")
+
+				libraries[simulator . ".CLR"] := library
+
+				if !library.Open()
+					throw "Cannot startup " . dllName . " in " . kBinariesDirectory . "..."
+			}
+
+			data := parseMultiMap(library.Call(options))
+		}
+		else if (protocol = "Provider") {
+			exePath := (kBinariesDirectory . simulator . A_Space . " SHM Provider.exe")
+
+			DirCreate(kTempDirectory . simulator . " Data")
+
+			dataFile := temporaryFileName(simulator . " Data\SHM", "data")
+
+			RunWait(A_ComSpec . " /c `"`"" . exePath . "`" " . options . " > `"" . dataFile . "`"`"", , "Hide")
+
+			data := readMultiMap(dataFile)
+
+			deleteFile(dataFile)
+		}
+
+		setMultiMapValue(data, "Session Data", "Simulator", simulator)
+
+		return data
+	}
+	catch Any as exception {
+		logError(exception, true)
+
+		if (protocol = "Provider") {
+			logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider (")
+													   , {simulator: simulator, protocol: protocol})
+								   . exePath . translate(") - please rebuild the applications in the binaries folder (")
+								   . kBinariesDirectory . translate(")"))
+
+			showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration...")
+										  , {exePath: exePath, simulator: simulator, protocol: "SHM"})
+					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+
+			return newMultiMap()
+		}
+		else
+			return callSimulator(simulator, options)
+	}
 }

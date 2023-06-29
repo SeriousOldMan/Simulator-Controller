@@ -3,17 +3,20 @@ RF2 SHM Provider main class.
 
 Small parts original by: The Iron Wolf (vleonavicius@hotmail.com; thecrewchief.org)
 */
-using RF2SHMProvider.rFactor2Data;
+using SHMConnector.rFactor2Data;
 using System;
+using System.Diagnostics.Eventing.Reader;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using static RF2SHMProvider.rFactor2Constants;
-using static RF2SHMProvider.rFactor2Constants.rF2GamePhase;
-using static RF2SHMProvider.rFactor2Constants.rF2PitState;
+using static SHMConnector.rFactor2Constants;
+using static SHMConnector.rFactor2Constants.rF2GamePhase;
+using static SHMConnector.rFactor2Constants.rF2PitState;
 
-namespace RF2SHMProvider {
-	public class SHMProvider {
+namespace SHMConnector {
+	public class SHMConnector {
 		bool connected = false;
 
 		// Read buffers:
@@ -48,11 +51,17 @@ namespace RF2SHMProvider {
 		rF2RulesControl rulesControl;
 		rF2PluginControl pluginControl;
 
-		public SHMProvider() {
+		public SHMConnector() {
+			
+		}
+
+		bool Open()
+		{
 			if (!this.connected)
 				this.Connect();
 
-			try {
+			try
+			{
 				extendedBuffer.GetMappedData(ref extended);
 				scoringBuffer.GetMappedData(ref scoring);
 				telemetryBuffer.GetMappedData(ref telemetry);
@@ -61,13 +70,50 @@ namespace RF2SHMProvider {
 				graphicsBuffer.GetMappedDataUnsynchronized(ref graphics);
 				pitInfoBuffer.GetMappedData(ref pitInfo);
 				weatherBuffer.GetMappedData(ref weather);
+
+				return true;
 			}
-			catch (Exception) {
+			catch (Exception)
+			{
 				this.Disconnect();
+
+				return false;
 			}
 		}
 
-		public string GetForname(byte[] name) {
+        void Close()
+		{
+			this.Disconnect();
+		}
+
+        string Call(string request)
+        {
+            Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("en-US");
+
+            SHMConnector provider = new SHMConnector();
+
+            if (request.StartsWith("Pitstop"))
+            {
+				request = request.Split(new char[] { '=' }, 2)[1];
+
+                string[] arguments = request.Split('=');
+
+                if (arguments[0] == "Set")
+                    provider.ExecutePitstopSetCommand(arguments[1], arguments[2].Split(';'));
+                else if ((arguments[0] == "Increase") || (arguments[0] == "Decrease"))
+                    provider.ExecutePitstopChangeCommand(arguments[1], arguments[0], arguments[2].Split(';'));
+
+				return "";
+            }
+            else if (request.StartsWith("Setup"))
+                return provider.ReadSetup();
+            else if (request.StartsWith("Standings"))
+                return provider.ReadStandings();
+            else
+                return provider.ReadData();
+        }
+
+        public string GetForname(byte[] name) {
 			string forName = GetStringFromBytes(name);
 
 			if (forName.Contains(" ")) {
@@ -136,78 +182,87 @@ namespace RF2SHMProvider {
 				return id.ToString();
 		}
 
-		public void ReadStandings() {
-			Console.WriteLine("[Position Data]");
+		public string ReadStandings()
+		{
+			StringWriter strWriter = new StringWriter();
 
-			Console.Write("Car.Count="); Console.WriteLine(scoring.mScoringInfo.mNumVehicles);
+			strWriter.WriteLine("[Position Data]");
 
-			for (int i = 1; i <= scoring.mScoringInfo.mNumVehicles; ++i) {
-				rF2VehicleScoring vehicle = scoring.mVehicles[i - 1];
+			if (connected)
+			{
+				strWriter.Write("Car.Count="); strWriter.WriteLine(scoring.mScoringInfo.mNumVehicles);
 
-                Console.Write("Car."); Console.Write(i); Console.Write(".Position="); Console.WriteLine(vehicle.mPlace);
-
-                Console.Write("Car."); Console.Write(i); Console.Write(".Laps="); Console.WriteLine(vehicle.mTotalLaps);
-				Console.Write("Car."); Console.Write(i); Console.Write(".Lap.Running="); Console.WriteLine(vehicle.mLapDist / scoring.mScoringInfo.mLapDist);
-				Console.Write("Car."); Console.Write(i); Console.Write(".Lap.Running.Valid="); Console.WriteLine(vehicle.mCountLapFlag == 2 ? "true" : "false");
-
-				int lapTime = (int)Math.Round(Normalize(vehicle.mLastLapTime) * 1000);
-
-				if (lapTime == 0)
-					lapTime = (int)Math.Round(Normalize(vehicle.mBestLapTime) * 1000);
-
-                int sector1Time = (int)Math.Round(Normalize(vehicle.mLastSector1) * 1000);
-				int sector2Time = (int)Math.Round(Normalize(vehicle.mLastSector2) * 1000);
-				int sector3Time = lapTime - sector1Time - sector2Time;
-
-				Console.Write("Car."); Console.Write(i); Console.Write(".Time="); Console.WriteLine(lapTime);
-				Console.Write("Car."); Console.Write(i); Console.Write(".Time.Sectors="); Console.WriteLine(sector1Time + "," + sector2Time + "," + sector3Time);
-
-				string carClass = GetStringFromBytes(vehicle.mVehicleClass);
-                string carModel = GetCarName(carClass, GetStringFromBytes(vehicle.mVehicleName));
-				string carNr = GetCarNr(vehicle.mID, carClass, GetStringFromBytes(vehicle.mVehicleName));
-				
-				Console.Write("Car."); Console.Write(i); Console.Write(".Nr="); Console.WriteLine(carNr);
-                Console.Write("Car."); Console.Write(i); Console.Write(".Class="); Console.WriteLine(carClass);
-                Console.Write("Car."); Console.Write(i); Console.Write(".Car="); Console.WriteLine(carModel);
-
-				Console.Write("Car."); Console.Write(i); Console.Write(".Driver.Forname="); Console.WriteLine(GetForname(vehicle.mDriverName));
-				Console.Write("Car."); Console.Write(i); Console.Write(".Driver.Surname="); Console.WriteLine(GetSurname(vehicle.mDriverName));
-				Console.Write("Car."); Console.Write(i); Console.Write(".Driver.Nickname="); Console.WriteLine(GetNickname(vehicle.mDriverName));
-
-				Console.Write("Car."); Console.Write(i); Console.Write(".InPitLane="); Console.WriteLine(vehicle.mInPits != 0 ? "true" : "false");
-				Console.Write("Car."); Console.Write(i); Console.Write(".InPit="); Console.WriteLine(vehicle.mPitState == (byte)Stopped ? "true" : "false");
-
-				if (vehicle.mIsPlayer != 0)
+				for (int i = 1; i <= scoring.mScoringInfo.mNumVehicles; ++i)
 				{
-					Console.Write("Driver.Car=");
-					Console.WriteLine(i);
+					rF2VehicleScoring vehicle = scoring.mVehicles[i - 1];
+
+					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Position="); strWriter.WriteLine(vehicle.mPlace);
+
+					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Laps="); strWriter.WriteLine(vehicle.mTotalLaps);
+					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Lap.Running="); strWriter.WriteLine(vehicle.mLapDist / scoring.mScoringInfo.mLapDist);
+					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Lap.Running.Valid="); strWriter.WriteLine(vehicle.mCountLapFlag == 2 ? "true" : "false");
+
+					int lapTime = (int)Math.Round(Normalize(vehicle.mLastLapTime) * 1000);
+
+					if (lapTime == 0)
+						lapTime = (int)Math.Round(Normalize(vehicle.mBestLapTime) * 1000);
+
+					int sector1Time = (int)Math.Round(Normalize(vehicle.mLastSector1) * 1000);
+					int sector2Time = (int)Math.Round(Normalize(vehicle.mLastSector2) * 1000);
+					int sector3Time = lapTime - sector1Time - sector2Time;
+
+					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Time="); strWriter.WriteLine(lapTime);
+					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Time.Sectors="); strWriter.WriteLine(sector1Time + "," + sector2Time + "," + sector3Time);
+
+					string carClass = GetStringFromBytes(vehicle.mVehicleClass);
+					string carModel = GetCarName(carClass, GetStringFromBytes(vehicle.mVehicleName));
+					string carNr = GetCarNr(vehicle.mID, carClass, GetStringFromBytes(vehicle.mVehicleName));
+
+					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Nr="); strWriter.WriteLine(carNr);
+					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Class="); strWriter.WriteLine(carClass);
+					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Car="); strWriter.WriteLine(carModel);
+
+					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Driver.Forname="); strWriter.WriteLine(GetForname(vehicle.mDriverName));
+					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Driver.Surname="); strWriter.WriteLine(GetSurname(vehicle.mDriverName));
+					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Driver.Nickname="); strWriter.WriteLine(GetNickname(vehicle.mDriverName));
+
+					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".InPitLane="); strWriter.WriteLine(vehicle.mInPits != 0 ? "true" : "false");
+					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".InPit="); strWriter.WriteLine(vehicle.mPitState == (byte)Stopped ? "true" : "false");
+
+					if (vehicle.mIsPlayer != 0)
+					{
+						strWriter.Write("Driver.Car=");
+						strWriter.WriteLine(i);
+					}
 				}
 			}
+			else
+				strWriter.WriteLine("Active=false");
+
+			return strWriter.ToString();
 		}
 
-		public void ReadData() {
-			rF2VehicleScoring playerScoring = GetPlayerScoring(ref scoring);
+		public string ReadData() {
+            StringWriter strWriter = new StringWriter();
+
+            rF2VehicleScoring playerScoring = GetPlayerScoring(ref scoring);
 			rF2VehicleTelemetry playerTelemetry = GetPlayerTelemetry(playerScoring.mID, ref telemetry);
 
 			string session = "";
 
-			Console.WriteLine("[Session Data]");
-			Console.Write("Active="); Console.WriteLine((connected && (extended.mSessionStarted != 0)) ? "true" : "false");
+			strWriter.WriteLine("[Session Data]");
+			strWriter.Write("Active="); strWriter.WriteLine((connected && (extended.mSessionStarted != 0)) ? "true" : "false");
 			if (connected) {
 				if (playerTelemetry.mWheels == null)
-					Console.WriteLine("Paused=true");
+					strWriter.WriteLine("Paused=true");
 				else
 				{
-					Console.Write("Paused=");
-					Console.WriteLine(scoring.mScoringInfo.mGamePhase <= (byte)GridWalk || scoring.mScoringInfo.mGamePhase == (byte)PausedOrHeartbeat ? "true" : "false");
+					strWriter.Write("Paused=");
+					strWriter.WriteLine(scoring.mScoringInfo.mGamePhase <= (byte)GridWalk || scoring.mScoringInfo.mGamePhase == (byte)PausedOrHeartbeat ? "true" : "false");
 				}
 
 				if (scoring.mScoringInfo.mEndET <= 0.0 && (scoring.mScoringInfo.mMaxLaps - playerScoring.mTotalLaps) <= 0)
 					session = "Finished";
-				/*
-				else if (scoring.mScoringInfo.mGamePhase == (byte)SessionOver)
-					session = "Finished";
-				*/
 				else if (scoring.mScoringInfo.mSession >= 10 && scoring.mScoringInfo.mSession <= 13)
 					session = "Race";
 				else if (scoring.mScoringInfo.mSession >= 0 && scoring.mScoringInfo.mSession <= 4)
@@ -217,149 +272,124 @@ namespace RF2SHMProvider {
 				else
 					session = "Other";
 
-				Console.Write("Session="); Console.WriteLine(session);
+				strWriter.Write("Session="); strWriter.WriteLine(session);
 
 				string vehicleClass = GetStringFromBytes(playerScoring.mVehicleClass);
 				string vehicleName = GetStringFromBytes(playerScoring.mVehicleName);
 
-				Console.Write("Car="); Console.WriteLine(GetCarName(vehicleClass, vehicleName));
-				Console.Write("CarName="); Console.WriteLine(vehicleName);
-				Console.Write("CarClass="); Console.WriteLine(vehicleClass);
-				Console.Write("Track="); Console.WriteLine(GetStringFromBytes(playerTelemetry.mTrackName));
-				Console.Write("SessionFormat="); Console.WriteLine((scoring.mScoringInfo.mEndET <= 0.0) ? "Laps" : "Time");
-				Console.Write("FuelAmount="); Console.WriteLine(Math.Round(playerTelemetry.mFuelCapacity));
+				strWriter.Write("Car="); strWriter.WriteLine(GetCarName(vehicleClass, vehicleName));
+				strWriter.Write("CarName="); strWriter.WriteLine(vehicleName);
+				strWriter.Write("CarClass="); strWriter.WriteLine(vehicleClass);
+				strWriter.Write("Track="); strWriter.WriteLine(GetStringFromBytes(playerTelemetry.mTrackName));
+				strWriter.Write("SessionFormat="); strWriter.WriteLine((scoring.mScoringInfo.mEndET <= 0.0) ? "Laps" : "Time");
+				strWriter.Write("FuelAmount="); strWriter.WriteLine(Math.Round(playerTelemetry.mFuelCapacity));
 
-				/*
-				if (session == "Practice")
-				{
-					Console.WriteLine("SessionTimeRemaining=3600000");
+				long time = GetRemainingTime(ref playerScoring);
 
-					Console.WriteLine("SessionLapsRemaining=30");
-				}
-				else
-				{
-				*/
-					long time = GetRemainingTime(ref playerScoring);
+				strWriter.Write("SessionTimeRemaining="); strWriter.WriteLine(time);
 
-					Console.Write("SessionTimeRemaining="); Console.WriteLine(time);
-
-					Console.Write("SessionLapsRemaining="); Console.WriteLine(GetRemainingLaps(ref playerScoring));
-				/*
-				}
-				*/
+				strWriter.Write("SessionLapsRemaining="); strWriter.WriteLine(GetRemainingLaps(ref playerScoring));
 			}
 
-			Console.WriteLine("[Stint Data]");
+			strWriter.WriteLine("[Stint Data]");
 			if (connected) {
-				Console.Write("DriverForname="); Console.WriteLine(GetForname(scoring.mScoringInfo.mPlayerName));
-				Console.Write("DriverSurname="); Console.WriteLine(GetSurname(scoring.mScoringInfo.mPlayerName));
-				Console.Write("DriverNickname="); Console.WriteLine(GetNickname(scoring.mScoringInfo.mPlayerName));
+				strWriter.Write("DriverForname="); strWriter.WriteLine(GetForname(scoring.mScoringInfo.mPlayerName));
+				strWriter.Write("DriverSurname="); strWriter.WriteLine(GetSurname(scoring.mScoringInfo.mPlayerName));
+				strWriter.Write("DriverNickname="); strWriter.WriteLine(GetNickname(scoring.mScoringInfo.mPlayerName));
 
-				Console.Write("LapValid="); Console.WriteLine((playerScoring.mCountLapFlag == 2) ? "true" : "false");
+				strWriter.Write("LapValid="); strWriter.WriteLine((playerScoring.mCountLapFlag == 2) ? "true" : "false");
 				
-				Console.Write("LapLastTime="); Console.WriteLine(Math.Round(Normalize(playerScoring.mLastLapTime > 0 ? playerScoring.mLastLapTime
+				strWriter.Write("LapLastTime="); strWriter.WriteLine(Math.Round(Normalize(playerScoring.mLastLapTime > 0 ? playerScoring.mLastLapTime
 																													 : playerScoring.mBestLapTime) * 1000));
-				Console.Write("LapBestTime="); Console.WriteLine(Math.Round(Normalize(playerScoring.mBestLapTime) * 1000));
+				strWriter.Write("LapBestTime="); strWriter.WriteLine(Math.Round(Normalize(playerScoring.mBestLapTime) * 1000));
 
 				if (playerScoring.mNumPenalties > 0)
-                    Console.WriteLine("Penalty=true");
+                    strWriter.WriteLine("Penalty=true");
 
-                Console.Write("Sector="); Console.WriteLine(playerScoring.mSector == 0 ? 3 : playerScoring.mSector);
-				Console.Write("Laps="); Console.WriteLine(playerScoring.mTotalLaps);
+                strWriter.Write("Sector="); strWriter.WriteLine(playerScoring.mSector == 0 ? 3 : playerScoring.mSector);
+				strWriter.Write("Laps="); strWriter.WriteLine(playerScoring.mTotalLaps);
 
-				/*
-				if (session == "Practice")
-				{
-					Console.WriteLine("StintTimeRemaining=3600000");
-					Console.WriteLine("DriverTimeRemaining=3600000");
-				}
-				else
-				{
-				*/
-					long time = GetRemainingTime(ref playerScoring);
+				long time = GetRemainingTime(ref playerScoring);
 
-					Console.Write("StintTimeRemaining="); Console.WriteLine(time);
-					Console.Write("DriverTimeRemaining="); Console.WriteLine(time);
-				/*
-				}
-				*/
-				Console.Write("InPit="); Console.WriteLine(playerScoring.mPitState == (byte)Stopped ? "true" : "false");
+				strWriter.Write("StintTimeRemaining="); strWriter.WriteLine(time);
+				strWriter.Write("DriverTimeRemaining="); strWriter.WriteLine(time);
+				strWriter.Write("InPit="); strWriter.WriteLine(playerScoring.mPitState == (byte)Stopped ? "true" : "false");
 			}
 
-			Console.WriteLine("[Car Data]");
+			strWriter.WriteLine("[Car Data]");
 			if (connected && (playerTelemetry.mWheels != null)) {
-				Console.WriteLine("MAP=n/a");
-				Console.Write("TC="); Console.WriteLine(extended.mPhysics.mTractionControl);
-				Console.Write("ABS="); Console.WriteLine(extended.mPhysics.mAntiLockBrakes);
+				strWriter.WriteLine("MAP=n/a");
+				strWriter.Write("TC="); strWriter.WriteLine(extended.mPhysics.mTractionControl);
+				strWriter.Write("ABS="); strWriter.WriteLine(extended.mPhysics.mAntiLockBrakes);
 				
-				Console.Write("FuelRemaining="); Console.WriteLine(playerTelemetry.mFuel);
-				Console.Write("TyreTemperature=");
-				Console.WriteLine(GetCelcius(playerTelemetry.mWheels[0].mTireCarcassTemperature) + "," +
+				strWriter.Write("FuelRemaining="); strWriter.WriteLine(playerTelemetry.mFuel);
+				strWriter.Write("TyreTemperature=");
+				strWriter.WriteLine(GetCelcius(playerTelemetry.mWheels[0].mTireCarcassTemperature) + "," +
 								  GetCelcius(playerTelemetry.mWheels[1].mTireCarcassTemperature) + "," +
 								  GetCelcius(playerTelemetry.mWheels[2].mTireCarcassTemperature) + "," +
 								  GetCelcius(playerTelemetry.mWheels[3].mTireCarcassTemperature));
-				Console.Write("TyrePressure=");
-				Console.WriteLine(GetPsi(playerTelemetry.mWheels[0].mPressure) + "," +
+				strWriter.Write("TyrePressure=");
+				strWriter.WriteLine(GetPsi(playerTelemetry.mWheels[0].mPressure) + "," +
 								  GetPsi(playerTelemetry.mWheels[1].mPressure) + "," +
 								  GetPsi(playerTelemetry.mWheels[2].mPressure) + "," +
 								  GetPsi(playerTelemetry.mWheels[3].mPressure));
-				Console.Write("TyreWear=");
+				strWriter.Write("TyreWear=");
 				if (extended.mPhysics.mTireMult > 0)
-					Console.WriteLine((100 - Math.Round(playerTelemetry.mWheels[0].mWear * 100)) + "," +
+					strWriter.WriteLine((100 - Math.Round(playerTelemetry.mWheels[0].mWear * 100)) + "," +
 									  (100 - Math.Round(playerTelemetry.mWheels[1].mWear * 100)) + "," +
 									  (100 - Math.Round(playerTelemetry.mWheels[2].mWear * 100)) + "," +
 									  (100 - Math.Round(playerTelemetry.mWheels[3].mWear * 100)));
 				else
-					Console.WriteLine("0,0,0,0");
-				Console.Write("BrakeTemperature=");
-				Console.WriteLine(GetCelcius(playerTelemetry.mWheels[0].mBrakeTemp) + "," +
+					strWriter.WriteLine("0,0,0,0");
+				strWriter.Write("BrakeTemperature=");
+				strWriter.WriteLine(GetCelcius(playerTelemetry.mWheels[0].mBrakeTemp) + "," +
 								  GetCelcius(playerTelemetry.mWheels[1].mBrakeTemp) + "," +
 								  GetCelcius(playerTelemetry.mWheels[2].mBrakeTemp) + "," +
 								  GetCelcius(playerTelemetry.mWheels[3].mBrakeTemp));
 
 				string compound = GetStringFromBytes(playerTelemetry.mFrontTireCompoundName);
 			
-				Console.Write("TyreCompoundRaw="); Console.WriteLine(compound);
+				strWriter.Write("TyreCompoundRaw="); strWriter.WriteLine(compound);
 
-				Console.Write("BodyworkDamage=0, 0, 0, 0, "); Console.WriteLine(extended.mTrackedDamages[playerTelemetry.mID].mAccumulatedImpactMagnitude / 1000);
-				Console.WriteLine("SuspensionDamage=0, 0, 0, 0");
-				Console.WriteLine("EngineDamage=0");
+				strWriter.Write("BodyworkDamage=0, 0, 0, 0, "); strWriter.WriteLine(extended.mTrackedDamages[playerTelemetry.mID].mAccumulatedImpactMagnitude / 1000);
+				strWriter.WriteLine("SuspensionDamage=0, 0, 0, 0");
+				strWriter.WriteLine("EngineDamage=0");
 			}
 
-			Console.WriteLine("[Track Data]");
-
+			strWriter.WriteLine("[Track Data]");
 			if (connected)
 			{
-				Console.WriteLine("Grip=Optimum");
-				Console.Write("Temperature="); Console.WriteLine(scoring.mScoringInfo.mTrackTemp);
+				strWriter.WriteLine("Grip=Optimum");
+				strWriter.Write("Temperature="); strWriter.WriteLine(scoring.mScoringInfo.mTrackTemp);
 
 				for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)	{
 					var vehicle = scoring.mVehicles[i];
 
-					Console.WriteLine("Car." + (i + 1) + ".Position=" + vehicle.mPos.x + "," + (- vehicle.mPos.z));
+					strWriter.WriteLine("Car." + (i + 1) + ".Position=" + vehicle.mPos.x + "," + (- vehicle.mPos.z));
 				}
 			}
 
-			Console.WriteLine("[Weather Data]");
-
+			strWriter.WriteLine("[Weather Data]");
 			if (connected) {
-				Console.Write("Temperature="); Console.WriteLine(scoring.mScoringInfo.mAmbientTemp);
+				strWriter.Write("Temperature="); strWriter.WriteLine(scoring.mScoringInfo.mAmbientTemp);
 
 				string theWeather = GetWeather(scoring.mScoringInfo.mDarkCloud, scoring.mScoringInfo.mRaining);
 
-				Console.Write("Weather="); Console.WriteLine(theWeather);
-				Console.Write("Weather10Min="); Console.WriteLine(theWeather);
-				Console.Write("Weather30Min="); Console.WriteLine(theWeather);
+				strWriter.Write("Weather="); strWriter.WriteLine(theWeather);
+				strWriter.Write("Weather10Min="); strWriter.WriteLine(theWeather);
+				strWriter.Write("Weather30Min="); strWriter.WriteLine(theWeather);
 			}
 
-			Console.WriteLine("[Test Data]");
+			strWriter.WriteLine("[Test Data]");
 			if (connected) {
-				Console.Write("Category="); Console.Write(pitInfo.mPitMenu.mCategoryIndex);
-				Console.Write(" -> "); Console.WriteLine(GetStringFromBytes(pitInfo.mPitMenu.mCategoryName));
-				Console.Write("Choices="); Console.Write(pitInfo.mPitMenu.mChoiceIndex);
-				Console.Write(" -> "); Console.WriteLine(GetStringFromBytes(pitInfo.mPitMenu.mChoiceString));
-				Console.Write("NumChoices="); Console.WriteLine(pitInfo.mPitMenu.mNumChoices);
+				strWriter.Write("Category="); strWriter.Write(pitInfo.mPitMenu.mCategoryIndex);
+				strWriter.Write(" -> "); strWriter.WriteLine(GetStringFromBytes(pitInfo.mPitMenu.mCategoryName));
+				strWriter.Write("Choices="); strWriter.Write(pitInfo.mPitMenu.mChoiceIndex);
+				strWriter.Write(" -> "); strWriter.WriteLine(GetStringFromBytes(pitInfo.mPitMenu.mChoiceString));
+				strWriter.Write("NumChoices="); strWriter.WriteLine(pitInfo.mPitMenu.mNumChoices);
 			}
+
+			return strWriter.ToString();
 		}
 
 		private long Normalize(long value) {
@@ -847,65 +877,74 @@ namespace RF2SHMProvider {
 			this.nextKeyHandlingTime = now + TimeSpan.FromMilliseconds(100);
 		}
 
-		public void ReadSetup() {
-			Console.WriteLine("[Setup Data]");
-			
-			if (connected) {
-				if (!SelectPitstopCategory("FUEL:"))
-					return;
+		public string ReadSetup() {
+            StringWriter strWriter = new StringWriter();
 
-				Console.Write("FuelAmount="); Console.WriteLine(pitInfo.mPitMenu.mChoiceIndex);
+            strWriter.WriteLine("[Setup Data]");
+
+			if (connected)
+			{
+				if (SelectPitstopCategory("FUEL:"))
+					strWriter.Write("FuelAmount="); strWriter.WriteLine(pitInfo.mPitMenu.mChoiceIndex);
 
 				if (!SelectPitstopCategory("F TIRES:"))
-					return;
+				{
+					string compound = GetStringFromBytes(pitInfo.mPitMenu.mChoiceString);
 
-				string compound = GetStringFromBytes(pitInfo.mPitMenu.mChoiceString);
+					if (compound != "No Change")
+						strWriter.WriteLine("TyreCompoundRaw=" + compound);
+					else
+						strWriter.WriteLine("TyreCompoundRaw=false");
 
-				if (compound != "No Change")
-					Console.WriteLine("TyreCompoundRaw=" + compound);
-				else
-					Console.WriteLine("TyreCompoundRaw=false");
+					void writePressure(string category, string key)
+					{
+						if (SelectPitstopCategory(category))
+						{
+							string currentPressure = GetStringFromBytes(pitInfo.mPitMenu.mChoiceString);
 
-                void writePressure(string category, string key) {
-					if (!SelectPitstopCategory(category))
-						return;
+							if (currentPressure.Contains(" "))
+								currentPressure = currentPressure.Split(' ')[0];
 
-					string currentPressure = GetStringFromBytes(pitInfo.mPitMenu.mChoiceString);
+							strWriter.Write(key); strWriter.Write("="); strWriter.WriteLine(GetPsi(Int16.Parse(currentPressure)));
+						}
+					}
 
-					if (currentPressure.Contains(" "))
-						currentPressure = currentPressure.Split(' ')[0];
-
-					Console.Write(key); Console.Write("="); Console.WriteLine(GetPsi(Int16.Parse(currentPressure)));
+					writePressure("FL PRESS:", "TyrePressureFL");
+					writePressure("FR PRESS:", "TyrePressureFR");
+					writePressure("RL PRESS:", "TyrePressureRL");
+					writePressure("RR PRESS:", "TyrePressureRR");
 				}
 
-				writePressure("FL PRESS:", "TyrePressureFL");
-				writePressure("FR PRESS:", "TyrePressureFR");
-				writePressure("RL PRESS:", "TyrePressureRL");
-				writePressure("RR PRESS:", "TyrePressureRR");
+				if (SelectPitstopCategory("DAMAGE:"))
+				{
+					string option = GetStringFromBytes(pitInfo.mPitMenu.mChoiceString);
 
-				if (!SelectPitstopCategory("DAMAGE:"))
-					return;
+					if (option.Contains("All"))
+					{
+						strWriter.WriteLine("RepairSupension=true");
+						strWriter.WriteLine("RepairBodywork=true");
+					}
+					else if (option.Contains("Bodywork"))
+					{
+						strWriter.WriteLine("RepairSupension=false");
+						strWriter.WriteLine("RepairBodywork=true");
+					}
+					else if (option.Contains("Suspension"))
+					{
+						strWriter.WriteLine("RepairSupension=true");
+						strWriter.WriteLine("RepairBodywork=false");
+					}
+					else
+					{
+						strWriter.WriteLine("RepairSupension=false");
+						strWriter.WriteLine("RepairBodywork=false");
+					}
+				}
 
-				string option = GetStringFromBytes(pitInfo.mPitMenu.mChoiceString);
-
-				if (option.Contains("All")) {
-					Console.WriteLine("RepairSupension=true");
-					Console.WriteLine("RepairBodywork=true");
-				}
-				else if (option.Contains("Bodywork")) {
-					Console.WriteLine("RepairSupension=false");
-					Console.WriteLine("RepairBodywork=true");
-				}
-				else if (option.Contains("Suspension")) {
-					Console.WriteLine("RepairSupension=true");
-					Console.WriteLine("RepairBodywork=false");
-				}
-				else {
-					Console.WriteLine("RepairSupension=false");
-					Console.WriteLine("RepairBodywork=false");
-				}
-
+				return strWriter.ToString();
 			}
+			else
+				return "";
 		}
     }
 }

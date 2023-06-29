@@ -453,7 +453,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	readSessionData(options := "") {
-		return super.readSessionData(options, "Connector")
+		return super.readSessionData(options, "DLL")
 	}
 
 	computeBrakePadWear(location, compound, thickness) {

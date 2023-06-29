@@ -207,7 +207,7 @@ BOOL getArgument(char* output, char* request, char* key) {
 
 BOOL mapped_r3e = FALSE;
 
-extern __declspec(dllexport) int __stdcall initialize() {
+extern __declspec(dllexport) int __stdcall open() {
 	if (!mapped_r3e && map_exists())
 	{
 		int err_code = map_init();
@@ -221,13 +221,13 @@ extern __declspec(dllexport) int __stdcall initialize() {
 	return mapped_r3e ? 0 : -1;
 }
 
-extern __declspec(dllexport) int __stdcall dispose() {
+extern __declspec(dllexport) int __stdcall close() {
 	map_close();
 
 	return 0;
 }
 
-extern __declspec(dllexport) int __stdcall collect(char* request, char* result, int size) {
+extern __declspec(dllexport) int __stdcall call(char* request, char* result, int size) {
 	char buffer[255];
 	int pos = 0;
 
@@ -254,7 +254,7 @@ extern __declspec(dllexport) int __stdcall collect(char* request, char* result, 
 				writeString(result, "Car.", &pos); writeInt(result, i, &pos); writeIntOption(result, ".Nr=", vehicle.driver_info.car_number, &pos);
 				writeString(result, "Car.", &pos); writeInt(result, i, &pos); writeIntOption(result, ".Class=", vehicle.driver_info.class_id, &pos);
 				writeString(result, "Car.", &pos); writeInt(result, i, &pos); writeIntOption(result, ".Position=", position, &pos);
-				writeString(result, "Car.", &pos); writeInt(result, i, &pos); writeIntOption(result, ".Lap=", vehicle.completed_laps, &pos);
+				writeString(result, "Car.", &pos); writeInt(result, i, &pos); writeIntOption(result, ".Laps=", vehicle.completed_laps, &pos);
 				writeString(result, "Car.", &pos); writeInt(result, i, &pos); writeFloatOption(result, ".Lap.Running=", (float)((double)(vehicle.lap_distance / map_buffer->lap_distance) * map_buffer->lap_distance_fraction), &pos);
 				writeString(result, "Car.", &pos); writeInt(result, i, &pos); writeString(result, vehicle.current_lap_valid ? "true\n" : "false\n", &pos);
 

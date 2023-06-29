@@ -5233,7 +5233,8 @@ class RaceCenter extends ConfigurationItem {
 
 				loop count {
 					lastPositions.Push(getMultiMapValue(positions, "Position Data", "Car." . A_Index . ".Position", 0))
-					lastRunnings.Push(getMultiMapValue(positions, "Position Data", "Car." . A_Index . ".Lap", 0)
+					lastRunnings.Push(getMultiMapValue(positions, "Position Data", "Car." . A_Index . ".Laps"
+																, getMultiMapValue(positions, "Position Data", "Car." . A_Index . ".Lap", 0))
 									+ getMultiMapValue(positions, "Position Data", "Car." . A_Index . ".Lap.Running", 0))
 				}
 

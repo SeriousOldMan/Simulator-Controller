@@ -622,7 +622,7 @@ void writePositions(std::ostringstream* output, const irsdk_header *header, cons
 
 				getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:CarIdx:{%s}LapsComplete:", sessionID, carIdx);
 
-				printLine(output, "Car." + std::string(carIdx1) + ".Lap=" + std::string(result));
+				printLine(output, "Car." + std::string(carIdx1) + ".Laps=" + std::string(result));
 
 				getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:CarIdx:{%s}LastTime:", sessionID, carIdx);
 
@@ -1060,7 +1060,7 @@ std::string getArgument(char* request, std::string key) {
 	return getArgument(std::string(request), key);
 }
 
-extern "C" __declspec(dllexport) int __stdcall initialize() {
+extern "C" __declspec(dllexport) int __stdcall open() {
 	// bump priority up so we get time from the sim
 	SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
 
@@ -1070,14 +1070,14 @@ extern "C" __declspec(dllexport) int __stdcall initialize() {
 	return 0;
 }
 
-extern "C" __declspec(dllexport) int __stdcall dispose() {
+extern "C" __declspec(dllexport) int __stdcall close() {
 	irsdk_shutdown();
 	timeEndPeriod(1);
 
 	return 0;
 }
 
-extern "C" __declspec(dllexport) int __stdcall collect(char* request, char* result, int size)
+extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result, int size)
 {
 	std::string argument = getArgument(request, "Track");
 

@@ -164,13 +164,13 @@ HANDLE fileHandle = NULL;
 const SharedMemory* sharedData = NULL;
 SharedMemory* localCopy = NULL;
 
-extern "C" __declspec(dllexport) int __stdcall initialize() {
+extern "C" __declspec(dllexport) int __stdcall open() {
 	fileHandle = OpenFileMappingA(PAGE_READONLY, FALSE, MAP_OBJECT_NAME);
 
 	return (fileHandle ? 0 : -1);
 }
 
-extern "C" __declspec(dllexport) int __stdcall dispose() {
+extern "C" __declspec(dllexport) int __stdcall close() {
 	UnmapViewOfFile(sharedData);
 	CloseHandle(fileHandle);
 	delete localCopy;
@@ -178,7 +178,7 @@ extern "C" __declspec(dllexport) int __stdcall dispose() {
 	return 0;
 }
 
-extern "C" __declspec(dllexport) int __stdcall collect(char* request, char* result, int size) {
+extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result, int size) {
 	std::ostringstream output;
 
 	if (fileHandle != NULL) {
@@ -247,7 +247,7 @@ extern "C" __declspec(dllexport) int __stdcall collect(char* request, char* resu
 				print(&output, "Car.", i); printLine(&output, ".Nr=", i);
 				print(&output, "Car.", i); printLine(&output, ".Class=", localCopy->mCarClassNames[i - 1]);
 				print(&output, "Car.", i); printLine(&output, ".Position=", (long)vehicle.mRacePosition);
-				print(&output, "Car.", i); printLine(&output, ".Lap=", (long)vehicle.mLapsCompleted);
+				print(&output, "Car.", i); printLine(&output, ".Laps=", (long)vehicle.mLapsCompleted);
 				print(&output, "Car.", i); printLine(&output, ".Lap.Running=", vehicle.mCurrentLapDistance / localCopy->mTrackLength);
 				print(&output, "Car.", i); printLine(&output, ".Lap.Running.Valid=", localCopy->mLapsInvalidated[i - 1] ? "false" : "true");
 				print(&output, "Car.", i); printLine(&output, ".Time=", (long)(localCopy->mLastLapTimes[i - 1] * 1000));

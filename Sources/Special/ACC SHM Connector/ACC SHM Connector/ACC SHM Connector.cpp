@@ -266,7 +266,7 @@ std::string getArgument(char* request, std::string key) {
 	return getArgument(std::string(request), key);
 }
 
-extern "C" __declspec(dllexport) int __stdcall initialize() {
+extern "C" __declspec(dllexport) int __stdcall open() {
 	initPhysics();
 	initGraphics();
 	initStatic();
@@ -274,7 +274,7 @@ extern "C" __declspec(dllexport) int __stdcall initialize() {
 	return 0;
 }
 
-extern "C" __declspec(dllexport) int __stdcall dispose() {
+extern "C" __declspec(dllexport) int __stdcall close() {
 	dismiss(m_graphics);
 	dismiss(m_physics);
 	dismiss(m_static);
@@ -282,7 +282,7 @@ extern "C" __declspec(dllexport) int __stdcall dispose() {
 	return 0;
 }
 
-extern "C" __declspec(dllexport) int __stdcall collect(char* request, char* result, int size)
+extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result, int size)
 {
 	SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;

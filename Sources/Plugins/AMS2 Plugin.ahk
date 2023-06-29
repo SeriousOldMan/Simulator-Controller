@@ -334,7 +334,7 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	readSessionData(options := "") {
-		return super.readSessionData(options, "Connector")
+		return super.readSessionData(options, "DLL")
 	}
 
 	updateSession(session) {

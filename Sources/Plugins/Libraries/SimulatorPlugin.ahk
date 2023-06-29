@@ -1161,11 +1161,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 
 		trackData := sessionDB.getTrackData(this.Code, this.Track)
 
-		data := this.readSessionData(trackData ? ("Track=" . trackData) : "")
-
-		setMultiMapValue(data, "Session Data", "Simulator", this.Code)
-
-		return data
+		return this.readSessionData(trackData ? ("Track=" . trackData) : "")
 	}
 
 	acquirePositionsData(telemetryData) {
@@ -1195,7 +1191,8 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 
 		if needCorrection {
 			loop count
-				cars.Push(Array(A_Index, getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Lap")
+				cars.Push(Array(A_Index, getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Laps"
+																	   , getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Lap"))
 									   + getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Lap.Running")))
 
 			bubbleSort(&cars, (c1, c2) => c1[2] < c2[2])
@@ -1214,8 +1211,6 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 				loop count
 					setMultiMapValue(positionsData, "Position Data", "Car." . cars[A_Index][1] . ".Position", A_Index)
 		}
-
-		setMultiMapValue(positionsData, "Position Data", "Simulator", this.Code)
 
 		return positionsData
 	}
@@ -1256,91 +1251,6 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	readSessionData(options := "", protocol?) {
 		return callSimulator(this.Code, options, protocol?)
 	}
-}
-
-
-;;;-------------------------------------------------------------------------;;;
-;;;                    Public Function Declaration Section                  ;;;
-;;;-------------------------------------------------------------------------;;;
-
-callSimulator(simulator, options := "", protocol := "Provider") {
-	local data := false
-
-	if (protocol = "Provider") {
-		local exePath := kBinariesDirectory . simulator . A_Space . protocol . " Provider.exe"
-		local dataFile, data
-
-		DirCreate(kTempDirectory . simulator . " Data")
-
-		dataFile := temporaryFileName(simulator . " Data\" . protocol, "data")
-
-		try {
-			RunWait(A_ComSpec . " /c `"`"" . exePath . "`" " . options . " > `"" . dataFile . "`"`"", , "Hide")
-		}
-		catch Any as exception {
-			logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider (")
-													   , {simulator: simulator, protocol: protocol})
-								   . exePath . translate(") - please rebuild the applications in the binaries folder (")
-								   . kBinariesDirectory . translate(")"))
-
-			showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration...")
-										  , {exePath: exePath, simulator: simulator, protocol: protocol})
-					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-		}
-
-		data := readMultiMap(dataFile)
-
-		deleteFile(dataFile)
-	}
-	else {
-		local library, curWorkingDir, buf
-
-		static libraries := CaseInsenseMap()
-
-		if libraries.Has(simulator)
-			library := libraries[simulator]
-		else {
-			curWorkingDir := A_WorkingDir
-
-			SetWorkingDir(kBinariesDirectory)
-
-			try {
-				library := DllCall("LoadLibrary", "Str", simulator . " SHM Connector.dll", "Ptr")
-
-				DLLCall(simulator . " SHM Connector\initialize")
-			}
-			catch Any as exception {
-				logError(exception)
-
-				library := false
-			}
-			finally {
-				SetWorkingDir(curWorkingDir)
-			}
-
-			if library
-				libraries[simulator] := library
-		}
-
-		if library {
-			try {
-				buf := Buffer(1024 * 1024)
-
-				DllCall(simulator . " SHM Connector\collect", "AStr", options, "Ptr", buf, "Int", buf.Size)
-
-				data := parseMultiMap(StrGet(buf, "UTF-8"))
-			}
-			catch Any as exception {
-				logError(exception)
-
-				data := newMultiMap()
-			}
-		}
-		else
-			return callSimulator(simulator, options)
-	}
-
-	return data
 }
 
 

@@ -603,7 +603,7 @@ void writePositions(const irsdk_header *header, const char* data)
 
 				getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:CarIdx:{%s}LapsComplete:", sessionID, carIdx);
 
-				printf("Car.%s.Lap=%s\n", carIdx1, result);
+				printf("Car.%s.Laps=%s\n", carIdx1, result);
 
 				getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:CarIdx:{%s}LastTime:", sessionID, carIdx);
 				

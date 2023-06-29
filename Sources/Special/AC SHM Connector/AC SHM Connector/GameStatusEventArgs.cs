@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SHMProvider
+namespace SHMConnector
 {
     public class GameStatusEventArgs : EventArgs
     {

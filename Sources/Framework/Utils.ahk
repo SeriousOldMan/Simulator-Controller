@@ -148,10 +148,10 @@ callSimulator(simulator, options := "", protocol?) {
 
 				library := CLR_LoadLibrary(dllFile).CreateInstance("SHMConnector.SHMConnector")
 
-				libraries[simulator . ".CLR"] := library
-
-				if !library.Open()
+				if (!library.Open() && !isDebug())
 					throw "Cannot startup " . dllName . " in " . kBinariesDirectory . "..."
+
+				libraries[simulator . ".CLR"] := library
 			}
 
 			data := parseMultiMap(library.Call(options))

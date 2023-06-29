@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace SHMProvider
+namespace SHMConnector
 {
     public class PhysicsEventArgs : EventArgs
     {

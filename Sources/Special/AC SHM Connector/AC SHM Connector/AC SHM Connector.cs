@@ -7,11 +7,11 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 
-namespace SHMProvider
+namespace SHMConnector
 {
     enum AC_MEMORY_STATUS { DISCONNECTED, CONNECTING, CONNECTED }
 
-    public class SHMProvider
+    public class SHMConnector
     {
         bool connected = false;
 
@@ -23,7 +23,7 @@ namespace SHMProvider
         Cars cars;
         StaticInfo staticInfo;
 
-        public SHMProvider()
+        public SHMConnector()
         {
         }
 

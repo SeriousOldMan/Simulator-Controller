@@ -241,7 +241,7 @@ namespace SHMConnector {
 				strWriter.WriteLine("Driver.Car=0");
 			}
 
-                return strWriter.ToString();
+            return strWriter.ToString();
 		}
 
 		public string ReadData() {
@@ -942,11 +942,9 @@ namespace SHMConnector {
 						strWriter.WriteLine("RepairBodywork=false");
 					}
 				}
-
-				return strWriter.ToString();
 			}
-			else
-				return "";
+
+			return strWriter.ToString();
 		}
     }
 }

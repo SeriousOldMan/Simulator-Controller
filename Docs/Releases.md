@@ -9,6 +9,7 @@
   8. Performance improvements in process communication.
   9. You can now press and hold Control to restart the ACC pitstop option walk, if it is running for an unusually long time.
   10. Fixed drivers position information for *iRacing*.
+  11. Initial support for *Rennsport*. Not yet documented...
 
 ## 5.0.9.0-release 06/23/23
   1. Minor bugfixes, as always

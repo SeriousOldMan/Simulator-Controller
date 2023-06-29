@@ -33,8 +33,6 @@ Simply download and run [Simulator Controller.exe](https://www.dropbox.com/s/vu3
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [information about the update process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.
 
-[5.0.8.1-release](https://cutt.ly/Kwr4Ixn4) (Changes: New widgets for the session dashboard in "System Monitor", Full customizaton of the displayed widgets for the session dashboard in "System Monitor", Added mor configuration sanity checks to "Simulator Setup", Consiolidated duplicate race setting, Only report strategy changes worth mentioning by the Strategist, Even more detailed explanation by the Strategist for strategy differences, "Race Center" prefers strategy over stint plan for pitstop preparation, Optimized Spotter speech handling, Fixed Spotter endless announcement loop, Fixed a couple of bugs with strategy handling in multiplayer races.)
-
 [5.0.9.0-release](https://cutt.ly/ZwtCJMfd) (Changes: Ctrl modifier for "Load current Race Strategy" in "Race Center", New core setting to choose the activation recognizer for the "Voice Server", Fixed data synchronization of setups and strategies, New "Empty" option for session info layout in "System Monitor", Fixed single class view in Overview report in "Race Reports" and "Race Center", Floating layout for session info page in "System Monitor", Increased stability of Team Server connections in case of connection loss events, Fixed team data management in cases where one or more assistants are disabled, Fixed a couple of bugs in the post pitstop report of "Race Center", More intelligent detection of unplanned pitstops for the Race Strategist, Migrated to AHK 2.03, Fixed visibility of wheelbase input field in Telemetry Analyzer, New car models for "Setup Workbench".)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-509) of this version and all the versions you might have skipped, before installing and using this version.
@@ -47,7 +45,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[5.0.9.1-beta](https://www.dropbox.com/s/2x1p58erd1jzic5/Simulator%20Controller%205.0.9.1-beta.zip?dl=1) (Test build for 5.0.9.1. Changes: Security question when renewing the data token, Traffic simulation respects the pitstop timer when computing a pitstop lap, Further reduce idiotic Spotter gap announcements, Fixed session info not updating when not having run the first stint in team sessions, "System Monitor" can now be resized vertically, Performance improvements in process communication, Pressing Control restarts the ACC pitstop option walk, Fixed position information for *iRacing*, Performance optimization in simulator data acquisition, Initial integration of *Rennsport*.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-509) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

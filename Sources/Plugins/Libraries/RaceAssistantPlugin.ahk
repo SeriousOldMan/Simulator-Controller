@@ -1004,13 +1004,20 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 	static requireAssistants(simulator, car, track, weather) {
 		local activeAssistant := false
-		local ignore, assistant, wait, settingsDB
+		local startupAssistant := false
+		local ignore, assistant, wasActive, wait, settingsDB
 
-		for ignore, assistant in RaceAssistantPlugin.Assistants
-			if assistant.requireRaceAssistant()
+		for ignore, assistant in RaceAssistantPlugin.Assistants {
+			wasActive := (assistant.RaceAssistant != false)
+
+			if assistant.requireRaceAssistant() {
 				activeAssistant := true
 
-		if activeAssistant {
+				startupAssistant := (startupAssistant || !wasActive)
+			}
+		}
+
+		if startupAssistant {
 			Sleep(1500)
 
 			RaceAssistantPlugin.CollectorTask.Priority := kLowPriority
@@ -1180,19 +1187,40 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	static updateAssistantsSession(session := kUndefined) {
+		local simulator := RaceAssistantPlugin.Simulator
 		local ignore, assistant
+
+		static lastSessions := false
+
+		if !lastSessions {
+			lastSessions := Map()
+
+			lastSessions.Default := kUndefined
+		}
 
 		if (session == kUndefined)
 			session := RaceAssistantPlugin.getSession()
 
-		if RaceAssistantPlugin.Simulator
-			RaceAssistantPlugin.Simulator.updateSession(session)
+		if simulator {
+			if (lastSessions[simulator] != session) {
+				lastSessions[simulator] := session
+
+				simulator.updateSession(session)
+			}
+		}
 		else
 			session := kSessionFinished
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
 			if assistant.Active
-				assistant.updateSession(session)
+				if (lastSessions[assistant] != (session . assistant.RaceAssistantActive)) {
+					lastSessions[assistant] := (session . assistant.RaceAssistantActive)
+
+					assistant.updateSession(session)
+				}
+
+		if (session = kSessionFinished)
+			lastSessions := false
 	}
 
 	static updateAssistantsTelemetryData(data) {
@@ -1843,6 +1871,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		local joinedSession := false
 		local teamSessionActive := false
 		local startTime := A_TickCount
+		local splitTime := startTime
 		local telemetryData, positionsData, data, dataLastLap
 		local testData, message, key, value, session, teamServer
 		local newLap, firstLap, ignore, assistant, hasAssistant
@@ -1867,11 +1896,23 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				RaceAssistantPlugin.initializeAssistantsState()
 		}
 
+		if isDebug() {
+			logMessage(kLogInfo, "Collect session data (Initialize):" . (A_TickCount - splitTime) . " ms...")
+
+			splitTime := A_TickCount
+		}
+
 		if RaceAssistantPlugin.Simulator {
 			telemetryData := true
 			positionsData := true
 
 			data := RaceAssistantPlugin.Simulator.acquireSessionData(&telemetryData, &positionsData)
+
+			if isDebug() {
+				logMessage(kLogInfo, "Collect session data (Data Acquisition):" . (A_TickCount - splitTime) . " ms...")
+
+				splitTime := A_TickCount
+			}
 
 			dataLastLap := getMultiMapValue(data, "Stint Data", "Laps", 0)
 
@@ -1909,7 +1950,19 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					}
 				}
 
+				if isDebug() {
+					logMessage(kLogInfo, "Collect session data (Preparation):" . (A_TickCount - splitTime) . " ms...")
+
+					splitTime := A_TickCount
+				}
+
 				RaceAssistantPlugin.updateAssistantsSession(session)
+
+				if isDebug() {
+					logMessage(kLogInfo, "Collect session data (Update Session):" . (A_TickCount - splitTime) . " ms...")
+
+					splitTime := A_TickCount
+				}
 
 				if (session == kSessionPaused) {
 					RaceAssistantPlugin.sInPit := false
@@ -1940,8 +1993,20 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				track := getMultiMapValue(data, "Session Data", "Track", "Unknown")
 				weather := getMultiMapValue(data, "Weather Data", "Weather", "Dry")
 
+				if isDebug() {
+					logMessage(kLogInfo, "Collect session data (Finalize):" . (A_TickCount - splitTime) . " ms...")
+
+					splitTime := A_TickCount
+				}
+
 				if RaceAssistantPlugin.requireAssistants(simulator, car, track, weather) {
 					; Car is on the track
+
+					if isDebug() {
+						logMessage(kLogInfo, "Collect session data (Require):" . (A_TickCount - splitTime) . " ms...")
+
+						splitTime := A_TickCount
+					}
 
 					if getMultiMapValue(data, "Stint Data", "InPit", false) {
 						; Car is in the Pit
@@ -2089,12 +2154,24 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 								RaceAssistantPlugin.startAssistantsSession(data)
 						}
 
+						if isDebug() {
+							logMessage(kLogInfo, "Collect session data (Start & Join):" . (A_TickCount - splitTime) . " ms...")
+
+							splitTime := A_TickCount
+						}
+
 						RaceAssistantPlugin.sLapRunning := RaceAssistantPlugin.LapRunning + 1
 
 						if newLap
 							RaceAssistantPlugin.addAssistantsLap(data, telemetryData, positionsData)
 						else
 							RaceAssistantPlugin.updateAssistantsLap(data, telemetryData, positionsData)
+
+						if isDebug() {
+							logMessage(kLogInfo, "Collect session data (Process):" . (A_TickCount - splitTime) . " ms...")
+
+							splitTime := A_TickCount
+						}
 					}
 				}
 
@@ -2109,7 +2186,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			RaceAssistantPlugin.finishAssistantsSession()
 
 		if isDebug()
-			logMessage(kLogInfo, "Collecting session data took " . (A_TickCount - startTime) . " ms...")
+			logMessage(kLogInfo, "Collect session data (Overall):" . (A_TickCount - startTime) . " ms...")
 	}
 }
 

@@ -77,6 +77,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 	iSelectedDriver := false
 
+	static sCarData := false
+
 	class ChatMode extends ControllerMode {
 		Mode {
 			Get {
@@ -211,6 +213,18 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		selectActions := ["NoRefuel", "TyreChange", "BrakeChange", "SuspensionRepair", "BodyworkRepair"]
 	}
 
+	simulatorStartup(simulator) {
+		loadDatabase() {
+			if !ACCPlugin.sCarData
+				ACCPlugin.sCarData := readMultiMap(kResourcesDirectory . "Simulator Data\ACC\Car Data.ini")
+		}
+
+		if (simulator = kACCApplication)
+			Task.startTask(loadDatabase, 1000, kLowPriority)
+
+		super.simulatorStartup(simulator)
+	}
+
 	startupUDPClient(force := false) {
 		local exePath, options, udpClient
 
@@ -338,7 +352,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		this.requireUDPClient(restart)
 
 		if !carIDs
-			carIDs := getMultiMapValues(readMultiMap(kResourcesDirectory . "Simulator Data\ACC\Car Data.ini"), "Car IDs")
+			carIDs := getMultiMapValues(ACCPlugin.sCarData, "Car IDs")
 
 		if ((A_TickCount + 5000) > lastRead) {
 			lastRead := (A_TickCount + 0)
@@ -486,7 +500,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		super.updatePositionsData(data)
 
 		if !carCategories
-			carCategories := getMultiMapValues(readMultiMap(kResourcesDirectory . "Simulator Data\ACC\Car Data.ini"), "Car Categories")
+			carCategories := getMultiMapValues(ACCPlugin.sCarData, "Car Categories")
 
 		loop {
 			car := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Car", kUndefined)

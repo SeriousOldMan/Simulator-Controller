@@ -558,23 +558,28 @@ class SessionDatabase extends ConfigurationItem {
 	static registerDriver(simulator, id, name) {
 		local sessionDB, forName, surName, nickName
 
-		if (simulator && id && name && (name != "John Doe (JD)")) {
-			sessionDB := Database(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\", kSessionSchemas)
+		static knownDrivers := CaseInsenseMap()
 
-			forName := false
-			surName := false
-			nickName := false
+		if (simulator && id && name && (name != "John Doe (JD)"))
+			if !knownDrivers.Has(id . name) {
+				sessionDB := Database(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\", kSessionSchemas)
 
-			parseDriverName(name, &forName, &surName, &nickName)
+				forName := false
+				surName := false
+				nickName := false
 
-			try {
-				if (sessionDB.query("Drivers", {Where: {ID: id, Forname: forName, Surname: surName}}).Length = 0)
-					sessionDB.add("Drivers", Database.Row("ID", id, "Forname", forName, "Surname", surName, "Nickname", nickName), true)
+				parseDriverName(name, &forName, &surName, &nickName)
+
+				try {
+					if (sessionDB.query("Drivers", {Where: {ID: id, Forname: forName, Surname: surName}}).Length = 0)
+						sessionDB.add("Drivers", Database.Row("ID", id, "Forname", forName, "Surname", surName, "Nickname", nickName), true)
+
+					knownDrivers[id . name] := true
+				}
+				catch Any as exception {
+					logError(exception)
+				}
 			}
-			catch Any as exception {
-				logError(exception)
-			}
-		}
 	}
 
 	registerDriver(simulator, id, name) {

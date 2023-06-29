@@ -52,53 +52,60 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		super.saveToConfiguration(configuration)
 
 		for ignore, simulator in this.Definition {
-			code := getApplicationDescriptor(simulator)[1]
+			try {
+				code := getApplicationDescriptor(simulator)[1]
 
-			if wizard.isApplicationSelected(simulator) {
-				simulators.Push(simulator)
+				if wizard.isApplicationSelected(simulator) {
+					simulators.Push(simulator)
 
-				arguments := ""
+					arguments := ""
 
-				for ignore, descriptor in this.iSimulatorMFDKeys[simulator] {
-					key := descriptor[3]
-					value := wizard.getSimulatorValue(simulator, key, descriptor[4])
+					for ignore, descriptor in this.iSimulatorMFDKeys[simulator] {
+						key := descriptor[3]
+						value := wizard.getSimulatorValue(simulator, key, descriptor[4])
 
-					if (arguments != "")
-						arguments .= "; "
-
-					arguments .= (key . ": " . value)
-				}
-
-				for ignore, mode in ["Pitstop", "Assistant"] {
-					actions := ""
-
-					for ignore, action in this.getActions(mode, simulator)
-						if wizard.simulatorActionAvailable(simulator, mode, action) {
-							function := wizard.getSimulatorActionFunction(simulator, mode, action)
-
-							if !isObject(function)
-								function := ((function && (function != "")) ? Array(function) : [])
-
-							if (function.Length > 0) {
-								if (actions != "")
-									actions .= ", "
-
-								actions .= (StrReplace(action, "InformationRequest.", "InformationRequest ") . A_Space . values2String(A_Space, function*))
-							}
-						}
-
-					if (actions != "") {
 						if (arguments != "")
 							arguments .= "; "
 
-						arguments .= (((mode = "Pitstop") ? "pitstopCommands: " : "assistantCommands: ") . actions)
+						arguments .= (key . ": " . value)
 					}
-				}
 
-				Plugin(code, false, true, simulator, arguments).saveToConfiguration(configuration)
+					for ignore, mode in ["Pitstop", "Assistant"] {
+						actions := ""
+
+						for ignore, action in this.getActions(mode, simulator)
+							if wizard.simulatorActionAvailable(simulator, mode, action) {
+								function := wizard.getSimulatorActionFunction(simulator, mode, action)
+
+								if !isObject(function)
+									function := ((function && (function != "")) ? Array(function) : [])
+
+								if (function.Length > 0) {
+									if (actions != "")
+										actions .= ", "
+
+									actions .= (StrReplace(action, "InformationRequest.", "InformationRequest ") . A_Space . values2String(A_Space, function*))
+								}
+							}
+
+						if (actions != "") {
+							if (arguments != "")
+								arguments .= "; "
+
+							arguments .= (((mode = "Pitstop") ? "pitstopCommands: " : "assistantCommands: ") . actions)
+						}
+					}
+
+					Plugin(code, false, true, simulator, arguments).saveToConfiguration(configuration)
+				}
+				else
+					Plugin(code, false, false, simulator, "").saveToConfiguration(configuration)
 			}
-			else
+			catch Any as exception {
+				logError(exception)
+
 				Plugin(code, false, false, simulator, "").saveToConfiguration(configuration)
+			}
 		}
 
 		setMultiMapValue(configuration, "Configuration", "Simulators", values2String("|", simulators*))
@@ -158,28 +165,33 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		secondX := x + 150
 
 		for ignore, simulator in this.Definition {
-			code := getApplicationDescriptor(simulator)[1]
-			keys := getMultiMapValue(wizard.Definition, "Setup.Simulators", "Simulators.MFDKeys." . code, false)
+			try {
+				code := getApplicationDescriptor(simulator)[1]
+				keys := getMultiMapValue(wizard.Definition, "Setup.Simulators", "Simulators.MFDKeys." . code, false)
 
-			if keys {
-				this.iSimulatorMFDKeys[simulator] := []
-				keyY := labelY + 90
+				if keys {
+					this.iSimulatorMFDKeys[simulator] := []
+					keyY := labelY + 90
 
-				for ignore, key in string2Values("|", keys) {
-					key := string2Values(":", key)
-					default := key[2]
-					key := key[1]
+					for ignore, key in string2Values("|", keys) {
+						key := string2Values(":", key)
+						default := key[2]
+						key := key[1]
 
-					label := getMultiMapValue(wizard.Definition, "Setup.Simulators", "Simulators.MFDKeys." . key . "." . getLanguage(), key)
+						label := getMultiMapValue(wizard.Definition, "Setup.Simulators", "Simulators.MFDKeys." . key . "." . getLanguage(), key)
 
-					labelHandle := window.Add("Text", "x" . x . " y" . keyY . " w148 h23 +0x200 Hidden", label)
-					editHandle := window.Add("Edit", "x" . secondX . " yp w60 h23 +0x200 Hidden", default)
+						labelHandle := window.Add("Text", "x" . x . " y" . keyY . " w148 h23 +0x200 Hidden", label)
+						editHandle := window.Add("Edit", "x" . secondX . " yp w60 h23 +0x200 Hidden", default)
 
-					this.iSimulatorMFDKeys[simulator].Push(Array(labelHandle, editHandle, key, default))
-					this.registerWidgets(1, labelHandle, editHandle)
+						this.iSimulatorMFDKeys[simulator].Push(Array(labelHandle, editHandle, key, default))
+						this.registerWidgets(1, labelHandle, editHandle)
 
-					keyY += 24
+						keyY += 24
+					}
 				}
+			}
+			catch Any as exception {
+				logError(exception)
 			}
 		}
 

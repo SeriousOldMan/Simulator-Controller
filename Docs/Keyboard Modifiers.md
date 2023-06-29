@@ -31,3 +31,4 @@ Many applications of Simulator Controller provide a couple of modifier keys for 
 | | Load Settings    | Control  | If you hold down the Control key while choosing the menu command "Load from Settings..." from the "Settings" menu, you can locate a settings file on your hard drives rather than loading the standard "Race.settings" file from "Config" folder. |
 | | Select a Validator    | Control  | Holding down the Control key let you edit the contents of the validator rules file rather than than selecting it as the active validator. |
 | | Running a simulation    | Escape  | Pressing the Escape key will stop the currently running strategy simulation. |
+| Assetto Corsa Competizione | Controlling Pitstop MFD    | Control  | In those rare situations, where the search for the current pitstop settings get stucked in an endless loop, you can press Control, which will restart the process. |

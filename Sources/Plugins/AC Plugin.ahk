@@ -44,6 +44,8 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 	iSettingsDatabase := false
 	iCarMetaData := CaseInsenseMap()
 
+	static sCarData := false
+
 	OpenPitstopMFDHotkey {
 		Get {
 			return this.iOpenPitstopMFDHotkey
@@ -120,6 +122,18 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 		selectActions := []
 	}
 
+	simulatorStartup(simulator) {
+		loadDatabase() {
+			if !ACPlugin.sCarData
+				ACPlugin.sCarData := readMultiMap(kResourcesDirectory . "Simulator Data\AC\Car Data.ini")
+		}
+
+		if (simulator = kACApplication)
+			Task.startTask(loadDatabase, 1000, kLowPriority)
+
+		super.simulatorStartup(simulator)
+	}
+
 	supportsPitstop() {
 		return true
 	}
@@ -172,19 +186,18 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 	getCarMetaData(meta, default := 0) {
 		local car := (this.Car ? this.Car : "*")
 		local track := (this.Track ? this.Track : "*")
-		local key := (car . "." . meta)
+		local key := (car . "." . track . "." . meta)
 		local value, settings
 
 		if this.CarMetaData.Has(key)
 			return this.CarMetaData[key]
 		else {
-			value := getMultiMapValue(readMultiMap(kResourcesDirectory . "Simulator Data\AC\Car Data.ini"), "Pitstop Settings", key, kUndefined)
+			settings := this.SettingsDatabase.loadSettings(this.Simulator[true], car, track, "*")
 
-			if (value == kUndefined) {
-				settings := this.SettingsDatabase.loadSettings(this.Simulator[true], car, track, "*")
+			value := getMultiMapValue(settings, "Simulator.Assetto Corsa", "Pitstop." . meta, kUndefined)
 
-				value := getMultiMapValue(settings, "Simulator.Assetto Corsa", "Pitstop." . meta, default)
-			}
+			if (value == kUndefined)
+				value := getMultiMapValue(ACPlugin.sCarData, "Pitstop Settings", key, default)
 
 			this.CarMetaData[key] := value
 

@@ -2203,6 +2203,38 @@ updateConfigurationForV398() {
 	}
 }
 
+updatePluginsForV5091() {
+	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	local userConfiguration := readMultiMap(userConfigurationFile)
+	local changed, rsp
+
+	if (userConfiguration.Count > 0) {
+		changed := false
+
+		if getMultiMapValue(userConfiguration, "Plugins", "RSP", false) {
+			rsp := Plugin("RSP", userConfiguration)
+
+			if (rsp.Simulators.Length = 0) {
+				rsp.iSimulators := ["Rennsport"]
+
+				rsp.saveToConfiguration(userConfiguration)
+
+				changed := true
+			}
+		}
+		else {
+			rsp := Plugin("RSP", false, false, "Rennsport")
+
+			rsp.saveToConfiguration(userConfiguration)
+
+			changed := true
+		}
+
+		if changed
+			writeMultiMap(userConfigurationFile, userConfiguration)
+	}
+}
+
 updatePluginsForV426() {
 	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
 	local userConfiguration := readMultiMap(userConfigurationFile)

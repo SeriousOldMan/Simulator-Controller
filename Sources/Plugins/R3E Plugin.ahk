@@ -118,19 +118,20 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 		selectActions := []
 	}
 
-	static loadDatabase() {
-		local data
-
-		if !R3EPlugin.sCarDB {
-			data := JSON.parse(FileRead(kResourcesDirectory . "Simulator Data\R3E\r3e-data.json"))
-
-			R3EPlugin.sCarDB := data["cars"]
-			R3EPlugin.sClassDB := data["classes"]
-		}
-	}
-
 	simulatorStartup(simulator) {
-		Task.startTask(ObjBindMethod(R3EPlugin, "loadDatabase"), 1000, kLowPriority)
+		loadDatabase() {
+			local data
+
+			if !R3EPlugin.sCarDB {
+				data := JSON.parse(FileRead(kResourcesDirectory . "Simulator Data\R3E\r3e-data.json"))
+
+				R3EPlugin.sCarDB := data["cars"]
+				R3EPlugin.sClassDB := data["classes"]
+			}
+		}
+
+		if (simulator = kR3EApplication)
+			Task.startTask(loadDatabase, 1000, kLowPriority)
 
 		super.simulatorStartup(simulator)
 	}

@@ -1227,11 +1227,8 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		RaceAssistantPlugin.updateAssistantsTelemetryData(telemetryData)
 		RaceAssistantPlugin.updateAssistantsPositionsData(positionsData)
 
-		for section, values in telemetryData
-			setMultiMapValues(data, section, values)
-
-		for section, values in positionsData
-			setMultiMapValues(data, section, values)
+		addMultiMapValues(data, telemetryData)
+		addMultiMapValues(data, positionsData)
 
 		driver := getMultiMapValue(data, "Position Data", "Driver.Car", false)
 

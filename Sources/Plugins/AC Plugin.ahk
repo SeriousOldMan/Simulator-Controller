@@ -467,6 +467,10 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 			}
 		}
 	}
+
+	readSessionData(options := "") {
+		return super.readSessionData(options, "CLR")
+	}
 }
 
 

@@ -3463,7 +3463,7 @@ class RaceStrategist extends GridRaceAssistant {
 				if (carIndex && times.Has(carIndex)) {
 					times[carIndex] := knowledgeBase.getValue(carPrefix . ".Time", "-")
 					positions[carIndex] := knowledgeBase.getValue(carPrefix . ".Position", "-")
-					laps[carIndex] := Floor(knowledgeBase.getValue(carPrefix . ".Laps", "-"))
+					laps[carIndex] := (isInteger(knowledgeBase.getValue(carPrefix . ".Laps", "-")) ? Floor(knowledgeBase.getValue(carPrefix . ".Laps")) : "-")
 
 					driverForname := knowledgeBase.getValue(carPrefix . ".Driver.Forname")
 					driverSurname := knowledgeBase.getValue(carPrefix . ".Driver.Surname")

@@ -52,7 +52,6 @@ namespace SHMConnector {
 		rF2PluginControl pluginControl;
 
 		public SHMConnector() {
-			
 		}
 
 		public bool Open()
@@ -60,25 +59,7 @@ namespace SHMConnector {
 			if (!this.connected)
 				this.Connect();
 
-			try
-			{
-				extendedBuffer.GetMappedData(ref extended);
-				scoringBuffer.GetMappedData(ref scoring);
-				telemetryBuffer.GetMappedData(ref telemetry);
-				rulesBuffer.GetMappedData(ref rules);
-				forceFeedbackBuffer.GetMappedDataUnsynchronized(ref forceFeedback);
-				graphicsBuffer.GetMappedDataUnsynchronized(ref graphics);
-				pitInfoBuffer.GetMappedData(ref pitInfo);
-				weatherBuffer.GetMappedData(ref weather);
-
-				return true;
-			}
-			catch (Exception)
-			{
-				this.Disconnect();
-
-				return false;
-			}
+			return connected;
 		}
 
         public void Close()
@@ -89,6 +70,24 @@ namespace SHMConnector {
         public string Call(string request)
         {
             Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("en-US");
+
+            try
+            {
+                extendedBuffer.GetMappedData(ref extended);
+                scoringBuffer.GetMappedData(ref scoring);
+                telemetryBuffer.GetMappedData(ref telemetry);
+                rulesBuffer.GetMappedData(ref rules);
+                forceFeedbackBuffer.GetMappedDataUnsynchronized(ref forceFeedback);
+                graphicsBuffer.GetMappedDataUnsynchronized(ref graphics);
+                pitInfoBuffer.GetMappedData(ref pitInfo);
+                weatherBuffer.GetMappedData(ref weather);
+            }
+            catch (Exception)
+            {
+                this.Disconnect();
+
+                return "";
+            }
 
             if (request.StartsWith("Pitstop"))
             {

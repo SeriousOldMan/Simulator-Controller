@@ -1,4 +1,4 @@
-## 5.0.9.1-release 06/30/23 (planned)
+## 5.0.9.1-release 06/30/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. When you press the renew button for the data token, you are now asked, if you really want to renew the token, before it is actually renewed.

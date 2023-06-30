@@ -252,7 +252,7 @@ long cycle = 0;
 
 const float nearByDistance = 8.0;
 const float longitudinalDistance = 5;
-const float lateralDistance = 6;
+const float lateralDistance = 8;
 const float verticalDistance = 2;
 
 const int CLEAR = 1;

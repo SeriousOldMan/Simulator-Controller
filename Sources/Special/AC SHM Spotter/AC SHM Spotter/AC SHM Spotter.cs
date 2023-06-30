@@ -754,7 +754,7 @@ namespace ACSHMSpotter {
             float angularVelocity = smoothValue(recentRealAngVels, physics.LocalAngularVelocity[2]);
             float steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
             float steerAngleRadians = -steeredAngleDegs / 57.2958f;
-            float wheelBaseMeter = wheelbase / 10f;
+            float wheelBaseMeter = wheelbase / 100f;
             float radius = wheelBaseMeter / steerAngleRadians;
             float perimeter = radius * (float)PI * 2;
             float perimeterSpeed = lastSpeed / 3.6f;
@@ -797,7 +797,7 @@ namespace ACSHMSpotter {
 								slip *= -1;
 						}
 
-                    cd.Usos = slip * 57.2989 * 10;
+                    cd.Usos = slip * 57.2989 * 1;
 
                     if (false)
                     {

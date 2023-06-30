@@ -566,7 +566,7 @@ bool collectTelemetry(const SharedMemory* sharedData) {
 	double angularVelocity = smoothValue(recentRealAngVels, sharedData->mAngularVelocity[VEC_Z]);
 	double steeredAngleDegs = sharedData->mSteering * steerLock / 2.0f / steerRatio;
 	double steerAngleRadians = -steeredAngleDegs / 57.2958;
-	double wheelBaseMeter = (float)wheelbase / 10;
+	double wheelBaseMeter = (float)wheelbase / 100;
 	double radius = wheelBaseMeter / steerAngleRadians;
 	double perimeter = radius * PI * 2;
 	double perimeterSpeed = lastSpeed / 3.6;
@@ -606,7 +606,7 @@ bool collectTelemetry(const SharedMemory* sharedData) {
 						slip *= -1;
 				}
 
-			cd.usos = slip * 57.2989 * 10;
+			cd.usos = slip * 57.2989 * 1;
 
 			if (false) {
 				std::ofstream output;

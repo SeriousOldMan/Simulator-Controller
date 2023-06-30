@@ -731,7 +731,7 @@ bool collectTelemetry(const irsdk_header* header, const char* data) {
 
 	float steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
 	float steerAngleRadians = -steeredAngleDegs / 57.2958;
-	float wheelBaseMeter = (float)wheelbase / 10;
+	float wheelBaseMeter = (float)wheelbase / 100;
 	float radius = wheelBaseMeter / steerAngleRadians;
 	float perimeter = radius * PI * 2;
 	float perimeterSpeed = lastSpeed / 3.6;
@@ -772,7 +772,7 @@ bool collectTelemetry(const irsdk_header* header, const char* data) {
 							slip *= -1;
 					}
 
-				cd.usos = slip * 57.2958 * 10;
+				cd.usos = slip * 57.2958 * 1;
 			}
 			else {
 				idealAngularVelocity = smoothValue(recentIdealAngVels, lateralAcceleration / max(0.01f, lastSpeed / 3.6));

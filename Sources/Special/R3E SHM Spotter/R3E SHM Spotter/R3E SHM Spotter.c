@@ -765,7 +765,7 @@ BOOL collectTelemetry() {
 		(float)map_buffer->player.local_angular_velocity.z);
 	r3e_float64 steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
 	r3e_float64 steerAngleRadians = -steeredAngleDegs / 57.2958;
-	r3e_float64 wheelBaseMeter = (float)wheelbase / 10;
+	r3e_float64 wheelBaseMeter = (float)wheelbase / 100;
 	r3e_float64 radius = wheelBaseMeter / steerAngleRadians;
 	r3e_float64 perimeter = radius * PI * 2;
 	r3e_float64 perimeterSpeed = lastSpeed / 3.6;
@@ -803,7 +803,7 @@ BOOL collectTelemetry() {
 						slip *= -1;
 				}
 
-			cd.usos = slip * 57.2989 * 10;
+			cd.usos = slip * 57.2989 * 1;
 
 			if (FALSE) {
 				char fileName[512];

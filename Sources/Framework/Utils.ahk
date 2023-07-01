@@ -156,7 +156,7 @@ callSimulator(simulator, options := "", protocol?) {
 
 			data := parseMultiMap(library.Call(options))
 		}
-		else if (protocol = "Provider") {
+		else if (protocol = "EXE") {
 			exePath := (kBinariesDirectory . simulator . A_Space . " SHM Provider.exe")
 
 			DirCreate(kTempDirectory . simulator . " Data")
@@ -177,7 +177,7 @@ callSimulator(simulator, options := "", protocol?) {
 	catch Any as exception {
 		logError(exception, true)
 
-		if (protocol = "Provider") {
+		if (protocol = "EXE") {
 			logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider (")
 													   , {simulator: simulator, protocol: protocol})
 								   . exePath . translate(") - please rebuild the applications in the binaries folder (")
@@ -190,6 +190,6 @@ callSimulator(simulator, options := "", protocol?) {
 			return newMultiMap()
 		}
 		else
-			return callSimulator(simulator, options, "Provider")
+			return callSimulator(simulator, options, "EXE")
 	}
 }

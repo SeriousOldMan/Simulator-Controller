@@ -476,7 +476,7 @@ namespace ACSHMSpotter {
 				double speed = 0.0;
 
 				if (hasLastCoordinates)
-					speed = vectorLength(lastCoordinates[carID, 0] - coordinateX, lastCoordinates[carID, 2] - coordinateY);
+					speed = vectorLength(lastCoordinates[carID, 0] - coordinateX, lastCoordinates[carID, 2] - coordinateZ);
 
 				int newSituation = CLEAR;
 
@@ -489,8 +489,8 @@ namespace ACSHMSpotter {
 					if ((id != carID) && (cars.cars[id].isCarInPitline == 0) && (cars.cars[id].isCarInPit == 0))
 					{
 						double otherSpeed = vectorLength(lastCoordinates[id, 0] - cars.cars[id].worldPosition.x,
-														 lastCoordinates[id, 2] - cars.cars[carID].worldPosition.y);
-
+														 lastCoordinates[id, 2] - cars.cars[id].worldPosition.y);
+						
 						if (Math.Abs(speed - otherSpeed) / speed < 0.5)
 						{
 							bool faster = false;

@@ -5709,7 +5709,7 @@ class RaceCenter extends ConfigurationItem {
 
 			lap.Stint := stint
 
-			tries := ((A_Index == count) ? 30 : 5)
+			tries := ((A_Index == count) ? 20 : 2)
 
 			while (tries > 0) {
 				rawData := this.Connector.GetLapValue(identifier, "Telemetry Data")
@@ -5810,7 +5810,7 @@ class RaceCenter extends ConfigurationItem {
 								   , getMultiMapValue(data, "Car Data", "TyreCompoundColor"))
 
 			try {
-				tries := ((A_Index == count) ? 30 : 5)
+				tries := ((A_Index == count) ? 20 : 2)
 
 				while (tries > 0) {
 					rawData := this.Connector.GetLapValue(identifier, "Positions Data")
@@ -9666,7 +9666,7 @@ class RaceCenter extends ConfigurationItem {
 					}
 
 					try {
-						tries := ((lap == lastLap) ? 30 : 5)
+						tries := ((lap == lastLap) ? 20 : 2)
 
 						while (tries > 0) {
 							standingsData := this.Connector.GetSessionLapValue(session, lap, "Race Strategist Race Standings")

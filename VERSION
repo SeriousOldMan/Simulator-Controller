@@ -1,16 +1,16 @@
 [Development]
-Version=5.0.9.1-release
-Target=5.0.9.1-release
-Date=06/30/2023
-Download=https://cutt.ly/awy00uid;https://www.dropbox.com/s/rssryvvpcal635l/Simulator%20Controller%205.0.9.1-release.zip?dl=1
-Changes=Security question when renewing the data token, Traffic simulation respects the pitstop timer when computing a pitstop lap, Further reduce idiotic Spotter gap announcements, Fixed session info not updating when not having run the first stint in team sessions, "System Monitor" can now be resized vertically, Performance improvements in process communication, Pressing Control restarts the ACC pitstop option walk, Fixed position information for *iRacing*, Performance optimization in simulator data acquisition, Initial integration of Rennsport
+Version=5.1.0.0-release
+Target=5.1.0.0-release
+Date=07/01/2023
+Download=
+Changes=Fixed the slider handling in the Telemetry Analyzer, Reduced waiting time for unavailable data in "Race Center", Fixed AC and RF2 Spotter
 [Release]
 Version=5.0.9.1-release
 Date=06/30/2023
 Download=https://cutt.ly/awy00uid;https://www.dropbox.com/s/rssryvvpcal635l/Simulator%20Controller%205.0.9.1-release.zip?dl=1
 Changes=Security question when renewing the data token, Traffic simulation respects the pitstop timer when computing a pitstop lap, Further reduce idiotic Spotter gap announcements, Fixed session info not updating when not having run the first stint in team sessions, "System Monitor" can now be resized vertically, Performance improvements in process communication, Pressing Control restarts the ACC pitstop option walk, Fixed position information for *iRacing*, Performance optimization in simulator data acquisition, Initial integration of Rennsport
 [Current]
-Type=Release
+Type=Development
 [Version]
 Release=5.0.9.1-release
-Development=5.0.9.1-release
+Development=5.1.0.0-release

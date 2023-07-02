@@ -5175,7 +5175,7 @@ class RaceCenter extends ConfigurationItem {
 			local carPitstops
 
 			if !pitstops.Has(car) {
-				carPitstops := this.Pitstops[getMultiMapValue(positions, "Position Data", "Car." . A_Index . ".ID", 0)]
+				carPitstops := this.Pitstops[getMultiMapValue(positions, "Position Data", "Car." . A_Index . ".ID", A_Index)]
 
 				if (carPitstops.Length > 0) {
 					loop carPitstops.Length

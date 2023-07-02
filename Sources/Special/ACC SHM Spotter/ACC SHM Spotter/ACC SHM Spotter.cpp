@@ -652,9 +652,13 @@ float averageValue(std::vector<float>& values, int& num) {
 float smoothValue(std::vector<float>& values, float value) {
 	int ignore;
 
-	pushValue(values, value);
+	if (false) {
+		pushValue(values, value);
 
-	return averageValue(values, ignore);
+		return averageValue(values, ignore);
+	}
+	else
+		return value;
 }
 
 std::vector<CornerDynamics> cornerDynamicsList;
@@ -667,9 +671,9 @@ int oversteerLightThreshold = 2;
 int oversteerMediumThreshold = -6;
 int oversteerHeavyThreshold = -10;
 int lowspeedThreshold = 100;
-int steerLock = 900;
-int steerRatio = 14;
-int wheelbase = 270;
+int steerLock = 480;
+int steerRatio = 12;
+int wheelbase = 267;
 int trackWidth = 150;
 
 int lastCompletedLaps = 0;
@@ -689,7 +693,7 @@ bool collectTelemetry() {
 
 	pushValue(recentGLongs, acceleration);
 
-	float angularVelocity = smoothValue(recentRealAngVels, pf->localAngularVel[2]);
+	float angularVelocity = smoothValue(recentRealAngVels, pf->localAngularVel[1]);
 	float steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
 	double steerAngleRadians = -steeredAngleDegs / 57.2958;
 	double wheelBaseMeter = (float)wheelbase / 100;
@@ -718,16 +722,6 @@ bool collectTelemetry() {
 		CornerDynamics cd = CornerDynamics(pf->speedKmh, 0, gf->completedLaps, phase);
 
 		if (fabs(angularVelocity * 57.2958) > 0.1) {
-			/*
-			double slip = fabs(idealAngularVelocity) - fabs(angularVelocity);
-
-			if (false)
-				if (steerAngle > 0)
-					slip = (angularVelocity < idealAngularVelocity) ? -1 * fabs(slip) : fabs(slip);
-				else
-					slip = (angularVelocity > idealAngularVelocity) ? -1 * fabs(slip) : fabs(slip);
-			*/
-			
 			double slip = fabs(angularVelocity - idealAngularVelocity);
 			
 			if (steerAngle > 0) {
@@ -751,6 +745,8 @@ bool collectTelemetry() {
 						  cd.usos << std::endl;
 
 				output.close();
+
+				Sleep(200);
 			}
 		}
 

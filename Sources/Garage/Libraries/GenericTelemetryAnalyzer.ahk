@@ -187,7 +187,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 		this.iTrackWidth := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "TrackWidth", 150)
 
 		if selectedCar {
-			fileName := getFileName("Workbench\Definitions\Cars\" . simulator . "." . selectedCar . ".ini", kResourcesDirectory, kUserHomeDirectory)
+			fileName := getFileName("Garage\Definitions\Cars\" . simulator . "." . selectedCar . ".ini", kResourcesDirectory, kUserHomeDirectory)
 
 			if FileExist(fileName) {
 				configuration := readMultiMap(fileName)

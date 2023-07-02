@@ -824,7 +824,7 @@ namespace RF2SHMSpotter {
 
             pushValue(recentGLongs, acceleration);
 
-            double angularVelocity = smoothValue(recentRealAngVels, (float)telemetry.mVehicles[carID].mLocalRot.z);
+            double angularVelocity = smoothValue(recentRealAngVels, (float)telemetry.mVehicles[carID].mLocalRot.y);
             double steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
             double steerAngleRadians = -steeredAngleDegs / 57.2958;
             double wheelBaseMeter = (float)wheelbase / 100;
@@ -1195,9 +1195,10 @@ namespace RF2SHMSpotter {
 			if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0))
 			{
 				double coordinateX = playerScoring.mPos.x;
-				double coordinateY = playerScoring.mPos.y;
-				
-				Console.WriteLine(coordinateX + ", " + coordinateY);
+				double coordinateY = (-playerScoring.mPos.z);
+
+
+                Console.WriteLine(coordinateX + ", " + coordinateY);
 
 				if (coordCount == 0)
 				{

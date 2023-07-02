@@ -3,7 +3,7 @@ Version=5.1.0.0-dev
 Target=5.1.0.0-release
 Date=07/02/2023
 Download=
-Changes=Fixes for Telemetry Analyzer in "Setup Workbench", New real-time capable data connector architecture, Increased bounding box for side proximity alerts by the Spotter from 6 to 8 meters lateral, Reduced waiting time for unavailable data in "Race Center", Fixed AC and RF2 Spotter, Fixed laoding of car geometry defaults in Telemetry Analyzer, Fixed car coordinates for rFactor2 (for track automation), Counter steering is now detected correctly in the Telemetry Analyzer of "Setup Workbench"
+Changes=Fixes for Telemetry Analyzer in "Setup Workbench", New real-time capable data connector architecture, Increased bounding box for side proximity alerts by the Spotter from 6 to 8 meters lateral, Reduced waiting time for unavailable data in "Race Center", Fixed AC and RF2 Spotter, Fixed laoding of car geometry defaults in Telemetry Analyzer, Fixed car coordinates for rFactor2 (for track automation), Counter steering is now detected correctly in the Telemetry Analyzer of "Setup Workbench", Rixed race reports and standings data in "Race Center" for rFactor2
 [Release]
 Version=5.0.9.1-release
 Date=06/30/2023

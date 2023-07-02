@@ -154,7 +154,8 @@ callSimulator(simulator, options := "", protocol?) {
 				libraries[simulator . ".CLR"] := library
 			}
 
-			data := parseMultiMap(library.Call(options))
+			data := library.Call(options)
+			data := parseMultiMap(data)
 		}
 		else if (protocol = "EXE") {
 			exePath := (kBinariesDirectory . simulator . A_Space . " SHM Provider.exe")

@@ -3350,14 +3350,14 @@ class RaceStrategist extends GridRaceAssistant {
 					carID := knowledgeBase.getValue("Car." . A_Index . ".ID", A_Index)
 
 					if slots {
-						key := ("!" . carNr)
+						key := ("!" . carID)
 
-						carIndex := (slots.Has(key) ? slots[key] : false)
+						carIndex := (slots.Has(key) ? slots[key] : A_Index)
 
 						if !carIndex {
-							key := ("#" . carID)
+							key := ("#" . carNr)
 
-							carIndex := (slots.Has(key) ? slots[key] : A_Index)
+							carIndex := (slots.Has(key) ? slots[key] : false)
 						}
 					}
 					else
@@ -3378,12 +3378,12 @@ class RaceStrategist extends GridRaceAssistant {
 							if (carCategory != kUndefined)
 								setMultiMapValue(data, "Cars", "Car." . carIndex . ".Category", carCategory)
 
-							key := ("!" . carNr)
+							key := ("!" . carID)
 
 							if ((raceInfo != false) && raceInfo.Has(key))
 								setMultiMapValue(data, "Cars", "Car." . carIndex . ".Position", grid[raceInfo[key]])
 							else {
-								key := ("#" . carID)
+								key := ("#" . carNr)
 
 								if ((raceInfo != false) && raceInfo.Has(key))
 									setMultiMapValue(data, "Cars", "Car." . carIndex . ".Position", grid[raceInfo[key]])
@@ -3466,13 +3466,13 @@ class RaceStrategist extends GridRaceAssistant {
 
 				carNr := knowledgeBase.getValue(carPrefix . ".Nr", kUndefined)
 
-				key := ("!" . carNr)
+				key := ("!" . carID)
 
 				if slots {
 					if slots.Has(key)
 						carIndex := slots[key]
 					else {
-						key := ("#" . carID)
+						key := ("#" . carNr)
 
 						if slots.Has(key)
 							carIndex := slots[key]
@@ -3485,7 +3485,7 @@ class RaceStrategist extends GridRaceAssistant {
 				else if raceInfo.Has(key)
 					carIndex := raceInfo[key]
 				else {
-					key := ("#" . carID)
+					key := ("#" . carNr)
 
 					if raceInfo.Has(key)
 						carIndex := raceInfo[key]

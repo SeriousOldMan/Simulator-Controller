@@ -1681,15 +1681,15 @@ class GridRaceAssistant extends RaceAssistant {
 	iLastPitstopUpdate := false
 
 	class Pitstop {
-		iNr := false
+		iID := false
 
 		iTime := false
 		iLap := 0
 		iDuration := 0
 
-		Nr {
+		ID {
 			Get {
-				return this.iNr
+				return this.iID
 			}
 		}
 
@@ -1715,21 +1715,21 @@ class GridRaceAssistant extends RaceAssistant {
 			}
 		}
 
-		__New(nr, time, lap, duration := 0) {
-			this.iNr := nr
+		__New(id, time, lap, duration := 0) {
+			this.iID := id
 			this.iTime := time
 			this.iLap := lap
 			this.iDuration := duration
 		}
 	}
 
-	Pitstops[nr?] {
+	Pitstops[id?] {
 		Get {
-			if isSet(nr) {
-				if !this.iPitstops.Has(nr)
-					this.iPitstops[nr] := []
+			if isSet(id) {
+				if !this.iPitstops.Has(id)
+					this.iPitstops[id] := []
 
-				return this.iPitstops[nr]
+				return this.iPitstops[id]
 			}
 			else
 				return this.iPitstops
@@ -2126,16 +2126,16 @@ class GridRaceAssistant extends RaceAssistant {
 	createSessionState() {
 		local state := super.createSessionState()
 		local data := CaseInsenseMap()
-		local nr, pitstops, index, pitstop
+		local id, pitstops, index, pitstop
 
-		for nr, pitstops in this.Pitstops {
-			setMultiMapValue(state, "Pitstop State", "Pitstop." . A_Index . ".Nr", nr)
+		for id, pitstops in this.Pitstops {
+			setMultiMapValue(state, "Pitstop State", "Pitstop." . A_Index . ".ID", id)
 
 			for index, pitstop in pitstops
-				setMultiMapValue(state, "Pitstop State", "Pitstop." . nr . "." . index
+				setMultiMapValue(state, "Pitstop State", "Pitstop." . id . "." . index
 							   , values2String(";", pitstop.Time, pitstop.Lap, pitstop.Duration))
 
-			setMultiMapValue(state, "Pitstop State", "Pitstop." . nr . ".Count", pitstops.Length)
+			setMultiMapValue(state, "Pitstop State", "Pitstop." . id . ".Count", pitstops.Length)
 		}
 
 		setMultiMapValue(state, "Pitstop State", "Pitstop.Count", this.Pitstops.Count)
@@ -2147,18 +2147,18 @@ class GridRaceAssistant extends RaceAssistant {
 	}
 
 	loadSessionState(state) {
-		local carNr
+		local carID
 
 		super.loadSessionState(state)
 
 		this.iPitstops := CaseInsenseMap()
 
 		loop getMultiMapValue(state, "Pitstop State", "Pitstop.Count", 0) {
-			carNr := getMultiMapValue(state, "Pitstop State", "Pitstop." . A_Index . ".Nr")
-			pitstops := this.Pitstops[carNr]
+			carID := getMultiMapValue(state, "Pitstop State", "Pitstop." . A_Index . ".ID")
+			pitstops := this.Pitstops[carID]
 
-			loop getMultiMapValue(state, "Pitstop State", "Pitstop." . carNr . ".Count", 0)
-				pitstops.Push(GridRaceAssistant.Pitstop(carNr, string2Values(";", getMultiMapValue(state, "Pitstop State", "Pitstop." . carNr . "." . A_Index))*))
+			loop getMultiMapValue(state, "Pitstop State", "Pitstop." . carID . ".Count", 0)
+				pitstops.Push(GridRaceAssistant.Pitstop(carID, string2Values(";", getMultiMapValue(state, "Pitstop State", "Pitstop." . carID . "." . A_Index))*))
 		}
 	}
 
@@ -2321,7 +2321,7 @@ class GridRaceAssistant extends RaceAssistant {
 	}
 
 	updatePitstops(lap, data) {
-		local carNr, delta, pitstops, pitstop
+		local carID, delta, pitstops, pitstop
 
 		if !this.iLastPitstopUpdate {
 			this.iLastPitstopUpdate := Round(getMultiMapValue(data, "Session Data", "SessionTimeRemaining", 0) / 1000)
@@ -2337,19 +2337,19 @@ class GridRaceAssistant extends RaceAssistant {
 		loop getMultiMapValue(data, "Position Data", "Car.Count", 0) {
 			if (getMultiMapValue(data, "Position Data", "Car." . A_Index . ".InPitlane", false)
 			 || getMultiMapValue(data, "Position Data", "Car." . A_Index . ".InPit", false)) {
-				carNr := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Nr", A_Index)
+				carID := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".ID", A_Index)
 
-				pitstops := this.Pitstops[carNr]
+				pitstops := this.Pitstops[carID]
 
 				if (pitstops.Length = 0)
-					pitstops.Push(GridRaceAssistant.Pitstop(carNr, this.iLastPitstopUpdate, lap))
+					pitstops.Push(GridRaceAssistant.Pitstop(carID, this.iLastPitstopUpdate, lap))
 				else {
 					pitstop := pitstops[pitstops.Length]
 
 					if ((pitstop.Time - pitstop.Duration - (delta + 20)) < this.iLastPitstopUpdate)
 						pitstop.Duration := (pitstop.Duration + delta)
 					else
-						pitstops.Push(GridRaceAssistant.Pitstop(carNr, this.iLastPitstopUpdate, lap))
+						pitstops.Push(GridRaceAssistant.Pitstop(carID, this.iLastPitstopUpdate, lap))
 				}
 			}
 		}

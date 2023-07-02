@@ -1,9 +1,9 @@
 [Development]
 Version=5.1.0.0-dev
 Target=5.1.0.0-release
-Date=06/30/2023
+Date=07/02/2023
 Download=
-Changes=Fixes for Telemetry Analyzer in "Setup Workbench"
+Changes=Fixes for Telemetry Analyzer in "Setup Workbench", New real-time capable data connector architecture, Increased distance for side proximity alerts by the Spotter from 6 to 8 meters lateral
 [Release]
 Version=5.0.9.1-release
 Date=06/30/2023

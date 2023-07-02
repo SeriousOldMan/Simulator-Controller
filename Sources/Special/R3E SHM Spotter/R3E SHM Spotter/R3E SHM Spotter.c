@@ -132,7 +132,7 @@ long cycle = 0;
 #define nearByZDistance 6.0
 float longitudinalFrontDistance = 4;
 float longitudinalRearDistance = 5;
-#define lateralDistance 6
+#define lateralDistance 8
 #define verticalDistance 2
 
 #define CLEAR 0
@@ -788,7 +788,6 @@ BOOL collectTelemetry() {
 			}
 		
 		corner_dynamics cd = { map_buffer->car_speed * 3.6f, 0, map_buffer->completed_laps, phase };
-
 
 		if (fabs(angularVelocity * 57.2958) > 0.1) {
 			r3e_float64 slip = fabs(idealAngularVelocity) - fabs(angularVelocity);

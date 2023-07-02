@@ -116,7 +116,7 @@ namespace RF2SHMSpotter
       handleBufferHeader.Free();
     }
 
-    public void GetMappedData(ref MappedBufferT mappedData)
+    public bool GetMappedData(ref MappedBufferT mappedData)
     {
       // This method tries to ensure we read consistent buffer view in three steps.
       // 1. Pre-Check:
@@ -173,7 +173,7 @@ namespace RF2SHMSpotter
             && currVersionEnd == this.stuckVersionEnd)
           {
             ++this.numStuckFrames;
-            return;  // Failed.
+            return false;  // Failed.
           }
 
           // If version is the same as previously successfully read, do nothing.
@@ -182,7 +182,7 @@ namespace RF2SHMSpotter
             && currVersionEnd == this.lastSuccessVersionEnd)
           {
             ++this.numSkippedNoChange;
-            return;
+            return true;
           }
 
           // Buffer version pre-check.  Verify if Begin/End versions match.
@@ -249,7 +249,7 @@ namespace RF2SHMSpotter
           this.lastSuccessVersionBegin = currVersionBegin;
           this.lastSuccessVersionEnd = currVersionEnd;
 
-          return;
+          return true;
         }
 
         // Failure.  Save the frame version.
@@ -258,6 +258,8 @@ namespace RF2SHMSpotter
 
         this.maxRetries = Math.Max(this.maxRetries, retry);
         ++this.numReadFailures;
+
+        return false;
       }
     }
 

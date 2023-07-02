@@ -125,7 +125,7 @@ const float nearByXYDistance = 10.0;
 const float nearByZDistance = 6.0;
 float longitudinalFrontDistance = 4;
 float longitudinalRearDistance = 5;
-const float lateralDistance = 6;
+const float lateralDistance = 8;
 const float verticalDistance = 2;
 
 const int CLEAR = 0;

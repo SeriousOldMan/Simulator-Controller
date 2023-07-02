@@ -203,10 +203,7 @@ class MessageManager extends PeriodicTask {
 					data := StrSplit(A_LoopReadLine, ":", , 2)
 					category := data[1]
 
-					messageHandler := (messageHandlers.Has(category) ? messageHandlers[category] : false)
-
-					if (!messageHandler)
-						messageHandler := messageHandlers["*"]
+					messageHandler := (messageHandlers.Has(category) ? messageHandlers[category] : messageHandlers["*"])
 
 					logMessage(kLogInfo, translate("Dispatching message `"") . category . (data[2] ? translate("`": ") . data[2] : translate("`"")))
 
@@ -250,10 +247,7 @@ class MessageManager extends PeriodicTask {
 					data := StrSplit(line, ":", , 2)
 					category := data[1]
 
-					messageHandler := (messageHandlers.Has(category) ? messageHandlers[category] : false)
-
-					if (!messageHandler)
-						messageHandler := messageHandlers["*"]
+					messageHandler := (messageHandlers.Has(category) ? messageHandlers[category] : messageHandlers["*"])
 
 					logMessage(kLogInfo, translate("Dispatching message `"") . category . (data[2] ? translate("`": ") . data[2] : translate("`"")))
 
@@ -369,10 +363,7 @@ class MessageManager extends PeriodicTask {
 
 				messageHandlers := MessageManager.MessageHandlers
 
-				messageHandler := (messageHandlers.Has(category) ? messageHandlers[category] : false)
-
-				if (!messageHandler)
-					messageHandler := messageHandlers["*"]
+				messageHandler := (messageHandlers.Has(category) ? messageHandlers[category] : messageHandler := messageHandlers["*"])
 
 				logMessage(kLogInfo, translate("Dispatching message `"") . category . (data ? translate("`": ") . data : translate("`"")))
 
@@ -499,7 +490,7 @@ sendWindowMessage(target, category, data, request) {
 }
 
 receiveWindowMessage(wParam, lParam, *) {
-	local messageHandlers, messageHandler, dwData, cbData, lpData, request, length, category, data, callable
+	local messageHandlers, messageHandler, dwData, cbData, lpData, request, length, category, data
 
 	;---------------------------------------------------------------------------
     ; retrieve info from COPYDATASTRUCT
@@ -529,25 +520,20 @@ receiveWindowMessage(wParam, lParam, *) {
 
 	messageHandlers := MessageManager.MessageHandlers
 
-	messageHandler := (messageHandlers.Has(category) ? messageHandlers[category] : false)
-
-	if (!messageHandler)
-		messageHandler := messageHandlers["*"]
+	messageHandler := (messageHandlers.Has(category) ? messageHandlers[category] : messageHandlers["*"])
 
 	logMessage(kLogInfo, translate("Dispatching message `"") . category . (data[2] ? translate("`": ") . data[2] : translate("`"")))
 
-	callable := ObjBindMethod(messageHandler, "call", category, data[2])
-
 	if ((request = "RS") || (request = "INTR")) {
 		try {
-			withProtection(callable)
+			withProtection(ObjBindMethod(messageHandler, "call", category, data[2]))
 		}
 		catch Any as exception {
 			logError(exception)
 		}
 	}
 	else
-		Task.startTask(callable)
+		Task.startTask(ObjBindMethod(messageHandler, "call", category, data[2]))
 }
 
 stopMessageManager(*) {

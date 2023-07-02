@@ -718,6 +718,7 @@ bool collectTelemetry() {
 		CornerDynamics cd = CornerDynamics(pf->speedKmh, 0, gf->completedLaps, phase);
 
 		if (fabs(angularVelocity * 57.2958) > 0.1) {
+			/*
 			double slip = fabs(idealAngularVelocity) - fabs(angularVelocity);
 
 			if (false)
@@ -725,7 +726,19 @@ bool collectTelemetry() {
 					slip = (angularVelocity < idealAngularVelocity) ? -1 * fabs(slip) : fabs(slip);
 				else
 					slip = (angularVelocity > idealAngularVelocity) ? -1 * fabs(slip) : fabs(slip);
-
+			*/
+			
+			double slip = fabs(angularVelocity - idealAngularVelocity);
+			
+			if (steerAngle > 0) {
+				if (angularVelocity < idealAngularVelocity)
+					slip *= -1;
+			}
+			else {
+				if (angularVelocity > idealAngularVelocity)
+					slip *= -1;
+			}
+			
 			cd.usos = slip * 57.2989 * 1;
 
 			if (false) {

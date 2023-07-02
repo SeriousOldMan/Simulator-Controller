@@ -607,6 +607,10 @@ bool greenFlag() {
 		return false;
 }
 
+template <typename T> int sgn(T val) {
+    return (T(0) < val) - (val < T(0));
+}
+
 class CornerDynamics {
 public:
 	float speed;
@@ -725,11 +729,15 @@ bool collectTelemetry() {
 			double slip = fabs(angularVelocity - idealAngularVelocity);
 			
 			if (steerAngle > 0) {
-				if (angularVelocity < idealAngularVelocity)
+				if (angularVelocity > 0)
+					slip = oversteerHeavyThreshold / 57.2989 - 1;
+				else if (angularVelocity < idealAngularVelocity)
 					slip *= -1;
 			}
 			else {
-				if (angularVelocity > idealAngularVelocity)
+				if (angularVelocity < 0)
+					slip = oversteerHeavyThreshold / 57.2989 - 1;
+				else if (angularVelocity > idealAngularVelocity)
 					slip *= -1;
 			}
 			

@@ -24,9 +24,8 @@
   1. Change hot target pressures for the next pitstop.
 
 #### Setup Workbench
-  1. General detection of counter steering in the telemetry analyzer
-  2. Collect telemetry data from multiple drivers and generate combined setup recommendations
-  3. Collect tyre data (pressures, temperatures) and integrate setup changes for them.
+  1. Collect telemetry data from multiple drivers and generate combined setup recommendations
+  2. Collect tyre data (pressures, temperatures) and integrate setup changes for them.
 
 #### Strategy Workbench
   1. Introduce data groups (for example all data belonging to a complete weekend w. practice, qualiy and race) and make this group usable for future strategy calculation

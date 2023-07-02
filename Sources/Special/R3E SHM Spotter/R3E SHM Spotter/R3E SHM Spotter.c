@@ -665,10 +665,16 @@ float averageValue(float* values, int count) {
 }
 
 float smoothValue(float* values, int* count, float value) {
-	pushValue(values, count, value);
+	if (FALSE) {
+		pushValue(values, count, value);
 
-	return averageValue(values, *count);
+		return averageValue(values, *count);
+	}
+	else
+		return value;
 }
+
+
 
 #define NumCornerDynamics 4096
 typedef struct {
@@ -762,7 +768,7 @@ BOOL collectTelemetry() {
 	smoothValue(recentGLongs, &recentGLongsCount, acceleration);
 
 	r3e_float64 angularVelocity = smoothValue(recentRealAngVels, &recentRealAngVelsCount,
-		(float)map_buffer->player.local_angular_velocity.z);
+		(float)map_buffer->player.local_angular_velocity.y);
 	r3e_float64 steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
 	r3e_float64 steerAngleRadians = -steeredAngleDegs / 57.2958;
 	r3e_float64 wheelBaseMeter = (float)wheelbase / 100;
@@ -790,17 +796,20 @@ BOOL collectTelemetry() {
 		corner_dynamics cd = { map_buffer->car_speed * 3.6f, 0, map_buffer->completed_laps, phase };
 
 		if (fabs(angularVelocity * 57.2958) > 0.1) {
-			r3e_float64 slip = fabs(idealAngularVelocity) - fabs(angularVelocity);
+			r3e_float64 slip = fabs(idealAngularVelocity - angularVelocity);
 
-			if (FALSE)
-				if (steerAngle > 0) {
-					if (angularVelocity < idealAngularVelocity)
-						slip *= -1;
-				}
-				else {
-					if (angularVelocity > idealAngularVelocity)
-						slip *= -1;
-				}
+			if (steerAngle > 0) {
+				if (angularVelocity > 0)
+					slip = oversteerHeavyThreshold / 57.2989 - 1;
+				else if (angularVelocity < idealAngularVelocity)
+					slip *= -1;
+			}
+			else {
+				if (angularVelocity < 0)
+					slip = oversteerHeavyThreshold / 57.2989 - 1;
+				else if (angularVelocity > idealAngularVelocity)
+					slip *= -1;
+			}
 
 			cd.usos = slip * 57.2989 * 1;
 
@@ -815,6 +824,8 @@ BOOL collectTelemetry() {
 					fprintf(output, "%f  %f  %f  %f  %f  %f  %f  %f\n", steerAngle, steeredAngleDegs, steerAngleRadians, lastSpeed, idealAngularVelocity, angularVelocity, slip, cd.usos);
 
 					fclose(output);
+					
+					Sleep(200);
 				}
 			}
 		}

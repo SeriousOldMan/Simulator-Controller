@@ -713,9 +713,13 @@ namespace ACSHMSpotter {
         {
             int ignore = 0;
 
-            pushValue(values, value);
+			if (false) {
+				pushValue(values, value);
 
-            return averageValue(values, ref ignore);
+				return averageValue(values, ref ignore);
+			}
+			else
+				return value;
         }
 
         List<CornerDynamics> cornerDynamicsList = new List<CornerDynamics>();
@@ -751,7 +755,7 @@ namespace ACSHMSpotter {
 
 			pushValue(recentGLongs, acceleration);
 
-            float angularVelocity = smoothValue(recentRealAngVels, physics.LocalAngularVelocity[2]);
+            float angularVelocity = smoothValue(recentRealAngVels, physics.LocalAngularVelocity[1]);
             float steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
             float steerAngleRadians = -steeredAngleDegs / 57.2958f;
             float wheelBaseMeter = wheelbase / 100f;
@@ -783,19 +787,20 @@ namespace ACSHMSpotter {
 
 				if (Math.Abs(angularVelocity * 57.2958) > 0.1)
 				{
-                    double slip = Math.Abs(idealAngularVelocity) - Math.Abs(angularVelocity);
-
-					if (false)
-						if (steerAngle > 0)
-						{
-							if (angularVelocity < idealAngularVelocity)
-								slip *= -1;
-						}
-						else
-						{
-							if (angularVelocity > idealAngularVelocity)
-								slip *= -1;
-						}
+                    double slip = Math.Abs(idealAngularVelocity - angularVelocity);
+			
+					if (steerAngle > 0) {
+						if (angularVelocity > 0)
+							slip = oversteerHeavyThreshold / 57.2989 - 1;
+						else if (angularVelocity < idealAngularVelocity)
+							slip *= -1;
+					}
+					else {
+						if (angularVelocity < 0)
+							slip = oversteerHeavyThreshold / 57.2989 - 1;
+						else if (angularVelocity > idealAngularVelocity)
+							slip *= -1;
+					}
 
                     cd.Usos = slip * 57.2989 * 1;
 
@@ -813,6 +818,8 @@ namespace ACSHMSpotter {
                         output.WriteLine(cd.Usos);
 
                         output.Close();
+						
+						Thread.Sleep(200);
                     }
                 }
 

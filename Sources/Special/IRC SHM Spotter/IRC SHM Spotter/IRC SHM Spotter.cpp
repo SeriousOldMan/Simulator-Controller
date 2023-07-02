@@ -644,9 +644,13 @@ float averageValue(std::vector<float>& values, int& num) {
 float smoothValue(std::vector<float>& values, float value) {
 	int ignore;
 
-	pushValue(values, value);
+	if (false) {
+		pushValue(values, value);
 
-	return averageValue(values, ignore);
+		return averageValue(values, ignore);
+	}
+	else
+		return value;
 }
 
 std::vector<CornerDynamics> cornerDynamicsList;
@@ -735,8 +739,6 @@ bool collectTelemetry(const irsdk_header* header, const char* data) {
 	float radius = wheelBaseMeter / steerAngleRadians;
 	float perimeter = radius * PI * 2;
 	float perimeterSpeed = lastSpeed / 3.6;
-	float idealAngularVelocity;
-	float slip;
 
 	if (fabs(steerAngle) > 0.1 && lastSpeed > 60) {
 		// Get the average recent GLong
@@ -758,19 +760,25 @@ bool collectTelemetry(const irsdk_header* header, const char* data) {
 		CornerDynamics cd = CornerDynamics(lastSpeed, 0, completedLaps, phase);
 
 		if (fabs(angularVelocity * 57.2958) > 0.1) {
-			if (false) {
+			float idealAngularVelocity;
+			float slip;
+	
+			if (true) {
 				idealAngularVelocity = smoothValue(recentIdealAngVels, perimeterSpeed / perimeter * 2 * PI);
-				slip = fabs(idealAngularVelocity) - fabs(angularVelocity);
+				slip = fabs(idealAngularVelocity - angularVelocity);
 
-				if (false)
-					if (steerAngle > 0) {
-						if (angularVelocity < idealAngularVelocity)
-							slip *= -1;
-					}
-					else {
-						if (angularVelocity > idealAngularVelocity)
-							slip *= -1;
-					}
+				if (steerAngle > 0) {
+					if (angularVelocity > 0)
+						slip = oversteerHeavyThreshold / 57.2989 - 1;
+					else if (angularVelocity < idealAngularVelocity)
+						slip *= -1;
+				}
+				else {
+					if (angularVelocity < 0)
+						slip = oversteerHeavyThreshold / 57.2989 - 1;
+					else if (angularVelocity > idealAngularVelocity)
+						slip *= -1;
+				}
 
 				cd.usos = slip * 57.2958 * 1;
 			}
@@ -783,7 +791,7 @@ bool collectTelemetry(const irsdk_header* header, const char* data) {
 				else
 					slip = fabs(angularVelocity) - fabs(idealAngularVelocity);
 
-				cd.usos = slip * 57.2958 * 10;
+				cd.usos = slip * 57.2958 * 1;
 			}
 
 			if (false) {
@@ -796,6 +804,8 @@ bool collectTelemetry(const irsdk_header* header, const char* data) {
 						  cd.usos << std::endl;
 
 				output.close();
+				
+				Sleep(200);
 			}
 		}
 

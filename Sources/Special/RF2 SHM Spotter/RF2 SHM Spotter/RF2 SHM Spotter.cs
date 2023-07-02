@@ -768,9 +768,13 @@ namespace RF2SHMSpotter {
         {
             int ignore = 0;
 
-            pushValue(values, value);
+			if (false) {
+				pushValue(values, value);
 
-            return averageValue(values, ref ignore);
+				return averageValue(values, ref ignore);
+			}
+			else
+				return value;
         }
 
         List<CornerDynamics> cornerDynamicsList = new List<CornerDynamics>();
@@ -852,23 +856,24 @@ namespace RF2SHMSpotter {
 
 				if (Math.Abs(angularVelocity * 57.2958) > 0.1)
 				{
-					double slip = Math.Abs(idealAngularVelocity) - Math.Abs(angularVelocity);
+					double slip = Math.Abs(idealAngularVelocity - angularVelocity);
 
-					if (false)
-						if (steerAngle > 0)
-						{
-							if (angularVelocity < idealAngularVelocity)
-								slip *= -1;
-						}
-						else
-						{
-							if (angularVelocity > idealAngularVelocity)
-								slip *= -1;
-						}
+					if (steerAngle > 0) {
+						if (angularVelocity > 0)
+							slip = oversteerHeavyThreshold / 57.2989 - 1;
+						else if (angularVelocity < idealAngularVelocity)
+							slip *= -1;
+					}
+					else {
+						if (angularVelocity < 0)
+							slip = oversteerHeavyThreshold / 57.2989 - 1;
+						else if (angularVelocity > idealAngularVelocity)
+							slip *= -1;
+					}
 
                     cd.Usos = slip * 57.2989 * 1;
 
-                    if (true)
+                    if (false)
                     {
                         StreamWriter output = new StreamWriter(dataFile + ".trace", true);
 
@@ -882,6 +887,8 @@ namespace RF2SHMSpotter {
                         output.WriteLine(cd.Usos);
 
                         output.Close();
+						
+						Thread.Sleep(200);
                     }
                 }
 
@@ -1188,9 +1195,9 @@ namespace RF2SHMSpotter {
 			if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0))
 			{
 				double coordinateX = playerScoring.mPos.x;
-				double coordinateY = (- playerScoring.mPos.z);
+				double coordinateY = playerScoring.mPos.y;
 				
-				Console.WriteLine(coordinateX + "," + coordinateY);
+				Console.WriteLine(coordinateX + ", " + coordinateY);
 
 				if (coordCount == 0)
 				{

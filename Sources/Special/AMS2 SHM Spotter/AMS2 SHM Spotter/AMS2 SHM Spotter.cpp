@@ -528,9 +528,13 @@ float averageValue(std::vector<float>& values, int& num) {
 float smoothValue(std::vector<float>& values, float value) {
 	int ignore;
 
-	pushValue(values, value);
+	if (false) {
+		pushValue(values, value);
 
-	return averageValue(values, ignore);
+		return averageValue(values, ignore);
+	}
+	else
+		return value;
 }
 
 std::vector<CornerDynamics> cornerDynamicsList;
@@ -563,8 +567,8 @@ bool collectTelemetry(const SharedMemory* sharedData) {
 
 	pushValue(recentGLongs, acceleration);
 
-	double angularVelocity = smoothValue(recentRealAngVels, sharedData->mAngularVelocity[VEC_Z]);
-	double steeredAngleDegs = sharedData->mSteering * steerLock / 2.0f / steerRatio;
+	double angularVelocity = smoothValue(recentRealAngVels, sharedData->mAngularVelocity[VEC_Y]);
+	double steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
 	double steerAngleRadians = -steeredAngleDegs / 57.2958;
 	double wheelBaseMeter = (float)wheelbase / 100;
 	double radius = wheelBaseMeter / steerAngleRadians;
@@ -572,7 +576,7 @@ bool collectTelemetry(const SharedMemory* sharedData) {
 	double perimeterSpeed = lastSpeed / 3.6;
 	double idealAngularVelocity = smoothValue(recentIdealAngVels, perimeterSpeed / perimeter * 2 * PI);
 
-	if (fabs(sharedData->mSteering) > 0.1 && lastSpeed > 60) {
+	if (fabs(steerAngle) > 0.1 && lastSpeed > 60) {
 		// Get the average recent GLong
 		int numGLong = 0;
 		float glongAverage = averageValue(recentGLongs, numGLong);
@@ -594,17 +598,20 @@ bool collectTelemetry(const SharedMemory* sharedData) {
 			phase);
 
 		if (fabs(angularVelocity * 57.2958) > 0.1) {
-			double slip = fabs(idealAngularVelocity) - fabs(angularVelocity);
+			double slip = fabs(idealAngularVelocity - angularVelocity);
 
-			if (false)
-				if (sharedData->mSteering > 0) {
-					if (angularVelocity < idealAngularVelocity)
-						slip *= -1;
-				}
-				else {
-					if (angularVelocity > idealAngularVelocity)
-						slip *= -1;
-				}
+			if (steerAngle > 0) {
+				if (angularVelocity > 0)
+					slip = oversteerHeavyThreshold / 57.2989 - 1;
+				else if (angularVelocity < idealAngularVelocity)
+					slip *= -1;
+			}
+			else {
+				if (angularVelocity < 0)
+					slip = oversteerHeavyThreshold / 57.2989 - 1;
+				else if (angularVelocity > idealAngularVelocity)
+					slip *= -1;
+			}
 
 			cd.usos = slip * 57.2989 * 1;
 
@@ -613,11 +620,13 @@ bool collectTelemetry(const SharedMemory* sharedData) {
 
 				output.open(dataFile + ".trace", std::ios::out | std::ios::app);
 
-				output << sharedData->mSteering << "  " << steeredAngleDegs << "  " << steerAngleRadians << "  " <<
+				output << steerAngle << "  " << steeredAngleDegs << "  " << steerAngleRadians << "  " <<
 					      lastSpeed << "  " << idealAngularVelocity << "  " << angularVelocity << "  " << slip << "  " <<
 						  cd.usos << std::endl;
 
 				output.close();
+				
+				Sleep(200);
 			}
 		}
 

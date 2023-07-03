@@ -72,6 +72,7 @@ class RaceAssistant extends ConfigurationItem {
 
 	iLearningLaps := 1
 
+	iPrepared := false
 	iKnowledgeBase := false
 
 	iSessionDuration := 0
@@ -316,6 +317,12 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
+	Prepared {
+		Get {
+			return this.iPrepared
+		}
+	}
+
 	KnowledgeBase {
 		Get {
 			return this.iKnowledgeBase
@@ -526,10 +533,14 @@ class RaceAssistant extends ConfigurationItem {
 		if values.HasProp("DriverFullName")
 			this.iDriverFullName := values.DriverFullName
 
+		if values.HasProp("Prepared")
+			this.iPrepared := values.Prepared
+
 		if values.HasProp("Session") {
 			this.iSession := values.Session
 
 			if (this.Session == kSessionFinished) {
+				this.iPrepared := false
 				this.iTeamSession := false
 
 				this.iSessionDuration := 0
@@ -975,8 +986,14 @@ class RaceAssistant extends ConfigurationItem {
 		this.prepareSession(&settings, &data)
 	}
 
-	prepareSession(&settings, &data) {
+	prepareSession(&settings, &data, formationLap?) {
 		local simulator, simulatorName, session, driverForname, driverSurname, driverNickname
+
+		if (settings && !isObject(settings))
+			settings := readMultiMap(settings)
+
+		if (data && !isObject(data))
+			data := readMultiMap(data)
 
 		if settings
 			this.updateConfigurationValues({Settings: settings})
@@ -1002,7 +1019,19 @@ class RaceAssistant extends ConfigurationItem {
 		driverNickname := getMultiMapValue(data, "Stint Data", "DriverNickname", "JDO")
 
 		this.updateSessionValues({Simulator: simulatorName, Session: session, TeamSession: (getMultiMapValue(data, "Session Data", "Mode", "Solo") = "Team")
-								, SessionTime: A_Now, Driver: driverForname, DriverFullName: computeDriverName(driverForName, driverSurName, driverNickName)})
+								, SessionTime: A_Now, Driver: driverForname, DriverFullName: computeDriverName(driverForName, driverSurName, driverNickName)
+								, Prepared: true})
+
+		lapTime := getMultiMapValue(data, "Stint Data", "LapLastTime", 0)
+
+		if this.AdjustLapTime {
+			settingsLapTime := (getDeprecatedValue(settings, "Session Settings", "Race Settings", "Lap.AvgTime", lapTime / 1000) * 1000)
+
+			if ((lapTime / settingsLapTime) > 1.2)
+				lapTime := settingsLapTime
+		}
+
+		this.initializeSessionFormat(false, settings, data, lapTime)
 	}
 
 	initializeSessionFormat(facts, settings, data, lapTime) {
@@ -1023,24 +1052,25 @@ class RaceAssistant extends ConfigurationItem {
 		else if (dataDuration > 0)
 			duration := dataDuration
 
-		if isInstance(facts, KnowledgeBase) {
-			if (facts.getValue("Session.Duration", 0) == 0)
-				facts.setValue("Session.Duration", duration)
+		if facts
+			if isInstance(facts, KnowledgeBase) {
+				if (facts.getValue("Session.Duration", 0) == 0)
+					facts.setFact("Session.Duration", duration)
 
-			if (facts.getValue("Session.Laps", 0) == 0)
-				facts.setValue("Session.Laps", laps)
+				if (facts.getValue("Session.Laps", 0) == 0)
+					facts.setFact("Session.Laps", laps)
 
-			facts.setValue("Session.Format", sessionFormat)
-		}
-		else {
-			if (!facts.Has("Session.Duration") || (facts["Session.Duration"] == 0))
-				facts["Session.Duration"] := duration
+				facts.setFact("Session.Format", sessionFormat)
+			}
+			else {
+				if (!facts.Has("Session.Duration") || (facts["Session.Duration"] == 0))
+					facts["Session.Duration"] := duration
 
-			if (!facts.Has("Session.Laps") || (facts["Session.Laps"] == 0))
-				facts["Session.Laps"] := laps
+				if (!facts.Has("Session.Laps") || (facts["Session.Laps"] == 0))
+					facts["Session.Laps"] := laps
 
-			facts["Session.Format"] := sessionFormat
-		}
+				facts["Session.Format"] := sessionFormat
+			}
 
 		this.updateSessionValues({SessionDuration: duration * 1000, SessionLaps: laps, TeamSession: (getMultiMapValue(data, "Session Data", "Mode", "Solo") = "Team")})
 	}
@@ -1070,65 +1100,22 @@ class RaceAssistant extends ConfigurationItem {
 				knowledgeBase.setFact(key, value)
 	}
 
-	createSession(&settings, &data) {
-		local configuration, simulator, simulatorName, session, driverForname, driverSurname, driverNickname
-		local lapTime, settingsLapTime, facts
+	createFacts(settings, data) {
+		local configuration := this.Configuration
+		local simulator := getMultiMapValue(data, "Session Data", "Simulator", "Unknown")
+		local simulatorName := this.SettingsDatabase.getSimulatorName(simulator)
 
-		if (settings && !isObject(settings))
-			settings := readMultiMap(settings)
-
-		if (data && !isObject(data))
-			data := readMultiMap(data)
-
-		if settings
-			this.updateConfigurationValues({Settings: settings})
-
-		configuration := this.Configuration
-		settings := this.Settings
-
-		simulator := getMultiMapValue(data, "Session Data", "Simulator", "Unknown")
-		simulatorName := this.SettingsDatabase.getSimulatorName(simulator)
-
-		switch getMultiMapValue(data, "Session Data", "Session", "Practice"), false {
-			case "Practice":
-				session := kSessionPractice
-			case "Qualification":
-				session := kSessionQualification
-			case "Race":
-				session := kSessionRace
-			default:
-				session := kSessionOther
-		}
-
-		driverForname := getMultiMapValue(data, "Stint Data", "DriverForname", this.DriverForName)
-		driverSurname := getMultiMapValue(data, "Stint Data", "DriverSurname", "Doe")
-		driverNickname := getMultiMapValue(data, "Stint Data", "DriverNickname", "JDO")
-
-		this.updateSessionValues({Simulator: simulatorName, Session: session, TeamSession: (getMultiMapValue(data, "Session Data", "Mode", "Solo") = "Team")
-								, SessionTime: A_Now, Driver: driverForname, DriverFullName: computeDriverName(driverForName, driverSurName, driverNickName)})
-
-		lapTime := getMultiMapValue(data, "Stint Data", "LapLastTime", 0)
-
-		if this.AdjustLapTime {
-			settingsLapTime := (getDeprecatedValue(settings, "Session Settings", "Race Settings", "Lap.AvgTime", lapTime / 1000) * 1000)
-
-			if ((lapTime / settingsLapTime) > 1.2)
-				lapTime := settingsLapTime
-		}
-
-		facts := combine(this.readSettings(simulator, getMultiMapValue(data, "Session Data", "Car", ""), getMultiMapValue(data, "Session Data", "Track", ""), &settings)
-					   , CaseInsenseMap("Session.Type", this.Session
-									  , "Session.Time.Remaining", getDeprecatedValue(data, "Session Data", "Stint Data", "SessionTimeRemaining", 0)
-									  , "Session.Lap.Remaining", getDeprecatedValue(data, "Session Data", "Stint Data", "SessionLapsRemaining", 0)
-									  , "Session.Settings.Lap.Time.Adjust", this.AdjustLapTime
-									  , "Session.Settings.Fuel.Max", getMultiMapValue(data, "Session Data", "FuelAmount", 0)
-									  , "Session.Settings.Lap.Learning.Laps", getMultiMapValue(configuration, this.AssistantType . " Analysis", simulatorName . ".LearningLaps", 1)
-									  , "Session.Settings.Lap.History.Considered", getMultiMapValue(configuration, this.AssistantType . " Analysis", simulatorName . ".ConsideredHistoryLaps", 5)
-									  , "Session.Settings.Lap.History.Damping", getMultiMapValue(configuration, this.AssistantType . " Analysis", simulatorName . ".HistoryLapsDamping", 0.2)))
-
-		this.initializeSessionFormat(facts, settings, data, lapTime)
-
-		return facts
+		return combine(this.readSettings(simulator
+									   , getMultiMapValue(data, "Session Data", "Car", "")
+									   , getMultiMapValue(data, "Session Data", "Track", ""), &settings)
+					 , CaseInsenseMap("Session.Type", this.Session
+									, "Session.Time.Remaining", getDeprecatedValue(data, "Session Data", "Stint Data", "SessionTimeRemaining", 0)
+									, "Session.Lap.Remaining", getDeprecatedValue(data, "Session Data", "Stint Data", "SessionLapsRemaining", 0)
+									, "Session.Settings.Lap.Time.Adjust", this.AdjustLapTime
+									, "Session.Settings.Fuel.Max", getMultiMapValue(data, "Session Data", "FuelAmount", 0)
+									, "Session.Settings.Lap.Learning.Laps", getMultiMapValue(configuration, this.AssistantType . " Analysis", simulatorName . ".LearningLaps", 1)
+									, "Session.Settings.Lap.History.Considered", getMultiMapValue(configuration, this.AssistantType . " Analysis", simulatorName . ".ConsideredHistoryLaps", 5)
+									, "Session.Settings.Lap.History.Damping", getMultiMapValue(configuration, this.AssistantType . " Analysis", simulatorName . ".HistoryLapsDamping", 0.2)))
 	}
 
 	callStartSession(settings, data) {

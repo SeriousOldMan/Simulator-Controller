@@ -130,15 +130,6 @@ class CarInfo {
 		}
 	}
 
-	LastPitstop {
-		Get {
-			local pitstops := this.Pitstops
-			local numStops := pitstops.Length
-
-			return ((numStops > 0) ? pitstops[numStops].Lap : false)
-		}
-	}
-
 	InPit {
 		Get {
 			return this.iInPit
@@ -2326,9 +2317,9 @@ class RaceSpotter extends GridRaceAssistant {
 	}
 
 	initializeAnnouncements(data) {
+		local configuration := this.Configuration
 		local simulator := getMultiMapValue(data, "Session Data", "Simulator", "Unknown")
 		local simulatorName := this.SettingsDatabase.getSimulatorName(simulator)
-		local configuration := this.Configuration
 		local announcements := CaseInsenseMap()
 		local ignore, key, default
 
@@ -2367,25 +2358,23 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 	}
 
-	prepareSession(&settings, &data) {
+	prepareSession(&settings, &data, formationLap := true) {
 		local speaker := this.getSpeaker()
 		local fragments := speaker.Fragments
 		local facts, weather, airTemperature, trackTemperature, weatherNow, weather10Min, weather30Min, driver
 		local position, length
 
-		super.prepareSession(&settings, &data)
+		super.prepareSession(&settings, &data, formationLap)
 
 		if settings
 			this.updateConfigurationValues({UseTalking: getMultiMapValue(settings, "Assistant.Spotter", "Voice.UseTalking", true)})
 
-		this.iWasStartDriver := true
+		this.iWasStartDriver := formationLap
 
 		this.initializeAnnouncements(data)
 		this.initializeGridPosition(data, true)
 
-		facts := this.createSession(&settings, &data)
-
-		if this.Speaker {
+		if (formationLap && this.Speaker) {
 			speaker.beginTalk()
 
 			try {
@@ -2424,7 +2413,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 				if (this.Session = kSessionRace) {
 					driver := getMultiMapValue(data, "Position Data", "Driver.Car", false)
-					position := this.getPosition(driver, "Overall", data) ; getMultiMapValue(data, "Position Data", "Car." . driver . ".Position")
+					position := this.getPosition(driver, "Overall", data)
 
 					if (driver && position)
 						speaker.speakPhrase("GreetingPosition", {position: position
@@ -2458,17 +2447,12 @@ class RaceSpotter extends GridRaceAssistant {
 		Task.startTask(ObjBindMethod(this, "updateSessionValues", {Running: true}), 25000)
 	}
 
-	createSession(&settings, &data) {
-		local facts := super.createSession(&settings, &data)
-
-		if settings
-			this.updateConfigurationValues({UseTalking: getMultiMapValue(settings, "Assistant.Spotter", "Voice.UseTalking", true)})
-
-		return facts
-	}
-
 	startSession(settings, data) {
-		local facts, joined, simulatorName, configuration, saveSettings
+		local configuration := this.Configuration
+		local joined, simulatorName, configuration, saveSettings
+
+		if !this.Prepared
+			this.prepareSession(&settings, &data, false)
 
 		if this.Debug[kDebugPositions]
 			deleteFile(kTempDirectory . "Race Spotter.positions")
@@ -2482,10 +2466,7 @@ class RaceSpotter extends GridRaceAssistant {
 				this.getSpeaker().speakPhrase("GreetingIntro")
 		}
 
-		facts := this.createSession(&settings, &data)
-
 		simulatorName := this.Simulator
-		configuration := this.Configuration
 
 		if (ProcessExist("Race Engineer.exe") > 0)
 			saveSettings := kNever
@@ -2496,9 +2477,9 @@ class RaceSpotter extends GridRaceAssistant {
 				saveSettings := getMultiMapValue(configuration, "Race Assistant Shutdown", simulatorName . ".SaveSettings")
 		}
 
-		this.updateConfigurationValues({LearningLaps: getMultiMapValue(configuration, "Race Spotter Analysis", simulatorName . ".LearningLaps", 1)									  , SaveSettings: saveSettings})
+		this.updateConfigurationValues({LearningLaps: getMultiMapValue(configuration, "Race Spotter Analysis", simulatorName . ".LearningLaps", 1)									, SaveSettings: saveSettings})
 
-		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(facts)
+		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(this.createFacts(settings, data))
 								, BestLapTime: 0, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0
 								, EnoughData: false})
 

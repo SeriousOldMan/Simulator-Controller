@@ -1171,20 +1171,39 @@ class RaceEngineer extends RaceAssistant {
 																									   , "Tyre.Wet.Pressure.RR", 28.2)))
 	}
 
-	prepareSession(&settings, &data) {
-		super.prepareSession(&settings, &data)
+	prepareSession(&settings, &data, formationLap?) {
+		local announcements := false
 
-		if settings
+		super.prepareSession(&settings, &data, formationLap?)
+
+		if settings {
 			this.updateConfigurationValues({UseTalking: getMultiMapValue(settings, "Assistant.Engineer", "Voice.UseTalking", true)})
+
+			if (this.Session = kSessionPractice)
+				announcements := {FuelWarning: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Practice.LowFuel", true)
+								, DamageReporting: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Practice.Damage", false)
+								, DamageAnalysis: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Practice.Damage", false)
+								, PressureReporting: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Practice.Pressure", true)}
+			else if (this.Session = kSessionQualification)
+				announcements := {FuelWarning: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Qualification.LowFuel", false)
+								, DamageReporting: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Qualification.Damage", false)
+								, DamageAnalysis: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Qualification.Damage", false)
+								, PressureReporting: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Qualification.Pressure", true)}
+			else if (this.Session = kSessionRace)
+				announcements := {FuelWarning: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Race.LowFuel", true)
+								, DamageReporting: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Race.Damage", true)
+								, DamageAnalysis: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Race.Damage", true)
+								, PressureReporting: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Race.Pressure", true)}
+
+			if announcements
+				this.updateConfigurationValues({Announcements: announcements})
+		}
 	}
 
-	createSession(&settings, &data) {
-		local facts := super.createSession(&settings, &data)
+	createFacts(settings, data) {
 		local configuration := this.Configuration
+		local facts := super.createFacts(settings, data)
 		local simulatorName := this.SettingsDatabase.getSimulatorName(facts["Session.Simulator"])
-
-		if settings
-			this.updateConfigurationValues({UseTalking: getMultiMapValue(settings, "Assistant.Engineer", "Voice.UseTalking", true)})
 
 		facts["Session.Settings.Damage.Analysis.Laps"]
 			:= getMultiMapValue(configuration, "Race Engineer Analysis", simulatorName . ".DamageAnalysisLaps", 1)
@@ -1201,33 +1220,18 @@ class RaceEngineer extends RaceAssistant {
 			:= getMultiMapValue(data, "Car Data", "TyreCompoundColor"
 									, getDeprecatedValue(settings, "Session Setup", "Race Setup", "Tyre.Compound.Color", "Black"))
 
-		if (this.Session = kSessionPractice)
-			this.updateConfigurationValues({Announcements: {FuelWarning: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Practice.LowFuel", true)
-														  , DamageReporting: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Practice.Damage", false)
-														  , DamageAnalysis: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Practice.Damage", false)
-														  , PressureReporting: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Practice.Pressure", true)}})
-		else if (this.Session = kSessionQualification)
-			this.updateConfigurationValues({Announcements: {FuelWarning: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Qualification.LowFuel", false)
-														  , DamageReporting: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Qualification.Damage", false)
-														  , DamageAnalysis: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Qualification.Damage", false)
-														  , PressureReporting: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Qualification.Pressure", true)}})
-		else if (this.Session = kSessionRace)
-			this.updateConfigurationValues({Announcements: {FuelWarning: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Race.LowFuel", true)
-										  , DamageReporting: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Race.Damage", true)
-										  , DamageAnalysis: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Race.Damage", true)
-										  , PressureReporting: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Race.Pressure", true)}})
-
 		return facts
 	}
 
 	startSession(settings, data) {
-		local facts, simulatorName, configuration, deprecated, saveSettings, speaker, strategistPlugin, strategistName
+		local configuration := this.Configuration
+		local simulatorName, configuration, deprecated, saveSettings, speaker, strategistPlugin, strategistName
 		local knowledgeBase
 
-		facts := this.createSession(&settings, &data)
+		if !this.Prepared
+			this.prepareSession(&settings, &data, false)
 
 		simulatorName := this.Simulator
-		configuration := this.Configuration
 
 		deprecated := getMultiMapValue(configuration, "Race Engineer Shutdown", simulatorName . ".SaveSettings", kNever)
 		saveSettings := getMultiMapValue(configuration, "Race Assistant Shutdown", simulatorName . ".SaveSettings", deprecated)
@@ -1237,7 +1241,7 @@ class RaceEngineer extends RaceAssistant {
 									  , SaveSettings: saveSettings
 									  , SaveTyrePressures: getMultiMapValue(configuration, "Race Engineer Shutdown", simulatorName . ".SaveTyrePressures", kAsk)})
 
-		knowledgeBase := this.createKnowledgeBase(facts)
+		knowledgeBase := this.createKnowledgeBase(this.createFacts(settings, data))
 
 		this.updateDynamicValues({KnowledgeBase: knowledgeBase, HasPressureData: false
 								, BestLapTime: 0, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})

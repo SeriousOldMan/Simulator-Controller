@@ -196,6 +196,9 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 
 			value := getMultiMapValue(settings, "Simulator.Assetto Corsa", "Pitstop." . meta, kUndefined)
 
+			if !ACPlugin.sCarData
+				ACPlugin.sCarData := readMultiMap(kResourcesDirectory . "Simulator Data\AC\Car Data.ini")
+
 			if (value == kUndefined)
 				value := getMultiMapValue(ACPlugin.sCarData, "Pitstop Settings", key, default)
 

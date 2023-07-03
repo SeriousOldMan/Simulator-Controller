@@ -644,37 +644,45 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	getCarName(carID) {
-		local carDB := R3EPlugin.sCarDB
+		local carDB, data
 
 		static lastCarID := false
 		static lastCarName := false
 
-		if carDB {
-			if (carID != lastCarID) {
-				lastCarID := carID
-				lastCarName := (carDB.Has(carID) ? carDB[carID]["Name"] : "Unknown")
-			}
+		if !R3EPlugin.sCarDB {
+			data := JSON.parse(FileRead(kResourcesDirectory . "Simulator Data\R3E\r3e-data.json"))
+
+			R3EPlugin.sCarDB := data["cars"]
 		}
-		else
-			lastCarName := "Unknown"
+
+		if (carID != lastCarID) {
+			carDB := R3EPlugin.sCarDB
+
+			lastCarID := carID
+			lastCarName := (carDB.Has(carID) ? carDB[carID]["Name"] : "Unknown")
+		}
 
 		return lastCarName
 	}
 
 	getClassName(classID) {
-		local classDB := R3EPlugin.sClassDB
+		local classDB, data := R3EPlugin.sClassDB
 
 		static lastClassID := false
 		static lastClassName := false
 
-		if classDB {
-			if (classID != lastClassID) {
-				lastClassID := classID
-				lastClassName := (classDB.Has(classID) ? classDB[classID]["Name"] : "Unknown")
-			}
+		if !R3EPlugin.sCarDB {
+			data := JSON.parse(FileRead(kResourcesDirectory . "Simulator Data\R3E\r3e-data.json"))
+
+			R3EPlugin.sClassDB := data["classes"]
 		}
-		else
-			lastClassName := "Unknown"
+
+		if (classID != lastClassID) {
+			classDB := R3EPlugin.sClassDB
+
+			lastClassID := classID
+			lastClassName := (classDB.Has(classID) ? classDB[classID]["Name"] : "Unknown")
+		}
 
 		return lastClassName
 	}

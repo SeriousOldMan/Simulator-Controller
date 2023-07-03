@@ -529,13 +529,13 @@ class RaceEngineer extends RaceAssistant {
 			try {
 				speaker.speakPhrase("Wear")
 
-				speaker.speakPhrase("WearFL", {used: speaker.number2Speech(flWear, 1), remaining: speaker.number2Speech(100 - flWear, 1)})
+				speaker.speakPhrase("WearFL", {used: Round(flWear), remaining: Round(100 - flWear)})
 
-				speaker.speakPhrase("WearFR", {used: speaker.number2Speech(frWear, 1), remaining: speaker.number2Speech(100 - frWear, 1)})
+				speaker.speakPhrase("WearFR", {used: Round(frWear), remaining: Round(100 - frWear)})
 
-				speaker.speakPhrase("WearRL", {used: speaker.number2Speech(rlWear, 1), remaining: speaker.number2Speech(100 - rlWear, 1)})
+				speaker.speakPhrase("WearRL", {used: Round(rlWear), remaining: Round(100 - rlWear)})
 
-				speaker.speakPhrase("WearRR", {used: speaker.number2Speech(rrWear, 1), remaining: speaker.number2Speech(100 - rrWear, 1)})
+				speaker.speakPhrase("WearRR", {used: Round(rrWear), remaining: Round(100 - rrWear)})
 			}
 			finally {
 				speaker.endTalk()

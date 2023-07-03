@@ -533,14 +533,10 @@ class RaceAssistant extends ConfigurationItem {
 		if values.HasProp("DriverFullName")
 			this.iDriverFullName := values.DriverFullName
 
-		if values.HasProp("Prepared")
-			this.iPrepared := values.Prepared
-
 		if values.HasProp("Session") {
 			this.iSession := values.Session
 
 			if (this.Session == kSessionFinished) {
-				this.iPrepared := false
 				this.iTeamSession := false
 
 				this.iSessionDuration := 0
@@ -556,6 +552,9 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	updateDynamicValues(values) {
+		if values.HasProp("Prepared")
+			this.iPrepared := values.Prepared
+
 		if values.HasProp("KnowledgeBase")
 			this.iKnowledgeBase := values.KnowledgeBase
 
@@ -1019,8 +1018,8 @@ class RaceAssistant extends ConfigurationItem {
 		driverNickname := getMultiMapValue(data, "Stint Data", "DriverNickname", "JDO")
 
 		this.updateSessionValues({Simulator: simulatorName, Session: session, TeamSession: (getMultiMapValue(data, "Session Data", "Mode", "Solo") = "Team")
-								, SessionTime: A_Now, Driver: driverForname, DriverFullName: computeDriverName(driverForName, driverSurName, driverNickName)
-								, Prepared: true})
+								, SessionTime: A_Now, Driver: driverForname, DriverFullName: computeDriverName(driverForName, driverSurName, driverNickName)})
+		this.updateDynamicValues({Prepared: true})
 
 		lapTime := getMultiMapValue(data, "Stint Data", "LapLastTime", 0)
 

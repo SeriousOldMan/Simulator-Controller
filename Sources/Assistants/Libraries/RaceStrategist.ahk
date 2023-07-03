@@ -1324,8 +1324,7 @@ class RaceStrategist extends GridRaceAssistant {
 		local raceEngineer := (ProcessExist("Race Engineer.exe") > 0)
 		local simulator, saveSettings, deprecated, telemetryDB
 
-		if !this.Prepared
-			this.prepareSession(&settings, &data, false)
+		this.prepareSession(&settings, &data, false)
 
 		simulatorName := this.Simulator
 
@@ -1408,7 +1407,7 @@ class RaceStrategist extends GridRaceAssistant {
 				}
 			}
 
-			this.updateDynamicValues({KnowledgeBase: false})
+			this.updateDynamicValues({KnowledgeBase: false, Prepared: false})
 		}
 
 		this.updateDynamicValues({OverallTime: 0, BestLapTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false
@@ -1418,7 +1417,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 	forceFinishSession() {
 		if !this.SessionDataActive {
-			this.updateDynamicValues({KnowledgeBase: false})
+			this.updateDynamicValues({KnowledgeBase: false, Prepared: false})
 
 			this.finishSession()
 
@@ -3501,7 +3500,7 @@ class RaceStrategist extends GridRaceAssistant {
 				if (carIndex && times.Has(carIndex)) {
 					times[carIndex] := knowledgeBase.getValue(carPrefix . ".Time", "-")
 					positions[carIndex] := knowledgeBase.getValue(carPrefix . ".Position", "-")
-					laps[carIndex] := (isInteger(knowledgeBase.getValue(carPrefix . ".Laps", "-")) ? Floor(knowledgeBase.getValue(carPrefix . ".Laps")) : "-")
+					laps[carIndex] := (isNumber(knowledgeBase.getValue(carPrefix . ".Laps", "-")) ? Floor(knowledgeBase.getValue(carPrefix . ".Laps")) : "-")
 
 					driverForname := knowledgeBase.getValue(carPrefix . ".Driver.Forname")
 					driverSurname := knowledgeBase.getValue(carPrefix . ".Driver.Surname")

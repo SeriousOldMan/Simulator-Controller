@@ -1228,8 +1228,7 @@ class RaceEngineer extends RaceAssistant {
 		local simulatorName, configuration, deprecated, saveSettings, speaker, strategistPlugin, strategistName
 		local knowledgeBase
 
-		if !this.Prepared
-			this.prepareSession(&settings, &data, false)
+		this.prepareSession(&settings, &data, false)
 
 		simulatorName := this.Simulator
 
@@ -1309,7 +1308,7 @@ class RaceEngineer extends RaceAssistant {
 				}
 			}
 
-			this.updateDynamicValues({KnowledgeBase: false})
+			this.updateDynamicValues({KnowledgeBase: false, Prepared: false})
 		}
 
 		this.updateDynamicValues({BestLapTime: 0, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false, HasPressureData: false})
@@ -1318,7 +1317,7 @@ class RaceEngineer extends RaceAssistant {
 
 	forceFinishSession() {
 		if !this.SessionDataActive {
-			this.updateDynamicValues({KnowledgeBase: false})
+			this.updateDynamicValues({KnowledgeBase: false, Prepared: false})
 
 			this.finishSession()
 

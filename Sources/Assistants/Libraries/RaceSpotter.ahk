@@ -711,8 +711,6 @@ class RaceSpotter extends GridRaceAssistant {
 	iOverallGridPosition := false
 	iClassGridPosition := false
 
-	iWasStartDriver := false
-
 	iLastDeltaInformationLap := 0
 	iPositionInfos := CaseInsenseMap()
 	iTacticalAdvices := CaseInsenseMap()
@@ -2369,8 +2367,6 @@ class RaceSpotter extends GridRaceAssistant {
 		if settings
 			this.updateConfigurationValues({UseTalking: getMultiMapValue(settings, "Assistant.Spotter", "Voice.UseTalking", true)})
 
-		this.iWasStartDriver := formationLap
-
 		this.initializeAnnouncements(data)
 		this.initializeGridPosition(data, true)
 
@@ -2449,15 +2445,16 @@ class RaceSpotter extends GridRaceAssistant {
 
 	startSession(settings, data) {
 		local configuration := this.Configuration
-		local joined, simulatorName, configuration, saveSettings
+		local joined := false
+		local simulatorName, configuration, saveSettings
 
 		if !this.Prepared
-			this.prepareSession(&settings, &data, false)
+			joined := true
+
+		this.prepareSession(&settings, &data, false)
 
 		if this.Debug[kDebugPositions]
 			deleteFile(kTempDirectory . "Race Spotter.positions")
-
-		joined := !this.iWasStartDriver
 
 		if joined {
 			this.initializeAnnouncements(data)
@@ -2517,7 +2514,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 			this.shutdownSpotter(true)
 
-			this.updateDynamicValues({KnowledgeBase: false})
+			this.updateDynamicValues({KnowledgeBase: false, Prepared: false})
 		}
 
 		this.updateDynamicValues({OverallTime: 0, BestLapTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
@@ -2526,7 +2523,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 	forceFinishSession() {
 		if !this.SessionDataActive {
-			this.updateDynamicValues({KnowledgeBase: false})
+			this.updateDynamicValues({KnowledgeBase: false, Prepared: false})
 
 			this.finishSession()
 

@@ -241,7 +241,7 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 		else {
 			printLine(&output, "Car.Count=", localCopy->mNumParticipants);
 			printLine(&output, "Driver.Car=", localCopy->mViewedParticipantIndex + 1);
-
+			
 			for (int i = 1; i <= localCopy->mNumParticipants; ++i) {
 				ParticipantInfo vehicle = localCopy->mParticipantInfo[i - 1];
 
@@ -283,7 +283,7 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 				}
 
 				print(&output, "Car.", i); printLine(&output, ".InPitLane=", localCopy->mPitModes[i - 1] > PIT_MODE_NONE ? "true" : "false");
-				print(&output, "Car.", i); printLine(&output, ".InPit=%s\n", localCopy->mPitModes[i - 1] > PIT_MODE_IN_PIT ? "true" : "false");
+				print(&output, "Car.", i); printLine(&output, ".InPit=", localCopy->mPitModes[i - 1] > PIT_MODE_IN_PIT ? "true" : "false");
 			}
 		}
 	}
@@ -329,7 +329,7 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 		printLine(&output, "TC=n/a");
 		printLine(&output, "ABS=n/a");
 
-		print(&output, "BodyworkDamage=", 0.0); print(&output, ",", 0.0); (&output, ",", 0.0); (&output, ",", 0.0); printLine(&output, ",", normalizeDamage(localCopy->mAeroDamage));
+		print(&output, "BodyworkDamage=", 0.0); print(&output, ",", 0.0); print(&output, ",", 0.0); print(&output, ",", 0.0); printLine(&output, ",", normalizeDamage(localCopy->mAeroDamage));
 
 		print(&output, "SuspensionDamage=", normalizeDamage(localCopy->mSuspensionDamage[TYRE_FRONT_LEFT]));
 		print(&output, ",", normalizeDamage(localCopy->mSuspensionDamage[TYRE_FRONT_RIGHT]));
@@ -392,6 +392,8 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 			printLine(&output, "DriverSurname=", "");
 			printLine(&output, "DriverNickname=", "");
 		}
+
+		printLine(&output, "Position=", (long)localCopy->mParticipantInfo[localCopy->mViewedParticipantIndex].mRacePosition);
 
 		printLine(&output, "LapValid=", localCopy->mLapInvalidated ? "false" : "true");
 

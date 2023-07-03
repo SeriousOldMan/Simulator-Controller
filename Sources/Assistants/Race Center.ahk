@@ -6347,7 +6347,7 @@ class RaceCenter extends ConfigurationItem {
 	syncTelemetry(load := false) {
 		local lastLap := this.LastLap
 		local tyreChange := true
-		local newData, message, session, telemetryDB, tyresTable, lap, runningLap, driverID
+		local newData, message, session, telemetryDB, tyresTable, lap, runningLap, driverID, telemetry
 		local telemetryData, pressures, temperatures, wear, lapPressures, pressure
 
 		wasPitstop(lap, &tyreChange := false) {
@@ -6431,7 +6431,30 @@ class RaceCenter extends ConfigurationItem {
 					else
 						fails := 0
 
-					telemetryData := values2String(";", "-", "-", "-", "-", "-", "-", "-", "-", "-", wasPitstop(lap), "n/a", "n/a", "n/a", "-", "-", ",,,", ",,,", "null,null,null,null")
+					if (this.Laps.Has(lap) && this.Laps[lap].HasOwnProp("Telemetry")) {
+						telemetry := parseMultiMap(this.Laps[lap].Telemetry)
+
+						telemetryData := values2String(";", this.Simulator ? this.Simulator : "-"
+														  , this.Car ? this.Car : "-"
+														  , this.Track ? this.Track : "-"
+														  , getMultiMapValue(telemetry, "Weather Data", "Weather", "Dry")
+														  , getMultiMapValue(telemetry, "Weather Data", "Temperature", 23)
+														  , getMultiMapValue(telemetry, "Track Data", "Temperature", 27)
+														  , "-"
+														  , getMultiMapValue(telemetry, "Car Data", "FuelRemaining", "-")
+														  , getMultiMapValue(telemetry, "Stint Data", "LapLastTime", "-")
+														  , wasPitstop(lap)
+														  , getMultiMapValue(telemetry, "Car Data", "Map", "n/a")
+														  , getMultiMapValue(telemetry, "Car Data", "TC", "n/a")
+														  , getMultiMapValue(telemetry, "Car Data", "ABS", "n/a")
+														  , getMultiMapValue(telemetry, "Car Data", "TyreCompound", "Dry")
+														  , getMultiMapValue(telemetry, "Car Data", "TyreCompoundColor", "Black")
+														  , getMultiMapValue(telemetry, "Car Data", "TyrePressure", ",,,")
+														  , getMultiMapValue(telemetry, "Car Data", "TyreTemperature", ",,,")
+														  , getMultiMapValue(telemetry, "Car Data", "TyreWear", "null,null,null,null"))
+					}
+					else
+						telemetryData := values2String(";", "-", "-", "-", "-", "-", "-", "-", "-", "-", wasPitstop(lap), "n/a", "n/a", "n/a", "-", "-", ",,,", ",,,", "null,null,null,null")
 				}
 
 				telemetryData := string2Values(";", telemetryData)
@@ -6603,7 +6626,23 @@ class RaceCenter extends ConfigurationItem {
 					else
 						fails := 0
 
-					lapPressures := values2String(";", "-", "-", "-", "-", "-", "-", "-", "-", "-,-,-,-", "-,-,-,-", "-,-,-,-")
+					if (this.Laps.Has(lap) && this.Laps[lap].HasOwnProp("Telemetry")) {
+						telemetry := parseMultiMap(this.Laps[lap].Telemetry)
+
+						lapPressures := values2String(";", this.Simulator ? this.Simulator : "-"
+														 , this.Car ? this.Car : "-"
+														 , this.Track ? this.Track : "-"
+														 , getMultiMapValue(telemetry, "Weather Data", "Weather", "Dry")
+														 , getMultiMapValue(telemetry, "Weather Data", "Temperature", 23)
+														 , getMultiMapValue(telemetry, "Track Data", "Temperature", 27)
+														 , getMultiMapValue(telemetry, "Car Data", "TyreCompound", "Dry")
+														 , getMultiMapValue(telemetry, "Car Data", "TyreCompoundColor", "Black")
+														 , "-,-,-,-"
+														 , getMultiMapValue(telemetry, "Car Data", "TyrePressure", ",,,")
+														 , "-,-,-,-")
+					}
+					else
+						lapPressures := values2String(";", "-", "-", "-", "-", "-", "-", "-", "-", "-,-,-,-", "-,-,-,-", "-,-,-,-")
 				}
 
 				lapPressures := string2Values(";", lapPressures)

@@ -182,7 +182,20 @@ class StreamDeck extends FunctionController {
 		dllName := "SimulatorControllerPluginConnector.dll"
 		dllFile := kBinariesDirectory . dllName
 
-		this.iConnector := CLR_LoadLibrary(dllFile).CreateInstance("PluginConnector.PluginConnector")
+		try {
+			if !FileExist(dllFile)
+				throw "File not found..."
+
+			this.iConnector := CLR_LoadLibrary(dllFile).CreateInstance("PluginConnector.PluginConnector")
+		}
+		catch Any as exception {
+			logError(exception, true)
+
+			logMessage(kLogCritical, substituteVariables(translate("Cannot start Stream Deck Connector (%dllFile%) - please check the configuration..."), {dllFile: dllFile}))
+
+			showMessage(substituteVariables(translate("Cannot start Stream Deck Connector (%dllFile%) - please check the configuration..."), {dllFile: dllFile})
+					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+		}
 
 		super.__New(controller, configuration)
 	}

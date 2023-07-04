@@ -716,6 +716,8 @@ callSimHub(command) {
 		RunWait("`"" . kSimHub . "`" -triggerinput " . command, , "Hide")
 	}
 	catch Any as exception {
+		logError(exception, true)
+					
 		message := (isObject(exception) ? exception.Message : exception)
 
 		logMessage(kLogCritical, translate("Error while connecting to SimHub (") . kSimHub . translate("): ") . message . translate(" - please check the configuration"))

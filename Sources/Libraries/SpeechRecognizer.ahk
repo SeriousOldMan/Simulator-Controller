@@ -231,6 +231,8 @@ class SpeechRecognizer {
 					Run("`"" . kNirCmd . "`" setdefaultsounddevice `"" . audioDevice . "`"")
 				}
 				catch Any as exception {
+					logError(exception, true)
+
 					showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
 							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
@@ -335,6 +337,8 @@ class SpeechRecognizer {
 					Run("`"" . kNirCmd . "`" setdefaultsounddevice `"" . audioDevice . "`"")
 				}
 				catch Any as exception {
+					logError(exception, true)
+
 					showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
 							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
@@ -393,6 +397,8 @@ class SpeechRecognizer {
 				Run("`"" . kNirCmd . "`" setdefaultsounddevice `"" .audioDevice . "`"")
 			}
 			catch Any as exception {
+				logError(exception, true)
+
 				showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
@@ -415,6 +421,8 @@ class SpeechRecognizer {
 					Run("`"" . kNirCmd . "`" setdefaultsounddevice `"" . audioDevice . "`"")
 				}
 				catch Any as exception {
+					logError(exception, true)
+
 					showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
 							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}

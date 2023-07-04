@@ -114,10 +114,10 @@ class TeamServerPlugin extends ControllerPlugin {
 				Run("`"" . exePath . "`"", kBinariesDirectory)
 			}
 			catch Any as exception {
+				logError(exception, true)
+				
 				logMessage(kLogCritical, translate("Cannot start the Race Settings tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (")
 									   . kBinariesDirectory . translate(")"))
-
-				logError(exception, true)
 
 				showMessage(substituteVariables(translate("Cannot start the Race Settings tool (%exePath%) - please check the configuration..."), {exePath: exePath})
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
@@ -147,10 +147,10 @@ class TeamServerPlugin extends ControllerPlugin {
 				Run("`"" . exePath . "`"", kBinariesDirectory)
 			}
 			catch Any as exception {
+				logError(exception, true)
+
 				logMessage(kLogCritical, translate("Cannot start the Race Center tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (")
 									   . kBinariesDirectory . translate(")"))
-
-				logError(exception, true)
 
 				showMessage(substituteVariables(translate("Cannot start the Race Center tool (%exePath%) - please check the configuration..."), {exePath: exePath})
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)

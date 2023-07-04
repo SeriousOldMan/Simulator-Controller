@@ -706,6 +706,8 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 				return result
 			}
 			catch Any as exception {
+				logError(exception, true)
+					
 				message := (isObject(exception) ? exception.Message : exception)
 
 				logMessage(kLogCritical, "Error while connecting to SimFeedback (" . kSimFeedbackConnector . "): " . message . " - please check the configuration")

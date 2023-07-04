@@ -429,6 +429,8 @@ extern __declspec(dllexport) int __stdcall call(char* request, char* result, int
 				writeStringOption(result, "DriverNickname=", "", &pos);
 			}
 
+			writeStringOption(result, "Position=", map_buffer->all_drivers_data_1[getPlayerCarID()].place, &pos);
+
 			writeStringOption(result, "LapValid=", map_buffer->current_lap_valid ? "true" : "false", &pos);
 
 			writeIntOption(result, "LapLastTime=", (long)(normalize(map_buffer->lap_time_previous_self) * 1000), &pos);

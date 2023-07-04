@@ -366,6 +366,13 @@ namespace ACSHMProvider
 
             Console.WriteLine("[Stint Data]");
 
+            if (cars.numVehicles > 0)
+            {
+                AcCarInfo car = cars.cars[0];
+
+                Console.Write("Position="); Console.WriteLine(car.carRealTimeLeaderboardPosition + 1);
+            }
+
             Console.WriteLine("DriverForname=" + staticInfo.PlayerName);
             Console.WriteLine("DriverSurname=" + staticInfo.PlayerSurname);
             Console.WriteLine("DriverNickname=" + staticInfo.PlayerNick);

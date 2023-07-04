@@ -160,6 +160,9 @@ callSimulator(simulator, options := "", protocol?) {
 		else if (protocol = "EXE") {
 			exePath := (kBinariesDirectory . simulator . A_Space . " SHM Provider.exe")
 
+			if !FileExist(exePath)
+				throw "File not found..."
+
 			DirCreate(kTempDirectory . simulator . " Data")
 
 			dataFile := temporaryFileName(simulator . " Data\SHM", "data")

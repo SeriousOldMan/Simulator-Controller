@@ -329,6 +329,8 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 							Run("`"" . exePath . "`" -Trigger " . positions, kBinariesDirectory, "Hide", &pid)
 					}
 					catch Any as exception {
+						logError(exception, true)
+					
 						logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (")
 																   , {simulator: code, protocol: "SHM"})
 											   . exePath . translate(") - please rebuild the applications in the binaries folder (")
@@ -435,6 +437,9 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 
 					if FileExist(exePath) {
 						try {
+							if !FileExist(exePath)
+								throw "File not found..."
+				
 							this.iMapperPhase := "Collect"
 
 							Run(A_ComSpec . " /c `"`"" . exePath . "`" -Map > `"" . dataFile . "`"`"", kBinariesDirectory, "Hide", &pid)

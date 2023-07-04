@@ -250,6 +250,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				this.iUDPClient := udpClient
 			}
 			catch Any as exception {
+				logError(exception, true)
+					
 				logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider ("), {simulator: "ACC", protocol: "UDP"})
 									   . exePath . translate(") - please rebuild the applications in the binaries folder (")
 									   . kBinariesDirectory . translate(")"))

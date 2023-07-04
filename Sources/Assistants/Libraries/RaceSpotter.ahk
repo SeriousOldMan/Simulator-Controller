@@ -2263,6 +2263,8 @@ class RaceSpotter extends GridRaceAssistant {
 					Run(exePath, kBinariesDirectory, "Hide", &pid)
 				}
 				catch Any as exception {
+					logError(exception, true)
+
 					logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (")
 															   , {simulator: code, protocol: "SHM"})
 										   . exePath . translate(") - please rebuild the applications in the binaries folder (")

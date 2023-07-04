@@ -364,6 +364,8 @@ int main(int argc, char* argv[])
 				wprintf_s(L"DriverNickname=%S\n", "");
 			}
 
+			wprintf_s(L"Position=%ld\n", map_buffer->all_drivers_data_1[getPlayerCarID()].place);
+
 			wprintf_s(L"LapValid=%S\n", map_buffer->current_lap_valid ? "true" : "false");
 
 			wprintf_s(L"LapLastTime=%ld\n", (long)(normalize(map_buffer->lap_time_previous_self) * 1000));

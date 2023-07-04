@@ -321,6 +321,8 @@ int main(int argc, char* argv[]) {
 			printf("DriverNickname=%s\n", "");
 		}
 
+		printf("Position=%ld\n", (long)localCopy->mParticipantInfo[localCopy->mViewedParticipantIndex].mRacePosition);
+
 		printf("LapValid=%s\n", localCopy->mLapInvalidated ? "false" : "true");
 
 		printf("LapLastTime=%ld\n", (long)(normalize(localCopy->mLastLapTime) * 1000));

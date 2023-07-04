@@ -3237,7 +3237,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 readSimulatorData(simulator) {
 	local data := callSimulator(simulator)
-	local setupData := callSimulator(simulator, "Setup")
+	local setupData := callSimulator(simulator, "Setup=true")
 
 	setMultiMapValues(data, "Setup Data", getMultiMapValues(setupData, "Setup Data"))
 

@@ -1490,10 +1490,10 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 }
 
 readSimulatorData(simulator) {
-	local data := callSimulator(simulator, "Setup")
+	local data := callSimulator(simulator, "Setup=true")
 	local tyreCompound, tyreCompoundColor
 
-	
+
 	if (getMultiMapValue(data, "Car Data", "TyreCompound", kUndefined) = kUndefined) {
 		tyreCompound := getMultiMapValue(data, "Car Data", "TyreCompoundRaw", kUndefined)
 

@@ -3373,6 +3373,8 @@ class RaceStrategist extends GridRaceAssistant {
 
 							if ((raceInfo != false) && raceInfo.Has(key))
 								carIndex := grid[raceInfo[key]]
+							else
+								carIndex := A_Index
 						}
 					}
 

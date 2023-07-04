@@ -942,7 +942,7 @@ void writeData(std::ostringstream * output, const irsdk_header *header, const ch
 				if (atoi(result) == irsdk_InPitStall)
 					printLine(output, "InPit=true");
 				else
-					printLine(output, "InPit=true");
+					printLine(output, "InPit=false");
 			}
 			else
 				printLine(output, "InPit=false");

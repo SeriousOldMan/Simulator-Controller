@@ -257,7 +257,7 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 				print(&output, (long)(localCopy->mCurrentSector2Times[i - 1] * 1000)); print(&output, ",");
 				print(&output, (long)(localCopy->mCurrentSector3Times[i - 1] * 1000)); printLine(&output);
 												
-				print(&output, "Car.", i); printLine(&output, ".Time.Car=", localCopy->mCarNames[i - 1]);
+				print(&output, "Car.", i); printLine(&output, ".Car=", localCopy->mCarNames[i - 1]);
 
 				char* name = (char*)vehicle.mName;
 

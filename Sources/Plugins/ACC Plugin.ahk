@@ -353,8 +353,12 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 		this.requireUDPClient(restart)
 
-		if !carIDs
+		if !carIDs {
+			if !ACCPlugin.sCarData
+				ACCPlugin.sCarData := readMultiMap(kResourcesDirectory . "Simulator Data\ACC\Car Data.ini")
+
 			carIDs := getMultiMapValues(ACCPlugin.sCarData, "Car IDs")
+		}
 
 		if ((A_TickCount + 5000) > lastRead) {
 			lastRead := (A_TickCount + 0)
@@ -505,8 +509,12 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 		super.updatePositionsData(data)
 
-		if !carCategories
+		if !carCategories {
+			if !ACCPlugin.sCarData
+				ACCPlugin.sCarData := readMultiMap(kResourcesDirectory . "Simulator Data\ACC\Car Data.ini")
+
 			carCategories := getMultiMapValues(ACCPlugin.sCarData, "Car Categories")
+		}
 
 		loop {
 			car := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Car", kUndefined)

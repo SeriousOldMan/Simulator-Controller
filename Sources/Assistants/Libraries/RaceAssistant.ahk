@@ -986,7 +986,7 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	prepareSession(&settings, &data, formationLap?) {
-		local simulator, simulatorName, session, driverForname, driverSurname, driverNickname
+		local simulator, simulatorName, session, driverForname, driverSurname, driverNickname, facts
 
 		if (settings && !isObject(settings))
 			settings := readMultiMap(settings)
@@ -1030,10 +1030,14 @@ class RaceAssistant extends ConfigurationItem {
 				lapTime := settingsLapTime
 		}
 
-		this.initializeSessionFormat(false, settings, data, lapTime)
+		facts := this.createFacts(settings, data)
+
+		this.initializeSessionFormat(facts, settings, data, lapTime)
+
+		return facts
 	}
 
-	initializeSessionFormat(facts, settings, data, lapTime) {
+	initializeSessionFormat(facts, settings, data, lapTime := 0, update := true) {
 		local sessionFormat := getMultiMapValue(data, "Session Data", "SessionFormat", "Time")
 		local sessionTimeRemaining := getDeprecatedValue(data, "Session Data", "Stint Data", "SessionTimeRemaining", 0)
 		local sessionLapsRemaining := getDeprecatedValue(data, "Session Data", "Stint Data", "SessionLapsRemaining", 0)
@@ -1071,7 +1075,8 @@ class RaceAssistant extends ConfigurationItem {
 				facts["Session.Format"] := sessionFormat
 			}
 
-		this.updateSessionValues({SessionDuration: duration * 1000, SessionLaps: laps, TeamSession: (getMultiMapValue(data, "Session Data", "Mode", "Solo") = "Team")})
+		if update
+			this.updateSessionValues({SessionDuration: duration * 1000, SessionLaps: laps, TeamSession: (getMultiMapValue(data, "Session Data", "Mode", "Solo") = "Team")})
 	}
 
 	readSettings(simulator, car, track, &settings) {

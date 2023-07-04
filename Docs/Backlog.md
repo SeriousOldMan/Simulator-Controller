@@ -19,6 +19,8 @@
   6. Better answers by the Strategist, when a pitstop cannot be recommended
   7. Create and manage a kind of training plan (Run Sheet) by the Strategist to gather data for strategy calculation
   8. "Leader on final lap" announcement for the Spotter.
+  9. Ask the Spotter for information on a specfic opponent.
+  10. Focus the Spotter on a specific opponent, so that he gives periodic information on gap, lap times, and so on.
 
 #### Race Center
   1. Change hot target pressures for the next pitstop.

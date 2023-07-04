@@ -2263,6 +2263,8 @@ class RaceSpotter extends GridRaceAssistant {
 					Run(exePath, kBinariesDirectory, "Hide", &pid)
 				}
 				catch Any as exception {
+					logError(exception, true)
+
 					logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (")
 															   , {simulator: code, protocol: "SHM"})
 										   . exePath . translate(") - please rebuild the applications in the binaries folder (")
@@ -2360,9 +2362,9 @@ class RaceSpotter extends GridRaceAssistant {
 		local speaker := this.getSpeaker()
 		local fragments := speaker.Fragments
 		local facts, weather, airTemperature, trackTemperature, weatherNow, weather10Min, weather30Min, driver
-		local position, length
+		local position, length, facts
 
-		super.prepareSession(&settings, &data, formationLap)
+		facts := super.prepareSession(&settings, &data, formationLap)
 
 		if settings
 			this.updateConfigurationValues({UseTalking: getMultiMapValue(settings, "Assistant.Spotter", "Voice.UseTalking", true)})
@@ -2441,17 +2443,19 @@ class RaceSpotter extends GridRaceAssistant {
 
 		Task.startTask(ObjBindMethod(this, "startupSpotter", true), 1000)
 		Task.startTask(ObjBindMethod(this, "updateSessionValues", {Running: true}), 25000)
+
+		return facts
 	}
 
 	startSession(settings, data) {
 		local configuration := this.Configuration
 		local joined := false
-		local simulatorName, configuration, saveSettings
+		local simulatorName, configuration, saveSettings, facts
 
 		if !this.Prepared
 			joined := true
 
-		this.prepareSession(&settings, &data, false)
+		facts := this.prepareSession(&settings, &data, false)
 
 		if this.Debug[kDebugPositions]
 			deleteFile(kTempDirectory . "Race Spotter.positions")
@@ -2476,7 +2480,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 		this.updateConfigurationValues({LearningLaps: getMultiMapValue(configuration, "Race Spotter Analysis", simulatorName . ".LearningLaps", 1)									, SaveSettings: saveSettings})
 
-		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(this.createFacts(settings, data))
+		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(facts)
 								, BestLapTime: 0, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0
 								, EnoughData: false})
 

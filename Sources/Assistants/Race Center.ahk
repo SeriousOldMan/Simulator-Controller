@@ -1605,6 +1605,8 @@ class RaceCenter extends ConfigurationItem {
 					Run("`"" . exePath . "`" " . options, kBinariesDirectory)
 				}
 				catch Any as exception {
+					logError(exception, true)
+
 					logMessage(kLogCritical, translate("Cannot start the Session Database tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
 
 					showMessage(substituteVariables(translate("Cannot start the Session Database tool (%exePath%) - please check the configuration..."), {exePath: exePath})
@@ -4598,6 +4600,8 @@ class RaceCenter extends ConfigurationItem {
 					Run("`"" . exePath . "`" " . options, kBinariesDirectory)
 				}
 				catch Any as exception {
+					logError(exception, true)
+
 					logMessage(kLogCritical, translate("Cannot start the Session Database tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
 
 					showMessage(substituteVariables(translate("Cannot start the Session Database tool (%exePath%) - please check the configuration..."), {exePath: exePath})
@@ -5710,7 +5714,7 @@ class RaceCenter extends ConfigurationItem {
 
 			lap.Stint := stint
 
-			tries := ((A_Index == count) ? ((isDebug() || (lap.Nr = 1)) ? 40 : 20) : 2)
+			tries := ((A_Index == count) ? ((isDebug() || (lap.Nr = 1)) ? 40 : 20) : 1)
 
 			while (tries > 0) {
 				rawData := this.Connector.GetLapValue(identifier, "Telemetry Data")
@@ -5727,7 +5731,7 @@ class RaceCenter extends ConfigurationItem {
 
 						return newLaps
 					}
-					else
+					else if (A_Index == count)
 						Sleep(400)
 				}
 				else {
@@ -5811,7 +5815,7 @@ class RaceCenter extends ConfigurationItem {
 								   , getMultiMapValue(data, "Car Data", "TyreCompoundColor"))
 
 			try {
-				tries := ((A_Index == count) ? ((isDebug() || (lap.Nr = 1)) ? 40 : 20) : 2)
+				tries := ((A_Index == count) ? ((isDebug() || (lap.Nr = 1)) ? 40 : 20) : 1)
 
 				while (tries > 0) {
 					rawData := this.Connector.GetLapValue(identifier, "Positions Data")
@@ -5826,7 +5830,7 @@ class RaceCenter extends ConfigurationItem {
 
 							throw "No data..."
 						}
-						else
+						else if (A_Index == count)
 							Sleep(400)
 					}
 					else
@@ -9706,7 +9710,7 @@ class RaceCenter extends ConfigurationItem {
 					}
 
 					try {
-						tries := ((lap == lastLap) ? ((isDebug() || (lap = 1)) ? 40 : 20) : 2)
+						tries := ((lap == lastLap) ? ((isDebug() || (lap = 1)) ? 40 : 20) : 1)
 
 						while (tries > 0) {
 							standingsData := this.Connector.GetSessionLapValue(session, lap, "Race Strategist Race Standings")
@@ -9721,7 +9725,7 @@ class RaceCenter extends ConfigurationItem {
 
 									throw "No data..."
 								}
-								else
+								else if (lap == lastLap)
 									Sleep(400)
 							}
 							else

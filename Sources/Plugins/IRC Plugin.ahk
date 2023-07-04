@@ -69,6 +69,8 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 				callSimulator(this.Code, command . "=" . operation . "=" . message . ":" . values2String(";", arguments*), "DLL")
 			}
 			catch Any as exception {
+				logError(exception, true)
+					
 				logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider ("), {simulator: this.Code, protocol: "SHM"})
 									   . exePath . translate(") - please rebuild the applications in the binaries folder (")
 									   . kBinariesDirectory . translate(")"))

@@ -692,6 +692,9 @@ class SessionDatabase extends ConfigurationItem {
 		}
 
 		try {
+			if !FileExist(kBinariesDirectory . "Track Mapper.exe")
+				throw "File not found..."
+				
 			Run(A_ComSpec . " /c `"`"" . kBinariesDirectory . "Track Mapper.exe`" -Simulator `"" . simulator . "`" -Track `"" . track . "`" -Data `"" . datafile . "`"`""
 			  , kBinariesDirectory, "Hide", &pid)
 		}

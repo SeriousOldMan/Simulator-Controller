@@ -1244,7 +1244,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 		this.updateSessionValues({RaceInfo: false})
 
-		super.prepareSession(&settings, &data, formationLap?)
+		facts := super.prepareSession(&settings, &data, formationLap?)
 
 		simulatorName := this.SettingsDatabase.getSimulatorName(this.Simulator)
 
@@ -1282,8 +1282,6 @@ class RaceStrategist extends GridRaceAssistant {
 
 			applicableStrategy := false
 
-			facts := this.createFacts(settings, data)
-
 			simulator := theStrategy.Simulator
 			car := theStrategy.Car
 			track := theStrategy.Track
@@ -1298,7 +1296,7 @@ class RaceStrategist extends GridRaceAssistant {
 				if ((sessionType = "Duration") && (facts["Session.Format"] = "Time")) {
 					duration := (facts["Session.Duration"] / 60)
 
-					if ((Abs(sessionLength - duration) / duration) >  0.05)
+					if ((Abs(sessionLength - duration) / duration) >  0.1)
 						applicableStrategy := false
 				}
 				else if ((sessionType = "Laps") && (facts["Session.Format"] = "Lap")) {
@@ -1317,14 +1315,16 @@ class RaceStrategist extends GridRaceAssistant {
 				}
 			}
 		}
+
+		return facts
 	}
 
 	startSession(settings, data) {
 		local configuration := this.Configuration
 		local raceEngineer := (ProcessExist("Race Engineer.exe") > 0)
-		local simulator, saveSettings, deprecated, telemetryDB
+		local simulator, saveSettings, deprecated, telemetryDB, facts
 
-		this.prepareSession(&settings, &data, false)
+		facts := this.prepareSession(&settings, &data, false)
 
 		simulatorName := this.Simulator
 
@@ -1350,7 +1350,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 		this.updateSessionValues({TelemetryDatabase: telemetryDB})
 
-		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(this.createFacts(settings, data)), HasTelemetryData: false
+		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(facts), HasTelemetryData: false
 								, BestLapTime: 0, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0
 								, EnoughData: false, StrategyReported: (getMultiMapValue(data, "Stint Data", "Laps", 0) > 1)})
 

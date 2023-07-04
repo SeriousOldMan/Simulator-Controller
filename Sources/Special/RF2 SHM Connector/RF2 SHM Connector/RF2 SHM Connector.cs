@@ -182,8 +182,9 @@ namespace SHMConnector {
 		public string ReadStandings()
 		{
 			StringWriter strWriter = new StringWriter();
+            rF2VehicleScoring playerVehicle = GetPlayerScoring(ref scoring);
 
-			strWriter.WriteLine("[Position Data]");
+            strWriter.WriteLine("[Position Data]");
 
 			if (connected)
 			{
@@ -226,7 +227,7 @@ namespace SHMConnector {
 					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".InPitLane="); strWriter.WriteLine(vehicle.mInPits != 0 ? "true" : "false");
 					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".InPit="); strWriter.WriteLine(vehicle.mPitState == (byte)Stopped ? "true" : "false");
 
-					if (vehicle.mIsPlayer != 0)
+					if (Object.ReferenceEquals(vehicle, playerVehicle))
 					{
 						strWriter.Write("Driver.Car=");
 						strWriter.WriteLine(i);
@@ -298,7 +299,9 @@ namespace SHMConnector {
 				strWriter.Write("DriverSurname="); strWriter.WriteLine(GetSurname(scoring.mScoringInfo.mPlayerName));
 				strWriter.Write("DriverNickname="); strWriter.WriteLine(GetNickname(scoring.mScoringInfo.mPlayerName));
 
-				strWriter.Write("LapValid="); strWriter.WriteLine((playerScoring.mCountLapFlag == 2) ? "true" : "false");
+				strWriter.Write("Position="); strWriter.WriteLine(playerScoring.mPlace);
+
+                strWriter.Write("LapValid="); strWriter.WriteLine((playerScoring.mCountLapFlag == 2) ? "true" : "false");
 				
 				strWriter.Write("LapLastTime="); strWriter.WriteLine(Math.Round(Normalize(playerScoring.mLastLapTime > 0 ? playerScoring.mLastLapTime
 																													 : playerScoring.mBestLapTime) * 1000));

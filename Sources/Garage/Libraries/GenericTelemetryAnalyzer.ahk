@@ -348,6 +348,8 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 				Run(kBinariesDirectory . code . " SHM Spotter.exe " . options, kBinariesDirectory, "Hide", &pid)
 			}
 			catch Any as exception {
+				logError(exception, true)
+
 				message := substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (%exePath%) - please check the configuration...")													   , {simulator: code, protocol: "SHM", exePath: kBinariesDirectory . code . " SHM Spotter.exe"})
 
 				logMessage(kLogCritical, message)

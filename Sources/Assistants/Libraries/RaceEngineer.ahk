@@ -1173,8 +1173,9 @@ class RaceEngineer extends RaceAssistant {
 
 	prepareSession(&settings, &data, formationLap?) {
 		local announcements := false
+		local facts
 
-		super.prepareSession(&settings, &data, formationLap?)
+		facts := super.prepareSession(&settings, &data, formationLap?)
 
 		if settings {
 			this.updateConfigurationValues({UseTalking: getMultiMapValue(settings, "Assistant.Engineer", "Voice.UseTalking", true)})
@@ -1198,6 +1199,8 @@ class RaceEngineer extends RaceAssistant {
 			if announcements
 				this.updateConfigurationValues({Announcements: announcements})
 		}
+
+		return facts
 	}
 
 	createFacts(settings, data) {
@@ -1225,10 +1228,9 @@ class RaceEngineer extends RaceAssistant {
 
 	startSession(settings, data) {
 		local configuration := this.Configuration
-		local simulatorName, configuration, deprecated, saveSettings, speaker, strategistPlugin, strategistName
-		local knowledgeBase
+		local simulatorName, configuration, deprecated, saveSettings, speaker, strategistPlugin, strategistName, facts
 
-		this.prepareSession(&settings, &data, false)
+		facts := this.prepareSession(&settings, &data, false)
 
 		simulatorName := this.Simulator
 
@@ -1240,9 +1242,7 @@ class RaceEngineer extends RaceAssistant {
 									  , SaveSettings: saveSettings
 									  , SaveTyrePressures: getMultiMapValue(configuration, "Race Engineer Shutdown", simulatorName . ".SaveTyrePressures", kAsk)})
 
-		knowledgeBase := this.createKnowledgeBase(this.createFacts(settings, data))
-
-		this.updateDynamicValues({KnowledgeBase: knowledgeBase, HasPressureData: false
+		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(facts), HasPressureData: false
 								, BestLapTime: 0, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
 
 		if this.Speaker {

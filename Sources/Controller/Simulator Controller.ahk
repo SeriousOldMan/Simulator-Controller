@@ -1403,7 +1403,7 @@ class ControllerFunction {
 					}
 				}
 				catch Any as exception {
-					logError(exception)
+					logError(exception, true)
 
 					logMessage(kLogCritical, translate("Error while registering hotkey ") . theHotkey . translate(" - please check the configuration"))
 
@@ -1890,7 +1890,7 @@ setHotkeyEnabled(function, trigger, enabled) {
 				Hotkey(theHotkey, state)
 			}
 			catch Any as exception {
-				logError(exception)
+				logError(exception, true)
 
 				logMessage(kLogCritical, translate("Error while registering hotkey ") . theHotkey . translate(" - please check the configuration"))
 

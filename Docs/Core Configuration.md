@@ -27,6 +27,7 @@ And finally a couple of other settings which configure low level components of S
 
 | Category | Setting | Default | Description |
 |----------|---------|---------|-------------|
+| Simulator | Data Provider  | DLL    | This defines the integration method used to acquire data from the different simulators. "EXE" is more reliable, but somewhat slower than "DLL", which is the default. If you encounter obviously wrong or missing data in race reports, for example, you can use the other method. |
 | HTML     | Viewer  | IE11    | Many application uses and embedded HTML viewer to show graphs or other content. Actually there are two HTML engines available - *IE11*, which is based on the old Internet Explorer, which is out of support by Micorsoft and the new *WebView2* engine, which is based on Chromium engine. Since the later uses quite some resources, *IE11* is the default as long as it is available in Windows. |
 | Voice     | ActivationRecognizer  | Server    | Let's you choose the speech recognizer engine for the activation command used by the voice recognition. Allowed values here are: "Server", "Desktop" and "Azure\|tokenIssuerEndpoint\|subscriptionKey" (with *tokenIssuerEndpoint* and *subscriptionKey* substituted by their corresponding values. |
 

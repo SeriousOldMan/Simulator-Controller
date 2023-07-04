@@ -2327,6 +2327,8 @@ openRaceSettings(import := false, silent := false, plugin := false, fileName := 
 		}
 	}
 	catch Any as exception {
+		logError(exception, true)
+					
 		logMessage(kLogCritical, translate("Cannot start the Race Settings tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
 
 		showMessage(substituteVariables(translate("Cannot start the Race Settings tool (%exePath%) - please check the configuration..."), {exePath: exePath})
@@ -2344,6 +2346,8 @@ openSessionDatabase(plugin := false) {
 		Run("`"" . exePath . "`" " . options, kBinariesDirectory, , &pid)
 	}
 	catch Any as exception {
+		logError(exception, true)
+					
 		logMessage(kLogCritical, translate("Cannot start the Session Database tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
 
 		showMessage(substituteVariables(translate("Cannot start the Session Database tool (%exePath%) - please check the configuration..."), {exePath: exePath})
@@ -2361,6 +2365,8 @@ openSetupWorkbench(plugin := false) {
 		Run("`"" . exePath . "`" " . options, kBinariesDirectory)
 	}
 	catch Any as exception {
+		logError(exception, true)
+					
 		logMessage(kLogCritical, translate("Cannot start the Setup Workbench tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
 
 		showMessage(substituteVariables(translate("Cannot start the Setup Workbench tool (%exePath%) - please check the configuration..."), {exePath: exePath})
@@ -2378,6 +2384,8 @@ openStrategyWorkbench(plugin := false) {
 		Run("`"" . exePath . "`" " . options, kBinariesDirectory)
 	}
 	catch Any as exception {
+		logError(exception, true)
+					
 		logMessage(kLogCritical, translate("Cannot start the Strategy Workbench tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
 
 		showMessage(substituteVariables(translate("Cannot start the Strategy Workbench tool (%exePath%) - please check the configuration..."), {exePath: exePath})
@@ -2395,6 +2403,8 @@ openRaceCenter(plugin := false) {
 		Run("`"" . exePath . "`" " . options, kBinariesDirectory)
 	}
 	catch Any as exception {
+		logError(exception, true)
+					
 		logMessage(kLogCritical, translate("Cannot start the Race Center tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
 
 		showMessage(substituteVariables(translate("Cannot start the Race Center tool (%exePath%) - please check the configuration..."), {exePath: exePath})

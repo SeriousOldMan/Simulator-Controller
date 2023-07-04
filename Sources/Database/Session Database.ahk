@@ -5068,9 +5068,9 @@ editSettings(editorOrCommand, arguments*) {
 
 				serverTokenEdit := stringToMap("|", "->", getMultiMapValue(configuration, "Team Server", "Server.Token", ""), "Standard")
 				serverTokenEdit := (serverTokenEdit.Has("Standard") ? serverTokenEdit["Standard"] : "")
-
-				serverUpdateEdit := replication
 			}
+
+			serverUpdateEdit := replication
 		}
 		else {
 			serverIdentifierEdit := ""

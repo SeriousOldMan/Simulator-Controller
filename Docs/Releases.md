@@ -1,3 +1,16 @@
+## 5.1.0.0-release 07/07/23 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. The oversteer detection method of the Telemetry Analyzer in the "Setup Workbench" has become much more sensitive and counter steering is now detected correctly (will always count as a *heavy+ oversteer event).
+  4. Loading of car specific defaults in the Telemetry Analyzer has been fixed as well.
+  5. A couple of bugs in the behaviour of the sliders in the Telemetry Analyzer in the "Setup Workbench" has been fixed.
+  6. New real-time capable data connector architecture. This will enable exciting new features in the future.
+  7. The bounding box for side proximity alerts by the Spotter has been increased from 6 to 8 meters lateral.
+  8. The waiting time for unavailable data in "Race Center" has been reduced.
+  9. Fixed a couple of bugs, which had been introduced to the AC and RF2 Spotter by the latest .NET framework update by Microsoft.
+  10. Fixed car coordinates for rFactor2 (used by the track automation).
+  11. Fixed race reports and standings data in "Race Center" for *rFactor2*.
+
 ## 5.0.9.1-release 06/30/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

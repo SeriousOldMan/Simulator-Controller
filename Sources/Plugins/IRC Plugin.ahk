@@ -262,6 +262,23 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 	readSessionData(options := "") {
 		return super.readSessionData(options, "DLL")
 	}
+
+	updatePositionsData(data) {
+		local carClass
+
+		super.updatePositionsData(data)
+
+		loop {
+			carClass := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Class", kUndefined)
+
+			if (carClass == kUndefined)
+				break
+			else if (Trim(carClass) != "")
+				setMultiMapValue(data, "Position Data", "Car." . A_Index . ".Class", Trim(carClass))
+			else
+				removeMultiMapValue(data, "Position Data", "Car." . A_Index . ".Class")
+		}
+	}
 }
 
 

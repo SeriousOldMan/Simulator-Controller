@@ -4,11 +4,11 @@
   3. The oversteer detection method of the Telemetry Analyzer in the "Setup Workbench" has become much more sensitive and counter steering is now detected correctly (will always count as a *heavy+ oversteer event).
   4. Loading of car specific defaults in the Telemetry Analyzer has been fixed as well.
   5. A couple of bugs in the behaviour of the sliders in the Telemetry Analyzer in the "Setup Workbench" has been fixed.
-  6. New real-time capable data connector architecture. This will enable exciting new features in the future. A switch is available in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration) to choose between the different protocols.
+  6. New real-time capable data connector architecture. This will enable exciting new features in the future. A switch is available in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration) to choose between the different protocols. The new protocol is the default, but you can go back, if you encounter data consistency issues.
   7. The bounding box for side proximity alerts by the Spotter has been increased from 6 to 8 meters lateral.
   8. The waiting time for unavailable data in "Race Center" has been reduced.
-  9. Fixed a couple of bugs, which had been introduced to the AC and RF2 Spotter by the latest .NET framework update by Microsoft.
-  10. Fixed car coordinates for rFactor2 (used by the track automation).
+  9. Fixed a couple of bugs, which had been introduced to the Spotter for *Assetto Corsa* and *rFactor 2* by the latest .NET framework update by Microsoft.
+  10. Fixed car coordinates for *rFactor2* (used by the track automation).
   11. Fixed race reports and standings data in "Race Center" for *rFactor2*.
 
 ## 5.0.9.1-release 06/30/23

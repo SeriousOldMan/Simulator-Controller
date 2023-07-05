@@ -434,19 +434,14 @@ namespace SHMConnector
             physics = ReadPhysics();
             graphics = ReadGraphics();
             staticInfo = ReadStaticInfo();
+            cars = ReadCars();
 
             if (request.StartsWith("Setup"))
                 return this.ReadSetup();
             else if (request.StartsWith("Standings"))
-            {
-                cars = ReadCars();
-
                 return this.ReadStandings();
-            }
             else
-            {
                 return this.ReadData();
-            }
         }
     }
 }

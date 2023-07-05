@@ -10,15 +10,12 @@ namespace ACSHMProvider {
 
             SHMProvider provider = new SHMProvider();
 
-            if (args.Length > 0 && args[0] == "-Setup")
+            if (args.Length > 0 && args[0].StartsWith("Setup"))
                 provider.ReadSetup();
-            else if (args.Length > 0 && args[0] == "-Standings")
+            else if (args.Length > 0 && args[0].StartsWith("Standings"))
                 provider.ReadStandings();
             else
-            {
                 provider.ReadData();
-                provider.ReadStandings();
-            }
 
             provider.Close();
         }

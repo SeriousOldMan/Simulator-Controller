@@ -384,12 +384,6 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 		output << "SessionFormat=Time" << endl;
 		printData(&output, "FuelAmount", sf->maxFuel);
 
-		if (timeLeft < 0)
-			if (gf->session == AC_PRACTICE)
-				timeLeft = 24 * 3600 * 1000;
-			else
-				timeLeft = 0.0;
-
 		printData(&output, "SessionTimeRemaining", timeLeft);
 
 		if (gf->session == AC_PRACTICE)

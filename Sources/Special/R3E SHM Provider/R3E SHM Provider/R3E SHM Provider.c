@@ -144,9 +144,26 @@ void printNAValue(long value) {
 		wprintf_s(L"%d\n", value);
 }
 
+BOOL getArgument(char* output, char* request, char* key) {
+	char buffer[255];
+
+	strcpy_s(buffer, 255, key);
+	strcat_s(buffer, 255 - strlen(key), "=");
+
+	if (strncmp(request, buffer, strlen(buffer)) == 0) {
+		substring(output, request, strlen(buffer), strlen(request) - strlen(buffer));
+
+		return TRUE;
+	}
+	else
+		return FALSE;
+}
+
 int main(int argc, char* argv[])
 {
-    int err_code = 0;
+	char* request = (argc > 1) ? argv[1] : "";
+	char buffer[255]; 
+	int err_code = 0;
     BOOL mapped_r3e = FALSE;
 
     if (!mapped_r3e && map_exists())
@@ -159,7 +176,7 @@ int main(int argc, char* argv[])
         mapped_r3e = TRUE;
 	}
 
-	BOOL writeStandings = ((argc > 1) && (strcmp(argv[1], "-Standings") == 0));
+	BOOL writeStandings = getArgument(buffer, request, "Standings");
 	BOOL writeTelemetry = !writeStandings;
 
 	writeStandings = TRUE;
@@ -196,8 +213,6 @@ int main(int argc, char* argv[])
 
 				wprintf_s(L"Car.%d.Time=%ld\n", i, sector1Time + sector2Time + sector3Time);
 				wprintf_s(L"Car.%d.Time.Sectors=%ld,%ld,%ld\n", i, sector1Time, sector2Time, sector3Time);
-
-				char buffer[33];
 
 				_itoa_s(vehicle.driver_info.model_id, buffer, 32, 10);
 
@@ -257,8 +272,6 @@ int main(int argc, char* argv[])
 			else
 				wprintf_s(L"Session=Other\n");
 			
-			char buffer[33];
-
 			_itoa_s(map_buffer->vehicle_info.model_id, buffer, 32, 10);
 
 			wprintf_s(L"Car=%S\n", buffer);

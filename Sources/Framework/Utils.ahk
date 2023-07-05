@@ -170,7 +170,7 @@ callSimulator(simulator, options := "", protocol?) {
 
 			dataFile := temporaryFileName(simulator . " Data\SHM", "data")
 
-			RunWait(A_ComSpec . " /c `"`"" . exePath . "`" " . options . " > `"" . dataFile . "`"`"", , "Hide")
+			RunWait(A_ComSpec . " /c `"`"" . exePath . "`" `"" . options . "`" > `"" . dataFile . "`"`"", , "Hide")
 
 			data := readMultiMap(dataFile)
 

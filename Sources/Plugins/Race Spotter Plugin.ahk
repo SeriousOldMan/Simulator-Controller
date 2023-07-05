@@ -402,6 +402,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 
 		createTrackMap() {
 			local pid := this.iMapperPID
+			local fileSize
 
 			finalizeTrackMap() {
 				deleteFile(kTempDirectory . "Track Mapper.state")
@@ -412,9 +413,22 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 
 			if pid {
 				if ProcessExist(pid) {
+					try {
+						fileSize := FileGetSize(dataFile)
+
+						setMultiMapValue(mapperState, "Track Mapper", "Size", fileSize)
+					}
+					catch Any {
+						fileSize := false
+					}
+
+					setMultiMapValue(mapperState, "Track Mapper", "Information"
+								   , translate("Message: ") . (fileSize ? substituteVariables(translate("Scanning track (%size% bytes)..."), {size: Round(fileSize)})
+																		: translate("Scanning track...")))
+
 					writeMultiMap(kTempDirectory . "Track Mapper.state", mapperState)
 
-					Task.startTask(Task.CurrentTask, 10000)
+					Task.startTask(Task.CurrentTask, 10000, kLowPriority)
 				}
 				else {
 					pid := SessionDatabase.mapTrack(simulator, track, dataFile, finalizeTrackMap)
@@ -500,7 +514,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 
 						writeMultiMap(kTempDirectory . "Track Mapper.state", mapperState)
 
-						Task.startTask(createTrackMap, 30000, kLowPriority)
+						Task.startTask(createTrackMap, 0, kLowPriority)
 					}
 				}
 				else {

@@ -1163,7 +1163,7 @@ systemMonitor(command := false, arguments*) {
 
 	updateMapperState(trackMapperState) {
 		local state := getMultiMapValue(trackMapperState, "Track Mapper", "State", "Disabled")
-		local html, icon, simulator, track, action, points
+		local html, icon, simulator, track, action, points, size
 
 		if kStateIcons.Has(state)
 			icon := kStateIcons[state]
@@ -1183,7 +1183,10 @@ systemMonitor(command := false, arguments*) {
 				case "Waiting":
 					action := translate("Waiting for track scanner...")
 				case "Scanning":
-					action := translate("Scanning track...")
+					size := getMultiMapValue(trackMapperState, "Track Mapper", "Size", false)
+
+					action := (size ? substituteVariables(translate("Scanning track (%size% bytes)..."), {size: size})
+									: translate("Scanning track..."))
 				case "Reading":
 					action := translate("Reading track coordinates (%points%)...")
 				case "Analyzing":

@@ -9,6 +9,8 @@
 #include <Windows.h>
 #include <tchar.h>
 
+#pragma comment(lib, "winmm")
+
 #define ALIVE_SEC 600
 #define INTERVAL_MS 100
 
@@ -750,8 +752,41 @@ int trackWidth = 150;
 
 int lastCompletedLaps = 0;
 r3e_float32 lastSpeed = 0.0f;
+long lastSound = 0;
 
-BOOL collectTelemetry() {
+BOOL triggerUSOSBeep(char* soundsDirectory, double usos) {
+	BOOL sound = TRUE;
+	char wavFile[255];
+
+	strcpy_s(wavFile, 255, soundsDirectory);
+	strcpy_s(wavFile + strlen(soundsDirectory), 255 - strlen(soundsDirectory), "");
+
+
+	if (usos < oversteerHeavyThreshold)
+		strcpy_s(wavFile + strlen(soundsDirectory), 255 - strlen(soundsDirectory), "Oversteer Heavy.wav");
+	else if (usos < oversteerMediumThreshold)
+		strcpy_s(wavFile + strlen(soundsDirectory), 255 - strlen(soundsDirectory), "Oversteer Medium.wav");
+	else if (usos < oversteerLightThreshold)
+		strcpy_s(wavFile + strlen(soundsDirectory), 255 - strlen(soundsDirectory), "Oversteer Light.wav");
+	else if (usos > understeerHeavyThreshold)
+		strcpy_s(wavFile + strlen(soundsDirectory), 255 - strlen(soundsDirectory), "Understeer Heavy.wav");
+	else if (usos > understeerMediumThreshold)
+		strcpy_s(wavFile + strlen(soundsDirectory), 255 - strlen(soundsDirectory), "Understeer Medium.wav");
+	else if (usos > understeerLightThreshold)
+		strcpy_s(wavFile + strlen(soundsDirectory), 255 - strlen(soundsDirectory), "Understeer Light.wav");
+	else
+		sound = FALSE;
+
+	if (sound) {
+		PlaySoundA(wavFile, NULL, SND_FILENAME | SND_ASYNC);
+
+		return TRUE;
+	}
+	else
+		return FALSE;
+}
+
+BOOL collectTelemetry(char* soundsDirectory) {
 	int playerIdx = getPlayerIndex();
 
 	if (map_buffer->game_paused || (map_buffer->all_drivers_data_1[playerIdx].in_pitlane != 0))
@@ -812,6 +847,10 @@ BOOL collectTelemetry() {
 			}
 
 			cd.usos = slip * 57.2989 * 1;
+
+			if ((strlen(soundsDirectory) > 0) && (long)GetTickCount() > (lastSound + 1000))
+				if (triggerUSOSBeep(soundsDirectory, cd.usos))
+					lastSound = GetTickCount();
 
 			if (FALSE) {
 				char fileName[512];
@@ -1160,6 +1199,8 @@ int main(int argc, char* argv[])
 	BOOL analyzeTelemetry = FALSE;
 	long counter = 0;
 
+	char* soundsDirectory = "";
+
 	if (argc > 1) {
 		mapTrack = (strcmp(argv[1], "-Map") == 0);
 		calibrateTelemetry = (strcmp(argv[1], "-Calibrate") == 0);
@@ -1184,6 +1225,9 @@ int main(int argc, char* argv[])
 				lowspeedThreshold = atoi(argv[9]);
 				wheelbase = atoi(argv[10]);
 				trackWidth = atoi(argv[11]);
+
+				if (argc > 12)
+					soundsDirectory = argv[12];
 			}
 		}
 		else if (positionTrigger) {
@@ -1208,7 +1252,7 @@ int main(int argc, char* argv[])
 
 		if (mapped_r3e) {
 			if (analyzeTelemetry) {
-				if (collectTelemetry()) {
+				if (collectTelemetry(soundsDirectory)) {
 					if (remainder(counter, 20) == 0)
 						writeTelemetry(calibrateTelemetry);
 				}

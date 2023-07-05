@@ -670,8 +670,71 @@ int trackWidth = 150;
 
 int lastCompletedLaps = 0;
 float lastSpeed = 0.0;
+long lastSound = 0;
 
-bool collectTelemetry(const irsdk_header* header, const char* data) {
+template<class E, class T = std::char_traits<E>, class A = std::allocator<E> >
+
+class Widen : public std::unary_function<const std::string&, std::basic_string<E, T, A> >
+{
+	std::locale loc_;
+	const std::ctype<E>* pCType_;
+
+	// No copy-constructor, no assignment operator...
+	Widen(const Widen&);
+	Widen& operator= (const Widen&);
+
+public:
+	// Constructor...
+	Widen(const std::locale& loc = std::locale()) : loc_(loc)
+	{
+#if defined(_MSC_VER) && (_MSC_VER < 1300) // VC++ 6.0...
+		using namespace std;
+		pCType_ = &_USE(loc, ctype<E>);
+#else
+		pCType_ = &std::use_facet<std::ctype<E> >(loc);
+#endif
+	}
+
+	// Conversion...
+	std::basic_string<E, T, A> operator() (const std::string& str) const
+	{
+		typename std::basic_string<E, T, A>::size_type srcLen =
+			str.length();
+		const char* pSrcBeg = str.c_str();
+		std::vector<E> tmp(srcLen);
+
+		pCType_->widen(pSrcBeg, pSrcBeg + srcLen, &tmp[0]);
+		return std::basic_string<E, T, A>(&tmp[0], srcLen);
+	}
+};
+
+bool triggerUSOSBeep(std::string soundsDirectory, float usos) {
+	Widen<wchar_t> toWString;
+	std::wstring wavFile = L"";
+
+	if (usos < oversteerHeavyThreshold)
+		wavFile = toWString(soundsDirectory + "Oversteer Heavy.wav");
+	else if (usos < oversteerMediumThreshold)
+		wavFile = toWString(soundsDirectory + "Oversteer Medium.wav");
+	else if (usos < oversteerLightThreshold)
+		wavFile = toWString(soundsDirectory + "Oversteer Light.wav");
+	else if (usos > understeerHeavyThreshold)
+		wavFile = toWString(soundsDirectory + "Understeer Heavy.wav");
+	else if (usos > understeerMediumThreshold)
+		wavFile = toWString(soundsDirectory + "Understeer Medium.wav");
+	else if (usos > understeerLightThreshold)
+		wavFile = toWString(soundsDirectory + "Understeer Light.wav");
+
+	if (wavFile != L"") {
+		PlaySoundW(wavFile.c_str(), NULL, SND_FILENAME | SND_ASYNC);
+
+		return true;
+	}
+	else
+		return false;
+}
+
+bool collectTelemetry(const irsdk_header* header, const char* data, std::string soundsDirectory) {
 	char result[64];
 	bool onTrack = true;
 
@@ -793,6 +856,10 @@ bool collectTelemetry(const irsdk_header* header, const char* data) {
 
 				cd.usos = slip * 57.2958 * 1;
 			}
+
+			if ((soundsDirectory != "") && GetTickCount() > (lastSound + 1000))
+				if (triggerUSOSBeep(soundsDirectory, cd.usos))
+					lastSound = GetTickCount();
 
 			if (false) {
 				std::ofstream output;
@@ -1230,6 +1297,8 @@ int main(int argc, char* argv[])
 	bool calibrateTelemetry = false;
 	bool analyzeTelemetry = false;
 
+	char* soundsDirectory = "";
+
 	if (argc > 1) {
 		calibrateTelemetry = (strcmp(argv[1], "-Calibrate") == 0);
 		analyzeTelemetry = calibrateTelemetry || (strcmp(argv[1], "-Analyze") == 0);
@@ -1256,6 +1325,9 @@ int main(int argc, char* argv[])
 				steerRatio = atoi(argv[10]);
 				wheelbase = atoi(argv[11]);
 				trackWidth = atoi(argv[12]);
+
+				if (argc > 14)
+					soundsDirectory = argv[14];
 			}
 		}
 		else if (positionTrigger) {
@@ -1331,7 +1403,7 @@ int main(int argc, char* argv[])
 					}
 
 					if (analyzeTelemetry) {
-						if (collectTelemetry(pHeader, g_data)) {
+						if (collectTelemetry(pHeader, g_data, soundsDirectory)) {
 							if (remainder(counter, 20) == 0)
 								writeTelemetry(pHeader, g_data, calibrateTelemetry);
 						}

@@ -1208,7 +1208,7 @@ int main(int argc, char* argv[])
 				wheelbase = atoi(argv[12]);
 				trackWidth = atoi(argv[13]);
 
-				if (argc > 13)
+				if (argc > 14)
 					soundsDirectory = argv[14];
 			}
 		}

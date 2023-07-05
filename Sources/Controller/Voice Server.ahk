@@ -920,20 +920,24 @@ class VoiceServer extends ConfigurationItem {
 	speak(descriptor, text, activate := false) {
 		local oldSpeaking := this.Speaking
 
-		this.iSpeaking := true
+		if this.Speaking
+			Task.startTask(ObjBindMethod(this, "speak", descriptor, text, activate))
+		else {
+			this.iSpeaking := true
 
-		try {
-			this.getVoiceClient(descriptor).speak(text)
+			try {
+				this.getVoiceClient(descriptor).speak(text)
 
-			if activate
-				this.activateVoiceClient(descriptor)
+				if activate
+					this.activateVoiceClient(descriptor)
 
-		}
-		catch Any as exception {
-			logError(exception)
-		}
-		finally {
-			this.iSpeaking := oldSpeaking
+			}
+			catch Any as exception {
+				logError(exception)
+			}
+			finally {
+				this.iSpeaking := oldSpeaking
+			}
 		}
 	}
 

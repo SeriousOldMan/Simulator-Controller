@@ -763,17 +763,17 @@ BOOL triggerUSOSBeep(char* soundsDirectory, double usos) {
 
 
 	if (usos < oversteerHeavyThreshold)
-		strcpy_s(wavFile + strlen(soundsDirectory), 255 - strlen(soundsDirectory), "Oversteer Heavy.wav");
+		strcpy_s(wavFile + strlen(soundsDirectory), 255 - strlen(soundsDirectory), "\\Oversteer Heavy.wav");
 	else if (usos < oversteerMediumThreshold)
-		strcpy_s(wavFile + strlen(soundsDirectory), 255 - strlen(soundsDirectory), "Oversteer Medium.wav");
+		strcpy_s(wavFile + strlen(soundsDirectory), 255 - strlen(soundsDirectory), "\\Oversteer Medium.wav");
 	else if (usos < oversteerLightThreshold)
-		strcpy_s(wavFile + strlen(soundsDirectory), 255 - strlen(soundsDirectory), "Oversteer Light.wav");
+		strcpy_s(wavFile + strlen(soundsDirectory), 255 - strlen(soundsDirectory), "\\Oversteer Light.wav");
 	else if (usos > understeerHeavyThreshold)
-		strcpy_s(wavFile + strlen(soundsDirectory), 255 - strlen(soundsDirectory), "Understeer Heavy.wav");
+		strcpy_s(wavFile + strlen(soundsDirectory), 255 - strlen(soundsDirectory), "\\Understeer Heavy.wav");
 	else if (usos > understeerMediumThreshold)
-		strcpy_s(wavFile + strlen(soundsDirectory), 255 - strlen(soundsDirectory), "Understeer Medium.wav");
+		strcpy_s(wavFile + strlen(soundsDirectory), 255 - strlen(soundsDirectory), "\\Understeer Medium.wav");
 	else if (usos > understeerLightThreshold)
-		strcpy_s(wavFile + strlen(soundsDirectory), 255 - strlen(soundsDirectory), "Understeer Light.wav");
+		strcpy_s(wavFile + strlen(soundsDirectory), 255 - strlen(soundsDirectory), "\\Understeer Light.wav");
 	else
 		sound = FALSE;
 
@@ -848,7 +848,7 @@ BOOL collectTelemetry(char* soundsDirectory) {
 
 			cd.usos = slip * 57.2989 * 1;
 
-			if ((strlen(soundsDirectory) > 0) && (long)GetTickCount() > (lastSound + 1000))
+			if ((strlen(soundsDirectory) > 0) && (long)GetTickCount() > (lastSound + 300))
 				if (triggerUSOSBeep(soundsDirectory, cd.usos))
 					lastSound = GetTickCount();
 

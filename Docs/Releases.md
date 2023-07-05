@@ -10,6 +10,7 @@
   9. Fixed a couple of bugs, which had been introduced to the Spotter for *Assetto Corsa* and *rFactor 2* by the latest .NET framework update by Microsoft.
   10. Fixed car coordinates for *rFactor2* (used by the track automation).
   11. Fixed race reports and standings data in "Race Center" for *rFactor2*.
+  12. Fixed track scanner and mapper for rare cases with special characters in car or track names. Happened especially in *Automobilista 2*.
 
 ## 5.0.9.1-release 06/30/23
   1. Minor bugfixes, as always

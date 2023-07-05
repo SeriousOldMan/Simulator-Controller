@@ -11,6 +11,7 @@
   10. Fixed car coordinates for *rFactor2* (used by the track automation).
   11. Fixed race reports and standings data in "Race Center" for *rFactor2*.
   12. Fixed track scanner and mapper for rare cases with special characters in car or track names. Happened especially in *Automobilista 2*.
+  13. Fixed a problem with manually locating *iRacing* in a non-standard install location.
 
 ## 5.0.9.1-release 06/30/23
   1. Minor bugfixes, as always

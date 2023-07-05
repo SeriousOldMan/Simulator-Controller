@@ -2731,7 +2731,7 @@ openLabelsAndIconsEditor(*) {
 
 standardApplication(definition, categories, executable) {
 	local ignore, category, name, descriptor
-	local software
+	local software, candidate
 
 	SplitPath(executable, &software)
 
@@ -2739,7 +2739,9 @@ standardApplication(definition, categories, executable) {
 		for name, descriptor in getMultiMapValues(definition, category) {
 			descriptor := string2Values("|", descriptor)
 
-			if (software = descriptor[3])
+			SplitPath(descriptor[3], &candidate)
+
+			if (software = candidate)
 				return name
 		}
 

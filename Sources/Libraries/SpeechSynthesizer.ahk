@@ -306,6 +306,8 @@ class SpeechSynthesizer {
 					Run("`"" . kNirCmd . "`" setappvolume /" . pid . A_Space . level)
 				}
 				catch Any as exception {
+					logError(exception, true)
+					
 					showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
 							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
@@ -369,6 +371,8 @@ class SpeechSynthesizer {
 					Run("`"" . kNirCmd . "`" setappvolume /" . pid . A_Space . level)
 				}
 				catch Any as exception {
+					logError(exception, true)
+					
 					showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
 												  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
@@ -541,6 +545,8 @@ class SpeechSynthesizer {
 						RunWait("`"" . kSoX . "`" `"" . temp1Name . "`" `"" . temp2Name . "`" norm vol " . volume, , "Hide")
 				}
 				catch Any as exception {
+					logError(exception, true)
+					
 					showMessage(substituteVariables(translate("Cannot start SoX (%kSoX%) - please check the configuration..."))
 							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 

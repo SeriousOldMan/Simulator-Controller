@@ -1152,17 +1152,16 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	acquireTelemetryData() {
-		local code, trackData, data
+		local trackData, data
 
 		static sessionDB := false
 
 		if !sessionDB
 			sessionDB := SessionDatabase()
 
-		code := this.Code
-		trackData := sessionDB.getTrackData(code, this.Track)
+		trackData := sessionDB.getTrackData(this.Code, this.Track)
 
-		return (trackData ? readSimulatorData(code, "-Track `"" . trackData . "`"") : readSimulatorData(code))
+		return this.readSessionData(trackData ? ("Track=" . trackData) : "")
 	}
 
 	acquirePositionsData(telemetryData) {
@@ -1177,7 +1176,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 			setMultiMapValues(positionsData, "Position Data", getMultiMapValues(telemetryData, "Position Data"))
 		}
 		else
-			positionsData := readSimulatorData(this.Code, "-Standings")
+			positionsData := this.readSessionData("Standings=true")
 
 		count := getMultiMapValue(positionsData, "Position Data", "Car.Count", 0)
 
@@ -1192,7 +1191,8 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 
 		if needCorrection {
 			loop count
-				cars.Push(Array(A_Index, getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Lap")
+				cars.Push(Array(A_Index, getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Laps"
+																	   , getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Lap"))
 									   + getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Lap.Running")))
 
 			bubbleSort(&cars, (c1, c2) => c1[2] < c2[2])
@@ -1227,11 +1227,8 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		RaceAssistantPlugin.updateAssistantsTelemetryData(telemetryData)
 		RaceAssistantPlugin.updateAssistantsPositionsData(positionsData)
 
-		for section, values in telemetryData
-			setMultiMapValues(data, section, values)
-
-		for section, values in positionsData
-			setMultiMapValues(data, section, values)
+		addMultiMapValues(data, telemetryData)
+		addMultiMapValues(data, positionsData)
 
 		driver := getMultiMapValue(data, "Position Data", "Driver.Car", false)
 
@@ -1247,43 +1244,12 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 
 		return data
 	}
+
+	readSessionData(options := "", protocol?) {
+		return callSimulator(this.Code, options, protocol?)
+	}
 }
 
-
-;;;-------------------------------------------------------------------------;;;
-;;;                    Public Function Declaration Section                  ;;;
-;;;-------------------------------------------------------------------------;;;
-
-readSimulatorData(simulator, options := "", protocol := "SHM") {
-	local exePath := kBinariesDirectory . simulator . A_Space . protocol . " Provider.exe"
-	local dataFile, data
-
-	DirCreate(kTempDirectory . simulator . " Data")
-
-	dataFile := temporaryFileName(simulator . " Data\" . protocol, "data")
-
-	try {
-		RunWait(A_ComSpec . " /c `"`"" . exePath . "`" " . options . " > `"" . dataFile . "`"`"", , "Hide")
-	}
-	catch Any as exception {
-		logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider (")
-												   , {simulator: simulator, protocol: protocol})
-							   . exePath . translate(") - please rebuild the applications in the binaries folder (")
-							   . kBinariesDirectory . translate(")"))
-
-		showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration...")
-									  , {exePath: exePath, simulator: simulator, protocol: protocol})
-				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-	}
-
-	data := readMultiMap(dataFile)
-
-	deleteFile(dataFile)
-
-	setMultiMapValue(data, "Session Data", "Simulator", simulator)
-
-	return data
-}
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Private Function Declaration Section                 ;;;

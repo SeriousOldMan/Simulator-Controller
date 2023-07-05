@@ -266,7 +266,7 @@ namespace ACSHMProvider
                     Console.Write("Car."); Console.Write(i); Console.Write(".Nr="); Console.WriteLine(car.carId);
                     Console.Write("Car."); Console.Write(i); Console.Write(".Position="); Console.WriteLine(car.carRealTimeLeaderboardPosition + 1);
 
-                    Console.Write("Car."); Console.Write(i); Console.Write(".Lap="); Console.WriteLine(car.lapCount);
+                    Console.Write("Car."); Console.Write(i); Console.Write(".Laps="); Console.WriteLine(car.lapCount);
                     Console.Write("Car."); Console.Write(i); Console.Write(".Lap.Running="); Console.WriteLine(car.splinePosition);
                     Console.Write("Car."); Console.Write(i); Console.Write(".Lap.Running.Valid="); Console.WriteLine((car.currentLapInvalid == 1) ? "false" : "true");
 
@@ -296,6 +296,7 @@ namespace ACSHMProvider
             }
             else
             {
+                Console.WriteLine("Active=false");
                 Console.WriteLine("Car.Count=0");
                 Console.WriteLine("Driver.Car=0");
             }
@@ -364,6 +365,13 @@ namespace ACSHMProvider
                 return;
 
             Console.WriteLine("[Stint Data]");
+
+            if (cars.numVehicles > 0)
+            {
+                AcCarInfo car = cars.cars[0];
+
+                Console.Write("Position="); Console.WriteLine(car.carRealTimeLeaderboardPosition + 1);
+            }
 
             Console.WriteLine("DriverForname=" + staticInfo.PlayerName);
             Console.WriteLine("DriverSurname=" + staticInfo.PlayerSurname);

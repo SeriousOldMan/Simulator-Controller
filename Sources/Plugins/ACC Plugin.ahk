@@ -250,6 +250,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				this.iUDPClient := udpClient
 			}
 			catch Any as exception {
+				logError(exception, true)
+					
 				logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider ("), {simulator: "ACC", protocol: "UDP"})
 									   . exePath . translate(") - please rebuild the applications in the binaries folder (")
 									   . kBinariesDirectory . translate(")"))
@@ -351,8 +353,12 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 		this.requireUDPClient(restart)
 
-		if !carIDs
+		if !carIDs {
+			if !ACCPlugin.sCarData
+				ACCPlugin.sCarData := readMultiMap(kResourcesDirectory . "Simulator Data\ACC\Car Data.ini")
+
 			carIDs := getMultiMapValues(ACCPlugin.sCarData, "Car IDs")
+		}
 
 		if ((A_TickCount + 5000) > lastRead) {
 			lastRead := (A_TickCount + 0)
@@ -466,6 +472,10 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			return newMultiMap()
 	}
 
+	readSessionData(options := "") {
+		return super.readSessionData(options, "DLL")
+	}
+
 	computeBrakePadWear(location, compound, thickness) {
 		if (location = "Front") {
 			switch compound {
@@ -499,8 +509,12 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 		super.updatePositionsData(data)
 
-		if !carCategories
+		if !carCategories {
+			if !ACCPlugin.sCarData
+				ACCPlugin.sCarData := readMultiMap(kResourcesDirectory . "Simulator Data\ACC\Car Data.ini")
+
 			carCategories := getMultiMapValues(ACCPlugin.sCarData, "Car Categories")
+		}
 
 		loop {
 			car := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Car", kUndefined)
@@ -1847,25 +1861,25 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			switch option, false {
 				case "Pit Limiter":
-					data := readSimulatorData(this.Code, "-Setup")
+					data := this.readSessionData("Setup=true")
 
 					return [getMultiMapValue(data, "Car Data", "PitLimiter", false)]
 				case "Refuel":
-					data := readSimulatorData(this.Code, "-Setup")
+					data := this.readSessionData("Setup=true")
 
 					return [getMultiMapValue(data, "Setup Data", "FuelAmount", 0)]
 				case "Tyre Pressures":
-					data := readSimulatorData(this.Code, "-Setup")
+					data := this.readSessionData("Setup=true")
 
 					return [getMultiMapValue(data, "Setup Data", "TyrePressureFL", 26.1), getMultiMapValue(data, "Setup Data", "TyrePressureFR", 26.1)
 						  , getMultiMapValue(data, "Setup Data", "TyrePressureRL", 26.1), getMultiMapValue(data, "Setup Data", "TyrePressureRR", 26.1)]
 				case "Tyre Set":
-					data := readSimulatorData(this.Code, "-Setup")
+					data := this.readSessionData("Setup=true")
 
 					return [getMultiMapValue(data, "Setup Data", "TyreSet", 0)]
 				case "Tyre Compound":
 					if this.iPSChangeTyres {
-						data := readSimulatorData(this.Code, "-Setup")
+						data := this.readSessionData("Setup=true")
 
 						return [getMultiMapValue(data, "Setup Data", "TyreCompound", false), getMultiMapValue(data, "Setup Data", "TyreCompoundColor", false)]
 					}

@@ -810,7 +810,7 @@ systemMonitor(command := false, arguments*) {
 
 				computeColorInfo(Abs(delta), &lastLeaderDelta, "red", "green", &colorOpen, &colorClose)
 
-				html .= ("<tr><th class=`"th-std th-left`">" . translate("Leader (Laps)") . "</th><td class=`"td-wdg`">" . getMultiMapValue(sessionState, "Standings", "Leader.Lap") . "</td></tr>")
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Leader (Laps)") . "</th><td class=`"td-wdg`">" . getMultiMapValue(sessionState, "Standings", "Leader.Laps") . "</td></tr>")
 				html .= ("<tr><th class=`"th-std th-left`">" . translate("Leader (Delta)") . "</th><td class=`"td-wdg`">" . colorOpen . displayValue("Time", delta) . colorClose . "</td></tr>")
 				html .= ("<tr><th class=`"th-std th-left`">" . translate("Leader (Lap Time)") . "</th><td class=`"td-wdg`">" . displayValue("Time", getMultiMapValue(sessionState, "Standings", "Leader.Lap.Time")) . "</td></tr>")
 			}
@@ -820,7 +820,7 @@ systemMonitor(command := false, arguments*) {
 
 				computeColorInfo(Abs(delta), &lastAheadDelta, "red", "green", &colorOpen, &colorClose)
 
-				html .= ("<tr><th class=`"th-std th-left`">" . translate("Ahead (Laps)") . "</th><td class=`"td-wdg`">" . getMultiMapValue(sessionState, "Standings", "Ahead.Lap") . "</td></tr>")
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Ahead (Laps)") . "</th><td class=`"td-wdg`">" . getMultiMapValue(sessionState, "Standings", "Ahead.Laps") . "</td></tr>")
 				html .= ("<tr><th class=`"th-std th-left`">" . translate("Ahead (Delta)") . "</th><td class=`"td-wdg`">" . colorOpen . displayValue("Time", delta) . colorClose . "</td></tr>")
 				html .= ("<tr><th class=`"th-std th-left`">" . translate("Ahead (Lap Time)") . "</th><td class=`"td-wdg`">" . displayValue("Time", getMultiMapValue(sessionState, "Standings", "Ahead.Lap.Time")) . "</td></tr>")
 			}
@@ -830,7 +830,7 @@ systemMonitor(command := false, arguments*) {
 
 				computeColorInfo(Abs(delta), &lastBehindDelta, "green", "red", &colorOpen, &colorClose)
 
-				html .= ("<tr><th class=`"th-std th-left`">" . translate("Behind (Laps)") . "</th><td class=`"td-wdg`">" . getMultiMapValue(sessionState, "Standings", "Behind.Lap") . "</td></tr>")
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Behind (Laps)") . "</th><td class=`"td-wdg`">" . getMultiMapValue(sessionState, "Standings", "Behind.Laps") . "</td></tr>")
 				html .= ("<tr><th class=`"th-std th-left`">" . translate("Behind (Delta)") . "</th><td class=`"td-wdg`">" . colorOpen . displayValue("Time", delta) . colorClose . "</td></tr>")
 				html .= ("<tr><th class=`"th-std th-left`">" . translate("Behind (Lap Time)") . "</th><td class=`"td-wdg`">" . displayValue("Time", getMultiMapValue(sessionState, "Standings", "Behind.Lap.Time")) . "</td></tr>")
 			}

@@ -800,7 +800,12 @@ class SimulatorController extends ConfigurationItem {
 
 		for ignore, thePlugin in this.Plugins
 			if this.isActive(thePlugin)
-				thePlugin.simulatorStartup(simulator)
+				try {
+					thePlugin.simulatorStartup(simulator)
+				}
+				catch Any as exception {
+					logError(exception, true)
+				}
 
 		for ignore, fnController in this.FunctionController[GuiFunctionController] {
 			fnController.hide()
@@ -813,7 +818,12 @@ class SimulatorController extends ConfigurationItem {
 
 		for ignore, thePlugin in this.Plugins
 			if this.isActive(thePlugin)
-				thePlugin.simulatorShutdown(simulator)
+				try {
+					thePlugin.simulatorShutdown(simulator)
+				}
+				catch Any as exception {
+					logError(exception, true)
+				}
 
 		for ignore, fnController in this.FunctionController[GuiFunctionController] {
 			fnController.hide()
@@ -1393,7 +1403,7 @@ class ControllerFunction {
 					}
 				}
 				catch Any as exception {
-					logError(exception)
+					logError(exception, true)
 
 					logMessage(kLogCritical, translate("Error while registering hotkey ") . theHotkey . translate(" - please check the configuration"))
 
@@ -1880,7 +1890,7 @@ setHotkeyEnabled(function, trigger, enabled) {
 				Hotkey(theHotkey, state)
 			}
 			catch Any as exception {
-				logError(exception)
+				logError(exception, true)
 
 				logMessage(kLogCritical, translate("Error while registering hotkey ") . theHotkey . translate(" - please check the configuration"))
 

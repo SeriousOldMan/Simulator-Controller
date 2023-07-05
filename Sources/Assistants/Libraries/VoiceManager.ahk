@@ -855,7 +855,7 @@ class VoiceManager {
 						throw "Recognizer not running..."
 				}
 				catch Any as exception {
-					logError(exception)
+					logError(exception, true)
 
 					logMessage(kLogCritical, translate("Error while registering voice command `"") . definition . translate("`" - please check the configuration"))
 

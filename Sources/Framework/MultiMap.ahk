@@ -158,6 +158,7 @@ writeMultiMap(multiMapFile, multiMap, symbolic := true) {
 
 	deleteFile(tempFile)
 
+	/*
 	for section, keyValues in multiMap {
 		pairs := ""
 
@@ -173,6 +174,9 @@ writeMultiMap(multiMapFile, multiMap, symbolic := true) {
 
 		FileAppend(section, tempFile, "UTF-16")
 	}
+	*/
+
+	FileAppend(printMultiMap(multiMap, symbolic), tempFile, "UTF-16")
 
 	multiMapFile := getFileName(multiMapFile, kUserConfigDirectory)
 

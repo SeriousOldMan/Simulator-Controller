@@ -40,6 +40,7 @@ global kDeltaMethodBoth := 3
 class CarInfo {
 	iSpotter := false
 
+	iID := false
 	iNr := false
 	iCar := false
 	iDriver := false
@@ -70,6 +71,12 @@ class CarInfo {
 	Spotter {
 		Get {
 			return this.iSpotter
+		}
+	}
+
+	ID {
+		Get {
+			return this.iID
 		}
 	}
 
@@ -117,18 +124,9 @@ class CarInfo {
 
 	Pitstops[key?] {
 		Get {
-			local pitstops := this.Spotter.Pitstops[this.Nr]
+			local pitstops := this.Spotter.Pitstops[this.ID]
 
 			return (isSet(key) ? pitstops[key] : pitstops)
-		}
-	}
-
-	LastPitstop {
-		Get {
-			local pitstops := this.Spotter.Pitstops[this.Nr]
-			local numStops := pitstops.Length
-
-			return ((numStops > 0) ? pitstops[numStops].Lap : false)
 		}
 	}
 
@@ -258,8 +256,9 @@ class CarInfo {
 		}
 	}
 
-	__New(spotter, nr, car, class) {
+	__New(spotter, id, nr, car, class) {
 		this.iSpotter := spotter
+		this.iID := id
 		this.iNr := nr
 		this.iCar := car
 		this.iClass := class
@@ -581,7 +580,7 @@ class PositionInfo {
 		else {
 			frontCar := positions["TrackAhead"]
 
-			return (frontCar ? (this.Car.Nr = positions[frontCar][1]) : false)
+			return (frontCar ? (this.Car.ID = positions[frontCar][17]) : false)
 		}
 	}
 
@@ -594,7 +593,7 @@ class PositionInfo {
 		else {
 			behindCar := positions["TrackBehind"]
 
-			return (behindCar ? (this.Car.Nr = positions[behindCar][1]) : false)
+			return (behindCar ? (this.Car.ID = positions[behindCar][17]) : false)
 		}
 	}
 
@@ -711,8 +710,6 @@ class RaceSpotter extends GridRaceAssistant {
 
 	iOverallGridPosition := false
 	iClassGridPosition := false
-
-	iWasStartDriver := false
 
 	iLastDeltaInformationLap := 0
 	iPositionInfos := CaseInsenseMap()
@@ -1009,22 +1006,23 @@ class RaceSpotter extends GridRaceAssistant {
 
 			loop positions["Count"] {
 				car := positions[A_Index]
+				carID := car[17]
 				carNr := car[1]
 
 				if (A_Index != driver) {
-					if otherCars.Has(carNr)
-						cInfo := otherCars[carNr]
+					if otherCars.Has(carID)
+						cInfo := otherCars[carID]
 					else {
-						cInfo := CarInfo(this, carNr, car[2], car[3])
+						cInfo := CarInfo(this, carID, carNr, car[2], car[3])
 
-						otherCars[carNr] := cInfo
+						otherCars[carID] := cInfo
 					}
 				}
 				else {
 					cInfo := this.DriverCar
 
 					if !cInfo {
-						cInfo := CarInfo(this, carNr, car[2], car[3])
+						cInfo := CarInfo(this, carID, carNr, car[2], car[3])
 
 						this.iDriverCar := cInfo
 					}
@@ -1035,8 +1033,8 @@ class RaceSpotter extends GridRaceAssistant {
 				if !cInfo.update(car[4], car[5], car[6], carLaps, sector
 							   , Round(car[9] / 1000, 1), Round(car[10] / 1000, 1), Round(car[11] / 1000, 1), Round(car[12] / 1000, 1)
 							   , car[13], (carLaps - car[14]), car[15], car[16])
-					if ((A_Index != driver) && this.PositionInfos.Has(cInfo.Nr))
-						this.PositionInfos[cInfo.Nr].reset(sector, true, true)
+					if ((A_Index != driver) && this.PositionInfos.Has(cInfo.ID))
+						this.PositionInfos[cInfo.ID].reset(sector, true, true)
 			}
 		}
 	}
@@ -1044,7 +1042,7 @@ class RaceSpotter extends GridRaceAssistant {
 	updatePositionInfos(lastLap, sector, positions) {
 		local debug := this.Debug[kDebugPositions]
 		local positionInfos, position, info
-		local nr, car
+		local id, car
 
 		this.updateCarInfos(lastLap, sector, positions)
 
@@ -1053,13 +1051,13 @@ class RaceSpotter extends GridRaceAssistant {
 		if debug
 			FileAppend("---------------------------------`n`n", kTempDirectory . "Race Spotter.positions")
 
-		for nr, car in this.OtherCars {
-			if positionInfos.Has(nr)
-				position := positionInfos[nr]
+		for id, car in this.OtherCars {
+			if positionInfos.Has(id)
+				position := positionInfos[id]
 			else {
 				position := PositionInfo(this, car)
 
-				positionInfos[nr] := position
+				positionInfos[id] := position
 			}
 
 			if debug {
@@ -1517,7 +1515,7 @@ class RaceSpotter extends GridRaceAssistant {
 		this.getPositionInfos(&standingsAhead, &standingsBehind, &trackAhead, &trackBehind, &leader, true)
 
 		if (standingsAhead && (standingsAhead != leader)) {
-			situation := ("AheadPitting " . standingsAhead.Car.Nr . A_Space . standingsAhead.Car.LastLap)
+			situation := ("AheadPitting " . standingsAhead.Car.ID . A_Space . standingsAhead.Car.LastLap)
 
 			if !this.TacticalAdvices.Has(situation) {
 				this.TacticalAdvices[situation] := true
@@ -1529,7 +1527,7 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 
 		if standingsBehind {
-			situation := ("BehindPitting " . standingsBehind.Car.Nr . A_Space . standingsBehind.Car.LastLap)
+			situation := ("BehindPitting " . standingsBehind.Car.ID . A_Space . standingsBehind.Car.LastLap)
 
 			if !this.TacticalAdvices.Has(situation) {
 				this.TacticalAdvices[situation] := true
@@ -1540,8 +1538,8 @@ class RaceSpotter extends GridRaceAssistant {
 			}
 		}
 
-		if (leader && (leader.Car.Nr != this.DriverCar.Nr)) {
-			situation := ("LeaderPitting " . leader.Car.Nr . A_Space . leader.Car.LastLap)
+		if (leader && (leader.Car.ID != this.DriverCar.ID)) {
+			situation := ("LeaderPitting " . leader.Car.ID . A_Space . leader.Car.LastLap)
 
 			if !this.TacticalAdvices.Has(situation) {
 				this.TacticalAdvices[situation] := true
@@ -1570,7 +1568,7 @@ class RaceSpotter extends GridRaceAssistant {
 		 && standingsBehind && (standingsBehind == trackBehind) && !trackAhead.Car.InPit
 		 && standingsBehind.hasGap(sector) && trackAhead.hasGap(sector)
 		 && standingsBehind.inDelta(sector) && standingsBehind.isFaster(sector)) {
-			situation := ("ProtectSlower " . trackAhead.Car.Nr . A_Space . trackBehind.Car.Nr)
+			situation := ("ProtectSlower " . trackAhead.Car.ID . A_Space . trackBehind.Car.ID)
 
 			if !this.TacticalAdvices.Has(situation) {
 				this.TacticalAdvices[situation] := true
@@ -1589,7 +1587,7 @@ class RaceSpotter extends GridRaceAssistant {
 				if (standingsBehind && (trackBehind != standingsBehind)
 				 && standingsBehind.hasGap(sector) && standingsBehind.inDelta(sector, 4.0)
 				 && standingsBehind.isFaster(sector) && (opponentType = "LapDown")) {
-					situation := ("ProtectFaster " . trackBehind.Car.Nr . A_Space . standingsBehind.Car.Nr)
+					situation := ("ProtectFaster " . trackBehind.Car.ID . A_Space . standingsBehind.Car.ID)
 
 					if !this.TacticalAdvices.Has(situation) {
 						this.TacticalAdvices[situation] := true
@@ -1601,7 +1599,7 @@ class RaceSpotter extends GridRaceAssistant {
 				}
 				else if (((opponentType = "LapDown") || (opponentType = "LapUp"))
 					  && trackBehind.isFaster(sector, 1)) {
-					situation := (opponentType . "Faster " . trackBehind.Car.Nr)
+					situation := (opponentType . "Faster " . trackBehind.Car.ID)
 
 					if !this.TacticalAdvices.Has(situation) {
 						this.TacticalAdvices[situation] := true
@@ -1665,7 +1663,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 					if ((delta = 0) || (inPit && (Abs(delta) < 30)))
 						return false
-					else if ((knowledgeBase.getValue("Car." . car . ".Lap", 0) > lap)
+					else if ((knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap", 0)) > lap)
 						  && (Abs(delta) > (knowledgeBase.getValue("Lap." . lap . ".Time", 0) / 1000)))
 						return false
 					else {
@@ -1712,7 +1710,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 					if ((delta = 0) || (inPit && (Abs(delta) < 30)))
 						return false
-					else if ((knowledgeBase.getValue("Car." . car . ".Lap", 0) < lap)
+					else if ((knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap", 0)) < lap)
 						  && (Abs(delta) > (knowledgeBase.getValue("Lap." . lap . ".Time", 0) / 1000)))
 						return false
 					else {
@@ -2265,6 +2263,8 @@ class RaceSpotter extends GridRaceAssistant {
 					Run(exePath, kBinariesDirectory, "Hide", &pid)
 				}
 				catch Any as exception {
+					logError(exception, true)
+
 					logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (")
 															   , {simulator: code, protocol: "SHM"})
 										   . exePath . translate(") - please rebuild the applications in the binaries folder (")
@@ -2317,9 +2317,9 @@ class RaceSpotter extends GridRaceAssistant {
 	}
 
 	initializeAnnouncements(data) {
+		local configuration := this.Configuration
 		local simulator := getMultiMapValue(data, "Session Data", "Simulator", "Unknown")
 		local simulatorName := this.SettingsDatabase.getSimulatorName(simulator)
-		local configuration := this.Configuration
 		local announcements := CaseInsenseMap()
 		local ignore, key, default
 
@@ -2358,25 +2358,21 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 	}
 
-	prepareSession(&settings, &data) {
+	prepareSession(&settings, &data, formationLap := true) {
 		local speaker := this.getSpeaker()
 		local fragments := speaker.Fragments
 		local facts, weather, airTemperature, trackTemperature, weatherNow, weather10Min, weather30Min, driver
-		local position, length
+		local position, length, facts
 
-		super.prepareSession(&settings, &data)
+		facts := super.prepareSession(&settings, &data, formationLap)
 
 		if settings
 			this.updateConfigurationValues({UseTalking: getMultiMapValue(settings, "Assistant.Spotter", "Voice.UseTalking", true)})
 
-		this.iWasStartDriver := true
-
 		this.initializeAnnouncements(data)
 		this.initializeGridPosition(data, true)
 
-		facts := this.createSession(&settings, &data)
-
-		if this.Speaker {
+		if (formationLap && this.Speaker) {
 			speaker.beginTalk()
 
 			try {
@@ -2415,7 +2411,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 				if (this.Session = kSessionRace) {
 					driver := getMultiMapValue(data, "Position Data", "Driver.Car", false)
-					position := this.getPosition(driver, "Overall", data) ; getMultiMapValue(data, "Position Data", "Car." . driver . ".Position")
+					position := this.getPosition(driver, "Overall", data)
 
 					if (driver && position)
 						speaker.speakPhrase("GreetingPosition", {position: position
@@ -2447,24 +2443,22 @@ class RaceSpotter extends GridRaceAssistant {
 
 		Task.startTask(ObjBindMethod(this, "startupSpotter", true), 1000)
 		Task.startTask(ObjBindMethod(this, "updateSessionValues", {Running: true}), 25000)
-	}
-
-	createSession(&settings, &data) {
-		local facts := super.createSession(&settings, &data)
-
-		if settings
-			this.updateConfigurationValues({UseTalking: getMultiMapValue(settings, "Assistant.Spotter", "Voice.UseTalking", true)})
 
 		return facts
 	}
 
 	startSession(settings, data) {
-		local facts, joined, simulatorName, configuration, saveSettings
+		local configuration := this.Configuration
+		local joined := false
+		local simulatorName, configuration, saveSettings, facts
+
+		if !this.Prepared
+			joined := true
+
+		facts := this.prepareSession(&settings, &data, false)
 
 		if this.Debug[kDebugPositions]
 			deleteFile(kTempDirectory . "Race Spotter.positions")
-
-		joined := !this.iWasStartDriver
 
 		if joined {
 			this.initializeAnnouncements(data)
@@ -2473,10 +2467,7 @@ class RaceSpotter extends GridRaceAssistant {
 				this.getSpeaker().speakPhrase("GreetingIntro")
 		}
 
-		facts := this.createSession(&settings, &data)
-
 		simulatorName := this.Simulator
-		configuration := this.Configuration
 
 		if (ProcessExist("Race Engineer.exe") > 0)
 			saveSettings := kNever
@@ -2487,7 +2478,7 @@ class RaceSpotter extends GridRaceAssistant {
 				saveSettings := getMultiMapValue(configuration, "Race Assistant Shutdown", simulatorName . ".SaveSettings")
 		}
 
-		this.updateConfigurationValues({LearningLaps: getMultiMapValue(configuration, "Race Spotter Analysis", simulatorName . ".LearningLaps", 1)									  , SaveSettings: saveSettings})
+		this.updateConfigurationValues({LearningLaps: getMultiMapValue(configuration, "Race Spotter Analysis", simulatorName . ".LearningLaps", 1)									, SaveSettings: saveSettings})
 
 		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(facts)
 								, BestLapTime: 0, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0
@@ -2527,7 +2518,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 			this.shutdownSpotter(true)
 
-			this.updateDynamicValues({KnowledgeBase: false})
+			this.updateDynamicValues({KnowledgeBase: false, Prepared: false})
 		}
 
 		this.updateDynamicValues({OverallTime: 0, BestLapTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
@@ -2536,7 +2527,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 	forceFinishSession() {
 		if !this.SessionDataActive {
-			this.updateDynamicValues({KnowledgeBase: false})
+			this.updateDynamicValues({KnowledgeBase: false, Prepared: false})
 
 			this.finishSession()
 
@@ -2598,7 +2589,7 @@ class RaceSpotter extends GridRaceAssistant {
 		local lastPenalty := false
 		local wasValid := true
 		local lastWarnings := 0
-		local lap, lastPitstop, result
+		local laps, lastPitstop, result
 		local simulator, car, track
 
 		if knowledgeBase {
@@ -2613,10 +2604,10 @@ class RaceSpotter extends GridRaceAssistant {
 			this.adjustGaps(data)
 
 		loop knowledgeBase.getValue("Car.Count") {
-			lap := knowledgeBase.getValue("Car." . A_Index . ".Lap", 0)
+			laps := knowledgeBase.getValue("Car." . A_Index . ".Laps", knowledgeBase.getValue("Car." . A_Index . ".Lap", 0))
 
-			if (lap != knowledgeBase.getValue("Car." . A_Index . ".Valid.LastLap", 0)) {
-				knowledgeBase.setFact("Car." . A_Index . ".Valid.LastLap", lap)
+			if (laps != knowledgeBase.getValue("Car." . A_Index . ".Valid.LastLap", 0)) {
+				knowledgeBase.setFact("Car." . A_Index . ".Valid.LastLap", laps)
 
 				if (knowledgeBase.getValue("Car." . A_Index . ".Lap.Valid", kUndefined) == kUndefined)
 					knowledgeBase.setFact("Car." . A_Index . ".Lap.Valid", knowledgeBase.getValue("Car." . A_Index . ".Valid.Running", true))
@@ -2769,7 +2760,7 @@ class RaceSpotter extends GridRaceAssistant {
 			}
 
 			loop count {
-				carLaps := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Lap")
+				carLaps := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Laps", getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Lap"))
 				carRunning := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Lap.Running")
 
 				if (A_Index = driver) {
@@ -2815,7 +2806,7 @@ class RaceSpotter extends GridRaceAssistant {
 					inPit := (getMultiMapValue(data, "Position Data", prefix . ".InPitlane", false)
 						   || getMultiMapValue(data, "Position Data", prefix . ".InPit", false))
 
-					positions[carIndex] := Array(getMultiMapValue(data, "Position Data", prefix . ".Nr")
+					positions[carIndex] := Array(getMultiMapValue(data, "Position Data", prefix . ".Nr", carIndex)
 											   , getMultiMapValue(data, "Position Data", prefix . ".Car", "Unknown")
 											   , this.getClass(carIndex, data)
 											   , computeDriverName(getMultiMapValue(data, "Position Data", prefix . ".Driver.Forname", "John")
@@ -2829,7 +2820,8 @@ class RaceSpotter extends GridRaceAssistant {
 																	  , getMultiMapValue(data, "Position Data", prefix . ".Lap.Running.Valid", true))
 											  , knowledgeBase.getValue(prefix . ".Valid.Laps", carLaps)
 											  , getMultiMapValue(data, "Position Data", prefix . ".Incidents", 0)
-											  , inPit)
+											  , inPit
+											  , getMultiMapValue(data, "Position Data", prefix . ".ID", carIndex))
 
 					if (class = this.getClass(carIndex, data)) {
 						if (carClassPosition = 1)

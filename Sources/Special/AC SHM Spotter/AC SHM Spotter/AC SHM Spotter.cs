@@ -267,7 +267,7 @@ namespace ACSHMSpotter {
 		const double nearByZDistance = 6.0;
 		double longitudinalFrontDistance = 4;
 		double longitudinalRearDistance = 5;
-		const double lateralDistance = 6;
+		const double lateralDistance = 8;
 		const double verticalDistance = 2;
 
 		const int CLEAR = 0;
@@ -476,7 +476,7 @@ namespace ACSHMSpotter {
 				double speed = 0.0;
 
 				if (hasLastCoordinates)
-					speed = vectorLength(lastCoordinates[carID, 0] - coordinateX, lastCoordinates[carID, 2] - coordinateY);
+					speed = vectorLength(lastCoordinates[carID, 0] - coordinateX, lastCoordinates[carID, 2] - coordinateZ);
 
 				int newSituation = CLEAR;
 
@@ -489,8 +489,8 @@ namespace ACSHMSpotter {
 					if ((id != carID) && (cars.cars[id].isCarInPitline == 0) && (cars.cars[id].isCarInPit == 0))
 					{
 						double otherSpeed = vectorLength(lastCoordinates[id, 0] - cars.cars[id].worldPosition.x,
-														 lastCoordinates[id, 2] - cars.cars[carID].worldPosition.y);
-
+														 lastCoordinates[id, 2] - cars.cars[id].worldPosition.y);
+						
 						if (Math.Abs(speed - otherSpeed) / speed < 0.5)
 						{
 							bool faster = false;
@@ -713,9 +713,13 @@ namespace ACSHMSpotter {
         {
             int ignore = 0;
 
-            pushValue(values, value);
+			if (false) {
+				pushValue(values, value);
 
-            return averageValue(values, ref ignore);
+				return averageValue(values, ref ignore);
+			}
+			else
+				return value;
         }
 
         List<CornerDynamics> cornerDynamicsList = new List<CornerDynamics>();
@@ -751,10 +755,10 @@ namespace ACSHMSpotter {
 
 			pushValue(recentGLongs, acceleration);
 
-            float angularVelocity = smoothValue(recentRealAngVels, physics.LocalAngularVelocity[2]);
+            float angularVelocity = smoothValue(recentRealAngVels, physics.LocalAngularVelocity[1]);
             float steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
             float steerAngleRadians = -steeredAngleDegs / 57.2958f;
-            float wheelBaseMeter = wheelbase / 10f;
+            float wheelBaseMeter = wheelbase / 100f;
             float radius = wheelBaseMeter / steerAngleRadians;
             float perimeter = radius * (float)PI * 2;
             float perimeterSpeed = lastSpeed / 3.6f;
@@ -783,21 +787,22 @@ namespace ACSHMSpotter {
 
 				if (Math.Abs(angularVelocity * 57.2958) > 0.1)
 				{
-                    double slip = Math.Abs(idealAngularVelocity) - Math.Abs(angularVelocity);
+                    double slip = Math.Abs(idealAngularVelocity - angularVelocity);
+			
+					if (steerAngle > 0) {
+						if (angularVelocity > 0)
+							slip = oversteerHeavyThreshold / 57.2989 - 1;
+						else if (angularVelocity < idealAngularVelocity)
+							slip *= -1;
+					}
+					else {
+						if (angularVelocity < 0)
+							slip = oversteerHeavyThreshold / 57.2989 - 1;
+						else if (angularVelocity > idealAngularVelocity)
+							slip *= -1;
+					}
 
-					if (false)
-						if (steerAngle > 0)
-						{
-							if (angularVelocity < idealAngularVelocity)
-								slip *= -1;
-						}
-						else
-						{
-							if (angularVelocity > idealAngularVelocity)
-								slip *= -1;
-						}
-
-                    cd.Usos = slip * 57.2989 * 10;
+                    cd.Usos = slip * 57.2989 * 1;
 
                     if (false)
                     {
@@ -813,6 +818,8 @@ namespace ACSHMSpotter {
                         output.WriteLine(cd.Usos);
 
                         output.Close();
+						
+						Thread.Sleep(200);
                     }
                 }
 

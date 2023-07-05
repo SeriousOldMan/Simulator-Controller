@@ -19,14 +19,15 @@
   6. Better answers by the Strategist, when a pitstop cannot be recommended
   7. Create and manage a kind of training plan (Run Sheet) by the Strategist to gather data for strategy calculation
   8. "Leader on final lap" announcement for the Spotter.
+  9. Ask the Spotter for information on a specfic opponent.
+  10. Focus the Spotter on a specific opponent, so that he gives periodic information on gap, lap times, and so on.
 
 #### Race Center
   1. Change hot target pressures for the next pitstop.
 
 #### Setup Workbench
-  1. General detection of counter steering in the telemetry analyzer
-  2. Collect telemetry data from multiple drivers and generate combined setup recommendations
-  3. Collect tyre data (pressures, temperatures) and integrate setup changes for them.
+  1. Collect telemetry data from multiple drivers and generate combined setup recommendations
+  2. Collect tyre data (pressures, temperatures) and integrate setup changes for them.
 
 #### Strategy Workbench
   1. Introduce data groups (for example all data belonging to a complete weekend w. practice, qualiy and race) and make this group usable for future strategy calculation

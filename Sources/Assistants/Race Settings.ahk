@@ -413,6 +413,8 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 			Run("`"" . exePath . "`" " . options, kBinariesDirectory, , &pid)
 		}
 		catch Any as exception {
+			logError(exception, true)
+
 			logMessage(kLogCritical, translate("Cannot start the Session Database tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
 
 			showMessage(substituteVariables(translate("Cannot start the Session Database tool (%exePath%) - please check the configuration..."), {exePath: exePath})
@@ -1488,27 +1490,9 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 }
 
 readSimulatorData(simulator) {
-	local dataFile := kTempDirectory . simulator . " Data\Setup.data"
-	local exePath := kBinariesDirectory . simulator . " SHM Provider.exe"
-	local data, tyreCompound, tyreCompoundColor
+	local data := callSimulator(simulator, "Setup=true")
+	local tyreCompound, tyreCompoundColor
 
-	DirCreate(kTempDirectory "" simulator " Data")
-
-	deleteFile(dataFile)
-
-	try {
-		RunWait(A_ComSpec " /c `"`"" . exePath . "`" -Setup > `"" . dataFile . "`"`"", , "Hide")
-	}
-	catch Any as exception {
-		logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider ("), {simulator: simulator, protocol: "SHM"}) . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
-
-		showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration..."), {simulator: simulator, protocol: "SHM", exePath: exePath})
-				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-	}
-
-	data := readMultiMap(dataFile)
-
-	deleteFile(dataFile)
 
 	if (getMultiMapValue(data, "Car Data", "TyreCompound", kUndefined) = kUndefined) {
 		tyreCompound := getMultiMapValue(data, "Car Data", "TyreCompoundRaw", kUndefined)

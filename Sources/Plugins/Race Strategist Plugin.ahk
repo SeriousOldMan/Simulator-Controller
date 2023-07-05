@@ -317,7 +317,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 					if (newStint && driverID) {
 						driverName := teamServer.getStintDriverName(stint)
-							
+
 						if driverName
 							telemetryDB.registerDriver(telemetryData[1], driverID, driverName)
 					}
@@ -497,7 +497,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		local reportsDirectory := getMultiMapValue(this.Configuration, "Race Strategist Reports", "Database", false)
 		local teamServer, session, runningLap, raceInfo, count, pitstops, lapData, data, key, value
 		local times, positions, laps, drivers, newLine, line, fileName, directory
-		local sessionDB, simulatorCode, carCode, trackCode
+		local simulatorCode, carCode, trackCode
 
 		if (targetDirectory || reportsDirectory) {
 			teamServer := this.TeamServer
@@ -579,11 +579,9 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 				writeMultiMap(kTempDirectory . "Race Report\Race.data", data)
 
 				if !targetDirectory {
-					sessionDB := SessionDatabase()
-
-					simulatorCode := sessionDB.getSimulatorCode(getMultiMapValue(data, "Session", "Simulator"))
-					carCode := sessionDB.getCarCode(simulatorCode, getMultiMapValue(data, "Session", "Car"))
-					trackCode := sessionDB.getCarCode(simulatorCode, getMultiMapValue(data, "Session", "Track"))
+					simulatorCode := SessionDatabase.getSimulatorCode(getMultiMapValue(data, "Session", "Simulator"))
+					carCode := SessionDatabase.getCarCode(simulatorCode, getMultiMapValue(data, "Session", "Car"))
+					trackCode := SessionDatabase.getTrackCode(simulatorCode, getMultiMapValue(data, "Session", "Track"))
 
 					targetDirectory := (reportsDirectory . "\" . simulatorCode . "\" . carCode . "\" . trackCode . "\" . getMultiMapValue(data, "Session", "Time"))
 				}
@@ -655,11 +653,9 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 				writeMultiMap(kTempDirectory . "Race Report\Output\Race.data", data)
 
 				if !targetDirectory {
-					sessionDB := SessionDatabase()
-
-					simulatorCode := sessionDB.getSimulatorCode(getMultiMapValue(data, "Session", "Simulator"))
-					carCode := sessionDB.getCarCode(simulatorCode, getMultiMapValue(data, "Session", "Car"))
-					trackCode := sessionDB.getCarCode(simulatorCode, getMultiMapValue(data, "Session", "Track"))
+					simulatorCode := SessionDatabase.getSimulatorCode(getMultiMapValue(data, "Session", "Simulator"))
+					carCode := SessionDatabase.getCarCode(simulatorCode, getMultiMapValue(data, "Session", "Car"))
+					trackCode := SessionDatabase.getTrackCode(simulatorCode, getMultiMapValue(data, "Session", "Track"))
 
 					targetDirectory := (reportsDirectory . "\" . simulatorCode . "\" . carCode . "\" . trackCode . "\" . getMultiMapValue(data, "Session", "Time"))
 				}

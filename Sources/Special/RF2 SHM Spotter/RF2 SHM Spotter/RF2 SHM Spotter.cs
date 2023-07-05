@@ -12,6 +12,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
+using System.Windows.Forms;
 using static RF2SHMSpotter.rFactor2Constants;
 using static RF2SHMSpotter.rFactor2Constants.rF2GamePhase;
 using static RF2SHMSpotter.rFactor2Constants.rF2PitState;
@@ -180,7 +181,7 @@ namespace RF2SHMSpotter {
 		const double nearByZDistance = 6.0;
 		double longitudinalFrontDistance = 4;
 		double longitudinalRearDistance = 5;
-		const double lateralDistance = 6;
+		const double lateralDistance = 8;
 		const double verticalDistance = 2;
 
 		const int CLEAR = 0;
@@ -406,67 +407,81 @@ namespace RF2SHMSpotter {
 				double coordinateZ = (- playerScoring.mPos.z);
 				double speed = 0.0;
 
-				if (hasLastCoordinates)
+                int newSituation = CLEAR;
+				bool skip = false;
+
+                carBehind = false;
+                carBehindLeft = false;
+                carBehindRight = false;
+
+                if (hasLastCoordinates)
+				{
 					speed = vectorLength(lastCoordinates[carID, 0] - coordinateX, lastCoordinates[carID, 2] - coordinateZ);
 
-				int newSituation = CLEAR;
-
-				carBehind = false;
-				carBehindLeft = false;
-				carBehindRight = false;
-
-				for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)
-				{
-					var vehicle = scoring.mVehicles[i];
-
-					if ((vehicle.mIsPlayer == 0) && (vehicle.mInPits == 0))
-					{
-						// Console.Write(i); Console.Write(" "); Console.Write(vehicle.mPos.x); Console.Write(" ");
-						// Console.Write(vehicle.mPos.z); Console.Write(" "); Console.WriteLine(vehicle.mPos.y);
-
-						double otherSpeed = vectorLength(lastCoordinates[i, 0] - vehicle.mPos.x,
-														 lastCoordinates[i, 2] - (-vehicle.mPos.z));
-
-						if (Math.Abs(speed - otherSpeed) / speed < 0.5)
+					if (speed == 0)
+						skip = true;
+					else
+						for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)
 						{
+							var vehicle = scoring.mVehicles[i];
 
-							bool faster = false;
+							if ((vehicle.mIsPlayer == 0) && (vehicle.mInPits == 0))
+							{
+								// Console.Write(i); Console.Write(" "); Console.Write(vehicle.mPos.x); Console.Write(" ");
+								// Console.Write(vehicle.mPos.z); Console.Write(" "); Console.WriteLine(vehicle.mPos.y);
 
-							if (hasLastCoordinates)
-								faster = otherSpeed > speed * 1.05;
+								double otherSpeed = vectorLength(lastCoordinates[i, 0] - vehicle.mPos.x,
+																 lastCoordinates[i, 2] - (-vehicle.mPos.z));
 
-							newSituation |= checkCarPosition(coordinateX, coordinateZ, coordinateY, angle, faster,
-															 vehicle.mPos.x, (-vehicle.mPos.z), vehicle.mPos.y);
+								if (otherSpeed == 0)
+									continue;
 
-							if ((newSituation == THREE) && carBehind)
-								break;
-						}
+								// Console.WriteLine(speed + " - " + otherSpeed);
+
+								if (Math.Abs(speed - otherSpeed) / speed < 0.5)
+								{
+
+									bool faster = false;
+
+									if (hasLastCoordinates)
+										faster = otherSpeed > speed * 1.05;
+
+									newSituation |= checkCarPosition(coordinateX, coordinateZ, coordinateY, angle, faster,
+																	 vehicle.mPos.x, (-vehicle.mPos.z), vehicle.mPos.y);
+
+									if ((newSituation == THREE) && carBehind)
+										break;
+								}
+							}
 					}
 				}
 
-				for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)
+				if (!skip)
 				{
-					var position = scoring.mVehicles[i].mPos;
+					for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)
+					{
+						var position = scoring.mVehicles[i].mPos;
 
-					lastCoordinates[i, 0] = position.x;
-					lastCoordinates[i, 1] = position.y;
-					lastCoordinates[i, 2] = (- position.z);
+						lastCoordinates[i, 0] = position.x;
+						lastCoordinates[i, 1] = position.y;
+						lastCoordinates[i, 2] = (-position.z);
+					}
+
+					hasLastCoordinates = true;
+
+					if (newSituation != CLEAR)
+					{
+						carBehind = false;
+						carBehindLeft = false;
+						carBehindRight = false;
+						carBehindReported = false;
+					}
+
+					if (carBehindCount++ > 200)
+						carBehindCount = 0;
 				}
 
-				hasLastCoordinates = true;
-
-				if (newSituation != CLEAR)
-				{
-					carBehind = false;
-					carBehindLeft = false;
-					carBehindRight = false;
-					carBehindReported = false;
-				}
-
-				if (carBehindCount++ > 200)
-					carBehindCount = 0;
-
-				string alert = computeAlert(newSituation);
+				string alert = computeAlert(skip ? lastSituation : newSituation);
 
 				if (alert != noAlert)
 				{
@@ -753,9 +768,13 @@ namespace RF2SHMSpotter {
         {
             int ignore = 0;
 
-            pushValue(values, value);
+			if (false) {
+				pushValue(values, value);
 
-            return averageValue(values, ref ignore);
+				return averageValue(values, ref ignore);
+			}
+			else
+				return value;
         }
 
         List<CornerDynamics> cornerDynamicsList = new List<CornerDynamics>();
@@ -805,10 +824,10 @@ namespace RF2SHMSpotter {
 
             pushValue(recentGLongs, acceleration);
 
-            double angularVelocity = smoothValue(recentRealAngVels, (float)telemetry.mVehicles[carID].mLocalRot.z);
+            double angularVelocity = smoothValue(recentRealAngVels, (float)telemetry.mVehicles[carID].mLocalRot.y);
             double steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
             double steerAngleRadians = -steeredAngleDegs / 57.2958;
-            double wheelBaseMeter = (float)wheelbase / 10;
+            double wheelBaseMeter = (float)wheelbase / 100;
             double radius = wheelBaseMeter / steerAngleRadians;
             double perimeter = radius * PI * 2;
             double perimeterSpeed = lastSpeed / 3.6;
@@ -837,23 +856,24 @@ namespace RF2SHMSpotter {
 
 				if (Math.Abs(angularVelocity * 57.2958) > 0.1)
 				{
-					double slip = Math.Abs(idealAngularVelocity) - Math.Abs(angularVelocity);
+					double slip = Math.Abs(idealAngularVelocity - angularVelocity);
 
-					if (false)
-						if (steerAngle > 0)
-						{
-							if (angularVelocity < idealAngularVelocity)
-								slip *= -1;
-						}
-						else
-						{
-							if (angularVelocity > idealAngularVelocity)
-								slip *= -1;
-						}
+					if (steerAngle > 0) {
+						if (angularVelocity > 0)
+							slip = oversteerHeavyThreshold / 57.2989 - 1;
+						else if (angularVelocity < idealAngularVelocity)
+							slip *= -1;
+					}
+					else {
+						if (angularVelocity < 0)
+							slip = oversteerHeavyThreshold / 57.2989 - 1;
+						else if (angularVelocity > idealAngularVelocity)
+							slip *= -1;
+					}
 
-                    cd.Usos = slip * 57.2989 * 10;
+                    cd.Usos = slip * 57.2989 * 1;
 
-                    if (true)
+                    if (false)
                     {
                         StreamWriter output = new StreamWriter(dataFile + ".trace", true);
 
@@ -867,6 +887,8 @@ namespace RF2SHMSpotter {
                         output.WriteLine(cd.Usos);
 
                         output.Close();
+						
+						Thread.Sleep(200);
                     }
                 }
 
@@ -1173,9 +1195,10 @@ namespace RF2SHMSpotter {
 			if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0))
 			{
 				double coordinateX = playerScoring.mPos.x;
-				double coordinateY = (- playerScoring.mPos.z);
-				
-				Console.WriteLine(coordinateX + "," + coordinateY);
+				double coordinateY = (-playerScoring.mPos.z);
+
+
+                Console.WriteLine(coordinateX + ", " + coordinateY);
 
 				if (coordCount == 0)
 				{
@@ -1294,9 +1317,9 @@ namespace RF2SHMSpotter {
 				{
 					try
 					{
-						extendedBuffer.GetMappedData(ref extended);
-                        scoringBuffer.GetMappedData(ref scoring);
-                        telemetryBuffer.GetMappedData(ref telemetry);
+						if (!extendedBuffer.GetMappedData(ref extended) || !scoringBuffer.GetMappedData(ref scoring)
+																	    || !telemetryBuffer.GetMappedData(ref telemetry))
+							continue;
                     }
 					catch (Exception)
 					{

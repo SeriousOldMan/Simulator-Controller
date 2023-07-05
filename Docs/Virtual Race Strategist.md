@@ -612,7 +612,7 @@ After the data has been gathered, it is then transfered to the *Race Strategist*
 	Car.1.Driver.Forname = The
 	Car.1.Driver.Nickname = TB
 	Car.1.Driver.Surname = BigO
-	Car.1.Lap = 2
+	Car.1.Laps = 2
 	Car.1.Lap.Running = 0
 	Car.1.Position = 1
 	Car.1.Time = 110650
@@ -620,7 +620,7 @@ After the data has been gathered, it is then transfered to the *Race Strategist*
 	Car.2.Driver.Forname = Jimmy
 	Car.2.Driver.Nickname = JV
 	Car.2.Driver.Surname = Van Veen
-	Car.2.Lap = 1
+	Car.2.Laps = 1
 	Car.2.Lap.Running = 0.9514
 	Car.2.Position = 14
 	Car.2.Time = 123535
@@ -628,7 +628,7 @@ After the data has been gathered, it is then transfered to the *Race Strategist*
 	Car.3.Driver.Forname = Jennifer
 	Car.3.Driver.Nickname = JY
 	Car.3.Driver.Surname = Young
-	Car.3.Lap = 1
+	Car.3.Laps = 1
 	Car.3.Lap.Running = 0.9827
 	Car.3.Position = 4
 	Car.3.Time = 117209

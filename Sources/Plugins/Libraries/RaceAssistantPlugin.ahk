@@ -1292,7 +1292,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 		if RaceAssistantPlugin.Simulator {
 			if !data
-				data := readSimulatorData(RaceAssistantPlugin.Simulator.Code)
+				data := RaceAssistantPlugin.Simulator.readSessionData()
 
 			return getDataSession(data, &ignore)
 		}
@@ -1327,7 +1327,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		if (RaceAssistantPlugin.Session == kSessionRace)
 			loop getMultiMapValue(data, "Position Data", "Car.Count")
 				if (getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Position") = 1)
-					return getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Lap")
+					return getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Laps", getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Lap"))
 
 		return getMultiMapValue(data, "Stint Data", "Laps", 0)
 	}
@@ -1924,7 +1924,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			if (RaceAssistantPlugin.runningSession(data) && (RaceAssistantPlugin.LastLap == 0))
 				prepareSessionDatabase(data)
 
-			if false && isDebug() {
+			if (false && isDebug()) {
 				testData := getMultiMapValues(data, "Test Data")
 
 				if (testData.Count > 0) {
@@ -2267,7 +2267,7 @@ getSimulatorOptions(plugin := false) {
 	plugin := findActivePlugin(plugin)
 
 	if (plugin && plugin.Simulator) {
-		data := readSimulatorData(plugin.Simulator.Code)
+		data := plugin.Simulator.readSessionData()
 
 		if getMultiMapValue(data, "Session Data", "Active", false) {
 			options := "-Simulator `"" . SessionDatabase.getSimulatorName(plugin.Simulator.runningSimulator()) . "`""
@@ -2327,6 +2327,8 @@ openRaceSettings(import := false, silent := false, plugin := false, fileName := 
 		}
 	}
 	catch Any as exception {
+		logError(exception, true)
+
 		logMessage(kLogCritical, translate("Cannot start the Race Settings tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
 
 		showMessage(substituteVariables(translate("Cannot start the Race Settings tool (%exePath%) - please check the configuration..."), {exePath: exePath})
@@ -2344,6 +2346,8 @@ openSessionDatabase(plugin := false) {
 		Run("`"" . exePath . "`" " . options, kBinariesDirectory, , &pid)
 	}
 	catch Any as exception {
+		logError(exception, true)
+
 		logMessage(kLogCritical, translate("Cannot start the Session Database tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
 
 		showMessage(substituteVariables(translate("Cannot start the Session Database tool (%exePath%) - please check the configuration..."), {exePath: exePath})
@@ -2361,6 +2365,8 @@ openSetupWorkbench(plugin := false) {
 		Run("`"" . exePath . "`" " . options, kBinariesDirectory)
 	}
 	catch Any as exception {
+		logError(exception, true)
+
 		logMessage(kLogCritical, translate("Cannot start the Setup Workbench tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
 
 		showMessage(substituteVariables(translate("Cannot start the Setup Workbench tool (%exePath%) - please check the configuration..."), {exePath: exePath})
@@ -2378,6 +2384,8 @@ openStrategyWorkbench(plugin := false) {
 		Run("`"" . exePath . "`" " . options, kBinariesDirectory)
 	}
 	catch Any as exception {
+		logError(exception, true)
+
 		logMessage(kLogCritical, translate("Cannot start the Strategy Workbench tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
 
 		showMessage(substituteVariables(translate("Cannot start the Strategy Workbench tool (%exePath%) - please check the configuration..."), {exePath: exePath})
@@ -2395,6 +2403,8 @@ openRaceCenter(plugin := false) {
 		Run("`"" . exePath . "`" " . options, kBinariesDirectory)
 	}
 	catch Any as exception {
+		logError(exception, true)
+
 		logMessage(kLogCritical, translate("Cannot start the Race Center tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
 
 		showMessage(substituteVariables(translate("Cannot start the Race Center tool (%exePath%) - please check the configuration..."), {exePath: exePath})

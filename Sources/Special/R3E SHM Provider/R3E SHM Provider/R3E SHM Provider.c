@@ -144,9 +144,26 @@ void printNAValue(long value) {
 		wprintf_s(L"%d\n", value);
 }
 
+BOOL getArgument(char* output, char* request, char* key) {
+	char buffer[255];
+
+	strcpy_s(buffer, 255, key);
+	strcat_s(buffer, 255 - strlen(key), "=");
+
+	if (strncmp(request, buffer, strlen(buffer)) == 0) {
+		substring(output, request, strlen(buffer), strlen(request) - strlen(buffer));
+
+		return TRUE;
+	}
+	else
+		return FALSE;
+}
+
 int main(int argc, char* argv[])
 {
-    int err_code = 0;
+	char* request = (argc > 1) ? argv[1] : "";
+	char buffer[255]; 
+	int err_code = 0;
     BOOL mapped_r3e = FALSE;
 
     if (!mapped_r3e && map_exists())
@@ -159,7 +176,7 @@ int main(int argc, char* argv[])
         mapped_r3e = TRUE;
 	}
 
-	BOOL writeStandings = ((argc > 1) && (strcmp(argv[1], "-Standings") == 0));
+	BOOL writeStandings = getArgument(buffer, request, "Standings");
 	BOOL writeTelemetry = !writeStandings;
 
 	writeStandings = TRUE;
@@ -169,6 +186,7 @@ int main(int argc, char* argv[])
 		wprintf_s(L"[Position Data]\n");
 		
 		if (!mapped_r3e) {
+			wprintf_s(L"Active=false\n");
 			wprintf_s(L"Car.Count=%d\n", 0);
 			wprintf_s(L"Driver.Car=%d\n", 0);
 		}
@@ -185,7 +203,7 @@ int main(int argc, char* argv[])
 				wprintf_s(L"Car.%d.Nr=%d\n", i, vehicle.driver_info.car_number);
 				wprintf_s(L"Car.%d.Class=%d\n", i, vehicle.driver_info.class_id);
 				wprintf_s(L"Car.%d.Position=%d\n", i, position);
-				wprintf_s(L"Car.%d.Lap=%d\n", i, vehicle.completed_laps);
+				wprintf_s(L"Car.%d.Laps=%d\n", i, vehicle.completed_laps);
 				wprintf_s(L"Car.%d.Lap.Running=%f\n", i, (float)((double)(vehicle.lap_distance / map_buffer->lap_distance) * map_buffer->lap_distance_fraction));
 				wprintf_s(L"Car.%d.Lap.Running.Valid=%s\n", i, vehicle.current_lap_valid ? L"true" : L"false");
 
@@ -195,8 +213,6 @@ int main(int argc, char* argv[])
 
 				wprintf_s(L"Car.%d.Time=%ld\n", i, sector1Time + sector2Time + sector3Time);
 				wprintf_s(L"Car.%d.Time.Sectors=%ld,%ld,%ld\n", i, sector1Time, sector2Time, sector3Time);
-
-				char buffer[33];
 
 				_itoa_s(vehicle.driver_info.model_id, buffer, 32, 10);
 
@@ -256,8 +272,6 @@ int main(int argc, char* argv[])
 			else
 				wprintf_s(L"Session=Other\n");
 			
-			char buffer[33];
-
 			_itoa_s(map_buffer->vehicle_info.model_id, buffer, 32, 10);
 
 			wprintf_s(L"Car=%S\n", buffer);
@@ -362,6 +376,8 @@ int main(int argc, char* argv[])
 				wprintf_s(L"DriverSurname=%S\n", "");
 				wprintf_s(L"DriverNickname=%S\n", "");
 			}
+
+			wprintf_s(L"Position=%ld\n", map_buffer->all_drivers_data_1[getPlayerCarID()].place);
 
 			wprintf_s(L"LapValid=%S\n", map_buffer->current_lap_valid ? "true" : "false");
 

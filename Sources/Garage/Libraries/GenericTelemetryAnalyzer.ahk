@@ -343,6 +343,8 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 				if this.settingAvailable("TrackWidth")
 					options .= (A_Space . this.TrackWidth)
 
+				options .= (A_Space . "`"" . kResourcesDirectory . "Sounds\`"")
+
 				code := SessionDatabase.getSimulatorCode(this.Simulator)
 
 				Run(kBinariesDirectory . code . " SHM Spotter.exe " . options, kBinariesDirectory, "Hide", &pid)

@@ -316,34 +316,34 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 				data := sessionDB.getTrackData(simulator, track)
 
 				exePath := (kBinariesDirectory . code . " SHM Spotter.exe")
+				pid := false
 
-				if FileExist(exePath) {
+				try {
+					if !FileExist(exePath)
+						throw "File not found..."
+
 					this.shutdownTrackAutomation()
 
-					pid := false
-
-					try {
-						if data
-							Run("`"" . exePath . "`" -Trigger `"" . data . "`" " . positions, kBinariesDirectory, "Hide", &pid)
-						else
-							Run("`"" . exePath . "`" -Trigger " . positions, kBinariesDirectory, "Hide", &pid)
-					}
-					catch Any as exception {
-						logError(exception, true)
-					
-						logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (")
-																   , {simulator: code, protocol: "SHM"})
-											   . exePath . translate(") - please rebuild the applications in the binaries folder (")
-											   . kBinariesDirectory . translate(")"))
-
-						showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (%exePath%) - please check the configuration...")
-													  , {exePath: exePath, simulator: code, protocol: "SHM"})
-								  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-					}
-
-					if pid
-						this.iAutomationPID := pid
+					if data
+						Run("`"" . exePath . "`" -Trigger `"" . data . "`" " . positions, kBinariesDirectory, "Hide", &pid)
+					else
+						Run("`"" . exePath . "`" -Trigger " . positions, kBinariesDirectory, "Hide", &pid)
 				}
+				catch Any as exception {
+					logError(exception, true)
+
+					logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (")
+															   , {simulator: code, protocol: "SHM"})
+										   . exePath . translate(") - please rebuild the applications in the binaries folder (")
+										   . kBinariesDirectory . translate(")"))
+
+					showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (%exePath%) - please check the configuration...")
+												  , {exePath: exePath, simulator: code, protocol: "SHM"})
+							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+				}
+
+				if pid
+					this.iAutomationPID := pid
 			}
 		}
 	}
@@ -396,9 +396,40 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 	}
 
 	addLap(lap, running, data) {
-		local simulator, simulatorName, hasTrackMap, track, code, exePath, pid, dataFile, trackMapperState
+		local simulator, simulatorName, hasTrackMap, track, code, exePath, pid, dataFile, mapperState
 
 		static sessionDB := false
+
+		createTrackMap() {
+			local pid := this.iMapperPID
+
+			finalizeTrackMap() {
+				deleteFile(kTempDirectory . "Track Mapper.state")
+
+				this.iMapperPID := false
+				this.iMapperPhase := false
+			}
+
+			if pid {
+				if ProcessExist(pid) {
+					writeMultiMap(kTempDirectory . "Track Mapper.state", mapperState)
+
+					Task.startTask(Task.CurrentTask, 10000)
+				}
+				else {
+					pid := SessionDatabase.mapTrack(simulator, track, dataFile, finalizeTrackMap)
+
+					if pid {
+						this.iMapperPID := pid
+						this.iMapperPhase := "Map"
+					}
+					else {
+						this.iMapperPhase := false
+						this.iMapperPID := false
+					}
+				}
+			}
+		}
 
 		if !sessionDB
 			sessionDB := SessionDatabase()
@@ -431,88 +462,60 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 					track := getMultiMapValue(data, "Session Data", "Track", false)
 
 					code := sessionDB.getSimulatorCode(simulator)
-					dataFile := (kTempDirectory . code . " Data\" . track . ".data")
+					dataFile := temporaryFileName(code . " Track Mapper", "data")
 
 					exePath := (kBinariesDirectory . code . " SHM Spotter.exe")
 
-					if FileExist(exePath) {
-						try {
-							if !FileExist(exePath)
-								throw "File not found..."
-				
-							this.iMapperPhase := "Collect"
+					try {
+						if !FileExist(exePath)
+							throw "File not found..."
 
-							Run(A_ComSpec . " /c `"`"" . exePath . "`" -Map > `"" . dataFile . "`"`"", kBinariesDirectory, "Hide", &pid)
+						this.iMapperPhase := "Collect"
 
-							this.iMapperPID := pid
-						}
-						catch Any as exception {
-							logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (")
-																	   , {simulator: code, protocol: "SHM"})
-												   . exePath . translate(") - please rebuild the applications in the binaries folder (")
-												   . kBinariesDirectory . translate(")"))
+						Run(A_ComSpec . " /c `"`"" . exePath . "`" -Map > `"" . dataFile . "`"`"", kBinariesDirectory, "Hide", &pid)
 
-							showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (%exePath%) - please check the configuration...")
-														  , {exePath: exePath, simulator: code, protocol: "SHM"})
-									  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+						this.iMapperPID := pid
+					}
+					catch Any as exception {
+						logError(exception, true)
 
-							this.iMapperPID := false
-						}
+						logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (")
+																   , {simulator: code, protocol: "SHM"})
+											   . exePath . translate(") - please rebuild the applications in the binaries folder (")
+											   . kBinariesDirectory . translate(")"))
 
-						if this.iMapperPID {
-							trackMapperState := newMultiMap()
+						showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (%exePath%) - please check the configuration...")
+													  , {exePath: exePath, simulator: code, protocol: "SHM"})
+								  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+					}
 
-							setMultiMapValue(trackMapperState, "Track Mapper", "State", "Active")
-							setMultiMapValue(trackMapperState, "Track Mapper", "Simulator", simulatorName)
-							setMultiMapValue(trackMapperState, "Track Mapper", "Track", sessionDB.getTrackName(simulator, track))
-							setMultiMapValue(trackMapperState, "Track Mapper", "Action", "Scanning")
-							setMultiMapValue(trackMapperState, "Track Mapper", "Information", translate("Message: ") . translate("Scanning track..."))
+					if this.iMapperPID {
+						mapperState := newMultiMap()
 
-							writeMultiMap(kTempDirectory . "Track Mapper.state", trackMapperState)
+						setMultiMapValue(mapperState, "Track Mapper", "State", "Active")
+						setMultiMapValue(mapperState, "Track Mapper", "Simulator", simulatorName)
+						setMultiMapValue(mapperState, "Track Mapper", "Track", sessionDB.getTrackName(simulator, track))
+						setMultiMapValue(mapperState, "Track Mapper", "Action", "Scanning")
+						setMultiMapValue(mapperState, "Track Mapper", "Information", translate("Message: ") . translate("Scanning track..."))
 
-							Task.startTask(ObjBindMethod(this, "createTrackMap", simulatorName, track, dataFile), 120000, kLowPriority)
-						}
+						writeMultiMap(kTempDirectory . "Track Mapper.state", mapperState)
+
+						Task.startTask(createTrackMap, 30000, kLowPriority)
 					}
 				}
 				else {
-					trackMapperState := newMultiMap()
+					mapperState := newMultiMap()
 
-					setMultiMapValue(trackMapperState, "Track Mapper", "State", "Passive")
-					setMultiMapValue(trackMapperState, "Track Mapper", "Simulator", simulatorName)
-					setMultiMapValue(trackMapperState, "Track Mapper", "Track", sessionDB.getTrackName(simulator, track))
-					setMultiMapValue(trackMapperState, "Track Mapper", "Action", "Waiting")
-					setMultiMapValue(trackMapperState, "Track Mapper", "Information", translate("Message: ") . translate("Waiting for track scanner..."))
+					setMultiMapValue(mapperState, "Track Mapper", "State", "Passive")
+					setMultiMapValue(mapperState, "Track Mapper", "Simulator", simulatorName)
+					setMultiMapValue(mapperState, "Track Mapper", "Track", sessionDB.getTrackName(simulator, track))
+					setMultiMapValue(mapperState, "Track Mapper", "Action", "Waiting")
+					setMultiMapValue(mapperState, "Track Mapper", "Information", translate("Message: ") . translate("Waiting for track scanner..."))
 
-					writeMultiMap(kTempDirectory . "Track Mapper.state", trackMapperState)
+					writeMultiMap(kTempDirectory . "Track Mapper.state", mapperState)
 				}
 			}
 		}
-	}
-
-	createTrackMap(simulator, track, dataFile) {
-		local pid := this.iMapperPID
-
-		if pid {
-			if ProcessExist(pid)
-				Task.startTask(Task.CurrentTask, 10000)
-			else {
-				pid := SessionDatabase.mapTrack(simulator, track, dataFile, ObjBindMethod(this, "finalizeTrackMap"))
-
-				if pid {
-					this.iMapperPID := pid
-					this.iMapperPhase := "Map"
-				}
-				else {
-					this.iMapperPhase := false
-					this.iMapperPID := false
-				}
-			}
-		}
-	}
-
-	finalizeTrackMap() {
-		this.iMapperPID := false
-		this.iMapperPhase := false
 	}
 
 	shutdownTrackMapper(force := false, *) {

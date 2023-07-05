@@ -413,6 +413,8 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 			Run("`"" . exePath . "`" " . options, kBinariesDirectory, , &pid)
 		}
 		catch Any as exception {
+			logError(exception, true)
+
 			logMessage(kLogCritical, translate("Cannot start the Session Database tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
 
 			showMessage(substituteVariables(translate("Cannot start the Session Database tool (%exePath%) - please check the configuration..."), {exePath: exePath})
@@ -1488,10 +1490,10 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 }
 
 readSimulatorData(simulator) {
-	local data := callSimulator(simulator, "Setup")
+	local data := callSimulator(simulator, "Setup=true")
 	local tyreCompound, tyreCompoundColor
 
-	
+
 	if (getMultiMapValue(data, "Car Data", "TyreCompound", kUndefined) = kUndefined) {
 		tyreCompound := getMultiMapValue(data, "Car Data", "TyreCompoundRaw", kUndefined)
 

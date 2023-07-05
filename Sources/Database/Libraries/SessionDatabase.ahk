@@ -692,10 +692,15 @@ class SessionDatabase extends ConfigurationItem {
 		}
 
 		try {
+			if !FileExist(kBinariesDirectory . "Track Mapper.exe")
+				throw "File not found..."
+
 			Run(A_ComSpec . " /c `"`"" . kBinariesDirectory . "Track Mapper.exe`" -Simulator `"" . simulator . "`" -Track `"" . track . "`" -Data `"" . datafile . "`"`""
 			  , kBinariesDirectory, "Hide", &pid)
 		}
 		catch Any as exception {
+			logError(exception, true)
+
 			logMessage(kLogCritical, translate("Cannot start Track Mapper - please rebuild the applications..."))
 
 			showMessage(translate("Cannot start Track Mapper - please rebuild the applications...")

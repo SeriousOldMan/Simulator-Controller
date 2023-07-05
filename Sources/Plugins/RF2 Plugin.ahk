@@ -75,6 +75,8 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 				callSimulator(simulator, command . "=" . operation . "=" . message . ":" . values2String(";", arguments*), "CLR")
 			}
 			catch Any as exception {
+				logError(exception, true)
+					
 				logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider ("), {simulator: simulator, protocol: "SHM"})
 									   . exePath . translate(") - please rebuild the applications in the binaries folder (")
 									   . kBinariesDirectory . translate(")"))

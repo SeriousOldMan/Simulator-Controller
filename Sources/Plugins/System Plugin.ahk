@@ -477,6 +477,8 @@ restoreSimulatorVolume() {
 			}
 		}
 		catch Any as exception {
+			logError(exception, true)
+					
 			showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
 					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 		}
@@ -498,6 +500,8 @@ muteSimulator() {
 				Run("`"" . kNirCmd . "`" setappvolume /" . pid . " 0.0")
 			}
 			catch Any as exception {
+				logError(exception, true)
+					
 				showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
@@ -671,6 +675,8 @@ execute(command) {
 		Run(substituteVariables(command))
 	}
 	catch Any as exception {
+		logError(exception, true)
+					
 		logMessage(kLogWarn, substituteVariables(translate("Cannot execute command (%command%) - please check the configuration"), {command: command}))
 	}
 }
@@ -700,6 +706,8 @@ trigger(hotkeys, method := "Event") {
 			}
 		}
 		catch Any as exception {
+			logError(exception, true)
+					
 			logMessage(kLogWarn, substituteVariables(translate("Cannot send command (%hotkey%) - please check the configuration"), {command: theHotkey}))
 		}
 }

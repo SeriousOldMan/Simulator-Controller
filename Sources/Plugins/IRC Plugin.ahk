@@ -69,6 +69,8 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 				callSimulator(this.Code, command . "=" . operation . "=" . message . ":" . values2String(";", arguments*), "DLL")
 			}
 			catch Any as exception {
+				logError(exception, true)
+					
 				logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider ("), {simulator: this.Code, protocol: "SHM"})
 									   . exePath . translate(") - please rebuild the applications in the binaries folder (")
 									   . kBinariesDirectory . translate(")"))
@@ -261,6 +263,23 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 
 	readSessionData(options := "") {
 		return super.readSessionData(options, "DLL")
+	}
+
+	updatePositionsData(data) {
+		local carClass
+
+		super.updatePositionsData(data)
+
+		loop {
+			carClass := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Class", kUndefined)
+
+			if (carClass == kUndefined)
+				break
+			else if (Trim(carClass) != "")
+				setMultiMapValue(data, "Position Data", "Car." . A_Index . ".Class", Trim(carClass))
+			else
+				removeMultiMapValue(data, "Position Data", "Car." . A_Index . ".Class")
+		}
 	}
 }
 

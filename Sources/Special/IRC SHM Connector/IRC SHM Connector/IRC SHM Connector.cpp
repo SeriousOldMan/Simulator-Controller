@@ -643,7 +643,8 @@ void writePositions(std::ostringstream* output, const irsdk_header *header, cons
 
 				getYamlValue(result, sessionInfo, "DriverInfo:Drivers:CarIdx:{%s}CarClassShortName:", carIdx);
 
-				printLine(output, "Car." + std::string(carIdx1) + ".Class=" + std::string(result));
+				if (std::string(result).length() > 0)
+					printLine(output, "Car." + std::string(carIdx1) + ".Class=" + std::string(result));
 
 				char forName[100];
 				char surName[100];
@@ -819,7 +820,10 @@ void writeData(std::ostringstream * output, const irsdk_header *header, const ch
 			else
 				printLine(output, "Car=Unknown");
 
-			printLine(output, "SessionFormat=" + (sessionLaps == -1) ? "Time" : "Laps");
+			if (sessionLaps == -1)
+				printLine(output, "SessionFormat=Time");
+			else
+				printLine(output, "SessionFormat=Laps");
 
 			long timeRemaining = -1;
 
@@ -913,7 +917,10 @@ void writeData(std::ostringstream * output, const irsdk_header *header, const ch
 			if (getDataValue(result, header, data, "LapDeltaToBestLap_OK"))
 				valid = (atoi(result) > 0);
 
-			printLine(output, "LapValid=" + valid ? "true" : "false");
+			if (valid)
+				printLine(output, "LapValid=true");
+			else
+				printLine(output, "LapValid=false");
 
 			printLine(output, "LapLastTime=" + std::to_string(lastTime));
 			printLine(output, "LapBestTime=" + std::to_string(bestTime));
@@ -931,8 +938,12 @@ void writeData(std::ostringstream * output, const irsdk_header *header, const ch
 			printLine(output, "StintTimeRemaining=" + std::to_string(timeRemaining));
 			printLine(output, "DriverTimeRemaining=" + std::to_string(timeRemaining));
 
-			if (getDataValue(result, header, data, "CarIdxTrackSurface"))
-				printLine(output, "InPit=" + (atoi(result) == irsdk_InPitStall) ? "true" : "false");
+			if (getDataValue(result, header, data, "CarIdxTrackSurface")) {
+				if (atoi(result) == irsdk_InPitStall)
+					printLine(output, "InPit=true");
+				else
+					printLine(output, "InPit=false");
+			}
 			else
 				printLine(output, "InPit=false");
 

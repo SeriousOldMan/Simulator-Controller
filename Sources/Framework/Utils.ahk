@@ -99,31 +99,34 @@ createGUID() {
 
 callSimulator(simulator, options := "", protocol?) {
 	local exePath, dataFile, data
-	local library, curWorkingDir, buf
+	local connector, curWorkingDir, buf
 	local dllName, dllFile
 
+	static defaultProtocol := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory)), "Simulator", "Data Provider", "DLL")
 	static protocols := CaseInsenseMap("AC", "CLR", "ACC", "DLL", "R3E", "DLL", "IRC", "DLL"
 									 , "AMS2", "DLL", "PCARS2", "DLL", "RF2", "CLR")
-	static libraries := CaseInsenseMap()
+	static connectors := CaseInsenseMap()
 
-	if (!isSet(protocol) && protocols.Has(simulator))
+	if (defaultProtocol = "EXE")
+		protocol := "EXE"
+	else if (!isSet(protocol) && protocols.Has(simulator))
 		protocol := protocols[simulator]
 
 	try {
 		if (protocol = "DLL") {
-			if libraries.Has(simulator . ".DLL")
-				library := libraries[simulator . ".DLL"]
+			if connectors.Has(simulator . ".DLL")
+				connector := connectors[simulator . ".DLL"]
 			else {
 				curWorkingDir := A_WorkingDir
 
 				SetWorkingDir(kBinariesDirectory)
 
 				try {
-					library := DllCall("LoadLibrary", "Str", simulator . " SHM Connector.dll", "Ptr")
+					connector := DllCall("LoadLibrary", "Str", simulator . " SHM Connector.dll", "Ptr")
 
 					DLLCall(simulator . " SHM Connector\open")
 
-					libraries[simulator . ".DLL"] := library
+					connectors[simulator . ".DLL"] := connector
 				}
 				finally {
 					SetWorkingDir(curWorkingDir)
@@ -137,8 +140,8 @@ callSimulator(simulator, options := "", protocol?) {
 			data := parseMultiMap(StrGet(buf, "UTF-8"))
 		}
 		else if (protocol = "CLR") {
-			if libraries.Has(simulator . ".CLR")
-				library := libraries[simulator . ".CLR"]
+			if connectors.Has(simulator . ".CLR")
+				connector := connectors[simulator . ".CLR"]
 			else {
 				dllName := (simulator . " SHM Connector.dll")
 				dllFile := (kBinariesDirectory . dllName)
@@ -146,25 +149,28 @@ callSimulator(simulator, options := "", protocol?) {
 				if (!FileExist(dllFile))
 					throw "Unable to find " . dllName . " in " . kBinariesDirectory . "..."
 
-				library := CLR_LoadLibrary(dllFile).CreateInstance("SHMConnector.SHMConnector")
+				connector := CLR_LoadLibrary(dllFile).CreateInstance("SHMConnector.SHMConnector")
 
-				if (!library.Open() && !isDebug())
+				if (!connector.Open() && !isDebug())
 					throw "Cannot startup " . dllName . " in " . kBinariesDirectory . "..."
 
-				libraries[simulator . ".CLR"] := library
+				connectors[simulator . ".CLR"] := connector
 			}
 
-			data := library.Call(options)
+			data := connector.Call(options)
 			data := parseMultiMap(data)
 		}
 		else if (protocol = "EXE") {
 			exePath := (kBinariesDirectory . simulator . A_Space . " SHM Provider.exe")
 
+			if !FileExist(exePath)
+				throw "File not found..."
+
 			DirCreate(kTempDirectory . simulator . " Data")
 
 			dataFile := temporaryFileName(simulator . " Data\SHM", "data")
 
-			RunWait(A_ComSpec . " /c `"`"" . exePath . "`" " . options . " > `"" . dataFile . "`"`"", , "Hide")
+			RunWait(A_ComSpec . " /c `"`"" . exePath . "`" `"" . options . "`" > `"" . dataFile . "`"`"", , "Hide")
 
 			data := readMultiMap(dataFile)
 

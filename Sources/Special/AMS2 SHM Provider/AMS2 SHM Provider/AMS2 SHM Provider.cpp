@@ -91,6 +91,17 @@ void substring(char s[], char sub[], int p, int l) {
 	sub[c] = '\0';
 }
 
+std::string getArgument(std::string request, std::string key) {
+	if (request.rfind(key + "=") == 0)
+		return request.substr(key.length() + 1, request.length() - (key.length() + 1)).c_str();
+	else
+		return "";
+}
+
+std::string getArgument(char* request, std::string key) {
+	return getArgument(std::string(request), key);
+}
+
 int main(int argc, char* argv[]) {
 	// Open the memory-mapped file
 	HANDLE fileHandle = OpenFileMappingA(PAGE_READONLY, FALSE, MAP_OBJECT_NAME);
@@ -136,7 +147,7 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
-	bool writeStandings = ((argc > 1) && (strcmp(argv[1], "-Standings") == 0));
+	bool writeStandings = ((argc > 1) && (getArgument(argv[1], "Standings") != ""));
 	bool writeTelemetry = !writeStandings;
 
 	writeTelemetry = true;
@@ -320,6 +331,8 @@ int main(int argc, char* argv[]) {
 			printf("DriverSurname=%s\n", "");
 			printf("DriverNickname=%s\n", "");
 		}
+
+		printf("Position=%ld\n", (long)localCopy->mParticipantInfo[localCopy->mViewedParticipantIndex].mRacePosition);
 
 		printf("LapValid=%s\n", localCopy->mLapInvalidated ? "false" : "true");
 

@@ -344,6 +344,14 @@ namespace SHMConnector
                 return strWriter.ToString();
 
             strWriter.WriteLine("[Stint Data]");
+
+            if (cars.numVehicles > 0)
+            {
+                AcCarInfo car = cars.cars[0];
+
+                strWriter.Write("Position="); strWriter.WriteLine(car.carRealTimeLeaderboardPosition + 1);
+            }
+
             strWriter.WriteLine("DriverForname=" + staticInfo.PlayerName);
             strWriter.WriteLine("DriverSurname=" + staticInfo.PlayerSurname);
             strWriter.WriteLine("DriverNickname=" + staticInfo.PlayerNick);
@@ -426,19 +434,14 @@ namespace SHMConnector
             physics = ReadPhysics();
             graphics = ReadGraphics();
             staticInfo = ReadStaticInfo();
+            cars = ReadCars();
 
             if (request.StartsWith("Setup"))
                 return this.ReadSetup();
             else if (request.StartsWith("Standings"))
-            {
-                cars = ReadCars();
-
                 return this.ReadStandings();
-            }
             else
-            {
                 return this.ReadData();
-            }
         }
     }
 }

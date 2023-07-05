@@ -136,8 +136,11 @@ namespace RF2SHMProvider {
 				return id.ToString();
 		}
 
-		public void ReadStandings() {
-			Console.WriteLine("[Position Data]");
+		public void ReadStandings()
+        {
+            rF2VehicleScoring playerVehicle = GetPlayerScoring(ref scoring);
+
+            Console.WriteLine("[Position Data]");
 
 			Console.Write("Car.Count="); Console.WriteLine(scoring.mScoringInfo.mNumVehicles);
 
@@ -177,7 +180,7 @@ namespace RF2SHMProvider {
 				Console.Write("Car."); Console.Write(i); Console.Write(".InPitLane="); Console.WriteLine(vehicle.mInPits != 0 ? "true" : "false");
 				Console.Write("Car."); Console.Write(i); Console.Write(".InPit="); Console.WriteLine(vehicle.mPitState == (byte)Stopped ? "true" : "false");
 
-				if (vehicle.mIsPlayer != 0)
+				if (Object.ReferenceEquals(vehicle, playerVehicle))
 				{
 					Console.Write("Driver.Car=");
 					Console.WriteLine(i);
@@ -255,7 +258,9 @@ namespace RF2SHMProvider {
 				Console.Write("DriverSurname="); Console.WriteLine(GetSurname(scoring.mScoringInfo.mPlayerName));
 				Console.Write("DriverNickname="); Console.WriteLine(GetNickname(scoring.mScoringInfo.mPlayerName));
 
-				Console.Write("LapValid="); Console.WriteLine((playerScoring.mCountLapFlag == 2) ? "true" : "false");
+                Console.Write("Position="); Console.WriteLine(playerScoring.mPlace);
+
+                Console.Write("LapValid="); Console.WriteLine((playerScoring.mCountLapFlag == 2) ? "true" : "false");
 				
 				Console.Write("LapLastTime="); Console.WriteLine(Math.Round(Normalize(playerScoring.mLastLapTime > 0 ? playerScoring.mLastLapTime
 																													 : playerScoring.mBestLapTime) * 1000));

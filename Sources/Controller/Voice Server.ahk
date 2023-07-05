@@ -469,7 +469,7 @@ class VoiceServer extends ConfigurationItem {
 					throw "Recognizer not running..."
 			}
 			catch Any as exception {
-				logError(exception)
+				logError(exception, true)
 
 				logMessage(kLogCritical, translate("Error while registering voice command `"") . command . translate("`" - please check the configuration"))
 
@@ -920,20 +920,24 @@ class VoiceServer extends ConfigurationItem {
 	speak(descriptor, text, activate := false) {
 		local oldSpeaking := this.Speaking
 
-		this.iSpeaking := true
+		if this.Speaking
+			Task.startTask(ObjBindMethod(this, "speak", descriptor, text, activate))
+		else {
+			this.iSpeaking := true
 
-		try {
-			this.getVoiceClient(descriptor).speak(text)
+			try {
+				this.getVoiceClient(descriptor).speak(text)
 
-			if activate
-				this.activateVoiceClient(descriptor)
+				if activate
+					this.activateVoiceClient(descriptor)
 
-		}
-		catch Any as exception {
-			logError(exception)
-		}
-		finally {
-			this.iSpeaking := oldSpeaking
+			}
+			catch Any as exception {
+				logError(exception)
+			}
+			finally {
+				this.iSpeaking := oldSpeaking
+			}
 		}
 	}
 
@@ -996,7 +1000,7 @@ class VoiceServer extends ConfigurationItem {
 					throw "Recognizer not running..."
 			}
 			catch Any as exception {
-				logError(exception)
+				logError(exception, true)
 
 				logMessage(kLogCritical, translate("Error while registering voice command `"") . activationCommand . translate("`" - please check the configuration"))
 

@@ -85,7 +85,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		iSimulator := false
 
 		iRestart := false
-		iRequest := false
+		iRequested := false
 		iTries := 0
 
 		iPositionsData := kUndefined
@@ -108,30 +108,36 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			this.iSimulator := simulator
 			this.iRestart := false
 
-			super.__New(false, 0, kInterruptPrority)
+			super.__New(false, 0, kInterruptPriority)
+		}
 
-			Task.start(this)
+		static create(simulator, restart := false) {
+			local future := ACCPlugin.PositionsDataFuture(simulator, restart)
+
+			future.start()
+
+			return future
 		}
 
 		run() {
 			local positionsData
 
-			if this.iRequest {
+			if !this.iRequested {
 				this.iSimulator.requireUDPClient(this.iRestart)
 				this.iSimulator.requestPositionsData()
 
-				this.iPhase := "Load"
+				this.iRequested := true
 
 				Task.CurrentTask.Sleep := 50
 
 				return Task.CurrentTask
 			}
 			else {
-				if (this.iTries > 40) {
-					positionsData := readPositionsData()
+				if (this.iTries++ <= 40) {
+					positionsData := this.iSimulator.readPositionsData()
 
 					if positionsData
-						this.iPositionsData := false
+						this.iPositionsData := positionsData
 					else
 						return Task.CurrentTask
 				}
@@ -425,9 +431,9 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 	acquireSessionData(&telemetryData, &positionsData) {
 		if !this.iPositionsDataFuture
-			this.iPositionsDataFuture := ACCPlugin.PositiosDataFuture(this)
+			this.iPositionsDataFuture := ACCPlugin.PositionsDataFuture.create(this)
 
-		super.acquireSessionData(&telemetryData, &positionsData)
+		return super.acquireSessionData(&telemetryData, &positionsData)
 	}
 
 	acquirePositionsData(telemetryData) {
@@ -463,7 +469,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		lastLap := lap
 
 		if (restart || !this.iPositionsDataFuture)
-			this.iPositionsDataFuture := ACCPlugin.PositiosDataFuture(this)
+			this.iPositionsDataFuture := ACCPlugin.PositionsDataFuture.create(this, restart)
 
 		try {
 			positionsData := this.iPositionsDataFuture.PositionsData

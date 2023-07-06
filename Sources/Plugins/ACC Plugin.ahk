@@ -113,12 +113,48 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			Task.startTask(this)
 		}
 
+		requestPositionsData() {
+			loop 5
+				try {
+					FileAppend("Read`n", kTempDirectory . "ACCUDP.cmd")
+
+					break
+				}
+				catch Any as exception {
+					if (A_Index = 5)
+						logError(exception)
+					else
+						Sleep(10)
+				}
+		}
+
+		readPositionsData() {
+			local fileName, positionsData
+
+			if FileExist(kTempDirectory . "ACCUDP.cmd")
+				return false
+			else {
+				fileName := (kTempDirectory . "ACCUDP.out")
+
+				if !FileExist(fileName)
+					return false
+				else {
+					positionsData := readMultiMap(fileName)
+
+					deleteFile(fileName)
+
+					return positionsData
+				}
+			}
+		}
+
 		run() {
 			local positionsData
 
 			if !this.iRequested {
 				this.iSimulator.requireUDPClient(this.iRestart)
-				this.iSimulator.requestPositionsData()
+
+				this.requestPositionsData()
 
 				this.iRequested := true
 
@@ -126,7 +162,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			}
 			else {
 				if (this.iTries++ <= 40) {
-					positionsData := this.iSimulator.readPositionsData()
+					positionsData := this.readPositionsData()
 
 					if positionsData
 						this.iPositionsData := positionsData
@@ -386,41 +422,6 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 			if (session != kSessionPaused)
 				this.shutdownUDPClient(true)
-		}
-	}
-
-	requestPositionsData() {
-		loop 5
-			try {
-				FileAppend("Read`n", kTempDirectory . "ACCUDP.cmd")
-
-				break
-			}
-			catch Any as exception {
-				if (A_Index = 5)
-					logError(exception)
-				else
-					Sleep(10)
-			}
-	}
-
-	readPositionsData() {
-		local fileName, positionsData
-
-		if FileExist(kTempDirectory . "ACCUDP.cmd")
-			return false
-		else {
-			fileName := (kTempDirectory . "ACCUDP.out")
-
-			if !FileExist(fileName)
-				return false
-			else {
-				positionsData := readMultiMap(fileName)
-
-				deleteFile(fileName)
-
-				return positionsData
-			}
 		}
 	}
 

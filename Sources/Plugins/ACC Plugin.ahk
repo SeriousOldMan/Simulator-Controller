@@ -95,7 +95,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				local positionsData := this.iPositionsData
 
 				while (positionsData == kUndefined) {
-					Sleep(10)
+					Task.yield(false)
 
 					positionsData := this.iPositionsData
 				}
@@ -109,14 +109,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			this.iRestart := false
 
 			super.__New(false, 0, kInterruptPriority)
-		}
 
-		static create(simulator, restart := false) {
-			local future := ACCPlugin.PositionsDataFuture(simulator, restart)
-
-			future.start()
-
-			return future
+			Task.startTask(this)
 		}
 
 		run() {
@@ -128,8 +122,6 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 				this.iRequested := true
 
-				Task.CurrentTask.Sleep := 50
-
 				return Task.CurrentTask
 			}
 			else {
@@ -138,8 +130,11 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 					if positionsData
 						this.iPositionsData := positionsData
-					else
+					else {
+						Task.CurrentTask.Sleep := 50
+
 						return Task.CurrentTask
+					}
 				}
 				else
 					this.iPositionsData := false
@@ -431,7 +426,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 	acquireSessionData(&telemetryData, &positionsData) {
 		if !this.iPositionsDataFuture
-			this.iPositionsDataFuture := ACCPlugin.PositionsDataFuture.create(this)
+			this.iPositionsDataFuture := ACCPlugin.PositionsDataFuture(this)
 
 		return super.acquireSessionData(&telemetryData, &positionsData)
 	}
@@ -469,7 +464,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		lastLap := lap
 
 		if (restart || !this.iPositionsDataFuture)
-			this.iPositionsDataFuture := ACCPlugin.PositionsDataFuture.create(this, restart)
+			this.iPositionsDataFuture := ACCPlugin.PositionsDataFuture(this, restart)
 
 		try {
 			positionsData := this.iPositionsDataFuture.PositionsData

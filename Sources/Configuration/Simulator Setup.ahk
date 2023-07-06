@@ -2778,8 +2778,11 @@ findSoftware(definition, software) {
 					else if (InStr(locator, "RegistryScan:") == 1) {
 						folder := findInstallProperty(substituteVariables(Trim(StrReplace(locator, "RegistryScan:", ""))), "InstallLocation")
 
-						if ((folder != "") && FileExist(folder . descriptor[3]))
-							return (folder . descriptor[3])
+						if (folder != "")
+							if FileExist(folder . descriptor[3])
+								return (folder . descriptor[3])
+							else if FileExist(folder . "\" . descriptor[3])
+								return (folder . descriptor[3])
 					}
 					else if (InStr(locator, "Steam:") == 1) {
 						locator := substituteVariables(Trim(StrReplace(locator, "Steam:", "")))

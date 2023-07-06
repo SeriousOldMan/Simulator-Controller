@@ -555,7 +555,7 @@ int trackWidth = 150;
 int lastCompletedLaps = 0;
 float lastSpeed = 0.0;
 
-bool collectTelemetry(const SharedMemory* sharedData) {
+bool collectTelemetry(const SharedMemory* sharedData, bool calibrate) {
 	if (sharedData->mGameState == GAME_INGAME_PAUSED && sharedData->mPitMode != PIT_MODE_NONE)
 		return true;
 
@@ -602,13 +602,23 @@ bool collectTelemetry(const SharedMemory* sharedData) {
 
 			if (steerAngle > 0) {
 				if (angularVelocity > 0)
-					slip = oversteerHeavyThreshold / 57.2989 - 1;
+				{
+					if (calibrate)
+						slip *= -1;
+					else
+						slip = (oversteerHeavyThreshold - 1) / 57.2989;
+				}
 				else if (angularVelocity < idealAngularVelocity)
 					slip *= -1;
 			}
 			else {
 				if (angularVelocity < 0)
-					slip = oversteerHeavyThreshold / 57.2989 - 1;
+				{
+					if (calibrate)
+						slip *= -1;
+					else
+						slip = (oversteerHeavyThreshold - 1) / 57.2989;
+				}
 				else if (angularVelocity > idealAngularVelocity)
 					slip *= -1;
 			}
@@ -1046,7 +1056,7 @@ int main(int argc, char* argv[]) {
 			}
 			
 			if (analyzeTelemetry) {
-				if (collectTelemetry(localCopy)) {
+				if (collectTelemetry(localCopy, calibrateTelemetry)) {
 					if (remainder(counter, 20) == 0)
 						writeTelemetry(localCopy, calibrateTelemetry);
 				}

@@ -683,7 +683,7 @@ int trackWidth = 150;
 int lastCompletedLaps = 0;
 float lastSpeed = 0.0;
 
-bool collectTelemetry() {
+bool collectTelemetry(bool calibrate) {
 	SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
@@ -730,13 +730,23 @@ bool collectTelemetry() {
 			
 			if (steerAngle > 0) {
 				if (angularVelocity > 0)
-					slip = oversteerHeavyThreshold / 57.2989 - 1;
+				{
+					if (calibrate)
+						slip *= -1;
+					else
+						slip = (oversteerHeavyThreshold - 1) / 57.2989;
+				}
 				else if (angularVelocity < idealAngularVelocity)
 					slip *= -1;
 			}
 			else {
 				if (angularVelocity < 0)
-					slip = oversteerHeavyThreshold / 57.2989 - 1;
+				{
+					if (calibrate)
+						slip *= -1;
+					else
+						slip = (oversteerHeavyThreshold - 1) / 57.2989;
+				}
 				else if (angularVelocity > idealAngularVelocity)
 					slip *= -1;
 			}
@@ -1160,7 +1170,7 @@ int main(int argc, char* argv[])
 		bool wait = true;
 
 		if (analyzeTelemetry) {
-			if (collectTelemetry()) {
+			if (collectTelemetry(calibrateTelemetry)) {
 				if (remainder(counter, 20) == 0)
 					writeTelemetry(calibrateTelemetry);
 			}

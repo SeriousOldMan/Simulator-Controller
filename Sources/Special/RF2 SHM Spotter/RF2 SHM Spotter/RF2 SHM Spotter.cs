@@ -860,14 +860,24 @@ namespace RF2SHMSpotter {
 
 					if (steerAngle > 0) {
 						if (angularVelocity > 0)
-							slip = oversteerHeavyThreshold / 57.2989 - 1;
-						else if (angularVelocity < idealAngularVelocity)
+                        {
+                            if (calibrate)
+                                slip *= -1;
+                            else
+                                slip = (oversteerHeavyThreshold - 1) / 57.2989;
+                        }
+                        else if (angularVelocity < idealAngularVelocity)
 							slip *= -1;
 					}
 					else {
 						if (angularVelocity < 0)
-							slip = oversteerHeavyThreshold / 57.2989 - 1;
-						else if (angularVelocity > idealAngularVelocity)
+                        {
+                            if (calibrate)
+                                slip *= -1;
+                            else
+                                slip = (oversteerHeavyThreshold - 1) / 57.2989;
+                        }
+                        else if (angularVelocity > idealAngularVelocity)
 							slip *= -1;
 					}
 

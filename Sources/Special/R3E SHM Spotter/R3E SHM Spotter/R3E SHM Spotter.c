@@ -751,7 +751,7 @@ int trackWidth = 150;
 int lastCompletedLaps = 0;
 r3e_float32 lastSpeed = 0.0f;
 
-BOOL collectTelemetry() {
+BOOL collectTelemetry(BOOL calibrate) {
 	int playerIdx = getPlayerIndex();
 
 	if (map_buffer->game_paused || (map_buffer->all_drivers_data_1[playerIdx].in_pitlane != 0))
@@ -800,13 +800,23 @@ BOOL collectTelemetry() {
 
 			if (steerAngle > 0) {
 				if (angularVelocity > 0)
-					slip = oversteerHeavyThreshold / 57.2989 - 1;
+				{
+					if (calibrate)
+						slip *= -1;
+					else
+						slip = (oversteerHeavyThreshold - 1) / 57.2989;
+				}
 				else if (angularVelocity < idealAngularVelocity)
 					slip *= -1;
 			}
 			else {
 				if (angularVelocity < 0)
-					slip = oversteerHeavyThreshold / 57.2989 - 1;
+				{
+					if (calibrate)
+						slip *= -1;
+					else
+						slip = (oversteerHeavyThreshold - 1) / 57.2989;
+				}
 				else if (angularVelocity > idealAngularVelocity)
 					slip *= -1;
 			}
@@ -1208,7 +1218,7 @@ int main(int argc, char* argv[])
 
 		if (mapped_r3e) {
 			if (analyzeTelemetry) {
-				if (collectTelemetry()) {
+				if (collectTelemetry(calibrateTelemetry)) {
 					if (remainder(counter, 20) == 0)
 						writeTelemetry(calibrateTelemetry);
 				}

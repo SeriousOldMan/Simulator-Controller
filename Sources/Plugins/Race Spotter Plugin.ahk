@@ -518,6 +518,8 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 					}
 				}
 				else {
+					this.iMapperPhase := "Wait"
+
 					mapperState := newMultiMap()
 
 					setMultiMapValue(mapperState, "Track Mapper", "State", "Passive")
@@ -529,6 +531,25 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 					writeMultiMap(kTempDirectory . "Track Mapper.state", mapperState)
 				}
 			}
+		}
+	}
+
+	updateLap(lap, update, data) {
+		local simulator, mapperState
+
+		super.updateLap(lap, update, data)
+
+		if (this.iMapperPhase = "Wait") {
+			simulator := this.Simulator.Simulator[true]
+			mapperState := newMultiMap()
+
+			setMultiMapValue(mapperState, "Track Mapper", "State", "Passive")
+			setMultiMapValue(mapperState, "Track Mapper", "Simulator", SessionDatabase.getSimulatorName(this.Simulator.Simulator[true]))
+			setMultiMapValue(mapperState, "Track Mapper", "Track", SessionDatabase.getTrackName(simulator, getMultiMapValue(data, "Session Data", "Track", false)))
+			setMultiMapValue(mapperState, "Track Mapper", "Action", "Waiting")
+			setMultiMapValue(mapperState, "Track Mapper", "Information", translate("Message: ") . translate("Waiting for track scanner..."))
+
+			writeMultiMap(kTempDirectory . "Track Mapper.state", mapperState)
 		}
 	}
 

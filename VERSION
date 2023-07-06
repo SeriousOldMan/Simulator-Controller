@@ -3,7 +3,7 @@ Version=5.1.0.0-alpha
 Target=5.1.0.0-release
 Date=07/05/2023
 Download=https://www.dropbox.com/s/5ufesns5cmm7u2m/Simulator%20Controller%205.1.0.0-alpha.zip?dl=1
-Changes=Fixes for Telemetry Analyzer in "Setup Workbench", New real-time capable data connector architecture, Increased bounding box for side proximity alerts by the Spotter from 6 to 8 meters lateral, Reduced waiting time for unavailable data in "Race Center", Fixed AC and RF2 Spotter, Fixed loading of car geometry defaults in Telemetry Analyzer, Fixed car coordinates for rFactor2 (for track automation), Counter steering is now detected correctly in the Telemetry Analyzer of "Setup Workbench", Fixed race reports and standings data in "Race Center" for rFactor2
+Changes=Fixes for Telemetry Analyzer in "Setup Workbench", New real-time capable data connector architecture, Increased bounding box for side proximity alerts by the Spotter from 6 to 8 meters lateral, Reduced waiting time for unavailable data in "Race Center", Fixed AC and RF2 Spotter, Fixed loading of car geometry defaults in Telemetry Analyzer, Fixed car coordinates for rFactor2 (for track automation), Counter steering is now detected correctly in the Telemetry Analyzer of "Setup Workbench", Fixed race reports and standings data in "Race Center" for rFactor2^, Fixed track scanner and mapper for rare cases with special characters, Fixed manually locating iRacing
 [Release]
 Version=5.0.9.1-release
 Date=06/30/2023

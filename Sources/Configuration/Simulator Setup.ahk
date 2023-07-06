@@ -2731,7 +2731,7 @@ openLabelsAndIconsEditor(*) {
 
 standardApplication(definition, categories, executable) {
 	local ignore, category, name, descriptor
-	local software
+	local software, candidate
 
 	SplitPath(executable, &software)
 
@@ -2739,7 +2739,9 @@ standardApplication(definition, categories, executable) {
 		for name, descriptor in getMultiMapValues(definition, category) {
 			descriptor := string2Values("|", descriptor)
 
-			if (software = descriptor[3])
+			SplitPath(descriptor[3], &candidate)
+
+			if (software = candidate)
 				return name
 		}
 
@@ -2776,8 +2778,11 @@ findSoftware(definition, software) {
 					else if (InStr(locator, "RegistryScan:") == 1) {
 						folder := findInstallProperty(substituteVariables(Trim(StrReplace(locator, "RegistryScan:", ""))), "InstallLocation")
 
-						if ((folder != "") && FileExist(folder . descriptor[3]))
-							return (folder . descriptor[3])
+						if (folder != "")
+							if FileExist(folder . descriptor[3])
+								return (folder . descriptor[3])
+							else if FileExist(folder . "\" . descriptor[3])
+								return (folder . descriptor[3])
 					}
 					else if (InStr(locator, "Steam:") == 1) {
 						locator := substituteVariables(Trim(StrReplace(locator, "Steam:", "")))

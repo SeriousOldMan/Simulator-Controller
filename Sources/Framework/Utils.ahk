@@ -161,7 +161,7 @@ callSimulator(simulator, options := "", protocol?) {
 			data := parseMultiMap(data)
 		}
 		else if (protocol = "EXE") {
-			exePath := (kBinariesDirectory . simulator . A_Space . " SHM Provider.exe")
+			exePath := (kBinariesDirectory . simulator . " SHM Provider.exe")
 
 			if !FileExist(exePath)
 				throw "File not found..."

@@ -1044,6 +1044,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 			try {
 				wait := settingsDB.readSettingValue(simulator, car, track, weather, "Assistant", "Session.Data.Frequency", 10)
+				wait := Max(wait, getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+															  , "Team Server", "Update Frequency", 10))
 
 				RaceAssistantPlugin.CollectorTask.Sleep := (wait * 1000)
 			}

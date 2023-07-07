@@ -796,8 +796,34 @@ namespace RF2SHMSpotter {
         float lastSpeed = 0.0f;
 		
 		bool calibrate = false;
+        long lastSound = 0;
 
-		bool collectTelemetry()
+		bool triggerUSOSBeep(string soundsDirectory, double usos)
+		{
+			string wavFile;
+
+			if (usos < oversteerHeavyThreshold)
+				wavFile = soundsDirectory + "Oversteer Heavy.wav";
+			else if (usos < oversteerMediumThreshold)
+				wavFile = soundsDirectory + "Oversteer Medium.wav";
+			else if (usos < oversteerLightThreshold)
+				wavFile = soundsDirectory + "Oversteer Light.wav";
+			else if (usos > understeerHeavyThreshold)
+				wavFile = soundsDirectory + "Understeer Heavy.wav";
+			else if (usos > understeerMediumThreshold)
+				wavFile = soundsDirectory + "Understeer Medium.wav";
+			else if (usos > understeerLightThreshold)
+				wavFile = soundsDirectory + "Understeer Light.wav";
+			else
+				return false;
+
+			if (wavFile != "")
+				new System.Media.SoundPlayer(wavFile).Play();
+			
+            return true;
+		}
+
+		bool collectTelemetry(string soundsDirectory)
 		{
             int carID = 0;
 
@@ -882,6 +908,10 @@ namespace RF2SHMSpotter {
 					}
 
                     cd.Usos = slip * 57.2989 * 1;
+
+                    if ((soundsDirectory != "") && Environment.TickCount > (lastSound + 1000))
+                        if (triggerUSOSBeep(soundsDirectory, cd.Usos))
+                            lastSound = Environment.TickCount;
 
                     if (false)
                     {
@@ -1283,6 +1313,8 @@ namespace RF2SHMSpotter {
 				numCoordinates += 1;
 			}
         }
+        
+		string soundsDirectory = "";
 
         public void initializeAnalyzer(bool calibrateTelemetry, string[] args)
         {
@@ -1309,7 +1341,10 @@ namespace RF2SHMSpotter {
 				steerRatio = int.Parse(args[10]);
 				wheelbase = int.Parse(args[11]);
 				trackWidth = int.Parse(args[12]);
-			}
+
+                if (args.Length > 13)
+                    soundsDirectory = args[13];
+            }
         }
 
         public void Run(bool mapTrack, bool positionTrigger, bool analyzeTelemetry) {
@@ -1317,7 +1352,7 @@ namespace RF2SHMSpotter {
 			int countdown = 4000;
 			long counter = 0;
 
-			while (true) {
+            while (true) {
 				counter++;
 
 				if (!connected)
@@ -1343,7 +1378,7 @@ namespace RF2SHMSpotter {
 
                         if (analyzeTelemetry)
                         {
-                            if (collectTelemetry())
+                            if (collectTelemetry(soundsDirectory))
 							{
                                 if (counter % 20 == 0)
                                     writeTelemetry();

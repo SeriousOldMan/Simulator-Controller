@@ -1,4 +1,4 @@
-## 5.1.0.0-release 07/07/23 (planned)
+## 5.1.0.0-release 07/07/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. The oversteer detection method of the Telemetry Analyzer in the "Setup Workbench" has become much more sensitive and counter steering is now detected correctly (will always count as a *heavy+ oversteer event).

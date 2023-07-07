@@ -1,16 +1,16 @@
 [Development]
-Version=5.1.0.0-rc1
+Version=5.1.0.0-release
 Target=5.1.0.0-release
-Date=07/06/2023
-Download=https://www.dropbox.com/s/kzmj4sc4zdc0euo/Simulator%20Controller%205.1.0.0-rc1.zip?dl=1
+Date=07/07/2023
+Download=https://cutt.ly/ywitakXC;https://www.dropbox.com/s/f37htgmcopfs47v/Simulator%20Controller%205.1.0.0-release.zip?dl=1
 Changes=Fixes for Telemetry Analyzer in "Setup Workbench", New real-time capable data connector architecture, Increased bounding box for side proximity alerts by the Spotter from 6 to 8 meters lateral, Reduced waiting time for unavailable data in "Race Center", Fixed AC and RF2 Spotter, Fixed loading of car geometry defaults in Telemetry Analyzer, Fixed car coordinates for rFactor2 (for track automation), Counter steering is now detected correctly in the Telemetry Analyzer of "Setup Workbench", Fixed race reports and standings data in "Race Center" for rFactor2^, Fixed track scanner and mapper for rare cases with special characters, Fixed manually locating iRacing, New car model for "Setup Workbench"
 [Release]
-Version=5.0.9.1-release
-Date=06/30/2023
-Download=https://cutt.ly/awy00uid;https://www.dropbox.com/s/rssryvvpcal635l/Simulator%20Controller%205.0.9.1-release.zip?dl=1
-Changes=Security question when renewing the data token, Traffic simulation respects the pitstop timer when computing a pitstop lap, Further reduce idiotic Spotter gap announcements, Fixed session info not updating when not having run the first stint in team sessions, "System Monitor" can now be resized vertically, Performance improvements in process communication, Pressing Control restarts the ACC pitstop option walk, Fixed position information for *iRacing*, Performance optimization in simulator data acquisition, Initial integration of Rennsport
+Version=5.1.0.0-release
+Date=07/07/2023
+Download=https://cutt.ly/ywitakXC;https://www.dropbox.com/s/f37htgmcopfs47v/Simulator%20Controller%205.1.0.0-release.zip?dl=1
+Changes=Fixes for Telemetry Analyzer in "Setup Workbench", New real-time capable data connector architecture, Increased bounding box for side proximity alerts by the Spotter from 6 to 8 meters lateral, Reduced waiting time for unavailable data in "Race Center", Fixed AC and RF2 Spotter, Fixed loading of car geometry defaults in Telemetry Analyzer, Fixed car coordinates for rFactor2 (for track automation), Counter steering is now detected correctly in the Telemetry Analyzer of "Setup Workbench", Fixed race reports and standings data in "Race Center" for rFactor2^, Fixed track scanner and mapper for rare cases with special characters, Fixed manually locating iRacing, New car model for "Setup Workbench"
 [Current]
-Type=Development
+Type=Release
 [Version]
-Development=5.1.0.0-rc1
-Release=5.0.9.1-release
+Development=5.1.0.0-release
+Release=5.1.0.0-release

@@ -466,7 +466,7 @@ systemMonitor(command := false, arguments*) {
 	}
 
 	createStintWidget(sessionState) {
-		local lastLap := getMultiMapValue(sessionState, "Stint", "Lap", 0)
+		local lastLap := getMultiMapValue(sessionState, "Session", "Laps", 0)
 		local lastValid := getMultiMapValue(sessionState, "Stint", "Valid", true)
 		local lastTime := getMultiMapValue(sessionState, "Stint", "Lap.Time.Last")
 		local bestTime := getMultiMapValue(sessionState, "Stint", "Lap.Time.Best")

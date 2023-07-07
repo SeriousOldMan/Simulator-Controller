@@ -360,7 +360,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 					options .= (A_Space . this.TrackWidth)
 
 				if this.AudibleFeedback
-					options .= (A_Space . "`"" . kResourcesDirectory . "Sounds\`"")
+					options .= (A_Space . "`"" . kResourcesDirectory . "Sounds`"")
 
 				code := SessionDatabase.getSimulatorCode(this.Simulator)
 

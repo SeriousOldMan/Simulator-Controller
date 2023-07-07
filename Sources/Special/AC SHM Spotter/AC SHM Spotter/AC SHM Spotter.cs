@@ -748,17 +748,17 @@ namespace ACSHMSpotter {
             string wavFile;
 
             if (usos < oversteerHeavyThreshold)
-                wavFile = soundsDirectory + "Oversteer Heavy.wav";
+                wavFile = soundsDirectory + "\\Oversteer Heavy.wav";
             else if (usos < oversteerMediumThreshold)
-                wavFile = soundsDirectory + "Oversteer Medium.wav";
+                wavFile = soundsDirectory + "\\Oversteer Medium.wav";
             else if (usos < oversteerLightThreshold)
-                wavFile = soundsDirectory + "Oversteer Light.wav";
+                wavFile = soundsDirectory + "\\Oversteer Light.wav";
             else if (usos > understeerHeavyThreshold)
-                wavFile = soundsDirectory + "Understeer Heavy.wav";
+                wavFile = soundsDirectory + "\\Understeer Heavy.wav";
             else if (usos > understeerMediumThreshold)
-                wavFile = soundsDirectory + "Understeer Medium.wav";
+                wavFile = soundsDirectory + "\\Understeer Medium.wav";
             else if (usos > understeerLightThreshold)
-                wavFile = soundsDirectory + "Understeer Light.wav";
+                wavFile = soundsDirectory + "\\Understeer Light.wav";
             else
                 return false;
 
@@ -840,7 +840,7 @@ namespace ACSHMSpotter {
 
                     cd.Usos = slip * 57.2989 * 1;
 
-                    if ((soundsDirectory != "") && Environment.TickCount > (lastSound + 1000))
+                    if ((soundsDirectory != "") && Environment.TickCount > (lastSound + 300))
                         if (triggerUSOSBeep(soundsDirectory, cd.Usos))
                             lastSound = Environment.TickCount;
 

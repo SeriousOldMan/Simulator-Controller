@@ -558,61 +558,24 @@ int lastCompletedLaps = 0;
 float lastSpeed = 0.0;
 long lastSound = 0;
 
-template<class E, class T = std::char_traits<E>, class A = std::allocator<E> >
-
-class Widen : public std::unary_function<const std::string&, std::basic_string<E, T, A> >
-{
-	std::locale loc_;
-	const std::ctype<E>* pCType_;
-
-	// No copy-constructor, no assignment operator...
-	Widen(const Widen&);
-	Widen& operator= (const Widen&);
-
-public:
-	// Constructor...
-	Widen(const std::locale& loc = std::locale()) : loc_(loc)
-	{
-#if defined(_MSC_VER) && (_MSC_VER < 1300) // VC++ 6.0...
-		using namespace std;
-		pCType_ = &_USE(loc, ctype<E>);
-#else
-		pCType_ = &std::use_facet<std::ctype<E> >(loc);
-#endif
-	}
-
-	// Conversion...
-	std::basic_string<E, T, A> operator() (const std::string& str) const
-	{
-		typename std::basic_string<E, T, A>::size_type srcLen =
-			str.length();
-		const char* pSrcBeg = str.c_str();
-		std::vector<E> tmp(srcLen);
-
-		pCType_->widen(pSrcBeg, pSrcBeg + srcLen, &tmp[0]);
-		return std::basic_string<E, T, A>(&tmp[0], srcLen);
-	}
-};
-
 bool triggerUSOSBeep(std::string soundsDirectory, float usos) {
-	Widen<wchar_t> toWString;
-	std::wstring wavFile = L"";
+	std::string wavFile = "";
 
 	if (usos < oversteerHeavyThreshold)
-		wavFile = toWString(soundsDirectory + "Oversteer Heavy.wav");
+		wavFile = soundsDirectory + "\\Oversteer Heavy.wav";
 	else if (usos < oversteerMediumThreshold)
-		wavFile = toWString(soundsDirectory + "Oversteer Medium.wav");
+		wavFile = soundsDirectory + "\\Oversteer Medium.wav";
 	else if (usos < oversteerLightThreshold)
-		wavFile = toWString(soundsDirectory + "Oversteer Light.wav");
+		wavFile = soundsDirectory + "\\Oversteer Light.wav";
 	else if (usos > understeerHeavyThreshold)
-		wavFile = toWString(soundsDirectory + "Understeer Heavy.wav");
+		wavFile = soundsDirectory + "\\Understeer Heavy.wav";
 	else if (usos > understeerMediumThreshold)
-		wavFile = toWString(soundsDirectory + "Understeer Medium.wav");
+		wavFile = soundsDirectory + "\\Understeer Medium.wav";
 	else if (usos > understeerLightThreshold)
-		wavFile = toWString(soundsDirectory + "Understeer Light.wav");
+		wavFile = soundsDirectory + "\\Understeer Light.wav";
 
-	if (wavFile != L"") {
-		PlaySound(wavFile.c_str(), NULL, SND_FILENAME | SND_ASYNC);
+	if (wavFile != "") {
+		PlaySoundA(wavFile.c_str(), NULL, SND_FILENAME | SND_ASYNC);
 
 		return true;
 	}
@@ -690,7 +653,7 @@ bool collectTelemetry(const SharedMemory* sharedData, std::string soundsDirector
 
 			cd.usos = slip * 57.2989 * 1;
 
-			if ((soundsDirectory != "") && GetTickCount() > (lastSound + 1000))
+			if ((soundsDirectory != "") && GetTickCount() > (lastSound + 300))
 				if (triggerUSOSBeep(soundsDirectory, cd.usos))
 					lastSound = GetTickCount();
 

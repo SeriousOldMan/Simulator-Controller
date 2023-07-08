@@ -426,7 +426,7 @@ class SetupWorkbench extends ConfigurationItem {
 
 		workbenchGui.Add("Documentation", "x508 YP+20 w184 Center H:Center", translate("Setup Workbench")
 					   , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench")
-					   
+
 		workbenchGui.Add("Text", "x8 yp+30 w1200 W:Grow 0x10 Section")
 
 		workbenchGui.SetFont("Norm")
@@ -512,7 +512,7 @@ class SetupWorkbench extends ConfigurationItem {
 		workbenchGui.SetFont("s8 Norm", "Arial")
 
 		this.iSettingsViewer := workbenchGui.Add("HTMLViewer", "x420 yp+30 w775 h621 W:Grow H:Grow Border vsettingsViewer")
-		
+
 		this.showSettingsChart(false)
 
 		/*
@@ -602,10 +602,17 @@ class SetupWorkbench extends ConfigurationItem {
 			if !GetKeyState("Ctrl", "P")
 				this.clearCharacteristics()
 
-			this.loadSimulator(simulator, reset)
-			this.loadCar(car)
-			this.loadTrack(track)
-			this.loadWeather(weather)
+			this.Window.Opt("-Disabled")
+
+			try {
+				this.loadSimulator(simulator, reset, false)
+				this.loadCar(car, false, false)
+				this.loadTrack(track, false, false)
+				this.loadWeather(weather, false, false)
+			}
+			finally {
+				this.Window.Opt("-Disabled")
+			}
 
 			characteristicLabels := getMultiMapValues(this.Definition, "Setup.Characteristics.Labels")
 
@@ -678,7 +685,7 @@ class SetupWorkbench extends ConfigurationItem {
 							<script type="text/javascript">
 								google.charts.load('current', {'packages':['corechart', 'table', 'bar']}).then(drawChart);
 					)"
-				
+
 					before := substituteVariables(before, {headerBackColor: this.Window.Theme.ListBackColor["Header"]
 														 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
 														 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
@@ -1197,7 +1204,7 @@ class SetupWorkbench extends ConfigurationItem {
 
 		Sleep(200)
 
-		this.updateRecommendations(false, false)
+		this.updateRecommendations(false, false, false)
 
 		this.showSettingsChart(false)
 
@@ -1212,11 +1219,12 @@ class SetupWorkbench extends ConfigurationItem {
 		this.updateState()
 	}
 
-	loadSimulator(simulator, force := false) {
+	loadSimulator(simulator, force := false, disable := true) {
 		local simulators, settings
 
 		if (force || (simulator != this.SelectedSimulator)) {
-			this.Window.Opt("+Disabled")
+			if disable
+				this.Window.Opt("+Disabled")
 
 			try {
 				this.iSelectedSimulator := simulator
@@ -1242,7 +1250,8 @@ class SetupWorkbench extends ConfigurationItem {
 				this.initializeWorkbench()
 			}
 			finally {
-				this.Window.Opt("-Disabled")
+				if disable
+					this.Window.Opt("-Disabled")
 			}
 		}
 	}
@@ -1265,11 +1274,12 @@ class SetupWorkbench extends ConfigurationItem {
 		this.Control["trackDropDown"].Choose(1)
 	}
 
-	loadCar(car, force := false) {
+	loadCar(car, force := false, disable := true) {
 		local tracks, trackNames, settings
 
 		if (force || (car != this.SelectedCar[false])) {
-			this.Window.Opt("+Disabled")
+			if disable
+				this.Window.Opt("+Disabled")
 
 			try {
 				this.iSelectedCar := car
@@ -1295,16 +1305,18 @@ class SetupWorkbench extends ConfigurationItem {
 				this.initializeWorkbench("Loading Car", "Loading Car", "Loading Car", true)
 			}
 			finally {
-				this.Window.Opt("-Disabled")
+				if disable
+					this.Window.Opt("-Disabled")
 			}
 		}
 	}
 
-	loadTrack(track, force := false) {
+	loadTrack(track, force := false, disable := true) {
 		local settings
 
 		if (force || (track != this.SelectedTrack[false])) {
-			this.Window.Opt("+Disabled")
+			if disable
+				this.Window.Opt("+Disabled")
 
 			try {
 				this.iSelectedTrack := track
@@ -1328,12 +1340,13 @@ class SetupWorkbench extends ConfigurationItem {
 				this.Control["trackDropDown"].Choose(track)
 			}
 			finally {
-				this.Window.Opt("-Disabled")
+				if disable
+					this.Window.Opt("-Disabled")
 			}
 		}
 	}
 
-	loadWeather(weather, force := false) {
+	loadWeather(weather, force := false, disable := true) {
 	}
 
 	startTelemetryAnalyzer() {
@@ -1534,12 +1547,13 @@ class SetupWorkbench extends ConfigurationItem {
 		this.updateRecommendations()
 	}
 
-	updateRecommendations(draw := true, update := true) {
+	updateRecommendations(draw := true, update := true, disable := true) {
 		local knowledgeBase := this.KnowledgeBase
 		local noProblem, ignore, characteristic, widgets, value1, value2, settingsLabels, settings
 		local setting, delta
 
-		this.Window.Opt("+Disabled")
+		if disable
+			this.Window.Opt("+Disabled")
 
 		try {
 			noProblem := true
@@ -1591,7 +1605,8 @@ class SetupWorkbench extends ConfigurationItem {
 				this.updateState()
 		}
 		finally {
-			this.Window.Opt("-Disabled")
+			if disable
+				this.Window.Opt("-Disabled")
 		}
 	}
 
@@ -3211,16 +3226,23 @@ runSetupWorkbench() {
 
 	if !GetKeyState("Ctrl", "P")
 		if simulator {
-			workbench.loadSimulator(simulator, true)
+			workbench.Window.Opt("+Disabled")
 
-			if inList(workbench.AvailableCars, car)
-				workbench.loadCar(car)
+			try {
+				workbench.loadSimulator(simulator, true, false)
 
-			if track
-				workbench.loadTrack(track)
+				if inList(workbench.AvailableCars, car)
+					workbench.loadCar(car, false, false)
 
-			if weather
-				workbench.loadWeather(weather)
+				if track
+					workbench.loadTrack(track, false, false)
+
+				if weather
+					workbench.loadWeather(weather, false, false)
+			}
+			finally {
+				workbench.Window.Opt("-Disabled")
+			}
 		}
 		else
 			workbench.loadSimulator(true, true)

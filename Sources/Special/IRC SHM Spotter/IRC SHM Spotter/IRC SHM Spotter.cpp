@@ -697,7 +697,7 @@ bool triggerUSOSBeep(std::string soundsDirectory, float usos) {
 		return false;
 }
 
-bool collectTelemetry(const irsdk_header* header, const char* data, std::string soundsDirectory) {
+bool collectTelemetry(const irsdk_header* header, const char* data, std::string soundsDirectory, bool calibrate) {
 	char result[64];
 	bool onTrack = true;
 
@@ -795,13 +795,23 @@ bool collectTelemetry(const irsdk_header* header, const char* data, std::string 
 
 				if (steerAngle > 0) {
 					if (angularVelocity > 0)
-						slip = oversteerHeavyThreshold / 57.2989 - 1;
+					{
+						if (calibrate)
+							slip *= -1;
+						else
+							slip = (oversteerHeavyThreshold - 1) / 57.2989;
+					}
 					else if (angularVelocity < idealAngularVelocity)
 						slip *= -1;
 				}
 				else {
 					if (angularVelocity < 0)
-						slip = oversteerHeavyThreshold / 57.2989 - 1;
+					{
+						if (calibrate)
+							slip *= -1;
+						else
+							slip = (oversteerHeavyThreshold - 1) / 57.2989;
+					}
 					else if (angularVelocity > idealAngularVelocity)
 						slip *= -1;
 				}
@@ -1366,7 +1376,7 @@ int main(int argc, char* argv[])
 					}
 
 					if (analyzeTelemetry) {
-						if (collectTelemetry(pHeader, g_data, soundsDirectory)) {
+						if (collectTelemetry(pHeader, g_data, soundsDirectory, calibrateTelemetry)) {
 							if (remainder(counter, 20) == 0)
 								writeTelemetry(pHeader, g_data, calibrateTelemetry);
 						}

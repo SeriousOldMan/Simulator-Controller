@@ -362,8 +362,11 @@ class Task {
 		Task.block(priority)
 	}
 
-	static yield() {
-		Task.schedule()
+	static yield(schedule := true) {
+		if schedule
+			Task.schedule()
+		else
+			Sleep(1)
 	}
 
 	static schedule(priority := 2) {

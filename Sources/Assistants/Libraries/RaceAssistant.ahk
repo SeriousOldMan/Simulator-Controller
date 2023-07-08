@@ -1221,7 +1221,7 @@ class RaceAssistant extends ConfigurationItem {
 			setMultiMapValue(sessionInfo, "Stint", "Driver", computeDriverName(getMultiMapValue(data, "Stint Data", "DriverForname", this.DriverForName)
 																			 , getMultiMapValue(data, "Stint Data", "DriverSurname", "Doe")
 																			 , getMultiMapValue(data, "Stint Data", "DriverNickname", "JDO")))
-			setMultiMapValue(sessionInfo, "Stint", "Lap", lapNumber)
+			setMultiMapValue(sessionInfo, "Stint", "Laps", lapNumber)
 			setMultiMapValue(sessionInfo, "Stint", "Position", knowledgeBase.getValue("Position", 0))
 			setMultiMapValue(sessionInfo, "Stint", "Valid", valid)
 			setMultiMapValue(sessionInfo, "Stint", "Fuel.AvgConsumption", Round(knowledgeBase.getValue("Lap." . lapNumber . ".Fuel.AvgConsumption", 0), 1))

@@ -851,11 +851,11 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		if this.Active {
 			teamServer := this.TeamServer
 
-			if (teamServer && teamServer.TeamServerActive && (A_TickCount > this.iNextSessionUpdate))
+			if (teamServer && teamServer.SessionActive && this.TeamSessionActive && (A_TickCount > this.iNextSessionUpdate))
 				try {
 					this.iNextSessionUpdate := (A_TickCount + 30000)
 
-					state := teamServer.Connector.GetSessionValue(teamServer.Session, this.Plugin . " Session Info")
+					state := teamServer.getSessionValue(this.Plugin . " Session Info", false)
 
 					if (state && (state != ""))
 						loop
@@ -1003,6 +1003,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	static requireAssistants(simulator, car, track, weather) {
+		local teamServer := this.TeamServer
 		local activeAssistant := false
 		local startupAssistant := false
 		local ignore, assistant, wasActive, wait, settingsDB
@@ -1044,6 +1045,10 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 			try {
 				wait := settingsDB.readSettingValue(simulator, car, track, weather, "Assistant", "Session.Data.Frequency", 10)
+
+				if (teamServer && teamServer.Connected)
+					wait := Max(wait, getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+																  , "Team Server", "Update Frequency", 10))
 
 				RaceAssistantPlugin.CollectorTask.Sleep := (wait * 1000)
 			}
@@ -1091,8 +1096,15 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 						assistant.joinSession(settings, data)
 				}
 
-			if first
+			if first {
 				RaceAssistantPlugin.Simulator.startSession(settings, data)
+
+				if (this.TeamServer && this.TeamServer.Connected)
+					RaceAssistantPlugin.CollectorTask.Sleep
+						:= Max(RaceAssistantPlugin.CollectorTask.Sleep
+							 , getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+																	   , "Team Server", "Update Frequency", 10) * 1000)
+			}
 		}
 	}
 
@@ -1604,6 +1616,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	startSession(settings, data) {
+		local teamServer := this.TeamServer
 		local code, assistant, settingsFile, dataFile
 
 		if this.Simulator {
@@ -1619,6 +1632,9 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				this.finishSession(false, false)
 			else
 				this.requireRaceAssistant()
+
+			if (teamServer && teamServer.SessionActive && this.TeamSessionActive)
+				teamServer.setSessionValue(this.Plugin . " Session Info", "")
 
 			if this.RaceAssistant {
 				settingsFile := (kTempDirectory . this.Plugin . ".settings")
@@ -1638,6 +1654,11 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	finishSession(finalize := true, shutdown := true) {
+		local teamServer := this.TeamServer
+
+		if (teamServer && teamServer.SessionActive && this.TeamSessionActive)
+			teamServer.setSessionValue(this.Plugin . " Session Info", "")
+
 		if this.RaceAssistant {
 			this.RaceAssistant.finishSession(finalize)
 

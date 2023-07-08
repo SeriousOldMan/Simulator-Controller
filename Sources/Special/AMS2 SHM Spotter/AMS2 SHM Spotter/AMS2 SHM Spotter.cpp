@@ -583,7 +583,7 @@ bool triggerUSOSBeep(std::string soundsDirectory, float usos) {
 		return false;
 }
 
-bool collectTelemetry(const SharedMemory* sharedData, std::string soundsDirectory) {
+bool collectTelemetry(const SharedMemory* sharedData, std::string soundsDirectory, bool calibrate) {
 	if (sharedData->mGameState == GAME_INGAME_PAUSED && sharedData->mPitMode != PIT_MODE_NONE)
 		return true;
 
@@ -630,13 +630,23 @@ bool collectTelemetry(const SharedMemory* sharedData, std::string soundsDirector
 
 			if (steerAngle > 0) {
 				if (angularVelocity > 0)
-					slip = oversteerHeavyThreshold / 57.2989 - 1;
+				{
+					if (calibrate)
+						slip *= -1;
+					else
+						slip = (oversteerHeavyThreshold - 1) / 57.2989;
+				}
 				else if (angularVelocity < idealAngularVelocity)
 					slip *= -1;
 			}
 			else {
 				if (angularVelocity < 0)
-					slip = oversteerHeavyThreshold / 57.2989 - 1;
+				{
+					if (calibrate)
+						slip *= -1;
+					else
+						slip = (oversteerHeavyThreshold - 1) / 57.2989;
+				}
 				else if (angularVelocity > idealAngularVelocity)
 					slip *= -1;
 			}
@@ -1083,7 +1093,7 @@ int main(int argc, char* argv[]) {
 			}
 			
 			if (analyzeTelemetry) {
-				if (collectTelemetry(localCopy, soundsDirectory)) {
+				if (collectTelemetry(localCopy, soundsDirectory, calibrateTelemetry)) {
 					if (remainder(counter, 20) == 0)
 						writeTelemetry(localCopy, calibrateTelemetry);
 				}

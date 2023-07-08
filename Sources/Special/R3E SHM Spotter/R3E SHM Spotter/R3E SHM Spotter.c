@@ -786,7 +786,7 @@ BOOL triggerUSOSBeep(char* soundsDirectory, double usos) {
 		return FALSE;
 }
 
-BOOL collectTelemetry(char* soundsDirectory) {
+BOOL collectTelemetry(char* soundsDirectory, BOOL calibrate) {
 	int playerIdx = getPlayerIndex();
 
 	if (map_buffer->game_paused || (map_buffer->all_drivers_data_1[playerIdx].in_pitlane != 0))
@@ -835,13 +835,23 @@ BOOL collectTelemetry(char* soundsDirectory) {
 
 			if (steerAngle > 0) {
 				if (angularVelocity > 0)
-					slip = oversteerHeavyThreshold / 57.2989 - 1;
+				{
+					if (calibrate)
+						slip *= -1;
+					else
+						slip = (oversteerHeavyThreshold - 1) / 57.2989;
+				}
 				else if (angularVelocity < idealAngularVelocity)
 					slip *= -1;
 			}
 			else {
 				if (angularVelocity < 0)
-					slip = oversteerHeavyThreshold / 57.2989 - 1;
+				{
+					if (calibrate)
+						slip *= -1;
+					else
+						slip = (oversteerHeavyThreshold - 1) / 57.2989;
+				}
 				else if (angularVelocity > idealAngularVelocity)
 					slip *= -1;
 			}
@@ -1252,7 +1262,7 @@ int main(int argc, char* argv[])
 
 		if (mapped_r3e) {
 			if (analyzeTelemetry) {
-				if (collectTelemetry(soundsDirectory)) {
+				if (collectTelemetry(soundsDirectory, calibrateTelemetry)) {
 					if (remainder(counter, 20) == 0)
 						writeTelemetry(calibrateTelemetry);
 				}

@@ -1,4 +1,4 @@
-## 5.1.0.0-release 07/07/23 (planned)
+## 5.1.0.0-release 07/07/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. The oversteer detection method of the Telemetry Analyzer in the "Setup Workbench" has become much more sensitive and counter steering is now detected correctly (will always count as a *heavy+ oversteer event).
@@ -10,13 +10,19 @@
   9. Fixed a couple of bugs, which had been introduced to the Spotter for *Assetto Corsa* and *rFactor 2* by the latest .NET framework update by Microsoft.
   10. Fixed car coordinates for *rFactor2* (used by the track automation).
   11. Fixed race reports and standings data in "Race Center" for *rFactor2*.
+  12. Fixed track scanner and mapper for rare cases with special characters in car or track names. Happened especially in *Automobilista 2*.
+  13. Fixed a problem with manually locating *iRacing* in a non-standard install location.
+  14. A new documentation chapter describes the process of [manually locating games and other software](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#locating-simulators-and-applications) during installation.
+  15. New car models for "Setup Workbench":
+      - Assetto Corsa
+	    - Alfa Romeo 155 V6 TI
 
 ## 5.0.9.1-release 06/30/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. When you press the renew button for the data token, you are now asked, if you really want to renew the token, before it is actually renewed.
   4. Traffic simulation now respects the pitstop window rule when calculating the lap for the next pitstop.
-  5. Unbelievable Spotter gap announcements are further reduced.
+  5. Imprecise Spotter gap announcements are further reduced.
   6. Fixed session info in "System Monitor" not updating when not having run the first stint in team sessions.
   7. "System Monitor" can now be resized vertically.
   8. Performance improvements in process communication.

@@ -711,7 +711,7 @@ bool triggerUSOSBeep(string soundsDirectory, float usos) {
 		return false;
 }
 
-bool collectTelemetry(string soundsDirectory) {
+bool collectTelemetry(string soundsDirectory, bool calibrate) {
 	SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
@@ -758,13 +758,23 @@ bool collectTelemetry(string soundsDirectory) {
 			
 			if (steerAngle > 0) {
 				if (angularVelocity > 0)
-					slip = oversteerHeavyThreshold / 57.2989 - 1;
+				{
+					if (calibrate)
+						slip *= -1;
+					else
+						slip = (oversteerHeavyThreshold - 1) / 57.2989;
+				}
 				else if (angularVelocity < idealAngularVelocity)
 					slip *= -1;
 			}
 			else {
 				if (angularVelocity < 0)
-					slip = oversteerHeavyThreshold / 57.2989 - 1;
+				{
+					if (calibrate)
+						slip *= -1;
+					else
+						slip = (oversteerHeavyThreshold - 1) / 57.2989;
+				}
 				else if (angularVelocity > idealAngularVelocity)
 					slip *= -1;
 			}
@@ -1197,7 +1207,7 @@ int main(int argc, char* argv[])
 		bool wait = true;
 
 		if (analyzeTelemetry) {
-			if (collectTelemetry(soundsDirectory)) {
+			if (collectTelemetry(soundsDirectory, calibrateTelemetry)) {
 				if (remainder(counter, 20) == 0)
 					writeTelemetry(calibrateTelemetry);
 			}

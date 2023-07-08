@@ -851,11 +851,11 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		if this.Active {
 			teamServer := this.TeamServer
 
-			if (teamServer && teamServer.SessionActive && this.TeamSessionActive && (A_TickCount > this.iNextSessionUpdate))
+			if (teamServer && teamServer.TeamServerActive && (A_TickCount > this.iNextSessionUpdate))
 				try {
 					this.iNextSessionUpdate := (A_TickCount + 30000)
 
-					state := teamServer.getSessionValue(this.Plugin . " Session Info", false)
+					state := teamServer.Connector.GetSessionValue(teamServer.Session, this.Plugin . " Session Info")
 
 					if (state && (state != ""))
 						loop

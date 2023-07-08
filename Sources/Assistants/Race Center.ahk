@@ -8383,6 +8383,10 @@ class RaceCenter extends ConfigurationItem {
 			if session {
 				try {
 					this.Connector.ClearSession(session)
+
+					this.Connector.setSessionValue("Race Engineer Session Info", "")
+					this.Connector.setSessionValue("Race Strategist Session Info", "")
+					this.Connector.setSessionValue("Race Spotter Session Info", "")
 				}
 				catch Any as exception {
 					logError(exception)

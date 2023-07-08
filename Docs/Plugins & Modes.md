@@ -2,7 +2,7 @@ The distribution of Simulator Controller includes a set of predefined plugins, w
 
 | Plugin | Description |
 | ------ | ------ |
-| [System](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-system) | Handles multiple Button Box layers and manages all applications configured for your simulation configuration. This plugin defines the "Launch" mode, where applications my be started and stopped from the controller hardware. These applications can be configured using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). |
+| [System](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-system) | Handles multiple Button Box layers and manages all applications configured for your simulation configuration. This plugin defines the "Launch" mode, where applications my be started and stopped from the controller hardware. These applications can be configured using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Beside that, you can define your own custom modes using some scripting magic. |
 | [Button Box](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#button-box-layouts) | Tools for building your own Button Box / Controller visuals. The default implementation of *ButtonBox* implements grid based Button Box layouts, which can be configured using a [graphical layout editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#button-box-layouts). |
 | [Stream Deck](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#stream-deck-layouts) | Tools for connecting one or more Stream Decks as external controller to Simulator Controller. A special Stream Deck plugin is provided, which is able to dynamically display information both as text and/or icon on your Stream Deck. |
 | [Tactile Feedback](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-tactile-feedback) | Fully configurable support for pedal and chassis vibration using [SimHub](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications). Simulator Controller comes with a set of predefined SimHub profiles, which may help you to connect and manage your vibration motors and chassis shakers. The plugin provides many initialization parameters to adopt to these profiles. Two modes, "Pedal Vibration" and "Chassis Vibration", are defined, which let you control the different vibration effects and intensities directly from your controller. |
@@ -41,12 +41,51 @@ As an alternative, you can use the *launchApplications* parameter to specify the
 The "System" plugin accepts one configuration argument in the [Plugins tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) of the configuration tool, which you almost always will provide:
 
 	modeSelector: *modeSelectorFunction1* *modeSelectorFunction2* ...;
-	launschApplications: *label* *application* *launchFunction1*, ...;
+	launchApplications: *label* *application* *launchFunction1*, ...;
 	shutdown: *shutdownFunction*
 	
 The *modeSelector* parameter allows you to define controller functions that switch between modes on your Button Boxes. The *modeSelectorFunctionX* must be in the descriptor format, i.e. *"functionType*.*number*". You can use binary functions, such as 2-way toggle switches or dials, to switch forward and backward between modes, but a simple push button can also be used. Example: "modeSelector: 2WayToggle.1". If you have multiple Button Boxes, you may want to create a mode selector for each one, especially, if you have defined modes, whose actions are exclusive for one of those Button Boxes. Doing this, you can have mutiple modes active on the same time on your Button Boxes and you can switch between those modes on each of those Button Boxes separately. An example: You may bind all action for controlling the ["Motion" mode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-motion) to one Button Box and all actions for the ["Pitstop" mode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-pitstop-1) to a different Button Box. In this configuration, both modes can be active at the same time.
 
 The parameter *launchApplications* allows you to specify a list of applications that you want to start and stop from your Button Box. *label* will be used as the display name and *application* must reference the application as defined in the [applications tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-applications). If the application name or the label contain spaces, you must enclose them in double quotes. With the *shutdown* parameter, a unary function can be supplied to shutdown the complete simulator system. This function will be available in the "Launch" mode.
+
+#### Configuration of custom modes
+
+Beside using all the predefined modes of the various plugins, you can define your own modes using custom functions. First you have to define your own functions using the builtin [controller action functions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions). You do this by creating a custom function like this:
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%204.JPG)
+
+Please consult the [documentation for controller configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-controller) for more information. Please note that when using "Simulator Setup", it is also possible to include custom functions and create custom modes using a configuration patch as described [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#patching-the-configuration).
+
+Hint: You can leave the trigger empty, if you want to use this action function only in a custom mode, since the trigger is defined for this purpose as shown below.
+
+Once you have created all your custom action functions, you can define one or more custom modes using:
+
+	customCommands: *mode1* -> *label* *modeFunction1* *customFunction1*, ... | *mode2* -> ...;
+
+*mode* is the name or label of the mode. After the "->" you can define a comma-separated list of bindings for your controller. *modeFunction* stands for a control on your hardware, like Button.7, whereas *customFunction* (like Custom.7) is one of the custom functions you defined as described above. This command will be shown using the *label* and will always be activated as long as the given mode is selected.
+
+##### Example
+
+We want to define a mode where it is possibe to switch between different [track automations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#track-automations). First you have to define a couple of custom functions like this:
+
+	Custom.18.Call=?Wet Track
+	Custom.18.Call Action=selectTrackAutomation(Wet)
+
+	Custom.19.Call=?Dry Track
+	Custom.19.Call Action=selectTrackAutomation(Dry)
+
+You can do this either in the "Controller" tab of "Simulator Configuration" or, as mentioned,  by using the configuration patch file when using "Simulator Setup". Then add the *customCommands* argument to the parameters of the "System Plugin":
+
+	customCommands: Automation -> Dry Button.1 Custom.19, Wet Button.2 Custom.18
+
+When using "Simulator Setup", add this to the patch file:
+
+	[Add: Plugins]
+	System=; customCommands: Automation -> Dry Button.1 Custom.19, Wet Button.2 Custom.18
+
+Voilà...
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%2015.JPG)
 
 ## Plugin *Tactile Feedback*
 

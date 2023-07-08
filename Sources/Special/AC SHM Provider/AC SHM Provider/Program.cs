@@ -15,7 +15,10 @@ namespace ACSHMProvider {
             else if (args.Length > 0 && args[0].StartsWith("Standings"))
                 provider.ReadStandings();
             else
+            {
                 provider.ReadData();
+                provider.ReadSetup();
+            }
 
             provider.Close();
         }

@@ -107,7 +107,7 @@ namespace SHMConnector {
             else if (request.StartsWith("Standings"))
                 return this.ReadStandings();
             else
-                return this.ReadData();
+                return this.ReadData() + this.ReadSetup();
         }
 
         public string GetForname(byte[] name) {

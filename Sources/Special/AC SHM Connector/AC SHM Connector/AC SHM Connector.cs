@@ -303,7 +303,7 @@ namespace SHMConnector
 
         public string ReadSetup()
         {
-            return "[Setup Data]";
+            return "[Setup Data]\n";
         }
 
         public string ReadData() {
@@ -441,7 +441,7 @@ namespace SHMConnector
             else if (request.StartsWith("Standings"))
                 return this.ReadStandings();
             else
-                return this.ReadData();
+                return this.ReadData() + this.ReadSetup();
         }
     }
 }

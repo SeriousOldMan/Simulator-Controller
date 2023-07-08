@@ -392,7 +392,7 @@ int main(int argc, char* argv[])
 			printData("SessionLapsRemaining", (gf->iLastTime > 0) ? timeLeft / gf->iLastTime : 99);
 	}
 
-	if (getArgument(request, "Setup") != "")
+	if (strlen(request) == 0 || getArgument(request, "Setup") != "")
 	{
 		wcout << "[Setup Data]" << endl;
 

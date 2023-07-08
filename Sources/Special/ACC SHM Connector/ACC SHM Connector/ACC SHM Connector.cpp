@@ -392,7 +392,7 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 			printData(&output, "SessionLapsRemaining", (gf->iLastTime > 0) ? timeLeft / gf->iLastTime : 99);
 	}
 	
-	if (getArgument(request, "Setup") != "")
+	if (strlen(request) == 0 || getArgument(request, "Setup") != "")
 	{
 		output << "[Setup Data]" << endl;
 

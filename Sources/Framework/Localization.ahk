@@ -233,8 +233,12 @@ displayTimeValue(time, fillHours := false, withSeconds := true, withFractions :=
 			hours := (Format("{1:02}", hours) . ":")
 			minutes := Format("{1:02}", minutes)
 		}
+		else if (hours > 0) {
+			hours := (hours . ":")
+			minutes := Format("{1:02}", minutes)
+		}
 		else
-			hours := ((hours > 0) ? (hours . ":") : "")
+			hours := ""
 
 		return ((sign ? "-" : "") . (hours . minutes . (withSeconds ? (":" . seconds . (withFractions ? (((gTimeFormat = "[H:]M:S.##") ? "." : ",") . fraction) : "")) : "")))
 	}

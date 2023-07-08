@@ -851,7 +851,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		if this.Active {
 			teamServer := this.TeamServer
 
-			if (teamServer && teamServer.TeamServerActive && (A_TickCount > this.iNextSessionUpdate))
+			if (teamServer && teamServer.SessionActive && this.TeamSessionActive && (A_TickCount > this.iNextSessionUpdate))
 				try {
 					this.iNextSessionUpdate := (A_TickCount + 30000)
 
@@ -864,8 +864,6 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 									throw "Cannot delete file..."
 
 								FileAppend(state, kTempDirectory . this.Plugin . " Session.state")
-
-								teamServer.setSessionValue(this.Plugin . " Session Info", "")
 
 								break
 							}
@@ -1618,6 +1616,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	startSession(settings, data) {
+		local teamServer := this.TeamServer
 		local code, assistant, settingsFile, dataFile
 
 		if this.Simulator {
@@ -1633,6 +1632,9 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				this.finishSession(false, false)
 			else
 				this.requireRaceAssistant()
+
+			if (teamServer && teamServer.SessionActive && this.TeamSessionActive)
+				teamServer.setSessionValue(this.Plugin . " Session Info", "")
 
 			if this.RaceAssistant {
 				settingsFile := (kTempDirectory . this.Plugin . ".settings")
@@ -1652,6 +1654,11 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	finishSession(finalize := true, shutdown := true) {
+		local teamServer := this.TeamServer
+
+		if (teamServer && teamServer.SessionActive && this.TeamSessionActive)
+			teamServer.setSessionValue(this.Plugin . " Session Info", "")
+
 		if this.RaceAssistant {
 			this.RaceAssistant.finishSession(finalize)
 

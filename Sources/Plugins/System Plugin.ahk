@@ -29,7 +29,7 @@ global kCustomMode := "Custom"
 class SystemPlugin extends ControllerPlugin {
 	iChildProcess := false
 	iLaunchMode := false
-	iCostumMode := false
+	iCustomMode := false
 	iMouseClicked := false
 	iStartupSongIsPlaying := false
 	iRunnableApplications := []
@@ -117,7 +117,7 @@ class SystemPlugin extends ControllerPlugin {
 		__New(plugin, mode := kCustomMode) {
 			this.iMode := mode
 
-			super.__New(this)
+			super.__New(plugin)
 		}
 	}
 
@@ -205,6 +205,7 @@ class SystemPlugin extends ControllerPlugin {
 		}
 
 		fireAction(function, trigger) {
+			function.Controller.fireActions(this.CustomFunction, "Call")
 		}
 	}
 
@@ -277,7 +278,7 @@ class SystemPlugin extends ControllerPlugin {
 
 			if InStr(commands, "->") {
 				for mode, modeCommands in string2Map("|", "->", commands) {
-					this.iCustomMode := CustomMode(this, mode)
+					this.iCustomMode := SystemPlugin.CustomMode(this, mode)
 
 					for ignore, arguments in string2Values(",", modeCommands)
 						this.createCustomAction(controller, this.parseValues(A_Space, arguments)*)
@@ -399,7 +400,7 @@ class SystemPlugin extends ControllerPlugin {
 
 		if !function
 			this.logFunctionNotFound(descriptor)
-		else if !customFunction
+		else if (!customFunction || !isInstance(customFunction, ControllerCustomFunction))
 			this.logFunctionNotFound(customDescriptor)
 		else {
 			action := SystemPlugin.CustomAction(function, label, this.getIcon("Custom.Activate"), customFunction)
@@ -407,7 +408,7 @@ class SystemPlugin extends ControllerPlugin {
 			if !this.iCustomMode
 				this.iCustomMode := SystemPlugin.CustomMode(this)
 
-			this.iCostumMode.registerAction(action)
+			this.iCustomMode.registerAction(action)
 		}
 	}
 

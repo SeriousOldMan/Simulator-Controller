@@ -660,7 +660,12 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	getActions(function, trigger) {
-		return (this.iFunctionActions.Has(function) ? this.iFunctionActions[function] : [])
+		if this.iFunctionActions.Has(function)
+			return this.iFunctionActions[function]
+		else if isInstance(function, ControllerCustomFunction)
+			return Array(function.Actions[trigger])
+		else
+			return []
 	}
 
 	getLogo() {
@@ -998,17 +1003,27 @@ class SimulatorController extends ConfigurationItem {
 	fireActions(function, trigger) {
 		local ignore, action
 
-		for ignore, action in this.getActions(function, trigger)
-			if function.Enabled[action]
-				if (action != false) {
-					this.updateLastEvent()
+		if isInstance(function, ControllerCustomFunction) {
+			action := function.Actions[trigger]
 
-					logMessage(kLogInfo, translate("Firing action ") . getLabelForLogMessage(action) . translate(" for ") . function.Descriptor)
+			if action
+				action.Call()
+			else
+				throw "Cannot find action for " . function.Descriptor . "[" . trigger . "] in SimulatorController.fireAction..."
+		}
+		else
+			for ignore, action in this.getActions(function, trigger)
 
-					action.fireAction(function, trigger)
-				}
-				else
-					throw "Cannot find action for " . function.Descriptor . ".trigger " . " in SimulatorController.fireAction..."
+				if function.Enabled[action]
+					if (action != false) {
+						this.updateLastEvent()
+
+						logMessage(kLogInfo, translate("Firing action ") . getLabelForLogMessage(action) . translate(" for ") . function.Descriptor)
+
+						action.fireAction(function, trigger)
+					}
+					else
+						throw "Cannot find action for " . function.Descriptor . "[" . trigger . "] in SimulatorController.fireAction..."
 	}
 
 	setMode(newMode) {

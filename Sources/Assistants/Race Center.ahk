@@ -6868,7 +6868,7 @@ class RaceCenter extends ConfigurationItem {
 			try {
 				state := this.Connector.GetLapValue(this.LastLap.Identifier, "Race Engineer Pitstop Pending")
 
-				if ((!state || (state == "")) && (this.LastLap.Nr > 1))
+				if ((!state || (state == "")) && (this.LastLap.Nr > 1) && this.Laps.Has(this.LastLap.Nr - 1))
 					state := this.Connector.GetLapValue(this.Laps[this.LastLap.Nr - 1].Identifier, "Race Engineer Pitstop Pending")
 
 				if (state && (state != "")) {

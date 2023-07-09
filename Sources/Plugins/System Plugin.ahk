@@ -29,7 +29,6 @@ global kCustomMode := "Custom"
 class SystemPlugin extends ControllerPlugin {
 	iChildProcess := false
 	iLaunchMode := false
-	iCustomMode := false
 	iMouseClicked := false
 	iStartupSongIsPlaying := false
 	iRunnableApplications := []
@@ -274,23 +273,20 @@ class SystemPlugin extends ControllerPlugin {
 			for ignore, arguments in string2Values(",", this.getArgumentValue("launchApplications", ""))
 				this.createLaunchAction(controller, this.parseValues(A_Space, arguments)*)
 
-			commands := this.getArgumentValue("customCommands", "")
+			for ignore, commands in string2Values("|", this.getArgumentValue("customCommands", ""))
+				if InStr(commands, "->") {
+					commands := string2Values("->", commands)
 
-			if InStr(commands, "->") {
-				for mode, modeCommands in string2Map("|", "->", commands) {
-					this.iCustomMode := SystemPlugin.CustomMode(this, mode)
+					mode := SystemPlugin.CustomMode(this, commands[1])
 
-					for ignore, arguments in string2Values(",", modeCommands)
-						this.createCustomAction(controller, this.parseValues(A_Space, arguments)*)
+					for ignore, arguments in string2Values(",", commands[2])
+						this.createCustomAction(controller, mode, this.parseValues(A_Space, arguments)*)
 
-					this.registerMode(this.iCustomMode)
-
-					this.iCustomMode := false
+					this.registerMode(mode)
 				}
-			}
-			else
-				for ignore, arguments in string2Values(",", commands)
-					this.createCustomAction(controller, this.parseValues(A_Space, arguments)*)
+				else
+					for ignore, arguments in string2Values(",", commands)
+						this.createCustomAction(controller, this, this.parseValues(A_Space, arguments)*)
 
 			descriptor := this.getArgumentValue("logo", false)
 
@@ -392,7 +388,7 @@ class SystemPlugin extends ControllerPlugin {
 			logMessage(kLogWarn, translate("Application ") . application . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
 	}
 
-	createCustomAction(controller, label, descriptor, customDescriptor) {
+	createCustomAction(controller, owner, label, descriptor, customDescriptor) {
 		local function, customFunction, action
 
 		function := this.Controller.findFunction(descriptor)
@@ -402,14 +398,8 @@ class SystemPlugin extends ControllerPlugin {
 			this.logFunctionNotFound(descriptor)
 		else if (!customFunction || !isInstance(customFunction, ControllerCustomFunction))
 			this.logFunctionNotFound(customDescriptor)
-		else {
-			action := SystemPlugin.CustomAction(function, label, this.getIcon("Custom.Activate"), customFunction)
-
-			if !this.iCustomMode
-				this.iCustomMode := SystemPlugin.CustomMode(this)
-
-			this.iCustomMode.registerAction(action)
-		}
+		else
+			owner.registerAction(SystemPlugin.CustomAction(function, label, this.getIcon("Custom.Activate"), customFunction))
 	}
 
 	writePluginState(configuration) {
@@ -789,6 +779,22 @@ trigger(hotkeys, method := "Event") {
 
 			logMessage(kLogWarn, substituteVariables(translate("Cannot send command (%hotkey%) - please check the configuration"), {command: theHotkey}))
 		}
+}
+
+mouse(button, x, y, count := 1, window := false) {
+	local curCoordMode := A_CoordModeMouse
+
+	CoordMode("Mouse", window ? "Window" : "Screen")
+
+	try {
+		if (window && WinExist(window))
+			WinActivate(window)
+
+		MouseClick(button, x, y, count)
+	}
+	finally {
+		CoordMode("Mouse", curCoordMode)
+	}
 }
 
 startSimulation(name := false) {

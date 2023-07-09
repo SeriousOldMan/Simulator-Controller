@@ -531,49 +531,49 @@ systemMonitor(command := false, arguments*) {
 			pressures := string2Values(",", getMultiMapValue(sessionState, "Tyres", "Pressures", ""))
 
 			if (pressures.Length = 4) {
-				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Pressures") . "</th><td class=`"td-wdg`" style=`"text-align: right`">"
-					   . displayValue("Float", convertUnit("Pressure", pressures[1])) . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
+				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Pressures") . "</th><td class=`"td-wdg`" style=`"text-align: center`">"
+					   . displayValue("Float", convertUnit("Pressure", pressures[1])) . "</td><td class=`"td-wdg`" style=`"text-align: center`">"
 					   . displayValue("Float", convertUnit("Pressure", pressures[2])) . "</td></tr>")
-				html .= ("<tr><td class=`"td-wdg`" style=`"text-align: right`">"
-					   . displayValue("Float", convertUnit("Pressure", pressures[3])) . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
+				html .= ("<tr><td class=`"td-wdg`" style=`"text-align: center`">"
+					   . displayValue("Float", convertUnit("Pressure", pressures[3])) . "</td><td class=`"td-wdg`" style=`"text-align: center`">"
 					   . displayValue("Float", convertUnit("Pressure", pressures[4])) . "</td></tr>")
 			}
 			else {
-				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Pressures") . "</th><td class=`"td-wdg`" style=`"text-align: right`">"
-					   . "-" . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
+				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Pressures") . "</th><td class=`"td-wdg`" style=`"text-align: center`">"
+					   . "-" . "</td><td class=`"td-wdg`" style=`"text-align: center`">"
 					   . "-" . "</td></tr>")
-				html .= ("<tr><td class=`"td-wdg`" style=`"text-align: right`">"
-					   . "-" . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
+				html .= ("<tr><td class=`"td-wdg`" style=`"text-align: center`">"
+					   . "-" . "</td><td class=`"td-wdg`" style=`"text-align: center`">"
 					   . "-" . "</td></tr>")
 			}
 
 			temperatures := string2Values(",", getMultiMapValue(sessionState, "Tyres", "Temperatures", ""))
 
 			if (temperatures.Length = 4) {
-				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Temperatures") . "</th><td class=`"td-wdg`" style=`"text-align: right`">"
-					   . displayValue("Float", convertUnit("Temperature", temperatures[1])) . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
+				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Temperatures") . "</th><td class=`"td-wdg`" style=`"text-align: center`">"
+					   . displayValue("Float", convertUnit("Temperature", temperatures[1])) . "</td><td class=`"td-wdg`" style=`"text-align: center`">"
 					   . displayValue("Float", convertUnit("Temperature", temperatures[2])) . "</td></tr>")
-				html .= ("<tr><td class=`"td-wdg`" style=`"text-align: right`">"
-					   . displayValue("Float", convertUnit("Temperature", temperatures[3])) . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
+				html .= ("<tr><td class=`"td-wdg`" style=`"text-align: center`">"
+					   . displayValue("Float", convertUnit("Temperature", temperatures[3])) . "</td><td class=`"td-wdg`" style=`"text-align: center`">"
 					   . displayValue("Float", convertUnit("Temperature", temperatures[4])) . "</td></tr>")
 			}
 			else {
-				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Temperatures") . "</th><td class=`"td-wdg`" style=`"text-align: right`">"
-					   . "-" . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
+				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Temperatures") . "</th><td class=`"td-wdg`" style=`"text-align: center`">"
+					   . "-" . "</td><td class=`"td-wdg`" style=`"text-align: center`">"
 					   . "-" . "</td></tr>")
-				html .= ("<tr><td class=`"td-wdg`" style=`"text-align: right`">"
-					   . "-" . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
+				html .= ("<tr><td class=`"td-wdg`" style=`"text-align: center`">"
+					   . "-" . "</td><td class=`"td-wdg`" style=`"text-align: center`">"
 					   . "-" . "</td></tr>")
 			}
 
 			wear := string2Values(",", getMultiMapValue(sessionState, "Tyres", "Wear", ""))
 
 			if (wear.Length = 4) {
-				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Wear") . "</th><td class=`"td-wdg`" style=`"text-align: right`">"
-					   . displayValue("Float", convertUnit("Temperature", wear[1])) . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
+				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Wear") . "</th><td class=`"td-wdg`" style=`"text-align: center`">"
+					   . displayValue("Float", convertUnit("Temperature", wear[1])) . "</td><td class=`"td-wdg`" style=`"text-align: center`">"
 					   . displayValue("Float", convertUnit("Temperature", wear[2])) . "</td></tr>")
-				html .= ("<tr><td class=`"td-wdg`" style=`"text-align: right`">"
-					   . displayValue("Float", convertUnit("Temperature", wear[3])) . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
+				html .= ("<tr><td class=`"td-wdg`" style=`"text-align: center`">"
+					   . displayValue("Float", convertUnit("Temperature", wear[3])) . "</td><td class=`"td-wdg`" style=`"text-align: center`">"
 					   . displayValue("Float", convertUnit("Temperature", wear[4])) . "</td></tr>")
 			}
 		}
@@ -599,30 +599,30 @@ systemMonitor(command := false, arguments*) {
 			temperatures := string2Values(",", getMultiMapValue(sessionState, "Brakes", "Temperatures", ""))
 
 			if (temperatures.Length = 4) {
-				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Temperatures") . "</th><td class=`"td-wdg`" style=`"text-align: right`">"
-					   . displayValue("Float", convertUnit("Temperature", temperatures[1])) . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
+				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Temperatures") . "</th><td class=`"td-wdg`" style=`"text-align: center`">"
+					   . displayValue("Float", convertUnit("Temperature", temperatures[1])) . "</td><td class=`"td-wdg`" style=`"text-align: center`">"
 					   . displayValue("Float", convertUnit("Temperature", temperatures[2])) . "</td></tr>")
-				html .= ("<tr><td class=`"td-wdg`" style=`"text-align: right`">"
-					   . displayValue("Float", convertUnit("Temperature", temperatures[3])) . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
+				html .= ("<tr><td class=`"td-wdg`" style=`"text-align: center`">"
+					   . displayValue("Float", convertUnit("Temperature", temperatures[3])) . "</td><td class=`"td-wdg`" style=`"text-align: center`">"
 					   . displayValue("Float", convertUnit("Temperature", temperatures[4])) . "</td></tr>")
 			}
 			else {
-				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Temperatures") . "</th><td class=`"td-wdg`" style=`"text-align: right`">"
-					   . "-" . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
+				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Temperatures") . "</th><td class=`"td-wdg`" style=`"text-align: center`">"
+					   . "-" . "</td><td class=`"td-wdg`" style=`"text-align: center`">"
 					   . "-" . "</td></tr>")
-				html .= ("<tr><td class=`"td-wdg`" style=`"text-align: right`">"
-					   . "-" . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
+				html .= ("<tr><td class=`"td-wdg`" style=`"text-align: center`">"
+					   . "-" . "</td><td class=`"td-wdg`" style=`"text-align: center`">"
 					   . "-" . "</td></tr>")
 			}
 
 			wear := string2Values(",", getMultiMapValue(sessionState, "Brakes", "Wear", ""))
 
 			if (wear.Length = 4) {
-				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Wear") . "</th><td class=`"td-wdg`" style=`"text-align: right`">"
-					   . displayValue("Float", convertUnit("Temperature", wear[1])) . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
+				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Wear") . "</th><td class=`"td-wdg`" style=`"text-align: center`">"
+					   . displayValue("Float", convertUnit("Temperature", wear[1])) . "</td><td class=`"td-wdg`" style=`"text-align: center`">"
 					   . displayValue("Float", convertUnit("Temperature", wear[2])) . "</td></tr>")
-				html .= ("<tr><td class=`"td-wdg`" style=`"text-align: right`">"
-					   . displayValue("Float", convertUnit("Temperature", wear[3])) . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
+				html .= ("<tr><td class=`"td-wdg`" style=`"text-align: center`">"
+					   . displayValue("Float", convertUnit("Temperature", wear[3])) . "</td><td class=`"td-wdg`" style=`"text-align: center`">"
 					   . displayValue("Float", convertUnit("Temperature", wear[4])) . "</td></tr>")
 			}
 		}

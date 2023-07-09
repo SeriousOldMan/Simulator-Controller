@@ -60,19 +60,16 @@ Hint: You can leave the trigger empty, if you want to use this action function o
 
 Once you have created all your custom action functions, you can define one or more custom modes using:
 
-	customCommands: *mode1* -> *label* *modeFunction1* *customFunction1*, ... | *mode2* -> ...;
+	customCommands: [*mode1* -> *label*] *modeFunction1* *customFunction1*, ... | [*mode2* ->] ...;
 
-*mode* is the name or label of the mode. After the "->" you can define a comma-separated list of bindings for your controller. *modeFunction* stands for a control on your hardware, like Button.7, whereas *customFunction* (like Custom.7) is one of the custom functions you defined as described above. This command will be shown using the *label* and will always be activated as long as the given mode is selected.
+*mode* is the name or label of the mode. After the "->" you can define a comma-separated list of bindings for your controller. *modeFunction* stands for a control on your hardware, like Button.7, whereas *customFunction* (like Custom.7) is one of the custom functions you defined as described above. This command will be shown using the *label* and will always be activated as long as the given mode is selected. When you omit the *mode* and the "->" as indicated above with the square brackets, the actions will be bound to the plugin itsself, thereby being available all the time. 
 
 ##### Example
 
 We want to define a mode where it is possibe to switch between different [track automations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#track-automations). First you have to define a couple of custom functions like this:
 
-	Custom.18.Call=?Wet Track
-	Custom.18.Call Action=selectTrackAutomation(Wet)
-
-	Custom.19.Call=?Dry Track
-	Custom.19.Call Action=selectTrackAutomation(Dry)
+	Custom.18.Call.Action=selectTrackAutomation(Wet)
+	Custom.19.Call.Action=selectTrackAutomation(Dry)
 
 You can do this either in the "Controller" tab of "Simulator Configuration" or, as mentioned,  by using the configuration patch file when using "Simulator Setup". Then add the *customCommands* argument to the parameters of the "System Plugin":
 

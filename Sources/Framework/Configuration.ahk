@@ -522,19 +522,25 @@ class Function extends ConfigurationItem {
 				break
 
 			this.loadFromDescriptor(trigger, hotkeyActions[index++])
-			this.loadFromDescriptor(trigger . " Action", hotkeyActions[index++])
+			this.loadFromDescriptor(trigger . ".Action", hotkeyActions[index++])
 		}
 
 		super.__New(configuration)
 	}
 
 	loadFromConfiguration(configuration) {
-		local functionDescriptor, descriptorValues
+		local functionDescriptor, descriptorValues, trigger
 
 		super.loadFromConfiguration(configuration)
 
 		for functionDescriptor, descriptorValues in getMultiMapValues(configuration, "Controller Functions") {
 			functionDescriptor := ConfigurationItem.splitDescriptor(functionDescriptor)
+
+			if (functionDescriptor.Length = 4) {
+				functionDescriptor[3] := ConfigurationItem.descriptor(functionDescriptor[3], functionDescriptor[4])
+
+				functionDescriptor.RemoveAt(4)
+			}
 
 			if ((functionDescriptor[1] == this.Type) && (functionDescriptor[2] == this.Number))
 				this.loadFromDescriptor(functionDescriptor[3], descriptorValues)
@@ -542,7 +548,12 @@ class Function extends ConfigurationItem {
 	}
 
 	loadFromDescriptor(trigger, value) {
-		if InStr(trigger, " Action") {
+		if InStr(trigger, ".Action") {
+			trigger := SubStr(trigger, 1, StrLen(trigger) - StrLen(".Action"))
+
+			this.iActions[trigger] := this.computeActions(trigger, value)
+		}
+		else if InStr(trigger, " Action") {
 			trigger := SubStr(trigger, 1, StrLen(trigger) - StrLen(" Action"))
 
 			this.iActions[trigger] := this.computeActions(trigger, value)
@@ -559,7 +570,7 @@ class Function extends ConfigurationItem {
 
 		for ignore, trigger in this.Trigger {
 			setMultiMapValue(configuration, "Controller Functions", descriptor . "." . trigger, this.Hotkeys[trigger, true])
-			setMultiMapValue(configuration, "Controller Functions", descriptor . "." . trigger . " Action", this.Actions[trigger, true])
+			setMultiMapValue(configuration, "Controller Functions", descriptor . "." . trigger . ".Action", this.Actions[trigger, true])
 		}
 	}
 

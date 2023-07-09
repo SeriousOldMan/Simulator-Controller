@@ -1492,12 +1492,12 @@ updateCustomCalls(startNumber, endNumber) {
 		customCallIndex := startNumber
 
 		loop {
-			key := ("Custom." . customCallIndex . ".Call")
+			key := ("Custom." . customCallIndex)
 
 			if (getMultiMapValue(userConfiguration, "Controller Functions", key, kUndefined) == kUndefined) {
 				setMultiMapValue(userConfiguration, "Controller Functions", key, getMultiMapValue(bundledConfiguration, "Controller Functions", key))
 
-				key .= " Action"
+				key .= ".Action"
 
 				setMultiMapValue(userConfiguration, "Controller Functions", key, getMultiMapValue(bundledConfiguration, "Controller Functions", key))
 			}

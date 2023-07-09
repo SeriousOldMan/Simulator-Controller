@@ -3,7 +3,7 @@ Version=5.1.1.0-dev
 Target=5.1.1.0-release
 Date=07/07/2023
 Download=
-Changes=Audible feedback in Telemetry Analyzer for handling events, New update frequency setting in Core Settings for team sessions, New support for the configuration of custom controller modes
+Changes=Audible feedback in Telemetry Analyzer for handling events, New update frequency setting in Core Settings for team sessions, New support for the configuration of custom controller modes, New controller action function "mouse"
 [Release]
 Version=5.1.0.0-release
 Date=07/07/2023

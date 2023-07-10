@@ -36,7 +36,6 @@
 #Include "..\Libraries\Task.ahk"
 #Include "..\Libraries\Messages.ahk"
 #Include "..\Libraries\SpeechRecognizer.ahk"
-#Include "..\Plugins\Libraries\SimulatorPlugin.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -1221,7 +1220,7 @@ class SimulatorController extends ConfigurationItem {
 				if (this.isActive(thePlugin)) {
 					modes := []
 
-					if isInstance(thePlugin, SimulatorPlugin) {
+					if isSet(SimulatorPlugin) && isInstance(thePlugin, SimulatorPlugin) {
 						states := []
 
 						for ignore, name in thePlugin.Sessions[true]

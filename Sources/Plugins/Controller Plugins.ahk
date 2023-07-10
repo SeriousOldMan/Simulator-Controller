@@ -8,8 +8,9 @@
 
 #Include "Button Box Plugin.ahk"				; Optional, but should be always first, so that Plugins can adopt to the controller layout
 #Include "Stream Deck Plugin.ahk"				; Optional, but should be always first, so that Plugins can adopt to the controller layout
-#Include "System Plugin.ahk"					; Required, must be loaded before all other ..\Plugins
-#Include "Core Plugin.ahk"						; Required, must be loaded directly after System Plugin
+
+#Include "System Plugin.ahk"					; Required, must be loaded before all other ..\Plugins, but after controller plugins
+#Include "Core Plugin.ahk"						; Optional, but must be loaded directly after System Plugin
 
 #Include "Motion Feedback Plugin.ahk"
 #Include "Tactile Feedback Plugin.ahk"

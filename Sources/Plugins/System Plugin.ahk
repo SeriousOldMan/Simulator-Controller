@@ -321,9 +321,6 @@ class SystemPlugin extends ControllerPlugin {
 			if this.iLaunchMode
 				this.registerMode(this.iLaunchMode)
 
-			if this.iCustomMode
-				this.registerMode(this.iCustomMode)
-
 			if register
 				controller.registerPlugin(this)
 

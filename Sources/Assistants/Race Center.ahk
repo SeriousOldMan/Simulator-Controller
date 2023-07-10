@@ -2281,7 +2281,7 @@ class RaceCenter extends ConfigurationItem {
 			local token, connection, serverURLs, settings, chosen
 
 			if (!silent && GetKeyState("Ctrl", "P")) {
-				window.Opt("+Disabled")
+				window.Block()
 
 				try {
 					token := loginDialog(this.Connector, this.ServerURL, window)
@@ -2295,7 +2295,7 @@ class RaceCenter extends ConfigurationItem {
 						return
 				}
 				finally {
-					window.Opt("-Disabled")
+					window.Unblock()
 				}
 			}
 
@@ -5401,7 +5401,7 @@ class RaceCenter extends ConfigurationItem {
 		}
 
 		if state {
-			this.Window.Opt("+Disabled")
+			this.Window.Block()
 
 			this.WaitViewer.Show()
 		}
@@ -5413,7 +5413,7 @@ class RaceCenter extends ConfigurationItem {
 			try {
 				this.Window.AutoActivate := false
 
-				this.Window.Opt("-Disabled")
+				this.Window.Unblock()
 			}
 			finally {
 				this.Window.AutoActivate := curAutoActivate
@@ -7804,7 +7804,7 @@ class RaceCenter extends ConfigurationItem {
 
 	manageTeam() {
 		manageTeamAsync() {
-			this.Window.Opt("+Disabled")
+			this.Window.Block()
 
 			try {
 				local teamDrivers := manageTeam(this, (this.TeamDrivers.Length = 0) ? removeDuplicates(getValues(this.getPlanDrivers()))
@@ -7839,7 +7839,7 @@ class RaceCenter extends ConfigurationItem {
 				}
 			}
 			finally {
-				this.Window.Opt("-Disabled")
+				this.Window.Unblock()
 			}
 		}
 
@@ -8770,13 +8770,13 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	editOverviewReportSettings() {
-		this.Window.Opt("+Disabled")
+		this.Window.Block()
 
 		try {
 			return this.ReportViewer.editReportSettings("Classes")
 		}
 		finally {
-			this.Window.Opt("-Disabled")
+			this.Window.Unblock()
 		}
 	}
 
@@ -8797,13 +8797,13 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	editDriverReportSettings() {
-		this.Window.Opt("+Disabled")
+		this.Window.Block()
 
 		try {
 			return this.ReportViewer.editReportSettings("Laps", "Drivers", "Classes")
 		}
 		finally {
-			this.Window.Opt("-Disabled")
+			this.Window.Unblock()
 		}
 	}
 
@@ -8816,13 +8816,13 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	editPositionsReportSettings() {
-		this.Window.Opt("+Disabled")
+		this.Window.Block()
 
 		try {
 			return this.ReportViewer.editReportSettings("Laps", "Classes")
 		}
 		finally {
-			this.Window.Opt("-Disabled")
+			this.Window.Unblock()
 		}
 	}
 
@@ -8835,13 +8835,13 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	editLapTimesReportSettings() {
-		this.Window.Opt("+Disabled")
+		this.Window.Block()
 
 		try {
 			return this.ReportViewer.editReportSettings("Laps", "Cars", "Classes")
 		}
 		finally {
-			this.Window.Opt("-Disabled")
+			this.Window.Unblock()
 		}
 	}
 
@@ -8854,13 +8854,13 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	editConsistencyReportSettings() {
-		this.Window.Opt("+Disabled")
+		this.Window.Block()
 
 		try {
 			return this.ReportViewer.editReportSettings("Laps", "Cars", "Classes")
 		}
 		finally {
-			this.Window.Opt("-Disabled")
+			this.Window.Unblock()
 		}
 	}
 
@@ -8873,13 +8873,13 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	editPaceReportSettings() {
-		this.Window.Opt("+Disabled")
+		this.Window.Block()
 
 		try {
 			return this.ReportViewer.editReportSettings("Laps", "Cars", "Classes")
 		}
 		finally {
-			this.Window.Opt("-Disabled")
+			this.Window.Unblock()
 		}
 	}
 
@@ -8892,13 +8892,13 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	editPerformanceReportSettings() {
-		this.Window.Opt("+Disabled")
+		this.Window.Block()
 
 		try {
 			return this.ReportViewer.editReportSettings("Laps", "Cars", "Classes")
 		}
 		finally {
-			this.Window.Opt("-Disabled")
+			this.Window.Unblock()
 		}
 	}
 
@@ -9221,13 +9221,13 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	editPressuresReportSettings() {
-		this.Window.Opt("+Disabled")
+		this.Window.Block()
 
 		try {
 			return this.ReportViewer.editReportSettings("Laps")
 		}
 		finally {
-			this.Window.Opt("-Disabled")
+			this.Window.Unblock()
 		}
 	}
 
@@ -9240,13 +9240,13 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	editBrakesReportSettings() {
-		this.Window.Opt("+Disabled")
+		this.Window.Block()
 
 		try {
 			return this.ReportViewer.editReportSettings("Laps")
 		}
 		finally {
-			this.Window.Opt("-Disabled")
+			this.Window.Unblock()
 		}
 	}
 
@@ -9259,13 +9259,13 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	editTemperaturesReportSettings() {
-		this.Window.Opt("+Disabled")
+		this.Window.Block()
 
 		try {
 			return this.ReportViewer.editReportSettings("Laps")
 		}
 		finally {
-			this.Window.Opt("-Disabled")
+			this.Window.Unblock()
 		}
 	}
 
@@ -9278,13 +9278,13 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	editCustomReportSettings() {
-		this.Window.Opt("+Disabled")
+		this.Window.Block()
 
 		try {
 			return this.ReportViewer.editReportSettings("Laps")
 		}
 		finally {
-			this.Window.Opt("-Disabled")
+			this.Window.Unblock()
 		}
 	}
 

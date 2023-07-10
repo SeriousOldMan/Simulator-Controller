@@ -955,7 +955,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 	editSoundProcessing() {
 		local newSettings
 
-		this.Window.Opt("+Disabled")
+		this.Window.Block()
 
 		try {
 			newSettings := editSoundProcessing(this, this.iSoundProcessingSettings)
@@ -964,7 +964,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 				this.iSoundProcessingSettings := newSettings
 		}
 		finally {
-			this.Window.Opt("-Disabled")
+			this.Window.Unblock()
 		}
 	}
 

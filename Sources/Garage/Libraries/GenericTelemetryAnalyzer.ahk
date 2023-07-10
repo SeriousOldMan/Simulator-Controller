@@ -506,7 +506,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 			}
 	}
 	else if (commandOrAnalyzer == "Calibrate") {
-		analyzerGui.Opt("+Disabled")
+		analyzerGui.Block()
 
 		try {
 			calibration := runCalibrator(analyzer, analyzerGui)
@@ -530,7 +530,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 			}
 		}
 		finally {
-			analyzerGui.Opt("-Disabled")
+			analyzerGui.Unblock()
 		}
 	}
 	else if ((commandOrAnalyzer == "Activate") && (state = "Prepare")) {

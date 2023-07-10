@@ -493,6 +493,7 @@ class Window extends Gui {
 	iTitleBarHeight := 0
 
 	iAutoActivate := true
+	iBlockLevel := 0
 	iBlockRedraw := 0
 
 	iCurrentFont := false
@@ -940,6 +941,19 @@ class Window extends Gui {
 
 	static DefineCustomControl(type, constructor) {
 		Window.sCustomControlTypes[type] := constructor
+	}
+
+	Block() {
+		if (this.iBlockLevel++ = 0)
+			this.Opt("+Disabled")
+	}
+
+	Unblock() {
+		if (--this.iBlockLevel <= 0) {
+			this.iBlockLevel := 0
+
+			this.Opt("-Disabled")
+		}
 	}
 
 	Opt(options) {

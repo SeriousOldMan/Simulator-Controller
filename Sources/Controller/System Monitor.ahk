@@ -344,7 +344,7 @@ systemMonitor(command := false, arguments*) {
 	modifySettings(systemMonitorGui, *) {
 		local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-		systemMonitorGui.Opt("+Disabled")
+		systemMonitorGui.Block()
 
 		try {
 			if editSettings(settings, infoWidgets, systemMonitorGui) {
@@ -362,7 +362,7 @@ systemMonitor(command := false, arguments*) {
 			}
 		}
 		finally {
-			systemMonitorGui.Opt("-Disabled")
+			systemMonitorGui.Unblock()
 		}
 	}
 

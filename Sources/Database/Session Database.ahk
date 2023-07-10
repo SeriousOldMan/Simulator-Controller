@@ -344,13 +344,13 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 
 		showSettings(*) {
-			editorGui.Opt("+Disabled")
+			editorGui.Block()
 
 			try {
 				editSettings(editor, editorGui)
 			}
 			finally {
-				editorGui.Opt("-Disabled")
+				editorGui.Unblock()
 			}
 		}
 
@@ -1047,7 +1047,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					info := readMultiMap(folder . "\Export.info")
 
 					if (getMultiMapValue(info, "General", "Simulator") = editor.SelectedSimulator) {
-						editorGui.Opt("+Disabled")
+						editorGui.Block()
 
 						try {
 							selection := selectImportData(editor, folder, editorGui)
@@ -1056,7 +1056,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 								editor.importData(folder, selection)
 						}
 						finally {
-							editorGui.Opt("-Disabled")
+							editorGui.Unblock()
 						}
 					}
 					else {
@@ -2727,7 +2727,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		progressWindow := showProgress({color: "Green", title: translate("Deleting Data")})
 
 		progressWindow.Opt("+Owner" . window.Hwnd)
-		window.Opt("+Disabled")
+		window.Block()
 
 		try {
 			simulator := this.SelectedSimulator
@@ -2816,7 +2816,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			}
 		}
 		finally {
-			window.Opt("-Disabled")
+			window.Unblock()
 
 			hideProgress()
 		}
@@ -2834,7 +2834,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		directory := normalizeDirectoryPath(directory)
 
 		progressWindow.Opt("+Owner" . window.Hwnd)
-		window.Opt("+Disabled")
+		window.Block()
 
 		try {
 			simulator := this.SelectedSimulator
@@ -2985,7 +2985,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			logError(exception)
 		}
 		finally {
-			window.Opt("-Disabled")
+			window.Unblock()
 
 			hideProgress()
 		}
@@ -3005,7 +3005,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			progressWindow := showProgress({color: "Green", title: translate("Importing Data")})
 
 			progressWindow.Opt("+Owner" . window.Hwnd)
-			window.Opt("+Disabled")
+			window.Block()
 
 			schemas := CaseInsenseMap()
 
@@ -3223,7 +3223,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				logError(exception)
 			}
 			finally {
-				window.Opt("-Disabled")
+				window.Unblock()
 
 				hideProgress()
 			}
@@ -3240,7 +3240,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local automations, trackName, setups, ignore, type, extension
 
 		progressWindow.Opt("+Owner" . window.Hwnd)
-		window.Opt("+Disabled")
+		window.Block()
 
 		try {
 			this.AdministrationListView.Delete()
@@ -3356,7 +3356,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			this.updateState()
 		}
 		finally {
-			window.Opt("-Disabled")
+			window.Unblock()
 
 			hideProgress()
 		}
@@ -3784,7 +3784,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local window := this.Window
 		local type, ignore, display
 
-		window.Opt("+Disabled")
+		window.Block()
 
 		try {
 			this.iSettings.Push(Array(section, key))
@@ -3821,7 +3821,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			this.SettingsListView.Redraw()
 		}
 		finally {
-			window.Opt("-Disabled")
+			window.Unblock()
 		}
 	}
 
@@ -3829,7 +3829,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local window := this.Window
 		local selected
 
-		window.Opt("+Disabled")
+		window.Block()
 
 		try {
 			selected := this.SettingsListView.GetNext(0)
@@ -3853,7 +3853,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			this.SettingsListView.Redraw()
 		}
 		finally {
-			window.Opt("-Disabled")
+			window.Unblock()
 		}
 	}
 
@@ -3861,7 +3861,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local window := this.Window
 		local selected, type, ignore, display, settingsDB
 
-		window.Opt("+Disabled")
+		window.Block()
 
 		try {
 			selected := this.SettingsListView.GetNext(0)
@@ -3909,7 +3909,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			this.SettingsListView.Redraw()
 		}
 		finally {
-			window.Opt("-Disabled")
+			window.Unblock()
 		}
 	}
 
@@ -4066,7 +4066,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local window := this.Window
 		local configuration
 
-		window.Opt("+Disabled")
+		window.Block()
 
 		try {
 			if PressuresEditor(this, this.iTyreCompound, this.iTyreCompoundColor
@@ -4075,7 +4075,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				this.selectPressures()
 		}
 		finally {
-			window.Opt("-Disabled")
+			window.Unblock()
 		}
 	}
 
@@ -4900,7 +4900,7 @@ editSettings(editorOrCommand, arguments*) {
 		}
 
 		if GetKeyState("Ctrl", "P") {
-			settingsEditorGui.Opt("+Disabled")
+			settingsEditorGui.Block()
 
 			try {
 				token := loginDialog(connector, serverURLEdit.Text, settingsEditorGui)
@@ -4911,7 +4911,7 @@ editSettings(editorOrCommand, arguments*) {
 					return
 			}
 			finally {
-				settingsEditorGui.Opt("-Disabled")
+				settingsEditorGui.Unblock()
 			}
 		}
 

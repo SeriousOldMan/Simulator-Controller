@@ -45,13 +45,13 @@ class PluginsConfigurator extends ConfigurationItemList {
 		local window := editor.Window
 
 		openActionsEditor(*) {
-			window.Opt("+Disabled")
+			window.Block()
 
 			try {
 				ControllerActionsEditor(kSimulatorConfiguration).editPluginActions(window["pluginEdit"].Text, window)
 			}
 			finally {
-				window.Opt("-Disabled")
+				window.Unblock()
 			}
 		}
 

@@ -398,7 +398,7 @@ class StrategyWorkbench extends ConfigurationItem {
 					OnMessage(0x44, translateYesNoButtons, 0)
 
 					if (msgResult = "Yes") {
-						this.Window.Opt("+Disabled")
+						this.Window.Block()
 
 						try {
 							TelemetryDatabase(workbench.SelectedSimulator , workbench.SelectedCar, workbench.SelectedTrack
@@ -410,7 +410,7 @@ class StrategyWorkbench extends ConfigurationItem {
 							workbench.loadCompound(workbench.AvailableCompounds[workbenchGui["compoundDropDown"].Value], true)
 						}
 						finally {
-							this.Window.Opt("-Disabled")
+							this.Window.Unblock()
 						}
 					}
 				}

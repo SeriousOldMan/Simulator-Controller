@@ -436,7 +436,7 @@ class Task {
 		Task.sCurrentTask := theTask
 
 		if window
-			window.Opt("+Disabled")
+			window.Block()
 
 		try {
 			next := theTask.execute()
@@ -449,14 +449,14 @@ class Task {
 					try {
 						window.AutoActivate := false
 
-						window.Opt("-Disabled")
+						window.Unblock()
 					}
 					finally {
 						window.AutoActivate := curAutoActivate
 					}
 				}
 				else
-					window.Opt("-Disabled")
+					window.Unblock()
 
 			Task.sCurrentTask := oldCurrentTask
 		}

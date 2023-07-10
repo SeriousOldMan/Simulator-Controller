@@ -204,13 +204,13 @@ editModes(&settingsOrCommand, arguments*) {
 
 		modesEditorGui.Opt("+Owner" . arguments[1].Hwnd)
 
-		arguments[1].Opt("+Disabled")
+		arguments[1].Block()
 
 		loop
 			Sleep(200)
 		until result
 
-		arguments[1].Opt("-Disabled")
+		arguments[1].Unblock()
 		arguments[1].Show("NoActivate")
 
 		if (result == kSave)

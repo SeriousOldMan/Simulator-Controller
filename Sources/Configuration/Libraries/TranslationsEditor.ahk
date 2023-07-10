@@ -516,13 +516,13 @@ class TranslationsList extends ConfigurationItemList {
 					translations[original] := translated
 				}
 
-				this.Window.Opt("+Disabled")
+				this.Window.Block()
 
 				try {
 					writeTranslations(this.iLanguageCode , this.Control["languageNameEdit"].Text, translations)
 				}
 				finally {
-					this.Window.Opt("-Disabled")
+					this.Window.Unblock()
 				}
 
 				return true

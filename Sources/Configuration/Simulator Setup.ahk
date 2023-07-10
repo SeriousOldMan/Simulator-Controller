@@ -873,7 +873,7 @@ class SetupWizard extends ConfiguratorPanel {
 
 			window := this.WizardWindow
 
-			window.Opt("+Disabled")
+			window.Block()
 
 			this.Control["firstPageButton"].Enabled := false
 			this.Control["previousPageButton"].Enabled := false
@@ -1079,7 +1079,7 @@ class SetupWizard extends ConfiguratorPanel {
 		local change := (step != this.Step)
 		local oldPageSwitch
 
-		this.WizardWindow.Opt("+Disabled")
+		this.WizardWindow.Block()
 
 		this.Control["firstPageButton"].Enabled := false
 		this.Control["previousPageButton"].Enabled := false
@@ -1248,7 +1248,7 @@ class SetupWizard extends ConfiguratorPanel {
 			}
 
 			if unlock
-				this.WizardWindow.Opt("-Disabled")
+				this.WizardWindow.Unblock()
 		}
 	}
 
@@ -2719,13 +2719,13 @@ startupSimulatorSetup() {
 openLabelsAndIconsEditor(*) {
 	local window := SetupWizard.Instance.WizardWindow
 
-	window.Opt("+Disabled")
+	window.Block()
 
 	try {
 		ControllerActionsEditor(kSimulatorConfiguration).editPluginActions(false, window)
 	}
 	finally {
-		window.Opt("-Disabled")
+		window.Unblock()
 	}
 }
 

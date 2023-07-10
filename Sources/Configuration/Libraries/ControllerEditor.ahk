@@ -330,13 +330,13 @@ class ControllerEditor extends ConfiguratorPanel {
 	openControllerActionsEditor() {
 		local window := this.Window
 
-		window.Opt("+Disabled")
+		window.Block()
 
 		try {
 			ControllerActionsEditor(kSimulatorConfiguration).editPluginActions(false, window)
 		}
 		finally {
-			window.Opt("-Disabled")
+			window.Unblock()
 		}
 	}
 
@@ -1203,13 +1203,13 @@ class LayoutsList extends ConfigurationItemList {
 		setMultiMapValues(configuration, "Icons", this.iIconDefinitions)
 		setMultiMapValues(configuration, "Buttons", this.iButtonDefinitions)
 
-		window.Opt("+Disabled")
+		window.Block()
 
 		try {
 			result := (DisplayRulesEditor(name, configuration)).editDisplayRules(window)
 		}
 		finally {
-			window.Opt("-Disabled")
+			window.Unblock()
 		}
 
 		if result {

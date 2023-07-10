@@ -411,7 +411,7 @@ launchPad(command := false, arguments*) {
 		local settings := readMultiMap(kSimulatorSettingsFile)
 		local restart := false
 
-		launchPadGui.Opt("+Disabled")
+		launchPadGui.Block()
 
 		try {
 			if (editSettings(&settings) == kSave) {
@@ -421,7 +421,7 @@ launchPad(command := false, arguments*) {
 			}
 		}
 		finally {
-			launchPadGui.Opt("-Disabled")
+			launchPadGui.Unblock()
 		}
 
 		if restart

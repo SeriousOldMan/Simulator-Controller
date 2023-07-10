@@ -529,13 +529,13 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 		if !this.Initialized {
 			this.iInitialized := true
 
-			this.Window.Opt("+Disabled")
+			this.Window.Block()
 
 			try {
 				this.connect(true, true)
 			}
 			finally {
-				this.Window.Opt("-Disabled")
+				this.Window.Unblock()
 			}
 		}
 	}
@@ -917,13 +917,13 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 	}
 
 	deleteTeam(name) {
-		this.Window.Opt("+Disabled")
+		this.Window.Block()
 
 		try {
 			this.Connector.DeleteTeam(this.Teams[name])
 		}
 		finally {
-			this.Window.Opt("-Disabled")
+			this.Window.Unblock()
 		}
 
 		this.loadTeams()
@@ -983,13 +983,13 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 	}
 
 	deleteDriver(name) {
-		this.Window.Opt("+Disabled")
+		this.Window.Block()
 
 		try {
 			this.Connector.DeleteDriver(this.Drivers[name])
 		}
 		finally {
-			this.Window.Opt("-Disabled")
+			this.Window.Unblock()
 		}
 
 		this.loadDrivers()
@@ -1015,13 +1015,13 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 	}
 
 	deleteSession(name) {
-		this.Window.Opt("+Disabled")
+		this.Window.Block()
 
 		try {
 			this.Connector.DeleteSession(this.Sessions[name])
 		}
 		finally {
-			this.Window.Opt("-Disabled")
+			this.Window.Unblock()
 		}
 
 		this.loadSessions()

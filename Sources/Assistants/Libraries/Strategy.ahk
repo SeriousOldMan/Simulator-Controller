@@ -774,7 +774,7 @@ class StrategySimulation {
 			if window {
 				progressWindow.Opt("+Owner" . window.Hwnd)
 
-				window.Opt("+Disabled")
+				window.Block()
 			}
 		}
 
@@ -845,7 +845,7 @@ class StrategySimulation {
 				hideProgress()
 
 				if window
-					window.Opt("-Disabled")
+					window.Unblock()
 			}
 		}
 	}

@@ -1,7 +1,7 @@
 [Development]
 Version=5.1.1.0-dev
 Target=5.1.1.0-release
-Date=07/09/2023
+Date=07/10/2023
 Download=
 Changes=Audible feedback in Telemetry Analyzer for handling events, New update frequency setting in Core Settings for team sessions, New support for the configuration of custom controller modes, Fixed regression in "Race Center" for the button which opens the pitstop settings info window, New controller action function "mouse"
 [Release]

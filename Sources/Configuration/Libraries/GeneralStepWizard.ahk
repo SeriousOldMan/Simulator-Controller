@@ -721,7 +721,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		local configuration := readMultiMap(kUserHomeDirectory . "Setup\Formats Configuration.ini")
 		local editor := FormatsEditor(configuration)
 
-		window.Opt("+Disabled")
+		window.Block()
 
 		try {
 			configuration := editor.editFormats(window)
@@ -730,7 +730,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 				writeMultiMap(kUserHomeDirectory . "Setup\Formats Configuration.ini", configuration)
 		}
 		finally {
-			window.Opt("-Disabled")
+			window.Unblock()
 		}
 	}
 }

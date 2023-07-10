@@ -244,7 +244,7 @@ class ControllerList extends ConfigurationItemList {
 		local window := this.Window
 		local choices, layout
 
-		window.Opt("+Disabled")
+		window.Block()
 
 		try {
 			layout := this.Control["controllerLayoutDropDown"].Text
@@ -258,7 +258,7 @@ class ControllerList extends ConfigurationItemList {
 			this.Control["controllerLayoutDropDown"].Choose(inList(choices, layout))
 		}
 		finally {
-			window.Opt("-Disabled")
+			window.Unblock()
 		}
 	}
 }

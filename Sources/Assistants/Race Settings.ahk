@@ -762,7 +762,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		if connector {
 			if GetKeyState("Ctrl", "P") {
-				settingsGui.Opt("+Disabled")
+				settingsGui.Block()
 
 				try {
 					token := loginDialog(connector, serverURL, settingsGui)
@@ -776,7 +776,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 						return
 				}
 				finally {
-					settingsGui.Opt("-Disabled")
+					settingsGui.Unblock()
 				}
 			}
 

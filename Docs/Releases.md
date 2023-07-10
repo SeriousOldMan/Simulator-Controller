@@ -1,3 +1,15 @@
+## 5.1.1.0-release 07/14/23 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. You can now enable an audible feedback for Audible feedback in the Telemetry Analyzer. Whenever a handling event is registered (over- or understeering) a short beep of varying pitch and intensity will give you some feedback. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-telemetry-analyzer) for more information.
+  4. [Experts only] It is now possible to define your own modes and layers for Button Boxes. This allows any function of your sim or other applications on your PC to be triggered by the Button Box, not only the actions supplied by the plugins. Please see the [new documentation](*) for more information.
+  5. A new controller action function "mouse" is available, which allows you to send virtual mouse clicks to any application by a button press on your controller.
+  6. Fixed a regression introduced in the last release, which disabled the pitstop settings preview window in "Race Center".
+  7. A new settings in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration) allows you to set the update frequency for the data transferred to the Team Server in team sessions. The default is an update each 10 seconds and I advise you to only go lower when hosting your own Team Server on a really powerful backend. Going lower on an instance run in the Azure cloud, for example, may stall the server and will increase the running costs at least.
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-511) if you have defined custom controller functions in your "Configuration Patch.ini" file (mostly an experts topic).
+
+
 ## 5.1.0.0-release 07/07/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

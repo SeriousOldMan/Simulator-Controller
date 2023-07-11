@@ -206,12 +206,15 @@ editModes(&settingsOrCommand, arguments*) {
 
 		arguments[1].Block()
 
-		loop
-			Sleep(200)
-		until result
-
-		arguments[1].Unblock()
-		arguments[1].Show("NoActivate")
+		try {
+			loop
+				Sleep(200)
+			until result
+		}
+		finally {
+			arguments[1].Unblock()
+			arguments[1].Show("NoActivate")
+		}
 
 		if (result == kSave)
 			settingsOrCommand := newSettings

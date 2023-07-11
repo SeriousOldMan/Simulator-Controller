@@ -28,7 +28,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   14. A new documentation chapter describes the process of [manually locating games and other software](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#locating-simulators-and-applications) during installation.
   15. New car models for "Setup Workbench":
       - Assetto Corsa
-	    - Alfa Romeo 155 V6 TI
+	    - Ferrari SF15-T
 
 ## 5.0.9.1-release 06/30/23
   1. Minor bugfixes, as always

@@ -800,6 +800,11 @@ call(target, method, arguments*) {
 	try {
 		if ((target = "Controller") || (target = "Simulator Controller"))
 			ObjBindMethod(SimulatorController.Instance, method).Call(arguments*)
+		else if InStr(target, ".") {
+			target := ConfigurationItem.splitDescriptor(target)
+
+			ObjBindMethod(SimulatorController.Instance.findMode(target[1], target[2]), method).Call(arguments*)
+		}
 		else
 			ObjBindMethod(SimulatorController.Instance.findPlugin(target), method).Call(arguments*)
 	}

@@ -56,7 +56,7 @@ Beside using all the predefined modes of the various plugins, you can define you
 
 Please consult the [documentation for controller configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-controller) for more information. Please note that when using "Simulator Setup", it is also possible to include custom functions and create custom modes using a configuration patch as described [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#patching-the-configuration).
 
-Hint: You can leave the trigger empty, if you want to use this action function only in a custom mode, since the trigger is defined for this purpose as shown below.
+Hint: You can leave the trigger "Hotkey(s)" empty, if you want to use this action function only in a custom mode, since the trigger is defined for this purpose as shown below.
 
 Once you have created all your custom action functions, you can define one or more custom modes using:
 

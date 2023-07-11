@@ -794,6 +794,24 @@ mouse(button, x, y, count := 1, window := false) {
 	}
 }
 
+call(target, method, arguments*) {
+	local command
+
+	try {
+		if ((target = "Controller") || (target = "Simulator Controller"))
+			ObjBindMethod(SimulatorController.Instance, method).Call(arguments*)
+		else
+			ObjBindMethod(SimulatorController.Instance.findPlugin(target), method).Call(arguments*)
+	}
+	catch Any as exception {
+		logError(exception, true)
+
+		command := ("call(" . values2String(", ", target, method, arguments*) . ")")
+
+		logMessage(kLogWarn, substituteVariables(translate("Cannot execute command (%command%) - please check the configuration"), {command: command}))
+	}
+}
+
 startSimulation(name := false) {
 	local controller := SimulatorController.Instance
 	local simulators

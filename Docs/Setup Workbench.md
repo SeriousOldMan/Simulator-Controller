@@ -26,7 +26,7 @@ Using the "Load..." and "Save..." buttons in the lower left corner of the window
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/Development/Docs/Images/Telemetry%20Analyzer%201.JPG)
 
-In this dialog you can initialize the analyzer for your car and you targeted driving style.
+In this dialog you can initialize the analyzer for your car and your targeted driving style.
 
   1. It is absolutely cruicial, that the steering lock and steering ratio information is correct, since a calculated combination of these values together with the angular velocity are used to detect over- or understeer in a corner.
   

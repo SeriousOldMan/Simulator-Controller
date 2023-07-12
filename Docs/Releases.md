@@ -11,7 +11,8 @@
   10. "Race Reports" will now try to open the recently selected simulator, car and track, if no simulation is currently running.
   11. New plugin parameter "openRaceReports" for the ["Race Strategist"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist), which let you start the race reports browser from your controller hardware.
   12. New controller action function ["openRaceReports"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) which you can use in your custom controller actions.
-  13. New car models for "Setup Workbench":
+  13. Migrated the sources to AHK 2.04
+  14. New car models for "Setup Workbench":
       - Assetto Corsa
 	    - Ford GT40
 

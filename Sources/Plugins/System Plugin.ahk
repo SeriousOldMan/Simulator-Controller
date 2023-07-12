@@ -789,6 +789,9 @@ mouse(button, x, y, count := 1, window := false) {
 
 		MouseClick(button, x, y, count)
 	}
+	catch Any as exception {
+		logError(exception, true)
+	}
 	finally {
 		CoordMode("Mouse", curCoordMode)
 	}

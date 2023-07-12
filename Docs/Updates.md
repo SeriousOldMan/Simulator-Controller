@@ -45,6 +45,8 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 5.1.1
 
+A new controller action function "openRaceReports" has been defined, which might be triggered by an external event source to open the "Race Reports" app. Similar, and a new plugin action "RaceReportsOpen" is available in the "Race Strategist" plugin to open the "Race Reports" from your controller by a press of a button.
+
 [Experts Only] This release introduces a new syntax for controller function configuration items. If you have defined your own controller function in the "Configuration Patch.ini" file, for example
 
 	Custom.1.Call=?Wet Track
@@ -496,7 +498,7 @@ Everything is handled automatically.
 
 ## Release 3.8.8
 
-Everything is handled automatically, but you might want to have a look at new plugin information request action “TIME”, which is available for the Race Assistant plugins (and also as a voice command). 
+Everything is handled automatically, but you might want to have a look at new plugin information request action "TIME", which is available for the Race Assistant plugins (and also as a voice command). 
 
 ***
 
@@ -596,11 +598,11 @@ Nothing to do for this release.
 
 ## Release 3.5.8
 
-Beginning with this release, the Virtual Race Strategist will also be active during a Practice session, but only as a passive observer in order to collect the telemetry data for future strategy development. Using the “Simulator Configuration”, you can [configure when to save this telemetry data for the different simulations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-strategist). More important, a new tool „Strategy Workbench“ is introduced with this release. Although the “Strategy” part of this tool is non-functional yet and documentation is not available as well, it can already be used to analyze the telemetry data. Active “Strategy” development using this tool will be completed step by step with the next releases.
+Beginning with this release, the Virtual Race Strategist will also be active during a Practice session, but only as a passive observer in order to collect the telemetry data for future strategy development. Using the "Simulator Configuration", you can [configure when to save this telemetry data for the different simulations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-strategist). More important, a new tool "Strategy Workbench" is introduced with this release. Although the "Strategy" part of this tool is non-functional yet and documentation is not available as well, it can already be used to analyze the telemetry data. Active "Strategy" development using this tool will be completed step by step with the next releases.
 
-A new controller action function “openStrategyWorkbench” has been defined, which might be triggered by an external event source to open the “Strategy Workbench”. Similar, and a new plugin action “StrategyWorkbenchOpen” is available in several plugins to open the “Strategy Workbench” from your controller by a press of a button.
+A new controller action function "openStrategyWorkbench" has been defined, which might be triggered by an external event source to open the "Strategy Workbench". Similar, and a new plugin action "StrategyWorkbenchOpen" is available in several plugins to open the "Strategy Workbench" from your controller by a press of a button.
 
-The local folder for the *Setup Database* has been renamed from “Setup Database” to “Database” in order to better reflect the future usage, since the telemetry data for the strategy development will be saved there also. Side note for all, who have given consent to share their tyre and/or setup data: Telemetry data will never be shared with the community, so no new consent is necessary.
+The local folder for the *Setup Database* has been renamed from "Setup Database" to "Database" in order to better reflect the future usage, since the telemetry data for the strategy development will be saved there also. Side note for all, who have given consent to share their tyre and/or setup data: Telemetry data will never be shared with the community, so no new consent is necessary.
 
 ***
 

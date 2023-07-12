@@ -534,7 +534,7 @@ launchPad(command := false, arguments*) {
 		removeMultiMapValue(startupConfig, "Simulator", "Car")
 		removeMultiMapValue(startupConfig, "Simulator", "Track")
 
-		writeMultiMapFile(kUserConfigDirectory . "Application Settings.ini", startupConfig)
+		writeMultiMap(kUserConfigDirectory . "Application Settings.ini", startupConfig)
 
 		result := false
 		toolTips := Map()

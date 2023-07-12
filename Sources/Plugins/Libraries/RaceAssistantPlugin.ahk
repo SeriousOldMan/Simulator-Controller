@@ -1070,11 +1070,21 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	static prepareAssistantsSession(data) {
-		local ignore, assistant
+		local first := true
+		local ignore, assistant, settings
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
-			if assistant.requireRaceAssistant()
-				assistant.prepareSession(assistant.prepareSettings(data), data)
+			if assistant.requireRaceAssistant() {
+				settings := assistant.prepareSettings(data)
+
+				assistant.prepareSession(settings, data)
+
+				if first {
+					first := false
+
+					RaceAssistantPlugin.Simulator.prepareSession(settings, data)
+				}
+			}
 	}
 
 	static startAssistantsSession(data) {
@@ -2364,7 +2374,7 @@ openRaceSettings(import := false, silent := false, plugin := false, fileName := 
 	}
 }
 
-openRaceReport(plugin := false) {
+openRaceReports(plugin := false) {
 	local exePath := kBinariesDirectory . "Race Reports.exe"
 	local pid, options
 

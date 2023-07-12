@@ -916,6 +916,8 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		local simulator := getMultiMapValue(data, "Session Data", "Simulator", "Unknown")
 		local car := getMultiMapValue(data, "Session Data", "Car", "Unknown")
 		local track := getMultiMapValue(data, "Session Data", "Track", "Unknown")
+		local tyreCompound := getMultiMapValue(settings, "Session Setup", "Tyre.Compound", "Dry")
+		local tyreCompoundColor := getMultiMapValue(settings, "Session Setup", "Tyre.Compound.Color", "Black")
 
 		static lastSimulator := false
 		static lastCar := false
@@ -928,7 +930,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 			setMultiMapValue(settings, "Simulator", "Car", car)
 			setMultiMapValue(settings, "Simulator", "Track", track)
 
-			writeMultiMapFile(kUserConfigDirectory . "Application Settings.ini", settings)
+			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 
 			SessionDatabase.registerCar(simulator, car, SessionDatabase.getCarName(simulator, car))
 
@@ -942,16 +944,13 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 
 		if ((simulator != lastSimulator) || (car != lastCar) || (track != lastTrack))
 			Task.startTask(registerSimulator.Bind(simulator, car, track), 1000, kLowPriority)
-	}
-
-	startSession(settings, data) {
-		local tyreCompound := getMultiMapValue(settings, "Session Setup", "Tyre.Compound", "Dry")
-		local tyreCompoundColor := getMultiMapValue(settings, "Session Setup", "Tyre.Compound.Color", "Black")
 
 		this.CurrentTyreCompound := compound(tyreCompound, tyreCompoundColor)
 
 		this.updateTyreCompound(data)
+	}
 
+	startSession(settings, data) {
 		this.prepareSession(settings, data)
 	}
 

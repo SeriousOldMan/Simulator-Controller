@@ -369,7 +369,7 @@ closeApplication(application) {
 }
 
 launchPad(command := false, arguments*) {
-	local ignore, application, startupConfig, x, y, settingsButton, name
+	local ignore, application, startupConfig, x, y, settingsButton, name, options
 
 	static result := false
 
@@ -505,8 +505,16 @@ launchPad(command := false, arguments*) {
 
 		if ProcessExist(application)
 			WinActivate("ahk_exe " . application)
-		else
+		else {
+			startupConfig := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+			if (getMultiMapValue(startupConfig, "Simulator", "Simulator", kUndefined) != kUndefined)
+				application .= (" -Simulator `"" . getMultiMapValue(startupConfig, "Simulator", "Simulator") . "`""
+							  . " -Car `"" . getMultiMapValue(startupConfig, "Simulator", "Car") . "`""
+							  . " -Track `"" . getMultiMapValue(startupConfig, "Simulator", "Track") . "`"")
+
 			Run(kBinariesDirectory . application)
+		}
 
 		if ((arguments.Length > 1) && arguments[2])
 			ExitApp(0)
@@ -520,6 +528,14 @@ launchPad(command := false, arguments*) {
 			launchPad(kClose)
 	}
 	else {
+		startupConfig := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+		removeMultiMapValue(startupConfig, "Simulator", "Simulator")
+		removeMultiMapValue(startupConfig, "Simulator", "Car")
+		removeMultiMapValue(startupConfig, "Simulator", "Track")
+
+		writeMultiMapFile(kUserConfigDirectory . "Application Settings.ini", startupConfig)
+
 		result := false
 		toolTips := Map()
 		executables := Map()
@@ -634,8 +650,6 @@ launchPad(command := false, arguments*) {
 		launchPadGui.SetFont("s8 Norm", "Arial")
 
 		launchPadGui.Add("Text", "x8 yp+40 w590 0x10")
-
-		startupConfig := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
 		closeCheckBox := launchPadGui.Add("CheckBox", "x16 yp+10 w120 h23 Checked" . getMultiMapValue(startupConfig, "Simulator Startup", "CloseLaunchPad", false), translate("Close on Startup"))
 		closeCheckBox.OnEvent("Click", closeOnStartup)

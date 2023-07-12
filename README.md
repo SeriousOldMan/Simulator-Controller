@@ -45,7 +45,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[5.1.1.0-dev](https://www.dropbox.com/s/guevjsyd9fqmbek/Simulator%20Controller%205.1.1.0-dev.zip?dl=1) (Early build for 5.1.1.0. Changes: Audible feedback in Telemetry Analyzer for handling events, New update frequency setting in Core Settings for team sessions, New support for the configuration of custom controller modes, Fixed regression in "Race Center" for the button which opens the pitstop settings info window, New controller action function "mouse", New controller action function *call*.)
+[5.1.1.0-dev](https://www.dropbox.com/s/guevjsyd9fqmbek/Simulator%20Controller%205.1.1.0-dev.zip?dl=1) (Early build for 5.1.1.0. Changes: Audible feedback in Telemetry Analyzer for handling events, New update frequency setting in Core Settings for team sessions, New support for the configuration of custom controller modes, Fixed regression in "Race Center" for the button which opens the pitstop settings info window, New controller action function "mouse", New controller action function "call", New car models for "Setup Workbench".)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-511) of this version and all the versions you might have skipped, before installing and using this version.
 

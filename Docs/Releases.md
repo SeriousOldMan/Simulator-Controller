@@ -7,9 +7,11 @@
   6. [Experts only] A new controller action function "call" let's you invoke internal methods for any plugin or the Controller itself.
   7. Fixed a regression introduced in the last release, which disabled the pitstop settings preview window in "Race Center".
   8. A new settings in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration) allows you to set the update frequency for the data transferred to the Team Server in team sessions. The default is an update each 10 seconds and I advise you to only go lower when hosting your own Team Server on a really powerful backend. Going lower on an instance run in the Azure cloud, for example, may stall the server and will increase the running costs at least.
+  9. New car models for "Setup Workbench":
+      - Assetto Corsa
+	    - Ford GT40
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-511) if you have defined custom controller functions in your "Configuration Patch.ini" file (mostly an experts topic).
-
 
 ## 5.1.0.0-release 07/07/23
   1. Minor bugfixes, as always

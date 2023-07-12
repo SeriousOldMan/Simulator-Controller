@@ -114,7 +114,7 @@ global kRCTyresSchemas := kTyresSchemas.Clone()
 
 kRCTyresSchemas["Tyres.Pressures"] := concatenate(kRCTyresSchemas["Tyres.Pressures"].Clone()
 												, ["Tyre.Pressure.Loss.Front.Left", "Tyre.Pressure.Loss.Front.Right"
-												, "Tyre.Pressure.Loss.Rear.Left", "Tyre.Pressure.Loss.Rear.Right"])
+												 , "Tyre.Pressure.Loss.Rear.Left", "Tyre.Pressure.Loss.Rear.Right"])
 
 
 ;;;-------------------------------------------------------------------------;;;

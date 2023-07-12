@@ -9,6 +9,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include "..\..\Libraries\Task.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\..\Database\Libraries\SettingsDatabase.ahk"
 
@@ -463,7 +464,7 @@ class SimulatorPlugin extends ControllerPlugin {
 
 	writePluginState(configuration) {
 		local simulator := this.runningSimulator()
-		local sessionDB, car, track
+		local car, track
 
 		if this.Active {
 			setMultiMapValue(configuration, this.Plugin, "State", simulator ? "Active" : "Passive")
@@ -474,10 +475,8 @@ class SimulatorPlugin extends ControllerPlugin {
 
 					setMultiMapValue(configuration, "Simulation", "Session", this.Session[true])
 
-					sessionDB := SessionDatabase()
-
-					car := sessionDB.getCarName(simulator, this.Car)
-					track := sessionDB.getTrackName(simulator, this.Track)
+					car := SessionDatabase.getCarName(simulator, this.Car)
+					track := SessionDatabase.getTrackName(simulator, this.Track)
 
 					setMultiMapValue(configuration, "Simulation", "Simulator", simulator)
 					setMultiMapValue(configuration, "Simulation", "Car", car)
@@ -918,18 +917,36 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		local car := getMultiMapValue(data, "Session Data", "Car", "Unknown")
 		local track := getMultiMapValue(data, "Session Data", "Track", "Unknown")
 
-		SessionDatabase.registerCar(simulator, car, SessionDatabase.getCarName(simulator, car))
+		static lastSimulator := false
+		static lastCar := false
+		static lastTrack := false
 
-		SessionDatabase.registerTrack(simulator, car, track
-									, SessionDatabase.getTrackName(simulator, track, false), SessionDatabase.getTrackName(simulator, track, true))
+		registerSimulator(simulator, car, track) {
+			local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+			setMultiMapValue(settings, "Simulator", "Simulator", SessionDatabase.getSimulatorName(simulator))
+			setMultiMapValue(settings, "Simulator", "Car", car)
+			setMultiMapValue(settings, "Simulator", "Track", track)
+
+			writeMultiMapFile(kUserConfigDirectory . "Application Settings.ini", settings)
+
+			SessionDatabase.registerCar(simulator, car, SessionDatabase.getCarName(simulator, car))
+
+			SessionDatabase.registerTrack(simulator, car, track
+										, SessionDatabase.getTrackName(simulator, track, false)
+										, SessionDatabase.getTrackName(simulator, track, true))
+		}
+
+		this.Car := car
+		this.Track := track
+
+		if ((simulator != lastSimulator) || (car != lastCar) || (track != lastTrack))
+			Task.startTask(registerSimulator.Bind(simulator, car, track), 1000, kLowPriority)
 	}
 
 	startSession(settings, data) {
 		local tyreCompound := getMultiMapValue(settings, "Session Setup", "Tyre.Compound", "Dry")
 		local tyreCompoundColor := getMultiMapValue(settings, "Session Setup", "Tyre.Compound.Color", "Black")
-
-		this.Car := getMultiMapValue(data, "Session Data", "Car")
-		this.Track := getMultiMapValue(data, "Session Data", "Track")
 
 		this.CurrentTyreCompound := compound(tyreCompound, tyreCompoundColor)
 

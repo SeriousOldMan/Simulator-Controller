@@ -248,6 +248,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				openRaceSettings(true, false, this.Plugin)
 			else if (this.Action = "RaceCenterOpen")
 				openRaceCenter(this.Plugin)
+			else if (this.Action = "RaceReportsOpen")
+				openRaceReports(this.Plugin)
 			else if (this.Action = "SessionDatabaseOpen")
 				openSessionDatabase(this.Plugin)
 			else if (this.Action = "SetupWorkbenchOpen")
@@ -665,7 +667,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 	__New(controller, name, configuration := false, register := true) {
 		local teamServer, raceAssistantToggle, teamServerToggle, arguments, ignore, theAction
-		local openRaceSettings, openSessionDatabase, openSetupWorkbench, openRaceCenter, openStrategyWorkbench, importSetup
+		local openRaceSettings, openRaceReports, openSessionDatabase, openSetupWorkbench, openRaceCenter, openStrategyWorkbench, importSetup
 		local assistantSpeaker, assistantListener, first
 
 		super.__New(controller, name, configuration, register)
@@ -736,6 +738,11 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 			if importSetup
 				this.createRaceAssistantAction(controller, "SetupImport", importSetup)
+
+			openRaceReports := this.getArgumentValue("openRaceReports", false)
+
+			if openRaceReports
+				this.createRaceAssistantAction(controller, "RaceReportsOpen", openRaceReports)
 
 			openSessionDatabase := this.getArgumentValue("openSessionDatabase", false)
 
@@ -831,7 +838,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				this.registerAction(RaceAssistantPlugin.TeamServerToggleAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor)))
 			}
 			else if ((action = "RaceSettingsOpen") || (action = "SetupImport")
-				  || (action = "SessionDatabaseOpen") || (action = "SetupWorkbenchOpen")
+				  || (action = "RaceReportsOpen") || (action = "SessionDatabaseOpen") || (action = "SetupWorkbenchOpen")
 				  || (action = "StrategyWorkbenchOpen") || (action = "RaceCenterOpen")) {
 				descriptor := ConfigurationItem.descriptor(action, "Activate")
 
@@ -1375,8 +1382,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				}
 			}
 			else if isInstance(theAction, RaceAssistantPlugin.RaceSettingsAction) {
-				if ((theAction.Action = "RaceSettingsOpen") || (theAction.Action = "SessionDatabaseOpen")
-				 || (theAction.Action = "SetupWorkbenchOpen")
+				if ((theAction.Action = "RaceSettingsOpen") || (theAction.Action = "RaceReportsOpen")
+				 || (theAction.Action = "SessionDatabaseOpen") || (theAction.Action = "SetupWorkbenchOpen")
 				 || (theAction.Action = "StrategyWorkbenchOpen")|| (theAction.Action = "RaceCenterOpen")) {
 					theAction.Function.enable(kAllTrigger, theAction)
 					theAction.Function.setLabel(theAction.Label)
@@ -2353,6 +2360,25 @@ openRaceSettings(import := false, silent := false, plugin := false, fileName := 
 		logMessage(kLogCritical, translate("Cannot start the Race Settings tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
 
 		showMessage(substituteVariables(translate("Cannot start the Race Settings tool (%exePath%) - please check the configuration..."), {exePath: exePath})
+				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+	}
+}
+
+openRaceReport(plugin := false) {
+	local exePath := kBinariesDirectory . "Race Reports.exe"
+	local pid, options
+
+	try {
+		options := getSimulatorOptions(plugin)
+
+		Run("`"" . exePath . "`" " . options, kBinariesDirectory, , &pid)
+	}
+	catch Any as exception {
+		logError(exception, true)
+
+		logMessage(kLogCritical, translate("Cannot start the Race Reports tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
+
+		showMessage(substituteVariables(translate("Cannot start the Race Reports tool (%exePath%) - please check the configuration..."), {exePath: exePath})
 				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 	}
 }

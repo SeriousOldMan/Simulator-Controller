@@ -747,7 +747,7 @@ class SetupWizard extends ConfiguratorPanel {
 	show(reset := false) {
 		local wizardWindow := this.WizardWindow
 		local helpWindow := this.HelpWindow
-		local x, y, w, h, posX, settings
+		local x, y, w, h, posX
 
 		if getWindowPosition("Simulator Setup.Help", &x, &y)
 			helpWindow.Show("x" . x . " y" . y)
@@ -778,9 +778,7 @@ class SetupWizard extends ConfiguratorPanel {
 		else
 			this.nextPage()
 
-		settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-		loop getMultiMapValue(settings, "Simulator Setup", "StartPage", 0)
+		loop getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini"), "Simulator Setup", "StartPage", 0)
 			this.nextPage()
 	}
 

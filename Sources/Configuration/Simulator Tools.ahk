@@ -936,6 +936,7 @@ writeAppPaths(installLocation) {
 	RegWrite(installLocation . "\Binaries\Session Database.exe", "REG_SZ", "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SessionDatabase.exe")
 	RegWrite(installLocation . "\Binaries\Race Reports.exe", "REG_SZ", "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceReports.exe")
 	RegWrite(installLocation . "\Binaries\Strategy Workbench.exe", "REG_SZ", "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\StrategyWorkbench.exe")
+	RegWrite(installLocation . "\Binaries\Practice Center.exe", "REG_SZ", "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\PracticeCenter.exe")
 	RegWrite(installLocation . "\Binaries\Race Center.exe", "REG_SZ", "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceCenter.exe")
 	RegWrite(installLocation . "\Binaries\Server Administration.exe", "REG_SZ", "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\ServerAdministration.exe")
 	RegWrite(installLocation . "\Binaries\SetupWorkbench.exe", "REG_SZ", "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupWorkbench.exe")
@@ -960,6 +961,7 @@ deleteAppPaths() {
 	deleteRegEntry("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SessionDatabase.exe")
 	deleteRegEntry("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceReports.exe")
 	deleteRegEntry("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\StrategyWorkbench.exe")
+	deleteRegEntry("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\PracticeCenter.exe")
 	deleteRegEntry("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceCenter.exe")
 	deleteRegEntry("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\ServerAdministration.exe")
 	deleteRegEntry("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupWorkbench.exe")
@@ -1567,6 +1569,7 @@ updateInstallationForV398() {
 	if (getMultiMapValue(installInfo, "Install", "Type", false) = "Registry") {
 		try {
 			RegWrite(installLocation . "\Binaries\Session Database.exe", "REG_SZ", "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SessionDatabase.exe")
+			RegWrite(installLocation . "\Binaries\Practice Center.exe", "REG_SZ", "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\PracticeCenter.exe")
 			RegWrite(installLocation . "\Binaries\Race Center.exe", "REG_SZ", "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceCenter.exe")
 			RegWrite(installLocation . "\Binaries\Server Administration.exe", "REG_SZ", "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\ServerAdministration.exe")
 			RegWrite(installLocation . "\Binaries\Setup Workbench.exe", "REG_SZ", "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupWorkbench.exe")

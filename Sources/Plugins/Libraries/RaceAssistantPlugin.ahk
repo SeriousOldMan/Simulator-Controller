@@ -246,6 +246,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				openRaceSettings(false, false, this.Plugin)
 			else if (this.Action = "SetupImport")
 				openRaceSettings(true, false, this.Plugin)
+			else if (this.Action = "PracticeCenterOpen")
+				openPracticeCenter(this.Plugin)
 			else if (this.Action = "RaceCenterOpen")
 				openRaceCenter(this.Plugin)
 			else if (this.Action = "RaceReportsOpen")
@@ -667,7 +669,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 	__New(controller, name, configuration := false, register := true) {
 		local teamServer, raceAssistantToggle, teamServerToggle, arguments, ignore, theAction
-		local openRaceSettings, openRaceReports, openSessionDatabase, openSetupWorkbench, openRaceCenter, openStrategyWorkbench, importSetup
+		local openRaceSettings, openRaceReports, openSessionDatabase, openSetupWorkbench
+		local openPracticeCenter, openRaceCenter, openStrategyWorkbench, importSetup
 		local assistantSpeaker, assistantListener, first
 
 		super.__New(controller, name, configuration, register)
@@ -759,6 +762,11 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			if openStrategyWorkbench
 				this.createRaceAssistantAction(controller, "StrategyWorkbenchOpen", openStrategyWorkbench)
 
+			openPracticeCenter := this.getArgumentValue("openPracticeCenter", false)
+
+			if openPracticeCenter
+				this.createRaceAssistantAction(controller, "PracticeCenterOpen", openPracticeCenter)
+
 			openRaceCenter := this.getArgumentValue("openRaceCenter", false)
 
 			if openRaceCenter
@@ -839,7 +847,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			}
 			else if ((action = "RaceSettingsOpen") || (action = "SetupImport")
 				  || (action = "RaceReportsOpen") || (action = "SessionDatabaseOpen") || (action = "SetupWorkbenchOpen")
-				  || (action = "StrategyWorkbenchOpen") || (action = "RaceCenterOpen")) {
+				  || (action = "StrategyWorkbenchOpen") || (action = "PracticeCenterOpen") || (action = "RaceCenterOpen")) {
 				descriptor := ConfigurationItem.descriptor(action, "Activate")
 
 				this.registerAction(RaceAssistantPlugin.RaceSettingsAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor), action))
@@ -1394,7 +1402,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			else if isInstance(theAction, RaceAssistantPlugin.RaceSettingsAction) {
 				if ((theAction.Action = "RaceSettingsOpen") || (theAction.Action = "RaceReportsOpen")
 				 || (theAction.Action = "SessionDatabaseOpen") || (theAction.Action = "SetupWorkbenchOpen")
-				 || (theAction.Action = "StrategyWorkbenchOpen")|| (theAction.Action = "RaceCenterOpen")) {
+				 || (theAction.Action = "StrategyWorkbenchOpen") || (theAction.Action = "PracticeCenterOpen")
+				 || (theAction.Action = "RaceCenterOpen")) {
 					theAction.Function.enable(kAllTrigger, theAction)
 					theAction.Function.setLabel(theAction.Label)
 				}
@@ -2446,6 +2455,25 @@ openStrategyWorkbench(plugin := false) {
 		logMessage(kLogCritical, translate("Cannot start the Strategy Workbench tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
 
 		showMessage(substituteVariables(translate("Cannot start the Strategy Workbench tool (%exePath%) - please check the configuration..."), {exePath: exePath})
+				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+	}
+}
+
+openPracticeCenter(plugin := false) {
+	local exePath := kBinariesDirectory . "Practice Center.exe"
+	local options
+
+	try {
+		options := getSimulatorOptions(plugin)
+
+		Run("`"" . exePath . "`" " . options, kBinariesDirectory)
+	}
+	catch Any as exception {
+		logError(exception, true)
+
+		logMessage(kLogCritical, translate("Cannot start the Practice Center tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
+
+		showMessage(substituteVariables(translate("Cannot start the Practice Center tool (%exePath%) - please check the configuration..."), {exePath: exePath})
 				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 	}
 }

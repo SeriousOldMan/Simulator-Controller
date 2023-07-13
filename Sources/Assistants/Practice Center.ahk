@@ -133,16 +133,16 @@ class PracticeCenterTask extends Task {
 	}
 
 	run() {
-		local rCenter := PracticeCenter.Instance
+		local pCenter := PracticeCenter.Instance
 
-		if rCenter.startWorking() {
+		if pCenter.startWorking() {
 			try {
 				super.run()
 
 				return false
 			}
 			finally {
-				rCenter.finishWorking()
+				pCenter.finishWorking()
 			}
 		}
 		else
@@ -568,8 +568,8 @@ class PracticeCenter extends ConfigurationItem {
 			}
 		}
 
-		__New(rCenter) {
-			this.iDatabase := Database(rCenter.SessionDirectory, kRCTyresSchemas)
+		__New(pCenter) {
+			this.iDatabase := Database(pCenter.SessionDirectory, kRCTyresSchemas)
 		}
 
 		updatePressures(weather, airTemperature, trackTemperature, tyreCompound, tyreCompoundColor, coldPressures, hotPressures, pressuresLosses, driver, flush) {
@@ -11838,7 +11838,7 @@ manageTeam(practiceCenterOrCommand, teamDrivers := false, arguments*) {
 }
 
 pitstopSettings(practiceCenterOrCommand := false, arguments*) {
-	static rCenter := false
+	static pCenter := false
 	static isOpen := false
 
 	static settingsGui := false
@@ -11850,8 +11850,8 @@ pitstopSettings(practiceCenterOrCommand := false, arguments*) {
 			settingsListView.Modify(A_Index, "-Select")
 	}
 
-	if !rCenter
-		rCenter := PracticeCenter.Instance
+	if !pCenter
+		pCenter := PracticeCenter.Instance
 
 	try {
 		if (practiceCenterOrCommand = "Visible")
@@ -11876,7 +11876,7 @@ pitstopSettings(practiceCenterOrCommand := false, arguments*) {
 				if arguments[1].Has("TyreCompound")
 					if arguments[1]["TyreCompound"]
 						settingsListView.Add("", translate("Tyre Compound"), compound(arguments[1]["TyreCompound"], arguments[1]["TyreCompoundColor"])
-											   . (inList(["ACC", "Assetto Corsa Competizione"], rCenter.Simulator) ? translate(" (probably)") : ""))
+											   . (inList(["ACC", "Assetto Corsa Competizione"], pCenter.Simulator) ? translate(" (probably)") : ""))
 
 				if arguments[1].Has("TyreSet")
 					if (arguments[1].Has("TyreCompound") && arguments[1]["TyreCompound"])
@@ -11890,7 +11890,7 @@ pitstopSettings(practiceCenterOrCommand := false, arguments*) {
 																								, displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureRR"]))))
 
 				if (arguments[1].Has("RepairBodywork") || arguments[1].Has("RepairSuspension") || arguments[1].Has("RepairEngine"))
-					settingsListView.Add("", translate("Repairs"), rCenter.computeRepairs(arguments[1].Has("RepairBodywork") ? arguments[1]["RepairBodywork"] : false
+					settingsListView.Add("", translate("Repairs"), pCenter.computeRepairs(arguments[1].Has("RepairBodywork") ? arguments[1]["RepairBodywork"] : false
 																						, arguments[1].Has("RepairSuspension") ? arguments[1]["RepairSuspension"] : false
 																						, arguments[1].Has("RepairEngine") ? arguments[1]["RepairEngine"] : false))
 
@@ -12108,18 +12108,18 @@ loadDrivers(connector, team) {
 
 startupPracticeCenter() {
 	local icon := kIconsDirectory . "Practice.ico"
-	local rCenter
+	local pCenter
 
 	TraySetIcon(icon, "1")
 	A_IconTip := "Practice Center"
 
-	rCenter := PracticeCenter(kSimulatorConfiguration, readMultiMap(kUserConfigDirectory . "Race.settings"))
+	pCenter := PracticeCenter(kSimulatorConfiguration, readMultiMap(kUserConfigDirectory . "Race.settings"))
 
-	rCenter.createGui(rCenter.Configuration)
+	pCenter.createGui(pCenter.Configuration)
 
-	rCenter.show()
+	pCenter.show()
 
-	rCenter.connect(true)
+	pCenter.connect(true)
 
 	registerMessageHandler("Setup", functionMessageHandler)
 }
@@ -12130,13 +12130,13 @@ startupPracticeCenter() {
 ;;;-------------------------------------------------------------------------;;;
 
 setTyrePressures(tyreCompound, tyreCompoundColor, flPressure, frPressure, rlPressure, rrPressure) {
-	local rCenter := PracticeCenter.Instance
+	local pCenter := PracticeCenter.Instance
 
-	if (rCenter.iPressuresRequest = "Pitstop")
-		rCenter.withExceptionhandler(ObjBindMethod(rCenter, "initializePitstopTyreSetup", &tyreCompound, &tyreCompoundColor, &flPressure, &frPressure, &rlPressure, &rrPressure))
+	if (pCenter.iPressuresRequest = "Pitstop")
+		pCenter.withExceptionhandler(ObjBindMethod(pCenter, "initializePitstopTyreSetup", &tyreCompound, &tyreCompoundColor, &flPressure, &frPressure, &rlPressure, &rrPressure))
 	else
-		if (rCenter.SetupsListView.GetNext(0) = rCenter.iPressuresRequest)
-			rCenter.withExceptionhandler(ObjBindMethod(rCenter, "initializeSetup", tyreCompound, tyreCompoundColor, flPressure, frPressure, rlPressure, rrPressure))
+		if (pCenter.SetupsListView.GetNext(0) = pCenter.iPressuresRequest)
+			pCenter.withExceptionhandler(ObjBindMethod(pCenter, "initializeSetup", tyreCompound, tyreCompoundColor, flPressure, frPressure, rlPressure, rrPressure))
 
 	return false
 }

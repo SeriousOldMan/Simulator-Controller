@@ -427,16 +427,26 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 	savePressureData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
 				   , compound, compoundColor, coldPressures, hotPressures, pressuresLosses) {
 		local teamServer := this.TeamServer
+		local pid
 
 		if (teamServer && teamServer.SessionActive)
 			teamServer.setLapValue(lapNumber, this.Plugin . " Pressures"
 								 , values2String(";", simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor
 								 , coldPressures, hotPressures, pressuresLosses))
-		else
-			this.LapDatabase.add("Pressures", Database.Row("Lap", lapNumber, "Simulator", simulator, "Car", car, "Track", track
-														 , "Weather", weather, "Temperature.Air", airTemperature, "Temperature.Track", trackTemperature
-														 , "Compound", compound, "Compound.Color", compoundColor
-														 , "Pressures.Cold", coldPressures, "Pressures.Hot", hotPressures, "Pressures.Losses", pressuresLosses))
+		else {
+			pid := ProcessExist("Practice Center")
+
+			if pid
+				messageSend(kFileMessage, "Practice", "addPressures:" . values2String(";", lapNumber, simulator, car, track, weather
+																						 , airTemperature, trackTemperature
+																						 , compound, compoundColor
+																						 , coldPressures, hotPressures, pressuresLosses), pid)
+			else
+				this.LapDatabase.add("Pressures", Database.Row("Lap", lapNumber, "Simulator", simulator, "Car", car, "Track", track
+															 , "Weather", weather, "Temperature.Air", airTemperature, "Temperature.Track", trackTemperature
+															 , "Compound", compound, "Compound.Color", compoundColor
+															 , "Pressures.Cold", coldPressures, "Pressures.Hot", hotPressures, "Pressures.Losses", pressuresLosses))
+		}
 	}
 
 	updateTyresDatabase() {
@@ -473,7 +483,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 
 						if (newStint && driverID) {
 							driverName := teamServer.getStintDriverName(stint)
-							
+
 							if driverName
 								tyresDB.registerDriver(lapPressures[1], driverID, driverName)
 						}

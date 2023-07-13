@@ -265,6 +265,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 					, fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
 					, compound, compoundColor, pressures, temperatures, wear) {
 		local teamServer := this.TeamServer
+		local pid
 
 		if !wear
 			wear := values2String(",", kNull, kNull, kNull, kNull)
@@ -274,13 +275,22 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 								 , values2String(";", simulator, car, track, weather, airTemperature, trackTemperature
 												    , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
 												    , compound, compoundColor, pressures, temperatures, wear, createGUID(), createGUID()))
-		else
-			this.LapDatabase.add("Telemetry", Database.Row("Lap", lapNumber, "Simulator", simulator, "Car", car, "Track", track
-														 , "Weather", weather, "Temperature.Air", airTemperature, "Temperature.Track", trackTemperature
-														 , "Fuel.Consumption", fuelConsumption, "Fuel.Remaining", fuelRemaining, "LapTime", lapTime
-														 , "Pitstop", pitstop, "Map", map, "TC", tc, "ABS", abs
-														 , "Compound", compound, "Compound.Color", compoundColor
-														 , "Pressures", pressures, "Temperatures", temperatures, "Wear", wear))
+		else {
+			pid := ProcessExist("Practice Center")
+
+			if pid
+				messageSend(kFileMessage, "Practice", "addTelemetry:" . values2String(";", lapNumber, simulator, car, track, weather
+																						 , airTemperature, trackTemperature
+																						 , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
+																						 , compound, compoundColor, pressures, temperatures, wear), pid)
+			else
+				this.LapDatabase.add("Telemetry", Database.Row("Lap", lapNumber, "Simulator", simulator, "Car", car, "Track", track
+															 , "Weather", weather, "Temperature.Air", airTemperature, "Temperature.Track", trackTemperature
+															 , "Fuel.Consumption", fuelConsumption, "Fuel.Remaining", fuelRemaining, "LapTime", lapTime
+															 , "Pitstop", pitstop, "Map", map, "TC", tc, "ABS", abs
+															 , "Compound", compound, "Compound.Color", compoundColor
+															 , "Pressures", pressures, "Temperatures", temperatures, "Wear", wear))
+		}
 	}
 
 	updateTelemetryDatabase() {
@@ -413,15 +423,26 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 	saveStandingsData(lapNumber, fileName) {
 		local teamServer := this.TeamServer
+		local pid
 
-		if (teamServer && teamServer.SessionActive)
+		if (teamServer && teamServer.SessionActive) {
 			this.setLapValue(lapNumber, this.Plugin . " Race Standings", fileName)
 
-		deleteFile(fileName)
+			deleteFile(fileName)
+		}
+		else {
+			pid := ProcessExist("Practice Center")
+
+			if pid
+				messageSend(kFileMessage, "Practice", "updateStandings:" . values2String(";", lapNumber, fileName), pid)
+			else
+				deleteFile(fileName)
+		}
 	}
 
 	saveRaceLap(lapNumber, fileName) {
 		local teamServer := this.TeamServer
+		local pid
 
 		if (teamServer && teamServer.SessionActive) {
 			this.setLapValue(lapNumber, this.Plugin . " Race Lap", fileName)
@@ -429,23 +450,30 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 			deleteFile(fileName)
 		}
 		else {
-			DirCreate(kTempDirectory . "Race Report")
+			pid := ProcessExist("Practice Center")
 
-			FileMove(fileName, kTempDirectory . "Race Report\Lap." lapNumber, 1)
+			if pid
+				messageSend(kFileMessage, "Practice", "addLap:" . values2String(";", lapNumber, fileName), pid)
+			else {
+				DirCreate(kTempDirectory . "Race Report")
 
-			loop {
-				lapNumber += 1
+				FileMove(fileName, kTempDirectory . "Race Report\Lap." lapNumber, 1)
 
-				if FileExist(kTempDirectory . "Race Report\Lap." . lapNumber)
-					deleteFile(kTempDirectory . "Race Report\Lap." . lapNumber)
-				else
-					break
+				loop {
+					lapNumber += 1
+
+					if FileExist(kTempDirectory . "Race Report\Lap." . lapNumber)
+						deleteFile(kTempDirectory . "Race Report\Lap." . lapNumber)
+					else
+						break
+				}
 			}
 		}
 	}
 
 	saveRaceInfo(lapNumber, fileName) {
 		local teamServer := this.TeamServer
+		local pid
 
 		if (teamServer && teamServer.SessionActive) {
 			this.setLapValue(lapNumber, this.Plugin . " Race Info", fileName)
@@ -453,11 +481,17 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 			deleteFile(fileName)
 		}
 		else {
-			deleteDirectory(kTempDirectory . "Race Report")
+			pid := ProcessExist("Practice Center")
 
-			DirCreate(kTempDirectory . "Race Report")
+			if pid
+				messageSend(kFileMessage, "Practice", "startSession:" . values2String(";", lapNumber, fileName), pid)
+			else {
+				deleteDirectory(kTempDirectory . "Race Report")
 
-			FileMove(fileName, kTempDirectory . "Race Report\Race.data")
+				DirCreate(kTempDirectory . "Race Report")
+
+				FileMove(fileName, kTempDirectory . "Race Report\Race.data")
+			}
 		}
 	}
 

@@ -1350,7 +1350,7 @@ class RaceEngineer extends RaceAssistant {
 			if this.Speaker
 				this.getSpeaker().speakPhrase("DataUpdated")
 
-			this.updateDynamicValues({KnowledgeBase: false, HasPressureData: false})
+			this.updateDynamicValues({KnowledgeBase: false})
 
 			this.finishSession()
 		}

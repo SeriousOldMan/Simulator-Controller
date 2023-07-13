@@ -544,6 +544,8 @@ class RaceAssistant extends ConfigurationItem {
 
 				this.iBaseLap := false
 				this.iInitialFuelAmount := 0
+
+				updateConfigurationValues({Settings: false})
 			}
 		}
 

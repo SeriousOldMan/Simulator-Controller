@@ -46,7 +46,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 	iWheelBase := 270
 	iTrackWidth := 150
 
-	iAudibleFeedback := true
+	iAcousticFeedback := true
 
 	iAnalyzerPID := false
 
@@ -164,15 +164,15 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 		}
 	}
 
-	AudibleFeedback {
+	AcousticFeedback {
 		Get {
-			return this.iAudibleFeedback
+			return this.iAcousticFeedback
 		}
 
 		Set {
 			setAnalyzerSetting(this, "Feedback", value)
 
-			return (this.iAudibleFeedback := value)
+			return (this.iAcousticFeedback := value)
 		}
 	}
 
@@ -225,7 +225,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 		this.iSteerRatio := getMultiMapValue(settings, "Setup Workbench", prefix . "SteerRatio", this.SteerRatio)
 		this.iWheelbase := getMultiMapValue(settings, "Setup Workbench", prefix . "Wheelbase", this.Wheelbase)
 		this.iTrackWidth := getMultiMapValue(settings, "Setup Workbench", prefix . "TrackWidth", this.TrackWidth)
-		this.iAudibleFeedback := getMultiMapValue(settings, "Setup Workbench", prefix . "Feedback", true)
+		this.iAcousticFeedback := getMultiMapValue(settings, "Setup Workbench", prefix . "Feedback", true)
 
 		defaultUndersteerThresholds := getMultiMapValue(settings, "Setup Workbench", prefix . "UndersteerThresholds", defaultUndersteerThresholds)
 		defaultOversteerThresholds := getMultiMapValue(settings, "Setup Workbench", prefix . "OversteerThresholds", defaultOversteerThresholds)
@@ -237,7 +237,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 		this.iSteerRatio := getMultiMapValue(settings, "Setup Workbench", prefix . "SteerRatio", this.SteerRatio)
 		this.iWheelbase := getMultiMapValue(settings, "Setup Workbench", prefix . "Wheelbase", this.Wheelbase)
 		this.iTrackWidth := getMultiMapValue(settings, "Setup Workbench", prefix . "TrackWidth", this.TrackWidth)
-		this.iAudibleFeedback := getMultiMapValue(settings, "Setup Workbench", prefix . "Feedback", this.AudibleFeedback)
+		this.iAcousticFeedback := getMultiMapValue(settings, "Setup Workbench", prefix . "Feedback", this.AcousticFeedback)
 
 		this.iUndersteerThresholds := string2Values(",", getMultiMapValue(settings, "Setup Workbench"
 													   , prefix . "UndersteerThresholds", defaultUndersteerThresholds))
@@ -359,7 +359,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 				if this.settingAvailable("TrackWidth")
 					options .= (A_Space . this.TrackWidth)
 
-				if this.AudibleFeedback
+				if this.AcousticFeedback
 					options .= (A_Space . "`"" . kResourcesDirectory . "Sounds`"")
 
 				code := SessionDatabase.getSimulatorCode(this.Simulator)
@@ -450,7 +450,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 	static mediumUndersteerThresholdEdit
 	static lightUndersteerThresholdEdit
 
-	static audibleFeedbackDropDown
+	static acousticFeedbackDropDown
 
 	static issuesListView
 
@@ -557,7 +557,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		if analyzer.settingAvailable("UndersteerThresholds")
 			analyzer.UndersteerThresholds := [lightUndersteerThresholdSlider.Value, mediumUndersteerThresholdSlider.Value, heavyUndersteerThresholdSlider.Value]
 
-		analyzer.AudibleFeedback := ((audibleFeedbackDropDown.Value = 1) ? true : false)
+		analyzer.AcousticFeedback := ((acousticFeedbackDropDown.Value = 1) ? true : false)
 
 		dataFile := temporaryFileName("Analyzer", "data")
 
@@ -824,11 +824,11 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		heavyUndersteerThresholdEdit.OnEvent("Change", runAnalyzer.Bind("UpdateSlider", true))
 		widget26 := heavyUndersteerThresholdEdit
 
-		chosen := (analyzer.AudibleFeedback ? 1 : 2)
+		chosen := (analyzer.AcousticFeedback ? 1 : 2)
 
-		widget34 := analyzerGui.Add("Text", "x16 yp+42 w130 h20 +0x200", translate("Audible Feedback"))
+		widget34 := analyzerGui.Add("Text", "x16 yp+42 w130 h20 +0x200", translate("Acoustic feedback"))
 		widget35 := analyzerGui.Add("DropDownList", "x158 yp w45 Choose" . chosen, [translate("Yes"), translate("No")])
-		audibleFeedbackDropDown := widget35
+		acousticFeedbackDropDown := widget35
 
 		if !analyzer.settingAvailable("OversteerThresholds") {
 			heavyOversteerThresholdSlider.Enabled := false

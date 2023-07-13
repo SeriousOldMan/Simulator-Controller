@@ -441,11 +441,11 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 																						 , airTemperature, trackTemperature
 																						 , compound, compoundColor
 																						 , coldPressures, hotPressures, pressuresLosses), pid)
-			else
-				this.LapDatabase.add("Pressures", Database.Row("Lap", lapNumber, "Simulator", simulator, "Car", car, "Track", track
-															 , "Weather", weather, "Temperature.Air", airTemperature, "Temperature.Track", trackTemperature
-															 , "Compound", compound, "Compound.Color", compoundColor
-															 , "Pressures.Cold", coldPressures, "Pressures.Hot", hotPressures, "Pressures.Losses", pressuresLosses))
+
+			this.LapDatabase.add("Pressures", Database.Row("Lap", lapNumber, "Simulator", simulator, "Car", car, "Track", track
+														 , "Weather", weather, "Temperature.Air", airTemperature, "Temperature.Track", trackTemperature
+														 , "Compound", compound, "Compound.Color", compoundColor
+														 , "Pressures.Cold", coldPressures, "Pressures.Hot", hotPressures, "Pressures.Losses", pressuresLosses))
 		}
 	}
 

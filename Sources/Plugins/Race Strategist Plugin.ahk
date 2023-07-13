@@ -283,13 +283,13 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 																						 , airTemperature, trackTemperature
 																						 , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
 																						 , compound, compoundColor, pressures, temperatures, wear), pid)
-			else
-				this.LapDatabase.add("Telemetry", Database.Row("Lap", lapNumber, "Simulator", simulator, "Car", car, "Track", track
-															 , "Weather", weather, "Temperature.Air", airTemperature, "Temperature.Track", trackTemperature
-															 , "Fuel.Consumption", fuelConsumption, "Fuel.Remaining", fuelRemaining, "LapTime", lapTime
-															 , "Pitstop", pitstop, "Map", map, "TC", tc, "ABS", abs
-															 , "Compound", compound, "Compound.Color", compoundColor
-															 , "Pressures", pressures, "Temperatures", temperatures, "Wear", wear))
+
+			this.LapDatabase.add("Telemetry", Database.Row("Lap", lapNumber, "Simulator", simulator, "Car", car, "Track", track
+														 , "Weather", weather, "Temperature.Air", airTemperature, "Temperature.Track", trackTemperature
+														 , "Fuel.Consumption", fuelConsumption, "Fuel.Remaining", fuelRemaining, "LapTime", lapTime
+														 , "Pitstop", pitstop, "Map", map, "TC", tc, "ABS", abs
+														 , "Compound", compound, "Compound.Color", compoundColor
+														 , "Pressures", pressures, "Temperatures", temperatures, "Wear", wear))
 		}
 	}
 
@@ -452,21 +452,23 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		else {
 			pid := ProcessExist("Practice Center")
 
-			if pid
-				messageSend(kFileMessage, "Practice", "addLap:" . values2String(";", lapNumber, fileName), pid)
-			else {
-				DirCreate(kTempDirectory . "Race Report")
+			DirCreate(kTempDirectory . "Race Report")
 
+			if pid {
+				FileCopy(fileName, kTempDirectory . "Race Report\Lap." lapNumber, 1)
+
+				messageSend(kFileMessage, "Practice", "addLap:" . values2String(";", lapNumber, fileName), pid)
+			}
+			else
 				FileMove(fileName, kTempDirectory . "Race Report\Lap." lapNumber, 1)
 
-				loop {
-					lapNumber += 1
+			loop {
+				lapNumber += 1
 
-					if FileExist(kTempDirectory . "Race Report\Lap." . lapNumber)
-						deleteFile(kTempDirectory . "Race Report\Lap." . lapNumber)
-					else
-						break
-				}
+				if FileExist(kTempDirectory . "Race Report\Lap." . lapNumber)
+					deleteFile(kTempDirectory . "Race Report\Lap." . lapNumber)
+				else
+					break
 			}
 		}
 	}
@@ -483,15 +485,17 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		else {
 			pid := ProcessExist("Practice Center")
 
-			if pid
+			deleteDirectory(kTempDirectory . "Race Report")
+
+			DirCreate(kTempDirectory . "Race Report")
+
+			if pid {
+				FileCopy(fileName, kTempDirectory . "Race Report\Race.data")
+
 				messageSend(kFileMessage, "Practice", "startSession:" . values2String(";", lapNumber, fileName), pid)
-			else {
-				deleteDirectory(kTempDirectory . "Race Report")
-
-				DirCreate(kTempDirectory . "Race Report")
-
-				FileMove(fileName, kTempDirectory . "Race Report\Race.data")
 			}
+			else
+				FileMove(fileName, kTempDirectory . "Race Report\Race.data")
 		}
 	}
 

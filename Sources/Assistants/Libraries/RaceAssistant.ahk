@@ -985,7 +985,7 @@ class RaceAssistant extends ConfigurationItem {
 		this.prepareSession(&settings, &data)
 	}
 
-	prepareSession(&settings, &data, formationLap?) {
+	prepareSession(&settings, &data, formationLap := true) {
 		local simulator, simulatorName, session, driverForname, driverSurname, driverNickname, facts
 
 		if (settings && !isObject(settings))
@@ -994,7 +994,7 @@ class RaceAssistant extends ConfigurationItem {
 		if (data && !isObject(data))
 			data := readMultiMap(data)
 
-		if settings
+		if (settings && (formationLap || !this.Settings))
 			this.updateConfigurationValues({Settings: settings})
 
 		settings := this.Settings

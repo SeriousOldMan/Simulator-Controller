@@ -1,16 +1,16 @@
 [Development]
-Version=5.1.1.0-alpha
+Version=5.1.1.0-release
 Target=5.1.1.0-release
-Date=07/12/2023
-Download=https://www.dropbox.com/s/5psbzpjfxjc8sd3/Simulator%20Controller%205.1.1.0-alpha.zip?dl=1
-Changes=Audible feedback in Telemetry Analyzer for handling events, New update frequency setting in Core Settings for team sessions, New support for the configuration of custom controller modes, Fixed regression in "Race Center" for the button which opens the pitstop settings info window, New controller action function "mouse", New controller action function "call", New car models for "Setup Workbench", Defaults for simulator, car and track in launched apps by "Simulator Startup", New plugin argument "openRaceReports" for "Race Strategist" plugin, New controller action function "openRaceReports"
+Date=07/14/2023
+Download=https://cutt.ly/LwojeG92;https://www.dropbox.com/s/x56eeytta0a21dc/Simulator%20Controller%205.1.1.0-release.zip?dl=1
+Changes=Acoustic feedback in Telemetry Analyzer for handling events, New update frequency setting in Core Settings for team sessions, New support for the configuration of custom controller modes, Fixed regression in "Race Center" for the button which opens the pitstop settings info window, New controller action function "mouse", New controller action function "call", New car models for "Setup Workbench", Defaults for simulator, car and track in launched apps by "Simulator Startup", New plugin argument "openRaceReports" for "Race Strategist" plugin, New controller action function "openRaceReports"
 [Release]
-Version=5.1.0.0-release
-Date=07/07/2023
-Download=https://cutt.ly/ywitakXC;https://www.dropbox.com/s/f37htgmcopfs47v/Simulator%20Controller%205.1.0.0-release.zip?dl=1
-Changes=Fixes for Telemetry Analyzer in "Setup Workbench", New real-time capable data connector architecture, Increased bounding box for side proximity alerts by the Spotter from 6 to 8 meters lateral, Reduced waiting time for unavailable data in "Race Center", Fixed AC and RF2 Spotter, Fixed loading of car geometry defaults in Telemetry Analyzer, Fixed car coordinates for rFactor2 (for track automation), Counter steering is now detected correctly in the Telemetry Analyzer of "Setup Workbench", Fixed race reports and standings data in "Race Center" for rFactor2, Fixed track scanner and mapper for rare cases with special characters, Fixed manually locating iRacing, New car model for "Setup Workbench"
+Version=5.1.1.0-release
+Date=07/14/2023
+Download=https://cutt.ly/LwojeG92;https://www.dropbox.com/s/x56eeytta0a21dc/Simulator%20Controller%205.1.1.0-release.zip?dl=1
+Changes=Acoustic feedback in Telemetry Analyzer for handling events, New update frequency setting in Core Settings for team sessions, New support for the configuration of custom controller modes, Fixed regression in "Race Center" for the button which opens the pitstop settings info window, New controller action function "mouse", New controller action function "call", New car models for "Setup Workbench", Defaults for simulator, car and track in launched apps by "Simulator Startup", New plugin argument "openRaceReports" for "Race Strategist" plugin, New controller action function "openRaceReports"
 [Current]
-Type=Development
+Type=Release
 [Version]
-Development=5.1.1.0-alpha
-Release=5.1.0.0-release
+Development=5.1.1.0-release
+Release=5.1.1.0-release

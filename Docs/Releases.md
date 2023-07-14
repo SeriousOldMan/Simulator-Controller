@@ -1,7 +1,7 @@
-## 5.1.1.0-release 07/14/23 (planned)
+## 5.1.1.0-release 07/14/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
-  3. You can now enable an audible feedback for Audible feedback in the Telemetry Analyzer. Whenever a handling event is registered (over- or understeering) a short beep of varying pitch and intensity will give you some feedback. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-telemetry-analyzer) for more information.
+  3. You can now enable an acoustic feedback for Audible feedback in the Telemetry Analyzer. Whenever a handling event is registered (over- or understeering) a short beep of varying pitch and intensity will give you some feedback. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-telemetry-analyzer) for more information.
   4. [Experts only] It is now possible to define your own modes and layers for Button Boxes. This allows any function of your sim or other applications on your PC to be triggered by the Button Box, not only the actions supplied by the plugins. Please see the [new documentation](*) for more information.
   5. A new controller action function "mouse" is available, which allows you to send virtual mouse clicks to any application by a button press on your controller.
   6. [Experts only] A new controller action function "call" let's you invoke internal methods for any plugin or the Controller itself.

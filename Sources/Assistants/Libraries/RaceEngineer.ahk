@@ -1297,14 +1297,27 @@ class RaceEngineer extends RaceAssistant {
 			if (shutdown && (knowledgeBase.getValue("Lap", 0) > this.LearningLaps)) {
 				this.shutdownSession("Before")
 
-				if (((this.SaveTyrePressures = kAsk) && this.collectTyrePressures() && this.HasPressureData) || (this.SaveSettings = kAsk)) {
-					this.getSpeaker().speakPhrase("ConfirmDataUpdate", false, true)
+				if ProcessExist("Practice Center.exe") {
+					if (this.SaveSettings = kAsk) {
+						this.getSpeaker().speakPhrase("ConfirmDataUpdate", false, true)
 
-					this.setContinuation(ObjBindMethod(this, "shutdownSession", "After"))
+						this.setContinuation(ObjBindMethod(this, "shutdownSession", "After"))
 
-					Task.startTask(ObjBindMethod(this, "forceFinishSession"), 120000, kLowPriority)
+						Task.startTask(ObjBindMethod(this, "forceFinishSession"), 120000, kLowPriority)
 
-					return
+						return
+					}
+				}
+				else {
+					if (((this.SaveTyrePressures = kAsk) && this.collectTyrePressures() && this.HasPressureData) || (this.SaveSettings = kAsk)) {
+						this.getSpeaker().speakPhrase("ConfirmDataUpdate", false, true)
+
+						this.setContinuation(ObjBindMethod(this, "shutdownSession", "After"))
+
+						Task.startTask(ObjBindMethod(this, "forceFinishSession"), 120000, kLowPriority)
+
+						return
+					}
 				}
 			}
 
@@ -1339,7 +1352,7 @@ class RaceEngineer extends RaceAssistant {
 					this.saveSessionSettings()
 
 			if (((phase = "After") && (this.SaveTyrePressures = kAsk)) || ((phase = "Before") && (this.SaveTyrePressures = kAlways)))
-				if (this.HasPressureData && this.collectTyrePressures())
+				if (this.HasPressureData && this.collectTyrePressures() && !ProcessExist("Practice Center.exe"))
 					this.updateTyresDatabase()
 		}
 		finally {

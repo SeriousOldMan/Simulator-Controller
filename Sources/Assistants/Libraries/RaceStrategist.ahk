@@ -1386,17 +1386,30 @@ class RaceStrategist extends GridRaceAssistant {
 
 				asked := true
 
-				if ((((this.SaveSettings = kAsk) && (this.Session == kSessionRace))
-				  || (this.collectTelemetryData() && (this.SaveTelemetry = kAsk) && this.HasTelemetryData))
-				 && ((this.SaveRaceReport = kAsk) && (this.Session == kSessionRace)))
-					this.getSpeaker().speakPhrase("ConfirmSaveSettingsAndRaceReport", false, true)
-				else if ((this.SaveRaceReport = kAsk) && (this.Session == kSessionRace))
-					this.getSpeaker().speakPhrase("ConfirmSaveRaceReport", false, true)
-				else if (((this.SaveSettings = kAsk) && (this.Session == kSessionRace))
+				if ProcessExist("Practice Center.exe") {
+					if (((this.SaveSettings = kAsk) && (this.Session == kSessionRace))
+					 && ((this.SaveRaceReport = kAsk) && (this.Session == kSessionRace)))
+						this.getSpeaker().speakPhrase("ConfirmSaveSettingsAndRaceReport", false, true)
+					else if ((this.SaveRaceReport = kAsk) && (this.Session == kSessionRace))
+						this.getSpeaker().speakPhrase("ConfirmSaveRaceReport", false, true)
+					else if ((this.SaveSettings = kAsk) && (this.Session == kSessionRace))
+						this.getSpeaker().speakPhrase("ConfirmSaveSettings", false, true)
+					else
+						asked := false
+				}
+				else {
+					if ((((this.SaveSettings = kAsk) && (this.Session == kSessionRace))
 					  || (this.collectTelemetryData() && (this.SaveTelemetry = kAsk) && this.HasTelemetryData))
-					this.getSpeaker().speakPhrase("ConfirmSaveSettings", false, true)
-				else
-					asked := false
+					 && ((this.SaveRaceReport = kAsk) && (this.Session == kSessionRace)))
+						this.getSpeaker().speakPhrase("ConfirmSaveSettingsAndRaceReport", false, true)
+					else if ((this.SaveRaceReport = kAsk) && (this.Session == kSessionRace))
+						this.getSpeaker().speakPhrase("ConfirmSaveRaceReport", false, true)
+					else if (((this.SaveSettings = kAsk) && (this.Session == kSessionRace))
+						  || (this.collectTelemetryData() && (this.SaveTelemetry = kAsk) && this.HasTelemetryData))
+						this.getSpeaker().speakPhrase("ConfirmSaveSettings", false, true)
+					else
+						asked := false
+				}
 
 				if asked {
 					this.setContinuation(ObjBindMethod(this, "shutdownSession", "After"))
@@ -1454,6 +1467,8 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	shutdownSession(phase) {
+		local reportSaved := false
+
 		this.iSessionDataActive := true
 
 		try {
@@ -1462,11 +1477,14 @@ class RaceStrategist extends GridRaceAssistant {
 					this.saveSessionSettings()
 
 			if (((phase = "After") && (this.SaveRaceReport = kAsk)) || ((phase = "Before") && (this.SaveRaceReport = kAlways)))
-				if (this.Session == kSessionRace)
+				if (this.Session == kSessionRace) {
+					reportSaved := true
+
 					this.createRaceReport()
+				}
 
 			if (((phase = "After") && (this.SaveTelemetry = kAsk)) || ((phase = "Before") && (this.SaveTelemetry = kAlways)))
-				if (this.HasTelemetryData && this.collectTelemetryData())
+				if (this.HasTelemetryData && this.collectTelemetryData() && !ProcessExist("Practice Center.exe"))
 					this.updateTelemetryDatabase()
 		}
 		finally {
@@ -1475,7 +1493,10 @@ class RaceStrategist extends GridRaceAssistant {
 
 		if (phase = "After") {
 			if this.Speaker
-				this.getSpeaker().speakPhrase("RaceReportSaved")
+				if reportSaved
+					this.getSpeaker().speakPhrase("RaceReportSaved")
+				else
+					this.getSpeaker().speakPhrase("Roger")
 
 			this.updateDynamicValues({KnowledgeBase: false, HasTelemetryData: false})
 

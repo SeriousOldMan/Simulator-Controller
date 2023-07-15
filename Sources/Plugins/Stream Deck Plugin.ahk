@@ -187,6 +187,9 @@ class StreamDeck extends FunctionController {
 				throw "File not found..."
 
 			this.iConnector := CLR_LoadLibrary(dllFile).CreateInstance("PluginConnector.PluginConnector")
+
+			if (getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory)), "Stream Deck", "Protocol", "Message") = "File")
+				this.iConnector.SetCommandFile(kTempDirectory . "Controller.cmd")
 		}
 		catch Any as exception {
 			logError(exception, true)

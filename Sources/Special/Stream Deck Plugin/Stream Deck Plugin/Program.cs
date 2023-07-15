@@ -112,9 +112,15 @@ namespace SimulatorControllerPlugin
             string operation = parameters[1];
             string argument = parameters[2];
 
-            foreach (var button in buttons)
-                if (button.Function.CompareTo(function) == 0)
-                    button.ProcessMessage(operation, argument);
+            if (function == "Command")
+            {
+                if (operation == "SetFile")
+                    ControllerFunction.CommandFile = argument;
+            }
+            else
+                foreach (var button in buttons)
+                    if (button.Function.CompareTo(function) == 0)
+                        button.ProcessMessage(operation, argument);
         }
 
         static void Main(string[] args)

@@ -1,9 +1,9 @@
 [Development]
-Version=5.1.1.0-release
-Target=5.1.1.0-release
-Date=07/14/2023
-Download=https://cutt.ly/LwojeG92;https://www.dropbox.com/s/x56eeytta0a21dc/Simulator%20Controller%205.1.1.0-release.zip?dl=1
-Changes=Acoustic feedback in Telemetry Analyzer for handling events, New update frequency setting in Core Settings for team sessions, New support for the configuration of custom controller modes, Fixed regression in "Race Center" for the button which opens the pitstop settings info window, New controller action function "mouse", New controller action function "call", New car models for "Setup Workbench", Defaults for simulator, car and track in launched apps by "Simulator Startup", New plugin argument "openRaceReports" for "Race Strategist" plugin, New controller action function "openRaceReports"
+Version=5.1.2.0-dev
+Target=5.1.3.0-release
+Date=07/15/2023
+Download=
+Changes=New core setting to choose the dispatch cycle of external commands, New communication method for the Stream Deck plugin, New core setting to choose the between the Stream Deck communication methods, The Spotter can now "focus" on a specific opponent
 [Release]
 Version=5.1.1.0-release
 Date=07/14/2023

@@ -23,6 +23,8 @@ namespace SimulatorControllerPlugin
 
     [PluginActionId("simulatorcontrollerplugin.controllerfunction")]
     public class ControllerFunction : PluginBase {
+        public static string CommandFile { get; set; }
+
         static string UnicodeToUTF8(string from) {
             var bytes = Encoding.UTF8.GetBytes(from);
             
@@ -156,13 +158,28 @@ namespace SimulatorControllerPlugin
         {
             try
             {
-                int winHandle = FindWindowEx(0, 0, null, "Simulator Controller.exe");
+                if (ControllerFunction.CommandFile != "")
+                {
+                    while (true)
+                        try
+                        {
+                            using (StreamWriter file = new StreamWriter(ControllerFunction.CommandFile, true))
+                                file.WriteLine(this.settings.Function);
 
-                if (winHandle == 0)
-                    FindWindowEx(0, 0, null, "Simulator Controller.ahk");
+                            break;
+                        }
+                        catch {
+                        }
+                }
+                else {
+                    int winHandle = FindWindowEx(0, 0, null, "Simulator Controller.exe");
 
-                if (winHandle != 0)
-                    SendStringMessage(winHandle, 0, "Stream Deck:" + this.settings.Function);
+                    if (winHandle == 0)
+                        FindWindowEx(0, 0, null, "Simulator Controller.ahk");
+
+                    if (winHandle != 0)
+                        SendStringMessage(winHandle, 0, "Stream Deck:" + this.settings.Function);
+                }
             }
             catch (Exception ex)
             {

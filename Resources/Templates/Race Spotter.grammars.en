@@ -24,6 +24,7 @@ Celsius=Celsius
 Fahrenheit=Fahrenheit
 Point=point
 Comma=comma
+Number=number
 SG=Stop and Go
 DT=Drive Through
 Time=Time
@@ -110,6 +111,8 @@ PositionClass.2=Your current position is P %positionClass% in our class, P %posi
 Great.1=Great, keep going.
 Great.2=Perfect job so far.
 
+ConfirmFocusCar.1=Okay, you want me to observe car number %number%, is that correct?
+ConfirmFocusCar.2=I shall update you on car number %number% from time to time, right?
 NoFocusCar.1=There is no such car.
 NoFocusCar.2=I cannot find a car with number %number%.
 NoFocusCar.3=There is no car with number %number% on the grid.

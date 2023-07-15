@@ -720,6 +720,8 @@ class RaceSpotter extends GridRaceAssistant {
 	iOtherCars := CaseInsenseMap()
 	iPositions := CaseInsenseWeakMap()
 
+	iFocusedCar := false
+
 	iPendingAlerts := []
 
 	iLastPenalty := false
@@ -861,6 +863,27 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 	}
 
+	FocusedCar[position := false] {
+		Get {
+			if isInstance(this.iFocusedCar, PositionInfo)
+				return (position ? this.iFocusedCar : this.iFocusedCar.Car.Nr)
+			else {
+				for ignore, candidate in this.PositionInfos
+					if (candidate.Car.Nr = this.iFocusedCar) {
+						this.iFocusedCar := candidate
+
+						return (position ? candidate : candidate.Car.Nr)
+					}
+
+				return false
+			}
+		}
+
+		Set {
+			return (this.iFocusedCar := value)
+		}
+	}
+
 	Positions[key?] {
 		Get {
 			return (isSet(key) ? this.iPositions[key] : this.iPositions)
@@ -976,6 +999,69 @@ class RaceSpotter extends GridRaceAssistant {
 
 			return super.getClass(car, data, spotterCategories)
 		}
+	}
+
+	handleVoiceCommand(grammar, words) {
+		switch grammar, false {
+			case "FocusCar":
+				this.focusCarRecognized(words)
+			default:
+				super.handleVoiceCommand(grammar, words)
+		}
+	}
+
+	focusCarRecognized(words) {
+		local knowledgeBase := this.KnowledgeBase
+		local speaker := this.getSpeaker()
+		local validCar := false
+		local number, numbers, ignore, candidate, fragment
+
+		numbers := []
+
+		for ignore, candidate in words {
+			if (InStr(candidate, "#") == 1)
+				candidate := SubStr(candidate, 2)
+
+			if isInteger(candidate)
+				numbers.Push(candidate)
+			else if (numbers.Length > 0)
+				break
+		}
+
+		if (numbers.Length > 0) {
+			number := ""
+
+			for ignore, fragment in numbers
+				number .= fragment
+
+			number := Integer(number)
+		}
+		else
+			number := false
+
+		if number
+			for ignore, carinfo in this.OtherCars
+				if (carInfo.Nr = number) {
+					validCar := true
+
+					break
+				}
+
+		if (number && validCar) {
+			speaker.speakPhrase("ConfirmFocusCar", {number: number}, true)
+
+			this.setContinuation(ObjBindMethod(this, "updateFocusCar", number))
+
+			return
+		}
+		else if number
+			speaker.speakPhrase("NoFocusCar", {number: number})
+		else
+			speaker.speakPhrase("Repeat")
+	}
+
+	updateFocusCar(number) {
+		this.FocusedCar := number
 	}
 
 	updateAnnouncement(announcement, value) {
@@ -2478,7 +2564,8 @@ class RaceSpotter extends GridRaceAssistant {
 				saveSettings := getMultiMapValue(configuration, "Race Assistant Shutdown", simulatorName . ".SaveSettings")
 		}
 
-		this.updateConfigurationValues({LearningLaps: getMultiMapValue(configuration, "Race Spotter Analysis", simulatorName . ".LearningLaps", 1)									, SaveSettings: saveSettings})
+		this.updateConfigurationValues({LearningLaps: getMultiMapValue(configuration, "Race Spotter Analysis", simulatorName . ".LearningLaps", 1)
+									  , SaveSettings: saveSettings})
 
 		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(facts)
 								, BestLapTime: 0, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0

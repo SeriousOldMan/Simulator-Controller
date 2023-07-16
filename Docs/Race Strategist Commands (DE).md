@@ -92,6 +92,8 @@ Announcements=Wetterwarnungen
 	[{Gib mir den, Gib mir bitte den, Sag mir den, Sag mir bitte den, Wie ist der} Abstand zu {dem Wagen, der Position} hinter mir, Wie groß ist die Lücke zu {dem Wagen, der Position} hinter mir]
 
 	[{Gib mir den, Gib mir bitte den, Sag mir den, Sag mir bitte den, Wie ist der} Abstand zum führenden Wagen, Wie groß ist {die Lücke, der Abstand} zum {Führenden, führenden Wagen, ersten Platz}]
+	
+	[{Gib mir den, Gib mir bitte den, Sag mir den, Sag mir bitte den, Wie ist der} Abstand {zu, zur, zum} {Wagen, Wagen Nummer, Nummer} (Number), Wie groß ist {die Lücke, der Abstand} {zu, zur, zum} {Wagen, Wagen Nummer, Nummer} (Number)]
 
 	[(KannstDu) (Mir) die {Rundenzeiten, Zeiten} durchgeben, Gib (Mir) die {Rundenzeiten, Zeiten}, Wie sind die {Rundenzeiten, Zeiten}, Welche {Rundenzeiten, Zeiten} fahren wir]
 	

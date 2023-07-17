@@ -649,7 +649,7 @@ class PositionInfo {
 		local trackBehind := this.atBehind(false)
 		local oldObserved := this.Observed
 		local newObserved := ((this.isLeader() ? "L" : "") . (trackAhead ? "TA" : "") . (trackBehind ? "TB" : "")
-							. (standingsAhead ? "SA" : "") . (standingsBehind ? "SB" : ""))
+							. (standingsAhead ? "SA" : "") . (standingsBehind ? "SB" : "") . ((this == this.Spotter.FocusedCar) ? "F" : ""))
 
 		if this.Spotter.DriverCar.InPit {
 			this.reset(sector, true, true)
@@ -1164,7 +1164,7 @@ class RaceSpotter extends GridRaceAssistant {
 			FileAppend("`n---------------------------------`n`n", kTempDirectory . "Race Spotter.positions")
 	}
 
-	getPositionInfos(&standingsAhead, &standingsBehind, &trackAhead, &trackBehind, &leader, inpit := false) {
+	getPositionInfos(&standingsAhead, &standingsBehind, &trackAhead, &trackBehind, &leader, &focused, inpit := false) {
 		local ignore, observed, candidate, cInpit
 
 		standingsAhead := false
@@ -1172,6 +1172,7 @@ class RaceSpotter extends GridRaceAssistant {
 		trackAhead := false
 		trackBehind := false
 		leader := false
+		focused := false
 
 		for ignore, candidate in this.PositionInfos {
 			observed := candidate.Observed
@@ -1193,6 +1194,9 @@ class RaceSpotter extends GridRaceAssistant {
 
 			if InStr(observed, "L")
 				leader := candidate
+
+			if InStr(observed, "F")
+				focused := candidate
 		}
 	}
 
@@ -1332,8 +1336,9 @@ class RaceSpotter extends GridRaceAssistant {
 		local trackAhead := false
 		local trackBehind := false
 		local leader := false
+		local focused := false
 		local situation, sessionDuration, lapTime, sessionEnding, minute, lastTemperature, stintLaps
-		local minute, rnd, phrase, bestLapTime
+		local minute, rnd, phrase, bestLapTime, number
 
 		if ((remainingSessionLaps = kUndefined) || (remainingStintLaps = kUndefined))
 			return false
@@ -1477,7 +1482,7 @@ class RaceSpotter extends GridRaceAssistant {
 			}
 
 			if ((InStr(sector, "1") = 1) && (lastLap > 2)) {
-				this.getPositionInfos(&standingsAhead, &standingsBehind, &trackAhead, &trackBehind, &leader)
+				this.getPositionInfos(&standingsAhead, &standingsBehind, &trackAhead, &trackBehind, &leader, &focused)
 
 				lapTime := false
 
@@ -1505,12 +1510,22 @@ class RaceSpotter extends GridRaceAssistant {
 					else
 						lapTime := false
 				}
+				else if (focused && focused.hasBestLapTime()) {
+					lapTime := focused.BestLapTime[true]
+
+					if (lapTime = focused.LastLapTime) {
+						phrase := "FocusBestLap"
+						number := focused.Car.Nr
+					}
+					else
+						lapTime := false
+				}
 
 				if (!lapTime && regular && (this.Session == kSessionRace)) {
 					rnd := Random(1, 10)
 
 					if (rnd > 8) {
-						rnd := Random(1, 100)
+						rnd := Random(1, focused ? 100 : 133)
 
 						if ((rnd <= 33) && standingsAhead) {
 							lapTime := standingsAhead.LastLapTime
@@ -1520,9 +1535,22 @@ class RaceSpotter extends GridRaceAssistant {
 							lapTime := standingsBehind.LastLapTime
 							phrase := "BehindLapTime"
 						}
-						else if ((rnd > 66) && leader) {
-							lapTime := leader.LastLapTime
-							phrase := "LeaderLapTime"
+						else {
+							if focused {
+								if ((rnd > 66) && (rnd <= 100)) {
+									lapTime := focused.LastLapTime
+									phrase := "FocusLapTime"
+									number := focused.Car.Nr
+								}
+								else if ((rnd > 100) && leader) {
+									lapTime := leader.LastLapTime
+									phrase := "LeaderLapTime"
+								}
+							}
+							else if ((rnd > 66) && leader) {
+								lapTime := leader.LastLapTime
+								phrase := "LeaderLapTime"
+							}
 						}
 					}
 				}
@@ -1531,7 +1559,8 @@ class RaceSpotter extends GridRaceAssistant {
 					minute := Floor(lapTime / 60)
 
 					speaker.speakPhrase(phrase, {time: speaker.number2Speech(lapTime, 1), minute: minute
-											   , seconds: speaker.number2Speech(lapTime - (minute * 60), 1)})
+											   , seconds: speaker.number2Speech(lapTime - (minute * 60), 1)
+											   , number: number})
 
 					return true
 				}
@@ -1596,9 +1625,10 @@ class RaceSpotter extends GridRaceAssistant {
 		local trackAhead := false
 		local trackBehind := false
 		local leader := false
+		local focused := false
 		local situation, opponentType, driverPitstops, carPitstops
 
-		this.getPositionInfos(&standingsAhead, &standingsBehind, &trackAhead, &trackBehind, &leader, true)
+		this.getPositionInfos(&standingsAhead, &standingsBehind, &trackAhead, &trackBehind, &leader, &focused, true)
 
 		if (standingsAhead && (standingsAhead != leader)) {
 			situation := ("AheadPitting " . standingsAhead.Car.ID . A_Space . standingsAhead.Car.LastLap)
@@ -1624,6 +1654,18 @@ class RaceSpotter extends GridRaceAssistant {
 			}
 		}
 
+		if focused {
+			situation := ("FocusPitting " . focused.Car.ID . A_Space . focused.Car.LastLap)
+
+			if !this.TacticalAdvices.Has(situation) {
+				this.TacticalAdvices[situation] := true
+
+				speaker.speakPhrase("FocusPitting", {number: focused.Car.Nr})
+
+				return true
+			}
+		}
+
 		if (leader && (leader.Car.ID != this.DriverCar.ID)) {
 			situation := ("LeaderPitting " . leader.Car.ID . A_Space . leader.Car.LastLap)
 
@@ -1636,7 +1678,7 @@ class RaceSpotter extends GridRaceAssistant {
 			}
 		}
 
-		this.getPositionInfos(&standingsAhead, &standingsBehind, &trackAhead, &trackBehind, &leader)
+		this.getPositionInfos(&standingsAhead, &standingsBehind, &trackAhead, &trackBehind, &leader, &focused)
 
 		if (standingsAhead && standingsAhead.hasProblem()) {
 			situation := ("AheadProblem " . lastLap)
@@ -1645,6 +1687,18 @@ class RaceSpotter extends GridRaceAssistant {
 				this.TacticalAdvices[situation] := true
 
 				speaker.speakPhrase("AheadProblem")
+
+				return true
+			}
+		}
+
+		if (focused && focused.hasProblem()) {
+			situation := ("FocusProblem " . lastLap)
+
+			if !this.TacticalAdvices.Has(situation) {
+				this.TacticalAdvices[situation] := true
+
+				speaker.speakPhrase("FocusProblem", {number: focused.Car.Nr})
 
 				return true
 			}
@@ -1758,15 +1812,12 @@ class RaceSpotter extends GridRaceAssistant {
 						speaker.speakPhrase("StandingsGapToAhead", {delta: speaker.number2Speech(delta, 1)})
 
 						talking := true
+
+						if inPit
+							speaker.speakPhrase("GapCarInPit")
 					}
 
-					if inPit {
-						speaker.speakPhrase("GapCarInPit")
-
-						return true
-					}
-					else
-						return talking
+					return talking
 				}
 				else
 					return false
@@ -1805,15 +1856,65 @@ class RaceSpotter extends GridRaceAssistant {
 						speaker.speakPhrase("StandingsGapToBehind", {delta: speaker.number2Speech(delta, 1)})
 
 						talking := true
+
+						if inPit
+							speaker.speakPhrase("GapCarInPit")
 					}
 
-					if inPit {
-						speaker.speakPhrase("GapCarInPit")
+					return talking
+				}
+				else
+					return false
+			}
+			finally {
+				if talking
+					speaker.endTalk()
+			}
+	}
 
-						return true
+	focusGap() {
+		local knowledgeBase := this.KnowledgeBase
+		local speaker := this.getSpeaker()
+		local talking := false
+		local number, focusedCar, delta, car, driver, inPit, lap, ignore, candidate
+
+		if (this.getPosition(false, "Class") = this.getCars("Class").Length)
+			return false
+		else
+			try {
+				lap := knowledgeBase.getValue("Lap", 0)
+
+				if (lap > 0) {
+					number := this.FocusedCar.Car.Nr
+
+					for ignore, candidate in this.getCars()
+						if (knowledgeBase.getValue("Car." . candidate . ".Nr", false) = number) {
+							car := candidate
+
+							break
+						}
+
+					delta := (this.getDelta(car) / 1000)
+					inPit := (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false))
+
+					if ((delta = 0) || (inPit && (Abs(delta) < 30)))
+						return false
+					else if ((knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap", 0)) < lap)
+						  && (Abs(delta) > (knowledgeBase.getValue("Lap." . lap . ".Time", 0) / 1000)))
+						return false
+					else {
+						speaker.beginTalk()
+
+						speaker.speakPhrase((delta < 0) ? "FocusGapToBehind" : "FocusGapToAhead"
+										  , {number: number, delta: speaker.number2Speech(Abs(delta), 1)})
+
+						talking := true
+
+						if inPit
+							speaker.speakPhrase("GapCarInPit")
 					}
-					else
-						return talking
+
+					return talking
 				}
 				else
 					return false
@@ -1827,7 +1928,7 @@ class RaceSpotter extends GridRaceAssistant {
 	deltaInformation(lastLap, sector, positions, regular, method) {
 		local knowledgeBase := this.KnowledgeBase
 		local spoken := false
-		local standingsAhead, standingsBehind, trackAhead, trackBehind, leader, info, informed, settings
+		local standingsAhead, standingsBehind, trackAhead, trackBehind, leader, focused, info, informed, settings
 		local opponentType, delta, deltaDifference, lapDifference, lapTimeDifference, car, remaining, speaker, rnd
 		local unsafe, driverPitstops, carPitstops
 
@@ -1866,8 +1967,9 @@ class RaceSpotter extends GridRaceAssistant {
 		trackAhead := false
 		trackBehind := false
 		leader := false
+		focused := false
 
-		this.getPositionInfos(&standingsAhead, &standingsBehind, &trackAhead, &trackBehind, &leader)
+		this.getPositionInfos(&standingsAhead, &standingsBehind, &trackAhead, &trackBehind, &leader, &focused)
 
 		if this.Debug[kDebugPositions] {
 			info := ("=================================`n" . regular . (standingsAhead != false) . (standingsBehind != false) . (trackAhead != false) . (trackBehind != false) . "`n=================================`n`n")
@@ -2090,6 +2192,100 @@ class RaceSpotter extends GridRaceAssistant {
 					}
 				}
 			}
+
+			focused := this.FocusedCar
+
+			if ((focused = standingsAhead) || (focused = standingsBehind))
+				focused := false
+
+			if focused {
+				delta := focused.Delta[false, true, 1]
+				deltaDifference := Abs(focused.DeltaDifference[sector])
+				lapTimeDifference := Abs(focused.LapTimeDifference)
+
+				if this.Debug[kDebugPositions] {
+					info := values2String(", ", values2String("|", this.DriverCar.LapTimes*), this.DriverCar.LapTime[true]
+																 , focused.Car.Nr, focused.Car.InPit, focused.Reported
+																 , values2String("|", focused.Car.LapTimes*), focused.Car.LapTime[true]
+																 , values2String("|", focused.Car.Deltas[sector]*)
+																 , focused.Delta[sector], focused.Delta[false, true, 1]
+																 , focused.inFront(), focused.atBehind()
+																 , focused.inFront(false), focused.atBehind(false), focused.forPosition()
+																 , focused.DeltaDifference[sector], focused.LapTimeDifference[true]
+																 , focused.isFaster(sector)
+																 , focused.closingIn(sector, behindLostThreshold)
+																 , focused.runningAway(sector, behindGainThreshold))
+
+					info := ("=================================`n" . info . "`n=================================`n`n")
+
+					FileAppend(info, kTempDirectory . "Race Spotter.positions")
+				}
+
+				lapDifference := focused.LapDifference[sector]
+
+				if (lapDifference > 0)
+					if (delta < 0) {
+						delta := Abs(delta)
+
+						if (focused.closingIn(sector, behindLostThreshold) && !focused.Reported) {
+							speaker.speakPhrase("LostFocusBehind", {delta: (delta > 5) ? Round(delta) : speaker.number2Speech(delta, 1)
+																  , lost: speaker.number2Speech(deltaDifference, 1)
+																  , lapTime: speaker.number2Speech(lapTimeDifference, 1)
+																  , deltaLaps: lapDifference
+																  , laps: speaker.Fragments[(lapDifference > 1) ? "Laps" : "Lap"]})
+
+							if !informed
+								speaker.speakPhrase("Focus")
+
+							focused.reset(sector, false, true)
+
+							spoken := true
+						}
+						else if focused.runningAway(sector, behindGainThreshold) {
+							speaker.speakPhrase("GainedFocusBehind", {delta: (delta > 5) ? Round(delta) : speaker.number2Speech(delta, 1)
+																	, gained: speaker.number2Speech(deltaDifference, 1)
+																	, lapTime: speaker.number2Speech(lapTimeDifference, 1)
+																	, deltaLaps: lapDifference
+																	, laps: speaker.Fragments[(lapDifference > 1) ? "Laps" : "Lap"]})
+
+							focused.reset(sector, true, true)
+
+							spoken := true
+						}
+					}
+					else {
+						if (focused.closingIn(sector, frontGainThreshold) && !focused.Reported) {
+							speaker.speakPhrase("GainedFocusFront", {delta: (delta > 5) ? Round(delta) : speaker.number2Speech(delta, 1)
+																   , gained: speaker.number2Speech(deltaDifference, 1)
+																   , lapTime: speaker.number2Speech(lapTimeDifference, 1)
+																   , deltaLaps: lapDifference
+																   , laps: speaker.Fragments[(lapDifference > 1) ? "Laps" : "Lap"]})
+
+							remaining := Min(knowledgeBase.getValue("Session.Time.Remaining"), knowledgeBase.getValue("Driver.Time.Stint.Remaining"))
+
+							if ((remaining > 0) && (lapTimeDifference > 0))
+								if (((remaining / 1000) / this.DriverCar.LapTime[true]) > (delta / lapTimeDifference))
+									speaker.speakPhrase("CanDoIt")
+								else
+									speaker.speakPhrase("CantDoIt")
+
+							focused.reset(sector, false, true)
+
+							spoken := true
+						}
+						else if (focused.runningAway(sector, frontLostThreshold)) {
+							speaker.speakPhrase("LostFocusFront", {delta: (delta > 5) ? Round(delta) : speaker.number2Speech(delta, 1)
+																 , lost: speaker.number2Speech(deltaDifference, 1)
+																 , lapTime: speaker.number2Speech(lapTimeDifference, 1)
+																 , deltaLaps: lapDifference
+																 , laps: speaker.Fragments[(lapDifference > 1) ? "Laps" : "Lap"]})
+
+							focused.reset(sector, true, true)
+
+							spoken := true
+						}
+					}
+			}
 		}
 		finally {
 			speaker.endTalk()
@@ -2102,12 +2298,14 @@ class RaceSpotter extends GridRaceAssistant {
 				rnd := Random(1, 9)
 
 			if (rnd > 6) {
-				rnd := Random(1, 10)
+				rnd := Random(1, focused ? 14 : 10)
 
-				if (standingsAhead && (rnd > 3))
+				if (standingsAhead && (rnd > 3) && (rnd < 11))
 					spoken := this.standingsGapToAhead()
 				else if (standingsBehind && (rnd <= 3))
 					spoken := this.standingsGapToBehind()
+				else if (focused && (rnd > 10))
+					spoken := this.focusGap()
 			}
 		}
 

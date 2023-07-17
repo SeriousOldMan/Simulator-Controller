@@ -1005,6 +1005,8 @@ class RaceSpotter extends GridRaceAssistant {
 		switch grammar, false {
 			case "FocusCar":
 				this.focusCarRecognized(words)
+			case "NoFocusCar":
+				this.noFocusCarRecognized(words)
 			default:
 				super.handleVoiceCommand(grammar, words)
 		}
@@ -1058,6 +1060,10 @@ class RaceSpotter extends GridRaceAssistant {
 			speaker.speakPhrase("NoFocusCar", {number: number})
 		else
 			speaker.speakPhrase("Repeat")
+	}
+
+	noFocusCarRecognized(words) {
+		this.FocusedCar := false
 	}
 
 	updateFocusCar(number) {
@@ -1195,7 +1201,7 @@ class RaceSpotter extends GridRaceAssistant {
 			if InStr(observed, "L")
 				leader := candidate
 
-			if InStr(observed, "F")
+			if (InStr(observed, "F") && (candidate == this.FocusedCar))
 				focused := candidate
 		}
 	}

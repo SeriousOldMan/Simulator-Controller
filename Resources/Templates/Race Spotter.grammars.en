@@ -56,6 +56,7 @@ GapToFocus=[(TellMe) the gap to {car, car number, number} (Number), (WhatIs) the
 LapTimes=[(TellMe) the {current lap, lap} times, (WhatAre) the {current lap, lap} times]
 ActiveCars=[(TellMe) the number of {cars, cars on the track, cars in the session, active cars, cars still active}, (WhatAre) the number of {cars, cars on the track, cars in the session}, How many cars {are, are still} {active, on the track, in the session}]
 FocusCar=[(CanYou) {focus on, observe} {car, car number, number} (Number), (CanYou) give {me, me more} information about {car, car number, number} (Number)]
+NoFocusCar=[Please no more information on {car, car number, number} (Number), Stop reporting on {car, car number, number} (Number) please]
 [Speaker Phrases]
 // Conversation //
 GreetingIntro.1=Hi %driver%, I am %name%. I will keep an eye on the other cars for you.

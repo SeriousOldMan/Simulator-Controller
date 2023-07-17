@@ -3,7 +3,7 @@ Version=5.1.2.0-dev
 Target=5.1.2.0-release
 Date=07/17/2023
 Download=
-Changes=New core setting to choose the dispatch cycle of external commands, New communication method for the Stream Deck plugin, New core setting to choose the between the Stream Deck communication methods, The Spotter can now "focus" on a specific opponent, Strategist and Spotter can now be asked for gap info for a specific car, Standings widget now shows car number in "System Monitor"
+Changes=New core setting to choose the dispatch cycle of external commands, New communication method for the Stream Deck plugin, New core setting to choose the between the Stream Deck communication methods, The Spotter can now "focus" on a specific opponent, Strategist and Spotter can now be asked for gap info for a specific car, Standings widget now shows car number in "System Monitor", Fixed bugs in Spanish grammars for Spotter and Strategist
 [Release]
 Version=5.1.1.0-release
 Date=07/14/2023

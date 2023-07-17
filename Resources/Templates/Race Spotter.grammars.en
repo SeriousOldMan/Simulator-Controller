@@ -111,7 +111,6 @@ PositionClass.1=You are currently in P %positionClass% in our class, P %position
 PositionClass.2=Your current position is P %positionClass% in our class, P %positionOverall% overall.
 Great.1=Great, keep going.
 Great.2=Perfect job so far.
-
 ConfirmFocusCar.1=Okay, you want me to observe car number %number%, is that correct?
 ConfirmFocusCar.2=I shall update you on car number %number% from time to time, right?
 NoFocusCar.1=There is no such car.
@@ -123,7 +122,10 @@ FocusGapToAhead.3=The gap is currently %delta% seconds.
 FocusGapToBehind.1=You are %delta% seconds ahead of car number %number%.
 FocusGapToBehind.2=The gap is currently %delta% seconds.
 FocusGapToBehind.3=The gap to car %number% behind you is %delta% seconds.
-
+FocusAheadLapped.1=Car number %number% is at least one lap up.
+FocusAheadLapped.2=You already have been lapped by car number %number%.
+FocusBehindLapped.1=Car number %number% is at least one lap down.
+FocusBehindLapped.2=You already have lapped car number %number%.
 TrackGapToAhead.1=You are currently %delta% seconds behind.
 TrackGapToAhead.2=You are %delta% seconds behind the car directly ahead of you.
 TrackGapToAhead.3=The gap is currently %delta% seconds.
@@ -264,7 +266,6 @@ InconsistentDriverBehind.2=But he's making a lot of mistakes, so it might be bet
 GainedBehind.1=The car behind you has lost %gained% seconds in %deltaLaps% %laps% and is %lapTime% seconds slower. Well done.
 GainedBehind.2=You gained %gained% seconds to the car behind you. The gap is already %delta% seconds and you are %lapTime% seconds faster.
 GainedBehind.3=The car one position behind you falls back. You gained %gained% seconds in %deltaLaps% %laps%.
-
 GainedFocusFront.1=You're catching up on the car number %number%, gained %gained% seconds. The gap is still %delta% seconds, but you are %lapTime% seconds faster.
 GainedFcousFront.2=You gained %gained% seconds in %deltaLaps% %laps% on the car number %number%, but you still have %delta% seconds to go.
 LostFocusFront.1=You lost to the car number %number%, %lost% seconds during %deltaLaps% %laps%. The gap is already %delta% seconds and he is %lapTime% seconds faster.
@@ -275,7 +276,6 @@ LostFocusBehind.3=The car number %number% is closing in. You lost %lost% seconds
 GainedFocusBehind.1=The car number %number% has lost %gained% seconds in %deltaLaps% %laps% and is %lapTime% seconds slower. Well done.
 GainedFocusBehind.2=You gained %gained% seconds to the car number %number%. The gap is already %delta% seconds and you are %lapTime% seconds faster.
 GainedFocusBehind.3=The car number %number% falls back. You gained %gained% seconds in %deltaLaps% %laps%.
-
 LessPitstops.1=%conjunction% you have already pitted.
 LessPitstops.2=%conjunction% you have %pitstops% pitstops more.
 LessPitstops.3=%conjunction% I think he still needs to pit.

@@ -1767,7 +1767,7 @@ class GridRaceAssistant extends RaceAssistant {
 				this.gapToBehindRecognized(words)
 			case "GapToLeader":
 				this.gapToLeaderRecognized(words)
-			case "GapToFoucs":
+			case "GapToFocus":
 				this.gapToFocusRecognized(words)
 			default:
 				super.handleVoiceCommand(grammar, words)
@@ -2123,7 +2123,7 @@ class GridRaceAssistant extends RaceAssistant {
 		local speaker := this.getSpeaker()
 		local car := knowledgebase.getValue("Driver.Car", kUndefined)
 		local validCar := false
-		local number, numbers, ignore, candidate, fragment, delta
+		local number, numbers, ignore, candidate, fragment, delta, inPit, lapped, lap
 
 		if !this.hasEnoughData()
 			return
@@ -2164,10 +2164,35 @@ class GridRaceAssistant extends RaceAssistant {
 					}
 
 			if car {
-				delta := (this.getDelta(car) / 1000)
+				speaker.beginTalk()
 
-				speaker.speakPhrase((delta < 0) ? "FocusGapToBehind" : "FocusGapToAhead"
-								  , {number: number, delta: speaker.number2Speech(Abs(delta), 1)})
+				try {
+					lap := knowledgeBase.getValue("Lap")
+					delta := (this.getDelta(car) / 1000)
+					inPit := (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false))
+					lapped := false
+
+					if ((delta = 0) || (inPit && (Abs(delta) < 30))) {
+						speaker.speakPhrase(inPit ? "GapCarInPit" : "NoTrackGap")
+
+						return
+					}
+					else if ((knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap")) < lap)
+						  && (Abs(delta) > (knowledgeBase.getValue("Lap." . lap . ".Time") / 1000))) {
+						speaker.speakPhrase((delta < 0) ? "FocusBehindLapped" : "FocusAheadLapped", {number: number})
+
+						lapped := true
+					}
+					else
+						speaker.speakPhrase((delta < 0) ? "FocusGapToBehind" : "FocusGapToAhead"
+										  , {number: number, delta: speaker.number2Speech(Abs(delta), 1)})
+
+					if (!lapped && inPit)
+						speaker.speakPhrase("GapCarInPit")
+				}
+				finally {
+					speaker.endTalk()
+				}
 			}
 			else if number
 				speaker.speakPhrase("NoFocusCar", {number: number})

@@ -2468,6 +2468,7 @@ class GridRaceAssistant extends RaceAssistant {
 				car := knowledgeBase.getValue("Position.Standings.Class.Leader.Car", 0)
 
 				if car {
+					setMultiMapValue(sessionInfo, "Standings", "Leader.Nr", knowledgeBase.getValue("Car." . car . ".Nr", false))
 					setMultiMapValue(sessionInfo, "Standings", "Leader.Lap.Time", Round(knowledgeBase.getValue("Car." . car . ".Time", 0) / 1000, 1))
 					setMultiMapValue(sessionInfo, "Standings", "Leader.Laps", knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap", 0)))
 					setMultiMapValue(sessionInfo, "Standings", "Leader.Delta", Round(knowledgeBase.getValue("Position.Standings.Class.Leader.Delta", 0) / 1000, 1))
@@ -2478,6 +2479,7 @@ class GridRaceAssistant extends RaceAssistant {
 				car := knowledgeBase.getValue("Position.Standings.Class.Ahead.Car", false)
 
 				if car {
+					setMultiMapValue(sessionInfo, "Standings", "Ahead.Nr", knowledgeBase.getValue("Car." . car . ".Nr", false))
 					setMultiMapValue(sessionInfo, "Standings", "Ahead.Lap.Time", Round(knowledgeBase.getValue("Car." . car . ".Time", 0) / 1000, 1))
 					setMultiMapValue(sessionInfo, "Standings", "Ahead.Laps", knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap", 0)))
 					setMultiMapValue(sessionInfo, "Standings", "Ahead.Delta", Round(knowledgeBase.getValue("Position.Standings.Class.Ahead.Delta", 0) / 1000, 1))
@@ -2490,6 +2492,7 @@ class GridRaceAssistant extends RaceAssistant {
 				car := knowledgeBase.getValue("Position.Standings.Class.Behind.Car")
 
 				if car {
+					setMultiMapValue(sessionInfo, "Standings", "Behind.Nr", knowledgeBase.getValue("Car." . car . ".Nr", false))
 					setMultiMapValue(sessionInfo, "Standings", "Behind.Lap.Time", Round(knowledgeBase.getValue("Car." . car . ".Time", 0) / 1000, 1))
 					setMultiMapValue(sessionInfo, "Standings", "Behind.Laps", knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap", 0)))
 					setMultiMapValue(sessionInfo, "Standings", "Behind.Delta", Round(knowledgeBase.getValue("Position.Standings.Class.Behind.Delta", 0) / 1000, 1))

@@ -649,7 +649,7 @@ class PositionInfo {
 		local trackBehind := this.atBehind(false)
 		local oldObserved := this.Observed
 		local newObserved := ((this.isLeader() ? "L" : "") . (trackAhead ? "TA" : "") . (trackBehind ? "TB" : "")
-							. (standingsAhead ? "SA" : "") . (standingsBehind ? "SB" : "") . ((this == this.Spotter.FocusedCar) ? "F" : ""))
+							. (standingsAhead ? "SA" : "") . (standingsBehind ? "SB" : "") . ((this == this.Spotter.FocusedCar[true]) ? "F" : ""))
 
 		if this.Spotter.DriverCar.InPit {
 			this.reset(sector, true, true)
@@ -1016,7 +1016,7 @@ class RaceSpotter extends GridRaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker := this.getSpeaker()
 		local validCar := false
-		local number, numbers, ignore, candidate, fragment
+		local number, numbers, ignore, carInfo, candidate, fragment
 
 		numbers := []
 
@@ -1042,7 +1042,7 @@ class RaceSpotter extends GridRaceAssistant {
 			number := false
 
 		if number
-			for ignore, carinfo in this.OtherCars
+			for ignore, carInfo in this.OtherCars
 				if (carInfo.Nr = number) {
 					validCar := true
 
@@ -1052,7 +1052,7 @@ class RaceSpotter extends GridRaceAssistant {
 		if (number && validCar) {
 			speaker.speakPhrase("ConfirmFocusCar", {number: number}, true)
 
-			this.setContinuation(ObjBindMethod(this, "updateFocusCar", number))
+			this.setContinuation(VoiceManager.ReplyContinuation(this, ObjBindMethod(this, "updateFocusCar", number), "Roger", "Okay"))
 
 			return
 		}
@@ -1201,7 +1201,7 @@ class RaceSpotter extends GridRaceAssistant {
 			if InStr(observed, "L")
 				leader := candidate
 
-			if (InStr(observed, "F") && (candidate == this.FocusedCar))
+			if (InStr(observed, "F") && (candidate == this.FocusedCar[true]))
 				focused := candidate
 		}
 	}
@@ -1343,8 +1343,9 @@ class RaceSpotter extends GridRaceAssistant {
 		local trackBehind := false
 		local leader := false
 		local focused := false
+		local number := false
 		local situation, sessionDuration, lapTime, sessionEnding, minute, lastTemperature, stintLaps
-		local minute, rnd, phrase, bestLapTime, number
+		local minute, rnd, phrase, bestLapTime
 
 		if ((remainingSessionLaps = kUndefined) || (remainingStintLaps = kUndefined))
 			return false
@@ -1891,7 +1892,7 @@ class RaceSpotter extends GridRaceAssistant {
 				lap := knowledgeBase.getValue("Lap", 0)
 
 				if (lap > 0) {
-					number := this.FocusedCar.Car.Nr
+					number := this.FocusedCar
 
 					for ignore, candidate in this.getCars()
 						if (knowledgeBase.getValue("Car." . candidate . ".Nr", false) = number) {
@@ -1936,7 +1937,7 @@ class RaceSpotter extends GridRaceAssistant {
 		local spoken := false
 		local standingsAhead, standingsBehind, trackAhead, trackBehind, leader, focused, info, informed, settings
 		local opponentType, delta, deltaDifference, lapDifference, lapTimeDifference, car, remaining, speaker, rnd
-		local unsafe, driverPitstops, carPitstops
+		local unsafe, driverPitstops, carPitstops, number
 
 		static lapUpRangeThreshold := kUndefined
 		static lapDownRangeThreshold := false
@@ -2199,19 +2200,18 @@ class RaceSpotter extends GridRaceAssistant {
 				}
 			}
 
-			focused := this.FocusedCar
-
 			if ((focused = standingsAhead) || (focused = standingsBehind))
 				focused := false
 
 			if focused {
+				number := focused.Car.Nr
 				delta := focused.Delta[false, true, 1]
 				deltaDifference := Abs(focused.DeltaDifference[sector])
 				lapTimeDifference := Abs(focused.LapTimeDifference)
 
 				if this.Debug[kDebugPositions] {
 					info := values2String(", ", values2String("|", this.DriverCar.LapTimes*), this.DriverCar.LapTime[true]
-																 , focused.Car.Nr, focused.Car.InPit, focused.Reported
+																 , number, focused.Car.InPit, focused.Reported
 																 , values2String("|", focused.Car.LapTimes*), focused.Car.LapTime[true]
 																 , values2String("|", focused.Car.Deltas[sector]*)
 																 , focused.Delta[sector], focused.Delta[false, true, 1]
@@ -2238,7 +2238,8 @@ class RaceSpotter extends GridRaceAssistant {
 																  , lost: speaker.number2Speech(deltaDifference, 1)
 																  , lapTime: speaker.number2Speech(lapTimeDifference, 1)
 																  , deltaLaps: lapDifference
-																  , laps: speaker.Fragments[(lapDifference > 1) ? "Laps" : "Lap"]})
+																  , laps: speaker.Fragments[(lapDifference > 1) ? "Laps" : "Lap"]
+																  , number: number})
 
 							if !informed
 								speaker.speakPhrase("Focus")
@@ -2252,7 +2253,8 @@ class RaceSpotter extends GridRaceAssistant {
 																	, gained: speaker.number2Speech(deltaDifference, 1)
 																	, lapTime: speaker.number2Speech(lapTimeDifference, 1)
 																	, deltaLaps: lapDifference
-																	, laps: speaker.Fragments[(lapDifference > 1) ? "Laps" : "Lap"]})
+																	, laps: speaker.Fragments[(lapDifference > 1) ? "Laps" : "Lap"]
+																	, number: number})
 
 							focused.reset(sector, true, true)
 
@@ -2265,7 +2267,8 @@ class RaceSpotter extends GridRaceAssistant {
 																   , gained: speaker.number2Speech(deltaDifference, 1)
 																   , lapTime: speaker.number2Speech(lapTimeDifference, 1)
 																   , deltaLaps: lapDifference
-																   , laps: speaker.Fragments[(lapDifference > 1) ? "Laps" : "Lap"]})
+																   , laps: speaker.Fragments[(lapDifference > 1) ? "Laps" : "Lap"]
+																   , number: number})
 
 							remaining := Min(knowledgeBase.getValue("Session.Time.Remaining"), knowledgeBase.getValue("Driver.Time.Stint.Remaining"))
 
@@ -2284,7 +2287,8 @@ class RaceSpotter extends GridRaceAssistant {
 																 , lost: speaker.number2Speech(deltaDifference, 1)
 																 , lapTime: speaker.number2Speech(lapTimeDifference, 1)
 																 , deltaLaps: lapDifference
-																 , laps: speaker.Fragments[(lapDifference > 1) ? "Laps" : "Lap"]})
+																 , laps: speaker.Fragments[(lapDifference > 1) ? "Laps" : "Lap"]
+																 , number: number})
 
 							focused.reset(sector, true, true)
 

@@ -1,9 +1,9 @@
 [Development]
 Version=5.2.0.0-dev
 Target=5.2.0.0-release
-Date=07/13/2023
+Date=07/18/2023
 Download=
-Changes=New controller action function "openPracticeCenter", New tool "PracticeCenter"
+Changes=New tool "PracticeCenter", New controller action function "openPracticeCenter", New plugin argument "openPracticeCenter" for "Race Engineer" and "Race Strategist" plugins
 [Release]
 Version=5.1.0.0-release
 Date=07/07/2023

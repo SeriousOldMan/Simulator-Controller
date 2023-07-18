@@ -66,6 +66,11 @@ namespace PluginConnector {
             }
         }
 
+        public void SetCommandFile(string commandFile)
+        {
+            SendMessage("Command:SetFile:" + commandFile);
+        }
+
         public void SetTitle(string function, string title) {
             SendMessage(function + ":SetTitle:" + title);
         }

@@ -300,7 +300,7 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 		}
 
 		printLine(&output, "Active=true");
-		printLine(&output, "Paused=", (localCopy->mGameState == GAME_INGAME_PAUSED) ? "true" : "false");
+		printLine(&output, "Paused=", ((localCopy->mGameState == GAME_INGAME_PLAYING) || (localCopy->mGameState == GAME_INGAME_INMENU_TIME_TICKING)) ? "false" : "true");
 
 		if (localCopy->mSessionState != SESSION_PRACTICE && localCopy->mLapsInEvent > 0 &&
 			(localCopy->mLapsInEvent - localCopy->mParticipantInfo[localCopy->mViewedParticipantIndex].mLapsCompleted) <= 0)

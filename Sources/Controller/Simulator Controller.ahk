@@ -1202,7 +1202,9 @@ class SimulatorController extends ConfigurationItem {
 
 	initializeBackgroundTasks() {
 		PeriodicTask(updateSimulatorState, 10000, kLowPriority).start()
-		PeriodicTask(externalCommandManager, 100, kLowPriority).start()
+		PeriodicTask(externalCommandManager, getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+															, "Controller", "External Dispatch", 100)
+										   , kLowPriority).start()
 
 		this.iShowLogo := (this.iShowLogo && !kSilentMode)
 	}
@@ -2046,7 +2048,6 @@ externalCommandManager() {
 	local file, line, commands, command, ignore, descriptor
 
 	if FileExist(fileName) {
-		commands := []
 		file := false
 
 		try {
@@ -2054,23 +2055,38 @@ externalCommandManager() {
 
 			if !file
 				return
+			else if (file.Length == 0) {
+				file.Close()
+
+				return
+			}
+			else
+				file.Pos := 0
 		}
 		catch Any as exception {
 			return
 		}
 
-		while !file.AtEOF {
-			command := Trim(file.ReadLine(), " `t`n`r")
+		commands := []
 
-			if (StrLen(command) == 0)
-				break
+		try {
+			while !file.AtEOF {
+				command := Trim(file.ReadLine(), " `t`n`r")
 
-			commands.Push(command)
+				if (StrLen(command) == 0)
+					break
+
+				commands.Push(command)
+			}
 		}
+		catch Any as exception {
+			logError(exception, true)
+		}
+		finally {
+			file.Length := 0
 
-		file.Close()
-
-		deleteFile(fileName)
+			file.Close()
+		}
 
 		for ignore, command in commands {
 			command := string2Values(A_Space, command)

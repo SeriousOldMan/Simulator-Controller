@@ -1,7 +1,7 @@
-## 5.1.1.0-release 07/14/23 (planned)
+## 5.1.1.0-release 07/14/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
-  3. You can now enable an audible feedback for Audible feedback in the Telemetry Analyzer. Whenever a handling event is registered (over- or understeering) a short beep of varying pitch and intensity will give you some feedback. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-telemetry-analyzer) for more information.
+  3. You can now enable an acoustic feedback for Audible feedback in the Telemetry Analyzer. Whenever a handling event is registered (over- or understeering) a short beep of varying pitch and intensity will give you some feedback. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-telemetry-analyzer) for more information.
   4. [Experts only] It is now possible to define your own modes and layers for Button Boxes. This allows any function of your sim or other applications on your PC to be triggered by the Button Box, not only the actions supplied by the plugins. Please see the [new documentation](*) for more information.
   5. A new controller action function "mouse" is available, which allows you to send virtual mouse clicks to any application by a button press on your controller.
   6. [Experts only] A new controller action function "call" let's you invoke internal methods for any plugin or the Controller itself.
@@ -11,8 +11,9 @@
   10. "Race Reports" will now try to open the recently selected simulator, car and track, if no simulation is currently running.
   11. New plugin parameter "openRaceReports" for the ["Race Strategist"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist), which let you start the race reports browser from your controller hardware.
   12. New controller action function ["openRaceReports"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) which you can use in your custom controller actions.
-  13. Migrated the sources to AHK 2.04
-  14. New car models for "Setup Workbench":
+  13. Fixed "Use initial pressures" for initialization of sessions with a very long formation lap.
+  14. Migrated the sources to AHK 2.04
+  15. New car models for "Setup Workbench":
       - Assetto Corsa
 	    - Ford GT40
 

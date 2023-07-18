@@ -1509,7 +1509,7 @@ class PracticeCenter extends ConfigurationItem {
 	}
 
 	createRun(lapNumber) {
-		local newRun := {Nr: (this.CurrentRun ? (this.CurrentRun.Nr + 1) : 1), Lap: lapNumber, StartTime: A_Now
+		local newRun := {Nr: (this.CurrentRun ? (this.CurrentRun.Nr + 1) : 1), Lap: lapNumber, StartTime: A_Now, TyreLaps: 0
 					   , Driver: "-", FuelAmount: "-", FuelConsumption: 0.0, Accidents: 0, Weather: "-", Compound: "-"
 					   , AvgLapTime: "-", Potential: "-", RaceCraft: "-", Speed: "-", Consistency: "-", CarControl: "-"
 					   , Laps: []}
@@ -1602,7 +1602,7 @@ class PracticeCenter extends ConfigurationItem {
 
 	createLap(run, lapNumber) {
 		local newLap := {Run: run, Nr: lapNumber, Weather: "-", Grip: "-", LapTime: "-", FuelConsumption: "-", FuelRemaining: "-"
-					   , Pressures: "-,-,-,-", Accident: ""}
+					   , Pressures: "-,-,-,-", Temperatures: "-,-,-,-", Accident: ""}
 
 		lap.Run := run
 		run.Laps.Push(lap)
@@ -1728,11 +1728,61 @@ class PracticeCenter extends ConfigurationItem {
 	addTelemetry(lap, simulator, car, track, weather, airTemperature, trackTemperature
 			   , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
 			   , compound, compoundColor, pressures, temperatures, wear) {
+		local telemetryDB := this.TelemetryDatabase
+		local driverID := lap.Run.Driver.ID
+		local update := false
+
+		if (lap.Pressures = "-,-,-,-") {
+			lap.Pressures := pressures
+
+			update := true
+		}
+
+		if (lap.Temperatures = "-,-,-,-") {
+			lap.Temperatures := temperatures
+
+			update := true
+		}
+
+		telemetryDB.addElectronicEntry(weather, airTemperature, trackTemperature, compound, compoundColor
+									 , map, tc, abs, fuelConsumption, fuelRemaining, lapTime
+									 , driverID)
+
+		pressures := string2Values(",", pressures)
+		temperatures := string2Values(",", temperatures)
+		wear := string2Values(",", wear)
+
+		telemetryDB.addTyreEntry(weather, airTemperature, trackTemperature, compound, compoundColor
+							   , lap.Run.TyreLaps + (lap.Nr - lap.Run.Lap) + 1
+							   , pressures[1], pressures[2], pressures[3], pressures[4]
+							   , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
+							   , wear[1], wear[2], wear[3], wear[4], fuelConsumption, fuelRemaining, lapTime
+							   , driverID)
+
+		if update {
+			this.modifyLap(lap)
+			this.modifyRun(lap.Run)
+
+			this.updateState()
+		}
 	}
 
 	addPressures(lap, simulator, car, track, weather, airTemperature, trackTemperature
 			   , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
-			   , compound, compoundColor, pressures, temperatures, wear) {
+			   , compound, compoundColor, coldPressures, hotPressures, pressuresLosses) {
+		this.PressuresDatabase.updatePressures(simulator, car, track, weather, airTemperature, trackTemperature
+											 , compound, compoundColor
+											 , string2Values(",", coldPressures)
+											 , string2Values(",", hotPressures), lap.Run.Driver.ID)
+
+		if (lap.Pressures = "-,-,-,-") {
+			lap.Pressures := hotPressures
+
+			this.modifyLap(lap)
+			this.modifyRun(lap.Run)
+
+			this.updateState()
+		}
 	}
 
 /*
@@ -5322,7 +5372,7 @@ class PracticeCenter extends ConfigurationItem {
 			if (this.SessionActive && (this.LastLap.Nr = lapNumber))
 				this.addPressures(this.LastLap, simulator, car, track, weather, airTemperature, trackTemperature
 								, fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
-								, compound, compoundColor, pressures, temperatures, wear)
+								, compound, compoundColor, coldPressures, hotPressures, pressuresLosses)
 		}
 
 		this.pushTask(udatePressuresAsync)

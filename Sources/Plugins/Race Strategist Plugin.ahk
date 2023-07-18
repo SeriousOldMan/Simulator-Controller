@@ -222,6 +222,18 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	}
 
 	addLap(lap, running, data) {
+		local teamServer := this.TeamServer
+		local pid := ProcessExist("Practice Center")
+		local fileName
+
+		if (pid && (!teamServer || !teamServer.SessionActive)) {
+			fileName := temporaryFileName("Practice Lap " . lap, "data")
+
+			writeMultiMap(fileName, data)
+
+			messageSend(kFileMessage, "Practice", "updateLap:" . values2String(";", lap, fileName), pid)
+		}
+
 		super.addLap(lap, running, data)
 
 		this.checkStrategy(lap)
@@ -279,10 +291,10 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 			pid := ProcessExist("Practice Center")
 
 			if pid
-				messageSend(kFileMessage, "Practice", "addTelemetry:" . values2String(";", lapNumber, simulator, car, track, weather
-																						 , airTemperature, trackTemperature
-																						 , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
-																						 , compound, compoundColor, pressures, temperatures, wear), pid)
+				messageSend(kFileMessage, "Practice", "updateTelemetry:" . values2String(";", lapNumber, simulator, car, track, weather
+																							, airTemperature, trackTemperature
+																							, fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
+																							, compound, compoundColor, pressures, temperatures, wear), pid)
 
 			this.LapDatabase.add("Telemetry", Database.Row("Lap", lapNumber, "Simulator", simulator, "Car", car, "Track", track
 														 , "Weather", weather, "Temperature.Air", airTemperature, "Temperature.Track", trackTemperature
@@ -454,13 +466,10 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 			DirCreate(kTempDirectory . "Race Report")
 
-			if pid {
-				FileCopy(fileName, kTempDirectory . "Race Report\Lap." lapNumber, 1)
+			FileCopy(fileName, kTempDirectory . "Race Report\Lap." lapNumber, 1)
 
-				messageSend(kFileMessage, "Practice", "addLap:" . values2String(";", lapNumber, fileName), pid)
-			}
-			else
-				FileMove(fileName, kTempDirectory . "Race Report\Lap." lapNumber, 1)
+			if pid
+				messageSend(kFileMessage, "Practice", "updateReportLap:" . values2String(";", lapNumber, fileName), pid)
 
 			loop {
 				lapNumber += 1
@@ -492,7 +501,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 			if pid {
 				FileCopy(fileName, kTempDirectory . "Race Report\Race.data")
 
-				messageSend(kFileMessage, "Practice", "startSession:" . values2String(";", lapNumber, fileName), pid)
+				messageSend(kFileMessage, "Practice", "updateReportData:" . values2String(";", lapNumber, fileName), pid)
 			}
 			else
 				FileMove(fileName, kTempDirectory . "Race Report\Race.data")

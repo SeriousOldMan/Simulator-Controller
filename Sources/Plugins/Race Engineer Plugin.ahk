@@ -437,10 +437,10 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 			pid := ProcessExist("Practice Center")
 
 			if pid
-				messageSend(kFileMessage, "Practice", "addPressures:" . values2String(";", lapNumber, simulator, car, track, weather
-																						 , airTemperature, trackTemperature
-																						 , compound, compoundColor
-																						 , coldPressures, hotPressures, pressuresLosses), pid)
+				messageSend(kFileMessage, "Practice", "updatePressures:" . values2String(";", lapNumber, simulator, car, track, weather
+																							, airTemperature, trackTemperature
+																							, compound, compoundColor
+																							, coldPressures, hotPressures, pressuresLosses), pid)
 
 			this.LapDatabase.add("Pressures", Database.Row("Lap", lapNumber, "Simulator", simulator, "Car", car, "Track", track
 														 , "Weather", weather, "Temperature.Air", airTemperature, "Temperature.Track", trackTemperature

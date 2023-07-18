@@ -1494,19 +1494,27 @@ class PracticeCenter extends ConfigurationItem {
 		}
 	}
 
+	getPreviousLap(lap) {
+		local laps := this.Laps
+
+		lap := (lap.Nr - 1)
+
+		while (lap > 0)
+			if laps.Has(lap)
+				return laps[lap]
+			else
+				lap -= 1
+
+		return false
+	}
+
 	createRun(lapNumber) {
 		local newRun := {Nr: (this.CurrentRun ? (this.CurrentRun.Nr + 1) : 1), Lap: lapNumber, StartTime: A_Now
-					   , Driver: "-", FuelAmount: 0.0, FuelConsumption: 0.0, Accidents: 0.0, Weather: "-", Compound: "-"
+					   , Driver: "-", FuelAmount: "-", FuelConsumption: 0.0, Accidents: 0, Weather: "-", Compound: "-"
 					   , AvgLapTime: "-", Potential: "-", RaceCraft: "-", Speed: "-", Consistency: "-", CarControl: "-"
 					   , Laps: []}
 
-		this.RunsListView.Add("", newRun.Nr, newRun.Lap, (run.Driver != "-") ? run.Driver.FullName : "-"
-								, values2String(", ", collect(string2Values(",", newRun.Weather), translate)*)
-								, translate(newRun.Compound), newRun.Laps.Length
-								, displayValue("Float", convertUnit("Volume", newRun.FuelAmount))
-								, displayValue("Float", convertUnit("Volume", newRun.FuelConsumption))
-								, lapTimeDisplayValue(newRun.AvgLaptime)
-								, newRun.Accidents, newRun.Potential, newRun.RaceCraft, newRun.Speed, newRun.Consistency, newRun.CarControl)
+		this.RunsListView.Add("", newRun.Nr, newRun.Lap, "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-")
 
 		newRun.Row := this.RunsListView.GetCount()
 
@@ -1518,21 +1526,213 @@ class PracticeCenter extends ConfigurationItem {
 		return newRun
 	}
 
-	updateRun(run) {
-		this.RunsListView.Modify(run.Row, "", run.Nr, newRun.Lap, (run.Driver != "-") ? run.Driver.FullName : "-"
+	modifyRun(run) {
+		local laps, numLaps, lapTimes, airTemperatures, trackTemperatures
+		local ignore, lap, consumption, weather, fuelAmount
+
+		run.FuelConsumption := 0.0
+		run.Accidents := 0
+		run.Weather := ""
+
+		laps := run.Laps
+		numLaps := laps.Length
+
+		lapTimes := []
+		airTemperatures := []
+		trackTemperatures := []
+
+		for ignore, lap in laps {
+			if (lap.Nr > 1) {
+				consumption := lap.FuelConsumption
+
+				if isNumber(consumption) {
+					run.FuelConsumption += ((this.getPreviousLap(lap).FuelConsumption = "-") ? (consumption * 2) : consumption)
+
+					if (run.FuelAmount = "-")
+						run.FuelAmount := (lap.FuelRemaining + run.FuelConsumption)
+				}
+			}
+
+			if lap.Accident
+				run.Accidents += 1
+
+			lapTimes.Push(lap.Laptime)
+			airTemperatures.Push(lap.AirTemperature)
+			trackTemperatures.Push(lap.TrackTemperature)
+
+			if (A_Index == 1)
+				run.Compound := lap.Compound
+
+			weather := lap.Weather
+
+			if (run.Weather = "")
+				run.Weather := weather
+			else if !inList(string2Values(",", run.Weather), weather)
+				run.Weather .= (", " . weather)
+		}
+
+		run.AvgLaptime := Round(average(laptimes), 1)
+		run.BestLaptime := Round(minimum(laptimes), 1)
+		run.FuelConsumption := Round(run.FuelConsumption, 2)
+		run.AirTemperature := Round(average(airTemperatures), 1)
+		run.TrackTemperature := Round(average(trackTemperatures), 1)
+
+		fuelAmount := run.FuelAmount
+
+		if isNumber(fuelAmount)
+			fuelAmount := displayValue("Float", convertUnit("Volume", fuelAmount))
+
+		this.RunsListView.Modify(run.Row, "", run.Nr, run.Lap, (run.Driver != "-") ? run.Driver.FullName : "-"
 											, values2String(", ", collect(string2Values(",", run.Weather), translate)*)
 											, translate(run.Compound), run.Laps.Length
-											, displayValue("Float", convertUnit("Volume", run.FuelAmount))
-											, displayValue("Float", convertUnit("Volume", run.FuelConsumption))
+											, fuelAmount, displayValue("Float", convertUnit("Volume", run.FuelConsumption))
 											, lapTimeDisplayValue(run.AvgLaptime)
 											, run.Accidents, run.Potential, run.RaceCraft, run.Speed, run.Consistency, run.CarControl)
 	}
 
-	createLap(run, lapNumber, data) {
+	requireRun(lapNumber) {
+		if !this.CurrentRun {
+			this.CurrentRun := this.createRun(lapNumber)
 
+			this.iSessionActive := true
+		}
+
+		return this.CurrentRun
 	}
 
-	updateLap(lap) {
+	createLap(run, lapNumber) {
+		local newLap := {Run: run, Nr: lapNumber, Weather: "-", Grip: "-", LapTime: "-", FuelConsumption: "-", FuelRemaining: "-"
+					   , Pressures: "-,-,-,-", Accident: ""}
+
+		lap.Run := run
+		run.Laps.Push(lap)
+
+		this.LapsListView.Add("", lap.Nr, run.Nr, "-", "-", "-", "-", "-", "-, -, -, -", "")
+
+		lap.Row := this.LapsListView.GetCount()
+
+		this.LapsListView.ModifyCol()
+
+		loop this.LapsListView.GetCount("Col")
+			this.LapsListView.ModifyCol(A_Index, "AutoHdr")
+
+		return lap
+	}
+
+	modifyLap(lap) {
+		local fuelConsumption := lap.FuelConsumption
+		local remainingFuel := lap.FuelRemaining
+		local pressures := string2Values(",", lap.Pressures)
+		local pressure
+
+		if isNumber(remainingFuel)
+			remainingFuel := displayValue("Float", convertUnit("Volume", remainingFuel))
+
+		if isNumber(fuelConsumption)
+			fuelConsumption := displayValue("Float", convertUnit("Volume", fuelConsumption))
+
+		loop 4 {
+			pressure := pressures[A_Index]
+
+			if isNumber(pressure)
+				pressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure))
+		}
+
+		this.LapsListView.Modify(lap.Row, "", lap.Nr, run.Nr, translate(lap.Weather), translate(lap.Grip)
+											, lapTimeDisplayValue(lap.Laptime), displayNullValue(fuelConsumption), remainingFuel
+											, values2String(", ", pressures*)
+											, lap.Accident ? translate("x") : "")
+	}
+
+	requireLap(lapNumber) {
+		if this.Laps.Has(lapNumber)
+			return this.Laps[lapNumber]
+		else
+			return this.createLap(this.requireRun(lapNumber), lapNumber)
+	}
+
+	addLap(lapNumber, data) {
+		local lap := this.requireLap(lapNumber)
+		local damage, pLap, fuelConsumption
+
+		lap.Data := data
+
+		if !isObject(lap.Run.Driver) {
+			lap.Run.Driver := this.createDriver({Forname: getMultiMapValue(data, "Stint Data", "DriverForname")
+											   , Surname: getMultiMapValue(data, "Stint Data", "DriverSurname")
+											   , Nickname: getMultiMapValue(data, "Stint Data", "DriverNickname")
+											   , ID: SessionDatabase.ID})
+
+			lap.Run.Compound := compound(getMultiMapValue(data, "Car Data", "TyreCompound")
+									   , getMultiMapValue(data, "Car Data", "TyreCompoundColor"))
+		}
+
+		damage := 0
+
+		for ignore, value in string2Values(",", getMultiMapValue(data, "Car Data", "BodyworkDamage"))
+			damage += value
+
+		for ignore, value in string2Values(",", getMultiMapValue(data, "Car Data", "SuspensionDamage"))
+			damage += value
+
+		lap.Damage := damage
+
+		if ((lap.Nr == 1) && (damage > 0))
+			lap.Accident := true
+		else {
+			pLap := this.getPreviousLap(lap)
+
+			if ((lap.Nr > 1) && pLap && (damage > pLap.Damage))
+				lap.Accident := true
+			else
+				lap.Accident := false
+		}
+
+		lap.EngineDamage := getMultiMapValue(data, "Car Data", "EngineDamage", 0)
+
+		lap.FuelRemaining := Round(getMultiMapValue(data, "Car Data", "FuelRemaining"), 1)
+
+		if ((lap.Nr == 1) || ((run.Laps.Length > 0) && (run.Laps[1] == lap)))
+			lap.FuelConsumption := "-"
+		else {
+			pLap := this.getPreviousLap(lap)
+
+			fuelConsumption := (pLap ? (pLap.FuelRemaining - lap.FuelRemaining) : 0)
+
+			lap.FuelConsumption := ((fuelConsumption > 0) ? Round(fuelConsumption, 2) : "-")
+		}
+
+		lap.Laptime := Round(getMultiMapValue(data, "Stint Data", "LapLastTime") / 1000, 1)
+
+		lap.Map := getMultiMapValue(data, "Car Data", "Map", "n/a")
+		lap.TC := getMultiMapValue(data, "Car Data", "TC", "n/a")
+		lap.ABS := getMultiMapValue(data, "Car Data", "ABS", "n/a")
+
+		lap.Weather := getMultiMapValue(data, "Weather Data", "Weather")
+		lap.Weather10Min := getMultiMapValue(data, "Weather Data", "Weather10Min")
+		lap.Weather30Min := getMultiMapValue(data, "Weather Data", "Weather30Min")
+		lap.AirTemperature := Round(getMultiMapValue(data, "Weather Data", "Temperature"), 1)
+		lap.TrackTemperature := Round(getMultiMapValue(data, "Track Data", "Temperature"), 1)
+		lap.Grip := getMultiMapValue(data, "Track Data", "Grip")
+
+		lap.Compound := lap.Run.Compound
+
+		this.LastLap := lap
+
+		this.modifyLap(lap)
+		this.modifyRun(lap.Run)
+
+		this.updateState()
+	}
+
+	addTelemetry(lap, simulator, car, track, weather, airTemperature, trackTemperature
+			   , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
+			   , compound, compoundColor, pressures, temperatures, wear) {
+	}
+
+	addPressures(lap, simulator, car, track, weather, airTemperature, trackTemperature
+			   , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
+			   , compound, compoundColor, pressures, temperatures, wear) {
 	}
 
 /*
@@ -4995,35 +5195,105 @@ class PracticeCenter extends ConfigurationItem {
 		this.pushTask(showLapDetailsAsync.Bind(lap))
 	}
 
-	startSession(lapNumber, fileName) {
-		startSessionAsync(fileName) {
-			if !this.SessionActive {
-				DirCreate(this.SessionDirectory . "Race Report")
+	updateLap(lapNumber, fileName) {
+		updateLapAsync() {
+			local data := readMultiMap(fileName)
 
-				FileCopy(fileName, this.SessionDirectory . "Race Report\Race.data", 1)
+			try {
+				if !this.SessionActive
+					this.iSessionActive := true
 
-				this.initializeReports()
-
-				this.iSessionActive := true
-
-				this.iCurrentRun := this.requireRun(lapNumber)
-
-				this.updateRaceData(lap, fileName)
-
-				this.updateState()
+				if (!this.LastLap || ((this.LastLap.Nr + 1) = lapNumber))
+					this.addLap(lapNumber, data)
 			}
-
-			deleteFile(fileName)
+			finally {
+				deleteFile(fileName)
+			}
 		}
 
-		this.pushTask(ObjBindMethod(this, "startSessionAsync"))
+		this.pushTask(updateLapAsync)
 	}
 
-	addLap(lapNumber, fileName) {
-		if this.SessionActive
-			this.updateRaceLap(this.requireLap(this.requireRun(lapNumber), lapNumber), fileName)
+	updateReportData(lapNumber, fileName) {
+		updateReportDataAsync() {
+			try {
+				if (this.SessionActive && (this.LastLap.Nr = lapNumber)) {
+					DirCreate(this.SessionDirectory . "Race Report")
 
-		deleteFile(fileName)
+					FileCopy(fileName, this.SessionDirectory . "Race Report\Race.data", 1)
+
+					this.initializeReports()
+				}
+			}
+			finally {
+				deleteFile(fileName)
+			}
+		}
+
+		this.pushTask(updateReportDataAsync)
+	}
+
+	updateReportLap(lapNumber, fileName) {
+		updateReportLapAsync() {
+			local raceData, lapData, directory, key, value, newLine, line
+			local pitstops, times, positions, laps, drivers
+
+			if (this.SessionActive && (this.LastLap.Nr = lapNumber)) {
+				directory := (this.SessionDirectory . "Race Report\")
+
+				raceData := readMultiMap(directory . "Race.data")
+				lapData := readMultiMap(fileName)
+
+				try {
+					if (lapData.Count == 0)
+						return
+
+					for key, value in getMultiMapValues(lapData, "Lap")
+						setMultiMapValue(raceData, "Laps", key, value)
+
+					pitstops := getMultiMapValue(lapData, "Pitstop", "Laps", "")
+
+					setMultiMapValue(data, "Laps", "Pitstops", pitstops)
+
+					times := getMultiMapValue(lapData, "Times", lapNumber)
+					positions := getMultiMapValue(lapData, "Positions", lapNumber)
+					laps := getMultiMapValue(lapData, "Laps", lapNumber)
+					drivers := getMultiMapValue(lapData, "Drivers", lapNumber)
+
+					newLine := ((lapNumber > 1) ? "`n" : "")
+
+					line := (newLine . times)
+
+					FileAppend(line, directory . "Times.CSV")
+
+					line := (newLine . positions)
+
+					FileAppend(line, directory . "Positions.CSV")
+
+					line := (newLine . laps)
+
+					FileAppend(line, directory . "Laps.CSV")
+
+					line := (newLine . drivers)
+					fileName := (directory . "Drivers.CSV")
+
+					FileAppend(line, fileName, "UTF-16")
+
+					removeMultiMapValue(raceData, "Laps", "Lap")
+					setMultiMapValue(raceData, "Laps", "Count", lapNumber)
+
+					writeMultiMap(directory . "Race.data", raceData)
+
+					this.updateReports()
+					this.updateState()
+				}
+				finally {
+					deleteFile(fileName)
+				}
+			}
+		}
+
+		this.pushTask(updateReportLapAsync)
 	}
 
 	updateStandings(lapNumber, fileName) {
@@ -5033,31 +5303,29 @@ class PracticeCenter extends ConfigurationItem {
 		deleteFile(fileName)
 	}
 
-	addTelemetry(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
-			   , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
-			   , compound, compoundColor, pressures, temperatures, wear) {
-		local lap
-
-		if this.SessionActive {
-			lap := this.requireLap(this.requireRun(lapNumber), lapNumber)
-
-			this.updateTelemetry(lap, simulator, car, track, weather, airTemperature, trackTemperature
-							   , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
-							   , compound, compoundColor, pressures, temperatures, wear)
+	updateTelemetry(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
+				  , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
+				  , compound, compoundColor, pressures, temperatures, wear) {
+		udateTelemetryAsync() {
+			if (this.SessionActive && (this.LastLap.Nr = lapNumber))
+				this.addTelemetry(this.LastLap, simulator, car, track, weather, airTemperature, trackTemperature
+								, fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
+								, compound, compoundColor, pressures, temperatures, wear)
 		}
+
+		this.pushTask(udateTelemetryAsync)
 	}
 
-	addPressures(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
-			   , compound, compoundColor, coldPressures, hotPressures, pressuresLosses) {
-		local lap
-
-		if this.SessionActive {
-			lap := this.requireLap(this.requireRun(lapNumber), lapNumber)
-
-			this.updatePressures(lap, simulator, car, track, weather, airTemperature, trackTemperature
-							   , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
-							   , compound, compoundColor, pressures, temperatures, wear)
+	updatePressures(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
+				  , compound, compoundColor, coldPressures, hotPressures, pressuresLosses) {
+		updatePressuresAsync() {
+			if (this.SessionActive && (this.LastLap.Nr = lapNumber))
+				this.addPressures(this.LastLap, simulator, car, track, weather, airTemperature, trackTemperature
+								, fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
+								, compound, compoundColor, pressures, temperatures, wear)
 		}
+
+		this.pushTask(udatePressuresAsync)
 	}
 }
 

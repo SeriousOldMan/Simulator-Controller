@@ -1496,8 +1496,14 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 			FileEncoding("UTF-8")
 
 			try {
-				loop Read, report . "\Drivers.CSV"
-					drivers.Push(string2Values(";", A_LoopReadLine))
+				loop Read, report . "\Drivers.CSV" {
+					lapDrivers := string2Values(";", A_LoopReadLine)
+
+					loop lapDrivers.Length
+						lapDrivers[A_Index] := string2Values("|||", lapDrivers[A_Index])[1]
+
+					drivers.Push(lapDrivers)
+				}
 
 				drivers := correctEmptyValues(drivers)
 			}

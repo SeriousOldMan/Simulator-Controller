@@ -775,6 +775,7 @@ systemMonitor(command := false, arguments*) {
 		local positionOverall := getMultiMapValue(sessionState, "Standings", "Position.Overall")
 		local positionClass := getMultiMapValue(sessionState, "Standings", "Position.Class")
 		local html := ""
+		local leaderNr := false
 		local nr, delta, colorOpen, colorClose
 
 		static lastLeaderDelta := false
@@ -812,6 +813,8 @@ systemMonitor(command := false, arguments*) {
 				computeColorInfo(Abs(delta), &lastLeaderDelta, "red", "green", &colorOpen, &colorClose)
 
 				if nr {
+					leaderNr := nr
+
 					html .= ("<tr><th class=`"th-std th-left`">" . substituteVariables(translate("Leader #%nr% (Laps)"), {nr: nr}) . "</th><td class=`"td-wdg`">" . getMultiMapValue(sessionState, "Standings", "Leader.Laps") . "</td></tr>")
 					html .= ("<tr><th class=`"th-std th-left`">" . substituteVariables(translate("Leader #%nr% (Delta)"), {nr: nr}) . "</th><td class=`"td-wdg`">" . colorOpen . displayValue("Time", delta) . colorClose . "</td></tr>")
 					html .= ("<tr><th class=`"th-std th-left`">" . substituteVariables(translate("Leader #%nr% (Lap Time)"), {nr: nr}) . "</th><td class=`"td-wdg`">" . displayValue("Time", getMultiMapValue(sessionState, "Standings", "Leader.Lap.Time")) . "</td></tr>")
@@ -830,9 +833,11 @@ systemMonitor(command := false, arguments*) {
 				computeColorInfo(Abs(delta), &lastAheadDelta, "red", "green", &colorOpen, &colorClose)
 
 				if nr {
-					html .= ("<tr><th class=`"th-std th-left`">" . substituteVariables(translate("Ahead #%nr% (Laps)"), {nr: nr}) . "</th><td class=`"td-wdg`">" . getMultiMapValue(sessionState, "Standings", "Ahead.Laps") . "</td></tr>")
-					html .= ("<tr><th class=`"th-std th-left`">" . substituteVariables(translate("Ahead #%nr% (Delta)"), {nr: nr}) . "</th><td class=`"td-wdg`">" . colorOpen . displayValue("Time", delta) . colorClose . "</td></tr>")
-					html .= ("<tr><th class=`"th-std th-left`">" . substituteVariables(translate("Ahead #%nr% (Lap Time)"), {nr: nr}) . "</th><td class=`"td-wdg`">" . displayValue("Time", getMultiMapValue(sessionState, "Standings", "Ahead.Lap.Time")) . "</td></tr>")
+					if (nr != leaderNr) {
+						html .= ("<tr><th class=`"th-std th-left`">" . substituteVariables(translate("Ahead #%nr% (Laps)"), {nr: nr}) . "</th><td class=`"td-wdg`">" . getMultiMapValue(sessionState, "Standings", "Ahead.Laps") . "</td></tr>")
+						html .= ("<tr><th class=`"th-std th-left`">" . substituteVariables(translate("Ahead #%nr% (Delta)"), {nr: nr}) . "</th><td class=`"td-wdg`">" . colorOpen . displayValue("Time", delta) . colorClose . "</td></tr>")
+						html .= ("<tr><th class=`"th-std th-left`">" . substituteVariables(translate("Ahead #%nr% (Lap Time)"), {nr: nr}) . "</th><td class=`"td-wdg`">" . displayValue("Time", getMultiMapValue(sessionState, "Standings", "Ahead.Lap.Time")) . "</td></tr>")
+					}
 				}
 				else {
 					html .= ("<tr><th class=`"th-std th-left`">" . translate("Ahead (Laps)") . "</th><td class=`"td-wdg`">" . getMultiMapValue(sessionState, "Standings", "Ahead.Laps") . "</td></tr>")

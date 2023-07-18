@@ -2393,10 +2393,10 @@ class GridRaceAssistant extends RaceAssistant {
 
 			if driver {
 				driverLap := getMultiMapValue(data, "Position Data", "Car." . driver . ".Laps", getMultiMapValue(data, "Position Data", "Car." . driver . ".Lap"))
-				driverRunning := getMultiMapValue(data, "Position Data", "Car." . driver . ".Running")
+				driverRunning := getMultiMapValue(data, "Position Data", "Car." . driver . ".Lap.Running")
 				driverTime := getMultiMapValue(data, "Position Data", "Car." . driver . ".Time")
 				carLap := getMultiMapValue(data, "Position Data", "Car." . car . ".Laps", getMultiMapValue(data, "Position Data", "Car." . car . ".Lap"))
-				carRunning := getMultiMapValue(data, "Position Data", "Car." . car . ".Running")
+				carRunning := getMultiMapValue(data, "Position Data", "Car." . car . ".Lap.Running")
 
 				return (((carLap + carRunning) - (driverLap + driverRunning)) * driverTime)
 			}
@@ -2410,12 +2410,12 @@ class GridRaceAssistant extends RaceAssistant {
 
 			if driver {
 				driverLap := knowledgeBase.getValue("Car." . driver . ".Laps", knowledgeBase.getValue("Car." . driver . ".Lap"))
-				driverRunning := knowledgeBase.getValue("Car." . driver . ".Running")
+				driverRunning := knowledgeBase.getValue("Car." . driver . ".Lap.Running")
 				driverTime := knowledgeBase.getValue("Car." . driver . ".Time")
 				carLap := knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap"))
-				carRunning := knowledgeBase.getValue("Car." . car . ".Running")
+				carRunning := knowledgeBase.getValue("Car." . car . ".Lap.Running")
 
-				return (((carLap + carRunning) - (driverLap + driverRunning)) * driverTime / 1000)
+				return (((carLap + carRunning) - (driverLap + driverRunning)) * driverTime)
 			}
 			else
 				return false
@@ -2426,7 +2426,7 @@ class GridRaceAssistant extends RaceAssistant {
 		if data
 			return getMultiMapValue(data, "Position Data", "Car." . car . ".Time", false)
 		else
-			return this.KnowledgeBase.getValue("Car." . driver . ".Time", false)
+			return this.KnowledgeBase.getValue("Car." . car . ".Time", false)
 	}
 
 	prepareData(lapNumber, data) {

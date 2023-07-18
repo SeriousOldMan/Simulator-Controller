@@ -17,8 +17,6 @@
 ;@SC #Include "..\Framework\Production.ahk"
 ;@SC-EndIf
 
-; REMOVED: #MaxMem 128
-
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Console.ico
 ;@Ahk2Exe-ExeName Race Center.exe
 
@@ -10240,7 +10238,7 @@ class RaceCenter extends ConfigurationItem {
 		local hasColdPressures := false
 		local pressuresDB := this.PressuresDatabase
 		local pressuresTable, pressures, coldPressures, hotPressures, pressuresLosses, tyresTable, tyres
-		local stintNr, fuel, tyreCompound, tyreCompoundColor, tyreSet, tyrePressures, pressureCorrections, pressure
+		local fuel, tyreCompound, tyreCompoundColor, tyreSet, tyrePressures, pressureCorrections, pressure
 		local fuelConsumption, remainingFuel, remainingDriverTime, remainingStintTime
 
 		if pressuresDB {

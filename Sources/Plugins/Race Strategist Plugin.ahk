@@ -629,76 +629,78 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 			else {
 				data := readMultiMap(kTempDirectory . "Race Report\Race.data")
 
-				count := 0
-				pitstops := false
+				if (data.Count > 0) {
+					count := 0
+					pitstops := false
 
-				try {
-					if FileExist(kTempDirectory . "Race Report\Output")
-						deleteDirectory(kTempDirectory . "Race Report\Output")
+					try {
+						if FileExist(kTempDirectory . "Race Report\Output")
+							deleteDirectory(kTempDirectory . "Race Report\Output")
 
-					DirCreate(kTempDirectory . "Race Report\Output")
-				}
-				catch Any as exception {
-					logError(exception)
-				}
-
-				loop {
-					fileName := (kTempDirectory . "Race Report\Lap." . A_Index)
-
-					if !FileExist(fileName)
-						break
-					else {
-						lapData := readMultiMap(fileName)
-
-						count += 1
-
-						for key, value in getMultiMapValues(lapData, "Lap")
-							setMultiMapValue(data, "Laps", key, value)
-
-						pitstops := getMultiMapValue(lapData, "Pitstop", "Laps", "")
-
-						times := getMultiMapValue(lapData, "Times", A_Index)
-						positions := getMultiMapValue(lapData, "Positions", A_Index)
-						laps := getMultiMapValue(lapData, "Laps", A_Index)
-						drivers := getMultiMapValue(lapData, "Drivers", A_Index)
-
-						newLine := ((count > 1) ? "`n" : "")
-
-						line := (newLine . times)
-
-						FileAppend(line, kTempDirectory . "Race Report\Output\Times.CSV")
-
-						line := (newLine . positions)
-
-						FileAppend(line, kTempDirectory . "Race Report\Output\Positions.CSV")
-
-						line := (newLine . laps)
-
-						FileAppend(line, kTempDirectory . "Race Report\Output\Laps.CSV")
-
-						line := (newLine . drivers)
-						fileName := (kTempDirectory . "Race Report\Output\Drivers.CSV")
-
-						FileAppend(line, fileName, "UTF-16")
+						DirCreate(kTempDirectory . "Race Report\Output")
 					}
+					catch Any as exception {
+						logError(exception)
+					}
+
+					loop {
+						fileName := (kTempDirectory . "Race Report\Lap." . A_Index)
+
+						if !FileExist(fileName)
+							break
+						else {
+							lapData := readMultiMap(fileName)
+
+							count += 1
+
+							for key, value in getMultiMapValues(lapData, "Lap")
+								setMultiMapValue(data, "Laps", key, value)
+
+							pitstops := getMultiMapValue(lapData, "Pitstop", "Laps", "")
+
+							times := getMultiMapValue(lapData, "Times", A_Index)
+							positions := getMultiMapValue(lapData, "Positions", A_Index)
+							laps := getMultiMapValue(lapData, "Laps", A_Index)
+							drivers := getMultiMapValue(lapData, "Drivers", A_Index)
+
+							newLine := ((count > 1) ? "`n" : "")
+
+							line := (newLine . times)
+
+							FileAppend(line, kTempDirectory . "Race Report\Output\Times.CSV")
+
+							line := (newLine . positions)
+
+							FileAppend(line, kTempDirectory . "Race Report\Output\Positions.CSV")
+
+							line := (newLine . laps)
+
+							FileAppend(line, kTempDirectory . "Race Report\Output\Laps.CSV")
+
+							line := (newLine . drivers)
+							fileName := (kTempDirectory . "Race Report\Output\Drivers.CSV")
+
+							FileAppend(line, fileName, "UTF-16")
+						}
+					}
+
+					removeMultiMapValue(data, "Laps", "Lap")
+					setMultiMapValue(data, "Laps", "Count", count)
+
+					setMultiMapValue(data, "Laps", "Pitstops", pitstops)
+
+					writeMultiMap(kTempDirectory . "Race Report\Output\Race.data", data)
+
+					if !targetDirectory {
+						simulatorCode := SessionDatabase.getSimulatorCode(getMultiMapValue(data, "Session", "Simulator"))
+						carCode := SessionDatabase.getCarCode(simulatorCode, getMultiMapValue(data, "Session", "Car"))
+						trackCode := SessionDatabase.getTrackCode(simulatorCode, getMultiMapValue(data, "Session", "Track"))
+
+						targetDirectory := (reportsDirectory . "\" . simulatorCode . "\" . carCode . "\" . trackCode . "\" . getMultiMapValue(data, "Session", "Time"))
+					}
+
+					DirCopy(kTempDirectory . "Race Report\Output", targetDirectory, 1)
 				}
-
-				removeMultiMapValue(data, "Laps", "Lap")
-				setMultiMapValue(data, "Laps", "Count", count)
-
-				setMultiMapValue(data, "Laps", "Pitstops", pitstops)
-
-				writeMultiMap(kTempDirectory . "Race Report\Output\Race.data", data)
-
-				if !targetDirectory {
-					simulatorCode := SessionDatabase.getSimulatorCode(getMultiMapValue(data, "Session", "Simulator"))
-					carCode := SessionDatabase.getCarCode(simulatorCode, getMultiMapValue(data, "Session", "Car"))
-					trackCode := SessionDatabase.getTrackCode(simulatorCode, getMultiMapValue(data, "Session", "Track"))
-
-					targetDirectory := (reportsDirectory . "\" . simulatorCode . "\" . carCode . "\" . trackCode . "\" . getMultiMapValue(data, "Session", "Time"))
-				}
-
-				DirCopy(kTempDirectory . "Race Report\Output", targetDirectory, 1)
 			}
 		}
 	}
@@ -739,82 +741,86 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 				reader.loadData(false, &raceData, &drivers, &positions, &times)
 
-				cars := getMultiMapValue(raceData, "Cars", "Count", 0)
-				driver := getMultiMapValue(raceData, "Cars", "Driver", 0)
-				laps := getMultiMapValue(raceData, "Laps", "Count", 0)
+				if (raceData.Count > 0) {
+					cars := getMultiMapValue(raceData, "Cars", "Count", 0)
+					driver := getMultiMapValue(raceData, "Cars", "Driver", 0)
+					laps := getMultiMapValue(raceData, "Laps", "Count", 0)
 
-				if (reader.getClasses(raceData, categories).Length > 1) {
-					class := reader.getClass(raceData, driver, categories)
+					if (reader.getClasses(raceData, categories).Length > 1) {
+						class := reader.getClass(raceData, driver, categories)
 
-					if class {
-						classCars := 0
-						classPositions := []
+						if class {
+							classCars := 0
+							classPositions := []
 
-						loop cars
-							if (reader.getClass(raceData, A_Index, categories) = class) {
-								classCars += 1
+							loop cars
+								if (reader.getClass(raceData, A_Index, categories) = class) {
+									classCars += 1
 
-								if laps
-									position := (positions[laps].Has(A_Index) ? positions[laps][A_Index] : cars)
-								else
-									position := cars
+									if laps
+										position := (positions[laps].Has(A_Index) ? positions[laps][A_Index] : cars)
+									else
+										position := cars
 
-								classPositions.Push(Array(A_Index, position))
+									classPositions.Push(Array(A_Index, position))
+								}
+
+							bubbleSort(&classPositions, comparePositions)
+
+							for car, candidate in classPositions {
+								if (car = 1)
+									leader := candidate[1]
+
+								if (candidate[1] = driver) {
+									position := car
+
+									break
+								}
 							}
 
-						bubbleSort(&classPositions, comparePositions)
+							if (position = cars)
+								position := classCars
 
-						for car, candidate in classPositions {
-							if (car = 1)
-								leader := candidate[1]
+							cars := classCars
+							multiClass := true
+						}
+					}
 
-							if (candidate[1] = driver) {
-								position := car
+					if !multiClass {
+						if laps
+							position := (positions[laps].Has(driver) ? positions[laps][driver] : cars)
+						else
+							position := cars
+
+						leader := 0
+
+						for car, candidate in positions[laps]
+							if (candidate = 1) {
+								leader := car
 
 								break
 							}
-						}
-
-						if (position = cars)
-							position := classCars
-
-						cars := classCars
-						multiClass := true
 					}
+
+					min := false
+					max := false
+					leaderAvgLapTime := false
+					stdDev := false
+
+					reader.getDriverPace(raceData, times, leader, &min, &max, &leaderAvgLapTime, &stdDev)
+
+					driverMinLapTime := false
+					driverMaxLapTime := false
+					driverAvgLapTime := false
+					driverLapTimeStdDev := false
+
+					reader.getDriverPace(raceData, times, driver, &driverMinLapTime, &driverMaxLapTime, &driverAvgLapTime, &driverLapTimeStdDev)
+
+					this.RaceAssistant["Ghost"].reviewRace(multiclass, cars, laps, position, leaderAvgLapTime
+														 , driverAvgLapTime, driverMinLapTime, driverMaxLapTime, driverLapTimeStdDev)
 				}
-
-				if !multiClass {
-					if laps
-						position := (positions[laps].Has(driver) ? positions[laps][driver] : cars)
-					else
-						position := cars
-
-					leader := 0
-
-					for car, candidate in positions[laps]
-						if (candidate = 1) {
-							leader := car
-
-							break
-						}
-				}
-
-				min := false
-				max := false
-				leaderAvgLapTime := false
-				stdDev := false
-
-				reader.getDriverPace(raceData, times, leader, &min, &max, &leaderAvgLapTime, &stdDev)
-
-				driverMinLapTime := false
-				driverMaxLapTime := false
-				driverAvgLapTime := false
-				driverLapTimeStdDev := false
-
-				reader.getDriverPace(raceData, times, driver, &driverMinLapTime, &driverMaxLapTime, &driverAvgLapTime, &driverLapTimeStdDev)
-
-				this.RaceAssistant["Ghost"].reviewRace(multiclass, cars, laps, position, leaderAvgLapTime
-													 , driverAvgLapTime, driverMinLapTime, driverMaxLapTime, driverLapTimeStdDev)
+				else
+					this.RaceAssistant["Ghost"].reviewRace(false, 0, 0, 0, 0, 0, 0, 0, 0)
 			}
 			catch Any as exception {
 				logError(exception)

@@ -349,7 +349,8 @@ class TelemetryDatabase extends SessionDatabase {
 	}
 
 	addTyreEntry(weather, airTemperature, trackTemperature, compound, compoundColor, tyreLaps
-			   , pressureFL, pressureFR, pressureRL, pressureRR, temperatureFL, temperatureFR, temperatureRL, temperatureRR
+			   , pressureFL, pressureFR, pressureRL, pressureRR
+			   , temperatureFL, temperatureFR, temperatureRL, temperatureRR
 			   , wearFL, wearFR, wearRL, wearRR, fuelConsumption, fuelRemaining, lapTime
 			   , driver := false, identifier := false) {
 		local db := this.Database

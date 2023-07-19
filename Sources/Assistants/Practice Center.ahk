@@ -967,7 +967,7 @@ class PracticeCenter extends ConfigurationItem {
 
 		centerGui.SetFont("Norm", "Arial")
 
-		centerTab := centerGui.Add("Tab3", "x16 ys+39 w593 h316 H:Grow(0.8) AltSubmit -Wrap Section vpracticeCenterTabView", collect(["Runs", "Laps"], translate))
+		centerTab := centerGui.Add("Tab3", "x16 ys+39 w593 h316 H:Grow(0.8) AltSubmit -Wrap Section vpracticeCenterTabView", collect(["Stints", "Laps"], translate))
 
 		centerTab.UseTab(1)
 
@@ -2245,7 +2245,7 @@ class PracticeCenter extends ConfigurationItem {
 				count := currentRun.Nr
 
 				loop count {
-					showProgress({progress: Round((A_Index / count) * 50), color: "Green", message: translate("Run: ") . A_Index})
+					showProgress({progress: Round((A_Index / count) * 50), color: "Green", message: translate("Stint: ") . A_Index})
 
 					if this.Runs.Has(A_Index) {
 						run := this.Runs[A_Index]
@@ -3518,7 +3518,7 @@ class PracticeCenter extends ConfigurationItem {
 				lapData["Tyre.Wear.Rear.Average"] := ((wearFL = kNull) ? kNull : null(average([wearRL, wearRR])))
 
 				if lap.HasProp("Data") {
-					telemetry := parseMultiMap(lap.Data)
+					telemetry := lap.Data
 
 					if (telemetry.Count > 0) {
 						brakeTemperatures := string2Values(",", getMultiMapValue(telemetry, "Car Data", "BrakeTemperature", ""))
@@ -3908,7 +3908,7 @@ class PracticeCenter extends ConfigurationItem {
 
 	showRunDetails(run) {
 		showRunDetailsAsync(run) {
-			local html := ("<div id=`"header`"><b>" . translate("Run: ") . run.Nr . "</b></div>")
+			local html := ("<div id=`"header`"><b>" . translate("Stint: ") . run.Nr . "</b></div>")
 			local laps := []
 			local positions := []
 			local lapTimes := []

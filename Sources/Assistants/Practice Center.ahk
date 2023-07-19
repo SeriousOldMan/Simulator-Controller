@@ -56,12 +56,12 @@ global kDetailReports := ["Run", "Lap", "Session", "Drivers"]
 global kSessionDataSchemas := CaseInsenseMap("Run.Data", ["Nr", "Lap", "Driver.Forname", "Driver.Surname", "Driver.Nickname", "Driver.ID"
 													    , "Weather", "Tyre.Compound", "Tyre.Compound.Color", "Tyre.Set", "Tyre.Laps"
 														, "Lap.Time.Average", "Lap.Time.Best"
-														, "Fuel.Amount", "Fuel.Consumption", "Accidents"
+														, "Fuel.Initial", "Fuel.Consumption", "Accidents"
 													    , "Time.Start", "Time.End"]
 										   , "Driver.Data", ["Forname", "Surname", "Nickname", "ID"]
 										   , "Lap.Data", ["Run", "Nr", "Lap", "Lap.Time", "Grip", "Map", "TC", "ABS"
 														, "Weather", "Temperature.Air", "Temperature.Track"
-														, "Fuel.Remaining", "Fuel.Consumption", "Damage", "EngineDamage", "Accident"
+														, "Fuel.Initial", "Fuel.Remaining", "Fuel.Consumption", "Damage", "EngineDamage", "Accident"
 														, "Tyre.Laps", "Tyre.Compound", "Tyre.Compound.Color"
 														, "Tyre.Pressure.Cold.Average", "Tyre.Pressure.Cold.Front.Average", "Tyre.Pressure.Cold.Rear.Average"
 														, "Tyre.Pressure.Cold.Front.Left", "Tyre.Pressure.Cold.Front.Right"
@@ -77,13 +77,12 @@ global kSessionDataSchemas := CaseInsenseMap("Run.Data", ["Nr", "Lap", "Driver.F
 														, "Tyre.Wear.Average", "Tyre.Wear.Front.Average", "Tyre.Wear.Rear.Average"
 														, "Tyre.Wear.Front.Left", "Tyre.Wear.Front.Right"
 														, "Tyre.Wear.Rear.Left", "Tyre.Wear.Rear.Right"
+														, "Brake.Temperature.Average", "Brake.Temperature.Front.Average", "Brake.Temperature.Rear.Average"
 														, "Brake.Temperature.Front.Left", "Brake.Temperature.Front.Right"
 														, "Brake.Temperature.Rear.Left", "Brake.Temperature.Rear.Right"
 														, "Brake.Wear.Average", "Brake.Wear.Front.Average", "Brake.Wear.Rear.Average"
 														, "Brake.Wear.Front.Left", "Brake.Wear.Front.Right"
 														, "Brake.Wear.Rear.Left", "Brake.Wear.Rear.Right"
-														, "Brake.Temperature.Average"
-														, "Brake.Temperature.Front.Average", "Brake.Temperature.Rear.Average"
 														, "Data.Telemetry", "Data.Pressures"])
 
 global kPCTyresSchemas := kTyresSchemas.Clone()
@@ -917,7 +916,7 @@ class PracticeCenter extends ConfigurationItem {
 
 		this.iReportsListView.ModifyCol(1, "AutoHdr")
 
-		centerGui.Add("Text", "x141 yp+2 w70 h23 +0x200", translate("Run"))
+		centerGui.Add("Text", "x141 yp+2 w70 h23 +0x200", translate("Stint"))
 		centerGui.Add("DropDownList", "x195 yp w191 vrunDropDown").OnEvent("Change", chooseRunData)
 
 		centerGui.Add("Text", "x141 yp+24 w70 h23 +0x200", translate("X-Axis"))
@@ -972,12 +971,12 @@ class PracticeCenter extends ConfigurationItem {
 
 		centerTab.UseTab(1)
 
-		this.iRunsListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 H:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Lap", "Driver", "Weather", "Compound", "Laps", "Fuel Level", "Consumption", "Avg. Lap Time", "Accidents", "Potential", "Race Craft", "Speed", "Consistency", "Car Control"], translate))
+		this.iRunsListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 H:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Lap", "Driver", "Weather", "Compound", "Laps", "Initial Fuel", "Consumed Fuel", "Avg. Lap Time", "Accidents", "Potential", "Race Craft", "Speed", "Consistency", "Car Control"], translate))
 		this.iRunsListView.OnEvent("Click", chooseRun)
 
 		centerTab.UseTab(2)
 
-		this.iLapsListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 H:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Run", "Weather", "Grip", "Lap Time", "Consumption", "Remaining", "Pressures", "Accident"], translate))
+		this.iLapsListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 H:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Stint", "Weather", "Grip", "Lap Time", "Consumption", "Remaining", "Pressures", "Accident"], translate))
 		this.iLapsListView.OnEvent("Click", chooseLap)
 
 		centerGui.Rules := ""
@@ -1529,7 +1528,7 @@ class PracticeCenter extends ConfigurationItem {
 
 	createRun(lapNumber) {
 		local newRun := {Nr: (this.CurrentRun ? (this.CurrentRun.Nr + 1) : 1), Lap: lapNumber, StartTime: A_Now, TyreLaps: 0
-					   , Driver: "-", FuelAmount: "-", FuelConsumption: 0.0, Accidents: 0, Weather: "-", Compound: "-"
+					   , Driver: "-", FuelInitial: "-", FuelConsumption: 0.0, Accidents: 0, Weather: "-", Compound: "-"
 					   , AvgLapTime: "-", Potential: "-", RaceCraft: "-", Speed: "-", Consistency: "-", CarControl: "-"
 					   , Laps: []}
 
@@ -1571,8 +1570,8 @@ class PracticeCenter extends ConfigurationItem {
 				if isNumber(consumption) {
 					run.FuelConsumption += ((this.getPreviousLap(lap).FuelConsumption = "-") ? (consumption * 2) : consumption)
 
-					if (run.FuelAmount = "-")
-						run.FuelAmount := (lap.FuelRemaining + run.FuelConsumption)
+					if (run.FuelInitial = "-")
+						run.FuelInitial := (lap.FuelRemaining + run.FuelConsumption)
 				}
 			}
 
@@ -1605,7 +1604,7 @@ class PracticeCenter extends ConfigurationItem {
 			this.iTyreCompoundColor := compoundColor(run.Compound)
 		}
 
-		fuelAmount := run.FuelAmount
+		fuelAmount := run.FuelInitial
 
 		if isNumber(fuelAmount)
 			fuelAmount := displayValue("Float", convertUnit("Volume", fuelAmount))
@@ -2418,7 +2417,7 @@ class PracticeCenter extends ConfigurationItem {
 			driver := this.createDriver({Forname: run["Driver.Forname"], Surname: run["Driver.Surname"], Nickname: run["Driver.Nickname"], ID: run["Driver.ID"]})
 
 			newRun := {Nr: run["Nr"], Lap: run["Lap"], Driver: driver, Weather: run["Weather"]
-					 , FuelAmound: run["Fuel.Amount"], FuelConsumption: run["Fuel.Consumption"]
+					 , FuelAmound: run["Fuel.Initial"], FuelConsumption: run["Fuel.Consumption"]
 					 , Compound: compound(run["Tyre.Compound"], run["Tyre.Compound.Color"]), TyreSet: run["Tyre.Set"], TyreLaps: run["Tyre.Laps"]
 					 , AvgLaptime: run["Lap.Time.Average"], BestLaptime: run["Lap.Time.Best"]
 					 , Accidents: run["Accidents"], StartTime: run["Time.Start"], EndTime: run["Time.End"]}
@@ -2479,8 +2478,8 @@ class PracticeCenter extends ConfigurationItem {
 			if (isNull(newRun.BestLaptime))
 				newRun.BestLaptime := "-"
 
-			if (isNull(newRun.FuelAmount))
-				newRun.FuelAmount := "-"
+			if (isNull(newRun.FuelInitial))
+				newRun.FuelInitial := "-"
 
 			if (isNull(newRun.FuelConsumption))
 				newRun.FuelConsumption := "-"
@@ -2501,7 +2500,7 @@ class PracticeCenter extends ConfigurationItem {
 					this.RunsListView.Add("", run.Nr, run.Lap, run.Driver.FullName
 											, values2String(", ", collect(string2Values(",", run.Weather), translate)*)
 											, translate(run.Compound), run.Laps.Length
-											, isNumber(run.FuelAmount) ? displayValue("Float", convertUnit("Volume", run.FuelAmount)) : run.FuelAmount
+											, isNumber(run.FuelInitial) ? displayValue("Float", convertUnit("Volume", run.FuelInitial)) : run.FuelInitial
 											, isNumber(run.FuelConsumption) ? displayValue("Float", convertUnit("Volume", run.FuelConsumption)) : run.FuelConsumption
 											, lapTimeDisplayValue(run.AvgLaptime)
 											, run.Accidents, run.Potential, run.RaceCraft, run.Speed, run.Consistency, run.CarControl)
@@ -2750,7 +2749,7 @@ class PracticeCenter extends ConfigurationItem {
 			first := false
 			value := ((this.SelectedRun && (this.SelectedRun != this.Runs[values["Run"]].Nr)) ? kNull : values[xAxis])
 
-			if ((value = "n/a") || (isNull(value)))
+			if !isNumber(value)
 				value := kNull
 
 			if (this.SelectedChartType = "Bubble")
@@ -2761,7 +2760,7 @@ class PracticeCenter extends ConfigurationItem {
 			for ignore, yAxis in yAxises {
 				value := values[yAxis]
 
-				if ((value = "n/a") || (isNull(value)))
+				if !isNumber(value)
 					value := kNull
 				else {
 					minValue := ((minValue == kUndefined) ? value : Min(minValue, value))
@@ -3266,7 +3265,8 @@ class PracticeCenter extends ConfigurationItem {
 			else if (report = "Free") {
 				xChoices := ["Run", "Lap", "Lap.Time", "Tyre.Laps", "Map", "TC", "ABS", "Temperature.Air", "Temperature.Track", "Tyre.Wear.Average", "Brake.Wear.Average"]
 
-				y1Choices := ["Temperature.Air", "Temperature.Track", "Fuel.Remaining", "Fuel.Consumption", "Lap.Time", "Tyre.Laps", "Map", "TC", "ABS"
+				y1Choices := ["Temperature.Air", "Temperature.Track", "Fuel.Initial", "Fuel.Remaining", "Fuel.Consumption"
+							, "Lap.Time", "Tyre.Laps", "Map", "TC", "ABS"
 							, "Tyre.Pressure.Cold.Average", "Tyre.Pressure.Cold.Front.Average", "Tyre.Pressure.Cold.Rear.Average"
 							, "Tyre.Pressure.Hot.Average", "Tyre.Pressure.Hot.Front.Average", "Tyre.Pressure.Hot.Rear.Average"
 							, "Tyre.Pressure.Hot.Front.Left", "Tyre.Pressure.Hot.Front.Right", "Tyre.Pressure.Hot.Rear.Left", "Tyre.Pressure.Hot.Rear.Right"
@@ -3432,7 +3432,8 @@ class PracticeCenter extends ConfigurationItem {
 
 				lapData := Database.Row("Nr", newLap, "Lap", newLap, "Run", lap.Run.Nr, "Lap.Time", null(lap.Laptime), "Position", null(lap.Position)
 									  , "Damage", lap.Damage, "EngineDamage", lap.EngineDamage, "Accident", lap.Accident
-									  , "Fuel.Consumption", null(lap.FuelConsumption), "Fuel.Remaining", null(lap.FuelRemaining)
+									  , "Fuel.Initial", null(lap.Run.FuelInitial), "Fuel.Consumption", null(lap.FuelConsumption)
+									  , "Fuel.Remaining", null(lap.FuelRemaining)
 									  , "Weather", lap.Weather, "Temperature.Air", null(lap.AirTemperature), "Temperature.Track", null(lap.TrackTemperature)
 									  , "Grip", lap.Grip, "Map", null(lap.Map), "TC", null(lap.TC), "ABS", null(lap.ABS)
 									  , "Tyre.Compound", compound(lap.Compound), "Tyre.Compound.Color", compoundColor(lap.Compound)
@@ -3588,7 +3589,7 @@ class PracticeCenter extends ConfigurationItem {
 											  , "Tyre.Compound", compound(run.Compound), "Tyre.Compound.Color", compoundColor(run.Compound)
 											  , "Tyre.Set", run.TyreSet, "Tyre.Laps", run.TyreLaps
 											  , "Lap.Time.Average", null(run.AvgLaptime), "Lap.Time.Best", null(run.BestLapTime)
-											  , "Fuel.Amount", null(run.FuelAmount), , "Fuel.Consumption", null(run.FuelConsumption)
+											  , "Fuel.Initial", null(run.FuelInitial), , "Fuel.Consumption", null(run.FuelConsumption)
 											  , "Accidents", run.Accidents
 											  , "Time.Start", this.computeStartTime(run), "Time.End", this.computeEndTime(run))
 

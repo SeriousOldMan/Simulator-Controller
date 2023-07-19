@@ -1533,6 +1533,8 @@ class PracticeCenter extends ConfigurationItem {
 					   , AvgLapTime: "-", Potential: "-", RaceCraft: "-", Speed: "-", Consistency: "-", CarControl: "-"
 					   , Laps: []}
 
+		this.Runs[newRun.Nr] := newRun
+
 		this.RunsListView.Add("", newRun.Nr, newRun.Lap, "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-")
 
 		newRun.Row := this.RunsListView.GetCount()
@@ -1631,6 +1633,8 @@ class PracticeCenter extends ConfigurationItem {
 
 		newLap.Run := run
 		run.Laps.Push(newLap)
+
+		this.Laps[newLap.Nr] := newLap
 
 		this.LapsListView.Add("", newLap.Nr, run.Nr, "-", "-", "-", "-", "-", "-, -, -, -", "")
 
@@ -1805,8 +1809,14 @@ class PracticeCenter extends ConfigurationItem {
 			update := true
 		}
 
-		while (tyreTables.Length < (lap.Nr - 1)) {
-			telemetry := this.Laps[tyreTables.Length + 1].Data
+		if (lap.FuelConsumption = "-") {
+			lap.FuelConsumption := fuelConsumption
+
+			update := true
+		}
+
+		while (tyresTable.Length < (lap.Nr - 1)) {
+			telemetry := this.Laps[tyresTable.Length + 1].Data
 
 			telemetryData := [simulator, car, track
 							, getMultiMapValue(telemetry, "Weather Data", "Weather", "Dry")
@@ -1825,7 +1835,7 @@ class PracticeCenter extends ConfigurationItem {
 							, getMultiMapValue(telemetry, "Car Data", "TyreTemperature", "-,-,-,-")
 							, getMultiMapValue(telemetry, "Car Data", "TyreWear", "null,null,null,null")]
 
-			this.Laps[tyreTables.Length + 1].TelemetryData := values2String("|||", telemetryData*)
+			this.Laps[tyresTable.Length + 1].TelemetryData := values2String("|||", telemetryData*)
 
 			telemetryDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6]
 										 , telemetryData[14], telemetryData[15]
@@ -1838,7 +1848,7 @@ class PracticeCenter extends ConfigurationItem {
 
 			telemetryDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6]
 								   , telemetryData[14], telemetryData[15]
-								   , lap.Run.TyreLaps + (tyreTables.Length - lap.Run.Lap) + 2
+								   , lap.Run.TyreLaps + (tyresTable.Length - lap.Run.Lap) + 2
 								   , pressuresData[1], pressuresData[2], pressuresData[3], pressuresData[4]
 								   , temperaturesData[1], temperaturesData[2], temperaturesData[3], temperaturesData[4]
 								   , wearData[1], wearData[2], wearData[3], wearData[4], kNull, telemetryData[8], telemetryData[9]

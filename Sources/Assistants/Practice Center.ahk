@@ -414,7 +414,7 @@ class PracticeCenter extends ConfigurationItem {
 			this.iDatabase := Database(pCenter.SessionDirectory, kPCTyresSchemas)
 		}
 
-		updatePressures(weather, airTemperature, trackTemperature, tyreCompound, tyreCompoundColor, coldPressures, hotPressures, pressuresLosses, driver, flush) {
+		updatePressures(weather, airTemperature, trackTemperature, tyreCompound, tyreCompoundColor, coldPressures, hotPressures, pressuresLosses, driver) {
 			local tyres, types, typeIndex, tPressures, tyreIndex, pressure
 
 			if (!tyreCompoundColor || (tyreCompoundColor = ""))
@@ -435,7 +435,7 @@ class PracticeCenter extends ConfigurationItem {
 										 , "Tyre.Pressure.Loss.Front.Right", null(pressuresLosses[2])
 										 , "Tyre.Pressure.Loss.Rear.Left", null(pressuresLosses[3])
 										 , "Tyre.Pressure.Loss.Rear.Right", null(pressuresLosses[4]))
-							, flush)
+							, true)
 
 			tyres := ["FL", "FR", "RL", "RR"]
 			types := ["Cold", "Hot"]
@@ -443,7 +443,7 @@ class PracticeCenter extends ConfigurationItem {
 			for typeIndex, tPressures in [coldPressures, hotPressures]
 				for tyreIndex, pressure in tPressures
 					this.updatePressure(weather, airTemperature, trackTemperature, tyreCompound, tyreCompoundColor
-									  , types[typeIndex], tyres[tyreIndex], pressure, 1, driver, flush)
+									  , types[typeIndex], tyres[tyreIndex], pressure, 1, driver, true)
 		}
 
 		updatePressure(weather, airTemperature, trackTemperature, tyreCompound, tyreCompoundColor
@@ -723,6 +723,12 @@ class PracticeCenter extends ConfigurationItem {
 		}
 	}
 
+	SelectedRun {
+		Get {
+			return this.iSelectedRun
+		}
+	}
+
 	SelectedReport {
 		Get {
 			return this.iSelectedReport
@@ -810,7 +816,7 @@ class PracticeCenter extends ConfigurationItem {
 
 		chooseRunData(*) {
 			center.withExceptionHandler(ObjBindMethod(center, "selectRun"
-									  , (centerGui["runDropDown"].Value = 1) ? true : center.Runs[centerGui["driverDropDown"].Value - 1]))
+									  , (centerGui["runDropDown"].Value = 1) ? false : center.Runs[centerGui["runDropDown"].Value - 1]))
 		}
 
 		chooseAxis(*) {
@@ -966,7 +972,7 @@ class PracticeCenter extends ConfigurationItem {
 
 		centerTab.UseTab(1)
 
-		this.iRunsListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 H:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Driver", "Weather", "Compound", "Laps", "Fuel Level", "Consumption", "Avg. Lap Time", "Accidents", "Potential", "Race Craft", "Speed", "Consistency", "Car Control"], translate))
+		this.iRunsListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 H:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Lap", "Driver", "Weather", "Compound", "Laps", "Fuel Level", "Consumption", "Avg. Lap Time", "Accidents", "Potential", "Race Craft", "Speed", "Consistency", "Car Control"], translate))
 		this.iRunsListView.OnEvent("Click", chooseRun)
 
 		centerTab.UseTab(2)
@@ -1091,6 +1097,16 @@ class PracticeCenter extends ConfigurationItem {
 			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 
 			this.Control["trackDropDown"].Choose(inList(this.getAvailableTracks(simulator, car), track))
+		}
+	}
+
+	selectRun(run, force := false) {
+		if (force || (run != this.SelectedRun)) {
+			this.Control["runDropDown"].Choose(run + 1)
+
+			this.iSelectedRun := run
+
+			this.updateReports()
 		}
 	}
 
@@ -1264,7 +1280,7 @@ class PracticeCenter extends ConfigurationItem {
 			if inList(["Pressures", "Brakes", "Temperatures", "Free"], this.SelectedReport) {
 				window["chartTypeDropDown"].Enabled := true
 
-				window["driverDropDown"].Enabled := true
+				window["runDropDown"].Enabled := true
 
 				window["dataXDropDown"].Enabled := true
 				window["dataY1DropDown"].Enabled := true
@@ -1326,7 +1342,7 @@ class PracticeCenter extends ConfigurationItem {
 
 	updateRunMenu() {
 		this.Control["runMenuDropDown"].Delete()
-		this.Control["runMenuDropDown"].Add(collect(["Run", "---------------------------------------------"], translate))
+		this.Control["runMenuDropDown"].Add(collect(["Practice", "---------------------------------------------"], translate))
 
 		this.Control["runMenuDropDown"].Choose(1)
 	}
@@ -1426,6 +1442,8 @@ class PracticeCenter extends ConfigurationItem {
 		this.iSessionLoaded := false
 
 		this.Control["runDropDown"].Delete()
+		this.Control["runDropDown"].Add([translate("All")])
+		this.Control["runDropDown"].Choose(1)
 
 		this.iDrivers := []
 
@@ -1524,6 +1542,8 @@ class PracticeCenter extends ConfigurationItem {
 		loop this.RunsListView.GetCount("Col")
 			this.RunsListView.ModifyCol(A_Index, "AutoHdr")
 
+		this.Control["runDropDown"].Add([newRun.Nr])
+
 		return newRun
 	}
 
@@ -1579,8 +1599,8 @@ class PracticeCenter extends ConfigurationItem {
 		run.TrackTemperature := Round(average(trackTemperatures), 1)
 
 		if (run.Compound != "-") {
-			this.iTyreCompound := compound(currentRun.Compound)
-			this.iTyreCompoundColor := compoundColor(currentRun.Compound)
+			this.iTyreCompound := compound(run.Compound)
+			this.iTyreCompoundColor := compoundColor(run.Compound)
 		}
 
 		fuelAmount := run.FuelAmount
@@ -1597,11 +1617,8 @@ class PracticeCenter extends ConfigurationItem {
 	}
 
 	requireRun(lapNumber) {
-		if !this.CurrentRun {
-			this.CurrentRun := this.createRun(lapNumber)
-
-			this.iSessionMode := true
-		}
+		if !this.CurrentRun
+			this.iCurrentRun := this.createRun(lapNumber)
 
 		return this.CurrentRun
 	}
@@ -1612,19 +1629,19 @@ class PracticeCenter extends ConfigurationItem {
 					   , Electronics: false, Tyres: false
 					   , HotPressures: false, ColdPressures: false, PressureLosses: false}
 
-		lap.Run := run
-		run.Laps.Push(lap)
+		newLap.Run := run
+		run.Laps.Push(newLap)
 
-		this.LapsListView.Add("", lap.Nr, run.Nr, "-", "-", "-", "-", "-", "-, -, -, -", "")
+		this.LapsListView.Add("", newLap.Nr, run.Nr, "-", "-", "-", "-", "-", "-, -, -, -", "")
 
-		lap.Row := this.LapsListView.GetCount()
+		newLap.Row := this.LapsListView.GetCount()
 
 		this.LapsListView.ModifyCol()
 
 		loop this.LapsListView.GetCount("Col")
 			this.LapsListView.ModifyCol(A_Index, "AutoHdr")
 
-		return lap
+		return newLap
 	}
 
 	modifyLap(lap) {
@@ -1646,7 +1663,7 @@ class PracticeCenter extends ConfigurationItem {
 				pressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure))
 		}
 
-		this.LapsListView.Modify(lap.Row, "", lap.Nr, run.Nr, translate(lap.Weather), translate(lap.Grip)
+		this.LapsListView.Modify(lap.Row, "", lap.Nr, lap.Run.Nr, translate(lap.Weather), translate(lap.Grip)
 											, lapTimeDisplayValue(lap.Laptime), displayNullValue(fuelConsumption), remainingFuel
 											, values2String(", ", pressures*)
 											, lap.Accident ? translate("x") : "")
@@ -1662,14 +1679,14 @@ class PracticeCenter extends ConfigurationItem {
 	addLap(lapNumber, data) {
 		local lap := this.requireLap(lapNumber)
 		local selectedLap := this.LapsListView.GetNext()
-		local selectedRun := this.StintsListView.GetNext()
+		local selectedRun := this.RunsListView.GetNext()
 		local damage, pLap, fuelConsumption, car
 
 		if selectedLap
 			selectedLap := (selectedLap == this.LapsListView.GetCount())
 
-		if selectedStint
-			selectedStint := (selectedStint == this.StintsListView.GetCount())
+		if selectedRun
+			selectedRun := (selectedRun == this.RunsListView.GetCount())
 
 		lap.Data := data
 
@@ -1708,7 +1725,7 @@ class PracticeCenter extends ConfigurationItem {
 
 		lap.FuelRemaining := Round(getMultiMapValue(data, "Car Data", "FuelRemaining"), 1)
 
-		if ((lap.Nr == 1) || ((run.Laps.Length > 0) && (run.Laps[1] == lap)))
+		if ((lap.Nr == 1) || ((lap.Run.Laps.Length > 0) && (lap.Run.Laps[1] == lap)))
 			lap.FuelConsumption := "-"
 		else {
 			pLap := this.getPreviousLap(lap)
@@ -1740,10 +1757,10 @@ class PracticeCenter extends ConfigurationItem {
 		this.iWeather := lap.Weather
 		this.iAirTemperature := lap.AirTemperature
 		this.iTrackTemperature := lap.TrackTemperature
-		this.iWeather10Min := llap.Weather10Min
-		this.iWeather30Min := llap.Weather30Min
+		this.iWeather10Min := lap.Weather10Min
+		this.iWeather30Min := lap.Weather30Min
 
-		this.LastLap := lap
+		this.iLastLap := lap
 
 		this.modifyLap(lap)
 		this.modifyRun(lap.Run)
@@ -1815,12 +1832,11 @@ class PracticeCenter extends ConfigurationItem {
 
 	addPressures(lap, simulator, car, track, weather, airTemperature, trackTemperature
 			   , compound, compoundColor, coldPressures, hotPressures, pressuresLosses) {
-		this.PressuresDatabase.updatePressures(simulator, car, track, weather, airTemperature, trackTemperature
-											 , compound, compoundColor
-											 , string2Values(",", coldPressures)
-											 , string2Values(",", hotPressures), lap.Run.Driver.ID)
+		this.PressuresDatabase.updatePressures(weather, airTemperature, trackTemperature, compound, compoundColor
+											 , string2Values(",", coldPressures), string2Values(",", hotPressures), string2Values(",", pressuresLosses)
+											 , lap.Run.Driver.ID)
 
-		lap.PressuresData := values2String("|||", lap, simulator, car, track, weather, airTemperature, trackTemperature
+		lap.PressuresData := values2String("|||", simulator, car, track, weather, airTemperature, trackTemperature
 												, compound, compoundColor, coldPressures, hotPressures, pressuresLosses)
 
 		if (lap.Pressures = "-,-,-,-") {
@@ -2207,7 +2223,7 @@ class PracticeCenter extends ConfigurationItem {
 				setMultiMapValue(info, "Weather", "AirTemperature", this.AirTemperature)
 				setMultiMapValue(info, "Weather", "TrackTemperature", this.TrackTemperature)
 
-				writeMultiMap(this.SessionDirectory . "Session.info", info)
+				writeMultiMap(this.SessionDirectory . "Practice.info", info)
 			}
 			else {
 				this.saveSetups()
@@ -3302,7 +3318,6 @@ class PracticeCenter extends ConfigurationItem {
 	}
 
 	syncSessionStore(forSave := false) {
-		local session := this.SelectedSession[true]
 		local sessionStore := this.SessionStore
 		local lastLap := this.LastLap
 		local pressuresTable, tyresTable, newLap, lap, lapData, pressures, tyres
@@ -4208,13 +4223,14 @@ class PracticeCenter extends ConfigurationItem {
 			local data := readMultiMap(fileName)
 
 			try {
-				if !this.SessionMode
-					this.iSessionMode := "Active"
-				else if (this.iSessionMode != "Active")
+				if (this.SessionMode && this.SessionMode != "Active")
 					return
 
-				if ((!this.LastLap && (lapNumber = 1)) || ((this.LastLap.Nr + 1) = lapNumber))
+				if ((!this.LastLap && (lapNumber = 1)) || ((this.LastLap.Nr + 1) = lapNumber)) {
+					this.iSessionMode := "Active"
+
 					this.addLap(lapNumber, data)
+				}
 			}
 			finally {
 				deleteFile(fileName)
@@ -4254,64 +4270,61 @@ class PracticeCenter extends ConfigurationItem {
 				raceData := readMultiMap(directory . "Race.data")
 				lapData := readMultiMap(fileName)
 
+				deleteFile(fileName)
+
 				if (getMultiMapValue(raceData, "Cars", "Count") = kNotInitialized)
 					setMultiMapValue(raceData, "Cars", "Count", 0)
 
 				if (getMultiMapValue(raceData, "Cars", "Driver") = kNotInitialized)
 					setMultiMapValue(raceData, "Cars", "Driver", 0)
 
-				try {
-					if (lapData.Count == 0)
-						return
+				if (lapData.Count == 0)
+					return
 
-					for key, value in getMultiMapValues(lapData, "Lap")
-						setMultiMapValue(raceData, "Laps", key, value)
+				for key, value in getMultiMapValues(lapData, "Lap")
+					setMultiMapValue(raceData, "Laps", key, value)
 
-					pitstops := getMultiMapValue(lapData, "Pitstop", "Laps", "")
+				pitstops := getMultiMapValue(lapData, "Pitstop", "Laps", "")
 
-					setMultiMapValue(raceData, "Laps", "Pitstops", pitstops)
+				setMultiMapValue(raceData, "Laps", "Pitstops", pitstops)
 
-					times := getMultiMapValue(lapData, "Times", lapNumber)
-					positions := getMultiMapValue(lapData, "Positions", lapNumber)
-					laps := getMultiMapValue(lapData, "Laps", lapNumber)
-					drivers := getMultiMapValue(lapData, "Drivers", lapNumber)
+				times := getMultiMapValue(lapData, "Times", lapNumber)
+				positions := getMultiMapValue(lapData, "Positions", lapNumber)
+				laps := getMultiMapValue(lapData, "Laps", lapNumber)
+				drivers := getMultiMapValue(lapData, "Drivers", lapNumber)
 
-					newLine := ((lapNumber > 1) ? "`n" : "")
+				newLine := ((lapNumber > 1) ? "`n" : "")
 
-					line := (newLine . times)
+				line := (newLine . times)
 
-					FileAppend(line, directory . "Times.CSV")
+				FileAppend(line, directory . "Times.CSV")
 
-					line := (newLine . positions)
+				line := (newLine . positions)
 
-					FileAppend(line, directory . "Positions.CSV")
+				FileAppend(line, directory . "Positions.CSV")
 
-					line := (newLine . laps)
+				line := (newLine . laps)
 
-					FileAppend(line, directory . "Laps.CSV")
+				FileAppend(line, directory . "Laps.CSV")
 
-					line := (newLine . drivers)
-					fileName := (directory . "Drivers.CSV")
+				line := (newLine . drivers)
+				fileName := (directory . "Drivers.CSV")
 
-					FileAppend(line, fileName, "UTF-16")
+				FileAppend(line, fileName, "UTF-16")
 
-					removeMultiMapValue(raceData, "Laps", "Lap")
-					setMultiMapValue(raceData, "Laps", "Count", lapNumber)
+				removeMultiMapValue(raceData, "Laps", "Lap")
+				setMultiMapValue(raceData, "Laps", "Count", lapNumber)
 
-					writeMultiMap(directory . "Race.data", raceData)
+				writeMultiMap(directory . "Race.data", raceData)
 
-					if (this.LapsListView.GetCount() && (this.SelectedDetailReport = "Lap")) {
-						this.LapsListView.Modify(this.LapsListView.GetCount(), "Select Vis")
+				if (this.LapsListView.GetCount() && (this.SelectedDetailReport = "Lap")) {
+					this.LapsListView.Modify(this.LapsListView.GetCount(), "Select Vis")
 
-						this.showLapDetails(this.LastLap)
-					}
-
-					this.updateReports()
-					this.updateState()
+					this.showLapDetails(this.LastLap)
 				}
-				finally {
-					deleteFile(fileName)
-				}
+
+				this.updateReports()
+				this.updateState()
 			}
 		}
 
@@ -4346,7 +4359,7 @@ class PracticeCenter extends ConfigurationItem {
 								, compound, compoundColor, coldPressures, hotPressures, pressuresLosses)
 		}
 
-		this.pushTask(udatePressuresAsync)
+		this.pushTask(updatePressuresAsync)
 	}
 }
 

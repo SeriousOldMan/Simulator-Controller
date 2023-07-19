@@ -1788,8 +1788,10 @@ class PracticeCenter extends ConfigurationItem {
 			   , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
 			   , compound, compoundColor, pressures, temperatures, wear) {
 		local telemetryDB := this.TelemetryDatabase
+		local tyresTable := this.TelemetryDatabase.Database.Tables["Tyres"]
 		local driverID := lap.Run.Driver.ID
 		local update := false
+		local telemetry, telemetryData, pressuresData, temperaturesData, wearData
 
 		if (lap.Pressures = "-,-,-,-") {
 			lap.Pressures := pressures
@@ -1803,6 +1805,46 @@ class PracticeCenter extends ConfigurationItem {
 			update := true
 		}
 
+		while (tyreTables.Length < (lap.Nr - 1)) {
+			telemetry := this.Laps[tyreTables.Length + 1].Data
+
+			telemetryData := [simulator, car, track
+							, getMultiMapValue(telemetry, "Weather Data", "Weather", "Dry")
+							, getMultiMapValue(telemetry, "Weather Data", "Temperature", 23)
+							, getMultiMapValue(telemetry, "Track Data", "Temperature", 27)
+							, "-"
+							, getMultiMapValue(telemetry, "Car Data", "FuelRemaining", "-")
+							, getMultiMapValue(telemetry, "Stint Data", "LapLastTime", "-")
+							, "-"
+							, getMultiMapValue(telemetry, "Car Data", "Map", "n/a")
+							, getMultiMapValue(telemetry, "Car Data", "TC", "n/a")
+							, getMultiMapValue(telemetry, "Car Data", "ABS", "n/a")
+							, getMultiMapValue(telemetry, "Car Data", "TyreCompound", "Dry")
+							, getMultiMapValue(telemetry, "Car Data", "TyreCompoundColor", "Black")
+							, getMultiMapValue(telemetry, "Car Data", "TyrePressure", "-,-,-,-")
+							, getMultiMapValue(telemetry, "Car Data", "TyreTemperature", "-,-,-,-")
+							, getMultiMapValue(telemetry, "Car Data", "TyreWear", "null,null,null,null")]
+
+			this.Laps[tyreTables.Length + 1].TelemetryData := values2String("|||", telemetryData*)
+
+			telemetryDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6]
+										 , telemetryData[14], telemetryData[15]
+										 , telemetryData[11], telemetryData[12], telemetryData[13]
+										 , kNull, telemetryData[8], telemetryData[9], driverID)
+
+			pressuresData := collect(string2Values(",", telemetryData[16]), null)
+			temperaturesData := collect(string2Values(",", telemetryData[17]), null)
+			wearData := collect(string2Values(",", telemetryData[18]), null)
+
+			telemetryDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6]
+								   , telemetryData[14], telemetryData[15]
+								   , lap.Run.TyreLaps + (tyreTables.Length - lap.Run.Lap) + 2
+								   , pressuresData[1], pressuresData[2], pressuresData[3], pressuresData[4]
+								   , temperaturesData[1], temperaturesData[2], temperaturesData[3], temperaturesData[4]
+								   , wearData[1], wearData[2], wearData[3], wearData[4], kNull, telemetryData[8], telemetryData[9]
+								   , driverID)
+		}
+
 		lap.TelemetryData := values2String("|||", simulator, car, track, weather, airTemperature, trackTemperature
 												, fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
 												, compound, compoundColor, pressures, temperatures, wear)
@@ -1811,9 +1853,9 @@ class PracticeCenter extends ConfigurationItem {
 									 , map, tc, abs, fuelConsumption, fuelRemaining, lapTime
 									 , driverID)
 
-		pressures := string2Values(",", pressures)
-		temperatures := string2Values(",", temperatures)
-		wear := string2Values(",", wear)
+		pressures := collect(string2Values(",", pressures), null)
+		temperatures := collect(string2Values(",", temperatures), null)
+		wear := collect(string2Values(",", wear), null)
 
 		telemetryDB.addTyreEntry(weather, airTemperature, trackTemperature, compound, compoundColor
 							   , lap.Run.TyreLaps + (lap.Nr - lap.Run.Lap) + 1
@@ -1832,12 +1874,40 @@ class PracticeCenter extends ConfigurationItem {
 
 	addPressures(lap, simulator, car, track, weather, airTemperature, trackTemperature
 			   , compound, compoundColor, coldPressures, hotPressures, pressuresLosses) {
-		this.PressuresDatabase.updatePressures(weather, airTemperature, trackTemperature, compound, compoundColor
-											 , string2Values(",", coldPressures), string2Values(",", hotPressures), string2Values(",", pressuresLosses)
-											 , lap.Run.Driver.ID)
+		local pressuresTable := this.PressuresDatabase.Database.Tables["Tyres.Pressures"]
+		local pressures, pressuresData
+
+		while (pressuresTable.Length < (lap.Nr - 1)) {
+			pressures := this.Laps[pressuresTable.Length + 1].Data
+
+			pressuresData := [simulator, car, track
+							, getMultiMapValue(pressures, "Weather Data", "Weather", "Dry")
+							, getMultiMapValue(pressures, "Weather Data", "Temperature", 23)
+							, getMultiMapValue(pressures, "Track Data", "Temperature", 27)
+							, getMultiMapValue(pressures, "Car Data", "TyreCompound", "Dry")
+							, getMultiMapValue(pressures, "Car Data", "TyreCompoundColor", "Black")
+							, "-,-,-,-"
+							, getMultiMapValue(pressures, "Car Data", "TyrePressure", "-,-,-,-")
+							, "null,null,null,null"]
+
+			this.Laps[pressuresTable.Length + 1].PressuresData := values2String("|||", pressuresData*)
+
+			this.PressuresDatabase.updatePressures(pressuresData[4], pressuresData[5], pressuresData[6]
+												 , pressuresData[7], pressuresData[8]
+												 , collect(string2Values(",",  pressuresData[9]), null)
+												 , string2Values(",",  pressuresData[10])
+												 , collect(string2Values(",",  pressuresData[11]), null)
+												 , lap.Run.Driver.ID)
+		}
 
 		lap.PressuresData := values2String("|||", simulator, car, track, weather, airTemperature, trackTemperature
 												, compound, compoundColor, coldPressures, hotPressures, pressuresLosses)
+
+		this.PressuresDatabase.updatePressures(weather, airTemperature, trackTemperature, compound, compoundColor
+											 , collect(string2Values(",", coldPressures), null)
+											 , collect(string2Values(",", hotPressures), null)
+											 , collect(string2Values(",", pressuresLosses), null)
+											 , lap.Run.Driver.ID)
 
 		if (lap.Pressures = "-,-,-,-") {
 			lap.Pressures := hotPressures

@@ -1510,7 +1510,7 @@ class RaceEngineer extends RaceAssistant {
 				targetCompoundColor := currentCompoundColor
 			}
 
-			if (currentCompound && (currentCompound = targetCompound) && (currentCompoundColor = targetCompoundColor)) {
+			if currentCompound {
 				if (lapNumber <= knowledgeBase.getValue("Session.Settings.Lap.Learning.Laps", 2)) {
 					if (currentCompound = "Dry")
 						prefix := "Session.Setup.Tyre.Dry.Pressure."
@@ -1524,10 +1524,13 @@ class RaceEngineer extends RaceAssistant {
 
 				if prefix
 					try {
-						coldPressures := values2String(",", Round(knowledgeBase.getValue(prefix . "FL"), 1)
-														  , Round(knowledgeBase.getValue(prefix . "FR"), 1)
-														  , Round(knowledgeBase.getValue(prefix . "RL"), 1)
-														  , Round(knowledgeBase.getValue(prefix . "RR"), 1))
+						if ((currentCompound = targetCompound) && (currentCompoundColor = targetCompoundColor))
+							coldPressures := values2String(",", Round(knowledgeBase.getValue(prefix . "FL"), 1)
+															  , Round(knowledgeBase.getValue(prefix . "FR"), 1)
+															  , Round(knowledgeBase.getValue(prefix . "RL"), 1)
+															  , Round(knowledgeBase.getValue(prefix . "RR"), 1))
+						else
+							coldPressures := values2String(",", kNull, kNull, kNull, kNull)
 
 						hotPressures := values2String(",", Round(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Pressure.FL"), 1)
 														 , Round(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Pressure.FR"), 1)
@@ -1536,10 +1539,13 @@ class RaceEngineer extends RaceAssistant {
 
 						prefix := "Tyre.Pressure.Loss."
 
-						pressuresLosses := values2String(",", Round(knowledgeBase.getValue(prefix . "FL", 0), 1)
-															, Round(knowledgeBase.getValue(prefix . "FR", 0), 1)
-															, Round(knowledgeBase.getValue(prefix . "RL", 0), 1)
-															, Round(knowledgeBase.getValue(prefix . "RR", 0), 1))
+						if ((currentCompound = targetCompound) && (currentCompoundColor = targetCompoundColor))
+							pressuresLosses := values2String(",", Round(knowledgeBase.getValue(prefix . "FL", 0), 1)
+																, Round(knowledgeBase.getValue(prefix . "FR", 0), 1)
+																, Round(knowledgeBase.getValue(prefix . "RL", 0), 1)
+																, Round(knowledgeBase.getValue(prefix . "RR", 0), 1))
+						else
+							pressuresLosses := values2String(",", kNull, kNull, kNull, kNull)
 
 						airTemperature := Round(getMultiMapValue(data, "Weather Data", "Temperature", 0))
 						trackTemperature := Round(getMultiMapValue(data, "Track Data", "Temperature", 0))

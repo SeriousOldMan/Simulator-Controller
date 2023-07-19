@@ -1904,7 +1904,7 @@ class PracticeCenter extends ConfigurationItem {
 			this.PressuresDatabase.updatePressures(pressuresData[4], pressuresData[5], pressuresData[6]
 												 , pressuresData[7], pressuresData[8]
 												 , collect(string2Values(",",  pressuresData[9]), null)
-												 , string2Values(",",  pressuresData[10])
+												 , collect(string2Values(",",  pressuresData[10]), null)
 												 , collect(string2Values(",",  pressuresData[11]), null)
 												 , lap.Run.Driver.ID)
 		}

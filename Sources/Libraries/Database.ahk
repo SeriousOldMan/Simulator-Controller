@@ -31,6 +31,11 @@ class Database {
 	iTableChanged := CaseInsenseMap()
 
 	class Row extends CaseInsenseMap {
+		__New(arguments*) {
+			this.Default := kNull
+
+			super.__New(arguments*)
+		}
 	}
 
 	Directory {

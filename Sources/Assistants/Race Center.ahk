@@ -8610,7 +8610,7 @@ class RaceCenter extends ConfigurationItem {
 			first := false
 			value := ((this.SelectedDrivers && !inList(this.SelectedDrivers, this.Stints[values["Stint"]].Driver.ID)) ? kNull : values[xAxis])
 
-			if ((value = "n/a") || (isNull(value)))
+			if !isNumber(value)
 				value := kNull
 
 			if (this.SelectedChartType = "Bubble")
@@ -8621,7 +8621,7 @@ class RaceCenter extends ConfigurationItem {
 			for ignore, yAxis in yAxises {
 				value := values[yAxis]
 
-				if ((value = "n/a") || (isNull(value)))
+				if !isNumber(value)
 					value := kNull
 				else {
 					minValue := ((minValue == kUndefined) ? value : Min(minValue, value))

@@ -1672,10 +1672,13 @@ class RaceStrategist extends GridRaceAssistant {
 		if pitstop
 			pitstop := (Abs(lapNumber - knowledgeBase.getValue("Pitstop." . pitstop . ".Lap")) <= 2)
 
-		if ((this.hasEnoughData(false) || pitstop) && this.collectTelemetryData()) {
+		if this.collectTelemetryData() {
 			prefix := "Lap." . lapNumber
 
-			validLap := knowledgeBase.getValue(prefix . ".Valid", true)
+			if this.hasEnoughData(false)
+				validLap := knowledgeBase.getValue(prefix . ".Valid", true)
+			else
+				validLap := false
 			weather := knowledgeBase.getValue(prefix . ".Weather")
 			airTemperature := knowledgeBase.getValue(prefix . ".Temperature.Air")
 			trackTemperature := knowledgeBase.getValue(prefix . ".Temperature.Track")

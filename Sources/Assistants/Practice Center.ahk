@@ -216,6 +216,8 @@ class PracticeCenter extends ConfigurationItem {
 
 				if (msgResult = "Cancel")
 					return true
+
+				super.Close()
 			}
 		}
 	}
@@ -761,6 +763,12 @@ class PracticeCenter extends ConfigurationItem {
 		}
 	}
 
+	SelectedDrivers {
+		Get {
+			return this.iSelectedDrivers
+		}
+	}
+
 	SelectedReport {
 		Get {
 			return this.iSelectedReport
@@ -1019,7 +1027,7 @@ class PracticeCenter extends ConfigurationItem {
 
 		centerTab.UseTab(3)
 
-		this.iLapsListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 H:Grow(0.8) Checked -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Stint", "Weather", "Grip", "Lap Time", "Consumption", "Remaining", "Pressures", "Valid", "Accident"], translate))
+		this.iLapsListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 H:Grow(0.8) Checked -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Stint", "Weather", "Grip", "Lap Time", "Consumption", "Remaining", "Pressures", "Invalid", "Accident"], translate))
 		this.iLapsListView.OnEvent("Click", chooseLap)
 
 		centerGui.Rules := ""
@@ -1758,7 +1766,7 @@ class PracticeCenter extends ConfigurationItem {
 
 		this.Laps[newLap.Nr] := newLap
 
-		this.LapsListView.Add("Check", newLap.Nr, run.Nr, "-", "-", "-", "-", "-", "-, -, -, -", "x", "")
+		this.LapsListView.Add("Check", newLap.Nr, run.Nr, "-", "-", "-", "-", "-", "-, -, -, -", "", "")
 
 		newLap.Row := this.LapsListView.GetCount()
 
@@ -1793,7 +1801,7 @@ class PracticeCenter extends ConfigurationItem {
 										, lap.Nr, lap.Run.Nr, translate(lap.Weather), translate(lap.Grip)
 										, lapTimeDisplayValue(lap.Laptime), displayNullValue(fuelConsumption), remainingFuel
 										, values2String(", ", pressures*)
-										, lap.Valid ? translate("x") : "", lap.Accident ? translate("x") : "")
+										, lap.Valid ? "" : translate("x"), lap.Accident ? translate("x") : "")
 	}
 
 	requireLap(lapNumber) {
@@ -2410,8 +2418,6 @@ class PracticeCenter extends ConfigurationItem {
 		saveSessionAsync(copy := false) {
 			local info, directory, translator, folder, session
 
-			this.showMessage(translate("Saving session"))
-
 			if (this.SessionMode = "Active") {
 				this.syncSessionStore(true)
 
@@ -2453,8 +2459,6 @@ class PracticeCenter extends ConfigurationItem {
 						logError(exception)
 					}
 			}
-
-			this.showMessage(false)
 		}
 
 		this.pushTask(saveSessionAsync.Bind(copy))
@@ -2656,7 +2660,7 @@ class PracticeCenter extends ConfigurationItem {
 					this.LapsListView.Add((this.SessionExported || !lap.Valid) ? "" : "Check"
 										, lap.Nr, lap.Run.Nr, translate(lap.Weather), translate(lap.Grip)
 										, lapTimeDisplayValue(lap.Laptime), displayNullValue(fuelConsumption), remainingFuel, "-, -, -, -"
-										, lap.Valid ? translate("x") : "", lap.Accident ? translate("x") : "")
+										, lap.Valid ? "" : translate("x"), lap.Accident ? translate("x") : "")
 				}
 
 		this.LapsListView.ModifyCol()
@@ -3513,7 +3517,7 @@ class PracticeCenter extends ConfigurationItem {
 
 			window["driverDropDown"].Delete()
 			window["driverDropDown"].Add(concatenate([translate("All")], this.Drivers))
-			window["driverDropDown"].Choose(((this.SelectedDrivers.Length > 0) ? inList(this.Drivers, this.SelectedDrivers[1]) : 0) + 1)
+			window["driverDropDown"].Choose(((this.SelectedDrivers && (this.SelectedDrivers.Length > 0)) ? inList(this.Drivers, this.SelectedDrivers[1]) : 0) + 1)
 
 			window["dataXDropDown"].Choose(dataXChoice)
 			window["dataY1DropDown"].Choose(dataY1Choice)
@@ -3712,7 +3716,7 @@ class PracticeCenter extends ConfigurationItem {
 
 						runData := Database.Row("Nr", newRun, "Lap", run.Lap
 											  , "Driver.Forname", run.Driver.Forname, "Driver.Surname", run.Driver.Surname
-											  , "Driver.Nickname", run.Driver.Nickname, "Driver.ID", run.ID
+											  , "Driver.Nickname", run.Driver.Nickname, "Driver.ID", run.Driver.ID
 											  , "Weather", run.Weather
 											  , "Tyre.Compound", compound(run.Compound), "Tyre.Compound.Color", compoundColor(run.Compound)
 											  , "Tyre.Set", run.TyreSet, "Tyre.Laps", run.TyreLaps

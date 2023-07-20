@@ -1,9 +1,9 @@
 [Development]
-Version=5.1.2.0-dev
+Version=5.1.2.0-beta
 Target=5.1.2.0-release
-Date=07/19/2023
-Download=
-Changes=New core setting to choose the dispatch cycle of external commands, New communication method for the Stream Deck plugin, New core setting to choose the between the Stream Deck communication methods, The Spotter can now "focus" on a specific opponent, Strategist and Spotter can now be asked for gap info for a specific car, Standings widget now shows car number in "System Monitor", Fixed bugs in Spanish grammars for Spotter and Strategist, Fixed AMS2 API to not interpret a replay as an actual session, New car models for "Setup Workbench"
+Date=07/20/2023
+Download=https://www.dropbox.com/s/r452fgdczs8lsli/Simulator%20Controller%205.1.2.0-beta.zip?dl=1
+Changes=New core setting to choose the dispatch cycle of external commands, New communication method for the Stream Deck plugin, New core setting to choose the between the Stream Deck communication methods, The Spotter can now "focus" on a specific opponent, Strategist and Spotter can now be asked for gap info for a specific car, Standings widget now shows car number in "System Monitor", Fixed bugs in Spanish grammars for Spotter and Strategist, Fixed AMS2 API to not interpret a replay as an actual session, New car models for "Setup Workbench", Renamed controller action function "call" to "invoke"
 [Release]
 Version=5.1.1.0-release
 Date=07/14/2023
@@ -12,5 +12,5 @@ Changes=Acoustic feedback in Telemetry Analyzer for handling events, New update 
 [Current]
 Type=Development
 [Version]
-Development=5.1.2.0-dev
+Development=5.1.2.0-beta
 Release=5.1.1.0-release

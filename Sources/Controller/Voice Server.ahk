@@ -77,8 +77,6 @@ class VoiceServer extends ConfigurationItem {
 	iHasPendingActivation := false
 	iLastCommand := A_TickCount
 
-	iDoublePress := 400
-
 	class VoiceClient {
 		iRouting := false
 
@@ -665,16 +663,11 @@ class VoiceServer extends ConfigurationItem {
 
 	initializePushToTalk() {
 		local p2tHotkey := this.PushToTalk
-		local toggle, configuration
+		local toggle
 
 		if p2tHotkey {
-			if FileExist(kUserConfigDirectory . "P2T Configuration.ini") {
-				configuration := readMultiMap(kUserConfigDirectory . "P2T Configuration.ini")
-
-				toggle := (getMultiMapValue(configuration, "PushToTalk", "Mode", "Press") = "Toggle")
-
-				this.iDoublePress := getMultiMapValue(configuration, "PushToTalk", "Double Press", 400)
-			}
+			if FileExist(kUserConfigDirectory . "P2T Configuration.ini")
+				toggle := (getMultiMapValue(readMultiMap(kUserConfigDirectory . "P2T Configuration.ini"), "PushToTalk", "Mode", "Press") = "Toggle")
 			else
 				toggle := false
 
@@ -698,7 +691,8 @@ class VoiceServer extends ConfigurationItem {
 
 		static listenTask := false
 
-		static doublePress := this.iDoublePress
+		static activationSpeed := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+												 , "Voice", "Activation Speed", DllCall("GetDoubleClickTime"))
 
 		try
 			pressed := toggle ? down : GetKeyState(this.PushToTalk, "P")
@@ -707,7 +701,7 @@ class VoiceServer extends ConfigurationItem {
 			lastDown := A_TickCount
 			isPressed := true
 
-			if (((lastDown - lastUp) < doublePress) && (clicks == 1))
+			if (((lastDown - lastUp) < activationSpeed) && (clicks == 1))
 				activation := true
 			else {
 				clicks := 0
@@ -719,7 +713,7 @@ class VoiceServer extends ConfigurationItem {
 			lastUp := A_TickCount
 			isPressed := false
 
-			if ((lastUp - lastDown) < doublePress)
+			if ((lastUp - lastDown) < activationSpeed)
 				clicks += 1
 			else
 				clicks := 0

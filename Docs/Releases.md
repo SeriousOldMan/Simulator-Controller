@@ -9,7 +9,8 @@
   8. A new communication method is available for the Stream Deck. It has been reported, that using OBS parallel to Simulator Controller can brake the Stream Deck functionality of Simulator Controller. The new communication method, although a little bit slower, prevents this. A new setting in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration) let you choose between the available communication methods.
   9. [Experts only] A new setting in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration) let you choose the frequency of external command processing. Change with caution.
   10. [Experts only] The controller action function "call" has been renamed to "invoke".
-  11. New car models for "Setup Workbench":
+  11. [Experts only] It is possible to alter the time, a press or click on the Push-to-Talk button is considered a double. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#push-to-talk-behaviour) for more information.
+  12. New car models for "Setup Workbench":
       - Assetto Corsa
 	    - Audi R8 LMS Ultra
 

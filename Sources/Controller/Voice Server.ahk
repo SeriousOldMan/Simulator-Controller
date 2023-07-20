@@ -77,6 +77,8 @@ class VoiceServer extends ConfigurationItem {
 	iHasPendingActivation := false
 	iLastCommand := A_TickCount
 
+	iDoublePress := 400
+
 	class VoiceClient {
 		iRouting := false
 
@@ -599,12 +601,12 @@ class VoiceServer extends ConfigurationItem {
 	SpeechRecognizer[create := false] {
 		Get {
 			local settings
-			
+
 			if (create && this.Listener && !this.iSpeechRecognizer) {
 				try {
 					try {
 						settings := readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
-						
+
 						this.iSpeechRecognizer := VoiceServer.ActivationSpeechRecognizer(getMultiMapValue(settings, "Voice", "Activation Recognizer"
 																										, getMultiMapValue(settings, "Voice", "ActivationRecognizer", "Server"))
 																					   , true, this.Language, true)
@@ -663,14 +665,18 @@ class VoiceServer extends ConfigurationItem {
 
 	initializePushToTalk() {
 		local p2tHotkey := this.PushToTalk
-		local toggle
+		local toggle, configuration
 
 		if p2tHotkey {
-			toggle := false
+			if FileExist(kUserConfigDirectory . "P2T Configuration.ini") {
+				configuration := readMultiMap(kUserConfigDirectory . "P2T Configuration.ini")
 
-			if FileExist(kUserConfigDirectory . "P2T Configuration.ini")
-				toggle := (getMultiMapValue(readMultiMap(kUserConfigDirectory . "P2T Configuration.ini")
-						 , "PushToTalk", "Mode", "Press") = "Toggle")
+				toggle := (getMultiMapValue(configuration, "PushToTalk", "Mode", "Press") = "Toggle")
+
+				this.iDoublePress := getMultiMapValue(configuration, "PushToTalk", "Double Press", 400)
+			}
+			else
+				toggle := false
 
 			if toggle
 				Hotkey(p2tHotkey, ObjBindMethod(this, "listen", true), "On")
@@ -692,6 +698,8 @@ class VoiceServer extends ConfigurationItem {
 
 		static listenTask := false
 
+		static doublePress := this.iDoublePress
+
 		try
 			pressed := toggle ? down : GetKeyState(this.PushToTalk, "P")
 
@@ -699,7 +707,7 @@ class VoiceServer extends ConfigurationItem {
 			lastDown := A_TickCount
 			isPressed := true
 
-			if (((lastDown - lastUp) < 400) && (clicks == 1))
+			if (((lastDown - lastUp) < doublePress) && (clicks == 1))
 				activation := true
 			else {
 				clicks := 0
@@ -711,7 +719,7 @@ class VoiceServer extends ConfigurationItem {
 			lastUp := A_TickCount
 			isPressed := false
 
-			if ((lastUp - lastDown) < 400)
+			if ((lastUp - lastDown) < doublePress)
 				clicks += 1
 			else
 				clicks := 0

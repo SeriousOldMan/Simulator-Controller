@@ -691,8 +691,8 @@ class VoiceServer extends ConfigurationItem {
 
 		static listenTask := false
 
-		static activationSpeed := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
-												 , "Voice", "Activation Speed", DllCall("GetDoubleClickTime"))
+		static speed := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+									   , "Voice", "Activation Speed", DllCall("GetDoubleClickTime"))
 
 		try
 			pressed := toggle ? down : GetKeyState(this.PushToTalk, "P")
@@ -701,7 +701,7 @@ class VoiceServer extends ConfigurationItem {
 			lastDown := A_TickCount
 			isPressed := true
 
-			if (((lastDown - lastUp) < activationSpeed) && (clicks == 1))
+			if (((lastDown - lastUp) < speed) && (clicks == 1))
 				activation := true
 			else {
 				clicks := 0
@@ -713,7 +713,7 @@ class VoiceServer extends ConfigurationItem {
 			lastUp := A_TickCount
 			isPressed := false
 
-			if ((lastUp - lastDown) < activationSpeed)
+			if ((lastUp - lastDown) < speed)
 				clicks += 1
 			else
 				clicks := 0
@@ -753,7 +753,7 @@ class VoiceServer extends ConfigurationItem {
 						listening := true
 					}
 					else {
-						listenTask := Task(ObjBindMethod(this, "listen", true, true), 400, kInterruptPriority)
+						listenTask := Task(ObjBindMethod(this, "listen", true, true), speed, kInterruptPriority)
 
 						Task.startTask(listenTask)
 					}

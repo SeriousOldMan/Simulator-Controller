@@ -1676,43 +1676,40 @@ class RaceStrategist extends GridRaceAssistant {
 			prefix := "Lap." . lapNumber
 
 			validLap := knowledgeBase.getValue(prefix . ".Valid", true)
+			weather := knowledgeBase.getValue(prefix . ".Weather")
+			airTemperature := knowledgeBase.getValue(prefix . ".Temperature.Air")
+			trackTemperature := knowledgeBase.getValue(prefix . ".Temperature.Track")
+			compound := knowledgeBase.getValue(prefix . ".Tyre.Compound")
+			compoundColor := knowledgeBase.getValue(prefix . ".Tyre.Compound.Color")
+			fuelConsumption := Round(knowledgeBase.getValue(prefix . ".Fuel.Consumption"), 1)
+			fuelRemaining := Round(knowledgeBase.getValue(prefix . ".Fuel.Remaining"), 1)
+			lapTime := Round(knowledgeBase.getValue(prefix . ".Time") / 1000, 1)
 
-			if (validLap || pitstop) {
-				weather := knowledgeBase.getValue(prefix . ".Weather")
-				airTemperature := knowledgeBase.getValue(prefix . ".Temperature.Air")
-				trackTemperature := knowledgeBase.getValue(prefix . ".Temperature.Track")
-				compound := knowledgeBase.getValue(prefix . ".Tyre.Compound")
-				compoundColor := knowledgeBase.getValue(prefix . ".Tyre.Compound.Color")
-				fuelConsumption := Round(knowledgeBase.getValue(prefix . ".Fuel.Consumption"), 1)
-				fuelRemaining := Round(knowledgeBase.getValue(prefix . ".Fuel.Remaining"), 1)
-				lapTime := Round(knowledgeBase.getValue(prefix . ".Time") / 1000, 1)
+			map := knowledgeBase.getValue(prefix . ".Map")
+			tc := knowledgeBase.getValue(prefix . ".TC")
+			antiBS := knowledgeBase.getValue(prefix . ".ABS")
 
-				map := knowledgeBase.getValue(prefix . ".Map")
-				tc := knowledgeBase.getValue(prefix . ".TC")
-				antiBS := knowledgeBase.getValue(prefix . ".ABS")
+			pressures := [Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.FL"), 1)
+						, Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.FR"), 1)
+						, Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.RL"), 1)
+						, Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.RR"), 1)]
 
-				pressures := [Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.FL"), 1)
-							, Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.FR"), 1)
-						    , Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.RL"), 1)
-						    , Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.RR"), 1)]
+			temperatures := [Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.FL"), 1)
+						   , Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.FR"), 1)
+						   , Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.RL"), 1)
+						   , Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.RR"), 1)]
 
-				temperatures := [Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.FL"), 1)
-							   , Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.FR"), 1)
-							   , Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.RL"), 1)
-							   , Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.RR"), 1)]
+			wear := false
 
-				wear := false
+			if (knowledgeBase.getValue(prefix . ".Tyre.Wear.FL", kUndefined) != kUndefined)
+				wear := [Round(knowledgeBase.getValue(prefix . ".Tyre.Wear.FL"))
+					   , Round(knowledgeBase.getValue(prefix . ".Tyre.Wear.FR"))
+					   , Round(knowledgeBase.getValue(prefix . ".Tyre.Wear.RL"))
+					   , Round(knowledgeBase.getValue(prefix . ".Tyre.Wear.RR"))]
 
-				if (knowledgeBase.getValue(prefix . ".Tyre.Wear.FL", kUndefined) != kUndefined)
-					wear := [Round(knowledgeBase.getValue(prefix . ".Tyre.Wear.FL"))
-						   , Round(knowledgeBase.getValue(prefix . ".Tyre.Wear.FR"))
-						   , Round(knowledgeBase.getValue(prefix . ".Tyre.Wear.RL"))
-						   , Round(knowledgeBase.getValue(prefix . ".Tyre.Wear.RR"))]
-
-				this.saveTelemetryData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
-									 , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, antiBS
-									 , compound, compoundColor, pressures, temperatures, wear)
-			}
+			this.saveTelemetryData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
+								 , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, antiBS
+								 , compound, compoundColor, pressures, temperatures, wear, validLap)
 		}
 
 		if this.Strategy {
@@ -3566,28 +3563,30 @@ class RaceStrategist extends GridRaceAssistant {
 
 	saveTelemetryData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
 					, fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
-					, compound, compoundColor, pressures, temperatures, wear) {
+					, compound, compoundColor, pressures, temperatures, wear, validLap) {
 		local knowledgeBase := this.KnowledgeBase
 		local telemetryDB := this.TelemetryDatabase
 		local tyreLaps, lastPitstop
 
-		telemetryDB.addElectronicEntry(weather, airTemperature, trackTemperature, compound, compoundColor
-									 , map, tc, abs, fuelConsumption, fuelRemaining, lapTime)
+		if (validLap && !pitstop) {
+			telemetryDB.addElectronicEntry(weather, airTemperature, trackTemperature, compound, compoundColor
+										 , map, tc, abs, fuelConsumption, fuelRemaining, lapTime)
 
-		lastPitstop := knowledgeBase.getValue("Pitstop.Last", false)
+			lastPitstop := knowledgeBase.getValue("Pitstop.Last", false)
 
-		if lastPitstop
-			tyreLaps := (lapNumber - (knowledgeBase.getValue("Pitstop." . lastPitstop . ".Lap")))
-		else
-			tyreLaps := lapNumber
+			if lastPitstop
+				tyreLaps := (lapNumber - (knowledgeBase.getValue("Pitstop." . lastPitstop . ".Lap")))
+			else
+				tyreLaps := lapNumber
 
-		if (tyreLaps > 1)
-			telemetryDB.addTyreEntry(weather, airTemperature, trackTemperature, compound, compoundColor, tyreLaps
-								   , pressures[1], pressures[2], pressures[3], pressures[4]
-								   , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
-								   , wear ? wear[1] : kNull, wear ? wear[2] : kNull
-								   , wear ? wear[3] : kNull, wear ? wear[4] : kNull
-								   , fuelConsumption, fuelRemaining, lapTime)
+			if (tyreLaps > 1)
+				telemetryDB.addTyreEntry(weather, airTemperature, trackTemperature, compound, compoundColor, tyreLaps
+									   , pressures[1], pressures[2], pressures[3], pressures[4]
+									   , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
+									   , wear ? wear[1] : kNull, wear ? wear[2] : kNull
+									   , wear ? wear[3] : kNull, wear ? wear[4] : kNull
+									   , fuelConsumption, fuelRemaining, lapTime)
+		}
 
 		if (this.RemoteHandler && this.collectTelemetryData()) {
 			this.updateDynamicValues({HasTelemetryData: true})
@@ -3595,7 +3594,8 @@ class RaceStrategist extends GridRaceAssistant {
 			this.RemoteHandler.saveTelemetryData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
 											   , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
 											   , compound, compoundColor, values2String(",", pressures*), values2String(",", temperatures*)
-											   , wear ? values2String(",", wear*) : false)
+											   , wear ? values2String(",", wear*) : false
+											   , validLap)
 		}
 	}
 

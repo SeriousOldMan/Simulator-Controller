@@ -59,7 +59,7 @@ global kSessionDataSchemas := CaseInsenseMap("Run.Data", ["Nr", "Lap", "Driver.F
 														, "Fuel.Initial", "Fuel.Consumption", "Accidents"
 													    , "Time.Start", "Time.End"]
 										   , "Driver.Data", ["Forname", "Surname", "Nickname", "ID"]
-										   , "Lap.Data", ["Run", "Nr", "Lap", "Lap.Time", "Grip", "Map", "TC", "ABS"
+										   , "Lap.Data", ["Run", "Nr", "Lap", "Lap.Time", "Lap.Valid", "Grip", "Map", "TC", "ABS"
 														, "Weather", "Temperature.Air", "Temperature.Track"
 														, "Fuel.Initial", "Fuel.Remaining", "Fuel.Consumption", "Damage", "EngineDamage", "Accident"
 														, "Tyre.Laps", "Tyre.Compound", "Tyre.Compound.Color"
@@ -138,9 +138,9 @@ class PracticeCenter extends ConfigurationItem {
 	iSessionDirectory := false
 
 	iSessionMode := false
+	iSessionExported := false
 
 	iDate := A_Now
-	iTime := A_Now
 
 	iSimulator := false
 	iCar := false
@@ -181,11 +181,44 @@ class PracticeCenter extends ConfigurationItem {
 	iSelectedChartType := false
 
 	iSelectedRun := false
+	iSelectedDrivers := []
 
 	iSelectedDetailReport := false
 	iSelectedDetailHTML := false
 
 	iTasks := []
+
+	class PracticeCenterWindow extends Window {
+		iPracticeCenter := false
+
+		PracticeCenter {
+			Get {
+				return this.iPracticeCenter
+			}
+		}
+
+		__New(center) {
+			this.iPracticeCenter := center
+
+			super.__New({Descriptor: "Practice Center", Closeable: true, Resizeable: "Deferred"})
+		}
+
+		Close(*) {
+			if (this.PracticeCenter.HasData && !this.PracticeCenter.SessionExported) {
+				local translator := translateMsgBoxButtons.Bind(["Yes", "No", "Cancel"])
+
+				OnMessage(0x44, translator)
+				msgResult := MsgBox(translate("Do you want to transfer your data to the session database before closing?"), translate("Export"), 262179)
+				OnMessage(0x44, translator, 0)
+
+				if (msgResult = "Yes")
+					this.PracticeCenter.exportData()
+
+				if (msgResult = "Cancel")
+					return true
+			}
+		}
+	}
 
 	class PracticeCenterResizer extends Window.Resizer {
 		iRedraw := false
@@ -495,6 +528,12 @@ class PracticeCenter extends ConfigurationItem {
 		}
 	}
 
+	SessionExported {
+		Get {
+			return this.iSessionExported
+		}
+	}
+
 	SessionLoaded {
 		Get {
 			return ((this.SessionMode = "Loaded") ? this.iSessionLoaded : false)
@@ -510,12 +549,6 @@ class PracticeCenter extends ConfigurationItem {
 	Date {
 		Get {
 			return this.iDate
-		}
-	}
-
-	Time {
-		Get {
-			return this.iTime
 		}
 	}
 
@@ -818,6 +851,11 @@ class PracticeCenter extends ConfigurationItem {
 									  , (centerGui["runDropDown"].Value = 1) ? false : center.Runs[centerGui["runDropDown"].Value - 1]))
 		}
 
+		chooseDriverData(*) {
+			center.withExceptionHandler(ObjBindMethod(center, "selectDriver"
+									  , (centerGui["driverDropDown"].Value = 1) ? false : center.Runs[centerGui["driverDropDown"].Value - 1]))
+		}
+
 		chooseAxis(*) {
 			center.withExceptionhandler(ObjBindMethod(center, "showTelemetryReport"))
 		}
@@ -848,7 +886,7 @@ class PracticeCenter extends ConfigurationItem {
 			center.withExceptionhandler(ObjBindMethod(center, "updateState"))
 		}
 
-		centerGui := Window({Descriptor: "Practice Center", Closeable: true, Resizeable: "Deferred"})
+		centerGui := PracticeCenter.PracticeCenterWindow(this)
 
 		this.iWindow := centerGui
 
@@ -919,6 +957,9 @@ class PracticeCenter extends ConfigurationItem {
 		centerGui.Add("Text", "x141 yp+2 w70 h23 +0x200", translate("Stint"))
 		centerGui.Add("DropDownList", "x195 yp w191 vrunDropDown").OnEvent("Change", chooseRunData)
 
+		centerGui.Add("Text", "x141 yp+24 w70 h23 +0x200", translate("Driver"))
+		centerGui.Add("DropDownList", "x195 yp w191 vdriverDropDown").OnEvent("Change", chooseDriverData)
+
 		centerGui.Add("Text", "x141 yp+24 w70 h23 +0x200", translate("X-Axis"))
 
 		centerGui.Add("DropDownList", "x195 yp w191 vdataXDropDown").OnEvent("Change", chooseAxis)
@@ -967,16 +1008,18 @@ class PracticeCenter extends ConfigurationItem {
 
 		centerGui.SetFont("Norm", "Arial")
 
-		centerTab := centerGui.Add("Tab3", "x16 ys+39 w593 h316 H:Grow(0.8) AltSubmit -Wrap Section vpracticeCenterTabView", collect(["Stints", "Laps"], translate))
+		centerTab := centerGui.Add("Tab3", "x16 ys+39 w593 h316 H:Grow(0.8) AltSubmit -Wrap Section vpracticeCenterTabView", collect(["Settings", "Stints", "Laps"], translate))
 
 		centerTab.UseTab(1)
 
-		this.iRunsListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 H:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Lap", "Driver", "Weather", "Compound", "Laps", "Initial Fuel", "Consumed Fuel", "Avg. Lap Time", "Accidents", "Potential", "Race Craft", "Speed", "Consistency", "Car Control"], translate))
-		this.iRunsListView.OnEvent("Click", chooseRun)
-
 		centerTab.UseTab(2)
 
-		this.iLapsListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 H:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Stint", "Weather", "Grip", "Lap Time", "Consumption", "Remaining", "Pressures", "Accident"], translate))
+		this.iRunsListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 H:Grow(0.8) Checked -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Start", "Driver", "Weather", "Compound", "Laps", "Initial Fuel", "Consumed Fuel", "Avg. Lap Time", "Accidents", "Potential", "Race Craft", "Speed", "Consistency", "Car Control"], translate))
+		this.iRunsListView.OnEvent("Click", chooseRun)
+
+		centerTab.UseTab(3)
+
+		this.iLapsListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 H:Grow(0.8) Checked -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Stint", "Weather", "Grip", "Lap Time", "Consumption", "Remaining", "Pressures", "Valid", "Accident"], translate))
 		this.iLapsListView.OnEvent("Click", chooseLap)
 
 		centerGui.Rules := ""
@@ -1104,6 +1147,24 @@ class PracticeCenter extends ConfigurationItem {
 			this.Control["runDropDown"].Choose(run + 1)
 
 			this.iSelectedRun := run
+
+			this.updateReports()
+		}
+	}
+
+	selectDriver(driver, force := false) {
+		if (force || (this.SelectedDrivers && !inList(this.SelectedDrivers, driver))
+				  || (!this.SelectedDrivers && ((driver != true) && (driver != false)))) {
+			if driver {
+				this.Control["driverDropDown"].Choose(((driver = true) || (driver = false)) ? 1 : (inList(this.Drivers, driver) + 1))
+
+				this.iSelectedDrivers := ((driver == true) ? false : [driver])
+			}
+			else {
+				this.Control["driverDropDown"].Choose(0)
+
+				this.iSelectedDrivers := false
+			}
 
 			this.updateReports()
 		}
@@ -1261,6 +1322,7 @@ class PracticeCenter extends ConfigurationItem {
 		window["trackDropDown"].Enabled := false
 
 		window["runDropDown"].Enabled := false
+		window["driverDropDown"].Enabled := false
 
 		window["dataXDropDown"].Enabled := false
 		window["dataY1DropDown"].Enabled := false
@@ -1278,8 +1340,6 @@ class PracticeCenter extends ConfigurationItem {
 
 			if inList(["Pressures", "Brakes", "Temperatures", "Free"], this.SelectedReport) {
 				window["chartTypeDropDown"].Enabled := true
-
-				window["runDropDown"].Enabled := true
 
 				window["dataXDropDown"].Enabled := true
 				window["dataY1DropDown"].Enabled := true
@@ -1299,6 +1359,7 @@ class PracticeCenter extends ConfigurationItem {
 				this.iSelectedChartType := false
 
 				window["runDropDown"].Choose(0)
+				window["driverDropDown"].Choose(0)
 
 				window["dataXDropDown"].Choose(0)
 				window["dataY1DropDown"].Choose(0)
@@ -1313,6 +1374,7 @@ class PracticeCenter extends ConfigurationItem {
 			window["reportSettingsButton"].Enabled := false
 
 			window["runDropDown"].Choose(0)
+			window["driverDropDown"].Choose(0)
 
 			window["dataXDropDown"].Choose(0)
 			window["dataY1DropDown"].Choose(0)
@@ -1334,19 +1396,76 @@ class PracticeCenter extends ConfigurationItem {
 
 	updateSessionMenu() {
 		this.Control["sessionMenuDropDown"].Delete()
-		this.Control["sessionMenuDropDown"].Add(collect(["Session", "---------------------------------------------"], translate))
+		this.Control["sessionMenuDropDown"].Add(collect(["Session", "---------------------------------------------", "Clear...", "---------------------------------------------", "Load Session...", "Save Session", "Save a Copy...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Session Summary"], translate))
+
+		if !this.SessionExported
+			this.Control["sessionMenuDropDown"].Add(collect(["---------------------------------------------", "Export to Database..."], translate))
 
 		this.Control["sessionMenuDropDown"].Choose(1)
 	}
 
 	updateRunMenu() {
 		this.Control["runMenuDropDown"].Delete()
-		this.Control["runMenuDropDown"].Add(collect(["Practice", "---------------------------------------------"], translate))
+		this.Control["runMenuDropDown"].Add(collect(["Stints", "---------------------------------------------", "New Stint...", "---------------------------------------------", "Stints Summary"], translate))
 
 		this.Control["runMenuDropDown"].Choose(1)
 	}
 
 	chooseSessionMenu(line) {
+		local msgResult
+
+		switch line {
+			case 3: ; Clear...
+				if (this.SessionMode = "Active") {
+					title :=
+
+					OnMessage(0x44, translateYesNoButtons)
+					msgResult := MsgBox(translate("Do you really want to delete all data from the currently active session? This can take quite a while..."), translate("Delete"), 262436)
+					OnMessage(0x44, translateYesNoButtons, 0)
+
+					if (msgResult = "Yes")
+						this.clearSession()
+				}
+				else {
+					OnMessage(0x44, translateOkButton)
+					MsgBox(translate("You are not connected to an active session."), translate("Information"), 262192)
+					OnMessage(0x44, translateOkButton, 0)
+				}
+			case 5: ; Load Session...
+				this.loadSession()
+			case 6: ; Save Session
+				if this.HasData {
+					if (this.SessionMode = "Active")
+						this.saveSession()
+					else {
+						OnMessage(0x44, translateOkButton)
+						MsgBox(translate("You are not connected to an active session. Use `"Save a Copy...`" instead."), translate("Information"), 262192)
+						OnMessage(0x44, translateOkButton, 0)
+					}
+				}
+				else {
+					OnMessage(0x44, translateOkButton)
+					MsgBox(translate("There is no session data to be saved."), translate("Information"), 262192)
+					OnMessage(0x44, translateOkButton, 0)
+				}
+			case 7: ; Save Session Copy...
+				if this.HasData
+					this.saveSession(true)
+				else {
+					OnMessage(0x44, translateOkButton)
+					MsgBox(translate("There is no session data to be saved."), translate("Information"), 262192)
+					OnMessage(0x44, translateOkButton, 0)
+				}
+			case 9: ; Update Statistics
+				this.updateStatistics()
+			case 11: ; Session Summary
+				this.showSessionSummary()
+			case 13: ; Session Summary
+				OnMessage(0x44, translateOkButton)
+				MsgBox(translate("Not yet implemented."), translate("Information"), 262192)
+				OnMessage(0x44, translateOkButton, 0)
+		}
+
 		this.updateSessionMenu()
 	}
 
@@ -1444,6 +1563,10 @@ class PracticeCenter extends ConfigurationItem {
 		this.Control["runDropDown"].Add([translate("All")])
 		this.Control["runDropDown"].Choose(1)
 
+		this.Control["driverDropDown"].Delete()
+		this.Control["driverDropDown"].Add([translate("All")])
+		this.Control["driverDropDown"].Choose(1)
+
 		this.iDrivers := []
 
 		this.iRuns := CaseInsenseWeakMap()
@@ -1534,7 +1657,7 @@ class PracticeCenter extends ConfigurationItem {
 
 		this.Runs[newRun.Nr] := newRun
 
-		this.RunsListView.Add("", newRun.Nr, newRun.Lap, "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-")
+		this.RunsListView.Add("Check", newRun.Nr, newRun.Lap, "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-")
 
 		newRun.Row := this.RunsListView.GetCount()
 
@@ -1625,8 +1748,8 @@ class PracticeCenter extends ConfigurationItem {
 	}
 
 	createLap(run, lapNumber) {
-		local newLap := {Run: run, Nr: lapNumber, Weather: "-", Grip: "-", LapTime: "-", FuelConsumption: "-", FuelRemaining: "-"
-					   , Pressures: "-,-,-,-", Temperatures: "-,-,-,-", Accident: ""
+		local newLap := {Run: run, Nr: lapNumber, Weather: "-", Grip: "-", Laptime: "-", FuelConsumption: "-", FuelRemaining: "-"
+					   , Pressures: "-,-,-,-", Temperatures: "-,-,-,-", Valid: true, Accident: ""
 					   , Electronics: false, Tyres: false
 					   , HotPressures: false, ColdPressures: false, PressureLosses: false}
 
@@ -1635,7 +1758,7 @@ class PracticeCenter extends ConfigurationItem {
 
 		this.Laps[newLap.Nr] := newLap
 
-		this.LapsListView.Add("", newLap.Nr, run.Nr, "-", "-", "-", "-", "-", "-, -, -, -", "")
+		this.LapsListView.Add("Check", newLap.Nr, run.Nr, "-", "-", "-", "-", "-", "-, -, -, -", "x", "")
 
 		newLap.Row := this.LapsListView.GetCount()
 
@@ -1666,10 +1789,11 @@ class PracticeCenter extends ConfigurationItem {
 				pressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure))
 		}
 
-		this.LapsListView.Modify(lap.Row, "", lap.Nr, lap.Run.Nr, translate(lap.Weather), translate(lap.Grip)
-											, lapTimeDisplayValue(lap.Laptime), displayNullValue(fuelConsumption), remainingFuel
-											, values2String(", ", pressures*)
-											, lap.Accident ? translate("x") : "")
+		this.LapsListView.Modify(lap.Row, !lap.Valid ? "-Check" : ""
+										, lap.Nr, lap.Run.Nr, translate(lap.Weather), translate(lap.Grip)
+										, lapTimeDisplayValue(lap.Laptime), displayNullValue(fuelConsumption), remainingFuel
+										, values2String(", ", pressures*)
+										, lap.Valid ? translate("x") : "", lap.Accident ? translate("x") : "")
 	}
 
 	requireLap(lapNumber) {
@@ -1789,12 +1913,12 @@ class PracticeCenter extends ConfigurationItem {
 
 	addTelemetry(lap, simulator, car, track, weather, airTemperature, trackTemperature
 			   , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
-			   , compound, compoundColor, pressures, temperatures, wear) {
+			   , compound, compoundColor, pressures, temperatures, wear, valid) {
 		local telemetryDB := this.TelemetryDatabase
 		local tyresTable := this.TelemetryDatabase.Database.Tables["Tyres"]
 		local driverID := lap.Run.Driver.ID
 		local update := false
-		local telemetry, telemetryData, pressuresData, temperaturesData, wearData
+		local telemetry, telemetryData, pressuresData, temperaturesData, wearData, recentLap
 
 		if (lap.Pressures = "-,-,-,-") {
 			lap.Pressures := pressures
@@ -1815,7 +1939,8 @@ class PracticeCenter extends ConfigurationItem {
 		}
 
 		while (tyresTable.Length < (lap.Nr - 1)) {
-			telemetry := this.Laps[tyresTable.Length + 1].Data
+			recentLap := this.Laps[tyresTable.Length + 1]
+			telemetry := recentLap.Data
 
 			telemetryData := [simulator, car, track
 							, getMultiMapValue(telemetry, "Weather Data", "Weather", "Dry")
@@ -1834,7 +1959,8 @@ class PracticeCenter extends ConfigurationItem {
 							, getMultiMapValue(telemetry, "Car Data", "TyreTemperature", "-,-,-,-")
 							, getMultiMapValue(telemetry, "Car Data", "TyreWear", "null,null,null,null")]
 
-			this.Laps[tyresTable.Length + 1].TelemetryData := values2String("|||", telemetryData*)
+			recentLap.Valid := valid
+			recentLap.TelemetryData := values2String("|||", telemetryData*)
 
 			telemetryDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6]
 										 , telemetryData[14], telemetryData[15]
@@ -1852,8 +1978,11 @@ class PracticeCenter extends ConfigurationItem {
 								   , temperaturesData[1], temperaturesData[2], temperaturesData[3], temperaturesData[4]
 								   , wearData[1], wearData[2], wearData[3], wearData[4], kNull, telemetryData[8], telemetryData[9]
 								   , driverID)
+
+			this.modifyLap(recentLap)
 		}
 
+		lap.Valid := valid
 		lap.TelemetryData := values2String("|||", simulator, car, track, weather, airTemperature, trackTemperature
 												, fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
 												, compound, compoundColor, pressures, temperatures, wear)
@@ -2252,7 +2381,7 @@ class PracticeCenter extends ConfigurationItem {
 
 						this.updateRunStatistics(run)
 
-						this.RunsListView.Modify(run.Row, "Col12", run.Potential, run.RaceCraft, run.Speed, run.Consistency, run.CarControl)
+						this.RunsListView.Modify(run.Row, "Col11", run.Potential, run.RaceCraft, run.Speed, run.Consistency, run.CarControl)
 					}
 
 					Sleep(200)
@@ -2288,10 +2417,8 @@ class PracticeCenter extends ConfigurationItem {
 
 				info := newMultiMap()
 
-				setMultiMapValue(info, "Session", "Team", this.SelectedTeam)
-				setMultiMapValue(info, "Session", "Session", this.SelectedSession)
+				setMultiMapValue(info, "Session", "Exported", this.SessionExported)
 				setMultiMapValue(info, "Session", "Date", this.Date)
-				setMultiMapValue(info, "Session", "Time", this.Time)
 				setMultiMapValue(info, "Session", "Simulator", this.Simulator)
 				setMultiMapValue(info, "Session", "Car", this.Car)
 				setMultiMapValue(info, "Session", "Track", this.Track)
@@ -2304,12 +2431,8 @@ class PracticeCenter extends ConfigurationItem {
 
 				writeMultiMap(this.SessionDirectory . "Practice.info", info)
 			}
-			else {
-				this.saveSetups()
-				this.savePlan()
-
+			else
 				this.SessionStore.flush()
-			}
 
 			if copy {
 				directory := ((this.SessionMode = "Loaded") ? this.SessionLoaded : this.SessionDirectory)
@@ -2324,7 +2447,7 @@ class PracticeCenter extends ConfigurationItem {
 
 				if (folder != "")
 					try {
-						DirCopy(directory, folder . "\" . this.SelectedSession, 1)
+						DirCopy(directory, folder . "\Practice " . FormatTime(this.Date, "YYYY-MMM-DD"), 1)
 					}
 					catch Any as exception {
 						logError(exception)
@@ -2364,7 +2487,7 @@ class PracticeCenter extends ConfigurationItem {
 
 		for ignore, lap in this.SessionStore.Tables["Lap.Data"] {
 			newLap := {Nr: lap["Nr"], Run: lap["Run"], Laptime: lap["Lap.Time"], Position: lap["Position"], Grip: lap["Grip"]
-					 , Map: lap["Map"], TC: lap["TC"], ABS: lap["ABS"]
+					 , Map: lap["Map"], TC: lap["TC"], ABS: lap["ABS"], Valid: lap["Lap.Valid"]
 					 , Weather: lap["Weather"], AirTemperature: lap["Temperature.Air"], TrackTemperature: lap["Temperature.Track"]
 					 , FuelRemaining: lap["Fuel.Remaining"], FuelConsumption: lap["Fuel.Consumption"]
 					 , Damage: lap["Damage"], EngineDamage: lap["EngineDamage"]
@@ -2497,13 +2620,14 @@ class PracticeCenter extends ConfigurationItem {
 					run := this.Runs[A_Index]
 					run.Row := (this.RunsListView.GetCount() + 1)
 
-					this.RunsListView.Add("", run.Nr, run.Lap, run.Driver.FullName
-											, values2String(", ", collect(string2Values(",", run.Weather), translate)*)
-											, translate(run.Compound), run.Laps.Length
-											, isNumber(run.FuelInitial) ? displayValue("Float", convertUnit("Volume", run.FuelInitial)) : run.FuelInitial
-											, isNumber(run.FuelConsumption) ? displayValue("Float", convertUnit("Volume", run.FuelConsumption)) : run.FuelConsumption
-											, lapTimeDisplayValue(run.AvgLaptime)
-											, run.Accidents, run.Potential, run.RaceCraft, run.Speed, run.Consistency, run.CarControl)
+					this.RunsListView.Add(this.SessionExported ? "" : "Check"
+										, run.Nr, run.Lap, run.Driver.FullName
+										, values2String(", ", collect(string2Values(",", run.Weather), translate)*)
+										, translate(run.Compound), run.Laps.Length
+										, isNumber(run.FuelInitial) ? displayValue("Float", convertUnit("Volume", run.FuelInitial)) : run.FuelInitial
+										, isNumber(run.FuelConsumption) ? displayValue("Float", convertUnit("Volume", run.FuelConsumption)) : run.FuelConsumption
+										, lapTimeDisplayValue(run.AvgLaptime)
+										, run.Accidents, run.Potential, run.RaceCraft, run.Speed, run.Consistency, run.CarControl)
 				}
 
 		this.RunsListView.ModifyCol()
@@ -2529,9 +2653,10 @@ class PracticeCenter extends ConfigurationItem {
 					if isNumber(fuelConsumption)
 						fuelConsumption := displayValue("Float", convertUnit("Volume", fuelConsumption))
 
-					this.LapsListView.Add("", lap.Nr, lap.Run.Nr, translate(lap.Weather), translate(lap.Grip)
-											, lapTimeDisplayValue(lap.Laptime), displayNullValue(fuelConsumption), remainingFuel, "-, -, -, -"
-											, lap.Accident ? translate("x") : "")
+					this.LapsListView.Add((this.SessionExported || !lap.Valid) ? "" : "Check"
+										, lap.Nr, lap.Run.Nr, translate(lap.Weather), translate(lap.Grip)
+										, lapTimeDisplayValue(lap.Laptime), displayNullValue(fuelConsumption), remainingFuel, "-, -, -, -"
+										, lap.Valid ? translate("x") : "", lap.Accident ? translate("x") : "")
 				}
 
 		this.LapsListView.ModifyCol()
@@ -2595,9 +2720,9 @@ class PracticeCenter extends ConfigurationItem {
 					this.iSessionMode := "Loaded"
 					this.iSessionLoaded := folder
 
-					this.iDate := getMultiMapValue(info, "Session", "Date", A_Now)
-					this.iTime := getMultiMapValue(info, "Session", "Time", A_Now)
 
+					this.iSessionExported := getMultiMapValue(info, "Session", "Exported", true)
+					this.iDate := getMultiMapValue(info, "Session", "Date", A_Now)
 					this.iWeather := getMultiMapValue(info, "Weather", "Weather", false)
 					this.iWeather10Min := getMultiMapValue(info, "Weather", "Weather10Min", false)
 					this.iWeather30Min := getMultiMapValue(info, "Weather", "Weather30Min", false)
@@ -2605,7 +2730,6 @@ class PracticeCenter extends ConfigurationItem {
 					this.iTrackTemperature := getMultiMapValue(info, "Weather", "TrackTemperature", false)
 
 					this.Control["sessionDateCal"].Value := this.Date
-					this.Control["sessionTimeEdit"].Value := this.Time
 
 					this.loadDrivers()
 					this.loadLaps()
@@ -3263,10 +3387,10 @@ class PracticeCenter extends ConfigurationItem {
 				y6Choices := y1Choices
 			}
 			else if (report = "Free") {
-				xChoices := ["Run", "Lap", "Lap.Time", "Tyre.Laps", "Map", "TC", "ABS", "Temperature.Air", "Temperature.Track", "Tyre.Wear.Average", "Brake.Wear.Average"]
+				xChoices := ["Run", "Lap", "Lap.Time", "Lap.Valid", "Tyre.Laps", "Map", "TC", "ABS", "Temperature.Air", "Temperature.Track", "Tyre.Wear.Average", "Brake.Wear.Average"]
 
 				y1Choices := ["Temperature.Air", "Temperature.Track", "Fuel.Initial", "Fuel.Remaining", "Fuel.Consumption"
-							, "Lap.Time", "Tyre.Laps", "Map", "TC", "ABS"
+							, "Lap.Time", "Lap.Valid", "Tyre.Laps", "Map", "TC", "ABS"
 							, "Tyre.Pressure.Cold.Average", "Tyre.Pressure.Cold.Front.Average", "Tyre.Pressure.Cold.Rear.Average"
 							, "Tyre.Pressure.Hot.Average", "Tyre.Pressure.Hot.Front.Average", "Tyre.Pressure.Hot.Rear.Average"
 							, "Tyre.Pressure.Hot.Front.Left", "Tyre.Pressure.Hot.Front.Right", "Tyre.Pressure.Hot.Rear.Left", "Tyre.Pressure.Hot.Rear.Right"
@@ -3387,6 +3511,10 @@ class PracticeCenter extends ConfigurationItem {
 			window["runDropDown"].Add(concatenate([translate("All")], runs))
 			window["runDropDown"].Choose(selected + 1)
 
+			window["driverDropDown"].Delete()
+			window["driverDropDown"].Add(concatenate([translate("All")], this.Drivers))
+			window["driverDropDown"].Choose(((this.SelectedDrivers.Length > 0) ? inList(this.Drivers, this.SelectedDrivers[1]) : 0) + 1)
+
 			window["dataXDropDown"].Choose(dataXChoice)
 			window["dataY1DropDown"].Choose(dataY1Choice)
 			window["dataY2DropDown"].Choose(dataY2Choice)
@@ -3433,7 +3561,7 @@ class PracticeCenter extends ConfigurationItem {
 				lapData := Database.Row("Nr", newLap, "Lap", newLap, "Run", lap.Run.Nr, "Lap.Time", null(lap.Laptime), "Position", null(lap.Position)
 									  , "Damage", lap.Damage, "EngineDamage", lap.EngineDamage, "Accident", lap.Accident
 									  , "Fuel.Initial", null(lap.Run.FuelInitial), "Fuel.Consumption", null(lap.FuelConsumption)
-									  , "Fuel.Remaining", null(lap.FuelRemaining)
+									  , "Fuel.Remaining", null(lap.FuelRemaining), "Lap.Valid", lap.Valid
 									  , "Weather", lap.Weather, "Temperature.Air", null(lap.AirTemperature), "Temperature.Track", null(lap.TrackTemperature)
 									  , "Grip", lap.Grip, "Map", null(lap.Map), "TC", null(lap.TC), "ABS", null(lap.ABS)
 									  , "Tyre.Compound", compound(lap.Compound), "Tyre.Compound.Color", compoundColor(lap.Compound)
@@ -4421,12 +4549,12 @@ class PracticeCenter extends ConfigurationItem {
 
 	updateTelemetry(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
 				  , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
-				  , compound, compoundColor, pressures, temperatures, wear) {
+				  , compound, compoundColor, pressures, temperatures, wear, valid) {
 		udateTelemetryAsync() {
 			if ((this.SessionMode = "Active") && (this.LastLap.Nr = lapNumber))
 				this.addTelemetry(this.LastLap, simulator, car, track, weather, airTemperature, trackTemperature
 								, fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
-								, compound, compoundColor, pressures, temperatures, wear)
+								, compound, compoundColor, pressures, temperatures, wear, valid)
 		}
 
 		this.pushTask(udateTelemetryAsync)

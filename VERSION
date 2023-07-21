@@ -1,16 +1,16 @@
 [Development]
-Version=5.1.2.0-beta
+Version=5.1.2.0-release
 Target=5.1.2.0-release
-Date=07/20/2023
-Download=https://www.dropbox.com/s/r452fgdczs8lsli/Simulator%20Controller%205.1.2.0-beta.zip?dl=1
+Date=07/21/2023
+Download=https://cutt.ly/6wpOauWf;https://www.dropbox.com/s/7yytpw6zyvy9fcj/Simulator%20Controller%205.1.2.0-release.zip?dl=1
 Changes=New core setting to choose the dispatch cycle of external commands, New communication method for the Stream Deck plugin, New core setting to choose the between the Stream Deck communication methods, The Spotter can now "focus" on a specific opponent, Strategist and Spotter can now be asked for gap info for a specific car, Standings widget now shows car number in "System Monitor", Fixed bugs in Spanish grammars for Spotter and Strategist, Fixed AMS2 API to not interpret a replay as an actual session, New car models for "Setup Workbench", Renamed controller action function "call" to "invoke", New double press setting for Push-to-Talk
 [Release]
-Version=5.1.1.0-release
-Date=07/14/2023
-Download=https://cutt.ly/LwojeG92;https://www.dropbox.com/s/x56eeytta0a21dc/Simulator%20Controller%205.1.1.0-release.zip?dl=1
-Changes=Acoustic feedback in Telemetry Analyzer for handling events, New update frequency setting in Core Settings for team sessions, New support for the configuration of custom controller modes, Fixed regression in "Race Center" for the button which opens the pitstop settings info window, New controller action function "mouse", New controller action function "call", New car models for "Setup Workbench", Defaults for simulator, car and track in launched apps by "Simulator Startup", New plugin argument "openRaceReports" for "Race Strategist" plugin, New controller action function "openRaceReports"
+Version=5.1.2.0-release
+Date=07/21/2023
+Download=https://cutt.ly/6wpOauWf;https://www.dropbox.com/s/7yytpw6zyvy9fcj/Simulator%20Controller%205.1.2.0-release.zip?dl=1
+Changes=New core setting to choose the dispatch cycle of external commands, New communication method for the Stream Deck plugin, New core setting to choose the between the Stream Deck communication methods, The Spotter can now "focus" on a specific opponent, Strategist and Spotter can now be asked for gap info for a specific car, Standings widget now shows car number in "System Monitor", Fixed bugs in Spanish grammars for Spotter and Strategist, Fixed AMS2 API to not interpret a replay as an actual session, New car models for "Setup Workbench", Renamed controller action function "call" to "invoke", New double press setting for Push-to-Talk
 [Current]
-Type=Development
+Type=Release
 [Version]
-Development=5.1.2.0-beta
-Release=5.1.1.0-release
+Development=5.1.2.0-release
+Release=5.1.2.0-release

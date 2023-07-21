@@ -1,4 +1,4 @@
-## 5.1.2.0-release 07/21/23 (planned)
+## 5.1.2.0-release 07/21/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. The Strategist and the Spotter can now be asked for the time to a specific car. Example: "Can you tell me the gap to the car number 81?"

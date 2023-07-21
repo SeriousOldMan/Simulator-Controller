@@ -599,12 +599,12 @@ class VoiceServer extends ConfigurationItem {
 	SpeechRecognizer[create := false] {
 		Get {
 			local settings
-			
+
 			if (create && this.Listener && !this.iSpeechRecognizer) {
 				try {
 					try {
 						settings := readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
-						
+
 						this.iSpeechRecognizer := VoiceServer.ActivationSpeechRecognizer(getMultiMapValue(settings, "Voice", "Activation Recognizer"
 																										, getMultiMapValue(settings, "Voice", "ActivationRecognizer", "Server"))
 																					   , true, this.Language, true)
@@ -666,11 +666,10 @@ class VoiceServer extends ConfigurationItem {
 		local toggle
 
 		if p2tHotkey {
-			toggle := false
-
 			if FileExist(kUserConfigDirectory . "P2T Configuration.ini")
-				toggle := (getMultiMapValue(readMultiMap(kUserConfigDirectory . "P2T Configuration.ini")
-						 , "PushToTalk", "Mode", "Press") = "Toggle")
+				toggle := (getMultiMapValue(readMultiMap(kUserConfigDirectory . "P2T Configuration.ini"), "PushToTalk", "Mode", "Press") = "Toggle")
+			else
+				toggle := false
 
 			if toggle
 				Hotkey(p2tHotkey, ObjBindMethod(this, "listen", true), "On")
@@ -692,6 +691,9 @@ class VoiceServer extends ConfigurationItem {
 
 		static listenTask := false
 
+		static speed := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+									   , "Voice", "Activation Speed", DllCall("GetDoubleClickTime"))
+
 		try
 			pressed := toggle ? down : GetKeyState(this.PushToTalk, "P")
 
@@ -699,7 +701,7 @@ class VoiceServer extends ConfigurationItem {
 			lastDown := A_TickCount
 			isPressed := true
 
-			if (((lastDown - lastUp) < 400) && (clicks == 1))
+			if (((lastDown - lastUp) < speed) && (clicks == 1))
 				activation := true
 			else {
 				clicks := 0
@@ -711,7 +713,7 @@ class VoiceServer extends ConfigurationItem {
 			lastUp := A_TickCount
 			isPressed := false
 
-			if ((lastUp - lastDown) < 400)
+			if ((lastUp - lastDown) < speed)
 				clicks += 1
 			else
 				clicks := 0
@@ -727,42 +729,40 @@ class VoiceServer extends ConfigurationItem {
 					listenTask := false
 				}
 
-				if (activation && listening) {
+				if listening {
 					this.stopActivationListener()
 					this.stopListening()
 
-					this.startActivationListener()
+					if activation
+						this.startActivationListener()
+					else
+						listening := false
 				}
-				else if listening {
-					this.stopActivationListener()
-					this.stopListening()
+				else if activation {
+					this.startActivationListener()
 
-					listening := false
+					listening := true
+				}
+				else if listen {
+					this.startListening(false)
+
+					listening := true
 				}
 				else {
-					if activation {
-						this.startActivationListener()
+					listenTask := Task(ObjBindMethod(this, "listen", true, true), speed, kInterruptPriority)
 
-						listening := true
-					}
-					else if listen {
-						this.startListening(false)
-
-						listening := true
-					}
-					else {
-						listenTask := Task(ObjBindMethod(this, "listen", true, true), 400, kInterruptPriority)
-
-						Task.startTask(listenTask)
-					}
+					Task.startTask(listenTask)
 				}
 			}
+
+			if down
+				this.listen(true, false)
 		}
 		else {
-			if (((A_TickCount - lastDown) < 200) && !activation)
+			if (((A_TickCount - lastDown) < (speed / 2)) && !activation)
 				pressed := false
 
-			if !this.Speaking && pressed {
+			if (!this.Speaking && pressed) {
 				if activation
 					this.startActivationListener()
 				else
@@ -777,9 +777,6 @@ class VoiceServer extends ConfigurationItem {
 				listening := false
 			}
 		}
-
-		if (toggle && down)
-			this.listen(toggle, false)
 	}
 
 	setDebug(option, enabled, *) {

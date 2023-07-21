@@ -1024,7 +1024,7 @@ class RaceSpotter extends GridRaceAssistant {
 			if (InStr(candidate, "#") == 1)
 				candidate := SubStr(candidate, 2)
 
-			if isInteger(candidate)
+			if this.isInteger(candidate, &candidate)
 				numbers.Push(candidate)
 			else if (numbers.Length > 0)
 				break

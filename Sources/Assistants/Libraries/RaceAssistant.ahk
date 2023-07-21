@@ -881,6 +881,13 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
+	isInteger(word, &number) {
+		if this.isNumber(word, &number)
+			return isInteger(number)
+		else
+			return false
+	}
+
 	setContinuation(continuation) {
 		if isInstance(continuation, VoiceManager.VoiceContinuation)
 			this.VoiceManager.setContinuation(continuation)
@@ -2138,7 +2145,7 @@ class GridRaceAssistant extends RaceAssistant {
 				if (InStr(candidate, "#") == 1)
 					candidate := SubStr(candidate, 2)
 
-				if isInteger(candidate)
+				if this.isInteger(candidate, &candidate)
 					numbers.Push(candidate)
 				else if (numbers.Length > 0)
 					break

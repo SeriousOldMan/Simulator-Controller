@@ -1583,7 +1583,7 @@ class RaceStrategist extends GridRaceAssistant {
 		local driverSurname := ""
 		local driverNickname := ""
 		local knowledgeBase, compound, result, lap, simulator, car, track, frequency, curContinuation
-		local pitstop, prefix, validLap, weather, airTemperature, trackTemperature, compound, compoundColor
+		local pitstop, prefix, validLap, lapState, weather, airTemperature, trackTemperature, compound, compoundColor
 		local fuelConsumption, fuelRemaining, lapTime, map, tc, antiBS, pressures, temperatures, wear, multiClass
 		local sessionInfo, driverCar, lastTime
 
@@ -1675,10 +1675,16 @@ class RaceStrategist extends GridRaceAssistant {
 		if this.collectTelemetryData() {
 			prefix := "Lap." . lapNumber
 
-			if this.hasEnoughData(false)
-				validLap := knowledgeBase.getValue(prefix . ".Valid", true)
+			if validLap
+				validLap := knowledgeBase.getValue(prefix . ".Valid", validLap)
+
+			if !validLap
+				lapState := "Invalid"
+			else if this.hasEnoughData(false)
+				lapState := "Valid"
 			else
-				validLap := false
+				lapState := "Warmup"
+
 			weather := knowledgeBase.getValue(prefix . ".Weather")
 			airTemperature := knowledgeBase.getValue(prefix . ".Temperature.Air")
 			trackTemperature := knowledgeBase.getValue(prefix . ".Temperature.Track")
@@ -1712,7 +1718,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 			this.saveTelemetryData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
 								 , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, antiBS
-								 , compound, compoundColor, pressures, temperatures, wear, validLap)
+								 , compound, compoundColor, pressures, temperatures, wear, lapState)
 		}
 
 		if this.Strategy {
@@ -3566,12 +3572,12 @@ class RaceStrategist extends GridRaceAssistant {
 
 	saveTelemetryData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
 					, fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
-					, compound, compoundColor, pressures, temperatures, wear, validLap) {
+					, compound, compoundColor, pressures, temperatures, wear, lapState) {
 		local knowledgeBase := this.KnowledgeBase
 		local telemetryDB := this.TelemetryDatabase
 		local tyreLaps, lastPitstop
 
-		if (validLap && !pitstop) {
+		if ((lapState = "Valid") && !pitstop) {
 			telemetryDB.addElectronicEntry(weather, airTemperature, trackTemperature, compound, compoundColor
 										 , map, tc, abs, fuelConsumption, fuelRemaining, lapTime)
 
@@ -3598,7 +3604,7 @@ class RaceStrategist extends GridRaceAssistant {
 											   , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
 											   , compound, compoundColor, values2String(",", pressures*), values2String(",", temperatures*)
 											   , wear ? values2String(",", wear*) : false
-											   , validLap)
+											   , lapState)
 		}
 	}
 

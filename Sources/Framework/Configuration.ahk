@@ -382,12 +382,18 @@ class Function extends ConfigurationItem {
 			local result, hotkeys
 
 			if trigger {
-				result := this.iHotkeys[trigger]
+				if this.iHotkeys.Has(trigger) {
+					result := this.iHotkeys[trigger]
 
-				if asText
-					result := values2String(" | ", result*)
+					if asText
+						result := values2String(" | ", result*)
 
-				return result
+					return result
+				}
+				else if asText
+					return ""
+				else
+					return CaseInsenseMap()
 			}
 			else if asText {
 				result := CaseInsenseMap()

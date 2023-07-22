@@ -1032,6 +1032,8 @@ class PracticeCenter extends ConfigurationItem {
 		x3 := x2 + 26
 		x4 := x1 + 16
 
+		xb := x1 + 87
+
 		x5 := 243 + 8
 		x6 := x5 - 4
 		x7 := x5 + 79
@@ -1069,7 +1071,10 @@ class PracticeCenter extends ConfigurationItem {
 		choices := [translate(normalizeCompound("Dry"))]
 		chosen := 1
 
-		centerGui.Add("DropDownList", "x" . x1 . " yp w110 Choose" . chosen, choices)
+		centerGui.Add("DropDownList", "x" . x1 . " yp w85 Choose" . chosen, choices)
+
+		centerGui.Add("Button", "x" . xb . " yp w23 h23 Center +0x200 vimportPressuresButton") ; .OnEvent("Click", copyPressures)
+		setButtonIcon(centerGui["importPressuresButton"], kIconsDirectory . "Copy.ico", 1, "")
 
 		centerGui.Add("Text", "x" . x . " yp+24 w75 h20", translate("Tyre Set"))
 		centerGui.Add("Edit", "x" . x1 . " yp w50 h20 Limit2 Number")
@@ -1109,7 +1114,7 @@ class PracticeCenter extends ConfigurationItem {
 
 		centerGui.Add("Text", "x" . x5 . " ys+130 w75 h23 +0x200", translate("Used"))
 
-		this.iTyreSetListView := centerGui.Add("ListView", "x" . x7 . " yp w" . w12 . " h65 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Compound", "#", "Laps"], translate))
+		this.iTyreSetListView := centerGui.Add("ListView", "x" . x7 . " yp w" . w12 . " h165 H:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Compound", "#", "Laps"], translate))
 
 		centerTab.UseTab(2)
 

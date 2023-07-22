@@ -216,9 +216,9 @@ class PracticeCenter extends ConfigurationItem {
 
 				if (msgResult = "Cancel")
 					return true
-
-				super.Close()
 			}
+
+			return super.Close()
 		}
 	}
 
@@ -520,7 +520,12 @@ class PracticeCenter extends ConfigurationItem {
 
 	SessionDirectory {
 		Get {
-			return this.iSessionDirectory
+			if (this.SessionMode = "Active")
+				return this.iSessionDirectory
+			else if (this.SessionMode = "Loaded")
+				return this.SessionLoaded
+			else
+				return this.iSessionDirectory
 		}
 	}
 
@@ -1532,17 +1537,14 @@ class PracticeCenter extends ConfigurationItem {
 					title :=
 
 					OnMessage(0x44, translateYesNoButtons)
-					msgResult := MsgBox(translate("Do you really want to delete all data from the currently active session? This can take quite a while..."), translate("Delete"), 262436)
+					msgResult := MsgBox(translate("Do you really want to delete all data from the currently active session? This cannot be undone."), translate("Delete"), 262436)
 					OnMessage(0x44, translateYesNoButtons, 0)
 
 					if (msgResult = "Yes")
 						this.clearSession()
 				}
-				else {
-					OnMessage(0x44, translateOkButton)
-					MsgBox(translate("You are not connected to an active session."), translate("Information"), 262192)
-					OnMessage(0x44, translateOkButton, 0)
-				}
+				else
+					this.clearSession()
 			case 5: ; Load Session...
 				this.loadSession()
 			case 6: ; Save Session
@@ -1655,19 +1657,21 @@ class PracticeCenter extends ConfigurationItem {
 	initializeSession() {
 		local directory, reportDirectory
 
-		directory := this.SessionDirectory
+		if (this.SessionMode = "Active") {
+			directory := this.SessionDirectory
 
-		deleteDirectory(directory)
+			deleteDirectory(directory)
 
-		DirCreate(directory)
+			DirCreate(directory)
 
-		reportDirectory := (directory . "Race Report")
+			reportDirectory := (directory . "Race Report")
 
-		deleteDirectory(reportDirectory)
+			deleteDirectory(reportDirectory)
 
-		DirCreate(reportDirectory)
+			DirCreate(reportDirectory)
 
-		this.ReportViewer.setReport(reportDirectory)
+			this.ReportViewer.setReport(reportDirectory)
+		}
 
 		this.RunsListView.Delete()
 		this.LapsListView.Delete()
@@ -1767,7 +1771,7 @@ class PracticeCenter extends ConfigurationItem {
 
 	createRun(lapNumber) {
 		local newRun := {Nr: (this.CurrentRun ? (this.CurrentRun.Nr + 1) : 1), Lap: lapNumber, StartTime: A_Now, TyreLaps: 0
-					   , Driver: "-", FuelInitial: "-", FuelConsumption: 0.0, Accidents: 0, Weather: "-", Compound: "-"
+					   , Driver: "-", FuelInitial: "-", FuelConsumption: 0.0, Accidents: 0, Weather: "-", Compound: "-", TyreSet: "-"
 					   , AvgLapTime: "-", Potential: "-", RaceCraft: "-", Speed: "-", Consistency: "-", CarControl: "-"
 					   , Laps: []}
 
@@ -2043,34 +2047,25 @@ class PracticeCenter extends ConfigurationItem {
 			   , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
 			   , compound, compoundColor, pressures, temperatures, wear, state) {
 		local telemetryDB := this.TelemetryDatabase
+		local electronicsTable := this.TelemetryDatabase.Database.Tables["Electronics"]
 		local tyresTable := this.TelemetryDatabase.Database.Tables["Tyres"]
 		local driverID := lap.Run.Driver.ID
-		local update := false
 		local telemetry, telemetryData, pressuresData, temperaturesData, wearData, recentLap, tyreLaps
 
-		if (lap.Pressures = "-,-,-,-") {
+		if (lap.Pressures = "-,-,-,-")
 			lap.Pressures := pressures
 
-			update := true
-		}
-
-		if (lap.Temperatures = "-,-,-,-") {
+		if (lap.Temperatures = "-,-,-,-")
 			lap.Temperatures := temperatures
 
-			update := true
-		}
-
-		if (lap.FuelConsumption = "-") {
+		if ((lap.FuelConsumption = "-") && (isNumber(fuelConsumption) && (fuelConsumption > 0)))
 			lap.FuelConsumption := fuelConsumption
-
-			update := true
-		}
 
 		while (tyresTable.Length < (lap.Nr - 1)) {
 			recentLap := this.Laps[tyresTable.Length + 1]
 			telemetry := recentLap.Data
 
-			tyreLaps := (recentLap.Run.TyreLaps + (tyresTable.Length - recentLap.Run.Lap) + 2)
+			tyreLaps := (recentLap.Run.TyreLaps + (recentLap.Nr - recentLap.Run.Lap) + 2)
 
 			telemetryData := [simulator, car, track
 							, getMultiMapValue(telemetry, "Weather Data", "Weather", "Dry")
@@ -2088,58 +2083,61 @@ class PracticeCenter extends ConfigurationItem {
 							, tyreLaps
 							, getMultiMapValue(telemetry, "Car Data", "TyrePressure", "-,-,-,-")
 							, getMultiMapValue(telemetry, "Car Data", "TyreTemperature", "-,-,-,-")
-							, getMultiMapValue(telemetry, "Car Data", "TyreWear", "null,null,null,null")]
+							, getMultiMapValue(telemetry, "Car Data", "TyreWear", "null,null,null,null")
+							, "Unknown"]
 
 			recentLap.State := "Unknown"
 			recentLap.TelemetryData := values2String("|||", telemetryData*)
 
-			telemetryDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6]
-										 , telemetryData[14], telemetryData[15]
-										 , telemetryData[11], telemetryData[12], telemetryData[13]
-										 , kNull, telemetryData[8], telemetryData[9], driverID)
+			if (electronicsTable.Length < recentLap.Nr)
+				telemetryDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6]
+											 , telemetryData[14], telemetryData[15]
+											 , telemetryData[11], telemetryData[12], telemetryData[13]
+											 , kNull, telemetryData[8], telemetryData[9], driverID)
 
 			pressuresData := collect(string2Values(",", telemetryData[16]), null)
 			temperaturesData := collect(string2Values(",", telemetryData[17]), null)
 			wearData := collect(string2Values(",", telemetryData[18]), null)
 
-			telemetryDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6]
-								   , telemetryData[14], telemetryData[15], tyreLaps
-								   , pressuresData[1], pressuresData[2], pressuresData[3], pressuresData[4]
-								   , temperaturesData[1], temperaturesData[2], temperaturesData[3], temperaturesData[4]
-								   , wearData[1], wearData[2], wearData[3], wearData[4], kNull, telemetryData[8], telemetryData[9]
-								   , driverID)
+			if (tyresTable.Length < recentLap.Nr)
+				telemetryDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6]
+									   , telemetryData[14], telemetryData[15], tyreLaps
+									   , pressuresData[1], pressuresData[2], pressuresData[3], pressuresData[4]
+									   , temperaturesData[1], temperaturesData[2], temperaturesData[3], temperaturesData[4]
+									   , wearData[1], wearData[2], wearData[3], wearData[4], kNull, telemetryData[8], telemetryData[9]
+									   , driverID)
 
 			this.modifyLap(recentLap)
 		}
 
 		lap.State := state
 
-		tyreLaps := (lap.Run.TyreLaps + (tyresTable.Length - lap.Run.Lap) + 2)
+		tyreLaps := (lap.Run.TyreLaps + (lap.Nr - lap.Run.Lap) + 1)
 
 		lap.TelemetryData := values2String("|||", simulator, car, track, weather, airTemperature, trackTemperature
 												, fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
-												, compound, compoundColor, tyreLaps, pressures, temperatures, wear)
+												, compound, compoundColor, tyreLaps, pressures, temperatures, wear, state)
 
-		telemetryDB.addElectronicEntry(weather, airTemperature, trackTemperature, compound, compoundColor
-									 , map, tc, abs, fuelConsumption, fuelRemaining, lapTime
-									 , driverID)
+		if (electronicsTable.Length < lap.Nr)
+			telemetryDB.addElectronicEntry(weather, airTemperature, trackTemperature, compound, compoundColor
+										 , map, tc, abs, fuelConsumption, fuelRemaining, lapTime
+										 , driverID)
 
 		pressures := collect(string2Values(",", pressures), null)
 		temperatures := collect(string2Values(",", temperatures), null)
 		wear := collect(string2Values(",", wear), null)
 
-		telemetryDB.addTyreEntry(weather, airTemperature, trackTemperature, compound, compoundColor, tyreLaps
-							   , pressures[1], pressures[2], pressures[3], pressures[4]
-							   , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
-							   , wear[1], wear[2], wear[3], wear[4], fuelConsumption, fuelRemaining, lapTime
-							   , driverID)
+		if (tyresTable.Length < lap.Nr)
+			telemetryDB.addTyreEntry(weather, airTemperature, trackTemperature, compound, compoundColor, tyreLaps
+								   , pressures[1], pressures[2], pressures[3], pressures[4]
+								   , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
+								   , wear[1], wear[2], wear[3], wear[4], fuelConsumption, fuelRemaining, lapTime
+								   , driverID)
 
-		if update {
-			this.modifyLap(lap)
-			this.modifyRun(lap.Run)
+		this.modifyLap(lap)
+		this.modifyRun(lap.Run)
 
-			this.updateState()
-		}
+		this.updateState()
 	}
 
 	addPressures(lap, simulator, car, track, weather, airTemperature, trackTemperature
@@ -2190,8 +2188,8 @@ class PracticeCenter extends ConfigurationItem {
 	}
 
 	exportSession() {
-		local telemetryDatabase := TelemetryDatabase(this.Simulator, this.Car, this.Track)
-		local tyresDatabase := TyresDatabase()
+		local telemetryDB := TelemetryDatabase(this.Simulator, this.Car, this.Track)
+		local tyresDB := TyresDatabase()
 		local sessionStore := this.SessionStore
 		local row := 0
 		local locked := false
@@ -2207,7 +2205,7 @@ class PracticeCenter extends ConfigurationItem {
 
 					telemetryData := string2Values("|||", lap.TelemetryData)
 
-					telemetryDatabase.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15]
+					telemetryDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15]
 													   , telemetryData[11], telemetryData[12], telemetryData[13], telemetryData[7], telemetryData[8], telemetryData[9]
 													   , driver)
 
@@ -2215,35 +2213,35 @@ class PracticeCenter extends ConfigurationItem {
 					temperatures := string2Values(",", telemetryData[18])
 					wear := string2Values(",", telemetryData[19])
 
-					telemetryDatabase.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6]
-												 , telemetryData[14], telemetryData[15], telemetryData[16]
-												 , pressures[1], pressures[2], pressures[3], pressures[4]
-												 , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
-												 , wear[1], wear[2], wear[3], wear[4]
-												 , telemetryData[7], telemetryData[8], telemetryData[9]
-												 , driver)
+					telemetryDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6]
+										   , telemetryData[14], telemetryData[15], telemetryData[16]
+										   , pressures[1], pressures[2], pressures[3], pressures[4]
+										   , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
+										   , wear[1], wear[2], wear[3], wear[4]
+										   , telemetryData[7], telemetryData[8], telemetryData[9]
+										   , driver)
 
 					pressuresData := string2Values("|||", lap.PressuresData)
 
 					if !locked
-						if tyresDatabase.lock(pressuresData[1], pressuresData[2], pressuresData[3], false)
+						if tyresDB.lock(pressuresData[1], pressuresData[2], pressuresData[3], false)
 							locked := true
 						else
 							Sleep(200)
 
 					if locked
-						tyresDatabase.updatePressures(pressuresData[1], pressuresData[2], pressuresData[3]
-													, pressuresData[4], pressuresData[5], pressuresData[6]
-													, pressuresData[7], pressuresData[8]
-													, string2Values(",", pressuresData[9]), string2Values(",", pressuresData[10])
-													, true, driver)
+						tyresDB.updatePressures(pressuresData[1], pressuresData[2], pressuresData[3]
+											  , pressuresData[4], pressuresData[5], pressuresData[6]
+											  , pressuresData[7], pressuresData[8]
+											  , string2Values(",", pressuresData[9]), string2Values(",", pressuresData[10])
+											  , true, driver)
 				}
 			}
 		}
 		finally {
 			if locked
 				try {
-					tyresDatabase.unlock()
+					tyresDB.unlock()
 				}
 				catch Any as exception {
 					logError(exception)
@@ -2649,7 +2647,7 @@ class PracticeCenter extends ConfigurationItem {
 
 				if (folder != "")
 					try {
-						DirCopy(directory, folder . "\Practice " . FormatTime(this.Date, "YYYY-MMM-DD"), 1)
+						DirCopy(directory, folder . "\Practice " . FormatTime(this.Date, "yyyy-MMM-dd"), 1)
 					}
 					catch Any as exception {
 						logError(exception)
@@ -2693,6 +2691,10 @@ class PracticeCenter extends ConfigurationItem {
 					 , Damage: lap["Damage"], EngineDamage: lap["EngineDamage"]
 					 , Accident: lap["Accident"]
 					 , Compound: compound(lap["Tyre.Compound"], lap["Tyre.Compound.Color"])
+					 , Pressures: values2String(",", lap["Tyre.Pressure.Hot.Front.Left"], lap["Tyre.Pressure.Hot.Front.Right"]
+												   , lap["Tyre.Pressure.Hot.Rear.Left"], lap["Tyre.Pressure.Hot.Rear.Right"])
+					 , Temperatures: values2String(",", lap["Tyre.Temperature.Front.Left"], lap["Tyre.Temperature.Front.Right"]
+													  , lap["Tyre.Temperature.Rear.Left"], lap["Tyre.Temperature.Rear.Right"])
 					 , Data: false, TelemetryData: lap["Data.Telemetry"], PressuresData: lap["Data.Pressures"]}
 
 			if (isNull(newLap.Map))
@@ -2740,7 +2742,7 @@ class PracticeCenter extends ConfigurationItem {
 			driver := this.createDriver({Forname: run["Driver.Forname"], Surname: run["Driver.Surname"], Nickname: run["Driver.Nickname"], ID: run["Driver.ID"]})
 
 			newRun := {Nr: run["Nr"], Lap: run["Lap"], Driver: driver, Weather: run["Weather"]
-					 , FuelAmound: run["Fuel.Initial"], FuelConsumption: run["Fuel.Consumption"]
+					 , FuelInitial: run["Fuel.Initial"], FuelConsumption: run["Fuel.Consumption"]
 					 , Compound: compound(run["Tyre.Compound"], run["Tyre.Compound.Color"]), TyreSet: run["Tyre.Set"], TyreLaps: run["Tyre.Laps"]
 					 , AvgLaptime: run["Lap.Time.Average"], BestLaptime: run["Lap.Time.Best"]
 					 , Accidents: run["Accidents"], StartTime: run["Time.Start"], EndTime: run["Time.End"]}
@@ -2867,14 +2869,18 @@ class PracticeCenter extends ConfigurationItem {
 
 	loadTelemetry() {
 		local lastLap := this.LastLap
-		local lap
+		local lap, telemetryData
 
 		if lastLap
 			loop lastLap.Nr
 				if this.Laps.Has(A_Index) {
 					lap := this.Laps[A_Index]
 
-					this.addTelemetry(lap, string2Values("|||", lap.TelemetryData)*)
+					telemetryData := string2Values("|||", lap.TelemetryData)
+
+					telemetryData.RemoveAt(16)
+
+					this.addTelemetry(lap, telemetryData*)
 				}
 	}
 
@@ -2927,8 +2933,6 @@ class PracticeCenter extends ConfigurationItem {
 					this.iWeather30Min := getMultiMapValue(info, "Weather", "Weather30Min", false)
 					this.iAirTemperature := getMultiMapValue(info, "Weather", "AirTemperature", false)
 					this.iTrackTemperature := getMultiMapValue(info, "Weather", "TrackTemperature", false)
-
-					this.Control["sessionDateCal"].Value := this.Date
 
 					this.loadDrivers()
 					this.loadLaps()
@@ -3916,7 +3920,7 @@ class PracticeCenter extends ConfigurationItem {
 											  , "Tyre.Compound", compound(run.Compound), "Tyre.Compound.Color", compoundColor(run.Compound)
 											  , "Tyre.Set", run.TyreSet, "Tyre.Laps", run.TyreLaps
 											  , "Lap.Time.Average", null(run.AvgLaptime), "Lap.Time.Best", null(run.BestLapTime)
-											  , "Fuel.Initial", null(run.FuelInitial), , "Fuel.Consumption", null(run.FuelConsumption)
+											  , "Fuel.Initial", null(run.FuelInitial), "Fuel.Consumption", null(run.FuelConsumption)
 											  , "Accidents", run.Accidents
 											  , "Time.Start", this.computeStartTime(run), "Time.End", this.computeEndTime(run))
 

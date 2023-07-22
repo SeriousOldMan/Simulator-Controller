@@ -1024,7 +1024,7 @@ class RaceSpotter extends GridRaceAssistant {
 			if (InStr(candidate, "#") == 1)
 				candidate := SubStr(candidate, 2)
 
-			if isInteger(candidate)
+			if this.isInteger(candidate, &candidate)
 				numbers.Push(candidate)
 			else if (numbers.Length > 0)
 				break
@@ -1501,6 +1501,16 @@ class RaceSpotter extends GridRaceAssistant {
 					else
 						lapTime := false
 				}
+				else if (focused && focused.hasBestLapTime()) {
+					lapTime := focused.BestLapTime[true]
+
+					if (lapTime = focused.LastLapTime) {
+						phrase := "FocusBestLap"
+						number := focused.Car.Nr
+					}
+					else
+						lapTime := false
+				}
 				else if (standingsBehind && standingsBehind.hasBestLapTime()) {
 					lapTime := standingsBehind.BestLapTime[true]
 
@@ -1514,16 +1524,6 @@ class RaceSpotter extends GridRaceAssistant {
 
 					if (lapTime = leader.LastLapTime)
 						phrase := "LeaderBestLap"
-					else
-						lapTime := false
-				}
-				else if (focused && focused.hasBestLapTime()) {
-					lapTime := focused.BestLapTime[true]
-
-					if (lapTime = focused.LastLapTime) {
-						phrase := "FocusBestLap"
-						number := focused.Car.Nr
-					}
 					else
 						lapTime := false
 				}
@@ -1649,18 +1649,6 @@ class RaceSpotter extends GridRaceAssistant {
 			}
 		}
 
-		if standingsBehind {
-			situation := ("BehindPitting " . standingsBehind.Car.ID . A_Space . standingsBehind.Car.LastLap)
-
-			if !this.TacticalAdvices.Has(situation) {
-				this.TacticalAdvices[situation] := true
-
-				speaker.speakPhrase("BehindPitting")
-
-				return true
-			}
-		}
-
 		if focused {
 			situation := ("FocusPitting " . focused.Car.ID . A_Space . focused.Car.LastLap)
 
@@ -1668,6 +1656,18 @@ class RaceSpotter extends GridRaceAssistant {
 				this.TacticalAdvices[situation] := true
 
 				speaker.speakPhrase("FocusPitting", {number: focused.Car.Nr})
+
+				return true
+			}
+		}
+
+		if standingsBehind {
+			situation := ("BehindPitting " . standingsBehind.Car.ID . A_Space . standingsBehind.Car.LastLap)
+
+			if !this.TacticalAdvices.Has(situation) {
+				this.TacticalAdvices[situation] := true
+
+				speaker.speakPhrase("BehindPitting")
 
 				return true
 			}

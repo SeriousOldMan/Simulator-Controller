@@ -507,5 +507,5 @@ This function can be used to send keyboard commands to a simulator, for example.
 #### *mouse(button :: OneOf("Left", "Right", "Middle"), x :: Integer, y :: Integer, count :: Integer := 1, window :: String := false)*
 Clicks the specified mouse button at the given location. You can supply the number of clicks using *count* and you can supply a target window using the optional parameter *window*. Coordinates are relative to the upper left corner of the *window*, if supplied, otherwise relative to the uper left corner of the screen.
 
-#### *call(target :: String, method :: String, [Optional] argument1, argument2, ...)*
-Invokes an internal method. *target* maybe either "Controller" (or "Simulator Controller") for method of the single controller instance itself or the name of a registered plugin or a name of a mode in the format *plugin*.*mode* and *method* is the name of the method to invoke for this target. You can supply any number of arguments to the call.
+#### *invoke(target :: String, method :: String, [Optional] argument1, argument2, ...)*
+Invokes an internal method. *target* may be either "Controller" (or "Simulator Controller") for a method of the single controller instance itself or the name of a registered plugin or a name of a mode in the format *plugin*.*mode* and *method* is the name of the method to invoke for this target. You can supply any number of arguments to the invocation call.

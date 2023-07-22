@@ -797,7 +797,7 @@ mouse(button, x, y, count := 1, window := false) {
 	}
 }
 
-call(target, method, arguments*) {
+invoke(target, method, arguments*) {
 	local command
 
 	try {
@@ -814,7 +814,7 @@ call(target, method, arguments*) {
 	catch Any as exception {
 		logError(exception, true)
 
-		command := ("call(" . values2String(", ", target, method, arguments*) . ")")
+		command := ("invoke(" . values2String(", ", target, method, arguments*) . ")")
 
 		logMessage(kLogWarn, substituteVariables(translate("Cannot execute command (%command%) - please check the configuration"), {command: command}))
 	}

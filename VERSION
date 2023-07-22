@@ -1,16 +1,16 @@
 [Development]
 Version=5.2.0.0-dev
 Target=5.2.0.0-release
-Date=07/18/2023
+Date=07/22/2023
 Download=
 Changes=New tool "PracticeCenter", New controller action function "openPracticeCenter", New plugin argument "openPracticeCenter" for "Race Engineer" and "Race Strategist" plugins
 [Release]
-Version=5.1.0.0-release
-Date=07/07/2023
-Download=https://cutt.ly/ywitakXC;https://www.dropbox.com/s/f37htgmcopfs47v/Simulator%20Controller%205.1.0.0-release.zip?dl=1
-Changes=Fixes for Telemetry Analyzer in "Setup Workbench", New real-time capable data connector architecture, Increased bounding box for side proximity alerts by the Spotter from 6 to 8 meters lateral, Reduced waiting time for unavailable data in "Race Center", Fixed AC and RF2 Spotter, Fixed loading of car geometry defaults in Telemetry Analyzer, Fixed car coordinates for rFactor 2 (for track automation), Counter steering is now detected correctly in the Telemetry Analyzer of "Setup Workbench", Fixed race reports and standings data in "Race Center" for rFactor 2, Fixed track scanner and mapper for rare cases with special characters, Fixed manually locating iRacing, New car model for "Setup Workbench"
+Version=5.1.2.0-release
+Date=07/21/2023
+Download=https://cutt.ly/6wpOauWf;https://www.dropbox.com/s/7yytpw6zyvy9fcj/Simulator%20Controller%205.1.2.0-release.zip?dl=1
+Changes=New core setting to choose the dispatch cycle of external commands, New communication method for the Stream Deck plugin, New core setting to choose the between the Stream Deck communication methods, The Spotter can now "focus" on a specific opponent, Strategist and Spotter can now be asked for gap info for a specific car, Standings widget now shows car number in "System Monitor", Fixed bugs in Spanish grammars for Spotter and Strategist, Fixed AMS2 API to not interpret a replay as an actual session, New car models for "Setup Workbench", Renamed controller action function "call" to "invoke", New double press setting for Push-to-Talk
 [Current]
 Type=Development
 [Version]
 Development=5.2.0.0-dev
-Release=5.1.0.0-release
+Release=5.1.2.0-release

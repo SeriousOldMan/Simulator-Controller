@@ -38,4 +38,4 @@
   
 #### General
   1. Choosing a specific color scheme and splash screen depending on the selected simulation game
-  2. Further simplification of the overall configuration process. Overhaul of "Race Settings", "Simulator Settings" and "Simulator Configuration"
+  2. Further simplification of the overall configuration process.  Create a quick install, which puts all optional software into default locations and asks for P2T button.

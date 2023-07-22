@@ -1,3 +1,21 @@
+## 5.1.2.0-release 07/21/23
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. The Strategist and the Spotter can now be asked for the time to a specific car. Example: "Can you tell me the gap to the car number 81?"
+  4. The Spotter can now be asked to observe a specific car: "Can you observe car number 81?". Very useful to gather periodic information about what your most important opponent is doing. Please take a look at the [updated documentation for voice commands](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Spotter-Commands-(EN)).
+  5. Car numbers are now shown in the standings widget for the "System Monitor".
+  6. Playing a replay in *Automobilista 2* no longer is interpreted as a valid session.
+  7. A couple of voice commands has been fixed in the Spanish grammar for the Strategist and the Spotter.
+  8. A new communication method is available for the Stream Deck. It has been reported, that using OBS parallel to Simulator Controller can brake the Stream Deck functionality of Simulator Controller. The new communication method, although a little bit slower, prevents this. A new setting in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration) let you choose between the available communication methods.
+  9. [Experts only] A new setting in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration) let you choose the frequency of external command processing. Change with caution.
+  10. [Experts only] The controller action function "call" has been renamed to "invoke".
+  11. [Experts only] It is now possible to alter the time, a press or click on the Push-to-Talk button is considered as an activation event. Default is the Windows setting for mouse double click speed. See the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration) for more information.
+  12. New car models for "Setup Workbench":
+      - Assetto Corsa
+	    - Audi R8 LMS Ultra
+
+  Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-512).
+
 ## 5.1.1.0-release 07/14/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

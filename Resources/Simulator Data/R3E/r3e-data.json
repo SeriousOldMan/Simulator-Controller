@@ -41765,6 +41765,196 @@
 				}
 			]
 		},
+		"9575": {
+			"Name": "McLaren 720S GT3",
+			"BrandName": "McLaren",
+			"CarManufacturer": 2621,
+			"DefaultLivery": 11450,
+			"Id": 9575,
+			"Class": 1703,
+			"liveries": [
+				{
+					"Name": "#1",
+					"Team": 9576,
+					"Car": 9575,
+					"Id": 9577,
+					"Class": 1703,
+					"TeamName": "Factory Team",
+					"drivers": [
+						{
+							"Forename": "Robert",
+							"Surname": "Davies",
+							"Id": 7583
+						}
+					]
+				},
+				{
+					"Name": "#72",
+					"Team": 11524,
+					"Car": 9575,
+					"Id": 9841,
+					"Class": 1703,
+					"TeamName": "Inception Racing by Optimum",
+					"drivers": [
+						{
+							"Forename": "Brendan",
+							"Surname": "Iribe",
+							"Id": 11525
+						}
+					]
+				},
+				{
+					"Name": "#3",
+					"Team": 9576,
+					"Car": 9575,
+					"Id": 11450,
+					"Class": 1703,
+					"TeamName": "Factory Team",
+					"drivers": [
+						{
+							"Forename": "Richard",
+							"Surname": "Good",
+							"Id": 8408
+						}
+					]
+				},
+				{
+					"Name": "#38",
+					"Team": 11526,
+					"Car": 9575,
+					"Id": 11527,
+					"Class": 1703,
+					"TeamName": "Jota Sport",
+					"drivers": [
+						{
+							"Forename": "Ben",
+							"Surname": "Barnicoat",
+							"Id": 11523
+						}
+					]
+				},
+				{
+					"Name": "#40",
+					"Team": 11529,
+					"Car": 9575,
+					"Id": 11530,
+					"Class": 1703,
+					"TeamName": "Fox Motorsport",
+					"drivers": [
+						{
+							"Forename": "Robert",
+							"Surname": "Bell",
+							"Id": 5945
+						}
+					]
+				},
+				{
+					"Name": "#5",
+					"Team": 11528,
+					"Car": 9575,
+					"Id": 11532,
+					"Class": 1703,
+					"TeamName": "Greystone GT",
+					"drivers": [
+						{
+							"Forename": "Lewis",
+							"Surname": "Proctor",
+							"Id": 11531
+						}
+					]
+				},
+				{
+					"Name": "#2",
+					"Team": 11543,
+					"Car": 9575,
+					"Id": 11544,
+					"Class": 1703,
+					"TeamName": "Jenson Team Rocket RJN",
+					"drivers": [
+						{
+							"Forename": "James",
+							"Surname": "Kel",
+							"Id": 11542
+						}
+					]
+				},
+				{
+					"Name": "#11",
+					"Team": 11545,
+					"Car": 9575,
+					"Id": 11547,
+					"Class": 1703,
+					"TeamName": "Paddock Motorsport",
+					"drivers": [
+						{
+							"Forename": "Kelvin",
+							"Surname": "Fletcher",
+							"Id": 11546
+						}
+					]
+				},
+				{
+					"Name": "#28",
+					"Team": 11548,
+					"Car": 9575,
+					"Id": 11550,
+					"Class": 1703,
+					"TeamName": "Optimum Motorsport",
+					"drivers": [
+						{
+							"Forename": "Nick",
+							"Surname": "Moss",
+							"Id": 11549
+						}
+					]
+				},
+				{
+					"Name": "#77",
+					"Team": 11552,
+					"Car": 9575,
+					"Id": 11553,
+					"Class": 1703,
+					"TeamName": "Enduro Motorsport",
+					"drivers": [
+						{
+							"Forename": "Morgan",
+							"Surname": "Tillbrook",
+							"Id": 12317
+						}
+					]
+				},
+				{
+					"Name": "#88",
+					"Team": 11554,
+					"Car": 9575,
+					"Id": 11555,
+					"Class": 1703,
+					"TeamName": "Garage 59",
+					"drivers": [
+						{
+							"Forename": "Marvin",
+							"Surname": "Kirchhöfer",
+							"Id": 7711
+						}
+					]
+				},
+				{
+					"Name": "#76",
+					"Team": 11558,
+					"Car": 9575,
+					"Id": 11559,
+					"Class": 1703,
+					"TeamName": "7TSIX",
+					"drivers": [
+						{
+							"Forename": "Mia",
+							"Surname": "Flewitt",
+							"Id": 11551
+						}
+					]
+				}
+			]
+		},
 		"9581": {
 			"Name": "Mercedes-AMG GT3 2020",
 			"BrandName": "Mercedes",
@@ -51395,6 +51585,346 @@
 				}
 			]
 		},
+		"11561": {
+			"Name": "Porsche 944 Turbo Cup",
+			"BrandName": "Porsche",
+			"CarManufacturer": 3013,
+			"DefaultLivery": 11803,
+			"Id": 11561,
+			"Class": 11564,
+			"liveries": [
+				{
+					"Name": "#1",
+					"Team": 11767,
+					"Car": 11561,
+					"Id": 11563,
+					"Class": 11564,
+					"TeamName": "Porsche Motorsport",
+					"drivers": [
+						{
+							"Forename": "Sebastian",
+							"Surname": "Schmalz",
+							"Id": 6387
+						}
+					]
+				},
+				{
+					"Name": "#36",
+					"Team": 11767,
+					"Car": 11561,
+					"Id": 11612,
+					"Class": 11564,
+					"TeamName": "Porsche Motorsport",
+					"drivers": [
+						{
+							"Forename": "Jürgen",
+							"Surname": "Barth",
+							"Id": 12286
+						}
+					]
+				},
+				{
+					"Name": "#2",
+					"Team": 11766,
+					"Car": 11561,
+					"Id": 11768,
+					"Class": 11564,
+					"TeamName": "Team Shell",
+					"drivers": [
+						{
+							"Forename": "Armin",
+							"Surname": "Schwarz",
+							"Id": 12060
+						}
+					]
+				},
+				{
+					"Name": "#17",
+					"Team": 12069,
+					"Car": 11561,
+					"Id": 11794,
+					"Class": 11564,
+					"TeamName": "DSR Motorsport",
+					"drivers": [
+						{
+							"Forename": "David",
+							"Surname": "Seabrooke",
+							"Id": 12068
+						}
+					]
+				},
+				{
+					"Name": "#60",
+					"Team": 12155,
+					"Car": 11561,
+					"Id": 11795,
+					"Class": 11564,
+					"TeamName": "Rothmans Porsche Turbo Cup Canada",
+					"drivers": [
+						{
+							"Forename": "Cam",
+							"Surname": "Champion",
+							"Id": 12075
+						}
+					]
+				},
+				{
+					"Name": "#86",
+					"Team": 12155,
+					"Car": 11561,
+					"Id": 11796,
+					"Class": 11564,
+					"TeamName": "Rothmans Porsche Turbo Cup Canada",
+					"drivers": [
+						{
+							"Forename": "Normand",
+							"Surname": "Boyer",
+							"Id": 12076
+						}
+					]
+				},
+				{
+					"Name": "Pinky",
+					"Team": 11767,
+					"Car": 11561,
+					"Id": 11803,
+					"Class": 11564,
+					"TeamName": "Porsche Motorsport",
+					"drivers": [
+						{
+							"Forename": "Harm",
+							"Surname": "Lagaay",
+							"Id": 12035
+						}
+					]
+				},
+				{
+					"Name": "#10",
+					"Team": 11562,
+					"Car": 11561,
+					"Id": 11805,
+					"Class": 11564,
+					"TeamName": "Porsche Motorsport",
+					"drivers": [
+						{
+							"Forename": "René",
+							"Surname": "Metge",
+							"Id": 12065
+						}
+					]
+				},
+				{
+					"Name": "#8",
+					"Team": 12064,
+					"Car": 11561,
+					"Id": 11806,
+					"Class": 11564,
+					"TeamName": "Commercial Motorsports",
+					"drivers": [
+						{
+							"Forename": "Rick",
+							"Surname": "Bye",
+							"Id": 12063
+						}
+					]
+				},
+				{
+					"Name": "#89",
+					"Team": 12078,
+					"Car": 11561,
+					"Id": 11807,
+					"Class": 11564,
+					"TeamName": "Auto Mizzi",
+					"drivers": [
+						{
+							"Forename": "Jacques",
+							"Surname": "Bienvenue",
+							"Id": 12077
+						}
+					]
+				},
+				{
+					"Name": "#24",
+					"Team": 12073,
+					"Car": 11561,
+					"Id": 11866,
+					"Class": 11564,
+					"TeamName": "Strähle Autosport",
+					"drivers": [
+						{
+							"Forename": "Fredi",
+							"Surname": "Briedl",
+							"Id": 12151
+						}
+					]
+				},
+				{
+					"Name": "#150",
+					"Team": 12080,
+					"Car": 11561,
+					"Id": 11867,
+					"Class": 11564,
+					"TeamName": "Cedarbrae Motorsport",
+					"drivers": [
+						{
+							"Forename": "David",
+							"Surname": "King",
+							"Id": 12079
+						}
+					]
+				},
+				{
+					"Name": "#11",
+					"Team": 12066,
+					"Car": 11561,
+					"Id": 11868,
+					"Class": 11564,
+					"TeamName": "Max Moritz Racing Team",
+					"drivers": [
+						{
+							"Forename": "Roland",
+							"Surname": "Asch",
+							"Id": 7499
+						}
+					]
+				},
+				{
+					"Name": "#19",
+					"Team": 12071,
+					"Car": 11561,
+					"Id": 11869,
+					"Class": 11564,
+					"TeamName": "Michel Mora",
+					"drivers": [
+						{
+							"Forename": "Michel",
+							"Surname": "Mora",
+							"Id": 12070
+						}
+					]
+				},
+				{
+					"Name": "#80",
+					"Team": 12153,
+					"Car": 11561,
+					"Id": 11870,
+					"Class": 11564,
+					"TeamName": "Schneider & Nelson Porsche",
+					"drivers": [
+						{
+							"Forename": "Robert J.",
+							"Surname": "Nelson",
+							"Id": 12152
+						}
+					]
+				},
+				{
+					"Name": "#90",
+					"Team": 12157,
+					"Car": 11561,
+					"Id": 11871,
+					"Class": 11564,
+					"TeamName": "Pine Tree Motorsports",
+					"drivers": [
+						{
+							"Forename": "Anthony",
+							"Surname": "Monteil",
+							"Id": 12158
+						}
+					]
+				},
+				{
+					"Name": "#6",
+					"Team": 12062,
+					"Car": 11561,
+					"Id": 11872,
+					"Class": 11564,
+					"TeamName": "Winkelhock Motorsport",
+					"drivers": [
+						{
+							"Forename": "Joachim",
+							"Surname": "Winkelhock",
+							"Id": 10749
+						}
+					]
+				},
+				{
+					"Name": "#3",
+					"Team": 12155,
+					"Car": 11561,
+					"Id": 11913,
+					"Class": 11564,
+					"TeamName": "Rothmans Porsche Turbo Cup Canada",
+					"drivers": [
+						{
+							"Forename": "Stéphane",
+							"Surname": "Proulx",
+							"Id": 12154
+						}
+					]
+				},
+				{
+					"Name": "#08",
+					"Team": 11767,
+					"Car": 11561,
+					"Id": 11914,
+					"Class": 11564,
+					"TeamName": "Porsche Motorsport",
+					"drivers": [
+						{
+							"Forename": "Robert",
+							"Surname": "Neumann",
+							"Id": 4465
+						}
+					]
+				},
+				{
+					"Name": "#14",
+					"Team": 12287,
+					"Car": 11561,
+					"Id": 11915,
+					"Class": 11564,
+					"TeamName": "Team Sportfil Organisation",
+					"drivers": [
+						{
+							"Forename": "André",
+							"Surname": "Bourdon",
+							"Id": 12067
+						}
+					]
+				},
+				{
+					"Name": "#22",
+					"Team": 12288,
+					"Car": 11561,
+					"Id": 11916,
+					"Class": 11564,
+					"TeamName": "Löhr & Becker Automobile",
+					"drivers": [
+						{
+							"Forename": "Marcus",
+							"Surname": "Luhr",
+							"Id": 12072
+						}
+					]
+				},
+				{
+					"Name": "#39",
+					"Team": 12066,
+					"Car": 11561,
+					"Id": 11942,
+					"Class": 11564,
+					"TeamName": "Max Moritz Racing Team",
+					"drivers": [
+						{
+							"Forename": "Matthias",
+							"Surname": "Kahle",
+							"Id": 12074
+						}
+					]
+				}
+			]
+		},
 		"11567": {
 			"Name": "Audi R8 LMS GT3 EVO",
 			"BrandName": "Audi",
@@ -52155,6 +52685,1116 @@
 							"Forename": "Marcus",
 							"Surname": "Dempwolf",
 							"Id": 9456
+						}
+					]
+				}
+			]
+		},
+		"12012": {
+			"Name": "Porsche 911 GT3 Cup (992) Endurance",
+			"BrandName": "Porsche",
+			"CarManufacturer": 3013,
+			"DefaultLivery": 12014,
+			"Id": 12012,
+			"Class": 12302,
+			"liveries": [
+				{
+					"Name": "#1",
+					"Team": 12013,
+					"Car": 12012,
+					"Id": 12014,
+					"Class": 12302,
+					"TeamName": "Porsche Motorsport",
+					"drivers": [
+						{
+							"Forename": "Sebastian",
+							"Surname": "Schmalz",
+							"Id": 6387
+						}
+					]
+				},
+				{
+					"Name": "#909",
+					"Team": 12123,
+					"Car": 12012,
+					"Id": 12126,
+					"Class": 12302,
+					"TeamName": "Red Camel-Jordans.nl",
+					"drivers": [
+						{
+							"Forename": "Ivo",
+							"Surname": "Breukers",
+							"Id": 12125
+						}
+					]
+				},
+				{
+					"Name": "#955",
+					"Team": 12124,
+					"Car": 12012,
+					"Id": 12128,
+					"Class": 12302,
+					"TeamName": "Willi Motorsport by Ebimotors",
+					"drivers": [
+						{
+							"Forename": "Fabrizio",
+							"Surname": "Broggi",
+							"Id": 12127
+						}
+					]
+				},
+				{
+					"Name": "#995",
+					"Team": 12134,
+					"Car": 12012,
+					"Id": 12135,
+					"Class": 12302,
+					"TeamName": "Duel Racing by Toro Verde",
+					"drivers": [
+						{
+							"Forename": "Philip",
+							"Surname": "Keen",
+							"Id": 12133
+						}
+					]
+				},
+				{
+					"Name": "#931",
+					"Team": 12139,
+					"Car": 12012,
+					"Id": 12140,
+					"Class": 12302,
+					"TeamName": "HRT Performance",
+					"drivers": [
+						{
+							"Forename": "Fidel",
+							"Surname": "Leib",
+							"Id": 8352
+						}
+					]
+				},
+				{
+					"Name": "#979",
+					"Team": 12141,
+					"Car": 12012,
+					"Id": 12142,
+					"Class": 12302,
+					"TeamName": "Speed Lover",
+					"drivers": [
+						{
+							"Forename": "Simon",
+							"Surname": "Balcaen",
+							"Id": 12143
+						}
+					]
+				},
+				{
+					"Name": "#989",
+					"Team": 12146,
+					"Car": 12012,
+					"Id": 12147,
+					"Class": 12302,
+					"TeamName": "MRS GT-Racing",
+					"drivers": [
+						{
+							"Forename": "Nico",
+							"Surname": "Verdonck",
+							"Id": 2704
+						}
+					]
+				},
+				{
+					"Name": "#124",
+					"Team": 12293,
+					"Car": 12012,
+					"Id": 12295,
+					"Class": 12302,
+					"TeamName": "Mühlner Motorsport H&R",
+					"drivers": [
+						{
+							"Forename": "Nick",
+							"Surname": "Salewsky",
+							"Id": 12292
+						}
+					]
+				},
+				{
+					"Name": "#308",
+					"Team": 12310,
+					"Car": 12012,
+					"Id": 12314,
+					"Class": 12302,
+					"TeamName": "Laptime-Performance",
+					"drivers": [
+						{
+							"Forename": "Moritz",
+							"Surname": "Löhner",
+							"Id": 9011
+						}
+					]
+				}
+			]
+		},
+		"12090": {
+			"Name": "Porsche 911 GT3 R (992)",
+			"BrandName": "Porsche",
+			"CarManufacturer": 3013,
+			"DefaultLivery": 12092,
+			"Id": 12090,
+			"Class": 1703,
+			"liveries": [
+				{
+					"Name": "#0",
+					"Team": 12091,
+					"Car": 12090,
+					"Id": 12092,
+					"Class": 1703,
+					"TeamName": "Porsche Motorsport",
+					"drivers": [
+						{
+							"Forename": "Sebastian",
+							"Surname": "Schmalz",
+							"Id": 6387
+						}
+					]
+				},
+				{
+					"Name": "#91",
+					"Team": 12097,
+					"Car": 12090,
+					"Id": 12096,
+					"Class": 1703,
+					"TeamName": "Kellymoss with Riley",
+					"drivers": [
+						{
+							"Forename": "Kay",
+							"Surname": "van Berlo",
+							"Id": 8899
+						}
+					]
+				},
+				{
+					"Name": "#77",
+					"Team": 12100,
+					"Car": 12090,
+					"Id": 12103,
+					"Class": 1703,
+					"TeamName": "Wright Motorsports",
+					"drivers": [
+						{
+							"Forename": "Alan",
+							"Surname": "Brynjolfsson",
+							"Id": 11999
+						}
+					]
+				},
+				{
+					"Name": "#53",
+					"Team": 12099,
+					"Car": 12090,
+					"Id": 12109,
+					"Class": 1703,
+					"TeamName": "MDK Motorsports",
+					"drivers": [
+						{
+							"Forename": "Mark",
+							"Surname": "Kvamme",
+							"Id": 10357
+						}
+					]
+				},
+				{
+					"Name": "#16",
+					"Team": 12100,
+					"Car": 12090,
+					"Id": 12115,
+					"Class": 1703,
+					"TeamName": "Wright Motorsports",
+					"drivers": [
+						{
+							"Forename": "Ryan",
+							"Surname": "Hardwick",
+							"Id": 8640
+						}
+					]
+				},
+				{
+					"Name": "#80",
+					"Team": 12101,
+					"Car": 12090,
+					"Id": 12116,
+					"Class": 1703,
+					"TeamName": "AO Racing",
+					"drivers": [
+						{
+							"Forename": "Sebastian",
+							"Surname": "Priaulx",
+							"Id": 12183
+						}
+					]
+				},
+				{
+					"Name": "#92",
+					"Team": 12097,
+					"Car": 12090,
+					"Id": 12117,
+					"Class": 1703,
+					"TeamName": "Kellymoss with Riley",
+					"drivers": [
+						{
+							"Forename": "Alec",
+							"Surname": "Udell",
+							"Id": 7301
+						}
+					]
+				},
+				{
+					"Name": "#44",
+					"Team": 12129,
+					"Car": 12090,
+					"Id": 12118,
+					"Class": 1703,
+					"TeamName": "Falken Motorsports",
+					"drivers": [
+						{
+							"Forename": "Tim",
+							"Surname": "Heinemann",
+							"Id": 6818
+						}
+					]
+				},
+				{
+					"Name": "#09",
+					"Team": 12098,
+					"Car": 12090,
+					"Id": 12144,
+					"Class": 1703,
+					"TeamName": "Pfaff Motorsports",
+					"drivers": [
+						{
+							"Forename": "Klaus",
+							"Surname": "Bachler",
+							"Id": 9706
+						}
+					]
+				},
+				{
+					"Name": "#24",
+					"Team": 12205,
+					"Car": 12090,
+					"Id": 12206,
+					"Class": 1703,
+					"TeamName": "Lionspeed by Car Collection Motorsport",
+					"drivers": [
+						{
+							"Forename": "Matt",
+							"Surname": "Campbell",
+							"Id": 8409
+						}
+					]
+				},
+				{
+					"Name": "#911",
+					"Team": 12207,
+					"Car": 12090,
+					"Id": 12208,
+					"Class": 1703,
+					"TeamName": "Mantey EMA",
+					"drivers": [
+						{
+							"Forename": "Michael",
+							"Surname": "Christensen",
+							"Id": 6709
+						}
+					]
+				},
+				{
+					"Name": "#80",
+					"Team": 12101,
+					"Car": 12090,
+					"Id": 12223,
+					"Class": 1703,
+					"TeamName": "AO Racing",
+					"drivers": [
+						{
+							"Forename": "Gunnar",
+							"Surname": "Jeannette",
+							"Id": 6478
+						}
+					]
+				},
+				{
+					"Name": "#96",
+					"Team": 12265,
+					"Car": 12090,
+					"Id": 12266,
+					"Class": 1703,
+					"TeamName": "Rutronik Racing",
+					"drivers": [
+						{
+							"Forename": "Julien",
+							"Surname": "Andlauer",
+							"Id": 8022
+						}
+					]
+				},
+				{
+					"Name": "#25",
+					"Team": 12315,
+					"Car": 12090,
+					"Id": 12316,
+					"Class": 1703,
+					"TeamName": "Huber Motorsport",
+					"drivers": [
+						{
+							"Forename": "Romain",
+							"Surname": "Dumas",
+							"Id": 4500
+						}
+					]
+				}
+			]
+		},
+		"12163": {
+			"Name": "Porsche 911 GT3 Cup (992)",
+			"BrandName": "Porsche",
+			"CarManufacturer": 3013,
+			"DefaultLivery": 12224,
+			"Id": 12163,
+			"Class": 12015,
+			"liveries": [
+				{
+					"Name": "#24",
+					"Team": 12164,
+					"Car": 12163,
+					"Id": 12168,
+					"Class": 12015,
+					"TeamName": "ProfilDoors by Huber Racing",
+					"drivers": [
+						{
+							"Forename": "Loek",
+							"Surname": "Hartog",
+							"Id": 12188
+						}
+					]
+				},
+				{
+					"Name": "#7",
+					"Team": 12164,
+					"Car": 12163,
+					"Id": 12169,
+					"Class": 12015,
+					"TeamName": "ProfilDoors by Huber Racing",
+					"drivers": [
+						{
+							"Forename": "Jasin",
+							"Surname": "Ferati",
+							"Id": 12184
+						}
+					]
+				},
+				{
+					"Name": "#19",
+					"Team": 12164,
+					"Car": 12163,
+					"Id": 12170,
+					"Class": 12015,
+					"TeamName": "ProfilDoors by Huber Racing",
+					"drivers": [
+						{
+							"Forename": "Harry",
+							"Surname": "King",
+							"Id": 12187
+						}
+					]
+				},
+				{
+					"Name": "#4",
+					"Team": 12164,
+					"Car": 12163,
+					"Id": 12189,
+					"Class": 12015,
+					"TeamName": "ProfilDoors by Huber Racing",
+					"drivers": [
+						{
+							"Forename": "Georgi",
+							"Surname": "Donchev",
+							"Id": 8897
+						}
+					]
+				},
+				{
+					"Name": "#8",
+					"Team": 12167,
+					"Car": 12163,
+					"Id": 12190,
+					"Class": 12015,
+					"TeamName": "Fach Auto Tech",
+					"drivers": [
+						{
+							"Forename": "Alexander",
+							"Surname": "Fach",
+							"Id": 12185
+						}
+					]
+				},
+				{
+					"Name": "#14",
+					"Team": 12167,
+					"Car": 12163,
+					"Id": 12191,
+					"Class": 12015,
+					"TeamName": "Fach Auto Tech",
+					"drivers": [
+						{
+							"Forename": "Morris",
+							"Surname": "Schuring",
+							"Id": 12186
+						}
+					]
+				},
+				{
+					"Name": "#99",
+					"Team": 12194,
+					"Car": 12163,
+					"Id": 12195,
+					"Class": 12015,
+					"TeamName": "Allied-Racing",
+					"drivers": [
+						{
+							"Forename": "Bastian",
+							"Surname": "Buus",
+							"Id": 12193
+						}
+					]
+				},
+				{
+					"Name": "#6",
+					"Team": 12194,
+					"Car": 12163,
+					"Id": 12201,
+					"Class": 12015,
+					"TeamName": "Allied Racing",
+					"drivers": [
+						{
+							"Forename": "Vincent",
+							"Surname": "Andronaco",
+							"Id": 12200
+						}
+					]
+				},
+				{
+					"Name": "#84",
+					"Team": 12203,
+					"Car": 12163,
+					"Id": 12204,
+					"Class": 12015,
+					"TeamName": "CarTech Motorsport Bonk",
+					"drivers": [
+						{
+							"Forename": "Ahmad",
+							"Surname": "Alshehab",
+							"Id": 12202
+						}
+					]
+				},
+				{
+					"Name": "#13",
+					"Team": 12165,
+					"Car": 12163,
+					"Id": 12213,
+					"Class": 12015,
+					"TeamName": "Huber Racing",
+					"drivers": [
+						{
+							"Forename": "Alexander",
+							"Surname": "Tauscher",
+							"Id": 12212
+						}
+					]
+				},
+				{
+					"Name": "#23",
+					"Team": 12214,
+					"Car": 12163,
+					"Id": 12215,
+					"Class": 12015,
+					"TeamName": "HP Racing International",
+					"drivers": [
+						{
+							"Forename": "Lukas",
+							"Surname": "Ertl",
+							"Id": 8034
+						}
+					]
+				},
+				{
+					"Name": "#25",
+					"Team": 12166,
+					"Car": 12163,
+					"Id": 12216,
+					"Class": 12015,
+					"TeamName": "Team GP Elite",
+					"drivers": [
+						{
+							"Forename": "Larry",
+							"Surname": "ten Voorde",
+							"Id": 8031
+						}
+					]
+				},
+				{
+					"Name": "#31",
+					"Team": 12165,
+					"Car": 12163,
+					"Id": 12218,
+					"Class": 12015,
+					"TeamName": "Huber Racing",
+					"drivers": [
+						{
+							"Forename": "Sebastian",
+							"Surname": "Freymuth",
+							"Id": 12217
+						}
+					]
+				},
+				{
+					"Name": "#44",
+					"Team": 12164,
+					"Car": 12163,
+					"Id": 12220,
+					"Class": 12015,
+					"TeamName": "ProfilDoors by Huber Racing",
+					"drivers": [
+						{
+							"Forename": "Jonas",
+							"Surname": "Greif",
+							"Id": 12219
+						}
+					]
+				},
+				{
+					"Name": "#77",
+					"Team": 12164,
+					"Car": 12163,
+					"Id": 12221,
+					"Class": 12015,
+					"TeamName": "ProfilDoors by Huber Racing",
+					"drivers": [
+						{
+							"Forename": "Leon",
+							"Surname": "Köhler",
+							"Id": 8045
+						}
+					]
+				},
+				{
+					"Name": "#92",
+					"Team": 12165,
+					"Car": 12163,
+					"Id": 12222,
+					"Class": 12015,
+					"TeamName": "Huber Racing",
+					"drivers": [
+						{
+							"Forename": "Luca",
+							"Surname": "Rettenbacher",
+							"Id": 8048
+						}
+					]
+				},
+				{
+					"Name": "#12",
+					"Team": 12225,
+					"Car": 12163,
+					"Id": 12224,
+					"Class": 12015,
+					"TeamName": "Scherer Sport PHX",
+					"drivers": [
+						{
+							"Forename": "Harri",
+							"Surname": "Jones",
+							"Id": 12227
+						}
+					]
+				},
+				{
+					"Name": "#22",
+					"Team": 12225,
+					"Car": 12163,
+					"Id": 12226,
+					"Class": 12015,
+					"TeamName": "Scherer Sport PHX",
+					"drivers": [
+						{
+							"Forename": "Matteo",
+							"Surname": "Ferrer-Aza",
+							"Id": 12228
+						}
+					]
+				},
+				{
+					"Name": "#66",
+					"Team": 12262,
+					"Car": 12163,
+					"Id": 12229,
+					"Class": 12015,
+					"TeamName": "Proton Competition",
+					"drivers": [
+						{
+							"Forename": "Adam",
+							"Surname": "Smalley",
+							"Id": 12230
+						}
+					]
+				},
+				{
+					"Name": "#27",
+					"Team": 12166,
+					"Car": 12163,
+					"Id": 12233,
+					"Class": 12015,
+					"TeamName": "Team GP Elite",
+					"drivers": [
+						{
+							"Forename": "Ghislain",
+							"Surname": "Cordeel",
+							"Id": 12231
+						}
+					]
+				},
+				{
+					"Name": "#28",
+					"Team": 12166,
+					"Car": 12163,
+					"Id": 12235,
+					"Class": 12015,
+					"TeamName": "Team GP Elite",
+					"drivers": [
+						{
+							"Forename": "Huub",
+							"Surname": "van Eijndhoven",
+							"Id": 12234
+						}
+					]
+				},
+				{
+					"Name": "#40",
+					"Team": 12257,
+					"Car": 12163,
+					"Id": 12258,
+					"Class": 12015,
+					"TeamName": "ID Racing",
+					"drivers": [
+						{
+							"Forename": "Janne",
+							"Surname": "Stiak",
+							"Id": 12256
+						}
+					]
+				},
+				{
+					"Name": "#54",
+					"Team": 12203,
+					"Car": 12163,
+					"Id": 12259,
+					"Class": 12015,
+					"TeamName": "CarTech Motorsport Bonk",
+					"drivers": [
+						{
+							"Forename": "Michael",
+							"Surname": "Essmann",
+							"Id": 8898
+						}
+					]
+				},
+				{
+					"Name": "#41",
+					"Team": 12257,
+					"Car": 12163,
+					"Id": 12261,
+					"Class": 12015,
+					"TeamName": "ID Racing",
+					"drivers": [
+						{
+							"Forename": "Diego",
+							"Surname": "Stifter",
+							"Id": 12260
+						}
+					]
+				},
+				{
+					"Name": "#88",
+					"Team": 12262,
+					"Car": 12163,
+					"Id": 12263,
+					"Class": 12015,
+					"TeamName": "Proton Competition",
+					"drivers": [
+						{
+							"Forename": "Horst",
+							"Surname": "Felbermayr",
+							"Id": 11387
+						}
+					]
+				},
+				{
+					"Name": "#98",
+					"Team": 12214,
+					"Car": 12163,
+					"Id": 12264,
+					"Class": 12015,
+					"TeamName": "HP Racing International",
+					"drivers": [
+						{
+							"Forename": "Jan",
+							"Surname": "Seyffert",
+							"Id": 10236
+						}
+					]
+				},
+				{
+					"Name": "#34",
+					"Team": 12203,
+					"Car": 12163,
+					"Id": 12276,
+					"Class": 12015,
+					"TeamName": "CarTech Motorsport Bonk",
+					"drivers": [
+						{
+							"Forename": "Theo",
+							"Surname": "Oeverhaus",
+							"Id": 12273
+						}
+					]
+				},
+				{
+					"Name": "#64",
+					"Team": 12278,
+					"Car": 12163,
+					"Id": 12277,
+					"Class": 12015,
+					"TeamName": "HRT Performance",
+					"drivers": [
+						{
+							"Forename": "Robert",
+							"Surname": "de Haan",
+							"Id": 12272
+						}
+					]
+				},
+				{
+					"Name": "#69",
+					"Team": 12278,
+					"Car": 12163,
+					"Id": 12282,
+					"Class": 12015,
+					"TeamName": "HRT Performance",
+					"drivers": [
+						{
+							"Forename": "Holger",
+							"Surname": "Harmsen",
+							"Id": 12281
+						}
+					]
+				},
+				{
+					"Name": "#87",
+					"Team": 12165,
+					"Car": 12163,
+					"Id": 12284,
+					"Class": 12015,
+					"TeamName": "Huber Racing",
+					"drivers": [
+						{
+							"Forename": "Ariel",
+							"Surname": "Levi",
+							"Id": 12283
+						}
+					]
+				},
+				{
+					"Name": "#5",
+					"Team": 12166,
+					"Car": 12163,
+					"Id": 12289,
+					"Class": 12015,
+					"TeamName": "Team GP Elite",
+					"drivers": [
+						{
+							"Forename": "Sören",
+							"Surname": "Spreng",
+							"Id": 8024
+						}
+					]
+				},
+				{
+					"Name": "#68",
+					"Team": 12278,
+					"Car": 12163,
+					"Id": 12291,
+					"Class": 12015,
+					"TeamName": "HRT Performance",
+					"drivers": [
+						{
+							"Forename": "Tim",
+							"Surname": "Stender",
+							"Id": 12290
+						}
+					]
+				}
+			]
+		},
+		"12197": {
+			"Name": "Porsche 911 GT3 R (992) DTM",
+			"BrandName": "Porsche",
+			"CarManufacturer": 3013,
+			"DefaultLivery": 12199,
+			"Id": 12197,
+			"Class": 12196,
+			"liveries": [
+				{
+					"Name": "#9",
+					"Team": 12198,
+					"Car": 12197,
+					"Id": 12199,
+					"Class": 12196,
+					"TeamName": "Toksport WRT",
+					"drivers": [
+						{
+							"Forename": "Tim",
+							"Surname": "Heinemann",
+							"Id": 6818
+						}
+					]
+				},
+				{
+					"Name": "#24",
+					"Team": 12246,
+					"Car": 12197,
+					"Id": 12249,
+					"Class": 12196,
+					"TeamName": "Küs Team Bernhard",
+					"drivers": [
+						{
+							"Forename": "Ayhancan",
+							"Surname": "Güven",
+							"Id": 12248
+						}
+					]
+				},
+				{
+					"Name": "#75",
+					"Team": 12246,
+					"Car": 12197,
+					"Id": 12250,
+					"Class": 12196,
+					"TeamName": "Küs Team Bernhard",
+					"drivers": [
+						{
+							"Forename": "Laurin",
+							"Surname": "Heinrich",
+							"Id": 8909
+						}
+					]
+				},
+				{
+					"Name": "#90",
+					"Team": 12245,
+					"Car": 12197,
+					"Id": 12251,
+					"Class": 12196,
+					"TeamName": "Manthey EMA",
+					"drivers": [
+						{
+							"Forename": "Dennis",
+							"Surname": "Olsen",
+							"Id": 12247
+						}
+					]
+				},
+				{
+					"Name": "#91",
+					"Team": 12245,
+					"Car": 12197,
+					"Id": 12252,
+					"Class": 12196,
+					"TeamName": "Manthey EMA",
+					"drivers": [
+						{
+							"Forename": "Thomas",
+							"Surname": "Preining",
+							"Id": 8410
+						}
+					]
+				},
+				{
+					"Name": "#99",
+					"Team": 12198,
+					"Car": 12197,
+					"Id": 12253,
+					"Class": 12196,
+					"TeamName": "Toksport WRT",
+					"drivers": [
+						{
+							"Forename": "Christian",
+							"Surname": "Engelhart",
+							"Id": 9748
+						}
+					]
+				}
+			]
+		},
+		"12237": {
+			"Name": "BMW M4 GT3 DTM",
+			"BrandName": "BMW",
+			"CarManufacturer": 2550,
+			"DefaultLivery": 12254,
+			"Id": 12237,
+			"Class": 12196,
+			"liveries": [
+				{
+					"Name": "#1",
+					"Team": 12238,
+					"Car": 12237,
+					"Id": 12254,
+					"Class": 12196,
+					"TeamName": "Schubert Motorsport",
+					"drivers": [
+						{
+							"Forename": "Sheldon",
+							"Surname": "van der Linde",
+							"Id": 9139
+						}
+					]
+				},
+				{
+					"Name": "#11",
+					"Team": 12239,
+					"Car": 12237,
+					"Id": 12269,
+					"Class": 12196,
+					"TeamName": "Project 1 Motorsport",
+					"drivers": [
+						{
+							"Forename": "Marco",
+							"Surname": "Wittmann",
+							"Id": 9138
+						}
+					]
+				},
+				{
+					"Name": "#33",
+					"Team": 12238,
+					"Car": 12237,
+					"Id": 12270,
+					"Class": 12196,
+					"TeamName": "Schubert Motorsport",
+					"drivers": [
+						{
+							"Forename": "René",
+							"Surname": "Rast",
+							"Id": 3598
+						}
+					]
+				}
+			]
+		},
+		"12240": {
+			"Name": "Mercedes-AMG GT3 2020 DTM",
+			"BrandName": "Mercedes",
+			"CarManufacturer": 2552,
+			"DefaultLivery": 12255,
+			"Id": 12240,
+			"Class": 12196,
+			"liveries": [
+				{
+					"Name": "#4",
+					"Team": 12241,
+					"Car": 12240,
+					"Id": 12255,
+					"Class": 12196,
+					"TeamName": "Mercedes-AMG Team Landgraf",
+					"drivers": [
+						{
+							"Forename": "Luca",
+							"Surname": "Stolz",
+							"Id": 9737
+						}
+					]
+				},
+				{
+					"Name": "#22",
+					"Team": 12241,
+					"Car": 12240,
+					"Id": 12271,
+					"Class": 12196,
+					"TeamName": "Mercedes-AMG Team Winward",
+					"drivers": [
+						{
+							"Forename": "Lucas",
+							"Surname": "Auer",
+							"Id": 9143
+						}
+					]
+				},
+				{
+					"Name": "#27",
+					"Team": 12243,
+					"Car": 12240,
+					"Id": 12274,
+					"Class": 12196,
+					"TeamName": "Mercedes-AMG Team Winward",
+					"drivers": [
+						{
+							"Forename": "David",
+							"Surname": "Schumacher",
+							"Id": 11854
+						}
+					]
+				},
+				{
+					"Name": "#36",
+					"Team": 12242,
+					"Car": 12240,
+					"Id": 12275,
+					"Class": 12196,
+					"TeamName": "Mercedes-AMG Team HRT",
+					"drivers": [
+						{
+							"Forename": "Arjun",
+							"Surname": "Maini",
+							"Id": 10696
+						}
+					]
+				},
+				{
+					"Name": "#48",
+					"Team": 12241,
+					"Car": 12240,
+					"Id": 12279,
+					"Class": 12196,
+					"TeamName": "Mercedes-AMG Team Landgraf",
+					"drivers": [
+						{
+							"Forename": "Maro",
+							"Surname": "Engel",
+							"Id": 9738
+						}
+					]
+				},
+				{
+					"Name": "#84",
+					"Team": 12241,
+					"Car": 12240,
+					"Id": 12280,
+					"Class": 12196,
+					"TeamName": "Mercedes-AMG Team Landgraf",
+					"drivers": [
+						{
+							"Forename": "Jusuf",
+							"Surname": "Owega",
+							"Id": 11560
 						}
 					]
 				}
@@ -87472,6 +89112,21 @@
 				}
 			]
 		},
+		"9577": {
+			"Name": "#1",
+			"Team": 9576,
+			"Car": 9575,
+			"Id": 9577,
+			"Class": 1703,
+			"TeamName": "Factory Team",
+			"drivers": [
+				{
+					"Forename": "Robert",
+					"Surname": "Davies",
+					"Id": 7583
+				}
+			]
+		},
 		"9578": {
 			"Name": "#15",
 			"Team": 9258,
@@ -89054,6 +90709,21 @@
 					"Forename": "Roberto",
 					"Surname": "Pampanini",
 					"Id": 10510
+				}
+			]
+		},
+		"9841": {
+			"Name": "#72",
+			"Team": 11524,
+			"Car": 9575,
+			"Id": 9841,
+			"Class": 1703,
+			"TeamName": "Inception Racing by Optimum",
+			"drivers": [
+				{
+					"Forename": "Brendan",
+					"Surname": "Iribe",
+					"Id": 11525
 				}
 			]
 		},
@@ -97947,6 +99617,21 @@
 				}
 			]
 		},
+		"11450": {
+			"Name": "#3",
+			"Team": 9576,
+			"Car": 9575,
+			"Id": 11450,
+			"Class": 1703,
+			"TeamName": "Factory Team",
+			"drivers": [
+				{
+					"Forename": "Richard",
+					"Surname": "Good",
+					"Id": 8408
+				}
+			]
+		},
 		"11456": {
 			"Name": "#1",
 			"Team": 9987,
@@ -98307,6 +99992,51 @@
 				}
 			]
 		},
+		"11527": {
+			"Name": "#38",
+			"Team": 11526,
+			"Car": 9575,
+			"Id": 11527,
+			"Class": 1703,
+			"TeamName": "Jota Sport",
+			"drivers": [
+				{
+					"Forename": "Ben",
+					"Surname": "Barnicoat",
+					"Id": 11523
+				}
+			]
+		},
+		"11530": {
+			"Name": "#40",
+			"Team": 11529,
+			"Car": 9575,
+			"Id": 11530,
+			"Class": 1703,
+			"TeamName": "Fox Motorsport",
+			"drivers": [
+				{
+					"Forename": "Robert",
+					"Surname": "Bell",
+					"Id": 5945
+				}
+			]
+		},
+		"11532": {
+			"Name": "#5",
+			"Team": 11528,
+			"Car": 9575,
+			"Id": 11532,
+			"Class": 1703,
+			"TeamName": "Greystone GT",
+			"drivers": [
+				{
+					"Forename": "Lewis",
+					"Surname": "Proctor",
+					"Id": 11531
+				}
+			]
+		},
 		"11534": {
 			"Name": "#67",
 			"Team": 11533,
@@ -98334,6 +100064,111 @@
 					"Forename": "Henri",
 					"Surname": "Latour",
 					"Id": 7605
+				}
+			]
+		},
+		"11544": {
+			"Name": "#2",
+			"Team": 11543,
+			"Car": 9575,
+			"Id": 11544,
+			"Class": 1703,
+			"TeamName": "Jenson Team Rocket RJN",
+			"drivers": [
+				{
+					"Forename": "James",
+					"Surname": "Kel",
+					"Id": 11542
+				}
+			]
+		},
+		"11547": {
+			"Name": "#11",
+			"Team": 11545,
+			"Car": 9575,
+			"Id": 11547,
+			"Class": 1703,
+			"TeamName": "Paddock Motorsport",
+			"drivers": [
+				{
+					"Forename": "Kelvin",
+					"Surname": "Fletcher",
+					"Id": 11546
+				}
+			]
+		},
+		"11550": {
+			"Name": "#28",
+			"Team": 11548,
+			"Car": 9575,
+			"Id": 11550,
+			"Class": 1703,
+			"TeamName": "Optimum Motorsport",
+			"drivers": [
+				{
+					"Forename": "Nick",
+					"Surname": "Moss",
+					"Id": 11549
+				}
+			]
+		},
+		"11553": {
+			"Name": "#77",
+			"Team": 11552,
+			"Car": 9575,
+			"Id": 11553,
+			"Class": 1703,
+			"TeamName": "Enduro Motorsport",
+			"drivers": [
+				{
+					"Forename": "Morgan",
+					"Surname": "Tillbrook",
+					"Id": 12317
+				}
+			]
+		},
+		"11555": {
+			"Name": "#88",
+			"Team": 11554,
+			"Car": 9575,
+			"Id": 11555,
+			"Class": 1703,
+			"TeamName": "Garage 59",
+			"drivers": [
+				{
+					"Forename": "Marvin",
+					"Surname": "Kirchhöfer",
+					"Id": 7711
+				}
+			]
+		},
+		"11559": {
+			"Name": "#76",
+			"Team": 11558,
+			"Car": 9575,
+			"Id": 11559,
+			"Class": 1703,
+			"TeamName": "7TSIX",
+			"drivers": [
+				{
+					"Forename": "Mia",
+					"Surname": "Flewitt",
+					"Id": 11551
+				}
+			]
+		},
+		"11563": {
+			"Name": "#1",
+			"Team": 11767,
+			"Car": 11561,
+			"Id": 11563,
+			"Class": 11564,
+			"TeamName": "Porsche Motorsport",
+			"drivers": [
+				{
+					"Forename": "Sebastian",
+					"Surname": "Schmalz",
+					"Id": 6387
 				}
 			]
 		},
@@ -98789,6 +100624,21 @@
 					"Forename": "Yusuke",
 					"Surname": "Ishihara",
 					"Id": 11902
+				}
+			]
+		},
+		"11612": {
+			"Name": "#36",
+			"Team": 11767,
+			"Car": 11561,
+			"Id": 11612,
+			"Class": 11564,
+			"TeamName": "Porsche Motorsport",
+			"drivers": [
+				{
+					"Forename": "Jürgen",
+					"Surname": "Barth",
+					"Id": 12286
 				}
 			]
 		},
@@ -99542,6 +101392,21 @@
 				}
 			]
 		},
+		"11768": {
+			"Name": "#2",
+			"Team": 11766,
+			"Car": 11561,
+			"Id": 11768,
+			"Class": 11564,
+			"TeamName": "Team Shell",
+			"drivers": [
+				{
+					"Forename": "Armin",
+					"Surname": "Schwarz",
+					"Id": 12060
+				}
+			]
+		},
 		"11771": {
 			"Name": "#7",
 			"Team": 10897,
@@ -99737,6 +101602,51 @@
 				}
 			]
 		},
+		"11794": {
+			"Name": "#17",
+			"Team": 12069,
+			"Car": 11561,
+			"Id": 11794,
+			"Class": 11564,
+			"TeamName": "DSR Motorsport",
+			"drivers": [
+				{
+					"Forename": "David",
+					"Surname": "Seabrooke",
+					"Id": 12068
+				}
+			]
+		},
+		"11795": {
+			"Name": "#60",
+			"Team": 12155,
+			"Car": 11561,
+			"Id": 11795,
+			"Class": 11564,
+			"TeamName": "Rothmans Porsche Turbo Cup Canada",
+			"drivers": [
+				{
+					"Forename": "Cam",
+					"Surname": "Champion",
+					"Id": 12075
+				}
+			]
+		},
+		"11796": {
+			"Name": "#86",
+			"Team": 12155,
+			"Car": 11561,
+			"Id": 11796,
+			"Class": 11564,
+			"TeamName": "Rothmans Porsche Turbo Cup Canada",
+			"drivers": [
+				{
+					"Forename": "Normand",
+					"Surname": "Boyer",
+					"Id": 12076
+				}
+			]
+		},
 		"11797": {
 			"Name": "#33",
 			"Team": 11286,
@@ -99829,6 +101739,66 @@
 					"Forename": "Michel",
 					"Surname": "Defoin",
 					"Id": 4985
+				}
+			]
+		},
+		"11803": {
+			"Name": "Pinky",
+			"Team": 11767,
+			"Car": 11561,
+			"Id": 11803,
+			"Class": 11564,
+			"TeamName": "Porsche Motorsport",
+			"drivers": [
+				{
+					"Forename": "Harm",
+					"Surname": "Lagaay",
+					"Id": 12035
+				}
+			]
+		},
+		"11805": {
+			"Name": "#10",
+			"Team": 11562,
+			"Car": 11561,
+			"Id": 11805,
+			"Class": 11564,
+			"TeamName": "Porsche Motorsport",
+			"drivers": [
+				{
+					"Forename": "René",
+					"Surname": "Metge",
+					"Id": 12065
+				}
+			]
+		},
+		"11806": {
+			"Name": "#8",
+			"Team": 12064,
+			"Car": 11561,
+			"Id": 11806,
+			"Class": 11564,
+			"TeamName": "Commercial Motorsports",
+			"drivers": [
+				{
+					"Forename": "Rick",
+					"Surname": "Bye",
+					"Id": 12063
+				}
+			]
+		},
+		"11807": {
+			"Name": "#89",
+			"Team": 12078,
+			"Car": 11561,
+			"Id": 11807,
+			"Class": 11564,
+			"TeamName": "Auto Mizzi",
+			"drivers": [
+				{
+					"Forename": "Jacques",
+					"Surname": "Bienvenue",
+					"Id": 12077
 				}
 			]
 		},
@@ -100062,6 +102032,111 @@
 				}
 			]
 		},
+		"11866": {
+			"Name": "#24",
+			"Team": 12073,
+			"Car": 11561,
+			"Id": 11866,
+			"Class": 11564,
+			"TeamName": "Strähle Autosport",
+			"drivers": [
+				{
+					"Forename": "Fredi",
+					"Surname": "Briedl",
+					"Id": 12151
+				}
+			]
+		},
+		"11867": {
+			"Name": "#150",
+			"Team": 12080,
+			"Car": 11561,
+			"Id": 11867,
+			"Class": 11564,
+			"TeamName": "Cedarbrae Motorsport",
+			"drivers": [
+				{
+					"Forename": "David",
+					"Surname": "King",
+					"Id": 12079
+				}
+			]
+		},
+		"11868": {
+			"Name": "#11",
+			"Team": 12066,
+			"Car": 11561,
+			"Id": 11868,
+			"Class": 11564,
+			"TeamName": "Max Moritz Racing Team",
+			"drivers": [
+				{
+					"Forename": "Roland",
+					"Surname": "Asch",
+					"Id": 7499
+				}
+			]
+		},
+		"11869": {
+			"Name": "#19",
+			"Team": 12071,
+			"Car": 11561,
+			"Id": 11869,
+			"Class": 11564,
+			"TeamName": "Michel Mora",
+			"drivers": [
+				{
+					"Forename": "Michel",
+					"Surname": "Mora",
+					"Id": 12070
+				}
+			]
+		},
+		"11870": {
+			"Name": "#80",
+			"Team": 12153,
+			"Car": 11561,
+			"Id": 11870,
+			"Class": 11564,
+			"TeamName": "Schneider & Nelson Porsche",
+			"drivers": [
+				{
+					"Forename": "Robert J.",
+					"Surname": "Nelson",
+					"Id": 12152
+				}
+			]
+		},
+		"11871": {
+			"Name": "#90",
+			"Team": 12157,
+			"Car": 11561,
+			"Id": 11871,
+			"Class": 11564,
+			"TeamName": "Pine Tree Motorsports",
+			"drivers": [
+				{
+					"Forename": "Anthony",
+					"Surname": "Monteil",
+					"Id": 12158
+				}
+			]
+		},
+		"11872": {
+			"Name": "#6",
+			"Team": 12062,
+			"Car": 11561,
+			"Id": 11872,
+			"Class": 11564,
+			"TeamName": "Winkelhock Motorsport",
+			"drivers": [
+				{
+					"Forename": "Joachim",
+					"Surname": "Winkelhock",
+					"Id": 10749
+				}
+			]
+		},
 		"11903": {
 			"Name": "#80",
 			"Team": 11286,
@@ -100104,6 +102179,66 @@
 					"Forename": "Ben",
 					"Surname": "Green",
 					"Id": 10204
+				}
+			]
+		},
+		"11913": {
+			"Name": "#3",
+			"Team": 12155,
+			"Car": 11561,
+			"Id": 11913,
+			"Class": 11564,
+			"TeamName": "Rothmans Porsche Turbo Cup Canada",
+			"drivers": [
+				{
+					"Forename": "Stéphane",
+					"Surname": "Proulx",
+					"Id": 12154
+				}
+			]
+		},
+		"11914": {
+			"Name": "#08",
+			"Team": 11767,
+			"Car": 11561,
+			"Id": 11914,
+			"Class": 11564,
+			"TeamName": "Porsche Motorsport",
+			"drivers": [
+				{
+					"Forename": "Robert",
+					"Surname": "Neumann",
+					"Id": 4465
+				}
+			]
+		},
+		"11915": {
+			"Name": "#14",
+			"Team": 12287,
+			"Car": 11561,
+			"Id": 11915,
+			"Class": 11564,
+			"TeamName": "Team Sportfil Organisation",
+			"drivers": [
+				{
+					"Forename": "André",
+					"Surname": "Bourdon",
+					"Id": 12067
+				}
+			]
+		},
+		"11916": {
+			"Name": "#22",
+			"Team": 12288,
+			"Car": 11561,
+			"Id": 11916,
+			"Class": 11564,
+			"TeamName": "Löhr & Becker Automobile",
+			"drivers": [
+				{
+					"Forename": "Marcus",
+					"Surname": "Luhr",
+					"Id": 12072
 				}
 			]
 		},
@@ -100239,6 +102374,21 @@
 					"Forename": "Ilia",
 					"Surname": "Drovossekov",
 					"Id": 11932
+				}
+			]
+		},
+		"11942": {
+			"Name": "#39",
+			"Team": 12066,
+			"Car": 11561,
+			"Id": 11942,
+			"Class": 11564,
+			"TeamName": "Max Moritz Racing Team",
+			"drivers": [
+				{
+					"Forename": "Matthias",
+					"Surname": "Kahle",
+					"Id": 12074
 				}
 			]
 		},
@@ -100842,6 +102992,21 @@
 				}
 			]
 		},
+		"12014": {
+			"Name": "#1",
+			"Team": 12013,
+			"Car": 12012,
+			"Id": 12014,
+			"Class": 12302,
+			"TeamName": "Porsche Motorsport",
+			"drivers": [
+				{
+					"Forename": "Sebastian",
+					"Surname": "Schmalz",
+					"Id": 6387
+				}
+			]
+		},
 		"12018": {
 			"Name": "#0059",
 			"Team": 12017,
@@ -101157,6 +103322,36 @@
 				}
 			]
 		},
+		"12092": {
+			"Name": "#0",
+			"Team": 12091,
+			"Car": 12090,
+			"Id": 12092,
+			"Class": 1703,
+			"TeamName": "Porsche Motorsport",
+			"drivers": [
+				{
+					"Forename": "Sebastian",
+					"Surname": "Schmalz",
+					"Id": 6387
+				}
+			]
+		},
+		"12096": {
+			"Name": "#91",
+			"Team": 12097,
+			"Car": 12090,
+			"Id": 12096,
+			"Class": 1703,
+			"TeamName": "Kellymoss with Riley",
+			"drivers": [
+				{
+					"Forename": "Kay",
+					"Surname": "van Berlo",
+					"Id": 8899
+				}
+			]
+		},
 		"12102": {
 			"Name": "#46",
 			"Team": 12081,
@@ -101172,6 +103367,21 @@
 				}
 			]
 		},
+		"12103": {
+			"Name": "#77",
+			"Team": 12100,
+			"Car": 12090,
+			"Id": 12103,
+			"Class": 1703,
+			"TeamName": "Wright Motorsports",
+			"drivers": [
+				{
+					"Forename": "Alan",
+					"Surname": "Brynjolfsson",
+					"Id": 11999
+				}
+			]
+		},
 		"12106": {
 			"Name": "#14",
 			"Team": 12105,
@@ -101184,6 +103394,81 @@
 					"Forename": "Roland",
 					"Surname": "Poulsen",
 					"Id": 12104
+				}
+			]
+		},
+		"12109": {
+			"Name": "#53",
+			"Team": 12099,
+			"Car": 12090,
+			"Id": 12109,
+			"Class": 1703,
+			"TeamName": "MDK Motorsports",
+			"drivers": [
+				{
+					"Forename": "Mark",
+					"Surname": "Kvamme",
+					"Id": 10357
+				}
+			]
+		},
+		"12115": {
+			"Name": "#16",
+			"Team": 12100,
+			"Car": 12090,
+			"Id": 12115,
+			"Class": 1703,
+			"TeamName": "Wright Motorsports",
+			"drivers": [
+				{
+					"Forename": "Ryan",
+					"Surname": "Hardwick",
+					"Id": 8640
+				}
+			]
+		},
+		"12116": {
+			"Name": "#80",
+			"Team": 12101,
+			"Car": 12090,
+			"Id": 12116,
+			"Class": 1703,
+			"TeamName": "AO Racing",
+			"drivers": [
+				{
+					"Forename": "Sebastian",
+					"Surname": "Priaulx",
+					"Id": 12183
+				}
+			]
+		},
+		"12117": {
+			"Name": "#92",
+			"Team": 12097,
+			"Car": 12090,
+			"Id": 12117,
+			"Class": 1703,
+			"TeamName": "Kellymoss with Riley",
+			"drivers": [
+				{
+					"Forename": "Alec",
+					"Surname": "Udell",
+					"Id": 7301
+				}
+			]
+		},
+		"12118": {
+			"Name": "#44",
+			"Team": 12129,
+			"Car": 12090,
+			"Id": 12118,
+			"Class": 1703,
+			"TeamName": "Falken Motorsports",
+			"drivers": [
+				{
+					"Forename": "Tim",
+					"Surname": "Heinemann",
+					"Id": 6818
 				}
 			]
 		},
@@ -101217,6 +103502,36 @@
 				}
 			]
 		},
+		"12126": {
+			"Name": "#909",
+			"Team": 12123,
+			"Car": 12012,
+			"Id": 12126,
+			"Class": 12302,
+			"TeamName": "Red Camel-Jordans.nl",
+			"drivers": [
+				{
+					"Forename": "Ivo",
+					"Surname": "Breukers",
+					"Id": 12125
+				}
+			]
+		},
+		"12128": {
+			"Name": "#955",
+			"Team": 12124,
+			"Car": 12012,
+			"Id": 12128,
+			"Class": 12302,
+			"TeamName": "Willi Motorsport by Ebimotors",
+			"drivers": [
+				{
+					"Forename": "Fabrizio",
+					"Surname": "Broggi",
+					"Id": 12127
+				}
+			]
+		},
 		"12132": {
 			"Name": "#44",
 			"Team": 12131,
@@ -101229,6 +103544,21 @@
 					"Forename": "Daniel",
 					"Surname": "Harper",
 					"Id": 12130
+				}
+			]
+		},
+		"12135": {
+			"Name": "#995",
+			"Team": 12134,
+			"Car": 12012,
+			"Id": 12135,
+			"Class": 12302,
+			"TeamName": "Duel Racing by Toro Verde",
+			"drivers": [
+				{
+					"Forename": "Philip",
+					"Surname": "Keen",
+					"Id": 12133
 				}
 			]
 		},
@@ -101247,6 +103577,51 @@
 				}
 			]
 		},
+		"12140": {
+			"Name": "#931",
+			"Team": 12139,
+			"Car": 12012,
+			"Id": 12140,
+			"Class": 12302,
+			"TeamName": "HRT Performance",
+			"drivers": [
+				{
+					"Forename": "Fidel",
+					"Surname": "Leib",
+					"Id": 8352
+				}
+			]
+		},
+		"12142": {
+			"Name": "#979",
+			"Team": 12141,
+			"Car": 12012,
+			"Id": 12142,
+			"Class": 12302,
+			"TeamName": "Speed Lover",
+			"drivers": [
+				{
+					"Forename": "Simon",
+					"Surname": "Balcaen",
+					"Id": 12143
+				}
+			]
+		},
+		"12144": {
+			"Name": "#09",
+			"Team": 12098,
+			"Car": 12090,
+			"Id": 12144,
+			"Class": 1703,
+			"TeamName": "Pfaff Motorsports",
+			"drivers": [
+				{
+					"Forename": "Klaus",
+					"Surname": "Bachler",
+					"Id": 9706
+				}
+			]
+		},
 		"12145": {
 			"Name": "#020",
 			"Team": 11912,
@@ -101259,6 +103634,21 @@
 					"Forename": "Alexander",
 					"Surname": "Sims",
 					"Id": 5979
+				}
+			]
+		},
+		"12147": {
+			"Name": "#989",
+			"Team": 12146,
+			"Car": 12012,
+			"Id": 12147,
+			"Class": 12302,
+			"TeamName": "MRS GT-Racing",
+			"drivers": [
+				{
+					"Forename": "Nico",
+					"Surname": "Verdonck",
+					"Id": 2704
 				}
 			]
 		},
@@ -101337,6 +103727,51 @@
 				}
 			]
 		},
+		"12168": {
+			"Name": "#24",
+			"Team": 12164,
+			"Car": 12163,
+			"Id": 12168,
+			"Class": 12015,
+			"TeamName": "ProfilDoors by Huber Racing",
+			"drivers": [
+				{
+					"Forename": "Loek",
+					"Surname": "Hartog",
+					"Id": 12188
+				}
+			]
+		},
+		"12169": {
+			"Name": "#7",
+			"Team": 12164,
+			"Car": 12163,
+			"Id": 12169,
+			"Class": 12015,
+			"TeamName": "ProfilDoors by Huber Racing",
+			"drivers": [
+				{
+					"Forename": "Jasin",
+					"Surname": "Ferati",
+					"Id": 12184
+				}
+			]
+		},
+		"12170": {
+			"Name": "#19",
+			"Team": 12164,
+			"Car": 12163,
+			"Id": 12170,
+			"Class": 12015,
+			"TeamName": "ProfilDoors by Huber Racing",
+			"drivers": [
+				{
+					"Forename": "Harry",
+					"Surname": "King",
+					"Id": 12187
+				}
+			]
+		},
 		"12172": {
 			"Name": "#035",
 			"Team": 12120,
@@ -101379,6 +103814,771 @@
 					"Forename": "Christian",
 					"Surname": "Krognes",
 					"Id": 8475
+				}
+			]
+		},
+		"12189": {
+			"Name": "#4",
+			"Team": 12164,
+			"Car": 12163,
+			"Id": 12189,
+			"Class": 12015,
+			"TeamName": "ProfilDoors by Huber Racing",
+			"drivers": [
+				{
+					"Forename": "Georgi",
+					"Surname": "Donchev",
+					"Id": 8897
+				}
+			]
+		},
+		"12190": {
+			"Name": "#8",
+			"Team": 12167,
+			"Car": 12163,
+			"Id": 12190,
+			"Class": 12015,
+			"TeamName": "Fach Auto Tech",
+			"drivers": [
+				{
+					"Forename": "Alexander",
+					"Surname": "Fach",
+					"Id": 12185
+				}
+			]
+		},
+		"12191": {
+			"Name": "#14",
+			"Team": 12167,
+			"Car": 12163,
+			"Id": 12191,
+			"Class": 12015,
+			"TeamName": "Fach Auto Tech",
+			"drivers": [
+				{
+					"Forename": "Morris",
+					"Surname": "Schuring",
+					"Id": 12186
+				}
+			]
+		},
+		"12195": {
+			"Name": "#99",
+			"Team": 12194,
+			"Car": 12163,
+			"Id": 12195,
+			"Class": 12015,
+			"TeamName": "Allied-Racing",
+			"drivers": [
+				{
+					"Forename": "Bastian",
+					"Surname": "Buus",
+					"Id": 12193
+				}
+			]
+		},
+		"12199": {
+			"Name": "#9",
+			"Team": 12198,
+			"Car": 12197,
+			"Id": 12199,
+			"Class": 12196,
+			"TeamName": "Toksport WRT",
+			"drivers": [
+				{
+					"Forename": "Tim",
+					"Surname": "Heinemann",
+					"Id": 6818
+				}
+			]
+		},
+		"12201": {
+			"Name": "#6",
+			"Team": 12194,
+			"Car": 12163,
+			"Id": 12201,
+			"Class": 12015,
+			"TeamName": "Allied Racing",
+			"drivers": [
+				{
+					"Forename": "Vincent",
+					"Surname": "Andronaco",
+					"Id": 12200
+				}
+			]
+		},
+		"12204": {
+			"Name": "#84",
+			"Team": 12203,
+			"Car": 12163,
+			"Id": 12204,
+			"Class": 12015,
+			"TeamName": "CarTech Motorsport Bonk",
+			"drivers": [
+				{
+					"Forename": "Ahmad",
+					"Surname": "Alshehab",
+					"Id": 12202
+				}
+			]
+		},
+		"12206": {
+			"Name": "#24",
+			"Team": 12205,
+			"Car": 12090,
+			"Id": 12206,
+			"Class": 1703,
+			"TeamName": "Lionspeed by Car Collection Motorsport",
+			"drivers": [
+				{
+					"Forename": "Matt",
+					"Surname": "Campbell",
+					"Id": 8409
+				}
+			]
+		},
+		"12208": {
+			"Name": "#911",
+			"Team": 12207,
+			"Car": 12090,
+			"Id": 12208,
+			"Class": 1703,
+			"TeamName": "Mantey EMA",
+			"drivers": [
+				{
+					"Forename": "Michael",
+					"Surname": "Christensen",
+					"Id": 6709
+				}
+			]
+		},
+		"12213": {
+			"Name": "#13",
+			"Team": 12165,
+			"Car": 12163,
+			"Id": 12213,
+			"Class": 12015,
+			"TeamName": "Huber Racing",
+			"drivers": [
+				{
+					"Forename": "Alexander",
+					"Surname": "Tauscher",
+					"Id": 12212
+				}
+			]
+		},
+		"12215": {
+			"Name": "#23",
+			"Team": 12214,
+			"Car": 12163,
+			"Id": 12215,
+			"Class": 12015,
+			"TeamName": "HP Racing International",
+			"drivers": [
+				{
+					"Forename": "Lukas",
+					"Surname": "Ertl",
+					"Id": 8034
+				}
+			]
+		},
+		"12216": {
+			"Name": "#25",
+			"Team": 12166,
+			"Car": 12163,
+			"Id": 12216,
+			"Class": 12015,
+			"TeamName": "Team GP Elite",
+			"drivers": [
+				{
+					"Forename": "Larry",
+					"Surname": "ten Voorde",
+					"Id": 8031
+				}
+			]
+		},
+		"12218": {
+			"Name": "#31",
+			"Team": 12165,
+			"Car": 12163,
+			"Id": 12218,
+			"Class": 12015,
+			"TeamName": "Huber Racing",
+			"drivers": [
+				{
+					"Forename": "Sebastian",
+					"Surname": "Freymuth",
+					"Id": 12217
+				}
+			]
+		},
+		"12220": {
+			"Name": "#44",
+			"Team": 12164,
+			"Car": 12163,
+			"Id": 12220,
+			"Class": 12015,
+			"TeamName": "ProfilDoors by Huber Racing",
+			"drivers": [
+				{
+					"Forename": "Jonas",
+					"Surname": "Greif",
+					"Id": 12219
+				}
+			]
+		},
+		"12221": {
+			"Name": "#77",
+			"Team": 12164,
+			"Car": 12163,
+			"Id": 12221,
+			"Class": 12015,
+			"TeamName": "ProfilDoors by Huber Racing",
+			"drivers": [
+				{
+					"Forename": "Leon",
+					"Surname": "Köhler",
+					"Id": 8045
+				}
+			]
+		},
+		"12222": {
+			"Name": "#92",
+			"Team": 12165,
+			"Car": 12163,
+			"Id": 12222,
+			"Class": 12015,
+			"TeamName": "Huber Racing",
+			"drivers": [
+				{
+					"Forename": "Luca",
+					"Surname": "Rettenbacher",
+					"Id": 8048
+				}
+			]
+		},
+		"12223": {
+			"Name": "#80",
+			"Team": 12101,
+			"Car": 12090,
+			"Id": 12223,
+			"Class": 1703,
+			"TeamName": "AO Racing",
+			"drivers": [
+				{
+					"Forename": "Gunnar",
+					"Surname": "Jeannette",
+					"Id": 6478
+				}
+			]
+		},
+		"12224": {
+			"Name": "#12",
+			"Team": 12225,
+			"Car": 12163,
+			"Id": 12224,
+			"Class": 12015,
+			"TeamName": "Scherer Sport PHX",
+			"drivers": [
+				{
+					"Forename": "Harri",
+					"Surname": "Jones",
+					"Id": 12227
+				}
+			]
+		},
+		"12226": {
+			"Name": "#22",
+			"Team": 12225,
+			"Car": 12163,
+			"Id": 12226,
+			"Class": 12015,
+			"TeamName": "Scherer Sport PHX",
+			"drivers": [
+				{
+					"Forename": "Matteo",
+					"Surname": "Ferrer-Aza",
+					"Id": 12228
+				}
+			]
+		},
+		"12229": {
+			"Name": "#66",
+			"Team": 12262,
+			"Car": 12163,
+			"Id": 12229,
+			"Class": 12015,
+			"TeamName": "Proton Competition",
+			"drivers": [
+				{
+					"Forename": "Adam",
+					"Surname": "Smalley",
+					"Id": 12230
+				}
+			]
+		},
+		"12233": {
+			"Name": "#27",
+			"Team": 12166,
+			"Car": 12163,
+			"Id": 12233,
+			"Class": 12015,
+			"TeamName": "Team GP Elite",
+			"drivers": [
+				{
+					"Forename": "Ghislain",
+					"Surname": "Cordeel",
+					"Id": 12231
+				}
+			]
+		},
+		"12235": {
+			"Name": "#28",
+			"Team": 12166,
+			"Car": 12163,
+			"Id": 12235,
+			"Class": 12015,
+			"TeamName": "Team GP Elite",
+			"drivers": [
+				{
+					"Forename": "Huub",
+					"Surname": "van Eijndhoven",
+					"Id": 12234
+				}
+			]
+		},
+		"12249": {
+			"Name": "#24",
+			"Team": 12246,
+			"Car": 12197,
+			"Id": 12249,
+			"Class": 12196,
+			"TeamName": "Küs Team Bernhard",
+			"drivers": [
+				{
+					"Forename": "Ayhancan",
+					"Surname": "Güven",
+					"Id": 12248
+				}
+			]
+		},
+		"12250": {
+			"Name": "#75",
+			"Team": 12246,
+			"Car": 12197,
+			"Id": 12250,
+			"Class": 12196,
+			"TeamName": "Küs Team Bernhard",
+			"drivers": [
+				{
+					"Forename": "Laurin",
+					"Surname": "Heinrich",
+					"Id": 8909
+				}
+			]
+		},
+		"12251": {
+			"Name": "#90",
+			"Team": 12245,
+			"Car": 12197,
+			"Id": 12251,
+			"Class": 12196,
+			"TeamName": "Manthey EMA",
+			"drivers": [
+				{
+					"Forename": "Dennis",
+					"Surname": "Olsen",
+					"Id": 12247
+				}
+			]
+		},
+		"12252": {
+			"Name": "#91",
+			"Team": 12245,
+			"Car": 12197,
+			"Id": 12252,
+			"Class": 12196,
+			"TeamName": "Manthey EMA",
+			"drivers": [
+				{
+					"Forename": "Thomas",
+					"Surname": "Preining",
+					"Id": 8410
+				}
+			]
+		},
+		"12253": {
+			"Name": "#99",
+			"Team": 12198,
+			"Car": 12197,
+			"Id": 12253,
+			"Class": 12196,
+			"TeamName": "Toksport WRT",
+			"drivers": [
+				{
+					"Forename": "Christian",
+					"Surname": "Engelhart",
+					"Id": 9748
+				}
+			]
+		},
+		"12254": {
+			"Name": "#1",
+			"Team": 12238,
+			"Car": 12237,
+			"Id": 12254,
+			"Class": 12196,
+			"TeamName": "Schubert Motorsport",
+			"drivers": [
+				{
+					"Forename": "Sheldon",
+					"Surname": "van der Linde",
+					"Id": 9139
+				}
+			]
+		},
+		"12255": {
+			"Name": "#4",
+			"Team": 12241,
+			"Car": 12240,
+			"Id": 12255,
+			"Class": 12196,
+			"TeamName": "Mercedes-AMG Team Landgraf",
+			"drivers": [
+				{
+					"Forename": "Luca",
+					"Surname": "Stolz",
+					"Id": 9737
+				}
+			]
+		},
+		"12258": {
+			"Name": "#40",
+			"Team": 12257,
+			"Car": 12163,
+			"Id": 12258,
+			"Class": 12015,
+			"TeamName": "ID Racing",
+			"drivers": [
+				{
+					"Forename": "Janne",
+					"Surname": "Stiak",
+					"Id": 12256
+				}
+			]
+		},
+		"12259": {
+			"Name": "#54",
+			"Team": 12203,
+			"Car": 12163,
+			"Id": 12259,
+			"Class": 12015,
+			"TeamName": "CarTech Motorsport Bonk",
+			"drivers": [
+				{
+					"Forename": "Michael",
+					"Surname": "Essmann",
+					"Id": 8898
+				}
+			]
+		},
+		"12261": {
+			"Name": "#41",
+			"Team": 12257,
+			"Car": 12163,
+			"Id": 12261,
+			"Class": 12015,
+			"TeamName": "ID Racing",
+			"drivers": [
+				{
+					"Forename": "Diego",
+					"Surname": "Stifter",
+					"Id": 12260
+				}
+			]
+		},
+		"12263": {
+			"Name": "#88",
+			"Team": 12262,
+			"Car": 12163,
+			"Id": 12263,
+			"Class": 12015,
+			"TeamName": "Proton Competition",
+			"drivers": [
+				{
+					"Forename": "Horst",
+					"Surname": "Felbermayr",
+					"Id": 11387
+				}
+			]
+		},
+		"12264": {
+			"Name": "#98",
+			"Team": 12214,
+			"Car": 12163,
+			"Id": 12264,
+			"Class": 12015,
+			"TeamName": "HP Racing International",
+			"drivers": [
+				{
+					"Forename": "Jan",
+					"Surname": "Seyffert",
+					"Id": 10236
+				}
+			]
+		},
+		"12266": {
+			"Name": "#96",
+			"Team": 12265,
+			"Car": 12090,
+			"Id": 12266,
+			"Class": 1703,
+			"TeamName": "Rutronik Racing",
+			"drivers": [
+				{
+					"Forename": "Julien",
+					"Surname": "Andlauer",
+					"Id": 8022
+				}
+			]
+		},
+		"12269": {
+			"Name": "#11",
+			"Team": 12239,
+			"Car": 12237,
+			"Id": 12269,
+			"Class": 12196,
+			"TeamName": "Project 1 Motorsport",
+			"drivers": [
+				{
+					"Forename": "Marco",
+					"Surname": "Wittmann",
+					"Id": 9138
+				}
+			]
+		},
+		"12270": {
+			"Name": "#33",
+			"Team": 12238,
+			"Car": 12237,
+			"Id": 12270,
+			"Class": 12196,
+			"TeamName": "Schubert Motorsport",
+			"drivers": [
+				{
+					"Forename": "René",
+					"Surname": "Rast",
+					"Id": 3598
+				}
+			]
+		},
+		"12271": {
+			"Name": "#22",
+			"Team": 12241,
+			"Car": 12240,
+			"Id": 12271,
+			"Class": 12196,
+			"TeamName": "Mercedes-AMG Team Winward",
+			"drivers": [
+				{
+					"Forename": "Lucas",
+					"Surname": "Auer",
+					"Id": 9143
+				}
+			]
+		},
+		"12274": {
+			"Name": "#27",
+			"Team": 12243,
+			"Car": 12240,
+			"Id": 12274,
+			"Class": 12196,
+			"TeamName": "Mercedes-AMG Team Winward",
+			"drivers": [
+				{
+					"Forename": "David",
+					"Surname": "Schumacher",
+					"Id": 11854
+				}
+			]
+		},
+		"12275": {
+			"Name": "#36",
+			"Team": 12242,
+			"Car": 12240,
+			"Id": 12275,
+			"Class": 12196,
+			"TeamName": "Mercedes-AMG Team HRT",
+			"drivers": [
+				{
+					"Forename": "Arjun",
+					"Surname": "Maini",
+					"Id": 10696
+				}
+			]
+		},
+		"12276": {
+			"Name": "#34",
+			"Team": 12203,
+			"Car": 12163,
+			"Id": 12276,
+			"Class": 12015,
+			"TeamName": "CarTech Motorsport Bonk",
+			"drivers": [
+				{
+					"Forename": "Theo",
+					"Surname": "Oeverhaus",
+					"Id": 12273
+				}
+			]
+		},
+		"12277": {
+			"Name": "#64",
+			"Team": 12278,
+			"Car": 12163,
+			"Id": 12277,
+			"Class": 12015,
+			"TeamName": "HRT Performance",
+			"drivers": [
+				{
+					"Forename": "Robert",
+					"Surname": "de Haan",
+					"Id": 12272
+				}
+			]
+		},
+		"12279": {
+			"Name": "#48",
+			"Team": 12241,
+			"Car": 12240,
+			"Id": 12279,
+			"Class": 12196,
+			"TeamName": "Mercedes-AMG Team Landgraf",
+			"drivers": [
+				{
+					"Forename": "Maro",
+					"Surname": "Engel",
+					"Id": 9738
+				}
+			]
+		},
+		"12280": {
+			"Name": "#84",
+			"Team": 12241,
+			"Car": 12240,
+			"Id": 12280,
+			"Class": 12196,
+			"TeamName": "Mercedes-AMG Team Landgraf",
+			"drivers": [
+				{
+					"Forename": "Jusuf",
+					"Surname": "Owega",
+					"Id": 11560
+				}
+			]
+		},
+		"12282": {
+			"Name": "#69",
+			"Team": 12278,
+			"Car": 12163,
+			"Id": 12282,
+			"Class": 12015,
+			"TeamName": "HRT Performance",
+			"drivers": [
+				{
+					"Forename": "Holger",
+					"Surname": "Harmsen",
+					"Id": 12281
+				}
+			]
+		},
+		"12284": {
+			"Name": "#87",
+			"Team": 12165,
+			"Car": 12163,
+			"Id": 12284,
+			"Class": 12015,
+			"TeamName": "Huber Racing",
+			"drivers": [
+				{
+					"Forename": "Ariel",
+					"Surname": "Levi",
+					"Id": 12283
+				}
+			]
+		},
+		"12289": {
+			"Name": "#5",
+			"Team": 12166,
+			"Car": 12163,
+			"Id": 12289,
+			"Class": 12015,
+			"TeamName": "Team GP Elite",
+			"drivers": [
+				{
+					"Forename": "Sören",
+					"Surname": "Spreng",
+					"Id": 8024
+				}
+			]
+		},
+		"12291": {
+			"Name": "#68",
+			"Team": 12278,
+			"Car": 12163,
+			"Id": 12291,
+			"Class": 12015,
+			"TeamName": "HRT Performance",
+			"drivers": [
+				{
+					"Forename": "Tim",
+					"Surname": "Stender",
+					"Id": 12290
+				}
+			]
+		},
+		"12295": {
+			"Name": "#124",
+			"Team": 12293,
+			"Car": 12012,
+			"Id": 12295,
+			"Class": 12302,
+			"TeamName": "Mühlner Motorsport H&R",
+			"drivers": [
+				{
+					"Forename": "Nick",
+					"Surname": "Salewsky",
+					"Id": 12292
+				}
+			]
+		},
+		"12314": {
+			"Name": "#308",
+			"Team": 12310,
+			"Car": 12012,
+			"Id": 12314,
+			"Class": 12302,
+			"TeamName": "Laptime-Performance",
+			"drivers": [
+				{
+					"Forename": "Moritz",
+					"Surname": "Löhner",
+					"Id": 9011
+				}
+			]
+		},
+		"12316": {
+			"Name": "#25",
+			"Team": 12315,
+			"Car": 12090,
+			"Id": 12316,
+			"Class": 1703,
+			"TeamName": "Huber Motorsport",
+			"drivers": [
+				{
+					"Forename": "Romain",
+					"Surname": "Dumas",
+					"Id": 4500
 				}
 			]
 		}
@@ -103687,6 +106887,9 @@
 					"Id": 5786
 				},
 				{
+					"Id": 9575
+				},
+				{
 					"Id": 1909
 				},
 				{
@@ -103709,6 +106912,9 @@
 				},
 				{
 					"Id": 8257
+				},
+				{
+					"Id": 12090
 				},
 				{
 					"Id": 3516
@@ -104317,7 +107523,7 @@
 			"Id": 6344
 		},
 		"6345": {
-			"Name": "Porsche 911 GT3 Cup",
+			"Name": "Porsche 991.2 GT3 Cup",
 			"Cars": [
 				{
 					"Id": 4675
@@ -104958,6 +108164,15 @@
 			],
 			"Id": 11485
 		},
+		"11564": {
+			"Name": "Porsche 944 Turbo Cup",
+			"Cars": [
+				{
+					"Id": 11561
+				}
+			],
+			"Id": 11564
+		},
 		"11566": {
 			"Name": "ADAC GT Masters 2021",
 			"Cars": [
@@ -105005,6 +108220,39 @@
 				}
 			],
 			"Id": 12003
+		},
+		"12015": {
+			"Name": "Porsche Carrera Cup Deutschland 2023",
+			"Cars": [
+				{
+					"Id": 12163
+				}
+			],
+			"Id": 12015
+		},
+		"12196": {
+			"Name": "DTM 2023",
+			"Cars": [
+				{
+					"Id": 12237
+				},
+				{
+					"Id": 12240
+				},
+				{
+					"Id": 12197
+				}
+			],
+			"Id": 12196
+		},
+		"12302": {
+			"Name": "Porsche 992 GT3 Cup",
+			"Cars": [
+				{
+					"Id": 12012
+				}
+			],
+			"Id": 12302
 		}
 	},
 	"manufacturers": {
@@ -112103,6 +115351,11 @@
 			"Name": "T3-HRT-Motorsport",
 			"Id": 9566
 		},
+		"9576": {
+			"Type": "CarTeam",
+			"Name": "Factory Team",
+			"Id": 9576
+		},
 		"9582": {
 			"Type": "CarTeam",
 			"Name": "Mercedes-AMG",
@@ -114453,6 +117706,26 @@
 			"Name": "Team eGG",
 			"Id": 11518
 		},
+		"11524": {
+			"Type": "CarTeam",
+			"Name": "Inception Racing by Optimum",
+			"Id": 11524
+		},
+		"11526": {
+			"Type": "CarTeam",
+			"Name": "Jota Sport",
+			"Id": 11526
+		},
+		"11528": {
+			"Type": "CarTeam",
+			"Name": "Greystone GT",
+			"Id": 11528
+		},
+		"11529": {
+			"Type": "CarTeam",
+			"Name": "Fox Motorsport",
+			"Id": 11529
+		},
 		"11533": {
 			"Type": "CarTeam",
 			"Name": "DDF Racer",
@@ -114467,6 +117740,41 @@
 			"Type": "CarTeam",
 			"Name": "BMW Motorsport",
 			"Id": 11537
+		},
+		"11543": {
+			"Type": "CarTeam",
+			"Name": "Jenson Team Rocket RJN",
+			"Id": 11543
+		},
+		"11545": {
+			"Type": "CarTeam",
+			"Name": "Paddock Motorsport",
+			"Id": 11545
+		},
+		"11548": {
+			"Type": "CarTeam",
+			"Name": "Optimum Motorsport",
+			"Id": 11548
+		},
+		"11552": {
+			"Type": "CarTeam",
+			"Name": "Enduro Motorsport",
+			"Id": 11552
+		},
+		"11554": {
+			"Type": "CarTeam",
+			"Name": "Garage 59",
+			"Id": 11554
+		},
+		"11558": {
+			"Type": "CarTeam",
+			"Name": "7TSIX",
+			"Id": 11558
+		},
+		"11562": {
+			"Type": "CarTeam",
+			"Name": "Team Metge",
+			"Id": 11562
 		},
 		"11565": {
 			"Type": "CarTeam",
@@ -114673,6 +117981,16 @@
 			"Name": "NGK Spark Plugs Esports Team",
 			"Id": 11752
 		},
+		"11766": {
+			"Type": "CarTeam",
+			"Name": "Team Shell",
+			"Id": 11766
+		},
+		"11767": {
+			"Type": "CarTeam",
+			"Name": "Porsche Motorsport",
+			"Id": 11767
+		},
 		"11770": {
 			"Type": "CarTeam",
 			"Name": "Motul-Firestone",
@@ -114803,6 +118121,11 @@
 			"Name": "Veloce",
 			"Id": 12005
 		},
+		"12013": {
+			"Type": "CarTeam",
+			"Name": "Porsche Motorsport",
+			"Id": 12013
+		},
 		"12017": {
 			"Type": "CarTeam",
 			"Name": "Dörr Motorsport",
@@ -114838,6 +118161,46 @@
 			"Name": "Team Rocket RJN",
 			"Id": 12051
 		},
+		"12062": {
+			"Type": "CarTeam",
+			"Name": "Winkelhock Motorsport",
+			"Id": 12062
+		},
+		"12064": {
+			"Type": "CarTeam",
+			"Name": "Commercial Motorsports",
+			"Id": 12064
+		},
+		"12066": {
+			"Type": "CarTeam",
+			"Name": "Max Moritz Racing Team",
+			"Id": 12066
+		},
+		"12069": {
+			"Type": "CarTeam",
+			"Name": "DSR Motorsport",
+			"Id": 12069
+		},
+		"12071": {
+			"Type": "CarTeam",
+			"Name": "Michel Mora",
+			"Id": 12071
+		},
+		"12073": {
+			"Type": "CarTeam",
+			"Name": "Strähle Autosport",
+			"Id": 12073
+		},
+		"12078": {
+			"Type": "CarTeam",
+			"Name": "Auto Mizzi",
+			"Id": 12078
+		},
+		"12080": {
+			"Type": "CarTeam",
+			"Name": "Cedarbrae Motorsport",
+			"Id": 12080
+		},
 		"12081": {
 			"Type": "CarTeam",
 			"Name": "Team WRT",
@@ -114858,6 +118221,36 @@
 			"Name": "SAKURAGEAR",
 			"Id": 12088
 		},
+		"12091": {
+			"Type": "CarTeam",
+			"Name": "Porsche Motorsport",
+			"Id": 12091
+		},
+		"12097": {
+			"Type": "CarTeam",
+			"Name": "Kellymoss with Riley",
+			"Id": 12097
+		},
+		"12098": {
+			"Type": "CarTeam",
+			"Name": "Pfaff Motorsports",
+			"Id": 12098
+		},
+		"12099": {
+			"Type": "CarTeam",
+			"Name": "MDK Motorsports",
+			"Id": 12099
+		},
+		"12100": {
+			"Type": "CarTeam",
+			"Name": "Wright Motorsports",
+			"Id": 12100
+		},
+		"12101": {
+			"Type": "CarTeam",
+			"Name": "AO Racing",
+			"Id": 12101
+		},
 		"12105": {
 			"Type": "CarTeam",
 			"Name": "Poulsen Motorsport",
@@ -114873,20 +118266,230 @@
 			"Name": "Walkenhorst Motorsport",
 			"Id": 12120
 		},
+		"12123": {
+			"Type": "CarTeam",
+			"Name": "Red Camel-Jordans.nl",
+			"Id": 12123
+		},
+		"12124": {
+			"Type": "CarTeam",
+			"Name": " Willi Motorsport by Ebimotors",
+			"Id": 12124
+		},
+		"12129": {
+			"Type": "CarTeam",
+			"Name": "Falken Motorsports",
+			"Id": 12129
+		},
 		"12131": {
 			"Type": "CarTeam",
 			"Name": "BMW Junior Team",
 			"Id": 12131
+		},
+		"12134": {
+			"Type": "CarTeam",
+			"Name": "Duel Racing By Toro Verde",
+			"Id": 12134
 		},
 		"12136": {
 			"Type": "CarTeam",
 			"Name": "Rowe Racing",
 			"Id": 12136
 		},
+		"12139": {
+			"Type": "CarTeam",
+			"Name": "HRT Performance",
+			"Id": 12139
+		},
+		"12141": {
+			"Type": "CarTeam",
+			"Name": "Speed Lover",
+			"Id": 12141
+		},
+		"12146": {
+			"Type": "CarTeam",
+			"Name": "MRS GT-Racing",
+			"Id": 12146
+		},
+		"12153": {
+			"Type": "CarTeam",
+			"Name": "Schneider & Nelson Porsche",
+			"Id": 12153
+		},
+		"12155": {
+			"Type": "CarTeam",
+			"Name": "Rothmans Porsche Turbo Cup Canada",
+			"Id": 12155
+		},
+		"12157": {
+			"Type": "CarTeam",
+			"Name": "Pine Tree Motorsports",
+			"Id": 12157
+		},
+		"12164": {
+			"Type": "CarTeam",
+			"Name": "ProfilDoors by Huber Racing",
+			"Id": 12164
+		},
+		"12165": {
+			"Type": "CarTeam",
+			"Name": "Huber Racing",
+			"Id": 12165
+		},
+		"12166": {
+			"Type": "CarTeam",
+			"Name": "Team GP Elite",
+			"Id": 12166
+		},
+		"12167": {
+			"Type": "CarTeam",
+			"Name": "Fach Auto Tech",
+			"Id": 12167
+		},
 		"12173": {
 			"Type": "CarTeam",
 			"Name": "Rahal Letterman Lanigan Racing",
 			"Id": 12173
+		},
+		"12194": {
+			"Type": "CarTeam",
+			"Name": "Allied-Racing",
+			"Id": 12194
+		},
+		"12198": {
+			"Type": "CarTeam",
+			"Name": "Toksport WRT",
+			"Id": 12198
+		},
+		"12203": {
+			"Type": "CarTeam",
+			"Name": "CarTech Motorsport Bonk",
+			"Id": 12203
+		},
+		"12205": {
+			"Type": "CarTeam",
+			"Name": "Lionspeed by Car Collection Motorsport",
+			"Id": 12205
+		},
+		"12207": {
+			"Type": "CarTeam",
+			"Name": "Manthey EMA",
+			"Id": 12207
+		},
+		"12214": {
+			"Type": "CarTeam",
+			"Name": "HP Racing International",
+			"Id": 12214
+		},
+		"12225": {
+			"Type": "CarTeam",
+			"Name": "Scherer Sport PHX",
+			"Id": 12225
+		},
+		"12232": {
+			"Type": "CarTeam",
+			"Name": "GP Elite",
+			"Id": 12232
+		},
+		"12238": {
+			"Type": "CarTeam",
+			"Name": "Schubert Motorsport",
+			"Id": 12238
+		},
+		"12239": {
+			"Type": "CarTeam",
+			"Name": "Project 1 Motorsport",
+			"Id": 12239
+		},
+		"12241": {
+			"Type": "CarTeam",
+			"Name": "Mercedes-AMG Team Landgraf",
+			"Id": 12241
+		},
+		"12242": {
+			"Type": "CarTeam",
+			"Name": "Mercedes-AMG Team HRT",
+			"Id": 12242
+		},
+		"12243": {
+			"Type": "CarTeam",
+			"Name": "Mercedes-AMG Team Winward",
+			"Id": 12243
+		},
+		"12245": {
+			"Type": "CarTeam",
+			"Name": "Manthey EMA",
+			"Id": 12245
+		},
+		"12246": {
+			"Type": "CarTeam",
+			"Name": "Küs Team Bernhard",
+			"Id": 12246
+		},
+		"12257": {
+			"Type": "CarTeam",
+			"Name": "ID Racing",
+			"Id": 12257
+		},
+		"12262": {
+			"Type": "CarTeam",
+			"Name": "Proton Competition",
+			"Id": 12262
+		},
+		"12265": {
+			"Type": "CarTeam",
+			"Name": "Rutronik Racing",
+			"Id": 12265
+		},
+		"12278": {
+			"Type": "CarTeam",
+			"Name": "HRT Performance",
+			"Id": 12278
+		},
+		"12285": {
+			"Type": "CarTeam",
+			"Name": "Mercedes-AMG Team Mann-Filter",
+			"Id": 12285
+		},
+		"12287": {
+			"Type": "CarTeam",
+			"Name": "Team Sportfil Organisation",
+			"Id": 12287
+		},
+		"12288": {
+			"Type": "CarTeam",
+			"Name": "Löhr & Becker Automobile",
+			"Id": 12288
+		},
+		"12293": {
+			"Type": "CarTeam",
+			"Name": "Mühlner Motorsport H&R",
+			"Id": 12293
+		},
+		"12297": {
+			"Type": "CarTeam",
+			"Name": "SebLajoux Racing by DUWO Racing",
+			"Id": 12297
+		},
+		"12300": {
+			"Type": "CarTeam",
+			"Name": "Fach Auto Tech",
+			"Id": 12300
+		},
+		"12307": {
+			"Type": "CarTeam",
+			"Name": "Rabdan Motorsport",
+			"Id": 12307
+		},
+		"12310": {
+			"Type": "CarTeam",
+			"Name": "Laptime-Performance",
+			"Id": 12310
+		},
+		"12315": {
+			"Type": "CarTeam",
+			"Name": "Huber Motorsport",
+			"Id": 12315
 		}
 	}
 }

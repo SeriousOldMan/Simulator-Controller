@@ -808,6 +808,8 @@ class PracticeCenter extends ConfigurationItem {
 		local center := this
 		local centerGui, centerTab, x, y, width, ignore, report, choices, serverURLs, settings, button, control
 		local simulator, car, track
+		local x, x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, xB
+		local w12, w13
 
 		validateNumber(field, *) {
 			field := centerGui[field]
@@ -901,6 +903,16 @@ class PracticeCenter extends ConfigurationItem {
 
 		updateState(*) {
 			center.withExceptionhandler(ObjBindMethod(center, "updateState"))
+		}
+
+		newRun(*) {
+			local lastLap := this.LastLap
+
+			center.withExceptionhandler(ObjBindMethod(center, "newRun", lastLap ? (lastLap.Nr + 1) : 1))
+		}
+
+		importPressures(*) {
+			this.withExceptionhandler(ObjBindMethod(this, "importFromSimulation"))
 		}
 
 		centerGui := PracticeCenter.PracticeCenterWindow(this)
@@ -1057,35 +1069,31 @@ class PracticeCenter extends ConfigurationItem {
 		centerGui.SetFont("Norm", "Arial")
 
 		centerGui.Add("Text", "x" . x . " yp+21 w75 h23 +0x200", translate("New Stint"))
-		centerGui.Add("DropDownList", "x" . x1 . " yp w110 Choose2", collect(["Manual", "Auto"], translate))
+		centerGui.Add("DropDownList", "x" . x1 . " yp w110 Choose2 vrunModeDropDown", collect(["Manual", "Auto"], translate)).OnEvent("Change", updateState)
 
-		centerGui.Add("Text", "x" . x . " yp+24 w75 h23 +0x200", translate("Tyre Change"))
-		centerGui.Add("DropDownList", "x" . x1 . " yp w110 Choose2", collect(["Manual", "Always", "Never"], translate))
+		centerGui.Add("Button", "x" . (x + 28) . " yp+35 w135 h20 vnewRunButton", translate("New Stint")).OnEvent("Click", newRun)
 
 		centerGui.Add("Text", "x" . (x + 8) . " yp+35 w175 0x10")
 
 		centerGui.SetFont("Norm", "Arial")
 		centerGui.SetFont("Italic", "Arial")
 
-		centerGui.Add("Text", "x" . (x + 8) . " yp+10 w175 h23 +0x200 Center", translate("Manual"))
+		centerGui.Add("Text", "x" . (x + 8) . " yp+10 w175 h23 +0x200 Center", translate("Tyres"))
 
 		centerGui.SetFont("Norm", "Arial")
 
-		centerGui.Add("Text", "x" . x . " yp+30 w85 h23 +0x200", translate("Compound"))
+		choices := collect(["No change", "Auto", normalizeCompound("Dry")], translate)
+		chosen := 2
 
-		choices := [translate(normalizeCompound("Dry"))]
-		chosen := 1
+		centerGui.Add("Text", "x" . x . " yp+24 w75 h23 +0x200", translate("Compound"))
+		centerGui.Add("DropDownList", "x" . x1 . " yp w86 Choose" . chosen . " vtyreCompoundDropDown", choices).OnEvent("Change", updateState)
 
-		centerGui.Add("DropDownList", "x" . x1 . " yp w85 Choose" . chosen, choices)
-
-		centerGui.Add("Button", "x" . xb . " yp w23 h23 Center +0x200 vimportPressuresButton") ; .OnEvent("Click", copyPressures)
+		centerGui.Add("Button", "x" . xb . " yp w23 h23 Center +0x200 vimportPressuresButton").OnEvent("Click", importPressures)
 		setButtonIcon(centerGui["importPressuresButton"], kIconsDirectory . "Copy.ico", 1, "")
 
-		centerGui.Add("Text", "x" . x . " yp+24 w75 h20", translate("Tyre Set"))
-		centerGui.Add("Edit", "x" . x1 . " yp w50 h20 Limit2 Number")
+		centerGui.Add("Text", "x" . x . " yp+28 w75 h20", translate("Set"))
+		centerGui.Add("Edit", "x" . x1 . " yp-4 w50 h20 Limit2 Number vtyreSetEdit")
 		centerGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range0-99")
-
-		centerGui.Add("Button", "x" . (x + 8) . " yp+35 w175 h20", translate("New Stint"))
 
 		centerGui.SetFont("Norm", "Arial")
 		centerGui.SetFont("Italic", "Arial")
@@ -1441,6 +1449,46 @@ class PracticeCenter extends ConfigurationItem {
 		window["dataY5DropDown"].Enabled := false
 		window["dataY6DropDown"].Enabled := false
 
+		window["tyreSetEdit"].Enabled := false
+
+		if this.SessionExported {
+			window["planMenuDropDown"].Visible := false
+			window["runMenuDropDown"].Visible := false
+
+			window["runModeDropDown"].Enabled := false
+			window["runModeDropDown"].Choose(0)
+
+			window["newRunButton"].Enabled := false
+
+			window["tyreCompoundDropDown"].Enabled := false
+			window["tyreCompoundDropDown"].Choose(0)
+
+			window["importPressuresButton"].Enabled := false
+		}
+		else {
+			window["planMenuDropDown"].Visible := true
+			window["runMenuDropDown"].Visible := true
+
+			window["runModeDropDown"].Enabled := true
+			if (window["runModeDropDown"].Value = 0)
+				window["runModeDropDown"].Choose(2)
+
+			window["newRunButton"].Enabled := true
+
+			window["tyreCompoundDropDown"].Enabled := true
+			if (window["runModeDropDown"].Value = 0)
+				window["runModeDropDown"].Choose(2)
+
+			window["importPressuresButton"].Enabled := true
+
+			if (window["runModeDropDown"].Value = 1)
+				window["newRunButton"].Enabled := true
+			else {
+				window["importPressuresButton"].Enabled := (window["tyreCompoundDropDown"].Value > 1)
+				window["newRunButton"].Enabled := false
+			}
+		}
+
 		if this.HasData {
 			if inList(["Overview", "Drivers", "Positions", "Lap Times", "Performance", "Consistency", "Pace", "Pressures", "Brakes", "Temperatures", "Free"], this.SelectedReport)
 				window["reportSettingsButton"].Enabled := true
@@ -1575,9 +1623,13 @@ class PracticeCenter extends ConfigurationItem {
 			case 11: ; Session Summary
 				this.showSessionSummary()
 			case 13: ; Session Summary
-				OnMessage(0x44, translateOkButton)
-				MsgBox(translate("Not yet implemented."), translate("Information"), 262192)
-				OnMessage(0x44, translateOkButton, 0)
+				if (this.HasData && !this.SessionExported)
+					this.exportSession()
+				else {
+					OnMessage(0x44, translateOkButton)
+					MsgBox(translate("There is no session data to be exported or the session already been exported."), translate("Information"), 262192)
+					OnMessage(0x44, translateOkButton, 0)
+				}
 		}
 
 		this.updateSessionMenu()
@@ -1588,6 +1640,28 @@ class PracticeCenter extends ConfigurationItem {
 	}
 
 	chooseRunMenu(line) {
+		switch line {
+			case 3: ; Initialize from Simulation
+				if (this.Control["tyreCompoundDropDown"].Value > 1)
+					this.withExceptionhandler(ObjBindMethod(this, "importFromSimulation"))
+				else {
+					OnMessage(0x44, translateOkButton)
+					MsgBox(translate("You must enable tyre change, before importing the current tyre compound from the simulation."), translate("Information"), 262192)
+					OnMessage(0x44, translateOkButton, 0)
+				}
+			case 5: ; New Stint
+				if (this.Control["runModeDropDown"].Value = 1) {
+					local lastLap := this.LastLap
+
+					this.withExceptionhandler(ObjBindMethod(this, "newRun", lastLap ? (lastLap.Nr + 1) : 1))
+				}
+				else {
+					OnMessage(0x44, translateOkButton)
+					MsgBox(translate("You must first set 'New Stint' to Auto."), translate("Information"), 262192)
+					OnMessage(0x44, translateOkButton, 0)
+				}
+		}
+
 		this.updateRunMenu()
 	}
 
@@ -1825,8 +1899,10 @@ class PracticeCenter extends ConfigurationItem {
 			airTemperatures.Push(lap.AirTemperature)
 			trackTemperatures.Push(lap.TrackTemperature)
 
-			if (A_Index == 1)
+			if ((A_Index == 1) && (run.Compound = "-"))
 				run.Compound := lap.Compound
+			else
+				lap.Compound := run.Compound
 
 			weather := lap.Weather
 
@@ -1860,11 +1936,44 @@ class PracticeCenter extends ConfigurationItem {
 											, run.Accidents, run.Potential, run.RaceCraft, run.Speed, run.Consistency, run.CarControl)
 	}
 
-	requireRun(lapNumber) {
-		if !this.CurrentRun
+	requireRun(lapNumber, new := false) {
+		if (new || !this.CurrentRun)
 			this.iCurrentRun := this.createRun(lapNumber)
 
 		return this.CurrentRun
+	}
+
+	newRun(lap, transferLap := false, newTyreSet := true) {
+		local currentRun := this.CurrentRun
+		local newRun
+
+		if (currentRun && (currentRun.Laps.Length = 0)) {
+			this.RunsListView.Delete(currentRun.Row)
+			this.Runs.Delete(currentRun.Nr)
+
+			if (currentRun.Nr > 1)
+				currentRun := this.Runs[currentRun.Nr - 1]
+			else
+				currentRun := false
+
+			this.iCurrentRun := currentRun
+		}
+
+		newRun := this.requireRun(lap, true)
+
+		if currentRun {
+			if transferLap {
+				currentRun.Laps.RemoveAt(currentRun.Laps.Length)
+				newRun.Laps.Push(this.LastLap)
+
+				this.LastLap.Run := newRun
+			}
+
+			if !newTyreSet
+				newRun.TyreLaps := (currentRun.TyreLaps + currentRun.Laps.Length)
+		}
+
+		return newRun
 	}
 
 	createLap(run, lapNumber) {
@@ -1955,8 +2064,9 @@ class PracticeCenter extends ConfigurationItem {
 											   , Nickname: getMultiMapValue(data, "Stint Data", "DriverNickname")
 											   , ID: SessionDatabase.ID})
 
-			lap.Run.Compound := compound(getMultiMapValue(data, "Car Data", "TyreCompound")
-									   , getMultiMapValue(data, "Car Data", "TyreCompoundColor"))
+			if (lap.Run.Compound = "-")
+				lap.Run.Compound := compound(getMultiMapValue(data, "Car Data", "TyreCompound")
+										   , getMultiMapValue(data, "Car Data", "TyreCompoundColor"))
 		}
 
 		damage := 0
@@ -2051,6 +2161,10 @@ class PracticeCenter extends ConfigurationItem {
 		local tyresTable := this.TelemetryDatabase.Database.Tables["Tyres"]
 		local driverID := lap.Run.Driver.ID
 		local telemetry, telemetryData, pressuresData, temperaturesData, wearData, recentLap, tyreLaps
+		local newRun, oldRun
+
+		if (pitstop && (this.Control["runModeDropDown"].Value = 2))
+			this.newRun(lap.Nr, true, (this.Control["tyreCompoundDropDown"].Value > 1))
 
 		if (lap.Pressures = "-,-,-,-")
 			lap.Pressures := pressures
@@ -3913,18 +4027,20 @@ class PracticeCenter extends ConfigurationItem {
 					if this.Runs.Has(newRun) {
 						run := this.Runs[newRun]
 
-						runData := Database.Row("Nr", newRun, "Lap", run.Lap
-											  , "Driver.Forname", run.Driver.Forname, "Driver.Surname", run.Driver.Surname
-											  , "Driver.Nickname", run.Driver.Nickname, "Driver.ID", run.Driver.ID
-											  , "Weather", run.Weather
-											  , "Tyre.Compound", compound(run.Compound), "Tyre.Compound.Color", compoundColor(run.Compound)
-											  , "Tyre.Set", run.TyreSet, "Tyre.Laps", run.TyreLaps
-											  , "Lap.Time.Average", null(run.AvgLaptime), "Lap.Time.Best", null(run.BestLapTime)
-											  , "Fuel.Initial", null(run.FuelInitial), "Fuel.Consumption", null(run.FuelConsumption)
-											  , "Accidents", run.Accidents
-											  , "Time.Start", this.computeStartTime(run), "Time.End", this.computeEndTime(run))
+						if (run.Laps.Length > 0) {
+							runData := Database.Row("Nr", newRun, "Lap", run.Lap
+												  , "Driver.Forname", run.Driver.Forname, "Driver.Surname", run.Driver.Surname
+												  , "Driver.Nickname", run.Driver.Nickname, "Driver.ID", run.Driver.ID
+												  , "Weather", run.Weather
+												  , "Tyre.Compound", compound(run.Compound), "Tyre.Compound.Color", compoundColor(run.Compound)
+												  , "Tyre.Set", run.TyreSet, "Tyre.Laps", run.TyreLaps
+												  , "Lap.Time.Average", null(run.AvgLaptime), "Lap.Time.Best", null(run.BestLapTime)
+												  , "Fuel.Initial", null(run.FuelInitial), "Fuel.Consumption", null(run.FuelConsumption)
+												  , "Accidents", run.Accidents
+												  , "Time.Start", this.computeStartTime(run), "Time.End", this.computeEndTime(run))
 
-						sessionStore.add("Run.Data", runData)
+							sessionStore.add("Run.Data", runData)
+						}
 					}
 
 					newRun += 1

@@ -151,6 +151,7 @@ class PracticeCenter extends ConfigurationItem {
 	iAirTemperature := false
 	iTrackTemperature := false
 
+	iAvailableTyreCompounds := [normalizeCompound("Dry")]
 	iTyreCompounds := [normalizeCompound("Dry")]
 
 	iTyreCompound := false
@@ -169,6 +170,7 @@ class PracticeCenter extends ConfigurationItem {
 	iRunsListView := false
 	iLapsListView := false
 	iTyreCompoundsListView := false
+	iUsedTyreSetsListView := false
 
 	iSessionStore := false
 	iTelemetryDatabase := false
@@ -566,33 +568,15 @@ class PracticeCenter extends ConfigurationItem {
 		}
 	}
 
-	SelectedSimulator {
-		Get {
-			return this.Simulator
-		}
-	}
-
 	Car {
 		Get {
 			return this.iCar
 		}
 	}
 
-	SelectedCar {
-		Get {
-			return this.Car
-		}
-	}
-
 	Track {
 		Get {
 			return this.iTrack
-		}
-	}
-
-	SelectedTrack {
-		Get {
-			return this.Track
 		}
 	}
 
@@ -623,6 +607,12 @@ class PracticeCenter extends ConfigurationItem {
 	TrackTemperature {
 		Get {
 			return this.iTrackTemperature
+		}
+	}
+
+	AvailableTyreCompounds {
+		Get {
+			return this.iAvailableTyreCompounds
 		}
 	}
 
@@ -715,6 +705,12 @@ class PracticeCenter extends ConfigurationItem {
 	TyreCompoundsListView {
 		Get {
 			return this.iTyreCompoundsListView
+		}
+	}
+
+	UsedTyreSetsListView {
+		Get {
+			return this.iUsedTyreSetsListView
 		}
 	}
 
@@ -836,19 +832,19 @@ class PracticeCenter extends ConfigurationItem {
 		}
 
 		chooseSimulator(*) {
-			this.loadSimulator(centerGui["simulatorDropDown"].Text)
+			center.loadSimulator(centerGui["simulatorDropDown"].Text)
 		}
 
 		chooseCar(*) {
-			this.loadCar(this.getAvailableCars(this.SelectedSimulator)[centerGui["carDropDown"].Value])
+			center.loadCar(this.getAvailableCars(this.Simulator)[centerGui["carDropDown"].Value])
 		}
 
 		chooseTrack(*) {
-			local simulator := this.SelectedSimulator
-			local tracks := this.getAvailableTracks(simulator, this.SelectedCar)
+			local simulator := center.Simulator
+			local tracks := center.getAvailableTracks(simulator, center.Car)
 			local trackNames := collect(tracks, ObjBindMethod(SessionDatabase, "getTrackName", simulator))
 
-			this.loadTrack(tracks[inList(trackNames, centerGui["trackDropDown"].Text)])
+			center.loadTrack(tracks[inList(trackNames, centerGui["trackDropDown"].Text)])
 		}
 
 		chooseReport(listView, line, *) {
@@ -913,19 +909,105 @@ class PracticeCenter extends ConfigurationItem {
 		}
 
 		newRun(*) {
-			local lastLap := this.LastLap
+			local lastLap := center.LastLap
 
 			center.withExceptionhandler(ObjBindMethod(center, "newRun", lastLap ? (lastLap.Nr + 1) : 1))
 		}
 
 		importPressures(*) {
-			if this.SelectedSimulator
-				this.withExceptionhandler(ObjBindMethod(this, "importFromSimulation", this.SelectedSimulator))
+			if center.Simulator
+				center.withExceptionhandler(ObjBindMethod(center, "importFromSimulation", center.Simulator))
 			else {
 				OnMessage(0x44, translateOkButton)
 				MsgBox(translate("You must first select a simulation."), translate("Information"), 262192)
 				OnMessage(0x44, translateOkButton, 0)
 			}
+		}
+
+		chooseTyreCompound(listView, line, *) {
+			local compound := listView.GetText(line, 1)
+			local count := listView.GetText(line, 2)
+			local chosen
+
+			if line {
+				if compound
+					compound := normalizeCompound(compound)
+
+				chosen := inList(collect(center.AvailableTyreCompounds, translate), compound)
+
+				centerGui["compoundDropDown"].Choose(chosen)
+				centerGui["compoundCountEdit"].Text := count
+
+				center.updateState()
+			}
+		}
+
+		updateTyreCompoundDropDown() {
+			local selected := centerGui["tyreCompoundDropDown"].Text
+			local compounds := []
+			local choosen := 0
+			local compound
+
+			loop center.TyreCompoundsListView.GetCount() {
+				compound := center.TyreCompoundsListView.GetText(A_Index, 1)
+				compounds.Push(compound)
+
+				if (compound = selected)
+					choosen := A_Index
+			}
+
+			centerGui["tyreCompoundDropDown"].Delete()
+			centerGui["tyreCompoundDropDown"].Add(concatenate(collect(["No change", "Auto"], translate), compounds))
+			centerGui["tyreCompoundDropDown"].Choose(choosen + 2)
+		}
+
+		updateTyreCompound(*) {
+			local row
+
+			row := center.TyreCompoundsListView.GetNext(0)
+
+			if (row > 0) {
+				center.TyreCompoundsListView.Modify(row, ""
+												  , collect(center.TyreCompounds, translate)[centerGui["compoundDropDown"].Value]
+												  , centerGui["compoundCountEdit"].Text)
+
+				center.TyreCompoundsListView.ModifyCol()
+
+				updateTyreCompoundDropDown()
+
+				center.updateState()
+			}
+		}
+
+		addTyreCompound(*) {
+			local index := inList(center.TyreCompounds, normalizeCompound("Dry"))
+			local selected
+
+			if !index
+				index := 1
+
+			center.TyreCompoundsListView.Add("", collect(center.TyreCompounds, translate)[index], 99)
+			center.TyreCompoundsListView.Modify(center.TyreCompoundsListView.GetCount(), "Select Vis")
+
+			center.TyreCompoundsListView.ModifyCol()
+
+			centerGui["compoundDropDown"].Choose(index)
+			centerGui["compoundCountEdit"].Value := 99
+
+			updateTyreCompoundDropDown()
+
+			center.updateState()
+		}
+
+		deleteTyreCompound(*) {
+			local index := center.TyreCompoundsListView.GetNext(0)
+
+			if (index > 0)
+				center.TyreCompoundsListView.Delete(index)
+
+			updateTyreCompoundDropDown()
+
+			center.updateState()
 		}
 
 		centerGui := PracticeCenter.PracticeCenterWindow(this)
@@ -963,8 +1045,8 @@ class PracticeCenter extends ConfigurationItem {
 		simulator := 0
 
 		if (simulators.Length > 0) {
-			if this.SelectedSimulator
-				simulator := inList(simulators, this.SelectedSimulator)
+			if this.Simulator
+				simulator := inList(simulators, this.Simulator)
 
 			if (simulator == 0)
 				simulator := 1
@@ -1081,11 +1163,10 @@ class PracticeCenter extends ConfigurationItem {
 
 		centerGui.SetFont("Norm", "Arial")
 
-		centerGui.Add("Text", "x" . x . " yp+21 w75 h23 +0x200", translate("New Stint"))
+		centerGui.Add("Text", "x" . x . " yp+21 w75 h23 +0x200", translate("Mode"))
 		centerGui.Add("DropDownList", "x" . x1 . " yp w110 Choose2 vrunModeDropDown", collect(["Manual", "Auto"], translate)).OnEvent("Change", updateState)
 
-		centerGui.Add("Button", "x" . (x + 28) . " yp+35 w135 h20 vnewRunButton", translate("New Stint")).OnEvent("Click", newRun)
-
+		/*
 		centerGui.Add("Text", "x" . (x + 8) . " yp+35 w175 0x10")
 
 		centerGui.SetFont("Norm", "Arial")
@@ -1094,6 +1175,7 @@ class PracticeCenter extends ConfigurationItem {
 		centerGui.Add("Text", "x" . (x + 8) . " yp+10 w175 h23 +0x200 Center", translate("Tyres"))
 
 		centerGui.SetFont("Norm", "Arial")
+		*/
 
 		choices := collect(["No change", "Auto", normalizeCompound("Dry")], translate)
 		chosen := 2
@@ -1108,6 +1190,8 @@ class PracticeCenter extends ConfigurationItem {
 		centerGui.Add("Edit", "x" . x1 . " yp-4 w50 h20 Limit2 Number vtyreSetEdit")
 		centerGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range0-99")
 
+		centerGui.Add("Button", "x" . (x + 28) . " ys+155 w135 h20 vnewRunButton", translate("New Stint")).OnEvent("Click", newRun)
+
 		centerGui.SetFont("Norm", "Arial")
 		centerGui.SetFont("Italic", "Arial")
 
@@ -1119,28 +1203,28 @@ class PracticeCenter extends ConfigurationItem {
 
 		w12 := (x11 + 50 - x7)
 
-		this.iTyreCompoundsListView := centerGui.Add("ListView", "x" . x7 . " yp w" . w12 . " h65 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Compound", "#"], translate))
-		; this.iTyreSetListView.OnEvent("Click", chooseTyreSet)
+		this.iTyreCompoundsListView := centerGui.Add("ListView", "x" . x7 . " yp w" . w12 . " h90 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Compound", "#"], translate))
+		this.iTyreCompoundsListView.OnEvent("Click", chooseTyreCompound)
 
 		x13 := (x7 + w12 + 5)
 
-		centerGui.Add("DropDownList", "x" . x13 . " yp w116 Choose0 ", [translate(normalizeCompound("Dry"))]) ; .OnEvent("Change", updateTyreSet)
-		centerGui.Add("Edit", "x" . x13 . " yp+24 w40 h20 Limit2 Number") ; .OnEvent("Change", updateTyreSet)
+		centerGui.Add("DropDownList", "x" . x13 . " yp w116 Choose0 vcompoundDropDown", [translate(normalizeCompound("Dry"))]).OnEvent("Change", updateTyreCompound)
+		centerGui.Add("Edit", "x" . x13 . " yp+24 w40 h20 Limit2 Number vcompoundCountEdit").OnEvent("Change", updateTyreCompound)
 		centerGui.Add("UpDown", "x" . x13 . " yp w18 h20 0x80 Range0-99")
 
 		x13 := (x7 + w12 + 5 + 116 - 48)
 
-		centerGui.Add("Button", "x" . x13 . " yp+18 w23 h23 Center +0x200 vtyreSetAddButton") ; .OnEvent("Click", addTyreSet)
-		setButtonIcon(centerGui["tyreSetAddButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
+		centerGui.Add("Button", "x" . x13 . " yp+18 w23 h23 Center +0x200 vcompoundAddButton").OnEvent("Click", addTyreCompound)
+		setButtonIcon(centerGui["compoundAddButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
 
 		x13 += 25
 
-		centerGui.Add("Button", "x" . x13 . " yp w23 h23 Center +0x200 vtyreSetDeleteButton") ; .OnEvent("Click", deleteTyreSet)
-		setButtonIcon(centerGui["tyreSetDeleteButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
+		centerGui.Add("Button", "x" . x13 . " yp w23 h23 Center +0x200 vcompoundDeleteButton").OnEvent("Click", deleteTyreCompound)
+		setButtonIcon(centerGui["compoundDeleteButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 
-		centerGui.Add("Text", "x" . x5 . " ys+130 w75 h23 +0x200", translate("Used"))
+		centerGui.Add("Text", "x" . x5 . " ys+155 w75 h23 +0x200", translate("Used"))
 
-		this.iTyreSetListView := centerGui.Add("ListView", "x" . x7 . " yp w" . w12 . " h165 H:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Compound", "#", "Laps"], translate))
+		this.iUsedTyreSetsListView := centerGui.Add("ListView", "x" . x7 . " yp w" . w12 . " h140 H:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Compound", "Set", "Laps"], translate))
 
 		centerTab.UseTab(2)
 
@@ -1158,8 +1242,8 @@ class PracticeCenter extends ConfigurationItem {
 
 		centerGui.Add(PracticeCenter.PracticeCenterResizer(centerGui))
 
-		car := this.SelectedCar
-		track := this.SelectedTrack
+		car := this.Car
+		track := this.Track
 
 		this.loadSimulator(simulator, true)
 
@@ -1193,7 +1277,7 @@ class PracticeCenter extends ConfigurationItem {
 	}
 
 	getAvailableSimulators() {
-		return SessionDatabase().getSimulators()
+		return SessionDatabase.getSimulators()
 	}
 
 	getAvailableCars(simulator) {
@@ -1207,7 +1291,7 @@ class PracticeCenter extends ConfigurationItem {
 	loadSimulator(simulator, force := false) {
 		local drivers, ignore, id, index, car, carNames, cars, settings
 
-		if (force || (simulator != this.SelectedSimulator)) {
+		if (force || (simulator != this.Simulator)) {
 			this.iSimulator := simulator
 
 			settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
@@ -1238,7 +1322,7 @@ class PracticeCenter extends ConfigurationItem {
 	loadCar(car, force := false) {
 		local tracks, settings
 
-		if (force || (car != this.SelectedCar)) {
+		if (force || (car != this.Car)) {
 			this.iCar := car
 
 			settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
@@ -1247,11 +1331,11 @@ class PracticeCenter extends ConfigurationItem {
 
 			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 
-			tracks := this.getAvailableTracks(this.SelectedSimulator, car)
+			tracks := this.getAvailableTracks(this.Simulator, car)
 
-			this.Control["carDropDown"].Choose(inList(this.getAvailableCars(this.SelectedSimulator), car))
+			this.Control["carDropDown"].Choose(inList(this.getAvailableCars(this.Simulator), car))
 			this.Control["trackDropDown"].Delete()
-			this.Control["trackDropDown"].Add(collect(tracks, ObjBindMethod(SessionDatabase, "getTrackName", this.SelectedSimulator)))
+			this.Control["trackDropDown"].Add(collect(tracks, ObjBindMethod(SessionDatabase, "getTrackName", this.Simulator)))
 
 			this.loadTrack((tracks.Length > 0) ? tracks[1] : false, true)
 		}
@@ -1260,9 +1344,9 @@ class PracticeCenter extends ConfigurationItem {
 	loadTrack(track, force := false) {
 		local simulator, car, settings
 
-		if (force || (track != this.SelectedTrack)) {
-			simulator := this.SelectedSimulator
-			car := this.SelectedCar
+		if (force || (track != this.Track)) {
+			simulator := this.Simulator
+			car := this.Car
 
 			this.iTrack := track
 
@@ -1280,9 +1364,10 @@ class PracticeCenter extends ConfigurationItem {
 	}
 
 	loadTyreCompounds(simulator, car, track) {
-		local compounds := SessionDatabase().getTyreCompounds(simulator, car, track)
+		local compounds := SessionDatabase.getTyreCompounds(simulator, car, track)
 		local translatedCompounds, choices, index, ignore, compound
 
+		this.iAvailableTyreCompounds := compounds
 		this.iTyreCompounds := compounds
 
 		translatedCompounds := collect(compounds, translate)
@@ -1290,6 +1375,10 @@ class PracticeCenter extends ConfigurationItem {
 		this.Control["tyreCompoundDropDown"].Delete()
 		this.Control["tyreCompoundDropDown"].Add(concatenate(collect(["No change", "Auto"], translate), translatedCompounds))
 		this.Control["tyreCompoundDropDown"].Choose(2)
+
+		this.Control["compoundDropDown"].Delete()
+		this.Control["compoundDropDown"].Add(translatedCompounds)
+		this.Control["compoundDropDown"].Choose(0)
 
 		this.TyreCompoundsListView.Delete()
 
@@ -1398,8 +1487,8 @@ class PracticeCenter extends ConfigurationItem {
 
 		data := readSimulatorData(prefix)
 
-		if ((getMultiMapValue(data, "Session Data", "Car") != this.SelectedCar)
-		 || (getMultiMapValue(data, "Session Data", "Track") != this.SelectedTrack))
+		if ((getMultiMapValue(data, "Session Data", "Car") != this.Car)
+		 || (getMultiMapValue(data, "Session Data", "Track") != this.Track))
 			return
 		else {
 			tyreCompound := getMultiMapValue(data, "Car Data", "TyreCompound", kUndefined)
@@ -1409,7 +1498,7 @@ class PracticeCenter extends ConfigurationItem {
 				tyreCompound := getMultiMapValue(data, "Car Data", "TyreCompoundRaw", kUndefined)
 
 				if (tyreCompound && (tyreCompound != kUndefined)) {
-					tyreCompound := SessionDatabase.getTyreCompoundName(simulator, this.SelectedCar, this.SelectedTrack, tyreCompound, false)
+					tyreCompound := SessionDatabase.getTyreCompoundName(simulator, this.Car, this.Track, tyreCompound, false)
 
 					if tyreCompound
 						splitCompound(tyreCompound, &tyreCompound, &tyreCompoundColor)
@@ -1583,6 +1672,20 @@ class PracticeCenter extends ConfigurationItem {
 			}
 		}
 
+		if (this.TyreCompoundsListView.GetNext(0) > 0) {
+			this.Control["compoundDropDown"].Enabled := true
+			this.Control["compoundCountEdit"].Enabled := true
+			this.Control["compoundDeleteButton"].Enabled := true
+		}
+		else {
+			this.Control["compoundDropDown"].Enabled := false
+			this.Control["compoundCountEdit"].Enabled := false
+			this.Control["compoundDeleteButton"].Enabled := false
+
+			this.Control["compoundDropDown"].Choose(0)
+			this.Control["compoundCountEdit"].Text := ""
+		}
+
 		if this.HasData {
 			if inList(["Overview", "Drivers", "Positions", "Lap Times", "Performance", "Consistency", "Pace", "Pressures", "Brakes", "Temperatures", "Free"], this.SelectedReport)
 				window["reportSettingsButton"].Enabled := true
@@ -1752,7 +1855,7 @@ class PracticeCenter extends ConfigurationItem {
 				}
 				else {
 					OnMessage(0x44, translateOkButton)
-					MsgBox(translate("You must first set 'New Stint' to Auto."), translate("Information"), 262192)
+					MsgBox(translate("You must first set 'Mode' to Auto."), translate("Information"), 262192)
 					OnMessage(0x44, translateOkButton, 0)
 				}
 			case 5:
@@ -1918,8 +2021,8 @@ class PracticeCenter extends ConfigurationItem {
 				this.iTrack := false
 			}
 
-			car := this.SelectedCar
-			track := this.SelectedTrack
+			car := this.Car
+			track := this.Track
 
 			this.loadSimulator(simulator, true)
 
@@ -3762,7 +3865,7 @@ class PracticeCenter extends ConfigurationItem {
 	updateSeriesSelector(report, force := false) {
 		local window := this.Window
 		local xChoices, y1Choices, y2Choices, y3Choices, y4Choices, y5Choices, y6Choices
-		local sessionDB, selected, runs, names, ignore, run, driver
+		local selected, runs, names, ignore, run, driver
 
 		if (force || (report != this.SelectedReport) || (window["dataXDropDown"].Value == 0)) {
 			xChoices := []
@@ -3937,7 +4040,6 @@ class PracticeCenter extends ConfigurationItem {
 				dataY6Choice := inList(y6Choices, "Tyre.Pressure.Hot.Average") + 1
 			}
 
-			sessionDB := SessionDatabase()
 			runs := []
 			selected := false
 

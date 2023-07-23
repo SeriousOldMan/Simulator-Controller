@@ -168,6 +168,7 @@ class PracticeCenter extends ConfigurationItem {
 
 	iRunsListView := false
 	iLapsListView := false
+	iTyreCompoundsListView := false
 
 	iSessionStore := false
 	iTelemetryDatabase := false
@@ -711,6 +712,12 @@ class PracticeCenter extends ConfigurationItem {
 		}
 	}
 
+	TyreCompoundsListView {
+		Get {
+			return this.iTyreCompoundsListView
+		}
+	}
+
 	SessionStore {
 		Get {
 			if !this.iSessionStore
@@ -912,7 +919,13 @@ class PracticeCenter extends ConfigurationItem {
 		}
 
 		importPressures(*) {
-			this.withExceptionhandler(ObjBindMethod(this, "importFromSimulation"))
+			if this.SelectedSimulator
+				this.withExceptionhandler(ObjBindMethod(this, "importFromSimulation", this.SelectedSimulator))
+			else {
+				OnMessage(0x44, translateOkButton)
+				MsgBox(translate("You must first select a simulation."), translate("Information"), 262192)
+				OnMessage(0x44, translateOkButton, 0)
+			}
 		}
 
 		centerGui := PracticeCenter.PracticeCenterWindow(this)
@@ -1106,7 +1119,7 @@ class PracticeCenter extends ConfigurationItem {
 
 		w12 := (x11 + 50 - x7)
 
-		this.iTyreSetListView := centerGui.Add("ListView", "x" . x7 . " yp w" . w12 . " h65 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Compound", "#"], translate))
+		this.iTyreCompoundsListView := centerGui.Add("ListView", "x" . x7 . " yp w" . w12 . " h65 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Compound", "#"], translate))
 		; this.iTyreSetListView.OnEvent("Click", chooseTyreSet)
 
 		x13 := (x7 + w12 + 5)
@@ -1203,7 +1216,11 @@ class PracticeCenter extends ConfigurationItem {
 
 			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 
-			cars := this.getAvailableCars(simulator)
+			if simulator
+				cars := this.getAvailableCars(simulator)
+			else
+				cars := []
+
 			carNames := cars.Clone()
 
 			for index, car in cars
@@ -1256,7 +1273,32 @@ class PracticeCenter extends ConfigurationItem {
 			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 
 			this.Control["trackDropDown"].Choose(inList(this.getAvailableTracks(simulator, car), track))
+
+			if track
+				this.loadTyreCompounds(this.Simulator, this.Car, this.Track)
 		}
+	}
+
+	loadTyreCompounds(simulator, car, track) {
+		local compounds := SessionDatabase().getTyreCompounds(simulator, car, track)
+		local translatedCompounds, choices, index, ignore, compound
+
+		this.iTyreCompounds := compounds
+
+		translatedCompounds := collect(compounds, translate)
+
+		this.Control["tyreCompoundDropDown"].Delete()
+		this.Control["tyreCompoundDropDown"].Add(concatenate(collect(["No change", "Auto"], translate), translatedCompounds))
+		this.Control["tyreCompoundDropDown"].Choose(2)
+
+		this.TyreCompoundsListView.Delete()
+
+		for ignore, compound in compounds
+			this.TyreCompoundsListView.Add("", translate(compound), 99)
+
+		this.TyreCompoundsListView.ModifyCol()
+
+		this.updateState()
 	}
 
 	selectRun(run, force := false) {
@@ -1340,6 +1382,50 @@ class PracticeCenter extends ConfigurationItem {
 			this.Drivers.Push(driver)
 
 		return driver
+	}
+
+	importFromSimulation(simulator) {
+		local prefix := SessionDatabase.getSimulatorCode(simulator)
+		local data, tyreCompound, tyreCompoundColor, tyreSet
+
+		if !prefix {
+			OnMessage(0x44, translateOkButton)
+			MsgBox(translate("This is not supported for the selected simulator..."), translate("Warning"), 262192)
+			OnMessage(0x44, translateOkButton, 0)
+
+			return
+		}
+
+		data := readSimulatorData(prefix)
+
+		if ((getMultiMapValue(data, "Session Data", "Car") != this.SelectedCar)
+		 || (getMultiMapValue(data, "Session Data", "Track") != this.SelectedTrack))
+			return
+		else {
+			tyreCompound := getMultiMapValue(data, "Car Data", "TyreCompound", kUndefined)
+			tyreCompoundColor := getMultiMapValue(data, "Car Data", "TyreCompoundColor", kUndefined)
+
+			if (tyreCompound = kUndefined) {
+				tyreCompound := getMultiMapValue(data, "Car Data", "TyreCompoundRaw", kUndefined)
+
+				if (tyreCompound && (tyreCompound != kUndefined)) {
+					tyreCompound := SessionDatabase.getTyreCompoundName(simulator, this.SelectedCar, this.SelectedTrack, tyreCompound, false)
+
+					if tyreCompound
+						splitCompound(tyreCompound, &tyreCompound, &tyreCompoundColor)
+					else
+						tyreCompound := kUndefined
+				}
+			}
+
+			if ((tyreCompound != kUndefined) && (tyreCompoundColor != kUndefined))
+				this.Control["tyreCompoundDropDown"].Choose(inList(this.TyreCompounds, compound(tyreCompound, tyreCompoundColor)) + 2)
+
+			tyreSet := getMultiMapValue(data, "Car Data", "TyreSet", kUndefined)
+
+			if (tyreSet != kUndefined)
+				this.Control["tyreSetEdit"].Text := tyreSet
+		}
 	}
 
 	getClasses(data) {
@@ -1440,9 +1526,11 @@ class PracticeCenter extends ConfigurationItem {
 	updateState() {
 		local window := this.Window
 
+		/*
 		window["simulatorDropDown"].Enabled := false
 		window["carDropDown"].Enabled := false
 		window["trackDropDown"].Enabled := false
+		*/
 
 		window["runDropDown"].Enabled := false
 		window["driverDropDown"].Enabled := false
@@ -1457,7 +1545,7 @@ class PracticeCenter extends ConfigurationItem {
 
 		window["tyreSetEdit"].Enabled := false
 
-		if this.SessionExported {
+		if (!this.Simulator || this.SessionExported) {
 			window["planMenuDropDown"].Visible := false
 			window["runMenuDropDown"].Visible := false
 
@@ -1504,6 +1592,8 @@ class PracticeCenter extends ConfigurationItem {
 			if inList(["Pressures", "Brakes", "Temperatures", "Free"], this.SelectedReport) {
 				window["chartTypeDropDown"].Enabled := true
 
+				window["runDropDown"].Enabled := true
+				window["driverDropDown"].Enabled := true
 				window["dataXDropDown"].Enabled := true
 				window["dataY1DropDown"].Enabled := true
 				window["dataY2DropDown"].Enabled := true
@@ -1577,7 +1667,7 @@ class PracticeCenter extends ConfigurationItem {
 
 	updateRunMenu() {
 		this.Control["runMenuDropDown"].Delete()
-		this.Control["runMenuDropDown"].Add(collect(["Stints", "---------------------------------------------", "Initialize from Simulation", "---------------------------------------------", "New Stint...", "---------------------------------------------", "Stints Summary"], translate))
+		this.Control["runMenuDropDown"].Add(collect(["Stints", "---------------------------------------------", "New Stint...", "---------------------------------------------", "Stints Summary"], translate))
 
 		this.Control["runMenuDropDown"].Choose(1)
 	}
@@ -1642,20 +1732,19 @@ class PracticeCenter extends ConfigurationItem {
 	}
 
 	choosePlanMenu(line) {
+		switch line {
+			case 3: ; New Stint
+				OnMessage(0x44, translateOkButton)
+				MsgBox(translate("Not yet implemented."), translate("Information"), 262192)
+				OnMessage(0x44, translateOkButton, 0)
+		}
+
 		this.updatePlanMenu()
 	}
 
 	chooseRunMenu(line) {
 		switch line {
-			case 3: ; Initialize from Simulation
-				if (this.Control["tyreCompoundDropDown"].Value > 1)
-					this.withExceptionhandler(ObjBindMethod(this, "importFromSimulation"))
-				else {
-					OnMessage(0x44, translateOkButton)
-					MsgBox(translate("You must enable tyre change, before importing the current tyre compound from the simulation."), translate("Information"), 262192)
-					OnMessage(0x44, translateOkButton, 0)
-				}
-			case 5: ; New Stint
+			case 3: ; New Stint
 				if (this.Control["runModeDropDown"].Value = 1) {
 					local lastLap := this.LastLap
 
@@ -1666,6 +1755,10 @@ class PracticeCenter extends ConfigurationItem {
 					MsgBox(translate("You must first set 'New Stint' to Auto."), translate("Information"), 262192)
 					OnMessage(0x44, translateOkButton, 0)
 				}
+			case 5:
+				OnMessage(0x44, translateOkButton)
+				MsgBox(translate("Not yet implemented."), translate("Information"), 262192)
+				OnMessage(0x44, translateOkButton, 0)
 		}
 
 		this.updateRunMenu()
@@ -1791,9 +1884,7 @@ class PracticeCenter extends ConfigurationItem {
 		this.iSelectedChartType := false
 		this.iSelectedDetailReport := false
 
-		this.iSimulator := false
-		this.iCar := false
-		this.iTrack := false
+		this.initializeSimulator(this.Simulator, this.Car, this.Track, true)
 
 		this.iWeather := false
 		this.iWeather10Min := false
@@ -1813,6 +1904,9 @@ class PracticeCenter extends ConfigurationItem {
 	initializeSimulator(simulator, car, track, force := false) {
 		local row, compound
 
+		if simulator
+			simulator := SessionDatabase.getSimulatorName(simulator)
+
 		if (force || !this.Simulator || (this.Simulator != simulator) || (this.Car != car) || (this.Track != track)) {
 			this.iSimulator := simulator
 			this.iCar := car
@@ -1823,6 +1917,17 @@ class PracticeCenter extends ConfigurationItem {
 				this.iCar := false
 				this.iTrack := false
 			}
+
+			car := this.SelectedCar
+			track := this.SelectedTrack
+
+			this.loadSimulator(simulator, true)
+
+			if car
+				this.loadCar(car)
+
+			if track
+				this.loadTrack(track)
 		}
 	}
 
@@ -1873,8 +1978,6 @@ class PracticeCenter extends ConfigurationItem {
 
 		loop this.RunsListView.GetCount("Col")
 			this.RunsListView.ModifyCol(A_Index, "AutoHdr")
-
-		this.Control["runDropDown"].Add([newRun.Nr])
 
 		return newRun
 	}
@@ -2182,6 +2285,8 @@ class PracticeCenter extends ConfigurationItem {
 		local driverID := lap.Run.Driver.ID
 		local telemetry, telemetryData, pressuresData, temperaturesData, wearData, recentLap, tyreLaps
 		local newRun, oldRun
+
+		this.initializeSimulator(simulator, car, track)
 
 		if (pitstop && (this.Control["runModeDropDown"].Value = 2))
 			this.newRun(lap.Nr, true, (this.Control["tyreCompoundDropDown"].Value > 1))
@@ -4771,6 +4876,25 @@ class PracticeCenter extends ConfigurationItem {
 		this.pushTask(showLapDetailsAsync.Bind(lap))
 	}
 
+	startSession(fileName) {
+		startSessionAsync() {
+			local data := readMultiMap(fileName)
+
+			try {
+				this.initializeSession()
+
+				this.initializeSimulator(SessionDatabase.getSimulatorName(getMultiMapValue(data, "Session Data", "Simulator"))
+									   , getMultiMapValue(data, "Session Data", "Car")
+									   , getMultiMapValue(data, "Session Data", "Track"))
+			}
+			finally {
+				deleteFile(fileName)
+			}
+		}
+
+		this.pushTask(startSessionAsync)
+	}
+
 	updateLap(lapNumber, fileName) {
 		updateLapAsync() {
 			local data := readMultiMap(fileName)
@@ -4918,8 +5042,17 @@ class PracticeCenter extends ConfigurationItem {
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                   Private Function Declaration Section                  ;;;
+;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+readSimulatorData(simulator) {
+	local data := callSimulator(simulator)
+	local setupData := callSimulator(simulator, "Setup=true")
+
+	setMultiMapValues(data, "Setup Data", getMultiMapValues(setupData, "Setup Data"))
+
+	return data
+}
 
 getDeprecatedValue(data, section, newKey, oldKey, default := false) {
 	local value := getMultiMapValue(data, section, newKey, kUndefined)

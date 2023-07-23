@@ -2485,8 +2485,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 					data := readSimulatorData(prefix)
 
-					if ((getMultiMapValue(data, "Session Data", "Car") != this.SelectedCar)
-					 || (getMultiMapValue(data, "Session Data", "Track") != this.SelectedTrack))
+					if ((getMultiMapValue(data, "Session Data", "Car") != car) || (getMultiMapValue(data, "Session Data", "Track") != track))
 						return
 					else {
 						fuelCapacity := getMultiMapValue(data, "Session Data", "FuelAmount", kUndefined)

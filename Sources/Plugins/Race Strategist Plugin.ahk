@@ -221,6 +221,21 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 			this.startSession(settings, data)
 	}
 
+	prepareSession(settings, data) {
+		local pid := ProcessExist("Practice Center.exe")
+		local dataFile
+
+		super.prepareSession(settings, data)
+
+		if pid {
+			dataFile := (kTempDirectory . "Practice Lap 0.0.data")
+
+			writeMultiMap(dataFile, data)
+
+			messageSend(kFileMessage, "Practice", "startSession:" . dataFile, pid)
+		}
+	}
+
 	addLap(lap, running, data) {
 		local teamServer := this.TeamServer
 		local pid := ProcessExist("Practice Center.exe")

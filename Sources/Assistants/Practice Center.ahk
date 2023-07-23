@@ -868,7 +868,7 @@ class PracticeCenter extends ConfigurationItem {
 
 		chooseDriverData(*) {
 			center.withExceptionHandler(ObjBindMethod(center, "selectDriver"
-									  , (centerGui["driverDropDown"].Value = 1) ? false : center.Runs[centerGui["driverDropDown"].Value - 1]))
+									  , (centerGui["driverDropDown"].Value = 1) ? false : center.Drivers[centerGui["driverDropDown"].Value - 1]))
 		}
 
 		chooseAxis(*) {
@@ -1303,11 +1303,8 @@ class PracticeCenter extends ConfigurationItem {
 				found := candidate
 
 			if found {
-				if driver.ID {
+				if (driver.ID && !found.ID) {
 					found.ID := driver.ID
-
-					if !inList(this.iDrivers, driver.ID)
-						this.iDrivers.Push(driver.ID)
 
 					if this.Simulator
 						SessionDatabase.registerDriver(this.Simulator, driver.ID, found.FullName)
@@ -1324,14 +1321,23 @@ class PracticeCenter extends ConfigurationItem {
 		driver.Penalties := 0
 
 		if driver.ID {
-			if !inList(this.iDrivers, driver.ID)
-				this.iDrivers.Push(driver.ID)
+			found := false
+
+			for ignore, candidate in this.Drivers
+				if (driver.ID = candidate.ID) {
+					found := true
+
+					break
+				}
+
+			if !found
+				this.Drivers.Push(driver)
 
 			if this.Simulator
 				SessionDatabase.registerDriver(this.Simulator, driver.ID, driver.FullName)
 		}
-
-		this.Drivers.Push(driver)
+		else
+			this.Drivers.Push(driver)
 
 		return driver
 	}
@@ -1731,7 +1737,7 @@ class PracticeCenter extends ConfigurationItem {
 	initializeSession() {
 		local directory, reportDirectory
 
-		if (this.SessionMode = "Active") {
+		if (!this.SessionMode || (this.SessionMode = "Active")) {
 			directory := this.SessionDirectory
 
 			deleteDirectory(directory)
@@ -1745,6 +1751,14 @@ class PracticeCenter extends ConfigurationItem {
 			DirCreate(reportDirectory)
 
 			this.ReportViewer.setReport(reportDirectory)
+		}
+		else {
+			this.iSessionMode := false
+			this.iSessionLoaded := false
+
+			this.initializeSession()
+
+			return
 		}
 
 		this.RunsListView.Delete()
@@ -2048,7 +2062,7 @@ class PracticeCenter extends ConfigurationItem {
 		local lap := this.requireLap(lapNumber)
 		local selectedLap := this.LapsListView.GetNext()
 		local selectedRun := this.RunsListView.GetNext()
-		local damage, pLap, fuelConsumption, car
+		local damage, pLap, fuelConsumption, car, tyreSet
 
 		if selectedLap
 			selectedLap := (selectedLap == this.LapsListView.GetCount())
@@ -2064,9 +2078,15 @@ class PracticeCenter extends ConfigurationItem {
 											   , Nickname: getMultiMapValue(data, "Stint Data", "DriverNickname")
 											   , ID: SessionDatabase.ID})
 
-			if (lap.Run.Compound = "-")
+			if (lap.Run.Compound = "-") {
 				lap.Run.Compound := compound(getMultiMapValue(data, "Car Data", "TyreCompound")
 										   , getMultiMapValue(data, "Car Data", "TyreCompoundColor"))
+
+				tyreSet := getMultiMapValue(data, "Car Data", "TyreSet", kUndefined)
+
+				if (tyreSet != kUndefined)
+					lap.Run.TyreSet := tyreSet
+			}
 		}
 
 		damage := 0
@@ -3637,7 +3657,7 @@ class PracticeCenter extends ConfigurationItem {
 	updateSeriesSelector(report, force := false) {
 		local window := this.Window
 		local xChoices, y1Choices, y2Choices, y3Choices, y4Choices, y5Choices, y6Choices
-		local sessionDB, selected, runs, ignore, run
+		local sessionDB, selected, runs, names, ignore, run, driver
 
 		if (force || (report != this.SelectedReport) || (window["dataXDropDown"].Value == 0)) {
 			xChoices := []
@@ -3828,8 +3848,13 @@ class PracticeCenter extends ConfigurationItem {
 			window["runDropDown"].Add(concatenate([translate("All")], runs))
 			window["runDropDown"].Choose(selected + 1)
 
+			names := [translate("All")]
+
+			for ignore, driver in this.Drivers
+				names.Push(driver.Fullname)
+
 			window["driverDropDown"].Delete()
-			window["driverDropDown"].Add(concatenate([translate("All")], this.Drivers))
+			window["driverDropDown"].Add(names)
 			window["driverDropDown"].Choose(((this.SelectedDrivers && (this.SelectedDrivers.Length > 0)) ? inList(this.Drivers, this.SelectedDrivers[1]) : 0) + 1)
 
 			window["dataXDropDown"].Choose(dataXChoice)
@@ -3872,7 +3897,7 @@ class PracticeCenter extends ConfigurationItem {
 
 				lap := this.Laps[newLap]
 
-				if ((pressuresTable.Length < newLap) || (tyresTable.Length < newLap))
+				if ((pressuresTable.Length < newLap) || (tyresTable.Length < newLap) || !lap.HasProp("TelemetryData"))
 					return
 
 				lapData := Database.Row("Nr", newLap, "Lap", newLap, "Run", lap.Run.Nr, "Lap.Time", null(lap.Laptime), "Position", null(lap.Position)

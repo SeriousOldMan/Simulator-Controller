@@ -40,8 +40,6 @@ class RaceStrategist extends GridRaceAssistant {
 
 	iUseTraffic := false
 
-	iWasPitstop := false
-
 	iSaveTelemetry := kAlways
 	iSaveRaceReport := false
 	iRaceReview := false
@@ -725,9 +723,6 @@ class RaceStrategist extends GridRaceAssistant {
 
 		if values.HasProp("RaceInfo")
 			this.iRaceInfo := values.RaceInfo
-
-		if (values.HasProp("Session") && (values.Session == kSessionFinished))
-			this.iWasPitstop := false
 	}
 
 	updateDynamicValues(values) {
@@ -1590,7 +1585,7 @@ class RaceStrategist extends GridRaceAssistant {
 		local knowledgeBase, compound, result, lap, simulator, car, track, frequency, curContinuation
 		local pitstop, prefix, validLap, lapState, weather, airTemperature, trackTemperature, compound, compoundColor
 		local fuelConsumption, fuelRemaining, lapTime, map, tc, antiBS, pressures, temperatures, wear, multiClass
-		local sessionInfo, driverCar, lastTime
+		local sessionInfo, driverCar, driverID, lastTime
 
 		static lastLap := 0
 
@@ -1651,10 +1646,6 @@ class RaceStrategist extends GridRaceAssistant {
 		driverCar := knowledgeBase.getValue("Driver.Car", 0)
 		validLap := true
 
-		if (driverCar && this.hasEnoughData(false))
-			this.iWasPitstop := (this.iWasPitstop || knowledgeBase.getValue("Car." . driverCar . ".InPitLane", false)
-												  || knowledgeBase.getValue("Car." . driverCar . ".InPit", false))
-
 		loop knowledgeBase.getValue("Car.Count") {
 			lap := knowledgeBase.getValue("Car." . A_Index . ".Laps", knowledgeBase.getValue("Car." . A_Index . ".Lap", 0))
 
@@ -1683,12 +1674,16 @@ class RaceStrategist extends GridRaceAssistant {
 				pitstop := (Abs(lapNumber - knowledgeBase.getValue("Pitstop." . pitstop . ".Lap")) <= 2)
 		}
 		else {
-			pitstop := this.iWasPitstop
+			pitstop := false
+			driverID := knowledgeBase.getValue("Car." . driverCar . ".ID", kUndefined)
+
+			if (driverID != kUndefined)
+				for index, pitstop in this.Pitstops[driverID]
+					if (pitstop.Lap = lapNumber)
+						pitstop := true
 
 			if pitstop
 				this.updateDynamicValues({EnoughData: false})
-
-			this.iWasPitstop := false
 		}
 
 		if this.collectTelemetryData() {
@@ -3360,7 +3355,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 	saveStandingsData(lapNumber, simulator, car, track) {
 		local knowledgeBase := this.KnowledgeBase
-		local driver, carCount, data, raceInfo, slots, grid, carNr, carID, key, fileName, slotsString
+		local driver, driverID, carCount, data, raceInfo, slots, grid, carNr, carID, key, fileName, slotsString
 		local data, pitstop, pitstops, prefix, times, positions, drivers, laps, carPrefix, carIndex
 		local driverForname, driverSurname, driverNickname, driverCategory, carCar, carCategory
 
@@ -3458,17 +3453,29 @@ class RaceStrategist extends GridRaceAssistant {
 
 			data := newMultiMap()
 
-			pitstop := knowledgeBase.getValue("Pitstop.Last", false)
+			if (this.Session = kSessionRace) {
+				pitstop := knowledgeBase.getValue("Pitstop.Last", false)
 
-			if pitstop {
-				pitstops := []
+				if pitstop {
+					pitstops := []
 
-				loop pitstop
-					pitstops.Push(knowledgeBase.getValue("Pitstop." . A_Index . ".Lap"))
+					loop pitstop
+						pitstops.Push(knowledgeBase.getValue("Pitstop." . A_Index . ".Lap"))
 
-				setMultiMapValue(data, "Pitstop", "Laps", values2String(",", pitstops*))
+					setMultiMapValue(data, "Pitstop", "Laps", values2String(",", pitstops*))
 
-				pitstop := (lapNumber == (knowledgeBase.getValue("Pitstop." . pitstop . ".Lap") + 1))
+					pitstop := (lapNumber == (knowledgeBase.getValue("Pitstop." . pitstop . ".Lap") + 1))
+				}
+			}
+			else {
+				pitstop := false
+
+				driverID := knowledgeBase.getValue("Car." . driver . ".ID", kUndefined)
+
+				if (driverID != kUndefined)
+					for index, pitstop in this.Pitstops[driverID]
+						if (pitstop.Lap = lapNumber)
+							pitstop := true
 			}
 
 			prefix := "Lap." . lapNumber

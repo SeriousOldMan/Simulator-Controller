@@ -850,10 +850,14 @@ class PracticeCenter extends ConfigurationItem {
 
 		chooseSimulator(*) {
 			center.loadSimulator(centerGui["simulatorDropDown"].Text)
+
+			center.initializeSession()
 		}
 
 		chooseCar(*) {
 			center.loadCar(this.getAvailableCars(this.Simulator)[centerGui["carDropDown"].Value])
+
+			center.initializeSession()
 		}
 
 		chooseTrack(*) {
@@ -862,6 +866,8 @@ class PracticeCenter extends ConfigurationItem {
 			local trackNames := collect(tracks, ObjBindMethod(SessionDatabase, "getTrackName", simulator))
 
 			center.loadTrack(tracks[inList(trackNames, centerGui["trackDropDown"].Text)])
+
+			center.initializeSession()
 		}
 
 		chooseReport(listView, line, *) {
@@ -912,13 +918,33 @@ class PracticeCenter extends ConfigurationItem {
 		}
 
 		chooseRun(listView, line, *) {
-			if line
-				center.withExceptionhandler(ObjBindMethod(center, "showRunDetails", center.Runs[listView.GetText(line, 1)]))
+			local run
+
+			if line {
+				run := center.Runs[listView.GetText(line, 1)]
+
+				if center.SessionExported
+					listView.Modify(line, "-Check")
+				else if (listView.GetNext(line - 1, "C") = line) {
+					for ignore, lap in run.Laps
+						if (lap.State = "Valid")
+							center.LapsListView.Modify(lap.Row, "Check")
+				}
+				else
+					for ignore, lap in run.Laps
+						center.LapsListView.Modify(lap.Row, "-Check")
+
+				center.withExceptionhandler(ObjBindMethod(center, "showRunDetails", run))
+			}
 		}
 
 		chooseLap(listView, line, *) {
-			if line
+			if line {
+				if center.SessionExported
+					listView.Modify(line, "-Check")
+
 				center.withExceptionhandler(ObjBindMethod(center, "showLapDetails", center.Laps[listView.GetText(line, 1)]))
+			}
 		}
 
 		updateState(*) {
@@ -1657,12 +1683,6 @@ class PracticeCenter extends ConfigurationItem {
 	updateState() {
 		local window := this.Window
 
-		/*
-		window["simulatorDropDown"].Enabled := false
-		window["carDropDown"].Enabled := false
-		window["trackDropDown"].Enabled := false
-		*/
-
 		window["runDropDown"].Enabled := false
 		window["driverDropDown"].Enabled := false
 
@@ -1716,7 +1736,7 @@ class PracticeCenter extends ConfigurationItem {
 
 		this.Control["compoundAddButton"].Enabled := (this.AvailableTyreCompounds.Length > this.TyreCompoundsListView.GetCount())
 
-		if (this.TyreCompoundsListView.GetNext(0) > 0) {
+		if ((this.TyreCompoundsListView.GetNext(0) > 0) && !this.SessionExported) {
 			this.Control["compoundDropDown"].Enabled := true
 			this.Control["compoundCountEdit"].Enabled := true
 			this.Control["compoundDeleteButton"].Enabled := true
@@ -1825,8 +1845,6 @@ class PracticeCenter extends ConfigurationItem {
 		switch line {
 			case 3: ; Clear...
 				if (this.SessionMode = "Active") {
-					title :=
-
 					OnMessage(0x44, translateYesNoButtons)
 					msgResult := MsgBox(translate("Do you really want to delete all data from the currently active session? This cannot be undone."), translate("Delete"), 262436)
 					OnMessage(0x44, translateYesNoButtons, 0)
@@ -1866,8 +1884,14 @@ class PracticeCenter extends ConfigurationItem {
 			case 11: ; Session Summary
 				this.showSessionSummary()
 			case 13: ; Session Summary
-				if (this.HasData && !this.SessionExported)
-					this.exportSession()
+				if (this.HasData && !this.SessionExported) {
+					OnMessage(0x44, translateYesNoButtons)
+					msgResult := MsgBox(translate("Do you want to transfer the selected laps to the session database? This is only possible once."), translate("Delete"), 262436)
+					OnMessage(0x44, translateYesNoButtons, 0)
+
+					if (msgResult = "Yes")
+						this.exportSession()
+				}
 				else {
 					OnMessage(0x44, translateOkButton)
 					MsgBox(translate("There is no session data to be exported or the session already been exported."), translate("Information"), 262192)
@@ -2013,6 +2037,7 @@ class PracticeCenter extends ConfigurationItem {
 		this.iSession := session
 		this.iSessionMode := false
 		this.iSessionLoaded := false
+		this.iSessionExported := false
 
 		this.Control["runDropDown"].Delete()
 		this.Control["runDropDown"].Add([translate("All")])
@@ -2701,24 +2726,23 @@ class PracticeCenter extends ConfigurationItem {
 	exportSession() {
 		local telemetryDB := TelemetryDatabase(this.Simulator, this.Car, this.Track)
 		local tyresDB := TyresDatabase()
-		local sessionStore := this.SessionStore
 		local row := 0
 		local locked := false
 		local lap, driver, telemetryData, pressures, temperatures, wear, pressuresData, info
 
 		try {
 			while (row := this.LapsListView.GetNext(row, "C")) {
-				lap := sessionStore.query("Lap.Data", {Where: {Lap: this.LapsListView.GetText(row, 1)}})
+				lap := this.LapsListView.GetText(row, 1)
+				lap := (this.Laps.Has(lap) ? this.Laps[lap] : false)
 
-				if (lap.Length > 0) {
-					lap := lap[1]
+				if lap {
 					driver := lap.Run.Driver.ID
 
 					telemetryData := string2Values("|||", lap.TelemetryData)
 
 					telemetryDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15]
-													   , telemetryData[11], telemetryData[12], telemetryData[13], telemetryData[7], telemetryData[8], telemetryData[9]
-													   , driver)
+												 , telemetryData[11], telemetryData[12], telemetryData[13], telemetryData[7], telemetryData[8], telemetryData[9]
+												 , driver)
 
 					pressures := string2Values(",", telemetryData[17])
 					temperatures := string2Values(",", telemetryData[18])
@@ -2745,7 +2769,7 @@ class PracticeCenter extends ConfigurationItem {
 											  , pressuresData[4], pressuresData[5], pressuresData[6]
 											  , pressuresData[7], pressuresData[8]
 											  , string2Values(",", pressuresData[9]), string2Values(",", pressuresData[10])
-											  , true, driver)
+											  , false, driver)
 				}
 			}
 		}
@@ -2768,6 +2792,8 @@ class PracticeCenter extends ConfigurationItem {
 
 			writeMultiMap(this.SessionLoaded . "Practice.info", info)
 		}
+
+		this.updateState()
 	}
 
 	updateReports(redraw := false) {

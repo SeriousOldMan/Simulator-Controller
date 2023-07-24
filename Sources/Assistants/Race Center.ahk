@@ -4287,8 +4287,6 @@ class RaceCenter extends ConfigurationItem {
 				this.connect()
 			case 4: ; Clear...
 				if this.SessionActive {
-					title :=
-
 					OnMessage(0x44, translateYesNoButtons)
 					msgResult := MsgBox(translate("Do you really want to delete all data from the currently active session? This can take quite a while..."), translate("Delete"), 262436)
 					OnMessage(0x44, translateYesNoButtons, 0)

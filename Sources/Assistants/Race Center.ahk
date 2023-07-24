@@ -10054,7 +10054,7 @@ class RaceCenter extends ConfigurationItem {
 		local ignore, lap, time, theMin, avg, theMax, delta, window, consistency, time, title
 
 		for ignore, lap in laps {
-			if (A_Index > 1) {
+			if ((laps.Length = 1) || (A_Index > 1)) {
 				time := lapTimes[A_Index]
 
 				if isNumber(time) {
@@ -10112,7 +10112,7 @@ class RaceCenter extends ConfigurationItem {
 		local fuelConsumptionData := []
 		local accidentData := []
 		local penaltyData := []
-		local ignore, lap, fuelConsumption
+		local ignore, lap, fuelConsumption, penalty
 
 		html .= ("<tr><td><b>" . translate("Average:") . "</b></td><td>" . lapTimeDisplayValue(stint.AvgLapTime) . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Best:") . "</b></td><td>" . lapTimeDisplayValue(stint.BestLapTime) . "</td></tr>")
@@ -10237,7 +10237,7 @@ class RaceCenter extends ConfigurationItem {
 		local pressuresLosses := "-, -, -, -"
 		local hasColdPressures := false
 		local pressuresDB := this.PressuresDatabase
-		local pressuresTable, pressures, coldPressures, hotPressures, pressuresLosses, tyresTable, tyres
+		local pressuresTable, pressures, coldPressures, hotPressures, tyresTable, tyres
 		local fuel, tyreCompound, tyreCompoundColor, tyreSet, tyrePressures, pressureCorrections, pressure
 		local fuelConsumption, remainingFuel, remainingDriverTime, remainingStintTime
 
@@ -11413,7 +11413,7 @@ class RaceCenter extends ConfigurationItem {
 
 		html .= "</table>"
 
-		html .= ("<br><br><div id=`"header`"><i>" . translate("Race Course") . "</i></div>")
+		html .= ("<br><br><div id=`"header`"><i>" . translate("Summary") . "</i></div>")
 
 		laps := []
 		positions := []

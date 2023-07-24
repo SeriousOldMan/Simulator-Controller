@@ -574,7 +574,7 @@ launchPad(command := false, arguments*) {
 
 		icons["Startup"] := kIconsDirectory . "Startup.ico"
 		icons["RaceReports"] := kIconsDirectory . "Chart.ico"
-		icons["StrategyWorkbench"] := kIconsDirectory . "Dashboard.ico"
+		icons["StrategyWorkbench"] := kIconsDirectory . "Workbench.ico"
 		icons["PracticeCenter"] := kIconsDirectory . "Practice.ico"
 		icons["RaceCenter"] := kIconsDirectory . "Console.ico"
 		icons["ServerAdministration"] := kIconsDirectory . "Server Administration.ico"
@@ -625,7 +625,7 @@ launchPad(command := false, arguments*) {
 		launchPadGui.Add("Picture", "xp+74 yp w60 h60 vSessionDatabase", kIconsDirectory . "Session Database.ico").OnEvent("Click", launchApplication.Bind("SessionDatabase"))
 
 		launchPadGui.Add("Picture", "xp+90 yp w60 h60 vPracticeCenter", kIconsDirectory . "Practice.ico").OnEvent("Click", launchApplication.Bind("PracticeCenter"))
-		launchPadGui.Add("Picture", "xp+74 yp w60 h60 vStrategyWorkbench", kIconsDirectory . "Dashboard.ico").OnEvent("Click", launchApplication.Bind("StrategyWorkbench"))
+		launchPadGui.Add("Picture", "xp+74 yp w60 h60 vStrategyWorkbench", kIconsDirectory . "Workbench.ico").OnEvent("Click", launchApplication.Bind("StrategyWorkbench"))
 
 		launchPadGui.Add("Picture", "xp+74 yp w60 h60 vRaceCenter", kIconsDirectory . "Console.ico").OnEvent("Click", launchApplication.Bind("RaceCenter"))
 

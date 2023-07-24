@@ -57,9 +57,9 @@ global kSessionDataSchemas := CaseInsenseMap("Run.Data", ["Nr", "Lap", "Driver.F
 													    , "Weather", "Tyre.Compound", "Tyre.Compound.Color", "Tyre.Set", "Tyre.Laps"
 														, "Lap.Time.Average", "Lap.Time.Best"
 														, "Fuel.Initial", "Fuel.Consumption", "Accidents"
-													    , "Time.Start", "Time.End"]
+														, "Position.Start", "Position.End", "Time.Start", "Time.End"]
 										   , "Driver.Data", ["Forname", "Surname", "Nickname", "ID"]
-										   , "Lap.Data", ["Run", "Nr", "Lap", "Lap.Time", "Lap.State", "Lap.Valid", "Grip", "Map", "TC", "ABS"
+										   , "Lap.Data", ["Run", "Nr", "Lap", "Position", "Lap.Time", "Lap.State", "Lap.Valid", "Grip", "Map", "TC", "ABS"
 														, "Weather", "Temperature.Air", "Temperature.Track"
 														, "Fuel.Initial", "Fuel.Remaining", "Fuel.Consumption", "Damage", "EngineDamage", "Accident"
 														, "Tyre.Laps", "Tyre.Compound", "Tyre.Compound.Color"
@@ -83,7 +83,9 @@ global kSessionDataSchemas := CaseInsenseMap("Run.Data", ["Nr", "Lap", "Driver.F
 														, "Brake.Wear.Average", "Brake.Wear.Front.Average", "Brake.Wear.Rear.Average"
 														, "Brake.Wear.Front.Left", "Brake.Wear.Front.Right"
 														, "Brake.Wear.Rear.Left", "Brake.Wear.Rear.Right"
-														, "Data.Telemetry", "Data.Pressures"])
+														, "Data.Telemetry", "Data.Pressures"]
+										   , "Delta.Data", ["Lap", "Car", "Type", "Delta", "Distance", "ID"]
+										   , "Standings.Data", ["Lap", "Car", "Driver", "Position", "Time", "Laps", "Delta", "ID", "Category"])
 
 global kPCTyresSchemas := kTyresSchemas.Clone()
 
@@ -142,6 +144,7 @@ class PracticeCenter extends ConfigurationItem {
 
 	iDate := A_Now
 
+	iSession := "Practice"
 	iSimulator := false
 	iCar := false
 	iTrack := false
@@ -153,6 +156,8 @@ class PracticeCenter extends ConfigurationItem {
 
 	iAvailableTyreCompounds := [normalizeCompound("Dry")]
 	iTyreCompounds := [normalizeCompound("Dry")]
+
+	iTyreSets := WeakMap()
 
 	iTyreCompound := false
 	iTyreCompoundColor := false
@@ -184,7 +189,7 @@ class PracticeCenter extends ConfigurationItem {
 	iSelectedChartType := false
 
 	iSelectedRun := false
-	iSelectedDrivers := []
+	iSelectedDrivers := false
 
 	iSelectedDetailReport := false
 	iSelectedDetailHTML := false
@@ -562,6 +567,12 @@ class PracticeCenter extends ConfigurationItem {
 		}
 	}
 
+	Session {
+		Get {
+			return this.iSession
+		}
+	}
+
 	Simulator {
 		Get {
 			return this.iSimulator
@@ -619,6 +630,12 @@ class PracticeCenter extends ConfigurationItem {
 	TyreCompounds[key?] {
 		Get {
 			return (isSet(key) ? this.iTyreCompounds[key] : this.iTyreCompounds)
+		}
+	}
+
+	TyreSets[key?] {
+		Get {
+			return (isSet(key) ? this.iTyreSets[key] : this.iTyreSets)
 		}
 	}
 
@@ -937,9 +954,9 @@ class PracticeCenter extends ConfigurationItem {
 
 				centerGui["compoundDropDown"].Choose(chosen)
 				centerGui["compoundCountEdit"].Text := count
-
-				center.updateState()
 			}
+
+			center.updateState()
 		}
 
 		updateTyreCompoundDropDown() {
@@ -959,17 +976,34 @@ class PracticeCenter extends ConfigurationItem {
 			centerGui["tyreCompoundDropDown"].Delete()
 			centerGui["tyreCompoundDropDown"].Add(concatenate(collect(["No change", "Auto"], translate), compounds))
 			centerGui["tyreCompoundDropDown"].Choose(choosen + 2)
+
+			center.updateState()
 		}
 
 		updateTyreCompound(*) {
-			local row
-
-			row := center.TyreCompoundsListView.GetNext(0)
+			local row := center.TyreCompoundsListView.GetNext(0)
+			local availableCompounds, compound, usedCompounds, index, candidate
 
 			if (row > 0) {
-				center.TyreCompoundsListView.Modify(row, ""
-												  , collect(center.TyreCompounds, translate)[centerGui["compoundDropDown"].Value]
-												  , centerGui["compoundCountEdit"].Text)
+				availableCompounds := collect(center.AvailableTyreCompounds, translate)
+				compound := availableCompounds[centerGui["compoundDropDown"].Value]
+				usedCompounds := []
+
+				loop center.TyreCompoundsListView.GetCount()
+					if (A_Index != row)
+						usedCompounds.Push(center.TyreCompoundsListView.GetText(A_Index, 1))
+
+				if inList(usedCompounds, compound)
+					for index, candidate in availableCompounds
+						if !inList(usedCompounds, candidate) {
+							compound := candidate
+
+							centerGui["compoundDropDown"].Choose(index)
+
+							break
+						}
+
+				center.TyreCompoundsListView.Modify(row, "", compound, centerGui["compoundCountEdit"].Text)
 
 				center.TyreCompoundsListView.ModifyCol()
 
@@ -980,11 +1014,18 @@ class PracticeCenter extends ConfigurationItem {
 		}
 
 		addTyreCompound(*) {
-			local index := inList(center.TyreCompounds, normalizeCompound("Dry"))
-			local selected
+			local usedCompounds := []
+			local index, ignore, candidate
 
-			if !index
-				index := 1
+			loop center.TyreCompoundsListView.GetCount()
+				usedCompounds.Push(center.TyreCompoundsListView.GetText(A_Index, 1))
+
+			for ignore, candidate in center.AvailableTyreCompounds
+				if !inList(usedCompounds, translate(candidate)) {
+					index := A_Index
+
+					break
+				}
 
 			center.TyreCompoundsListView.Add("", collect(center.TyreCompounds, translate)[index], 99)
 			center.TyreCompoundsListView.Modify(center.TyreCompoundsListView.GetCount(), "Select Vis")
@@ -1224,7 +1265,9 @@ class PracticeCenter extends ConfigurationItem {
 
 		centerGui.Add("Text", "x" . x5 . " ys+155 w75 h23 +0x200", translate("Used"))
 
-		this.iUsedTyreSetsListView := centerGui.Add("ListView", "x" . x7 . " yp w" . w12 . " h140 H:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Compound", "Set", "Laps"], translate))
+		w13 := (x13 + 23 - x7)
+
+		this.iUsedTyreSetsListView := centerGui.Add("ListView", "x" . x7 . " yp w" . w13 . " h140 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Compound", "Set", "Laps"], translate))
 
 		centerTab.UseTab(2)
 
@@ -1392,7 +1435,7 @@ class PracticeCenter extends ConfigurationItem {
 
 	selectRun(run, force := false) {
 		if (force || (run != this.SelectedRun)) {
-			this.Control["runDropDown"].Choose(run + 1)
+			this.Control["runDropDown"].Choose(run ? (run.Nr + 1) : 1)
 
 			this.iSelectedRun := run
 
@@ -1449,7 +1492,6 @@ class PracticeCenter extends ConfigurationItem {
 		driver.Laps := []
 		driver.Runs := []
 		driver.Accidents := 0
-		driver.Penalties := 0
 
 		if driver.ID {
 			found := false
@@ -1671,6 +1713,8 @@ class PracticeCenter extends ConfigurationItem {
 				window["newRunButton"].Enabled := false
 			}
 		}
+
+		this.Control["compoundAddButton"].Enabled := (this.AvailableTyreCompounds.Length > this.TyreCompoundsListView.GetCount())
 
 		if (this.TyreCompoundsListView.GetNext(0) > 0) {
 			this.Control["compoundDropDown"].Enabled := true
@@ -1930,7 +1974,7 @@ class PracticeCenter extends ConfigurationItem {
 		return (this.iWorking > 0)
 	}
 
-	initializeSession() {
+	initializeSession(session := "Practice") {
 		local directory, reportDirectory
 
 		if (!this.SessionMode || (this.SessionMode = "Active")) {
@@ -1952,14 +1996,21 @@ class PracticeCenter extends ConfigurationItem {
 			this.iSessionMode := false
 			this.iSessionLoaded := false
 
-			this.initializeSession()
+			this.initializeSession(session)
 
 			return
 		}
 
+		this.iAvailableTyreCompounds := [normalizeCompound("Dry")]
+		this.iTyreCompounds := [normalizeCompound("Dry")]
+		this.iTyreSets := WeakMap()
+
 		this.RunsListView.Delete()
 		this.LapsListView.Delete()
+		this.TyreCompoundsListView.Delete()
+		this.UsedTyreSetsListView.Delete()
 
+		this.iSession := session
 		this.iSessionMode := false
 		this.iSessionLoaded := false
 
@@ -1986,6 +2037,9 @@ class PracticeCenter extends ConfigurationItem {
 		this.iSelectedReport := false
 		this.iSelectedChartType := false
 		this.iSelectedDetailReport := false
+
+		this.iSelectedRun := false
+		this.iSelectedDrivers := false
 
 		this.initializeSimulator(this.Simulator, this.Car, this.Track, true)
 
@@ -2065,11 +2119,36 @@ class PracticeCenter extends ConfigurationItem {
 		return false
 	}
 
+	updateUsedTyreSets(all := false) {
+		local tyreSets := WeakMap()
+		local currentRun := this.CurrentRun
+		local nr, tyreSet, run
+
+		this.UsedTyreSetsListView.Delete()
+
+		this.iTyreSets := tyreSets
+
+		if currentRun
+			loop currentRun.Nr {
+				run := this.Runs[A_Index]
+
+				tyreSets[run.TyreSet] := {Compound: run.Compound, Laps: (run.TyreLaps + run.Laps.Length)}
+			}
+
+		for nr, tyreSet in tyreSets
+			this.UsedTyreSetsListView.Add("", translate(tyreSet.Compound), nr, tyreSet.Laps)
+
+		this.UsedTyreSetsListView.ModifyCol()
+
+		loop this.UsedTyreSetsListView.GetCount("Col")
+			this.UsedTyreSetsListView.ModifyCol(A_Index, "AutoHdr")
+	}
+
 	createRun(lapNumber) {
 		local newRun := {Nr: (this.CurrentRun ? (this.CurrentRun.Nr + 1) : 1), Lap: lapNumber, StartTime: A_Now, TyreLaps: 0
 					   , Driver: "-", FuelInitial: "-", FuelConsumption: 0.0, Accidents: 0, Weather: "-", Compound: "-", TyreSet: "-"
 					   , AvgLapTime: "-", Potential: "-", RaceCraft: "-", Speed: "-", Consistency: "-", CarControl: "-"
-					   , Laps: []}
+					   , StartPosition: "-", EndPosition: "-", Laps: []}
 
 		this.Runs[newRun.Nr] := newRun
 
@@ -2101,7 +2180,7 @@ class PracticeCenter extends ConfigurationItem {
 		trackTemperatures := []
 
 		for ignore, lap in laps {
-			if (lap.Nr > 1) {
+			if (lap.Nr > run.Lap) {
 				consumption := lap.FuelConsumption
 
 				if isNumber(consumption) {
@@ -2111,6 +2190,11 @@ class PracticeCenter extends ConfigurationItem {
 						run.FuelInitial := (lap.FuelRemaining + run.FuelConsumption)
 				}
 			}
+
+			if (A_Index == 1)
+				run.StartPosition := lap.Position
+			else if (A_Index == numLaps)
+				run.EndPosition := lap.Position
 
 			if lap.Accident
 				run.Accidents += 1
@@ -2376,7 +2460,92 @@ class PracticeCenter extends ConfigurationItem {
 			this.showRunDetails(this.CurrentRun)
 		}
 
+		this.updateUsedTyreSets()
+
 		this.updateState()
+	}
+
+	addStandings(lap, data) {
+		local sessionStore := this.SessionStore
+		local prefix := ("Standings.Lap." . lap.Nr . ".Car.")
+		local driver, category, carIDs
+
+		carIDs := CaseInsenseWeakMap()
+
+		loop getMultiMapValue(lap.Data, "Position Data", "Car.Count")
+			carIDs[A_Index] := getMultiMapValue(lap.Data, "Position Data", "Car." . A_Index . ".ID")
+
+		sessionStore.add("Delta.Data"
+					   , Database.Row("Lap", lap, "Type", "Standings.Behind"
+									, "Car", getDeprecatedValue(data, "Position"
+																	, "Position.Standings.Class.Behind.Car", "Position.Standings.Behind.Car")
+									, "ID", carIDs[getDeprecatedValue(data, "Position"
+																		  , "Position.Standings.Class.Behind.Car", "Position.Standings.Behind.Car")]
+									, "Delta", Round(getDeprecatedValue(data, "Position"
+																			, "Position.Standings.Class.Behind.Delta"
+																			, "Position.Standings.Behind.Delta") / 1000, 2)
+									, "Distance", Round(getDeprecatedValue(data, "Position"
+																			   , "Position.Standings.Class.Behind.Distance"
+																			   , "Position.Standings.Behind.Distance"), 2)))
+
+		sessionStore.add("Delta.Data"
+					   , Database.Row("Lap", lap, "Type", "Standings.Ahead"
+									, "Car", getDeprecatedValue(data, "Position"
+																	, "Position.Standings.Class.Ahead.Car", "Position.Standings.Ahead.Car")
+									, "ID", carIDs[getDeprecatedValue(data, "Position"
+																		  , "Position.Standings.Class.Ahead.Car", "Position.Standings.Ahead.Car")]
+									, "Delta", Round(getDeprecatedValue(data, "Position"
+																			, "Position.Standings.Class.Ahead.Delta"
+																			, "Position.Standings.Ahead.Delta") / 1000, 2)
+									, "Distance", Round(getDeprecatedValue(data, "Position"
+																			   , "Position.Standings.Class.Ahead.Distance"
+																			   , "Position.Standings.Ahead.Distance"), 2)))
+
+		sessionStore.add("Delta.Data"
+					   , Database.Row("Lap", lap, "Type", "Standings.Leader"
+									, "Car", getDeprecatedValue(data, "Position"
+																    , "Position.Standings.Class.Leader.Car", "Position.Standings.Leader.Car")
+									, "ID", carIDs[getDeprecatedValue(data, "Position"
+																		  , "Position.Standings.Class.Leader.Car", "Position.Standings.Leader.Car")]
+									, "Delta", Round(getDeprecatedValue(data, "Position"
+																			, "Position.Standings.Class.Leader.Delta"
+																			, "Position.Standings.Leader.Delta") / 1000, 2)
+									, "Distance", Round(getDeprecatedValue(data, "Position"
+																			   , "Position.Standings.Class.Leader.Distance"
+																			   , "Position.Standings.Leader.Distance"), 2)))
+
+		sessionStore.add("Delta.Data"
+					   , Database.Row("Lap", lap, "Type", "Track.Behind"
+									, "Car", getMultiMapValue(data, "Position", "Position.Track.Behind.Car")
+									, "ID", carIDs[getMultiMapValue(data, "Position", "Position.Track.Behind.Car")]
+									, "Delta", Round(getMultiMapValue(data, "Position", "Position.Track.Behind.Delta") / 1000, 2)
+									, "Distance", Round(getMultiMapValue(data, "Position", "Position.Track.Behind.Distance"), 2)))
+
+		sessionStore.add("Delta.Data"
+					   , Database.Row("Lap", lap, "Type", "Track.Ahead"
+									, "Car", getMultiMapValue(data, "Position", "Position.Track.Ahead.Car")
+									, "ID", carIDs[getMultiMapValue(data, "Position", "Position.Track.Ahead.Car")]
+									, "Delta", Round(getMultiMapValue(data, "Position", "Position.Track.Ahead.Delta") / 1000, 2)
+									, "Distance", Round(getMultiMapValue(data, "Position", "Position.Track.Ahead.Distance"), 2)))
+
+		prefix := ("Standings.Lap." . lap . ".Car.")
+
+		loop getMultiMapValue(data, "Standings", prefix . "Count") {
+			driver := computeDriverName(getMultiMapValue(data, "Standings", prefix . A_Index . ".Driver.Forname")
+									  , getMultiMapValue(data, "Standings", prefix . A_Index . ".Driver.Surname")
+									  , getMultiMapValue(data, "Standings", prefix . A_Index . ".Driver.Nickname"))
+			category := getMultiMapValue(data, "Standings", prefix . A_Index . ".Driver.Category", "Unknown")
+
+			if (category = "Unknown")
+				category := kNull
+
+			sessionStore.add("Standings.Data"
+						   , Database.Row("Lap", lap, "Car", A_Index, "ID", carIDs[A_Index], "Driver", driver, "Category", category
+										, "Position", getMultiMapValue(data, "Standings", prefix . A_Index . ".Position")
+										, "Time", Round(getMultiMapValue(data, "Standings", prefix . A_Index . ".Time") / 1000, 1)
+										, "Laps", Round(getMultiMapValue(data, "Standings", prefix . A_Index . ".Laps"), 1)
+										, "Delta", Round(getMultiMapValue(data, "Standings", prefix . A_Index . ".Delta") / 1000, 2)))
+		}
 	}
 
 	addTelemetry(lap, simulator, car, track, weather, airTemperature, trackTemperature
@@ -2878,7 +3047,6 @@ class PracticeCenter extends ConfigurationItem {
 	updateDriverStatistics(driver) {
 		local laps := []
 		local accidents := 0
-		local penalties := 0
 		local ignore, lap, potential, raceCraft, speed, consistency, carControl
 
 		for ignore, lap in driver.Laps {
@@ -2886,9 +3054,6 @@ class PracticeCenter extends ConfigurationItem {
 
 			if lap.Accident
 				accidents += 1
-
-			if lap.Penalty
-				penalties += 1
 		}
 
 		potential := false
@@ -2905,7 +3070,6 @@ class PracticeCenter extends ConfigurationItem {
 		driver.Consistency := consistency
 		driver.CarControl := carControl
 		driver.Accidents := accidents
-		driver.Penalties := penalties
 	}
 
 	updateStatistics() {
@@ -2959,6 +3123,7 @@ class PracticeCenter extends ConfigurationItem {
 
 				info := newMultiMap()
 
+				setMultiMapValue(info, "Session", "Session", this.Session)
 				setMultiMapValue(info, "Session", "Exported", this.SessionExported)
 				setMultiMapValue(info, "Session", "Date", this.Date)
 				setMultiMapValue(info, "Session", "Simulator", this.Simulator)
@@ -3076,7 +3241,7 @@ class PracticeCenter extends ConfigurationItem {
 
 	loadRuns() {
 		local ignore, run, newRun, driver, laps, lap, runNr, runLap, airTemperatures, trackTemperatures
-		local currentRun, lastLap, remainingFuel, fuelConsumption, penalty
+		local currentRun, lastLap, remainingFuel, fuelConsumption
 
 		this.iRuns := CaseInsenseWeakMap()
 
@@ -3087,7 +3252,8 @@ class PracticeCenter extends ConfigurationItem {
 					 , FuelInitial: run["Fuel.Initial"], FuelConsumption: run["Fuel.Consumption"]
 					 , Compound: compound(run["Tyre.Compound"], run["Tyre.Compound.Color"]), TyreSet: run["Tyre.Set"], TyreLaps: run["Tyre.Laps"]
 					 , AvgLaptime: run["Lap.Time.Average"], BestLaptime: run["Lap.Time.Best"]
-					 , Accidents: run["Accidents"], StartTime: run["Time.Start"], EndTime: run["Time.End"]}
+					 , Accidents: run["Accidents"], StartPosition: run["Position.Start"], EndPosition: run["Position.End"]
+					 , StartTime: run["Time.Start"], EndTime: run["Time.End"]}
 
 			if (isNull(newRun.StartTime))
 				newRun.StartTime := false
@@ -3150,6 +3316,12 @@ class PracticeCenter extends ConfigurationItem {
 
 			if (isNull(newRun.FuelConsumption))
 				newRun.FuelConsumption := "-"
+
+			if (isNull(newRun.StartPosition))
+				newRun.StartPosition := "-"
+
+			if (isNull(newRun.EndPosition))
+				newRun.EndPosition := "-"
 
 			this.Runs[newRun.Nr] := newRun
 
@@ -3263,7 +3435,7 @@ class PracticeCenter extends ConfigurationItem {
 					OnMessage(0x44, translateOkButton, 0)
 				}
 				else {
-					this.initializeSession()
+					this.initializeSession(getMultiMapValue(info, "Session", "Session", "Practice"))
 
 					this.iSessionMode := "Loaded"
 					this.iSessionLoaded := folder
@@ -3308,6 +3480,8 @@ class PracticeCenter extends ConfigurationItem {
 					}
 
 					this.updateReports()
+
+					this.updateUsedTyreSets()
 
 					this.updateState()
 				}
@@ -3416,7 +3590,10 @@ class PracticeCenter extends ConfigurationItem {
 				drawChartFunction .= ",`n"
 
 			first := false
-			value := ((this.SelectedRun && (this.SelectedRun != this.Runs[values["Run"]].Nr)) ? kNull : values[xAxis])
+			value := ((this.SelectedRun && (this.SelectedRun != this.Runs[values["Run"]])) ? kNull : values[xAxis])
+
+			if (this.SelectedDrivers && !inList(this.SelectedDrivers, this.Runs[values["Run"]].Driver))
+				value := kNull
 
 			if !isNumber(value)
 				value := kNull
@@ -3502,6 +3679,71 @@ class PracticeCenter extends ConfigurationItem {
 		local html := (details ? details : "")
 		local script, ignore, chart
 
+		getTableCSS() {
+			local script
+
+			script := "
+			(
+				.table-std, .th-std, .td-std {
+					border-collapse: collapse;
+					padding: .3em .5em;
+				}
+
+				.th-std, .td-std {
+					text-align: center;
+				}
+
+				.th-std, .caption-std {
+					background-color: #%headerBackColor%;
+					color: #%textColor%;
+					border: thin solid #%frameColor%;
+				}
+
+				.td-std {
+					border-left: thin solid #%frameColor%;
+					border-right: thin solid #%frameColor%;
+				}
+
+				.th-left {
+					text-align: left;
+				}
+
+				.td-left {
+					text-align: left;
+				}
+
+				.th-right {
+					text-align: right;
+				}
+
+				.td-right {
+					text-align: right;
+				}
+
+				tfoot {
+					border-bottom: thin solid #%frameColor%;
+				}
+
+				.caption-std {
+					font-size: 1.5em;
+					border-radius: .5em .5em 0 0;
+					padding: .5em 0 0 0
+				}
+
+				.table-std tbody tr:nth-child(even) {
+					background-color: #%altBackColor%;
+				}
+
+				.table-std tbody tr:nth-child(odd) {
+					background-color: #%backColor%;
+				}
+			)"
+
+			return substituteVariables(script, {altBackColor: this.Window.AltBackColor, backColor: this.Window.BackColor
+											  , textColor: this.Window.Theme.TextColor
+											  , headerBackColor: this.Window.Theme.TableColor["Header"], frameColor: this.Window.Theme.TableColor["Frame"]})
+		}
+
 		this.iSelectedDetailReport := report
 
 		if details {
@@ -3522,7 +3764,7 @@ class PracticeCenter extends ConfigurationItem {
 						function drawCharts() {
 			)"
 
-			script := substituteVariables(script, {tableCSS: this.StrategyViewer.getTableCSS()
+			script := substituteVariables(script, {tableCSS: getTableCSS()
 												 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
 												 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
 												 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
@@ -4047,7 +4289,7 @@ class PracticeCenter extends ConfigurationItem {
 				loop this.CurrentRun.Nr {
 					runs.Push(A_Index)
 
-					if (A_Index = this.SelectedRun)
+					if (this.SelectedRun && (A_Index = this.SelectedRun.Nr))
 						selected := A_Index
 				}
 
@@ -4268,7 +4510,7 @@ class PracticeCenter extends ConfigurationItem {
 												  , "Tyre.Set", run.TyreSet, "Tyre.Laps", run.TyreLaps
 												  , "Lap.Time.Average", null(run.AvgLaptime), "Lap.Time.Best", null(run.BestLapTime)
 												  , "Fuel.Initial", null(run.FuelInitial), "Fuel.Consumption", null(run.FuelConsumption)
-												  , "Accidents", run.Accidents
+												  , "Accidents", run.Accidents, "Position.Start", null(run.StartPosition), "Position.End", null(run.EndPosition)
 												  , "Time.Start", this.computeStartTime(run), "Time.End", this.computeEndTime(run))
 
 							sessionStore.add("Run.Data", runData)
@@ -4356,6 +4598,174 @@ class PracticeCenter extends ConfigurationItem {
 		}
 	}
 
+	createSessionSummaryChart(chartID, width, height, lapSeries, positionSeries, fuelSeries, tyreSeries) {
+		local drawChartFunction := ("function drawChart" . chartID . "() {")
+		local ignore, time, fuel
+
+		drawChartFunction .= "`nvar data = new google.visualization.DataTable();"
+		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Lap") . "');")
+		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Position") . "');")
+		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Fuel Level") . "');")
+		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Tyre Laps") . "');")
+		drawChartFunction .= "`ndata.addRows(["
+
+		for ignore, time in lapSeries {
+			if (A_Index > 1)
+				drawChartFunction .= ", "
+
+			fuel := fuelSeries[A_Index]
+
+			if isNumber(fuel)
+				fuel := convertUnit("Volume", fuel)
+
+			drawChartFunction .= ("[" . values2String(", ", lapSeries[A_Index]
+														  , chartValue(null(positionSeries[A_Index]))
+														  , chartValue(null(fuel))
+														  , chartValue(null(tyreSeries[A_Index])))
+								. "]")
+		}
+
+		drawChartFunction .= ("]);`nvar options = { legend: { position: 'Right' }, chartArea: { left: '10%', top: '5%', right: '25%', bottom: '20%' }, hAxis: { title: '" . translate("Lap") . "', gridlines: {count: 0} }, vAxis: { viewWindow: { min: 0 }, gridlines: {count: 0} }, backgroundColor: '" . this.Window.AltBackColor . "' };`n")
+
+		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_" . chartID . "')); chart.draw(data, options); }")
+
+		return drawChartFunction
+	}
+
+	showSessionSummary() {
+		local telemetryDB := this.TelemetryDatabase
+		local html := ("<div id=`"header`"><b>" . translate("Race Summary") . "</b></div>")
+		local runs := []
+		local drivers := []
+		local laps := []
+		local durations := []
+		local numLaps := []
+		local positions := []
+		local avgLapTimes := []
+		local fuelConsumptions := []
+		local accidents := []
+		local penalties := []
+		local currentRun := this.CurrentRun
+		local positions := []
+		local remainingFuels := []
+		local tyreLaps := []
+		local lastLap := this.LastLap
+		local lapDataTable := this.SessionStore.Tables["Lap.Data"]
+		local run, duration, ignore, lap, width, chart1
+		local simulator, carName, trackName, sessionDate, sessionTime, fuelConsumption
+
+		simulator := this.Simulator
+		carName := this.Car
+		carName := (carName ? telemetryDB.getCarName(simulator, carName) : "-")
+		trackName := this.Track
+		trackName := (trackName ? telemetryDB.getTrackName(simulator, trackName) : "-")
+
+		sessionDate := this.Date
+
+		if sessionDate
+			sessionDate := FormatTime(sessionDate, "ShortDate")
+		else
+			sessionDate := "-"
+
+		sessionTime := this.Date
+
+		if sessionTime
+			sessionTime := FormatTime(sessionTime, "Time")
+		else
+			sessionTime := "-"
+
+		html .= "<br><br><table>"
+		html .= ("<tr><td><b>" . translate("Simulator:") . "</b></td><td>" . (simulator ? simulator : "-") . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Car:") . "</b></td><td>" . carName . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Track:") . "</b></td><td>" . trackName . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Date:") . "</b></td><td>" . sessionDate . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Time:") . "</b></td><td>" . sessionTime . "</td></tr>")
+		html .= "</table>"
+
+		html .= ("<br><br><div id=`"header`"><i>" . translate("Stints") . "</i></div>")
+
+		if currentRun
+			loop currentRun.Nr {
+				run := this.Runs[A_Index]
+
+				runs.Push("<th class=`"th-std`">" . run.Nr . "</th>")
+				drivers.Push("<td class=`"td-std`">" . StrReplace(run.Driver.Fullname, "'", "\'") . "</td>")
+				laps.Push("<td class=`"td-std`">" . run.Lap . "</td>")
+
+				duration := 0
+
+				for ignore, lap in run.Laps
+					duration += lap.Laptime
+
+				durations.Push("<td class=`"td-std`">" . Round(duration / 60) . "</td>")
+				numLaps.Push("<td class=`"td-std`">" . run.Laps.Length . "</td>")
+				positions.Push("<td class=`"td-std`">" . run.StartPosition . translate(" -> ") . run.EndPosition . "</td>")
+				avgLapTimes.Push("<td class=`"td-std`">" . lapTimeDisplayValue(run.AvgLaptime) . "</td>")
+
+				fuelConsumption := run.FuelConsumption
+
+				if isNumber(fuelConsumption)
+					fuelConsumption := displayValue("Float", convertUnit("Volume", fuelConsumption))
+
+				fuelConsumptions.Push("<td class=`"td-std`">" . displayNullValue(fuelConsumption) . "</td>")
+				accidents.Push("<td class=`"td-std`">" . run.Accidents . "</td>")
+			}
+
+		html .= "<br><table class=`"table-std`">"
+
+		html .= ("<tr><th class=`"th-std`">" . translate("Stint") . "</th>"
+				   . "<th class=`"th-std`">" . translate("Driver") . "</th>"
+				   . "<th class=`"th-std`">" . translate("Lap") . "</th>"
+			       . "<th class=`"th-std`">" . translate("Duration") . "</th>"
+			       . "<th class=`"th-std`">" . translate("Laps") . "</th>"
+			       . "<th class=`"th-std`">" . translate("Position") . "</th>"
+			       . "<th class=`"th-std`">" . translate("Avg. Lap Time") . "</th>"
+			       . "<th class=`"th-std`">" . translate("Consumption") . "</th>"
+			       . "<th class=`"th-std`">" . translate("Accidents") . "</th>"
+			   . "</tr>")
+
+		loop runs.Length
+			html .= ("<tr>" . runs[A_Index]
+							. drivers[A_Index]
+							. laps[A_Index]
+							. durations[A_Index]
+							. numLaps[A_Index]
+							. positions[A_Index]
+							. avgLapTimes[A_Index]
+							. fuelConsumptions[A_Index]
+							. accidents[A_Index]
+				   . "</tr>")
+
+		html .= "</table>"
+
+		html .= ("<br><br><div id=`"header`"><i>" . translate("Summary") . "</i></div>")
+
+		laps := []
+		positions := []
+
+		if lastLap
+			loop lastLap.Nr {
+				lap := this.Laps[A_Index]
+
+				laps.Push(A_Index)
+				positions.Push(lap.Position)
+				remainingFuels.Push(lap.FuelRemaining)
+
+				if lapDataTable.Has(A_Index)
+					tyreLaps.Push(lapDataTable[A_Index]["Tyre.Laps"])
+				else
+					tyreLaps.Push(kNull)
+			}
+
+		width := (this.DetailsViewer.getWidth() - 20)
+
+		chart1 := this.createSessionSummaryChart(1, width, 248, laps, positions, remainingFuels, tyreLaps)
+
+		html .= ("<br><br><div id=`"chart_1`" style=`"width: " . width . "px; height: 248px`"></div>")
+
+		this.showDetails("Session", html, [1, chart1])
+	}
+
 	createRunHeader(run) {
 		local startTime := this.computeStartTime(run)
 		local endTime := this.computeEndTime(run)
@@ -4380,8 +4790,12 @@ class PracticeCenter extends ConfigurationItem {
 		html .= ("<tr><td><b>" . translate("Start:") . "</b></div></td><td>" . startTime . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("End:") . "</b></div></td><td>" . endTime . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Duration:") . "</b></div></td><td>" . Round(duration / 60) . A_Space . translate("Minutes") . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Start Position:") . "</b></div></td><td>" . run.StartPosition . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("End Position:") . "</b></div></td><td>" . run.EndPosition . "</td></tr>")
+
+		if (this.Session = "Race") {
+			html .= ("<tr><td><b>" . translate("Start Position:") . "</b></div></td><td>" . run.StartPosition . "</td></tr>")
+			html .= ("<tr><td><b>" . translate("End Position:") . "</b></div></td><td>" . run.EndPosition . "</td></tr>")
+		}
+
 		html .= ("<tr><td><b>" . translate("Temperatures (A / T):") . "</b></td><td>" . displayValue("Float", convertUnit("Temperature", run.AirTemperature)) . ", " . displayValue("Float", convertUnit("Temperature", run.TrackTemperature)) . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Consumption:") . "</b></div></td><td>" . displayValue("Float", convertUnit("Volume", run.FuelConsumption)) . "</td></tr>")
 		html .= "</table>"
@@ -4464,7 +4878,7 @@ class PracticeCenter extends ConfigurationItem {
 		local ignore, lap, time, theMin, avg, theMax, delta, window, consistency, time, title
 
 		for ignore, lap in laps {
-			if (A_Index > 1) {
+			if ((laps.Length = 1) || (A_Index > 1)) {
 				time := lapTimes[A_Index]
 
 				if isNumber(time) {
@@ -4521,7 +4935,6 @@ class PracticeCenter extends ConfigurationItem {
 		local lapTimeData := []
 		local fuelConsumptionData := []
 		local accidentData := []
-		local penaltyData := []
 		local ignore, lap, fuelConsumption
 
 		html .= ("<tr><td><b>" . translate("Average:") . "</b></td><td>" . lapTimeDisplayValue(run.AvgLapTime) . "</td></tr>")
@@ -4538,27 +4951,8 @@ class PracticeCenter extends ConfigurationItem {
 			if isNumber(fuelConsumption)
 				fuelConsumption := displayValue("Float", convertUnit("Volume", fuelConsumption))
 
-			penalty := ""
-
-			if lap.Penalty {
-				penalty := lap.Penalty
-
-				if (InStr(penalty, "SG") = 1) {
-					penalty := ((StrLen(penalty) > 2) ? (A_Space . SubStr(penalty, 3)) : "")
-
-					penalty := (translate("Stop and Go") . penalty)
-				}
-				else if (penalty = "Time")
-					penalty := translate("Time")
-				else if (penalty = "DT")
-					penalty := translate("Drive Through")
-				else if (penalty == true)
-					penalty := "x"
-			}
-
 			fuelConsumptionData.Push("<td class=`"td-std`">" . displayNullValue(fuelConsumption) . "</td>")
 			accidentData.Push("<td class=`"td-std`">" . (lap.Accident ? "x" : "") . "</td>")
-			penaltyData.Push("<td class=`"td-std`">" . penalty . "</td>")
 		}
 
 		html .= "<br><table class=`"table-std`">"
@@ -4568,7 +4962,6 @@ class PracticeCenter extends ConfigurationItem {
 				   . "<th class=`"th-std`">" . translate("Lap Time") . "</th>"
 				   . "<th class=`"th-std`">" . translate("Consumption") . "</th>"
 				   . "<th class=`"th-std`">" . translate("Accident") . "</th>"
-				   . "<th class=`"th-std`">" . translate("Penalty") . "</th>"
 			   . "</tr>")
 
 		loop lapData.Length
@@ -4577,7 +4970,6 @@ class PracticeCenter extends ConfigurationItem {
 							. lapTimeData[A_Index]
 							. fuelConsumptionData[A_Index]
 							. accidentData[A_Index]
-							. penaltyData[A_Index]
 				   . "</tr>")
 
 		html .= "</table>"
@@ -4644,11 +5036,10 @@ class PracticeCenter extends ConfigurationItem {
 		local html := "<table>"
 		local hotPressures := "-, -, -, -"
 		local coldPressures := "-, -, -, -"
-		local pressuresLosses := "-, -, -, -"
 		local hasColdPressures := false
 		local pressuresDB := this.PressuresDatabase
 		local pressuresTable, pressures, coldPressures, hotPressures, pressuresLosses, tyresTable, tyres
-		local fuel, tyreCompound, tyreCompoundColor, tyreSet, tyrePressures, pressureCorrections, pressure
+		local fuel, tyreCompound, tyreCompoundColor, tyreSet, tyrePressures, pressure
 		local fuelConsumption, remainingFuel
 
 		if pressuresDB {
@@ -4660,32 +5051,11 @@ class PracticeCenter extends ConfigurationItem {
 				coldPressures := [displayNullValue(pressures["Tyre.Pressure.Cold.Front.Left"]), displayNullValue(pressures["Tyre.Pressure.Cold.Front.Right"])
 								, displayNullValue(pressures["Tyre.Pressure.Cold.Rear.Left"]), displayNullValue(pressures["Tyre.Pressure.Cold.Rear.Right"])]
 
-				this.getRunSetup(lap.Run.Nr, true, &fuel, &tyreCompound, &tyreCompoundColor, &tyreSet, &tyrePressures)
+				fuel := lap.Run.FuelInitial
 
-				if tyrePressures {
-					loop 4 {
-						coldPressure := coldPressures[A_Index]
+				splitCompound(lap.Run.Compound, &tyreCompound, &tyreCompoundColor)
 
-						if (coldPressure != "-") {
-							tyrePressures[A_Index] := Round(coldPressure - tyrePressures[A_Index], 1)
-
-							if (tyrePressures[A_Index] = 0)
-								tyrePressures[A_Index] := displayNullValue(kNull)
-							else if (tyrePressures[A_Index] > 0)
-								tyrePressures[A_Index] := ("+ " . displayValue("Float", convertUnit("Pressure", tyrePressures[A_Index])))
-							else if (tyrePressures[A_Index] < 0)
-								tyrePressures[A_Index] := ("- " . displayValue("Float", convertUnit("Pressure", Abs(tyrePressures[A_Index]))))
-
-							hasColdPressures := true
-						}
-						else
-							tyrePressures[A_Index] := displayNullValue(kNull)
-					}
-
-					pressureCorrections := (translate(" (") . values2String(", ", tyrePressures*) . translate(")"))
-				}
-				else
-					pressureCorrections := ""
+				tyreSet := lap.Run.TyreSet
 
 				loop 4 {
 					pressure := coldPressures[A_Index]
@@ -4697,8 +5067,6 @@ class PracticeCenter extends ConfigurationItem {
 				coldPressures := values2String(", ", coldPressures*)
 
 				hasColdPressures := (hasColdPressures || (coldPressures != "-, -, -, -"))
-
-				coldPressures := (coldPressures . pressureCorrections)
 
 				hotPressures := [displayNullValue(pressures["Tyre.Pressure.Hot.Front.Left"]), displayNullValue(pressures["Tyre.Pressure.Hot.Front.Right"])
 							   , displayNullValue(pressures["Tyre.Pressure.Hot.Rear.Left"]), displayNullValue(pressures["Tyre.Pressure.Hot.Rear.Right"])]
@@ -4778,7 +5146,7 @@ class PracticeCenter extends ConfigurationItem {
 		return html
 	}
 
-	createLapDeltas(lap, leaderColor := false, aheadColor := false, behindColor := false) {
+	createLapDeltas(lap) {
 		local sessionStore := this.SessionStore
 		local html := "<table class=`"table-std`">"
 		local labels := [translate("Leader"), translate("Standings (Ahead)"), translate("Standings (Behind)")
@@ -4825,14 +5193,7 @@ class PracticeCenter extends ConfigurationItem {
 
 				index := rowIndices[entryType]
 
-				if (leaderColor && (entryType = "Standings.Leader"))
-					label := ("<p style=`"color:#" . leaderColor . "`";>" . labels[index] . "</p>")
-				else if (aheadColor && ((entryType = "Standings.Front") || (entryType = "Standings.Ahead")))
-					label := ("<p style=`"color:#" . aheadColor . "`";>" . labels[index] . "</p>")
-				else if (behindColor && (entryType = "Standings.Behind"))
-					label := ("<p style=`"color:#" . behindColor . "`";>" . labels[index] . "</p>")
-				else
-					label := labels[index]
+				label := labels[index]
 
 				rows[index] := ("<tr><th class=`"th-std th-left`">" . label . "</th>"
 							  . "<td class=`"td-std`">" . values2String("</td><td class=`"td-std`">" , carNumber, driverFullname, telemetryDB.getCarName(this.Simulator, carName), delta)
@@ -4851,6 +5212,7 @@ class PracticeCenter extends ConfigurationItem {
 	createLapStandings(lap) {
 		local sessionStore := this.SessionStore
 		local telemetryDB := this.TelemetryDatabase
+		local isRace := (this.Session = "Race")
 		local html := "<table class=`"table-std`">"
 		local lapNr := lap.Nr
 		local cars := true
@@ -4878,8 +5240,7 @@ class PracticeCenter extends ConfigurationItem {
 
 		html .= ("<th class=`"th-std`">" . translate("Lap Time") . "</th>"
 			   . "<th class=`"th-std`">" . translate("Laps") . "</th>"
-			   . "<th class=`"th-std`">" . translate("Delta") . "</th>"
-			   . "<th class=`"th-std`">" . translate("Pitstops") . "</th>"
+			   . (isRace ? ("<th class=`"th-std`">" . translate("Delta") . "</th>") : "")
 			   . "</tr>")
 
 		for index, position in overallPositions
@@ -4888,15 +5249,25 @@ class PracticeCenter extends ConfigurationItem {
 				laps := "-"
 				delta := "-"
 
-				result := sessionStore.query("Standings.Data", {Select: ["Time", "Laps", "Delta"], Where: {Lap: lap.Nr, ID: carIDs[index]}})
+				if isRace {
+					result := sessionStore.query("Standings.Data", {Select: ["Time", "Laps", "Delta"], Where: {Lap: lap.Nr, ID: carIDs[index]}})
 
-				if (result.Length = 0)
-					result := sessionStore.query("Standings.Data", {Select: ["Time", "Laps", "Delta"], Where: {Lap: lap.Nr, Car: cars[index]}})
+					if (result.Length = 0)
+						result := sessionStore.query("Standings.Data", {Select: ["Time", "Laps", "Delta"], Where: {Lap: lap.Nr, Car: cars[index]}})
+				}
+				else {
+					result := sessionStore.query("Standings.Data", {Select: ["Time", "Laps"], Where: {Lap: lap.Nr, ID: carIDs[index]}})
+
+					if (result.Length = 0)
+						result := sessionStore.query("Standings.Data", {Select: ["Time", "Laps"], Where: {Lap: lap.Nr, Car: cars[index]}})
+				}
 
 				if (result.Length > 0) {
 					lapTime := result[1]["Time"]
 					laps := result[1]["Laps"]
-					delta := Round(result[1]["Delta"], 1)
+
+					if isRace
+						delta := Round(result[1]["Delta"], 1)
 				}
 
 				driver := computeDriverName(driverFornames[index] , driverSurnames[index], driverNickNames[index])
@@ -4912,39 +5283,10 @@ class PracticeCenter extends ConfigurationItem {
 				if multiClass
 					html .= ("<td class=`"td-std`">" . classPositions[index] . "</td>")
 
-				html .= ("<td class=`"td-std`">" . values2String("</td><td class=`"td-std`">", lapTimeDisplayValue(lapTime), laps, delta) . "</td>")
-
-				pitstops := this.Pitstops[carIDs[index]]
-				numPitstops := 0
-
-				if (pitstops.Length > 0) {
-					pitstopLaps := []
-
-					for ignore, pitstop in pitstops
-						if (pitstop.Lap <= lapNr) {
-							numPitstops += 1
-
-							pitstopLaps.Push(pitstop.Lap)
-
-							if (pitstopLaps.Length > 3)
-								pitstopLaps.RemoveAt(1)
-						}
-
-					if (numPitstops > 0) {
-						pitstops := (numPitstops . translate(":   ["))
-
-						if (numPitstops > 3)
-							pitstops .= (translate("...") . translate(", "))
-
-						pitstops .= (values2String(", ", pitstopLaps*) . translate("]"))
-					}
-					else
-						pitstops := "-"
-				}
+				if isRace
+					html .= ("<td class=`"td-std`">" . values2String("</td><td class=`"td-std`">", lapTimeDisplayValue(lapTime), laps, delta) . "</td>")
 				else
-					pitstops := "-"
-
-				html .= ("<td class=`"td-std td-left`">" . pitstops . "</td></tr>")
+					html .= ("<td class=`"td-std`">" . values2String("</td><td class=`"td-std`">", lapTimeDisplayValue(lapTime), laps) . "</td>")
 			}
 
 		html .= "</table>"
@@ -4962,9 +5304,11 @@ class PracticeCenter extends ConfigurationItem {
 
 			html .= ("<br>" . this.createLapOverview(lap))
 
-			html .= ("<br><br><div id=`"header`"><i>" . translate("Deltas") . "</i></div>")
+			if (this.Session = "Race") {
+				html .= ("<br><br><div id=`"header`"><i>" . translate("Deltas") . "</i></div>")
 
-			html .= ("<br>" . this.createLapDeltas(lap))
+				html .= ("<br>" . this.createLapDeltas(lap))
+			}
 
 			html .= ("<br><br><div id=`"header`"><i>" . translate("Standings") . "</i></div>")
 
@@ -4983,7 +5327,7 @@ class PracticeCenter extends ConfigurationItem {
 			local data := readMultiMap(fileName)
 
 			try {
-				this.initializeSession()
+				this.initializeSession(getMultiMapValue(data, "Session Data", "Session", "Practice"))
 
 				this.initializeSimulator(SessionDatabase.getSimulatorName(getMultiMapValue(data, "Session Data", "Simulator"))
 									   , getMultiMapValue(data, "Session Data", "Car")
@@ -5111,10 +5455,19 @@ class PracticeCenter extends ConfigurationItem {
 	}
 
 	updateStandings(lapNumber, fileName) {
-		if (this.SessionMode = "Active") {
+		updateStandingsAsync() {
+			local data := readMultiMap(fileName)
+
+			try {
+				if ((this.SessionMode = "Active") && (this.LastLap.Nr = lapNumber))
+					this.addStandings(this.LastLap, data)
+			}
+			finally {
+				deleteFile(fileName)
+			}
 		}
 
-		deleteFile(fileName)
+		this.pushTask(updateStandingsAsync)
 	}
 
 	updateTelemetry(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature

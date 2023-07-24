@@ -490,29 +490,56 @@ class StrategyWorkbench extends ConfigurationItem {
 
 				workbenchGui["tyreSetDropDown"].Choose(inList(collect(workbench.TyreCompounds, translate), compound))
 				workbenchGui["tyreSetCountEdit"].Text := count
-
-				workbench.updateState()
 			}
+
+			workbench.updateState()
 		}
 
 		updateTyreSet(*) {
-			local row
-
-			row := workbench.TyreSetListView.GetNext(0)
+			local row := workbench.TyreSetListView.GetNext(0)
+			local availableCompounds, compound, usedCompounds, index, candidate
 
 			if (row > 0) {
-				workbench.TyreSetListView.Modify(row, "", collect(workbench.TyreCompounds, translate)[workbenchGui["tyreSetDropDown"].Value]
-														, workbenchGui["tyreSetCountEdit"].Text)
+				availableCompounds := collect(workbench.TyreCompounds, translate)
+				compound := availableCompounds[workbenchGui["tyreSetDropDown"].Value]
+				usedCompounds := []
+
+				loop workbench.TyreSetListView.GetCount()
+					if (A_Index != row)
+						usedCompounds.Push(workbench.TyreSetListView.GetText(A_Index, 1))
+
+				if inList(usedCompounds, compound)
+					for index, candidate in availableCompounds
+						if !inList(usedCompounds, candidate) {
+							compound := candidate
+
+							workbenchGui["tyreSetDropDown"].Choose(index)
+
+							break
+						}
+
+				workbench.TyreSetListView.Modify(row, "", compound, workbenchGui["tyreSetCountEdit"].Text)
 
 				workbench.TyreSetListView.ModifyCol()
 			}
+
+			workbench.updateState()
 		}
 
 		addTyreSet(*) {
-			local index := inList(workbench.TyreCompounds, normalizeCompound("Dry"))
+			local availableCompounds := collect(workbench.TyreCompounds, translate)
+			local usedCompounds := []
+			local index, ignore, candidate
 
-			if !index
-				index := 1
+			loop workbench.TyreSetListView.GetCount()
+				usedCompounds.Push(workbench.TyreSetListView.GetText(A_Index, 1))
+
+			for ignore, candidate in availableCompounds
+				if !inList(usedCompounds, candidate) {
+					index := A_Index
+
+					break
+				}
 
 			workbench.TyreSetListView.Add("", collect(workbench.TyreCompounds, translate)[index], 99)
 			workbench.TyreSetListView.Modify(workbench.TyreSetListView.GetCount(), "Select Vis")
@@ -1509,6 +1536,8 @@ class StrategyWorkbench extends ConfigurationItem {
 			this.Control["simAvgLapTimeEdit"].Enabled := false
 			this.Control["simFuelConsumptionEdit"].Enabled := false
 		}
+
+		this.Control["tyreSetAddButton"].Enabled := (this.TyreCompounds.Length > this.TyreSetListView.GetCount())
 
 		if (this.TyreSetListView.GetNext(0) > 0) {
 			this.Control["tyreSetDropDown"].Enabled := true
@@ -3268,7 +3297,7 @@ convertValue(name, value) {
 }
 
 runStrategyWorkbench() {
-	local icon := kIconsDirectory . "Dashboard.ico"
+	local icon := kIconsDirectory . "Workbench.ico"
 	local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 	local simulator := getMultiMapValue(settings, "Strategy Workbench", "Simulator", false)
 	local car := getMultiMapValue(settings, "Strategy Workbench", "Car", false)

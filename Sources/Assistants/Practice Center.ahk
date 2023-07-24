@@ -1200,7 +1200,7 @@ class PracticeCenter extends ConfigurationItem {
 
 		centerGui.SetFont("Norm", "Arial")
 
-		centerTab := centerGui.Add("Tab3", "x16 ys+39 w593 h316 H:Grow(0.8) AltSubmit -Wrap Section vpracticeCenterTabView", collect(["Plan && Control", "Stints", "Laps"], translate))
+		centerTab := centerGui.Add("Tab3", "x16 ys+39 w593 h316 H:Grow(0.8) AltSubmit -Wrap Section vpracticeCenterTabView", collect(["Tyres", "Stints", "Laps"], translate))
 
 		centerTab.UseTab(1)
 
@@ -1721,8 +1721,8 @@ class PracticeCenter extends ConfigurationItem {
 			window["newRunButton"].Enabled := true
 
 			window["tyreCompoundDropDown"].Enabled := true
-			if (window["runModeDropDown"].Value = 0)
-				window["runModeDropDown"].Choose(2)
+			if (window["tyreCompoundDropDown"].Value = 0)
+				window["tyreCompoundDropDown"].Choose(2)
 
 			window["importPressuresButton"].Enabled := true
 
@@ -1732,6 +1732,16 @@ class PracticeCenter extends ConfigurationItem {
 				window["importPressuresButton"].Enabled := (window["tyreCompoundDropDown"].Value > 1)
 				window["newRunButton"].Enabled := false
 			}
+		}
+
+		if (window["tyreCompoundDropDown"].Value <= 2) {
+			window["tyreSetEdit"].Enabled := false
+			window["tyreSetEdit"].Text := ""
+		}
+		else {
+			window["tyreSetEdit"].Enabled := true
+			if (window["tyreSetEdit"].Text = "")
+				window["tyreSetEdit"].Text := 0
 		}
 
 		this.Control["compoundAddButton"].Enabled := (this.AvailableTyreCompounds.Length > this.TyreCompoundsListView.GetCount())
@@ -2233,6 +2243,11 @@ class PracticeCenter extends ConfigurationItem {
 			else
 				lap.Compound := run.Compound
 
+			if ((A_Index == 1) && (run.TyreSet = "-"))
+				run.Compound := lap.TyreSet
+			else
+				lap.TyreSet := run.TyreSet
+
 			weather := lap.Weather
 
 			if (run.Weather = "")
@@ -2274,7 +2289,7 @@ class PracticeCenter extends ConfigurationItem {
 
 	newRun(lap, transferLap := false, newTyreSet := true) {
 		local currentRun := this.CurrentRun
-		local newRun
+		local newRun, tyreCompound, tyreSet
 
 		if (currentRun && (currentRun.Laps.Length = 0)) {
 			this.RunsListView.Delete(currentRun.Row)
@@ -2298,8 +2313,20 @@ class PracticeCenter extends ConfigurationItem {
 				this.LastLap.Run := newRun
 			}
 
-			if !newTyreSet
+			if newTyreSet {
+				tyreCompound := this.Control["tyreCompoundDropDown"].Value
+				tyreSet := this.Control["tyreSetEdit"].Value
+
+				if (tyreCompound > 2) {
+					newRun.Compound := this.TyreCompounds[tyreCompound - 2]
+
+					if (isInteger(tyreSet) && (tyreSet > 0))
+						newRun.TyreSet := tyreSet
+				}
+			}
+			else
 				newRun.TyreLaps := (currentRun.TyreLaps + currentRun.Laps.Length)
+
 		}
 
 		return newRun

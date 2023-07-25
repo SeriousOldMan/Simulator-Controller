@@ -2,7 +2,7 @@
 Version=5.2.0.0-dev
 Target=5.2.0.0-release
 Date=07/25/2023
-Download=
+Download=https://www.dropbox.com/s/x7f2a5rwtthmg6d/Simulator%20Controller%205.2.0.0-dev.zip?dl=1
 Changes=New tool "PracticeCenter", New controller action function "openPracticeCenter", New plugin argument "openPracticeCenter" for "Race Engineer" and "Race Strategist" plugins, Added in "Invalid" column for the "Car" report in "Race Reports", Added in "Invalid" column for the *Laps* list in "Race Center"
 [Release]
 Version=5.1.2.0-release

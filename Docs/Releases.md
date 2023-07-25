@@ -1,3 +1,13 @@
+## 5.2.0.0-release 07/28/23 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. Introducing a complete [new tool "Practice Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#practice-center), which helps you to manage your practice sessions and allows you to inspect and select the data to be transfered to the session database. The development of this application is still in its early stage, but it is already usable.
+  4. A new controller action function "openPracticeCenter" allows you to open the "Practice Center" from your controller hardware.
+  5. A new plugin argument "openPracticeCenter" has been introduced for the "Race Engineer" and "Race Strategist" plugins.
+  6. Added in "Invalid" column for the "Car" report in "Race Reports".
+  7. Added in "Invalid" column for the *Laps* list in "Race Center".
+  8. A bug has been fixed which may crash the Simulator Controller background process, when a custom controller function without a triger has been configured.
+
 ## 5.1.2.0-release 07/21/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
@@ -14,7 +24,7 @@
       - Assetto Corsa
 	    - Audi R8 LMS Ultra
 
-  Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-512).
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-512).
 
 ## 5.1.1.0-release 07/14/23
   1. Minor bugfixes, as always

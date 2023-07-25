@@ -317,7 +317,7 @@ All these report documents are HTML-based and can be saved or printed using the 
 
 The first tab "Tyres" in the lower left corner allows you to manage your tyre sets during your practice runs. In many cases, you can let the "Practice Center" decide automatically, when to create a new stint and when a tyre change happend (at least for *Assetto Corsa Competizione* and *rFactor 2*). But not all simulators provide access to the mounted tyres in their data API, so it is also possible to create a new stint with tyre selection and tyre set manually.
 
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Practice%20Center%205.JPG)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Practice%20Center%206.JPG)
 
 To create a new stint manually while you are standing in the pit, follow these steps:
 

@@ -3355,9 +3355,10 @@ class RaceStrategist extends GridRaceAssistant {
 
 	saveStandingsData(lapNumber, simulator, car, track) {
 		local knowledgeBase := this.KnowledgeBase
+		local validLap := true
 		local driver, driverID, carCount, data, raceInfo, slots, grid, carNr, carID, key, fileName, slotsString
 		local data, pitstop, pitstops, prefix, times, positions, drivers, laps, carPrefix, carIndex
-		local driverForname, driverSurname, driverNickname, driverCategory, carCar, carCategory
+		local driverForname, driverSurname, driverNickname, driverCategory, carCar, carCategory, lapState
 
 		if this.RemoteHandler {
 			driver := knowledgeBase.getValue("Driver.Car", 0)
@@ -3436,6 +3437,9 @@ class RaceStrategist extends GridRaceAssistant {
 
 							setMultiMapValue(data, "Cars", "Car." . carIndex . ".Position", grid[carIndex])
 							setMultiMapValue(data, "Cars", "Car." . carIndex . ".Position", grid[raceInfo[key]])
+
+							if (A_Index = driverCar)
+								validLap := knowledgeBase.getValue("Car." . A_Index . ".Lap.Valid")
 						}
 					}
 				}
@@ -3480,6 +3484,16 @@ class RaceStrategist extends GridRaceAssistant {
 
 			prefix := "Lap." . lapNumber
 
+			if validLap
+				validLap := knowledgeBase.getValue(prefix . ".Valid", validLap)
+
+			if !validLap
+				lapState := "Invalid"
+			else if this.hasEnoughData(false)
+				lapState := "Valid"
+			else
+				lapState := "Warmup"
+
 			setMultiMapValue(data, "Lap", "Lap", lapNumber)
 
 			setMultiMapValue(data, "Lap", prefix . ".Weather", knowledgeBase.getValue("Standings.Lap." . lapNumber . ".Weather"))
@@ -3491,6 +3505,7 @@ class RaceStrategist extends GridRaceAssistant {
 			setMultiMapValue(data, "Lap", prefix . ".ABS", knowledgeBase.getValue(prefix . ".ABS", "n/a"))
 			setMultiMapValue(data, "Lap", prefix . ".Consumption", knowledgeBase.getValue(prefix . ".Fuel.Consumption", "n/a"))
 			setMultiMapValue(data, "Lap", prefix . ".Pitstop", pitstop)
+			setMultiMapValue(data, "Lap", prefix . ".State", lapState)
 
 			raceInfo := this.RaceInfo
 			slots := false

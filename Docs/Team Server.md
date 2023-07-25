@@ -160,11 +160,11 @@ The "Race Center" *understands* multi-class and/or multi-category races. Please 
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%205.JPG)
 
-The reports at the top of the list are the well known report, wich are also available after a session using the ["Race Reports"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-reports) tool. They are mostly useful to analyze the standings and the performance of the various drivers and cars. The other reports will give you an insight into the telemetry data. You can select the data to be shown using the selector menus on the right of the report list. You can also choose the type of visualization using the "Plot" menu on top of the report area. Use the "Driver" menu, it is possible to restrict the data of the various charts to one the drivers who has already driven some laps in the session. Only data of the selected driver will be shown then.
+The reports at the top of the list are the well known reports, wich are also available after a session using the ["Race Reports"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-reports) tool. They are mostly useful to analyze the standings and the performance of the various drivers and cars. The other reports will give you an insight into the telemetry data. You can select the data to be shown using the selector menus on the right of the report list. You can also choose the type of visualization using the "Plot" menu on top of the report area. Use the "Driver" menu, it is possible to restrict the data of the various charts to one the drivers who has already driven some laps in the session. Only data of the selected driver will be shown then.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2019.JPG)
 
-Note: The values for wear (tyres and brake pads) range from 0% up to 100%. For most of the simulators this value is directly available through the API, whereas in *Assetto Corsa Competizione*, the data interface provide the remaining thickness of each pad. Depending on the compound of the pad, the wear level for 100% ranges from 12 mm to 15.5 mm left pad thickness here, with a starting thickness for a fresh pad with 29 mm.
+Note: The values for wear (tyres and brake pads) range from 0% up to 100%. For most of the simulators these values are directly available through the API, whereas in *Assetto Corsa Competizione*, the data interface provide the remaining thickness of each pad. Depending on the compound of the pad, the wear level for 100% ranges from 12 mm to 15.5 mm left pad thickness here, with a starting thickness for a fresh pad with 29 mm.
 
 Last but not least, using the small button with the cog wheel icon, you can choose various settings for the currently selected report, for example the range of laps to be considered in the data or the set of drivers in reports which are driver specific.
 
@@ -186,7 +186,7 @@ Beside all that, you can request several context specific data, which will be sh
 
   3. Details of a selected stint
   
-     This will give you an overview over the stint, the driven laps, as well as performance figures for the driver. Please select a stint in the list of stints to generate this report.
+     This will give you an overview over the stint, the driven laps, as well as some performance figures for the driver. Please select a stint in the list of stints to generate this report.
 	 
 	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%208.JPG)
 
@@ -228,7 +228,7 @@ Beside all that, you can request several context specific data, which will be sh
 	 
   10. Race Summary
   
-      This report is usefull by the end of a race to create a document to be stored away in the archive. It contains data on all stints and drivers. This report can be created using the "Race Summary" command from the "Session" menu.
+      This report is useful by the end of a race to create a document to be stored away in the archive. It contains data on all stints and drivers. This report can be created using the "Race Summary" command from the "Session" menu.
 	 
 	  ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2011.JPG)
 	 
@@ -417,7 +417,7 @@ In the top section of "Server Administration" you have to enter the login creden
 
 Then you define, whether users of this account can access team session and / or use data replication using the checkboxes. Although technically possible to create an account which has no rights at all, this does not make much sense, right? So tick at least one of those boxes.
 
-Very important are the settings for the time contingent. You can choose between "One-Time" contingents, which renders the account useless after the contingent has been used up, or you can choose two variants of renewable time contingents. The number of minutes entered on the right will be available directly after the account has been saved and they might be automatically renewed according to the contingent rule. More on that later. Last, but not least, you can manually set the number of currently available minutes using the small button with the clock. If you don't want to use all this stuff, you can create an unlimited account which is usefull, if you run your own server for a closed group of team mates.
+Very important are the settings for the time contingent. You can choose between "One-Time" contingents, which renders the account useless after the contingent has been used up, or you can choose two variants of renewable time contingents. The number of minutes entered on the right will be available directly after the account has been saved and they might be automatically renewed according to the contingent rule. More on that later. Last, but not least, you can manually set the number of currently available minutes using the small button with the clock. If you don't want to use all this stuff, you can create an unlimited account which is useful, if you run your own server for a closed group of team mates.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Server%20Administration%202.JPG)
 

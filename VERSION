@@ -1,9 +1,9 @@
 [Development]
 Version=5.2.0.0-dev
 Target=5.2.0.0-release
-Date=07/24/2023
+Date=07/25/2023
 Download=
-Changes=New tool "PracticeCenter", New controller action function "openPracticeCenter", New plugin argument "openPracticeCenter" for "Race Engineer" and "Race Strategist" plugins
+Changes=New tool "PracticeCenter", New controller action function "openPracticeCenter", New plugin argument "openPracticeCenter" for "Race Engineer" and "Race Strategist" plugins, Added in "Invalid" column for the "Car" report in "Race Reports", Added in "Invalid" column for the *Laps* list in "Race Center"
 [Release]
 Version=5.1.2.0-release
 Date=07/21/2023

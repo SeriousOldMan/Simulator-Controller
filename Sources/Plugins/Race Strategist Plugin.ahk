@@ -255,7 +255,19 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	}
 
 	updateLap(lap, running, data) {
+		local teamServer := this.TeamServer
+		local pid := ProcessExist("Practice Center.exe")
+		local fileName
+
 		super.updateLap(lap, running, data)
+
+		if (pid && (!teamServer || !teamServer.SessionActive)) {
+			fileName := temporaryFileName("Practice Lap " . lap, "data")
+
+			writeMultiMap(fileName, data)
+
+			messageSend(kFileMessage, "Practice", "updateLap:" . values2String(";", lap, fileName, true), pid)
+		}
 
 		this.checkStrategy()
 	}

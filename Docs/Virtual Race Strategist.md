@@ -271,6 +271,8 @@ Simply start the "Practice Center" **before** starting the session in your simul
 
 Note: If you have [enabled a team session](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#connecting-to-a-session), the "Practice Center" cannot be used, of course, since all data are handled by the Team Server in this case.
 
+Good to know: The "Practice Center" benefits from a high data update frequency of the Race Assistants. Therefore, if your PC is powerful enough, you can change this value in the "Session Database".
+
 ### Data Analysis
 
 "Practice Center" supplies you with a couple of reports, which you can use to analyse your performance and dig deeper into the telemetry data of the car. Choose one of the reports in the reports list and this report will be shown in the report area on the top right of "Practice Center" window.
@@ -325,6 +327,8 @@ To create a new stint manually while you are standing in the pit, follow these s
 2. Select whether you want to change tyres and possibly a specific tyre compound using the "Compound" drop down menu. You can also use the small button beside the drop down menu to query the simulator for the currently mounted tyre compound and tyre set, if this data is provided.
 3. Select the number of the mounted tyre set. This is important, so that the "Practice Center" can manage the number of laps driven with this specific tyre set.
 4. Finally click on the button "New Stint" or choose the corresponding command from the "Stints" menu.
+
+It is recommended to use the "Auto" mode in races, since then the pitstops are reliable detected by the Race Assistants, whereas in Practice sessions, it will be much better to create the different practice stints manually.
 
 ### Exporting data to the session database
 

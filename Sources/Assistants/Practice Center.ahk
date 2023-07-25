@@ -62,7 +62,7 @@ global kSessionDataSchemas := CaseInsenseMap("Run.Data", ["Nr", "Lap", "Driver.F
 										   , "Lap.Data", ["Run", "Nr", "Lap", "Position", "Lap.Time", "Lap.State", "Lap.Valid", "Grip", "Map", "TC", "ABS"
 														, "Weather", "Temperature.Air", "Temperature.Track"
 														, "Fuel.Initial", "Fuel.Remaining", "Fuel.Consumption", "Damage", "EngineDamage", "Accident"
-														, "Tyre.Laps", "Tyre.Compound", "Tyre.Compound.Color"
+														, "Tyre.Laps", "Tyre.Compound", "Tyre.Compound.Color", "Tyre.Set"
 														, "Tyre.Pressure.Cold.Average", "Tyre.Pressure.Cold.Front.Average", "Tyre.Pressure.Cold.Rear.Average"
 														, "Tyre.Pressure.Cold.Front.Left", "Tyre.Pressure.Cold.Front.Right"
 														, "Tyre.Pressure.Cold.Rear.Left", "Tyre.Pressure.Cold.Rear.Right"
@@ -157,7 +157,7 @@ class PracticeCenter extends ConfigurationItem {
 	iAvailableTyreCompounds := [normalizeCompound("Dry")]
 	iTyreCompounds := [normalizeCompound("Dry")]
 
-	iTyreSets := WeakMap()
+	iUsedTyreSets := WeakMap()
 
 	iTyreCompound := false
 	iTyreCompoundColor := false
@@ -678,9 +678,9 @@ class PracticeCenter extends ConfigurationItem {
 		}
 	}
 
-	TyreSets[key?] {
+	UsedTyreSets[key?] {
 		Get {
-			return (isSet(key) ? this.iTyreSets[key] : this.iTyreSets)
+			return (isSet(key) ? this.iUsedTyreSets[key] : this.iUsedTyreSets)
 		}
 	}
 
@@ -1355,7 +1355,7 @@ class PracticeCenter extends ConfigurationItem {
 
 		centerTab.UseTab(2)
 
-		this.iRunsListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 H:Grow(0.8) Checked -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Driver", "Weather", "Compound", "Laps", "Initial Fuel", "Consumed Fuel", "Avg. Lap Time", "Accidents", "Potential", "Race Craft", "Speed", "Consistency", "Car Control"], translate))
+		this.iRunsListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 H:Grow(0.8) Checked -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Driver", "Weather", "Compound", "Set", "Laps", "Initial Fuel", "Consumed Fuel", "Avg. Lap Time", "Accidents", "Potential", "Race Craft", "Speed", "Consistency", "Car Control"], translate))
 		this.iRunsListView.OnEvent("Click", chooseRun)
 
 		centerTab.UseTab(3)
@@ -2095,7 +2095,7 @@ class PracticeCenter extends ConfigurationItem {
 
 		this.iAvailableTyreCompounds := [normalizeCompound("Dry")]
 		this.iTyreCompounds := [normalizeCompound("Dry")]
-		this.iTyreSets := WeakMap()
+		this.iUsedTyreSets := WeakMap()
 
 		this.RunsListView.Delete()
 		this.LapsListView.Delete()
@@ -2222,14 +2222,15 @@ class PracticeCenter extends ConfigurationItem {
 
 		this.UsedTyreSetsListView.Delete()
 
-		this.iTyreSets := tyreSets
+		this.iUsedTyreSets := tyreSets
 
 		if currentRun
-			loop currentRun.Nr {
-				run := this.Runs[A_Index]
+			loop currentRun.Nr
+				if this.Runs.Has(A_Index) {
+					run := this.Runs[A_Index]
 
-				tyreSets[run.Compound . "." . run.TyreSet] := {Nr: run.TyreSet, Compound: run.Compound, Laps: (run.TyreLaps + run.Laps.Length)}
-			}
+					tyreSets[run.Compound . "." . run.TyreSet] := {Nr: run.TyreSet, Compound: run.Compound, Laps: (run.TyreLaps + run.Laps.Length)}
+				}
 
 		for ignore, tyreSet in tyreSets
 			this.UsedTyreSetsListView.Add("", translate(tyreSet.Compound), tyreSet.Nr, tyreSet.Laps)
@@ -2246,9 +2247,18 @@ class PracticeCenter extends ConfigurationItem {
 					   , AvgLapTime: "-", Potential: "-", RaceCraft: "-", Speed: "-", Consistency: "-", CarControl: "-"
 					   , StartPosition: "-", EndPosition: "-", Laps: []}
 
+		switch this.Control["tyreCompoundDropDown"].Value {
+			case 1:
+				newRun.TyreMode := false
+			case 2:
+				newRun.TyreMode := "Auto"
+			default:
+				newRun.TyreMode := "Manual"
+		}
+
 		this.Runs[newRun.Nr] := newRun
 
-		this.RunsListView.Add("Check", newRun.Nr, "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-")
+		this.RunsListView.Add("Check", newRun.Nr, "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-")
 
 		newRun.Row := this.RunsListView.GetCount()
 
@@ -2261,6 +2271,9 @@ class PracticeCenter extends ConfigurationItem {
 	}
 
 	modifyRun(run) {
+		local tyreCompound := false
+		local tyreSet := false
+		local driver := false
 		local laps, numLaps, lapTimes, airTemperatures, trackTemperatures
 		local ignore, lap, consumption, weather, fuelAmount
 
@@ -2299,23 +2312,34 @@ class PracticeCenter extends ConfigurationItem {
 			airTemperatures.Push(lap.AirTemperature)
 			trackTemperatures.Push(lap.TrackTemperature)
 
-			if ((A_Index == 1) && (run.Compound = "-"))
-				run.Compound := lap.Compound
-			else
-				lap.Compound := run.Compound
-
-			if ((A_Index == 1) && (run.TyreSet = "-"))
-				run.Compound := lap.TyreSet
-			else
-				lap.TyreSet := run.TyreSet
-
 			weather := lap.Weather
 
 			if (run.Weather = "")
 				run.Weather := weather
 			else if !inList(string2Values(",", run.Weather), weather)
 				run.Weather .= (", " . weather)
+
+			tyreCompound := lap.Compound
+			tyreSet := lap.TyreSet
+			driver := lap.Driver
 		}
+
+		if (run.TyreMode = "Auto") {
+			if (tyreCompound && (run.Compound != tyreCompound))
+				run.Compound := tyreCompound
+
+			if (tyreSet && (run.TyreSet != tyreSet)) {
+				run.TyreSet := tyreSet
+
+				if this.UsedTyreSets.Has(tyreCompound . "." . tyreSet)
+					run.TyreLaps := this.UsedTyreSets[tyreCompound . "." . tyreSet].Laps
+				else
+					run.TyreLaps := 0
+			}
+		}
+
+		if driver
+			run.Driver := driver
 
 		run.AvgLaptime := Round(average(laptimes), 1)
 		run.BestLaptime := Round(minimum(laptimes), 1)
@@ -2335,7 +2359,7 @@ class PracticeCenter extends ConfigurationItem {
 
 		this.RunsListView.Modify(run.Row, "", run.Nr, (run.Driver != "-") ? run.Driver.FullName : "-"
 											, values2String(", ", collect(string2Values(",", run.Weather), translate)*)
-											, translate(run.Compound), run.Laps.Length
+											, translate(run.Compound), run.TyreSet, run.Laps.Length
 											, fuelAmount, displayValue("Float", convertUnit("Volume", run.FuelConsumption))
 											, lapTimeDisplayValue(run.AvgLaptime)
 											, run.Accidents, run.Potential, run.RaceCraft, run.Speed, run.Consistency, run.CarControl)
@@ -2348,9 +2372,14 @@ class PracticeCenter extends ConfigurationItem {
 		return this.CurrentRun
 	}
 
-	newRun(lap, transferLap := false, newTyres := true) {
+	newRun(lap, transferLap := false, newTyres?) {
 		local currentRun := this.CurrentRun
-		local newRun, tyreCompound, tyreSet
+		local tyreCompound := "-"
+		local tyreSet := "-"
+		local newRun
+
+		if !isSet(newTyres)
+			newTyres := (this.Control["tyreCompoundDropDown"].Value > 1)
 
 		if (currentRun && (currentRun.Laps.Length = 0)) {
 			this.RunsListView.Delete(currentRun.Row)
@@ -2366,41 +2395,45 @@ class PracticeCenter extends ConfigurationItem {
 
 		newRun := this.requireRun(lap, true)
 
-		if (currentRun && transferLap) {
+		if (currentRun && transferLap && this.LastLap) {
 			currentRun.Laps.RemoveAt(currentRun.Laps.Length)
 			newRun.Laps.Push(this.LastLap)
 
 			this.LastLap.Run := newRun
+
+			this.modifyRun(currentRun)
 		}
 
 		if newTyres {
 			tyreCompound := this.Control["tyreCompoundDropDown"].Value
-			tyreSet := this.Control["tyreSetEdit"].Value
 
 			if (tyreCompound > 2) {
+				newRun.TyreMode := "Manual"
+
+				tyreSet := this.Control["tyreSetEdit"].Value
+
 				newRun.Compound := this.TyreCompounds[tyreCompound - 2]
 
 				if (isInteger(tyreSet) && (tyreSet > 0))
 					newRun.TyreSet := tyreSet
 			}
+			else
+				newRun.TyreMode := "Auto"
 		}
 		else if currentRun {
-			tyreSet := currentRun.TyreSet
+			newRun.TyreMode := false
 
 			newRun.Compound := currentRun.Compound
-			newRun.TyreSet := tyreSet
+			newRun.TyreSet := currentRun.TyreSet
 			newRun.TyreLaps := (currentRun.TyreLaps + currentRun.Laps.Length)
 		}
-
-		if this.UsedTyreSets.Has(newRun.Compound . "." . tyreSet)
-			newRun.TyreLaps := this.UsedTyreSets[newRun.Compound . "." . tyreSet].Laps
 
 		return newRun
 	}
 
 	createLap(run, lapNumber) {
 		local newLap := {Run: run, Nr: lapNumber, Weather: "-", Grip: "-", Laptime: "-", FuelConsumption: "-", FuelRemaining: "-"
-					   , Pressures: "-,-,-,-", Temperatures: "-,-,-,-", State: "Valid", Accident: ""
+					   , Compound: "-", TyreSet: "-", Pressures: "-,-,-,-", Temperatures: "-,-,-,-", State: "Valid", Accident: ""
 					   , Electronics: false, Tyres: false
 					   , HotPressures: false, ColdPressures: false, PressureLosses: false}
 
@@ -2470,7 +2503,7 @@ class PracticeCenter extends ConfigurationItem {
 		local lap := this.requireLap(lapNumber)
 		local selectedLap := this.LapsListView.GetNext()
 		local selectedRun := this.RunsListView.GetNext()
-		local damage, pLap, fuelConsumption, car, tyreCompound, tyreSet, run
+		local damage, pLap, fuelConsumption, car, run
 
 		if selectedLap
 			selectedLap := (selectedLap == this.LapsListView.GetCount())
@@ -2482,26 +2515,14 @@ class PracticeCenter extends ConfigurationItem {
 
 		run := lap.Run
 
-		if !isObject(run.Driver)
-			run.Driver := this.createDriver({Forname: getMultiMapValue(data, "Stint Data", "DriverForname")
-										   , Surname: getMultiMapValue(data, "Stint Data", "DriverSurname")
-										   , Nickname: getMultiMapValue(data, "Stint Data", "DriverNickname")
-										   , ID: SessionDatabase.ID})
+		lap.Driver := this.createDriver({Forname: getMultiMapValue(data, "Stint Data", "DriverForname")
+									   , Surname: getMultiMapValue(data, "Stint Data", "DriverSurname")
+									   , Nickname: getMultiMapValue(data, "Stint Data", "DriverNickname")
+									   , ID: SessionDatabase.ID})
 
-		if (run.Compound = "-")
-			run.Compound := compound(getMultiMapValue(data, "Car Data", "TyreCompound")
-								   , getMultiMapValue(data, "Car Data", "TyreCompoundColor"))
-
-		if (run.TyreSet = "-") {
-			tyreSet := getMultiMapValue(data, "Car Data", "TyreSet", kUndefined)
-
-			if (tyreSet != kUndefined) {
-				run.TyreSet := tyreSet
-
-				if this.UsedTyreSets.Has(run.Compound . "." . tyreSet)
-					run.TyreLaps := this.UsedTyreSets[run.Compound . "." . tyreSet].Laps
-			}
-		}
+		lap.Compound := compound(getMultiMapValue(data, "Car Data", "TyreCompound")
+							   , getMultiMapValue(data, "Car Data", "TyreCompoundColor"))
+		lap.TyreSet := getMultiMapValue(data, "Car Data", "TyreSet", "-")
 
 		damage := 0
 
@@ -2565,8 +2586,6 @@ class PracticeCenter extends ConfigurationItem {
 		car := getMultiMapValue(data, "Position Data", "Driver.Car")
 
 		lap.Position := (car ? getMultiMapValue(data, "Position Data", "Car." . car . ".Position") : false)
-
-		lap.Compound := lap.Run.Compound
 
 		this.iWeather := lap.Weather
 		this.iAirTemperature := lap.AirTemperature
@@ -2643,13 +2662,16 @@ class PracticeCenter extends ConfigurationItem {
 
 	addStandings(lap, data) {
 		local sessionStore := this.SessionStore
-		local prefix := ("Standings.Lap." . lap.Nr . ".Car.")
-		local driver, category, carIDs
+		local prefix, driver, category, carIDs
 
 		carIDs := CaseInsenseWeakMap()
 
 		loop getMultiMapValue(lap.Data, "Position Data", "Car.Count")
 			carIDs[A_Index] := getMultiMapValue(lap.Data, "Position Data", "Car." . A_Index . ".ID")
+
+		lap := lap.Nr
+
+		prefix := ("Standings.Lap." . lap . ".Car.")
 
 		sessionStore.add("Delta.Data"
 					   , Database.Row("Lap", lap, "Type", "Standings.Behind"
@@ -2737,7 +2759,10 @@ class PracticeCenter extends ConfigurationItem {
 		this.initializeSimulator(simulator, car, track)
 
 		if (pitstop && (this.Control["runModeDropDown"].Value = 2))
-			this.newRun(lap.Nr, true, (this.Control["tyreCompoundDropDown"].Value > 1))
+			this.newRun(lap.Nr, true)
+
+		if (this.Control["tyreCompoundDropDown"].Value = 2) {
+		}
 
 		if (lap.Pressures = "-,-,-,-")
 			lap.Pressures := pressures
@@ -3433,7 +3458,7 @@ class PracticeCenter extends ConfigurationItem {
 					 , FuelRemaining: lap["Fuel.Remaining"], FuelConsumption: lap["Fuel.Consumption"]
 					 , Damage: lap["Damage"], EngineDamage: lap["EngineDamage"]
 					 , Accident: lap["Accident"]
-					 , Compound: compound(lap["Tyre.Compound"], lap["Tyre.Compound.Color"])
+					 , Compound: compound(lap["Tyre.Compound"], lap["Tyre.Compound.Color"]), TyreSet: lap["Tyre.Set"]
 					 , Pressures: values2String(",", lap["Tyre.Pressure.Hot.Front.Left"], lap["Tyre.Pressure.Hot.Front.Right"]
 												   , lap["Tyre.Pressure.Hot.Rear.Left"], lap["Tyre.Pressure.Hot.Rear.Right"])
 					 , Temperatures: values2String(",", lap["Tyre.Temperature.Front.Left"], lap["Tyre.Temperature.Front.Right"]
@@ -3575,7 +3600,7 @@ class PracticeCenter extends ConfigurationItem {
 					this.RunsListView.Add(this.SessionExported ? "" : "Check"
 										, run.Nr, run.Driver.FullName
 										, values2String(", ", collect(string2Values(",", run.Weather), translate)*)
-										, translate(run.Compound), run.Laps.Length
+										, translate(run.Compound), run.TyreSet, run.Laps.Length
 										, isNumber(run.FuelInitial) ? displayValue("Float", convertUnit("Volume", run.FuelInitial)) : run.FuelInitial
 										, isNumber(run.FuelConsumption) ? displayValue("Float", convertUnit("Volume", run.FuelConsumption)) : run.FuelConsumption
 										, lapTimeDisplayValue(run.AvgLaptime)
@@ -4591,7 +4616,7 @@ class PracticeCenter extends ConfigurationItem {
 									  , "Fuel.Remaining", null(lap.FuelRemaining), "Lap.State", lap.State, "Lap.Valid", (lap.State != "Invalid")
 									  , "Weather", lap.Weather, "Temperature.Air", null(lap.AirTemperature), "Temperature.Track", null(lap.TrackTemperature)
 									  , "Grip", lap.Grip, "Map", null(lap.Map), "TC", null(lap.TC), "ABS", null(lap.ABS)
-									  , "Tyre.Compound", compound(lap.Compound), "Tyre.Compound.Color", compoundColor(lap.Compound)
+									  , "Tyre.Compound", compound(lap.Compound), "Tyre.Compound.Color", compoundColor(lap.Compound), "Tyre.Set", lap.TyreSet
 									  , "Data.Telemetry", lap.TelemetryData, "Data.Pressures", lap.PressuresData)
 
 				pressures := pressuresTable[newLap]
@@ -5234,13 +5259,14 @@ class PracticeCenter extends ConfigurationItem {
 
 			html .= ("<br><br><div id=`"header`"><i>" . translate("Telemetry") . "</i></div>")
 
-			for ignore, lap in run.Laps {
-				laps.Push(lap.Nr)
-				positions.Push(lap.Position)
-				lapTimes.Push(lap.Laptime)
-				fuelConsumptions.Push(lap.FuelConsumption)
-				temperatures.Push(lapTable[lap.Nr]["Tyre.Temperature.Average"])
-			}
+			for ignore, lap in run.Laps
+				if lapTable.Has(lap.Nr) {
+					laps.Push(lap.Nr)
+					positions.Push(lap.Position)
+					lapTimes.Push(lap.Laptime)
+					fuelConsumptions.Push(lap.FuelConsumption)
+					temperatures.Push(lapTable[lap.Nr]["Tyre.Temperature.Average"])
+				}
 
 			width := (this.DetailsViewer.getWidth() - 20)
 
@@ -5272,9 +5298,10 @@ class PracticeCenter extends ConfigurationItem {
 		local html := "<table>"
 		local hotPressures := "-, -, -, -"
 		local coldPressures := "-, -, -, -"
+		local pressuresLosses := "-, -, -, -"
 		local hasColdPressures := false
 		local pressuresDB := this.PressuresDatabase
-		local pressuresTable, pressures, coldPressures, hotPressures, pressuresLosses, tyresTable, tyres
+		local pressuresTable, pressures, tyresTable, tyres
 		local fuel, tyreCompound, tyreCompoundColor, tyreSet, tyrePressures, pressure
 		local fuelConsumption, remainingFuel
 

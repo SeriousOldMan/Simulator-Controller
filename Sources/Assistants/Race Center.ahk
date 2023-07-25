@@ -10205,13 +10205,14 @@ class RaceCenter extends ConfigurationItem {
 
 			html .= ("<br><br><div id=`"header`"><i>" . translate("Telemetry") . "</i></div>")
 
-			for ignore, lap in stint.Laps {
-				laps.Push(lap.Nr)
-				positions.Push(lap.Position)
-				lapTimes.Push(lap.Laptime)
-				fuelConsumptions.Push(lap.FuelConsumption)
-				temperatures.Push(lapTable[lap.Nr]["Tyre.Temperature.Average"])
-			}
+			for ignore, lap in stint.Laps
+				if lapTable.Has(lap.Nr) {
+					laps.Push(lap.Nr)
+					positions.Push(lap.Position)
+					lapTimes.Push(lap.Laptime)
+					fuelConsumptions.Push(lap.FuelConsumption)
+					temperatures.Push(lapTable[lap.Nr]["Tyre.Temperature.Average"])
+				}
 
 			width := (this.DetailsViewer.getWidth() - 20)
 
@@ -10246,7 +10247,7 @@ class RaceCenter extends ConfigurationItem {
 		local pressuresLosses := "-, -, -, -"
 		local hasColdPressures := false
 		local pressuresDB := this.PressuresDatabase
-		local pressuresTable, pressures, coldPressures, hotPressures, tyresTable, tyres
+		local pressuresTable, pressures, tyresTable, tyres
 		local fuel, tyreCompound, tyreCompoundColor, tyreSet, tyrePressures, pressureCorrections, pressure
 		local fuelConsumption, remainingFuel, remainingDriverTime, remainingStintTime
 

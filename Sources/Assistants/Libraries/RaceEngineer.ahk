@@ -1511,7 +1511,7 @@ class RaceEngineer extends RaceAssistant {
 			}
 
 			if currentCompound {
-				if (lapNumber <= knowledgeBase.getValue("Session.Settings.Lap.Learning.Laps", 2)) {
+				if (lapNumber <= (((this.Session = kSessionRace) ? 0 : this.BaseLap) + knowledgeBase.getValue("Session.Settings.Lap.Learning.Laps", 2))) {
 					if (currentCompound = "Dry")
 						prefix := "Session.Setup.Tyre.Dry.Pressure."
 					else
@@ -2250,6 +2250,45 @@ class RaceEngineer extends RaceAssistant {
 			this.RemoteHandler.pitstopFinished(this.KnowledgeBase.getValue("Pitstop.Last", 0))
 
 		return result
+	}
+
+	performService(lapNumber, fuel, tyreCompound, tyreCompoundColor, tyreSet
+						    , tyrePressureFL, tyrePressureFR, tyrePressureRL, tyrePressureRR) {
+		local knowledgeBase := this.KnowledgeBase
+		local pitstop := (knowledgeBase.getValue("Pitstop.Last", 0) + 1)
+		local ignore, fact
+
+		setValue(fact, value) {
+			knowledgeBase.setFact("Pitstop." . pitstop . "." . fact, value)
+		}
+
+		knowledgeBase.setFact("Tyre.Compound", tyreCompound)
+		knowledgeBase.setFact("Tyre.Compound.Color", tyreCompoundColor)
+
+		setValue("Lap", lapNumber)
+		setValue("Time", A_Now)
+		setValue("Time", A_Now)
+		setValue("Temperature.Air", knowledgeBase.getValue("Lap." . lapNumber . "Temperature.Air"))
+		setValue("Temperature.Track", knowledgeBase.getValue("Lap." . lapNumber . "Temperature.Track"))
+		setValue("Fuel", fuel)
+		setValue("Tyre.Compound", tyreCompound)
+		setValue("Tyre.Compound.Color", tyreCompoundColor)
+		setValue("Tyre.Set", tyreSet)
+		setValue("Tyre.Pressure.FL", tyrePressureFL)
+		setValue("Tyre.Pressure.FR", tyrePressureFR)
+		setValue("Tyre.Pressure.RL", tyrePressureRL)
+		setValue("Tyre.Pressure.RR", tyrePressureRR)
+
+		for ignore, fact in ["Tyre.Pressure.Correction", "Driver.Request", "Repair.Bodywork", "Repair.Suspension", "Repair.Engine"]
+			setValue(fact, false)
+
+		knowledgeBase.setFact("Pitstop.Last", pitstop)
+		knowledgeBase.setFact("Pitstop.Clear", lapNumber)
+
+		knowledgeBase.produce()
+
+		if this.Debug[kDebugKnowledgeBase]
+ 			this.dumpKnowledgeBase(this.KnowledgeBase)
 	}
 
 	callPlanPitstop(lap := kUndefined, arguments*) {

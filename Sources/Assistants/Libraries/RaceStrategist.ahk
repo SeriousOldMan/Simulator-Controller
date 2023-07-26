@@ -1671,7 +1671,8 @@ class RaceStrategist extends GridRaceAssistant {
 			pitstop := knowledgeBase.getValue("Pitstop.Last", false)
 
 			if pitstop
-				pitstop := (Abs(lapNumber - knowledgeBase.getValue("Pitstop." . pitstop . ".Lap")) <= 2)
+				pitstop := (lapNumber = (knowledgeBase.getValue("Pitstop." . pitstop . ".Lap") + 1))
+				; pitstop := (Abs(lapNumber - knowledgeBase.getValue("Pitstop." . pitstop . ".Lap")) <= 2)
 		}
 		else {
 			pitstop := false
@@ -3438,7 +3439,7 @@ class RaceStrategist extends GridRaceAssistant {
 							setMultiMapValue(data, "Cars", "Car." . carIndex . ".Position", grid[carIndex])
 							setMultiMapValue(data, "Cars", "Car." . carIndex . ".Position", grid[raceInfo[key]])
 
-							if (A_Index = driverCar)
+							if (A_Index = driver)
 								validLap := knowledgeBase.getValue("Car." . A_Index . ".Lap.Valid")
 						}
 					}

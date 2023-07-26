@@ -573,7 +573,7 @@ class PracticeCenter extends ConfigurationItem {
 
 	SessionDirectory {
 		Get {
-			if (this.SessionMode = "Active")
+			if this.SessionActive
 				return this.iSessionDirectory
 			else if (this.SessionMode = "Loaded")
 				return this.SessionLoaded
@@ -585,6 +585,12 @@ class PracticeCenter extends ConfigurationItem {
 	SessionMode {
 		Get {
 			return this.iSessionMode
+		}
+	}
+
+	SessionActive {
+		Get {
+			return (this.SessionMode = "Active")
 		}
 	}
 
@@ -888,6 +894,11 @@ class PracticeCenter extends ConfigurationItem {
 		local simulator, car, track
 		local x, x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, xB
 		local w12, w13
+
+		noSelect(listView, *) {
+			loop listView.GetCount()
+				listView.Modify(A_Index, "-Select")
+		}
 
 		validateNumber(field, *) {
 			field := centerGui[field]
@@ -1337,6 +1348,7 @@ class PracticeCenter extends ConfigurationItem {
 
 		this.iTyreCompoundsListView := centerGui.Add("ListView", "x" . x7 . " yp w" . w12 . " h90 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Compound", "#"], translate))
 		this.iTyreCompoundsListView.OnEvent("Click", chooseTyreCompound)
+		this.iTyreCompoundsListView.OnEvent("DoubleClick", chooseTyreCompound)
 
 		x13 := (x7 + w12 + 5)
 
@@ -1359,6 +1371,8 @@ class PracticeCenter extends ConfigurationItem {
 		w13 := (x13 + 23 - x7)
 
 		this.iUsedTyreSetsListView := centerGui.Add("ListView", "x" . x7 . " yp w" . w13 . " h140 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Compound", "Set", "Laps"], translate))
+		this.iUsedTyreSetsListView.OnEvent("Click", noSelect)
+		this.iUsedTyreSetsListView.OnEvent("DoubleClick", noSelect)
 
 		centerTab.UseTab(2)
 
@@ -1783,7 +1797,7 @@ class PracticeCenter extends ConfigurationItem {
 
 			window["importPressuresButton"].Enabled := false
 		}
-		else {
+		else if (this.SessionActive || !this.SessionMode) {
 			window["planMenuDropDown"].Visible := true
 			window["runMenuDropDown"].Visible := true
 
@@ -1806,6 +1820,20 @@ class PracticeCenter extends ConfigurationItem {
 				window["newRunButton"].Enabled := false
 			}
 		}
+		else {
+			window["planMenuDropDown"].Visible := true
+			window["runMenuDropDown"].Visible := true
+
+			window["runModeDropDown"].Enabled := false
+			window["runModeDropDown"].Choose(0)
+
+			window["newRunButton"].Enabled := false
+
+			window["tyreCompoundDropDown"].Enabled := false
+			window["tyreCompoundDropDown"].Choose(0)
+
+			window["importPressuresButton"].Enabled := false
+		}
 
 		if (window["tyreCompoundDropDown"].Value <= 2) {
 			for ignore, field in ["tyreSetEdit", "tyrePressureFLEdit", "tyrePressureFREdit", "tyrePressureRLEdit", "tyrePressureRREdit"] {
@@ -1823,7 +1851,7 @@ class PracticeCenter extends ConfigurationItem {
 
 		this.Control["compoundAddButton"].Enabled := (this.AvailableTyreCompounds.Length > this.TyreCompoundsListView.GetCount())
 
-		if ((this.TyreCompoundsListView.GetNext(0) > 0) && !this.SessionExported) {
+		if ((this.SessionActive || !this.SessionMode) && (this.TyreCompoundsListView.GetNext(0) > 0) && !this.SessionExported) {
 			this.Control["compoundDropDown"].Enabled := true
 			this.Control["compoundCountEdit"].Enabled := true
 			this.Control["compoundDeleteButton"].Enabled := true
@@ -1931,7 +1959,7 @@ class PracticeCenter extends ConfigurationItem {
 
 		switch line {
 			case 3: ; Clear...
-				if (this.SessionMode = "Active") {
+				if this.SessionActive {
 					OnMessage(0x44, translateYesNoButtons)
 					msgResult := MsgBox(translate("Do you really want to delete all data from the currently active session? This cannot be undone."), translate("Delete"), 262436)
 					OnMessage(0x44, translateYesNoButtons, 0)
@@ -1945,7 +1973,7 @@ class PracticeCenter extends ConfigurationItem {
 				this.loadSession()
 			case 6: ; Save Session
 				if this.HasData {
-					if (this.SessionMode = "Active")
+					if this.SessionActive
 						this.saveSession()
 					else {
 						OnMessage(0x44, translateOkButton)
@@ -1970,7 +1998,7 @@ class PracticeCenter extends ConfigurationItem {
 				this.updateStatistics()
 			case 11: ; Session Summary
 				this.showSessionSummary()
-			case 13: ; Session Summary
+			case 13: ; Export data
 				if (this.HasData && !this.SessionExported) {
 					OnMessage(0x44, translateYesNoButtons)
 					msgResult := MsgBox(translate("Do you want to transfer the selected data to the session database? This is only possible once."), translate("Delete"), 262436)
@@ -2003,14 +2031,20 @@ class PracticeCenter extends ConfigurationItem {
 	chooseRunMenu(line) {
 		switch line {
 			case 3: ; New Stint
-				if (this.Control["runModeDropDown"].Value = 1) {
-					local lastLap := this.LastLap
+				if this.SessionActive {
+					if (this.Control["runModeDropDown"].Value = 1) {
+						local lastLap := this.LastLap
 
-					this.withExceptionhandler(ObjBindMethod(this, "newRun", lastLap ? (lastLap.Nr + 1) : 1))
-				}
+						this.withExceptionhandler(ObjBindMethod(this, "newRun", lastLap ? (lastLap.Nr + 1) : 1))
+					}
+					else {
+						OnMessage(0x44, translateOkButton)
+						MsgBox(translate("You must have manual stint mode enabled to create a new stint manually."), translate("Information"), 262192)
+						OnMessage(0x44, translateOkButton, 0)
+					}
 				else {
 					OnMessage(0x44, translateOkButton)
-					MsgBox(translate("You must have manual stint mode enabled to create a new stint manually."), translate("Information"), 262192)
+					MsgBox(translate("You are not connected to an active session."), translate("Information"), 262192)
 					OnMessage(0x44, translateOkButton, 0)
 				}
 			case 5:
@@ -2088,7 +2122,7 @@ class PracticeCenter extends ConfigurationItem {
 	initializeSession(session := "Practice") {
 		local directory, reportDirectory
 
-		if (!this.SessionMode || (this.SessionMode = "Active")) {
+		if (!this.SessionMode || this.SessionActive) {
 			directory := this.SessionDirectory
 
 			deleteDirectory(directory)
@@ -2347,10 +2381,12 @@ class PracticeCenter extends ConfigurationItem {
 
 			tyreCompound := lap.Compound
 			tyreSet := lap.TyreSet
-			driver := lap.Driver
+
+			if lap.HasProp("Driver")
+				driver := lap.Driver
 		}
 
-		if (run.TyreMode = "Auto") {
+		if (this.SessionActive && (run.TyreMode = "Auto")) {
 			if (tyreCompound && (run.Compound != tyreCompound))
 				run.Compound := tyreCompound
 
@@ -2911,6 +2947,7 @@ class PracticeCenter extends ConfigurationItem {
 	addPressures(lap, simulator, car, track, weather, airTemperature, trackTemperature
 			   , compound, compoundColor, coldPressures, hotPressures, pressuresLosses) {
 		local pressuresTable := this.PressuresDatabase.Database.Tables["Tyres.Pressures"]
+		local driverID := lap.Run.Driver.ID
 		local pressures, pressuresData
 
 		while (pressuresTable.Length < (lap.Nr - 1)) {
@@ -2933,7 +2970,7 @@ class PracticeCenter extends ConfigurationItem {
 												 , collect(string2Values(",",  pressuresData[9]), null)
 												 , collect(string2Values(",",  pressuresData[10]), null)
 												 , collect(string2Values(",",  pressuresData[11]), null)
-												 , lap.Run.Driver.ID)
+												 , driverID)
 		}
 
 		lap.PressuresData := values2String("|||", simulator, car, track, weather, airTemperature, trackTemperature
@@ -2943,7 +2980,7 @@ class PracticeCenter extends ConfigurationItem {
 											 , collect(string2Values(",", coldPressures), null)
 											 , collect(string2Values(",", hotPressures), null)
 											 , collect(string2Values(",", pressuresLosses), null)
-											 , lap.Run.Driver.ID)
+											 , driverID)
 
 		if (lap.Pressures = "-,-,-,-") {
 			lap.Pressures := hotPressures
@@ -3406,7 +3443,7 @@ class PracticeCenter extends ConfigurationItem {
 
 						this.updateRunStatistics(run)
 
-						this.RunsListView.Modify(run.Row, "Col10", run.Potential, run.RaceCraft, run.Speed, run.Consistency, run.CarControl)
+						this.RunsListView.Modify(run.Row, "Col11", run.Potential, run.RaceCraft, run.Speed, run.Consistency, run.CarControl)
 					}
 
 					Sleep(200)
@@ -3435,7 +3472,7 @@ class PracticeCenter extends ConfigurationItem {
 		saveSessionAsync(copy := false) {
 			local info, directory, translator, folder, session
 
-			if (this.SessionMode = "Active") {
+			if this.SessionActive {
 				this.syncSessionStore(true)
 
 				info := newMultiMap()
@@ -5704,7 +5741,7 @@ class PracticeCenter extends ConfigurationItem {
 
 			try {
 				if update {
-					if ((this.SessionMode = "Active") && (this.LastLap.Nr = lapNumber))
+					if (this.SessionActive && (this.LastLap.Nr = lapNumber))
 						this.updateRunning(lapNumber, data)
 				}
 				else {
@@ -5729,7 +5766,7 @@ class PracticeCenter extends ConfigurationItem {
 	updateReportData(lapNumber, fileName) {
 		updateReportDataAsync() {
 			try {
-				if ((this.SessionMode = "Active") && (this.LastLap.Nr = lapNumber)) {
+				if (this.SessionActive && (this.LastLap.Nr = lapNumber)) {
 					DirCreate(this.SessionDirectory . "Race Report")
 
 					FileCopy(fileName, this.SessionDirectory . "Race Report\Race.data", 1)
@@ -5750,7 +5787,7 @@ class PracticeCenter extends ConfigurationItem {
 			local raceData, lapData, directory, key, value, newLine, line
 			local pitstops, times, positions, laps, drivers
 
-			if ((this.SessionMode = "Active") && (this.LastLap.Nr = lapNumber)) {
+			if (this.SessionActive && (this.LastLap.Nr = lapNumber)) {
 				directory := (this.SessionDirectory . "Race Report\")
 
 				raceData := readMultiMap(directory . "Race.data")
@@ -5822,7 +5859,7 @@ class PracticeCenter extends ConfigurationItem {
 			local data := readMultiMap(fileName)
 
 			try {
-				if ((this.SessionMode = "Active") && (this.LastLap.Nr = lapNumber))
+				if (this.SessionActive && (this.LastLap.Nr = lapNumber))
 					this.addStandings(this.LastLap, data)
 			}
 			finally {
@@ -5837,7 +5874,7 @@ class PracticeCenter extends ConfigurationItem {
 				  , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
 				  , compound, compoundColor, pressures, temperatures, wear, state) {
 		udateTelemetryAsync() {
-			if ((this.SessionMode = "Active") && (this.LastLap.Nr = lapNumber))
+			if (this.SessionActive && (this.LastLap.Nr = lapNumber))
 				this.addTelemetry(this.LastLap, simulator, car, track, weather, airTemperature, trackTemperature
 								, fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
 								, compound, compoundColor, pressures, temperatures, wear, state)
@@ -5849,7 +5886,7 @@ class PracticeCenter extends ConfigurationItem {
 	updatePressures(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
 				  , compound, compoundColor, coldPressures, hotPressures, pressuresLosses) {
 		updatePressuresAsync() {
-			if ((this.SessionMode = "Active") && (this.LastLap.Nr = lapNumber))
+			if (this.SessionActive && (this.LastLap.Nr = lapNumber))
 				this.addPressures(this.LastLap, simulator, car, track, weather, airTemperature, trackTemperature
 								, compound, compoundColor, coldPressures, hotPressures, pressuresLosses)
 		}

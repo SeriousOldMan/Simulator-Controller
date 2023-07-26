@@ -1655,6 +1655,8 @@ class PracticeCenter extends ConfigurationItem {
 					this.Control[field . "Edit"].Text := displayValue("Float", convertUnit("Pressure", tyrePressure))
 			}
 		}
+
+		this.updateState()
 	}
 
 	getClasses(data) {
@@ -2264,14 +2266,21 @@ class PracticeCenter extends ConfigurationItem {
 					   , AvgLapTime: "-", Potential: "-", RaceCraft: "-", Speed: "-", Consistency: "-", CarControl: "-"
 					   , StartPosition: "-", EndPosition: "-", Laps: []}
 
-		switch this.Control["tyreCompoundDropDown"].Value {
-			case 1:
-				newRun.TyreMode := false
-			case 2:
-				newRun.TyreMode := "Auto"
-			default:
+		if (newRun.Nr = 1) {
+			if (this.Control["tyreCompoundDropDown"].Value > 2)
 				newRun.TyreMode := "Manual"
+			else
+				newRun.TyreMode := "Auto"
 		}
+		else
+			switch this.Control["tyreCompoundDropDown"].Value {
+				case 1:
+					newRun.TyreMode := false
+				case 2:
+					newRun.TyreMode := "Auto"
+				default:
+					newRun.TyreMode := "Manual"
+			}
 
 		this.Runs[newRun.Nr] := newRun
 
@@ -2421,12 +2430,10 @@ class PracticeCenter extends ConfigurationItem {
 			this.modifyRun(currentRun)
 		}
 
-		if newTyres {
+		if (newTyres || !currentRun) {
 			tyreCompound := this.Control["tyreCompoundDropDown"].Value
 
-			if (tyreCompound > 2) {
-				newRun.TyreMode := "Manual"
-
+			if (newRun.TyreMode = "Manual") {
 				tyreSet := this.Control["tyreSetEdit"].Value
 
 				newRun.Compound := this.TyreCompounds[tyreCompound - 2]
@@ -2434,40 +2441,40 @@ class PracticeCenter extends ConfigurationItem {
 				if (isInteger(tyreSet) && (tyreSet > 0))
 					newRun.TyreSet := tyreSet
 
-				engineerPID := ProcessExist("Race Engineer.exe")
+				if (newRun.Nr > 1) {
+					engineerPID := ProcessExist("Race Engineer.exe")
 
-				if engineerPID {
-					tyrePressures := []
+					if engineerPID {
+						tyrePressures := []
 
-					for ignore, tyre in ["FL", "FR", "RL", "RR"] {
-						tyre := internalValue("Float", this.Control["tyrePressure" . tyre . "Edit"].Text)
+						for ignore, tyre in ["FL", "FR", "RL", "RR"] {
+							tyre := internalValue("Float", this.Control["tyrePressure" . tyre . "Edit"].Text)
 
-						if isNumber(tyre)
-							tyrePressures.Push(convertUnit("Pressure", tyre, false))
-						else {
-							tyrePressures := false
+							if isNumber(tyre)
+								tyrePressures.Push(convertUnit("Pressure", tyre, false))
+							else {
+								tyrePressures := false
 
-							break
+								break
+							}
 						}
-					}
 
-					if tyrePressures {
-						splitCompound(newRun.Compound, &tyreCompound, &tyreCompoundColor)
+						if tyrePressures {
+							splitCompound(newRun.Compound, &tyreCompound, &tyreCompoundColor)
 
-						tyreSet := newRun.TyreSet
+							tyreSet := newRun.TyreSet
 
-						if (tyreSet = "-")
-							tyreSet := false
+							if (tyreSet = "-")
+								tyreSet := false
 
-						messageSend(kFileMessage, "Race Engineer"
-								  , "performService:" . values2String(";", lap.Nr, 0,
-																		 , tyreCompound, tyreCompoundColor, tyreSet, tyrePressures*)
-								  , engineerPID)
+							messageSend(kFileMessage, "Race Engineer"
+									  , "performService:" . values2String(";", lap, 0
+																			 , tyreCompound, tyreCompoundColor, tyreSet, tyrePressures*)
+									  , engineerPID)
+						}
 					}
 				}
 			}
-			else
-				newRun.TyreMode := "Auto"
 		}
 		else if currentRun {
 			newRun.TyreMode := false
@@ -2545,7 +2552,7 @@ class PracticeCenter extends ConfigurationItem {
 		if this.Laps.Has(lapNumber)
 			return this.Laps[lapNumber]
 		else
-			return this.createLap(this.requireRun(lapNumber), lapNumber)
+			return this.createLap((lapNumber = 1) ? this.newRun(lapNumber, false, true) : this.requireRun(lapNumber), lapNumber)
 	}
 
 	addLap(lapNumber, data) {

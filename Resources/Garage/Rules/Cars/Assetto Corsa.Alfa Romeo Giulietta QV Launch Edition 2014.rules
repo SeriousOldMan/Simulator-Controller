@@ -11,7 +11,7 @@
 ;;;                            Initialization                               ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Initialize] => (Prove: removeSettings("Assetto Corsa", "Alfa Romeo Giuletta QV Launch Edition 2014",
+[?Initialize] => (Prove: removeSettings("Assetto Corsa", "Alfa Romeo Giulietta QV Launch Edition 2014",
 										[Aero.Wing.Front, Aero.Wing.Rear,
 										 Brake.Balance, Aero.Height.Front, Aero.Height.Rear,
 										 Spring.Rate.Front.Left, Spring.Rate.Front.Right,

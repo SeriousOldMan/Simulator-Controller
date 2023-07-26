@@ -223,7 +223,7 @@ class PracticeCenter extends ConfigurationItem {
 				OnMessage(0x44, translator, 0)
 
 				if (msgResult = "Yes")
-					this.PracticeCenter.exportSession()
+					this.PracticeCenter.exportSession(true)
 
 				if (msgResult = "Cancel")
 					return true
@@ -2993,7 +2993,7 @@ class PracticeCenter extends ConfigurationItem {
 		}
 	}
 
-	exportSession() {
+	exportSession(wait := false) {
 		exportSessionAsync() {
 			local progressWindow := showProgress({color: "Green", title: translate("Export to Database")})
 			local telemetryDB := TelemetryDatabase(this.Simulator, this.Car, this.Track)
@@ -3080,7 +3080,10 @@ class PracticeCenter extends ConfigurationItem {
 			this.updateState()
 		}
 
-		this.pushTask(exportSessionAsync)
+		if wait
+			exportSessionAsync()
+		else
+			this.pushTask(exportSessionAsync)
 	}
 
 	updateReports(redraw := false) {

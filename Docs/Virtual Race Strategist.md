@@ -271,7 +271,11 @@ Simply start the "Practice Center" **before** starting the session in your simul
 
 Note: If you have [enabled a team session](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#connecting-to-a-session), the "Practice Center" cannot be used, of course, since all data are handled by the Team Server in this case.
 
-Good to know: The "Practice Center" benefits from a high data update frequency of the Race Assistants. Therefore, if your PC is powerful enough, you can change this value in the "Session Database".
+Good to know: The "Practice Center" benefits from a high data update frequency of the Race Assistants. Therefore, if your PC is powerful enough, you can change this value in the [settings of the "Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database):
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Practice%20Center%207.JPG)
+
+The default value for the data update frequency is 10 seconds, but you can can try to go as low as 2 seconds, if your PC is powerful enough.
 
 ### Data Analysis
 

@@ -909,30 +909,33 @@ requestDriver(?pitstopNumber) <= Call(requestPitstopDriver, ?pitstopNumber, !Pit
 ;;; history memory as a reference for future calculations.                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Pitstop.Lap] => (ProveAll: pitstopPerformed(?Pitstop.Lap)), (Set: Cleanup, Laps)
-[?Pitstop.Lap] => (Prove: clearPressureLossCalibration(?Pitstop.Lap))
-[?Pitstop.Lap] => (Prove: updateDamageReported(?Pitstop.Lap)),
-				  (Set: Damage.Suspension.Reported, ?Pitstop.Lap), (Set: Damage.Bodywork.Reported, ?Pitstop.Lap),
-				  (Set: Damage.Engine.Reported, ?Pitstop.Lap)
+[?Pitstop.Lap] => (ProveAll: pitstopPerformed(?Pitstop.Lap))
+
+priority: -10, {All: [?Pitstop.Lap], [?Pitstop.Prepared], [?Pitstop.Planned.Nr]} => (Set: Pitstop.Last, ?Pitstop.Planned.Nr)
+priority: -10, [?Pitstop.Lap] => (Set: Pitstop.Clear, ?Pitstop.Lap),
+
+[?Pitstop.Clear] => (Set: Cleanup, Laps),
+					(Prove: clearPressureLossCalibration(?Pitstop.Clear)),
+					(Prove: updateDamageReported(?Pitstop.Clear)),
+					(Set: Damage.Suspension.Reported, ?Pitstop.Clear), (Set: Damage.Bodywork.Reported, ?Pitstop.Clear),
+					(Set: Damage.Engine.Reported, ?Pitstop.Clear)
+					(Clear: Pitstop.Planned.Lap),
+					(Clear: Pitstop.Planned.Fuel),
+					(Clear: Pitstop.Planned.Tyre.Compound), (Clear: Pitstop.Planned.Tyre.Compound.Color),
+					(Clear: Pitstop.Planned.Tyre.Set),
+					(Clear: Pitstop.Planned.Tyre.Pressure.FL), (Clear: Pitstop.Planned.Tyre.Pressure.FR),
+					(Clear: Pitstop.Planned.Tyre.Pressure.RL), (Clear: Pitstop.Planned.Tyre.Pressure.RR),
+					(Clear: Pitstop.Planned.Tyre.Pressure.FL.Increment), (Clear: Pitstop.Planned.Tyre.Pressure.FR.Increment),
+					(Clear: Pitstop.Planned.Tyre.Pressure.RL.Increment), (Clear: Pitstop.Planned.Tyre.Pressure.RR.Increment),
+					(Clear: Pitstop.Planned.Tyre.Pressure.Correction),
+					(Clear: Pitstop.Planned.Tyre.Pressure.Lost.FL), (Clear: Pitstop.Planned.Tyre.Pressure.Lost.FR),
+					(Clear: Pitstop.Planned.Tyre.Pressure.Lost.RL), (Clear: Pitstop.Planned.Tyre.Pressure.Lost.RR),
+					(Clear: Pitstop.Planned.Driver.Request),
+					(Clear: Pitstop.Planned.Repair.Suspension), (Clear: Pitstop.Planned.Repair.Bodywork),
+					(Clear: Pitstop.Planned.Repair.Engine),
+					(Clear: Pitstop.Clear), (Clear: Pitstop.Lap), (Clear: Pitstop.Prepared), (Clear: Pitstop.Planned.Nr)
 				  
 updateDamageReported(?lap) <= ?lastLap = ?lap - 1, Set(Damage.Reported, ?lastLap), Set(Damage.Analysis.Reported, ?lap)
-
-priority: -10, [?Pitstop.Lap] => (Clear: Pitstop.Planned.Lap),
-								 (Clear: Pitstop.Planned.Fuel),
-								 (Clear: Pitstop.Planned.Tyre.Compound), (Clear: Pitstop.Planned.Tyre.Compound.Color),
-								 (Clear: Pitstop.Planned.Tyre.Set),
-								 (Clear: Pitstop.Planned.Tyre.Pressure.FL), (Clear: Pitstop.Planned.Tyre.Pressure.FR),
-								 (Clear: Pitstop.Planned.Tyre.Pressure.RL), (Clear: Pitstop.Planned.Tyre.Pressure.RR),
-								 (Clear: Pitstop.Planned.Tyre.Pressure.FL.Increment), (Clear: Pitstop.Planned.Tyre.Pressure.FR.Increment),
-								 (Clear: Pitstop.Planned.Tyre.Pressure.RL.Increment), (Clear: Pitstop.Planned.Tyre.Pressure.RR.Increment),
-								 (Clear: Pitstop.Planned.Tyre.Pressure.Correction),
-								 (Clear: Pitstop.Planned.Tyre.Pressure.Lost.FL), (Clear: Pitstop.Planned.Tyre.Pressure.Lost.FR),
-								 (Clear: Pitstop.Planned.Tyre.Pressure.Lost.RL), (Clear: Pitstop.Planned.Tyre.Pressure.Lost.RR),
-								 (Clear: Pitstop.Planned.Driver.Request),
-								 (Clear: Pitstop.Planned.Repair.Suspension), (Clear: Pitstop.Planned.Repair.Bodywork),
-								 (Clear: Pitstop.Planned.Repair.Engine)
-priority: -20, {All: [?Pitstop.Lap], [?Pitstop.Prepared], [?Pitstop.Planned.Nr]} => (Set: Pitstop.Last, ?Pitstop.Planned.Nr)
-priority: -20, [?Pitstop.Lap] => (Clear: Pitstop.Lap), (Clear: Pitstop.Prepared), (Clear: Pitstop.Planned.Nr)
 
 pitstopPerformed(?lap) <= unbound?(!Pitstop.Prepared), !, unpreparedPitstopPerformed(?lap), fail
 pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Lap, ?lap)

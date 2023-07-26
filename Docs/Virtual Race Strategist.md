@@ -326,9 +326,10 @@ To create a new stint manually while you are standing in the pit, follow these s
 1. Select "Manual" from the "Mode" drop down menu.
 2. Select whether you want to change tyres and possibly a specific tyre compound using the "Compound" drop down menu. You can also use the small button beside the drop down menu to query the simulator for the currently mounted tyre compound and tyre set, if this data is provided.
 3. Select the number of the mounted tyre set. This is important, so that the "Practice Center" can manage the number of laps driven with this specific tyre set.
-4. Finally click on the button "New Stint" or choose the corresponding command from the "Stints" menu.
+4. Enter the cold pressures, you have chosen for the new tyres.
+5. Finally click on the button "New Stint" or choose the corresponding command from the "Stints" menu.
 
-It is recommended to use the "Auto" mode in races, since then the pitstops are reliable detected by the Race Assistants, whereas in Practice sessions, it will be much better to create the different practice stints manually.
+It is recommended to use the "Auto" mode in races, since then the pitstops are reliable detected by the Race Assistants, whereas in Practice sessions, it will be much better to create the different practice stints manually. Esspecially the ideal cold tyre pressures derived by the Race Engineer will be mostly wrong, when the tyre change has not been planned and prepared under the control of the Race Engineer, which is typical in a practice session.
 
 ### Exporting data to the session database
 

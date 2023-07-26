@@ -1284,7 +1284,7 @@ class PracticeCenter extends ConfigurationItem {
 		centerGui.SetFont("Norm", "Arial")
 		centerGui.SetFont("Italic", "Arial")
 
-		centerGui.Add("GroupBox", "x24 ys+34 w209 h271", translate("Stint"))
+		centerGui.Add("GroupBox", "x24 ys+34 w209 h271", translate("Setup"))
 
 		centerGui.SetFont("Norm", "Arial")
 
@@ -1315,7 +1315,14 @@ class PracticeCenter extends ConfigurationItem {
 		centerGui.Add("Edit", "x" . x1 . " yp-4 w50 h20 Limit2 Number vtyreSetEdit")
 		centerGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range0-99")
 
-		centerGui.Add("Button", "x" . (x + 28) . " ys+155 w135 h20 vnewRunButton", translate("New Stint")).OnEvent("Click", newRun)
+		centerGui.Add("Text", "x" . x . " yp+28 w85 h40", translate("Pressures") . translate(" (") . getUnit("Pressure") . translate(")"))
+
+		centerGui.Add("Edit", "x" . x1 . " yp-2 w50 h20 Limit4 vtyrePressureFLEdit").OnEvent("Change", validateNumber.Bind("tyrePressureFLEdit"))
+		centerGui.Add("Edit", "x" . (x1 + 58) . " yp w50 h20 Limit4 vtyrePressureFREdit").OnEvent("Change", validateNumber.Bind("tyrePressureFREdit"))
+		centerGui.Add("Edit", "x" . x1 . " yp+22 w50 h20 Limit4 vtyrePressureRLEdit").OnEvent("Change", validateNumber.Bind("tyrePressureRLEdit"))
+		centerGui.Add("Edit", "x" . (x1 + 58) . " yp w50 h20 Limit4 vtyrePressureRREdit").OnEvent("Change", validateNumber.Bind("tyrePressureRREdit"))
+
+		centerGui.Add("Button", "x" . (x + 28) . " ys+207 w135 h20 vnewRunButton", translate("New Stint")).OnEvent("Click", newRun)
 
 		centerGui.SetFont("Norm", "Arial")
 		centerGui.SetFont("Italic", "Arial")
@@ -1601,7 +1608,7 @@ class PracticeCenter extends ConfigurationItem {
 
 	importFromSimulation(simulator) {
 		local prefix := SessionDatabase.getSimulatorCode(simulator)
-		local data, tyreCompound, tyreCompoundColor, tyreSet
+		local data, tyreCompound, tyreCompoundColor, tyreSet, tyrePressure, ignore, field
 
 		if !prefix {
 			OnMessage(0x44, translateOkButton)
@@ -1640,6 +1647,13 @@ class PracticeCenter extends ConfigurationItem {
 
 			if (tyreSet != kUndefined)
 				this.Control["tyreSetEdit"].Text := tyreSet
+
+			for ignore, field in ["TyrePressureFL", "TyrePressureFR", "TyrePressureRL", "TyrePressureRR"] {
+				tyrePressure := getMultiMapValue(data, "Setup Data", field, kUndefined)
+
+				if (tyrePressure != kUndefined)
+					this.Control[field . "Edit"].Text := displayValue("Float", convertUnit("Pressure", tyrePressure))
+			}
 		}
 	}
 
@@ -1740,6 +1754,7 @@ class PracticeCenter extends ConfigurationItem {
 
 	updateState() {
 		local window := this.Window
+		local ignore, field
 
 		window["runDropDown"].Enabled := false
 		window["driverDropDown"].Enabled := false
@@ -1751,8 +1766,6 @@ class PracticeCenter extends ConfigurationItem {
 		window["dataY4DropDown"].Enabled := false
 		window["dataY5DropDown"].Enabled := false
 		window["dataY6DropDown"].Enabled := false
-
-		window["tyreSetEdit"].Enabled := false
 
 		if (!this.Simulator || this.SessionExported) {
 			window["planMenuDropDown"].Visible := false
@@ -1793,11 +1806,15 @@ class PracticeCenter extends ConfigurationItem {
 		}
 
 		if (window["tyreCompoundDropDown"].Value <= 2) {
-			window["tyreSetEdit"].Enabled := false
-			window["tyreSetEdit"].Text := ""
+			for ignore, field in ["tyreSetEdit", "tyrePressureFLEdit", "tyrePressureFREdit", "tyrePressureRLEdit", "tyrePressureRREdit"] {
+				window[field].Enabled := false
+				window[field].Text := ""
+			}
 		}
 		else {
-			window["tyreSetEdit"].Enabled := true
+			for ignore, field in ["tyreSetEdit", "tyrePressureFLEdit", "tyrePressureFREdit", "tyrePressureRLEdit", "tyrePressureRREdit"]
+				window[field].Enabled := true
+
 			if (window["tyreSetEdit"].Text = "")
 				window["tyreSetEdit"].Text := 0
 		}
@@ -2376,7 +2393,7 @@ class PracticeCenter extends ConfigurationItem {
 		local currentRun := this.CurrentRun
 		local tyreCompound := "-"
 		local tyreSet := "-"
-		local newRun
+		local newRun, engineerPID, tyrePressures, tyre, tyreCompound, tyreCompoundColor
 
 		if !isSet(newTyres)
 			newTyres := (this.Control["tyreCompoundDropDown"].Value > 1)
@@ -2416,6 +2433,38 @@ class PracticeCenter extends ConfigurationItem {
 
 				if (isInteger(tyreSet) && (tyreSet > 0))
 					newRun.TyreSet := tyreSet
+
+				engineerPID := ProcessExist("Race Engineer.exe")
+
+				if engineerPID {
+					tyrePressures := []
+
+					for ignore, tyre in ["FL", "FR", "RL", "RR"] {
+						tyre := internalValue("Float", this.Control["tyrePressure" . tyre . "Edit"].Text)
+
+						if isNumber(tyre)
+							tyrePressures.Push(convertUnit("Pressure", tyre, false))
+						else {
+							tyrePressures := false
+
+							break
+						}
+					}
+
+					if tyrePressures {
+						splitCompound(newRun.Compound, &tyreCompound, &tyreCompoundColor)
+
+						tyreSet := newRun.TyreSet
+
+						if (tyreSet = "-")
+							tyreSet := false
+
+						messageSend(kFileMessage, "Race Engineer"
+								  , "performService:" . values2String(";", lap.Nr, 0,
+																		 , tyreCompound, tyreCompoundColor, tyreSet, tyrePressures*)
+								  , engineerPID)
+					}
+				}
 			}
 			else
 				newRun.TyreMode := "Auto"

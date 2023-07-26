@@ -2042,6 +2042,7 @@ class PracticeCenter extends ConfigurationItem {
 						MsgBox(translate("You must have manual stint mode enabled to create a new stint manually."), translate("Information"), 262192)
 						OnMessage(0x44, translateOkButton, 0)
 					}
+				}
 				else {
 					OnMessage(0x44, translateOkButton)
 					MsgBox(translate("You are not connected to an active session."), translate("Information"), 262192)

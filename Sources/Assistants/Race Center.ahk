@@ -7960,12 +7960,7 @@ class RaceCenter extends ConfigurationItem {
 			this.showMessage(translate("Saving session"))
 
 			if this.SessionActive {
-				try {
-					this.syncSessionStore(true)
-				}
-				catch Any as exception {
-					logError(exception, true)
-				}
+				this.syncSessionStore(true)
 
 				info := newMultiMap()
 

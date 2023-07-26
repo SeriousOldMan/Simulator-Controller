@@ -912,13 +912,13 @@ requestDriver(?pitstopNumber) <= Call(requestPitstopDriver, ?pitstopNumber, !Pit
 [?Pitstop.Lap] => (ProveAll: pitstopPerformed(?Pitstop.Lap))
 
 priority: -10, {All: [?Pitstop.Lap], [?Pitstop.Prepared], [?Pitstop.Planned.Nr]} => (Set: Pitstop.Last, ?Pitstop.Planned.Nr)
-priority: -10, [?Pitstop.Lap] => (Set: Pitstop.Clear, ?Pitstop.Lap),
+priority: -10, [?Pitstop.Lap] => (Set: Pitstop.Clear, ?Pitstop.Lap)
 
 [?Pitstop.Clear] => (Set: Cleanup, Laps),
 					(Prove: clearPressureLossCalibration(?Pitstop.Clear)),
 					(Prove: updateDamageReported(?Pitstop.Clear)),
 					(Set: Damage.Suspension.Reported, ?Pitstop.Clear), (Set: Damage.Bodywork.Reported, ?Pitstop.Clear),
-					(Set: Damage.Engine.Reported, ?Pitstop.Clear)
+					(Set: Damage.Engine.Reported, ?Pitstop.Clear),
 					(Clear: Pitstop.Planned.Lap),
 					(Clear: Pitstop.Planned.Fuel),
 					(Clear: Pitstop.Planned.Tyre.Compound), (Clear: Pitstop.Planned.Tyre.Compound.Color),

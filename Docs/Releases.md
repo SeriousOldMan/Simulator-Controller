@@ -7,6 +7,9 @@
   6. Added in "Invalid" column for the "Car" report in "Race Reports".
   7. Added in "Invalid" column for the *Laps* list in "Race Center".
   8. A bug has been fixed which may crash the Simulator Controller background process, when a custom controller function without a triger has been configured.
+  9. New car models for "Setup Workbench":
+      - Assetto Corsa
+        - Alfa Romeo Giulietta QV Launch Edition 2014
 
 ## 5.1.2.0-release 07/21/23
   1. Minor bugfixes, as always

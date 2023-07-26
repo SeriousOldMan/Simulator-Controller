@@ -2994,76 +2994,93 @@ class PracticeCenter extends ConfigurationItem {
 	}
 
 	exportSession() {
-		local telemetryDB := TelemetryDatabase(this.Simulator, this.Car, this.Track)
-		local tyresDB := TyresDatabase()
-		local row := 0
-		local locked := false
-		local lap, driver, telemetryData, pressures, temperatures, wear, pressuresData, info
+		exportSessionAsync() {
+			local progressWindow := showProgress({color: "Green", title: translate("Export to Database")})
+			local telemetryDB := TelemetryDatabase(this.Simulator, this.Car, this.Track)
+			local tyresDB := TyresDatabase()
+			local row := 0
+			local locked := false
+			local count := 0
+			local lap, driver, telemetryData, pressures, temperatures, wear, pressuresData, info
 
-		try {
-			while (row := this.LapsListView.GetNext(row, "C")) {
-				lap := this.LapsListView.GetText(row, 1)
-				lap := (this.Laps.Has(lap) ? this.Laps[lap] : false)
+			while (row := this.LapsListView.GetNext(row, "C"))
+				count += 1
 
-				if lap {
-					driver := lap.Run.Driver.ID
+			try {
+				row := 0
 
-					telemetryData := string2Values("|||", lap.TelemetryData)
+				while (row := this.LapsListView.GetNext(row, "C")) {
+					showProgress({progress: Round((A_Index / count) * 100), color: "Green", message: translate("Lap:") . A_Space . A_Index})
 
-					telemetryDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15]
-												 , telemetryData[11], telemetryData[12], telemetryData[13], telemetryData[7], telemetryData[8], telemetryData[9]
-												 , driver)
+					Sleep(50)
 
-					pressures := string2Values(",", telemetryData[17])
-					temperatures := string2Values(",", telemetryData[18])
-					wear := string2Values(",", telemetryData[19])
+					lap := this.LapsListView.GetText(row, 1)
+					lap := (this.Laps.Has(lap) ? this.Laps[lap] : false)
 
-					telemetryDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6]
-										   , telemetryData[14], telemetryData[15], telemetryData[16]
-										   , pressures[1], pressures[2], pressures[3], pressures[4]
-										   , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
-										   , wear[1], wear[2], wear[3], wear[4]
-										   , telemetryData[7], telemetryData[8], telemetryData[9]
-										   , driver)
+					if lap {
+						driver := lap.Run.Driver.ID
 
-					pressuresData := string2Values("|||", lap.PressuresData)
+						telemetryData := string2Values("|||", lap.TelemetryData)
 
-					if !locked
-						if tyresDB.lock(pressuresData[1], pressuresData[2], pressuresData[3], false)
-							locked := true
-						else
-							Sleep(200)
+						telemetryDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15]
+													 , telemetryData[11], telemetryData[12], telemetryData[13], telemetryData[7], telemetryData[8], telemetryData[9]
+													 , driver)
 
-					if locked
-						tyresDB.updatePressures(pressuresData[1], pressuresData[2], pressuresData[3]
-											  , pressuresData[4], pressuresData[5], pressuresData[6]
-											  , pressuresData[7], pressuresData[8]
-											  , string2Values(",", pressuresData[9]), string2Values(",", pressuresData[10])
-											  , false, driver)
+						pressures := string2Values(",", telemetryData[17])
+						temperatures := string2Values(",", telemetryData[18])
+						wear := string2Values(",", telemetryData[19])
+
+						telemetryDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6]
+											   , telemetryData[14], telemetryData[15], telemetryData[16]
+											   , pressures[1], pressures[2], pressures[3], pressures[4]
+											   , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
+											   , wear[1], wear[2], wear[3], wear[4]
+											   , telemetryData[7], telemetryData[8], telemetryData[9]
+											   , driver)
+
+						pressuresData := string2Values("|||", lap.PressuresData)
+
+						if !locked
+							if tyresDB.lock(pressuresData[1], pressuresData[2], pressuresData[3], false)
+								locked := true
+							else
+								Sleep(200)
+
+						if locked
+							tyresDB.updatePressures(pressuresData[1], pressuresData[2], pressuresData[3]
+												  , pressuresData[4], pressuresData[5], pressuresData[6]
+												  , pressuresData[7], pressuresData[8]
+												  , string2Values(",", pressuresData[9]), string2Values(",", pressuresData[10])
+												  , false, driver)
+					}
 				}
 			}
+			finally {
+				if locked
+					try {
+						tyresDB.unlock()
+					}
+					catch Any as exception {
+						logError(exception)
+					}
+			}
+
+			this.iSessionExported := true
+
+			if (this.SessionMode = "Loaded") {
+				info := readMultiMap(this.SessionLoaded . "Practice.info")
+
+				setMultiMapValue(info, "Session", "Exported", true)
+
+				writeMultiMap(this.SessionLoaded . "Practice.info", info)
+			}
+
+			hideProgress()
+
+			this.updateState()
 		}
-		finally {
-			if locked
-				try {
-					tyresDB.unlock()
-				}
-				catch Any as exception {
-					logError(exception)
-				}
-		}
 
-		this.iSessionExported := true
-
-		if (this.SessionMode = "Loaded") {
-			info := readMultiMap(this.SessionLoaded . "Practice.info")
-
-			setMultiMapValue(info, "Session", "Exported", true)
-
-			writeMultiMap(this.SessionLoaded . "Practice.info", info)
-		}
-
-		this.updateState()
+		this.pushTask(exportSessionAsync)
 	}
 
 	updateReports(redraw := false) {

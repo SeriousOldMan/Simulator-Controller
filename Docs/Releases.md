@@ -6,7 +6,7 @@
   5. A new plugin argument "openPracticeCenter" has been introduced for the "Race Engineer" and "Race Strategist" plugins.
   6. Added an "Invalid" column for the "Car" report in "Race Reports".
   7. Added an "Invalid" column for the *Laps* list in "Race Center".
-  8. A bug has been fixed which may crash the Simulator Controller background process, when a custom controller function without a triger has been configured.
+  8. A bug has been fixed which may crash the Simulator Controller background process, when a custom controller function without a trigger was configured.
   9. The application icons in "Simulator Startup" have been rearranged.
   10. New car models for "Setup Workbench":
       - Assetto Corsa

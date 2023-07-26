@@ -1,8 +1,8 @@
 [Development]
-Version=5.2.0.0-dev
+Version=5.2.0.0-alpha
 Target=5.2.0.0-release
 Date=07/26/2023
-Download=https://www.dropbox.com/s/x7f2a5rwtthmg6d/Simulator%20Controller%205.2.0.0-dev.zip?dl=1
+Download=
 Changes=New tool "PracticeCenter", New controller action function "openPracticeCenter", New plugin argument "openPracticeCenter" for "Race Engineer" and "Race Strategist" plugins, Added in "Invalid" column for the "Car" report in "Race Reports", Added in "Invalid" column for the *Laps* list in "Race Center", New car models for "Setup Workbench"
 [Release]
 Version=5.1.2.0-release
@@ -12,5 +12,5 @@ Changes=New core setting to choose the dispatch cycle of external commands, New 
 [Current]
 Type=Development
 [Version]
-Development=5.2.0.0-dev
+Development=5.2.0.0-alpha
 Release=5.1.2.0-release

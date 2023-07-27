@@ -54,7 +54,7 @@ global kClose := "Close"
 global kConnect := "Connect"
 global kEvent := "Event"
 
-global kSessionReports := concatenate(["Track"], kRaceReports, ["Pressures", "Brakes", "Temperatures", "Free"])
+global kSessionReports := concatenate(["Track"], kRaceReports, ["Pressures", "Temperatures", "Brakes", "Free"])
 global kDetailReports := ["Plan", "Stint", "Lap", "Session", "Drivers", "Strategy", "Pitstop", "Pitstops", "Setups"]
 
 global kSessionDataSchemas := CaseInsenseMap("Stint.Data", ["Nr", "Lap", "Driver.Forname", "Driver.Surname", "Driver.Nickname"

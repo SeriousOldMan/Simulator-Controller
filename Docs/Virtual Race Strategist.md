@@ -259,19 +259,19 @@ Last, but not least, you can choose to display driver categories (i.e. Platinum,
 
 ## Practice Center
 
-The "Practice Center" is an application, which you can run alongside your practice session or even while running a solo race. When the Race Assistants detect that the "Practice Center" is running, the transfer all collected data to this application and do not store them automatically or after your consent in the [session databse](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database) (depending on your [configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-strategist). You can use the "Practice Center" after your session to investigate the data and select the data that should be stored permanently in the session database, if any at all. You can also use the "Practice Center" to plan your practice session, review the car telemetry data and compare your performance to other drivers participating in the same session.
+The "Practice Center" is an application, which you can run alongside your practice sessions or even while running a solo race. When the Race Assistants detect that the "Practice Center" is running, they transfer all collected data to this application and do not store the data in the [session databse](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database) at the end of the session. Instead you can use the "Practice Center" after your session to investigate the data and select the data that should be stored permanently in the session database, if any at all. You can also use the "Practice Center" to plan your practice session, review the car telemetry data and compare your performance to other drivers participating in the same session.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Practice%20Center.JPG)
 
-The "Practice Center" looks very similar to the ["Race Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#race-center), a tool typically used to manage team endurance races. Both tools share common concepts, reports and data views by intention.
+The "Practice Center" looks very similar to the ["Race Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#race-center), a tool typically used to manage team endurance races. Both tools share common concepts, reports and data views by intention, but there are also some differences, of course.
 
 ### Starting a session
 
-Simply start the "Practice Center" **before** starting the session in your simulator. The Race Assistants will automatically connect ot the "Practice Center" after the first lap and initiate a session there as well.
+Simply start the "Practice Center" **before** starting the session in your simulator. The Race Assistants will automatically connect to the "Practice Center" after the first lap and initiate a session there as well.
 
-Note: If you have [enabled a team session](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#connecting-to-a-session), the "Practice Center" cannot be used, of course, since all data are handled by the Team Server in this case.
+Note: If you have [enabled a team session](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#connecting-to-a-session), the "Practice Center" cannot be used, since all data duties are handled by the Team Server in this case. But you may want to use the "Race Center" to control your race in this case anyway.
 
-Good to know: The "Practice Center" benefits from a high data update frequency of the Race Assistants. Therefore, if your PC is powerful enough, you can change this value in the [settings of the "Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database):
+Good to know: The "Practice Center" benefits from a high data update frequency of the Race Assistants. Therefore, if your PC is powerful enough, you can lower this value in the [settings of the "Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database):
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Practice%20Center%207.JPG)
 
@@ -283,17 +283,17 @@ The default value for the data update frequency is 10 seconds, but you can can t
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Practice%20Center%201.JPG)
 
-The reports at the top of the list are the well known reports, wich are also available after a session using the ["Race Reports"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-reports) tool. They are mostly useful to analyze the standings and the performance of the various drivers and cars. The other reports will give you an insight into the telemetry data. You can select the data to be shown using the selector menus on the right of the report list. You can also choose the type of visualization using the "Plot" menu on top of the report area. Use the "Stint" menu to restrict the visualized data to a specific stint or use the "Driver" menu to restrict the data of the various charts to one the drivers who has already driven some laps in the session (normally only you). Only data of the selected driver will be shown then.
+The reports at the top of the list are the well known reports, which are also available after a session using the ["Race Reports"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-reports) tool. They are mostly useful to analyze the standings and the performance of the various drivers and cars. The other reports will give you an insight into the telemetry data. You can select the data to be shown using the selector menus on the right of the report list. You can also choose the type of visualization using the "Plot" menu on top of the report area. Use the "Stint" menu to restrict the visualized data to a specific stint or use the "Driver" menu to restrict the data of the various charts to one the drivers who has already driven some laps in the session (normally only you). Only data of the selected driver will be shown then.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Practice%20Center%202.JPG)
 
 Note: The values for wear (tyres and brake pads) range from 0% up to 100%. For most of the simulators these values are directly available through the API, whereas in *Assetto Corsa Competizione*, the data interface provide the remaining thickness of each pad. Depending on the compound of the pad, the wear level for 100% ranges from 12 mm to 15.5 mm left pad thickness here, with a starting thickness for a fresh pad with 29 mm.
 
-Last but not least, using the small button with the cog wheel icon, you can choose various settings for the currently selected report, for example the range of laps to be considered in the data or the set of drivers in reports which are driver specific
+Last but not least, using the small button with the cog wheel icon, you can choose various settings for the currently selected report, for example the range of laps to be considered in the data or the set of drivers in reports which are driver specific.
 
   1. Details of a selected stint
   
-     This will give you an overview over the stint, the driven laps, as well as some performance figures for the driver. Please select a stint in the list of stints to generate this report.
+     This will give you an overview for the stint, the driven laps, as well as some performance figures for the driver. Please select a stint in the list of stints to generate this report.
 	 
 	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Practice%20Center%203.JPG)
 
@@ -305,11 +305,11 @@ Last but not least, using the small button with the cog wheel icon, you can choo
 	 
 	 If the current race is a multi-class race, the report will also show the class specific positions of all cars, additionally to their overall position in the race. In a multi-class race, the gaps shown in the gap table at the top of the report will always be specific for the own class. Additionaly, if driver categories are available, the category label of a given driver will be added to his name.
 	 
-	 Last, but not least, you will find informations about the past pitstops of each car (only in a race session). The overall number of pitstops, as well as the lap (in reference to your own laps) of the last stop are shown. Please keep in mind, that due to restrictions in the data provided by the various simulators, it cannot be differentiated in many cases, whether a car has been in the pits for a penalty, an regular pitstop or even an unplanned stop due to repairs. It is also possible, that the number of pitstops are not correct at all, since not all stops may be correctly reported by the simulator.
+	 Last, but not least, you will find informations about the past pitstops of each car (only in a race session). The overall number of pitstops, as well as the lap (in reference to your own laps) of the last stop are shown. Please keep in mind, that due to restrictions in the data provided by the various simulators, it cannot be differentiated in many cases whether a car has been in the pits for a penalty, a regular pitstop or even an unplanned stop due to repairs. It is also possible, that the number of pitstops are not correct at all, since not all stops may be correctly reported by the simulator.
 	 
 	 If you are in a practice session, the standings table will list all drivers, which has also been present at the start of your session, and the list will be sorted according to the best lap times of all drivers.
 	 
-	 Some basic data is shown in the header of the lap details as well. Important are here the ambient temperatures and the tyre pressure information. You can see the current hot pressures, recommend cold pressures (incl. a potential correction factor compared to the pressure setup at the beginning of the stint) and information about tyre pressure losses, if there are any.
+	 Some basic data is shown in the header of the lap details as well. Important are here the ambient temperatures and the tyre pressure information. You can see the current hot pressures, recommend cold pressures and information about tyre pressure losses, if there are any.
 	 
   3. Session Summary
   
@@ -321,7 +321,7 @@ All these report documents are HTML-based and can be saved or printed using the 
 
 ### Managing tyres and planning practice stints
 
-The first tab "Tyres" in the lower left corner allows you to manage your tyre sets during your practice runs. In many cases, you can let the "Practice Center" decide automatically, when to create a new stint and when a tyre change happend (at least for *Assetto Corsa Competizione* and *rFactor 2*). But not all simulators provide access to the mounted tyres in their data API, so it is also possible to create a new stint with tyre selection and tyre set manually.
+The first tab "Tyres" in the lower left corner allows you to manage your tyre sets during your practice runs. In many cases, you can let the "Practice Center" decide automatically, when to create a new stint and when a tyre change happend (at least for *Assetto Corsa Competizione* and *rFactor 2*). But not all simulators provide access to the mounted tyres in their data API, so it is also possible to create a new stint with your individual tyre setup manually.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Practice%20Center%206.JPG)
 
@@ -330,18 +330,18 @@ To create a new stint manually while you are standing in the pit, follow these s
 1. Select "Manual" from the "Mode" drop down menu.
 2. Select whether you want to change tyres and possibly a specific tyre compound using the "Compound" drop down menu. You can also use the small button beside the drop down menu to query the simulator for the currently mounted tyre compound and tyre set, if this data is provided.
 3. Select the number of the mounted tyre set. This is important, so that the "Practice Center" can manage the number of laps driven with this specific tyre set.
-4. Enter the cold pressures, you have chosen for the new tyres.
+4. Enter the cold pressures, you have chosen for the new tyres. This is particular important, otherwise the cold pressures derived by the Race Engineer will be wrong.
 5. Finally click on the button "New Stint" or choose the corresponding command from the "Stints" menu.
 
-It is recommended to use the "Auto" mode in races, since then the pitstops are reliable detected by the Race Assistants, whereas in Practice sessions, it will be much better to create the different practice stints manually. Esspecially the ideal cold tyre pressures derived by the Race Engineer will be mostly wrong, when the tyre change has not been planned and prepared under the control of the Race Engineer, which is typical in a practice session.
+It is recommended to use the "Auto" mode in races, since then the pitstops are reliable detected by the Race Assistants (and the additional data like tyre set and tyre pressures will be taken from the pitstop plan), whereas in Practice sessions, it will be much better to create the different practice stints manually. Esspecially the ideal cold tyre pressures derived by the Race Engineer will be mostly wrong, when the tyre change has not been planned and prepared under the control of the Race Engineer, which is uncommon in a practice session.
 
 ### Exporting data to the session database
 
-At the end of your session, you can decide which data should be transfered to the session database by clicking the small check marks for each lap in the list of driven laps. "Practice Center" will already have selected all valid laps for your convinience. Then choose the command "Export to Database" from the "Session" menu.
+At the end of your session, you can decide which data should be transfered to the session database by clicking the small check marks for each lap in the list of driven laps. "Practice Center" will already have selected by default all valid laps for your convinience. Then choose the command "Export to Database" from the "Session" menu.
 
 Please note, that this export is possible only once, to prevent duplicate data entries in your database, and cannot be undone. Therefore check your selection carefully beforehand.
 
-You can also store your session data in any location on your PC for later inspection using the "Save a copy..." command from the "Session" menu. The mentioned data export can also be initiated from a saved copy - very helpful, if you are exhausted after your session and want to defer the data inspection for later.
+You can also store your session for later inspection in any location on your PC using the "Save a copy..." command from the "Session" menu. The mentioned data export can also be initiated from a saved copy - very helpful, if you are exhausted after your session and want to defer the data inspection for later.
 
 ## Strategy Development
 

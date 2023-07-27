@@ -364,6 +364,7 @@ Below you will find a brief and incomplete overview over the possible hotkeys, t
 | ^ | A modifier that represents the CTRL key. |
 | ! | A modifier that represents the ALT key. |
 | + | A modifier that represents the SHIFT key. |
+| # | A modifier that represents the WIN key. Not a good idea to consume them, but they can still be used in the "trigger" controller action function. |
 | < | A modifier for all keys that restrict it to be on the left side of the keyboard. |
 | > | A modifier for all keys that restrict it to be on the right side of the keyboard. |
 | A - Z | A normal alphabetical key on the keyboard. |

@@ -1,16 +1,16 @@
 [Development]
-Version=5.2.0.0-alpha
+Version=5.2.0.0-release
 Target=5.2.0.0-release
-Date=07/26/2023
-Download=https://www.dropbox.com/s/wuvwv2iw002gb4w/Simulator%20Controller%205.2.0.0-alpha.zip?dl=1
+Date=07/28/2023
+Download=https://cutt.ly/ZwaKV25j;https://www.dropbox.com/s/ypr9x9gf0o2tw34/Simulator%20Controller%205.2.0.0-release.zip?dl=1
 Changes=New tool "PracticeCenter", New controller action function "openPracticeCenter", New plugin argument "openPracticeCenter" for "Race Engineer" and "Race Strategist" plugins, Added in "Invalid" column for the "Car" report in "Race Reports", Added in "Invalid" column for the *Laps* list in "Race Center", New car models for "Setup Workbench"
 [Release]
-Version=5.1.2.0-release
-Date=07/21/2023
-Download=https://cutt.ly/6wpOauWf;https://www.dropbox.com/s/7yytpw6zyvy9fcj/Simulator%20Controller%205.1.2.0-release.zip?dl=1
-Changes=New core setting to choose the dispatch cycle of external commands, New communication method for the Stream Deck plugin, New core setting to choose the between the Stream Deck communication methods, The Spotter can now "focus" on a specific opponent, Strategist and Spotter can now be asked for gap info for a specific car, Standings widget now shows car number in "System Monitor", Fixed bugs in Spanish grammars for Spotter and Strategist, Fixed AMS2 API to not interpret a replay as an actual session, New car models for "Setup Workbench", Renamed controller action function "call" to "invoke", New double press setting for Push-to-Talk
+Version=5.2.0.0-release
+Date=07/28/2023
+Download=https://cutt.ly/ZwaKV25j;https://www.dropbox.com/s/ypr9x9gf0o2tw34/Simulator%20Controller%205.2.0.0-release.zip?dl=1
+Changes=New tool "PracticeCenter", New controller action function "openPracticeCenter", New plugin argument "openPracticeCenter" for "Race Engineer" and "Race Strategist" plugins, Added in "Invalid" column for the "Car" report in "Race Reports", Added in "Invalid" column for the *Laps* list in "Race Center", New car models for "Setup Workbench"
 [Current]
-Type=Development
+Type=Release
 [Version]
-Development=5.2.0.0-alpha
-Release=5.1.2.0-release
+Development=5.2.0.0-release
+Release=5.2.0.0-release

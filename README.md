@@ -45,7 +45,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[5.2.0.0-alpha](https://www.dropbox.com/s/wuvwv2iw002gb4w/Simulator%20Controller%205.2.0.0-alpha.zip?dl=1) (Test build for 5.2.0. Changes: New tool "PracticeCenter", New controller action function "openPracticeCenter", New plugin argument "openPracticeCenter" for "Race Engineer" and "Race Strategist" plugins, Added in "Invalid" column for the "Car" report in "Race Reports", Added in "Invalid" column for the *Laps* list in "Race Center". New car models for "Setup Workbench".)
+[5.2.0.0-alpha](https://www.dropbox.com/s/wuvwv2iw002gb4w/Simulator%20Controller%205.2.0.0-alpha.zip?dl=1) (Test build for 5.2.0. Changes: New tool "PracticeCenter", New controller action function "openPracticeCenter", New plugin argument "openPracticeCenter" for "Race Engineer" and "Race Strategist" plugins, Added in "Invalid" column for the "Car" report in "Race Reports", Added in "Invalid" column for the *Laps* list in "Race Center", New car models for "Setup Workbench".)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-520) of this version and all the versions you might have skipped, before installing and using this version.
 
@@ -135,7 +135,7 @@ Based on the data sets, that are acquired during your sessions by the Virtual Ra
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Reports%202.JPG)
 
-Another capability of the Virtual Race Strategist is to support you during the [development of a strategy](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-development) for an upcoming race using the telemetry data of past sessions on the same track in similar conditions.
+Another capability of the Virtual Race Strategist is to support you during the [development of a strategy](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-workbench) for an upcoming race using the telemetry data of past sessions on the same track in similar conditions.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Workbench.JPG)
 

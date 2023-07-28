@@ -2503,6 +2503,8 @@ class PracticeCenter extends ConfigurationItem {
 
 							if (tyreSet = "-")
 								tyreSet := false
+							else if this.UsedTyreSets.Has(newRun.Compound . "." . tyreSet)
+								newRun.TyreLaps := this.UsedTyreSets[newRun.Compound . "." . tyreSet].Laps
 
 							messageSend(kFileMessage, "Race Engineer"
 									  , "performService:" . values2String(";", lap, 0

@@ -1,16 +1,16 @@
 [Development]
-Version=5.2.0.0-release
-Target=5.2.0.0-release
+Version=5.2.1.0-dev
+Target=5.2.1.0-release
 Date=07/28/2023
 Download=https://cutt.ly/ZwaKV25j;https://www.dropbox.com/s/ypr9x9gf0o2tw34/Simulator%20Controller%205.2.0.0-release.zip?dl=1
-Changes=New tool "PracticeCenter", New controller action function "openPracticeCenter", New plugin argument "openPracticeCenter" for "Race Engineer" and "Race Strategist" plugins, Added in "Invalid" column for the "Car" report in "Race Reports", Added in "Invalid" column for the *Laps* list in "Race Center", New car models for "Setup Workbench"
+Changes=Many bug fixes in "Practice Center", Better last lap detection in timed races, Spotter now announces the last lap
 [Release]
 Version=5.2.0.0-release
 Date=07/28/2023
 Download=https://cutt.ly/ZwaKV25j;https://www.dropbox.com/s/ypr9x9gf0o2tw34/Simulator%20Controller%205.2.0.0-release.zip?dl=1
 Changes=New tool "PracticeCenter", New controller action function "openPracticeCenter", New plugin argument "openPracticeCenter" for "Race Engineer" and "Race Strategist" plugins, Added in "Invalid" column for the "Car" report in "Race Reports", Added in "Invalid" column for the *Laps* list in "Race Center", New car models for "Setup Workbench"
 [Current]
-Type=Release
+Type=Development
 [Version]
-Development=5.2.0.0-release
+Development=5.2.1.0-dev
 Release=5.2.0.0-release

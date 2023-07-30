@@ -134,6 +134,7 @@ void substring(char s[], char sub[], int p, int l) {
 
       c++;
    }
+   
    sub[c] = '\0';
 }
 
@@ -197,7 +198,7 @@ BOOL getArgument(char* output, char* request, char* key) {
 	strcat_s(buffer, 255 - strlen(key), "=");
 
 	if (strncmp(request, buffer, strlen(buffer)) == 0) {
-		substring(output, request, strlen(buffer), strlen(request) - strlen(buffer));
+		substring(request, output, strlen(buffer), strlen(request) - strlen(buffer));
 	
 		return TRUE;
 	}

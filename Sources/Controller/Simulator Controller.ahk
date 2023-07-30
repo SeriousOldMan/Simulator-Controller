@@ -1409,7 +1409,7 @@ class ControllerFunction {
 
 						logMessage(kLogInfo, translate("Binding voice command ") . command . translate(" for trigger ") . trigger . translate(" to ") . (action ? (action.base.__Class . ".fireAction") : this.Function.Actions[trigger, true]))
 					}
-					else if (theHotKey && (theHotKey != "")) {
+					else {
 						Hotkey(theHotkey, handler, "On")
 
 						logMessage(kLogInfo, translate("Binding hotkey ") . theHotkey . translate(" for trigger ") . trigger . translate(" to ") . (action ? (action.base.__Class . ".fireAction")

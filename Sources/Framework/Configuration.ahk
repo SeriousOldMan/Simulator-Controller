@@ -570,17 +570,21 @@ class Function extends ConfigurationItem {
 
 	saveToConfiguration(configuration) {
 		local descriptor := this.Descriptor
-		local ignore, trigger
+		local ignore, trigger, hotkeys
 
 		super.saveToConfiguration(configuration)
 
 		for ignore, trigger in this.Trigger {
-			setMultiMapValue(configuration, "Controller Functions", descriptor . "." . trigger, this.Hotkeys[trigger, true])
+			hotkeys := this.Hotkeys[trigger, true]
+
+			if (hotkeys != "")
+				setMultiMapValue(configuration, "Controller Functions", descriptor . "." . trigger, hotkeys)
+
 			setMultiMapValue(configuration, "Controller Functions", descriptor . "." . trigger . ".Action", this.Actions[trigger, true])
 		}
 	}
 
-	static createFunction(descriptor, configuration := false, onHotkeys := false, onAction := false, offHotkeys := false, offAction := false) {
+	static createFunction(descriptor, configuration := false, onHotkeys := "", onAction := "", offHotkeys := "", offAction := "") {
 		descriptor := ConfigurationItem.splitDescriptor(descriptor)
 
 		switch descriptor[1], false {
@@ -613,7 +617,7 @@ class Function extends ConfigurationItem {
 		else {
 			actions := []
 
-			for ignore, action in StrSplit(action, "|") {
+			for ignore, action in (InStr(action, ";") ? StrSplit(action, ";") : StrSplit(action, "|")) {
 				action := StrSplit(action, "(", " `t", 2)
 
 				arguments := string2Values(",", SubStr(action[2], 1, StrLen(action[2]) - 1))

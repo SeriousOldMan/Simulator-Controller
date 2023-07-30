@@ -358,10 +358,10 @@ int main(int argc, char* argv[])
 			
 			if (map_buffer->tire_wear_active > 0)
 				wprintf_s(L"TyreWear=%d,%d,%d,%d\n",
-					(int)round(normalize(map_buffer->tire_wear[R3E_TIRE_FRONT_LEFT]) * 100),
-					(int)round(normalize(map_buffer->tire_wear[R3E_TIRE_FRONT_RIGHT]) * 100),
-					(int)round(normalize(map_buffer->tire_wear[R3E_TIRE_REAR_LEFT]) * 100),
-					(int)round(normalize(map_buffer->tire_wear[R3E_TIRE_REAR_RIGHT]) * 100));
+					(int)round(100 - normalize(map_buffer->tire_wear[R3E_TIRE_FRONT_LEFT]) * 100),
+					(int)round(100 - normalize(map_buffer->tire_wear[R3E_TIRE_FRONT_RIGHT]) * 100),
+					(int)round(100 - normalize(map_buffer->tire_wear[R3E_TIRE_REAR_LEFT]) * 100),
+					(int)round(100 - normalize(map_buffer->tire_wear[R3E_TIRE_REAR_RIGHT]) * 100));
 			else
 				wprintf_s(L"TyreWear=0,0,0,0\n");
 			if (map_buffer->brake_temp[R3E_TIRE_FRONT_LEFT].current_temp != -1)

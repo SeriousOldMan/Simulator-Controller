@@ -103,7 +103,7 @@ callSimulator(simulator, options := "", protocol?) {
 	local dllName, dllFile
 
 	static defaultProtocol := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory)), "Simulator", "Data Provider", "DLL")
-	static protocols := CaseInsenseMap("AC", "CLR", "ACC", "DLL", "R3E", "EXE", "IRC", "DLL"
+	static protocols := CaseInsenseMap("AC", "CLR", "ACC", "DLL", "R3E", "DLL", "IRC", "DLL"
 									 , "AMS2", "DLL", "PCARS2", "DLL", "RF2", "CLR")
 	static connectors := CaseInsenseMap()
 
@@ -157,8 +157,7 @@ callSimulator(simulator, options := "", protocol?) {
 				connectors[simulator . ".CLR"] := connector
 			}
 
-			data := connector.Call(options)
-			data := parseMultiMap(data)
+			data := parseMultiMap(connector.Call(options))
 		}
 		else if (protocol = "EXE") {
 			exePath := (kBinariesDirectory . simulator . " SHM Provider.exe")

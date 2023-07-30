@@ -6350,7 +6350,7 @@ class RaceCenter extends ConfigurationItem {
 	syncTelemetry(load := false) {
 		local lastLap := this.LastLap
 		local tyreChange := true
-		local newData, message, session, telemetryDB, tyresTable, lap, runningLap, driverID, telemetry
+		local newData, message, session, telemetryDB, tyresTable, lap, theLap, runningLap, driverID, telemetry
 		local telemetryData, pressures, temperatures, wear, lapPressures, pressure
 
 		wasPitstop(lap, &tyreChange := false) {
@@ -6454,10 +6454,12 @@ class RaceCenter extends ConfigurationItem {
 														  , getMultiMapValue(telemetry, "Car Data", "TyreCompoundColor", "Black")
 														  , getMultiMapValue(telemetry, "Car Data", "TyrePressure", ",,,")
 														  , getMultiMapValue(telemetry, "Car Data", "TyreTemperature", ",,,")
-														  , getMultiMapValue(telemetry, "Car Data", "TyreWear", "null,null,null,null"))
+														  , getMultiMapValue(telemetry, "Car Data", "TyreWear", "null,null,null,null")
+														  , false, false
+														  , "Unknown")
 					}
 					else
-						telemetryData := values2String(";", "-", "-", "-", "-", "-", "-", "-", "-", "-", wasPitstop(lap), "n/a", "n/a", "n/a", "-", "-", ",,,", ",,,", "null,null,null,null")
+						telemetryData := values2String(";", "-", "-", "-", "-", "-", "-", "-", "-", "-", wasPitstop(lap), "n/a", "n/a", "n/a", "-", "-", ",,,", ",,,", "null,null,null,null", false, false, "Unknown")
 				}
 
 				telemetryData := string2Values(";", telemetryData)
@@ -6472,7 +6474,7 @@ class RaceCenter extends ConfigurationItem {
 					telemetryData.Push("null,null,null,null")
 
 				if telemetryData[10] {
-					telemetryData := ["-", "-", "-", "-", "-", "-", "-", "-", "-", true, "n/a", "n/a", "n/a", "-", "-", ",,,", ",,,", "null,null,null,null"]
+					telemetryData := ["-", "-", "-", "-", "-", "-", "-", "-", "-", true, "n/a", "n/a", "n/a", "-", "-", ",,,", ",,,", "null,null,null,null", false, false, "Warmup"]
 
 					if (runningLap > 2) {
 						wasPitstop(lap, &tyreChange)
@@ -6503,10 +6505,19 @@ class RaceCenter extends ConfigurationItem {
 									   , telemetryData[7], telemetryData[8], telemetryData[9]
 									   , driverID)
 
-				lapPressures := this.LapsListView.GetText(this.Laps[lap].Row, 10)
+				theLap := this.Laps[lap]
+
+				if (telemetryData.Length > 20) {
+					theLap.State := telemetryData[21]
+					theLap.Valid := (theLap.State != "Invalid")
+				}
+
+				this.LapsListView.Modify(theLap.Row, "Col11", theLap.Valid ? "" : translate("x"))
+
+				lapPressures := this.LapsListView.GetText(theLap.Row, 10)
 
 				if (lapPressures = "-, -, -, -")
-					this.LapsListView.Modify(this.Laps[lap].Row, "Col10", values2String(", ", collect(pressures, p => isNumber(p) ? displayValue("Float", convertUnit("Pressure", p)) : "-")*))
+					this.LapsListView.Modify(theLap.Row, "Col10", values2String(", ", collect(pressures, p => isNumber(p) ? displayValue("Float", convertUnit("Pressure", p)) : "-")*))
 
 				newData := true
 				lap += 1

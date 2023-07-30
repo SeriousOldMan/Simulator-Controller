@@ -2027,8 +2027,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 						if !RaceAssistantPlugin.Finished
 							if this.lastLap(data, &overLap)
 								RaceAssistantPlugin.sFinished := (dataLastLap + overLap)
-							else
-								RaceAssistantPlugin.sFinished := (RaceAssistantPlugin.currentLap(data) + 1)
+							; else
+							;	RaceAssistantPlugin.sFinished := (RaceAssistantPlugin.currentLap(data) + 1)
 
 						finished := false
 					}
@@ -2173,7 +2173,9 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 							RaceAssistantPlugin.sLapRunning := 0
 
 							if RaceAssistantPlugin.Finished {
-								if (RaceAssistantPlugin.currentLap(data) >= RaceAssistantPlugin.Finished) {
+								if (dataLastLap >= RaceAssistantPlugin.Finished) {
+
+								; if (RaceAssistantPlugin.currentLap(data) >= RaceAssistantPlugin.Finished) {
 									; Session has endedd
 
 									finished := true
@@ -2181,12 +2183,16 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 							}
 							else {
 								if (getMultiMapValue(data, "Session Data", "SessionFormat") = "Time") {
+									/*
 									if (getMultiMapValue(data, "Session Data", "SessionTimeRemaining", 0) <= 0)
 										RaceAssistantPlugin.sFinished := (RaceAssistantPlugin.currentLap(data) + 1)
-									else if this.lastLap(data, &overLap)
+									else
+									*/
+
+									if this.lastLap(data, &overLap)
 										RaceAssistantPlugin.sFinished := (dataLastLap + overLap)
-									else if (getMultiMapValue(data, "Session Data", "SessionLapsRemaining", 0) < 1)
-										RaceAssistantPlugin.sFinished := (RaceAssistantPlugin.currentLap(data) + 2)
+									; else if (getMultiMapValue(data, "Session Data", "SessionLapsRemaining", 0) < 1)
+									; 	RaceAssistantPlugin.sFinished := (RaceAssistantPlugin.currentLap(data) + 2)
 								}
 								else if (getMultiMapValue(data, "Session Data", "SessionLapsRemaining", 0) == 0)
 									RaceAssistantPlugin.sFinished := dataLastLap

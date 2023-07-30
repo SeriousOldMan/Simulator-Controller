@@ -1393,18 +1393,54 @@ class RaceSpotter extends GridRaceAssistant {
 				}
 			}
 			else if this.lastLap() {
-				situation := "StartSummary"
+				situation := "LastLap"
 
 				if !this.SessionInfos.Has(situation) {
 					this.SessionInfos[situation] := true
 
 					if (knowledgeBase.getValue("Session.Format") = "Time") {
 						if (this.getPosition() = 1) {
+							speaker.beginTalk()
+
+							try {
+								speaker.speakPhrase("LastLapDriver")
+								speaker.speakPhrase("Leader")
+								speaker.speakPhrase("BringItHome")
+							}
+							finally {
+								speaker.endTalk()
+							}
 						}
 						else {
+							speaker.beginTalk()
+
+							try {
+								speaker.speakPhrase("LastLapLeader")
+
+								if (this.getPosition(false, "Class") < 3) {
+									speaker.speakPhrase("Position", {position: this.getPosition(false, "Class")})
+									speaker.speakPhrase("BringItHome")
+								}
+							}
+							finally {
+								speaker.endTalk()
+							}
 						}
 					}
 					else {
+						speaker.beginTalk()
+
+						try {
+							speaker.speakPhrase("LastLapDriver")
+
+							if (this.getPosition(false, "Class") < 3) {
+								speaker.speakPhrase("Position", {position: this.getPosition(false, "Class")})
+								speaker.speakPhrase("BringItHome")
+							}
+						}
+						finally {
+							speaker.endTalk()
+						}
 					}
 				}
 			}

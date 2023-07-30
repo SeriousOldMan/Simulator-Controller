@@ -3124,6 +3124,12 @@ class PracticeCenter extends ConfigurationItem {
 				writeMultiMap(this.SessionLoaded . "Practice.info", info)
 			}
 
+			loop this.RunsListView.GetCount()
+				this.RunsListView.Modify(A_Index, "-Check")
+
+			loop this.LapsListView.GetCount()
+				this.LapsListView.Modify(A_Index, "-Check")
+
 			hideProgress()
 
 			this.updateState()

@@ -103,7 +103,7 @@ callSimulator(simulator, options := "", protocol?) {
 	local dllName, dllFile
 
 	static defaultProtocol := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory)), "Simulator", "Data Provider", "DLL")
-	static protocols := CaseInsenseMap("AC", "CLR", "ACC", "DLL", "R3E", "DLL", "IRC", "DLL"
+	static protocols := CaseInsenseMap("AC", "CLR", "ACC", "DLL", "R3E", "EXE", "IRC", "DLL"
 									 , "AMS2", "DLL", "PCARS2", "DLL", "RF2", "CLR")
 	static connectors := CaseInsenseMap()
 

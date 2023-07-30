@@ -7493,7 +7493,7 @@ class RaceCenter extends ConfigurationItem {
 
 		if this.HasData {
 			if !this.SelectedReport
-				this.iSelectedReport := "Overview"
+				this.selectReport("Overview")
 
 			this.showReport(this.SelectedReport, true)
 		}

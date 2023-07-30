@@ -380,11 +380,31 @@ extern __declspec(dllexport) int __stdcall call(char* request, char* result, int
 			writeFloat(result, map_buffer->tire_temp[R3E_TIRE_FRONT_RIGHT].current_temp[R3E_TIRE_TEMP_CENTER], &pos); writeString(result, ", ", &pos);
 			writeFloat(result, map_buffer->tire_temp[R3E_TIRE_REAR_LEFT].current_temp[R3E_TIRE_TEMP_CENTER], &pos); writeString(result, ", ", &pos);
 			writeFloat(result, map_buffer->tire_temp[R3E_TIRE_REAR_RIGHT].current_temp[R3E_TIRE_TEMP_CENTER], &pos); writeLine(result, &pos);
+
+			writeString(result, "TyreInnerTemperature=", &pos);
+			writeFloat(result, map_buffer->tire_temp[R3E_TIRE_FRONT_LEFT].current_temp[R3E_TIRE_TEMP_RIGHT], &pos); writeString(result, ", ", &pos);
+			writeFloat(result, map_buffer->tire_temp[R3E_TIRE_FRONT_RIGHT].current_temp[R3E_TIRE_TEMP_LEFT], &pos); writeString(result, ", ", &pos);
+			writeFloat(result, map_buffer->tire_temp[R3E_TIRE_REAR_LEFT].current_temp[R3E_TIRE_TEMP_RIGHT], &pos); writeString(result, ", ", &pos);
+			writeFloat(result, map_buffer->tire_temp[R3E_TIRE_REAR_RIGHT].current_temp[R3E_TIRE_TEMP_LEFT], &pos); writeLine(result, &pos);
+
+			writeString(result, "TyreMiddleTemperature=", &pos);
+			writeFloat(result, map_buffer->tire_temp[R3E_TIRE_FRONT_LEFT].current_temp[R3E_TIRE_TEMP_CENTER], &pos); writeString(result, ", ", &pos);
+			writeFloat(result, map_buffer->tire_temp[R3E_TIRE_FRONT_RIGHT].current_temp[R3E_TIRE_TEMP_CENTER], &pos); writeString(result, ", ", &pos);
+			writeFloat(result, map_buffer->tire_temp[R3E_TIRE_REAR_LEFT].current_temp[R3E_TIRE_TEMP_CENTER], &pos); writeString(result, ", ", &pos);
+			writeFloat(result, map_buffer->tire_temp[R3E_TIRE_REAR_RIGHT].current_temp[R3E_TIRE_TEMP_CENTER], &pos); writeLine(result, &pos);
+
+			writeString(result, "TyreOuterTemperature=", &pos);
+			writeFloat(result, map_buffer->tire_temp[R3E_TIRE_FRONT_LEFT].current_temp[R3E_TIRE_TEMP_LEFT], &pos); writeString(result, ", ", &pos);
+			writeFloat(result, map_buffer->tire_temp[R3E_TIRE_FRONT_RIGHT].current_temp[R3E_TIRE_TEMP_RIGHT], &pos); writeString(result, ", ", &pos);
+			writeFloat(result, map_buffer->tire_temp[R3E_TIRE_REAR_LEFT].current_temp[R3E_TIRE_TEMP_LEFT], &pos); writeString(result, ", ", &pos);
+			writeFloat(result, map_buffer->tire_temp[R3E_TIRE_REAR_RIGHT].current_temp[R3E_TIRE_TEMP_RIGHT], &pos); writeLine(result, &pos);
+			
 			writeString(result, "TyrePressure=", &pos);
 			writeFloat(result, map_buffer->tire_pressure[R3E_TIRE_FRONT_LEFT] / 6.895, &pos); writeString(result, ", ", &pos);
 			writeFloat(result, map_buffer->tire_pressure[R3E_TIRE_FRONT_RIGHT] / 6.895, &pos); writeString(result, ", ", &pos);
 			writeFloat(result, map_buffer->tire_pressure[R3E_TIRE_REAR_LEFT] / 6.895, &pos); writeString(result, ", ", &pos);
 			writeFloat(result, map_buffer->tire_pressure[R3E_TIRE_REAR_RIGHT] / 6.895, &pos); writeLine(result, &pos);
+			
 			if (map_buffer->tire_wear_active > 0) {
 				writeString(result, "TyreWear=", &pos);
 				writeFloat(result, (int)round(normalize(map_buffer->tire_wear[R3E_TIRE_FRONT_LEFT]) * 100), &pos); writeString(result, ", ", &pos);

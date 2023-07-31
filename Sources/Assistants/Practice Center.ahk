@@ -4116,12 +4116,12 @@ class PracticeCenter extends ConfigurationItem {
 				else
 					value := kNull
 
-				if !isNumber(value)
-					value := kNull
-				else {
+				if isNumber(value) {
 					minValue := ((minValue == kUndefined) ? value : Min(minValue, value))
 					maxValue := ((maxValue == kUndefined) ? value : Max(maxValue, value))
 				}
+				else
+					value := kNull
 
 				drawChartFunction .= (", " . convertValue(yAxis, value))
 			}
@@ -6152,12 +6152,12 @@ getDeprecatedValue(data, section, newKey, oldKey, default := false) {
 convertValue(name, value) {
 	if (value = kNull)
 		return value
-	else if InStr(name, "Fuel")
-		return convertUnit("Volume", value)
 	else if InStr(name, "Temperature")
 		return convertUnit("Temperature", value)
 	else if InStr(name, "Pressure")
 		return convertUnit("Pressure", value)
+	else if InStr(name, "Fuel")
+		return convertUnit("Volume", value)
 	else
 		return value
 }

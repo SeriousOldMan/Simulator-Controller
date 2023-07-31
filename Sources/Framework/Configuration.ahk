@@ -613,7 +613,7 @@ class Function extends ConfigurationItem {
 		else {
 			actions := []
 
-			for ignore, action in (InStr(action, ";") ? StrSplit(action, ";") : StrSplit(action, "|")) {
+			for ignore, action in (InStr(action, "|") ? StrSplit(action, "|") : StrSplit(action, ";")) {
 				action := StrSplit(action, "(", " `t", 2)
 
 				arguments := string2Values(",", SubStr(action[2], 1, StrLen(action[2]) - 1))

@@ -575,11 +575,7 @@ class Function extends ConfigurationItem {
 		super.saveToConfiguration(configuration)
 
 		for ignore, trigger in this.Trigger {
-			hotkeys := this.Hotkeys[trigger, true]
-
-			if (hotkeys != "")
-				setMultiMapValue(configuration, "Controller Functions", descriptor . "." . trigger, hotkeys)
-
+			setMultiMapValue(configuration, "Controller Functions", descriptor . "." . trigger, this.Hotkeys[trigger, true])
 			setMultiMapValue(configuration, "Controller Functions", descriptor . "." . trigger . ".Action", this.Actions[trigger, true])
 		}
 	}

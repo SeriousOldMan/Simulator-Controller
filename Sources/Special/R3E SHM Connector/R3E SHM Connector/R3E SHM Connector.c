@@ -234,7 +234,7 @@ extern __declspec(dllexport) int __stdcall call(char* request, char* result, int
 
 	BOOL writeStandings = getArgument(buffer, request, "Standings");
 	BOOL writeTelemetry = !writeStandings;
-
+	
 	if (writeStandings) {
 		writeString(result, "[Position Data]\n", &pos);
 
@@ -295,12 +295,11 @@ extern __declspec(dllexport) int __stdcall call(char* request, char* result, int
 					writeString(result, "Car.", &pos); writeInt(result, i, &pos); writeStringOption(result, ".Driver.Nickname=", "", &pos);
 				}
 
-				
 				writeString(result, "Car.", &pos); writeInt(result, i, &pos); writeStringOption(result, ".InPitLane=", vehicle.in_pitlane ? "true" : "false", &pos);
 			}
 		}
 	}
-
+	
 	if (writeTelemetry) {
 		BOOL practice = FALSE;
 
@@ -408,10 +407,10 @@ extern __declspec(dllexport) int __stdcall call(char* request, char* result, int
 			
 			if (map_buffer->tire_wear_active > 0) {
 				writeString(result, "TyreWear=", &pos);
-				writeFloat(result, (int)round(normalize(map_buffer->tire_wear[R3E_TIRE_FRONT_LEFT]) * 100), &pos); writeString(result, ", ", &pos);
-				writeFloat(result, (int)round(normalize(map_buffer->tire_wear[R3E_TIRE_FRONT_RIGHT]) * 100), &pos); writeString(result, ", ", &pos);
-				writeFloat(result, (int)round(normalize(map_buffer->tire_wear[R3E_TIRE_REAR_LEFT]) * 100), &pos); writeString(result, ", ", &pos);
-				writeFloat(result, (int)round(normalize(map_buffer->tire_wear[R3E_TIRE_REAR_RIGHT]) * 100), &pos); writeLine(result, &pos);
+				writeFloat(result, (int)round(100 - normalize(map_buffer->tire_wear[R3E_TIRE_FRONT_LEFT]) * 100), &pos); writeString(result, ", ", &pos);
+				writeFloat(result, (int)round(100 - normalize(map_buffer->tire_wear[R3E_TIRE_FRONT_RIGHT]) * 100), &pos); writeString(result, ", ", &pos);
+				writeFloat(result, (int)round(100 - normalize(map_buffer->tire_wear[R3E_TIRE_REAR_LEFT]) * 100), &pos); writeString(result, ", ", &pos);
+				writeFloat(result, (int)round(100 - normalize(map_buffer->tire_wear[R3E_TIRE_REAR_RIGHT]) * 100), &pos); writeLine(result, &pos);
 			}
 			else
 				writeString(result, "TyreWear=0,0,0,0\n", &pos);
@@ -450,7 +449,7 @@ extern __declspec(dllexport) int __stdcall call(char* request, char* result, int
 				writeStringOption(result, "DriverNickname=", "", &pos);
 			}
 
-			writeStringOption(result, "Position=", map_buffer->all_drivers_data_1[getPlayerCarID()].place, &pos);
+			writeIntOption(result, "Position=", map_buffer->all_drivers_data_1[getPlayerCarID()].place, &pos);
 
 			writeStringOption(result, "LapValid=", map_buffer->current_lap_valid ? "true" : "false", &pos);
 
@@ -501,139 +500,141 @@ extern __declspec(dllexport) int __stdcall call(char* request, char* result, int
 			writeString(result, "Weather10Min=Dry\n", &pos);
 			writeString(result, "Weather30Min=Dry\n", &pos);
 		}
+		
+		if (TRUE) {
+			writeString(result, "[Pit Menu State]\n", &pos);
+			if (mapped_r3e) {
+				writeString(result, "Selected=", &pos);
 
-		writeString(result, "[Pit Menu State]\n", &pos);
-		if (mapped_r3e) {
-			writeString(result, "Selected=", &pos);
-
-			switch (map_buffer->pit_menu_selection) {
-			case R3E_PIT_MENU_UNAVAILABLE:
-				writeString(result, "Unavailable\n", &pos);
-
-				break;
-			case R3E_PIT_MENU_PRESET:
-				writeString(result, "Strategy\n", &pos);
-
-				break;
-			case R3E_PIT_MENU_PENALTY:
-				writeString(result, "Serve Penalty\n", &pos);
-
-				break;
-			case R3E_PIT_MENU_DRIVERCHANGE:
-				writeString(result, "Driver\n", &pos);
-
-				break;
-			case R3E_PIT_MENU_FUEL:
-				writeString(result, "Refuel\n", &pos);
-
-				break;
-			case R3E_PIT_MENU_FRONTTIRES:
-				writeString(result, "Change Front Tyres\n", &pos);
-
-				break;
-			case R3E_PIT_MENU_REARTIRES:
-				writeString(result, "Change Rear Tyres\n", &pos);
-
-				break;
-			case R3E_PIT_MENU_FRONTWING:
-				writeString(result, "Repair Front Aero\n", &pos);
-
-				break;
-			case R3E_PIT_MENU_REARWING:
-				writeString(result, "Repair Rear Aero\n", &pos);
-
-				break;
-				/*
-				case R3E_PIT_MENU_SUSPENSION:
-					writeString(result, "Repair Suspension\n", &pos);
+				switch (map_buffer->pit_menu_selection) {
+				case R3E_PIT_MENU_UNAVAILABLE:
+					writeString(result, "Unavailable\n", &pos);
 
 					break;
-				*/
-			case R3E_PIT_MENU_BUTTON_TOP:
-				writeString(result, "Top Button\n", &pos);
-
-				break;
-			case R3E_PIT_MENU_BUTTON_BOTTOM:
-				writeString(result, "Bottom Button\n", &pos);
-
-				break;
-			case R3E_PIT_MENU_MAX:
-				writeString(result, "false\n", &pos);
-
-				break;
-			default:
-				writeString(result, "false\n", &pos);
-
-				break;
-			}
-
-			for (int i = 0; i < R3E_PIT_MENU_MAX; i++) {
-				switch (i) {
 				case R3E_PIT_MENU_PRESET:
-					writeString(result, "Strategy=", &pos);
+					writeString(result, "Strategy\n", &pos);
 
 					break;
 				case R3E_PIT_MENU_PENALTY:
-					writeString(result, "Serve Penalty=", &pos);
+					writeString(result, "Serve Penalty\n", &pos);
 
 					break;
 				case R3E_PIT_MENU_DRIVERCHANGE:
-					writeString(result, "Driver=", &pos);
+					writeString(result, "Driver\n", &pos);
 
 					break;
 				case R3E_PIT_MENU_FUEL:
-					writeString(result, "Refuel=", &pos);
+					writeString(result, "Refuel\n", &pos);
 
 					break;
 				case R3E_PIT_MENU_FRONTTIRES:
-					writeString(result, "Change Front Tyres=", &pos);
+					writeString(result, "Change Front Tyres\n", &pos);
 
 					break;
 				case R3E_PIT_MENU_REARTIRES:
-					writeString(result, "Change Rear Tyres=", &pos);
+					writeString(result, "Change Rear Tyres\n", &pos);
 
 					break;
 				case R3E_PIT_MENU_FRONTWING:
-					writeString(result, "Repair Front Aero=", &pos);
+					writeString(result, "Repair Front Aero\n", &pos);
 
 					break;
 				case R3E_PIT_MENU_REARWING:
-					writeString(result, "Repair Rear Aero=", &pos);
+					writeString(result, "Repair Rear Aero\n", &pos);
 
 					break;
 					/*
 					case R3E_PIT_MENU_SUSPENSION:
-						writeString(result, "Repair Suspension=", &pos);
+						writeString(result, "Repair Suspension\n", &pos);
 
 						break;
 					*/
 				case R3E_PIT_MENU_BUTTON_TOP:
-					writeString(result, "Top Button=", &pos);
+					writeString(result, "Top Button\n", &pos);
 
 					break;
 				case R3E_PIT_MENU_BUTTON_BOTTOM:
-					writeString(result, "Bottom Button=", &pos);
+					writeString(result, "Bottom Button\n", &pos);
+
+					break;
+				case R3E_PIT_MENU_MAX:
+					writeString(result, "false\n", &pos);
 
 					break;
 				default:
-					writeString(result, "Unknown=", &pos);
+					writeString(result, "false\n", &pos);
 
 					break;
 				}
 
-				switch (map_buffer->pit_menu_state[i]) {
-				case 0:
-					writeString(result, "false\n", &pos);
+				for (int i = 0; i < R3E_PIT_MENU_MAX; i++) {
+					switch (i) {
+					case R3E_PIT_MENU_PRESET:
+						writeString(result, "Strategy=", &pos);
 
-					break;
-				case 1:
-					writeString(result, "true\n", &pos);
+						break;
+					case R3E_PIT_MENU_PENALTY:
+						writeString(result, "Serve Penalty=", &pos);
 
-					break;
-				default:
-					writeString(result, "Unavailable\n", &pos);
+						break;
+					case R3E_PIT_MENU_DRIVERCHANGE:
+						writeString(result, "Driver=", &pos);
 
-					break;
+						break;
+					case R3E_PIT_MENU_FUEL:
+						writeString(result, "Refuel=", &pos);
+
+						break;
+					case R3E_PIT_MENU_FRONTTIRES:
+						writeString(result, "Change Front Tyres=", &pos);
+
+						break;
+					case R3E_PIT_MENU_REARTIRES:
+						writeString(result, "Change Rear Tyres=", &pos);
+
+						break;
+					case R3E_PIT_MENU_FRONTWING:
+						writeString(result, "Repair Front Aero=", &pos);
+
+						break;
+					case R3E_PIT_MENU_REARWING:
+						writeString(result, "Repair Rear Aero=", &pos);
+
+						break;
+						/*
+						case R3E_PIT_MENU_SUSPENSION:
+							writeString(result, "Repair Suspension=", &pos);
+
+							break;
+						*/
+					case R3E_PIT_MENU_BUTTON_TOP:
+						writeString(result, "Top Button=", &pos);
+
+						break;
+					case R3E_PIT_MENU_BUTTON_BOTTOM:
+						writeString(result, "Bottom Button=", &pos);
+
+						break;
+					default:
+						writeString(result, "Unknown=", &pos);
+
+						break;
+					}
+
+					switch (map_buffer->pit_menu_state[i]) {
+					case 0:
+						writeString(result, "false\n", &pos);
+
+						break;
+					case 1:
+						writeString(result, "true\n", &pos);
+
+						break;
+					default:
+						writeString(result, "Unavailable\n", &pos);
+
+						break;
+					}
 				}
 			}
 		}

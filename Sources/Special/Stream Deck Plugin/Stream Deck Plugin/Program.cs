@@ -115,7 +115,10 @@ namespace SimulatorControllerPlugin
             if (function == "Command")
             {
                 if (operation == "SetFile")
+                {
                     ControllerFunction.CommandFile = argument;
+                    ControllerFunction.HasCommandFile = true;
+                }
             }
             else
                 foreach (var button in buttons)

@@ -3,7 +3,7 @@ Version=5.2.1.0-dev
 Target=5.2.1.0-release
 Date=07/28/2023
 Download=https://cutt.ly/ZwaKV25j;https://www.dropbox.com/s/ypr9x9gf0o2tw34/Simulator%20Controller%205.2.0.0-release.zip?dl=1
-Changes=Many bug fixes in "Practice Center", Better last lap detection in timed races, Spotter now announces the last lap, Fixed "Invalid" column in "Race Center", Fixed support for RaceRoom Racing Experience
+Changes=Many bug fixes in "Practice Center", Better last lap detection in timed races, Spotter now announces the last lap, Fixed "Invalid" column in "Race Center", Fixed support for RaceRoom Racing Experience, Fixed tyre wear for RaceRoom Racing Experience, Fixed Stream Deck plugin
 [Release]
 Version=5.2.0.0-release
 Date=07/28/2023

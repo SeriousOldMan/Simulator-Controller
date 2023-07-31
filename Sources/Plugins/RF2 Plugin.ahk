@@ -306,10 +306,6 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	readSessionData(options := "") {
-		return super.readSessionData(options, "CLR")
-	}
-
 	updateTelemetryData(data) {
 		super.updateTelemetryData(data)
 

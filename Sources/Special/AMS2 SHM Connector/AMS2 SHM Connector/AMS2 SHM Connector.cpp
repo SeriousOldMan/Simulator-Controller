@@ -346,6 +346,21 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 		print(&output, ",", localCopy->mTyreTemp[TYRE_REAR_LEFT]);
 		printLine(&output, ",", localCopy->mTyreTemp[TYRE_REAR_RIGHT]);
 
+		print(&output, "TyreInnerTemperature=", localCopy->mTyreTreadTemp[TYRE_FRONT_LEFT] - 272.15);
+		print(&output, ",", localCopy->mTyreTreadTemp[TYRE_FRONT_RIGHT] - 272.15);
+		print(&output, ",", localCopy->mTyreTreadTemp[TYRE_REAR_LEFT] - 272.15);
+		printLine(&output, ",", localCopy->mTyreTreadTemp[TYRE_REAR_RIGHT] - 272.15);
+
+		print(&output, "TyreMiddleTemperature=", localCopy->mTyreTreadTemp[TYRE_FRONT_LEFT] - 272.15);
+		print(&output, ",", localCopy->mTyreTreadTemp[TYRE_FRONT_RIGHT] - 272.15);
+		print(&output, ",", localCopy->mTyreTreadTemp[TYRE_REAR_LEFT] - 272.15);
+		printLine(&output, ",", localCopy->mTyreTreadTemp[TYRE_REAR_RIGHT] - 272.15);
+
+		print(&output, "TyreOuterTemperature=", localCopy->mTyreTreadTemp[TYRE_FRONT_LEFT] - 272.15);
+		print(&output, ",", localCopy->mTyreTreadTemp[TYRE_FRONT_RIGHT] - 272.15);
+		print(&output, ",", localCopy->mTyreTreadTemp[TYRE_REAR_LEFT] - 272.15);
+		printLine(&output, ",", localCopy->mTyreTreadTemp[TYRE_REAR_RIGHT] - 272.15);
+
 		print(&output, "TyrePressure=", localCopy->mAirPressure[TYRE_FRONT_LEFT] / 10);
 		print(&output, ",", localCopy->mAirPressure[TYRE_FRONT_RIGHT] / 10);
 		print(&output, ",", localCopy->mAirPressure[TYRE_REAR_LEFT] / 10);

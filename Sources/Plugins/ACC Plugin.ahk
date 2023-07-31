@@ -546,10 +546,6 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	readSessionData(options := "") {
-		return super.readSessionData(options, "DLL")
-	}
-
 	computeBrakePadWear(location, compound, thickness) {
 		if (location = "Front") {
 			switch compound {

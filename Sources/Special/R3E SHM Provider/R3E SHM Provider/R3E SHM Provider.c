@@ -331,17 +331,37 @@ int main(int argc, char* argv[])
 				map_buffer->tire_temp[R3E_TIRE_FRONT_RIGHT].current_temp[R3E_TIRE_TEMP_CENTER],
 				map_buffer->tire_temp[R3E_TIRE_REAR_LEFT].current_temp[R3E_TIRE_TEMP_CENTER],
 				map_buffer->tire_temp[R3E_TIRE_REAR_RIGHT].current_temp[R3E_TIRE_TEMP_CENTER]);
+
+			wprintf_s(L"TyreInnerTemperature=%f,%f,%f,%f\n",
+				map_buffer->tire_temp[R3E_TIRE_FRONT_LEFT].current_temp[R3E_TIRE_TEMP_RIGHT],
+				map_buffer->tire_temp[R3E_TIRE_FRONT_RIGHT].current_temp[R3E_TIRE_TEMP_LEFT],
+				map_buffer->tire_temp[R3E_TIRE_REAR_LEFT].current_temp[R3E_TIRE_TEMP_RIGHT],
+				map_buffer->tire_temp[R3E_TIRE_REAR_RIGHT].current_temp[R3E_TIRE_TEMP_LEFT]);
+
+			wprintf_s(L"TyreMiddleTemperature=%f,%f,%f,%f\n",
+				map_buffer->tire_temp[R3E_TIRE_FRONT_LEFT].current_temp[R3E_TIRE_TEMP_CENTER],
+				map_buffer->tire_temp[R3E_TIRE_FRONT_RIGHT].current_temp[R3E_TIRE_TEMP_CENTER],
+				map_buffer->tire_temp[R3E_TIRE_REAR_LEFT].current_temp[R3E_TIRE_TEMP_CENTER],
+				map_buffer->tire_temp[R3E_TIRE_REAR_RIGHT].current_temp[R3E_TIRE_TEMP_CENTER]);
+
+			wprintf_s(L"TyreOuterTemperature=%f,%f,%f,%f\n",
+				map_buffer->tire_temp[R3E_TIRE_FRONT_LEFT].current_temp[R3E_TIRE_TEMP_LEFT],
+				map_buffer->tire_temp[R3E_TIRE_FRONT_RIGHT].current_temp[R3E_TIRE_TEMP_RIGHT],
+				map_buffer->tire_temp[R3E_TIRE_REAR_LEFT].current_temp[R3E_TIRE_TEMP_LEFT],
+				map_buffer->tire_temp[R3E_TIRE_REAR_RIGHT].current_temp[R3E_TIRE_TEMP_RIGHT]);
+
 			wprintf_s(L"TyrePressure=%f,%f,%f,%f\n",
 				map_buffer->tire_pressure[R3E_TIRE_FRONT_LEFT] / 6.895,
 				map_buffer->tire_pressure[R3E_TIRE_FRONT_RIGHT] / 6.895,
 				map_buffer->tire_pressure[R3E_TIRE_REAR_LEFT] / 6.895,
 				map_buffer->tire_pressure[R3E_TIRE_REAR_RIGHT] / 6.895);
+			
 			if (map_buffer->tire_wear_active > 0)
 				wprintf_s(L"TyreWear=%d,%d,%d,%d\n",
-					(int)round(normalize(map_buffer->tire_wear[R3E_TIRE_FRONT_LEFT]) * 100),
-					(int)round(normalize(map_buffer->tire_wear[R3E_TIRE_FRONT_RIGHT]) * 100),
-					(int)round(normalize(map_buffer->tire_wear[R3E_TIRE_REAR_LEFT]) * 100),
-					(int)round(normalize(map_buffer->tire_wear[R3E_TIRE_REAR_RIGHT]) * 100));
+					(int)round(100 - normalize(map_buffer->tire_wear[R3E_TIRE_FRONT_LEFT]) * 100),
+					(int)round(100 - normalize(map_buffer->tire_wear[R3E_TIRE_FRONT_RIGHT]) * 100),
+					(int)round(100 - normalize(map_buffer->tire_wear[R3E_TIRE_REAR_LEFT]) * 100),
+					(int)round(100 - normalize(map_buffer->tire_wear[R3E_TIRE_REAR_RIGHT]) * 100));
 			else
 				wprintf_s(L"TyreWear=0,0,0,0\n");
 			if (map_buffer->brake_temp[R3E_TIRE_FRONT_LEFT].current_temp != -1)

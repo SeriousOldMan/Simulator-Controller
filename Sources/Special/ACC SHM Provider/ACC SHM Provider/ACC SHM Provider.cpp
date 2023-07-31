@@ -296,6 +296,11 @@ int main(int argc, char* argv[])
 		wcout << "TyreCompoundColor=Black" << endl;
 		printData("TyreSet", gf->currentTyreSet);
 		printData("TyreTemperature", pf->tyreCoreTemperature);
+		printData("TyreInnerTemperature", pf->tyreTempI);
+		printData("TyreMiddleTemperature", pf->tyreTempM);
+		printData("TyreOuterTemperature", pf->tyreTempO);
+		printData("TyreTemperature", pf->tyreCoreTemperature);
+		printData("TyreTemperature", pf->tyreCoreTemperature);
 		printData("TyrePressure", pf->wheelsPressure);
 		printData("BrakeTemperature", pf->brakeTemp);
 		printData("BrakePadLifeRaw", pf->padLife);

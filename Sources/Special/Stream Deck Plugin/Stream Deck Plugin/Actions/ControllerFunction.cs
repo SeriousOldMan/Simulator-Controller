@@ -24,6 +24,7 @@ namespace SimulatorControllerPlugin
     [PluginActionId("simulatorcontrollerplugin.controllerfunction")]
     public class ControllerFunction : PluginBase {
         public static string CommandFile { get; set; }
+        public static bool HasCommandFile = false;
 
         static string UnicodeToUTF8(string from) {
             var bytes = Encoding.UTF8.GetBytes(from);
@@ -158,7 +159,7 @@ namespace SimulatorControllerPlugin
         {
             try
             {
-                if (ControllerFunction.CommandFile != "")
+                if (ControllerFunction.HasCommandFile)
                 {
                     while (true)
                         try

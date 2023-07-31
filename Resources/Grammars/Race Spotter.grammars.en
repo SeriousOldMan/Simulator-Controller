@@ -217,6 +217,10 @@ BringItHome.3=That will be a good result.
 Focus.1=Focus.
 Focus.2=Pull yourself together.
 Focus.3=Get with it.
+LastLapLeader.1=The leader is on the last lap.
+LastLapLeader.1=Leader is on last lap.
+LastLapDriver.1=You are on the last lap.
+LastLapDriver.1=Last lap now.
 // Weather Information //
 Temperature.1=This is %name%. We have %air% degrees air and %track% degrees track temperature.
 Temperature.2=This is %name%. Currently we have %air% degrees air and %track% degrees track temperature.
@@ -240,6 +244,8 @@ HalfTimeNotEnoughFuel.1=but the remaining fuel is only good for %laps% laps.
 HalfTimeNotEnoughFuel.2=but we do not have enough fuel for rest.
 SessionEnding.1=The current session ends in %minutes% minutes.
 SessionEnding.1=%minutes% minutes remaining for the current session.
+LastLapPosition.1=The leader is on the last lap and you are 
+LastLapLeader.1=Leader is on last lap. Bring it home.
 // Lap Timing //
 BestLap.1=%minute% minute %seconds% seconds. This was your best lap so far.
 BestLap.2=Great, %minute% minute %seconds% seconds. Your best lap so far.

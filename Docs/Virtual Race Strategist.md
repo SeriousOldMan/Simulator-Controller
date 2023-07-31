@@ -287,6 +287,8 @@ The reports at the top of the list are the well known reports, which are also av
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Practice%20Center%202.JPG)
 
+A special case is the "Running" report, which gives you access to many telemetry values for the previous and the currently running lap. The X-Axis stands for the track length here withe the 0 value beeing the start/finish line and the values are updated, when you reach the given point on the track (depending on the general data update frequency - see below). Please be aware that not all values may be provided by a given simulator.
+
 Note: The values for wear (tyres and brake pads) range from 0% up to 100%. For most of the simulators these values are directly available through the API, whereas in *Assetto Corsa Competizione*, the data interface provide the remaining thickness of each pad. Depending on the compound of the pad, the wear level for 100% ranges from 12 mm to 15.5 mm left pad thickness here, with a starting thickness for a fresh pad with 29 mm.
 
 Last but not least, using the small button with the cog wheel icon, you can choose various settings for the currently selected report, for example the range of laps to be considered in the data or the set of drivers in reports which are driver specific.

@@ -1206,6 +1206,27 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 	}
 
+	lastLap() {
+		local knowledgeBase := this.KnowledgeBase
+		local sessionTimeRemaining, driverCar
+
+		if (knowledgeBase.getValue("Session.Format") = "Time") {
+			sessionTimeRemaining := knowledgeBase.getValue("Session.Time.Remaining")
+
+			loop knowledgeBase.getValue("Car.Count", 0)
+				if (knowledgeBase.getValue("Car." . A_Index . ".Position") = 1) {
+					if ((sessionTimeRemaining - knowledgeBase.getValue("Car." . A_Index . ".Time")) <= 0)
+						return true
+
+					break
+				}
+
+			return (sessionTimeRemaining = 0)
+		}
+		else
+			return (knowledgeBase.getValue("Session.Lap.Remaining") = 0)
+	}
+
 	reviewRaceStart(lastLap, sector, positions) {
 		local startPosition := this.GridPosition["Class"]
 		local speaker, driver, currentPosition, startPosition
@@ -1345,7 +1366,7 @@ class RaceSpotter extends GridRaceAssistant {
 		local focused := false
 		local number := false
 		local situation, sessionDuration, lapTime, sessionEnding, minute, lastTemperature, stintLaps
-		local minute, rnd, phrase, bestLapTime
+		local minute, rnd, phrase, bestLapTime, ignore
 
 		if ((remainingSessionLaps = kUndefined) || (remainingStintLaps = kUndefined))
 			return false
@@ -1371,6 +1392,59 @@ class RaceSpotter extends GridRaceAssistant {
 						return true
 				}
 			}
+			else if this.lastLap() {
+				situation := "LastLap"
+
+				if !this.SessionInfos.Has(situation) {
+					this.SessionInfos[situation] := true
+
+					if (knowledgeBase.getValue("Session.Format") = "Time") {
+						if (this.getPosition() = 1) {
+							speaker.beginTalk()
+
+							try {
+								speaker.speakPhrase("LastLapDriver")
+								speaker.speakPhrase("Leader")
+								speaker.speakPhrase("BringItHome")
+							}
+							finally {
+								speaker.endTalk()
+							}
+						}
+						else {
+							speaker.beginTalk()
+
+							try {
+								speaker.speakPhrase("LastLapLeader")
+
+								if (this.getPosition(false, "Class") < 3) {
+									speaker.speakPhrase("Position", {position: this.getPosition(false, "Class")})
+									speaker.speakPhrase("BringItHome")
+								}
+							}
+							finally {
+								speaker.endTalk()
+							}
+						}
+					}
+					else {
+						speaker.beginTalk()
+
+						try {
+							speaker.speakPhrase("LastLapDriver")
+
+							if (this.getPosition(false, "Class") < 3) {
+								speaker.speakPhrase("Position", {position: this.getPosition(false, "Class")})
+								speaker.speakPhrase("BringItHome")
+							}
+						}
+						finally {
+							speaker.endTalk()
+						}
+					}
+				}
+			}
+
 
 		if (enoughData && (lastLap > (this.BaseLap + 2))) {
 			if ((remainingSessionLaps <= 3) && (Floor(remainingSessionLaps) > 1) && (this.Session = kSessionRace)) {

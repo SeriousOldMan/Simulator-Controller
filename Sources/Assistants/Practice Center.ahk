@@ -154,7 +154,7 @@ class PracticeCenter extends ConfigurationItem {
 	iAirTemperature := false
 	iTrackTemperature := false
 
-	iRunning := WeakMap()
+	iRunning := Map()
 
 	iAvailableTyreCompounds := [normalizeCompound("Dry")]
 	iTyreCompounds := [normalizeCompound("Dry")]
@@ -2189,7 +2189,7 @@ class PracticeCenter extends ConfigurationItem {
 		this.iRuns := CaseInsenseWeakMap()
 		this.iLaps := CaseInsenseWeakMap()
 
-		this.iRunning := WeakMap()
+		this.iRunning := Map()
 
 		this.iPitstops := CaseInsenseMap()
 		this.iLastPitstopUpdate := false
@@ -2771,6 +2771,7 @@ class PracticeCenter extends ConfigurationItem {
 	updateRunning(lapNumber, data) {
 		local driverCar := getMultiMapValue(data, "Position Data", "Driver.Car", 0)
 		local running := getMultiMapValue(data, "Position Data", "Car." . driverCar . ".Lap.Running", false)
+		local runnings := this.Running
 		local pressures, temperatures
 
 		static lastRunning := 0
@@ -2781,12 +2782,20 @@ class PracticeCenter extends ConfigurationItem {
 			running := Floor(running * 100)
 
 			if (running > lastRunning) {
-				loop (running - lastRunning - 1)
-					this.Running.Delete(lastRunning + A_Index)
+				loop (running - lastRunning - 1) {
+					lastRunning += 1
+
+					if runnings.Has(lastRunning)
+						runnings.Delete(lastRunning)
+				}
 			}
 			else
-				loop (100 - lastRunning - 1)
-					this.Running.Delete(lastRunning + A_Index)
+				loop (100 - lastRunning - 1) {
+					lastRunning += 1
+
+					if runnings.Has(lastRunning)
+						runnings.Delete(lastRunning)
+				}
 
 			lastRunning := running
 

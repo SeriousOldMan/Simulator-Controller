@@ -570,7 +570,7 @@ class Function extends ConfigurationItem {
 
 	saveToConfiguration(configuration) {
 		local descriptor := this.Descriptor
-		local ignore, trigger
+		local ignore, trigger, hotkeys
 
 		super.saveToConfiguration(configuration)
 

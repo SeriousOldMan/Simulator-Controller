@@ -2410,8 +2410,6 @@ class StrategyWorkbench extends ConfigurationItem {
 				}
 			case 5:
 				if (simulator && car && track) {
-					settingsDB := SettingsDatabase()
-
 					settings := SettingsDatabase().loadSettings(simulator, car, track, this.SelectedWeather)
 
 					if (settings.Count > 0) {

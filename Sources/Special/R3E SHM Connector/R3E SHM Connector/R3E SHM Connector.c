@@ -459,6 +459,7 @@ extern __declspec(dllexport) int __stdcall call(char* request, char* result, int
 
 		writeString(result, "[Track Data]\n", &pos);
 		if (mapped_r3e) {
+			writeString(result, "Length=", &pos); writeFloat(result, map_buffer->layout_length, &pos); writeLine(result, &pos);
 			writeString(result, "Temperature=26\n", &pos);
 			writeString(result, "Grip=Optimum\n", &pos);
 

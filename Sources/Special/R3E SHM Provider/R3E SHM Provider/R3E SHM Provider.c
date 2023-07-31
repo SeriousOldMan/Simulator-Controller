@@ -416,6 +416,7 @@ int main(int argc, char* argv[])
 		}
 
 		wprintf_s(L"[Track Data]\n");
+		wprintf_s(L"Length=%f\n", map_buffer->layout_length);
 		wprintf_s(L"Temperature=26\n");
 		wprintf_s(L"Grip=Optimum\n");
 

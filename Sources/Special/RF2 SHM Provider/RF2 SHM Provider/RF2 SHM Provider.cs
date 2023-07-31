@@ -335,7 +335,9 @@ namespace RF2SHMProvider {
 
 			if (connected)
 			{
-				Console.WriteLine("Grip=Optimum");
+				Console.Write("Length="); Console.WriteLine(scoring.mScoringInfo.mLapDist);
+
+                Console.WriteLine("Grip=Optimum");
 				Console.Write("Temperature="); Console.WriteLine(scoring.mScoringInfo.mTrackTemp);
 
 				for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)	{

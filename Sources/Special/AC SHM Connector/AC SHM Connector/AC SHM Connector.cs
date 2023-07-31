@@ -373,6 +373,7 @@ namespace SHMConnector
             strWriter.WriteLine("InPit=" + (graphics.IsInPit != 0 ? "true" : "false"));
 
             strWriter.WriteLine("[Track Data]");
+            strWriter.Write("Length="); strWriter.WriteLine(staticInfo.TrackSPlineLength);
             strWriter.Write("Temperature="); strWriter.WriteLine(physics.RoadTemp);
             strWriter.WriteLine("Grip=" + GetGrip(graphics.SurfaceGrip));
 

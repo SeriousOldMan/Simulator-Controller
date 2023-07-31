@@ -415,6 +415,7 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 		printLine(&output, "InPit=", (localCopy->mPitMode == PIT_MODE_IN_PIT) ? "true" : "false");
 
 		printLine(&output, "[Track Data]");
+		printLine(&output, "Length=", localCopy->mTrackLength);
 		printLine(&output, "Temperature=", localCopy->mTrackTemperature);
 		printLine(&output, "Grip=Optimum");
 

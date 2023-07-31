@@ -363,6 +363,7 @@ int main(int argc, char* argv[]) {
 		printf("InPit=%s\n", (localCopy->mPitMode == PIT_MODE_IN_PIT) ? "true" : "false");
 
 		printf("[Track Data]\n");
+		printf("Length=%f\n", localCopy->mTrackLength);
 		printf("Temperature=%f\n", localCopy->mTrackTemperature);
 		printf("Grip=Optimum\n");
 

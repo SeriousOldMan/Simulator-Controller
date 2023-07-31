@@ -148,11 +148,11 @@ class PracticeCenter extends ConfigurationItem {
 	iSimulator := false
 	iCar := false
 	iTrack := false
-	iWeather := false
-	iWeather10Min := false
-	iWeather30Min := false
-	iAirTemperature := false
-	iTrackTemperature := false
+	iWeather := "Dry"
+	iWeather10Min := "Dry"
+	iWeather30Min := "Dry"
+	iAirTemperature := 23
+	iTrackTemperature := 27
 
 	iRunning := Map()
 
@@ -161,8 +161,8 @@ class PracticeCenter extends ConfigurationItem {
 
 	iUsedTyreSets := WeakMap()
 
-	iTyreCompound := false
-	iTyreCompoundColor := false
+	iTyreCompound := "Dry"
+	iTyreCompoundColor := "Back"
 
 	iUseSessionData := true
 	iUseTelemetryDatabase := false
@@ -461,12 +461,12 @@ class PracticeCenter extends ConfigurationItem {
 			local curDrivers := this.Drivers
 			local tyreData := this.getTyreData(weather, tyreCompound, tyreCompoundColor)
 			local maxFuel := getMultiMapValue(settings, "Session Settings", "Fuel.Amount", false)
-			local map, ignore, entry
+			local map, ignore, entry, index
 
 			center.UseSessionData := true
 			center.UseTelemetryDatabase := true
 
-			this.setDrivers(center.Drivers)
+			this.setDrivers(center.Drivers ? ((center.Drivers.Length > 0) ? collect(center.Drivers, (d) => d.ID) : false) : false)
 
 			fuelLaps := CaseInsenseMap()
 			tyreLaps := CaseInsenseMap()
@@ -476,23 +476,33 @@ class PracticeCenter extends ConfigurationItem {
 					map := entry["Map"]
 
 					if !fuelLaps.Has(map)
-						fuelLaps[map] := [false, false, false, false, false, false, false, false]
+						fuelLaps[map] := [false, false, false, false, false, false, false, false, false]
 
-					mapLaps[map][Min(8, Floor(entry["Fuel.Remaining"] / 15) + 1)] := Round(entry["Lap.Time"] / 1000, 1)
+					index := Min(9, Floor(entry["Fuel.Remaining"] / 15) + 1)
+
+					if (fuelLaps[map][index] != false)
+						fuelLaps[map][index] := Min(entry["Lap.Time"], fuelLaps[map][index])
+					else
+						fuelLaps[map][index] := entry["Lap.Time"]
 				}
 
 				for ignore, entry in this.getTyreLapTimes(weather, tyreCompound, tyreCompoundColor) {
-					if !fuelLaps.Has("-")
-						fuelLaps["-"] := [false, false, false, false, false, false, false, false]
+					if !tyreLaps.Has("-")
+						tyreLaps["-"] := [false, false, false, false, false, false, false, false, false, false, false, false, false, false]
 
-					mapLaps["-"][Min(14, Floor(entry["Tyre.Laps"] / 5) + 1)] := Round(entry["Lap.Time"] / 1000, 1)
+					index := Min(14, Floor(entry["Tyre.Laps"] / 5) + 1)
+
+					if (tyreLaps["-"][index] != false)
+						tyreLaps["-"][index] := Min(entry["Lap.Time"], tyreLaps["-"][index])
+					else
+						tyreLaps["-"][index] := entry["Lap.Time"]
 				}
 			}
 			finally {
 				center.UseSessionData := curUseSessionData
 				center.UseTelemetryDatabase := curUseTelemetryDatabase
 
-				center.setDrivers(curDrivers)
+				this.setDrivers(curDrivers)
 			}
 		}
 	}
@@ -515,7 +525,7 @@ class PracticeCenter extends ConfigurationItem {
 
 			if (!tyreCompoundColor || (tyreCompoundColor = ""))
 				tyreCompoundColor := "Black"
-false
+
 			this.Database.add("Tyres.Pressures",
 							  Database.Row("Weather", weather, "Temperature.Air", airTemperature, "Temperature.Track", trackTemperature
 										 , "Compound", tyreCompound, "Compound.Color", tyreCompoundColor, "Driver", driver
@@ -888,7 +898,7 @@ false
 	TelemetryDatabase {
 		Get {
 			if !this.iTelemetryDatabase
-				this.iTelemetryDatabase := PracticeCenter.SessionTelemetryDatabase(this)
+				this.iTelemetryDatabase := PracticeCenter.SessionTelemetryDatabase(this, this.Simulator, this.Car, this.Track)
 
 			return this.iTelemetryDatabase
 		}
@@ -1002,12 +1012,20 @@ false
 			center.loadSimulator(centerGui["simulatorDropDown"].Text)
 
 			center.initializeSession()
+
+			center.analyzeTelemetry()
+
+			center.updateState()
 		}
 
 		chooseCar(*) {
 			center.loadCar(this.getAvailableCars(this.Simulator)[centerGui["carDropDown"].Value])
 
 			center.initializeSession()
+
+			center.analyzeTelemetry()
+
+			center.updateState()
 		}
 
 		chooseTrack(*) {
@@ -1018,6 +1036,10 @@ false
 			center.loadTrack(tracks[inList(trackNames, centerGui["trackDropDown"].Text)])
 
 			center.initializeSession()
+
+			center.analyzeTelemetry()
+
+			center.updateState()
 		}
 
 		chooseReport(listView, line, *) {
@@ -1356,20 +1378,20 @@ false
 
 		centerGui.Add("Text", "x24 ys+40 w80 h21", translate("Fuel Level"))
 
-		columns := collect([15, 30, 45, 60, 75, 90, 105, 120], convertUnit.Bind("Volume"))
+		columns := collect([0, 15, 30, 45, 60, 75, 90, 105, 120], convertUnit.Bind("Volume"))
 
 		loop columns.Length
 			columns[A_Index] := (columns[A_Index] . A_Space . SubStr(getUnit("Volume"), 1, 1))
 
-		this.iFuelDataListView := centerGui.Add("ListView", "x124 ys+33 w477 h132 H:Grow(0.8) Checked -Multi -LV0x10 AltSubmit NoSort NoSortHdr", concatenate([translate("Map")], columns))
+		this.iFuelDataListView := centerGui.Add("ListView", "x124 ys+33 w477 h212 H:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", concatenate([translate("Map")], columns))
 		this.iFuelDataListView.OnEvent("Click", noSelect)
 		this.iFuelDataListView.OnEvent("DoubleClick", noSelect)
 
-		centerGui.Add("Text", "x24 ys+178 w80 h21", translate("Tyre Usage"))
+		centerGui.Add("Text", "x24 ys+260 w80 h21 Y:Move(0.8)", translate("Tyre Usage"))
 
 		columns := [5, 10, 15, 20, 25, 30, 35, 30, 35, 40, 45, 50, 55, 60]
 
-		this.iTyreDataListView := centerGui.Add("ListView", "x124 ys+171 w477 h132 H:Grow(0.8) Checked -Multi -LV0x10 AltSubmit NoSort NoSortHdr", columns)
+		this.iTyreDataListView := centerGui.Add("ListView", "x124 ys+253 w477 h50 Y:Move(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", columns)
 		this.iTyreDataListView.OnEvent("Click", noSelect)
 		this.iTyreDataListView.OnEvent("DoubleClick", noSelect)
 
@@ -2302,14 +2324,14 @@ false
 
 		this.initializeSimulator(this.Simulator, this.Car, this.Track, true)
 
-		this.iWeather := false
-		this.iWeather10Min := false
-		this.iWeather30Min := false
-		this.iAirTemperature := false
-		this.iTrackTemperature := false
+		this.iWeather := "Dry"
+		this.iWeather10Min := "Dry"
+		this.iWeather30Min := "Dry"
+		this.iAirTemperature := 23
+		this.iTrackTemperature := 27
 
-		this.iTyreCompound := false
-		this.iTyreCompoundColor := false
+		this.iTyreCompound := "Dry"
+		this.iTyreCompoundColor := "Black"
 
 		this.iSelectedRun := false
 
@@ -3205,7 +3227,7 @@ false
 	analyzeTelemetry() {
 		local fuelLaps, tyreLaps, map, data
 
-		this.analyzeData(this.Weather, this.TyreCompound, this.TyreCompoundColor, &fuelLaps, &tyreLaps)
+		this.TelemetryDatabase.analyzeData(this.Weather, this.TyreCompound, this.TyreCompoundColor, &fuelLaps, &tyreLaps)
 
 		this.FuelDataListView.Delete()
 		this.TyreDataListView.Delete()
@@ -3799,6 +3821,9 @@ false
 	clearSession() {
 		clearSessionAsync() {
 			this.initializeSession()
+
+			this.analyzeTelemetry()
+
 			this.updateState()
 		}
 
@@ -4113,6 +4138,8 @@ false
 					this.updateReports()
 
 					this.updateUsedTyreSets()
+
+					this.analyzeTelemetry()
 
 					this.updateState()
 				}
@@ -6090,6 +6117,8 @@ false
 				this.initializeSimulator(SessionDatabase.getSimulatorName(getMultiMapValue(data, "Session Data", "Simulator"))
 									   , getMultiMapValue(data, "Session Data", "Car")
 									   , getMultiMapValue(data, "Session Data", "Track"))
+
+				this.analyzeTelemetry()
 			}
 			finally {
 				deleteFile(fileName)

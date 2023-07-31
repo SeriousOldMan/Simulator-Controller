@@ -142,8 +142,8 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 		return true
 	}
 
-	updateSession(session) {
-		super.updateSession(session)
+	updateSession(session, force) {
+		super.updateSession(session, force)
 
 		if (session == kSessionFinished) {
 			this.iRepairSuspensionChosen := false

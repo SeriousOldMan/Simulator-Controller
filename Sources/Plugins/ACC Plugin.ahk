@@ -398,11 +398,11 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		return this.sessionActive(data)
 	}
 
-	updateSession(session) {
+	updateSession(session, force := false) {
 		local lastSession := this.Session
 		local activeModes
 
-		super.updateSession(session)
+		super.updateSession(session, force)
 
 		activeModes := this.Controller.ActiveModes
 

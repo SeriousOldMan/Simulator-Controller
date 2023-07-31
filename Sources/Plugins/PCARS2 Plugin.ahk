@@ -318,8 +318,8 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	updateSession(session) {
-		super.updateSession(session)
+	updateSession(session, force := false) {
+		super.updateSession(session, force)
 
 		if (session == kSessionFinished) {
 			this.iTyreCompoundChosen := 0

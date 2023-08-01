@@ -1645,11 +1645,9 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	updateSettingsMenu() {
-		local settingsMenu, fileNames, validators, ignore, fileName, validator
-
-		settingsMenu := collect(["Settings", "---------------------------------------------", "Initialize from Strategy", "Initialize from Settings...", "Initialize from Database", "Initialize from Telemetry", "Initialize from Simulation"], translate)
-
-		fileNames := getFileNames("*.rules", kResourcesDirectory . "Strategy\Validators\", kUserHomeDirectory . "Validators\")
+		local settingsMenu := collect(["Settings", "---------------------------------------------", "Initialize from Strategy", "Initialize from Settings...", "Initialize from Database", "Initialize from Telemetry", "Initialize from Simulation"], translate)
+		local fileNames := getFileNames("*.rules", kResourcesDirectory . "Strategy\Validators\", kUserHomeDirectory . "Validators\")
+		local validators, ignore, fileName, validator
 
 		if (fileNames.Length > 0) {
 			settingsMenu.Push(translate("---------------------------------------------"))

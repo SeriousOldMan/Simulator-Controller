@@ -93,6 +93,12 @@ kPCTyresSchemas["Tyres.Pressures"] := concatenate(kPCTyresSchemas["Tyres.Pressur
 												, ["Tyre.Pressure.Loss.Front.Left", "Tyre.Pressure.Loss.Front.Right"
 												 , "Tyre.Pressure.Loss.Rear.Left", "Tyre.Pressure.Loss.Rear.Right"])
 
+global kFuelBuckets := [0, 15, 30, 45, 60, 75, 90, 105, 120]
+global kFuelBucketSize := 15
+
+global kTyreLapsBuckets := [5, 10, 15, 20, 25, 30, 35, 30, 35, 40, 45, 50, 55, 60]
+global kTyreLapsBucketSize := 5
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
@@ -163,6 +169,10 @@ class PracticeCenter extends ConfigurationItem {
 
 	iTyreCompound := "Dry"
 	iTyreCompoundColor := "Back"
+
+	iDataWeather := "Dry"
+	iDataTyreCompound := "Dry"
+	iDataTyreCompoundColor := "Back"
 
 	iUseSessionData := true
 	iUseTelemetryDatabase := false
@@ -415,19 +425,19 @@ class PracticeCenter extends ConfigurationItem {
 			return entries
 		}
 
-		getTyreLapTimes(weather, tyreCompound, tyreCompoundColor) {
+		getTyreLapTimes(weather, tyreCompound, tyreCompoundColor, withFuel := false) {
 			local entries := []
 			local newEntries, ignore, entry, found, candidate
 
 			if this.PracticeCenter.UseSessionData
-				for ignore, entry in super.getTyreLapTimes(weather, tyreCompound, tyreCompoundColor)
+				for ignore, entry in super.getTyreLapTimes(weather, tyreCompound, tyreCompoundColor, withFuel)
 					if (entry["Lap.Time"] > 0)
 						entries.Push(entry)
 
 			if (this.PracticeCenter.UseTelemetryDatabase && this.TelemetryDatabase) {
 				newEntries := []
 
-				for ignore, entry in this.TelemetryDatabase.getTyreLapTimes(weather, tyreCompound, tyreCompoundColor) {
+				for ignore, entry in this.TelemetryDatabase.getTyreLapTimes(weather, tyreCompound, tyreCompoundColor, withFuel) {
 					if (entry["Lap.Time"] > 0) {
 						found := false
 
@@ -448,62 +458,6 @@ class PracticeCenter extends ConfigurationItem {
 			}
 
 			return entries
-		}
-
-		analyzeData(weather, tyreCompound, tyreCompoundColor, &fuelLaps, &tyreLaps) {
-			local center := this.PracticeCenter
-			local simulator := center.Simulator
-			local car := center.Car
-			local track := center.Track
-			local settings := SettingsDatabase().loadSettings(simulator, car, track, weather)
-			local curUseSessionData := center.UseSessionData
-			local curUseTelemetryDatabase := center.UseTelemetryDatabase
-			local curDrivers := this.Drivers
-			local tyreData := this.getTyreData(weather, tyreCompound, tyreCompoundColor)
-			local maxFuel := getMultiMapValue(settings, "Session Settings", "Fuel.Amount", false)
-			local map, ignore, entry, index
-
-			center.UseSessionData := true
-			center.UseTelemetryDatabase := true
-
-			this.setDrivers(center.Drivers ? ((center.Drivers.Length > 0) ? collect(center.Drivers, (d) => d.ID) : false) : false)
-
-			fuelLaps := CaseInsenseMap()
-			tyreLaps := CaseInsenseMap()
-
-			try {
-				for ignore, entry in this.getMapLapTimes(weather, tyreCompound, tyreCompoundColor) {
-					map := entry["Map"]
-
-					if !fuelLaps.Has(map)
-						fuelLaps[map] := [false, false, false, false, false, false, false, false, false]
-
-					index := Min(9, Floor(entry["Fuel.Remaining"] / 15) + 1)
-
-					if (fuelLaps[map][index] != false)
-						fuelLaps[map][index] := Min(entry["Lap.Time"], fuelLaps[map][index])
-					else
-						fuelLaps[map][index] := entry["Lap.Time"]
-				}
-
-				for ignore, entry in this.getTyreLapTimes(weather, tyreCompound, tyreCompoundColor) {
-					if !tyreLaps.Has("-")
-						tyreLaps["-"] := [false, false, false, false, false, false, false, false, false, false, false, false, false, false]
-
-					index := Min(14, Floor(entry["Tyre.Laps"] / 5) + 1)
-
-					if (tyreLaps["-"][index] != false)
-						tyreLaps["-"][index] := Min(entry["Lap.Time"], tyreLaps["-"][index])
-					else
-						tyreLaps["-"][index] := entry["Lap.Time"]
-				}
-			}
-			finally {
-				center.UseSessionData := curUseSessionData
-				center.UseTelemetryDatabase := curUseTelemetryDatabase
-
-				this.setDrivers(curDrivers)
-			}
 		}
 	}
 
@@ -703,9 +657,9 @@ class PracticeCenter extends ConfigurationItem {
 		}
 	}
 
-	Weather {
+	Weather[type := "Run"] {
 		Get {
-			return this.iWeather
+			return ((type = "Run") ? this.iWeather : this.iDataWeather)
 		}
 	}
 
@@ -751,15 +705,15 @@ class PracticeCenter extends ConfigurationItem {
 		}
 	}
 
-	TyreCompound {
+	TyreCompound[type := "Run"] {
 		Get {
-			return this.iTyreCompound
+			return ((type = "Run") ? this.iTyreCompound : this.iDataTyreCompound)
 		}
 	}
 
-	TyreCompoundColor {
+	TyreCompoundColor[type := "Run"] {
 		Get {
-			return this.iTyreCompoundColor
+			return ((type = "Run") ? this.iTyreCompoundColor : this.iDataTyreCompoundColor)
 		}
 	}
 
@@ -1081,8 +1035,8 @@ class PracticeCenter extends ConfigurationItem {
 			center.withExceptionhandler(ObjBindMethod(center, "chooseSessionMenu", centerGui["sessionMenuDropDown"].Value))
 		}
 
-		planMenu(*) {
-			center.withExceptionhandler(ObjBindMethod(center, "choosePlanMenu", centerGui["planMenuDropDown"].Value))
+		dataMenu(*) {
+			center.withExceptionhandler(ObjBindMethod(center, "chooseDataMenu", centerGui["dataMenuDropDown"].Value))
 		}
 
 		runMenu(*) {
@@ -1357,7 +1311,7 @@ class PracticeCenter extends ConfigurationItem {
 		centerGui.SetFont("s8 Norm", "Arial")
 
 		centerGui.Add("DropDownList", "x195 yp-2 w180 Choose1 +0x200 vsessionMenuDropDown").OnEvent("Change", sessionMenu)
-		centerGui.Add("DropDownList", "x380 yp w180 Choose1 +0x200 vplanMenuDropDown").OnEvent("Change", planMenu)
+		centerGui.Add("DropDownList", "x380 yp w180 Choose1 +0x200 vdataMenuDropDown").OnEvent("Change", dataMenu)
 		centerGui.Add("DropDownList", "x565 yp w180 Choose1 +0x200 vrunMenuDropDown").OnEvent("Change", runMenu)
 
 		centerGui.SetFont("s8 Norm", "Arial")
@@ -1372,30 +1326,10 @@ class PracticeCenter extends ConfigurationItem {
 
 		centerGui.SetFont("Norm", "Arial")
 
-		centerTab := centerGui.Add("Tab3", "x16 ys+39 w593 h316 H:Grow(0.8) AltSubmit -Wrap Section vpracticeCenterTabView", collect(["Data", "Tyres", "Stints", "Laps"], translate))
+		centerTab := centerGui.Add("Tab3", "x16 ys+39 w593 h316 H:Grow(0.8) AltSubmit -Wrap Section vpracticeCenterTabView", collect(["Tyres", "Stints", "Laps", "Data"], translate))
+		centerTab.OnEvent("Change", (*) => this.analyzeTelemetry())
 
 		centerTab.UseTab(1)
-
-		centerGui.Add("Text", "x24 ys+40 w80 h21", translate("Fuel Level"))
-
-		columns := collect([0, 15, 30, 45, 60, 75, 90, 105, 120], convertUnit.Bind("Volume"))
-
-		loop columns.Length
-			columns[A_Index] := (columns[A_Index] . A_Space . SubStr(getUnit("Volume"), 1, 1))
-
-		this.iFuelDataListView := centerGui.Add("ListView", "x124 ys+33 w477 h212 H:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", concatenate([translate("Map")], columns))
-		this.iFuelDataListView.OnEvent("Click", noSelect)
-		this.iFuelDataListView.OnEvent("DoubleClick", noSelect)
-
-		centerGui.Add("Text", "x24 ys+260 w80 h21 Y:Move(0.8)", translate("Tyre Usage"))
-
-		columns := [5, 10, 15, 20, 25, 30, 35, 30, 35, 40, 45, 50, 55, 60]
-
-		this.iTyreDataListView := centerGui.Add("ListView", "x124 ys+253 w477 h50 Y:Move(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", columns)
-		this.iTyreDataListView.OnEvent("Click", noSelect)
-		this.iTyreDataListView.OnEvent("DoubleClick", noSelect)
-
-		centerTab.UseTab(2)
 
 		x := 32
 		x0 := x - 4
@@ -1498,15 +1432,34 @@ class PracticeCenter extends ConfigurationItem {
 		this.iUsedTyreSetsListView.OnEvent("Click", noSelect)
 		this.iUsedTyreSetsListView.OnEvent("DoubleClick", noSelect)
 
-		centerTab.UseTab(3)
+		centerTab.UseTab(2)
 
 		this.iRunsListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 H:Grow(0.8) Checked -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Driver", "Weather", "Compound", "Set", "Laps", "Initial Fuel", "Consumed Fuel", "Avg. Lap Time", "Accidents", "Potential", "Race Craft", "Speed", "Consistency", "Car Control"], translate))
 		this.iRunsListView.OnEvent("Click", chooseRun)
 
-		centerTab.UseTab(4)
+		centerTab.UseTab(3)
 
 		this.iLapsListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 H:Grow(0.8) Checked -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Stint", "Weather", "Grip", "Lap Time", "Consumption", "Remaining", "Pressures", "Invalid", "Accident"], translate))
 		this.iLapsListView.OnEvent("Click", chooseLap)
+
+		centerTab.UseTab(4)
+
+		centerGui.Add("Text", "x24 ys+40 w80 h21", translate("Fuel Level"))
+
+		columns := collect(kFuelBuckets, convertUnit.Bind("Volume"))
+
+		loop columns.Length
+			columns[A_Index] := (columns[A_Index] . A_Space . SubStr(getUnit("Volume"), 1, 1))
+
+		this.iFuelDataListView := centerGui.Add("ListView", "x124 ys+33 w477 h132 H:Grow(0.4) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", concatenate([translate("Map")], columns))
+		this.iFuelDataListView.OnEvent("Click", noSelect)
+		this.iFuelDataListView.OnEvent("DoubleClick", noSelect)
+
+		centerGui.Add("Text", "x24 ys+178 w80 h21 Y:Move(0.4)", translate("Tyre Usage"))
+
+		this.iTyreDataListView := centerGui.Add("ListView", "x124 ys+171 w477 h132 Y:Move(0.4) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", concatenate([translate("Fuel")], kTyreLapsBuckets))
+		this.iTyreDataListView.OnEvent("Click", noSelect)
+		this.iTyreDataListView.OnEvent("DoubleClick", noSelect)
 
 		centerGui.Rules := ""
 
@@ -1908,7 +1861,6 @@ class PracticeCenter extends ConfigurationItem {
 		window["dataY6DropDown"].Enabled := false
 
 		if (!this.Simulator || this.SessionExported) {
-			window["planMenuDropDown"].Visible := false
 			window["runMenuDropDown"].Visible := false
 
 			window["runModeDropDown"].Enabled := false
@@ -1922,7 +1874,6 @@ class PracticeCenter extends ConfigurationItem {
 			window["importPressuresButton"].Enabled := false
 		}
 		else if (this.SessionActive || !this.SessionMode) {
-			window["planMenuDropDown"].Visible := true
 			window["runMenuDropDown"].Visible := true
 
 			window["runModeDropDown"].Enabled := true
@@ -1945,7 +1896,6 @@ class PracticeCenter extends ConfigurationItem {
 			}
 		}
 		else {
-			window["planMenuDropDown"].Visible := true
 			window["runMenuDropDown"].Visible := true
 
 			window["runModeDropDown"].Enabled := false
@@ -2053,8 +2003,8 @@ class PracticeCenter extends ConfigurationItem {
 		}
 
 		this.updateSessionMenu()
-		this.updatePlanMenu()
 		this.updateRunMenu()
+		this.updateDataMenu()
 	}
 
 	updateSessionMenu() {
@@ -2067,18 +2017,35 @@ class PracticeCenter extends ConfigurationItem {
 		this.Control["sessionMenuDropDown"].Choose(1)
 	}
 
-	updatePlanMenu() {
-		this.Control["planMenuDropDown"].Delete()
-		this.Control["planMenuDropDown"].Add(collect(["Plan", "---------------------------------------------", "New Plan..."], translate))
-
-		this.Control["planMenuDropDown"].Choose(1)
-	}
-
 	updateRunMenu() {
 		this.Control["runMenuDropDown"].Delete()
 		this.Control["runMenuDropDown"].Add(collect(["Stints", "---------------------------------------------", "New Stint", "---------------------------------------------", "Stints Summary"], translate))
 
 		this.Control["runMenuDropDown"].Choose(1)
+	}
+
+	updateDataMenu() {
+		local use1 := (this.UseSessionData ? "(x) Use Session Data" : "      Use Session Data")
+		local use2 := (this.UseTelemetryDatabase ? "(x) Use Telemetry Database" : "      Use Telemetry Database")
+		local tyreCompounds := collect(this.AvailableTyreCompounds, translate)
+		local tyreCompound := compound(this.TyreCompound["Data"], this.TyreCompoundColor["Data"])
+
+		static weatherConditions := collect(kWeatherConditions, translate)
+
+		wConditions := weatherConditions.Clone()
+
+		loop wConditions.Length
+			wConditions[A_Index] := (((wConditions[A_Index] = this.Weather["Data"]) ? "(x) " : "      ") . wConditions[A_Index])
+
+		loop tyreCompounds.Length
+			tyreCompounds[A_Index] := (((tyreCompounds[A_Index] = tyreCompound) ? "(x) " : "      ") . tyreCompounds[A_Index])
+
+		this.Control["dataMenuDropDown"].Delete()
+		this.Control["dataMenuDropDown"].Add(concatenate(collect(["Data", "---------------------------------------------", use1, use2, "---------------------------------------------"], translate)
+													   , tyreCompounds, [translate("---------------------------------------------")]
+													   , wConditions, collect(["---------------------------------------------", "Data Summary"], translate)))
+
+		this.Control["dataMenuDropDown"].Choose(1)
 	}
 
 	chooseSessionMenu(line) {
@@ -2144,15 +2111,50 @@ class PracticeCenter extends ConfigurationItem {
 		this.updateSessionMenu()
 	}
 
-	choosePlanMenu(line) {
+	chooseDataMenu(line) {
+		local tyreCompound, tyreCompoundColor
+
 		switch line {
-			case 3: ; New Stint
-				OnMessage(0x44, translateOkButton)
-				MsgBox(translate("Not yet implemented."), translate("Information"), 262192)
-				OnMessage(0x44, translateOkButton, 0)
+			case 3:
+				this.UseSessionData := !this.UseSessionData
+
+				this.analyzeTelemetry()
+			case 4:
+				this.UseTelemetryDatabase := !this.UseTelemetryDatabase
+
+				this.analyzeTelemetry()
+			default:
+				line -= 5
+
+				if ((line > 0) && (line <= this.AvailableTyreCompounds.Length)) {
+					splitCompound(this.AvailableTyreCompounds[line], &tyreCompound, &tyreCompoundColor)
+
+					this.iDataTyreCompound := tyreCompound
+					this.iDataTyreCompoundColor := tyreCompoundColor
+
+					this.analyzeTelemetry()
+				}
+				else {
+					line -= (this.AvailableTyreCompounds.Length + 1)
+
+					if ((line > 0) && (line <= kWeatherConditions.Length)) {
+						this.iDataWeather := kWeatherConditions[line]
+
+						this.analyzeTelemetry()
+					}
+					else {
+						line -= (kWeatherConditions.Length + 1)
+
+						if (line = 1) {
+							OnMessage(0x44, translateOkButton)
+							MsgBox(translate("Not yet implemented."), translate("Information"), 262192)
+							OnMessage(0x44, translateOkButton, 0)
+						}
+					}
+				}
 		}
 
-		this.updatePlanMenu()
+		this.updateDataMenu()
 	}
 
 	chooseRunMenu(line) {
@@ -2332,6 +2334,10 @@ class PracticeCenter extends ConfigurationItem {
 
 		this.iTyreCompound := "Dry"
 		this.iTyreCompoundColor := "Black"
+
+		this.iDataWeather := "Dry"
+		this.iDataTyreCompound := "Dry"
+		this.iDataTyreCompoundColor := "Black"
 
 		this.iSelectedRun := false
 
@@ -3224,45 +3230,99 @@ class PracticeCenter extends ConfigurationItem {
 		}
 	}
 
+	analyzeData(weather, tyreCompound, tyreCompoundColor, &fuelLaps, &tyreLaps) {
+		local telemetryDB := this.TelemetryDatabase
+		local simulator := this.Simulator
+		local car := this.Car
+		local track := this.Track
+		local curDrivers := telemetryDB.Drivers
+		local hasData := false
+		local map, fuel, ignore, entry, index
+
+		fuelLaps := CaseInsenseMap()
+		tyreLaps := CaseInsenseMap()
+
+		telemetryDB.setDrivers(this.Drivers ? ((this.Drivers.Length > 0) ? collect(this.Drivers, (d) => d.ID) : false) : false)
+
+		try {
+			for ignore, entry in telemetryDB.getMapLapTimes(weather, tyreCompound, tyreCompoundColor) {
+				map := entry["Map"]
+
+				if !fuelLaps.Has(map)
+					fuelLaps[map] := collect(kFuelBuckets, always.Bind(false))
+
+				index := Min(kFuelBuckets.Length, Floor(entry["Fuel.Remaining"] / kFuelBucketSize) + 1)
+
+				if (fuelLaps[map][index] != false)
+					fuelLaps[map][index] := Min(entry["Lap.Time"], fuelLaps[map][index])
+				else
+					fuelLaps[map][index] := entry["Lap.Time"]
+
+				hasData := true
+			}
+
+			for ignore, entry in telemetryDB.getTyreLapTimes(weather, tyreCompound, tyreCompoundColor, true) {
+				fuel := (Floor(entry["Fuel.Remaining"] / kFuelBucketSize) * kFuelBucketSize)
+
+				if !tyreLaps.Has(fuel)
+					tyreLaps[fuel] := collect(kTyreLapsBuckets, always.Bind(false))
+
+				index := Min(kTyreLapsBuckets.Length, Floor(entry["Tyre.Laps"] / kTyreLapsBucketSize) + 1)
+
+				if (tyreLaps[fuel][index] != false)
+					tyreLaps[fuel][index] := Min(entry["Lap.Time"], tyreLaps[fuel][index])
+				else
+					tyreLaps[fuel][index] := entry["Lap.Time"]
+
+				hasData := true
+			}
+		}
+		finally {
+			telemetryDB.setDrivers(curDrivers)
+		}
+
+		return hasData
+	}
+
 	analyzeTelemetry() {
-		local fuelLaps, tyreLaps, map, data
+		local fuelLaps, tyreLaps, map, fuel, data
 
-		this.TelemetryDatabase.analyzeData(this.Weather, this.TyreCompound, this.TyreCompoundColor, &fuelLaps, &tyreLaps)
+		if (this.Control["practiceCenterTabView"].Value = 4) {
+			this.analyzeData(this.Weather["Data"], this.TyreCompound["Data"], this.TyreCompoundColor["Data"], &fuelLaps, &tyreLaps)
 
-		this.FuelDataListView.Delete()
-		this.TyreDataListView.Delete()
+			this.FuelDataListView.Delete()
+			this.TyreDataListView.Delete()
 
-		for map, data in fuelLaps {
-			loop data.Length
-				if !data[A_Index]
-					data[A_Index] := ""
-				else
-					data[A_Index] := displayValue("Time", data[A_Index])
+			for map, data in fuelLaps {
+				loop data.Length
+					if !data[A_Index]
+						data[A_Index] := ""
+					else
+						data[A_Index] := displayValue("Time", data[A_Index])
 
-			this.FuelDataListView.Add("", map, data*)
+				this.FuelDataListView.Add("", map, data*)
+			}
+
+			for fuel, data in tyreLaps {
+				loop data.Length
+					if !data[A_Index]
+						data[A_Index] := ""
+					else
+						data[A_Index] := displayValue("Time", data[A_Index])
+
+				this.TyreDataListView.Add("", displayValue("Float", convertUnit("Volume", fuel)) . A_Space . SubStr(getUnit("Volume"), 1, 1), data*)
+			}
+
+			this.FuelDataListView.ModifyCol()
+
+			loop this.FuelDataListView.GetCount("Col")
+				this.FuelDataListView.ModifyCol(A_Index, "AutoHdr")
+
+			this.TyreDataListView.ModifyCol()
+
+			loop this.TyreDataListView.GetCount("Col")
+				this.TyreDataListView.ModifyCol(A_Index, "AutoHdr")
 		}
-
-		if tyreLaps.Has("-") {
-			data := tyreLaps["-"]
-
-			loop data.Length
-				if !data[A_Index]
-					data[A_Index] := ""
-				else
-					data[A_Index] := displayValue("Time", data[A_Index])
-
-			this.TyreDataListView.Add("", data*)
-		}
-
-		this.FuelDataListView.ModifyCol()
-
-		loop this.FuelDataListView.GetCount("Col")
-			this.FuelDataListView.ModifyCol(A_Index, "AutoHdr")
-
-		this.TyreDataListView.ModifyCol()
-
-		loop this.TyreDataListView.GetCount("Col")
-			this.TyreDataListView.ModifyCol(A_Index, "AutoHdr")
 	}
 
 	exportSession(wait := false) {

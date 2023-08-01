@@ -2914,9 +2914,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	updateSessionMenu() {
-		local synchronize
-
-		synchronize := (this.Synchronize ? "(x) Synchronize" : "      Synchronize")
+		local synchronize := (this.Synchronize ? "(x) Synchronize" : "      Synchronize")
 
 		this.Control["sessionMenuDropDown"].Delete()
 		this.Control["sessionMenuDropDown"].Add(collect(["Session", "---------------------------------------------", "Connect", "Clear...", "---------------------------------------------", synchronize, "---------------------------------------------", "Select Team...", "---------------------------------------------", "Load Session...", "Save Session", "Save a Copy...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Race Summary", "Driver Statistics"], translate))
@@ -2929,13 +2927,10 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	updateStrategyMenu() {
-		local use1, use2, use3, use4
-
-
-		use1 := (this.UseSessionData ? "(x) Use Session Data" : "      Use Session Data")
-		use2 := (this.UseTelemetryDatabase ? "(x) Use Telemetry Database" : "      Use Telemetry Database")
-		use3 := (this.UseCurrentMap ? "(x) Keep current Map" : "      Keep current Map")
-		use4 := (this.UseTraffic ? "(x) Analyze Traffic" : "      Analyze Traffic")
+		local use1 := (this.UseSessionData ? "(x) Use Session Data" : "      Use Session Data")
+		local use2 := (this.UseTelemetryDatabase ? "(x) Use Telemetry Database" : "      Use Telemetry Database")
+		local use3 := (this.UseCurrentMap ? "(x) Keep current Map" : "      Keep current Map")
+		local use4 := (this.UseTraffic ? "(x) Analyze Traffic" : "      Analyze Traffic")
 
 		this.Control["strategyMenuDropDown"].Delete()
 		this.Control["strategyMenuDropDown"].Add(collect(["Strategy", "---------------------------------------------", "Load current Race Strategy", "Load Strategy...", "Save Strategy...", "---------------------------------------------", "Strategy Summary", "---------------------------------------------", use1, use2, use3, use4, "---------------------------------------------", "Adjust Strategy (Simulation)", "---------------------------------------------", "Release Strategy", "Discard Strategy", "---------------------------------------------", "Instruct Strategist"], translate))
@@ -2949,11 +2944,9 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	updatePitstopMenu() {
-		local correct1, correct2, correct3
-
-		correct1 := ((this.TyrePressureMode = "Reference") ? "(x) Adjust Pressures (Reference)" : "      Adjust Pressures (Reference)")
-		correct2 := ((this.TyrePressureMode = "Relative") ? "(x) Adjust Pressures (Relative)" : "      Adjust Pressures (Relative)")
-		correct3 := (this.CorrectPressureLoss ? "(x) Correct pressure loss" : "      Correct pressure loss")
+		local correct1 := ((this.TyrePressureMode = "Reference") ? "(x) Adjust Pressures (Reference)" : "      Adjust Pressures (Reference)")
+		local correct2 := ((this.TyrePressureMode = "Relative") ? "(x) Adjust Pressures (Relative)" : "      Adjust Pressures (Relative)")
+		local correct3 := (this.CorrectPressureLoss ? "(x) Correct pressure loss" : "      Correct pressure loss")
 
 		this.Control["pitstopMenuDropDown"].Delete()
 		this.Control["pitstopMenuDropDown"].Add(collect(["Pitstop", "---------------------------------------------", "Select Team...", "---------------------------------------------", "Initialize from Session", "Load from Database...", "Clear Setups...", "---------------------------------------------", "Setups Summary", "Pitstops Summary", "---------------------------------------------", correct1, correct2, correct3, "---------------------------------------------", "Instruct Engineer"], translate))

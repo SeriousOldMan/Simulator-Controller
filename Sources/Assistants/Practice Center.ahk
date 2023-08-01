@@ -2142,15 +2142,8 @@ class PracticeCenter extends ConfigurationItem {
 
 						this.analyzeTelemetry()
 					}
-					else {
-						line -= (this.AvailableTyreCompounds.Length + 1)
-
-						if (line = 1) { ; Data Summary
-							OnMessage(0x44, translateOkButton)
-							MsgBox(translate("Not yet implemented."), translate("Information"), 262192)
-							OnMessage(0x44, translateOkButton, 0)
-						}
-					}
+					else if ((line - (this.AvailableTyreCompounds.Length + 1)) = 1) ; Data Summary
+						this.showDataSummary()
 				}
 		}
 
@@ -3323,6 +3316,9 @@ class PracticeCenter extends ConfigurationItem {
 			loop this.TyreDataListView.GetCount("Col")
 				this.TyreDataListView.ModifyCol(A_Index, "AutoHdr")
 		}
+
+		if (this.SelectedDetailReport = "Data")
+			this.showDataSummary()
 	}
 
 	exportSession(wait := false) {
@@ -5441,6 +5437,118 @@ class PracticeCenter extends ConfigurationItem {
 		return drawChartFunction
 	}
 
+	showDataSummary() {
+		local telemetryDB := this.TelemetryDatabase
+		local html := ("<div id=`"header`"><b>" . translate("Data Summary") . "</b></div>")
+		local simulator := this.Simulator
+		local carName := this.Car
+		local trackName := this.Track
+		local sessionDate := this.Date
+		local sessionTime := this.Date
+		local ignore, weather, tyreCompound, tyreCompoundColor, fuelLaps, tyreLaps, dataSource
+		local map, tyreLaps, data, rows, row, columns
+
+		carName := (carName ? telemetryDB.getCarName(simulator, carName) : "-")
+		trackName := (trackName ? telemetryDB.getTrackName(simulator, trackName) : "-")
+
+		if sessionDate
+			sessionDate := FormatTime(sessionDate, "ShortDate")
+		else
+			sessionDate := "-"
+
+		if sessionTime
+			sessionTime := FormatTime(sessionTime, "Time")
+		else
+			sessionTime := "-"
+
+		if (this.UseSessionData && this.UseTelemetryDatabase)
+			dataSource := (translate("Session") . translate(", ") . translate("Database"))
+		else if this.UseSessionData
+			dataSource := translate("Session")
+		else if this.UseTelemetryDatabase
+			dataSource := translate("Database")
+		else
+			dataSource := translate("-")
+
+		html .= "<br><br><table>"
+		html .= ("<tr><td><b>" . translate("Simulator:") . "</b></td><td>" . (simulator ? simulator : "-") . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Car:") . "</b></td><td>" . carName . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Track:") . "</b></td><td>" . trackName . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Date:") . "</b></td><td>" . sessionDate . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Time:") . "</b></td><td>" . sessionTime . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Source:") . "</b></td><td>" . dataSource . "</td></tr>")
+		html .= "</table>"
+
+		for ignore, weather in kWeatherConditions
+			for ignore, tyreCompound in this.AvailableTyreCompounds {
+				splitCompound(tyreCompound, &tyreCompound, &tyreCompoundColor)
+
+				if this.analyzeData(weather, tyreCompound, tyreCompoundColor, &fuelLaps, &tyreLaps) {
+					html .= ("<br><br><b>" . translate(weather) . translate(" - ") . translate(compound(tyreCompound, tyreCompoundColor)) . "</b>")
+
+					rows := []
+
+					for map, data in fuelLaps {
+						loop data.Length
+							if !data[A_Index]
+								data[A_Index] := "<td class=`"td-std`"></td>"
+							else
+								data[A_Index] := ("<td class=`"td-std`">" . displayValue("Time", data[A_Index]) . "</td>")
+
+						rows.Push(Array("<td class=`"td-std`">" . map . "</td>", data*))
+					}
+
+					if (rows.Length > 0) {
+						html .= "<br><br><table class=`"table-std`">"
+
+						html .= ("<tr><th class=`"th-std`">" . translate("Map") . "</th>")
+
+						columns := collect(kFuelBuckets, convertUnit.Bind("Volume"))
+
+						loop columns.Length
+							html .= ("<th class=`"th-std`">" . (columns[A_Index] . A_Space . SubStr(getUnit("Volume"), 1, 1)) . "</th>")
+
+						html .= "</tr>"
+
+						for ignore, row in rows
+							html .= ("<tr>" . values2String("", row*) . "</tr>")
+
+						html .= "</table>"
+					}
+
+					rows := []
+
+					for fuel, data in tyreLaps {
+						loop data.Length
+							if !data[A_Index]
+								data[A_Index] := "<td class=`"td-std`"></td>"
+							else
+								data[A_Index] := ("<td class=`"td-std`">" . displayValue("Time", data[A_Index]) . "</td>")
+
+						rows.Push(Array("<td class=`"td-std`">" . displayValue("Float", convertUnit("Volume", fuel)) . "</td>", data*))
+					}
+
+					if (rows.Length > 0) {
+						html .= "<br><br><table class=`"table-std`">"
+
+						html .= ("<tr><th class=`"th-std`">" . translate("Fuel") . "</th>")
+
+						loop kTyreLapsBuckets.Length
+							html .= ("<th class=`"th-std`">" . kTyreLapsBuckets[A_Index] . "</th>")
+
+						html .= "</tr>"
+
+						for ignore, row in rows
+							html .= ("<tr>" . values2String("", row*) . "</tr>")
+
+						html .= "</table>"
+					}
+				}
+			}
+
+		this.showDetails("Data", html)
+	}
+
 	showSessionSummary() {
 		local telemetryDB := this.TelemetryDatabase
 		local html := ("<div id=`"header`"><b>" . translate("Race Summary") . "</b></div>")
@@ -5460,23 +5568,20 @@ class PracticeCenter extends ConfigurationItem {
 		local tyreLaps := []
 		local lastLap := this.LastLap
 		local lapDataTable := this.SessionStore.Tables["Lap.Data"]
-		local run, duration, ignore, lap, width, chart1
-		local simulator, carName, trackName, sessionDate, sessionTime, fuelConsumption
+		local simulator := this.Simulator
+		local carName := this.Car
+		local trackName := this.Track
+		local sessionDate := this.Date
+		local sessionTime := this.Date
+		local run, duration, ignore, lap, width, chart1, fuelConsumption
 
-		simulator := this.Simulator
-		carName := this.Car
 		carName := (carName ? telemetryDB.getCarName(simulator, carName) : "-")
-		trackName := this.Track
 		trackName := (trackName ? telemetryDB.getTrackName(simulator, trackName) : "-")
-
-		sessionDate := this.Date
 
 		if sessionDate
 			sessionDate := FormatTime(sessionDate, "ShortDate")
 		else
 			sessionDate := "-"
-
-		sessionTime := this.Date
 
 		if sessionTime
 			sessionTime := FormatTime(sessionTime, "Time")

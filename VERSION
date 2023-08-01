@@ -1,9 +1,9 @@
 [Development]
 Version=5.2.1.0-dev
 Target=5.2.1.0-release
-Date=07/31/2023
+Date=08/01/2023
 Download=
-Changes=Many bug fixes in "Practice Center", Better last lap detection in timed races, Spotter now announces the last lap, Fixed "Invalid" column in "Race Center", Fixed support for RaceRoom Racing Experience, Fixed tyre wear for RaceRoom Racing Experience, Fixed Stream Deck plugin, Support for a couple of new fields in the simulator data files, Telemetry charts in "Race Center" and "Practice Center" apply unit conversion correctly
+Changes=Many bug fixes in "Practice Center", Better last lap detection in timed races, Spotter now announces the last lap, Fixed "Invalid" column in "Race Center", Fixed support for RaceRoom Racing Experience, Fixed tyre wear for RaceRoom Racing Experience, Fixed Stream Deck plugin, Support for a couple of new fields in the simulator data files, Telemetry charts in "Race Center" and "Practice Center" apply unit conversion correctly, New data summary report in "Practice Center"
 [Release]
 Version=5.2.0.0-release
 Date=07/28/2023

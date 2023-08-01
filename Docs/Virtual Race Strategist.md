@@ -315,9 +315,17 @@ Last but not least, using the small button with the cog wheel icon, you can choo
 	 
   3. Session Summary
   
-      This report is useful by the end of a session to create a document to be stored away in the archive. It contains data on all stints. This report can be created using the "Session Summary" command from the "Session" menu.
+     This report is useful by the end of a session to create a document to be stored away in the archive. It contains data on all stints. This report can be created using the "Session Summary" command from the "Session" menu.
 	 
-	  ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Practice%20Center%205.JPG)
+	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Practice%20Center%205.JPG)
+
+  4. Data Summary
+  
+     Data Summary is another useful report, which gives you a complete documentation of all data collected in your session or already stored in your database (depending on your choice in the "Data" menu.
+	 
+	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Practice%20Center%209.JPG)
+	 
+	 You can create this report by chooosing "Data Summary" from the "Data" menu.
 	 
 All these report documents are HTML-based and can be saved or printed using the context menu when right-clicking into the output area.
 

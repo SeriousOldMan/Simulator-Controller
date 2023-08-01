@@ -11341,23 +11341,20 @@ class RaceCenter extends ConfigurationItem {
 		local tyreLaps := []
 		local lastLap := this.LastLap
 		local lapDataTable := this.SessionStore.Tables["Lap.Data"]
-		local stint, duration, ignore, lap, width, chart1
-		local simulator, carName, trackName, sessionDate, sessionTime, fuelConsumption
+		local simulator := this.Simulator
+		local carName := this.Car
+		local trackName := this.Track
+		local sessionDate := this.Date
+		local sessionTime := this.Time
+		local stint, duration, ignore, lap, width, chart1, fuelConsumption
 
-		simulator := this.Simulator
-		carName := this.Car
 		carName := (carName ? telemetryDB.getCarName(simulator, carName) : "-")
-		trackName := this.Track
 		trackName := (trackName ? telemetryDB.getTrackName(simulator, trackName) : "-")
-
-		sessionDate := this.Date
 
 		if sessionDate
 			sessionDate := FormatTime(sessionDate, "ShortDate")
 		else
 			sessionDate := "-"
-
-		sessionTime := this.Time
 
 		if sessionTime
 			sessionTime := FormatTime(sessionTime, "Time")

@@ -285,20 +285,43 @@ int main(int argc, char* argv[]) {
 			localCopy->mTyreTemp[TYRE_REAR_LEFT],
 			localCopy->mTyreTemp[TYRE_REAR_RIGHT]);
 
-		printf("TyreInnerTemperature=%f,%f,%f,%f\n", localCopy->mTyreTreadTemp[TYRE_FRONT_LEFT] - 272.15,
-			localCopy->mTyreTreadTemp[TYRE_FRONT_RIGHT] - 272.15,
-			localCopy->mTyreTreadTemp[TYRE_REAR_LEFT] - 272.15,
-			localCopy->mTyreTreadTemp[TYRE_REAR_RIGHT] - 272.15);
+		if (localCopy->mVersion < SHARED_MEMORY_VERSION) {
+			printf("TyreInnerTemperature=%f,%f,%f,%f\n", localCopy->mTyreTreadTemp[TYRE_FRONT_LEFT] - 272.15,
+				localCopy->mTyreTreadTemp[TYRE_FRONT_RIGHT] - 272.15,
+				localCopy->mTyreTreadTemp[TYRE_REAR_LEFT] - 272.15,
+				localCopy->mTyreTreadTemp[TYRE_REAR_RIGHT] - 272.15);
 
-		printf("TyreMiddleTemperature=%f,%f,%f,%f\n", localCopy->mTyreTreadTemp[TYRE_FRONT_LEFT] - 272.15,
-			localCopy->mTyreTreadTemp[TYRE_FRONT_RIGHT] - 272.15,
-			localCopy->mTyreTreadTemp[TYRE_REAR_LEFT] - 272.15,
-			localCopy->mTyreTreadTemp[TYRE_REAR_RIGHT] - 272.15);
+			printf("TyreMiddleTemperature=%f,%f,%f,%f\n", localCopy->mTyreTreadTemp[TYRE_FRONT_LEFT] - 272.15,
+				localCopy->mTyreTreadTemp[TYRE_FRONT_RIGHT] - 272.15,
+				localCopy->mTyreTreadTemp[TYRE_REAR_LEFT] - 272.15,
+				localCopy->mTyreTreadTemp[TYRE_REAR_RIGHT] - 272.15);
 
-		printf("TyreOuterTemperature=%f,%f,%f,%f\n", localCopy->mTyreTreadTemp[TYRE_FRONT_LEFT] - 272.15,
-			localCopy->mTyreTreadTemp[TYRE_FRONT_RIGHT] - 272.15,
-			localCopy->mTyreTreadTemp[TYRE_REAR_LEFT] - 272.15,
-			localCopy->mTyreTreadTemp[TYRE_REAR_RIGHT] - 272.15);
+			printf("TyreOuterTemperature=%f,%f,%f,%f\n", localCopy->mTyreTreadTemp[TYRE_FRONT_LEFT] - 272.15,
+				localCopy->mTyreTreadTemp[TYRE_FRONT_RIGHT] - 272.15,
+				localCopy->mTyreTreadTemp[TYRE_REAR_LEFT] - 272.15,
+				localCopy->mTyreTreadTemp[TYRE_REAR_RIGHT] - 272.15);
+		}
+		else {
+			printf("TyreCompoundRawFL=%s\n", localCopy->mTyreCompound[TYRE_FRONT_LEFT]);
+			printf("TyreCompoundRawFR=%s\n", localCopy->mTyreCompound[TYRE_FRONT_RIGHT]);
+			printf("TyreCompoundRawRL=%s\n", localCopy->mTyreCompound[TYRE_REAR_LEFT]);
+			printf("TyreCompoundRawRR=%s\n", localCopy->mTyreCompound[TYRE_REAR_RIGHT]);
+
+			printf("TyreInnerTemperature=%f,%f,%f,%f\n", localCopy->mTyreTempRight[TYRE_FRONT_LEFT],
+				localCopy->mTyreTempLeft[TYRE_FRONT_RIGHT],
+				localCopy->mTyreTempRight[TYRE_REAR_LEFT],
+				localCopy->mTyreTempLeft[TYRE_REAR_RIGHT]);
+
+			printf("TyreMiddleTemperature=%f,%f,%f,%f\n", localCopy->mTyreTempCenter[TYRE_FRONT_LEFT],
+				localCopy->mTyreTempCenter[TYRE_FRONT_RIGHT],
+				localCopy->mTyreTempCenter[TYRE_REAR_LEFT],
+				localCopy->mTyreTempCenter[TYRE_REAR_RIGHT]);
+
+			printf("TyreOuterTemperature=%f,%f,%f,%f\n", localCopy->mTyreTempLeft[TYRE_FRONT_LEFT],
+				localCopy->mTyreTempRight[TYRE_FRONT_RIGHT],
+				localCopy->mTyreTempLeft[TYRE_REAR_LEFT],
+				localCopy->mTyreTempRight[TYRE_REAR_RIGHT]);
+		}
 
 		printf("TyrePressure=%f,%f,%f,%f\n", localCopy->mAirPressure[TYRE_FRONT_LEFT] / 10,
 			localCopy->mAirPressure[TYRE_FRONT_RIGHT] / 10,

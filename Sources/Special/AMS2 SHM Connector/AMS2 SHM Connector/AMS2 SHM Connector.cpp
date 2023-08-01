@@ -346,20 +346,43 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 		print(&output, ",", localCopy->mTyreTemp[TYRE_REAR_LEFT]);
 		printLine(&output, ",", localCopy->mTyreTemp[TYRE_REAR_RIGHT]);
 
-		print(&output, "TyreInnerTemperature=", localCopy->mTyreTreadTemp[TYRE_FRONT_LEFT] - 272.15);
-		print(&output, ",", localCopy->mTyreTreadTemp[TYRE_FRONT_RIGHT] - 272.15);
-		print(&output, ",", localCopy->mTyreTreadTemp[TYRE_REAR_LEFT] - 272.15);
-		printLine(&output, ",", localCopy->mTyreTreadTemp[TYRE_REAR_RIGHT] - 272.15);
+		if (localCopy->mVersion < SHARED_MEMORY_VERSION) {
+			print(&output, "TyreInnerTemperature=", localCopy->mTyreTreadTemp[TYRE_FRONT_LEFT] - 272.15);
+			print(&output, ",", localCopy->mTyreTreadTemp[TYRE_FRONT_RIGHT] - 272.15);
+			print(&output, ",", localCopy->mTyreTreadTemp[TYRE_REAR_LEFT] - 272.15);
+			printLine(&output, ",", localCopy->mTyreTreadTemp[TYRE_REAR_RIGHT] - 272.15);
 
-		print(&output, "TyreMiddleTemperature=", localCopy->mTyreTreadTemp[TYRE_FRONT_LEFT] - 272.15);
-		print(&output, ",", localCopy->mTyreTreadTemp[TYRE_FRONT_RIGHT] - 272.15);
-		print(&output, ",", localCopy->mTyreTreadTemp[TYRE_REAR_LEFT] - 272.15);
-		printLine(&output, ",", localCopy->mTyreTreadTemp[TYRE_REAR_RIGHT] - 272.15);
+			print(&output, "TyreMiddleTemperature=", localCopy->mTyreTreadTemp[TYRE_FRONT_LEFT] - 272.15);
+			print(&output, ",", localCopy->mTyreTreadTemp[TYRE_FRONT_RIGHT] - 272.15);
+			print(&output, ",", localCopy->mTyreTreadTemp[TYRE_REAR_LEFT] - 272.15);
+			printLine(&output, ",", localCopy->mTyreTreadTemp[TYRE_REAR_RIGHT] - 272.15);
 
-		print(&output, "TyreOuterTemperature=", localCopy->mTyreTreadTemp[TYRE_FRONT_LEFT] - 272.15);
-		print(&output, ",", localCopy->mTyreTreadTemp[TYRE_FRONT_RIGHT] - 272.15);
-		print(&output, ",", localCopy->mTyreTreadTemp[TYRE_REAR_LEFT] - 272.15);
-		printLine(&output, ",", localCopy->mTyreTreadTemp[TYRE_REAR_RIGHT] - 272.15);
+			print(&output, "TyreOuterTemperature=", localCopy->mTyreTreadTemp[TYRE_FRONT_LEFT] - 272.15);
+			print(&output, ",", localCopy->mTyreTreadTemp[TYRE_FRONT_RIGHT] - 272.15);
+			print(&output, ",", localCopy->mTyreTreadTemp[TYRE_REAR_LEFT] - 272.15);
+			printLine(&output, ",", localCopy->mTyreTreadTemp[TYRE_REAR_RIGHT] - 272.15);
+		}
+		else {
+			printLine(&output, "TyreCompoundRawFL=", localCopy->mTyreCompound[TYRE_FRONT_LEFT]);
+			printLine(&output, "TyreCompoundRawFR=", localCopy->mTyreCompound[TYRE_FRONT_RIGHT]);
+			printLine(&output, "TyreCompoundRawRL=", localCopy->mTyreCompound[TYRE_REAR_LEFT]);
+			printLine(&output, "TyreCompoundRawRR=", localCopy->mTyreCompound[TYRE_REAR_RIGHT]);
+
+			print(&output, "TyreInnerTemperature=", localCopy->mTyreTempRight[TYRE_FRONT_LEFT]);
+			print(&output, ",", localCopy->mTyreTempLeft[TYRE_FRONT_RIGHT]);
+			print(&output, ",", localCopy->mTyreTempRight[TYRE_REAR_LEFT]);
+			printLine(&output, ",", localCopy->mTyreTempLeft[TYRE_REAR_RIGHT]);
+
+			print(&output, "TyreMiddleTemperature=", localCopy->mTyreTempCenter[TYRE_FRONT_LEFT]);
+			print(&output, ",", localCopy->mTyreTempCenter[TYRE_FRONT_RIGHT]);
+			print(&output, ",", localCopy->mTyreTempCenter[TYRE_REAR_LEFT]);
+			printLine(&output, ",", localCopy->mTyreTempCenter[TYRE_REAR_RIGHT]);
+
+			print(&output, "TyreOuterTemperature=", localCopy->mTyreTempLeft[TYRE_FRONT_LEFT]);
+			print(&output, ",", localCopy->mTyreTempRight[TYRE_FRONT_RIGHT]);
+			print(&output, ",", localCopy->mTyreTempLeft[TYRE_REAR_LEFT]);
+			printLine(&output, ",", localCopy->mTyreTempRight[TYRE_REAR_RIGHT]);
+		}
 
 		print(&output, "TyrePressure=", localCopy->mAirPressure[TYRE_FRONT_LEFT] / 10);
 		print(&output, ",", localCopy->mAirPressure[TYRE_FRONT_RIGHT] / 10);

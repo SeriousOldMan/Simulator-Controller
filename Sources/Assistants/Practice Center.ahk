@@ -1203,6 +1203,12 @@ class PracticeCenter extends ConfigurationItem {
 			center.updateState()
 		}
 
+		updateTelemetry(*) {
+			centerGui["practiceCenterTabView"].Redraw()
+
+			this.analyzeTelemetry()
+		}
+
 		centerGui := PracticeCenter.PracticeCenterWindow(this)
 
 		this.iWindow := centerGui
@@ -1327,7 +1333,7 @@ class PracticeCenter extends ConfigurationItem {
 		centerGui.SetFont("Norm", "Arial")
 
 		centerTab := centerGui.Add("Tab3", "x16 ys+39 w593 h316 H:Grow(0.8) AltSubmit -Wrap Section vpracticeCenterTabView", collect(["Tyres", "Stints", "Laps", "Data"], translate))
-		centerTab.OnEvent("Change", (*) => centerTab.Redraw(), this.analyzeTelemetry())
+		centerTab.OnEvent("Change", updateTelemetry)
 
 		centerTab.UseTab(1)
 

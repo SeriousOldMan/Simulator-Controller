@@ -5525,7 +5525,7 @@ class PracticeCenter extends ConfigurationItem {
 							else
 								data[A_Index] := ("<td class=`"td-std`">" . displayValue("Time", data[A_Index]) . "</td>")
 
-						rows.Push(Array("<td class=`"td-std`">" . displayValue("Float", convertUnit("Volume", fuel)) . "</td>", data*))
+						rows.Push(Array("<td class=`"td-std`">" . (displayValue("Float", convertUnit("Volume", fuel)) . A_Space . SubStr(getUnit("Volume"), 1, 1)) . "</td>", data*))
 					}
 
 					if (rows.Length > 0) {

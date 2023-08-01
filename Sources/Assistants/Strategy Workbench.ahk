@@ -17,7 +17,7 @@
 ;@SC #Include "..\Framework\Production.ahk"
 ;@SC-EndIf
 
-;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Dashboard.ico
+;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Workbench.ico
 ;@Ahk2Exe-ExeName Strategy Workbench.exe
 
 

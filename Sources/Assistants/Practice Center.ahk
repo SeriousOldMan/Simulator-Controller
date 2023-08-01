@@ -2042,8 +2042,8 @@ class PracticeCenter extends ConfigurationItem {
 
 		this.Control["dataMenuDropDown"].Delete()
 		this.Control["dataMenuDropDown"].Add(concatenate(collect(["Data", "---------------------------------------------", use1, use2, "---------------------------------------------"], translate)
-													   , tyreCompounds, [translate("---------------------------------------------")]
-													   , wConditions, collect(["---------------------------------------------", "Data Summary"], translate)))
+													   , wConditions, [translate("---------------------------------------------")]
+													   , tyreCompounds, collect(["---------------------------------------------", "Data Summary"], translate)))
 
 		this.Control["dataMenuDropDown"].Choose(1)
 	}
@@ -2126,26 +2126,26 @@ class PracticeCenter extends ConfigurationItem {
 			default:
 				line -= 5
 
-				if ((line > 0) && (line <= this.AvailableTyreCompounds.Length)) {
-					splitCompound(this.AvailableTyreCompounds[line], &tyreCompound, &tyreCompoundColor)
-
-					this.iDataTyreCompound := tyreCompound
-					this.iDataTyreCompoundColor := tyreCompoundColor
+				if ((line > 0) && (line <= kWeatherConditions.Length)) {
+					this.iDataWeather := kWeatherConditions[line]
 
 					this.analyzeTelemetry()
 				}
 				else {
-					line -= (this.AvailableTyreCompounds.Length + 1)
+					line -= (kWeatherConditions.Length + 1)
 
-					if ((line > 0) && (line <= kWeatherConditions.Length)) {
-						this.iDataWeather := kWeatherConditions[line]
+					if ((line > 0) && (line <= this.AvailableTyreCompounds.Length)) {
+						splitCompound(this.AvailableTyreCompounds[line], &tyreCompound, &tyreCompoundColor)
+
+						this.iDataTyreCompound := tyreCompound
+						this.iDataTyreCompoundColor := tyreCompoundColor
 
 						this.analyzeTelemetry()
 					}
 					else {
-						line -= (kWeatherConditions.Length + 1)
+						line -= (this.AvailableTyreCompounds.Length + 1)
 
-						if (line = 1) {
+						if (line = 1) { ; Data Summary
 							OnMessage(0x44, translateOkButton)
 							MsgBox(translate("Not yet implemented."), translate("Information"), 262192)
 							OnMessage(0x44, translateOkButton, 0)

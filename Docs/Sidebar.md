@@ -145,6 +145,7 @@
     - [Starting a session](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#starting-a-session)
     - [Data Analysis](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#data-analysis)
     - [Managing practice runs](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#managing-tyres-and-planning-practice-stints)
+	- [Exploring data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#exploring-data)
     - [Exporting data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#exporting-data-to-the-session-database)
   - [Strategy Workbench](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-workbench)
     - [Rules & Settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#rules--settings)

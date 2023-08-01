@@ -337,6 +337,14 @@ To create a new stint manually while you are standing in the pit, follow these s
 
 It is recommended to use the "Auto" mode in races, since then the pitstops are reliable detected by the Race Assistants (and the additional data like tyre set and tyre pressures will be taken from the pitstop plan), whereas in Practice sessions, it will be much better to create the different practice stints manually. Esspecially the ideal cold tyre pressures derived by the Race Engineer will be mostly wrong, when the tyre change has not been planned and prepared under the control of the Race Engineer, which is uncommon in a practice session.
 
+### Exploring data
+
+The "Data" tab will give you an overview of what data you have collected during your session, or, after you have selected the corrsponding option in the "Data" menu, what data is available in your session database.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Practice%20Center%208.JPG)
+
+Using the "Data" menu, you can choose between the different weather conditions and available tyre compounds, thereby identifying possible gaps in your data collection that need to be filled with a specific practice run.
+
 ### Exporting data to the session database
 
 At the end of your session, you can decide which data should be transfered to the session database by clicking the small check marks for each lap in the list of driven laps. "Practice Center" will already have selected by default all valid laps for your convinience. Then choose the command "Export to Database" from the "Session" menu.

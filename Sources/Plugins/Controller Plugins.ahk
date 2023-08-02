@@ -29,4 +29,4 @@
 #Include "RSP Plugin.ahk"
 #Include "RST Plugin.ahk"
 
-#include "SimHub Plugin.ahk"
+#include "State Plugin.ahk"

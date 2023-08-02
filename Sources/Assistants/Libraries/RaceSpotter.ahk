@@ -2909,6 +2909,29 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 	}
 
+	createSessionInfo(lapNumber, valid, data, simulator, car, track) {
+		local knowledgeBase := this.KnowledgeBase
+		local sessionInfo := super.createSessionInfo(lapNumber, valid, data, simulator, car, track)
+		local position, classPosition
+
+		if knowledgeBase {
+			car := this.FocusedCar[true]
+
+			if car {
+				car := car.Car.Car
+
+				setMultiMapValue(sessionInfo, "Standings", "Leader.Nr", knowledgeBase.getValue("Car." . car . ".Nr", false))
+				setMultiMapValue(sessionInfo, "Standings", "Leader.Lap.Time", Round(knowledgeBase.getValue("Car." . car . ".Time", 0) / 1000, 1))
+				setMultiMapValue(sessionInfo, "Standings", "Leader.Laps", knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap", 0)))
+				setMultiMapValue(sessionInfo, "Standings", "Leader.Delta", Round(knowledgeBase.getValue("Position.Standings.Class.Leader.Delta", 0) / 1000, 1))
+				setMultiMapValue(sessionInfo, "Standings", "Leader.InPit", (knowledgeBase.getValue("Car." . car . ".InPitLane", false)
+																		 || knowledgeBase.getValue("Car." . car . ".InPit", false)))
+			}
+		}
+
+		return sessionInfo
+	}
+
 	adjustGaps(data, &gapAhead := false, &gapBehind := false) {
 		local knowledgeBase := this.KnowledgeBase
 

@@ -676,10 +676,14 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		super.__New(controller, name, configuration, register)
 
 		if !RaceAssistantPlugin.sTeamServer {
-			teamServer := this.Controller.findPlugin(kTeamServerPlugin)
+			if isSet(kTeamServerPlugin) {
+				teamServer := this.Controller.findPlugin(kTeamServerPlugin)
 
-			if (teamServer && this.Controller.isActive(teamServer))
-				RaceAssistantPlugin.sTeamServer := teamServer
+				if (teamServer && this.Controller.isActive(teamServer))
+					RaceAssistantPlugin.sTeamServer := teamServer
+				else
+					teamServer := false
+			}
 			else
 				teamServer := false
 		}
@@ -863,12 +867,15 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		local tries := 10
 		local teamServer, session, information, state
 
+		static updateCycle := (getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+																	   , "Team Server", "Update Frequency", 10) * 1000)
+
 		if this.Active {
 			teamServer := this.TeamServer
 
 			if (teamServer && teamServer.TeamServerActive && (A_TickCount > this.iNextSessionUpdate))
 				try {
-					this.iNextSessionUpdate := (A_TickCount + 30000)
+					this.iNextSessionUpdate := (A_TickCount + updateCycle)
 
 					state := teamServer.Connector.GetSessionValue(teamServer.Session, this.Plugin . " Session Info")
 

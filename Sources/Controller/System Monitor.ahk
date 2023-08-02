@@ -781,6 +781,7 @@ systemMonitor(command := false, arguments*) {
 		static lastLeaderDelta := false
 		static lastAheadDelta := false
 		static lastBehindDelta := false
+		static lastFocusDelta := false
 
 		computeColorInfo(delta, &lastDelta, upColor, downColor, &colorOpen, &colorClose) {
 			if (lastDelta && (lastDelta != delta)) {
@@ -805,6 +806,24 @@ systemMonitor(command := false, arguments*) {
 			}
 			else
 				html .= ("<tr><th class=`"th-std th-left`">" . translate("Position") . "</th><td class=`"td-wdg`">" . positionOverall . "</td></tr>")
+
+			if (getMultiMapValue(sessionState, "Standings", "Focus.Lap.Time", kUndefined) != kUndefined) {
+				nr := getMultiMapValue(sessionState, "Standings", "Focus.Nr")
+				delta := getMultiMapValue(sessionState, "Standings", "Focus.Delta")
+
+				computeColorInfo(Abs(delta), &lastFocusDelta, "green", "red", &colorOpen, &colorClose)
+
+				if nr {
+					html .= ("<tr><th class=`"th-std th-left`">" . substituteVariables(translate("Focus #%nr% (Laps)"), {nr: nr}) . "</th><td class=`"td-wdg`">" . getMultiMapValue(sessionState, "Standings", "Focus.Laps") . "</td></tr>")
+					html .= ("<tr><th class=`"th-std th-left`">" . substituteVariables(translate("Focus #%nr% (Delta)"), {nr: nr}) . "</th><td class=`"td-wdg`">" . colorOpen . displayValue("Time", delta) . colorClose . "</td></tr>")
+					html .= ("<tr><th class=`"th-std th-left`">" . substituteVariables(translate("Focus #%nr% (Lap Time)"), {nr: nr}) . "</th><td class=`"td-wdg`">" . displayValue("Time", getMultiMapValue(sessionState, "Standings", "Focus.Lap.Time")) . "</td></tr>")
+				}
+				else {
+					html .= ("<tr><th class=`"th-std th-left`">" . translate("Focus (Laps)") . "</th><td class=`"td-wdg`">" . getMultiMapValue(sessionState, "Standings", "Focus.Laps") . "</td></tr>")
+					html .= ("<tr><th class=`"th-std th-left`">" . translate("Focus (Delta)") . "</th><td class=`"td-wdg`">" . colorOpen . displayValue("Time", delta) . colorClose . "</td></tr>")
+					html .= ("<tr><th class=`"th-std th-left`">" . translate("Focus (Lap Time)") . "</th><td class=`"td-wdg`">" . displayValue("Time", getMultiMapValue(sessionState, "Standings", "Focus.Lap.Time")) . "</td></tr>")
+				}
+			}
 
 			if (getMultiMapValue(sessionState, "Standings", "Leader.Lap.Time", kUndefined) != kUndefined) {
 				nr := getMultiMapValue(sessionState, "Standings", "Leader.Nr")

@@ -12,7 +12,9 @@
   11. The telemetry charts in "Race Center" and "Practice Center" now apply unit conversion correctly.
   12. New data summary report in "Practice Center" and a new tab to review the [available telemtry data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#exploring-data).
   13. Updated *Automobilista 2* data integration to shared memory API version 13.
-  14. New car models for "Setup Workbench":
+  14. The Standings info widget in "Session Monitor" now also shows the observed opponent, if one is currently observed by the Spotter.
+  15. A new plugin "State" is available, which exposes the complete state of the Race Assistants to external applications using a JSON file, which is updated periodically. With this it is possible, for example, to create a dashboard for Simulator Controller in SimHub.
+  16. New car models for "Setup Workbench":
       - Assetto Corsa
         - Alfa Romeo 33 Stradale
 		- Alfa Romeo Giulietta QV Launch Edition 2014 (Fixed)

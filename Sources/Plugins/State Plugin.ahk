@@ -25,7 +25,14 @@ global kStatePlugin := "State"
 ;;;-------------------------------------------------------------------------;;;
 
 class StatePlugin extends ControllerPlugin {
+	iStateFile := (kTempDirectory . "Session State.json")
 	iAssistantsStateTask := false
+
+	StateFile {
+		Get {
+			return this.iStateFile
+		}
+	}
 
 	AssistantsStateTask {
 		Get {
@@ -34,6 +41,8 @@ class StatePlugin extends ControllerPlugin {
 	}
 
 	__New(controller, name, configuration := false) {
+		this.iStateFile := this.getArgumentValue("stateFile", kTempDirectory . "Session State.json")
+
 		super.__New(controller, name, configuration)
 
 		if (this.Active || isDebug()) {
@@ -371,7 +380,7 @@ class StatePlugin extends ControllerPlugin {
 
 			loop 10
 				try {
-					FileMove(fileName, kTempDirectory . "Session State.json", 1)
+					FileMove(fileName, this.StateFile, 1)
 
 					break
 				}

@@ -84,6 +84,7 @@
   - [PCARS2 - Project CARS 2](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-pcars2)
     - [Pitstop](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-pitstop-6)
     - [Assistant](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-assistant-6)
+  - [Interface](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-interface)
 
 [Tyre Compounds](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds)
 ------

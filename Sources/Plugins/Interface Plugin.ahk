@@ -46,8 +46,9 @@ class InterfacePlugin extends ControllerPlugin {
 		super.__New(controller, name, configuration)
 
 		if (this.Active || isDebug()) {
-			this.iAssistantsStateTask := Task(ObjBindMethod(this, "updateSessionState"), 1000, kLowPriority)
+			this.iAssistantsStateTask := PeriodicTask(ObjBindMethod(this, "updateSessionState"), 1000, kLowPriority)
 
+			this.iAssistantsStateTask.start()
 			this.iAssistantsStateTask.pause()
 		}
 	}
@@ -70,7 +71,7 @@ class InterfacePlugin extends ControllerPlugin {
 		return Map("Simulator", getMultiMapValue(sessionInfo, "Session", "Simulator")
 				 , "Car", getMultiMapValue(sessionInfo, "Session", "Car")
 				 , "Track", getMultiMapValue(sessionInfo, "Session", "Track")
-				 , "Session", translate(getMultiMapValue(sessionInfo, "Session", "Session")))
+				 , "Session", translate(getMultiMapValue(sessionInfo, "Session", "Type")))
 	}
 
 	createDurationState(sessionInfo) {
@@ -328,15 +329,15 @@ class InterfacePlugin extends ControllerPlugin {
 			if (getMultiMapValue(sessionInfo, "Standings", opponent . ".Lap.Time", kUndefined) != kUndefined) {
 				nr := getMultiMapValue(sessionInfo, "Standings", opponent . ".Nr")
 
-				state["Leader"] := Map("Laps", getMultiMapValue(sessionInfo, "Standings", opponent . ".Laps")
+				state[opponent] := Map("Laps", getMultiMapValue(sessionInfo, "Standings", opponent . ".Laps")
 									 , "Delta", displayValue("Time", getMultiMapValue(sessionInfo, "Standings", opponent . ".Delta"))
 									 , "LapTime", displayValue("Time", getMultiMapValue(sessionInfo, "Standings", opponent . ".Lap.Time"))
 									 , "InPit", getMultiMapValue(sessionInfo, "Standings", opponent . ".InPit"))
 
-				state["Leader"]["Nr"] := (nr ? nr : kNull)
+				state[opponent]["Nr"] := (nr ? nr : kNull)
 			}
 			else
-				state["Leader"] := kNull
+				state[opponent] := kNull
 
 		return state
 	}
@@ -345,13 +346,16 @@ class InterfacePlugin extends ControllerPlugin {
 		local hasUpdate := false
 		local sessionInfo, sessionState, ignore, assistant, fileName
 
-		static lastUpdate := false
+		static lastUpdate := A_Now
 
 		for ignore, assistant in ["Race Engineer", "Race Strategist", "Race Spotter"] {
 			fileName := (kTempDirectory . assistant . " Session.state")
 
-			if (FileExist(fileName) && (FileGetTime(fileName, "M") > lastUpdate))
+			if (FileExist(fileName) && (FileGetTime(fileName, "M") > lastUpdate)) {
 				hasUpdate := true
+
+				break
+			}
 		}
 
 		if hasUpdate {

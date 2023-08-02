@@ -188,9 +188,23 @@ class CarInfo {
 		}
 	}
 
-	LastDelta[sector] {
+	LastDelta[sector := false] {
 		Get {
-			return (this.iLastDeltas.Has(sector) ? this.iLastDeltas[sector] : false)
+			local lastSector := 0
+			local lastDelta := false
+			local delta
+
+			if (sector && this.iLastDeltas.Has(sector))
+				return this.iLastDeltas[sector]
+			else {
+				for sector, delta in this.iLastDeltas
+					if (sector > lastSector) {
+						lastSector := sector
+						lastDelta := delta
+					}
+
+				return lastDelta
+			}
 		}
 	}
 
@@ -234,7 +248,7 @@ class CarInfo {
 			if sector
 				return (average ? this.AverageDelta[sector] : this.LastDelta[sector])
 			else
-				return (average ? this.AverageDelta[false, count] : this.LastDelta[sector])
+				return (average ? this.AverageDelta[false, count] : this.LastDelta[false])
 		}
 	}
 
@@ -1241,13 +1255,21 @@ class RaceSpotter extends GridRaceAssistant {
 				speaker.beginTalk()
 
 				try {
-					if (currentPosition = startPosition)
+					if (currentPosition = startPosition) {
 						speaker.speakPhrase("GoodStart")
+
+						if (currentPosition = 1)
+							speaker.speakPhrase("Leader")
+						else if (currentPosition <= 5)
+							speaker.speakPhrase("Position", {position: currentPosition})
+					}
 					else if (currentPosition < startPosition) {
 						speaker.speakPhrase("GreatStart")
 
 						if (currentPosition = 1)
 							speaker.speakPhrase("Leader")
+						else if (currentPosition <= 5)
+							speaker.speakPhrase("Position", {position: currentPosition})
 						else
 							speaker.speakPhrase("PositionsGained", {positions: Abs(currentPosition - startPosition)})
 					}
@@ -2918,14 +2940,13 @@ class RaceSpotter extends GridRaceAssistant {
 			car := this.FocusedCar[true]
 
 			if car {
-				car := car.Car.Car
+				car := car.Car
 
-				setMultiMapValue(sessionInfo, "Standings", "Leader.Nr", knowledgeBase.getValue("Car." . car . ".Nr", false))
-				setMultiMapValue(sessionInfo, "Standings", "Leader.Lap.Time", Round(knowledgeBase.getValue("Car." . car . ".Time", 0) / 1000, 1))
-				setMultiMapValue(sessionInfo, "Standings", "Leader.Laps", knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap", 0)))
-				setMultiMapValue(sessionInfo, "Standings", "Leader.Delta", Round(knowledgeBase.getValue("Position.Standings.Class.Leader.Delta", 0) / 1000, 1))
-				setMultiMapValue(sessionInfo, "Standings", "Leader.InPit", (knowledgeBase.getValue("Car." . car . ".InPitLane", false)
-																		 || knowledgeBase.getValue("Car." . car . ".InPit", false)))
+				setMultiMapValue(sessionInfo, "Standings", "Focus.Nr", car.Nr)
+				setMultiMapValue(sessionInfo, "Standings", "Focus.Lap.Time", car.LastLapTime)
+				setMultiMapValue(sessionInfo, "Standings", "Focus.Laps", car.LastLap)
+				setMultiMapValue(sessionInfo, "Standings", "Focus.Delta", car.LastDelta)
+				setMultiMapValue(sessionInfo, "Standings", "Focus.InPit", car.InPit)
 			}
 		}
 

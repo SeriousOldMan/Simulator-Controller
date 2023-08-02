@@ -814,14 +814,14 @@ systemMonitor(command := false, arguments*) {
 				computeColorInfo(Abs(delta), &lastFocusDelta, "green", "red", &colorOpen, &colorClose)
 
 				if nr {
-					html .= ("<tr><th class=`"th-std th-left`">" . substituteVariables(translate("Focus #%nr% (Laps)"), {nr: nr}) . "</th><td class=`"td-wdg`">" . getMultiMapValue(sessionState, "Standings", "Focus.Laps") . "</td></tr>")
-					html .= ("<tr><th class=`"th-std th-left`">" . substituteVariables(translate("Focus #%nr% (Delta)"), {nr: nr}) . "</th><td class=`"td-wdg`">" . colorOpen . displayValue("Time", delta) . colorClose . "</td></tr>")
-					html .= ("<tr><th class=`"th-std th-left`">" . substituteVariables(translate("Focus #%nr% (Lap Time)"), {nr: nr}) . "</th><td class=`"td-wdg`">" . displayValue("Time", getMultiMapValue(sessionState, "Standings", "Focus.Lap.Time")) . "</td></tr>")
+					html .= ("<tr><th class=`"th-std th-left`">" . substituteVariables(translate("Observed #%nr% (Laps)"), {nr: nr}) . "</th><td class=`"td-wdg`">" . getMultiMapValue(sessionState, "Standings", "Focus.Laps") . "</td></tr>")
+					html .= ("<tr><th class=`"th-std th-left`">" . substituteVariables(translate("Observed #%nr% (Delta)"), {nr: nr}) . "</th><td class=`"td-wdg`">" . colorOpen . displayValue("Time", delta) . colorClose . "</td></tr>")
+					html .= ("<tr><th class=`"th-std th-left`">" . substituteVariables(translate("Observed #%nr% (Lap Time)"), {nr: nr}) . "</th><td class=`"td-wdg`">" . displayValue("Time", getMultiMapValue(sessionState, "Standings", "Focus.Lap.Time")) . "</td></tr>")
 				}
 				else {
-					html .= ("<tr><th class=`"th-std th-left`">" . translate("Focus (Laps)") . "</th><td class=`"td-wdg`">" . getMultiMapValue(sessionState, "Standings", "Focus.Laps") . "</td></tr>")
-					html .= ("<tr><th class=`"th-std th-left`">" . translate("Focus (Delta)") . "</th><td class=`"td-wdg`">" . colorOpen . displayValue("Time", delta) . colorClose . "</td></tr>")
-					html .= ("<tr><th class=`"th-std th-left`">" . translate("Focus (Lap Time)") . "</th><td class=`"td-wdg`">" . displayValue("Time", getMultiMapValue(sessionState, "Standings", "Focus.Lap.Time")) . "</td></tr>")
+					html .= ("<tr><th class=`"th-std th-left`">" . translate("Observed (Laps)") . "</th><td class=`"td-wdg`">" . getMultiMapValue(sessionState, "Standings", "Focus.Laps") . "</td></tr>")
+					html .= ("<tr><th class=`"th-std th-left`">" . translate("Observed (Delta)") . "</th><td class=`"td-wdg`">" . colorOpen . displayValue("Time", delta) . colorClose . "</td></tr>")
+					html .= ("<tr><th class=`"th-std th-left`">" . translate("Observed (Lap Time)") . "</th><td class=`"td-wdg`">" . displayValue("Time", getMultiMapValue(sessionState, "Standings", "Focus.Lap.Time")) . "</td></tr>")
 				}
 			}
 

@@ -95,6 +95,8 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 
 18. [Race handled fully by AI](https://youtu.be/MlbAESpzg7Q) - This video gives you a full demonstration of a race under complete control of the AI Assistants. No driver interaction was necessary during this 3-stint race. Fully supported in solo as well as in multi player team races.
 
+19. [Defining custom Button Box Modes](https://youtu.be/CqXcjTRoLpE) - This video demonstrates how you can define your own Button Box layers with custom commands.
+
 This list will be extended from time to time to cover new functionalities.
 
 ### Discord Community

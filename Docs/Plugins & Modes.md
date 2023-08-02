@@ -19,7 +19,7 @@ The distribution of Simulator Controller includes a set of predefined plugins, w
 | [RF2](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-rf2) | Similar to the ACC and IRC plugin provides this plugin start and stop support for *rFactor 2*. A "Pitstop" mode is available to control the pitstop settings from your controller hardware and an integration with Jona, the Virtual Race Engineer, and with Cato, the Virtual Race Strategist is available as well. The "Assistant" mode can handle most of the Race Assistant commands from your hardware controller. |
 | [R3E](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-rre) | Similar to the ACC, IRC and RF2 plugins provides this plugin start and stop support for *RaceRoom Racing Experience*. A "Pitstop" mode is available to control the pitstop settings from your controller hardware and an integration with Jona, the Virtual Race Engineer, with Cato, the Virtual Race Strategist and also with Elisa, the Virtual Race Spotter is available as well. The "Assistant" mode can handle most of the Race Assistant commands from your hardware controller. |
 | [PCARS2](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-PCARS2) | Integration for *Project CARS 2*, which supports  Jona, the Virtual Race Engineer, Cato, the Virtual Race Strategist and also Elisa, the Virtual Race Spotter. The plugin also supports a "Pitstop" mode for adjusting pitstop settings and a "Assistant" mode to interact with the Race Assistants. |
-| [Interface](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-interface) | This plugin implements interoperability with other applications like SimHub. |
+| [Integration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) | This plugin implements interoperability with other applications like SimHub. |
 
 All plugins can be configured in the [Plugins tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) of the configuration tool.
 
@@ -1194,19 +1194,19 @@ Note: For convinience, all commands available for the *assistantCommands* parame
 
 It is very important, that you do not use the *Project CARS 2* ICM on your own, when you want to control the pitstop settings using the "Pitstop" mode, or if you want Jona to control the pitstop settings. Furthermore, you must leave *all* repairs selected in the default pitstop strategy and select *no tyre change* in the default pitstop strategy as well. And declare that the ICM should be returned to the standard page, when closed. This option can be found in the *Gameplay* section of the *Automobilista 2* settings. Not complying with this requirements will give you funny results at least.
 
-## Plugin *Interface*
+## Plugin *Integration*
 
 This plugin, which is normally not automatically included and enabled, can export the internal state of Simulator Controller - especially a lot of the knowledge of all Race Assistants and plenty of information about the currently running simulator session - to other applications using a JSON file.
 
 To activate this plugin, add it to the list of active plugins in "Simulator Configuration", or, of you are using the "Simulator Setup" wizard for your configuration work, add the following line to the ["Configuration Patch.ini"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#patching-the-configuration) file:
 
 	[Plugins]
-	Interface=true||
+	Integration=true||
 
 If you want to use the *stateFile* parameter here (see below), it looks like:
 
 	[Plugins]
-	Interface=true||stateFile: D:\SimRacing\Session State.json
+	Integration=true||stateFile: D:\SimRacing\Session State.json
 	
 where *D:\SimRacing\Session State.json* is an example. Substitute your own path here.
 

@@ -1262,7 +1262,7 @@ class SimulatorController extends ConfigurationItem {
 		writeMultiMap(kTempDirectory . "Simulator Controller.state", configuration)
 
 		if periodic
-			if (ProcessExist("System Monitor.exe") || (isSet(kInterfacePlugin) && SimulatorController.Instance.findPlugin(kInterfacePlugin).Active))
+			if (ProcessExist("System Monitor.exe") || (isSet(kIntegrationPlugin) && SimulatorController.Instance.findPlugin(kIntegrationPlugin).Active))
 				Task.CurrentTask.Sleep := 2000
 			else
 				Task.CurrentTask.Sleep := 60000

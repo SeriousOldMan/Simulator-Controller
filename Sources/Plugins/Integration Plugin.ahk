@@ -1,5 +1,5 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Interface Plugin                ;;;
+;;;   Modular Simulator Controller System - Integration Plugin              ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2023) Creative Commons - BY-NC-SA                        ;;;
@@ -17,14 +17,14 @@
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kInterfacePlugin := "Interface"
+global kIntegrationPlugin := "Integration"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class InterfacePlugin extends ControllerPlugin {
+class IntegrationPlugin extends ControllerPlugin {
 	iStateFile := (kTempDirectory . "Session State.json")
 	iAssistantsStateTask := false
 
@@ -400,10 +400,10 @@ class InterfacePlugin extends ControllerPlugin {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-initializeInterfacePlugin() {
+initializeIntegrationPlugin() {
 	local controller := SimulatorController.Instance
 
-	InterfacePlugin(controller, kInterfacePlugin, controller.Configuration)
+	IntegrationPlugin(controller, kIntegrationPlugin, controller.Configuration)
 }
 
 
@@ -411,4 +411,4 @@ initializeInterfacePlugin() {
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-initializeInterfacePlugin()
+initializeIntegrationPlugin()

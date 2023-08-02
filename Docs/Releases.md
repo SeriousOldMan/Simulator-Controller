@@ -10,7 +10,12 @@
   9. Fixed a couple of stability issues in the Stream Deck plugin. If you have encountered problems lately, you might want to update the plugin.
   10. Support has added for a couple of new fields in the simulator data files - inner, middle and outer tyre temperatures and in-game tyre compound identifiers for *Automobilista 2*.
   11. The telemetry charts in "Race Center" and "Practice Center" now apply unit conversion correctly.
-  12. New data summary report in "Practice Center" and a new tab to review the [available telemtry data](*)
+  12. New data summary report in "Practice Center" and a new tab to review the [available telemtry data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#exploring-data)
+  13. Updated *Automobilista 2* data integration to shared memory API version 13.
+  14. New car models for "Setup Workbench":
+      - Assetto Corsa
+        - Alfa Romeo 33 Stradale
+		- Alfa Romeo Giulietta QV Launch Edition 2014 (Fixed)
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-521).
   

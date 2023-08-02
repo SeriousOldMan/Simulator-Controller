@@ -1,6 +1,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Assetto Corsa Competitizione    ;;;
-;;;                                         Ford Escort RS1600              ;;;
+;;;                                         Alfa Romeo Giulietta QV         ;;;
+;;;                                         Launch Edition 2014             ;;;
 ;;;                                         Setup Rules                     ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -28,7 +29,5 @@
 										 Damper.Rebound.Slow.Rear.Left, Damper.Rebound.Slow.Rear.Right,
 										 Damper.Rebound.Fast.Front.Left, Damper.Rebound.Fast.Front.Right,
 										 Damper.Rebound.Fast.Rear.Left, Damper.Rebound.Fast.Rear.Right,
-										 Geometry.Toe.Rear.Left, Geometry.Toe.Rear.Right,
-										 Geometry.Camber.Rear.Left, Geometry.Camber.Rear.Right,
 										 Differential.Preload,
 										 AntiRollBar.Front, AntiRollBar.Rear]))

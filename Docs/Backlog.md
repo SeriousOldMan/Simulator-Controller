@@ -18,7 +18,6 @@
   5. Graphical Editor for Vocalics Settings inkl. Test-Modus...
   6. Better answers by the Strategist, when a pitstop cannot be recommended
   7. Create and manage a kind of training plan (Run Sheet) by the Strategist to gather data for strategy calculation
-  8. "Leader on final lap" announcement for the Spotter.
 
 #### Race Center
   1. Change hot target pressures for the next pitstop.
@@ -39,3 +38,4 @@
 #### General
   1. Choosing a specific color scheme and splash screen depending on the selected simulation game
   2. Further simplification of the overall configuration process.  Create a quick install, which puts all optional software into default locations and asks for P2T button.
+  3. One-click install for the simplest possible configuration.

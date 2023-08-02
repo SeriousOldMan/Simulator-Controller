@@ -1,6 +1,22 @@
 ## 5.2.0.0-release 07/28/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
+  3. Many bugfixes and polishing in the new "Practice Center"
+  4. Better last lap detection in timed races.
+  5. The Spotter now announces the last lap of the leader or yourself.
+  6. Fixed the handling of the "Invalid" column in "Race Center".
+  7. Fixed data integration for RaceRoom Racing Experience. Sorry for that.
+  8. Fixed tyre wear for RaceRoom Racing Experience, which was 100% for fresh tyres.
+  9. Fixed a couple of stability issues in the Stream Deck plugin. If you have encountered problems lately, you might want to update the plugin.
+  10. Support has added for a couple of new fields in the simulator data files - inner, middle and outer tyre temperatures and in-game tyre compound identifiers for *Automobilista 2*.
+  11. The telemetry charts in "Race Center" and "Practice Center" now apply unit conversion correctly.
+  12. New data summary report in "Practice Center" and a new tab to review the [available telemtry data](*)
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-521).
+  
+## 5.2.0.0-release 07/28/23
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
   3. Introducing a complete [new tool "Practice Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#practice-center), which helps you to manage your practice sessions and allows you to inspect and select the data to be transfered to the session database. The development of this application is still in its early stage, but it is already quite usable.
   4. A new controller action function "openPracticeCenter" allows you to open the "Practice Center" from your controller hardware.
   5. A new plugin argument "openPracticeCenter" has been introduced for the "Race Engineer" and "Race Strategist" plugins.

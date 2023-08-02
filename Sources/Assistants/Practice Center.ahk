@@ -1203,6 +1203,12 @@ class PracticeCenter extends ConfigurationItem {
 			center.updateState()
 		}
 
+		updateTelemetry(*) {
+			centerGui["practiceCenterTabView"].Redraw()
+
+			this.analyzeTelemetry()
+		}
+
 		centerGui := PracticeCenter.PracticeCenterWindow(this)
 
 		this.iWindow := centerGui
@@ -1327,7 +1333,7 @@ class PracticeCenter extends ConfigurationItem {
 		centerGui.SetFont("Norm", "Arial")
 
 		centerTab := centerGui.Add("Tab3", "x16 ys+39 w593 h316 H:Grow(0.8) AltSubmit -Wrap Section vpracticeCenterTabView", collect(["Tyres", "Stints", "Laps", "Data"], translate))
-		centerTab.OnEvent("Change", (*) => this.analyzeTelemetry())
+		centerTab.OnEvent("Change", updateTelemetry)
 
 		centerTab.UseTab(1)
 
@@ -2028,20 +2034,22 @@ class PracticeCenter extends ConfigurationItem {
 		local use1 := (this.UseSessionData ? "(x) Use Session Data" : "      Use Session Data")
 		local use2 := (this.UseTelemetryDatabase ? "(x) Use Telemetry Database" : "      Use Telemetry Database")
 		local tyreCompounds := collect(this.AvailableTyreCompounds, translate)
-		local tyreCompound := compound(this.TyreCompound["Data"], this.TyreCompoundColor["Data"])
+		local tyreCompound := translate(compound(this.TyreCompound["Data"], this.TyreCompoundColor["Data"]))
+		local weather := translate(this.Weather["Data"])
 
 		static weatherConditions := collect(kWeatherConditions, translate)
 
 		wConditions := weatherConditions.Clone()
 
 		loop wConditions.Length
-			wConditions[A_Index] := (((wConditions[A_Index] = this.Weather["Data"]) ? "(x) " : "      ") . wConditions[A_Index])
+			wConditions[A_Index] := (((wConditions[A_Index] = weather) ? "(x) " : "      ") . wConditions[A_Index])
 
 		loop tyreCompounds.Length
 			tyreCompounds[A_Index] := (((tyreCompounds[A_Index] = tyreCompound) ? "(x) " : "      ") . tyreCompounds[A_Index])
 
 		this.Control["dataMenuDropDown"].Delete()
-		this.Control["dataMenuDropDown"].Add(concatenate(collect(["Data", "---------------------------------------------", use1, use2, "---------------------------------------------"], translate)
+		this.Control["dataMenuDropDown"].Add(concatenate(collect(["Data", "---------------------------------------------"
+																		, use1, use2, "---------------------------------------------"], translate)
 													   , wConditions, [translate("---------------------------------------------")]
 													   , tyreCompounds, collect(["---------------------------------------------", "Data Summary"], translate)))
 
@@ -5476,7 +5484,7 @@ class PracticeCenter extends ConfigurationItem {
 		html .= ("<tr><td><b>" . translate("Track:") . "</b></td><td>" . trackName . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Date:") . "</b></td><td>" . sessionDate . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Time:") . "</b></td><td>" . sessionTime . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Source:") . "</b></td><td>" . dataSource . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Origin:") . "</b></td><td>" . dataSource . "</td></tr>")
 		html .= "</table>"
 
 		for ignore, weather in kWeatherConditions
@@ -5525,7 +5533,7 @@ class PracticeCenter extends ConfigurationItem {
 							else
 								data[A_Index] := ("<td class=`"td-std`">" . displayValue("Time", data[A_Index]) . "</td>")
 
-						rows.Push(Array("<td class=`"td-std`">" . displayValue("Float", convertUnit("Volume", fuel)) . "</td>", data*))
+						rows.Push(Array("<td class=`"td-std`">" . (displayValue("Float", convertUnit("Volume", fuel)) . A_Space . SubStr(getUnit("Volume"), 1, 1)) . "</td>", data*))
 					}
 
 					if (rows.Length > 0) {

@@ -30,7 +30,7 @@
 // Header version number to test against
 enum
 {
-  SHARED_MEMORY_VERSION = 8
+  SHARED_MEMORY_VERSION = 13
 };
 
 // Maximum allowed length of string
@@ -43,6 +43,12 @@ enum
 enum
 {
   STORED_PARTICIPANTS_MAX = 64
+};
+
+// Maximum length of a tyre compound name
+enum
+{
+ TYRE_COMPOUND_NAME_LENGTH_MAX = 40
 };
 
 // Tyres
@@ -168,7 +174,7 @@ enum
 };
 
 // (Type#9) Car Flags (to be used with 'mCarFlags')
-enum
+enum CarFlags
 {
   CAR_HEADLIGHT         = (1<<0),
   CAR_ENGINE_ACTIVE     = (1<<1),
@@ -176,6 +182,8 @@ enum
   CAR_SPEED_LIMITER     = (1<<3),
   CAR_ABS               = (1<<4),
   CAR_HANDBRAKE         = (1<<5),
+  CAR_TCS               = (1<<6),
+  CAR_SCS               = (1<<7),
 };
 
 // (Type#10) Tyre Flags (to be used with 'mTyreFlags')
@@ -237,6 +245,9 @@ enum
   TERRAIN_ICE_ROAD,
   TERRAIN_RUNOFF_ROAD,
   TERRAIN_ILLEGAL_STRIP,
+	TERRAIN_PAINT_CONCRETE,
+	TERRAIN_PAINT_CONCRETE_ILLEGAL,
+	TERRAIN_RALLY_TARMAC,
 
   //-------------
   TERRAIN_MAX
@@ -267,6 +278,43 @@ typedef struct
   int mCurrentSector;                              // [ RANGE = 0->... ]   [ UNSET = -1 ]
 } ParticipantInfo;
 
+// (Type#14) DrsState Flags (to be used with 'mDrsState')
+enum DrsState
+{
+	DRS_INSTALLED       = (1<<0),  // Vehicle has DRS capability
+	DRS_ZONE_RULES      = (1<<1),  // 1 if DRS uses F1 style rules
+	DRS_AVAILABLE_NEXT  = (1<<2),  // detection zone was triggered (only applies to f1 style rules)
+	DRS_AVAILABLE_NOW   = (1<<3),  // detection zone was triggered and we are now in the zone (only applies to f1 style rules)
+	DRS_ACTIVE          = (1<<4),  // Wing is in activated state
+};
+
+// (Type#15) ErsDeploymentMode (to be used with 'mErsDeploymentMode')
+enum ErsDeploymentMode
+{
+  ERS_DEPLOYMENT_MODE_NONE = 0, // The vehicle does not support deployment modes
+	ERS_DEPLOYMENT_MODE_OFF, // Regen only, no deployment
+	ERS_DEPLOYMENT_MODE_BUILD, // Heavy emphasis towards regen
+	ERS_DEPLOYMENT_MODE_BALANCED, // Deployment map automatically adjusted to try and maintain target SoC
+	ERS_DEPLOYMENT_MODE_ATTACK,  // More aggressive deployment, no target SoC
+	ERS_DEPLOYMENT_MODE_QUAL, // Maximum deployment, no target Soc
+};
+
+// (Type#16) YellowFlagState represents current FCY state (to be used with 'mYellowFlagState')
+enum YellowFlagState
+{
+	YFS_INVALID = -1,
+	YFS_NONE,           // No yellow flag pending on track
+	YFS_PENDING,        // Flag has been thrown, but not yet taken by leader
+	YFS_PITS_CLOSED,    // Flag taken by leader, pits not yet open
+	YFS_PIT_LEAD_LAP,   // Those on the lead lap may pit
+	YFS_PITS_OPEN,      // Everyone may pit
+	YFS_PITS_OPEN2,     // Everyone may pit
+	YFS_LAST_LAP,       // On the last caution lap
+	YFS_RESUME,         // About to restart (pace car will duck out)
+	YFS_RACE_HALT,      // Safety car will lead field into pits
+	//-------------
+	YFS_MAXIMUM,
+};
 
 // *** Shared Memory ***
 
@@ -438,6 +486,50 @@ typedef struct
 	int		mEnforcedPitStopLap;                          // [ UNITS = in which lap there will be a mandatory pitstop] [ RANGE = 0.0f->... ] [ UNSET = -1 ]
 	char	mTranslatedTrackLocation[STRING_LENGTH_MAX];  // [ string ]
 	char	mTranslatedTrackVariation[STRING_LENGTH_MAX]; // [ string ]
+	float	mBrakeBias;																		// [ RANGE = 0.0f->1.0f... ]   [ UNSET = -1.0f ]
+	float mTurboBoostPressure;													//	 RANGE = 0.0f->1.0f... ]   [ UNSET = -1.0f ]
+	char	mTyreCompound[TYRE_MAX][TYRE_COMPOUND_NAME_LENGTH_MAX];// [ strings  ]
+	unsigned int	mPitSchedules[STORED_PARTICIPANTS_MAX];  // [ enum (Type#7)  Pit Mode ]
+	unsigned int	mHighestFlagColours[STORED_PARTICIPANTS_MAX];                 // [ enum (Type#5) Flag Colour ]
+	unsigned int	mHighestFlagReasons[STORED_PARTICIPANTS_MAX];                 // [ enum (Type#6) Flag Reason ]
+	unsigned int	mNationalities[STORED_PARTICIPANTS_MAX];										  // [ nationality table , SP AND UNSET = 0 ]
+	float	mSnowDensity;																// [ UNITS = How much snow will fall ]   [ RANGE = 0.0f->1.0f ], this is non zero only in Winter and Snow seasons
+	
+  // AMS2 Additions (v10...)
+
+  // Session info
+  float mSessionDuration;           // [ UNITS = minutes ]   [ UNSET = 0.0f ]  The scheduled session Length (unset means laps race. See mLapsInEvent)
+  int   mSessionAdditionalLaps;     // The number of additional complete laps lead lap drivers must complete to finish a timed race after the session duration has elapsed.
+
+  // Tyres
+	float mTyreTempLeft[TYRE_MAX];    // [ UNITS = Celsius ]   [ UNSET = 0.0f ]
+  float mTyreTempCenter[TYRE_MAX];  // [ UNITS = Celsius ]   [ UNSET = 0.0f ]
+  float mTyreTempRight[TYRE_MAX];   // [ UNITS = Celsius ]   [ UNSET = 0.0f ]
+
+  // DRS
+  unsigned int mDrsState;           // [ enum (Type#14) DrsState ]
+
+  // Suspension
+  float mRideHeight[TYRE_MAX];      // [ UNITS = cm ]
+
+  // Input
+	unsigned int mJoyPad0;            // button mask
+  unsigned int mDPad;               // button mask
+
+  int mAntiLockSetting;             // [ UNSET = -1 ] Current ABS garage setting. Valid under player control only.
+  int mTractionControlSetting;      // [ UNSET = -1 ] Current ABS garage setting. Valid under player control only.
+
+  // ERS
+  int mErsDeploymentMode;           // [ enum (Type#15)  ErsDeploymentMode ]
+  bool mErsAutoModeEnabled;         // true if the deployment mode was selected by auto system. Valid only when mErsDeploymentMode > ERS_DEPLOYMENT_MODE_NONE
+
+	// Clutch State & Damage
+	float	mClutchTemp;                // [ UNITS = Kelvin ] [ UNSET = -273.16 ]
+	float	mClutchWear;                // [ RANGE = 0.0f->1.0f... ]
+	bool  mClutchOverheated;          // true if clutch performance is degraded due to overheating
+	bool  mClutchSlipping;            // true if clutch is slipping (can be induced by overheating or wear)
+
+  int mYellowFlagState;             // [ enum (Type#16) YellowFlagState ]
 
 } SharedMemory;
 

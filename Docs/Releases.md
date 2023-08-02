@@ -1,4 +1,4 @@
-## 5.2.0.0-release 07/28/23
+## 5.2.1.0-release 08/04/23 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Many bugfixes and polishing in the new "Practice Center"

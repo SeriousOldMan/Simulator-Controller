@@ -3382,12 +3382,16 @@ class PracticeCenter extends ConfigurationItem {
 							else
 								Sleep(200)
 
-						if locked
-							tyresDB.updatePressures(pressuresData[1], pressuresData[2], pressuresData[3]
-												  , pressuresData[4], pressuresData[5], pressuresData[6]
-												  , pressuresData[7], pressuresData[8]
-												  , string2Values(",", pressuresData[9]), string2Values(",", pressuresData[10])
-												  , false, driver)
+						if locked {
+							coldPressures := string2Values(",", pressuresData[9])
+							hotPressures := string2Values(",", pressuresData[10])
+
+							if (isNumber(coldPressures[1]) && isNumber(hotPressures[1]))
+								tyresDB.updatePressures(pressuresData[1], pressuresData[2], pressuresData[3]
+													  , pressuresData[4], pressuresData[5], pressuresData[6]
+													  , pressuresData[7], pressuresData[8]
+													  , coldPressures, hotPressures, false, driver)
+						}
 					}
 				}
 			}

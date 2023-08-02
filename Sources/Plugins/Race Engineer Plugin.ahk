@@ -456,7 +456,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 		local first := true
 		local tries := 10
 		local stint, lastStint, newStint, driverID, lapPressures, ignore, lapData, driverName
-		local coldPressures, pressureLosses
+		local coldPressures, hotPressures, pressureLosses
 
 		try {
 			if (teamServer && teamServer.Active && session) {
@@ -502,13 +502,18 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 						}
 
 						coldPressures := string2Values(",", lapPressures[9])
-						pressureLosses := string2Values(",", lapPressures[11])
+						hotPressures := string2Values(",", lapPressures[10])
 
-						loop 4
-							coldPressures[A_Index] -= pressureLosses[A_Index]
+						if (isNumber(coldPressures[1]) && isNumber(hotPressures[1])) {
+							pressureLosses := string2Values(",", lapPressures[11])
 
-						tyresDB.updatePressures(lapPressures[1], lapPressures[2], lapPressures[3], lapPressures[4], lapPressures[5], lapPressures[6]
-											  , lapPressures[7], lapPressures[8], coldPressures, string2Values(",", lapPressures[10]), false, driverID)
+							if isNumber(pressureLosses[1])
+								loop 4
+									coldPressures[A_Index] -= pressureLosses[A_Index]
+
+							tyresDB.updatePressures(lapPressures[1], lapPressures[2], lapPressures[3], lapPressures[4], lapPressures[5], lapPressures[6]
+												  , lapPressures[7], lapPressures[8], coldPressures, hotPressures, false, driverID)
+						}
 					}
 					catch Any as exception {
 						logError(exception)
@@ -533,15 +538,21 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 						}
 
 						coldPressures := string2Values(",", lapData["Pressures.Cold"])
+						hotPressures := string2Values(",", lapData["Pressures.Hot"])
 						pressureLosses := string2Values(",", lapData["Pressures.Losses"])
 
-						loop 4
-							coldPressures[A_Index] -= pressureLosses[A_Index]
+						if (isNumber(coldPressures[1]) && isNumber(hotPressures[1])) {
+							pressureLosses := string2Values(",", lapPressures[11])
 
-						tyresDB.updatePressures(lapData["Simulator"], lapData["Car"], lapData["Track"], lapData["Weather"]
-											  , lapData["Temperature.Air"], lapData["Temperature.Track"]
-											  , lapData["Compound"], lapData["Compound.Color"]
-											  , coldPressures, string2Values(",", lapData["Pressures.Hot"]), false)
+							if isNumber(pressureLosses[1])
+								loop 4
+									coldPressures[A_Index] -= pressureLosses[A_Index]
+
+							tyresDB.updatePressures(lapData["Simulator"], lapData["Car"], lapData["Track"], lapData["Weather"]
+												  , lapData["Temperature.Air"], lapData["Temperature.Track"]
+												  , lapData["Compound"], lapData["Compound.Color"]
+												  , coldPressures, hotPressures, false)
+						}
 					}
 				}
 				catch Any as exception {

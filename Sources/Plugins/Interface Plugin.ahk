@@ -1,5 +1,5 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - State Plugin                   ;;;
+;;;   Modular Simulator Controller System - Interface Plugin                ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2023) Creative Commons - BY-NC-SA                        ;;;
@@ -17,14 +17,14 @@
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kStatePlugin := "State"
+global kInterfacePlugin := "Interface"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class StatePlugin extends ControllerPlugin {
+class InterfacePlugin extends ControllerPlugin {
 	iStateFile := (kTempDirectory . "Session State.json")
 	iAssistantsStateTask := false
 
@@ -322,7 +322,7 @@ class StatePlugin extends ControllerPlugin {
 
 		state["Position"] := positionOverall
 		state["OverallPosition"] := positionOverall
-		state["ClassPosition"] := classOverall
+		state["ClassPosition"] := positionClass
 
 		for ignore, opponent in ["Leader", "Ahead", "Behind", "Focus"]
 			if (getMultiMapValue(sessionInfo, "Standings", opponent . ".Lap.Time", kUndefined) != kUndefined) {
@@ -376,7 +376,7 @@ class StatePlugin extends ControllerPlugin {
 
 			deleteFile(fileName)
 
-			FileAppend(JSON.print(sessionState), fileName)
+			FileAppend(JSON.print(sessionState, "`t"), fileName)
 
 			loop 10
 				try {
@@ -396,10 +396,10 @@ class StatePlugin extends ControllerPlugin {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-initializeStatePlugin() {
+initializeInterfacePlugin() {
 	local controller := SimulatorController.Instance
 
-	StatePlugin(controller, kStatePlugin, controller.Configuration)
+	InterfacePlugin(controller, kInterfacePlugin, controller.Configuration)
 }
 
 
@@ -407,4 +407,4 @@ initializeStatePlugin() {
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-initializeStatePlugin()
+initializeInterfacePlugin()

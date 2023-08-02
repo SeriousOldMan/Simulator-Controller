@@ -1193,7 +1193,7 @@ Note: For convinience, all commands available for the *assistantCommands* parame
 
 It is very important, that you do not use the *Project CARS 2* ICM on your own, when you want to control the pitstop settings using the "Pitstop" mode, or if you want Jona to control the pitstop settings. Furthermore, you must leave *all* repairs selected in the default pitstop strategy and select *no tyre change* in the default pitstop strategy as well. And declare that the ICM should be returned to the standard page, when closed. This option can be found in the *Gameplay* section of the *Automobilista 2* settings. Not complying with this requirements will give you funny results at least.
 
-## Plugin *State*
+## Plugin *Interface*
 
 This plugin, which is normally not automatically included and enabled, can export the internal state of Simulator Controller - especially for all Assistants and the currently running simulator session - to other applications using a JSON file.
 
@@ -1205,4 +1205,4 @@ Only one plugin argument is provided, with which you can define the output file 
 
 If no argument for *stateFile* is provided, the state info will be put in a file named "Session State.json" in the *Simulator Controller\Temp* folder which resides in your *Documents* folder.
 
-The content of the state JSON file looks like this:
+The content of the JSON file looks like this:

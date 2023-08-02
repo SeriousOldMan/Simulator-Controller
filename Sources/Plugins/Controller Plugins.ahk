@@ -28,3 +28,5 @@
 #Include "PCARS2 Plugin.ahk"
 #Include "RSP Plugin.ahk"
 #Include "RST Plugin.ahk"
+
+#include "SimHub Plugin.ahk"

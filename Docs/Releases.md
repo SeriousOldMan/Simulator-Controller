@@ -1,4 +1,4 @@
-## 5.2.0.0-release 07/28/23
+## 5.2.1.0-release 08/04/23 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Many bugfixes and polishing in the new "Practice Center"
@@ -10,7 +10,7 @@
   9. Fixed a couple of stability issues in the Stream Deck plugin. If you have encountered problems lately, you might want to update the plugin.
   10. Support has added for a couple of new fields in the simulator data files - inner, middle and outer tyre temperatures and in-game tyre compound identifiers for *Automobilista 2*.
   11. The telemetry charts in "Race Center" and "Practice Center" now apply unit conversion correctly.
-  12. New data summary report in "Practice Center" and a new tab to review the [available telemtry data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#exploring-data)
+  12. New data summary report in "Practice Center" and a new tab to review the [available telemtry data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#exploring-data).
   13. Updated *Automobilista 2* data integration to shared memory API version 13.
   14. New car models for "Setup Workbench":
       - Assetto Corsa

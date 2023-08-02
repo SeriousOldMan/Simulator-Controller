@@ -570,11 +570,11 @@ systemMonitor(command := false, arguments*) {
 
 			if (wear.Length = 4) {
 				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Wear") . "</th><td class=`"td-wdg`" style=`"text-align: center`">"
-					   . displayValue("Float", convertUnit("Temperature", wear[1])) . "</td><td class=`"td-wdg`" style=`"text-align: center`">"
-					   . displayValue("Float", convertUnit("Temperature", wear[2])) . "</td></tr>")
+					   . displayValue("Float", wear[1]) . "</td><td class=`"td-wdg`" style=`"text-align: center`">"
+					   . displayValue("Float", wear[2]) . "</td></tr>")
 				html .= ("<tr><td class=`"td-wdg`" style=`"text-align: center`">"
-					   . displayValue("Float", convertUnit("Temperature", wear[3])) . "</td><td class=`"td-wdg`" style=`"text-align: center`">"
-					   . displayValue("Float", convertUnit("Temperature", wear[4])) . "</td></tr>")
+					   . displayValue("Float", wear[3]) . "</td><td class=`"td-wdg`" style=`"text-align: center`">"
+					   . displayValue("Float", wear[4]) . "</td></tr>")
 			}
 		}
 		catch Any as exception {

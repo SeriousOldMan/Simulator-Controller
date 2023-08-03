@@ -1867,7 +1867,7 @@ class PracticeCenter extends ConfigurationItem {
 		window["dataY6DropDown"].Enabled := false
 
 		if (!this.Simulator || this.SessionExported) {
-			window["runMenuDropDown"].Visible := false
+			; window["runMenuDropDown"].Visible := false
 
 			window["runModeDropDown"].Enabled := false
 			window["runModeDropDown"].Choose(0)
@@ -1880,7 +1880,7 @@ class PracticeCenter extends ConfigurationItem {
 			window["importPressuresButton"].Enabled := false
 		}
 		else if (this.SessionActive || !this.SessionMode) {
-			window["runMenuDropDown"].Visible := true
+			; window["runMenuDropDown"].Visible := true
 
 			window["runModeDropDown"].Enabled := true
 			if (window["runModeDropDown"].Value = 0)
@@ -1902,7 +1902,7 @@ class PracticeCenter extends ConfigurationItem {
 			}
 		}
 		else {
-			window["runMenuDropDown"].Visible := true
+			; window["runMenuDropDown"].Visible := true
 
 			window["runModeDropDown"].Enabled := false
 			window["runModeDropDown"].Choose(0)
@@ -2025,7 +2025,11 @@ class PracticeCenter extends ConfigurationItem {
 
 	updateRunMenu() {
 		this.Control["runMenuDropDown"].Delete()
-		this.Control["runMenuDropDown"].Add(collect(["Stints", "---------------------------------------------", "New Stint", "---------------------------------------------", "Stints Summary"], translate))
+
+		if (this.SessionActive || !this.SessionMode)
+			this.Control["runMenuDropDown"].Add(collect(["Stints", "---------------------------------------------", "New Stint", "---------------------------------------------", "Stints Summary"], translate))
+		else
+			this.Control["runMenuDropDown"].Add(collect(["Stints", "---------------------------------------------", "Stints Summary"], translate))
 
 		this.Control["runMenuDropDown"].Choose(1)
 	}
@@ -2159,9 +2163,9 @@ class PracticeCenter extends ConfigurationItem {
 	}
 
 	chooseRunMenu(line) {
-		switch line {
-			case 3: ; New Stint
-				if this.SessionActive {
+		if (this.SessionActive || !this.SessionMode) {
+			switch line {
+				case 3: ; New Stint
 					if (this.Control["runModeDropDown"].Value = 1) {
 						local lastLap := this.LastLap
 
@@ -2172,17 +2176,12 @@ class PracticeCenter extends ConfigurationItem {
 						MsgBox(translate("You must have manual stint mode enabled to create a new stint manually."), translate("Information"), 262192)
 						OnMessage(0x44, translateOkButton, 0)
 					}
-				}
-				else {
-					OnMessage(0x44, translateOkButton)
-					MsgBox(translate("You are not connected to an active session."), translate("Information"), 262192)
-					OnMessage(0x44, translateOkButton, 0)
-				}
-			case 5:
-				OnMessage(0x44, translateOkButton)
-				MsgBox(translate("Not yet implemented."), translate("Information"), 262192)
-				OnMessage(0x44, translateOkButton, 0)
+				case 5:
+					this.showRunsSummary()
+			}
 		}
+		else if (line = 3)
+			this.showRunsSummary()
 
 		this.updateRunMenu()
 	}
@@ -5563,7 +5562,7 @@ class PracticeCenter extends ConfigurationItem {
 
 	showSessionSummary() {
 		local telemetryDB := this.TelemetryDatabase
-		local html := ("<div id=`"header`"><b>" . translate("Race Summary") . "</b></div>")
+		local html := ("<div id=`"header`"><b>" . translate("Stints Summary") . "</b></div>")
 		local runs := []
 		local drivers := []
 		local laps := []
@@ -5690,6 +5689,175 @@ class PracticeCenter extends ConfigurationItem {
 		html .= ("<br><br><div id=`"chart_1`" style=`"width: " . width . "px; height: 248px`"></div>")
 
 		this.showDetails("Session", html, [1, chart1])
+	}
+
+	showRunsSummary() {
+		local telemetryDB := this.TelemetryDatabase
+		local html := ("<div id=`"header`"><b>" . translate("Stints Summary") . "</b></div>")
+		local runs := []
+		local drivers := []
+		local laps := []
+		local durations := []
+		local numLaps := []
+		local fuelAmounts := []
+		local tyreCompounds := []
+		local tyreSets := []
+		local tyreLaps := []
+		local bestLapTimes := []
+		local avgLapTimes := []
+		local currentRun := this.CurrentRun
+		local lapTable := this.SessionStore.Tables["Lap.Data"]
+		local simulator := this.Simulator
+		local carName := this.Car
+		local trackName := this.Track
+		local sessionDate := this.Date
+		local sessionTime := this.Date
+		local charts := []
+		local run, duration, ignore, lap, fuelAmount, width, chart
+		local positions, lapTimes, fuelConsumptions, temperatures
+
+		carName := (carName ? telemetryDB.getCarName(simulator, carName) : "-")
+		trackName := (trackName ? telemetryDB.getTrackName(simulator, trackName) : "-")
+
+		if sessionDate
+			sessionDate := FormatTime(sessionDate, "ShortDate")
+		else
+			sessionDate := "-"
+
+		if sessionTime
+			sessionTime := FormatTime(sessionTime, "Time")
+		else
+			sessionTime := "-"
+
+		html .= "<br><br><table>"
+		html .= ("<tr><td><b>" . translate("Simulator:") . "</b></td><td>" . (simulator ? simulator : "-") . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Car:") . "</b></td><td>" . carName . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Track:") . "</b></td><td>" . trackName . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Date:") . "</b></td><td>" . sessionDate . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Time:") . "</b></td><td>" . sessionTime . "</td></tr>")
+		html .= "</table>"
+
+		html .= ("<br><br><div id=`"header`"><i>" . translate("Stints") . "</i></div>")
+
+		if currentRun
+			loop currentRun.Nr {
+				run := this.Runs[A_Index]
+
+				runs.Push("<th class=`"th-std`">" . run.Nr . "</th>")
+				drivers.Push("<td class=`"td-std`">" . StrReplace(run.Driver.Fullname, "'", "\'") . "</td>")
+				laps.Push("<td class=`"td-std`">" . run.Lap . "</td>")
+
+				duration := 0
+
+				bestLapTime := 999999
+
+				for ignore, lap in run.Laps {
+					bestLapTime := Min(bestLapTime, lap.LapTime)
+
+					duration += lap.Laptime
+				}
+
+				durations.Push("<td class=`"td-std`">" . Round(duration / 60) . "</td>")
+				numLaps.Push("<td class=`"td-std`">" . run.Laps.Length . "</td>")
+				bestLapTimes.Push("<td class=`"td-std`">" . lapTimeDisplayValue(bestLapTime) . "</td>")
+				avgLapTimes.Push("<td class=`"td-std`">" . lapTimeDisplayValue(run.AvgLaptime) . "</td>")
+
+				fuelAmount := run.FuelInitial
+
+				if isNumber(fuelAmount)
+					fuelAmount := displayValue("Float", convertUnit("Volume", fuelAmount))
+
+				fuelAmounts.Push("<td class=`"td-std`">" . displayNullValue(fuelAmount) . "</td>")
+				tyreCompounds.Push("<td class=`"td-std`">" . translate(run.Compound) . "</td>")
+				tyreSets.Push("<td class=`"td-std`">" . run.TyreSet . "</td>")
+				tyreLaps.Push("<td class=`"td-std`">" . run.TyreLaps . "</td>")
+			}
+
+		html .= "<br><table class=`"table-std`">"
+
+		html .= ("<tr><th class=`"th-std`">" . translate("Stint") . "</th>"
+				   . "<th class=`"th-std`">" . translate("Driver") . "</th>"
+				   . "<th class=`"th-std`">" . translate("Lap") . "</th>"
+			       . "<th class=`"th-std`">" . translate("Duration") . "</th>"
+			       . "<th class=`"th-std`">" . translate("Laps") . "</th>"
+			       . "<th class=`"th-std`">" . translate("Initial Fuel") . "</th>"
+			       . "<th class=`"th-std`">" . translate("Tyre Compound") . "</th>"
+			       . "<th class=`"th-std`">" . translate("Tyre Set") . "</th>"
+			       . "<th class=`"th-std`">" . translate("Tyre Laps") . "</th>"
+			       . "<th class=`"th-std`">" . translate("Best Lap Time") . "</th>"
+			       . "<th class=`"th-std`">" . translate("Avg. Lap Time") . "</th>"
+			   . "</tr>")
+
+		loop runs.Length
+			html .= ("<tr>" . runs[A_Index]
+							. drivers[A_Index]
+							. laps[A_Index]
+							. durations[A_Index]
+							. numLaps[A_Index]
+							. fuelAmounts[A_Index]
+							. tyreCompounds[A_Index]
+							. tyreSets[A_Index]
+							. tyreLaps[A_Index]
+							. bestLapTimes[A_Index]
+							. avgLapTimes[A_Index]
+				   . "</tr>")
+
+		html .= "</table>"
+
+		width := (this.DetailsViewer.getWidth() - 20)
+
+		if currentRun
+			loop currentRun.Nr
+				if this.Runs.Has(A_Index) {
+					html .= ("<br><br><div id=`"header`"><b>" . translate("Stint: ") . A_Index . "</b></div>")
+
+					html .= ("<br><div id=`"header`"><i>" . translate("Laps") . "</i></div>")
+
+					run := this.Runs[A_Index]
+
+					html .= ("<br>" . this.createLapDetails(run))
+
+					html .= ("<br><br><div id=`"header`"><i>" . translate("Telemetry") . "</i></div>")
+
+					laps := []
+					positions := []
+					lapTimes := []
+					fuelConsumptions := []
+					temperatures := []
+
+					for ignore, lap in run.Laps
+						if lapTable.Has(lap.Nr) {
+							laps.Push(lap.Nr)
+							positions.Push(lap.Position)
+							lapTimes.Push(lap.Laptime)
+							fuelConsumptions.Push(lap.FuelConsumption)
+							temperatures.Push(lapTable[lap.Nr]["Tyre.Temperature.Average"])
+						}
+
+					chart := this.createLapDetailsChart(charts.Length + 1, width, 248, laps, positions, lapTimes, fuelConsumptions, temperatures)
+
+					charts.Push(Array(charts.Length + 1, chart))
+
+					html .= ("<br><br><div id=`"chart_" . charts.Length . "`" style=`"width: " . width . "px; height: 248px`"></div>")
+
+					html .= ("<br><br><div id=`"header`"><i>" . translate("Statistics") . "</i></div>")
+
+					chart := this.createRunPerformanceChart(charts.Length + 1, width, 248, run)
+
+					charts.Push(Array(charts.Length + 1, chart))
+
+					html .= ("<br><div id=`"chart_" . charts.Length . "`" style=`"width: " . width . "px; height: 248px`"></div>")
+
+					html .= ("<br><br><div id=`"header`"><i>" . translate("Consistency") . "</i></div>")
+
+					chart := this.createRunConsistencyChart(charts.Length + 1, width, 248, run, laps, lapTimes)
+
+					charts.Push(Array(charts.Length + 1, chart))
+
+					html .= ("<br><div id=`"chart_" . charts.Length . "`" style=`"width: " . width . "px; height: 248px`"></div>")
+				}
+
+		this.showDetails("Runs", html, charts*)
 	}
 
 	createRunHeader(run) {

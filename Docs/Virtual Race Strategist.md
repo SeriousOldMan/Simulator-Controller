@@ -326,6 +326,10 @@ Last but not least, using the small button with the cog wheel icon, you can choo
 	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Practice%20Center%209.JPG)
 	 
 	 You can create this report by chooosing "Data Summary" from the "Data" menu.
+
+  5. Stints Summary
+  
+     This report combines the output of the stint report (see above) for all stints into one document.
 	 
 All these report documents are HTML-based and can be saved or printed using the context menu when right-clicking into the output area.
 

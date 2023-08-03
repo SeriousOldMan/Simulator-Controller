@@ -6289,13 +6289,17 @@ class PracticeCenter extends ConfigurationItem {
 			local data := readMultiMap(fileName)
 
 			try {
-				this.initializeSession(getMultiMapValue(data, "Session Data", "Session", "Practice"))
+				if (this.HasData && !this.SessionExported && (this.SesssionMode != "Loaded"))
+					this.iSessionMode := "Finished"
+				else {
+					this.initializeSession(getMultiMapValue(data, "Session Data", "Session", "Practice"))
 
-				this.initializeSimulator(SessionDatabase.getSimulatorName(getMultiMapValue(data, "Session Data", "Simulator"))
-									   , getMultiMapValue(data, "Session Data", "Car")
-									   , getMultiMapValue(data, "Session Data", "Track"))
+					this.initializeSimulator(SessionDatabase.getSimulatorName(getMultiMapValue(data, "Session Data", "Simulator"))
+										   , getMultiMapValue(data, "Session Data", "Car")
+										   , getMultiMapValue(data, "Session Data", "Track"))
 
-				this.analyzeTelemetry()
+					this.analyzeTelemetry()
+				}
 			}
 			finally {
 				deleteFile(fileName)

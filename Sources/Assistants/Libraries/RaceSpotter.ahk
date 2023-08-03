@@ -194,7 +194,7 @@ class CarInfo {
 			local lastDelta := false
 			local delta
 
-			if (sector && this.iLastDeltas.Has(sector))
+			if this.iLastDeltas.Has(sector)
 				return this.iLastDeltas[sector]
 			else {
 				for sector, delta in this.iLastDeltas
@@ -245,10 +245,7 @@ class CarInfo {
 
 	Delta[sector, average := false, count := 3] {
 		Get {
-			if sector
-				return (average ? this.AverageDelta[sector] : this.LastDelta[sector])
-			else
-				return (average ? this.AverageDelta[false, count] : this.LastDelta[false])
+			return (average ? this.AverageDelta[sector, count] : this.LastDelta[sector])
 		}
 	}
 
@@ -348,6 +345,7 @@ class CarInfo {
 				deltas.RemoveAt(1)
 
 			this.iLastDeltas[sector] := delta
+			this.iLastDeltas[false] := delta
 
 			this.iTrackAheadDelta := trackAheadDelta
 			this.iTrackBehindDelta := trackBehindDelta

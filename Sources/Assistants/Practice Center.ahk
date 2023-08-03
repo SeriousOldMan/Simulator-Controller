@@ -5737,7 +5737,7 @@ class PracticeCenter extends ConfigurationItem {
 		html .= ("<tr><td><b>" . translate("Time:") . "</b></td><td>" . sessionTime . "</td></tr>")
 		html .= "</table>"
 
-		html .= ("<br><br><div id=`"header`"><i>" . translate("Stints") . "</i></div>")
+		html .= ("<br><br><div id=`"header`"><i>" . translate("Overview") . "</i></div>")
 
 		if currentRun
 			loop currentRun.Nr {

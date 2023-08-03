@@ -2026,7 +2026,7 @@ class PracticeCenter extends ConfigurationItem {
 	updateRunMenu() {
 		this.Control["runMenuDropDown"].Delete()
 
-		if (this.SessionActive || !this.SessionMode)
+		if ((this.SessionActive || !this.SessionMode) && !this.SessionExported)
 			this.Control["runMenuDropDown"].Add(collect(["Stints", "---------------------------------------------", "New Stint", "---------------------------------------------", "Stints Summary"], translate))
 		else
 			this.Control["runMenuDropDown"].Add(collect(["Stints", "---------------------------------------------", "Stints Summary"], translate))
@@ -2163,7 +2163,7 @@ class PracticeCenter extends ConfigurationItem {
 	}
 
 	chooseRunMenu(line) {
-		if (this.SessionActive || !this.SessionMode) {
+		if ((this.SessionActive || !this.SessionMode) && !this.SessionExported) {
 			switch line {
 				case 3: ; New Stint
 					if (this.Control["runModeDropDown"].Value = 1) {

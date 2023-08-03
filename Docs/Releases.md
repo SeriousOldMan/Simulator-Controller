@@ -8,14 +8,15 @@
   7. Fixed data integration for RaceRoom Racing Experience. Sorry for that.
   8. Fixed tyre wear for RaceRoom Racing Experience, which was 100% for fresh tyres.
   9. Fixed a couple of stability issues in the Stream Deck plugin. If you have encountered problems lately, you might want to update the plugin.
-  10. Support for a couple of new fields has been added in the simulator data files - inner, middle and outer tyre temperatures and in-game tyre compound identifiers for *Automobilista 2*.
-  11. The telemetry charts in "Race Center" and "Practice Center" now apply unit conversion correctly.
-  12. New data summary report in "Practice Center" and a new tab to review the [available telemtry data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#exploring-data).
-  13. New [stints summary report](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#data-analysis) in "Practice Center".
-  14. Updated *Automobilista 2* data integration to shared memory API version 13.
-  15. The Standings info widget in "Session Monitor" now also shows the observed opponent, if one is currently observed by the Spotter.
-  16. A new [plugin named "Integration"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) is available, which exposes the internal state of the Race Assistants and many information about the current session to external applications using a JSON file, which is updated periodically, even when another driver is running the car in a team race. With this it is possible, for example, to create a dashboard for Simulator Controller in SimHub.
-  17. New car models for "Setup Workbench":
+  10. Fixed a rare bug with SFX-100 motion intensity controller.
+  11. Support for a couple of new fields has been added in the simulator data files - inner, middle and outer tyre temperatures and in-game tyre compound identifiers for *Automobilista 2*.
+  12. The telemetry charts in "Race Center" and "Practice Center" now apply unit conversion correctly.
+  13. New data summary report in "Practice Center" and a new tab to review the [available telemtry data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#exploring-data).
+  14. New [stints summary report](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#data-analysis) in "Practice Center".
+  15. Updated *Automobilista 2* data integration to shared memory API version 13.
+  16. The Standings info widget in "Session Monitor" now also shows the observed opponent, if one is currently observed by the Spotter.
+  17. A new [plugin named "Integration"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) is available, which exposes the internal state of the Race Assistants and many information about the current session to external applications using a JSON file, which is updated periodically, even when another driver is running the car in a team race. With this it is possible, for example, to create a dashboard for Simulator Controller in SimHub.
+  18. New car models for "Setup Workbench":
       - Assetto Corsa
         - Alfa Romeo 33 Stradale
 		- Alfa Romeo Giulietta QV Launch Edition 2014 (Fixed)

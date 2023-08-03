@@ -707,7 +707,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			}
 			catch Any as exception {
 				logError(exception, true)
-					
+
 				message := (isObject(exception) ? exception.Message : exception)
 
 				logMessage(kLogCritical, "Error while connecting to SimFeedback (" . kSimFeedbackConnector . "): " . message . " - please check the configuration")
@@ -956,7 +956,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			initialIntensity := this.kInitialEffectIntensities[index]
 
 			if (this.iCurrentEffectIntensities[index] != initialIntensity) {
-				this.setEffectIntensity(effect, initialIntensity, false)
+				this.setEffectIntensity(effect, initialIntensity)
 
 				Sleep(50)
 			}

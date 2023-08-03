@@ -8,7 +8,7 @@
   7. Fixed data integration for RaceRoom Racing Experience. Sorry for that.
   8. Fixed tyre wear for RaceRoom Racing Experience, which was 100% for fresh tyres.
   9. Fixed a couple of stability issues in the Stream Deck plugin. If you have encountered problems lately, you might want to update the plugin.
-  10. Support has added for a couple of new fields in the simulator data files - inner, middle and outer tyre temperatures and in-game tyre compound identifiers for *Automobilista 2*.
+  10. Support for a couple of new fields has been added in the simulator data files - inner, middle and outer tyre temperatures and in-game tyre compound identifiers for *Automobilista 2*.
   11. The telemetry charts in "Race Center" and "Practice Center" now apply unit conversion correctly.
   12. New data summary report in "Practice Center" and a new tab to review the [available telemtry data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#exploring-data).
   13. Updated *Automobilista 2* data integration to shared memory API version 13.

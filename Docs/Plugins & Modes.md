@@ -1258,7 +1258,7 @@ The content of the JSON file looks like this (depending on the current situation
 		},
 		"Pitstop": {
 			"Fuel": "68.0",
-			"Lap": "null",
+			"Lap": null,
 			"Number": 1,
 			"Prepared": 0,
 			"Repairs": "-",
@@ -1278,7 +1278,7 @@ The content of the JSON file looks like this (depending on the current situation
 			"Track": "Circuit de Spa-Franchorchamps"
 		},
 		"Standings": {
-			"Ahead": "null",
+			"Ahead": null,
 			"Behind": {
 				"Delta": "-0:02,1",
 				"InPit": 0,
@@ -1294,12 +1294,12 @@ The content of the JSON file looks like this (depending on the current situation
 				"Laps": "2",
 				"Nr": "15"
 			},
-			"Leader": "null",
+			"Leader": null,
 			"OverallPosition": 1,
 			"Position": 1
 		},
 		"Stint": {
-			"BestTime": "null",
+			"BestTime": null,
 			"Driver": "Oliver Juwig (OJU)",
 			"Lap": 3,
 			"Laps": "2",
@@ -1327,10 +1327,10 @@ The content of the JSON file looks like this (depending on the current situation
 				"91.1"
 			],
 			"Wear": [
-				"null",
-				"null",
-				"null",
-				"null"
+				null,
+				null,
+				null,
+				null
 			]
 		}
 	}

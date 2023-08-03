@@ -113,7 +113,7 @@ class JSON {
 					else if (val == "true" || val == "false")
 						val := (val == "true")
 					else if (val == "null")
-						val := ""
+						val := kNull
 					else if is_key {
 						pos--, next := "#"
 						continue
@@ -178,16 +178,20 @@ class JSON {
 			return escape_str(obj)
 
 		escape_str(obj) {
-			obj := StrReplace(obj,"\","\\")
-			obj := StrReplace(obj,"`t","\t")
-			obj := StrReplace(obj,"`r","\r")
-			obj := StrReplace(obj,"`n","\n")
-			obj := StrReplace(obj,"`b","\b")
-			obj := StrReplace(obj,"`f","\f")
-			obj := StrReplace(obj,"/","\/")
-			obj := StrReplace(obj,'"','\"')
+			if (obj = kNull)
+				return "null"
+			else {
+				obj := StrReplace(obj,"\","\\")
+				obj := StrReplace(obj,"`t","\t")
+				obj := StrReplace(obj,"`r","\r")
+				obj := StrReplace(obj,"`n","\n")
+				obj := StrReplace(obj,"`b","\b")
+				obj := StrReplace(obj,"`f","\f")
+				obj := StrReplace(obj,"/","\/")
+				obj := StrReplace(obj,'"','\"')
 
-			return '"' obj '"'
+				return '"' obj '"'
+			}
 		}
 	}
 }

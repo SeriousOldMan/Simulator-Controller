@@ -1030,6 +1030,9 @@ class RaceSpotter extends GridRaceAssistant {
 		local validCar := false
 		local number, numbers, ignore, carInfo, candidate, fragment
 
+		if !this.hasEnoughData()
+			return
+
 		numbers := []
 
 		for ignore, candidate in words {
@@ -1075,6 +1078,8 @@ class RaceSpotter extends GridRaceAssistant {
 	}
 
 	noFocusCarRecognized(words) {
+		this.getSpeaker().speakPhrase("Roger")
+
 		this.FocusedCar := false
 	}
 

@@ -1221,55 +1221,71 @@ If no argument for *stateFile* is provided, the state info will be put in a file
 The content of the JSON file looks like this (depending on the current situation, of course):
 
 	{
+		"Assistants": {
+			"Mode": "Team",
+			"Race Engineer": {
+				"Muted": false,
+				"State": "Active"
+			},
+			"Race Spotter": {
+				"Muted": false,
+				"State": "Active"
+			},
+			"Race Strategist": {
+				"Muted": false,
+				"State": "Active"
+			},
+			"Session": "Race"
+		},
 		"Brakes": {
 			"Temperatures": [
-				"199.6",
-				"197.6",
-				"339.9",
-				"337.0"
+				199.6,
+				197.6,
+				339.9,
+				337.0
 			],
 			"Wear": [
-				"2",
-				"2",
-				"3",
-				"3"
+				2,
+				2,
+				3,
+				3
 			]
 		},
 		"Conditions": {
-			"AirTemperature": "24.9",
+			"AirTemperature": 24.9,
 			"Grip": "Optimum",
-			"TrackTemperature": "31.4",
+			"TrackTemperature": 31.4,
 			"Weather": "Dry",
 			"Weather10Min": "Dry",
 			"Weather30Min": "Dry"
 		},
 		"Duration": {
 			"Format": "Time",
-			"SessionLapsLeft": "24",
+			"SessionLapsLeft": 24,
 			"SessionTimeLeft": "54:53,0",
-			"StintLapsLeft": "9",
+			"StintLapsLeft": 9,
 			"StintTimeLeft": "54:53,0"
 		},
 		"Fuel": {
-			"AvgConsumption": "4.1",
-			"LastConsumption": "4.1",
-			"RemainingFuel": "36.9",
+			"AvgConsumption": 4.1,
+			"LastConsumption": 4.1,
+			"RemainingFuel": 36.9,
 			"RemainingLaps": 9
 		},
 		"Pitstop": {
-			"Fuel": "68.0",
+			"Fuel": 68.0,
 			"Lap": null,
 			"Number": 1,
 			"Prepared": 0,
 			"Repairs": "-",
 			"TyreCompound": "Dry (Black)",
 			"TyrePressures": [
-				"25.2",
-				"25.2",
-				"24.4",
-				"24.3"
+				25.2,
+				25.2,
+				24.4,
+				24.3
 			],
-			"TyreSet": "2"
+			"TyreSet": 2
 		},
 		"Session": {
 			"Car": "McLaren 720S GT3",
@@ -1281,18 +1297,18 @@ The content of the JSON file looks like this (depending on the current situation
 			"Ahead": null,
 			"Behind": {
 				"Delta": "-0:02,1",
-				"InPit": 0,
+				"InPit": false,
 				"LapTime": "2:21,3",
-				"Laps": "2",
-				"Nr": "109"
+				"Laps": 2,
+				"Nr": 109
 			},
 			"ClassPosition": 1,
 			"Focus": {
 				"Delta": "-0:15,9",
-				"InPit": 0,
+				"InPit": false,
 				"LapTime": "2:24,3",
-				"Laps": "2",
-				"Nr": "15"
+				"Laps": 2,
+				"Nr": 15
 			},
 			"Leader": null,
 			"OverallPosition": 1,
@@ -1302,29 +1318,36 @@ The content of the JSON file looks like this (depending on the current situation
 			"BestTime": null,
 			"Driver": "Oliver Juwig (OJU)",
 			"Lap": 3,
-			"Laps": "2",
+			"Laps": 2,
 			"LastTime": "2:21,3",
 			"Position": 1
 		},
 		"Strategy": {
-			"Fuel": "12.0",
-			"Lap": "10",
-			"PlannedPitstops": "2",
+			"Fuel": 12.0,
+			"Lap": 10,
+			"PlannedPitstops": 2,
 			"RemainingPitstops": 2,
 			"TyreCompound": "Dry (Black)"
 		},
+		"TeamServer": {
+			"Driver": "Oliver Juwig",
+			"Server": "https:\/\/vgr-teamserver.azurewebsites.net",
+			"Session": "24H Spa",
+			"Team": "VGR (EOS)",
+			"Token": "xxxxxxxx-yyyy-zzzz-aaaa-bbbbbbbbbbbb"
+		},
 		"Tyres": {
 			"Pressures": [
-				"26.4",
-				"26.4",
-				"26.7",
-				"26.5"
+				26.4,
+				26.4,
+				26.7,
+				26.5
 			],
 			"Temperatures": [
-				"80.6",
-				"80.6",
-				"91.7",
-				"91.1"
+				80.6,
+				80.6,
+				91.7,
+				91.1
 			],
 			"Wear": [
 				null,

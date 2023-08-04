@@ -332,7 +332,7 @@ class IntegrationPlugin extends ControllerPlugin {
 				state[opponent] := Map("Laps", getMultiMapValue(sessionInfo, "Standings", opponent . ".Laps")
 									 , "Delta", displayValue("Time", getMultiMapValue(sessionInfo, "Standings", opponent . ".Delta"))
 									 , "LapTime", displayValue("Time", getMultiMapValue(sessionInfo, "Standings", opponent . ".Lap.Time"))
-									 , "InPit", getMultiMapValue(sessionInfo, "Standings", opponent . ".InPit"))
+									 , "InPit", (getMultiMapValue(sessionInfo, "Standings", opponent . ".InPit") ? kTrue : kFalse))
 
 				state[opponent]["Nr"] := (nr ? nr : kNull)
 			}
@@ -377,6 +377,8 @@ class IntegrationPlugin extends ControllerPlugin {
 		state := getMultiMapValue(controllerState, "Team Server", "State", "Disabled")
 
 		if ((state != "Unknown") && (state != "Disabled")) {
+			state := CaseInsenseMap()
+
 			for ignore, property in string2Values(";", getMultiMapValue(controllerState, "Team Server", "Properties")) {
 				property := StrSplit(property, ":", " `t", 2)
 
@@ -415,6 +417,11 @@ class IntegrationPlugin extends ControllerPlugin {
 				break
 			}
 		}
+
+		fileName := (kTempDirectory . "Simulator Controller.state")
+
+		if (FileExist(fileName) && (FileGetTime(fileName, "M") > lastUpdate))
+			hasUpdate := true
 
 		if hasUpdate {
 			lastUpdate := A_Now

@@ -3,7 +3,7 @@ Version=5.2.2.0-dev
 Target=5.2.2.0-release
 Date=08/04/2023
 Download=
-Changes=More fields for "Session State.json"
+Changes=More fields for "Session State.json", Data format update for "Session State.json"
 [Release]
 Version=5.2.1.0-release
 Date=08/04/2023

@@ -43,6 +43,8 @@ class IntegrationPlugin extends ControllerPlugin {
 	__New(controller, name, configuration := false) {
 		this.iStateFile := this.getArgumentValue("stateFile", kTempDirectory . "Session State.json")
 
+		deleteFile(this.StateFile)
+
 		super.__New(controller, name, configuration)
 
 		if (this.Active || isDebug()) {
@@ -50,6 +52,8 @@ class IntegrationPlugin extends ControllerPlugin {
 
 			this.iAssistantsStateTask.start()
 			this.iAssistantsStateTask.pause()
+
+			this.updateSessionState()
 		}
 	}
 
@@ -68,10 +72,10 @@ class IntegrationPlugin extends ControllerPlugin {
 	}
 
 	createSessionState(sessionInfo) {
-		return Map("Simulator", getMultiMapValue(sessionInfo, "Session", "Simulator")
-				 , "Car", getMultiMapValue(sessionInfo, "Session", "Car")
-				 , "Track", getMultiMapValue(sessionInfo, "Session", "Track")
-				 , "Session", translate(getMultiMapValue(sessionInfo, "Session", "Type")))
+		return Map("Simulator", getMultiMapValue(sessionInfo, "Session", "Simulator", kNull)
+				 , "Car", getMultiMapValue(sessionInfo, "Session", "Car", kNull)
+				 , "Track", getMultiMapValue(sessionInfo, "Session", "Track", kNull)
+				 , "Session", translate(getMultiMapValue(sessionInfo, "Session", "Type", kNull)))
 	}
 
 	createDurationState(sessionInfo) {
@@ -100,7 +104,7 @@ class IntegrationPlugin extends ControllerPlugin {
 		else
 			remainingDriverTime := kNull
 
-		state["Format"] := translate(getMultiMapValue(sessionInfo, "Session", "Format"))
+		state["Format"] := translate(getMultiMapValue(sessionInfo, "Session", "Format", kNull))
 		state["SessionTimeLeft"] := remainingSessionTime
 		state["StintTimeLeft"] := remainingStintTime
 		state["StintTimeLeft"] := remainingDriverTime
@@ -111,14 +115,14 @@ class IntegrationPlugin extends ControllerPlugin {
 	}
 
 	createConditionsState(sessionInfo) {
-		local weatherNow := getMultiMapValue(sessionInfo, "Weather", "Now")
-		local weather10Min := getMultiMapValue(sessionInfo, "Weather", "10Min")
-		local weather30Min := getMultiMapValue(sessionInfo, "Weather", "30Min")
+		local weatherNow := getMultiMapValue(sessionInfo, "Weather", "Now", kNull)
+		local weather10Min := getMultiMapValue(sessionInfo, "Weather", "10Min", kNull)
+		local weather30Min := getMultiMapValue(sessionInfo, "Weather", "30Min", kNull)
 
 		return Map("Weather", translate(weatherNow)
-				 , "AirTemperature", convertUnit("Temperature", getMultiMapValue(sessionInfo, "Weather", "Temperature"))
-				 , "TrackTemperature", convertUnit("Temperature", getMultiMapValue(sessionInfo, "Track", "Temperature"))
-				 , "Grip", translate(getMultiMapValue(sessionInfo, "Track", "Grip"))
+				 , "AirTemperature", convertUnit("Temperature", getMultiMapValue(sessionInfo, "Weather", "Temperature", 23))
+				 , "TrackTemperature", convertUnit("Temperature", getMultiMapValue(sessionInfo, "Track", "Temperature", 27))
+				 , "Grip", translate(getMultiMapValue(sessionInfo, "Track", "Grip", kNull))
 				 , "Weather10Min", translate(weather10Min)
 				 , "Weather30Min", translate(weather30Min))
 	}
@@ -126,8 +130,8 @@ class IntegrationPlugin extends ControllerPlugin {
 	createStintState(sessionInfo) {
 		local lastLap := getMultiMapValue(sessionInfo, "Session", "Laps", 0)
 		local lastValid := getMultiMapValue(sessionInfo, "Stint", "Valid", true)
-		local lastTime := getMultiMapValue(sessionInfo, "Stint", "Lap.Time.Last")
-		local bestTime := getMultiMapValue(sessionInfo, "Stint", "Lap.Time.Best")
+		local lastTime := getMultiMapValue(sessionInfo, "Stint", "Lap.Time.Last", 3600)
+		local bestTime := getMultiMapValue(sessionInfo, "Stint", "Lap.Time.Best", 3600)
 
 		return Map("Driver", getMultiMapValue(sessionInfo, "Stint", "Driver")
 				 , "Laps", getMultiMapValue(sessionInfo, "Stint", "Laps")
@@ -141,10 +145,10 @@ class IntegrationPlugin extends ControllerPlugin {
 	createFuelState(sessionInfo) {
 		local fuelLow := (Floor(getMultiMapValue(sessionInfo, "Stint", "Laps.Remaining.Fuel", 0)) < 4)
 
-		return Map("LastConsumption", convertUnit("Volume", getMultiMapValue(sessionInfo, "Stint", "Fuel.Consumption"))
-				 , "AvgConsumption", convertUnit("Volume", getMultiMapValue(sessionInfo, "Stint", "Fuel.AvgConsumption"))
-				 , "RemainingFuel", convertUnit("Volume", getMultiMapValue(sessionInfo, "Stint", "Fuel.Remaining"))
-				 , "RemainingLaps", Floor(getMultiMapValue(sessionInfo, "Stint", "Laps.Remaining.Fuel")))
+		return Map("LastConsumption", convertUnit("Volume", getMultiMapValue(sessionInfo, "Stint", "Fuel.Consumption", 0))
+				 , "AvgConsumption", convertUnit("Volume", getMultiMapValue(sessionInfo, "Stint", "Fuel.AvgConsumption", 0))
+				 , "RemainingFuel", convertUnit("Volume", getMultiMapValue(sessionInfo, "Stint", "Fuel.Remaining", 0))
+				 , "RemainingLaps", Floor(getMultiMapValue(sessionInfo, "Stint", "Laps.Remaining.Fuel", 0)))
 	}
 
 	createTyresState(sessionInfo) {
@@ -214,8 +218,8 @@ class IntegrationPlugin extends ControllerPlugin {
 		state["RemainingPitstops"] := remainingPitstops
 
 		if nextPitstop {
-			state["Lap"] := getMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Lap")
-			state["Fuel"] := convertUnit("Volume", getMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Refuel"))
+			state["Lap"] := getMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Lap", kNull)
+			state["Fuel"] := convertUnit("Volume", getMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Refuel", 0))
 
 			tyreCompound := getMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound")
 
@@ -312,8 +316,8 @@ class IntegrationPlugin extends ControllerPlugin {
 	}
 
 	createStandingsState(sessionInfo) {
-		local positionOverall := getMultiMapValue(sessionInfo, "Standings", "Position.Overall")
-		local positionClass := getMultiMapValue(sessionInfo, "Standings", "Position.Class")
+		local positionOverall := getMultiMapValue(sessionInfo, "Standings", "Position.Overall", 0)
+		local positionClass := getMultiMapValue(sessionInfo, "Standings", "Position.Class", 0)
 		local state := Map()
 		local nr, opponent
 
@@ -373,6 +377,14 @@ class IntegrationPlugin extends ControllerPlugin {
 			}
 		}
 
+		if (assistantsState.Count == 0) {
+			assistantsState["Mode"] := kNull
+			assistantsState["Session"] := kNull
+			assistantsState["Race Engineer"] := Map("State", "Disabled", "Muted", kNull)
+			assistantsState["Race Strategist"] := Map("State", "Disabled", "Muted", kNull)
+			assistantsState["Race Spotter"] := Map("State", "Disabled", "Muted", kNull)
+		}
+
 		sessionState["Assistants"] := assistantsState
 
 		state := getMultiMapValue(controllerState, "Team Server", "State", "Disabled")
@@ -430,7 +442,7 @@ class IntegrationPlugin extends ControllerPlugin {
 	}
 
 	updateSessionState() {
-		local hasUpdate := false
+		local needsUpdate := !FileExist(this.StateFile)
 		local sessionInfo, sessionState, ignore, assistant, fileName
 
 		static lastUpdate := A_Now
@@ -439,7 +451,7 @@ class IntegrationPlugin extends ControllerPlugin {
 			fileName := (kTempDirectory . assistant . " Session.state")
 
 			if (FileExist(fileName) && (FileGetTime(fileName, "M") > lastUpdate)) {
-				hasUpdate := true
+				needsUpdate := true
 
 				break
 			}
@@ -448,9 +460,9 @@ class IntegrationPlugin extends ControllerPlugin {
 		fileName := (kTempDirectory . "Simulator Controller.state")
 
 		if (FileExist(fileName) && (FileGetTime(fileName, "M") > lastUpdate))
-			hasUpdate := true
+			needsUpdate := true
 
-		if hasUpdate {
+		if needsUpdate {
 			lastUpdate := A_Now
 			sessionInfo := newMultiMap()
 

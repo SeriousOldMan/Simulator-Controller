@@ -345,6 +345,7 @@ class IntegrationPlugin extends ControllerPlugin {
 	updateControllerState(sessionState, controllerState) {
 		local assistantsState := Map()
 		local teamServerState := Map()
+		local automationState := Map()
 		local ignore, property, key, value, state, configuration
 
 		for key, state in getMultiMapValues(controllerState, "Race Assistants") {
@@ -357,7 +358,7 @@ class IntegrationPlugin extends ControllerPlugin {
 				if (state = "Active")
 					assistantsState[key]["State"] := "Active"
 				else if (state = "Waiting")
-					assistantsState[key]["State"] := "Wait"
+					assistantsState[key]["State"] := "Waiting"
 				else if (state = "Shutdown")
 					assistantsState[key]["State"] := "Finished"
 				else
@@ -400,6 +401,32 @@ class IntegrationPlugin extends ControllerPlugin {
 		}
 
 		sessionState["TeamServer"] := teamServerState
+
+		state := getMultiMapValue(controllerState, "Track Automation", "State", "Disabled")
+
+		if ((state != "Unknown") && (state != "Disabled")) {
+			if (state = "Passive")
+				automationState["State"] := "Waiting"
+			else {
+				automation := getMultiMapValue(controllerState, "Track Automation", "Automation", false)
+
+				automationState["State"] := (automation ? "Active" : "Unavailable")
+
+				automationState["Simulator"] := getMultiMapValue(controllerState, "Track Automation", "Simulator")
+				automationState["Car"] := getMultiMapValue(controllerState, "Track Automation", "Car")
+				automationState["Track"] := getMultiMapValue(controllerState, "Track Automation", "Track")
+				automationState["Automation"] := (automation ? automation : kNull)
+			}
+		}
+		else {
+			automationState["Simulator"] := kNull
+			automationState["Car"] := kNull
+			automationState["Track"] := kNull
+			automationState["Automation"] := kNull
+			automationState["State"] := "Disabled"
+		}
+
+		sessionState["Automation"] := automationState
 	}
 
 	updateSessionState() {

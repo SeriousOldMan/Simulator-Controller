@@ -378,7 +378,8 @@ Please see the following table for available information commands.
 | LapsRemaining | Cato will give you the number of laps still to drive. The number of remaining laps is determined by the remaining stint, session or driver time, but of course is also limited by the remaining fuel. |
 | Weather | You will get information about the current and upcoming weather. |
 | Position | Cato will tell you your current position. |
-| LapTimes | You will be given information about your average lap time and those of your direct opponents. |
+| LapTime | You will be given information about your last lap time. |
+| LapTimes | You will be given information about your last lap time and those of your direct opponents. |
 | ActiveCars | Cato will give you information about the number of cars in the session. In a multi-class or multi-category session additional information will be given on the number of cars in your own class as well. |
 | GapToAhead [Standings, Track] | Cato will tell you the gap in seconds to the car one position ahead of you or to the car directly in front of you. If you don't supply *Standings* or *Track*, it will default to *Standings*. Please note, that for compatibility reasons, *GapToFront* is supported as well. |
 | GapToBehind [Standings, Track] | Cato will tell you the gap in seconds to the car one position behind you or to the car directly behind you. If you don't supply *Standings* or *Track*, it will default to *Standings*. |
@@ -444,7 +445,8 @@ Please see the following table for available information commands.
 | ------ | ------ |
 | Time | You will be told the current time of your local computer. |
 | Position | Elisa will tell you your current position. |
-| LapTimes | You will be given information about your average lap time and those of your direct opponents. |
+| LapTime | You will be given information about your last lap time. |
+| LapTimes | You will be given information about your last lap time and those of your direct opponents. |
 | ActiveCars | Elisa will give you information about the number of cars in the session. In a multi-class or multi-category session additional information will be given on the number of cars in your own class as well. |
 | GapToAhead [Standings, Track] | Elisa will tell you the gap in seconds to the car one position ahead of you or to the car directly in front of you. If you don't supply *Standings* or *Track*, it will default to *Standings*. |
 | GapToBehind [Standings, Track] | Elisa will tell you the gap in seconds to the car one position behind you or to the car directly behind you. If you don't supply *Standings* or *Track*, it will default to *Standings*. |
@@ -1236,6 +1238,13 @@ The content of the JSON file looks like this (depending on the current situation
 				"State": "Active"
 			},
 			"Session": "Race"
+		},
+		"Automation": {
+			"Automation": "Dry",
+			"Car": "McLaren 720S GT3",
+			"Session": "Race",
+			"Simulator": "Assetto Corsa Competizione",
+			"State": "Active"
 		},
 		"Brakes": {
 			"Temperatures": [

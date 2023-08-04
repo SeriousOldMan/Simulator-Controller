@@ -12,5 +12,5 @@ Changes=Many bug fixes in "Practice Center", Better last lap detection in timed 
 [Current]
 Type=Release
 [Version]
-Development=5.2.1.0-beta
+Development=5.2.1.0-release
 Release=5.2.1.0-release

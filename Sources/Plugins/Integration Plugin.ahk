@@ -342,6 +342,64 @@ class IntegrationPlugin extends ControllerPlugin {
 		return state
 	}
 
+	updateControllerState(sessionState, controllerState) {
+		local assistantsState := Map()
+		local teamServerState := Map()
+		local ignore, property, key, value, state, configuration
+
+		for key, state in getMultiMapValues(controllerState, "Race Assistants") {
+			if ((key = "Mode") || (key = "Session"))
+				assistantsState[key] := translate(state)
+			else {
+				if !assistantsState.Has(key)
+					assistantsState[key] := Map()
+
+				if (state = "Active")
+					assistantsState[key]["State"] := "Active"
+				else if (state = "Waiting")
+					assistantsState[key]["State"] := "Wait"
+				else if (state = "Shutdown")
+					assistantsState[key]["State"] := "Finished"
+				else
+					assistantsState[key]["State"] := "Disabled"
+
+				assistantsState[key]["Muted"] := (getMultiMapValue(controllerState, key, "Muted", false) ? kTrue : kFalse)
+
+				configuration := readMultiMap(kTempDirectory . key . ".state")
+
+				if (getMultiMapValue(configuration, "Voice", "Muted", false) || !getMultiMapValue(configuration, "Voice", "Speaker", true))
+					assistantsState[key]["Muted"] := kTrue
+			}
+		}
+
+		sessionState["Assistants"] := assistantsState
+
+		state := getMultiMapValue(controllerState, "Team Server", "State", "Disabled")
+
+		if ((state != "Unknown") && (state != "Disabled")) {
+			for ignore, property in string2Values(";", getMultiMapValue(controllerState, "Team Server", "Properties")) {
+				property := StrSplit(property, ":", " `t", 2)
+
+				state[property[1]] := property[2]
+			}
+
+			teamServerState["Server"] := state["ServerURL"]
+			teamServerState["Token"] := state["SessionToken"]
+			teamServerState["Team"] := state["Team"]
+			teamServerState["Driver"] := state["Driver"]
+			teamServerState["Session"] := state["Session"]
+		}
+		else {
+			teamServerState["Server"] := kNull
+			teamServerState["Token"] := kNull
+			teamServerState["Team"] := kNull
+			teamServerState["Driver"] := kNull
+			teamServerState["Session"] := kNull
+		}
+
+		sessionState["TeamServer"] := teamServerState
+	}
+
 	updateSessionState() {
 		local hasUpdate := false
 		local sessionInfo, sessionState, ignore, assistant, fileName
@@ -375,6 +433,8 @@ class IntegrationPlugin extends ControllerPlugin {
 							  , "Strategy", this.createStrategyState(sessionInfo)
 							  , "Pitstop", this.createPitstopState(sessionInfo)
 							  , "Standings", this.createStandingsState(sessionInfo))
+
+			this.updateControllerState(sessionState, readMultiMap(kTempDirectory . "Simulator Controller.state"))
 
 			fileName := temporaryFileName("Session State", "json")
 

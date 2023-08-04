@@ -178,20 +178,25 @@ class JSON {
 			return escape_str(obj)
 
 		escape_str(obj) {
+			obj := StrReplace(obj,"\","\\")
+			obj := StrReplace(obj,"`t","\t")
+			obj := StrReplace(obj,"`r","\r")
+			obj := StrReplace(obj,"`n","\n")
+			obj := StrReplace(obj,"`b","\b")
+			obj := StrReplace(obj,"`f","\f")
+			obj := StrReplace(obj,"/","\/")
+			obj := StrReplace(obj,'"','\"')
+
 			if (obj = kNull)
 				return "null"
-			else {
-				obj := StrReplace(obj,"\","\\")
-				obj := StrReplace(obj,"`t","\t")
-				obj := StrReplace(obj,"`r","\r")
-				obj := StrReplace(obj,"`n","\n")
-				obj := StrReplace(obj,"`b","\b")
-				obj := StrReplace(obj,"`f","\f")
-				obj := StrReplace(obj,"/","\/")
-				obj := StrReplace(obj,'"','\"')
-
+			else if isNumber(obj)
+				return obj
+			else if (obj = kTrue)
+				return "true"
+			else if (obj = kFalse)
+				return "false"
+			else
 				return '"' obj '"'
-			}
 		}
 	}
 }

@@ -3063,7 +3063,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	importSetups(fileName, clear) {
-		local directory, ignore, entry
+		local directory, ignore, entry, candidate, forName, surName, cForName, cSurName, found
 
 		if clear
 			this.SessionStore.clear("Setups.Data")
@@ -3081,11 +3081,26 @@ class RaceCenter extends ConfigurationItem {
 			}
 
 			for ignore, entry in Database(directory . "\", kSessionDataSchemas).Tables["Setups.Data"] {
-				if !inList(getKeys(this.SessionDrivers), entry["Driver"]) {
-					entry.Clone()
+				entry := entry.Clone()
 
-					entry["Driver"] := "John Doe (JD)"
+				parseDriverName(entry["Driver"], &forName, &surName, &ignore := false)
+
+				found := false
+
+				for ignore, candidate in getKeys(this.SessionDrivers) {
+					parseDriverName(candidate, &cForName, &cSurName, &ignore := false)
+
+					if ((forName = cForName) && (surName = cSurName)) {
+						entry["Driver"] := candidate
+
+						found := true
+
+						break
+					}
 				}
+
+				if !found
+					entry["Driver"] := "John Doe (JD)"
 
 				this.SessionStore.add("Setups.Data", entry)
 			}

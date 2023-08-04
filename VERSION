@@ -1,16 +1,16 @@
 [Development]
-Version=5.2.1.0-beta
+Version=5.2.1.0-release
 Target=5.2.1.0-release
-Date=08/03/2023
-Download=https://www.dropbox.com/s/gqwt1mbxmgf4fpk/Simulator%20Controller%205.2.1.0-beta.zip?dl=1
+Date=08/04/2023
+Download=https://cutt.ly/XwdsMjAh;https://www.dropbox.com/s/1hizqd3znejv4jr/Simulator%20Controller%205.2.1.0-release.zip?dl=1
 Changes=Many bug fixes in "Practice Center", Better last lap detection in timed races, Spotter now announces the last lap, Fixed "Invalid" column in "Race Center", Fixed support for RaceRoom Racing Experience, Fixed tyre wear for RaceRoom Racing Experience, Fixed Stream Deck plugin, Support for a couple of new fields in the simulator data files, Telemetry charts in "Race Center" and "Practice Center" apply unit conversion correctly, New data summary report in "Practice Center", Updated AMS2 API to version 13, New car models for "Setup Workbench", Experimental integration of a plugin to publish Simulator Controller state to external apps, Standings info widget in "Session Monitor" now also shows the observed opponent, New stints summary report in "Practice Center", Fixed SFX-100 motion intensity controller
 [Release]
-Version=5.2.0.0-release
-Date=07/28/2023
-Download=https://cutt.ly/ZwaKV25j;https://www.dropbox.com/s/ypr9x9gf0o2tw34/Simulator%20Controller%205.2.0.0-release.zip?dl=1
-Changes=New tool "PracticeCenter", New controller action function "openPracticeCenter", New plugin argument "openPracticeCenter" for "Race Engineer" and "Race Strategist" plugins, Added in "Invalid" column for the "Car" report in "Race Reports", Added in "Invalid" column for the *Laps* list in "Race Center", New car models for "Setup Workbench"
+Version=5.2.1.0-release
+Date=08/04/2023
+Download=https://cutt.ly/XwdsMjAh;https://www.dropbox.com/s/1hizqd3znejv4jr/Simulator%20Controller%205.2.1.0-release.zip?dl=1
+Changes=Many bug fixes in "Practice Center", Better last lap detection in timed races, Spotter now announces the last lap, Fixed "Invalid" column in "Race Center", Fixed support for RaceRoom Racing Experience, Fixed tyre wear for RaceRoom Racing Experience, Fixed Stream Deck plugin, Support for a couple of new fields in the simulator data files, Telemetry charts in "Race Center" and "Practice Center" apply unit conversion correctly, New data summary report in "Practice Center", Updated AMS2 API to version 13, New car models for "Setup Workbench", Experimental integration of a plugin to publish Simulator Controller state to external apps, Standings info widget in "Session Monitor" now also shows the observed opponent, New stints summary report in "Practice Center", Fixed SFX-100 motion intensity controller
 [Current]
-Type=Development
+Type=Release
 [Version]
 Development=5.2.1.0-beta
-Release=5.2.0.0-release
+Release=5.2.1.0-release

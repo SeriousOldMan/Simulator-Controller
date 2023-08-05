@@ -675,6 +675,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 		super.__New(controller, name, configuration, register)
 
+		deleteFile(kTempDirectory . this.Plugin . " Session.state")
+
 		if !RaceAssistantPlugin.sTeamServer {
 			if isSet(kTeamServerPlugin) {
 				teamServer := this.Controller.findPlugin(kTeamServerPlugin)

@@ -2644,7 +2644,11 @@ class RaceEngineer extends RaceAssistant {
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
 		if this.RemoteHandler
-			this.RemoteHandler.setPitstopTyrePressures(pitstopNumber, Round(pressureFL, 1), Round(pressureFR, 1), Round(pressureRL, 1), Round(pressureRR, 1))
+			if (pressureFL && isNumber(pressureFL)
+			 && pressureFR && isNumber(pressureFR)
+			 && pressureRL && isNumber(pressureRL)
+			 && pressureRR && isNumber(pressureRR))
+				this.RemoteHandler.setPitstopTyrePressures(pitstopNumber, Round(pressureFL, 1), Round(pressureFR, 1), Round(pressureRL, 1), Round(pressureRR, 1))
 	}
 
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine) {

@@ -3857,10 +3857,22 @@ class RaceCenter extends ConfigurationItem {
 				this.driverReferencePressure(nextDriver, weather, airTemperature, trackTemperature, tyreCompound, tyreCompoundColor
 										   , &nextBasePressureFL, &nextBasePressureFR, &nextBasePressureRL, &nextBasePressureRR)
 
-				deltaFL := (nextBasePressureFL - currentBasePressureFL)
-				deltaFR := (nextBasePressureFR - currentBasePressureFR)
-				deltaRL := (nextBasePressureRL - currentBasePressureRL)
-				deltaRR := (nextBasePressureRR - currentBasePressureRR)
+				if (isNumber(nextBasePressureFL) && (currentBasePressureFL))
+					deltaFL := (nextBasePressureFL - currentBasePressureFL)
+				else
+					deltaFL := 0
+				if (isNumber(nextBasePressureFR) && (currentBasePressureFR))
+					deltaFR := (nextBasePressureFR - currentBasePressureFR)
+				else
+					deltaFR := 0
+				if (isNumber(nextBasePressureRL) && (currentBasePressureRL))
+					deltaRL := (nextBasePressureRL - currentBasePressureRL)
+				else
+					deltaRL := 0
+				if (isNumber(nextBasePressureRR) && (currentBasePressureRR))
+					deltaRR := (nextBasePressureRR - currentBasePressureRR)
+				else
+					deltaRR := 0
 
 				return true
 			}
@@ -3898,10 +3910,14 @@ class RaceCenter extends ConfigurationItem {
 
 				if this.driverPressureDelta(currentDriver, nextDriver, weather, airTemperature, trackTemperature, tyreCompound, tyreCompoundColor
 										  , &deltaFL, &deltaFR, &deltaRL, &deltaRR) {
-					flPressure += deltaFL
-					frPressure += deltaFR
-					rlPressure += deltaRL
-					rrPressure += deltaRR
+					if isNumber(flPressure)
+						flPressure += deltaFL
+					if isNumber(frPressure)
+						frPressure += deltaFR
+					if isNumber(rlPressure)
+						rlPressure += deltaRL
+					if isNumber(rrPressure)
+						rrPressure += deltaRR
 				}
 			}
 			else
@@ -3917,6 +3933,15 @@ class RaceCenter extends ConfigurationItem {
 				if this.TyrePressureMode
 					this.adjustPitstopTyrePressures(this.TyrePressureMode, this.Weather, this.AirTemperature, this.TrackTemperature
 												  , tyreCompound, tyreCompoundColor, &flPressure, &frPressure, &rlPressure, &rrPressure)
+
+				if !isNumber(flPressure)
+					flPressure := false
+				if !isNumber(frPressure)
+					frPressure := false
+				if !isNumber(rlPressure)
+					rlPressure := false
+				if !isNumber(rrPressure)
+					rrPressure := false
 			}
 			else {
 				tyreCompoundColor := false
@@ -3937,10 +3962,10 @@ class RaceCenter extends ConfigurationItem {
 
 				this.Control["pitstopTyreCompoundDropDown"].Choose((chosen == 0) ? 1 : chosen)
 
-				this.Control["pitstopPressureFLEdit"].Text := displayValue("Float", convertUnit("Pressure", flPressure))
-				this.Control["pitstopPressureFREdit"].Text := displayValue("Float", convertUnit("Pressure", frPressure))
-				this.Control["pitstopPressureRLEdit"].Text := displayValue("Float", convertUnit("Pressure", rlPressure))
-				this.Control["pitstopPressureRREdit"].Text := displayValue("Float", convertUnit("Pressure", rrPressure))
+				this.Control["pitstopPressureFLEdit"].Text := (isNumber(flPressure) ? displayValue("Float", convertUnit("Pressure", flPressure)) : "")
+				this.Control["pitstopPressureFREdit"].Text := (isNumber(frPressure) ? displayValue("Float", convertUnit("Pressure", frPressure)) : "")
+				this.Control["pitstopPressureRLEdit"].Text := (isNumber(rlPressure) ? displayValue("Float", convertUnit("Pressure", rlPressure)) : "")
+				this.Control["pitstopPressureRREdit"].Text := (isNumber(rrPressure) ? displayValue("Float", convertUnit("Pressure", rrPressure)) : "")
 			}
 			else {
 				this.Control["pitstopTyreCompoundDropDown"].Choose(1)
@@ -6731,7 +6756,7 @@ class RaceCenter extends ConfigurationItem {
 		local nextDriver := false
 		local session, lap, fuel, tyreCompound, tyreCompoundColor, tyreSet
 		local pressureFL, pressureFR, pressureRL, pressureRR, repairBodywork, repairSuspension, repairEngine
-		local pressures, displayPressures, displayFuel, driverRequest, tries, pitstopNr, stint
+		local pressures, displayPressures, displayFuel, driverRequest, tries, pitstopNr, stint, hasPlanned
 
 		loop this.PitstopsListView.GetCount()
 			if (this.PitstopsListView.GetNext(A_Index - 1, "C") != A_Index) {
@@ -6905,9 +6930,21 @@ class RaceCenter extends ConfigurationItem {
 				if (state && (state != "")) {
 					state := parseMultiMap(state)
 
+					hasPlanned := false
+
+					loop this.PitstopsListView.GetCount()
+						if (this.PitstopsListView.GetNext(A_Index - 1, "C") != A_Index) {
+							this.PitstopsListView.Delete(A_Index)
+
+							hasPlanned := true
+
+							break
+						}
+
+
 					pitstopNr := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Nr", false)
 
-					if (pitstopNr && (pitstopNr > this.PitstopsListView.GetCount())) {
+					if (pitstopNr && ((pitstopNr > this.PitstopsListView.GetCount()) || hasPlanned)) {
 						newData := true
 
 						lap := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Lap", "-")
@@ -6970,13 +7007,6 @@ class RaceCenter extends ConfigurationItem {
 						}
 						else
 							displayFuel := fuel
-
-						loop this.PitstopsListView.GetCount()
-							if (this.PitstopsListView.GetNext(A_Index - 1, "C") != A_Index) {
-								this.PitstopsListView.Delete(A_Index)
-
-								break
-							}
 
 						this.PitstopsListView.Add("", this.PitstopsListView.GetCount() + 1, (lap = "-") ? "-" : (lap + 1), displayNullValue(nextDriver), displayFuel
 													, (tyreCompound = "-") ? tyreCompound : translate(compound(tyreCompound, tyreCompoundColor)), ((tyreSet = 0) ? "-" : tyreSet)

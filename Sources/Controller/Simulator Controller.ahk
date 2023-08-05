@@ -815,6 +815,8 @@ class SimulatorController extends ConfigurationItem {
 			fnController.hide()
 			fnController.show()
 		}
+
+		this.setModes(simulator)
 	}
 
 	simulatorShutdown(simulator) {
@@ -833,6 +835,8 @@ class SimulatorController extends ConfigurationItem {
 			fnController.hide()
 			fnController.show()
 		}
+
+		this.setModes()
 	}
 
 	startSimulator(application, splashImage := false) {

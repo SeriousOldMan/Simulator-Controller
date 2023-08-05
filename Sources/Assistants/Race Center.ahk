@@ -1700,7 +1700,7 @@ class RaceCenter extends ConfigurationItem {
 			OnMessage(0x44, translateSaveCancelButtons, 0)
 
 			if (fileName != "") {
-				if !InStr(fileName, ".")
+				if !InStr(fileName, ".setups")
 					fileName := (fileName . ".setups")
 
 				center.saveSetups(true)

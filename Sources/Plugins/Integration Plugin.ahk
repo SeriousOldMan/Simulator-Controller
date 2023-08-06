@@ -41,11 +41,11 @@ class IntegrationPlugin extends ControllerPlugin {
 	}
 
 	__New(controller, name, configuration := false) {
+		super.__New(controller, name, configuration)
+
 		this.iStateFile := this.getArgumentValue("stateFile", kTempDirectory . "Session State.json")
 
 		deleteFile(this.StateFile)
-
-		super.__New(controller, name, configuration)
 
 		if (this.Active || isDebug()) {
 			this.iAssistantsStateTask := PeriodicTask(ObjBindMethod(this, "updateSessionState"), 1000, kLowPriority)

@@ -357,6 +357,8 @@ The "Data" tab will give you an overview of what data you have collected during 
 
 Using the "Data" menu, you can choose between the different weather conditions and available tyre compounds, thereby identifying possible gaps in your data collection that need to be filled with a specific practice run.
 
+The choices (except tyre compounds) will be remembered between different runs of "Practice Center".
+
 ### Exporting data to the session database
 
 At the end of your session, you can decide which data should be transfered to the session database by clicking the small check marks for each lap in the list of driven laps. "Practice Center" will already have selected by default all valid laps for your convinience. Then choose the command "Export to Database" from the "Session" menu.

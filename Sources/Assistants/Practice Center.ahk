@@ -922,11 +922,17 @@ class PracticeCenter extends ConfigurationItem {
 	}
 
 	__New(configuration, raceSettings, simulator := false, car := false, track := false) {
+		local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
 		this.iSimulator := simulator
 		this.iCar := car
 		this.iTrack := track
 
 		this.iSessionDirectory := (kTempDirectory . "Sessions\Practice\")
+
+		this.UseSessionData := getMultiMapValue(settings, "Practice Center", "UseSessionData", true)
+		this.UseTelemetryDatabase := getMultiMapValue(settings, "Practice Center", "UseTelemetryDatabase", false)
+		this.iDataWeather := getMultiMapValue(settings, "Practice Center", "Weather", "Dry")
 
 		super.__New(configuration)
 
@@ -2126,13 +2132,25 @@ class PracticeCenter extends ConfigurationItem {
 	chooseDataMenu(line) {
 		local tyreCompound, tyreCompoundColor
 
+		updateSetting(setting, value) {
+			local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+			setMultiMapValue(settings, "Practice Center", setting, value)
+
+			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+		}
+
 		switch line {
 			case 3:
 				this.UseSessionData := !this.UseSessionData
 
+				updateSetting("UseSessionData", this.UseSessionData)
+
 				this.analyzeTelemetry()
 			case 4:
 				this.UseTelemetryDatabase := !this.UseTelemetryDatabase
+
+				updateSetting("UseTelemetryDatabase", this.UseTelemetryDatabase)
 
 				this.analyzeTelemetry()
 			default:
@@ -2140,6 +2158,8 @@ class PracticeCenter extends ConfigurationItem {
 
 				if ((line > 0) && (line <= kWeatherConditions.Length)) {
 					this.iDataWeather := kWeatherConditions[line]
+
+					updateSetting("Weather", this.Weather["Data"])
 
 					this.analyzeTelemetry()
 				}
@@ -2335,7 +2355,6 @@ class PracticeCenter extends ConfigurationItem {
 		this.iTyreCompound := "Dry"
 		this.iTyreCompoundColor := "Black"
 
-		this.iDataWeather := "Dry"
 		this.iDataTyreCompound := "Dry"
 		this.iDataTyreCompoundColor := "Black"
 

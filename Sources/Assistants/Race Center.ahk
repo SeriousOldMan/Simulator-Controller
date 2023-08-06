@@ -2957,7 +2957,7 @@ class RaceCenter extends ConfigurationItem {
 		local correct4 := (this.SelectTyreSet ? "(x) Select tyre set" : "      Select tyre set")
 
 		this.Control["pitstopMenuDropDown"].Delete()
-		this.Control["pitstopMenuDropDown"].Add(collect(["Pitstop", "---------------------------------------------", "Select Team...", "---------------------------------------------", "Initialize from Session", "Load from Database...", "Clear Setups...", "---------------------------------------------", "Setups Summary", "Pitstops Summary", "---------------------------------------------", correct1, correct2, correct3, "---------------------------------------------", "Instruct Engineer"], translate))
+		this.Control["pitstopMenuDropDown"].Add(collect(["Pitstop", "---------------------------------------------", "Select Team...", "---------------------------------------------", "Initialize from Session", "Load from Database...", "Clear Setups...", "---------------------------------------------", "Setups Summary", "Pitstops Summary", "---------------------------------------------", correct1, correct2, correct3, correct4, "---------------------------------------------", "Instruct Engineer"], translate))
 
 		this.Control["pitstopMenuDropDown"].Choose(1)
 	}
@@ -3953,8 +3953,6 @@ class RaceCenter extends ConfigurationItem {
 				if (tyreSet > 0)
 					tyreSet += 1
 		}
-
-
 
 		if remote {
 			if tyreCompound {

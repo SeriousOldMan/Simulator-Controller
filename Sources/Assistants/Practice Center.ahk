@@ -2191,7 +2191,7 @@ class PracticeCenter extends ConfigurationItem {
 			return function.Call(arguments*)
 		}
 		catch Any as exception {
-			logError(exception, false)
+			logError(exception, true)
 
 			OnMessage(0x44, translateOkButton)
 			MsgBox((translate("Error while executing command.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)

@@ -101,14 +101,6 @@ When you head out onto the track, you must decide, whether you want this session
 And now the important stuff: To declare, that you want to join a team session, you must use the corresponding [action from the "Team Server" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-team-server). For your convinience, it is also possible, to always enable team sessions using the action declaration of this plugin or using the corresponding preset in "Simulator Setup", but I don't recommend that, since you might end up being part of a session, you are not planned for. And finally, you can use the tray menu of the Simulator Controller application as an alternative to declare an action to enable the Team Server with a button on your Button Box or Steering Wheel.
 
 Note: Simulator Controller detects a valid team session configuration upon startup, it will open a notification window and will show you the configuration of this session (either when the Team Server is enabled by default, or later, when you enable the Team Server using the corresponding button). If you missed this notification, you can still check whether the team mode is currently active, when you hover over the small cog wheel icon of Simulator Controller in the task bar. If Simulator Controller is enabled for a team session, the tooltip will show "Simulator Controller (Team)". When no valid team session could be established, the tooltip will read "Simulator Controller (Team) - Invalid". Also, the *Team Server* item in the right mouse menu of the tray icon will be checked.
-
-### Special notes
-
-Every simulation game is unique and handles multiplayer team races different. Therefore, you have to be aware of the individual drawbacks and specialities. In this section I will provide a growing collection of hints and special operation tipps for all the individual simulations, whenever I stumble over them. When you found some specialities on your own, please feel free to share them with me, and I will be happy to add them to this section as well.
-
-#### Assetto Corsa Competizione
-
-  1. *Assetto Corsa Competizione* looses the knowledge about the currently selected repair options in the Pitstop MFD sometimes after a driver swap. The internal selection state of the ["ACC" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-acc) will therefore be reset to the selection during the last pitstop of the previous driver, but this might not reflect the internal state of the Pitstop MFD of the current driver. This means, that you have to open the Pitstop MFD and check both repair options, after the next pitstop has been planned. If you have to correct one or both settings, you must do this **without** the help and control of the ["Pitstop" mode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-pitstop) of the "ACC" plugin. So do not use your Button Box here. 
   
 ## Race Center
 
@@ -141,6 +133,10 @@ It is no problem, to reuse a session for many races, because the old data (excep
 It is obvious, that it is **not** a good idea to use the same session in more than one race at the same time.
 
 Important: Although it is possible and I have done it on my own for several races longer than 6 hours, I do not recommend to run "Race Center" on the same PC where your simulation runs. Sevaral operations, for example updating the strategy using extensive traffic simulation will consume quite a lot of memory and CPU-cycles. This might interfere with the memory requirements of your running simulator and might lead to decreased frame rates and - in very worse cases - to freezes due to shortage of memory. Therefore, I strongly recommend using a laptop or another separate PC, that sits aside your simulation rig, for the "Race Center" operation.
+
+#### Connection failures
+
+The Team Server connection is based on http and implements a sophisticated retry strategy. Most of the time, it will recover without notice. More severe is the behaviour of the simulation game itself after an internet failure and it heavily depends on the simulation, whether you may continue your session. In any case, I stronlgy recommend to reload the session in the "Race Center" after the car is back on the road and has crossed the start/finish line for the first time after the failure, since a couple of items in the history, for example the number of pitstops, migh be wrong otherwise.
 
 #### Session Data Management
 
@@ -332,6 +328,8 @@ Using the elements on the "Pitstops" tab, any team member can prepare the next p
 
 Especially before selecting the tyre pressures, you might want to analyze the data as described above. But you may also use the "Initialize from Session" command from the "Pitstop" menu, which will select the next driver according to the stint plam (make sure, that your plan is correct), and then it will use the values, that are currently recommended by Jona, the Virtual Race Engineer, for tyre pressures and correct them for the next driver as described below. The recommended pitstop lap and the amount of fuel to be added, will be taken from the strategy, or from the stint plan, in that order. In situations, where the conditions change dramatically, for example an upcoming thunderstorm, you can also load the tyre data from the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--session-database) using the "Load from Database..." command, when you think that you might have cold pressure information available from previous sessions in comparable conditions.
 
+Some simulators not only provide different tyre compounds for a given car, but also manage a number of available tyre sets for each compound, where this number might differ between different events or sessions. When initializing a pitstop, the next unused tyre set number for the given compound will be automatically calculated in most cases and will be entered in the "Tyre Set" field (you can enable or disable the automatic tyre set selection in the "Pitstop" menu). Always double check the value here, or you might end up with worn tyres on the wheels. Please note, that *Assetto Corsa Competizione* provide a kind of automatic selection, which only works reliable, when using the same compound as in the last stint. Set "Tyre Set" to **0** in this case.
+
 You can also choose between two different methods to further adjust tyre pressures, when swapping drivers, as described in the previous section:
 
   1. Reference
@@ -406,6 +404,14 @@ You probably already have used the Race Engineer to plan and prepare a pitstop d
    But there are, of course, exceptions which cannot be handled automatically. One notable exception might be an unplanned stop due to unexpected weather changes or a heavy crash. In some cases, especially when there is not enough data already available in the "Race Center" for the upcoming weather conditions, the stop will planned by the Race Engineer locally, which means that the current driver will stay in the car. But it is of course possible to plan the pitstop using the "Race Center" manually by your team mate in this case as well. Another exception might be a deviation from the stint plan or the current strategy due to an absent driver or an unexpected disconnect. You might adopt the plan or the strategy before proceeding, but there might not be enough time to do this. In the later case, try to adopt the stint plan and the strategy to the new situation afterwards and check whether everything picks up the new conditions.
    
    Please note, that whenever a strategy has been revised, either locally in the "Race Center" or by the Race Strategist at the current drivers site, you should check and possibly update the Stint Plan as well, since data taken from the strategy like refuel amount might have changed.
+
+#### Special notes
+
+Every simulation game is unique and handles multiplayer team races differently. Therefore, you have to be aware of the individual drawbacks and specialities. In this section I will provide a growing collection of hints and special operation tipps for all the individual simulations, whenever I stumble over them. When you found some specialities on your own, please feel free to share them with me, and I will be happy to add them to this section as well.
+
+##### Assetto Corsa Competizione
+
+  1. *Assetto Corsa Competizione* provides tyre set identification for dry tyres. Unfortunately, information about the state of the tyre sets is not available through the data API. The "Race Center will do its best to select the next fresh tyre set for the next pitstop, but always double check, especially when switching from wet to dry tyres, since in this case *Assetto Corsa Competizione* will reset the next tyre set number back to 1. *Assetto Corsa Competizione* also provides a kind of automatic mode to select the next free tyre set on its own. To use this, disable the calculation of the "Race Center" in the "Pitstop" menu or set the "Tyre Set" field to zero. But be aware, that this might fail, if you switch from wet to dry tyres due to a bug in *Assetto Corsa Competizione*.
   
 ## Server Administration
 

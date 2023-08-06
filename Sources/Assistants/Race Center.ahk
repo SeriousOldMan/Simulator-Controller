@@ -59,7 +59,7 @@ global kDetailReports := ["Plan", "Stint", "Lap", "Session", "Drivers", "Strateg
 
 global kSessionDataSchemas := CaseInsenseMap("Stint.Data", ["Nr", "Lap", "Driver.Forname", "Driver.Surname", "Driver.Nickname"
 														  , "Weather", "Compound", "Lap.Time.Average", "Lap.Time.Best", "Fuel.Consumption", "Accidents"
-														  , "Position.Start", "Position.End", "Time.Start", "Driver.ID", "Penalties", "Time.End"]
+														  , "Position.Start", "Position.End", "Time.Start", "Driver.ID", "Penalties", "Time.End", "TyreSet"]
 										   , "Driver.Data", ["Forname", "Surname", "Nickname", "Nr", "ID"]
 										   , "Lap.Data", ["Stint", "Nr", "Lap", "Lap.Time", "Position", "Grip", "Map", "TC", "ABS"
 														, "Weather", "Temperature.Air", "Temperature.Track"
@@ -279,6 +279,7 @@ class RaceCenter extends ConfigurationItem {
 
 	iTyrePressureMode := "Reference"
 	iCorrectPressureLoss := false
+	iSelectTyreSet := true
 
 	iSessionStore := false
 	iTelemetryDatabase := false
@@ -1052,6 +1053,12 @@ class RaceCenter extends ConfigurationItem {
 	CorrectPressureLoss {
 		Get {
 			return this.iCorrectPressureLoss
+		}
+	}
+
+	SelectTyreSet {
+		Get {
+			return this.iSelectTyreSet
 		}
 	}
 
@@ -2947,6 +2954,7 @@ class RaceCenter extends ConfigurationItem {
 		local correct1 := ((this.TyrePressureMode = "Reference") ? "(x) Adjust Pressures (Reference)" : "      Adjust Pressures (Reference)")
 		local correct2 := ((this.TyrePressureMode = "Relative") ? "(x) Adjust Pressures (Relative)" : "      Adjust Pressures (Relative)")
 		local correct3 := (this.CorrectPressureLoss ? "(x) Correct pressure loss" : "      Correct pressure loss")
+		local correct4 := (this.SelectTyreSet ? "(x) Select tyre set" : "      Select tyre set")
 
 		this.Control["pitstopMenuDropDown"].Delete()
 		this.Control["pitstopMenuDropDown"].Add(collect(["Pitstop", "---------------------------------------------", "Select Team...", "---------------------------------------------", "Initialize from Session", "Load from Database...", "Clear Setups...", "---------------------------------------------", "Setups Summary", "Pitstops Summary", "---------------------------------------------", correct1, correct2, correct3, "---------------------------------------------", "Instruct Engineer"], translate))
@@ -3637,7 +3645,7 @@ class RaceCenter extends ConfigurationItem {
 							   , &pitstopLap := false, &pitstopDriver := false, &pitstopRefuel := false, &pitstopTyreSetup := false) {
 		local stint := this.CurrentStint
 		local drivers, index, key, pressuresDB, pressuresTable, last, pressures, coldPressures, pressuresLosses
-		local lap, refuel, tyreCompound, tyreCompoundColor, flPressure, frPressure, rlPressure, rrPressure
+		local lap, refuel, tyreCompound, tyreCompoundColor, tyreSet, flPressure, frPressure, rlPressure, rrPressure
 
 		if stint {
 			drivers := this.getPlanDrivers()
@@ -3703,10 +3711,10 @@ class RaceCenter extends ConfigurationItem {
 				rlPressure := coldPressures[3]
 				rrPressure := coldPressures[4]
 
-				this.initializePitstopTyreSetup(&tyreCompound, &tyreCompoundColor, &flPressure, &frPressure, &rlPressure, &rrPressure, remote)
+				this.initializePitstopTyreSetup(&tyreCompound, &tyreCompoundColor, &tyreSet, &flPressure, &frPressure, &rlPressure, &rrPressure, remote)
 
 				if remote
-					pitstopTyreSetup := [tyreCompound, tyreCompoundColor, flPressure, frPressure, rlPressure, rrPressure]
+					pitstopTyreSetup := [tyreCompound, tyreCompoundColor, tyreSet, flPressure, frPressure, rlPressure, rrPressure]
 			}
 		}
 	}
@@ -3925,8 +3933,28 @@ class RaceCenter extends ConfigurationItem {
 		}
 	}
 
-	initializePitstopTyreSetup(&tyreCompound, &tyreCompoundColor, &flPressure, &frPressure, &rlPressure, &rrPressure, remote := false) {
-		local chosen
+	initializePitstopTyreSetup(&tyreCompound, &tyreCompoundColor, &tyreSet, &flPressure, &frPressure, &rlPressure, &rrPressure, remote := false) {
+		local currentStint := this.CurrentStint
+		local chosen, stint, theCompound
+
+		tyreSet := 0
+
+		if (this.SelectTyreSet && tyreCompound && currentStint) {
+			theCompound := compound(tyreCompound, tyreCompoundColor)
+
+			loop currentStint.Nr
+				if this.Stints.Has(A_Index) {
+					stint := this.Stints[A_Index]
+
+					if ((stint.Compound = theCompound) && stint.TyreSet)
+						tyreSet := Max(tyreSet, stint.TyreSet)
+				}
+
+				if (tyreSet > 0)
+					tyreSet += 1
+		}
+
+
 
 		if remote {
 			if tyreCompound {
@@ -3962,6 +3990,8 @@ class RaceCenter extends ConfigurationItem {
 
 				this.Control["pitstopTyreCompoundDropDown"].Choose((chosen == 0) ? 1 : chosen)
 
+				this.Control["pitstopTyreSetEdit"].Text := tyreSet
+
 				this.Control["pitstopPressureFLEdit"].Text := (isNumber(flPressure) ? displayValue("Float", convertUnit("Pressure", flPressure)) : "")
 				this.Control["pitstopPressureFREdit"].Text := (isNumber(frPressure) ? displayValue("Float", convertUnit("Pressure", frPressure)) : "")
 				this.Control["pitstopPressureRLEdit"].Text := (isNumber(rlPressure) ? displayValue("Float", convertUnit("Pressure", rlPressure)) : "")
@@ -3969,6 +3999,8 @@ class RaceCenter extends ConfigurationItem {
 			}
 			else {
 				this.Control["pitstopTyreCompoundDropDown"].Choose(1)
+
+				this.Control["pitstopTyreSetEdit"].Text := 0
 
 				this.Control["pitstopPressureFLEdit"].Text := ""
 				this.Control["pitstopPressureFREdit"].Text := ""
@@ -4101,13 +4133,13 @@ class RaceCenter extends ConfigurationItem {
 			repairEngine := inList(pitstopRepairs, "Engine")
 		}
 
-		if ((pitstopLap = "") || (pitstopLap <= 0))
+		if (!isNumber(pitstopLap) || (pitstopLap <= 0))
 			pitstopLap := (this.LastLap ? (this.LastLap.Nr + 1) : 1)
 
-		if (pitstopRefuel = "")
+		if !isNumber(pitstopRefuel)
 			pitstopRefuel := 0
 
-		if (pitstopTyreSet = "")
+		if !isNumber(pitstopTyreSet)
 			pitstopTyreSet := 0
 
 		setMultiMapValue(pitstopPlan, "Pitstop", "Lap", pitstopLap)
@@ -4302,8 +4334,8 @@ class RaceCenter extends ConfigurationItem {
 				this.initializePitstopFromSession(lap, true, &pitstopLap, &pitstopDriver, &pitstopRefuel, &pitstopTyreSetup)
 
 				pitstopPlan := this.createPitstopPlan(true, pitstopLap, pitstopDriver, pitstopRefuel,
-															pitstopTyreSetup[1], pitstopTyreSetup[2], false
-														  , pitstopTyreSetup[3], pitstopTyreSetup[4], pitstopTyreSetup[5], pitstopTyreSetup[6]
+															pitstopTyreSetup[1], pitstopTyreSetup[2], pitstopTyreSetup[3]
+														  , pitstopTyreSetup[4], pitstopTyreSetup[5], pitstopTyreSetup[6], pitstopTyreSetup[7]
 														  , pitstopRepairs)
 
 				if pitstopPlan {
@@ -4667,7 +4699,11 @@ class RaceCenter extends ConfigurationItem {
 				this.iCorrectPressureLoss := !this.CorrectPressureLoss
 
 				this.updateState()
-			case 16:
+			case 15:
+				this.iSelectTyreSet := !this.SelectTyreSet
+
+				this.updateState()
+			case 17:
 				this.planPitstop()
 		}
 
@@ -4679,7 +4715,7 @@ class RaceCenter extends ConfigurationItem {
 			return function.Call(arguments*)
 		}
 		catch Any as exception {
-			logError(exception, false)
+			logError(exception, true)
 
 			OnMessage(0x44, translateOkButton)
 			MsgBox((translate("Error while executing command.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
@@ -5857,6 +5893,7 @@ class RaceCenter extends ConfigurationItem {
 
 			lap.Compound := compound(getMultiMapValue(data, "Car Data", "TyreCompound")
 								   , getMultiMapValue(data, "Car Data", "TyreCompoundColor"))
+			lap.TyreSet := getMultiMapValue(data, "Car Data", "TyreSet", false)
 
 			try {
 				tries := ((A_Index == count) ? ((isDebug() || (lap.Nr = 1)) ? 40 : 20) : 1)
@@ -6031,6 +6068,7 @@ class RaceCenter extends ConfigurationItem {
 
 			if (A_Index == 1) {
 				stint.Compound := lap.Compound
+				stint.TyreSet := lap.TyreSet
 				stint.StartPosition := lap.Position
 			}
 			else if (A_Index == numLaps)
@@ -8160,7 +8198,7 @@ class RaceCenter extends ConfigurationItem {
 			driver := this.createDriver({Forname: stint["Driver.Forname"], Surname: stint["Driver.Surname"], Nickname: stint["Driver.Nickname"], ID: stint["Driver.ID"]})
 
 			newStint := {Nr: stint["Nr"], Lap: stint["Lap"], Driver: driver
-					   , Weather: stint["Weather"], Compound: normalizeCompound(stint["Compound"])
+					   , Weather: stint["Weather"], Compound: normalizeCompound(stint["Compound"]), TyreSet: stint["TyreSet"]
 					   , AvgLaptime: stint["Lap.Time.Average"], BestLaptime: stint["Lap.Time.Best"], FuelConsumption: stint["Fuel.Consumption"]
 					   , Accidents: stint["Accidents"], Penalties: stint["Penalties"], StartPosition: stint["Position.Start"], EndPosition: stint["Position.End"]
 					   , StartTime: stint["Time.Start"], EndTime: stint["Time.End"]}
@@ -8170,6 +8208,9 @@ class RaceCenter extends ConfigurationItem {
 
 			if isNull(newStint.EndTime)
 				newStint.EndTime := false
+
+			if isNull(newStint.TyreSet)
+				newStint.TyreSet := false
 
 			driver.Stints.Push(newStint)
 			laps := []
@@ -9921,7 +9962,7 @@ class RaceCenter extends ConfigurationItem {
 
 						stintData := Database.Row("Nr", newStint, "Lap", stint.Lap
 												, "Driver.Forname", stint.Driver.Forname, "Driver.Surname", stint.Driver.Surname, "Driver.Nickname", stint.Driver.Nickname
-												, "Weather", stint.Weather, "Compound", stint.Compound
+												, "Weather", stint.Weather, "Compound", stint.Compound, "TyreSet", stint.TyreSet
 												, "Lap.Time.Average", null(stint.AvgLaptime), "Lap.Time.Best", null(stint.BestLapTime)
 												, "Fuel.Consumption", null(stint.FuelConsumption), "Accidents", stint.Accidents, "Penalties", stint.Penalties
 												, "Position.Start", null(stint.StartPosition), "Position.End", null(stint.EndPosition)
@@ -12204,7 +12245,8 @@ setTyrePressures(tyreCompound, tyreCompoundColor, flPressure, frPressure, rlPres
 	local rCenter := RaceCenter.Instance
 
 	if (rCenter.iPressuresRequest = "Pitstop")
-		rCenter.withExceptionhandler(ObjBindMethod(rCenter, "initializePitstopTyreSetup", &tyreCompound, &tyreCompoundColor, &flPressure, &frPressure, &rlPressure, &rrPressure))
+		rCenter.withExceptionhandler(ObjBindMethod(rCenter, "initializePitstopTyreSetup", &tyreCompound, &tyreCompoundColor, &tyreSet := false
+																						, &flPressure, &frPressure, &rlPressure, &rrPressure))
 	else
 		if (rCenter.SetupsListView.GetNext(0) = rCenter.iPressuresRequest)
 			rCenter.withExceptionhandler(ObjBindMethod(rCenter, "initializeSetup", tyreCompound, tyreCompoundColor, flPressure, frPressure, rlPressure, rrPressure))

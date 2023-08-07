@@ -2057,7 +2057,8 @@ class PracticeCenter extends ConfigurationItem {
 
 		this.Control["dataMenuDropDown"].Delete()
 		this.Control["dataMenuDropDown"].Add(concatenate(collect(["Data", "---------------------------------------------"
-																		, use1, use2, "---------------------------------------------"], translate)
+																, "Run Sheet...", "---------------------------------------------"
+																, use1, use2, "---------------------------------------------"], translate)
 													   , wConditions, [translate("---------------------------------------------")]
 													   , tyreCompounds, collect(["---------------------------------------------", "Data Summary"], translate)))
 
@@ -2068,7 +2069,7 @@ class PracticeCenter extends ConfigurationItem {
 		this.Control["runMenuDropDown"].Delete()
 
 		if ((this.SessionActive || !this.SessionMode) && !this.SessionExported)
-			this.Control["runMenuDropDown"].Add(collect(["Stints", "---------------------------------------------", "New Stint", "Recommend Stint...", "---------------------------------------------", "Stints Summary"], translate))
+			this.Control["runMenuDropDown"].Add(collect(["Stints", "---------------------------------------------", "New Stint", "---------------------------------------------", "Stints Summary"], translate))
 		else
 			this.Control["runMenuDropDown"].Add(collect(["Stints", "---------------------------------------------", "Stints Summary"], translate))
 
@@ -2142,16 +2143,18 @@ class PracticeCenter extends ConfigurationItem {
 		local tyreCompound, tyreCompoundColor
 
 		switch line {
-			case 3:
+			case 3: ; Recommend...
+				this.withExceptionhandler(ObjBindMethod(this, "recommendDataRun", true))
+			case 5:
 				this.UseSessionData := !this.UseSessionData
 
 				this.analyzeTelemetry()
-			case 4:
+			case 6:
 				this.UseTelemetryDatabase := !this.UseTelemetryDatabase
 
 				this.analyzeTelemetry()
 			default:
-				line -= 5
+				line -= 7
 
 				if ((line > 0) && (line <= kWeatherConditions.Length)) {
 					this.iDataWeather := kWeatherConditions[line]
@@ -2191,9 +2194,7 @@ class PracticeCenter extends ConfigurationItem {
 						MsgBox(translate("You must have manual stint mode enabled to create a new stint manually."), translate("Information"), 262192)
 						OnMessage(0x44, translateOkButton, 0)
 					}
-				case 4: ; Recommend...
-					this.withExceptionhandler(ObjBindMethod(this, "recommendDataRun", true))
-				case 6:
+				case 5:
 					this.showRunsSummary()
 			}
 		}
@@ -6836,13 +6837,15 @@ recommendDataRun(centerOrCommand := false, arguments*) {
 					text .= substituteVariables(translate("3. Go to the track and run a couple of clean laps in race speed. %laps% laps will be perfect, but it is Ok to run a few less.")
 											  , {laps: string2Values("-", listView.GetText(line, 2))[2] - string2Values("-", listView.GetText(line, 2))[1]})
 
+					text .= "`n`n"
+
 					text .= translate("4. Make sure to select the typical engine map for the given weather conditions and mounted tyres for the practice stint.")
 				}
 
 				recoGui["recommendationText"].Text := text
 			}
 			else
-				recoGui["recommendationText"].Text := text
+				recoGui["recommendationText"].Text := ""
 		}
 	}
 	else {
@@ -6860,7 +6863,7 @@ recommendDataRun(centerOrCommand := false, arguments*) {
 
 			recoGui.SetFont("s9 Norm", "Arial")
 
-			recoGui.Add("Documentation", "x106 YP+20 w164 Center", translate("Recommend Practice")
+			recoGui.Add("Documentation", "x106 YP+20 w164 Center", translate("Run Sheet")
 									   , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#recommend-practice-run")
 
 			recoGui.SetFont("s8 Norm", "Arial")
@@ -6883,11 +6886,11 @@ recommendDataRun(centerOrCommand := false, arguments*) {
 
 			recoGui.SetFont("Bold", "Arial")
 
-			recoGui.Add("Text", "x45 yp+145 w320 h200 vrecommendationText")
+			recoGui.Add("Text", "x45 yp+145 w320 h240 vrecommendationText")
 
 			recoGui.SetFont("Norm", "Arial")
 
-			recoGui.Add("Text", "x8 yp+205 w360 0x10")
+			recoGui.Add("Text", "x8 yp+245 w360 0x10")
 
 			recoGui.Add("Button", "x152 yp+10 w80 h23 Default", translate("Close")).OnEvent("Click", recommendDataRun.Bind(kClose))
 

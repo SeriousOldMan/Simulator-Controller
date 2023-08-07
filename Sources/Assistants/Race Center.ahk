@@ -4758,16 +4758,19 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	withExceptionHandler(function, arguments*) {
-		try {
+		if isDevelopment()
 			return function.Call(arguments*)
-		}
-		catch Any as exception {
-			logError(exception, true)
+		else
+			try {
+				return function.Call(arguments*)
+			}
+			catch Any as exception {
+				logError(exception, true)
 
-			OnMessage(0x44, translateOkButton)
-			MsgBox((translate("Error while executing command.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
-			OnMessage(0x44, translateOkButton, 0)
-		}
+				OnMessage(0x44, translateOkButton)
+				MsgBox((translate("Error while executing command.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
+				OnMessage(0x44, translateOkButton, 0)
+			}
 	}
 
 	pushTask(theTask) {

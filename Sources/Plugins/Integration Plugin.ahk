@@ -205,11 +205,19 @@ class IntegrationPlugin extends ControllerPlugin {
 	}
 
 	createStrategyState(sessionInfo) {
-		local pitstopsCount := getMultiMapValue(sessionInfo, "Strategy", "Pitstops", 0)
+		local pitstopsCount := getMultiMapValue(sessionInfo, "Strategy", "Pitstops", kUndefined)
 		local nextPitstop := getMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next", false)
 		local remainingPitstops := 0
 		local state := Map()
 		local nextPitstop, tyreCompound
+
+		if (pitstopsCount == kUndefined) {
+			pitstopsCount := 0
+
+			state["State"] := "Unavailable"
+		}
+		else
+			state["State"] := "Active"
 
 		if (nextPitstop && (pitstopsCount != 0))
 			remainingPitstops := (pitstopsCount - nextPitstop + 1)
@@ -240,7 +248,7 @@ class IntegrationPlugin extends ControllerPlugin {
 	}
 
 	createPitstopState(sessionInfo) {
-		local pitstopNr := getMultiMapValue(sessionInfo, "Pitstop", "Planned.Nr", false)
+		local pitstopNr := getMultiMapValue(sessionInfo, "Pitstop", "Planned.Nr", kUndefined)
 		local pitstopLap := getMultiMapValue(sessionInfo, "Pitstop", "Planned.Lap", 0)
 		local state := Map()
 		local tyreCompound, tyreSet, tyrePressures
@@ -267,6 +275,14 @@ class IntegrationPlugin extends ControllerPlugin {
 
 			return ((StrLen(repairs) > 0) ? repairs : "-")
 		}
+
+		if (pitstopNr == kUndefined) {
+			pitstopNr := false
+
+			state["State"] := "Unavailable"
+		}
+		else
+			state["State"] := "Planned"
 
 		if pitstopNr {
 			state["Number"] := pitstopNr

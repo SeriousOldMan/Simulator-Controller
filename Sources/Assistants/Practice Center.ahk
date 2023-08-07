@@ -1212,6 +1212,21 @@ class PracticeCenter extends ConfigurationItem {
 		updateTelemetry(*) {
 			centerGui["practiceCenterTabView"].Redraw()
 
+			if (centerGui["practiceCenterTabView"].Value = 4) {
+				center.FuelDataListView.Redraw()
+				center.TyreDataListView.Redraw()
+
+				center.FuelDataListView.ModifyCol()
+
+				loop center.FuelDataListView.GetCount("Col")
+					center.FuelDataListView.ModifyCol(A_Index, "AutoHdr")
+
+				center.TyreDataListView.ModifyCol()
+
+				loop center.TyreDataListView.GetCount("Col")
+					center.TyreDataListView.ModifyCol(A_Index, "AutoHdr")
+			}
+
 			this.analyzeTelemetry()
 		}
 
@@ -1469,7 +1484,7 @@ class PracticeCenter extends ConfigurationItem {
 
 		centerGui.Add("Text", "x24 ys+178 w80 h21 Y:Move(0.4)", translate("Tyre Usage"))
 
-		this.iTyreDataListView := centerGui.Add("ListView", "x124 ys+171 w477 h132 Y:Move(0.4) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", concatenate([translate("Fuel")], kTyreLapsBuckets))
+		this.iTyreDataListView := centerGui.Add("ListView", "x124 ys+171 w477 h132 Y:Move(0.4) H:Grow(0.4) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", concatenate([translate("Fuel")], kTyreLapsBuckets))
 		this.iTyreDataListView.OnEvent("Click", noSelect)
 		this.iTyreDataListView.OnEvent("DoubleClick", noSelect)
 
@@ -2029,17 +2044,6 @@ class PracticeCenter extends ConfigurationItem {
 		this.Control["sessionMenuDropDown"].Choose(1)
 	}
 
-	updateRunMenu() {
-		this.Control["runMenuDropDown"].Delete()
-
-		if ((this.SessionActive || !this.SessionMode) && !this.SessionExported)
-			this.Control["runMenuDropDown"].Add(collect(["Stints", "---------------------------------------------", "New Stint", "---------------------------------------------", "Stints Summary"], translate))
-		else
-			this.Control["runMenuDropDown"].Add(collect(["Stints", "---------------------------------------------", "Stints Summary"], translate))
-
-		this.Control["runMenuDropDown"].Choose(1)
-	}
-
 	updateDataMenu() {
 		local use1 := (this.UseSessionData ? "(x) Use Session Data" : "      Use Session Data")
 		local use2 := (this.UseTelemetryDatabase ? "(x) Use Telemetry Database" : "      Use Telemetry Database")
@@ -2059,11 +2063,23 @@ class PracticeCenter extends ConfigurationItem {
 
 		this.Control["dataMenuDropDown"].Delete()
 		this.Control["dataMenuDropDown"].Add(concatenate(collect(["Data", "---------------------------------------------"
-																		, use1, use2, "---------------------------------------------"], translate)
+																, "Run Sheet...", "---------------------------------------------"
+																, use1, use2, "---------------------------------------------"], translate)
 													   , wConditions, [translate("---------------------------------------------")]
 													   , tyreCompounds, collect(["---------------------------------------------", "Data Summary"], translate)))
 
 		this.Control["dataMenuDropDown"].Choose(1)
+	}
+
+	updateRunMenu() {
+		this.Control["runMenuDropDown"].Delete()
+
+		if ((this.SessionActive || !this.SessionMode) && !this.SessionExported)
+			this.Control["runMenuDropDown"].Add(collect(["Stints", "---------------------------------------------", "New Stint", "---------------------------------------------", "Stints Summary"], translate))
+		else
+			this.Control["runMenuDropDown"].Add(collect(["Stints", "---------------------------------------------", "Stints Summary"], translate))
+
+		this.Control["runMenuDropDown"].Choose(1)
 	}
 
 	chooseSessionMenu(line) {
@@ -2141,20 +2157,22 @@ class PracticeCenter extends ConfigurationItem {
 		}
 
 		switch line {
-			case 3:
+			case 3: ; Recommend...
+				this.withExceptionhandler(ObjBindMethod(this, "recommendDataRun", true))
+			case 5:
 				this.UseSessionData := !this.UseSessionData
 
 				updateSetting("UseSessionData", this.UseSessionData)
 
 				this.analyzeTelemetry()
-			case 4:
+			case 6:
 				this.UseTelemetryDatabase := !this.UseTelemetryDatabase
 
 				updateSetting("UseTelemetryDatabase", this.UseTelemetryDatabase)
 
 				this.analyzeTelemetry()
 			default:
-				line -= 5
+				line -= 7
 
 				if ((line > 0) && (line <= kWeatherConditions.Length)) {
 					this.iDataWeather := kWeatherConditions[line]
@@ -2207,16 +2225,19 @@ class PracticeCenter extends ConfigurationItem {
 	}
 
 	withExceptionHandler(function, arguments*) {
-		try {
+		if isDevelopment()
 			return function.Call(arguments*)
-		}
-		catch Any as exception {
-			logError(exception, true)
+		else
+			try {
+				return function.Call(arguments*)
+			}
+			catch Any as exception {
+				logError(exception, true)
 
-			OnMessage(0x44, translateOkButton)
-			MsgBox((translate("Error while executing command.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
-			OnMessage(0x44, translateOkButton, 0)
-		}
+				OnMessage(0x44, translateOkButton)
+				MsgBox((translate("Error while executing command.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
+				OnMessage(0x44, translateOkButton, 0)
+			}
 	}
 
 	pushTask(theTask) {
@@ -2680,6 +2701,17 @@ class PracticeCenter extends ConfigurationItem {
 		}
 
 		return newRun
+	}
+
+	recommendDataRun(open := false) {
+		local availableFuelData, availableTyreData
+
+		this.computeAvailableData(kFuelBuckets[kFuelBuckets.Length], 4, kTyreLapsBuckets[kTyreLapsBuckets.Length], 4, &availableFuelData, &availableTyreData)
+
+		if open
+			recommendDataRun(this, kFuelBuckets[kFuelBuckets.Length], 4, kTyreLapsBuckets[kTyreLapsBuckets.Length], 4, availableFuelData, availableTyreData)
+		else
+			recommendDataRun("Update", availableFuelData, availableTyreData)
 	}
 
 	createLap(run, lapNumber) {
@@ -3303,6 +3335,49 @@ class PracticeCenter extends ConfigurationItem {
 		return hasData
 	}
 
+	computeAvailableData(maxFuel, fuelSplits, maxTyreLaps, tyreLapsSplits, &availableFuelData, &availableTyreData) {
+		local fSplit := Round(maxFuel / fuelSplits)
+		local tSplit := Round(maxTyreLaps / tyreLapsSplits)
+		local fuelLaps, tyreLaps, map, fuel, data, mIndex, fIndex, tIndex
+
+		this.analyzeData(this.Weather["Data"], this.TyreCompound["Data"], this.TyreCompoundColor["Data"], &fuelLaps, &tyreLaps)
+
+		availableFuelData := CaseInsenseMap()
+		availableTyreData := CaseInsenseMap()
+
+		for map, data in fuelLaps {
+			availableFuelData[map] := CaseInsenseMap()
+
+			loop fuelSplits
+				availableFuelData[map][(A_Index - 1) * fSplit] := true
+
+			loop data.Length
+				if ((kFuelBuckets[A_Index] < maxFuel) && !data[A_Index]) {
+					fIndex := (Floor(kFuelBuckets[A_Index] / maxFuel * fuelSplits) * fSplit)
+
+					availableFuelData[map][fIndex] := false
+				}
+		}
+
+		loop fuelSplits {
+			data := CaseInsenseMap()
+
+			loop tyreLapsSplits
+				data[(A_Index - 1) * tSplit] := true
+
+			availableTyreData[(A_Index - 1) * fSplit] := data
+		}
+
+		for fuel, data in tyreLaps
+			loop data.Length
+				if ((kTyreLapsBuckets[A_Index] < maxTyreLaps) && !data[A_Index]) {
+					fIndex := (Min(Floor(fuel / maxFuel * fuelSplits), fuelSplits - 1) * fSplit)
+					tIndex := (Floor(kTyreLapsBuckets[A_Index] / maxTyreLaps * tyreLapsSplits) * tSplit)
+
+					availableTyreData[fIndex][tIndex] := false
+				}
+	}
+
 	analyzeTelemetry() {
 		local fuelLaps, tyreLaps, map, fuel, data
 
@@ -3342,6 +3417,8 @@ class PracticeCenter extends ConfigurationItem {
 			loop this.TyreDataListView.GetCount("Col")
 				this.TyreDataListView.ModifyCol(A_Index, "AutoHdr")
 		}
+
+		this.recommendDataRun()
 
 		if (this.SelectedDetailReport = "Data")
 			this.showDataSummary()
@@ -6661,8 +6738,194 @@ class PracticeCenter extends ConfigurationItem {
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                    Private Classes Declaration Section                  ;;;
+;;;-------------------------------------------------------------------------;;;
+
+class RecommendationWindow extends Window {
+	__New() {
+		super.__New({Descriptor: "Practice Center.Recommendation", Closeable: true, Options: "+SysMenu +Caption"})
+	}
+
+	Close(*) {
+		recommendDataRun(kClose)
+	}
+}
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+recommendDataRun(centerOrCommand := false, arguments*) {
+	local availableFuelData, availableTyreData
+	local x, y, listView, line
+	local map, data, fuel, tyreLaps, available, text
+
+	static fSplit, tSplit
+	static recoGui
+	static isOpen := false
+
+	noSelect(listView, *) {
+		loop listView.GetCount()
+			listView.Modify(A_Index, "-Select")
+	}
+
+	displayFuel(fuel) {
+		return displayValue("Float", convertUnit("Volume", fuel))
+	}
+
+	if (centerOrCommand == kClose) {
+		isOpen := false
+
+		recoGui.Destroy()
+	}
+	else if (centerOrCommand == "Update") {
+		if isOpen {
+			availableFuelData := arguments[1]
+			availableTyreData := arguments[2]
+
+			recoGui["fuelListView"].Delete()
+			recoGui["tyreLapsListView"].Delete()
+
+			for map, data in availableFuelData
+				for fuel, available in data
+					if !available
+						recoGui["fuelListView"].Add("", map, displayFuel(fuel) . translate(" - ") . displayFuel(fuel + fSplit))
+
+			recoGui["fuelListView"].ModifyCol()
+
+			loop recoGui["fuelListView"].GetCount("Col")
+				recoGui["fuelListView"].ModifyCol(A_Index, "AutoHdr")
+
+			for fuel, data in availableTyreData
+				for tyreLaps, available in data
+					if !available
+						recoGui["tyreLapsListView"].Add("", displayFuel(fuel) . translate(" - ") . displayFuel(fuel + fSplit), tyreLaps . translate(" - ") . (tyreLaps + tSplit))
+
+			recoGui["tyreLapsListView"].ModifyCol()
+
+			loop recoGui["tyreLapsListView"].GetCount("Col")
+				recoGui["tyreLapsListView"].ModifyCol(A_Index, "AutoHdr")
+
+			recoGui["recommendationText"].Text := ""
+		}
+	}
+	else if (centerOrCommand == "Recommend") {
+		if isOpen {
+			listView := arguments[2]
+			line := arguments[3]
+
+			if line {
+				text := (translate("Prepare and run your next stint as follows:") . "`n`n")
+
+				if (arguments[1] = "Fuel") {
+					noSelect(recoGui["tyreLapsListView"])
+
+					text .= translate("1. Mount fresh tyres.")
+
+					text .= "`n`n"
+
+					text .= substituteVariables(translate("2. Put %fuel% %unit% fuel into the tank. Add a little bit more for the out lap.")
+											  , {fuel: string2Values("-", listView.GetText(line, 2))[2], unit: getUnit("Volume")})
+
+					text .= "`n`n"
+
+					text .= substituteVariables(translate("3. Go to the track and run clean laps in race speed until your fuel level reaches %fuel% %unit%.")
+											  , {fuel: string2Values("-", listView.GetText(line, 2))[1], unit: getUnit("Volume")})
+
+					if isNumber(listView.GetText(line, 1)) {
+						text .= "`n`n"
+
+						text .= substituteVariables(translate("4. Make sure to select engine map %map% during your run.")
+												  , {map: listView.GetText(line, 1)})
+					}
+				}
+				else {
+					noSelect(recoGui["fuelListView"])
+
+					text .= substituteVariables(translate("1. Mount a tyre set, which has already been used for %laps% laps.")
+											  , {laps: string2Values("-", listView.GetText(line, 2))[1]})
+
+					text .= "`n`n"
+
+					text .= substituteVariables(translate("2. Put %fuel% %unit% fuel into the tank. Add a little bit more for the outlap.")
+											  , {fuel: string2Values("-", listView.GetText(line, 1))[2], unit: getUnit("Volume")})
+
+					text .= "`n`n"
+
+					text .= substituteVariables(translate("3. Go to the track and run a couple of clean laps in race speed. %laps% laps will be perfect, but it is Ok to run a few less.")
+											  , {laps: string2Values("-", listView.GetText(line, 2))[2] - string2Values("-", listView.GetText(line, 2))[1]})
+
+					text .= "`n`n"
+
+					text .= translate("4. Make sure to select the typical engine map for the given weather conditions and mounted tyres for the practice stint.")
+				}
+
+				recoGui["recommendationText"].Text := text
+			}
+			else
+				recoGui["recommendationText"].Text := ""
+		}
+	}
+	else {
+		fSplit := Round(arguments[1] / arguments[2])
+		tSplit := Round(arguments[3] / arguments[4])
+
+		if isOpen
+			WinActivate(recoGui)
+		else {
+			recoGui := RecommendationWindow()
+
+			recoGui.SetFont("s10 Bold", "Arial")
+
+			recoGui.Add("Text", "w351 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(recoGui, "Practice Center.Recommendation"))
+
+			recoGui.SetFont("s9 Norm", "Arial")
+
+			recoGui.Add("Documentation", "x106 YP+20 w164 Center", translate("Run Sheet")
+									   , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#recommend-practice-run")
+
+			recoGui.SetFont("s8 Norm", "Arial")
+
+			recoGui.Add("Text", "x8 yp+30 w360 0x10")
+
+			recoGui.SetFont("Norm", "Arial")
+
+			recoGui.Add("Picture", "x8 yp+10 w32 h32", kIconsDirectory . "Can.ico")
+
+			recoGui.Add("ListView", "x45 yp w320 h135 -Multi -LV0x10 AltSubmit NoSort NoSortHdr vfuelListView", collect(["Map", "Fuel Level"], translate))
+			recoGui["fuelListView"].OnEvent("Click", recommendDataRun.Bind("Recommend", "Fuel"))
+			recoGui["fuelListView"].OnEvent("DoubleClick", recommendDataRun.Bind("Recommend", "Fuel"))
+
+			recoGui.Add("Picture", "x8 yp+140 w32 h32", kIconsDirectory . "Wheel.ico")
+
+			recoGui.Add("ListView", "x45 yp w320 h135 -Multi -LV0x10 AltSubmit NoSort NoSortHdr vtyreLapsListView", collect(["Fuel Level", "Tyre Laps"], translate))
+			recoGui["tyreLapsListView"].OnEvent("Click", recommendDataRun.Bind("Recommend", "TyreLaps"))
+			recoGui["tyreLapsListView"].OnEvent("DoubleClick", recommendDataRun.Bind("Recommend", "TyreLaps"))
+
+			recoGui.SetFont("Bold", "Arial")
+
+			recoGui.Add("Text", "x45 yp+145 w320 h240 vrecommendationText")
+
+			recoGui.SetFont("Norm", "Arial")
+
+			recoGui.Add("Text", "x8 yp+245 w360 0x10")
+
+			recoGui.Add("Button", "x152 yp+10 w80 h23 Default", translate("Close")).OnEvent("Click", recommendDataRun.Bind(kClose))
+
+			recoGui.Show("AutoSize Center")
+
+			if getWindowPosition("Practice Center.Recommendation", &x, &y)
+				recoGui.Show("x" . x . " y" . y)
+			else
+				recoGui.Show()
+
+			isOpen := true
+
+			recommendDataRun("Update", arguments[5], arguments[6])
+		}
+	}
+}
 
 readSimulatorData(simulator) {
 	local data := callSimulator(simulator)

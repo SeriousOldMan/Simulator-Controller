@@ -539,10 +539,9 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 
 						coldPressures := string2Values(",", lapData["Pressures.Cold"])
 						hotPressures := string2Values(",", lapData["Pressures.Hot"])
-						pressureLosses := string2Values(",", lapData["Pressures.Losses"])
 
 						if (isNumber(coldPressures[1]) && isNumber(hotPressures[1])) {
-							pressureLosses := string2Values(",", lapPressures[11])
+							pressureLosses := string2Values(",", lapData["Pressures.Losses"])
 
 							if isNumber(pressureLosses[1])
 								loop 4

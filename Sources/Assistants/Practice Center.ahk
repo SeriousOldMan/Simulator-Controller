@@ -2192,7 +2192,7 @@ class PracticeCenter extends ConfigurationItem {
 						OnMessage(0x44, translateOkButton, 0)
 					}
 				case 4: ; Recommend...
-					this.withExceptionhandler(ObjBindMethod(this, "recommendRun"))
+					this.withExceptionhandler(ObjBindMethod(this, "recommendDataRun", true))
 				case 6:
 					this.showRunsSummary()
 			}
@@ -2683,12 +2683,15 @@ class PracticeCenter extends ConfigurationItem {
 		return newRun
 	}
 
-	recommendRun() {
+	recommendDataRun(open := false) {
 		local availableFuelData, availableTyreData
 
 		this.computeAvailableData(kFuelBuckets[kFuelBuckets.Length], 4, kTyreLapsBuckets[kTyreLapsBuckets.Length], 4, &availableFuelData, &availableTyreData)
 
-		recommendDataRun(this, kFuelBuckets[kFuelBuckets.Length], 4, kTyreLapsBuckets[kTyreLapsBuckets.Length], 4, availableFuelData, availableTyreData)
+		if open
+			recommendDataRun(this, kFuelBuckets[kFuelBuckets.Length], 4, kTyreLapsBuckets[kTyreLapsBuckets.Length], 4, availableFuelData, availableTyreData)
+		else
+			recommendDataRun("Update", availableFuelData, availableTyreData)
 	}
 
 	createLap(run, lapNumber) {
@@ -3348,7 +3351,7 @@ class PracticeCenter extends ConfigurationItem {
 		for fuel, data in tyreLaps
 			loop data.Length
 				if ((kTyreLapsBuckets[A_Index] < maxTyreLaps) && !data[A_Index]) {
-					fIndex := (Floor(fuel / maxFuel * fuelSplits) * fSplit)
+					fIndex := (Min(Floor(fuel / maxFuel * fuelSplits), fuelSplits - 1) * fSplit)
 					tIndex := (Floor(kTyreLapsBuckets[A_Index] / maxTyreLaps * tyreLapsSplits) * tSplit)
 
 					availableTyreData[fIndex][tIndex] := false
@@ -3394,6 +3397,8 @@ class PracticeCenter extends ConfigurationItem {
 			loop this.TyreDataListView.GetCount("Col")
 				this.TyreDataListView.ModifyCol(A_Index, "AutoHdr")
 		}
+
+		this.recommendDataRun()
 
 		if (this.SelectedDetailReport = "Data")
 			this.showDataSummary()
@@ -6713,16 +6718,32 @@ class PracticeCenter extends ConfigurationItem {
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                    Private Classes Declaration Section                  ;;;
+;;;-------------------------------------------------------------------------;;;
+
+class RecommendationWindow extends Window {
+	__New() {
+		super.__New({Descriptor: "Practice Center.Recommendation", Closeable: true, Options: "+SysMenu +Caption"})
+	}
+
+	Close(*) {
+		recommendDataRun(kClose)
+	}
+}
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 recommendDataRun(centerOrCommand := false, arguments*) {
-	local fSplit, tSplit, availableFuelData, availableTyreData
+	local availableFuelData, availableTyreData
 	local x, y, listView, line
 	local map, data, fuel, tyreLaps, available, text
 
+	static fSplit, tSplit
 	static recoGui
-	static result := false
+	static isOpen := false
 
 	noSelect(listView, *) {
 		loop listView.GetCount()
@@ -6733,142 +6754,154 @@ recommendDataRun(centerOrCommand := false, arguments*) {
 		return displayValue("Float", convertUnit("Volume", fuel))
 	}
 
-	if (centerOrCommand == kClose)
-		result := kClose
+	if (centerOrCommand == kClose) {
+		isOpen := false
+
+		recoGui.Destroy()
+	}
+	else if (centerOrCommand == "Update") {
+		if isOpen {
+			availableFuelData := arguments[1]
+			availableTyreData := arguments[2]
+
+			recoGui["fuelListView"].Delete()
+			recoGui["tyreLapsListView"].Delete()
+
+			for map, data in availableFuelData
+				for fuel, available in data
+					if !available
+						recoGui["fuelListView"].Add("", map, displayFuel(fuel) . translate(" - ") . displayFuel(fuel + fSplit))
+
+			recoGui["fuelListView"].ModifyCol()
+
+			loop recoGui["fuelListView"].GetCount("Col")
+				recoGui["fuelListView"].ModifyCol(A_Index, "AutoHdr")
+
+			for fuel, data in availableTyreData
+				for tyreLaps, available in data
+					if !available
+						recoGui["tyreLapsListView"].Add("", displayFuel(fuel) . translate(" - ") . displayFuel(fuel + fSplit), tyreLaps . translate(" - ") . (tyreLaps + tSplit))
+
+			recoGui["tyreLapsListView"].ModifyCol()
+
+			loop recoGui["tyreLapsListView"].GetCount("Col")
+				recoGui["tyreLapsListView"].ModifyCol(A_Index, "AutoHdr")
+
+			recoGui["recommendationText"].Text := ""
+		}
+	}
 	else if (centerOrCommand == "Recommend") {
-		listView := arguments[2]
-		line := arguments[3]
+		if isOpen {
+			listView := arguments[2]
+			line := arguments[3]
 
-		if line {
-			text := (translate("Prepare and run your next stint as follows:") . "`n`n")
+			if line {
+				text := (translate("Prepare and run your next stint as follows:") . "`n`n")
 
-			if (arguments[1] = "Fuel") {
-				noSelect(recoGui["tyreLapsListView"])
+				if (arguments[1] = "Fuel") {
+					noSelect(recoGui["tyreLapsListView"])
 
-				text .= translate("1. Mount fresh tyres.")
+					text .= translate("1. Mount fresh tyres.")
 
-				text .= "`n`n"
-
-				text .= substituteVariables(translate("2. Put %fuel% %unit% fuel into the tank. Add a little bit more for the out lap.")
-										  , {fuel: string2Values("-", listView.GetText(line, 2))[2], unit: getUnit("Volume")})
-
-				text .= "`n`n"
-
-				text .= substituteVariables(translate("3. Go to the track and run clean laps in race speed until your fuel level reaches %fuel% %unit%.")
-										  , {fuel: string2Values("-", listView.GetText(line, 2))[1], unit: getUnit("Volume")})
-
-				if isNumber(listView.GetText(line, 1)) {
 					text .= "`n`n"
 
-					text .= substituteVariables(translate("4. Make sure to select engine map %map% during your run.")
-											  , {map: listView.GetText(line, 1)})
+					text .= substituteVariables(translate("2. Put %fuel% %unit% fuel into the tank. Add a little bit more for the out lap.")
+											  , {fuel: string2Values("-", listView.GetText(line, 2))[2], unit: getUnit("Volume")})
+
+					text .= "`n`n"
+
+					text .= substituteVariables(translate("3. Go to the track and run clean laps in race speed until your fuel level reaches %fuel% %unit%.")
+											  , {fuel: string2Values("-", listView.GetText(line, 2))[1], unit: getUnit("Volume")})
+
+					if isNumber(listView.GetText(line, 1)) {
+						text .= "`n`n"
+
+						text .= substituteVariables(translate("4. Make sure to select engine map %map% during your run.")
+												  , {map: listView.GetText(line, 1)})
+					}
 				}
+				else {
+					noSelect(recoGui["fuelListView"])
+
+					text .= substituteVariables(translate("1. Mount a tyre set, which has already been used for %laps% laps.")
+											  , {laps: string2Values("-", listView.GetText(line, 2))[1]})
+
+					text .= "`n`n"
+
+					text .= substituteVariables(translate("2. Put %fuel% %unit% fuel into the tank. Add a little bit more for the outlap.")
+											  , {fuel: string2Values("-", listView.GetText(line, 1))[2], unit: getUnit("Volume")})
+
+					text .= "`n`n"
+
+					text .= substituteVariables(translate("3. Go to the track and run a couple of clean laps in race speed. %laps% laps will be perfect, but it is Ok to run a few less.")
+											  , {laps: string2Values("-", listView.GetText(line, 2))[2] - string2Values("-", listView.GetText(line, 2))[1]})
+
+					text .= translate("4. Make sure to select the typical engine map for the given weather conditions and mounted tyres for the practice stint.")
+				}
+
+				recoGui["recommendationText"].Text := text
 			}
-			else {
-				noSelect(recoGui["fuelListView"])
-
-				text .= substituteVariables(translate("1. Mount a tyre set, which has already been used for %laps% laps.")
-										  , {laps: string2Values("-", listView.GetText(line, 2))[1]})
-
-				text .= "`n`n"
-
-				text .= substituteVariables(translate("2. Put %fuel% %unit% fuel into the tank. Add a little bit more for the outlap.")
-										  , {fuel: string2Values("-", listView.GetText(line, 1))[2], unit: getUnit("Volume")})
-
-				text .= "`n`n"
-
-				text .= substituteVariables(translate("3. Go to the track and run a couple of clean laps in race speed. %laps% laps will be perfect, but it is Ok to run a few less.")
-										  , {laps: string2Values("-", listView.GetText(line, 2))[2] - string2Values("-", listView.GetText(line, 2))[1]})
-
-				text .= translate("4. Make sure to select the typical engine map for the given weather conditions and mounted tyres for the practice stint.")
-			}
-
-			recoGui["recomendationText"].Text := text
+			else
+				recoGui["recommendationText"].Text := text
 		}
-		else
-			recoGui["recomendationText"].Text := text
 	}
 	else {
 		fSplit := Round(arguments[1] / arguments[2])
 		tSplit := Round(arguments[3] / arguments[4])
 
-		availableFuelData := arguments[5]
-		availableTyreData := arguments[6]
+		if isOpen
+			WinActivate(recoGui)
+		else {
+			recoGui := RecommendationWindow()
 
-		result := false
+			recoGui.SetFont("s10 Bold", "Arial")
 
-		recoGui := Window({Options: "0x400000"}, "")
+			recoGui.Add("Text", "w351 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(recoGui, "Practice Center.Recommendation"))
 
-		recoGui.SetFont("s10 Bold", "Arial")
+			recoGui.SetFont("s9 Norm", "Arial")
 
-		recoGui.Add("Text", "w351 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(recoGui, "Practice Center.Recommend Run"))
+			recoGui.Add("Documentation", "x106 YP+20 w164 Center", translate("Recommend Practice")
+									   , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#recommend-practice-run")
 
-		recoGui.SetFont("s9 Norm", "Arial")
+			recoGui.SetFont("s8 Norm", "Arial")
 
-		recoGui.Add("Documentation", "x106 YP+20 w164 Center", translate("Recommend Practice")
-								   , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#recommend-practice-run")
+			recoGui.Add("Text", "x8 yp+30 w360 0x10")
 
-		recoGui.SetFont("s8 Norm", "Arial")
+			recoGui.SetFont("Norm", "Arial")
 
-		recoGui.Add("Text", "x8 yp+30 w360 0x10")
+			recoGui.Add("Picture", "x8 yp+10 w32 h32", kIconsDirectory . "Can.ico")
 
-		recoGui.SetFont("Norm", "Arial")
+			recoGui.Add("ListView", "x45 yp w320 h135 -Multi -LV0x10 AltSubmit NoSort NoSortHdr vfuelListView", collect(["Map", "Fuel Level"], translate))
+			recoGui["fuelListView"].OnEvent("Click", recommendDataRun.Bind("Recommend", "Fuel"))
+			recoGui["fuelListView"].OnEvent("DoubleClick", recommendDataRun.Bind("Recommend", "Fuel"))
 
-		recoGui.Add("Picture", "x8 yp+10 w32 h32", kIconsDirectory . "Can.ico")
+			recoGui.Add("Picture", "x8 yp+140 w32 h32", kIconsDirectory . "Wheel.ico")
 
-		recoGui.Add("ListView", "x45 yp w320 h135 -Multi -LV0x10 AltSubmit NoSort NoSortHdr vfuelListView", collect(["Map", "Fuel Level"], translate))
-		recoGui["fuelListView"].OnEvent("Click", recommendDataRun.Bind("Recommend", "Fuel"))
-		recoGui["fuelListView"].OnEvent("DoubleClick", recommendDataRun.Bind("Recommend", "Fuel"))
+			recoGui.Add("ListView", "x45 yp w320 h135 -Multi -LV0x10 AltSubmit NoSort NoSortHdr vtyreLapsListView", collect(["Fuel Level", "Tyre Laps"], translate))
+			recoGui["tyreLapsListView"].OnEvent("Click", recommendDataRun.Bind("Recommend", "TyreLaps"))
+			recoGui["tyreLapsListView"].OnEvent("DoubleClick", recommendDataRun.Bind("Recommend", "TyreLaps"))
 
-		for map, data in availableFuelData
-			for fuel, available in data
-				if !available
-					recoGui["fuelListView"].Add("", map, displayFuel(fuel) . translate(" - ") . displayFuel(fuel + fSplit))
+			recoGui.SetFont("Bold", "Arial")
 
-		recoGui["fuelListView"].ModifyCol()
+			recoGui.Add("Text", "x45 yp+145 w320 h200 vrecommendationText")
 
-		loop recoGui["fuelListView"].GetCount("Col")
-			recoGui["fuelListView"].ModifyCol(A_Index, "AutoHdr")
+			recoGui.SetFont("Norm", "Arial")
 
-		recoGui.Add("Picture", "x8 yp+140 w32 h32", kIconsDirectory . "Wheel.ico")
+			recoGui.Add("Text", "x8 yp+205 w360 0x10")
 
-		recoGui.Add("ListView", "x45 yp w320 h135 -Multi -LV0x10 AltSubmit NoSort NoSortHdr vtyreLapsListView", collect(["Fuel Level", "Tyre Laps"], translate))
-		recoGui["tyreLapsListView"].OnEvent("Click", recommendDataRun.Bind("Recommend", "TyreLaps"))
-		recoGui["tyreLapsListView"].OnEvent("DoubleClick", recommendDataRun.Bind("Recommend", "TyreLaps"))
+			recoGui.Add("Button", "x152 yp+10 w80 h23 Default", translate("Close")).OnEvent("Click", recommendDataRun.Bind(kClose))
 
-		for fuel, data in availableTyreData
-			for tyreLaps, available in data
-				if !available
-					recoGui["tyreLapsListView"].Add("", displayFuel(fuel) . translate(" - ") . displayFuel(fuel + fSplit), tyreLaps . translate(" - ") . (tyreLaps + tSplit))
+			recoGui.Show("AutoSize Center")
 
-		recoGui["tyreLapsListView"].ModifyCol()
+			if getWindowPosition("Practice Center.Recommendation", &x, &y)
+				recoGui.Show("x" . x . " y" . y)
+			else
+				recoGui.Show()
 
-		loop recoGui["tyreLapsListView"].GetCount("Col")
-			recoGui["tyreLapsListView"].ModifyCol(A_Index, "AutoHdr")
+			isOpen := true
 
-		recoGui.SetFont("Bold", "Arial")
-
-		recoGui.Add("Text", "x45 yp+145 w320 h200 vrecomendationText")
-
-		recoGui.SetFont("Norm", "Arial")
-
-		recoGui.Add("Text", "x8 yp+205 w360 0x10")
-
-		recoGui.Add("Button", "x152 yp+10 w80 h23 Default", translate("Close")).OnEvent("Click", recommendDataRun.Bind(kClose))
-
-		recoGui.Opt("+Owner" . centerOrCommand.Window.Hwnd)
-
-		recoGui.Show("AutoSize Center")
-
-		if getWindowPosition("Practice Center.Recommend Run", &x, &y)
-			recoGui.Show("x" . x . " y" . y)
-		else
-			recoGui.Show()
-
-		while !result
-			Sleep(100)
-
-		recoGui.Destroy()
+			recommendDataRun("Update", arguments[5], arguments[6])
+		}
 	}
 }
 

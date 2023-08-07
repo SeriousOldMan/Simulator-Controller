@@ -414,7 +414,7 @@ launchPad(command := false, arguments*) {
 		launchPadGui.Block()
 
 		try {
-			if (editSettings(&settings) == kSave) {
+			if (editSettings(&settings, launchPadGui) == kSave) {
 				writeMultiMap(kSimulatorSettingsFile, settings)
 
 				restart := true

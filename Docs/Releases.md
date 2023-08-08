@@ -11,6 +11,8 @@
   10. "Race Center" and "Practice Center" now remember many menu choices between different runs.
   11. [Developer] Additional information has been added to the ["Session State.json" file](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) introduced with the last release.
   12. [Developer] The data format of the "Session State.json" file has been updated to better reflect the JSON data type standard.
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-522).
   
 ## 5.2.1.0-release 08/04/23
   1. Minor bugfixes, as always

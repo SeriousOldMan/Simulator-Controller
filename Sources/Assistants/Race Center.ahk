@@ -1162,6 +1162,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	__New(configuration, raceSettings) {
+		local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 		local dllName, dllFile
 
 		this.iRaceSettings := raceSettings
@@ -1184,6 +1185,15 @@ class RaceCenter extends ConfigurationItem {
 			showMessage(translate("Error while initializing Team Server Connector - please rebuild the applications") . translate("...")
 					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 		}
+
+		this.iTyrePressureMode := getMultiMapValue(settings, "Race Center", "TyrePressureMode", "Reference")
+		this.iCorrectPressureLoss := getMultiMapValue(settings, "Race Center", "CorrectPressureLoss", "Reference")
+		this.iSelectTyreSet := getMultiMapValue(settings, "Race Center", "SelectTyreSet", true)
+
+		this.iUseSessionData := getMultiMapValue(settings, "Race Center", "UseSessionData", true)
+		this.iUseTelemetryDatabase := getMultiMapValue(settings, "Race Center", "UseTelemetryDatabase", false)
+		this.iUseCurrentMap := getMultiMapValue(settings, "Race Center", "UseCurrentMap", true)
+		this.iUseTraffic := getMultiMapValue(settings, "Race Center", "UseTraffic", false)
 
 		super.__New(configuration)
 
@@ -3711,7 +3721,8 @@ class RaceCenter extends ConfigurationItem {
 				rlPressure := coldPressures[3]
 				rrPressure := coldPressures[4]
 
-				this.initializePitstopTyreSetup(&tyreCompound, &tyreCompoundColor, &tyreSet, &flPressure, &frPressure, &rlPressure, &rrPressure, remote)
+				this.initializePitstopTyreSetup(&tyreCompound, &tyreCompoundColor, &tyreSet := true
+											  , &flPressure, &frPressure, &rlPressure, &rrPressure, remote)
 
 				if remote
 					pitstopTyreSetup := [tyreCompound, tyreCompoundColor, tyreSet, flPressure, frPressure, rlPressure, rrPressure]
@@ -3933,30 +3944,35 @@ class RaceCenter extends ConfigurationItem {
 		}
 	}
 
-	initializePitstopTyreSetup(&tyreCompound, &tyreCompoundColor, &tyreSet, &flPressure, &frPressure, &rlPressure, &rrPressure, remote := false) {
+	initializePitstopTyreSetup(&tyreCompound, &tyreCompoundColor, &tyreSet
+							 , &flPressure, &frPressure, &rlPressure, &rrPressure
+							 , remote := false, adjust := true) {
 		local currentStint := this.CurrentStint
+		local calcTyreSet := tyreSet
 		local chosen, stint, theCompound
 
-		tyreSet := 0
+		if calcTyreSet {
+			tyreSet := 0
 
-		if (this.SelectTyreSet && tyreCompound && currentStint) {
-			theCompound := compound(tyreCompound, tyreCompoundColor)
+			if (this.SelectTyreSet && tyreCompound && currentStint) {
+				theCompound := compound(tyreCompound, tyreCompoundColor)
 
-			loop currentStint.Nr
-				if this.Stints.Has(A_Index) {
-					stint := this.Stints[A_Index]
+				loop currentStint.Nr
+					if this.Stints.Has(A_Index) {
+						stint := this.Stints[A_Index]
 
-					if ((stint.Compound = theCompound) && stint.TyreSet)
-						tyreSet := Max(tyreSet, stint.TyreSet)
-				}
+						if ((stint.Compound = theCompound) && stint.TyreSet)
+							tyreSet := Max(tyreSet, stint.TyreSet)
+					}
 
-				if (tyreSet > 0)
-					tyreSet += 1
+					if (tyreSet > 0)
+						tyreSet += 1
+			}
 		}
 
 		if remote {
 			if tyreCompound {
-				if this.TyrePressureMode
+				if (adjust && this.TyrePressureMode)
 					this.adjustPitstopTyrePressures(this.TyrePressureMode, this.Weather, this.AirTemperature, this.TrackTemperature
 												  , tyreCompound, tyreCompoundColor, &flPressure, &frPressure, &rlPressure, &rrPressure)
 
@@ -3980,7 +3996,7 @@ class RaceCenter extends ConfigurationItem {
 		}
 		else {
 			if tyreCompound {
-				if this.TyrePressureMode
+				if (adjust && this.TyrePressureMode)
 					this.adjustPitstopTyrePressures(this.TyrePressureMode, this.Weather, this.AirTemperature, this.TrackTemperature
 												  , tyreCompound, tyreCompoundColor, &flPressure, &frPressure, &rlPressure, &rrPressure)
 
@@ -3988,7 +4004,8 @@ class RaceCenter extends ConfigurationItem {
 
 				this.Control["pitstopTyreCompoundDropDown"].Choose((chosen == 0) ? 1 : chosen)
 
-				this.Control["pitstopTyreSetEdit"].Text := tyreSet
+				if calcTyreSet
+					this.Control["pitstopTyreSetEdit"].Text := tyreSet
 
 				this.Control["pitstopPressureFLEdit"].Text := (isNumber(flPressure) ? displayValue("Float", convertUnit("Pressure", flPressure)) : "")
 				this.Control["pitstopPressureFREdit"].Text := (isNumber(frPressure) ? displayValue("Float", convertUnit("Pressure", frPressure)) : "")
@@ -4446,6 +4463,14 @@ class RaceCenter extends ConfigurationItem {
 		local strategy, simulator, car, track, simulatorCode, dirName, fileName, configuration, fileName, name, msgResult
 		local directory
 
+		updateSetting(setting, value) {
+			local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+			setMultiMapValue(settings, "Race Center", setting, value)
+
+			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+		}
+
 		if this.Simulator {
 			simulator := this.Simulator
 			car := this.Car
@@ -4539,17 +4564,25 @@ class RaceCenter extends ConfigurationItem {
 			case 9: ; Use Session Data
 				this.iUseSessionData := !this.UseSessionData
 
+				updateSetting("UseSessionData", this.UseSessionData)
+
 				this.updateState()
 			case 10: ; Use Telemetry Database
 				this.iUseTelemetryDatabase := !this.UseTelemetryDatabase
+
+				updateSetting("UseTelemetryDatabase", this.UseTelemetryDatabase)
 
 				this.updateState()
 			case 11: ; Use current Map
 				this.iUseCurrentMap := !this.UseCurrentMap
 
+				updateSetting("UseCurrentMap", this.UseCurrentMap)
+
 				this.updateState()
 			case 12: ; Use Traffic
 				this.iUseTraffic := !this.UseTraffic
+
+				updateSetting("UseTraffic", this.UseTraffic)
 
 				this.updateState()
 			case 14: ; Run Simulation
@@ -4642,6 +4675,14 @@ class RaceCenter extends ConfigurationItem {
 	choosePitstopMenu(line) {
 		local exePath, options, simulator
 
+		updateSetting(setting, value) {
+			local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+			setMultiMapValue(settings, "Race Center", setting, value)
+
+			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+		}
+
 		switch line {
 			case 3: ; Manage Team
 				this.manageTeam()
@@ -4688,17 +4729,25 @@ class RaceCenter extends ConfigurationItem {
 			case 12:
 				this.iTyrePressureMode := ((this.TyrePressureMode = "Reference") ? false : "Reference")
 
+				updateSetting("TyrePressureMode", this.TyrePressureMode)
+
 				this.updateState()
 			case 13:
 				this.iTyrePressureMode := ((this.TyrePressureMode = "Relative") ? false : "Relative")
+
+				updateSetting("TyrePressureMode", this.TyrePressureMode)
 
 				this.updateState()
 			case 14:
 				this.iCorrectPressureLoss := !this.CorrectPressureLoss
 
+				updateSetting("CorrectPressureLoss", this.CorrectPressureLoss)
+
 				this.updateState()
 			case 15:
 				this.iSelectTyreSet := !this.SelectTyreSet
+
+				updateSetting("SelectTyreSet", this.SelectTyreSet)
 
 				this.updateState()
 			case 17:
@@ -12256,10 +12305,13 @@ startupRaceCenter() {
 
 setTyrePressures(tyreCompound, tyreCompoundColor, flPressure, frPressure, rlPressure, rrPressure) {
 	local rCenter := RaceCenter.Instance
+	local tyreSet
 
 	if (rCenter.iPressuresRequest = "Pitstop")
-		rCenter.withExceptionhandler(ObjBindMethod(rCenter, "initializePitstopTyreSetup", &tyreCompound, &tyreCompoundColor, &tyreSet := false
-																						, &flPressure, &frPressure, &rlPressure, &rrPressure))
+		rCenter.withExceptionhandler(ObjBindMethod(rCenter, "initializePitstopTyreSetup", &tyreCompound, &tyreCompoundColor
+																						, &tyreSet := false
+																						, &flPressure, &frPressure
+																						, &rlPressure, &rrPressure, false, false))
 	else
 		if (rCenter.SetupsListView.GetNext(0) = rCenter.iPressuresRequest)
 			rCenter.withExceptionhandler(ObjBindMethod(rCenter, "initializeSetup", tyreCompound, tyreCompoundColor, flPressure, frPressure, rlPressure, rrPressure))

@@ -1282,6 +1282,7 @@ The content of the JSON file looks like this (depending on the current situation
 			"RemainingLaps": 9
 		},
 		"Pitstop": {
+			"State": "Planned",
 			"Fuel": 68.0,
 			"Lap": null,
 			"Number": 1,
@@ -1332,6 +1333,7 @@ The content of the JSON file looks like this (depending on the current situation
 			"Position": 1
 		},
 		"Strategy": {
+			"State": "Active",
 			"Fuel": 12.0,
 			"Lap": 10,
 			"PlannedPitstops": 2,

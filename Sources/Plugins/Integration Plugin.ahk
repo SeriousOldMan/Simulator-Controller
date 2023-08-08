@@ -209,7 +209,8 @@ class IntegrationPlugin extends ControllerPlugin {
 		local nextPitstop := getMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next", false)
 		local remainingPitstops := 0
 		local state := Map()
-		local nextPitstop, tyreCompound
+		local pitstops := []
+		local nextPitstop, tyreCompound, tyreCompoundColor, pitstop
 
 		if (pitstopsCount == kUndefined) {
 			pitstopsCount := 0
@@ -243,6 +244,25 @@ class IntegrationPlugin extends ControllerPlugin {
 			state["Fuel"] := kNull
 			state["TyreCompound"] := kNull
 		}
+
+		loop pitstopsCount {
+			pitstop := Map("Nr", A_Index
+						 , "Lap", getMultiMapValue(sessionInfo, "Strategy", "Pitstop." . A_Index . ".Lap")
+						 , "Fuel", getMultiMapValue(sessionInfo, "Strategy", "Pitstop." . A_Index . ".Fuel.Amount"))
+
+			if getMultiMapValue(sessionInfo, "Strategy", "Pitstop." . A_Index . ".Tyre.Change") {
+				tyreCompound := getMultiMapValue(sessionInfo, "Strategy", "Pitstop." . A_Index . ".Tyre.Compound")
+				tyreCompoundColor := getMultiMapValue(sessionInfo, "Strategy", "Pitstop." . A_Index . ".Tyre.Compound.Color")
+
+				pitstop["TyreCompound"] := translate(compound(tyreCompound, tyreCompoundColor))
+			}
+			else
+				pitstop["TyreCompound"] := kNull
+
+			pitstops.Push(pitstop)
+		}
+
+		state["Pitstops"] := pitstops
 
 		return state
 	}

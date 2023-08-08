@@ -1551,7 +1551,7 @@ class RaceStrategist extends GridRaceAssistant {
 	createSessionInfo(lapNumber, valid, data, simulator, car, track) {
 		local knowledgeBase := this.KnowledgeBase
 		local sessionInfo := super.createSessionInfo(lapNumber, valid, data, simulator, car, track)
-		local nextPitstop
+		local nextPitstop, pitstop, ignore, theFact
 
 		if (knowledgeBase && knowledgeBase.getValue("Strategy.Name", false)) {
 			setMultiMapValue(sessionInfo, "Strategy", "Pitstops", knowledgeBase.getValue("Strategy.Pitstop.Count"))
@@ -1572,6 +1572,17 @@ class RaceStrategist extends GridRaceAssistant {
 					setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound", false)
 					setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound.Color", false)
 				}
+			}
+
+			setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Count"
+						   , knowledgeBase.getValue("Strategy.Pitstop.Count", 0))
+
+			loop getMultiMapValue(sessionInfo, "Strategy", "Pitstop.Count") {
+				pitstop := A_Index
+
+				for ignore, theFact in [".Lap", ".Fuel.Amount", ".Tyre.Change", ".Tyre.Compound", ".Tyre.Compound.Color", ".Map"]
+					setMultiMapValue(sessionInfo, "Strategy", "Pitstop." . pitstop . theFact
+								   , knowledgeBase.getValue("Strategy.Pitstop." . pitstop . theFact))
 			}
 		}
 

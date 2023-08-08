@@ -6825,7 +6825,7 @@ recommendDataRun(centerOrCommand := false, arguments*) {
 
 					text .= "`n`n"
 
-					text .= substituteVariables(translate("2. Put %fuel% %unit% fuel into the tank. Add a little bit more for the out lap.")
+					text .= substituteVariables(translate("2. Put %fuel% %unit% fuel into the tank. Add a little bit more for the outlap.")
 											  , {fuel: string2Values("-", listView.GetText(line, 2))[2], unit: getUnit("Volume")})
 
 					text .= "`n`n"
@@ -6843,7 +6843,7 @@ recommendDataRun(centerOrCommand := false, arguments*) {
 				else {
 					noSelect(recoGui["fuelListView"])
 
-					text .= substituteVariables(translate("1. Mount a tyre set, which has already been used for %laps% laps.")
+					text .= substituteVariables(translate("1. Mount a tyre set, which has already been used for roughly %laps% laps.")
 											  , {laps: string2Values("-", listView.GetText(line, 2))[1]})
 
 					text .= "`n`n"

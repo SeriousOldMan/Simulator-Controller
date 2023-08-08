@@ -349,6 +349,20 @@ To create a new stint manually while you are standing in the pit, follow these s
 
 It is recommended to use the "Auto" mode in races, since then the pitstops are reliable detected by the Race Assistants (and the additional data like tyre set and tyre pressures will be taken from the pitstop plan), whereas in Practice sessions, it will be much better to create the different practice stints manually. Esspecially the ideal cold tyre pressures derived by the Race Engineer will be mostly wrong, when the tyre change has not been planned and prepared under the control of the Race Engineer, which is uncommon in a practice session.
 
+#### Using the run sheet
+
+The "Practice Center" can give you hints for worthy practice runs, which will create data for specific car configurations, for which currently no data is available in the database. This is somewhat the inverse approach as taken by the data explorer described in the next section, since the "Run Sheet" will show you data, that is *missing*
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Practice%20Center%2010.JPG)
+
+You can open the "Run Sheet" by choosing the corresponding command in the "Data" menu and the window can stay open, while you are working in other areas of the "Practice Center". The data shown, will always reflect your current selection of car and track and the chosen data setting in the "Data" menu.
+
+In the upper list, you will see entries for missing data which relate your lap times to the combination of chosen engine map (if available in your simulator) and the amount of fuel currently in the tank (thereby determining the car weight and balance). The lower list show missing data correlations between fuel level (car weight) and the number of laps you have already driven with a given tyre set.
+
+When you now select an entry in one of these lists, instructions will be given how to create the missing data points, thereby defining the conditions for a worthy practice run.
+
+Please note, that not all data points may be of interest. Decide for yourself, if you will ever encounter a situation, where you will run a car with a full tank, but worn tyres, for example. If you are participating mostly in sprint races, this will be very unlikely. If you are running high class endurance races, on the other hand, it can happen that you must double stint a tyre set due to tyre set restrictions imposed by the race rules. You see, it depends...
+
 ### Exploring data
 
 The "Data" tab will give you an overview of what data you have collected during your session, or, after you have selected the corrsponding option in the "Data" menu, what data is available in your session database.
@@ -356,6 +370,8 @@ The "Data" tab will give you an overview of what data you have collected during 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Practice%20Center%208.JPG)
 
 Using the "Data" menu, you can choose between the different weather conditions and available tyre compounds, thereby identifying possible gaps in your data collection that need to be filled with a specific practice run.
+
+The choices (except tyre compounds) will be remembered between different runs of "Practice Center".
 
 ### Exporting data to the session database
 

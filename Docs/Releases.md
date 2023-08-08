@@ -1,3 +1,19 @@
+## 5.2.2.0-release 08/11/23 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. The management of tyre pressure data has been fixed. It happened in rare situations, that tyre pressure were not stored in the session database, although you gave your consent.
+  4. A new [voice command "Tell me my last laptime"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Strategist-Commands-(EN)) is available for the Race Strategist and Race Spotter.
+  5. A new [information request action "LapTime"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) is available for the Race Strategist and Race Spotter to request the last lap time by a press of a button on your controller hardware.
+  6. An icon has been added to the Stream Deck icon set for the "LapTime" information request action.
+  7. *Practice run sheets* have been added to the "Practice Center", which helps you to create telemetry data for special conditions and car setups, for which no data is available yet. See the all new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#using-the-run-sheet) for more information.
+  8. When a stint plan is created or updated in the "Race Center" it now not only includes information from the strategy but also take the already run stints into account, especially for the driver selection of a stint in the stint plan. When a stint plan is already present, driver selection of stints that have not been started will not be overwritten anymore by information from the strategy.
+  9. When initializing the settings for the next pitstop in the "Race Center", used tyre sets of past stints will be taken into account and the system tries to [recommend the next fresh tyre set](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#planning-a-pitstop). But be sure to double check the recommendation to not end up with worn tyres after your pitstop. This method can be deactivated in the "Pitstop" menu.
+  10. "Race Center" and "Practice Center" now remember many menu choices between different runs.
+  11. [Developer] Additional information has been added to the ["Session State.json" file](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) introduced with the last release.
+  12. [Developer] The data format of the "Session State.json" file has been updated to better reflect the JSON data type standard.
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-522).
+  
 ## 5.2.1.0-release 08/04/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

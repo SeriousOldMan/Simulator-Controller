@@ -922,11 +922,17 @@ class PracticeCenter extends ConfigurationItem {
 	}
 
 	__New(configuration, raceSettings, simulator := false, car := false, track := false) {
+		local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
 		this.iSimulator := simulator
 		this.iCar := car
 		this.iTrack := track
 
 		this.iSessionDirectory := (kTempDirectory . "Sessions\Practice\")
+
+		this.UseSessionData := getMultiMapValue(settings, "Practice Center", "UseSessionData", true)
+		this.UseTelemetryDatabase := getMultiMapValue(settings, "Practice Center", "UseTelemetryDatabase", false)
+		this.iDataWeather := getMultiMapValue(settings, "Practice Center", "Weather", "Dry")
 
 		super.__New(configuration)
 
@@ -2142,15 +2148,27 @@ class PracticeCenter extends ConfigurationItem {
 	chooseDataMenu(line) {
 		local tyreCompound, tyreCompoundColor
 
+		updateSetting(setting, value) {
+			local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+			setMultiMapValue(settings, "Practice Center", setting, value)
+
+			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+		}
+
 		switch line {
 			case 3: ; Recommend...
 				this.withExceptionhandler(ObjBindMethod(this, "recommendDataRun", true))
 			case 5:
 				this.UseSessionData := !this.UseSessionData
 
+				updateSetting("UseSessionData", this.UseSessionData)
+
 				this.analyzeTelemetry()
 			case 6:
 				this.UseTelemetryDatabase := !this.UseTelemetryDatabase
+
+				updateSetting("UseTelemetryDatabase", this.UseTelemetryDatabase)
 
 				this.analyzeTelemetry()
 			default:
@@ -2158,6 +2176,8 @@ class PracticeCenter extends ConfigurationItem {
 
 				if ((line > 0) && (line <= kWeatherConditions.Length)) {
 					this.iDataWeather := kWeatherConditions[line]
+
+					updateSetting("Weather", this.Weather["Data"])
 
 					this.analyzeTelemetry()
 				}
@@ -2356,7 +2376,6 @@ class PracticeCenter extends ConfigurationItem {
 		this.iTyreCompound := "Dry"
 		this.iTyreCompoundColor := "Black"
 
-		this.iDataWeather := "Dry"
 		this.iDataTyreCompound := "Dry"
 		this.iDataTyreCompoundColor := "Black"
 
@@ -6864,7 +6883,7 @@ recommendDataRun(centerOrCommand := false, arguments*) {
 			recoGui.SetFont("s9 Norm", "Arial")
 
 			recoGui.Add("Documentation", "x106 YP+20 w164 Center", translate("Run Sheet")
-									   , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#recommend-practice-run")
+									   , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#using-the-run-sheet")
 
 			recoGui.SetFont("s8 Norm", "Arial")
 
@@ -6887,12 +6906,6 @@ recommendDataRun(centerOrCommand := false, arguments*) {
 			recoGui.SetFont("Bold", "Arial")
 
 			recoGui.Add("Text", "x45 yp+145 w320 h240 vrecommendationText")
-
-			recoGui.SetFont("Norm", "Arial")
-
-			recoGui.Add("Text", "x8 yp+245 w360 0x10")
-
-			recoGui.Add("Button", "x152 yp+10 w80 h23 Default", translate("Close")).OnEvent("Click", recommendDataRun.Bind(kClose))
 
 			recoGui.Show("AutoSize Center")
 

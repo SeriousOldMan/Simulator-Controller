@@ -340,6 +340,8 @@ You can also choose between two different methods to further adjust tyre pressur
   
      Using this method will use the target pressures derived by the Virtual Race Engineer, but these values will be corrected by applying the temperature corrected difference between the base pressures of the current driver and the next driver according to the stint plan. This will work best, when the reference pressures have been entered for very similar conditions.
 
+The choices will be remembered between different runs of "Race Center".
+
 Important: The correction factor to be applied for temperature corrections will be calculated with a linear regression using the supplied setup data. If there is not enough data available and the dependency of tyre pressures from the ambient temperatures cannot be derived, a fixed correction factor will be used instead. This correction factor can be defined in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings-1) independently for each simulator / car / track / weather combination, when necessary. When even these settings are missing, -0.1 PSI will be applied for each degree Celsius increase in air temperature, and -0.02 PSI for each increase in track temperature.
 
 Furthermore, it is possible to enable a compensation for pressure losses as reported by the Race Engineer, like slow punctures or sudden pressure losses cause of collisions with curbs. But be sure, that it is really a loss of pressure due to a puncture or running over curbs. If not, you will end up with even worse pressures in those tyres.

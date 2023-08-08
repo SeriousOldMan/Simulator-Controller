@@ -1338,7 +1338,19 @@ The content of the JSON file looks like this (depending on the current situation
 			"Lap": 10,
 			"PlannedPitstops": 2,
 			"RemainingPitstops": 2,
-			"TyreCompound": "Dry (Black)"
+			"TyreCompound": "Dry (Black)",
+			"Pitstops": [
+				{
+					"Nr": 1,
+					"Fuel": 12.0,
+					"TyreCompound": "Dry (Black)"
+				},
+				{
+					"Nr": 2,
+					"Fuel": 0.0,
+					"TyreCompound": null
+				}
+			]
 		},
 		"TeamServer": {
 			"Driver": "Oliver Juwig",

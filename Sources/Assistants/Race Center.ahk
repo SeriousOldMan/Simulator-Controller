@@ -181,7 +181,7 @@ class SyncSessionTask extends RaceCenterTask {
 	run() {
 		super.run()
 
-		this.Sleep := (RaceCenter.Instance.Synchronize ? (RaceCenter.Instance.Synchronize * 1000) : 10000)
+		this.Sleep := ((RaceCenter.Instance.Synchronize && isNumber(RaceCenter.Instance.Synchronize)) ? (RaceCenter.Instance.Synchronize * 1000) : 10000)
 
 		return this
 	}
@@ -1162,6 +1162,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	__New(configuration, raceSettings) {
+		local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 		local dllName, dllFile
 
 		this.iRaceSettings := raceSettings
@@ -1184,6 +1185,15 @@ class RaceCenter extends ConfigurationItem {
 			showMessage(translate("Error while initializing Team Server Connector - please rebuild the applications") . translate("...")
 					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 		}
+
+		this.iTyrePressureMode := getMultiMapValue(settings, "Race Center", "TyrePressureMode", "Reference")
+		this.iCorrectPressureLoss := getMultiMapValue(settings, "Race Center", "CorrectPressureLoss", "Reference")
+		this.iSelectTyreSet := getMultiMapValue(settings, "Race Center", "SelectTyreSet", true)
+
+		this.iUseSessionData := getMultiMapValue(settings, "Race Center", "UseSessionData", true)
+		this.iUseTelemetryDatabase := getMultiMapValue(settings, "Race Center", "UseTelemetryDatabase", false)
+		this.iUseCurrentMap := getMultiMapValue(settings, "Race Center", "UseCurrentMap", true)
+		this.iUseTraffic := getMultiMapValue(settings, "Race Center", "UseTraffic", false)
 
 		super.__New(configuration)
 
@@ -2921,7 +2931,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	updateSessionMenu() {
-		local synchronize := (this.Synchronize ? "(x) Synchronize" : "      Synchronize")
+		local synchronize := ((this.Synchronize && isNumber(this.Synchronize)) ? "(x) Synchronize" : "      Synchronize")
 
 		this.Control["sessionMenuDropDown"].Delete()
 		this.Control["sessionMenuDropDown"].Add(collect(["Session", "---------------------------------------------", "Connect", "Clear...", "---------------------------------------------", synchronize, "---------------------------------------------", "Select Team...", "---------------------------------------------", "Load Session...", "Save Session", "Save a Copy...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Race Summary", "Driver Statistics"], translate))
@@ -3711,7 +3721,8 @@ class RaceCenter extends ConfigurationItem {
 				rlPressure := coldPressures[3]
 				rrPressure := coldPressures[4]
 
-				this.initializePitstopTyreSetup(&tyreCompound, &tyreCompoundColor, &tyreSet, &flPressure, &frPressure, &rlPressure, &rrPressure, remote)
+				this.initializePitstopTyreSetup(&tyreCompound, &tyreCompoundColor, &tyreSet := true
+											  , &flPressure, &frPressure, &rlPressure, &rrPressure, remote)
 
 				if remote
 					pitstopTyreSetup := [tyreCompound, tyreCompoundColor, tyreSet, flPressure, frPressure, rlPressure, rrPressure]
@@ -3933,30 +3944,35 @@ class RaceCenter extends ConfigurationItem {
 		}
 	}
 
-	initializePitstopTyreSetup(&tyreCompound, &tyreCompoundColor, &tyreSet, &flPressure, &frPressure, &rlPressure, &rrPressure, remote := false) {
+	initializePitstopTyreSetup(&tyreCompound, &tyreCompoundColor, &tyreSet
+							 , &flPressure, &frPressure, &rlPressure, &rrPressure
+							 , remote := false, adjust := true) {
 		local currentStint := this.CurrentStint
+		local calcTyreSet := tyreSet
 		local chosen, stint, theCompound
 
-		tyreSet := 0
+		if calcTyreSet {
+			tyreSet := 0
 
-		if (this.SelectTyreSet && tyreCompound && currentStint) {
-			theCompound := compound(tyreCompound, tyreCompoundColor)
+			if (this.SelectTyreSet && tyreCompound && currentStint) {
+				theCompound := compound(tyreCompound, tyreCompoundColor)
 
-			loop currentStint.Nr
-				if this.Stints.Has(A_Index) {
-					stint := this.Stints[A_Index]
+				loop currentStint.Nr
+					if this.Stints.Has(A_Index) {
+						stint := this.Stints[A_Index]
 
-					if ((stint.Compound = theCompound) && stint.TyreSet)
-						tyreSet := Max(tyreSet, stint.TyreSet)
-				}
+						if ((stint.Compound = theCompound) && stint.TyreSet)
+							tyreSet := Max(tyreSet, stint.TyreSet)
+					}
 
-				if (tyreSet > 0)
-					tyreSet += 1
+					if (tyreSet > 0)
+						tyreSet += 1
+			}
 		}
 
 		if remote {
 			if tyreCompound {
-				if this.TyrePressureMode
+				if (adjust && this.TyrePressureMode)
 					this.adjustPitstopTyrePressures(this.TyrePressureMode, this.Weather, this.AirTemperature, this.TrackTemperature
 												  , tyreCompound, tyreCompoundColor, &flPressure, &frPressure, &rlPressure, &rrPressure)
 
@@ -3980,7 +3996,7 @@ class RaceCenter extends ConfigurationItem {
 		}
 		else {
 			if tyreCompound {
-				if this.TyrePressureMode
+				if (adjust && this.TyrePressureMode)
 					this.adjustPitstopTyrePressures(this.TyrePressureMode, this.Weather, this.AirTemperature, this.TrackTemperature
 												  , tyreCompound, tyreCompoundColor, &flPressure, &frPressure, &rlPressure, &rrPressure)
 
@@ -3988,7 +4004,8 @@ class RaceCenter extends ConfigurationItem {
 
 				this.Control["pitstopTyreCompoundDropDown"].Choose((chosen == 0) ? 1 : chosen)
 
-				this.Control["pitstopTyreSetEdit"].Text := tyreSet
+				if calcTyreSet
+					this.Control["pitstopTyreSetEdit"].Text := tyreSet
 
 				this.Control["pitstopPressureFLEdit"].Text := (isNumber(flPressure) ? displayValue("Float", convertUnit("Pressure", flPressure)) : "")
 				this.Control["pitstopPressureFREdit"].Text := (isNumber(frPressure) ? displayValue("Float", convertUnit("Pressure", frPressure)) : "")
@@ -4382,7 +4399,7 @@ class RaceCenter extends ConfigurationItem {
 
 					synchronizeMenu.Add(translate("Off"), (*) => (this.iSynchronize := false))
 
-					if !this.Synchronize
+					if (!this.Synchronize || (this.Synchronize = "Off"))
 						synchronizeMenu.Check(translate("Off"))
 
 					for ignore, seconds in [4, 5, 6, 8, 10, 12, 14, 16, 20, 25, 30, 40, 50, 60] {
@@ -4398,7 +4415,7 @@ class RaceCenter extends ConfigurationItem {
 
 					synchronizeMenu.Show()
 				}
-				else if this.Synchronize
+				else if (this.Synchronize && isNumber(this.Synchronize))
 					this.iSynchronize := false
 				else
 					this.iSynchronize := 10
@@ -4445,6 +4462,14 @@ class RaceCenter extends ConfigurationItem {
 	chooseStrategyMenu(line) {
 		local strategy, simulator, car, track, simulatorCode, dirName, fileName, configuration, fileName, name, msgResult
 		local directory
+
+		updateSetting(setting, value) {
+			local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+			setMultiMapValue(settings, "Race Center", setting, value)
+
+			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+		}
 
 		if this.Simulator {
 			simulator := this.Simulator
@@ -4539,17 +4564,25 @@ class RaceCenter extends ConfigurationItem {
 			case 9: ; Use Session Data
 				this.iUseSessionData := !this.UseSessionData
 
+				updateSetting("UseSessionData", this.UseSessionData)
+
 				this.updateState()
 			case 10: ; Use Telemetry Database
 				this.iUseTelemetryDatabase := !this.UseTelemetryDatabase
+
+				updateSetting("UseTelemetryDatabase", this.UseTelemetryDatabase)
 
 				this.updateState()
 			case 11: ; Use current Map
 				this.iUseCurrentMap := !this.UseCurrentMap
 
+				updateSetting("UseCurrentMap", this.UseCurrentMap)
+
 				this.updateState()
 			case 12: ; Use Traffic
 				this.iUseTraffic := !this.UseTraffic
+
+				updateSetting("UseTraffic", this.UseTraffic)
 
 				this.updateState()
 			case 14: ; Run Simulation
@@ -4642,6 +4675,14 @@ class RaceCenter extends ConfigurationItem {
 	choosePitstopMenu(line) {
 		local exePath, options, simulator
 
+		updateSetting(setting, value) {
+			local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+			setMultiMapValue(settings, "Race Center", setting, value)
+
+			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+		}
+
 		switch line {
 			case 3: ; Manage Team
 				this.manageTeam()
@@ -4688,17 +4729,25 @@ class RaceCenter extends ConfigurationItem {
 			case 12:
 				this.iTyrePressureMode := ((this.TyrePressureMode = "Reference") ? false : "Reference")
 
+				updateSetting("TyrePressureMode", this.TyrePressureMode)
+
 				this.updateState()
 			case 13:
 				this.iTyrePressureMode := ((this.TyrePressureMode = "Relative") ? false : "Relative")
+
+				updateSetting("TyrePressureMode", this.TyrePressureMode)
 
 				this.updateState()
 			case 14:
 				this.iCorrectPressureLoss := !this.CorrectPressureLoss
 
+				updateSetting("CorrectPressureLoss", this.CorrectPressureLoss)
+
 				this.updateState()
 			case 15:
 				this.iSelectTyreSet := !this.SelectTyreSet
+
+				updateSetting("SelectTyreSet", this.SelectTyreSet)
 
 				this.updateState()
 			case 17:
@@ -7399,7 +7448,7 @@ class RaceCenter extends ConfigurationItem {
 	syncSession() {
 		local initial := !this.LastLap
 		local strategy, session, lastLap, simulator, car, track, newLaps, newData, newReports, finished, message, forcePitstopUpdate
-		local selectedLap, selectedStint, currentStint, driverSwapRequest
+		local selectedLap, selectedStint, currentStint, driverSwapRequest, sessionActive
 
 		static hadLastLap := false
 		static nextPitstopUpdate := false
@@ -7408,17 +7457,23 @@ class RaceCenter extends ConfigurationItem {
 			session := this.SelectedSession[true]
 
 			try {
+				sessionActive := isNumber(this.Synchronize)
+
 				this.showMessage(translate("Syncing session"))
 
 				if (getLogLevel() <= kLogInfo)
 					logMessage(kLogInfo, translate("Syncing session"))
 
-				lastLap := this.Connector.GetSessionLastLap(session)
+				if sessionActive {
+					lastLap := this.Connector.GetSessionLastLap(session)
 
-				if lastLap {
-					lastLap := parseObject(this.Connector.GetLap(lastLap))
-					lastLap.Nr := (lastLap.Nr + 0)
+					if lastLap {
+						lastLap := parseObject(this.Connector.GetLap(lastLap))
+						lastLap.Nr := (lastLap.Nr + 0)
+					}
 				}
+				else
+					lastLap := false
 
 				if (hadLastLap && !lastLap) {
 					this.initializeSession()
@@ -7450,101 +7505,103 @@ class RaceCenter extends ConfigurationItem {
 				this.syncPlan()
 				this.syncStrategy()
 
-				newLaps := false
-				newData := false
+				if sessionActive {
+					newLaps := false
+					newData := false
 
-				selectedLap := this.LapsListView.GetNext()
+					selectedLap := this.LapsListView.GetNext()
 
-				if selectedLap
-					selectedLap := (selectedLap == this.LapsListView.GetCount())
+					if selectedLap
+						selectedLap := (selectedLap == this.LapsListView.GetCount())
 
-				selectedStint := this.StintsListView.GetNext()
+					selectedStint := this.StintsListView.GetNext()
 
-				if selectedStint
-					selectedStint := (selectedStint == this.StintsListView.GetCount())
+					if selectedStint
+						selectedStint := (selectedStint == this.StintsListView.GetCount())
 
-				if lastLap
-					newLaps := this.syncLaps(lastLap)
+					if lastLap
+						newLaps := this.syncLaps(lastLap)
 
-				if this.syncRaceReport() {
-					newData := true
-
-					newReports := true
-				}
-				else
-					newReports := false
-
-				if this.syncPitstops(newLaps) {
-					newData := true
-
-					nextPitstopUpdate := (this.LastLap.Nr + 2)
-				}
-
-				if this.syncTelemetry()
-					newData := true
-
-				if this.syncTyrePressures()
-					newData := true
-
-				this.updatePitstops()
-
-				forcePitstopUpdate := (this.LastLap && (this.LastLap.Nr = nextPitstopUpdate))
-
-				if this.syncPitstopsDetails(forcePitstopUpdate || initial)
-					newData := true
-
-				if forcePitstopUpdate
-					nextPitstopUpdate := false
-
-				if (this.LastLap && (this.SelectedReport == "Track"))
-					if this.syncTrackMap()
+					if this.syncRaceReport() {
 						newData := true
 
-				if newLaps {
-					this.showMessage(translate("Saving session"))
+						newReports := true
+					}
+					else
+						newReports := false
 
-					this.syncSessionStore()
-				}
+					if this.syncPitstops(newLaps) {
+						newData := true
 
-				if (newData || newLaps)
-					this.updateReports()
-
-				if newLaps {
-					if (selectedLap && (this.SelectedDetailReport = "Lap")) {
-						this.LapsListView.Modify(this.LapsListView.GetCount(), "Select Vis")
-
-						this.showLapDetails(this.LastLap)
+						nextPitstopUpdate := (this.LastLap.Nr + 2)
 					}
 
-					if (selectedStint && (this.SelectedDetailReport = "Stint")) {
-						this.StintsListView.Modify(this.StintsListView.GetCount(), "Select Vis")
+					if this.syncTelemetry()
+						newData := true
 
-						this.showStintDetails(this.CurrentStint)
+					if this.syncTyrePressures()
+						newData := true
+
+					this.updatePitstops()
+
+					forcePitstopUpdate := (this.LastLap && (this.LastLap.Nr = nextPitstopUpdate))
+
+					if this.syncPitstopsDetails(forcePitstopUpdate || initial)
+						newData := true
+
+					if forcePitstopUpdate
+						nextPitstopUpdate := false
+
+					if (this.LastLap && (this.SelectedReport == "Track"))
+						if this.syncTrackMap()
+							newData := true
+
+					if newLaps {
+						this.showMessage(translate("Saving session"))
+
+						this.syncSessionStore()
 					}
 
-					if (this.SelectedDetailReport = "Plan") {
-						if (currentStint != this.CurrentStint)
-							this.showPlanDetails()
+					if (newData || newLaps)
+						this.updateReports()
+
+					if newLaps {
+						if (selectedLap && (this.SelectedDetailReport = "Lap")) {
+							this.LapsListView.Modify(this.LapsListView.GetCount(), "Select Vis")
+
+							this.showLapDetails(this.LastLap)
+						}
+
+						if (selectedStint && (this.SelectedDetailReport = "Stint")) {
+							this.StintsListView.Modify(this.StintsListView.GetCount(), "Select Vis")
+
+							this.showStintDetails(this.CurrentStint)
+						}
+
+						if (this.SelectedDetailReport = "Plan") {
+							if (currentStint != this.CurrentStint)
+								this.showPlanDetails()
+						}
+						else if (this.SelectedDetailReport = "Session")
+							this.showSessionSummary()
+						else if (this.SelectedDetailReport = "Drivers")
+							this.showDriverStatistics()
 					}
-					else if (this.SelectedDetailReport = "Session")
-						this.showSessionSummary()
-					else if (this.SelectedDetailReport = "Drivers")
-						this.showDriverStatistics()
-				}
-				else if newReports {
-					if (selectedLap && (this.SelectedDetailReport = "Lap")) {
-						this.LapsListView.Modify(this.LapsListView.GetCount(), "Select Vis")
+					else if newReports {
+						if (selectedLap && (this.SelectedDetailReport = "Lap")) {
+							this.LapsListView.Modify(this.LapsListView.GetCount(), "Select Vis")
 
-						this.showLapDetails(this.LastLap)
+							this.showLapDetails(this.LastLap)
+						}
 					}
-				}
-				else if (!newLaps && !this.SessionFinished) {
-					finished := parseObject(this.Connector.GetSession(this.SelectedSession[true])).Finished
+					else if (!newLaps && !this.SessionFinished) {
+						finished := parseObject(this.Connector.GetSession(this.SelectedSession[true])).Finished
 
-					if (finished && (finished = "true")) {
-						this.saveSession()
+						if (finished && (finished = "true")) {
+							this.saveSession()
 
-						this.iSessionFinished := true
+							this.iSessionFinished := true
+						}
 					}
 				}
 
@@ -7561,18 +7618,19 @@ class RaceCenter extends ConfigurationItem {
 				Sleep(2000)
 			}
 
-			try {
-				driverSwapRequest := this.Connector.GetSessionValue(session, "Race Engineer Driver Swap Request")
+			if sessionActive
+				try {
+					driverSwapRequest := this.Connector.GetSessionValue(session, "Race Engineer Driver Swap Request")
 
-				if (StrLen(driverSwapRequest) > 0) {
-					this.Connector.DeleteSessionValue(session, "Race Engineer Driver Swap Request")
+					if (StrLen(driverSwapRequest) > 0) {
+						this.Connector.DeleteSessionValue(session, "Race Engineer Driver Swap Request")
 
-					this.pushTask(ObjBindMethod(this, "planDriverSwap", string2Values(";", driverSwapRequest)*))
+						this.pushTask(ObjBindMethod(this, "planDriverSwap", string2Values(";", driverSwapRequest)*))
+					}
 				}
-			}
-			catch Any as exception {
-				logError(exception, true)
-			}
+				catch Any as exception {
+					logError(exception, true)
+				}
 
 			this.showMessage(false)
 		}
@@ -12228,6 +12286,9 @@ startupRaceCenter() {
 
 	rCenter := RaceCenter(kSimulatorConfiguration, readMultiMap(kUserConfigDirectory . "Race.settings"))
 
+	if GetKeyState("Ctrl", "P")
+		rCenter.iSynchronize := "Off"
+
 	rCenter.createGui(rCenter.Configuration)
 
 	rCenter.show()
@@ -12244,10 +12305,13 @@ startupRaceCenter() {
 
 setTyrePressures(tyreCompound, tyreCompoundColor, flPressure, frPressure, rlPressure, rrPressure) {
 	local rCenter := RaceCenter.Instance
+	local tyreSet
 
 	if (rCenter.iPressuresRequest = "Pitstop")
-		rCenter.withExceptionhandler(ObjBindMethod(rCenter, "initializePitstopTyreSetup", &tyreCompound, &tyreCompoundColor, &tyreSet := false
-																						, &flPressure, &frPressure, &rlPressure, &rrPressure))
+		rCenter.withExceptionhandler(ObjBindMethod(rCenter, "initializePitstopTyreSetup", &tyreCompound, &tyreCompoundColor
+																						, &tyreSet := false
+																						, &flPressure, &frPressure
+																						, &rlPressure, &rrPressure, false, false))
 	else
 		if (rCenter.SetupsListView.GetNext(0) = rCenter.iPressuresRequest)
 			rCenter.withExceptionhandler(ObjBindMethod(rCenter, "initializeSetup", tyreCompound, tyreCompoundColor, flPressure, frPressure, rlPressure, rrPressure))

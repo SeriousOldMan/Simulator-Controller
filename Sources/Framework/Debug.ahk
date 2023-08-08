@@ -9,8 +9,8 @@
 ;;;                        Private Variable Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global gDebug := (kBuildConfiguration = "Development")
-global gLogLevel := ((kBuildConfiguration = "Development") ? kLogDebug : kLogWarn)
+global gDebug := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory)), "Debug", "Debug", kBuildConfiguration = "Development")
+global gLogLevel := kLogLevels[getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory)), "Debug", "LogLevel", (kBuildConfiguration = "Development") ? "Debug" : "Warn")]
 
 
 ;;;-------------------------------------------------------------------------;;;

@@ -83,7 +83,8 @@ readMultiMap(multiMapFile) {
 	local tries := 20
 	local data := false
 
-	multiMapFile := getFileName(multiMapFile, kUserConfigDirectory, kConfigDirectory)
+	if !FileExist(multiMapFile)
+		multiMapFile := getFileName(multiMapFile, kUserConfigDirectory, kConfigDirectory)
 
 	if FileExist(multiMapFile) {
 		loop
@@ -143,7 +144,7 @@ parseMultiMap(text) {
 				key := StrReplace(StrReplace(StrReplace(keyValue[1], "_#_EQ-#_", "="), "_#_AC-#_", "\\"), "_#_CR-#_", "`n")
 				value := ((keyValue.Length > 1) ? StrReplace(StrReplace(StrReplace(keyValue[2], "_#_EQ-#_", "="), "_#_AC-#_", "\"), "_#_CR-#_", "`n") : "")
 
-				multiMap[section][key] := ((value = kTrue) ? true : ((value = kFalse) ? false : value))
+				multiMap[section][key] := ((value = "true") ? true : ((value = "false") ? false : value))
 			}
 		}
 	}

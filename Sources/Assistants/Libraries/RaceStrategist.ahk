@@ -1570,7 +1570,7 @@ class RaceStrategist extends GridRaceAssistant {
 				}
 				else {
 					setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound", false)
-					setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound", false)
+					setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound.Color", false)
 				}
 			}
 		}

@@ -60,15 +60,16 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 
 					arguments := ""
 
-					for ignore, descriptor in this.iSimulatorMFDKeys[simulator] {
-						key := descriptor[3]
-						value := wizard.getSimulatorValue(simulator, key, descriptor[4])
+					if this.iSimulatorMFDKeys.Has(simulator)
+						for ignore, descriptor in this.iSimulatorMFDKeys[simulator] {
+							key := descriptor[3]
+							value := wizard.getSimulatorValue(simulator, key, descriptor[4])
 
-						if (arguments != "")
-							arguments .= "; "
+							if (arguments != "")
+								arguments .= "; "
 
-						arguments .= (key . ": " . value)
-					}
+							arguments .= (key . ": " . value)
+						}
 
 					for ignore, mode in ["Pitstop", "Assistant"] {
 						actions := ""

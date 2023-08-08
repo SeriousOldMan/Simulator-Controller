@@ -129,6 +129,8 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		}
 
 		Plugin("System", false, true, "", arguments).saveToConfiguration(configuration)
+		
+		Plugin("Integration", false, false).saveToConfiguration(configuration)
 	}
 
 	createGui(wizard, x, y, width, height) {

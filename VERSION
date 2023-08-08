@@ -1,9 +1,9 @@
 [Development]
 Version=5.2.2.0-dev
 Target=5.2.2.0-release
-Date=08/06/2023
+Date=08/08/2023
 Download=
-Changes=More fields for "Session State.json", Data format update for "Session State.json", New voice command "Tell me my last laptime", New information request action "LapTime", New icon in Stream Deck icon set for "LapTime", Optimized stint plan creation/update in "Race Center", Next tyre set handling in "Race Center"
+Changes=More fields for "Session State.json", Data format update for "Session State.json", New voice command "Tell me my last laptime", New information request action "LapTime", New icon in Stream Deck icon set for "LapTime", Optimized stint plan creation/update in "Race Center", Next tyre set handling in "Race Center", New practice run sheets in "Practice Center", New framework configuration and debug settings in "Core Settings.ini", New modifier key when starting "Race Center"
 [Release]
 Version=5.2.1.0-release
 Date=08/04/2023

@@ -43,6 +43,12 @@ Although the code, that handles all the update tasks, is integrated into *Simula
 
 Note: Some of you might want to have more control. No problem. All the files in the *Simulator Controller\Config*, *Simulator Controller\Translations*, *Simulator Controller\Grammars* and *Simulator Controller\Rules* folders are human readable and using a text editor and some *Diff* tool, you can do everything the automated procedure does on your own. But be sure to make a backup copy of all the files, just for peace of mind. Attention: These files use a two-byte character set, so be sure to use an editor that can handle this.
 
+## Release 5.2.2
+
+A new information request action "LapTime" is available, incl. a specialized icon for Stream Deck. If you are a Stream Deck user, you might want to integrate the new action into your profile.
+
+***
+
 ## Release 5.2.1
 
 The Stream Deck plugin has been updated. You may want to install the new version, if you have encountered stability issues in the past.

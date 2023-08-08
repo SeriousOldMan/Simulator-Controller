@@ -181,7 +181,7 @@ class SyncSessionTask extends RaceCenterTask {
 	run() {
 		super.run()
 
-		this.Sleep := (RaceCenter.Instance.Synchronize ? (RaceCenter.Instance.Synchronize * 1000) : 10000)
+		this.Sleep := ((RaceCenter.Instance.Synchronize && isNumber(RaceCenter.Instance.Synchronize)) ? (RaceCenter.Instance.Synchronize * 1000) : 10000)
 
 		return this
 	}
@@ -2921,7 +2921,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	updateSessionMenu() {
-		local synchronize := (this.Synchronize ? "(x) Synchronize" : "      Synchronize")
+		local synchronize := ((this.Synchronize && isNumber(this.Synchronize)) ? "(x) Synchronize" : "      Synchronize")
 
 		this.Control["sessionMenuDropDown"].Delete()
 		this.Control["sessionMenuDropDown"].Add(collect(["Session", "---------------------------------------------", "Connect", "Clear...", "---------------------------------------------", synchronize, "---------------------------------------------", "Select Team...", "---------------------------------------------", "Load Session...", "Save Session", "Save a Copy...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Race Summary", "Driver Statistics"], translate))
@@ -4382,7 +4382,7 @@ class RaceCenter extends ConfigurationItem {
 
 					synchronizeMenu.Add(translate("Off"), (*) => (this.iSynchronize := false))
 
-					if !this.Synchronize
+					if (!this.Synchronize || (this.Synchronize = "Off"))
 						synchronizeMenu.Check(translate("Off"))
 
 					for ignore, seconds in [4, 5, 6, 8, 10, 12, 14, 16, 20, 25, 30, 40, 50, 60] {
@@ -4398,7 +4398,7 @@ class RaceCenter extends ConfigurationItem {
 
 					synchronizeMenu.Show()
 				}
-				else if this.Synchronize
+				else if (this.Synchronize && isNumber(this.Synchronize))
 					this.iSynchronize := false
 				else
 					this.iSynchronize := 10
@@ -7399,7 +7399,7 @@ class RaceCenter extends ConfigurationItem {
 	syncSession() {
 		local initial := !this.LastLap
 		local strategy, session, lastLap, simulator, car, track, newLaps, newData, newReports, finished, message, forcePitstopUpdate
-		local selectedLap, selectedStint, currentStint, driverSwapRequest
+		local selectedLap, selectedStint, currentStint, driverSwapRequest, sessionActive
 
 		static hadLastLap := false
 		static nextPitstopUpdate := false
@@ -7408,17 +7408,23 @@ class RaceCenter extends ConfigurationItem {
 			session := this.SelectedSession[true]
 
 			try {
+				sessionActive := isNumber(this.Synchronize)
+
 				this.showMessage(translate("Syncing session"))
 
 				if (getLogLevel() <= kLogInfo)
 					logMessage(kLogInfo, translate("Syncing session"))
 
-				lastLap := this.Connector.GetSessionLastLap(session)
+				if sessionActive {
+					lastLap := this.Connector.GetSessionLastLap(session)
 
-				if lastLap {
-					lastLap := parseObject(this.Connector.GetLap(lastLap))
-					lastLap.Nr := (lastLap.Nr + 0)
+					if lastLap {
+						lastLap := parseObject(this.Connector.GetLap(lastLap))
+						lastLap.Nr := (lastLap.Nr + 0)
+					}
 				}
+				else
+					lastLap := false
 
 				if (hadLastLap && !lastLap) {
 					this.initializeSession()
@@ -7450,101 +7456,103 @@ class RaceCenter extends ConfigurationItem {
 				this.syncPlan()
 				this.syncStrategy()
 
-				newLaps := false
-				newData := false
+				if sessionActive {
+					newLaps := false
+					newData := false
 
-				selectedLap := this.LapsListView.GetNext()
+					selectedLap := this.LapsListView.GetNext()
 
-				if selectedLap
-					selectedLap := (selectedLap == this.LapsListView.GetCount())
+					if selectedLap
+						selectedLap := (selectedLap == this.LapsListView.GetCount())
 
-				selectedStint := this.StintsListView.GetNext()
+					selectedStint := this.StintsListView.GetNext()
 
-				if selectedStint
-					selectedStint := (selectedStint == this.StintsListView.GetCount())
+					if selectedStint
+						selectedStint := (selectedStint == this.StintsListView.GetCount())
 
-				if lastLap
-					newLaps := this.syncLaps(lastLap)
+					if lastLap
+						newLaps := this.syncLaps(lastLap)
 
-				if this.syncRaceReport() {
-					newData := true
-
-					newReports := true
-				}
-				else
-					newReports := false
-
-				if this.syncPitstops(newLaps) {
-					newData := true
-
-					nextPitstopUpdate := (this.LastLap.Nr + 2)
-				}
-
-				if this.syncTelemetry()
-					newData := true
-
-				if this.syncTyrePressures()
-					newData := true
-
-				this.updatePitstops()
-
-				forcePitstopUpdate := (this.LastLap && (this.LastLap.Nr = nextPitstopUpdate))
-
-				if this.syncPitstopsDetails(forcePitstopUpdate || initial)
-					newData := true
-
-				if forcePitstopUpdate
-					nextPitstopUpdate := false
-
-				if (this.LastLap && (this.SelectedReport == "Track"))
-					if this.syncTrackMap()
+					if this.syncRaceReport() {
 						newData := true
 
-				if newLaps {
-					this.showMessage(translate("Saving session"))
+						newReports := true
+					}
+					else
+						newReports := false
 
-					this.syncSessionStore()
-				}
+					if this.syncPitstops(newLaps) {
+						newData := true
 
-				if (newData || newLaps)
-					this.updateReports()
-
-				if newLaps {
-					if (selectedLap && (this.SelectedDetailReport = "Lap")) {
-						this.LapsListView.Modify(this.LapsListView.GetCount(), "Select Vis")
-
-						this.showLapDetails(this.LastLap)
+						nextPitstopUpdate := (this.LastLap.Nr + 2)
 					}
 
-					if (selectedStint && (this.SelectedDetailReport = "Stint")) {
-						this.StintsListView.Modify(this.StintsListView.GetCount(), "Select Vis")
+					if this.syncTelemetry()
+						newData := true
 
-						this.showStintDetails(this.CurrentStint)
+					if this.syncTyrePressures()
+						newData := true
+
+					this.updatePitstops()
+
+					forcePitstopUpdate := (this.LastLap && (this.LastLap.Nr = nextPitstopUpdate))
+
+					if this.syncPitstopsDetails(forcePitstopUpdate || initial)
+						newData := true
+
+					if forcePitstopUpdate
+						nextPitstopUpdate := false
+
+					if (this.LastLap && (this.SelectedReport == "Track"))
+						if this.syncTrackMap()
+							newData := true
+
+					if newLaps {
+						this.showMessage(translate("Saving session"))
+
+						this.syncSessionStore()
 					}
 
-					if (this.SelectedDetailReport = "Plan") {
-						if (currentStint != this.CurrentStint)
-							this.showPlanDetails()
+					if (newData || newLaps)
+						this.updateReports()
+
+					if newLaps {
+						if (selectedLap && (this.SelectedDetailReport = "Lap")) {
+							this.LapsListView.Modify(this.LapsListView.GetCount(), "Select Vis")
+
+							this.showLapDetails(this.LastLap)
+						}
+
+						if (selectedStint && (this.SelectedDetailReport = "Stint")) {
+							this.StintsListView.Modify(this.StintsListView.GetCount(), "Select Vis")
+
+							this.showStintDetails(this.CurrentStint)
+						}
+
+						if (this.SelectedDetailReport = "Plan") {
+							if (currentStint != this.CurrentStint)
+								this.showPlanDetails()
+						}
+						else if (this.SelectedDetailReport = "Session")
+							this.showSessionSummary()
+						else if (this.SelectedDetailReport = "Drivers")
+							this.showDriverStatistics()
 					}
-					else if (this.SelectedDetailReport = "Session")
-						this.showSessionSummary()
-					else if (this.SelectedDetailReport = "Drivers")
-						this.showDriverStatistics()
-				}
-				else if newReports {
-					if (selectedLap && (this.SelectedDetailReport = "Lap")) {
-						this.LapsListView.Modify(this.LapsListView.GetCount(), "Select Vis")
+					else if newReports {
+						if (selectedLap && (this.SelectedDetailReport = "Lap")) {
+							this.LapsListView.Modify(this.LapsListView.GetCount(), "Select Vis")
 
-						this.showLapDetails(this.LastLap)
+							this.showLapDetails(this.LastLap)
+						}
 					}
-				}
-				else if (!newLaps && !this.SessionFinished) {
-					finished := parseObject(this.Connector.GetSession(this.SelectedSession[true])).Finished
+					else if (!newLaps && !this.SessionFinished) {
+						finished := parseObject(this.Connector.GetSession(this.SelectedSession[true])).Finished
 
-					if (finished && (finished = "true")) {
-						this.saveSession()
+						if (finished && (finished = "true")) {
+							this.saveSession()
 
-						this.iSessionFinished := true
+							this.iSessionFinished := true
+						}
 					}
 				}
 
@@ -7561,18 +7569,19 @@ class RaceCenter extends ConfigurationItem {
 				Sleep(2000)
 			}
 
-			try {
-				driverSwapRequest := this.Connector.GetSessionValue(session, "Race Engineer Driver Swap Request")
+			if sessionActive
+				try {
+					driverSwapRequest := this.Connector.GetSessionValue(session, "Race Engineer Driver Swap Request")
 
-				if (StrLen(driverSwapRequest) > 0) {
-					this.Connector.DeleteSessionValue(session, "Race Engineer Driver Swap Request")
+					if (StrLen(driverSwapRequest) > 0) {
+						this.Connector.DeleteSessionValue(session, "Race Engineer Driver Swap Request")
 
-					this.pushTask(ObjBindMethod(this, "planDriverSwap", string2Values(";", driverSwapRequest)*))
+						this.pushTask(ObjBindMethod(this, "planDriverSwap", string2Values(";", driverSwapRequest)*))
+					}
 				}
-			}
-			catch Any as exception {
-				logError(exception, true)
-			}
+				catch Any as exception {
+					logError(exception, true)
+				}
 
 			this.showMessage(false)
 		}
@@ -12227,6 +12236,9 @@ startupRaceCenter() {
 	A_IconTip := "Race Center"
 
 	rCenter := RaceCenter(kSimulatorConfiguration, readMultiMap(kUserConfigDirectory . "Race.settings"))
+
+	if GetKeyState("Ctrl", "P")
+		rCenter.iSynchronize := "Off"
 
 	rCenter.createGui(rCenter.Configuration)
 

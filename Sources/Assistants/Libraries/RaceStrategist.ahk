@@ -1580,9 +1580,12 @@ class RaceStrategist extends GridRaceAssistant {
 			loop getMultiMapValue(sessionInfo, "Strategy", "Pitstop.Count") {
 				pitstop := A_Index
 
-				for ignore, theFact in [".Lap", ".Fuel.Amount", ".Tyre.Change", ".Tyre.Compound", ".Tyre.Compound.Color", ".Map"]
+				for ignore, theFact in [".Fuel.Amount", ".Tyre.Change", ".Tyre.Compound", ".Tyre.Compound.Color", ".Map"]
 					setMultiMapValue(sessionInfo, "Strategy", "Pitstop." . pitstop . theFact
 								   , knowledgeBase.getValue("Strategy.Pitstop." . pitstop . theFact))
+
+				setMultiMapValue(sessionInfo, "Strategy", "Pitstop." . pitstop . ".Lap"
+							   , knowledgeBase.getValue("Strategy.Pitstop." . pitstop . ".Lap") + 1)
 			}
 		}
 

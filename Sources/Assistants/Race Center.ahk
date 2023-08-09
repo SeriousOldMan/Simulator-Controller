@@ -1298,7 +1298,7 @@ class RaceCenter extends ConfigurationItem {
 		}
 
 		chooseAxis(*) {
-			center.withExceptionhandler(ObjBindMethod(center, "showTelemetryReport"))
+			center.withExceptionhandler(ObjBindMethod(center, "showTelemetryReport", true))
 		}
 
 		chooseChartType(*) {
@@ -9353,9 +9353,9 @@ class RaceCenter extends ConfigurationItem {
 		}
 	}
 
-	showTelemetryReport() {
+	showTelemetryReport(save := false) {
 		local window := this.Window
-		local xAxis, yAxises
+		local xAxis, yAxises, report, settings
 
 		xAxis := this.iXColumns[window["dataXDropDown"].Value]
 		yAxises := Array(this.iY1Columns[window["dataY1DropDown"].Value])
@@ -9374,6 +9374,17 @@ class RaceCenter extends ConfigurationItem {
 
 		if (window["dataY6DropDown"].Value > 1)
 			yAxises.Push(this.iY6Columns[window["dataY6DropDown"].Value - 1])
+
+		if save {
+			report := this.SelectedReport
+			settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+			setMultiMapValue(settings, "Race Center", "Report." . report . ".Plot", ["Scatter", "Bar", "Bubble", "Line"][this.Control["chartTypeDropDown"].Value])
+			setMultiMapValue(settings, "Race Center", "Report." . report . ".X-Axis", xAxis)
+			setMultiMapValue(settings, "Race Center", "Report." . report . ".Y-Axises", values2String(";", yAxises*))
+
+			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+		}
 
 		this.showDataPlot(this.SessionStore.Tables["Lap.Data"], xAxis, yAxises)
 
@@ -9460,6 +9471,7 @@ class RaceCenter extends ConfigurationItem {
 		local window := this.Window
 		local xChoices, y1Choices, y2Choices, y3Choices, y4Choices, y5Choices, y6Choices
 		local sessionDB, selected, names, ignore, id, found, index, driver
+		local settings, axis, value
 
 		if (force || (report != this.SelectedReport) || (window["dataXDropDown"].Value == 0)) {
 			xChoices := []
@@ -9580,7 +9592,24 @@ class RaceCenter extends ConfigurationItem {
 			local dataY5Choice := 0
 			local dataY6Choice := 0
 
-			if (report = "Pressures") {
+			settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+			value := getMultiMapValue(settings, "Race Center", "Report." . report . ".Plot", kUndefined)
+
+			if (value != kUndefined) {
+				this.Control["chartTypeDropDown"].Choose(inList(["Scatter", "Bar", "Bubble", "Line"], value))
+
+				this.iSelectedChartType := value
+
+				dataXChoice := inList(xChoices, getMultiMapValue(settings, "Race Center", "Report." . report . ".X-Axis"))
+
+				loop 6
+					%"dataY" . A_Index . "Choice"% := 1
+
+				for axis, value in string2Values(";", getMultiMapValue(settings, "Race Center", "Report." . report . ".Y-Axises"))
+					%"dataY" . axis . "Choice"% := (inList(%"y" . axis . "Choices"%) + ((axis = 1) ? 0 : 1))
+			}
+			else if (report = "Pressures") {
 				window["chartTypeDropDown"].Choose(4)
 
 				this.iSelectedChartType := "Line"
@@ -10117,7 +10146,7 @@ class RaceCenter extends ConfigurationItem {
 
 			this.iSelectedChartType := chartType
 
-			this.showTelemetryReport()
+			this.showTelemetryReport(true)
 		}
 	}
 

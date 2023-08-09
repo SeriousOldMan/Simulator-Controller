@@ -1030,7 +1030,7 @@ class PracticeCenter extends ConfigurationItem {
 		}
 
 		chooseAxis(*) {
-			center.withExceptionhandler(ObjBindMethod(center, "showTelemetryReport"))
+			center.withExceptionhandler(ObjBindMethod(center, "showTelemetryReport", true))
 		}
 
 		chooseChartType(*) {
@@ -4834,9 +4834,9 @@ class PracticeCenter extends ConfigurationItem {
 		}
 	}
 
-	showTelemetryReport() {
+	showTelemetryReport(save := false) {
 		local window := this.Window
-		local xAxis, yAxises, data, lapData, defaults
+		local xAxis, yAxises, data, lapData, defaults, report, settings
 
 		xAxis := this.iXColumns[window["dataXDropDown"].Value]
 		yAxises := Array(this.iY1Columns[window["dataY1DropDown"].Value])
@@ -4855,6 +4855,17 @@ class PracticeCenter extends ConfigurationItem {
 
 		if (window["dataY6DropDown"].Value > 1)
 			yAxises.Push(this.iY6Columns[window["dataY6DropDown"].Value - 1])
+
+		if save {
+			report := this.SelectedReport
+			settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+			setMultiMapValue(settings, "Practice Center", "Report." . report . ".Plot", ["Scatter", "Bar", "Bubble", "Line"][this.Control["chartTypeDropDown"].Value])
+			setMultiMapValue(settings, "Practice Center", "Report." . report . ".X-Axis", xAxis)
+			setMultiMapValue(settings, "Practice Center", "Report." . report . ".Y-Axises", values2String(";", yAxises*))
+
+			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+		}
 
 		lapData := this.SessionStore.Tables["Lap.Data"]
 
@@ -4965,6 +4976,7 @@ class PracticeCenter extends ConfigurationItem {
 		local window := this.Window
 		local xChoices, y1Choices, y2Choices, y3Choices, y4Choices, y5Choices, y6Choices
 		local selected, runs, names, ignore, run, driver
+		local settings, axis, value
 
 		if (force || (report != this.SelectedReport) || (window["dataXDropDown"].Value == 0)) {
 			xChoices := []
@@ -5114,7 +5126,24 @@ class PracticeCenter extends ConfigurationItem {
 			local dataY5Choice := 0
 			local dataY6Choice := 0
 
-			if (report = "Running") {
+			settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+			value := getMultiMapValue(settings, "Practice Center", "Report." . report . ".Plot", kUndefined)
+
+			if (value != kUndefined) {
+				this.Control["chartTypeDropDown"].Choose(inList(["Scatter", "Bar", "Bubble", "Line"], value))
+
+				this.iSelectedChartType := value
+
+				dataXChoice := inList(xChoices, getMultiMapValue(settings, "Practice Center", "Report." . report . ".X-Axis"))
+
+				loop 6
+					%"dataY" . A_Index . "Choice"% := 1
+
+				for axis, value in string2Values(";", getMultiMapValue(settings, "Practice Center", "Report." . report . ".Y-Axises"))
+					%"dataY" . axis . "Choice"% := (inList(%"y" . axis . "Choices"%, value) + ((axis = 1) ? 0 : 1))
+			}
+			else if (report = "Running") {
 				window["chartTypeDropDown"].Choose(4)
 
 				this.iSelectedChartType := "Line"
@@ -5506,7 +5535,7 @@ class PracticeCenter extends ConfigurationItem {
 
 			this.iSelectedChartType := chartType
 
-			this.showTelemetryReport()
+			this.showTelemetryReport(true)
 		}
 	}
 

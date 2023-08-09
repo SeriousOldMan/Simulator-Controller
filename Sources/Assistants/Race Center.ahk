@@ -9607,7 +9607,7 @@ class RaceCenter extends ConfigurationItem {
 					%"dataY" . A_Index . "Choice"% := 1
 
 				for axis, value in string2Values(";", getMultiMapValue(settings, "Race Center", "Report." . report . ".Y-Axises"))
-					%"dataY" . axis . "Choice"% := (inList(%"y" . axis . "Choices"%) + ((axis = 1) ? 0 : 1))
+					%"dataY" . axis . "Choice"% := (inList(%"y" . axis . "Choices"%, value) + ((axis = 1) ? 0 : 1))
 			}
 			else if (report = "Pressures") {
 				window["chartTypeDropDown"].Choose(4)

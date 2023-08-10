@@ -138,7 +138,7 @@ class TelemetryDatabase extends SessionDatabase {
 
 	getElectronicsCount(drivers := kUndefined) {
 		local result := this.combineResults("Electronics", {Group: [["Lap.Time", count, "Count"]]
-														  , Transform: removeInvalidLaps
+														  ; , Transform: removeInvalidLaps
 														  , Where: {}}, drivers)
 
 		return ((result.Length > 0) ? result[1]["Count"] : 0)
@@ -146,7 +146,7 @@ class TelemetryDatabase extends SessionDatabase {
 
 	getTyresCount(drivers := kUndefined) {
 		local result := this.combineResults("Tyres", {Group: [["Lap.Time", count, "Count"]]
-													, Transform: removeInvalidLaps
+													; , Transform: removeInvalidLaps
 													, Where: {}}, drivers)
 
 		return ((result.Length > 0) ? result[1]["Count"] : 0)

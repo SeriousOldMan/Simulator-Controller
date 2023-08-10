@@ -26,6 +26,7 @@
 global kUninstallKey := "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\SimulatorController"
 
 global kDetachedInstallation := false
+global kProperInstallation := true
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -119,7 +120,7 @@ loadSimulatorConfiguration() {
 }
 
 initializeEnvironment() {
-	global kSimulatorConfiguration, kDetachedInstallation
+	global kSimulatorConfiguration, kDetachedInstallation, kProperInstallation
 	local installOptions, installLocation, install, newID, idFileName, ID, ticks, wait, major, minor, msgResult
 
 	if !isDebug() {
@@ -139,8 +140,13 @@ initializeEnvironment() {
 
 			install := (installLocation && (installLocation != "") && (InStr(kHomeDirectory, installLocation) != 1))
 			install := (install || !installLocation || (installLocation = ""))
+			
+			if install
+				kProperInstallation := false
 
-			if (install && !inList(["Simulator Tools", "Simulator Download", "Database Synchronizer"], StrSplit(A_ScriptName, ".")[1])) {
+			if (!isProperInstallation() && inList(kForegroundApps, StrSplit(A_ScriptName, ".")[1])) {
+										   ; !inList(["Simulator Tools", "Simulator Download"
+										   ;	    , "Database Synchronizer", "Simulator Controller"], StrSplit(A_ScriptName, ".")[1])) {
 				kSimulatorConfiguration := readMultiMap(kSimulatorConfigurationFile)
 
 				if !FileExist(getFileName(kSimulatorConfigurationFile, kUserConfigDirectory))
@@ -227,6 +233,10 @@ initializeEnvironment() {
 
 isDetachedInstallation() {
 	return kDetachedInstallation
+}
+
+isProperInstallation() {
+	return kProperInstallation
 }
 
 

@@ -38,7 +38,7 @@ getControllerState(configuration := kUndefined) {
 
 	pid := ProcessExist("Simulator Controller.exe")
 
-	if (load && !pid && (configuration || !FileExist(kTempDirectory . "Simulator Controller.state")))
+	if (isProperInstallation() && load && !pid && (configuration || !FileExist(kTempDirectory . "Simulator Controller.state")))
 		if FileExist(kUserConfigDirectory . "Simulator Controller.install")
 			try {
 				if configuration {

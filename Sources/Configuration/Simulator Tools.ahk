@@ -376,7 +376,7 @@ exitProcesses(silent := false, force := false) {
 		hasFGProcesses := false
 		hasBGProcesses := false
 
-		for ignore, app in concatenate(kForegroundApps, ["Race Settings"])
+		for ignore, app in kForegroundApps
 			if ProcessExist(app . ".exe") {
 				hasFGProcesses := true
 
@@ -405,7 +405,7 @@ exitProcesses(silent := false, force := false) {
 
 		if hasFGProcesses
 			if force
-				broadcastMessage(concatenate(kForegroundApps, ["Race Settings"]), "exitApplication")
+				broadcastMessage(kForegroundApps, "exitApplication")
 			else
 				return false
 

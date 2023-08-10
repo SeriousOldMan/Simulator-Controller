@@ -1339,8 +1339,16 @@ class SetupWorkbench extends ConfigurationItem {
 	startTelemetryAnalyzer() {
 		local analyzerClass := getMultiMapValue(this.SimulatorDefinition, "Simulator", "Analyzer", false)
 
-		if analyzerClass
-			%analyzerClass%(this, this.SelectedSimulator).createCharacteristics()
+		if analyzerClass {
+			this.Window.Block()
+
+			try {
+				%analyzerClass%(this, this.SelectedSimulator).createCharacteristics()
+			}
+			finally {
+				this.Window.Unblock()
+			}
+		}
 	}
 
 	clearCharacteristics() {

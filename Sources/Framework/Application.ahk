@@ -236,7 +236,7 @@ checkForNews() {
 startDatabaseSynchronizer() {
 	local idFileName, ID, dbIDFileName, dbID, shareTyrePressures, shareCarSetups, shareRaceStrategies, options, consent
 
-	if ((StrSplit(A_ScriptName, ".")[1] = "Simulator Startup") && !ProcessExist("Database Synchronizer.exe")) {
+	if (isProperInstallation() && (StrSplit(A_ScriptName, ".")[1] = "Simulator Startup") && !ProcessExist("Database Synchronizer.exe")) {
 		idFileName := kUserConfigDirectory . "ID"
 
 		ID := StrSplit(FileRead(idFileName), "`n", "`r")[1]

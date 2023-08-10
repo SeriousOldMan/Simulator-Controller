@@ -11,9 +11,10 @@
   10. "Race Center" and "Practice Center" now remember many menu choices between different runs.
   11. "Practice Center" and "Race Center" remember the layout of the telemetry charts between different runs.
   12. Holding down the Ctrl key while starting the "Race Center" will deactivate the synchronization.
-  13. [Developer] Additional information has been added to the ["Session State.json" file](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) introduced with the last release.
-  14. [Developer] The data format of the "Session State.json" file has been updated to better reflect the JSON data type standard.
-  15. New car models for "Setup Workbench":
+  13. Potential fix for the nasty auto update loop, which has been encountered by a couple of users.
+  14. [Developer] Additional information has been added to the ["Session State.json" file](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) introduced with the last release.
+  15. [Developer] The data format of the "Session State.json" file has been updated to better reflect the JSON data type standard.
+  16. New car models for "Setup Workbench":
       - Assetto Corsa
         - Lamborghini Miura
 

@@ -1030,7 +1030,7 @@ class PracticeCenter extends ConfigurationItem {
 		}
 
 		chooseAxis(*) {
-			center.withExceptionhandler(ObjBindMethod(center, "showTelemetryReport"))
+			center.withExceptionhandler(ObjBindMethod(center, "showTelemetryReport", true))
 		}
 
 		chooseChartType(*) {
@@ -4834,9 +4834,9 @@ class PracticeCenter extends ConfigurationItem {
 		}
 	}
 
-	showTelemetryReport() {
+	showTelemetryReport(save := false) {
 		local window := this.Window
-		local xAxis, yAxises, data, lapData, defaults
+		local xAxis, yAxises, data, lapData, defaults, report, settings
 
 		xAxis := this.iXColumns[window["dataXDropDown"].Value]
 		yAxises := Array(this.iY1Columns[window["dataY1DropDown"].Value])
@@ -4855,6 +4855,25 @@ class PracticeCenter extends ConfigurationItem {
 
 		if (window["dataY6DropDown"].Value > 1)
 			yAxises.Push(this.iY6Columns[window["dataY6DropDown"].Value - 1])
+
+		if save {
+			report := this.SelectedReport
+			settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+			setMultiMapValue(settings, "Practice Center", "Chart." . report . ".Type", ["Scatter", "Bar", "Bubble", "Line"][this.Control["chartTypeDropDown"].Value])
+			setMultiMapValue(settings, "Practice Center", "Chart." . report . ".X-Axis", xAxis)
+			setMultiMapValue(settings, "Practice Center", "Chart." . report . ".Y-Axises", values2String(";", yAxises*))
+
+			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+
+			settings := readMultiMap(this.SessionDirectory . "Session Settings.ini")
+
+			setMultiMapValue(settings, "Chart", report . ".Type", ["Scatter", "Bar", "Bubble", "Line"][this.Control["chartTypeDropDown"].Value])
+			setMultiMapValue(settings, "Chart", report . ".X-Axis", xAxis)
+			setMultiMapValue(settings, "Chart", report . ".Y-Axises", values2String(";", yAxises*))
+
+			writeMultiMap(this.SessionDirectory . "Session Settings.ini", settings)
+		}
 
 		lapData := this.SessionStore.Tables["Lap.Data"]
 
@@ -4965,6 +4984,7 @@ class PracticeCenter extends ConfigurationItem {
 		local window := this.Window
 		local xChoices, y1Choices, y2Choices, y3Choices, y4Choices, y5Choices, y6Choices
 		local selected, runs, names, ignore, run, driver
+		local settings, axis, value
 
 		if (force || (report != this.SelectedReport) || (window["dataXDropDown"].Value == 0)) {
 			xChoices := []
@@ -5114,70 +5134,106 @@ class PracticeCenter extends ConfigurationItem {
 			local dataY5Choice := 0
 			local dataY6Choice := 0
 
-			if (report = "Running") {
-				window["chartTypeDropDown"].Choose(4)
+			settings := readMultiMap(this.SessionDirectory . "Session Settings.ini")
 
-				this.iSelectedChartType := "Line"
+			value := getMultiMapValue(settings, "Chart", report . ".Type", kUndefined)
 
-				dataXChoice := inList(xChoices, "Running")
-				dataY1Choice := inList(y1Choices, "Tyre.Temperature.Core.Front.Left")
-				dataY2Choice := inList(y2Choices, "Tyre.Temperature.Core.Front.Right") + 1
-				dataY3Choice := inList(y3Choices, "Tyre.Temperature.Core.Rear.Left") + 1
-				dataY4Choice := inList(y4Choices, "Tyre.Temperature.Core.Rear.Right") + 1
-				dataY5Choice := inList(y5Choices, "Brake.Temperature.Front.Average") + 1
-				dataY6Choice := inList(y6Choices, "Brake.Temperature.Rear.Average") + 1
+			if (value != kUndefined) {
+				this.Control["chartTypeDropDown"].Choose(inList(["Scatter", "Bar", "Bubble", "Line"], value))
+
+				this.iSelectedChartType := value
+
+				dataXChoice := inList(xChoices, getMultiMapValue(settings, "Chart", report . ".X-Axis"))
+
+				loop 6
+					%"dataY" . A_Index . "Choice"% := 1
+
+				for axis, value in string2Values(";", getMultiMapValue(settings, "Chart", report . ".Y-Axises"))
+					%"dataY" . axis . "Choice"% := (inList(%"y" . axis . "Choices"%, value) + ((axis = 1) ? 0 : 1))
 			}
-			else if (report = "Pressures") {
-				window["chartTypeDropDown"].Choose(4)
+			else {
+				settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-				this.iSelectedChartType := "Line"
+				value := getMultiMapValue(settings, "Practice Center", "Chart." . report . ".Type", kUndefined)
 
-				dataXChoice := inList(xChoices, "Lap")
-				dataY1Choice := inList(y1Choices, "Temperature.Air")
-				dataY2Choice := inList(y2Choices, "Tyre.Pressure.Cold.Average") + 1
-				dataY3Choice := inList(y3Choices, "Tyre.Pressure.Hot.Average") + 1
-				dataY4Choice := 1
-				dataY5Choice := 1
-				dataY6Choice := 1
-			}
-			else if (report = "Brakes") {
-				window["chartTypeDropDown"].Choose(4)
+				if (value != kUndefined) {
+					this.Control["chartTypeDropDown"].Choose(inList(["Scatter", "Bar", "Bubble", "Line"], value))
 
-				this.iSelectedChartType := "Line"
+					this.iSelectedChartType := value
 
-				dataXChoice := inList(xChoices, "Lap")
-				dataY1Choice := inList(y1Choices, "Temperature.Air")
-				dataY2Choice := inList(y2Choices, "Brake.Temperature.Front.Average") + 1
-				dataY3Choice := inList(y3Choices, "Brake.Temperature.Rear.Average") + 1
-				dataY4Choice := inList(y4Choices, "Brake.Wear.Front.Average") + 1
-				dataY5Choice := inList(y5Choices, "Brake.Wear.Rear.Average") + 1
-				dataY6Choice := 1
-			}
-			else if (report = "Temperatures") {
-				window["chartTypeDropDown"].Choose(1)
+					dataXChoice := inList(xChoices, getMultiMapValue(settings, "Practice Center", "Chart." . report . ".X-Axis"))
 
-				this.iSelectedChartType := "Scatter"
+					loop 6
+						%"dataY" . A_Index . "Choice"% := 1
 
-				dataXChoice := inList(xChoices, "Lap")
-				dataY1Choice := inList(y1Choices, "Temperature.Air")
-				dataY2Choice := inList(y2Choices, "Tyre.Temperature.Front.Average") + 1
-				dataY3Choice := inList(y3Choices, "Tyre.Temperature.Rear.Average") + 1
-				dataY4Choice := 1
-				dataY5Choice := 1
-				dataY6Choice := 1
-			}
-			else if (report = "Free") {
-				window["chartTypeDropDown"].Choose(4)
+					for axis, value in string2Values(";", getMultiMapValue(settings, "Practice Center", "Chart." . report . ".Y-Axises"))
+						%"dataY" . axis . "Choice"% := (inList(%"y" . axis . "Choices"%, value) + ((axis = 1) ? 0 : 1))
+				}
+				else if (report = "Running") {
+					window["chartTypeDropDown"].Choose(4)
 
-				this.iSelectedChartType := "Line"
+					this.iSelectedChartType := "Line"
 
-				dataXChoice := inList(xChoices, "Lap")
-				dataY1Choice := inList(y1Choices, "Lap.Time")
-				dataY2Choice := inList(y2Choices, "Tyre.Laps") + 1
-				dataY3Choice := inList(y3Choices, "Temperature.Air") + 1
-				dataY4Choice := inList(y4Choices, "Temperature.Track") + 1
-				dataY5Choice := inList(y5Choices, "Tyre.Pressure.Cold.Average") + 1
-				dataY6Choice := inList(y6Choices, "Tyre.Pressure.Hot.Average") + 1
+					dataXChoice := inList(xChoices, "Running")
+					dataY1Choice := inList(y1Choices, "Tyre.Temperature.Core.Front.Left")
+					dataY2Choice := inList(y2Choices, "Tyre.Temperature.Core.Front.Right") + 1
+					dataY3Choice := inList(y3Choices, "Tyre.Temperature.Core.Rear.Left") + 1
+					dataY4Choice := inList(y4Choices, "Tyre.Temperature.Core.Rear.Right") + 1
+					dataY5Choice := inList(y5Choices, "Brake.Temperature.Front.Average") + 1
+					dataY6Choice := inList(y6Choices, "Brake.Temperature.Rear.Average") + 1
+				}
+				else if (report = "Pressures") {
+					window["chartTypeDropDown"].Choose(4)
+
+					this.iSelectedChartType := "Line"
+
+					dataXChoice := inList(xChoices, "Lap")
+					dataY1Choice := inList(y1Choices, "Temperature.Air")
+					dataY2Choice := inList(y2Choices, "Tyre.Pressure.Cold.Average") + 1
+					dataY3Choice := inList(y3Choices, "Tyre.Pressure.Hot.Average") + 1
+					dataY4Choice := 1
+					dataY5Choice := 1
+					dataY6Choice := 1
+				}
+				else if (report = "Brakes") {
+					window["chartTypeDropDown"].Choose(4)
+
+					this.iSelectedChartType := "Line"
+
+					dataXChoice := inList(xChoices, "Lap")
+					dataY1Choice := inList(y1Choices, "Temperature.Air")
+					dataY2Choice := inList(y2Choices, "Brake.Temperature.Front.Average") + 1
+					dataY3Choice := inList(y3Choices, "Brake.Temperature.Rear.Average") + 1
+					dataY4Choice := inList(y4Choices, "Brake.Wear.Front.Average") + 1
+					dataY5Choice := inList(y5Choices, "Brake.Wear.Rear.Average") + 1
+					dataY6Choice := 1
+				}
+				else if (report = "Temperatures") {
+					window["chartTypeDropDown"].Choose(1)
+
+					this.iSelectedChartType := "Scatter"
+
+					dataXChoice := inList(xChoices, "Lap")
+					dataY1Choice := inList(y1Choices, "Temperature.Air")
+					dataY2Choice := inList(y2Choices, "Tyre.Temperature.Front.Average") + 1
+					dataY3Choice := inList(y3Choices, "Tyre.Temperature.Rear.Average") + 1
+					dataY4Choice := 1
+					dataY5Choice := 1
+					dataY6Choice := 1
+				}
+				else if (report = "Free") {
+					window["chartTypeDropDown"].Choose(4)
+
+					this.iSelectedChartType := "Line"
+
+					dataXChoice := inList(xChoices, "Lap")
+					dataY1Choice := inList(y1Choices, "Lap.Time")
+					dataY2Choice := inList(y2Choices, "Tyre.Laps") + 1
+					dataY3Choice := inList(y3Choices, "Temperature.Air") + 1
+					dataY4Choice := inList(y4Choices, "Temperature.Track") + 1
+					dataY5Choice := inList(y5Choices, "Tyre.Pressure.Cold.Average") + 1
+					dataY6Choice := inList(y6Choices, "Tyre.Pressure.Hot.Average") + 1
+				}
 			}
 
 			if (report = "Running") {
@@ -5506,7 +5562,7 @@ class PracticeCenter extends ConfigurationItem {
 
 			this.iSelectedChartType := chartType
 
-			this.showTelemetryReport()
+			this.showTelemetryReport(true)
 		}
 	}
 

@@ -1162,20 +1162,6 @@ editTargets(command := "", *) {
 	else {
 		result := false
 
-		/*
-		if (gUpdateSettings.Count > 16)
-			throw "Too many update targets detected in editTargets..."
-
-		if (gCleanupSettings.Count > 8)
-			throw "Too many cleanup targets detected in editTargets..."
-
-		if (gCopySettings.Count > 16)
-			throw "Too many copy targets detected in editTargets..."
-
-		if (gBuildSettings.Count > 24)
-			throw "Too many build targets detected in editTargets..."
-		*/
-
 		targetsGui := Window({Descriptor: "Simulator Tools", Closeable: true, Options: "+SysMenu +Caption"})
 
 		targetsGui.SetFont("Bold", "Arial")

@@ -17,8 +17,6 @@
   4. Controller action and voice command to enable/disable data collection
   5. Graphical Editor for Vocalics Settings inkl. Test-Modus...
   6. Better answers by the Strategist, when a pitstop cannot be recommended
-  7. Create and manage a kind of training plan (Run Sheet) by the Strategist to gather data for strategy calculation
-  8. Command: "Can you tell me my last lap time?" for Strategist and Spotter.
 
 #### Race Center
   1. Change hot target pressures for the next pitstop.

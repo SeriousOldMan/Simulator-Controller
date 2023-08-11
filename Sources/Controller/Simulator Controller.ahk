@@ -2154,8 +2154,6 @@ initializeSimulatorController() {
 
 	registerMessageHandler("Controller", functionMessageHandler)
 	registerMessageHandler("Voice", methodMessageHandler, SimulatorController.Instance)
-
-	return
 }
 
 startupSimulatorController() {
@@ -2231,6 +2229,16 @@ switchToggle(toggleType, toggleNumber, mode := "activate") {
 	}
 	else
 		logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in custom controller action switchToggle - please check the configuration"))
+}
+
+callCustom(customNumber) {
+	local descriptor := ConfigurationItem.descriptor(kCustomType, customNumber)
+	local function := SimulatorController.Instance.findFunction(descriptor)
+
+	if ((function != false) && (SimulatorController.Instance.getActions(function, "Call").Length > 0))
+		fireControllerActions(function, "Call")
+	else
+		logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in custom controller action callCustom - please check the configuration"))
 }
 
 setMode(actionOrPlugin, mode := false) {

@@ -1,16 +1,16 @@
 [Development]
-Version=5.2.2.0-beta
-Target=5.2.2.0-release
-Date=08/10/2023
-Download=https://www.dropbox.com/scl/fi/k74oiveylhzzvfyresau2/Simulator-Controller-5.2.2.0-beta.zip?rlkey=58uq29k90ro52t1fh20mibint&dl=1
-Changes=More fields for "Session State.json", Data format update for "Session State.json", New voice command "Tell me my last laptime", New information request action "LapTime", New icon in Stream Deck icon set for "LapTime", Optimized stint plan creation/update in "Race Center", Next tyre set handling in "Race Center", New practice run sheets in "Practice Center", New framework configuration and debug settings in "Core Settings.ini", New modifier key when starting "Race Center", "Practice Center" and "Race Center" remember various menu settings, "Practice Center" and "Race Center" remember the layout of the telemetry charts, Fixed pressure data management in "Session Database", New car models for "Setup Workbench", Optimized auto updater
+Version=5.2.3.0-dev
+Target=5.2.3.0-release
+Date=08/11/2023
+Download=
+Changes=New controller action function "callCustom"
 [Release]
-Version=5.2.1.0-release
-Date=08/04/2023
-Download=https://cutt.ly/XwdsMjAh;https://www.dropbox.com/s/1hizqd3znejv4jr/Simulator%20Controller%205.2.1.0-release.zip?dl=1
-Changes=Many bug fixes in "Practice Center", Better last lap detection in timed races, Spotter now announces the last lap, Fixed "Invalid" column in "Race Center", Fixed support for RaceRoom Racing Experience, Fixed tyre wear for RaceRoom Racing Experience, Fixed Stream Deck plugin, Support for a couple of new fields in the simulator data files, Telemetry charts in "Race Center" and "Practice Center" apply unit conversion correctly, New data summary report in "Practice Center", Updated AMS2 API to version 13, New car models for "Setup Workbench", Experimental integration of a plugin to publish Simulator Controller state to external apps, Standings info widget in "Session Monitor" now also shows the observed opponent, New stints summary report in "Practice Center", Fixed SFX-100 motion intensity controller
+Version=5.2.2.0-release
+Date=08/11/2023
+Download=https://cutt.ly/MwfATSpm;https://www.dropbox.com/scl/fi/24my1qin8nn9rz89w6wvf/Simulator-Controller-5.2.2.0-release.zip?rlkey=28e670qu608h26uibnkobmujk&dl=1
+Changes=More fields for "Session State.json", Data format update for "Session State.json", New voice command "Tell me my last laptime", New information request action "LapTime", New icon in Stream Deck icon set for "LapTime", Optimized stint plan creation/update in "Race Center", Next tyre set handling in "Race Center", New practice run sheets in "Practice Center", New framework configuration and debug settings in "Core Settings.ini", New modifier key when starting "Race Center", "Practice Center" and "Race Center" remember various menu settings, "Practice Center" and "Race Center" remember the layout of the telemetry charts, Fixed pressure data management in "Session Database", New car models for "Setup Workbench", Optimized auto updater
 [Current]
 Type=Development
 [Version]
-Development=5.2.2.0-beta
-Release=5.2.1.0-release
+Development=5.2.3.0-dev
+Release=5.2.2.0-release

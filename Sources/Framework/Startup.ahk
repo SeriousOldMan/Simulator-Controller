@@ -145,8 +145,6 @@ initializeEnvironment() {
 				kProperInstallation := false
 
 			if (!isProperInstallation() && inList(kForegroundApps, StrSplit(A_ScriptName, ".")[1])) {
-										   ; !inList(["Simulator Tools", "Simulator Download"
-										   ;	    , "Database Synchronizer", "Simulator Controller"], StrSplit(A_ScriptName, ".")[1])) {
 				kSimulatorConfiguration := readMultiMap(kSimulatorConfigurationFile)
 
 				if !FileExist(getFileName(kSimulatorConfigurationFile, kUserConfigDirectory))

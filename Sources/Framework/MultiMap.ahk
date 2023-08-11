@@ -84,7 +84,12 @@ readMultiMap(multiMapFile) {
 	local data := false
 
 	if !FileExist(multiMapFile)
-		multiMapFile := getFileName(multiMapFile, kUserConfigDirectory, kConfigDirectory)
+		if (isSet(kUserConfigDirectory) && isSet(kConfigDirectory))
+			multiMapFile := getFileName(multiMapFile, kUserConfigDirectory, kConfigDirectory)
+		else
+			multiMapFile := getFileName(multiMapFile, A_MyDocuments . "\Simulator Controller\Config\"
+													, normalizeFilePath(A_ScriptDir . (A_IsCompiled ? "\..\Config\" : "\..\..\Config\")))
+
 
 	if FileExist(multiMapFile) {
 		loop

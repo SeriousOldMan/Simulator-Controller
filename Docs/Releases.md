@@ -1,4 +1,4 @@
-## 5.2.2.0-release 08/11/23 (planned)
+## 5.2.2.0-release 08/11/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. The management of tyre pressure data has been fixed. It happened in rare situations, that tyre pressure were not stored in the session database, although you gave your consent.

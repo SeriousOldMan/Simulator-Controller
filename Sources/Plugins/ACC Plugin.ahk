@@ -2128,7 +2128,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		super.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
 
 		if compound {
-			if (this.getPitstopOptionValues("Tyre Compound") != compound)
+			if (this.getPitstopOptionValues("Tyre Compound")[1] != compound)
 				changePitstopTyreCompound((compound = "Wet") ? "Increase" : "Decrease")
 
 			if (set && (compound = "Dry")) {

@@ -138,7 +138,7 @@ class TelemetryDatabase extends SessionDatabase {
 
 	getElectronicsCount(drivers := kUndefined) {
 		local result := this.combineResults("Electronics", {Group: [["Lap.Time", count, "Count"]]
-														  , Transform: removeInvalidLaps
+														  ; , Transform: removeInvalidLaps
 														  , Where: {}}, drivers)
 
 		return ((result.Length > 0) ? result[1]["Count"] : 0)
@@ -146,7 +146,7 @@ class TelemetryDatabase extends SessionDatabase {
 
 	getTyresCount(drivers := kUndefined) {
 		local result := this.combineResults("Tyres", {Group: [["Lap.Time", count, "Count"]]
-													, Transform: removeInvalidLaps
+													; , Transform: removeInvalidLaps
 													, Where: {}}, drivers)
 
 		return ((result.Length > 0) ? result[1]["Count"] : 0)
@@ -199,8 +199,8 @@ class TelemetryDatabase extends SessionDatabase {
 												, drivers)
 	}
 
-	getTyreLapTimes(weather, compound, compoundColor, drivers := kUndefined) {
-		return this.combineResults("Tyres", {Group: [["Lap.Time", minimum, "Lap.Time"]], By: "Tyre.Laps"
+	getTyreLapTimes(weather, compound, compoundColor, withFuel := false, drivers := kUndefined) {
+		return this.combineResults("Tyres", {Group: [["Lap.Time", minimum, "Lap.Time"]], By: (withFuel ? ["Tyre.Laps", "Fuel.Remaining"] : "Tyre.Laps")
 										   , Transform: removeInvalidLaps
 										   , Where: Map("Weather", weather, "Tyre.Compound", compound, "Tyre.Compound.Color", compoundColor)}
 										  , drivers)

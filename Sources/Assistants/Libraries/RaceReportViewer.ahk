@@ -490,7 +490,7 @@ class RaceReportViewer extends RaceReportReader {
 	showCarReport() {
 		local drawChartFunction := "function drawChart() {`nvar data = new google.visualization.DataTable();`n"
 		local report := this.Report
-		local tyreCompound, cars, rows, raceData, pitstops, ignore, lap, weather, consumption, lapTime, pitstop, row
+		local tyreCompound, cars, rows, raceData, pitstops, ignore, lap, weather, consumption, lapTime, pitstop, row, lapState
 
 		if report {
 			raceData := readMultiMap(report . "\Race.data")
@@ -525,6 +525,8 @@ class RaceReportViewer extends RaceReportReader {
 					if (lapTime != "-")
 						lapTime := Round(lapTime / 1000, 1)
 
+					lapState := getMultiMapValue(raceData, "Laps", "Lap." . lap . ".State", "Valid")
+
 					pitstop := ((pitstops.Length > 0) ? inList(pitstops, lap - 1) : (getMultiMapValue(raceData, "Laps", "Lap." . (lap - 1) . ".Pitstop", false)))
 
 					row := values2String(", ", lap
@@ -535,6 +537,7 @@ class RaceReportViewer extends RaceReportReader {
 											 , "'" . getMultiMapValue(raceData, "Laps", "Lap." . lap . ".ABS", translate("n/a")) . "'"
 											 , "'" . consumption . "'"
 											 , "'" . RaceReportViewer.lapTimeDisplayValue(lapTime) . "'"
+											 , "'" . ((lapState != "Invalid") ? "" : translate("x")) . "'"
 											 , "'" . (pitstop ? translate("x") : "") . "'")
 
 					rows.Push("[" . row	. "]")
@@ -549,6 +552,7 @@ class RaceReportViewer extends RaceReportReader {
 			drawChartFunction .= "`ndata.addColumn('string', '" . translate("ABS") . "');"
 			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Consumption") . "');"
 			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Lap Time") . "');"
+			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Invalid") . "');"
 			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Pitstop") . "');"
 
 			drawChartFunction .= ("`ndata.addRows([" . values2String(", ", rows*) . "]);")

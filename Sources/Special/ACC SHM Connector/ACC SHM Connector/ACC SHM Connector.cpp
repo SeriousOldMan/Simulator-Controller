@@ -313,6 +313,9 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 		output << "TyreCompoundColor=Black" << endl;
 		printData(&output, "TyreSet", gf->currentTyreSet);
 		printData(&output, "TyreTemperature", pf->tyreCoreTemperature);
+		printData(&output, "TyreInnerTemperature", pf->tyreTempI);
+		printData(&output, "TyreMiddleTemperature", pf->tyreTempM);
+		printData(&output, "TyreOuterTemperature", pf->tyreTempO);
 		printData(&output, "TyrePressure", pf->wheelsPressure);
 		printData(&output, "BrakeTemperature", pf->brakeTemp);
 		printData(&output, "BrakePadLifeRaw", pf->padLife);

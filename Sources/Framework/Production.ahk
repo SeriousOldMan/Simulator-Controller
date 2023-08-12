@@ -14,4 +14,4 @@ SetWorkingDir(A_ScriptDir)		; Ensures a consistent starting directory.
 
 ListLines(false)				; Disable execution history
 
-global kBuildConfiguration := "Production"
+global kBuildConfiguration := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", A_MyDocuments . "\Simulator Controller\Config\", normalizeFilePath(A_ScriptDir . (A_IsCompiled ? "\..\Config\" : "\..\..\Config\")))), "Build", "Configuration", "Production")

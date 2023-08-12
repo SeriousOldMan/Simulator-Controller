@@ -38,7 +38,7 @@ getControllerState(configuration := kUndefined) {
 
 	pid := ProcessExist("Simulator Controller.exe")
 
-	if (load && !pid && (configuration || !FileExist(kTempDirectory . "Simulator Controller.state")))
+	if (isProperInstallation() && load && !pid && (configuration || !FileExist(kTempDirectory . "Simulator Controller.state")))
 		if FileExist(kUserConfigDirectory . "Simulator Controller.install")
 			try {
 				if configuration {
@@ -157,8 +157,7 @@ callSimulator(simulator, options := "", protocol?) {
 				connectors[simulator . ".CLR"] := connector
 			}
 
-			data := connector.Call(options)
-			data := parseMultiMap(data)
+			data := parseMultiMap(connector.Call(options))
 		}
 		else if (protocol = "EXE") {
 			exePath := (kBinariesDirectory . simulator . " SHM Provider.exe")

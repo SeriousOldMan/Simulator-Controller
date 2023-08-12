@@ -1919,19 +1919,13 @@ mapToString(elementSeparator, valueSeparator, map) {
 ;;;-------------------------------------------------------------------------;;;
 
 compound(compound, color := false) {
-	if color
-		return (compound . " (" . color . ")")
-	else
-		return string2Values(A_Space, compound)[1]
+	return (color ? (compound . " (" . color . ")") : string2Values(A_Space, compound)[1])
 }
 
 compoundColor(compound) {
 	compound := string2Values(A_Space, compound)
 
-	if (compound.Length == 1)
-		return "Black"
-	else
-		return SubStr(compound[2], 2, StrLen(compound[2]) - 2)
+	return ((compound.Length == 1) ? "Black" : SubStr(compound[2], 2, StrLen(compound[2]) - 2))
 }
 
 splitCompound(qualifiedCompound, &tyreCompound, &tyreCompoundColor) {

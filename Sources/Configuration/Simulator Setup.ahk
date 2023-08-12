@@ -2469,7 +2469,7 @@ class FinishStepWizard extends StepWizard {
 
 			this.SetupWizard.SettingsOpen := true
 
-			editSettings(&settings, false, configuration
+			editSettings(&settings, this.SetupWizard.Window, false, configuration
 					   , Min(A_ScreenWidth - Round(A_ScreenWidth / 3) + Round(A_ScreenWidth / 3 / 2) - 180, A_ScreenWidth - 360)
 					   , "Center")
 		}
@@ -2483,7 +2483,7 @@ class FinishStepWizard extends StepWizard {
 		if !this.SetupWizard.SettingsOpen
 			Task.startTask(ObjBindMethod(this, "closeSettingsEditor"), 1000, kHighPriority)
 
-		writeMultiMap(kUserHomeDirectory . "Setup\Simulator Settings.ini", editSettings(&kSave, false, true))
+		writeMultiMap(kUserHomeDirectory . "Setup\Simulator Settings.ini", editSettings(&kSave, false, false, true))
 
 		this.SetupWizard.SettingsOpen := false
 

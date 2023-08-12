@@ -334,6 +334,10 @@ namespace ACCUDPProvider {
                                     outStream.WriteLine("Session=Finished");
                                 }
 
+                                outStream.WriteLine("[Track Data]");
+
+                                outStream.Write("Length="); outStream.WriteLine(trackMeters);
+
                                 outStream.WriteLine("[Position Data]");
 
                                 // outStream.Write("Car.Count="); outStream.WriteLine(Cars.Count);

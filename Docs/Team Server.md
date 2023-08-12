@@ -101,14 +101,6 @@ When you head out onto the track, you must decide, whether you want this session
 And now the important stuff: To declare, that you want to join a team session, you must use the corresponding [action from the "Team Server" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-team-server). For your convinience, it is also possible, to always enable team sessions using the action declaration of this plugin or using the corresponding preset in "Simulator Setup", but I don't recommend that, since you might end up being part of a session, you are not planned for. And finally, you can use the tray menu of the Simulator Controller application as an alternative to declare an action to enable the Team Server with a button on your Button Box or Steering Wheel.
 
 Note: Simulator Controller detects a valid team session configuration upon startup, it will open a notification window and will show you the configuration of this session (either when the Team Server is enabled by default, or later, when you enable the Team Server using the corresponding button). If you missed this notification, you can still check whether the team mode is currently active, when you hover over the small cog wheel icon of Simulator Controller in the task bar. If Simulator Controller is enabled for a team session, the tooltip will show "Simulator Controller (Team)". When no valid team session could be established, the tooltip will read "Simulator Controller (Team) - Invalid". Also, the *Team Server* item in the right mouse menu of the tray icon will be checked.
-
-### Special notes
-
-Every simulation game is unique and handles multiplayer team races different. Therefore, you have to be aware of the individual drawbacks and specialities. In this section I will provide a growing collection of hints and special operation tipps for all the individual simulations, whenever I stumble over them. When you found some specialities on your own, please feel free to share them with me, and I will be happy to add them to this section as well.
-
-#### Assetto Corsa Competizione
-
-  1. *Assetto Corsa Competizione* looses the knowledge about the currently selected repair options in the Pitstop MFD sometimes after a driver swap. The internal selection state of the ["ACC" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-acc) will therefore be reset to the selection during the last pitstop of the previous driver, but this might not reflect the internal state of the Pitstop MFD of the current driver. This means, that you have to open the Pitstop MFD and check both repair options, after the next pitstop has been planned. If you have to correct one or both settings, you must do this **without** the help and control of the ["Pitstop" mode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-pitstop) of the "ACC" plugin. So do not use your Button Box here. 
   
 ## Race Center
 
@@ -142,6 +134,10 @@ It is obvious, that it is **not** a good idea to use the same session in more th
 
 Important: Although it is possible and I have done it on my own for several races longer than 6 hours, I do not recommend to run "Race Center" on the same PC where your simulation runs. Sevaral operations, for example updating the strategy using extensive traffic simulation will consume quite a lot of memory and CPU-cycles. This might interfere with the memory requirements of your running simulator and might lead to decreased frame rates and - in very worse cases - to freezes due to shortage of memory. Therefore, I strongly recommend using a laptop or another separate PC, that sits aside your simulation rig, for the "Race Center" operation.
 
+#### Connection failures
+
+The Team Server connection is based on http and implements a sophisticated retry strategy. Most of the time, it will recover without notice. More severe is the behaviour of the simulation game itself after an internet failure and it heavily depends on the simulation, whether you may continue your session. In any case, I stronlgy recommend to reload the session in the "Race Center" after the car is back on the road and has crossed the start/finish line for the first time after the failure, since a couple of items in the history, for example the number of pitstops, migh be wrong otherwise.
+
 #### Session Data Management
 
 All data of an active session is stored on the Team Server. It is therefore possible to start the "Race Center" anytime, even late into the race. The data might be kept for a finished session on Team Server as well, depending on the settings chosen by the server administrator. See the corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#server-administration) for more information. To secure the session data on your local PC, you can use the "Save" and "Save a copy..." commands from the "Session" menu at the end of the session and you can load a recently saved session anytime later using the "Load..." command.
@@ -160,11 +156,11 @@ The "Race Center" *understands* multi-class and/or multi-category races. Please 
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%205.JPG)
 
-The reports at the top of the list are the well known report, wich are also available after a session using the ["Race Reports"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-reports) tool. They are mostly useful to analyze the standings and the performance of the various drivers and cars. The other reports will give you an insight into the telemetry data. You can select the data to be shown using the selector menus on the right of the report list. You can also choose the type of visualization using the "Plot" menu on top of the report area. Use the "Driver" menu, it is possible to restrict the data of the various charts to one the drivers who has already driven some laps in the session. Only data of the selected driver will be shown then.
+The reports at the top of the list are the well known reports, wich are also available after a session using the ["Race Reports"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-reports) tool. They are mostly useful to analyze the standings and the performance of the various drivers and cars. The other reports will give you an insight into the telemetry data. You can select the data to be shown using the selector menus on the right of the report list. You can also choose the type of visualization using the "Plot" menu on top of the report area. Use the "Driver" menu, it is possible to restrict the data of the various charts to one the drivers who has already driven some laps in the session. Only data of the selected driver will be shown then.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2019.JPG)
 
-Note: The values for wear (tyres and brake pads) range from 0% up to 100%. For most of the simulators this value is directly available through the API, whereas in *Assetto Corsa Competizione*, the data interface provide the remaining thickness of each pad. Depending on the compound of the pad, the wear level for 100% ranges from 12 mm to 15.5 mm left pad thickness here, with a starting thickness for a fresh pad with 29 mm.
+Note: The values for wear (tyres and brake pads) range from 0% up to 100%. For most of the simulators these values are directly available through the API, whereas in *Assetto Corsa Competizione*, the data interface provide the remaining thickness of each pad. Depending on the compound of the pad, the wear level for 100% ranges from 12 mm to 15.5 mm left pad thickness here, with a starting thickness for a fresh pad with 29 mm.
 
 Last but not least, using the small button with the cog wheel icon, you can choose various settings for the currently selected report, for example the range of laps to be considered in the data or the set of drivers in reports which are driver specific.
 
@@ -186,7 +182,7 @@ Beside all that, you can request several context specific data, which will be sh
 
   3. Details of a selected stint
   
-     This will give you an overview over the stint, the driven laps, as well as performance figures for the driver. Please select a stint in the list of stints to generate this report.
+     This will give you an overview over the stint, the driven laps, as well as some performance figures for the driver. Please select a stint in the list of stints to generate this report.
 	 
 	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%208.JPG)
 
@@ -198,7 +194,7 @@ Beside all that, you can request several context specific data, which will be sh
 	 
 	 If the current race is a multi-class race, the report will also show the class specific positions of all cars, additionally to their overall position in the race. In a multi-class race, the gaps shown in the gap table at the top of the report will always be specific for the own class. Additionaly, if driver categories are available, the category label of a given driver will be added to his name.
 	 
-	 Last, but not least, you will find informations about the past pitstops of each car. The overall number of pitstops, as well as the lap (in reference to your own laps) of the last stop are shown. Please keep in mind, that due to restrictions in the data provided by the various simulators, it cannot be differentiated in many cases, whether a car has been in the pits for a penalty, an regular pitstop or even an unplanned stop due to repairs. It is also possible, that the number of pitstops are not correct at all, since not all stops may be correctly reported by the simulator.
+	 Last, but not least, you will find informations about the past pitstops of each car. The overall number of pitstops, as well as the lap (in reference to your own laps) of the last stop are shown. Please keep in mind, that due to restrictions in the data provided by the various simulators, it cannot be differentiated in many cases whether a car has been in the pits for a penalty, a regular pitstop or even an unplanned stop due to repairs. It is also possible, that the number of pitstops are not correct at all, since not all stops may be correctly reported by the simulator.
 	 
 	 Some basic data is shown in the header of the lap details as well. Important are here the ambient temperatures and the tyre pressure information. You can see the current hot pressures, recommend cold pressures (incl. a potential correction factor compared to the pressure setup at the beginning of the stint) and information about tyre pressure losses, if there are any.
 
@@ -228,7 +224,7 @@ Beside all that, you can request several context specific data, which will be sh
 	 
   10. Race Summary
   
-      This report is usefull by the end of a race to create a document to be stored away in the archive. It contains data on all stints and drivers. This report can be created using the "Race Summary" command from the "Session" menu.
+      This report is useful by the end of a race to create a document to be stored away in the archive. It contains data on all stints and drivers. This report can be created using the "Race Summary" command from the "Session" menu.
 	 
 	  ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2011.JPG)
 	 
@@ -236,7 +232,7 @@ All these report documents are HTML-based and can be saved or printed using the 
 
 ### Strategy Handling
 
-If you are running a race based on a predefined strategy developed using the ["Strategy Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-development), you can adopt this strategy when necessary after important race events, for example after an accident, or after or just before significant weather changes.
+If you are running a race based on a predefined strategy developed using the ["Strategy Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-workbench), you can adopt this strategy when necessary after important race events, for example after an accident, or after or just before significant weather changes.
 
 To do this, you have to load the strategy, which have been selected for the current race using the "Load current Race Strategy" command from the "Strategy" menu. This command will load the strategy, which has been selected as the current race strategy in "Strategy Workbench" the last time. This will be done automatically for your convinience, when you enter the "Race Center" and no strategy has been selected so far. Please note, that it will not be checked, whether this strategy will be accepted by the Race Strategist for the current race. Please see the [documentation on strategy handling](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-handling) for more information. As an alternative to the active race strategy mentioned before you can always load any strategy by using the "Load Strategy..." command.
 
@@ -330,7 +326,9 @@ Using the elements on the "Pitstops" tab, any team member can prepare the next p
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%206.JPG)
 
-Especially before selecting the tyre pressures, you might want to analyze the data as described above. But you may also use the "Initialize from Session" command from the "Pitstop" menu, which will use the values, that are currently recommended by Jona, the Virtual Race Engineer, for tyre pressures. Also, the recommended pitstop lap and the amount of fuel to be added, will be taken from the strategy, or from the stint plan, in that order. In situations, where the conditions change dramatically, for example an upcoming thunderstorm, you can also load the tyre data from the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--session-database) using the "Load from Database..." command, when you think that you might have cold pressure information available from previous sessions in comparable conditions.
+Especially before selecting the tyre pressures, you might want to analyze the data as described above. But you may also use the "Initialize from Session" command from the "Pitstop" menu, which will select the next driver according to the stint plam (make sure, that your plan is correct), and then it will use the values, that are currently recommended by Jona, the Virtual Race Engineer, for tyre pressures and correct them for the next driver as described below. The recommended pitstop lap and the amount of fuel to be added, will be taken from the strategy, or from the stint plan, in that order. In situations, where the conditions change dramatically, for example an upcoming thunderstorm, you can also load the tyre data from the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--session-database) using the "Load from Database..." command, when you think that you might have cold pressure information available from previous sessions in comparable conditions.
+
+Some simulators not only provide different tyre compounds for a given car, but also manage a number of available tyre sets for each compound, where this number might differ between different events or sessions. When initializing a pitstop, the next unused tyre set number for the given compound will be automatically calculated in most cases and will be entered in the "Tyre Set" field (you can enable or disable the automatic tyre set selection in the "Pitstop" menu). Always double check the value here, or you might end up with worn tyres on the wheels. Please note, that *Assetto Corsa Competizione* provide a kind of automatic selection, which only works reliable, when using the same compound as in the last stint. Set "Tyre Set" to **0** in this case.
 
 You can also choose between two different methods to further adjust tyre pressures, when swapping drivers, as described in the previous section:
 
@@ -341,6 +339,8 @@ You can also choose between two different methods to further adjust tyre pressur
   2. Relative
   
      Using this method will use the target pressures derived by the Virtual Race Engineer, but these values will be corrected by applying the temperature corrected difference between the base pressures of the current driver and the next driver according to the stint plan. This will work best, when the reference pressures have been entered for very similar conditions.
+
+The choices will be remembered between different runs of "Race Center".
 
 Important: The correction factor to be applied for temperature corrections will be calculated with a linear regression using the supplied setup data. If there is not enough data available and the dependency of tyre pressures from the ambient temperatures cannot be derived, a fixed correction factor will be used instead. This correction factor can be defined in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings-1) independently for each simulator / car / track / weather combination, when necessary. When even these settings are missing, -0.1 PSI will be applied for each degree Celsius increase in air temperature, and -0.02 PSI for each increase in track temperature.
 
@@ -406,6 +406,14 @@ You probably already have used the Race Engineer to plan and prepare a pitstop d
    But there are, of course, exceptions which cannot be handled automatically. One notable exception might be an unplanned stop due to unexpected weather changes or a heavy crash. In some cases, especially when there is not enough data already available in the "Race Center" for the upcoming weather conditions, the stop will planned by the Race Engineer locally, which means that the current driver will stay in the car. But it is of course possible to plan the pitstop using the "Race Center" manually by your team mate in this case as well. Another exception might be a deviation from the stint plan or the current strategy due to an absent driver or an unexpected disconnect. You might adopt the plan or the strategy before proceeding, but there might not be enough time to do this. In the later case, try to adopt the stint plan and the strategy to the new situation afterwards and check whether everything picks up the new conditions.
    
    Please note, that whenever a strategy has been revised, either locally in the "Race Center" or by the Race Strategist at the current drivers site, you should check and possibly update the Stint Plan as well, since data taken from the strategy like refuel amount might have changed.
+
+#### Special notes
+
+Every simulation game is unique and handles multiplayer team races differently. Therefore, you have to be aware of the individual drawbacks and specialities. In this section I will provide a growing collection of hints and special operation tipps for all the individual simulations, whenever I stumble over them. When you found some specialities on your own, please feel free to share them with me, and I will be happy to add them to this section as well.
+
+##### Assetto Corsa Competizione
+
+  1. *Assetto Corsa Competizione* provides tyre set identification for dry tyres. Unfortunately, information about the state of the tyre sets is not available through the data API. The "Race Center will do its best to select the next fresh tyre set for the next pitstop, but always double check, especially when switching from wet to dry tyres, since in this case *Assetto Corsa Competizione* will reset the next tyre set number back to 1. *Assetto Corsa Competizione* also provides a kind of automatic mode to select the next free tyre set on its own. To use this, disable the calculation of the "Race Center" in the "Pitstop" menu or set the "Tyre Set" field to zero. But be aware, that this might fail, if you switch from wet to dry tyres due to a bug in *Assetto Corsa Competizione*.
   
 ## Server Administration
 
@@ -417,7 +425,7 @@ In the top section of "Server Administration" you have to enter the login creden
 
 Then you define, whether users of this account can access team session and / or use data replication using the checkboxes. Although technically possible to create an account which has no rights at all, this does not make much sense, right? So tick at least one of those boxes.
 
-Very important are the settings for the time contingent. You can choose between "One-Time" contingents, which renders the account useless after the contingent has been used up, or you can choose two variants of renewable time contingents. The number of minutes entered on the right will be available directly after the account has been saved and they might be automatically renewed according to the contingent rule. More on that later. Last, but not least, you can manually set the number of currently available minutes using the small button with the clock. If you don't want to use all this stuff, you can create an unlimited account which is usefull, if you run your own server for a closed group of team mates.
+Very important are the settings for the time contingent. You can choose between "One-Time" contingents, which renders the account useless after the contingent has been used up, or you can choose two variants of renewable time contingents. The number of minutes entered on the right will be available directly after the account has been saved and they might be automatically renewed according to the contingent rule. More on that later. Last, but not least, you can manually set the number of currently available minutes using the small button with the clock. If you don't want to use all this stuff, you can create an unlimited account which is useful, if you run your own server for a closed group of team mates.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Server%20Administration%202.JPG)
 

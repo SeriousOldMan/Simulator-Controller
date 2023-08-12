@@ -19,6 +19,7 @@ The distribution of Simulator Controller includes a set of predefined plugins, w
 | [RF2](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-rf2) | Similar to the ACC and IRC plugin provides this plugin start and stop support for *rFactor 2*. A "Pitstop" mode is available to control the pitstop settings from your controller hardware and an integration with Jona, the Virtual Race Engineer, and with Cato, the Virtual Race Strategist is available as well. The "Assistant" mode can handle most of the Race Assistant commands from your hardware controller. |
 | [R3E](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-rre) | Similar to the ACC, IRC and RF2 plugins provides this plugin start and stop support for *RaceRoom Racing Experience*. A "Pitstop" mode is available to control the pitstop settings from your controller hardware and an integration with Jona, the Virtual Race Engineer, with Cato, the Virtual Race Strategist and also with Elisa, the Virtual Race Spotter is available as well. The "Assistant" mode can handle most of the Race Assistant commands from your hardware controller. |
 | [PCARS2](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-PCARS2) | Integration for *Project CARS 2*, which supports  Jona, the Virtual Race Engineer, Cato, the Virtual Race Strategist and also Elisa, the Virtual Race Spotter. The plugin also supports a "Pitstop" mode for adjusting pitstop settings and a "Assistant" mode to interact with the Race Assistants. |
+| [Integration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) | This plugin implements interoperability with other applications like SimHub. |
 
 All plugins can be configured in the [Plugins tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) of the configuration tool.
 
@@ -377,7 +378,8 @@ Please see the following table for available information commands.
 | LapsRemaining | Cato will give you the number of laps still to drive. The number of remaining laps is determined by the remaining stint, session or driver time, but of course is also limited by the remaining fuel. |
 | Weather | You will get information about the current and upcoming weather. |
 | Position | Cato will tell you your current position. |
-| LapTimes | You will be given information about your average lap time and those of your direct opponents. |
+| LapTime | You will be given information about your last lap time. |
+| LapTimes | You will be given information about your last lap time and those of your direct opponents. |
 | ActiveCars | Cato will give you information about the number of cars in the session. In a multi-class or multi-category session additional information will be given on the number of cars in your own class as well. |
 | GapToAhead [Standings, Track] | Cato will tell you the gap in seconds to the car one position ahead of you or to the car directly in front of you. If you don't supply *Standings* or *Track*, it will default to *Standings*. Please note, that for compatibility reasons, *GapToFront* is supported as well. |
 | GapToBehind [Standings, Track] | Cato will tell you the gap in seconds to the car one position behind you or to the car directly behind you. If you don't supply *Standings* or *Track*, it will default to *Standings*. |
@@ -385,7 +387,7 @@ Please see the following table for available information commands.
 | StrategyOverview | As the name says, you will get a complete overview of the race strategy, as long as one has been defined in the "Strategy Workbench" and has been exported to be used in this session. |
 | NextPitstop | Cato tells you the lap, where the next pitstop according to the strategy has been planned. |
 | StrategyCancel | Cancels the current strategy. Cato will not have any strategy information from now on. |
-| StrategyRecommend | Cato will try to update the currently active strategy according to the current situation. Very usefull after an unplanned pitstop or a sudden weather change. |
+| StrategyRecommend | Cato will try to update the currently active strategy according to the current situation. Very useful after an unplanned pitstop or a sudden weather change. |
 | PitstopRecommend | Cato will try to determine the best possible lap for the next pitstop. Possible undercuts will be taken into account as well as the traffic situation after the pitstop. |
 
 Note: All these commands are also available in most of the simulation plugins, either in the "Pitstop" mode or in the "Assistant" mode, depending on the configuration parameters.
@@ -443,7 +445,8 @@ Please see the following table for available information commands.
 | ------ | ------ |
 | Time | You will be told the current time of your local computer. |
 | Position | Elisa will tell you your current position. |
-| LapTimes | You will be given information about your average lap time and those of your direct opponents. |
+| LapTime | You will be given information about your last lap time. |
+| LapTimes | You will be given information about your last lap time and those of your direct opponents. |
 | ActiveCars | Elisa will give you information about the number of cars in the session. In a multi-class or multi-category session additional information will be given on the number of cars in your own class as well. |
 | GapToAhead [Standings, Track] | Elisa will tell you the gap in seconds to the car one position ahead of you or to the car directly in front of you. If you don't supply *Standings* or *Track*, it will default to *Standings*. |
 | GapToBehind [Standings, Track] | Elisa will tell you the gap in seconds to the car one position behind you or to the car directly behind you. If you don't supply *Standings* or *Track*, it will default to *Standings*. |
@@ -1192,3 +1195,188 @@ Note: For convinience, all commands available for the *assistantCommands* parame
 ### Special requirements when using the Pitstop automation
 
 It is very important, that you do not use the *Project CARS 2* ICM on your own, when you want to control the pitstop settings using the "Pitstop" mode, or if you want Jona to control the pitstop settings. Furthermore, you must leave *all* repairs selected in the default pitstop strategy and select *no tyre change* in the default pitstop strategy as well. And declare that the ICM should be returned to the standard page, when closed. This option can be found in the *Gameplay* section of the *Automobilista 2* settings. Not complying with this requirements will give you funny results at least.
+
+## Plugin *Integration*
+
+This plugin, which is normally not automatically included and enabled, can export the internal state of Simulator Controller - especially a lot of the knowledge of all Race Assistants and plenty of information about the currently running simulator session - to other applications using a JSON file.
+
+To activate this plugin, add it to the list of active plugins in "Simulator Configuration", or, of you are using the "Simulator Setup" wizard for your configuration work, add the following line to the ["Configuration Patch.ini"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#patching-the-configuration) file:
+
+	[Plugins]
+	Integration=true||
+
+If you want to use the *stateFile* parameter here (see below), it looks like:
+
+	[Plugins]
+	Integration=true||stateFile: D:\SimRacing\Session State.json
+	
+where *D:\SimRacing\Session State.json* is an example. Substitute your own path here.
+
+### Configuration
+
+Only one plugin argument is provided, with which you can define the output file for the state representation.
+
+	stateFile: *path*
+
+If no argument for *stateFile* is provided, the state info will be put in a file named "Session State.json" in the *Simulator Controller\Temp* folder which resides in your *Documents* folder.
+
+The content of the JSON file looks like this (depending on the current situation, of course):
+
+	{
+		"Assistants": {
+			"Mode": "Team",
+			"Race Engineer": {
+				"Muted": false,
+				"State": "Active"
+			},
+			"Race Spotter": {
+				"Muted": false,
+				"State": "Active"
+			},
+			"Race Strategist": {
+				"Muted": false,
+				"State": "Active"
+			},
+			"Session": "Race"
+		},
+		"Automation": {
+			"Automation": "Dry",
+			"Car": "McLaren 720S GT3",
+			"Session": "Race",
+			"Simulator": "Assetto Corsa Competizione",
+			"State": "Active"
+		},
+		"Brakes": {
+			"Temperatures": [
+				199.6,
+				197.6,
+				339.9,
+				337.0
+			],
+			"Wear": [
+				2,
+				2,
+				3,
+				3
+			]
+		},
+		"Conditions": {
+			"AirTemperature": 24.9,
+			"Grip": "Optimum",
+			"TrackTemperature": 31.4,
+			"Weather": "Dry",
+			"Weather10Min": "Dry",
+			"Weather30Min": "Dry"
+		},
+		"Duration": {
+			"Format": "Time",
+			"SessionLapsLeft": 24,
+			"SessionTimeLeft": "54:53,0",
+			"StintLapsLeft": 9,
+			"StintTimeLeft": "54:53,0"
+		},
+		"Fuel": {
+			"AvgConsumption": 4.1,
+			"LastConsumption": 4.1,
+			"RemainingFuel": 36.9,
+			"RemainingLaps": 9
+		},
+		"Pitstop": {
+			"State": "Planned",
+			"Fuel": 68.0,
+			"Lap": null,
+			"Number": 1,
+			"Prepared": 0,
+			"Repairs": "-",
+			"TyreCompound": "Dry (Black)",
+			"TyrePressures": [
+				25.2,
+				25.2,
+				24.4,
+				24.3
+			],
+			"TyreSet": 2
+		},
+		"Session": {
+			"Car": "McLaren 720S GT3",
+			"Session": "Race",
+			"Simulator": "Assetto Corsa Competizione",
+			"Track": "Circuit de Spa-Franchorchamps"
+		},
+		"Standings": {
+			"Ahead": null,
+			"Behind": {
+				"Delta": "-0:02,1",
+				"InPit": false,
+				"LapTime": "2:21,3",
+				"Laps": 2,
+				"Nr": 109
+			},
+			"ClassPosition": 1,
+			"Focus": {
+				"Delta": "-0:15,9",
+				"InPit": false,
+				"LapTime": "2:24,3",
+				"Laps": 2,
+				"Nr": 15
+			},
+			"Leader": null,
+			"OverallPosition": 1,
+			"Position": 1
+		},
+		"Stint": {
+			"BestTime": null,
+			"Driver": "Oliver Juwig (OJU)",
+			"Lap": 3,
+			"Laps": 2,
+			"LastTime": "2:21,3",
+			"Position": 1
+		},
+		"Strategy": {
+			"State": "Active",
+			"Fuel": 12.0,
+			"Lap": 10,
+			"PlannedPitstops": 2,
+			"RemainingPitstops": 2,
+			"TyreCompound": "Dry (Black)",
+			"Pitstops": [
+				{
+					"Nr": 1,
+					"Fuel": 12.0,
+					"TyreCompound": "Dry (Black)"
+				},
+				{
+					"Nr": 2,
+					"Fuel": 0.0,
+					"TyreCompound": null
+				}
+			]
+		},
+		"TeamServer": {
+			"Driver": "Oliver Juwig",
+			"Server": "https:\/\/vgr-teamserver.azurewebsites.net",
+			"Session": "24H Spa",
+			"Team": "VGR (EOS)",
+			"Token": "xxxxxxxx-yyyy-zzzz-aaaa-bbbbbbbbbbbb"
+		},
+		"Tyres": {
+			"Pressures": [
+				26.4,
+				26.4,
+				26.7,
+				26.5
+			],
+			"Temperatures": [
+				80.6,
+				80.6,
+				91.7,
+				91.1
+			],
+			"Wear": [
+				null,
+				null,
+				null,
+				null
+			]
+		}
+	}

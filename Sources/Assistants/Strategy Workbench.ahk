@@ -17,7 +17,7 @@
 ;@SC #Include "..\Framework\Production.ahk"
 ;@SC-EndIf
 
-;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Dashboard.ico
+;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Workbench.ico
 ;@Ahk2Exe-ExeName Strategy Workbench.exe
 
 
@@ -881,7 +881,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.SetFont("s9 Norm", "Arial")
 
 		workbenchGui.Add("Documentation", "x608 YP+20 w134 Center H:Center", translate("Strategy Workbench")
-					   , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-development")
+					   , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-workbench")
 
 		workbenchGui.Add("Text", "x8 yp+30 w1350 0x10 W:Grow")
 
@@ -1645,11 +1645,9 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	updateSettingsMenu() {
-		local settingsMenu, fileNames, validators, ignore, fileName, validator
-
-		settingsMenu := collect(["Settings", "---------------------------------------------", "Initialize from Strategy", "Initialize from Settings...", "Initialize from Database", "Initialize from Telemetry", "Initialize from Simulation"], translate)
-
-		fileNames := getFileNames("*.rules", kResourcesDirectory . "Strategy\Validators\", kUserHomeDirectory . "Validators\")
+		local settingsMenu := collect(["Settings", "---------------------------------------------", "Initialize from Strategy", "Initialize from Settings...", "Initialize from Database", "Initialize from Telemetry", "Initialize from Simulation"], translate)
+		local fileNames := getFileNames("*.rules", kResourcesDirectory . "Strategy\Validators\", kUserHomeDirectory . "Validators\")
+		local validators, ignore, fileName, validator
 
 		if (fileNames.Length > 0) {
 			settingsMenu.Push(translate("---------------------------------------------"))
@@ -2410,8 +2408,6 @@ class StrategyWorkbench extends ConfigurationItem {
 				}
 			case 5:
 				if (simulator && car && track) {
-					settingsDB := SettingsDatabase()
-
 					settings := SettingsDatabase().loadSettings(simulator, car, track, this.SelectedWeather)
 
 					if (settings.Count > 0) {

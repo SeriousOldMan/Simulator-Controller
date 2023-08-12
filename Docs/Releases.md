@@ -1,3 +1,64 @@
+## 5.2.2.0-release 08/11/23
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. The management of tyre pressure data has been fixed. It happened in rare situations, that tyre pressure were not stored in the session database, although you gave your consent.
+  4. A new [voice command "Tell me my last laptime"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Strategist-Commands-(EN)) is available for the Race Strategist and Race Spotter.
+  5. A new [information request action "LapTime"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) is available for the Race Strategist and Race Spotter to request the last lap time by a press of a button on your controller hardware.
+  6. An icon has been added to the Stream Deck icon set for the "LapTime" information request action.
+  7. *Practice run sheets* have been added to the "Practice Center", which helps you to create telemetry data for special conditions and car setups, for which no data is available yet. See the all new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#using-the-run-sheet) for more information.
+  8. When a stint plan is created or updated in the "Race Center" it now not only includes information from the strategy but also take the already run stints into account, especially for the driver selection of a stint in the stint plan. When a stint plan is already present, driver selection of stints that have not been started will not be overwritten anymore by information from the strategy.
+  9. When initializing the settings for the next pitstop in the "Race Center", used tyre sets of past stints will be taken into account and the system tries to [recommend the next fresh tyre set](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#planning-a-pitstop). But be sure to double check the recommendation to not end up with worn tyres after your pitstop. This method can be deactivated in the "Pitstop" menu.
+  10. "Race Center" and "Practice Center" now remember many menu choices between different runs.
+  11. "Practice Center" and "Race Center" remember the layout of the telemetry charts between different runs.
+  12. Holding down the Ctrl key while starting the "Race Center" will deactivate the synchronization.
+  13. Potential fix for the nasty auto update loop, which has been encountered by a couple of users.
+  14. [Developer] Additional information has been added to the ["Session State.json" file](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) introduced with the last release.
+  15. [Developer] The data format of the "Session State.json" file has been updated to better reflect the JSON data type standard.
+  16. New car models for "Setup Workbench":
+      - Assetto Corsa
+        - Lamborghini Miura
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-522).
+  
+## 5.2.1.0-release 08/04/23
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. Many bugfixes and polishing in the new "Practice Center".
+  4. Better last lap detection in timed races.
+  5. The Spotter now announces the last lap of the leader or yourself.
+  6. Fixed the handling of the "Invalid" column in "Race Center".
+  7. Fixed data integration for RaceRoom Racing Experience. Sorry for that.
+  8. Fixed tyre wear for RaceRoom Racing Experience, which was 100% for fresh tyres.
+  9. Fixed a couple of stability issues in the Stream Deck plugin. If you have encountered problems lately, you might want to update the plugin.
+  10. Fixed a rare bug with SFX-100 motion intensity controller.
+  11. Support for a couple of new fields has been added in the simulator data files - inner, middle and outer tyre temperatures and in-game tyre compound identifiers for *Automobilista 2*.
+  12. The telemetry charts in "Race Center" and "Practice Center" now apply unit conversion correctly.
+  13. New data summary report in "Practice Center" and a new tab to review the [available telemtry data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#exploring-data).
+  14. New [stints summary report](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#data-analysis) in "Practice Center".
+  15. Updated *Automobilista 2* data integration to shared memory API version 13.
+  16. The Standings info widget in "Session Monitor" now also shows the observed opponent, if one is currently observed by the Spotter.
+  17. A new [plugin named "Integration"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) is available, which exposes the internal state of the Race Assistants and many information about the current session to external applications using a JSON file, which is updated periodically, even when another driver is running the car in a team race. With this it is possible, for example, to create a dashboard for Simulator Controller in SimHub.
+  18. New car models for "Setup Workbench":
+      - Assetto Corsa
+        - Alfa Romeo 33 Stradale
+		- Alfa Romeo Giulietta QV Launch Edition 2014 (Fixed)
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-521).
+  
+## 5.2.0.0-release 07/28/23
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. Introducing a complete [new tool "Practice Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#practice-center), which helps you to manage your practice sessions and allows you to inspect and select the data to be transfered to the session database. The development of this application is still in its early stage, but it is already quite usable.
+  4. A new controller action function "openPracticeCenter" allows you to open the "Practice Center" from your controller hardware.
+  5. A new plugin argument "openPracticeCenter" has been introduced for the "Race Engineer" and "Race Strategist" plugins.
+  6. Added an "Invalid" column for the "Car" report in "Race Reports".
+  7. Added an "Invalid" column for the *Laps* list in "Race Center".
+  8. A bug has been fixed which may crash the Simulator Controller background process, when a custom controller function without a trigger was configured.
+  9. The application icons in "Simulator Startup" have been rearranged.
+  10. New car models for "Setup Workbench":
+      - Assetto Corsa
+        - Alfa Romeo Giulietta QV Launch Edition 2014
+
 ## 5.1.2.0-release 07/21/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
@@ -14,7 +75,7 @@
       - Assetto Corsa
 	    - Audi R8 LMS Ultra
 
-  Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-512).
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-512).
 
 ## 5.1.1.0-release 07/14/23
   1. Minor bugfixes, as always
@@ -880,7 +941,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
   1. Bugfixes, as always
   2. Documentation updates, as always
-  3. Support driver filters for telemetry in "Strategy Workbench" and "Race Center". You can now select a driver, for which the data in various reports and charts should be displayed. See the updated documentation for ["Strategy Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-development) and ["Race Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#data-analysis) for more information.
+  3. Support driver filters for telemetry in "Strategy Workbench" and "Race Center". You can now select a driver, for which the data in various reports and charts should be displayed. See the updated documentation for ["Strategy Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-workbench) and ["Race Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#data-analysis) for more information.
   4. The strategy simulation in "Race Center" has been extended to support more edge cases regarding the current traffic situation.
   5. When simulating a strategy in "Strategy Workbench", it is now possible to preselect drivers for the various stints. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#drivers) for more information.
   6. When a stint plan is created from a strategy in "Race Center", the drivers are preselected, if the strategy has been created with driver information.
@@ -1405,7 +1466,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   5. Renamed "Controller Plugin Labels" file to "Controller Action Labels". Important: Take a look at the [update notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-366), if you have changed labels in the past.
   6. Introduced "Controller Action Icons.XX" file in order to support action specific icons on the Stream Deck controller.
   7. With the new plugin parameter [*udpConnection*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-4) for the ACC plugin to support non-standard UDP connect strings for the broadcasting interface.
-  8. ["Strategy Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-development) supports a new command to remove faulty data from the telemetry database.
+  8. ["Strategy Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-workbench) supports a new command to remove faulty data from the telemetry database.
   9. Only valid laps will be written to the telemetry database and will be used for statistical tyre pressure data.
   10. Support for binary functions for the effect intensity manipulation in the "Motion Feedback" plugin. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-2) for more information.
   11. [Developer only] Full refactoring of the *ButtonBox* class which is now the [*FunctionController*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-functioncontroller-extends-configurationitem-simulator-controllerahk) in [Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk) in order to support the new Stream Deck integration.
@@ -1435,14 +1496,14 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   5. Initializing a various fields in the "Strategy Workbench" from *Race.settings* files, from a running simulation or from data acquired from the telemetry information is now supported.
   6. Comparison of strategies is now supported in the "Strategy Workbench".
   7. Defined pitstop rules are now taken into account for strategy simulations.
-  8. Expanded [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-development) to reflect the new functions of the "Strategy Workbench".
+  8. Expanded [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-workbench) to reflect the new functions of the "Strategy Workbench".
 
 ## 3.6.0-release 10/08/21
 
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. Important fix for handling startup of SimFeedback by the "Motion Feedback" plugin.
-  4. Initial strategy simulation based on telemetry data for the "Strategy Workbench". The tool is still in an early stage of development and the functionality might change with future releases. A very rudimentary [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-development) can be found in the chapter on the Virtual Race Strategist. This documentation will be completed with the upcoming releases.
+  4. Initial strategy simulation based on telemetry data for the "Strategy Workbench". The tool is still in an early stage of development and the functionality might change with future releases. A very rudimentary [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-workbench) can be found in the chapter on the Virtual Race Strategist. This documentation will be completed with the upcoming releases.
 
 ## 3.5.9-release 10/01/21
 

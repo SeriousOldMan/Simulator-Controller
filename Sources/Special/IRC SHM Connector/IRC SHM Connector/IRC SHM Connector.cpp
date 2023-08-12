@@ -949,6 +949,9 @@ void writeData(std::ostringstream * output, const irsdk_header *header, const ch
 
 			printLine(output, "[Track Data]");
 
+			if (getYamlValue(result, sessionInfo, "WeekendInfo:TrackLength:"))
+				printLine(output, "Length=" + std::to_string(atof(result) * 1000));
+
 			if (getDataValue(result, header, data, "TrackTemp"))
 				printLine(output, "Temperature=" + std::string(result));
 			else if (getYamlValue(result, sessionInfo, "WeekendInfo:TrackSurfaceTemp:")) {

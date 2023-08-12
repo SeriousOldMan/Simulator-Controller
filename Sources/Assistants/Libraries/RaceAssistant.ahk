@@ -1764,6 +1764,8 @@ class GridRaceAssistant extends RaceAssistant {
 		switch grammar, false {
 			case "Position":
 				this.positionRecognized(words)
+			case "LapTime":
+				this.lapTimeRecognized(words)
 			case "LapTimes":
 				this.lapTimesRecognized(words)
 			case "ActiveCars":
@@ -1785,6 +1787,8 @@ class GridRaceAssistant extends RaceAssistant {
 		switch category, false {
 			case "Position":
 				this.positionRecognized([])
+			case "LapTime":
+				this.lapTimeRecognized([])
 			case "LapTimes":
 				this.lapTimesRecognized([])
 			case "ActiveCars":
@@ -1847,27 +1851,46 @@ class GridRaceAssistant extends RaceAssistant {
 		}
 	}
 
+	lapTimeRecognized(words) {
+		local knowledgeBase := this.KnowledgeBase
+		local speaker := this.getSpeaker()
+		local car := knowledgeBase.getValue("Driver.Car", kUndefined)
+		local lap := knowledgeBase.getValue("Lap", 0)
+		local lapTime, minute, seconds
+
+		if !this.hasEnoughData()
+			return
+
+		if ((lap == 0) || (car == kUndefined) || (car == 0))
+			speaker.speakPhrase("Later")
+		else {
+			lapTime := (knowledgeBase.getValue("Car." . car . ".Time") / 1000)
+
+			minute := Floor(lapTime / 60)
+			seconds := (lapTime - (minute * 60))
+
+			speaker.speakPhrase("LapTime", {time: speaker.number2Speech(lapTime, 1), minute: minute, seconds: speaker.number2Speech(seconds, 1)})
+		}
+	}
+
 	lapTimesRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
+		local speaker := this.getSpeaker()
 		local car, lap, position, cars, driverLapTime, speaker, minute, seconds
 
 		reportLapTime(phrase, driverLapTime, car) {
-			local lapTime := this.KnowledgeBase.getValue("Car." . car . ".Time", false)
-			local speaker, fragments, minute, seconds, delta
-
-			if !this.hasEnoughData()
-				return
+			local lapTime := knowledgeBase.getValue("Car." . car . ".Time", false)
+			local fragments, minute, seconds, delta
 
 			if lapTime {
 				lapTime /= 1000
 
-				speaker := this.getSpeaker()
-
-				speaker.beginTalk()
 				fragments := speaker.Fragments
 
 				minute := Floor(lapTime / 60)
 				seconds := (lapTime - (minute * 60))
+
+				speaker.beginTalk()
 
 				try {
 					speaker.speakPhrase(phrase, {time: speaker.number2Speech(lapTime, 1), minute: minute, seconds: speaker.number2Speech(seconds, 1)})
@@ -1892,12 +1915,10 @@ class GridRaceAssistant extends RaceAssistant {
 		position := this.getPosition(false, "Class")
 		cars := knowledgeBase.getValue("Car.Count")
 
-		driverLapTime := (knowledgeBase.getValue("Car." . car . ".Time") / 1000)
-
 		if ((lap == 0) || (car == kUndefined) || (car == 0))
-			this.getSpeaker().speakPhrase("Later")
+			speaker.speakPhrase("Later")
 		else {
-			speaker := this.getSpeaker()
+			driverLapTime := (knowledgeBase.getValue("Car." . car . ".Time") / 1000)
 
 			speaker.beginTalk()
 
@@ -1906,19 +1927,19 @@ class GridRaceAssistant extends RaceAssistant {
 				seconds := (driverLapTime - (minute * 60))
 
 				speaker.speakPhrase("LapTime", {time: speaker.number2Speech(driverLapTime, 1), minute: minute, seconds: speaker.number2Speech(seconds, 1)})
-
-				if (position > 2)
-					reportLapTime("LapTimeFront", driverLapTime, knowledgeBase.getValue("Position.Standings.Class.Ahead.Car", 0))
-
-				if (position < cars)
-					reportLapTime("LapTimeBehind", driverLapTime, knowledgeBase.getValue("Position.Standings.Class.Behind.Car", 0))
-
-				if (position > 1)
-					reportLapTime("LapTimeLeader", driverLapTime, knowledgeBase.getValue("Position.Standings.Class.Leader.Car", 0))
 			}
 			finally {
 				speaker.endTalk()
 			}
+
+			if (position > 2)
+				reportLapTime("LapTimeFront", driverLapTime, knowledgeBase.getValue("Position.Standings.Class.Ahead.Car", 0))
+
+			if (position < cars)
+				reportLapTime("LapTimeBehind", driverLapTime, knowledgeBase.getValue("Position.Standings.Class.Behind.Car", 0))
+
+			if (position > 1)
+				reportLapTime("LapTimeLeader", driverLapTime, knowledgeBase.getValue("Position.Standings.Class.Leader.Car", 0))
 		}
 	}
 

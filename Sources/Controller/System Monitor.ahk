@@ -570,11 +570,11 @@ systemMonitor(command := false, arguments*) {
 
 			if (wear.Length = 4) {
 				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Wear") . "</th><td class=`"td-wdg`" style=`"text-align: center`">"
-					   . displayValue("Float", convertUnit("Temperature", wear[1])) . "</td><td class=`"td-wdg`" style=`"text-align: center`">"
-					   . displayValue("Float", convertUnit("Temperature", wear[2])) . "</td></tr>")
+					   . displayValue("Float", wear[1]) . "</td><td class=`"td-wdg`" style=`"text-align: center`">"
+					   . displayValue("Float", wear[2]) . "</td></tr>")
 				html .= ("<tr><td class=`"td-wdg`" style=`"text-align: center`">"
-					   . displayValue("Float", convertUnit("Temperature", wear[3])) . "</td><td class=`"td-wdg`" style=`"text-align: center`">"
-					   . displayValue("Float", convertUnit("Temperature", wear[4])) . "</td></tr>")
+					   . displayValue("Float", wear[3]) . "</td><td class=`"td-wdg`" style=`"text-align: center`">"
+					   . displayValue("Float", wear[4]) . "</td></tr>")
 			}
 		}
 		catch Any as exception {
@@ -781,6 +781,7 @@ systemMonitor(command := false, arguments*) {
 		static lastLeaderDelta := false
 		static lastAheadDelta := false
 		static lastBehindDelta := false
+		static lastFocusDelta := false
 
 		computeColorInfo(delta, &lastDelta, upColor, downColor, &colorOpen, &colorClose) {
 			if (lastDelta && (lastDelta != delta)) {
@@ -805,6 +806,24 @@ systemMonitor(command := false, arguments*) {
 			}
 			else
 				html .= ("<tr><th class=`"th-std th-left`">" . translate("Position") . "</th><td class=`"td-wdg`">" . positionOverall . "</td></tr>")
+
+			if (getMultiMapValue(sessionState, "Standings", "Focus.Lap.Time", kUndefined) != kUndefined) {
+				nr := getMultiMapValue(sessionState, "Standings", "Focus.Nr")
+				delta := getMultiMapValue(sessionState, "Standings", "Focus.Delta")
+
+				computeColorInfo(Abs(delta), &lastFocusDelta, "green", "red", &colorOpen, &colorClose)
+
+				if nr {
+					html .= ("<tr><th class=`"th-std th-left`">" . substituteVariables(translate("Observed #%nr% (Laps)"), {nr: nr}) . "</th><td class=`"td-wdg`">" . getMultiMapValue(sessionState, "Standings", "Focus.Laps") . "</td></tr>")
+					html .= ("<tr><th class=`"th-std th-left`">" . substituteVariables(translate("Observed #%nr% (Delta)"), {nr: nr}) . "</th><td class=`"td-wdg`">" . colorOpen . displayValue("Time", delta) . colorClose . "</td></tr>")
+					html .= ("<tr><th class=`"th-std th-left`">" . substituteVariables(translate("Observed #%nr% (Lap Time)"), {nr: nr}) . "</th><td class=`"td-wdg`">" . displayValue("Time", getMultiMapValue(sessionState, "Standings", "Focus.Lap.Time")) . "</td></tr>")
+				}
+				else {
+					html .= ("<tr><th class=`"th-std th-left`">" . translate("Observed (Laps)") . "</th><td class=`"td-wdg`">" . getMultiMapValue(sessionState, "Standings", "Focus.Laps") . "</td></tr>")
+					html .= ("<tr><th class=`"th-std th-left`">" . translate("Observed (Delta)") . "</th><td class=`"td-wdg`">" . colorOpen . displayValue("Time", delta) . colorClose . "</td></tr>")
+					html .= ("<tr><th class=`"th-std th-left`">" . translate("Observed (Lap Time)") . "</th><td class=`"td-wdg`">" . displayValue("Time", getMultiMapValue(sessionState, "Standings", "Focus.Lap.Time")) . "</td></tr>")
+				}
+			}
 
 			if (getMultiMapValue(sessionState, "Standings", "Leader.Lap.Time", kUndefined) != kUndefined) {
 				nr := getMultiMapValue(sessionState, "Standings", "Leader.Nr")

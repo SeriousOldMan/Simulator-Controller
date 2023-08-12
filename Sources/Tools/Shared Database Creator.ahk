@@ -290,17 +290,39 @@ createDatabases(inputDirectory, outputDirectory) {
 	version1 := Random(1, 1000)
 	version2 := Random(1, 1000)
 
+	updateProgress("Processing [Pressures]...")
+
+	DatabaseCreator(inputDirectory, outputDirectory . "Pressures\", true, false, false).createDatabase()
+
+	updateProgress("Processing [Setups]...")
+
+	DatabaseCreator(inputDirectory, outputDirectory . "Setups\", false, true, false).createDatabase()
+
+	updateProgress("Processing [Strategies]...")
+
+	DatabaseCreator(inputDirectory, outputDirectory . "Strategies\", false, false, true).createDatabase()
+
 	for strategiesLabel, strategiesEnabled in Map("Strategies", true, "No Strategies", false)
 		for setupsLabel, setupsEnabled in Map("Setups", true, "No Setups", false)
 			for pressuresLabel, pressuresEnabled in Map("Pressures", true, "No Pressures", false)
 				if (pressuresEnabled || setupsEnabled || strategiesEnabled) {
-					updateProgress("Processing [" . strategiesLabel . " | " . setupsLabel . " | " . pressuresLabel . "]...")
+					updateProgress("Assembling [" . strategiesLabel . " | " . setupsLabel . " | " . pressuresLabel . "]...")
 
 					type := (pressuresEnabled . setupsEnabled . strategiesEnabled)
 
 					database := (outputDirectory . type . "." . version1 . "." . version2)
 
-					DatabaseCreator(inputDirectory, database . "\", pressuresEnabled, setupsEnabled, strategiesEnabled).createDatabase()
+					if pressuresEnabled
+						if FileExist(outputDirectory . pressuresLabel)
+							DirCopy(outputDirectory . pressuresLabel, database, 1)
+
+					if setupsEnabled
+						if FileExist(outputDirectory . setupsLabel)
+							DirCopy(outputDirectory . setupsLabel, database, 1)
+
+					if strategiesEnabled
+						if FileExist(outputDirectory . strategiesLabel)
+							DirCopy(outputDirectory . strategiesLabel, database, 1)
 
 					RunWait("PowerShell.exe -Command Compress-Archive -LiteralPath '" . database . "\Community' -CompressionLevel Optimal -DestinationPath '" . database . ".zip'", , "Hide")
 
@@ -311,13 +333,19 @@ createDatabases(inputDirectory, outputDirectory) {
 	for setupsLabel, setupsEnabled in Map("Setups", true, "No Setups", false)
 		for pressuresLabel, pressuresEnabled in Map("Pressures", true, "No Pressures", false)
 			if (pressuresEnabled || setupsEnabled) {
-				updateProgress("Processing [" . setupsLabel . " | " . pressuresLabel . "]...")
+				updateProgress("Assembling [" . setupsLabel . " | " . pressuresLabel . "]...")
 
 				type := (pressuresEnabled . setupsEnabled)
 
 				database := (outputDirectory . type . "." . version1 . "." . version2)
 
-				DatabaseCreator(inputDirectory, database . "\", pressuresEnabled, setupsEnabled, false).createDatabase()
+				if pressuresEnabled
+					if FileExist(outputDirectory . setupsLabel)
+						DirCopy(outputDirectory . setupsLabel, database, 1)
+
+				if setupsEnabled
+					if FileExist(outputDirectory . setupsLabel)
+						DirCopy(outputDirectory . setupsLabel, database, 1)
 
 				RunWait("PowerShell.exe -Command Compress-Archive -LiteralPath '" . database . "\Community' -CompressionLevel Optimal -DestinationPath '" . database . ".zip'", , "Hide")
 

@@ -1511,7 +1511,7 @@ class RaceEngineer extends RaceAssistant {
 			}
 
 			if currentCompound {
-				if (lapNumber <= knowledgeBase.getValue("Session.Settings.Lap.Learning.Laps", 2)) {
+				if (lapNumber <= (((this.Session = kSessionRace) ? 0 : this.BaseLap) + knowledgeBase.getValue("Session.Settings.Lap.Learning.Laps", 2))) {
 					if (currentCompound = "Dry")
 						prefix := "Session.Setup.Tyre.Dry.Pressure."
 					else
@@ -2252,6 +2252,45 @@ class RaceEngineer extends RaceAssistant {
 		return result
 	}
 
+	performService(lapNumber, fuel, tyreCompound, tyreCompoundColor, tyreSet
+						    , tyrePressureFL, tyrePressureFR, tyrePressureRL, tyrePressureRR) {
+		local knowledgeBase := this.KnowledgeBase
+		local pitstop := (knowledgeBase.getValue("Pitstop.Last", 0) + 1)
+		local ignore, fact
+
+		setValue(fact, value) {
+			knowledgeBase.setFact("Pitstop." . pitstop . "." . fact, value)
+		}
+
+		knowledgeBase.setFact("Tyre.Compound", tyreCompound)
+		knowledgeBase.setFact("Tyre.Compound.Color", tyreCompoundColor)
+
+		setValue("Lap", lapNumber)
+		setValue("Time", A_Now)
+		setValue("Time", A_Now)
+		setValue("Temperature.Air", knowledgeBase.getValue("Lap." . lapNumber . "Temperature.Air"))
+		setValue("Temperature.Track", knowledgeBase.getValue("Lap." . lapNumber . "Temperature.Track"))
+		setValue("Fuel", fuel)
+		setValue("Tyre.Compound", tyreCompound)
+		setValue("Tyre.Compound.Color", tyreCompoundColor)
+		setValue("Tyre.Set", tyreSet)
+		setValue("Tyre.Pressure.FL", tyrePressureFL)
+		setValue("Tyre.Pressure.FR", tyrePressureFR)
+		setValue("Tyre.Pressure.RL", tyrePressureRL)
+		setValue("Tyre.Pressure.RR", tyrePressureRR)
+
+		for ignore, fact in ["Tyre.Pressure.Correction", "Driver.Request", "Repair.Bodywork", "Repair.Suspension", "Repair.Engine"]
+			setValue(fact, false)
+
+		knowledgeBase.setFact("Pitstop.Last", pitstop)
+		knowledgeBase.setFact("Pitstop.Clear", lapNumber)
+
+		knowledgeBase.produce()
+
+		if this.Debug[kDebugKnowledgeBase]
+ 			this.dumpKnowledgeBase(this.KnowledgeBase)
+	}
+
 	callPlanPitstop(lap := kUndefined, arguments*) {
 		this.clearContinuation()
 
@@ -2605,7 +2644,11 @@ class RaceEngineer extends RaceAssistant {
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
 		if this.RemoteHandler
-			this.RemoteHandler.setPitstopTyrePressures(pitstopNumber, Round(pressureFL, 1), Round(pressureFR, 1), Round(pressureRL, 1), Round(pressureRR, 1))
+			if (pressureFL && isNumber(pressureFL)
+			 && pressureFR && isNumber(pressureFR)
+			 && pressureRL && isNumber(pressureRL)
+			 && pressureRR && isNumber(pressureRR))
+				this.RemoteHandler.setPitstopTyrePressures(pitstopNumber, Round(pressureFL, 1), Round(pressureFR, 1), Round(pressureRL, 1), Round(pressureRR, 1))
 	}
 
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine) {

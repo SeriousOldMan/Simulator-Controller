@@ -23,6 +23,15 @@ Built on top of the Task framework, the Message Manager handles the communcation
 | Messages     | Schedule | 200 | The number of milliseconds to wait between each run of the message scheduler, which sends messages to and receives messages from other processes of Simulator Controller. |
 |      | Dispatch | 100 | All received messages are placed in a queue for processing. This setting defines the number of milliseconds to let other activities run between each message processing. |
 
+The next group of settings are used mainly for development purposes. It allows to control the level of self-diagnosing of the framework during development and testing, but can also be used to track down really complex bugs in the production code. Please note, that some of these settings can also be toggled using the choices in the respective application menu during runtime.
+
+| Category | Setting | Default | Description |
+|----------|---------|---------|-------------|
+| Build     | Configuration | Production | Chooses the runtime mode (*Production* or *Development*) of the framework. This normaly determined during compile time, but it is possible to activate parts of the *Development* mode even for production code.  |
+| Debug     | Debug | *depending on configuration* | Specifies, whether the framework is running in a special debug mode. Default is *false* for a production (release) configuration and *true* for a development configuration. This optiona can be switched using the application menu. |
+|      | LogLevel | *depending on configuration* | Defines the level of verbosity of the logging messages. Allowed values are *Debug*, *Info*, *Warn*, *Critical* and *Off*. Defult is *Warn* for production configuration and *Debug* for devlopment configuration. This optiona can be switched using the application menu. |
+|      | Verbose | *depending on configuration* | Enables or disables additional and very verbose diagnostic output. Never use it in a real race, since error dialogs might popup while driving. Default is *true* for non-compiled code, when *Debug* is enabled, *false* otherwise. |
+
 And finally a couple of other settings which configure low level components of Simulator Controller:
 
 | Category | Setting | Default | Description |

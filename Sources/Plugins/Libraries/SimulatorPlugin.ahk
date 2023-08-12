@@ -543,7 +543,7 @@ class SimulatorPlugin extends ControllerPlugin {
 			if SimulatorPlugin.ActiveSimulator
 				SimulatorPlugin.ActiveSimulator.simulatorShutdown(SimulatorPlugin.ActiveSimulation)
 
-			this.updateSession(kSessionFinished)
+			this.updateSession(kSessionFinished, true)
 
 			SimulatorPlugin.sActiveSimulator := this
 			SimulatorPlugin.sActiveSimulation := simulator
@@ -554,24 +554,24 @@ class SimulatorPlugin extends ControllerPlugin {
 		super.simulatorShutdown(simulator)
 
 		if ((simulator = this.Simulator.Application) && (SimulatorPlugin.ActiveSimulator == this)) {
-			this.updateSession(kSessionFinished)
+			this.updateSession(kSessionFinished, true)
 
 			SimulatorPlugin.sActiveSimulator := false
 			SimulatorPlugin.sActiveSimulation := false
 		}
 	}
 
-	updateSession(session) {
+	updateSession(session, force := false) {
 		local mode
 
-		if ((session != this.Session) && (session != kSessionPaused)) {
+		if (force || ((session != this.Session) && (session != kSessionPaused))) {
 			this.iSession := session
 
 			if (session == kSessionFinished) {
 				this.Car := false
 				this.Track := false
 
-				this.Controller.setModes()
+				this.Controller.setModes(this.Simulator.Application)
 			}
 			else
 				this.Controller.setModes(this.Simulator.Application, ["Other", "Practice", "Qualification", "Race"][session])
@@ -862,8 +862,8 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		return false
 	}
 
-	updateSession(session) {
-		super.updateSession(session)
+	updateSession(session, force := false) {
+		super.updateSession(session, force)
 
 		if (session = kSessionFinished) {
 			this.CurrentTyreCompound := false

@@ -1,16 +1,16 @@
 [Development]
-Version=5.2.0.0-dev
-Target=5.2.0.0-release
-Date=07/22/2023
+Version=5.2.3.0-dev
+Target=5.2.3.0-release
+Date=08/12/2023
 Download=
-Changes=New tool "PracticeCenter", New controller action function "openPracticeCenter", New plugin argument "openPracticeCenter" for "Race Engineer" and "Race Strategist" plugins
+Changes=New controller action function "callCustom", Significant speed improvement in ACC pitstop setup when using the same tyre compound
 [Release]
-Version=5.1.2.0-release
-Date=07/21/2023
-Download=https://cutt.ly/6wpOauWf;https://www.dropbox.com/s/7yytpw6zyvy9fcj/Simulator%20Controller%205.1.2.0-release.zip?dl=1
-Changes=New core setting to choose the dispatch cycle of external commands, New communication method for the Stream Deck plugin, New core setting to choose the between the Stream Deck communication methods, The Spotter can now "focus" on a specific opponent, Strategist and Spotter can now be asked for gap info for a specific car, Standings widget now shows car number in "System Monitor", Fixed bugs in Spanish grammars for Spotter and Strategist, Fixed AMS2 API to not interpret a replay as an actual session, New car models for "Setup Workbench", Renamed controller action function "call" to "invoke", New double press setting for Push-to-Talk
+Version=5.2.2.0-release
+Date=08/11/2023
+Download=https://cutt.ly/MwfATSpm;https://www.dropbox.com/scl/fi/24my1qin8nn9rz89w6wvf/Simulator-Controller-5.2.2.0-release.zip?rlkey=28e670qu608h26uibnkobmujk&dl=1
+Changes=More fields for "Session State.json", Data format update for "Session State.json", New voice command "Tell me my last laptime", New information request action "LapTime", New icon in Stream Deck icon set for "LapTime", Optimized stint plan creation/update in "Race Center", Next tyre set handling in "Race Center", New practice run sheets in "Practice Center", New framework configuration and debug settings in "Core Settings.ini", New modifier key when starting "Race Center", "Practice Center" and "Race Center" remember various menu settings, "Practice Center" and "Race Center" remember the layout of the telemetry charts, Fixed pressure data management in "Session Database", New car models for "Setup Workbench", Optimized auto updater
 [Current]
 Type=Development
 [Version]
-Development=5.2.0.0-dev
-Release=5.1.2.0-release
+Development=5.2.3.0-dev
+Release=5.2.2.0-release

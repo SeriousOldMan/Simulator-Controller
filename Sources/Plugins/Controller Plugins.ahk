@@ -28,3 +28,5 @@
 #Include "PCARS2 Plugin.ahk"
 #Include "RSP Plugin.ahk"
 #Include "RST Plugin.ahk"
+
+#include "Integration Plugin.ahk"				; Must be loaded last, if at all

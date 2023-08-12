@@ -407,6 +407,8 @@ namespace ACSHMProvider
 
             Console.WriteLine("[Track Data]");
 
+            Console.Write("Length="); Console.WriteLine(staticInfo.TrackSPlineLength);
+
             Console.Write("Temperature="); Console.WriteLine(physics.RoadTemp);
             Console.WriteLine("Grip=" + GetGrip(graphics.SurfaceGrip));
 

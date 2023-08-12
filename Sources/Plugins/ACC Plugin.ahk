@@ -398,11 +398,11 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		return this.sessionActive(data)
 	}
 
-	updateSession(session) {
+	updateSession(session, force := false) {
 		local lastSession := this.Session
 		local activeModes
 
-		super.updateSession(session)
+		super.updateSession(session, force)
 
 		activeModes := this.Controller.ActiveModes
 
@@ -544,10 +544,6 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 			return newMultiMap()
 		}
-	}
-
-	readSessionData(options := "") {
-		return super.readSessionData(options, "DLL")
 	}
 
 	computeBrakePadWear(location, compound, thickness) {
@@ -2132,7 +2128,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		super.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
 
 		if compound {
-			if (this.getPitstopOptionValues("Tyre Compound") != compound)
+			if (this.getPitstopOptionValues("Tyre Compound")[1] != compound)
 				changePitstopTyreCompound((compound = "Wet") ? "Increase" : "Decrease")
 
 			if (set && (compound = "Dry")) {

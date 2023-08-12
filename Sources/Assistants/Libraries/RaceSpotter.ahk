@@ -188,9 +188,23 @@ class CarInfo {
 		}
 	}
 
-	LastDelta[sector] {
+	LastDelta[sector := false] {
 		Get {
-			return (this.iLastDeltas.Has(sector) ? this.iLastDeltas[sector] : false)
+			local lastSector := 0
+			local lastDelta := false
+			local delta
+
+			if this.iLastDeltas.Has(sector)
+				return this.iLastDeltas[sector]
+			else {
+				for sector, delta in this.iLastDeltas
+					if (sector > lastSector) {
+						lastSector := sector
+						lastDelta := delta
+					}
+
+				return lastDelta
+			}
 		}
 	}
 
@@ -231,10 +245,7 @@ class CarInfo {
 
 	Delta[sector, average := false, count := 3] {
 		Get {
-			if sector
-				return (average ? this.AverageDelta[sector] : this.LastDelta[sector])
-			else
-				return (average ? this.AverageDelta[false, count] : this.LastDelta[sector])
+			return (average ? this.AverageDelta[sector, count] : this.LastDelta[sector])
 		}
 	}
 
@@ -334,6 +345,7 @@ class CarInfo {
 				deltas.RemoveAt(1)
 
 			this.iLastDeltas[sector] := delta
+			this.iLastDeltas[false] := delta
 
 			this.iTrackAheadDelta := trackAheadDelta
 			this.iTrackBehindDelta := trackBehindDelta
@@ -1018,6 +1030,9 @@ class RaceSpotter extends GridRaceAssistant {
 		local validCar := false
 		local number, numbers, ignore, carInfo, candidate, fragment
 
+		if !this.hasEnoughData()
+			return
+
 		numbers := []
 
 		for ignore, candidate in words {
@@ -1063,6 +1078,8 @@ class RaceSpotter extends GridRaceAssistant {
 	}
 
 	noFocusCarRecognized(words) {
+		this.getSpeaker().speakPhrase("Roger")
+
 		this.FocusedCar := false
 	}
 
@@ -1206,6 +1223,27 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 	}
 
+	lastLap() {
+		local knowledgeBase := this.KnowledgeBase
+		local sessionTimeRemaining, driverCar
+
+		if (knowledgeBase.getValue("Session.Format") = "Time") {
+			sessionTimeRemaining := knowledgeBase.getValue("Session.Time.Remaining")
+
+			loop knowledgeBase.getValue("Car.Count", 0)
+				if (knowledgeBase.getValue("Car." . A_Index . ".Position") = 1) {
+					if ((sessionTimeRemaining - knowledgeBase.getValue("Car." . A_Index . ".Time")) <= 0)
+						return true
+
+					break
+				}
+
+			return (sessionTimeRemaining = 0)
+		}
+		else
+			return (knowledgeBase.getValue("Session.Lap.Remaining") = 0)
+	}
+
 	reviewRaceStart(lastLap, sector, positions) {
 		local startPosition := this.GridPosition["Class"]
 		local speaker, driver, currentPosition, startPosition
@@ -1220,13 +1258,21 @@ class RaceSpotter extends GridRaceAssistant {
 				speaker.beginTalk()
 
 				try {
-					if (currentPosition = startPosition)
+					if (currentPosition = startPosition) {
 						speaker.speakPhrase("GoodStart")
+
+						if (currentPosition = 1)
+							speaker.speakPhrase("Leader")
+						else if (currentPosition <= 5)
+							speaker.speakPhrase("Position", {position: currentPosition})
+					}
 					else if (currentPosition < startPosition) {
 						speaker.speakPhrase("GreatStart")
 
 						if (currentPosition = 1)
 							speaker.speakPhrase("Leader")
+						else if (currentPosition <= 5)
+							speaker.speakPhrase("Position", {position: currentPosition})
 						else
 							speaker.speakPhrase("PositionsGained", {positions: Abs(currentPosition - startPosition)})
 					}
@@ -1345,7 +1391,7 @@ class RaceSpotter extends GridRaceAssistant {
 		local focused := false
 		local number := false
 		local situation, sessionDuration, lapTime, sessionEnding, minute, lastTemperature, stintLaps
-		local minute, rnd, phrase, bestLapTime
+		local minute, rnd, phrase, bestLapTime, ignore
 
 		if ((remainingSessionLaps = kUndefined) || (remainingStintLaps = kUndefined))
 			return false
@@ -1371,6 +1417,59 @@ class RaceSpotter extends GridRaceAssistant {
 						return true
 				}
 			}
+			else if this.lastLap() {
+				situation := "LastLap"
+
+				if !this.SessionInfos.Has(situation) {
+					this.SessionInfos[situation] := true
+
+					if (knowledgeBase.getValue("Session.Format") = "Time") {
+						if (this.getPosition() = 1) {
+							speaker.beginTalk()
+
+							try {
+								speaker.speakPhrase("LastLapDriver")
+								speaker.speakPhrase("Leader")
+								speaker.speakPhrase("BringItHome")
+							}
+							finally {
+								speaker.endTalk()
+							}
+						}
+						else {
+							speaker.beginTalk()
+
+							try {
+								speaker.speakPhrase("LastLapLeader")
+
+								if (this.getPosition(false, "Class") < 3) {
+									speaker.speakPhrase("Position", {position: this.getPosition(false, "Class")})
+									speaker.speakPhrase("BringItHome")
+								}
+							}
+							finally {
+								speaker.endTalk()
+							}
+						}
+					}
+					else {
+						speaker.beginTalk()
+
+						try {
+							speaker.speakPhrase("LastLapDriver")
+
+							if (this.getPosition(false, "Class") < 3) {
+								speaker.speakPhrase("Position", {position: this.getPosition(false, "Class")})
+								speaker.speakPhrase("BringItHome")
+							}
+						}
+						finally {
+							speaker.endTalk()
+						}
+					}
+				}
+			}
+
 
 		if (enoughData && (lastLap > (this.BaseLap + 2))) {
 			if ((remainingSessionLaps <= 3) && (Floor(remainingSessionLaps) > 1) && (this.Session = kSessionRace)) {
@@ -2833,6 +2932,28 @@ class RaceSpotter extends GridRaceAssistant {
 
 			return Task.CurrentTask
 		}
+	}
+
+	createSessionInfo(lapNumber, valid, data, simulator, car, track) {
+		local knowledgeBase := this.KnowledgeBase
+		local sessionInfo := super.createSessionInfo(lapNumber, valid, data, simulator, car, track)
+		local position, classPosition
+
+		if knowledgeBase {
+			car := this.FocusedCar[true]
+
+			if car {
+				car := car.Car
+
+				setMultiMapValue(sessionInfo, "Standings", "Focus.Nr", car.Nr)
+				setMultiMapValue(sessionInfo, "Standings", "Focus.Lap.Time", car.LastLapTime)
+				setMultiMapValue(sessionInfo, "Standings", "Focus.Laps", car.LastLap)
+				setMultiMapValue(sessionInfo, "Standings", "Focus.Delta", car.LastDelta)
+				setMultiMapValue(sessionInfo, "Standings", "Focus.InPit", car.InPit)
+			}
+		}
+
+		return sessionInfo
 	}
 
 	adjustGaps(data, &gapAhead := false, &gapBehind := false) {

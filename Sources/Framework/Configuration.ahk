@@ -570,7 +570,7 @@ class Function extends ConfigurationItem {
 
 	saveToConfiguration(configuration) {
 		local descriptor := this.Descriptor
-		local ignore, trigger
+		local ignore, trigger, hotkeys
 
 		super.saveToConfiguration(configuration)
 
@@ -580,7 +580,7 @@ class Function extends ConfigurationItem {
 		}
 	}
 
-	static createFunction(descriptor, configuration := false, onHotkeys := false, onAction := false, offHotkeys := false, offAction := false) {
+	static createFunction(descriptor, configuration := false, onHotkeys := "", onAction := "", offHotkeys := "", offAction := "") {
 		descriptor := ConfigurationItem.splitDescriptor(descriptor)
 
 		switch descriptor[1], false {
@@ -613,7 +613,7 @@ class Function extends ConfigurationItem {
 		else {
 			actions := []
 
-			for ignore, action in StrSplit(action, "|") {
+			for ignore, action in (InStr(action, "|") ? StrSplit(action, "|") : StrSplit(action, ";")) {
 				action := StrSplit(action, "(", " `t", 2)
 
 				arguments := string2Values(",", SubStr(action[2], 1, StrLen(action[2]) - 1))

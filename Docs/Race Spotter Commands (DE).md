@@ -87,7 +87,9 @@ Mir=mir, mir bitte
 	
 	[{Gib mir den, Gib mir bitte den, Sag mir den, Sag mir bitte den, Wie ist der} Abstand {zu, zur, zum} {Wagen, Wagen Nummer, Nummer} (Number), Wie groß ist {die Lücke, der Abstand} {zu, zur, zum} {Wagen, Wagen Nummer, Nummer} (Number)]
 
-	[(KannstDu) (Mir) die {Rundenzeiten, Zeiten} durchgeben, Gib (Mir) die {Rundenzeiten, Zeiten}, Wie sind die {Rundenzeiten, Zeiten}, Welche {Rundenzeiten, Zeiten} fahren wir]
+	[(KannstDu) (Mir) {die, meine} {Rundenzeit, letzte Rundenzeit, Zeit, letzte Zeit} {durchgeben, sagen}, {Gib, Sag} (Mir) {die, meine} {Rundenzeit, letzte Rundenzeit, Zeit, letzte Zeit}, Wie ist {die, meine} {Rundenzeit, letzte Rundenzeit, Zeit, letzte Zeit}]
+
+	[(KannstDu) (Mir) die {Rundenzeiten, Zeiten} {durchgeben, sagen}, {Gib, Sag} (Mir) die {Rundenzeiten, Zeiten}, Wie sind die {Rundenzeiten, Zeiten}, Welche {Rundenzeiten, Zeiten} fahren wir]
 	
 	[(KannstDu) (Mir) die Anzahl der {Wagen, Fahrzeuge} {durchgeben, durchgeben die noch auf der Strecke sind, durchgeben die noch in der Session sind, durchgeben die noch aktiv sind}, Wie viele {Wagen, Fahrzeuge} {sind, sind noch} {aktiv, auf der Strecke, in der Session}]
 	

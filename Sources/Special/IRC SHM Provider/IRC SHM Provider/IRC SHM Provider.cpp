@@ -942,6 +942,9 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 
 			printf("[Track Data]\n");
 
+			if (getYamlValue(result, sessionInfo, "WeekendInfo:TrackLength:"))
+				printf("Length=%f\n", atof(result) * 1000);
+
 			if (getDataValue(result, header, data, "TrackTemp"))
 				printf("Temperature=%f\n", atof(result));
 			else if (getYamlValue(result, sessionInfo, "WeekendInfo:TrackSurfaceTemp:")) {

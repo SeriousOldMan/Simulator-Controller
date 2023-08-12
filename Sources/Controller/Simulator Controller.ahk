@@ -815,6 +815,8 @@ class SimulatorController extends ConfigurationItem {
 			fnController.hide()
 			fnController.show()
 		}
+
+		this.setModes(simulator)
 	}
 
 	simulatorShutdown(simulator) {
@@ -833,6 +835,8 @@ class SimulatorController extends ConfigurationItem {
 			fnController.hide()
 			fnController.show()
 		}
+
+		this.setModes()
 	}
 
 	startSimulator(application, splashImage := false) {
@@ -1262,7 +1266,10 @@ class SimulatorController extends ConfigurationItem {
 		writeMultiMap(kTempDirectory . "Simulator Controller.state", configuration)
 
 		if periodic
-			Task.CurrentTask.Sleep := (ProcessExist("System Monitor.exe") ? 2000 : 60000)
+			if (ProcessExist("System Monitor.exe") || (isSet(kIntegrationPlugin) && SimulatorController.Instance.findPlugin(kIntegrationPlugin).Active))
+				Task.CurrentTask.Sleep := 2000
+			else
+				Task.CurrentTask.Sleep := 60000
 	}
 }
 
@@ -1410,8 +1417,6 @@ class ControllerFunction {
 						logMessage(kLogInfo, translate("Binding voice command ") . command . translate(" for trigger ") . trigger . translate(" to ") . (action ? (action.base.__Class . ".fireAction") : this.Function.Actions[trigger, true]))
 					}
 					else {
-						if theHotkey = ""
-							MsgBox ("Oops")
 						Hotkey(theHotkey, handler, "On")
 
 						logMessage(kLogInfo, translate("Binding hotkey ") . theHotkey . translate(" for trigger ") . trigger . translate(" to ") . (action ? (action.base.__Class . ".fireAction")
@@ -2149,8 +2154,6 @@ initializeSimulatorController() {
 
 	registerMessageHandler("Controller", functionMessageHandler)
 	registerMessageHandler("Voice", methodMessageHandler, SimulatorController.Instance)
-
-	return
 }
 
 startupSimulatorController() {
@@ -2226,6 +2229,16 @@ switchToggle(toggleType, toggleNumber, mode := "activate") {
 	}
 	else
 		logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in custom controller action switchToggle - please check the configuration"))
+}
+
+callCustom(customNumber) {
+	local descriptor := ConfigurationItem.descriptor(kCustomType, customNumber)
+	local function := SimulatorController.Instance.findFunction(descriptor)
+
+	if ((function != false) && (SimulatorController.Instance.getActions(function, "Call").Length > 0))
+		fireControllerActions(function, "Call")
+	else
+		logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in custom controller action callCustom - please check the configuration"))
 }
 
 setMode(actionOrPlugin, mode := false) {

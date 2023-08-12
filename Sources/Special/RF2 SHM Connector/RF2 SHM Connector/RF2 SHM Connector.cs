@@ -363,7 +363,8 @@ namespace SHMConnector {
 			strWriter.WriteLine("[Track Data]");
 			if (connected)
 			{
-				strWriter.WriteLine("Grip=Optimum");
+                strWriter.Write("Length="); strWriter.WriteLine(scoring.mScoringInfo.mLapDist);
+                strWriter.WriteLine("Grip=Optimum");
 				strWriter.Write("Temperature="); strWriter.WriteLine(scoring.mScoringInfo.mTrackTemp);
 
 				for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)	{

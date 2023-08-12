@@ -21,7 +21,6 @@ namespace TeamServer.Controllers
             _logger = logger;
         }
 
-
         [HttpGet("validatetoken")]
         public string ValidateToken([FromQuery(Name = "token")] string token)
         {
@@ -40,7 +39,6 @@ namespace TeamServer.Controllers
                 return "Error: " + exception.Message;
             }
         }
-
 
         [HttpGet("timestamp")]
         public string Timestamp([FromQuery(Name = "token")] string token)

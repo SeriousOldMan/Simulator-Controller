@@ -617,6 +617,16 @@ administrationEditor(configurationOrCommand, arguments*) {
 			}
 			else if (arguments[1] = "LoadConnections")
 				loadConnections(connector, connectionsListView)
+			else if (arguments[1] = "CompactDatabase") {
+				OnMessage(0x44, translateYesNoButtons)
+				msgResult := MsgBox(translate("Do you really want to compact the database? This can take quite a while and cannot be interrupted..."), translate("Compact"), 262436)
+				OnMessage(0x44, translateYesNoButtons, 0)
+
+				if (msgResult = "Yes")
+					connector.CompactDatabase()
+
+				loadObjects(connector, objectsListView)
+			}
 		}
 		catch Any as exception {
 			OnMessage(0x44, translateOkButton)
@@ -780,7 +790,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 		objectsListView.OnEvent("Click", noSelect)
 		objectsListView.OnEvent("DoubleClick", noSelect)
 
-		administrationGui.Add("Button", "x" . x0 . " y430 w80 h23 Y:Move vcleanupDatabaseButton", translate("Cleanup...")) ; .OnEvent("Click", administrationEditor.Bind(kEvent, "LoadConnections"))
+		administrationGui.Add("Button", "x" . x0 . " y430 w80 h23 Y:Move vcleanupDatabaseButton", translate("Compact...")).OnEvent("Click", administrationEditor.Bind(kEvent, "CompactDatabase"))
 
 		administrationGui.Add(AdministrationResizer(administrationGui))
 

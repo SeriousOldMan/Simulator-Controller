@@ -63,6 +63,15 @@ namespace TeamServer.Model {
 
             return Connection.ExecuteScalarAsync<long>(@"Select Count(*) From " + mapping.TableName).Result;
         }
+
+        public void CompactDatabase()
+        {
+            SQLiteConnection connection = new SQLiteConnection(Connection.DatabasePath);
+            SQLiteCommand command = new SQLiteCommand(connection);
+
+            command.CommandText = @"vacuum;";
+            command.ExecuteNonQuery();
+        }
         #endregion
 
         #region Access.Account

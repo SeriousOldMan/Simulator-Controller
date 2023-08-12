@@ -433,7 +433,12 @@ On the second page, you start a couple of background jobs on the server, which w
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Server%20Administration%203.JPG)
 
-Last, but not least, you can investigate the list of currently active connections to the server on the third page. You will see the name of your team mate, the role with which he is currently connected to the server and since then. If the connection is for an active team session, the name of the session will be shown as well.
+The remaining pages can be used to take a look at the server state and content of the database.
+
+1. You can investigate the list of currently active connections to the server on the third page. You will see the name of your team mate, the role with which he is currently connected to the server and since then. If the connection is for an active team session, the name of the session will be shown as well.
+
+2. On the last page you see a list of all currently stored data in the server. If you are running a very large server, it would be a good idea to compact the database from time to time using the "Compact..." button, but make sure you have a valid backup copy and that are no active connections to the server in that particular moment.
+
 
 ## How it works
 

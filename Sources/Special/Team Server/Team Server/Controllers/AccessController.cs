@@ -229,6 +229,28 @@ namespace TeamServer.Controllers {
             }
         }
 
+        [HttpGet("allobjects")]
+        public string GetAllObjects([FromQuery(Name = "token")] string token)
+        {
+            try
+            {
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager,
+                                                                   Server.TeamServer.TokenIssuer.ElevateToken(token));
+                Dictionary<string, long> counts = new ModelManager(Server.TeamServer.ObjectManager.Connection).GetObjectCounts();
+
+
+                return String.Join(";", counts.Select(e => e.Key + "=" + e.Value));
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
+            }
+            catch (Exception exception)
+            {
+                return "Error: " + exception.Message;
+            }
+        }
+
         [HttpGet("allsessions")]
         public string GetSessions([FromQuery(Name = "token")] string token)
         {
@@ -249,17 +271,16 @@ namespace TeamServer.Controllers {
             }
         }
 
-        [HttpGet("objectsCount")]
-        public string GetObjectsCount([FromQuery(Name = "token")] string token)
+        [HttpGet("compactdatabase")]
+        public string CompactDatabase([FromQuery(Name = "token")] string token)
         {
             try
             {
-                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager,
-                                                                   Server.TeamServer.TokenIssuer.ElevateToken(token));
-                Dictionary<string, long> counts = new ModelManager(Server.TeamServer.ObjectManager.Connection).GetObjectCounts();
+                Server.TeamServer.TokenIssuer.ElevateToken(token);
 
+                Server.TeamServer.ObjectManager.CompactDatabase();
 
-                return String.Join(";", counts.Select(e => e.Key + "=" + e.Value));
+                return "Ok";
             }
             catch (AggregateException exception)
             {

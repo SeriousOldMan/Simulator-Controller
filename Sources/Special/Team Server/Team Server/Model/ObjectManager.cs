@@ -56,6 +56,13 @@ namespace TeamServer.Model {
             if (attribute != null)
                 attribute.Delete();
         }
+
+        public long GetCount(Type tableClass)
+        {
+            TableMapping mapping = new TableMapping(tableClass);
+
+            return Connection.ExecuteScalarAsync<long>(@"Select Count(*) From " + mapping.TableName).Result;
+        }
         #endregion
 
         #region Access.Account

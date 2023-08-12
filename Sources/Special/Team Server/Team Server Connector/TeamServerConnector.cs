@@ -241,9 +241,14 @@ namespace TeamServer {
 		public string GetAllSessions()
 		{
 			return Get("login/allsessions");
-		}
+        }
 
-		public string GetConnection(string identifier)
+        public string GetAllObjects()
+        {
+            return Get("login/objectsCount");
+        }
+
+        public string GetConnection(string identifier)
 		{
 			return Get("login/" + identifier);
 		}

@@ -92,6 +92,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 
 	static accountsListView
 	static connectionsListView
+	static objectsListView
 
 	static connector := false
 	static done := false
@@ -197,6 +198,24 @@ administrationEditor(configurationOrCommand, arguments*) {
 		listView.ModifyCol()
 
 		loop 4
+			listView.ModifyCol(A_Index, "AutoHdr")
+	}
+
+	loadObjects(connector, listView) {
+		local ignore, objectInfo
+
+		listView.Delete()
+
+		if administrationEditor(kToken)
+			for ignore, objectInfo in string2Values(";", connector.GetAllObjects()) {
+				objectInfo := string2Values("=", objectInfo)
+
+				listView.Add("", objectInfo[1], objectInfo[2])
+			}
+
+		listView.ModifyCol()
+
+		loop 2
 			listView.ModifyCol(A_Index, "AutoHdr")
 	}
 
@@ -307,6 +326,8 @@ administrationEditor(configurationOrCommand, arguments*) {
 				administrationEditor(kEvent, "AccountClear")
 
 				loadConnections(connector, connectionsListView)
+
+				loadObjects(connector, objectsListView)
 
 				showMessage(translate("Successfully connected to the Team Server."))
 			}
@@ -682,7 +703,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 		button.OnEvent("Click", changePassword)
 		setButtonIcon(button, kIconsDirectory . "Pencil.ico", 1, "L4 T4 R4 B4")
 
-		administrationTab := administrationGui.Add("Tab3", "x8 y122 w388 h343 W:Grow H:Grow -Wrap", collect(["Accounts", "Jobs", "Connections"], translate))
+		administrationTab := administrationGui.Add("Tab3", "x8 y122 w388 h343 W:Grow H:Grow -Wrap", collect(["Accounts", "Jobs", "Connections", "Database"], translate))
 
 		x0 := 16
 		y := 152
@@ -752,6 +773,14 @@ administrationEditor(configurationOrCommand, arguments*) {
 		connectionsListView.OnEvent("DoubleClick", noSelect)
 
 		administrationGui.Add("Button", "x" . x0 . " y430 w80 h23 Y:Move vrefreshConnectionsListButton", translate("Refresh")).OnEvent("Click", administrationEditor.Bind(kEvent, "LoadConnections"))
+
+		administrationTab.UseTab(4)
+
+		objectsListView := administrationGui.Add("ListView", "x" . x0 . " y" . y . " w372 h270 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Type", "#"], translate))
+		objectsListView.OnEvent("Click", noSelect)
+		objectsListView.OnEvent("DoubleClick", noSelect)
+
+		administrationGui.Add("Button", "x" . x0 . " y430 w80 h23 Y:Move vcleanupDatabaseButton", translate("Cleanup...")) ; .OnEvent("Click", administrationEditor.Bind(kEvent, "LoadConnections"))
 
 		administrationGui.Add(AdministrationResizer(administrationGui))
 

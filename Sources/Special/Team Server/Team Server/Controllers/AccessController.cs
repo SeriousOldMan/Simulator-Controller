@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using SQLite;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -237,6 +238,28 @@ namespace TeamServer.Controllers {
                                                                    Server.TeamServer.TokenIssuer.ElevateToken(token));
 
                 return String.Join(";", sessionManager.GetAllSessions().Select(c => c.Identifier));
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
+            }
+            catch (Exception exception)
+            {
+                return "Error: " + exception.Message;
+            }
+        }
+
+        [HttpGet("objectsCount")]
+        public string GetObjectsCount([FromQuery(Name = "token")] string token)
+        {
+            try
+            {
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager,
+                                                                   Server.TeamServer.TokenIssuer.ElevateToken(token));
+                Dictionary<string, long> counts = new ModelManager(Server.TeamServer.ObjectManager.Connection).GetObjectCounts();
+
+
+                return String.Join(";", counts.Select(e => e.Key + "=" + e.Value));
             }
             catch (AggregateException exception)
             {

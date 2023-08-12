@@ -19,7 +19,7 @@ class ApplicationsStepWizard extends StepWizard {
 
 	Pages {
 		Get {
-			return 2
+			return (this.SetupWizard.QuickSetup ? 0 : 2)
 		}
 	}
 

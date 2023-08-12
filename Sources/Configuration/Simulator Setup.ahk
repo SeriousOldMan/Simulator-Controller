@@ -130,6 +130,8 @@ class SetupWizard extends ConfiguratorPanel {
 	iStep := 0
 	iPage := 0
 
+	iQuickSetup := true
+
 	iPresets := false
 	iInitialize := false
 
@@ -352,6 +354,12 @@ class SetupWizard extends ConfiguratorPanel {
 	Page {
 		Get {
 			return this.iPage
+		}
+	}
+
+	QuickSetup {
+		Get {
+			return this.iQuickSetup
 		}
 	}
 
@@ -2135,27 +2143,29 @@ class StepWizard extends ConfiguratorPanel {
 	showPage(page) {
 		local ignore, widget
 
-		for ignore, widget in this.iWidgets[page] {
-			if widget.HasProp("Show")
-				widget.Show()
-			else
-				widget.Visible := true
+		if this.iWidgets.Has(page)
+			for ignore, widget in this.iWidgets[page] {
+				if widget.HasProp("Show")
+					widget.Show()
+				else
+					widget.Visible := true
 
-			widget.Enabled := true
-		}
+				widget.Enabled := true
+			}
 	}
 
 	hidePage(page) {
 		local ignore, widget
 
-		for ignore, widget in this.iWidgets[page] {
-			widget.Enabled := false
+		if this.iWidgets.Has(page)
+			for ignore, widget in this.iWidgets[page] {
+				widget.Enabled := false
 
-			if widget.HasProp("Hide")
-				widget.Hide()
-			else
-				widget.Visible := false
-		}
+				if widget.HasProp("Hide")
+					widget.Hide()
+				else
+					widget.Visible := false
+			}
 
 		return true
 	}
@@ -2888,6 +2898,7 @@ initializeSimulatorSetup()
 ;;;                          Wizard Include Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include "Libraries\QuickSetupStepWizard.ahk"
 #Include "Libraries\ModulesStepWizard.ahk"
 #Include "Libraries\InstallationStepWizard.ahk"
 #Include "Libraries\ApplicationsStepWizard.ahk"

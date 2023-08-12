@@ -33,14 +33,19 @@ class AssistantsStepWizard extends ActionsStepWizard {
 	Pages {
 		Get {
 			local wizard := this.SetupWizard
-			local count := 0
-			local ignore, assistant
+			local count, ignore, assistant
 
-			for ignore, assistant in this.Definition
-				if wizard.isModuleSelected(assistant)
-					count += 1
+			if wizard.QuickSetup
+				return 0
+			else {
+				count := 0
+				
+				for ignore, assistant in this.Definition
+					if wizard.isModuleSelected(assistant)
+						count += 1
 
-			return count
+				return count
+			}
 		}
 	}
 

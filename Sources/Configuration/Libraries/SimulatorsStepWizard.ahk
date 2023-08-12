@@ -35,10 +35,11 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 			local wizard := this.SetupWizard
 			local ignore, simulator
 
-			if (wizard.isModuleSelected("Controller") || wizard.isModuleSelected("Race Engineer") || wizard.isModuleSelected("Race Strategist"))
-				for ignore, simulator in this.Definition
-					if wizard.isApplicationSelected(simulator)
-						return 1
+			if !wizard.QuickSetup
+				if (wizard.isModuleSelected("Controller") || wizard.isModuleSelected("Race Engineer") || wizard.isModuleSelected("Race Strategist"))
+					for ignore, simulator in this.Definition
+						if wizard.isApplicationSelected(simulator)
+							return 1
 
 			return 0
 		}

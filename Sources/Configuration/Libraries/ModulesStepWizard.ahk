@@ -444,7 +444,7 @@ class ModulesStepWizard extends StepWizard {
 
 	Pages {
 		Get {
-			return Ceil(this.Definition.Length / 3) + 1
+			return (this.SetupWizard.QuickSetup ? 0 : (Ceil(this.Definition.Length / 3) + 1))
 		}
 	}
 

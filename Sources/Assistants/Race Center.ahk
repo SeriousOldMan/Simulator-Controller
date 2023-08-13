@@ -6109,7 +6109,7 @@ class RaceCenter extends ConfigurationItem {
 			if lap.Accident
 				stint.Accidents += 1
 
-			if lap.Penalty
+			if (lap.Penalty && this.Laps.Has(lap.Nr - 1) && (this.Laps(lap.Nr - 1).Penalty != lap.Penalty))
 				stint.Penalties += 1
 
 			lapTimes.Push(lap.Laptime)
@@ -6222,11 +6222,9 @@ class RaceCenter extends ConfigurationItem {
 						if isNumber(fuelConsumption)
 							fuelConsumption := displayValue("Float", convertUnit("Volume", fuelConsumption))
 
-						penalty := ""
+						penalty := lap.Penalty
 
-						if lap.Penalty {
-							penalty := lap.Penalty
-
+						if (penalty && this.Laps.Has(lap.Nr - 1) && (this.Laps(lap.Nr - 1).Penalty != penalty)) {
 							if (InStr(penalty, "SG") = 1) {
 								penalty := ((StrLen(penalty) > 2) ? (A_Space . SubStr(penalty, 3)) : "")
 
@@ -6239,6 +6237,8 @@ class RaceCenter extends ConfigurationItem {
 							else if (penalty == true)
 								penalty := "x"
 						}
+						else
+							penalty := ""
 
 						this.LapsListView.Add("", lap.Nr, stint.Nr, stint.Driver.FullName, lap.Position, translate(lap.Weather), translate(lap.Grip)
 												, lapTimeDisplayValue(lap.Laptime), displayNullValue(fuelConsumption), remainingFuel, "-, -, -, -"
@@ -7939,7 +7939,7 @@ class RaceCenter extends ConfigurationItem {
 			if lap.Accident
 				accidents += 1
 
-			if lap.Penalty
+			if (lap.Penalty && this.Laps.Has(lap.Nr - 1) && (this.Laps(lap.Nr - 1).Penalty != lap.Penalty))
 				penalties += 1
 		}
 
@@ -8375,11 +8375,9 @@ class RaceCenter extends ConfigurationItem {
 					if isNumber(fuelConsumption)
 						fuelConsumption := displayValue("Float", convertUnit("Volume", fuelConsumption))
 
-					penalty := ""
+					penalty := lap.Penalty
 
-					if lap.Penalty {
-						penalty := lap.Penalty
-
+					if (penalty && this.Laps.Has(lap.Nr - 1) && (this.Laps(lap.Nr - 1).Penalty != penalty)) {
 						if (InStr(penalty, "SG") = 1) {
 							penalty := ((StrLen(penalty) > 2) ? (A_Space . SubStr(penalty, 3)) : "")
 
@@ -8392,6 +8390,8 @@ class RaceCenter extends ConfigurationItem {
 						else if (penalty == true)
 							penalty := "x"
 					}
+					else
+						penalty := ""
 
 					this.LapsListView.Add("", lap.Nr, lap.Stint.Nr, lap.Stint.Driver.FullName, lap.Position, translate(lap.Weather), translate(lap.Grip)
 											, lapTimeDisplayValue(lap.Laptime), displayNullValue(fuelConsumption), remainingFuel, "-, -, -, -"
@@ -10358,11 +10358,9 @@ class RaceCenter extends ConfigurationItem {
 			if isNumber(fuelConsumption)
 				fuelConsumption := displayValue("Float", convertUnit("Volume", fuelConsumption))
 
-			penalty := ""
+			penalty := lap.Penalty
 
-			if lap.Penalty {
-				penalty := lap.Penalty
-
+			if (penalty && this.Laps.Has(lap.Nr - 1) && (this.Laps(lap.Nr - 1).Penalty != penalty)) {
 				if (InStr(penalty, "SG") = 1) {
 					penalty := ((StrLen(penalty) > 2) ? (A_Space . SubStr(penalty, 3)) : "")
 
@@ -10375,6 +10373,8 @@ class RaceCenter extends ConfigurationItem {
 				else if (penalty == true)
 					penalty := "x"
 			}
+			else
+				penalty := ""
 
 			fuelConsumptionData.Push("<td class=`"td-std`">" . displayNullValue(fuelConsumption) . "</td>")
 			accidentData.Push("<td class=`"td-std`">" . (lap.Accident ? "x" : "") . "</td>")
@@ -11296,7 +11296,7 @@ class RaceCenter extends ConfigurationItem {
 				if lap.Accident
 					lapAccidents += 1
 
-				if lap.Penalty
+				if (lap.Penalty && this.Laps.Has(lap.Nr - 1) && (this.Laps(lap.Nr - 1).Penalty != lap.Penalty))
 					lapPenalties += 1
 			}
 

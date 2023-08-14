@@ -944,7 +944,7 @@ class SimulatorController extends ConfigurationItem {
 		}
 	}
 
-	activationCommand(words*) {
+	acknowledgeVoiceCommand() {
 		static audioDevice := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Audio Settings.ini"), "Output", "Controller.AudioDevice", false)
 		static first := true
 
@@ -959,8 +959,14 @@ class SimulatorController extends ConfigurationItem {
 			SoundPlay(kResourcesDirectory . "Sounds\Activated.wav")
 	}
 
+	activationCommand(words*) {
+		this.acknowledgeVoiceCommand()
+	}
+
 	voiceCommand(grammar, command, words*) {
 		local ignore, handler
+
+		this.acknowledgeVoiceCommand()
 
 		for ignore, handler in this.iVoiceCommands[command][2]
 			handler.Call()

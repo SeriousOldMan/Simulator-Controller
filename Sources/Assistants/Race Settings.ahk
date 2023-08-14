@@ -253,7 +253,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 	loadDrivers(connector, team) {
 		local drivers := CaseInsenseMap()
-		local identifiers, ignore, identifier, driver, name
+		local identifiers, ignore, identifier, driver
 
 		if team {
 			try {
@@ -266,9 +266,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 			for ignore, identifier in identifiers {
 				driver := parseObject(connector.GetDriver(identifier))
 
-				name := computeDriverName(driver["ForName"], driver["SurName"], driver["NickName"])
-
-				drivers[name] := driver["Identifier"]
+				drivers[driverName(driver["ForName"], driver["SurName"], driver["NickName"])] := driver["Identifier"]
 			}
 		}
 

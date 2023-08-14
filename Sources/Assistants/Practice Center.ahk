@@ -1697,7 +1697,7 @@ class PracticeCenter extends ConfigurationItem {
 			}
 		}
 
-		driver.FullName := computeDriverName(driver.Forname, driver.Surname, driver.Nickname)
+		driver.FullName := driverName(driver.Forname, driver.Surname, driver.Nickname)
 		driver.Laps := []
 		driver.Runs := []
 		driver.Accidents := 0
@@ -3110,9 +3110,9 @@ class PracticeCenter extends ConfigurationItem {
 		prefix := ("Standings.Lap." . lap . ".Car.")
 
 		loop getMultiMapValue(data, "Standings", prefix . "Count") {
-			driver := computeDriverName(getMultiMapValue(data, "Standings", prefix . A_Index . ".Driver.Forname")
-									  , getMultiMapValue(data, "Standings", prefix . A_Index . ".Driver.Surname")
-									  , getMultiMapValue(data, "Standings", prefix . A_Index . ".Driver.Nickname"))
+			driver := driverName(getMultiMapValue(data, "Standings", prefix . A_Index . ".Driver.Forname")
+							   , getMultiMapValue(data, "Standings", prefix . A_Index . ".Driver.Surname")
+							   , getMultiMapValue(data, "Standings", prefix . A_Index . ".Driver.Nickname"))
 			category := getMultiMapValue(data, "Standings", prefix . A_Index . ".Driver.Category", "Unknown")
 
 			if (category = "Unknown")
@@ -4000,7 +4000,7 @@ class PracticeCenter extends ConfigurationItem {
 
 		for ignore, driver in this.SessionStore.Tables["Driver.Data"]
 			this.createDriver({Forname: driver["Forname"], Surname: driver["Surname"], Nickname: driver["Nickname"]
-							 , Fullname: computeDriverName(driver["Forname"], driver["Surname"], driver["Nickname"])
+							 , Fullname: driverName(driver["Forname"], driver["Surname"], driver["Nickname"])
 							 , ID: driver["ID"]})
 	}
 
@@ -6431,7 +6431,7 @@ class PracticeCenter extends ConfigurationItem {
 					car := entry["Car"]
 
 					if this.getCar(lap, (entry["ID"] != kNull) ? entry["ID"] : false, &car, &carNumber, &carName, &driverForname, &driverSurname, &driverNickname) {
-						driverFullname := computeDriverName(driverForname, driverSurname, driverNickname)
+						driverFullname := driverName(driverForname, driverSurname, driverNickname)
 
 						delta := entry["Delta"]
 					}
@@ -6519,7 +6519,7 @@ class PracticeCenter extends ConfigurationItem {
 						delta := Round(result[1]["Delta"], 1)
 				}
 
-				driver := computeDriverName(driverFornames[index] , driverSurnames[index], driverNickNames[index])
+				driver := driverName(driverFornames[index] , driverSurnames[index], driverNickNames[index])
 
 				if (driverCategories && (driverCategories[index] != "Unknown"))
 					driver .= (translate(" [") . translate(driverCategories[index]) . translate("]"))

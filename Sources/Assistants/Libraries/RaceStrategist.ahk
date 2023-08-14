@@ -1627,7 +1627,7 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 
 		if (this.Speaker && (lastLap < (lapNumber - 2))
-		 && (computeDriverName(driverForname, driverSurname, driverNickname) != this.DriverFullName))
+		 && (driverName(driverForname, driverSurname, driverNickname) != this.DriverFullName))
 			this.getSpeaker().speakPhrase(ProcessExist("Race Engineer.exe") ? "" : "WelcomeBack")
 
 		lastLap := lapNumber
@@ -3591,7 +3591,7 @@ class RaceStrategist extends GridRaceAssistant {
 					driverSurname := knowledgeBase.getValue(carPrefix . ".Driver.Surname")
 					driverNickname := knowledgeBase.getValue(carPrefix . ".Driver.Nickname")
 
-					drivers[carIndex] := computeDriverName(driverForname, driverSurname, driverNickname)
+					drivers[carIndex] := driverName(driverForname, driverSurname, driverNickname)
 
 					driverCategory := knowledgeBase.getValue(carPrefix . ".Driver.Category", "Unknown")
 

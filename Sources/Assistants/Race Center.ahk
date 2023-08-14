@@ -2465,11 +2465,8 @@ class RaceCenter extends ConfigurationItem {
 		else {
 			drivers := CaseInsenseMap()
 
-			for ignore, driver in this.Drivers {
-				name := computeDriverName(driver.Forname, driver.Surname, driver.Nickname)
-
-				drivers[name] := false
-			}
+			for ignore, driver in this.Drivers
+				drivers[driverName(driver.Forname, driver.Surname, driver.Nickname)] := false
 		}
 
 		this.iSessionDrivers := drivers
@@ -2565,7 +2562,7 @@ class RaceCenter extends ConfigurationItem {
 			}
 		}
 
-		driver.FullName := computeDriverName(driver.Forname, driver.Surname, driver.Nickname)
+		driver.FullName := driverName(driver.Forname, driver.Surname, driver.Nickname)
 		driver.Laps := []
 		driver.Stints := []
 		driver.Accidents := 0
@@ -8179,7 +8176,7 @@ class RaceCenter extends ConfigurationItem {
 
 		for ignore, driver in this.SessionStore.Tables["Driver.Data"]
 			this.createDriver({Forname: driver["Forname"], Surname: driver["Surname"], Nickname: driver["Nickname"]
-							 , Fullname: computeDriverName(driver["Forname"], driver["Surname"], driver["Nickname"])
+							 , Fullname: driverName(driver["Forname"], driver["Surname"], driver["Nickname"])
 							 , Nr: driver["Nr"], ID: driver["ID"]})
 	}
 
@@ -10037,9 +10034,9 @@ class RaceCenter extends ConfigurationItem {
 							prefix := ("Standings.Lap." . lap . ".Car.")
 
 							loop getMultiMapValue(standingsData, "Standings", prefix . "Count") {
-								driver := computeDriverName(getMultiMapValue(standingsData, "Standings", prefix . A_Index . ".Driver.Forname")
-														  , getMultiMapValue(standingsData, "Standings", prefix . A_Index . ".Driver.Surname")
-														  , getMultiMapValue(standingsData, "Standings", prefix . A_Index . ".Driver.Nickname"))
+								driver := driverName(getMultiMapValue(standingsData, "Standings", prefix . A_Index . ".Driver.Forname")
+												   , getMultiMapValue(standingsData, "Standings", prefix . A_Index . ".Driver.Surname")
+												   , getMultiMapValue(standingsData, "Standings", prefix . A_Index . ".Driver.Nickname"))
 								category := getMultiMapValue(standingsData, "Standings", prefix . A_Index . ".Driver.Category", "Unknown")
 
 								if (category = "Unknown")
@@ -10648,7 +10645,7 @@ class RaceCenter extends ConfigurationItem {
 					car := entry["Car"]
 
 					if this.getCar(lap, (entry["ID"] != kNull) ? entry["ID"] : false, &car, &carNumber, &carName, &driverForname, &driverSurname, &driverNickname) {
-						driverFullname := computeDriverName(driverForname, driverSurname, driverNickname)
+						driverFullname := driverName(driverForname, driverSurname, driverNickname)
 
 						delta := entry["Delta"]
 					}
@@ -10732,7 +10729,7 @@ class RaceCenter extends ConfigurationItem {
 					delta := Round(result[1]["Delta"], 1)
 				}
 
-				driver := computeDriverName(driverFornames[index] , driverSurnames[index], driverNickNames[index])
+				driver := driverName(driverFornames[index] , driverSurnames[index], driverNickNames[index])
 
 				if (driverCategories && (driverCategories[index] != "Unknown"))
 					driver .= (translate(" [") . translate(driverCategories[index]) . translate("]"))
@@ -12322,7 +12319,7 @@ loadDrivers(connector, team) {
 			try {
 				driver := parseObject(connector.GetDriver(identifier))
 
-				drivers[computeDriverName(driver.ForName, driver.SurName, driver.NickName)] := driver.Identifier
+				drivers[driverName(driver.ForName, driver.SurName, driver.NickName)] := driver.Identifier
 			}
 			catch Any as exception {
 				logError(exception)

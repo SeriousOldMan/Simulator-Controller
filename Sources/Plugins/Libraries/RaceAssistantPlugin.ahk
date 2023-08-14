@@ -2347,9 +2347,9 @@ prepareSessionDatabase(data) {
 			SessionDatabase.prepareDatabase(simulator, car, track, data)
 
 		SessionDatabase.registerDriver(simulator, plugin.Controller.ID
-									 , computeDriverName(getMultiMapValue(data, "Stint Data", "DriverForname")
-									 , getMultiMapValue(data, "Stint Data", "DriverSurname")
-									 , getMultiMapValue(data, "Stint Data", "DriverNickname")))
+									 , driverName(getMultiMapValue(data, "Stint Data", "DriverForname")
+												, getMultiMapValue(data, "Stint Data", "DriverSurname")
+												, getMultiMapValue(data, "Stint Data", "DriverNickname")))
 	}
 }
 

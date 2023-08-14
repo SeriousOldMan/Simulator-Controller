@@ -635,7 +635,7 @@ class SessionDatabase extends ConfigurationItem {
 			drivers := []
 
 			for ignore, driver in sessionDB.query("Drivers", {Where: {ID: id}})
-				drivers.Push(computeDriverName(driver["Forname"], driver["Surname"], driver["Nickname"]))
+				drivers.Push(driverName(driver["Forname"], driver["Surname"], driver["Nickname"]))
 
 			return ((drivers.Length = 0) ? ["John Doe (JD)"] : drivers)
 		}
@@ -644,7 +644,7 @@ class SessionDatabase extends ConfigurationItem {
 				sessionDB := Database(kDatabaseDirectory . "User\" . SessionDatabase.getSimulatorCode(simulator) . "\", kSessionSchemas)
 
 				for ignore, driver in sessionDB.query("Drivers", {Where: {ID: id}})
-					return Array(computeDriverName(driver["Forname"], driver["Surname"], driver["Nickname"]))
+					return Array(driverName(driver["Forname"], driver["Surname"], driver["Nickname"]))
 			}
 
 			return ["John Doe (JD)"]
@@ -1964,7 +1964,7 @@ parseDriverName(fullName, &forName, &surName, &nickName) {
 
 }
 
-computeDriverName(forName, surName, nickName) {
+driverName(forName, surName, nickName) {
 	local name := ""
 
 	if (forName != "")

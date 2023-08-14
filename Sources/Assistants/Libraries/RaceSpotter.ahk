@@ -3225,9 +3225,9 @@ class RaceSpotter extends GridRaceAssistant {
 					positions[carIndex] := Array(getMultiMapValue(data, "Position Data", prefix . ".Nr", carIndex)
 											   , getMultiMapValue(data, "Position Data", prefix . ".Car", "Unknown")
 											   , this.getClass(carIndex, data)
-											   , computeDriverName(getMultiMapValue(data, "Position Data", prefix . ".Driver.Forname", "John")
-																 , getMultiMapValue(data, "Position Data", prefix . ".Driver.Surname", "Doe")
-																 , getMultiMapValue(data, "Position Data", prefix . ".Driver.Nickname", "JD"))
+											   , driverName(getMultiMapValue(data, "Position Data", prefix . ".Driver.Forname", "John")
+														  , getMultiMapValue(data, "Position Data", prefix . ".Driver.Surname", "Doe")
+														  , getMultiMapValue(data, "Position Data", prefix . ".Driver.Nickname", "JD"))
 											   , carOverallPosition, carClassPosition
 											   , carLaps, carRunning
 											   , getMultiMapValue(data, "Position Data", prefix . ".Time")

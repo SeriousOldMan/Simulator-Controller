@@ -1027,7 +1027,7 @@ class RaceAssistant extends ConfigurationItem {
 		driverNickname := getMultiMapValue(data, "Stint Data", "DriverNickname", "JDO")
 
 		this.updateSessionValues({Simulator: simulatorName, Session: session, TeamSession: (getMultiMapValue(data, "Session Data", "Mode", "Solo") = "Team")
-								, SessionTime: A_Now, Driver: driverForname, DriverFullName: computeDriverName(driverForName, driverSurName, driverNickName)})
+								, SessionTime: A_Now, Driver: driverForname, DriverFullName: driverName(driverForName, driverSurName, driverNickName)})
 		this.updateDynamicValues({Prepared: true})
 
 		lapTime := getMultiMapValue(data, "Stint Data", "LapLastTime", 0)
@@ -1227,9 +1227,9 @@ class RaceAssistant extends ConfigurationItem {
 			setMultiMapValue(sessionInfo, "Session", "Laps.Remaining", Ceil(knowledgeBase.getValue("Lap.Remaining.Session", 0)))
 			setMultiMapValue(sessionInfo, "Session", "Time.Remaining", Round(getMultiMapValue(data, "Session Data", "SessionTimeRemaining", 0) / 1000))
 
-			setMultiMapValue(sessionInfo, "Stint", "Driver", computeDriverName(getMultiMapValue(data, "Stint Data", "DriverForname", this.DriverForName)
-																			 , getMultiMapValue(data, "Stint Data", "DriverSurname", "Doe")
-																			 , getMultiMapValue(data, "Stint Data", "DriverNickname", "JDO")))
+			setMultiMapValue(sessionInfo, "Stint", "Driver", driverName(getMultiMapValue(data, "Stint Data", "DriverForname", this.DriverForName)
+																	  , getMultiMapValue(data, "Stint Data", "DriverSurname", "Doe")
+																	  , getMultiMapValue(data, "Stint Data", "DriverNickname", "JDO")))
 			setMultiMapValue(sessionInfo, "Stint", "Laps", lapNumber)
 			setMultiMapValue(sessionInfo, "Stint", "Position", knowledgeBase.getValue("Position", 0))
 			setMultiMapValue(sessionInfo, "Stint", "Valid", valid)
@@ -1328,7 +1328,7 @@ class RaceAssistant extends ConfigurationItem {
 		driverSurname := getMultiMapValue(data, "Stint Data", "DriverSurname", "Doe")
 		driverNickname := getMultiMapValue(data, "Stint Data", "DriverNickname", "JDO")
 
-		this.updateSessionValues({Driver: driverForname, DriverFullName: computeDriverName(driverForname, driverSurname, driverNickname)
+		this.updateSessionValues({Driver: driverForname, DriverFullName: driverName(driverForname, driverSurname, driverNickname)
 								, TeamSession: (getMultiMapValue(data, "Session Data", "Mode", "Solo") = "Team")})
 
 		knowledgeBase.addFact("Lap." . lapNumber . ".Driver.Forname", driverForname)

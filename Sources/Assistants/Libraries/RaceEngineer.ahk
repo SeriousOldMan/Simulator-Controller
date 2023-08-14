@@ -1486,7 +1486,7 @@ class RaceEngineer extends RaceAssistant {
 
 		knowledgeBase := this.KnowledgeBase
 
-		if (this.Speaker && (lastLap < (lapNumber - 2)) && (computeDriverName(driverForname, driverSurname, driverNickname) != this.DriverFullName))
+		if (this.Speaker && (lastLap < (lapNumber - 2)) && (driverName(driverForname, driverSurname, driverNickname) != this.DriverFullName))
 			this.getSpeaker().speakPhrase("WelcomeBack")
 
 		lastLap := lapNumber
@@ -2186,9 +2186,9 @@ class RaceEngineer extends RaceAssistant {
 				rlWear := knowledgeBase.getValue("Lap." . lastLap . ".Tyre.Wear.RL")
 				rrWear := knowledgeBase.getValue("Lap." . lastLap . ".Tyre.Wear.RR")
 
-				driver := computeDriverName(knowledgeBase.getValue("Lap." . lastLap . ".Driver.Forname")
-										  , knowledgeBase.getValue("Lap." . lastLap . ".Driver.Surname")
-										  , knowledgeBase.getValue("Lap." . lastLap . ".Driver.Nickname"))
+				driver := driverName(knowledgeBase.getValue("Lap." . lastLap . ".Driver.Forname")
+								   , knowledgeBase.getValue("Lap." . lastLap . ".Driver.Surname")
+								   , knowledgeBase.getValue("Lap." . lastLap . ".Driver.Nickname"))
 
 				tyreCompound := knowledgeBase.getValue("Lap." . lastLap . ".Tyre.Compound")
 				tyreCompoundColor := knowledgeBase.getValue("Lap." . lastLap . ".Tyre.Compound.Color")

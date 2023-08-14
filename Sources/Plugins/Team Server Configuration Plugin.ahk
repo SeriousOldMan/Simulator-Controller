@@ -766,7 +766,7 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 				try {
 					driver := this.parseObject(connector.GetDriver(identifier))
 
-					name := computeDriverName(driver.ForName, driver.SurName, driver.NickName)
+					name := driverName(driver.ForName, driver.SurName, driver.NickName)
 
 					if (StrLen(Trim(name)) = 0)
 						connector.DeleteDriver(identifier)
@@ -946,7 +946,7 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 
 		nickName := SubStr(nickName, 1, 3)
 
-		return computeDriverName(forName, surName, nickName)
+		return driverName(forName, surName, nickName)
 	}
 
 	addDriver(name) {

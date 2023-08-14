@@ -1,0 +1,7 @@
+[Add: Plugins]
+Race Engineer=; raceAssistantSpeakerVocalics: *,*,1
+Race Spotter=; raceAssistantSpeakerVocalics: *,*,2
+[Replace: Plugins]
+Race Engineer=raceAssistantName: Jona->raceAssistantName: %jonaName%|raceAssistantSpeaker: On->raceAssistantSpeaker: %jonaVoice%
+Race Spotter=raceAssistantName: Elisa->raceAssistantName: %elisaName%|raceAssistantSpeaker: On->raceAssistantSpeaker: %elisaVoice%
+Race Strategist=raceAssistantName: Khato->raceAssistantName: %catoName%|raceAssistantSpeaker: On->raceAssistantSpeaker: %catoVoice%

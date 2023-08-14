@@ -1,7 +1,8 @@
 [Add: Plugins]
-Race Engineer=; raceAssistantSpeakerVocalics: *,*,1
-Race Spotter=; raceAssistantSpeakerVocalics: *,*,2
+Race Engineer=; raceAssistantLanguage: %engineerLanguage%; raceAssistantSpeakerVocalics: *,*,%engineerSpeed%
+Race Spotter=; raceAssistantLanguage: %spotterLanguage%; raceAssistantSpeakerVocalics: *,*,%spotterSpeed%
+Race Strategist=; raceAssistantLanguage: %strategistLanguage%; raceAssistantSpeakerVocalics: *,*,%strategistSpeed%
 [Replace: Plugins]
-Race Engineer=raceAssistantName: Jona->raceAssistantName: %jonaName%|raceAssistantSpeaker: On->raceAssistantSpeaker: %jonaVoice%
-Race Spotter=raceAssistantName: Elisa->raceAssistantName: %elisaName%|raceAssistantSpeaker: On->raceAssistantSpeaker: %elisaVoice%
-Race Strategist=raceAssistantName: Khato->raceAssistantName: %catoName%|raceAssistantSpeaker: On->raceAssistantSpeaker: %catoVoice%
+Race Engineer=raceAssistantName: Jona->raceAssistantName: %engineerName%|raceAssistantSpeaker: On->raceAssistantSpeaker: %engineerVoice%
+Race Spotter=raceAssistantName: Elisa->raceAssistantName: %spotterName%|raceAssistantSpeaker: On->raceAssistantSpeaker: %spotterVoice%
+Race Strategist=raceAssistantName: Khato->raceAssistantName: %strategistName%|raceAssistantSpeaker: On->raceAssistantSpeaker: %strategistVoice%

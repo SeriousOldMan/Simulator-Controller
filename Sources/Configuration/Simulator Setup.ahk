@@ -130,7 +130,7 @@ class SetupWizard extends ConfiguratorPanel {
 	iStep := 0
 	iPage := 0
 
-	iQuickSetup := true
+	iQuickSetup := false
 
 	iPresets := false
 	iInitialize := false
@@ -360,6 +360,10 @@ class SetupWizard extends ConfiguratorPanel {
 	QuickSetup {
 		Get {
 			return this.iQuickSetup
+		}
+
+		Set {
+			return (this.iQuickSetup := value)
 		}
 	}
 
@@ -1481,6 +1485,131 @@ class SetupWizard extends ConfiguratorPanel {
 
 	applicationPath(application) {
 		return this.KnowledgeBase.getValue("Application." . application . ".Path", false)
+	}
+
+	isQuickSetupAvailable() {
+		return (isDebug() || this.Initialize)
+	}
+
+	installSoftware() {
+		local progressCount := 0
+
+		detectSimulators() {
+			local task := PeriodicTask((*) => showProgress({progress: progressCount++, message: "Detecting Simulators..."}), 100, kHighPriority)
+
+			try {
+				task.start()
+
+				try {
+					this.Steps["Applications"].updateAvailableApplications(true)
+
+					Sleep(1000)
+				}
+				finally {
+					task.stop()
+				}
+			}
+			catch Any as exception {
+				showProgress({color: "Red", message: translate("Error while detecting Simulators...")})
+
+				Sleep(1000)
+
+				logError(exception, true)
+			}
+		}
+
+		installRuntimes() {
+			local runtime, definition
+
+			for runtime, definition in getMultiMapValues(this.Definition, "Applications.Runtimes")
+				if !this.isSoftwareInstalled(runtime)
+					try {
+						showProgress({progress: progressCount++, color: "Green", message: translate("Installing ") . runtime . translate("...")})
+
+						definition := string2Values("|", definition)
+
+						RunWait(kHomeDirectory . definition[2])
+
+						this.locateSoftware(runtime, true)
+					}
+					catch Any as exception {
+						showProgress({color: "Red", message: translate("Error while installing ") . runtime . translate("...")})
+
+						Sleep(1000)
+
+						logError(exception, true)
+					}
+		}
+
+		installSoftware() {
+			local software, definition
+
+			for software, definition in getMultiMapValues(this.Definition, "Applications.Special")
+				if !this.isSoftwareInstalled(software)
+					try {
+						showProgress({progress: progressCount++, color: "Green", message: translate("Installing ") . software . translate("...")})
+
+						definition := string2Values(":", string2Values("|", definition)[4])
+
+						this.locateSoftware(software, %definition[1]%.Call(string2Values(";", definition[2])*), false)
+					}
+					catch Any as exception {
+						showProgress({color: "Red", message: translate("Error while installing ") . software . translate("...")})
+
+						Sleep(1000)
+
+						logError(exception, true)
+					}
+		}
+
+		installPlugins() {
+			Sleep(1000)
+		}
+
+		this.Window.block()
+
+		showProgress({color: "Blue", title: "Preparing Configuration"})
+
+		try {
+			showProgress({progress: ++progressCount, messsage: translate("Create Configuration...")})
+
+			Sleep(1000)
+
+			showProgress({progress: ++progressCount, message: translate("Parsing Registry...")})
+
+			loop 10 {
+				Sleep(500)
+
+				showProgress({progress: ++progressCount})
+			}
+
+			showProgress({progress: progressCount++, message: translate("Detecting Simulators...")})
+
+			detectSimulators()
+
+			showProgress({color: "Green", title: translate("Install Runtimes")})
+
+			installRuntimes()
+
+			showProgress({color: "Green", title: translate("Install Software")})
+
+			installSoftware()
+
+			showProgress({color: "Green", title: translate("Install Plugins")})
+
+			installPlugins()
+
+			showProgress({progress: 100, message: translate("Finished...")})
+
+			Sleep(1000)
+		}
+		finally {
+			hideProgress()
+
+			this.Window.unblock()
+
+			this.updateState()
+		}
 	}
 
 	setGeneralConfiguration(language, startWithWindows, silentMode) {
@@ -2649,7 +2778,8 @@ initializeSimulatorSetup() {
 	if wizard.Debug[kDebugKnowledgeBase]
 		SupportMenu.Check(label)
 
-	showSplashScreen("Rotating Brain")
+	if !isDebug()
+		showSplashScreen("Rotating Brain")
 
 	wizard.ProgressCount := 0
 
@@ -2684,7 +2814,9 @@ startupSimulatorSetup() {
 
 		Sleep(1000)
 
-		hideSplashScreen()
+		if !isDebug()
+			hideSplashScreen()
+
 		hideProgress()
 
 		wizard.show()
@@ -2711,7 +2843,9 @@ startupSimulatorSetup() {
 
 			wizard.ProgressCount := 0
 
-			showSplashScreen("Rotating Brain")
+			if !isDebug()
+				showSplashScreen("Rotating Brain")
+
 			showProgress({color: "Blue", title: translate("Initializing Setup Wizard"), message: translate("")})
 		}
 		else
@@ -2723,6 +2857,31 @@ startupSimulatorSetup() {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Public Function Declaration Section                   ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+installMSI(command) {
+	RunWait(kHomeDirectory . command)
+
+	return false
+}
+
+installZIP(path, application) {
+	deleteDirectory(A_Temp . "\Simulator Controller\Temp")
+
+	DirCreate(A_Temp . "\Simulator Controller\Temp")
+	DirCreate(kUserHomeDirectory . "Programs")
+
+	RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . kHomeDirectory . path . "' -DestinationPath '" . A_Temp . "\Simulator Controller\Temp'", , "Hide")
+
+	FileCopy(A_Temp . "\Simulator Controller\Temp\" . application, kUserHomeDirectory . "Programs", 1)
+
+	return (kUserHomeDirectory . "Programs\" . application)
+}
+
+installEXE(command) {
+	RunWait(kHomeDirectory . command)
+
+	return false
+}
 
 openLabelsAndIconsEditor(*) {
 	local window := SetupWizard.Instance.WizardWindow
@@ -2898,7 +3057,7 @@ initializeSimulatorSetup()
 ;;;                          Wizard Include Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "Libraries\QuickSetupStepWizard.ahk"
+#Include "Libraries\QuickStepWizard.ahk"
 #Include "Libraries\ModulesStepWizard.ahk"
 #Include "Libraries\InstallationStepWizard.ahk"
 #Include "Libraries\ApplicationsStepWizard.ahk"

@@ -537,7 +537,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 			setMultiMapValue(positionsData, "Position Data", "Driver.Car", driverCar)
 
-			return positionsData
+			return this.correctPositionsData(positionsData)
 		}
 		else {
 			this.shutdownUDPClient(true)

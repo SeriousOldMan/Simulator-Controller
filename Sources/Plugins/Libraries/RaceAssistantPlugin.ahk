@@ -875,7 +875,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		if this.Active {
 			teamServer := this.TeamServer
 
-			if (teamServer && teamServer.TeamServerActive && (A_TickCount > this.iNextSessionUpdate) && (this.Session != kSessionFinished))
+			if (teamServer && teamServer.TeamServerActive && (A_TickCount > this.iNextSessionUpdate))
 				try {
 					this.iNextSessionUpdate := (A_TickCount + updateCycle)
 

@@ -198,8 +198,6 @@ Supported input routes are:
 | Race Strategist | All voice output for the Race Strategist.                                                                            |
 | Controller      | Listens to the voice commands directly issued to the Controller, for example to switch between track automations.    |
 
-Supported input routes are here: "Default", "Activation", "Race Spotter", "Race Engineer", "Race Strategist" and "Controller".
-
 First you **have to identify** the default audio input device, which should be active whenever no voice input is captured by Simulator Controller (i.e. the Push-To-Talk button is not activated). This may be important, when you are using different microphones, for example, because you are streaming your race on a video platform. In the example above, this microphone device is named "Streaming". This setting must be identical to that you have chosen in the Windows settings, otherwise you won't get the desired results.
 
 All other input routes are typically set to the same input device, normally the microphone of your headset. Don't be confused here, because, similar to the output settings shown above, you only have to enter those audio devices, which differ from the default audio device. Please note, that changing the input audio device is only supported when the additional software [NirCmd](https://www.nirsoft.net/utils/nircmd.html) is installed and configured.

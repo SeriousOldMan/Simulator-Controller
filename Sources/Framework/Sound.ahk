@@ -11,6 +11,7 @@
 
 #Include "Constants.ahk"
 #Include "Variables.ahk"
+#Include "Debug.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;

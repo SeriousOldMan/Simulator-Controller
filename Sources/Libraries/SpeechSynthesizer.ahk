@@ -162,8 +162,7 @@ class SpeechSynthesizer {
 	}
 
 	__New(synthesizer, voice := false, language := false) {
-		local dllName, dllFile, voices, languageCode, voiceInfos, ignore, voiceInfo, dirName
-		local player, copied, configuration
+		local dllName, dllFile, voices, languageCode, voiceInfos, ignore, voiceInfo, dirName, configuration
 
 		dirName := ("PhraseCache." . StrSplit(A_ScriptName, ".")[1] . "." . kVersion)
 
@@ -276,22 +275,6 @@ class SpeechSynthesizer {
 				SpeechSynthesizer.sAudioDriver := getMultiMapValue(configuration, "Output", this.Routing . ".AudioDriver", false)
 				SpeechSynthesizer.sAudioDevice := getMultiMapValue(configuration, "Output", this.Routing . ".AudioDevice", false)
 			}
-
-			if FileExist(kSox)
-				for ignore, player in ["SoundPlayerSync.exe", "SoundPlayerAsync.exe"]
-					if !FileExist(kTempDirectory . player) {
-						copied := false
-
-						while (!copied)
-							try {
-								FileCopy(kSox, kTempDirectory . player, true)
-
-								copied := true
-							}
-							catch Any as exception {
-								logError(exception)
-							}
-					}
 		}
 	}
 
@@ -344,18 +327,13 @@ class SpeechSynthesizer {
 	}
 
 	playSound(soundFile, wait := true) {
-		local callback, player, pid, workingDirectory, level, option
+		local callback, pid, level
 
 		callback := this.SpeechStatusCallback
 
 		if kSox {
-			player := (wait ? "SoundPlayerSync.exe" : "SoundPlayerAsync.exe")
-
-			SplitPath(kSox, , &workingDirectory)
-
-			option := (SpeechSynthesizer.sAudioDevice ? ("`"" . SpeechSynthesizer.sAudioDevice . "`"") : "")
-
-			Run("`"" . kTempDirectory . player . "`" `"" . soundFile . "`" -t waveaudio " . option, workingDirectory, "HIDE", &pid)
+			pid := playSound(wait ? "SoundPlayerSync.exe" : "SoundPlayerAsync.exe", soundFile
+						   , SpeechSynthesizer.sAudioDevice ? ("`"" . SpeechSynthesizer.sAudioDevice . "`"") : "")
 
 			if callback
 				callback.Call("Start")
@@ -398,7 +376,7 @@ class SpeechSynthesizer {
 				if callback
 					callback.Call("Start")
 
-				SoundPlay(soundFile, "Wait")
+				playSound("System", soundFile, "Wait")
 
 				if callback
 					callback.Call("Stop")
@@ -407,7 +385,7 @@ class SpeechSynthesizer {
 				if callback
 					callback.Call("Play")
 
-				SoundPlay(soundFile)
+				playSound("System", soundFile)
 			}
 		}
 	}
@@ -704,7 +682,7 @@ class SpeechSynthesizer {
 		}
 		else if (this.iPlaysCacheFile || (this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure")) {
 			try
-				SoundPlay("NonExistent.avi")
+				playSound("System", "NonExistent.avi")
 
 			if this.iPlaysCacheFile {
 				this.iPlaysCacheFile := false

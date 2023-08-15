@@ -375,6 +375,8 @@ class VoiceServer extends ConfigurationItem {
 		}
 
 		startListening(retry := true) {
+			static audioDevice := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Audio Settings.ini"), "Output", "Activation.AudioDevice", false)
+			
 			if (this.SpeechRecognizer[true] && !this.Listening)
 				if !this.SpeechRecognizer.startRecognizer() {
 					if retry
@@ -384,8 +386,8 @@ class VoiceServer extends ConfigurationItem {
 				}
 				else {
 					if this.VoiceServer.PushToTalk
-						SoundPlay(kResourcesDirectory . "Sounds\Talk.wav")
-
+						playSound("VSSoundPlayer.exe", kResourcesDirectory . "Sounds\Talk.wav", audioDevice)
+						
 					this.iListening := true
 
 					return true
@@ -852,6 +854,8 @@ class VoiceServer extends ConfigurationItem {
 	}
 
 	startActivationListener(retry := false) {
+		static audioDevice := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Audio Settings.ini"), "Output", "Activation.AudioDevice", false)
+			
 		if (this.SpeechRecognizer && !this.Listening)
 			if !this.SpeechRecognizer.startRecognizer() {
 				if retry
@@ -861,7 +865,7 @@ class VoiceServer extends ConfigurationItem {
 			}
 			else {
 				if this.PushToTalk
-					SoundPlay(kResourcesDirectory . "Sounds\Talk.wav")
+					playSound("VSSoundPlayer.exe", kResourcesDirectory . "Sounds\Talk.wav", audioDevice)
 
 				this.iListening := true
 

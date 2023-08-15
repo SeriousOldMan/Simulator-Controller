@@ -157,16 +157,25 @@ There is also the possibility to trigger actions in Simulator Controller from ot
 
 ### Audio Routing
 
-Simulator Controller allows you to direct voice output to different audio devices, as long as the additional software [SoX](http://sox.sourceforge.net/) is installed and configured. This is mainly of interest to those of you, who are streaming their races, or when you want maximum immersion by directing car sound to a 5.1 sound system, but the assistant voices to your headphone. Since this if not of widespread use, there is no user interface to configure this, but a simple text file. If you want to configure your audio routing, create a text file with the name "Audio Settings.ini" and place it in the *Config* folder which is located in your user *Documents* folder. Open it with a text editor and enter the following content:
+Simulator Controller allows you to direct sound output (for example the voices of the different Race Assistants) to different audio devices, as long as the additional software [SoX](http://sox.sourceforge.net/) is installed and configured. This is mainly of interest to those of you, who are streaming their races, or when you want maximum immersion by directing car sound to a 5.1 sound system, but the assistant voices to your headphone. Since this if not of widespread use, there is no user interface to configure this. Instead, a simple text file is used. If you want to configure your audio routing, create a text file with the name "Audio Settings.ini" and place it in the *Simulator Controller\Config* folder which is located in your user *Documents* folder. Open it with a text editor and enter the following content:
 
 	[Output]
 	Race Spotter.AudioDevice=Headphone
 	Race Engineer.AudioDevice=Headphone
 	Race Strategist.AudioDevice=Headphone
 
-Supported output routes are here: "Race Spotter", "Race Engineer", "Race Strategist", "Controller" and "Analyzer".
+Supported output routes are:
 
-*Headphone* is only an example for any configured audio device which is named "Headphone" in the standard Windows settings. You only have to enter those lines, where you want to configure a non-default audio device, if not present the currently selected default audio device will be used.
+| Route           | Description                                                                                                          |
+|-----------------|----------------------------------------------------------------------------------------------------------------------|
+| Activation      | The short acknowledge sound, when the Push-2-Talk button is pressed.                                                 |
+| Race Spotter    | All voice output by the Race Spotter.                                                                                |
+| Race Engineer   | All voice output by the Race Engineer.                                                                               |
+| Race Strategist | All voice output by the Race Strategist.                                                                             |
+| Controller      | The short acknowledge sound, when the Controller itself received a voice command or was activated for voice control. |
+| Analyzer        | The feedback sound of the Telemetry Analyzer for over- or understeer handling events.                                |
+
+*Headphone* is only an example for any configured audio device which is named "Headphone" in the standard Windows settings. You only have to enter those lines, where you want to configure a non-default audio device. If nothing is configured here, the currently in the Windows settings selected default audio device will be used.
 
 As you might expect, you can configure voice input as well. There are some additional things to consider, though, as you can see in the example below.
 
@@ -178,13 +187,20 @@ As you might expect, you can configure voice input as well. There are some addit
 	Race Strategist.AudioDevice=Headphone
 	Controller.AudioDevice=Headphone
 
-Supported input routes are here: "Default", "Activation", "Race Spotter", "Race Engineer", "Race Strategist" and "Controller".
+Supported input routes are:
 
-First you have to identify the default audio input device, which should be active whenever no voice input is captured by Simulator Controller (i.e. the Push-To-Talk button is not activated). This may be important, when you are using different microphones, for example, because you are streaming your race on a video platform. In the example above, this microphone device is named "Streaming". This setting must be identical to that you have chosen in the Windows settings, otherwise you won't get the desired results.
+| Route           | Description                                                                                                          |
+|-----------------|----------------------------------------------------------------------------------------------------------------------|
+| Default         | Default audio input device, which should be active whenever no voice input is captured by Simulator Controller.      |
+| Activation      | Listens to the activation phrases, as you might expect. Typically you will use here the same input device here, you use to talk to the Assistants. |
+| Race Spotter    | All voice input for the Race Spotter.                                                                                |
+| Race Engineer   | All voice output for the Race Engineer.                                                                              |
+| Race Strategist | All voice output for the Race Strategist.                                                                            |
+| Controller      | Listens to the voice commands directly issued to the Controller, for example to switch between track automations.    |
 
-After defining the default input device, you can configure the voice input devices for all Simulator Controller dialog partners, first and foremost the Race Assistants. A special listener is the *Activation* object, which listens to the activation phrases, as you might expect. Typically you will use here the same input device here, you use to talk to the Assistants. Additionally, if you are using voice commands to trigger actions in Simulator Controller, for example switching between track automations, you can also set the input audio device for the *Controller* object as well.
- 
-Similar to the output settings shown above, you only have to enter those audio devices, which differ from the default audio device. Please note, that changing the input audio device is only supported when the additional software [NirCmd](https://www.nirsoft.net/utils/nircmd.html) is installed and configured.
+First you **have to identify** the default audio input device, which should be active whenever no voice input is captured by Simulator Controller (i.e. the Push-To-Talk button is not activated). This may be important, when you are using different microphones, for example, because you are streaming your race on a video platform. In the example above, this microphone device is named "Streaming". This setting must be identical to that you have chosen in the Windows settings, otherwise you won't get the desired results.
+
+All other input routes are typically set to the same input device, normally the microphone of your headset. Don't be confused here, because, similar to the output settings shown above, you only have to enter those audio devices, which differ from the default audio device. Please note, that changing the input audio device is only supported when the additional software [NirCmd](https://www.nirsoft.net/utils/nircmd.html) is installed and configured.
 
 ## Keyboard shortcuts & modifiers
 

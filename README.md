@@ -95,6 +95,8 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 
 19. [Defining custom Button Box Modes](https://youtu.be/CqXcjTRoLpE) - This video demonstrates how you can define your own Button Box layers with custom commands.
 
+20. [Unboxing Practice Center](https://www.youtube.com/watch?v=Qx3I0B8AvhQ) - We are taking a detailed look at the "Practice Center", which lets you organize your practice sessions and solo races, as well as the data collected during those sessions.
+
 This list will be extended from time to time to cover new functionalities.
 
 ### Discord Community

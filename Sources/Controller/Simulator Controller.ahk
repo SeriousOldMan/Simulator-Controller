@@ -587,7 +587,7 @@ class SimulatorController extends ConfigurationItem {
 		super.__New(configuration)
 
 		if !inList(A_Args, "-NoStartup") {
-			if FileExist(kSox)
+			if (kSox && FileExist(kSox))
 				for ignore, player in ["SoundPlayerSync.exe", "SoundPlayerAsync.exe"]
 					if !FileExist(kTempDirectory . player) {
 						copied := false
@@ -945,6 +945,8 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	activationCommand(words*) {
+		local workingDirectory
+
 		static audioDevice := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Audio Settings.ini"), "Output", "Controller.AudioDevice", false)
 		static first := true
 

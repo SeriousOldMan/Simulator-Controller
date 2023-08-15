@@ -10,6 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\..\Libraries\Task.ahk"
+#Include "..\..\Libraries\Messages.ahk"
 #Include "..\..\Libraries\Math.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
 
@@ -47,6 +48,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 	iTrackWidth := 150
 
 	iAcousticFeedback := true
+	static sAudioDevice := false
 
 	iAnalyzerPID := false
 
@@ -176,6 +178,18 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 		}
 	}
 
+	static AudioDevice {
+		Get {
+			return GenericTelemetryAnalyzer.sAudioDevice
+		}
+	}
+
+	AudioDevice {
+		Get {
+			return GenericTelemetryAnalyzer.AudioDevice
+		}
+	}
+
 	__New(workbench, simulator) {
 		local selectedCar := workbench.SelectedCar[false]
 		local selectedTrack := workbench.SelectedTrack[false]
@@ -183,6 +197,8 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 		local defaultOversteerThresholds := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "OversteerThresholds", "-40,-70,-100")
 		local defaultLowspeedThreshold := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "LowspeedThreshold", 120)
 		local fileName, configuration, settings, prefix
+
+		static first := false
 
 		simulator := SessionDatabase.getSimulatorName(simulator)
 
@@ -248,6 +264,30 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 		super.__New(workbench, simulator)
 
 		OnExit(ObjBindMethod(this, "stopTelemetryAnalyzer", true))
+
+		if first {
+			GenericTelemetryAnalyzer.sAudioDevice := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Audio Settings.ini"), "Output", "Analyzer.AudioDevice", false)
+
+			registerMessageHandler("Analyzer", methodMessageHandler, GenericTelemetryAnalyzer)
+
+			first := false
+		}
+
+		if (kSox && FileExist(kSox))
+			for ignore, player in ["SoundPlayerSync.exe", "SoundPlayerAsync.exe"]
+				if !FileExist(kTempDirectory . player) {
+					copied := false
+
+					while (!copied)
+						try {
+							FileCopy(kSox, kTempDirectory . player, true)
+
+							copied := true
+						}
+						catch Any as exception {
+							logError(exception)
+						}
+				}
 	}
 
 	settingAvailable(setting) {
@@ -362,6 +402,9 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 				if this.AcousticFeedback
 					options .= (A_Space . "`"" . kResourcesDirectory . "Sounds`"")
 
+				if this.AudioDevice
+					options .= (A_Space . "`"" . this.AudioDevice . "`"")
+
 				code := SessionDatabase.getSimulatorCode(this.Simulator)
 
 				Run(kBinariesDirectory . code . " SHM Spotter.exe " . options, kBinariesDirectory, "Hide", &pid)
@@ -403,6 +446,18 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 		}
 
 		return false
+	}
+
+	static acousticFeedback(soundFile) {
+		local workingDirectory
+
+		if (kSox && GenericTelemetryAnalyzer.AudioDevice) {
+			SplitPath(kSox, , &workingDirectory)
+
+			Run("`"" . kTempDirectory . "SoundPlayerSync.exe`" `"" . soundFile . "`" -t waveaudio `"" . GenericTelemetryAnalyzer.AudioDevice . "`"", workingDirectory, "HIDE")
+		}
+		else
+			SoundPlay(soundFile)
 	}
 }
 

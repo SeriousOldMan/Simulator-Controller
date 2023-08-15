@@ -45,7 +45,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[5.2.3.0-release]() (Early build for 5.2.3. Changes: New controller action function "callCustom", Significant speed improvement in ACC pitstop setup when using the same tyre compound, Fixed position data for retired cars in Assetto Corsa Competizione, Fixed session info not showing up for drivers which have not driven their first stint, Extended audio routing for Analyzer and Controller.)
+[5.2.3.0-release](https://www.dropbox.com/scl/fi/dynd58pkfup6v8tq9ax6q/Simulator-Controller-5.2.3.0-dev.zip?rlkey=lx4n8h2pvpgmm174m0j85twrz&dl=1) (Early build for 5.2.3. Changes: New controller action function "callCustom", Significant speed improvement in ACC pitstop setup when using the same tyre compound, Fixed position data for retired cars in Assetto Corsa Competizione, Fixed session info not showing up for drivers which have not driven their first stint, Extended audio routing for Analyzer and Controller.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-523) of this version and all the versions you might have skipped, before installing and using this version.
 

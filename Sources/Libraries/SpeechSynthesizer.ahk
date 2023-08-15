@@ -327,7 +327,7 @@ class SpeechSynthesizer {
 	}
 
 	playSound(soundFile, wait := true) {
-		local callback, pid, workingDirectory, level
+		local callback, pid, level
 
 		callback := this.SpeechStatusCallback
 

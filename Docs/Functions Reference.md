@@ -402,6 +402,9 @@ Virtually rotates the rotary dial with the given number. *direction* must be one
 #### *switchToggle(type :: OneOf("1WayToggle", "2WayToggle"), number :: Integer, state :: OneOf("On", "Off"))*
 Virtually switches the toggle switch with the given number. *state* must be one of "On" or "Off" for 2-way toggle switches and "On" for 1-way toggle switches. The type of the toggle switch must be passed as *type*, one of "1WayToggle" and "2WayToggle".
 
+#### *callCustom(number :: Integer)*
+Virtually calls the custom function with the given number.
+
 #### *setMode(mode :: String)*
 Switches the currently active mode for the hardware controller. See the [plugin reference](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes) for an in depth explanation of all available modes.
 

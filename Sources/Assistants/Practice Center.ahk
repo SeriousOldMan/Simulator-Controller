@@ -1541,9 +1541,21 @@ class PracticeCenter extends ConfigurationItem {
 	}
 
 	loadSimulator(simulator, force := false) {
-		local drivers, ignore, id, index, car, carNames, cars, settings
+		local drivers, ignore, id, index, car, carNames, cars, settings, msgResult
 
 		if (force || (simulator != this.Simulator)) {
+			if (!force && this.SessionActive && this.HasData && !this.SessionExported) {
+				OnMessage(0x44, translateYesNoButtons)
+				msgResult := MsgBox(translate("You have unsaved data. Do you really want to continue?"), translate("Information"), 262436)
+				OnMessage(0x44, translateYesNoButtons, 0)
+
+				if (msgResult = "No") {
+					this.Control["simulatorDropDown"].Choose(inList(this.getAvailableSimulators(), this.Simulator))
+
+					return
+				}
+			}
+
 			this.iSimulator := simulator
 
 			settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
@@ -1575,6 +1587,18 @@ class PracticeCenter extends ConfigurationItem {
 		local tracks, settings
 
 		if (force || (car != this.Car)) {
+			if (!force && this.SessionActive && this.HasData && !this.SessionExported) {
+				OnMessage(0x44, translateYesNoButtons)
+				msgResult := MsgBox(translate("You have unsaved data. Do you really want to continue?"), translate("Information"), 262436)
+				OnMessage(0x44, translateYesNoButtons, 0)
+
+				if (msgResult = "No") {
+					this.Control["carDropDown"].Choose(inList(this.getAvailableCars(this.Simulator), this.Car))
+
+					return
+				}
+			}
+
 			this.iCar := car
 
 			settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
@@ -1597,6 +1621,18 @@ class PracticeCenter extends ConfigurationItem {
 		local simulator, car, settings
 
 		if (force || (track != this.Track)) {
+			if (!force && this.SessionActive && this.HasData && !this.SessionExported) {
+				OnMessage(0x44, translateYesNoButtons)
+				msgResult := MsgBox(translate("You have unsaved data. Do you really want to continue?"), translate("Information"), 262436)
+				OnMessage(0x44, translateYesNoButtons, 0)
+
+				if (msgResult = "No") {
+					this.Control["trackDropDown"].Choose(inList(this.getAvailableTracks(simulator, car), this.Track))
+
+					return
+				}
+			}
+
 			simulator := this.Simulator
 			car := this.Car
 

@@ -198,7 +198,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 		local defaultLowspeedThreshold := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "LowspeedThreshold", 120)
 		local fileName, configuration, settings, prefix
 
-		static first := false
+		static first := true
 
 		simulator := SessionDatabase.getSimulatorName(simulator)
 
@@ -272,22 +272,6 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 
 			first := false
 		}
-
-		if (kSox && FileExist(kSox))
-			for ignore, player in ["SoundPlayerSync.exe", "SoundPlayerAsync.exe"]
-				if !FileExist(kTempDirectory . player) {
-					copied := false
-
-					while (!copied)
-						try {
-							FileCopy(kSox, kTempDirectory . player, true)
-
-							copied := true
-						}
-						catch Any as exception {
-							logError(exception)
-						}
-				}
 	}
 
 	settingAvailable(setting) {
@@ -449,15 +433,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 	}
 
 	static acousticFeedback(soundFile) {
-		local workingDirectory
-
-		if (kSox && GenericTelemetryAnalyzer.AudioDevice) {
-			SplitPath(kSox, , &workingDirectory)
-
-			Run("`"" . kTempDirectory . "SoundPlayerSync.exe`" `"" . soundFile . "`" -t waveaudio `"" . GenericTelemetryAnalyzer.AudioDevice . "`"", workingDirectory, "HIDE")
-		}
-		else
-			SoundPlay(soundFile)
+		playSound("SWSoundPlayer.exe", soundFile, (GenericTelemetryAnalyzer.AudioDevice ? GenericTelemetryAnalyzer.AudioDevice : "") . " echos 1 1 1 1")
 	}
 }
 

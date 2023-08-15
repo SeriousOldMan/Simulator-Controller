@@ -394,7 +394,7 @@ class SpeechRecognizer {
 			audioDevice := SpeechRecognizer.sRecognizerAudioDevice
 
 			try {
-				Run("`"" . kNirCmd . "`" setdefaultsounddevice `"" .audioDevice . "`"")
+				Run("`"" . kNirCmd . "`" setdefaultsounddevice `"" . audioDevice . "`"")
 			}
 			catch Any as exception {
 				logError(exception, true)

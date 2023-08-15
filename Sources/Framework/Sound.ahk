@@ -56,9 +56,7 @@ playSound(player, wavFile, options := false) {
 	if player {
 		SplitPath(kSox, , &workingDirectory)
 
-		if (options && (options != ""))
-			options := ("`"" . options . "`"")
-		else
+		if !options
 			options := ""
 
 		Run("`"" . player . "`" `"" . wavFile . "`" -t waveaudio " . options, workingDirectory, "HIDE", &pid)

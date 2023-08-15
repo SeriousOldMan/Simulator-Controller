@@ -926,6 +926,8 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	activationCommand(words*) {
+		local workingDirectory
+
 		static audioDevice := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Audio Settings.ini"), "Output", "Controller.AudioDevice", false)
 		static first := true
 

@@ -214,7 +214,7 @@ int sendStringMessage(HWND hWnd, int wParam, char* msg) {
 	return result;
 }
 
-void sendSpotterMessage(char* message) {
+void sendSpotterMessage(const char* message) {
 	HWND winHandle = FindWindowEx(0, 0, 0, "Race Spotter.exe");
 
 	if (winHandle == 0)
@@ -230,7 +230,7 @@ void sendSpotterMessage(char* message) {
 	}
 }
 
-void sendAutomationMessage(char* message) {
+void sendAutomationMessage(const char* message) {
 	HWND winHandle = FindWindowEx(0, 0, 0, "Simulator Controller.exe");
 
 	if (winHandle == 0)
@@ -241,6 +241,22 @@ void sendAutomationMessage(char* message) {
 
 		strcpy_s(buffer, 128, "Race Spotter:");
 		strcpy_s(buffer + strlen("Race Spotter:"), 128 - strlen("Race Spotter:"), message);
+
+		sendStringMessage(winHandle, 0, buffer);
+	}
+}
+
+void sendAnalyzerMessage(const char* message) {
+	HWND winHandle = FindWindowEx(0, 0, 0, "Setup Workbench.exe");
+
+	if (winHandle == 0)
+		winHandle = FindWindowEx(0, 0, 0, "Setup Workbench.ahk");
+
+	if (winHandle != 0) {
+		char buffer[128];
+
+		strcpy_s(buffer, 128, "Analyzer:");
+		strcpy_s(buffer + strlen("Analyzer:"), 128 - strlen("Analyzer:"), message);
 
 		sendStringMessage(winHandle, 0, buffer);
 	}
@@ -672,7 +688,7 @@ int lastCompletedLaps = 0;
 float lastSpeed = 0.0;
 long lastSound = 0;
 
-bool triggerUSOSBeep(std::string soundsDirectory, float usos) {
+bool triggerUSOSBeep(std::string soundsDirectory, std::string audioDevice, float usos) {
 	std::string wavFile = "";
 
 	if (usos < oversteerHeavyThreshold)
@@ -689,7 +705,10 @@ bool triggerUSOSBeep(std::string soundsDirectory, float usos) {
 		wavFile = soundsDirectory + "\\Understeer Light.wav";
 
 	if (wavFile != "") {
-		PlaySoundA(wavFile.c_str(), NULL, SND_FILENAME | SND_ASYNC);
+		if (audioDevice != "")
+			sendAnalyzerMessage(("acousticFeedback:" + wavFile).c_str());
+		else
+			PlaySoundA(wavFile.c_str(), NULL, SND_FILENAME | SND_ASYNC);
 
 		return true;
 	}
@@ -697,7 +716,7 @@ bool triggerUSOSBeep(std::string soundsDirectory, float usos) {
 		return false;
 }
 
-bool collectTelemetry(const irsdk_header* header, const char* data, std::string soundsDirectory, bool calibrate) {
+bool collectTelemetry(const irsdk_header* header, const char* data, std::string soundsDirectory, std::string audioDevice, bool calibrate) {
 	char result[64];
 	bool onTrack = true;
 
@@ -831,7 +850,7 @@ bool collectTelemetry(const irsdk_header* header, const char* data, std::string 
 			}
 
 			if ((soundsDirectory != "") && GetTickCount() > (lastSound + 300))
-				if (triggerUSOSBeep(soundsDirectory, cd.usos))
+				if (triggerUSOSBeep(soundsDirectory, audioDevice, cd.usos))
 					lastSound = GetTickCount();
 
 			if (false) {
@@ -1271,6 +1290,7 @@ int main(int argc, char* argv[])
 	bool analyzeTelemetry = false;
 
 	char* soundsDirectory = "";
+	char* audioDevice = "";
 
 	if (argc > 1) {
 		calibrateTelemetry = (strcmp(argv[1], "-Calibrate") == 0);
@@ -1301,6 +1321,9 @@ int main(int argc, char* argv[])
 
 				if (argc > 14)
 					soundsDirectory = argv[14];
+
+				if (argc > 15)
+					soundsDirectory = argv[15];
 			}
 		}
 		else if (positionTrigger) {
@@ -1376,7 +1399,7 @@ int main(int argc, char* argv[])
 					}
 
 					if (analyzeTelemetry) {
-						if (collectTelemetry(pHeader, g_data, soundsDirectory, calibrateTelemetry)) {
+						if (collectTelemetry(pHeader, g_data, soundsDirectory, audioDevice, calibrateTelemetry)) {
 							if (remainder(counter, 20) == 0)
 								writeTelemetry(pHeader, g_data, calibrateTelemetry);
 						}

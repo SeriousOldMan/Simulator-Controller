@@ -1,9 +1,9 @@
 [Development]
 Version=5.2.3.0-dev
 Target=5.2.3.0-release
-Date=08/14/2023
+Date=08/15/2023
 Download=
-Changes=New controller action function "callCustom", Significant speed improvement in ACC pitstop setup when using the same tyre compound, Fixed position data for retired cars in Assetto Corsa Competizione, Fixed session info not showing up for drivers which have not driven their first stint
+Changes=New controller action function "callCustom", Significant speed improvement in ACC pitstop setup when using the same tyre compound, Fixed position data for retired cars in Assetto Corsa Competizione, Fixed session info not showing up for drivers which have not driven their first stint, Extended audio routing for Analyzer and Controller
 [Release]
 Version=5.2.2.0-release
 Date=08/11/2023

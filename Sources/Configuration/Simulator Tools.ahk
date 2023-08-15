@@ -3102,8 +3102,6 @@ cancelBuild() {
 	protectionOn()
 
 	try {
-		SoundPlay("*32")
-
 		OnMessage(0x44, translateYesNoButtons)
 		msgResult := MsgBox(translate("Cancel target processing?"), translate("Modular Simulator Controller System"), 262180)
 		OnMessage(0x44, translateYesNoButtons, 0)

@@ -164,7 +164,7 @@ Simulator Controller allows you to direct voice output to different audio device
 	Race Engineer.AudioDevice=Headphone
 	Race Strategist.AudioDevice=Headphone
 
-Supported output routes are here: "Race Spotter", "Race Engineer", "Race Strategist", "Controller" and "Analyzer".
+Supported output routes are here: "Activation", "Race Spotter", "Race Engineer", "Race Strategist", "Controller" and "Analyzer".
 
 *Headphone* is only an example for any configured audio device which is named "Headphone" in the standard Windows settings. You only have to enter those lines, where you want to configure a non-default audio device, if not present the currently selected default audio device will be used.
 

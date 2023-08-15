@@ -573,8 +573,6 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	__New(configuration, settings, voiceServer := false) {
-		local ignore, player, copied
-
 		this.iID := FileRead(kUserConfigDirectory . "ID")
 
 		SimulatorController.Controller := this
@@ -586,25 +584,8 @@ class SimulatorController extends ConfigurationItem {
 
 		super.__New(configuration)
 
-		if !inList(A_Args, "-NoStartup") {
-			if FileExist(kSox)
-				for ignore, player in ["SoundPlayerSync.exe", "SoundPlayerAsync.exe"]
-					if !FileExist(kTempDirectory . player) {
-						copied := false
-
-						while (!copied)
-							try {
-								FileCopy(kSox, kTempDirectory . player, true)
-
-								copied := true
-							}
-							catch Any as exception {
-								logError(exception)
-							}
-					}
-
+		if !inList(A_Args, "-NoStartup")
 			this.initializeBackgroundTasks()
-		}
 	}
 
 	loadFromConfiguration(configuration) {
@@ -950,13 +931,8 @@ class SimulatorController extends ConfigurationItem {
 
 		if first
 			first := false
-		else if (kSox && audioDevice) {
-			SplitPath(kSox, , &workingDirectory)
-
-			Run("`"" . kTempDirectory . "SoundPlayerSync.exe`" `"" . kResourcesDirectory . "Sounds\Activated.wav`" -t waveaudio `"" . audioDevice . "`"", workingDirectory, "HIDE")
-		}
 		else
-			SoundPlay(kResourcesDirectory . "Sounds\Activated.wav")
+			playSound("SCSoundPlayer.exe", kResourcesDirectory . "Sounds\Activated.wav", audioDevice)
 	}
 
 	voiceCommand(grammar, command, words*) {

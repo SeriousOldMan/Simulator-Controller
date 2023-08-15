@@ -249,8 +249,6 @@ class TranslationsEditor extends ConfiguratorPanel {
 	deleteLanguage() {
 		local msgResult, languageCode, code, language, ignore, fileName
 
-		SoundPlay("*32")
-
 		OnMessage(0x44, translateYesNoButtons)
 		msgResult := MsgBox(translate("Do you really want to delete this translation?"), translate("Delete"), 262436)
 		OnMessage(0x44, translateYesNoButtons, 0)
@@ -488,8 +486,6 @@ class TranslationsList extends ConfigurationItemList {
 			this.updateItem()
 
 		if this.iChanged {
-			SoundPlay("*32")
-
 			OnMessage(0x44, translateYesNoButtons)
 			msgResult := MsgBox(translate("Do you want to save your changes? Any existing translations will be overwritten."), translate("Save"), 262436)
 			OnMessage(0x44, translateYesNoButtons, 0)

@@ -7,7 +7,7 @@
   6. The audio routing capabilities have been extended. Please see the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#audio-routing) for more information.
   7. "Practice Center" now warns you, if you try to switch the simulator, car or track, while still having unsaved data in an active session.
   8. [Experts Only] A new [controller action function "callCustom"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) has been addded, which allow you to activate custom controller functions from external scripts, for example.
-  9. [Developer] Additional information has been added to the ["Session State.json" file](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) for tyre pressures. The property "Pressures" was renamed to "HotPressures".
+  9. [Developer Only] Additional information has been added to the ["Session State.json" file](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) for tyre pressures. The property "Pressures" was renamed to "HotPressures".
   10. New car models for "Setup Workbench":
       - Assetto Corsa
         - Alfa Romeo 4C

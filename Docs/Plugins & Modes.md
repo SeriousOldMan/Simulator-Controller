@@ -1361,11 +1361,17 @@ The content of the JSON file looks like this (depending on the current situation
 			"Token": "xxxxxxxx-yyyy-zzzz-aaaa-bbbbbbbbbbbb"
 		},
 		"Tyres": {
-			"Pressures": [
+			"HotPressures": [
 				26.4,
 				26.4,
 				26.7,
 				26.5
+			],
+			"ColdPressures": [
+				25.3,
+				24.9,
+				25.1,
+				24.5
 			],
 			"Temperatures": [
 				80.6,

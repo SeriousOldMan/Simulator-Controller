@@ -1438,6 +1438,11 @@ class RaceEngineer extends RaceAssistant {
 
 				setMultiMapValue(sessionInfo, "Pitstop", "Prepared", prepared && !planned)
 			}
+
+			setMultiMapValue(sessionInfo, "Tyres", "Pressures.Cold", values2String(", ", knowledgeBase.getValue("Tyre.Pressure.Target.FL", 0)
+																					   , knowledgeBase.getValue("Tyre.Pressure.Target.FR", 0)
+																					   , knowledgeBase.getValue("Tyre.Pressure.Target.RL", 0)
+																					   , knowledgeBase.getValue("Tyre.Pressure.Target.RR", 0)))
 		}
 
 		return sessionInfo

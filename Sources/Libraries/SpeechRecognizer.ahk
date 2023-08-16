@@ -388,11 +388,9 @@ class SpeechRecognizer {
 	}
 
 	startRecognizer() {
-		local audioDevice
+		local audioDevice := SpeechRecognizer.sRecognizerAudioDevice
 
-		if (SpeechRecognizer.sRecognizerAudioDevice && kNirCmd) {
-			audioDevice := SpeechRecognizer.sRecognizerAudioDevice
-
+		if (audioDevice && kNirCmd) {
 			try {
 				Run("`"" . kNirCmd . "`" setdefaultsounddevice `"" . audioDevice . "`"")
 			}
@@ -408,15 +406,13 @@ class SpeechRecognizer {
 	}
 
 	stopRecognizer() {
-		local audioDevice
+		local audioDevice := SpeechRecognizer.sDefaultAudioDevice
 
 		try {
 			return (this.Instance ? this.Instance.StopRecognizer() : false)
 		}
 		finally {
-			if (SpeechRecognizer.sDefaultAudioDevice && kNirCmd) {
-				audioDevice := SpeechRecognizer.sDefaultAudioDevice
-
+			if (audioDevice && kNirCmd) {
 				try {
 					Run("`"" . kNirCmd . "`" setdefaultsounddevice `"" . audioDevice . "`"")
 				}

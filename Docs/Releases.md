@@ -7,6 +7,11 @@
   6. The audio routing capabilities have been extended. Please see the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#audio-routing) for more information.
   7. "Practice Center" now warns you, if you try to switch the simulator, car or track, while still having unsaved data in an active session.
   8. [Experts Only] A new [controller action function "callCustom"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) has been addded, which allow you to activate custom controller functions from external scripts, for example.
+  9. New car models for "Setup Workbench":
+      - Assetto Corsa
+        - Alfa Romeo 4C
+        - Alfa Romeo 33 Stradale (Fixed)
+        - Lamborghini Miura (Fixed)
   
 ## 5.2.2.0-release 08/11/23
   1. Minor bugfixes, as always

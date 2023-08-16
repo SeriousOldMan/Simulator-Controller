@@ -202,6 +202,8 @@ First you **have to identify** the default audio input device, which should be a
 
 All other input routes are typically set to the same input device, normally the microphone of your headset. Don't be confused here, because, similar to the output settings shown above, you only have to enter those audio devices, which differ from the default audio device. Please note, that changing the input audio device is only supported when the additional software [NirCmd](https://www.nirsoft.net/utils/nircmd.html) is installed and configured.
 
+A final note here: Make sure, that all your audio devices are named differently, even when they belong to the same type of equipment, for example a headset. Otherwise you will have unwanted effects. Example: Name the speakers of your headset "HeadsetSpeaker" and the microphone of your headset "HeadsetMic" in your Windows sound settings. Doing this you can activate them seperately.
+
 ## Keyboard shortcuts & modifiers
 
 Many applications of Simulator Controller provide modifier keys for several functions. You can find a list of all modifiers and their functionalities [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Keyboard-Modifiers).

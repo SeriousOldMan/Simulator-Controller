@@ -573,9 +573,7 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	__New(configuration, settings, voiceServer := false) {
-		identifier := FileRead(kUserConfigDirectory . "ID")
-
-		this.iID := identifier
+		this.iID := FileRead(kUserConfigDirectory . "ID")
 
 		SimulatorController.Controller := this
 
@@ -927,17 +925,24 @@ class SimulatorController extends ConfigurationItem {
 		}
 	}
 
-	activationCommand(words*) {
+	acknowledgeVoiceCommand() {
+		static audioDevice := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Audio Settings.ini"), "Output", "Controller.AudioDevice", false)
 		static first := true
 
 		if first
 			first := false
 		else
-			SoundPlay(kResourcesDirectory . "Sounds\Activated.wav")
+			playSound("SCSoundPlayer.exe", kResourcesDirectory . "Sounds\Activated.wav", audioDevice)
+	}
+
+	activationCommand(words*) {
+		this.acknowledgeVoiceCommand()
 	}
 
 	voiceCommand(grammar, command, words*) {
 		local ignore, handler
+
+		this.acknowledgeVoiceCommand()
 
 		for ignore, handler in this.iVoiceCommands[command][2]
 			handler.Call()

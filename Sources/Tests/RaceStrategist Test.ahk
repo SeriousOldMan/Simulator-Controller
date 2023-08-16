@@ -339,7 +339,7 @@ if !GetKeyState("Ctrl") {
 else {
 	raceNr := 17
 	strategist := TestRaceStrategist(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Strategist.settings")
-								   , RaceStrategist.RaceStrategistRemoteHandler(0), "Khato", "EN", "Windows", true, true, true)
+								   , RaceStrategist.RaceStrategistRemoteHandler(0), "Khato", "EN", true, true, true, true)
 
 	strategist.VoiceManager.setDebug(kDebugGrammars, false)
 

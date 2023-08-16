@@ -45,7 +45,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[5.2.3.0-release](https://www.dropbox.com/scl/fi/dynd58pkfup6v8tq9ax6q/Simulator-Controller-5.2.3.0-dev.zip?rlkey=lx4n8h2pvpgmm174m0j85twrz&dl=1) (Early build for 5.2.3. Changes: New controller action function "callCustom", Significant speed improvement in ACC pitstop setup when using the same tyre compound, Fixed position data for retired cars in Assetto Corsa Competizione, Fixed session info not showing up for drivers which have not driven their first stint, Extended audio routing for Analyzer and Controller, New car models for "Setup Workbench".)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-523) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 
@@ -94,6 +96,8 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 18. [Race handled fully by AI](https://youtu.be/MlbAESpzg7Q) - This video gives you a full demonstration of a race under complete control of the AI Assistants. No driver interaction was necessary during this 3-stint race. Fully supported in solo as well as in multi player team races.
 
 19. [Defining custom Button Box Modes](https://youtu.be/CqXcjTRoLpE) - This video demonstrates how you can define your own Button Box layers with custom commands.
+
+20. [Unboxing Practice Center](https://www.youtube.com/watch?v=Qx3I0B8AvhQ) - We are taking a detailed look at the "Practice Center", which lets you organize your practice sessions and solo races, as well as the data collected during those sessions.
 
 This list will be extended from time to time to cover new functionalities.
 
@@ -197,6 +201,7 @@ These plugins are part of the Simulator Controller distribution. Beside providin
 | [IRC](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-irc) | This plugin integrates the *iRacing* simulation game with Simulator Controller. A "Pitstop" mode is available to control the pitstop settings from your controller hardware and an integration with Jona, the Virtual Race Engineer, with Cato, the Virtual Race Strategist and also with Elisa, the Virtual Race Spotter is available as well. The "Assistant" mode can handle most of the Race Assistant commands from your hardware controller. |
 | [RF2](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-rf2) | Similar to the ACC and IRC plugin provides this plugin start and stop support for *rFactor 2*. A "Pitstop" mode is available to control the pitstop settings from your controller hardware and an integration with Jona, the Virtual Race Engineer, and with Cato, the Virtual Race Strategist is available as well. The "Assistant" mode can handle most of the Race Assistant commands from your hardware controller. |
 | [R3E](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-rre) | Similar to the ACC, IRC and RF2 plugins provides this plugin start and stop support for *RaceRoom Racing Experience*. A "Pitstop" mode is available to control the pitstop settings from your controller hardware and an integration with Jona, the Virtual Race Engineer, with Cato, the Virtual Race Strategist and also with Elisa, the Virtual Race Spotter is available as well. The "Assistant" mode can handle most of the Race Assistant commands from your hardware controller. |
+| RSP | Simple integration for Rennsport. No functionality beside starting and stopping from a hardware controller. |
 | [PCARS2](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-PCARS2) | Integration for *Project CARS 2*, which supports  Jona, the Virtual Race Engineer, Cato, the Virtual Race Strategist and also Elisa, the Virtual Race Spotter. The plugin also supports a "Pitstop" mode for adjusting pitstop settings and a "Assistant" mode to interact with the Race Assistants. |
 | [Integration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) | This plugin implements interoperability with other applications like SimHub. |
 

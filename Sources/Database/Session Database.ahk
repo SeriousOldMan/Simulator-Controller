@@ -5217,8 +5217,6 @@ editSettings(editorOrCommand, arguments*) {
 							continue
 						}
 
-					SoundPlay("*32")
-
 					translator := translateMsgBoxButtons.Bind(["Yes", "No", "Cancel"])
 
 					OnMessage(0x44, translator)

@@ -126,6 +126,22 @@ void sendAutomationMessage(char* message) {
 	}
 }
 
+void sendAnalyzerMessage(char* message) {
+	HWND winHandle = FindWindowEx(0, 0, 0, L"Setup Workbench.exe");
+
+	if (winHandle == 0)
+		winHandle = FindWindowEx(0, 0, 0, L"Setup Workbench.ahk");
+
+	if (winHandle != 0) {
+		char buffer[128];
+
+		strcpy_s(buffer, 128, "Analyzer:");
+		strcpy_s(buffer + strlen("Analyzer:"), 128 - strlen("Analyzer:"), message);
+
+		sendStringMessage(winHandle, 0, buffer);
+	}
+}
+
 #define PI 3.14159265
 
 long cycle = 0;
@@ -754,13 +770,12 @@ int lastCompletedLaps = 0;
 r3e_float32 lastSpeed = 0.0f;
 long lastSound = 0;
 
-BOOL triggerUSOSBeep(char* soundsDirectory, double usos) {
+BOOL triggerUSOSBeep(char* soundsDirectory, char* audioDevice, double usos) {
 	BOOL sound = TRUE;
 	char wavFile[255];
 
 	strcpy_s(wavFile, 255, soundsDirectory);
 	strcpy_s(wavFile + strlen(soundsDirectory), 255 - strlen(soundsDirectory), "");
-
 
 	if (usos < oversteerHeavyThreshold)
 		strcpy_s(wavFile + strlen(soundsDirectory), 255 - strlen(soundsDirectory), "\\Oversteer Heavy.wav");
@@ -778,7 +793,16 @@ BOOL triggerUSOSBeep(char* soundsDirectory, double usos) {
 		sound = FALSE;
 
 	if (sound) {
-		PlaySoundA(wavFile, NULL, SND_FILENAME | SND_ASYNC);
+		if (audioDevice) {
+			char buffer[512];
+
+			strcpy_s(buffer, 512, "acousticFeedback:");
+			strcpy_s(buffer + strlen("acousticFeedback:"), 512 - strlen("acousticFeedback:"), wavFile);
+
+			sendAnalyzerMessage(buffer);
+		}
+		else
+			PlaySoundA(wavFile, NULL, SND_FILENAME | SND_ASYNC);
 
 		return TRUE;
 	}
@@ -786,7 +810,7 @@ BOOL triggerUSOSBeep(char* soundsDirectory, double usos) {
 		return FALSE;
 }
 
-BOOL collectTelemetry(char* soundsDirectory, BOOL calibrate) {
+BOOL collectTelemetry(char* soundsDirectory, char* audioDevice, BOOL calibrate) {
 	int playerIdx = getPlayerIndex();
 
 	if (map_buffer->game_paused || (map_buffer->all_drivers_data_1[playerIdx].in_pitlane != 0))
@@ -859,7 +883,7 @@ BOOL collectTelemetry(char* soundsDirectory, BOOL calibrate) {
 			cd.usos = slip * 57.2989 * 1;
 
 			if ((strlen(soundsDirectory) > 0) && (long)GetTickCount() > (lastSound + 300))
-				if (triggerUSOSBeep(soundsDirectory, cd.usos))
+				if (triggerUSOSBeep(soundsDirectory, audioDevice, cd.usos))
 					lastSound = GetTickCount();
 
 			if (FALSE) {
@@ -1210,6 +1234,7 @@ int main(int argc, char* argv[])
 	long counter = 0;
 
 	char* soundsDirectory = "";
+	char* audioDevice = NULL;
 
 	if (argc > 1) {
 		mapTrack = (strcmp(argv[1], "-Map") == 0);
@@ -1238,6 +1263,9 @@ int main(int argc, char* argv[])
 
 				if (argc > 12)
 					soundsDirectory = argv[12];
+
+				if (argc > 13)
+					audioDevice = argv[13];
 			}
 		}
 		else if (positionTrigger) {
@@ -1262,7 +1290,7 @@ int main(int argc, char* argv[])
 
 		if (mapped_r3e) {
 			if (analyzeTelemetry) {
-				if (collectTelemetry(soundsDirectory, calibrateTelemetry)) {
+				if (collectTelemetry(soundsDirectory, audioDevice, calibrateTelemetry)) {
 					if (remainder(counter, 20) == 0)
 						writeTelemetry(calibrateTelemetry);
 				}

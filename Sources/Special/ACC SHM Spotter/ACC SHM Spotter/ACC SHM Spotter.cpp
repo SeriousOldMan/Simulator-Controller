@@ -117,6 +117,16 @@ void sendAutomationMessage(string message) {
 		sendStringMessage(winHandle, 0, "Race Spotter:" + message);
 }
 
+void sendAnalyzerMessage(string message) {
+	HWND winHandle = FindWindowEx(0, 0, 0, L"Setup Workbench.exe");
+
+	if (winHandle == 0)
+		winHandle = FindWindowEx(0, 0, 0, L"Setup Workbench.ahk");
+
+	if (winHandle != 0)
+		sendStringMessage(winHandle, 0, "Analyzer:" + message);
+}
+
 #define PI 3.14159265
 
 long cycle = 0;
@@ -686,7 +696,7 @@ int lastCompletedLaps = 0;
 float lastSpeed = 0.0;
 long lastSound = 0;
 
-bool triggerUSOSBeep(string soundsDirectory, float usos) {
+bool triggerUSOSBeep(string soundsDirectory, string audioDevice, float usos) {
 	string wavFile = "";
 
 	if (usos < oversteerHeavyThreshold)
@@ -703,7 +713,10 @@ bool triggerUSOSBeep(string soundsDirectory, float usos) {
 		wavFile = soundsDirectory + "\\Understeer Light.wav";
 	
 	if (wavFile != "") {
-		PlaySoundA(wavFile.c_str(), NULL, SND_FILENAME | SND_ASYNC);
+		if (audioDevice != "")
+			sendAnalyzerMessage("acousticFeedback:" + wavFile);
+		else
+			PlaySoundA(wavFile.c_str(), NULL, SND_FILENAME | SND_ASYNC);
 
 		return true;
 	}
@@ -711,7 +724,7 @@ bool triggerUSOSBeep(string soundsDirectory, float usos) {
 		return false;
 }
 
-bool collectTelemetry(string soundsDirectory, bool calibrate) {
+bool collectTelemetry(string soundsDirectory, string audioDevice, bool calibrate) {
 	SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
@@ -782,7 +795,7 @@ bool collectTelemetry(string soundsDirectory, bool calibrate) {
 			cd.usos = slip * 57.2989 * 1;
 
 			if ((soundsDirectory != "") && GetTickCount() > (lastSound + 300))
-				if (triggerUSOSBeep(soundsDirectory, cd.usos))
+				if (triggerUSOSBeep(soundsDirectory, audioDevice, cd.usos))
 					lastSound = GetTickCount();
 
 			if (false) {
@@ -1151,6 +1164,7 @@ int main(int argc, char* argv[])
 	bool positionTrigger = false;
 
 	char* soundsDirectory = "";
+	char* audioDevice = "";
 
 	if (argc > 1) {
 		calibrateTelemetry = (strcmp(argv[1], "-Calibrate") == 0);
@@ -1183,6 +1197,9 @@ int main(int argc, char* argv[])
 
 				if (argc > 14)
 					soundsDirectory = argv[14];
+
+				if (argc > 15)
+					audioDevice = argv[15];
 			}
 		}
 		else if (positionTrigger) {
@@ -1207,7 +1224,7 @@ int main(int argc, char* argv[])
 		bool wait = true;
 
 		if (analyzeTelemetry) {
-			if (collectTelemetry(soundsDirectory, calibrateTelemetry)) {
+			if (collectTelemetry(soundsDirectory, audioDevice, calibrateTelemetry)) {
 				if (remainder(counter, 20) == 0)
 					writeTelemetry(calibrateTelemetry);
 			}

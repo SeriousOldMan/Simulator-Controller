@@ -380,6 +380,8 @@ class RaceEngineer extends RaceAssistant {
 		if !this.hasEnoughData()
 			return
 
+		words := string2values(";", StrReplace(values2String(";", words*), "set;up", "setup"))
+
 		if inList(words, fragments["Temperatures"])
 			unit := "Temperature"
 		else if inList(words, fragments["Pressures"]) {

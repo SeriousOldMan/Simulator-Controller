@@ -45,7 +45,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 5.3.0
 
-No manual updates necessary.
+[Developers only]: The property "Pressures" of the "Tyres" object in the "Session State.json" file has been renamed to "HotPressures".
 
 ***
 

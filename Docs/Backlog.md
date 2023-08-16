@@ -8,7 +8,7 @@
 
 #### Simulation Support
   1. Better integration with the weather forecast data of *rFactor 2*
-  2. Support for new simulators
+  2. Support for new and also historic simulators
 
 #### Assistants
   1. Overhaul (shortening) of Assistant phrases

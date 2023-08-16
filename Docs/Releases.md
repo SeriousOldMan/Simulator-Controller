@@ -13,6 +13,8 @@
         - Alfa Romeo 4C
         - Alfa Romeo 33 Stradale (Fixed)
         - Lamborghini Miura (Fixed)
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-523).
   
 ## 5.2.2.0-release 08/11/23
   1. Minor bugfixes, as always

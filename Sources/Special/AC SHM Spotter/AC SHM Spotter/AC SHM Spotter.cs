@@ -1260,11 +1260,12 @@ namespace ACSHMSpotter {
 				wheelbase = int.Parse(args[11]);
 				trackWidth = int.Parse(args[12]);
 
-                if (args.Length > 13)
+                if (args.Length > 13) {
                     soundsDirectory = args[13];
 
-                if (args.Length > 14)
-                    audioDevice = args[14];
+					if (args.Length > 14)
+						audioDevice = args[14];
+				}
             }
         }
 

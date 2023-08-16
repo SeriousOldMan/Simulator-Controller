@@ -1319,11 +1319,12 @@ int main(int argc, char* argv[])
 				wheelbase = atoi(argv[11]);
 				trackWidth = atoi(argv[12]);
 
-				if (argc > 14)
+				if (argc > 14) {
 					soundsDirectory = argv[14];
 
-				if (argc > 15)
-					soundsDirectory = argv[15];
+					if (argc > 15)
+						soundsDirectory = argv[15];
+				}
 			}
 		}
 		else if (positionTrigger) {

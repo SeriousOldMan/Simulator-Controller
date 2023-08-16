@@ -383,11 +383,12 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 				if this.settingAvailable("TrackWidth")
 					options .= (A_Space . this.TrackWidth)
 
-				if this.AcousticFeedback
+				if this.AcousticFeedback {
 					options .= (A_Space . "`"" . kResourcesDirectory . "Sounds`"")
 
-				if this.AudioDevice
-					options .= (A_Space . "`"" . this.AudioDevice . "`"")
+					if this.AudioDevice
+						options .= (A_Space . "`"" . this.AudioDevice . "`"")
+				}
 
 				code := SessionDatabase.getSimulatorCode(this.Simulator)
 

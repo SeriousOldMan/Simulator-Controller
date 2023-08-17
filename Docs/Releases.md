@@ -1,4 +1,4 @@
-## 5.2.3.0-release 08/18/23 (planned)
+## 5.2.3.0-release 08/18/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Significant speed improvement in ACC pitstop setup when using the same tyre compound.

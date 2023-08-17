@@ -780,7 +780,6 @@ cancelStartup(*) {
 			startupManager.hideSplashScreen()
 
 			if !startupManager.Finished {
-				SoundPlay("*32")
 				OnMessage(0x44, translateYesNoButtons)
 				msgResult := MsgBox(translate("Cancel Startup?"), translate("Startup"), 262180)
 				OnMessage(0x44, translateYesNoButtons, 0)

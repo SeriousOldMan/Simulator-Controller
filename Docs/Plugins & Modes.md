@@ -18,6 +18,7 @@ The distribution of Simulator Controller includes a set of predefined plugins, w
 | [IRC](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-irc) | This plugin integrates the *iRacing* simulation game with Simulator Controller. A "Pitstop" mode is available to control the pitstop settings from your controller hardware and an integration with Jona, the Virtual Race Engineer, with Cato, the Virtual Race Strategist and also with Elisa, the Virtual Race Spotter is available as well. The "Assistant" mode can handle most of the Race Assistant commands from your hardware controller. |
 | [RF2](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-rf2) | Similar to the ACC and IRC plugin provides this plugin start and stop support for *rFactor 2*. A "Pitstop" mode is available to control the pitstop settings from your controller hardware and an integration with Jona, the Virtual Race Engineer, and with Cato, the Virtual Race Strategist is available as well. The "Assistant" mode can handle most of the Race Assistant commands from your hardware controller. |
 | [R3E](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-rre) | Similar to the ACC, IRC and RF2 plugins provides this plugin start and stop support for *RaceRoom Racing Experience*. A "Pitstop" mode is available to control the pitstop settings from your controller hardware and an integration with Jona, the Virtual Race Engineer, with Cato, the Virtual Race Strategist and also with Elisa, the Virtual Race Spotter is available as well. The "Assistant" mode can handle most of the Race Assistant commands from your hardware controller. |
+| RSP | Simple integration for Rennsport. No functionality beside starting and stopping from a hardware controller. |
 | [PCARS2](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-PCARS2) | Integration for *Project CARS 2*, which supports  Jona, the Virtual Race Engineer, Cato, the Virtual Race Strategist and also Elisa, the Virtual Race Spotter. The plugin also supports a "Pitstop" mode for adjusting pitstop settings and a "Assistant" mode to interact with the Race Assistants. |
 | [Integration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) | This plugin implements interoperability with other applications like SimHub. |
 
@@ -1360,11 +1361,17 @@ The content of the JSON file looks like this (depending on the current situation
 			"Token": "xxxxxxxx-yyyy-zzzz-aaaa-bbbbbbbbbbbb"
 		},
 		"Tyres": {
-			"Pressures": [
+			"HotPressures": [
 				26.4,
 				26.4,
 				26.7,
 				26.5
+			],
+			"ColdPressures": [
+				25.3,
+				24.9,
+				25.1,
+				24.5
 			],
 			"Temperatures": [
 				80.6,

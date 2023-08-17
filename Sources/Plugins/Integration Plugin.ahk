@@ -155,14 +155,23 @@ class IntegrationPlugin extends ControllerPlugin {
 		local state := Map()
 		local pressures, temperatures, wear
 
-		pressures := string2Values(",", getMultiMapValue(sessionInfo, "Tyres", "Pressures", ""))
+		pressures := string2Values(",", getMultiMapValue(sessionInfo, "Tyres", "Pressures.Hot", ""))
 
 		if (pressures.Length = 4) {
-			state["Pressures"] := [convertUnit("Pressure", pressures[1]), convertUnit("Pressure", pressures[2])
-								 , convertUnit("Pressure", pressures[3]), convertUnit("Pressure", pressures[4])]
+			state["HotPressures"] := [convertUnit("Pressure", pressures[1]), convertUnit("Pressure", pressures[2])
+								    , convertUnit("Pressure", pressures[3]), convertUnit("Pressure", pressures[4])]
 		}
 		else
-			state["Pressures"] := [kNull, kNull, kNull, kNull]
+			state["HotPressures"] := [kNull, kNull, kNull, kNull]
+
+		pressures := string2Values(",", getMultiMapValue(sessionInfo, "Tyres", "Pressures.Cold", ""))
+
+		if ((pressures.Length = 4) && (pressures[1] != 0)) {
+			state["ColdPressures"] := [convertUnit("Pressure", pressures[1]), convertUnit("Pressure", pressures[2])
+									 , convertUnit("Pressure", pressures[3]), convertUnit("Pressure", pressures[4])]
+		}
+		else
+			state["ColdPressures"] := [kNull, kNull, kNull, kNull]
 
 		temperatures := string2Values(",", getMultiMapValue(sessionInfo, "Tyres", "Temperatures", ""))
 

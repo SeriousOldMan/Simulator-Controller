@@ -846,8 +846,6 @@ stopSimulation() {
 shutdownSystem() {
 	local msgResult
 
-	SoundPlay("*32")
-
 	OnMessage(0x44, translateYesNoButtons)
 	msgResult := MsgBox(translate("Shutdown Simulator?"), translate("Shutdown"), 262436)
 	OnMessage(0x44, translateYesNoButtons, 0)

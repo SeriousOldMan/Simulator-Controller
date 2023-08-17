@@ -739,8 +739,8 @@ class VoiceManager {
 	}
 
 	startListening(retry := true) {
-		local function
-
+		static audioDevice := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Audio Settings.ini"), "Output", "Activation.AudioDevice", false)
+		
 		if this.iSpeechRecognizer && !this.Listening
 			if !this.iSpeechRecognizer.startRecognizer() {
 				if retry
@@ -749,7 +749,7 @@ class VoiceManager {
 				return false
 			}
 			else {
-				SoundPlay(kResourcesDirectory . "Sounds\Talk.wav")
+				playSound("VMSoundPlayer.exe", kResourcesDirectory . "Sounds\Talk.wav", audioDevice)
 
 				this.iIsListening := true
 
@@ -758,8 +758,6 @@ class VoiceManager {
 	}
 
 	stopListening(retry := false) {
-		local function
-
 		if this.iSpeechRecognizer && this.Listening
 			if !this.iSpeechRecognizer.stopRecognizer() {
 				if retry

@@ -1,9 +1,9 @@
 [Development]
-Version=5.2.3.0-dev
-Target=5.2.3.0-release
-Date=08/12/2023
+Version=5.3.0.0-dev
+Target=5.3.0.0-release
+Date=08/16/2023
 Download=
-Changes=New controller action function "callCustom", Significant speed improvement in ACC pitstop setup when using the same tyre compound, New page in "Server Administration, Compact database function in "Server Administration"
+Changes=New page in "Server Administration, Compact database function in "Server Administration", New quick setup feature in "Simulator Setup"
 [Release]
 Version=5.2.2.0-release
 Date=08/11/2023
@@ -12,5 +12,5 @@ Changes=More fields for "Session State.json", Data format update for "Session St
 [Current]
 Type=Development
 [Version]
-Development=5.2.3.0-dev
+Development=5.3.0.0-dev
 Release=5.2.2.0-release

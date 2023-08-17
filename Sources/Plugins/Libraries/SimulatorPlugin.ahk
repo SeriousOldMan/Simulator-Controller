@@ -1174,32 +1174,11 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		}
 	}
 
-	acquireTelemetryData() {
-		local trackData, data
-
-		static sessionDB := false
-
-		if !sessionDB
-			sessionDB := SessionDatabase()
-
-		trackData := sessionDB.getTrackData(this.Code, this.Track)
-
-		return this.readSessionData(trackData ? ("Track=" . trackData) : "")
-	}
-
-	acquirePositionsData(telemetryData) {
+	correctPositionsData(positionsData) {
 		local positions := Map()
 		local needCorrection := false
 		local cars := []
-		local positionsData, count, position
-
-		if telemetryData.Has("Position Data") {
-			positionsData := newMultiMap()
-
-			setMultiMapValues(positionsData, "Position Data", getMultiMapValues(telemetryData, "Position Data"))
-		}
-		else
-			positionsData := this.readSessionData("Standings=true")
+		local count, position
 
 		count := getMultiMapValue(positionsData, "Position Data", "Car.Count", 0)
 
@@ -1234,6 +1213,41 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 				loop count
 					setMultiMapValue(positionsData, "Position Data", "Car." . cars[A_Index][1] . ".Position", A_Index)
 		}
+
+		return positionsData
+	}
+
+	acquireTelemetryData() {
+		local trackData, data
+
+		static sessionDB := false
+
+		if !sessionDB
+			sessionDB := SessionDatabase()
+
+		trackData := sessionDB.getTrackData(this.Code, this.Track)
+
+		return this.readSessionData(trackData ? ("Track=" . trackData) : "")
+	}
+
+	acquirePositionsData(telemetryData) {
+		local positions := Map()
+		local needCorrection := false
+		local cars := []
+		local positionsData, count, position
+
+		if telemetryData.Has("Position Data") {
+			positionsData := newMultiMap()
+
+			setMultiMapValues(positionsData, "Position Data", getMultiMapValues(telemetryData, "Position Data"))
+		}
+		else
+			positionsData := this.readSessionData("Standings=true")
+
+		positionsData := this.correctPositionsData(positionsData)
+
+		if telemetryData.Has("Position Data")
+			telemetryData["Position Data"] := positionsData["Position Data"]
 
 		return positionsData
 	}

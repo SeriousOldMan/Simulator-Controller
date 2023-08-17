@@ -528,10 +528,10 @@ systemMonitor(command := false, arguments*) {
 			html .= "<table class=`"table-std`">"
 			html .= ("<tr><th class=`"th-std th-left`" colspan=`"3`"><div id=`"header`"><i>" . translate("Tyres") . "</i></div></th></tr>")
 
-			pressures := string2Values(",", getMultiMapValue(sessionState, "Tyres", "Pressures", ""))
+			pressures := string2Values(",", getMultiMapValue(sessionState, "Tyres", "Pressures.Hot", ""))
 
 			if (pressures.Length = 4) {
-				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Pressures") . "</th><td class=`"td-wdg`" style=`"text-align: center`">"
+				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Pressures (hot)") . "</th><td class=`"td-wdg`" style=`"text-align: center`">"
 					   . displayValue("Float", convertUnit("Pressure", pressures[1])) . "</td><td class=`"td-wdg`" style=`"text-align: center`">"
 					   . displayValue("Float", convertUnit("Pressure", pressures[2])) . "</td></tr>")
 				html .= ("<tr><td class=`"td-wdg`" style=`"text-align: center`">"
@@ -539,7 +539,26 @@ systemMonitor(command := false, arguments*) {
 					   . displayValue("Float", convertUnit("Pressure", pressures[4])) . "</td></tr>")
 			}
 			else {
-				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Pressures") . "</th><td class=`"td-wdg`" style=`"text-align: center`">"
+				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Pressures (hot)") . "</th><td class=`"td-wdg`" style=`"text-align: center`">"
+					   . "-" . "</td><td class=`"td-wdg`" style=`"text-align: center`">"
+					   . "-" . "</td></tr>")
+				html .= ("<tr><td class=`"td-wdg`" style=`"text-align: center`">"
+					   . "-" . "</td><td class=`"td-wdg`" style=`"text-align: center`">"
+					   . "-" . "</td></tr>")
+			}
+
+			pressures := string2Values(",", getMultiMapValue(sessionState, "Tyres", "Pressures.Cold", ""))
+
+			if ((pressures.Length = 4) && (pressures[1] != 0)) {
+				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Pressures (cold)") . "</th><td class=`"td-wdg`" style=`"text-align: center`">"
+					   . displayValue("Float", convertUnit("Pressure", pressures[1])) . "</td><td class=`"td-wdg`" style=`"text-align: center`">"
+					   . displayValue("Float", convertUnit("Pressure", pressures[2])) . "</td></tr>")
+				html .= ("<tr><td class=`"td-wdg`" style=`"text-align: center`">"
+					   . displayValue("Float", convertUnit("Pressure", pressures[3])) . "</td><td class=`"td-wdg`" style=`"text-align: center`">"
+					   . displayValue("Float", convertUnit("Pressure", pressures[4])) . "</td></tr>")
+			}
+			else {
+				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Pressures (cold)") . "</th><td class=`"td-wdg`" style=`"text-align: center`">"
 					   . "-" . "</td><td class=`"td-wdg`" style=`"text-align: center`">"
 					   . "-" . "</td></tr>")
 				html .= ("<tr><td class=`"td-wdg`" style=`"text-align: center`">"

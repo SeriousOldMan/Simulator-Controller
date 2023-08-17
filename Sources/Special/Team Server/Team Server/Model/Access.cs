@@ -116,7 +116,7 @@ namespace TeamServer.Model.Access {
 
         public bool IsValid()
         {
-            return Type != TokenType.Invalid || Until == null || DateTime.Now < Until || DateTime.Now < Used + new TimeSpan(0, 5, 0);
+            return (Type != TokenType.Invalid) && (Until == null || DateTime.Now < Until || DateTime.Now < Used + new TimeSpan(0, 5, 0));
         }
 
         public bool HasAccess(TokenType type)

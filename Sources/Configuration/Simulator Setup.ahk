@@ -130,7 +130,7 @@ class SetupWizard extends ConfiguratorPanel {
 	iStep := 0
 	iPage := 0
 
-	iQuickSetup := false
+	iQuickSetup := true
 
 	iPresets := false
 	iInitialize := false
@@ -359,7 +359,7 @@ class SetupWizard extends ConfiguratorPanel {
 
 	QuickSetup {
 		Get {
-			return this.iQuickSetup
+			return (this.isQuickSetupAvailable() && this.iQuickSetup)
 		}
 
 		Set {
@@ -1253,7 +1253,7 @@ class SetupWizard extends ConfiguratorPanel {
 			}
 			else {
 				this.Control["nextPageButton"].Enabled := true
-				this.Control["lastPageButton"].Enabled := true
+				this.Control["lastPageButton"].Enabled := !this.QuickSetup
 				this.Control["finishButton"].Enabled := false
 			}
 

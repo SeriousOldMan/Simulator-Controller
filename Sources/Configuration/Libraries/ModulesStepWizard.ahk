@@ -406,7 +406,7 @@ class SetupPatch extends NamedPreset {
 		}
 	}
 
-	install(wizard) {
+	install(wizard, edit := true) {
 		local file := this.File
 		local name
 
@@ -419,7 +419,8 @@ class SetupPatch extends NamedPreset {
 			logError(exception)
 		}
 
-		this.edit()
+		if edit
+			this.edit()
 	}
 
 	uninstall(wizard) {

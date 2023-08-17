@@ -442,6 +442,8 @@ class ModulesStepWizard extends StepWizard {
 
 	iAvailablePresetsListView := false
 	iSelectedPresetsListView := false
+	
+	iPresetsPage := false
 
 	Pages {
 		Get {
@@ -526,6 +528,8 @@ class ModulesStepWizard extends StepWizard {
 		updateSelectedModules(*) {
 			this.updateSelectedModules()
 		}
+		
+		this.iPresetsPage := (Ceil(definition.Length / 3) + 1)
 
 		loop definition.Length {
 			window.SetFont("s10 Bold", "Arial")
@@ -605,7 +609,7 @@ class ModulesStepWizard extends StepWizard {
 
 		widget7.document.write(html)
 
-		this.registerWidgets(this.Pages, widget1, widget2, widget3, widget4, widget5, widget6, widget7)
+		this.registerWidgets(this.iPresetsPage, widget1, widget2, widget3, widget4, widget5, widget6, widget7)
 	}
 
 	reset() {
@@ -617,7 +621,7 @@ class ModulesStepWizard extends StepWizard {
 	showPage(page) {
 		super.showPage(page)
 
-		if (page = this.Pages) {
+		if (page = this.iPresetsPage) {
 			this.loadAvailablePresets()
 			this.loadSelectedPresets()
 

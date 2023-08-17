@@ -1551,7 +1551,7 @@ class SetupWizard extends ConfiguratorPanel {
 
 						definition := string2Values(":", string2Values("|", definition)[4])
 
-						this.locateSoftware(software, %definition[1]%.Call(string2Values(";", definition[2])*), false)
+						this.locateSoftware(software, %definition[1]%.Call(string2Values(";", definition[2])*))
 					}
 					catch Any as exception {
 						showProgress({color: "Red", message: translate("Error while installing ") . software . translate("...")})

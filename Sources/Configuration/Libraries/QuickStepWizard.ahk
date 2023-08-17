@@ -128,7 +128,11 @@ class QuickStepWizard extends StepWizard {
 					ExitApp(0)
 		}
 
-		widget1 := window.Add("HTMLViewer", "x" . (x - 10) . " y" . y . " w" . (width + 20) . " h140 W:Grow H:Grow Hidden")
+		updateAssistant(assistant, infix, *) {
+			wizard.selectModule(assistant, window["quick" . infix . "EnabledCheck"].Value)
+		}
+
+		widget1 := window.Add("HTMLViewer", "x" . x . " y" . y . " w" . width . " h100 W:Grow H:Grow Hidden")
 
 		text := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Quick", "Quick.StartHeader." . getLanguage()))
 
@@ -150,7 +154,7 @@ class QuickStepWizard extends StepWizard {
 
 		y += 100
 
-		widget6 := window.Add("HTMLViewer", "x" . (x - 10) . " y" . y . " w" . (width + 20) . " h140 W:Grow H:Grow Hidden")
+		widget6 := window.Add("HTMLViewer", "x" . x . " y" . y . " w" . width . " h100 W:Grow H:Grow Hidden")
 
 		text := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Quick", "Quick.StartFooter." . getLanguage()))
 
@@ -244,6 +248,7 @@ class QuickStepWizard extends StepWizard {
 		}
 
 		widget14 := window.Add("CheckBox", "x" . x . " yp+10 w16 h23 vquickREEnabledCheck Hidden" . (wizard.isModuleSelected("Race Engineer") ? " Checked" : ""))
+		widget14.OnEvent("Click", updateAssistant.Bind("Race Engineer", "RE"))
 		widget15 := window.Add("Text", "xp+16 yp w86 h23 +0x200 Hidden", translate("Race Engineer"))
 		widget16 := window.Add("Edit", "xp+114 yp w96 VquickRENameEdit Hidden", "Jona")
 		widget17 := window.Add("DropDownList", "xp+98 yp w96 VquickRELanguageDropDown Hidden Choose" . enIndex, choices)
@@ -254,6 +259,7 @@ class QuickStepWizard extends StepWizard {
 		setButtonIcon(widget19, kIconsDirectory . "General Settings.ico", 1)
 
 		widget20 := window.Add("CheckBox", "x" . x . " yp+24 w16 h23 vquickRSEnabledCheck Hidden" . (wizard.isModuleSelected("Race Strategist") ? " Checked" : ""))
+		widget20.OnEvent("Click", updateAssistant.Bind("Race Strategist", "RS"))
 		widget21 := window.Add("Text", "xp+16 yp w86 h23 +0x200 Hidden", translate("Race Strategist"))
 		widget22 := window.Add("Edit", "xp+114 yp w96 VquickRSNameEdit Hidden", "Khato")
 		widget23 := window.Add("DropDownList", "xp+98 yp w96 VquickRSLanguageDropDown Hidden Choose" . enIndex, choices)
@@ -264,6 +270,7 @@ class QuickStepWizard extends StepWizard {
 		setButtonIcon(widget25, kIconsDirectory . "General Settings.ico", 1)
 
 		widget26 := window.Add("CheckBox", "x" . x . " yp+24 w16 h23 vquickRSPEnabledCheck Hidden" . (wizard.isModuleSelected("Race Spotter") ? " Checked" : ""))
+		widget26.OnEvent("Click", updateAssistant.Bind("Race Spotter", "RSP"))
 		widget27 := window.Add("Text", "xp+16 yp w86 h23 +0x200 Hidden", translate("Race Spotter"))
 		widget28 := window.Add("Edit", "xp+114 yp w96 VquickRSPNameEdit Hidden", "Elisa")
 		widget29 := window.Add("DropDownList", "xp+98 yp w96 VquickRSPLanguageDropDown Hidden Choose" . enIndex, choices)
@@ -296,7 +303,7 @@ class QuickStepWizard extends StepWizard {
 		local enIndex := 0
 		local code, language, uiLanguage, startWithWindows, silentMode
 
-		super.showPage(page)
+		static installed := false
 
 		wizard.getGeneralConfiguration(&uiLanguage, &startWithWindows, &silentMode)
 
@@ -321,6 +328,14 @@ class QuickStepWizard extends StepWizard {
 
 			this.SetupWizard.QuickSetup := false
 		}
+
+		super.showPage(page)
+
+		if ((page = 2) && !installed) {
+			wizard.installSoftware()
+
+			installed := true
+		}
 	}
 
 	hidePage(page) {
@@ -334,15 +349,27 @@ class QuickStepWizard extends StepWizard {
 	}
 
 	updateState() {
+		local wizard := this.SetupWizard
+		local infix, assistant, enabled
+
 		super.updateState()
 
-		if this.SetupWizard.QuickSetup {
+		if wizard.QuickSetup {
 			this.Control["quickSetupButton"].Value := (kResourcesDirectory . "Setup\Images\Quick Setup.ico")
 			this.Control["customSetupButton"].Value := (kResourcesDirectory . "Setup\Images\Full Setup Gray.ico")
 		}
 		else {
 			this.Control["quickSetupButton"].Value := (kResourcesDirectory . "Setup\Images\Quick Setup Gray.ico")
 			this.Control["customSetupButton"].Value := (kResourcesDirectory . "Setup\Images\Full Setup.ico")
+		}
+
+		for infix, assistant in {RE: "Race Engineer", RS: "Race Strategist", RSP: "Race Spotter"}.OwnProps() {
+			enabled := wizard.isModuleSelected(assistant)
+
+			this.Control["quick" . infix . "EnabledCheck"].Value := (enabled != false)
+			this.Control["quick" . infix . "LanguageDropDown"].Enabled := enabled
+			this.Control["quick" . infix . "VoiceDropDown"].Enabled := enabled
+			this.Control["quick" . infix . "NameEdit"].Enabled := enabled
 		}
 	}
 
@@ -520,6 +547,8 @@ class QuickStepWizard extends StepWizard {
 		wizard.selectModule("Race Engineer", true, false)
 		wizard.selectModule("Race Strategist", true, false)
 		wizard.selectModule("Race Spotter", true, false)
+
+		wizard.updateState()
 	}
 
 	assistantSetup(assistant) {
@@ -532,12 +561,14 @@ class QuickStepWizard extends StepWizard {
 		else
 			infix := "RSP"
 
-		return {Language: this.getLanguage(assistant), Speed: this.getSpeed(assistant)
+		return {Enabled: (this.Control["quick" . infix . "EnabledCheck"].Value != 0)
+			  , Language: this.getLanguage(assistant), Speed: this.getSpeed(assistant)
 			  , Name: this.Control["quick" . infix . "NameEdit"].Text
 			  , Voice: this.Control["quick" . infix . "VoiceDropDown"].Text}
 	}
 
 	finishSetup() {
+		local wizard := this.SetupWizard
 		local voiceConfiguration := readMultiMap(kResourcesDirectory . "Setup\Presets\Voice Control Configuration.ini")
 		local patch := substituteVariables(FileRead(kResourcesDirectory . "Setup\Presets\Configuration Patch.template")
 										 , {engineerLanguage: this.assistantSetup("Race Engineer").Language
@@ -555,18 +586,21 @@ class QuickStepWizard extends StepWizard {
 		local voicePreset := SilentSetupPatch("SpecialSpeakerConfiguration", kResourcesDirectory . "Setup\Presets\Configuration Patch.ini")
 		local pushToTalkPreset := P2TConfiguration("PushToTalkConfiguration", kResourcesDirectory . "Setup\Presets\P2T Configuration.ini")
 		local languageCode := "en"
-		local code, language
+		local code, language, ignore, assistant
 
-		this.SetupWizard.uninstallPreset(voicePreset)
-		this.SetupWizard.installPreset(voicePreset)
+		wizard.uninstallPreset(voicePreset)
+		wizard.installPreset(voicePreset)
 
 		deleteFile(kUserHomeDirectory . "Setup\Configuration Patch.ini", true)
 
 		FileAppend(patch, kUserHomeDirectory . "Setup\Configuration Patch.ini")
 
-		this.SetupWizard.uninstallPreset(pushToTalkPreset)
+		wizard.uninstallPreset(pushToTalkPreset)
 		if (this.Control["quickPushToTalkMethodDropDown"].Value = 2)
-			this.SetupWizard.installPreset(pushToTalkPreset)
+			wizard.installPreset(pushToTalkPreset)
+
+		for ignore, assistant in ["Race Engineer", "Race Strategist", "Race Spotter"]
+			wizard.selectModule(assistant, this.assistantSetup(assistant).Enabled, false)
 
 		setMultiMapValue(voiceConfiguration, "Voice Control", "Language", getLanguage())
 		setMultiMapValue(voiceConfiguration, "Voice Control", "PushToTalk", this.Control["quickPushToTalkEdit"].Text)
@@ -584,7 +618,9 @@ class QuickStepWizard extends StepWizard {
 				break
 			}
 
-		this.SetupWizard.setGeneralConfiguration(languageCode, true, false)
+		wizard.setGeneralConfiguration(languageCode, true, false)
+
+		wizard.updateState()
 	}
 }
 

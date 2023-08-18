@@ -17,12 +17,6 @@
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class SilentSetupPatch extends SetupPatch {
-	install(wizard) {
-		super.install(wizard, false)
-	}
-}
-
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; QuickStepWizard                                                         ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -132,7 +126,7 @@ class QuickStepWizard extends StepWizard {
 			wizard.selectModule(assistant, window["quick" . infix . "EnabledCheck"].Value)
 		}
 
-		widget1 := window.Add("HTMLViewer", "x" . x . " y" . y . " w" . width . " h100 W:Grow H:Grow Hidden")
+		widget1 := window.Add("HTMLViewer", "x" . x . " y" . y . " w" . width . " h100 W:Grow Hidden")
 
 		text := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Quick", "Quick.StartHeader." . getLanguage()))
 
@@ -154,7 +148,7 @@ class QuickStepWizard extends StepWizard {
 
 		y += 100
 
-		widget6 := window.Add("HTMLViewer", "x" . x . " y" . y . " w" . width . " h100 W:Grow H:Grow Hidden")
+		widget6 := window.Add("HTMLViewer", "x" . x . " y" . y . " w" . width . " h100 W:Grow Hidden")
 
 		text := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Quick", "Quick.StartFooter." . getLanguage()))
 
@@ -247,7 +241,11 @@ class QuickStepWizard extends StepWizard {
 			}
 		}
 
-		widget14 := window.Add("CheckBox", "x" . x . " yp+10 w16 h23 vquickREEnabledCheck Hidden" . (wizard.isModuleSelected("Race Engineer") ? " Checked" : ""))
+		widget38 := window.Add("Text", "x" . (x + 16 + 114) . " yp+10 w96 h23 +0x200 Hidden", translate("Name"))
+		widget39 := window.Add("Text", "xp+98 yp w96 h23 +0x200 Hidden", translate("Language"))
+		widget40 := window.Add("Text", "xp+98 yp w96 h23 +0x200 Hidden", translate("Voice"))
+
+		widget14 := window.Add("CheckBox", "x" . x . " yp+24 w16 h23 vquickREEnabledCheck Hidden" . (wizard.isModuleSelected("Race Engineer") ? " Checked" : ""))
 		widget14.OnEvent("Click", updateAssistant.Bind("Race Engineer", "RE"))
 		widget15 := window.Add("Text", "xp+16 yp w86 h23 +0x200 Hidden", translate("Race Engineer"))
 		widget16 := window.Add("Edit", "xp+114 yp w96 VquickRENameEdit Hidden", "Jona")
@@ -280,7 +278,7 @@ class QuickStepWizard extends StepWizard {
 		widget31.OnEvent("Click", (*) => Run("explorer.exe ms-settings:speech"))
 		setButtonIcon(widget31, kIconsDirectory . "General Settings.ico", 1)
 
-		widget36 := window.Add("HTMLViewer", "x" . (x - 10) . " yp+30 w" . (width + 20) . " h100 W:Grow Hidden")
+		widget36 := window.Add("HTMLViewer", "x" . (x - 10) . " yp+30 w" . (width + 20) . " h95 W:Grow Hidden")
 
 		text := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Quick", "Quick.FinishFooter." . getLanguage()))
 
@@ -290,10 +288,11 @@ class QuickStepWizard extends StepWizard {
 
 		widget36.document.write(html)
 
-		widget37 := window.Add("Button", "x" . (x + Round((width / 2) - 45)) . " yp+100 w90 h23 X:Move(0.5) Hidden", translate("Finish"))
+		widget37 := window.Add("Button", "x" . (x + Round((width / 2) - 45)) . " yp+96 w90 h60 X:Move(0.5) Hidden")
+		setButtonIcon(widget37, kResourcesDirectory . "\Setup\Images\Finish Line.png", 1, "w80 h53")
 		widget37.OnEvent("Click", finishSetup)
 
-		loop 37
+		loop 40
 			this.registerWidget(2, widget%A_Index%)
 	}
 
@@ -301,37 +300,46 @@ class QuickStepWizard extends StepWizard {
 		local wizard := this.SetupWizard
 		local chosen := 0
 		local enIndex := 0
-		local code, language, uiLanguage, startWithWindows, silentMode
+		local code, language, uiLanguage, startWithWindows, silentMode, ignore, preset
 
 		static installed := false
 
-		wizard.getGeneralConfiguration(&uiLanguage, &startWithWindows, &silentMode)
-
-		for code, language in availableLanguages() {
-			if (code = uiLanguage)
-				chosen := A_Index
-			else if (code = "en")
-				enIndex := A_Index
-		}
-
-		if (chosen == 0)
-			chosen := enIndex
-
-		this.Control["quickUILanguageDropDown"].Choose(chosen)
-
 		if (page = 2) {
-			this.startSetup()
+			wizard.getGeneralConfiguration(&uiLanguage, &startWithWindows, &silentMode)
 
-			this.loadSimulators()
+			for code, language in availableLanguages() {
+				if (code = uiLanguage)
+					chosen := A_Index
+				else if (code = "en")
+					enIndex := A_Index
+			}
 
-			this.loadVoices()
+			if (chosen == 0)
+				chosen := enIndex
+
+			this.Control["quickUILanguageDropDown"].Choose(chosen)
+
+			this.Control["quickPushToTalkEdit"].Text := getMultiMapValue(readMultiMap(kUserHomeDirectory . "Setup\Voice Control Configuration.ini")
+																	   , "Voice Control", "PushToTalk", "")
+
+
+			this.Control["quickPushToTalkMethodDropDown"].Value := 1
+
+			for ignore, preset in wizard.loadPresets()
+				if isInstance(preset, P2TConfiguration) {
+					this.Control["quickPushToTalkMethodDropDown"].Value := 2
+
+					break
+				}
+
+			this.loadSetup()
 
 			this.SetupWizard.QuickSetup := false
 		}
 
 		super.showPage(page)
 
-		if ((page = 2) && !installed) {
+		if ((page = 2) && !installed && !isDevelopment()) {
 			wizard.installSoftware()
 
 			installed := true
@@ -373,11 +381,48 @@ class QuickStepWizard extends StepWizard {
 		}
 	}
 
-	getLanguage(assistant) {
+	assistantEnabled(assistant, editor := true) {
+		local infix
+
+		if editor {
+			if (assistant = "Race Engineer")
+				infix := "RE"
+			else if (assistant = "Race Strategist")
+				infix := "RS"
+			else
+				infix := "RSP"
+
+			return (this.Control["quick" . infix . "EnabledCheck"].Value != 0)
+		}
+		else
+			return this.SetupWizard.isModuleSelected(assistant)
+	}
+
+	assistantName(assistant, editor := true) {
+		local infix, name
+
+		if (assistant = "Race Engineer") {
+			infix := "RE"
+			name := "Jona"
+		}
+		else if (assistant = "Race Strategist") {
+			infix := "RS"
+			name := "Khato"
+		}
+		else {
+			infix := "RSP"
+			name := "Elisa"
+		}
+
+		if editor
+			return this.Control["quick" . infix . "NameEdit"].Text
+		else
+			return this.SetupWizard.getModuleValue(assistant, "Name", name)
+	}
+
+	assistantLanguage(assistant, editor := true) {
 		local languageCode := "en"
-		local languages := availableLanguages()
-		local found := false
-		local code, language, ignore, grammarFile, grammarLanguageCode, infix, voiceLanguage
+		local languages, found, code, language, ignore, grammarFile, grammarLanguageCode, infix, voiceLanguage
 
 		if (assistant = "Race Engineer")
 			infix := "RE"
@@ -386,41 +431,114 @@ class QuickStepWizard extends StepWizard {
 		else
 			infix := "RSP"
 
-		voiceLanguage := this.Control["quick" . infix . "LanguageDropDown"].Text
+		if editor {
+			languages := availableLanguages()
+			found := false
+			voiceLanguage := this.Control["quick" . infix . "LanguageDropDown"].Text
 
-		for code, language in availableLanguages()
-			if (language = voiceLanguage) {
-				found := true
-
-				languageCode := code
-			}
-
-		if !found
-			for ignore, grammarFile in getFileNames("Race Engineer.grammars.*", kUserGrammarsDirectory, kGrammarsDirectory) {
-				SplitPath(grammarFile, , , &grammarLanguageCode)
-
-				if languages.Has(grammarLanguageCode)
-					language := languages[grammarLanguageCode]
-				else
-					language := grammarLanguageCode
-
+			for code, language in availableLanguages()
 				if (language = voiceLanguage) {
-					languageCode := grammarLanguageCode
+					found := true
 
-					break
+					languageCode := code
 				}
-			}
+
+			if !found
+				for ignore, grammarFile in getFileNames("Race Engineer.grammars.*", kUserGrammarsDirectory, kGrammarsDirectory) {
+					SplitPath(grammarFile, , , &grammarLanguageCode)
+
+					if languages.Has(grammarLanguageCode)
+						language := languages[grammarLanguageCode]
+					else
+						language := grammarLanguageCode
+
+					if (language = voiceLanguage) {
+						languageCode := grammarLanguageCode
+
+						break
+					}
+				}
+		}
+		else
+			languageCode := this.SetupWizard.getModuleValue(assistant, "Language", getLanguage())
 
 		return languageCode
 	}
 
-	getSpeed(assistant) {
+	assistantSynthesizer(assistant, editor := true) {
+		return this.SetupWizard.getModuleValue(assistant, "Synthesizer", "dotNET")
+	}
+
+	assistantVoice(assistant, editor := true) {
+		local infix, voice
+
 		if (assistant = "Race Engineer")
-			return 1
+			infix := "RE"
 		else if (assistant = "Race Strategist")
-			return 0
+			infix := "RS"
 		else
-			return 1
+			infix := "RSP"
+
+		voice := this.Control["quick" . infix . "VoiceDropDown"].Text
+
+		if (voice = translate("Deactivated"))
+			voice := false
+		else if (voice = translate("Random"))
+			voice := true
+		else if (!voice || (voice = ""))
+			voice := true
+
+		if editor
+			return voice
+		else
+			return this.SetupWizard.getModuleValue(assistant, "Voice", voice)
+	}
+
+	assistantVolume(assistant, editor := true) {
+		return this.SetupWizard.getModuleValue(assistant, "Volume", "*")
+	}
+
+	assistantPitch(assistant, editor := true) {
+		return this.SetupWizard.getModuleValue(assistant, "Pitch", "*")
+	}
+
+	assistantSpeed(assistant, editor := true) {
+		local speed
+
+		if ((assistant = "Race Engineer") || (assistant = "Race Spotter"))
+			speed := 1
+		else
+			speed := "*"
+
+		return this.SetupWizard.getModuleValue(assistant, "Speed", speed)
+	}
+
+	assistantSetup(assistant, editor := true) {
+		return {Enabled: this.assistantEnabled(assistant, editor), Name: this.assistantName(assistant, editor)
+			  , Language: this.assistantLanguage(assistant, editor), Synthesizer: this.assistantSynthesizer(assistant, editor)
+			  , Voice: this.assistantVoice(assistant, editor)
+			  , Volume: this.assistantVolume(assistant), Pitch: this.assistantPitch(assistant), Speed: this.assistantSpeed(assistant)}
+	}
+
+	loadSetup() {
+		local wizard := this.SetupWizard
+		local ignore, module
+
+		if (wizard.getModuleValue("Race Engineer", "Name", kUndefined) == kUndefined) {
+			for ignore, module in wizard.Steps["Modules"].Definition
+				wizard.selectModule(module, false, false)
+
+			wizard.selectModule("Voice Control", true, false)
+			wizard.selectModule("Race Engineer", true, false)
+			wizard.selectModule("Race Strategist", true, false)
+			wizard.selectModule("Race Spotter", true, false)
+
+			wizard.updateState()
+		}
+
+		this.loadSimulators()
+
+		this.loadAssistants()
 	}
 
 	locateSimulator(name, fileName) {
@@ -435,12 +553,12 @@ class QuickStepWizard extends StepWizard {
 		this.loadSimulators()
 	}
 
-	loadVoices(assistant := false) {
+	loadVoices(assistant := false, editor := true) {
 		local assistants := (assistant ? [assistant] : ["Race Engineer", "Race Strategist", "Race Spotter"])
-		local voices, language, ignore, dropDown
+		local voices, language, ignore, dropDown, index
 
 		for ignore, assistant in assistants {
-			language := this.getLanguage(assistant)
+			language := this.assistantLanguage(assistant, editor)
 
 			voices := SpeechSynthesizer("dotNET", true, language).Voices[language]
 
@@ -452,8 +570,14 @@ class QuickStepWizard extends StepWizard {
 				dropDown := this.Control["quickRSPVoiceDropDown"]
 
 			dropDown.Delete()
-			dropDown.Add(voices)
-			dropDown.Choose((voices.Length > 0) ? 1 : 0)
+			dropDown.Add((voices.Length > 0) ? concatenate(collect(["Deactivated", "Random"], translate), voices) : [translate("Deactivated")])
+			dropDown.Choose((voices.Length > 0) ? 2 : 1)
+
+			if (!editor && (voices.Length > 1)) {
+				voice := this.SetupWizard.getModuleValue(assistant, "Voice", true)
+
+				dropDown.Choose(voice ? (inList(voices, voice) + 2) : 1)
+			}
 		}
 	}
 
@@ -507,6 +631,34 @@ class QuickStepWizard extends StepWizard {
 		}
 	}
 
+	loadAssistants() {
+		local languages := []
+		local key, assistant, assistantLanguage, code, language, ignore, grammarFile
+
+		for code, language in languages
+			languages.Push(code)
+
+		for ignore, grammarFile in concatenate(getFileNames("Race Engineer.grammars.*", kUserGrammarsDirectory, kGrammarsDirectory)
+											 , getFileNames("Race Strategist.grammars.*", kUserGrammarsDirectory, kGrammarsDirectory)
+											 , getFileNames("Race Spotter.grammars.*", kUserGrammarsDirectory, kGrammarsDirectory)) {
+			SplitPath(grammarFile, , , &code)
+
+			if !languages.Has(code)
+				languages.Push(code)
+		}
+
+		for key, assistant in {RE: "Race Engineer", RS: "Race Strategist", RSP: "Race Spotter"}.OwnProps() {
+			this.Control["quick" . key . "EnabledCheck"].Value := (this.assistantEnabled(assistant, false) != false)
+			this.Control["quick" . key . "NameEdit"].Text := this.assistantName(assistant, false)
+
+			assistantLanguage := inList(languages, this.assistantLanguage(assistant, false))
+
+			this.Control["quick" . key . "LanguageDropDown"].Choose(assistantLanguage ? assistantLanguage : 1)
+
+			this.loadVoices(assistant, false)
+		}
+	}
+
 	updateSelectedSimulators() {
 		local wizard := this.SetupWizard
 		local listView := this.iSimulatorsListView
@@ -536,75 +688,30 @@ class QuickStepWizard extends StepWizard {
 		}
 	}
 
-	startSetup() {
-		local wizard := this.SetupWizard
-		local ignore, module
-
-		for ignore, module in wizard.Steps["Modules"].Definition
-			wizard.selectModule(module, false, false)
-
-		wizard.selectModule("Voice Control", true, false)
-		wizard.selectModule("Race Engineer", true, false)
-		wizard.selectModule("Race Strategist", true, false)
-		wizard.selectModule("Race Spotter", true, false)
-
-		wizard.updateState()
-	}
-
-	assistantSetup(assistant) {
-		local infix
-
-		if (assistant = "Race Engineer")
-			infix := "RE"
-		else if (assistant = "Race Strategist")
-			infix := "RS"
-		else
-			infix := "RSP"
-
-		return {Enabled: (this.Control["quick" . infix . "EnabledCheck"].Value != 0)
-			  , Language: this.getLanguage(assistant), Speed: this.getSpeed(assistant)
-			  , Name: this.Control["quick" . infix . "NameEdit"].Text
-			  , Voice: this.Control["quick" . infix . "VoiceDropDown"].Text}
-	}
-
 	finishSetup() {
 		local wizard := this.SetupWizard
-		local voiceConfiguration := readMultiMap(kResourcesDirectory . "Setup\Presets\Voice Control Configuration.ini")
-		local patch := substituteVariables(FileRead(kResourcesDirectory . "Setup\Presets\Configuration Patch.template")
-										 , {engineerLanguage: this.assistantSetup("Race Engineer").Language
-										  , engineerSpeed: this.assistantSetup("Race Engineer").Speed
-										  , engineerName: this.assistantSetup("Race Engineer").Name
-										  , engineerVoice: this.assistantSetup("Race Engineer").Voice
-										  , strategistLanguage: this.assistantSetup("Race Strategist").Language
-										  , strategistSpeed: this.assistantSetup("Race Strategist").Speed
-										  , strategistName: this.assistantSetup("Race Strategist").Name
-										  , strategistVoice: this.assistantSetup("Race Strategist").Voice
-										  , spotterLanguage: this.assistantSetup("Race Spotter").Language
-										  , spotterSpeed: this.assistantSetup("Race Spotter").Speed
-										  , spotterName: this.assistantSetup("Race Spotter").Name
-										  , spotterVoice: this.assistantSetup("Race Spotter").Voice})
-		local voicePreset := SilentSetupPatch("SpecialSpeakerConfiguration", kResourcesDirectory . "Setup\Presets\Configuration Patch.ini")
+		local voiceConfiguration := readMultiMap(kUserHomeDirectory . "Setup\Voice Control Configuration.ini")
+		local assistantSetups := {RE: this.assistantSetup("Race Engineer")
+								, RS: this.assistantSetup("Race Strategist")
+								, RSP: this.assistantSetup("Race Spotter")}
 		local pushToTalkPreset := P2TConfiguration("PushToTalkConfiguration", kResourcesDirectory . "Setup\Presets\P2T Configuration.ini")
 		local languageCode := "en"
-		local code, language, ignore, assistant
-
-		wizard.uninstallPreset(voicePreset)
-		wizard.installPreset(voicePreset)
-
-		deleteFile(kUserHomeDirectory . "Setup\Configuration Patch.ini", true)
-
-		FileAppend(patch, kUserHomeDirectory . "Setup\Configuration Patch.ini")
+		local code, language, ignore, key, value, assistant
 
 		wizard.uninstallPreset(pushToTalkPreset)
 		if (this.Control["quickPushToTalkMethodDropDown"].Value = 2)
 			wizard.installPreset(pushToTalkPreset)
 
-		for ignore, assistant in ["Race Engineer", "Race Strategist", "Race Spotter"]
-			wizard.selectModule(assistant, this.assistantSetup(assistant).Enabled, false)
+		for key, assistant in {RE: "Race Engineer", RS: "Race Strategist", RSP: "Race Spotter"}.OwnProps() {
+			wizard.selectModule(assistant, assistantSetups.%key%.Enabled, false)
+
+			for ignore, value in ["Name", "Language", "Synthesizer", "Voice", "Volume", "Pitch", "Speed"]
+				wizard.setModuleValue(assistant, value, assistantSetups.%key%.%value%, false)
+		}
 
 		setMultiMapValue(voiceConfiguration, "Voice Control", "Language", getLanguage())
 		setMultiMapValue(voiceConfiguration, "Voice Control", "PushToTalk", this.Control["quickPushToTalkEdit"].Text)
-		setMultiMapValue(voiceConfiguration, "Voice Control", "Synthesizer", "dotNet")
+		setMultiMapValue(voiceConfiguration, "Voice Control", "Synthesizer", "dotNET")
 		setMultiMapValue(voiceConfiguration, "Voice Control", "Speaker", true)
 		setMultiMapValue(voiceConfiguration, "Voice Control", "Recognizer", "Desktop")
 		setMultiMapValue(voiceConfiguration, "Voice Control", "Listener", true)

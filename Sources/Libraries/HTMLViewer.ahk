@@ -2044,9 +2044,8 @@ class WebView2Viewer extends HTMLViewer {
 	Write(html, force := false) {
 		if (force || (html != this.iHTML)) {
 			if this.WebView2 {
-				deleteFile(this.iHTMLFile)
-
-				FileAppend(html, this.iHTMLFile, "UTF-8")
+				if deleteFile(this.iHTMLFile)
+					FileAppend(html, this.iHTMLFile, "UTF-8")
 
 				this.WebView2.CoreWebView2.Navigate(this.iHTMLFile)
 				this.WebView2.CoreWebView2.Resume()

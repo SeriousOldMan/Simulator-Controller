@@ -85,7 +85,7 @@ class Preset {
 		throw "Virtual method Preset.getArguments must be implemented in a subclass..."
 	}
 
-	install(wizard) {
+	install(wizard, edit := true) {
 	}
 
 	uninstall(wizard) {
@@ -1262,11 +1262,11 @@ class SetupWizard extends ConfiguratorPanel {
 		}
 	}
 
-	installPreset(preset) {
+	installPreset(preset, edit := true) {
 		local knowledgeBase := this.KnowledgeBase
 		local count
 
-		preset.install(this)
+		preset.install(this, edit)
 
 		count := (knowledgeBase.getValue("Preset.Count", 0) + 1)
 

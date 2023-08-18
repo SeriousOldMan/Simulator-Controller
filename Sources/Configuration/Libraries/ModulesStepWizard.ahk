@@ -175,7 +175,7 @@ class DefaultButtonBox extends NamedPreset {
 		return concatenate(super.getArguments(), Array(this.File))
 	}
 
-	install(wizard) {
+	install(wizard, edit := true) {
 		local file := this.iFile
 		local config, section, values, key, value
 
@@ -218,7 +218,7 @@ class DefaultStreamDeck extends NamedPreset {
 		return concatenate(super.getArguments(), Array(this.File))
 	}
 
-	install(wizard) {
+	install(wizard, edit := true) {
 		local file := this.iFile
 		local config, section, values, key, value
 
@@ -272,7 +272,7 @@ class FilesPreset extends NamedPreset {
 		return concatenate(super.getArguments(), this.Files)
 	}
 
-	install(wizard) {
+	install(wizard, edit := true) {
 		local directory := this.Directory
 		local ignore, file
 
@@ -332,7 +332,7 @@ class PitstopImages extends NamedPreset {
 		return concatenate(super.getArguments(), Array(this.Directory))
 	}
 
-	install(wizard) {
+	install(wizard, edit := true) {
 		local directory := this.Directory
 		local name
 
@@ -442,7 +442,7 @@ class ModulesStepWizard extends StepWizard {
 
 	iAvailablePresetsListView := false
 	iSelectedPresetsListView := false
-	
+
 	iPresetsPage := false
 
 	Pages {
@@ -528,7 +528,7 @@ class ModulesStepWizard extends StepWizard {
 		updateSelectedModules(*) {
 			this.updateSelectedModules()
 		}
-		
+
 		this.iPresetsPage := (Ceil(definition.Length / 3) + 1)
 
 		loop definition.Length {

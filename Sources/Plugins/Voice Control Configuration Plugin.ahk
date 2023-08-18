@@ -238,7 +238,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		this.iTopWidgets := [[widget1, widget2], [widget3, widget4]]
 
-		voices := [translate("Automatic"), translate("Deactivated")]
+		voices := [translate("Random"), translate("Deactivated")]
 
 		widget5 := window.Add("Text", "x" . x . " ys+24 w110 h23 +0x200 VwindowsSpeakerLabel Hidden", translate("Voice"))
 		widget6 := window.Add("DropDownList", "x" . x1 . " yp w" . w1 . " W:Grow VwindowsSpeakerDropDown Hidden", voices)
@@ -317,7 +317,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		widget29 := window.Add("Edit", "x" . x1 . " yp w" . w1 . " h21 W:Grow VazureTokenIssuerEdit Hidden")
 		widget29.OnEvent("Change", updateAzureVoices)
 
-		voices := [translate("Automatic"), translate("Deactivated")]
+		voices := [translate("Random"), translate("Deactivated")]
 
 		widget30 := window.Add("Text", "x" . x . " yp+24 w110 h23 +0x200 VazureSpeakerLabel Hidden", translate("Voice"))
 		widget31 := window.Add("DropDownList", "x" . x1 . " yp w" . w1 . " W:Grow VazureSpeakerDropDown Hidden", voices)
@@ -390,12 +390,12 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 			if this.Configuration {
 				if (this.Value["windowsSpeaker"] == true)
-					this.Value["windowsSpeaker"] := translate("Automatic")
+					this.Value["windowsSpeaker"] := translate("Random")
 				else if (this.Value["windowsSpeaker"] == false)
 					this.Value["windowsSpeaker"] := translate("Deactivated")
 
 				if (this.Value["azureSpeaker"] == true)
-					this.Value["azureSpeaker"] := translate("Automatic")
+					this.Value["azureSpeaker"] := translate("Random")
 				else if (this.Value["azureSpeaker"] == false)
 					this.Value["azureSpeaker"] := translate("Deactivated")
 
@@ -423,12 +423,12 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		setMultiMapValue(configuration, "Voice Control", "Language", this.getCurrentLanguage())
 
-		if (windowsSpeaker = translate("Automatic"))
+		if (windowsSpeaker = translate("Random"))
 			windowsSpeaker := true
 		else if ((windowsSpeaker = translate("Deactivated")) || (windowsSpeaker = A_Space))
 			windowsSpeaker := false
 
-		if (azureSpeaker = translate("Automatic"))
+		if (azureSpeaker = translate("Random"))
 			azureSpeaker := true
 		else if ((azureSpeaker = translate("Deactivated")) || (azureSpeaker = A_Space))
 			azureSpeaker := false
@@ -861,7 +861,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		local voices := SpeechSynthesizer(synthesizer, true, language).Voices[language].Clone()
 
 		voices.InsertAt(1, translate("Deactivated"))
-		voices.InsertAt(1, translate("Automatic"))
+		voices.InsertAt(1, translate("Random"))
 
 		return voices
 	}
@@ -940,7 +940,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		}
 
 		voices.InsertAt(1, translate("Deactivated"))
-		voices.InsertAt(1, translate("Automatic"))
+		voices.InsertAt(1, translate("Random"))
 
 		chosen := inList(voices, azureSpeaker)
 

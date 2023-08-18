@@ -847,11 +847,12 @@ class Plugin extends ConfigurationItem {
 		local ignore, argument
 		local result := CaseInsenseMap()
 
-		for ignore, argument in string2Values(";", arguments) {
-			argument := string2Values(":", argument, 2)
+		for ignore, argument in string2Values(";", arguments)
+			if (Trim(argument) != "") {
+				argument := string2Values(":", argument, 2)
 
-			result[argument[1]] := ((argument.Length == 1) ? "" : argument[2])
-		}
+				result[argument[1]] := ((argument.Length == 1) ? "" : argument[2])
+			}
 
 		return result
 	}

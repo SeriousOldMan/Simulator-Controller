@@ -359,7 +359,7 @@ class SetupWizard extends ConfiguratorPanel {
 
 	QuickSetup {
 		Get {
-			return (this.isQuickSetupAvailable() && this.iQuickSetup)
+			return (this.iQuickSetup && (this.isQuickSetupAvailable() || (this.iQuickSetup = "Force")))
 		}
 
 		Set {
@@ -1326,14 +1326,19 @@ class SetupWizard extends ConfiguratorPanel {
 			class := knowledgeBase.getValue("Preset." . A_Index . ".Class")
 			arguments := string2Values("###", knowledgeBase.getValue("Preset." . A_Index . ".Arguments"))
 
-			if InStr(class, ".") {
-				class := StrSplit(class, ".")
-				outerClass := class[1]
+			try {
+				if InStr(class, ".") {
+					class := StrSplit(class, ".")
+					outerClass := class[1]
 
-				presets.Push(%outerClass%[class[2]](arguments*))
+					presets.Push(%outerClass%[class[2]](arguments*))
+				}
+				else
+					presets.Push(%class%(arguments*))
 			}
-			else
-				presets.Push(%class%(arguments*))
+			catch Any as exception {
+				logError(exception)
+			}
 		}
 
 		return presets

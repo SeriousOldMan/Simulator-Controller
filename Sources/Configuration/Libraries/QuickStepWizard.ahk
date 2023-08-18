@@ -26,15 +26,8 @@ class QuickStepWizard extends StepWizard {
 
 	Pages {
 		Get {
-			if this.SetupWizard.isQuickSetupAvailable()
-				return (1 + (this.SetupWizard.QuickSetup ? 1 : 0))
-			else
-				return 0
+			return (1 + (this.SetupWizard.QuickSetup ? 1 : 0))
 		}
-	}
-
-	saveToConfiguration(configuration) {
-
 	}
 
 	createGui(wizard, x, y, width, height) {
@@ -103,7 +96,14 @@ class QuickStepWizard extends StepWizard {
 		}
 
 		chooseMethod(method, *) {
-			wizard.QuickSetup := (method = "Quick")
+			if (method = "Quick") {
+				if (wizard.isQuickSetupAvailable() || GetKeyState("Ctrl", "P"))
+					wizard.QuickSetup := (GetKeyState("Ctrl", "P") ? "Force" : true)
+				else
+					wizard.QuickSetup := false
+			}
+			else
+				wizard.QuickSetup := false
 
 			wizard.updateState()
 		}

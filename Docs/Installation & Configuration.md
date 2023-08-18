@@ -74,7 +74,7 @@ Several components of Simulator Controller are based on low level language runti
   
   [.NET Framework 4.8](https://dotnet.microsoft.com/en-us/download/dotnet-framework/net48)
   
-For your convience, you can find these installers also in the *Utilities\3rd Party\Windows Runtimes* folder.
+For your convience, you can find these installers also in the *Utilities\3rd Party\Windows Runtimes* folder. These runtimes will be automatically installed by the quick setup method of "Simulator Setup".
 
 ## Installing additional components
 
@@ -638,7 +638,11 @@ The configuration file for Stream Deck controller is to some extent similar to t
 	Stream Deck Mini.Button.11.Label=Select\nMode
 	Stream Deck Mini.Button.11.Mode=IconAndLabel
 
-To connect your Stream Deck(s) with Simulator Controller, you must install the special Stream Deck plugin, which is supplied in the *Utilities\Plugins* folder, which is located in the installation directory of Simulator Controller. Copy the complete folder *de.thebigo.simulatorcontroller.sdplugin* to *%appdata%\Elgato\StreamDeck\Plugins* and restart the Stream Deck software. Then create a profile using the special action *Controller Function* supplied by this Stream Deck plugin. It is important that you leave the title of the action blank and set the *Function* to the desired controller function, for example "Buttton.1".
+To connect your Stream Deck(s) with Simulator Controller, you must install the special Stream Deck plugin, which is supplied in the *Utilities\Plugins* folder, which is located in the installation directory of Simulator Controller. Copy the complete folder *de.thebigo.simulatorcontroller.sdplugin* to *%appdata%\Elgato\StreamDeck\Plugins* and restart the Stream Deck software.
+
+Important: If you have used the quick setup method of "Simulator Setup", the plugin might already have been installed.
+
+After you have installed and activated the plugin, create a profile using the special action *Controller Function* supplied by this Stream Deck plugin. It is important that you leave the title of the action blank and set the *Function* to the desired controller function, for example "Buttton.1".
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Stream%20Deck%20Action.JPG)
 

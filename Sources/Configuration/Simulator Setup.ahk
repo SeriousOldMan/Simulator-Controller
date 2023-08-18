@@ -1568,7 +1568,44 @@ class SetupWizard extends ConfiguratorPanel {
 		}
 
 		installPlugins() {
-			Sleep(1000)
+			local path, directory
+
+			if FileExist(A_AppData . "\Elgato\StreamDeck\Plugins") {
+				showProgress({progress: progressCount++, color: "Green", message: translate("Installing ") . "Stream Deck Plugin" . translate("...")})
+
+				DirCopy(kResourcesDirectory . "Setup\Plugins\de.thebigo.simulatorcontroller.sdPlugin"
+					  , A_AppData . "\Elgato\StreamDeck\Plugins", 1)
+			}
+
+			this.locateSoftware("Assetto Corsa")
+
+			path := this.softwarePath("Assetto Corsa")
+
+			if path {
+				SplitPath(path, , &directory)
+
+				if FileExist(directory . "\apps\python") {
+					showProgress({progress: progressCount++, color: "Green", message: translate("Installing ") . "Assetto Corsa Plugin" . translate("...")})
+
+					DirCopy(kResourcesDirectory . "Setup\Plugins\SimlatorController"
+						  , directory . "\apps\python", 1)
+				}
+			}
+
+			this.locateSoftware("rFactor 2")
+
+			path := this.softwarePath("rFactor 2")
+
+			if path {
+				SplitPath(path, , &directory)
+
+				if FileExist(directory . "\Plugins") {
+					showProgress({progress: progressCount++, color: "Green", message: translate("Installing ") . "rFactor 2 Plugin" . translate("...")})
+
+					FileCopy(kResourcesDirectory . "Setup\Plugins\rFactor2SharedMemoryMapPlugin64.dll"
+						   , directory . "\Plugins", 1)
+				}
+			}
 		}
 
 		this.Window.block()

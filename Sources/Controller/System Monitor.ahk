@@ -69,13 +69,15 @@ updateDashboard(window, viewer, html := "") {
 	local script, ignore, chart
 
 	if (html == false)
-		html := ""
+		html := " "
 
 	html := ("<html><meta charset='utf-8'><body style='background-color: #" . window.BackColor . "; overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 10px }</style><style> #header { font-size: 12px; } td {vertical-align: top } </style><div>" . html . "</div></body></html>")
 
 	viewer.document.open()
 	viewer.document.write(html)
 	viewer.document.close()
+
+	Sleep(100)
 }
 
 getTableCSS(window) {

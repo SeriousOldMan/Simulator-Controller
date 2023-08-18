@@ -2028,7 +2028,7 @@ class WebView2Viewer extends HTMLViewer {
 				this.iWebView2 := WebView2.create(this.Control.Hwnd)
 
 			if this.iHTML
-				this.Write(this.iHTML, true)
+				this.Write(StrReplace(this.iHTML, "<div></div>", ""), true)
 		}
 	}
 
@@ -2042,10 +2042,29 @@ class WebView2Viewer extends HTMLViewer {
 	}
 
 	Write(html, force := false) {
+		local file
+
 		if (force || (html != this.iHTML)) {
 			if this.WebView2 {
-				if deleteFile(this.iHTMLFile)
+				if !FileExist(this.iHTMLFile)
 					FileAppend(html, this.iHTMLFile, "UTF-8")
+				else
+					loop
+						try {
+							file := FileOpen(this.iHTMLFile, "w-rwd", "UTF-8")
+
+							file.Length := 0
+							file.Write(html)
+
+							file.Close()
+
+							break
+						}
+						catch Any as exception {
+							logError(exception)
+
+							Sleep(100)
+						}
 
 				this.WebView2.CoreWebView2.Navigate(this.iHTMLFile)
 				this.WebView2.CoreWebView2.Resume()
@@ -2170,6 +2189,8 @@ initializeHTMLViewer() {
 	createWebView2Viewer(window, arguments*) {
 		local control := window.Add("Picture", arguments*)
 		local viewer := WebView2Viewer(control)
+
+		viewer.Navigate("about:blank")
 
 		control.HTMLViewer := viewer
 		control.Document := viewer

@@ -132,9 +132,11 @@ class AssistantsStepWizard extends ActionsStepWizard {
 
 					arguments .= ("; raceAssistantSpeaker: " . voice . "; raceAssistantListener: On")
 
-					arguments .= ("; raceAssistantSpeakerVocalics: " . values2String(",", wizard.getModuleValue(assistant, "Volume", "*")
-																						, wizard.getModuleValue(assistant, "Pitch", "*")
-																						, wizard.getModuleValue(assistant, "Speed", "*")))
+					if ((wizard.getModuleValue(assistant, "Volume", "*") != "*") || (wizard.getModuleValue(assistant, "Pitch", "*") != "*")
+																				 || (wizard.getModuleValue(assistant, "Speed", "*") != "*"))
+						arguments .= ("; raceAssistantSpeakerVocalics: " . values2String(",", wizard.getModuleValue(assistant, "Volume", "*")
+																							, wizard.getModuleValue(assistant, "Pitch", "*")
+																							, wizard.getModuleValue(assistant, "Speed", "*")))
 				}
 				else
 					arguments .= "; raceAssistantSpeaker: Off"

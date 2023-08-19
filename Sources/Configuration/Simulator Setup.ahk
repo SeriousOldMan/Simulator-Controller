@@ -895,18 +895,22 @@ class SetupWizard extends ConfiguratorPanel {
 
 			try {
 				if save {
+					configuration := this.getSimulatorConfiguration()
+
 					if FileExist(kUserConfigDirectory . "Simulator Configuration.ini")
 						FileMove(kUserConfigDirectory "Simulator Configuration.ini", kUserConfigDirectory "Simulator Configuration.ini.bak", 1)
 
-					if (FileExist(kUserConfigDirectory . "Simulator Settings.ini") && FileExist(kUserHomeDirectory . "Setup\Simulator Settings.ini"))
-						FileMove(kUserConfigDirectory "Simulator Settings.ini", kUserConfigDirectory "Simulator Settings.ini.bak", 1)
+					if FileExist(kUserConfigDirectory . "Simulator Settings.ini") {
+						settings := readMultiMap(kUserConfigDirectory . "Simulator Settings.ini")
 
-					configuration := this.getSimulatorConfiguration()
-
-					if FileExist(kUserHomeDirectory . "Setup\Simulator Settings.ini")
-						settings := readMultiMap(kUserHomeDirectory . "Setup\Simulator Settings.ini")
+						FileMove(kUserConfigDirectory . "Simulator Settings.ini"
+							   , kUserConfigDirectory . "Simulator Settings.ini.bak", 1)
+					}
 					else
 						settings := newMultiMap()
+
+					if FileExist(kUserHomeDirectory . "Setup\Simulator Settings.ini")
+						addMultiMapValues(settings, readMultiMap(kUserHomeDirectory . "Setup\Simulator Settings.ini"))
 
 					for ignore, file in this.getPatchFiles("Configuration")
 						if FileExist(file)
@@ -1526,7 +1530,7 @@ class SetupWizard extends ConfiguratorPanel {
 		installRuntimes() {
 			local runtime, definition
 
-			for runtime, definition in getMultiMapValues(this.Definition, "Applications.Runtimes")
+			for runtime, definition in getMultiMapValues(this.Definition, "Software.Runtimes")
 				if !this.isSoftwareInstalled(runtime)
 					try {
 						showProgress({progress: progressCount++, color: "Green", message: translate("Installing ") . runtime . translate("...")})
@@ -1568,44 +1572,61 @@ class SetupWizard extends ConfiguratorPanel {
 		}
 
 		installPlugins() {
-			local path, directory
+			local plugin, definition, ignore, target, root, path, skip, source
 
-			if FileExist(A_AppData . "\Elgato\StreamDeck\Plugins") {
-				showProgress({progress: progressCount++, color: "Green", message: translate("Installing ") . "Stream Deck Plugin" . translate("...")})
+			for plugin, definition in getMultiMapValues(this.Definition, "Software.Plugins")
+				if !this.isSoftwareInstalled(plugin)
+					try {
+						definition := string2Values("|", definition)
+						skip := false
+						root := ""
 
-				DirCopy(kResourcesDirectory . "Setup\Plugins\de.thebigo.simulatorcontroller.sdPlugin"
-					  , A_AppData . "\Elgato\StreamDeck\Plugins", 1)
-			}
+						for ignore, target in string2Values(";", definition[3]) {
+							target := string2Values(":", target)
 
-			this.locateSoftware("Assetto Corsa")
+							if (target[1] = "Software") {
+								this.locateSoftware(target[2])
 
-			path := this.softwarePath("Assetto Corsa")
+								root := (this.isSoftwareInstalled(target[2]) && this.softwarePath(target[2]))
 
-			if path {
-				SplitPath(path, , &directory)
+								if root
+									SplitPath(root, , &root)
+								else
+									skip := true
+							}
+							else if (target[1] = "Path")
+								path := target[2]
+						}
 
-				if FileExist(directory . "\apps\python") {
-					showProgress({progress: progressCount++, color: "Green", message: translate("Installing ") . "Assetto Corsa Plugin" . translate("...")})
+						if (!skip && (root = ""))
+							if !FileExist(substituteVariables(path))
+								skip := true
 
-					DirCopy(kResourcesDirectory . "Setup\Plugins\SimlatorController"
-						  , directory . "\apps\python", 1)
-				}
-			}
+						if !skip {
+							showProgress({progress: progressCount++, color: "Green", message: translate("Installing ") . plugin . translate("...")})
 
-			this.locateSoftware("rFactor 2")
+							path := (root . substituteVariables(path))
+							source := string2Values(":", definition[2])
 
-			path := this.softwarePath("rFactor 2")
+							SplitPath(substituteVariables(source[2]), &name)
 
-			if path {
-				SplitPath(path, , &directory)
+							if (source[1] = "Directory")
+								DirCopy(substituteVariables(source[2]), path . "\" . name, 1)
+							else if (source[1] = "File")
+								FileCopy(substituteVariables(source[2]), path, 1)
+							else
+								throw "Unknown plugin source type detected in SetupWizard.installSoftware..."
 
-				if FileExist(directory . "\Plugins") {
-					showProgress({progress: progressCount++, color: "Green", message: translate("Installing ") . "rFactor 2 Plugin" . translate("...")})
+							this.locateSoftware(plugin, path . "\" . name)
+						}
+					}
+					catch Any as exception {
+						showProgress({color: "Red", message: translate("Error while installing ") . plugin . translate("...")})
 
-					FileCopy(kResourcesDirectory . "Setup\Plugins\rFactor2SharedMemoryMapPlugin64.dll"
-						   , directory . "\Plugins", 1)
-				}
-			}
+						Sleep(1000)
+
+						logError(exception, true)
+					}
 		}
 
 		this.Window.block()
@@ -2641,10 +2662,13 @@ class FinishStepWizard extends StepWizard {
 		if this.SetupWizard.Working
 			Task.startTask(ObjBindMethod(this, "openSettingsEditor"), 200)
 		else {
-			if FileExist(kUserHomeDirectory . "Setup\Simulator Settings.ini")
-				settings := readMultiMap(kUserHomeDirectory . "Setup\Simulator Settings.ini")
+			if FileExist(kUserConfigDirectory . "Simulator Settings.ini")
+				settings := readMultiMap(kUserConfigDirectory . "Simulator Settings.ini")
 			else
 				settings := newMultiMap()
+
+			if FileExist(kUserHomeDirectory . "Setup\Simulator Settings.ini")
+				addMultiMapValues(settings, readMultiMap(kUserHomeDirectory . "Setup\Simulator Settings.ini"))
 
 			configuration := this.SetupWizard.getSimulatorConfiguration()
 

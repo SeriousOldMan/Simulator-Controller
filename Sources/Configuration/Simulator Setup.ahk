@@ -75,6 +75,18 @@ global kDebugRules := 2
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class Preset {
+	iActive := true
+
+	Active {
+		Get {
+			return this.iActive
+		}
+
+		Set {
+			return (this.iActive := value)
+		}
+	}
+
 	Name {
 		Get {
 			throw "Virtual property Preset.Name must be implemented in a subclass..."
@@ -921,8 +933,10 @@ class SetupWizard extends ConfiguratorPanel {
 							this.applyPatches(settings, readMultiMap(file))
 
 					for ignore, preset in this.Presets {
-						preset.patchSimulatorConfiguration(this, configuration)
-						preset.patchSimulatorSettings(this, settings)
+						if preset.Active {
+							preset.patchSimulatorConfiguration(this, configuration)
+							preset.patchSimulatorSettings(this, settings)
+						}
 					}
 
 					if (settings.Count > 0)
@@ -955,7 +969,8 @@ class SetupWizard extends ConfiguratorPanel {
 								this.applyPatches(buttonBoxConfiguration, readMultiMap(file))
 
 						for ignore, preset in this.Presets
-							preset.patchButtonBoxConfiguration(this, buttonBoxConfiguration)
+							if preset.Active
+								preset.patchButtonBoxConfiguration(this, buttonBoxConfiguration)
 
 						writeMultiMap(kUserConfigDirectory . "Button Box Configuration.ini", buttonBoxConfiguration)
 
@@ -969,7 +984,8 @@ class SetupWizard extends ConfiguratorPanel {
 								this.applyPatches(streamDeckConfiguration, readMultiMap(file))
 
 						for ignore, preset in this.Presets
-							preset.patchStreamDeckConfiguration(this, streamDeckConfiguration)
+							if preset.Active
+								preset.patchStreamDeckConfiguration(this, streamDeckConfiguration)
 
 						writeMultiMap(kUserConfigDirectory . "Stream Deck Configuration.ini", streamDeckConfiguration)
 					}

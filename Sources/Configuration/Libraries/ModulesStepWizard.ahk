@@ -373,6 +373,33 @@ class TeamServerAlwaysOn extends NamedPreset {
 	}
 }
 
+class ConfigurationPatch extends NamedPreset {
+	edit() {
+		try {
+			Run("notepad " . kUserHomeDirectory . "Setup\Configuration Patch.ini")
+		}
+		catch Any as exception {
+			logError(exception)
+		}
+	}
+
+	install(wizard, edit := true) {
+		try {
+			FileCopy(kResourcesDirectory . "Setup\Presets\Configuration Patch.ini", kUserHomeDirectory . "Setup", 1)
+		}
+		catch Any as exception {
+			logError(exception)
+		}
+
+		if edit
+			this.edit()
+	}
+
+	uninstall(wizard) {
+		deleteFile(kUserHomeDirectory . "Setup\Configuration Patch.ini")
+	}
+}
+
 class SetupPatch extends NamedPreset {
 	iFile := false
 
@@ -424,10 +451,9 @@ class SetupPatch extends NamedPreset {
 	}
 
 	uninstall(wizard) {
-		local file := this.File
 		local name
 
-		SplitPath(file, &name)
+		SplitPath(this.File, &name)
 
 		deleteFile(kUserHomeDirectory . "Setup\" . name)
 	}
@@ -670,12 +696,14 @@ class ModulesStepWizard extends StepWizard {
 				modulePresets := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules." . module . ".Presets", ""))
 
 				for ignore, preset in string2Values("|", modulePresets)
-					this.AvailablePresetsListView.Add("", getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . "." . getLanguage()))
+					if getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . ".Active", true)
+						this.AvailablePresetsListView.Add("", getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . "." . getLanguage()))
 			}
 		}
 
 		for ignore, preset in string2Values("|", substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets", "")))
-			this.AvailablePresetsListView.Add("", getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . "." . getLanguage()))
+			if getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . ".Active", true)
+				this.AvailablePresetsListView.Add("", getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . "." . getLanguage()))
 
 		this.AvailablePresetsListView.ModifyCol()
 		this.AvailablePresetsListView.ModifyCol(1, "AutoHdr")

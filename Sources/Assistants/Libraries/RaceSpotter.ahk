@@ -1733,6 +1733,7 @@ class RaceSpotter extends GridRaceAssistant {
 		local leader := false
 		local focused := false
 		local situation, opponentType, driverPitstops, carPitstops
+		local driverPosition, driverLapTime, slowerCar, carPosition, delta, lapTimeDifference, key
 
 		this.getPositionInfos(&standingsAhead, &standingsBehind, &trackAhead, &trackBehind, &leader, &focused, true)
 
@@ -1884,6 +1885,52 @@ class RaceSpotter extends GridRaceAssistant {
 				speaker.speakPhrase("BehindProblem")
 
 				return true
+			}
+		}
+
+		if (Random(1, 10) < 5) {
+			driverPosition := this.DriverCar.Position["Class"]
+			driverLapTime := this.DriverCar.AvgLapTime
+			slowerCar := false
+
+			for ignore, carInfo in this.OtherCars {
+				carPosition := carInfo.Position["Class"]
+
+				if ((carPosition < driverPosition) && (carInfo.AvgLapTime > driverLapTime))
+					if (!slowerCar || (carPosition < slowerCar.Position["Class"]))
+						slowerCar := carInfo
+			}
+
+			if slowerCar
+				if (standingsAhead && (standingsAhead.Car = slowerCar))
+					slowerCar := false
+				else if (standingsBehind && (standingsBehind.Car = slowerCar))
+					slowerCar := false
+				else if (focused && (focused.Car = slowerCar))
+					slowerCar := false
+
+			if slowerCar {
+				delta := Abs(slowerCar.AvgDelta[false])
+				lapTimeDifference := Abs(driverLapTime - slowerCar.AvgLapTime)
+
+				if ((delta != 0) && (lapTimeDifference != 0)) {
+					key := (slowerCar.Nr . "|" . slowerCar.ID)
+					situation := (this.TacticalAdvices.Has("FasterThan") ? this.TacticalAdvices["FasterThan"] : false)
+
+					if situation
+						if (situation.Key != key)
+							situation := false
+						else if ((situation.Lap + 5) <= lastLap)
+							situation := false
+
+					if !situation {
+						this.TacticalAdvices["FasterThan"] := {Key: key, Lap: lastLap}
+
+						speaker.speakPhrase("FasterThan", {position: slowerCar.Position["Class"], delta: delta, lapTime: lapTimeDifference})
+
+						return true
+					}
+				}
 			}
 		}
 
@@ -2424,7 +2471,7 @@ class RaceSpotter extends GridRaceAssistant {
 	updateDriver(lastLap, sector, newSector, positions) {
 		local raceInfo := (this.hasEnoughData(false) && (this.Session = kSessionRace) && (lastLap > 2))
 		local hadInfo := false
-		local deltaInformation, rnd
+		local deltaInformation
 
 		if this.Speaker[false] {
 			if (lastLap > 1)
@@ -2441,12 +2488,8 @@ class RaceSpotter extends GridRaceAssistant {
 												   , (deltaInformation = "S") || (lastLap = this.iLastDeltaInformationLap)
 												   , this.Announcements["DeltaInformationMethod"])
 
-					if hadInfo {
-						rnd := Random(1, 10)
-
-						if (rnd < 5)
-							hadInfo := false
-					}
+					if (hadInfo && (Random(1, 10) < 5))
+						hadInfo := false
 				}
 
 				if (!hadInfo && this.Announcements["SessionInformation"])

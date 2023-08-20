@@ -348,6 +348,8 @@ BehindProblem.3=The last lap of the car one position behind was very slow. There
 FocusProblem.1=Car number %number% was much slower in the last lap. Maybe there was a problem.
 FocusProblem.2=Looks like car number %number% had a problem. The last lap was quite slow.
 FoucsProblem.3=The last lap of car number %number% was very slow. There might be a problem.
+FasterThan.1=You have been %lapTime% seconds faster then P %position% during the last laps. Keep it up.
+FasterThan.2=Great, you are faster then P %position% by %lapTime% seconds. The car is %delta% seconds ahead of you.
 // Spotting //
 Right.1=Attention right.
 Right.2=Car on the right.

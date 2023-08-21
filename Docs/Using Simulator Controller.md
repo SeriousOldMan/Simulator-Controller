@@ -94,7 +94,7 @@ Important: In order to reduce confusion of an activation command with a normal c
 
 #### Push-To-Talk Behaviour
 
-Beside the behaviour of the Push-To-Talk button described above, where you need to hold down the button as long as your are talking, there is an alternative mode available. This mode allows you to release the button while you are talking. Once, you have finished your voice command, you press the Push-2-Talk button again, to indicate that you have finished and that the command should be executed. This alternative mode can be activated either by choosing the corresponding preset in "Simulator Setup" or by copying the file "P2T Configuration.ini" from the *Resources\Templates* directory from the program folder to the *Simulator Controller\Config* directory which resides in your user *Documents* folder.
+Beside the behaviour of the Push-To-Talk button described above, where you need to hold down the button as long as your are talking, there is an alternative mode available. This mode allows you to release the button while you are talking. Once, you have finished your voice command, you press the Push-2-Talk button again, to indicate that you have finished and that the command should be executed. This alternative mode can be enabled in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration).
 
 Good to know: You can also alter the speed for the two clicks or presses (Windows default is 500 ms) in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration).
 	

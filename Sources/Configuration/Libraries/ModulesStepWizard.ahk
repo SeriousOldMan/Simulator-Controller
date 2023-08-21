@@ -305,14 +305,6 @@ class StreamDeckIcons extends FilesPreset {
 	}
 }
 
-class P2TConfiguration extends FilesPreset {
-	Directory {
-		Get {
-			return kUserConfigDirectory
-		}
-	}
-}
-
 class PitstopImages extends NamedPreset {
 	iDirectory := false
 
@@ -384,8 +376,20 @@ class ConfigurationPatch extends NamedPreset {
 	}
 
 	install(wizard, edit := true) {
+		local configuration
+
 		try {
-			FileCopy(kResourcesDirectory . "Setup\Presets\Configuration Patch.ini", kUserHomeDirectory . "Setup", 1)
+			if !FileExist(kUserHomeDirectory . "Setup\Configuration Patch.ini")
+				FileCopy(kResourcesDirectory . "Setup\Presets\Configuration Patch.ini", kUserHomeDirectory . "Setup", 1)
+			else {
+				configuration := FileRead(kUserHomeDirectory . "Setup\Configuration Patch.ini")
+
+				if (InStr(configuration, "// Using this file ") != 1) {
+					FileMove(kUserHomeDirectory . "Setup\Configuration Patch.ini", kUserHomeDirectory . "Setup\Configuration Patch.ini.bak", 1)
+					FileCopy(kResourcesDirectory . "Setup\Presets\Configuration Patch.ini", kUserHomeDirectory . "Setup", 1)
+					FileAppend("`n" . configuration, kUserHomeDirectory . "Setup\Configuration Patch.ini")
+				}
+			}
 		}
 		catch Any as exception {
 			logError(exception)
@@ -397,6 +401,32 @@ class ConfigurationPatch extends NamedPreset {
 
 	uninstall(wizard) {
 		deleteFile(kUserHomeDirectory . "Setup\Configuration Patch.ini")
+	}
+}
+
+class P2TConfiguration extends NamedPreset {
+	__New(name, *) {
+		super.__New(name)
+	}
+
+	install(wizard, edit := true) {
+		local configuration := readMultiMap(kUserConfigDirectory . "Core Settings.ini")
+
+		setMultiMapValue(configuration, "Voice", "Push-To-Talk", "Press")
+
+		writeMultiMap(kUserConfigDirectory . "Core Settings.ini", configuration)
+
+		deleteFile(kUserConfigDirectory . "P2T Configuration.ini")
+	}
+
+	uninstall(wizard) {
+		local configuration := readMultiMap(kUserConfigDirectory . "Core Settings.ini")
+
+		setMultiMapValue(configuration, "Voice", "Push-To-Talk", "Hold")
+
+		writeMultiMap(kUserConfigDirectory . "Core Settings.ini", configuration)
+
+		deleteFile(kUserConfigDirectory . "P2T Configuration.ini")
 	}
 }
 
@@ -451,9 +481,16 @@ class SetupPatch extends NamedPreset {
 	}
 
 	uninstall(wizard) {
-		local name
+		local name, configuration
 
 		SplitPath(this.File, &name)
+
+		if ((name = "Configuration Patch.ini") && FileExist(kUserHomeDirectory . "Setup\Configuration Patch.ini")) {
+			configuration := FileRead(kUserHomeDirectory . "Setup\Configuration Patch.ini")
+
+			if (InStr(configuration, "// Using this file ") = 1)
+				return
+		}
 
 		deleteFile(kUserHomeDirectory . "Setup\" . name)
 	}

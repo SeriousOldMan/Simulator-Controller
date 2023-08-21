@@ -668,8 +668,8 @@ class VoiceServer extends ConfigurationItem {
 		local toggle
 
 		if p2tHotkey {
-			if FileExist(kUserConfigDirectory . "P2T Configuration.ini")
-				toggle := (getMultiMapValue(readMultiMap(kUserConfigDirectory . "P2T Configuration.ini"), "PushToTalk", "Mode", "Press") = "Toggle")
+			if FileExist(kUserConfigDirectory . "Core Settings.ini")
+				toggle := (getMultiMapValue(readMultiMap(kUserConfigDirectory . "Core Settings.ini"), "Voice", "Push-To-Talk", "Hold") = "Press")
 			else
 				toggle := false
 

@@ -114,6 +114,9 @@ class Preset {
 
 	patchStreamDeckConfiguration(wizard, streamDeckConfiguration) {
 	}
+
+	finalizeConfiguration(wizard) {
+	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -989,6 +992,10 @@ class SetupWizard extends ConfiguratorPanel {
 
 						writeMultiMap(kUserConfigDirectory . "Stream Deck Configuration.ini", streamDeckConfiguration)
 					}
+
+					for ignore, preset in this.Presets
+						if preset.Active
+							preset.finalizeConfiguration(this)
 				}
 			}
 			finally {

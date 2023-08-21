@@ -158,7 +158,7 @@ class QuickStepWizard extends StepWizard {
 
 		widget2 := window.Add("Picture", "x" . button1X . " y" . y . " w64 h64 vquickSetupButton Hidden X:Move(0.33)", kResourcesDirectory . (wizard.QuickSetup ? "Setup\Images\Quick Setup.ico" : "Setup\Images\Quick Setup Gray.ico"))
 		widget2.OnEvent("Click", chooseMethod.Bind("Quick"))
-		widget3 := window.Add("Text", "x" . button1X . " yp+68 w64 Hidden Center X:Move(0.33)", translate("Quick"))
+		widget3 := window.Add("Text", "x" . button1X . " yp+68 w64 Hidden Center X:Move(0.33)", translate("Basic"))
 
 		widget4 := window.Add("Picture", "x" . button2X . " y" . y . " w64 h64 vcustomSetupButton Hidden X:Move(0.66)", kResourcesDirectory . (!wizard.QuickSetup ? "Setup\Images\Full Setup.ico" : "Setup\Images\Full Setup Gray.ico"))
 		widget4.OnEvent("Click", chooseMethod.Bind("Custom"))
@@ -183,7 +183,7 @@ class QuickStepWizard extends StepWizard {
 		window.SetFont("s10 Bold", "Arial")
 
 		widget1 := window.Add("Picture", "x" . x . " y" . y . " w30 h30 Hidden", kResourcesDirectory . "Setup\Images\Gears.ico")
-		widget2 := window.Add("Text", "x" . labelX . " y" . labelY . " w" . labelWidth . " h26 Hidden", translate("Configuration"))
+		widget2 := window.Add("Text", "x" . labelX . " y" . labelY . " w" . labelWidth . " h26 Hidden", translate("Basic Configuration"))
 
 		window.SetFont("s8 Norm", "Arial")
 
@@ -856,11 +856,11 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 		chosen := 0
 
 		widget1 := editorGui.Add("Text", "x" . x0 . " yp+10 w110 h23 +0x200 Section Hidden", translate("Speech Synthesizer"))
-		widget2 := editorGui.Add("DropDownList", "x" . x1 . " yp w136 W:Grow(0.3) Choose" . chosen . "  VquickVoiceSynthesizerDropDown Hidden", choices)
+		widget2 := editorGui.Add("DropDownList", "x" . x1 . " yp w156 W:Grow(0.3) Choose" . chosen . "  VquickVoiceSynthesizerDropDown Hidden", choices)
 		widget2.LastValue := chosen
 		widget2.OnEvent("Change", chooseVoiceSynthesizer)
 
-		editorGui.Add("Button", "xp+137 yp-1 w23 h23 X:Move(0.3) vquickWindowsSettingsButton Hidden").OnEvent("Click", (*) => Run("explorer.exe ms-settings:speech"))
+		editorGui.Add("Button", "xp+157 yp-1 w23 h23 X:Move(0.3) vquickWindowsSettingsButton Hidden").OnEvent("Click", (*) => Run("explorer.exe ms-settings:speech"))
 		setButtonIcon(editorGui["quickWindowsSettingsButton"], kIconsDirectory . "General Settings.ico", 1)
 
 		this.iTopWidgets := [[widget1, widget2, editorGui["quickWindowsSettingsButton"]]]
@@ -871,13 +871,13 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 		widget4 := editorGui.Add("DropDownList", "x" . x1 . " yp w" . w1 . " W:Grow VquickWindowsSpeakerDropDown Hidden", voices)
 
 		widget5 := editorGui.Add("Text", "x" . x0 . " ys+24 w110 h23 +0x200 VquickWindowsSpeakerVolumeLabel Hidden", translate("Level"))
-		widget6 := editorGui.Add("Slider", "Center Thick15 x" . x1 . " yp+2 w160 W:Grow(0.3) 0x10 Range0-100 ToolTip VquickSpeakerVolumeSlider Hidden")
+		widget6 := editorGui.Add("Slider", "Center Thick15 x" . x1 . " yp+2 w180 W:Grow(0.3) 0x10 Range0-100 ToolTip VquickSpeakerVolumeSlider Hidden")
 
 		widget7 := editorGui.Add("Text", "x" . x0 . " yp+22 w110 h23 +0x200 VquickWindowsSpeakerPitchLabel Hidden", translate("Pitch"))
-		widget8 := editorGui.Add("Slider", "Center Thick15 x" . x1 . " yp+2 w160 W:Grow(0.3) 0x10 Range-10-10 ToolTip VquickSpeakerPitchSlider Hidden")
+		widget8 := editorGui.Add("Slider", "Center Thick15 x" . x1 . " yp+2 w180 W:Grow(0.3) 0x10 Range-10-10 ToolTip VquickSpeakerPitchSlider Hidden")
 
 		widget9 := editorGui.Add("Text", "x" . x0 . " yp+22 w110 h23 +0x200 VquickWindowsSpeakerSpeedLabel Hidden", translate("Speed"))
-		widget10 := editorGui.Add("Slider", "Center Thick15 x" . x1 . " yp+2 w160 W:Grow(0.3) 0x10 Range-10-10 ToolTip VquickSpeakerSpeedSlider Hidden")
+		widget10 := editorGui.Add("Slider", "Center Thick15 x" . x1 . " yp+2 w180 W:Grow(0.3) 0x10 Range-10-10 ToolTip VquickSpeakerSpeedSlider Hidden")
 
 		this.iWindowsSynthesizerWidgets := [[editorGui["quickWindowsSpeakerLabel"], editorGui["quickWindowsSpeakerDropDown"]]]
 
@@ -1081,23 +1081,6 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 			this.showAzureSynthesizerEditor()
 	}
 
-	hideWidgets() {
-		if (this.iSynthesizerMode = "Windows")
-			this.hideWindowsSynthesizerEditor()
-		else if (this.iSynthesizerMode = "dotNET")
-			this.hideDotNETSynthesizerEditor()
-		else if (this.iSynthesizerMode = "Azure")
-			this.hideAzureSynthesizerEditor()
-		else {
-			this.hideControls(this.iTopWidgets)
-			this.hideControls(this.iWindowsSynthesizerWidgets)
-			this.hideControls(this.iAzureSynthesizerWidgets)
-			this.hideControls(this.iOtherWidgets)
-		}
-
-		this.iTopAzureCredentialsVisible := false
-	}
-
 	showWindowsSynthesizerEditor() {
 		this.showControls(this.iTopWidgets)
 		this.showControls(this.iWindowsSynthesizerWidgets)
@@ -1109,11 +1092,15 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 
 		this.showControls(this.iOtherWidgets)
 
+		this.Control["quickWindowsSettingsButton"].Enabled := false
+
 		this.iSynthesizerMode := "Windows"
 	}
 
 	showDotNETSynthesizerEditor() {
 		this.showWindowsSynthesizerEditor()
+
+		this.Control["quickWindowsSettingsButton"].Enabled := true
 
 		this.iSynthesizerMode := "dotNET"
 	}
@@ -1128,11 +1115,15 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 		else if (this.iSynthesizerMode != "Init")
 			throw "Internal error detected in VoiceControlConfigurator.hideWindowsSynthesizerEditor..."
 
+		this.Control["quickWindowsSettingsButton"].Enabled := false
+
 		this.iSynthesizerMode := false
 	}
 
 	hideDotNETSynthesizerEditor() {
 		this.hideWindowsSynthesizerEditor()
+
+		this.Control["quickWindowsSettingsButton"].Enabled := false
 	}
 
 	showAzureSynthesizerEditor() {
@@ -1148,6 +1139,8 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 
 		this.showControls(this.iOtherWidgets)
 
+		this.Control["quickWindowsSettingsButton"].Enabled := false
+
 		this.iSynthesizerMode := "Azure"
 	}
 
@@ -1162,6 +1155,8 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 			this.transposeControls(this.iOtherWidgets, -24 * this.iAzureSynthesizerWidgets.Length, this.Window.TitleBarHeight)
 		else if (this.iSynthesizerMode != "Init")
 			throw "Internal error detected in VoiceControlConfigurator.hideAzureSynthesizerEditor..."
+
+		this.Control["quickWindowsSettingsButton"].Enabled := false
 
 		this.iSynthesizerMode := false
 	}

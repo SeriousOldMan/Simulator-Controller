@@ -56,7 +56,7 @@ class QuickStepWizard extends StepWizard {
 		local button1X := x + (Round(width / 3) - 32)
 		local button2X := x + (Round(width / 3 * 2) - 32)
 		local languages := availableLanguages()
-		local code, language, w, h, choices, ignore, grammarFile
+		local code, language, w, h, choices
 
 		noSelect(listView, *) {
 			loop listView.GetCount()
@@ -138,6 +138,10 @@ class QuickStepWizard extends StepWizard {
 
 		updateAssistant(assistant, *) {
 			wizard.selectModule(assistant, window["quick" . this.Keys[assistant] . "EnabledCheck"].Value)
+		}
+
+		editSynthesizer(assistant, *) {
+			this.editSynthesizer(assistant)
 		}
 
 		widget1 := window.Add("HTMLViewer", "x" . x . " y" . y . " w" . width . " h100 W:Grow Hidden")
@@ -244,7 +248,7 @@ class QuickStepWizard extends StepWizard {
 		widget17.OnEvent("Change", loadVoice.Bind("Race Engineer"))
 		widget18 := window.Add("DropDownList", "xp+98 yp w333 W:Grow VquickREVoiceDropDown Hidden")
 		widget19 := window.Add("Button", "xp+335 yp-1 w23 h23 X:Move vquickRESettingsButton Hidden")
-		widget19.OnEvent("Click", (*) => Run("explorer.exe ms-settings:speech"))
+		widget19.OnEvent("Click", editSynthesizer.Bind("Race Engineer"))
 		setButtonIcon(widget19, kIconsDirectory . "General Settings.ico", 1)
 
 		widget20 := window.Add("CheckBox", "x" . x . " yp+24 w16 h23 vquickRSEnabledCheck Hidden" . (wizard.isModuleSelected("Race Strategist") ? " Checked" : ""))
@@ -255,7 +259,7 @@ class QuickStepWizard extends StepWizard {
 		widget23.OnEvent("Change", loadVoice.Bind("Race Strategist"))
 		widget24 := window.Add("DropDownList", "xp+98 yp w333 W:Grow VquickRSVoiceDropDown Hidden")
 		widget25 := window.Add("Button", "xp+335 yp-1 w23 h23 X:Move vquickRSSettingsButton Hidden")
-		widget25.OnEvent("Click", (*) => Run("explorer.exe ms-settings:speech"))
+		widget25.OnEvent("Click", editSynthesizer.Bind("Race Strategist"))
 		setButtonIcon(widget25, kIconsDirectory . "General Settings.ico", 1)
 
 		widget26 := window.Add("CheckBox", "x" . x . " yp+24 w16 h23 vquickRSPEnabledCheck Hidden" . (wizard.isModuleSelected("Race Spotter") ? " Checked" : ""))
@@ -266,7 +270,7 @@ class QuickStepWizard extends StepWizard {
 		widget29.OnEvent("Change", loadVoice.Bind("Race Spotter"))
 		widget30 := window.Add("DropDownList", "xp+98 yp w333 W:Grow VquickRSPVoiceDropDown Hidden")
 		widget31 := window.Add("Button", "xp+335 yp-1 w23 h23 X:Move vquickRSPSettingsButton Hidden")
-		widget31.OnEvent("Click", (*) => Run("explorer.exe ms-settings:speech"))
+		widget31.OnEvent("Click", editSynthesizer.Bind("Race Spotter"))
 		setButtonIcon(widget31, kIconsDirectory . "General Settings.ico", 1)
 
 		widget36 := window.Add("HTMLViewer", "x" . (x - 10) . " yp+30 w" . (width + 20) . " h95 W:Grow Hidden")
@@ -401,22 +405,17 @@ class QuickStepWizard extends StepWizard {
 	}
 
 	assistantLanguage(assistant, editor := true) {
-		local languageCode := "en"
 		local languages, found, code, language, ignore, grammarFile, grammarLanguageCode, voiceLanguage
 
 		if editor {
 			languages := availableLanguages()
-			found := false
 			voiceLanguage := this.Control["quick" . this.Keys[assistant] . "LanguageDropDown"].Text
 
 			for code, language in availableLanguages()
-				if (language = voiceLanguage) {
-					found := true
+				if (language = voiceLanguage)
+					return code
 
-					languageCode := code
-				}
-
-			if !found
+			for ignore, assistant in this.Definition
 				for ignore, grammarFile in getFileNames("Race Engineer.grammars.*", kUserGrammarsDirectory, kGrammarsDirectory) {
 					SplitPath(grammarFile, , , &grammarLanguageCode)
 
@@ -425,17 +424,12 @@ class QuickStepWizard extends StepWizard {
 					else
 						language := grammarLanguageCode
 
-					if (language = voiceLanguage) {
-						languageCode := grammarLanguageCode
-
-						break
-					}
+					if (language = voiceLanguage)
+						return grammarLanguageCode
 				}
 		}
 		else
-			languageCode := this.SetupWizard.getModuleValue(assistant, "Language", getLanguage())
-
-		return languageCode
+			return this.SetupWizard.getModuleValue(assistant, "Language", getLanguage())
 	}
 
 	assistantSynthesizer(assistant, editor := true) {
@@ -530,7 +524,7 @@ class QuickStepWizard extends StepWizard {
 		for ignore, assistant in assistants {
 			language := this.assistantLanguage(assistant, editor)
 
-			voices := SpeechSynthesizer("dotNET", true, language).Voices[language]
+			voices := SpeechSynthesizer(this.assistantSynthesizer(assistant, editor), true, language).Voices[language]
 
 			dropDown := this.Control["quick" . this.Keys[assistant] . "VoiceDropDown"]
 
@@ -596,10 +590,11 @@ class QuickStepWizard extends StepWizard {
 		}
 	}
 
-	loadAssistants() {
+	loadAssistant(assistant) {
+		local key := this.Keys[assistant]
 		local choices := []
 		local languages := []
-		local key, assistant, assistantLanguage, code, language, ignore, grammarFile
+		local assistantLanguage, code, language, ignore, grammarFile
 
 		for code, language in availableLanguages() {
 			choices.Push(language)
@@ -616,18 +611,23 @@ class QuickStepWizard extends StepWizard {
 				}
 			}
 
-		for key, assistant in this.Assistants {
-			this.Control["quick" . key . "EnabledCheck"].Value := (this.assistantEnabled(assistant, false) != false)
-			this.Control["quick" . key . "NameEdit"].Text := this.assistantName(assistant, false)
+		this.Control["quick" . key . "EnabledCheck"].Value := (this.assistantEnabled(assistant, false) != false)
+		this.Control["quick" . key . "NameEdit"].Text := this.assistantName(assistant, false)
 
-			assistantLanguage := inList(languages, this.assistantLanguage(assistant, false))
+		assistantLanguage := inList(languages, this.assistantLanguage(assistant, false))
 
-			this.Control["quick" . key . "LanguageDropDown"].Delete()
-			this.Control["quick" . key . "LanguageDropDown"].Add(choices)
-			this.Control["quick" . key . "LanguageDropDown"].Choose(assistantLanguage ? assistantLanguage : 1)
+		this.Control["quick" . key . "LanguageDropDown"].Delete()
+		this.Control["quick" . key . "LanguageDropDown"].Add(choices)
+		this.Control["quick" . key . "LanguageDropDown"].Choose(assistantLanguage ? assistantLanguage : 1)
 
-			this.loadVoices(assistant, false)
-		}
+		this.loadVoices(assistant, false)
+	}
+
+	loadAssistants() {
+		local ignore, assistant
+
+		for ignore, assistant in this.Assistants
+			this.loadAssistant(assistant)
 	}
 
 	updateSelectedSimulators() {
@@ -662,12 +662,13 @@ class QuickStepWizard extends StepWizard {
 	finishSetup() {
 		local wizard := this.SetupWizard
 		local voiceConfiguration := readMultiMap(kUserHomeDirectory . "Setup\Voice Control Configuration.ini")
-		local assistantSetups := {RE: this.assistantSetup("Race Engineer")
-								, RS: this.assistantSetup("Race Strategist")
-								, RSP: this.assistantSetup("Race Spotter")}
-		local pushToTalkPreset := P2TConfiguration("PushToTalkConfiguration", kResourcesDirectory . "Setup\Presets\P2T Configuration.ini")
+		local assistantSetups := {}
+		local pushToTalkPreset := P2TConfiguration("PushToTalkConfiguration")
 		local languageCode := "en"
 		local code, language, ignore, key, value, assistant
+
+		for key, assistant in this.Assistants
+			assistantSetups.%key% := this.assistantSetup(assistant)
 
 		wizard.uninstallPreset(pushToTalkPreset)
 		if (this.Control["quickPushToTalkMethodDropDown"].Value = 2)
@@ -700,8 +701,640 @@ class QuickStepWizard extends StepWizard {
 
 		wizard.updateState()
 	}
+
+	editSynthesizer(assistant) {
+		local wizard := this.SetupWizard
+		local window := this.Window
+		local configuration, setup
+
+		window.Block()
+
+		try {
+			configuration := newMultiMap()
+
+			setup := this.assistantSetup(assistant)
+
+			setMultiMapValue(configuration, "Voice Control", "Language", setup.Language)
+			setMultiMapValue(configuration, "Voice Control", "Synthesizer", setup.Synthesizer)
+			setMultiMapValue(configuration, "Voice Control", "Speaker", setup.Voice)
+			setMultiMapValue(configuration, "Voice Control", "SpeakerVolume", (setup.Volume = "*") ? 100 : setup.Volume)
+			setMultiMapValue(configuration, "Voice Control", "SpeakerPitch", (setup.Pitch = "*") ? 0 : setup.Pitch)
+			setMultiMapValue(configuration, "Voice Control", "SpeakerSpeed", (setup.Speed = "*") ? 0 : setup.Speed)
+
+			if (InStr(setup.Synthesizer, "Azure") = 1) {
+				setMultiMapValue(configuration, "Voice Control", "Speaker.Azure", setup.Voice)
+
+				setup := string2Values("|", setup.Synthesizer)
+
+				setMultiMapValue(configuration, "Voice Control", "SubscriptionKey", setup[2])
+				setMultiMapValue(configuration, "Voice Control", "TokenIssuer", setup[3])
+			}
+			else if (setup.Synthesizer = "dotNET")
+				setMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", setup.Voice)
+			else
+				setMultiMapValue(configuration, "Voice Control", "Speaker.Windows", setup.Voice)
+
+			configuration := VoiceSynthesizerEditor(this, configuration).editSynthesizer(window)
+
+			if configuration {
+				wizard.setModuleValue(assistant, "Synthesizer", getMultiMapValue(configuration, "Voice Control", "Synthesizer"))
+				wizard.setModuleValue(assistant, "Voice", getMultiMapValue(configuration, "Voice Control", "Speaker"))
+				wizard.setModuleValue(assistant, "Volume", getMultiMapValue(configuration, "Voice Control", "SpeakerVolume"))
+				wizard.setModuleValue(assistant, "Pitch", getMultiMapValue(configuration, "Voice Control", "SpeakerPitch"))
+				wizard.setModuleValue(assistant, "Speed", getMultiMapValue(configuration, "Voice Control", "SpeakerSpeed"))
+
+				this.loadAssistant(assistant)
+			}
+		}
+		finally {
+			window.Unblock()
+		}
+	}
 }
 
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; VoiceSynthesizerEditor                                                  ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class VoiceSynthesizerEditor extends ConfiguratorPanel {
+	iResult := false
+
+	iStepWizard := false
+	iLanguage := "English"
+
+	iWindow := false
+
+	iLanguages := []
+
+	iSynthesizerMode := false
+
+	iTopWidgets := []
+	iBottomWidgets := []
+	iWindowsSynthesizerWidgets := []
+	iAzureSynthesizerWidgets := []
+	iOtherWidgets := []
+
+	iTopAzureCredentialsVisible := false
+
+	Window {
+		Get {
+			return this.iWindow
+		}
+	}
+
+	__New(stepWizard, configuration := false) {
+		this.iStepWizard := stepWizard
+
+		super.__New(configuration)
+	}
+
+	createGui(configuration) {
+		local choices := []
+		local chosen := 0
+		local x := 8
+		local width := 380
+		local editorGui, x0, x1, x2, w1, w2, x3, w3, x4, w4, voices
+
+		updateAzureVoices(*) {
+			this.updateAzureVoices()
+		}
+
+		chooseVoiceSynthesizer(*) {
+			local voiceSynthesizerDropDown := this.Control["quickVoiceSynthesizerDropDown"]
+			local oldChoice := voiceSynthesizerDropDown.LastValue
+
+			if (oldChoice == 1)
+				this.hideWindowsSynthesizerEditor()
+			else if (oldChoice == 2)
+				this.hideDotNETSynthesizerEditor()
+			else
+				this.hideAzureSynthesizerEditor()
+
+			if (voiceSynthesizerDropDown.Value == 1)
+				this.showWindowsSynthesizerEditor()
+			else if (voiceSynthesizerDropDown.Value == 2)
+				this.showDotNETSynthesizerEditor()
+			else
+				this.showAzureSynthesizerEditor()
+
+			if (voiceSynthesizerDropDown.Value <= 2)
+				this.updateLanguage()
+
+			voiceSynthesizerDropDown.LastValue := voiceSynthesizerDropDown.Value
+		}
+
+		editorGui := Window({Descriptor: "Synthesizer Editor", Options: "0x400000"}, "")
+
+		this.iWindow := editorGui
+
+		editorGui.SetFont("Bold", "Arial")
+
+		editorGui.Add("Text", "w388 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(editorGui, "Synthesizer Editor"))
+
+		editorGui.SetFont("Norm", "Arial")
+
+		editorGui.Add("Documentation", "x138 YP+20 w128 H:Center Center", translate("Voice Configuration")
+					, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control")
+
+		editorGui.SetFont("Norm", "Arial")
+
+		editorGui.Add("Text", "x8 yp+30 w388 W:Grow 0x10")
+
+		x0 := x + 8
+		x1 := x + 118
+		x2 := x + 230
+
+		w1 := width - (x1 - x)
+		w2 := w1 - 26 - 26
+
+		x3 := x1 + w2 + 2
+		x4 := x2 + 24 + 8
+		w4 := width - (x4 - x)
+		x5 := x3 + 24
+
+		choices := ["Windows (Win32)", "Windows (.NET)", "Azure Cognitive Services"]
+		chosen := 0
+
+		widget1 := editorGui.Add("Text", "x" . x0 . " yp+10 w110 h23 +0x200 Section Hidden", translate("Speech Synthesizer"))
+		widget2 := editorGui.Add("DropDownList", "x" . x1 . " yp w136 W:Grow(0.3) Choose" . chosen . "  VquickVoiceSynthesizerDropDown Hidden", choices)
+		widget2.LastValue := chosen
+		widget2.OnEvent("Change", chooseVoiceSynthesizer)
+
+		editorGui.Add("Button", "xp+137 yp-1 w23 h23 X:Move(0.3) vquickWindowsSettingsButton Hidden").OnEvent("Click", (*) => Run("explorer.exe ms-settings:speech"))
+		setButtonIcon(editorGui["quickWindowsSettingsButton"], kIconsDirectory . "General Settings.ico", 1)
+
+		this.iTopWidgets := [[widget1, widget2, editorGui["quickWindowsSettingsButton"]]]
+
+		voices := [translate("Random"), translate("Deactivated")]
+
+		widget3 := editorGui.Add("Text", "x" . x0 . " ys+24 w110 h23 +0x200 VquickWindowsSpeakerLabel Hidden", translate("Voice"))
+		widget4 := editorGui.Add("DropDownList", "x" . x1 . " yp w" . w1 . " W:Grow VquickWindowsSpeakerDropDown Hidden", voices)
+
+		widget5 := editorGui.Add("Text", "x" . x0 . " ys+24 w110 h23 +0x200 VquickWindowsSpeakerVolumeLabel Hidden", translate("Level"))
+		widget6 := editorGui.Add("Slider", "Center Thick15 x" . x1 . " yp+2 w160 W:Grow(0.3) 0x10 Range0-100 ToolTip VquickSpeakerVolumeSlider Hidden")
+
+		widget7 := editorGui.Add("Text", "x" . x0 . " yp+22 w110 h23 +0x200 VquickWindowsSpeakerPitchLabel Hidden", translate("Pitch"))
+		widget8 := editorGui.Add("Slider", "Center Thick15 x" . x1 . " yp+2 w160 W:Grow(0.3) 0x10 Range-10-10 ToolTip VquickSpeakerPitchSlider Hidden")
+
+		widget9 := editorGui.Add("Text", "x" . x0 . " yp+22 w110 h23 +0x200 VquickWindowsSpeakerSpeedLabel Hidden", translate("Speed"))
+		widget10 := editorGui.Add("Slider", "Center Thick15 x" . x1 . " yp+2 w160 W:Grow(0.3) 0x10 Range-10-10 ToolTip VquickSpeakerSpeedSlider Hidden")
+
+		this.iWindowsSynthesizerWidgets := [[editorGui["quickWindowsSpeakerLabel"], editorGui["quickWindowsSpeakerDropDown"]]]
+
+		this.iOtherWidgets := [[editorGui["quickWindowsSpeakerVolumeLabel"], editorGui["quickSpeakerVolumeSlider"]]
+							 , [editorGui["quickWindowsSpeakerPitchLabel"], editorGui["quickSpeakerPitchSlider"]]
+							 , [editorGui["quickWindowsSpeakerSpeedLabel"], editorGui["quickSpeakerSpeedSlider"]]]
+
+		widget11 := editorGui.Add("Text", "x" . x0 . " ys+24 w140 h23 +0x200 VquickAzureSubscriptionKeyLabel Hidden", translate("Subscription Key"))
+		widget12 := editorGui.Add("Edit", "x" . x1 . " yp w" . w1 . " h21 W:Grow VquickAzureSubscriptionKeyEdit Hidden")
+		widget12.OnEvent("Change", updateAzureVoices)
+
+		widget13 := editorGui.Add("Text", "x" . x0 . " yp+24 w140 h23 +0x200 VquickAzureTokenIssuerLabel Hidden", translate("Token Issuer Endpoint"))
+		widget14 := editorGui.Add("Edit", "x" . x1 . " yp w" . w1 . " h21 W:Grow VquickAzureTokenIssuerEdit Hidden")
+		widget14.OnEvent("Change", updateAzureVoices)
+
+		voices := [translate("Random"), translate("Deactivated")]
+
+		widget15 := editorGui.Add("Text", "x" . x0 . " yp+24 w110 h23 +0x200 VquickAzureSpeakerLabel Hidden", translate("Voice"))
+		widget16 := editorGui.Add("DropDownList", "x" . x1 . " yp w" . w1 . " W:Grow VquickAzureSpeakerDropDown Hidden", voices)
+
+		editorGui.Add("Text", "x8 yp+102 w388 W:Grow 0x10")
+
+		editorGui.Add("Button", "x120 yp+10 w80 h23 Default", translate("Ok")).OnEvent("Click", (*) => this.iResult := kOk)
+		editorGui.Add("Button", "x206 yp w80 h23", translate("&Cancel")).OnEvent("Click", (*) => this.iResult := kCancel)
+
+		this.iAzureSynthesizerWidgets := [[editorGui["quickAzureSubscriptionKeyLabel"], editorGui["quickAzureSubscriptionKeyEdit"]]
+										, [editorGui["quickAzureTokenIssuerLabel"], editorGui["quickAzureTokenIssuerEdit"]]
+										, [editorGui["quickAzureSpeakerLabel"], editorGui["quickAzureSpeakerDropDown"]]]
+
+		this.updateLanguage()
+
+		this.hideControls(this.iTopWidgets)
+		this.hideControls(this.iWindowsSynthesizerWidgets)
+		this.hideControls(this.iAzureSynthesizerWidgets)
+		this.hideControls(this.iOtherWidgets)
+
+		this.iSynthesizerMode := "Init"
+	}
+
+	loadFromConfiguration(configuration, load := false) {
+		local synthesizer, languageCode, languages
+
+		super.loadFromConfiguration(configuration)
+
+		if load {
+			languageCode := getMultiMapValue(configuration, "Voice Control", "Language", getLanguage())
+			languages := availableLanguages()
+
+			if languages.Has(languageCode)
+				this.iLanguage := languages[languageCode]
+			else
+				this.iLanguage := languageCode
+
+			synthesizer := getMultiMapValue(configuration, "Voice Control", "Synthesizer", "dotNET")
+			if (InStr(synthesizer, "Azure") == 1)
+				synthesizer := "Azure"
+
+			this.Value["voiceSynthesizer"] := inList(["Windows", "dotNET", "Azure"], synthesizer)
+
+			this.Value["azureSpeaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker.Azure", true)
+			this.Value["windowsSpeaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker.Windows",  getMultiMapValue(configuration, "Voice Control", "Speaker", true))
+
+			this.Value["azureSubscriptionKey"] := getMultiMapValue(configuration, "Voice Control", "SubscriptionKey", "")
+			this.Value["azureTokenIssuer"] := getMultiMapValue(configuration, "Voice Control", "TokenIssuer", "")
+
+			this.Value["speakerVolume"] := getMultiMapValue(configuration, "Voice Control", "SpeakerVolume", 100)
+			this.Value["speakerPitch"] := getMultiMapValue(configuration, "Voice Control", "SpeakerPitch", 0)
+			this.Value["speakerSpeed"] := getMultiMapValue(configuration, "Voice Control", "SpeakerSpeed", 0)
+
+			if this.Configuration {
+				if (this.Value["windowsSpeaker"] == true)
+					this.Value["windowsSpeaker"] := translate("Random")
+				else if (this.Value["windowsSpeaker"] == false)
+					this.Value["windowsSpeaker"] := translate("Deactivated")
+
+				if (this.Value["azureSpeaker"] == true)
+					this.Value["azureSpeaker"] := translate("Random")
+				else if (this.Value["azureSpeaker"] == false)
+					this.Value["azureSpeaker"] := translate("Deactivated")
+			}
+		}
+	}
+
+	saveToConfiguration(configuration) {
+		local windowsSpeaker := this.Control["quickWindowsSpeakerDropDown"].Text
+		local azureSpeaker := this.Control["quickAzureSpeakerDropDown"].Text
+
+		super.saveToConfiguration(configuration)
+
+		setMultiMapValue(configuration, "Voice Control", "Language", this.getCurrentLanguage())
+
+		if (windowsSpeaker = translate("Random"))
+			windowsSpeaker := true
+		else if ((windowsSpeaker = translate("Deactivated")) || (windowsSpeaker = A_Space))
+			windowsSpeaker := false
+
+		if (azureSpeaker = translate("Random"))
+			azureSpeaker := true
+		else if ((azureSpeaker = translate("Deactivated")) || (azureSpeaker = A_Space))
+			azureSpeaker := false
+
+		if (this.Control["quickVoiceSynthesizerDropDown"].Value = 1) {
+			setMultiMapValue(configuration, "Voice Control", "Synthesizer", "Windows")
+			setMultiMapValue(configuration, "Voice Control", "Speaker", windowsSpeaker)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.Windows", windowsSpeaker)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", true)
+		}
+		else if (this.Control["quickVoiceSynthesizerDropDown"].Value = 2) {
+			setMultiMapValue(configuration, "Voice Control", "Synthesizer", "dotNET")
+			setMultiMapValue(configuration, "Voice Control", "Speaker", windowsSpeaker)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.Windows", true)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", windowsSpeaker)
+		}
+		else {
+			setMultiMapValue(configuration, "Voice Control", "Synthesizer", "Azure|" . this.Control["quickAzureTokenIssuerEdit"].Text . "|" . this.Control["quickAzureSubscriptionKeyEdit"].Text)
+			setMultiMapValue(configuration, "Voice Control", "Speaker", azureSpeaker)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.Windows", true)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", true)
+		}
+
+		setMultiMapValue(configuration, "Voice Control", "Speaker.Azure", azureSpeaker)
+		setMultiMapValue(configuration, "Voice Control", "SubscriptionKey", this.Control["quickAzureSubscriptionKeyEdit"].Text)
+		setMultiMapValue(configuration, "Voice Control", "TokenIssuer", this.Control["quickAzureTokenIssuerEdit"].Text)
+
+		setMultiMapValue(configuration, "Voice Control", "SpeakerVolume", this.Control["quickSpeakerVolumeSlider"].Value)
+		setMultiMapValue(configuration, "Voice Control", "SpeakerPitch", this.Control["quickSpeakerPitchSlider"].Value)
+		setMultiMapValue(configuration, "Voice Control", "SpeakerSpeed", this.Control["quickSpeakerSpeedSlider"].Value)
+	}
+
+	loadConfigurator(configuration) {
+		this.loadFromConfiguration(configuration, true)
+
+		this.Control["quickVoiceSynthesizerDropDown"].Choose(this.Value["voiceSynthesizer"])
+		this.Control["quickVoiceSynthesizerDropDown"].LastValue := this.Value["voiceSynthesizer"]
+
+		this.Control["quickAzureSubscriptionKeyEdit"].Text := this.Value["azureSubscriptionKey"]
+		this.Control["quickAzureTokenIssuerEdit"].Text := this.Value["azureTokenIssuer"]
+
+		if (this.Value["voiceSynthesizer"] = 1)
+			this.updateWindowsVoices(configuration)
+		else if (this.Value["voiceSynthesizer"] = 2)
+			this.updateDotNETVoices(configuration)
+
+		this.updateAzureVoices(configuration)
+
+		this.Control["quickSpeakerVolumeSlider"].Value := this.Value["speakerVolume"]
+		this.Control["quickSpeakerPitchSlider"].Value := this.Value["speakerPitch"]
+		this.Control["quickSpeakerSpeedSlider"].Value := this.Value["speakerSpeed"]
+	}
+
+	editSynthesizer(owner := false) {
+		local window, x, y, w, h, configuration
+
+		this.createGui(this.Configuration)
+
+		window := this.Window
+
+		if owner
+			window.Opt("+Owner" . owner.Hwnd)
+
+		if getWindowPosition("Synthesizer Editor", &x, &y)
+			window.Show("x" . x . " y" . y)
+		else
+			window.Show()
+
+		this.loadConfigurator(this.Configuration)
+
+		this.showWidgets()
+
+		loop
+			Sleep(200)
+		until this.iResult
+
+		try {
+			if (this.iResult = kOk) {
+				configuration := newMultiMap()
+
+				this.saveToConfiguration(configuration)
+
+				return configuration
+			}
+			else
+				return false
+		}
+		finally {
+			window.Destroy()
+		}
+	}
+
+	showWidgets() {
+		local voiceSynthesizer := this.Control["quickVoiceSynthesizerDropDown"].Value
+
+		if !voiceSynthesizer
+			voiceSynthesizer := 1
+
+		if (voiceSynthesizer == 1)
+			this.showWindowsSynthesizerEditor()
+		else if (voiceSynthesizer == 2)
+			this.showDotNETSynthesizerEditor()
+		else
+			this.showAzureSynthesizerEditor()
+	}
+
+	hideWidgets() {
+		if (this.iSynthesizerMode = "Windows")
+			this.hideWindowsSynthesizerEditor()
+		else if (this.iSynthesizerMode = "dotNET")
+			this.hideDotNETSynthesizerEditor()
+		else if (this.iSynthesizerMode = "Azure")
+			this.hideAzureSynthesizerEditor()
+		else {
+			this.hideControls(this.iTopWidgets)
+			this.hideControls(this.iWindowsSynthesizerWidgets)
+			this.hideControls(this.iAzureSynthesizerWidgets)
+			this.hideControls(this.iOtherWidgets)
+		}
+
+		this.iTopAzureCredentialsVisible := false
+	}
+
+	showWindowsSynthesizerEditor() {
+		this.showControls(this.iTopWidgets)
+		this.showControls(this.iWindowsSynthesizerWidgets)
+
+		if ((this.iSynthesizerMode == false) || (this.iSynthesizerMode = "Init"))
+			this.transposeControls(this.iOtherWidgets, 24 * this.iWindowsSynthesizerWidgets.Length, this.Window.TitleBarHeight)
+		else
+			throw "Internal error detected in VoiceControlConfigurator.showWindowsSynthesizerEditor..."
+
+		this.showControls(this.iOtherWidgets)
+
+		this.iSynthesizerMode := "Windows"
+	}
+
+	showDotNETSynthesizerEditor() {
+		this.showWindowsSynthesizerEditor()
+
+		this.iSynthesizerMode := "dotNET"
+	}
+
+	hideWindowsSynthesizerEditor() {
+		this.hideControls(this.iTopWidgets)
+		this.hideControls(this.iWindowsSynthesizerWidgets)
+		this.hideControls(this.iOtherWidgets)
+
+		if ((this.iSynthesizerMode == "Windows") || (this.iSynthesizerMode == "dotNET"))
+			this.transposeControls(this.iOtherWidgets, -24 * this.iWindowsSynthesizerWidgets.Length, this.Window.TitleBarHeight)
+		else if (this.iSynthesizerMode != "Init")
+			throw "Internal error detected in VoiceControlConfigurator.hideWindowsSynthesizerEditor..."
+
+		this.iSynthesizerMode := false
+	}
+
+	hideDotNETSynthesizerEditor() {
+		this.hideWindowsSynthesizerEditor()
+	}
+
+	showAzureSynthesizerEditor() {
+		this.showControls(this.iTopWidgets)
+		this.showControls(this.iAzureSynthesizerWidgets)
+
+		this.iTopAzureCredentialsVisible := true
+
+		if ((this.iSynthesizerMode == false) || (this.iSynthesizerMode = "Init"))
+			this.transposeControls(this.iOtherWidgets, 24 * this.iAzureSynthesizerWidgets.Length, this.Window.TitleBarHeight)
+		else
+			throw "Internal error detected in VoiceControlConfigurator.showAzureSynthesizerEditor..."
+
+		this.showControls(this.iOtherWidgets)
+
+		this.iSynthesizerMode := "Azure"
+	}
+
+	hideAzureSynthesizerEditor() {
+		this.hideControls(this.iTopWidgets)
+		this.hideControls(this.iAzureSynthesizerWidgets)
+		this.hideControls(this.iOtherWidgets)
+
+		this.iTopAzureCredentialsVisible := false
+
+		if (this.iSynthesizerMode == "Azure")
+			this.transposeControls(this.iOtherWidgets, -24 * this.iAzureSynthesizerWidgets.Length, this.Window.TitleBarHeight)
+		else if (this.iSynthesizerMode != "Init")
+			throw "Internal error detected in VoiceControlConfigurator.hideAzureSynthesizerEditor..."
+
+		this.iSynthesizerMode := false
+	}
+
+	getCurrentLanguage() {
+		local voiceLanguage := this.iLanguage
+		local languages := availableLanguages()
+		local languageCode, code, language, ignore, assistant, grammarFile, grammarLanguageCode
+
+		for code, language in availableLanguages()
+			if (language = voiceLanguage)
+				return code
+
+		for ignore, assistant in this.StepWizard.Definition
+			for ignore, grammarFile in getFileNames(assistant . ".grammars.*", kUserGrammarsDirectory, kGrammarsDirectory) {
+				SplitPath(grammarFile, , , &grammarLanguageCode)
+
+				if languages.Has(grammarLanguageCode)
+					language := languages[grammarLanguageCode]
+				else
+					language := grammarLanguageCode
+
+				if (language = voiceLanguage)
+					return grammarLanguageCode
+			}
+
+		return "en"
+	}
+
+	updateLanguage() {
+		if (this.Control["quickVoiceSynthesizerDropDown"].Value = 1)
+			this.updateWindowsVoices()
+		else if (this.Control["quickVoiceSynthesizerDropDown"].Value = 2)
+			this.updateDotNETVoices()
+
+		this.updateAzureVoices()
+	}
+
+	loadVoices(synthesizer, configuration) {
+		local language := this.getCurrentLanguage()
+		local voices := SpeechSynthesizer(synthesizer, true, language).Voices[language].Clone()
+
+		voices.InsertAt(1, translate("Deactivated"))
+		voices.InsertAt(1, translate("Random"))
+
+		return voices
+	}
+
+	loadWindowsVoices(configuration, &windowsSpeaker) {
+		if configuration
+			windowsSpeaker := getMultiMapValue(configuration, "Voice Control", "Speaker.Windows", getMultiMapValue(this.Configuration, "Voice Control", "Speaker", true))
+		else {
+			windowsSpeaker := this.Control["quickWindowsSpeakerDropDown"].Text
+
+			configuration := this.Configuration
+		}
+
+		return this.loadVoices("Windows", configuration)
+	}
+
+	loadDotNETVoices(configuration, &dotNETSpeaker)	{
+		if configuration
+			dotNETSpeaker := getMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", true)
+		else {
+			dotNETSpeaker := this.Control["quickWindowsSpeakerDropDown"].Text
+
+			configuration := this.Configuration
+		}
+
+		return this.loadVoices("dotNET", configuration)
+	}
+
+	updateWindowsVoices(configuration := false) {
+		local windowsSpeaker, voices, chosen
+
+		voices := this.loadWindowsVoices(configuration, &windowsSpeaker)
+		chosen := inList(voices, windowsSpeaker)
+
+		if (chosen == 0)
+			chosen := 1
+
+		this.Control["quickWindowsSpeakerDropDown"].Delete()
+		this.Control["quickWindowsSpeakerDropDown"].Add(voices)
+		this.Control["quickWindowsSpeakerDropDown"].Choose(chosen)
+	}
+
+	updateDotNETVoices(configuration := false) {
+		local dotNETSpeaker, voices, chosen
+
+		voices := this.loadDotNETVoices(configuration, &dotNETSpeaker)
+		chosen := inList(voices, dotNETSpeaker)
+
+		if (chosen == 0)
+			chosen := 1
+
+		this.Control["quickWindowsSpeakerDropDown"].Delete()
+		this.Control["quickWindowsSpeakerDropDown"].Add(voices)
+		this.Control["quickWindowsSpeakerDropDown"].Choose(chosen)
+	}
+
+	updateAzureVoices(configuration := false) {
+		local voices := []
+		local language, chosen, azureSpeaker
+
+		if configuration
+			azureSpeaker := getMultiMapValue(configuration, "Voice Control", "Speaker.Azure", true)
+		else {
+			configuration := this.Configuration
+
+			azureSpeaker := this.Control["quickAzureSpeakerDropDown"].Text
+		}
+
+		if (configuration && !azureSpeaker)
+			azureSpeaker := getMultiMapValue(configuration, "Voice Control", "Speaker.Azure", true)
+
+		if ((this.Control["quickAzureSubscriptionKeyEdit"].Text != "") && (this.Control["quickAzureTokenIssuerEdit"].Text != "")) {
+			language := this.getCurrentLanguage()
+
+			voices := SpeechSynthesizer("Azure|" . this.Control["quickAzureTokenIssuerEdit"].Text . "|" . this.Control["quickAzureSubscriptionKeyEdit"].Text, true, language).Voices[language].Clone()
+		}
+
+		voices.InsertAt(1, translate("Deactivated"))
+		voices.InsertAt(1, translate("Random"))
+
+		chosen := inList(voices, azureSpeaker)
+
+		if (chosen == 0)
+			chosen := 1
+
+		this.Control["quickAzureSpeakerDropDown"].Delete()
+		this.Control["quickAzureSpeakerDropDown"].Add(voices)
+		this.Control["quickAzureSpeakerDropDown"].Choose(chosen)
+	}
+
+	showControls(widgets) {
+		local ignore, widget, widgetPart
+
+		for ignore, widget in widgets
+			for ignore, widgetPart in widget {
+				widgetPart.Enabled := true
+				widgetPart.Visible := true
+			}
+	}
+
+	hideControls(widgets) {
+		local ignore, widget, widgetPart
+
+		for ignore, widget in widgets
+			for ignore, widgetPart in widget {
+				widgetPart.Enabled := false
+				widgetPart.Visible := false
+			}
+	}
+
+	transposeControls(widgets, offset, correction) {
+		local ignore, widget, widgetPart
+		local posY
+
+		correction := 0
+
+		for ignore, widget in widgets
+			for ignore, widgetPart in widget {
+				ControlGetPos( , &posY, , , widgetPart)
+
+				posY := (posY + offset - correction)
+
+				ControlMove( , posY, , , widgetPart)
+
+				for ignore, resizer in this.Window.Resizers[widgetPart]
+					resizer.OriginalY := posY
+			}
+	}
+}
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;

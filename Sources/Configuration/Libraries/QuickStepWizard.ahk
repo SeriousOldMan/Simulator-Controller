@@ -137,7 +137,22 @@ class QuickStepWizard extends StepWizard {
 		}
 
 		updateAssistant(assistant, *) {
-			wizard.selectModule(assistant, window["quick" . this.Keys[assistant] . "EnabledCheck"].Value)
+			local enabled := window["quick" . this.Keys[assistant] . "EnabledCheck"].Value
+			local found := false
+			local ignore, key
+
+			if !enabled
+				for ignore, key in this.Keys
+					if window["quick" . key . "EnabledCheck"].Value {
+						found := true
+
+						break
+					}
+
+			if (found || enabled)
+				wizard.selectModule(assistant, enabled)
+			else
+				window["quick" . this.Keys[assistant] . "EnabledCheck"].Value := true
 		}
 
 		editSynthesizer(assistant, *) {
@@ -161,8 +176,8 @@ class QuickStepWizard extends StepWizard {
 		widget3 := window.Add("Text", "x" . button1X . " yp+68 w64 Hidden Center X:Move(0.33)", translate("Basic"))
 
 		widget4 := window.Add("Picture", "x" . button2X . " y" . y . " w64 h64 vcustomSetupButton Hidden X:Move(0.66)", kResourcesDirectory . (!wizard.QuickSetup ? "Setup\Images\Full Setup.ico" : "Setup\Images\Full Setup Gray.ico"))
-		widget4.OnEvent("Click", chooseMethod.Bind("Custom"))
-		widget5 := window.Add("Text", "x" . button2X . " yp+68 w64 Hidden Center X:Move(0.66)", translate("Custom"))
+		widget4.OnEvent("Click", chooseMethod.Bind("Extended"))
+		widget5 := window.Add("Text", "x" . button2X . " yp+68 w64 Hidden Center X:Move(0.66)", translate("Extended"))
 
 		y += 100
 
@@ -205,7 +220,7 @@ class QuickStepWizard extends StepWizard {
 		setButtonIcon(widget6, kIconsDirectory . "Locale.ico", 1, "L4 T4 R4 B4")
 		widget7 := window.Add("DropDownList", "xp+24 yp w96 VquickUILanguageDropDown Hidden", choices)
 
-		widget8 := window.Add("Text", "x" . x . " yp+24 w86 h23 +0x200 Hidden", translate("Push-2-Talk"))
+		widget8 := window.Add("Text", "x" . x . " yp+24 w86 h23 +0x200 Hidden", translate("Push-To-Talk"))
 		widget9 := window.Add("Button", "xp+106 yp-1 w23 h23 VquickPushToTalkButton Hidden")
 		widget9.OnEvent("Click", getPTTHotkey)
 		setButtonIcon(widget9, kIconsDirectory . "Key.ico", 1)
@@ -387,6 +402,7 @@ class QuickStepWizard extends StepWizard {
 			this.Control["quick" . key . "LanguageDropDown"].Enabled := enabled
 			this.Control["quick" . key . "VoiceDropDown"].Enabled := enabled
 			this.Control["quick" . key . "NameEdit"].Enabled := enabled
+			this.Control["quick" . key . "SettingsButton"].Enabled := enabled
 		}
 	}
 

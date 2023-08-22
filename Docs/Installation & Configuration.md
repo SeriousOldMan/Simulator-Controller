@@ -118,6 +118,12 @@ The initial configuration after the first installation is handled by the tool *S
 
 This tool is self-explanatory to a great extent, so you don't have to read the remaining documentation, before you start your initial installation & configuration process. And you can repeat the installation & configuration process with *Simulator Setup* as many times as you want, since the tool will retain your work between sessions. The current state of the installation & configuration process is stored in the folder *Simulator Controller\Setup* in your *Documents* folder, if you want to make a backup of your currently chosen settings and options.
 
+When you start "Simulator Setup" for the first time, you may create a so called basic configuration, which gives you the opportunity to create a simple, but working configuration with just a few choices. This configuration will support the installed simulators and will activate at least one Race Assistant together with voice control. No configuration support is given for your Button Boxes and Stream Decks, but you can add them anytime later.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Quick%20Start%204.JPG)
+   
+The details of this basic configuration are discussed in the [quick start guide](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Quick-Start-Guide). However, you don't need to stop at the basic configuration. You can go on and go through all the remaining pages of "Simulator Setup" to create a full-blown configuration at the first run.
+
 If you ever have the need to start with an empty, fresh configuration, you can do this either by deleting the *Simulator Controller\Setup* folder or you can hold the Shift and Control key down, while starting *Simulator Setup*. You will be asked, if you want to ignore all the saved settings and options.
 
 Additionally, since the configuration files will only be created in the last step the process, you can experiment with the settings & options until you are satisfied with your choices. Doing this, you will learn a lot about the functionalities of Simulator Controller. If you decide to generate a new configuration in the last step of the installation & configuration step, backup files of all changed configurartion files (named *.bak) will be created automatically, so you can always rescue your current configuration, if something goes wrong.

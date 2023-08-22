@@ -1527,7 +1527,7 @@ class SetupWizard extends ConfiguratorPanel {
 		local progressCount := 0
 
 		detectSimulators() {
-			local task := PeriodicTask((*) => showProgress({progress: progressCount++, message: "Detecting Simulators..."}), 100, kHighPriority)
+			local task := PeriodicTask((*) => showProgress({progress: progressCount++, message: translate("Detecting Simulators...")}), 100, kHighPriority)
 
 			try {
 				task.start()
@@ -1654,10 +1654,10 @@ class SetupWizard extends ConfiguratorPanel {
 
 		this.Window.block()
 
-		showProgress({color: "Blue", title: "Preparing Configuration"})
+		showProgress({color: "Blue", title: translate("Preparing Configuration")})
 
 		try {
-			showProgress({progress: ++progressCount, messsage: translate("Create Configuration...")})
+			showProgress({progress: ++progressCount, message: translate("Creating Configuration...")})
 
 			Sleep(1000)
 

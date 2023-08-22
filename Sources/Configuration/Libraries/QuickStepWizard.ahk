@@ -144,7 +144,7 @@ class QuickStepWizard extends StepWizard {
 			this.editSynthesizer(assistant)
 		}
 
-		widget1 := window.Add("HTMLViewer", "x" . x . " y" . y . " w" . width . " h100 W:Grow Hidden")
+		widget1 := window.Add("HTMLViewer", "x" . x . " y" . y . " w" . width . " h120 W:Grow Hidden")
 
 		text := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Quick", "Quick.StartHeader." . getLanguage()))
 
@@ -166,7 +166,7 @@ class QuickStepWizard extends StepWizard {
 
 		y += 100
 
-		widget6 := window.Add("HTMLViewer", "x" . x . " y" . y . " w" . width . " h100 W:Grow Hidden")
+		widget6 := window.Add("HTMLViewer", "x" . x . " y" . y . " w" . width . " h120 W:Grow Hidden")
 
 		text := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Quick", "Quick.StartFooter." . getLanguage()))
 
@@ -231,7 +231,7 @@ class QuickStepWizard extends StepWizard {
 
 		window.SetFont("Bold", "Arial")
 
-		widget12 := window.Add("Text", "x" . x . " yp+30 w110 h23 +0x200 Hidden Section", translate("Assistants"))
+		widget12 := window.Add("Text", "x" . x . " yp+20 w110 h23 +0x200 Hidden Section", translate("Assistants"))
 		widget13 := window.Add("Text", "yp+20 xp w" . width . " W:Grow 0x10 Hidden")
 
 		window.SetFont("Norm", "Arial")
@@ -273,7 +273,7 @@ class QuickStepWizard extends StepWizard {
 		widget31.OnEvent("Click", editSynthesizer.Bind("Race Spotter"))
 		setButtonIcon(widget31, kIconsDirectory . "General Settings.ico", 1)
 
-		widget36 := window.Add("HTMLViewer", "x" . (x - 10) . " yp+30 w" . (width + 20) . " h95 W:Grow Hidden")
+		widget36 := window.Add("HTMLViewer", "x" . x . " yp+30 w" . width . " h105 W:Grow Hidden")
 
 		text := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Quick", "Quick.FinishFooter." . getLanguage()))
 
@@ -283,7 +283,7 @@ class QuickStepWizard extends StepWizard {
 
 		widget36.document.write(html)
 
-		widget37 := window.Add("Button", "x" . (x + Round((width / 2) - 45)) . " yp+96 w90 h60 X:Move(0.5) Hidden")
+		widget37 := window.Add("Button", "x" . (x + Round((width / 2) - 45)) . " yp+106 w90 h60 X:Move(0.5) Hidden")
 		setButtonIcon(widget37, kResourcesDirectory . "\Setup\Images\Finish Line.png", 1, "w80 h53")
 		widget37.OnEvent("Click", finishSetup)
 

@@ -2446,7 +2446,8 @@ checkFileDependency(file, modification) {
 		lastModified := FileGetTime(file, "M")
 	}
 	catch Any as exception {
-		logError(exception)
+		if FileExist(file)
+			logError(exception)
 
 		lastModified := false
 	}
@@ -2693,7 +2694,8 @@ runCopyTargets(&buildProgress) {
 					srcLastModified := FileGetTime(A_LoopFilePath, "M")
 				}
 				catch Any as exception {
-					logError(exception)
+					if FileExist(A_LoopFilePath)
+						logError(exception)
 
 					srcLastModified := false
 				}
@@ -2702,7 +2704,8 @@ runCopyTargets(&buildProgress) {
 					dstLastModified := FileGetTime(targetFile, "M")
 				}
 				catch Any as exception {
-					logError(exception)
+					if FileExist(targetFile)
+						logError(exception)
 
 					dstLastModified := false
 				}
@@ -2747,7 +2750,8 @@ runCopyTargets(&buildProgress) {
 					srcLastModified := FileGetTime(targetSource, "M")
 				}
 				catch Any as exception {
-					logError(exception)
+					if FileExist(targetSource)
+						logError(exception)
 
 					srcLastModified := false
 				}
@@ -2756,7 +2760,8 @@ runCopyTargets(&buildProgress) {
 					dstLastModified := FileGetTime(targetDestination, "M")
 				}
 				catch Any as exception {
-					logError(exception)
+					if FileExist(targetDestination)
+						logError(exception)
 
 					dstLastModified := false
 				}
@@ -2833,7 +2838,8 @@ runBuildTargets(&buildProgress) {
 			srcLastModified := FileGetTime(targetSource, "M")
 		}
 		catch Any as exception {
-			logError(exception)
+			if FileExist(targetSource)
+				logError(exception)
 
 			srcLastModified := false
 		}
@@ -2842,7 +2848,8 @@ runBuildTargets(&buildProgress) {
 			binLastModified := FileGetTime(targetBinary, "M")
 		}
 		catch Any as exception {
-			logError(exception)
+			if FileExist(targetBinary)
+				logError(exception)
 
 			binLastModified := false
 		}

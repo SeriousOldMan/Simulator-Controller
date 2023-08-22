@@ -1,8 +1,16 @@
-You probably already have understood, that Simulator Controller is a quite sophisticated software with tons of configuration options. On the other hand, and especially as a new user, you want to get up and running as quickly as possible. This quick start guide will help you to get a fairly simple initial configuration as quickly as possible. Please follow the steps below, but also read the disclaimer at the end of the list to fully understand, what you *get for your money* and what not.
+You probably already have understood, that Simulator Controller is a quite sophisticated software with tons of configuration options. On the other hand, and especially as a new user, you want to get up and running as quickly as possible. This quick start guide will help you to get a fairly simple initial configuration as quickly as possible. This configuration will support the installed simulators and will activate at least one Race Assistant together with voice control. No configuration support is given for your Button Boxes and Stream Decks, but you can add them anytime later. Please follow the steps below, but also read the disclaimer at the end of the list to fully understand, what you *get for your money* and what not.
 
 1. Start "Simulator Setup"
 
    At the end of the initial installation of Simulator Controller using the automated installer, the configuration wizard "Simmulator Setup" is run automatically, unless you uncheck this option in the installer. This wizard will guide you through the configuration and will offer you configuration options for even the most sophisticated environments. We will disable almost all this stuff for an initial and simple configuration. You can always visit "Simulator Setup" again to enable additional functionality later on.
+   
+   There are two ways to get to a basic working setup with a few clicks. "Simulator Setup" offers a basic setup page, which does all the work for you, but you do not have any control where all the software components are installed. This is in general no problem, since the software components will be installed in the typical locations used by the Windows operating system.
+   
+   If you want to use the basic setup select the "Basic" option when asked by "Simulator Setup" and continue. On the next page, you can take all decisions for your initial setup. Then use this configuration for your initial experiences with Simulator Controller. When you feel comfortable, you can come back to "Simulator Setup" and complete your configuration.
+   
+   ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Quick%20Start%204.JPG)
+   
+   If you don't want to use the basic configuration page, simply select "Custom" and continue to the next page. Then go through the following steps for a basic configuration.
 
 2. Select modules
 

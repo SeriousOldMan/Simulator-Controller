@@ -1,3 +1,18 @@
+## 5.3.0.0-release 09/15/23 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. A fourth page has been added to the "Server Administration" application. This page shows a [list of all data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#server-administration) currently stored on the Team Server and also allows to compact the database, if necessary.
+  4. The "Practice Center" now shows the sector times, if available from the simulator data API, in the laps list and various reports.
+  5. The Race Spotter now compares your pace to the pace of all cars on the grid and informs you from time, whether you are faster than cars that are in positions in front of you.
+  6. The "Simulator Setup" application has seen a major overhaul:
+     - It now supports a kind of quick configuration, which allow especially new users to create a useful configuration very fast. See the extended documentation of the [quick start guide](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Quick-Start-Guide) for more information.
+	 - Full configuration of the *Names*, *Language* and *Voices* of the Race Assistants is now possible in the "Basic" configuration page-
+	 - When a new configuration is being created by "Simulator Setup", current changes made by the user, for example in the settings of "Simulator Setup", will be preserved.
+	 - The presets "Names and voices of Assistants", "Different Speaker Voices" and "Mode Automation" have been removed, since they are no longer needed. If such a preset is in use in your configuration, it will still be active, until you remove it.
+	 - All presets with search images for *Assetto Corsa Competizione* has been removed, since it is no longer needed.
+	 - A new preset "Custom Configuration" has been added with a very extensive sample section, which helps the experts to create special configurations.
+  7. The configuration option to choose between the different possible behaviours of the *Push-To-Talk* button (formerly handled by the "P2T Configuration.ini" file) has been moved to the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration). Normally automatically handled by "Simulator Setup".
+
 ## 5.2.3.0-release 08/18/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

@@ -173,6 +173,17 @@ namespace RF2SHMSpotter {
 				SendStringMessage(winHandle, 0, "Race Spotter:" + message);
 		}
 
+        void SendAnalyzerMessage(string message)
+        {
+            int winHandle = FindWindowEx(0, 0, null, "Setup Workbench.exe");
+
+            if (winHandle == 0)
+                winHandle = FindWindowEx(0, 0, null, "Setup Workbench.ahk");
+
+            if (winHandle != 0)
+                SendStringMessage(winHandle, 0, "Analyzer:" + message);
+        }
+
 		const double PI = 3.14159265;
 
 		long cycle = 0;
@@ -798,7 +809,7 @@ namespace RF2SHMSpotter {
 		bool calibrate = false;
         long lastSound = 0;
 
-		bool triggerUSOSBeep(string soundsDirectory, double usos)
+		bool triggerUSOSBeep(string soundsDirectory, string audioDevice, double usos)
 		{
 			string wavFile;
 
@@ -818,12 +829,15 @@ namespace RF2SHMSpotter {
 				return false;
 
 			if (wavFile != "")
-				new System.Media.SoundPlayer(wavFile).Play();
+				if (audioDevice != "")
+					SendAnalyzerMessage("acousticFeedback:" + wavFile);
+				else
+					new System.Media.SoundPlayer(wavFile).Play();
 			
             return true;
 		}
 
-		bool collectTelemetry(string soundsDirectory)
+		bool collectTelemetry(string soundsDirectory, string audioDevice)
 		{
             int carID = 0;
 
@@ -910,7 +924,7 @@ namespace RF2SHMSpotter {
                     cd.Usos = slip * 57.2989 * 1;
 
                     if ((soundsDirectory != "") && Environment.TickCount > (lastSound + 300))
-                        if (triggerUSOSBeep(soundsDirectory, cd.Usos))
+                        if (triggerUSOSBeep(soundsDirectory, audioDevice, cd.Usos))
                             lastSound = Environment.TickCount;
 
                     if (false)
@@ -1315,6 +1329,7 @@ namespace RF2SHMSpotter {
         }
         
 		string soundsDirectory = "";
+		string audioDevice = "";
 
         public void initializeAnalyzer(bool calibrateTelemetry, string[] args)
         {
@@ -1342,8 +1357,12 @@ namespace RF2SHMSpotter {
 				wheelbase = int.Parse(args[11]);
 				trackWidth = int.Parse(args[12]);
 
-                if (args.Length > 13)
+                if (args.Length > 13) {
                     soundsDirectory = args[13];
+					
+					if (args.Length > 14)
+						audioDevice = args[14];
+				}
             }
         }
 
@@ -1378,7 +1397,7 @@ namespace RF2SHMSpotter {
 
                         if (analyzeTelemetry)
                         {
-                            if (collectTelemetry(soundsDirectory))
+                            if (collectTelemetry(soundsDirectory, audioDevice))
 							{
                                 if (counter % 20 == 0)
                                     writeTelemetry();

@@ -36,6 +36,4 @@
   
 #### General
   1. Choosing a specific color scheme and splash screen depending on the selected simulation game
-  2. Further simplification of the overall configuration process.  Create a quick install, which puts all optional software into default locations and asks for P2T button.
-  3. One-click install for the simplest possible configuration.
-  4. More audio routing options - SoundPlay -> SyncPlayer (Simulator Controller, Setup Workbench)
+  2. Further simplification of the overall configuration process. Create a quick (one click) install, which puts all optional software into default locations and asks for P2T button.

@@ -83,7 +83,7 @@ global kSessionDataSchemas := CaseInsenseMap("Run.Data", ["Nr", "Lap", "Driver.F
 														, "Brake.Wear.Average", "Brake.Wear.Front.Average", "Brake.Wear.Rear.Average"
 														, "Brake.Wear.Front.Left", "Brake.Wear.Front.Right"
 														, "Brake.Wear.Rear.Left", "Brake.Wear.Rear.Right"
-														, "Data.Telemetry", "Data.Pressures"]
+														, "Data.Telemetry", "Data.Pressures", "Sectors.Time"]
 										   , "Delta.Data", ["Lap", "Car", "Type", "Delta", "Distance", "ID"]
 										   , "Standings.Data", ["Lap", "Car", "Driver", "Position", "Time", "Laps", "Delta", "ID", "Category"])
 
@@ -1466,7 +1466,7 @@ class PracticeCenter extends ConfigurationItem {
 
 		centerTab.UseTab(3)
 
-		this.iLapsListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 H:Grow(0.8) Checked -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Stint", "Weather", "Grip", "Lap Time", "Consumption", "Remaining", "Pressures", "Invalid", "Accident"], translate))
+		this.iLapsListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 H:Grow(0.8) Checked -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Stint", "Weather", "Grip", "Lap Time", "Sector Times", "Consumption", "Remaining", "Pressures", "Invalid", "Accident"], translate))
 		this.iLapsListView.OnEvent("Click", chooseLap)
 
 		centerTab.UseTab(4)
@@ -2582,7 +2582,7 @@ class PracticeCenter extends ConfigurationItem {
 			if lap.Accident
 				run.Accidents += 1
 
-			lapTimes.Push(lap.Laptime)
+			lapTimes.Push(lap.LapTime)
 			airTemperatures.Push(lap.AirTemperature)
 			trackTemperatures.Push(lap.TrackTemperature)
 
@@ -2617,8 +2617,8 @@ class PracticeCenter extends ConfigurationItem {
 		if driver
 			run.Driver := driver
 
-		run.AvgLaptime := Round(average(laptimes), 1)
-		run.BestLaptime := Round(minimum(laptimes), 1)
+		run.AvgLapTime := Round(average(laptimes), 1)
+		run.BestLapTime := Round(minimum(laptimes), 1)
 		run.FuelConsumption := Round(run.FuelConsumption, 2)
 		run.AirTemperature := Round(average(airTemperatures), 1)
 		run.TrackTemperature := Round(average(trackTemperatures), 1)
@@ -2637,7 +2637,7 @@ class PracticeCenter extends ConfigurationItem {
 											, values2String(", ", collect(string2Values(",", run.Weather), translate)*)
 											, translate(run.Compound), run.TyreSet, run.Laps.Length
 											, fuelAmount, displayValue("Float", convertUnit("Volume", run.FuelConsumption))
-											, lapTimeDisplayValue(run.AvgLaptime)
+											, lapTimeDisplayValue(run.AvgLapTime)
 											, run.Accidents, run.Potential, run.RaceCraft, run.Speed, run.Consistency, run.CarControl)
 	}
 
@@ -2751,7 +2751,7 @@ class PracticeCenter extends ConfigurationItem {
 	}
 
 	createLap(run, lapNumber) {
-		local newLap := {Run: run, Nr: lapNumber, Weather: "-", Grip: "-", Laptime: "-", FuelConsumption: "-", FuelRemaining: "-"
+		local newLap := {Run: run, Nr: lapNumber, Weather: "-", Grip: "-", LapTime: "-", FuelConsumption: "-", FuelRemaining: "-"
 					   , Compound: "-", TyreSet: "-", Pressures: "-,-,-,-", Temperatures: "-,-,-,-", State: "Valid", Accident: ""
 					   , Electronics: false, Tyres: false
 					   , HotPressures: false, ColdPressures: false, PressureLosses: false}
@@ -2761,7 +2761,7 @@ class PracticeCenter extends ConfigurationItem {
 
 		this.Laps[newLap.Nr] := newLap
 
-		this.LapsListView.Add("Check", newLap.Nr, run.Nr, "-", "-", "-", "-", "-", "-, -, -, -", "", "")
+		this.LapsListView.Add("Check", newLap.Nr, run.Nr, "-", "-", "-", "-", "-", "-", "-, -, -, -", "", "")
 
 		newLap.Row := this.LapsListView.GetCount()
 
@@ -2806,7 +2806,9 @@ class PracticeCenter extends ConfigurationItem {
 
 		this.LapsListView.Modify(lap.Row, (lap.State != "Valid") ? "-Check" : ""
 										, lap.Nr, lap.Run.Nr, translate(lap.Weather), translate(lap.Grip)
-										, lapTimeDisplayValue(lap.Laptime), displayNullValue(fuelConsumption), remainingFuel
+										, lapTimeDisplayValue(lap.LapTime)
+										, values2String(", ", collect(lap.SectorsTime, lapTimeDisplayValue)*)
+										, displayNullValue(fuelConsumption), remainingFuel
 										, values2String(", ", pressures*)
 										, (lap.State != "Invalid") ? "" : translate("x"), lap.Accident ? translate("x") : "")
 	}
@@ -2822,7 +2824,7 @@ class PracticeCenter extends ConfigurationItem {
 		local lap := this.requireLap(lapNumber)
 		local selectedLap := this.LapsListView.GetNext()
 		local selectedRun := this.RunsListView.GetNext()
-		local damage, pLap, fuelConsumption, car, run
+		local damage, pLap, fuelConsumption, car, run, sectorTimes
 
 		if selectedLap
 			selectedLap := (selectedLap == this.LapsListView.GetCount())
@@ -2878,7 +2880,7 @@ class PracticeCenter extends ConfigurationItem {
 			lap.FuelConsumption := ((fuelConsumption > 0) ? Round(fuelConsumption, 2) : "-")
 		}
 
-		lap.Laptime := Round(getMultiMapValue(data, "Stint Data", "LapLastTime") / 1000, 1)
+		lap.LapTime := Round(getMultiMapValue(data, "Stint Data", "LapLastTime") / 1000, 1)
 
 		lap.RemainingSessionTime := getMultiMapValue(data, "Session Data", "SessionTimeRemaining")
 		lap.RemainingDriverTime := getMultiMapValue(data, "Stint Data", "DriverTimeRemaining", "-")
@@ -2905,6 +2907,19 @@ class PracticeCenter extends ConfigurationItem {
 		car := getMultiMapValue(data, "Position Data", "Driver.Car")
 
 		lap.Position := (car ? getMultiMapValue(data, "Position Data", "Car." . car . ".Position") : false)
+
+		sectorTimes := (car ? getMultiMapValue(data, "Position Data", "Car." . car . ".Time.Sectors", kUndefined) : false)
+
+		if (sectorTimes && (sectorTimes != kUndefined) && (sectorTimes != "")) {
+			sectorTimes := string2Values(",", sectorTimes)
+
+			loop sectorTimes.Length
+				sectorTimes[A_Index] := Round(sectorTimes[A_Index] / 1000, 2)
+
+			lap.SectorsTime := sectorTimes
+		}
+		else
+			lap.SectorsTime := "-"
 
 		this.iWeather := lap.Weather
 		this.iAirTemperature := lap.AirTemperature
@@ -4046,7 +4061,8 @@ class PracticeCenter extends ConfigurationItem {
 		this.iLaps := CaseInsenseWeakMap()
 
 		for ignore, lap in this.SessionStore.Tables["Lap.Data"] {
-			newLap := {Nr: lap["Nr"], Run: lap["Run"], Laptime: lap["Lap.Time"], Position: lap["Position"], Grip: lap["Grip"]
+			newLap := {Nr: lap["Nr"], Run: lap["Run"], LapTime: lap["Lap.Time"], SectorsTime: lap["Sectors.Time"]
+					 , Position: lap["Position"], Grip: lap["Grip"]
 					 , Map: lap["Map"], TC: lap["TC"], ABS: lap["ABS"], State: lap["Lap.State"]
 					 , Weather: lap["Weather"], AirTemperature: lap["Temperature.Air"], TrackTemperature: lap["Temperature.Track"]
 					 , FuelRemaining: lap["Fuel.Remaining"], FuelConsumption: lap["Fuel.Consumption"]
@@ -4074,8 +4090,13 @@ class PracticeCenter extends ConfigurationItem {
 			if isNull(newLap.Position)
 				newLap.Position := "-"
 
-			if isNull(newLap.Laptime)
-				newLap.Laptime := "-"
+			if isNull(newLap.LapTime)
+				newLap.LapTime := "-"
+
+			if isNull(newLap.SectorsTime)
+				newLap.SectorsTime := ["-"]
+			else if isObject(newLap.SectorsTime)
+				newLap.SectorsTime := collect(newLap.SectorsTime, displayNullValue)
 
 			if isNull(newLap.FuelConsumption)
 				newLap.FuelConsumption := "-"
@@ -4106,7 +4127,7 @@ class PracticeCenter extends ConfigurationItem {
 			newRun := {Nr: run["Nr"], Lap: run["Lap"], Driver: driver, Weather: run["Weather"]
 					 , FuelInitial: run["Fuel.Initial"], FuelConsumption: run["Fuel.Consumption"]
 					 , Compound: compound(run["Tyre.Compound"], run["Tyre.Compound.Color"]), TyreSet: run["Tyre.Set"], TyreLaps: run["Tyre.Laps"]
-					 , AvgLaptime: run["Lap.Time.Average"], BestLaptime: run["Lap.Time.Best"]
+					 , AvgLapTime: run["Lap.Time.Average"], BestLapTime: run["Lap.Time.Best"]
 					 , Accidents: run["Accidents"], StartPosition: run["Position.Start"], EndPosition: run["Position.End"]
 					 , StartTime: run["Time.Start"], EndTime: run["Time.End"]}
 
@@ -4160,11 +4181,11 @@ class PracticeCenter extends ConfigurationItem {
 			newRun.Consistency := "-"
 			newRun.CarControl := "-"
 
-			if isNull(newRun.AvgLaptime)
-				newRun.AvgLaptime := "-"
+			if isNull(newRun.AvgLapTime)
+				newRun.AvgLapTime := "-"
 
-			if isNull(newRun.BestLaptime)
-				newRun.BestLaptime := "-"
+			if isNull(newRun.BestLapTime)
+				newRun.BestLapTime := "-"
 
 			if isNull(newRun.FuelInitial)
 				newRun.FuelInitial := "-"
@@ -4197,7 +4218,7 @@ class PracticeCenter extends ConfigurationItem {
 										, translate(run.Compound), run.TyreSet, run.Laps.Length
 										, isNumber(run.FuelInitial) ? displayValue("Float", convertUnit("Volume", run.FuelInitial)) : run.FuelInitial
 										, isNumber(run.FuelConsumption) ? displayValue("Float", convertUnit("Volume", run.FuelConsumption)) : run.FuelConsumption
-										, lapTimeDisplayValue(run.AvgLaptime)
+										, lapTimeDisplayValue(run.AvgLapTime)
 										, run.Accidents, run.Potential, run.RaceCraft, run.Speed, run.Consistency, run.CarControl)
 				}
 
@@ -4226,7 +4247,9 @@ class PracticeCenter extends ConfigurationItem {
 
 					this.LapsListView.Add((this.SessionExported || (lap.State != "Valid")) ? "" : "Check"
 										, lap.Nr, lap.Run.Nr, translate(lap.Weather), translate(lap.Grip)
-										, lapTimeDisplayValue(lap.Laptime), displayNullValue(fuelConsumption), remainingFuel, "-, -, -, -"
+										, lapTimeDisplayValue(lap.LapTime)
+										, values2String(", ", collect(lap.SectorsTime, lapTimeDisplayValue)*)
+										, displayNullValue(fuelConsumption), remainingFuel, "-, -, -, -"
 										, (lap.State != "Invalid") ? "" : translate("x"), lap.Accident ? translate("x") : "")
 				}
 
@@ -5343,14 +5366,15 @@ class PracticeCenter extends ConfigurationItem {
 				lap := this.Laps[newLap]
 
 				if ((pressuresTable.Length >= newLap) && (tyresTable.Length >= newLap) && lap.HasProp("TelemetryData")) {
-					lapData := Database.Row("Nr", newLap, "Lap", newLap, "Run", lap.Run.Nr, "Lap.Time", null(lap.Laptime), "Position", null(lap.Position)
-									  , "Damage", lap.Damage, "EngineDamage", lap.EngineDamage, "Accident", lap.Accident
-									  , "Fuel.Initial", null(lap.Run.FuelInitial), "Fuel.Consumption", null(lap.FuelConsumption)
-									  , "Fuel.Remaining", null(lap.FuelRemaining), "Lap.State", lap.State, "Lap.Valid", (lap.State != "Invalid")
-									  , "Weather", lap.Weather, "Temperature.Air", null(lap.AirTemperature), "Temperature.Track", null(lap.TrackTemperature)
-									  , "Grip", lap.Grip, "Map", null(lap.Map), "TC", null(lap.TC), "ABS", null(lap.ABS)
-									  , "Tyre.Compound", compound(lap.Compound), "Tyre.Compound.Color", compoundColor(lap.Compound), "Tyre.Set", lap.TyreSet
-									  , "Data.Telemetry", lap.TelemetryData, "Data.Pressures", lap.PressuresData)
+					lapData := Database.Row("Nr", newLap, "Lap", newLap, "Run", lap.Run.Nr, "Lap.Time", null(lap.LapTime)
+										  , "Sectors.Time", values2String(",", collect(lap.SectorsTime, null)), "Position", null(lap.Position)
+										  , "Damage", lap.Damage, "EngineDamage", lap.EngineDamage, "Accident", lap.Accident
+										  , "Fuel.Initial", null(lap.Run.FuelInitial), "Fuel.Consumption", null(lap.FuelConsumption)
+										  , "Fuel.Remaining", null(lap.FuelRemaining), "Lap.State", lap.State, "Lap.Valid", (lap.State != "Invalid")
+										  , "Weather", lap.Weather, "Temperature.Air", null(lap.AirTemperature), "Temperature.Track", null(lap.TrackTemperature)
+										  , "Grip", lap.Grip, "Map", null(lap.Map), "TC", null(lap.TC), "ABS", null(lap.ABS)
+										  , "Tyre.Compound", compound(lap.Compound), "Tyre.Compound.Color", compoundColor(lap.Compound), "Tyre.Set", lap.TyreSet
+										  , "Data.Telemetry", lap.TelemetryData, "Data.Pressures", lap.PressuresData)
 
 					pressures := pressuresTable[newLap]
 					tyres := tyresTable[newLap]
@@ -5505,7 +5529,7 @@ class PracticeCenter extends ConfigurationItem {
 												  , "Weather", run.Weather
 												  , "Tyre.Compound", compound(run.Compound), "Tyre.Compound.Color", compoundColor(run.Compound)
 												  , "Tyre.Set", run.TyreSet, "Tyre.Laps", run.TyreLaps
-												  , "Lap.Time.Average", null(run.AvgLaptime), "Lap.Time.Best", null(run.BestLapTime)
+												  , "Lap.Time.Average", null(run.AvgLapTime), "Lap.Time.Best", null(run.BestLapTime)
 												  , "Fuel.Initial", null(run.FuelInitial), "Fuel.Consumption", null(run.FuelConsumption)
 												  , "Accidents", run.Accidents, "Position.Start", null(run.StartPosition), "Position.End", null(run.EndPosition)
 												  , "Time.Start", this.computeStartTime(run), "Time.End", this.computeEndTime(run))
@@ -5757,7 +5781,7 @@ class PracticeCenter extends ConfigurationItem {
 		local durations := []
 		local numLaps := []
 		local positions := []
-		local avgLapTimes := []
+		local AvgLapTimes := []
 		local fuelConsumptions := []
 		local accidents := []
 		local penalties := []
@@ -5808,12 +5832,12 @@ class PracticeCenter extends ConfigurationItem {
 				duration := 0
 
 				for ignore, lap in run.Laps
-					duration += lap.Laptime
+					duration += lap.LapTime
 
 				durations.Push("<td class=`"td-std`">" . Round(duration / 60) . "</td>")
 				numLaps.Push("<td class=`"td-std`">" . run.Laps.Length . "</td>")
 				positions.Push("<td class=`"td-std`">" . run.StartPosition . translate(" -> ") . run.EndPosition . "</td>")
-				avgLapTimes.Push("<td class=`"td-std`">" . lapTimeDisplayValue(run.AvgLaptime) . "</td>")
+				AvgLapTimes.Push("<td class=`"td-std`">" . lapTimeDisplayValue(run.AvgLapTime) . "</td>")
 
 				fuelConsumption := run.FuelConsumption
 
@@ -5844,7 +5868,7 @@ class PracticeCenter extends ConfigurationItem {
 							. durations[A_Index]
 							. numLaps[A_Index]
 							. positions[A_Index]
-							. avgLapTimes[A_Index]
+							. AvgLapTimes[A_Index]
 							. fuelConsumptions[A_Index]
 							. accidents[A_Index]
 				   . "</tr>")
@@ -5892,7 +5916,7 @@ class PracticeCenter extends ConfigurationItem {
 		local tyreSets := []
 		local tyreLaps := []
 		local bestLapTimes := []
-		local avgLapTimes := []
+		local AvgLapTimes := []
 		local currentRun := this.CurrentRun
 		local lapTable := this.SessionStore.Tables["Lap.Data"]
 		local simulator := this.Simulator
@@ -5942,13 +5966,13 @@ class PracticeCenter extends ConfigurationItem {
 				for ignore, lap in run.Laps {
 					bestLapTime := Min(bestLapTime, lap.LapTime)
 
-					duration += lap.Laptime
+					duration += lap.LapTime
 				}
 
 				durations.Push("<td class=`"td-std`">" . Round(duration / 60) . "</td>")
 				numLaps.Push("<td class=`"td-std`">" . run.Laps.Length . "</td>")
 				bestLapTimes.Push("<td class=`"td-std`">" . lapTimeDisplayValue(bestLapTime) . "</td>")
-				avgLapTimes.Push("<td class=`"td-std`">" . lapTimeDisplayValue(run.AvgLaptime) . "</td>")
+				AvgLapTimes.Push("<td class=`"td-std`">" . lapTimeDisplayValue(run.AvgLapTime) . "</td>")
 
 				fuelAmount := run.FuelInitial
 
@@ -5987,7 +6011,7 @@ class PracticeCenter extends ConfigurationItem {
 							. tyreSets[A_Index]
 							. tyreLaps[A_Index]
 							. bestLapTimes[A_Index]
-							. avgLapTimes[A_Index]
+							. AvgLapTimes[A_Index]
 				   . "</tr>")
 
 		html .= "</table>"
@@ -6017,7 +6041,7 @@ class PracticeCenter extends ConfigurationItem {
 						if lapTable.Has(lap.Nr) {
 							laps.Push(lap.Nr)
 							positions.Push(lap.Position)
-							lapTimes.Push(lap.Laptime)
+							lapTimes.Push(lap.LapTime)
 							fuelConsumptions.Push(lap.FuelConsumption)
 							temperatures.Push(lapTable[lap.Nr]["Tyre.Temperature.Average"])
 						}
@@ -6055,7 +6079,7 @@ class PracticeCenter extends ConfigurationItem {
 		local ignore, lap, html
 
 		for ignore, lap in run.Laps
-			duration += lap.Laptime
+			duration += lap.LapTime
 
 		if startTime
 			startTime := FormatTime(startTime, "Time")
@@ -6215,6 +6239,7 @@ class PracticeCenter extends ConfigurationItem {
 		local lapData := []
 		local mapData := []
 		local lapTimeData := []
+		local sectorTimesData := []
 		local fuelConsumptionData := []
 		local accidentData := []
 		local ignore, lap, fuelConsumption
@@ -6226,7 +6251,8 @@ class PracticeCenter extends ConfigurationItem {
 		for ignore, lap in run.Laps {
 			lapData.Push("<th class=`"th-std`">" . lap.Nr . "</th>")
 			mapData.Push("<td class=`"td-std`">" . lap.Map . "</td>")
-			lapTimeData.Push("<td class=`"td-std`">" . lapTimeDisplayValue(lap.Laptime) . "</td>")
+			lapTimeData.Push("<td class=`"td-std`">" . lapTimeDisplayValue(lap.LapTime) . "</td>")
+			sectorTimesData.Push("<td class=`"td-std`">" . values2String(", ", collect(lap.SectorsTime, lapTimeDisplayValue)*) . "</td>")
 
 			fuelConsumption := lap.FuelConsumption
 
@@ -6242,6 +6268,7 @@ class PracticeCenter extends ConfigurationItem {
 		html .= ("<tr><th class=`"th-std`">" . translate("Lap") . "</th>"
 				   . "<th class=`"th-std`">" . translate("Map") . "</th>"
 				   . "<th class=`"th-std`">" . translate("Lap Time") . "</th>"
+				   . "<th class=`"th-std`">" . translate("Sector Times") . "</th>"
 				   . "<th class=`"th-std`">" . translate("Consumption") . "</th>"
 				   . "<th class=`"th-std`">" . translate("Accident") . "</th>"
 			   . "</tr>")
@@ -6250,6 +6277,7 @@ class PracticeCenter extends ConfigurationItem {
 			html .= ("<tr>" . lapData[A_Index]
 							. mapData[A_Index]
 							. lapTimeData[A_Index]
+							. sectorTimesData[A_Index]
 							. fuelConsumptionData[A_Index]
 							. accidentData[A_Index]
 				   . "</tr>")
@@ -6284,7 +6312,7 @@ class PracticeCenter extends ConfigurationItem {
 				if lapTable.Has(lap.Nr) {
 					laps.Push(lap.Nr)
 					positions.Push(lap.Position)
-					lapTimes.Push(lap.Laptime)
+					lapTimes.Push(lap.LapTime)
 					fuelConsumptions.Push(lap.FuelConsumption)
 					temperatures.Push(lapTable[lap.Nr]["Tyre.Temperature.Average"])
 				}
@@ -6410,6 +6438,7 @@ class PracticeCenter extends ConfigurationItem {
 
 		html .= ("<tr><td><b>" . translate("Position:") . "</b></td><td>" . lap.Position . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Lap Time:") . "</b></td><td>" . lapTimeDisplayValue(lap.LapTime) . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Sector Times:") . "</b></td><td>" . values2String(", ", collect(lap.SectorsTime, lapTimeDisplayValue)*) . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Consumption:") . "</b></td><td>" . displayNullValue(fuelConsumption) . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Fuel Level:") . "</b></td><td>" . remainingFuel . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Temperatures (A / T):") . "</b></td><td>" . displayValue("Float", convertUnit("Temperature", lap.AirTemperature)) . ", " . displayValue("Float", convertUnit("Temperature", lap.TrackTemperature)) . "</td></tr>")

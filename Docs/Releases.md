@@ -13,6 +13,8 @@
 	 - A new preset "Custom Configuration" has been added with a very extensive sample section, which helps the experts to create special configurations.
   7. The configuration option to choose between the different possible behaviours of the *Push-To-Talk* button (formerly handled by the "P2T Configuration.ini" file) has been moved to the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration). Normally automatically handled by "Simulator Setup".
 
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-530).
+
 ## 5.2.3.0-release 08/18/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

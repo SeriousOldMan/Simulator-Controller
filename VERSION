@@ -1,7 +1,7 @@
 [Development]
 Version=5.3.0.0-dev
 Target=5.3.0.0-release
-Date=08/22/2023
+Date=08/23/2023
 Download=
 Changes=New page in "Server Administration, Compact database function in "Server Administration", New quick setup method in "Simulator Setup", Spotter informs you about being faster than cars ahead of you, "Mode Automation" preset no longer available, "Names and voices of Assistants" preset no longer available, Simulator settings are preserved when using "Simulator Setup", Names and voices of Assistants can be changed in Quick setup, New general configuration patch in "Simulator Setup", New general settings patch in "Simulator Setup", ACC Pitstop search image presets no longer available in "Simulator Setup", Integrated "P2T Configuration.ini" into "Core Settings.ini", "Practice Center" displays sector times in several places
 [Release]

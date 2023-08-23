@@ -324,11 +324,20 @@ class QuickStepWizard extends StepWizard {
 		local wizard := this.SetupWizard
 		local chosen := 0
 		local enIndex := 0
+		local enabled := false
 		local code, language, uiLanguage, startWithWindows, silentMode, ignore, preset
 
 		static installed := false
 
 		if (page = 2) {
+			wizard.selectModule("Voice Control", true, false)
+
+			for ignore, assistant in this.Definition
+				enabled := (enabled || wizard.isModuleSelected(assistant))
+
+			if !enabled
+				wizard.selectModule(this.Definition[1], true, false)
+
 			wizard.getGeneralConfiguration(&uiLanguage, &startWithWindows, &silentMode)
 
 			for code, language in availableLanguages() {
@@ -382,9 +391,14 @@ class QuickStepWizard extends StepWizard {
 
 	updateState() {
 		local wizard := this.SetupWizard
-		local key, assistant, enabled
+		local key, assistant, enabled, ignore, assistant, value
 
 		super.updateState()
+
+		if !wizard.isModuleSelected("Voice Control")
+			for ignore, assistant in this.Definition
+				for ignore, value in ["Synthesizer", "Voice", "Volume", "Pitch", "Speed"]
+					wizard.clearModuleValue(assistant, value, false)
 
 		if wizard.QuickSetup {
 			this.Control["quickSetupButton"].Value := (kResourcesDirectory . "Setup\Images\Quick Setup.ico")
@@ -449,7 +463,10 @@ class QuickStepWizard extends StepWizard {
 	}
 
 	assistantSynthesizer(assistant, editor := true) {
-		return this.SetupWizard.getModuleValue(assistant, "Synthesizer", this.assistantDefaults(assistant).Synthesizer)
+		if this.SetupWizard.isModuleSelected("Voice Control")
+			return this.SetupWizard.getModuleValue(assistant, "Synthesizer", this.assistantDefaults(assistant).Synthesizer)
+		else
+			return false
 	}
 
 	assistantVoice(assistant, editor := true) {
@@ -457,29 +474,42 @@ class QuickStepWizard extends StepWizard {
 
 		voice := this.Control["quick" . this.Keys[assistant] . "VoiceDropDown"].Text
 
-		if (voice = translate("Deactivated"))
-			voice := false
-		else if (voice = translate("Random"))
-			voice := true
-		else if (!voice || (voice = ""))
-			voice := true
+		if this.SetupWizard.isModuleSelected("Voice Control") {
+			if (voice = translate("Deactivated"))
+				voice := false
+			else if (voice = translate("Random"))
+				voice := true
+			else if (!voice || (voice = ""))
+				voice := true
 
-		if editor
-			return voice
+			if editor
+				return voice
+			else
+				return this.SetupWizard.getModuleValue(assistant, "Voice", this.assistantDefaults(assistant).Voice)
+		}
 		else
-			return this.SetupWizard.getModuleValue(assistant, "Voice", this.assistantDefaults(assistant).Voice)
+			voice := false
 	}
 
 	assistantVolume(assistant, editor := true) {
-		return this.SetupWizard.getModuleValue(assistant, "Volume", this.assistantDefaults(assistant).Volume)
+		if this.SetupWizard.isModuleSelected("Voice Control")
+			return this.SetupWizard.getModuleValue(assistant, "Volume", this.assistantDefaults(assistant).Volume)
+		else
+			return false
 	}
 
 	assistantPitch(assistant, editor := true) {
-		return this.SetupWizard.getModuleValue(assistant, "Pitch", this.assistantDefaults(assistant).Pitch)
+		if this.SetupWizard.isModuleSelected("Voice Control")
+			return this.SetupWizard.getModuleValue(assistant, "Pitch", this.assistantDefaults(assistant).Pitch)
+		else
+			return false
 	}
 
 	assistantSpeed(assistant, editor := true) {
-		return this.SetupWizard.getModuleValue(assistant, "Speed", this.assistantDefaults(assistant).Speed)
+		if this.SetupWizard.isModuleSelected("Voice Control")
+			return this.SetupWizard.getModuleValue(assistant, "Speed", this.assistantDefaults(assistant).Speed)
+		else
+			return false
 	}
 
 	assistantSetup(assistant, editor := true) {
@@ -504,13 +534,15 @@ class QuickStepWizard extends StepWizard {
 		local wizard := this.SetupWizard
 		local ignore, module, assistant
 
-		if (wizard.getModuleValue(this.Definition[1], "Name", kUndefined) == kUndefined) {
+		if (wizard.Initialize && !wizard.getModuleValue(this.Step, "Initialized", false)) {
+			wizard.setModuleValue(this.Step, "Initialized", true)
+
 			for ignore, module in wizard.Steps["Modules"].Definition
 				wizard.selectModule(module, false, false)
 
 			wizard.selectModule("Voice Control", true, false)
 
-			for ignore, assistant in this.Defintion
+			for ignore, assistant in this.Definition
 				wizard.selectModule(assistant, true, false)
 
 			wizard.updateState()

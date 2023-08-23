@@ -1148,6 +1148,9 @@ class SetupWizard extends ConfiguratorPanel {
 
 			this.iPage := page
 		}
+		catch Any as exception {
+			logError(exception, true)
+		}
 		finally {
 			this.PageSwitch := oldPageSwitch
 		}
@@ -1156,13 +1159,20 @@ class SetupWizard extends ConfiguratorPanel {
 	}
 
 	hidePage(step, page) {
-		if step.hidePage(page) {
-			this.saveKnowledgeBase()
+		try {
+			if step.hidePage(page) {
+				this.saveKnowledgeBase()
 
-			return true
+				return true
+			}
+			else
+				return false
 		}
-		else
+		catch Any as exception {
+			logError(exception, true)
+
 			return false
+		}
 	}
 
 	firstPage() {
@@ -1520,7 +1530,7 @@ class SetupWizard extends ConfiguratorPanel {
 	}
 
 	isQuickSetupAvailable() {
-		return (isDebug() || this.Initialize)
+		return (this.isModuleSelected("Voice Control") && (this.loadPresets().Length = 0))
 	}
 
 	installSoftware() {

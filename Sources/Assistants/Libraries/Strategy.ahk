@@ -2962,6 +2962,11 @@ class Strategy extends ConfigurationItem {
 		return (this.PitstopDelta + ((this.PitstopServiceOrder = "Simultaneous") ? Max(tyreService, refuelService) : (tyreService + refuelService)))
 	}
 
+	calcRemainingLaps(pitstopNr, currentLap, remainingStintLaps, remainingTyreLaps, remainingFuel, fuelConsumption) {
+		return Floor(Min(this.StintLaps, remainingStintLaps, remainingTyreLaps
+					   , this.getMaxFuelLaps(remainingFuel, fuelConsumption)))
+	}
+
 	calcNextPitstopLap(pitstopNr, currentLap
 					 , remainingStintLaps, remainingSessionLaps, remainingTyreLaps, remainingFuel
 					 , &adjusted) {
@@ -2982,8 +2987,9 @@ class Strategy extends ConfigurationItem {
 		if (this.LastPitstop && !this.LastPitstop.TyreChange)
 			remainingTyreLaps := this.MaxTyreLaps
 
-		targetLap := (currentLap + Floor(Min(this.StintLaps, remainingStintLaps, remainingTyreLaps
-										   , this.getMaxFuelLaps(remainingFuel, fuelConsumption))))
+		targetLap := (currentLap + this.calcRemainingLaps(pitstopNr, currentLap
+														, remainingStintLaps, remainingTyreLaps
+														, remainingFuel, fuelConsumption))
 
 		loop
 			if (A_Index >= (targetLap - currentLap))

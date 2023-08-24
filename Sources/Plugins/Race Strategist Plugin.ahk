@@ -60,6 +60,10 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 			this.callRemote("callRecommendStrategy", arguments*)
 		}
 
+		recommendFullCourseYellow(arguments*) {
+			this.callRemote("callRecommendFullCourseYellow", arguments*)
+		}
+
 		restoreRaceInfo(arguments*) {
 			this.callRemote("restoreRaceInfo", arguments*)
 		}
@@ -81,6 +85,8 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 				this.Plugin.cancelStrategy()
 			else if (this.Plugin.RaceStrategist && (this.Action = "StrategyRecommend"))
 				this.Plugin.recommendStrategy()
+			else if (this.Plugin.RaceStrategist && (this.Action = "FCYRecommend"))
+				this.Plugin.recommendFullCourseYellow()
 			else
 				super.fireAction(function, trigger)
 		}
@@ -120,7 +126,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	createRaceAssistantAction(controller, action, actionFunction, arguments*) {
 		local function, descriptor
 
-		if inList(["PitstopRecommend", "StrategyCancel", "StrategyRecommend"], action) {
+		if inList(["PitstopRecommend", "StrategyCancel", "StrategyRecommend", "FCYRecommend"], action) {
 			function := controller.findFunction(actionFunction)
 
 			if (function != false) {
@@ -293,6 +299,11 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	recommendStrategy() {
 		if this.RaceStrategist
 			this.RaceStrategist.recommendStrategy()
+	}
+
+	recommendFullCourseYellow() {
+		if this.RaceStrategist
+			this.RaceStrategist.recommendFullCourseYellow()
 	}
 
 	cancelStrategy() {

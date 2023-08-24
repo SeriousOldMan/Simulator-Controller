@@ -241,7 +241,11 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		voices := [translate("Random"), translate("Deactivated")]
 
 		widget5 := window.Add("Text", "x" . x . " ys+24 w110 h23 +0x200 VwindowsSpeakerLabel Hidden", translate("Voice"))
-		widget6 := window.Add("DropDownList", "x" . x1 . " yp w" . w1 . " W:Grow VwindowsSpeakerDropDown Hidden", voices)
+		widget6 := window.Add("DropDownList", "x" . (x1 + 24) . " yp w" . (w1 - 24) . " W:Grow VwindowsSpeakerDropDown Hidden", voices)
+
+		widget32 := window.Add("Button", "x" . x1 . " yp w23 h23 Default Hidden")
+		widget32.OnEvent("Click", (*) => this.test())
+		setButtonIcon(widget32, kIconsDirectory . "Start.ico", 1, "L4 T4 R4 B4")
 
 		widget7 := window.Add("Text", "x" . x . " ys+24 w110 h23 +0x200 VwindowsSpeakerVolumeLabel Hidden", translate("Level"))
 		widget8 := window.Add("Slider", "Center Thick15 x" . x1 . " yp+2 w160 W:Grow(0.3) 0x10 Range0-100 ToolTip VspeakerVolumeSlider Hidden")
@@ -252,7 +256,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		widget11 := window.Add("Text", "x" . x . " yp+22 w110 h23 +0x200 VwindowsSpeakerSpeedLabel Hidden", translate("Speed"))
 		widget12 := window.Add("Slider", "Center Thick15 x" . x1 . " yp+2 w160 W:Grow(0.3) 0x10 Range-10-10 ToolTip VspeakerSpeedSlider Hidden")
 
-		this.iWindowsSynthesizerWidgets := [[window["windowsSpeakerLabel"], window["windowsSpeakerDropDown"]]]
+		this.iWindowsSynthesizerWidgets := [[window["windowsSpeakerLabel"], window["windowsSpeakerDropDown"], widget32]]
 
 		widget13 := window.Add("Text", "x" . x . " yp+26 w110 h23 +0x200 VsoXPathLabel1 Hidden", translate("SoX Folder (optional)"))
 
@@ -320,17 +324,21 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		voices := [translate("Random"), translate("Deactivated")]
 
 		widget30 := window.Add("Text", "x" . x . " yp+24 w110 h23 +0x200 VazureSpeakerLabel Hidden", translate("Voice"))
-		widget31 := window.Add("DropDownList", "x" . x1 . " yp w" . w1 . " W:Grow VazureSpeakerDropDown Hidden", voices)
+		widget31 := window.Add("DropDownList", "x" . (x1 + 24) . " yp w" . (w1 - 24) . " W:Grow VazureSpeakerDropDown Hidden", voices)
+
+		widget33 := window.Add("Button", "x" . x1 . " yp w23 h23 Default Hidden")
+		widget33.OnEvent("Click", (*) => this.test())
+		setButtonIcon(widget33, kIconsDirectory . "Start.ico", 1, "L4 T4 R4 B4")
 
 		this.iAzureSynthesizerWidgets := [[window["azureSubscriptionKeyLabel"], window["azureSubscriptionKeyEdit"]]
 										, [window["azureTokenIssuerLabel"], window["azureTokenIssuerEdit"]]
-										, [window["azureSpeakerLabel"], window["azureSpeakerDropDown"]]]
+										, [window["azureSpeakerLabel"], window["azureSpeakerDropDown"], widget33]]
 		this.iAzureRecognizerWidgets := [[window["azureSubscriptionKeyLabel"], window["azureSubscriptionKeyEdit"]]
 									   , [window["azureTokenIssuerLabel"], window["azureTokenIssuerEdit"]]]
 
 		this.updateLanguage(false)
 
-		loop 31
+		loop 33
 			editor.registerWidget(this, widget%A_Index%)
 
 		this.hideControls(this.iTopWidgets)
@@ -1008,6 +1016,36 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 				for ignore, resizer in this.Window.Resizers[widgetPart]
 					resizer.OriginalY := posY
 			}
+	}
+
+	test() {
+		global kSimulatorConfiguration
+
+		local configuration := newMultiMap()
+		local synthesizer, language, voice, curSimulatorConfiguration
+
+		this.Editor.saveToConfiguration(configuration)
+
+		curSimulatorConfiguration := kSimulatorConfiguration
+
+		kSimulatorConfiguration := configuration
+
+		try {
+			synthesizer := getMultiMapValue(configuration, "Voice Control", "Synthesizer", "dotNET")
+			language := getMultiMapValue(configuration, "Voice Control", "Language", getLanguage())
+			voice := getMultiMapValue(configuration, "Voice Control", "Speaker")
+
+			synthesizer := SpeechSynthesizer(synthesizer, voice, language)
+
+			synthesizer.setVolume(getMultiMapValue(configuration, "Voice Control", "SpeakerVolume"))
+			synthesizer.setPitch(getMultiMapValue(configuration, "Voice Control", "SpeakerPitch"))
+			synthesizer.setRate(getMultiMapValue(configuration, "Voice Control", "SpeakerSpeed"))
+
+			synthesizer.speakTest()
+		}
+		finally {
+			kSimulatorConfiguration := curSimulatorConfiguration
+		}
 	}
 }
 

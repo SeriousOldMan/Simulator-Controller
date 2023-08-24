@@ -824,6 +824,12 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 
 	iTopAzureCredentialsVisible := false
 
+	StepWizard {
+		Get {
+			return this.iStepWizard
+		}
+	}
+
 	Window {
 		Get {
 			return this.iWindow
@@ -916,7 +922,11 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 		voices := [translate("Random"), translate("Deactivated")]
 
 		widget3 := editorGui.Add("Text", "x" . x0 . " ys+24 w110 h23 +0x200 VquickWindowsSpeakerLabel Hidden", translate("Voice"))
-		widget4 := editorGui.Add("DropDownList", "x" . x1 . " yp w" . w1 . " W:Grow VquickWindowsSpeakerDropDown Hidden", voices)
+		widget4 := editorGui.Add("DropDownList", "x" . (x1 + 24) . " yp w" . (w1 - 24) . " W:Grow VquickWindowsSpeakerDropDown Hidden", voices)
+
+		widget17 := editorGui.Add("Button", "x" . x1 . " yp w23 h23 Default")
+		widget17.OnEvent("Click", (*) => this.test())
+		setButtonIcon(widget17, kIconsDirectory . "Start.ico", 1, "L4 T4 R4 B4")
 
 		widget5 := editorGui.Add("Text", "x" . x0 . " ys+24 w110 h23 +0x200 VquickWindowsSpeakerVolumeLabel Hidden", translate("Level"))
 		widget6 := editorGui.Add("Slider", "Center Thick15 x" . x1 . " yp+2 w180 W:Grow(0.3) 0x10 Range0-100 ToolTip VquickSpeakerVolumeSlider Hidden")
@@ -927,7 +937,7 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 		widget9 := editorGui.Add("Text", "x" . x0 . " yp+22 w110 h23 +0x200 VquickWindowsSpeakerSpeedLabel Hidden", translate("Speed"))
 		widget10 := editorGui.Add("Slider", "Center Thick15 x" . x1 . " yp+2 w180 W:Grow(0.3) 0x10 Range-10-10 ToolTip VquickSpeakerSpeedSlider Hidden")
 
-		this.iWindowsSynthesizerWidgets := [[editorGui["quickWindowsSpeakerLabel"], editorGui["quickWindowsSpeakerDropDown"]]]
+		this.iWindowsSynthesizerWidgets := [[editorGui["quickWindowsSpeakerLabel"], editorGui["quickWindowsSpeakerDropDown"], widget17]]
 
 		this.iOtherWidgets := [[editorGui["quickWindowsSpeakerVolumeLabel"], editorGui["quickSpeakerVolumeSlider"]]
 							 , [editorGui["quickWindowsSpeakerPitchLabel"], editorGui["quickSpeakerPitchSlider"]]
@@ -944,16 +954,20 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 		voices := [translate("Random"), translate("Deactivated")]
 
 		widget15 := editorGui.Add("Text", "x" . x0 . " yp+24 w110 h23 +0x200 VquickAzureSpeakerLabel Hidden", translate("Voice"))
-		widget16 := editorGui.Add("DropDownList", "x" . x1 . " yp w" . w1 . " W:Grow VquickAzureSpeakerDropDown Hidden", voices)
+		widget16 := editorGui.Add("DropDownList", "x" . (x1 + 24) . " yp w" . (w1 - 24) . " W:Grow VquickAzureSpeakerDropDown Hidden", voices)
 
-		editorGui.Add("Text", "x8 yp+102 w388 W:Grow 0x10")
+		widget18 := editorGui.Add("Button", "x" . x1 . " yp w23 h23 Default")
+		widget18.OnEvent("Click", (*) => this.test())
+		setButtonIcon(widget18, kIconsDirectory . "Start.ico", 1, "L4 T4 R4 B4")
+
+		editorGui.Add("Text", "x8 yp+106 w388 W:Grow 0x10")
 
 		editorGui.Add("Button", "x120 yp+10 w80 h23 Default", translate("Ok")).OnEvent("Click", (*) => this.iResult := kOk)
 		editorGui.Add("Button", "x206 yp w80 h23", translate("&Cancel")).OnEvent("Click", (*) => this.iResult := kCancel)
 
 		this.iAzureSynthesizerWidgets := [[editorGui["quickAzureSubscriptionKeyLabel"], editorGui["quickAzureSubscriptionKeyEdit"]]
 										, [editorGui["quickAzureTokenIssuerLabel"], editorGui["quickAzureTokenIssuerEdit"]]
-										, [editorGui["quickAzureSpeakerLabel"], editorGui["quickAzureSpeakerDropDown"]]]
+										, [editorGui["quickAzureSpeakerLabel"], editorGui["quickAzureSpeakerDropDown"], widget18]]
 
 		this.updateLanguage()
 
@@ -1376,6 +1390,37 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 				for ignore, resizer in this.Window.Resizers[widgetPart]
 					resizer.OriginalY := posY
 			}
+	}
+
+	test() {
+		global kSimulatorConfiguration
+
+		local configuration := newMultiMap()
+		local synthesizer, language, voice, curSimulatorConfiguration
+
+		this.StepWizard.SetupWizard.saveToConfiguration(configuration)
+		this.saveToConfiguration(configuration)
+
+		curSimulatorConfiguration := kSimulatorConfiguration
+
+		kSimulatorConfiguration := configuration
+
+		try {
+			synthesizer := getMultiMapValue(configuration, "Voice Control", "Synthesizer", "dotNET")
+			language := getMultiMapValue(configuration, "Voice Control", "Language", getLanguage())
+			voice := getMultiMapValue(configuration, "Voice Control", "Speaker")
+
+			synthesizer := SpeechSynthesizer(synthesizer, voice, language)
+
+			synthesizer.setVolume(getMultiMapValue(configuration, "Voice Control", "SpeakerVolume"))
+			synthesizer.setPitch(getMultiMapValue(configuration, "Voice Control", "SpeakerPitch"))
+			synthesizer.setRate(getMultiMapValue(configuration, "Voice Control", "SpeakerSpeed"))
+
+			synthesizer.speakTest()
+		}
+		finally {
+			kSimulatorConfiguration := curSimulatorConfiguration
+		}
 	}
 }
 

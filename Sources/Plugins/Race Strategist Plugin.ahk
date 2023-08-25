@@ -282,6 +282,8 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		if (this.RaceStrategist && inList(["Time", "LapsRemaining", "Weather", "Position", "LapTime", "LapTimes", "ActiveCars"
 										 , "GapToAhead", "GapToFront", "GapToBehind", "GapToAheadStandings", "GapToFrontStandings"
 										 , "GapToBehindStandings", "GapToAheadTrack", "GapToBehindTrack", "GapToLeader"
+										 , "DriverNameAhead", "DriverNameBehind"
+										 , "CarClassAhead", "CarClassBehind", "CarCupAhead", "CarCupBehind"
 										 , "StrategyOverview", "NextPitstop"], arguments[1])) {
 			this.RaceStrategist.requestInformation(arguments*)
 

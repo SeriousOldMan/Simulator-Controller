@@ -167,12 +167,12 @@ class VoiceManager {
 			if phrases.Has(phrase) {
 				phrases := phrases[phrase]
 
-				index := Random(1, phrases.Length)
+				index := Round(Random(0.55, phrases.Length + 0.45))
 
 				if cache
 					cache .= ("." . index)
 
-				phrase := substituteVariables(phrases[Round(index)], this.VoiceManager.getPhraseVariables(variables))
+				phrase := substituteVariables(phrases[index], this.VoiceManager.getPhraseVariables(variables))
 			}
 
 			if phrase
@@ -313,12 +313,12 @@ class VoiceManager {
 			if phrases.Has(phrase) {
 				phrases := phrases[phrase]
 
-				index := Random(1, phrases.Length)
+				index := Round(Random(0.55, phrases.Length + 0.45))
 
 				if cache
 					cache .= ("." . index)
 
-				phrase := substituteVariables(phrases[Round(index)], this.VoiceManager.getPhraseVariables(variables))
+				phrase := substituteVariables(phrases[index], this.VoiceManager.getPhraseVariables(variables))
 			}
 
 			if phrase

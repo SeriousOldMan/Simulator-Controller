@@ -742,7 +742,7 @@ class SpeechSynthesizer {
 
 	computeVoice(voice, language, randomize := true) {
 		local voices := this.Voices
-		local availableVoices, count, index, locale, ignore, candidate
+		local availableVoices, count, locale, ignore, candidate
 
 		if (this.Synthesizer = "Windows") {
 			if ((voice == true) && language) {
@@ -752,11 +752,8 @@ class SpeechSynthesizer {
 
 				if (count == 0)
 					voice := false
-				else if randomize {
-					index := Random(1, count)
-
-					voice := availableVoices[Round(index)]
-				}
+				else if randomize
+					voice := availableVoices[Round(Random(1, count))]
 				else
 					voice := availableVoices[1]
 			}
@@ -779,11 +776,8 @@ class SpeechSynthesizer {
 
 				if (count == 0)
 					voice := false
-				else if randomize {
-					index := Random(1, count)
-
-					voice := availableVoices[Round(index)]
-				}
+				else if randomize
+					voice := availableVoices[Round(Random(1, count))]
 				else
 					voice := availableVoices[1]
 			}

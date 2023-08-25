@@ -772,11 +772,9 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	jokeRecognized(words) {
-		local rnd, joke, speaker, html, index, hasJoke
+		local joke, speaker, html, index, hasJoke
 
-		rnd := Random(0, 4)
-
-		hasJoke := (rnd > 1)
+		hasJoke := (Random(0, 4) > 1)
 
 		if hasJoke
 			if (this.VoiceManager.Language = "EN") {

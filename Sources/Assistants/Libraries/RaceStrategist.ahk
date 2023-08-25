@@ -2468,7 +2468,7 @@ class RaceStrategist extends GridRaceAssistant {
 		local fuelCapacity, safetyFuel, pitstopDelta, pitstopFuelService, pitstopTyreService, pitstopServiceOrder
 		local lastPositions, lastRunnings, count, laps, curLap, carPositions, nextRunnings
 		local lapTime, potential, raceCraft, speed, consistency, carControl
-		local rnd, delta, running, nr, position, ignore, nextPositions, runnings, car
+		local delta, running, nr, position, ignore, nextPositions, runnings, car
 
 		getCarStatistics(car, &lapTime, &potential, &raceCraft, &speed, &consistency, &carControl) {
 			local statistics := Task.CurrentTask.Statistics
@@ -2498,14 +2498,10 @@ class RaceStrategist extends GridRaceAssistant {
 						return true
 					}
 				}
-				else {
-					rnd := Random(0.0, 1.0)
+				else  if (Random(0.0, 1.0) < (randomFactor / 100)) {
+					pitstops[car] := true
 
-					if (rnd < (randomFactor / 100)) {
-						pitstops[car] := true
-
-						return true
-					}
+					return true
 				}
 			}
 
@@ -2576,18 +2572,12 @@ class RaceStrategist extends GridRaceAssistant {
 				consistency := carStatistics[A_Index][5]
 				carControl := carStatistics[A_Index][6]
 
-				if useLapTimeVariation {
-					rnd := Random(-1.0, 1.0)
-
-					lapTime += (rnd * ((5 - consistency) / 5) * (randomFactor / 100))
-				}
-
-				if useDriverErrors {
-					rnd := Random(0.0, 1.0)
-
-					lapTime += (rnd * ((5 - carControl) / 5) * (randomFactor / 100))
-				}
-
+				if useLapTimeVariation
+					lapTime += (Random(-1.0, 1.0) * ((5 - consistency) / 5) * (randomFactor / 100))
+				
+				if useDriverErrors
+					lapTime += (Random(0.0, 1.0) * ((5 - carControl) / 5) * (randomFactor / 100))
+				
 				if (usePitstops && (A_Index != driver) && carPitstop(A_Index, (startLap + curLap)))
 					lapTime += strategy.calcPitstopDuration(fuelCapacity, true)
 

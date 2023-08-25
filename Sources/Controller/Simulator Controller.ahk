@@ -666,11 +666,7 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	getLogo() {
-		local rnd
-
-		rnd := Random(0, 1)
-
-		return ((Round(rnd) == 1) ? kLogoDark : kLogoBright)
+		return ((Round(Random(0, 1)) == 1) ? kLogoDark : kLogoBright)
 	}
 
 	registerFunctionController(controller) {

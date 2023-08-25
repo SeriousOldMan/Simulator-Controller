@@ -116,3 +116,5 @@ Announcements=Wetterwarnungen
 	[Wann ist {der, der nächste} {Boxenstopp, Boxenstopp geplant}, Wann soll ich an die Box kommen, {In welcher, Für welche} Runde ist {der, der nächste} Boxenstopp geplant, (KannstDu) (Mir) sagen {wann ich an die Box kommen soll, der nächste Boxenstopp geplant ist, in welcher Runde der nächste Boxenstopp geplant ist, für welche Runde der nächste Boxenstopp geplant ist}]
 	
 	[(KannstDu) eine neue Strategie entwickeln, (KannstDu) die Strategie {überarbeiten, anpassen}, Wir brauchen eine neue Strategie]
+	
+	[{Wir haben Full, Full} Course Yellow. Was {soll, können} {ich, wir} tun, {Wir haben Full, Full} Course Yellow. {Soll, Sollen} {ich, wir} {jetz an, an} die {Box kommen, Box}]

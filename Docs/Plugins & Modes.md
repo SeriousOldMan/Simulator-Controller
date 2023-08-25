@@ -361,6 +361,15 @@ Similar as for Jona, you can use the following parameters to trigger some of Cat
 	
 All these command actions will be bound to the plugin itself, thereby are available all the time, and only unary functions are supported here. By using these actions, you will be able to use Cato with voice output, but no voice control, thereby getting most of the support from Cato, but you have to use an *oldschool* interface to control the strategist actions. To *answer* "Yes" to one of the questions of Cato, you must supply a controller function, for example a push button function, to the *Accept* parameter and for "No", you must use the *Reject* parameter. A little bit different is the *Call* action. This action will activate Cato and will make it the active listening dialog partner for voice control by the push of a button. This is similar to issuing the "Hey Cato" activation command. Last but not least, you can use *Mute* and *Unmute*, when you temporarely want to deactivate voice ouput for Cato.
 
+These additional commands are available:
+
+| Command | Description |
+| ------ | ------ |
+| StrategyCancel | Cancels the current strategy. Cato will not have any strategy information from now on. |
+| StrategyRecommend | Cato will try to update the currently active strategy according to the current situation. Very useful after an unplanned pitstop or a sudden weather change. |
+| FCYRecommend | This command can be triggered, when the track is under Full Course Yellow with pitstops allowed. Cato  |
+| PitstopRecommend | Cato will try to determine the best possible lap for the next pitstop. Possible undercuts will be taken into account as well as the traffic situation after the pitstop. |
+
 Furthermore, you can request a lot of information from Cato about the current race situation. Thefore, you can supply the *InformationRequest* parameter multiple times.
 
 Example:
@@ -393,9 +402,6 @@ Please see the following table for available information commands.
 | CarCupBehind | The Strategist will tell you the cup category of the car behind of you. |
 | StrategyOverview | As the name says, you will get a complete overview of the race strategy, as long as one has been defined in the "Strategy Workbench" and has been exported to be used in this session. |
 | NextPitstop | Cato tells you the lap, where the next pitstop according to the strategy has been planned. |
-| StrategyCancel | Cancels the current strategy. Cato will not have any strategy information from now on. |
-| StrategyRecommend | Cato will try to update the currently active strategy according to the current situation. Very useful after an unplanned pitstop or a sudden weather change. |
-| PitstopRecommend | Cato will try to determine the best possible lap for the next pitstop. Possible undercuts will be taken into account as well as the traffic situation after the pitstop. |
 
 Note: All these commands are also available in most of the simulation plugins, either in the "Pitstop" mode or in the "Assistant" mode, depending on the configuration parameters.
 

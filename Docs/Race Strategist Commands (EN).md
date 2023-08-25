@@ -116,3 +116,5 @@ Announcements=weather warnings
 	[When is the next pitstop, In which {lap is the pitstop planned, should I come to the pit}, When should I come to the pit, (TellMe) {the lap for the next pitstop, when I should I come to the pit}]
 	
 	[(CanYou) develop a new strategy, (CanYou) adjust the strategy, (CanYou) plan a new strategy, We need a new strategy]
+	
+	[{We have a Full, Full} Course Yellow. What {should, can} {I, we} do, {We have a Full, Full} Course Yellow. Should {I, we} {come to the pit, come to the pit now, pit, pit now}]

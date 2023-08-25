@@ -71,6 +71,7 @@ StrategyOverview=[How is our strategy for {today, the race}, Can you give me a s
 CancelStrategy=[(CanYou) {suspend, cancel} the strategy, {Suspend, Cancel} the strategy, The strategy no longer makes sense, The strategy makes no sense anymore]
 NextPitstop=[When is the next pitstop, In which {lap is the pitstop planned, should I come to the pit}, When should I come to the pit, (TellMe) {the lap for the next pitstop, when I should I come to the pit}]
 StrategyRecommend=[(CanYou) develop a new strategy, (CanYou) adjust the strategy, (CanYou) plan a new strategy, We need a new strategy]
+FCYRecommend=[{We have a Full, Full} Course Yellow. What {should, can} {I, we} do, {We have a Full, Full} Course Yellow. Should {I, we} {come to the pit, come to the pit now, pit, pit now}]
 [Speaker Phrases]
 // Conversation //	
 Greeting.1=Hi %driver%, I am %name%. I will watch the race and find the best strategy for you.
@@ -251,8 +252,17 @@ ConfirmReportStrategy.3=%driver%, this is %name%. I can briefly summarize our st
 Strategy.1=%driver%, we have developed the following strategy.
 Strategy.2=We have the following strategy.
 Strategy.3=Ok, here is a summary of the strategy.
+FCYStrategy.1=Ok, it looks like pitting now is a good idea.
+FCYStrategy.2=We can use the full course yellow for a pitstop.
+FCYStrategy.3=A pitstop during the full course yellow will be of benefit.
+FCYStrategy.4=Ok, come to the pit.
 NoStrategy.1=%driver%, we have not developed a strategy for this race. You are free to choose your pitstops on your own.
 NoStrategy.2=We have no strategy for this race. You are on your own.
+NoFCYStrategy.1=A pitstop now will not be benficial.
+NoFCYStrategy.2=We don't need a pitstop now.
+NoFCYStrategy.3=Stay out.
+FCYPitstop.1=But pitting during a full course yellow might be beneficial.
+FCYPitstop.2=But you can use the full course yellow for a pitstop, if necessary.
 NoStrategyRecommendation.1=Sorry, I need the support of our engineer to do this.
 NoStrategyRecommendation.2=Our engineer is not around here. I can't do this alone.
 NoStrategyRecommendation.3=I can't find our engineer. It is impossible for me to do this alone.

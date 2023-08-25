@@ -444,7 +444,7 @@ updatePitstopLap(?lap) <= Set(Pitstop.1.Lap, ?lap), Set(Pitstop.Last, 1)
 
 updatePitWarningLap(?pitstopLap, ?warningLaps) <= ?warningLap = ?pitstopLap - ?warningLaps, Set(Strategy.Pitstop.Lap.Warning, ?warningLap)
 
-[?Lap = ?Strategy.Pitstop.Lap.Warning] => (Call: reportUpcomingPitstop(!Strategy.Pitstop.Lap))
+[?Lap >= ?Strategy.Pitstop.Lap.Warning] => (Call: reportUpcomingPitstop(!Strategy.Pitstop.Lap)), (Clear: Strategy.Pitstop.Lap.Warning)
 
 [?Pitstop.Lap] => (Prove: pitstopPerformed(?Pitstop.Lap))
 

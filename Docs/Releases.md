@@ -11,8 +11,15 @@
 	 - The presets "Names and voices of Assistants", "Different Speaker Voices" and "Mode Automation" have been removed, since they are no longer needed. If such a preset is in use in your configuration, it will still be active, until you remove it.
 	 - All presets with search images for *Assetto Corsa Competizione* has been removed, since it is no longer needed.
 	 - A new preset "Custom Configuration" has been added with a very extensive sample section, which helps the experts to create special configurations.
-  7. New test mode in the voice configuration let you now test your changes to pitch, speed or distortion in place.
-  8. The configuration option to choose between the different possible behaviours of the *Push-To-Talk* button (formerly handled by the "P2T Configuration.ini" file) has been moved to the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration). Normally automatically handled by "Simulator Setup".
+  7. Many new voice commands for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Strategist-Commands-(EN)) and [Race Spotter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Spotter-Commands-(EN)):
+     - "Can you tell me the name of the driver ahead / behind?"
+     - "Can you tell me the class of the car ahead / behind?"
+     - "Can you tell me the cup catgory of the car ahead / behind?"
+     - "Can you tell me the last lap time of car number XY?"
+     - "Can you tell me the last lap time of P X?"
+	 - New information request actions for ["Race Strategist"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) and ["Race Spotter"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter) plugins, to resemble most of the above voice commands: "DriverNameAhead", "DriverNameBehind", "CarClassAhead", "CarClassBehind", "CarCupAhead" and "CarCupBehind".
+  8. New test mode in the voice configuration let you now test your changes to pitch, speed or distortion in place.
+  9. The configuration option to choose between the different possible behaviours of the *Push-To-Talk* button (formerly handled by the "P2T Configuration.ini" file) has been moved to the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration). Normally automatically handled by "Simulator Setup".
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-530).
 

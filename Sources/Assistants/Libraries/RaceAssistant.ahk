@@ -2332,32 +2332,28 @@ class GridRaceAssistant extends RaceAssistant {
 		if !this.hasEnoughData()
 			return
 
-		if ((car == kUndefined) || (car == 0))
-			this.getSpeaker().speakPhrase("Later")
-		else {
-			car := getCarPosition(words, &position)
+		car := getCarPosition(words, &position)
 
-			if car {
-				lapTime := (this.getLapTime(car) / 1000)
-				inPit := (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false))
+		if car {
+			lapTime := (this.getLapTime(car) / 1000)
+			inPit := (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false))
 
-				if (inPit || (lapTime = 0)) {
-					speaker.speakPhrase("CarInPit")
+			if (inPit || (lapTime = 0)) {
+				speaker.speakPhrase("CarInPit")
 
-					return
-				}
-				else {
-					minute := Floor(lapTime / 60)
-					seconds := (lapTime - (minute * 60))
-
-					speaker.speakPhrase("PositionLapTime", {position: position, time: speaker.number2Speech(lapTime, 1), minute: minute, seconds: speaker.number2Speech(seconds, 1)})
-				}
+				return
 			}
-			else if position
-				speaker.speakPhrase("NoPositionCar", {position: position})
-			else
-				speaker.speakPhrase("Repeat")
+			else {
+				minute := Floor(lapTime / 60)
+				seconds := (lapTime - (minute * 60))
+
+				speaker.speakPhrase("PositionLapTime", {position: position, time: speaker.number2Speech(lapTime, 1), minute: minute, seconds: speaker.number2Speech(seconds, 1)})
+			}
 		}
+		else if position
+			speaker.speakPhrase("NoPositionCar", {position: position})
+		else
+			speaker.speakPhrase("Repeat")
 	}
 
 	driverNameAheadRecognized(words) {
@@ -2397,9 +2393,9 @@ class GridRaceAssistant extends RaceAssistant {
 			class := this.getClass(car)
 
 			if (class = "Unknown")
-				class := translate(class)
-
-			this.getSpeaker().speakPhrase("CarClassAhead", {class: class})
+				this.getSpeaker().speakPhrase("NoTrackGap")
+			else
+				this.getSpeaker().speakPhrase("CarClassAhead", {class: class})
 		}
 		else
 			this.getSpeaker().speakPhrase("NoTrackGap")
@@ -2414,9 +2410,9 @@ class GridRaceAssistant extends RaceAssistant {
 			class := this.getClass(car)
 
 			if (class = "Unknown")
-				class := translate(class)
-
-			this.getSpeaker().speakPhrase("CarClassBehind", {class: class})
+				this.getSpeaker().speakPhrase("NoTrackGap")
+			else
+				this.getSpeaker().speakPhrase("CarClassBehind", {class: class})
 		}
 		else
 			this.getSpeaker().speakPhrase("NoTrackGap")
@@ -2431,9 +2427,9 @@ class GridRaceAssistant extends RaceAssistant {
 			cup := this.getClass(car, false, "Cup")
 
 			if (cup = "Unknown")
-				cup := translate(cup)
-
-			this.getSpeaker().speakPhrase("CarCupAhead", {cup: cup})
+				this.getSpeaker().speakPhrase("NoTrackGap")
+			else
+				this.getSpeaker().speakPhrase("CarCupAhead", {cup: cup})
 		}
 		else
 			this.getSpeaker().speakPhrase("NoTrackGap")
@@ -2448,9 +2444,9 @@ class GridRaceAssistant extends RaceAssistant {
 			cup := this.getClass(car, false, "Cup")
 
 			if (cup = "Unknown")
-				cup := translate(cup)
-
-			this.getSpeaker().speakPhrase("CarCupBehind", {cup: cup})
+				this.getSpeaker().speakPhrase("NoTrackGap")
+			else
+				this.getSpeaker().speakPhrase("CarCupBehind", {cup: cup})
 		}
 		else
 			this.getSpeaker().speakPhrase("NoTrackGap")

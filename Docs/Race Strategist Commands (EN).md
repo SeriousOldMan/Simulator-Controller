@@ -109,7 +109,7 @@ Announcements=weather warnings
 	
 	[(TellMe) the {current lap, last lap, lap} time of {car, car number, number} (Number), (WhatIs) the {current lap, last lap, lap} time of {car, car number, number} (Number)]
 	
-	[(TellMe) the {current lap, last lap, lap} time of P (Number)]
+	[(TellMe) the {current lap, last lap, lap} time of P (Number), (WhatIs) the {current lap, last lap, lap} time of P (Number)]
 
 	[(TellMe) {the, my} {current lap, last lap, lap} time, (WhatIs) {my, the} {current lap, last lap, lap} time]
 

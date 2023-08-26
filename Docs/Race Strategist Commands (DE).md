@@ -94,6 +94,22 @@ Announcements=Wetterwarnungen
 	[{Gib mir den, Gib mir bitte den, Sag mir den, Sag mir bitte den, Wie ist der} Abstand zum führenden Wagen, Wie groß ist {die Lücke, der Abstand} zum {Führenden, führenden Wagen, ersten Platz}]
 	
 	[{Gib mir den, Gib mir bitte den, Sag mir den, Sag mir bitte den, Wie ist der} Abstand {zu, zur, zum} {Wagen, Wagen Nummer, Nummer} (Number), Wie groß ist {die Lücke, der Abstand} {zu, zur, zum} {Wagen, Wagen Nummer, Nummer} (Number)]
+	
+	[(KannstDu) (Mir) den {Fahrernamen, Fahrernamen im Wagen} vor mir {durchgeben, sagen}, Wie heißt der {Fahrer, Fahrer im Wagen} vor mir]
+
+	[(KannstDu) (Mir) den {Fahrernamen, Fahrernamen im Wagen} hinter mir {durchgeben, sagen}, Wie heißt der {Fahrer, Fahrer im Wagen} hinter mir]
+
+	[(KannstDu) (Mir) die {Fahrzeugklasse, Klasse des Wagens} vor mir {durchgeben, sagen}, Wie ist {Fahrzeugklasse, Klasse des Wagens} vor mir]
+
+	[(KannstDu) (Mir) die {Fahrzeugklasse, Klasse des Wagens} hinter mir {durchgeben, sagen}, Wie ist {Fahrzeugklasse, Klasse des Wagens} hinter mir]
+
+	[(KannstDu) (Mir) die {Pokalkategorie, Pokalkategorie des Wagens} vor mir {durchgeben, sagen}, Wie ist {Pokalkategorie, Pokalkategorie des Wagens} vor mir]
+
+	[(KannstDu) (Mir) die {Pokalkategorie, Pokalkategorie des Wagens} hinter mir {durchgeben, sagen}, Wie ist {Pokalkategorie, Pokalkategorie des Wagens} hinter mir]
+
+	[(KannstDu) (Mir) die {Rundenzeit, letzte Rundenzeit, Zeit, letzte Zeit} {des, von} {Wagens, Wagens Nummer, Nummer} (Number) {durchgeben, sagen}, {Gib, Sag} (Mir) die die {Rundenzeit, letzte Rundenzeit, Zeit, letzte Zeit} {des, von} {Wagens, Wagens Nummer, Nummer} (Number)]
+
+	[(KannstDu) (Mir) die {Rundenzeit, letzte Rundenzeit, Zeit, letzte Zeit} von P (Number) {durchgeben, sagen}, {Gib, Sag} (Mir) die die {Rundenzeit, letzte Rundenzeit, Zeit, letzte Zeit} von P (Number)]
 
 	[(KannstDu) (Mir) {die, meine} {Rundenzeit, letzte Rundenzeit, Zeit, letzte Zeit} {durchgeben, sagen}, {Gib, Sag} (Mir) {die, meine} {Rundenzeit, letzte Rundenzeit, Zeit, letzte Zeit}, Wie ist {die, meine} {Rundenzeit, letzte Rundenzeit, Zeit, letzte Zeit}]
 

@@ -2368,7 +2368,7 @@ class GridRaceAssistant extends RaceAssistant {
 		if (car != kUndefined) {
 			parseDriverName(this.getDriver(car), &forName, &surName, &ignore := false)
 
-			this.getSpeaker().speakPhrase("AheadDriverName", {forName: forName, surName: surName})
+			this.getSpeaker().speakPhrase("DriverNameAhead", {forName: forName, surName: surName})
 		}
 		else
 			this.getSpeaker().speakPhrase("NoTrackGap")
@@ -2382,7 +2382,7 @@ class GridRaceAssistant extends RaceAssistant {
 		if (car != kUndefined) {
 			parseDriverName(this.getDriver(car), &forName, &surName, &ignore := false)
 
-			this.getSpeaker().speakPhrase("BehindDriverName", {forName: forName, surName: surName})
+			this.getSpeaker().speakPhrase("DriverNameBehind", {forName: forName, surName: surName})
 		}
 		else
 			this.getSpeaker().speakPhrase("NoTrackGap")
@@ -2391,9 +2391,16 @@ class GridRaceAssistant extends RaceAssistant {
 	carClassAheadRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
 		local car := knowledgeBase.getValue("Position.Track.Ahead.Car", kUndefined)
+		local class
 
-		if (car != kUndefined)
-			this.getSpeaker().speakPhrase("AheadCarClass", {class: this.getClass(car)})
+		if (car != kUndefined) {
+			class := this.getClass(car)
+
+			if (class = "Unknown")
+				class := translate(class)
+
+			this.getSpeaker().speakPhrase("CarClassAhead", {class: class})
+		}
 		else
 			this.getSpeaker().speakPhrase("NoTrackGap")
 	}
@@ -2401,9 +2408,16 @@ class GridRaceAssistant extends RaceAssistant {
 	carClassBehindRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
 		local car := knowledgeBase.getValue("Position.Track.Behind.Car", kUndefined)
+		local class
 
-		if (car != kUndefined)
-			this.getSpeaker().speakPhrase("BehindCarClass", {class: this.getClass(car)})
+		if (car != kUndefined) {
+			class := this.getClass(car)
+
+			if (class = "Unknown")
+				class := translate(class)
+
+			this.getSpeaker().speakPhrase("CarClassBehind", {class: class})
+		}
 		else
 			this.getSpeaker().speakPhrase("NoTrackGap")
 	}
@@ -2411,9 +2425,16 @@ class GridRaceAssistant extends RaceAssistant {
 	carCupAheadRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
 		local car := knowledgeBase.getValue("Position.Track.Ahead.Car", kUndefined)
+		local cup
 
-		if (car != kUndefined)
-			this.getSpeaker().speakPhrase("AheadCarCup", {class: this.getClass(car, false, "Cup")})
+		if (car != kUndefined) {
+			cup := this.getClass(car, false, "Cup")
+
+			if (cup = "Unknown")
+				cup := translate(cup)
+
+			this.getSpeaker().speakPhrase("CarCupAhead", {cup: cup})
+		}
 		else
 			this.getSpeaker().speakPhrase("NoTrackGap")
 	}
@@ -2421,9 +2442,16 @@ class GridRaceAssistant extends RaceAssistant {
 	carCupBehindRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
 		local car := knowledgeBase.getValue("Position.Track.Behind.Car", kUndefined)
+		local cup
 
-		if (car != kUndefined)
-			this.getSpeaker().speakPhrase("BehindCarCup", {class: this.getClass(car, false, "Cup")})
+		if (car != kUndefined) {
+			cup := this.getClass(car, false, "Cup")
+
+			if (cup = "Unknown")
+				cup := translate(cup)
+
+			this.getSpeaker().speakPhrase("CarCupBehind", {cup: cup})
+		}
 		else
 			this.getSpeaker().speakPhrase("NoTrackGap")
 	}

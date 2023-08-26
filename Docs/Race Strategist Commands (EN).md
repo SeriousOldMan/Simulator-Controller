@@ -94,6 +94,22 @@ Announcements=weather warnings
 	[(TellMe) the gap to the {leading car, leader}, (WhatIs) the gap to the {leading car, leader}, How big is the gap to the {leading car, leader}]
 	
 	[(TellMe) the gap to {car, car number, number} (Number), (WhatIs) the gap to {car, car number, number} (Number), How big is the gap to {car, car number, number} (Number)]
+	
+	[(TellMe) the {driver name, name of the driver, driver in the car} ahead, (WhatIs) the {driver name, name of the driver, driver in the car} ahead]
+
+	[(TellMe) the {driver name, name of the driver, driver in the car} behind, (WhatIs) the {driver name, name of the driver, driver in the car} behind]
+	
+	[(TellMe) the {class of the car, car class} ahead, (WhatIs) the {class of the car, car class} ahead]
+	
+	[(TellMe) the {class of the car, car class} behind, (WhatIs) the {class of the car, car class} behind]
+	
+	[(TellMe) the {cup category of the car, car cup category} ahead, (WhatIs) the {cup category of the car, car cup category} ahead]
+	
+	[(TellMe) the {cup category of the car, car cup category} behind, (WhatIs) the {cup category of the car, car cup category} behind]
+	
+	[(TellMe) the {current lap, last lap, lap} time of {car, car number, number} (Number), (WhatIs) the {current lap, last lap, lap} time of {car, car number, number} (Number)]
+	
+	[(TellMe) the {current lap, last lap, lap} time of P (Number)]
 
 	[(TellMe) {the, my} {current lap, last lap, lap} time, (WhatIs) {my, the} {current lap, last lap, lap} time]
 

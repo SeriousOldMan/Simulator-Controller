@@ -14,8 +14,7 @@
   1. Overhaul (shortening) of Assistant phrases
   2. More (configurable) verbosity for the Spotter, for example earlier announcements of cars approaching from behind (depending on the distance of the car behind)
   3. Controller action and voice command to enable/disable data collection
-  4. Graphical Editor for Vocalics Settings inkl. Test-Modus...
-  5. Better answers by the Strategist, when a pitstop cannot be recommended
+  4. Better answers by the Strategist, when a pitstop cannot be recommended
 
 #### Race Center
   1. Change hot target pressures for the next pitstop.
@@ -35,4 +34,3 @@
   
 #### General
   1. Choosing a specific color scheme and splash screen depending on the selected simulation game
-  2. Further simplification of the overall configuration process. Create a quick (one click) install, which puts all optional software into default locations and asks for P2T button.

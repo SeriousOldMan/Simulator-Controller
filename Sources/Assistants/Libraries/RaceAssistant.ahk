@@ -2392,7 +2392,7 @@ class GridRaceAssistant extends RaceAssistant {
 		if (car != kUndefined) {
 			class := this.getClass(car)
 
-			if (class = "Unknown")
+			if (class = kUnknown)
 				this.getSpeaker().speakPhrase("NoTrackGap")
 			else
 				this.getSpeaker().speakPhrase("CarClassAhead", {class: class})
@@ -2409,7 +2409,7 @@ class GridRaceAssistant extends RaceAssistant {
 		if (car != kUndefined) {
 			class := this.getClass(car)
 
-			if (class = "Unknown")
+			if (class = kUnknown)
 				this.getSpeaker().speakPhrase("NoTrackGap")
 			else
 				this.getSpeaker().speakPhrase("CarClassBehind", {class: class})
@@ -2424,9 +2424,9 @@ class GridRaceAssistant extends RaceAssistant {
 		local cup
 
 		if (car != kUndefined) {
-			cup := this.getClass(car, false, "Cup")
+			cup := this.getClass(car, false, ["Cup"])
 
-			if (cup = "Unknown")
+			if (cup = kUnknown)
 				this.getSpeaker().speakPhrase("NoTrackGap")
 			else
 				this.getSpeaker().speakPhrase("CarCupAhead", {cup: cup})
@@ -2441,9 +2441,9 @@ class GridRaceAssistant extends RaceAssistant {
 		local cup
 
 		if (car != kUndefined) {
-			cup := this.getClass(car, false, "Cup")
+			cup := this.getClass(car, false, [Cup])
 
-			if (cup = "Unknown")
+			if (cup = kUnknown)
 				this.getSpeaker().speakPhrase("NoTrackGap")
 			else
 				this.getSpeaker().speakPhrase("CarCupBehind", {cup: cup})

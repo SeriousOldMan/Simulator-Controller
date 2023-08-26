@@ -101,7 +101,7 @@ Mir=mir, mir bitte
 
 	[(KannstDu) (Mir) die {Rundenzeit, letzte Rundenzeit, Zeit, letzte Zeit} {des, von} {Wagens, Wagens Nummer, Nummer} (Number) {durchgeben, sagen}, {Gib, Sag} (Mir) die die {Rundenzeit, letzte Rundenzeit, Zeit, letzte Zeit} {des, von} {Wagens, Wagens Nummer, Nummer} (Number)]
 
-	[(KannstDu) (Mir) die {Rundenzeit, letzte Rundenzeit, Zeit, letzte Zeit} von P (Number) {durchgeben, sagen}, {Gib, Sag} (Mir) die die {Rundenzeit, letzte Rundenzeit, Zeit, letzte Zeit} von P (Number)]
+	[(KannstDu) (Mir) die {Rundenzeit, letzte Rundenzeit, Zeit, letzte Zeit} von Position (Number) {durchgeben, sagen}, {Gib, Sag} (Mir) die die {Rundenzeit, letzte Rundenzeit, Zeit, letzte Zeit} von Position (Number)]
 
 	[(KannstDu) (Mir) {die, meine} {Rundenzeit, letzte Rundenzeit, Zeit, letzte Zeit} {durchgeben, sagen}, {Gib, Sag} (Mir) {die, meine} {Rundenzeit, letzte Rundenzeit, Zeit, letzte Zeit}, Wie ist {die, meine} {Rundenzeit, letzte Rundenzeit, Zeit, letzte Zeit}]
 

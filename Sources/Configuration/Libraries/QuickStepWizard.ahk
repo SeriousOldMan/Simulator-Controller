@@ -29,7 +29,28 @@ class QuickStepWizard extends StepWizard {
 
 	Pages {
 		Get {
-			return (1 + (this.SetupWizard.QuickSetup ? 1 : 0))
+			return (1 + (this.QuickSetup ? 1 : 0))
+		}
+	}
+
+	QuickSetup {
+		Get {
+			return this.SetupWizard.QuickSetup
+		}
+
+		Set {
+			this.SetupWizard.QuickSetup := value
+
+			if this.SetupWizard.QuickSetup {
+				this.Control["quickSetupButton"].Value := (kResourcesDirectory . "Setup\Images\Quick Setup.ico")
+				this.Control["customSetupButton"].Value := (kResourcesDirectory . "Setup\Images\Full Setup Gray.ico")
+			}
+			else {
+				this.Control["quickSetupButton"].Value := (kResourcesDirectory . "Setup\Images\Quick Setup Gray.ico")
+				this.Control["customSetupButton"].Value := (kResourcesDirectory . "Setup\Images\Full Setup.ico")
+			}
+
+			return value
 		}
 	}
 
@@ -112,12 +133,12 @@ class QuickStepWizard extends StepWizard {
 		chooseMethod(method, *) {
 			if (method = "Quick") {
 				if (wizard.isQuickSetupAvailable() || GetKeyState("Ctrl", "P"))
-					wizard.QuickSetup := (GetKeyState("Ctrl", "P") ? "Force" : true)
+					this.QuickSetup := (GetKeyState("Ctrl", "P") ? "Force" : true)
 				else
-					wizard.QuickSetup := false
+					this.QuickSetup := false
 			}
 			else
-				wizard.QuickSetup := false
+				this.QuickSetup := false
 
 			wizard.updateState()
 		}
@@ -171,11 +192,11 @@ class QuickStepWizard extends StepWizard {
 
 		y += 150
 
-		widget2 := window.Add("Picture", "x" . button1X . " y" . y . " w64 h64 vquickSetupButton Hidden X:Move(0.33)", kResourcesDirectory . (wizard.QuickSetup ? "Setup\Images\Quick Setup.ico" : "Setup\Images\Quick Setup Gray.ico"))
+		widget2 := window.Add("Picture", "x" . button1X . " y" . y . " w64 h64 vquickSetupButton Hidden X:Move(0.33)", kResourcesDirectory . (this.QuickSetup ? "Setup\Images\Quick Setup.ico" : "Setup\Images\Quick Setup Gray.ico"))
 		widget2.OnEvent("Click", chooseMethod.Bind("Quick"))
 		widget3 := window.Add("Text", "x" . button1X . " yp+68 w64 Hidden Center X:Move(0.33)", translate("Basic"))
 
-		widget4 := window.Add("Picture", "x" . button2X . " y" . y . " w64 h64 vcustomSetupButton Hidden X:Move(0.66)", kResourcesDirectory . (!wizard.QuickSetup ? "Setup\Images\Full Setup.ico" : "Setup\Images\Full Setup Gray.ico"))
+		widget4 := window.Add("Picture", "x" . button2X . " y" . y . " w64 h64 vcustomSetupButton Hidden X:Move(0.66)", kResourcesDirectory . (!this.QuickSetup ? "Setup\Images\Full Setup.ico" : "Setup\Images\Full Setup Gray.ico"))
 		widget4.OnEvent("Click", chooseMethod.Bind("Extended"))
 		widget5 := window.Add("Text", "x" . button2X . " yp+68 w64 Hidden Center X:Move(0.66)", translate("Extended"))
 
@@ -367,7 +388,7 @@ class QuickStepWizard extends StepWizard {
 
 			this.loadSetup()
 
-			this.SetupWizard.QuickSetup := false
+			this.QuickSetup := false
 		}
 
 		super.showPage(page)
@@ -399,15 +420,6 @@ class QuickStepWizard extends StepWizard {
 			for ignore, assistant in this.Definition
 				for ignore, value in ["Synthesizer", "Voice", "Volume", "Pitch", "Speed"]
 					wizard.clearModuleValue(assistant, value, false)
-
-		if wizard.QuickSetup {
-			this.Control["quickSetupButton"].Value := (kResourcesDirectory . "Setup\Images\Quick Setup.ico")
-			this.Control["customSetupButton"].Value := (kResourcesDirectory . "Setup\Images\Full Setup Gray.ico")
-		}
-		else {
-			this.Control["quickSetupButton"].Value := (kResourcesDirectory . "Setup\Images\Quick Setup Gray.ico")
-			this.Control["customSetupButton"].Value := (kResourcesDirectory . "Setup\Images\Full Setup.ico")
-		}
 
 		for key, assistant in this.Assistants {
 			enabled := wizard.isModuleSelected(assistant)

@@ -1,9 +1,9 @@
 // Standard
+#Include Fragments.en
 #Include Choices.en
 #Include Conversation.en
 #Include Weather.en
 [Fragments]
-Not=not
 FrontLeft=front left
 FrontRight=front right
 RearLeft=rear left
@@ -13,46 +13,14 @@ Rear=rear
 Left=left
 Right=right
 All=all
-Increase=increase
-Decrease=decrease
-Cold=cold
-Setup=setup
-More=more
-Less=less
-Point=point
-Comma=comma
-UpTo=up to
-Zero=zero
-One=one
-Two=two
-Three=three
-Four=four
-Five=five
-Six=six
-Seven=seven
-Eight=eight
-Nine=nine
-DryTyre=dry
-IntermediateTyre=intermediate
-WetTyre=wet
 Suspension=suspension
 Bodywork=bodywork
 Engine=engine
 Temperatures=temperatures
 Pressures=pressures
 Wear=wear
-PSI=PSI
-Bar=Bar
-KPa=kilopascals
-Falling=falling
-Rising=rising
-Degrees=Degrees
-Celsius=Celsius
-Fahrenheit=Fahrenheit
-Liter=liters
-Gallon=gallons
-Gallon (GB)=gallons
-Gallon (US)=gallons
+Cold=cold
+Setup=setup
 FuelWarning=fuel warnings
 DamageReporting=damage warnings
 DamageAnalysis=damage analysis
@@ -62,9 +30,6 @@ ForYou=for you
 [Choices]
 Announcements=fuel warnings, damage warnings, damage analysis, weather warnings, pressure warnings
 [Listener Grammars]
-// Conversation //
-AnnouncementsOff=[Please no more (Announcements), No more (Announcements), No more (Announcements) please]
-AnnouncementsOn=[Please give me (Announcements), Can you give me (Announcements), Can you give me (Announcements) please, Give me (Announcements), Give me (Announcements) please]
 // Information //
 TyrePressures=[(WhatAre) {the, the cold, the setup, the current} {tire pressures, pressures}, (TellMe) {the, the cold, the setup, the current} {tire pressures, pressures}]
 TyreTemperatures=[(WhatAre) {the tire temperatures, the current tire temperatures, the temperatures at the moment}, (TellMe) {the tire temperatures, the current tire temperatures, the temperatures at the moment}]

@@ -1,50 +1,14 @@
 // Standard
+#Include Fragments.en
 #Include Choices.en
 #Include Conversation.en
 #Include Weather.en
 #Include Grid.en
 [Fragments]
-But=but
-And=and
-Zero=zero
-One=one
-Two=two
-Three=three
-Four=four
-Five=five
-Six=six
-Seven=seven
-Eight=eight
-Nine=nine
-Faster=faster
-Slower=slower
-Laps=laps
-Lap=lap
-Car=car
-Position=position
-Class=in our class
-Overall=overall
-Only=only
-DryTyre=dry
-IntermediateTyre=intermediate
-WetTyre=wet
 WeatherUpdate=weather warnings
-Point=point
-Comma=comma
-Liter=liters
-Gallon=gallons
-Gallon (GB)=gallons
-Gallon (US)=gallons
-Less=less
-More=More
-Earlier=earlier
-Later=later
 [Choices]
 Announcements=weather warnings
 [Listener Grammars]
-// Conversation //
-AnnouncementsOff=[Please no more (Announcements), No more (Announcements), No more (Announcements) please]
-AnnouncementsOn=[Please give me (Announcements), Can you give me (Announcements), Can you give me (Announcements) please, Give me (Announcements), Give me (Announcements) please]
 // Information //
 LapsRemaining=[(TellMe) the remaining laps, How many laps are remaining, How many laps are left, How many laps to go, How long to go]
 FuturePosition=[Simulate the {race, standings} in (Number) laps, (CanYou) simulate the {race, standings} in (Number) laps, What will my position be in (Number) laps, What is my position in (Number) laps]

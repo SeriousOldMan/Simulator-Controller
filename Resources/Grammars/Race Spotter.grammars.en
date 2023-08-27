@@ -1,30 +1,13 @@
 // Includes
+#Include Fragments.en
 #Include Choices.en
 #Include Conversation.en
 #Include Grid.en
 [Fragments]
-Zero=zero
-One=one
-Two=two
-Three=three
-Four=four
-Five=five
-Six=six
-Seven=seven
-Eight=eight
-Nine=nine
 GreetingDry=it is dry
 GreetingDry2Wet=it is still dry
 GreetingWet=it is wet
 GreetingWet2Dry=it is still wet
-Faster=faster
-Slower=slower
-Laps=laps
-Lap=lap
-Car=car
-Position=position
-Class=in our class
-Overall=overall
 DeltaInformation=delta information
 CutWarnings=cut warnings
 PenaltyInformation=penalty information
@@ -33,23 +16,12 @@ SideProximity=side alerts
 RearProximity=rear alerts
 BlueFlags=blue flag warnings
 YellowFlags=yellow flag warnings
-Sectors=first,second,third,fourth,fifth
-Celsius=Celsius
-Fahrenheit=Fahrenheit
-Point=point
-Comma=comma
-Number=number
 SG=Stop and Go
 DT=Drive Through
 Time=Time
-And=and
-But=but
 [Choices]
 Announcements=delta information, tactical advice, side alerts, rear alerts, blue flag warnings, yellow flag warnings, cut warnings, penalty information
 [Listener Grammars]
-// Conversation //
-AnnouncementsOff=[Please no more (Announcements), No more (Announcements), No more (Announcements) please]
-AnnouncementsOn=[Please give me (Announcements), Can you give me (Announcements), Can you give me (Announcements) please, Give me (Announcements), Give me (Announcements) please]
 // Information //
 FocusCar=[(CanYou) {focus on, observe} {car, car number, number} (Number), (CanYou) give {me, me more} information about {car, car number, number} (Number)]
 NoFocusCar=[Please no more information on {car, car number, number} (Number), Stop reporting on {car, car number, number} (Number) please]

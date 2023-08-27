@@ -1,6 +1,7 @@
 // Standard
 #Include Choices.en
 #Include Conversation.en
+#Include Weather.en
 #Include Grid.en
 [Fragments]
 But=but
@@ -46,7 +47,6 @@ AnnouncementsOff=[Please no more (Announcements), No more (Announcements), No mo
 AnnouncementsOn=[Please give me (Announcements), Can you give me (Announcements), Can you give me (Announcements) please, Give me (Announcements), Give me (Announcements) please]
 // Information //
 LapsRemaining=[(TellMe) the remaining laps, How many laps are remaining, How many laps are left, How many laps to go, How long to go]
-Weather=[What about the weather, Is rain ahead, {Any, Are} weather changes in sight, (CanYou) check the {weather, weather please}]
 FuturePosition=[Simulate the {race, standings} in (Number) laps, (CanYou) simulate the {race, standings} in (Number) laps, What will my position be in (Number) laps, What is my position in (Number) laps]
 // Pitstop Planning //
 PitstopRecommend=[(WhatIs) the best {lap, option} for the next pitstop, When do you recommend the next pitstop, (CanYou) recommend the next pitstop, In what lap should I come to the pit]
@@ -87,24 +87,11 @@ LapsStint.1=But your stint ends in %laps% laps.
 LapsStint.2=But only %laps% laps are remaining for your stint.
 LapsSession.1=But the session ends in about %laps% laps.
 LapsSession.2=But only %laps% laps to go for the rest of the session.
-WeatherGood.1=The weather looks stable.
-WeatherGood.2=The weather will be Okay. Don't worry.
-WeatherRain.1=It looks like rain is ahead.
-WeatherRain.2=%driver%, we have to expect rain in a few minutes.
 NoFutureLap.1=This makes no sense. Please choose a future lap.
 FuturePosition.1=You will most likely be in P %position% %class%.
 FuturePosition.2=The simulation shows you in P %position% %class%.
 FuturePosition.3=Looks like you will be in P %position% %class%.
 NoFuturePosition.1=We do not have enough data for a simulation yet.
-// Weather Analysis & Tyre Recommendation //
-WeatherChange.1=%driver%, it looks like the weather will change in about %minutes% minutes. I will keep an eye on that.
-WeatherChange.2=This is %name%. I just got the latest weather information. Maybe we need to adjust our strategy.
-WeatherNoChange.1=%driver%, it looks like the weather will change in about %minutes% minutes. But a strategy change so late might not be worth it.
-WeatherNoChange.2=This is %name%. I just got the latest weather information. There is a change ahead, but we might make it with our current setup.
-WeatherRainChange.1=%driver%, %name% here. It will start raining in %minutes% minutes. We should switch to %compound% tires as soon as possible.
-WeatherRainChange.2=%name% here. It looks like that it will begin raining in a few minutes. I recommend a tire change.
-WeatherDryChange.1=%driver%, it will dry up in the next %minutes% minutes. Maybe be we should change to %compound% tires.
-WeatherDryChange.2=Hey %driver%, %name% here. It will stop raining in %minutes% minutes. I think, we can plan for a change to %compound% tires.
 // Pitstop Strategy Planning //
 PitstopLap.1=Hi %driver%, the best lap for a pitstop will be lap %lap%.
 PitstopLap.2=%name% here, you should come to the pit on lap %lap%.

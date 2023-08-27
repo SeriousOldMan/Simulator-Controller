@@ -1,3 +1,6 @@
+// Standard
+#Include Choices.en
+#Include Conversation.en
 [Fragments]
 Not=not
 FrontLeft=front left
@@ -56,24 +59,12 @@ WeatherUpdate=weather warnings
 PressureReporting=pressure warnings
 ForYou=for you
 [Choices]
-TellMe=Can you tell me, Please tell me, Tell me, Can you give me, Please give me, Give me
-WhatAre=Tell me, Give me, What are
-WhatIs=Tell me, Give me, What is
-CanYou=Can you, Please
-CanWe=Can you, Can we, Please
 Announcements=fuel warnings, damage warnings, damage analysis, weather warnings, pressure warnings
 [Listener Grammars]
 // Conversation //
-Call=[{Hi, Hey} %name%, %name% do you hear me, %name% I need you, %name% where are you, %name% come in please]
-Yes=[Yes {please, of course}, {Yes, Perfect} go on, {Go, Okay go} {on, on please, ahead, ahead please}, I agree, Right, Correct, Confirmed, I confirm, Affirmative]
-No=[No {thank you, not now, I will call you later, not right now, not at the moment}, Not at the moment, Negative]
-Joke=[(CanYou) tell me a joke, Do you have a joke for me]
-Deactivate=[Shut up, Silence please, Be quiet please, I must concentrate, I {must, need to} focus now, Please be quiet]
-Activate=[Okay you can talk, I can listen {now, again}, You can talk {now, again}, Keep me {informed, updated, up to date}]
 AnnouncementsOff=[Please no more (Announcements), No more (Announcements), No more (Announcements) please]
 AnnouncementsOn=[Please give me (Announcements), Can you give me (Announcements), Can you give me (Announcements) please, Give me (Announcements), Give me (Announcements) please]
 // Information //
-Time=[(TellMe) the time, What time is it, What is the {current time, time}]
 TyrePressures=[(WhatAre) {the, the cold, the setup, the current} {tire pressures, pressures}, (TellMe) {the, the cold, the setup, the current} {tire pressures, pressures}]
 TyreTemperatures=[(WhatAre) {the tire temperatures, the current tire temperatures, the temperatures at the moment}, (TellMe) {the tire temperatures, the current tire temperatures, the temperatures at the moment}]
 TyreWear=[{Check, Please check} {the tire wear, the tire wear at the moment}, (TellMe) {the tire wear, the tire wear at the moment}]
@@ -111,52 +102,18 @@ CallUs.3=Good luck.
 CallMe.1=You can call me anytime if you have questions. Good luck.
 CallMe.2=Call me anytime.
 CallMe.3=Have a good race.
-WelcomeBack.1=Hi %driver%, welcome back.
-WelcomeBack.2=Welcome back, %driver%.
-IHearYou.1=I am here. What can I do for you?
-IHearYou.2=Yeah %driver%? Have you called me?
-IHearYou.3=I hear you. Go on.
-IHearYou.4=Yes, I hear you. What do you need?
-IHearYou.5=Reading you five by five. How can I help?
-Confirm.1=Roger, I come back to you as soon as possible.
-Confirm.2=Okay, give me a second.
-Confirm.3=Wait a minute.
-Confirm.4=I will check it out immediately.
-Roger.1=Okay, I will do it.
-Roger.2=Will do.
-Roger.3=Okay, got it.
-Roger.4=Roger, understood.
-Okay.1=Okay. Call me when you are ready.
-Okay.2=Understood. I will be here.
-NotPossible.1=Cannot do this right now.
-NotPossible.2=This is not possible at the moment.
-NotPossible.3=It is not possible to do this right now.
-Repeat.1=Sorry %driver%, I did not understand. Can you repeat?
-Repeat.2=Sorry, I didn't get that. Repeat please.
-Repeat.3=Can you repeat that please?
-Repeat.4=Negative copy, please repeat.
-Bye.1=Well done, come to the pits now.
-Bye.2=Bring the car home.
-Bye.3=Done. It was great working with you again.
 Later.1=Sorry, I do not have enough data yet. Please come back in one or two laps.
 Later.2=We have a blue screen here. Windows XP is crap. Give me a minute.
 Later.3=Your telemetry data was corrupted this lap. We need another lap to gather the data.
 MoreChanges.1=Do you have more changes?
 MoreChanges.2=Anything else?
 MoreChanges.3=Is there anything else to change?
-Joke.1=Actually, you should concentrate on your driving, but here we go.
-Joke.2=Okay, but afterwards I want to see your focus.
-NoJoke.1=Sorry, I have nothing to laugh at the moment.
-NoJoke.2=What? You should concentrate at your driving.
 // Announcement Handling //
 ConfirmAnnouncementOff.1=You want no more %announcement%, is this correct?
 ConfirmAnnouncementOff.2=No more %announcement%, right?
 ConfirmAnnouncementOn.1=You want me to give you %announcement%, right?
 ConfirmAnnouncementOn.2=I will give you %announcement%, is this correct?
 // Information //
-Time.1=It is %time%.
-Time.2=Now it is exactly %time%.
-Time.3=We have %time%.
 Laps.1=You still have %laps% laps to go.
 Laps.2=The remaining fuel is good for %laps% laps.
 LowLaps.1=Not so much. You will run out of fuel in %laps% laps.

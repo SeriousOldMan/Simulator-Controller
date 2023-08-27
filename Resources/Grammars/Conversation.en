@@ -1,0 +1,52 @@
+[Listener Grammars]
+// Conversation //
+Call=[{Hi, Hey} %name%, %name% do you hear me, %name% I need you, %name% where are you, %name% come in please]
+Yes=[Yes {please, of course}, {Yes, Perfect} go on, {Go, Okay go} {on, on please, ahead, ahead please}, I agree, Right, Correct, Confirmed, I confirm, Affirmative]
+No=[No {thank you, not now, I will call you later}, Not at the moment, Negative]
+Joke=[(CanYou) tell me a joke, Do you have a joke for me]
+Deactivate=[Shut up, Silence please, Be quiet please, I must concentrate, I {need to, must} focus now]
+Activate=[Okay you can talk, I can listen {now, again}, You can talk {now, again}, Keep me {informed, updated, up to date}]
+// Information //
+Time=[(TellMe) the time, What time is it, What is the {current time, time}]
+[Speaker Phrases]
+// Conversation //	
+WelcomeBack.1=Hi %driver%, welcome back.
+WelcomeBack.2=Welcome back, %driver%.
+IHearYou.1=I am here. What can I do for you?
+IHearYou.2=Yeah %driver%? Have you called me?
+IHearYou.3=I hear you. Go on.
+IHearYou.4=Yes, I hear you. What do you need?
+IHearYou.5=Reading you five by five. How can I help?
+Confirm.1=Roger, I come back to you as soon as possible.
+Confirm.2=Okay, give me a second.
+Confirm.3=Wait a minute.
+Confirm.4=I will check it out immediately.
+Confirm.5=Roger, wait a moment.
+Confirm.6=Okay, I'll do it right now.
+Comfirm.7=Okay, let me see.
+Roger.1=Okay, I will do it.
+Roger.2=Will do.
+Roger.3=Okay, got it.
+Roger.4=Roger, understood.
+NotPossible.1=Cannot do this right now.
+NotPossible.2=This is not possible at the moment.
+NotPossible.3=It is not possible to do this right now.
+Okay.1=Okay. Call me when you are ready.
+Okay.2=Understood. I will be here.
+Okay.3=Okay. But I'll be here if you need me.
+Okay.4=Understood, no problem.
+Repeat.1=Sorry %driver%, I did not understand. Can you repeat?
+Repeat.2=Sorry, I didn't get that. Repeat please.
+Repeat.3=Can you repeat that please?
+Bye.1=Okay, come to the pits now.
+Bye.2=Well done, then bring the car back.
+Bye.3=Done. I love to work with you.
+Bye.4=Done. It was great working with you again.
+Joke.1=Actually you should concentrate on your driving, but here we go.
+Joke.2=Okay, but afterwards I want to see your focus.
+NoJoke.1=Sorry, I have nothing to laugh at the moment.
+NoJoke.2=What? You should concentrate at your driving.
+// Information //
+Time.1=It is %time%.
+Time.2=Now it is exactly %time%.
+Time.3=We have %time%.

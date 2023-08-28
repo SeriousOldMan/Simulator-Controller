@@ -394,6 +394,12 @@ Please see the following table for available information commands.
 | GapToAhead [Standings, Track] | Cato will tell you the gap in seconds to the car one position ahead of you or to the car directly in front of you. If you don't supply *Standings* or *Track*, it will default to *Standings*. Please note, that for compatibility reasons, *GapToFront* is supported as well. |
 | GapToBehind [Standings, Track] | Cato will tell you the gap in seconds to the car one position behind you or to the car directly behind you. If you don't supply *Standings* or *Track*, it will default to *Standings*. |
 | GapToLeader | Cato will tell you the gap in seconds to the leading car. |
+| DriverNameAhead | The Strategist will tell you the driver name of the car ahead of you. |
+| DriverNameBehind | The Strategist will tell you the driver name of the car behind of you. |
+| CarClassAhead | The Strategist will tell you the class of the car ahead of you. |
+| CarClassBehind | The Strategist will tell you the class of the car behind of you. |
+| CarCupAhead | The Strategist will tell you the cup category of the car ahead of you. |
+| CarCupBehind | The Strategist will tell you the cup category of the car behind of you. |
 | StrategyOverview | As the name says, you will get a complete overview of the race strategy, as long as one has been defined in the "Strategy Workbench" and has been exported to be used in this session. |
 | NextPitstop | Cato tells you the lap, where the next pitstop according to the strategy has been planned. |
 
@@ -458,6 +464,12 @@ Please see the following table for available information commands.
 | GapToAhead [Standings, Track] | Elisa will tell you the gap in seconds to the car one position ahead of you or to the car directly in front of you. If you don't supply *Standings* or *Track*, it will default to *Standings*. |
 | GapToBehind [Standings, Track] | Elisa will tell you the gap in seconds to the car one position behind you or to the car directly behind you. If you don't supply *Standings* or *Track*, it will default to *Standings*. |
 | GapToLeader | Elisa will tell you the gap in seconds to the leading car. |
+| DriverNameAhead | The Spotter will tell you the driver name of the car ahead of you. |
+| DriverNameBehind | The Spotter will tell you the driver name of the car behind of you. |
+| CarClassAhead | The Spotter will tell you the class of the car ahead of you. |
+| CarClassBehind | The Spotter will tell you the class of the car behind of you. |
+| CarCupAhead | The Spotter will tell you the cup category of the car ahead of you. |
+| CarCupBehind | The Spotter will tell you the cup category of the car behind of you. |
 
 Note: All these commands are also available in most of the simulation plugins, either in the "Pitstop" mode or in the "Assistant" mode, depending on the configuration parameters.
 

@@ -2015,9 +2015,8 @@ class WebView2Viewer extends HTMLViewer {
 
 	__New(control) {
 		local application := Strsplit(A_ScriptName, ".")[1]
-		local rnd := Random(1, 1000)
 
-		this.iHTMLFile := temporaryFileName("HTML\" . application . "\" . "html" . rnd, "html")
+		this.iHTMLFile := temporaryFileName("HTML\" . application . "\" . "html" . Random(1, 1000), "html")
 
 		super.__New(control)
 	}

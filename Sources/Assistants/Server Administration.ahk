@@ -71,14 +71,10 @@ class AdministrationResizer extends Window.Resizer {
 generatePassword(length) {
 	local valid := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
 	local result := ""
-	local index
-
-	while (0 < length--) {
-		index := Random(1, StrLen(valid))
-
-		result .= SubStr(valid, Round(index), 1)
-	}
-
+	
+	while (0 < length--)
+		result .= SubStr(valid, Round(Random(1, StrLen(valid))), 1)
+	
 	return result
 }
 

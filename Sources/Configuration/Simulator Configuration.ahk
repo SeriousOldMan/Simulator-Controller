@@ -525,6 +525,8 @@ startupSimulatorConfiguration() {
 	local done, saved, result
 
 	saveConfiguration(configurationFile, editor) {
+		global kSimulatorConfiguration
+
 		local configuration := newMultiMap()
 		local startupLink, startupExe
 
@@ -545,6 +547,8 @@ startupSimulatorConfiguration() {
 			deleteFile(startupLink)
 
 		deleteDirectory(kTempDirectory, false)
+
+		kSimulatorConfiguration := configuration
 	}
 
 	editor.createGui(editor.Configuration)

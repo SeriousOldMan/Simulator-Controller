@@ -13,6 +13,7 @@
 #Include "Variables.ahk"
 #Include "Debug.ahk"
 #Include "Files.ahk"
+#Include "Strings.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -26,6 +27,20 @@ class MultiMap extends CaseInsenseWeakMap {
 
 	static parse(text) {
 		return parseMultiMap(text)
+	}
+
+	include(path, directory?) {
+		local curWorkingDir := A_WorkingDir
+
+		if isSet(directory)
+			SetWorkingDir(directory)
+
+		try {
+			addMultiMapValues(this, readMultiMap(path))
+		}
+		finally {
+			SetWorkingDir(curWorkingDir)
+		}
 	}
 
 	write(multiMapFile, symbolic := true) {
@@ -78,7 +93,7 @@ newSectionMap(arguments*) {
 	return CaseInsenseWeakMap(arguments*)
 }
 
-readMultiMap(multiMapFile) {
+readMultiMap(multiMapFile, class?) {
 	local file := false
 	local tries := 20
 	local data := false
@@ -108,20 +123,23 @@ readMultiMap(multiMapFile) {
 			}
 			catch Any as exception {
 				if (tries-- <= 0)
-					return newMultiMap()
+					return isSet(class) ? class() : newMultiMap()
 				else
 					Sleep(10)
 			}
 
-		if (data && (data != ""))
-			return parseMultiMap(data)
+		if (data && (data != "")) {
+			SplitPath(multiMapFile, , &directory)
+
+			return parseMultiMap(data, class?, directory)
+		}
 	}
 
 	return newMultiMap()
 }
 
-parseMultiMap(text) {
-	local multiMap := newMultiMap()
+parseMultiMap(text, class?, directory?) {
+	local multiMap := (isSet(class) ? class() : newMultiMap())
 	local section := false
 	local currentLine, firstChar, keyValue, key, value
 
@@ -138,8 +156,11 @@ parseMultiMap(text) {
 		else if (firstChar = "[") {
 			section := StrReplace(StrReplace(RTrim(currentLine), "[", ""), "]", "")
 
-			multiMap[section] := newSectionMap()
+			if !multiMap.Has(section)
+				multiMap[section] := newSectionMap()
 		}
+		else if ((firstChar = "#") && (InStr(currentLine, "#Include") = 1))
+			multiMap.include(substituteVariables(Trim(SubStr(currentLine, 9))), directory?)
 		else if section {
 			keyValue := LTrim(currentLine)
 

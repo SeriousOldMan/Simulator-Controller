@@ -1,5 +1,9 @@
+// Standard
+#Include Fragments.en
+#Include Choices.en
+#Include Conversation.en
+#Include Weather.en
 [Fragments]
-Not=not
 FrontLeft=front left
 FrontRight=front right
 RearLeft=rear left
@@ -9,46 +13,14 @@ Rear=rear
 Left=left
 Right=right
 All=all
-Increase=increase
-Decrease=decrease
-Cold=cold
-Setup=setup
-More=more
-Less=less
-Point=point
-Comma=comma
-UpTo=up to
-Zero=zero
-One=one
-Two=two
-Three=three
-Four=four
-Five=five
-Six=six
-Seven=seven
-Eight=eight
-Nine=nine
-DryTyre=dry
-IntermediateTyre=intermediate
-WetTyre=wet
 Suspension=suspension
 Bodywork=bodywork
 Engine=engine
 Temperatures=temperatures
 Pressures=pressures
 Wear=wear
-PSI=PSI
-Bar=Bar
-KPa=kilopascals
-Falling=falling
-Rising=rising
-Degrees=Degrees
-Celsius=Celsius
-Fahrenheit=Fahrenheit
-Liter=liters
-Gallon=gallons
-Gallon (GB)=gallons
-Gallon (US)=gallons
+Cold=cold
+Setup=setup
 FuelWarning=fuel warnings
 DamageReporting=damage warnings
 DamageAnalysis=damage analysis
@@ -56,24 +28,9 @@ WeatherUpdate=weather warnings
 PressureReporting=pressure warnings
 ForYou=for you
 [Choices]
-TellMe=Can you tell me, Please tell me, Tell me, Can you give me, Please give me, Give me
-WhatAre=Tell me, Give me, What are
-WhatIs=Tell me, Give me, What is
-CanYou=Can you, Please
-CanWe=Can you, Can we, Please
 Announcements=fuel warnings, damage warnings, damage analysis, weather warnings, pressure warnings
 [Listener Grammars]
-// Conversation //
-Call=[{Hi, Hey} %name%, %name% do you hear me, %name% I need you, %name% where are you, %name% come in please]
-Yes=[Yes {please, of course}, {Yes, Perfect} go on, {Go, Okay go} {on, on please, ahead, ahead please}, I agree, Right, Correct, Confirmed, I confirm, Affirmative]
-No=[No {thank you, not now, I will call you later, not right now, not at the moment}, Not at the moment, Negative]
-Joke=[(CanYou) tell me a joke, Do you have a joke for me]
-Deactivate=[Shut up, Silence please, Be quiet please, I must concentrate, I {must, need to} focus now, Please be quiet]
-Activate=[Okay you can talk, I can listen {now, again}, You can talk {now, again}, Keep me {informed, updated, up to date}]
-AnnouncementsOff=[Please no more (Announcements), No more (Announcements), No more (Announcements) please]
-AnnouncementsOn=[Please give me (Announcements), Can you give me (Announcements), Can you give me (Announcements) please, Give me (Announcements), Give me (Announcements) please]
 // Information //
-Time=[(TellMe) the time, What time is it, What is the {current time, time}]
 TyrePressures=[(WhatAre) {the, the cold, the setup, the current} {tire pressures, pressures}, (TellMe) {the, the cold, the setup, the current} {tire pressures, pressures}]
 TyreTemperatures=[(WhatAre) {the tire temperatures, the current tire temperatures, the temperatures at the moment}, (TellMe) {the tire temperatures, the current tire temperatures, the temperatures at the moment}]
 TyreWear=[{Check, Please check} {the tire wear, the tire wear at the moment}, (TellMe) {the tire wear, the tire wear at the moment}]
@@ -81,7 +38,6 @@ BrakeTemperatures=[(WhatAre) {the brake temperatures, the current brake temperat
 BrakeWear=[{Check, Please check} {the brake wear, the brake wear at the moment}, (TellMe) {the brake wear, the brake wear at the moment}]
 LapsRemaining=[(TellMe) the remaining laps, How many laps are remaining, How many laps are left, How many laps to go, How long to go]
 FuelRemaining=[How much {gas, fuel} is left, How much {gas, fuel} is {left in the tank, still there}, (TellMe) the remaining {gas, fuel}, (WhatIs) the remaining {gas, fuel}]
-Weather=[What about the weather, Is rain ahead, {Any, Are} weather changes in sight, (CanYou) check the {weather, weather please}]
 // Pitstop //
 PitstopPlan=(CanWe) {plan the pitstop, create a plan for the pitstop, create a pitstop plan, come up with a pitstop plan}
 DriverSwapPlan=(CanWe) {plan the driver swap, create a plan for the driver swap, create a driver swap plan, come up with a driver swap plan}
@@ -111,52 +67,18 @@ CallUs.3=Good luck.
 CallMe.1=You can call me anytime if you have questions. Good luck.
 CallMe.2=Call me anytime.
 CallMe.3=Have a good race.
-WelcomeBack.1=Hi %driver%, welcome back.
-WelcomeBack.2=Welcome back, %driver%.
-IHearYou.1=I am here. What can I do for you?
-IHearYou.2=Yeah %driver%? Have you called me?
-IHearYou.3=I hear you. Go on.
-IHearYou.4=Yes, I hear you. What do you need?
-IHearYou.5=Reading you five by five. How can I help?
-Confirm.1=Roger, I come back to you as soon as possible.
-Confirm.2=Okay, give me a second.
-Confirm.3=Wait a minute.
-Confirm.4=I will check it out immediately.
-Roger.1=Okay, I will do it.
-Roger.2=Will do.
-Roger.3=Okay, got it.
-Roger.4=Roger, understood.
-Okay.1=Okay. Call me when you are ready.
-Okay.2=Understood. I will be here.
-NotPossible.1=Cannot do this right now.
-NotPossible.2=This is not possible at the moment.
-NotPossible.3=It is not possible to do this right now.
-Repeat.1=Sorry %driver%, I did not understand. Can you repeat?
-Repeat.2=Sorry, I didn't get that. Repeat please.
-Repeat.3=Can you repeat that please?
-Repeat.4=Negative copy, please repeat.
-Bye.1=Well done, come to the pits now.
-Bye.2=Bring the car home.
-Bye.3=Done. It was great working with you again.
 Later.1=Sorry, I do not have enough data yet. Please come back in one or two laps.
 Later.2=We have a blue screen here. Windows XP is crap. Give me a minute.
 Later.3=Your telemetry data was corrupted this lap. We need another lap to gather the data.
 MoreChanges.1=Do you have more changes?
 MoreChanges.2=Anything else?
 MoreChanges.3=Is there anything else to change?
-Joke.1=Actually, you should concentrate on your driving, but here we go.
-Joke.2=Okay, but afterwards I want to see your focus.
-NoJoke.1=Sorry, I have nothing to laugh at the moment.
-NoJoke.2=What? You should concentrate at your driving.
 // Announcement Handling //
 ConfirmAnnouncementOff.1=You want no more %announcement%, is this correct?
 ConfirmAnnouncementOff.2=No more %announcement%, right?
 ConfirmAnnouncementOn.1=You want me to give you %announcement%, right?
 ConfirmAnnouncementOn.2=I will give you %announcement%, is this correct?
 // Information //
-Time.1=It is %time%.
-Time.2=Now it is exactly %time%.
-Time.3=We have %time%.
 Laps.1=You still have %laps% laps to go.
 Laps.2=The remaining fuel is good for %laps% laps.
 LowLaps.1=Not so much. You will run out of fuel in %laps% laps.
@@ -216,10 +138,6 @@ WearRL.1=%used% percent wear in rear left.
 WearRL.2=%remaining% percent remain at the rear left.
 WearRR.1=Rear right %used% percent gone.
 WearRR.2=Rear right there are still %remaining% percent.
-WeatherGood.1=The weather looks stable.
-WeatherGood.2=The weather will be Okay. Don't worry.
-WeatherRain.1=It looks like rain is ahead.
-WeatherRain.2=%driver%, we have to expect rain in a few minutes.
 // Fuel Warning //
 LowFuel.1=This is %name%. You have fuel left for %laps% laps. Keep an eye on that.
 LowFuel.2=%name% here. Fuel is getting low, only %laps% laps left.
@@ -261,15 +179,6 @@ NoTimeLost.3=%driver%, the damage is no issue. You are doing great.
 PressureLoss.1=It looks like your %tyre% tire is losing pressure. I will take a look at that.
 PressureLoss.2=Your %tyre% tire has lost pressure, be careful.
 PressureLoss.3=Hi %driver%, I can see in the data that your %tyre% tire is losing pressure. Let me see what we can do.
-// Weather Analysis & Tyre Recommendation //
-WeatherChange.1=%driver%, it looks like the weather will change in about %minutes% minutes. I will keep an eye on that.
-WeatherChange.2=This is %name%. I just got the latest weather information. Maybe we need to change tires.
-WeatherNoChange.1=%driver%, it looks like the weather will change in about %minutes% minutes. But a tire change so late might not be worth it.
-WeatherNoChange.2=This is %name%. I just got the latest weather information. There is a change ahead, but we might make it with our current setup.
-WeatherRainChange.1=%driver%, %name% here. It will start raining in %minutes% minutes. We should switch to %compound% tires as soon as possible.
-WeatherRainChange.2=%name% here. It looks like that it will begin raining in a few minutes. I recommend a tire change.
-WeatherDryChange.1=%driver%, it will dry up in the next %minutes% minutes. Maybe be we should change to %compound% tires.
-WeatherDryChange.2=Hey, it will stop raining in %minutes% minutes. I think, we can plan for a change to %compound% tires.
 // Pitstop Planning, Preparation & Handling //
 NoPitstop.1=We don't need to do that. Just come in.
 NoPitstop.2=This makes no sense. You can come in whenever you want.

@@ -1,0 +1,18 @@
+[Listener Grammars]
+// Information //
+Weather=[Wie wird das Wetter, Wird es regnen, Kommmt ein Wetterwechsel, Sag (Mir) ob {es regnen wird, ein Wetterwechsel kommt, wie das Wetter wird}]
+[Speaker Phrases]
+// Information //
+WeatherGood.1=Das Wetter ist im Moment stabil.
+WeatherGood.2=Ist Okay, mach Dir keine Gedanken.
+WeatherRain.1=Es sieht leider nach Regen aus.
+WeatherRain.2=%driver%, wir müssen wohl in einigen Minuten mit Regen rechnen.
+// Weather Analysis & Tyre Recommendation //
+WeatherChange.1=%driver%, es sieht so aus als erwartet uns in %minutes% Minuten ein Wetterwechsel. Ich werde das beobachten.
+WeatherChange.2=Hier ist %name%. Ich habe gerade die letzten Wetterdaten für die nächsten %minutes% Minuten bekommen. Wir müssen uns wohl auf einen Reifenwechsel einstellen.
+WeatherNoChange.1=%driver%, es sieht so aus als erwartet uns in %minutes% Minuten ein Wetterwechsel. Aber ein Reifenwechsel so spät wird sich wahrscheinlich nicht mehr lohnen.
+WeatherNoChange.2=Hier ist %name%. Ich habe gerade die letzten Wetterdaten für die nächsten %minutes% Minuten bekommen. Uns erwartet ein Wetterwechsel, aber wir sollten es mit unserem aktuellen Setup schaffen.
+WeatherRainChange.1=%driver%, %name% hier. Es wird in %minutes% Minuten zu regnen beginnen. Wir sollten bald auf %compound% Reifen wechseln.
+WeatherRainChange.2=%name% hier. Es wird wohl gleich regnen. Ich empfehle einen Reifenwechsel.
+WeatherDryChange.1=%driver%, in %minutes% Minuten wird der Track abtrocknen. Wir sollten langsam auf %compound% Reifen wechseln.
+WeatherDryChange.2=Hey, es wird in %minutes% Minuten aufhören zu regnen. Ich empfehle einen Wechsel auf %compound% Reifen.

@@ -182,6 +182,24 @@ class SpeechRecognizer {
 		}
 	}
 
+	Engine {
+		Get {
+			return this.iEngine
+		}
+	}
+
+	Choices {
+		Get {
+			return this.iChoices
+		}
+	}
+
+	Grammars {
+		Get {
+			return this._grammars
+		}
+	}
+
 	Recognizers[language := false] {
 		Get {
 			local result := []
@@ -266,7 +284,7 @@ class SpeechRecognizer {
 
 				choices := []
 
-				loop 11
+				loop 10
 					choices.Push((A_Index - 1) . "")
 
 				this.setChoices("Digit", choices)
@@ -495,8 +513,11 @@ class SpeechRecognizer {
 
 			return grammar
 		}
-		else if this.Instance
+		else if this.Instance {
+			this._grammars[name] := {Name: name, Grammar: grammar, Callback: callback}
+
 			return this.Instance.LoadGrammar(grammar, name, this._onGrammarCallback.Bind(this))
+		}
 		else
 			return false
 	}
@@ -761,8 +782,12 @@ class GrammarCompiler {
 
 		literalValue := this.readLiteral(&text, &nextCharIndex)
 
-		if literalValue
+		if literalValue {
 			builtin := literalValue.Value
+
+			if !this.SpeechRecognizer.Choices.Has(builtin)
+				throw "Syntax error detected in `"" . text . "`" at " . nextCharIndex . " in GrammarCompiler.readBuiltinChoices..."
+		}
 		else
 			throw "Syntax error detected in `"" . text . "`" at " . nextCharIndex . " in GrammarCompiler.readBuiltinChoices..."
 

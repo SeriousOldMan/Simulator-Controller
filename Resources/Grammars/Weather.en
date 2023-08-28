@@ -1,0 +1,18 @@
+[Listener Grammars]
+// Information //
+Weather=[What about the weather, Is rain ahead, {Any, Are} weather changes in sight, (CanYou) check the {weather, weather please}]
+[Speaker Phrases]
+// Information //
+WeatherGood.1=The weather looks stable.
+WeatherGood.2=The weather will be Okay. Don't worry.
+WeatherRain.1=It looks like rain is ahead.
+WeatherRain.2=%driver%, we have to expect rain in a few minutes.
+// Weather Analysis & Tyre Recommendation //
+WeatherChange.1=%driver%, it looks like the weather will change in about %minutes% minutes. I will keep an eye on that.
+WeatherChange.2=This is %name%. I just got the latest weather information. Maybe we need to change tires.
+WeatherNoChange.1=%driver%, it looks like the weather will change in about %minutes% minutes. But a tire change so late might not be worth it.
+WeatherNoChange.2=This is %name%. I just got the latest weather information. There is a change ahead, but we might make it with our current setup.
+WeatherRainChange.1=%driver%, %name% here. It will start raining in %minutes% minutes. We should switch to %compound% tires as soon as possible.
+WeatherRainChange.2=%name% here. It looks like that it will begin raining in a few minutes. I recommend a tire change.
+WeatherDryChange.1=%driver%, it will dry up in the next %minutes% minutes. Maybe be we should change to %compound% tires.
+WeatherDryChange.2=Hey, it will stop raining in %minutes% minutes. I think, we can plan for a change to %compound% tires.

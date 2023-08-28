@@ -629,6 +629,19 @@ class SpeechSynthesizer {
 		}
 	}
 
+	speakTest() {
+		switch this.Language, false {
+			case "EN":
+				this.speak("The quick brown fox jumps over the lazy dog")
+			case "DE":
+				this.speak("Falsches Üben von Xylophonmusik quält jeden größeren Zwerg")
+			case "ES":
+				this.speak("Extraño pan de col y kiwi se quemó bajo fugaz vaho")
+			default:
+				this.speak("The quick brown fox jumps over the lazy dog")
+		}
+	}
+
 	isSpeaking() {
 		if this.iSoundPlayer {
 			if ProcessExist(this.iSoundPlayer)
@@ -729,7 +742,7 @@ class SpeechSynthesizer {
 
 	computeVoice(voice, language, randomize := true) {
 		local voices := this.Voices
-		local availableVoices, count, index, locale, ignore, candidate
+		local availableVoices, count, locale, ignore, candidate
 
 		if (this.Synthesizer = "Windows") {
 			if ((voice == true) && language) {
@@ -739,11 +752,8 @@ class SpeechSynthesizer {
 
 				if (count == 0)
 					voice := false
-				else if randomize {
-					index := Random(1, count)
-
-					voice := availableVoices[Round(index)]
-				}
+				else if randomize
+					voice := availableVoices[Round(Random(1, count))]
 				else
 					voice := availableVoices[1]
 			}
@@ -766,11 +776,8 @@ class SpeechSynthesizer {
 
 				if (count == 0)
 					voice := false
-				else if randomize {
-					index := Random(1, count)
-
-					voice := availableVoices[Round(index)]
-				}
+				else if randomize
+					voice := availableVoices[Round(Random(1, count))]
 				else
 					voice := availableVoices[1]
 			}

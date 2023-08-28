@@ -167,12 +167,12 @@ class VoiceManager {
 			if phrases.Has(phrase) {
 				phrases := phrases[phrase]
 
-				index := Random(1, phrases.Length)
+				index := Round(Random(0.55, phrases.Length + 0.45))
 
 				if cache
 					cache .= ("." . index)
 
-				phrase := substituteVariables(phrases[Round(index)], this.VoiceManager.getPhraseVariables(variables))
+				phrase := substituteVariables(phrases[index], this.VoiceManager.getPhraseVariables(variables))
 			}
 
 			if phrase
@@ -313,12 +313,12 @@ class VoiceManager {
 			if phrases.Has(phrase) {
 				phrases := phrases[phrase]
 
-				index := Random(1, phrases.Length)
+				index := Round(Random(0.55, phrases.Length + 0.45))
 
 				if cache
 					cache .= ("." . index)
 
-				phrase := substituteVariables(phrases[Round(index)], this.VoiceManager.getPhraseVariables(variables))
+				phrase := substituteVariables(phrases[index], this.VoiceManager.getPhraseVariables(variables))
 			}
 
 			if phrase
@@ -740,7 +740,7 @@ class VoiceManager {
 
 	startListening(retry := true) {
 		static audioDevice := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Audio Settings.ini"), "Output", "Activation.AudioDevice", false)
-		
+
 		if this.iSpeechRecognizer && !this.Listening
 			if !this.iSpeechRecognizer.startRecognizer() {
 				if retry
@@ -880,7 +880,6 @@ class VoiceManager {
 
 		if !speechRecognizer
 			messageSend(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, "?", "[Unknown]", "remoteCommandRecognized"), this.VoiceServer)
-
 	}
 
 	raisePhraseRecognized(grammar, words) {

@@ -135,6 +135,7 @@ class SetupWizard extends ConfiguratorPanel {
 	iResult := false
 
 	iStepWizards := CaseInsenseMap()
+	iWizards := []
 
 	iDefinition := false
 	iKnowledgeBase := false
@@ -522,6 +523,8 @@ class SetupWizard extends ConfiguratorPanel {
 	}
 
 	registerStepWizard(stepWizard) {
+		this.iWizards.Push(stepWizard)
+
 		this.StepWizards[stepWizard.Step] := stepWizard
 	}
 
@@ -706,11 +709,13 @@ class SetupWizard extends ConfiguratorPanel {
 		local y := 0
 		local width := 0
 		local height := 0
-		local stepWizard, step
+		local ignore, stepWizard, step
 
 		this.getWorkArea(&x, &y, &width, &height)
 
-		for step, stepWizard in this.StepWizards {
+		for ignore, stepWizard in this.iWizards {
+			step := stepWizard.Step
+
 			this.ProgressCount += 2
 
 			showProgress({progress: this.ProgressCount, message: translate("Creating UI for Step: ")

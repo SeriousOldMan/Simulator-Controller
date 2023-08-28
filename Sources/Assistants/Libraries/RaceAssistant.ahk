@@ -17,6 +17,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\..\Libraries\JSON.ahk"
+#Include "..\..\Libraries\Task.ahk"
 #Include "..\..\Libraries\RuleEngine.ahk"
 #Include "VoiceManager.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
@@ -133,6 +134,28 @@ class RaceAssistant extends ConfigurationItem {
 	class RaceVoiceManager extends VoiceManager {
 		iRaceAssistant := false
 
+		class Grammars extends MultiMap {
+			include(path, directory?) {
+				local fileName, include
+
+				if FileExist(path)
+					super.include(path, directory?)
+				else {
+					SplitPath(path, &fileName)
+
+					include := getFileName(fileName, kGrammarsDirectory)
+
+					if (include && FileExist(include))
+						super.include(include, directory?)
+
+					include := getFileName(fileName, kUserGrammarsDirectory)
+
+					if (include && FileExist(include))
+						super.include(include, directory?)
+				}
+			}
+		}
+
 		Routing {
 			Get {
 				return this.RaceAssistant.AssistantType
@@ -177,13 +200,31 @@ class RaceAssistant extends ConfigurationItem {
 			if !FileExist(getFileName(fileName, kUserGrammarsDirectory, kGrammarsDirectory))
 				fileName := (prefix . "en")
 
-			grammars := readMultiMap(kGrammarsDirectory . fileName)
+			grammars := readMultiMap(kGrammarsDirectory . fileName, RaceAssistant.RaceVoiceManager.Grammars)
 
-			for section, values in readMultiMap(kUserGrammarsDirectory . fileName)
-				for key, value in values
-					setMultiMapValue(grammars, section, key, value)
+			addMultiMapValues(grammars, readMultiMap(kUserGrammarsDirectory . fileName, RaceAssistant.RaceVoiceManager.Grammars))
 
 			return grammars
+		}
+
+		buildGrammars(speechRecognizer, language) {
+			prepareGrammar(grammars, index) {
+				local start := A_TickCount
+
+				if (index <= grammars.Length) {
+					grammars[index].Grammar.Phrases
+
+					if isDebug()
+						logMessage(kLogDebug, "Preparing grammar " . grammars[index].Name . " took " . (A_TickCount - start) . " ms")
+
+					return Continuation(Task.CurrentTask, prepareGrammar.Bind(grammars, index + 1))
+				}
+			}
+
+			super.buildGrammars(speechRecognizer, language)
+
+			if (speechRecognizer && (speechRecognizer.Engine = "Azure"))
+				Task.startTask(prepareGrammar.Bind(getValues(speechRecognizer.Grammars), 1), 1000, kLowPriority)
 		}
 
 		handleVoiceCommand(phrase, words) {
@@ -772,11 +813,9 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	jokeRecognized(words) {
-		local rnd, joke, speaker, html, index, hasJoke
+		local joke, speaker, html, index, hasJoke
 
-		rnd := Random(0, 4)
-
-		hasJoke := (rnd > 1)
+		hasJoke := (Random(0, 4) > 1)
 
 		if hasJoke
 			if (this.VoiceManager.Language = "EN") {
@@ -1779,6 +1818,22 @@ class GridRaceAssistant extends RaceAssistant {
 				this.gapToLeaderRecognized(words)
 			case "GapToFocus":
 				this.gapToFocusRecognized(words)
+			case "LapTimeFocus":
+				this.lapTimeFocusRecognized(words)
+			case "LapTimePosition":
+				this.lapTimePositionRecognized(words)
+			case "DriverNameAhead":
+				this.driverNameAheadRecognized(words)
+			case "DriverNameBehind":
+				this.driverNameBehindRecognized(words)
+			case "CarClassAhead":
+				this.carClassAheadRecognized(words)
+			case "CarClassBehind":
+				this.carClassBehindRecognized(words)
+			case "CarCupAhead":
+				this.carCupAheadRecognized(words)
+			case "CarCupBehind":
+				this.carCupBehindRecognized(words)
 			default:
 				super.handleVoiceCommand(grammar, words)
 		}
@@ -1808,6 +1863,18 @@ class GridRaceAssistant extends RaceAssistant {
 				this.gapToBehindRecognized(inList(arguments, "Track") ? Array(this.getSpeaker().Fragments["Car"]) : [])
 			case "GapToLeader":
 				this.gapToLeaderRecognized([])
+			case "DriverNameAhead":
+				this.driverNameAheadRecognized([])
+			case "DriverNameBehind":
+				this.driverNameBehindRecognized([])
+			case "CarClassAhead":
+				this.carClassAheadRecognized([])
+			case "CarClassBehind":
+				this.carClassBehindRecognized([])
+			case "CarCupAhead":
+				this.carCupAheadRecognized([])
+			case "CarCupBehind":
+				this.carCupBehindRecognized([])
 			default:
 				super.requestInformation(category, arguments*)
 		}
@@ -2147,12 +2214,55 @@ class GridRaceAssistant extends RaceAssistant {
 		}
 	}
 
+	getNumber(words) {
+		local numbers := []
+		local ignore, candidate, fragment
+
+		for ignore, candidate in words {
+			if (InStr(candidate, "#") == 1)
+				candidate := SubStr(candidate, 2)
+
+			if this.isInteger(candidate, &candidate)
+				numbers.Push(candidate)
+			else if (numbers.Length > 0)
+				break
+		}
+
+		if (numbers.Length > 0) {
+			number := ""
+
+			for ignore, fragment in numbers
+				number .= fragment
+
+			return Integer(number)
+		}
+		else
+			return false
+	}
+
+	getCarNumber(words, &number) {
+		local knowledgeBase := this.KnowledgeBase
+		local car := false
+		local ignore, candidate
+
+		number := this.getNumber(words)
+
+		if number
+			for ignore, candidate in this.getCars()
+				if (knowledgeBase.getValue("Car." . candidate . ".Nr", false) = number) {
+					car := candidate
+
+					break
+				}
+
+		return car
+	}
+
 	gapToFocusRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker := this.getSpeaker()
 		local car := knowledgebase.getValue("Driver.Car", kUndefined)
-		local validCar := false
-		local number, numbers, ignore, candidate, fragment, delta, inPit, lapped, lap
+		local number, delta, inPit, lapped, lap
 
 		if !this.hasEnoughData()
 			return
@@ -2160,37 +2270,7 @@ class GridRaceAssistant extends RaceAssistant {
 		if ((car == kUndefined) || (car == 0))
 			this.getSpeaker().speakPhrase("Later")
 		else {
-			car := false
-			numbers := []
-
-			for ignore, candidate in words {
-				if (InStr(candidate, "#") == 1)
-					candidate := SubStr(candidate, 2)
-
-				if this.isInteger(candidate, &candidate)
-					numbers.Push(candidate)
-				else if (numbers.Length > 0)
-					break
-			}
-
-			if (numbers.Length > 0) {
-				number := ""
-
-				for ignore, fragment in numbers
-					number .= fragment
-
-				number := Integer(number)
-			}
-			else
-				number := false
-
-			if number
-				for ignore, candidate in this.getCars()
-					if (knowledgeBase.getValue("Car." . candidate . ".Nr", false) = number) {
-						car := candidate
-
-						break
-					}
+			car := this.getCarNumber(words, &number)
 
 			if car {
 				speaker.beginTalk()
@@ -2202,7 +2282,7 @@ class GridRaceAssistant extends RaceAssistant {
 					lapped := false
 
 					if ((delta = 0) || (inPit && (Abs(delta) < 30))) {
-						speaker.speakPhrase(inPit ? "GapCarInPit" : "NoTrackGap")
+						speaker.speakPhrase(inPit ? "CarInPit" : "NoTrackGap")
 
 						return
 					}
@@ -2228,6 +2308,189 @@ class GridRaceAssistant extends RaceAssistant {
 			else
 				speaker.speakPhrase("Repeat")
 		}
+	}
+
+	lapTimeFocusRecognized(words) {
+		local knowledgeBase := this.KnowledgeBase
+		local speaker := this.getSpeaker()
+		local car := knowledgebase.getValue("Driver.Car", kUndefined)
+		local number, lapTime, minute, seconds, inPit
+
+		if !this.hasEnoughData()
+			return
+
+		if ((car == kUndefined) || (car == 0))
+			this.getSpeaker().speakPhrase("Later")
+		else {
+			car := this.getCarNumber(words, &number)
+
+			if car {
+				lapTime := (this.getLapTime(car) / 1000)
+				inPit := (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false))
+
+				if (inPit || (lapTime = 0)) {
+					speaker.speakPhrase("CarInPit")
+
+					return
+				}
+				else {
+					minute := Floor(lapTime / 60)
+					seconds := (lapTime - (minute * 60))
+
+					speaker.speakPhrase("FocusLapTime", {number: number, time: speaker.number2Speech(lapTime, 1), minute: minute, seconds: speaker.number2Speech(seconds, 1)})
+				}
+			}
+			else if number
+				speaker.speakPhrase("NoFocusCar", {number: number})
+			else
+				speaker.speakPhrase("Repeat")
+		}
+	}
+
+	lapTimePositionRecognized(words) {
+		local knowledgeBase := this.KnowledgeBase
+		local speaker := this.getSpeaker()
+		local position, car, lapTime, minute, seconds, inPit
+
+		getCarPosition(words, &position) {
+			local knowledgeBase := this.KnowledgeBase
+			local car := false
+			local ignore, candidate
+
+			position := this.getNumber(words)
+
+			if position
+				for ignore, candidate in this.getCars()
+					if (knowledgeBase.getValue("Car." . candidate . ".Position", false) = position) {
+						car := candidate
+
+						break
+					}
+
+			return car
+		}
+
+		if !this.hasEnoughData()
+			return
+
+		car := getCarPosition(words, &position)
+
+		if car {
+			lapTime := (this.getLapTime(car) / 1000)
+			inPit := (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false))
+
+			if (inPit || (lapTime = 0)) {
+				speaker.speakPhrase("CarInPit")
+
+				return
+			}
+			else {
+				minute := Floor(lapTime / 60)
+				seconds := (lapTime - (minute * 60))
+
+				speaker.speakPhrase("PositionLapTime", {position: position, time: speaker.number2Speech(lapTime, 1), minute: minute, seconds: speaker.number2Speech(seconds, 1)})
+			}
+		}
+		else if position
+			speaker.speakPhrase("NoPositionCar", {position: position})
+		else
+			speaker.speakPhrase("Repeat")
+	}
+
+	driverNameAheadRecognized(words) {
+		local knowledgeBase := this.KnowledgeBase
+		local car := knowledgeBase.getValue("Position.Track.Ahead.Car", kUndefined)
+		local forName, surName, ignore
+
+		if (car != kUndefined) {
+			parseDriverName(this.getDriver(car), &forName, &surName, &ignore := false)
+
+			this.getSpeaker().speakPhrase("DriverNameAhead", {forName: forName, surName: surName})
+		}
+		else
+			this.getSpeaker().speakPhrase("NoTrackGap")
+	}
+
+	driverNameBehindRecognized(words) {
+		local knowledgeBase := this.KnowledgeBase
+		local car := knowledgeBase.getValue("Position.Track.Behind.Car", kUndefined)
+		local forName, surName, ignore
+
+		if (car != kUndefined) {
+			parseDriverName(this.getDriver(car), &forName, &surName, &ignore := false)
+
+			this.getSpeaker().speakPhrase("DriverNameBehind", {forName: forName, surName: surName})
+		}
+		else
+			this.getSpeaker().speakPhrase("NoTrackGap")
+	}
+
+	carClassAheadRecognized(words) {
+		local knowledgeBase := this.KnowledgeBase
+		local car := knowledgeBase.getValue("Position.Track.Ahead.Car", kUndefined)
+		local class
+
+		if (car != kUndefined) {
+			class := this.getClass(car)
+
+			if (class = kUnknown)
+				this.getSpeaker().speakPhrase("NoTrackGap")
+			else
+				this.getSpeaker().speakPhrase("CarClassAhead", {class: class})
+		}
+		else
+			this.getSpeaker().speakPhrase("NoTrackGap")
+	}
+
+	carClassBehindRecognized(words) {
+		local knowledgeBase := this.KnowledgeBase
+		local car := knowledgeBase.getValue("Position.Track.Behind.Car", kUndefined)
+		local class
+
+		if (car != kUndefined) {
+			class := this.getClass(car)
+
+			if (class = kUnknown)
+				this.getSpeaker().speakPhrase("NoTrackGap")
+			else
+				this.getSpeaker().speakPhrase("CarClassBehind", {class: class})
+		}
+		else
+			this.getSpeaker().speakPhrase("NoTrackGap")
+	}
+
+	carCupAheadRecognized(words) {
+		local knowledgeBase := this.KnowledgeBase
+		local car := knowledgeBase.getValue("Position.Track.Ahead.Car", kUndefined)
+		local cup
+
+		if (car != kUndefined) {
+			cup := this.getClass(car, false, ["Cup"])
+
+			if (cup = kUnknown)
+				this.getSpeaker().speakPhrase("NoTrackGap")
+			else
+				this.getSpeaker().speakPhrase("CarCupAhead", {cup: cup})
+		}
+		else
+			this.getSpeaker().speakPhrase("NoTrackGap")
+	}
+
+	carCupBehindRecognized(words) {
+		local knowledgeBase := this.KnowledgeBase
+		local car := knowledgeBase.getValue("Position.Track.Behind.Car", kUndefined)
+		local cup
+
+		if (car != kUndefined) {
+			cup := this.getClass(car, false, [Cup])
+
+			if (cup = kUnknown)
+				this.getSpeaker().speakPhrase("NoTrackGap")
+			else
+				this.getSpeaker().speakPhrase("CarCupBehind", {cup: cup})
+		}
+		else
+			this.getSpeaker().speakPhrase("NoTrackGap")
 	}
 
 	createSessionState() {
@@ -2456,6 +2719,25 @@ class GridRaceAssistant extends RaceAssistant {
 			return getMultiMapValue(data, "Position Data", "Car." . car . ".Time", false)
 		else
 			return this.KnowledgeBase.getValue("Car." . car . ".Time", false)
+	}
+
+	getDriver(car, data := false) {
+		local forName, surName, nickName, knowledgeBase
+
+		if data {
+			forName := getMultiMapValue(data, "Position Data", "Car." . car . ".Driver.ForName", "John")
+			surName := getMultiMapValue(data, "Position Data", "Car." . car . ".Driver.SurName", "Doe")
+			nickName := getMultiMapValue(data, "Position Data", "Car." . car . ".Driver.NickName", "JDO")
+		}
+		else {
+			knowledgeBase := this.KnowledgeBase
+
+			forName := knowledgeBase.getValue("Car." . car . ".Driver.ForName", "John")
+			surName := knowledgeBase.getValue("Car." . car . ".Driver.SurName", "Doe")
+			nickName := knowledgeBase.getValue("Car." . car . ".Driver.NickName", "JDO")
+		}
+
+		return driverName(forName, surName, nickName)
 	}
 
 	prepareData(lapNumber, data) {

@@ -10,7 +10,7 @@ You probably already have understood, that Simulator Controller is a quite sophi
    
    ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Quick%20Start%204.JPG)
    
-   If you don't want to use the basic configuration page, simply select "Custom" and continue to the next page. Then go through the following steps for a basic configuration.
+   If you don't want to use the basic configuration page, simply select "Extended" and continue to the next page. Then go through the following steps for a basic configuration.
 
 2. Select modules
 
@@ -30,7 +30,7 @@ You probably already have understood, that Simulator Controller is a quite sophi
    
    - Plugins - Can be skipped for the moment, unless *Assetto Corsa* and / or *rFactor 2* are your only games. Then you have to install the "SimulatorController" plugin for *Assetto Corsa* and "rFactor2SharedMemoryMapPlugin64.dll" plugin for *rFactor 2*. Instructions can be found [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#installation-of-telemetry-providers).
    
-   - SoX - Although optional, I strongly recommend installing SoX for an immersive soud experience.
+   - SoX - Although optional, I strongly recommend installing SoX for an immersive sound experience.
    
    - NirCmd - Also optional, but strongly recommended as well. It is used to control sound volumes, when more than one assistant try to talk to you at the same time.
    

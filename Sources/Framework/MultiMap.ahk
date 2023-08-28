@@ -156,7 +156,8 @@ parseMultiMap(text, class?, directory?) {
 		else if (firstChar = "[") {
 			section := StrReplace(StrReplace(RTrim(currentLine), "[", ""), "]", "")
 
-			multiMap[section] := newSectionMap()
+			if !multiMap.Has(section)
+				multiMap[section] := newSectionMap()
 		}
 		else if ((firstChar = "#") && (InStr(currentLine, "#Include") = 1))
 			multiMap.include(substituteVariables(Trim(SubStr(currentLine, 9))), directory?)

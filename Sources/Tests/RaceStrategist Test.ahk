@@ -343,6 +343,9 @@ else {
 
 	strategist.VoiceManager.setDebug(kDebugGrammars, false)
 
+	setDebug(true)
+	setLogLevel(kLogDebug)
+
 	if (raceNr == 15) {
 		done := false
 
@@ -431,7 +434,7 @@ else {
 				data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Strategist Lap " . lap . "." . A_Index . ".data")
 
 				if (lap == 1 && A_Index == 1)
-					strategist.prepareSession(false, data)
+					strategist.prepareSession(&ignore := false, &data)
 
 				if (data.Count == 0) {
 					if (lap == 82)

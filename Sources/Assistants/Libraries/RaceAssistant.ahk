@@ -17,6 +17,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\..\Libraries\JSON.ahk"
+#Include "..\..\Libraries\Task.ahk"
 #Include "..\..\Libraries\RuleEngine.ahk"
 #Include "VoiceManager.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
@@ -204,6 +205,26 @@ class RaceAssistant extends ConfigurationItem {
 			addMultiMapValues(grammars, readMultiMap(kUserGrammarsDirectory . fileName, RaceAssistant.RaceVoiceManager.Grammars))
 
 			return grammars
+		}
+
+		buildGrammars(speechRecognizer, language) {
+			prepareGrammar(grammars, index) {
+				local start := A_TickCount
+
+				if (index <= grammars.Length) {
+					grammars[index].Grammar.Phrases
+
+					if isDebug()
+						logMessage(kLogDebug, "Preparing grammar " . grammars[index].Name . " took " . (A_TickCount - start) . " ms")
+
+					return Continuation(Task.CurrentTask, prepareGrammar.Bind(grammars, index + 1))
+				}
+			}
+
+			super.buildGrammars(speechRecognizer, language)
+
+			if (speechRecognizer && (speechRecognizer.Engine = "Azure"))
+				Task.startTask(prepareGrammar.Bind(getValues(speechRecognizer.Grammars), 1), 1000, kLowPriority)
 		}
 
 		handleVoiceCommand(phrase, words) {

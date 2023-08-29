@@ -309,7 +309,7 @@ class QuickStepWizard extends StepWizard {
 		widget31.OnEvent("Click", editSynthesizer.Bind("Race Spotter"))
 		setButtonIcon(widget31, kIconsDirectory . "General Settings.ico", 1)
 
-		widget36 := window.Add("HTMLViewer", "x" . x . " yp+30 w" . width . " h105 W:Grow Hidden")
+		widget36 := window.Add("HTMLViewer", "x" . x . " yp+30 w" . width . " h105 W:Grow H:Grow(0.8) Hidden")
 
 		text := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Quick", "Quick.FinishFooter." . getLanguage()))
 
@@ -319,7 +319,7 @@ class QuickStepWizard extends StepWizard {
 
 		widget36.document.write(html)
 
-		widget37 := window.Add("Button", "x" . (x + Round((width / 2) - 45)) . " yp+106 w90 h60 X:Move(0.5) Hidden")
+		widget37 := window.Add("Button", "x" . (x + Round((width / 2) - 45)) . " yp+106 w90 h60 X:Move(0.4) W:Grow(0.2) Y:Move(0.8) H:Grow(0.2) Hidden")
 		setButtonIcon(widget37, kResourcesDirectory . "\Setup\Images\Finish Line.png", 1, "w80 h53")
 		widget37.OnEvent("Click", finishSetup)
 

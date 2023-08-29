@@ -346,11 +346,14 @@ class QuickStepWizard extends StepWizard {
 		local chosen := 0
 		local enIndex := 0
 		local enabled := false
+		local fullInstall := false
 		local code, language, uiLanguage, startWithWindows, silentMode, ignore, preset
 
 		static installed := false
 
 		if (page = 2) {
+			fullInstall := (!installed && (!isDevelopment() || (GetKeyState("Ctrl", "P") && GetKeyState("Shift", "P"))))
+
 			wizard.selectModule("Voice Control", true, false)
 
 			for ignore, assistant in this.Definition
@@ -386,15 +389,17 @@ class QuickStepWizard extends StepWizard {
 					break
 				}
 
-			this.loadSetup()
+			this.loadSetup(!fullInstall)
 
 			this.QuickSetup := false
 		}
 
 		super.showPage(page)
 
-		if ((page = 2) && !installed && (!isDevelopment() || (GetKeyState("Ctrl", "P") && GetKeyState("Shift", "P")))) {
+		if fullInstall {
 			wizard.installSoftware()
+
+			this.loadSimulators()
 
 			installed := true
 		}
@@ -542,7 +547,7 @@ class QuickStepWizard extends StepWizard {
 		return defaults
 	}
 
-	loadSetup() {
+	loadSetup(simulators := true) {
 		local wizard := this.SetupWizard
 		local ignore, module, assistant
 
@@ -560,7 +565,10 @@ class QuickStepWizard extends StepWizard {
 			wizard.updateState()
 		}
 
-		this.loadSimulators()
+		if simulators
+			this.loadSimulators()
+		else
+			this.iSimulatorsListView.Delete()
 
 		this.loadAssistants()
 	}

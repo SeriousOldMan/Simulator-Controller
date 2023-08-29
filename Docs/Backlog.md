@@ -15,6 +15,7 @@
   2. More (configurable) verbosity for the Spotter, for example earlier announcements of cars approaching from behind (depending on the distance of the car behind)
   3. Controller action and voice command to enable/disable data collection
   4. Better answers by the Strategist, when a pitstop cannot be recommended
+  5. Recommendation by Spotter where on the track an Attack/Defend is of most benefit
 
 #### Race Center
   1. Change hot target pressures for the next pitstop.

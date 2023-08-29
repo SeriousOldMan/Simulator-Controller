@@ -510,9 +510,13 @@ class SetupWizard extends ConfiguratorPanel {
 		this.iInitialize := initialize
 
 		if initialize {
+			this.QuickSetup := true
+
 			this.addPatchFile("Settings", kUserHomeDirectory . "Setup\Settings Patch.ini")
 			this.addPatchFile("Configuration", kUserHomeDirectory . "Setup\Configuration Patch.ini")
 		}
+		else
+			this.QuickSetup := false
 
 		showProgress({progress: ++this.ProgressCount, message: translate("Starting AI Kernel...")})
 

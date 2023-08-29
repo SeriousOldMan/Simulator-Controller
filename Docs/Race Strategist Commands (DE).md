@@ -95,9 +95,9 @@ Announcements=Wetterwarnungen
 	
 	[{Gib mir den, Gib mir bitte den, Sag mir den, Sag mir bitte den, Wie ist der} Abstand {zu, zur, zum} {Wagen, Wagen Nummer, Nummer} (Number), Wie groß ist {die Lücke, der Abstand} {zu, zur, zum} {Wagen, Wagen Nummer, Nummer} (Number)]
 	
-	[(KannstDu) (Mir) den {Fahrernamen, Fahrernamen im Wagen} vor mir {durchgeben, sagen}, Wie heißt der {Fahrer, Fahrer im Wagen} vor mir]
+	[(KannstDu) (Mir) den {Fahrernamen, Fahrernamen im Wagen} vor mir {durchgeben, sagen}, Wie heißt der {Fahrer, Fahrer im Wagen} vor mir, Wie ist der Name des {Fahrers, Fahrers im Wagen} vor mir]
 
-	[(KannstDu) (Mir) den {Fahrernamen, Fahrernamen im Wagen} hinter mir {durchgeben, sagen}, Wie heißt der {Fahrer, Fahrer im Wagen} hinter mir]
+	[(KannstDu) (Mir) den {Fahrernamen, Fahrernamen im Wagen} hinter mir {durchgeben, sagen}, Wie heißt der {Fahrer, Fahrer im Wagen} hinter mir, Wie ist der Name des {Fahrers, Fahrers im Wagen} hinter mir]
 
 	[(KannstDu) (Mir) die {Fahrzeugklasse, Klasse des Wagens} vor mir {durchgeben, sagen}, Wie ist {Fahrzeugklasse, Klasse des Wagens} vor mir]
 

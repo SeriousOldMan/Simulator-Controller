@@ -52,3 +52,6 @@ NoJoke.2=What? You should concentrate at your driving.
 Time.1=It is %time%.
 Time.2=Now it is exactly %time%.
 Time.3=We have %time%.
+NoInformation.1=I do not have this information, sorry.
+NoInformation.2=Don't know, sorry.
+NoInformation.3=Sorry, can't help you with this.

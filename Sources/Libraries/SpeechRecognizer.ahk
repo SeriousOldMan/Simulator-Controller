@@ -20,6 +20,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\Libraries\CLR.ahk"
+#Include "..\Libraries\Task.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -501,12 +502,24 @@ class SpeechRecognizer {
 	}
 
 	loadGrammar(name, grammar, callback) {
+		prepareGrammar(name, grammar) {
+			local start := A_TickCount
+			local ignore
+
+			ignore := grammar.Phrases
+
+			if isDebug()
+				logMessage(kLogDebug, "Preparing grammar " . name . " took " . (A_TickCount - start) . " ms")
+		}
+
 		if (this._grammarCallbacks.Has(name))
 			throw "Grammar " . name . " already exists in SpeechRecognizer.loadGrammar..."
 
 		this._grammarCallbacks[name] := callback
 
 		if (this.iEngine = "Azure") {
+			Task.startTask(prepareGrammar.Bind(name, grammar), 1000, kLowPriority)
+
 			grammar := {Name: name, Grammar: grammar, Callback: callback}
 
 			this._grammars[name] := grammar
@@ -514,6 +527,8 @@ class SpeechRecognizer {
 			return grammar
 		}
 		else if this.Instance {
+			Task.startTask(prepareGrammar.Bind(name, grammar), 1000, kLowPriority)
+
 			this._grammars[name] := {Name: name, Grammar: grammar, Callback: callback}
 
 			return this.Instance.LoadGrammar(grammar, name, this._onGrammarCallback.Bind(this))
@@ -633,8 +648,22 @@ class SpeechRecognizer {
 		}
 	}
 
-	match(words, grammar, minRating := 0.7, maxRating := 0.85) {
-		local matches := this.allMatches(words, minRating, maxRating, grammar.Phrases*)
+	match(words, grammar, minRating?, maxRating?) {
+		local matches, settings
+
+		static ratingLow := kUndefined
+		static ratingHigh := kUndefined
+
+		if (ratingLow = kUndefined) {
+			settings := readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+
+			ratingLow := getMultiMapValue(settings, "Voice", "Low Rating", 0.7)
+			ratingHigh := getMultiMapValue(settings, "Voice", "High Rating", 0.85)
+		}
+
+		matches := this.allMatches(words, isSet(minRating) ? minRating : ratingLow
+										, isSet(maxRating) ? maxRating : ratingHigh
+										, grammar.Phrases*)
 
 		return (matches.HasProp("BestMatch") ? matches.BestMatch.Rating : false)
 	}

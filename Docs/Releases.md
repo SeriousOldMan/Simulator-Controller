@@ -31,10 +31,11 @@
 	  - New icons for the Stream Deck icon set for above actions.
   13 *Reactivated* proper handling of improper formed voice commands.
   14. Small performance improvement for voice commands, since grammars are now pre-compiled in the background.
-  15. New test mode in the voice configuration let you now test your changes to pitch, speed or distortion in place.
-  16. The configuration option to choose between the different possible behaviours of the *Push-To-Talk* button (formerly handled by the "P2T Configuration.ini" file) has been moved to the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration). Normally automatically handled by "Simulator Setup".
-  17. [Developers Only] MultiMap files can now "#Include" other MultiMap files.
-  18. [Experts Only] The grammar files has been split up and modularized.
+  15. The threshold values for the Sorenson-Dice algorithm, which is used to compare spoken commands against the registered command syntax, can now be configured in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration). This allows you to tune, how exact your commands must follow the predefined syntax and it can also be used in cases, where a wrong command is detected, which can happen when two commands are quite similar.
+  16. New test mode in the voice configuration let you now test your changes to pitch, speed or distortion in place.
+  17. The configuration option to choose between the different possible behaviours of the *Push-To-Talk* button (formerly handled by the "P2T Configuration.ini" file) has been moved to the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration). Normally automatically handled by "Simulator Setup".
+  18. [Developers Only] MultiMap files can now "#Include" other MultiMap files.
+  19. [Experts Only] The grammar files has been split up and modularized.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-530).
 

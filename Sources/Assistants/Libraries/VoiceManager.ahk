@@ -837,17 +837,7 @@ class VoiceManager {
 
 	buildGrammars(speechRecognizer, language) {
 		local grammars := this.getGrammars(language)
-		local grammar, definition, name, choices, nextCharIndex, compiledGrammar
-
-		prepareGrammar(name, grammar) {
-			local start := A_TickCount
-			local ignore
-
-			ignore := grammar.Phrases
-
-			if isDebug()
-				logMessage(kLogDebug, "Preparing grammar " . name . " took " . (A_TickCount - start) . " ms")
-		}
+		local grammar, definition, name, choices, nextCharIndex
 
 		for name, choices in getMultiMapValues(grammars, "Choices")
 			if speechRecognizer
@@ -868,12 +858,8 @@ class VoiceManager {
 				}
 
 				try {
-					compiledGrammar := speechRecognizer.compileGrammar(definition)
-
-					if !speechRecognizer.loadGrammar(grammar, compiledGrammar, ObjBindMethod(this, "raisePhraseRecognized"))
+					if !speechRecognizer.loadGrammar(grammar, speechRecognizer.compileGrammar(definition), ObjBindMethod(this, "raisePhraseRecognized"))
 						throw "Recognizer not running..."
-
-					Task.startTask(prepareGrammar.Bind(grammar, compiledGrammar), 1000, kLowPriority)
 				}
 				catch Any as exception {
 					logError(exception, true)

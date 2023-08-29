@@ -444,7 +444,17 @@ class VoiceServer extends ConfigurationItem {
 
 		registerVoiceCommand(grammar, command, callback) {
 			local recognizer := this.SpeechRecognizer[true]
-			local key, descriptor, nextCharIndex
+			local key, descriptor, nextCharIndex, compiledGrammar
+
+			prepareGrammar(name, grammar) {
+				local start := A_TickCount
+				local ignore
+
+				ignore := grammar.Phrases
+
+				if isDebug()
+					logMessage(kLogDebug, "Preparing grammar " . name . " took " . (A_TickCount - start) . " ms")
+			}
 
 			if !grammar {
 				for key, descriptor in this.iVoiceCommands
@@ -467,8 +477,12 @@ class VoiceServer extends ConfigurationItem {
 			}
 
 			try {
-				if !recognizer.loadGrammar(grammar, recognizer.compileGrammar(command), ObjBindMethod(this.VoiceServer, "recognizeVoiceCommand", this))
+				compiledGrammar := recognizer.compileGrammar(command)
+
+				if !recognizer.loadGrammar(grammar, compiledGrammar, ObjBindMethod(this.VoiceServer, "recognizeVoiceCommand", this))
 					throw "Recognizer not running..."
+
+				Task.startTask(prepareGrammar.Bind(grammar, compiledGrammar), 1000, kLowPriority)
 			}
 			catch Any as exception {
 				logError(exception, true)
@@ -1197,8 +1211,11 @@ startupVoiceServer() {
 		}
 	}
 
-	if debug
+	if debug {
 		setDebug(true)
+
+		setLogLevel(kLogDebug)
+	}
 
 	server := VoiceServer(kSimulatorConfiguration)
 

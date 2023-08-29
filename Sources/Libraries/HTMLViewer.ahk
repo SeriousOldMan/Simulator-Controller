@@ -2081,13 +2081,6 @@ class WebView2Viewer extends HTMLViewer {
 
 class IEViewer extends HTMLViewer {
 	iExplorer := false
-	iControl := false
-
-	Control {
-		Get {
-			return this.iControl
-		}
-	}
 
 	Explorer {
 		Get {
@@ -2109,6 +2102,8 @@ class IEViewer extends HTMLViewer {
 
 	__New(control) {
 		this.iExplorer := control.Value
+
+		super.__New(control)
 	}
 
 	Navigate(uri) {
@@ -2126,8 +2121,15 @@ class IEViewer extends HTMLViewer {
 		this.Document.write(html)
 	}
 
+	Resized() {
+		if this.Control.Visible {
+			this.Control.Visible := false
+			this.Control.Visible := true
+		}
+	}
+
 	Reload() {
-		this.Location.reload()
+		; this.Location.reload()
 	}
 }
 

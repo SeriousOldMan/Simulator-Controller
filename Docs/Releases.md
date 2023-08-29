@@ -19,7 +19,7 @@
      - "Can you tell me the name of the driver ahead / behind?"
      - "Can you tell me the class of the car ahead / behind?"
      - "Can you tell me the cup catgory of the car ahead / behind?"
-     - "Can you tell me the last lap time of car number XY?"
+     - "Can you tell me the last lap time of car number X?"
      - "Can you tell me the last lap time of P X?"
 	 - New information request actions for ["Race Strategist"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) and ["Race Spotter"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter) plugins, to resemble most of the above voice commands: "DriverNameAhead", "DriverNameBehind", "CarClassAhead", "CarClassBehind", "CarCupAhead" and "CarCupBehind".
 	 - New icons for the Stream Deck icon set for above actions.

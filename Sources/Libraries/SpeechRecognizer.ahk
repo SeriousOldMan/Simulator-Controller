@@ -501,20 +501,22 @@ class SpeechRecognizer {
 			return false
 	}
 
-	loadGrammar(name, grammar, callback) {
+	loadGrammar(name, theGrammar, callback) {
 		prepareGrammar(theName, theGrammar) {
 			local start := A_TickCount
 			local ignore
 
-			try {
-				ignore := theGrammar.Phrases
+			if isInstance(theGrammar, Grammar)
+				try {
+					ignore := theGrammar.Phrases
 
-				if isDebug()
-					logMessage(kLogDebug, "Preparing grammar " . theName . " took " . (A_TickCount - start) . " ms")
-			}
-			catch Any as exception {
-				logError(exception)
-			}
+					if isDebug()
+						logMessage(kLogDebug, "Preparing grammar " . theName . " took " . (A_TickCount - start) . " ms")
+				}
+				catch Any as exception {
+					MsgBox theName
+					logError(exception)
+				}
 		}
 
 		if (this._grammarCallbacks.Has(name))
@@ -523,20 +525,20 @@ class SpeechRecognizer {
 		this._grammarCallbacks[name] := callback
 
 		if (this.iEngine = "Azure") {
-			Task.startTask(prepareGrammar.Bind(name, grammar), 1000, kLowPriority)
+			Task.startTask(prepareGrammar.Bind(name, theGrammar), 1000, kLowPriority)
 
-			grammar := {Name: name, Grammar: grammar, Callback: callback}
+			theGrammar := {Name: name, Grammar: theGrammar, Callback: callback}
 
-			this._grammars[name] := grammar
+			this._grammars[name] := theGrammar
 
-			return grammar
+			return theGrammar
 		}
 		else if this.Instance {
-			Task.startTask(prepareGrammar.Bind(name, grammar), 1000, kLowPriority)
+			Task.startTask(prepareGrammar.Bind(name, theGrammar), 1000, kLowPriority)
 
-			this._grammars[name] := {Name: name, Grammar: grammar, Callback: callback}
+			this._grammars[name] := {Name: name, Grammar: theGrammar, Callback: callback}
 
-			return this.Instance.LoadGrammar(grammar, name, this._onGrammarCallback.Bind(this))
+			return this.Instance.LoadGrammar(theGrammar, name, this._onGrammarCallback.Bind(this))
 		}
 		else
 			return false

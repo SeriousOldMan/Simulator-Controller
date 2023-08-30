@@ -5367,7 +5367,7 @@ class PracticeCenter extends ConfigurationItem {
 
 				if ((pressuresTable.Length >= newLap) && (tyresTable.Length >= newLap) && lap.HasProp("TelemetryData")) {
 					lapData := Database.Row("Nr", newLap, "Lap", newLap, "Run", lap.Run.Nr, "Lap.Time", null(lap.LapTime)
-										  , "Sectors.Time", values2String(",", collect(lap.SectorsTime, null)), "Position", null(lap.Position)
+										  , "Sectors.Time", values2String(",", collect(lap.SectorsTime, null)*), "Position", null(lap.Position)
 										  , "Damage", lap.Damage, "EngineDamage", lap.EngineDamage, "Accident", lap.Accident
 										  , "Fuel.Initial", null(lap.Run.FuelInitial), "Fuel.Consumption", null(lap.FuelConsumption)
 										  , "Fuel.Remaining", null(lap.FuelRemaining), "Lap.State", lap.State, "Lap.Valid", (lap.State != "Invalid")

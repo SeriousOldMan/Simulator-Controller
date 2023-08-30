@@ -71,10 +71,10 @@ class AdministrationResizer extends Window.Resizer {
 generatePassword(length) {
 	local valid := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
 	local result := ""
-	
+
 	while (0 < length--)
 		result .= SubStr(valid, Round(Random(1, StrLen(valid))), 1)
-	
+
 	return result
 }
 
@@ -202,17 +202,22 @@ administrationEditor(configurationOrCommand, arguments*) {
 
 		listView.Delete()
 
-		if administrationEditor(kToken)
-			for ignore, objectInfo in string2Values(";", connector.GetAllObjects()) {
-				objectInfo := string2Values("=", objectInfo)
+		try {
+			if administrationEditor(kToken)
+				for ignore, objectInfo in string2Values(";", connector.GetAllObjects()) {
+					objectInfo := string2Values("=", objectInfo)
 
-				listView.Add("", objectInfo[1], objectInfo[2])
-			}
+					listView.Add("", objectInfo[1], objectInfo[2])
+				}
 
-		listView.ModifyCol()
+			listView.ModifyCol()
 
-		loop 2
-			listView.ModifyCol(A_Index, "AutoHdr")
+			loop 2
+				listView.ModifyCol(A_Index, "AutoHdr")
+		}
+		catch Any as exception {
+			logError(exception, true)
+		}
 	}
 
 	changePassword(*) {
@@ -619,7 +624,12 @@ administrationEditor(configurationOrCommand, arguments*) {
 				OnMessage(0x44, translateYesNoButtons, 0)
 
 				if (msgResult = "Yes")
-					connector.CompactDatabase()
+					try {
+						connector.CompactDatabase()
+					}
+					catch Any as exception {
+						logError(exception, true)
+					}
 
 				loadObjects(connector, objectsListView)
 			}

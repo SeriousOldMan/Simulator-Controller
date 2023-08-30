@@ -1,7 +1,7 @@
 ## 5.3.0.0-release 09/15/23 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
-  3. A fourth page has been added to the "Server Administration" application. This page shows a [list of all data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#server-administration) currently stored on the Team Server and also allows to compact the database, if necessary.
+  3. A fourth page has been added to the "Server Administration" application. This page shows a [list of all data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#server-administration) currently stored on the Team Server and also allows to compact the database, if necessary. This requires a new version of the Team Server. **If you are running your own Team Server, you should update your instance(s).**
   4. The "Practice Center" now shows the sector times, if available from the simulator data API, in the laps list and various reports.
   5. The Race Spotter now compares your pace to the pace of all cars on the grid and informs you from time, whether you are faster than cars that are in positions in front of you.
   6. The "Simulator Setup" application has seen a major overhaul:

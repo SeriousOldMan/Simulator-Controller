@@ -45,7 +45,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 5.3.0
 
-No manual updates necessery, but you may want to check your preset choices in "Simulator Setup" and use the new "Basic" setup method, since this will make a couple of presets obsolete:
+You may want to check your preset choices in "Simulator Setup" and use the new "Basic" setup method, since this will make a couple of presets obsolete:
 
   1. Start "Simulator Setup" and go to the presets page.
   2. Open "Names and Voices of the Assistants" (if used) by double-clicking on it in the right list.
@@ -56,6 +56,8 @@ No manual updates necessery, but you may want to check your preset choices in "S
   7. Go back to the preset page and add all other presets you have used (if any).
   8. [Optional] If you had additional entries in the "Configuration Patch.ini" file, choose the "Custom Configuration..." preset and add them back in.
   9. Go to the last page and create a new configuration.
+
+Beside that, a new version of the Team Server is part of the release. The Team Server instances on Azure will be updated automatically, but if you are running a local Team Server for testing purposes, or if you are hosting a Team Server by yourself for your team(s), you might want to update your instance. Don't forget to backup your database file and copy it back after the update.
 
 ***
 

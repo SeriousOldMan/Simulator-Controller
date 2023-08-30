@@ -1025,6 +1025,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		local synthesizer, language, voice, curSimulatorConfiguration
 
 		this.Editor.saveToConfiguration(configuration)
+		this.saveToConfiguration(configuration)
 
 		curSimulatorConfiguration := kSimulatorConfiguration
 

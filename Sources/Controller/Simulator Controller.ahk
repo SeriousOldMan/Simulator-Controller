@@ -1214,7 +1214,7 @@ class SimulatorController extends ConfigurationItem {
 		this.iShowLogo := (this.iShowLogo && !kSilentMode)
 	}
 
-	writeControllerState(periodic := true) {
+	writeControllerState(fromTask := false) {
 		local plugins := CaseInsenseMap()
 		local controller, configuration, ignore, thePlugin, modes, states, name, theMode, simulators, simulator, fnController
 
@@ -1266,11 +1266,17 @@ class SimulatorController extends ConfigurationItem {
 
 		writeMultiMap(kTempDirectory . "Simulator Controller.state", configuration)
 
-		if periodic
-			if (ProcessExist("System Monitor.exe") || (isSet(kIntegrationPlugin) && SimulatorController.Instance.findPlugin(kIntegrationPlugin).Active))
+		if fromTask {
+			if isSet(kIntegrationPlugin)
+				thePlugin := SimulatorController.Instance.findPlugin(kIntegrationPlugin)
+			else
+				thePlugin := false
+
+			if (ProcessExist("System Monitor.exe") || (thePlugin && thePlugin.Active && this.isActive(thePlugin)))
 				Task.CurrentTask.Sleep := 2000
 			else
 				Task.CurrentTask.Sleep := 60000
+		}
 	}
 }
 
@@ -2162,9 +2168,9 @@ startupSimulatorController() {
 	local noStartup := ((A_Args.Length > 0) && (A_Args[1] = "-NoStartup"))
 
 	if noStartup
-		controller.writeControllerState(false)
+		controller.writeControllerState()
 	else
-		PeriodicTask(ObjBindMethod(controller, "writeControllerState"), 0, kLowPriority).start()
+		PeriodicTask(ObjBindMethod(controller, "writeControllerState", true), 0, kLowPriority).start()
 
 	controller.computeControllerModes()
 
@@ -2273,7 +2279,7 @@ setMode(actionOrPlugin, mode := false) {
 ;;;-------------------------------------------------------------------------;;;
 
 writeControllerState() {
-	SimulatorController.Instance.writeControllerState(false)
+	SimulatorController.Instance.writeControllerState()
 }
 
 

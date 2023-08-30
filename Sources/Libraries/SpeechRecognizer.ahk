@@ -502,14 +502,19 @@ class SpeechRecognizer {
 	}
 
 	loadGrammar(name, grammar, callback) {
-		prepareGrammar(name, grammar) {
+		prepareGrammar(theName, theGrammar) {
 			local start := A_TickCount
 			local ignore
 
-			ignore := grammar.Phrases
+			try {
+				ignore := theGrammar.Phrases
 
-			if isDebug()
-				logMessage(kLogDebug, "Preparing grammar " . name . " took " . (A_TickCount - start) . " ms")
+				if isDebug()
+					logMessage(kLogDebug, "Preparing grammar " . theName . " took " . (A_TickCount - start) . " ms")
+			}
+			catch Any as exception {
+				logError(exception)
+			}
 		}
 
 		if (this._grammarCallbacks.Has(name))

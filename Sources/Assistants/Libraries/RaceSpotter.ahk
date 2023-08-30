@@ -157,7 +157,7 @@ class CarInfo {
 		}
 	}
 
-	AverageLapTime[count := 3] {
+	AvgLapTime[count := 3] {
 		Get {
 			local lapTimes := []
 			local numLapTimes := this.LapTimes.Length
@@ -171,7 +171,7 @@ class CarInfo {
 
 	LapTime[average := false] {
 		Get {
-			return (average ? this.AverageLapTime : this.LastLapTime)
+			return (average ? this.AvgLapTime : this.LastLapTime)
 		}
 	}
 
@@ -295,7 +295,7 @@ class CarInfo {
 
 	update(driver, overallPosition, classPosition, lastLap, sector, lapTime, delta, trackAheadDelta, trackBehindDelta
 		 , validLap, invalidLaps, incidents, inPit) {
-		local avgLapTime := this.AverageLapTime
+		local avgLapTime := this.AvgLapTime
 		local pitted := (inPit || this.hasPitted(lastLap))
 		local valid := true
 		local deltas
@@ -556,7 +556,7 @@ class PositionInfo {
 		local difference := this.LapTimeDifference[true]
 
 		if (difference > 0)
-			return (percentage ? (difference > (this.Spotter.DriverCar.AverageLapTime / 100 * percentage)) : true)
+			return (percentage ? (difference > (this.Spotter.DriverCar.AvgLapTime / 100 * percentage)) : true)
 		else
 			return false
 	}

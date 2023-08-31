@@ -320,6 +320,7 @@ class PitstopRecommendation extends Assert {
 	}
 }
 
+
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
@@ -337,7 +338,7 @@ if !GetKeyState("Ctrl") {
 	MsgBox("Full run took " . (A_TickCount - startTime) . " ms")
 }
 else {
-	raceNr := 17
+	raceNr := 15
 	strategist := TestRaceStrategist(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Strategist.settings")
 								   , RaceStrategist.RaceStrategistRemoteHandler(0), "Khato", "DE", true, true, true, true)
 
@@ -362,8 +363,14 @@ else {
 					break
 				}
 				else {
-					if (A_Index == 1)
+					if (A_Index == 1) {
 						strategist.addLap(lap, &data)
+
+						if (lap = 2)
+							strategist.callRecommendFullCourseYellow()
+						else if (lap = 9)
+							strategist.callRecommendFullCourseYellow()
+					}
 					else
 						strategist.updateLap(lap, &data)
 

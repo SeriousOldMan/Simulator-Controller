@@ -189,9 +189,9 @@ class SpeechRecognizer {
 		}
 	}
 
-	Choices {
+	Choices[name?] {
 		Get {
-			return this.iChoices
+			return this.getChoices(name?)
 		}
 	}
 
@@ -458,13 +458,17 @@ class SpeechRecognizer {
 		return result
 	}
 
-	getChoices(name) {
-		if this.iChoices.Has(name)
-			return this.iChoices[name]
-		else if (this.iEngine = "Azure")
-			return []
+	getChoices(name?) {
+		if isSet(name) {
+			if this.iChoices.Has(name)
+				return this.iChoices[name]
+			else if (this.iEngine = "Azure")
+				return []
+			else
+				return (this.Instance ? ((this.iEngine = "Server") ? this.Instance.GetServerChoices(name) : this.Instance.GetDesktopChoices(name)) : [])
+		}
 		else
-			return (this.Instance ? ((this.iEngine = "Server") ? this.Instance.GetServerChoices(name) : this.Instance.GetDesktopChoices(name)) : [])
+			return this.iChoices
 	}
 
 	setChoices(name, choices) {
@@ -514,7 +518,6 @@ class SpeechRecognizer {
 						logMessage(kLogDebug, "Preparing grammar " . theName . " took " . (A_TickCount - start) . " ms")
 				}
 				catch Any as exception {
-					MsgBox theName
 					logError(exception)
 				}
 		}
@@ -821,8 +824,13 @@ class GrammarCompiler {
 		if literalValue {
 			builtin := literalValue.Value
 
-			if !this.SpeechRecognizer.Choices.Has(builtin)
+			try {
+				if !this.SpeechRecognizer.Choices[builtin]
+					throw "Syntax error detected in `"" . text . "`" at " . nextCharIndex . " in GrammarCompiler.readBuiltinChoices..."
+			}
+			catch Any {
 				throw "Syntax error detected in `"" . text . "`" at " . nextCharIndex . " in GrammarCompiler.readBuiltinChoices..."
+			}
 		}
 		else
 			throw "Syntax error detected in `"" . text . "`" at " . nextCharIndex . " in GrammarCompiler.readBuiltinChoices..."

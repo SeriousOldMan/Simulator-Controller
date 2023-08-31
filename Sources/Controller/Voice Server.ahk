@@ -949,7 +949,7 @@ class VoiceServer extends ConfigurationItem {
 					  , activationCommand := false, activationCallback := false, deactivationCallback := false, language := false
 					  , synthesizer := true, speaker := true, recognizer := false, listener := false
 					  , speakerVolume := kUndefined, speakerPitch := kUndefined, speakerSpeed := kUndefined) {
-		local grammar, client, nextCharIndex, command, theDescriptor, ignore
+		local grammar, client, nextCharIndex, theDescriptor, ignore
 
 		static counter := 1
 
@@ -998,9 +998,7 @@ class VoiceServer extends ConfigurationItem {
 			}
 
 			try {
-				command := recognizer.compileGrammar(activationCommand)
-
-				if !recognizer.loadGrammar(grammar, command, ObjBindMethod(this, "recognizeActivationCommand", client))
+				if !recognizer.loadGrammar(grammar, recognizer.compileGrammar(activationCommand), ObjBindMethod(this, "recognizeActivationCommand", client))
 					throw "Recognizer not running..."
 			}
 			catch Any as exception {

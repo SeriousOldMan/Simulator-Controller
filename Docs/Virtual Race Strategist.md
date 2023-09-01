@@ -721,6 +721,16 @@ It is also possible to enable automatic revision of the current strategy in the 
 
 Finally a word of a advice: The calculation of a strategy can be a time consuming and CPU intensive process, especially for long endurance races or if the *Optimizer* was used during the creation of the initially strategy, and, with even more impact, when the Monte Carlo traffic simulation method is used. This can result in framerate drops on weaker PC systems. So please check before an important race, whether you can use this functionality safely in your specific environment. But, even if your system is capable to handle the load, the recalculation may take some time, especially when high *Optimizer* settings were chosen during the creation of the original strategy.
 
+#### Handling Full Course Yellow
+
+Cato is also able to handle a Full Course Yellow condition, as long as a selected strategy is active. If you encounter a Full Course Yellow and if it is allowed to go to the pit during Full Course Yellow, you can ask the Strategist to evaluate whether a pitstop will be of benefit in this situation. There is a voice command and also a controller action available to trigger this evaluation. If the Strategist thinks that it is of benefit to perform an early pitstop, it will ask you and then directly calls you to the pit, while the Engineer is already preparing the pitstop.
+
+Remarks:
+
+1. When Cato has created a new strategy with an immediate pitstop, only the number of pitstops are used to compare it against the currently active strategy, since in most cases, the benefits of performing a pitstop during Full Course Yellow outweighs a possible longer stint afterwards. Therefore, if the new strategy has the same number of remaining pitstops, it is considered valid and the Strategist will call you to the pit.
+2. Be careful, when using teh Full Course Yellow handling during the first few laps, since the calculation of average lap time and fuel consumption might not be exact then. Normally, the Asisstants will refuse to help you in the learning phase, but in case of Full Course Yellow this is overriden. As long as you have already collected data about the given car / track / weather condition, this information is used and you will be fine. Otherwise double-check the recommendation.
+3. If you have accepted the new strategy with an immediate pitstop, the Engineer will be informed without further notice. He will plan and prepare the pitstop immediately without waiting for the next crossing of the start/finish line, as usual. This is important, so that you can enter the pit at the end of the current lap.
+
 ## Technical information
 
 Cato uses the same AI kernel as Jona. In fact, large parts of the basic rule set is identical for both Assistants. Therefore, you can consult the [technical information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#technical-information) of Jona, if you want to dig deeper into the inner workings.

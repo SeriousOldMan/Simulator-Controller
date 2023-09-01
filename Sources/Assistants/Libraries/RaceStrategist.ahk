@@ -2970,13 +2970,15 @@ class RaceStrategist extends GridRaceAssistant {
 								this.reportStrategy({Strategy: false, FullCourseYellow: true, NextPitstop: false
 												   , TyreChange: true, Refuel: true}, scenario)
 
-								speaker.speakPhrase("ConfirmUpdateStrategy", false, true)
+								if this.Speaker {
+									speaker.speakPhrase("ConfirmUpdateStrategy", false, true)
 
-								this.setContinuation(RaceStrategist.ConfirmStrategyUpdateContinuation(this, scenario, false))
+									this.setContinuation(RaceStrategist.ConfirmStrategyUpdateContinuation(this, scenario, false))
 
-								dispose := false
+									dispose := false
 
-								return
+									return
+								}
 							}
 							else
 								scenario := false
@@ -3314,7 +3316,8 @@ class RaceStrategist extends GridRaceAssistant {
 	callRecommendPitstop(lapNumber := false) {
 		this.clearContinuation()
 
-		this.getSpeaker().speakPhrase("Confirm")
+		if this.Speaker
+			this.getSpeaker().speakPhrase("Confirm")
 
 		Task.yield()
 
@@ -3327,7 +3330,8 @@ class RaceStrategist extends GridRaceAssistant {
 	callRecommendStrategy() {
 		this.clearContinuation()
 
-		this.getSpeaker().speakPhrase("Confirm")
+		if this.Speaker
+			this.getSpeaker().speakPhrase("Confirm")
 
 		Task.yield()
 
@@ -3340,7 +3344,8 @@ class RaceStrategist extends GridRaceAssistant {
 	callRecommendFullCourseYellow() {
 		this.clearContinuation()
 
-		this.getSpeaker().speakPhrase("Confirm")
+		if this.Speaker
+			this.getSpeaker().speakPhrase("Confirm")
 
 		Task.yield()
 

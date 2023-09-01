@@ -320,6 +320,47 @@ class PitstopRecommendation extends Assert {
 	}
 }
 
+class FCYHandling extends Assert {
+	FCYHandlingTest() {
+		strategist := TestRaceStrategist(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 15\Race Strategist.settings"), RaceStrategist.RaceStrategistRemoteHandler(0), "Khato", "DE", false, false, false)
+
+		FileCopy(kSourcesDirectory . "Tests\Test Data\Race 15\Race.strategy", kUserConfigDirectory . "Race.strategy", 1)
+
+		setDebug(true)
+
+		loop {
+			data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 15\Race Strategist Lap " . A_Index . ".1.data")
+
+			if (data.Count == 0)
+				break
+			else
+				strategist.addLap(A_Index, &data)
+
+			if (A_Index = 2)
+				strategist.callRecommendFullCourseYellow()
+			else if (A_Index = 9)
+				strategist.callRecommendFullCourseYellow()
+
+			if (A_Index = 4) {
+				this.AssertEqual(1, strategist.KnowledgeBase.getValue("Strategy.Pitstop.Next"), "Unexpected next pitstop detected in lap 2...")
+				this.AssertEqual(28, strategist.KnowledgeBase.getValue("Strategy.Pitstop.Lap"), "Unexpected pitstop lap detected in lap 2...")
+			}
+			else if (A_Index = 11) {
+				this.AssertEqual(1, strategist.KnowledgeBase.getValue("Strategy.Pitstop.Next"), "Unexpected next pitstop detected in lap 2...")
+				this.AssertEqual(9, strategist.KnowledgeBase.getValue("Strategy.Pitstop.Lap"), "Unexpected pitstop lap detected in lap 2...")
+			}
+
+			if strategist.Debug[kDebugKnowledgeBase]
+				strategist.dumpKnowledgeBase(strategist.KnowledgeBase)
+
+			if (A_Index >= 12)
+				break
+		}
+
+		strategist.finishSession(false)
+	}
+}
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Initialization Section                          ;;;
@@ -332,6 +373,7 @@ if !GetKeyState("Ctrl") {
 	AHKUnit.AddTestClass(PositionProjection)
 	AHKUnit.AddTestClass(GapReporting)
 	AHKUnit.AddTestClass(PitstopRecommendation)
+	AHKUnit.AddTestClass(FCYHandling)
 
 	AHKUnit.Run()
 
@@ -349,6 +391,8 @@ else {
 
 	if (raceNr == 15) {
 		done := false
+
+		FileCopy(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race.strategy", kUserConfigDirectory . "Race.strategy", 1)
 
 		loop {
 			lap := A_Index

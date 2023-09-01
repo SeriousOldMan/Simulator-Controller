@@ -2301,10 +2301,13 @@ class RaceEngineer extends RaceAssistant {
 	callPlanPitstop(lap := kUndefined, arguments*) {
 		this.clearContinuation()
 
-		if !this.supportsPitstop()
-			this.getSpeaker().speakPhrase("NoPitstop")
+		if !this.supportsPitstop() {
+			if this.Speaker
+				this.getSpeaker().speakPhrase("NoPitstop")
+		}
 		else if ((lap = kUndefined) && this.hasPlannedPitstop()) {
-			this.getSpeaker().speakPhrase("ConfirmRePlan")
+			if this.Speaker
+				this.getSpeaker().speakPhrase("ConfirmRePlan")
 
 			this.setContinuation(ObjBindMethod(this, "invokePlanPitstop", false, lap, arguments*))
 		}
@@ -2336,8 +2339,10 @@ class RaceEngineer extends RaceAssistant {
 
 		this.clearContinuation()
 
-		if !this.supportsPitstop()
-			speaker.speakPhrase("NoPitstop")
+		if !this.supportsPitstop() {
+			if this.Speaker
+				speaker.speakPhrase("NoPitstop")
+		}
 		else if (!this.TeamSession || (lap == false)) {
 			speaker.speakPhrase("NoDriverSwap")
 
@@ -2378,10 +2383,13 @@ class RaceEngineer extends RaceAssistant {
 	callPreparePitstop(lap := false) {
 		this.clearContinuation()
 
-		if !this.supportsPitstop()
-			this.getSpeaker().speakPhrase("NoPitstop")
+		if !this.supportsPitstop() {
+			if this.Speaker
+				this.getSpeaker().speakPhrase("NoPitstop")
+		}
 		else {
-			this.getSpeaker().speakPhrase("Confirm")
+			if this.Speaker
+				this.getSpeaker().speakPhrase("Confirm")
 
 			Task.yield()
 

@@ -750,10 +750,73 @@ startSimulator() {
 	local icon := kIconsDirectory . "Startup.ico"
 	local noLaunch, ignore
 
+	unblockExecutables() {
+		local progress := 0
+		local ignore, directory, currentDirectory, pid
+
+		if !A_IsAdmin {
+			if A_IsCompiled
+				Run("*RunAs `"" . A_ScriptFullPath . "`" -Unblock")
+			else
+				Run("*RunAs `"" . A_AhkPath . "`" `"" . A_ScriptFullPath . "`" -Unblock")
+
+			ExitApp(0)
+		}
+
+		showProgress({color: "Green", title: translate("Unblocking Applications and DLLs")})
+
+		try {
+			for ignore, directory in [kBinariesDirectory, kResourcesDirectory . "Setup\Installer\"
+									, kResourcesDirectory . "Setup\Plugins\"] {
+				currentDirectory := A_WorkingDir
+
+				try {
+					SetWorkingDir(directory)
+
+					Run("Powershell -Command Get-ChildItem -Path '.' -Recurse | Unblock-File", , "Hide", &pid)
+
+					while ProcessExist(pid) {
+						showProgress({progress: Min(100, progress++)})
+
+						Sleep(50)
+					}
+				}
+				catch Any as exception {
+					logError(exception)
+				}
+				finally {
+					SetWorkingDir(currentDirectory)
+				}
+			}
+
+			while (progress++ <= 100) {
+				showProgress({progress: progress})
+
+				Sleep(50)
+			}
+		}
+		catch Any as exception {
+			logError(exception)
+		}
+		finally {
+			hideProgress()
+
+			if A_IsCompiled
+				Run("*RunAs `"" . A_ScriptFullPath . "`"")
+			else
+				Run("*RunAs `"" . A_AhkPath . "`" `"" . A_ScriptFullPath . "`"")
+
+			ExitApp(0)
+		}
+	}
+
 	Hotkey("Escape", cancelStartup, "Off")
 
 	TraySetIcon(icon, "1")
 	A_IconTip := "Simulator Startup"
+
+	if (inList(A_Args, "-Unblock") || (GetKeyState("Ctrl", "P") && GetKeyState("Shift", "P")))
+		unblockExecutables()
 
 	noLaunch := inList(A_Args, "-NoLaunchPad")
 

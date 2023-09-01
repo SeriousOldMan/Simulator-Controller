@@ -84,6 +84,12 @@ Simulataor Controller is a modular software and consists of many functions, whic
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Simulator%20Controller%20Menu.JPG)
 
+### Fixing problems
+
+Windows is an operating system with many, and sometimes confusing, security features. In many situations, Windows will prevent execution of executables and DLLs, which have been downloaded from an *unknown* location. This can be prevented by digitally signing those files, but this comes with some cost and is therefore not an option for free Open Source software.
+
+If you encounter problems during runtime, for example, that application cannot be started or that voice commands cannot be registered, this can be due to WIndows preventing the execution of components of Simulator Controller, especially, if you have downloaded the software as a ZIP and installed it manually. In this case start "Simulator Setup" and unblock the files following the instructions on the second page of the wizard, or start "Simulator Startup" while holding down the Control together with the Shift key. In both cases, the software will elevate the priviliges (you will be asked to run the software in Admin mode) and the runtime components will be unblocked.
+
 ### Voice Commands
 
 The Simulator Controller framework supports a sophisticated natural language interface. This capability is used by the Race Assistants Jona and Cato, thereby allowing a fully voice enabled dialog between you and these Assistants, but the voice recognition can also be used to control parts of your controller hardware by voice commands.

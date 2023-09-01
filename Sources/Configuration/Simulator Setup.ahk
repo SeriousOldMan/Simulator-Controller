@@ -2562,13 +2562,14 @@ class StartStepWizard extends StepWizard {
 			this.registerWidgets(2, widget1, widget2, widget3, widget4)
 		}
 		else
-			for ignore, directory in [kBinariesDirectory, kResourcesDirectory . "Setup\Installer\"] {
+			for ignore, directory in [kBinariesDirectory, kResourcesDirectory . "Setup\Installer\"
+									, kResourcesDirectory . "Setup\Plugins\"] {
 				currentDirectory := A_WorkingDir
 
 				try {
 					SetWorkingDir(directory)
 
-					Run("Powershell -Command Get-ChildItem -Path '.' -Recurse | Unblock-File", , "Hide")
+					RunWait("Powershell -Command Get-ChildItem -Path '.' -Recurse | Unblock-File", , "Hide")
 				}
 				catch Any as exception {
 					logError(exception)

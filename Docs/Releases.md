@@ -1,4 +1,4 @@
-## 5.3.0.0-release 09/15/23 (planned)
+## 5.3.0.0-release 09/15/23 (planned - latest, maybe earlier)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. A fourth page has been added to the "Server Administration" application. This page shows a [list of all data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#server-administration) currently stored on the Team Server and also allows to compact the database, if necessary. This requires a new version of the Team Server. **If you are running your own Team Server, you should update your instance(s).**

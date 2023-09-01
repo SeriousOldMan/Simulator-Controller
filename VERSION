@@ -2,7 +2,7 @@
 Version=5.3.0.0-alpha
 Target=5.3.0.0-release
 Date=09/01/2023
-Download=
+Download=https://www.dropbox.com/scl/fi/rhss39kqub5lqcv373oqx/Simulator-Controller-5.3.0.0-alpha.zip?rlkey=nmis4qqooxsdoqtj53hzmsi9z&dl=1
 Changes=New page in "Server Administration, Compact database function in "Server Administration", New quick setup method in "Simulator Setup", Spotter informs you about being faster than cars ahead of you, "Mode Automation" preset no longer available, "Names and voices of Assistants" preset no longer available, Simulator settings are preserved when using "Simulator Setup", Names and voices of Assistants can be changed in Quick setup, New general configuration patch in "Simulator Setup", New general settings patch in "Simulator Setup", ACC Pitstop search image presets no longer available in "Simulator Setup", Integrated "P2T Configuration.ini" into "Core Settings.ini", "Practice Center" displays sector times in several places, Voice test mode in the new basic setup page, Voice prelisten mode in general voice configuration, Optimized random distributions, New Strategist voice command for FCY, New controller action "FCYRecommend" for "Race Strategist" plugin, New icon in Stream Deck Icon set for "FCYRecommend" action, Many new voice commands for Spotter and Strategist, New information request actions for Spotter and Strategist incl. new icons in the Stream Deck Icon set, Include clause for multi map files, Refactoring of grammar files, New match rating core settings
 [Release]
 Version=5.2.3.0-release
@@ -10,7 +10,7 @@ Date=08/18/2023
 Download=https://cutt.ly/nwg5Cmrz;https://www.dropbox.com/scl/fi/z98x4at0ydwwo5eium3a0/Simulator-Controller-5.2.3.0-release.zip?rlkey=br57kpsirtrwk55il01mb35fc&dl=1
 Changes=New controller action function "callCustom", Significant speed improvement in ACC pitstop setup when using the same tyre compound, Fixed position data for retired cars in Assetto Corsa Competizione, Fixed session info not showing up for drivers which have not driven their first stint, Extended audio routing for Analyzer and Controller, New car models for "Setup Workbench", Show recommended cold pressures in session info, Provide recommended cold pressures in "Session State.json"
 [Current]
-Type=Development
+Type=Release
 [Version]
 Development=5.3.0.0-alpha
 Release=5.2.3.0-release

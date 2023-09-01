@@ -12,7 +12,7 @@
 	 - All presets with search images for *Assetto Corsa Competizione* has been removed, since it is no longer needed.
 	 - A new preset "Custom Configuration" has been added with a very extensive sample section, which helps the experts to create special configurations.
   7. The Race Strategist now understands Full Course Yellow situations and can evaluate, whether a pitstop under FCY might be beneficial:
-     - New [voice command "We have Full Course Cellow. Should I come to the pit?"] (https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Strategist-Commands-(EN)) to ask the Strategist for possible actions under Full Course Yellow.
+     - New [voice command "We have Full Course Cellow. Should I come to the pit?"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Strategist-Commands-(EN)) to ask the Strategist for possible actions under Full Course Yellow.
 	 - New controller action ["FCYRecommend"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the Race Strategist plugin, which triggers the same.
 	 - New icon in the Stream Deck icon set for the "FCYRecommend" action.
 	 Please see the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#handling-full-course-yellow) for more information about Full Course Yellow handling.

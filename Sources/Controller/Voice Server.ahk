@@ -676,7 +676,7 @@ class VoiceServer extends ConfigurationItem {
 			if toggle {
 				Hotkey(p2tHotkey, ObjBindMethod(this, "listen", true), "On")
 
-				PeriodicTask(processExternalCommand, 50, kLowPriority).start()
+				PeriodicTask(ObjBindMethod(this, "processExternalCommand"), 50, kInterruptPriority).start()
 			}
 			else
 				PeriodicTask(ObjBindMethod(this, "listen", false), 50, kInterruptPriority).start()

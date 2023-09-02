@@ -673,11 +673,56 @@ class VoiceServer extends ConfigurationItem {
 			else
 				toggle := false
 
-			if toggle
+			if toggle {
 				Hotkey(p2tHotkey, ObjBindMethod(this, "listen", true), "On")
+
+				PeriodicTask(processExternalCommand, 50, kLowPriority).start()
+			}
 			else
 				PeriodicTask(ObjBindMethod(this, "listen", false), 50, kInterruptPriority).start()
 		}
+	}
+
+	processExternalCommand() {
+		local fileName := (kTempDirectory . "Voice.cmd")
+		local file, command
+
+		try {
+			file := FileOpen(fileName, "rw-rwd")
+
+			if !file
+				return false
+			else if (file.Length == 0) {
+				file.Close()
+
+				return false
+			}
+			else {
+				file.Pos := 0
+
+				command := file.ReadLine()
+
+				file.Close()
+
+				deleteFile(fileName)
+
+				if (InStr(command, "Target:") = 1)
+					this.activateVoiceClient(string2Values(":", command)[2])
+				else if (command = "Activation")
+					this.startActivationListener()
+				else if (command = "Listen")
+					this.startListening(false)
+				else if (command = "Stop") {
+					this.stopActivationListener()
+					this.stopListening()
+				}
+			}
+		}
+		catch Any {
+			return false
+		}
+
+		return true
 	}
 
 	listen(toggle, down := true) {
@@ -695,6 +740,9 @@ class VoiceServer extends ConfigurationItem {
 
 		static speed := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
 									   , "Voice", "Activation Speed", DllCall("GetDoubleClickTime"))
+
+		if (!toggle && this.processExternalCommand())
+			return
 
 		try
 			pressed := toggle ? down : GetKeyState(this.PushToTalk, "P")
@@ -838,7 +886,11 @@ class VoiceServer extends ConfigurationItem {
 				if !this.PushToTalk
 					this.startListening()
 			}
+			else
+				return true
 		}
+
+		return true
 	}
 
 	deactivateVoiceClient(descriptor) {
@@ -934,7 +986,6 @@ class VoiceServer extends ConfigurationItem {
 
 				if activate
 					this.activateVoiceClient(descriptor)
-
 			}
 			catch Any as exception {
 				logError(exception)

@@ -365,7 +365,8 @@ class RaceEngineer extends RaceAssistant {
 			if (fuel == 0)
 				speaker.speakPhrase("Later")
 			else
-				speaker.speakPhrase("Fuel", {fuel: Floor(speaker.number2Speech(convertUnit("Volume", fuel), 1)), unit: speaker.Fragments[getUnit("Volume")]})
+				speaker.speakPhrase("Fuel", {fuel: speaker.number2Speech(Floor(convertUnit("Volume", fuel)), 0)
+										   , unit: speaker.Fragments[getUnit("Volume")]})
 		}
 	}
 

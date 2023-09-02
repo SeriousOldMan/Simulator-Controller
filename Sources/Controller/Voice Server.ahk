@@ -487,7 +487,10 @@ class VoiceServer extends ConfigurationItem {
 				if !words
 					words := []
 
-				messageSend(kFileMessage, "Voice", this.ActivationCallback . ":" . values2String(";", words*), this.PID)
+				if (words.Length = 0)
+					messageSend(kFileMessage, "Voice", this.ActivationCallback, this.PID)
+				else
+					messageSend(kFileMessage, "Voice", this.ActivationCallback . ":" . values2String(";", words*), this.PID)
 			}
 		}
 
@@ -665,21 +668,20 @@ class VoiceServer extends ConfigurationItem {
 
 	initializePushToTalk() {
 		local p2tHotkey := this.PushToTalk
-		local toggle
+		local mode
 
 		if p2tHotkey {
 			if FileExist(kUserConfigDirectory . "Core Settings.ini")
-				toggle := (getMultiMapValue(readMultiMap(kUserConfigDirectory . "Core Settings.ini"), "Voice", "Push-To-Talk", "Hold") = "Press")
+				mode := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Core Settings.ini"), "Voice", "Push-To-Talk", "Hold")
 			else
-				toggle := false
+				mode := "Hold"
 
-			if toggle {
+			if (mode = "Press")
 				Hotkey(p2tHotkey, ObjBindMethod(this, "listen", true), "On")
-
-				PeriodicTask(ObjBindMethod(this, "processExternalCommand"), 50, kInterruptPriority).start()
-			}
-			else
+			else if (mode = "Hold")
 				PeriodicTask(ObjBindMethod(this, "listen", false), 50, kInterruptPriority).start()
+			else if (mode = "Custom")
+				PeriodicTask(ObjBindMethod(this, "processExternalCommand"), 50, kInterruptPriority).start()
 		}
 	}
 
@@ -688,14 +690,14 @@ class VoiceServer extends ConfigurationItem {
 		local file, command
 
 		try {
-			file := FileOpen(fileName, "rw-rwd")
+			file := FileOpen(fileName, "r-rwd")
 
 			if !file
-				return false
+				return
 			else if (file.Length == 0) {
 				file.Close()
 
-				return false
+				return
 			}
 			else {
 				file.Pos := 0
@@ -719,10 +721,7 @@ class VoiceServer extends ConfigurationItem {
 			}
 		}
 		catch Any {
-			return false
 		}
-
-		return true
 	}
 
 	listen(toggle, down := true) {
@@ -740,9 +739,6 @@ class VoiceServer extends ConfigurationItem {
 
 		static speed := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
 									   , "Voice", "Activation Speed", DllCall("GetDoubleClickTime"))
-
-		if (!toggle && this.processExternalCommand())
-			return
 
 		try
 			pressed := toggle ? down : GetKeyState(this.PushToTalk, "P")

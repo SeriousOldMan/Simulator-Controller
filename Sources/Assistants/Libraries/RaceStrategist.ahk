@@ -479,8 +479,9 @@ class RaceStrategist extends GridRaceAssistant {
 		loadFromConfiguration(configuration) {
 			local pitstops := []
 			local tyreSets := []
+			local knowledgeBase, lapNumber
 
-			loop getMultiMapValue(configuration, "Pitstops", "Count")
+			loop getMultiMapValue(configuration, "Pitstops", "Count", 0)
 				pitstops.Push({Lap: getMultiMapValue(configuration, "Pitstops", A_Index . ".Lap")
 							 , Refuel: getMultiMapValue(configuration, "Pitstops", A_Index . ".Refuel", 0)
 							 , TyreChange: getMultiMapValue(configuration, "Pitstops", A_Index . ".TyreChange")
@@ -491,11 +492,22 @@ class RaceStrategist extends GridRaceAssistant {
 							 , RepairSuspension: getMultiMapValue(configuration, "Pitstops", A_Index . ".RepairSuspension", false)
 							 , RepairEngine: getMultiMapValue(configuration, "Pitstops", A_Index . ".RepairEngine")})
 
-			loop getMultiMapValue(configuration, "TyreSets", "Count")
+			loop getMultiMapValue(configuration, "TyreSets", "Count", 0)
 				tyreSets.Push({Laps: getMultiMapValue(configuration, "TyreSets", A_Index . ".Laps")
 							 , Set: getMultiMapValue(configuration, "TyreSets", A_Index . ".Set")
 							 , Compound: getMultiMapValue(configuration, "TyreSets", A_Index . ".Compound")
 							 , CompoundColor: getMultiMapValue(configuration, "TyreSets", A_Index . ".CompoundColor")})
+
+			if (tyreSets.Length = 0) {
+				knowledgeBase := this.RaceStrategist.KnowledgeBase
+
+				lapNumber := knowledgeBase.getValue("Lap")
+
+				tyreSets.Push({Laps: lapNumber
+							 , Set: knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Set", 1)
+							 , Compound: knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound", "Dry")
+							 , CompoundColor: knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.Color", "Black")})
+			}
 
 			this.iPitstops := pitstops
 			this.iUsedTyreSets := tyreSets
@@ -565,6 +577,10 @@ class RaceStrategist extends GridRaceAssistant {
 			Get {
 				return this.iFullCourseYellow
 			}
+
+			Set {
+				return (this.iFullCourseYellow := value)
+			}
 		}
 
 		__New(strategyManager, configuration, driver, fullCourseYellow) {
@@ -586,7 +602,7 @@ class RaceStrategist extends GridRaceAssistant {
 			if this.StrategyManager.StrategyManager.unplannedPitstop(pitstopNr, currentLap, &remainingLaps)
 				return remainingLaps
 			else
-				return super.calcRemainingLaps(remainingStintLaps, remainingTyreLaps, remainingFuel, fuelConsumption)
+				return super.calcRemainingLaps(pitstopNr, currentLap, remainingStintLaps, remainingTyreLaps, remainingFuel, fuelConsumption)
 		}
 	}
 
@@ -1236,6 +1252,7 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	loadStrategy(facts, strategy, lastLap := false, lastPitstop := false, lastPitstopLap := false) {
+		local fullCourseYellow := strategy.FullCourseYellow
 		local pitstopWindow := (this.Settings ? getMultiMapValue(this.Settings, "Strategy Settings", "Strategy.Window.Considered", 3) : 3)
 		local pitstop, count, ignore, pitstopLap, pitstopMaxLap, first, rootStrategy, pitstopDeviation
 
@@ -1266,9 +1283,10 @@ class RaceStrategist extends GridRaceAssistant {
 		count := 0
 
 		for ignore, pitstop in strategy.Pitstops {
-			if ((lastPitstop && (pitstop.Nr <= lastPitstop)) || (lastPitstopLap && (Abs(pitstop.Lap - lastPitstopLap) <= pitstopWindow))
-															 || (lastLap && (pitstop.Lap < lastLap)))
-				continue
+			if !fullCourseYellow
+				if ((lastPitstop && (pitstop.Nr <= lastPitstop)) || (lastPitstopLap && (Abs(pitstop.Lap - lastPitstopLap) <= pitstopWindow))
+																 || (lastLap && (pitstop.Lap < lastLap)))
+					continue
 
 			pitstopLap := pitstop.Lap
 
@@ -2149,6 +2167,9 @@ class RaceStrategist extends GridRaceAssistant {
 																			, options.HasProp("Confirm") && options.Confirm
 																			, request, fullCourseYellow)
 										, engineerPID)
+			else if isDebug() {
+				this.runSimulation(newMultiMap(), options.HasProp("Confirm") && options.Confirm, request, fullCourseYellow)
+			}
 			else if (this.Speaker && (!options.HasProp("Silent") || !options.Silent))
 				this.getSpeaker().speakPhrase("NoStrategyRecommendation")
 		}
@@ -2252,6 +2273,8 @@ class RaceStrategist extends GridRaceAssistant {
 			if !isDebug()
 				deleteFile(pitstopHistory)
 		}
+		else
+			data := pitstopHistory
 
 		if (this.UseTraffic && this.RemoteHandler) {
 			this.setContinuation(RaceStrategist.RaceStrategySimulationContinuation(this, data, confirm, request, fullCourseYellow))
@@ -2777,7 +2800,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 			for nr, pitstop in strategy.Pitstops
 				if (nr > skip)
-					laps += pitstop.Lap
+					laps += pitstop.StintLaps
 
 			return laps
 		}
@@ -2871,10 +2894,12 @@ class RaceStrategist extends GridRaceAssistant {
 					 + StrategySimulation.scenarioCoefficient("PitstopsPostLaps", sPLaps - cPLaps, 10))
 
 		if (scenario.SessionType = "Duration") {
-			result += StrategySimulation.scenarioCoefficient("ResultMajor", sLaps - cLaps, 1)
+			if (!scenario.FullCourseYellow || (result != 0)) {
+				result += StrategySimulation.scenarioCoefficient("ResultMajor", sLaps - cLaps, 1)
 
-			if extended
-				result += StrategySimulation.scenarioCoefficient("ResultMinor", cDuration - sDuration, (strategy.AvgLapTime + scenario.AvgLapTime) / 4)
+				if extended
+					result += StrategySimulation.scenarioCoefficient("ResultMinor", cDuration - sDuration, (strategy.AvgLapTime + scenario.AvgLapTime) / 4)
+			}
 		}
 		else
 			result += StrategySimulation.scenarioCoefficient("ResultMajor", cDuration - sDuration, (strategy.AvgLapTime + scenario.AvgLapTime) / 4)
@@ -2945,13 +2970,15 @@ class RaceStrategist extends GridRaceAssistant {
 								this.reportStrategy({Strategy: false, FullCourseYellow: true, NextPitstop: false
 												   , TyreChange: true, Refuel: true}, scenario)
 
-								speaker.speakPhrase("ConfirmUpdateStrategy", false, true)
+								if this.Speaker {
+									speaker.speakPhrase("ConfirmUpdateStrategy", false, true)
 
-								this.setContinuation(RaceStrategist.ConfirmStrategyUpdateContinuation(this, scenario, false))
+									this.setContinuation(RaceStrategist.ConfirmStrategyUpdateContinuation(this, scenario, false))
 
-								dispose := false
+									dispose := false
 
-								return
+									return
+								}
 							}
 							else
 								scenario := false
@@ -3289,7 +3316,8 @@ class RaceStrategist extends GridRaceAssistant {
 	callRecommendPitstop(lapNumber := false) {
 		this.clearContinuation()
 
-		this.getSpeaker().speakPhrase("Confirm")
+		if this.Speaker
+			this.getSpeaker().speakPhrase("Confirm")
 
 		Task.yield()
 
@@ -3302,7 +3330,8 @@ class RaceStrategist extends GridRaceAssistant {
 	callRecommendStrategy() {
 		this.clearContinuation()
 
-		this.getSpeaker().speakPhrase("Confirm")
+		if this.Speaker
+			this.getSpeaker().speakPhrase("Confirm")
 
 		Task.yield()
 
@@ -3315,7 +3344,8 @@ class RaceStrategist extends GridRaceAssistant {
 	callRecommendFullCourseYellow() {
 		this.clearContinuation()
 
-		this.getSpeaker().speakPhrase("Confirm")
+		if this.Speaker
+			this.getSpeaker().speakPhrase("Confirm")
 
 		Task.yield()
 
@@ -3375,6 +3405,7 @@ class RaceStrategist extends GridRaceAssistant {
 	reportUpcomingPitstop(plannedPitstopLap) {
 		local knowledgeBase := this.KnowledgeBase
 		local fullCourseYellow, speaker, plannedLap, nextPitstop, maxLap
+		local refuel, tyreChange, tyreCompound, tyreCompoundColor
 
 		if (this.Speaker[false]) {
 			speaker := this.getSpeaker()
@@ -3413,10 +3444,25 @@ class RaceStrategist extends GridRaceAssistant {
 													   , laps: (plannedPitstopLap - knowledgeBase.getValue("Lap"))})
 
 				if ProcessExist("Race Engineer.exe")
-					this.confirmNextPitstop(plannedPitstopLap)
+					if fullCourseYellow {
+						refuel := Round(knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Fuel.Amount"), 1)
+						tyreChange := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Change")
+						tyreCompound := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Compound")
+						tyreCompoundColor := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Compound.Color")
+
+						if (knowledgeBase.getValue("Strategy.Pitstop.Count") > nextPitstop)
+							refuel := ("!" . refuel)
+
+						this.planPitstop(plannedPitstopLap, refuel, "!" . tyreChange, tyreCompound, tyreCompoundColor)
+					}
+					else
+						this.confirmNextPitstop(plannedPitstopLap)
 			}
 			finally {
 				speaker.endTalk()
+
+				if fullCourseYellow
+					this.Strategy.FullCourseYellow := false
 			}
 		}
 	}

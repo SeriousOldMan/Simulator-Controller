@@ -260,7 +260,7 @@ class CarInfo {
 		}
 	}
 
-	AverageDelta[sector, count := 3] {
+	AvgDelta[sector, count := 3] {
 		Get {
 			local deltas := []
 			local numDeltas, ignore, sDeltas
@@ -285,7 +285,7 @@ class CarInfo {
 
 	Delta[sector, average := false, count := 3] {
 		Get {
-			return (average ? this.AverageDelta[sector, count] : this.LastDelta[sector])
+			return (average ? this.AvgDelta[sector, count] : this.LastDelta[sector])
 		}
 	}
 

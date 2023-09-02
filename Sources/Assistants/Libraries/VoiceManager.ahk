@@ -900,8 +900,7 @@ class VoiceManager {
 	}
 
 	remoteActivationRecognized(words*) {
-		if (words.Length > 0)
-			this.phraseRecognized("Call", words, true)
+		this.phraseRecognized("Call", words, true)
 	}
 
 	remoteDeactivationRecognized(words*) {

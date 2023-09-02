@@ -417,6 +417,18 @@ Stops the currently running simulation game.
 #### *shutdownSystem()*
 Displays a dialog and asks, whether the PC should be shutdown. Use with caution.
 
+#### *targetListen(target :: String)*
+Directs the next voice commands to the supplied *target*, which must eiher be "Controller" or the name of one of the Race Assistants. Simuilar to using the [Push-To-Talk](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#voice-commands) button and then issuing an activation command.
+
+#### *startActivation()*
+Activates the activation listen mode. Simuilar to using the [Push-To-Talk](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#voice-commands) button to prepare for issuing an activation command.
+
+#### *startListen()*
+Activates the listen mode of the currently targeted dialog partner. Simuilar to using the [Push-To-Talk](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#voice-commands) button.
+
+#### *stopListen()*
+Stops the listen mode and tries to understand the spoken command. Simuilar to using the [Push-To-Talk](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#voice-commands) button.
+
 #### *enablePedalVibration()*
 Enables the pedal vibration motors, that might be mounted to your pedals. This action function is provided by the "Tactile Feedback" plugin and is available depending on the concrete configuration.
 

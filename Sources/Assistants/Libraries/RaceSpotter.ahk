@@ -1926,7 +1926,9 @@ class RaceSpotter extends GridRaceAssistant {
 					if !situation {
 						this.TacticalAdvices["FasterThan"] := {Key: key, Lap: lastLap}
 
-						speaker.speakPhrase("FasterThan", {position: slowerCar.Position["Class"], delta: delta, lapTime: lapTimeDifference})
+						speaker.speakPhrase("FasterThan", {position: slowerCar.Position["Class"]
+														 , delta: speaker.number2Speech(delta, 1)
+														 , lapTime: speaker.number2Speech(lapTimeDifference, 1)})
 
 						return true
 					}

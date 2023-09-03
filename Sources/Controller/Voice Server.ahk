@@ -487,7 +487,10 @@ class VoiceServer extends ConfigurationItem {
 				if !words
 					words := []
 
-				messageSend(kFileMessage, "Voice", this.ActivationCallback . ":" . values2String(";", words*), this.PID)
+				if (words.Length = 0)
+					messageSend(kFileMessage, "Voice", this.ActivationCallback, this.PID)
+				else
+					messageSend(kFileMessage, "Voice", this.ActivationCallback . ":" . values2String(";", words*), this.PID)
 			}
 		}
 
@@ -665,18 +668,62 @@ class VoiceServer extends ConfigurationItem {
 
 	initializePushToTalk() {
 		local p2tHotkey := this.PushToTalk
-		local toggle
+		local mode
 
 		if p2tHotkey {
 			if FileExist(kUserConfigDirectory . "Core Settings.ini")
-				toggle := (getMultiMapValue(readMultiMap(kUserConfigDirectory . "Core Settings.ini"), "Voice", "Push-To-Talk", "Hold") = "Press")
+				mode := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Core Settings.ini"), "Voice", "Push-To-Talk", "Hold")
 			else
-				toggle := false
+				mode := "Hold"
 
-			if toggle
+			if (mode = "Press")
 				Hotkey(p2tHotkey, ObjBindMethod(this, "listen", true), "On")
-			else
+			else if (mode = "Hold")
 				PeriodicTask(ObjBindMethod(this, "listen", false), 50, kInterruptPriority).start()
+			else if (mode = "Custom")
+				PeriodicTask(ObjBindMethod(this, "processExternalCommand"), 50, kInterruptPriority).start()
+		}
+	}
+
+	processExternalCommand() {
+		local fileName := (kTempDirectory . "Voice.cmd")
+		local file, command, descriptor
+
+		try {
+			file := FileOpen(fileName, "r-rwd")
+
+			if !file
+				return
+			else if (file.Length == 0) {
+				file.Close()
+
+				return
+			}
+			else {
+				file.Pos := 0
+
+				command := file.ReadLine()
+
+				file.Close()
+
+				deleteFile(fileName)
+
+				if (InStr(command, "Target:") = 1) {
+					descriptor := string2Values(":", command)[2]
+
+					this.activateVoiceClient(descriptor, ["Hey", descriptor])
+				}
+				else if (command = "Activation")
+					this.startActivationListener()
+				else if (command = "Listen")
+					this.startListening(false)
+				else if (command = "Stop") {
+					this.stopActivationListener()
+					this.stopListening()
+				}
+			}
+		}
+		catch Any {
 		}
 	}
 
@@ -838,7 +885,11 @@ class VoiceServer extends ConfigurationItem {
 				if !this.PushToTalk
 					this.startListening()
 			}
+			else
+				return true
 		}
+
+		return true
 	}
 
 	deactivateVoiceClient(descriptor) {
@@ -934,7 +985,6 @@ class VoiceServer extends ConfigurationItem {
 
 				if activate
 					this.activateVoiceClient(descriptor)
-
 			}
 			catch Any as exception {
 				logError(exception)

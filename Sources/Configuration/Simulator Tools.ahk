@@ -1583,11 +1583,11 @@ updateConfigurationForV530() {
 	local configuration
 
 	if FileExist(kUserConfigDirectory . "P2T Configuration.ini") {
-		local configuration := readMultiMap(kUserConfigDirectory . "Core Settings.ini")
+		configuration := readMultiMap(kUserConfigDirectory . "Simulator Configuration.ini")
 
-		setMultiMapValue(configuration, "Voice", "Push-To-Talk", "Press")
+		setMultiMapValue(configuration, "Voice Control", "PushToTalkMode", "Press")
 
-		writeMultiMap(kUserConfigDirectory . "Core Settings.ini", configuration)
+		writeMultiMap(kUserConfigDirectory . "Simulator Configuration.ini", configuration)
 
 		deleteFile(kUserConfigDirectory . "P2T Configuration.ini")
 	}

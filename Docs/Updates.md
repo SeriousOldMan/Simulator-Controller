@@ -52,10 +52,12 @@ You may want to check your preset choices in "Simulator Setup" and use the new "
   3. Note your changes (names, voices, ...) and store the file in a safe location.
   4. Note down your used other presets, then remove all from the right lisst.
   5. Go to the beginning, choose "Basic" as setup method and continue to the next page.
-  6. Configure your Assistants as in the "Names and Voices of the Assistants" preset.
+  6. Configure the Language, *Push To Talk* and your Assistants as in the "Names and Voices of the Assistants" preset.
   7. Go back to the preset page and add all other presets you have used (if any).
   8. [Optional] If you had additional entries in the "Configuration Patch.ini" file, choose the "Custom Configuration..." preset and add them back in.
   9. Go to the last page and create a new configuration.
+
+IMPORTANT: If you have used the alternate *Push To Talk* behaviour preset in the past, you may want to set the desired behaviour in the voice control configuration, so that everything works as before.
 
 Beside that, a new version of the Team Server is part of the release. The Team Server instances on Azure will be updated automatically, but if you are running a local Team Server for testing purposes, or if you are hosting a Team Server by yourself for your team(s), you might want to update your instance. Don't forget to backup your database file and copy it back after the update.
 

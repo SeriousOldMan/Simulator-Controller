@@ -9,6 +9,7 @@
 	 - Full configuration of the *Names*, *Languages* and *Voices* of the Race Assistants is now possible in the "Basic" configuration page-
 	 - When a new configuration is being created, current changes made by the user since in other application, for example in the settings of "Simulator Startup", will be preserved, if possible.
 	 - The presets "Names and voices of Assistants", "Different Speaker Voices" and "Mode Automation" have been removed, since they are no longer needed. If such a preset is in use in your configuration, it will still be active, until you remove it.
+	 - The "Push-To-Talk Behaviour" preset has been deprecated as well. This option is now available in the standard voice control configuration.
 	 - All presets with search images for *Assetto Corsa Competizione* has been removed, since it is no longer needed.
 	 - A new preset "Custom Configuration" has been added with a very extensive sample section, which helps the experts to create special configurations.
   7. The Race Strategist now understands Full Course Yellow situations and can evaluate, whether a pitstop under FCY might be beneficial:
@@ -35,7 +36,7 @@
   15. Small performance improvement for voice commands, since grammars are now pre-compiled in the background.
   16. The threshold values for the Sorenson-Dice algorithm, which is used to compare spoken commands against the registered command syntax, can now be configured in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration). This allows you to tune, how exact your commands must follow the predefined syntax and it can also be used in cases, where a wrong command is detected, which can happen when two commands are quite similar.
   17. New test mode in the voice configuration let you now test your changes to pitch, speed or distortion in place.
-  18. The configuration option to choose between the different possible behaviours of the *Push-To-Talk* button (formerly handled by the "P2T Configuration.ini" file) has been moved to the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration). Normally automatically handled by "Simulator Setup".
+  18. The special configuration to choose between the different possible behaviours of the *Push To Talk* button (formerly handled by the "P2T Configuration.ini" file) has been moved to the standard configuration. This is automatically handled by "Simulator Setup" and "Simulator Configuration".
   19. [Developers Only] MultiMap files can now "#Include" other MultiMap files.
   20. [Experts Only] The grammar files has been split up and modularized.
 
@@ -132,7 +133,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   8. A new communication method is available for the Stream Deck. It has been reported, that using OBS parallel to Simulator Controller can brake the Stream Deck functionality of Simulator Controller. The new communication method, although a little bit slower, prevents this. A new setting in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration) let you choose between the available communication methods.
   9. [Experts only] A new setting in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration) let you choose the frequency of external command processing. Change with caution.
   10. [Experts only] The controller action function "call" has been renamed to "invoke".
-  11. [Experts only] It is now possible to alter the time, a press or click on the Push-to-Talk button is considered as an activation event. Default is the Windows setting for mouse double click speed. See the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration) for more information.
+  11. [Experts only] It is now possible to alter the time, a press or click on the *Push To Talk* button is considered as an activation event. Default is the Windows setting for mouse double click speed. See the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration) for more information.
   12. New car models for "Setup Workbench":
       - Assetto Corsa
 	    - Audi R8 LMS Ultra
@@ -795,7 +796,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   12. A lot of new tyre compound data has been added for *Automobilista 2* (many thanks to Chris Matthews to provide the data).
   13. Fixed a regression where in many lists and reports the last name of the drivers where missing.
   14. Implemented state caching in "Simulator Setup" which results in a significant performance improvement when stepping to a page, which had already been visited.
-  15. A preset has been added to "Simulator Setup" to enable a toggle mode for the Push-To-Talk trigger. Please see the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#push-to-talk-behaviour) for more information.
+  15. A preset has been added to "Simulator Setup" to enable a toggle mode for the *Push To Talk* trigger. Please see the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#push-to-talk-behaviour) for more information.
   16. New car models for "Setup Advisor":
       - Assetto Corsa
         - Pagani Zonda R
@@ -1594,7 +1595,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   4. Improved "Pace" report including median and quartile calculation.
   5. Various usability improvements for the "Race Reports" tool, incl. better selection of reports based on car and track grouping.
   6. [New "Call" command](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) allows you to actiavte the listen mode of a Race Assistant by the touch of a button on your Button Box.
-  7. Improved reliability for voice control of multiple Race Assistants, when Push-to-Talk is not used.
+  7. Improved reliability for voice control of multiple Race Assistants, when *Push To Talk* is not used.
   8. Optimized language handling for SAPI voices to support non-Microsoft language packs.
 
 ## 3.5.4-release 09/03/21
@@ -1625,7 +1626,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   4. Button Boxes can now be invisible to define and group controls, which are located on non-typical controllers like steering wheels.
   5. For the introduction of the new Setup Wizard, the localized Plugin Labels has been extensively reworked. Please see the [update notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-350), if you have changed the default Plugin Labels and want to preserve your changes.
   6. The "System" plugin now supports a [parameter *launchApplications*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration) to specify the applications to be used for the "Launch" mode.
-  7. The Push-To-Talk function now emits a short sound, when the listen mode is activated.
+  7. The *Push To Talk* function now emits a short sound, when the listen mode is activated.
 
 ## 3.3.1-release 07/25/21
 
@@ -1852,7 +1853,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   
   1. Bugfixes, as always
   2. Documentation updates, as always
-  3. Push-To-Talk function for voice recognition - this will reduce false positives almost to zero
+  3. *Push To Talk* function for voice recognition - this will reduce false positives almost to zero
   4. Button Boxes can be created with a configuration file - no more programming knowledge needed
   5. Extension of ACC Shared Memory Reader for weather information and track grip status
   6. Jona now issues notifications about upcoming weather changes and recommends tyre changes

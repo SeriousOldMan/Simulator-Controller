@@ -181,7 +181,7 @@ class QuickStepWizard extends StepWizard {
 		}
 
 		updateP2T(*) {
-			if (window["quickPushToTalkMethodDropDown"].Value = 3) {
+			if (window["quickPushToTalkModeDropDown"].Value = 3) {
 				window["quickPushToTalkEdit"].Enabled := false
 				window["quickPushToTalkEdit"].Value := ""
 				window["quickPushToTalkButton"].Enabled := false
@@ -257,7 +257,7 @@ class QuickStepWizard extends StepWizard {
 		widget9 := window.Add("Button", "xp+106 yp-1 w23 h23 VquickPushToTalkButton Hidden")
 		widget9.OnEvent("Click", getPTTHotkey)
 		setButtonIcon(widget9, kIconsDirectory . "Key.ico", 1)
-		widget10 := window.Add("DropDownList", "xp+24 yp w96 Choose1 VquickPushToTalkMethodDropDown Hidden", collect(["Hold & Talk", "Press & Talk", "Custom"], translate))
+		widget10 := window.Add("DropDownList", "xp+24 yp w96 Choose1 VquickPushToTalkModeDropDown Hidden", collect(["Hold & Talk", "Press & Talk", "Custom"], translate))
 		widget10.OnEvent("Change", updateP2T)
 		widget11 := window.Add("Edit", "xp+98 yp w96 h21 VquickPushToTalkEdit Hidden")
 
@@ -392,11 +392,11 @@ class QuickStepWizard extends StepWizard {
 			configuration := readMultiMap(kUserHomeDirectory . "Setup\Voice Control Configuration.ini")
 
 			this.Control["quickPushToTalkEdit"].Text := getMultiMapValue(configuration, "Voice Control", "PushToTalk", "")
-			this.Control["quickPushToTalkMethodDropDown"].Choose(inList(["Hold", "Press", "Custom"]
-																	  , getMultiMapValue(configuration, "Voice Control"
-																					   , "PushToTalkMode", "Hold")))
+			this.Control["quickPushToTalkModeDropDown"].Choose(inList(["Hold", "Press", "Custom"]
+																	, getMultiMapValue(configuration, "Voice Control"
+																					 , "PushToTalkMode", "Hold")))
 
-			if (this.Control["quickPushToTalkMethodDropDown"].Value = 3) {
+			if (this.Control["quickPushToTalkModeDropDown"].Value = 3) {
 				this.Control["quickPushToTalkEdit"].Enabled := false
 				this.Control["quickPushToTalkEdit"].Value := ""
 				this.Control["quickPushToTalkButton"].Enabled := false
@@ -763,7 +763,7 @@ class QuickStepWizard extends StepWizard {
 
 		setMultiMapValue(voiceConfiguration, "Voice Control", "Language", getLanguage())
 		setMultiMapValue(voiceConfiguration, "Voice Control", "PushToTalk", this.Control["quickPushToTalkEdit"].Text)
-		setMultiMapValue(voiceConfiguration, "Voice Control", "PushToTalkMode", ["Hold", "Press", "Custom"][this.Control["quickPushToTalkMethodDropDown"].Value])
+		setMultiMapValue(voiceConfiguration, "Voice Control", "PushToTalkMode", ["Hold", "Press", "Custom"][this.Control["quickPushToTalkModeDropDown"].Value])
 		setMultiMapValue(voiceConfiguration, "Voice Control", "Synthesizer", "dotNET")
 		setMultiMapValue(voiceConfiguration, "Voice Control", "Speaker", true)
 		setMultiMapValue(voiceConfiguration, "Voice Control", "Recognizer", "Desktop")

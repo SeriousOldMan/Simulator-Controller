@@ -670,19 +670,15 @@ class VoiceServer extends ConfigurationItem {
 		local p2tHotkey := this.PushToTalk
 		local mode
 
-		if p2tHotkey {
-			if FileExist(kUserConfigDirectory . "Core Settings.ini")
-				mode := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Core Settings.ini"), "Voice", "Push-To-Talk", "Hold")
-			else
-				mode := "Hold"
-
-			if (mode = "Press")
-				Hotkey(p2tHotkey, ObjBindMethod(this, "listen", true), "On")
-			else if (mode = "Hold")
-				PeriodicTask(ObjBindMethod(this, "listen", false), 50, kInterruptPriority).start()
-			else if (mode = "Custom")
-				PeriodicTask(ObjBindMethod(this, "processExternalCommand"), 50, kInterruptPriority).start()
-		}
+		if p2tHotkey
+			switch getMultiMapValue(this.Configuration, "Voice Control", "PushToTalkMode", "Hold"), false {
+				case "Press":
+					Hotkey(p2tHotkey, ObjBindMethod(this, "listen", true), "On")
+				case "Hold":
+					PeriodicTask(ObjBindMethod(this, "listen", false), 50, kInterruptPriority).start()
+				case "Custom":
+					PeriodicTask(ObjBindMethod(this, "processExternalCommand"), 50, kInterruptPriority).start()
+			}
 	}
 
 	processExternalCommand() {

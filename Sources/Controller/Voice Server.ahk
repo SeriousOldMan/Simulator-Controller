@@ -687,7 +687,7 @@ class VoiceServer extends ConfigurationItem {
 
 	processExternalCommand() {
 		local fileName := (kTempDirectory . "Voice.cmd")
-		local file, command
+		local file, command, descriptor
 
 		try {
 			file := FileOpen(fileName, "r-rwd")
@@ -708,8 +708,11 @@ class VoiceServer extends ConfigurationItem {
 
 				deleteFile(fileName)
 
-				if (InStr(command, "Target:") = 1)
-					this.activateVoiceClient(string2Values(":", command)[2])
+				if (InStr(command, "Target:") = 1) {
+					descriptor := string2Values(":", command)[2]
+
+					this.activateVoiceClient(descriptor, ["Hey", descriptor])
+				}
 				else if (command = "Activation")
 					this.startActivationListener()
 				else if (command = "Listen")

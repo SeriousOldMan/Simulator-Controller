@@ -417,7 +417,7 @@ Stops the currently running simulation game.
 #### *shutdownSystem()*
 Displays a dialog and asks, whether the PC should be shutdown. Use with caution.
 
-#### *targetListen(target :: String)*
+#### *targetListener(target :: String)*
 Directs the next voice commands to the supplied *target*, which must eiher be "Controller" or the name of one of the Race Assistants. Simuilar to using the [Push-To-Talk](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#voice-commands) button and then issuing an activation command.
 
 #### *startActivation()*

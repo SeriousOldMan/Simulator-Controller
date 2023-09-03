@@ -9,7 +9,7 @@
 ;;;                        Controller Action Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-targetListen(target) {
+targetListener(target) {
 	while FileExist(kTempDirectory . "Voice.cmd")
 		deleteFile(kTempDirectory . "Voice.cmd")
 

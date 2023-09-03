@@ -187,15 +187,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		}
 
 		updateP2T(*) {
-			if (this.Control["pushToTalkModeDropDown"].Value = 3) {
-				this.Control["pushToTalkEdit"].Enabled := false
-				this.Control["pushToTalkEdit"].Value := ""
-				this.Control["pushToTalkButton"].Enabled := false
-			}
-			else {
-				this.Control["pushToTalkEdit"].Enabled := true
-				this.Control["pushToTalkButton"].Enabled := true
-			}
+			this.updateWidgets()
 		}
 
 		window.SetFont("Norm", "Arial")
@@ -616,6 +608,10 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		this.showWidgets()
 
+		this.updateWidgets()
+	}
+
+	updateWidgets() {
 		if (this.Control["pushToTalkModeDropDown"].Value = 3) {
 			this.Control["pushToTalkEdit"].Enabled := false
 			this.Control["pushToTalkEdit"].Value := ""

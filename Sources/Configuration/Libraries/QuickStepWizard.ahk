@@ -396,6 +396,14 @@ class QuickStepWizard extends StepWizard {
 																	, getMultiMapValue(configuration, "Voice Control"
 																					 , "PushToTalkMode", "Hold")))
 
+			this.loadSetup(!fullInstall)
+
+			this.QuickSetup := false
+		}
+
+		super.showPage(page)
+
+		if (page = 2) {
 			if (this.Control["quickPushToTalkModeDropDown"].Value = 3) {
 				this.Control["quickPushToTalkEdit"].Enabled := false
 				this.Control["quickPushToTalkEdit"].Value := ""
@@ -405,13 +413,7 @@ class QuickStepWizard extends StepWizard {
 				this.Control["quickPushToTalkEdit"].Enabled := true
 				this.Control["quickPushToTalkButton"].Enabled := true
 			}
-
-			this.loadSetup(!fullInstall)
-
-			this.QuickSetup := false
 		}
-
-		super.showPage(page)
 
 		if fullInstall {
 			wizard.installSoftware()

@@ -1591,6 +1591,14 @@ updateConfigurationForV530() {
 
 		deleteFile(kUserConfigDirectory . "P2T Configuration.ini")
 	}
+
+	if FileExist(kUserConfigDirectory . "Core Settings.ini") {
+		configuration := readMultiMap(kUserConfigDirectory . "Core Settings.ini")
+
+		removeMultiMapValue(configuration, "Voice", "Push-To-Talk")
+
+		writeMultiMap(kUserConfigDirectory . "Core Settings.ini", configuration)
+	}
 }
 
 updateConfigurationForV500() {

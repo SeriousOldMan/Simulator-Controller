@@ -1537,48 +1537,6 @@ updateInstallationForV500() {
 	}
 }
 
-updateInstallationForV398() {
-	local installInfo := readMultiMap(kUserConfigDirectory . "Simulator Controller.install")
-	local installLocation := getMultiMapValue(installInfo, "Install", "Location")
-
-	if (getMultiMapValue(installInfo, "Shortcuts", "StartMenu", false)) {
-		deleteFile(installLocation . "\Binaries\Setup Database.exe")
-
-		try {
-			FileCreateShortcut(installLocation . "\Binaries\Session Database.exe", A_StartMenu . "\Simulator Controller\Session Database.lnk", installLocation . "\Binaries")
-		}
-		catch Any as exception {
-			logError(exception)
-		}
-	}
-
-	if (getMultiMapValue(installInfo, "Install", "Type", false) = "Registry") {
-		try {
-			RegWrite(installLocation . "\Binaries\Session Database.exe", "REG_SZ", "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SessionDatabase.exe")
-			RegWrite(installLocation . "\Binaries\Practice Center.exe", "REG_SZ", "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\PracticeCenter.exe")
-			RegWrite(installLocation . "\Binaries\Race Center.exe", "REG_SZ", "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceCenter.exe")
-			RegWrite(installLocation . "\Binaries\Server Administration.exe", "REG_SZ", "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\ServerAdministration.exe")
-			RegWrite(installLocation . "\Binaries\Setup Workbench.exe", "REG_SZ", "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupWorkbench.exe")
-
-			RegDelete("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupDatabase.exe")
-		}
-		catch Any as exception {
-			logError(exception)
-		}
-	}
-}
-
-updateInstallationForV392() {
-	local installInfo := readMultiMap(kUserConfigDirectory . "Simulator Controller.install")
-	local installLocation
-
-	if (getMultiMapValue(installInfo, "Shortcuts", "StartMenu", false)) {
-		installLocation := getMultiMapValue(installInfo, "Install", "Location")
-
-		FileCreateShortcut(installLocation . "\Binaries\Setup Advisor.exe", A_StartMenu . "\Simulator Controller\Setup Adisor.lnk", installLocation . "\Binaries")
-	}
-}
-
 updateConfigurationForV530() {
 	local configuration
 
@@ -1589,6 +1547,12 @@ updateConfigurationForV530() {
 
 		writeMultiMap(kUserConfigDirectory . "Simulator Configuration.ini", configuration)
 
+		configuration := readMultiMap(kUserHomeDirectory . "Setup\Voice Control Configuration.ini")
+
+		setMultiMapValue(configuration, "Voice Control", "PushToTalkMode", "Press")
+
+		writeMultiMap(kUserHomeDirectory . "Setup\Voice Control Configuration.ini", configuration)
+
 		deleteFile(kUserConfigDirectory . "P2T Configuration.ini")
 	}
 
@@ -1598,6 +1562,15 @@ updateConfigurationForV530() {
 		removeMultiMapValue(configuration, "Voice", "Push-To-Talk")
 
 		writeMultiMap(kUserConfigDirectory . "Core Settings.ini", configuration)
+	}
+
+	if FileExist(kUserHomeDirectory . "Setup\Setup.data") {
+		configuration := readMultiMap(kUserHomeDirectory . "Setup\Setup.data")
+
+		setMultiMapValue(configuration, "Setup", "Patch.Configuration.Files", "%kUserHomeDirectory%Setup\\Configuration Patch.ini")
+		setMultiMapValue(configuration, "Setup", "Patch.Settings.Files", "%kUserHomeDirectory%Setup\\Settingss Patch.ini")
+
+		writeMultiMap(kUserHomeDirectory . "Setup\Setup.data", configuration)
 	}
 }
 
@@ -2140,80 +2113,6 @@ updateConfigurationForV400() {
 	deleteFile(kDatabaseDirectory . "User\UPLOAD")
 }
 
-updateConfigurationForV398() {
-	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
-	local userConfiguration := readMultiMap(userConfigurationFile)
-	local simulator, car, track, fileName, text, ignore
-
-	if (userConfiguration.Count > 0) {
-		for ignore, simulator in ["Assetto Corsa Competizione", "rFactor 2", "iRacing", "Automobilista 2", "RaceRoom Racing Experience"] {
-			if (getMultiMapValue(userConfiguration, "Race Assistant Startup", simulator . ".LoadSettings", false) = "SetupDatabase")
-				setMultiMapValue(userConfiguration, "Race Assistant Startup", simulator . ".LoadSettings", "SettingsDatabase")
-
-			if (getMultiMapValue(userConfiguration, "Race Engineer Startup", simulator . ".LoadTyrePressures", false) = "SetupDatabase")
-				setMultiMapValue(userConfiguration, "Race Engineer Startup", simulator . ".LoadTyrePressures", "TyresDatabase")
-
-			setMultiMapValue(userConfiguration, "Race Assistant Shutdown", simulator . ".SaveSettings", "Never")
-		}
-
-		writeMultiMap(userConfigurationFile, userConfiguration)
-	}
-
-	if FileExist(kDatabaseDirectory . "Local") {
-		try {
-			DirCopy(kDatabaseDirectory . "Local", kDatabaseDirectory . "User", 1)
-		}
-		catch Any as exception {
-			logError(exception)
-		}
-
-		deleteDirectory(kDatabaseDirectory . "Local")
-	}
-
-	if FileExist(kDatabaseDirectory . "Global") {
-		try {
-			DirCopy(kDatabaseDirectory . "Global", kDatabaseDirectory . "Community", 1)
-		}
-		catch Any as exception {
-			logError(exception)
-		}
-
-		deleteDirectory(kDatabaseDirectory . "Global")
-	}
-
-	loop Files, kDatabaseDirectory . "User\*.*", "D" {
-		simulator := A_LoopFileName
-
-		loop Files, kDatabaseDirectory . "User\" . simulator . "\*.*", "D" {
-			car := A_LoopFileName
-
-			loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car "\*.*", "D" {
-				track := A_LoopFileName
-
-				fileName := kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Setup.Pressures.CSV"
-
-				if FileExist(fileName)
-					FileMove(fileName, kDatabaseDirectory "User\" simulator . "\" . car . "\" . track "\Tyres.Pressures.CSV")
-
-				fileName := kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Setup.Pressures.Distribution.CSV"
-
-				if FileExist(fileName)
-					FileMove(fileName, kDatabaseDirectory "User\" simulator . "\" . car . "\" . track "\Tyres.Pressures.Distribution.CSV")
-			}
-		}
-	}
-
-	if FileExist(kUserHomeDirectory . "Setup\Setup.data") {
-		text := FileRead(kUserHomeDirectory . "Setup\Setup.data")
-
-		text := StrReplace(text, "SetupDatabase", "SessionDatabase")
-
-		deleteFile(kUserHomeDirectory . "Setup\Setup.data")
-
-		FileAppend(text, kUserHomeDirectory "Setup\Setup.data", "UTF-16")
-	}
-}
-
 updatePluginsForV5091() {
 	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
 	local userConfiguration := readMultiMap(userConfigurationFile)
@@ -2300,56 +2199,6 @@ updatePluginsForV424() {
 	}
 }
 
-updateConfigurationForV394() {
-	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
-	local userConfiguration := readMultiMap(userConfigurationFile)
-	local subtitle
-
-	if (userConfiguration.Count > 0) {
-		subtitle := getMultiMapValue(userConfiguration, "Splash Window", "Subtitle", "")
-
-		if InStr(subtitle, "2021") {
-			setMultiMapValue(userConfiguration, "Splash Window", "Subtitle", StrReplace(subtitle, "2021", "2023"))
-
-			writeMultiMap(userConfigurationFile, userConfiguration)
-		}
-	}
-}
-
-updateConfigurationForV384() {
-	local simulator, car, track, directoryName
-
-	loop Files, kDatabaseDirectory . "Local\*.*", "D" {
-		simulator := A_LoopFileName
-
-		if (simulator = "0") {
-			directoryName := kDatabaseDirectory . "Local\" . simulator
-
-			deleteDirectory(directoryName)
-		}
-		else
-			loop Files, kDatabaseDirectory . "Local\" . simulator . "\*.*", "D"	{
-				car := A_LoopFileName
-
-				if (car = "0") {
-					directoryName := kDatabaseDirectory . "Local\" . simulator . "\" . car
-
-					deleteDirectory(directoryName)
-				}
-				else
-					loop Files, kDatabaseDirectory . "Local\" . simulator . "\" . car "\*.*", "D" {
-						track := A_LoopFileName
-
-						if (track = "0") {
-							directoryName := kDatabaseDirectory . "Local\" . simulator . "\" . car . "\" . track
-
-							deleteDirectory(directoryName)
-						}
-					}
-			}
-	}
-}
-
 updatePluginsForV402() {
 	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
 	local userConfiguration := readMultiMap(userConfigurationFile)
@@ -2368,76 +2217,7 @@ updatePluginsForV402() {
 	}
 }
 
-updatePluginsForV400() {
-	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
-	local userConfiguration := readMultiMap(userConfigurationFile)
-	local ignore, name, descriptor
-
-	if (userConfiguration.Count > 0) {
-		for ignore, name in ["Race Engineer", "Race Strategist", "Race Spotter"] {
-			descriptor := getMultiMapValue(userConfiguration, "Plugins", name, false)
-
-			if descriptor {
-				descriptor := StrReplace(descriptor, "raceAssistantService", "raceAssistantSynthesizer")
-
-				setMultiMapValue(userConfiguration, "Plugins", name, descriptor)
-			}
-		}
-
-		descriptor := getMultiMapValue(userConfiguration, "Plugins", "Race Spotter", false)
-
-		if descriptor {
-			descriptor := StrReplace(descriptor, "raceAssistantListener: false", "raceAssistantListener: true")
-
-			setMultiMapValue(userConfiguration, "Plugins", "Race Spotter", descriptor)
-		}
-
-		writeMultiMap(userConfigurationFile, userConfiguration)
-	}
-}
-
-updatePluginsForV398() {
-	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
-	local userConfiguration := readMultiMap(userConfigurationFile)
-	local engineerDescriptor, strategistDescriptor
-
-	if (userConfiguration.Count > 0) {
-		engineerDescriptor := getMultiMapValue(userConfiguration, "Plugins", "Race Engineer", false)
-
-		if engineerDescriptor {
-			engineerDescriptor := StrReplace(engineerDescriptor, "openSetupDatabase", "openSessionDatabase")
-
-			setMultiMapValue(userConfiguration, "Plugins", "Race Engineer", engineerDescriptor)
-		}
-
-		strategistDescriptor := getMultiMapValue(userConfiguration, "Plugins", "Race Strategist", false)
-
-		if strategistDescriptor {
-			strategistDescriptor := StrReplace(strategistDescriptor, "openSetupDatabase", "openSessionDatabase")
-
-			setMultiMapValue(userConfiguration, "Plugins", "Race Strategist", strategistDescriptor)
-		}
-
-		writeMultiMap(userConfigurationFile, userConfiguration)
-	}
-}
-
-updatePluginsForV386() {
-	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
-	local userConfiguration := readMultiMap(userConfigurationFile)
-	local raceSpotter
-
-	if (userConfiguration.Count > 0)
-		if !getMultiMapValue(userConfiguration, "Plugins", "Race Spotter", false) {
-			raceSpotter := Plugin("Race Spotter", false, false, "", "raceAssistant: On; raceAssistantName: Elisa; raceAssistantSpeaker: true; raceAssistantListener: false")
-
-			raceSpotter.saveToConfiguration(userConfiguration)
-
-			writeMultiMap(userConfigurationFile, userConfiguration)
-		}
-}
-
-updateToV380() {
+updateToV400() {
 	OnMessage(0x44, translateOkButton)
 	MsgBox(translate("Your installed version is to old to be updated automatically. Please remove the `"Simulator Controller`" folder in your user `"Documents`" folder and restart the application. Application will exit..."), translate("Error"), 262160)
 	OnMessage(0x44, translateOkButton, 0)

@@ -67,6 +67,7 @@ class VoiceServer extends ConfigurationItem {
 	iRecognizer := "Desktop"
 	iListener := false
 	iPushToTalk := false
+	iPushToTalkMode := false
 
 	iSpeechRecognizer := false
 
@@ -385,7 +386,7 @@ class VoiceServer extends ConfigurationItem {
 					return false
 				}
 				else {
-					if this.VoiceServer.PushToTalk
+					if this.VoiceServer.hasPushToTalk()
 						playSound("VSSoundPlayer.exe", kResourcesDirectory . "Sounds\Talk.wav", audioDevice)
 
 					this.iListening := true
@@ -601,6 +602,12 @@ class VoiceServer extends ConfigurationItem {
 		}
 	}
 
+	PushToTalkMode {
+		Get {
+			return this.iPushToTalkMode
+		}
+	}
+
 	SpeechRecognizer[create := false] {
 		Get {
 			local settings
@@ -628,7 +635,7 @@ class VoiceServer extends ConfigurationItem {
 					this.iSpeechRecognizer := VoiceServer.ActivationSpeechRecognizer(this.Recognizer, this.Listener, this.Language)
 				}
 
-				if !this.PushToTalk
+				if !this.hasPushToTalk()
 					this.startListening()
 			}
 
@@ -662,23 +669,29 @@ class VoiceServer extends ConfigurationItem {
 		this.iRecognizer := getMultiMapValue(configuration, "Voice Control", "Recognizer", "Desktop")
 		this.iListener := getMultiMapValue(configuration, "Voice Control", "Listener", false)
 		this.iPushToTalk := getMultiMapValue(configuration, "Voice Control", "PushToTalk", false)
+		this.iPushToTalkMode := getMultiMapValue(configuration, "Voice Control", "PushToTalkMode", "Hold")
 
 		this.initializePushToTalk()
+	}
+
+	hasPushtoTalk() {
+		return ((this.PushToTalkMode = "Custom") || this.PushToTalk)
 	}
 
 	initializePushToTalk() {
 		local p2tHotkey := this.PushToTalk
 		local mode
 
-		if p2tHotkey
-			switch getMultiMapValue(this.Configuration, "Voice Control", "PushToTalkMode", "Hold"), false {
-				case "Press":
+		switch this.PushToTalkMode, false {
+			case "Press":
+				if p2THotkey
 					Hotkey(p2tHotkey, ObjBindMethod(this, "listen", true), "On")
-				case "Hold":
+			case "Hold":
+				if p2THotkey
 					PeriodicTask(ObjBindMethod(this, "listen", false), 50, kInterruptPriority).start()
-				case "Custom":
-					PeriodicTask(ObjBindMethod(this, "processExternalCommand"), 50, kInterruptPriority).start()
-			}
+			case "Custom":
+				PeriodicTask(ObjBindMethod(this, "processExternalCommand"), 50, kInterruptPriority).start()
+		}
 	}
 
 	processExternalCommand() {
@@ -878,7 +891,7 @@ class VoiceServer extends ConfigurationItem {
 
 				activeVoiceClient.activate(words)
 
-				if !this.PushToTalk
+				if !this.hasPushToTalk()
 					this.startListening()
 			}
 			else
@@ -911,7 +924,7 @@ class VoiceServer extends ConfigurationItem {
 				return false
 			}
 			else {
-				if this.PushToTalk
+				if this.hasPushToTalk()
 					playSound("VSSoundPlayer.exe", kResourcesDirectory . "Sounds\Talk.wav", audioDevice)
 
 				this.iListening := true
@@ -1064,7 +1077,7 @@ class VoiceServer extends ConfigurationItem {
 				if (descriptor != theDescriptor)
 					this.deactivateVoiceClient(theDescriptor)
 
-			if !this.PushToTalk
+			if !this.hasPushToTalk()
 				this.startActivationListener()
 		}
 	}
@@ -1082,7 +1095,7 @@ class VoiceServer extends ConfigurationItem {
 			for theDescriptor, ignore in this.VoiceClients
 				this.activateVoiceClient(theDescriptor)
 
-			if !this.PushToTalk
+			if !this.hasPushToTalk()
 				this.stopActivationListener()
 		}
 	}

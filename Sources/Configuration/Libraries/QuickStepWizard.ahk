@@ -428,7 +428,7 @@ class QuickStepWizard extends StepWizard {
 		if (page = 2) {
 			this.updateSelectedSimulators()
 
-			this.finishSetup()
+			this.saveSetup()
 		}
 
 		return super.hidePage(page)
@@ -746,7 +746,7 @@ class QuickStepWizard extends StepWizard {
 		}
 	}
 
-	finishSetup() {
+	saveSetup() {
 		local wizard := this.SetupWizard
 		local voiceConfiguration := readMultiMap(kUserHomeDirectory . "Setup\Voice Control Configuration.ini")
 		local assistantSetups := {}
@@ -793,6 +793,8 @@ class QuickStepWizard extends StepWizard {
 		window.Block()
 
 		try {
+			this.saveSetup()
+
 			configuration := newMultiMap()
 
 			setup := this.assistantSetup(assistant)
@@ -809,8 +811,8 @@ class QuickStepWizard extends StepWizard {
 
 				setup := string2Values("|", setup.Synthesizer)
 
-				setMultiMapValue(configuration, "Voice Control", "SubscriptionKey", setup[2])
-				setMultiMapValue(configuration, "Voice Control", "TokenIssuer", setup[3])
+				setMultiMapValue(configuration, "Voice Control", "SubscriptionKey", setup[3])
+				setMultiMapValue(configuration, "Voice Control", "TokenIssuer", setup[2])
 			}
 			else if (setup.Synthesizer = "dotNET")
 				setMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", setup.Voice)

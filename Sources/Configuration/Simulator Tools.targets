@@ -1,15 +1,5 @@
 [Update]
-Release 3.8.0=updateToV380
-Release 3.8.2=Release 3.8.0 -> updateTranslations
-Release 3.8.4=Release 3.8.2 -> updateTranslations, updateConfigurationForV384
-Release 3.8.6=Release 3.8.4 -> updateTranslations, updateActionLabels, updateActionIcons, updatePluginsForV386
-Release 3.8.8=Release 3.8.6 -> updateTranslations, updatePhraseGrammars, updateActionLabels, updateActionIcons
-Release 3.9.0=Release 3.8.8 -> updateTranslations, updatePhraseGrammars
-Release 3.9.2=Release 3.9.0 -> updateTranslations, updateInstallationForV392
-Release 3.9.4=Release 3.9.2 -> updateTranslations, updateActionLabels, updateActionIcons, updateConfigurationForV394
-Release 3.9.6=Release 3.9.4 -> updateTranslations
-Release 3.9.8=Release 3.9.6 -> updateTranslations, updateInstallationForV398, updateConfigurationForV398, updatePluginsForV398
-Release 4.0.0=Release 3.9.8 -> updateTranslations, updatePhraseGrammars, updateActionLabels, updateActionIcons, renewConsent, updateConfigurationForV400, updatePluginsForV400
+Release 4.0.0=updateToV400
 Release 4.0.2=Release 4.0.0 -> updateTranslations, updatePhraseGrammars, updatePluginsForV402
 Release 4.0.4=Release 4.0.2 -> updateTranslations, updatePhraseGrammars, updateActionLabels, updateActionIcons
 Release 4.0.6=Release 4.0.4 -> updateTranslations

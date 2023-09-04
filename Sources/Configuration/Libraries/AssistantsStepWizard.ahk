@@ -118,7 +118,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 
 				if wizard.isModuleSelected("Voice Control") {
 					if (wizard.getModuleValue(assistant, "Language", kUndefined) != kUndefined)
-						arguments .= ("; raceAssistantLanguage: " . wizard.getModuleValue(assistant, "Synthesizer"))
+						arguments .= ("; raceAssistantLanguage: " . wizard.getModuleValue(assistant, "Language"))
 
 					if (wizard.getModuleValue(assistant, "Synthesizer", kUndefined) != kUndefined)
 						arguments .= ("; raceAssistantSynthesizer: " . wizard.getModuleValue(assistant, "Synthesizer"))

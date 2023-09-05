@@ -131,7 +131,15 @@ If you want to become a part of the small and very young Community for Simulator
   - Additional support to trigger every function and action from external sources like a voice or gesture recognition software to always keep your hands on the wheel
   - Builtin support for visual head tracking to control ingame viewing angle - see [third party applications](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications) below
 
-#### Virtual Race Engineer & Virtual Race Strategist
+#### AI powered Virtual Race Assistants
+
+Simulator Controller offers a virtual pit crew based on an AI powered chatbot engine. At the heart of this engine is hybrid rule engine coupled with voice recognition and voice synthesis. A rule engine is very suitable for the tasks of a typical pit crew, since all actions are event based and use big amounts of data.
+
+According to the maturity scale of *attractive.ai* (one of several hundreds maturity models that can be found on the net), the Race Assistants of Simulator Controller are at level 2.5. The observe your racing, can give recommendations and take responsibilty for certain tasks like strategy management and pitstop planning and preparation.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/AI%20Maturity%20Levels.png)
+
+##### Race Engineer & Race Strategist
 
 An AI based Race Engineer with fully dialog capable voice control will guide you through your race, warn you about critical technical issues and will help you with the pitstop, whereas the Race Strategist keeps an eye on the race positions, develops a pitstop strategy, and so on. These smart chat bots are independent applications, but are integreated with the ACC and other simulation game plugins using interprocess communication right now. An integration for a new simulation games requires some effort, especially for the necessary data acquisition from the simulation game, but a knowledged programmer can manage it in about three to four hours.
 
@@ -147,7 +155,7 @@ You can even use all these functionalities during multiplayer team races using t
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%201.JPG)
 
-#### Virtual Race Spotter
+##### Race Spotter
 
 Simulator Controller also comes with a Virtual Spotter, which will keep an eye on the traffic around you and will warn you about critical situations. You can fully customize the information provided by the Spotter to your specific needs and taste.
 

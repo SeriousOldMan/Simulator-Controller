@@ -42,7 +42,8 @@
   21. Migrated the sources to AHK 2.07.
   22. [Experts Only] The grammar files has been split up and modularized.
   23. [Experts Only] New [controller action functions "targetListener", "startActivation", "startListen" and "stopListen"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions), which let you control the listen mode of voice control from your custom scripts. There are also three new icons in the Stream Deck icon set, which can represent these custom actions.
-  24. [Developers Only] MultiMap files can now "#Include" other MultiMap files.
+  24. [Experts Only] *Normal* controller functions (for example "Button", "Dial", etc.) can now also call a [controller action function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) directly. This opens endless possibilities for controller hardware configuration.
+  25. [Developers Only] MultiMap files can now "#Include" other MultiMap files.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-530).
 

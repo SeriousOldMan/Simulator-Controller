@@ -392,7 +392,7 @@ class StreamDeck extends FunctionController {
 
 	setControlIcon(function, icon) {
 		local controller := this.Controller
-		local enabled, displayMode, iconMode, ignore, theAction
+		local enabled, displayMode, iconMode, ignore, theAction, actions
 
 		if !isObject(function)
 			function := controller.findFunction(function)
@@ -400,12 +400,18 @@ class StreamDeck extends FunctionController {
 		if (this.isRunning() && this.hasFunction(function)) {
 			enabled := false
 
-			for ignore, theAction in this.Actions[function]
-				if function.Enabled[theAction] {
-					enabled := true
+			actions := this.Actions[function]
 
-					break
-				}
+			if (actions.Length > 0) {
+				for ignore, theAction in actions
+					if function.Enabled[theAction] {
+						enabled := true
+
+						break
+					}
+			}
+			else
+				enabled := true
 
 			if (!icon || (icon = ""))
 				icon := "clear"

@@ -49,10 +49,10 @@ You may want to check your preset choices in "Simulator Setup" and use the new "
 
   1. Start "Simulator Setup" and go to the presets page.
   2. Open "Names and Voices of the Assistants" (if used) by double-clicking on it in the right list.
-  3. Note your changes (names, voices, ...) and store the file in a safe location.
-  4. Note down your used other presets, then remove all from the right lisst.
+  3. Note your changes (names, voices, vocalics, ...) and store the file in a safe location.
+  4. Note down your used other presets, then remove all from the right list.
   5. Go to the beginning, choose "Basic" as setup method (with pressed Control key) and continue to the next page.
-  6. Configure the Language, *Push To Talk* and your Assistants as in the "Names and Voices of the Assistants" preset.
+  6. Configure the Language, *Push To Talk* and your Assistants as in the "Names and Voices of the Assistants" preset. You can click on the settings button on the right of the voice drop down menu to select different synthesizers, vocalics, etc.
   7. Go back to the preset page and add all other presets you have used (if any).
   8. [Optional] If you had additional entries in the "Configuration Patch.ini" file, choose the "Custom Configuration..." preset and add them back in.
   9. Go to the last page and create a new configuration.

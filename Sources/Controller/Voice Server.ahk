@@ -680,7 +680,6 @@ class VoiceServer extends ConfigurationItem {
 
 	initializePushToTalk() {
 		local p2tHotkey := this.PushToTalk
-		local mode
 
 		switch this.PushToTalkMode, false {
 			case "Press":

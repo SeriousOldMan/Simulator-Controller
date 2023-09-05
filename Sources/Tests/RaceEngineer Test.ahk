@@ -82,6 +82,13 @@ class TestRaceEngineer extends RaceEngineer {
 		return true
 	}
 
+	addLap(lapNumber, &data) {
+		super.addLap(lapNumber, &data)
+
+		if (lapNumber = 1)
+			this.updateConfigurationValues({Announcements: {FuelWarning: true, DamageReporting: true, DamageAnalysis: true, PressureReporting: true, WeatherUpdate: true}})
+	}
+
 	lowFuelWarning(remainingLaps) {
 		super.lowFuelWarning(remainingLaps)
 

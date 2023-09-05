@@ -39,9 +39,10 @@
   18. New test mode in the voice configuration let you now test your changes to pitch, speed or distortion in place.
   19. The special configuration to choose between the different possible behaviours of the *Push To Talk* button (formerly handled by the "P2T Configuration.ini" file) has been moved to the standard configuration. This is automatically handled by "Simulator Setup" and "Simulator Configuration".
   20. Automatic updates for versions prior to 4.0.0 are no longer possible.
-  21. [Experts Only] The grammar files has been split up and modularized.
-  22. [Experts Only] New [controller action functions "targetListener", "startActivation", "startListen" and "stopListen"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions), which let you control the listen mode of voice control from your custom scripts. There are also three new icons in the Stream Deck icon set, which can represent these custom actions.
-  23. [Developers Only] MultiMap files can now "#Include" other MultiMap files.
+  21. Migrated the sources to AHK 2.07.
+  22. [Experts Only] The grammar files has been split up and modularized.
+  23. [Experts Only] New [controller action functions "targetListener", "startActivation", "startListen" and "stopListen"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions), which let you control the listen mode of voice control from your custom scripts. There are also three new icons in the Stream Deck icon set, which can represent these custom actions.
+  24. [Developers Only] MultiMap files can now "#Include" other MultiMap files.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-530).
 
@@ -157,7 +158,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   11. New plugin parameter "openRaceReports" for the ["Race Strategist"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist), which let you start the race reports browser from your controller hardware.
   12. New controller action function ["openRaceReports"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) which you can use in your custom controller actions.
   13. Fixed "Use initial pressures" for initialization of sessions with a very long formation lap.
-  14. Migrated the sources to AHK 2.04
+  14. Migrated the sources to AHK 2.04.
   15. New car models for "Setup Workbench":
       - Assetto Corsa
 	    - Ford GT40

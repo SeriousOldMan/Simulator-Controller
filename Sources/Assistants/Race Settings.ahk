@@ -210,7 +210,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 	static connected
 	static keepAliveTask := false
 
-	static serverURL, serverToken, teamName, driverName, sessionName, teamIdentifier, driverIdentifier, sessionIdentifier
+	static serverURL, serverToken, teamName, theDriverName, sessionName, teamIdentifier, driverIdentifier, sessionIdentifier
 
 	static teams := CaseInsenseMap()
 	static drivers := CaseInsenseMap()
@@ -690,12 +690,12 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 					chosen := 1
 
 				if (chosen == 0) {
-					driverName := ""
+					theDriverName := ""
 					driverIdentifier := false
 				}
 				else {
-					driverName := names[chosen]
-					driverIdentifier := drivers[driverName]
+					theDriverName := names[chosen]
+					driverIdentifier := drivers[theDriverName]
 				}
 
 				settingsGui["driverDropDownMenu"].Delete()
@@ -735,11 +735,11 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 			}
 			else if (arguments[1] == "Driver") {
 				if ((drivers.Count > 0) || (settingsGui["driverDropDownMenu"].Value = 0)) {
-					driverName := getKeys(drivers)[settingsGui["driverDropDownMenu"].Value]
-					driverIdentifier := drivers[driverName]
+					theDriverName := getKeys(drivers)[settingsGui["driverDropDownMenu"].Value]
+					driverIdentifier := drivers[theDriverName]
 				}
 				else {
-					driverName := ""
+					theDriverName := ""
 					driverIdentifier := false
 				}
 			}
@@ -958,7 +958,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 			setMultiMapValue(newSettings, "Team Settings", "Server.URL", settingsGui["serverURLEdit"].Text)
 			setMultiMapValue(newSettings, "Team Settings", "Server.Token", settingsGui["serverTokenEdit"].Text)
 			setMultiMapValue(newSettings, "Team Settings", "Team.Name", teamName)
-			setMultiMapValue(newSettings, "Team Settings", "Driver.Name", driverName)
+			setMultiMapValue(newSettings, "Team Settings", "Driver.Name", theDriverName)
 			setMultiMapValue(newSettings, "Team Settings", "Session.Name", sessionName)
 			setMultiMapValue(newSettings, "Team Settings", "Team.Identifier", teamIdentifier)
 			setMultiMapValue(newSettings, "Team Settings", "Driver.Identifier", driverIdentifier)
@@ -1418,7 +1418,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 			serverToken := getMultiMapValue(settingsOrCommand, "Team Settings", "Server.Token", "")
 			teamName := getMultiMapValue(settingsOrCommand, "Team Settings", "Team.Name", "")
 			teamIdentifier := getMultiMapValue(settingsOrCommand, "Team Settings", "Team.Identifier", false)
-			driverName := getMultiMapValue(settingsOrCommand, "Team Settings", "Driver.Name", "")
+			theDriverName := getMultiMapValue(settingsOrCommand, "Team Settings", "Driver.Name", "")
 			driverIdentifier := getMultiMapValue(settingsOrCommand, "Team Settings", "Driver.Identifier", false)
 			sessionName := getMultiMapValue(settingsOrCommand, "Team Settings", "Session.Name", "")
 			sessionIdentifier := getMultiMapValue(settingsOrCommand, "Team Settings", "Session.Identifier", false)
@@ -1452,7 +1452,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 				settingsGui.Add("DropDownList", "x126 yp w126 vteamDropDownMenu").OnEvent("Change", editRaceSettings.Bind(&kUpdate, "Team"))
 
 			if driverIdentifier
-				settingsGui.Add("DropDownList", "x256 yp w126 Choose1 vdriverDropDownMenu", [driverName]).OnEvent("Change", editRaceSettings.Bind(&kUpdate, "Driver"))
+				settingsGui.Add("DropDownList", "x256 yp w126 Choose1 vdriverDropDownMenu", [theDriverName]).OnEvent("Change", editRaceSettings.Bind(&kUpdate, "Driver"))
 			else
 				settingsGui.Add("DropDownList", "x256 yp w126 vdriverDropDownMenu").OnEvent("Change", editRaceSettings.Bind(&kUpdate, "Driver"))
 

@@ -1018,7 +1018,7 @@ class SetupWizard extends ConfiguratorPanel {
 	}
 
 	getSimulatorConfiguration() {
-		local configuration := newMultiMap()
+		local configuration := readMultiMap(kUserConfigDirectory . "Simulator Configuration.ini")
 
 		this.saveToConfiguration(configuration)
 

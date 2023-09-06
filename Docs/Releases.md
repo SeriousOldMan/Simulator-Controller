@@ -12,6 +12,7 @@
 	 - The presets "Names and voices of Assistants", "Different Speaker Voices" and "Mode Automation" have been removed, since they are no longer needed. If such a preset is in use in your configuration, it will still be active, until you remove it.
 	 - All presets with search images for *Assetto Corsa Competizione* has been removed, since it is no longer needed.
 	 - A new preset "Custom Configuration" has been added with a very extensive sample section, which helps the experts to create special configurations.
+	 - When a new configuration is beeing created, "Simulator Setup" will first read the currently active configuration and then will generate the new configuration. The new configuration will then be integrated into the current configuration, preserving in most cases the custom additions, that may have been made with "Simulator Configuration", as long as they are not in conflict.
   8. The Race Strategist now understands Full Course Yellow situations and can evaluate, whether a pitstop under FCY might be beneficial:
      - New [voice command "We have Full Course Cellow. Should I come to the pit?"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Strategist-Commands-(EN)) to ask the Strategist for possible actions under Full Course Yellow.
 	 - New controller action ["FCYRecommend"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the Race Strategist plugin, which triggers the same.

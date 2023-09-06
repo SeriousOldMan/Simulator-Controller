@@ -1,9 +1,9 @@
 [Development]
-Version=5.3.0.0-alpha
+Version=5.3.0.0-beta
 Target=5.3.0.0-release
-Date=09/05/2023
-Download=https://www.dropbox.com/scl/fi/rhss39kqub5lqcv373oqx/Simulator-Controller-5.3.0.0-alpha.zip?rlkey=nmis4qqooxsdoqtj53hzmsi9z&dl=1
-Changes=New page in "Server Administration, Compact database function in "Server Administration", New quick setup method in "Simulator Setup", Spotter informs you about being faster than cars ahead of you, "Mode Automation" preset no longer available, "Names and voices of Assistants" preset no longer available, Simulator settings are preserved when using "Simulator Setup", Names and voices of Assistants can be changed in Quick setup, New general configuration patch in "Simulator Setup", New general settings patch in "Simulator Setup", ACC Pitstop search image presets no longer available in "Simulator Setup", Integrated "P2T Configuration.ini" into "Core Settings.ini", "Practice Center" displays sector times in several places, Voice test mode in the new basic setup page, Voice prelisten mode in general voice configuration, Optimized random distributions, New Strategist voice command for FCY, New controller action "FCYRecommend" for "Race Strategist" plugin, New icon in Stream Deck Icon set for "FCYRecommend" action, Many new voice commands for Spotter and Strategist, New information request actions for Spotter and Strategist incl. new icons in the Stream Deck Icon set, Include clause for multi map files, Refactoring of grammar files, New match rating core settings, "Simulator Startup" can now unblock files, Spotter informes about in which sectors the driver is faster and/or slower than its opponents, New controller action functions "targetListen", "startActivation", "startListen" and "stopListen", No more automatic updates prior to 4.0, Migrated sources to AHK 2.07
+Date=09/06/2023
+Download=https://www.dropbox.com/scl/fi/rma3cw8td0i7h6qmrv28s/Simulator-Controller-5.3.0.0-beta.zip?rlkey=9d7diesikxudjv6q98xi20oqi&dl=1
+Changes=New page in "Server Administration, Compact database function in "Server Administration", New quick setup method in "Simulator Setup", Spotter informs you about being faster than cars ahead of you, "Mode Automation" preset no longer available, "Names and voices of Assistants" preset no longer available, Simulator settings are preserved when using "Simulator Setup", Names and voices of Assistants can be changed in Quick setup, New general configuration patch in "Simulator Setup", New general settings patch in "Simulator Setup", ACC Pitstop search image presets no longer available in "Simulator Setup", Integrated "P2T Configuration.ini" into "Core Settings.ini", "Practice Center" displays sector times in several places, Voice test mode in the new basic setup page, Voice prelisten mode in general voice configuration, Optimized random distributions, New Strategist voice command for FCY, New controller action "FCYRecommend" for "Race Strategist" plugin, New icon in Stream Deck Icon set for "FCYRecommend" action, Many new voice commands for Spotter and Strategist, New information request actions for Spotter and Strategist incl. new icons in the Stream Deck Icon set, Include clause for multi map files, Refactoring of grammar files, New match rating core settings, "Simulator Startup" can now unblock files, Spotter informes about in which sectors the driver is faster and/or slower than its opponents, New controller action functions "targetListen", "startActivation", "startListen" and "stopListen", No more automatic updates prior to 4.0, Migrated sources to AHK 2.07, Race Center display sector times
 [Release]
 Version=5.2.3.0-release
 Date=08/18/2023
@@ -12,5 +12,5 @@ Changes=New controller action function "callCustom", Significant speed improveme
 [Current]
 Type=Release
 [Version]
-Development=5.3.0.0-alpha
+Development=5.3.0.0-beta
 Release=5.2.3.0-release

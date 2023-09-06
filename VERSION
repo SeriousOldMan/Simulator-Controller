@@ -10,7 +10,7 @@ Date=08/18/2023
 Download=https://cutt.ly/nwg5Cmrz;https://www.dropbox.com/scl/fi/z98x4at0ydwwo5eium3a0/Simulator-Controller-5.2.3.0-release.zip?rlkey=br57kpsirtrwk55il01mb35fc&dl=1
 Changes=New controller action function "callCustom", Significant speed improvement in ACC pitstop setup when using the same tyre compound, Fixed position data for retired cars in Assetto Corsa Competizione, Fixed session info not showing up for drivers which have not driven their first stint, Extended audio routing for Analyzer and Controller, New car models for "Setup Workbench", Show recommended cold pressures in session info, Provide recommended cold pressures in "Session State.json"
 [Current]
-Type=Release
+Type=Development
 [Version]
 Development=5.3.0.0-beta
 Release=5.2.3.0-release

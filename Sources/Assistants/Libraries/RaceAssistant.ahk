@@ -511,6 +511,7 @@ class RaceAssistant extends ConfigurationItem {
 		options["Recognizer"] := getMultiMapValue(configuration, "Voice Control", "Recognizer", "Desktop")
 		options["Listener"] := getMultiMapValue(configuration, "Voice Control", "Listener", false)
 		options["PushToTalk"] := getMultiMapValue(configuration, "Voice Control", "PushToTalk", false)
+		options["PushToTalkMode"] := getMultiMapValue(configuration, "Voice Control", "PushToTalkMode", "Hold")
 	}
 
 	createVoiceManager(name, options) {

@@ -45,7 +45,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[5.3.0.0-alpha](https://www.dropbox.com/scl/fi/rhss39kqub5lqcv373oqx/Simulator-Controller-5.3.0.0-alpha.zip?rlkey=nmis4qqooxsdoqtj53hzmsi9z&dl=1) (Test Build for 5.3.0. Changes: New page in "Server Administration, Compact database function in "Server Administration", New quick setup method in "Simulator Setup", Spotter informs you about being faster than cars ahead of you, "Mode Automation" preset no longer available, "Names and voices of Assistants" preset no longer available, Simulator settings are preserved when using "Simulator Setup", Names and voices of Assistants can be changed in Quick setup, New general configuration patch in "Simulator Setup", New general settings patch in "Simulator Setup", ACC Pitstop search image presets no longer available in "Simulator Setup", Integrated "P2T Configuration.ini" into "Core Settings.ini", "Practice Center" displays sector times in several places, Voice test mode in the new basic setup page, Voice prelisten mode in general voice configuration, Optimized random distributions, New Strategist voice command for FCY, New controller action "FCYRecommend" for "Race Strategist" plugin, New icon in Stream Deck Icon set for "FCYRecommend" action, Many new voice commands for Spotter and Strategist, New information request actions for Spotter and Strategist incl. new icons in the Stream Deck Icon set, Include clause for multi map files, Refactoring of grammar files, New match rating core settings, "Simulator Startup" can now unblock files, Spotter informes about in which sectors the driver is faster and/or slower than its opponents, New controller action functions for custom P2T handling.)
+[5.3.0.0-beta](https://www.dropbox.com/scl/fi/rma3cw8td0i7h6qmrv28s/Simulator-Controller-5.3.0.0-beta.zip?rlkey=9d7diesikxudjv6q98xi20oqi&dl=1) (Test Build for 5.3.0. Changes: New page in "Server Administration, Compact database function in "Server Administration", New quick setup method in "Simulator Setup", Spotter informs you about being faster than cars ahead of you, "Mode Automation" preset no longer available, "Names and voices of Assistants" preset no longer available, Simulator settings are preserved when using "Simulator Setup", Names and voices of Assistants can be changed in Quick setup, New general configuration patch in "Simulator Setup", New general settings patch in "Simulator Setup", ACC Pitstop search image presets no longer available in "Simulator Setup", Integrated "P2T Configuration.ini" into "Core Settings.ini", "Practice Center" displays sector times in several places, Voice test mode in the new basic setup page, Voice prelisten mode in general voice configuration, Optimized random distributions, New Strategist voice command for FCY, New controller action "FCYRecommend" for "Race Strategist" plugin, New icon in Stream Deck Icon set for "FCYRecommend" action, Many new voice commands for Spotter and Strategist, New information request actions for Spotter and Strategist incl. new icons in the Stream Deck Icon set, Include clause for multi map files, Refactoring of grammar files, New match rating core settings, "Simulator Startup" can now unblock files, Spotter informes about in which sectors the driver is faster and/or slower than its opponents, New controller action functions "targetListen", "startActivation", "startListen" and "stopListen", No more automatic updates prior to 4.0, Migrated sources to AHK 2.07, Race Center display sector times.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-530) of this version and all the versions you might have skipped, before installing and using this version.
 
@@ -131,7 +131,15 @@ If you want to become a part of the small and very young Community for Simulator
   - Additional support to trigger every function and action from external sources like a voice or gesture recognition software to always keep your hands on the wheel
   - Builtin support for visual head tracking to control ingame viewing angle - see [third party applications](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications) below
 
-#### Virtual Race Engineer & Virtual Race Strategist
+#### AI powered Virtual Race Assistants
+
+Simulator Controller offers a virtual pit crew based on an AI powered chatbot engine. At the heart of this engine is hybrid rule engine coupled with voice recognition and voice synthesis. A rule engine is very suitable for the tasks of a typical pit crew, since all actions are event based and use big amounts of data.
+
+According to the maturity scale of *attractive.ai* (one of several hundreds maturity models that can be found on the net), the Race Assistants of Simulator Controller are at level 2.5. The observe your racing, can give recommendations and take responsibilty for certain tasks like strategy management and pitstop planning and preparation.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/AI%20Maturity%20Levels.png)
+
+##### Race Engineer & Race Strategist
 
 An AI based Race Engineer with fully dialog capable voice control will guide you through your race, warn you about critical technical issues and will help you with the pitstop, whereas the Race Strategist keeps an eye on the race positions, develops a pitstop strategy, and so on. These smart chat bots are independent applications, but are integreated with the ACC and other simulation game plugins using interprocess communication right now. An integration for a new simulation games requires some effort, especially for the necessary data acquisition from the simulation game, but a knowledged programmer can manage it in about three to four hours.
 
@@ -147,7 +155,7 @@ You can even use all these functionalities during multiplayer team races using t
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%201.JPG)
 
-#### Virtual Race Spotter
+##### Race Spotter
 
 Simulator Controller also comes with a Virtual Spotter, which will keep an eye on the traffic around you and will warn you about critical situations. You can fully customize the information provided by the Spotter to your specific needs and taste.
 

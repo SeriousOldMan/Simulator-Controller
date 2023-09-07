@@ -1,48 +1,53 @@
 ## 5.3.0.0-release 09/15/23 (planned - latest, maybe earlier)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
-  3. A fourth page has been added to the "Server Administration" application. This page shows a [list of all data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#server-administration) currently stored on the Team Server and also allows to compact the database, if necessary. This requires a new version of the Team Server. **If you are running your own Team Server, you should update your instance(s).**
-  4. The "Practice Center" now shows the sector times, if available from the simulator data API, in the laps list and various reports.
-  5. The Race Spotter now compares your pace to the pace of all cars on the grid and informs you from time, whether you are faster than cars that are in positions in front of you.
-  6. When you are in close combat with other cars, the Spotter now informs you, in which sectors your opponent is faster or slower than you.
-  7. The "Simulator Setup" application has seen a major overhaul:
+  3. The "Simulator Setup" application has seen a major overhaul:
      - It now supports a kind of quick configuration, which allow especially new users to create a useful configuration very fast. See the extended documentation of the [quick start guide](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Quick-Start-Guide) for more information.
 	 - Full configuration of the *Names*, *Languages* and *Voices* of the Race Assistants is now possible in the "Basic" configuration page-
 	 - When a new configuration is being created, current changes made by the user since in other application, for example in the settings of "Simulator Startup", will be preserved, if possible.
 	 - The presets "Names and voices of Assistants", "Different Speaker Voices" and "Mode Automation" have been removed, since they are no longer needed. If such a preset is in use in your configuration, it will still be active, until you remove it.
+	 - The "Push-To-Talk Behaviour" preset has been deprecated as well. This option is now available in the standard voice control configuration.
 	 - All presets with search images for *Assetto Corsa Competizione* has been removed, since it is no longer needed.
 	 - A new preset "Custom Configuration" has been added with a very extensive sample section, which helps the experts to create special configurations.
-	 - When a new configuration is beeing created, "Simulator Setup" will first read the currently active configuration and then will generate the new configuration. The new configuration will then be integrated into the current configuration, preserving in most cases the custom additions, that may have been made with "Simulator Configuration", as long as they are not in conflict.
-  8. The Race Strategist now understands Full Course Yellow situations and can evaluate, whether a pitstop under FCY might be beneficial:
-     - New [voice command "We have Full Course Cellow. Should I come to the pit?"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Strategist-Commands-(EN)) to ask the Strategist for possible actions under Full Course Yellow.
-	 - New controller action ["FCYRecommend"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the Race Strategist plugin, which triggers the same.
-	 - New icon in the Stream Deck icon set for the "FCYRecommend" action.
+	 - When a new configuration is beeing created, "Simulator Setup" will first read the currently active configuration and then will generate the new configuration. The new configuration will then be integrated into the current configuration, preserving in most cases the custom additions, that may have been made with "Simulator Configuration", as long as they are not in conflict or happen to be the same configuration item.
+  4. "Simulator Startup" learned a new trick. It can now unblock applications and DLLs, when holding down the Control together with the Shift key, while starting. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#fixing-problems) for more information.
+  5. A fourth page has been added to the "Server Administration" application. This page shows a [list of all data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#server-administration) currently stored on the Team Server and also allows to compact the database, if necessary. This requires a new version of the Team Server. **If you are running your own Team Server, you should update your instance(s).**
+  6. The "Practice Center" now shows the sector times, if available from the simulator data API, in the laps list and various reports.
+  7. The "Race Center" now shows the sector times, if available from the simulator data API, in the laps list and various reports.
+  8. The Race Spotter now compares your pace to the pace of all cars on the grid and informs you from time, whether you are faster than cars that are in positions in front of you.
+  9. When you are in close combat with other cars, the Spotter now informs you, in which sectors your opponent is faster or slower than you.
+  10. The Race Strategist now understands Full Course Yellow situations and can evaluate, whether a pitstop under FCY might be beneficial:
+      - New [voice command "We have Full Course Cellow. Should I come to the pit?"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Strategist-Commands-(EN)) to ask the Strategist for possible actions under Full Course Yellow.
+	  - New controller action ["FCYRecommend"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the Race Strategist plugin, which triggers the same.
+	  - New icon in the Stream Deck icon set for the "FCYRecommend" action.
 	 Please see the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#handling-full-course-yellow) for more information about Full Course Yellow handling.
-  9. New voice command for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Strategist-Commands-(EN)) and [Race Spotter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Spotter-Commands-(EN)) to ask for the last lap time of a specific car: "Can you tell me the last lap time of car number X?"
-  10. New voice command for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Strategist-Commands-(EN)) and [Race Spotter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Spotter-Commands-(EN)) to ask for the last lap time of a car in a specific position: "Can you tell me the last lap time of position X?"
-  11. You can also get information about the name of the driver in the car ahead or behind you:
+  11. New voice command for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Strategist-Commands-(EN)) and [Race Spotter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Spotter-Commands-(EN)) to ask for the last lap time of a specific car: "Can you tell me the last lap time of car number X?"
+  12. New voice command for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Strategist-Commands-(EN)) and [Race Spotter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Spotter-Commands-(EN)) to ask for the last lap time of a car in a specific position: "Can you tell me the last lap time of position X?"
+  13. You can also get information about the name of the driver in the car ahead or behind you:
       - New voice command for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Strategist-Commands-(EN)) and [Race Spotter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Spotter-Commands-(EN)): "Can you tell me the name of the driver ahead / behind?"
 	  - Corresponding information request actions "DriverNameAhead" and "DriverNameBehind" for ["Race Strategist"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) and ["Race Spotter"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter) plugins.
 	  - New icons for the Stream Deck icon set for above actions.
-  12. Also you can get information about the class of the car ahead or behind you (as long as available):
+  14. Also you can get information about the class of the car ahead or behind you (as long as available):
       - New voice command for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Strategist-Commands-(EN)) and [Race Spotter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Spotter-Commands-(EN)): "Can you tell me the class of the car ahead / behind?"
 	  - Corresponding information request actions "CarClassAhead" and "CarClassBehind" for ["Race Strategist"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) and ["Race Spotter"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter) plugins.
 	  - New icons for the Stream Deck icon set for above actions.
-  13. Finally you can get information about the cup category of the car ahead or behind you (as long as available):
+  15. Finally you can get information about the cup category of the car ahead or behind you (as long as available):
       - New voice command for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Strategist-Commands-(EN)) and [Race Spotter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Spotter-Commands-(EN)): "Can you tell me the cup category of the car ahead / behind?"
 	  - Corresponding information request actions "CarCupAhead" and "CarCupBehind" for ["Race Strategist"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) and ["Race Spotter"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter) plugins.
 	  - New icons for the Stream Deck icon set for above actions.
-  14. "Simulator Startup" learned a new trick. It can now unblock applications and DLLs, when holding down the Control together with the Shift key, while starting. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#fixing-problems) for more information.
-  15. *Reactivated* proper handling of improper formed voice commands.
-  16. Small performance improvement for voice commands, since grammars are now pre-compiled in the background.
-  17. The threshold values for the Sorenson-Dice algorithm, which is used to compare spoken commands against the registered command syntax, can now be configured in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration). This allows you to tune, how exact your commands must follow the predefined syntax and it can also be used in cases, where a wrong command is detected, which can happen when two commands are quite similar.
-  18. New test mode in the voice configuration let you now test your changes to pitch, speed or distortion in place.
-  19. The configuration option to choose between the different possible behaviours of the *Push-To-Talk* button (formerly handled by the "P2T Configuration.ini" file) has been moved to the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration). Normally automatically handled by "Simulator Setup".
-  20. [Experts Only] The grammar files has been split up and modularized.
-  21. [Experts Only] New [controller action functions "targetListener", "startActivation", "startListen" and "stopListen"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions), which let you control the listen mode of voice control from your custom scripts. There are also three new icons in the Stream Deck icon set, which can represent these custom actions.
-  22. [Developers Only] MultiMap files can now "#Include" other MultiMap files.
+  16. *Reactivated* proper handling of improper formed voice commands.
+  17. Small performance improvement for voice commands, since grammars are now pre-compiled in the background.
+  18. The threshold values for the Sorenson-Dice algorithm, which is used to compare spoken commands against the registered command syntax, can now be configured in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration). This allows you to tune, how exact your commands must follow the predefined syntax and it can also be used in cases, where a wrong command is detected, which can happen when two commands are quite similar.
+  19. New test mode in the voice configuration let you now test your changes to pitch, speed or distortion in place.
+  21. The special configuration to choose between the different possible behaviours of the *Push To Talk* button (formerly handled by the "P2T Configuration.ini" file) has been moved to the standard configuration. This is automatically handled by "Simulator Setup" and "Simulator Configuration".
+  21. Automatic updates for versions prior to 4.0.0 are no longer possible.
+  22. Migrated the sources to AHK 2.07.
+  23. [Experts Only] The grammar files has been split up and modularized.
+  24. [Experts Only] New [controller action functions "targetListener", "startActivation", "startListen" and "stopListen"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions), which let you control the listen mode of voice control from your custom scripts. There are also three new icons in the Stream Deck icon set, which can represent these custom actions.
+  25. [Experts Only] *Normal* controller functions (for example "Button", "Dial", etc.) can now also call a [controller action function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) directly. This opens endless possibilities for controller hardware configuration.
+  26. [Developers Only] MultiMap files can now "#Include" other MultiMap files.
 
-Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-530).
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-530). You will find there a description how to change your configuration to use the new capabilities of "Simulator Setup".
 
 ## 5.2.3.0-release 08/18/23
   1. Minor bugfixes, as always
@@ -135,7 +140,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   8. A new communication method is available for the Stream Deck. It has been reported, that using OBS parallel to Simulator Controller can brake the Stream Deck functionality of Simulator Controller. The new communication method, although a little bit slower, prevents this. A new setting in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration) let you choose between the available communication methods.
   9. [Experts only] A new setting in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration) let you choose the frequency of external command processing. Change with caution.
   10. [Experts only] The controller action function "call" has been renamed to "invoke".
-  11. [Experts only] It is now possible to alter the time, a press or click on the Push-to-Talk button is considered as an activation event. Default is the Windows setting for mouse double click speed. See the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration) for more information.
+  11. [Experts only] It is now possible to alter the time, a press or click on the *Push To Talk* button is considered as an activation event. Default is the Windows setting for mouse double click speed. See the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration) for more information.
   12. New car models for "Setup Workbench":
       - Assetto Corsa
 	    - Audi R8 LMS Ultra
@@ -156,7 +161,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   11. New plugin parameter "openRaceReports" for the ["Race Strategist"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist), which let you start the race reports browser from your controller hardware.
   12. New controller action function ["openRaceReports"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) which you can use in your custom controller actions.
   13. Fixed "Use initial pressures" for initialization of sessions with a very long formation lap.
-  14. Migrated the sources to AHK 2.04
+  14. Migrated the sources to AHK 2.04.
   15. New car models for "Setup Workbench":
       - Assetto Corsa
 	    - Ford GT40
@@ -798,7 +803,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   12. A lot of new tyre compound data has been added for *Automobilista 2* (many thanks to Chris Matthews to provide the data).
   13. Fixed a regression where in many lists and reports the last name of the drivers where missing.
   14. Implemented state caching in "Simulator Setup" which results in a significant performance improvement when stepping to a page, which had already been visited.
-  15. A preset has been added to "Simulator Setup" to enable a toggle mode for the Push-To-Talk trigger. Please see the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#push-to-talk-behaviour) for more information.
+  15. A preset has been added to "Simulator Setup" to enable a toggle mode for the *Push To Talk* trigger. Please see the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#push-to-talk-behaviour) for more information.
   16. New car models for "Setup Advisor":
       - Assetto Corsa
         - Pagani Zonda R
@@ -1597,7 +1602,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   4. Improved "Pace" report including median and quartile calculation.
   5. Various usability improvements for the "Race Reports" tool, incl. better selection of reports based on car and track grouping.
   6. [New "Call" command](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) allows you to actiavte the listen mode of a Race Assistant by the touch of a button on your Button Box.
-  7. Improved reliability for voice control of multiple Race Assistants, when Push-to-Talk is not used.
+  7. Improved reliability for voice control of multiple Race Assistants, when *Push To Talk* is not used.
   8. Optimized language handling for SAPI voices to support non-Microsoft language packs.
 
 ## 3.5.4-release 09/03/21
@@ -1628,7 +1633,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   4. Button Boxes can now be invisible to define and group controls, which are located on non-typical controllers like steering wheels.
   5. For the introduction of the new Setup Wizard, the localized Plugin Labels has been extensively reworked. Please see the [update notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-350), if you have changed the default Plugin Labels and want to preserve your changes.
   6. The "System" plugin now supports a [parameter *launchApplications*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration) to specify the applications to be used for the "Launch" mode.
-  7. The Push-To-Talk function now emits a short sound, when the listen mode is activated.
+  7. The *Push To Talk* function now emits a short sound, when the listen mode is activated.
 
 ## 3.3.1-release 07/25/21
 
@@ -1855,7 +1860,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   
   1. Bugfixes, as always
   2. Documentation updates, as always
-  3. Push-To-Talk function for voice recognition - this will reduce false positives almost to zero
+  3. *Push To Talk* function for voice recognition - this will reduce false positives almost to zero
   4. Button Boxes can be created with a configuration file - no more programming knowledge needed
   5. Extension of ACC Shared Memory Reader for weather information and track grip status
   6. Jona now issues notifications about upcoming weather changes and recommends tyre changes

@@ -180,6 +180,18 @@ class QuickStepWizard extends StepWizard {
 			this.editSynthesizer(assistant)
 		}
 
+		updateP2T(*) {
+			if (window["quickPushToTalkModeDropDown"].Value = 3) {
+				window["quickPushToTalkEdit"].Enabled := false
+				window["quickPushToTalkEdit"].Value := ""
+				window["quickPushToTalkButton"].Enabled := false
+			}
+			else {
+				window["quickPushToTalkEdit"].Enabled := true
+				window["quickPushToTalkButton"].Enabled := true
+			}
+		}
+
 		widget1 := window.Add("HTMLViewer", "x" . x . " y" . y . " w" . width . " h120 W:Grow Hidden")
 
 		text := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Quick", "Quick.StartHeader." . getLanguage()))
@@ -245,7 +257,8 @@ class QuickStepWizard extends StepWizard {
 		widget9 := window.Add("Button", "xp+106 yp-1 w23 h23 VquickPushToTalkButton Hidden")
 		widget9.OnEvent("Click", getPTTHotkey)
 		setButtonIcon(widget9, kIconsDirectory . "Key.ico", 1)
-		widget10 := window.Add("DropDownList", "xp+24 yp w96 Choose1 VquickPushToTalkMethodDropDown Hidden", collect(["Hold & Talk", "Press & Talk"], translate))
+		widget10 := window.Add("DropDownList", "xp+24 yp w96 Choose1 VquickPushToTalkModeDropDown Hidden", collect(["Hold & Talk", "Press & Talk", "Custom"], translate))
+		widget10.OnEvent("Change", updateP2T)
 		widget11 := window.Add("Edit", "xp+98 yp w96 h21 VquickPushToTalkEdit Hidden")
 
 		window.SetFont("Bold", "Arial")
@@ -347,7 +360,7 @@ class QuickStepWizard extends StepWizard {
 		local enIndex := 0
 		local enabled := false
 		local fullInstall := false
-		local code, language, uiLanguage, startWithWindows, silentMode, ignore, preset
+		local code, language, uiLanguage, startWithWindows, silentMode, configuration
 
 		static installed := false
 
@@ -376,18 +389,12 @@ class QuickStepWizard extends StepWizard {
 
 			this.Control["quickUILanguageDropDown"].Choose(chosen)
 
-			this.Control["quickPushToTalkEdit"].Text := getMultiMapValue(readMultiMap(kUserHomeDirectory . "Setup\Voice Control Configuration.ini")
-																	   , "Voice Control", "PushToTalk", "")
+			configuration := readMultiMap(kUserHomeDirectory . "Setup\Voice Control Configuration.ini")
 
-
-			this.Control["quickPushToTalkMethodDropDown"].Value := 1
-
-			for ignore, preset in wizard.loadPresets()
-				if isInstance(preset, P2TConfiguration) {
-					this.Control["quickPushToTalkMethodDropDown"].Value := 2
-
-					break
-				}
+			this.Control["quickPushToTalkEdit"].Text := getMultiMapValue(configuration, "Voice Control", "PushToTalk", "")
+			this.Control["quickPushToTalkModeDropDown"].Choose(inList(["Hold", "Press", "Custom"]
+																	, getMultiMapValue(configuration, "Voice Control"
+																					 , "PushToTalkMode", "Hold")))
 
 			this.loadSetup(!fullInstall)
 
@@ -395,6 +402,18 @@ class QuickStepWizard extends StepWizard {
 		}
 
 		super.showPage(page)
+
+		if (page = 2) {
+			if (this.Control["quickPushToTalkModeDropDown"].Value = 3) {
+				this.Control["quickPushToTalkEdit"].Enabled := false
+				this.Control["quickPushToTalkEdit"].Value := ""
+				this.Control["quickPushToTalkButton"].Enabled := false
+			}
+			else {
+				this.Control["quickPushToTalkEdit"].Enabled := true
+				this.Control["quickPushToTalkButton"].Enabled := true
+			}
+		}
 
 		if fullInstall {
 			wizard.installSoftware()
@@ -409,7 +428,7 @@ class QuickStepWizard extends StepWizard {
 		if (page = 2) {
 			this.updateSelectedSimulators()
 
-			this.finishSetup()
+			this.saveSetup()
 		}
 
 		return super.hidePage(page)
@@ -727,20 +746,15 @@ class QuickStepWizard extends StepWizard {
 		}
 	}
 
-	finishSetup() {
+	saveSetup() {
 		local wizard := this.SetupWizard
 		local voiceConfiguration := readMultiMap(kUserHomeDirectory . "Setup\Voice Control Configuration.ini")
 		local assistantSetups := {}
-		local pushToTalkPreset := P2TConfiguration("PushToTalkConfiguration")
 		local languageCode := "en"
 		local code, language, ignore, key, value, assistant
 
 		for key, assistant in this.Assistants
 			assistantSetups.%key% := this.assistantSetup(assistant)
-
-		wizard.uninstallPreset(pushToTalkPreset)
-		if (this.Control["quickPushToTalkMethodDropDown"].Value = 2)
-			wizard.installPreset(pushToTalkPreset)
 
 		for key, assistant in this.Assistants {
 			wizard.selectModule(assistant, assistantSetups.%key%.Enabled, false)
@@ -751,6 +765,7 @@ class QuickStepWizard extends StepWizard {
 
 		setMultiMapValue(voiceConfiguration, "Voice Control", "Language", getLanguage())
 		setMultiMapValue(voiceConfiguration, "Voice Control", "PushToTalk", this.Control["quickPushToTalkEdit"].Text)
+		setMultiMapValue(voiceConfiguration, "Voice Control", "PushToTalkMode", ["Hold", "Press", "Custom"][this.Control["quickPushToTalkModeDropDown"].Value])
 		setMultiMapValue(voiceConfiguration, "Voice Control", "Synthesizer", "dotNET")
 		setMultiMapValue(voiceConfiguration, "Voice Control", "Speaker", true)
 		setMultiMapValue(voiceConfiguration, "Voice Control", "Recognizer", "Desktop")
@@ -778,6 +793,8 @@ class QuickStepWizard extends StepWizard {
 		window.Block()
 
 		try {
+			this.saveSetup()
+
 			configuration := newMultiMap()
 
 			setup := this.assistantSetup(assistant)
@@ -794,8 +811,8 @@ class QuickStepWizard extends StepWizard {
 
 				setup := string2Values("|", setup.Synthesizer)
 
-				setMultiMapValue(configuration, "Voice Control", "SubscriptionKey", setup[2])
-				setMultiMapValue(configuration, "Voice Control", "TokenIssuer", setup[3])
+				setMultiMapValue(configuration, "Voice Control", "SubscriptionKey", setup[3])
+				setMultiMapValue(configuration, "Voice Control", "TokenIssuer", setup[2])
 			}
 			else if (setup.Synthesizer = "dotNET")
 				setMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", setup.Voice)

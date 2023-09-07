@@ -410,22 +410,9 @@ class P2TConfiguration extends NamedPreset {
 	}
 
 	install(wizard, edit := true) {
-		local configuration := readMultiMap(kUserConfigDirectory . "Core Settings.ini")
-
-		setMultiMapValue(configuration, "Voice", "Push-To-Talk", "Press")
-
-		writeMultiMap(kUserConfigDirectory . "Core Settings.ini", configuration)
-
-		deleteFile(kUserConfigDirectory . "P2T Configuration.ini")
 	}
 
 	uninstall(wizard) {
-		local configuration := readMultiMap(kUserConfigDirectory . "Core Settings.ini")
-
-		setMultiMapValue(configuration, "Voice", "Push-To-Talk", "Hold")
-
-		writeMultiMap(kUserConfigDirectory . "Core Settings.ini", configuration)
-
 		deleteFile(kUserConfigDirectory . "P2T Configuration.ini")
 	}
 }

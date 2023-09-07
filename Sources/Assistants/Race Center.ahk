@@ -88,7 +88,7 @@ global kSessionDataSchemas := CaseInsenseMap("Stint.Data", ["Nr", "Lap", "Driver
 														, "Tyre.Pressure.Loss.Front.Left", "Tyre.Pressure.Loss.Front.Right"
 														, "Tyre.Pressure.Loss.Rear.Left", "Tyre.Pressure.Loss.Rear.Right"
 														, "Penalty", "Time.Stint.Remaining", "Time.Driver.Remaining"
-														, "Lap.State", "Lap.Valid"]
+														, "Lap.State", "Lap.Valid", "Sectors.Time"]
 										   , "Pitstop.Data", ["Lap", "Fuel", "Tyre.Compound", "Tyre.Compound.Color", "Tyre.Set"
 															, "Tyre.Pressure.Cold.Front.Left", "Tyre.Pressure.Cold.Front.Right"
 															, "Tyre.Pressure.Cold.Rear.Left", "Tyre.Pressure.Cold.Rear.Right"
@@ -2072,7 +2072,7 @@ class RaceCenter extends ConfigurationItem {
 
 		centerTab.UseTab(3)
 
-		this.iLapsListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 H:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Stint", "Driver", "Position", "Weather", "Grip", "Lap Time", "Consumption", "Remaining", "Pressures", "Invalid", "Accident", "Penalty"], translate))
+		this.iLapsListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 H:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Stint", "Driver", "Position", "Weather", "Grip", "Lap Time", "Sector Times", "Consumption", "Remaining", "Pressures", "Invalid", "Accident", "Penalty"], translate))
 		this.iLapsListView.OnEvent("Click", chooseLap)
 
 		centerTab.UseTab(4)
@@ -5399,10 +5399,10 @@ class RaceCenter extends ConfigurationItem {
 
 						if useLapTimeVariation
 							lapTime += (Random(-1.0, 1.0) * ((5 - consistency) / 5) * (randomFactor / 100))
-					
+
 						if useDriverErrors
 							lapTime += (Random(0.0, 1.0) * ((5 - carControl) / 5) * (randomFactor / 100))
-						
+
 						if (usePitstops && (A_Index != driver) && carPitstop(A_Index, (startLap + curLap)))
 							lapTime += strategy.calcPitstopDuration(fuelCapacity, true)
 
@@ -5808,7 +5808,7 @@ class RaceCenter extends ConfigurationItem {
 		local newLaps := []
 		local newTelemetry := false
 		local ignore, identifier, newLap, count, lap, tries, rawData, data, damage, ignore, value
-		local fuelConsumption, car, pLap
+		local fuelConsumption, car, pLap, sectorTimes
 
 		for ignore, identifier in stintLaps
 			if !this.Laps.Has(identifier) {
@@ -5905,6 +5905,7 @@ class RaceCenter extends ConfigurationItem {
 			}
 
 			lap.Laptime := Round(getMultiMapValue(data, "Stint Data", "LapLastTime") / 1000, 1)
+			lap.SectorsTime := "-"
 
 			lap.RemainingSessionTime := getMultiMapValue(data, "Session Data", "SessionTimeRemaining")
 			lap.RemainingDriverTime := getMultiMapValue(data, "Stint Data", "DriverTimeRemaining", "-")
@@ -5957,11 +5958,24 @@ class RaceCenter extends ConfigurationItem {
 
 				data := parseMultiMap(rawData)
 
+				car := getMultiMapValue(data, "Position Data", "Driver.Car")
+
 				lap.Positions := rawData
 
-				this.updatePitstopState(lap, data)
+				sectorTimes := (car ? getMultiMapValue(data, "Position Data", "Car." . car . ".Time.Sectors", kUndefined) : false)
 
-				car := getMultiMapValue(data, "Position Data", "Driver.Car")
+				if (sectorTimes && (sectorTimes != kUndefined) && (sectorTimes != "")) {
+					sectorTimes := string2Values(",", sectorTimes)
+
+					loop sectorTimes.Length
+						sectorTimes[A_Index] := Round(sectorTimes[A_Index] / 1000, 2)
+
+					lap.SectorsTime := sectorTimes
+				}
+				else
+					lap.SectorsTime := "-"
+
+				this.updatePitstopState(lap, data)
 
 				if car
 					lap.Position := getMultiMapValue(data, "Position Data", "Car." . car . ".Position")
@@ -6228,7 +6242,9 @@ class RaceCenter extends ConfigurationItem {
 							penalty := ""
 
 						this.LapsListView.Add("", lap.Nr, stint.Nr, stint.Driver.FullName, lap.Position, translate(lap.Weather), translate(lap.Grip)
-												, lapTimeDisplayValue(lap.Laptime), displayNullValue(fuelConsumption), remainingFuel, "-, -, -, -"
+												, lapTimeDisplayValue(lap.Laptime)
+												, values2String(", ", collect(lap.SectorsTime, lapTimeDisplayValue)*)
+												, displayNullValue(fuelConsumption), remainingFuel, "-, -, -, -"
 												, (lap.State != "Invalid") ? "" : translate("x"), lap.Accident ? translate("x") : "", penalty)
 
 						lap.Row := this.LapsListView.GetCount()
@@ -6633,12 +6649,12 @@ class RaceCenter extends ConfigurationItem {
 					theLap.Valid := (theLap.State != "Invalid")
 				}
 
-				this.LapsListView.Modify(theLap.Row, "Col11", theLap.Valid ? "" : translate("x"))
+				this.LapsListView.Modify(theLap.Row, "Col12", theLap.Valid ? "" : translate("x"))
 
-				lapPressures := this.LapsListView.GetText(theLap.Row, 10)
+				lapPressures := this.LapsListView.GetText(theLap.Row, 11)
 
 				if (lapPressures = "-, -, -, -")
-					this.LapsListView.Modify(theLap.Row, "Col10", values2String(", ", collect(pressures, p => isNumber(p) ? displayValue("Float", convertUnit("Pressure", p)) : "-")*))
+					this.LapsListView.Modify(theLap.Row, "Col11", values2String(", ", collect(pressures, p => isNumber(p) ? displayValue("Float", convertUnit("Pressure", p)) : "-")*))
 
 				newData := true
 				lap += 1
@@ -6697,7 +6713,7 @@ class RaceCenter extends ConfigurationItem {
 					if isNumber(pressureRR)
 						pressureRR := displayValue("Float", convertUnit("Pressure", pressureRR))
 
-					this.LapsListView.Modify(row, "Col10", values2String(", ", displayNullValue(pressureFL), displayNullValue(pressureFR)
+					this.LapsListView.Modify(row, "Col11", values2String(", ", displayNullValue(pressureFL), displayNullValue(pressureFR)
 																			 , displayNullValue(pressureRL), displayNullValue(pressureRR)))
 				}
 			}
@@ -6808,7 +6824,7 @@ class RaceCenter extends ConfigurationItem {
 						pressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure))
 				}
 
-				this.LapsListView.Modify(this.Laps[lap].Row, "Col10", values2String(", ", pressures*))
+				this.LapsListView.Modify(this.Laps[lap].Row, "Col11", values2String(", ", pressures*))
 
 				newData := true
 				lap += 1
@@ -8176,7 +8192,8 @@ class RaceCenter extends ConfigurationItem {
 		this.iLaps := CaseInsenseWeakMap()
 
 		for ignore, lap in this.SessionStore.Tables["Lap.Data"] {
-			newLap := {Nr: lap["Nr"], Stint: lap["Stint"], Laptime: lap["Lap.Time"], State: lap["Lap.State"], Valid: lap["Lap.Valid"]
+			newLap := {Nr: lap["Nr"], Stint: lap["Stint"], Laptime: lap["Lap.Time"], SectorsTime: lap["Sectors.Time"]
+					 , State: lap["Lap.State"], Valid: lap["Lap.Valid"]
 					 , Position: lap["Position"], Grip: lap["Grip"]
 					 , Map: lap["Map"], TC: lap["TC"], ABS: lap["ABS"]
 					 , Weather: lap["Weather"], AirTemperature: lap["Temperature.Air"], TrackTemperature: lap["Temperature.Track"]
@@ -8210,6 +8227,11 @@ class RaceCenter extends ConfigurationItem {
 
 			if isNull(newLap.Laptime)
 				newLap.Laptime := "-"
+
+			if isNull(newLap.SectorsTime)
+				newLap.SectorsTime := ["-"]
+			else if isObject(newLap.SectorsTime)
+				newLap.SectorsTime := collect(newLap.SectorsTime, displayNullValue)
 
 			if isNull(newLap.FuelConsumption)
 				newLap.FuelConsumption := "-"
@@ -8381,7 +8403,9 @@ class RaceCenter extends ConfigurationItem {
 						penalty := ""
 
 					this.LapsListView.Add("", lap.Nr, lap.Stint.Nr, lap.Stint.Driver.FullName, lap.Position, translate(lap.Weather), translate(lap.Grip)
-											, lapTimeDisplayValue(lap.Laptime), displayNullValue(fuelConsumption), remainingFuel, "-, -, -, -"
+											, lapTimeDisplayValue(lap.Laptime)
+											, values2String(", ", collect(lap.SectorsTime, lapTimeDisplayValue)*)
+											, displayNullValue(fuelConsumption), remainingFuel, "-, -, -, -"
 											, (lap.State != "Invalid") ? "" : translate("x"), lap.Accident ? translate("x") : "", penalty)
 				}
 
@@ -9754,6 +9778,7 @@ class RaceCenter extends ConfigurationItem {
 
 				if ((pressuresTable.Length >= newLap) && (tyresTable.Length >= newLap)) {
 					lapData := Database.Row("Nr", newLap, "Lap", newLap, "Stint", lap.Stint.Nr, "Lap.Time", null(lap.Laptime)
+										  , "Sectors.Time", values2String(",", collect(lap.SectorsTime, null)*)
 										  , "Lap.State", lap.State, "Lap.Valid", (lap.State != "Invalid"), "Position", null(lap.Position)
 										  , "Damage", lap.Damage, "EngineDamage", lap.EngineDamage, "Accident", lap.Accident, "Penalty", lap.Penalty
 										  , "Fuel.Consumption", null(lap.FuelConsumption), "Fuel.Remaining", null(lap.FuelRemaining)
@@ -9888,7 +9913,7 @@ class RaceCenter extends ConfigurationItem {
 
 					sessionStore.add("Lap.Data", lapData)
 
-					lapPressures := this.LapsListView.GetText(lap.Row, 10)
+					lapPressures := this.LapsListView.GetText(lap.Row, 11)
 
 					if (lapPressures = "-, -, -, -") {
 						if isNumber(pressureFL)
@@ -10326,6 +10351,7 @@ class RaceCenter extends ConfigurationItem {
 		local lapData := []
 		local mapData := []
 		local lapTimeData := []
+		local sectorTimesData := []
 		local fuelConsumptionData := []
 		local accidentData := []
 		local penaltyData := []
@@ -10339,6 +10365,7 @@ class RaceCenter extends ConfigurationItem {
 			lapData.Push("<th class=`"th-std`">" . lap.Nr . "</th>")
 			mapData.Push("<td class=`"td-std`">" . lap.Map . "</td>")
 			lapTimeData.Push("<td class=`"td-std`">" . lapTimeDisplayValue(lap.Laptime) . "</td>")
+			sectorTimesData.Push("<td class=`"td-std`">" . values2String(", ", collect(lap.SectorsTime, lapTimeDisplayValue)*) . "</td>")
 
 			fuelConsumption := lap.FuelConsumption
 
@@ -10373,6 +10400,7 @@ class RaceCenter extends ConfigurationItem {
 		html .= ("<tr><th class=`"th-std`">" . translate("Lap") . "</th>"
 				   . "<th class=`"th-std`">" . translate("Map") . "</th>"
 				   . "<th class=`"th-std`">" . translate("Lap Time") . "</th>"
+				   . "<th class=`"th-std`">" . translate("Sector Times") . "</th>"
 				   . "<th class=`"th-std`">" . translate("Consumption") . "</th>"
 				   . "<th class=`"th-std`">" . translate("Accident") . "</th>"
 				   . "<th class=`"th-std`">" . translate("Penalty") . "</th>"
@@ -10382,6 +10410,7 @@ class RaceCenter extends ConfigurationItem {
 			html .= ("<tr>" . lapData[A_Index]
 							. mapData[A_Index]
 							. lapTimeData[A_Index]
+							. sectorTimesData[A_Index]
 							. fuelConsumptionData[A_Index]
 							. accidentData[A_Index]
 							. penaltyData[A_Index]
@@ -10566,6 +10595,7 @@ class RaceCenter extends ConfigurationItem {
 
 		html .= ("<tr><td><b>" . translate("Position:") . "</b></td><td>" . lap.Position . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Lap Time:") . "</b></td><td>" . lapTimeDisplayValue(lap.LapTime) . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Sector Times:") . "</b></td><td>" . values2String(", ", collect(lap.SectorsTime, lapTimeDisplayValue)*) . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Consumption:") . "</b></td><td>" . displayNullValue(fuelConsumption) . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Fuel Level:") . "</b></td><td>" . remainingFuel . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Temperatures (A / T):") . "</b></td><td>" . displayValue("Float", convertUnit("Temperature", lap.AirTemperature)) . ", " . displayValue("Float", convertUnit("Temperature", lap.TrackTemperature)) . "</td></tr>")

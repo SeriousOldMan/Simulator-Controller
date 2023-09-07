@@ -1009,7 +1009,7 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	fireActions(function, trigger) {
-		local ignore, action
+		local ignore, action, actions
 
 		if isInstance(function, ControllerCustomFunction) {
 			action := function.Actions[trigger]
@@ -1019,19 +1019,29 @@ class SimulatorController extends ConfigurationItem {
 			else
 				throw "Cannot find action for " . function.Descriptor . "[" . trigger . "] in SimulatorController.fireAction..."
 		}
-		else
-			for ignore, action in this.getActions(function, trigger)
+		else {
+			actions := this.getActions(function, trigger)
 
-				if function.Enabled[action]
-					if (action != false) {
-						this.updateLastEvent()
+			if (actions.Length > 0) {
+				for ignore, action in actions
+					if function.Enabled[action]
+						if (action != false) {
+							this.updateLastEvent()
 
-						logMessage(kLogInfo, translate("Firing action ") . getLabelForLogMessage(action) . translate(" for ") . function.Descriptor)
+							logMessage(kLogInfo, translate("Firing action ") . getLabelForLogMessage(action) . translate(" for ") . function.Descriptor)
 
-						action.fireAction(function, trigger)
-					}
-					else
-						throw "Cannot find action for " . function.Descriptor . "[" . trigger . "] in SimulatorController.fireAction..."
+							action.fireAction(function, trigger)
+						}
+						else
+							throw "Cannot find action for " . function.Descriptor . "[" . trigger . "] in SimulatorController.fireAction..."
+			}
+			else {
+				action := function.Actions[trigger]
+
+				if action
+					action.Call()
+			}
+		}
 	}
 
 	setMode(newMode) {
@@ -2207,7 +2217,7 @@ pushButton(buttonNumber) {
 	local descriptor := ConfigurationItem.descriptor(kButtonType, buttonNumber)
 	local function := SimulatorController.Instance.findFunction(descriptor)
 
-	if ((function != false) && (SimulatorController.Instance.getActions(function, "Push").Length > 0))
+	if (function != false)
 		fireControllerActions(function, "Push")
 	else
 		logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in custom controller action pushButton - please check the configuration"))
@@ -2229,7 +2239,7 @@ rotateDial(dialNumber, direction) {
 	descriptor := ConfigurationItem.descriptor(kDialType, dialNumber)
 	function := SimulatorController.Instance.findFunction(descriptor)
 
-	if ((function != false) && (SimulatorController.Instance.getActions(function, direction).Length > 0))
+	if (function != false)
 		fireControllerActions(function, direction)
 	else
 		logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in custom controller action rotateDial - please check the configuration"))
@@ -2258,7 +2268,7 @@ callCustom(customNumber) {
 	local descriptor := ConfigurationItem.descriptor(kCustomType, customNumber)
 	local function := SimulatorController.Instance.findFunction(descriptor)
 
-	if ((function != false) && (SimulatorController.Instance.getActions(function, "Call").Length > 0))
+	if (function != false)
 		fireControllerActions(function, "Call")
 	else
 		logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in custom controller action callCustom - please check the configuration"))

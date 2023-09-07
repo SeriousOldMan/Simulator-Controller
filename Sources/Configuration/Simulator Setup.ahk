@@ -512,8 +512,8 @@ class SetupWizard extends ConfiguratorPanel {
 		if initialize {
 			this.QuickSetup := true
 
-			this.addPatchFile("Settings", kUserHomeDirectory . "Setup\Settings Patch.ini")
-			this.addPatchFile("Configuration", kUserHomeDirectory . "Setup\Configuration Patch.ini")
+			this.addPatchFile("Settings", "%kUserHomeDirectory%Setup\Settings Patch.ini")
+			this.addPatchFile("Configuration", "%kUserHomeDirectory%Setup\Configuration Patch.ini")
 		}
 		else
 			this.QuickSetup := false

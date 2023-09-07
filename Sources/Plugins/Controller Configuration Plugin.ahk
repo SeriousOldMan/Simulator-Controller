@@ -383,19 +383,17 @@ class FunctionsList extends ConfigurationItemList {
 
 		functionType := this.Control["functionTypeDropDown"].Value
 
-		if (functionType < 5) {
-			this.Control["functionOnActionEdit"].Enabled := false
+		if (functionType = 5) {
+			this.Control["functionOnActionEdit"].Enabled := true
+			this.Control["functionOffHotkeysEdit"].Enabled := false
+			this.Control["functionOffHotkeysEdit"].Text := ""
 			this.Control["functionOffActionEdit"].Enabled := false
-			this.Control["functionOnActionEdit"].Text := ""
 			this.Control["functionOffActionEdit"].Text := ""
 		}
-		else {
-			this.Control["functionOnActionEdit"].Enabled := true
+		else if ((functionType == 2) || (functionType == 4)) {
+			this.Control["functionOffHotkeysEdit"].Enabled := true
 			this.Control["functionOffActionEdit"].Enabled := true
 		}
-
-		if ((functionType == 2) || (functionType == 4))
-			this.Control["functionOffHotkeysEdit"].Enabled := true
 		else {
 			this.Control["functionOffHotkeysEdit"].Enabled := false
 			this.Control["functionOffActionEdit"].Enabled := false

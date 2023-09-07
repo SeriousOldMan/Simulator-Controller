@@ -349,6 +349,7 @@ class Application extends ConfigurationItem {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class Function extends ConfigurationItem {
+	iLabel := false
 	iNumber := 0
 	iHotkeys := CaseInsenseMap()
 	iActions := CaseInsenseMap()
@@ -356,6 +357,16 @@ class Function extends ConfigurationItem {
 	Type {
 		Get {
 			throw "Virtual property Function.Type must be implemented in a subclass..."
+		}
+	}
+
+	Label {
+		Get {
+			return this.iLabel
+		}
+
+		Set {
+			return (this.iLabel := value)
 		}
 	}
 
@@ -367,7 +378,7 @@ class Function extends ConfigurationItem {
 
 	Descriptor {
 		Get {
-			return this.Type . "." . this.Number
+			return (this.Type . "." . this.Number)
 		}
 	}
 
@@ -542,14 +553,15 @@ class Function extends ConfigurationItem {
 		for functionDescriptor, descriptorValues in getMultiMapValues(configuration, "Controller Functions") {
 			functionDescriptor := ConfigurationItem.splitDescriptor(functionDescriptor)
 
-			if (functionDescriptor.Length = 4) {
-				functionDescriptor[3] := ConfigurationItem.descriptor(functionDescriptor[3], functionDescriptor[4])
+			if ((functionDescriptor[1] == this.Type) && (functionDescriptor[2] == this.Number)) {
+				if (functionDescriptor.Length = 4) {
+					functionDescriptor[3] := ConfigurationItem.descriptor(functionDescriptor[3], functionDescriptor[4])
 
-				functionDescriptor.RemoveAt(4)
-			}
+					functionDescriptor.RemoveAt(4)
+				}
 
-			if ((functionDescriptor[1] == this.Type) && (functionDescriptor[2] == this.Number))
 				this.loadFromDescriptor(functionDescriptor[3], descriptorValues)
+			}
 		}
 	}
 
@@ -564,6 +576,8 @@ class Function extends ConfigurationItem {
 
 			this.iActions[trigger] := this.computeActions(trigger, value)
 		}
+		else if (trigger = "Label")
+			this.iLabel := value
 		else
 			this.iHotkeys[trigger] := this.computeHotkeys(value)
 	}
@@ -838,9 +852,28 @@ class Plugin extends ConfigurationItem {
 	}
 
 	saveToConfiguration(configuration) {
+		local descriptor, arguments, key, value
+
 		super.saveToConfiguration(configuration)
 
-		setMultiMapValue(configuration, "Plugins", this.Plugin, (this.Active ? kTrue : kFalse) . "|" . values2String(", ", this.Simulators*) . "|" . this.Arguments[true])
+		descriptor := getMultiMapValue(configuration, "Plugins", this.Plugin, "")
+
+		if (StrLen(descriptor) > 0) {
+			descriptor := StrSplit(descriptor, "|", " `t", 3)
+
+			if (descriptor.Length > 0) {
+				arguments := this.computeArgments(descriptor[3])
+
+				for key, value in this.Arguments[true]
+					arguments[key] := value
+			}
+			else
+				arguments := this.Arguments[true]
+		}
+		else
+			arguments := this.Arguments[true]
+
+		setMultiMapValue(configuration, "Plugins", this.Plugin, (this.Active ? kTrue : kFalse) . "|" . values2String(", ", this.Simulators*) . "|" . arguments)
 	}
 
 	computeArgments(arguments) {

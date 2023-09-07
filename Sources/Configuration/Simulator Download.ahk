@@ -52,6 +52,8 @@ downloadSimulatorController() {
 	local options, index, cState, devVersion, release, version, package, updateTask
 	local directory, currentDirectory, start, ignore, url, error
 
+	cState := GetKeyState("Ctrl", "P")
+
 	TraySetIcon(icon, "1")
 	A_IconTip := "Simulator Download"
 
@@ -72,6 +74,9 @@ downloadSimulatorController() {
 		if index
 			options .= (" -Start `"" . A_Args[index + 1] . "`"")
 
+		if cState
+			options .= " -Development"
+
 		try {
 			if A_IsCompiled
 				Run("*RunAs `"" . A_ScriptFullPath . "`" /restart " . options)
@@ -87,9 +92,7 @@ downloadSimulatorController() {
 		ExitApp(0)
 	}
 
-	cState := GetKeyState("Control", "P")
-	
-	devVersion := (cState != false)
+	devVersion := (cState || inList(A_Args, "-Development"))
 
 	try {
 		Download("https://www.dropbox.com/s/txa8muw9j3g66tl/VERSION?dl=1", kTempDirectory . "VERSION")

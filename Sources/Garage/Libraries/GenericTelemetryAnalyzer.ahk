@@ -10,6 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\..\Libraries\Task.ahk"
+#Include "..\..\Libraries\Messages.ahk"
 #Include "..\..\Libraries\Math.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
 
@@ -45,6 +46,9 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 
 	iWheelBase := 270
 	iTrackWidth := 150
+
+	iAcousticFeedback := true
+	static sAudioDevice := false
 
 	iAnalyzerPID := false
 
@@ -162,6 +166,30 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 		}
 	}
 
+	AcousticFeedback {
+		Get {
+			return this.iAcousticFeedback
+		}
+
+		Set {
+			setAnalyzerSetting(this, "Feedback", value)
+
+			return (this.iAcousticFeedback := value)
+		}
+	}
+
+	static AudioDevice {
+		Get {
+			return GenericTelemetryAnalyzer.sAudioDevice
+		}
+	}
+
+	AudioDevice {
+		Get {
+			return GenericTelemetryAnalyzer.AudioDevice
+		}
+	}
+
 	__New(workbench, simulator) {
 		local selectedCar := workbench.SelectedCar[false]
 		local selectedTrack := workbench.SelectedTrack[false]
@@ -169,6 +197,8 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 		local defaultOversteerThresholds := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "OversteerThresholds", "-40,-70,-100")
 		local defaultLowspeedThreshold := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "LowspeedThreshold", 120)
 		local fileName, configuration, settings, prefix
+
+		static first := true
 
 		simulator := SessionDatabase.getSimulatorName(simulator)
 
@@ -187,7 +217,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 		this.iTrackWidth := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "TrackWidth", 150)
 
 		if selectedCar {
-			fileName := getFileName("Workbench\Definitions\Cars\" . simulator . "." . selectedCar . ".ini", kResourcesDirectory, kUserHomeDirectory)
+			fileName := getFileName("Garage\Definitions\Cars\" . simulator . "." . selectedCar . ".ini", kResourcesDirectory, kUserHomeDirectory)
 
 			if FileExist(fileName) {
 				configuration := readMultiMap(fileName)
@@ -211,6 +241,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 		this.iSteerRatio := getMultiMapValue(settings, "Setup Workbench", prefix . "SteerRatio", this.SteerRatio)
 		this.iWheelbase := getMultiMapValue(settings, "Setup Workbench", prefix . "Wheelbase", this.Wheelbase)
 		this.iTrackWidth := getMultiMapValue(settings, "Setup Workbench", prefix . "TrackWidth", this.TrackWidth)
+		this.iAcousticFeedback := getMultiMapValue(settings, "Setup Workbench", prefix . "Feedback", true)
 
 		defaultUndersteerThresholds := getMultiMapValue(settings, "Setup Workbench", prefix . "UndersteerThresholds", defaultUndersteerThresholds)
 		defaultOversteerThresholds := getMultiMapValue(settings, "Setup Workbench", prefix . "OversteerThresholds", defaultOversteerThresholds)
@@ -222,6 +253,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 		this.iSteerRatio := getMultiMapValue(settings, "Setup Workbench", prefix . "SteerRatio", this.SteerRatio)
 		this.iWheelbase := getMultiMapValue(settings, "Setup Workbench", prefix . "Wheelbase", this.Wheelbase)
 		this.iTrackWidth := getMultiMapValue(settings, "Setup Workbench", prefix . "TrackWidth", this.TrackWidth)
+		this.iAcousticFeedback := getMultiMapValue(settings, "Setup Workbench", prefix . "Feedback", this.AcousticFeedback)
 
 		this.iUndersteerThresholds := string2Values(",", getMultiMapValue(settings, "Setup Workbench"
 													   , prefix . "UndersteerThresholds", defaultUndersteerThresholds))
@@ -232,6 +264,14 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 		super.__New(workbench, simulator)
 
 		OnExit(ObjBindMethod(this, "stopTelemetryAnalyzer", true))
+
+		if first {
+			GenericTelemetryAnalyzer.sAudioDevice := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Audio Settings.ini"), "Output", "Analyzer.AudioDevice", false)
+
+			registerMessageHandler("Analyzer", methodMessageHandler, GenericTelemetryAnalyzer)
+
+			first := false
+		}
 	}
 
 	settingAvailable(setting) {
@@ -343,11 +383,20 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 				if this.settingAvailable("TrackWidth")
 					options .= (A_Space . this.TrackWidth)
 
+				if this.AcousticFeedback {
+					options .= (A_Space . "`"" . kResourcesDirectory . "Sounds`"")
+
+					if this.AudioDevice
+						options .= (A_Space . "`"" . this.AudioDevice . "`"")
+				}
+
 				code := SessionDatabase.getSimulatorCode(this.Simulator)
 
 				Run(kBinariesDirectory . code . " SHM Spotter.exe " . options, kBinariesDirectory, "Hide", &pid)
 			}
 			catch Any as exception {
+				logError(exception, true)
+
 				message := substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (%exePath%) - please check the configuration...")													   , {simulator: code, protocol: "SHM", exePath: kBinariesDirectory . code . " SHM Spotter.exe"})
 
 				logMessage(kLogCritical, message)
@@ -383,6 +432,10 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 
 		return false
 	}
+
+	static acousticFeedback(soundFile) {
+		playSound("SWSoundPlayer.exe", soundFile, (GenericTelemetryAnalyzer.AudioDevice ? GenericTelemetryAnalyzer.AudioDevice : "") . " echos 1 1 1 1")
+	}
 }
 
 
@@ -404,7 +457,7 @@ setAnalyzerSetting(analyzer, key, value) {
 runAnalyzer(commandOrAnalyzer := false, arguments*) {
 	local x, y, ignore, widget, workbench, row, include
 	local tries, data, type, speed, severity, key, value, newValue, characteristic, characteristicLabels, fromEdit
-	local calibration, theListView
+	local calibration, theListView, chosen
 
 	static analyzerGui
 
@@ -428,6 +481,8 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 	static heavyUndersteerThresholdEdit
 	static mediumUndersteerThresholdEdit
 	static lightUndersteerThresholdEdit
+
+	static acousticFeedbackDropDown
 
 	static issuesListView
 
@@ -466,6 +521,11 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 				if fromEdit {
 					value := %severity . type . "ThresholdEdit"%.Text
 
+					if !isInteger(value) {
+						%severity . type . "ThresholdEdit"%.Text := 0
+						value := 0
+					}
+
 					newValue := Min(Max(value, kMinThreshold), kMaxThreshold)
 
 					%severity . type . "ThresholdSlider"%.Value := newValue
@@ -478,7 +538,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 			}
 	}
 	else if (commandOrAnalyzer == "Calibrate") {
-		analyzerGui.Opt("+Disabled")
+		analyzerGui.Block()
 
 		try {
 			calibration := runCalibrator(analyzer, analyzerGui)
@@ -502,7 +562,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 			}
 		}
 		finally {
-			analyzerGui.Opt("-Disabled")
+			analyzerGui.Unblock()
 		}
 	}
 	else if ((commandOrAnalyzer == "Activate") && (state = "Prepare")) {
@@ -528,6 +588,8 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		if analyzer.settingAvailable("UndersteerThresholds")
 			analyzer.UndersteerThresholds := [lightUndersteerThresholdSlider.Value, mediumUndersteerThresholdSlider.Value, heavyUndersteerThresholdSlider.Value]
+
+		analyzer.AcousticFeedback := ((acousticFeedbackDropDown.Value = 1) ? true : false)
 
 		dataFile := temporaryFileName("Analyzer", "data")
 
@@ -748,7 +810,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		widget9 := analyzerGui.Add("Text", "x24 yp+30 w130 h20 +0x200", translate("Heavy Oversteer"))
 		heavyOversteerThresholdSlider := analyzerGui.Add("Slider", "Center Thick15 x158 yp+2 w132 0x10 Range" . kMinThreshold . "-" . kMaxThreshold . " ToolTip", analyzer.OversteerThresholds[3])
-		heavyOversteerThresholdSlider.OnEvent("Change", runAnalyzer.Bind("UpdateSlider"))
+		heavyOversteerThresholdSlider.OnEvent("Change", runAnalyzer.Bind("UpdateSlider", false))
 		widget10 := heavyOversteerThresholdSlider
 		heavyOversteerThresholdEdit := analyzerGui.Add("Edit", "x293 yp w35 +0x200", analyzer.OversteerThresholds[3])
 		heavyOversteerThresholdEdit.OnEvent("Change", runAnalyzer.Bind("UpdateSlider", true))
@@ -756,7 +818,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		widget11 := analyzerGui.Add("Text", "x24 yp+22 w130 h20 +0x200", translate("Medium Oversteer"))
 		mediumOversteerThresholdSlider := analyzerGui.Add("Slider", "Center Thick15 x158 yp+2 w132 0x10 Range" . kMinThreshold . "-" . kMaxThreshold . " ToolTip", analyzer.OversteerThresholds[2])
-		mediumOversteerThresholdSlider.OnEvent("Change", runAnalyzer.Bind("UpdateSlider"))
+		mediumOversteerThresholdSlider.OnEvent("Change", runAnalyzer.Bind("UpdateSlider", false))
 		widget12 := mediumOversteerThresholdSlider
 		mediumOversteerThresholdEdit := analyzerGui.Add("Edit", "x293 yp w35 +0x200", analyzer.OversteerThresholds[2])
 		mediumOversteerThresholdEdit.OnEvent("Change", runAnalyzer.Bind("UpdateSlider", true))
@@ -764,7 +826,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		widget13 := analyzerGui.Add("Text", "x24 yp+22 w130 h20 +0x200", translate("Light Oversteer"))
 		lightOversteerThresholdSlider := analyzerGui.Add("Slider", "Center Thick15 x158 yp+2 w132 0x10 Range" . kMinThreshold . "-" . kMaxThreshold . " ToolTip", analyzer.OversteerThresholds[1])
-		lightOversteerThresholdSlider.OnEvent("Change", runAnalyzer.Bind("UpdateSlider"))
+		lightOversteerThresholdSlider.OnEvent("Change", runAnalyzer.Bind("UpdateSlider", false))
 		widget14 := lightOversteerThresholdSlider
 		lightOversteerThresholdEdit := analyzerGui.Add("Edit", "x293 yp w35 +0x200", analyzer.OversteerThresholds[1])
 		lightOversteerThresholdEdit.OnEvent("Change", runAnalyzer.Bind("UpdateSlider", true))
@@ -772,7 +834,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		widget15 := analyzerGui.Add("Text", "x24 yp+30 w130 h20 +0x200", translate("Light Understeer"))
 		lightUndersteerThresholdSlider := analyzerGui.Add("Slider", "Center Thick15 x158 yp+2 w132 0x10 Range" . kMinThreshold . "-" . kMaxThreshold . " ToolTip", analyzer.UndersteerThresholds[1])
-		lightUndersteerThresholdSlider.OnEvent("Change", runAnalyzer.Bind("UpdateSlider"))
+		lightUndersteerThresholdSlider.OnEvent("Change", runAnalyzer.Bind("UpdateSlider", false))
 		widget16 := lightUndersteerThresholdSlider
 		lightUndersteerThresholdEdit := analyzerGui.Add("Edit", "x293 yp w35 +0x200", analyzer.UndersteerThresholds[1])
 		lightUndersteerThresholdEdit.OnEvent("Change", runAnalyzer.Bind("UpdateSlider", true))
@@ -780,7 +842,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		widget17 := analyzerGui.Add("Text", "x24 yp+22 w130 h20 +0x200", translate("Medium Understeer"))
 		mediumUndersteerThresholdSlider := analyzerGui.Add("Slider", "Center Thick15 x158 yp+2 w132 0x10 Range" . kMinThreshold . "-" . kMaxThreshold . " ToolTip", analyzer.UndersteerThresholds[2])
-		mediumUndersteerThresholdSlider.OnEvent("Change", runAnalyzer.Bind("UpdateSlider"))
+		mediumUndersteerThresholdSlider.OnEvent("Change", runAnalyzer.Bind("UpdateSlider", false))
 		widget18 := mediumUndersteerThresholdSlider
 		mediumUndersteerThresholdEdit := analyzerGui.Add("Edit", "x293 yp w35 +0x200", analyzer.UndersteerThresholds[2])
 		mediumUndersteerThresholdEdit.OnEvent("Change", runAnalyzer.Bind("UpdateSlider", true))
@@ -788,11 +850,17 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		widget19 := analyzerGui.Add("Text", "x24 yp+22 w130 h20 +0x200", translate("Heavy Understeer"))
 		heavyUndersteerThresholdSlider := analyzerGui.Add("Slider", "Center Thick15 x158 yp+2 w132 0x10 Range" . kMinThreshold . "-" . kMaxThreshold . " ToolTip", analyzer.UndersteerThresholds[3])
-		heavyUndersteerThresholdSlider.OnEvent("Change", runAnalyzer.Bind("UpdateSlider"))
+		heavyUndersteerThresholdSlider.OnEvent("Change", runAnalyzer.Bind("UpdateSlider", false))
 		widget20 := heavyUndersteerThresholdSlider
 		heavyUndersteerThresholdEdit := analyzerGui.Add("Edit", "x293 yp w35 +0x200", analyzer.UndersteerThresholds[3])
 		heavyUndersteerThresholdEdit.OnEvent("Change", runAnalyzer.Bind("UpdateSlider", true))
 		widget26 := heavyUndersteerThresholdEdit
+
+		chosen := (analyzer.AcousticFeedback ? 1 : 2)
+
+		widget34 := analyzerGui.Add("Text", "x16 yp+42 w130 h20 +0x200", translate("Acoustic feedback"))
+		widget35 := analyzerGui.Add("DropDownList", "x158 yp w45 Choose" . chosen, [translate("Yes"), translate("No")])
+		acousticFeedbackDropDown := widget35
 
 		if !analyzer.settingAvailable("OversteerThresholds") {
 			heavyOversteerThresholdSlider.Enabled := false
@@ -812,7 +880,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 			lightUndersteerThresholdSlider.Value := 0
 		}
 
-		loop 33
+		loop 35
 			prepareWidgets.Push(%"widget" . A_Index%)
 
 		widget1 := analyzerGui.Add("ListView", "x16 ys w320 h190 -Multi -LV0x10 NoSort NoSortHdr  Hidden", collect(["Characteristic", "Intensity", "Frequency (%)"], translate))
@@ -845,7 +913,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		loop 4
 			analyzeWidgets.Push(%"widget" . A_Index%)
 
-		calibrateButton := analyzerGui.Add("Button", "x16 ys+290 w80 h23 ", translate("Calibrate..."))
+		calibrateButton := analyzerGui.Add("Button", "x16 ys+328 w80 h23 ", translate("Calibrate..."))
 		calibrateButton.OnEvent("Click", runAnalyzer.Bind("Calibrate"))
 		activateButton := analyzerGui.Add("Button", "x158 yp w80 h23 Default", translate("Start"))
 		activateButton.OnEvent("Click", runAnalyzer.Bind("Activate"))
@@ -977,8 +1045,8 @@ runCalibrator(commandOrAnalyzer, *) {
 				Sleep(100)
 		}
 		finally {
-			; if dataFile
-			; 	deleteFile(dataFile)
+			if dataFile
+			 	deleteFile(dataFile)
 
 			analyzer.stopTelemetryAnalyzer()
 		}

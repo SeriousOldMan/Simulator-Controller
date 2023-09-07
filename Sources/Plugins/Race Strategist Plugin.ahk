@@ -33,7 +33,7 @@ global kRaceStrategistPlugin := "Race Strategist"
 class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	static kLapDataSchemas := CaseInsenseMap("Telemetry", ["Lap", "Simulator", "Car", "Track", "Weather", "Temperature.Air", "Temperature.Track"
 														 , "Fuel.Consumption", "Fuel.Remaining", "LapTime", "Pitstop", "Map", "TC", "ABS"
-														 , "Compound", "Compound.Color", "Pressures", "Temperatures", "Wear"])
+														 , "Compound", "Compound.Color", "Pressures", "Temperatures", "Wear", "State"])
 
 	iRaceStrategist := false
 
@@ -60,6 +60,10 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 			this.callRemote("callRecommendStrategy", arguments*)
 		}
 
+		recommendFullCourseYellow(arguments*) {
+			this.callRemote("callRecommendFullCourseYellow", arguments*)
+		}
+
 		restoreRaceInfo(arguments*) {
 			this.callRemote("restoreRaceInfo", arguments*)
 		}
@@ -81,6 +85,8 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 				this.Plugin.cancelStrategy()
 			else if (this.Plugin.RaceStrategist && (this.Action = "StrategyRecommend"))
 				this.Plugin.recommendStrategy()
+			else if (this.Plugin.RaceStrategist && (this.Action = "FCYRecommend"))
+				this.Plugin.recommendFullCourseYellow()
 			else
 				super.fireAction(function, trigger)
 		}
@@ -120,7 +126,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	createRaceAssistantAction(controller, action, actionFunction, arguments*) {
 		local function, descriptor
 
-		if inList(["PitstopRecommend", "StrategyCancel", "StrategyRecommend"], action) {
+		if inList(["PitstopRecommend", "StrategyCancel", "StrategyRecommend", "FCYRecommend"], action) {
 			function := controller.findFunction(actionFunction)
 
 			if (function != false) {
@@ -221,22 +227,63 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 			this.startSession(settings, data)
 	}
 
+	prepareSession(settings, data) {
+		local pid := ProcessExist("Practice Center.exe")
+		local dataFile
+
+		super.prepareSession(settings, data)
+
+		if pid {
+			dataFile := (kTempDirectory . "Practice Lap 0.0.data")
+
+			writeMultiMap(dataFile, data)
+
+			messageSend(kFileMessage, "Practice", "startSession:" . dataFile, pid)
+		}
+	}
+
 	addLap(lap, running, data) {
+		local teamServer := this.TeamServer
+		local pid := ProcessExist("Practice Center.exe")
+		local fileName
+
+		if (pid && (!teamServer || !teamServer.SessionActive)) {
+			fileName := temporaryFileName("Practice Lap " . lap, "data")
+
+			writeMultiMap(fileName, data)
+
+			messageSend(kFileMessage, "Practice", "updateLap:" . values2String(";", lap, fileName), pid)
+		}
+
 		super.addLap(lap, running, data)
 
 		this.checkStrategy(lap)
 	}
 
 	updateLap(lap, running, data) {
+		local teamServer := this.TeamServer
+		local pid := ProcessExist("Practice Center.exe")
+		local fileName
+
 		super.updateLap(lap, running, data)
+
+		if (pid && (!teamServer || !teamServer.SessionActive)) {
+			fileName := temporaryFileName("Practice Lap " . lap, "data")
+
+			writeMultiMap(fileName, data)
+
+			messageSend(kFileMessage, "Practice", "updateLap:" . values2String(";", lap, fileName, true), pid)
+		}
 
 		this.checkStrategy()
 	}
 
 	requestInformation(arguments*) {
-		if (this.RaceStrategist && inList(["Time", "LapsRemaining", "Weather", "Position", "LapTimes", "ActiveCars"
+		if (this.RaceStrategist && inList(["Time", "LapsRemaining", "Weather", "Position", "LapTime", "LapTimes", "ActiveCars"
 										 , "GapToAhead", "GapToFront", "GapToBehind", "GapToAheadStandings", "GapToFrontStandings"
 										 , "GapToBehindStandings", "GapToAheadTrack", "GapToBehindTrack", "GapToLeader"
+										 , "DriverNameAhead", "DriverNameBehind"
+										 , "CarClassAhead", "CarClassBehind", "CarCupAhead", "CarCupBehind"
 										 , "StrategyOverview", "NextPitstop"], arguments[1])) {
 			this.RaceStrategist.requestInformation(arguments*)
 
@@ -256,6 +303,11 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 			this.RaceStrategist.recommendStrategy()
 	}
 
+	recommendFullCourseYellow() {
+		if this.RaceStrategist
+			this.RaceStrategist.recommendFullCourseYellow()
+	}
+
 	cancelStrategy() {
 		if this.RaceStrategist
 			this.RaceStrategist.cancelStrategy()
@@ -263,8 +315,9 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 	saveTelemetryData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
 					, fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
-					, compound, compoundColor, pressures, temperatures, wear) {
+					, compound, compoundColor, pressures, temperatures, wear, lapState) {
 		local teamServer := this.TeamServer
+		local pid
 
 		if !wear
 			wear := values2String(",", kNull, kNull, kNull, kNull)
@@ -273,14 +326,23 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 			teamServer.setLapValue(lapNumber, this.Plugin . " Telemetry"
 								 , values2String(";", simulator, car, track, weather, airTemperature, trackTemperature
 												    , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
-												    , compound, compoundColor, pressures, temperatures, wear, createGUID(), createGUID()))
-		else
+												    , compound, compoundColor, pressures, temperatures, wear, createGUID(), createGUID(), lapState))
+		else {
+			pid := ProcessExist("Practice Center.exe")
+
+			if pid
+				messageSend(kFileMessage, "Practice", "updateTelemetry:" . values2String(";", lapNumber, simulator, car, track, weather
+																							, airTemperature, trackTemperature
+																							, fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
+																							, compound, compoundColor, pressures, temperatures, wear, lapState), pid)
+
 			this.LapDatabase.add("Telemetry", Database.Row("Lap", lapNumber, "Simulator", simulator, "Car", car, "Track", track
 														 , "Weather", weather, "Temperature.Air", airTemperature, "Temperature.Track", trackTemperature
 														 , "Fuel.Consumption", fuelConsumption, "Fuel.Remaining", fuelRemaining, "LapTime", lapTime
 														 , "Pitstop", pitstop, "Map", map, "TC", tc, "ABS", abs
 														 , "Compound", compound, "Compound.Color", compoundColor
-														 , "Pressures", pressures, "Temperatures", temperatures, "Wear", wear))
+														 , "Pressures", pressures, "Temperatures", temperatures, "Wear", wear, "State", lapState))
+		}
 	}
 
 	updateTelemetryDatabase() {
@@ -317,7 +379,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 					if (newStint && driverID) {
 						driverName := teamServer.getStintDriverName(stint)
-							
+
 						if driverName
 							telemetryDB.registerDriver(telemetryData[1], driverID, driverName)
 					}
@@ -329,7 +391,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 					runningLap += 1
 
-					if !pitstop {
+					if (!pitstop && (telemetryData[21] = "Valid")) {
 						pressures := string2Values(",", telemetryData[16])
 						temperatures := string2Values(",", telemetryData[17])
 						wear := string2Values(",", telemetryData[18])
@@ -361,31 +423,32 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 				if !telemetryDB
 					telemetryDB := TelemetryDatabase(telemetryData["Simulator"], telemetryData["Car"], telemetryData["Track"])
 
-				if telemetryData["Pitstop"]
+				if ((runningLap > 2) && telemetryData["Pitstop"])
 					runningLap := 0
 
 				runningLap += 1
 
-				try {
-					telemetryDB.addElectronicEntry(telemetryData["Weather"], telemetryData["Temperature.Air"], telemetryData["Temperature.Track"]
-												 , telemetryData["Compound"], telemetryData["Compound.Color"]
-												 , telemetryData["Map"], telemetryData["TC"], telemetryData["ABS"]
-												 , telemetryData["Fuel.Consumption"], telemetryData["Fuel.Remaining"], telemetryData["LapTime"])
+				if (!telemetryData["Pitstop"] && (telemetryData["State"] = "Valid"))
+					try {
+						telemetryDB.addElectronicEntry(telemetryData["Weather"], telemetryData["Temperature.Air"], telemetryData["Temperature.Track"]
+													 , telemetryData["Compound"], telemetryData["Compound.Color"]
+													 , telemetryData["Map"], telemetryData["TC"], telemetryData["ABS"]
+													 , telemetryData["Fuel.Consumption"], telemetryData["Fuel.Remaining"], telemetryData["LapTime"])
 
-					pressures := string2Values(",", telemetryData["Pressures"])
-					temperatures := string2Values(",", telemetryData["Temperatures"])
-					wear := string2Values(",", telemetryData["Wear"])
+						pressures := string2Values(",", telemetryData["Pressures"])
+						temperatures := string2Values(",", telemetryData["Temperatures"])
+						wear := string2Values(",", telemetryData["Wear"])
 
-					telemetryDB.addTyreEntry(telemetryData["Weather"], telemetryData["Temperature.Air"], telemetryData["Temperature.Track"]
-										   , telemetryData["Compound"], telemetryData["Compound.Color"], runningLap
-										   , pressures[1], pressures[2], pressures[4], pressures[4]
-										   , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
-										   , wear[1], wear[2], wear[3], wear[4]
-										   , telemetryData["Fuel.Consumption"], telemetryData["Fuel.Remaining"], telemetryData["LapTime"])
-				}
-				catch Any as exception {
-					logError(exception)
-				}
+						telemetryDB.addTyreEntry(telemetryData["Weather"], telemetryData["Temperature.Air"], telemetryData["Temperature.Track"]
+											   , telemetryData["Compound"], telemetryData["Compound.Color"], runningLap
+											   , pressures[1], pressures[2], pressures[4], pressures[4]
+											   , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
+											   , wear[1], wear[2], wear[3], wear[4]
+											   , telemetryData["Fuel.Consumption"], telemetryData["Fuel.Remaining"], telemetryData["LapTime"])
+					}
+					catch Any as exception {
+						logError(exception)
+					}
 			}
 	}
 
@@ -413,15 +476,26 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 	saveStandingsData(lapNumber, fileName) {
 		local teamServer := this.TeamServer
+		local pid
 
-		if (teamServer && teamServer.SessionActive)
+		if (teamServer && teamServer.SessionActive) {
 			this.setLapValue(lapNumber, this.Plugin . " Race Standings", fileName)
 
-		deleteFile(fileName)
+			deleteFile(fileName)
+		}
+		else {
+			pid := ProcessExist("Practice Center.exe")
+
+			if pid
+				messageSend(kFileMessage, "Practice", "updateStandings:" . values2String(";", lapNumber, fileName), pid)
+			else
+				deleteFile(fileName)
+		}
 	}
 
 	saveRaceLap(lapNumber, fileName) {
 		local teamServer := this.TeamServer
+		local pid
 
 		if (teamServer && teamServer.SessionActive) {
 			this.setLapValue(lapNumber, this.Plugin . " Race Lap", fileName)
@@ -429,9 +503,14 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 			deleteFile(fileName)
 		}
 		else {
+			pid := ProcessExist("Practice Center.exe")
+
 			DirCreate(kTempDirectory . "Race Report")
 
-			FileMove(fileName, kTempDirectory . "Race Report\Lap." lapNumber, 1)
+			FileCopy(fileName, kTempDirectory . "Race Report\Lap." lapNumber, 1)
+
+			if pid
+				messageSend(kFileMessage, "Practice", "updateReportLap:" . values2String(";", lapNumber, fileName), pid)
 
 			loop {
 				lapNumber += 1
@@ -446,6 +525,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 	saveRaceInfo(lapNumber, fileName) {
 		local teamServer := this.TeamServer
+		local pid
 
 		if (teamServer && teamServer.SessionActive) {
 			this.setLapValue(lapNumber, this.Plugin . " Race Info", fileName)
@@ -453,11 +533,19 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 			deleteFile(fileName)
 		}
 		else {
+			pid := ProcessExist("Practice Center.exe")
+
 			deleteDirectory(kTempDirectory . "Race Report")
 
 			DirCreate(kTempDirectory . "Race Report")
 
-			FileMove(fileName, kTempDirectory . "Race Report\Race.data")
+			if pid {
+				FileCopy(fileName, kTempDirectory . "Race Report\Race.data")
+
+				messageSend(kFileMessage, "Practice", "updateReportData:" . values2String(";", lapNumber, fileName), pid)
+			}
+			else
+				FileMove(fileName, kTempDirectory . "Race Report\Race.data")
 		}
 	}
 
@@ -497,7 +585,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		local reportsDirectory := getMultiMapValue(this.Configuration, "Race Strategist Reports", "Database", false)
 		local teamServer, session, runningLap, raceInfo, count, pitstops, lapData, data, key, value
 		local times, positions, laps, drivers, newLine, line, fileName, directory
-		local sessionDB, simulatorCode, carCode, trackCode
+		local simulatorCode, carCode, trackCode
 
 		if (targetDirectory || reportsDirectory) {
 			teamServer := this.TeamServer
@@ -579,11 +667,9 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 				writeMultiMap(kTempDirectory . "Race Report\Race.data", data)
 
 				if !targetDirectory {
-					sessionDB := SessionDatabase()
-
-					simulatorCode := sessionDB.getSimulatorCode(getMultiMapValue(data, "Session", "Simulator"))
-					carCode := sessionDB.getCarCode(simulatorCode, getMultiMapValue(data, "Session", "Car"))
-					trackCode := sessionDB.getCarCode(simulatorCode, getMultiMapValue(data, "Session", "Track"))
+					simulatorCode := SessionDatabase.getSimulatorCode(getMultiMapValue(data, "Session", "Simulator"))
+					carCode := SessionDatabase.getCarCode(simulatorCode, getMultiMapValue(data, "Session", "Car"))
+					trackCode := SessionDatabase.getTrackCode(simulatorCode, getMultiMapValue(data, "Session", "Track"))
 
 					targetDirectory := (reportsDirectory . "\" . simulatorCode . "\" . carCode . "\" . trackCode . "\" . getMultiMapValue(data, "Session", "Time"))
 				}
@@ -593,78 +679,78 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 			else {
 				data := readMultiMap(kTempDirectory . "Race Report\Race.data")
 
-				count := 0
-				pitstops := false
+				if (data.Count > 0) {
+					count := 0
+					pitstops := false
 
-				try {
-					if FileExist(kTempDirectory . "Race Report\Output")
-						deleteDirectory(kTempDirectory . "Race Report\Output")
+					try {
+						if FileExist(kTempDirectory . "Race Report\Output")
+							deleteDirectory(kTempDirectory . "Race Report\Output")
 
-					DirCreate(kTempDirectory . "Race Report\Output")
-				}
-				catch Any as exception {
-					logError(exception)
-				}
-
-				loop {
-					fileName := (kTempDirectory . "Race Report\Lap." . A_Index)
-
-					if !FileExist(fileName)
-						break
-					else {
-						lapData := readMultiMap(fileName)
-
-						count += 1
-
-						for key, value in getMultiMapValues(lapData, "Lap")
-							setMultiMapValue(data, "Laps", key, value)
-
-						pitstops := getMultiMapValue(lapData, "Pitstop", "Laps", "")
-
-						times := getMultiMapValue(lapData, "Times", A_Index)
-						positions := getMultiMapValue(lapData, "Positions", A_Index)
-						laps := getMultiMapValue(lapData, "Laps", A_Index)
-						drivers := getMultiMapValue(lapData, "Drivers", A_Index)
-
-						newLine := ((count > 1) ? "`n" : "")
-
-						line := (newLine . times)
-
-						FileAppend(line, kTempDirectory . "Race Report\Output\Times.CSV")
-
-						line := (newLine . positions)
-
-						FileAppend(line, kTempDirectory . "Race Report\Output\Positions.CSV")
-
-						line := (newLine . laps)
-
-						FileAppend(line, kTempDirectory . "Race Report\Output\Laps.CSV")
-
-						line := (newLine . drivers)
-						fileName := (kTempDirectory . "Race Report\Output\Drivers.CSV")
-
-						FileAppend(line, fileName, "UTF-16")
+						DirCreate(kTempDirectory . "Race Report\Output")
 					}
+					catch Any as exception {
+						logError(exception)
+					}
+
+					loop {
+						fileName := (kTempDirectory . "Race Report\Lap." . A_Index)
+
+						if !FileExist(fileName)
+							break
+						else {
+							lapData := readMultiMap(fileName)
+
+							count += 1
+
+							for key, value in getMultiMapValues(lapData, "Lap")
+								setMultiMapValue(data, "Laps", key, value)
+
+							pitstops := getMultiMapValue(lapData, "Pitstop", "Laps", "")
+
+							times := getMultiMapValue(lapData, "Times", A_Index)
+							positions := getMultiMapValue(lapData, "Positions", A_Index)
+							laps := getMultiMapValue(lapData, "Laps", A_Index)
+							drivers := getMultiMapValue(lapData, "Drivers", A_Index)
+
+							newLine := ((count > 1) ? "`n" : "")
+
+							line := (newLine . times)
+
+							FileAppend(line, kTempDirectory . "Race Report\Output\Times.CSV")
+
+							line := (newLine . positions)
+
+							FileAppend(line, kTempDirectory . "Race Report\Output\Positions.CSV")
+
+							line := (newLine . laps)
+
+							FileAppend(line, kTempDirectory . "Race Report\Output\Laps.CSV")
+
+							line := (newLine . drivers)
+							fileName := (kTempDirectory . "Race Report\Output\Drivers.CSV")
+
+							FileAppend(line, fileName, "UTF-16")
+						}
+					}
+
+					removeMultiMapValue(data, "Laps", "Lap")
+					setMultiMapValue(data, "Laps", "Count", count)
+
+					setMultiMapValue(data, "Laps", "Pitstops", pitstops)
+
+					writeMultiMap(kTempDirectory . "Race Report\Output\Race.data", data)
+
+					if !targetDirectory {
+						simulatorCode := SessionDatabase.getSimulatorCode(getMultiMapValue(data, "Session", "Simulator"))
+						carCode := SessionDatabase.getCarCode(simulatorCode, getMultiMapValue(data, "Session", "Car"))
+						trackCode := SessionDatabase.getTrackCode(simulatorCode, getMultiMapValue(data, "Session", "Track"))
+
+						targetDirectory := (reportsDirectory . "\" . simulatorCode . "\" . carCode . "\" . trackCode . "\" . getMultiMapValue(data, "Session", "Time"))
+					}
+
+					DirCopy(kTempDirectory . "Race Report\Output", targetDirectory, 1)
 				}
-
-				removeMultiMapValue(data, "Laps", "Lap")
-				setMultiMapValue(data, "Laps", "Count", count)
-
-				setMultiMapValue(data, "Laps", "Pitstops", pitstops)
-
-				writeMultiMap(kTempDirectory . "Race Report\Output\Race.data", data)
-
-				if !targetDirectory {
-					sessionDB := SessionDatabase()
-
-					simulatorCode := sessionDB.getSimulatorCode(getMultiMapValue(data, "Session", "Simulator"))
-					carCode := sessionDB.getCarCode(simulatorCode, getMultiMapValue(data, "Session", "Car"))
-					trackCode := sessionDB.getCarCode(simulatorCode, getMultiMapValue(data, "Session", "Track"))
-
-					targetDirectory := (reportsDirectory . "\" . simulatorCode . "\" . carCode . "\" . trackCode . "\" . getMultiMapValue(data, "Session", "Time"))
-				}
-
-				DirCopy(kTempDirectory . "Race Report\Output", targetDirectory, 1)
 			}
 		}
 	}
@@ -705,82 +791,86 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 				reader.loadData(false, &raceData, &drivers, &positions, &times)
 
-				cars := getMultiMapValue(raceData, "Cars", "Count", 0)
-				driver := getMultiMapValue(raceData, "Cars", "Driver", 0)
-				laps := getMultiMapValue(raceData, "Laps", "Count", 0)
+				if (raceData.Count > 0) {
+					cars := getMultiMapValue(raceData, "Cars", "Count", 0)
+					driver := getMultiMapValue(raceData, "Cars", "Driver", 0)
+					laps := getMultiMapValue(raceData, "Laps", "Count", 0)
 
-				if (reader.getClasses(raceData, categories).Length > 1) {
-					class := reader.getClass(raceData, driver, categories)
+					if (reader.getClasses(raceData, categories).Length > 1) {
+						class := reader.getClass(raceData, driver, categories)
 
-					if class {
-						classCars := 0
-						classPositions := []
+						if class {
+							classCars := 0
+							classPositions := []
 
-						loop cars
-							if (reader.getClass(raceData, A_Index, categories) = class) {
-								classCars += 1
+							loop cars
+								if (reader.getClass(raceData, A_Index, categories) = class) {
+									classCars += 1
 
-								if laps
-									position := (positions[laps].Has(A_Index) ? positions[laps][A_Index] : cars)
-								else
-									position := cars
+									if laps
+										position := (positions[laps].Has(A_Index) ? positions[laps][A_Index] : cars)
+									else
+										position := cars
 
-								classPositions.Push(Array(A_Index, position))
+									classPositions.Push(Array(A_Index, position))
+								}
+
+							bubbleSort(&classPositions, comparePositions)
+
+							for car, candidate in classPositions {
+								if (car = 1)
+									leader := candidate[1]
+
+								if (candidate[1] = driver) {
+									position := car
+
+									break
+								}
 							}
 
-						bubbleSort(&classPositions, comparePositions)
+							if (position = cars)
+								position := classCars
 
-						for car, candidate in classPositions {
-							if (car = 1)
-								leader := candidate[1]
+							cars := classCars
+							multiClass := true
+						}
+					}
 
-							if (candidate[1] = driver) {
-								position := car
+					if !multiClass {
+						if laps
+							position := (positions[laps].Has(driver) ? positions[laps][driver] : cars)
+						else
+							position := cars
+
+						leader := 0
+
+						for car, candidate in positions[laps]
+							if (candidate = 1) {
+								leader := car
 
 								break
 							}
-						}
-
-						if (position = cars)
-							position := classCars
-
-						cars := classCars
-						multiClass := true
 					}
+
+					min := false
+					max := false
+					leaderAvgLapTime := false
+					stdDev := false
+
+					reader.getDriverPace(raceData, times, leader, &min, &max, &leaderAvgLapTime, &stdDev)
+
+					driverMinLapTime := false
+					driverMaxLapTime := false
+					driverAvgLapTime := false
+					driverLapTimeStdDev := false
+
+					reader.getDriverPace(raceData, times, driver, &driverMinLapTime, &driverMaxLapTime, &driverAvgLapTime, &driverLapTimeStdDev)
+
+					this.RaceAssistant["Ghost"].reviewRace(multiclass, cars, laps, position, leaderAvgLapTime
+														 , driverAvgLapTime, driverMinLapTime, driverMaxLapTime, driverLapTimeStdDev)
 				}
-
-				if !multiClass {
-					if laps
-						position := (positions[laps].Has(driver) ? positions[laps][driver] : cars)
-					else
-						position := cars
-
-					leader := 0
-
-					for car, candidate in positions[laps]
-						if (candidate = 1) {
-							leader := car
-
-							break
-						}
-				}
-
-				min := false
-				max := false
-				leaderAvgLapTime := false
-				stdDev := false
-
-				reader.getDriverPace(raceData, times, leader, &min, &max, &leaderAvgLapTime, &stdDev)
-
-				driverMinLapTime := false
-				driverMaxLapTime := false
-				driverAvgLapTime := false
-				driverLapTimeStdDev := false
-
-				reader.getDriverPace(raceData, times, driver, &driverMinLapTime, &driverMaxLapTime, &driverAvgLapTime, &driverLapTimeStdDev)
-
-				this.RaceAssistant["Ghost"].reviewRace(multiclass, cars, laps, position, leaderAvgLapTime
-													 , driverAvgLapTime, driverMinLapTime, driverMaxLapTime, driverLapTimeStdDev)
+				else
+					this.RaceAssistant["Ghost"].reviewRace(false, 0, 0, 0, 0, 0, 0, 0, 0)
 			}
 			catch Any as exception {
 				logError(exception)

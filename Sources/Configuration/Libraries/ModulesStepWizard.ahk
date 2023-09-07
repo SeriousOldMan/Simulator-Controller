@@ -175,7 +175,7 @@ class DefaultButtonBox extends NamedPreset {
 		return concatenate(super.getArguments(), Array(this.File))
 	}
 
-	install(wizard) {
+	install(wizard, edit := true) {
 		local file := this.iFile
 		local config, section, values, key, value
 
@@ -218,7 +218,7 @@ class DefaultStreamDeck extends NamedPreset {
 		return concatenate(super.getArguments(), Array(this.File))
 	}
 
-	install(wizard) {
+	install(wizard, edit := true) {
 		local file := this.iFile
 		local config, section, values, key, value
 
@@ -272,7 +272,7 @@ class FilesPreset extends NamedPreset {
 		return concatenate(super.getArguments(), this.Files)
 	}
 
-	install(wizard) {
+	install(wizard, edit := true) {
 		local directory := this.Directory
 		local ignore, file
 
@@ -305,14 +305,6 @@ class StreamDeckIcons extends FilesPreset {
 	}
 }
 
-class P2TConfiguration extends FilesPreset {
-	Directory {
-		Get {
-			return kUserConfigDirectory
-		}
-	}
-}
-
 class PitstopImages extends NamedPreset {
 	iDirectory := false
 
@@ -332,7 +324,7 @@ class PitstopImages extends NamedPreset {
 		return concatenate(super.getArguments(), Array(this.Directory))
 	}
 
-	install(wizard) {
+	install(wizard, edit := true) {
 		local directory := this.Directory
 		local name
 
@@ -373,6 +365,58 @@ class TeamServerAlwaysOn extends NamedPreset {
 	}
 }
 
+class ConfigurationPatch extends NamedPreset {
+	edit() {
+		try {
+			Run("notepad " . kUserHomeDirectory . "Setup\Configuration Patch.ini")
+		}
+		catch Any as exception {
+			logError(exception)
+		}
+	}
+
+	install(wizard, edit := true) {
+		local configuration
+
+		try {
+			if !FileExist(kUserHomeDirectory . "Setup\Configuration Patch.ini")
+				FileCopy(kResourcesDirectory . "Setup\Presets\Configuration Patch.ini", kUserHomeDirectory . "Setup", 1)
+			else {
+				configuration := FileRead(kUserHomeDirectory . "Setup\Configuration Patch.ini")
+
+				if (InStr(configuration, "// Using this file ") != 1) {
+					FileMove(kUserHomeDirectory . "Setup\Configuration Patch.ini", kUserHomeDirectory . "Setup\Configuration Patch.ini.bak", 1)
+					FileCopy(kResourcesDirectory . "Setup\Presets\Configuration Patch.ini", kUserHomeDirectory . "Setup", 1)
+					FileAppend("`n" . configuration, kUserHomeDirectory . "Setup\Configuration Patch.ini")
+				}
+			}
+		}
+		catch Any as exception {
+			logError(exception)
+		}
+
+		if edit
+			this.edit()
+	}
+
+	uninstall(wizard) {
+		deleteFile(kUserHomeDirectory . "Setup\Configuration Patch.ini")
+	}
+}
+
+class P2TConfiguration extends NamedPreset {
+	__New(name, *) {
+		super.__New(name)
+	}
+
+	install(wizard, edit := true) {
+	}
+
+	uninstall(wizard) {
+		deleteFile(kUserConfigDirectory . "P2T Configuration.ini")
+	}
+}
+
 class SetupPatch extends NamedPreset {
 	iFile := false
 
@@ -406,7 +450,7 @@ class SetupPatch extends NamedPreset {
 		}
 	}
 
-	install(wizard) {
+	install(wizard, edit := true) {
 		local file := this.File
 		local name
 
@@ -419,14 +463,21 @@ class SetupPatch extends NamedPreset {
 			logError(exception)
 		}
 
-		this.edit()
+		if edit
+			this.edit()
 	}
 
 	uninstall(wizard) {
-		local file := this.File
-		local name
+		local name, configuration
 
-		SplitPath(file, &name)
+		SplitPath(this.File, &name)
+
+		if ((name = "Configuration Patch.ini") && FileExist(kUserHomeDirectory . "Setup\Configuration Patch.ini")) {
+			configuration := FileRead(kUserHomeDirectory . "Setup\Configuration Patch.ini")
+
+			if (InStr(configuration, "// Using this file ") = 1)
+				return
+		}
 
 		deleteFile(kUserHomeDirectory . "Setup\" . name)
 	}
@@ -442,9 +493,11 @@ class ModulesStepWizard extends StepWizard {
 	iAvailablePresetsListView := false
 	iSelectedPresetsListView := false
 
+	iPresetsPage := false
+
 	Pages {
 		Get {
-			return Ceil(this.Definition.Length / 3) + 1
+			return (this.SetupWizard.QuickSetup ? 0 : (Ceil(this.Definition.Length / 3) + 1))
 		}
 	}
 
@@ -526,6 +579,8 @@ class ModulesStepWizard extends StepWizard {
 			this.updateSelectedModules()
 		}
 
+		this.iPresetsPage := (Ceil(definition.Length / 3) + 1)
+
 		loop definition.Length {
 			window.SetFont("s10 Bold", "Arial")
 
@@ -604,7 +659,7 @@ class ModulesStepWizard extends StepWizard {
 
 		widget7.document.write(html)
 
-		this.registerWidgets(this.Pages, widget1, widget2, widget3, widget4, widget5, widget6, widget7)
+		this.registerWidgets(this.iPresetsPage, widget1, widget2, widget3, widget4, widget5, widget6, widget7)
 	}
 
 	reset() {
@@ -616,7 +671,7 @@ class ModulesStepWizard extends StepWizard {
 	showPage(page) {
 		super.showPage(page)
 
-		if (page = this.Pages) {
+		if (page = this.iPresetsPage) {
 			this.loadAvailablePresets()
 			this.loadSelectedPresets()
 
@@ -665,12 +720,16 @@ class ModulesStepWizard extends StepWizard {
 				modulePresets := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules." . module . ".Presets", ""))
 
 				for ignore, preset in string2Values("|", modulePresets)
-					this.AvailablePresetsListView.Add("", getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . "." . getLanguage()))
+					if (getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . ".Active", true)
+					 && !getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . ".Deprecated", false))
+						this.AvailablePresetsListView.Add("", getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . "." . getLanguage()))
 			}
 		}
 
 		for ignore, preset in string2Values("|", substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets", "")))
-			this.AvailablePresetsListView.Add("", getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . "." . getLanguage()))
+			if (getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . ".Active", true)
+			 && !getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . ".Deprecated", false))
+				this.AvailablePresetsListView.Add("", getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . "." . getLanguage()))
 
 		this.AvailablePresetsListView.ModifyCol()
 		this.AvailablePresetsListView.ModifyCol(1, "AutoHdr")

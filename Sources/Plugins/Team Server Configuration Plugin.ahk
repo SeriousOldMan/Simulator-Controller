@@ -529,13 +529,13 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 		if !this.Initialized {
 			this.iInitialized := true
 
-			this.Window.Opt("+Disabled")
+			this.Window.Block()
 
 			try {
 				this.connect(true, true)
 			}
 			finally {
-				this.Window.Opt("-Disabled")
+				this.Window.Unblock()
 			}
 		}
 	}
@@ -766,7 +766,7 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 				try {
 					driver := this.parseObject(connector.GetDriver(identifier))
 
-					name := computeDriverName(driver.ForName, driver.SurName, driver.NickName)
+					name := driverName(driver.ForName, driver.SurName, driver.NickName)
 
 					if (StrLen(Trim(name)) = 0)
 						connector.DeleteDriver(identifier)
@@ -917,13 +917,13 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 	}
 
 	deleteTeam(name) {
-		this.Window.Opt("+Disabled")
+		this.Window.Block()
 
 		try {
 			this.Connector.DeleteTeam(this.Teams[name])
 		}
 		finally {
-			this.Window.Opt("-Disabled")
+			this.Window.Unblock()
 		}
 
 		this.loadTeams()
@@ -946,7 +946,7 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 
 		nickName := SubStr(nickName, 1, 3)
 
-		return computeDriverName(forName, surName, nickName)
+		return driverName(forName, surName, nickName)
 	}
 
 	addDriver(name) {
@@ -983,13 +983,13 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 	}
 
 	deleteDriver(name) {
-		this.Window.Opt("+Disabled")
+		this.Window.Block()
 
 		try {
 			this.Connector.DeleteDriver(this.Drivers[name])
 		}
 		finally {
-			this.Window.Opt("-Disabled")
+			this.Window.Unblock()
 		}
 
 		this.loadDrivers()
@@ -1015,13 +1015,13 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 	}
 
 	deleteSession(name) {
-		this.Window.Opt("+Disabled")
+		this.Window.Block()
 
 		try {
 			this.Connector.DeleteSession(this.Sessions[name])
 		}
 		finally {
-			this.Window.Opt("-Disabled")
+			this.Window.Unblock()
 		}
 
 		this.loadSessions()

@@ -373,14 +373,14 @@ void setPitstopTyrePressures(float pressures[4]) {
 	setTyrePressure(irsdk_PitCommand_RR, pressures[3]);
 }
 
-void pitstopSetValues(const irsdk_header* header, const char* data, char* arguments) {
+void pitstopSetValues(const irsdk_header* header, const char* data, const char* arguments) {
 	char service[64];
 	char valuesBuffer[64];
 	char* values = valuesBuffer;
 	size_t length = strcspn(arguments, ":");
 
-	substring((char*)arguments, service, 0, length);
-	substring((char*)arguments, values, length + 1, strlen(arguments) - length - 1);
+	substring(arguments, service, 0, length);
+	substring(arguments, values, length + 1, strlen(arguments) - length - 1);
 
 	if (strcmp(service, "Refuel") == 0)
 		setPitstopRefuelAmount(atof(values));
@@ -439,13 +439,13 @@ void changePitstopTyrePressure(const irsdk_header* header, char* tyre, float pre
 		changePitstopTyrePressure(header, irsdk_PitCommand_RR, "PitSvRRP", pressureDelta);
 }
 
-void pitstopChangeValues(const irsdk_header* header, const char* data, char* arguments) {
+void pitstopChangeValues(const irsdk_header* header, const char* data, const char* arguments) {
 	char service[64];
 	char values[64];
 	size_t length = strcspn(arguments, ":");
 
-	substring((char*)arguments, service, 0, length);
-	substring((char*)arguments, values, length + 1, strlen(arguments) - length - 1);
+	substring(arguments, service, 0, length);
+	substring(arguments, values, length + 1, strlen(arguments) - length - 1);
 
 	if (strcmp(service, "Refuel") == 0)
 		changePitstopRefuelAmount(header, data, atof(values));
@@ -603,7 +603,7 @@ void writePositions(const irsdk_header *header, const char* data)
 
 				getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:CarIdx:{%s}LapsComplete:", sessionID, carIdx);
 
-				printf("Car.%s.Lap=%s\n", carIdx1, result);
+				printf("Car.%s.Laps=%s\n", carIdx1, result);
 
 				getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:CarIdx:{%s}LastTime:", sessionID, carIdx);
 				
@@ -942,6 +942,9 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 
 			printf("[Track Data]\n");
 
+			if (getYamlValue(result, sessionInfo, "WeekendInfo:TrackLength:"))
+				printf("Length=%f\n", atof(result) * 1000);
+
 			if (getDataValue(result, header, data, "TrackTemp"))
 				printf("Temperature=%f\n", atof(result));
 			else if (getYamlValue(result, sessionInfo, "WeekendInfo:TrackSurfaceTemp:")) {
@@ -1062,16 +1065,26 @@ void loadTrackCoordinates(char* fileName) {
 	}
 }
 
+std::string getArgument(std::string request, std::string key) {
+	if (request.rfind(key + "=") == 0)
+		return request.substr(key.length() + 1, request.length() - (key.length() + 1)).c_str();
+	else
+		return "";
+}
+
+std::string getArgument(char* request, std::string key) {
+	return getArgument(std::string(request), key);
+}
+
 int main(int argc, char* argv[])
 {
-	loadTrackCoordinates("D:\\Dateien\\Dokumente\\Simulator Controller\\Database\\User\\Tracks\\IRC\\oulton international.data");
-	hasTrackCoordinates = true;
-	if (argc > 1) {
-		if (strcmp(argv[1], "-Track") == 0) {
-			loadTrackCoordinates(argv[2]);
+	char* request = (argc > 1) ? argv[1] : "";
+	std::string argument = getArgument(request, "Track");
 
-			hasTrackCoordinates = true;
-		}
+	if (argument != "") {
+		loadTrackCoordinates(argv[2]);
+
+		hasTrackCoordinates = true;
 	}
 
 	// bump priority up so we get time from the sim
@@ -1098,25 +1111,29 @@ int main(int argc, char* argv[])
 					continue;
 				}
 				
-				if ((argc > 2) && (strcmp(argv[1], "-Pitstop") == 0)) {
-					if (strcmp(argv[2], "Set") == 0)
-						pitstopSetValues(pHeader, g_data, argv[3]);
-					else if (strcmp(argv[2], "Change") == 0)
-						pitstopChangeValues(pHeader, g_data, argv[3]);
+				argument = getArgument(request, "Pitstop");
+
+				if (argument != "") {
+					argument = getArgument(argument, "Set");
+
+					if (argument != "")
+						pitstopSetValues(pHeader, g_data, argument.c_str());
+					else {
+						argument = getArgument(getArgument(request, "Pitstop"), "Change");
+
+						if (argument != "")
+							pitstopChangeValues(pHeader, g_data, argument.c_str());
+					}
 				}
 				else {
-					bool writeStandings = ((argc > 1) && (strcmp(argv[1], "-Standings") == 0));
-					bool writeTelemetry = !writeStandings;
-					bool writeSetup = ((argc == 2) && (strcmp(argv[1], "-Setup") == 0));
-
-					writeTelemetry = true;
-					writeStandings = !writeSetup;
-
-					if (writeStandings)
-						writePositions(pHeader, g_data);
-
-					if (writeTelemetry)
-						writeData(pHeader, g_data, writeSetup);
+					if (getArgument(request, "Setup") != "")
+						writeData(pHeader, g_data, true);
+					else {
+						if (getArgument(request, "Standings") != "")
+							writePositions(pHeader, g_data);
+						else
+							writeData(pHeader, g_data, false);
+					}
 				}
 
 				break;

@@ -84,6 +84,12 @@ Simulataor Controller is a modular software and consists of many functions, whic
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Simulator%20Controller%20Menu.JPG)
 
+### Fixing problems
+
+Windows is an operating system with many, and sometimes confusing, security features. In many situations, Windows will prevent execution of executables and DLLs, which have been downloaded from an *unknown* location. This can be prevented by digitally signing those files, but this comes with some cost and is therefore not an option for free Open Source software.
+
+If you encounter problems during runtime, for example, that application cannot be started or that voice commands cannot be registered, this can be due to WIndows preventing the execution of components of Simulator Controller, especially, if you have downloaded the software as a ZIP and installed it manually. In this case start "Simulator Setup" and unblock the files following the instructions on the second page of the wizard, or start "Simulator Startup" while holding down the Control together with the Shift key. In both cases, the software will elevate the priviliges (you will be asked to run the software in Admin mode) and the runtime components will be unblocked.
+
 ### Voice Commands
 
 The Simulator Controller framework supports a sophisticated natural language interface. This capability is used by the Race Assistants Jona and Cato, thereby allowing a fully voice enabled dialog between you and these Assistants, but the voice recognition can also be used to control parts of your controller hardware by voice commands.
@@ -94,9 +100,11 @@ Important: In order to reduce confusion of an activation command with a normal c
 
 #### Push-To-Talk Behaviour
 
-Beside the behaviour of the Push-To-Talk button described above, where you need to hold down the button as long as your are talking, there is an alternative mode available. This mode allows you to release the button while you are talking. Once, you have finished your voice command, you press the Push-2-Talk button again, to indicate that you have finished and that the command should be executed. This alternative mode can be activated either by choosing the corresponding preset in "Simulator Setup" or by copying the file "P2T Configuration.ini" from the *Resources\Templates* directory from the program folder to the *Simulator Controller\Config* directory which resides in your user *Documents* folder.
+Beside the behaviour of the *Push To Talk* button described above, where you need to hold down the button as long as your are talking, there is an alternative mode available. This mode allows you to release the button while you are talking. Once, you have finished your voice command, you press the *Push To Talk* button again, to indicate that you have finished and that the command should be executed. This alternative mode can be enabled [voice control configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control).
 
-Please don't forget to press the Push-To-Talk button at the end of your speech, even, if the command had already been recognized, because you made a long pause. If you don't push the button, the sequence will get out of sync and you will end up being very confused.
+Good to know: You can also alter the speed for the two clicks or presses (Windows default is 500 ms) in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration).
+	
+Please don't forget to press the *Push To Talk* button at the end of your speech, even, if the command had already been recognized, because you made a long pause. If you don't push the button, the sequence will get out of sync and you will end up being very confused.
 
 #### Testing voice configuration and voice commands
 
@@ -108,7 +116,7 @@ Please don't forget to press the Push-To-Talk button at the end of your speech, 
 
 	D:\Controller\Binaries>"Race Strategist.exe" -Debug true -Speaker true -Listener true -language EN -Name Cato -Logo true
 	
-Both, the Virtual Race Engineer and the Virtual Race Strategist will start up and will listen to your commands (Jona will be a german personality, while Cato will use English to talk with you). Please note, that if you configured [Push To Talk](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) in the configuration, you need to hold the respective button, while talking. Since no simulation will be running during your test, the functionality of Jona und Cato will be quite restricted, but you may switch between those Assistants using the activation phrase and you may ask some questions like "Is rain ahead?" or "Wird es regnen?". You may also start the Virtual Race Spotter here, but this will be of no big use, since the Spotter does not answer many questions.
+Both, the Virtual Race Engineer and the Virtual Race Strategist will start up and will listen to your commands (Jona will be a german personality, while Cato will use English to talk with you). Please note, that if you configured [*Push To Talk*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) in the configuration, you need to hold the respective button, while talking. Since no simulation will be running during your test, the functionality of Jona und Cato will be quite restricted, but you may switch between those Assistants using the activation phrase and you may ask some questions like "Is rain ahead?" or "Wird es regnen?". You may also start the Virtual Race Spotter here, but this will be of no big use, since the Spotter does not answer many questions.
 
 Note: If there is only *one* dialog partner configured, this will be activated for listen mode by default. In this situation, no activation command is necesssary.
 
@@ -142,7 +150,7 @@ There is also the possibility to trigger actions in Simulator Controller from ot
 
 2. Command scripts
 
-   Not every application can easily send keyboard commands to other applications, for example Windows .BAT or .CMD scripts. A second method exists therefore, that uses a script file as an interface. You can create a file named "Controller.cmd" in the *Simulator Controller\Temp* folder which resides in your user *Documents* folder. This file is checked every 100 ms, and if it is not empty, it will be processed and afterwards deleted. Here is in example for a "Controller.cmd":
+   Not every application can easily send keyboard commands to other applications, for example Windows .BAT or .CMD scripts. A second method exists therefore, that uses a script file as an interface. You can create a file named "Controller.cmd" in the *Simulator Controller\Temp* folder which resides in your user *Documents* folder. This file is checked every 100 ms, and if it is not empty, it will be processed and afterwards truncated. Here is in example for a "Controller.cmd":
    
 	2WayToggle.1 On
 	Button.1
@@ -155,14 +163,25 @@ There is also the possibility to trigger actions in Simulator Controller from ot
 
 ### Audio Routing
 
-Simulator Controller allows you to direct voice output to different audio devices, as long as the additional software [SoX](http://sox.sourceforge.net/) is installed and configured. This is mainly of interest to those of you, who are streaming their races, or when you want maximum immersion by directing car sound to a 5.1 sound system, but the assistant voices to your headphone. Since this if not of widespread use, there is no user interface to configure this, but a simple text file. If you want to configure your audio routing, create a text file with the name "Audio Settings.ini" and place it in the *Config* folder which is located in your user *Documents* folder. Open it with a text editor and enter the following content:
+Simulator Controller allows you to direct sound output (for example the voices of the different Race Assistants) to different audio devices, as long as the additional software [SoX](http://sox.sourceforge.net/) is installed and configured. This is mainly of interest to those of you, who are streaming their races, or when you want maximum immersion by directing car sound to a 5.1 sound system, but the assistant voices to your headphone. Since this if not of widespread use, there is no user interface to configure this. Instead, a simple text file is used. If you want to configure your audio routing, create a text file with the name "Audio Settings.ini" and place it in the *Simulator Controller\Config* folder which is located in your user *Documents* folder. Open it with a text editor and enter the following content:
 
 	[Output]
 	Race Spotter.AudioDevice=Headphone
 	Race Engineer.AudioDevice=Headphone
 	Race Strategist.AudioDevice=Headphone
 
-*Headphone* is only an example for any configured audio device which is named "Headphone" in the standard Windows settings. You only have to enter those lines, where you want to configure a non-default audio device, if not present the currently selected default audio device will be used.
+Supported output routes are:
+
+| Route           | Description                                                                                                          |
+|-----------------|----------------------------------------------------------------------------------------------------------------------|
+| Activation      | The short acknowledge sound, when the Push-2-Talk button is pressed.                                                 |
+| Race Spotter    | All voice output by the Race Spotter.                                                                                |
+| Race Engineer   | All voice output by the Race Engineer.                                                                               |
+| Race Strategist | All voice output by the Race Strategist.                                                                             |
+| Controller      | The short acknowledge sound, when the Controller itself received a voice command or was activated for voice control. |
+| Analyzer        | The feedback sound of the Telemetry Analyzer for over- or understeer handling events.                                |
+
+*Headphone* is only an example for any configured audio device which is named "Headphone" in the standard Windows settings. You only have to enter those lines, where you want to configure a non-default audio device. If nothing is configured here, the currently in the Windows settings selected default audio device will be used.
 
 As you might expect, you can configure voice input as well. There are some additional things to consider, though, as you can see in the example below.
 
@@ -174,11 +193,22 @@ As you might expect, you can configure voice input as well. There are some addit
 	Race Strategist.AudioDevice=Headphone
 	Controller.AudioDevice=Headphone
 
-First you have to identify the default audio input device, which should be active whenever no voice input is captured by Simulator Controller (i.e. the Push-To-Talk button is not activated). This may be important, when you are using different microphones, for example, because you are streaming your race on a video platform. In the example above, this microphone device is named "Streaming". This setting must be identical to that you have chosen in the Windows settings, otherwise you won't get the desired results.
+Supported input routes are:
 
-After defining the default input device, you can configure the voice input devices for all Simulator Controller dialog partners, first and foremost the Race Assistants. A special listener is the *Activation* object, which listens to the activation phrases, as you might expect. Typically you will use here the same input device here, you use to talk to the Assistants. Additionally, if you are using voice commands to trigger actions in Simulator Controller, for example switching between track automations, you can also set the input audio device for the *Controller* object as well.
- 
-Similar to the output settings shown above, you only have to enter those audio devices, which differ from the default audio device. Please note, that changing the input audio device is only supported when the additional software [NirCmd](https://www.nirsoft.net/utils/nircmd.html) is installed and configured.
+| Route           | Description                                                                                                          |
+|-----------------|----------------------------------------------------------------------------------------------------------------------|
+| Default         | Default audio input device, which should be active whenever no voice input is captured by Simulator Controller.      |
+| Activation      | Listens to the activation phrases, as you might expect. Typically you will use here the same input device here, you use to talk to the Assistants. |
+| Race Spotter    | All voice input for the Race Spotter.                                                                                |
+| Race Engineer   | All voice output for the Race Engineer.                                                                              |
+| Race Strategist | All voice output for the Race Strategist.                                                                            |
+| Controller      | Listens to the voice commands directly issued to the Controller, for example to switch between track automations.    |
+
+First you **have to identify** the default audio input device, which should be active whenever no voice input is captured by Simulator Controller (i.e. the *Push To Talk* button is not activated). This may be important, when you are using different microphones, for example, because you are streaming your race on a video platform. In the example above, this microphone device is named "Streaming". This setting must be identical to that you have chosen in the Windows settings, otherwise you won't get the desired results.
+
+All other input routes are typically set to the same input device, normally the microphone of your headset. Don't be confused here, because, similar to the output settings shown above, you only have to enter those audio devices, which differ from the default audio device. Please note, that changing the input audio device is only supported when the additional software [NirCmd](https://www.nirsoft.net/utils/nircmd.html) is installed and configured.
+
+A final note here: Make sure, that all your audio devices are named differently, even when they belong to the same type of equipment, for example a headset. Otherwise you will have unwanted effects. Example: Name the speakers of your headset "HeadsetSpeaker" and the microphone of your headset "HeadsetMic" in your Windows sound settings. Doing this you can activate them seperately.
 
 ## Keyboard shortcuts & modifiers
 

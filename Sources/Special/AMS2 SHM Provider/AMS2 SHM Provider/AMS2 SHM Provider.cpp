@@ -91,6 +91,17 @@ void substring(char s[], char sub[], int p, int l) {
 	sub[c] = '\0';
 }
 
+std::string getArgument(std::string request, std::string key) {
+	if (request.rfind(key + "=") == 0)
+		return request.substr(key.length() + 1, request.length() - (key.length() + 1)).c_str();
+	else
+		return "";
+}
+
+std::string getArgument(char* request, std::string key) {
+	return getArgument(std::string(request), key);
+}
+
 int main(int argc, char* argv[]) {
 	// Open the memory-mapped file
 	HANDLE fileHandle = OpenFileMappingA(PAGE_READONLY, FALSE, MAP_OBJECT_NAME);
@@ -136,7 +147,7 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
-	bool writeStandings = ((argc > 1) && (strcmp(argv[1], "-Standings") == 0));
+	bool writeStandings = ((argc > 1) && (getArgument(argv[1], "Standings") != ""));
 	bool writeTelemetry = !writeStandings;
 
 	writeTelemetry = true;
@@ -152,6 +163,7 @@ int main(int argc, char* argv[]) {
 		}
 
 		if (fileHandle == NULL) {
+			printf("Active=false\n");
 			printf("Car.Count=0\n");
 			printf("Driver.Car=0\n");
 		}
@@ -165,7 +177,7 @@ int main(int argc, char* argv[]) {
 				printf("Car.%d.Nr=%d\n", i, i);
 				printf("Car.%d.Class=%s\n", i, localCopy->mCarClassNames[i - 1]);
 				printf("Car.%d.Position=%d\n", i, vehicle.mRacePosition);
-				printf("Car.%d.Lap=%d\n", i, vehicle.mLapsCompleted);
+				printf("Car.%d.Laps=%d\n", i, vehicle.mLapsCompleted);
 				printf("Car.%d.Lap.Running=%f\n", i, vehicle.mCurrentLapDistance / localCopy->mTrackLength);
 				printf("Car.%d.Lap.Running.Valid=%s\n", i, localCopy->mLapsInvalidated[i - 1] ? "false" : "true");
 				printf("Car.%d.Time=%ld\n", i, (long)(localCopy->mLastLapTimes[i - 1] * 1000));
@@ -214,7 +226,7 @@ int main(int argc, char* argv[]) {
 		}
 
 		printf("Active=true\n");
-		printf("Paused=%s\n", (localCopy->mGameState == GAME_INGAME_PAUSED) ? "true" : "false");
+		printf("Paused=%s\n", ((localCopy->mGameState == GAME_INGAME_PLAYING) || (localCopy->mGameState == GAME_INGAME_INMENU_TIME_TICKING)) ? "false" : "true");
 
 		if (localCopy->mSessionState != SESSION_PRACTICE && localCopy->mLapsInEvent > 0 &&
 			(localCopy->mLapsInEvent - localCopy->mParticipantInfo[localCopy->mViewedParticipantIndex].mLapsCompleted) <= 0)
@@ -273,6 +285,44 @@ int main(int argc, char* argv[]) {
 			localCopy->mTyreTemp[TYRE_REAR_LEFT],
 			localCopy->mTyreTemp[TYRE_REAR_RIGHT]);
 
+		if (localCopy->mVersion < SHARED_MEMORY_VERSION) {
+			printf("TyreInnerTemperature=%f,%f,%f,%f\n", localCopy->mTyreTreadTemp[TYRE_FRONT_LEFT] - 272.15,
+				localCopy->mTyreTreadTemp[TYRE_FRONT_RIGHT] - 272.15,
+				localCopy->mTyreTreadTemp[TYRE_REAR_LEFT] - 272.15,
+				localCopy->mTyreTreadTemp[TYRE_REAR_RIGHT] - 272.15);
+
+			printf("TyreMiddleTemperature=%f,%f,%f,%f\n", localCopy->mTyreTreadTemp[TYRE_FRONT_LEFT] - 272.15,
+				localCopy->mTyreTreadTemp[TYRE_FRONT_RIGHT] - 272.15,
+				localCopy->mTyreTreadTemp[TYRE_REAR_LEFT] - 272.15,
+				localCopy->mTyreTreadTemp[TYRE_REAR_RIGHT] - 272.15);
+
+			printf("TyreOuterTemperature=%f,%f,%f,%f\n", localCopy->mTyreTreadTemp[TYRE_FRONT_LEFT] - 272.15,
+				localCopy->mTyreTreadTemp[TYRE_FRONT_RIGHT] - 272.15,
+				localCopy->mTyreTreadTemp[TYRE_REAR_LEFT] - 272.15,
+				localCopy->mTyreTreadTemp[TYRE_REAR_RIGHT] - 272.15);
+		}
+		else {
+			printf("TyreCompoundRawFL=%s\n", localCopy->mTyreCompound[TYRE_FRONT_LEFT]);
+			printf("TyreCompoundRawFR=%s\n", localCopy->mTyreCompound[TYRE_FRONT_RIGHT]);
+			printf("TyreCompoundRawRL=%s\n", localCopy->mTyreCompound[TYRE_REAR_LEFT]);
+			printf("TyreCompoundRawRR=%s\n", localCopy->mTyreCompound[TYRE_REAR_RIGHT]);
+
+			printf("TyreInnerTemperature=%f,%f,%f,%f\n", localCopy->mTyreTempRight[TYRE_FRONT_LEFT],
+				localCopy->mTyreTempLeft[TYRE_FRONT_RIGHT],
+				localCopy->mTyreTempRight[TYRE_REAR_LEFT],
+				localCopy->mTyreTempLeft[TYRE_REAR_RIGHT]);
+
+			printf("TyreMiddleTemperature=%f,%f,%f,%f\n", localCopy->mTyreTempCenter[TYRE_FRONT_LEFT],
+				localCopy->mTyreTempCenter[TYRE_FRONT_RIGHT],
+				localCopy->mTyreTempCenter[TYRE_REAR_LEFT],
+				localCopy->mTyreTempCenter[TYRE_REAR_RIGHT]);
+
+			printf("TyreOuterTemperature=%f,%f,%f,%f\n", localCopy->mTyreTempLeft[TYRE_FRONT_LEFT],
+				localCopy->mTyreTempRight[TYRE_FRONT_RIGHT],
+				localCopy->mTyreTempLeft[TYRE_REAR_LEFT],
+				localCopy->mTyreTempRight[TYRE_REAR_RIGHT]);
+		}
+
 		printf("TyrePressure=%f,%f,%f,%f\n", localCopy->mAirPressure[TYRE_FRONT_LEFT] / 10,
 			localCopy->mAirPressure[TYRE_FRONT_RIGHT] / 10,
 			localCopy->mAirPressure[TYRE_REAR_LEFT] / 10,
@@ -320,6 +370,8 @@ int main(int argc, char* argv[]) {
 			printf("DriverNickname=%s\n", "");
 		}
 
+		printf("Position=%ld\n", (long)localCopy->mParticipantInfo[localCopy->mViewedParticipantIndex].mRacePosition);
+
 		printf("LapValid=%s\n", localCopy->mLapInvalidated ? "false" : "true");
 
 		printf("LapLastTime=%ld\n", (long)(normalize(localCopy->mLastLapTime) * 1000));
@@ -349,6 +401,7 @@ int main(int argc, char* argv[]) {
 		printf("InPit=%s\n", (localCopy->mPitMode == PIT_MODE_IN_PIT) ? "true" : "false");
 
 		printf("[Track Data]\n");
+		printf("Length=%f\n", localCopy->mTrackLength);
 		printf("Temperature=%f\n", localCopy->mTrackTemperature);
 		printf("Grip=Optimum\n");
 

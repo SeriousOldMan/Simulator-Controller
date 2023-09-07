@@ -19,6 +19,7 @@
 
 global kSystemPlugin := "System"
 global kLaunchMode := "Launch"
+global kCustomMode := "Custom"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -103,6 +104,22 @@ class SystemPlugin extends ControllerPlugin {
 		}
 	}
 
+	class CustomMode extends ControllerMode {
+		iMode := false
+
+		Mode {
+			Get {
+				return this.iMode
+			}
+		}
+
+		__New(plugin, mode := kCustomMode) {
+			this.iMode := mode
+
+			super.__New(plugin)
+		}
+	}
+
 	class ModeSelectorAction extends ControllerAction {
 		Label {
 			Get {
@@ -171,6 +188,26 @@ class SystemPlugin extends ControllerPlugin {
 		}
 	}
 
+	class CustomAction extends ControllerAction {
+		iCustomFunction := false
+
+		CustomFunction {
+			Get {
+				return this.iCustomFunction
+			}
+		}
+
+		__New(function, label, icon, customFunction) {
+			this.iCustomFunction := customFunction
+
+			super.__New(function, label, icon)
+		}
+
+		fireAction(function, trigger) {
+			function.Controller.fireActions(this.CustomFunction, "Call")
+		}
+	}
+
 	class LogoToggleAction extends ControllerAction {
 		iLogoIsVisible := false
 
@@ -210,7 +247,7 @@ class SystemPlugin extends ControllerPlugin {
 	}
 
 	__New(controller, name, configuration := false, register := true) {
-		local function, action, ignore, descriptor, arguments
+		local function, action, ignore, descriptor, arguments, commands, mode, modeCommands
 
 		if inList(A_Args, "-Startup")
 			this.iChildProcess := true
@@ -235,6 +272,21 @@ class SystemPlugin extends ControllerPlugin {
 
 			for ignore, arguments in string2Values(",", this.getArgumentValue("launchApplications", ""))
 				this.createLaunchAction(controller, this.parseValues(A_Space, arguments)*)
+
+			for ignore, commands in string2Values("|", this.getArgumentValue("customCommands", ""))
+				if InStr(commands, "->") {
+					commands := string2Values("->", commands)
+
+					mode := SystemPlugin.CustomMode(this, commands[1])
+
+					for ignore, arguments in string2Values(",", commands[2])
+						this.createCustomAction(controller, mode, this.parseValues(A_Space, arguments)*)
+
+					this.registerMode(mode)
+				}
+				else
+					for ignore, arguments in string2Values(",", commands)
+						this.createCustomAction(controller, this, this.parseValues(A_Space, arguments)*)
 
 			descriptor := this.getArgumentValue("logo", false)
 
@@ -331,6 +383,20 @@ class SystemPlugin extends ControllerPlugin {
 		}
 		else
 			logMessage(kLogWarn, translate("Application ") . application . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
+	}
+
+	createCustomAction(controller, owner, label, descriptor, customDescriptor) {
+		local function, customFunction, action
+
+		function := this.Controller.findFunction(descriptor)
+		customFunction := this.Controller.findFunction(customDescriptor)
+
+		if !function
+			this.logFunctionNotFound(descriptor)
+		else if (!customFunction || !isInstance(customFunction, ControllerCustomFunction))
+			this.logFunctionNotFound(customDescriptor)
+		else
+			owner.registerAction(SystemPlugin.CustomAction(function, label, this.getIcon("Custom.Activate"), customFunction))
 	}
 
 	writePluginState(configuration) {
@@ -477,6 +543,8 @@ restoreSimulatorVolume() {
 			}
 		}
 		catch Any as exception {
+			logError(exception, true)
+
 			showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
 					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 		}
@@ -498,6 +566,8 @@ muteSimulator() {
 				Run("`"" . kNirCmd . "`" setappvolume /" . pid . " 0.0")
 			}
 			catch Any as exception {
+				logError(exception, true)
+
 				showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
@@ -671,6 +741,8 @@ execute(command) {
 		Run(substituteVariables(command))
 	}
 	catch Any as exception {
+		logError(exception, true)
+
 		logMessage(kLogWarn, substituteVariables(translate("Cannot execute command (%command%) - please check the configuration"), {command: command}))
 	}
 }
@@ -700,8 +772,52 @@ trigger(hotkeys, method := "Event") {
 			}
 		}
 		catch Any as exception {
+			logError(exception, true)
+
 			logMessage(kLogWarn, substituteVariables(translate("Cannot send command (%hotkey%) - please check the configuration"), {command: theHotkey}))
 		}
+}
+
+mouse(button, x, y, count := 1, window := false) {
+	local curCoordMode := A_CoordModeMouse
+
+	CoordMode("Mouse", window ? "Window" : "Screen")
+
+	try {
+		if (window && WinExist(window))
+			WinActivate(window)
+
+		MouseClick(button, x, y, count)
+	}
+	catch Any as exception {
+		logError(exception, true)
+	}
+	finally {
+		CoordMode("Mouse", curCoordMode)
+	}
+}
+
+invoke(target, method, arguments*) {
+	local command
+
+	try {
+		if ((target = "Controller") || (target = "Simulator Controller"))
+			ObjBindMethod(SimulatorController.Instance, method).Call(arguments*)
+		else if InStr(target, ".") {
+			target := ConfigurationItem.splitDescriptor(target)
+
+			ObjBindMethod(SimulatorController.Instance.findMode(target[1], target[2]), method).Call(arguments*)
+		}
+		else
+			ObjBindMethod(SimulatorController.Instance.findPlugin(target), method).Call(arguments*)
+	}
+	catch Any as exception {
+		logError(exception, true)
+
+		command := ("invoke(" . values2String(", ", target, method, arguments*) . ")")
+
+		logMessage(kLogWarn, substituteVariables(translate("Cannot execute command (%command%) - please check the configuration"), {command: command}))
+	}
 }
 
 startSimulation(name := false) {
@@ -729,8 +845,6 @@ stopSimulation() {
 
 shutdownSystem() {
 	local msgResult
-
-	SoundPlay("*32")
 
 	OnMessage(0x44, translateYesNoButtons)
 	msgResult := MsgBox(translate("Shutdown Simulator?"), translate("Shutdown"), 262436)

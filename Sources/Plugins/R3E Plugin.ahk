@@ -118,20 +118,20 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 		selectActions := []
 	}
 
-	simulatorStartup(simulator) {
-		loadDatabase() {
-			local data
+	static loadDatabase() {
+		local data
 
-			if !R3EPlugin.sCarDB {
-				data := JSON.parse(FileRead(kResourcesDirectory . "Simulator Data\R3E\r3e-data.json"))
+		if !R3EPlugin.sCarDB {
+			data := JSON.parse(FileRead(kResourcesDirectory . "Simulator Data\R3E\r3e-data.json"))
 
-				R3EPlugin.sCarDB := data["cars"]
-				R3EPlugin.sClassDB := data["classes"]
-			}
+			R3EPlugin.sClassDB := data["classes"]
+			R3EPlugin.sCarDB := data["cars"]
 		}
+	}
 
+	simulatorStartup(simulator) {
 		if (simulator = kR3EApplication)
-			Task.startTask(loadDatabase, 1000, kLowPriority)
+			Task.startTask(ObjBindMethod(R3EPlugin, "loadDatabase"), 1000, kLowPriority)
 
 		super.simulatorStartup(simulator)
 	}
@@ -299,7 +299,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 			}
 		}
 		else {
-			pitMenuState := getMultiMapValues(readSimulatorData(this.Code), "Pit Menu State")
+			pitMenuState := getMultiMapValues(callSimulator(this.Code), "Pit Menu State=true")
 
 			if (pitMenuState["Strategy"] != "Unavailable") {
 				this.iPitstopOptions.Push("Strategy")
@@ -649,11 +649,8 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 		static lastCarID := false
 		static lastCarName := false
 
-		if !R3EPlugin.sCarDB {
-			data := JSON.parse(FileRead(kResourcesDirectory . "Simulator Data\R3E\r3e-data.json"))
-
-			R3EPlugin.sCarDB := data["cars"]
-		}
+		if !R3EPlugin.sCarDB
+			R3EPlugin.loadDatabase()
 
 		if (carID != lastCarID) {
 			carDB := R3EPlugin.sCarDB
@@ -666,16 +663,13 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	getClassName(classID) {
-		local classDB, data := R3EPlugin.sClassDB
+		local classDB
 
 		static lastClassID := false
 		static lastClassName := false
 
-		if !R3EPlugin.sCarDB {
-			data := JSON.parse(FileRead(kResourcesDirectory . "Simulator Data\R3E\r3e-data.json"))
-
-			R3EPlugin.sClassDB := data["classes"]
-		}
+		if !R3EPlugin.sClassDB
+			R3EPlugin.loadDatabase()
 
 		if (classID != lastClassID) {
 			classDB := R3EPlugin.sClassDB

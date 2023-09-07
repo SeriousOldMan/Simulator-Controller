@@ -210,7 +210,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 	static connected
 	static keepAliveTask := false
 
-	static serverURL, serverToken, teamName, driverName, sessionName, teamIdentifier, driverIdentifier, sessionIdentifier
+	static serverURL, serverToken, teamName, theDriverName, sessionName, teamIdentifier, driverIdentifier, sessionIdentifier
 
 	static teams := CaseInsenseMap()
 	static drivers := CaseInsenseMap()
@@ -253,7 +253,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 	loadDrivers(connector, team) {
 		local drivers := CaseInsenseMap()
-		local identifiers, ignore, identifier, driver, name
+		local identifiers, ignore, identifier, driver
 
 		if team {
 			try {
@@ -266,9 +266,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 			for ignore, identifier in identifiers {
 				driver := parseObject(connector.GetDriver(identifier))
 
-				name := computeDriverName(driver["ForName"], driver["SurName"], driver["NickName"])
-
-				drivers[name] := driver["Identifier"]
+				drivers[driverName(driver["ForName"], driver["SurName"], driver["NickName"])] := driver["Identifier"]
 			}
 		}
 
@@ -413,6 +411,8 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 			Run("`"" . exePath . "`" " . options, kBinariesDirectory, , &pid)
 		}
 		catch Any as exception {
+			logError(exception, true)
+
 			logMessage(kLogCritical, translate("Cannot start the Session Database tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
 
 			showMessage(substituteVariables(translate("Cannot start the Session Database tool (%exePath%) - please check the configuration..."), {exePath: exePath})
@@ -690,12 +690,12 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 					chosen := 1
 
 				if (chosen == 0) {
-					driverName := ""
+					theDriverName := ""
 					driverIdentifier := false
 				}
 				else {
-					driverName := names[chosen]
-					driverIdentifier := drivers[driverName]
+					theDriverName := names[chosen]
+					driverIdentifier := drivers[theDriverName]
 				}
 
 				settingsGui["driverDropDownMenu"].Delete()
@@ -735,11 +735,11 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 			}
 			else if (arguments[1] == "Driver") {
 				if ((drivers.Count > 0) || (settingsGui["driverDropDownMenu"].Value = 0)) {
-					driverName := getKeys(drivers)[settingsGui["driverDropDownMenu"].Value]
-					driverIdentifier := drivers[driverName]
+					theDriverName := getKeys(drivers)[settingsGui["driverDropDownMenu"].Value]
+					driverIdentifier := drivers[theDriverName]
 				}
 				else {
-					driverName := ""
+					theDriverName := ""
 					driverIdentifier := false
 				}
 			}
@@ -760,7 +760,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		if connector {
 			if GetKeyState("Ctrl", "P") {
-				settingsGui.Opt("+Disabled")
+				settingsGui.Block()
 
 				try {
 					token := loginDialog(connector, serverURL, settingsGui)
@@ -774,7 +774,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 						return
 				}
 				finally {
-					settingsGui.Opt("-Disabled")
+					settingsGui.Unblock()
 				}
 			}
 
@@ -958,7 +958,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 			setMultiMapValue(newSettings, "Team Settings", "Server.URL", settingsGui["serverURLEdit"].Text)
 			setMultiMapValue(newSettings, "Team Settings", "Server.Token", settingsGui["serverTokenEdit"].Text)
 			setMultiMapValue(newSettings, "Team Settings", "Team.Name", teamName)
-			setMultiMapValue(newSettings, "Team Settings", "Driver.Name", driverName)
+			setMultiMapValue(newSettings, "Team Settings", "Driver.Name", theDriverName)
 			setMultiMapValue(newSettings, "Team Settings", "Session.Name", sessionName)
 			setMultiMapValue(newSettings, "Team Settings", "Team.Identifier", teamIdentifier)
 			setMultiMapValue(newSettings, "Team Settings", "Driver.Identifier", driverIdentifier)
@@ -1418,7 +1418,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 			serverToken := getMultiMapValue(settingsOrCommand, "Team Settings", "Server.Token", "")
 			teamName := getMultiMapValue(settingsOrCommand, "Team Settings", "Team.Name", "")
 			teamIdentifier := getMultiMapValue(settingsOrCommand, "Team Settings", "Team.Identifier", false)
-			driverName := getMultiMapValue(settingsOrCommand, "Team Settings", "Driver.Name", "")
+			theDriverName := getMultiMapValue(settingsOrCommand, "Team Settings", "Driver.Name", "")
 			driverIdentifier := getMultiMapValue(settingsOrCommand, "Team Settings", "Driver.Identifier", false)
 			sessionName := getMultiMapValue(settingsOrCommand, "Team Settings", "Session.Name", "")
 			sessionIdentifier := getMultiMapValue(settingsOrCommand, "Team Settings", "Session.Identifier", false)
@@ -1452,7 +1452,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 				settingsGui.Add("DropDownList", "x126 yp w126 vteamDropDownMenu").OnEvent("Change", editRaceSettings.Bind(&kUpdate, "Team"))
 
 			if driverIdentifier
-				settingsGui.Add("DropDownList", "x256 yp w126 Choose1 vdriverDropDownMenu", [driverName]).OnEvent("Change", editRaceSettings.Bind(&kUpdate, "Driver"))
+				settingsGui.Add("DropDownList", "x256 yp w126 Choose1 vdriverDropDownMenu", [theDriverName]).OnEvent("Change", editRaceSettings.Bind(&kUpdate, "Driver"))
 			else
 				settingsGui.Add("DropDownList", "x256 yp w126 vdriverDropDownMenu").OnEvent("Change", editRaceSettings.Bind(&kUpdate, "Driver"))
 
@@ -1488,27 +1488,9 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 }
 
 readSimulatorData(simulator) {
-	local dataFile := kTempDirectory . simulator . " Data\Setup.data"
-	local exePath := kBinariesDirectory . simulator . " SHM Provider.exe"
-	local data, tyreCompound, tyreCompoundColor
+	local data := callSimulator(simulator, "Setup=true")
+	local tyreCompound, tyreCompoundColor
 
-	DirCreate(kTempDirectory "" simulator " Data")
-
-	deleteFile(dataFile)
-
-	try {
-		RunWait(A_ComSpec " /c `"`"" . exePath . "`" -Setup > `"" . dataFile . "`"`"", , "Hide")
-	}
-	catch Any as exception {
-		logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider ("), {simulator: simulator, protocol: "SHM"}) . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
-
-		showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration..."), {simulator: simulator, protocol: "SHM", exePath: exePath})
-				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-	}
-
-	data := readMultiMap(dataFile)
-
-	deleteFile(dataFile)
 
 	if (getMultiMapValue(data, "Car Data", "TyreCompound", kUndefined) = kUndefined) {
 		tyreCompound := getMultiMapValue(data, "Car Data", "TyreCompoundRaw", kUndefined)

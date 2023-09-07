@@ -77,7 +77,106 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 	iSelectedDriver := false
 
+	iPositionsDataFuture := false
+
 	static sCarData := false
+
+	class PositionsDataFuture extends Task {
+		iSimulator := false
+
+		iRestart := false
+		iRequested := false
+		iTries := 0
+
+		iPositionsData := kUndefined
+
+		PositionsData {
+			Get {
+				local positionsData := this.iPositionsData
+
+				while (positionsData == kUndefined) {
+					Task.yield(false)
+
+					positionsData := this.iPositionsData
+				}
+
+				return positionsData
+			}
+		}
+
+		__New(simulator, restart := false) {
+			this.iSimulator := simulator
+			this.iRestart := false
+
+			super.__New(false, 0, kInterruptPriority)
+
+			Task.startTask(this)
+		}
+
+		requestPositionsData() {
+			loop 5
+				try {
+					FileAppend("Read`n", kTempDirectory . "ACCUDP.cmd")
+
+					break
+				}
+				catch Any as exception {
+					if (A_Index = 5)
+						logError(exception)
+					else
+						Sleep(10)
+				}
+		}
+
+		readPositionsData() {
+			local fileName, positionsData
+
+			if FileExist(kTempDirectory . "ACCUDP.cmd")
+				return false
+			else {
+				fileName := (kTempDirectory . "ACCUDP.out")
+
+				if !FileExist(fileName)
+					return false
+				else {
+					positionsData := readMultiMap(fileName)
+
+					deleteFile(fileName)
+
+					return positionsData
+				}
+			}
+		}
+
+		run() {
+			local positionsData
+
+			if !this.iRequested {
+				this.iSimulator.requireUDPClient(this.iRestart)
+
+				this.requestPositionsData()
+
+				this.iRequested := true
+
+				return Task.CurrentTask
+			}
+			else {
+				if (this.iTries++ <= 40) {
+					positionsData := this.readPositionsData()
+
+					if positionsData
+						this.iPositionsData := positionsData
+					else {
+						Task.CurrentTask.Sleep := 50
+
+						return Task.CurrentTask
+					}
+				}
+				else
+					this.iPositionsData := false
+			}
+		}
+	}
 
 	class ChatMode extends ControllerMode {
 		Mode {
@@ -250,6 +349,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				this.iUDPClient := udpClient
 			}
 			catch Any as exception {
+				logError(exception, true)
+
 				logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider ("), {simulator: "ACC", protocol: "UDP"})
 									   . exePath . translate(") - please rebuild the applications in the binaries folder (")
 									   . kBinariesDirectory . translate(")"))
@@ -264,7 +365,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	shutdownUDPClient(force := false, *) {
-		if ((this.UDPClient || force) && ProcessExist("ACC UDP Provider.exe"))
+		if ((this.UDPClient || force) && ProcessExist("ACC UDP Provider.exe")) {
 			loop 5 {
 				try {
 					FileAppend("Exit`n", kTempDirectory . "ACCUDP.cmd")
@@ -276,12 +377,12 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 				Sleep(250)
 
-				if !ProcessExist("ACC UDP Provider.exe") {
-					this.iUDPClient := false
-
+				if !ProcessExist("ACC UDP Provider.exe")
 					break
-				}
 			}
+
+			this.iUDPClient := false
+		}
 
 		return false
 	}
@@ -297,11 +398,11 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		return this.sessionActive(data)
 	}
 
-	updateSession(session) {
+	updateSession(session, force := false) {
 		local lastSession := this.Session
 		local activeModes
 
-		super.updateSession(session)
+		super.updateSession(session, force)
 
 		activeModes := this.Controller.ActiveModes
 
@@ -324,6 +425,13 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
+	acquireSessionData(&telemetryData, &positionsData) {
+		if !this.iPositionsDataFuture
+			this.iPositionsDataFuture := ACCPlugin.PositionsDataFuture(this)
+
+		return super.acquireSessionData(&telemetryData, &positionsData)
+	}
+
 	acquirePositionsData(telemetryData) {
 		local positionsData, session
 		local lap, restart, fileName, tries
@@ -334,6 +442,13 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		static lastRead := false
 		static sessionID := 0
 		static lastLap := 0
+
+		if !carIDs {
+			if !ACCPlugin.sCarData
+				ACCPlugin.sCarData := readMultiMap(kResourcesDirectory . "Simulator Data\ACC\Car Data.ini")
+
+			carIDs := getMultiMapValues(ACCPlugin.sCarData, "Car IDs")
+		}
 
 		lap := getMultiMapValue(telemetryData, "Stint Data", "Laps", 0)
 
@@ -349,56 +464,14 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 		lastLap := lap
 
-		this.requireUDPClient(restart)
+		if (restart || !this.iPositionsDataFuture)
+			this.iPositionsDataFuture := ACCPlugin.PositionsDataFuture(this, restart)
 
-		if !carIDs {
-			if !ACCPlugin.sCarData
-				ACCPlugin.sCarData := readMultiMap(kResourcesDirectory . "Simulator Data\ACC\Car Data.ini")
-
-			carIDs := getMultiMapValues(ACCPlugin.sCarData, "Car IDs")
+		try {
+			positionsData := this.iPositionsDataFuture.PositionsData
 		}
-
-		if ((A_TickCount + 5000) > lastRead) {
-			lastRead := (A_TickCount + 0)
-
-			fileName := (kTempDirectory . "ACCUDP.cmd")
-
-			loop 5
-				try {
-					FileAppend("Read`n", fileName)
-
-					break
-				}
-				catch Any as exception {
-					if (A_Index = 5)
-						logError(exception)
-					else
-						Sleep(10)
-				}
-
-			tries := 10
-
-			while FileExist(fileName) {
-				Sleep(200)
-
-				if (--tries <= 0)
-					break
-			}
-
-			if (tries > 0) {
-				fileName := kTempDirectory . "ACCUDP.out"
-
-				positionsData := readMultiMap(fileName)
-
-				deleteFile(fileName)
-			}
-			else {
-				positionsData := false
-
-				deleteFile(fileName)
-
-				this.iUDPClient := false
-			}
+		finally {
+			this.iPositionsDataFuture := false
 		}
 
 		if positionsData {
@@ -464,10 +537,13 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 			setMultiMapValue(positionsData, "Position Data", "Driver.Car", driverCar)
 
-			return positionsData
+			return this.correctPositionsData(positionsData)
 		}
-		else
+		else {
+			this.shutdownUDPClient(true)
+
 			return newMultiMap()
+		}
 	}
 
 	computeBrakePadWear(location, compound, thickness) {
@@ -1855,25 +1931,25 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			switch option, false {
 				case "Pit Limiter":
-					data := readSimulatorData(this.Code, "-Setup")
+					data := this.readSessionData("Setup=true")
 
 					return [getMultiMapValue(data, "Car Data", "PitLimiter", false)]
 				case "Refuel":
-					data := readSimulatorData(this.Code, "-Setup")
+					data := this.readSessionData("Setup=true")
 
 					return [getMultiMapValue(data, "Setup Data", "FuelAmount", 0)]
 				case "Tyre Pressures":
-					data := readSimulatorData(this.Code, "-Setup")
+					data := this.readSessionData("Setup=true")
 
 					return [getMultiMapValue(data, "Setup Data", "TyrePressureFL", 26.1), getMultiMapValue(data, "Setup Data", "TyrePressureFR", 26.1)
 						  , getMultiMapValue(data, "Setup Data", "TyrePressureRL", 26.1), getMultiMapValue(data, "Setup Data", "TyrePressureRR", 26.1)]
 				case "Tyre Set":
-					data := readSimulatorData(this.Code, "-Setup")
+					data := this.readSessionData("Setup=true")
 
 					return [getMultiMapValue(data, "Setup Data", "TyreSet", 0)]
 				case "Tyre Compound":
 					if this.iPSChangeTyres {
-						data := readSimulatorData(this.Code, "-Setup")
+						data := this.readSessionData("Setup=true")
 
 						return [getMultiMapValue(data, "Setup Data", "TyreCompound", false), getMultiMapValue(data, "Setup Data", "TyreCompoundColor", false)]
 					}
@@ -2052,7 +2128,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		super.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
 
 		if compound {
-			if (this.getPitstopOptionValues("Tyre Compound") != compound)
+			if (this.getPitstopOptionValues("Tyre Compound")[1] != compound)
 				changePitstopTyreCompound((compound = "Wet") ? "Increase" : "Decrease")
 
 			if (set && (compound = "Dry")) {

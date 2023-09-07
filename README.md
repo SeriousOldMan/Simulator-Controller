@@ -33,19 +33,21 @@ Simply download and run [Simulator Controller.exe](https://www.dropbox.com/s/vu3
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [information about the update process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.
 
-[5.0.9.1-release](https://cutt.ly/awy00uid) (Changes: Security question when renewing the data token, Traffic simulation respects the pitstop timer when computing a pitstop lap, Further reduce idiotic Spotter gap announcements, Fixed session info not updating when not having run the first stint in team sessions, "System Monitor" can now be resized vertically, Performance improvements in process communication, Pressing Control restarts the ACC pitstop option walk, Fixed position information for *iRacing*, Performance optimization in simulator data acquisition, Initial integration of *Rennsport*.)
+[5.2.3.0-release](https://cutt.ly/nwg5Cmrz) (Changes: New controller action function "callCustom", Significant speed improvement in ACC pitstop setup when using the same tyre compound, Fixed position data for retired cars in Assetto Corsa Competizione, Fixed session info not showing up for drivers which have not driven their first stint, Extended audio routing for Analyzer and Controller, New car models for "Setup Workbench", Show recommended cold pressures in session info, Provide recommended cold pressures in "Session State.json".)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-509) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-523) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[5.0.9.0-release](https://cutt.ly/ZwtCJMfd) (Changes: Ctrl modifier for "Load current Race Strategy" in "Race Center", New core setting to choose the activation recognizer for the "Voice Server", Fixed data synchronization of setups and strategies, New "Empty" option for session info layout in "System Monitor", Fixed single class view in Overview report in "Race Reports" and "Race Center", Floating layout for session info page in "System Monitor", Increased stability of Team Server connections in case of connection loss events, Fixed team data management in cases where one or more assistants are disabled, Fixed a couple of bugs in the post pitstop report of "Race Center", More intelligent detection of unplanned pitstops for the Race Strategist, Migrated to AHK 2.03, Fixed visibility of wheelbase input field in Telemetry Analyzer, New car models for "Setup Workbench".)
+[5.2.2.0-release](https://cutt.ly/MwfATSpm) (Changes: More fields for "Session State.json", Data format update for "Session State.json", New voice command "Tell me my last laptime", New information request action "LapTime", New icon in Stream Deck icon set for "LapTime", Optimized stint plan creation/update in "Race Center", Next tyre set handling in "Race Center", New practice run sheets in "Practice Center", New framework configuration and debug settings in "Core Settings.ini", New modifier key when starting "Race Center", "Practice Center" and "Race Center" remember various menu settings, "Practice Center" and "Race Center" remember the layout of the telemetry charts, Fixed pressure data management in "Session Database", New car models for "Setup Workbench", Optimized auto updater.)
 
-[5.0.8.1-release](https://cutt.ly/Kwr4Ixn4) (Changes: New widgets for the session dashboard in "System Monitor", Full customizaton of the displayed widgets for the session dashboard in "System Monitor", Added mor configuration sanity checks to "Simulator Setup", Consiolidated duplicate race setting, Only report strategy changes worth mentioning by the Strategist, Even more detailed explanation by the Strategist for strategy differences, "Race Center" prefers strategy over stint plan for pitstop preparation, Optimized Spotter speech handling, Fixed Spotter endless announcement loop, Fixed a couple of bugs with strategy handling in multiplayer races.)
+[5.2.1.0-release](https://cutt.ly/XwdsMjAh) (Changes: Many bug fixes in "Practice Center", Better last lap detection in timed races, Spotter now announces the last lap, Fixed "Invalid" column in "Race Center", Fixed support for RaceRoom Racing Experience, Fixed tyre wear for RaceRoom Racing Experience, Fixed Stream Deck plugin, Support for a couple of new fields in the simulator data files, Telemetry charts in "Race Center" and "Practice Center" apply unit conversion correctly, New data summary report in "Practice Center", Updated AMS2 API to version 13, New car models for "Setup Workbench", Experimental integration of a plugin to publish Simulator Controller state to external apps, Standings info widget in "Session Monitor" now also shows the observed opponent, New stints summary report in "Practice Center", Fixed SFX-100 motion intensity controller.)
 
 #### Latest development build
 
-None for the moment...
+[5.3.0.0-beta](https://www.dropbox.com/scl/fi/rma3cw8td0i7h6qmrv28s/Simulator-Controller-5.3.0.0-beta.zip?rlkey=9d7diesikxudjv6q98xi20oqi&dl=1) (Test Build for 5.3.0. Changes: New page in "Server Administration, Compact database function in "Server Administration", New quick setup method in "Simulator Setup", Spotter informs you about being faster than cars ahead of you, "Mode Automation" preset no longer available, "Names and voices of Assistants" preset no longer available, Simulator settings are preserved when using "Simulator Setup", Names and voices of Assistants can be changed in Quick setup, New general configuration patch in "Simulator Setup", New general settings patch in "Simulator Setup", ACC Pitstop search image presets no longer available in "Simulator Setup", Integrated "P2T Configuration.ini" into "Core Settings.ini", "Practice Center" displays sector times in several places, Voice test mode in the new basic setup page, Voice prelisten mode in general voice configuration, Optimized random distributions, New Strategist voice command for FCY, New controller action "FCYRecommend" for "Race Strategist" plugin, New icon in Stream Deck Icon set for "FCYRecommend" action, Many new voice commands for Spotter and Strategist, New information request actions for Spotter and Strategist incl. new icons in the Stream Deck Icon set, Include clause for multi map files, Refactoring of grammar files, New match rating core settings, "Simulator Startup" can now unblock files, Spotter informes about in which sectors the driver is faster and/or slower than its opponents, New controller action functions "targetListen", "startActivation", "startListen" and "stopListen", No more automatic updates prior to 4.0, Migrated sources to AHK 2.07, Race Center display sector times.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-530) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 
@@ -93,6 +95,10 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 
 18. [Race handled fully by AI](https://youtu.be/MlbAESpzg7Q) - This video gives you a full demonstration of a race under complete control of the AI Assistants. No driver interaction was necessary during this 3-stint race. Fully supported in solo as well as in multi player team races.
 
+19. [Defining custom Button Box Modes](https://youtu.be/CqXcjTRoLpE) - This video demonstrates how you can define your own Button Box layers with custom commands.
+
+20. [Unboxing Practice Center](https://www.youtube.com/watch?v=Qx3I0B8AvhQ) - We are taking a detailed look at the "Practice Center", which lets you organize your practice sessions and solo races, as well as the data collected during those sessions.
+
 This list will be extended from time to time to cover new functionalities.
 
 ### Discord Community
@@ -125,7 +131,15 @@ If you want to become a part of the small and very young Community for Simulator
   - Additional support to trigger every function and action from external sources like a voice or gesture recognition software to always keep your hands on the wheel
   - Builtin support for visual head tracking to control ingame viewing angle - see [third party applications](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications) below
 
-#### Virtual Race Engineer & Virtual Race Strategist
+#### AI powered Virtual Race Assistants
+
+Simulator Controller offers a virtual pit crew based on an AI powered chatbot engine. At the heart of this engine is hybrid rule engine coupled with voice recognition and voice synthesis. A rule engine is very suitable for the tasks of a typical pit crew, since all actions are event based and use big amounts of data.
+
+According to the maturity scale of *attractive.ai* (one of several hundreds maturity models that can be found on the net), the Race Assistants of Simulator Controller are at level 2.5. The observe your racing, can give recommendations and take responsibilty for certain tasks like strategy management and pitstop planning and preparation.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/AI%20Maturity%20Levels.png)
+
+##### Race Engineer & Race Strategist
 
 An AI based Race Engineer with fully dialog capable voice control will guide you through your race, warn you about critical technical issues and will help you with the pitstop, whereas the Race Strategist keeps an eye on the race positions, develops a pitstop strategy, and so on. These smart chat bots are independent applications, but are integreated with the ACC and other simulation game plugins using interprocess communication right now. An integration for a new simulation games requires some effort, especially for the necessary data acquisition from the simulation game, but a knowledged programmer can manage it in about three to four hours.
 
@@ -133,7 +147,7 @@ Based on the data sets, that are acquired during your sessions by the Virtual Ra
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Reports%202.JPG)
 
-Another capability of the Virtual Race Strategist is to support you during the [development of a strategy](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-development) for an upcoming race using the telemetry data of past sessions on the same track in similar conditions.
+Another capability of the Virtual Race Strategist is to support you during the [development of a strategy](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-workbench) for an upcoming race using the telemetry data of past sessions on the same track in similar conditions.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Workbench.JPG)
 
@@ -141,7 +155,7 @@ You can even use all these functionalities during multiplayer team races using t
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%201.JPG)
 
-#### Virtual Race Spotter
+##### Race Spotter
 
 Simulator Controller also comes with a Virtual Spotter, which will keep an eye on the traffic around you and will warn you about critical situations. You can fully customize the information provided by the Spotter to your specific needs and taste.
 
@@ -195,7 +209,9 @@ These plugins are part of the Simulator Controller distribution. Beside providin
 | [IRC](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-irc) | This plugin integrates the *iRacing* simulation game with Simulator Controller. A "Pitstop" mode is available to control the pitstop settings from your controller hardware and an integration with Jona, the Virtual Race Engineer, with Cato, the Virtual Race Strategist and also with Elisa, the Virtual Race Spotter is available as well. The "Assistant" mode can handle most of the Race Assistant commands from your hardware controller. |
 | [RF2](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-rf2) | Similar to the ACC and IRC plugin provides this plugin start and stop support for *rFactor 2*. A "Pitstop" mode is available to control the pitstop settings from your controller hardware and an integration with Jona, the Virtual Race Engineer, and with Cato, the Virtual Race Strategist is available as well. The "Assistant" mode can handle most of the Race Assistant commands from your hardware controller. |
 | [R3E](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-rre) | Similar to the ACC, IRC and RF2 plugins provides this plugin start and stop support for *RaceRoom Racing Experience*. A "Pitstop" mode is available to control the pitstop settings from your controller hardware and an integration with Jona, the Virtual Race Engineer, with Cato, the Virtual Race Strategist and also with Elisa, the Virtual Race Spotter is available as well. The "Assistant" mode can handle most of the Race Assistant commands from your hardware controller. |
+| RSP | Simple integration for Rennsport. No functionality beside starting and stopping from a hardware controller. |
 | [PCARS2](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-PCARS2) | Integration for *Project CARS 2*, which supports  Jona, the Virtual Race Engineer, Cato, the Virtual Race Strategist and also Elisa, the Virtual Race Spotter. The plugin also supports a "Pitstop" mode for adjusting pitstop settings and a "Assistant" mode to interact with the Race Assistants. |
+| [Integration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) | This plugin implements interoperability with other applications like SimHub. |
 
 ### Third party applications
 

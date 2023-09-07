@@ -246,20 +246,31 @@ namespace ACSHMSpotter {
 
 			if (winHandle != 0)
 				SendStringMessage(winHandle, 0, "Race Spotter:" + message);
-		}
+        }
 
-		void SendAutomationMessage(string message)
-		{
-			int winHandle = FindWindowEx(0, 0, null, "Simulator Controller.exe");
+        void SendAutomationMessage(string message)
+        {
+            int winHandle = FindWindowEx(0, 0, null, "Simulator Controller.exe");
 
-			if (winHandle == 0)
-				winHandle = FindWindowEx(0, 0, null, "Simulator Controller.ahk");
+            if (winHandle == 0)
+                winHandle = FindWindowEx(0, 0, null, "Simulator Controller.ahk");
 
-			if (winHandle != 0)
-				SendStringMessage(winHandle, 0, "Race Spotter:" + message);
-		}
+            if (winHandle != 0)
+                SendStringMessage(winHandle, 0, "Race Spotter:" + message);
+        }
 
-		const double PI = 3.14159265;
+        void SendAnalyzerMessage(string message)
+        {
+            int winHandle = FindWindowEx(0, 0, null, "Setup Workbench.exe");
+
+            if (winHandle == 0)
+                winHandle = FindWindowEx(0, 0, null, "Setup Workbench.ahk");
+
+            if (winHandle != 0)
+                SendStringMessage(winHandle, 0, "Analyzer:" + message);
+        }
+
+        const double PI = 3.14159265;
 
 		long cycle = 0;
 
@@ -267,7 +278,7 @@ namespace ACSHMSpotter {
 		const double nearByZDistance = 6.0;
 		double longitudinalFrontDistance = 4;
 		double longitudinalRearDistance = 5;
-		const double lateralDistance = 6;
+		const double lateralDistance = 8;
 		const double verticalDistance = 2;
 
 		const int CLEAR = 0;
@@ -476,7 +487,7 @@ namespace ACSHMSpotter {
 				double speed = 0.0;
 
 				if (hasLastCoordinates)
-					speed = vectorLength(lastCoordinates[carID, 0] - coordinateX, lastCoordinates[carID, 2] - coordinateY);
+					speed = vectorLength(lastCoordinates[carID, 0] - coordinateX, lastCoordinates[carID, 2] - coordinateZ);
 
 				int newSituation = CLEAR;
 
@@ -489,8 +500,8 @@ namespace ACSHMSpotter {
 					if ((id != carID) && (cars.cars[id].isCarInPitline == 0) && (cars.cars[id].isCarInPit == 0))
 					{
 						double otherSpeed = vectorLength(lastCoordinates[id, 0] - cars.cars[id].worldPosition.x,
-														 lastCoordinates[id, 2] - cars.cars[carID].worldPosition.y);
-
+														 lastCoordinates[id, 2] - cars.cars[id].worldPosition.y);
+						
 						if (Math.Abs(speed - otherSpeed) / speed < 0.5)
 						{
 							bool faster = false;
@@ -713,9 +724,13 @@ namespace ACSHMSpotter {
         {
             int ignore = 0;
 
-            pushValue(values, value);
+			if (false) {
+				pushValue(values, value);
 
-            return averageValue(values, ref ignore);
+				return averageValue(values, ref ignore);
+			}
+			else
+				return value;
         }
 
         List<CornerDynamics> cornerDynamicsList = new List<CornerDynamics>();
@@ -737,8 +752,37 @@ namespace ACSHMSpotter {
         float lastSpeed = 0.0f;
 		
 		bool calibrate = false;
+        long lastSound = 0;
 
-		bool collectTelemetry()
+        bool triggerUSOSBeep(string soundsDirectory, string audioDevice, double usos)
+        {
+            string wavFile;
+
+            if (usos < oversteerHeavyThreshold)
+                wavFile = soundsDirectory + "\\Oversteer Heavy.wav";
+            else if (usos < oversteerMediumThreshold)
+                wavFile = soundsDirectory + "\\Oversteer Medium.wav";
+            else if (usos < oversteerLightThreshold)
+                wavFile = soundsDirectory + "\\Oversteer Light.wav";
+            else if (usos > understeerHeavyThreshold)
+                wavFile = soundsDirectory + "\\Understeer Heavy.wav";
+            else if (usos > understeerMediumThreshold)
+                wavFile = soundsDirectory + "\\Understeer Medium.wav";
+            else if (usos > understeerLightThreshold)
+                wavFile = soundsDirectory + "\\Understeer Light.wav";
+            else
+                return false;
+
+			if (wavFile != "")
+				if (audioDevice != "")
+					SendAnalyzerMessage("acousticFeedback:" + wavFile);
+				else
+					new System.Media.SoundPlayer(wavFile).Play();
+
+            return true;
+        }
+
+        bool collectTelemetry(string soundsDirectory, string audioDevice)
 		{
 			if ((graphics.Status != AC_STATUS.AC_LIVE) || graphics.IsInPit != 0 || graphics.IsInPitLane != 0)
 				return true;
@@ -751,10 +795,10 @@ namespace ACSHMSpotter {
 
 			pushValue(recentGLongs, acceleration);
 
-            float angularVelocity = smoothValue(recentRealAngVels, physics.LocalAngularVelocity[2]);
+            float angularVelocity = smoothValue(recentRealAngVels, physics.LocalAngularVelocity[1]);
             float steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
             float steerAngleRadians = -steeredAngleDegs / 57.2958f;
-            float wheelBaseMeter = wheelbase / 10f;
+            float wheelBaseMeter = wheelbase / 100f;
             float radius = wheelBaseMeter / steerAngleRadians;
             float perimeter = radius * (float)PI * 2;
             float perimeterSpeed = lastSpeed / 3.6f;
@@ -783,21 +827,36 @@ namespace ACSHMSpotter {
 
 				if (Math.Abs(angularVelocity * 57.2958) > 0.1)
 				{
-                    double slip = Math.Abs(idealAngularVelocity) - Math.Abs(angularVelocity);
-
-					if (false)
-						if (steerAngle > 0)
+                    double slip = Math.Abs(idealAngularVelocity - angularVelocity);
+			
+					if (steerAngle > 0) {
+						if (angularVelocity > 0)
 						{
-							if (angularVelocity < idealAngularVelocity)
+							if (calibrate)
 								slip *= -1;
+							else
+								slip = (oversteerHeavyThreshold - 1) / 57.2989;
 						}
-						else
+						else if (angularVelocity < idealAngularVelocity)
+							slip *= -1;
+					}
+					else {
+						if (angularVelocity < 0)
 						{
-							if (angularVelocity > idealAngularVelocity)
+							if (calibrate)
 								slip *= -1;
+							else
+								slip = (oversteerHeavyThreshold - 1) / 57.2989;
 						}
+						else if (angularVelocity > idealAngularVelocity)
+							slip *= -1;
+					}
 
-                    cd.Usos = slip * 57.2989 * 10;
+                    cd.Usos = slip * 57.2989 * 1;
+
+                    if ((soundsDirectory != "") && Environment.TickCount > (lastSound + 300))
+                        if (triggerUSOSBeep(soundsDirectory, audioDevice, cd.Usos))
+                            lastSound = Environment.TickCount;
 
                     if (false)
                     {
@@ -813,6 +872,8 @@ namespace ACSHMSpotter {
                         output.WriteLine(cd.Usos);
 
                         output.Close();
+						
+						Thread.Sleep(200);
                     }
                 }
 
@@ -1170,6 +1231,9 @@ namespace ACSHMSpotter {
             }
         }
 
+        string soundsDirectory = "";
+        string audioDevice = "";
+
         public void initializeAnalyzer(bool calibrateTelemetry, string[] args)
         {
             dataFile = args[1];
@@ -1195,7 +1259,14 @@ namespace ACSHMSpotter {
 				steerRatio = int.Parse(args[10]);
 				wheelbase = int.Parse(args[11]);
 				trackWidth = int.Parse(args[12]);
-			}
+
+                if (args.Length > 13) {
+                    soundsDirectory = args[13];
+
+					if (args.Length > 14)
+						audioDevice = args[14];
+				}
+            }
         }
 
         public void Run(bool mapTrack, bool positionTrigger, bool analyzeTelemetry)
@@ -1221,7 +1292,7 @@ namespace ACSHMSpotter {
 
                 if (analyzeTelemetry)
                 {
-                    if (collectTelemetry())
+                    if (collectTelemetry(soundsDirectory, audioDevice))
 					{
                         if (counter % 20 == 0)
                             writeTelemetry();

@@ -43,6 +43,77 @@ Although the code, that handles all the update tasks, is integrated into *Simula
 
 Note: Some of you might want to have more control. No problem. All the files in the *Simulator Controller\Config*, *Simulator Controller\Translations*, *Simulator Controller\Grammars* and *Simulator Controller\Rules* folders are human readable and using a text editor and some *Diff* tool, you can do everything the automated procedure does on your own. But be sure to make a backup copy of all the files, just for peace of mind. Attention: These files use a two-byte character set, so be sure to use an editor that can handle this.
 
+## Release 5.3.0
+
+You may want to check your preset choices in "Simulator Setup" and use the new "Basic" setup method, since this will make a couple of presets obsolete:
+
+  1. Start "Simulator Setup" and go to the presets page.
+  2. Open "Names and Voices of the Assistants" (if used) by double-clicking on it in the right list.
+  3. Note your changes (names, voices, vocalics, ...) and store the file in a safe location.
+  4. Note down the other presets you used, then remove all from the right list.
+  5. Go to the beginning, choose "Basic" as setup method (if not possible, press the Control key while clicking on the *Basic* icon) and continue to the next page.
+  6. Configure the Language, *Push To Talk* and your Assistants as in the "Names and Voices of the Assistants" preset. You can click on the settings button on the right of the voice drop down menu to select different synthesizers, vocalics, etc.
+  7. Go back to the preset page and add all other presets you have used (if any).
+  8. [Optional] If you had additional entries in the "Configuration Patch.ini" file, choose the "Custom Configuration..." preset and add them back in.
+  9. Go to the last page and create a new configuration.
+
+Beside that, a new version of the Team Server is part of the release. The Team Server instances on Azure will be updated automatically, but if you are running a local Team Server for testing purposes, or if you are hosting a Team Server by yourself for your team(s), you might want to update your instance. Don't forget to backup your database file and copy it back after the update.
+
+***
+
+## Release 5.2.3
+
+[Developers only]: The property "Pressures" of the "Tyres" object in the "Session State.json" file has been renamed to "HotPressures".
+
+***
+
+## Release 5.2.2
+
+A new information request action "LapTime" is available, incl. a specialized icon for Stream Deck. If you are a Stream Deck user, you might want to integrate the new action into your profile.
+
+***
+
+## Release 5.2.1
+
+The Stream Deck plugin has been updated. You may want to install the new version, if you have encountered stability issues in the past.
+
+***
+
+## Release 5.2.0
+
+No manual updates necessary.
+
+***
+
+## Release 5.1.2
+
+The controller action function "call" has been renamed to "invoke". You must change your configuration manually here.
+
+***
+
+## Release 5.1.1
+
+A new controller action function "openRaceReports" has been defined, which might be triggered by an external event source to open the "Race Reports" app. Similar, and a new plugin action "RaceReportsOpen" is available in the "Race Strategist" plugin to open the "Race Reports" from your controller by a press of a button.
+
+[Experts Only] This release introduces a new syntax for controller function configuration items. If you have defined your own controller function in the "Configuration Patch.ini" file, for example
+
+	Custom.1.Call=?Wet Track
+	Custom.1.Call Action=selectTrackAutomation(Wet)
+
+you might want to use the new syntax
+
+	Custom.1.Call.Action=selectTrackAutomation(Wet)
+
+using the **dot** between the trigger and "Action". It is not strictly necessary, since the old syntax is still supported during reading of configurations.
+
+***
+
+## Release 5.1.0
+
+No manual updates necessary.
+
+***
+
 ## Release 5.0.9
 
 A bug has been fixed in the Team Server for handling strategies und setups. The Team Server instances on Azure will be updated automatically, but if you are running a local Team Server for testing purposes, or if you are hosting a Team Server by yourself for your team(s), you might want to update your instance. Don't forget to backup your database file and copy it back after the update.
@@ -477,7 +548,7 @@ Everything is handled automatically.
 
 ## Release 3.8.8
 
-Everything is handled automatically, but you might want to have a look at new plugin information request action “TIME”, which is available for the Race Assistant plugins (and also as a voice command). 
+Everything is handled automatically, but you might want to have a look at new plugin information request action "TIME", which is available for the Race Assistant plugins (and also as a voice command). 
 
 ***
 
@@ -577,11 +648,11 @@ Nothing to do for this release.
 
 ## Release 3.5.8
 
-Beginning with this release, the Virtual Race Strategist will also be active during a Practice session, but only as a passive observer in order to collect the telemetry data for future strategy development. Using the “Simulator Configuration”, you can [configure when to save this telemetry data for the different simulations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-strategist). More important, a new tool „Strategy Workbench“ is introduced with this release. Although the “Strategy” part of this tool is non-functional yet and documentation is not available as well, it can already be used to analyze the telemetry data. Active “Strategy” development using this tool will be completed step by step with the next releases.
+Beginning with this release, the Virtual Race Strategist will also be active during a Practice session, but only as a passive observer in order to collect the telemetry data for future strategy development. Using the "Simulator Configuration", you can [configure when to save this telemetry data for the different simulations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-strategist). More important, a new tool "Strategy Workbench" is introduced with this release. Although the "Strategy" part of this tool is non-functional yet and documentation is not available as well, it can already be used to analyze the telemetry data. Active "Strategy" development using this tool will be completed step by step with the next releases.
 
-A new controller action function “openStrategyWorkbench” has been defined, which might be triggered by an external event source to open the “Strategy Workbench”. Similar, and a new plugin action “StrategyWorkbenchOpen” is available in several plugins to open the “Strategy Workbench” from your controller by a press of a button.
+A new controller action function "openStrategyWorkbench" has been defined, which might be triggered by an external event source to open the "Strategy Workbench". Similar, and a new plugin action "StrategyWorkbenchOpen" is available in several plugins to open the "Strategy Workbench" from your controller by a press of a button.
 
-The local folder for the *Setup Database* has been renamed from “Setup Database” to “Database” in order to better reflect the future usage, since the telemetry data for the strategy development will be saved there also. Side note for all, who have given consent to share their tyre and/or setup data: Telemetry data will never be shared with the community, so no new consent is necessary.
+The local folder for the *Setup Database* has been renamed from "Setup Database" to "Database" in order to better reflect the future usage, since the telemetry data for the strategy development will be saved there also. Side note for all, who have given consent to share their tyre and/or setup data: Telemetry data will never be shared with the community, so no new consent is necessary.
 
 ***
 

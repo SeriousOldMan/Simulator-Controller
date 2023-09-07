@@ -19,28 +19,29 @@ namespace RF2SHMProvider {
         static void Main(string[] args)
         {
             Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("en-US");
-
+            string request = args.Length > 0 ? args[0] : "";
             SHMProvider provider = new SHMProvider();
 
-            if (args.Length > 0 && args[0] == "-Pitstop")
+            if (request.StartsWith("Pitstop"))
             {
-                string[] arguments = args[1].Split(':');
+                request = request.Split(new char[] { '=' }, 2)[1];
+
+                string[] arguments = request.Split('=');
 
                 if (arguments[0] == "Set")
                     provider.ExecutePitstopSetCommand(arguments[1], arguments[2].Split(';'));
                 else if ((arguments[0] == "Increase") || (arguments[0] == "Decrease"))
                     provider.ExecutePitstopChangeCommand(arguments[1], arguments[0], arguments[2].Split(';'));
             }
-            else if (args.Length > 0 && args[0] == "-Setup")
+            else if (request.StartsWith("Setup"))
                 provider.ReadSetup();
-            else if (args.Length > 0 && args[0] == "-Standings")
+            else if (request.StartsWith("Standings"))
                 provider.ReadStandings();
             else
             {
                 provider.ReadData();
-                provider.ReadStandings();
-				provider.ReadSetup();
+                provider.ReadSetup();
             }
-        }
+            }
     }
 }

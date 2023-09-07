@@ -108,7 +108,7 @@ Cato will always be active during a race, even if you have disabled data collect
 
 2. Cato can simulate future race situations based on the knowledge about your driving and all the other participants. This includes the devlopment of the standings as well as a [recommendation for the best possible lap for an upcoming pitstop](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#pitstop-recommendation).
 
-3. And Cato is able to guide you through the race using a strategy that was prepared before the race using the ["Strategy Workbench" tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-development). This includes the announcement of an upcoming pitstop, as well as a cooperation with the Race Engineer to prepare and handle the pitstop.
+3. And Cato is able to guide you through the race using a strategy that was prepared before the race using the ["Strategy Workbench" tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-workbench). This includes the announcement of an upcoming pitstop, as well as a cooperation with the Race Engineer to prepare and handle the pitstop.
 
 Normally, Cato will not contact you on its own as often as Jona does. Most of the time, you must ask Cato specifically for its support. An exception is, when you have an active race strategy or when a weather change will require you to conduct an unplanned pitstop for tyre change.
 
@@ -151,7 +151,7 @@ The following statistical models are currently implemented:
 
   1. Pre-Race strategy development
   
-     Cato can import a prepared strategy model at the start of a race session and will automatically call you to the pit and collaborate with Jona to give you a real life like race crew experience. Please see the dedicated chapters on [Strategy Development](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-development) and [Strategy Handling](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-handling) for more information.
+     Cato can import a prepared strategy model at the start of a race session and will automatically call you to the pit and collaborate with Jona to give you a real life like race crew experience. Please see the dedicated chapters on [Strategy Development](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-workbench) and [Strategy Handling](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-handling) for more information.
 	 
 	 You can configure in the race settings, that this predefined strategy will be revised actively by Cato depending on the current race situation or unplanned pitstops and so on.
 
@@ -257,6 +257,132 @@ On the other side, you can restrict a report only to a given class or cup catego
 
 Last, but not least, you can choose to display driver categories (i.e. Platinum, Gold, and so on), when they are supplied by the simulator.
 
+## Practice Center
+
+The "Practice Center" is an application, which you can run alongside your practice sessions or even while running a solo race. When the Race Assistants detect that the "Practice Center" is running, they transfer all collected data to this application and do not store the data in the [session databse](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database) at the end of the session. Instead you can use the "Practice Center" after your session to investigate the data and select the data that should be stored permanently in the session database, if any at all. You can also use the "Practice Center" to plan your practice session, review the car telemetry data and compare your performance to other drivers participating in the same session.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Practice%20Center.JPG)
+
+The "Practice Center" looks very similar to the ["Race Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#race-center), a tool typically used to manage team endurance races. Both tools share common concepts, reports and data views by intention, but there are also some differences, of course.
+
+### Starting a session
+
+Simply start the "Practice Center" **before** starting the session in your simulator. The Race Assistants will automatically connect to the "Practice Center" after the first lap and initiate a session there as well. Once data has been collected in the "Practice Center", it will **not** connect to a new session, before this data has been exported. However, you can use the "Clear..." command from the "Session" menu and you are ready to go for a new session, if you don't want to retain your collected data.
+
+Do **not** start the "Practice Center" after you have already started your session in the simulator. Although nothing will explode, you will loose your valuable practice data, since it will be send to the "Practice Center", which most likely will not collect it. Also, do not quit the "Practice Center" **before** quiting the session in your simulator. You will also end up with an inconsistent data constellation. Nothing really harmful, since in the end all data is treated with statistical weights and averages, but if possible, do avoid it.
+
+Note: If you have [enabled a team session](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#connecting-to-a-session), the "Practice Center" cannot be used (it will simply ignore the running session), since all data duties are handled by the Team Server in this case. But you may want to use the "Race Center" to control your race in this case anyway.
+
+Good to know: The "Practice Center" benefits from a high data update frequency of the Race Assistants. Therefore, if your PC is powerful enough, you can lower this value in the [settings of the "Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database):
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Practice%20Center%207.JPG)
+
+The default value for the data update frequency is 10 seconds, but you can can try to go as low as 2 seconds, if your PC is powerful enough.
+
+### Data Analysis
+
+"Practice Center" supplies you with a couple of reports, which you can use to analyse your performance and dig deeper into the telemetry data of the car. Choose one of the reports in the reports list and this report will be shown in the report area on the top right of "Practice Center" window.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Practice%20Center%201.JPG)
+
+The reports at the top of the list are the well known reports, which are also available after a session using the ["Race Reports"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-reports) tool. They are mostly useful to analyze the standings and the performance of the various drivers and cars. The other reports will give you an insight into the telemetry data. You can select the data to be shown using the selector menus on the right of the report list. You can also choose the type of visualization using the "Plot" menu on top of the report area. Use the "Stint" menu to restrict the visualized data to a specific stint or use the "Driver" menu to restrict the data of the various charts to one the drivers who has already driven some laps in the session (normally only you). Only data of the selected driver will be shown then.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Practice%20Center%202.JPG)
+
+A special case is the "Running" report, which gives you access to many telemetry values for the previous and the currently running lap. The X-Axis stands for the track length here withe the 0 value beeing the start/finish line and the values are updated, when you reach the given point on the track (depending on the general data update frequency - see below). Please be aware that not all values may be provided by a given simulator.
+
+Note: The values for wear (tyres and brake pads) range from 0% up to 100%. For most of the simulators these values are directly available through the API, whereas in *Assetto Corsa Competizione*, the data interface provide the remaining thickness of each pad. Depending on the compound of the pad, the wear level for 100% ranges from 12 mm to 15.5 mm left pad thickness here, with a starting thickness for a fresh pad with 29 mm.
+
+Last but not least, using the small button with the cog wheel icon, you can choose various settings for the currently selected report, for example the range of laps to be considered in the data or the set of drivers in reports which are driver specific.
+
+  1. Details of a selected stint
+  
+     This will give you an overview for the stint, the driven laps, as well as some performance figures for the driver. Please select a stint in the list of stints to generate this report.
+	 
+	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Practice%20Center%203.JPG)
+
+  2. Details for a given lap
+  
+     When you select a lap in the *Laps* tab, you will get a detailed table of the standings and (depending on the type of the session) the gaps to the cars in front of and behind the drivers car, as well as to the leader.
+	 
+	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Practice%20Center%204.JPG)
+	 
+	 If the current race is a multi-class race, the report will also show the class specific positions of all cars, additionally to their overall position in the race. In a multi-class race, the gaps shown in the gap table at the top of the report will always be specific for the own class. Additionaly, if driver categories are available, the category label of a given driver will be added to his name.
+	 
+	 Last, but not least, you will find informations about the past pitstops of each car (only in a race session). The overall number of pitstops, as well as the lap (in reference to your own laps) of the last stop are shown. Please keep in mind, that due to restrictions in the data provided by the various simulators, it cannot be differentiated in many cases whether a car has been in the pits for a penalty, a regular pitstop or even an unplanned stop due to repairs. It is also possible, that the number of pitstops are not correct at all, since not all stops may be correctly reported by the simulator.
+	 
+	 If you are in a practice session, the standings table will list all drivers, which has also been present at the start of your session, and the list will be sorted according to the best lap times of all drivers.
+	 
+	 Some basic data is shown in the header of the lap details as well. Important are here the ambient temperatures and the tyre pressure information. You can see the current hot pressures, recommend cold pressures and information about tyre pressure losses, if there are any.
+	 
+  3. Session Summary
+  
+     This report is useful by the end of a session to create a document to be stored away in the archive. It contains data on all stints. This report can be created using the "Session Summary" command from the "Session" menu.
+	 
+	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Practice%20Center%205.JPG)
+
+  4. Data Summary
+  
+     Data Summary is another useful report, which gives you a complete documentation of all data collected in your session or already stored in your database (depending on your choice in the "Data" menu.
+	 
+	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Practice%20Center%209.JPG)
+	 
+	 You can create this report by chooosing "Data Summary" from the "Data" menu.
+
+  5. Stints Summary
+  
+     This report combines the output of the stint report (see above) for all stints into one document.
+	 
+All these report documents are HTML-based and can be saved or printed using the context menu when right-clicking into the output area.
+
+### Managing tyres and planning practice stints
+
+The first tab "Tyres" in the lower left corner allows you to manage your tyre sets during your practice runs. In many cases, you can let the "Practice Center" decide automatically, when to create a new stint and when a tyre change happend (at least for *Assetto Corsa Competizione* and *rFactor 2*). But not all simulators provide access to the mounted tyres in their data API, so it is also possible to create a new stint with your individual tyre setup manually.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Practice%20Center%206.JPG)
+
+To create a new stint manually while you are standing in the pit, follow these steps:
+
+1. Select "Manual" from the "Mode" drop down menu.
+2. Select whether you want to change tyres and possibly a specific tyre compound using the "Compound" drop down menu. You can also use the small button beside the drop down menu to query the simulator for the currently mounted tyre compound and tyre set, if this data is provided.
+3. Select the number of the mounted tyre set. This is important, so that the "Practice Center" can manage the number of laps driven with this specific tyre set.
+4. Enter the cold pressures, you have chosen for the new tyres. This is particular important, otherwise the cold pressures derived by the Race Engineer will be wrong.
+5. Finally click on the button "New Stint" or choose the corresponding command from the "Stints" menu.
+
+It is recommended to use the "Auto" mode in races, since then the pitstops are reliable detected by the Race Assistants (and the additional data like tyre set and tyre pressures will be taken from the pitstop plan), whereas in Practice sessions, it will be much better to create the different practice stints manually. Esspecially the ideal cold tyre pressures derived by the Race Engineer will be mostly wrong, when the tyre change has not been planned and prepared under the control of the Race Engineer, which is uncommon in a practice session.
+
+#### Using the Run Sheet
+
+The "Practice Center" can give you hints for worthy practice runs, which will create data for specific car configurations, for which currently no data is available in the database. This is somewhat the inverse approach as taken by the data explorer described in the next section, since the "Run Sheet" will show you data, that is *missing*
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Practice%20Center%2010.JPG)
+
+You can open the "Run Sheet" by choosing the corresponding command in the "Data" menu and the window can stay open, while you are working in other areas of the "Practice Center". The data shown, will always reflect your current selection of car and track and the chosen data setting in the "Data" menu.
+
+In the upper list, you will see entries for missing data which relate your lap times to the combination of chosen engine map (if available in your simulator) and the amount of fuel currently in the tank (thereby determining the car weight and balance). The lower list show missing data correlations between fuel level (car weight) and the number of laps you have already driven with a given tyre set.
+
+When you now select an entry in one of these lists, instructions will be given how to create the missing data points, thereby defining the conditions for a worthy practice run.
+
+Please note, that not all data points may be of interest. Decide for yourself, if you will ever encounter a situation, where you will run a car with a full tank, but worn tyres, for example. If you are participating mostly in sprint races, this will be very unlikely. If you are running high class endurance races, on the other hand, it can happen that you must double stint a tyre set due to tyre set restrictions imposed by the race rules. You see, it depends...
+
+### Exploring data
+
+The "Data" tab will give you an overview of what data you have collected during your session, or, after you have selected the corrsponding option in the "Data" menu, what data is available in your session database.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Practice%20Center%208.JPG)
+
+Using the "Data" menu, you can choose between the different weather conditions and available tyre compounds, thereby identifying possible gaps in your data collection that need to be filled with a specific practice run.
+
+The choices (except tyre compounds) will be remembered between different runs of "Practice Center".
+
+### Exporting data to the session database
+
+At the end of your session, you can decide which data should be transfered to the session database by clicking the small check marks for each lap in the list of driven laps. "Practice Center" will already have selected by default all valid laps for your convinience. Then choose the command "Export to Database" from the "Session" menu.
+
+Please note, that this export is possible only once, to prevent duplicate data entries in your database, and cannot be undone. Therefore check your selection carefully beforehand.
+
+You can also store your session for later inspection in any location on your PC using the "Save a copy..." command from the "Session" menu. The mentioned data export can also be initiated from a saved copy - very helpful, if you are exhausted after your session and want to defer the data inspection for later.
+
 ## Strategy Development
 
 Another valuable tool, which is supported by Cato is the "Strategy Workbench". With the help of this tool, you can develop a pitstop and tyre strategy for an upcoming race. Simple sprint races with a single required pitstop are supported as well as endurance races with multiple stints and complex tyre and fuel saving strategies. An important feature of this tool is the ability to analyze telemetry data of past stints, that have been collected by Cato. This telemetry information is stored in the local database at the end of a session, as long as thiis has been activated in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-strategist) for the given simulator.
@@ -269,7 +395,7 @@ The "Strategy Workbench" is divided into two main areas. The upper area allows y
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Chart%20Selector.JPG)
 
-Each group provide data sets for all tyre compounds which have been used in the selected conditions. You can choose between the different tyre compounds and you can select up to four different series of values ​​that are to be plotted against each other in the chart.
+Each group provide data sets for all tyre compounds which have been used in the selected conditions. You can choose between the different tyre compounds and you can select up to four different series of values, that are to be plotted against each other in the chart.
 
 If you have data for different drivers available in your telemetry database, you switch between the dfferent drivers yusing the "Driver" menu. Only data of the selected driver will then be visible in the various charts.
 
@@ -595,6 +721,16 @@ It is also possible to enable automatic revision of the current strategy in the 
 
 Finally a word of a advice: The calculation of a strategy can be a time consuming and CPU intensive process, especially for long endurance races or if the *Optimizer* was used during the creation of the initially strategy, and, with even more impact, when the Monte Carlo traffic simulation method is used. This can result in framerate drops on weaker PC systems. So please check before an important race, whether you can use this functionality safely in your specific environment. But, even if your system is capable to handle the load, the recalculation may take some time, especially when high *Optimizer* settings were chosen during the creation of the original strategy.
 
+#### Handling Full Course Yellow
+
+Cato is also able to handle a Full Course Yellow condition, as long as a selected strategy is active. If you encounter a Full Course Yellow and if it is allowed to go to the pit during Full Course Yellow, you can ask the Strategist to evaluate whether a pitstop will be of benefit in this situation. There is a voice command and also a controller action available to trigger this evaluation. If the Strategist thinks that it is of benefit to perform an early pitstop, it will ask you and then directly calls you to the pit, while the Engineer is already preparing the pitstop.
+
+Remarks:
+
+1. When Cato has created a new strategy with an immediate pitstop, only the number of pitstops are used to compare it against the currently active strategy, since in most cases, the benefits of performing a pitstop during Full Course Yellow outweighs a possible longer stint afterwards. Therefore, if the new strategy has the same number of remaining pitstops, it is considered valid and the Strategist will call you to the pit.
+2. Be careful, when using teh Full Course Yellow handling during the first few laps, since the calculation of average lap time and fuel consumption might not be exact then. Normally, the Asisstants will refuse to help you in the learning phase, but in case of Full Course Yellow this is overriden. As long as you have already collected data about the given car / track / weather condition, this information is used and you will be fine. Otherwise double-check the recommendation.
+3. If you have accepted the new strategy with an immediate pitstop, the Engineer will be informed without further notice. He will plan and prepare the pitstop immediately without waiting for the next crossing of the start/finish line, as usual. This is important, so that you can enter the pit at the end of the current lap.
+
 ## Technical information
 
 Cato uses the same AI kernel as Jona. In fact, large parts of the basic rule set is identical for both Assistants. Therefore, you can consult the [technical information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#technical-information) of Jona, if you want to dig deeper into the inner workings.
@@ -612,7 +748,7 @@ After the data has been gathered, it is then transfered to the *Race Strategist*
 	Car.1.Driver.Forname = The
 	Car.1.Driver.Nickname = TB
 	Car.1.Driver.Surname = BigO
-	Car.1.Lap = 2
+	Car.1.Laps = 2
 	Car.1.Lap.Running = 0
 	Car.1.Position = 1
 	Car.1.Time = 110650
@@ -620,7 +756,7 @@ After the data has been gathered, it is then transfered to the *Race Strategist*
 	Car.2.Driver.Forname = Jimmy
 	Car.2.Driver.Nickname = JV
 	Car.2.Driver.Surname = Van Veen
-	Car.2.Lap = 1
+	Car.2.Laps = 1
 	Car.2.Lap.Running = 0.9514
 	Car.2.Position = 14
 	Car.2.Time = 123535
@@ -628,7 +764,7 @@ After the data has been gathered, it is then transfered to the *Race Strategist*
 	Car.3.Driver.Forname = Jennifer
 	Car.3.Driver.Nickname = JY
 	Car.3.Driver.Surname = Young
-	Car.3.Lap = 1
+	Car.3.Laps = 1
 	Car.3.Lap.Running = 0.9827
 	Car.3.Position = 4
 	Car.3.Time = 117209

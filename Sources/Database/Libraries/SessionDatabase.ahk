@@ -635,7 +635,7 @@ class SessionDatabase extends ConfigurationItem {
 			drivers := []
 
 			for ignore, driver in sessionDB.query("Drivers", {Where: {ID: id}})
-				drivers.Push(computeDriverName(driver["Forname"], driver["Surname"], driver["Nickname"]))
+				drivers.Push(driverName(driver["Forname"], driver["Surname"], driver["Nickname"]))
 
 			return ((drivers.Length = 0) ? ["John Doe (JD)"] : drivers)
 		}
@@ -644,7 +644,7 @@ class SessionDatabase extends ConfigurationItem {
 				sessionDB := Database(kDatabaseDirectory . "User\" . SessionDatabase.getSimulatorCode(simulator) . "\", kSessionSchemas)
 
 				for ignore, driver in sessionDB.query("Drivers", {Where: {ID: id}})
-					return Array(computeDriverName(driver["Forname"], driver["Surname"], driver["Nickname"]))
+					return Array(driverName(driver["Forname"], driver["Surname"], driver["Nickname"]))
 			}
 
 			return ["John Doe (JD)"]
@@ -692,10 +692,15 @@ class SessionDatabase extends ConfigurationItem {
 		}
 
 		try {
-			Run(A_ComSpec . " /c `"`"" . kBinariesDirectory . "Track Mapper.exe`" -Simulator `"" . simulator . "`" -Track `"" . track . "`" -Data `"" . datafile . "`"`""
+			if !FileExist(kBinariesDirectory . "Track Mapper.exe")
+				throw "File not found..."
+
+			Run(kBinariesDirectory . "Track Mapper.exe -Simulator `"" . simulator . "`" -Track `"" . track . "`" -Data `"" . datafile . "`""
 			  , kBinariesDirectory, "Hide", &pid)
 		}
 		catch Any as exception {
+			logError(exception, true)
+
 			logMessage(kLogCritical, translate("Cannot start Track Mapper - please rebuild the applications..."))
 
 			showMessage(translate("Cannot start Track Mapper - please rebuild the applications...")
@@ -799,7 +804,7 @@ class SessionDatabase extends ConfigurationItem {
 		local fileName := (kDatabaseDirectory . "User\Tracks\" . this.getSimulatorCode(simulator) . "\" . this.getTrackCode(simulator, track) . ".data")
 
 		if FileExist(fileName)
-			return (fileName)
+			return fileName
 		else
 			return false
 	}
@@ -1914,19 +1919,13 @@ mapToString(elementSeparator, valueSeparator, map) {
 ;;;-------------------------------------------------------------------------;;;
 
 compound(compound, color := false) {
-	if color
-		return (compound . " (" . color . ")")
-	else
-		return string2Values(A_Space, compound)[1]
+	return (color ? (compound . " (" . color . ")") : string2Values(A_Space, compound)[1])
 }
 
 compoundColor(compound) {
 	compound := string2Values(A_Space, compound)
 
-	if (compound.Length == 1)
-		return "Black"
-	else
-		return SubStr(compound[2], 2, StrLen(compound[2]) - 2)
+	return ((compound.Length == 1) ? "Black" : SubStr(compound[2], 2, StrLen(compound[2]) - 2))
 }
 
 splitCompound(qualifiedCompound, &tyreCompound, &tyreCompoundColor) {
@@ -1965,7 +1964,7 @@ parseDriverName(fullName, &forName, &surName, &nickName) {
 
 }
 
-computeDriverName(forName, surName, nickName) {
+driverName(forName, surName, nickName) {
 	local name := ""
 
 	if (forName != "")

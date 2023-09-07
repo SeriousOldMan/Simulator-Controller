@@ -369,7 +369,7 @@ closeApplication(application) {
 }
 
 launchPad(command := false, arguments*) {
-	local ignore, application, startupConfig, x, y, settingsButton, name
+	local ignore, application, startupConfig, x, y, settingsButton, name, options
 
 	static result := false
 
@@ -411,17 +411,17 @@ launchPad(command := false, arguments*) {
 		local settings := readMultiMap(kSimulatorSettingsFile)
 		local restart := false
 
-		launchPadGui.Opt("+Disabled")
+		launchPadGui.Block()
 
 		try {
-			if (editSettings(&settings) == kSave) {
+			if (editSettings(&settings, launchPadGui) == kSave) {
 				writeMultiMap(kSimulatorSettingsFile, settings)
 
 				restart := true
 			}
 		}
 		finally {
-			launchPadGui.Opt("-Disabled")
+			launchPadGui.Unblock()
 		}
 
 		if restart
@@ -505,8 +505,16 @@ launchPad(command := false, arguments*) {
 
 		if ProcessExist(application)
 			WinActivate("ahk_exe " . application)
-		else
+		else {
+			startupConfig := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+			if (getMultiMapValue(startupConfig, "Simulator", "Simulator", kUndefined) != kUndefined)
+				application .= (" -Simulator `"" . getMultiMapValue(startupConfig, "Simulator", "Simulator") . "`""
+							  . " -Car `"" . getMultiMapValue(startupConfig, "Simulator", "Car") . "`""
+							  . " -Track `"" . getMultiMapValue(startupConfig, "Simulator", "Track") . "`"")
+
 			Run(kBinariesDirectory . application)
+		}
 
 		if ((arguments.Length > 1) && arguments[2])
 			ExitApp(0)
@@ -520,6 +528,14 @@ launchPad(command := false, arguments*) {
 			launchPad(kClose)
 	}
 	else {
+		startupConfig := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+		removeMultiMapValue(startupConfig, "Simulator", "Simulator")
+		removeMultiMapValue(startupConfig, "Simulator", "Car")
+		removeMultiMapValue(startupConfig, "Simulator", "Track")
+
+		writeMultiMap(kUserConfigDirectory . "Application Settings.ini", startupConfig)
+
 		result := false
 		toolTips := Map()
 		executables := Map()
@@ -529,6 +545,7 @@ launchPad(command := false, arguments*) {
 
 		toolTips["RaceReports"] := "Race Reports: Analyze your recent races."
 		toolTips["StrategyWorkbench"] := "Strategy Workbench: Find the best strategy for an upcoming race."
+		toolTips["PracticeCenter"] := "Practice Center: Make the most out of your practice sessions."
 		toolTips["RaceCenter"] := "Race Center: Manage your team and control the race during an event using the Team Server."
 		toolTips["ServerAdministration"] := "Server Administration: Manage accounts and access rights on your Team Server. Only needed, when you run your own Team Server."
 
@@ -543,6 +560,7 @@ launchPad(command := false, arguments*) {
 
 		executables["RaceReports"] := "Race Reports.exe"
 		executables["StrategyWorkbench"] := "Strategy Workbench.exe"
+		executables["PracticeCenter"] := "Practice Center.exe"
 		executables["RaceCenter"] := "Race Center.exe"
 		executables["ServerAdministration"] := "Server Administration.exe"
 		executables["SimulatorSetup"] := "Simulator Setup.exe"
@@ -556,7 +574,8 @@ launchPad(command := false, arguments*) {
 
 		icons["Startup"] := kIconsDirectory . "Startup.ico"
 		icons["RaceReports"] := kIconsDirectory . "Chart.ico"
-		icons["StrategyWorkbench"] := kIconsDirectory . "Dashboard.ico"
+		icons["StrategyWorkbench"] := kIconsDirectory . "Workbench.ico"
+		icons["PracticeCenter"] := kIconsDirectory . "Practice.ico"
 		icons["RaceCenter"] := kIconsDirectory . "Console.ico"
 		icons["ServerAdministration"] := kIconsDirectory . "Server Administration.ico"
 		icons["SimulatorSetup"] := kIconsDirectory . "Configuration Wand.ico"
@@ -576,13 +595,13 @@ launchPad(command := false, arguments*) {
 
 		launchPadGui.SetFont("s8 Norm", "Arial")
 
-		launchPadGui.Add("Text", "x560 YP w30 Section Right", string2Values("-", kVersion)[1])
+		launchPadGui.Add("Text", "x544 YP w30 Section Right", string2Values("-", kVersion)[1])
 
 		launchPadGui.SetFont("s6")
 
 		try {
 			if (string2Values("-", kVersion)[2] != "release")
-				launchPadGui.Add("Text", "x562 YP+12 w30 BackgroundTrans Right c" . launchPadGui.Theme.TextColor["Disabled"], StrUpper(string2Values("-", kVersion)[2]))
+				launchPadGui.Add("Text", "x546 YP+12 w30 BackgroundTrans Right c" . launchPadGui.Theme.TextColor["Disabled"], StrUpper(string2Values("-", kVersion)[2]))
 		}
 
 		launchPadGui.SetFont("s9 Norm", "Arial")
@@ -592,56 +611,61 @@ launchPad(command := false, arguments*) {
 
 		launchPadGui.SetFont("s8 Norm", "Arial")
 
-		settingsButton := launchPadGui.Add("Button", "x573 yp+4 w23 h23")
+		settingsButton := launchPadGui.Add("Button", "x556 yp+4 w23 h23")
 		settingsButton.OnEvent("Click", modifySettings.Bind(launchPadGui))
 		setButtonIcon(settingsButton, kIconsDirectory . "General Settings.ico", 1)
 
-		launchPadGui.Add("Text", "x8 yp+26 w590 0x10")
+		launchPadGui.Add("Text", "x8 yp+26 w574 0x10")
 
 		launchPadGui.SetFont("s7 Norm", "Arial")
 
 		launchPadGui.Add("Picture", "x16 yp+24 w60 h60 Section vStartup", kIconsDirectory . "Startup.ico").OnEvent("Click", launchStartup)
 
-		launchPadGui.Add("Picture", "xp+90 yp w60 h60 vRaceReports", kIconsDirectory . "Chart.ico").OnEvent("Click", launchApplication.Bind("RaceReports"))
-		launchPadGui.Add("Picture", "xp+74 yp w60 h60 vStrategyWorkbench", kIconsDirectory . "Dashboard.ico").OnEvent("Click", launchApplication.Bind("StrategyWorkbench"))
-		launchPadGui.Add("Picture", "xp+110 yp w60 h60 vRaceCenter", kIconsDirectory . "Console.ico").OnEvent("Click", launchApplication.Bind("RaceCenter"))
-		launchPadGui.Add("Picture", "xp+74 yp w60 h60 vServerAdministration", kIconsDirectory . "Server Administration.ico").OnEvent("Click", launchApplication.Bind("ServerAdministration"))
-
-		launchPadGui.Add("Picture", "xp+150 yp w60 h60 vSystemMonitor", kIconsDirectory . "Monitoring.ico").OnEvent("Click", launchApplication.Bind("SystemMonitor"))
-
-		launchPadGui.Add("Text", "x16 yp+64 w60 h40 Center", "Startup")
-		launchPadGui.Add("Text", "xp+90 yp w60 h40 Center", "Race Reports")
-		launchPadGui.Add("Text", "xp+74 yp w60 h40 Center", "Strategy Workbench")
-		launchPadGui.Add("Text", "xp+110 yp w60 h40 Center", "Race Center")
-		launchPadGui.Add("Text", "xp+74 yp w60 h40 Center", "Server Administration")
-		launchPadGui.Add("Text", "xp+150 yp w60 h40 Center", "System Monitor")
-
-		launchPadGui.Add("Picture", "x16 ys+104 w60 h60 vSetupWorkbench", kIconsDirectory . "Setup.ico").OnEvent("Click", launchApplication.Bind("SetupWorkbench"))
 		launchPadGui.Add("Picture", "xp+90 yp w60 h60 vRaceSettings", kIconsDirectory . "Race Settings.ico").OnEvent("Click", launchApplication.Bind("RaceSettings"))
 		launchPadGui.Add("Picture", "xp+74 yp w60 h60 vSessionDatabase", kIconsDirectory . "Session Database.ico").OnEvent("Click", launchApplication.Bind("SessionDatabase"))
 
-		launchPadGui.Add("Picture", "xp+110 yp w60 h60 vSimulatorSetup", kIconsDirectory . "Configuration Wand.ico").OnEvent("Click", launchApplication.Bind("SimulatorSetup"))
-		launchPadGui.Add("Picture", "xp+74 yp w60 h60 vSimulatorConfiguration", kIconsDirectory . "Configuration.ico").OnEvent("Click", launchApplication.Bind("SimulatorConfiguration"))
-		launchPadGui.Add("Picture", "xp+150 yp w60 h60 vSimulatorDownload", kIconsDirectory . "Installer.ico").OnEvent("Click", launchSimulatorDownload.Bind("SimulatorDownload"))
+		launchPadGui.Add("Picture", "xp+90 yp w60 h60 vPracticeCenter", kIconsDirectory . "Practice.ico").OnEvent("Click", launchApplication.Bind("PracticeCenter"))
+		launchPadGui.Add("Picture", "xp+74 yp w60 h60 vStrategyWorkbench", kIconsDirectory . "Workbench.ico").OnEvent("Click", launchApplication.Bind("StrategyWorkbench"))
 
-		launchPadGui.Add("Text", "x16 yp+64 w60 h40 Center", "Setup Workbench")
+		launchPadGui.Add("Picture", "xp+74 yp w60 h60 vRaceCenter", kIconsDirectory . "Console.ico").OnEvent("Click", launchApplication.Bind("RaceCenter"))
+
+
+		launchPadGui.Add("Picture", "xp+90 yp w60 h60 vRaceReports", kIconsDirectory . "Chart.ico").OnEvent("Click", launchApplication.Bind("RaceReports"))
+		; launchPadGui.Add("Picture", "xp+184 yp w60 h60 vSystemMonitor", kIconsDirectory . "Monitoring.ico").OnEvent("Click", launchApplication.Bind("SystemMonitor"))
+
+		launchPadGui.Add("Text", "x16 yp+64 w60 h40 Center", "Startup")
 		launchPadGui.Add("Text", "xp+90 yp w60 h40 Center", "Race Settings")
 		launchPadGui.Add("Text", "xp+74 yp w60 h40 Center", "Session Database")
-		launchPadGui.Add("Text", "xp+110 yp w60 h40 Center", "Simulator Setup")
+		launchPadGui.Add("Text", "xp+90 yp w60 h40 Center", "Practice Center")
+		launchPadGui.Add("Text", "xp+74 yp w60 h40 Center", "Strategy Workbench")
+		launchPadGui.Add("Text", "xp+74 yp w60 h40 Center", "Race Center")
+		launchPadGui.Add("Text", "xp+90 yp w60 h40 Center", "Race Reports")
+
+		launchPadGui.Add("Picture", "x16 ys+104 w60 h60 vSystemMonitor", kIconsDirectory . "Monitoring.ico").OnEvent("Click", launchApplication.Bind("SystemMonitor"))
+		launchPadGui.Add("Picture", "xp+126 ys+104 w60 h60 vSetupWorkbench", kIconsDirectory . "Setup.ico").OnEvent("Click", launchApplication.Bind("SetupWorkbench"))
+
+		launchPadGui.Add("Picture", "xp+128 yp w60 h60 vSimulatorSetup", kIconsDirectory . "Configuration Wand.ico").OnEvent("Click", launchApplication.Bind("SimulatorSetup"))
+		launchPadGui.Add("Picture", "xp+74 yp w60 h60 vSimulatorConfiguration", kIconsDirectory . "Configuration.ico").OnEvent("Click", launchApplication.Bind("SimulatorConfiguration"))
+		launchPadGui.Add("Picture", "xp+74 yp w60 h60 vServerAdministration", kIconsDirectory . "Server Administration.ico").OnEvent("Click", launchApplication.Bind("ServerAdministration"))
+
+		launchPadGui.Add("Picture", "xp+90 yp w60 h60 vSimulatorDownload", kIconsDirectory . "Installer.ico").OnEvent("Click", launchSimulatorDownload.Bind("SimulatorDownload"))
+
+		launchPadGui.Add("Text", "x16 yp+64 w60 h40 Center", "System Monitor")
+		launchPadGui.Add("Text", "xp+126 yp w60 h40 Center", "Setup Workbench")
+		launchPadGui.Add("Text", "xp+128 yp w60 h40 Center", "Simulator Setup")
 		launchPadGui.Add("Text", "xp+74 yp w60 h40 Center", "Simulator Configuration")
-		launchPadGui.Add("Text", "xp+150 yp w60 h40 Center", "Simulator Download")
+		launchPadGui.Add("Text", "xp+74 yp w60 h40 Center", "Server Administration")
+		launchPadGui.Add("Text", "xp+90 yp w60 h40 Center", "Simulator Download")
 
 		launchPadGui.SetFont("s8 Norm", "Arial")
 
-		launchPadGui.Add("Text", "x8 yp+40 w590 0x10")
-
-		startupConfig := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+		launchPadGui.Add("Text", "x8 yp+40 w574 0x10")
 
 		closeCheckBox := launchPadGui.Add("CheckBox", "x16 yp+10 w120 h23 Checked" . getMultiMapValue(startupConfig, "Simulator Startup", "CloseLaunchPad", false), translate("Close on Startup"))
 		closeCheckBox.OnEvent("Click", closeOnStartup)
 
-		launchPadGui.Add("Button", "x267 yp w80 h23 Default", translate("Close")).OnEvent("Click", closeLaunchPad)
-		launchPadGui.Add("Button", "x482 yp w100 h23", translate("Close All...")).OnEvent("Click", closeAll)
+		launchPadGui.Add("Button", "x259 yp w80 h23 Default", translate("Close")).OnEvent("Click", closeLaunchPad)
+		launchPadGui.Add("Button", "x476 yp w100 h23", translate("Close All...")).OnEvent("Click", closeAll)
 
 		OnMessage(0x0200, showApplicationInfo)
 
@@ -726,10 +750,73 @@ startSimulator() {
 	local icon := kIconsDirectory . "Startup.ico"
 	local noLaunch, ignore
 
+	unblockExecutables() {
+		local progress := 0
+		local ignore, directory, currentDirectory, pid
+
+		if !A_IsAdmin {
+			if A_IsCompiled
+				Run("*RunAs `"" . A_ScriptFullPath . "`" -Unblock")
+			else
+				Run("*RunAs `"" . A_AhkPath . "`" `"" . A_ScriptFullPath . "`" -Unblock")
+
+			ExitApp(0)
+		}
+
+		showProgress({color: "Green", title: translate("Unblocking Applications and DLLs")})
+
+		try {
+			for ignore, directory in [kBinariesDirectory, kResourcesDirectory . "Setup\Installer\"
+									, kResourcesDirectory . "Setup\Plugins\"] {
+				currentDirectory := A_WorkingDir
+
+				try {
+					SetWorkingDir(directory)
+
+					Run("Powershell -Command Get-ChildItem -Path '.' -Recurse | Unblock-File", , "Hide", &pid)
+
+					while ProcessExist(pid) {
+						showProgress({progress: Min(100, progress++)})
+
+						Sleep(50)
+					}
+				}
+				catch Any as exception {
+					logError(exception)
+				}
+				finally {
+					SetWorkingDir(currentDirectory)
+				}
+			}
+
+			while (progress++ <= 100) {
+				showProgress({progress: progress})
+
+				Sleep(50)
+			}
+		}
+		catch Any as exception {
+			logError(exception)
+		}
+		finally {
+			hideProgress()
+
+			if A_IsCompiled
+				Run("*RunAs `"" . A_ScriptFullPath . "`"")
+			else
+				Run("*RunAs `"" . A_AhkPath . "`" `"" . A_ScriptFullPath . "`"")
+
+			ExitApp(0)
+		}
+	}
+
 	Hotkey("Escape", cancelStartup, "Off")
 
 	TraySetIcon(icon, "1")
 	A_IconTip := "Simulator Startup"
+
+	if (inList(A_Args, "-Unblock") || (GetKeyState("Ctrl", "P") && GetKeyState("Shift", "P")))
+		unblockExecutables()
 
 	noLaunch := inList(A_Args, "-NoLaunchPad")
 
@@ -756,7 +843,6 @@ cancelStartup(*) {
 			startupManager.hideSplashScreen()
 
 			if !startupManager.Finished {
-				SoundPlay("*32")
 				OnMessage(0x44, translateYesNoButtons)
 				msgResult := MsgBox(translate("Cancel Startup?"), translate("Startup"), 262180)
 				OnMessage(0x44, translateYesNoButtons, 0)

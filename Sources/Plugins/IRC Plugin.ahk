@@ -61,30 +61,24 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 		selectActions := []
 	}
 
-	sendPitstopCommand(command, operation := false, message := false, arguments*) {
-		local simulator, exePath
+	sendPitstopCommand(command, operation, message, arguments*) {
+		local exePath := (kBinariesDirectory . "IRC SHM Connector.dll")
 
-		if this.iCurrentPitstopMFD {
-			simulator := this.Code
-			arguments := values2String(";", arguments*)
-			exePath := kBinariesDirectory . simulator . " SHM Provider.exe"
-
+		if this.iCurrentPitstopMFD
 			try {
-				if operation
-					RunWait(A_ComSpec . " /c `"`"" . exePath . "`" -" . command . A_Space . operation . " `"" . message . ":" . arguments . "`"`"", , "Hide")
-				else
-					RunWait(A_ComSpec . " /c `"`"" . exePath . "`" -" . command . "`"", , "Hide")
+				callSimulator(this.Code, command . "=" . operation . "=" . message . ":" . values2String(";", arguments*), "DLL")
 			}
 			catch Any as exception {
-				logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider ("), {simulator: simulator, protocol: "SHM"})
+				logError(exception, true)
+					
+				logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider ("), {simulator: this.Code, protocol: "SHM"})
 									   . exePath . translate(") - please rebuild the applications in the binaries folder (")
 									   . kBinariesDirectory . translate(")"))
 
 				showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration...")
-											  , {exePath: exePath, simulator: simulator, protocol: "SHM"})
+											  , {exePath: exePath, simulator: this.Code, protocol: "SHM"})
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
-		}
 	}
 
 	openPitstopMFD(descriptor := false) {
@@ -265,6 +259,23 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 		this.openPitstopMFD("Fuel")
 
 		this.sendPitstopCommand("Pitstop", "Set", "Repair", (repairBodywork || repairSuspension) ? "true" : "false")
+	}
+
+	updatePositionsData(data) {
+		local carClass
+
+		super.updatePositionsData(data)
+
+		loop {
+			carClass := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Class", kUndefined)
+
+			if (carClass == kUndefined)
+				break
+			else if (Trim(carClass) != "")
+				setMultiMapValue(data, "Position Data", "Car." . A_Index . ".Class", Trim(carClass))
+			else
+				removeMultiMapValue(data, "Position Data", "Car." . A_Index . ".Class")
+		}
 	}
 }
 

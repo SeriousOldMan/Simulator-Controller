@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using SQLite;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -228,6 +229,28 @@ namespace TeamServer.Controllers {
             }
         }
 
+        [HttpGet("allobjects")]
+        public string GetAllObjects([FromQuery(Name = "token")] string token)
+        {
+            try
+            {
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager,
+                                                                   Server.TeamServer.TokenIssuer.ElevateToken(token));
+                Dictionary<string, long> counts = new ModelManager(Server.TeamServer.ObjectManager.Connection).GetObjectCounts();
+
+
+                return String.Join(";", counts.Select(e => e.Key + "=" + e.Value));
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
+            }
+            catch (Exception exception)
+            {
+                return "Error: " + exception.Message;
+            }
+        }
+
         [HttpGet("allsessions")]
         public string GetSessions([FromQuery(Name = "token")] string token)
         {
@@ -237,6 +260,27 @@ namespace TeamServer.Controllers {
                                                                    Server.TeamServer.TokenIssuer.ElevateToken(token));
 
                 return String.Join(";", sessionManager.GetAllSessions().Select(c => c.Identifier));
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
+            }
+            catch (Exception exception)
+            {
+                return "Error: " + exception.Message;
+            }
+        }
+
+        [HttpGet("compactdatabase")]
+        public string CompactDatabase([FromQuery(Name = "token")] string token)
+        {
+            try
+            {
+                Server.TeamServer.TokenIssuer.ElevateToken(token);
+
+                Server.TeamServer.ObjectManager.CompactDatabase();
+
+                return "Ok";
             }
             catch (AggregateException exception)
             {

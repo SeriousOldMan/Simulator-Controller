@@ -20,6 +20,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\Libraries\CLR.ahk"
+#Include "..\Libraries\Task.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -182,6 +183,24 @@ class SpeechRecognizer {
 		}
 	}
 
+	Engine {
+		Get {
+			return this.iEngine
+		}
+	}
+
+	Choices[name?] {
+		Get {
+			return this.getChoices(name?)
+		}
+	}
+
+	Grammars {
+		Get {
+			return this._grammars
+		}
+	}
+
 	Recognizers[language := false] {
 		Get {
 			local result := []
@@ -231,6 +250,8 @@ class SpeechRecognizer {
 					Run("`"" . kNirCmd . "`" setdefaultsounddevice `"" . audioDevice . "`"")
 				}
 				catch Any as exception {
+					logError(exception, true)
+
 					showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
 							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
@@ -264,7 +285,7 @@ class SpeechRecognizer {
 
 				choices := []
 
-				loop 11
+				loop 10
 					choices.Push((A_Index - 1) . "")
 
 				this.setChoices("Digit", choices)
@@ -335,6 +356,8 @@ class SpeechRecognizer {
 					Run("`"" . kNirCmd . "`" setdefaultsounddevice `"" . audioDevice . "`"")
 				}
 				catch Any as exception {
+					logError(exception, true)
+
 					showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
 							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
@@ -384,15 +407,15 @@ class SpeechRecognizer {
 	}
 
 	startRecognizer() {
-		local audioDevice
+		local audioDevice := SpeechRecognizer.sRecognizerAudioDevice
 
-		if (SpeechRecognizer.sRecognizerAudioDevice && kNirCmd) {
-			audioDevice := SpeechRecognizer.sRecognizerAudioDevice
-
+		if (audioDevice && kNirCmd) {
 			try {
-				Run("`"" . kNirCmd . "`" setdefaultsounddevice `"" .audioDevice . "`"")
+				Run("`"" . kNirCmd . "`" setdefaultsounddevice `"" . audioDevice . "`"")
 			}
 			catch Any as exception {
+				logError(exception, true)
+
 				showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
@@ -402,19 +425,19 @@ class SpeechRecognizer {
 	}
 
 	stopRecognizer() {
-		local audioDevice
+		local audioDevice := SpeechRecognizer.sDefaultAudioDevice
 
 		try {
 			return (this.Instance ? this.Instance.StopRecognizer() : false)
 		}
 		finally {
-			if (SpeechRecognizer.sDefaultAudioDevice && kNirCmd) {
-				audioDevice := SpeechRecognizer.sDefaultAudioDevice
-
+			if (audioDevice && kNirCmd) {
 				try {
 					Run("`"" . kNirCmd . "`" setdefaultsounddevice `"" . audioDevice . "`"")
 				}
 				catch Any as exception {
+					logError(exception, true)
+
 					showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
 							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
@@ -435,13 +458,17 @@ class SpeechRecognizer {
 		return result
 	}
 
-	getChoices(name) {
-		if this.iChoices.Has(name)
-			return this.iChoices[name]
-		else if (this.iEngine = "Azure")
-			return []
+	getChoices(name?) {
+		if isSet(name) {
+			if this.iChoices.Has(name)
+				return this.iChoices[name]
+			else if (this.iEngine = "Azure")
+				return []
+			else
+				return (this.Instance ? ((this.iEngine = "Server") ? this.Instance.GetServerChoices(name) : this.Instance.GetDesktopChoices(name)) : [])
+		}
 		else
-			return (this.Instance ? ((this.iEngine = "Server") ? this.Instance.GetServerChoices(name) : this.Instance.GetDesktopChoices(name)) : [])
+			return this.iChoices
 	}
 
 	setChoices(name, choices) {
@@ -478,21 +505,44 @@ class SpeechRecognizer {
 			return false
 	}
 
-	loadGrammar(name, grammar, callback) {
+	loadGrammar(name, theGrammar, callback) {
+		prepareGrammar(theName, theGrammar) {
+			local start := A_TickCount
+			local ignore
+
+			if isInstance(theGrammar, Grammar)
+				try {
+					ignore := theGrammar.Phrases
+
+					if isDebug()
+						logMessage(kLogDebug, "Preparing grammar " . theName . " took " . (A_TickCount - start) . " ms")
+				}
+				catch Any as exception {
+					logError(exception)
+				}
+		}
+
 		if (this._grammarCallbacks.Has(name))
 			throw "Grammar " . name . " already exists in SpeechRecognizer.loadGrammar..."
 
 		this._grammarCallbacks[name] := callback
 
 		if (this.iEngine = "Azure") {
-			grammar := {Name: name, Grammar: grammar, Callback: callback}
+			Task.startTask(prepareGrammar.Bind(name, theGrammar), 1000, kLowPriority)
 
-			this._grammars[name] := grammar
+			theGrammar := {Name: name, Grammar: theGrammar, Callback: callback}
 
-			return grammar
+			this._grammars[name] := theGrammar
+
+			return theGrammar
 		}
-		else if this.Instance
-			return this.Instance.LoadGrammar(grammar, name, this._onGrammarCallback.Bind(this))
+		else if this.Instance {
+			Task.startTask(prepareGrammar.Bind(name, theGrammar), 1000, kLowPriority)
+
+			this._grammars[name] := {Name: name, Grammar: theGrammar, Callback: callback}
+
+			return this.Instance.LoadGrammar(theGrammar, name, this._onGrammarCallback.Bind(this))
+		}
 		else
 			return false
 	}
@@ -608,8 +658,22 @@ class SpeechRecognizer {
 		}
 	}
 
-	match(words, grammar, minRating := 0.7, maxRating := 0.85) {
-		local matches := this.allMatches(words, minRating, maxRating, grammar.Phrases*)
+	match(words, grammar, minRating?, maxRating?) {
+		local matches, settings
+
+		static ratingLow := kUndefined
+		static ratingHigh := kUndefined
+
+		if (ratingLow = kUndefined) {
+			settings := readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+
+			ratingLow := getMultiMapValue(settings, "Voice", "Low Rating", 0.7)
+			ratingHigh := getMultiMapValue(settings, "Voice", "High Rating", 0.85)
+		}
+
+		matches := this.allMatches(words, isSet(minRating) ? minRating : ratingLow
+										, isSet(maxRating) ? maxRating : ratingHigh
+										, grammar.Phrases*)
 
 		return (matches.HasProp("BestMatch") ? matches.BestMatch.Rating : false)
 	}
@@ -757,8 +821,17 @@ class GrammarCompiler {
 
 		literalValue := this.readLiteral(&text, &nextCharIndex)
 
-		if literalValue
+		if literalValue {
 			builtin := literalValue.Value
+
+			try {
+				if !this.SpeechRecognizer.Choices[builtin]
+					throw "Syntax error detected in `"" . text . "`" at " . nextCharIndex . " in GrammarCompiler.readBuiltinChoices..."
+			}
+			catch Any {
+				throw "Syntax error detected in `"" . text . "`" at " . nextCharIndex . " in GrammarCompiler.readBuiltinChoices..."
+			}
+		}
 		else
 			throw "Syntax error detected in `"" . text . "`" at " . nextCharIndex . " in GrammarCompiler.readBuiltinChoices..."
 

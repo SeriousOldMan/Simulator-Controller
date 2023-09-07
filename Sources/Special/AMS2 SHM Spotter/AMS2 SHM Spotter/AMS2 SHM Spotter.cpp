@@ -12,6 +12,8 @@
 #include <fstream>
 #include <iostream>
 
+#pragma comment( lib, "winmm.lib" )
+
 // Name of the pCars memory mapped file
 #define MAP_OBJECT_NAME "$pcars2$"
 
@@ -45,7 +47,7 @@ int sendStringMessage(HWND hWnd, int wParam, char* msg) {
 	return result;
 }
 
-void sendSpotterMessage(char* message) {
+void sendSpotterMessage(const char* message) {
 	HWND winHandle = FindWindowExA(0, 0, 0, "Race Spotter.exe");
 
 	if (winHandle == 0)
@@ -61,7 +63,7 @@ void sendSpotterMessage(char* message) {
 	}
 }
 
-void sendAutomationMessage(char* message) {
+void sendAutomationMessage(const char* message) {
 	HWND winHandle = FindWindowEx(0, 0, 0, L"Simulator Controller.exe");
 
 	if (winHandle == 0)
@@ -77,6 +79,22 @@ void sendAutomationMessage(char* message) {
 	}
 }
 
+void sendAnalyzerMessage(const char* message) {
+	HWND winHandle = FindWindowEx(0, 0, 0, L"Setup Workbench.exe");
+
+	if (winHandle == 0)
+		winHandle = FindWindowEx(0, 0, 0, L"Setup Workbench.ahk");
+
+	if (winHandle != 0) {
+		char buffer[128];
+
+		strcpy_s(buffer, 128, "Analyzer:");
+		strcpy_s(buffer + strlen("Analyzer:"), 128 - strlen("Analyzer:"), message);
+
+		sendStringMessage(winHandle, 0, buffer);
+	}
+}
+
 #define PI 3.14159265
 
 long cycle = 0;
@@ -85,7 +103,7 @@ const float nearByXYDistance = 10.0;
 const float nearByZDistance = 6.0;
 float longitudinalFrontDistance = 4;
 float longitudinalRearDistance = 5;
-const float lateralDistance = 6;
+const float lateralDistance = 8;
 const float verticalDistance = 2;
 
 const int CLEAR = 0;
@@ -528,9 +546,13 @@ float averageValue(std::vector<float>& values, int& num) {
 float smoothValue(std::vector<float>& values, float value) {
 	int ignore;
 
-	pushValue(values, value);
+	if (false) {
+		pushValue(values, value);
 
-	return averageValue(values, ignore);
+		return averageValue(values, ignore);
+	}
+	else
+		return value;
 }
 
 std::vector<CornerDynamics> cornerDynamicsList;
@@ -550,8 +572,37 @@ int trackWidth = 150;
 
 int lastCompletedLaps = 0;
 float lastSpeed = 0.0;
+long lastSound = 0;
 
-bool collectTelemetry(const SharedMemory* sharedData) {
+bool triggerUSOSBeep(std::string soundsDirectory, std::string audioDevice, float usos) {
+	std::string wavFile = "";
+
+	if (usos < oversteerHeavyThreshold)
+		wavFile = soundsDirectory + "\\Oversteer Heavy.wav";
+	else if (usos < oversteerMediumThreshold)
+		wavFile = soundsDirectory + "\\Oversteer Medium.wav";
+	else if (usos < oversteerLightThreshold)
+		wavFile = soundsDirectory + "\\Oversteer Light.wav";
+	else if (usos > understeerHeavyThreshold)
+		wavFile = soundsDirectory + "\\Understeer Heavy.wav";
+	else if (usos > understeerMediumThreshold)
+		wavFile = soundsDirectory + "\\Understeer Medium.wav";
+	else if (usos > understeerLightThreshold)
+		wavFile = soundsDirectory + "\\Understeer Light.wav";
+
+	if (wavFile != "") {
+		if (audioDevice != "")
+			sendAnalyzerMessage(("acousticFeedback:" + wavFile).c_str());
+		else
+			PlaySoundA(wavFile.c_str(), NULL, SND_FILENAME | SND_ASYNC);
+
+		return true;
+	}
+	else
+		return false;
+}
+
+bool collectTelemetry(const SharedMemory* sharedData, std::string soundsDirectory, std::string audioDevice, bool calibrate) {
 	if (sharedData->mGameState == GAME_INGAME_PAUSED && sharedData->mPitMode != PIT_MODE_NONE)
 		return true;
 
@@ -563,16 +614,16 @@ bool collectTelemetry(const SharedMemory* sharedData) {
 
 	pushValue(recentGLongs, acceleration);
 
-	double angularVelocity = smoothValue(recentRealAngVels, sharedData->mAngularVelocity[VEC_Z]);
-	double steeredAngleDegs = sharedData->mSteering * steerLock / 2.0f / steerRatio;
+	double angularVelocity = smoothValue(recentRealAngVels, sharedData->mAngularVelocity[VEC_Y]);
+	double steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
 	double steerAngleRadians = -steeredAngleDegs / 57.2958;
-	double wheelBaseMeter = (float)wheelbase / 10;
+	double wheelBaseMeter = (float)wheelbase / 100;
 	double radius = wheelBaseMeter / steerAngleRadians;
 	double perimeter = radius * PI * 2;
 	double perimeterSpeed = lastSpeed / 3.6;
 	double idealAngularVelocity = smoothValue(recentIdealAngVels, perimeterSpeed / perimeter * 2 * PI);
 
-	if (fabs(sharedData->mSteering) > 0.1 && lastSpeed > 60) {
+	if (fabs(steerAngle) > 0.1 && lastSpeed > 60) {
 		// Get the average recent GLong
 		int numGLong = 0;
 		float glongAverage = averageValue(recentGLongs, numGLong);
@@ -594,30 +645,49 @@ bool collectTelemetry(const SharedMemory* sharedData) {
 			phase);
 
 		if (fabs(angularVelocity * 57.2958) > 0.1) {
-			double slip = fabs(idealAngularVelocity) - fabs(angularVelocity);
+			double slip = fabs(idealAngularVelocity - angularVelocity);
 
-			if (false)
-				if (sharedData->mSteering > 0) {
-					if (angularVelocity < idealAngularVelocity)
+			if (steerAngle > 0) {
+				if (angularVelocity > 0)
+				{
+					if (calibrate)
 						slip *= -1;
+					else
+						slip = (oversteerHeavyThreshold - 1) / 57.2989;
 				}
-				else {
-					if (angularVelocity > idealAngularVelocity)
+				else if (angularVelocity < idealAngularVelocity)
+					slip *= -1;
+			}
+			else {
+				if (angularVelocity < 0)
+				{
+					if (calibrate)
 						slip *= -1;
+					else
+						slip = (oversteerHeavyThreshold - 1) / 57.2989;
 				}
+				else if (angularVelocity > idealAngularVelocity)
+					slip *= -1;
+			}
 
-			cd.usos = slip * 57.2989 * 10;
+			cd.usos = slip * 57.2989 * 1;
+
+			if ((soundsDirectory != "") && GetTickCount() > (lastSound + 300))
+				if (triggerUSOSBeep(soundsDirectory, audioDevice, cd.usos))
+					lastSound = GetTickCount();
 
 			if (false) {
 				std::ofstream output;
 
 				output.open(dataFile + ".trace", std::ios::out | std::ios::app);
 
-				output << sharedData->mSteering << "  " << steeredAngleDegs << "  " << steerAngleRadians << "  " <<
+				output << steerAngle << "  " << steeredAngleDegs << "  " << steerAngleRadians << "  " <<
 					      lastSpeed << "  " << idealAngularVelocity << "  " << angularVelocity << "  " << slip << "  " <<
 						  cd.usos << std::endl;
 
 				output.close();
+				
+				Sleep(200);
 			}
 		}
 
@@ -952,6 +1022,9 @@ int main(int argc, char* argv[]) {
 	bool calibrateTelemetry = false;
 	bool analyzeTelemetry = false;
 
+	char* soundsDirectory = "";
+	char* audioDevice = "";
+
 	if (argc > 1) {
 		calibrateTelemetry = (strcmp(argv[1], "-Calibrate") == 0);
 		analyzeTelemetry = calibrateTelemetry || (strcmp(argv[1], "-Analyze") == 0);
@@ -980,6 +1053,13 @@ int main(int argc, char* argv[]) {
 				steerRatio = atoi(argv[11]);
 				wheelbase = atoi(argv[12]);
 				trackWidth = atoi(argv[13]);
+
+				if (argc > 14) {
+					soundsDirectory = argv[14];
+
+					if (argc > 15)
+						audioDevice = argv[15];
+				}
 			}
 		}
 		else if (positionTrigger) {
@@ -1037,7 +1117,7 @@ int main(int argc, char* argv[]) {
 			}
 			
 			if (analyzeTelemetry) {
-				if (collectTelemetry(localCopy)) {
+				if (collectTelemetry(localCopy, soundsDirectory, audioDevice, calibrateTelemetry)) {
 					if (remainder(counter, 20) == 0)
 						writeTelemetry(localCopy, calibrateTelemetry);
 				}

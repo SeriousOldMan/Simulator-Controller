@@ -162,8 +162,7 @@ class SpeechSynthesizer {
 	}
 
 	__New(synthesizer, voice := false, language := false) {
-		local dllName, dllFile, voices, languageCode, voiceInfos, ignore, voiceInfo, dirName
-		local player, copied, configuration
+		local dllName, dllFile, voices, languageCode, voiceInfos, ignore, voiceInfo, dirName, configuration
 
 		dirName := ("PhraseCache." . StrSplit(A_ScriptName, ".")[1] . "." . kVersion)
 
@@ -276,22 +275,6 @@ class SpeechSynthesizer {
 				SpeechSynthesizer.sAudioDriver := getMultiMapValue(configuration, "Output", this.Routing . ".AudioDriver", false)
 				SpeechSynthesizer.sAudioDevice := getMultiMapValue(configuration, "Output", this.Routing . ".AudioDevice", false)
 			}
-
-			if FileExist(kSox)
-				for ignore, player in ["SoundPlayerSync.exe", "SoundPlayerAsync.exe"]
-					if !FileExist(kTempDirectory . player) {
-						copied := false
-
-						while (!copied)
-							try {
-								FileCopy(kSox, kTempDirectory . player, true)
-
-								copied := true
-							}
-							catch Any as exception {
-								logError(exception)
-							}
-					}
 		}
 	}
 
@@ -306,6 +289,8 @@ class SpeechSynthesizer {
 					Run("`"" . kNirCmd . "`" setappvolume /" . pid . A_Space . level)
 				}
 				catch Any as exception {
+					logError(exception, true)
+
 					showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
 							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
@@ -342,18 +327,13 @@ class SpeechSynthesizer {
 	}
 
 	playSound(soundFile, wait := true) {
-		local callback, player, pid, workingDirectory, level, option
+		local callback, pid, level
 
 		callback := this.SpeechStatusCallback
 
 		if kSox {
-			player := (wait ? "SoundPlayerSync.exe" : "SoundPlayerAsync.exe")
-
-			SplitPath(kSox, , &workingDirectory)
-
-			option := (SpeechSynthesizer.sAudioDevice ? ("`"" . SpeechSynthesizer.sAudioDevice . "`"") : "")
-
-			Run("`"" . kTempDirectory . player . "`" `"" . soundFile . "`" -t waveaudio " . option, workingDirectory, "HIDE", &pid)
+			pid := playSound(wait ? "SoundPlayerSync.exe" : "SoundPlayerAsync.exe", soundFile
+						   , SpeechSynthesizer.sAudioDevice ? ("`"" . SpeechSynthesizer.sAudioDevice . "`"") : "")
 
 			if callback
 				callback.Call("Start")
@@ -369,6 +349,8 @@ class SpeechSynthesizer {
 					Run("`"" . kNirCmd . "`" setappvolume /" . pid . A_Space . level)
 				}
 				catch Any as exception {
+					logError(exception, true)
+
 					showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
 												  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
@@ -394,7 +376,7 @@ class SpeechSynthesizer {
 				if callback
 					callback.Call("Start")
 
-				SoundPlay(soundFile, "Wait")
+				playSound("System", soundFile, "Wait")
 
 				if callback
 					callback.Call("Stop")
@@ -403,7 +385,7 @@ class SpeechSynthesizer {
 				if callback
 					callback.Call("Play")
 
-				SoundPlay(soundFile)
+				playSound("System", soundFile)
 			}
 		}
 	}
@@ -541,6 +523,8 @@ class SpeechSynthesizer {
 						RunWait("`"" . kSoX . "`" `"" . temp1Name . "`" `"" . temp2Name . "`" norm vol " . volume, , "Hide")
 				}
 				catch Any as exception {
+					logError(exception, true)
+
 					showMessage(substituteVariables(translate("Cannot start SoX (%kSoX%) - please check the configuration..."))
 							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 
@@ -645,6 +629,19 @@ class SpeechSynthesizer {
 		}
 	}
 
+	speakTest() {
+		switch this.Language, false {
+			case "EN":
+				this.speak("The quick brown fox jumps over the lazy dog")
+			case "DE":
+				this.speak("Falsches Üben von Xylophonmusik quält jeden größeren Zwerg")
+			case "ES":
+				this.speak("Extraño pan de col y kiwi se quemó bajo fugaz vaho")
+			default:
+				this.speak("The quick brown fox jumps over the lazy dog")
+		}
+	}
+
 	isSpeaking() {
 		if this.iSoundPlayer {
 			if ProcessExist(this.iSoundPlayer)
@@ -698,7 +695,7 @@ class SpeechSynthesizer {
 		}
 		else if (this.iPlaysCacheFile || (this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure")) {
 			try
-				SoundPlay("NonExistent.avi")
+				playSound("System", "NonExistent.avi")
 
 			if this.iPlaysCacheFile {
 				this.iPlaysCacheFile := false
@@ -745,7 +742,7 @@ class SpeechSynthesizer {
 
 	computeVoice(voice, language, randomize := true) {
 		local voices := this.Voices
-		local availableVoices, count, index, locale, ignore, candidate
+		local availableVoices, count, locale, ignore, candidate
 
 		if (this.Synthesizer = "Windows") {
 			if ((voice == true) && language) {
@@ -755,11 +752,8 @@ class SpeechSynthesizer {
 
 				if (count == 0)
 					voice := false
-				else if randomize {
-					index := Random(1, count)
-
-					voice := availableVoices[Round(index)]
-				}
+				else if randomize
+					voice := availableVoices[Round(Random(1, count))]
 				else
 					voice := availableVoices[1]
 			}
@@ -782,11 +776,8 @@ class SpeechSynthesizer {
 
 				if (count == 0)
 					voice := false
-				else if randomize {
-					index := Random(1, count)
-
-					voice := availableVoices[Round(index)]
-				}
+				else if randomize
+					voice := availableVoices[Round(Random(1, count))]
 				else
 					voice := availableVoices[1]
 			}

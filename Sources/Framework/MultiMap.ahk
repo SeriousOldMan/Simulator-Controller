@@ -13,6 +13,7 @@
 #Include "Variables.ahk"
 #Include "Debug.ahk"
 #Include "Files.ahk"
+#Include "Strings.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -26,6 +27,20 @@ class MultiMap extends CaseInsenseWeakMap {
 
 	static parse(text) {
 		return parseMultiMap(text)
+	}
+
+	include(path, directory?) {
+		local curWorkingDir := A_WorkingDir
+
+		if isSet(directory)
+			SetWorkingDir(directory)
+
+		try {
+			addMultiMapValues(this, readMultiMap(path))
+		}
+		finally {
+			SetWorkingDir(curWorkingDir)
+		}
 	}
 
 	write(multiMapFile, symbolic := true) {
@@ -78,12 +93,18 @@ newSectionMap(arguments*) {
 	return CaseInsenseWeakMap(arguments*)
 }
 
-readMultiMap(multiMapFile) {
+readMultiMap(multiMapFile, class?) {
 	local file := false
 	local tries := 20
 	local data := false
 
-	multiMapFile := getFileName(multiMapFile, kUserConfigDirectory, kConfigDirectory)
+	if !FileExist(multiMapFile)
+		if (isSet(kUserConfigDirectory) && isSet(kConfigDirectory))
+			multiMapFile := getFileName(multiMapFile, kUserConfigDirectory, kConfigDirectory)
+		else
+			multiMapFile := getFileName(multiMapFile, A_MyDocuments . "\Simulator Controller\Config\"
+													, normalizeFilePath(A_ScriptDir . (A_IsCompiled ? "\..\Config\" : "\..\..\Config\")))
+
 
 	if FileExist(multiMapFile) {
 		loop
@@ -102,20 +123,23 @@ readMultiMap(multiMapFile) {
 			}
 			catch Any as exception {
 				if (tries-- <= 0)
-					return newMultiMap()
+					return isSet(class) ? class() : newMultiMap()
 				else
 					Sleep(10)
 			}
 
-		if (data && (data != ""))
-			return parseMultiMap(data)
+		if (data && (data != "")) {
+			SplitPath(multiMapFile, , &directory)
+
+			return parseMultiMap(data, class?, directory)
+		}
 	}
 
 	return newMultiMap()
 }
 
-parseMultiMap(text) {
-	local multiMap := newMultiMap()
+parseMultiMap(text, class?, directory?) {
+	local multiMap := (isSet(class) ? class() : newMultiMap())
 	local section := false
 	local currentLine, firstChar, keyValue, key, value
 
@@ -132,8 +156,11 @@ parseMultiMap(text) {
 		else if (firstChar = "[") {
 			section := StrReplace(StrReplace(RTrim(currentLine), "[", ""), "]", "")
 
-			multiMap[section] := newSectionMap()
+			if !multiMap.Has(section)
+				multiMap[section] := newSectionMap()
 		}
+		else if ((firstChar = "#") && (InStr(currentLine, "#Include") = 1))
+			multiMap.include(substituteVariables(Trim(SubStr(currentLine, 9))), directory?)
 		else if section {
 			keyValue := LTrim(currentLine)
 
@@ -143,7 +170,7 @@ parseMultiMap(text) {
 				key := StrReplace(StrReplace(StrReplace(keyValue[1], "_#_EQ-#_", "="), "_#_AC-#_", "\\"), "_#_CR-#_", "`n")
 				value := ((keyValue.Length > 1) ? StrReplace(StrReplace(StrReplace(keyValue[2], "_#_EQ-#_", "="), "_#_AC-#_", "\"), "_#_CR-#_", "`n") : "")
 
-				multiMap[section][key] := ((value = kTrue) ? true : ((value = kFalse) ? false : value))
+				multiMap[section][key] := ((value = "true") ? true : ((value = "false") ? false : value))
 			}
 		}
 	}
@@ -158,6 +185,7 @@ writeMultiMap(multiMapFile, multiMap, symbolic := true) {
 
 	deleteFile(tempFile)
 
+	/*
 	for section, keyValues in multiMap {
 		pairs := ""
 
@@ -173,6 +201,9 @@ writeMultiMap(multiMapFile, multiMap, symbolic := true) {
 
 		FileAppend(section, tempFile, "UTF-16")
 	}
+	*/
+
+	FileAppend(printMultiMap(multiMap, symbolic), tempFile, "UTF-16")
 
 	multiMapFile := getFileName(multiMapFile, kUserConfigDirectory)
 

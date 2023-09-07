@@ -27,7 +27,7 @@ class JSON {
 		next := '"{[01234567890-tfn'
 		pos := 0
 
-		while ( (ch := SubStr(src, ++pos, 1)) != "" ) {
+		while ((ch := SubStr(src, ++pos, 1)) != "" ) {
 			if InStr(" `t`n`r", ch)
 				continue
 			if !InStr(next, ch, true) {
@@ -113,7 +113,7 @@ class JSON {
 					else if (val == "true" || val == "false")
 						val := (val == "true")
 					else if (val == "null")
-						val := ""
+						val := kNull
 					else if is_key {
 						pos--, next := "#"
 						continue
@@ -187,7 +187,16 @@ class JSON {
 			obj := StrReplace(obj,"/","\/")
 			obj := StrReplace(obj,'"','\"')
 
-			return '"' obj '"'
+			if (obj = kNull)
+				return "null"
+			else if isNumber(obj)
+				return obj
+			else if (obj = kTrue)
+				return "true"
+			else if (obj = kFalse)
+				return "false"
+			else
+				return '"' obj '"'
 		}
 	}
 }

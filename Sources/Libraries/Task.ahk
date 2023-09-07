@@ -362,8 +362,11 @@ class Task {
 		Task.block(priority)
 	}
 
-	static yield() {
-		Task.schedule()
+	static yield(schedule := true) {
+		if schedule
+			Task.schedule()
+		else
+			Sleep(1)
 	}
 
 	static schedule(priority := 2) {
@@ -433,7 +436,7 @@ class Task {
 		Task.sCurrentTask := theTask
 
 		if window
-			window.Opt("+Disabled")
+			window.Block()
 
 		try {
 			next := theTask.execute()
@@ -446,14 +449,14 @@ class Task {
 					try {
 						window.AutoActivate := false
 
-						window.Opt("-Disabled")
+						window.Unblock()
 					}
 					finally {
 						window.AutoActivate := curAutoActivate
 					}
 				}
 				else
-					window.Opt("-Disabled")
+					window.Unblock()
 
 			Task.sCurrentTask := oldCurrentTask
 		}

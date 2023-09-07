@@ -68,9 +68,7 @@ class MessagesTest extends Assert {
 			messageSend(kFileMessage, "Test", "registerValue:" . A_Index, pid)
 
 		while (vIncomingValues.Length < 5) {
-			priority := Random(1, 4)
-
-			Task.startTask(disturb, 50, Round(priority))
+			Task.startTask(disturb, 50, Round(Random(1, 4)))
 
 			Sleep(1)
 		}

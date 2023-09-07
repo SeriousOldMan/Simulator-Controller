@@ -241,9 +241,19 @@ namespace TeamServer {
 		public string GetAllSessions()
 		{
 			return Get("login/allsessions");
-		}
+        }
 
-		public string GetConnection(string identifier)
+        public string GetAllObjects()
+        {
+            return Get("login/allobjects");
+        }
+
+        public string CompactDatabase()
+        {
+            return Get("login/compactdatabase");
+        }
+
+        public string GetConnection(string identifier)
 		{
 			return Get("login/" + identifier);
 		}
@@ -305,11 +315,11 @@ namespace TeamServer {
 
 		public void DeleteAccount(string identifier) {
 			Delete("account/" + identifier);
-		}
-		#endregion
+        }
+        #endregion
 
-		#region Task
-		public string GetAllTasks() {
+        #region Task
+        public string GetAllTasks() {
 			return Get("task/alltasks");
 		}
 		public string CreateTask(string type, string operation, string frequency) {

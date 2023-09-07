@@ -234,10 +234,10 @@ class ControllerEditor extends ConfiguratorPanel {
 			moveByMouse(window)
 
 			WinGetPos(&x, &y, &width, &height, window)
-			
+
 			x := screen2Window(x)
 			y := screen2Window(y)
-			
+
 			preview := ControllerPreview.ControllerPreviews[window]
 
 			preview.PreviewManager.setPreviewCenter(window, x + Round(width / 2), y + Round(height / 2))
@@ -330,13 +330,13 @@ class ControllerEditor extends ConfiguratorPanel {
 	openControllerActionsEditor() {
 		local window := this.Window
 
-		window.Opt("+Disabled")
+		window.Block()
 
 		try {
 			ControllerActionsEditor(kSimulatorConfiguration).editPluginActions(false, window)
 		}
 		finally {
-			window.Opt("-Disabled")
+			window.Unblock()
 		}
 	}
 
@@ -1203,13 +1203,13 @@ class LayoutsList extends ConfigurationItemList {
 		setMultiMapValues(configuration, "Icons", this.iIconDefinitions)
 		setMultiMapValues(configuration, "Buttons", this.iButtonDefinitions)
 
-		window.Opt("+Disabled")
+		window.Block()
 
 		try {
 			result := (DisplayRulesEditor(name, configuration)).editDisplayRules(window)
 		}
 		finally {
-			window.Opt("-Disabled")
+			window.Unblock()
 		}
 
 		if result {
@@ -1368,7 +1368,7 @@ class LayoutsList extends ConfigurationItemList {
 		else if (control = "__Image_Icon__") {
 			oldImage := (oldButton ? oldButton.Icon : false)
 
-			newImage := chooseImageFile(this.Window, (oldImage && (oldImage != true)) ? oldImage : SubStr(kStreamDeckImagesDirectory, 1, StrLen(kStreamDeckImagesDirectory) - 1))
+			newImage := chooseImageFile(this.Window, (oldImage && (oldImage != true)) ? oldImage : (kStreamDeckImagesDirectory . "Icons"))
 
 			if newImage
 				oldButton.Icon := newImage
@@ -1380,8 +1380,13 @@ class LayoutsList extends ConfigurationItemList {
 		}
 		else if (control = "__Number__") {
 			if !number {
-				result := InputBox(translate("Please enter a controller function number:"), translate("Function Number"), "w200 h150"
-								 , ConfigurationItem.splitDescriptor(definition[1])[2])
+				if (definition.Length > 0)
+					number := ConfigurationItem.splitDescriptor(definition[1])[2]
+				else
+					number := ""
+
+				result := InputBox(translate("Please enter a controller function number:")
+								 , translate("Function Number"), "w200 h150", number)
 
 				if (result.Result = "Ok")
 					number := result.Value
@@ -1958,7 +1963,7 @@ class DisplayRulesList extends ConfigurationItemList {
 			if (path && (path != ""))
 				path := getFileName(path, kStreamDeckImagesDirectory)
 			else
-				path := SubStr(kStreamDeckImagesDirectory, 1, StrLen(kStreamDeckImagesDirectory) - 1)
+				path := (kStreamDeckImagesDirectory . "Icons")
 
 			pictureFile := chooseImageFile(window, path)
 
@@ -2107,10 +2112,10 @@ controlClick(window, *) {
 
 	try {
 		MouseGetPos(&clickX, &clickY)
-		
+
 		clickX := screen2Window(clickX)
 		clickY := screen2Window(clickY)
-		
+
 		row := 0
 		column := 0
 		isEmpty := false

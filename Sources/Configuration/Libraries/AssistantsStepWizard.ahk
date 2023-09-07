@@ -33,14 +33,19 @@ class AssistantsStepWizard extends ActionsStepWizard {
 	Pages {
 		Get {
 			local wizard := this.SetupWizard
-			local count := 0
-			local ignore, assistant
+			local count, ignore, assistant
 
-			for ignore, assistant in this.Definition
-				if wizard.isModuleSelected(assistant)
-					count += 1
+			if wizard.QuickSetup
+				return 0
+			else {
+				count := 0
 
-			return count
+				for ignore, assistant in this.Definition
+					if wizard.isModuleSelected(assistant)
+						count += 1
+
+				return count
+			}
 		}
 	}
 
@@ -61,7 +66,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 	saveToConfiguration(configuration) {
 		local wizard := this.SetupWizard
 		local assistantActive := false
-		local function, action, ignore, assistant, assistantConfiguration, section, subConfiguration, arguments
+		local function, action, ignore, assistant, assistantConfiguration, section, subConfiguration, arguments, voice
 		local actions
 
 		super.saveToConfiguration(configuration)
@@ -83,11 +88,11 @@ class AssistantsStepWizard extends ActionsStepWizard {
 				}
 
 				if (assistant = "Race Engineer")
-					arguments := "raceAssistantName: Jona"
+					arguments := ("raceAssistantName: " . wizard.getModuleValue(assistant, "Name", "Jona"))
 				else if (assistant = "Race Strategist")
-					arguments := "raceAssistantName: Khato"
+					arguments := ("raceAssistantName: " . wizard.getModuleValue(assistant, "Name", "Khato"))
 				else if (assistant = "Race Spotter")
-					arguments := "raceAssistantName: Elisa"
+					arguments := ("raceAssistantName: " . wizard.getModuleValue(assistant, "Name", "Elisa"))
 				else
 					throw "Unsupported race assistant detected in AssistantsStepWizard.saveToConfiguration..."
 
@@ -111,8 +116,28 @@ class AssistantsStepWizard extends ActionsStepWizard {
 				if (actions != "")
 					arguments .= ("; assistantCommands: " . actions)
 
-				if wizard.isModuleSelected("Voice Control")
-					arguments .= "; raceAssistantSpeaker: On; raceAssistantListener: On"
+				if wizard.isModuleSelected("Voice Control") {
+					if (wizard.getModuleValue(assistant, "Language", kUndefined) != kUndefined)
+						arguments .= ("; raceAssistantLanguage: " . wizard.getModuleValue(assistant, "Language"))
+
+					if (wizard.getModuleValue(assistant, "Synthesizer", kUndefined) != kUndefined)
+						arguments .= ("; raceAssistantSynthesizer: " . wizard.getModuleValue(assistant, "Synthesizer"))
+
+					voice := wizard.getModuleValue(assistant, "Voice", true)
+
+					if (voice == true)
+						voice := "On"
+					else if (voice == false)
+						voice := "Off"
+
+					arguments .= ("; raceAssistantSpeaker: " . voice . "; raceAssistantListener: On")
+
+					if ((wizard.getModuleValue(assistant, "Volume", "*") != "*") || (wizard.getModuleValue(assistant, "Pitch", "*") != "*")
+																				 || (wizard.getModuleValue(assistant, "Speed", "*") != "*"))
+						arguments .= ("; raceAssistantSpeakerVocalics: " . values2String(",", wizard.getModuleValue(assistant, "Volume", "*")
+																							, wizard.getModuleValue(assistant, "Pitch", "*")
+																							, wizard.getModuleValue(assistant, "Speed", "*")))
+				}
 				else
 					arguments .= "; raceAssistantSpeaker: Off"
 
@@ -133,8 +158,12 @@ class AssistantsStepWizard extends ActionsStepWizard {
 									arguments .= ("; openSessionDatabase: " . values2String(A_Space, function*))
 								case "RaceSettingsOpen":
 									arguments .= ("; openRaceSettings: " . values2String(A_Space, function*))
+								case "RaceReportsOpen":
+									arguments .= ("; openRaceReports: " . values2String(A_Space, function*))
 								case "StrategyWorkbenchOpen":
 									arguments .= ("; openStrategyWorkbench: " . values2String(A_Space, function*))
+								case "PracticeCenterOpen":
+									arguments .= ("; openPracticeCenter: " . values2String(A_Space, function*))
 								case "RaceCenterOpen":
 									arguments .= ("; openRaceCenter: " . values2String(A_Space, function*))
 								case "SetupWorkbenchOpen":

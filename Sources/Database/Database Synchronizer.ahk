@@ -337,12 +337,11 @@ synchronizeSessionDatabase(minutes) {
 
 updateSessionDatabase() {
 	local icon := kIconsDirectory . "Database Update.ico"
-	local usePressures, useSetups, useStrategies, id, minutes, configuration
+	local usePressures, useSetups, useStrategies, id, minutes
 
 	TraySetIcon(icon, "1")
 	A_IconTip := "Database Synchronizer"
 
-/*
 	usePressures := (inList(A_Args, "-Pressures") != 0)
 	useSetups := (inList(A_Args, "-Setups") != 0)
 	useStrategies := (inList(A_Args, "-Strategies") != 0)
@@ -353,22 +352,17 @@ updateSessionDatabase() {
 		PeriodicTask(synchronizeCommunityDatabase.Bind(A_Args[id + 1], usePressures, useSetups, useStrategies), 10000, kLowPriority).start()
 
 	minutes := inList(A_Args, "-Synchronize")
-*/
-
-	id := "42812.9640.8993"
-	minutes := true
 
 	if minutes {
-		; minutes := A_Args[minutes + 1]
-
-		minutes := 1
+		minutes := A_Args[minutes + 1]
 
 		if (minutes && (minutes != kFalse)) {
-			if ((minutes == true) || (minutes = kTrue)) {
-				configuration := readMultiMap(kUserConfigDirectory . "Session Database.ini")
+			if ((minutes == true) || (minutes = kTrue))
+				minutes := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Session Database.ini")
+										  , "Team Server", "Replication", 30)
 
-				minutes := getMultiMapValue(configuration, "Team Server", "Replication", 30)
-			}
+			if !isInteger(minutes)
+				minutes := 30
 
 			Task.startTask(synchronizeSessionDatabase.Bind(minutes), 1000, kLowPriority)
 		}

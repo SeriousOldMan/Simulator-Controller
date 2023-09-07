@@ -182,7 +182,23 @@ class StreamDeck extends FunctionController {
 		dllName := "SimulatorControllerPluginConnector.dll"
 		dllFile := kBinariesDirectory . dllName
 
-		this.iConnector := CLR_LoadLibrary(dllFile).CreateInstance("PluginConnector.PluginConnector")
+		try {
+			if !FileExist(dllFile)
+				throw "File not found..."
+
+			this.iConnector := CLR_LoadLibrary(dllFile).CreateInstance("PluginConnector.PluginConnector")
+
+			if (getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory)), "Stream Deck", "Protocol", "Message") = "File")
+				this.iConnector.SetCommandFile(kTempDirectory . "Controller.cmd")
+		}
+		catch Any as exception {
+			logError(exception, true)
+
+			logMessage(kLogCritical, substituteVariables(translate("Cannot start Stream Deck Connector (%dllFile%) - please check the configuration..."), {dllFile: dllFile}))
+
+			showMessage(substituteVariables(translate("Cannot start Stream Deck Connector (%dllFile%) - please check the configuration..."), {dllFile: dllFile})
+					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+		}
 
 		super.__New(controller, configuration)
 	}
@@ -376,7 +392,7 @@ class StreamDeck extends FunctionController {
 
 	setControlIcon(function, icon) {
 		local controller := this.Controller
-		local enabled, displayMode, iconMode, ignore, theAction
+		local enabled, displayMode, iconMode, ignore, theAction, actions
 
 		if !isObject(function)
 			function := controller.findFunction(function)
@@ -384,12 +400,18 @@ class StreamDeck extends FunctionController {
 		if (this.isRunning() && this.hasFunction(function)) {
 			enabled := false
 
-			for ignore, theAction in this.Actions[function]
-				if function.Enabled[theAction] {
-					enabled := true
+			actions := this.Actions[function]
 
-					break
-				}
+			if (actions.Length > 0) {
+				for ignore, theAction in actions
+					if function.Enabled[theAction] {
+						enabled := true
+
+						break
+					}
+			}
+			else
+				enabled := true
 
 			if (!icon || (icon = ""))
 				icon := "clear"
@@ -460,7 +482,7 @@ class StreamDeck extends FunctionController {
 	}
 
 	refresh(full := false) {
-		local function, theFunction, title, controller, image, enabled, ignore, theAction, update
+		local function, theFunction, title, controller, image, enabled, ignore, theAction, update, actions
 
 		if this.RefreshActive
 			return
@@ -481,12 +503,18 @@ class StreamDeck extends FunctionController {
 						function := controller.findFunction(theFunction)
 
 						if function {
-							for ignore, theAction in this.Actions[function]
-								if function.Enabled[theAction] {
-									enabled := true
+							actions := this.Actions[function]
 
-									break
+							if (actions.Length > 0) {
+								for ignore, theAction in actions
+									if function.Enabled[theAction] {
+										enabled := true
+
+										break
+								}
 							}
+							else
+								enabled := true
 
 							this.setFunctionImage(theFunction, image, enabled, true)
 						}

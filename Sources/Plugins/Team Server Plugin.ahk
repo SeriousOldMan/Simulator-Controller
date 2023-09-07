@@ -114,10 +114,10 @@ class TeamServerPlugin extends ControllerPlugin {
 				Run("`"" . exePath . "`"", kBinariesDirectory)
 			}
 			catch Any as exception {
+				logError(exception, true)
+				
 				logMessage(kLogCritical, translate("Cannot start the Race Settings tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (")
 									   . kBinariesDirectory . translate(")"))
-
-				logError(exception, true)
 
 				showMessage(substituteVariables(translate("Cannot start the Race Settings tool (%exePath%) - please check the configuration..."), {exePath: exePath})
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
@@ -147,10 +147,10 @@ class TeamServerPlugin extends ControllerPlugin {
 				Run("`"" . exePath . "`"", kBinariesDirectory)
 			}
 			catch Any as exception {
+				logError(exception, true)
+
 				logMessage(kLogCritical, translate("Cannot start the Race Center tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (")
 									   . kBinariesDirectory . translate(")"))
-
-				logError(exception, true)
 
 				showMessage(substituteVariables(translate("Cannot start the Race Center tool (%exePath%) - please check the configuration..."), {exePath: exePath})
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
@@ -457,7 +457,7 @@ class TeamServerPlugin extends ControllerPlugin {
 							driver := this.iCachedObjects[driver]
 
 							lastStintInfo := [this.iCachedObjects[stint]["Nr"], this.iCachedObjects[lap]["Nr"]
-											, computeDriverName(driver["ForName"], driver["SurName"], driver["NickName"])]
+											, driverName(driver["ForName"], driver["SurName"], driver["NickName"])]
 
 							nextUpdate := (A_TickCount + 60000)
 						}
@@ -729,7 +729,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 				driver := this.iCachedObjects[driver]
 
-				return computeDriverName(driver.ForName, driver.SurName, driver.NickName)
+				return driverName(driver.ForName, driver.SurName, driver.NickName)
 			}
 			catch Any as exception {
 				this.LastMessage := (translate("Error while fetching stint data (Session: ") . session . translate(", Stint: ") . stint
@@ -1396,7 +1396,7 @@ class TeamServerPlugin extends ControllerPlugin {
 							car := getMultiMapValue(telemetryData, "Session Data", "Car", "Unknown")
 							track := getMultiMapValue(telemetryData, "Session Data", "Track", "Unknown")
 
-							SessionDatabase.registerDriver(simulator, this.ID, computeDriverName(driverForName, driverSurName, driverNickName))
+							SessionDatabase.registerDriver(simulator, this.ID, driverName(driverForName, driverSurName, driverNickName))
 
 							stint := this.joinSession(simulator, car, track, lapNumber)
 						}
@@ -1496,9 +1496,9 @@ class TeamServerPlugin extends ControllerPlugin {
 					if (this.Driver && this.Session)
 						connection := this.Connector.Connect(this.ServerToken
 														   , SessionDatabase().ID
-														   , computeDriverName(this.DriverForName[true]
-														   , this.DriverSurName[true]
-														   , this.DriverNickName[true])
+														   , driverName(this.DriverForName[true]
+																	  , this.DriverSurName[true]
+																	  , this.DriverNickName[true])
 														   , "Driver", this.Session)
 
 					if connection {

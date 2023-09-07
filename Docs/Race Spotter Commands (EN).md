@@ -86,7 +86,31 @@ Announcements=delta information, tactical advice, side alerts, rear alerts, blue
 	[(TellMe) the gap to {the car behind me, the position behind me, the previous car}, (WhatIs) the gap to {the car behind me, the position behind me, the previous car}, How big is the gap to the {car behind me, position behind me, previous car}]
 
 	[(TellMe) the gap to the {leading car, leader}, (WhatIs) the gap to the {leading car, leader}, How big is the gap to the {leading car, leader}]
+	
+	[(TellMe) the gap to {car, car number, number} (Number), (WhatIs) the gap to {car, car number, number} (Number), How big is the gap to {car, car number, number} (Number)]
+	
+	[(TellMe) the {driver name, name of the driver, driver in the car} ahead, (WhatIs) the {driver name, name of the driver, driver in the car} ahead]
+
+	[(TellMe) the {driver name, name of the driver, driver in the car} behind, (WhatIs) the {driver name, name of the driver, driver in the car} behind]
+	
+	[(TellMe) the {class of the car, car class} ahead, (WhatIs) the {class of the car, car class} ahead]
+	
+	[(TellMe) the {class of the car, car class} behind, (WhatIs) the {class of the car, car class} behind]
+	
+	[(TellMe) the {cup category of the car, car cup category} ahead, (WhatIs) the {cup category of the car, car cup category} ahead]
+	
+	[(TellMe) the {cup category of the car, car cup category} behind, (WhatIs) the {cup category of the car, car cup category} behind]
+	
+	[(TellMe) the {current lap, last lap, lap} time of {car, car number, number} (Number), (WhatIs) the {current lap, last lap, lap} time of {car, car number, number} (Number)]
+	
+	[(TellMe) the {current lap, last lap, lap} time of position (Number), (WhatIs) the {current lap, last lap, lap} time of position (Number)]
+
+	[(TellMe) {the, my} {current lap, last lap, lap} time, (WhatIs) {my, the} {current lap, last lap, lap} time]
 
 	[(TellMe) the {current lap, lap} times, (WhatAre) the {current lap, lap} times]
 	
 	[(TellMe) the number of {cars, cars on the track, cars in the session, active cars, cars still active}, (WhatAre) the number of {cars, cars on the track, cars in the session}, How many cars {are, are still} {active, on the track, in the session}]
+	
+	[(CanYou) {focus on, observe} {car, car number, number} (Number), (CanYou) give {me, me more} information about {car, car number, number} (Number)]
+	
+	[Please no more information on {car, car number, number} (Number), Stop reporting on {car, car number, number} (Number) please]

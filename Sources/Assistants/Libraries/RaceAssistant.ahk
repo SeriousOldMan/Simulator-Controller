@@ -72,6 +72,7 @@ class RaceAssistant extends ConfigurationItem {
 
 	iLearningLaps := 1
 
+	iPrepared := false
 	iKnowledgeBase := false
 
 	iSessionDuration := 0
@@ -132,6 +133,28 @@ class RaceAssistant extends ConfigurationItem {
 	class RaceVoiceManager extends VoiceManager {
 		iRaceAssistant := false
 
+		class Grammars extends MultiMap {
+			include(path, directory?) {
+				local fileName, include
+
+				if FileExist(path)
+					super.include(path, directory?)
+				else {
+					SplitPath(path, &fileName)
+
+					include := getFileName(fileName, kGrammarsDirectory)
+
+					if (include && FileExist(include))
+						super.include(include, directory?)
+
+					include := getFileName(fileName, kUserGrammarsDirectory)
+
+					if (include && FileExist(include))
+						super.include(include, directory?)
+				}
+			}
+		}
+
 		Routing {
 			Get {
 				return this.RaceAssistant.AssistantType
@@ -176,11 +199,9 @@ class RaceAssistant extends ConfigurationItem {
 			if !FileExist(getFileName(fileName, kUserGrammarsDirectory, kGrammarsDirectory))
 				fileName := (prefix . "en")
 
-			grammars := readMultiMap(kGrammarsDirectory . fileName)
+			grammars := readMultiMap(kGrammarsDirectory . fileName, RaceAssistant.RaceVoiceManager.Grammars)
 
-			for section, values in readMultiMap(kUserGrammarsDirectory . fileName)
-				for key, value in values
-					setMultiMapValue(grammars, section, key, value)
+			addMultiMapValues(grammars, readMultiMap(kUserGrammarsDirectory . fileName, RaceAssistant.RaceVoiceManager.Grammars))
 
 			return grammars
 		}
@@ -313,6 +334,12 @@ class RaceAssistant extends ConfigurationItem {
 	TeamSession {
 		Get {
 			return this.iTeamSession
+		}
+	}
+
+	Prepared {
+		Get {
+			return this.iPrepared
 		}
 	}
 
@@ -484,6 +511,7 @@ class RaceAssistant extends ConfigurationItem {
 		options["Recognizer"] := getMultiMapValue(configuration, "Voice Control", "Recognizer", "Desktop")
 		options["Listener"] := getMultiMapValue(configuration, "Voice Control", "Listener", false)
 		options["PushToTalk"] := getMultiMapValue(configuration, "Voice Control", "PushToTalk", false)
+		options["PushToTalkMode"] := getMultiMapValue(configuration, "Voice Control", "PushToTalkMode", "Hold")
 	}
 
 	createVoiceManager(name, options) {
@@ -537,6 +565,8 @@ class RaceAssistant extends ConfigurationItem {
 
 				this.iBaseLap := false
 				this.iInitialFuelAmount := 0
+
+				this.updateConfigurationValues({Settings: false})
 			}
 		}
 
@@ -545,6 +575,9 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	updateDynamicValues(values) {
+		if values.HasProp("Prepared")
+			this.iPrepared := values.Prepared
+
 		if values.HasProp("KnowledgeBase")
 			this.iKnowledgeBase := values.KnowledgeBase
 
@@ -760,11 +793,9 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	jokeRecognized(words) {
-		local rnd, joke, speaker, html, index, hasJoke
+		local joke, speaker, html, index, hasJoke
 
-		rnd := Random(0, 4)
-
-		hasJoke := (rnd > 1)
+		hasJoke := (Random(0, 4) > 1)
 
 		if hasJoke
 			if (this.VoiceManager.Language = "EN") {
@@ -867,6 +898,13 @@ class RaceAssistant extends ConfigurationItem {
 			else
 				return false
 		}
+	}
+
+	isInteger(word, &number) {
+		if this.isNumber(word, &number)
+			return isInteger(number)
+		else
+			return false
 	}
 
 	setContinuation(continuation) {
@@ -975,10 +1013,16 @@ class RaceAssistant extends ConfigurationItem {
 		this.prepareSession(&settings, &data)
 	}
 
-	prepareSession(&settings, &data) {
-		local simulator, simulatorName, session, driverForname, driverSurname, driverNickname
+	prepareSession(&settings, &data, formationLap := true) {
+		local simulator, simulatorName, session, driverForname, driverSurname, driverNickname, facts
 
-		if settings
+		if (settings && !isObject(settings))
+			settings := readMultiMap(settings)
+
+		if (data && !isObject(data))
+			data := readMultiMap(data)
+
+		if (settings && (formationLap || !this.Settings))
 			this.updateConfigurationValues({Settings: settings})
 
 		settings := this.Settings
@@ -1002,10 +1046,26 @@ class RaceAssistant extends ConfigurationItem {
 		driverNickname := getMultiMapValue(data, "Stint Data", "DriverNickname", "JDO")
 
 		this.updateSessionValues({Simulator: simulatorName, Session: session, TeamSession: (getMultiMapValue(data, "Session Data", "Mode", "Solo") = "Team")
-								, SessionTime: A_Now, Driver: driverForname, DriverFullName: computeDriverName(driverForName, driverSurName, driverNickName)})
+								, SessionTime: A_Now, Driver: driverForname, DriverFullName: driverName(driverForName, driverSurName, driverNickName)})
+		this.updateDynamicValues({Prepared: true})
+
+		lapTime := getMultiMapValue(data, "Stint Data", "LapLastTime", 0)
+
+		if this.AdjustLapTime {
+			settingsLapTime := (getDeprecatedValue(settings, "Session Settings", "Race Settings", "Lap.AvgTime", lapTime / 1000) * 1000)
+
+			if ((lapTime / settingsLapTime) > 1.2)
+				lapTime := settingsLapTime
+		}
+
+		facts := this.createFacts(settings, data)
+
+		this.initializeSessionFormat(facts, settings, data, lapTime)
+
+		return facts
 	}
 
-	initializeSessionFormat(facts, settings, data, lapTime) {
+	initializeSessionFormat(facts, settings, data, lapTime := 0, update := true) {
 		local sessionFormat := getMultiMapValue(data, "Session Data", "SessionFormat", "Time")
 		local sessionTimeRemaining := getDeprecatedValue(data, "Session Data", "Stint Data", "SessionTimeRemaining", 0)
 		local sessionLapsRemaining := getDeprecatedValue(data, "Session Data", "Stint Data", "SessionLapsRemaining", 0)
@@ -1023,26 +1083,28 @@ class RaceAssistant extends ConfigurationItem {
 		else if (dataDuration > 0)
 			duration := dataDuration
 
-		if isInstance(facts, KnowledgeBase) {
-			if (facts.getValue("Session.Duration", 0) == 0)
-				facts.setValue("Session.Duration", duration)
+		if facts
+			if isInstance(facts, KnowledgeBase) {
+				if (facts.getValue("Session.Duration", 0) == 0)
+					facts.setFact("Session.Duration", duration)
 
-			if (facts.getValue("Session.Laps", 0) == 0)
-				facts.setValue("Session.Laps", laps)
+				if (facts.getValue("Session.Laps", 0) == 0)
+					facts.setFact("Session.Laps", laps)
 
-			facts.setValue("Session.Format", sessionFormat)
-		}
-		else {
-			if (!facts.Has("Session.Duration") || (facts["Session.Duration"] == 0))
-				facts["Session.Duration"] := duration
+				facts.setFact("Session.Format", sessionFormat)
+			}
+			else {
+				if (!facts.Has("Session.Duration") || (facts["Session.Duration"] == 0))
+					facts["Session.Duration"] := duration
 
-			if (!facts.Has("Session.Laps") || (facts["Session.Laps"] == 0))
-				facts["Session.Laps"] := laps
+				if (!facts.Has("Session.Laps") || (facts["Session.Laps"] == 0))
+					facts["Session.Laps"] := laps
 
-			facts["Session.Format"] := sessionFormat
-		}
+				facts["Session.Format"] := sessionFormat
+			}
 
-		this.updateSessionValues({SessionDuration: duration * 1000, SessionLaps: laps, TeamSession: (getMultiMapValue(data, "Session Data", "Mode", "Solo") = "Team")})
+		if update
+			this.updateSessionValues({SessionDuration: duration * 1000, SessionLaps: laps, TeamSession: (getMultiMapValue(data, "Session Data", "Mode", "Solo") = "Team")})
 	}
 
 	readSettings(simulator, car, track, &settings) {
@@ -1070,65 +1132,22 @@ class RaceAssistant extends ConfigurationItem {
 				knowledgeBase.setFact(key, value)
 	}
 
-	createSession(&settings, &data) {
-		local configuration, simulator, simulatorName, session, driverForname, driverSurname, driverNickname
-		local lapTime, settingsLapTime, facts
+	createFacts(settings, data) {
+		local configuration := this.Configuration
+		local simulator := getMultiMapValue(data, "Session Data", "Simulator", "Unknown")
+		local simulatorName := this.SettingsDatabase.getSimulatorName(simulator)
 
-		if (settings && !isObject(settings))
-			settings := readMultiMap(settings)
-
-		if (data && !isObject(data))
-			data := readMultiMap(data)
-
-		if settings
-			this.updateConfigurationValues({Settings: settings})
-
-		configuration := this.Configuration
-		settings := this.Settings
-
-		simulator := getMultiMapValue(data, "Session Data", "Simulator", "Unknown")
-		simulatorName := this.SettingsDatabase.getSimulatorName(simulator)
-
-		switch getMultiMapValue(data, "Session Data", "Session", "Practice"), false {
-			case "Practice":
-				session := kSessionPractice
-			case "Qualification":
-				session := kSessionQualification
-			case "Race":
-				session := kSessionRace
-			default:
-				session := kSessionOther
-		}
-
-		driverForname := getMultiMapValue(data, "Stint Data", "DriverForname", this.DriverForName)
-		driverSurname := getMultiMapValue(data, "Stint Data", "DriverSurname", "Doe")
-		driverNickname := getMultiMapValue(data, "Stint Data", "DriverNickname", "JDO")
-
-		this.updateSessionValues({Simulator: simulatorName, Session: session, TeamSession: (getMultiMapValue(data, "Session Data", "Mode", "Solo") = "Team")
-								, SessionTime: A_Now, Driver: driverForname, DriverFullName: computeDriverName(driverForName, driverSurName, driverNickName)})
-
-		lapTime := getMultiMapValue(data, "Stint Data", "LapLastTime", 0)
-
-		if this.AdjustLapTime {
-			settingsLapTime := (getDeprecatedValue(settings, "Session Settings", "Race Settings", "Lap.AvgTime", lapTime / 1000) * 1000)
-
-			if ((lapTime / settingsLapTime) > 1.2)
-				lapTime := settingsLapTime
-		}
-
-		facts := combine(this.readSettings(simulator, getMultiMapValue(data, "Session Data", "Car", ""), getMultiMapValue(data, "Session Data", "Track", ""), &settings)
-					   , CaseInsenseMap("Session.Type", this.Session
-									  , "Session.Time.Remaining", getDeprecatedValue(data, "Session Data", "Stint Data", "SessionTimeRemaining", 0)
-									  , "Session.Lap.Remaining", getDeprecatedValue(data, "Session Data", "Stint Data", "SessionLapsRemaining", 0)
-									  , "Session.Settings.Lap.Time.Adjust", this.AdjustLapTime
-									  , "Session.Settings.Fuel.Max", getMultiMapValue(data, "Session Data", "FuelAmount", 0)
-									  , "Session.Settings.Lap.Learning.Laps", getMultiMapValue(configuration, this.AssistantType . " Analysis", simulatorName . ".LearningLaps", 1)
-									  , "Session.Settings.Lap.History.Considered", getMultiMapValue(configuration, this.AssistantType . " Analysis", simulatorName . ".ConsideredHistoryLaps", 5)
-									  , "Session.Settings.Lap.History.Damping", getMultiMapValue(configuration, this.AssistantType . " Analysis", simulatorName . ".HistoryLapsDamping", 0.2)))
-
-		this.initializeSessionFormat(facts, settings, data, lapTime)
-
-		return facts
+		return combine(this.readSettings(simulator
+									   , getMultiMapValue(data, "Session Data", "Car", "")
+									   , getMultiMapValue(data, "Session Data", "Track", ""), &settings)
+					 , CaseInsenseMap("Session.Type", this.Session
+									, "Session.Time.Remaining", getDeprecatedValue(data, "Session Data", "Stint Data", "SessionTimeRemaining", 0)
+									, "Session.Lap.Remaining", getDeprecatedValue(data, "Session Data", "Stint Data", "SessionLapsRemaining", 0)
+									, "Session.Settings.Lap.Time.Adjust", this.AdjustLapTime
+									, "Session.Settings.Fuel.Max", getMultiMapValue(data, "Session Data", "FuelAmount", 0)
+									, "Session.Settings.Lap.Learning.Laps", getMultiMapValue(configuration, this.AssistantType . " Analysis", simulatorName . ".LearningLaps", 1)
+									, "Session.Settings.Lap.History.Considered", getMultiMapValue(configuration, this.AssistantType . " Analysis", simulatorName . ".ConsideredHistoryLaps", 5)
+									, "Session.Settings.Lap.History.Damping", getMultiMapValue(configuration, this.AssistantType . " Analysis", simulatorName . ".HistoryLapsDamping", 0.2)))
 	}
 
 	callStartSession(settings, data) {
@@ -1227,10 +1246,10 @@ class RaceAssistant extends ConfigurationItem {
 			setMultiMapValue(sessionInfo, "Session", "Laps.Remaining", Ceil(knowledgeBase.getValue("Lap.Remaining.Session", 0)))
 			setMultiMapValue(sessionInfo, "Session", "Time.Remaining", Round(getMultiMapValue(data, "Session Data", "SessionTimeRemaining", 0) / 1000))
 
-			setMultiMapValue(sessionInfo, "Stint", "Driver", computeDriverName(getMultiMapValue(data, "Stint Data", "DriverForname", this.DriverForName)
-																			 , getMultiMapValue(data, "Stint Data", "DriverSurname", "Doe")
-																			 , getMultiMapValue(data, "Stint Data", "DriverNickname", "JDO")))
-			setMultiMapValue(sessionInfo, "Stint", "Lap", lapNumber)
+			setMultiMapValue(sessionInfo, "Stint", "Driver", driverName(getMultiMapValue(data, "Stint Data", "DriverForname", this.DriverForName)
+																	  , getMultiMapValue(data, "Stint Data", "DriverSurname", "Doe")
+																	  , getMultiMapValue(data, "Stint Data", "DriverNickname", "JDO")))
+			setMultiMapValue(sessionInfo, "Stint", "Laps", lapNumber)
 			setMultiMapValue(sessionInfo, "Stint", "Position", knowledgeBase.getValue("Position", 0))
 			setMultiMapValue(sessionInfo, "Stint", "Valid", valid)
 			setMultiMapValue(sessionInfo, "Stint", "Fuel.AvgConsumption", Round(knowledgeBase.getValue("Lap." . lapNumber . ".Fuel.AvgConsumption", 0), 1))
@@ -1253,6 +1272,7 @@ class RaceAssistant extends ConfigurationItem {
 			setMultiMapValue(sessionInfo, "Track", "Grip", getMultiMapValue(data, "Track Data", "Grip", "Optimum"))
 
 			setMultiMapValue(sessionInfo, "Tyres", "Pressures", getMultiMapValue(data, "Car Data", "TyrePressure", ""))
+			setMultiMapValue(sessionInfo, "Tyres", "Pressures.Hot", getMultiMapValue(data, "Car Data", "TyrePressure", ""))
 			setMultiMapValue(sessionInfo, "Tyres", "Temperatures", getMultiMapValue(data, "Car Data", "TyreTemperature", ""))
 
 			tyreWear := getMultiMapValue(data, "Car Data", "TyreWear", "")
@@ -1328,7 +1348,7 @@ class RaceAssistant extends ConfigurationItem {
 		driverSurname := getMultiMapValue(data, "Stint Data", "DriverSurname", "Doe")
 		driverNickname := getMultiMapValue(data, "Stint Data", "DriverNickname", "JDO")
 
-		this.updateSessionValues({Driver: driverForname, DriverFullName: computeDriverName(driverForname, driverSurname, driverNickname)
+		this.updateSessionValues({Driver: driverForname, DriverFullName: driverName(driverForname, driverSurname, driverNickname)
 								, TeamSession: (getMultiMapValue(data, "Session Data", "Mode", "Solo") = "Team")})
 
 		knowledgeBase.addFact("Lap." . lapNumber . ".Driver.Forname", driverForname)
@@ -1681,15 +1701,15 @@ class GridRaceAssistant extends RaceAssistant {
 	iLastPitstopUpdate := false
 
 	class Pitstop {
-		iNr := false
+		iID := false
 
 		iTime := false
 		iLap := 0
 		iDuration := 0
 
-		Nr {
+		ID {
 			Get {
-				return this.iNr
+				return this.iID
 			}
 		}
 
@@ -1715,21 +1735,21 @@ class GridRaceAssistant extends RaceAssistant {
 			}
 		}
 
-		__New(nr, time, lap, duration := 0) {
-			this.iNr := nr
+		__New(id, time, lap, duration := 0) {
+			this.iID := id
 			this.iTime := time
 			this.iLap := lap
 			this.iDuration := duration
 		}
 	}
 
-	Pitstops[nr?] {
+	Pitstops[id?] {
 		Get {
-			if isSet(nr) {
-				if !this.iPitstops.Has(nr)
-					this.iPitstops[nr] := []
+			if isSet(id) {
+				if !this.iPitstops.Has(id)
+					this.iPitstops[id] := []
 
-				return this.iPitstops[nr]
+				return this.iPitstops[id]
 			}
 			else
 				return this.iPitstops
@@ -1764,6 +1784,8 @@ class GridRaceAssistant extends RaceAssistant {
 		switch grammar, false {
 			case "Position":
 				this.positionRecognized(words)
+			case "LapTime":
+				this.lapTimeRecognized(words)
 			case "LapTimes":
 				this.lapTimesRecognized(words)
 			case "ActiveCars":
@@ -1774,6 +1796,24 @@ class GridRaceAssistant extends RaceAssistant {
 				this.gapToBehindRecognized(words)
 			case "GapToLeader":
 				this.gapToLeaderRecognized(words)
+			case "GapToFocus":
+				this.gapToFocusRecognized(words)
+			case "LapTimeFocus":
+				this.lapTimeFocusRecognized(words)
+			case "LapTimePosition":
+				this.lapTimePositionRecognized(words)
+			case "DriverNameAhead":
+				this.driverNameAheadRecognized(words)
+			case "DriverNameBehind":
+				this.driverNameBehindRecognized(words)
+			case "CarClassAhead":
+				this.carClassAheadRecognized(words)
+			case "CarClassBehind":
+				this.carClassBehindRecognized(words)
+			case "CarCupAhead":
+				this.carCupAheadRecognized(words)
+			case "CarCupBehind":
+				this.carCupBehindRecognized(words)
 			default:
 				super.handleVoiceCommand(grammar, words)
 		}
@@ -1783,6 +1823,8 @@ class GridRaceAssistant extends RaceAssistant {
 		switch category, false {
 			case "Position":
 				this.positionRecognized([])
+			case "LapTime":
+				this.lapTimeRecognized([])
 			case "LapTimes":
 				this.lapTimesRecognized([])
 			case "ActiveCars":
@@ -1801,6 +1843,18 @@ class GridRaceAssistant extends RaceAssistant {
 				this.gapToBehindRecognized(inList(arguments, "Track") ? Array(this.getSpeaker().Fragments["Car"]) : [])
 			case "GapToLeader":
 				this.gapToLeaderRecognized([])
+			case "DriverNameAhead":
+				this.driverNameAheadRecognized([])
+			case "DriverNameBehind":
+				this.driverNameBehindRecognized([])
+			case "CarClassAhead":
+				this.carClassAheadRecognized([])
+			case "CarClassBehind":
+				this.carClassBehindRecognized([])
+			case "CarCupAhead":
+				this.carCupAheadRecognized([])
+			case "CarCupBehind":
+				this.carCupBehindRecognized([])
 			default:
 				super.requestInformation(category, arguments*)
 		}
@@ -1845,27 +1899,46 @@ class GridRaceAssistant extends RaceAssistant {
 		}
 	}
 
+	lapTimeRecognized(words) {
+		local knowledgeBase := this.KnowledgeBase
+		local speaker := this.getSpeaker()
+		local car := knowledgeBase.getValue("Driver.Car", kUndefined)
+		local lap := knowledgeBase.getValue("Lap", 0)
+		local lapTime, minute, seconds
+
+		if !this.hasEnoughData()
+			return
+
+		if ((lap == 0) || (car == kUndefined) || (car == 0))
+			speaker.speakPhrase("Later")
+		else {
+			lapTime := (knowledgeBase.getValue("Car." . car . ".Time") / 1000)
+
+			minute := Floor(lapTime / 60)
+			seconds := (lapTime - (minute * 60))
+
+			speaker.speakPhrase("LapTime", {time: speaker.number2Speech(lapTime, 1), minute: minute, seconds: speaker.number2Speech(seconds, 1)})
+		}
+	}
+
 	lapTimesRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
+		local speaker := this.getSpeaker()
 		local car, lap, position, cars, driverLapTime, speaker, minute, seconds
 
 		reportLapTime(phrase, driverLapTime, car) {
-			local lapTime := this.KnowledgeBase.getValue("Car." . car . ".Time", false)
-			local speaker, fragments, minute, seconds, delta
-
-			if !this.hasEnoughData()
-				return
+			local lapTime := knowledgeBase.getValue("Car." . car . ".Time", false)
+			local fragments, minute, seconds, delta
 
 			if lapTime {
 				lapTime /= 1000
 
-				speaker := this.getSpeaker()
-
-				speaker.beginTalk()
 				fragments := speaker.Fragments
 
 				minute := Floor(lapTime / 60)
 				seconds := (lapTime - (minute * 60))
+
+				speaker.beginTalk()
 
 				try {
 					speaker.speakPhrase(phrase, {time: speaker.number2Speech(lapTime, 1), minute: minute, seconds: speaker.number2Speech(seconds, 1)})
@@ -1890,12 +1963,10 @@ class GridRaceAssistant extends RaceAssistant {
 		position := this.getPosition(false, "Class")
 		cars := knowledgeBase.getValue("Car.Count")
 
-		driverLapTime := (knowledgeBase.getValue("Car." . car . ".Time") / 1000)
-
 		if ((lap == 0) || (car == kUndefined) || (car == 0))
-			this.getSpeaker().speakPhrase("Later")
+			speaker.speakPhrase("Later")
 		else {
-			speaker := this.getSpeaker()
+			driverLapTime := (knowledgeBase.getValue("Car." . car . ".Time") / 1000)
 
 			speaker.beginTalk()
 
@@ -1904,19 +1975,19 @@ class GridRaceAssistant extends RaceAssistant {
 				seconds := (driverLapTime - (minute * 60))
 
 				speaker.speakPhrase("LapTime", {time: speaker.number2Speech(driverLapTime, 1), minute: minute, seconds: speaker.number2Speech(seconds, 1)})
-
-				if (position > 2)
-					reportLapTime("LapTimeFront", driverLapTime, knowledgeBase.getValue("Position.Standings.Class.Ahead.Car", 0))
-
-				if (position < cars)
-					reportLapTime("LapTimeBehind", driverLapTime, knowledgeBase.getValue("Position.Standings.Class.Behind.Car", 0))
-
-				if (position > 1)
-					reportLapTime("LapTimeLeader", driverLapTime, knowledgeBase.getValue("Position.Standings.Class.Leader.Car", 0))
 			}
 			finally {
 				speaker.endTalk()
 			}
+
+			if (position > 2)
+				reportLapTime("LapTimeFront", driverLapTime, knowledgeBase.getValue("Position.Standings.Class.Ahead.Car", 0))
+
+			if (position < cars)
+				reportLapTime("LapTimeBehind", driverLapTime, knowledgeBase.getValue("Position.Standings.Class.Behind.Car", 0))
+
+			if (position > 1)
+				reportLapTime("LapTimeLeader", driverLapTime, knowledgeBase.getValue("Position.Standings.Class.Leader.Car", 0))
 		}
 	}
 
@@ -1986,7 +2057,7 @@ class GridRaceAssistant extends RaceAssistant {
 		local delta, lap, inPit, speaker
 
 		if ((car == kUndefined) || (car == 0))
-			this.getSpeaker().speakPhrase("Later")
+			speaker.speakPhrase("Later")
 		else if (this.getPosition(false, "Class") = 1)
 			speaker.speakPhrase("NoGapToAhead")
 		else {
@@ -2003,7 +2074,7 @@ class GridRaceAssistant extends RaceAssistant {
 
 					return
 				}
-				else if ((knowledgeBase.getValue("Car." . car . ".Lap") > lap)
+				else if ((knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap")) > lap)
 					  && (Abs(delta) > (knowledgeBase.getValue("Lap." . lap . ".Time") / 1000)))
 					speaker.speakPhrase("StandingsAheadLapped")
 				else
@@ -2067,7 +2138,7 @@ class GridRaceAssistant extends RaceAssistant {
 		local delta, speaker, driver, inPit, lap, lapped
 
 		if ((car == kUndefined) || (car == 0))
-			this.getSpeaker().speakPhrase("Later")
+			speaker.speakPhrase("Later")
 		else if (this.getPosition(false, "Class") = this.getCars("Class").Length)
 			speaker.speakPhrase("NoGapToBehind")
 		else {
@@ -2085,7 +2156,7 @@ class GridRaceAssistant extends RaceAssistant {
 
 					return
 				}
-				else if ((knowledgeBase.getValue("Car." . car . ".Lap") < lap)
+				else if ((knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap")) < lap)
 					  && (Abs(delta) > (knowledgeBase.getValue("Lap." . lap . ".Time") / 1000))) {
 					speaker.speakPhrase("StandingsBehindLapped")
 
@@ -2113,7 +2184,7 @@ class GridRaceAssistant extends RaceAssistant {
 			return
 
 		if ((car == kUndefined) || (car == 0))
-			this.getSpeaker().speakPhrase("Later")
+			speaker.speakPhrase("Later")
 		else if (this.getPosition(false, "Class") = 1)
 			speaker.speakPhrase("NoGapToAhead")
 		else {
@@ -2123,19 +2194,298 @@ class GridRaceAssistant extends RaceAssistant {
 		}
 	}
 
+	getNumber(words) {
+		local numbers := []
+		local ignore, candidate, fragment
+
+		for ignore, candidate in words {
+			if (InStr(candidate, "#") == 1)
+				candidate := SubStr(candidate, 2)
+
+			if this.isInteger(candidate, &candidate)
+				numbers.Push(candidate)
+			else if (numbers.Length > 0)
+				break
+		}
+
+		if (numbers.Length > 0) {
+			number := ""
+
+			for ignore, fragment in numbers
+				number .= fragment
+
+			return Integer(number)
+		}
+		else
+			return false
+	}
+
+	getCarNumber(words, &number) {
+		local knowledgeBase := this.KnowledgeBase
+		local car := false
+		local ignore, candidate
+
+		number := this.getNumber(words)
+
+		if number
+			for ignore, candidate in this.getCars()
+				if (knowledgeBase.getValue("Car." . candidate . ".Nr", false) = number) {
+					car := candidate
+
+					break
+				}
+
+		return car
+	}
+
+	gapToFocusRecognized(words) {
+		local knowledgeBase := this.KnowledgeBase
+		local speaker := this.getSpeaker()
+		local car := knowledgebase.getValue("Driver.Car", kUndefined)
+		local number, delta, inPit, lapped, lap
+
+		if !this.hasEnoughData()
+			return
+
+		if ((car == kUndefined) || (car == 0))
+			this.getSpeaker().speakPhrase("Later")
+		else {
+			car := this.getCarNumber(words, &number)
+
+			if car {
+				speaker.beginTalk()
+
+				try {
+					lap := knowledgeBase.getValue("Lap")
+					delta := (this.getDelta(car) / 1000)
+					inPit := (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false))
+					lapped := false
+
+					if ((delta = 0) || (inPit && (Abs(delta) < 30))) {
+						speaker.speakPhrase(inPit ? "CarInPit" : "NoTrackGap")
+
+						return
+					}
+					else if ((knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap")) < lap)
+						  && (Abs(delta) > (knowledgeBase.getValue("Lap." . lap . ".Time") / 1000))) {
+						speaker.speakPhrase((delta < 0) ? "FocusBehindLapped" : "FocusAheadLapped", {number: number})
+
+						lapped := true
+					}
+					else
+						speaker.speakPhrase((delta < 0) ? "FocusGapToBehind" : "FocusGapToAhead"
+										  , {number: number, delta: speaker.number2Speech(Abs(delta), 1)})
+
+					if (!lapped && inPit)
+						speaker.speakPhrase("GapCarInPit")
+				}
+				finally {
+					speaker.endTalk()
+				}
+			}
+			else if number
+				speaker.speakPhrase("NoFocusCar", {number: number})
+			else
+				speaker.speakPhrase("Repeat")
+		}
+	}
+
+	lapTimeFocusRecognized(words) {
+		local knowledgeBase := this.KnowledgeBase
+		local speaker := this.getSpeaker()
+		local car := knowledgebase.getValue("Driver.Car", kUndefined)
+		local number, lapTime, minute, seconds, inPit
+
+		if !this.hasEnoughData()
+			return
+
+		if ((car == kUndefined) || (car == 0))
+			this.getSpeaker().speakPhrase("Later")
+		else {
+			car := this.getCarNumber(words, &number)
+
+			if car {
+				lapTime := (this.getLapTime(car) / 1000)
+				inPit := (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false))
+
+				if (inPit || (lapTime = 0)) {
+					speaker.speakPhrase("CarInPit")
+
+					return
+				}
+				else {
+					minute := Floor(lapTime / 60)
+					seconds := (lapTime - (minute * 60))
+
+					speaker.speakPhrase("FocusLapTime", {number: number, time: speaker.number2Speech(lapTime, 1), minute: minute, seconds: speaker.number2Speech(seconds, 1)})
+				}
+			}
+			else if number
+				speaker.speakPhrase("NoFocusCar", {number: number})
+			else
+				speaker.speakPhrase("Repeat")
+		}
+	}
+
+	lapTimePositionRecognized(words) {
+		local knowledgeBase := this.KnowledgeBase
+		local speaker := this.getSpeaker()
+		local position, car, lapTime, minute, seconds, inPit
+
+		getCarPosition(words, &position) {
+			local knowledgeBase := this.KnowledgeBase
+			local car := false
+			local ignore, candidate
+
+			position := this.getNumber(words)
+
+			if position
+				for ignore, candidate in this.getCars()
+					if (knowledgeBase.getValue("Car." . candidate . ".Position", false) = position) {
+						car := candidate
+
+						break
+					}
+
+			return car
+		}
+
+		if !this.hasEnoughData()
+			return
+
+		car := getCarPosition(words, &position)
+
+		if car {
+			lapTime := (this.getLapTime(car) / 1000)
+			inPit := (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false))
+
+			if (inPit || (lapTime = 0)) {
+				speaker.speakPhrase("CarInPit")
+
+				return
+			}
+			else {
+				minute := Floor(lapTime / 60)
+				seconds := (lapTime - (minute * 60))
+
+				speaker.speakPhrase("PositionLapTime", {position: position, time: speaker.number2Speech(lapTime, 1), minute: minute, seconds: speaker.number2Speech(seconds, 1)})
+			}
+		}
+		else if position
+			speaker.speakPhrase("NoPositionCar", {position: position})
+		else
+			speaker.speakPhrase("Repeat")
+	}
+
+	driverNameAheadRecognized(words) {
+		local knowledgeBase := this.KnowledgeBase
+		local car := knowledgeBase.getValue("Position.Track.Ahead.Car", kUndefined)
+		local forName, surName, ignore
+
+		if (car != kUndefined) {
+			parseDriverName(this.getDriver(car), &forName, &surName, &ignore := false)
+
+			this.getSpeaker().speakPhrase("DriverNameAhead", {forName: forName, surName: surName})
+		}
+		else
+			this.getSpeaker().speakPhrase("NoTrackGap")
+	}
+
+	driverNameBehindRecognized(words) {
+		local knowledgeBase := this.KnowledgeBase
+		local car := knowledgeBase.getValue("Position.Track.Behind.Car", kUndefined)
+		local forName, surName, ignore
+
+		if (car != kUndefined) {
+			parseDriverName(this.getDriver(car), &forName, &surName, &ignore := false)
+
+			this.getSpeaker().speakPhrase("DriverNameBehind", {forName: forName, surName: surName})
+		}
+		else
+			this.getSpeaker().speakPhrase("NoTrackGap")
+	}
+
+	carClassAheadRecognized(words) {
+		local knowledgeBase := this.KnowledgeBase
+		local car := knowledgeBase.getValue("Position.Track.Ahead.Car", kUndefined)
+		local class
+
+		if (car != kUndefined) {
+			class := this.getClass(car)
+
+			if (class = kUnknown)
+				this.getSpeaker().speakPhrase("NoInformation")
+			else
+				this.getSpeaker().speakPhrase("CarClassAhead", {class: class})
+		}
+		else
+			this.getSpeaker().speakPhrase("NoTrackGap")
+	}
+
+	carClassBehindRecognized(words) {
+		local knowledgeBase := this.KnowledgeBase
+		local car := knowledgeBase.getValue("Position.Track.Behind.Car", kUndefined)
+		local class
+
+		if (car != kUndefined) {
+			class := this.getClass(car)
+
+			if (class = kUnknown)
+				this.getSpeaker().speakPhrase("NoInformation")
+			else
+				this.getSpeaker().speakPhrase("CarClassBehind", {class: class})
+		}
+		else
+			this.getSpeaker().speakPhrase("NoTrackGap")
+	}
+
+	carCupAheadRecognized(words) {
+		local knowledgeBase := this.KnowledgeBase
+		local car := knowledgeBase.getValue("Position.Track.Ahead.Car", kUndefined)
+		local cup
+
+		if (car != kUndefined) {
+			cup := this.getClass(car, false, ["Cup"])
+
+			if (cup = kUnknown)
+				this.getSpeaker().speakPhrase("NoInformation")
+			else
+				this.getSpeaker().speakPhrase("CarCupAhead", {cup: cup})
+		}
+		else
+			this.getSpeaker().speakPhrase("NoTrackGap")
+	}
+
+	carCupBehindRecognized(words) {
+		local knowledgeBase := this.KnowledgeBase
+		local car := knowledgeBase.getValue("Position.Track.Behind.Car", kUndefined)
+		local cup
+
+		if (car != kUndefined) {
+			cup := this.getClass(car, false, [Cup])
+
+			if (cup = kUnknown)
+				this.getSpeaker().speakPhrase("NoInformation")
+			else
+				this.getSpeaker().speakPhrase("CarCupBehind", {cup: cup})
+		}
+		else
+			this.getSpeaker().speakPhrase("NoTrackGap")
+	}
+
 	createSessionState() {
 		local state := super.createSessionState()
 		local data := CaseInsenseMap()
-		local nr, pitstops, index, pitstop
+		local id, pitstops, index, pitstop
 
-		for nr, pitstops in this.Pitstops {
-			setMultiMapValue(state, "Pitstop State", "Pitstop." . A_Index . ".Nr", nr)
+		for id, pitstops in this.Pitstops {
+			setMultiMapValue(state, "Pitstop State", "Pitstop." . A_Index . ".ID", id)
 
 			for index, pitstop in pitstops
-				setMultiMapValue(state, "Pitstop State", "Pitstop." . nr . "." . index
+				setMultiMapValue(state, "Pitstop State", "Pitstop." . id . "." . index
 							   , values2String(";", pitstop.Time, pitstop.Lap, pitstop.Duration))
 
-			setMultiMapValue(state, "Pitstop State", "Pitstop." . nr . ".Count", pitstops.Length)
+			setMultiMapValue(state, "Pitstop State", "Pitstop." . id . ".Count", pitstops.Length)
 		}
 
 		setMultiMapValue(state, "Pitstop State", "Pitstop.Count", this.Pitstops.Count)
@@ -2147,18 +2497,18 @@ class GridRaceAssistant extends RaceAssistant {
 	}
 
 	loadSessionState(state) {
-		local carNr
+		local carID
 
 		super.loadSessionState(state)
 
 		this.iPitstops := CaseInsenseMap()
 
 		loop getMultiMapValue(state, "Pitstop State", "Pitstop.Count", 0) {
-			carNr := getMultiMapValue(state, "Pitstop State", "Pitstop." . A_Index . ".Nr")
-			pitstops := this.Pitstops[carNr]
+			carID := getMultiMapValue(state, "Pitstop State", "Pitstop." . A_Index . ".ID")
+			pitstops := this.Pitstops[carID]
 
-			loop getMultiMapValue(state, "Pitstop State", "Pitstop." . carNr . ".Count", 0)
-				pitstops.Push(GridRaceAssistant.Pitstop(carNr, string2Values(";", getMultiMapValue(state, "Pitstop State", "Pitstop." . carNr . "." . A_Index))*))
+			loop getMultiMapValue(state, "Pitstop State", "Pitstop." . carID . ".Count", 0)
+				pitstops.Push(GridRaceAssistant.Pitstop(carID, string2Values(";", getMultiMapValue(state, "Pitstop State", "Pitstop." . carID . "." . A_Index))*))
 		}
 	}
 
@@ -2307,6 +2657,69 @@ class GridRaceAssistant extends RaceAssistant {
 			return (knowledgeBase ? knowledgeBase.getValue("Car." . car . ".Position", car) : 0)
 	}
 
+	getDelta(car, data := false) {
+		local knowledgeBase, driverLap, driverRunning, driverTime, carLap, carRunning, delta
+
+		if data {
+			driver := getMultiMapValue(data, "Position Data", "Driver.Car", false)
+
+			if driver {
+				driverLap := getMultiMapValue(data, "Position Data", "Car." . driver . ".Laps", getMultiMapValue(data, "Position Data", "Car." . driver . ".Lap"))
+				driverRunning := getMultiMapValue(data, "Position Data", "Car." . driver . ".Lap.Running")
+				driverTime := getMultiMapValue(data, "Position Data", "Car." . driver . ".Time")
+				carLap := getMultiMapValue(data, "Position Data", "Car." . car . ".Laps", getMultiMapValue(data, "Position Data", "Car." . car . ".Lap"))
+				carRunning := getMultiMapValue(data, "Position Data", "Car." . car . ".Lap.Running")
+
+				return (((carLap + carRunning) - (driverLap + driverRunning)) * driverTime)
+			}
+			else
+				return false
+		}
+		else {
+			knowledgeBase := this.KnowledgeBase
+
+			driver := knowledgeBase.getValue("Driver.Car", false)
+
+			if driver {
+				driverLap := knowledgeBase.getValue("Car." . driver . ".Laps", knowledgeBase.getValue("Car." . driver . ".Lap"))
+				driverRunning := knowledgeBase.getValue("Car." . driver . ".Lap.Running")
+				driverTime := knowledgeBase.getValue("Car." . driver . ".Time")
+				carLap := knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap"))
+				carRunning := knowledgeBase.getValue("Car." . car . ".Lap.Running")
+
+				return (((carLap + carRunning) - (driverLap + driverRunning)) * driverTime)
+			}
+			else
+				return false
+		}
+	}
+
+	getLapTime(car, data := false) {
+		if data
+			return getMultiMapValue(data, "Position Data", "Car." . car . ".Time", false)
+		else
+			return this.KnowledgeBase.getValue("Car." . car . ".Time", false)
+	}
+
+	getDriver(car, data := false) {
+		local forName, surName, nickName, knowledgeBase
+
+		if data {
+			forName := getMultiMapValue(data, "Position Data", "Car." . car . ".Driver.ForName", "John")
+			surName := getMultiMapValue(data, "Position Data", "Car." . car . ".Driver.SurName", "Doe")
+			nickName := getMultiMapValue(data, "Position Data", "Car." . car . ".Driver.NickName", "JDO")
+		}
+		else {
+			knowledgeBase := this.KnowledgeBase
+
+			forName := knowledgeBase.getValue("Car." . car . ".Driver.ForName", "John")
+			surName := knowledgeBase.getValue("Car." . car . ".Driver.SurName", "Doe")
+			nickName := knowledgeBase.getValue("Car." . car . ".Driver.NickName", "JDO")
+		}
+
+		return driverName(forName, surName, nickName)
+	}
+
 	prepareData(lapNumber, data) {
 		local knowledgeBase, key, value
 
@@ -2321,7 +2734,7 @@ class GridRaceAssistant extends RaceAssistant {
 	}
 
 	updatePitstops(lap, data) {
-		local carNr, delta, pitstops, pitstop
+		local carID, delta, pitstops, pitstop
 
 		if !this.iLastPitstopUpdate {
 			this.iLastPitstopUpdate := Round(getMultiMapValue(data, "Session Data", "SessionTimeRemaining", 0) / 1000)
@@ -2337,19 +2750,19 @@ class GridRaceAssistant extends RaceAssistant {
 		loop getMultiMapValue(data, "Position Data", "Car.Count", 0) {
 			if (getMultiMapValue(data, "Position Data", "Car." . A_Index . ".InPitlane", false)
 			 || getMultiMapValue(data, "Position Data", "Car." . A_Index . ".InPit", false)) {
-				carNr := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Nr", A_Index)
+				carID := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".ID", A_Index)
 
-				pitstops := this.Pitstops[carNr]
+				pitstops := this.Pitstops[carID]
 
 				if (pitstops.Length = 0)
-					pitstops.Push(GridRaceAssistant.Pitstop(carNr, this.iLastPitstopUpdate, lap))
+					pitstops.Push(GridRaceAssistant.Pitstop(carID, this.iLastPitstopUpdate, lap))
 				else {
 					pitstop := pitstops[pitstops.Length]
 
 					if ((pitstop.Time - pitstop.Duration - (delta + 20)) < this.iLastPitstopUpdate)
 						pitstop.Duration := (pitstop.Duration + delta)
 					else
-						pitstops.Push(GridRaceAssistant.Pitstop(carNr, this.iLastPitstopUpdate, lap))
+						pitstops.Push(GridRaceAssistant.Pitstop(carID, this.iLastPitstopUpdate, lap))
 				}
 			}
 		}
@@ -2371,8 +2784,9 @@ class GridRaceAssistant extends RaceAssistant {
 				car := knowledgeBase.getValue("Position.Standings.Class.Leader.Car", 0)
 
 				if car {
+					setMultiMapValue(sessionInfo, "Standings", "Leader.Nr", knowledgeBase.getValue("Car." . car . ".Nr", false))
 					setMultiMapValue(sessionInfo, "Standings", "Leader.Lap.Time", Round(knowledgeBase.getValue("Car." . car . ".Time", 0) / 1000, 1))
-					setMultiMapValue(sessionInfo, "Standings", "Leader.Lap", knowledgeBase.getValue("Car." . car . ".Lap", 0))
+					setMultiMapValue(sessionInfo, "Standings", "Leader.Laps", knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap", 0)))
 					setMultiMapValue(sessionInfo, "Standings", "Leader.Delta", Round(knowledgeBase.getValue("Position.Standings.Class.Leader.Delta", 0) / 1000, 1))
 					setMultiMapValue(sessionInfo, "Standings", "Leader.InPit", (knowledgeBase.getValue("Car." . car . ".InPitLane", false)
 																			 || knowledgeBase.getValue("Car." . car . ".InPit", false)))
@@ -2381,8 +2795,9 @@ class GridRaceAssistant extends RaceAssistant {
 				car := knowledgeBase.getValue("Position.Standings.Class.Ahead.Car", false)
 
 				if car {
+					setMultiMapValue(sessionInfo, "Standings", "Ahead.Nr", knowledgeBase.getValue("Car." . car . ".Nr", false))
 					setMultiMapValue(sessionInfo, "Standings", "Ahead.Lap.Time", Round(knowledgeBase.getValue("Car." . car . ".Time", 0) / 1000, 1))
-					setMultiMapValue(sessionInfo, "Standings", "Ahead.Lap", knowledgeBase.getValue("Car." . car . ".Lap", 0))
+					setMultiMapValue(sessionInfo, "Standings", "Ahead.Laps", knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap", 0)))
 					setMultiMapValue(sessionInfo, "Standings", "Ahead.Delta", Round(knowledgeBase.getValue("Position.Standings.Class.Ahead.Delta", 0) / 1000, 1))
 					setMultiMapValue(sessionInfo, "Standings", "Ahead.InPit", (knowledgeBase.getValue("Car." . car . ".InPitLane", false)
 																			|| knowledgeBase.getValue("Car." . car . ".InPit", false)))
@@ -2393,8 +2808,9 @@ class GridRaceAssistant extends RaceAssistant {
 				car := knowledgeBase.getValue("Position.Standings.Class.Behind.Car")
 
 				if car {
+					setMultiMapValue(sessionInfo, "Standings", "Behind.Nr", knowledgeBase.getValue("Car." . car . ".Nr", false))
 					setMultiMapValue(sessionInfo, "Standings", "Behind.Lap.Time", Round(knowledgeBase.getValue("Car." . car . ".Time", 0) / 1000, 1))
-					setMultiMapValue(sessionInfo, "Standings", "Behind.Lap", knowledgeBase.getValue("Car." . car . ".Lap", 0))
+					setMultiMapValue(sessionInfo, "Standings", "Behind.Laps", knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap", 0)))
 					setMultiMapValue(sessionInfo, "Standings", "Behind.Delta", Round(knowledgeBase.getValue("Position.Standings.Class.Behind.Delta", 0) / 1000, 1))
 					setMultiMapValue(sessionInfo, "Standings", "Behind.InPit", (knowledgeBase.getValue("Car." . car . ".InPitLane", false)
 																			 || knowledgeBase.getValue("Car." . car . ".InPit", false)))
@@ -2416,7 +2832,7 @@ class GridRaceAssistant extends RaceAssistant {
 		lapValid := getMultiMapValue(data, "Stint Data", "LapValid", true)
 		lapPenalty := getMultiMapValue(data, "Stint Data", "Penalty", false)
 
-		if (driver && (getMultiMapValue(data, "Position Data", "Car." . driver . ".Lap", false) = lapNumber)) {
+		if (driver && (getMultiMapValue(data, "Position Data", "Car." . driver . ".Laps", getMultiMapValue(data, "Position Data", "Car." . driver . ".Lap", false)) = lapNumber)) {
 			lapValid := getMultiMapValue(data, "Position Data", "Car." . driver . ".Lap.Valid", lapValid)
 			lapPenalty := getMultiMapValue(data, "Position Data", "Car." . driver . ".Lap.Penalty", lapPenalty)
 		}
@@ -2437,7 +2853,7 @@ class GridRaceAssistant extends RaceAssistant {
 		lapValid := getMultiMapValue(data, "Stint Data", "LapValid", true)
 		lapPenalty := getMultiMapValue(data, "Stint Data", "Penalty", false)
 
-		if (driver && (getMultiMapValue(data, "Position Data", "Car." . driver . ".Lap", false) = lapNumber)) {
+		if (driver && (getMultiMapValue(data, "Position Data", "Car." . driver . ".Laps", getMultiMapValue(data, "Position Data", "Car." . driver . ".Lap", false)) = lapNumber)) {
 			lapValid := getMultiMapValue(data, "Position Data", "Car." . driver . ".Lap.Running.Valid", lapValid)
 			lapPenalty := getMultiMapValue(data, "Position Data", "Car." . driver . ".Lap.Running.Penalty", lapPenalty)
 		}

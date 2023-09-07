@@ -1,4 +1,5 @@
 ﻿using SQLite;
+using System.Collections.Generic;
 
 namespace TeamServer.Model {
     public class ModelManager {
@@ -61,6 +62,32 @@ namespace TeamServer.Model {
             Connection.CreateTableAsync<Data.Brakes>().Wait();
             Connection.CreateTableAsync<Data.TyresPressures>().Wait();
             Connection.CreateTableAsync<Data.TyresPressuresDistribution>().Wait();
+        }
+
+        public Dictionary<string, long> GetObjectCounts()
+        {
+            ObjectManager objectManager = new ObjectManager(Connection);
+            Dictionary<string, long> result = new Dictionary<string, long>();
+
+            result["Accounts"] = objectManager.GetCount(typeof(Access.Account));
+            result["Tokens"] = objectManager.GetCount(typeof(Access.Token));
+            result["Connections"] = objectManager.GetCount(typeof(Access.Connection));
+
+            result["Teams"] = objectManager.GetCount(typeof(Team));
+            result["Drivers"] = objectManager.GetCount(typeof(Driver));
+            result["Sessions"] = objectManager.GetCount(typeof(Session));
+            result["Stints"] = objectManager.GetCount(typeof(Stint));
+            result["Laps"] = objectManager.GetCount(typeof(Lap));
+
+            result["Attributes"] = objectManager.GetCount(typeof(Attribute));
+            result["Licenses"] = objectManager.GetCount(typeof(Data.Document));
+            result["Electronics"] = objectManager.GetCount(typeof(Data.Electronics));
+            result["Tyres"] = objectManager.GetCount(typeof(Data.Tyres));
+            result["Brakes"] = objectManager.GetCount(typeof(Data.Brakes));
+            result["TyresPressures"] = objectManager.GetCount(typeof(Data.TyresPressures));
+            result["TyresPressuresDistribution"] = objectManager.GetCount(typeof(Data.TyresPressuresDistribution));
+
+            return result;
         }
     }
 }

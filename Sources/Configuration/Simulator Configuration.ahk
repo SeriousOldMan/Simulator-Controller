@@ -337,12 +337,10 @@ class GeneralTab extends ConfiguratorPanel {
 		local window := this.Window
 		local choices, chosen, enIndex, code, language
 
-		window.Opt("+Disabled")
+		window.Block()
 
 		try {
 			if (TranslationsEditor(this.Configuration)).editTranslations(window) {
-				window.Opt("-Disabled")
-
 				choices := []
 				chosen := 0
 				enIndex := 1
@@ -368,7 +366,7 @@ class GeneralTab extends ConfiguratorPanel {
 			}
 		}
 		finally {
-			window.Opt("-Disabled")
+			window.Unblock()
 		}
 	}
 
@@ -376,7 +374,7 @@ class GeneralTab extends ConfiguratorPanel {
 		local window := this.Window
 		local configuration
 
-		window.Opt("+Disabled")
+		window.Block()
 
 		try {
 			configuration := (SplashScreenEditor(this.iSplashSplashScreensConfiguration ? this.iSplashSplashScreensConfiguration : this.Configuration)).editSplashScreens(window)
@@ -385,7 +383,7 @@ class GeneralTab extends ConfiguratorPanel {
 				this.iSplashSplashScreensConfiguration := configuration
 		}
 		finally {
-			window.Opt("-Disabled")
+			window.Unblock()
 		}
 	}
 
@@ -393,7 +391,7 @@ class GeneralTab extends ConfiguratorPanel {
 		local window := this.Window
 		local configuration
 
-		window.Opt("+Disabled")
+		window.Block()
 
 		try {
 			configuration := FormatsEditor(this.iFormatsConfiguration ? this.iFormatsConfiguration : this.Configuration).editFormats(window)
@@ -402,7 +400,7 @@ class GeneralTab extends ConfiguratorPanel {
 				this.iFormatsConfiguration := configuration
 		}
 		finally {
-			window.Opt("-Disabled")
+			window.Unblock()
 		}
 	}
 }
@@ -527,6 +525,8 @@ startupSimulatorConfiguration() {
 	local done, saved, result
 
 	saveConfiguration(configurationFile, editor) {
+		global kSimulatorConfiguration
+
 		local configuration := newMultiMap()
 		local startupLink, startupExe
 
@@ -547,6 +547,8 @@ startupSimulatorConfiguration() {
 			deleteFile(startupLink)
 
 		deleteDirectory(kTempDirectory, false)
+
+		kSimulatorConfiguration := configuration
 	}
 
 	editor.createGui(editor.Configuration)

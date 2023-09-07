@@ -59,6 +59,7 @@ class VoiceManager {
 	iGrammars := CaseInsenseMap()
 
 	iPushToTalk := false
+	iPushToTalkMode := "Hold"
 
 	iSpeechSynthesizer := false
 	iSpeechRecognizer := false
@@ -167,12 +168,12 @@ class VoiceManager {
 			if phrases.Has(phrase) {
 				phrases := phrases[phrase]
 
-				index := Random(1, phrases.Length)
+				index := Round(Random(0.55, phrases.Length + 0.45))
 
 				if cache
 					cache .= ("." . index)
 
-				phrase := substituteVariables(phrases[Round(index)], this.VoiceManager.getPhraseVariables(variables))
+				phrase := substituteVariables(phrases[index], this.VoiceManager.getPhraseVariables(variables))
 			}
 
 			if phrase
@@ -313,12 +314,12 @@ class VoiceManager {
 			if phrases.Has(phrase) {
 				phrases := phrases[phrase]
 
-				index := Random(1, phrases.Length)
+				index := Round(Random(0.55, phrases.Length + 0.45))
 
 				if cache
 					cache .= ("." . index)
 
-				phrase := substituteVariables(phrases[Round(index)], this.VoiceManager.getPhraseVariables(variables))
+				phrase := substituteVariables(phrases[index], this.VoiceManager.getPhraseVariables(variables))
 			}
 
 			if phrase
@@ -555,6 +556,12 @@ class VoiceManager {
 		}
 	}
 
+	PushToTalkMode {
+		Get {
+			return this.iPushToTalkMode
+		}
+	}
+
 	User {
 		Get {
 			throw "Virtual property VoiceManager.User must be implemented in a subclass..."
@@ -578,7 +585,7 @@ class VoiceManager {
 		registerMessageHandler("Voice", methodMessageHandler, this)
 
 		if (!this.VoiceServer && this.PushToTalk)
-			PeriodicTask(ObjBindMethod(this, "listen"), 100, kHighPriority).start()
+			this.initializePushToTalk()
 
 		if this.VoiceServer
 			OnExit(ObjBindMethod(this, "shutdownVoiceManager"))
@@ -637,17 +644,163 @@ class VoiceManager {
 		if options.Has("PushToTalk")
 			this.iPushToTalk := options["PushToTalk"]
 
+		if options.Has("PushToTalkMode")
+			this.iPushToTalkMode := options["PushToTalkMode"]
+
 		if options.Has("VoiceServer")
 			this.iVoiceServer := options["VoiceServer"]
 	}
 
-	listen() {
-		local theHotkey := this.PushToTalk
+	hasPushtoTalk() {
+		return ((this.PushToTalkMode = "Custom") || this.PushToTalk)
+	}
 
-		if !this.Speaking && GetKeyState(theHotkey, "P")
-			this.startListening()
-		else if !GetKeyState(theHotkey, "P")
-			this.stopListening()
+	initializePushToTalk() {
+		local p2tHotkey := this.PushToTalk
+
+		switch this.PushToTalkMode, false {
+			case "Press":
+				if p2THotkey
+					Hotkey(p2tHotkey, ObjBindMethod(this, "listen", true), "On")
+			case "Hold":
+				if p2THotkey
+					PeriodicTask(ObjBindMethod(this, "listen", false), 50, kInterruptPriority).start()
+			case "Custom":
+				PeriodicTask(ObjBindMethod(this, "processExternalCommand"), 50, kInterruptPriority).start()
+		}
+	}
+
+	processExternalCommand() {
+		local fileName := (kTempDirectory . "Voice.cmd")
+		local file, command, descriptor
+
+		try {
+			file := FileOpen(fileName, "r-rwd")
+
+			if !file
+				return
+			else if (file.Length == 0) {
+				file.Close()
+
+				return
+			}
+			else {
+				file.Pos := 0
+
+				command := file.ReadLine()
+
+				file.Close()
+
+				deleteFile(fileName)
+
+				if ((command = "Activation") || (command = "Listen"))
+					this.startListening(false)
+				else if (command = "Stop")
+					this.stopListening()
+			}
+		}
+		catch Any {
+		}
+	}
+
+	listen(toggle, down := true) {
+		local listen := false
+		local pressed := false
+
+		static isPressed := false
+		static lastDown := 0
+		static lastUp := 0
+		static clicks := 0
+		static activation := false
+		static listening := false
+
+		static listenTask := false
+
+		static speed := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+									   , "Voice", "Activation Speed", DllCall("GetDoubleClickTime"))
+
+		try
+			pressed := toggle ? down : GetKeyState(this.PushToTalk, "P")
+
+		if (pressed && !isPressed) {
+			lastDown := A_TickCount
+			isPressed := true
+
+			if (((lastDown - lastUp) < speed) && (clicks == 1))
+				activation := true
+			else {
+				clicks := 0
+
+				activation := false
+			}
+		}
+		else if (!pressed && isPressed) {
+			lastUp := A_TickCount
+			isPressed := false
+
+			if ((lastUp - lastDown) < speed)
+				clicks += 1
+			else
+				clicks := 0
+		}
+
+		if toggle {
+			if pressed {
+				if listenTask {
+					listen := true
+
+					listenTask.stop()
+
+					listenTask := false
+				}
+
+				if listening {
+					this.stopListening()
+
+					if activation
+						this.startActivationListener()
+					else
+						listening := false
+				}
+				else if activation {
+					this.startActivationListener()
+
+					listening := true
+				}
+				else if listen {
+					this.startListening(false)
+
+					listening := true
+				}
+				else {
+					listenTask := Task(ObjBindMethod(this, "listen", true, true), speed, kInterruptPriority)
+
+					Task.startTask(listenTask)
+				}
+			}
+
+			if down
+				this.listen(true, false)
+		}
+		else {
+			if (((A_TickCount - lastDown) < (speed / 2)) && !activation)
+				pressed := false
+
+			if (!this.Speaking && pressed) {
+				if activation
+					this.startActivationListener()
+				else
+					this.startListening(false)
+
+				listening := true
+			}
+			else if !pressed {
+				this.stopActivationListener()
+				this.stopListening()
+
+				listening := false
+			}
+		}
 	}
 
 	setDebug(option, enabled, *) {
@@ -738,8 +891,12 @@ class VoiceManager {
 		}
 	}
 
+	startActivationListener(retry := true) {
+		this.startListening(retry)
+	}
+
 	startListening(retry := true) {
-		local function
+		static audioDevice := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Audio Settings.ini"), "Output", "Activation.AudioDevice", false)
 
 		if this.iSpeechRecognizer && !this.Listening
 			if !this.iSpeechRecognizer.startRecognizer() {
@@ -749,7 +906,7 @@ class VoiceManager {
 				return false
 			}
 			else {
-				SoundPlay(kResourcesDirectory . "Sounds\Talk.wav")
+				playSound("VMSoundPlayer.exe", kResourcesDirectory . "Sounds\Talk.wav", audioDevice)
 
 				this.iIsListening := true
 
@@ -757,9 +914,11 @@ class VoiceManager {
 			}
 	}
 
-	stopListening(retry := false) {
-		local function
+	stopActivationListener(retry := false) {
+		this.stopListening(retry)
+	}
 
+	stopListening(retry := false) {
 		if this.iSpeechRecognizer && this.Listening
 			if !this.iSpeechRecognizer.stopRecognizer() {
 				if retry
@@ -801,6 +960,15 @@ class VoiceManager {
 		local fragments := CaseInsenseWeakMap()
 		local grammars := this.getGrammars(language)
 		local fragment, word
+
+		prepareGrammar(name, grammar) {
+			local start := A_TickCount
+
+			grammar.Phrases
+
+			if isDebug()
+				logMessage(kLogDebug, "Preparing grammar " . name . " took " . (A_TickCount - start) . " ms")
+		}
 
 		for fragment, word in getMultiMapValues(grammars, "Fragments")
 			fragments[fragment] := word
@@ -855,7 +1023,7 @@ class VoiceManager {
 						throw "Recognizer not running..."
 				}
 				catch Any as exception {
-					logError(exception)
+					logError(exception, true)
 
 					logMessage(kLogCritical, translate("Error while registering voice command `"") . definition . translate("`" - please check the configuration"))
 
@@ -867,22 +1035,21 @@ class VoiceManager {
 				messageSend(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, grammar, definition, "remoteCommandRecognized"), this.VoiceServer)
 		}
 
-		/*
 		if speechRecognizer {
 			try {
 				speechRecognizer.loadGrammar("?", speechRecognizer.compileGrammar("[Unknown]"), ObjBindMethod(this, "raisePhraseRecognized"))
 			}
 			catch Any as exception {
-				logError(exception)^
+				logError(exception, true)
 			}
 		}
 		else
 			messageSend(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, "?", "[Unknown]", "remoteCommandRecognized"), this.VoiceServer)
-		*/
 
+		/*
 		if !speechRecognizer
 			messageSend(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, "?", "[Unknown]", "remoteCommandRecognized"), this.VoiceServer)
-
+		*/
 	}
 
 	raisePhraseRecognized(grammar, words) {

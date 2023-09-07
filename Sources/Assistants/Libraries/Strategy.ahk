@@ -638,7 +638,7 @@ class StrategySimulation {
 			local ignore, pitstop
 
 			for ignore, pitstop in scenario.Pitstops
-				laps += pitstop.Lap
+				laps += pitstop.StintLaps
 
 			return laps
 		}
@@ -774,7 +774,7 @@ class StrategySimulation {
 			if window {
 				progressWindow.Opt("+Owner" . window.Hwnd)
 
-				window.Opt("+Disabled")
+				window.Block()
 			}
 		}
 
@@ -845,7 +845,7 @@ class StrategySimulation {
 				hideProgress()
 
 				if window
-					window.Opt("-Disabled")
+					window.Unblock()
 			}
 		}
 	}
@@ -1717,7 +1717,7 @@ class Strategy extends ConfigurationItem {
 			local remainingFuel := strategy.RemainingFuel[true]
 			local remainingSessionLaps := strategy.RemainingSessionLaps[true]
 			local fuelConsumption := strategy.FuelConsumption[true]
-			local lastStintLaps := Floor(Min(remainingFuel / fuelConsumption, strategy.LastPitstop ? (lap - strategy.LastPitstop.Lap) : lap))
+			local lastStintLaps := Floor(Min(remainingFuel / fuelConsumption, strategy.LastPitstop ? (lap - strategy.LastPitstop.Lap) : ((strategy.StartLap = 0) ? lap : (lap - strategy.StartLap))))
 			local stintLaps, refuelAmount, tyreChange, remainingTyreLaps, freshTyreLaps, lastPitstop, delta
 			local avgLapTime, openingLap, closingLap, weather, airTemperature, trackTemperature
 
@@ -1767,10 +1767,7 @@ class Strategy extends ConfigurationItem {
 			this.iRemainingSessionLaps := (remainingSessionLaps - lastStintLaps)
 			this.iRemainingFuel := (remainingFuel - (lastStintLaps * fuelConsumption) + refuelAmount)
 
-			if ((nr = 1) && (strategy.StartTyreLaps > 0))
-				remainingTyreLaps := (strategy.RemainingTyreLaps + strategy.StartTyreLaps - lastStintLaps)
-			else
-				remainingTyreLaps := (strategy.RemainingTyreLaps[true] - lastStintLaps)
+			remainingTyreLaps := (strategy.RemainingTyreLaps[true] - lastStintLaps)
 
 			freshTyreLaps := (strategy.MaxTyreLaps + (strategy.MaxTyreLaps * strategy.TyreLapsVariation / 100 * (Min(100 - Sqrt(Random(0, 10000)), 100) / 100)))
 
@@ -2962,6 +2959,11 @@ class Strategy extends ConfigurationItem {
 		return (this.PitstopDelta + ((this.PitstopServiceOrder = "Simultaneous") ? Max(tyreService, refuelService) : (tyreService + refuelService)))
 	}
 
+	calcRemainingLaps(pitstopNr, currentLap, remainingStintLaps, remainingTyreLaps, remainingFuel, fuelConsumption) {
+		return Floor(Min(this.StintLaps, remainingStintLaps, remainingTyreLaps
+					   , this.getMaxFuelLaps(remainingFuel, fuelConsumption)))
+	}
+
 	calcNextPitstopLap(pitstopNr, currentLap
 					 , remainingStintLaps, remainingSessionLaps, remainingTyreLaps, remainingFuel
 					 , &adjusted) {
@@ -2982,8 +2984,9 @@ class Strategy extends ConfigurationItem {
 		if (this.LastPitstop && !this.LastPitstop.TyreChange)
 			remainingTyreLaps := this.MaxTyreLaps
 
-		targetLap := (currentLap + Floor(Min(this.StintLaps, remainingStintLaps, remainingTyreLaps
-										   , this.getMaxFuelLaps(remainingFuel, fuelConsumption))))
+		targetLap := (currentLap + this.calcRemainingLaps(pitstopNr, currentLap
+														, remainingStintLaps, remainingTyreLaps
+														, remainingFuel, fuelConsumption))
 
 		loop
 			if (A_Index >= (targetLap - currentLap))
@@ -3355,6 +3358,7 @@ class Strategy extends ConfigurationItem {
 			adjustment.StintLaps := stintLaps
 
 			adjustments[pitstops[numPitstops].Nr].StintLaps := stintLaps
+			adjustments[pitstops[numPitstops].Nr].Lap := (pitstops[numPitstops - 1].Lap + stintLaps)
 
 			this.initializeAvailableTyreSets()
 

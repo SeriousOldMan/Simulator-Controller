@@ -10,6 +10,8 @@
 #include <codecvt>
 #include <vector>
 
+#pragma comment( lib, "winmm.lib" )
+
 #pragma optimize("",off)
 using namespace std;
 
@@ -115,6 +117,16 @@ void sendAutomationMessage(string message) {
 		sendStringMessage(winHandle, 0, "Race Spotter:" + message);
 }
 
+void sendAnalyzerMessage(string message) {
+	HWND winHandle = FindWindowEx(0, 0, 0, L"Setup Workbench.exe");
+
+	if (winHandle == 0)
+		winHandle = FindWindowEx(0, 0, 0, L"Setup Workbench.ahk");
+
+	if (winHandle != 0)
+		sendStringMessage(winHandle, 0, "Analyzer:" + message);
+}
+
 #define PI 3.14159265
 
 long cycle = 0;
@@ -125,7 +137,7 @@ const float nearByXYDistance = 10.0;
 const float nearByZDistance = 6.0;
 float longitudinalFrontDistance = 4;
 float longitudinalRearDistance = 5;
-const float lateralDistance = 6;
+const float lateralDistance = 8;
 const float verticalDistance = 2;
 
 const int CLEAR = 0;
@@ -607,6 +619,10 @@ bool greenFlag() {
 		return false;
 }
 
+template <typename T> int sgn(T val) {
+    return (T(0) < val) - (val < T(0));
+}
+
 class CornerDynamics {
 public:
 	float speed;
@@ -652,9 +668,13 @@ float averageValue(std::vector<float>& values, int& num) {
 float smoothValue(std::vector<float>& values, float value) {
 	int ignore;
 
-	pushValue(values, value);
+	if (false) {
+		pushValue(values, value);
 
-	return averageValue(values, ignore);
+		return averageValue(values, ignore);
+	}
+	else
+		return value;
 }
 
 std::vector<CornerDynamics> cornerDynamicsList;
@@ -667,15 +687,44 @@ int oversteerLightThreshold = 2;
 int oversteerMediumThreshold = -6;
 int oversteerHeavyThreshold = -10;
 int lowspeedThreshold = 100;
-int steerLock = 900;
-int steerRatio = 14;
-int wheelbase = 270;
+int steerLock = 480;
+int steerRatio = 12;
+int wheelbase = 267;
 int trackWidth = 150;
 
 int lastCompletedLaps = 0;
 float lastSpeed = 0.0;
+long lastSound = 0;
 
-bool collectTelemetry() {
+bool triggerUSOSBeep(string soundsDirectory, string audioDevice, float usos) {
+	string wavFile = "";
+
+	if (usos < oversteerHeavyThreshold)
+		wavFile = soundsDirectory + "\\Oversteer Heavy.wav";
+	else if (usos < oversteerMediumThreshold)
+		wavFile = soundsDirectory + "\\Oversteer Medium.wav";
+	else if (usos < oversteerLightThreshold)
+		wavFile = soundsDirectory + "\\Oversteer Light.wav";
+	else if (usos > understeerHeavyThreshold)
+		wavFile = soundsDirectory + "\\Understeer Heavy.wav";
+	else if (usos > understeerMediumThreshold)
+		wavFile = soundsDirectory + "\\Understeer Medium.wav";
+	else if (usos > understeerLightThreshold)
+		wavFile = soundsDirectory + "\\Understeer Light.wav";
+	
+	if (wavFile != "") {
+		if (audioDevice != "")
+			sendAnalyzerMessage("acousticFeedback:" + wavFile);
+		else
+			PlaySoundA(wavFile.c_str(), NULL, SND_FILENAME | SND_ASYNC);
+
+		return true;
+	}
+	else
+		return false;
+}
+
+bool collectTelemetry(string soundsDirectory, string audioDevice, bool calibrate) {
 	SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
@@ -689,10 +738,10 @@ bool collectTelemetry() {
 
 	pushValue(recentGLongs, acceleration);
 
-	float angularVelocity = smoothValue(recentRealAngVels, pf->localAngularVel[2]);
+	float angularVelocity = smoothValue(recentRealAngVels, pf->localAngularVel[1]);
 	float steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
 	double steerAngleRadians = -steeredAngleDegs / 57.2958;
-	double wheelBaseMeter = (float)wheelbase / 10;
+	double wheelBaseMeter = (float)wheelbase / 100;
 	double radius = wheelBaseMeter / steerAngleRadians;
 	double perimeter = radius * PI * 2;
 	double perimeterSpeed = lastSpeed / 3.6;
@@ -718,19 +767,36 @@ bool collectTelemetry() {
 		CornerDynamics cd = CornerDynamics(pf->speedKmh, 0, gf->completedLaps, phase);
 
 		if (fabs(angularVelocity * 57.2958) > 0.1) {
-			double slip = fabs(idealAngularVelocity) - fabs(angularVelocity);
-
-			if (false)
-				if (steerAngle > 0) {
-					if (angularVelocity < idealAngularVelocity)
+			double slip = fabs(angularVelocity - idealAngularVelocity);
+			
+			if (steerAngle > 0) {
+				if (angularVelocity > 0)
+				{
+					if (calibrate)
 						slip *= -1;
+					else
+						slip = (oversteerHeavyThreshold - 1) / 57.2989;
 				}
-				else {
-					if (angularVelocity > idealAngularVelocity)
+				else if (angularVelocity < idealAngularVelocity)
+					slip *= -1;
+			}
+			else {
+				if (angularVelocity < 0)
+				{
+					if (calibrate)
 						slip *= -1;
+					else
+						slip = (oversteerHeavyThreshold - 1) / 57.2989;
 				}
+				else if (angularVelocity > idealAngularVelocity)
+					slip *= -1;
+			}
+			
+			cd.usos = slip * 57.2989 * 1;
 
-			cd.usos = slip * 57.2989 * 10;
+			if ((soundsDirectory != "") && GetTickCount() > (lastSound + 300))
+				if (triggerUSOSBeep(soundsDirectory, audioDevice, cd.usos))
+					lastSound = GetTickCount();
 
 			if (false) {
 				std::ofstream output;
@@ -742,6 +808,8 @@ bool collectTelemetry() {
 						  cd.usos << std::endl;
 
 				output.close();
+
+				Sleep(200);
 			}
 		}
 
@@ -1095,6 +1163,9 @@ int main(int argc, char* argv[])
 	bool analyzeTelemetry = false;
 	bool positionTrigger = false;
 
+	char* soundsDirectory = "";
+	char* audioDevice = "";
+
 	if (argc > 1) {
 		calibrateTelemetry = (strcmp(argv[1], "-Calibrate") == 0);
 		analyzeTelemetry = calibrateTelemetry || (strcmp(argv[1], "-Analyze") == 0);
@@ -1123,6 +1194,13 @@ int main(int argc, char* argv[])
 				steerRatio = atoi(argv[11]);
 				wheelbase = atoi(argv[12]);
 				trackWidth = atoi(argv[13]);
+
+				if (argc > 14) {
+					soundsDirectory = argv[14];
+
+					if (argc > 15)
+						audioDevice = argv[15];
+				}
 			}
 		}
 		else if (positionTrigger) {
@@ -1147,7 +1225,7 @@ int main(int argc, char* argv[])
 		bool wait = true;
 
 		if (analyzeTelemetry) {
-			if (collectTelemetry()) {
+			if (collectTelemetry(soundsDirectory, audioDevice, calibrateTelemetry)) {
 				if (remainder(counter, 20) == 0)
 					writeTelemetry(calibrateTelemetry);
 			}

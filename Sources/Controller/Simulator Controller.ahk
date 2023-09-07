@@ -36,7 +36,6 @@
 #Include "..\Libraries\Task.ahk"
 #Include "..\Libraries\Messages.ahk"
 #Include "..\Libraries\SpeechRecognizer.ahk"
-#Include "..\Plugins\Libraries\SimulatorPlugin.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -574,9 +573,7 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	__New(configuration, settings, voiceServer := false) {
-		identifier := FileRead(kUserConfigDirectory . "ID")
-
-		this.iID := identifier
+		this.iID := FileRead(kUserConfigDirectory . "ID")
 
 		SimulatorController.Controller := this
 
@@ -660,15 +657,16 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	getActions(function, trigger) {
-		return (this.iFunctionActions.Has(function) ? this.iFunctionActions[function] : [])
+		if this.iFunctionActions.Has(function)
+			return this.iFunctionActions[function]
+		else if isInstance(function, ControllerCustomFunction)
+			return Array(function.Actions[trigger])
+		else
+			return []
 	}
 
 	getLogo() {
-		local rnd
-
-		rnd := Random(0, 1)
-
-		return ((Round(rnd) == 1) ? kLogoDark : kLogoBright)
+		return ((Round(Random(0, 1)) == 1) ? kLogoDark : kLogoBright)
 	}
 
 	registerFunctionController(controller) {
@@ -716,11 +714,15 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	startup() {
-		local ignore, fnController
+		local ignore, function, fnController
 
 		this.iStarted := true
 
 		this.setModes()
+
+		for ignore, function in this.Functions
+			if function.Label
+				function.setLabel(function.Label)
 
 		for ignore, fnController in this.FunctionController[GuiFunctionController]
 			if fnController.VisibleDuration >= 9999
@@ -800,12 +802,19 @@ class SimulatorController extends ConfigurationItem {
 
 		for ignore, thePlugin in this.Plugins
 			if this.isActive(thePlugin)
-				thePlugin.simulatorStartup(simulator)
+				try {
+					thePlugin.simulatorStartup(simulator)
+				}
+				catch Any as exception {
+					logError(exception, true)
+				}
 
 		for ignore, fnController in this.FunctionController[GuiFunctionController] {
 			fnController.hide()
 			fnController.show()
 		}
+
+		this.setModes(simulator)
 	}
 
 	simulatorShutdown(simulator) {
@@ -813,12 +822,19 @@ class SimulatorController extends ConfigurationItem {
 
 		for ignore, thePlugin in this.Plugins
 			if this.isActive(thePlugin)
-				thePlugin.simulatorShutdown(simulator)
+				try {
+					thePlugin.simulatorShutdown(simulator)
+				}
+				catch Any as exception {
+					logError(exception, true)
+				}
 
 		for ignore, fnController in this.FunctionController[GuiFunctionController] {
 			fnController.hide()
 			fnController.show()
 		}
+
+		this.setModes()
 	}
 
 	startSimulator(application, splashImage := false) {
@@ -909,17 +925,24 @@ class SimulatorController extends ConfigurationItem {
 		}
 	}
 
-	activationCommand(words*) {
+	acknowledgeVoiceCommand() {
+		static audioDevice := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Audio Settings.ini"), "Output", "Controller.AudioDevice", false)
 		static first := true
 
 		if first
 			first := false
 		else
-			SoundPlay(kResourcesDirectory . "Sounds\Activated.wav")
+			playSound("SCSoundPlayer.exe", kResourcesDirectory . "Sounds\Activated.wav", audioDevice)
+	}
+
+	activationCommand(words*) {
+		this.acknowledgeVoiceCommand()
 	}
 
 	voiceCommand(grammar, command, words*) {
 		local ignore, handler
+
+		this.acknowledgeVoiceCommand()
 
 		for ignore, handler in this.iVoiceCommands[command][2]
 			handler.Call()
@@ -986,19 +1009,39 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	fireActions(function, trigger) {
-		local ignore, action
+		local ignore, action, actions
 
-		for ignore, action in this.getActions(function, trigger)
-			if function.Enabled[action]
-				if (action != false) {
-					this.updateLastEvent()
+		if isInstance(function, ControllerCustomFunction) {
+			action := function.Actions[trigger]
 
-					logMessage(kLogInfo, translate("Firing action ") . getLabelForLogMessage(action) . translate(" for ") . function.Descriptor)
+			if action
+				action.Call()
+			else
+				throw "Cannot find action for " . function.Descriptor . "[" . trigger . "] in SimulatorController.fireAction..."
+		}
+		else {
+			actions := this.getActions(function, trigger)
 
-					action.fireAction(function, trigger)
-				}
-				else
-					throw "Cannot find action for " . function.Descriptor . ".trigger " . " in SimulatorController.fireAction..."
+			if (actions.Length > 0) {
+				for ignore, action in actions
+					if function.Enabled[action]
+						if (action != false) {
+							this.updateLastEvent()
+
+							logMessage(kLogInfo, translate("Firing action ") . getLabelForLogMessage(action) . translate(" for ") . function.Descriptor)
+
+							action.fireAction(function, trigger)
+						}
+						else
+							throw "Cannot find action for " . function.Descriptor . "[" . trigger . "] in SimulatorController.fireAction..."
+			}
+			else {
+				action := function.Actions[trigger]
+
+				if action
+					action.Call()
+			}
+		}
 	}
 
 	setMode(newMode) {
@@ -1178,12 +1221,14 @@ class SimulatorController extends ConfigurationItem {
 
 	initializeBackgroundTasks() {
 		PeriodicTask(updateSimulatorState, 10000, kLowPriority).start()
-		PeriodicTask(externalCommandManager, 100, kLowPriority).start()
+		PeriodicTask(externalCommandManager, getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+															, "Controller", "External Dispatch", 100)
+										   , kLowPriority).start()
 
 		this.iShowLogo := (this.iShowLogo && !kSilentMode)
 	}
 
-	writeControllerState(periodic := true) {
+	writeControllerState(fromTask := false) {
 		local plugins := CaseInsenseMap()
 		local controller, configuration, ignore, thePlugin, modes, states, name, theMode, simulators, simulator, fnController
 
@@ -1196,7 +1241,7 @@ class SimulatorController extends ConfigurationItem {
 				if (this.isActive(thePlugin)) {
 					modes := []
 
-					if isInstance(thePlugin, SimulatorPlugin) {
+					if isSet(SimulatorPlugin) && isInstance(thePlugin, SimulatorPlugin) {
 						states := []
 
 						for ignore, name in thePlugin.Sessions[true]
@@ -1235,8 +1280,17 @@ class SimulatorController extends ConfigurationItem {
 
 		writeMultiMap(kTempDirectory . "Simulator Controller.state", configuration)
 
-		if periodic
-			Task.CurrentTask.Sleep := (ProcessExist("System Monitor.exe") ? 2000 : 60000)
+		if fromTask {
+			if isSet(kIntegrationPlugin)
+				thePlugin := SimulatorController.Instance.findPlugin(kIntegrationPlugin)
+			else
+				thePlugin := false
+
+			if (ProcessExist("System Monitor.exe") || (thePlugin && thePlugin.Active && this.isActive(thePlugin)))
+				Task.CurrentTask.Sleep := 2000
+			else
+				Task.CurrentTask.Sleep := 60000
+		}
 	}
 }
 
@@ -1256,6 +1310,16 @@ class ControllerFunction {
 	Function {
 		Get {
 			return this.iFunction
+		}
+	}
+
+	Label {
+		Get {
+			return this.Function.Label
+		}
+
+		Set {
+			return (this.Function.Label := value)
 		}
 	}
 
@@ -1314,6 +1378,8 @@ class ControllerFunction {
 
 	setLabel(text, color := "Black", overlay := false) {
 		local controller, ignore, fnController
+
+		this.Label := text
 
 		for ignore, fnController in this.Controller.FunctionController
 			if fnController.hasFunction(this)
@@ -1384,8 +1450,6 @@ class ControllerFunction {
 						logMessage(kLogInfo, translate("Binding voice command ") . command . translate(" for trigger ") . trigger . translate(" to ") . (action ? (action.base.__Class . ".fireAction") : this.Function.Actions[trigger, true]))
 					}
 					else {
-						if theHotkey = ""
-							MsgBox ("Oops")
 						Hotkey(theHotkey, handler, "On")
 
 						logMessage(kLogInfo, translate("Binding hotkey ") . theHotkey . translate(" for trigger ") . trigger . translate(" to ") . (action ? (action.base.__Class . ".fireAction")
@@ -1393,7 +1457,7 @@ class ControllerFunction {
 					}
 				}
 				catch Any as exception {
-					logError(exception)
+					logError(exception, true)
 
 					logMessage(kLogCritical, translate("Error while registering hotkey ") . theHotkey . translate(" - please check the configuration"))
 
@@ -1880,7 +1944,7 @@ setHotkeyEnabled(function, trigger, enabled) {
 				Hotkey(theHotkey, state)
 			}
 			catch Any as exception {
-				logError(exception)
+				logError(exception, true)
 
 				logMessage(kLogCritical, translate("Error while registering hotkey ") . theHotkey . translate(" - please check the configuration"))
 
@@ -2022,7 +2086,6 @@ externalCommandManager() {
 	local file, line, commands, command, ignore, descriptor
 
 	if FileExist(fileName) {
-		commands := []
 		file := false
 
 		try {
@@ -2030,23 +2093,38 @@ externalCommandManager() {
 
 			if !file
 				return
+			else if (file.Length == 0) {
+				file.Close()
+
+				return
+			}
+			else
+				file.Pos := 0
 		}
 		catch Any as exception {
 			return
 		}
 
-		while !file.AtEOF {
-			command := Trim(file.ReadLine(), " `t`n`r")
+		commands := []
 
-			if (StrLen(command) == 0)
-				break
+		try {
+			while !file.AtEOF {
+				command := Trim(file.ReadLine(), " `t`n`r")
 
-			commands.Push(command)
+				if (StrLen(command) == 0)
+					break
+
+				commands.Push(command)
+			}
 		}
+		catch Any as exception {
+			logError(exception, true)
+		}
+		finally {
+			file.Length := 0
 
-		file.Close()
-
-		deleteFile(fileName)
+			file.Close()
+		}
 
 		for ignore, command in commands {
 			command := string2Values(A_Space, command)
@@ -2109,8 +2187,6 @@ initializeSimulatorController() {
 
 	registerMessageHandler("Controller", functionMessageHandler)
 	registerMessageHandler("Voice", methodMessageHandler, SimulatorController.Instance)
-
-	return
 }
 
 startupSimulatorController() {
@@ -2118,9 +2194,9 @@ startupSimulatorController() {
 	local noStartup := ((A_Args.Length > 0) && (A_Args[1] = "-NoStartup"))
 
 	if noStartup
-		controller.writeControllerState(false)
+		controller.writeControllerState()
 	else
-		PeriodicTask(ObjBindMethod(controller, "writeControllerState"), 0, kLowPriority).start()
+		PeriodicTask(ObjBindMethod(controller, "writeControllerState", true), 0, kLowPriority).start()
 
 	controller.computeControllerModes()
 
@@ -2141,7 +2217,7 @@ pushButton(buttonNumber) {
 	local descriptor := ConfigurationItem.descriptor(kButtonType, buttonNumber)
 	local function := SimulatorController.Instance.findFunction(descriptor)
 
-	if ((function != false) && (SimulatorController.Instance.getActions(function, "Push").Length > 0))
+	if (function != false)
 		fireControllerActions(function, "Push")
 	else
 		logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in custom controller action pushButton - please check the configuration"))
@@ -2163,7 +2239,7 @@ rotateDial(dialNumber, direction) {
 	descriptor := ConfigurationItem.descriptor(kDialType, dialNumber)
 	function := SimulatorController.Instance.findFunction(descriptor)
 
-	if ((function != false) && (SimulatorController.Instance.getActions(function, direction).Length > 0))
+	if (function != false)
 		fireControllerActions(function, direction)
 	else
 		logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in custom controller action rotateDial - please check the configuration"))
@@ -2186,6 +2262,16 @@ switchToggle(toggleType, toggleNumber, mode := "activate") {
 	}
 	else
 		logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in custom controller action switchToggle - please check the configuration"))
+}
+
+callCustom(customNumber) {
+	local descriptor := ConfigurationItem.descriptor(kCustomType, customNumber)
+	local function := SimulatorController.Instance.findFunction(descriptor)
+
+	if (function != false)
+		fireControllerActions(function, "Call")
+	else
+		logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in custom controller action callCustom - please check the configuration"))
 }
 
 setMode(actionOrPlugin, mode := false) {
@@ -2219,7 +2305,7 @@ setMode(actionOrPlugin, mode := false) {
 ;;;-------------------------------------------------------------------------;;;
 
 writeControllerState() {
-	SimulatorController.Instance.writeControllerState(false)
+	SimulatorController.Instance.writeControllerState()
 }
 
 

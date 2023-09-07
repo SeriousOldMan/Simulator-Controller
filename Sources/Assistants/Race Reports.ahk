@@ -355,13 +355,13 @@ class RaceReports extends ConfigurationItem {
 	editOverviewReportSettings(reportDirectory) {
 		this.ReportViewer.setReport(reportDirectory)
 
-		this.Window.Opt("+Disabled")
+		this.Window.Block()
 
 		try {
 			return this.ReportViewer.editReportSettings("Classes")
 		}
 		finally {
-			this.Window.Opt("-Disabled")
+			this.Window.Unblock()
 		}
 	}
 
@@ -401,13 +401,13 @@ class RaceReports extends ConfigurationItem {
 	editDriverReportSettings(reportDirectory) {
 		this.ReportViewer.setReport(reportDirectory)
 
-		this.Window.Opt("+Disabled")
+		this.Window.Block()
 
 		try {
 			return this.ReportViewer.editReportSettings("Laps", "Drivers", "Classes")
 		}
 		finally {
-			this.Window.Opt("-Disabled")
+			this.Window.Unblock()
 		}
 	}
 
@@ -431,13 +431,13 @@ class RaceReports extends ConfigurationItem {
 	editPositionsReportSettings(reportDirectory) {
 		this.ReportViewer.setReport(reportDirectory)
 
-		this.Window.Opt("+Disabled")
+		this.Window.Block()
 
 		try {
 			return this.ReportViewer.editReportSettings("Laps", "Classes")
 		}
 		finally {
-			this.Window.Opt("-Disabled")
+			this.Window.Unblock()
 		}
 	}
 
@@ -461,13 +461,13 @@ class RaceReports extends ConfigurationItem {
 	editLapTimesReportSettings(reportDirectory) {
 		this.ReportViewer.setReport(reportDirectory)
 
-		this.Window.Opt("+Disabled")
+		this.Window.Block()
 
 		try {
 			return this.ReportViewer.editReportSettings("Laps", "Cars", "Classes")
 		}
 		finally {
-			this.Window.Opt("-Disabled")
+			this.Window.Unblock()
 		}
 	}
 
@@ -491,13 +491,13 @@ class RaceReports extends ConfigurationItem {
 	editConsistencyReportSettings(reportDirectory) {
 		this.ReportViewer.setReport(reportDirectory)
 
-		this.Window.Opt("+Disabled")
+		this.Window.Block()
 
 		try {
 			return this.ReportViewer.editReportSettings("Laps", "Cars", "Classes")
 		}
 		finally {
-			this.Window.Opt("-Disabled")
+			this.Window.Unblock()
 		}
 	}
 
@@ -521,13 +521,13 @@ class RaceReports extends ConfigurationItem {
 	editPaceReportSettings(reportDirectory) {
 		this.ReportViewer.setReport(reportDirectory)
 
-		this.Window.Opt("+Disabled")
+		this.Window.Block()
 
 		try {
 			return this.ReportViewer.editReportSettings("Laps", "Cars", "Classes")
 		}
 		finally {
-			this.Window.Opt("-Disabled")
+			this.Window.Unblock()
 		}
 	}
 
@@ -551,13 +551,13 @@ class RaceReports extends ConfigurationItem {
 	editPerformanceReportSettings(reportDirectory) {
 		this.ReportViewer.setReport(reportDirectory)
 
-		this.Window.Opt("+Disabled")
+		this.Window.Block()
 
 		try {
 			return this.ReportViewer.editReportSettings("Laps", "Cars", "Classes")
 		}
 		finally {
-			this.Window.Opt("-Disabled")
+			this.Window.Unblock()
 		}
 	}
 
@@ -665,7 +665,7 @@ class RaceReports extends ConfigurationItem {
 	}
 
 	loadTrack(track, force := false) {
-		local simulator, ignore, report, fileName, raceData, date, time
+		local simulator, ignore, report, fileName, raceData, date, time, settings
 
 		if (force || (track != this.SelectedTrack)) {
 			simulator := this.SelectedSimulator
@@ -712,6 +712,14 @@ class RaceReports extends ConfigurationItem {
 				this.RacesListView.ModifyCol(2, "AutoHdr")
 				this.RacesListView.ModifyCol(3, "AutoHdr")
 				this.RacesListView.ModifyCol(4, "AutoHdr")
+
+				settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+				setMultiMapValue(settings, "Race Reports", "Simulator", this.SelectedSimulator)
+				setMultiMapValue(settings, "Race Reports", "Car", this.SelectedCar)
+				setMultiMapValue(settings, "Race Reports", "Track", this.SelectedTrack)
+
+				writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 			}
 		}
 	}
@@ -899,11 +907,32 @@ class RaceReports extends ConfigurationItem {
 
 runRaceReports() {
 	local icon := kIconsDirectory . "Chart.ico"
+	local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+	local simulator := getMultiMapValue(settings, "Race Reports", "Simulator", false)
+	local car := getMultiMapValue(settings, "Race Reports", "Car", false)
+	local track := getMultiMapValue(settings, "Race Reports", "Track", false)
 	local reportsDirectory := getMultiMapValue(kSimulatorConfiguration, "Race Strategist Reports", "Database", false)
-	local reports, simulators, msgResult
+	local index := 1
+	local reports, simulators, cars, tracks, msgResult
 
 	TraySetIcon(icon, "1")
 	A_IconTip := "Race Reports"
+
+	while (index < A_Args.Length) {
+		switch A_Args[index], false {
+			case "-Simulator":
+				simulator := A_Args[index + 1]
+				index += 2
+			case "-Car":
+				car := A_Args[index + 1]
+				index += 2
+			case "-Track":
+				track := A_Args[index + 1]
+				index += 2
+			default:
+				index += 1
+		}
+	}
 
 	if !reportsDirectory {
 		OnMessage(0x44, translateYesNoButtons)
@@ -922,8 +951,33 @@ runRaceReports() {
 
 	simulators := reports.getSimulators()
 
-	if (simulators.Length > 0)
-		reports.loadSimulator(simulators[1])
+	if (simulators.Length > 0) {
+		simulator := (inList(simulators, simulator) ? simulator : simulators[1])
+
+		reports.loadSimulator(simulator)
+
+		cars := reports.getCars(simulator)
+
+		if (cars.Length > 0) {
+			if car
+				car := SessionDatabase.getCarCode(simulator, car)
+
+			car := (inList(cars, car) ? car : cars[1])
+
+			reports.loadCar(car)
+
+			tracks := reports.getTracks(simulator, car)
+
+			if (tracks.Length > 0) {
+				if track
+					track := SessionDatabase.getTrackCode(simulator, track)
+
+				track := (inList(tracks, track) ? track : tracks[1])
+
+				reports.loadTrack(track)
+			}
+		}
+	}
 
 	return
 }

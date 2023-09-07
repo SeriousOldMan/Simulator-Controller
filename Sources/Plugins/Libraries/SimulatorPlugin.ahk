@@ -9,6 +9,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include "..\..\Libraries\Task.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\..\Database\Libraries\SettingsDatabase.ahk"
 
@@ -463,7 +464,7 @@ class SimulatorPlugin extends ControllerPlugin {
 
 	writePluginState(configuration) {
 		local simulator := this.runningSimulator()
-		local sessionDB, car, track
+		local car, track
 
 		if this.Active {
 			setMultiMapValue(configuration, this.Plugin, "State", simulator ? "Active" : "Passive")
@@ -474,10 +475,8 @@ class SimulatorPlugin extends ControllerPlugin {
 
 					setMultiMapValue(configuration, "Simulation", "Session", this.Session[true])
 
-					sessionDB := SessionDatabase()
-
-					car := sessionDB.getCarName(simulator, this.Car)
-					track := sessionDB.getTrackName(simulator, this.Track)
+					car := SessionDatabase.getCarName(simulator, this.Car)
+					track := SessionDatabase.getTrackName(simulator, this.Track)
 
 					setMultiMapValue(configuration, "Simulation", "Simulator", simulator)
 					setMultiMapValue(configuration, "Simulation", "Car", car)
@@ -544,7 +543,7 @@ class SimulatorPlugin extends ControllerPlugin {
 			if SimulatorPlugin.ActiveSimulator
 				SimulatorPlugin.ActiveSimulator.simulatorShutdown(SimulatorPlugin.ActiveSimulation)
 
-			this.updateSession(kSessionFinished)
+			this.updateSession(kSessionFinished, true)
 
 			SimulatorPlugin.sActiveSimulator := this
 			SimulatorPlugin.sActiveSimulation := simulator
@@ -555,24 +554,24 @@ class SimulatorPlugin extends ControllerPlugin {
 		super.simulatorShutdown(simulator)
 
 		if ((simulator = this.Simulator.Application) && (SimulatorPlugin.ActiveSimulator == this)) {
-			this.updateSession(kSessionFinished)
+			this.updateSession(kSessionFinished, true)
 
 			SimulatorPlugin.sActiveSimulator := false
 			SimulatorPlugin.sActiveSimulation := false
 		}
 	}
 
-	updateSession(session) {
+	updateSession(session, force := false) {
 		local mode
 
-		if ((session != this.Session) && (session != kSessionPaused)) {
+		if (force || ((session != this.Session) && (session != kSessionPaused))) {
 			this.iSession := session
 
 			if (session == kSessionFinished) {
 				this.Car := false
 				this.Track := false
 
-				this.Controller.setModes()
+				this.Controller.setModes(this.Simulator.Application)
 			}
 			else
 				this.Controller.setModes(this.Simulator.Application, ["Other", "Practice", "Qualification", "Race"][session])
@@ -863,8 +862,8 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		return false
 	}
 
-	updateSession(session) {
-		super.updateSession(session)
+	updateSession(session, force := false) {
+		super.updateSession(session, force)
 
 		if (session = kSessionFinished) {
 			this.CurrentTyreCompound := false
@@ -917,24 +916,48 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		local simulator := getMultiMapValue(data, "Session Data", "Simulator", "Unknown")
 		local car := getMultiMapValue(data, "Session Data", "Car", "Unknown")
 		local track := getMultiMapValue(data, "Session Data", "Track", "Unknown")
-
-		SessionDatabase.registerCar(simulator, car, SessionDatabase.getCarName(simulator, car))
-
-		SessionDatabase.registerTrack(simulator, car, track
-									, SessionDatabase.getTrackName(simulator, track, false), SessionDatabase.getTrackName(simulator, track, true))
-	}
-
-	startSession(settings, data) {
 		local tyreCompound := getMultiMapValue(settings, "Session Setup", "Tyre.Compound", "Dry")
 		local tyreCompoundColor := getMultiMapValue(settings, "Session Setup", "Tyre.Compound.Color", "Black")
 
-		this.Car := getMultiMapValue(data, "Session Data", "Car")
-		this.Track := getMultiMapValue(data, "Session Data", "Track")
+		static lastSimulator := false
+		static lastCar := false
+		static lastTrack := false
+
+		registerSimulator(simulator, car, track) {
+			local settings
+
+			SessionDatabase.registerCar(simulator, car, SessionDatabase.getCarName(simulator, car))
+
+			SessionDatabase.registerTrack(simulator, car, track
+										, SessionDatabase.getTrackName(simulator, track, false)
+										, SessionDatabase.getTrackName(simulator, track, true))
+
+			settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+			setMultiMapValue(settings, "Simulator", "Simulator", SessionDatabase.getSimulatorName(simulator))
+			setMultiMapValue(settings, "Simulator", "Car", car)
+			setMultiMapValue(settings, "Simulator", "Track", track)
+
+			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+		}
+
+		this.Car := car
+		this.Track := track
+
+		if ((simulator != lastSimulator) || (car != lastCar) || (track != lastTrack)) {
+			lastSimulator := simulator
+			lastCar := car
+			lastTrack := track
+
+			Task.startTask(registerSimulator.Bind(simulator, car, track), 1000, kLowPriority)
+		}
 
 		this.CurrentTyreCompound := compound(tyreCompound, tyreCompoundColor)
 
 		this.updateTyreCompound(data)
+	}
 
+	startSession(settings, data) {
 		this.prepareSession(settings, data)
 	}
 
@@ -1151,33 +1174,11 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		}
 	}
 
-	acquireTelemetryData() {
-		local code, trackData, data
-
-		static sessionDB := false
-
-		if !sessionDB
-			sessionDB := SessionDatabase()
-
-		code := this.Code
-		trackData := sessionDB.getTrackData(code, this.Track)
-
-		return (trackData ? readSimulatorData(code, "-Track `"" . trackData . "`"") : readSimulatorData(code))
-	}
-
-	acquirePositionsData(telemetryData) {
+	correctPositionsData(positionsData) {
 		local positions := Map()
 		local needCorrection := false
 		local cars := []
-		local positionsData, count, position
-
-		if telemetryData.Has("Position Data") {
-			positionsData := newMultiMap()
-
-			setMultiMapValues(positionsData, "Position Data", getMultiMapValues(telemetryData, "Position Data"))
-		}
-		else
-			positionsData := readSimulatorData(this.Code, "-Standings")
+		local count, position
 
 		count := getMultiMapValue(positionsData, "Position Data", "Car.Count", 0)
 
@@ -1192,7 +1193,8 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 
 		if needCorrection {
 			loop count
-				cars.Push(Array(A_Index, getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Lap")
+				cars.Push(Array(A_Index, getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Laps"
+																	   , getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Lap"))
 									   + getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Lap.Running")))
 
 			bubbleSort(&cars, (c1, c2) => c1[2] < c2[2])
@@ -1215,6 +1217,41 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		return positionsData
 	}
 
+	acquireTelemetryData() {
+		local trackData, data
+
+		static sessionDB := false
+
+		if !sessionDB
+			sessionDB := SessionDatabase()
+
+		trackData := sessionDB.getTrackData(this.Code, this.Track)
+
+		return this.readSessionData(trackData ? ("Track=" . trackData) : "")
+	}
+
+	acquirePositionsData(telemetryData) {
+		local positions := Map()
+		local needCorrection := false
+		local cars := []
+		local positionsData, count, position
+
+		if telemetryData.Has("Position Data") {
+			positionsData := newMultiMap()
+
+			setMultiMapValues(positionsData, "Position Data", getMultiMapValues(telemetryData, "Position Data"))
+		}
+		else
+			positionsData := this.readSessionData("Standings=true")
+
+		positionsData := this.correctPositionsData(positionsData)
+
+		if telemetryData.Has("Position Data")
+			telemetryData["Position Data"] := positionsData["Position Data"]
+
+		return positionsData
+	}
+
 	acquireSessionData(&telemetryData, &positionsData) {
 		local data := newMultiMap()
 		local section, values, driver
@@ -1227,11 +1264,8 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		RaceAssistantPlugin.updateAssistantsTelemetryData(telemetryData)
 		RaceAssistantPlugin.updateAssistantsPositionsData(positionsData)
 
-		for section, values in telemetryData
-			setMultiMapValues(data, section, values)
-
-		for section, values in positionsData
-			setMultiMapValues(data, section, values)
+		addMultiMapValues(data, telemetryData)
+		addMultiMapValues(data, positionsData)
 
 		driver := getMultiMapValue(data, "Position Data", "Driver.Car", false)
 
@@ -1247,43 +1281,12 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 
 		return data
 	}
+
+	readSessionData(options := "", protocol?) {
+		return callSimulator(this.Code, options, protocol?)
+	}
 }
 
-
-;;;-------------------------------------------------------------------------;;;
-;;;                    Public Function Declaration Section                  ;;;
-;;;-------------------------------------------------------------------------;;;
-
-readSimulatorData(simulator, options := "", protocol := "SHM") {
-	local exePath := kBinariesDirectory . simulator . A_Space . protocol . " Provider.exe"
-	local dataFile, data
-
-	DirCreate(kTempDirectory . simulator . " Data")
-
-	dataFile := temporaryFileName(simulator . " Data\" . protocol, "data")
-
-	try {
-		RunWait(A_ComSpec . " /c `"`"" . exePath . "`" " . options . " > `"" . dataFile . "`"`"", , "Hide")
-	}
-	catch Any as exception {
-		logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider (")
-												   , {simulator: simulator, protocol: protocol})
-							   . exePath . translate(") - please rebuild the applications in the binaries folder (")
-							   . kBinariesDirectory . translate(")"))
-
-		showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration...")
-									  , {exePath: exePath, simulator: simulator, protocol: protocol})
-				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-	}
-
-	data := readMultiMap(dataFile)
-
-	deleteFile(dataFile)
-
-	setMultiMapValue(data, "Session Data", "Simulator", simulator)
-
-	return data
-}
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Private Function Declaration Section                 ;;;

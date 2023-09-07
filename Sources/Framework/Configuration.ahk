@@ -330,6 +330,8 @@ class Application extends ConfigurationItem {
 			}
 		}
 		catch Any as exception {
+			logError(exception, true)
+
 			message := (isObject(exception) ? exception.Message : exception)
 
 			logMessage(kLogCritical, translate("Error while starting application ") . application . translate(" (") . exePath . translate("): ") . message . " - please check the configuration")
@@ -347,6 +349,7 @@ class Application extends ConfigurationItem {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class Function extends ConfigurationItem {
+	iLabel := false
 	iNumber := 0
 	iHotkeys := CaseInsenseMap()
 	iActions := CaseInsenseMap()
@@ -354,6 +357,16 @@ class Function extends ConfigurationItem {
 	Type {
 		Get {
 			throw "Virtual property Function.Type must be implemented in a subclass..."
+		}
+	}
+
+	Label {
+		Get {
+			return this.iLabel
+		}
+
+		Set {
+			return (this.iLabel := value)
 		}
 	}
 
@@ -365,7 +378,7 @@ class Function extends ConfigurationItem {
 
 	Descriptor {
 		Get {
-			return this.Type . "." . this.Number
+			return (this.Type . "." . this.Number)
 		}
 	}
 
@@ -380,12 +393,18 @@ class Function extends ConfigurationItem {
 			local result, hotkeys
 
 			if trigger {
-				result := this.iHotkeys[trigger]
+				if this.iHotkeys.Has(trigger) {
+					result := this.iHotkeys[trigger]
 
-				if asText
-					result := values2String(" | ", result*)
+					if asText
+						result := values2String(" | ", result*)
 
-				return result
+					return result
+				}
+				else if asText
+					return ""
+				else
+					return CaseInsenseMap()
 			}
 			else if asText {
 				result := CaseInsenseMap()
@@ -520,48 +539,62 @@ class Function extends ConfigurationItem {
 				break
 
 			this.loadFromDescriptor(trigger, hotkeyActions[index++])
-			this.loadFromDescriptor(trigger . " Action", hotkeyActions[index++])
+			this.loadFromDescriptor(trigger . ".Action", hotkeyActions[index++])
 		}
 
 		super.__New(configuration)
 	}
 
 	loadFromConfiguration(configuration) {
-		local functionDescriptor, descriptorValues
+		local functionDescriptor, descriptorValues, trigger
 
 		super.loadFromConfiguration(configuration)
 
 		for functionDescriptor, descriptorValues in getMultiMapValues(configuration, "Controller Functions") {
 			functionDescriptor := ConfigurationItem.splitDescriptor(functionDescriptor)
 
-			if ((functionDescriptor[1] == this.Type) && (functionDescriptor[2] == this.Number))
+			if ((functionDescriptor[1] == this.Type) && (functionDescriptor[2] == this.Number)) {
+				if (functionDescriptor.Length = 4) {
+					functionDescriptor[3] := ConfigurationItem.descriptor(functionDescriptor[3], functionDescriptor[4])
+
+					functionDescriptor.RemoveAt(4)
+				}
+
 				this.loadFromDescriptor(functionDescriptor[3], descriptorValues)
+			}
 		}
 	}
 
 	loadFromDescriptor(trigger, value) {
-		if InStr(trigger, " Action") {
+		if InStr(trigger, ".Action") {
+			trigger := SubStr(trigger, 1, StrLen(trigger) - StrLen(".Action"))
+
+			this.iActions[trigger] := this.computeActions(trigger, value)
+		}
+		else if InStr(trigger, " Action") {
 			trigger := SubStr(trigger, 1, StrLen(trigger) - StrLen(" Action"))
 
 			this.iActions[trigger] := this.computeActions(trigger, value)
 		}
+		else if (trigger = "Label")
+			this.iLabel := value
 		else
 			this.iHotkeys[trigger] := this.computeHotkeys(value)
 	}
 
 	saveToConfiguration(configuration) {
 		local descriptor := this.Descriptor
-		local ignore, trigger
+		local ignore, trigger, hotkeys
 
 		super.saveToConfiguration(configuration)
 
 		for ignore, trigger in this.Trigger {
 			setMultiMapValue(configuration, "Controller Functions", descriptor . "." . trigger, this.Hotkeys[trigger, true])
-			setMultiMapValue(configuration, "Controller Functions", descriptor . "." . trigger . " Action", this.Actions[trigger, true])
+			setMultiMapValue(configuration, "Controller Functions", descriptor . "." . trigger . ".Action", this.Actions[trigger, true])
 		}
 	}
 
-	static createFunction(descriptor, configuration := false, onHotkeys := false, onAction := false, offHotkeys := false, offAction := false) {
+	static createFunction(descriptor, configuration := false, onHotkeys := "", onAction := "", offHotkeys := "", offAction := "") {
 		descriptor := ConfigurationItem.splitDescriptor(descriptor)
 
 		switch descriptor[1], false {
@@ -594,7 +627,7 @@ class Function extends ConfigurationItem {
 		else {
 			actions := []
 
-			for ignore, action in StrSplit(action, "|") {
+			for ignore, action in (InStr(action, "|") ? StrSplit(action, "|") : StrSplit(action, ";")) {
 				action := StrSplit(action, "(", " `t", 2)
 
 				arguments := string2Values(",", SubStr(action[2], 1, StrLen(action[2]) - 1))
@@ -768,16 +801,16 @@ class Plugin extends ConfigurationItem {
 
 	Arguments[asText := false] {
 		Get {
-			local argument, values, result
+			local argument, value, result
 
 			if asText {
 				result := []
 
-				for argument, values in this.Arguments
-					if (values == "")
+				for argument, value in this.Arguments
+					if (value == "")
 						result.Push(argument)
 					else
-						result.Push(argument . ": " . values)
+						result.Push(argument . ": " . value)
 
 				return values2String("; ", result*)
 			}
@@ -819,20 +852,50 @@ class Plugin extends ConfigurationItem {
 	}
 
 	saveToConfiguration(configuration) {
+		local descriptor, arguments, key, value, result, argument, values
+
 		super.saveToConfiguration(configuration)
 
-		setMultiMapValue(configuration, "Plugins", this.Plugin, (this.Active ? kTrue : kFalse) . "|" . values2String(", ", this.Simulators*) . "|" . this.Arguments[true])
+		descriptor := getMultiMapValue(configuration, "Plugins", this.Plugin, "")
+
+		if (StrLen(descriptor) > 0) {
+			descriptor := StrSplit(descriptor, "|", " `t", 3)
+
+			if (descriptor.Length > 0) {
+				arguments := this.computeArgments(descriptor[3])
+
+				for key, value in this.Arguments
+					arguments[key] := value
+
+				result := []
+
+				for argument, values in arguments
+					if (values == "")
+						result.Push(argument)
+					else
+						result.Push(argument . ": " . values)
+
+				return values2String("; ", result*)
+			}
+			else
+				arguments := this.Arguments[true]
+		}
+		else
+			arguments := this.Arguments[true]
+
+		setMultiMapValue(configuration, "Plugins", this.Plugin, (this.Active ? kTrue : kFalse) . "|" . values2String(", ", this.Simulators*) . "|" . arguments)
 	}
 
 	computeArgments(arguments) {
 		local ignore, argument
 		local result := CaseInsenseMap()
 
-		for ignore, argument in string2Values(";", arguments) {
-			argument := string2Values(":", argument, 2)
+		for ignore, argument in string2Values(";", arguments)
+			if (Trim(argument) != "") {
+				argument := string2Values(":", argument, 2)
 
-			result[argument[1]] := ((argument.Length == 1) ? "" : argument[2])
-		}
+				result[argument[1]] := ((argument.Length == 1) ? "" : argument[2])
+			}
 
 		return result
 	}

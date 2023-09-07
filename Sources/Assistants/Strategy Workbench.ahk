@@ -17,7 +17,7 @@
 ;@SC #Include "..\Framework\Production.ahk"
 ;@SC-EndIf
 
-;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Dashboard.ico
+;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Workbench.ico
 ;@Ahk2Exe-ExeName Strategy Workbench.exe
 
 
@@ -398,7 +398,7 @@ class StrategyWorkbench extends ConfigurationItem {
 					OnMessage(0x44, translateYesNoButtons, 0)
 
 					if (msgResult = "Yes") {
-						this.Window.Opt("+Disabled")
+						this.Window.Block()
 
 						try {
 							TelemetryDatabase(workbench.SelectedSimulator , workbench.SelectedCar, workbench.SelectedTrack
@@ -410,7 +410,7 @@ class StrategyWorkbench extends ConfigurationItem {
 							workbench.loadCompound(workbench.AvailableCompounds[workbenchGui["compoundDropDown"].Value], true)
 						}
 						finally {
-							this.Window.Opt("-Disabled")
+							this.Window.Unblock()
 						}
 					}
 				}
@@ -490,29 +490,56 @@ class StrategyWorkbench extends ConfigurationItem {
 
 				workbenchGui["tyreSetDropDown"].Choose(inList(collect(workbench.TyreCompounds, translate), compound))
 				workbenchGui["tyreSetCountEdit"].Text := count
-
-				workbench.updateState()
 			}
+
+			workbench.updateState()
 		}
 
 		updateTyreSet(*) {
-			local row
-
-			row := workbench.TyreSetListView.GetNext(0)
+			local row := workbench.TyreSetListView.GetNext(0)
+			local availableCompounds, compound, usedCompounds, index, candidate
 
 			if (row > 0) {
-				workbench.TyreSetListView.Modify(row, "", collect(workbench.TyreCompounds, translate)[workbenchGui["tyreSetDropDown"].Value]
-														, workbenchGui["tyreSetCountEdit"].Text)
+				availableCompounds := collect(workbench.TyreCompounds, translate)
+				compound := availableCompounds[workbenchGui["tyreSetDropDown"].Value]
+				usedCompounds := []
+
+				loop workbench.TyreSetListView.GetCount()
+					if (A_Index != row)
+						usedCompounds.Push(workbench.TyreSetListView.GetText(A_Index, 1))
+
+				if inList(usedCompounds, compound)
+					for index, candidate in availableCompounds
+						if !inList(usedCompounds, candidate) {
+							compound := candidate
+
+							workbenchGui["tyreSetDropDown"].Choose(index)
+
+							break
+						}
+
+				workbench.TyreSetListView.Modify(row, "", compound, workbenchGui["tyreSetCountEdit"].Text)
 
 				workbench.TyreSetListView.ModifyCol()
 			}
+
+			workbench.updateState()
 		}
 
 		addTyreSet(*) {
-			local index := inList(workbench.TyreCompounds, normalizeCompound("Dry"))
+			local availableCompounds := collect(workbench.TyreCompounds, translate)
+			local usedCompounds := []
+			local index, ignore, candidate
 
-			if !index
-				index := 1
+			loop workbench.TyreSetListView.GetCount()
+				usedCompounds.Push(workbench.TyreSetListView.GetText(A_Index, 1))
+
+			for ignore, candidate in availableCompounds
+				if !inList(usedCompounds, candidate) {
+					index := A_Index
+
+					break
+				}
 
 			workbench.TyreSetListView.Add("", collect(workbench.TyreCompounds, translate)[index], 99)
 			workbench.TyreSetListView.Modify(workbench.TyreSetListView.GetCount(), "Select Vis")
@@ -854,7 +881,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.SetFont("s9 Norm", "Arial")
 
 		workbenchGui.Add("Documentation", "x608 YP+20 w134 Center H:Center", translate("Strategy Workbench")
-					   , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-development")
+					   , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-workbench")
 
 		workbenchGui.Add("Text", "x8 yp+30 w1350 0x10 W:Grow")
 
@@ -1510,6 +1537,8 @@ class StrategyWorkbench extends ConfigurationItem {
 			this.Control["simFuelConsumptionEdit"].Enabled := false
 		}
 
+		this.Control["tyreSetAddButton"].Enabled := (this.TyreCompounds.Length > this.TyreSetListView.GetCount())
+
 		if (this.TyreSetListView.GetNext(0) > 0) {
 			this.Control["tyreSetDropDown"].Enabled := true
 			this.Control["tyreSetCountEdit"].Enabled := true
@@ -1616,11 +1645,9 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	updateSettingsMenu() {
-		local settingsMenu, fileNames, validators, ignore, fileName, validator
-
-		settingsMenu := collect(["Settings", "---------------------------------------------", "Initialize from Strategy", "Initialize from Settings...", "Initialize from Database", "Initialize from Telemetry", "Initialize from Simulation"], translate)
-
-		fileNames := getFileNames("*.rules", kResourcesDirectory . "Strategy\Validators\", kUserHomeDirectory . "Validators\")
+		local settingsMenu := collect(["Settings", "---------------------------------------------", "Initialize from Strategy", "Initialize from Settings...", "Initialize from Database", "Initialize from Telemetry", "Initialize from Simulation"], translate)
+		local fileNames := getFileNames("*.rules", kResourcesDirectory . "Strategy\Validators\", kUserHomeDirectory . "Validators\")
+		local validators, ignore, fileName, validator
 
 		if (fileNames.Length > 0) {
 			settingsMenu.Push(translate("---------------------------------------------"))
@@ -2381,8 +2408,6 @@ class StrategyWorkbench extends ConfigurationItem {
 				}
 			case 5:
 				if (simulator && car && track) {
-					settingsDB := SettingsDatabase()
-
 					settings := SettingsDatabase().loadSettings(simulator, car, track, this.SelectedWeather)
 
 					if (settings.Count > 0) {
@@ -2485,8 +2510,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 					data := readSimulatorData(prefix)
 
-					if ((getMultiMapValue(data, "Session Data", "Car") != this.SelectedCar)
-					 || (getMultiMapValue(data, "Session Data", "Track") != this.SelectedTrack))
+					if ((getMultiMapValue(data, "Session Data", "Car") != car) || (getMultiMapValue(data, "Session Data", "Track") != track))
 						return
 					else {
 						fuelCapacity := getMultiMapValue(data, "Session Data", "FuelAmount", kUndefined)
@@ -3236,35 +3260,12 @@ class StrategyWorkbench extends ConfigurationItem {
 ;;;-------------------------------------------------------------------------;;;
 
 readSimulatorData(simulator) {
-	local dataFile := kTempDirectory . simulator . " Data\Setup.data"
-	local exePath := kBinariesDirectory . simulator . " SHM Provider.exe"
-	local data, setupData
+	local data := callSimulator(simulator)
+	local setupData := callSimulator(simulator, "Setup=true")
 
-	DirCreate(kTempDirectory . simulator . " Data")
+	setMultiMapValues(data, "Setup Data", getMultiMapValues(setupData, "Setup Data"))
 
-	try {
-		RunWait(A_ComSpec . " /c `"`"" . exePath . "`" -Setup > `"" . dataFile . "`"`"", , "Hide")
-
-		data := readMultiMap(dataFile)
-
-		setupData := getMultiMapValues(data, "Setup Data")
-
-		RunWait(A_ComSpec . " /c `"`"" . exePath . "`" > `"" . dataFile "`"`"", , "Hide")
-
-		data := readMultiMap(dataFile)
-
-		deleteFile(dataFile)
-
-		setMultiMapValues(data, "Setup Data", setupData)
-
-		return data
-	}
-	catch Any as exception {
-		logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider ("), {simulator: simulator, protocol: "SHM"}) . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
-
-		showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration..."), {simulator: simulator, protocol: "SHM", exePath: exePath})
-				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-	}
+	return data
 }
 
 filterSchema(schema) {
@@ -3292,7 +3293,7 @@ convertValue(name, value) {
 }
 
 runStrategyWorkbench() {
-	local icon := kIconsDirectory . "Dashboard.ico"
+	local icon := kIconsDirectory . "Workbench.ico"
 	local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 	local simulator := getMultiMapValue(settings, "Strategy Workbench", "Simulator", false)
 	local car := getMultiMapValue(settings, "Strategy Workbench", "Car", false)

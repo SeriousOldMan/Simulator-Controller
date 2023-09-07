@@ -35,10 +35,11 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 			local wizard := this.SetupWizard
 			local ignore, simulator
 
-			if (wizard.isModuleSelected("Controller") || wizard.isModuleSelected("Race Engineer") || wizard.isModuleSelected("Race Strategist"))
-				for ignore, simulator in this.Definition
-					if wizard.isApplicationSelected(simulator)
-						return 1
+			if !wizard.QuickSetup
+				if (wizard.isModuleSelected("Controller") || wizard.isModuleSelected("Race Engineer") || wizard.isModuleSelected("Race Strategist"))
+					for ignore, simulator in this.Definition
+						if wizard.isApplicationSelected(simulator)
+							return 1
 
 			return 0
 		}
@@ -60,15 +61,16 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 
 					arguments := ""
 
-					for ignore, descriptor in this.iSimulatorMFDKeys[simulator] {
-						key := descriptor[3]
-						value := wizard.getSimulatorValue(simulator, key, descriptor[4])
+					if this.iSimulatorMFDKeys.Has(simulator)
+						for ignore, descriptor in this.iSimulatorMFDKeys[simulator] {
+							key := descriptor[3]
+							value := wizard.getSimulatorValue(simulator, key, descriptor[4])
 
-						if (arguments != "")
-							arguments .= "; "
+							if (arguments != "")
+								arguments .= "; "
 
-						arguments .= (key . ": " . value)
-					}
+							arguments .= (key . ": " . value)
+						}
 
 					for ignore, mode in ["Pitstop", "Assistant"] {
 						actions := ""

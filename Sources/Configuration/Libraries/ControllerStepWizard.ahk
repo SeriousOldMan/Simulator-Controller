@@ -60,7 +60,7 @@ class ControllerStepWizard extends StepWizard {
 
 	Pages {
 		Get {
-			return (this.SetupWizard.isModuleSelected("Controller") ? 1 : 0)
+			return (this.SetupWizard.QuickSetup ? 0 : (this.SetupWizard.isModuleSelected("Controller") ? 1 : 0))
 		}
 	}
 
@@ -251,6 +251,24 @@ class ControllerStepWizard extends StepWizard {
 			this.iControllerEditor.close(true)
 
 			this.iControllerEditor := false
+		}
+	}
+
+	startSetup() {
+		local buttonBoxConfiguration, streamDeckConfiguration
+
+		if !this.SetupWizard.Initialize {
+			buttonBoxConfiguration := readMultiMap(kUserConfigDirectory . "Button Box Configuration.ini")
+
+			addMultiMapValues(buttonBoxConfiguration, readMultiMap(kUserHomeDirectory . "Setup\Button Box Configuration.ini"))
+
+			writeMultiMap(kUserHomeDirectory . "Setup\Button Box Configuration.ini", buttonBoxConfiguration)
+
+			streamDeckConfiguration := readMultiMap(kUserConfigDirectory . "Stream Deck Configuration.ini")
+
+			addMultiMapValues(streamDeckConfiguration, readMultiMap(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini"))
+
+			writeMultiMap(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini", streamDeckConfiguration)
 		}
 	}
 

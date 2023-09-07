@@ -334,6 +334,10 @@ namespace ACCUDPProvider {
                                     outStream.WriteLine("Session=Finished");
                                 }
 
+                                outStream.WriteLine("[Track Data]");
+
+                                outStream.Write("Length="); outStream.WriteLine(trackMeters);
+
                                 outStream.WriteLine("[Position Data]");
 
                                 // outStream.Write("Car.Count="); outStream.WriteLine(Cars.Count);
@@ -349,7 +353,7 @@ namespace ACCUDPProvider {
 
                                         outStream.Write("Car."); outStream.Write(index); outStream.Write(".Nr="); outStream.WriteLine(car.RaceNumber);
                                         outStream.Write("Car."); outStream.Write(index); outStream.Write(".Position="); outStream.WriteLine(car.Position);
-                                        outStream.Write("Car."); outStream.Write(index); outStream.Write(".Lap="); outStream.WriteLine(car.Laps);
+                                        outStream.Write("Car."); outStream.Write(index); outStream.Write(".Laps="); outStream.WriteLine(car.Laps);
                                         outStream.Write("Car."); outStream.Write(index); outStream.Write(".Lap.Running="); outStream.WriteLine(car.SplinePosition);
 
                                         LapData lastLap = car.LastLap;

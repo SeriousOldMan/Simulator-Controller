@@ -26,7 +26,7 @@ Using the "Load..." and "Save..." buttons in the lower left corner of the window
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/Development/Docs/Images/Telemetry%20Analyzer%201.JPG)
 
-In this dialog you can initialize the analyzer for your car and you targeted driving style.
+In this dialog you can initialize the analyzer for your car and your targeted driving style.
 
   1. It is absolutely cruicial, that the steering lock and steering ratio information is correct, since a calculated combination of these values together with the angular velocity are used to detect over- or understeer in a corner.
   
@@ -53,7 +53,11 @@ In this dialog you can initialize the analyzer for your car and you targeted dri
   
      As said, you must experiment with the positions of the thresholds, until the analyzer will *reflect* your desired driving style and will only collect those over- and understeer issues, which you want to *report*. If you want the analyzer to detect those values for you, you can use a special calibration mode. If you click on "Calibrate..." you will be aksed to first drive a couple of laps as clean as possible (without over- or understeering the car) and then drive as dirty as possible, but without loosing control and going off-track. The analyzer will then use the collected data  to come up with some decent settings for the thresholds to work with. Whatever way you choose, the position of the sliders and all other values will be remembered for each simulator, car and possibly track combination, so you have to go through this process only once.
 	 
+	 A special case while detecting over- and understeer is the situation, when you already have lost the rear and try to catch the car using counter steering. This will always count as heavy oversteer. It is detected, when the steering angle (in radians) has a different sign than the angular velocity (in radians / second) of the car rotation around the Z axis.
+	 
 	 Technical: The sliders indicate from which value a deviation of the ideal yaw angle is considered light, medium or heavy. If there is no glide angle at all, this value is 0. In the case of oversteer, the value is negative (the larger, the more drift angle) and in the case of understeer, the value is positive, the larger, the more understeer. If the wheelbase and the track width has been set exactly as known to the simulator, the values used here are ten times that of the slip angle (aka deviation of the ideal yaw angle). Therefore an oversteer angle by 3 degrees will have a value of -30.
+
+  5. Finally, you can enable a short feedback sound, which varies in frequency and volume depending on over-/understeer events and their intensity. Lower tones indicate oversteering while higher tones indicate understeering.
 
 Note: It is recommended to choose a car before entering the analyzer mode, since then some of the values in this dialog will be initialized with car specific data, depending on the chosen simulator.
 

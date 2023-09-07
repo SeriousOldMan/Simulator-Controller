@@ -58,7 +58,9 @@ lapRemainingFuel(?lap, ?remainingFuel) <= Get(Lap, ?lap, Fuel.Remaining, ?remain
 lapTime(?lap, ?time) <= Get(Lap, ?lap, Time, ?time)
 
 lapAvgTime(?lap, ?avgTime) <= Get(Lap, ?lap, Time.Average, ?avgTime)
-lapAvgTime(?lap, ?avgTime) <= weightedLapTimes(?lap, ?lapTimes), lapAvgTime(?lap, ?lapTimes, ?avgTime), Set(Lap, ?lap, Time.Average, ?avgTime)
+lapAvgTime(?lap, ?avgTime) <= weightedLapTimes(?lap, ?lapTimes), lapAvgTime(?lap, ?lapTimes, ?avgTime), !, Set(Lap, ?lap, Time.Average, ?avgTime)
+lapAvgTime(?lap, ?avgTime) <= lapTime(?lap, ?avgTime)
+lapAvgTime(?lap, !Session.Settings.Lap.AvgTime)
 
 lapAvgTime(?lap, [], ?avgTime) <= Get(Session.Settings.Lap.Time.Adjust, true), !, ?avgTime = !Session.Settings.Lap.AvgTime * 1000
 lapAvgTime(?lap, [], 0) <= !

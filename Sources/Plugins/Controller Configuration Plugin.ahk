@@ -244,7 +244,7 @@ class ControllerList extends ConfigurationItemList {
 		local window := this.Window
 		local choices, layout
 
-		window.Opt("+Disabled")
+		window.Block()
 
 		try {
 			layout := this.Control["controllerLayoutDropDown"].Text
@@ -258,7 +258,7 @@ class ControllerList extends ConfigurationItemList {
 			this.Control["controllerLayoutDropDown"].Choose(inList(choices, layout))
 		}
 		finally {
-			window.Opt("-Disabled")
+			window.Unblock()
 		}
 	}
 }
@@ -383,19 +383,17 @@ class FunctionsList extends ConfigurationItemList {
 
 		functionType := this.Control["functionTypeDropDown"].Value
 
-		if (functionType < 5) {
-			this.Control["functionOnActionEdit"].Enabled := false
+		if (functionType = 5) {
+			this.Control["functionOnActionEdit"].Enabled := true
+			this.Control["functionOffHotkeysEdit"].Enabled := false
+			this.Control["functionOffHotkeysEdit"].Text := ""
 			this.Control["functionOffActionEdit"].Enabled := false
-			this.Control["functionOnActionEdit"].Text := ""
 			this.Control["functionOffActionEdit"].Text := ""
 		}
-		else {
-			this.Control["functionOnActionEdit"].Enabled := true
+		else if ((functionType == 2) || (functionType == 4)) {
+			this.Control["functionOffHotkeysEdit"].Enabled := true
 			this.Control["functionOffActionEdit"].Enabled := true
 		}
-
-		if ((functionType == 2) || (functionType == 4))
-			this.Control["functionOffHotkeysEdit"].Enabled := true
 		else {
 			this.Control["functionOffHotkeysEdit"].Enabled := false
 			this.Control["functionOffActionEdit"].Enabled := false
@@ -411,6 +409,8 @@ class FunctionsList extends ConfigurationItemList {
 	computeHotkeysAndActionText(hotkeys, action) {
 		if (hotKeys && (hotkeys != ""))
 			return (hotkeys . ((action == "") ? "" : (" => " . action)))
+		else if (action != "")
+			return action
 		else
 			return ""
 	}

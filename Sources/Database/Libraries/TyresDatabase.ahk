@@ -432,14 +432,14 @@ class TyresDatabase extends SessionDatabase {
 		db.add("Tyres.Pressures", Database.Row("Driver", driver, "Weather", weather
 											 , "Temperature.Air", Round(airTemperature), "Temperature.Track", Round(trackTemperature)
 											 , "Compound", compound, "Compound.Color", compoundColor
-											 , "Tyre.Pressure.Cold.Front.Left", Round(coldPressures[1], 1)
-											 , "Tyre.Pressure.Cold.Front.Right", Round(coldPressures[2], 1)
-											 , "Tyre.Pressure.Cold.Rear.Left", Round(coldPressures[3], 1)
-											 , "Tyre.Pressure.Cold.Rear.Right", Round(coldPressures[4], 1)
-											 , "Tyre.Pressure.Hot.Front.Left", Round(hotPressures[1], 1)
-											 , "Tyre.Pressure.Hot.Front.Right", Round(hotPressures[2], 1)
-											 , "Tyre.Pressure.Hot.Rear.Left", Round(hotPressures[3], 1)
-											 , "Tyre.Pressure.Hot.Rear.Right", Round(hotPressures[4], 1))
+											 , "Tyre.Pressure.Cold.Front.Left", valueOrNull(coldPressures[1])
+											 , "Tyre.Pressure.Cold.Front.Right", valueOrNull(coldPressures[2])
+											 , "Tyre.Pressure.Cold.Rear.Left", valueOrNull(coldPressures[3])
+											 , "Tyre.Pressure.Cold.Rear.Right", valueOrNull(coldPressures[4])
+											 , "Tyre.Pressure.Hot.Front.Left", valueOrNull(hotPressures[1])
+											 , "Tyre.Pressure.Hot.Front.Right", valueOrNull(hotPressures[2])
+											 , "Tyre.Pressure.Hot.Rear.Left", valueOrNull(hotPressures[3])
+											 , "Tyre.Pressure.Hot.Rear.Right", valueOrNull(hotPressures[4]))
 									  , flush)
 
 		tyres := ["FL", "FR", "RL", "RR"]
@@ -460,6 +460,9 @@ class TyresDatabase extends SessionDatabase {
 	updatePressure(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor
 				 , type, tyre, pressure, count := 1, flush := true, require := true, scope := "User", driver := false) {
 		local db, rows, row
+
+		if (isNull(valueOrNull(pressure)))
+			return
 
 		if !driver
 			driver := this.ID

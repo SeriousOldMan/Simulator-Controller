@@ -2,7 +2,7 @@ The distribution of Simulator Controller includes a set of predefined plugins, w
 
 | Plugin | Description |
 | ------ | ------ |
-| [System](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-system) | Handles multiple Button Box layers and manages all applications configured for your simulation configuration. This plugin defines the "Launch" mode, where applications my be started and stopped from the controller hardware. These applications can be configured using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). |
+| [System](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-system) | Handles multiple Button Box layers and manages all applications configured for your simulation configuration. This plugin defines the "Launch" mode, where applications my be started and stopped from the controller hardware. These applications can be configured using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Beside that, you can define your own custom modes using some scripting magic. |
 | [Button Box](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#button-box-layouts) | Tools for building your own Button Box / Controller visuals. The default implementation of *ButtonBox* implements grid based Button Box layouts, which can be configured using a [graphical layout editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#button-box-layouts). |
 | [Stream Deck](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#stream-deck-layouts) | Tools for connecting one or more Stream Decks as external controller to Simulator Controller. A special Stream Deck plugin is provided, which is able to dynamically display information both as text and/or icon on your Stream Deck. |
 | [Tactile Feedback](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-tactile-feedback) | Fully configurable support for pedal and chassis vibration using [SimHub](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications). Simulator Controller comes with a set of predefined SimHub profiles, which may help you to connect and manage your vibration motors and chassis shakers. The plugin provides many initialization parameters to adopt to these profiles. Two modes, "Pedal Vibration" and "Chassis Vibration", are defined, which let you control the different vibration effects and intensities directly from your controller. |
@@ -18,7 +18,9 @@ The distribution of Simulator Controller includes a set of predefined plugins, w
 | [IRC](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-irc) | This plugin integrates the *iRacing* simulation game with Simulator Controller. A "Pitstop" mode is available to control the pitstop settings from your controller hardware and an integration with Jona, the Virtual Race Engineer, with Cato, the Virtual Race Strategist and also with Elisa, the Virtual Race Spotter is available as well. The "Assistant" mode can handle most of the Race Assistant commands from your hardware controller. |
 | [RF2](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-rf2) | Similar to the ACC and IRC plugin provides this plugin start and stop support for *rFactor 2*. A "Pitstop" mode is available to control the pitstop settings from your controller hardware and an integration with Jona, the Virtual Race Engineer, and with Cato, the Virtual Race Strategist is available as well. The "Assistant" mode can handle most of the Race Assistant commands from your hardware controller. |
 | [R3E](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-rre) | Similar to the ACC, IRC and RF2 plugins provides this plugin start and stop support for *RaceRoom Racing Experience*. A "Pitstop" mode is available to control the pitstop settings from your controller hardware and an integration with Jona, the Virtual Race Engineer, with Cato, the Virtual Race Strategist and also with Elisa, the Virtual Race Spotter is available as well. The "Assistant" mode can handle most of the Race Assistant commands from your hardware controller. |
+| RSP | Simple integration for Rennsport. No functionality beside starting and stopping from a hardware controller. |
 | [PCARS2](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-PCARS2) | Integration for *Project CARS 2*, which supports  Jona, the Virtual Race Engineer, Cato, the Virtual Race Strategist and also Elisa, the Virtual Race Spotter. The plugin also supports a "Pitstop" mode for adjusting pitstop settings and a "Assistant" mode to interact with the Race Assistants. |
+| [Integration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) | This plugin implements interoperability with other applications like SimHub. |
 
 All plugins can be configured in the [Plugins tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) of the configuration tool.
 
@@ -41,12 +43,48 @@ As an alternative, you can use the *launchApplications* parameter to specify the
 The "System" plugin accepts one configuration argument in the [Plugins tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) of the configuration tool, which you almost always will provide:
 
 	modeSelector: *modeSelectorFunction1* *modeSelectorFunction2* ...;
-	launschApplications: *label* *application* *launchFunction1*, ...;
+	launchApplications: *label* *application* *launchFunction1*, ...;
 	shutdown: *shutdownFunction*
 	
 The *modeSelector* parameter allows you to define controller functions that switch between modes on your Button Boxes. The *modeSelectorFunctionX* must be in the descriptor format, i.e. *"functionType*.*number*". You can use binary functions, such as 2-way toggle switches or dials, to switch forward and backward between modes, but a simple push button can also be used. Example: "modeSelector: 2WayToggle.1". If you have multiple Button Boxes, you may want to create a mode selector for each one, especially, if you have defined modes, whose actions are exclusive for one of those Button Boxes. Doing this, you can have mutiple modes active on the same time on your Button Boxes and you can switch between those modes on each of those Button Boxes separately. An example: You may bind all action for controlling the ["Motion" mode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-motion) to one Button Box and all actions for the ["Pitstop" mode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-pitstop-1) to a different Button Box. In this configuration, both modes can be active at the same time.
 
 The parameter *launchApplications* allows you to specify a list of applications that you want to start and stop from your Button Box. *label* will be used as the display name and *application* must reference the application as defined in the [applications tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-applications). If the application name or the label contain spaces, you must enclose them in double quotes. With the *shutdown* parameter, a unary function can be supplied to shutdown the complete simulator system. This function will be available in the "Launch" mode.
+
+#### Configuration of custom modes
+
+Beside using all the predefined modes of the various plugins, you can define your own modes using custom functions. First you have to define your own functions using the builtin [controller action functions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions). You do this by creating a custom function like this:
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%204.JPG)
+
+Please consult the [documentation for controller configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-controller) for more information. Please note that when using "Simulator Setup", it is also possible to include custom functions and create custom modes using a configuration patch as described [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#patching-the-configuration).
+
+Hint: You can leave the trigger "Hotkey(s)" empty, if you want to use this action function only in a custom mode, since the trigger is defined for this purpose as shown below.
+
+Once you have created all your custom action functions, you can define one or more custom modes using:
+
+	customCommands: [*mode1* -> *label*] *modeFunction1* *customFunction1*, ... | [*mode2* ->] ...;
+
+*mode* is the name or label of the mode. After the "->" you can define a comma-separated list of bindings for your controller. *modeFunction* stands for a control on your hardware, like Button.7, whereas *customFunction* (like Custom.7) is one of the custom functions you defined as described above. This command will be shown using the *label* and will always be activated as long as the given mode is selected. When you omit the *mode* and the "->" as indicated above with the square brackets, the actions will be bound to the plugin itsself, thereby being available all the time. 
+
+##### Example
+
+We want to define a mode where it is possibe to switch between different [track automations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#track-automations). First you have to define a couple of custom functions like this:
+
+	Custom.18.Call.Action=selectTrackAutomation(Wet)
+	Custom.19.Call.Action=selectTrackAutomation(Dry)
+
+You can do this either in the "Controller" tab of "Simulator Configuration" or, as mentioned,  by using the configuration patch file when using "Simulator Setup". Then add the *customCommands* argument to the parameters of the "System Plugin":
+
+	customCommands: Automation -> Dry Button.1 Custom.19, Wet Button.2 Custom.18
+
+When using "Simulator Setup", add this to the patch file:
+
+	[Add: Plugins]
+	System=; customCommands: Automation -> Dry Button.1 Custom.19, Wet Button.2 Custom.18
+
+Voilà...
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%2015.JPG)
 
 ## Plugin *Tactile Feedback*
 
@@ -225,11 +263,12 @@ The "Race Engineer" plugin handles the interaction of the currently active simul
 	raceAssistentMuted: true | false;
 	teamServer: [*initialState*] [*onOffFunction*];
 	openRaceSettings: *settingsFunction*; importSetup: *importFunction*;
-	openSessionDatabase: *setupsFunction*; openSetupWorkbench: *workbenchFunction*; openRaceCenter: *centerFunction*
+	openSessionDatabase: *setupsFunction*; openSetupWorkbench: *workbenchFunction*;
+	openPracticeCenter: *practiceCenterFunction*; openRaceCenter: *raceCenterFunction*
 	
 For Jona to be generally available, you must supply an argument for the *raceAssistantName* parameter, for example "Jona". You can define a function on your hardware controller with the parameter *raceAssistant*, to enable or disable the Virtual Race Engineer dynamically. The *onOffFunction* may be ommited, if you only want to enable or disable the Assistant for all your sessions. The also optional *initialState* must be either "On" or "Off" (default is "On") and for *onOffFunction* unary and binary functions are supported. The function will be bound to a plugin action.
 The *teamServer* parameter replicates the configuration option of the ["Team Server" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-team-server) for your convience (and to have it available for configuration in "Simulator Setup"). Additionally, the parameter *openRaceSettings* allows you to bind a plugin action to your hardware controller, which opens the [settings dialog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings), which you will use before a race to give Jona the necessary information about your car setup and other stuff. As an alternative you can use the plugin action *importSetup* to import the current tyre setup data only, without opening the settings dialog. Nevertheless, you will get a notification, when the setup has been imported successfully.
-Last, but not least, with *openSessionDatabase* you can open the [session database tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database). If a simulation is currently running, most of the query arguments will already be prefilled. Very similar are the parameters *openSetupWorkbench* and *openRaceCenter*, which let you open the "Setup Workbench" and the "Race Center" tool.
+Last, but not least, with *openSessionDatabase* you can open the [session database tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database). If a simulation is currently running, most of the query arguments will already be prefilled. Very similar are the parameters *openSetupWorkbench*, *openPracticeCenter* and *openRaceCenter*, which let you open the "Setup Workbench", the "Practice Center" and the "Race Center" tool.
 
 Hint: You can bind the activation and deactivation of all the Virtual Race Assistants to one function, if you want to control them with the same switch on your hardwar controller.
 
@@ -294,11 +333,12 @@ The "Race Strategist" plugin handles the interaction of the currently active sim
 	raceAssistantListener: On | Off | *Microsoft Speech Recognition Engine*;
 	raceAssistentMuted: true | false;
 	teamServer: [*initialState*] [*onOffFunction*];
-	openRaceSettings: *settingsFunction*; openSessionDatabase: *setupsFunction*;
-	openStrategyWorkbench: *strategyFunction*; openRaceCenter: *centerFunction*
+	openRaceSettings: *settingsFunction*; openRaceReports: *reportsFunction*;
+	openSessionDatabase: *setupsFunction*; openStrategyWorkbench: *strategyFunction*;
+	openPracticeCenter: *practiceCenterFunction*, openRaceCenter: *raceCenterFunction*
 	
 For Cato to be generally available, you must supply an argument for the *raceAssistantName* parameter, for example "Khato". You can define a function on your hardware controller with the parameter *raceAssistant*, to enable or disable the Virtual Race Strategist dynamically. The *onOffFunction* may be ommited, if you only want to enable or disable the Assistant for all your sessions. The also optional *initialState* must be either "On" or "Off" (default is "On") and for *onOffFunction* unary and binary functions are supported. The function will be bound to a plugin action.
-The *teamServer* parameter replicates the configuration option of the ["Team Server" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-team-server) for your convience (and to have it available for configuration in "Simulator Setup"). Additionally, the parameter *openRaceSettings* allows you to bind a plugin action to your hardware controller, which opens the [settings dialog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-settings), which you will use before a race to give Cato the necessary information about your car setup and strategy options. And with *openSessionDatabase* you can open the [session database tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database). If a simulation is currently running, most of the query arguments will already be prefilled. Very similar are the parameters *openStrategyWorkbench* and *openRaceCenter*, which let you open the "Strategy Workbench" and the "Race Center" tool.
+The *teamServer* parameter replicates the configuration option of the ["Team Server" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-team-server) for your convience (and to have it available for configuration in "Simulator Setup"). Additionally, the parameter *openRaceSettings* allows you to bind a plugin action to your hardware controller, which opens the [settings dialog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-settings), which you will use before a race to give Cato the necessary information about your car setup and strategy options. With *openRaceReports* you can open the [race reports browser](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-reports) with the current simulator, car and track already selected and with *openSessionDatabase* you can open the [session database tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database). If a simulation is currently running, most of the query arguments will already be prefilled. Very similar are the parameters *openStrategyWorkbench*, *openPracticeCenter* and *openRaceCenter*, which let you open the "Strategy Workbench", "Practice Center" and the "Race Center" tool.
 
 Hint: You can bind the activation and deactivation of all the Virtual Race Assistants to one function, if you want to control them with the same switch on your hardwar controller.
 
@@ -321,6 +361,15 @@ Similar as for Jona, you can use the following parameters to trigger some of Cat
 	
 All these command actions will be bound to the plugin itself, thereby are available all the time, and only unary functions are supported here. By using these actions, you will be able to use Cato with voice output, but no voice control, thereby getting most of the support from Cato, but you have to use an *oldschool* interface to control the strategist actions. To *answer* "Yes" to one of the questions of Cato, you must supply a controller function, for example a push button function, to the *Accept* parameter and for "No", you must use the *Reject* parameter. A little bit different is the *Call* action. This action will activate Cato and will make it the active listening dialog partner for voice control by the push of a button. This is similar to issuing the "Hey Cato" activation command. Last but not least, you can use *Mute* and *Unmute*, when you temporarely want to deactivate voice ouput for Cato.
 
+These additional commands are available:
+
+| Command | Description |
+| ------ | ------ |
+| StrategyCancel | Cancels the current strategy. Cato will not have any strategy information from now on. |
+| StrategyRecommend | Cato will try to update the currently active strategy according to the current situation. Very useful after an unplanned pitstop or a sudden weather change. |
+| FCYRecommend | This command can be triggered, when the track is under Full Course Yellow with pitstops allowed. Cato  |
+| PitstopRecommend | Cato will try to determine the best possible lap for the next pitstop. Possible undercuts will be taken into account as well as the traffic situation after the pitstop. |
+
 Furthermore, you can request a lot of information from Cato about the current race situation. Thefore, you can supply the *InformationRequest* parameter multiple times.
 
 Example:
@@ -339,16 +388,20 @@ Please see the following table for available information commands.
 | LapsRemaining | Cato will give you the number of laps still to drive. The number of remaining laps is determined by the remaining stint, session or driver time, but of course is also limited by the remaining fuel. |
 | Weather | You will get information about the current and upcoming weather. |
 | Position | Cato will tell you your current position. |
-| LapTimes | You will be given information about your average lap time and those of your direct opponents. |
+| LapTime | You will be given information about your last lap time. |
+| LapTimes | You will be given information about your last lap time and those of your direct opponents. |
 | ActiveCars | Cato will give you information about the number of cars in the session. In a multi-class or multi-category session additional information will be given on the number of cars in your own class as well. |
 | GapToAhead [Standings, Track] | Cato will tell you the gap in seconds to the car one position ahead of you or to the car directly in front of you. If you don't supply *Standings* or *Track*, it will default to *Standings*. Please note, that for compatibility reasons, *GapToFront* is supported as well. |
 | GapToBehind [Standings, Track] | Cato will tell you the gap in seconds to the car one position behind you or to the car directly behind you. If you don't supply *Standings* or *Track*, it will default to *Standings*. |
 | GapToLeader | Cato will tell you the gap in seconds to the leading car. |
+| DriverNameAhead | The Strategist will tell you the driver name of the car ahead of you. |
+| DriverNameBehind | The Strategist will tell you the driver name of the car behind of you. |
+| CarClassAhead | The Strategist will tell you the class of the car ahead of you. |
+| CarClassBehind | The Strategist will tell you the class of the car behind of you. |
+| CarCupAhead | The Strategist will tell you the cup category of the car ahead of you. |
+| CarCupBehind | The Strategist will tell you the cup category of the car behind of you. |
 | StrategyOverview | As the name says, you will get a complete overview of the race strategy, as long as one has been defined in the "Strategy Workbench" and has been exported to be used in this session. |
 | NextPitstop | Cato tells you the lap, where the next pitstop according to the strategy has been planned. |
-| StrategyCancel | Cancels the current strategy. Cato will not have any strategy information from now on. |
-| StrategyRecommend | Cato will try to update the currently active strategy according to the current situation. Very usefull after an unplanned pitstop or a sudden weather change. |
-| PitstopRecommend | Cato will try to determine the best possible lap for the next pitstop. Possible undercuts will be taken into account as well as the traffic situation after the pitstop. |
 
 Note: All these commands are also available in most of the simulation plugins, either in the "Pitstop" mode or in the "Assistant" mode, depending on the configuration parameters.
 
@@ -405,11 +458,18 @@ Please see the following table for available information commands.
 | ------ | ------ |
 | Time | You will be told the current time of your local computer. |
 | Position | Elisa will tell you your current position. |
-| LapTimes | You will be given information about your average lap time and those of your direct opponents. |
+| LapTime | You will be given information about your last lap time. |
+| LapTimes | You will be given information about your last lap time and those of your direct opponents. |
 | ActiveCars | Elisa will give you information about the number of cars in the session. In a multi-class or multi-category session additional information will be given on the number of cars in your own class as well. |
 | GapToAhead [Standings, Track] | Elisa will tell you the gap in seconds to the car one position ahead of you or to the car directly in front of you. If you don't supply *Standings* or *Track*, it will default to *Standings*. |
 | GapToBehind [Standings, Track] | Elisa will tell you the gap in seconds to the car one position behind you or to the car directly behind you. If you don't supply *Standings* or *Track*, it will default to *Standings*. |
 | GapToLeader | Elisa will tell you the gap in seconds to the leading car. |
+| DriverNameAhead | The Spotter will tell you the driver name of the car ahead of you. |
+| DriverNameBehind | The Spotter will tell you the driver name of the car behind of you. |
+| CarClassAhead | The Spotter will tell you the class of the car ahead of you. |
+| CarClassBehind | The Spotter will tell you the class of the car behind of you. |
+| CarCupAhead | The Spotter will tell you the cup category of the car ahead of you. |
+| CarCupBehind | The Spotter will tell you the cup category of the car behind of you. |
 
 Note: All these commands are also available in most of the simulation plugins, either in the "Pitstop" mode or in the "Assistant" mode, depending on the configuration parameters.
 
@@ -536,7 +596,7 @@ Note: For convinience, all commands available for the *assistantCommands* parame
 
 Simulator Controller must *understand* the current choices and the available settings in the Pitstop MFD, before any changes can be made automatically. There are two different methods available for this task:
 
-  1. The first method does not need any special preparation from your side. It uses a kind of fuzzy option walk, where the cursor in the Pitstop MFD jumpy wildly around and it looks like that the settings are changed randomly. But in the end, everything will be dialed as expected. The *learned* structure will be kept in memory for the next 60 seconds, plenty of time for all changes using your Button Box or by the Race Engineer. After this period, the *learning* walk will happen again, since it might be possible, that you changed something in between without the *knowledge* of Simulator Controller. This method is used by default from now on, but you might take a look at the second method below.
+  1. The first method does not need any special preparation from your side. It uses a kind of fuzzy option walk, where the cursor in the Pitstop MFD jumps wildly around and it looks like that the settings are changed randomly. But in the end, everything will be dialed as expected. The *learned* structure will be kept in memory for the next 60 seconds, plenty of time for all changes using your Button Box or by the Race Engineer. After this period, the *learning* walk will happen again, since it might be possible, that you changed something in between without the *knowledge* of Simulator Controller. This method is used by default from now on, but you might take a look at the second method below.
   
   It is possible in very rare situations or when you have accidently interfered using the keyboard yourself, while the option walk is running, that the search for the current pitstop settings get stucked in an endless loop. Press and hold Control in this case will restart the process.
   
@@ -548,8 +608,6 @@ Simulator Controller must *understand* the current choices and the available set
 
      These pictures are located in the *Resources\Screen Images\ACC folder* in the installation folder of Simulator Controller. They have been taken from a Full HD triple screen setup (5760 * 1080) using the English language setting in *Assetto Corsa Competizione*. If you are running a different resolution or, even more important, are using a different language, the search for these pictures will fail. But there is help, since you can provide your own pictures by placing your own ones with identical names in the *Simulator Controller\Screen Images\ACC* folder in your user *Documents* folder. Use the Snipping Tool of Windows to create all the necessary pictures, it will only take a few minutes. It is important, that you choose identical names as the originals for your versions of the picture files. While testing your images, you will find information about the images found (or not found) in the "Simulator Controller Logs.txt" file located in the *Logs* folder in your user *Documents* folder. If you set the log level to "Information" in the configuration (see [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-general) on how to do this), you will even get more information in the logs.
 	 
-	 There are a couple of presets with predefined pictures for different screen setups and resolutions available in ["Simulator Setup"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#presets--special-configurations), but if they will work in your specific configuration must be tested.
-
      Note: You may use the Windows print screen command to generate a full screen picture of the ACC window and then open this screenshot with "Paint" and grab the pictures using the Snipping Tool. But you will introduce the double amount of compression artefacts into the pictures, since JPG does not use a losslesss compression. This may lead to recognition errors. The preferred method is to switch between the Snipping Tool and ACC back and forth using Alt-Tab and take the pictures single by single.
 
      Hint: The "Select Driver" option might only be available in special multiuser server setups or custom single user races, whereas the "Strategy" option is available in almost every session.
@@ -669,7 +727,7 @@ Note: For convinience, all commands available for the *assistantCommands* parame
 
 ## Plugin *IRC*
 
-This plugin handles starting and stopping of the *iRacing* simulation game. An application with the name "iRacing" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please locate the "iRacingUI.exe" application, set "ahk_exe iRacingSim64DX11.exe" as the window title and "startIRC" as a special function hook in this configuration. An integration with Jona is available through the "Race Engineer" plugin, an integration with Cato through the plugin "Race Strategist", and an integration with Elisa through the plugin "Race Spotter".
+This plugin handles starting and stopping of the *iRacing* simulation game. An application with the name "iRacing" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please locate the "iRacingUI.exe" application (in a subfolder named "ui"), set "ahk_exe iRacingSim64DX11.exe" as the window title and "startIRC" as a special function hook in this configuration. An integration with Jona is available through the "Race Engineer" plugin, an integration with Cato through the plugin "Race Strategist", and an integration with Elisa through the plugin "Race Spotter".
 
 ### Mode *Pitstop*
 
@@ -1154,3 +1212,194 @@ Note: For convinience, all commands available for the *assistantCommands* parame
 ### Special requirements when using the Pitstop automation
 
 It is very important, that you do not use the *Project CARS 2* ICM on your own, when you want to control the pitstop settings using the "Pitstop" mode, or if you want Jona to control the pitstop settings. Furthermore, you must leave *all* repairs selected in the default pitstop strategy and select *no tyre change* in the default pitstop strategy as well. And declare that the ICM should be returned to the standard page, when closed. This option can be found in the *Gameplay* section of the *Automobilista 2* settings. Not complying with this requirements will give you funny results at least.
+
+## Plugin *Integration*
+
+This plugin, which is normally not automatically included and enabled, can export the internal state of Simulator Controller - especially a lot of the knowledge of all Race Assistants and plenty of information about the currently running simulator session - to other applications using a JSON file.
+
+To activate this plugin, add it to the list of active plugins in "Simulator Configuration", or, of you are using the "Simulator Setup" wizard for your configuration work, add the following line to the ["Configuration Patch.ini"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#patching-the-configuration) file:
+
+	[Plugins]
+	Integration=true||
+
+If you want to use the *stateFile* parameter here (see below), it looks like:
+
+	[Plugins]
+	Integration=true||stateFile: D:\SimRacing\Session State.json
+	
+where *D:\SimRacing\Session State.json* is an example. Substitute your own path here.
+
+### Configuration
+
+Only one plugin argument is provided, with which you can define the output file for the state representation.
+
+	stateFile: *path*
+
+If no argument for *stateFile* is provided, the state info will be put in a file named "Session State.json" in the *Simulator Controller\Temp* folder which resides in your *Documents* folder.
+
+The content of the JSON file looks like this (depending on the current situation, of course):
+
+	{
+		"Assistants": {
+			"Mode": "Team",
+			"Race Engineer": {
+				"Muted": false,
+				"State": "Active"
+			},
+			"Race Spotter": {
+				"Muted": false,
+				"State": "Active"
+			},
+			"Race Strategist": {
+				"Muted": false,
+				"State": "Active"
+			},
+			"Session": "Race"
+		},
+		"Automation": {
+			"Automation": "Dry",
+			"Car": "McLaren 720S GT3",
+			"Session": "Race",
+			"Simulator": "Assetto Corsa Competizione",
+			"State": "Active"
+		},
+		"Brakes": {
+			"Temperatures": [
+				199.6,
+				197.6,
+				339.9,
+				337.0
+			],
+			"Wear": [
+				2,
+				2,
+				3,
+				3
+			]
+		},
+		"Conditions": {
+			"AirTemperature": 24.9,
+			"Grip": "Optimum",
+			"TrackTemperature": 31.4,
+			"Weather": "Dry",
+			"Weather10Min": "Dry",
+			"Weather30Min": "Dry"
+		},
+		"Duration": {
+			"Format": "Time",
+			"SessionLapsLeft": 24,
+			"SessionTimeLeft": "54:53,0",
+			"StintLapsLeft": 9,
+			"StintTimeLeft": "54:53,0"
+		},
+		"Fuel": {
+			"AvgConsumption": 4.1,
+			"LastConsumption": 4.1,
+			"RemainingFuel": 36.9,
+			"RemainingLaps": 9
+		},
+		"Pitstop": {
+			"State": "Planned",
+			"Fuel": 68.0,
+			"Lap": null,
+			"Number": 1,
+			"Prepared": 0,
+			"Repairs": "-",
+			"TyreCompound": "Dry (Black)",
+			"TyrePressures": [
+				25.2,
+				25.2,
+				24.4,
+				24.3
+			],
+			"TyreSet": 2
+		},
+		"Session": {
+			"Car": "McLaren 720S GT3",
+			"Session": "Race",
+			"Simulator": "Assetto Corsa Competizione",
+			"Track": "Circuit de Spa-Franchorchamps"
+		},
+		"Standings": {
+			"Ahead": null,
+			"Behind": {
+				"Delta": "-0:02,1",
+				"InPit": false,
+				"LapTime": "2:21,3",
+				"Laps": 2,
+				"Nr": 109
+			},
+			"ClassPosition": 1,
+			"Focus": {
+				"Delta": "-0:15,9",
+				"InPit": false,
+				"LapTime": "2:24,3",
+				"Laps": 2,
+				"Nr": 15
+			},
+			"Leader": null,
+			"OverallPosition": 1,
+			"Position": 1
+		},
+		"Stint": {
+			"BestTime": null,
+			"Driver": "Oliver Juwig (OJU)",
+			"Lap": 3,
+			"Laps": 2,
+			"LastTime": "2:21,3",
+			"Position": 1
+		},
+		"Strategy": {
+			"State": "Active",
+			"Fuel": 12.0,
+			"Lap": 10,
+			"PlannedPitstops": 2,
+			"RemainingPitstops": 2,
+			"TyreCompound": "Dry (Black)",
+			"Pitstops": [
+				{
+					"Nr": 1,
+					"Fuel": 12.0,
+					"TyreCompound": "Dry (Black)"
+				},
+				{
+					"Nr": 2,
+					"Fuel": 0.0,
+					"TyreCompound": null
+				}
+			]
+		},
+		"TeamServer": {
+			"Driver": "Oliver Juwig",
+			"Server": "https:\/\/vgr-teamserver.azurewebsites.net",
+			"Session": "24H Spa",
+			"Team": "VGR (EOS)",
+			"Token": "xxxxxxxx-yyyy-zzzz-aaaa-bbbbbbbbbbbb"
+		},
+		"Tyres": {
+			"HotPressures": [
+				26.4,
+				26.4,
+				26.7,
+				26.5
+			],
+			"ColdPressures": [
+				25.3,
+				24.9,
+				25.1,
+				24.5
+			],
+			"Temperatures": [
+				80.6,
+				80.6,
+				91.7,
+				91.1
+			],
+			"Wear": [
+				null,
+				null,
+				null,
+				null
+			]
+		}
+	}

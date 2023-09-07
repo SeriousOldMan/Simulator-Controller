@@ -71,13 +71,9 @@ class AdministrationResizer extends Window.Resizer {
 generatePassword(length) {
 	local valid := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
 	local result := ""
-	local index
 
-	while (0 < length--) {
-		index := Random(1, StrLen(valid))
-
-		result .= SubStr(valid, Round(index), 1)
-	}
+	while (0 < length--)
+		result .= SubStr(valid, Round(Random(1, StrLen(valid))), 1)
 
 	return result
 }
@@ -92,6 +88,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 
 	static accountsListView
 	static connectionsListView
+	static objectsListView
 
 	static connector := false
 	static done := false
@@ -198,6 +195,29 @@ administrationEditor(configurationOrCommand, arguments*) {
 
 		loop 4
 			listView.ModifyCol(A_Index, "AutoHdr")
+	}
+
+	loadObjects(connector, listView) {
+		local ignore, objectInfo
+
+		listView.Delete()
+
+		try {
+			if administrationEditor(kToken)
+				for ignore, objectInfo in string2Values(";", connector.GetAllObjects()) {
+					objectInfo := string2Values("=", objectInfo)
+
+					listView.Add("", objectInfo[1], objectInfo[2])
+				}
+
+			listView.ModifyCol()
+
+			loop 2
+				listView.ModifyCol(A_Index, "AutoHdr")
+		}
+		catch Any as exception {
+			logError(exception, true)
+		}
 	}
 
 	changePassword(*) {
@@ -307,6 +327,8 @@ administrationEditor(configurationOrCommand, arguments*) {
 				administrationEditor(kEvent, "AccountClear")
 
 				loadConnections(connector, connectionsListView)
+
+				loadObjects(connector, objectsListView)
 
 				showMessage(translate("Successfully connected to the Team Server."))
 			}
@@ -596,6 +618,21 @@ administrationEditor(configurationOrCommand, arguments*) {
 			}
 			else if (arguments[1] = "LoadConnections")
 				loadConnections(connector, connectionsListView)
+			else if (arguments[1] = "CompactDatabase") {
+				OnMessage(0x44, translateYesNoButtons)
+				msgResult := MsgBox(translate("Do you really want to compact the database? This can take quite a while and cannot be interrupted..."), translate("Compact"), 262436)
+				OnMessage(0x44, translateYesNoButtons, 0)
+
+				if (msgResult = "Yes")
+					try {
+						connector.CompactDatabase()
+					}
+					catch Any as exception {
+						logError(exception, true)
+					}
+
+				loadObjects(connector, objectsListView)
+			}
 		}
 		catch Any as exception {
 			OnMessage(0x44, translateOkButton)
@@ -682,7 +719,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 		button.OnEvent("Click", changePassword)
 		setButtonIcon(button, kIconsDirectory . "Pencil.ico", 1, "L4 T4 R4 B4")
 
-		administrationTab := administrationGui.Add("Tab3", "x8 y122 w388 h343 W:Grow H:Grow -Wrap", collect(["Accounts", "Jobs", "Connections"], translate))
+		administrationTab := administrationGui.Add("Tab3", "x8 y122 w388 h343 W:Grow H:Grow -Wrap", collect(["Accounts", "Jobs", "Connections", "Database"], translate))
 
 		x0 := 16
 		y := 152
@@ -752,6 +789,14 @@ administrationEditor(configurationOrCommand, arguments*) {
 		connectionsListView.OnEvent("DoubleClick", noSelect)
 
 		administrationGui.Add("Button", "x" . x0 . " y430 w80 h23 Y:Move vrefreshConnectionsListButton", translate("Refresh")).OnEvent("Click", administrationEditor.Bind(kEvent, "LoadConnections"))
+
+		administrationTab.UseTab(4)
+
+		objectsListView := administrationGui.Add("ListView", "x" . x0 . " y" . y . " w372 h270 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Type", "#"], translate))
+		objectsListView.OnEvent("Click", noSelect)
+		objectsListView.OnEvent("DoubleClick", noSelect)
+
+		administrationGui.Add("Button", "x" . x0 . " y430 w80 h23 Y:Move vcleanupDatabaseButton", translate("Compact...")).OnEvent("Click", administrationEditor.Bind(kEvent, "CompactDatabase"))
 
 		administrationGui.Add(AdministrationResizer(administrationGui))
 

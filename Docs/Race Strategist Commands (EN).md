@@ -92,6 +92,26 @@ Announcements=weather warnings
 	[(TellMe) the gap to {the car behind me, the position behind me, the previous car}, (WhatIs) the gap to {the car behind me, the position behind me, the previous car}, How big is the gap to the {car behind me, position behind me, previous car}]
 
 	[(TellMe) the gap to the {leading car, leader}, (WhatIs) the gap to the {leading car, leader}, How big is the gap to the {leading car, leader}]
+	
+	[(TellMe) the gap to {car, car number, number} (Number), (WhatIs) the gap to {car, car number, number} (Number), How big is the gap to {car, car number, number} (Number)]
+	
+	[(TellMe) the {driver name, name of the driver, driver in the car} ahead, (WhatIs) the {driver name, name of the driver, driver in the car} ahead]
+
+	[(TellMe) the {driver name, name of the driver, driver in the car} behind, (WhatIs) the {driver name, name of the driver, driver in the car} behind]
+	
+	[(TellMe) the {class of the car, car class} ahead, (WhatIs) the {class of the car, car class} ahead]
+	
+	[(TellMe) the {class of the car, car class} behind, (WhatIs) the {class of the car, car class} behind]
+	
+	[(TellMe) the {cup category of the car, car cup category} ahead, (WhatIs) the {cup category of the car, car cup category} ahead]
+	
+	[(TellMe) the {cup category of the car, car cup category} behind, (WhatIs) the {cup category of the car, car cup category} behind]
+	
+	[(TellMe) the {current lap, last lap, lap} time of {car, car number, number} (Number), (WhatIs) the {current lap, last lap, lap} time of {car, car number, number} (Number)]
+	
+	[(TellMe) the {current lap, last lap, lap} time of position (Number), (WhatIs) the {current lap, last lap, lap} time of position (Number)]
+
+	[(TellMe) {the, my} {current lap, last lap, lap} time, (WhatIs) {my, the} {current lap, last lap, lap} time]
 
 	[(TellMe) the {current lap, lap} times, (WhatAre) the {current lap, lap} times]
 	
@@ -112,3 +132,5 @@ Announcements=weather warnings
 	[When is the next pitstop, In which {lap is the pitstop planned, should I come to the pit}, When should I come to the pit, (TellMe) {the lap for the next pitstop, when I should I come to the pit}]
 	
 	[(CanYou) develop a new strategy, (CanYou) adjust the strategy, (CanYou) plan a new strategy, We need a new strategy]
+	
+	[{We have a Full, Full} Course Yellow. What {should, can} {I, we} do, {We have a Full, Full} Course Yellow. Should {I, we} {come to the pit, come to the pit now, pit, pit now}]

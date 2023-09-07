@@ -204,14 +204,17 @@ editModes(&settingsOrCommand, arguments*) {
 
 		modesEditorGui.Opt("+Owner" . arguments[1].Hwnd)
 
-		arguments[1].Opt("+Disabled")
+		arguments[1].Block()
 
-		loop
-			Sleep(200)
-		until result
-
-		arguments[1].Opt("-Disabled")
-		arguments[1].Show("NoActivate")
+		try {
+			loop
+				Sleep(200)
+			until result
+		}
+		finally {
+			arguments[1].Unblock()
+			arguments[1].Show("NoActivate")
+		}
 
 		if (result == kSave)
 			settingsOrCommand := newSettings
@@ -225,7 +228,7 @@ editModes(&settingsOrCommand, arguments*) {
 ;;;                     Public Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-editSettings(&settingsOrCommand, withContinue := false, fromSetup := false, x := kUndefined, y := kUndefined) {
+editSettings(&settingsOrCommand, owner := false, withContinue := false, fromSetup := false, x := kUndefined, y := kUndefined) {
 	global kSave, kCancel, kContinue, kUpdate, kEditModes
 
 	local index, coreDescriptor, coreVariable, feedbackDescriptor, feedbackVariable, positions
@@ -631,6 +634,9 @@ editSettings(&settingsOrCommand, withContinue := false, fromSetup := false, x :=
 		}
 		else
 			settingsEditorGui.Show("AutoSize x" . x . " y" . y)
+
+		if owner
+			settingsEditorGui.Opt("+Owner" . owner.Hwnd)
 
 		if (!fromSetup && (readMultiMap(kSimulatorConfigurationFile).Count == 0))
 			startConfiguration()

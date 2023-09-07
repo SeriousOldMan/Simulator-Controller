@@ -249,18 +249,32 @@ inline const string getPenalty(PenaltyShortcut penalty) {
 	}
 }
 
+std::string getArgument(std::string request, std::string key) {
+	if (request.rfind(key + "=") == 0)
+		return request.substr(key.length() + 1, request.length() - (key.length() + 1)).c_str();
+	else
+		return "";
+}
+
+std::string getArgument(char* request, std::string key) {
+	return getArgument(std::string(request), key);
+}
+
 int main(int argc, char* argv[])
 {
 	initPhysics();
 	initGraphics();
 	initStatic();
 
- 	if ((argc == 1) || strchr(argv[1], 'C'))
+	char* request = (argc == 1) ? "" : argv[1];
+
+ 	if (strlen(request) == 0)
 	{
 		wcout << "[Car Data]" << endl;
 
 		SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
 		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
+		SPageFileStatic* sf = (SPageFileStatic*)m_static.mapFileBuffer;
 
 		_bstr_t tc(gf->tyreCompound);
 		std::string tyreCompound(tc);
@@ -272,6 +286,7 @@ int main(int argc, char* argv[])
 		printData("Ignition", pf->ignitionOn ? "true" : "false");
 		printData("HeadLights", (gf->lightsStage == 0) ? "Off" : (gf->lightsStage == 1) ? "Low" : "High");
 		printData("RainLights", gf->rainLights ? "true" : "false");
+		wcout << "PitLimiter=" << ((pf->pitLimiterOn == 0) ? "false" : "true") << endl;
 
 		printData("BodyworkDamage", pf->carDamage);
 		printData("SuspensionDamage", pf->suspensionDamage);
@@ -281,20 +296,19 @@ int main(int argc, char* argv[])
 		wcout << "TyreCompoundColor=Black" << endl;
 		printData("TyreSet", gf->currentTyreSet);
 		printData("TyreTemperature", pf->tyreCoreTemperature);
+		printData("TyreInnerTemperature", pf->tyreTempI);
+		printData("TyreMiddleTemperature", pf->tyreTempM);
+		printData("TyreOuterTemperature", pf->tyreTempO);
+		printData("TyreTemperature", pf->tyreCoreTemperature);
+		printData("TyreTemperature", pf->tyreCoreTemperature);
 		printData("TyrePressure", pf->wheelsPressure);
 		printData("BrakeTemperature", pf->brakeTemp);
 		printData("BrakePadLifeRaw", pf->padLife);
 		printData("BrakeDiscLifeRaw", pf->discLife);
 		printData("FrontBrakePadCompoundRaw", pf->frontBrakeCompound + 1);
 		printData("RearBrakePadCompoundRaw", pf->rearBrakeCompound + 1);
-	}
 
-	if ((argc == 1) || (argv[1][0] == 'D'))
-	{
 		wcout << "[Stint Data]" << endl;
-
-		SPageFileStatic* sf = (SPageFileStatic*)m_static.mapFileBuffer;
-		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 		
 		wcout << "DriverForname=" << sf->playerName << endl;
 		wcout << "DriverSurname=" << sf->playerSurname << endl;
@@ -346,14 +360,8 @@ int main(int argc, char* argv[])
 
 		printData("InPitLane", gf->isInPit ? "true" : "false");
 		printData("InPit", gf->isInPit ? "true" : "false");
-	}
 
-	if ((argc == 1) || strchr(argv[1], 'T'))
-	{
 		wcout << "[Track Data]" << endl;
-
-		SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
-		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
 		printData("Temperature", pf->roadTemp);
 		printData("Grip", getGrip(gf->trackGripStatus));
@@ -362,27 +370,15 @@ int main(int argc, char* argv[])
 			wcout << "Car." << id + 1 << ".ID=" << gf->carID[id] << endl;
 			wcout << "Car." << id + 1 << ".Position=" << gf->carCoordinates[id][0] << "," << gf->carCoordinates[id][2] << endl;
 		}
-	}
-	
-	if ((argc == 1) || (argv[1][0] == 'W'))
-	{
-		wcout << "[Weather Data]" << endl;
 
-		SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
-		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
+		wcout << "[Weather Data]" << endl;
 
 		printData("Temperature", pf->airTemp);
 		printData("Weather", getWeather(gf->rainIntensity));
 		printData("Weather10min", getWeather(gf->rainIntensityIn10min));
 		printData("Weather30min", getWeather(gf->rainIntensityIn30min));
-	}
 
-	if ((argc == 1) || (argv[1][0] == 'S'))
-	{
 		wcout << "[Session Data]" << endl;
-
-		SPageFileStatic* sf = (SPageFileStatic*)m_static.mapFileBuffer;
-		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
 		printData("Active", ((gf->status == AC_LIVE) || (gf->status == AC_PAUSE) || (gf->status == AC_REPLAY)) ? "true" : "false");
 		printData("Paused", ((gf->status == AC_PAUSE) || (gf->status == AC_REPLAY)) ? "true" : "false");
@@ -393,14 +389,6 @@ int main(int argc, char* argv[])
 		wcout << "SessionFormat=Time" << endl;
 		printData("FuelAmount", sf->maxFuel);
 
-		long timeLeft = gf->sessionTimeLeft;
-
-		if (timeLeft < 0)
-			if (gf->session == AC_PRACTICE)
-				timeLeft = 24 * 3600 * 1000;
-			else
-				timeLeft = 0.0;
-
 		printData("SessionTimeRemaining", timeLeft);
 
 		if (gf->session == AC_PRACTICE)
@@ -409,7 +397,7 @@ int main(int argc, char* argv[])
 			printData("SessionLapsRemaining", (gf->iLastTime > 0) ? timeLeft / gf->iLastTime : 99);
 	}
 
-	if ((argc == 1) || ((argc == 2) && (strcmp(argv[1], "-Setup") == 0)))
+	if (strlen(request) == 0 || getArgument(request, "Setup") != "")
 	{
 		wcout << "[Setup Data]" << endl;
 
@@ -434,11 +422,6 @@ int main(int argc, char* argv[])
 		printData("TyrePressureFR", gf->mfdTyrePressureFR);
 		printData("TyrePressureRL", gf->mfdTyrePressureRL);
 		printData("TyrePressureRR", gf->mfdTyrePressureRR);
-		
-		if (argc == 2) {
-			wcout << "[Car Data]" << endl;
-			wcout << "PitLimiter=" << ((pf->pitLimiterOn == 0) ? "false" : "true") << endl;
-		}
 	}
 
 	dismiss(m_graphics);

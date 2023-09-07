@@ -2015,9 +2015,8 @@ class WebView2Viewer extends HTMLViewer {
 
 	__New(control) {
 		local application := Strsplit(A_ScriptName, ".")[1]
-		local rnd := Random(1, 1000)
 
-		this.iHTMLFile := temporaryFileName("HTML\" . application . "\" . "html" . rnd, "html")
+		this.iHTMLFile := temporaryFileName("HTML\" . application . "\" . "html" . Random(1, 1000), "html")
 
 		super.__New(control)
 	}
@@ -2028,7 +2027,7 @@ class WebView2Viewer extends HTMLViewer {
 				this.iWebView2 := WebView2.create(this.Control.Hwnd)
 
 			if this.iHTML
-				this.Write(this.iHTML, true)
+				this.Write(StrReplace(this.iHTML, "<div></div>", ""), true)
 		}
 	}
 
@@ -2042,11 +2041,29 @@ class WebView2Viewer extends HTMLViewer {
 	}
 
 	Write(html, force := false) {
+		local file
+
 		if (force || (html != this.iHTML)) {
 			if this.WebView2 {
-				deleteFile(this.iHTMLFile)
+				if !FileExist(this.iHTMLFile)
+					FileAppend(html, this.iHTMLFile, "UTF-8")
+				else
+					loop
+						try {
+							file := FileOpen(this.iHTMLFile, "w-rwd", "UTF-8")
 
-				FileAppend(html, this.iHTMLFile, "UTF-8")
+							file.Length := 0
+							file.Write(html)
+
+							file.Close()
+
+							break
+						}
+						catch Any as exception {
+							logError(exception)
+
+							Sleep(100)
+						}
 
 				this.WebView2.CoreWebView2.Navigate(this.iHTMLFile)
 				this.WebView2.CoreWebView2.Resume()
@@ -2064,13 +2081,6 @@ class WebView2Viewer extends HTMLViewer {
 
 class IEViewer extends HTMLViewer {
 	iExplorer := false
-	iControl := false
-
-	Control {
-		Get {
-			return this.iControl
-		}
-	}
 
 	Explorer {
 		Get {
@@ -2092,6 +2102,8 @@ class IEViewer extends HTMLViewer {
 
 	__New(control) {
 		this.iExplorer := control.Value
+
+		super.__New(control)
 	}
 
 	Navigate(uri) {
@@ -2109,8 +2121,15 @@ class IEViewer extends HTMLViewer {
 		this.Document.write(html)
 	}
 
+	Resized() {
+		if this.Control.Visible {
+			this.Control.Visible := false
+			this.Control.Visible := true
+		}
+	}
+
 	Reload() {
-		this.Location.reload()
+		; this.Location.reload()
 	}
 }
 
@@ -2171,6 +2190,8 @@ initializeHTMLViewer() {
 	createWebView2Viewer(window, arguments*) {
 		local control := window.Add("Picture", arguments*)
 		local viewer := WebView2Viewer(control)
+
+		viewer.Navigate("about:blank")
 
 		control.HTMLViewer := viewer
 		control.Document := viewer

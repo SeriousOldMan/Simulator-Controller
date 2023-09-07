@@ -1,3 +1,192 @@
+## 5.3.0.0-release 09/15/23 (planned - latest, maybe earlier)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. The "Simulator Setup" application has seen a major overhaul:
+     - It now supports a kind of quick configuration, which allow especially new users to create a useful configuration very fast. See the extended documentation of the [quick start guide](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Quick-Start-Guide) for more information.
+	 - Full configuration of the *Names*, *Languages* and *Voices* of the Race Assistants is now possible in the "Basic" configuration page-
+	 - When a new configuration is being created, some of the changes made by the user in other application, for example in the settings of "Simulator Startup", will be preserved, if possible.
+	 - The presets "Names and voices of Assistants", "Different Speaker Voices" and "Mode Automation" have been removed, since they are no longer needed. If such a preset is in use in your configuration, it will still be active, until you remove it.
+	 - The "Push-To-Talk Behaviour" preset has been deprecated as well. This option is now available in the standard voice control configuration.
+	 - All presets with search images for *Assetto Corsa Competizione* has been removed, since it is no longer needed.
+	 - [Expert Only] A new preset "Custom Configuration" has been added with a very extensive sample section, which helps the experts to create special configurations.
+	 - [Expert Only] When a new configuration is beeing created, "Simulator Setup" will first read the currently active configuration and then will generate the new configuration. The new configuration will then be integrated into the current configuration, preserving in most cases the custom additions, that may have been made with "Simulator Configuration", as long as they are not in conflict or happen to be the same configuration item. This means, that it is now possible to use the wizard "Simulator Setup" together with "Simulator Configuration" for configuration tasks.
+  4. "Simulator Startup" learned a new trick. It can now unblock applications and DLLs, when holding down the Control together with the Shift key, while starting. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#fixing-problems) for more information.
+  5. A fourth page has been added to the "Server Administration" application. This page shows a [list of all data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#server-administration) currently stored on the Team Server and also allows to compact the database, if necessary. This requires a new version of the Team Server. **If you are running your own Team Server, you should update your instance(s).**
+  6. The "Practice Center" now shows the sector times, if available from the simulator data API, in the laps list and various reports.
+  7. The "Race Center" now shows the sector times, if available from the simulator data API, in the laps list and various reports.
+  8. The Race Spotter now compares your pace to the pace of all cars on the grid and informs you from time, whether you are faster than cars that are in positions in front of you.
+  9. When you are in close combat with other cars, the Spotter now informs you, in which sectors your opponent is faster or slower than you.
+  10. The Race Strategist now understands Full Course Yellow situations and can evaluate, whether a pitstop under FCY might be beneficial:
+      - New [voice command "We have Full Course Cellow. Should I come to the pit?"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Strategist-Commands-(EN)) to ask the Strategist for possible actions under Full Course Yellow.
+	  - New controller action ["FCYRecommend"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the Race Strategist plugin, which triggers the same.
+	  - New icon in the Stream Deck icon set for the "FCYRecommend" action.
+	 Please see the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#handling-full-course-yellow) for more information about Full Course Yellow handling.
+  11. New voice command for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Strategist-Commands-(EN)) and [Race Spotter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Spotter-Commands-(EN)) to ask for the last lap time of a specific car: "Can you tell me the last lap time of car number X?"
+  12. New voice command for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Strategist-Commands-(EN)) and [Race Spotter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Spotter-Commands-(EN)) to ask for the last lap time of a car in a specific position: "Can you tell me the last lap time of position X?"
+  13. You can also get information about the name of the driver in the car ahead or behind you:
+      - New voice command for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Strategist-Commands-(EN)) and [Race Spotter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Spotter-Commands-(EN)): "Can you tell me the name of the driver ahead / behind?"
+	  - Corresponding information request actions "DriverNameAhead" and "DriverNameBehind" for ["Race Strategist"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) and ["Race Spotter"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter) plugins.
+	  - New icons for the Stream Deck icon set for above actions.
+  14. Also you can get information about the class of the car ahead or behind you (as long as available):
+      - New voice command for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Strategist-Commands-(EN)) and [Race Spotter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Spotter-Commands-(EN)): "Can you tell me the class of the car ahead / behind?"
+	  - Corresponding information request actions "CarClassAhead" and "CarClassBehind" for ["Race Strategist"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) and ["Race Spotter"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter) plugins.
+	  - New icons for the Stream Deck icon set for above actions.
+  15. Finally you can get information about the cup category of the car ahead or behind you (as long as available):
+      - New voice command for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Strategist-Commands-(EN)) and [Race Spotter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Spotter-Commands-(EN)): "Can you tell me the cup category of the car ahead / behind?"
+	  - Corresponding information request actions "CarCupAhead" and "CarCupBehind" for ["Race Strategist"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) and ["Race Spotter"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter) plugins.
+	  - New icons for the Stream Deck icon set for above actions.
+  16. *Reactivated* proper handling of improper formed voice commands.
+  17. Small performance improvement for voice commands, since grammars are now pre-compiled in the background.
+  18. The threshold values for the Sorenson-Dice algorithm, which is used to compare spoken commands against the registered command syntax, can now be configured in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration). This allows you to tune, how exact your commands must follow the predefined syntax and it can also be used in cases, where a wrong command is detected, which can happen when two commands are quite similar.
+  19. New test mode in the voice configuration let you now test your changes to pitch, speed or distortion in place.
+  21. The special configuration to choose between the different possible behaviours of the *Push To Talk* button (formerly handled by the "P2T Configuration.ini" file) has been moved to the standard configuration. This is automatically handled by "Simulator Setup" and "Simulator Configuration".
+  21. Automatic updates for versions prior to 4.0.0 are no longer possible.
+  22. Migrated the sources to AHK 2.07.
+  23. [Experts Only] The grammar files has been split up and modularized.
+  24. [Experts Only] New [controller action functions "targetListener", "startActivation", "startListen" and "stopListen"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions), which let you control the listen mode of voice control from your custom scripts. There are also three new icons in the Stream Deck icon set, which can represent these custom actions.
+  25. [Experts Only] *Normal* controller functions (for example "Button", "Dial", etc.) can now also call a [controller action function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) directly. This opens endless possibilities for controller hardware configuration.
+  26. [Developers Only] MultiMap files can now "#Include" other MultiMap files.
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-530). You will find there a description how to change your configuration to use the new capabilities of "Simulator Setup".
+
+## 5.2.3.0-release 08/18/23
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. Significant speed improvement in ACC pitstop setup when using the same tyre compound.
+  4. Fixed position data handling for retired cars in *Assetto Corsa Competizione*. Previously it was possible for the complete grid information to be in disorder, when a car retired, but was still reported with its last position by the data interface.
+  5. The session info widget in the "System Monitor" will now also be updated for all team members in a team race, which have not driven their first stint. Same is true for the JSON state file generated by the "Interface" plugin.
+  6. The recommended cold tyre pressures will be displayed in the "Tyres" session info widget in the "System Monitor".
+  7. The "Practice Center" now warns you, if you try to switch the simulator, car or track, while still having unsaved data in an active session.
+  8. The audio routing capabilities have been extended. Please see the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#audio-routing) for more information.
+  9. [Experts Only] A new [controller action function "callCustom"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) has been addded, which allow you to activate custom controller functions from external scripts, for example.
+  10. [Developer Only] Additional information has been added to the ["Session State.json" file](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) for tyre pressures. The property "Pressures" was renamed to "HotPressures" and a new property "ColdPressures" is available now.
+  11. New car models for "Setup Workbench":
+      - Assetto Corsa
+        - Alfa Romeo 4C
+        - Alfa Romeo 33 Stradale (Fixed)
+        - Lamborghini Miura (Fixed)
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-523).
+  
+## 5.2.2.0-release 08/11/23
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. The management of tyre pressure data has been fixed. It happened in rare situations, that tyre pressure were not stored in the session database, although you gave your consent.
+  4. A new [voice command "Tell me my last laptime"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Strategist-Commands-(EN)) is available for the Race Strategist and Race Spotter.
+  5. A new [information request action "LapTime"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) is available for the Race Strategist and Race Spotter to request the last lap time by a press of a button on your controller hardware.
+  6. An icon has been added to the Stream Deck icon set for the "LapTime" information request action.
+  7. *Practice run sheets* have been added to the "Practice Center", which helps you to create telemetry data for special conditions and car setups, for which no data is available yet. See the all new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#using-the-run-sheet) for more information.
+  8. When a stint plan is created or updated in the "Race Center" it now not only includes information from the strategy but also take the already run stints into account, especially for the driver selection of a stint in the stint plan. When a stint plan is already present, driver selection of stints that have not been started will not be overwritten anymore by information from the strategy.
+  9. When initializing the settings for the next pitstop in the "Race Center", used tyre sets of past stints will be taken into account and the system tries to [recommend the next fresh tyre set](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#planning-a-pitstop). But be sure to double check the recommendation to not end up with worn tyres after your pitstop. This method can be deactivated in the "Pitstop" menu.
+  10. "Race Center" and "Practice Center" now remember many menu choices between different runs.
+  11. "Practice Center" and "Race Center" remember the layout of the telemetry charts between different runs.
+  12. Holding down the Ctrl key while starting the "Race Center" will deactivate the synchronization.
+  13. Potential fix for the nasty auto update loop, which has been encountered by a couple of users.
+  14. [Developer] Additional information has been added to the ["Session State.json" file](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) introduced with the last release.
+  15. [Developer] The data format of the "Session State.json" file has been updated to better reflect the JSON data type standard.
+  16. New car models for "Setup Workbench":
+      - Assetto Corsa
+        - Lamborghini Miura
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-522).
+  
+## 5.2.1.0-release 08/04/23
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. Many bugfixes and polishing in the new "Practice Center".
+  4. Better last lap detection in timed races.
+  5. The Spotter now announces the last lap of the leader or yourself.
+  6. Fixed the handling of the "Invalid" column in "Race Center".
+  7. Fixed data integration for RaceRoom Racing Experience. Sorry for that.
+  8. Fixed tyre wear for RaceRoom Racing Experience, which was 100% for fresh tyres.
+  9. Fixed a couple of stability issues in the Stream Deck plugin. If you have encountered problems lately, you might want to update the plugin.
+  10. Fixed a rare bug with SFX-100 motion intensity controller.
+  11. Support for a couple of new fields has been added in the simulator data files - inner, middle and outer tyre temperatures and in-game tyre compound identifiers for *Automobilista 2*.
+  12. The telemetry charts in "Race Center" and "Practice Center" now apply unit conversion correctly.
+  13. New data summary report in "Practice Center" and a new tab to review the [available telemtry data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#exploring-data).
+  14. New [stints summary report](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#data-analysis) in "Practice Center".
+  15. Updated *Automobilista 2* data integration to shared memory API version 13.
+  16. The Standings info widget in "Session Monitor" now also shows the observed opponent, if one is currently observed by the Spotter.
+  17. A new [plugin named "Integration"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) is available, which exposes the internal state of the Race Assistants and many information about the current session to external applications using a JSON file, which is updated periodically, even when another driver is running the car in a team race. With this it is possible, for example, to create a dashboard for Simulator Controller in SimHub.
+  18. New car models for "Setup Workbench":
+      - Assetto Corsa
+        - Alfa Romeo 33 Stradale
+		- Alfa Romeo Giulietta QV Launch Edition 2014 (Fixed)
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-521).
+  
+## 5.2.0.0-release 07/28/23
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. Introducing a complete [new tool "Practice Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#practice-center), which helps you to manage your practice sessions and allows you to inspect and select the data to be transfered to the session database. The development of this application is still in its early stage, but it is already quite usable.
+  4. A new controller action function "openPracticeCenter" allows you to open the "Practice Center" from your controller hardware.
+  5. A new plugin argument "openPracticeCenter" has been introduced for the "Race Engineer" and "Race Strategist" plugins.
+  6. Added an "Invalid" column for the "Car" report in "Race Reports".
+  7. Added an "Invalid" column for the *Laps* list in "Race Center".
+  8. A bug has been fixed which may crash the Simulator Controller background process, when a custom controller function without a trigger was configured.
+  9. The application icons in "Simulator Startup" have been rearranged.
+  10. New car models for "Setup Workbench":
+      - Assetto Corsa
+        - Alfa Romeo Giulietta QV Launch Edition 2014
+
+## 5.1.2.0-release 07/21/23
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. The Strategist and the Spotter can now be asked for the time to a specific car. Example: "Can you tell me the gap to the car number 81?"
+  4. The Spotter can now be asked to observe a specific car: "Can you observe car number 81?". Very useful to gather periodic information about what your most important opponent is doing. Please take a look at the [updated documentation for voice commands](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Spotter-Commands-(EN)).
+  5. Car numbers are now shown in the standings widget for the "System Monitor".
+  6. Playing a replay in *Automobilista 2* no longer is interpreted as a valid session.
+  7. A couple of voice commands has been fixed in the Spanish grammar for the Strategist and the Spotter.
+  8. A new communication method is available for the Stream Deck. It has been reported, that using OBS parallel to Simulator Controller can brake the Stream Deck functionality of Simulator Controller. The new communication method, although a little bit slower, prevents this. A new setting in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration) let you choose between the available communication methods.
+  9. [Experts only] A new setting in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration) let you choose the frequency of external command processing. Change with caution.
+  10. [Experts only] The controller action function "call" has been renamed to "invoke".
+  11. [Experts only] It is now possible to alter the time, a press or click on the *Push To Talk* button is considered as an activation event. Default is the Windows setting for mouse double click speed. See the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration) for more information.
+  12. New car models for "Setup Workbench":
+      - Assetto Corsa
+	    - Audi R8 LMS Ultra
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-512).
+
+## 5.1.1.0-release 07/14/23
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. You can now enable an acoustic feedback for Audible feedback in the Telemetry Analyzer. Whenever a handling event is registered (over- or understeering) a short beep of varying pitch and intensity will give you some feedback. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-telemetry-analyzer) for more information.
+  4. [Experts only] It is now possible to define your own modes and layers for Button Boxes. This allows any function of your sim or other applications on your PC to be triggered by the Button Box, not only the actions supplied by the plugins. Please see the [new documentation](*) for more information.
+  5. A new controller action function "mouse" is available, which allows you to send virtual mouse clicks to any application by a button press on your controller.
+  6. [Experts only] A new controller action function "call" let's you invoke internal methods for any plugin or the Controller itself.
+  7. Fixed a regression introduced in the last release, which disabled the pitstop settings preview window in "Race Center".
+  8. A new setting in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration) allows you to set the update frequency for the data transferred to the Team Server in team sessions. The default is an update each 10 seconds and I advise you to only go lower when hosting your own Team Server on a really powerful backend. Going lower on an instance run in the Azure cloud, for example, may stall the server and will increase the running costs at least.
+  9. Apps launched from "Simulator Startup" will select the current simulator, car and track a simulation is currently running.
+  10. "Race Reports" will now try to open the recently selected simulator, car and track, if no simulation is currently running.
+  11. New plugin parameter "openRaceReports" for the ["Race Strategist"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist), which let you start the race reports browser from your controller hardware.
+  12. New controller action function ["openRaceReports"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) which you can use in your custom controller actions.
+  13. Fixed "Use initial pressures" for initialization of sessions with a very long formation lap.
+  14. Migrated the sources to AHK 2.04.
+  15. New car models for "Setup Workbench":
+      - Assetto Corsa
+	    - Ford GT40
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-511) if you have defined custom controller functions in your "Configuration Patch.ini" file (mostly an experts topic).
+
+## 5.1.0.0-release 07/07/23
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. The oversteer detection method of the Telemetry Analyzer in the "Setup Workbench" has become much more sensitive and counter steering is now detected correctly (will always count as a *heavy+ oversteer event).
+  4. Loading of car specific defaults in the Telemetry Analyzer has been fixed as well.
+  5. A couple of bugs in the behaviour of the sliders in the Telemetry Analyzer in the "Setup Workbench" has been fixed.
+  6. New real-time capable data connector architecture. This will enable exciting new features in the future. A switch is available in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration) to choose between the different protocols. The new protocol is the default, but you can go back, if you encounter data consistency issues.
+  7. The bounding box for side proximity alerts by the Spotter has been increased from 6 to 8 meters lateral.
+  8. The waiting time for unavailable data in "Race Center" has been reduced.
+  9. Fixed a couple of bugs, which had been introduced to the Spotter for *Assetto Corsa* and *rFactor 2* by the latest .NET framework update by Microsoft.
+  10. Fixed car coordinates for *rFactor2* (used by the track automation).
+  11. Fixed race reports and standings data in "Race Center" for *rFactor2*.
+  12. Fixed track scanner and mapper for rare cases with special characters in car or track names. Happened especially in *Automobilista 2*.
+  13. Fixed a problem with manually locating *iRacing* in a non-standard install location.
+  14. A new documentation chapter describes the process of [manually locating games and other software](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#locating-simulators-and-applications) during installation.
+  15. New car models for "Setup Workbench":
+      - Assetto Corsa
+	    - Ferrari SF15-T
+
 ## 5.0.9.1-release 06/30/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
@@ -614,7 +803,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   12. A lot of new tyre compound data has been added for *Automobilista 2* (many thanks to Chris Matthews to provide the data).
   13. Fixed a regression where in many lists and reports the last name of the drivers where missing.
   14. Implemented state caching in "Simulator Setup" which results in a significant performance improvement when stepping to a page, which had already been visited.
-  15. A preset has been added to "Simulator Setup" to enable a toggle mode for the Push-To-Talk trigger. Please see the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#push-to-talk-behaviour) for more information.
+  15. A preset has been added to "Simulator Setup" to enable a toggle mode for the *Push To Talk* trigger. Please see the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#push-to-talk-behaviour) for more information.
   16. New car models for "Setup Advisor":
       - Assetto Corsa
         - Pagani Zonda R
@@ -822,7 +1011,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
   1. Bugfixes, as always
   2. Documentation updates, as always
-  3. Support driver filters for telemetry in "Strategy Workbench" and "Race Center". You can now select a driver, for which the data in various reports and charts should be displayed. See the updated documentation for ["Strategy Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-development) and ["Race Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#data-analysis) for more information.
+  3. Support driver filters for telemetry in "Strategy Workbench" and "Race Center". You can now select a driver, for which the data in various reports and charts should be displayed. See the updated documentation for ["Strategy Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-workbench) and ["Race Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#data-analysis) for more information.
   4. The strategy simulation in "Race Center" has been extended to support more edge cases regarding the current traffic situation.
   5. When simulating a strategy in "Strategy Workbench", it is now possible to preselect drivers for the various stints. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#drivers) for more information.
   6. When a stint plan is created from a strategy in "Race Center", the drivers are preselected, if the strategy has been created with driver information.
@@ -1347,7 +1536,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   5. Renamed "Controller Plugin Labels" file to "Controller Action Labels". Important: Take a look at the [update notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-366), if you have changed labels in the past.
   6. Introduced "Controller Action Icons.XX" file in order to support action specific icons on the Stream Deck controller.
   7. With the new plugin parameter [*udpConnection*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-4) for the ACC plugin to support non-standard UDP connect strings for the broadcasting interface.
-  8. ["Strategy Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-development) supports a new command to remove faulty data from the telemetry database.
+  8. ["Strategy Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-workbench) supports a new command to remove faulty data from the telemetry database.
   9. Only valid laps will be written to the telemetry database and will be used for statistical tyre pressure data.
   10. Support for binary functions for the effect intensity manipulation in the "Motion Feedback" plugin. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-2) for more information.
   11. [Developer only] Full refactoring of the *ButtonBox* class which is now the [*FunctionController*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-functioncontroller-extends-configurationitem-simulator-controllerahk) in [Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk) in order to support the new Stream Deck integration.
@@ -1377,14 +1566,14 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   5. Initializing a various fields in the "Strategy Workbench" from *Race.settings* files, from a running simulation or from data acquired from the telemetry information is now supported.
   6. Comparison of strategies is now supported in the "Strategy Workbench".
   7. Defined pitstop rules are now taken into account for strategy simulations.
-  8. Expanded [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-development) to reflect the new functions of the "Strategy Workbench".
+  8. Expanded [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-workbench) to reflect the new functions of the "Strategy Workbench".
 
 ## 3.6.0-release 10/08/21
 
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. Important fix for handling startup of SimFeedback by the "Motion Feedback" plugin.
-  4. Initial strategy simulation based on telemetry data for the "Strategy Workbench". The tool is still in an early stage of development and the functionality might change with future releases. A very rudimentary [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-development) can be found in the chapter on the Virtual Race Strategist. This documentation will be completed with the upcoming releases.
+  4. Initial strategy simulation based on telemetry data for the "Strategy Workbench". The tool is still in an early stage of development and the functionality might change with future releases. A very rudimentary [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-workbench) can be found in the chapter on the Virtual Race Strategist. This documentation will be completed with the upcoming releases.
 
 ## 3.5.9-release 10/01/21
 
@@ -1413,7 +1602,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   4. Improved "Pace" report including median and quartile calculation.
   5. Various usability improvements for the "Race Reports" tool, incl. better selection of reports based on car and track grouping.
   6. [New "Call" command](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) allows you to actiavte the listen mode of a Race Assistant by the touch of a button on your Button Box.
-  7. Improved reliability for voice control of multiple Race Assistants, when Push-to-Talk is not used.
+  7. Improved reliability for voice control of multiple Race Assistants, when *Push To Talk* is not used.
   8. Optimized language handling for SAPI voices to support non-Microsoft language packs.
 
 ## 3.5.4-release 09/03/21
@@ -1444,7 +1633,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   4. Button Boxes can now be invisible to define and group controls, which are located on non-typical controllers like steering wheels.
   5. For the introduction of the new Setup Wizard, the localized Plugin Labels has been extensively reworked. Please see the [update notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-350), if you have changed the default Plugin Labels and want to preserve your changes.
   6. The "System" plugin now supports a [parameter *launchApplications*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration) to specify the applications to be used for the "Launch" mode.
-  7. The Push-To-Talk function now emits a short sound, when the listen mode is activated.
+  7. The *Push To Talk* function now emits a short sound, when the listen mode is activated.
 
 ## 3.3.1-release 07/25/21
 
@@ -1671,7 +1860,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   
   1. Bugfixes, as always
   2. Documentation updates, as always
-  3. Push-To-Talk function for voice recognition - this will reduce false positives almost to zero
+  3. *Push To Talk* function for voice recognition - this will reduce false positives almost to zero
   4. Button Boxes can be created with a configuration file - no more programming knowledge needed
   5. Extension of ACC Shared Memory Reader for weather information and track grip status
   6. Jona now issues notifications about upcoming weather changes and recommends tyre changes

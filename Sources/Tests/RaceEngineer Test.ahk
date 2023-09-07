@@ -82,6 +82,13 @@ class TestRaceEngineer extends RaceEngineer {
 		return true
 	}
 
+	addLap(lapNumber, &data) {
+		super.addLap(lapNumber, &data)
+
+		if (lapNumber = 1)
+			this.updateConfigurationValues({Announcements: {FuelWarning: true, DamageReporting: true, DamageAnalysis: true, PressureReporting: true, WeatherUpdate: true}})
+	}
+
 	lowFuelWarning(remainingLaps) {
 		super.lowFuelWarning(remainingLaps)
 
@@ -1033,7 +1040,7 @@ if !GetKeyState("Ctrl") {
 else {
 	raceNr := (GetKeyState("Alt") ? 18 : ((GetKeyState("Shift") ? 2 : 1)))
 	engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Engineer.settings")
-							   , TestPitStopHandler(), "Jona", "en", "Windows", true, true, true)
+							   , TestPitStopHandler(), "Jona", "EN", true, true, true, true)
 
 	engineer.VoiceManager.setDebug(kDebugGrammars, false)
 

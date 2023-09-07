@@ -75,6 +75,18 @@ global kDebugRules := 2
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class Preset {
+	iActive := true
+
+	Active {
+		Get {
+			return this.iActive
+		}
+
+		Set {
+			return (this.iActive := value)
+		}
+	}
+
 	Name {
 		Get {
 			throw "Virtual property Preset.Name must be implemented in a subclass..."
@@ -85,7 +97,7 @@ class Preset {
 		throw "Virtual method Preset.getArguments must be implemented in a subclass..."
 	}
 
-	install(wizard) {
+	install(wizard, edit := true) {
 	}
 
 	uninstall(wizard) {
@@ -101,6 +113,9 @@ class Preset {
 	}
 
 	patchStreamDeckConfiguration(wizard, streamDeckConfiguration) {
+	}
+
+	finalizeConfiguration(wizard) {
 	}
 }
 
@@ -120,6 +135,7 @@ class SetupWizard extends ConfiguratorPanel {
 	iResult := false
 
 	iStepWizards := CaseInsenseMap()
+	iWizards := []
 
 	iDefinition := false
 	iKnowledgeBase := false
@@ -129,6 +145,8 @@ class SetupWizard extends ConfiguratorPanel {
 	iSteps := CaseInsenseWeakMap()
 	iStep := 0
 	iPage := 0
+
+	iQuickSetup := true
 
 	iPresets := false
 	iInitialize := false
@@ -355,6 +373,16 @@ class SetupWizard extends ConfiguratorPanel {
 		}
 	}
 
+	QuickSetup {
+		Get {
+			return (this.iQuickSetup && (this.isQuickSetupAvailable() || (this.iQuickSetup = "Force")))
+		}
+
+		Set {
+			return (this.iQuickSetup := value)
+		}
+	}
+
 	Initialize {
 		Get {
 			return this.iInitialize
@@ -482,9 +510,13 @@ class SetupWizard extends ConfiguratorPanel {
 		this.iInitialize := initialize
 
 		if initialize {
-			this.addPatchFile("Settings", kUserHomeDirectory . "Setup\Settings Patch.ini")
-			this.addPatchFile("Configuration", kUserHomeDirectory . "Setup\Configuration Patch.ini")
+			this.QuickSetup := true
+
+			this.addPatchFile("Settings", "%kUserHomeDirectory%Setup\Settings Patch.ini")
+			this.addPatchFile("Configuration", "%kUserHomeDirectory%Setup\Configuration Patch.ini")
 		}
+		else
+			this.QuickSetup := false
 
 		showProgress({progress: ++this.ProgressCount, message: translate("Starting AI Kernel...")})
 
@@ -495,6 +527,8 @@ class SetupWizard extends ConfiguratorPanel {
 	}
 
 	registerStepWizard(stepWizard) {
+		this.iWizards.Push(stepWizard)
+
 		this.StepWizards[stepWizard.Step] := stepWizard
 	}
 
@@ -679,11 +713,13 @@ class SetupWizard extends ConfiguratorPanel {
 		local y := 0
 		local width := 0
 		local height := 0
-		local stepWizard, step
+		local ignore, stepWizard, step
 
 		this.getWorkArea(&x, &y, &width, &height)
 
-		for step, stepWizard in this.StepWizards {
+		for ignore, stepWizard in this.iWizards {
+			step := stepWizard.Step
+
 			this.ProgressCount += 2
 
 			showProgress({progress: this.ProgressCount, message: translate("Creating UI for Step: ")
@@ -747,7 +783,7 @@ class SetupWizard extends ConfiguratorPanel {
 	show(reset := false) {
 		local wizardWindow := this.WizardWindow
 		local helpWindow := this.HelpWindow
-		local x, y, w, h, posX, settings
+		local x, y, w, h, posX
 
 		if getWindowPosition("Simulator Setup.Help", &x, &y)
 			helpWindow.Show("x" . x . " y" . y)
@@ -778,9 +814,7 @@ class SetupWizard extends ConfiguratorPanel {
 		else
 			this.nextPage()
 
-		settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-		loop getMultiMapValue(settings, "Simulator Setup", "StartPage", 0)
+		loop getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini"), "Simulator Setup", "StartPage", 0)
 			this.nextPage()
 	}
 
@@ -806,6 +840,10 @@ class SetupWizard extends ConfiguratorPanel {
 
 		showProgress({progress: ++this.ProgressCount, color: "Green", title: translate("Starting Setup Wizard")
 					, message: translate("Starting Configuration Engine...")})
+
+		loop this.Count
+			if this.Steps.Has(A_Index)
+				this.Steps[A_Index].startSetup()
 
 		viewers := []
 
@@ -873,7 +911,7 @@ class SetupWizard extends ConfiguratorPanel {
 
 			window := this.WizardWindow
 
-			window.Opt("+Disabled")
+			window.Block()
 
 			this.Control["firstPageButton"].Enabled := false
 			this.Control["previousPageButton"].Enabled := false
@@ -885,18 +923,25 @@ class SetupWizard extends ConfiguratorPanel {
 
 			try {
 				if save {
+					configuration := this.getSimulatorConfiguration()
+
 					if FileExist(kUserConfigDirectory . "Simulator Configuration.ini")
 						FileMove(kUserConfigDirectory "Simulator Configuration.ini", kUserConfigDirectory "Simulator Configuration.ini.bak", 1)
 
-					if (FileExist(kUserConfigDirectory . "Simulator Settings.ini") && FileExist(kUserHomeDirectory . "Setup\Simulator Settings.ini"))
-						FileMove(kUserConfigDirectory "Simulator Settings.ini", kUserConfigDirectory "Simulator Settings.ini.bak", 1)
+					if FileExist(kUserConfigDirectory . "Simulator Settings.ini") {
+						if this.Initialize
+							settings := newMultiMap()
+						else
+							settings := readMultiMap(kUserConfigDirectory . "Simulator Settings.ini")
 
-					configuration := this.getSimulatorConfiguration()
-
-					if FileExist(kUserHomeDirectory . "Setup\Simulator Settings.ini")
-						settings := readMultiMap(kUserHomeDirectory . "Setup\Simulator Settings.ini")
+						FileMove(kUserConfigDirectory . "Simulator Settings.ini"
+							   , kUserConfigDirectory . "Simulator Settings.ini.bak", 1)
+					}
 					else
 						settings := newMultiMap()
+
+					if FileExist(kUserHomeDirectory . "Setup\Simulator Settings.ini")
+						addMultiMapValues(settings, readMultiMap(kUserHomeDirectory . "Setup\Simulator Settings.ini"))
 
 					for ignore, file in this.getPatchFiles("Configuration")
 						if FileExist(file)
@@ -907,8 +952,10 @@ class SetupWizard extends ConfiguratorPanel {
 							this.applyPatches(settings, readMultiMap(file))
 
 					for ignore, preset in this.Presets {
-						preset.patchSimulatorConfiguration(this, configuration)
-						preset.patchSimulatorSettings(this, settings)
+						if preset.Active {
+							preset.patchSimulatorConfiguration(this, configuration)
+							preset.patchSimulatorSettings(this, settings)
+						}
 					}
 
 					if (settings.Count > 0)
@@ -941,7 +988,8 @@ class SetupWizard extends ConfiguratorPanel {
 								this.applyPatches(buttonBoxConfiguration, readMultiMap(file))
 
 						for ignore, preset in this.Presets
-							preset.patchButtonBoxConfiguration(this, buttonBoxConfiguration)
+							if preset.Active
+								preset.patchButtonBoxConfiguration(this, buttonBoxConfiguration)
 
 						writeMultiMap(kUserConfigDirectory . "Button Box Configuration.ini", buttonBoxConfiguration)
 
@@ -955,10 +1003,15 @@ class SetupWizard extends ConfiguratorPanel {
 								this.applyPatches(streamDeckConfiguration, readMultiMap(file))
 
 						for ignore, preset in this.Presets
-							preset.patchStreamDeckConfiguration(this, streamDeckConfiguration)
+							if preset.Active
+								preset.patchStreamDeckConfiguration(this, streamDeckConfiguration)
 
 						writeMultiMap(kUserConfigDirectory . "Stream Deck Configuration.ini", streamDeckConfiguration)
 					}
+
+					for ignore, preset in this.Presets
+						if preset.Active
+							preset.finalizeConfiguration(this)
 				}
 			}
 			finally {
@@ -972,7 +1025,8 @@ class SetupWizard extends ConfiguratorPanel {
 	}
 
 	getSimulatorConfiguration() {
-		local configuration := newMultiMap()
+		local configuration := (this.Initialize ? newMultiMap()
+												: readMultiMap(kUserConfigDirectory . "Simulator Configuration.ini"))
 
 		this.saveToConfiguration(configuration)
 
@@ -1079,7 +1133,7 @@ class SetupWizard extends ConfiguratorPanel {
 		local change := (step != this.Step)
 		local oldPageSwitch
 
-		this.WizardWindow.Opt("+Disabled")
+		this.WizardWindow.Block()
 
 		this.Control["firstPageButton"].Enabled := false
 		this.Control["previousPageButton"].Enabled := false
@@ -1111,6 +1165,9 @@ class SetupWizard extends ConfiguratorPanel {
 
 			this.iPage := page
 		}
+		catch Any as exception {
+			logError(exception, true)
+		}
 		finally {
 			this.PageSwitch := oldPageSwitch
 		}
@@ -1119,13 +1176,20 @@ class SetupWizard extends ConfiguratorPanel {
 	}
 
 	hidePage(step, page) {
-		if step.hidePage(page) {
-			this.saveKnowledgeBase()
+		try {
+			if step.hidePage(page) {
+				this.saveKnowledgeBase()
 
-			return true
+				return true
+			}
+			else
+				return false
 		}
-		else
+		catch Any as exception {
+			logError(exception, true)
+
 			return false
+		}
 	}
 
 	firstPage() {
@@ -1243,20 +1307,20 @@ class SetupWizard extends ConfiguratorPanel {
 			}
 			else {
 				this.Control["nextPageButton"].Enabled := true
-				this.Control["lastPageButton"].Enabled := true
+				this.Control["lastPageButton"].Enabled := !this.QuickSetup
 				this.Control["finishButton"].Enabled := false
 			}
 
 			if unlock
-				this.WizardWindow.Opt("-Disabled")
+				this.WizardWindow.Unblock()
 		}
 	}
 
-	installPreset(preset) {
+	installPreset(preset, edit := true) {
 		local knowledgeBase := this.KnowledgeBase
 		local count
 
-		preset.install(this)
+		preset.install(this, edit)
 
 		count := (knowledgeBase.getValue("Preset.Count", 0) + 1)
 
@@ -1316,14 +1380,19 @@ class SetupWizard extends ConfiguratorPanel {
 			class := knowledgeBase.getValue("Preset." . A_Index . ".Class")
 			arguments := string2Values("###", knowledgeBase.getValue("Preset." . A_Index . ".Arguments"))
 
-			if InStr(class, ".") {
-				class := StrSplit(class, ".")
-				outerClass := class[1]
+			try {
+				if InStr(class, ".") {
+					class := StrSplit(class, ".")
+					outerClass := class[1]
 
-				presets.Push(%outerClass%[class[2]](arguments*))
+					presets.Push(%outerClass%[class[2]](arguments*))
+				}
+				else
+					presets.Push(%class%(arguments*))
 			}
-			else
-				presets.Push(%class%(arguments*))
+			catch Any as exception {
+				logError(exception)
+			}
 		}
 
 		return presets
@@ -1475,6 +1544,185 @@ class SetupWizard extends ConfiguratorPanel {
 
 	applicationPath(application) {
 		return this.KnowledgeBase.getValue("Application." . application . ".Path", false)
+	}
+
+	isQuickSetupAvailable() {
+		return (this.isModuleSelected("Voice Control") && (this.loadPresets().Length = 0))
+	}
+
+	installSoftware() {
+		local progressCount := 0
+
+		detectSimulators() {
+			local task := PeriodicTask((*) => showProgress({progress: progressCount++, message: translate("Detecting Simulators...")}), 100, kHighPriority)
+
+			try {
+				task.start()
+
+				try {
+					this.Steps["Applications"].updateAvailableApplications(true)
+
+					Sleep(1000)
+				}
+				finally {
+					task.stop()
+				}
+			}
+			catch Any as exception {
+				showProgress({color: "Red", message: translate("Error while detecting Simulators...")})
+
+				Sleep(1000)
+
+				logError(exception, true)
+			}
+		}
+
+		installRuntimes() {
+			local runtime, definition
+
+			for runtime, definition in getMultiMapValues(this.Definition, "Software.Runtimes")
+				if !this.isSoftwareInstalled(runtime)
+					try {
+						showProgress({progress: progressCount++, color: "Green", message: translate("Installing ") . runtime . translate("...")})
+
+						definition := string2Values("|", definition)
+
+						RunWait(kHomeDirectory . definition[2])
+
+						this.locateSoftware(runtime, true)
+					}
+					catch Any as exception {
+						showProgress({color: "Red", message: translate("Error while installing ") . runtime . translate("...")})
+
+						Sleep(1000)
+
+						logError(exception, true)
+					}
+		}
+
+		installSoftware() {
+			local software, definition
+
+			for software, definition in getMultiMapValues(this.Definition, "Applications.Special")
+				if !this.isSoftwareInstalled(software)
+					try {
+						showProgress({progress: progressCount++, color: "Green", message: translate("Installing ") . software . translate("...")})
+
+						definition := string2Values(":", string2Values("|", definition)[4])
+
+						this.locateSoftware(software, %definition[1]%.Call(string2Values(";", definition[2])*))
+					}
+					catch Any as exception {
+						showProgress({color: "Red", message: translate("Error while installing ") . software . translate("...")})
+
+						Sleep(1000)
+
+						logError(exception, true)
+					}
+		}
+
+		installPlugins() {
+			local plugin, definition, ignore, target, root, path, skip, source
+
+			for plugin, definition in getMultiMapValues(this.Definition, "Software.Plugins")
+				if !this.isSoftwareInstalled(plugin)
+					try {
+						definition := string2Values("|", definition)
+						skip := false
+						root := ""
+
+						for ignore, target in string2Values(";", definition[3]) {
+							target := string2Values(":", target)
+
+							if (target[1] = "Software") {
+								this.locateSoftware(target[2])
+
+								root := (this.isSoftwareInstalled(target[2]) && this.softwarePath(target[2]))
+
+								if root
+									SplitPath(root, , &root)
+								else
+									skip := true
+							}
+							else if (target[1] = "Path")
+								path := target[2]
+						}
+
+						if (!skip && (root = ""))
+							if !FileExist(substituteVariables(path))
+								skip := true
+
+						if !skip {
+							showProgress({progress: progressCount++, color: "Green", message: translate("Installing ") . plugin . translate("...")})
+
+							path := (root . substituteVariables(path))
+							source := string2Values(":", definition[2])
+
+							SplitPath(substituteVariables(source[2]), &name)
+
+							if (source[1] = "Directory")
+								DirCopy(substituteVariables(source[2]), path . "\" . name, 1)
+							else if (source[1] = "File")
+								FileCopy(substituteVariables(source[2]), path, 1)
+							else
+								throw "Unknown plugin source type detected in SetupWizard.installSoftware..."
+
+							this.locateSoftware(plugin, path . "\" . name)
+						}
+					}
+					catch Any as exception {
+						showProgress({color: "Red", message: translate("Error while installing ") . plugin . translate("...")})
+
+						Sleep(1000)
+
+						logError(exception, true)
+					}
+		}
+
+		this.Window.block()
+
+		showProgress({color: "Blue", title: translate("Preparing Configuration")})
+
+		try {
+			showProgress({progress: ++progressCount, message: translate("Creating Configuration...")})
+
+			Sleep(1000)
+
+			showProgress({progress: ++progressCount, message: translate("Parsing Registry...")})
+
+			loop 10 {
+				Sleep(500)
+
+				showProgress({progress: ++progressCount})
+			}
+
+			showProgress({progress: progressCount++, message: translate("Detecting Simulators...")})
+
+			detectSimulators()
+
+			showProgress({color: "Green", title: translate("Install Runtimes")})
+
+			installRuntimes()
+
+			showProgress({color: "Green", title: translate("Install Software")})
+
+			installSoftware()
+
+			showProgress({color: "Green", title: translate("Install Plugins")})
+
+			installPlugins()
+
+			showProgress({progress: 100, message: translate("Finished...")})
+
+			Sleep(1000)
+		}
+		finally {
+			hideProgress()
+
+			this.Window.unblock()
+
+			this.updateState()
+		}
 	}
 
 	setGeneralConfiguration(language, startWithWindows, silentMode) {
@@ -2137,29 +2385,34 @@ class StepWizard extends ConfiguratorPanel {
 	showPage(page) {
 		local ignore, widget
 
-		for ignore, widget in this.iWidgets[page] {
-			if widget.HasProp("Show")
-				widget.Show()
-			else
-				widget.Visible := true
+		if this.iWidgets.Has(page)
+			for ignore, widget in this.iWidgets[page] {
+				if widget.HasProp("Show")
+					widget.Show()
+				else
+					widget.Visible := true
 
-			widget.Enabled := true
-		}
+				widget.Enabled := true
+			}
 	}
 
 	hidePage(page) {
 		local ignore, widget
 
-		for ignore, widget in this.iWidgets[page] {
-			widget.Enabled := false
+		if this.iWidgets.Has(page)
+			for ignore, widget in this.iWidgets[page] {
+				widget.Enabled := false
 
-			if widget.HasProp("Hide")
-				widget.Hide()
-			else
-				widget.Visible := false
-		}
+				if widget.HasProp("Hide")
+					widget.Hide()
+				else
+					widget.Visible := false
+			}
 
 		return true
+	}
+
+	startSetup() {
 	}
 
 	updateState() {
@@ -2320,13 +2573,14 @@ class StartStepWizard extends StepWizard {
 			this.registerWidgets(2, widget1, widget2, widget3, widget4)
 		}
 		else
-			for ignore, directory in [kBinariesDirectory, kResourcesDirectory . "Setup\Installer\"] {
+			for ignore, directory in [kBinariesDirectory, kResourcesDirectory . "Setup\Installer\"
+									, kResourcesDirectory . "Setup\Plugins\"] {
 				currentDirectory := A_WorkingDir
 
 				try {
 					SetWorkingDir(directory)
 
-					Run("Powershell -Command Get-ChildItem -Path '.' -Recurse | Unblock-File", , "Hide")
+					RunWait("Powershell -Command Get-ChildItem -Path '.' -Recurse | Unblock-File", , "Hide")
 				}
 				catch Any as exception {
 					logError(exception)
@@ -2462,16 +2716,19 @@ class FinishStepWizard extends StepWizard {
 		if this.SetupWizard.Working
 			Task.startTask(ObjBindMethod(this, "openSettingsEditor"), 200)
 		else {
-			if FileExist(kUserHomeDirectory . "Setup\Simulator Settings.ini")
-				settings := readMultiMap(kUserHomeDirectory . "Setup\Simulator Settings.ini")
+			if FileExist(kUserConfigDirectory . "Simulator Settings.ini")
+				settings := readMultiMap(kUserConfigDirectory . "Simulator Settings.ini")
 			else
 				settings := newMultiMap()
+
+			if FileExist(kUserHomeDirectory . "Setup\Simulator Settings.ini")
+				addMultiMapValues(settings, readMultiMap(kUserHomeDirectory . "Setup\Simulator Settings.ini"))
 
 			configuration := this.SetupWizard.getSimulatorConfiguration()
 
 			this.SetupWizard.SettingsOpen := true
 
-			editSettings(&settings, false, configuration
+			editSettings(&settings, this.SetupWizard.Window, false, configuration
 					   , Min(A_ScreenWidth - Round(A_ScreenWidth / 3) + Round(A_ScreenWidth / 3 / 2) - 180, A_ScreenWidth - 360)
 					   , "Center")
 		}
@@ -2485,7 +2742,7 @@ class FinishStepWizard extends StepWizard {
 		if !this.SetupWizard.SettingsOpen
 			Task.startTask(ObjBindMethod(this, "closeSettingsEditor"), 1000, kHighPriority)
 
-		writeMultiMap(kUserHomeDirectory . "Setup\Simulator Settings.ini", editSettings(&kSave, false, true))
+		writeMultiMap(kUserHomeDirectory . "Setup\Simulator Settings.ini", editSettings(&kSave, false, false, true))
 
 		this.SetupWizard.SettingsOpen := false
 
@@ -2641,7 +2898,8 @@ initializeSimulatorSetup() {
 	if wizard.Debug[kDebugKnowledgeBase]
 		SupportMenu.Check(label)
 
-	showSplashScreen("Rotating Brain")
+	if !isDebug()
+		showSplashScreen("Rotating Brain")
 
 	wizard.ProgressCount := 0
 
@@ -2676,7 +2934,9 @@ startupSimulatorSetup() {
 
 		Sleep(1000)
 
-		hideSplashScreen()
+		if !isDebug()
+			hideSplashScreen()
+
 		hideProgress()
 
 		wizard.show()
@@ -2703,7 +2963,9 @@ startupSimulatorSetup() {
 
 			wizard.ProgressCount := 0
 
-			showSplashScreen("Rotating Brain")
+			if !isDebug()
+				showSplashScreen("Rotating Brain")
+
 			showProgress({color: "Blue", title: translate("Initializing Setup Wizard"), message: translate("")})
 		}
 		else
@@ -2716,22 +2978,47 @@ startupSimulatorSetup() {
 ;;;                   Public Function Declaration Section                   ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+installMSI(command) {
+	RunWait(kHomeDirectory . command)
+
+	return false
+}
+
+installZIP(path, application) {
+	deleteDirectory(A_Temp . "\Simulator Controller\Temp")
+
+	DirCreate(A_Temp . "\Simulator Controller\Temp")
+	DirCreate(kUserHomeDirectory . "Programs")
+
+	RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . kHomeDirectory . path . "' -DestinationPath '" . A_Temp . "\Simulator Controller\Temp'", , "Hide")
+
+	FileCopy(A_Temp . "\Simulator Controller\Temp\" . application, kUserHomeDirectory . "Programs", 1)
+
+	return (kUserHomeDirectory . "Programs\" . application)
+}
+
+installEXE(command) {
+	RunWait(kHomeDirectory . command)
+
+	return false
+}
+
 openLabelsAndIconsEditor(*) {
 	local window := SetupWizard.Instance.WizardWindow
 
-	window.Opt("+Disabled")
+	window.Block()
 
 	try {
 		ControllerActionsEditor(kSimulatorConfiguration).editPluginActions(false, window)
 	}
 	finally {
-		window.Opt("-Disabled")
+		window.Unblock()
 	}
 }
 
 standardApplication(definition, categories, executable) {
 	local ignore, category, name, descriptor
-	local software
+	local software, candidate
 
 	SplitPath(executable, &software)
 
@@ -2739,7 +3026,9 @@ standardApplication(definition, categories, executable) {
 		for name, descriptor in getMultiMapValues(definition, category) {
 			descriptor := string2Values("|", descriptor)
 
-			if (software = descriptor[3])
+			SplitPath(descriptor[3], &candidate)
+
+			if (software = candidate)
 				return name
 		}
 
@@ -2776,8 +3065,11 @@ findSoftware(definition, software) {
 					else if (InStr(locator, "RegistryScan:") == 1) {
 						folder := findInstallProperty(substituteVariables(Trim(StrReplace(locator, "RegistryScan:", ""))), "InstallLocation")
 
-						if ((folder != "") && FileExist(folder . descriptor[3]))
-							return (folder . descriptor[3])
+						if (folder != "")
+							if FileExist(folder . descriptor[3])
+								return (folder . descriptor[3])
+							else if FileExist(folder . "\" . descriptor[3])
+								return (folder . descriptor[3])
 					}
 					else if (InStr(locator, "Steam:") == 1) {
 						locator := substituteVariables(Trim(StrReplace(locator, "Steam:", "")))
@@ -2885,6 +3177,7 @@ initializeSimulatorSetup()
 ;;;                          Wizard Include Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include "Libraries\QuickStepWizard.ahk"
 #Include "Libraries\ModulesStepWizard.ahk"
 #Include "Libraries\InstallationStepWizard.ahk"
 #Include "Libraries\ApplicationsStepWizard.ahk"

@@ -9,6 +9,8 @@
 #include <Windows.h>
 #include <tchar.h>
 
+#pragma comment(lib, "winmm")
+
 #define ALIVE_SEC 600
 #define INTERVAL_MS 100
 
@@ -124,6 +126,22 @@ void sendAutomationMessage(char* message) {
 	}
 }
 
+void sendAnalyzerMessage(char* message) {
+	HWND winHandle = FindWindowEx(0, 0, 0, L"Setup Workbench.exe");
+
+	if (winHandle == 0)
+		winHandle = FindWindowEx(0, 0, 0, L"Setup Workbench.ahk");
+
+	if (winHandle != 0) {
+		char buffer[128];
+
+		strcpy_s(buffer, 128, "Analyzer:");
+		strcpy_s(buffer + strlen("Analyzer:"), 128 - strlen("Analyzer:"), message);
+
+		sendStringMessage(winHandle, 0, buffer);
+	}
+}
+
 #define PI 3.14159265
 
 long cycle = 0;
@@ -132,7 +150,7 @@ long cycle = 0;
 #define nearByZDistance 6.0
 float longitudinalFrontDistance = 4;
 float longitudinalRearDistance = 5;
-#define lateralDistance 6
+#define lateralDistance 8
 #define verticalDistance 2
 
 #define CLEAR 0
@@ -665,10 +683,16 @@ float averageValue(float* values, int count) {
 }
 
 float smoothValue(float* values, int* count, float value) {
-	pushValue(values, count, value);
+	if (FALSE) {
+		pushValue(values, count, value);
 
-	return averageValue(values, *count);
+		return averageValue(values, *count);
+	}
+	else
+		return value;
 }
+
+
 
 #define NumCornerDynamics 4096
 typedef struct {
@@ -744,8 +768,49 @@ int trackWidth = 150;
 
 int lastCompletedLaps = 0;
 r3e_float32 lastSpeed = 0.0f;
+long lastSound = 0;
 
-BOOL collectTelemetry() {
+BOOL triggerUSOSBeep(char* soundsDirectory, char* audioDevice, double usos) {
+	BOOL sound = TRUE;
+	char wavFile[255];
+
+	strcpy_s(wavFile, 255, soundsDirectory);
+	strcpy_s(wavFile + strlen(soundsDirectory), 255 - strlen(soundsDirectory), "");
+
+	if (usos < oversteerHeavyThreshold)
+		strcpy_s(wavFile + strlen(soundsDirectory), 255 - strlen(soundsDirectory), "\\Oversteer Heavy.wav");
+	else if (usos < oversteerMediumThreshold)
+		strcpy_s(wavFile + strlen(soundsDirectory), 255 - strlen(soundsDirectory), "\\Oversteer Medium.wav");
+	else if (usos < oversteerLightThreshold)
+		strcpy_s(wavFile + strlen(soundsDirectory), 255 - strlen(soundsDirectory), "\\Oversteer Light.wav");
+	else if (usos > understeerHeavyThreshold)
+		strcpy_s(wavFile + strlen(soundsDirectory), 255 - strlen(soundsDirectory), "\\Understeer Heavy.wav");
+	else if (usos > understeerMediumThreshold)
+		strcpy_s(wavFile + strlen(soundsDirectory), 255 - strlen(soundsDirectory), "\\Understeer Medium.wav");
+	else if (usos > understeerLightThreshold)
+		strcpy_s(wavFile + strlen(soundsDirectory), 255 - strlen(soundsDirectory), "\\Understeer Light.wav");
+	else
+		sound = FALSE;
+
+	if (sound) {
+		if (audioDevice) {
+			char buffer[512];
+
+			strcpy_s(buffer, 512, "acousticFeedback:");
+			strcpy_s(buffer + strlen("acousticFeedback:"), 512 - strlen("acousticFeedback:"), wavFile);
+
+			sendAnalyzerMessage(buffer);
+		}
+		else
+			PlaySoundA(wavFile, NULL, SND_FILENAME | SND_ASYNC);
+
+		return TRUE;
+	}
+	else
+		return FALSE;
+}
+
+BOOL collectTelemetry(char* soundsDirectory, char* audioDevice, BOOL calibrate) {
 	int playerIdx = getPlayerIndex();
 
 	if (map_buffer->game_paused || (map_buffer->all_drivers_data_1[playerIdx].in_pitlane != 0))
@@ -762,10 +827,10 @@ BOOL collectTelemetry() {
 	smoothValue(recentGLongs, &recentGLongsCount, acceleration);
 
 	r3e_float64 angularVelocity = smoothValue(recentRealAngVels, &recentRealAngVelsCount,
-		(float)map_buffer->player.local_angular_velocity.z);
+		(float)map_buffer->player.local_angular_velocity.y);
 	r3e_float64 steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
 	r3e_float64 steerAngleRadians = -steeredAngleDegs / 57.2958;
-	r3e_float64 wheelBaseMeter = (float)wheelbase / 10;
+	r3e_float64 wheelBaseMeter = (float)wheelbase / 100;
 	r3e_float64 radius = wheelBaseMeter / steerAngleRadians;
 	r3e_float64 perimeter = radius * PI * 2;
 	r3e_float64 perimeterSpeed = lastSpeed / 3.6;
@@ -789,21 +854,37 @@ BOOL collectTelemetry() {
 		
 		corner_dynamics cd = { map_buffer->car_speed * 3.6f, 0, map_buffer->completed_laps, phase };
 
-
 		if (fabs(angularVelocity * 57.2958) > 0.1) {
-			r3e_float64 slip = fabs(idealAngularVelocity) - fabs(angularVelocity);
+			r3e_float64 slip = fabs(idealAngularVelocity - angularVelocity);
 
-			if (FALSE)
-				if (steerAngle > 0) {
-					if (angularVelocity < idealAngularVelocity)
+			if (steerAngle > 0) {
+				if (angularVelocity > 0)
+				{
+					if (calibrate)
 						slip *= -1;
+					else
+						slip = (oversteerHeavyThreshold - 1) / 57.2989;
 				}
-				else {
-					if (angularVelocity > idealAngularVelocity)
+				else if (angularVelocity < idealAngularVelocity)
+					slip *= -1;
+			}
+			else {
+				if (angularVelocity < 0)
+				{
+					if (calibrate)
 						slip *= -1;
+					else
+						slip = (oversteerHeavyThreshold - 1) / 57.2989;
 				}
+				else if (angularVelocity > idealAngularVelocity)
+					slip *= -1;
+			}
 
-			cd.usos = slip * 57.2989 * 10;
+			cd.usos = slip * 57.2989 * 1;
+
+			if ((strlen(soundsDirectory) > 0) && (long)GetTickCount() > (lastSound + 300))
+				if (triggerUSOSBeep(soundsDirectory, audioDevice, cd.usos))
+					lastSound = GetTickCount();
 
 			if (FALSE) {
 				char fileName[512];
@@ -816,6 +897,8 @@ BOOL collectTelemetry() {
 					fprintf(output, "%f  %f  %f  %f  %f  %f  %f  %f\n", steerAngle, steeredAngleDegs, steerAngleRadians, lastSpeed, idealAngularVelocity, angularVelocity, slip, cd.usos);
 
 					fclose(output);
+					
+					Sleep(200);
 				}
 			}
 		}
@@ -1150,6 +1233,9 @@ int main(int argc, char* argv[])
 	BOOL analyzeTelemetry = FALSE;
 	long counter = 0;
 
+	char* soundsDirectory = "";
+	char* audioDevice = NULL;
+
 	if (argc > 1) {
 		mapTrack = (strcmp(argv[1], "-Map") == 0);
 		calibrateTelemetry = (strcmp(argv[1], "-Calibrate") == 0);
@@ -1174,6 +1260,13 @@ int main(int argc, char* argv[])
 				lowspeedThreshold = atoi(argv[9]);
 				wheelbase = atoi(argv[10]);
 				trackWidth = atoi(argv[11]);
+
+				if (argc > 12) {
+					soundsDirectory = argv[12];
+
+					if (argc > 13)
+						audioDevice = argv[13];
+				}
 			}
 		}
 		else if (positionTrigger) {
@@ -1198,7 +1291,7 @@ int main(int argc, char* argv[])
 
 		if (mapped_r3e) {
 			if (analyzeTelemetry) {
-				if (collectTelemetry()) {
+				if (collectTelemetry(soundsDirectory, audioDevice, calibrateTelemetry)) {
 					if (remainder(counter, 20) == 0)
 						writeTelemetry(calibrateTelemetry);
 				}

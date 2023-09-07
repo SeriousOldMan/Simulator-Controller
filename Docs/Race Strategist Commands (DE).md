@@ -92,8 +92,28 @@ Announcements=Wetterwarnungen
 	[{Gib mir den, Gib mir bitte den, Sag mir den, Sag mir bitte den, Wie ist der} Abstand zu {dem Wagen, der Position} hinter mir, Wie groß ist die Lücke zu {dem Wagen, der Position} hinter mir]
 
 	[{Gib mir den, Gib mir bitte den, Sag mir den, Sag mir bitte den, Wie ist der} Abstand zum führenden Wagen, Wie groß ist {die Lücke, der Abstand} zum {Führenden, führenden Wagen, ersten Platz}]
+	
+	[{Gib mir den, Gib mir bitte den, Sag mir den, Sag mir bitte den, Wie ist der} Abstand {zu, zur, zum} {Wagen, Wagen Nummer, Nummer} (Number), Wie groß ist {die Lücke, der Abstand} {zu, zur, zum} {Wagen, Wagen Nummer, Nummer} (Number)]
+	
+	[(KannstDu) (Mir) den {Fahrernamen, Fahrernamen im Wagen} vor mir {durchgeben, sagen}, Wie heißt der {Fahrer, Fahrer im Wagen} vor mir, Wie ist der Name des {Fahrers, Fahrers im Wagen} vor mir]
 
-	[(KannstDu) (Mir) die {Rundenzeiten, Zeiten} durchgeben, Gib (Mir) die {Rundenzeiten, Zeiten}, Wie sind die {Rundenzeiten, Zeiten}, Welche {Rundenzeiten, Zeiten} fahren wir]
+	[(KannstDu) (Mir) den {Fahrernamen, Fahrernamen im Wagen} hinter mir {durchgeben, sagen}, Wie heißt der {Fahrer, Fahrer im Wagen} hinter mir, Wie ist der Name des {Fahrers, Fahrers im Wagen} hinter mir]
+
+	[(KannstDu) (Mir) die {Fahrzeugklasse, Klasse des Wagens} vor mir {durchgeben, sagen}, Wie ist {Fahrzeugklasse, Klasse des Wagens} vor mir]
+
+	[(KannstDu) (Mir) die {Fahrzeugklasse, Klasse des Wagens} hinter mir {durchgeben, sagen}, Wie ist {Fahrzeugklasse, Klasse des Wagens} hinter mir]
+
+	[(KannstDu) (Mir) die {Pokalkategorie, Pokalkategorie des Wagens} vor mir {durchgeben, sagen}, Wie ist {Pokalkategorie, Pokalkategorie des Wagens} vor mir]
+
+	[(KannstDu) (Mir) die {Pokalkategorie, Pokalkategorie des Wagens} hinter mir {durchgeben, sagen}, Wie ist {Pokalkategorie, Pokalkategorie des Wagens} hinter mir]
+
+	[(KannstDu) (Mir) die {Rundenzeit, letzte Rundenzeit, Zeit, letzte Zeit} {des, von} {Wagens, Wagens Nummer, Nummer} (Number) {durchgeben, sagen}, {Gib, Sag} (Mir) die die {Rundenzeit, letzte Rundenzeit, Zeit, letzte Zeit} {des, von} {Wagens, Wagens Nummer, Nummer} (Number)]
+
+	[(KannstDu) (Mir) die {Rundenzeit, letzte Rundenzeit, Zeit, letzte Zeit} von Position (Number) {durchgeben, sagen}, {Gib, Sag} (Mir) die die {Rundenzeit, letzte Rundenzeit, Zeit, letzte Zeit} von Position (Number)]
+
+	[(KannstDu) (Mir) {die, meine} {Rundenzeit, letzte Rundenzeit, Zeit, letzte Zeit} {durchgeben, sagen}, {Gib, Sag} (Mir) {die, meine} {Rundenzeit, letzte Rundenzeit, Zeit, letzte Zeit}, Wie ist {die, meine} {Rundenzeit, letzte Rundenzeit, Zeit, letzte Zeit}]
+
+	[(KannstDu) (Mir) die {Rundenzeiten, Zeiten} {durchgeben, sagen}, {Gib, Sag} (Mir) die {Rundenzeiten, Zeiten}, Wie sind die {Rundenzeiten, Zeiten}, Welche {Rundenzeiten, Zeiten} fahren wir]
 	
 	[(KannstDu) (Mir) die Anzahl der {Wagen, Fahrzeuge} {durchgeben, durchgeben die noch auf der Strecke sind, durchgeben die noch in der Session sind, durchgeben die noch aktiv sind}, Wie viele {Wagen, Fahrzeuge} {sind, sind noch} {aktiv, auf der Strecke, in der Session}]
 
@@ -112,3 +132,5 @@ Announcements=Wetterwarnungen
 	[Wann ist {der, der nächste} {Boxenstopp, Boxenstopp geplant}, Wann soll ich an die Box kommen, {In welcher, Für welche} Runde ist {der, der nächste} Boxenstopp geplant, (KannstDu) (Mir) sagen {wann ich an die Box kommen soll, der nächste Boxenstopp geplant ist, in welcher Runde der nächste Boxenstopp geplant ist, für welche Runde der nächste Boxenstopp geplant ist}]
 	
 	[(KannstDu) eine neue Strategie entwickeln, (KannstDu) die Strategie {überarbeiten, anpassen}, Wir brauchen eine neue Strategie]
+	
+	[{Wir haben Full, Full} Course Yellow. Was {soll, können} {ich, wir} tun, {Wir haben Full, Full} Course Yellow. {Soll, Sollen} {ich, wir} {jetz an, an} die {Box kommen, Box}]

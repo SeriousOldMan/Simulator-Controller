@@ -801,16 +801,16 @@ class Plugin extends ConfigurationItem {
 
 	Arguments[asText := false] {
 		Get {
-			local argument, values, result
+			local argument, value, result
 
 			if asText {
 				result := []
 
-				for argument, values in this.Arguments
-					if (values == "")
+				for argument, value in this.Arguments
+					if (value == "")
 						result.Push(argument)
 					else
-						result.Push(argument . ": " . values)
+						result.Push(argument . ": " . value)
 
 				return values2String("; ", result*)
 			}
@@ -852,7 +852,7 @@ class Plugin extends ConfigurationItem {
 	}
 
 	saveToConfiguration(configuration) {
-		local descriptor, arguments, key, value
+		local descriptor, arguments, key, value, result, argument, values
 
 		super.saveToConfiguration(configuration)
 
@@ -864,8 +864,18 @@ class Plugin extends ConfigurationItem {
 			if (descriptor.Length > 0) {
 				arguments := this.computeArgments(descriptor[3])
 
-				for key, value in this.Arguments[true]
+				for key, value in this.Arguments
 					arguments[key] := value
+
+				result := []
+
+				for argument, values in arguments
+					if (values == "")
+						result.Push(argument)
+					else
+						result.Push(argument . ": " . values)
+
+				return values2String("; ", result*)
 			}
 			else
 				arguments := this.Arguments[true]

@@ -841,6 +841,10 @@ class SetupWizard extends ConfiguratorPanel {
 		showProgress({progress: ++this.ProgressCount, color: "Green", title: translate("Starting Setup Wizard")
 					, message: translate("Starting Configuration Engine...")})
 
+		loop this.Count
+			if this.Steps.Has(A_Index)
+				this.Steps[A_Index].startSetup()
+
 		viewers := []
 
 		for ignore, viewer in this.WizardWindow
@@ -925,7 +929,10 @@ class SetupWizard extends ConfiguratorPanel {
 						FileMove(kUserConfigDirectory "Simulator Configuration.ini", kUserConfigDirectory "Simulator Configuration.ini.bak", 1)
 
 					if FileExist(kUserConfigDirectory . "Simulator Settings.ini") {
-						settings := readMultiMap(kUserConfigDirectory . "Simulator Settings.ini")
+						if this.Initialize
+							settings := newMultiMap()
+						else
+							settings := readMultiMap(kUserConfigDirectory . "Simulator Settings.ini")
 
 						FileMove(kUserConfigDirectory . "Simulator Settings.ini"
 							   , kUserConfigDirectory . "Simulator Settings.ini.bak", 1)
@@ -1018,7 +1025,8 @@ class SetupWizard extends ConfiguratorPanel {
 	}
 
 	getSimulatorConfiguration() {
-		local configuration := readMultiMap(kUserConfigDirectory . "Simulator Configuration.ini")
+		local configuration := (this.Initialize ? newMultiMap()
+												: readMultiMap(kUserConfigDirectory . "Simulator Configuration.ini"))
 
 		this.saveToConfiguration(configuration)
 
@@ -2402,6 +2410,9 @@ class StepWizard extends ConfiguratorPanel {
 			}
 
 		return true
+	}
+
+	startSetup() {
 	}
 
 	updateState() {

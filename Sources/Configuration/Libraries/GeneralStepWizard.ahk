@@ -350,6 +350,8 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		local code, language, configuration, voiceControlConfiguration, ignore, section, subConfiguration
 		local path, directory, widget, listBox, uiLanguage, startWithWindows, silentMode
 
+		static first := true
+
 		GeneralStepWizard.sCurrentGeneralStep := this
 
 		super.showPage(page)
@@ -376,14 +378,14 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 
 		if this.SetupWizard.isModuleSelected("Voice Control") {
 			configuration := this.SetupWizard.getSimulatorConfiguration()
-			voiceControlConfiguration := readMultiMap(kUserHomeDirectory . "Setup\Voice Control Configuration.ini")
 
-			for ignore, section in ["Voice Control"] {
-				subConfiguration := getMultiMapValues(voiceControlConfiguration, section, false)
+			if (this.SetupWizard.Initialize || !first) {
+				voiceControlConfiguration := readMultiMap(kUserHomeDirectory . "Setup\Voice Control Configuration.ini")
 
-				if subConfiguration
-					setMultiMapValues(configuration, section, subConfiguration)
+				addMultiMapValues(configuration, voiceControlConfiguration)
 			}
+
+			first := false
 
 			if (getMultiMapValue(configuration, "Voice Control", "SoX Path", "") = "") {
 				path := wizard.softwarePath("SoX")
@@ -721,16 +723,27 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 
 	openFormatsEditor() {
 		local window := this.Window
-		local configuration := readMultiMap(kUserHomeDirectory . "Setup\Formats Configuration.ini")
-		local editor := FormatsEditor(configuration)
+		local configuration, editor
+
+		static first := true
+
+		if (this.SetupWizard.Initialize || !first)
+			configuration := readMultiMap(kUserHomeDirectory . "Setup\Formats Configuration.ini")
+		else
+			configuration := kSimulatorConfiguration
+
+		editor := FormatsEditor(configuration)
 
 		window.Block()
 
 		try {
 			configuration := editor.editFormats(window)
 
-			if configuration
+			if configuration {
+				first := false
+
 				writeMultiMap(kUserHomeDirectory . "Setup\Formats Configuration.ini", configuration)
+			}
 		}
 		finally {
 			window.Unblock()

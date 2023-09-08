@@ -5,7 +5,7 @@
      - A new navigation menu at the bottom of the window allows you to go to each configuration step quickly.
      - It now supports a kind of quick configuration, which allow especially new users to create a useful configuration very fast. See the extended documentation of the [quick start guide](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Quick-Start-Guide) for more information.
 	 - Full configuration of the *Names*, *Languages* and *Voices* of the Race Assistants is now possible in the "Basic" configuration page-
-	 - When a new configuration is being created, current changes made by the user since in other application, for example in the settings of "Simulator Startup", will be preserved, if possible.
+	 - When a new configuration is being created, some of the changes made by the user in other application, for example in the settings of "Simulator Startup", will be preserved, if possible.
 	 - The presets "Names and voices of Assistants", "Different Speaker Voices" and "Mode Automation" have been removed, since they are no longer needed. If such a preset is in use in your configuration, it will still be active, until you remove it.
 	 - The "Push-To-Talk Behaviour" preset has been deprecated as well. This option is now available in the standard voice control configuration.
 	 - All presets with search images for *Assetto Corsa Competizione* has been removed, since they are no longer needed.

@@ -644,7 +644,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	getCarName(carID) {
-		local carDB, data
+		local carDB
 
 		static lastCarID := false
 		static lastCarName := false
@@ -663,7 +663,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	getClassName(classID) {
-		local classDB, data
+		local classDB
 
 		static lastClassID := false
 		static lastClassName := false

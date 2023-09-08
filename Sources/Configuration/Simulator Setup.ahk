@@ -632,6 +632,22 @@ class SetupWizard extends ConfiguratorPanel {
 			}
 		}
 
+		gotoStep(*) {
+			local language := getLanguage()
+			local stepName := this.Control["stepDropDown"].Text
+			local step
+
+			loop {
+				step := this.Steps[A_Index]
+
+				if (StrReplace(getMultiMapValue(this.Definition, "Setup." . step.Step, step.Step . ".Subtitle." . language), "...", "") = stepName) {
+					this.showPage(step, 1)
+
+					break
+				}
+			}
+		}
+
 		wizardGui := SetupWizard.SetupWindow(this)
 
 		this.Window := wizardGui
@@ -675,6 +691,8 @@ class SetupWizard extends ConfiguratorPanel {
 
 		wizardGui.Add("Text", "x16 y580 w85 h23 Y:Move +0x200", translate("Language"))
 		wizardGui.Add("DropDownList", "x100 y580 w75 Y:Move Choose" . chosen . "  VlanguageDropDown", collect(choices, translate)).OnEvent("Change", chooseLanguage)
+
+		wizardGui.Add("DropDownList", "x230 y580 w260 X:Move(0.5) Y:Move VstepDropDown").OnEvent("Change", gotoStep)
 
 		wizardGui.Add("Button", "x535 y580 w80 h23 Y:Move X:Move Disabled VfinishButton", translate("Finish")).OnEvent("Click", finishSetup)
 		wizardGui.Add("Button", "x620 y580 w80 h23 Y:Move X:Move", translate("Cancel")).OnEvent("Click", cancelSetup)
@@ -1281,16 +1299,35 @@ class SetupWizard extends ConfiguratorPanel {
 	}
 
 	updateState(unlock := true) {
+		local language := getLanguage()
+		local pages := []
+		local currentStep := false
+		local step
+
 		this.KnowledgeBase.produce()
 
 		if this.Debug[kDebugKnowledgeBase]
 			this.dumpKnowledgeBase(this.KnowledgeBase)
 
 		loop this.Count
-			if this.Steps.Has(A_Index)
-				this.Steps[A_Index].updateState()
+			if this.Steps.Has(A_Index) {
+				step := this.Steps[A_Index]
+
+				step.updateState()
+
+				if step.Active {
+					pages.Push(StrReplace(getMultiMapValue(this.Definition, "Setup." . step.Step, step.Step . ".Subtitle." . language), "...", ""))
+
+					if (step = this.Step)
+						currentStep := pages.Length
+				}
+			}
 
 		if (this.WizardWindow && !this.PageSwitch) {
+			this.Control["stepDropDown"].Delete()
+			this.Control["stepDropDown"].Add(pages)
+			this.Control["stepDropDown"].Choose(currentStep ? currentStep : 1)
+
 			if this.isFirstPage() {
 				this.Control["firstPageButton"].Enabled := false
 				this.Control["previousPageButton"].Enabled := false

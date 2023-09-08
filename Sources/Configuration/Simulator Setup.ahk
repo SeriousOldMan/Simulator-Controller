@@ -637,15 +637,16 @@ class SetupWizard extends ConfiguratorPanel {
 			local stepName := this.Control["stepDropDown"].Text
 			local step
 
-			loop {
-				step := this.Steps[A_Index]
+			loop this.Count
+				if this.Steps.Has(A_Index) {
+					step := this.Steps[A_Index]
 
-				if (StrReplace(getMultiMapValue(this.Definition, "Setup." . step.Step, step.Step . ".Subtitle." . language), "...", "") = stepName) {
-					this.showPage(step, 1)
+					if (StrReplace(getMultiMapValue(this.Definition, "Setup." . step.Step, step.Step . ".Subtitle." . language), "...", "") = stepName) {
+						this.showPage(step, 1)
 
-					break
+						break
+					}
 				}
-			}
 		}
 
 		wizardGui := SetupWizard.SetupWindow(this)
@@ -801,7 +802,7 @@ class SetupWizard extends ConfiguratorPanel {
 	show(reset := false) {
 		local wizardWindow := this.WizardWindow
 		local helpWindow := this.HelpWindow
-		local x, y, w, h, posX
+		local x, y, w, h, posX, page, step
 
 		if getWindowPosition("Simulator Setup.Help", &x, &y)
 			helpWindow.Show("x" . x . " y" . y)
@@ -832,8 +833,20 @@ class SetupWizard extends ConfiguratorPanel {
 		else
 			this.nextPage()
 
-		loop getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini"), "Simulator Setup", "StartPage", 0)
-			this.nextPage()
+		page := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini"), "Simulator Setup", "StartPage", 0)
+
+		if isInteger(page) {
+			loop page
+				this.nextPage()
+		}
+		else
+			loop this.Count
+				if this.Steps.Has(A_Index) {
+					step := this.Steps[A_Index]
+
+					if (step.Active && (step.Step = page))
+						this.showPage(step, 1)
+				}
 	}
 
 	hide() {

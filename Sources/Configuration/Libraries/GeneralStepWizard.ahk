@@ -39,7 +39,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 
 	Pages {
 		Get {
-			return (this.SetupWizard.QuickSetup ? 0 : 1)
+			return (this.SetupWizard.BasicSetup ? 0 : 1)
 		}
 	}
 

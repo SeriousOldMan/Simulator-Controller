@@ -60,7 +60,7 @@ class ControllerStepWizard extends StepWizard {
 
 	Pages {
 		Get {
-			return (this.SetupWizard.QuickSetup ? 0 : (this.SetupWizard.isModuleSelected("Controller") ? 1 : 0))
+			return (this.SetupWizard.BasicSetup ? 0 : (this.SetupWizard.isModuleSelected("Controller") ? 1 : 0))
 		}
 	}
 

@@ -19,7 +19,7 @@ class InstallationStepWizard extends StepWizard {
 
 	Pages {
 		Get {
-			return (this.SetupWizard.QuickSetup ? 0 : Ceil(this.Definition.Length / 3))
+			return (this.SetupWizard.BasicSetup ? 0 : Ceil(this.Definition.Length / 3))
 		}
 	}
 

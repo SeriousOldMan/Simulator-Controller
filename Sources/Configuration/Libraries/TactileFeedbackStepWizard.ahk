@@ -30,7 +30,7 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 		Get {
 			local wizard := this.SetupWizard
 
-			if (wizard.isModuleSelected("Controller") && wizard.isModuleSelected("Tactile Feedback") && !wizard.QuickSetup)
+			if (wizard.isModuleSelected("Controller") && wizard.isModuleSelected("Tactile Feedback") && !wizard.BasicSetup)
 				return 1
 			else
 				return 0

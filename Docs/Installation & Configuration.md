@@ -153,7 +153,7 @@ Replace *X* with the number of the page you want to jump to on startup. As an al
 | Step | Name              |
 |------|-------------------|
 | 1    | Start             |
-| 2    | Quick             |
+| 2    | Basic             |
 | 3    | Modules           |
 | 4    | Installation      |
 | 5    | Applications      |

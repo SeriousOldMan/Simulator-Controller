@@ -146,7 +146,7 @@ class SetupWizard extends ConfiguratorPanel {
 	iStep := 0
 	iPage := 0
 
-	iQuickSetup := true
+	iBasicSetup := true
 
 	iPresets := false
 	iInitialize := false
@@ -373,13 +373,13 @@ class SetupWizard extends ConfiguratorPanel {
 		}
 	}
 
-	QuickSetup {
+	BasicSetup {
 		Get {
-			return (this.iQuickSetup && (this.isQuickSetupAvailable() || (this.iQuickSetup = "Force")))
+			return (this.iBasicSetup && (this.isBasicSetupAvailable() || (this.iBasicSetup = "Force")))
 		}
 
 		Set {
-			return (this.iQuickSetup := value)
+			return (this.iBasicSetup := value)
 		}
 	}
 
@@ -510,13 +510,13 @@ class SetupWizard extends ConfiguratorPanel {
 		this.iInitialize := initialize
 
 		if initialize {
-			this.QuickSetup := true
+			this.BasicSetup := true
 
 			this.addPatchFile("Settings", "%kUserHomeDirectory%Setup\Settings Patch.ini")
 			this.addPatchFile("Configuration", "%kUserHomeDirectory%Setup\Configuration Patch.ini")
 		}
 		else
-			this.QuickSetup := false
+			this.BasicSetup := false
 
 		showProgress({progress: ++this.ProgressCount, message: translate("Starting AI Kernel...")})
 
@@ -1357,7 +1357,7 @@ class SetupWizard extends ConfiguratorPanel {
 			}
 			else {
 				this.Control["nextPageButton"].Enabled := true
-				this.Control["lastPageButton"].Enabled := !this.QuickSetup
+				this.Control["lastPageButton"].Enabled := !this.BasicSetup
 				this.Control["finishButton"].Enabled := false
 			}
 
@@ -1596,7 +1596,7 @@ class SetupWizard extends ConfiguratorPanel {
 		return this.KnowledgeBase.getValue("Application." . application . ".Path", false)
 	}
 
-	isQuickSetupAvailable() {
+	isBasicSetupAvailable() {
 		return (this.isModuleSelected("Voice Control") && (this.loadPresets().Length = 0))
 	}
 
@@ -3227,7 +3227,7 @@ initializeSimulatorSetup()
 ;;;                          Wizard Include Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "Libraries\QuickStepWizard.ahk"
+#Include "Libraries\BasicStepWizard.ahk"
 #Include "Libraries\ModulesStepWizard.ahk"
 #Include "Libraries\InstallationStepWizard.ahk"
 #Include "Libraries\ApplicationsStepWizard.ahk"

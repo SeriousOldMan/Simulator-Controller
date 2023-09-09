@@ -1031,9 +1031,12 @@ class RaceSpotter extends GridRaceAssistant {
 			this.iRunning := values.Running
 
 		if (values.HasProp("Session") && (values.Session == kSessionFinished)) {
+			this.iOverallGridPosition := false
+			this.iClassGridPosition := false
+
 			this.iRunning := false
 
-			this.initializeHistory
+			this.initializeHistory()
 		}
 	}
 
@@ -2902,7 +2905,7 @@ class RaceSpotter extends GridRaceAssistant {
 			this.updateConfigurationValues({UseTalking: getMultiMapValue(settings, "Assistant.Spotter", "Voice.UseTalking", true)})
 
 		this.initializeAnnouncements(data)
-		this.initializeGridPosition(data, true)
+		this.initializeGridPosition(data)
 
 		if (formationLap && this.Speaker) {
 			speaker.beginTalk()

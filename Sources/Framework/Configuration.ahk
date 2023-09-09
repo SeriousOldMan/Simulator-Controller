@@ -875,7 +875,7 @@ class Plugin extends ConfigurationItem {
 					else
 						result.Push(argument . ": " . values)
 
-				return values2String("; ", result*)
+				arguments := values2String("; ", result*)
 			}
 			else
 				arguments := this.Arguments[true]

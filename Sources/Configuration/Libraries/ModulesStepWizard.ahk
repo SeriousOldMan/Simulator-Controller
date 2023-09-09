@@ -409,6 +409,10 @@ class P2TConfiguration extends NamedPreset {
 		super.__New(name)
 	}
 
+	getArguments() {
+		return concatenate(super.getArguments(), Array(kResourcesDirectory . "Setup\Presets\P2T Configuration.ini"))
+	}
+
 	install(wizard, edit := true) {
 	}
 

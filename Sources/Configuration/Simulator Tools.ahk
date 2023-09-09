@@ -1572,6 +1572,9 @@ updateConfigurationForV530() {
 
 		writeMultiMap(kUserHomeDirectory . "Setup\Setup.data", configuration)
 	}
+
+	deleteFile(kUserHomeDirectory . "Setup\Settings Patch.ini")
+	deleteFile(kUserHomeDirectory . "Setup\Simulator Settings.ini")
 }
 
 updateConfigurationForV500() {

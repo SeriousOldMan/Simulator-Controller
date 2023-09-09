@@ -647,6 +647,10 @@ class RaceStrategist extends GridRaceAssistant {
 			Get {
 				return this.iFullCourseYellow
 			}
+
+			Set {
+				return (this.iFullCourseYellow := value)
+			}
 		}
 
 		__New(strategyManager, configuration, driver, fullCourseYellow) {
@@ -668,7 +672,7 @@ class RaceStrategist extends GridRaceAssistant {
 			if this.StrategyManager.StrategyManager.unplannedPitstop(pitstopNr, currentLap, &remainingLaps)
 				return remainingLaps
 			else
-				return super.calcRemainingLaps(remainingStintLaps, remainingTyreLaps, remainingFuel, fuelConsumption)
+				return super.calcRemainingLaps(pitstopNr, currentLap, remainingStintLaps, remainingTyreLaps, remainingFuel, fuelConsumption)
 		}
 	}
 
@@ -1381,7 +1385,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 		if ((this.Session == kSessionRace) && (getMultiMapValue(data, "Stint Data", "Laps", 0) <= 1)
 										   && FileExist(kUserConfigDirectory . "Race.strategy")) {
-			theStrategy := Strategy(this, readMultiMap(kUserConfigDirectory . "Race.strategy"))
+			theStrategy := RaceStrategist.RaceStrategy(this, readMultiMap(kUserConfigDirectory . "Race.strategy"), SessionDatabase.ID, false)
 
 			applicableStrategy := false
 
@@ -2203,7 +2207,7 @@ class RaceStrategist extends GridRaceAssistant {
 		if newStrategy {
 			if (this.Session == kSessionRace) {
 				if !isObject(newStrategy)
-					newStrategy := Strategy(this, readMultiMap(newStrategy))
+					newStrategy := Strategy(this, readMultiMap(newStrategy), SessionDatabase.ID, false)
 
 				this.clearStrategy()
 

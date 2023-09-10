@@ -726,43 +726,47 @@ class PositionInfo {
 
 			this.reset(sector, true, true)
 		}
-		else if (newObserved != oldObserved) {
-			this.reset(sector, true, true)
-
-			this.iObserved := newObserved
-
-			/*
-			if (((trackAhead && standingsBehind) || (trackBehind && standingsAhead))
-			 && (this.Car.LastLap = this.Spotter.DriverCar.LastLap)) {
-				; Can happen in ACC due to asynchronous position updating
-
+		else if (!(InStr(newObserved, "SA") && InStr(oldObserved, "SA"))
+			  && !(InStr(newObserved, "SB") && InStr(oldObserved, "SB"))
+			  && !(InStr(newObserved, "F") && InStr(oldObserved, "F"))) {
+			if (newObserved != oldObserved) {
 				this.reset(sector, true, true)
-
-				this.iObserved := ""
-			}
-			else if ((standingsBehind && InStr(oldObserved, "SA")) || (standingsAhead && InStr(oldObserved, "SB"))
-				  || (trackBehind && InStr(oldObserved, "TA")) || (trackAhead && InStr(oldObserved, "TB"))) {
-				; Drivers car has been overtaken
-
-				this.reset(sector, true, true)
-
-				this.iObserved := ""
-			}
-			else {
-				if ((trackBehind || trackAhead) && (!InStr(oldObserved, "TB") && !InStr(oldObserved, "TA"))) {
-					; Change in car ahead or behind due to an overtake
-
-					this.reset(sector, true, true)
-				}
-				else
-					this.Reported := false
 
 				this.iObserved := newObserved
+
+				/*
+				if (((trackAhead && standingsBehind) || (trackBehind && standingsAhead))
+				 && (this.Car.LastLap = this.Spotter.DriverCar.LastLap)) {
+					; Can happen in ACC due to asynchronous position updating
+
+					this.reset(sector, true, true)
+
+					this.iObserved := ""
+				}
+				else if ((standingsBehind && InStr(oldObserved, "SA")) || (standingsAhead && InStr(oldObserved, "SB"))
+					  || (trackBehind && InStr(oldObserved, "TA")) || (trackAhead && InStr(oldObserved, "TB"))) {
+					; Drivers car has been overtaken
+
+					this.reset(sector, true, true)
+
+					this.iObserved := ""
+				}
+				else {
+					if ((trackBehind || trackAhead) && (!InStr(oldObserved, "TB") && !InStr(oldObserved, "TA"))) {
+						; Change in car ahead or behind due to an overtake
+
+						this.reset(sector, true, true)
+					}
+					else
+						this.Reported := false
+
+					this.iObserved := newObserved
+				}
+				*/
 			}
-			*/
+			else if ((newObserved = "") || (newObserved = "L"))
+				this.rebase(sector)
 		}
-		else if ((newObserved = "") || (newObserved = "L"))
-			this.rebase(sector)
 	}
 }
 
@@ -1031,9 +1035,6 @@ class RaceSpotter extends GridRaceAssistant {
 			this.iRunning := values.Running
 
 		if (values.HasProp("Session") && (values.Session == kSessionFinished)) {
-			this.iOverallGridPosition := false
-			this.iClassGridPosition := false
-
 			this.iRunning := false
 
 			this.initializeHistory()
@@ -2906,7 +2907,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 		this.initializeAnnouncements(data)
 
-		this.initializeGridPosition(data, getMultiMapValue(data, "Stint Data", "Laps", 0) == 0)
+		this.initializeGridPosition(data, formationLap)
 
 		if (formationLap && this.Speaker) {
 			speaker.beginTalk()

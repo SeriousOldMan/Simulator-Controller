@@ -2905,7 +2905,8 @@ class RaceSpotter extends GridRaceAssistant {
 			this.updateConfigurationValues({UseTalking: getMultiMapValue(settings, "Assistant.Spotter", "Voice.UseTalking", true)})
 
 		this.initializeAnnouncements(data)
-		this.initializeGridPosition(data)
+
+		this.initializeGridPosition(data, getMultiMapValue(data, "Stint Data", "Laps", 0) == 0)
 
 		if (formationLap && this.Speaker) {
 			speaker.beginTalk()

@@ -1256,13 +1256,19 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	loadStrategy(facts, strategy, lastLap := false, lastPitstop := false, lastPitstopLap := false) {
-		local fullCourseYellow := strategy.FullCourseYellow
 		local pitstopWindow := (this.Settings ? getMultiMapValue(this.Settings, "Strategy Settings", "Strategy.Window.Considered", 3) : 3)
-		local pitstop, count, ignore, pitstopLap, pitstopMaxLap, first, rootStrategy, pitstopDeviation
+		local fullCourseYellow, pitstop, count, ignore, pitstopLap, pitstopMaxLap, first, rootStrategy, pitstopDeviation
 
-		strategy.RunningPitstops := 0
-		strategy.RunningLaps := 0
-		strategy.RunningTime := 0
+		if !strategy.HasProp("RunningPitstops")
+			strategy.RunningPitstops := 0
+		if !strategy.HasProp("RunningLaps")
+			strategy.RunningLaps := 0
+		if !strategy.HasProp("RunningTime")
+			strategy.RunningTime := 0
+		if !strategy.HasProp("FullCourseYellow")
+			strategy.FullCourseYellow := false
+
+		fullCourseYellow := strategy.FullCourseYellow
 
 		facts["Strategy.Name"] := strategy.Name
 		facts["Strategy.Version"] := strategy.Version
@@ -2207,7 +2213,7 @@ class RaceStrategist extends GridRaceAssistant {
 		if newStrategy {
 			if (this.Session == kSessionRace) {
 				if !isObject(newStrategy)
-					newStrategy := Strategy(this, readMultiMap(newStrategy), SessionDatabase.ID, false)
+					newStrategy := RaceStrategist.RaceStrategy(this, readMultiMap(newStrategy), SessionDatabase.ID, false)
 
 				this.clearStrategy()
 

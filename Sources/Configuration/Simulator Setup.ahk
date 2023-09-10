@@ -1680,6 +1680,7 @@ class SetupWizard extends ConfiguratorPanel {
 						definition := string2Values("|", definition)
 						skip := false
 						root := ""
+						path := ""
 
 						for ignore, target in string2Values(";", definition[3]) {
 							target := string2Values(":", target)
@@ -1688,6 +1689,12 @@ class SetupWizard extends ConfiguratorPanel {
 								this.locateSoftware(target[2])
 
 								root := (this.isSoftwareInstalled(target[2]) && this.softwarePath(target[2]))
+
+								if !root {
+									this.locateApplication(target[2])
+
+									root := (this.isApplicationInstalled(target[2]) && this.applicationPath(target[2]))
+								}
 
 								if root
 									SplitPath(root, , &root)
@@ -1705,7 +1712,10 @@ class SetupWizard extends ConfiguratorPanel {
 						if !skip {
 							showProgress({progress: progressCount++, color: "Green", message: translate("Installing ") . plugin . translate("...")})
 
-							path := (root . substituteVariables(path))
+							if (Trim(root) != "")
+								path := ((Trim(path) = "") ? root : (root . "\" . substituteVariables(path)))
+							else
+								path := substituteVariables(path)
 							source := string2Values(":", definition[2])
 
 							SplitPath(substituteVariables(source[2]), &name)

@@ -100,6 +100,10 @@ getTableCSS(window) {
 			border: thin solid #%frameColor%;
 		}
 
+		.th-std {
+			vertical-align: top;
+		}
+
 		.td-std {
 			border-left: thin solid #%frameColor%;
 			border-right: thin solid #%frameColor%;
@@ -973,7 +977,7 @@ systemMonitor(command := false, arguments*) {
 				widgets.Push(false)
 		}
 
-		if (sessionState.Count > 0) {
+		if true || (sessionState.Count > 0) {
 			html := "<style>" . getTableCSS(systemMonitorGui) . " div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { text-align: center; font-size: 12px; background-color: #" . systemMonitorGui.Theme.TableColor["Header"] . "; } td {vertical-align: top } </style><table>"
 
 			widgets := []

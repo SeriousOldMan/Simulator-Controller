@@ -1,4 +1,4 @@
-## 5.3.0.0-release 09/15/23 (planned - latest, maybe earlier)
+## 5.3.0.0-release 09/13/23 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. The "Simulator Setup" application has seen a major overhaul:
@@ -48,6 +48,10 @@
   24. [Experts Only] New [controller action functions "targetListener", "startActivation", "startListen" and "stopListen"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions), which let you control the listen mode of voice control from your custom scripts. There are also three new icons in the Stream Deck icon set, which can represent these custom actions.
   25. [Experts Only] *Normal* controller functions (for example "Button", "Dial", etc.) can now also call a [controller action function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) directly. This opens endless possibilities for controller hardware configuration.
   26. [Developers Only] MultiMap files can now "#Include" other MultiMap files.
+  27. New car models for "Setup Workbench":
+      - Assetto Corsa
+        - Alfa Romeo MiTo QV
+		- Alfa Romeo Giulietta QV
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-530). You will find there a description how to change your configuration to use the new capabilities of "Simulator Setup".
 

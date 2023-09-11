@@ -2196,7 +2196,7 @@ class GridRaceAssistant extends RaceAssistant {
 
 	getNumber(words) {
 		local numbers := []
-		local ignore, candidate, fragment
+		local ignore, candidate, fragment, number
 
 		for ignore, candidate in words {
 			if (InStr(candidate, "#") == 1)

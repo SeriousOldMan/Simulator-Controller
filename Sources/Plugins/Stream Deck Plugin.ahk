@@ -624,11 +624,11 @@ handleStreamDeckMessage(category, data) {
 
 	switch descriptor[1], false {
 		case k1WayToggleType, k2WayToggleType:
-			switchToggle(descriptor[1], descriptor[2], (command.Length > 1) ? command[2] : "On")
+			switchToggle(descriptor[1], descriptor[2], (command.Length > 1) ? command[2] : "On", false)
 		case kButtonType:
-			pushButton(descriptor[2])
+			pushButton(descriptor[2], false)
 		case kDialType:
-			rotateDial(descriptor[2], command[2])
+			rotateDial(descriptor[2], command[2], false)
 		default:
 			throw "Unknown controller function type (" . descriptor[1] . ") detected in handleStreamDeckMessage..."
 	}

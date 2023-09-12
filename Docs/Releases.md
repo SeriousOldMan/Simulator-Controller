@@ -43,7 +43,7 @@
   19. New test mode in the voice configuration let you now test your changes to pitch, speed or distortion in place.
   21. The special configuration to choose between the different possible behaviours of the *Push To Talk* button (formerly handled by the "P2T Configuration.ini" file) has been moved to the standard configuration. This is automatically handled by "Simulator Setup" and "Simulator Configuration".
   21. Automatic updates for versions prior to 4.0.0 are no longer possible.
-  22. Migrated the sources to AHK 2.07.
+  22. Migrated the sources to AHK 2.08.
   23. [Experts Only] The grammar files has been split up and modularized.
   24. [Experts Only] New [controller action functions "targetListener", "startActivation", "startListen" and "stopListen"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions), which let you control the listen mode of voice control from your custom scripts. There are also three new icons in the Stream Deck icon set, which can represent these custom actions.
   25. [Experts Only] *Normal* controller functions (for example "Button", "Dial", etc.) can now also call a [controller action function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) directly. This opens endless possibilities for controller hardware configuration.

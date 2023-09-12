@@ -1791,7 +1791,7 @@ class RaceSpotter extends GridRaceAssistant {
 		local trackBehind := false
 		local leader := false
 		local focused := false
-		local situation, opponentType, driverPitstops, carPitstops
+		local situation, opponentType, driverPitstops, carPitstops, carInfo
 		local driverPosition, driverLapTime, slowerCar, carPosition, delta, lapTimeDifference, key
 
 		this.getPositionInfos(&standingsAhead, &standingsBehind, &trackAhead, &trackBehind, &leader, &focused, true)

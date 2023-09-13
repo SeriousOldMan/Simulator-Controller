@@ -263,7 +263,7 @@ downloadUserDatabases(directory) {
 
 		updateProgress("Extracting " . idName . "...")
 
-		RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . directory . fileName . "' -DestinationPath '" . wDirectory . "'", , "Hide")
+		RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . directory . fileName . "' -DestinationPath '" . wDirectory . "' -Force", , "Hide")
 
 		deleteFile(directory . fileName)
 

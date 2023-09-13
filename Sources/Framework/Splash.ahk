@@ -65,52 +65,58 @@ showSplash(image, alwaysOnTop := true, video := false) {
 	else {
 		image := getFileName(image, kUserSplashMediaDirectory, kSplashMediaDirectory)
 
-		if (++splashCounter > 10) {
-			splashCounter := 1
+		if FileExist(image) {
+			if (++splashCounter > splashGuis.Length) {
+				splashCounter := 1
 
-			if splashGuis[splashCounter] {
-				splashGuis[splashCounter].Destroy()
+				if splashGuis[splashCounter] {
+					splashGuis[splashCounter].Destroy()
 
-				splashGuis[splashCounter] := false
+					splashGuis[splashCounter] := false
+				}
 			}
-		}
 
-		title := substituteVariables(translate(getMultiMapValue(kSimulatorConfiguration, "Splash Window", "Title", "")))
-		subTitle := substituteVariables(translate(getMultiMapValue(kSimulatorConfiguration, "Splash Window", "Subtitle", "")))
+			title := substituteVariables(translate(getMultiMapValue(kSimulatorConfiguration, "Splash Window", "Title", "")))
+			subTitle := substituteVariables(translate(getMultiMapValue(kSimulatorConfiguration, "Splash Window", "Subtitle", "")))
 
-		SplitPath(image, , , &extension)
+			SplitPath(image, , , &extension)
 
-		splashGui := Window({Options: "+E0x02000000"})
+			splashGui := Window({Options: "+E0x02000000"})
 
-		splashGuis[splashCounter] := splashGui
+			splashGuis[splashCounter] := splashGui
 
-		splashGui.SetFont("s10 Bold", "Arial")
+			splashGui.SetFont("s10 Bold", "Arial")
 
-		splashGui.Add("Text", "x10 w780 Center", title)
+			splashGui.Add("Text", "x10 w780 Center", title)
 
-		if (extension = "GIF")
-			videoPlayer := splashGui.Add("GIFViewer", "x10 y30 w780 h439 vvideoPlayer", image)
-		else
-			splashGui.Add("Picture", "x10 y30 w780 h439", image)
+			if (extension = "GIF")
+				videoPlayer := splashGui.Add("GIFViewer", "x10 y30 w780 h439 vvideoPlayer", image)
+			else
+				splashGui.Add("Picture", "x10 y30 w780 h439", image)
 
-		splashGui.SetFont("s8 Norm", "Arial")
+			splashGui.SetFont("s8 Norm", "Arial")
 
-		splashGui.Add("Text", "x10 y474 w780 Center", subTitle)
+			splashGui.Add("Text", "x10 y474 w780 Center", subTitle)
 
-		if alwaysOnTop
-			splashGui.Opt("+AlwaysOnTop")
+			if alwaysOnTop
+				splashGui.Opt("+AlwaysOnTop")
 
-		splashGui.Show("x" . Round((A_ScreenWidth - 800) / 2) . " y" . Round(A_ScreenHeight / 4) . " AutoSize NoActivate")
+			splashGui.Show("x" . Round((A_ScreenWidth - 800) / 2) . " y" . Round(A_ScreenHeight / 4) . " AutoSize NoActivate")
 
-		if videoPlayer
-			videoPlayer.Start()
+			if videoPlayer
+				videoPlayer.Start()
 
-		if ((lastSplash > 0) && splashGuis[lastSplash]) {
-			splashGuis[lastSplash].Destroy()
+			if ((lastSplash > 0) && splashGuis[lastSplash]) {
+				splashGuis[lastSplash].Destroy()
 
-			splashGuis[lastSplash] := false
+				splashGuis[lastSplash] := false
+			}
+
+			return true
 		}
 	}
+
+	return false
 }
 
 hideSplash() {
@@ -136,7 +142,7 @@ rotateSplash(alwaysOnTop := true) {
 }
 
 showSplashScreen(splashScreen := unset, songHandler := false, alwaysOnTop := true) {
-	local song, video, duration, type
+	local song, video, duration, type, result
 
 	static images := false
 	static number := 1
@@ -151,9 +157,9 @@ showSplashScreen(splashScreen := unset, songHandler := false, alwaysOnTop := tru
 			number := 1
 
 		if (number <= numImages)
-			showSplash(images[number++], onTop)
-
-		return
+			return showSplash(images[number++], onTop)
+		else
+			return false
 	}
 
 	song := false
@@ -164,12 +170,12 @@ showSplashScreen(splashScreen := unset, songHandler := false, alwaysOnTop := tru
 		song := getMultiMapValue(kSimulatorConfiguration, "Splash Screens", splashScreen . ".Song", false)
 		video := getMultiMapValue(kSimulatorConfiguration, "Splash Screens", splashScreen . ".Video")
 
-		showSplash(video, true)
+		result := showSplash(video, true)
 
 		if song
 			songHandler(song)
 
-		return
+		return result
 	}
 	else if (type == "Picture Carousel") {
 		duration := getMultiMapValue(kSimulatorConfiguration, "Splash Screens", splashScreen . ".Duration", 5000)
@@ -185,15 +191,19 @@ showSplashScreen(splashScreen := unset, songHandler := false, alwaysOnTop := tru
 	numImages := images.Length
 	onTop := alwaysOnTop
 
-	showSplashScreen()
+	if showSplashScreen() {
+		SetTimer(showSplashScreen, duration)
 
-	SetTimer(showSplashScreen, duration)
+		if song {
+			vSongIsPlaying := true
 
-	if song {
-		vSongIsPlaying := true
+			songHandler(song)
+		}
 
-		songHandler(song)
+		return true
 	}
+	else
+		return false
 }
 
 hideSplashScreen() {

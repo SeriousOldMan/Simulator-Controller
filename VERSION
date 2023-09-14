@@ -3,7 +3,7 @@ Version=5.3.1.0-dev
 Target=5.3.1.0-release
 Date=09/13/2023
 Download=
-Changes=Downloadable components for installation and update process
+Changes=Downloadable components for installation and update process, Fixed list update when adding a setting in "Session Database"
 [Release]
 Version=5.3.0.0-release
 Date=09/13/2023
@@ -20,7 +20,7 @@ Media.Content=Setup
 Setup.Version=5.3.0
 Setup.Download=https://www.dropbox.com/scl/fi/vkpggadd4rd1w9h2ow1dv/Setup.zip?rlkey=hqr342uzalm1dqd6v710ccjr3&dl=1
 [Current]
-Type=Release
+Type=Development
 [Version]
 Development=5.3.0.0-release
 Release=5.3.0.0-release

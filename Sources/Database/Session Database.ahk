@@ -400,96 +400,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 
 		chooseSetting(*) {
-			Task.startTask(chooseSettingAsync)
-		}
-
-		chooseSettingAsync() {
-			local selected, setting, value, settings, section, key, ignore, candidate
-			local labels, descriptor, type
-
-			selected := editor.SettingsListView.GetNext(0)
-
-			if !selected
-				return
-
-			setting := editor.SettingsListView.GetText(selected, 1)
-			value := editor.SettingsListView.GetText(selected, 2)
-
-			settings := editor.getAvailableSettings(selected)
-
-			section := false
-			key := false
-
-			for ignore, candidate in settings
-				if (setting = editor.getSettingLabel(candidate[1], candidate[2])) {
-					section := candidate[1]
-					key := candidate[2]
-
-					break
-				}
-
-			labels := []
-
-			for ignore, descriptor in settings
-				labels.Push(editor.getSettingLabel(descriptor[1], descriptor[2]))
-
-			bubbleSort(&labels)
-
-			editorGui["settingDropDown"].Delete()
-			editorGui["settingDropDown"].Add(labels)
-			editorGui["settingDropDown"].Choose(inList(labels, setting))
-
-			ignore := false
-
-			type := editor.getSettingType(section, key, &ignore)
-
-			if isObject(type) {
-				editorGui["settingValueEdit"].Visible := false
-				editorGui["settingValueText"].Visible := false
-				editorGui["settingValueCheck"].Visible := false
-				editorGui["settingValueDropDown"].Visible := true
-				editorGui["settingValueDropDown"].Enabled := true
-
-				labels := collect(type, translate)
-
-				editorGui["settingValueDropDown"].Delete()
-				editorGui["settingValueDropDown"].Add(labels)
-				editorGui["settingValueDropDown"].Choose(inList(labels, value))
-			}
-			else if (type = "Boolean") {
-				editorGui["settingValueDropDown"].Visible := false
-				editorGui["settingValueEdit"].Visible := false
-				editorGui["settingValueText"].Visible := false
-				editorGui["settingValueCheck"].Visible := true
-				editorGui["settingValueCheck"].Enabled := true
-
-				if (editorGui["settingValueCheck"].Value != value)
-					editorGui["settingValueCheck"].Value := (value = "x") ? true : false
-			}
-			else if (type = "Text") {
-				editorGui["settingValueDropDown"].Visible := false
-				editorGui["settingValueCheck"].Visible := false
-				editorGui["settingValueEdit"].Visible := false
-				editorGui["settingValueText"].Visible := true
-				editorGui["settingValueText"].Enabled := true
-
-				if (editorGui["settingValueText"].Text != value)
-					editorGui["settingValueText"].Text := value
-			}
-			else {
-				editorGui["settingValueDropDown"].Visible := false
-				editorGui["settingValueCheck"].Visible := false
-				editorGui["settingValueText"].Visible := false
-				editorGui["settingValueEdit"].Visible := true
-				editorGui["settingValueEdit"].Enabled := true
-
-				editor.iSelectedValue := value
-
-				if (editorGui["settingValueEdit"].Text != value)
-					editorGui["settingValueEdit"].Text := value
-			}
-
-			editor.updateState()
+			Task.startTask(ObjBindMethod(this, "chooseSetting"))
 		}
 
 		addSetting(*) {
@@ -2462,7 +2373,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	saveTrackAutomation() {
 		local window := this.Window
-		local trackAutomation, origin, newTrackAutomation
+		local trackAutomation, origin, newTrackAutomation, row
 
 		trackAutomation := this.SelectedTrackAutomation
 
@@ -2484,7 +2395,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			this.TrackAutomations.Push(newTrackAutomation)
 
-			this.TrackAutomationsListView.Modify(this.TrackAutomationsListView.Add("Select", trackAutomation.Name, trackAutomation.Actions.Length), "Vis")
+			row := this.TrackAutomationsListView.Add("", trackAutomation.Name, trackAutomation.Actions.Length)
+
+			this.TrackAutomationsListView.Modify(row, "Vis Select")
 		}
 
 		this.TrackAutomationsListView.ModifyCol()
@@ -3780,9 +3693,98 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		return settings
 	}
 
+	chooseSetting() {
+		local selected, setting, value, settings, section, key, ignore, candidate
+		local labels, descriptor, type
+
+		selected := this.SettingsListView.GetNext(0)
+
+		if !selected
+			return
+
+		setting := this.SettingsListView.GetText(selected, 1)
+		value := this.SettingsListView.GetText(selected, 2)
+
+		settings := this.getAvailableSettings(selected)
+
+		section := false
+		key := false
+
+		for ignore, candidate in settings
+			if (setting = this.getSettingLabel(candidate[1], candidate[2])) {
+				section := candidate[1]
+				key := candidate[2]
+
+				break
+			}
+
+		labels := []
+
+		for ignore, descriptor in settings
+			labels.Push(this.getSettingLabel(descriptor[1], descriptor[2]))
+
+		bubbleSort(&labels)
+
+		this.Control["settingDropDown"].Delete()
+		this.Control["settingDropDown"].Add(labels)
+		this.Control["settingDropDown"].Choose(inList(labels, setting))
+
+		ignore := false
+
+		type := this.getSettingType(section, key, &ignore)
+
+		if isObject(type) {
+			this.Control["settingValueEdit"].Visible := false
+			this.Control["settingValueText"].Visible := false
+			this.Control["settingValueCheck"].Visible := false
+			this.Control["settingValueDropDown"].Visible := true
+			this.Control["settingValueDropDown"].Enabled := true
+
+			labels := collect(type, translate)
+
+			this.Control["settingValueDropDown"].Delete()
+			this.Control["settingValueDropDown"].Add(labels)
+			this.Control["settingValueDropDown"].Choose(inList(labels, value))
+		}
+		else if (type = "Boolean") {
+			this.Control["settingValueDropDown"].Visible := false
+			this.Control["settingValueEdit"].Visible := false
+			this.Control["settingValueText"].Visible := false
+			this.Control["settingValueCheck"].Visible := true
+			this.Control["settingValueCheck"].Enabled := true
+
+			if (this.Control["settingValueCheck"].Value != value)
+				this.Control["settingValueCheck"].Value := (value = "x") ? true : false
+		}
+		else if (type = "Text") {
+			this.Control["settingValueDropDown"].Visible := false
+			this.Control["settingValueCheck"].Visible := false
+			this.Control["settingValueEdit"].Visible := false
+			this.Control["settingValueText"].Visible := true
+			this.Control["settingValueText"].Enabled := true
+
+			if (this.Control["settingValueText"].Text != value)
+				this.Control["settingValueText"].Text := value
+		}
+		else {
+			this.Control["settingValueDropDown"].Visible := false
+			this.Control["settingValueCheck"].Visible := false
+			this.Control["settingValueText"].Visible := false
+			this.Control["settingValueEdit"].Visible := true
+			this.Control["settingValueEdit"].Enabled := true
+
+			this.iSelectedValue := value
+
+			if (this.Control["settingValueEdit"].Text != value)
+				this.Control["settingValueEdit"].Text := value
+		}
+
+		this.updateState()
+	}
+
 	addSetting(section, key, value) {
 		local window := this.Window
-		local type, ignore, display
+		local type, ignore, display, row
 
 		window.Block()
 
@@ -3804,7 +3806,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			else
 				display := value
 
-			this.SettingsListView.Modify(this.SettingsListView.Add("Select", this.getSettingLabel(section, key), display), "Vis")
+			row := this.SettingsListView.Add("", this.getSettingLabel(section, key), display)
+
+			this.SettingsListView.Modify(row, "Vis Select")
 
 			this.SettingsListView.ModifyCol()
 
@@ -3814,6 +3818,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			SettingsDatabase().setSettingValue(this.SelectedSimulator
 											 , this.SelectedCar["*"], this.SelectedTrack["*"], this.SelectedWeather["*"]
 											 , section, key, value)
+
+			this.chooseSetting()
 
 			this.selectSettings(false)
 			this.updateState()

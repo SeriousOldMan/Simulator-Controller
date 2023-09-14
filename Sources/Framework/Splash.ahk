@@ -37,6 +37,7 @@ playSplashScreenSong(songFile) {
 		SoundPlay(songFile)
 }
 
+
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
@@ -88,10 +89,11 @@ showSplash(image, alwaysOnTop := true, video := false) {
 
 		splashGui.Add("Text", "x10 w780 Center", title)
 
-		if (extension = "GIF")
-			videoPlayer := splashGui.Add("GIFViewer", "x10 y30 w780 h439 vvideoPlayer", image)
-		else
-			splashGui.Add("Picture", "x10 y30 w780 h439", image)
+		if FileExist(image)
+			if (extension = "GIF")
+				videoPlayer := splashGui.Add("GIFViewer", "x10 y30 w780 h439 vvideoPlayer", image)
+			else
+				splashGui.Add("Picture", "x10 y30 w780 h439", image)
 
 		splashGui.SetFont("s8 Norm", "Arial")
 
@@ -118,6 +120,8 @@ hideSplash() {
 }
 
 rotateSplash(alwaysOnTop := true) {
+	local image
+
 	static number := 1
 	static images := false
 	static numImages := 0
@@ -131,8 +135,12 @@ rotateSplash(alwaysOnTop := true) {
 	if (number > numImages)
 		number := 1
 
-	if (number <= numImages)
-		showSplash(images[number++], alwaysOnTop)
+	if (number <= numImages) {
+		image := images[number++]
+
+		if FileExist(image)
+			showSplash(image, alwaysOnTop)
+	}
 }
 
 showSplashScreen(splashScreen := unset, songHandler := false, alwaysOnTop := true) {
@@ -166,7 +174,7 @@ showSplashScreen(splashScreen := unset, songHandler := false, alwaysOnTop := tru
 
 		showSplash(video, true)
 
-		if song
+		if (song && FileExist(song))
 			songHandler(song)
 
 		return
@@ -189,7 +197,7 @@ showSplashScreen(splashScreen := unset, songHandler := false, alwaysOnTop := tru
 
 	SetTimer(showSplashScreen, duration)
 
-	if song {
+	if (song && FileExist(song)) {
 		vSongIsPlaying := true
 
 		songHandler(song)

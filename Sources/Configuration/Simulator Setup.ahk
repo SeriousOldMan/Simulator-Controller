@@ -3050,7 +3050,7 @@ installZIP(path, application) {
 	DirCreate(A_Temp . "\Simulator Controller\Temp")
 	DirCreate(kUserHomeDirectory . "Programs")
 
-	RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . kHomeDirectory . path . "' -DestinationPath '" . A_Temp . "\Simulator Controller\Temp'", , "Hide")
+	RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . kHomeDirectory . path . "' -DestinationPath '" . A_Temp . "\Simulator Controller\Temp' -Force", , "Hide")
 
 	FileCopy(A_Temp . "\Simulator Controller\Temp\" . application, kUserHomeDirectory . "Programs", 1)
 

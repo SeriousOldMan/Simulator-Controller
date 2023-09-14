@@ -135,12 +135,12 @@ downloadSimulatorController() {
 					break
 				}
 				catch Any as exception {
-					logError(exception)
-
-					error := true
+					error := exception
 				}
 
 			if error {
+				logError(error, true)
+
 				OnMessage(0x44, translateOkButton)
 				MsgBox(translate("The version repository is currently unavailable. Please try again later."), translate("Error"), 262160)
 				OnMessage(0x44, translateOkButton, 0)
@@ -159,10 +159,10 @@ downloadSimulatorController() {
 			deleteDirectory(A_Temp . "\Simulator Controller")
 
 			try {
-				RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\Simulator Controller.zip' -DestinationPath '" . A_Temp . "\Simulator Controller'", , "Hide")
+				RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\Simulator Controller.zip' -DestinationPath '" . A_Temp . "\Simulator Controller' -Force", , "Hide")
 			}
 			catch Any as exception {
-				logError(exception)
+				logError(exception, true)
 
 				OnMessage(0x44, translateOkButton)
 				MsgBox(translate("The version repository is currently unavailable. Please try again later."), translate("Error"), 262160)
@@ -188,7 +188,7 @@ downloadSimulatorController() {
 				RunWait("Powershell -Command Get-ChildItem -Path '.' | Unblock-File", , "Hide")
 			}
 			catch Any as exception {
-				logError(exception)
+				logError(exception, true)
 
 				OnMessage(0x44, translateOkButton)
 				MsgBox(translate("An error occured while starting the automatic instalation due to Windows security restrictions. You can try a manual installation."), translate("Error"), 262160)

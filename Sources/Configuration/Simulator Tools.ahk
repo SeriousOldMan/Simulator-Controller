@@ -420,8 +420,57 @@ checkInstallation() {
 	global gProgressCount
 
 	local installLocation := ""
-	local installInfo, quiet, options, msgResult
+	local installInfo, quiet, options, msgResult, hasSplash
 	local install, index, options, isNew, packageLocation, ignore, directory, currentDirectory
+
+	downloadComponents(packageLocation, installLocation) {
+		global gProgressCount
+
+		local packageInfo := readMultiMap(packageLocation . "\VERSION")
+		local installInfo := readMultiMap(installLocation . "\VERSION")
+		local error := false
+		local version, type, ignore, component, part, path
+
+		for ignore, component in string2Values(",", getMultiMapValue(packageInfo, "Components", "Components"))
+			if ((packageLocation != installLocation)
+			 || (VerCompare(getMultiMapValue(packageInfo, "Components", component . ".Version")
+						  , getMultiMapValue(installInfo, "Components", component . ".Version", "0.0.0")) > 0)) {
+				try {
+					showProgress({progress: (gProgressCount += 2)
+								, message: translate("Downloading") . A_Space . component . A_Space . translate("files...")})
+
+					Download(getMultiMapValue(packageInfo, "Components", component . ".Download"), A_Temp)
+
+					showProgress({progress: (gProgressCount += 2)
+								, message: translate("Extracting") . A_Space . component . A_Space . translate("files...")})
+
+					RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\" . component . ".zip' -DestinationPath '" . packageLocation . "\" . getMultiMapValue(packageInfo, "Components", component . ".Path") . "' -Force", , "Hide")
+
+					showProgress({progress: (gProgressCount += 5)})
+				}
+				catch Any as exception {
+					logError(exception, true)
+
+					error := true
+				}
+			}
+			else
+				for ignore, part in string2Values(",", getMultiMapValue(packageInfo, "Components", component . ".Content")) {
+					path := ("\" . getMultiMapValue(packageInfo, "Components", component . ".Path") . "\" . part)
+					type := FileExist(installLocation . path)
+
+					if (type && InStr(type, "D"))
+						DirCopy(installLocation . path, packageLocation . path, 1)
+					else if type
+						FileCopy(installLocation . path, packageLocation, 1)
+				}
+
+		if error {
+			OnMessage(0x44, translateOkButton)
+			MsgBox(translate("Cannot download additional files, because the version repository is currently unavailable. Please start `"Simulator Download`" again later."), translate("Error"), 262160)
+			OnMessage(0x44, translateOkButton, 0)
+		}
+	}
 
 	try {
 		installLocation := RegRead("HKLM\" . kUninstallKey, "InstallLocation")
@@ -463,7 +512,7 @@ checkInstallation() {
 				  , DeleteUserFiles: false}
 
 		if (quiet || uninstallOptions(options)) {
-			showSplashScreen("McLaren 720s GT3 Pictures")
+			hasSplash := showSplashScreen("McLaren 720s GT3 Pictures")
 
 			gProgressCount := 0
 
@@ -507,7 +556,9 @@ checkInstallation() {
 
 			Sleep(1000)
 
-			hideSplashScreen()
+			if hasSplash
+				hideSplashScreen()
+
 			hideProgress()
 
 			ExitApp(0)
@@ -609,30 +660,32 @@ checkInstallation() {
 						Sleep(1000)
 					}
 
+					downloadComponents(packageLocation, installLocation)
+
 					if options.StartMenuShortcuts {
-						showProgress({progress: gProgressCount, message: translate("Creating Start menu shortcuts...")})
+						showProgress({progress: gProgressCount++, message: translate("Creating Start menu shortcuts...")})
 
 						createShortcuts(A_StartMenu, installLocation)
 					}
 					else {
-						showProgress({progress: gProgressCount, message: translate("Removing Start menu shortcuts...")})
+						showProgress({progress: gProgressCount++, message: translate("Removing Start menu shortcuts...")})
 
 						deleteShortcuts(A_StartMenu)
 					}
 
 					if options.DesktopShortcuts {
-						showProgress({progress: gProgressCount, message: translate("Creating Desktop shortcuts...")})
+						showProgress({progress: gProgressCount++, message: translate("Creating Desktop shortcuts...")})
 
 						createShortcuts(A_Desktop, installLocation)
 					}
 					else {
-						showProgress({progress: gProgressCount, message: translate("Removing Desktop shortcuts...")})
+						showProgress({progress: gProgressCount++, message: translate("Removing Desktop shortcuts...")})
 
 						deleteShortcuts(A_Desktop)
 					}
 
 					if (options.InstallType = "Registry") {
-						showProgress({message: translate("Updating Registry...")})
+						showProgress({progress: gProgressCount++, message: translate("Updating Registry...")})
 
 						writeAppPaths(installLocation)
 						writeUninstallerInfo(installLocation)
@@ -649,7 +702,7 @@ checkInstallation() {
 					writeMultiMap(kUserConfigDirectory . "Simulator Controller.install", installInfo)
 
 					if (installLocation != packageLocation) {
-						showProgress({message: translate("Removing installation files...")})
+						showProgress({progress: gProgressCount++, message: translate("Removing installation files...")})
 
 						if InStr(packageLocation, A_Temp)
 							removeDirectory(packageLocation)

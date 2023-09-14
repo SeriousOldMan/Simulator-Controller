@@ -6062,7 +6062,7 @@ class RaceCenter extends ConfigurationItem {
 			this.iLastPitstopUpdate -= delta
 		}
 
-		loop getMultiMapValue(data, "Position Data", "Car.Count", 0) {
+		loop getMultiMapValue(data, "Position Data", "Car.Count", 0)
 			if (getMultiMapValue(data, "Position Data", "Car." . A_Index . ".InPitlane", false)
 			 || getMultiMapValue(data, "Position Data", "Car." . A_Index . ".InPit", false)) {
 				carID := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".ID", A_Index)
@@ -6080,7 +6080,6 @@ class RaceCenter extends ConfigurationItem {
 						pitstops.Push(RaceCenter.Pitstop(carID, this.iLastPitstopUpdate, lap.Nr))
 				}
 			}
-		}
 	}
 
 	updateStint(stint) {

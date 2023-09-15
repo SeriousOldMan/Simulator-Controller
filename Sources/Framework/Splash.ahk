@@ -203,11 +203,8 @@ showSplashScreen(splashScreen := unset, songHandler := false, alwaysOnTop := tru
 	if showSplashScreen() {
 		SetTimer(showSplashScreen, duration)
 
-		if (song && FileExist(song)) {
-			vSongIsPlaying := true
-
+		if song
 			songHandler(song)
-		}
 
 		return true
 	}

@@ -400,7 +400,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 
 		chooseSetting(*) {
-			Task.startTask(ObjBindMethod(this, "chooseSetting"))
+			this.chooseSetting()
 		}
 
 		addSetting(*) {

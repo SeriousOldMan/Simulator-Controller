@@ -1,26 +1,24 @@
 [Development]
 Version=5.3.1.0-dev
 Target=5.3.1.0-release
-Date=09/13/2023
+Date=09/15/2023
 Download=
 Changes=Downloadable components for installation and update process, Fixed list update when adding a setting in "Session Database"
+Components=Media->5.3.0,Configuration->5.3.0
 [Release]
 Version=5.3.0.0-release
 Date=09/13/2023
 Download=https://cutt.ly/Mwz4gWij;https://www.dropbox.com/scl/fi/cjvc05bl3sk6z72uejaey/Simulator-Controller-5.3.0.0-release.zip?rlkey=ph3n3n43kq12rut1rlqhgdesx&dl=1
 Changes=New page in "Server Administration, Compact database function in "Server Administration", New quick setup method in "Simulator Setup", Spotter informs you about being faster than cars ahead of you, "Mode Automation" preset no longer available, "Names and voices of Assistants" preset no longer available, Simulator settings are preserved when using "Simulator Setup", Names and voices of Assistants can be changed in Quick setup, New general configuration patch in "Simulator Setup", New general settings patch in "Simulator Setup", ACC Pitstop search image presets no longer available in "Simulator Setup", Integrated "P2T Configuration.ini" into "Core Settings.ini", "Practice Center" displays sector times in several places, Voice test mode in the new basic setup page, Voice prelisten mode in general voice configuration, Optimized random distributions, New Strategist voice command for FCY, New controller action "FCYRecommend" for "Race Strategist" plugin, New icon in Stream Deck Icon set for "FCYRecommend" action, Many new voice commands for Spotter and Strategist, New information request actions for Spotter and Strategist incl. new icons in the Stream Deck Icon set, Include clause for multi map files, Refactoring of grammar files, New match rating core settings, "Simulator Startup" can now unblock files, Spotter informes about in which sectors the driver is faster and/or slower than its opponents, New controller action functions "targetListen", "startActivation", "startListen" and "stopListen", No more automatic updates prior to 4.0, Migrated sources to AHK 2.07, Race Center display sector times, Navigation menu for "Simulator Setup", New car models for "Setup Workbench"
 [Components]
-Components=Media,Setup
-Media.Path=Resources
-Media.Content=Splash Media
-Media.Version=5.3.0
-Media.Download=https://www.dropbox.com/scl/fi/s4uchdrhdm0m4giiix86k/Media.zip?rlkey=t9lkkd9nj4koxyaaqa2h6i8nx&dl=1
-Setup.Path=Resources
-Media.Content=Setup
-Setup.Version=5.3.0
-Setup.Download=https://www.dropbox.com/scl/fi/vkpggadd4rd1w9h2ow1dv/Setup.zip?rlkey=hqr342uzalm1dqd6v710ccjr3&dl=1
+Media.5.3.0.Path=Resources
+Media.5.3.0.Content=Splash Media
+Media.5.3.0.Download=https://www.dropbox.com/scl/fi/s4uchdrhdm0m4giiix86k/Media-5.3.0.zip?rlkey=t9lkkd9nj4koxyaaqa2h6i8nx&dl=1
+Configuration.5.3.0.Path=Resources
+Configuration.5.3.0.Content=Setup
+Configuration.5.3.0.Download=https://www.dropbox.com/scl/fi/vkpggadd4rd1w9h2ow1dv/Configuration-5.3.0.zip?rlkey=hqr342uzalm1dqd6v710ccjr3&dl=1
 [Current]
 Type=Development
 [Version]
-Development=5.3.0.0-release
+Development=5.3.1.0-dev
 Release=5.3.0.0-release

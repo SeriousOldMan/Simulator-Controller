@@ -423,28 +423,31 @@ checkInstallation() {
 	local installInfo, quiet, options, msgResult, hasSplash
 	local install, index, options, isNew, packageLocation, ignore, directory, currentDirectory
 
-	downloadComponents(packageLocation, installLocation) {
+	installComponents(packageLocation, installLocation) {
 		global gProgressCount
 
 		local packageInfo := readMultiMap(packageLocation . "\VERSION")
+		local packageType := getMultiMapValue(packageInfo, "Current", "Type")
+		local packageComponents := string2Map(",", "->", getMultiMapValue(packageInfo, packageType, "Components", ""))
 		local installInfo := readMultiMap(installLocation . "\VERSION")
+		local installType := getMultiMapValue(installInfo, "Current", "Type", "Release")
+		local installComponents := string2Map(",", "->", getMultiMapValue(installInfo, installType, "Components", ""))
 		local error := false
-		local version, type, ignore, component, part, path
+		local component, version, type, ignore, part, path
 
-		for ignore, component in string2Values(",", getMultiMapValue(packageInfo, "Components", "Components"))
-			if ((packageLocation != installLocation)
-			 || (VerCompare(getMultiMapValue(packageInfo, "Components", component . ".Version")
-						  , getMultiMapValue(installInfo, "Components", component . ".Version", "0.0.0")) > 0)) {
+		for component, version in packageComponents {
+			if ((packageLocation = installLocation) || !installComponents.Has(component)
+													|| (VerCompare(version, installComponents[component]) > 0)) {
 				try {
 					showProgress({progress: (gProgressCount += 2)
 								, message: translate("Downloading") . A_Space . component . A_Space . translate("files...")})
 
-					Download(getMultiMapValue(packageInfo, "Components", component . ".Download"), A_Temp)
+					Download(getMultiMapValue(packageInfo, "Components", component . "." . version . ".Download"), A_Temp)
 
 					showProgress({progress: (gProgressCount += 2)
 								, message: translate("Extracting") . A_Space . component . A_Space . translate("files...")})
 
-					RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\" . component . ".zip' -DestinationPath '" . packageLocation . "\" . getMultiMapValue(packageInfo, "Components", component . ".Path") . "' -Force", , "Hide")
+					RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\" . component . A_Space . version . ".zip' -DestinationPath '" . packageLocation . "\" . getMultiMapValue(packageInfo, "Components", component . "." . version . ".Path") . "' -Force", , "Hide")
 
 					showProgress({progress: (gProgressCount += 5)})
 				}
@@ -454,9 +457,11 @@ checkInstallation() {
 					error := true
 				}
 			}
-			else
-				for ignore, part in string2Values(",", getMultiMapValue(packageInfo, "Components", component . ".Content")) {
-					path := ("\" . getMultiMapValue(packageInfo, "Components", component . ".Path") . "\" . part)
+			else {
+				version := installComponents[component]
+
+				for ignore, part in string2Values(",", getMultiMapValue(installInfo, "Components", component . "." . version . ".Content")) {
+					path := ("\" . getMultiMapValue(installInfo, "Components", component . "." . version . ".Path") . "\" . part)
 					type := FileExist(installLocation . path)
 
 					if (type && InStr(type, "D"))
@@ -464,6 +469,8 @@ checkInstallation() {
 					else if type
 						FileCopy(installLocation . path, packageLocation, 1)
 				}
+			}
+		}
 
 		if error {
 			OnMessage(0x44, translateOkButton)
@@ -660,7 +667,7 @@ checkInstallation() {
 						Sleep(1000)
 					}
 
-					downloadComponents(packageLocation, installLocation)
+					installComponents(packageLocation, installLocation)
 
 					if options.StartMenuShortcuts {
 						showProgress({progress: gProgressCount++, message: translate("Creating Start menu shortcuts...")})

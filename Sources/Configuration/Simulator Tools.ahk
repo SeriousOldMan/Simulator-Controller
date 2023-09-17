@@ -2887,7 +2887,7 @@ prepareTargets(&buildProgress, updateOnly) {
 	}
 }
 
-startSimulatorTools() {
+startupSimulatorTools() {
 	global gUpdateSettings, gCleanupSettings, gCopySettings, gBuildSettings, gSplashScreen, gTargetConfiguration, gTargetsCount
 
 	local forceExit := GetKeyState("Shift")
@@ -2919,6 +2919,8 @@ startSimulatorTools() {
 			if !editTargets()
 				ExitApp(0)
 	}
+
+	startupApplication()
 
 	if (!kSilentMode && gSplashScreen)
 		showSplashScreen(gSplashScreen, false, false)
@@ -2991,7 +2993,7 @@ cancelBuild() {
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-startSimulatorTools()
+startupSimulatorTools()
 
 
 ;;;-------------------------------------------------------------------------;;;

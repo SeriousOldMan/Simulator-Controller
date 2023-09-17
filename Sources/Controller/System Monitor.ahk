@@ -1817,7 +1817,7 @@ clearOrphaneStateFiles() {
 	}
 }
 
-startSystemMonitor() {
+startupSystemMonitor() {
 	local icon := kIconsDirectory . "Monitoring.ico"
 	local noLaunch, ignore, assistant
 
@@ -1834,6 +1834,8 @@ startSystemMonitor() {
 		deleteFile(kTempDirectory . assistant . " Session.state")
 
 	PeriodicTask(clearOrphaneStateFiles, 60000, kLowPriority).start()
+
+	startupApplication()
 
 	systemMonitor()
 }
@@ -1860,4 +1862,4 @@ monitoringMessageHandler(category, data) {
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-startSystemMonitor()
+startupSystemMonitor()

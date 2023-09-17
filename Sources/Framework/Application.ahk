@@ -22,6 +22,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include "..\Libraries\Task.ahk"
 #Include "..\Libraries\Messages.ahk"
 
 
@@ -248,7 +249,7 @@ startDatabaseSynchronizer() {
 		}
 		catch Any as exception {
 			logError(exception, true)
-			
+
 			dbID := false
 		}
 
@@ -464,6 +465,31 @@ viewHTML(fileName, title := false, x := kUndefined, y := kUndefined, width := 80
 
 	htmlGui.Opt("+AlwaysOnTop")
 	htmlGui.Show("X" . x . " Y" . y . " W" . width . " H" . height . " NoActivate")
+}
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                    Public Function Declaration Section                  ;;;
+;;;-------------------------------------------------------------------------;;;
+
+startupApplication() {
+	local canExit := Task.ExitHandler
+
+	guardExit(*) {
+		if !canExit() {
+			OnMessage(0x44, translateOkButton)
+			MsgBox(translate("Please wait until all tasks have been finished."), translate("Information"), 262192)
+			OnMessage(0x44, translateOkButton, 0)
+
+			return true
+		}
+		else
+			return false
+	}
+
+	Task.ExitHandler := (*) => !guardExit()
+
+	OnExit(guardExit, -1)
 }
 
 

@@ -193,7 +193,7 @@ class SetupWizard extends ConfiguratorPanel {
 		}
 
 		Close(*) {
-			if this.SetupWizard.finishSetup(false)
+			if (this.Closeable && this.SetupWizard.finishSetup(false))
 				ExitApp(0)
 			else
 				return true
@@ -3000,6 +3000,8 @@ startupSimulatorSetup() {
 		hideProgress()
 
 		wizard.show()
+
+		startupApplication()
 
 		try {
 			loop {

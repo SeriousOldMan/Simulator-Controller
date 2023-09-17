@@ -2333,3 +2333,5 @@ initializeSimulatorController()
 startupSimulatorController()
 
 MessageManager.resume()
+
+startupApplication()

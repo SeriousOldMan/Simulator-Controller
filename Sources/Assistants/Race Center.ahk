@@ -12425,3 +12425,5 @@ setTyrePressures(tyreCompound, tyreCompoundColor, flPressure, frPressure, rlPres
 ;;;-------------------------------------------------------------------------;;;
 
 startupRaceCenter()
+
+startupApplication()

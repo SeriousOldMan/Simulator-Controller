@@ -741,7 +741,7 @@ class Window extends Gui {
 
 	Closeable {
 		Get {
-			return this.iCloseable
+			return (this.iCloseable && Task.Exitable)
 		}
 	}
 

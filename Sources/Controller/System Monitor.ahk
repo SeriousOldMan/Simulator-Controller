@@ -519,7 +519,7 @@ systemMonitor(command := false, arguments*) {
 			lastTime := getMultiMapValue(sessionState, "Stint", "Lap.Time.Last", kUndefined)
 
 			if (lastTime != kUndefined)
-				html .= ("<tr><th class=`"th-std th-left`">" . translate("Time Left") . "</th><td class=`"td-wdg`">" . (fuelLow ? "<font color=`"red`">" : "") . displayValue("Time", lastTime * Floor(getMultiMapValue(sessionState, "Stint", "Laps.Remaining.Fuel"))) . (fuelLow ? "</font>" : "") . "</td></tr>")
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Time Left") . "</th><td class=`"td-wdg`">" . (fuelLow ? "<font color=`"red`">" : "") . displayValue("Time", Floor(lastTime * getMultiMapValue(sessionState, "Stint", "Laps.Remaining.Fuel"))) . (fuelLow ? "</font>" : "") . "</td></tr>")
 		}
 		catch Any as exception {
 			logError(exception)

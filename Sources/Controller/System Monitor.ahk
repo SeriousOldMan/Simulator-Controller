@@ -71,7 +71,7 @@ updateDashboard(window, viewer, html := "") {
 	if (html == false)
 		html := " "
 
-	html := ("<html><meta charset='utf-8'><body style='background-color: #" . window.BackColor . "; overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 10px }</style><style> #header { font-size: 12px; } td {vertical-align: top } </style><div>" . html . "</div></body></html>")
+	html := ("<html><meta charset='utf-8'><body style='background-color: #" . window.BackColor . "; overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 10px }</style><style> #header { font-size: 12px; } </style><div>" . html . "</div></body></html>")
 
 	viewer.document.open()
 	viewer.document.write(html)
@@ -983,8 +983,8 @@ systemMonitor(command := false, arguments*) {
 				widgets.Push(false)
 		}
 
-		if (sessionState.Count > 0) {
-			html := "<style>" . getTableCSS(systemMonitorGui) . " div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { text-align: center; font-size: 12px; background-color: #" . systemMonitorGui.Theme.TableColor["Header"] . "; } td {vertical-align: top } </style><table>"
+		if true || (sessionState.Count > 0) {
+			html := "<style>" . getTableCSS(systemMonitorGui) . " div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { text-align: center; font-size: 12px; background-color: #" . systemMonitorGui.Theme.TableColor["Header"] . "; } </style><table>"
 
 			widgets := []
 

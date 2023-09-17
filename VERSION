@@ -1,7 +1,7 @@
 [Development]
 Version=5.3.1.0-dev
 Target=5.3.1.0-release
-Date=09/15/2023
+Date=09/16/2023
 Download=
 Changes=Downloadable components for installation and update process, Fixed list update when adding a setting in "Session Database"
 Components=Media->5.3.0,Configuration->5.3.0

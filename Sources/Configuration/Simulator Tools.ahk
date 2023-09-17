@@ -657,6 +657,8 @@ checkInstallation() {
 						}
 					}
 
+					installComponents(packageLocation, installLocation)
+
 					if (installLocation != packageLocation)
 						copyFiles(packageLocation, installLocation, !isNew)
 					else {
@@ -666,8 +668,6 @@ checkInstallation() {
 
 						Sleep(1000)
 					}
-
-					installComponents(packageLocation, installLocation)
 
 					if options.StartMenuShortcuts {
 						showProgress({progress: gProgressCount++, message: translate("Creating Start menu shortcuts...")})

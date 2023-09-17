@@ -321,13 +321,15 @@ class Application extends ConfigurationItem {
 
 				return result
 			}
-			else {
+			else if (FileExist(exePath) && ((Trim(workingDirectory) != "") && FileExist(workingDirectory))) {
 				Run(exePath, workingDirectory, options, &pid)
 
 				logMessage(kLogInfo, translate("Application ") . application . translate(" started"))
 
 				return pid
 			}
+			else
+				throw "Invalid application path detected..."
 		}
 		catch Any as exception {
 			logError(exception, true)

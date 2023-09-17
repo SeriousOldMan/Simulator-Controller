@@ -1773,9 +1773,15 @@ class RaceSpotter extends GridRaceAssistant {
 
 	cutWarning(lastLap, sector, wasValid, lastWarnings) {
 		local knowledgeBase := this.KnowledgeBase
+		local driverCar := this.DriverCar
 
 		if ((this.Session = kSessionRace) && ((wasValid && !knowledgeBase.getValue("Lap.Valid", true)) || (lastWarnings < knowledgeBase.getValue("Lap.Warnings", 0)))) {
-			this.getSpeaker(true).speakPhrase(((knowledgeBase.getValue("Lap.Warnings", 0) > 2) || (this.DriverCar.InvalidLaps > 3)) ? "RepeatedCut" : "Cut")
+			if (knowledgeBase.getValue("Lap.Warnings", 0) > 2)
+				this.getSpeaker(true).speakPhrase("RepeatedCut")
+			else if driverCar
+				this.getSpeaker(true).speakPhrase((this.DriverCar.InvalidLaps > 3) ? "RepeatedCut" : "Cut")
+			else
+				this.getSpeaker(true).speakPhrase("Cut")
 
 			return true
 		}
@@ -2895,8 +2901,7 @@ class RaceSpotter extends GridRaceAssistant {
 	}
 
 	prepareSession(&settings, &data, formationLap := true) {
-		local speaker := this.getSpeaker()
-		local fragments := speaker.Fragments
+		local speaker, fragments
 		local facts, weather, airTemperature, trackTemperature, weatherNow, weather10Min, weather30Min, driver
 		local position, length, facts
 
@@ -2910,6 +2915,9 @@ class RaceSpotter extends GridRaceAssistant {
 		this.initializeGridPosition(data, formationLap)
 
 		if (formationLap && this.Speaker) {
+			speaker := this.getSpeaker()
+			fragments := speaker.Fragments
+
 			speaker.beginTalk()
 
 			try {

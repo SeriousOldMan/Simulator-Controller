@@ -1,9 +1,9 @@
 [Development]
 Version=5.3.1.0-dev
 Target=5.3.1.0-release
-Date=09/16/2023
+Date=09/17/2023
 Download=
-Changes=Downloadable components for installation and update process, Fixed list update when adding a setting in "Session Database"
+Changes=Downloadable components for installation and update process, Fixed list update when adding a setting in "Session Database", Fixed rare off-by-one error for tyre set selection in ACC, Fixed Engineer to be optimistic in reporting the remaining laps on fuel, Fixed time in log files to be in 24 hour format, Fixed a couple of bugs in "Race Center" related to sector times, Migrated to AHK 2.09, Display time left on fuel in fuel widget in "Session Monitor"
 Components=Media->5.3.0,Configuration->5.3.0
 [Release]
 Version=5.3.0.0-release

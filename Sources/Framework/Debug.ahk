@@ -138,7 +138,7 @@ logMessage(logLevel, message, monitor := true) {
 				throw "Unknown log level (" . logLevel . ") encountered in logMessage..."
 		}
 
-		logTime := FormatTime(time, "dd.MM.yy hh:mm:ss tt")
+		logTime := FormatTime(time, "dd.MM.yy HH:mm:ss")
 
 		fileName := kLogsDirectory . script . " Logs.txt"
 		logLine := "[" level . " - " . logTime . "]: " . message . "`n"

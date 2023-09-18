@@ -2923,7 +2923,7 @@ class PracticeCenter extends ConfigurationItem {
 			lap.SectorsTime := sectorTimes
 		}
 		else
-			lap.SectorsTime := "-"
+			lap.SectorsTime := ["-"]
 
 		this.iWeather := lap.Weather
 		this.iAirTemperature := lap.AirTemperature
@@ -3187,17 +3187,16 @@ class PracticeCenter extends ConfigurationItem {
 		local telemetryDB := this.TelemetryDatabase
 		local electronicsTable := this.TelemetryDatabase.Database.Tables["Electronics"]
 		local tyresTable := this.TelemetryDatabase.Database.Tables["Tyres"]
-		local driverID := lap.Run.Driver.ID
+		local driver := lap.Run.Driver
 		local telemetry, telemetryData, pressuresData, temperaturesData, wearData, recentLap, tyreLaps
-		local newRun, oldRun
+		local newRun, oldRun, driverID
 
 		this.initializeSimulator(simulator, car, track)
 
+		driverID := ((driver != "-") ? driver.ID : SessionDatabase.ID)
+
 		if (pitstop && (this.Control["runModeDropDown"].Value = 2))
 			this.newRun(lap.Nr, true)
-
-		if (this.Control["tyreCompoundDropDown"].Value = 2) {
-		}
 
 		if (lap.Pressures = "-,-,-,-")
 			lap.Pressures := pressures
@@ -4102,6 +4101,8 @@ class PracticeCenter extends ConfigurationItem {
 				newLap.SectorsTime := ["-"]
 			else if isObject(newLap.SectorsTime)
 				newLap.SectorsTime := collect(newLap.SectorsTime, displayNullValue)
+			else
+				newLap.SectorsTime := collect(string2Values(",", newLap.SectorsTime), displayNullValue)
 
 			if isNull(newLap.FuelConsumption)
 				newLap.FuelConsumption := "-"
@@ -5303,6 +5304,16 @@ class PracticeCenter extends ConfigurationItem {
 			if (report = "Running") {
 				this.iSelectedRun := false
 				this.iSelectedDrivers := false
+
+				names := [translate("All")]
+
+				window["runDropDown"].Delete()
+				window["runDropDown"].Add(names)
+				window["runDropDown"].Choose(1)
+
+				window["driverDropDown"].Delete()
+				window["driverDropDown"].Add(names)
+				window["driverDropDown"].Choose(1)
 			}
 			else {
 				runs := []

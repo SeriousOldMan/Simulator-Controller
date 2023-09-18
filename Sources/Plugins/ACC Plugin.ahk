@@ -263,7 +263,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 		super.__New(controller, name, simulator, configuration)
 
-		if (this.Active || isDebug()) {
+		if (this.Active || (isDebug() && isDevelopment())) {
 			this.iPitstopMode := this.findMode(kPitstopMode)
 
 			if this.iChatMode

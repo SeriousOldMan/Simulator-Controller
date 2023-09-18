@@ -72,7 +72,7 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 	__New(controller, name, simulator, configuration := false) {
 		super.__New(controller, name, simulator, configuration)
 
-		if (this.Active || isDebug()) {
+		if (this.Active || (isDebug() && isDevelopment())) {
 			this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", "I")
 
 			this.iPreviousOptionHotkey := this.getArgumentValue("previousOption", "Z")

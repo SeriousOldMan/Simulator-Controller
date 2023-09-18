@@ -404,7 +404,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 
 		super.__New(controller, name, configuration, false)
 
-		if (this.Active || isDebug()) {
+		if (this.Active || (isDebug() && isDevelopment())) {
 			this.iMotionApplication := Application(this.getArgumentValue("controlApplication", kMotionFeedbackPlugin), configuration)
 
 			kSimFeedback := this.iMotionApplication.ExePath

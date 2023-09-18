@@ -254,7 +254,7 @@ class SystemPlugin extends ControllerPlugin {
 
 		super.__New(controller, name, configuration, false)
 
-		if (this.Active || isDebug()) {
+		if (this.Active || (isDebug() && isDevelopment())) {
 			for ignore, descriptor in string2Values(A_Space, this.getArgumentValue("modeSelector", ""))
 				if (descriptor != false) {
 					function := controller.findFunction(descriptor)

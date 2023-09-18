@@ -182,6 +182,12 @@ As you might have noticed, the "Setup Workbench" implements a quite generic, but
 
 Although it is possible to introduce support for a completely new simulator, much more common is the addition of a new car. Every simulator will support a so called generic car, with all setup settings supported by this simulator. Also, the Setup Editor will handle this generic car, but almost all settings will be handled as simple "clicks" without restricting the changes to a known range. This information is provided by the so called car definition files and the car specific rules.
 
+### Introducing a new car
+
+General car meta data is managed in the files "Car Data.ini" and "Tyre Data.ini" which can be found in *Resources\Simulator Data\[Simulator]* in the program folder (with [Simulator] substituted with "AC" or "ACC" and so on). If your specific car is not already available, you can create an entry for your own car by placing corresponding files in the *Simulator Controller\Simulator Data\[Simulator]* folder which resides in your user *Documents* folder. Use one of the already available cars as a template for your own entries.
+
+Once the car is generally known to Simulator Controller, proceed to the next section.
+
 ### Introducing new car specifications
 
 Each simulator comes with a set of default settings which will be available for all cars. A specific car might restrict or change this set by using a car specific rule file. Let's start with a simple example:

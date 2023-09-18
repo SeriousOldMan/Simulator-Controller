@@ -122,14 +122,20 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 		selectActions := []
 	}
 
-	simulatorStartup(simulator) {
-		loadDatabase() {
-			if !ACPlugin.sCarData
-				ACPlugin.sCarData := readMultiMap(kResourcesDirectory . "Simulator Data\AC\Car Data.ini")
-		}
+	static requireCarDatabase() {
+		if !ACPlugin.sCarData {
+			data := readMultiMap(kResourcesDirectory . "Simulator Data\AC\Car Data.ini")
 
+			if FileExist(kUserHomeDirectory . "Simulator Data\AC\Car Data.ini")
+				addMultiMapValues(data, readMultiMap(kUserHomeDirectory . "Simulator Data\AC\Car Data.ini"))
+
+			ACPlugin.sCarData := data
+		}
+	}
+
+	simulatorStartup(simulator) {
 		if (simulator = kACApplication)
-			Task.startTask(loadDatabase, 1000, kLowPriority)
+			Task.startTask(ObjBindMethod(ACPlugin, "requireCarDatabase"), 1000, kLowPriority)
 
 		super.simulatorStartup(simulator)
 	}
@@ -196,8 +202,7 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 
 			value := getMultiMapValue(settings, "Simulator.Assetto Corsa", "Pitstop." . meta, kUndefined)
 
-			if !ACPlugin.sCarData
-				ACPlugin.sCarData := readMultiMap(kResourcesDirectory . "Simulator Data\AC\Car Data.ini")
+			ACPlugin.requireCarDatabase()
 
 			if (value == kUndefined)
 				value := getMultiMapValue(ACPlugin.sCarData, "Pitstop Settings", key, default)

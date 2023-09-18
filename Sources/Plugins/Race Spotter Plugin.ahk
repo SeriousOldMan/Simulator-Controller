@@ -87,7 +87,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 
 		super.__New(controller, name, configuration)
 
-		if (this.Active || isDebug()) {
+		if (this.Active || (isDebug() && isDevelopment())) {
 			trackAutomation := this.getArgumentValue("trackAutomation", false)
 
 			if trackAutomation {

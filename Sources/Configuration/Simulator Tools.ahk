@@ -427,27 +427,35 @@ checkInstallation() {
 		global gProgressCount
 
 		local packageInfo := readMultiMap(packageLocation . "\VERSION")
-		local packageType := getMultiMapValue(packageInfo, "Current", "Type")
-		local packageComponents := string2Map(",", "->", getMultiMapValue(packageInfo, packageType, "Components", ""))
 		local installInfo := readMultiMap(installLocation . "\VERSION")
-		local installType := getMultiMapValue(installInfo, "Current", "Type", "Release")
-		local installComponents := string2Map(",", "->", getMultiMapValue(installInfo, installType, "Components", ""))
+		local installedComponents := string2Map(",", "->", getMultiMapValue(installInfo
+																		  , getMultiMapValue(installInfo, "Current", "Type", "Release")
+																		  , "Components", ""))
 		local error := false
 		local component, version, type, ignore, part, path
 
-		for component, version in packageComponents {
-			if ((packageLocation = installLocation) || !installComponents.Has(component)
-													|| (VerCompare(version, installComponents[component]) > 0)) {
+		for component, version in string2Map(",", "->"
+										   , getMultiMapValue(packageInfo, getMultiMapValue(packageInfo, "Current", "Type")
+																		 , "Components", "")) {
+			if ((packageLocation = installLocation) || !installedComponents.Has(component)
+													|| (VerCompare(version, installedComponents[component]) > 0)) {
 				try {
 					showProgress({progress: (gProgressCount += 2)
 								, message: translate("Downloading") . A_Space . component . A_Space . translate("files...")})
 
-					Download(getMultiMapValue(packageInfo, "Components", component . "." . version . ".Download"), A_Temp)
+					Download(getMultiMapValue(packageInfo, "Components", component . "." . version . ".Download"), A_Temp . "\Temp.zip")
 
 					showProgress({progress: (gProgressCount += 2)
 								, message: translate("Extracting") . A_Space . component . A_Space . translate("files...")})
 
-					RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\" . component . A_Space . version . ".zip' -DestinationPath '" . packageLocation . "\" . getMultiMapValue(packageInfo, "Components", component . "." . version . ".Path") . "' -Force", , "Hide")
+					path := Trim(getMultiMapValue(packageInfo, "Components", component . "." . version . ".Path", ""))
+
+					if (path && (path != "") && (path != "."))
+						path := (packageLocation . "\" . path)
+					else
+						path := packageLocation
+
+					RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\Temp.zip' -DestinationPath '" . path . "' -Force", , "Hide")
 
 					showProgress({progress: (gProgressCount += 5)})
 				}
@@ -458,11 +466,20 @@ checkInstallation() {
 				}
 			}
 			else {
-				version := installComponents[component]
+				version := installedComponents[component]
 
 				for ignore, part in string2Values(",", getMultiMapValue(installInfo, "Components", component . "." . version . ".Content")) {
-					path := ("\" . getMultiMapValue(installInfo, "Components", component . "." . version . ".Path") . "\" . part)
+					path := Trim(getMultiMapValue(packageInfo, "Components", component . "." . version . ".Path", ""))
+
+					if (path && (path != "") && (path != "."))
+						path := ("\" . path . "\" . part)
+					else
+						path := ("\" . part)
+
 					type := FileExist(installLocation . path)
+
+					showProgress({progress: (gProgressCount += 2)
+								, message: translate("Migrating") . A_Space . component . A_Space . translate("files...")})
 
 					if (type && InStr(type, "D"))
 						DirCopy(installLocation . path, packageLocation . path, 1)
@@ -637,6 +654,8 @@ checkInstallation() {
 				showProgress({color: "Blue", title: translate("Installing Simulator Controller"), message: translate("...")})
 
 				try {
+					installComponents(packageLocation, installLocation)
+
 					for ignore, directory in [kBinariesDirectory, kResourcesDirectory . "Setup\Installer\"] {
 						gProgressCount += 1
 
@@ -656,8 +675,6 @@ checkInstallation() {
 							SetWorkingDir(currentDirectory)
 						}
 					}
-
-					installComponents(packageLocation, installLocation)
 
 					if (installLocation != packageLocation)
 						copyFiles(packageLocation, installLocation, !isNew)
@@ -2887,7 +2904,7 @@ prepareTargets(&buildProgress, updateOnly) {
 	}
 }
 
-startSimulatorTools() {
+startupSimulatorTools() {
 	global gUpdateSettings, gCleanupSettings, gCopySettings, gBuildSettings, gSplashScreen, gTargetConfiguration, gTargetsCount
 
 	local forceExit := GetKeyState("Shift")
@@ -2919,6 +2936,8 @@ startSimulatorTools() {
 			if !editTargets()
 				ExitApp(0)
 	}
+
+	startupApplication()
 
 	if (!kSilentMode && gSplashScreen)
 		showSplashScreen(gSplashScreen, false, false)
@@ -2991,7 +3010,7 @@ cancelBuild() {
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-startSimulatorTools()
+startupSimulatorTools()
 
 
 ;;;-------------------------------------------------------------------------;;;

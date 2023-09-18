@@ -47,7 +47,7 @@ class IntegrationPlugin extends ControllerPlugin {
 
 		deleteFile(this.StateFile)
 
-		if (this.Active || isDebug()) {
+		if (this.Active || (isDebug() && isDevelopment())) {
 			this.iAssistantsStateTask := PeriodicTask(ObjBindMethod(this, "updateSessionState"), 1000, kLowPriority)
 
 			this.iAssistantsStateTask.start()

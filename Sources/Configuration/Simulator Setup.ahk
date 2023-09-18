@@ -193,7 +193,7 @@ class SetupWizard extends ConfiguratorPanel {
 		}
 
 		Close(*) {
-			if this.SetupWizard.finishSetup(false)
+			if (this.Closeable && this.SetupWizard.finishSetup(false))
 				ExitApp(0)
 			else
 				return true
@@ -983,10 +983,8 @@ class SetupWizard extends ConfiguratorPanel {
 							this.applyPatches(settings, readMultiMap(file))
 
 					for ignore, preset in this.Presets {
-						if preset.Active {
-							preset.patchSimulatorConfiguration(this, configuration)
-							preset.patchSimulatorSettings(this, settings)
-						}
+						preset.patchSimulatorConfiguration(this, configuration)
+						preset.patchSimulatorSettings(this, settings)
 					}
 
 					if (settings.Count > 0)
@@ -1034,15 +1032,13 @@ class SetupWizard extends ConfiguratorPanel {
 								this.applyPatches(streamDeckConfiguration, readMultiMap(file))
 
 						for ignore, preset in this.Presets
-							if preset.Active
-								preset.patchStreamDeckConfiguration(this, streamDeckConfiguration)
+							preset.patchStreamDeckConfiguration(this, streamDeckConfiguration)
 
 						writeMultiMap(kUserConfigDirectory . "Stream Deck Configuration.ini", streamDeckConfiguration)
 					}
 
 					for ignore, preset in this.Presets
-						if preset.Active
-							preset.finalizeConfiguration(this)
+						preset.finalizeConfiguration(this)
 				}
 			}
 			finally {
@@ -3000,6 +2996,8 @@ startupSimulatorSetup() {
 		hideProgress()
 
 		wizard.show()
+
+		startupApplication()
 
 		try {
 			loop {

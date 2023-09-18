@@ -458,6 +458,9 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 		local stint, lastStint, newStint, driverID, lapPressures, ignore, lapData, driverName
 		local coldPressures, hotPressures, pressureLosses
 
+		if Task.CurrentTask
+			Task.CurrentTask.Interruptable := false
+
 		try {
 			if (teamServer && teamServer.Active && session) {
 				lastStint := false

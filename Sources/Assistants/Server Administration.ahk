@@ -25,7 +25,7 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Framework\Process.ahk"
+#Include "..\Framework\Application.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -868,3 +868,5 @@ startupServerAdministration() {
 ;;;-------------------------------------------------------------------------;;;
 
 startupServerAdministration()
+
+startupApplication()

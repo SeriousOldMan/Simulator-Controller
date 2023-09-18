@@ -1,10 +1,10 @@
 [Development]
 Version=5.3.1.0-dev
 Target=5.3.1.0-release
-Date=09/17/2023
-Download=
-Changes=Downloadable components for installation and update process, Fixed list update when adding a setting in "Session Database", Fixed rare off-by-one error for tyre set selection in ACC, Fixed Engineer to be optimistic in reporting the remaining laps on fuel, Fixed time in log files to be in 24 hour format, Fixed a couple of bugs in "Race Center" related to sector times, Migrated to AHK 2.09, Display time left on fuel in fuel widget in "Session Monitor", Optical enhancement in "Session Monitor" HTML generator
-Components=Media->5.3.0,Configuration->5.3.0
+Date=09/18/2023
+Download=https://www.dropbox.com/scl/fi/cbql6vfg0d48b9z0war9l/Simulator-Controller-5.3.1.0-dev.zip?rlkey=snqmponr84awjkr4ws0ewej9z&dl=1
+Changes=Downloadable components for installation and update process, Fixed list update when adding a setting in "Session Database", Fixed rare off-by-one error for tyre set selection in ACC, Fixed Engineer to be optimistic in reporting the remaining laps on fuel, Fixed time in log files to be in 24 hour format, Fixed a couple of bugs in "Race Center" related to sector times, Migrated to AHK 2.09, Display time left on fuel in fuel widget in "Session Monitor", Optical enhancement in "Session Monitor" HTML generator, Prevent exit while tasks are running
+Components=Media->5.3.0,Configuration->5.3.0,Utilities->5.3.0
 [Release]
 Version=5.3.0.0-release
 Date=09/13/2023
@@ -17,6 +17,9 @@ Media.5.3.0.Download=https://www.dropbox.com/scl/fi/s4uchdrhdm0m4giiix86k/Media-
 Configuration.5.3.0.Path=Resources
 Configuration.5.3.0.Content=Setup
 Configuration.5.3.0.Download=https://www.dropbox.com/scl/fi/vkpggadd4rd1w9h2ow1dv/Configuration-5.3.0.zip?rlkey=hqr342uzalm1dqd6v710ccjr3&dl=1
+Utilities.5.3.0.Path=.
+Utilities.5.3.0.Content=Utilities
+Utilities.5.3.0.Download=https://www.dropbox.com/scl/fi/hlza8t9tae5d0vnd7wmqa/Utilities-5.3.0.zip?rlkey=ciotp2dr5u3e4rxgikf45a1dq&dl=1
 [Current]
 Type=Development
 [Version]

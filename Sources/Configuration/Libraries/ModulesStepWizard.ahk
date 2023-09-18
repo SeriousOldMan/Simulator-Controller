@@ -724,15 +724,17 @@ class ModulesStepWizard extends StepWizard {
 				modulePresets := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules." . module . ".Presets", ""))
 
 				for ignore, preset in string2Values("|", modulePresets)
-					if (getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . ".Active", true)
-					 && !getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . ".Deprecated", false))
+					if (isDevelopment() ||
+						(getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . ".Active", true)
+					  && !getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . ".Deprecated", false)))
 						this.AvailablePresetsListView.Add("", getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . "." . getLanguage()))
 			}
 		}
 
 		for ignore, preset in string2Values("|", substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets", "")))
-			if (getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . ".Active", true)
-			 && !getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . ".Deprecated", false))
+			if (isDevelopment() ||
+				(getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . ".Active", true)
+			  && !getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . ".Deprecated", false)))
 				this.AvailablePresetsListView.Add("", getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . "." . getLanguage()))
 
 		this.AvailablePresetsListView.ModifyCol()

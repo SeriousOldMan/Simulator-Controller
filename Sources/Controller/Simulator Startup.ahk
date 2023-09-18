@@ -61,7 +61,10 @@ class StartupWindow extends Window {
 	}
 
 	Close(*) {
-		closeLaunchPad()
+		if this.Closeable
+			closeLaunchPad()
+		else
+			return true
 	}
 }
 
@@ -828,8 +831,6 @@ startSimulator() {
 
 	if (!SimulatorStartup.Instance || SimulatorStartup.Instance.Finished)
 		ExitApp(0)
-
-	return
 }
 
 cancelStartup(*) {
@@ -899,3 +900,5 @@ exitStartup(sayGoodBye := false) {
 ;;;-------------------------------------------------------------------------;;;
 
 startSimulator()
+
+startupApplication()

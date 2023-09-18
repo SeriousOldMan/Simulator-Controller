@@ -39,7 +39,7 @@
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-showSettingsEditor() {
+startupSimulatorSettings() {
 	local icon := kIconsDirectory . "Settings.ico"
 	local settings
 
@@ -47,6 +47,8 @@ showSettingsEditor() {
 	A_IconTip := "Simulator Settings"
 
 	settings := readMultiMap(kSimulatorSettingsFile)
+
+	startupApplication()
 
 	if (editSettings(&settings) == kSave)
 		writeMultiMap(kSimulatorSettingsFile, settings)
@@ -59,4 +61,4 @@ showSettingsEditor() {
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-showSettingsEditor()
+startupSimulatorSettings()

@@ -322,7 +322,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 		super.__New(controller, name, configuration, false)
 
-		if (this.Active || isDebug()) {
+		if (this.Active || (isDebug() && isDevelopment())) {
 			teamServerToggle := this.getArgumentValue("teamServer", false)
 
 			if teamServerToggle {

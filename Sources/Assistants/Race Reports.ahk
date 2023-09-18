@@ -905,7 +905,7 @@ class RaceReports extends ConfigurationItem {
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-runRaceReports() {
+startupRaceReports() {
 	local icon := kIconsDirectory . "Chart.ico"
 	local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 	local simulator := getMultiMapValue(settings, "Race Reports", "Simulator", false)
@@ -978,8 +978,6 @@ runRaceReports() {
 			}
 		}
 	}
-
-	return
 }
 
 
@@ -987,4 +985,6 @@ runRaceReports() {
 ;;;                           Initialization Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-runRaceReports()
+startupRaceReports()
+
+startupApplication()

@@ -114,7 +114,10 @@ class SetupWorkbench extends ConfigurationItem {
 		}
 
 		Close(*) {
-			closeSetupWorkbench()
+			if this.Closeable
+				closeSetupWorkbench()
+			else
+				return true
 		}
 	}
 
@@ -3160,7 +3163,7 @@ factPath(path*) {
 	return result
 }
 
-runSetupWorkbench() {
+startupSetupWorkbench() {
 	local icon := kIconsDirectory . "Setup.ico"
 	local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 	local simulator := getMultiMapValue(settings, "Setup Workbench", "Simulator", false)
@@ -3241,8 +3244,6 @@ runSetupWorkbench() {
 			workbench.loadSimulator(true, true)
 	else
 		Task.startTask(ObjBindMethod(workbench, "restoreState"), 100)
-
-	return
 }
 
 
@@ -3261,4 +3262,6 @@ runSetupWorkbench() {
 ;;;                          Initialization Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-runSetupWorkbench()
+startupSetupWorkbench()
+
+startupApplication()

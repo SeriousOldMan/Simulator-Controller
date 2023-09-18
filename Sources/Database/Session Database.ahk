@@ -5415,7 +5415,7 @@ loginDialog(connectorOrCommand := false, teamServerURL := false, owner := false,
 	}
 }
 
-showSessionDatabaseEditor() {
+startupSessionDatabase() {
 	local icon := kIconsDirectory . "Session Database.ico"
 	local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 	local simulator := getMultiMapValue(settings, "Session Database", "Simulator", false)
@@ -5492,4 +5492,6 @@ showSessionDatabaseEditor() {
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-showSessionDatabaseEditor()
+startupSessionDatabase()
+
+startupApplication()

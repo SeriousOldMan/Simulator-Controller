@@ -45,7 +45,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[5.3.1.0-dev](https://www.dropbox.com/scl/fi/cbql6vfg0d48b9z0war9l/Simulator-Controller-5.3.1.0-dev.zip?rlkey=snqmponr84awjkr4ws0ewej9z&dl=1) (Early build for 5.3.1. Changes: Downloadable components for installation and update process, Fixed list update when adding a setting in "Session Database", Fixed rare off-by-one error for tyre set selection in ACC, Fixed Engineer to be optimistic in reporting the remaining laps on fuel, Fixed time in log files to be in 24 hour format, Fixed a couple of bugs in "Race Center" related to sector times, Migrated to AHK 2.09, Display time left on fuel in fuel widget in "Session Monitor", Prevent exit while tasks are running.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-531) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

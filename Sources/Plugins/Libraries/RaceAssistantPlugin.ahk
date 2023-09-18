@@ -692,7 +692,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		else
 			teamServer := RaceAssistantPlugin.TeamServer
 
-		if (this.Active || isDebug()) {
+		if (this.Active || (isDebug() && isDevelopment())) {
 			RaceAssistantPlugin.Assistants.Push(this)
 
 			this.iRaceAssistantName := this.getArgumentValue("raceAssistantName", false)

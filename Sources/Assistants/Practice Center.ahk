@@ -230,21 +230,25 @@ class PracticeCenter extends ConfigurationItem {
 		}
 
 		Close(*) {
-			if (this.PracticeCenter.HasData && !this.PracticeCenter.SessionExported) {
-				local translator := translateMsgBoxButtons.Bind(["Yes", "No", "Cancel"])
+			if this.Closeable {
+				if (this.PracticeCenter.HasData && !this.PracticeCenter.SessionExported) {
+					local translator := translateMsgBoxButtons.Bind(["Yes", "No", "Cancel"])
 
-				OnMessage(0x44, translator)
-				msgResult := MsgBox(translate("Do you want to transfer your data to the session database before closing?"), translate("Export"), 262179)
-				OnMessage(0x44, translator, 0)
+					OnMessage(0x44, translator)
+					msgResult := MsgBox(translate("Do you want to transfer your data to the session database before closing?"), translate("Export"), 262179)
+					OnMessage(0x44, translator, 0)
 
-				if (msgResult = "Yes")
-					this.PracticeCenter.exportSession(true)
+					if (msgResult = "Yes")
+						this.PracticeCenter.exportSession(true)
 
-				if (msgResult = "Cancel")
-					return true
+					if (msgResult = "Cancel")
+						return true
+				}
+
+				return super.Close()
 			}
-
-			return super.Close()
+			else
+				return true
 		}
 	}
 
@@ -2969,7 +2973,7 @@ class PracticeCenter extends ConfigurationItem {
 			this.iLastPitstopUpdate -= delta
 		}
 
-		loop getMultiMapValue(data, "Position Data", "Car.Count", 0) {
+		loop getMultiMapValue(data, "Position Data", "Car.Count", 0)
 			if (getMultiMapValue(data, "Position Data", "Car." . A_Index . ".InPitlane", false)
 			 || getMultiMapValue(data, "Position Data", "Car." . A_Index . ".InPit", false)) {
 				carID := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".ID", A_Index)
@@ -2987,7 +2991,6 @@ class PracticeCenter extends ConfigurationItem {
 						pitstops.Push(PracticeCenter.Pitstop(carID, this.iLastPitstopUpdate, lap.Nr))
 				}
 			}
-		}
 	}
 
 	updateRunning(lapNumber, data) {
@@ -3484,6 +3487,8 @@ class PracticeCenter extends ConfigurationItem {
 			local locked := false
 			local count := 0
 			local lap, driver, telemetryData, pressures, temperatures, wear, pressuresData, info
+
+			Task.CurrentTask.Interruptable := false
 
 			while (row := this.LapsListView.GetNext(row, "C"))
 				count += 1
@@ -7135,3 +7140,5 @@ startupPracticeCenter() {
 ;;;-------------------------------------------------------------------------;;;
 
 startupPracticeCenter()
+
+startupApplication()

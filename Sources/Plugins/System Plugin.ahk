@@ -679,7 +679,7 @@ initializeSystemPlugin() {
 ;;;                         Message Handler Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-startupApplication(application, silent := true) {
+startApplication(application, silent := true) {
 	local runnable := SimulatorController.Instance.findPlugin(kSystemPlugin).findRunnableApplication(application)
 
 	if (runnable != false)
@@ -692,11 +692,11 @@ startupApplication(application, silent := true) {
 }
 
 startupComponent(component) {
-	startupApplication(component, false)
+	startApplication(component, false)
 }
 
 startupSimulator(simulator, silent := false) {
-	startupApplication(simulator, silent)
+	startApplication(simulator, silent)
 }
 
 shutdownSimulator(simulator) {

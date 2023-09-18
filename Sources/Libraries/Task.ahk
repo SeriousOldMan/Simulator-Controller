@@ -45,6 +45,10 @@ class Task {
 
 	static sCurrentTask := false
 
+	static sExitHandler := () => (!Task.CurrentTask || Task.CurrentTask.Interruptable)
+
+	iPreviousTask := false
+
 	iStopped := false
 	iRunnable := true
 	iSleep := false
@@ -54,6 +58,8 @@ class Task {
 	iNextExecution := false
 
 	iCallable := false
+
+	iInterruptable := true
 
 	static LowTimer {
 		Get {
@@ -95,9 +101,27 @@ class Task {
 		}
 	}
 
+	static ExitHandler {
+		Get {
+			return Task.sExitHandler
+		}
+
+		Set {
+			return (Task.sExitHandler := value)
+		}
+	}
+
 	static CurrentTask {
 		Get {
 			return Task.sCurrentTask
+		}
+	}
+
+	static Exitable {
+		Get {
+			local handler := Task.ExitHandler
+
+			return handler()
 		}
 	}
 
@@ -172,6 +196,16 @@ class Task {
 	Callable {
 		Get {
 			return this.iCallable
+		}
+	}
+
+	Interruptable {
+		Get {
+			return (this.iInterruptable || (this.iPreviousTask && this.iPreviousTask.Interruptable))
+		}
+
+		Set {
+			return (this.iInterruptable := value)
 		}
 	}
 
@@ -433,6 +467,7 @@ class Task {
 		local next := false
 		local curAutoActivate
 
+		theTask.iPreviousTask := oldCurrentTask
 		Task.sCurrentTask := theTask
 
 		if window
@@ -458,6 +493,7 @@ class Task {
 				else
 					window.Unblock()
 
+			theTask.iPreviousTask := false
 			Task.sCurrentTask := oldCurrentTask
 		}
 

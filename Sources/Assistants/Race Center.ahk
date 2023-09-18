@@ -5734,6 +5734,7 @@ class RaceCenter extends ConfigurationItem {
 				if !this.Stints.Has(identifier) {
 					newStint := parseObject(this.Connector.GetStint(identifier))
 					newStint.Nr := (newStint.Nr + 0)
+					newStint.Row := false
 
 					try {
 						time := this.Connector.GetStintValue(identifier, "Time")
@@ -5814,6 +5815,7 @@ class RaceCenter extends ConfigurationItem {
 			if !this.Laps.Has(identifier) {
 				newLap := parseObject(this.Connector.GetLap(identifier))
 				newLap.Nr := (newLap.Nr + 0)
+				newLap.Row := false
 
 				if !this.Laps.Has(newLap.Nr)
 					newLaps.Push(newLap)
@@ -5905,7 +5907,7 @@ class RaceCenter extends ConfigurationItem {
 			}
 
 			lap.Laptime := Round(getMultiMapValue(data, "Stint Data", "LapLastTime") / 1000, 1)
-			lap.SectorsTime := "-"
+			lap.SectorsTime := ["-"]
 
 			lap.RemainingSessionTime := getMultiMapValue(data, "Session Data", "SessionTimeRemaining")
 			lap.RemainingDriverTime := getMultiMapValue(data, "Stint Data", "DriverTimeRemaining", "-")
@@ -5973,7 +5975,7 @@ class RaceCenter extends ConfigurationItem {
 					lap.SectorsTime := sectorTimes
 				}
 				else
-					lap.SectorsTime := "-"
+					lap.SectorsTime := ["-"]
 
 				this.updatePitstopState(lap, data)
 
@@ -6062,7 +6064,7 @@ class RaceCenter extends ConfigurationItem {
 			this.iLastPitstopUpdate -= delta
 		}
 
-		loop getMultiMapValue(data, "Position Data", "Car.Count", 0) {
+		loop getMultiMapValue(data, "Position Data", "Car.Count", 0)
 			if (getMultiMapValue(data, "Position Data", "Car." . A_Index . ".InPitlane", false)
 			 || getMultiMapValue(data, "Position Data", "Car." . A_Index . ".InPit", false)) {
 				carID := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".ID", A_Index)
@@ -6080,12 +6082,11 @@ class RaceCenter extends ConfigurationItem {
 						pitstops.Push(RaceCenter.Pitstop(carID, this.iLastPitstopUpdate, lap.Nr))
 				}
 			}
-		}
 	}
 
 	updateStint(stint) {
 		local laps, numLaps, lapTimes, airTemperatures, trackTemperatures
-		local ignore, lap, consumption, weather
+		local ignore, lap, consumption, weather, row
 
 		stint.FuelConsumption := 0.0
 		stint.Accidents := 0
@@ -6139,10 +6140,13 @@ class RaceCenter extends ConfigurationItem {
 		stint.AirTemperature := Round(average(airTemperatures), 1)
 		stint.TrackTemperature := Round(average(trackTemperatures), 1)
 
-		this.StintsListView.Modify(stint.Row, "", stint.Nr, stint.Driver.FullName, values2String(", ", collect(string2Values(",", stint.Weather), translate)*)
-												, translate(stint.Compound), stint.Laps.Length, stint.StartPosition, stint.EndPosition, lapTimeDisplayValue(stint.AvgLaptime)
-												, displayValue("Float", convertUnit("Volume", stint.FuelConsumption)), stint.Accidents, stint.Penalties
-												, stint.Potential, stint.RaceCraft, stint.Speed, stint.Consistency, stint.CarControl)
+		row := stint.Row
+
+		if row
+			this.StintsListView.Modify(row, "", stint.Nr, stint.Driver.FullName, values2String(", ", collect(string2Values(",", stint.Weather), translate)*)
+											  , translate(stint.Compound), stint.Laps.Length, stint.StartPosition, stint.EndPosition, lapTimeDisplayValue(stint.AvgLaptime)
+											  , displayValue("Float", convertUnit("Volume", stint.FuelConsumption)), stint.Accidents, stint.Penalties
+											  , stint.Potential, stint.RaceCraft, stint.Speed, stint.Consistency, stint.CarControl)
 
 		this.updatePlan(stint)
 	}
@@ -6487,7 +6491,7 @@ class RaceCenter extends ConfigurationItem {
 		local lastLap := this.LastLap
 		local tyreChange := true
 		local newData, message, session, telemetryDB, tyresTable, lap, theLap, runningLap, driverID, telemetry
-		local telemetryData, pressures, temperatures, wear, lapPressures, pressure, driver
+		local telemetryData, pressures, temperatures, wear, lapPressures, pressure, driver, row
 
 		wasPitstop(lap, &tyreChange := false) {
 			local fuel, tyreCompound, tyreCompoundColor, tyreSet, tyrePressures
@@ -6649,12 +6653,16 @@ class RaceCenter extends ConfigurationItem {
 					theLap.Valid := (theLap.State != "Invalid")
 				}
 
-				this.LapsListView.Modify(theLap.Row, "Col12", theLap.Valid ? "" : translate("x"))
+				row := theLap.Row
 
-				lapPressures := this.LapsListView.GetText(theLap.Row, 11)
+				if row {
+					this.LapsListView.Modify(row, "Col12", theLap.Valid ? "" : translate("x"))
 
-				if (lapPressures = "-, -, -, -")
-					this.LapsListView.Modify(theLap.Row, "Col11", values2String(", ", collect(pressures, p => isNumber(p) ? displayValue("Float", convertUnit("Pressure", p)) : "-")*))
+					lapPressures := this.LapsListView.GetText(row, 11)
+
+					if (lapPressures = "-, -, -, -")
+						this.LapsListView.Modify(row, "Col11", values2String(", ", collect(pressures, p => isNumber(p) ? displayValue("Float", convertUnit("Pressure", p)) : "-")*))
+				}
 
 				newData := true
 				lap += 1
@@ -6666,7 +6674,7 @@ class RaceCenter extends ConfigurationItem {
 
 	syncTyrePressures(load := false) {
 		local lastLap, tyresTable, ignore, pressureData, pressureFL, pressureFR, pressureRL, pressureRR, tyres
-		local row, session, pressuresDB, message, newData, lap, flush, driverID
+		local row, session, pressuresDB, message, newData, lap, flush, driverID, row
 		local lapPressures, coldPressures, hotPressures, pressuresLosses, pressuresTable, pressures, pressure
 
 		static fails := 0
@@ -6704,17 +6712,19 @@ class RaceCenter extends ConfigurationItem {
 				if this.Laps.Has(A_Index) {
 					row := this.Laps[A_Index].Row
 
-					if isNumber(pressureFL)
-						pressureFL := displayValue("Float", convertUnit("Pressure", pressureFL))
-					if isNumber(pressureFR)
-						pressureFR := displayValue("Float", convertUnit("Pressure", pressureFR))
-					if isNumber(pressureRL)
-						pressureRL := displayValue("Float", convertUnit("Pressure", pressureRL))
-					if isNumber(pressureRR)
-						pressureRR := displayValue("Float", convertUnit("Pressure", pressureRR))
+					if row {
+						if isNumber(pressureFL)
+							pressureFL := displayValue("Float", convertUnit("Pressure", pressureFL))
+						if isNumber(pressureFR)
+							pressureFR := displayValue("Float", convertUnit("Pressure", pressureFR))
+						if isNumber(pressureRL)
+							pressureRL := displayValue("Float", convertUnit("Pressure", pressureRL))
+						if isNumber(pressureRR)
+							pressureRR := displayValue("Float", convertUnit("Pressure", pressureRR))
 
-					this.LapsListView.Modify(row, "Col11", values2String(", ", displayNullValue(pressureFL), displayNullValue(pressureFR)
-																			 , displayNullValue(pressureRL), displayNullValue(pressureRR)))
+						this.LapsListView.Modify(row, "Col11", values2String(", ", displayNullValue(pressureFL), displayNullValue(pressureFR)
+																				 , displayNullValue(pressureRL), displayNullValue(pressureRR)))
+					}
 				}
 			}
 
@@ -6824,7 +6834,10 @@ class RaceCenter extends ConfigurationItem {
 						pressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure))
 				}
 
-				this.LapsListView.Modify(this.Laps[lap].Row, "Col11", values2String(", ", pressures*))
+				row := this.Laps[lap].Row
+
+				if row
+					this.LapsListView.Modify(row, "Col11", values2String(", ", pressures*))
 
 				newData := true
 				lap += 1
@@ -7522,42 +7535,48 @@ class RaceCenter extends ConfigurationItem {
 					if selectedStint
 						selectedStint := (selectedStint == this.StintsListView.GetCount())
 
-					if lastLap
+					if lastLap {
 						newLaps := this.syncLaps(lastLap)
 
-					if this.syncRaceReport() {
-						newData := true
-
-						newReports := true
-					}
-					else
-						newReports := false
-
-					if this.syncPitstops(newLaps) {
-						newData := true
-
-						nextPitstopUpdate := (this.LastLap.Nr + 2)
-					}
-
-					if this.syncTelemetry()
-						newData := true
-
-					if this.syncTyrePressures()
-						newData := true
-
-					this.updatePitstops()
-
-					forcePitstopUpdate := (this.LastLap && (this.LastLap.Nr = nextPitstopUpdate))
-
-					if this.syncPitstopsDetails(forcePitstopUpdate || initial)
-						newData := true
-
-					if forcePitstopUpdate
-						nextPitstopUpdate := false
-
-					if (this.LastLap && (this.SelectedReport == "Track"))
-						if this.syncTrackMap()
+						if this.syncRaceReport() {
 							newData := true
+
+							newReports := true
+						}
+						else
+							newReports := false
+
+						if this.syncPitstops(newLaps) {
+							newData := true
+
+							nextPitstopUpdate := (this.LastLap.Nr + 2)
+						}
+
+						if this.syncTelemetry()
+							newData := true
+
+						if this.syncTyrePressures()
+							newData := true
+
+						this.updatePitstops()
+
+						forcePitstopUpdate := (this.LastLap && (this.LastLap.Nr = nextPitstopUpdate))
+
+						if this.syncPitstopsDetails(forcePitstopUpdate || initial)
+							newData := true
+
+						if forcePitstopUpdate
+							nextPitstopUpdate := false
+
+						if (this.LastLap && (this.SelectedReport == "Track"))
+							if this.syncTrackMap()
+								newData := true
+					}
+					else {
+						newLaps := false
+						newData := false
+						newReports := false
+					}
 
 					if newLaps {
 						this.showMessage(translate("Saving session"))
@@ -8011,7 +8030,7 @@ class RaceCenter extends ConfigurationItem {
 		updateStatisticsAsync() {
 			local progressWindow := showProgress({color: "Green", title: translate("Updating Stint Statistics")})
 			local currentStint := this.CurrentStint
-			local count, stint, ignore, driver
+			local count, stint, ignore, driver, row
 
 			if currentStint {
 				count := currentStint.Nr
@@ -8024,7 +8043,10 @@ class RaceCenter extends ConfigurationItem {
 
 						this.updateStintStatistics(stint)
 
-						this.StintsListView.Modify(stint.Row, "Col12", stint.Potential, stint.RaceCraft, stint.Speed, stint.Consistency, stint.CarControl)
+						row := stint.Row
+
+						if row
+							this.StintsListView.Modify(row, "Col12", stint.Potential, stint.RaceCraft, stint.Speed, stint.Consistency, stint.CarControl)
 					}
 
 					Sleep(200)
@@ -8192,7 +8214,7 @@ class RaceCenter extends ConfigurationItem {
 		this.iLaps := CaseInsenseWeakMap()
 
 		for ignore, lap in this.SessionStore.Tables["Lap.Data"] {
-			newLap := {Nr: lap["Nr"], Stint: lap["Stint"], Laptime: lap["Lap.Time"], SectorsTime: lap["Sectors.Time"]
+			newLap := {Nr: lap["Nr"], Row: false, Stint: lap["Stint"], Laptime: lap["Lap.Time"], SectorsTime: lap["Sectors.Time"]
 					 , State: lap["Lap.State"], Valid: lap["Lap.Valid"]
 					 , Position: lap["Position"], Grip: lap["Grip"]
 					 , Map: lap["Map"], TC: lap["TC"], ABS: lap["ABS"]
@@ -8232,6 +8254,8 @@ class RaceCenter extends ConfigurationItem {
 				newLap.SectorsTime := ["-"]
 			else if isObject(newLap.SectorsTime)
 				newLap.SectorsTime := collect(newLap.SectorsTime, displayNullValue)
+			else
+				newLap.SectorsTime := collect(string2Values(",", newLap.SectorsTime), displayNullValue)
 
 			if isNull(newLap.FuelConsumption)
 				newLap.FuelConsumption := "-"
@@ -8265,7 +8289,7 @@ class RaceCenter extends ConfigurationItem {
 		for ignore, stint in this.SessionStore.Tables["Stint.Data"] {
 			driver := this.createDriver({Forname: stint["Driver.Forname"], Surname: stint["Driver.Surname"], Nickname: stint["Driver.Nickname"], ID: stint["Driver.ID"]})
 
-			newStint := {Nr: stint["Nr"], Lap: stint["Lap"], Driver: driver
+			newStint := {Nr: stint["Nr"], Row: false, Lap: stint["Lap"], Driver: driver
 					   , Weather: stint["Weather"], Compound: normalizeCompound(stint["Compound"]), TyreSet: stint["TyreSet"]
 					   , AvgLaptime: stint["Lap.Time.Average"], BestLaptime: stint["Lap.Time.Best"], FuelConsumption: stint["Fuel.Consumption"]
 					   , Accidents: stint["Accidents"], Penalties: stint["Penalties"], StartPosition: stint["Position.Start"], EndPosition: stint["Position.End"]
@@ -9756,7 +9780,7 @@ class RaceCenter extends ConfigurationItem {
 		local wearFL, wearFR, wearRL, wearRR
 		local telemetry, brakeTemperatures, ignore, table, field, brakeWears
 		local currentListView, lapPressures, entry, standingsData, prefix, driver, category
-		local currentStint, newStint, stint, stintData, tries, carIDs, positions
+		local currentStint, newStint, stint, stintData, tries, carIDs, positions, row
 
 		if lastLap
 			lastLap := lastLap.Nr
@@ -9913,20 +9937,24 @@ class RaceCenter extends ConfigurationItem {
 
 					sessionStore.add("Lap.Data", lapData)
 
-					lapPressures := this.LapsListView.GetText(lap.Row, 11)
+					row := lap.Row
 
-					if (lapPressures = "-, -, -, -") {
-						if isNumber(pressureFL)
-							pressureFL := displayValue("Float", convertUnit("Pressure", pressureFL))
-						if isNumber(pressureFR)
-							pressureFR := displayValue("Float", convertUnit("Pressure", pressureFR))
-						if isNumber(pressureRL)
-							pressureRL := displayValue("Float", convertUnit("Pressure", pressureRL))
-						if isNumber(pressureRR)
-							pressureRR := displayValue("Float", convertUnit("Pressure", pressureRR))
+					if row {
+						lapPressures := this.LapsListView.GetText(row, 11)
 
-						this.LapsListView.Modify(lap.Row, "Col10", values2String(", ", displayNullValue(pressureFL), displayNullValue(pressureFR)
-																					 , displayNullValue(pressureRL), displayNullValue(pressureRR)))
+						if (lapPressures = "-, -, -, -") {
+							if isNumber(pressureFL)
+								pressureFL := displayValue("Float", convertUnit("Pressure", pressureFL))
+							if isNumber(pressureFR)
+								pressureFR := displayValue("Float", convertUnit("Pressure", pressureFR))
+							if isNumber(pressureRL)
+								pressureRL := displayValue("Float", convertUnit("Pressure", pressureRL))
+							if isNumber(pressureRR)
+								pressureRR := displayValue("Float", convertUnit("Pressure", pressureRR))
+
+							this.LapsListView.Modify(lap.Row, "Col10", values2String(", ", displayNullValue(pressureFL), displayNullValue(pressureFR)
+																						 , displayNullValue(pressureRL), displayNullValue(pressureRR)))
+						}
 					}
 				}
 				else if !forSave
@@ -12397,3 +12425,5 @@ setTyrePressures(tyreCompound, tyreCompoundColor, flPressure, frPressure, rlPres
 ;;;-------------------------------------------------------------------------;;;
 
 startupRaceCenter()
+
+startupApplication()

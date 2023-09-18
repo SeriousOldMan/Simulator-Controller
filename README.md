@@ -99,6 +99,8 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 
 20. [Unboxing Practice Center](https://www.youtube.com/watch?v=Qx3I0B8AvhQ) - We are taking a detailed look at the "Practice Center", which lets you organize your practice sessions and solo races, as well as the data collected during those sessions.
 
+21. [Updating your configuration to 5.3](https://youtu.be/f4HuUjSW-3k) - This video shows you how to update your configuration to use the new capabilities of "Simulator Setup", which simplify many configuration tasks significantly.
+
 This list will be extended from time to time to cover new functionalities.
 
 ### Discord Community

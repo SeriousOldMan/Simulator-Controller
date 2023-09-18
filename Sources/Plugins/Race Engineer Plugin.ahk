@@ -459,7 +459,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 		local coldPressures, hotPressures, pressureLosses
 
 		if Task.CurrentTask
-			Task.CurrentTask.Interruptable := false
+			Task.CurrentTask.Critical := true
 
 		try {
 			if (teamServer && teamServer.Active && session) {

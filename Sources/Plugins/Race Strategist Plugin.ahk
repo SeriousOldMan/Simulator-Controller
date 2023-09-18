@@ -353,7 +353,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		local stint, newStint, lastStint, driverID, driverName, ignore, telemetryData, pitstop, pressures, temperatures, wear
 
 		if Task.CurrentTask
-			Task.CurrentTask.Interruptable := false
+			Task.CurrentTask.Critical := true
 
 		if (teamServer && teamServer.Active && session) {
 			lastStint := false
@@ -591,7 +591,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		local simulatorCode, carCode, trackCode
 
 		if Task.CurrentTask
-			Task.CurrentTask.Interruptable := false
+			Task.CurrentTask.Critical := true
 
 		if (targetDirectory || reportsDirectory) {
 			teamServer := this.TeamServer

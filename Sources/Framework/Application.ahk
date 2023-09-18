@@ -473,10 +473,10 @@ viewHTML(fileName, title := false, x := kUndefined, y := kUndefined, width := 80
 ;;;-------------------------------------------------------------------------;;;
 
 startupApplication() {
-	local canExit := Task.ExitHandler
+	local isCritical := Task.CriticalHandler
 
 	guardExit(*) {
-		if !canExit() {
+		if isCritical() {
 			OnMessage(0x44, translateOkButton)
 			MsgBox(translate("Please wait until all tasks have been finished."), translate("Information"), 262192)
 			OnMessage(0x44, translateOkButton, 0)
@@ -487,7 +487,7 @@ startupApplication() {
 			return false
 	}
 
-	Task.ExitHandler := (*) => !guardExit()
+	Task.CriticalHandler := (*) => guardExit()
 
 	OnExit(guardExit, -1)
 }

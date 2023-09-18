@@ -3487,7 +3487,7 @@ class PracticeCenter extends ConfigurationItem {
 			local count := 0
 			local lap, driver, telemetryData, pressures, temperatures, wear, pressuresData, info
 
-			Task.CurrentTask.Interruptable := false
+			Task.CurrentTask.Critical := true
 
 			while (row := this.LapsListView.GetNext(row, "C"))
 				count += 1

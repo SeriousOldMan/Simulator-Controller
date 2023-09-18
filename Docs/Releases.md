@@ -1,17 +1,18 @@
 ## 5.3.1.0-release 09/22/23 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
-  3. Fixed a bug in "Session Database", where the list of settings were not updated correctly, when a new setting was added.
-  4. Fixed a rare off by one error, when requesting a specific tyre set for a pitstop controlled by the "Race Center" in *Assetto Corsa Competizione*.
-  5. Fixed too optimistic reporting of remaining laps based on remaining fuel by the Race Engineer.
-  6. Fixed a couple of bugs in "Race Center" related to handling and reporting of sector times.
-  7. Fixed a couple of bugs in "Practice Center" related to handling and reporting of sector times.
-  8. Added the possible remaining driving time based on remaning fuel to the "Fuel" info widget in "System Monitor".
-  9. A couple of optical enhancements to the info widgets in "System Monitor" to make them more readable.
-  10. Prevent exit of applications while a background process is still running. This is especially important at the end of a long session, when the "Simulator Controller" process is still working on the session database or is creating a race report.
-  11. Donload and installation has been optimized. A couple of very large parts of the package that are changed not very often has been removed from the installation package and will be handled as separate downloads, if required. This will speed up the update process significantly in the future.
-  12. Migrated sources to AHK 2.09.
-  13. [Experts Only] Changed timestamp in log files to 24 hour format.
+  3. Fixed a bug in "Simulator Setup", where last changes were not saved, when generating a new configuration directly from the basic setup page.
+  4. Fixed a bug in "Session Database", where the list of settings were not updated correctly, when a new setting was added.
+  5. Fixed a rare off by one error, when requesting a specific tyre set for a pitstop controlled by the "Race Center" in *Assetto Corsa Competizione*.
+  6. Fixed too optimistic reporting of remaining laps based on remaining fuel by the Race Engineer.
+  7. Fixed a couple of bugs in "Race Center" related to handling and reporting of sector times.
+  8. Fixed a couple of bugs in "Practice Center" related to handling and reporting of sector times.
+  9. Added the possible remaining driving time based on remaning fuel to the "Fuel" info widget in "System Monitor".
+  10. A couple of optical enhancements to the info widgets in "System Monitor" to make them more readable.
+  11. Prevent exit of applications while a background process is still running. This is especially important at the end of a long session, when the "Simulator Controller" process is still working on the session database or is creating a race report.
+  12. Donload and installation has been optimized. A couple of very large parts of the package that are changed not very often has been removed from the installation package and will be handled as separate downloads, if required. This will speed up the update process significantly in the future.
+  13. Migrated sources to AHK 2.09.
+  14. [Experts Only] Changed timestamp in log files to 24 hour format.
 
 ## 5.3.0.0-release 09/13/23
   1. Minor bugfixes, as always

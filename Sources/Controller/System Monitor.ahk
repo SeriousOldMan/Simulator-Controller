@@ -983,7 +983,7 @@ systemMonitor(command := false, arguments*) {
 				widgets.Push(false)
 		}
 
-		if true || (sessionState.Count > 0) {
+		if (sessionState.Count > 0) {
 			html := "<style>" . getTableCSS(systemMonitorGui) . " div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { text-align: center; font-size: 12px; background-color: #" . systemMonitorGui.Theme.TableColor["Header"] . "; } </style><table>"
 
 			widgets := []

@@ -519,10 +519,6 @@ class SetupWizard extends ConfiguratorPanel {
 		else
 			this.BasicSetup := false
 
-		loop count
-			if this.Steps.Has(A_index)
-				this.Steps[A_Index].initialize(initialize)
-
 		showProgress({progress: ++this.ProgressCount, message: translate("Starting AI Kernel...")})
 
 		this.KnowledgeBase.produce()
@@ -879,7 +875,7 @@ class SetupWizard extends ConfiguratorPanel {
 
 		loop this.Count
 			if this.Steps.Has(A_Index)
-				this.Steps[A_Index].startSetup()
+				this.Steps[A_Index].startSetup(this.Initialize)
 
 		viewers := []
 
@@ -1717,6 +1713,7 @@ class SetupWizard extends ConfiguratorPanel {
 								path := ((Trim(path) = "") ? root : (root . "\" . substituteVariables(path)))
 							else
 								path := substituteVariables(path)
+
 							source := string2Values(":", definition[2])
 
 							SplitPath(substituteVariables(source[2]), &name)
@@ -1774,6 +1771,8 @@ class SetupWizard extends ConfiguratorPanel {
 			installPlugins()
 
 			showProgress({progress: 100, message: translate("Finished...")})
+
+			this.saveKnowledgeBase()
 
 			Sleep(1000)
 		}
@@ -2424,7 +2423,7 @@ class StepWizard extends ConfiguratorPanel {
 		this.iWidgets.Delete(page)
 	}
 
-	initialize(new) {
+	startSetup(new) {
 	}
 
 	reset() {
@@ -2474,9 +2473,6 @@ class StepWizard extends ConfiguratorPanel {
 			}
 
 		return true
-	}
-
-	startSetup() {
 	}
 
 	updateState() {

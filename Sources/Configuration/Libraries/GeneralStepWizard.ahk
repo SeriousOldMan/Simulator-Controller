@@ -325,7 +325,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 			super.registerWidget(page, widget)
 	}
 
-	initialize(new) {
+	startSetup(new) {
 		local wizard, uiLanguage, startWithWindows, silentMode
 
 		if !new {

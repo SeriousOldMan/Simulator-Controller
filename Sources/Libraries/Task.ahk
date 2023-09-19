@@ -45,7 +45,7 @@ class Task {
 
 	static sCurrentTask := false
 
-	static sExitHandler := () => (!Task.CurrentTask || Task.CurrentTask.Interruptable)
+	static sCriticalHandler := () => (Task.CurrentTask && Task.CurrentTask.Critical)
 
 	iPreviousTask := false
 
@@ -59,7 +59,7 @@ class Task {
 
 	iCallable := false
 
-	iInterruptable := true
+	iCritical := false
 
 	static LowTimer {
 		Get {
@@ -101,13 +101,13 @@ class Task {
 		}
 	}
 
-	static ExitHandler {
+	static CriticalHandler {
 		Get {
-			return Task.sExitHandler
+			return Task.sCriticalHandler
 		}
 
 		Set {
-			return (Task.sExitHandler := value)
+			return (Task.sCriticalHandler := value)
 		}
 	}
 
@@ -117,11 +117,9 @@ class Task {
 		}
 	}
 
-	static Exitable {
+	static Critical {
 		Get {
-			local handler := Task.ExitHandler
-
-			return handler()
+			return Task.CriticalHandler.Call()
 		}
 	}
 
@@ -199,13 +197,13 @@ class Task {
 		}
 	}
 
-	Interruptable {
+	Critical {
 		Get {
-			return (this.iInterruptable || (this.iPreviousTask && this.iPreviousTask.Interruptable))
+			return (this.iCritical || (this.iPreviousTask && this.iPreviousTask.Critical))
 		}
 
 		Set {
-			return (this.iInterruptable := value)
+			return (this.iCritical := value)
 		}
 	}
 

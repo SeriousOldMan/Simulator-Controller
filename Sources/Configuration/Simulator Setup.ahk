@@ -933,7 +933,7 @@ class SetupWizard extends ConfiguratorPanel {
 		local preset, window, configuration, settings, ignore, file, startupLink, startupExe
 		local buttonBoxConfiguration, streamDeckConfiguration
 
-		if (this.Step && this.Step.hidePage(this.Page)) {
+		if (this.Step && this.hidePage(this.Step, this.Page)) {
 			while this.SettingsOpen {
 				Task.yield()
 

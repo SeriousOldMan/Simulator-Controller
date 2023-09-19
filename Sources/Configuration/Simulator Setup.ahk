@@ -454,28 +454,29 @@ class SetupWizard extends ConfiguratorPanel {
 			}
 		}
 
-		loop count {
-			step := this.Steps[A_Index]
+		loop count
+			if this.Steps.Has(A_index) {
+				step := this.Steps[A_Index]
 
-			this.ProgressCount += 2
+				this.ProgressCount += 2
 
-			showProgress({progress: this.ProgressCount})
+				showProgress({progress: this.ProgressCount})
 
-			if step {
-				stepDefinition := readMultiMap(kResourcesDirectory . "Setup\Definitions\" . step.Step . " Step.ini")
+				if step {
+					stepDefinition := readMultiMap(kResourcesDirectory . "Setup\Definitions\" . step.Step . " Step.ini")
 
-				setMultiMapValues(definition, "Setup." . step.Step, getMultiMapValues(stepDefinition, "Setup." . step.Step))
+					setMultiMapValues(definition, "Setup." . step.Step, getMultiMapValues(stepDefinition, "Setup." . step.Step))
 
-				for language, ignore in availableLanguages()
-					for ignore, rootDirectory in [kResourcesDirectory . "Setup\Translations\", kUserTranslationsDirectory . "Setup\"]
-						if FileExist(rootDirectory . step.Step . " Step." . language)
-							for section, keyValues in readMultiMap(rootDirectory . step.Step . " Step." . language)
-								for key, value in keyValues
-									setMultiMapValue(definition, section, key, value)
+					for language, ignore in availableLanguages()
+						for ignore, rootDirectory in [kResourcesDirectory . "Setup\Translations\", kUserTranslationsDirectory . "Setup\"]
+							if FileExist(rootDirectory . step.Step . " Step." . language)
+								for section, keyValues in readMultiMap(rootDirectory . step.Step . " Step." . language)
+									for key, value in keyValues
+										setMultiMapValue(definition, section, key, value)
 
-				step.loadDefinition(definition, getMultiMapValue(definition, "Setup." . step.Step, step.Step . ".Definition", ""))
+					step.loadDefinition(definition, getMultiMapValue(definition, "Setup." . step.Step, step.Step . ".Definition", ""))
+				}
 			}
-		}
 
 		this.iCount := count
 
@@ -517,6 +518,10 @@ class SetupWizard extends ConfiguratorPanel {
 		}
 		else
 			this.BasicSetup := false
+
+		loop count
+			if this.Steps.Has(A_index)
+				this.Steps[A_Index].initialize(initialize)
 
 		showProgress({progress: ++this.ProgressCount, message: translate("Starting AI Kernel...")})
 
@@ -2417,6 +2422,9 @@ class StepWizard extends ConfiguratorPanel {
 
 	deleteWidgets(page) {
 		this.iWidgets.Delete(page)
+	}
+
+	initialize(new) {
 	}
 
 	reset() {

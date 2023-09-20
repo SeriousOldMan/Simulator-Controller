@@ -254,10 +254,10 @@ class ControllerStepWizard extends StepWizard {
 		}
 	}
 
-	startSetup() {
+	startSetup(new) {
 		local buttonBoxConfiguration, streamDeckConfiguration
 
-		if !this.SetupWizard.Initialize {
+		if !new {
 			buttonBoxConfiguration := readMultiMap(kUserConfigDirectory . "Button Box Configuration.ini")
 
 			addMultiMapValues(buttonBoxConfiguration, readMultiMap(kUserHomeDirectory . "Setup\Button Box Configuration.ini"))

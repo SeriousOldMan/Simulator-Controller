@@ -441,12 +441,12 @@ checkInstallation() {
 													|| (VerCompare(version, installedComponents[component]) > 0)) {
 				try {
 					showProgress({progress: (gProgressCount += 2)
-								, message: translate("Downloading") . A_Space . component . A_Space . translate("files...")})
+								, message: translate("Downloading ") . component . translate(" files...")})
 
 					Download(getMultiMapValue(packageInfo, "Components", component . "." . version . ".Download"), A_Temp . "\Temp.zip")
 
 					showProgress({progress: (gProgressCount += 2)
-								, message: translate("Extracting") . A_Space . component . A_Space . translate("files...")})
+								, message: translate("Extracting ") . component . translate(" files...")})
 
 					path := Trim(getMultiMapValue(packageInfo, "Components", component . "." . version . ".Path", ""))
 
@@ -479,7 +479,7 @@ checkInstallation() {
 					type := FileExist(installLocation . path)
 
 					showProgress({progress: (gProgressCount += 2)
-								, message: translate("Migrating") . A_Space . component . A_Space . translate("files...")})
+								, message: translate("Copying ") . component . translate(" files...")})
 
 					if (type && InStr(type, "D"))
 						DirCopy(installLocation . path, packageLocation . path, 1)

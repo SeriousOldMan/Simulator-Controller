@@ -445,7 +445,7 @@ readTranslations(targetLanguageCode, withUserTranslations := true, fromEditor :=
 					if isDebug()
 						throw "Inconsistent translation encountered for `"" . enString . "`" in readTranslations..."
 					else
-						logError("Inconsistent translation encountered for `"" . enString . "`" in readTranslations...")
+						logError("Inconsistent translation encountered for `"" . enString . "`" in readTranslations...", true)
 				}
 				else
 					translations[enString] := ((translation.Length < 2) ? "" : translation[2])

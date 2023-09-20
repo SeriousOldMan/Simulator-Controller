@@ -7,12 +7,13 @@
   6. Fixed too optimistic reporting of remaining laps based on remaining fuel by the Race Engineer.
   7. Fixed a couple of bugs in "Race Center" related to handling and reporting of sector times.
   8. Fixed a couple of bugs in "Practice Center" related to handling and reporting of sector times.
-  9. Added the possible remaining driving time based on remaning fuel to the "Fuel" info widget in "System Monitor".
-  10. A couple of optical enhancements to the info widgets in "System Monitor" to make them more readable.
-  11. Prevent exit of applications while a background process is still running. This is especially important at the end of a long session, when the "Simulator Controller" process is still working on the session database or is creating a race report.
-  12. Donload and installation has been optimized. A couple of very large parts of the package that are changed not very often has been removed from the installation package and will be handled as separate downloads, if required. This will speed up the update process significantly in the future.
-  13. Migrated sources to AHK 2.09.
-  14. [Experts Only] Changed timestamp in log files to 24 hour format.
+  9. Fixed hundreds of translation errors for the Spanish translation.
+  10. Added the possible remaining driving time based on remaning fuel to the "Fuel" info widget in "System Monitor".
+  11. A couple of optical enhancements to the info widgets in "System Monitor" to make them more readable.
+  12. Prevent exit of applications while a background process is still running. This is especially important at the end of a long session, when the "Simulator Controller" process is still working on the session database or is creating a race report.
+  13. Donload and installation has been optimized. A couple of very large parts of the package that are changed not very often has been removed from the installation package and will be handled as separate downloads, if required. This will speed up the update process significantly in the future.
+  14. Migrated sources to AHK 2.09.
+  15. [Experts Only] Changed timestamp in log files to 24 hour format.
 
 ## 5.3.0.0-release 09/13/23
   1. Minor bugfixes, as always

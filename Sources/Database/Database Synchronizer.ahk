@@ -309,11 +309,15 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups, downloadStrategie
 synchronizeCommunityDatabase(id, usePressures, useSetups, useStrategies) {
 	synchronizeDatabase("Stop")
 
+	Task.CurrentTask.Critical := true
+
 	try {
 		uploadSessionDatabase(id, usePressures, useSetups, useStrategies)
 		downloadSessionDatabase(id, usePressures, useSetups, useStrategies)
 	}
 	finally {
+		Task.CurrentTask.Critical := false
+
 		synchronizeDatabase("Start")
 	}
 
@@ -323,11 +327,16 @@ synchronizeCommunityDatabase(id, usePressures, useSetups, useStrategies) {
 }
 
 synchronizeSessionDatabase(minutes) {
+	Task.CurrentTask.Critical := true
+
 	try {
 		synchronizeDatabase()
 	}
 	catch Any as exception {
 		logError(exception, true)
+	}
+	finally {
+		Task.CurrentTask.Critical := false
 	}
 
 	Task.CurrentTask.Sleep := (minutes * 60000)

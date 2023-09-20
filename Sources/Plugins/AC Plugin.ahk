@@ -202,10 +202,11 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 
 			value := getMultiMapValue(settings, "Simulator.Assetto Corsa", "Pitstop." . meta, kUndefined)
 
-			ACPlugin.requireCarDatabase()
+			if (value == kUndefined) {
+				ACPlugin.requireCarDatabase()
 
-			if (value == kUndefined)
 				value := getMultiMapValue(ACPlugin.sCarData, "Pitstop Settings", key, default)
+			}
 
 			this.CarMetaData[key] := value
 
@@ -414,38 +415,49 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
+		local postFix, tyre
+
 		super.setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR)
 
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			this.requirePitstopMFD()
 
+			for postFix, tyre in Map("FL", "Front Left", "FR", "Front Right", "RL", "Rear Left", "RR", "Rear Right")
+				if this.selectPitstopOption(tyre) {
+					this.dialPitstopOption(tyre, "Decrease", 60)
+
+					this.dialPitstopOption(tyre, "Increase", Round(pressure%postFix% - this.getCarMetaData("TyrePressureMin" . postFix, 15)))
+				}
+
+			/*
 			if this.selectPitstopOption("Front Left") {
-				this.dialPitstopOption("Front Left", "Decrease", 30)
+				this.dialPitstopOption("Front Left", "Decrease", 60)
 
 				loop Round(pressureFL - this.getCarMetaData("TyrePressureMinFL", 15))
 					this.dialPitstopOption("Front Left", "Increase")
 			}
 
 			if this.selectPitstopOption("Front Right") {
-				this.dialPitstopOption("Front Right", "Decrease", 30)
+				this.dialPitstopOption("Front Right", "Decrease", 60)
 
 				loop Round(pressureFR - this.getCarMetaData("TyrePressureMinFR", 15))
 					this.dialPitstopOption("Front Right", "Increase")
 			}
 
 			if this.selectPitstopOption("Rear Left") {
-				this.dialPitstopOption("Rear Left", "Decrease", 30)
+				this.dialPitstopOption("Rear Left", "Decrease", 60)
 
 				loop Round(pressureRL - this.getCarMetaData("TyrePressureMinRL", 15))
 					this.dialPitstopOption("Rear Left", "Increase")
 			}
 
 			if this.selectPitstopOption("Rear Right") {
-				this.dialPitstopOption("Rear Right", "Decrease", 30)
+				this.dialPitstopOption("Rear Right", "Decrease", 60)
 
 				loop Round(pressureRR - this.getCarMetaData("TyrePressureMinRR", 15))
 					this.dialPitstopOption("Rear Right", "Increase")
 			}
+			*/
 		}
 	}
 

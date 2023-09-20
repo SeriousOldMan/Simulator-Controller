@@ -1525,6 +1525,8 @@ showRaceSettingsEditor() {
 	
 	startupApplication()
 
+	startupProcess()
+
 	gSimulator := false
 	gCar := false
 	gTrack := false

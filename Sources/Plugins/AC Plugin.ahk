@@ -422,13 +422,11 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			this.requirePitstopMFD()
 
-			for postFix, tyre in Map("FL", "Front Left", "FR", "Front Right"
-								   , "RL", "Rear Left", "RR", "Rear Right")
+			for postFix, tyre in Map("FL", "Front Left", "FR", "Front Right", "RL", "Rear Left", "RR", "Rear Right")
 				if this.selectPitstopOption(tyre) {
 					this.dialPitstopOption(tyre, "Decrease", 60)
 
-					loop Round(pressure%postFix% - this.getCarMetaData("TyrePressureMin" . postFix, 15))
-						this.dialPitstopOption(tyre, "Increase")
+					this.dialPitstopOption(tyre, "Increase", Round(pressure%postFix% - this.getCarMetaData("TyrePressureMin" . postFix, 15)))
 				}
 
 			/*

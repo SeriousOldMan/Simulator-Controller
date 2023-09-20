@@ -497,7 +497,7 @@ startupApplication() {
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-if (!isDetachedInstallation() && !isDebug()) {
+if (!isDetachedInstallation() && !isDebug() && !inList(kBackgroundApps, StrSplit(A_ScriptName, ".")[1])) {
 	checkForUpdates()
 
 	requestShareSessionDatabaseConsent()

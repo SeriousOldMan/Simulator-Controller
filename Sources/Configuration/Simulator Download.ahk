@@ -57,6 +57,8 @@ downloadSimulatorController() {
 	TraySetIcon(icon, "1")
 	A_IconTip := "Simulator Download"
 
+	startupProcess()
+
 	if !A_IsAdmin {
 		options := ""
 

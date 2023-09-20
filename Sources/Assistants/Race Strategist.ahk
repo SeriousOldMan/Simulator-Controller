@@ -78,7 +78,7 @@ checkRemoteProcessAlive(pid) {
 		ExitApp(0)
 }
 
-startRaceStrategist() {
+startupRaceStrategist() {
 	local icon := kIconsDirectory . "Artificial Intelligence.ico"
 	local remotePID := false
 	local strategistName := "Cato"
@@ -95,6 +95,8 @@ startRaceStrategist() {
 
 	TraySetIcon(icon, "1")
 	A_IconTip := "Race Strategist"
+
+	startupProcess()
 
 	voiceServer := ProcessExist("Voice Server.exe")
 
@@ -237,4 +239,4 @@ handleStrategistMessage(category, data) {
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-startRaceStrategist()
+startupRaceStrategist()

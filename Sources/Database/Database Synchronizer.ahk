@@ -351,6 +351,8 @@ updateSessionDatabase() {
 	TraySetIcon(icon, "1")
 	A_IconTip := "Database Synchronizer"
 
+	startupProcess()
+
 	usePressures := (inList(A_Args, "-Pressures") != 0)
 	useSetups := (inList(A_Args, "-Setups") != 0)
 	useStrategies := (inList(A_Args, "-Strategies") != 0)

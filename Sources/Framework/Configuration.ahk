@@ -852,7 +852,7 @@ class Plugin extends ConfigurationItem {
 	}
 
 	saveToConfiguration(configuration) {
-		local descriptor, arguments, key, value
+		local descriptor, arguments, key, value, argument, values, result
 
 		super.saveToConfiguration(configuration)
 
@@ -864,8 +864,15 @@ class Plugin extends ConfigurationItem {
 			if (descriptor.Length > 0) {
 				arguments := this.computeArgments(descriptor[3])
 
-				for key, value in this.Arguments[true]
-					arguments[key] := value
+				result := []
+
+				for argument, values in this.Arguments
+					if (values == "")
+						result.Push(argument)
+					else
+						result.Push(argument . ": " . values)
+
+				arguments := values2String("; ", result*)
 			}
 			else
 				arguments := this.Arguments[true]

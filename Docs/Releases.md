@@ -14,6 +14,10 @@
   13. Donload and installation has been optimized. A couple of very large parts of the package that are changed not very often has been removed from the installation package and will be handled as separate downloads, if required. This will speed up the update process significantly in the future.
   14. Migrated sources to AHK 2.09.
   15. [Experts Only] Changed timestamp in log files to 24 hour format.
+  16. New car models for "Setup Workbench":
+      - Assetto Corsa
+        - Pagani Huayra
+        - Pagani Huayra BC
 
 ## 5.3.0.0-release 09/13/23
   1. Minor bugfixes, as always

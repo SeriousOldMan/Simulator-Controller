@@ -1043,10 +1043,16 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 						this.activateWindow()
 
-						if (targetSelectedOption > this.iPSSelectedOption)
-							this.sendCommand("{Down}", targetSelectedOption - this.iPSSelectedOption)
+						delta := (this.iPSOptions.Length - targetSelectedOption + this.iPSSelectedOption)
+
+						if (Abs(targetSelectedOption - this.iPSSelectedOption) <= delta) {
+							if (targetSelectedOption > this.iPSSelectedOption)
+								this.sendCommand("{Down}", targetSelectedOption - this.iPSSelectedOption)
+							else
+								this.sendCommand("{Up}", this.iPSSelectedOption - targetSelectedOption)
+						}
 						else
-							this.sendCommand("{Up}", this.iPSSelectedOption - targetSelectedOption)
+							this.sendCommand("{Up}", delta)
 
 						this.iPSSelectedOption := targetSelectedOption
 

@@ -24,6 +24,7 @@
 
 #Include "..\Libraries\Task.ahk"
 #Include "..\Libraries\Messages.ahk"
+#Include "..\Libraries\HTMLViewer.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;

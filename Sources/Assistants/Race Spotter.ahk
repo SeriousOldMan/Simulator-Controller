@@ -78,7 +78,7 @@ checkRemoteProcessAlive(pid) {
 		ExitApp(0)
 }
 
-startRaceSpotter() {
+startupRaceSpotter() {
 	local icon := kIconsDirectory . "Artificial Intelligence.ico"
 	local remotePID := false
 	local spotterName := "Elisa"
@@ -95,6 +95,8 @@ startRaceSpotter() {
 
 	TraySetIcon(icon, "1")
 	A_IconTip := "Race Spotter"
+
+	startupProcess()
 
 	voiceServer := ProcessExist("Voice Server.exe")
 
@@ -244,4 +246,4 @@ handleSpotterMessage(category, data) {
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-startRaceSpotter()
+startupRaceSpotter()

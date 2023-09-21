@@ -32,7 +32,7 @@ class SplashScreenEditor extends ConfiguratorPanel {
 	iClosed := false
 	iSplashScreensList := false
 
-	class SplashScreensWindow extends Window {
+	class SplashScreenEditorWindow extends Window {
 		iEditor := false
 
 		__New(editor) {
@@ -79,7 +79,7 @@ class SplashScreenEditor extends ConfiguratorPanel {
 			}
 		}
 
-		splashScreensGui := SplashScreenEditor.SplashScreensWindow(this)
+		splashScreensGui := SplashScreenEditor.SplashScreenEditorWindow(this)
 
 		this.Window := splashScreensGui
 

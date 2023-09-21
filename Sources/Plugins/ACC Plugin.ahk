@@ -263,7 +263,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 		super.__New(controller, name, simulator, configuration)
 
-		if (this.Active || isDebug()) {
+		if (this.Active || (isDebug() && isDevelopment())) {
 			this.iPitstopMode := this.findMode(kPitstopMode)
 
 			if this.iChatMode
@@ -312,14 +312,22 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		selectActions := ["NoRefuel", "TyreChange", "BrakeChange", "SuspensionRepair", "BodyworkRepair"]
 	}
 
-	simulatorStartup(simulator) {
-		loadDatabase() {
-			if !ACCPlugin.sCarData
-				ACCPlugin.sCarData := readMultiMap(kResourcesDirectory . "Simulator Data\ACC\Car Data.ini")
-		}
+	static requireCarDatabase() {
+		local data
 
+		if !ACCPlugin.sCarData {
+			data := readMultiMap(kResourcesDirectory . "Simulator Data\ACC\Car Data.ini")
+
+			if FileExist(kUserHomeDirectory . "Simulator Data\ACC\Car Data.ini")
+				addMultiMapValues(data, readMultiMap(kUserHomeDirectory . "Simulator Data\ACC\Car Data.ini"))
+
+			ACCPlugin.sCarData := data
+		}
+	}
+
+	simulatorStartup(simulator) {
 		if (simulator = kACCApplication)
-			Task.startTask(loadDatabase, 1000, kLowPriority)
+			Task.startTask(ObjBindMethod(ACCPlugin, "requireCarDatabase"), 1000, kLowPriority)
 
 		super.simulatorStartup(simulator)
 	}
@@ -444,8 +452,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		static lastLap := 0
 
 		if !carIDs {
-			if !ACCPlugin.sCarData
-				ACCPlugin.sCarData := readMultiMap(kResourcesDirectory . "Simulator Data\ACC\Car Data.ini")
+			ACCPlugin.requireCarDatabase()
 
 			carIDs := getMultiMapValues(ACCPlugin.sCarData, "Car IDs")
 		}
@@ -580,8 +587,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		super.updatePositionsData(data)
 
 		if !carCategories {
-			if !ACCPlugin.sCarData
-				ACCPlugin.sCarData := readMultiMap(kResourcesDirectory . "Simulator Data\ACC\Car Data.ini")
+			ACCPlugin.requireCarDatabase()
 
 			carCategories := getMultiMapValues(ACCPlugin.sCarData, "Car Categories")
 		}
@@ -2137,12 +2143,15 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			if (this.getPitstopOptionValues("Tyre Compound")[1] != compound)
 				changePitstopTyreCompound((compound = "Wet") ? "Increase" : "Decrease")
 
-			if (set && (compound = "Dry")) {
-				tyreSetIncrement := Round(set - this.getPitstopOptionValues("Tyre Set")[1])
+			if (set && (compound = "Dry"))
+				loop {
+					tyreSetIncrement := Round(set - this.getPitstopOptionValues("Tyre Set")[1])
 
-				if (tyreSetIncrement != 0)
-					changePitstopTyreSet((tyreSetIncrement > 0) ? "Next" : "Previous", Abs(tyreSetIncrement))
-			}
+					if (tyreSetIncrement = 0)
+						break
+					else
+						changePitstopTyreSet((tyreSetIncrement > 0) ? "Next" : "Previous", Abs(tyreSetIncrement))
+				}
 		}
 		else if this.iPSChangeTyres
 			this.toggleActivity("Change Tyres")

@@ -420,8 +420,81 @@ checkInstallation() {
 	global gProgressCount
 
 	local installLocation := ""
-	local installInfo, quiet, options, msgResult
+	local installInfo, quiet, options, msgResult, hasSplash
 	local install, index, options, isNew, packageLocation, ignore, directory, currentDirectory
+
+	installComponents(packageLocation, installLocation) {
+		global gProgressCount
+
+		local packageInfo := readMultiMap(packageLocation . "\VERSION")
+		local installInfo := readMultiMap(installLocation . "\VERSION")
+		local installedComponents := string2Map(",", "->", getMultiMapValue(installInfo
+																		  , getMultiMapValue(installInfo, "Current", "Type", "Release")
+																		  , "Components", ""))
+		local error := false
+		local component, version, type, ignore, part, path
+
+		for component, version in string2Map(",", "->"
+										   , getMultiMapValue(packageInfo, getMultiMapValue(packageInfo, "Current", "Type")
+																		 , "Components", "")) {
+			if ((packageLocation = installLocation) || !installedComponents.Has(component)
+													|| (VerCompare(version, installedComponents[component]) > 0)) {
+				try {
+					showProgress({progress: (gProgressCount += 2)
+								, message: translate("Downloading ") . component . translate(" files...")})
+
+					Download(getMultiMapValue(packageInfo, "Components", component . "." . version . ".Download"), A_Temp . "\Temp.zip")
+
+					showProgress({progress: (gProgressCount += 2)
+								, message: translate("Extracting ") . component . translate(" files...")})
+
+					path := Trim(getMultiMapValue(packageInfo, "Components", component . "." . version . ".Path", ""))
+
+					if (path && (path != "") && (path != "."))
+						path := (packageLocation . "\" . path)
+					else
+						path := packageLocation
+
+					RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\Temp.zip' -DestinationPath '" . path . "' -Force", , "Hide")
+
+					showProgress({progress: (gProgressCount += 5)})
+				}
+				catch Any as exception {
+					logError(exception, true)
+
+					error := true
+				}
+			}
+			else {
+				version := installedComponents[component]
+
+				for ignore, part in string2Values(",", getMultiMapValue(installInfo, "Components", component . "." . version . ".Content")) {
+					path := Trim(getMultiMapValue(packageInfo, "Components", component . "." . version . ".Path", ""))
+
+					if (path && (path != "") && (path != "."))
+						path := ("\" . path . "\" . part)
+					else
+						path := ("\" . part)
+
+					type := FileExist(installLocation . path)
+
+					showProgress({progress: (gProgressCount += 2)
+								, message: translate("Copying ") . component . translate(" files...")})
+
+					if (type && InStr(type, "D"))
+						DirCopy(installLocation . path, packageLocation . path, 1)
+					else if type
+						FileCopy(installLocation . path, packageLocation, 1)
+				}
+			}
+		}
+
+		if error {
+			OnMessage(0x44, translateOkButton)
+			MsgBox(translate("Cannot download additional files, because the version repository is currently unavailable. Please start `"Simulator Download`" again later."), translate("Error"), 262160)
+			OnMessage(0x44, translateOkButton, 0)
+		}
+	}
 
 	try {
 		installLocation := RegRead("HKLM\" . kUninstallKey, "InstallLocation")
@@ -463,7 +536,7 @@ checkInstallation() {
 				  , DeleteUserFiles: false}
 
 		if (quiet || uninstallOptions(options)) {
-			showSplashScreen("McLaren 720s GT3 Pictures")
+			hasSplash := showSplashScreen("McLaren 720s GT3 Pictures")
 
 			gProgressCount := 0
 
@@ -507,7 +580,9 @@ checkInstallation() {
 
 			Sleep(1000)
 
-			hideSplashScreen()
+			if hasSplash
+				hideSplashScreen()
+
 			hideProgress()
 
 			ExitApp(0)
@@ -579,6 +654,8 @@ checkInstallation() {
 				showProgress({color: "Blue", title: translate("Installing Simulator Controller"), message: translate("...")})
 
 				try {
+					installComponents(packageLocation, installLocation)
+
 					for ignore, directory in [kBinariesDirectory, kResourcesDirectory . "Setup\Installer\"] {
 						gProgressCount += 1
 
@@ -610,29 +687,29 @@ checkInstallation() {
 					}
 
 					if options.StartMenuShortcuts {
-						showProgress({progress: gProgressCount, message: translate("Creating Start menu shortcuts...")})
+						showProgress({progress: gProgressCount++, message: translate("Creating Start menu shortcuts...")})
 
 						createShortcuts(A_StartMenu, installLocation)
 					}
 					else {
-						showProgress({progress: gProgressCount, message: translate("Removing Start menu shortcuts...")})
+						showProgress({progress: gProgressCount++, message: translate("Removing Start menu shortcuts...")})
 
 						deleteShortcuts(A_StartMenu)
 					}
 
 					if options.DesktopShortcuts {
-						showProgress({progress: gProgressCount, message: translate("Creating Desktop shortcuts...")})
+						showProgress({progress: gProgressCount++, message: translate("Creating Desktop shortcuts...")})
 
 						createShortcuts(A_Desktop, installLocation)
 					}
 					else {
-						showProgress({progress: gProgressCount, message: translate("Removing Desktop shortcuts...")})
+						showProgress({progress: gProgressCount++, message: translate("Removing Desktop shortcuts...")})
 
 						deleteShortcuts(A_Desktop)
 					}
 
 					if (options.InstallType = "Registry") {
-						showProgress({message: translate("Updating Registry...")})
+						showProgress({progress: gProgressCount++, message: translate("Updating Registry...")})
 
 						writeAppPaths(installLocation)
 						writeUninstallerInfo(installLocation)
@@ -649,7 +726,7 @@ checkInstallation() {
 					writeMultiMap(kUserConfigDirectory . "Simulator Controller.install", installInfo)
 
 					if (installLocation != packageLocation) {
-						showProgress({message: translate("Removing installation files...")})
+						showProgress({progress: gProgressCount++, message: translate("Removing installation files...")})
 
 						if InStr(packageLocation, A_Temp)
 							removeDirectory(packageLocation)
@@ -2827,7 +2904,7 @@ prepareTargets(&buildProgress, updateOnly) {
 	}
 }
 
-startSimulatorTools() {
+startupSimulatorTools() {
 	global gUpdateSettings, gCleanupSettings, gCopySettings, gBuildSettings, gSplashScreen, gTargetConfiguration, gTargetsCount
 
 	local forceExit := GetKeyState("Shift")
@@ -2859,6 +2936,8 @@ startSimulatorTools() {
 			if !editTargets()
 				ExitApp(0)
 	}
+
+	startupApplication()
 
 	if (!kSilentMode && gSplashScreen)
 		showSplashScreen(gSplashScreen, false, false)
@@ -2931,7 +3010,7 @@ cancelBuild() {
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-startSimulatorTools()
+startupSimulatorTools()
 
 
 ;;;-------------------------------------------------------------------------;;;

@@ -362,7 +362,7 @@ class SimulatorPlugin extends ControllerPlugin {
 
 		super.__New(controller, name, configuration, register)
 
-		if (this.Active || isDebug()) {
+		if (this.Active || (isDebug() && isDevelopment())) {
 			this.iCommandMode := this.getArgumentValue("pitstopMFDMode", "Event")
 
 			for ignore, theAction in string2Values(",", this.getArgumentValue("pitstopCommands", "")) {
@@ -765,7 +765,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 
 		super.__New(controller, name, simulator, configuration)
 
-		if (this.Active || isDebug()) {
+		if (this.Active || (isDebug() && isDevelopment())) {
 			this.iActionMode := kAssistantMode
 
 			for ignore, theAction in string2Values(",", this.getArgumentValue("assistantCommands", ""))

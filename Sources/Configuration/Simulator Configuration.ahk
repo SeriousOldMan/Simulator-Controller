@@ -558,6 +558,8 @@ startupSimulatorConfiguration() {
 
 	editor.show()
 
+	startupApplication()
+
 	try {
 		loop {
 			Sleep(200)

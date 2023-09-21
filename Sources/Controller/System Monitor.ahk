@@ -71,7 +71,7 @@ updateDashboard(window, viewer, html := "") {
 	if (html == false)
 		html := " "
 
-	html := ("<html><meta charset='utf-8'><body style='background-color: #" . window.BackColor . "; overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 10px }</style><style> #header { font-size: 12px; } td {vertical-align: top } </style><div>" . html . "</div></body></html>")
+	html := ("<html><meta charset='utf-8'><body style='background-color: #" . window.BackColor . "; overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 10px }</style><style> #header { font-size: 12px; } </style><div>" . html . "</div></body></html>")
 
 	viewer.document.open()
 	viewer.document.write(html)
@@ -98,6 +98,10 @@ getTableCSS(window) {
 			background-color: #%headerBackColor%;
 			color: #%textColor%;
 			border: thin solid #%frameColor%;
+		}
+
+		.th-std {
+			vertical-align: top;
 		}
 
 		.td-std {
@@ -502,6 +506,7 @@ systemMonitor(command := false, arguments*) {
 	createFuelWidget(sessionState) {
 		local fuelLow := (Floor(getMultiMapValue(sessionState, "Stint", "Laps.Remaining.Fuel", 0)) < 4)
 		local html := ""
+		local lastTime
 
 		try {
 			html .= "<table class=`"table-std`">"
@@ -509,7 +514,12 @@ systemMonitor(command := false, arguments*) {
 			html .= ("<tr><th class=`"th-std th-left`">" . translate("Consumption (Lap)") . "</th><td class=`"td-wdg`">" . displayValue("Float", convertUnit("Volume", getMultiMapValue(sessionState, "Stint", "Fuel.Consumption"))) . "</td></tr>")
 			html .= ("<tr><th class=`"th-std th-left`">" . translate("Consumption (Avg.)") . "</th><td class=`"td-wdg`">" . displayValue("Float", convertUnit("Volume", getMultiMapValue(sessionState, "Stint", "Fuel.AvgConsumption"))) . "</td></tr>")
 			html .= ("<tr><th class=`"th-std th-left`">" . translate("Remaining Fuel") . "</th><td class=`"td-wdg`">" . displayValue("Float", convertUnit("Volume", getMultiMapValue(sessionState, "Stint", "Fuel.Remaining"))) . "</td></tr>")
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Remaining Laps") . "</th><td class=`"td-wdg`">" . (fuelLow ? "<font color=`"red`">" : "") . Floor(getMultiMapValue(sessionState, "Stint", "Laps.Remaining.Fuel")) . (fuelLow ? "</font>" : "") . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Laps Left") . "</th><td class=`"td-wdg`">" . (fuelLow ? "<font color=`"red`">" : "") . Floor(getMultiMapValue(sessionState, "Stint", "Laps.Remaining.Fuel")) . (fuelLow ? "</font>" : "") . "</td></tr>")
+
+			lastTime := getMultiMapValue(sessionState, "Stint", "Lap.Time.Last", kUndefined)
+
+			if (lastTime != kUndefined)
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Time Left") . "</th><td class=`"td-wdg`">" . (fuelLow ? "<font color=`"red`">" : "") . displayValue("Time", Floor(lastTime * getMultiMapValue(sessionState, "Stint", "Laps.Remaining.Fuel"))) . (fuelLow ? "</font>" : "") . "</td></tr>")
 		}
 		catch Any as exception {
 			logError(exception)
@@ -974,7 +984,7 @@ systemMonitor(command := false, arguments*) {
 		}
 
 		if (sessionState.Count > 0) {
-			html := "<style>" . getTableCSS(systemMonitorGui) . " div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { text-align: center; font-size: 12px; background-color: #" . systemMonitorGui.Theme.TableColor["Header"] . "; } td {vertical-align: top } </style><table>"
+			html := "<style>" . getTableCSS(systemMonitorGui) . " div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { text-align: center; font-size: 12px; background-color: #" . systemMonitorGui.Theme.TableColor["Header"] . "; } </style><table>"
 
 			widgets := []
 
@@ -1807,7 +1817,7 @@ clearOrphaneStateFiles() {
 	}
 }
 
-startSystemMonitor() {
+startupSystemMonitor() {
 	local icon := kIconsDirectory . "Monitoring.ico"
 	local noLaunch, ignore, assistant
 
@@ -1824,6 +1834,8 @@ startSystemMonitor() {
 		deleteFile(kTempDirectory . assistant . " Session.state")
 
 	PeriodicTask(clearOrphaneStateFiles, 60000, kLowPriority).start()
+
+	startupApplication()
 
 	systemMonitor()
 }
@@ -1850,4 +1862,4 @@ monitoringMessageHandler(category, data) {
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-startSystemMonitor()
+startupSystemMonitor()

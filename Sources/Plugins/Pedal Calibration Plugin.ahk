@@ -186,7 +186,7 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 
 		super.__New(controller, name, configuration, false)
 
-		if (this.Active || isDebug()) {
+		if (this.Active || (isDebug() && isDevelopment())) {
 			this.iSmartCtrlApplication := Application(this.getArgumentValue("controlApplication", kPedalCalibrationPlugin), configuration)
 
 			smartCtrl := this.iSmartCtrlApplication.ExePath

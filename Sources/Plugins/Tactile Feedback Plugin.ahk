@@ -285,7 +285,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 
 		super.__New(controller, name, configuration, false)
 
-		if (this.Active || isDebug()) {
+		if (this.Active || (isDebug() && isDevelopment())) {
 			simFeedbackApplication := Application(this.getArgumentValue("controlApplication", kTactileFeedbackPlugin), configuration)
 
 			kSimHub := simFeedbackApplication.ExePath

@@ -352,6 +352,9 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		local runningLap := 0
 		local stint, newStint, lastStint, driverID, driverName, ignore, telemetryData, pitstop, pressures, temperatures, wear
 
+		if Task.CurrentTask
+			Task.CurrentTask.Critical := true
+
 		if (teamServer && teamServer.Active && session) {
 			lastStint := false
 			driverID := kNull
@@ -586,6 +589,9 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		local teamServer, session, runningLap, raceInfo, count, pitstops, lapData, data, key, value
 		local times, positions, laps, drivers, newLine, line, fileName, directory
 		local simulatorCode, carCode, trackCode
+
+		if Task.CurrentTask
+			Task.CurrentTask.Critical := true
 
 		if (targetDirectory || reportsDirectory) {
 			teamServer := this.TeamServer

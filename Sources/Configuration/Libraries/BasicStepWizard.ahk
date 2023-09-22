@@ -149,7 +149,7 @@ class BasicStepWizard extends StepWizard {
 			wizard.Window.Show()
 
 			OnMessage(0x44, translateYesNoButtons)
-			msgResult := MsgBox((translate("Do you want to generate the new configuration?") . "`n`n" . translate("Backup files will be saved for your current configuration in the `"Simulator Controller\Config`" folder in your user `"Documents`" folder.")), translate("Setup"), 262436)
+			msgResult := MsgBox((translate("Do you want to generate the new configuration?") . "`n`n" . translate("Backup files will be saved for your current configuration in the `"Simulator Controller\Config`" folder in your user `"Documents`" folder.")), translate("Setup "), 262436)
 			OnMessage(0x44, translateYesNoButtons, 0)
 
 			if (msgResult = "Yes")

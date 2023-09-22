@@ -482,7 +482,7 @@ class SetupWizard extends ConfiguratorPanel {
 
 		if (GetKeyState("Ctrl") && GetKeyState("Shift")) {
 			OnMessage(0x44, translateYesNoButtons)
-			msgResult := MsgBox(translate("Do you really want to start with a fresh configuration?"), translate("Setup"), 262436)
+			msgResult := MsgBox(translate("Do you really want to start with a fresh configuration?"), translate("Setup "), 262436)
 			OnMessage(0x44, translateYesNoButtons, 0)
 
 			if (msgResult = "Yes")
@@ -621,7 +621,7 @@ class SetupWizard extends ConfiguratorPanel {
 				this.WizardWindow.Show()
 
 				OnMessage(0x44, translateYesNoButtons)
-				msgResult := MsgBox((translate("Do you want to generate the new configuration?") . "`n`n" . translate("Backup files will be saved for your current configuration in the `"Simulator Controller\Config`" folder in your user `"Documents`" folder.")), translate("Setup"), 262436)
+				msgResult := MsgBox((translate("Do you want to generate the new configuration?") . "`n`n" . translate("Backup files will be saved for your current configuration in the `"Simulator Controller\Config`" folder in your user `"Documents`" folder.")), translate("Setup "), 262436)
 				OnMessage(0x44, translateYesNoButtons, 0)
 
 				if (msgResult = "Yes")

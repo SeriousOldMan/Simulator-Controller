@@ -1522,10 +1522,8 @@ showRaceSettingsEditor() {
 
 	TraySetIcon(icon, "1")
 	A_IconTip := "Race Settings"
-	
-	startupApplication()
 
-	startupProcess()
+	startupApplication()
 
 	gSimulator := false
 	gCar := false

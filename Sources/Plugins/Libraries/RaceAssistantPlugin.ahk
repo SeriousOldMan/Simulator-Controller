@@ -1379,7 +1379,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	static lastLap(data, &overLap) {
-		local sessionTimeRemaining, driverCar
+		local sessionTimeRemaining, driverCar, time, running
 
 		overLap := 0
 
@@ -1388,12 +1388,14 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 			loop getMultiMapValue(data, "Position Data", "Car.Count")
 				if (getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Position") = 1) {
-					if ((sessionTimeRemaining - getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Time")) <= 0) {
+					time := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Time")
+					running := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Lap.Running")
+
+					if ((sessionTimeRemaining - ((1 - running) * time)) <= 0) {
 						driverCar := getMultiMapValue(data, "Position Data", "Driver.Car")
 
 						if (driverCar != A_Index)
-							if (getMultiMapValue(data, "Position Data", "Car." . driverCar . ".Lap.Running")
-							  > getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Lap.Running"))
+							if (getMultiMapValue(data, "Position Data", "Car." . driverCar . ".Lap.Running") > running)
 								overLap := 1
 
 						return true
@@ -1402,10 +1404,10 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					break
 				}
 
-			return (sessionTimeRemaining = 0)
+			return (sessionTimeRemaining <= 0)
 		}
 		else
-			return (getMultiMapValue(data, "Session Data", "SessionLapsRemaining", 0) = 0)
+			return (getMultiMapValue(data, "Session Data", "SessionLapsRemaining", 0) <= 0)
 	}
 
 	activate() {

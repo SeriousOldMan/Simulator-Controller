@@ -3,7 +3,7 @@ Version=5.3.2.0-dev
 Target=5.3.2.0-release
 Date=09/21/2023
 Download=
-Changes=Performance improvement for ACC Pitstop MFD handling
+Changes=Performance improvement for ACC Pitstop MFD handling, Fixed last lap detection for timed races
 [Release]
 Version=5.3.0.0-release
 Date=09/13/2023

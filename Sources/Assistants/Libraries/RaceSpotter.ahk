@@ -1284,23 +1284,26 @@ class RaceSpotter extends GridRaceAssistant {
 
 	lastLap() {
 		local knowledgeBase := this.KnowledgeBase
-		local sessionTimeRemaining, driverCar
+		local sessionTimeRemaining, driverCar, running, time
 
 		if (knowledgeBase.getValue("Session.Format") = "Time") {
 			sessionTimeRemaining := knowledgeBase.getValue("Session.Time.Remaining")
 
 			loop knowledgeBase.getValue("Car.Count", 0)
 				if (knowledgeBase.getValue("Car." . A_Index . ".Position") = 1) {
-					if ((sessionTimeRemaining - knowledgeBase.getValue("Car." . A_Index . ".Time")) <= 0)
+					time := knowledgeBase.getValue("Car." . A_Index . ".Time")
+					running := knowledgeBase.getValue("Car." . A_Index . ".Lap.Running")
+
+					if ((sessionTimeRemaining - ((1 - running) * time)) <= 0)
 						return true
 
 					break
 				}
 
-			return (sessionTimeRemaining = 0)
+			return (sessionTimeRemaining <= 0)
 		}
 		else
-			return (knowledgeBase.getValue("Session.Lap.Remaining") = 0)
+			return (knowledgeBase.getValue("Session.Lap.Remaining") <= 0)
 	}
 
 	reviewRaceStart(lastLap, sector, positions) {

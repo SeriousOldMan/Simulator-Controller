@@ -321,16 +321,21 @@ recreateTrackMaps() {
 
 	Task.CurrentTask.Critical := true
 
-	loop Files, directory . "User\Tracks\*.*", "D" {
-		code := A_LoopFileName
+	try {
+		loop Files, directory . "User\Tracks\*.*", "D" {
+			code := A_LoopFileName
 
-		simulator := sessionDB.getSimulatorName(code)
+			simulator := sessionDB.getSimulatorName(code)
 
-		loop Files, directory . "User\Tracks\" . code . "\*.map", "F" {
-			SplitPath(A_LoopFileName, , , , &track)
+			loop Files, directory . "User\Tracks\" . code . "\*.map", "F" {
+				SplitPath(A_LoopFileName, , , , &track)
 
-			recreateTrackMap(simulator, track)
+				recreateTrackMap(simulator, track)
+			}
 		}
+	}
+	finally {
+		Task.CurrentTask.Critical := false
 	}
 }
 
@@ -345,9 +350,14 @@ startupTrackMapper() {
 	createMap(simulator, track, data) {
 		Task.CurrentTask.Critical := true
 
-		createTrackMap(simulator, track, data)
+		try {
+			createTrackMap(simulator, track, data)
 
-		deleteFile(data)
+			deleteFile(data)
+		}
+		finally {
+			Task.CurrentTask.Critical := false
+		}
 
 		ExitApp(0)
 	}

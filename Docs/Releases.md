@@ -1,3 +1,6 @@
+## 5.3.1.1-release 09/23/23
+  1. Fixed a critical bug for the track mapper, that could present a dialog box while you are on the track.
+
 ## 5.3.1.0-release 09/22/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

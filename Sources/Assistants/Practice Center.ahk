@@ -3487,10 +3487,10 @@ class PracticeCenter extends ConfigurationItem {
 			local count := 0
 			local lap, driver, telemetryData, pressures, temperatures, wear, pressuresData, info
 
-			Task.CurrentTask.Critical := true
-
 			while (row := this.LapsListView.GetNext(row, "C"))
 				count += 1
+
+			Task.CurrentTask.Critical := true
 
 			try {
 				row := 0
@@ -3553,6 +3553,8 @@ class PracticeCenter extends ConfigurationItem {
 					catch Any as exception {
 						logError(exception)
 					}
+				
+				Task.CurrentTask.Critical := false
 			}
 
 			this.iSessionExported := true

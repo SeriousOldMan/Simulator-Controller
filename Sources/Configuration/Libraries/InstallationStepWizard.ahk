@@ -19,7 +19,7 @@ class InstallationStepWizard extends StepWizard {
 
 	Pages {
 		Get {
-			return (this.SetupWizard.QuickSetup ? 0 : Ceil(this.Definition.Length / 3))
+			return (this.SetupWizard.BasicSetup ? 0 : Ceil(this.Definition.Length / 3))
 		}
 	}
 
@@ -244,7 +244,7 @@ class InstallationStepWizard extends StepWizard {
 
 		if !done {
 			OnMessage(0x44, translateYesNoButtons)
-			msgResult := MsgBox(translate("Not all required software components have been installed. Do you really want to proceed?"), translate("Setup"), 262436)
+			msgResult := MsgBox(translate("Not all required software components have been installed. Do you really want to proceed?"), translate("Setup "), 262436)
 			OnMessage(0x44, translateYesNoButtons, 0)
 
 			if (msgResult = "No")

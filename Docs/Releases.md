@@ -1,13 +1,36 @@
-## 5.3.0.0-release 09/15/23 (planned - latest, maybe earlier)
+## 5.3.1.0-release 09/22/23
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. Fixed a bug in "Simulator Setup", where last changes were not saved, when generating a new configuration directly from the basic setup page.
+  4. Fixed a bug in "Session Database", where the list of settings were not updated correctly, when a new setting was added.
+  5. Fixed a rare off by one error, when requesting a specific tyre set for a pitstop controlled by the "Race Center" in *Assetto Corsa Competizione*.
+  6. Fixed too optimistic reporting of remaining laps based on remaining fuel by the Race Engineer.
+  7. Fixed a couple of bugs in "Race Center" related to handling and reporting of sector times.
+  8. Fixed a couple of bugs in "Practice Center" related to handling and reporting of sector times.
+  9. Fixed hundreds of translation errors for the Spanish translation.
+  10. Added the possible remaining driving time based on remaning fuel to the "Fuel" info widget in "System Monitor".
+  11. A couple of optical enhancements to the info widgets in "System Monitor" to make them more readable.
+  12. Prevent exit of applications while a background process is still running. This is especially important at the end of a long session, when the "Simulator Controller" process is still working on the session database or is creating a race report.
+  13. Donload and installation has been optimized. A couple of very large parts of the package that are changed not very often has been removed from the installation package and will be handled as separate downloads, if required. This will speed up the update process significantly in the future.
+  14. Migrated sources to AHK 2.09.
+  15. [Experts Only] Changed timestamp in log files to 24 hour format.
+  16. New car models for "Setup Workbench":
+      - Assetto Corsa
+        - Pagani Huayra
+        - Pagani Huayra BC
+
+## 5.3.0.0-release 09/13/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. The "Simulator Setup" application has seen a major overhaul:
-     - It now supports a kind of quick configuration, which allow especially new users to create a useful configuration very fast. See the extended documentation of the [quick start guide](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Quick-Start-Guide) for more information.
+     - A new navigation menu at the bottom of the window allows you to go to each configuration step quickly.
+	 - You can also always jump to a specific page when "Simulator Setup" is started, by [referencing this page in "Application Settings.ini"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#running-the-setup-tool).
+     - "Simulator Setup" now supports a kind of quick configuration, which allow especially new users to create a useful configuration very fast. See the extended documentation of the [quick start guide](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Quick-Start-Guide) for more information.
 	 - Full configuration of the *Names*, *Languages* and *Voices* of the Race Assistants is now possible in the "Basic" configuration page-
 	 - When a new configuration is being created, some of the changes made by the user in other application, for example in the settings of "Simulator Startup", will be preserved, if possible.
 	 - The presets "Names and voices of Assistants", "Different Speaker Voices" and "Mode Automation" have been removed, since they are no longer needed. If such a preset is in use in your configuration, it will still be active, until you remove it.
 	 - The "Push-To-Talk Behaviour" preset has been deprecated as well. This option is now available in the standard voice control configuration.
-	 - All presets with search images for *Assetto Corsa Competizione* has been removed, since it is no longer needed.
+	 - All presets with search images for *Assetto Corsa Competizione* has been removed, since they are no longer needed.
 	 - [Expert Only] A new preset "Custom Configuration" has been added with a very extensive sample section, which helps the experts to create special configurations.
 	 - [Expert Only] When a new configuration is beeing created, "Simulator Setup" will first read the currently active configuration and then will generate the new configuration. The new configuration will then be integrated into the current configuration, preserving in most cases the custom additions, that may have been made with "Simulator Configuration", as long as they are not in conflict or happen to be the same configuration item. This means, that it is now possible to use the wizard "Simulator Setup" together with "Simulator Configuration" for configuration tasks.
   4. "Simulator Startup" learned a new trick. It can now unblock applications and DLLs, when holding down the Control together with the Shift key, while starting. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#fixing-problems) for more information.
@@ -41,11 +64,15 @@
   19. New test mode in the voice configuration let you now test your changes to pitch, speed or distortion in place.
   21. The special configuration to choose between the different possible behaviours of the *Push To Talk* button (formerly handled by the "P2T Configuration.ini" file) has been moved to the standard configuration. This is automatically handled by "Simulator Setup" and "Simulator Configuration".
   21. Automatic updates for versions prior to 4.0.0 are no longer possible.
-  22. Migrated the sources to AHK 2.07.
+  22. Migrated the sources to AHK 2.08.
   23. [Experts Only] The grammar files has been split up and modularized.
   24. [Experts Only] New [controller action functions "targetListener", "startActivation", "startListen" and "stopListen"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions), which let you control the listen mode of voice control from your custom scripts. There are also three new icons in the Stream Deck icon set, which can represent these custom actions.
   25. [Experts Only] *Normal* controller functions (for example "Button", "Dial", etc.) can now also call a [controller action function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) directly. This opens endless possibilities for controller hardware configuration.
   26. [Developers Only] MultiMap files can now "#Include" other MultiMap files.
+  27. New car models for "Setup Workbench":
+      - Assetto Corsa
+        - Alfa Romeo MiTo QV
+		- Alfa Romeo Giulietta QV
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-530). You will find there a description how to change your configuration to use the new capabilities of "Simulator Setup".
 

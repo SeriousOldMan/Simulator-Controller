@@ -2691,7 +2691,7 @@ class RaceEngineer extends RaceAssistant {
 ;;;-------------------------------------------------------------------------;;;
 
 lowFuelWarning(context, remainingLaps) {
-	context.KnowledgeBase.RaceAssistant.lowFuelWarning(Round(remainingLaps))
+	context.KnowledgeBase.RaceAssistant.lowFuelWarning(Floor(remainingLaps))
 
 	return true
 }

@@ -1,16 +1,28 @@
 [Development]
-Version=5.3.0.0-beta
-Target=5.3.0.0-release
-Date=09/07/2023
-Download=https://www.dropbox.com/scl/fi/rma3cw8td0i7h6qmrv28s/Simulator-Controller-5.3.0.0-beta.zip?rlkey=9d7diesikxudjv6q98xi20oqi&dl=1
-Changes=New page in "Server Administration, Compact database function in "Server Administration", New quick setup method in "Simulator Setup", Spotter informs you about being faster than cars ahead of you, "Mode Automation" preset no longer available, "Names and voices of Assistants" preset no longer available, Simulator settings are preserved when using "Simulator Setup", Names and voices of Assistants can be changed in Quick setup, New general configuration patch in "Simulator Setup", New general settings patch in "Simulator Setup", ACC Pitstop search image presets no longer available in "Simulator Setup", Integrated "P2T Configuration.ini" into "Core Settings.ini", "Practice Center" displays sector times in several places, Voice test mode in the new basic setup page, Voice prelisten mode in general voice configuration, Optimized random distributions, New Strategist voice command for FCY, New controller action "FCYRecommend" for "Race Strategist" plugin, New icon in Stream Deck Icon set for "FCYRecommend" action, Many new voice commands for Spotter and Strategist, New information request actions for Spotter and Strategist incl. new icons in the Stream Deck Icon set, Include clause for multi map files, Refactoring of grammar files, New match rating core settings, "Simulator Startup" can now unblock files, Spotter informes about in which sectors the driver is faster and/or slower than its opponents, New controller action functions "targetListen", "startActivation", "startListen" and "stopListen", No more automatic updates prior to 4.0, Migrated sources to AHK 2.07, Race Center display sector times
+Version=5.3.1.0-release
+Target=5.3.1.0-release
+Date=09/22/2023
+Download=https://cutt.ly/7wc44IWJ;https://www.dropbox.com/scl/fi/ru77ar6wbh5h6pbkwzrzr/Simulator-Controller-5.3.1.0-release.zip?rlkey=2mlamuv1apsspn3m1m5tiubx2&dl=1
+Changes=Downloadable components for installation and update process, Fixed list update when adding a setting in "Session Database", Fixed rare off-by-one error for tyre set selection in ACC, Fixed Engineer to be optimistic in reporting the remaining laps on fuel, Fixed time in log files to be in 24 hour format, Fixed a couple of bugs in "Race Center" related to sector times, Migrated to AHK 2.09, Display time left on fuel in fuel widget in "Session Monitor", Optical enhancement in "Session Monitor" HTML generator, Prevent exit while tasks are running, Fixes for the Spanish translation, New car models for "Setup Workbench"
+Components=Media->5.3.0,Configuration->5.3.0,Utilities->5.3.0
 [Release]
-Version=5.2.3.0-release
-Date=08/18/2023
-Download=https://cutt.ly/nwg5Cmrz;https://www.dropbox.com/scl/fi/z98x4at0ydwwo5eium3a0/Simulator-Controller-5.2.3.0-release.zip?rlkey=br57kpsirtrwk55il01mb35fc&dl=1
-Changes=New controller action function "callCustom", Significant speed improvement in ACC pitstop setup when using the same tyre compound, Fixed position data for retired cars in Assetto Corsa Competizione, Fixed session info not showing up for drivers which have not driven their first stint, Extended audio routing for Analyzer and Controller, New car models for "Setup Workbench", Show recommended cold pressures in session info, Provide recommended cold pressures in "Session State.json"
+Version=5.3.1.0-release
+Date=09/22/2023
+Download=https://cutt.ly/7wc44IWJ;https://www.dropbox.com/scl/fi/ru77ar6wbh5h6pbkwzrzr/Simulator-Controller-5.3.1.0-release.zip?rlkey=2mlamuv1apsspn3m1m5tiubx2&dl=1
+Changes=Downloadable components for installation and update process, Fixed list update when adding a setting in "Session Database", Fixed rare off-by-one error for tyre set selection in ACC, Fixed Engineer to be optimistic in reporting the remaining laps on fuel, Fixed time in log files to be in 24 hour format, Fixed a couple of bugs in "Race Center" related to sector times, Migrated to AHK 2.09, Display time left on fuel in fuel widget in "Session Monitor", Optical enhancement in "Session Monitor" HTML generator, Prevent exit while tasks are running, Fixes for the Spanish translation, New car models for "Setup Workbench"
+Components=Media->5.3.0,Configuration->5.3.0,Utilities->5.3.0
+[Components]
+Media.5.3.0.Path=Resources
+Media.5.3.0.Content=Splash Media
+Media.5.3.0.Download=https://www.dropbox.com/scl/fi/s4uchdrhdm0m4giiix86k/Media-5.3.0.zip?rlkey=t9lkkd9nj4koxyaaqa2h6i8nx&dl=1
+Configuration.5.3.0.Path=Resources
+Configuration.5.3.0.Content=Setup
+Configuration.5.3.0.Download=https://www.dropbox.com/scl/fi/vkpggadd4rd1w9h2ow1dv/Configuration-5.3.0.zip?rlkey=hqr342uzalm1dqd6v710ccjr3&dl=1
+Utilities.5.3.0.Path=.
+Utilities.5.3.0.Content=Utilities
+Utilities.5.3.0.Download=https://www.dropbox.com/scl/fi/hlza8t9tae5d0vnd7wmqa/Utilities-5.3.0.zip?rlkey=ciotp2dr5u3e4rxgikf45a1dq&dl=1
 [Current]
-Type=Development
+Type=Release
 [Version]
-Development=5.3.0.0-beta
-Release=5.2.3.0-release
+Development=5.3.1.0-release
+Release=5.3.1.0-release

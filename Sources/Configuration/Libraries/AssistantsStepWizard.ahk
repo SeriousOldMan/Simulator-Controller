@@ -35,7 +35,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 			local wizard := this.SetupWizard
 			local count, ignore, assistant
 
-			if wizard.QuickSetup
+			if wizard.BasicSetup
 				return 0
 			else {
 				count := 0

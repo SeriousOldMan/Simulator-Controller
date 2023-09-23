@@ -230,21 +230,25 @@ class PracticeCenter extends ConfigurationItem {
 		}
 
 		Close(*) {
-			if (this.PracticeCenter.HasData && !this.PracticeCenter.SessionExported) {
-				local translator := translateMsgBoxButtons.Bind(["Yes", "No", "Cancel"])
+			if this.Closeable {
+				if (this.PracticeCenter.HasData && !this.PracticeCenter.SessionExported) {
+					local translator := translateMsgBoxButtons.Bind(["Yes", "No", "Cancel"])
 
-				OnMessage(0x44, translator)
-				msgResult := MsgBox(translate("Do you want to transfer your data to the session database before closing?"), translate("Export"), 262179)
-				OnMessage(0x44, translator, 0)
+					OnMessage(0x44, translator)
+					msgResult := MsgBox(translate("Do you want to transfer your data to the session database before closing?"), translate("Export"), 262179)
+					OnMessage(0x44, translator, 0)
 
-				if (msgResult = "Yes")
-					this.PracticeCenter.exportSession(true)
+					if (msgResult = "Yes")
+						this.PracticeCenter.exportSession(true)
 
-				if (msgResult = "Cancel")
-					return true
+					if (msgResult = "Cancel")
+						return true
+				}
+
+				return super.Close()
 			}
-
-			return super.Close()
+			else
+				return true
 		}
 	}
 
@@ -2919,7 +2923,7 @@ class PracticeCenter extends ConfigurationItem {
 			lap.SectorsTime := sectorTimes
 		}
 		else
-			lap.SectorsTime := "-"
+			lap.SectorsTime := ["-"]
 
 		this.iWeather := lap.Weather
 		this.iAirTemperature := lap.AirTemperature
@@ -2969,7 +2973,7 @@ class PracticeCenter extends ConfigurationItem {
 			this.iLastPitstopUpdate -= delta
 		}
 
-		loop getMultiMapValue(data, "Position Data", "Car.Count", 0) {
+		loop getMultiMapValue(data, "Position Data", "Car.Count", 0)
 			if (getMultiMapValue(data, "Position Data", "Car." . A_Index . ".InPitlane", false)
 			 || getMultiMapValue(data, "Position Data", "Car." . A_Index . ".InPit", false)) {
 				carID := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".ID", A_Index)
@@ -2987,7 +2991,6 @@ class PracticeCenter extends ConfigurationItem {
 						pitstops.Push(PracticeCenter.Pitstop(carID, this.iLastPitstopUpdate, lap.Nr))
 				}
 			}
-		}
 	}
 
 	updateRunning(lapNumber, data) {
@@ -3184,17 +3187,16 @@ class PracticeCenter extends ConfigurationItem {
 		local telemetryDB := this.TelemetryDatabase
 		local electronicsTable := this.TelemetryDatabase.Database.Tables["Electronics"]
 		local tyresTable := this.TelemetryDatabase.Database.Tables["Tyres"]
-		local driverID := lap.Run.Driver.ID
+		local driver := lap.Run.Driver
 		local telemetry, telemetryData, pressuresData, temperaturesData, wearData, recentLap, tyreLaps
-		local newRun, oldRun
+		local newRun, oldRun, driverID
 
 		this.initializeSimulator(simulator, car, track)
 
+		driverID := ((driver != "-") ? driver.ID : SessionDatabase.ID)
+
 		if (pitstop && (this.Control["runModeDropDown"].Value = 2))
 			this.newRun(lap.Nr, true)
-
-		if (this.Control["tyreCompoundDropDown"].Value = 2) {
-		}
 
 		if (lap.Pressures = "-,-,-,-")
 			lap.Pressures := pressures
@@ -3484,6 +3486,8 @@ class PracticeCenter extends ConfigurationItem {
 			local locked := false
 			local count := 0
 			local lap, driver, telemetryData, pressures, temperatures, wear, pressuresData, info
+
+			Task.CurrentTask.Critical := true
 
 			while (row := this.LapsListView.GetNext(row, "C"))
 				count += 1
@@ -4097,6 +4101,8 @@ class PracticeCenter extends ConfigurationItem {
 				newLap.SectorsTime := ["-"]
 			else if isObject(newLap.SectorsTime)
 				newLap.SectorsTime := collect(newLap.SectorsTime, displayNullValue)
+			else
+				newLap.SectorsTime := collect(string2Values(",", newLap.SectorsTime), displayNullValue)
 
 			if isNull(newLap.FuelConsumption)
 				newLap.FuelConsumption := "-"
@@ -5298,6 +5304,16 @@ class PracticeCenter extends ConfigurationItem {
 			if (report = "Running") {
 				this.iSelectedRun := false
 				this.iSelectedDrivers := false
+
+				names := [translate("All")]
+
+				window["runDropDown"].Delete()
+				window["runDropDown"].Add(names)
+				window["runDropDown"].Choose(1)
+
+				window["driverDropDown"].Delete()
+				window["driverDropDown"].Add(names)
+				window["driverDropDown"].Choose(1)
 			}
 			else {
 				runs := []
@@ -7135,3 +7151,5 @@ startupPracticeCenter() {
 ;;;-------------------------------------------------------------------------;;;
 
 startupPracticeCenter()
+
+startupApplication()

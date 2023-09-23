@@ -34,6 +34,7 @@
 
 #Include "..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\Libraries\GDIP.ahk"
+#Include "..\Libraries\Task.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -318,6 +319,8 @@ recreateTrackMaps() {
 	local directory := sessionDB.DatabasePath
 	local code, simulator, track
 
+	Task.CurrentTask.Critical := true
+
 	loop Files, directory . "User\Tracks\*.*", "D" {
 		code := A_LoopFileName
 
@@ -331,7 +334,7 @@ recreateTrackMaps() {
 	}
 }
 
-startTrackMapper() {
+startupTrackMapper() {
 	local icon := kIconsDirectory . "Track.ico"
 	local simulator := false
 	local track := false
@@ -339,8 +342,26 @@ startTrackMapper() {
 	local recreate := false
 	local index
 
+	createMap(simulator, track, data) {
+		Task.CurrentTask.Critical := true
+
+		createTrackMap(simulator, track, data)
+
+		deleteFile(data)
+
+		ExitApp(0)
+	}
+
+	recreateMaps() {
+		recreateTrackMaps()
+
+		ExitApp(0)
+	}
+
 	TraySetIcon(icon, "1")
 	A_IconTip := "Track Mapper"
+
+	startupProcess()
 
 	index := 1
 
@@ -363,20 +384,14 @@ startTrackMapper() {
 		}
 	}
 
-	if (simulator && track && data) {
-		createTrackMap(simulator, track, data)
-
-		deleteFile(data)
-	}
-
-	if recreate
-		recreateTrackMaps()
-
-	ExitApp(0)
+	if (simulator && track && data)
+		Task.startTask(createMap.Bind(simulator, track, data))
+	else if recreate
+		Task.startTask(recreateMaps)
 }
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Initialization Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-startTrackMapper()
+startupTrackMapper()

@@ -31,7 +31,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		Get {
 			local wizard := this.SetupWizard
 
-			if (wizard.isModuleSelected("Controller") && wizard.isModuleSelected("Motion Feedback") && !wizard.QuickSetup)
+			if (wizard.isModuleSelected("Controller") && wizard.isModuleSelected("Motion Feedback") && !wizard.BasicSetup)
 				return 1
 			else
 				return 0

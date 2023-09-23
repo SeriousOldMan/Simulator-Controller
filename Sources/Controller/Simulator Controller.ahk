@@ -1964,14 +1964,14 @@ functionActionCallable(function, trigger, action) {
 	return (handler ? actionCallable : false)
 }
 
-fireControllerActions(function, trigger, fromTask := false) {
-	if fromTask {
+fireControllerActions(function, trigger, async := true) {
+	if async
+		Task.startTask(fireControllerActions.Bind(function, trigger, false), 0, kLowPriority)
+	else {
 		function.Controller.fireActions(function, trigger)
 
 		return false
 	}
-	else
-		Task.startTask(fireControllerActions.Bind(function, trigger, true), 0, kLowPriority)
 }
 
 getLabelForLogMessage(action) {
@@ -2133,11 +2133,11 @@ externalCommandManager() {
 
 			switch descriptor[1], false {
 				case k1WayToggleType, k2WayToggleType:
-					switchToggle(descriptor[1], descriptor[2], (command.Length > 1) ? command[2] : "On")
+					switchToggle(descriptor[1], descriptor[2], (command.Length > 1) ? command[2] : "On", false)
 				case kButtonType:
-					pushButton(descriptor[2])
+					pushButton(descriptor[2], false)
 				case kDialType:
-					rotateDial(descriptor[2], command[2])
+					rotateDial(descriptor[2], command[2], false)
 				default:
 					throw "Unknown controller function type (" . descriptor[1] . ") detected in externalCommand..."
 			}
@@ -2151,6 +2151,8 @@ initializeSimulatorController() {
 
 	TraySetIcon(icon, "1")
 	A_IconTip := "Simulator Controller"
+
+	MessageManager.pause()
 
 	SetKeyDelay(10, 30)
 
@@ -2206,6 +2208,10 @@ startupSimulatorController() {
 		ExitApp(0)
 
 	controller.startup()
+
+	MessageManager.resume()
+
+	startupApplication()
 }
 
 
@@ -2213,17 +2219,17 @@ startupSimulatorController() {
 ;;;                        Controller Action Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-pushButton(buttonNumber) {
+pushButton(buttonNumber, async := true) {
 	local descriptor := ConfigurationItem.descriptor(kButtonType, buttonNumber)
 	local function := SimulatorController.Instance.findFunction(descriptor)
 
 	if (function != false)
-		fireControllerActions(function, "Push")
+		fireControllerActions(function, "Push", async)
 	else
 		logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in custom controller action pushButton - please check the configuration"))
 }
 
-rotateDial(dialNumber, direction) {
+rotateDial(dialNumber, direction, async := true) {
 	local function, descriptor
 
 	if ((direction = kIncrease) || (direction = "plus") || (direction = "+"))
@@ -2240,20 +2246,20 @@ rotateDial(dialNumber, direction) {
 	function := SimulatorController.Instance.findFunction(descriptor)
 
 	if (function != false)
-		fireControllerActions(function, direction)
+		fireControllerActions(function, direction, async)
 	else
 		logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in custom controller action rotateDial - please check the configuration"))
 }
 
-switchToggle(toggleType, toggleNumber, mode := "activate") {
+switchToggle(toggleType, toggleNumber, mode := "activate", async := true) {
 	local descriptor := ConfigurationItem.descriptor(toggleType, toggleNumber)
 	local function := SimulatorController.Instance.findFunction(descriptor)
 
 	if (function != false) {
 		if (((mode = "activate") || (mode = "on")) && (SimulatorController.Instance.getActions(function, "On").Length > 0))
-			fireControllerActions(function, "On")
+			fireControllerActions(function, "On", async)
 		else if (((mode = "deactivate") || (mode = "off")) && (SimulatorController.Instance.getActions(function, "Off").Length > 0))
-			fireControllerActions(function, "Off")
+			fireControllerActions(function, "Off", async)
 		else {
 			logMessage(kLogWarn, translate("Unsupported argument (") . mode . translate(") detected in switchToggle - please check the configuration"))
 
@@ -2264,12 +2270,12 @@ switchToggle(toggleType, toggleNumber, mode := "activate") {
 		logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in custom controller action switchToggle - please check the configuration"))
 }
 
-callCustom(customNumber) {
+callCustom(customNumber, async := true) {
 	local descriptor := ConfigurationItem.descriptor(kCustomType, customNumber)
 	local function := SimulatorController.Instance.findFunction(descriptor)
 
 	if (function != false)
-		fireControllerActions(function, "Call")
+		fireControllerActions(function, "Call", async)
 	else
 		logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in custom controller action callCustom - please check the configuration"))
 }
@@ -2313,8 +2319,6 @@ writeControllerState() {
 ;;;                       Initialization Section Part 1                     ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-MessageManager.pause()
-
 initializeSimulatorController()
 
 
@@ -2331,5 +2335,3 @@ initializeSimulatorController()
 ;;;-------------------------------------------------------------------------;;;
 
 startupSimulatorController()
-
-MessageManager.resume()

@@ -726,43 +726,47 @@ class PositionInfo {
 
 			this.reset(sector, true, true)
 		}
-		else if (newObserved != oldObserved) {
-			this.reset(sector, true, true)
-
-			this.iObserved := newObserved
-
-			/*
-			if (((trackAhead && standingsBehind) || (trackBehind && standingsAhead))
-			 && (this.Car.LastLap = this.Spotter.DriverCar.LastLap)) {
-				; Can happen in ACC due to asynchronous position updating
-
+		else if (!(InStr(newObserved, "SA") && InStr(oldObserved, "SA"))
+			  && !(InStr(newObserved, "SB") && InStr(oldObserved, "SB"))
+			  && !(InStr(newObserved, "F") && InStr(oldObserved, "F"))) {
+			if (newObserved != oldObserved) {
 				this.reset(sector, true, true)
-
-				this.iObserved := ""
-			}
-			else if ((standingsBehind && InStr(oldObserved, "SA")) || (standingsAhead && InStr(oldObserved, "SB"))
-				  || (trackBehind && InStr(oldObserved, "TA")) || (trackAhead && InStr(oldObserved, "TB"))) {
-				; Drivers car has been overtaken
-
-				this.reset(sector, true, true)
-
-				this.iObserved := ""
-			}
-			else {
-				if ((trackBehind || trackAhead) && (!InStr(oldObserved, "TB") && !InStr(oldObserved, "TA"))) {
-					; Change in car ahead or behind due to an overtake
-
-					this.reset(sector, true, true)
-				}
-				else
-					this.Reported := false
 
 				this.iObserved := newObserved
+
+				/*
+				if (((trackAhead && standingsBehind) || (trackBehind && standingsAhead))
+				 && (this.Car.LastLap = this.Spotter.DriverCar.LastLap)) {
+					; Can happen in ACC due to asynchronous position updating
+
+					this.reset(sector, true, true)
+
+					this.iObserved := ""
+				}
+				else if ((standingsBehind && InStr(oldObserved, "SA")) || (standingsAhead && InStr(oldObserved, "SB"))
+					  || (trackBehind && InStr(oldObserved, "TA")) || (trackAhead && InStr(oldObserved, "TB"))) {
+					; Drivers car has been overtaken
+
+					this.reset(sector, true, true)
+
+					this.iObserved := ""
+				}
+				else {
+					if ((trackBehind || trackAhead) && (!InStr(oldObserved, "TB") && !InStr(oldObserved, "TA"))) {
+						; Change in car ahead or behind due to an overtake
+
+						this.reset(sector, true, true)
+					}
+					else
+						this.Reported := false
+
+					this.iObserved := newObserved
+				}
+				*/
 			}
-			*/
+			else if ((newObserved = "") || (newObserved = "L"))
+				this.rebase(sector)
 		}
-		else if ((newObserved = "") || (newObserved = "L"))
-			this.rebase(sector)
 	}
 }
 
@@ -1033,7 +1037,7 @@ class RaceSpotter extends GridRaceAssistant {
 		if (values.HasProp("Session") && (values.Session == kSessionFinished)) {
 			this.iRunning := false
 
-			this.initializeHistory
+			this.initializeHistory()
 		}
 	}
 
@@ -1769,9 +1773,15 @@ class RaceSpotter extends GridRaceAssistant {
 
 	cutWarning(lastLap, sector, wasValid, lastWarnings) {
 		local knowledgeBase := this.KnowledgeBase
+		local driverCar := this.DriverCar
 
 		if ((this.Session = kSessionRace) && ((wasValid && !knowledgeBase.getValue("Lap.Valid", true)) || (lastWarnings < knowledgeBase.getValue("Lap.Warnings", 0)))) {
-			this.getSpeaker(true).speakPhrase(((knowledgeBase.getValue("Lap.Warnings", 0) > 2) || (this.DriverCar.InvalidLaps > 3)) ? "RepeatedCut" : "Cut")
+			if (knowledgeBase.getValue("Lap.Warnings", 0) > 2)
+				this.getSpeaker(true).speakPhrase("RepeatedCut")
+			else if driverCar
+				this.getSpeaker(true).speakPhrase((this.DriverCar.InvalidLaps > 3) ? "RepeatedCut" : "Cut")
+			else
+				this.getSpeaker(true).speakPhrase("Cut")
 
 			return true
 		}
@@ -1787,205 +1797,207 @@ class RaceSpotter extends GridRaceAssistant {
 		local trackBehind := false
 		local leader := false
 		local focused := false
-		local situation, opponentType, driverPitstops, carPitstops
+		local situation, opponentType, driverPitstops, carPitstops, carInfo
 		local driverPosition, driverLapTime, slowerCar, carPosition, delta, lapTimeDifference, key
 
-		this.getPositionInfos(&standingsAhead, &standingsBehind, &trackAhead, &trackBehind, &leader, &focused, true)
+		if (this.hasEnoughData(false) && (lastLap > (this.BaseLap + 2))) {
+			this.getPositionInfos(&standingsAhead, &standingsBehind, &trackAhead, &trackBehind, &leader, &focused, true)
 
-		if (standingsAhead && (standingsAhead != leader)) {
-			situation := ("AheadPitting " . standingsAhead.Car.ID . A_Space . standingsAhead.Car.LastLap)
+			if (standingsAhead && (standingsAhead != leader)) {
+				situation := ("AheadPitting " . standingsAhead.Car.ID . A_Space . standingsAhead.Car.LastLap)
 
-			if !this.TacticalAdvices.Has(situation) {
-				this.TacticalAdvices[situation] := true
+				if !this.TacticalAdvices.Has(situation) {
+					this.TacticalAdvices[situation] := true
 
-				speaker.speakPhrase("AheadPitting")
+					speaker.speakPhrase("AheadPitting")
 
-				return true
-			}
-		}
-
-		if focused {
-			situation := ("FocusPitting " . focused.Car.ID . A_Space . focused.Car.LastLap)
-
-			if !this.TacticalAdvices.Has(situation) {
-				this.TacticalAdvices[situation] := true
-
-				speaker.speakPhrase("FocusPitting", {number: focused.Car.Nr})
-
-				return true
-			}
-		}
-
-		if standingsBehind {
-			situation := ("BehindPitting " . standingsBehind.Car.ID . A_Space . standingsBehind.Car.LastLap)
-
-			if !this.TacticalAdvices.Has(situation) {
-				this.TacticalAdvices[situation] := true
-
-				speaker.speakPhrase("BehindPitting")
-
-				return true
-			}
-		}
-
-		if (leader && (leader.Car.ID != this.DriverCar.ID)) {
-			situation := ("LeaderPitting " . leader.Car.ID . A_Space . leader.Car.LastLap)
-
-			if !this.TacticalAdvices.Has(situation) {
-				this.TacticalAdvices[situation] := true
-
-				speaker.speakPhrase("LeaderPitting")
-
-				return true
-			}
-		}
-
-		this.getPositionInfos(&standingsAhead, &standingsBehind, &trackAhead, &trackBehind, &leader, &focused)
-
-		if (standingsAhead && standingsAhead.hasProblem()) {
-			situation := ("AheadProblem " . lastLap)
-
-			if !this.TacticalAdvices.Has(situation) {
-				this.TacticalAdvices[situation] := true
-
-				speaker.speakPhrase("AheadProblem")
-
-				return true
-			}
-		}
-
-		if (focused && focused.hasProblem()) {
-			situation := ("FocusProblem " . lastLap)
-
-			if !this.TacticalAdvices.Has(situation) {
-				this.TacticalAdvices[situation] := true
-
-				speaker.speakPhrase("FocusProblem", {number: focused.Car.Nr})
-
-				return true
-			}
-		}
-
-		if (regular && trackAhead && trackAhead.inRange(sector, true) && !trackAhead.isFaster(sector)
-		 && standingsBehind && (standingsBehind == trackBehind) && !trackAhead.Car.InPit
-		 && standingsBehind.hasGap(sector) && trackAhead.hasGap(sector)
-		 && standingsBehind.inDelta(sector) && standingsBehind.isFaster(sector)) {
-			situation := ("ProtectSlower " . trackAhead.Car.ID . A_Space . trackBehind.Car.ID)
-
-			if !this.TacticalAdvices.Has(situation) {
-				this.TacticalAdvices[situation] := true
-
-				speaker.speakPhrase("ProtectSlower")
-
-				return true
-			}
-		}
-
-		if (InStr(sector, "1") != 1) {
-			opponentType := (trackBehind ? trackBehind.OpponentType[sector] : false)
-
-			if (regular && trackBehind && trackBehind.hasGap(sector) && !trackBehind.Car.InPit
-			 && trackBehind.isFaster(sector) && trackBehind.inRange(sector, true)) {
-				if (standingsBehind && (trackBehind != standingsBehind)
-				 && standingsBehind.hasGap(sector) && standingsBehind.inDelta(sector, 4.0)
-				 && standingsBehind.isFaster(sector) && (opponentType = "LapDown")) {
-					situation := ("ProtectFaster " . trackBehind.Car.ID . A_Space . standingsBehind.Car.ID)
-
-					if !this.TacticalAdvices.Has(situation) {
-						this.TacticalAdvices[situation] := true
-
-						speaker.speakPhrase("ProtectFaster")
-
-						return true
-					}
-				}
-				else if (((opponentType = "LapDown") || (opponentType = "LapUp"))
-					  && trackBehind.isFaster(sector, 1)) {
-					situation := (opponentType . "Faster " . trackBehind.Car.ID)
-
-					if !this.TacticalAdvices.Has(situation) {
-						this.TacticalAdvices[situation] := true
-
-						speaker.beginTalk()
-
-						try {
-							speaker.speakPhrase(opponentType . "Faster")
-
-							driverPitstops := this.DriverCar.Pitstops.Length
-							carPitstops := trackBehind.Car.Pitstops.Length
-
-							if ((driverPitstops < carPitstops) && (opponentType = "LapDown"))
-								speaker.speakPhrase("MorePitstops", {conjunction: speaker.Fragments["But"], pitstops: carPitstops - driverPitstops})
-							else if ((driverPitstops > carPitstops) && (opponentType = "LapUp"))
-								speaker.speakPhrase("LessPitstops", {conjunction: speaker.Fragments["But"], pitstops: driverPitstops - carPitstops})
-							else
-								speaker.speakPhrase("Slipstream")
-						}
-						finally {
-							speaker.endTalk()
-						}
-
-						return true
-					}
+					return true
 				}
 			}
-		}
 
-		if (standingsBehind && standingsBehind.hasProblem()) {
-			situation := ("BehindProblem " . lastLap)
+			if focused {
+				situation := ("FocusPitting " . focused.Car.ID . A_Space . focused.Car.LastLap)
 
-			if !this.TacticalAdvices.Has(situation) {
-				this.TacticalAdvices[situation] := true
+				if !this.TacticalAdvices.Has(situation) {
+					this.TacticalAdvices[situation] := true
 
-				speaker.speakPhrase("BehindProblem")
+					speaker.speakPhrase("FocusPitting", {number: focused.Car.Nr})
 
-				return true
-			}
-		}
-
-		if (Random(1, 10) < 5) {
-			driverPosition := this.DriverCar.Position["Class"]
-			driverLapTime := this.DriverCar.AvgLapTime
-			slowerCar := false
-
-			for ignore, carInfo in this.OtherCars {
-				carPosition := carInfo.Position["Class"]
-
-				if ((carPosition < driverPosition) && (carInfo.AvgLapTime > driverLapTime))
-					if (!slowerCar || (carPosition < slowerCar.Position["Class"]))
-						slowerCar := carInfo
+					return true
+				}
 			}
 
-			if slowerCar
-				if (standingsAhead && (standingsAhead.Car = slowerCar))
-					slowerCar := false
-				else if (standingsBehind && (standingsBehind.Car = slowerCar))
-					slowerCar := false
-				else if (focused && (focused.Car = slowerCar))
-					slowerCar := false
+			if standingsBehind {
+				situation := ("BehindPitting " . standingsBehind.Car.ID . A_Space . standingsBehind.Car.LastLap)
 
-			if slowerCar {
-				delta := Abs(slowerCar.AvgDelta[false])
-				lapTimeDifference := Abs(driverLapTime - slowerCar.AvgLapTime)
+				if !this.TacticalAdvices.Has(situation) {
+					this.TacticalAdvices[situation] := true
 
-				if ((delta != 0) && (lapTimeDifference != 0)) {
-					key := (slowerCar.Nr . "|" . slowerCar.ID)
-					situation := (this.TacticalAdvices.Has("FasterThan") ? this.TacticalAdvices["FasterThan"] : false)
+					speaker.speakPhrase("BehindPitting")
 
-					if situation
-						if (situation.Key != key)
-							situation := false
-						else if ((situation.Lap + 5) <= lastLap)
-							situation := false
+					return true
+				}
+			}
 
-					if !situation {
-						this.TacticalAdvices["FasterThan"] := {Key: key, Lap: lastLap}
+			if (leader && (leader.Car.ID != this.DriverCar.ID)) {
+				situation := ("LeaderPitting " . leader.Car.ID . A_Space . leader.Car.LastLap)
 
-						speaker.speakPhrase("FasterThan", {position: slowerCar.Position["Class"]
-														 , delta: speaker.number2Speech(delta, 1)
-														 , lapTime: speaker.number2Speech(lapTimeDifference, 1)})
+				if !this.TacticalAdvices.Has(situation) {
+					this.TacticalAdvices[situation] := true
 
-						return true
+					speaker.speakPhrase("LeaderPitting")
+
+					return true
+				}
+			}
+
+			this.getPositionInfos(&standingsAhead, &standingsBehind, &trackAhead, &trackBehind, &leader, &focused)
+
+			if (standingsAhead && standingsAhead.hasProblem()) {
+				situation := ("AheadProblem " . lastLap)
+
+				if !this.TacticalAdvices.Has(situation) {
+					this.TacticalAdvices[situation] := true
+
+					speaker.speakPhrase("AheadProblem")
+
+					return true
+				}
+			}
+
+			if (focused && focused.hasProblem()) {
+				situation := ("FocusProblem " . lastLap)
+
+				if !this.TacticalAdvices.Has(situation) {
+					this.TacticalAdvices[situation] := true
+
+					speaker.speakPhrase("FocusProblem", {number: focused.Car.Nr})
+
+					return true
+				}
+			}
+
+			if (regular && trackAhead && trackAhead.inRange(sector, true) && !trackAhead.isFaster(sector)
+			 && standingsBehind && (standingsBehind == trackBehind) && !trackAhead.Car.InPit
+			 && standingsBehind.hasGap(sector) && trackAhead.hasGap(sector)
+			 && standingsBehind.inDelta(sector) && standingsBehind.isFaster(sector)) {
+				situation := ("ProtectSlower " . trackAhead.Car.ID . A_Space . trackBehind.Car.ID)
+
+				if !this.TacticalAdvices.Has(situation) {
+					this.TacticalAdvices[situation] := true
+
+					speaker.speakPhrase("ProtectSlower")
+
+					return true
+				}
+			}
+
+			if (InStr(sector, "1") != 1) {
+				opponentType := (trackBehind ? trackBehind.OpponentType[sector] : false)
+
+				if (regular && trackBehind && trackBehind.hasGap(sector) && !trackBehind.Car.InPit
+				 && trackBehind.isFaster(sector) && trackBehind.inRange(sector, true)) {
+					if (standingsBehind && (trackBehind != standingsBehind)
+					 && standingsBehind.hasGap(sector) && standingsBehind.inDelta(sector, 4.0)
+					 && standingsBehind.isFaster(sector) && (opponentType = "LapDown")) {
+						situation := ("ProtectFaster " . trackBehind.Car.ID . A_Space . standingsBehind.Car.ID)
+
+						if !this.TacticalAdvices.Has(situation) {
+							this.TacticalAdvices[situation] := true
+
+							speaker.speakPhrase("ProtectFaster")
+
+							return true
+						}
+					}
+					else if (((opponentType = "LapDown") || (opponentType = "LapUp"))
+						  && trackBehind.isFaster(sector, 1)) {
+						situation := (opponentType . "Faster " . trackBehind.Car.ID)
+
+						if !this.TacticalAdvices.Has(situation) {
+							this.TacticalAdvices[situation] := true
+
+							speaker.beginTalk()
+
+							try {
+								speaker.speakPhrase(opponentType . "Faster")
+
+								driverPitstops := this.DriverCar.Pitstops.Length
+								carPitstops := trackBehind.Car.Pitstops.Length
+
+								if ((driverPitstops < carPitstops) && (opponentType = "LapDown"))
+									speaker.speakPhrase("MorePitstops", {conjunction: speaker.Fragments["But"], pitstops: carPitstops - driverPitstops})
+								else if ((driverPitstops > carPitstops) && (opponentType = "LapUp"))
+									speaker.speakPhrase("LessPitstops", {conjunction: speaker.Fragments["But"], pitstops: driverPitstops - carPitstops})
+								else
+									speaker.speakPhrase("Slipstream")
+							}
+							finally {
+								speaker.endTalk()
+							}
+
+							return true
+						}
+					}
+				}
+			}
+
+			if (standingsBehind && standingsBehind.hasProblem()) {
+				situation := ("BehindProblem " . lastLap)
+
+				if !this.TacticalAdvices.Has(situation) {
+					this.TacticalAdvices[situation] := true
+
+					speaker.speakPhrase("BehindProblem")
+
+					return true
+				}
+			}
+
+			if (Random(1, 10) < 5) {
+				driverPosition := this.DriverCar.Position["Class"]
+				driverLapTime := this.DriverCar.AvgLapTime
+				slowerCar := false
+
+				for ignore, carInfo in this.OtherCars {
+					carPosition := carInfo.Position["Class"]
+
+					if ((carPosition < driverPosition) && (carInfo.AvgLapTime > driverLapTime))
+						if (!slowerCar || (carPosition < slowerCar.Position["Class"]))
+							slowerCar := carInfo
+				}
+
+				if slowerCar
+					if (standingsAhead && (standingsAhead.Car = slowerCar))
+						slowerCar := false
+					else if (standingsBehind && (standingsBehind.Car = slowerCar))
+						slowerCar := false
+					else if (focused && (focused.Car = slowerCar))
+						slowerCar := false
+
+				if slowerCar {
+					delta := Abs(slowerCar.AvgDelta[false])
+					lapTimeDifference := Abs(driverLapTime - slowerCar.AvgLapTime)
+
+					if ((delta != 0) && (lapTimeDifference != 0)) {
+						key := (slowerCar.Nr . "|" . slowerCar.ID)
+						situation := (this.TacticalAdvices.Has("FasterThan") ? this.TacticalAdvices["FasterThan"] : false)
+
+						if situation
+							if (situation.Key != key)
+								situation := false
+							else if ((situation.Lap + 5) <= lastLap)
+								situation := false
+
+						if !situation {
+							this.TacticalAdvices["FasterThan"] := {Key: key, Lap: lastLap}
+
+							speaker.speakPhrase("FasterThan", {position: slowerCar.Position["Class"]
+															 , delta: speaker.number2Speech(delta, 1)
+															 , lapTime: speaker.number2Speech(lapTimeDifference, 1)})
+
+							return true
+						}
 					}
 				}
 			}
@@ -2891,8 +2903,7 @@ class RaceSpotter extends GridRaceAssistant {
 	}
 
 	prepareSession(&settings, &data, formationLap := true) {
-		local speaker := this.getSpeaker()
-		local fragments := speaker.Fragments
+		local speaker, fragments
 		local facts, weather, airTemperature, trackTemperature, weatherNow, weather10Min, weather30Min, driver
 		local position, length, facts
 
@@ -2902,9 +2913,13 @@ class RaceSpotter extends GridRaceAssistant {
 			this.updateConfigurationValues({UseTalking: getMultiMapValue(settings, "Assistant.Spotter", "Voice.UseTalking", true)})
 
 		this.initializeAnnouncements(data)
-		this.initializeGridPosition(data, true)
+
+		this.initializeGridPosition(data, formationLap)
 
 		if (formationLap && this.Speaker) {
+			speaker := this.getSpeaker()
+			fragments := speaker.Fragments
+
 			speaker.beginTalk()
 
 			try {

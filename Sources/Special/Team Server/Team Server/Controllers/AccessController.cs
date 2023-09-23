@@ -271,6 +271,28 @@ namespace TeamServer.Controllers {
             }
         }
 
+        [HttpGet("compactingdatabase")]
+        public string CompactingDatabase([FromQuery(Name = "token")] string token)
+        {
+            try
+            {
+                Server.TeamServer.TokenIssuer.ElevateToken(token);
+
+                if (Server.TeamServer.ObjectManager.Compressing)
+                    return "true";
+                else
+                    return "false";
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
+            }
+            catch (Exception exception)
+            {
+                return "Error: " + exception.Message;
+            }
+        }
+
         [HttpGet("compactdatabase")]
         public string CompactDatabase([FromQuery(Name = "token")] string token)
         {

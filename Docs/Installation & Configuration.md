@@ -148,7 +148,23 @@ Good to know: As said, you can run "Simulator Setup" as often as necessary. Duri
 	[Simulator Setup]
 	StartPage=X
 
-Replace *X* with the number of the page you want to jump to on startup.
+Replace *X* with the number of the page you want to jump to on startup. As an alternative, you can also use the internal name of the step here:
+
+| Step | Name              |
+|------|-------------------|
+| 1    | Start             |
+| 2    | Basic             |
+| 3    | Modules           |
+| 4    | Installation      |
+| 5    | Applications      |
+| 6    | Controller        |
+| 7    | General           |
+| 8    | Simulators        |
+| 9    | Assistants        |
+| 10   | Motion Feedback   |
+| 11   | Tactile Feedback  |
+| 12   | Pedal Calibration |
+| 13   | Finish            |
 
 ### Presets & Special Configurations
 

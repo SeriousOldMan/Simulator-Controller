@@ -248,6 +248,11 @@ namespace TeamServer {
             return Get("login/allobjects");
         }
 
+        public string CompactingDatabase()
+        {
+            return Get("login/compactingdatabase");
+        }
+
         public string CompactDatabase()
         {
             return Get("login/compactdatabase");

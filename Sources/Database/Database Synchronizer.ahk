@@ -259,7 +259,7 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups, downloadStrategie
 					ftpDownload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "simulator-controller/database-downloads/" . fileName, kTempDirectory . fileName)
 
 					try {
-						RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . kTempDirectory . fileName . "' -DestinationPath '" . kTempDirectory . "Shared Database'", , "Hide")
+						RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . kTempDirectory . fileName . "' -DestinationPath '" . kTempDirectory . "Shared Database' -Force", , "Hide")
 					}
 					catch Any as exception {
 						logError(exception)
@@ -309,11 +309,15 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups, downloadStrategie
 synchronizeCommunityDatabase(id, usePressures, useSetups, useStrategies) {
 	synchronizeDatabase("Stop")
 
+	Task.CurrentTask.Critical := true
+
 	try {
 		uploadSessionDatabase(id, usePressures, useSetups, useStrategies)
 		downloadSessionDatabase(id, usePressures, useSetups, useStrategies)
 	}
 	finally {
+		Task.CurrentTask.Critical := false
+
 		synchronizeDatabase("Start")
 	}
 
@@ -323,11 +327,16 @@ synchronizeCommunityDatabase(id, usePressures, useSetups, useStrategies) {
 }
 
 synchronizeSessionDatabase(minutes) {
+	Task.CurrentTask.Critical := true
+
 	try {
 		synchronizeDatabase()
 	}
 	catch Any as exception {
 		logError(exception, true)
+	}
+	finally {
+		Task.CurrentTask.Critical := false
 	}
 
 	Task.CurrentTask.Sleep := (minutes * 60000)
@@ -341,6 +350,8 @@ updateSessionDatabase() {
 
 	TraySetIcon(icon, "1")
 	A_IconTip := "Database Synchronizer"
+
+	startupProcess()
 
 	usePressures := (inList(A_Args, "-Pressures") != 0)
 	useSetups := (inList(A_Args, "-Setups") != 0)

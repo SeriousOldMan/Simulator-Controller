@@ -99,7 +99,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	__New(controller, name, simulator, configuration := false) {
 		super.__New(controller, name, simulator, configuration)
 
-		if (this.Active || isDebug()) {
+		if (this.Active || (isDebug() && isDevelopment())) {
 			this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", false)
 			this.iClosePitstopMFDHotkey := this.getArgumentValue("closePitstopMFD", false)
 
@@ -644,7 +644,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	getCarName(carID) {
-		local carDB, data
+		local carDB
 
 		static lastCarID := false
 		static lastCarName := false

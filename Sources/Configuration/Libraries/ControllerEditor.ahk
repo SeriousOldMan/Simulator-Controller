@@ -428,8 +428,8 @@ class ControlsList extends ConfigurationItemList {
 		window.Add("ListView", "x16 y79 w134 h108 W:Grow(0.2) -Multi -LV0x10 AltSubmit NoSort NoSortHdr VcontrolsListView", collect(["Name", "Function", "Size"], translate))
 
 		window.Add("Text", "x164 y79 w80 h23 X:Move(0.2) +0x200", translate("Name"))
-		window.Add("Edit", "x214 y80 w101 h21 X:Move(0.2) W:Grow(0.3) VcontrolNameEdit")
-		window.Add("DropDownList", "x321 y79 w105 X:Move(0.5) W:Grow(0.5) Choose1 VcontrolTypeDropDown", collect(["1-way Toggle", "2-way Toggle", "Button", "Dial"], translate))
+		window.Add("Edit", "x214 y80 w105 h21 X:Move(0.2) W:Grow(0.3) VcontrolNameEdit")
+		window.Add("DropDownList", "x325 y79 w101 X:Move(0.5) W:Grow(0.5) Choose1 VcontrolTypeDropDown", collect(["1-way Toggle", "2-way Toggle", "Button", "Dial"], translate))
 
 		window.Add("Text", "x164 y103 w80 h23 X:Move(0.2) +0x200", translate("Image"))
 		window.Add("Edit", "x214 y103 w186 h21 X:Move(0.2) W:Grow(0.8) VimageFilePathEdit")
@@ -576,7 +576,7 @@ class LabelsList extends ConfigurationItemList {
 		window.Add("ListView", "x16 y224 w134 h84 W:Grow(0.2) -Multi -LV0x10 AltSubmit NoSort NoSortHdr VlabelsListView", collect(["Name", "Size"], translate))
 
 		window.Add("Text", "x164 y224 w80 h23 X:Move(0.2) +0x200", translate("Name"))
-		window.Add("Edit", "x214 y225 w101 h21 X:Move(0.2) W:Grow(0.3) VlabelNameEdit")
+		window.Add("Edit", "x214 y225 w105 h21 X:Move(0.2) W:Grow(0.3) VlabelNameEdit")
 
 		window.Add("Text", "x164 y248 w80 h23 X:Move(0.2) +0x200", translate("Size"))
 		window.Add("Edit", "x214 y248 w40 h21 X:Move(0.2) Limit3 Number VlabelWidthEdit")

@@ -25,7 +25,7 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Framework\Process.ahk"
+#Include "..\Framework\Application.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -1522,6 +1522,8 @@ showRaceSettingsEditor() {
 
 	TraySetIcon(icon, "1")
 	A_IconTip := "Race Settings"
+
+	startupApplication()
 
 	gSimulator := false
 	gCar := false

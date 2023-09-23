@@ -22,7 +22,9 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include "..\Libraries\Task.ahk"
 #Include "..\Libraries\Messages.ahk"
+#Include "..\Libraries\HTMLViewer.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -248,7 +250,7 @@ startDatabaseSynchronizer() {
 		}
 		catch Any as exception {
 			logError(exception, true)
-			
+
 			dbID := false
 		}
 
@@ -468,10 +470,35 @@ viewHTML(fileName, title := false, x := kUndefined, y := kUndefined, width := 80
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                    Public Function Declaration Section                  ;;;
+;;;-------------------------------------------------------------------------;;;
+
+startupApplication() {
+	local isCritical := Task.CriticalHandler
+
+	guardExit(*) {
+		if isCritical() {
+			OnMessage(0x44, translateOkButton)
+			MsgBox(translate("Please wait until all tasks have been finished."), StrSplit(A_ScriptName, ".")[1], 262192)
+			OnMessage(0x44, translateOkButton, 0)
+
+			return true
+		}
+		else
+			return false
+	}
+
+	Task.CriticalHandler := (*) => guardExit()
+
+	OnExit(guardExit, -1)
+}
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-if (!isDetachedInstallation() && !isDebug()) {
+if (!isDetachedInstallation() && !isDebug() && !inList(kBackgroundApps, StrSplit(A_ScriptName, ".")[1])) {
 	checkForUpdates()
 
 	requestShareSessionDatabaseConsent()

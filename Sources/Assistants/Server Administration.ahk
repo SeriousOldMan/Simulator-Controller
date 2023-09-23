@@ -25,7 +25,7 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Framework\Process.ahk"
+#Include "..\Framework\Application.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -82,7 +82,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 	local task, ignore, identifier, type, which, contract
 	local dllName, dllFile, sessionDB, connection, administrationConfig
 	local x, y, w, h, width, x0, x1, w1, w2, x2, w4, x4, w3, x3, x4, x5, w5, x6, x7
-	local button, administrationTab
+	local button, administrationTab, progress, compacting
 
 	static administrationGui
 
@@ -541,6 +541,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 					administrationGui["taskAccountFrequencyDropDown"].Enabled := true
 
 					administrationGui["refreshConnectionsListButton"].Enabled := true
+					administrationGui["refreshObjectsListButton"].Enabled := true
 				}
 				else {
 					administrationGui["changePasswordButton"].Enabled := false
@@ -556,6 +557,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 					administrationGui["taskAccountFrequencyDropDown"].Enabled := false
 
 					administrationGui["refreshConnectionsListButton"].Enabled := false
+					administrationGui["refreshObjectsListButton"].Enabled := false
 
 					connectionsListView.Delete()
 				}
@@ -618,6 +620,8 @@ administrationEditor(configurationOrCommand, arguments*) {
 			}
 			else if (arguments[1] = "LoadConnections")
 				loadConnections(connector, connectionsListView)
+			else if (arguments[1] = "LoadObjects")
+				loadObjects(connector, objectsListView)
 			else if (arguments[1] = "CompactDatabase") {
 				OnMessage(0x44, translateYesNoButtons)
 				msgResult := MsgBox(translate("Do you really want to compact the database? This can take quite a while and cannot be interrupted..."), translate("Compact"), 262436)
@@ -625,7 +629,34 @@ administrationEditor(configurationOrCommand, arguments*) {
 
 				if (msgResult = "Yes")
 					try {
-						connector.CompactDatabase()
+						progress := 0
+
+						showProgress({color: "Green", title: translate("Compacting Database")})
+
+						try {
+							connector.CompactDatabase()
+
+							loop {
+								Sleep(1000)
+
+								showProgress({progress: progress++})
+
+								if (progress > 100)
+									progress := 0
+
+								compacting := connector.CompactingDatabase()
+							}
+							until (!compacting || (compacting = kFalse))
+
+							while (progress < 100) {
+								showProgress({progress: progress++})
+
+								Sleep(100)
+							}
+						}
+						finally {
+							hideProgress()
+						}
 					}
 					catch Any as exception {
 						logError(exception, true)
@@ -796,7 +827,9 @@ administrationEditor(configurationOrCommand, arguments*) {
 		objectsListView.OnEvent("Click", noSelect)
 		objectsListView.OnEvent("DoubleClick", noSelect)
 
-		administrationGui.Add("Button", "x" . x0 . " y430 w80 h23 Y:Move vcleanupDatabaseButton", translate("Compact...")).OnEvent("Click", administrationEditor.Bind(kEvent, "CompactDatabase"))
+		administrationGui.Add("Button", "x" . x0 . " y430 w80 h23 Y:Move vrefreshObjectsListButton", translate("Refresh")).OnEvent("Click", administrationEditor.Bind(kEvent, "LoadObjects"))
+
+		administrationGui.Add("Button", "x" . (x0 + 372 - 80) . " y430 w80 h23 Y:Move vcleanupDatabaseButton", translate("Compact...")).OnEvent("Click", administrationEditor.Bind(kEvent, "CompactDatabase"))
 
 		administrationGui.Add(AdministrationResizer(administrationGui))
 
@@ -835,3 +868,5 @@ startupServerAdministration() {
 ;;;-------------------------------------------------------------------------;;;
 
 startupServerAdministration()
+
+startupApplication()

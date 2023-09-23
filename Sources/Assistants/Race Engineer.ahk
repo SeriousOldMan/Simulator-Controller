@@ -78,7 +78,7 @@ checkRemoteProcessAlive(pid) {
 		ExitApp(0)
 }
 
-startRaceEngineer() {
+startupRaceEngineer() {
 	local icon := kIconsDirectory . "Artificial Intelligence.ico"
 	local remotePID := false
 	local engineerName := "Jona"
@@ -96,6 +96,8 @@ startRaceEngineer() {
 	TraySetIcon(icon, "1")
 	A_IconTip := "Race Engineer"
 
+	startupProcess()
+	
 	voiceServer := ProcessExist("Voice Server.exe")
 
 	index := 1
@@ -237,4 +239,4 @@ handleEngineerMessage(category, data) {
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-startRaceEngineer()
+startupRaceEngineer()

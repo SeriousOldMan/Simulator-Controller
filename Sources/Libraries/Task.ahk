@@ -45,6 +45,10 @@ class Task {
 
 	static sCurrentTask := false
 
+	static sCriticalHandler := () => (Task.CurrentTask && Task.CurrentTask.Critical)
+
+	iPreviousTask := false
+
 	iStopped := false
 	iRunnable := true
 	iSleep := false
@@ -54,6 +58,8 @@ class Task {
 	iNextExecution := false
 
 	iCallable := false
+
+	iCritical := false
 
 	static LowTimer {
 		Get {
@@ -95,9 +101,25 @@ class Task {
 		}
 	}
 
+	static CriticalHandler {
+		Get {
+			return Task.sCriticalHandler
+		}
+
+		Set {
+			return (Task.sCriticalHandler := value)
+		}
+	}
+
 	static CurrentTask {
 		Get {
 			return Task.sCurrentTask
+		}
+	}
+
+	static Critical {
+		Get {
+			return Task.CriticalHandler.Call()
 		}
 	}
 
@@ -172,6 +194,16 @@ class Task {
 	Callable {
 		Get {
 			return this.iCallable
+		}
+	}
+
+	Critical {
+		Get {
+			return (this.iCritical || (this.iPreviousTask && this.iPreviousTask.Critical))
+		}
+
+		Set {
+			return (this.iCritical := value)
 		}
 	}
 
@@ -433,6 +465,7 @@ class Task {
 		local next := false
 		local curAutoActivate
 
+		theTask.iPreviousTask := oldCurrentTask
 		Task.sCurrentTask := theTask
 
 		if window
@@ -458,6 +491,7 @@ class Task {
 				else
 					window.Unblock()
 
+			theTask.iPreviousTask := false
 			Task.sCurrentTask := oldCurrentTask
 		}
 

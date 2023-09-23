@@ -39,7 +39,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 
 	Pages {
 		Get {
-			return (this.SetupWizard.QuickSetup ? 0 : 1)
+			return (this.SetupWizard.BasicSetup ? 0 : 1)
 		}
 	}
 
@@ -65,9 +65,6 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		setMultiMapValue(configuration, "Configuration", "Language", language)
 		setMultiMapValue(configuration, "Configuration", "Start With Windows", startWithWindows)
 		setMultiMapValue(configuration, "Configuration", "Silent Mode", silentMode)
-
-		setMultiMapValue(configuration, "Configuration", "Log Level", "Warn")
-		setMultiMapValue(configuration, "Configuration", "Debug", false)
 
 		for section, values in readMultiMap(kUserHomeDirectory . "Setup\Formats Configuration.ini")
 			for key, value in values
@@ -326,6 +323,20 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 			super.registerWidget(1, widget)
 		else
 			super.registerWidget(page, widget)
+	}
+
+	startSetup(new) {
+		local wizard, uiLanguage, startWithWindows, silentMode
+
+		if !new {
+			wizard := this.SetupWizard
+
+			wizard.getGeneralConfiguration(&uiLanguage, &startWithWindows, &silentMode)
+
+			wizard.setGeneralConfiguration(getMultiMapValue(kSimulatorConfiguration, "Configuration", "Language", uiLanguage)
+										 , getMultiMapValue(kSimulatorConfiguration, "Configuration", "Start With Windows", startWithWindows)
+										 , getMultiMapValue(kSimulatorConfiguration, "Configuration", "Silent Mode", silentMode))
+		}
 	}
 
 	reset() {

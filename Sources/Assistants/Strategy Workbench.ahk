@@ -3292,7 +3292,7 @@ convertValue(name, value) {
 		return value
 }
 
-runStrategyWorkbench() {
+startupStrategyWorkbench() {
 	local icon := kIconsDirectory . "Workbench.ico"
 	local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 	local simulator := getMultiMapValue(settings, "Strategy Workbench", "Simulator", false)
@@ -3358,4 +3358,6 @@ runStrategyWorkbench() {
 ;;;                           Initialization Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-runStrategyWorkbench()
+startupStrategyWorkbench()
+
+startupApplication()

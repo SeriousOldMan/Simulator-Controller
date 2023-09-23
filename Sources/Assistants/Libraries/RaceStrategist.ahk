@@ -647,6 +647,10 @@ class RaceStrategist extends GridRaceAssistant {
 			Get {
 				return this.iFullCourseYellow
 			}
+
+			Set {
+				return (this.iFullCourseYellow := value)
+			}
 		}
 
 		__New(strategyManager, configuration, driver, fullCourseYellow) {
@@ -668,7 +672,7 @@ class RaceStrategist extends GridRaceAssistant {
 			if this.StrategyManager.StrategyManager.unplannedPitstop(pitstopNr, currentLap, &remainingLaps)
 				return remainingLaps
 			else
-				return super.calcRemainingLaps(remainingStintLaps, remainingTyreLaps, remainingFuel, fuelConsumption)
+				return super.calcRemainingLaps(pitstopNr, currentLap, remainingStintLaps, remainingTyreLaps, remainingFuel, fuelConsumption)
 		}
 	}
 
@@ -1252,13 +1256,19 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	loadStrategy(facts, strategy, lastLap := false, lastPitstop := false, lastPitstopLap := false) {
-		local fullCourseYellow := strategy.FullCourseYellow
 		local pitstopWindow := (this.Settings ? getMultiMapValue(this.Settings, "Strategy Settings", "Strategy.Window.Considered", 3) : 3)
-		local pitstop, count, ignore, pitstopLap, pitstopMaxLap, first, rootStrategy, pitstopDeviation
+		local fullCourseYellow, pitstop, count, ignore, pitstopLap, pitstopMaxLap, first, rootStrategy, pitstopDeviation
 
-		strategy.RunningPitstops := 0
-		strategy.RunningLaps := 0
-		strategy.RunningTime := 0
+		if !strategy.HasProp("RunningPitstops")
+			strategy.RunningPitstops := 0
+		if !strategy.HasProp("RunningLaps")
+			strategy.RunningLaps := 0
+		if !strategy.HasProp("RunningTime")
+			strategy.RunningTime := 0
+		if !strategy.HasProp("FullCourseYellow")
+			strategy.FullCourseYellow := false
+
+		fullCourseYellow := strategy.FullCourseYellow
 
 		facts["Strategy.Name"] := strategy.Name
 		facts["Strategy.Version"] := strategy.Version
@@ -1381,7 +1391,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 		if ((this.Session == kSessionRace) && (getMultiMapValue(data, "Stint Data", "Laps", 0) <= 1)
 										   && FileExist(kUserConfigDirectory . "Race.strategy")) {
-			theStrategy := Strategy(this, readMultiMap(kUserConfigDirectory . "Race.strategy"))
+			theStrategy := RaceStrategist.RaceStrategy(this, readMultiMap(kUserConfigDirectory . "Race.strategy"), SessionDatabase.ID, false)
 
 			applicableStrategy := false
 
@@ -2203,7 +2213,7 @@ class RaceStrategist extends GridRaceAssistant {
 		if newStrategy {
 			if (this.Session == kSessionRace) {
 				if !isObject(newStrategy)
-					newStrategy := Strategy(this, readMultiMap(newStrategy))
+					newStrategy := RaceStrategist.RaceStrategy(this, readMultiMap(newStrategy), SessionDatabase.ID, false)
 
 				this.clearStrategy()
 

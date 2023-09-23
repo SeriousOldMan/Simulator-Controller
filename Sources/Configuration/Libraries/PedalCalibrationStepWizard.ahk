@@ -28,7 +28,7 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 		Get {
 			local wizard := this.SetupWizard
 
-			if (wizard.isModuleSelected("Controller") && wizard.isModuleSelected("Pedal Calibration") && !wizard.QuickSetup)
+			if (wizard.isModuleSelected("Controller") && wizard.isModuleSelected("Pedal Calibration") && !wizard.BasicSetup)
 				return 1
 			else
 				return 0

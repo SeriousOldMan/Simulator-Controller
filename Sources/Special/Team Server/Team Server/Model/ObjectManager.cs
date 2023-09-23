@@ -10,6 +10,8 @@ namespace TeamServer.Model {
 
         public SQLiteAsyncConnection Connection { get; private set; }
 
+        public bool Compressing { get; set; } = false;  
+
         public ObjectManager(SQLiteAsyncConnection connection) {
             Connection = connection;
 
@@ -69,8 +71,18 @@ namespace TeamServer.Model {
             SQLiteConnection connection = new SQLiteConnection(Connection.DatabasePath);
             SQLiteCommand command = new SQLiteCommand(connection);
 
-            command.CommandText = @"vacuum;";
-            command.ExecuteNonQuery();
+            if (!Compressing)
+                try
+                {
+                    Compressing = true;
+
+                    command.CommandText = @"vacuum;";
+                    command.ExecuteNonQuery();
+                }
+                finally
+                {
+                    Compressing = false;
+                }
         }
         #endregion
 

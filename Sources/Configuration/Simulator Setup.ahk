@@ -146,7 +146,7 @@ class SetupWizard extends ConfiguratorPanel {
 	iStep := 0
 	iPage := 0
 
-	iQuickSetup := true
+	iBasicSetup := true
 
 	iPresets := false
 	iInitialize := false
@@ -193,7 +193,7 @@ class SetupWizard extends ConfiguratorPanel {
 		}
 
 		Close(*) {
-			if this.SetupWizard.finishSetup(false)
+			if (this.Closeable && this.SetupWizard.finishSetup(false))
 				ExitApp(0)
 			else
 				return true
@@ -373,13 +373,13 @@ class SetupWizard extends ConfiguratorPanel {
 		}
 	}
 
-	QuickSetup {
+	BasicSetup {
 		Get {
-			return (this.iQuickSetup && (this.isQuickSetupAvailable() || (this.iQuickSetup = "Force")))
+			return (this.iBasicSetup && (this.isBasicSetupAvailable() || (this.iBasicSetup = "Force")))
 		}
 
 		Set {
-			return (this.iQuickSetup := value)
+			return (this.iBasicSetup := value)
 		}
 	}
 
@@ -454,34 +454,35 @@ class SetupWizard extends ConfiguratorPanel {
 			}
 		}
 
-		loop count {
-			step := this.Steps[A_Index]
+		loop count
+			if this.Steps.Has(A_index) {
+				step := this.Steps[A_Index]
 
-			this.ProgressCount += 2
+				this.ProgressCount += 2
 
-			showProgress({progress: this.ProgressCount})
+				showProgress({progress: this.ProgressCount})
 
-			if step {
-				stepDefinition := readMultiMap(kResourcesDirectory . "Setup\Definitions\" . step.Step . " Step.ini")
+				if step {
+					stepDefinition := readMultiMap(kResourcesDirectory . "Setup\Definitions\" . step.Step . " Step.ini")
 
-				setMultiMapValues(definition, "Setup." . step.Step, getMultiMapValues(stepDefinition, "Setup." . step.Step))
+					setMultiMapValues(definition, "Setup." . step.Step, getMultiMapValues(stepDefinition, "Setup." . step.Step))
 
-				for language, ignore in availableLanguages()
-					for ignore, rootDirectory in [kResourcesDirectory . "Setup\Translations\", kUserTranslationsDirectory . "Setup\"]
-						if FileExist(rootDirectory . step.Step . " Step." . language)
-							for section, keyValues in readMultiMap(rootDirectory . step.Step . " Step." . language)
-								for key, value in keyValues
-									setMultiMapValue(definition, section, key, value)
+					for language, ignore in availableLanguages()
+						for ignore, rootDirectory in [kResourcesDirectory . "Setup\Translations\", kUserTranslationsDirectory . "Setup\"]
+							if FileExist(rootDirectory . step.Step . " Step." . language)
+								for section, keyValues in readMultiMap(rootDirectory . step.Step . " Step." . language)
+									for key, value in keyValues
+										setMultiMapValue(definition, section, key, value)
 
-				step.loadDefinition(definition, getMultiMapValue(definition, "Setup." . step.Step, step.Step . ".Definition", ""))
+					step.loadDefinition(definition, getMultiMapValue(definition, "Setup." . step.Step, step.Step . ".Definition", ""))
+				}
 			}
-		}
 
 		this.iCount := count
 
 		if (GetKeyState("Ctrl") && GetKeyState("Shift")) {
 			OnMessage(0x44, translateYesNoButtons)
-			msgResult := MsgBox(translate("Do you really want to start with a fresh configuration?"), translate("Setup"), 262436)
+			msgResult := MsgBox(translate("Do you really want to start with a fresh configuration?"), translate("Setup "), 262436)
 			OnMessage(0x44, translateYesNoButtons, 0)
 
 			if (msgResult = "Yes")
@@ -510,13 +511,13 @@ class SetupWizard extends ConfiguratorPanel {
 		this.iInitialize := initialize
 
 		if initialize {
-			this.QuickSetup := true
+			this.BasicSetup := true
 
 			this.addPatchFile("Settings", "%kUserHomeDirectory%Setup\Settings Patch.ini")
 			this.addPatchFile("Configuration", "%kUserHomeDirectory%Setup\Configuration Patch.ini")
 		}
 		else
-			this.QuickSetup := false
+			this.BasicSetup := false
 
 		showProgress({progress: ++this.ProgressCount, message: translate("Starting AI Kernel...")})
 
@@ -620,7 +621,7 @@ class SetupWizard extends ConfiguratorPanel {
 				this.WizardWindow.Show()
 
 				OnMessage(0x44, translateYesNoButtons)
-				msgResult := MsgBox((translate("Do you want to generate the new configuration?") . "`n`n" . translate("Backup files will be saved for your current configuration in the `"Simulator Controller\Config`" folder in your user `"Documents`" folder.")), translate("Setup"), 262436)
+				msgResult := MsgBox((translate("Do you want to generate the new configuration?") . "`n`n" . translate("Backup files will be saved for your current configuration in the `"Simulator Controller\Config`" folder in your user `"Documents`" folder.")), translate("Setup "), 262436)
 				OnMessage(0x44, translateYesNoButtons, 0)
 
 				if (msgResult = "Yes")
@@ -630,6 +631,23 @@ class SetupWizard extends ConfiguratorPanel {
 
 				Task.startTask(finishSetup.Bind("Finish", save), 200)
 			}
+		}
+
+		gotoStep(*) {
+			local language := getLanguage()
+			local stepName := this.Control["stepDropDown"].Text
+			local step
+
+			loop this.Count
+				if this.Steps.Has(A_Index) {
+					step := this.Steps[A_Index]
+
+					if (StrReplace(getMultiMapValue(this.Definition, "Setup." . step.Step, step.Step . ".Subtitle." . language), "...", "") = stepName) {
+						this.showPage(step, 1)
+
+						break
+					}
+				}
 		}
 
 		wizardGui := SetupWizard.SetupWindow(this)
@@ -675,6 +693,8 @@ class SetupWizard extends ConfiguratorPanel {
 
 		wizardGui.Add("Text", "x16 y580 w85 h23 Y:Move +0x200", translate("Language"))
 		wizardGui.Add("DropDownList", "x100 y580 w75 Y:Move Choose" . chosen . "  VlanguageDropDown", collect(choices, translate)).OnEvent("Change", chooseLanguage)
+
+		wizardGui.Add("DropDownList", "x230 y580 w260 X:Move(0.5) Y:Move VstepDropDown").OnEvent("Change", gotoStep)
 
 		wizardGui.Add("Button", "x535 y580 w80 h23 Y:Move X:Move Disabled VfinishButton", translate("Finish")).OnEvent("Click", finishSetup)
 		wizardGui.Add("Button", "x620 y580 w80 h23 Y:Move X:Move", translate("Cancel")).OnEvent("Click", cancelSetup)
@@ -783,7 +803,7 @@ class SetupWizard extends ConfiguratorPanel {
 	show(reset := false) {
 		local wizardWindow := this.WizardWindow
 		local helpWindow := this.HelpWindow
-		local x, y, w, h, posX
+		local x, y, w, h, posX, page, step
 
 		if getWindowPosition("Simulator Setup.Help", &x, &y)
 			helpWindow.Show("x" . x . " y" . y)
@@ -814,8 +834,20 @@ class SetupWizard extends ConfiguratorPanel {
 		else
 			this.nextPage()
 
-		loop getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini"), "Simulator Setup", "StartPage", 0)
-			this.nextPage()
+		page := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini"), "Simulator Setup", "StartPage", 0)
+
+		if isInteger(page) {
+			loop page
+				this.nextPage()
+		}
+		else
+			loop this.Count
+				if this.Steps.Has(A_Index) {
+					step := this.Steps[A_Index]
+
+					if (step.Active && (step.Step = page))
+						this.showPage(step, 1)
+				}
 	}
 
 	hide() {
@@ -843,7 +875,7 @@ class SetupWizard extends ConfiguratorPanel {
 
 		loop this.Count
 			if this.Steps.Has(A_Index)
-				this.Steps[A_Index].startSetup()
+				this.Steps[A_Index].startSetup(this.Initialize)
 
 		viewers := []
 
@@ -902,7 +934,7 @@ class SetupWizard extends ConfiguratorPanel {
 		local preset, window, configuration, settings, ignore, file, startupLink, startupExe
 		local buttonBoxConfiguration, streamDeckConfiguration
 
-		if (this.Step && this.Step.hidePage(this.Page)) {
+		if (this.Step && this.hidePage(this.Step, this.Page)) {
 			while this.SettingsOpen {
 				Task.yield()
 
@@ -952,10 +984,8 @@ class SetupWizard extends ConfiguratorPanel {
 							this.applyPatches(settings, readMultiMap(file))
 
 					for ignore, preset in this.Presets {
-						if preset.Active {
-							preset.patchSimulatorConfiguration(this, configuration)
-							preset.patchSimulatorSettings(this, settings)
-						}
+						preset.patchSimulatorConfiguration(this, configuration)
+						preset.patchSimulatorSettings(this, settings)
 					}
 
 					if (settings.Count > 0)
@@ -1003,15 +1033,13 @@ class SetupWizard extends ConfiguratorPanel {
 								this.applyPatches(streamDeckConfiguration, readMultiMap(file))
 
 						for ignore, preset in this.Presets
-							if preset.Active
-								preset.patchStreamDeckConfiguration(this, streamDeckConfiguration)
+							preset.patchStreamDeckConfiguration(this, streamDeckConfiguration)
 
 						writeMultiMap(kUserConfigDirectory . "Stream Deck Configuration.ini", streamDeckConfiguration)
 					}
 
 					for ignore, preset in this.Presets
-						if preset.Active
-							preset.finalizeConfiguration(this)
+						preset.finalizeConfiguration(this)
 				}
 			}
 			finally {
@@ -1281,16 +1309,35 @@ class SetupWizard extends ConfiguratorPanel {
 	}
 
 	updateState(unlock := true) {
+		local language := getLanguage()
+		local pages := []
+		local currentStep := false
+		local step
+
 		this.KnowledgeBase.produce()
 
 		if this.Debug[kDebugKnowledgeBase]
 			this.dumpKnowledgeBase(this.KnowledgeBase)
 
 		loop this.Count
-			if this.Steps.Has(A_Index)
-				this.Steps[A_Index].updateState()
+			if this.Steps.Has(A_Index) {
+				step := this.Steps[A_Index]
+
+				step.updateState()
+
+				if step.Active {
+					pages.Push(StrReplace(getMultiMapValue(this.Definition, "Setup." . step.Step, step.Step . ".Subtitle." . language), "...", ""))
+
+					if (step = this.Step)
+						currentStep := pages.Length
+				}
+			}
 
 		if (this.WizardWindow && !this.PageSwitch) {
+			this.Control["stepDropDown"].Delete()
+			this.Control["stepDropDown"].Add(pages)
+			this.Control["stepDropDown"].Choose(currentStep ? currentStep : 1)
+
 			if this.isFirstPage() {
 				this.Control["firstPageButton"].Enabled := false
 				this.Control["previousPageButton"].Enabled := false
@@ -1307,7 +1354,7 @@ class SetupWizard extends ConfiguratorPanel {
 			}
 			else {
 				this.Control["nextPageButton"].Enabled := true
-				this.Control["lastPageButton"].Enabled := !this.QuickSetup
+				this.Control["lastPageButton"].Enabled := !this.BasicSetup
 				this.Control["finishButton"].Enabled := false
 			}
 
@@ -1546,7 +1593,7 @@ class SetupWizard extends ConfiguratorPanel {
 		return this.KnowledgeBase.getValue("Application." . application . ".Path", false)
 	}
 
-	isQuickSetupAvailable() {
+	isBasicSetupAvailable() {
 		return (this.isModuleSelected("Voice Control") && (this.loadPresets().Length = 0))
 	}
 
@@ -1630,6 +1677,7 @@ class SetupWizard extends ConfiguratorPanel {
 						definition := string2Values("|", definition)
 						skip := false
 						root := ""
+						path := ""
 
 						for ignore, target in string2Values(";", definition[3]) {
 							target := string2Values(":", target)
@@ -1638,6 +1686,12 @@ class SetupWizard extends ConfiguratorPanel {
 								this.locateSoftware(target[2])
 
 								root := (this.isSoftwareInstalled(target[2]) && this.softwarePath(target[2]))
+
+								if !root {
+									this.locateApplication(target[2])
+
+									root := (this.isApplicationInstalled(target[2]) && this.applicationPath(target[2]))
+								}
 
 								if root
 									SplitPath(root, , &root)
@@ -1655,7 +1709,11 @@ class SetupWizard extends ConfiguratorPanel {
 						if !skip {
 							showProgress({progress: progressCount++, color: "Green", message: translate("Installing ") . plugin . translate("...")})
 
-							path := (root . substituteVariables(path))
+							if (Trim(root) != "")
+								path := ((Trim(path) = "") ? root : (root . "\" . substituteVariables(path)))
+							else
+								path := substituteVariables(path)
+
 							source := string2Values(":", definition[2])
 
 							SplitPath(substituteVariables(source[2]), &name)
@@ -1713,6 +1771,8 @@ class SetupWizard extends ConfiguratorPanel {
 			installPlugins()
 
 			showProgress({progress: 100, message: translate("Finished...")})
+
+			this.saveKnowledgeBase()
 
 			Sleep(1000)
 		}
@@ -2363,6 +2423,9 @@ class StepWizard extends ConfiguratorPanel {
 		this.iWidgets.Delete(page)
 	}
 
+	startSetup(new) {
+	}
+
 	reset() {
 		this.iWidgets := CaseInsenseMap()
 	}
@@ -2410,9 +2473,6 @@ class StepWizard extends ConfiguratorPanel {
 			}
 
 		return true
-	}
-
-	startSetup() {
 	}
 
 	updateState() {
@@ -2941,6 +3001,8 @@ startupSimulatorSetup() {
 
 		wizard.show()
 
+		startupApplication()
+
 		try {
 			loop {
 				wizard.Working := false
@@ -2990,7 +3052,7 @@ installZIP(path, application) {
 	DirCreate(A_Temp . "\Simulator Controller\Temp")
 	DirCreate(kUserHomeDirectory . "Programs")
 
-	RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . kHomeDirectory . path . "' -DestinationPath '" . A_Temp . "\Simulator Controller\Temp'", , "Hide")
+	RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . kHomeDirectory . path . "' -DestinationPath '" . A_Temp . "\Simulator Controller\Temp' -Force", , "Hide")
 
 	FileCopy(A_Temp . "\Simulator Controller\Temp\" . application, kUserHomeDirectory . "Programs", 1)
 
@@ -3177,7 +3239,7 @@ initializeSimulatorSetup()
 ;;;                          Wizard Include Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "Libraries\QuickStepWizard.ahk"
+#Include "Libraries\BasicStepWizard.ahk"
 #Include "Libraries\ModulesStepWizard.ahk"
 #Include "Libraries\InstallationStepWizard.ahk"
 #Include "Libraries\ApplicationsStepWizard.ahk"

@@ -36,7 +36,29 @@ global kProperInstallation := true
 loadSimulatorConfiguration() {
 	global kSimulatorConfiguration, kVersion, kDatabaseDirectory, kAHKDirectory, kMSBuildDirectory, kNirCmd, kSox, kSilentMode
 
-	local version, section, pid, path
+	local packageInfo, type, pid, path
+
+	checkInstallation(components) {
+		local component, version, ignore, part
+
+		for component, version in components {
+			path := Trim(getMultiMapValue(packageInfo, "Components", component . "." . version . ".Path", ""))
+
+			if (path && (path != "") && (path != "."))
+				path := (kHomeDirectory . path . "\")
+			else
+				path := kHomeDirectory
+
+			if !FileExist(path)
+				return false
+
+			for ignore, part in string2Values(",", getMultiMapValue(packageInfo, "Components", component . "." . version . ".Content"))
+				if !FileExist(path . part)
+					return false
+		}
+
+		return true
+	}
 
 	kSimulatorConfiguration := readMultiMap(kSimulatorConfigurationFile)
 
@@ -45,17 +67,21 @@ loadSimulatorConfiguration() {
 	else
 		setLanguage(getMultiMapValue(kSimulatorConfiguration, "Configuration", "Language", getSystemLanguage()))
 
-	version := readMultiMap(kHomeDirectory . "VERSION")
-	section := getMultiMapValue(version, "Current", "Type", false)
+	packageInfo := readMultiMap(kHomeDirectory . "VERSION")
+	type := getMultiMapValue(packageInfo, "Current", "Type", false)
 
-	if section {
-		kVersion := getMultiMapValue(version, section, "Version", false)
+	if type {
+		if (StrSplit(A_ScriptName, ".")[1] != "Simulator Tools")
+			if !checkInstallation(string2Map(",", "->", getMultiMapValue(packageInfo, type, "Components", "")))
+				RunWait(kBinariesDirectory . "Simulator Tools.exe -Repair")
+
+		kVersion := getMultiMapValue(packageInfo, type, "Version", false)
 
 		if !kVersion
-			kVersion := getMultiMapValue(version, "Release", "Version", "0.0.0.0-dev")
+			kVersion := getMultiMapValue(packageInfo, "Release", "Version", "0.0.0.0-dev")
 	}
 	else
-		kVersion := getMultiMapValue(version, "Current", "Version", getMultiMapValue(version, "Version", "Current", "0.0.0.0-dev"))
+		kVersion := getMultiMapValue(packageInfo, "Current", "Version", getMultiMapValue(packageInfo, "Version", "Current", "0.0.0.0-dev"))
 
 	pid := ProcessExist()
 
@@ -140,7 +166,7 @@ initializeEnvironment() {
 
 			install := (installLocation && (installLocation != "") && (InStr(kHomeDirectory, installLocation) != 1))
 			install := (install || !installLocation || (installLocation = ""))
-			
+
 			if install
 				kProperInstallation := false
 

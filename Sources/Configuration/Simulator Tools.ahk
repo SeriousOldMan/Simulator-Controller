@@ -467,7 +467,16 @@ checkInstallation() {
 	installInfo := readMultiMap(kUserConfigDirectory . "Simulator Controller.install")
 	installLocation := getMultiMapValue(installInfo, "Install", "Location", installLocation)
 
-	if inList(A_Args, "-Uninstall") {
+	if inList(A_Args, "-Repair") {
+		showProgress({color: "Blue", title: translate("Installing Simulator Controller"), message: translate("...")})
+
+		installComponents(normalizeDirectoryPath(installLocation), normalizeDirectoryPath(installLocation))
+
+		hideProgress()
+
+		ExitApp(0)
+	}
+	else if inList(A_Args, "-Uninstall") {
 		quiet := inList(A_Args, "-Quiet")
 
 		if !A_IsAdmin {

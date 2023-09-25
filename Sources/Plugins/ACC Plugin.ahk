@@ -1049,7 +1049,9 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 						this.activateWindow()
 
-						delta := (this.iPSOptions.Length - targetSelectedOption + this.iPSSelectedOption)
+						delta := ((this.iPSOptions.Length - (this.iPSChangeTyres ? 0 : this.iPSTyreOptions)
+														  - (this.iPSChangeBrakes ? 0 : this.iPSBrakeOptions))
+								- targetSelectedOption + this.iPSSelectedOption)
 
 						if (Abs(targetSelectedOption - this.iPSSelectedOption) <= delta) {
 							if (targetSelectedOption > this.iPSSelectedOption)

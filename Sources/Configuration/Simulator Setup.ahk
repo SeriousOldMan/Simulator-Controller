@@ -2651,11 +2651,11 @@ class StartStepWizard extends StepWizard {
 
 			widget3 := window.Add("HTMLViewer", "x" . x . " yp+30 w" . width . " h350 W:Grow H:Grow Hidden")
 
-			x := x + Round((width - 240) / 2)
+			x := x + Round((width - 260) / 2)
 
 			window.SetFont("s10 Bold", "Arial")
 
-			widget4 := window.Add("Button", "x" . x . " yp+380 w240 h30 Y:Move H:Center Hidden", translate("Restart as Administrator"))
+			widget4 := window.Add("Button", "x" . x . " yp+380 w260 h30 Y:Move H:Center Hidden", translate("Unblock Applications and DLLs..."))
 			widget4.OnEvent("Click", elevateAndRestart)
 
 			html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"

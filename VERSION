@@ -3,7 +3,7 @@ Version=5.3.2.0-dev
 Target=5.3.2.0-release
 Date=09/26/2023
 Download=
-Changes=Performance improvement for ACC Pitstop MFD handling, Optimized last lap detection for timed races,  Migrated sources to AHK 2.0.10, Fixed manual installation
+Changes=Performance improvement for ACC Pitstop MFD handling, Optimized last lap detection for timed races,  Migrated sources to AHK 2.0.10, Fixed manual installation, Detect removed software in "Simulator Setup"
 Components=Media->5.3.0,Configuration->5.3.0,Utilities->5.3.0
 [Release]
 Version=5.3.1.2-release

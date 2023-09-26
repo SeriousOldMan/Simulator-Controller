@@ -124,20 +124,21 @@ class InstallationStepWizard extends StepWizard {
 		}
 	}
 
+	startSetup(new) {
+		local ignore, software
+
+		for ignore, software in this.Definition
+			if new
+				this.SetupWizard.locateSoftware(software)
+			else
+				this.SetupWizard.locateSoftware(software, "CHECK")
+	}
+
 	reset() {
 		super.reset()
 
 		this.iPages := CaseInsenseMap()
 		this.iSoftwareLocators := CaseInsenseMap()
-	}
-
-	loadStepDefinition(definition) {
-		local ignore, software
-
-		super.loadStepDefinition(definition)
-
-		for ignore, software in this.Definition
-			this.SetupWizard.locateSoftware(software)
 	}
 
 	installSoftware(software) {

@@ -2152,7 +2152,6 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 					if (tyreSetIncrement != 0)
 						changePitstopTyreSet((tyreSetIncrement > 0) ? "Next" : "Previous", Abs(tyreSetIncrement))
 				}
-			}
 		}
 		else if this.iPSChangeTyres
 			this.toggleActivity("Change Tyres")

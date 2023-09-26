@@ -196,11 +196,11 @@ class ApplicationsStepWizard extends StepWizard {
 		this.registerWidgets(2, widget1, widget2, widget3, widget4, widget5)
 	}
 
-	loadStepDefinition(definition) {
-		super.loadStepDefinition(definition)
-
-		if !FileExist(kUserHomeDirectory . "Setup\Simulator Setup.data")
+	startSetup(new) {
+		if new
 			this.updateAvailableApplications(true)
+		else
+			this.updateAvailableApplications("CHECK")
 	}
 
 	reset() {
@@ -234,14 +234,18 @@ class ApplicationsStepWizard extends StepWizard {
 	updateAvailableApplications(initialize := false) {
 		local wizard := this.SetupWizard
 		local definition := this.Definition
+		local check := (initialize = "CHECK")
 		local application, ignore, section, application, category
+
+		if check
+			initialize := false
 
 		for ignore, section in concatenate([definition[1]], string2Values(",", definition[2])) {
 			category := ConfigurationItem.splitDescriptor(section)[2]
 
 			for application, ignore in getMultiMapValues(wizard.Definition, section) {
-				if !wizard.isApplicationInstalled(application) {
-					wizard.locateApplication(application, false, false)
+				if (check || !wizard.isApplicationInstalled(application)) {
+					wizard.locateApplication(application, check ? "CHECK" : false, false)
 
 					if (initialize && wizard.isApplicationInstalled(application))
 						wizard.selectApplication(application, true, false)

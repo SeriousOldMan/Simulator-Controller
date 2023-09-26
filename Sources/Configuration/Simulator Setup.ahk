@@ -1501,8 +1501,16 @@ class SetupWizard extends ConfiguratorPanel {
 
 	locateSoftware(software, executable := false) {
 		local knowledgeBase := this.KnowledgeBase
+		local installed := this.isSoftwareInstalled(software)
+		local check := (executable = "CHECK")
 
-		if !this.isSoftwareInstalled(software) {
+		if check
+			executable := false
+
+		if (check || !installed) {
+			if (check && installed && FileExist(this.softwarePath(software)))
+				return true
+
 			if !executable {
 				executable := findSoftware(this.Definition, software)
 
@@ -1518,7 +1526,11 @@ class SetupWizard extends ConfiguratorPanel {
 				knowledgeBase.setFact("Software." . software . ".Path", executable)
 
 			this.updateState()
+
+			return (executable != false)
 		}
+		else
+			return true
 	}
 
 	softwarePath(software) {
@@ -1556,33 +1568,53 @@ class SetupWizard extends ConfiguratorPanel {
 
 	locateApplication(application, executable := false, update := true) {
 		local knowledgeBase := this.KnowledgeBase
+		local check := (executable = "CHECK")
+		local installed := this.isApplicationInstalled(application)
 		local ignore, section, descriptor, applications
 
-		if (!this.isApplicationInstalled(application) && !executable)
-			for ignore, section in ["Applications.Simulators", "Applications.Core", "Applications.Feedback", "Applications.Other"] {
-				descriptor := getMultiMapValue(this.Definition, section, application, false)
+		if check
+			executable := false
 
-				if descriptor {
-					descriptor := string2Values("|", descriptor)
+		if (check || !installed) {
+			if (check && installed && FileExist(this.applicationPath(application)))
+				return true
 
-					executable := findSoftware(this.Definition, descriptor[1])
+			if !executable
+				for ignore, section in ["Applications.Simulators", "Applications.Core", "Applications.Feedback", "Applications.Other"] {
+					descriptor := getMultiMapValue(this.Definition, section, application, false)
 
-					break
+					if descriptor {
+						descriptor := string2Values("|", descriptor)
+
+						executable := findSoftware(this.Definition, descriptor[1])
+
+						break
+					}
 				}
+
+			if executable {
+				knowledgeBase.setFact("Application." . application . ".Installed", true)
+				knowledgeBase.setFact("Application." . application . ".Path", executable)
+
+				applications := string2Values("###", knowledgeBase.getValue("Application.Installed", ""))
+
+				if !inList(applications, application)
+					knowledgeBase.setFact("Application.Installed", values2String("###", concatenate(applications, [application])*))
+
+				if update
+					this.updateState()
+
+				return true
 			}
+			else {
+				knowledgeBase.setFact("Application." . application . ".Installed", false)
+				knowledgeBase.removeFact("Application." . application . ".Path")
 
-		if executable {
-			knowledgeBase.setFact("Application." . application . ".Installed", true)
-			knowledgeBase.setFact("Application." . application . ".Path", executable)
-
-			applications := string2Values("###", knowledgeBase.getValue("Application.Installed", ""))
-
-			if !inList(applications, application)
-				knowledgeBase.setFact("Application.Installed", values2String("###", concatenate(applications, [application])*))
-
-			if update
-				this.updateState()
+				return false
+			}
 		}
+		else
+			return true
 	}
 
 	installedApplications() {

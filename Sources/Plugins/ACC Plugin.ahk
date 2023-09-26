@@ -2145,11 +2145,13 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			if (this.getPitstopOptionValues("Tyre Compound")[1] != compound)
 				changePitstopTyreCompound((compound = "Wet") ? "Increase" : "Decrease")
 
-			if (set && (compound = "Dry")) {
-				tyreSetIncrement := Round(set - this.getPitstopOptionValues("Tyre Set")[1])
+			if (set && (compound = "Dry"))
+				loop 2 {
+					tyreSetIncrement := Round(set - this.getPitstopOptionValues("Tyre Set")[1])
 
-				if (tyreSetIncrement != 0)
-					changePitstopTyreSet((tyreSetIncrement > 0) ? "Next" : "Previous", Abs(tyreSetIncrement))
+					if (tyreSetIncrement != 0)
+						changePitstopTyreSet((tyreSetIncrement > 0) ? "Next" : "Previous", Abs(tyreSetIncrement))
+				}
 			}
 		}
 		else if this.iPSChangeTyres

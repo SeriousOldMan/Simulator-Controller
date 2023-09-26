@@ -1,3 +1,6 @@
+## 5.3.1.2-release 09/26/23
+  1. Fixed a critical bug which creates an infinite loop during pitstop setup by the Engineer, when wrong tyre sets had been configured in the "Race Settings".
+
 ## 5.3.1.1-release 09/23/23
   1. Fixed a critical bug for the track mapper, that could present a dialog box while you are on the track.
 

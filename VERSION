@@ -1,14 +1,14 @@
 [Development]
-Version=5.3.1.1-release
-Target=5.3.1.1-release
-Date=09/23/2023
-Download=https://cutt.ly/2wvhZVgp;https://www.dropbox.com/scl/fi/04850ip12c21zs4y1sd9a/Simulator-Controller-5.3.1.1-release.zip?rlkey=2vu0tpzhltrsv92lx4qc8l2rx&dl=1
+Version=5.3.1.2-release
+Target=5.3.1.2-release
+Date=09/26/2023
+Download=https://cutt.ly/XwvLSo0N;https://www.dropbox.com/scl/fi/f67erh47ax0wiv5pjkn12/Simulator-Controller-5.3.1.2-release.zip?rlkey=w0315nju2ckyh8nhnzj4zvrzx&dl=1
 Changes=Downloadable components for installation and update process, Fixed list update when adding a setting in "Session Database", Fixed rare off-by-one error for tyre set selection in ACC, Fixed Engineer to be optimistic in reporting the remaining laps on fuel, Fixed time in log files to be in 24 hour format, Fixed a couple of bugs in "Race Center" related to sector times, Migrated to AHK 2.09, Display time left on fuel in fuel widget in "Session Monitor", Optical enhancement in "Session Monitor" HTML generator, Prevent exit while tasks are running, Fixes for the Spanish translation, New car models for "Setup Workbench"
 Components=Media->5.3.0,Configuration->5.3.0,Utilities->5.3.0
 [Release]
-Version=5.3.1.1-release
-Date=09/23/2023
-Download=https://cutt.ly/2wvhZVgp;https://www.dropbox.com/scl/fi/04850ip12c21zs4y1sd9a/Simulator-Controller-5.3.1.1-release.zip?rlkey=2vu0tpzhltrsv92lx4qc8l2rx&dl=1
+Version=5.3.1.2-release
+Date=09/26/2023
+Download=https://cutt.ly/XwvLSo0N;https://www.dropbox.com/scl/fi/f67erh47ax0wiv5pjkn12/Simulator-Controller-5.3.1.2-release.zip?rlkey=w0315nju2ckyh8nhnzj4zvrzx&dl=1
 Changes=Downloadable components for installation and update process, Fixed list update when adding a setting in "Session Database", Fixed rare off-by-one error for tyre set selection in ACC, Fixed Engineer to be optimistic in reporting the remaining laps on fuel, Fixed time in log files to be in 24 hour format, Fixed a couple of bugs in "Race Center" related to sector times, Migrated to AHK 2.09, Display time left on fuel in fuel widget in "Session Monitor", Optical enhancement in "Session Monitor" HTML generator, Prevent exit while tasks are running, Fixes for the Spanish translation, New car models for "Setup Workbench"
 Components=Media->5.3.0,Configuration->5.3.0,Utilities->5.3.0
 [Components]
@@ -24,5 +24,5 @@ Utilities.5.3.0.Download=https://www.dropbox.com/scl/fi/hlza8t9tae5d0vnd7wmqa/Ut
 [Current]
 Type=Release
 [Version]
-Development=5.3.1.1-release
-Release=5.3.1.1-release
+Development=5.3.1.2-release
+Release=5.3.1.2-release

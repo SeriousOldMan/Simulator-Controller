@@ -56,9 +56,9 @@ namespace Speech
             _azureRecognizer.SetLanguage(language);
         }
 
-        public void SetContinuous(bool continuous)
+        public void SetContinuous(dynamic continuous)
         {
-            _continuousMode = continuous;
+            _continuousMode = true;
 
             if (_engineType == "Server")
                 throw new Exception("Not supported");
@@ -590,7 +590,7 @@ namespace Speech
             new Dictionary<string, System.Speech.Recognition.Choices>(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, LoadedGrammar> _loadedGrammarDictionary = new Dictionary<string, LoadedGrammar>(StringComparer.OrdinalIgnoreCase);
 
-        private bool _continuous = false;
+        private dynamic _continuous = null;
 
         #region Startup
         public DesktopSpeechRecognizer()
@@ -613,7 +613,7 @@ namespace Speech
             _choicesDictionary.Add("Digit", digitChoices);
         }
 
-        public void SetContinuous(bool continuous)
+        public void SetContinuous(dynamic continuous)
         {
             _continuous = continuous;
         }
@@ -640,10 +640,10 @@ namespace Speech
             // Configure the input to the speech recognizer.
             _recognizer.SetInputToDefaultAudioDevice();
 
-            if (_continuous)
+            if (_continuous != null)
             {
                 DictationGrammar grammar = new DictationGrammar();
-                grammar.Name = "Speech";
+                grammar.Name = "Continuous";
                 grammar.Enabled = true;
 
                 _recognizer.LoadGrammar(grammar);
@@ -816,15 +816,25 @@ namespace Speech
                 words[i] = e.Result.Words[i].Text;
             }
 
-            try
-            {
-                _loadedGrammarDictionary[name].Callback(name, words);
-                //_loadedGrammarDictionary[name](name, words);
-            }
-            catch
-            {
-                // ignore for now
-            }
+            if (_continuous != null)
+                try
+                {
+                    _continuous(name, words);
+                }
+                catch
+                {
+                    // ignore for now
+                }
+            else
+                try
+                {
+                    _loadedGrammarDictionary[name].Callback(name, words);
+                    //_loadedGrammarDictionary[name](name, words);
+                }
+                catch
+                {
+                    // ignore for now
+                }
         }
 
         // Write the audio level to the console when the AudioLevelUpdated event is raised.

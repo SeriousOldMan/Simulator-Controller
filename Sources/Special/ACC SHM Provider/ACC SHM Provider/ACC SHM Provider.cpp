@@ -399,16 +399,16 @@ int main(int argc, char* argv[])
 
 	if (strlen(request) == 0 || getArgument(request, "Setup") != "")
 	{
-		if (strlen(request) != 0) {
-			wcout << "[Car Data]" << endl;
-			
-			printData("TyreSet", gf->currentTyreSet);
-		}
-		
 		wcout << "[Setup Data]" << endl;
 
 		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 		SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
+
+		if (strlen(request) != 0) {
+			wcout << "[Car Data]" << endl;
+
+			printData("TyreSet", gf->currentTyreSet);
+		}
 
 		_bstr_t tc(gf->tyreCompound);
 		std::string tyreCompound(tc);
@@ -421,8 +421,8 @@ int main(int argc, char* argv[])
 		wcout << "TyreCompoundColor=Black" << endl;
 		
 		printData("TyreSet", gf->mfdTyreSet + 1);
-		printData("TyreSetCurrent", gf->currentTyreSet + 1);
-		printData("TyreSetStrategy", gf->strategyTyreSet + 1);
+		printData("TyreSetCurrent", gf->currentTyreSet);
+		printData("TyreSetStrategy", gf->strategyTyreSet);
 		printData("FuelAmount", gf->mfdFuelToAdd);
 		printData("TyrePressureFL", gf->mfdTyrePressureFL);
 		printData("TyrePressureFR", gf->mfdTyrePressureFR);

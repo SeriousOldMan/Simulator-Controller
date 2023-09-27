@@ -29,16 +29,17 @@
 class DrivingCoach extends RaceAssistant {
 	iConnector := false
 
-	class OpenAIConnector {
+	class ChatGPTConnector {
 		iServer := ""
 		iToken := ""
 		iModel := ""
 
-		iMaxTokens := 256
+		iMaxTokens := 1024
 		iTemperature := 0.5
 
 		iSystem := ""
 		iTranscript := []
+		iMaxTranscript := 3
 
 		Server {
 			Get {
@@ -87,6 +88,10 @@ class DrivingCoach extends RaceAssistant {
 			Get {
 				return this.iMaxTokens
 			}
+
+			Set {
+				return (this.iMaxTokens := value)
+			}
 		}
 
 		System {
@@ -101,12 +106,20 @@ class DrivingCoach extends RaceAssistant {
 			}
 		}
 
-		Connect(server?, token?, model?, system?, maxTokens?) {
+		MaxTranscript {
+			Get {
+				return this.iMaxTranscript
+			}
+
+			Set {
+				return (this.iMaxTranscript := value)
+			}
+		}
+
+		Connect(server?, token?, model?) {
 			this.iServer := (isSet(server) ? server : this.Server)
 			this.iToken := (isSet(token) ? token : this.Token)
 			this.iModel := (isSet(model) ? model : this.Model)
-			this.iSystem := (isSet(system) ? system : this.System)
-			this.iMaxTokens := (isSet(maxTokens) ? maxTokens : this.MaxTokens)
 
 			this.Transcript.Length := 0
 		}
@@ -119,6 +132,9 @@ class DrivingCoach extends RaceAssistant {
 
 		AddConversation(question, answer) {
 			this.Transcript.Push([question, answer])
+
+			while (this.Transcript.Length > this.MaxTranscript)
+				this.Transcript.RemoveAt(1)
 		}
 
 		Ask(question) {
@@ -163,13 +179,22 @@ class DrivingCoach extends RaceAssistant {
 
 	__New(configuration, remoteHandler, name := false, language := kUndefined
 		, synthesizer := false, speaker := false, vocalics := false, recognizer := false, listener := false, muted := false, voiceServer := false) {
-		this.iConnector := DrivingCoach.OpenAIConnector()
+		this.iConnector := DrivingCoach.ChatGPTConnector()
 
 		this.Connector.Connect("", "", "GPT 3.5 turbo")
 
 		this.initializeCoach()
 
-		result := this.Connector.Ask("I have understeering on corner entry in fast corners. What can I do?")
+		; result := this.Connector.Ask("I have understeering on corner entry in fast corners. What can I do?")
+
+		; result := this.Connector.Ask("I always have neck pain and feel a little bit dizzy after a race. What do you recommend?")
+
+		; result := this.Connector.Ask("The feeling in my brake pedal of my sim racing rig is kind of dumb. What do you recommend?")
+
+		; result := this.Connector.Ask("Wie stelle ich am besten das FOV ein?")
+		; result := this.Connector.Ask("Und bei einem Triple Screen?")
+
+		result := this.Connector.Ask("Hast Du ein Kochrezept für Möhrensuppe?")
 
 		MsgBox(result)
 

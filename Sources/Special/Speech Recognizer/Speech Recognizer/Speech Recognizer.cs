@@ -630,26 +630,23 @@ namespace Speech
                 _recognizer.SpeechRecognized -= Recognizer_SpeechRecognized;
             }
 
+            AssertRecognizerExists(recognizerId);
+
+            _recognizer = new System.Speech.Recognition.SpeechRecognitionEngine(_recognizers[recognizerId].Culture);
+
+            // Add a handler for the speech recognized event.
+            _recognizer.SpeechRecognized += Recognizer_SpeechRecognized;
+
+            // Configure the input to the speech recognizer.
+            _recognizer.SetInputToDefaultAudioDevice();
+
             if (_continuous)
             {
                 DictationGrammar grammar = new DictationGrammar();
                 grammar.Name = "Speech";
                 grammar.Enabled = true;
 
-                _recognizer = new System.Speech.Recognition.SpeechRecognitionEngine(_recognizers[recognizerId].Culture);
                 _recognizer.LoadGrammar(grammar);
-            }
-            else
-            {
-                AssertRecognizerExists(recognizerId);
-
-                _recognizer = new System.Speech.Recognition.SpeechRecognitionEngine(_recognizers[recognizerId].Culture);
-
-                // Add a handler for the speech recognized event.
-                _recognizer.SpeechRecognized += Recognizer_SpeechRecognized;
-
-                // Configure the input to the speech recognizer.
-                _recognizer.SetInputToDefaultAudioDevice();
             }
         }
 

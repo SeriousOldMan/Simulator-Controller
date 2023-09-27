@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net.Http;
+using System.Speech.Recognition;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Microsoft.CognitiveServices.Speech;
 using Microsoft.CognitiveServices.Speech.Audio;
 
@@ -28,6 +30,8 @@ namespace Speech
         private DesktopSpeechRecognizer _desktopRecognizer;
         private AzureSpeechRecognizer _azureRecognizer;
 
+        private bool _continuousMode = false;
+
         public bool Connect(string tokenIssuerEndpoint, string subscriptionKey, string language, dynamic callback)
         {
             this._engineType = "Azure";
@@ -50,6 +54,16 @@ namespace Speech
         public void SetLanguage(string language)
         {
             _azureRecognizer.SetLanguage(language);
+        }
+
+        public void SetContinuous(bool continuous)
+        {
+            _continuousMode = continuous;
+
+            if (_engineType == "Server")
+                throw new Exception("Not supported");
+            else if (_engineType == "Desktop")
+                _desktopRecognizer.SetContinuous(continuous);
         }
 
         public string OkCheck()
@@ -576,6 +590,8 @@ namespace Speech
             new Dictionary<string, System.Speech.Recognition.Choices>(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, LoadedGrammar> _loadedGrammarDictionary = new Dictionary<string, LoadedGrammar>(StringComparer.OrdinalIgnoreCase);
 
+        private bool _continuous = false;
+
         #region Startup
         public DesktopSpeechRecognizer()
         {
@@ -597,6 +613,11 @@ namespace Speech
             _choicesDictionary.Add("Digit", digitChoices);
         }
 
+        public void SetContinuous(bool continuous)
+        {
+            _continuous = continuous;
+        }
+
         /// <summary>
         /// Start the Recognizer
         /// </summary>
@@ -608,15 +629,28 @@ namespace Speech
                 StopRecognizer();
                 _recognizer.SpeechRecognized -= Recognizer_SpeechRecognized;
             }
-            AssertRecognizerExists(recognizerId);
 
-            _recognizer = new System.Speech.Recognition.SpeechRecognitionEngine(_recognizers[recognizerId].Culture);
+            if (_continuous)
+            {
+                DictationGrammar grammar = new DictationGrammar();
+                grammar.Name = "Speech";
+                grammar.Enabled = true;
 
-            // Add a handler for the speech recognized event.
-            _recognizer.SpeechRecognized += Recognizer_SpeechRecognized;
+                _recognizer = new System.Speech.Recognition.SpeechRecognitionEngine(_recognizers[recognizerId].Culture);
+                _recognizer.LoadGrammar(grammar);
+            }
+            else
+            {
+                AssertRecognizerExists(recognizerId);
 
-            // Configure the input to the speech recognizer.
-            _recognizer.SetInputToDefaultAudioDevice();
+                _recognizer = new System.Speech.Recognition.SpeechRecognitionEngine(_recognizers[recognizerId].Culture);
+
+                // Add a handler for the speech recognized event.
+                _recognizer.SpeechRecognized += Recognizer_SpeechRecognized;
+
+                // Configure the input to the speech recognizer.
+                _recognizer.SetInputToDefaultAudioDevice();
+            }
         }
 
         /// <summary>
@@ -628,6 +662,9 @@ namespace Speech
         /// <returns></returns>
         public string LoadGrammar(DesktopGrammar grammar, string name, dynamic callback)
         {
+            if (_continuous)
+                throw new Exception("Not supported in continuous mode.");
+
             _loadedGrammarDictionary.Add(name, new LoadedGrammar { Grammar = grammar, Callback = callback });
             var g = new System.Speech.Recognition.Grammar(grammar.GrammarBuilder) { Name = name };
             _recognizer.LoadGrammar(g);

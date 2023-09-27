@@ -157,7 +157,6 @@ Race Spotter Configuration.3=%kGrammarsDirectory%Race Spotter.grammars.en <- %kS
 Race Spotter Configuration.4=%kResourcesDirectory%Templates\Race Spotter.grammars.en <- %kSourcesDirectory%Assistants\Grammars\Race Spotter.grammars.en
 Race Spotter Configuration.5=%kGrammarsDirectory%Race Spotter.grammars.de <- %kSourcesDirectory%Assistants\Grammars\Race Spotter.grammars.de
 Race Spotter Configuration.6=%kGrammarsDirectory%Race Spotter.grammars.es <- %kSourcesDirectory%Assistants\Grammars\Race Spotter.grammars.es
-Driving Coach.1=%kBinariesDirectory% <- %kSourcesDirectory%Special\OpenAI Connector\Release\\net472\*.*
 Team Server.1=%kBinariesDirectory%Team Server Connector.dll <- %kSourcesDirectory%Special\Team Server\Release\\net471\Team Server Connector.dll
 Team Server.2=%kBinariesDirectory%Data Store Connector.dll <- %kSourcesDirectory%Special\Team Server\Release\\net471\Data Store Connector.dll
 Team Server.3=%kBinariesDirectory%Team Server <- %kSourcesDirectory%Special\Team Server\Release\\net6.0

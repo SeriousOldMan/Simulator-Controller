@@ -17,7 +17,8 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\..\Libraries\Task.ahk"
-#Include "..\..\Libraries\CLR.ahk"
+#Include "..\..\Libraries\JSON.ahk"
+#Include "..\..\Libraries\HTTP.ahk"
 #Include "RaceAssistant.ahk"
 
 
@@ -27,6 +28,126 @@
 
 class DrivingCoach extends RaceAssistant {
 	iConnector := false
+
+	class OpenAIConnector {
+		iServer := ""
+		iToken := ""
+		iModel := ""
+
+		iMaxTokens := 256
+		iTemperature := 0.5
+
+		iSystem := ""
+		iTranscript := []
+
+		Server {
+			Get {
+				return this.iServer
+			}
+		}
+
+		Token {
+			Get {
+				return this.iToken
+			}
+		}
+
+		Model[internal := false] {
+			Get {
+				if internal {
+					switch this.iModel, false {
+						case "GPT 4":
+							return "gpt-4"
+						case "GPT 4 32k":
+							return "gpt-4-32k"
+						case "GPT 3.5 turbo":
+							return "gpt-3.5-turbo"
+						case "GPT 3.5 turbo 16k":
+							return "gpt-3.5-turbo-16k"
+						default:
+							return this.iModel
+					}
+				}
+				else
+					return this.iModel
+			}
+		}
+
+		Temperature {
+			Get {
+				return this.iTemperature
+			}
+
+			Set {
+				return (this.iTemperature := value)
+			}
+		}
+
+		MaxTokens {
+			Get {
+				return this.iMaxTokens
+			}
+		}
+
+		System {
+			Get {
+				return this.iSystem
+			}
+		}
+
+		Transcript[key?] {
+			Get {
+				return (isSet(key) ? this.iTranscript[key] : this.iTranscript)
+			}
+		}
+
+		Connect(server?, token?, model?, system?, maxTokens?) {
+			this.iServer := (isSet(server) ? server : this.Server)
+			this.iToken := (isSet(token) ? token : this.Token)
+			this.iModel := (isSet(model) ? model : this.Model)
+			this.iSystem := (isSet(system) ? system : this.System)
+			this.iMaxTokens := (isSet(maxTokens) ? maxTokens : this.MaxTokens)
+
+			this.Transcript.Length := 0
+		}
+
+		Restart := () => this.Connect()
+
+		SetSystem(text) {
+			this.iSystem := text
+		}
+
+		AddConversation(question, answer) {
+			this.Transcript.Push([question, answer])
+		}
+
+		Ask(question) {
+			local url := "https://api.openai.com/v1/chat/completions"
+			local headers := Map("Content-Type", "application/json", "Authorization", "Bearer " . this.Token)
+			local body := {model: this.Model[true], max_tokens: this.MaxTokens, temperature: this.Temperature}
+			local messages := []
+			local ignore, conversation
+
+			if (this.System != "")
+				messages.Push({role: "system", content: this.System})
+
+			for ignore, conversation in this.Transcript {
+				messages.Push({role: "user", content: conversation[1]})
+				messages.Push({role: "assistant", content: conversation[2]})
+			}
+
+			messages.Push({role: "user", content: question})
+
+			body.messages := messages
+
+			answer := WinHttpRequest().POST(url, JSON.print(body), headers, {Object: true, Encoding: "UTF-8"}).JSON
+			answer := answer["choices"][1]["message"]["content"]
+
+			this.AddConversation(question, answer)
+
+			return answer
+		}
+	}
 
 	class DrivingCoachRemoteHandler extends RaceAssistant.RaceAssistantRemoteHandler {
 		__New(remotePID) {
@@ -42,34 +163,15 @@ class DrivingCoach extends RaceAssistant {
 
 	__New(configuration, remoteHandler, name := false, language := kUndefined
 		, synthesizer := false, speaker := false, vocalics := false, recognizer := false, listener := false, muted := false, voiceServer := false) {
-		local dllName := "OpenAI Connector.dll"
-		local dllFile := kBinariesDirectory . dllName
+		this.iConnector := DrivingCoach.OpenAIConnector()
 
-		try {
-			if (!FileExist(dllFile)) {
-				logMessage(kLogCritical, translate("OpenAI Connector.dll not found in ") . kBinariesDirectory)
+		this.Connector.Connect("", "", "GPT 3.5 turbo")
 
-				throw "Unable to find OpenAI Connector.dll in " . kBinariesDirectory . "..."
-			}
+		this.initializeCoach()
 
-			this.iConnector := CLR_LoadLibrary(dllFile).CreateInstance("OpenAI.OpenAIConnector")
+		result := this.Connector.Ask("I have understeering on corner entry in fast corners. What can I do?")
 
-			this.Connector.Connect("", "", "GPT 3.5 turbo")
-
-			this.initializeCoach()
-
-			result := this.Connector.Ask("I have understeering on corner entry in fast corners. What can I do?")
-
-			MsgBox(result)
-		}
-		catch Any as exception {
-			logMessage(kLogCritical, translate("Error while initializing Team Server Connector - please rebuild the applications"))
-
-			logError(exception, true)
-
-			showMessage(translate("Error while initializing Team Server Connector - please rebuild the applications") . translate("...")
-					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-		}
+		MsgBox(result)
 
 		super.__New(configuration, "Driving Coach", remoteHandler, name, language, synthesizer, speaker, vocalics, recognizer, listener, muted, voiceServer)
 	}

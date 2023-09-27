@@ -1,10 +1,10 @@
 [Development]
-Version=5.3.2.0-dev
-Target=5.3.2.0-release
-Date=09/26/2023
+Version=5.4.0.0-dev
+Target=5.4.0.0-release
+Date=09/27/2023
 Download=
-Changes=Performance improvement for ACC Pitstop MFD handling, Optimized last lap detection for timed races,  Migrated sources to AHK 2.0.10, Fixed manual installation, Detect removed software in "Simulator Setup"
-Components=Media->5.3.0,Configuration->5.3.0,Utilities->5.3.0
+Changes=New assistant "Driving Coach"
+Components=Media->5.3.0,Configuration->5.4.0,Utilities->5.3.0
 [Release]
 Version=5.3.1.2-release
 Date=09/26/2023
@@ -18,11 +18,14 @@ Media.5.3.0.Download=https://www.dropbox.com/scl/fi/s4uchdrhdm0m4giiix86k/Media-
 Configuration.5.3.0.Path=Resources
 Configuration.5.3.0.Content=Setup
 Configuration.5.3.0.Download=https://www.dropbox.com/scl/fi/vkpggadd4rd1w9h2ow1dv/Configuration-5.3.0.zip?rlkey=hqr342uzalm1dqd6v710ccjr3&dl=1
+Configuration.5.4.0.Path=Resources
+Configuration.5.4.0.Content=Setup
+Configuration.5.4.0.Download=https://www.dropbox.com/scl/fi/vkpggadd4rd1w9h2ow1dv/Configuration-5.3.0.zip?rlkey=hqr342uzalm1dqd6v710ccjr3&dl=1
 Utilities.5.3.0.Path=.
 Utilities.5.3.0.Content=Utilities
 Utilities.5.3.0.Download=https://www.dropbox.com/scl/fi/hlza8t9tae5d0vnd7wmqa/Utilities-5.3.0.zip?rlkey=ciotp2dr5u3e4rxgikf45a1dq&dl=1
 [Current]
 Type=Development
 [Version]
-Development=5.3.2.0-dev
+Development=5.4.0.0-dev
 Release=5.3.1.2-release

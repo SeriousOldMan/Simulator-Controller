@@ -170,6 +170,8 @@ class SpeechRecognizer {
 	iEngine := false
 	iChoices := CaseInsenseMap()
 
+	iContinuous := false
+
 	static sAudioRoutingInitialized := false
 	static sRecognizerAudioDevice := false
 	static sDefaultAudioDevice := false
@@ -218,7 +220,7 @@ class SpeechRecognizer {
 		}
 	}
 
-	__New(engine, recognizer := false, language := false, silent := false) {
+	__New(engine, recognizer := false, language := false, silent := false, continuous := false) {
 		local dllName := "Speech.Recognizer.dll"
 		local dllFile := kBinariesDirectory . dllName
 		local instance, choices, found, ignore, recognizerDescriptor, configuration, audioDevice
@@ -226,6 +228,7 @@ class SpeechRecognizer {
 		this.iEngine := engine
 		this.Instance := false
 		this.RecognizerList := []
+		this.iContinuous := continuous
 
 		try {
 			if (!FileExist(dllFile)) {
@@ -261,6 +264,9 @@ class SpeechRecognizer {
 
 			this.Instance := instance
 
+			if continuous
+				this.Instance.SetContinuous(true)
+
 			if (InStr(engine, "Azure|") == 1) {
 				this.iEngine := "Azure"
 
@@ -276,19 +282,21 @@ class SpeechRecognizer {
 					throw "Could not communicate with speech recognizer library (" . dllName . ")..."
 				}
 
-				choices := []
+				if !continuous {
+					choices := []
 
-				loop 101
-					choices.Push((A_Index - 1) . "")
+					loop 101
+						choices.Push((A_Index - 1) . "")
 
-				this.setChoices("Number", choices)
+					this.setChoices("Number", choices)
 
-				choices := []
+					choices := []
 
-				loop 10
-					choices.Push((A_Index - 1) . "")
+					loop 10
+						choices.Push((A_Index - 1) . "")
 
-				this.setChoices("Digit", choices)
+					this.setChoices("Digit", choices)
+				}
 			}
 			else
 				instance.SetEngine(engine)
@@ -300,42 +308,50 @@ class SpeechRecognizer {
 				throw "Could not communicate with speech recognizer library (" . dllName . ")..."
 			}
 
-			this.RecognizerList := this.createRecognizerList()
+			if !continuous {
+				this.RecognizerList := this.createRecognizerList()
 
-			if (this.RecognizerList.Length == 0) {
-				logMessage(kLogCritical, translate("No languages found while initializing speech recognition system - please install the speech recognition software"))
+				if (this.RecognizerList.Length == 0) {
+					logMessage(kLogCritical, translate("No languages found while initializing speech recognition system - please install the speech recognition software"))
 
-				if !silent
-					showMessage(translate("No languages found while initializing speech recognition system - please install the speech recognition software") . translate("...")
-							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+					if !silent
+						showMessage(translate("No languages found while initializing speech recognition system - please install the speech recognition software") . translate("...")
+								  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+				}
+
+				found := false
+
+				if ((recognizer == true) && language) {
+					for ignore, recognizerDescriptor in this.getRecognizerList()
+						if (recognizerDescriptor.Language = language) {
+							recognizer := recognizerDescriptor.ID
+
+							found := true
+
+							break
+						}
+				}
+				else if (recognizer && (recognizer != true))
+					for ignore, recognizerDescriptor in this.getRecognizerList()
+						if (recognizerDescriptor.Name = recognizer) {
+							recognizer := recognizerDescriptor.ID
+
+							found := true
+
+							break
+						}
+
+				if !found
+					recognizer := 0
+
+				this.initialize(recognizer)
 			}
+			else {
+				if (engine = "Server")
+					throw "Continuous mode not supported for Server recognition engine..."
 
-			found := false
-
-			if ((recognizer == true) && language) {
-				for ignore, recognizerDescriptor in this.getRecognizerList()
-					if (recognizerDescriptor.Language = language) {
-						recognizer := recognizerDescriptor.ID
-
-						found := true
-
-						break
-					}
+				this.initialize()
 			}
-			else if (recognizer && (recognizer != true))
-				for ignore, recognizerDescriptor in this.getRecognizerList()
-					if (recognizerDescriptor.Name = recognizer) {
-						recognizer := recognizerDescriptor.ID
-
-						found := true
-
-						break
-					}
-
-			if !found
-				recognizer := 0
-
-			this.initialize(recognizer)
 		}
 		catch Any as exception {
 			logError(exception, true)
@@ -599,61 +615,69 @@ class SpeechRecognizer {
 	}
 
 	_onGrammarCallback(name, wordArr) {
-		this._grammarCallbacks[name].Call(name, this.getWords(wordArr))
+		if this.iContinuous
+			this.iContinuous.Call(values2String(A_Space, this.getWords(wordArr)*))
+		else
+			this._grammarCallbacks[name].Call(name, this.getWords(wordArr))
 	}
 
 	_onTextCallback(text) {
-		local words := string2Values(A_Space, text)
-		local ignore, name, grammar, rating, index, literal, bestRating, bestMatch, callback
+		local words, ignore, name, grammar, rating, index, literal, bestRating, bestMatch, callback
 
-		for index, literal in words {
-			literal := StrReplace(literal, ".", "")
-			literal := StrReplace(literal, ",", "")
-			literal := StrReplace(literal, ";", "")
-			literal := StrReplace(literal, "?", "")
-			literal := StrReplace(literal, "-", "")
-
-			words[index] := literal
-		}
-
-		if true {
-			bestRating := 0
-			bestMatch := false
-
-			for ignore, grammar in this._grammars {
-				rating := this.match(text, grammar.Grammar)
-
-				if (rating > bestRating) {
-					bestRating := rating
-					bestMatch := grammar
-				}
-			}
-
-			if bestMatch {
-				callback := bestMatch.Callback
-
-				callback.Call(bestMatch.Name, words)
-			}
-			else if this._grammars.Has("?") {
-				callback := this._grammars["?"].Callback
-
-				callback.Call("?", words)
-			}
-		}
+		if this.iContinuous
+			this.iContinuous.Call(text)
 		else {
-			for name, grammar in this._grammars
-				if grammar.Grammar.match(words) {
-					callback := grammar.Callback
+			words := string2Values(A_Space, text)
 
-					callback.Call(name, words)
+			for index, literal in words {
+				literal := StrReplace(literal, ".", "")
+				literal := StrReplace(literal, ",", "")
+				literal := StrReplace(literal, ";", "")
+				literal := StrReplace(literal, "?", "")
+				literal := StrReplace(literal, "-", "")
 
-					return
+				words[index] := literal
+			}
+
+			if true {
+				bestRating := 0
+				bestMatch := false
+
+				for ignore, grammar in this._grammars {
+					rating := this.match(text, grammar.Grammar)
+
+					if (rating > bestRating) {
+						bestRating := rating
+						bestMatch := grammar
+					}
 				}
 
-			if this._grammars.Has("?") {
-				callback := this._grammars["?"].Callback
+				if bestMatch {
+					callback := bestMatch.Callback
 
-				callback.Call("?", words)
+					callback.Call(bestMatch.Name, words)
+				}
+				else if this._grammars.Has("?") {
+					callback := this._grammars["?"].Callback
+
+					callback.Call("?", words)
+				}
+			}
+			else {
+				for name, grammar in this._grammars
+					if grammar.Grammar.match(words) {
+						callback := grammar.Callback
+
+						callback.Call(name, words)
+
+						return
+					}
+
+				if this._grammars.Has("?") {
+					callback := this._grammars["?"].Callback
+
+					callback.Call("?", words)
+				}
 			}
 		}
 	}

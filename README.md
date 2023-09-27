@@ -45,7 +45,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[5.3.2.0-beta](https://www.dropbox.com/scl/fi/h02hiz40fmqbq0t76j8r5/Simulator-Controller-5.3.2.0-beta.zip?rlkey=0s2y3584un2pyrk3gyzbwx0cr&dl=1) (Test version for 5.3.2. Changes: Performance improvement for ACC Pitstop MFD handling, Optimized last lap detection for timed races,  Migrated sources to AHK 2.0.10, Fixed manual installation, Detect removed software in "Simulator Setup", Changed semantics of tyre set handling in "Race Settings", New car models for "Setup Workbench".)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-532) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

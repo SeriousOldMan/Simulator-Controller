@@ -29,6 +29,7 @@ Release 4.6.3=Release 4.6.0 -> updateStreamDeckIconPreset, updateConfigurationFo
 Release 5.0.0=Release 4.6.3 -> updateConfigurationForV500, updateInstallationForV500
 Release 5.0.9.1=Release 5.0.0 -> updatePluginsForV5091
 Release 5.3.0=Release 5.0.9.1 -> updateConfigurationForV530, updateStreamDeckIconPreset
+Release 5.3.2=Release 5.3.0 -> updateConfigurationForV532
 [Cleanup]
 Binaries Folder=%kBinariesDirectory%
 Logs Folder=%kLogsDirectory%

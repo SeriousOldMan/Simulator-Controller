@@ -399,6 +399,12 @@ int main(int argc, char* argv[])
 
 	if (strlen(request) == 0 || getArgument(request, "Setup") != "")
 	{
+		if (strlen(request) != 0) {
+			wcout << "[Car Data]" << endl;
+			
+			printData("TyreSet", gf->currentTyreSet);
+		}
+		
 		wcout << "[Setup Data]" << endl;
 
 		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;

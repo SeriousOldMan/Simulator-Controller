@@ -233,6 +233,12 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
+	Options {
+		Get {
+			return (this.iOptions)
+		}
+	}
+
 	AssistantType {
 		Get {
 			return this.iAssistantType

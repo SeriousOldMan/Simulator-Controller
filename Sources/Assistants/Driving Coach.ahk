@@ -182,7 +182,7 @@ startupDrivingCoach() {
 	if coach.Debug[kDebugKnowledgebase]
 		SupportMenu.Check(label)
 
-	registerMessageHandler("Driving Coach", handlecoachMessage)
+	registerMessageHandler("Driving Coach", handleCoachMessage)
 
 	if (debug && coachSpeaker) {
 		DrivingCoach.Instance.getSpeaker()
@@ -205,18 +205,10 @@ startupDrivingCoach() {
 ;;;-------------------------------------------------------------------------;;;
 
 shutdownDrivingCoach(shutdown := false) {
-	if shutdown
-		ExitApp(0)
-
-	if (DrivingCoach.Instance.Session == kSessionFinished)
-		Task.startTask(shutdownDrivingCoach.Bind(true), 10000, kLowPriority)
-	else
-		Task.startTask(shutdownDrivingCoach, 1000, kLowPriority)
-
 	return false
 }
 
-handlecoachMessage(category, data) {
+handleCoachMessage(category, data) {
 	if InStr(data, ":") {
 		data := StrSplit(data, ":", , 2)
 

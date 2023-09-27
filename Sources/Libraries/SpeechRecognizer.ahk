@@ -264,9 +264,6 @@ class SpeechRecognizer {
 
 			this.Instance := instance
 
-			if continuous
-				this.Instance.SetContinuous(true)
-
 			if (InStr(engine, "Azure|") == 1) {
 				this.iEngine := "Azure"
 
@@ -298,8 +295,12 @@ class SpeechRecognizer {
 					this.setChoices("Digit", choices)
 				}
 			}
-			else
+			else {
 				instance.SetEngine(engine)
+
+				if continuous
+					this.Instance.SetContinuous(this._onGrammarCallback.Bind(this))
+			}
 
 			if (this.Instance.OkCheck() != "OK") {
 				logMessage(kLogCritical, translate("Could not communicate with speech recognizer library (") . dllName . translate(")"))
@@ -308,50 +309,42 @@ class SpeechRecognizer {
 				throw "Could not communicate with speech recognizer library (" . dllName . ")..."
 			}
 
-			if !continuous {
-				this.RecognizerList := this.createRecognizerList()
+			this.RecognizerList := this.createRecognizerList()
 
-				if (this.RecognizerList.Length == 0) {
-					logMessage(kLogCritical, translate("No languages found while initializing speech recognition system - please install the speech recognition software"))
+			if (this.RecognizerList.Length == 0) {
+				logMessage(kLogCritical, translate("No languages found while initializing speech recognition system - please install the speech recognition software"))
 
-					if !silent
-						showMessage(translate("No languages found while initializing speech recognition system - please install the speech recognition software") . translate("...")
-								  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-				}
-
-				found := false
-
-				if ((recognizer == true) && language) {
-					for ignore, recognizerDescriptor in this.getRecognizerList()
-						if (recognizerDescriptor.Language = language) {
-							recognizer := recognizerDescriptor.ID
-
-							found := true
-
-							break
-						}
-				}
-				else if (recognizer && (recognizer != true))
-					for ignore, recognizerDescriptor in this.getRecognizerList()
-						if (recognizerDescriptor.Name = recognizer) {
-							recognizer := recognizerDescriptor.ID
-
-							found := true
-
-							break
-						}
-
-				if !found
-					recognizer := 0
-
-				this.initialize(recognizer)
+				if !silent
+					showMessage(translate("No languages found while initializing speech recognition system - please install the speech recognition software") . translate("...")
+							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
-			else {
-				if (engine = "Server")
-					throw "Continuous mode not supported for Server recognition engine..."
 
-				this.initialize()
+			found := false
+
+			if ((recognizer == true) && language) {
+				for ignore, recognizerDescriptor in this.getRecognizerList()
+					if (recognizerDescriptor.Language = language) {
+						recognizer := recognizerDescriptor.ID
+
+						found := true
+
+						break
+					}
 			}
+			else if (recognizer && (recognizer != true))
+				for ignore, recognizerDescriptor in this.getRecognizerList()
+					if (recognizerDescriptor.Name = recognizer) {
+						recognizer := recognizerDescriptor.ID
+
+						found := true
+
+						break
+					}
+
+			if !found
+				recognizer := 0
+
+			this.initialize(recognizer)
 		}
 		catch Any as exception {
 			logError(exception, true)

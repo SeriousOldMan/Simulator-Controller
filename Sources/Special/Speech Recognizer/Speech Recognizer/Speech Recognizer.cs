@@ -642,7 +642,7 @@ namespace Speech
 
             if (_continuous != null)
             {
-                DictationGrammar grammar = new DictationGrammar();
+                DictationGrammar grammar = new DictationGrammar("grammar:dictation");
                 grammar.Name = "Continuous";
                 grammar.Enabled = true;
 

@@ -397,6 +397,12 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 	
 	if (strlen(request) == 0 || getArgument(request, "Setup") != "")
 	{
+		if (strlen(request) != 0) {
+			output << "[Car Data]" << endl;
+			
+			printData(&output, "TyreSet", gf->currentTyreSet);
+		}
+		
 		output << "[Setup Data]" << endl;
 
 		_bstr_t tc(gf->tyreCompound);

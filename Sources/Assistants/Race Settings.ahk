@@ -196,10 +196,11 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 	local setupTyreCompound := "Dry"
 	local setupTyreCompoundColor := "Black"
-	local setupTyreSet := 1
-	local pitstopTyreSet := 2
 	local dryFrontLeft := 26.1, dryFrontRight := 26.1, dryRearLeft := 26.1, dryRearRight := 26.1
 	local wetFrontLeft := 28.5, wetFrontRight := 28.5, wetRearLeft := 28.5, wetRearRight := 28.5
+
+	static setupTyreSet := false
+	static pitstopTyreSet := false
 
 	static settingsGui
 
@@ -445,11 +446,14 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 			readTyreSetup(readMultiMap(kRaceSettingsFile))
 
 			pitstopTyreSet := getMultiMapValue(data, "Setup Data", "TyreSet", pitstopTyreSet)
-			setupTyreSet := Max(1, pitstopTyreSet - 1)
+			setupTyreSet := getMultiMapValue(data, "Car Data", "TyreSet", setupTyreSet ? setupTyreSet : Max(0, pitstopTyreSet - 1))
 
 			if settings {
-				setMultiMapValue(settings, "Session Setup", "Tyre.Set", setupTyreSet)
-				setMultiMapValue(settings, "Session Setup", "Tyre.Set.Fresh", pitstopTyreSet)
+				if (getMultiMapValue(settings, "Session Setup", "Tyre.Set.Fresh", 0) != 0)
+					setMultiMapValue(settings, "Session Setup", "Tyre.Set.Fresh", pitstopTyreSet)
+
+				if (getMultiMapValue(settings, "Session Setup", "Tyre.Set", 0) = 0)
+					setMultiMapValue(settings, "Session Setup", "Tyre.Set", setupTyreSet)
 			}
 
 			tyreCompound := getMultiMapValue(data, "Setup Data", "TyreCompound", setupTyreCompound)
@@ -546,8 +550,8 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 			setupTyreCompoundColor := getDeprecatedValue(settings, "Session Setup", "Race Setup", "Tyre.Compound.Color", "Black")
 		}
 
-		setupTyreSet := getDeprecatedValue(settings, "Session Setup", "Race Setup", "Tyre.Set", 1)
-		pitstopTyreSet := getDeprecatedValue(settings, "Session Setup", "Race Setup", "Tyre.Set.Fresh", 2)
+		setupTyreSet := getDeprecatedValue(settings, "Session Setup", "Race Setup", "Tyre.Set", false)
+		pitstopTyreSet := getDeprecatedValue(settings, "Session Setup", "Race Setup", "Tyre.Set.Fresh", false)
 
 		dryFrontLeft := displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settings, "Session Setup", "Race Setup", "Tyre.Dry.Pressure.FL", 26.1)))
 		dryFrontRight := displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settings, "Session Setup", "Race Setup", "Tyre.Dry.Pressure.FR", 26.1)))
@@ -608,6 +612,21 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 	}
 
+	updateTyreSet(field, *) {
+		local value := settingsGui[field].Text
+
+		if !isInteger(value)
+			value := 0
+
+		if (value = 0)
+			settingsGui[field].Text := translate("Auto ")
+
+		if (field = "spSetupTyreSetEdit")
+			setupTyreSet := value
+		else
+			pitstopTyreSet := value
+	}
+
 	if (settingsOrCommand == kLoad) {
 		if (gSimulator && gCar && gTrack) {
 			directory := SessionDatabase.DatabasePath
@@ -640,8 +659,8 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		value := importFromSimulation("Editor")
 
 		if value {
-			settingsGui["spSetupTyreSetEdit"].Text := setupTyreSet
-			settingsGui["spPitstopTyreSetEdit"].Text := pitstopTyreSet
+			settingsGui["spSetupTyreSetEdit"].Text := (setupTyreSet ? setupTyreSet : translate("Auto "))
+			settingsGui["spPitstopTyreSetEdit"].Text := (pitstopTyreSet ? pitstopTyreSet : translate("Auto "))
 
 			settingsGui["spSetupTyreCompoundDropDown"].Choose(inList(gTyreCompounds, compound(setupTyreCompound, setupTyreCompoundColor)))
 		}
@@ -924,8 +943,8 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		setMultiMapValue(newSettings, "Session Setup", "Tyre.Compound", tyreCompound)
 		setMultiMapValue(newSettings, "Session Setup", "Tyre.Compound.Color", tyreCompoundColor)
 
-		setMultiMapValue(newSettings, "Session Setup", "Tyre.Set", settingsGui["spSetupTyreSetEdit"].Text)
-		setMultiMapValue(newSettings, "Session Setup", "Tyre.Set.Fresh", settingsGui["spPitstopTyreSetEdit"].Text)
+		setMultiMapValue(newSettings, "Session Setup", "Tyre.Set", isInteger(settingsGui["spSetupTyreSetEdit"].Text) ? settingsGui["spSetupTyreSetEdit"].Text : false)
+		setMultiMapValue(newSettings, "Session Setup", "Tyre.Set.Fresh", isInteger(settingsGui["spPitstopTyreSetEdit"].Text) ? settingsGui["spPitstopTyreSetEdit"].Text : false)
 
 		setMultiMapValue(newSettings, "Session Setup", "Tyre.Dry.Pressure.FL", convertUnit("Pressure", internalValue("Float", settingsGui["spDryFrontLeftEdit"].Text), false))
 		setMultiMapValue(newSettings, "Session Setup", "Tyre.Dry.Pressure.FR", convertUnit("Pressure", internalValue("Float", settingsGui["spDryFrontRightEdit"].Text), false))
@@ -1246,12 +1265,15 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		settingsGui.Add("DropDownList", "x106 yp w110 Choose" . chosen . " VspSetupTyreCompoundDropDown", choices)
 
 		settingsGui.Add("Text", "x16 yp+26 w90 h20", translate("Start Tyre Set"))
-		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit2 Number VspSetupTyreSetEdit", setupTyreSet)
-		settingsGui.Add("UpDown", "x138 yp-2 w18 h20 Range0-99", setupTyreSet)
+		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit2 VspSetupTyreSetEdit").OnEvent("Change", updateTyreSet.Bind("spSetupTyreSetEdit"))
+		settingsGui.Add("UpDown", "x138 yp-2 w18 h20 Range0-99")
 
 		settingsGui.Add("Text", "x16 yp+24 w95 h20", translate("Pitstop Tyre Set"))
-		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit2 Number VspPitstopTyreSetEdit", pitstopTyreSet)
-		settingsGui.Add("UpDown", "x138 yp-2 w18 h20 Range0-99", pitstopTyreSet)
+		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit2 VspPitstopTyreSetEdit").OnEvent("Change", updateTyreSet.Bind("spPitstopTyreSetEdit"))
+		settingsGui.Add("UpDown", "x138 yp-2 w18 h20 Range0-99")
+
+		settingsGui["spSetupTyreSetEdit"].Text := (setupTyreSet ? setupTyreSet : translate("Auto "))
+		settingsGui["spPitstopTyreSetEdit"].Text := (pitstopTyreSet ? pitstopTyreSet : translate("Auto "))
 
 		import := false
 

@@ -1584,6 +1584,19 @@ updateInstallationForV500() {
 	}
 }
 
+updateConfigurationForV532() {
+	local settings
+
+	if FileExist(kUserConfigDirectory . "Race.settings") {
+		settings := readMultiMap(kUserConfigDirectory . "Race.settings")
+
+		setMultiMapValue(settings, "Session Setup", "Tyre.Set", false)
+		setMultiMapValue(settings, "Session Setup", "Tyre.Set.Fresh", false)
+
+		writeMultiMap(kUserConfigDirectory . "Race.settings", settings)
+	}
+}
+
 updateConfigurationForV530() {
 	local configuration
 

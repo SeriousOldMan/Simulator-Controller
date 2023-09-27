@@ -1,3 +1,16 @@
+## 5.3.2.0-release 09/29/23 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. A significant performance improvement has been achieved for the ACC Pitstop MFD handling.
+  4. The detection of the last lap in timed races has been optimized.
+  5. Manual installations using the ZIP file from GitHub are working again.
+  6. "Simulator Setup" now detects software that has been emoved from the PC after the last run of "Simulator Setup".
+  7. The semantics of tyre set handling in "Race Settings" has changed. Please read the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#assetto-corsa-competizione) for more information.
+  8. Migrated sources to AHK 2.0.10.
+  9. New car models for "Setup Workbench":
+     - Assetto Corsa
+       - Shelby Cobra 427 S/C
+
 ## 5.3.1.2-release 09/26/23
   1. Fixed a critical bug which creates an infinite loop during pitstop setup by the Engineer, when wrong tyre sets had been configured in the "Race Settings".
 

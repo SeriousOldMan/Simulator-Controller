@@ -33,6 +33,10 @@ Welcome to the Simulator Controller documentation. Here you will find everything
 
     This smart tool gives valuable recommendations on how to change a car setup for a given problem. The tool follows an interview-like approach and can even handle contradictory requirements.
 	
+  - [Virtual Driving Coach](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach)
+
+    This a very special chatbot, which behaves as your personal driving coach. Based on text-based GPT technology, it uses a publically available large language model which has been trained with vasts amount of information. Aks anything about racing, car handling and driving techniques and you will probably will get an interesting answer.
+	
   - [Virtual Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer)
 
     You don't want to miss out Jona, the world first full voice dialog capable Virtual Race Engineer based on artificial intelligence algorithms. Jona keeps an eye on all the technical stuff regarding your car and will help you to determine the correct amount of fuel and the correct tyre pressures for an upcoming pitstop.
@@ -44,6 +48,10 @@ Welcome to the Simulator Controller documentation. Here you will find everything
   - [Virtual Race Spotter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter)
 
     The third Assistant, Elisa, will watch your race and will warn you about nearby other cars and will give you general information about the current race situation.
+	
+  - [Virtual Driving Coach](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach)
+
+    This a very special chatbot, which behaves as your personal driving coach. Based on text-based GPT technology, it uses a publically available large language model which has been trained with vasts amount of information. Ask anything about racing, car handling and driving techniques and you will probably will get an interesting answer.
 	
   - [Team Server](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server)
 

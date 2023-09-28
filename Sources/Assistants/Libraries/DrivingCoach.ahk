@@ -258,25 +258,27 @@ class DrivingCoach extends GridRaceAssistant {
 	startConversation() {
 		local service := this.Options["Driving Coach.Service"]
 
-		if (InStr(service, "OpenAI") = 1) {
-			this.iConnector := DrivingCoach.OpenAIConnector(this)
+		if service {
+			if (InStr(service, "OpenAI") = 1) {
+				this.iConnector := DrivingCoach.OpenAIConnector(this)
 
-			service := string2Values("|", service)
+				service := string2Values("|", service)
 
-			this.Connector.Connect(service[2], service[3], this.Options["Driving Coach.Model"])
+				this.Connector.Connect(service[2], service[3], this.Options["Driving Coach.Model"])
 
-			this.Connector.MaxTokens := this.Options["Driving Coach.MaxTokens"]
-			this.Connector.Temperature := this.Options["Driving Coach.Temperature"]
-			this.Connector.MaxHistory := this.Options["Driving Coach.MaxHistory"]
+				this.Connector.MaxTokens := this.Options["Driving Coach.MaxTokens"]
+				this.Connector.Temperature := this.Options["Driving Coach.Temperature"]
+				this.Connector.MaxHistory := this.Options["Driving Coach.MaxHistory"]
 
-			this.Connector.Instructions["Character"] := this.Options["Driving Coach.Instructions.Character"]
-			this.Connector.Instructions["Simulation"] := this.Options["Driving Coach.Instructions.Simulation"]
-			this.Connector.Instructions["Stint"] := this.Options["Driving Coach.Instructions.Stint"]
+				this.Connector.Instructions["Character"] := this.Options["Driving Coach.Instructions.Character"]
+				this.Connector.Instructions["Simulation"] := this.Options["Driving Coach.Instructions.Simulation"]
+				this.Connector.Instructions["Stint"] := this.Options["Driving Coach.Instructions.Stint"]
+			}
+			else
+				throw "Unsupported service detected in DrivingCoach.connect..."
+
+			this.iTranscript := (normalizeDirectoryPath(this.Options["Driving Coach.Archive"]) . "\" . translate("Conversation ") . A_Now . ".txt")
 		}
-		else
-			throw "Unsupported service detected in DrivingCoach.connect..."
-
-		this.iTranscript := (normalizeDirectoryPath(this.Options["Driving Coach.Archive"]) . "\" . translate("Conversation ") . A_Now . ".txt")
 	}
 
 	stopConversation() {
@@ -287,36 +289,40 @@ class DrivingCoach extends GridRaceAssistant {
 	handleVoiceText(grammar, text) {
 		local answer := false
 
-		try {
-			if this.Speaker
-				this.getSpeaker().speakPhrase("Confirm")
+		if this.Connector {
+			try {
+				if this.Speaker
+					this.getSpeaker().speakPhrase("Confirm")
 
-			if !this.Connector
-				this.startConversation()
+				if !this.Connector
+					this.startConversation()
 
-			answer := this.Connector.Ask(text)
+				answer := this.Connector.Ask(text)
+			}
+			catch Any as exception {
+				if this.Speaker
+					this.getSpeaker().speakPhrase("Later")
+
+				logError(exception, true)
+
+				logMessage(kLogCritical, substituteVariables(translate("Cannot connect to GPT service (%service%) - please check the configuration")
+														   , {service: this.Options["Driving Coach.Service"]}))
+
+				showMessage(substituteVariables(translate("Cannot connect to GPT service (%service%) - please check the configuration...")
+											  , {service: this.Options["Driving Coach.Service"]})
+						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			}
+
+			if answer {
+				if this.Speaker
+					this.getSpeaker().speak(answer)
+
+				if this.Transcript
+					FileAppend(translate("-- Driver --------") . "`n`n" . text . "`n`n" . translate("-- Coach ---------") . "`n`n" . answer . "`n`n", this.Transcript)
+			}
 		}
-		catch Any as exception {
-			if this.Speaker
-				this.getSpeaker().speakPhrase("Later")
-
-			logError(exception, true)
-
-			logMessage(kLogCritical, substituteVariables(translate("Cannot connect to GPT service (%service%) - please check the configuration")
-													   , {service: this.Options["Driving Coach.Service"]}))
-
-			showMessage(substituteVariables(translate("Cannot connect to GPT service (%service%) - please check the configuration...")
-										  , {service: this.Options["Driving Coach.Service"]})
-					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-		}
-
-		if answer {
-			if this.Speaker
-				this.getSpeaker().speak(answer)
-
-			if this.Transcript
-				FileAppend(translate("-- Driver --------") . "`n`n" . text . "`n`n" . translate("-- Coach ---------") . "`n`n" . answer . "`n`n", this.Transcript)
-		}
+		else if this.Speaker
+			this.getSpeaker().speakPhrase("Later")
 	}
 
 	startSession(settings, data) {

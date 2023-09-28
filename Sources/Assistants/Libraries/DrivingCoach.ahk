@@ -16,7 +16,6 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\..\Libraries\Task.ahk"
 #Include "..\..\Libraries\JSON.ahk"
 #Include "..\..\Libraries\HTTP.ahk"
 #Include "RaceAssistant.ahk"
@@ -29,7 +28,7 @@
 class DrivingCoach extends GridRaceAssistant {
 	iConnector := false
 
-	iTranscript := false
+	iHistory := false
 
 	class OpenAIConnector {
 		iCoach := false
@@ -42,8 +41,8 @@ class DrivingCoach extends GridRaceAssistant {
 		iTemperature := 0.5
 
 		iInstructions := CaseInsenseMap()
-		iTranscript := []
-		iMaxTranscript := 3
+		iHistory := []
+		iMaxHistory := 3
 
 		Coach {
 			Get {
@@ -104,19 +103,19 @@ class DrivingCoach extends GridRaceAssistant {
 			}
 		}
 
-		Transcript[key?] {
+		History[key?] {
 			Get {
-				return (isSet(key) ? this.iTranscript[key] : this.iTranscript)
+				return (isSet(key) ? this.iHistory[key] : this.iHistory)
 			}
 		}
 
-		MaxTranscript {
+		MaxHistory {
 			Get {
-				return this.iMaxTranscript
+				return this.iMaxHistory
 			}
 
 			Set {
-				return (this.iMaxTranscript := value)
+				return (this.iMaxHistory := value)
 			}
 		}
 
@@ -139,16 +138,16 @@ class DrivingCoach extends GridRaceAssistant {
 			this.iToken := (isSet(token) ? token : this.Token)
 			this.iModel := (isSet(model) ? model : this.Model)
 
-			this.Transcript.Length := 0
+			this.History.Length := 0
 		}
 
 		Restart := () => this.Connect()
 
 		AddConversation(question, answer) {
-			this.Transcript.Push([question, answer])
+			this.History.Push([question, answer])
 
-			while (this.Transcript.Length > this.MaxTranscript)
-				this.Transcript.RemoveAt(1)
+			while (this.History.Length > this.MaxHistory)
+				this.History.RemoveAt(1)
 		}
 
 		Ask(question) {
@@ -156,7 +155,6 @@ class DrivingCoach extends GridRaceAssistant {
 			local settingsDB := coach.SettingsDatabase
 			local knowledgeBase := coach.KnowledgeBase
 			local speaker := coach.getSpeaker()
-			local url := "https://api.openai.com/v1/chat/completions"
 			local headers := Map("Content-Type", "application/json", "Authorization", "Bearer " . this.Token)
 			local body := {model: this.Model[true], max_tokens: this.MaxTokens, temperature: this.Temperature}
 			local messages := []
@@ -194,7 +192,7 @@ class DrivingCoach extends GridRaceAssistant {
 					}
 				}
 
-			for ignore, conversation in this.Transcript {
+			for ignore, conversation in this.History {
 				messages.Push({role: "user", content: conversation[1]})
 				messages.Push({role: "assistant", content: conversation[2]})
 			}
@@ -203,7 +201,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 			body.messages := messages
 
-			answer := WinHttpRequest().POST(url, JSON.print(body), headers, {Object: true, Encoding: "UTF-8"}).JSON
+			answer := WinHttpRequest().POST(this.Server, JSON.print(body), headers, {Object: true, Encoding: "UTF-8"}).JSON
 			answer := answer["choices"][1]["message"]["content"]
 
 			this.AddConversation(question, answer)
@@ -249,17 +247,19 @@ class DrivingCoach extends GridRaceAssistant {
 		options["Driving Coach.Model"] := getMultiMapValue(configuration, "Driving Coach Service", "Model", false)
 		options["Driving Coach.MaxTokens"] := getMultiMapValue(configuration, "Driving Coach Service", "MaxTokens", 1024)
 		options["Driving Coach.Temperature"] := getMultiMapValue(configuration, "Driving Coach Personality", "Temperature", 0.5)
-		options["Driving Coach.MaxTranscript"] := getMultiMapValue(configuration, "Driving Coach Personality", "MaxTranscript", 3)
+		options["Driving Coach.MaxHistory"] := getMultiMapValue(configuration, "Driving Coach Personality", "MaxHistory", 3)
 		options["Driving Coach.Instructions.Character"] := getMultiMapValue(configuration, "Driving Coach Personality", "Instructions.Character", false)
 		options["Driving Coach.Instructions.Simulation"] := getMultiMapValue(configuration, "Driving Coach Personality", "Instructions.Simulation", false)
 		options["Driving Coach.Instructions.Stint"] := getMultiMapValue(configuration, "Driving Coach Personality", "Instructions.Stint", false)
+
+		setMultiMapValue(configuration, "Voice Control", "Speaker.NoiseVolume", 0)
 	}
 
 	startConversation() {
 		local service := this.Options["Driving Coach.Service"]
 
 		if (InStr(service, "OpenAI") = 1) {
-			this.iConnector := DrivingCoach.OpenAIConnector()
+			this.iConnector := DrivingCoach.OpenAIConnector(this)
 
 			service := string2Values("|", service)
 
@@ -267,7 +267,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 			this.Connector.MaxTokens := this.Options["Driving Coach.MaxTokens"]
 			this.Connector.Temperature := this.Options["Driving Coach.Temperature"]
-			this.Connector.MaxTranscript := this.Options["Driving Coach.History"]
+			this.Connector.MaxHistory := this.Options["Driving Coach.MaxHistory"]
 
 			this.Connector.Instructions["Character"] := this.Options["Driving Coach.Instructions.Character"]
 			this.Connector.Instructions["Simulation"] := this.Options["Driving Coach.Instructions.Simulation"]
@@ -276,7 +276,7 @@ class DrivingCoach extends GridRaceAssistant {
 		else
 			throw "Unsupported service detected in DrivingCoach.connect..."
 
-		this.iTranscript := (normalizeDirectoryPath(this.Options["Driving Coach.Archive"]) . "\" . translate("Conversation ") . FormatTime() . ".txt")
+		this.iTranscript := (normalizeDirectoryPath(this.Options["Driving Coach.Archive"]) . "\" . translate("Conversation ") . A_Now . ".txt")
 	}
 
 	stopConversation() {
@@ -288,6 +288,9 @@ class DrivingCoach extends GridRaceAssistant {
 		local answer := false
 
 		try {
+			if this.Speaker
+				this.getSpeaker().speakPhrase("Confirm")
+
 			if !this.Connector
 				this.startConversation()
 
@@ -312,7 +315,7 @@ class DrivingCoach extends GridRaceAssistant {
 				this.getSpeaker().speak(answer)
 
 			if this.Transcript
-				FileAppend(translate("-- Driver --------") . "`n`n" . text . translate("-- Coach ---------") . answer . "`n`n", this.Transcript)
+				FileAppend(translate("-- Driver --------") . "`n`n" . text . "`n`n" . translate("-- Coach ---------") . "`n`n" . answer . "`n`n", this.Transcript)
 		}
 	}
 

@@ -484,12 +484,12 @@ class SpeechRecognizer {
 	setMode(mode) {
 		this.iMode := mode
 
-		if this.Instance
+		if ((mode = "Text") && this.Instance)
 			switch this.iEngine, false {
 				case "Desktop", "Server":
-					this.Instance.SetContinuous((mode = "Text") ? this._onGrammarCallback.Bind(this) : false)
+					this.Instance.SetContinuous(true, this._onGrammarCallback.Bind(this))
 				case "Azure":
-					this.Instance.SetContinuous(mode = "Text")
+					this.Instance.SetContinuous(true)
 			}
 	}
 

@@ -67,7 +67,7 @@ showLogo(name) {
 	logoGui.AddText("w279 Center", info)
 
 	logoGui.Show("X" . x . " Y" . y)
-	
+
 	videoPlayer.Start()
 
 	WinSetTransparent(224, logoGui)
@@ -191,11 +191,11 @@ startupRaceSpotter() {
 
 	registerMessageHandler("Race Spotter", handleSpotterMessage)
 
-	if (debug && spotterSpeaker) {
+	if spotterSpeaker
 		RaceSpotter.Instance.getSpeaker()
 
+	if debug
 		RaceSpotter.Instance.updateDynamicValues({KnowledgeBase: RaceSpotter.Instance.createKnowledgeBase({})})
-	}
 
 	if (spotterLogo && !kSilentMode)
 		showLogo(spotterName)

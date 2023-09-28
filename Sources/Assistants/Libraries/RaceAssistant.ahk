@@ -209,6 +209,10 @@ class RaceAssistant extends ConfigurationItem {
 		handleVoiceCommand(phrase, words) {
 			this.RaceAssistant.handleVoiceCommand(phrase, words)
 		}
+
+		handleVoiceText(phrase, text) {
+			this.RaceAssistant.handleVoiceText(phrase, text)
+		}
 	}
 
 	class RaceKnowledgeBase extends KnowledgeBase {
@@ -661,6 +665,10 @@ class RaceAssistant extends ConfigurationItem {
 			default:
 				throw "Unknown grammar `"" . grammar . "`" detected in RaceAssistant.handleVoiceCommand...."
 		}
+	}
+
+	handleVoiceText(grammar, text) {
+		throw "Unknown grammar `"" . grammar . "`" detected in RaceAssistant.handleVoiceText...."
 	}
 
 	requestInformation(category, arguments*) {

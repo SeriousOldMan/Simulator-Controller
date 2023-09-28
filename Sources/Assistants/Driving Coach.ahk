@@ -184,11 +184,11 @@ startupDrivingCoach() {
 
 	registerMessageHandler("Driving Coach", handleCoachMessage)
 
-	if (debug && coachSpeaker) {
-		DrivingCoach.Instance.getSpeaker()
+	if coachSpeaker
+		coach.getSpeaker()
 
-		DrivingCoach.Instance.updateDynamicValues({KnowledgeBase: DrivingCoach.Instance.createKnowledgeBase({})})
-	}
+	if debug
+		coach.updateDynamicValues({KnowledgeBase: DrivingCoach.Instance.createKnowledgeBase({})})
 
 	if (coachLogo && !kSilentMode)
 		showLogo(coachName)

@@ -3,6 +3,8 @@
 #Include Choices.en
 #Include Conversation.en
 #Include Weather.en
+[Configuration]
+Recognizer=Grammar
 [Fragments]
 FrontLeft=front left
 FrontRight=front right

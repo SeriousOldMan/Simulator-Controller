@@ -170,7 +170,7 @@ class SpeechRecognizer {
 	iEngine := false
 	iChoices := CaseInsenseMap()
 
-	iContinuous := false
+	iMode := "Grammar"
 
 	static sAudioRoutingInitialized := false
 	static sRecognizerAudioDevice := false
@@ -220,7 +220,7 @@ class SpeechRecognizer {
 		}
 	}
 
-	__New(engine, recognizer := false, language := false, silent := false, continuous := false) {
+	__New(engine, recognizer := false, language := false, silent := false, mode := "Grammar") {
 		local dllName := "Speech.Recognizer.dll"
 		local dllFile := kBinariesDirectory . dllName
 		local instance, choices, found, ignore, recognizerDescriptor, configuration, audioDevice
@@ -228,7 +228,7 @@ class SpeechRecognizer {
 		this.iEngine := engine
 		this.Instance := false
 		this.RecognizerList := []
-		this.iContinuous := continuous
+		this.iMode := mode
 
 		try {
 			if (!FileExist(dllFile)) {
@@ -279,28 +279,25 @@ class SpeechRecognizer {
 					throw "Could not communicate with speech recognizer library (" . dllName . ")..."
 				}
 
-				if !continuous {
-					choices := []
+				choices := []
 
-					loop 101
-						choices.Push((A_Index - 1) . "")
+				loop 101
+					choices.Push((A_Index - 1) . "")
 
-					this.setChoices("Number", choices)
+				this.setChoices("Number", choices)
 
-					choices := []
+				choices := []
 
-					loop 10
-						choices.Push((A_Index - 1) . "")
+				loop 10
+					choices.Push((A_Index - 1) . "")
 
-					this.setChoices("Digit", choices)
-				}
+				this.setChoices("Digit", choices)
 			}
 			else {
 				instance.SetEngine(engine)
-
-				if continuous
-					this.Instance.SetContinuous(this._onGrammarCallback.Bind(this))
 			}
+
+			this.setMode(mode)
 
 			if (this.Instance.OkCheck() != "OK") {
 				logMessage(kLogCritical, translate("Could not communicate with speech recognizer library (") . dllName . translate(")"))
@@ -484,6 +481,18 @@ class SpeechRecognizer {
 		this.iChoices[name] := this.newChoices(choices)
 	}
 
+	setMode(mode) {
+		this.iMode := mode
+
+		if this.Instance
+			switch this.iEngine, false {
+				case "Desktop", "Server":
+					this.Instance.SetContinuous((mode = "Text") ? this._onGrammarCallback.Bind(this) : false)
+				case "Azure":
+					this.Instance.SetContinuous(mode = "Text")
+			}
+	}
+
 	newGrammar() {
 		if this.Instance {
 			switch this.iEngine, false {
@@ -607,9 +616,12 @@ class SpeechRecognizer {
 		return bestMatch
 	}
 
+	textRecognized(text) {
+	}
+
 	_onGrammarCallback(name, wordArr) {
-		if this.iContinuous
-			this.iContinuous.Call(values2String(A_Space, this.getWords(wordArr)*))
+		if (this.iMode = "Text")
+			this.textRecognized(values2String(A_Space, this.getWords(wordArr)*))
 		else
 			this._grammarCallbacks[name].Call(name, this.getWords(wordArr))
 	}
@@ -617,8 +629,8 @@ class SpeechRecognizer {
 	_onTextCallback(text) {
 		local words, ignore, name, grammar, rating, index, literal, bestRating, bestMatch, callback
 
-		if this.iContinuous
-			this.iContinuous.Call(text)
+		if (this.iMode = "Text")
+			this.textRecognized(text)
 		else {
 			words := string2Values(A_Space, text)
 

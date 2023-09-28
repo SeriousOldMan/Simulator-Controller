@@ -185,24 +185,6 @@ writeMultiMap(multiMapFile, multiMap, symbolic := true) {
 
 	deleteFile(tempFile)
 
-	/*
-	for section, keyValues in multiMap {
-		pairs := ""
-
-		for key, value in keyValues {
-			value := StrReplace(value, "\", "\\")
-			value := StrReplace(value, "=", "\=")
-			value := StrReplace(value, "`n", "\n")
-
-			pairs := (pairs . "`n" . key . "=" . (symbolic ? ((value == true) ? kTrue : ((value == false) ? kFalse : value)) : value))
-		}
-
-		section := "[" . section . "]" . pairs . "`n"
-
-		FileAppend(section, tempFile, "UTF-16")
-	}
-	*/
-
 	FileAppend(printMultiMap(multiMap, symbolic), tempFile, "UTF-16")
 
 	multiMapFile := getFileName(multiMapFile, kUserConfigDirectory)
@@ -247,9 +229,7 @@ printMultiMap(multiMap, symbolic := true) {
 		pairs := ""
 
 		for key, value in keyValues {
-			value := StrReplace(value, "\", "\\")
-			value := StrReplace(value, "=", "\=")
-			value := StrReplace(value, "`n", "\n")
+			value := encode(value)
 
 			pairs .= ("`n" . key . "=" . (symbolic ? ((value == true) ? kTrue : ((value == false) ? kFalse : value)) : value))
 		}

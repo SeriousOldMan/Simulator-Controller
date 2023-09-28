@@ -205,6 +205,14 @@ startupDrivingCoach() {
 ;;;-------------------------------------------------------------------------;;;
 
 shutdownDrivingCoach(shutdown := false) {
+	if shutdown
+		ExitApp(0)
+
+	if (DrivingCoach.Instance.Session == kSessionFinished)
+		Task.startTask(shutdownDrivingCoach.Bind(true), 10000, kLowPriority)
+	else
+		Task.startTask(shutdownDrivingCoach, 1000, kLowPriority)
+
 	return false
 }
 

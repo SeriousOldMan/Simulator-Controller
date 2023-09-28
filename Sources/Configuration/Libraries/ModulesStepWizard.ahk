@@ -608,7 +608,7 @@ class ModulesStepWizard extends StepWizard {
 			widget3.OnEvent("Click", updateSelectedModules)
 			widget4 := window.Add("HTMLViewer", "x" . x . " yp+26 w" . width . " h120 Y:Move(" . factor . ") W:Grow H:Grow(0.33) Hidden")
 
-			html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
+			html := "<html><body style='background-color: #" . window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
 			widget4.document.write(html)
 
@@ -659,7 +659,7 @@ class ModulesStepWizard extends StepWizard {
 
 		widget7 := window.Add("HTMLViewer", "x" . x . " ys+229 w" . width . " h210 Y:Move(0.7) W:Grow H:Grow(0.3) VpresetsInfoText Hidden")
 
-		html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
+		html := "<html><body style='background-color: #" . window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
 		widget7.document.write(html)
 
@@ -823,7 +823,7 @@ class ModulesStepWizard extends StepWizard {
 
 		info := "<div style='font-family: Arial, Helvetica, sans-serif; font-size: 11px'><hr style='border-width:1pt;border-color:#AAAAAA;color:#AAAAAA;width: 90%'>" . info . "</div>"
 
-		html := "<html><body style='background-color: #" . this.Window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
+		html := "<html><body style='background-color: #" . this.Window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
 		this.Control["presetsInfoText"].document.open()
 		this.Control["presetsInfoText"].document.write(html)

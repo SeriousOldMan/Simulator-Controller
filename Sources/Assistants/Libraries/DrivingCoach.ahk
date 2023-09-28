@@ -29,6 +29,8 @@
 class DrivingCoach extends GridRaceAssistant {
 	iConnector := false
 
+	iTranscript := false
+
 	class OpenAIConnector {
 		iCoach := false
 
@@ -39,7 +41,7 @@ class DrivingCoach extends GridRaceAssistant {
 		iMaxTokens := 1024
 		iTemperature := 0.5
 
-		iInstructions := ""
+		iInstructions := CaseInsenseMap()
 		iTranscript := []
 		iMaxTranscript := 3
 
@@ -118,13 +120,13 @@ class DrivingCoach extends GridRaceAssistant {
 			}
 		}
 
-		Instructions {
+		Instructions[type?] {
 			Get {
-				return this.iInstructions
+				return (isSet(type) ? this.iInstructions[type] : this.iInstructions)
 			}
 
 			Set {
-				return (this.iInstructions := value)
+				return (isSet(type) ? (this.iInstructions[type] := value) : (this.iInstructions := value))
 			}
 		}
 
@@ -160,15 +162,16 @@ class DrivingCoach extends GridRaceAssistant {
 			local messages := []
 			local ignore, conversation, message, simulator, car, track
 
-			if (this.Instructions != "") {
-				messages.Push({role: "system", content: this.Instructions})
+			if (this.Instructions.Has("Character") && this.Instructions["Character"])
+				messages.Push({role: "system", content: substituteVariables(this.Instructions["Character"], {name: coach.VoiceManager.Name})})
 
+			if (this.Instructions.Has("Simulation") && this.Instructions["Simulation"])
 				if (knowledgeBase && (this.Coach.Session != kSessionFinished)) {
 					simulator := knowledgeBase.getValue("Session.Simulator")
 					car := knowledgeBase.getValue("Session.Car")
 					track := knowledgeBase.getValue("Session.Track")
 
-					message := substituteVariables(speaker.Phrases["Simulation"]
+					message := substituteVariables(this.Instructions["Simulation"]
 												 , {name: coach.VoiceManager.Name
 												  , driver: coach.DriverForName
 												  , simulator: settingsDB.getSimulatorName(simulator)
@@ -176,18 +179,20 @@ class DrivingCoach extends GridRaceAssistant {
 												  , track: settingsDB.getTrackName(simulator, track)})
 
 					messages.Push({role: "system", content: message})
+				}
 
+			if (this.Instructions.Has("Stint") && this.Instructions["Stint"])
+				if (knowledgeBase && (this.Coach.Session != kSessionFinished)) {
 					position := coach.getPosition(false, "Class")
 
 					if (position != 0) {
-						message := substituteVariables(speaker.Phrases["Stint"]
+						message := substituteVariables(this.Instructions["Stint"]
 													 , {lap: knowledgeBase.getValue("Lap") + 1
 													  , position: position})
 
 						messages.Push({role: "system", content: message})
 					}
 				}
-			}
 
 			for ignore, conversation in this.Transcript {
 				messages.Push({role: "user", content: conversation[1]})
@@ -219,9 +224,17 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 	}
 
+	Transcript {
+		Get {
+			return this.iTranscript
+		}
+	}
+
 	__New(configuration, remoteHandler, name := false, language := kUndefined
 		, synthesizer := false, speaker := false, vocalics := false, recognizer := false, listener := false, muted := false, voiceServer := false) {
 		super.__New(configuration, "Driving Coach", remoteHandler, name, language, synthesizer, speaker, vocalics, recognizer, listener, muted, voiceServer)
+
+		DirCreate(this.Options["Driving Coach.Archive"])
 	}
 
 	loadFromConfiguration(configuration) {
@@ -232,15 +245,17 @@ class DrivingCoach extends GridRaceAssistant {
 		options := this.Options
 
 		options["Driving Coach.Archive"] := getMultiMapValue(configuration, "Driving Coach Conversations", "Archive", kTempDirectory . "Conversations")
-		options["Driving Coach.Service"] := getMultiMapValue(configuration, "Driving Coach", "Service", getMultiMapValue(configuration, "Driving Coach", "Service", false))
-		options["Driving Coach.Model"] := getMultiMapValue(configuration, "Driving Coach", "Model", false)
-		options["Driving Coach.MaxTokens"] := getMultiMapValue(configuration, "Driving Coach", "MaxTokens", 1024)
-		options["Driving Coach.Temperature"] := getMultiMapValue(configuration, "Driving Coach", "Temperature", 0.5)
-		options["Driving Coach.MaxTranscript"] := getMultiMapValue(configuration, "Driving Coach", "MaxTranscript", 3)
-		options["Driving Coach.Instructions"] := getMultiMapValue(configuration, "Driving Coach", "Instructions", "")
+		options["Driving Coach.Service"] := getMultiMapValue(configuration, "Driving Coach Service", "Service", getMultiMapValue(configuration, "Driving Coach", "Service", false))
+		options["Driving Coach.Model"] := getMultiMapValue(configuration, "Driving Coach Service", "Model", false)
+		options["Driving Coach.MaxTokens"] := getMultiMapValue(configuration, "Driving Coach Service", "MaxTokens", 1024)
+		options["Driving Coach.Temperature"] := getMultiMapValue(configuration, "Driving Coach Personality", "Temperature", 0.5)
+		options["Driving Coach.MaxTranscript"] := getMultiMapValue(configuration, "Driving Coach Personality", "MaxTranscript", 3)
+		options["Driving Coach.Instructions.Character"] := getMultiMapValue(configuration, "Driving Coach Personality", "Instructions.Character", false)
+		options["Driving Coach.Instructions.Simulation"] := getMultiMapValue(configuration, "Driving Coach Personality", "Instructions.Simulation", false)
+		options["Driving Coach.Instructions.Stint"] := getMultiMapValue(configuration, "Driving Coach Personality", "Instructions.Stint", false)
 	}
 
-	connect() {
+	startConversation() {
 		local service := this.Options["Driving Coach.Service"]
 
 		if (InStr(service, "OpenAI") = 1) {
@@ -254,7 +269,50 @@ class DrivingCoach extends GridRaceAssistant {
 			this.Connector.Temperature := this.Options["Driving Coach.Temperature"]
 			this.Connector.MaxTranscript := this.Options["Driving Coach.History"]
 
-			this.Connector.Instructions := this.Options["Driving Coach.Instructions"]
+			this.Connector.Instructions["Character"] := this.Options["Driving Coach.Instructions.Character"]
+			this.Connector.Instructions["Simulation"] := this.Options["Driving Coach.Instructions.Simulation"]
+			this.Connector.Instructions["Stint"] := this.Options["Driving Coach.Instructions.Stint"]
+		}
+		else
+			throw "Unsupported service detected in DrivingCoach.connect..."
+
+		this.iTranscript := (normalizeDirectoryPath(this.Options["Driving Coach.Archive"]) . "\" . translate("Conversation ") . FormatTime() . ".txt")
+	}
+
+	stopConversation() {
+		if this.Connector
+			this.Connector.Restart()
+	}
+
+	handleVoiceText(grammar, text) {
+		local answer := false
+
+		try {
+			if !this.Connector
+				this.startConversation()
+
+			answer := this.Connector.Ask(text)
+		}
+		catch Any as exception {
+			if this.Speaker
+				this.getSpeaker().speakPhrase("Later")
+
+			logError(exception, true)
+
+			logMessage(kLogCritical, substituteVariables(translate("Cannot connect to GPT service (%service%) - please check the configuration")
+													   , {service: this.Options["Driving Coach.Service"]}))
+
+			showMessage(substituteVariables(translate("Cannot connect to GPT service (%service%) - please check the configuration...")
+										  , {service: this.Options["Driving Coach.Service"]})
+					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+		}
+
+		if answer {
+			if this.Speaker
+				this.getSpeaker().speak(answer)
+
+			if this.Transcript
+				FileAppend(translate("-- Driver --------") . "`n`n" . text . translate("-- Coach ---------") . answer . "`n`n", this.Transcript)
 		}
 	}
 
@@ -269,6 +327,8 @@ class DrivingCoach extends GridRaceAssistant {
 
 		if this.Debug[kDebugKnowledgeBase]
 			this.dumpKnowledgeBase(this.KnowledgeBase)
+
+		this.stopConversation()
 	}
 
 	finishSession(shutdown := true) {
@@ -276,5 +336,7 @@ class DrivingCoach extends GridRaceAssistant {
 								, OverallTime: 0, BestLapTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0
 								, EnoughData: false})
 		this.updateSessionValues({Simulator: "", Session: kSessionFinished, SessionTime: false})
+
+		this.stopConversation()
 	}
 }

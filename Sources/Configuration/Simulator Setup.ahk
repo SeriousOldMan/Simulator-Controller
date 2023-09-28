@@ -41,6 +41,7 @@
 #Include "Libraries\ControllerActionsEditor.ahk"
 #Include "Libraries\ControllerEditor.ahk"
 #Include "..\Plugins\Voice Control Configuration Plugin.ahk"
+#Include "..\Plugins\Driving Coach Configuration Plugin.ahk"
 #Include "..\Plugins\Race Engineer Configuration Plugin.ahk"
 #Include "..\Plugins\Race Strategist Configuration Plugin.ahk"
 #Include "..\Plugins\Race Spotter Configuration Plugin.ahk"
@@ -2310,7 +2311,7 @@ class SetupWizard extends ConfiguratorPanel {
 	}
 
 	setInfo(html) {
-		html := "<html><body style='background-color: #" . this.HelpWindow.BackColor . "; overflow: auto; font-family: Arial, Helvetica, sans-serif; font-size: 11px; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'>" . html . "</body></html>"
+		html := "<html><body style='background-color: #" . this.HelpWindow.Theme.WindowBackColor . "; overflow: auto; font-family: Arial, Helvetica, sans-serif; font-size: 11px; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'>" . html . "</body></html>"
 
 		this.HelpWindow["infoViewer"].document.open()
 		this.HelpWindow["infoViewer"].document.write(html)
@@ -2621,7 +2622,7 @@ class StartStepWizard extends StepWizard {
 
 		height := Round(width / 16 * 9)
 
-		html := "<html><body style='background-color: #" . window.BackColor . "; overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><br>" . text . "<br><center><img src='" . image . "' width='" . width . "' height='" . height . "' border='0' padding='0'></center></body></html>"
+		html := "<html><body style='background-color: #" . window.Theme.WindowBackColor . "; overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><br>" . text . "<br><center><img src='" . image . "' width='" . width . "' height='" . height . "' border='0' padding='0'></center></body></html>"
 
 		widget1.document.write(html)
 
@@ -2658,7 +2659,7 @@ class StartStepWizard extends StepWizard {
 			widget4 := window.Add("Button", "x" . x . " yp+380 w260 h30 Y:Move H:Center Hidden", translate("Unblock Applications and DLLs..."))
 			widget4.OnEvent("Click", elevateAndRestart)
 
-			html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
+			html := "<html><body style='background-color: #" . window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
 			widget3.document.write(html)
 
@@ -2779,7 +2780,7 @@ class FinishStepWizard extends StepWizard {
 
 		height := Round(width / 16 * 9)
 
-		html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='auto' bottommargin='0'><img src='" . image . "' width='" . (width - 24) . "' height='" . (height - 50) . "' border='0' padding='0'><br><br><br>" . text . "</body></html>"
+		html := "<html><body style='background-color: #" . window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='auto' bottommargin='0'><img src='" . image . "' width='" . (width - 24) . "' height='" . (height - 50) . "' border='0' padding='0'><br><br><br>" . text . "</body></html>"
 
 		widget1.document.write(html)
 

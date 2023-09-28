@@ -158,7 +158,7 @@ class VoiceManager {
 				this.iFocus := (this.iFocus || focus)
 			}
 			else
-				messageSend(kFileMessage, "Voice", "speak:" . values2String(";", this.VoiceManager.Name, text, focus), this.VoiceManager.VoiceServer)
+				messageSend(kFileMessage, "Voice", "speak:" . values2String(";", this.VoiceManager.Name, encode(text), focus), this.VoiceManager.VoiceServer)
 		}
 
 		speakPhrase(phrase, variables := false, focus := false, cache := false) {
@@ -361,6 +361,10 @@ class VoiceManager {
 			this.iVoiceManager := voiceManager
 
 			super.__New(arguments*)
+		}
+
+		textRecognized(text) {
+			this.VoiceManager.raiseTextRecognized("Text", text)
 		}
 	}
 
@@ -845,7 +849,9 @@ class VoiceManager {
 																					, "remoteActivationRecognized", "remoteDeactivationRecognized"
 																					, this.Language, this.Synthesizer, this.Speaker
 																					, this.Recognizer, this.Listener
-																					, this.SpeakerVolume, this.SpeakerPitch, this.SpeakerSpeed)
+																					, this.SpeakerVolume, this.SpeakerPitch, this.SpeakerSpeed
+																					, getMultiMapValue(this.getGrammars(this.Language)
+																									 , "Configuration", "Recognizer", "Grammar"))
 										, this.VoiceServer)
 
 				this.iSpeechSynthesizer := VoiceManager.RemoteSpeaker(this, this.Synthesizer, this.Speaker, this.Language
@@ -998,6 +1004,7 @@ class VoiceManager {
 
 	buildGrammars(speechRecognizer, language) {
 		local grammars := this.getGrammars(language)
+		local mode := getMultiMapValue(grammars, "Configuration", "Recognizer", "Grammar")
 		local grammar, definition, name, choices, nextCharIndex
 
 		for name, choices in getMultiMapValues(grammars, "Choices")
@@ -1006,12 +1013,21 @@ class VoiceManager {
 			else
 				messageSend(kFileMessage, "Voice", "registerChoices:" . values2String(";", this.Name, name, string2Values(",", choices)*), this.VoiceServer)
 
+		speechRecognizer.setMode(mode)
+
 		for grammar, definition in getMultiMapValues(grammars, "Listener Grammars") {
 			definition := substituteVariables(definition, {name: this.Name})
 
 			this.Grammars[grammar] := definition
 
 			if speechRecognizer {
+				if (mode = "Text") {
+					if (grammar != "Call")
+						throw "Listener grammars are not supported in continuous text recognition..."
+
+					continue
+				}
+
 				if this.Debug[kDebugGrammars] {
 					nextCharIndex := 1
 
@@ -1031,33 +1047,46 @@ class VoiceManager {
 							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
 			}
-			else if (grammar != "Call")
+			else if (grammar != "Call") {
+				if (mode = "Text")
+					throw "Listener grammars are not supported in continuous text recognition..."
+
 				messageSend(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, grammar, definition, "remoteCommandRecognized"), this.VoiceServer)
-		}
-
-		if speechRecognizer {
-			try {
-				speechRecognizer.loadGrammar("?", speechRecognizer.compileGrammar("[Unknown]"), ObjBindMethod(this, "raisePhraseRecognized"))
-			}
-			catch Any as exception {
-				logError(exception, true)
 			}
 		}
-		else
-			messageSend(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, "?", "[Unknown]", "remoteCommandRecognized"), this.VoiceServer)
 
-		/*
-		if !speechRecognizer
-			messageSend(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, "?", "[Unknown]", "remoteCommandRecognized"), this.VoiceServer)
-		*/
+		if (mode = "Text") {
+			if !speechRecognizer
+				messageSend(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, "Text", "*", "remoteTextRecognized"), this.VoiceServer)
+		}
+		else {
+			if speechRecognizer {
+				try {
+					speechRecognizer.loadGrammar("?", speechRecognizer.compileGrammar("[Unknown]"), ObjBindMethod(this, "raisePhraseRecognized"))
+				}
+				catch Any as exception {
+					logError(exception, true)
+				}
+			}
+			else
+				messageSend(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, "?", "[Unknown]", "remoteCommandRecognized"), this.VoiceServer)
+		}
 	}
 
 	raisePhraseRecognized(grammar, words) {
 		messageSend(kLocalMessage, "Voice", "localPhraseRecognized:" . values2String(";", grammar, words*))
 	}
 
+	raiseTextRecognized(grammar, text) {
+		messageSend(kLocalMessage, "Voice", "localTextRecognized:" . values2String(";", grammar, text))
+	}
+
 	localPhraseRecognized(grammar, words*) {
 		this.phraseRecognized(grammar, words)
+	}
+
+	localTextRecognized(grammar, text) {
+		this.textRecognized(grammar, text)
 	}
 
 	remoteActivationRecognized(words*) {
@@ -1073,6 +1102,10 @@ class VoiceManager {
 		this.phraseRecognized(grammar, words, true)
 	}
 
+	remoteTextRecognized(grammar, command, text) {
+		this.textRecognized(grammar, text, true)
+	}
+
 	phraseRecognized(grammar, words, remote := false) {
 		if (this.Debug[kDebugRecognitions] && !remote)
 			showMessage("Command phrase recognized: " . grammar . " => " . values2String(A_Space, words*))
@@ -1081,6 +1114,20 @@ class VoiceManager {
 
 		try {
 			this.handleVoiceCommand(grammar, words)
+		}
+		finally {
+			protectionOff()
+		}
+	}
+
+	textRecognized(grammar, text, remote := false) {
+		if (this.Debug[kDebugRecognitions] && !remote)
+			showMessage("Text recognized: " . text)
+
+		protectionOn()
+
+		try {
+			this.handleVoiceText(grammar, text)
 		}
 		finally {
 			protectionOff()
@@ -1111,5 +1158,9 @@ class VoiceManager {
 
 	handleVoiceCommand(grammar, words) {
 		throw "Virtual method VoiceManager.handleVoiceCommand must be implemented in a subclass..."
+	}
+
+	handleVoiceText(grammar, text) {
+		throw "Virtual method VoiceManager.handleVoiceText must be implemented in a subclass..."
 	}
 }

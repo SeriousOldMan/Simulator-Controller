@@ -63,20 +63,20 @@ class WinHTTPRequest extends WinHttpRequest._Call {
         this.whr := ""
     }
 
-    EncodeUri(sUri) {
-        return this._EncodeDecode(sUri, true, false)
+    static EncodeUri(uri) {
+        return WinHTTPRequest._EncodeDecode(uri, true, false)
     }
 
-    EncodeUriComponent(sComponent) {
-        return this._EncodeDecode(sComponent, true, true)
+    static EncodeUriComponent(component) {
+        return WinHTTPRequest._EncodeDecode(component, true, true)
     }
 
-    DecodeUri(sUri) {
-        return this._EncodeDecode(sUri, false, false)
+    static DecodeUri(uri) {
+        return WinHTTPRequest._EncodeDecode(uri, false, false)
     }
 
-    DecodeUriComponent(sComponent) {
-        return this._EncodeDecode(sComponent, false, true)
+    static DecodeUriComponent(component) {
+        return WinHTTPRequest._EncodeDecode(component, false, true)
     }
 
     ObjToQuery(data) {
@@ -87,8 +87,8 @@ class WinHTTPRequest extends WinHttpRequest._Call {
             return data
 
         for key, value in (isInstance(data, Map) ? data : data.OwnProps()) {
-            result .= this.EncodeUriComponent(key) "="
-            result .= this.EncodeUriComponent(value) "&"
+            result .= WinHTTPRequest.EncodeUriComponent(key) "="
+            result .= WinHTTPRequest.EncodeUriComponent(value) "&"
         }
 
         return RTrim(result, "&")
@@ -106,8 +106,8 @@ class WinHTTPRequest extends WinHttpRequest._Call {
         for ignore, part in StrSplit(data, "&") {
             pair := StrSplit(part, "=", , 2)
 
-            key := this.DecodeUriComponent(pair[1])
-            value := this.DecodeUriComponent(pair[2])
+            key := WinHTTPRequest.DecodeUriComponent(pair[1])
+            value := WinHTTPRequest.DecodeUriComponent(pair[2])
 
             result.%key% := value
         }
@@ -176,7 +176,7 @@ class WinHTTPRequest extends WinHttpRequest._Call {
         return result
     }
 
-    _EncodeDecode(text, encode, component) {
+    static _EncodeDecode(text, encode, component) {
         local action := ((encode ? "en" : "de") . "codeURI" . (component ? "Component" : ""))
 
         if (WinHTTPRequest._doc = "") {
@@ -186,6 +186,17 @@ class WinHTTPRequest extends WinHttpRequest._Call {
         }
 
         return (WinHTTPRequest._doc.parentWindow).%action%(text)
+    }
+
+    static _Mime(extension) {
+        static mime := CaseInsenseMap("7z", "application/x-7z-compressed"
+                                    , "gif", "image/gif"
+                                    , "jpg", "image/jpeg"
+                                    , "json", "application/json"
+                                    , "png", "image/png"
+                                    , "zip", "application/zip")
+
+        return (mime.Has(extension) ? mime[Extension] : "application/octet-stream")
     }
 
     _Headers() {
@@ -200,17 +211,6 @@ class WinHTTPRequest extends WinHttpRequest._Call {
         }
 
         return result
-    }
-
-    _Mime(extension) {
-        static mime := CaseInsenseMap("7z", "application/x-7z-compressed"
-                                    , "gif", "image/gif"
-                                    , "jpg", "image/jpeg"
-                                    , "json", "application/json"
-                                    , "png", "image/png"
-                                    , "zip", "application/zip")
-
-        return (mime.Has(extension) ? mime[Extension] : "application/octet-stream")
     }
 
     _MultiPart(&body) {
@@ -260,7 +260,7 @@ class WinHTTPRequest extends WinHttpRequest._Call {
                 str .= EOL
                 str .= ("Content-Disposition: form-data; name=`"" . field . "`"; filename=`"" . file . "`"")
                 str .= EOL
-                str .= ("Content-Type: " . this._Mime(ext))
+                str .= ("Content-Type: " . WinHTTPRequest._Mime(ext))
                 str .= EOL
                 str .= EOL
 

@@ -2176,6 +2176,27 @@ updateConfigurationForV400() {
 	deleteFile(kDatabaseDirectory . "User\UPLOAD")
 }
 
+updatePluginsForV540() {
+	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	local userConfiguration := readMultiMap(userConfigurationFile)
+	local changed, coach
+
+	if (userConfiguration.Count > 0) {
+		changed := false
+
+		if !getMultiMapValue(userConfiguration, "Plugins", "Driving Coach", false) {
+			coach := Plugin("Driving Coach", false, false)
+
+			coach.saveToConfiguration(userConfiguration)
+
+			changed := true
+		}
+
+		if changed
+			writeMultiMap(userConfigurationFile, userConfiguration)
+	}
+}
+
 updatePluginsForV5091() {
 	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
 	local userConfiguration := readMultiMap(userConfigurationFile)

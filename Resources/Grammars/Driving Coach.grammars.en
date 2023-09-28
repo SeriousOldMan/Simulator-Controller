@@ -1,0 +1,10 @@
+[Configuration]
+Recognizer=Text
+[Listener Grammars]
+// Conversation //
+Call=[{Hi, Hey} %name%, %name% do you hear me, %name% I need you, %name% where are you, %name% come in please]
+[Speaker Phrases]
+// Conversation //
+Later.1=Sorry, I'm busy right now. Please contact me later.
+Later.2=I'm currently on the other line. Give me some time.
+Later.3=I just have to evaluate some data. Get in touch again in 5 minutes.

@@ -80,7 +80,8 @@ class AssistantsStepWizard extends ActionsStepWizard {
 				for ignore, section in ["Race Assistant Startup", "Race Assistant Shutdown", "Race Engineer Startup", "Race Engineer Shutdown"
 									  , "Race Strategist Startup", "Race Strategist Shutdown"
 									  , "Race Engineer Analysis", "Race Strategist Analysis", "Race Strategist Reports"
-									  , "Race Spotter Analysis", "Race Spotter Announcements"] {
+									  , "Race Spotter Analysis", "Race Spotter Announcements"
+									  , "Driving Coach Conversations", "Driving Coach Service", "Driving Coach Personality"] {
 					subConfiguration := getMultiMapValues(assistantConfiguration, section, false)
 
 					if subConfiguration
@@ -93,6 +94,8 @@ class AssistantsStepWizard extends ActionsStepWizard {
 					arguments := ("raceAssistantName: " . wizard.getModuleValue(assistant, "Name", "Khato"))
 				else if (assistant = "Race Spotter")
 					arguments := ("raceAssistantName: " . wizard.getModuleValue(assistant, "Name", "Elisa"))
+				else if (assistant = "Driving Coach")
+					arguments := ("raceAssistantName: " . wizard.getModuleValue(assistant, "Name", "Aiden"))
 				else
 					throw "Unsupported race assistant detected in AssistantsStepWizard.saveToConfiguration..."
 
@@ -245,7 +248,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 
 			widget := window.Add("HTMLViewer", "x" . x . " yp+352 w" . width . " h58 Y:Move(0.66) W:Grow H:Grow(0.33) VactionsInfoText" . page . " Hidden")
 
-			html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
+			html := "<html><body style='background-color: #" . window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
 			widget.document.write(html)
 
@@ -257,6 +260,8 @@ class AssistantsStepWizard extends ActionsStepWizard {
 				configurator := RaceStrategistConfigurator(this)
 			else if (assistant = "Race Spotter")
 				configurator := RaceSpotterConfigurator(this)
+			else if (assistant = "Driving Coach")
+				configurator := DrivingCoachConfigurator(this)
 			else
 				configurator := false
 
@@ -328,7 +333,8 @@ class AssistantsStepWizard extends ActionsStepWizard {
 		for ignore, section in ["Race Assistant Startup", "Race Assistant Shutdown", "Race Engineer Startup", "Race Engineer Shutdown"
 							  , "Race Strategist Startup", "Race Strategist Shutdown"
 							  , "Race Engineer Analysis", "Race Strategist Analysis", "Race Strategist Reports"
-							  , "Race Spotter Analysis", "Race Spotter Announcements"] {
+							  , "Race Spotter Analysis", "Race Spotter Announcements"
+							  , "Driving Coach Conversations", "Driving Coach Service", "Driving Coach Personality"] {
 			subConfiguration := getMultiMapValues(assistantConfiguration, section, false)
 
 			if subConfiguration
@@ -355,7 +361,8 @@ class AssistantsStepWizard extends ActionsStepWizard {
 			for ignore, section in ["Race Assistant Startup", "Race Assistant Shutdown", "Race Engineer Startup", "Race Engineer Shutdown"
 								  , "Race Strategist Startup", "Race Strategist Shutdown"
 								  , "Race Engineer Analysis", "Race Strategist Analysis", "Race Strategist Reports"
-								  , "Race Spotter Analysis", "Race Spotter Announcements"] {
+								  , "Race Spotter Analysis", "Race Spotter Announcements"
+								  , "Driving Coach Conversations", "Driving Coach Service", "Driving Coach Personality"] {
 				subConfiguration := getMultiMapValues(configuration, section, false)
 
 				if subConfiguration

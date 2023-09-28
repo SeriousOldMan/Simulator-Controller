@@ -157,7 +157,7 @@ class ApplicationsStepWizard extends StepWizard {
 
 		widget5 := window.Add("HTMLViewer", "x" . x . " ys+205 w" . width . " h180 Y:Move(0.5) W:Grow VsimulatorsInfoText Hidden")
 
-		html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
+		html := "<html><body style='background-color: #" . window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
 		widget5.document.write(html)
 
@@ -187,7 +187,7 @@ class ApplicationsStepWizard extends StepWizard {
 
 		widget5 := window.Add("HTMLViewer", "x" . x . " ys+265 w" . width . " h120 Y:Move(0.5) W:Grow VapplicationsInfoText Hidden")
 
-		html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
+		html := "<html><body style='background-color: #" . window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
 		widget5.document.write(html)
 

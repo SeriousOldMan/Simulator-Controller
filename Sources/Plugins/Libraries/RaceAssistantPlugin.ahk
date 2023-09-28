@@ -865,14 +865,14 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			this.logFunctionNotFound(actionFunction)
 	}
 
-	writePluginState(configuration) {
+	writePluginState(configuration, extended := true) {
 		local tries := 10
 		local teamServer, session, information, state
 
 		static updateCycle := (getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
 																	   , "Team Server", "Update Frequency", 10) * 1000)
 
-		if this.Active {
+		if (this.Active && extended) {
 			teamServer := this.TeamServer
 
 			if (teamServer && teamServer.TeamServerActive && (A_TickCount > this.iNextSessionUpdate))
@@ -1026,7 +1026,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		RaceAssistantPlugin.sFinished := false
 	}
 
-	static requireAssistants(simulator, car, track, weather) {
+	static requireRaceAssistants(simulator, car, track, weather) {
 		local teamServer := this.TeamServer
 		local activeAssistant := false
 		local startupAssistant := false
@@ -2094,7 +2094,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					splitTime := A_TickCount
 				}
 
-				if RaceAssistantPlugin.requireAssistants(simulator, car, track, weather) {
+				if RaceAssistantPlugin.requireRaceAssistants(simulator, car, track, weather) {
 					; Car is on the track
 
 					if isDebug() {

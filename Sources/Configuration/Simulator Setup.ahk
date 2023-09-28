@@ -1571,7 +1571,7 @@ class SetupWizard extends ConfiguratorPanel {
 		local knowledgeBase := this.KnowledgeBase
 		local check := (executable = "CHECK")
 		local installed := this.isApplicationInstalled(application)
-		local ignore, section, descriptor, applications
+		local ignore, section, descriptor, applications, index
 
 		if check
 			executable := false
@@ -1610,6 +1610,16 @@ class SetupWizard extends ConfiguratorPanel {
 			else {
 				knowledgeBase.setFact("Application." . application . ".Installed", false)
 				knowledgeBase.removeFact("Application." . application . ".Path")
+
+				applications := string2Values("###", knowledgeBase.getValue("Application.Installed", ""))
+
+				index := inList(applications, application)
+
+				if index {
+					applications.RemoveAt(index)
+
+					knowledgeBase.setFact("Application.Installed", values2String("###", applications*))
+				}
 
 				return false
 			}

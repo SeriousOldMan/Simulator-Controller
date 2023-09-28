@@ -1,4 +1,4 @@
-## 5.3.2.0-release 09/29/23 (planned)
+## 5.3.2.0-release 09/29/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. A significant performance improvement has been achieved for the ACC Pitstop MFD handling.

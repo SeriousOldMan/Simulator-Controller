@@ -9,9 +9,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Libraries\Task.ahk"
 #Include "Libraries\RaceAssistantPlugin.ahk"
-#Include "..\Database\Libraries\SessionDatabase.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;

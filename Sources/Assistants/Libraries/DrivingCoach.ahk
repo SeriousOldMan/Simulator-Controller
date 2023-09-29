@@ -30,7 +30,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 	iHistory := false
 
-	class OpenAIConnector {
+	class HTTPConnector {
 		iCoach := false
 
 		iServer := ""
@@ -64,22 +64,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 		Model[internal := false] {
 			Get {
-				if internal {
-					switch this.iModel, false {
-						case "GPT 4":
-							return "gpt-4"
-						case "GPT 4 32k":
-							return "gpt-4-32k"
-						case "GPT 3.5 turbo":
-							return "gpt-3.5-turbo"
-						case "GPT 3.5 turbo 16k":
-							return "gpt-3.5-turbo-16k"
-						default:
-							return this.iModel
-					}
-				}
-				else
-					return this.iModel
+				return this.iModel
 			}
 		}
 
@@ -156,7 +141,7 @@ class DrivingCoach extends GridRaceAssistant {
 			local knowledgeBase := coach.KnowledgeBase
 			local speaker := coach.getSpeaker()
 			local headers := Map("Content-Type", "application/json", "Authorization", "Bearer " . this.Token)
-			local body := {model: this.Model[true], max_tokens: this.MaxTokens, temperature: this.Temperature}
+			local body := {model: this.Model, max_tokens: this.MaxTokens, temperature: this.Temperature}
 			local messages := []
 			local ignore, conversation, message, simulator, car, track
 
@@ -210,6 +195,24 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 	}
 
+	class OpenAIConnector extends DrivingCoach.HTTPConnector {
+		Model[external := false] {
+			Get {
+				if !external {
+					if inList(["GPT 3.5 turbo", "GPT 3.5 turbo 16k", "GPT 4", "GPT 4 32k"], this.iModel)
+						return StrReplace(super.Model, A_Space, "-")
+					else
+						return super.Model
+				}
+				else
+					return super.Model
+			}
+		}
+	}
+
+	class GPT4AllConnector extends DrivingCoach.HTTPConnector {
+	}
+
 	class DrivingCoachRemoteHandler extends RaceAssistant.RaceAssistantRemoteHandler {
 		__New(remotePID) {
 			super.__New("Driving Coach", remotePID)
@@ -259,20 +262,27 @@ class DrivingCoach extends GridRaceAssistant {
 		local service := this.Options["Driving Coach.Service"]
 
 		if service {
-			if (InStr(service, "OpenAI") = 1) {
-				this.iConnector := DrivingCoach.OpenAIConnector(this)
+			if ((InStr(service, "OpenAI") = 1) || (InStr(service, "GPT4All") = 1)) {
+				try {
+					service := string2Values("|", service)
 
-				service := string2Values("|", service)
+					this.iConnector := DrivingCoach.%service[1]%Connector(this)
 
-				this.Connector.Connect(service[2], service[3], this.Options["Driving Coach.Model"])
+					this.Connector.Connect(service[2], service[3], this.Options["Driving Coach.Model"])
 
-				this.Connector.MaxTokens := this.Options["Driving Coach.MaxTokens"]
-				this.Connector.Temperature := this.Options["Driving Coach.Temperature"]
-				this.Connector.MaxHistory := this.Options["Driving Coach.MaxHistory"]
+					this.Connector.MaxTokens := this.Options["Driving Coach.MaxTokens"]
+					this.Connector.Temperature := this.Options["Driving Coach.Temperature"]
+					this.Connector.MaxHistory := this.Options["Driving Coach.MaxHistory"]
 
-				this.Connector.Instructions["Character"] := this.Options["Driving Coach.Instructions.Character"]
-				this.Connector.Instructions["Simulation"] := this.Options["Driving Coach.Instructions.Simulation"]
-				this.Connector.Instructions["Stint"] := this.Options["Driving Coach.Instructions.Stint"]
+					this.Connector.Instructions["Character"] := this.Options["Driving Coach.Instructions.Character"]
+					this.Connector.Instructions["Simulation"] := this.Options["Driving Coach.Instructions.Simulation"]
+					this.Connector.Instructions["Stint"] := this.Options["Driving Coach.Instructions.Stint"]
+				}
+				catch Any as exception {
+					logError(exception)
+
+					throw "Unsupported service detected in DrivingCoach.connect..."
+				}
 			}
 			else
 				throw "Unsupported service detected in DrivingCoach.connect..."

@@ -37,15 +37,11 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		local window := editor.Window
 		local x0, x1, x2, x3, x4, x5, x6, w1, w2, w3, w4, choices, chosen, lineX, lineW
 
-return
-		replicateRSSettings(*) {
-			this.replicateSettings()
-		}
+		validateTemperature(*) {
+			local field := this.Control["dcTemperatureEdit"]
+			local value := field.Text
 
-		validateRSDampingFactor(*) {
-			local field := this.Control["rsDampingFactorEdit"]
-
-			if !isNumber(internalValue("Float", field.Text)) {
+			if (!isInteger(value) || (value < 0) || (value > 100)) {
 				field.Text := (field.HasProp("ValidText") ? field.ValidText : "")
 
 				loop 10
@@ -55,22 +51,61 @@ return
 				field.ValidText := field.Text
 		}
 
-		chooseRaceReportsPath(*) {
+		validateTokens(*) {
+			local field := this.Control["dcMaxTokensEdit"]
+			local value := field.Text
+
+			if (!isInteger(value) || (value < 200) || (value > 32000)) {
+				field.Text := (field.HasProp("ValidText") ? field.ValidText : "200")
+
+				loop 10
+					SendInput("{Right}")
+			}
+			else
+				field.ValidText := field.Text
+		}
+
+		chooseConversationsPath(*) {
 			local directory, translator
 
 			translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
 
 			OnMessage(0x44, translator)
-			directory := DirSelect("*" . window["raceReportsPathEdit"].Text, 0, translate("Select Race Reports Folder..."))
+			directory := DirSelect("*" . window["dcConversationsPathEdit"].Text, 0, translate("Select Conversations Folder..."))
 			OnMessage(0x44, translator, 0)
 
 			if (directory != "")
-				window["raceReportsPathEdit"].Text := directory
+				window["dcConversationsPathEdit"].Text := directory
 		}
 
-		chooseDrivingCoachSimulator(*) {
-			this.saveSimulatorConfiguration()
-			this.loadSimulatorConfiguration()
+		chooseService(*) {
+			window["dcServiceURLEdit"].Text := this.Value[window["dcServiceDropDown"].Text . ".serviceURL"]
+			window["dcServiceKeyEdit"].Text := this.Value[window["dcServiceDropDown"].Text . ".serviceKey"]
+
+			chooseInstructions()
+
+			this.updateState()
+		}
+
+		chooseInstructions(*) {
+			this.loadInstructions(window["dcServiceDropDown"].Text, window["dcModelDropDown"].Text, "instructions." . window["dcInstructionsDropDown"].Text)
+
+			window["dcInstructionsEdit"].Value := this.Value[window["dcServiceDropDown"].Text . ".instructions." . window["dcInstructionsDropDown"].Text]
+
+			this.updateState()
+		}
+
+		updateURL(*) {
+			this.Value[window["dcServiceDropDown"].Text . ".serviceURL"] := window["dcServiceURLEdit"].Text
+		}
+
+		updateKey(*) {
+			this.Value[window["dcServiceDropDown"].Text . ".serviceKey"] := window["dcServiceKeyEdit"].Text
+		}
+
+		updateInstructions(*) {
+			this.Value[window["dcServiceDropDown"].Text . ".instructions." . window["dcInstructionsDropDown"].Text] := window["dcInstructionsEdit"].Value
+			this.Value["instructions." . window["dcInstructionsDropDown"].Text] := window["dcInstructionsEdit"].Value
 		}
 
 		window.SetFont("Norm", "Arial")
@@ -89,212 +124,228 @@ return
 		w4 := w1 - 24
 		x6 := x1 + w4 + 1
 
-		widget1 := window.Add("Text", "x" . x0 . " y" . y . " w160 h23 +0x200 Hidden", translate("Race Reports Folder"))
-		widget2 := window.Add("Edit", "x" . x1 . " yp w" . w2 . " h21 W:Grow VraceReportsPathEdit Hidden", this.Value["raceReportsPath"])
+		widget1 := window.Add("Text", "x" . x0 . " y" . y . " w160 h23 +0x200 Hidden", translate("Conversations Folder"))
+		widget2 := window.Add("Edit", "x" . x1 . " yp w" . w2 . " h21 W:Grow VdcConversationsPathEdit Hidden")
 		widget3 := window.Add("Button", "x" . x4 . " yp-1 w23 h23 X:Move Hidden", translate("..."))
-		widget3.OnEvent("Click", chooseRaceReportsPath)
+		widget3.OnEvent("Click", chooseConversationsPath)
 
-		lineX := x + 20
-		lineW := width - 40
+		window.SetFont("Italic", "Arial")
+		widget4 := window.Add("Text", "x" . x0 . " yp+40 w105 h23 Hidden", translate("Service"))
+		widget5 := window.Add("Text", "x120 yp+7 w" . (width + 8 - 120) . " 0x10 W:Grow Hidden")
+		window.SetFont("s8 Norm", "Arial")
 
-		widget4 := window.Add("Text", "x" . lineX . " yp+30 w" . lineW . " 0x10 W:Grow Hidden")
+		widget6 := window.Add("Text", "x" . x0 . " yp+20 w105 h23 +0x200 Hidden", translate("Provider"))
 
-		widget5 := window.Add("Text", "x" . x0 . " yp+10 w105 h23 +0x200 Hidden", translate("Simulator"))
-
-		if (this.Simulators.Length = 0)
-			this.iSimulators := this.getSimulators()
-
- 		choices := this.iSimulators
+ 		choices := ["OpenAI", "GPT4ALL"]
 		chosen := (choices.Length > 0) ? 1 : 0
 
-		widget6 := window.Add("DropDownList", "x" . x1 . " yp w" . w4 . " W:Grow Choose" . chosen . " vrsSimulatorDropDown Hidden", choices)
-		widget6.OnEvent("Change", chooseDrivingCoachSimulator)
+		widget7 := window.Add("DropDownList", "x" . x1 . " yp w" . w1 . " Choose" . chosen . " vdcServiceDropDown Hidden", choices)
+		widget7.OnEvent("Change", chooseService)
 
-		widget7 := window.Add("Button", "x" . x6 . " yp w23 h23 X:Move Center +0x200  Hidden")
-		widget7.OnEvent("Click", replicateRSSettings)
-		setButtonIcon(widget7, kIconsDirectory . "Renew.ico", 1, "L4 T4 R4 B4")
+		widget8 := window.Add("Text", "x" . x0 . " yp+24 w80 h23 +0x200 Hidden", translate("Service URL"))
+		widget9 := window.Add("Edit", "x" . x1 . " yp w" . w1 . " h23 vdcServiceURLEdit Hidden")
+		widget9.OnEvent("Change", updateURL)
 
-		window.SetFont("Norm", "Arial")
+		widget10 := window.Add("Text", "x" . x0 . " yp+24 w80 h23 +0x200 Hidden", translate("Service Key"))
+		widget11 := window.Add("Edit", "x" . x1 . " yp w" . w1 . " h23 vdcServiceKeyEdit Hidden")
+		widget11.OnEvent("Change", updateKey)
+
+		widget12 := window.Add("Text", "x" . x0 . " yp+30 w80 h23 +0x200 Hidden", translate("Model / # Tokens"))
+		widget13 := window.Add("ComboBox", "x" . x1 . " yp w" . (w1 - 64) . " vdcModelDropDown Hidden")
+		widget14 := window.Add("Edit", "x" . (x1 + (w1 - 60)) . " yp-1 w60 h23 Number vdcMaxTokensEdit Hidden")
+		widget14.OnEvent("Change", validateTokens)
+		widget15 := window.Add("UpDown", "x" . (x1 + (w1 - 60)) . " yp w60 h23 Range200-32000 Hidden")
+
 		window.SetFont("Italic", "Arial")
+		widget16 := window.Add("Text", "x" . x0 . " yp+40 w105 h23 Hidden", translate("Personality"))
+		widget17 := window.Add("Text", "x120 yp+7 w" . (width + 8 - 120) . " 0x10 W:Grow Hidden")
+		window.SetFont("s8 Norm", "Arial")
 
-		widget8 := window.Add("GroupBox", "x" . x . " yp+40 w" . width . " h96 W:Grow Hidden", translate("Data Analysis"))
+		widget18 := window.Add("Text", "x" . x0 . " yp+20 w80 h23 +0x200 Hidden", translate("Creativity"))
+		widget19 := window.Add("Edit", "x" . x1 . " yp w40 Number Limit3 vdcTemperatureEdit Hidden")
+		widget19.OnEvent("Change", validateTemperature)
+		widget20 := window.Add("UpDown", "x" . x1 . " yp w40 h23 Range0-100 Hidden")
+		widget21 := window.Add("Text", "x" . (x1 + 45) . " yp w100 h23 +0x200 Hidden", translate("%"))
 
-		window.SetFont("Norm", "Arial")
+		widget22 := window.Add("Text", "x" . x0 . " yp+24 w80 h23 +0x200 Hidden", translate("Memory"))
+		widget23 := window.Add("Edit", "x" . x1 . " yp w40 h23 Number Limit2 vdcMaxHistoryEdit Hidden")
+		widget24 := window.Add("UpDown", "x" . x1 . " yp w40 h23 Range1-10 Hidden")
+		widget25 := window.Add("Text", "x" . (x1 + 45) . " yp w100 h23 +0x200 Hidden", translate("Conversations"))
 
-		widget9 := window.Add("Text", "x" . x0 . " yp+17 w80 h23 +0x200 Hidden", translate("Learn for"))
-		widget10 := window.Add("Edit", "x" . x1 . " yp w40 h21 Number Limit1 vrsLearningLapsEdit Hidden")
-		widget11 := window.Add("UpDown", "x" . x2 . " yp w17 h21 Range1-9 Hidden", 2)
-		widget12 := window.Add("Text", "x" . x3 . " yp w" . w3 . " h23 +0x200 Hidden", translate("Laps after Start or Pitstop"))
+		widget26 := window.Add("Text", "x" . x0 . " yp+24 w80 h23 +0x200 Hidden", translate("Instructions"))
 
-		widget13 := window.Add("Text", "x" . x0 . " yp+26 w105 h20 Section Hidden", translate("Statistical Window"))
-		widget14 := window.Add("Edit", "x" . x1 . " yp-2 w40 h21 Number Limit1 vrsLapsConsideredEdit Hidden", 5)
-		widget15 := window.Add("UpDown", "x" . x2 . " yp w17 h21 Range1-9 Hidden", 5)
-		widget16 := window.Add("Text", "x" . x3 . " yp+2 w80 h20 Hidden", translate("Laps"))
+		widget27 := window.Add("DropDownList", "x" . x1 . " yp w120 vdcInstructionsDropDown Hidden", collect(["Character", "Simulation", "Stint"], translate))
+		widget27.OnEvent("Change", chooseInstructions)
 
-		widget17 := window.Add("Text", "x" . x0 . " ys+24 w105 h20 Section Hidden", translate("Damping Factor"))
-		widget18 := window.Add("Edit", "x" . x1 . " yp-2 w40 h21 vrsDampingFactorEdit Hidden", displayValue("Float", 0.2, 1))
-		widget18.OnEvent("Change", validateRSDampingFactor)
-		widget19 := window.Add("Text", "x" . x3 . " yp+2 w80 h20 Hidden", translate("p. Lap"))
+		if (StrSplit(A_ScriptName, ".")[1] = "Simulator Configuration")
+			height := 140
+		else
+			height := 65
 
-		window.SetFont("Norm", "Arial")
-		window.SetFont("Italic", "Arial")
+		widget28 := window.Add("Edit", "x" . x1 . " yp+24 w" . w1 . " h" . height . " Multi H:Grow W:Grow vdcInstructionsEdit Hidden")
+		widget28.OnEvent("Change", updateInstructions)
 
-		widget20 := window.Add("GroupBox", "x" . x . " yp+40 w" . width . " h96 W:Grow Hidden", translate("Actions"))
-
-		window.SetFont("Norm", "Arial")
-
-		choices := collect(["Ask", "Always save", "No action"], translate)
-		widget21 := window.Add("Text", "x" . x0 . " yp+17 w105 h23 +0x200 Hidden", translate("Save Race Report"))
-		widget22 := window.Add("DropDownList", "x" . x1 . " yp w110 W:Grow(0.3) vrsSaveRaceReportDropDown Hidden", choices)
-
-		x5 := x1 + 114
-
-		widget23 := window.Add("Text", "x" . x5 . " yp+3 w110 h20 X:Move(0.3) Hidden", translate("@ Session End"))
-
-		choices := collect(["Ask", "Always save", "No action"], translate)
-		widget24 := window.Add("Text", "x" . x0 . " yp+21 w105 h23 +0x200 Hidden", translate("Save Telemetry"))
-		widget25 := window.Add("DropDownList", "x" . x1 . " yp w110 W:Grow(0.3) vrsSaveTelemetryDropDown Hidden", choices)
-
-		widget26 := window.Add("Text", "x" . x5 . " yp+3 w110 h20 X:Move(0.3) Hidden", translate("@ Session End"))
-
-		choices := collect(["No", "Yes"], translate)
-		widget27 := window.Add("Text", "x" . x0 . " yp+21 w105 h23 +0x200 Hidden", translate("Race Review"))
-		widget28 := window.Add("DropDownList", "x" . x1 . " yp w110 W:Grow(0.3) vrsRaceReviewDropDown Hidden", choices)
-
-		widget29 := window.Add("Text", "x" . x5 . " yp+3 w110 h20 X:Move(0.3) Hidden", translate("@ Session End"))
-
-		loop 29
+		loop 28
 			editor.registerWidget(this, widget%A_Index%)
+	}
 
-		this.loadSimulatorConfiguration()
+	loadInstructions(service, model, descriptor) {
+		getInstructionTemplate() {
+			local language := (isSet(SetupWizard) ? SetupWizard.Instance.getModuleValue("Driving Coach", "Language", getLanguage())
+												  : getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Language", getLanguage()))
+
+			static templates := readMultiMap(kResourcesDirectory . "Templates\Driving Coach.instructions")
+
+			return getMultiMapValue(templates, language, descriptor, "")
+		}
+
+		this.Value[descriptor] := this.Value[service . "." . descriptor]
+
+		if (this.Value[descriptor] = "") {
+			this.Value[descriptor] := getInstructionTemplate()
+			this.Value[service . "." . descriptor] := this.Value[descriptor]
+		}
 	}
 
 	loadFromConfiguration(configuration) {
-		local ignore, simulator, simulatorConfiguration
+		local service
 
 		super.loadFromConfiguration(configuration)
-return
-		this.Value["raceReportsPath"] := getMultiMapValue(configuration, "Driving Coach Reports", "Database", false)
 
-		if !this.Value["raceReportsPath"]
-			this.Value["raceReportsPath"] := ""
+		this.Value["conversationsPath"] := getMultiMapValue(configuration, "Driving Coach Conversations", "Archive", "")
 
-		if (this.Simulators.Length = 0)
-			this.iSimulators := this.getSimulators()
+		this.Value["OpenAI.serviceURL"] := getMultiMapValue(configuration, "Driving Coach Service", "OpenAI.ServiceURL", "https://api.openai.com/v1/chat/completions")
+		this.Value["OpenAI.serviceKey"] := getMultiMapValue(configuration, "Driving Coach Service", "OpenAI.ServiceKey", "")
 
-		for ignore, simulator in this.Simulators {
-			simulatorConfiguration := CaseInsenseMap()
+		this.Value["OpenAI.instructions.character"] := getMultiMapValue(configuration, "Driving Coach Personality", "OpenAI.Instructions.Character", "")
+		this.Value["OpenAI.instructions.simulation"] := getMultiMapValue(configuration, "Driving Coach Personality", "OpenAI.Instructions.Simulation", "")
+		this.Value["OpenAI.instructions.stint"] := getMultiMapValue(configuration, "Driving Coach Personality", "OpenAI.Instructions.Stint", "")
 
-			simulatorConfiguration["LearningLaps"] := getMultiMapValue(configuration, "Driving Coach Analysis", simulator . ".LearningLaps", 1)
-			simulatorConfiguration["ConsideredHistoryLaps"] := getMultiMapValue(configuration, "Driving Coach Analysis", simulator . ".ConsideredHistoryLaps", 5)
-			simulatorConfiguration["HistoryLapsDamping"] := getMultiMapValue(configuration, "Driving Coach Analysis", simulator . ".HistoryLapsDamping", 0.2)
-			simulatorConfiguration["SaveRaceReport"] := getMultiMapValue(configuration, "Driving Coach Shutdown", simulator . ".SaveRaceReport", "Never")
-			simulatorConfiguration["SaveTelemetry"] := getMultiMapValue(configuration, "Driving Coach Shutdown", simulator . ".SaveTelemetry", "Always")
-			simulatorConfiguration["RaceReview"] := getMultiMapValue(configuration, "Driving Coach Shutdown", simulator . ".RaceReview", "Yes")
+		this.Value["GPT4All.serviceURL"] := getMultiMapValue(configuration, "Driving Coach Service", "GPT4All.ServiceURL", "http://localhost:4891/v1")
+		this.Value["GPT4All.serviceKey"] := getMultiMapValue(configuration, "Driving Coach Service", "GPT4All.ServiceKey", "")
 
-			this.iSimulatorConfigurations[simulator] := simulatorConfiguration
+		this.Value["GPT4All.instructions.character"] := getMultiMapValue(configuration, "Driving Coach Personality", "GPT4All.Instructions.Character", "")
+		this.Value["GPT4All.instructions.simulation"] := getMultiMapValue(configuration, "Driving Coach Personality", "GPT4All.Instructions.Simulation", "")
+		this.Value["GPT4All.instructions.stint"] := getMultiMapValue(configuration, "Driving Coach Personality", "GPT4All.Instructions.Stint", "")
+
+		service := getMultiMapValue(configuration, "Driving Coach Service", "Service", false)
+
+		if (InStr(service, "OpenAI") = 1) {
+			service := string2Values("|", service)
+
+			this.Value["service"] := "OpenAI"
+			this.Value["serviceURL"] := service[2]
+			this.Value["serviceKey"] := service[3]
 		}
+		else if (InStr(service, "GPT4ALL") = 1) {
+			service := string2Values("|", service)
+
+			this.Value["service"] := "GPT4All"
+			this.Value["serviceURL"] := service[2]
+			this.Value["serviceKey"] := ""
+		}
+		else {
+			this.Value["service"] := "OpenAI"
+			this.Value["serviceURL"] := "https://api.openai.com/v1/chat/completions"
+			this.Value["serviceKey"] := ""
+		}
+
+		this.Value["model"] := getMultiMapValue(configuration, "Driving Coach Service", "Model", false)
+		this.Value["maxTokens"] := getMultiMapValue(configuration, "Driving Coach Service", "MaxTokens", 512)
+
+		this.Value["temperature"] := getMultiMapValue(configuration, "Driving Coach Personality", "Temperature", 0.5)
+		this.Value["maxHistory"] := getMultiMapValue(configuration, "Driving Coach Personality", "MaxHistory", 3)
+
+		this.loadInstructions(this.Value["service"], this.Value["model"], "instructions.character")
+		this.loadInstructions(this.Value["service"], this.Value["model"], "instructions.simulation")
+		this.loadInstructions(this.Value["service"], this.Value["model"], "instructions.stint")
 	}
 
 	saveToConfiguration(configuration) {
-		local simulator, simulatorConfiguration, ignore, key
+		local service, value
 
 		super.saveToConfiguration(configuration)
-return
-		this.saveSimulatorConfiguration()
 
-		setMultiMapValue(configuration, "Driving Coach Reports", "Database"
-									  , (Trim(this.Control["raceReportsPathEdit"].Text) != "") ? Trim(this.Control["raceReportsPathEdit"].Text) : false)
+		service := this.Control["dcServiceDropDown"].Text
+		value := this.Control["dcConversationsPathEdit"].Text
 
-		for simulator, simulatorConfiguration in this.iSimulatorConfigurations {
-			for ignore, key in ["LearningLaps", "ConsideredHistoryLaps", "HistoryLapsDamping"]
-				setMultiMapValue(configuration, "Driving Coach Analysis", simulator . "." . key, simulatorConfiguration[key])
+		setMultiMapValue(configuration, "Driving Coach Conversations", "Archive", (Trim(value) != "") ? Trim(value) : false)
 
-			setMultiMapValue(configuration, "Driving Coach Shutdown", simulator . ".SaveRaceReport", simulatorConfiguration["SaveRaceReport"])
-			setMultiMapValue(configuration, "Driving Coach Shutdown", simulator . ".SaveTelemetry", simulatorConfiguration["SaveTelemetry"])
-			setMultiMapValue(configuration, "Driving Coach Shutdown", simulator . ".RaceReview", simulatorConfiguration["RaceReview"])
-		}
+		setMultiMapValue(configuration, "Driving Coach Service", "Service", values2String("|", service
+																							 , Trim(this.Control["dcServiceURLEdit"].Text)
+																							 , Trim(this.Control["dcServiceKeyEdit"].Text)))
+
+		value := this.Control["dcModelDropDown"].Text
+
+		setMultiMapValue(configuration, "Driving Coach Service", "Model", (Trim(value) != "") ? Trim(value) : false)
+
+		setMultiMapValue(configuration, "Driving Coach Service", "MaxTokens", this.Control["dcMaxTokensEdit"].Text)
+
+		setMultiMapValue(configuration, "Driving Coach Service", "OpenAI.ServiceURL", this.Value["OpenAI.serviceURL"])
+		setMultiMapValue(configuration, "Driving Coach Service", "OpenAI.ServiceKey", this.Value["OpenAI.serviceKey"])
+		setMultiMapValue(configuration, "Driving Coach Personality", "OpenAI.Instructions.Character", this.Value["OpenAI.instructions.character"])
+		setMultiMapValue(configuration, "Driving Coach Personality", "OpenAI.Instructions.Simulation", this.Value["OpenAI.instructions.simulation"])
+		setMultiMapValue(configuration, "Driving Coach Personality", "OpenAI.Instructions.Stint", this.Value["OpenAI.instructions.stint"])
+
+		setMultiMapValue(configuration, "Driving Coach Service", "GPT4All.ServiceURL", this.Value["GPT4All.serviceURL"])
+		setMultiMapValue(configuration, "Driving Coach Service", "GPT4All.ServiceKey", this.Value["GPT4All.serviceKey"])
+		setMultiMapValue(configuration, "Driving Coach Personality", "GPT4All.Instructions.Character", this.Value["GPT4All.instructions.character"])
+		setMultiMapValue(configuration, "Driving Coach Personality", "GPT4All.Instructions.Simulation", this.Value["GPT4All.instructions.simulation"])
+		setMultiMapValue(configuration, "Driving Coach Personality", "GPT4All.Instructions.Stint", this.Value["GPT4All.instructions.stint"])
+
+		setMultiMapValue(configuration, "Driving Coach Personality", "MaxHistory", this.Control["dcMaxHistoryEdit"].Text)
+		setMultiMapValue(configuration, "Driving Coach Personality", "Temperature", this.Control["dcTemperatureEdit"].Text / 100)
+
+		setMultiMapValue(configuration, "Driving Coach Personality", "Instructions.Character", this.Value[service . ".instructions.character"])
+		setMultiMapValue(configuration, "Driving Coach Personality", "Instructions.Simulation", this.Value[service . ".instructions.simulation"])
+		setMultiMapValue(configuration, "Driving Coach Personality", "Instructions.Stint", this.Value[service . ".instructions.stint"])
 	}
 
-	loadConfigurator(configuration, simulators) {
+	loadConfigurator(configuration, simulators := false) {
 		this.loadFromConfiguration(configuration)
-return
-		this.Control["raceReportsPathEdit"].Text := this.Value["raceReportsPath"]
 
-		this.setSimulators(simulators)
+		this.Control["dcConversationsPathEdit"].Text := this.Value["conversationsPath"]
+		this.Control["dcServiceURLEdit"].Text := this.Value["serviceURL"]
+		this.Control["dcServiceKeyEdit"].Text := this.Value["serviceKey"]
+
+		model := this.Value["model"]
+
+		this.Control["dcModelDropDown"].Delete()
+
+		if (this.Value["service"] = "OpenAI")
+			this.Control["dcModelDropDown"].Add(["GPT 3.5 turbo", "GPT 3.5 turbo 16k", "GPT 4", "GPT 4 32k"])
+
+		if model {
+			this.Control["dcModelDropDown"].Add([model])
+			this.Control["dcModelDropDown"].Choose(((this.Value["service"] = "OpenAI") ? 4 : 0) + 1)
+		}
+		else
+			this.Control["dcModelDropDown"].Choose((this.Value["service"] = "OpenAI") ? 1 : 0)
+
+		this.Control["dcMaxTokensEdit"].Text := this.Value["maxTokens"]
+
+		this.Control["dcTemperatureEdit"].Text := Round(this.Value["temperature"] * 100)
+		this.Control["dcMaxHistoryEdit"].Text := this.Value["maxHistory"]
+
+		this.Control["dcInstructionsDropDown"].Choose(1)
+		this.Control["dcInstructionsEdit"].Value := this.Value["instructions.character"]
+
+		this.updateState()
 	}
 
 	show() {
 		super.show()
 
-		this.loadConfigurator(this.Configuration, this.getSimulators())
+		this.loadConfigurator(this.Configuration)
 	}
 
-	loadSimulatorConfiguration(simulator := false) {
-		local configuration
-
-		if simulator
-			this.Control["rsSimulatorDropDown"].Choose(inList(this.iSimulators, simulator))
-
-		this.iCurrentSimulator := this.Control["rsSimulatorDropDown"].Text
-
-		if this.iSimulatorConfigurations.Has(this.iCurrentSimulator) {
-			configuration := this.iSimulatorConfigurations[this.iCurrentSimulator]
-
-			this.Control["rsSaveRaceReportDropDown"].Choose(inList(["Ask", "Always", "Never"], configuration["SaveRaceReport"]))
-			this.Control["rsSaveTelemetryDropDown"].Choose(inList(["Ask", "Always", "Never"], configuration["SaveTelemetry"]))
-			this.Control["rsRaceReviewDropDown"].Choose(inList(["No", "Yes"], configuration["RaceReview"]))
-			this.Control["rsLearningLapsEdit"].Text := configuration["LearningLaps"]
-			this.Control["rsLapsConsideredEdit"].Text := configuration["ConsideredHistoryLaps"]
-
-			this.Control["rsDampingFactorEdit"].Text := displayValue("Float", configuration["HistoryLapsDamping"], 1)
-			this.Control["rsDampingFactorEdit"].ValidText := this.Control["rsDampingFactorEdit"].Text
+	updateState() {
+		if (this.Control["dcServiceDropDown"].Text = "GPT4ALL") {
+			this.Control["dcServiceKeyEdit"].Enabled := false
+			this.Control["dcServiceKeyEdit"].Text := ""
 		}
-	}
-
-	saveSimulatorConfiguration() {
-		local configuration
-
-		if this.iCurrentSimulator {
-			configuration := this.iSimulatorConfigurations[this.iCurrentSimulator]
-
-			configuration["LearningLaps"] := this.Control["rsLearningLapsEdit"].Text
-			configuration["ConsideredHistoryLaps"] := this.Control["rsLapsConsideredEdit"].Text
-			configuration["HistoryLapsDamping"] := internalValue("Float", this.Control["rsDampingFactorEdit"].Text)
-			configuration["SaveRaceReport"] := ["Ask", "Always", "Never"][this.Control["rsSaveRaceReportDropDown"].Value]
-			configuration["SaveTelemetry"] := ["Ask", "Always", "Never"][this.Control["rsSaveTelemetryDropDown"].Value]
-			configuration["RaceReview"] := ["No", "Yes"][this.Control["rsRaceReviewDropDown"].Value]
-		}
-	}
-
-	setSimulators(simulators) {
-		this.iSimulators := simulators
-
-		this.Control["rsSimulatorDropDown"].Delete()
-		this.Control["rsSimulatorDropDown"].Add(simulators)
-
-		if (simulators.Length > 0) {
-			this.loadFromConfiguration(this.Configuration)
-
-			this.loadSimulatorConfiguration(simulators[1])
-		}
-	}
-
-	getSimulators() {
-		return this.Editor.getSimulators()
-	}
-
-	replicateSettings() {
-		local configuration, simulator, simulatorConfiguration
-
-		this.saveSimulatorConfiguration()
-
-		configuration := this.iSimulatorConfigurations[this.iCurrentSimulator]
-
-		for simulator, simulatorConfiguration in this.iSimulatorConfigurations
-			if (simulator != this.iCurrentSimulator)
-				for ignore, key in ["LearningLaps", "ConsideredHistoryLaps", "HistoryLapsDamping", "SaveRaceReport", "SaveTelemetry", "RaceReview"]
-					simulatorConfiguration[key] := configuration[key]
+		else
+			this.Control["dcServiceKeyEdit"].Enabled := true
 	}
 }
 

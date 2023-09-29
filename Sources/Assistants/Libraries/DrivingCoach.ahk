@@ -186,7 +186,22 @@ class DrivingCoach extends GridRaceAssistant {
 
 			body.messages := messages
 
-			answer := WinHttpRequest().POST(this.Server, JSON.print(body), headers, {Object: true, Encoding: "UTF-8"}).JSON
+			body := JSON.print(body)
+
+			if isDebug {
+				deleteFile(kTempDirectory . "Chat.request")
+
+				FileAppend(body, kTempDirectory . "Chat.request")
+			}
+
+			answer := WinHttpRequest().POST(this.Server, body, headers, {Object: true, Encoding: "UTF-8"}).JSON
+
+			if isDebug {
+				deleteFile(kTempDirectory . "Chat.response")
+
+				FileAppend(JSON.print(answer), kTempDirectory . "Chat.response")
+			}
+
 			answer := answer["choices"][1]["message"]["content"]
 
 			this.AddConversation(question, answer)
@@ -200,7 +215,7 @@ class DrivingCoach extends GridRaceAssistant {
 			Get {
 				if !external {
 					if inList(["GPT 3.5 turbo", "GPT 3.5 turbo 16k", "GPT 4", "GPT 4 32k"], this.iModel)
-						return StrReplace(super.Model, A_Space, "-")
+						return StrLower(StrReplace(super.Model, A_Space, "-"))
 					else
 						return super.Model
 				}
@@ -235,6 +250,8 @@ class DrivingCoach extends GridRaceAssistant {
 		, synthesizer := false, speaker := false, vocalics := false, recognizer := false, listener := false, muted := false, voiceServer := false) {
 		super.__New(configuration, "Driving Coach", remoteHandler, name, language, synthesizer, speaker, vocalics, recognizer, listener, muted, voiceServer)
 
+		setMultiMapValue(configuration ? configuration : kSimulatorConfiguration, "Voice Control", "Speaker.NoiseVolume", 0)
+
 		DirCreate(this.Options["Driving Coach.Archive"])
 	}
 
@@ -254,8 +271,6 @@ class DrivingCoach extends GridRaceAssistant {
 		options["Driving Coach.Instructions.Character"] := getMultiMapValue(configuration, "Driving Coach Personality", "Instructions.Character", false)
 		options["Driving Coach.Instructions.Simulation"] := getMultiMapValue(configuration, "Driving Coach Personality", "Instructions.Simulation", false)
 		options["Driving Coach.Instructions.Stint"] := getMultiMapValue(configuration, "Driving Coach Personality", "Instructions.Stint", false)
-
-		setMultiMapValue(configuration, "Voice Control", "Speaker.NoiseVolume", 0)
 	}
 
 	startConversation() {
@@ -299,40 +314,36 @@ class DrivingCoach extends GridRaceAssistant {
 	handleVoiceText(grammar, text) {
 		local answer := false
 
-		if this.Connector {
-			try {
-				if this.Speaker
-					this.getSpeaker().speakPhrase("Confirm")
+		try {
+			if this.Speaker
+				this.getSpeaker().speakPhrase("Confirm")
 
-				if !this.Connector
-					this.startConversation()
+			if !this.Connector
+				this.startConversation()
 
-				answer := this.Connector.Ask(text)
-			}
-			catch Any as exception {
-				if this.Speaker
-					this.getSpeaker().speakPhrase("Later")
-
-				logError(exception, true)
-
-				logMessage(kLogCritical, substituteVariables(translate("Cannot connect to GPT service (%service%) - please check the configuration")
-														   , {service: this.Options["Driving Coach.Service"]}))
-
-				showMessage(substituteVariables(translate("Cannot connect to GPT service (%service%) - please check the configuration...")
-											  , {service: this.Options["Driving Coach.Service"]})
-						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-			}
-
-			if answer {
-				if this.Speaker
-					this.getSpeaker().speak(answer)
-
-				if this.Transcript
-					FileAppend(translate("-- Driver --------") . "`n`n" . text . "`n`n" . translate("-- Coach ---------") . "`n`n" . answer . "`n`n", this.Transcript)
-			}
+			answer := this.Connector.Ask(text)
 		}
-		else if this.Speaker
-			this.getSpeaker().speakPhrase("Later")
+		catch Any as exception {
+			if this.Speaker
+				this.getSpeaker().speakPhrase("Later")
+
+			logError(exception, true)
+
+			logMessage(kLogCritical, substituteVariables(translate("Cannot connect to GPT service (%service%) - please check the configuration")
+													   , {service: this.Options["Driving Coach.Service"]}))
+
+			showMessage(substituteVariables(translate("Cannot connect to GPT service (%service%) - please check the configuration...")
+										  , {service: this.Options["Driving Coach.Service"]})
+					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+		}
+
+		if answer {
+			if this.Speaker
+				this.getSpeaker().speak(answer)
+
+			if this.Transcript
+				FileAppend(translate("-- Driver --------") . "`n`n" . text . "`n`n" . translate("-- Coach ---------") . "`n`n" . answer . "`n`n", this.Transcript)
+		}
 	}
 
 	startSession(settings, data) {

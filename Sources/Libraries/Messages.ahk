@@ -179,6 +179,10 @@ class MessageManager extends PeriodicTask {
 		}
 	}
 
+	static isPaused() {
+		return MessageManager.Instance.iPaused
+	}
+
 	static pause() {
 		MessageManager.Instance.iPaused := true
 	}

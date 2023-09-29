@@ -1504,8 +1504,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			A_TrayMenu.Uncheck(label)
 	}
 
-	enableRaceAssistant(label := false, force := false) {
-		if (!this.RaceAssistantEnabled || force) {
+	enableRaceAssistant(label := false, startup := false) {
+		if (!this.RaceAssistantEnabled || startup) {
 			this.iRaceAssistantEnabled := (this.RaceAssistantName != false)
 
 			if this.RaceAssistantEnabled {
@@ -1518,10 +1518,10 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		}
 	}
 
-	disableRaceAssistant(label := false, force := false) {
+	disableRaceAssistant(label := false, startup := false) {
 		local ignore, assistant
 
-		if (this.RaceAssistantEnabled || force) {
+		if (this.RaceAssistantEnabled || startup) {
 			label := translate(this.Plugin)
 
 			trayMessage(label, translate("State: Off"))

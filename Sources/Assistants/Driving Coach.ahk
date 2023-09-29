@@ -195,8 +195,6 @@ startupDrivingCoach() {
 
 	if remotePID
 		Task.startTask(PeriodicTask(checkRemoteProcessAlive.Bind(remotePID), 10000, kLowPriority))
-
-	return
 }
 
 

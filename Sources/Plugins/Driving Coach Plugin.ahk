@@ -9,6 +9,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include "..\Libraries\Task.ahk"
 #Include "Libraries\RaceAssistantPlugin.ahk"
 
 
@@ -68,14 +69,21 @@ class DrivingCoachPlugin extends RaceAssistantPlugin  {
 			super.writePluginState(configuration, false)
 	}
 
-	enableRaceAssistant(label := false, force := false) {
-		super.enableRaceAssistant(label, force)
+	enableRaceAssistant(label := false, startup := false) {
+		startCoach() {
+			if MessageManager.isPaused()
+				return Task.CurrentTask
+			else
+				this.requireRaceAssistant()
+		}
 
-		this.requireRaceAssistant()
+		super.enableRaceAssistant(label, startup)
+
+		Task.startTask(startCoach, 1000, kLowPriority)
 	}
 
-	disableRaceAssistant(label := false, force := false) {
-		super.disableRaceAssistant(label, force)
+	disableRaceAssistant(label := false, startup := false) {
+		super.disableRaceAssistant(label, startup)
 
 		this.shutdownRaceAssistant(true)
 	}

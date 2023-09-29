@@ -56,14 +56,14 @@ namespace Speech
             _azureRecognizer.SetLanguage(language);
         }
 
-        public void SetContinuous(dynamic continuous)
+        public void SetContinuous(bool enabled, dynamic callback = null)
         {
-            _continuousMode = (continuous != null) && (continuous != false);
+            _continuousMode = enabled;
 
-            if ((_engineType == "Server") && (continuous != null) && (continuous != false))
+            if ((_engineType == "Server") && enabled)
                 throw new Exception("Not supported");
-            else if (_engineType == "Desktop")
-                _desktopRecognizer.SetContinuous(continuous);
+            else if ((_engineType == "Desktop") && enabled)
+                _desktopRecognizer.SetContinuous(callback);
         }
 
         public string OkCheck()
@@ -590,7 +590,7 @@ namespace Speech
             new Dictionary<string, System.Speech.Recognition.Choices>(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, LoadedGrammar> _loadedGrammarDictionary = new Dictionary<string, LoadedGrammar>(StringComparer.OrdinalIgnoreCase);
 
-        private dynamic _continuous = null;
+        private dynamic _continuousCallback = null;
 
         #region Startup
         public DesktopSpeechRecognizer()
@@ -613,9 +613,9 @@ namespace Speech
             _choicesDictionary.Add("Digit", digitChoices);
         }
 
-        public void SetContinuous(dynamic continuous)
+        public void SetContinuous(dynamic callback)
         {
-            _continuous = continuous;
+            this._continuousCallback = callback;
         }
 
         /// <summary>
@@ -640,7 +640,7 @@ namespace Speech
             // Configure the input to the speech recognizer.
             _recognizer.SetInputToDefaultAudioDevice();
 
-            if ((_continuous != null) && (_continuous != false))
+            if (_continuousCallback != null)
             {
                 DictationGrammar grammar = new DictationGrammar("grammar:dictation");
                 grammar.Name = "Continuous";
@@ -659,7 +659,7 @@ namespace Speech
         /// <returns></returns>
         public string LoadGrammar(DesktopGrammar grammar, string name, dynamic callback)
         {
-            if ((_continuous != null) && (_continuous != false))
+            if (this._continuousCallback != null)
                 throw new Exception("Not supported in continuous mode.");
 
             _loadedGrammarDictionary.Add(name, new LoadedGrammar { Grammar = grammar, Callback = callback });
@@ -816,10 +816,10 @@ namespace Speech
                 words[i] = e.Result.Words[i].Text;
             }
 
-            if ((_continuous != null) && (_continuous != false))
+            if (_continuousCallback != null)
                 try
                 {
-                    _continuous(name, words);
+                    _continuousCallback(name, words);
                 }
                 catch
                 {

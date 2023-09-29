@@ -102,6 +102,12 @@
   - [Managing Car Setups](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#managing-car-setups)
   - [Extending and Customizing](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#extending-and-cutomizing-setup-workbench)
 
+[Virtual Driving Coach](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach)
+------
+  - [Introduction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#introduction)
+  - [Installation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#installation)
+  - [Interacting with Aiden](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#interacting-with-aiden)
+
 [Virtual Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer)
 ------
   - [Introduction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#introduction)

@@ -875,7 +875,7 @@ class VoiceManager {
 	}
 
 	startListener() {
-		local recognizer
+		local recognizer, mode
 
 		static initialized := false
 
@@ -885,7 +885,8 @@ class VoiceManager {
 			if this.VoiceServer
 				this.buildGrammars(false, this.Language)
 			else {
-				recognizer := VoiceManager.LocalRecognizer(this, this.Recognizer, this.Listener, this.Language)
+				recognizer := VoiceManager.LocalRecognizer(this, this.Recognizer, this.Listener, this.Language, false
+														 , getMultiMapValue(this.getGrammars(this.Language), "Configuration", "Recognizer", "Grammar"))
 
 				this.buildGrammars(recognizer, this.Language)
 
@@ -904,7 +905,7 @@ class VoiceManager {
 	startListening(retry := true) {
 		static audioDevice := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Audio Settings.ini"), "Output", "Activation.AudioDevice", false)
 
-		if this.iSpeechRecognizer && !this.Listening
+		if (this.iSpeechRecognizer && !this.Listening)
 			if !this.iSpeechRecognizer.startRecognizer() {
 				if retry
 					Task.startTask(ObjBindMethod(this, "startListening", true), 200)
@@ -925,7 +926,7 @@ class VoiceManager {
 	}
 
 	stopListening(retry := false) {
-		if this.iSpeechRecognizer && this.Listening
+		if (this.iSpeechRecognizer && this.Listening)
 			if !this.iSpeechRecognizer.stopRecognizer() {
 				if retry
 					Task.startTask(ObjBindMethod(this, "stopListening", true), 200)
@@ -1012,8 +1013,6 @@ class VoiceManager {
 				speechRecognizer.setChoices(name, choices)
 			else
 				messageSend(kFileMessage, "Voice", "registerChoices:" . values2String(";", this.Name, name, string2Values(",", choices)*), this.VoiceServer)
-
-		speechRecognizer.setMode(mode)
 
 		for grammar, definition in getMultiMapValues(grammars, "Listener Grammars") {
 			definition := substituteVariables(definition, {name: this.Name})

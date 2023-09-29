@@ -493,6 +493,18 @@ Many simulation games provide an ingame multiplayer text based chat system. Sinc
 
 In the first field, you define the push button function for the given chat message on one of your hardware controllers. You also need to specify a small label text to display on the visual representation of your controller and you specifiy the long chat message, which will be send to the ingame chat system, when the corresponding button is pressed.
 
+### Tab *Driving Coach*
+
+The [Virtual Driving Coach](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach) can be configured on this tab.
+
+![](*)
+
+You **must** supply an API key for a chatbot service (currently only *OpenAI* is supported), otherwise the coach will not react to your questions. And you should supply the different instructions for the chatbot, so that it knows as much as possible about its duties. Especially the "Character" instructions is important, so that the chatbot *knows* how to behave as a driving coach. Defaults will be provided here for all supported languages. Other instructions may be used depending on the current context and the situation at the time of your conversation.
+
+You must also specify the speech recognition engine to be used by the chatbot. Since free speech must be handled, recognition quality is very important. The "Azure" engine is preferred, but the "Desktop" recognition engine will also be quite good when used with a headset. The "Server" recognition engine is not available, because it does not support free speech recognition.
+
+The conversations you have with your coach, will be transcribed to text files. You can supply a special folder, where these transcriptions will be saved, in the first field. If you leave this field empty, the transcriptions will be saved temporarily in the *Simulator Controller\Temp\Conversations* folder which is located in the user *Documents* folder.
+
 ### Tab *Race Engineer*
 
 With the settings on this tab, the dynamic behaviour of the [Virtual Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer) and its integration with the [session database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--session-database) can be customized. All options can be chosen independently for each configured simulation game.

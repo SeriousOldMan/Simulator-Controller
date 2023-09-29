@@ -153,8 +153,6 @@ class VoiceServer extends ConfigurationItem {
 				this.iVoiceClient := voiceClient
 
 				super.__New(arguments*)
-
-				this.setMode(voiceClient.RecognizerMode)
 			}
 
 			textRecognized(text) {
@@ -315,7 +313,8 @@ class VoiceServer extends ConfigurationItem {
 		SpeechRecognizer[create := false] {
 			Get {
 				if (!this.iSpeechRecognizer && create && this.Listener)
-					this.iSpeechRecognizer := VoiceServer.VoiceClient.ClientSpeechRecognizer(this, this.Recognizer, this.Listener, this.Language)
+					this.iSpeechRecognizer := VoiceServer.VoiceClient.ClientSpeechRecognizer(this, this.Recognizer, this.Listener
+																						   , this.Language, false, this.RecognizerMode)
 
 				return this.iSpeechRecognizer
 			}

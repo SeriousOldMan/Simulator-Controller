@@ -5,6 +5,17 @@ Recognizer=Text
 Call=[{Hi, Hey} %name%, %name% hörst du mich, %name% ich brauche Dich, Hey %name% wo bist Du]
 [Speaker Phrases]
 // Conversation //
+Confirm.1=Verstanden, gib mir einen Moment.
+Confirm.2=Alles klar, einen Moment bitte.
+Confirm.3=Verstanden, Ich melde mich so schnell ich kann.
+Confirm.4=Alles klar, gib mir ein paar Sekunden.
+Comfirm.5=Warte kurz. Ich bin gleich wieder da.
+Comfirm.6=Okay, ich kümmere mich sofort.
+IHearYou.1=Ich bin da. Was kann ich für Dich tun?
+IHearYou.2=Ja, %driver%? Hast Du mich gerufen?
+IHearYou.3=Ich höre Dich. Was kann ich tun?
+IHearYou.4=Ja, was brauchst Du?
+IHearYou.5=Du kommst perfekt rüber. Was ist?
 Later.1=Sorry, ich bin gerade beschäftigt. Bitte melde Dich später noch mal.
 Later.2=Ich telefoniere gerade auf der anderen Leitung. Gib mir etwas Zeit.
 Later.3=Ich muss gerade noch ein paar Daten auswerten. Melde Dich in 5 Minuten noch einmal.

@@ -250,8 +250,6 @@ class DrivingCoach extends GridRaceAssistant {
 		, synthesizer := false, speaker := false, vocalics := false, recognizer := false, listener := false, muted := false, voiceServer := false) {
 		super.__New(configuration, "Driving Coach", remoteHandler, name, language, synthesizer, speaker, vocalics, recognizer, listener, muted, voiceServer)
 
-		setMultiMapValue(configuration ? configuration : kSimulatorConfiguration, "Voice Control", "Speaker.NoiseVolume", 0)
-
 		DirCreate(this.Options["Driving Coach.Archive"])
 	}
 
@@ -316,7 +314,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 		try {
 			if this.Speaker
-				this.getSpeaker().speakPhrase("Confirm")
+				this.getSpeaker().speakPhrase("Confirm", false, false, false, {Noise: false})
 
 			if !this.Connector
 				this.startConversation()
@@ -325,7 +323,7 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 		catch Any as exception {
 			if this.Speaker
-				this.getSpeaker().speakPhrase("Later")
+				this.getSpeaker().speakPhrase("Later", false, false, false, {Noise: false})
 
 			logError(exception, true)
 
@@ -339,7 +337,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 		if answer {
 			if this.Speaker
-				this.getSpeaker().speak(answer)
+				this.getSpeaker().speak(answer, false, false, {Noise: false})
 
 			if this.Transcript
 				FileAppend(translate("-- Driver --------") . "`n`n" . text . "`n`n" . translate("-- Coach ---------") . "`n`n" . answer . "`n`n", this.Transcript)

@@ -340,7 +340,7 @@ class VoiceServer extends ConfigurationItem {
 			this.iDeactivationCallback := deactivationCallback
 		}
 
-		speak(text) {
+		speak(text, options := false) {
 			local tries := 5
 			local stopped, oldSpeaking, oldInterruptable
 
@@ -360,10 +360,10 @@ class VoiceServer extends ConfigurationItem {
 				try {
 					while (tries-- > 0) {
 						if (tries == 0)
-							this.SpeechSynthesizer[true].speak(text, true)
+							this.SpeechSynthesizer[true].speak(text, true, false, options)
 						else {
 							if !this.Interrupted
-								this.SpeechSynthesizer[true].speak(text, true)
+								this.SpeechSynthesizer[true].speak(text, true, false, options)
 
 							if this.Interrupted {
 								Sleep(2000)
@@ -1000,18 +1000,18 @@ class VoiceServer extends ConfigurationItem {
 			this.unmute()
 	}
 
-	speak(descriptor, text, activate := false) {
+	speak(descriptor, text, activate := false, options := false) {
 		local oldSpeaking := this.Speaking
 
 		text := text
 
 		if this.Speaking
-			Task.startTask(ObjBindMethod(this, "speak", descriptor, text, activate))
+			Task.startTask(ObjBindMethod(this, "speak", descriptor, text, activate, options))
 		else {
 			this.iSpeaking := true
 
 			try {
-				this.getVoiceClient(descriptor).speak(text)
+				this.getVoiceClient(descriptor).speak(text, options ? string2Map("|", "->", options) : false)
 
 				if activate
 					this.activateVoiceClient(descriptor)

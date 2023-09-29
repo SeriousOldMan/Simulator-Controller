@@ -136,7 +136,7 @@ class VoiceManager {
 				this.iIsTalking := true
 		}
 
-		endTalk() {
+		endTalk(options := false) {
 			local text, focus
 
 			if this.Talking {
@@ -148,20 +148,23 @@ class VoiceManager {
 				this.iIsTalking := false
 
 				if (StrLen(Trim(text)) > 0)
-					this.speak(text, focus)
+					this.speak(text, focus, false, options)
 			}
 		}
 
-		speak(text, focus := false, cache := false) {
+		speak(text, focus := false, cache := false, options := false) {
 			if this.Talking {
 				this.iText .= (A_Space . text)
 				this.iFocus := (this.iFocus || focus)
+
+				if options
+					throw "Options are not supported while talking..."
 			}
 			else
-				messageSend(kFileMessage, "Voice", "speak:" . values2String(";", this.VoiceManager.Name, text, focus), this.VoiceManager.VoiceServer)
+				messageSend(kFileMessage, "Voice", "speak:" . values2String(";", this.VoiceManager.Name, text, focus, options ? map2String("|", "->", toMap(options)) : false), this.VoiceManager.VoiceServer)
 		}
 
-		speakPhrase(phrase, variables := false, focus := false, cache := false) {
+		speakPhrase(phrase, variables := false, focus := false, cache := false, options := false) {
 			local phrases := this.Phrases
 			local index
 
@@ -177,7 +180,7 @@ class VoiceManager {
 			}
 
 			if phrase
-				this.speak(phrase, focus, cache)
+				this.speak(phrase, focus, cache, options)
 		}
 
 		number2Speech(number, precision := kUndefined) {
@@ -264,7 +267,7 @@ class VoiceManager {
 				this.iIsTalking := true
 		}
 
-		endTalk() {
+		endTalk(options := false) {
 			local text, focus
 
 			if this.Talking {
@@ -276,16 +279,19 @@ class VoiceManager {
 				this.iIsTalking := false
 
 				if (StrLen(Trim(text)) > 0)
-					this.speak(text, focus)
+					this.speak(text, focus, false, options)
 			}
 		}
 
-		speak(text, focus := false, cache := false) {
+		speak(text, focus := false, cache := false, options := false) {
 			local stopped
 
 			if this.Talking {
 				this.iText .= (A_Space . text)
 				this.iFocus := (this.iFocus || focus)
+
+				if options
+					throw "Options are not supported while talking..."
 			}
 			else {
 				stopped := this.VoiceManager.stopListening()
@@ -294,7 +300,7 @@ class VoiceManager {
 					this.Speaking := true
 
 					try {
-						super.speak(text, !this.Awaitable, cache)
+						super.speak(text, !this.Awaitable, cache, options)
 					}
 					finally {
 						this.Speaking := false
@@ -307,7 +313,7 @@ class VoiceManager {
 			}
 		}
 
-		speakPhrase(phrase, variables := false, focus := false, cache := false) {
+		speakPhrase(phrase, variables := false, focus := false, cache := false, options := false) {
 			local phrases := this.Phrases
 			local index
 
@@ -323,7 +329,7 @@ class VoiceManager {
 			}
 
 			if phrase
-				this.speak(phrase, focus, cache)
+				this.speak(phrase, focus, cache, options)
 		}
 
 		number2Speech(number, precision := kUndefined) {

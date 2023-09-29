@@ -411,11 +411,14 @@ class SpeechSynthesizer {
 		}
 	}
 
-	speak(text, wait := true, cache := false) {
+	speak(text, wait := true, cache := false, options := false) {
 		local cacheFileName, tempName, temp1Name, temp2Name, callback, volume
 		local overdriveGain, overdriveColor, filterHighpass, filterLowpass, noiseVolume, clickVolume
 
 		static counter := 1
+
+		if options
+			options := toMap(options)
 
 		this.wait()
 
@@ -469,13 +472,36 @@ class SpeechSynthesizer {
 				return
 			}
 
-			overdriveGain := getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Speaker.Overdrive", 20)
-			overdriveColor := getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Speaker.Color", 20)
-			filterHighpass := getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Speaker.HighPass", 800)
-			filterLowpass := getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Speaker.LowPass", 1800)
+			if (!options || !options.Has("Distort") || options["Distort"]) {
+				overdriveGain := getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Speaker.Overdrive", 20)
+				overdriveColor := getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Speaker.Color", 20)
+				filterHighpass := getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Speaker.HighPass", 800)
+				filterLowpass := getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Speaker.LowPass", 1800)
+
+				if !isInteger(overDriveGain)
+					overDriveGain := 20
+
+				if !isInteger(overDriveColor)
+					overDriveColor := 20
+
+				if !isInteger(filterHighpass)
+					filterHighpass := 800
+
+				if !isInteger(filterLowpass)
+					filterLowpass := 1800
+			}
+			else {
+				overdriveGain := 0
+				overdriveColor := 0
+				filterHighpass := 50
+				filterLowpass := 10800
+			}
 
 			try {
-				noiseVolume := Round(0.3 * getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Speaker.NoiseVolume", 66) / 100, 2)
+				if (!options || !options.Has("Noise") || options["Noise"])
+					noiseVolume := Round(0.3 * getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Speaker.NoiseVolume", 66) / 100, 2)
+				else
+					noiseVolume := 0
 			}
 			catch Any as exception {
 				logError(exception, true)
@@ -484,25 +510,16 @@ class SpeechSynthesizer {
 			}
 
 			try {
-				clickVolume := Round(0.6 * getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Speaker.ClickVolume", 80) / 100, 2)
+				if (!options || !options.Has("Click") || options["Click"])
+					clickVolume := Round(0.6 * getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Speaker.ClickVolume", 80) / 100, 2)
+				else
+					clickVolume := 0
 			}
 			catch Any as exception {
 				logError(exception, true)
 
 				clickVolume := Round(0.6 * 66 / 100, 2)
 			}
-
-			if !isInteger(overDriveGain)
-				overDriveGain := 20
-
-			if !isInteger(overDriveColor)
-				overDriveColor := 20
-
-			if !isInteger(filterHighpass)
-				filterHighpass := 800
-
-			if !isInteger(filterLowpass)
-				filterLowpass := 1800
 
 			try {
 				try {

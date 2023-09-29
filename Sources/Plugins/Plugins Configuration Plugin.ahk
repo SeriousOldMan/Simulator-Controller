@@ -65,6 +65,8 @@ class PluginsConfigurator extends ConfigurationItemList {
 					Run("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-2")
 				case "Pedal Calibration":
 					Run("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-3")
+				case "Driving Coach":
+					Run("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-driving-coach")
 				case "Race Engineer":
 					Run("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer")
 				case "Race Strategist":

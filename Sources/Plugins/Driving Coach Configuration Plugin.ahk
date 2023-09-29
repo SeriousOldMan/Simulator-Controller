@@ -79,8 +79,10 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		}
 
 		chooseService(*) {
-			window["dcServiceURLEdit"].Text := this.Value[window["dcServiceDropDown"].Text . ".serviceURL"]
-			window["dcServiceKeyEdit"].Text := this.Value[window["dcServiceDropDown"].Text . ".serviceKey"]
+			window["dcServiceURLEdit"].Text := this.Value[window["dcProviderDropDown"].Text . ".serviceURL"]
+			window["dcServiceKeyEdit"].Text := this.Value[window["dcProviderDropDown"].Text . ".serviceKey"]
+
+			this.loadModels(window["dcProviderDropDown"].Text, this.Value[window["dcProviderDropDown"].Text . ".model"])
 
 			chooseInstructions()
 
@@ -88,23 +90,27 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		}
 
 		chooseInstructions(*) {
-			this.loadInstructions(window["dcServiceDropDown"].Text, window["dcModelDropDown"].Text, "instructions." . window["dcInstructionsDropDown"].Text)
+			this.loadInstructions(window["dcProviderDropDown"].Text, window["dcModelDropDown"].Text, "instructions." . window["dcInstructionsDropDown"].Text)
 
-			window["dcInstructionsEdit"].Value := this.Value[window["dcServiceDropDown"].Text . ".instructions." . window["dcInstructionsDropDown"].Text]
+			window["dcInstructionsEdit"].Value := this.Value[window["dcProviderDropDown"].Text . ".instructions." . window["dcInstructionsDropDown"].Text]
 
 			this.updateState()
 		}
 
 		updateURL(*) {
-			this.Value[window["dcServiceDropDown"].Text . ".serviceURL"] := window["dcServiceURLEdit"].Text
+			this.Value[window["dcProviderDropDown"].Text . ".serviceURL"] := window["dcServiceURLEdit"].Text
 		}
 
 		updateKey(*) {
-			this.Value[window["dcServiceDropDown"].Text . ".serviceKey"] := window["dcServiceKeyEdit"].Text
+			this.Value[window["dcProviderDropDown"].Text . ".serviceKey"] := window["dcServiceKeyEdit"].Text
+		}
+
+		updateModel(*) {
+			this.Value[window["dcProviderDropDown"].Text . ".model"] := window["dcModelDropDown"].Text
 		}
 
 		updateInstructions(*) {
-			this.Value[window["dcServiceDropDown"].Text . ".instructions." . window["dcInstructionsDropDown"].Text] := window["dcInstructionsEdit"].Value
+			this.Value[window["dcProviderDropDown"].Text . ".instructions." . window["dcInstructionsDropDown"].Text] := window["dcInstructionsEdit"].Value
 			this.Value["instructions." . window["dcInstructionsDropDown"].Text] := window["dcInstructionsEdit"].Value
 		}
 
@@ -131,15 +137,15 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 
 		window.SetFont("Italic", "Arial")
 		widget4 := window.Add("Text", "x" . x0 . " yp+40 w105 h23 Hidden", translate("Service"))
-		widget5 := window.Add("Text", "x120 yp+7 w" . (width + 8 - 120) . " 0x10 W:Grow Hidden")
-		window.SetFont("s8 Norm", "Arial")
+		widget5 := window.Add("Text", "x100 yp+7 w" . (width + 8 - 100) . " 0x10 W:Grow Hidden")
+		window.SetFont("Norm", "Arial")
 
 		widget6 := window.Add("Text", "x" . x0 . " yp+20 w105 h23 +0x200 Hidden", translate("Provider"))
 
  		choices := ["OpenAI", "GPT4ALL"]
 		chosen := (choices.Length > 0) ? 1 : 0
 
-		widget7 := window.Add("DropDownList", "x" . x1 . " yp w" . w1 . " Choose" . chosen . " vdcServiceDropDown Hidden", choices)
+		widget7 := window.Add("DropDownList", "x" . x1 . " yp w" . w1 . " Choose" . chosen . " vdcProviderDropDown Hidden", choices)
 		widget7.OnEvent("Change", chooseService)
 
 		widget8 := window.Add("Text", "x" . x0 . " yp+24 w80 h23 +0x200 Hidden", translate("Service URL"))
@@ -152,14 +158,15 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 
 		widget12 := window.Add("Text", "x" . x0 . " yp+30 w80 h23 +0x200 Hidden", translate("Model / # Tokens"))
 		widget13 := window.Add("ComboBox", "x" . x1 . " yp w" . (w1 - 64) . " vdcModelDropDown Hidden")
+		widget13.OnEvent("Change", updateModel)
 		widget14 := window.Add("Edit", "x" . (x1 + (w1 - 60)) . " yp-1 w60 h23 Number vdcMaxTokensEdit Hidden")
 		widget14.OnEvent("Change", validateTokens)
 		widget15 := window.Add("UpDown", "x" . (x1 + (w1 - 60)) . " yp w60 h23 Range200-32000 Hidden")
 
 		window.SetFont("Italic", "Arial")
 		widget16 := window.Add("Text", "x" . x0 . " yp+40 w105 h23 Hidden", translate("Personality"))
-		widget17 := window.Add("Text", "x120 yp+7 w" . (width + 8 - 120) . " 0x10 W:Grow Hidden")
-		window.SetFont("s8 Norm", "Arial")
+		widget17 := window.Add("Text", "x100 yp+7 w" . (width + 8 - 100) . " 0x10 W:Grow Hidden")
+		window.SetFont("Norm", "Arial")
 
 		widget18 := window.Add("Text", "x" . x0 . " yp+20 w80 h23 +0x200 Hidden", translate("Creativity"))
 		widget19 := window.Add("Edit", "x" . x1 . " yp w40 Number Limit3 vdcTemperatureEdit Hidden")
@@ -189,7 +196,21 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 			editor.registerWidget(this, widget%A_Index%)
 	}
 
-	loadInstructions(service, model, descriptor) {
+	loadModels(provider, model) {
+		this.Control["dcModelDropDown"].Delete()
+
+		if (provider = "OpenAI")
+			this.Control["dcModelDropDown"].Add(["GPT 3.5 turbo", "GPT 3.5 turbo 16k", "GPT 4", "GPT 4 32k"])
+
+		if model {
+			this.Control["dcModelDropDown"].Add([model])
+			this.Control["dcModelDropDown"].Choose(((provider = "OpenAI") ? 4 : 0) + 1)
+		}
+		else
+			this.Control["dcModelDropDown"].Choose((provider = "OpenAI") ? 1 : 0)
+	}
+
+	loadInstructions(provider, model, descriptor) {
 		getInstructionTemplate() {
 			local language := (isSet(SetupWizard) ? SetupWizard.Instance.getModuleValue("Driving Coach", "Language", getLanguage())
 												  : getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Language", getLanguage()))
@@ -199,11 +220,11 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 			return getMultiMapValue(templates, language, descriptor, "")
 		}
 
-		this.Value[descriptor] := this.Value[service . "." . descriptor]
+		this.Value[descriptor] := this.Value[provider . "." . descriptor]
 
 		if (this.Value[descriptor] = "") {
 			this.Value[descriptor] := getInstructionTemplate()
-			this.Value[service . "." . descriptor] := this.Value[descriptor]
+			this.Value[provider . "." . descriptor] := this.Value[descriptor]
 		}
 	}
 
@@ -216,6 +237,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 
 		this.Value["OpenAI.serviceURL"] := getMultiMapValue(configuration, "Driving Coach Service", "OpenAI.ServiceURL", "https://api.openai.com/v1/chat/completions")
 		this.Value["OpenAI.serviceKey"] := getMultiMapValue(configuration, "Driving Coach Service", "OpenAI.ServiceKey", "")
+		this.Value["OpenAI.model"] := getMultiMapValue(configuration, "Driving Coach Service", "OpenAI.Model", "")
 
 		this.Value["OpenAI.instructions.character"] := getMultiMapValue(configuration, "Driving Coach Personality", "OpenAI.Instructions.Character", "")
 		this.Value["OpenAI.instructions.simulation"] := getMultiMapValue(configuration, "Driving Coach Personality", "OpenAI.Instructions.Simulation", "")
@@ -223,6 +245,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 
 		this.Value["GPT4All.serviceURL"] := getMultiMapValue(configuration, "Driving Coach Service", "GPT4All.ServiceURL", "http://localhost:4891/v1")
 		this.Value["GPT4All.serviceKey"] := getMultiMapValue(configuration, "Driving Coach Service", "GPT4All.ServiceKey", "")
+		this.Value["GPT4All.model"] := getMultiMapValue(configuration, "Driving Coach Service", "GPT4All.Model", "")
 
 		this.Value["GPT4All.instructions.character"] := getMultiMapValue(configuration, "Driving Coach Personality", "GPT4All.Instructions.Character", "")
 		this.Value["GPT4All.instructions.simulation"] := getMultiMapValue(configuration, "Driving Coach Personality", "GPT4All.Instructions.Simulation", "")
@@ -233,19 +256,19 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		if (InStr(service, "OpenAI") = 1) {
 			service := string2Values("|", service)
 
-			this.Value["service"] := "OpenAI"
+			this.Value["provider"] := "OpenAI"
 			this.Value["serviceURL"] := service[2]
 			this.Value["serviceKey"] := service[3]
 		}
 		else if (InStr(service, "GPT4ALL") = 1) {
 			service := string2Values("|", service)
 
-			this.Value["service"] := "GPT4All"
+			this.Value["provider"] := "GPT4All"
 			this.Value["serviceURL"] := service[2]
 			this.Value["serviceKey"] := ""
 		}
 		else {
-			this.Value["service"] := "OpenAI"
+			this.Value["provider"] := "OpenAI"
 			this.Value["serviceURL"] := "https://api.openai.com/v1/chat/completions"
 			this.Value["serviceKey"] := ""
 		}
@@ -256,22 +279,22 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		this.Value["temperature"] := getMultiMapValue(configuration, "Driving Coach Personality", "Temperature", 0.5)
 		this.Value["maxHistory"] := getMultiMapValue(configuration, "Driving Coach Personality", "MaxHistory", 3)
 
-		this.loadInstructions(this.Value["service"], this.Value["model"], "instructions.character")
-		this.loadInstructions(this.Value["service"], this.Value["model"], "instructions.simulation")
-		this.loadInstructions(this.Value["service"], this.Value["model"], "instructions.stint")
+		this.loadInstructions(this.Value["provider"], this.Value["model"], "instructions.character")
+		this.loadInstructions(this.Value["provider"], this.Value["model"], "instructions.simulation")
+		this.loadInstructions(this.Value["provider"], this.Value["model"], "instructions.stint")
 	}
 
 	saveToConfiguration(configuration) {
-		local service, value
+		local provider, value
 
 		super.saveToConfiguration(configuration)
 
-		service := this.Control["dcServiceDropDown"].Text
+		provider := this.Control["dcProviderDropDown"].Text
 		value := this.Control["dcConversationsPathEdit"].Text
 
 		setMultiMapValue(configuration, "Driving Coach Conversations", "Archive", (Trim(value) != "") ? Trim(value) : false)
 
-		setMultiMapValue(configuration, "Driving Coach Service", "Service", values2String("|", service
+		setMultiMapValue(configuration, "Driving Coach Service", "Service", values2String("|", provider
 																							 , Trim(this.Control["dcServiceURLEdit"].Text)
 																							 , Trim(this.Control["dcServiceKeyEdit"].Text)))
 
@@ -283,12 +306,14 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 
 		setMultiMapValue(configuration, "Driving Coach Service", "OpenAI.ServiceURL", this.Value["OpenAI.serviceURL"])
 		setMultiMapValue(configuration, "Driving Coach Service", "OpenAI.ServiceKey", this.Value["OpenAI.serviceKey"])
+		setMultiMapValue(configuration, "Driving Coach Service", "OpenAI.Model", this.Value["OpenAI.model"])
 		setMultiMapValue(configuration, "Driving Coach Personality", "OpenAI.Instructions.Character", this.Value["OpenAI.instructions.character"])
 		setMultiMapValue(configuration, "Driving Coach Personality", "OpenAI.Instructions.Simulation", this.Value["OpenAI.instructions.simulation"])
 		setMultiMapValue(configuration, "Driving Coach Personality", "OpenAI.Instructions.Stint", this.Value["OpenAI.instructions.stint"])
 
 		setMultiMapValue(configuration, "Driving Coach Service", "GPT4All.ServiceURL", this.Value["GPT4All.serviceURL"])
 		setMultiMapValue(configuration, "Driving Coach Service", "GPT4All.ServiceKey", this.Value["GPT4All.serviceKey"])
+		setMultiMapValue(configuration, "Driving Coach Service", "GPT4All.Model", this.Value["GPT4All.model"])
 		setMultiMapValue(configuration, "Driving Coach Personality", "GPT4All.Instructions.Character", this.Value["GPT4All.instructions.character"])
 		setMultiMapValue(configuration, "Driving Coach Personality", "GPT4All.Instructions.Simulation", this.Value["GPT4All.instructions.simulation"])
 		setMultiMapValue(configuration, "Driving Coach Personality", "GPT4All.Instructions.Stint", this.Value["GPT4All.instructions.stint"])
@@ -296,31 +321,23 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		setMultiMapValue(configuration, "Driving Coach Personality", "MaxHistory", this.Control["dcMaxHistoryEdit"].Text)
 		setMultiMapValue(configuration, "Driving Coach Personality", "Temperature", this.Control["dcTemperatureEdit"].Text / 100)
 
-		setMultiMapValue(configuration, "Driving Coach Personality", "Instructions.Character", this.Value[service . ".instructions.character"])
-		setMultiMapValue(configuration, "Driving Coach Personality", "Instructions.Simulation", this.Value[service . ".instructions.simulation"])
-		setMultiMapValue(configuration, "Driving Coach Personality", "Instructions.Stint", this.Value[service . ".instructions.stint"])
+		setMultiMapValue(configuration, "Driving Coach Personality", "Instructions.Character", this.Value[provider . ".instructions.character"])
+		setMultiMapValue(configuration, "Driving Coach Personality", "Instructions.Simulation", this.Value[provider . ".instructions.simulation"])
+		setMultiMapValue(configuration, "Driving Coach Personality", "Instructions.Stint", this.Value[provider . ".instructions.stint"])
 	}
 
 	loadConfigurator(configuration, simulators := false) {
 		this.loadFromConfiguration(configuration)
 
 		this.Control["dcConversationsPathEdit"].Text := this.Value["conversationsPath"]
+
+		this.Control["dcProviderDropDown"].Choose(inList(["OpenAI", "GPT4All"], this.Value["provider"]))
 		this.Control["dcServiceURLEdit"].Text := this.Value["serviceURL"]
 		this.Control["dcServiceKeyEdit"].Text := this.Value["serviceKey"]
 
 		model := this.Value["model"]
 
-		this.Control["dcModelDropDown"].Delete()
-
-		if (this.Value["service"] = "OpenAI")
-			this.Control["dcModelDropDown"].Add(["GPT 3.5 turbo", "GPT 3.5 turbo 16k", "GPT 4", "GPT 4 32k"])
-
-		if model {
-			this.Control["dcModelDropDown"].Add([model])
-			this.Control["dcModelDropDown"].Choose(((this.Value["service"] = "OpenAI") ? 4 : 0) + 1)
-		}
-		else
-			this.Control["dcModelDropDown"].Choose((this.Value["service"] = "OpenAI") ? 1 : 0)
+		this.loadModels(this.Value["provider"], model)
 
 		this.Control["dcMaxTokensEdit"].Text := this.Value["maxTokens"]
 
@@ -340,7 +357,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 	}
 
 	updateState() {
-		if (this.Control["dcServiceDropDown"].Text = "GPT4ALL") {
+		if (this.Control["dcProviderDropDown"].Text = "GPT4ALL") {
 			this.Control["dcServiceKeyEdit"].Enabled := false
 			this.Control["dcServiceKeyEdit"].Text := ""
 		}

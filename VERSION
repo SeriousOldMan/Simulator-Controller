@@ -6,10 +6,10 @@ Download=
 Changes=New assistant "Driving Coach", New HTTP library, Added installer for .NET 6.0, Added full free text mode to speech recognition, New plugin "Driving Coach"
 Components=Media->5.3.0,Configuration->5.4.0,Utilities->5.3.0
 [Release]
-Version=5.3.1.2-release
-Date=09/26/2023
-Download=https://cutt.ly/XwvLSo0N;https://www.dropbox.com/scl/fi/f67erh47ax0wiv5pjkn12/Simulator-Controller-5.3.1.2-release.zip?rlkey=w0315nju2ckyh8nhnzj4zvrzx&dl=1
-Changes=Downloadable components for installation and update process, Fixed list update when adding a setting in "Session Database", Fixed rare off-by-one error for tyre set selection in ACC, Fixed Engineer to be optimistic in reporting the remaining laps on fuel, Fixed time in log files to be in 24 hour format, Fixed a couple of bugs in "Race Center" related to sector times, Migrated to AHK 2.09, Display time left on fuel in fuel widget in "Session Monitor", Optical enhancement in "Session Monitor" HTML generator, Prevent exit while tasks are running, Fixes for the Spanish translation, New car models for "Setup Workbench"
+Version=5.3.2.0-release
+Date=09/29/2023
+Download=https://cutt.ly/WwbfGxWv;https://www.dropbox.com/scl/fi/vixc57sptqri9fcctq1i5/Simulator-Controller-5.3.2.0-release.zip?rlkey=mha1mtzhnnh49alke4qcnc2g5&dl=1
+Changes=Performance improvement for ACC Pitstop MFD handling, Optimized last lap detection for timed races,  Migrated sources to AHK 2.0.10, Fixed manual installation, Detect removed software in "Simulator Setup", Changed semantics of tyre set handling in "Race Settings", New car models for "Setup Workbench"
 Components=Media->5.3.0,Configuration->5.3.0,Utilities->5.3.0
 [Components]
 Media.5.3.0.Path=Resources
@@ -28,4 +28,4 @@ Utilities.5.3.0.Download=https://www.dropbox.com/scl/fi/hlza8t9tae5d0vnd7wmqa/Ut
 Type=Development
 [Version]
 Development=5.4.0.0-dev
-Release=5.3.1.2-release
+Release=5.3.2.0-release

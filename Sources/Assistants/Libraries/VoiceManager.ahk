@@ -158,7 +158,7 @@ class VoiceManager {
 				this.iFocus := (this.iFocus || focus)
 			}
 			else
-				messageSend(kFileMessage, "Voice", "speak:" . values2String(";", this.VoiceManager.Name, encode(text), focus), this.VoiceManager.VoiceServer)
+				messageSend(kFileMessage, "Voice", "speak:" . values2String(";", this.VoiceManager.Name, text, focus), this.VoiceManager.VoiceServer)
 		}
 
 		speakPhrase(phrase, variables := false, focus := false, cache := false) {

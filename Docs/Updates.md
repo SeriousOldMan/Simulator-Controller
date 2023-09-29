@@ -45,7 +45,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 5.3.2
 
-No manual updates necessary.
+Tyre set handling has changed with this release. This is a specific feature for *Assetto Corsa Competizione*. You now have the choice to explicitly define the first tyre set to use for an upcoming pitstop, or you can set the tyre sets in "Race Settings" to "Auto", which will let ACC decide on its own, which tyre set to use (please be aware, that there is a bug in the automatic selection in ACC, when switching from wet to dry tyres, though). The automatic update procedure of this release will set the tyre sets to "Auto" in "Race Settings", which will be perfect for most users. If you also specified tyre sets in the settings in the "Session Database", you can remove the settings there.
 
 ***
 

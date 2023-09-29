@@ -11,6 +11,8 @@
      - Assetto Corsa
        - Shelby Cobra 427 S/C
 
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-532), because you may want to check the definition of tyre set handling for *Assetto Corsa Competizione*.
+
 ## 5.3.1.2-release 09/26/23
   1. Fixed a critical bug which creates an infinite loop during pitstop setup by the Engineer, when wrong tyre sets had been configured in the "Race Settings".
 

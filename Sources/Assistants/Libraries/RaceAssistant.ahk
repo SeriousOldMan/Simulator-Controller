@@ -458,11 +458,18 @@ class RaceAssistant extends ConfigurationItem {
 	__New(configuration, assistantType, remoteHandler, name := false, language := kUndefined
 		, synthesizer := false, speaker := false, vocalics := false, recognizer := false, listener := false, muted := false, voiceServer := false) {
 		global kUnknown
-		local options
+		
+		local userName := SessionDatabase.getUserName()
+		local options, forName, ignore
 
 		if !kUnknown
 			kUnknown := translate("Unknown")
+			
+		parseDriverName(userName, &forName, &ignore := false, &ignore := false)
 
+		this.iDriverForName := forName
+		this.iDriverFullName := userName
+		
 		this.iAssistantType := assistantType
 		this.iRemoteHandler := remoteHandler
 

@@ -135,21 +135,70 @@ class DrivingCoach extends GridRaceAssistant {
 				this.History.RemoveAt(1)
 		}
 
+		CreatePrompt(body) {
+			throw "Virtual method HTTPConnector.CreatePrompt must be implemented in a subclass..."
+		}
+
 		Ask(question) {
 			local coach := this.Coach
-			local settingsDB := coach.SettingsDatabase
-			local knowledgeBase := coach.KnowledgeBase
 			local speaker := coach.getSpeaker()
 			local headers := Map("Content-Type", "application/json")
 			local body := {model: this.Model, max_tokens: this.MaxTokens, temperature: this.Temperature}
-			local messages := []
-			local ignore, conversation, message, simulator, car, track
 
 			if (Trim(this.Token) != "")
 				headers["Authorization"] := ("Bearer " . this.Token)
 
-			if (this.Instructions.Has("Character") && this.Instructions["Character"])
-				messages.Push({role: "system", content: substituteVariables(this.Instructions["Character"], {name: coach.VoiceManager.Name})})
+			this.CreatePrompt(body, question)
+
+			body := JSON.print(body)
+
+			if isDebug() {
+				deleteFile(kTempDirectory . "Chat.request")
+
+				FileAppend(body, kTempDirectory . "Chat.request")
+			}
+
+			answer := WinHttpRequest().POST(this.Server, body, headers, {Object: true, Encoding: "UTF-8"})
+
+			if ((answer.Status >= 200) && (answer.Status < 300))
+				answer := answer.JSON
+			else
+				throw "Cannot connect to " . this.Server . "..."
+
+			if isDebug() {
+				deleteFile(kTempDirectory . "Chat.response")
+
+				FileAppend(JSON.print(answer), kTempDirectory . "Chat.response")
+			}
+
+			answer := answer["choices"][1]["message"]["content"]
+
+			this.AddConversation(question, answer)
+
+			return answer
+		}
+	}
+
+	class OpenAIConnector extends DrivingCoach.HTTPConnector {
+		Model[external := false] {
+			Get {
+				if !external {
+					if inList(["GPT 3.5 turbo", "GPT 3.5 turbo 16k", "GPT 4", "GPT 4 32k"], this.iModel)
+						return StrLower(StrReplace(super.Model, A_Space, "-"))
+					else
+						return super.Model
+				}
+				else
+					return super.Model
+			}
+		}
+
+		CreatePrompt(body, question) {
+			local coach := this.Coach
+			local settingsDB := coach.SettingsDatabase
+			local knowledgeBase := coach.KnowledgeBase
+			local messages := []
+			local simulator, car, track, message, position, ignore, conversation
 
 			if (this.Instructions.Has("Simulation") && this.Instructions["Simulation"])
 				if (knowledgeBase && (this.Coach.Session != kSessionFinished)) {
@@ -188,52 +237,55 @@ class DrivingCoach extends GridRaceAssistant {
 			messages.Push({role: "user", content: question})
 
 			body.messages := messages
-
-			body := JSON.print(body)
-
-			if isDebug {
-				deleteFile(kTempDirectory . "Chat.request")
-
-				FileAppend(body, kTempDirectory . "Chat.request")
-			}
-
-			answer := WinHttpRequest().POST(this.Server, body, headers, {Object: true, Encoding: "UTF-8"})
-
-			if ((answer.Status >= 200) && (answer.Status < 300))
-				answer := answer.JSON
-			else
-				throw "Cannot connect to " . this.Server . "..."
-
-			if isDebug {
-				deleteFile(kTempDirectory . "Chat.response")
-
-				FileAppend(JSON.print(answer), kTempDirectory . "Chat.response")
-			}
-
-			answer := answer["choices"][1]["message"]["content"]
-
-			this.AddConversation(question, answer)
-
-			return answer
-		}
-	}
-
-	class OpenAIConnector extends DrivingCoach.HTTPConnector {
-		Model[external := false] {
-			Get {
-				if !external {
-					if inList(["GPT 3.5 turbo", "GPT 3.5 turbo 16k", "GPT 4", "GPT 4 32k"], this.iModel)
-						return StrLower(StrReplace(super.Model, A_Space, "-"))
-					else
-						return super.Model
-				}
-				else
-					return super.Model
-			}
 		}
 	}
 
 	class GPT4AllConnector extends DrivingCoach.HTTPConnector {
+		CreatePrompt(body, question) {
+			local coach := this.Coach
+			local settingsDB := coach.SettingsDatabase
+			local knowledgeBase := coach.KnowledgeBase
+			local prompt := ""
+			local simulator, car, track, message, position, ignore, conversation
+
+			if (this.Instructions.Has("Simulation") && this.Instructions["Simulation"])
+				if (knowledgeBase && (this.Coach.Session != kSessionFinished)) {
+					simulator := knowledgeBase.getValue("Session.Simulator")
+					car := knowledgeBase.getValue("Session.Car")
+					track := knowledgeBase.getValue("Session.Track")
+
+					message := substituteVariables(this.Instructions["Simulation"]
+												 , {name: coach.VoiceManager.Name
+												  , driver: coach.DriverForName
+												  , simulator: settingsDB.getSimulatorName(simulator)
+												  , car: settingsDB.getCarName(simulator, car)
+												  , track: settingsDB.getTrackName(simulator, track)})
+
+					prompt .= (message . "`n")
+				}
+
+			if (this.Instructions.Has("Stint") && this.Instructions["Stint"])
+				if (knowledgeBase && (this.Coach.Session != kSessionFinished)) {
+					position := coach.getPosition(false, "Class")
+
+					if (position != 0) {
+						message := substituteVariables(this.Instructions["Stint"]
+													 , {lap: knowledgeBase.getValue("Lap") + 1
+													  , position: position})
+
+						prompt .= (message . "`n")
+					}
+				}
+
+			for ignore, conversation in this.History {
+				prompt .= ("User: " . conversation[1] . "`n")
+				prompt .= ("AI: " . conversation[2] . "`n")
+			}
+
+			prompt .= ("User: " . question . "`n")
+
+			body.prompt := prompt
+		}
 	}
 
 	class DrivingCoachRemoteHandler extends RaceAssistant.RaceAssistantRemoteHandler {

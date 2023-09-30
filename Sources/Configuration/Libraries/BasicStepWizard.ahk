@@ -777,10 +777,18 @@ class BasicStepWizard extends StepWizard {
 		setMultiMapValue(voiceConfiguration, "Voice Control", "Language", getLanguage())
 		setMultiMapValue(voiceConfiguration, "Voice Control", "PushToTalk", this.Control["basicPushToTalkEdit"].Text)
 		setMultiMapValue(voiceConfiguration, "Voice Control", "PushToTalkMode", ["Hold", "Press", "Custom"][this.Control["basicPushToTalkModeDropDown"].Value])
-		setMultiMapValue(voiceConfiguration, "Voice Control", "Synthesizer", "dotNET")
-		setMultiMapValue(voiceConfiguration, "Voice Control", "Speaker", true)
-		setMultiMapValue(voiceConfiguration, "Voice Control", "Recognizer", "Desktop")
-		setMultiMapValue(voiceConfiguration, "Voice Control", "Listener", true)
+
+		if (getMultiMapValue(voiceConfiguration, "Voice Control", "Synthesizer", kUndefined) = kUndefined)
+			setMultiMapValue(voiceConfiguration, "Voice Control", "Synthesizer", "dotNET")
+
+		if (getMultiMapValue(voiceConfiguration, "Voice Control", "Speaker", kUndefined) = kUndefined)
+			setMultiMapValue(voiceConfiguration, "Voice Control", "Speaker", true)
+
+		if (getMultiMapValue(voiceConfiguration, "Voice Control", "Recognizer", kUndefined) = kUndefined)
+			setMultiMapValue(voiceConfiguration, "Voice Control", "Recognizer", "Desktop")
+
+		if (getMultiMapValue(voiceConfiguration, "Voice Control", "Listener", kUndefined) = kUndefined)
+			setMultiMapValue(voiceConfiguration, "Voice Control", "Listener", true)
 
 		writeMultiMap(kUserHomeDirectory . "Setup\Voice Control Configuration.ini", voiceConfiguration)
 

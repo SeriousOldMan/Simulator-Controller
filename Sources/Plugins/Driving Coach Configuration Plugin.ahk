@@ -329,7 +329,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 	loadConfigurator(configuration, simulators := false) {
 		this.loadFromConfiguration(configuration)
 
-		this.Control["dcConversationsPathEdit"].Text := this.Value["conversationsPath"]
+		this.Control["dcConversationsPathEdit"].Text := (this.Value["conversationsPath"] ? this.Value["conversationsPath"] : "")
 
 		this.Control["dcProviderDropDown"].Choose(inList(["OpenAI", "GPT4All"], this.Value["provider"]))
 		this.Control["dcServiceURLEdit"].Text := this.Value["serviceURL"]

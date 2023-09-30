@@ -51,8 +51,6 @@ class DrivingCoachPlugin extends RaceAssistantPlugin  {
 	writePluginState(configuration) {
 		if this.Active {
 			if this.RaceAssistantEnabled {
-				setMultiMapValue(configuration, "Race Assistants", this.Plugin, "Active")
-
 				setMultiMapValue(configuration, this.Plugin, "State", "Active")
 
 				information := (translate("Started: ") . translate(this.RaceAssistant ? "Yes" : "No"))

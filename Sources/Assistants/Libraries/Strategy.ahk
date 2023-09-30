@@ -3327,7 +3327,7 @@ class Strategy extends ConfigurationItem {
 															  && !isInstance(this, TrafficStrategy)) {
 			remainingSessionLaps := Ceil(pitstops[numPitstops - 1].StintLaps + pitstops[numPitstops].StintLaps)
 
-			if pitstops[numPitstops - 1].Fixed {
+			if (false && pitstops[numPitstops - 1].Fixed) {
 				refuelAmount := pitstops[numPitstops - 1].RefuelAmount
 				stintLaps := pitstops[numPitstops - 1].StintLaps
 			}

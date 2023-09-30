@@ -911,7 +911,7 @@ class Window extends Gui {
 					this.iDescriptor := argument
 
 					if argument
-						Task.startTask(ObjBindMethod(this, "UpdatePosition", argument), 2000, kLowPriority)
+						Task.startTask(ObjBindMethod(this, "UpdatePosition", argument), 5000, kLowPriority)
 				case "Options":
 					options := argument
 			}

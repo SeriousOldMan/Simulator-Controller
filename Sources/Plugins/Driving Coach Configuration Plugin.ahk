@@ -193,7 +193,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		widget28 := window.Add("Edit", "x" . x1 . " yp+24 w" . w1 . " h" . height . " Multi H:Grow W:Grow vdcInstructionsEdit Hidden")
 		widget28.OnEvent("Change", updateInstructions)
 
-		widget29 := window.Add("Button", "x" . (x1 + w1 - 23) . " yp-25 w23 h23 X:Move")
+		widget29 := window.Add("Button", "x" . (x1 + w1 - 23) . " yp-25 w23 h23 X:Move Hidden")
 		widget29.OnEvent("Click", reloadInstructions)
 		setButtonIcon(widget29, kIconsDirectory . "Renew.ico", 1)
 
@@ -202,14 +202,22 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 	}
 
 	loadModels(provider, model) {
+		local index
+
 		this.Control["dcModelDropDown"].Delete()
 
 		if (provider = "OpenAI")
 			this.Control["dcModelDropDown"].Add(["GPT 3.5 turbo", "GPT 3.5 turbo 16k", "GPT 4", "GPT 4 32k"])
 
 		if model {
-			this.Control["dcModelDropDown"].Add([model])
-			this.Control["dcModelDropDown"].Choose(((provider = "OpenAI") ? 4 : 0) + 1)
+			index := inList(["GPT 3.5 turbo", "GPT 3.5 turbo 16k", "GPT 4", "GPT 4 32k"], model)
+
+			if ((provider != "OpenAI") || !index) {
+				this.Control["dcModelDropDown"].Add([model])
+				this.Control["dcModelDropDown"].Choose(((provider = "OpenAI") ? 4 : 0) + 1)
+			}
+			else
+				this.Control["dcModelDropDown"].Choose(index)
 		}
 		else
 			this.Control["dcModelDropDown"].Choose((provider = "OpenAI") ? 1 : 0)
@@ -301,9 +309,10 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		}
 
 		provider := this.iCurrentProvider
+		providerConfiguration := this.iProviderConfigurations[provider]
 
 		for ignore, setting in ["Model", "MaxTokens"]
-			setMultiMapValue(configuration, "Driving Coach Service", provider . "." . setting, providerConfiguration[setting])
+			setMultiMapValue(configuration, "Driving Coach Service", setting, providerConfiguration[setting])
 
 		setMultiMapValue(configuration, "Driving Coach Service", "Service"
 									  , values2String("|", provider, Trim(providerConfiguration["ServiceURL"])

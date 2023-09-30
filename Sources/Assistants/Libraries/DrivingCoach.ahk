@@ -140,10 +140,13 @@ class DrivingCoach extends GridRaceAssistant {
 			local settingsDB := coach.SettingsDatabase
 			local knowledgeBase := coach.KnowledgeBase
 			local speaker := coach.getSpeaker()
-			local headers := Map("Content-Type", "application/json", "Authorization", "Bearer " . this.Token)
+			local headers := Map("Content-Type", "application/json")
 			local body := {model: this.Model, max_tokens: this.MaxTokens, temperature: this.Temperature}
 			local messages := []
 			local ignore, conversation, message, simulator, car, track
+
+			if (Trim(this.Token) != "")
+				headers["Authorization"] := ("Bearer " . this.Token)
 
 			if (this.Instructions.Has("Character") && this.Instructions["Character"])
 				messages.Push({role: "system", content: substituteVariables(this.Instructions["Character"], {name: coach.VoiceManager.Name})})
@@ -194,7 +197,12 @@ class DrivingCoach extends GridRaceAssistant {
 				FileAppend(body, kTempDirectory . "Chat.request")
 			}
 
-			answer := WinHttpRequest().POST(this.Server, body, headers, {Object: true, Encoding: "UTF-8"}).JSON
+			answer := WinHttpRequest().POST(this.Server, body, headers, {Object: true, Encoding: "UTF-8"})
+
+			if ((answer.Status >= 200) && (answer.Status < 300))
+				answer := answer.JSON
+			else
+				throw "Cannot connect to " . this.Server . "..."
 
 			if isDebug {
 				deleteFile(kTempDirectory . "Chat.response")

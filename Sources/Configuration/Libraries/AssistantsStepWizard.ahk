@@ -302,6 +302,40 @@ class AssistantsStepWizard extends ActionsStepWizard {
 			super.registerWidget(page, widget)
 	}
 
+	startSetup(new) {
+		local configuration, ignore, section
+
+		if !new {
+			configuration := readMultiMap(kUserHomeDirectory . "Setup\Driving Coach Configuration.ini")
+
+			for ignore, section in ["Driving Coach Conversations", "Driving Coach Service", "Driving Coach Personality"]
+				setMultiMapValues(configuration, section, getMultiMapValues(kSimulatorConfiguration, section), false)
+
+			writeMultiMap(kUserHomeDirectory . "Setup\Driving Coach Configuration.ini", configuration)
+
+			configuration := readMultiMap(kUserHomeDirectory . "Setup\Race Engineer Configuration.ini")
+
+			for ignore, section in ["Race Assistant Startup", "Race Assistant Shutdown", "Race Engineer Startup", "Race Engineer Shutdown", "Race Engineer Analysis"]
+				setMultiMapValues(configuration, section, getMultiMapValues(kSimulatorConfiguration, section), false)
+
+			writeMultiMap(kUserHomeDirectory . "Setup\Race Engineer Configuration.ini", configuration)
+
+			configuration := readMultiMap(kUserHomeDirectory . "Setup\Race Strategist Configuration.ini")
+
+			for ignore, section in ["Race Strategist Startup", "Race Strategist Shutdown", "Race Strategist Analysis", "Race Strategist Reports"]
+				setMultiMapValues(configuration, section, getMultiMapValues(kSimulatorConfiguration, section), false)
+
+			writeMultiMap(kUserHomeDirectory . "Setup\Race Strategist Configuration.ini", configuration)
+
+			configuration := readMultiMap(kUserHomeDirectory . "Setup\Race Spotter Configuration.ini")
+
+			for ignore, section in ["Race Spotter Analysis", "Race Spotter Announcements"]
+				setMultiMapValues(configuration, section, getMultiMapValues(kSimulatorConfiguration, section), false)
+
+			writeMultiMap(kUserHomeDirectory . "Setup\Race Spotter Configuration.ini", configuration)
+		}
+	}
+
 	reset() {
 		super.reset()
 

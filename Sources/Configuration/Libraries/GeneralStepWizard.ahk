@@ -326,7 +326,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 	}
 
 	startSetup(new) {
-		local wizard, uiLanguage, startWithWindows, silentMode
+		local wizard, uiLanguage, startWithWindows, silentMode, voiceControlConfiguration
 
 		if !new {
 			wizard := this.SetupWizard
@@ -336,6 +336,12 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 			wizard.setGeneralConfiguration(getMultiMapValue(kSimulatorConfiguration, "Configuration", "Language", uiLanguage)
 										 , getMultiMapValue(kSimulatorConfiguration, "Configuration", "Start With Windows", startWithWindows)
 										 , getMultiMapValue(kSimulatorConfiguration, "Configuration", "Silent Mode", silentMode))
+
+			voiceControlConfiguration := readMultiMap(kUserHomeDirectory . "Setup\Voice Control Configuration.ini")
+
+			setMultiMapValues(voiceControlConfiguration, "Voice Control", getMultiMapValues(kSimulatorConfiguration, "Voice Control"), false)
+
+			writeMultiMap(kUserHomeDirectory . "Setup\Voice Control Configuration.ini", voiceControlConfiguration)
 		}
 	}
 

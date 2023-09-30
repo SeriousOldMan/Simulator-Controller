@@ -171,7 +171,13 @@ class WinHTTPRequest extends WinHttpRequest._Call {
 
         result.Headers := this._Headers()
         result.Status := this.whr.Status
-        result.Text := this._Text(options.HasProp("Encoding") && options.Encoding)
+
+        try {
+            result.Text := this._Text(options.HasProp("Encoding") && options.Encoding)
+        }
+        catch {
+            result.Text := ""
+        }
 
         return result
     }

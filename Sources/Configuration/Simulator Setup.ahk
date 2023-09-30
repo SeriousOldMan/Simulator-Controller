@@ -866,7 +866,7 @@ class SetupWizard extends ConfiguratorPanel {
 
 		showProgress({progress: ++this.ProgressCount, message: translate("Initializing Settings && Options...")})
 
-		this.updateState(false)
+		this.updateState()
 
 		this.iStep := false
 		this.iPage := false
@@ -1045,6 +1045,8 @@ class SetupWizard extends ConfiguratorPanel {
 			}
 			finally {
 				this.Working := false
+
+				window.Unblock()
 			}
 
 			return true
@@ -1175,15 +1177,8 @@ class SetupWizard extends ConfiguratorPanel {
 		this.PageSwitch := true
 
 		try {
-			if this.Step {
-				if !this.hidePage(this.Step, this.Page) {
-					this.PageSwitch := oldPageSwitch
-
-					this.updateState()
-
-					return false
-				}
-			}
+			if (this.Step && !this.hidePage(this.Step, this.Page))
+				return false
 
 			this.iStep := step
 
@@ -1199,9 +1194,11 @@ class SetupWizard extends ConfiguratorPanel {
 		}
 		finally {
 			this.PageSwitch := oldPageSwitch
-		}
 
-		this.updateState()
+			this.updateState()
+
+			this.WizardWindow.Unblock()
+		}
 	}
 
 	hidePage(step, page) {
@@ -1309,7 +1306,7 @@ class SetupWizard extends ConfiguratorPanel {
 		}
 	}
 
-	updateState(unlock := true) {
+	updateState() {
 		local language := getLanguage()
 		local pages := []
 		local currentStep := false
@@ -1358,9 +1355,6 @@ class SetupWizard extends ConfiguratorPanel {
 				this.Control["lastPageButton"].Enabled := !this.BasicSetup
 				this.Control["finishButton"].Enabled := false
 			}
-
-			if unlock
-				this.WizardWindow.Unblock()
 		}
 	}
 

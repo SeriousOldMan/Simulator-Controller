@@ -705,6 +705,12 @@ The currently active strategy might be dropped, if you do not adhere to the pits
 
 Please note, that in a team race, the starting driver must be the one, which created and activated the strategy for the given event, or you musr use the "Instruct Strategist" command of the "Race Center" during the first laps to activate the strategy.
 
+If you want to see all this in action in session in *Assetto Corsa Competizione*, take your time and watch this video:
+
+[![](https://img.youtube.com/vi/MlbAESpzg7Q/0.jpg)](https://www.youtube.com/watch?v=MlbAESpzg7Q)
+
+The video has jump marks, so you can skip the boring time in between the interesting parts, where the Race Assistants take action.
+
 ### Adjusting the Strategy during a race
 
 If there is a need to revise the selected strategy later on, for example due to an accident with an unplanned repair pitstop or also due to severe wether changes, you can instruct the Strategist to recalculate and adjust the currently active strategy using a voice command or the ["StrategyRecommend" controller action](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist). In this case, the currently active strategy will be taken as a template incl. all original settings like pitstop rules, available tyre sets, and so on, but other aspects like starting fuel level or the current weather conditions, will be taken from the actual race situation. Based on this conditions a new strategy will be derived for the remaining race. The Strategist will inform you about the new strategy and will give you as much information as possible about the differences between the currently active and the new strategy. If it is not possible to calculate a new strategy, for example, when too few laps remain or if there is no telemetry data available for the requested weather conditions and tyre compound, the currently active strategy will be canceled upon your decision.

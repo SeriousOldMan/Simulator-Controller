@@ -200,6 +200,9 @@ class DrivingCoach extends GridRaceAssistant {
 			local messages := []
 			local simulator, car, track, message, position, ignore, conversation
 
+			if (this.Instructions.Has("Character") && this.Instructions["Character"])
+				messages.Push({role: "system", content: substituteVariables(this.Instructions["Character"], {name: coach.VoiceManager.Name})})
+
 			if (this.Instructions.Has("Simulation") && this.Instructions["Simulation"])
 				if (knowledgeBase && (this.Coach.Session != kSessionFinished)) {
 					simulator := knowledgeBase.getValue("Session.Simulator")
@@ -248,6 +251,9 @@ class DrivingCoach extends GridRaceAssistant {
 			local prompt := ""
 			local simulator, car, track, message, position, ignore, conversation
 
+			if (this.Instructions.Has("Character") && this.Instructions["Character"])
+				prompt .= ("### Instruction:`n" . substituteVariables(this.Instructions["Character"], {name: coach.VoiceManager.Name}))
+
 			if (this.Instructions.Has("Simulation") && this.Instructions["Simulation"])
 				if (knowledgeBase && (this.Coach.Session != kSessionFinished)) {
 					simulator := knowledgeBase.getValue("Session.Simulator")
@@ -278,11 +284,11 @@ class DrivingCoach extends GridRaceAssistant {
 				}
 
 			for ignore, conversation in this.History {
-				prompt .= ("User: " . conversation[1] . "`n")
-				prompt .= ("AI: " . conversation[2] . "`n")
+				prompt .= ("### Human: " . conversation[1] . "`n")
+				prompt .= ("### Assistant: " . conversation[2] . "`n")
 			}
 
-			prompt .= ("User: " . question . "`n")
+			prompt .= ("### Human: " . question . "`n### Assistant:")
 
 			body.prompt := prompt
 		}

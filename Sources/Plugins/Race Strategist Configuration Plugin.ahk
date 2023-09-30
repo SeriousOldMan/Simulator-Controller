@@ -308,7 +308,8 @@ initializeRaceStrategistConfigurator() {
 	if kConfigurationEditor {
 		editor := ConfigurationEditor.Instance
 
-		editor.registerConfigurator(translate("Race Strategist"), RaceStrategistConfigurator(editor, editor.Configuration))
+		editor.registerConfigurator(translate("Race Strategist"), RaceStrategistConfigurator(editor, editor.Configuration)
+								  , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-strategist")
 	}
 }
 

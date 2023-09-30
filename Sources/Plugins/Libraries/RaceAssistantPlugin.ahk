@@ -916,7 +916,6 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				}
 				else if this.RaceAssistantActive {
 					setMultiMapValue(configuration, "Race Assistants", this.Plugin, "Active")
-					setMultiMapValue(configuration, "Race Assistants", "Mode", this.TeamSessionActive ? "Team" : "Solo")
 
 					setMultiMapValue(configuration, this.Plugin, "State", "Active")
 
@@ -931,7 +930,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 							session := "Unknown"
 					}
 
-					setMultiMapValue(configuration, "Race Assistants", "Session", session)
+					setMultiMapValue(configuration, "Race Assistants", "Session", (this.TeamSessionActive ? "Team" : "Solo") . ";" . session)
 
 					information := values2String("; ", translate("Started: ") . translate(this.RaceAssistant ? "Yes" : "No")
 													 , translate("Session: ") . translate((session = "Qualification") ? "Qualifying" : session)

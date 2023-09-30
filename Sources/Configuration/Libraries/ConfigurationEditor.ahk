@@ -294,13 +294,14 @@ class ConfigurationEditor extends ConfigurationItem {
 		super.__New(configuration)
 
 		if isSet(GeneralTab)
-			this.registerConfigurator(translate("General"), GeneralTab(development, configuration))
+			this.registerConfigurator(translate("General"), GeneralTab(development, configuration)
+									, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-general")
 
 		ConfigurationEditor.Instance := this
 	}
 
-	registerConfigurator(label, configurator) {
-		this.Configurators.Push(Array(label, configurator))
+	registerConfigurator(label, configurator, documentation := false) {
+		this.Configurators.Push(Array(label, configurator, documentation))
 	}
 
 	unregisterConfigurator(labelOrConfigurator) {
@@ -341,6 +342,15 @@ class ConfigurationEditor extends ConfigurationItem {
 				configurator.activate()
 		}
 
+		openDocumentation(*) {
+			local documentation := ConfigurationEditor.Instance.Configurators[editorGui["configuratorTabView"].Value][3]
+
+			if documentation
+				Run(documentation)
+			else
+				Run("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration")
+		}
+
 		editorGui := Window({Descriptor: "Simulator Configuration", Options: "+SysMenu +Caption -MaximizeBox", Closeable: true, Resizeable: "Deferred"})
 
 		this.iWindow := editorGui
@@ -351,8 +361,7 @@ class ConfigurationEditor extends ConfigurationItem {
 
 		editorGui.SetFont("Norm", "Arial")
 
-		editorGui.Add("Documentation", "x178 YP+20 w138 H:Center Center", translate("Configuration")
-					, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration")
+		editorGui.Add("Documentation", "x178 YP+20 w138 H:Center Center", translate("Configuration"), openDocumentation)
 
 		editorGui.SetFont("Norm", "Arial")
 

@@ -1041,8 +1041,11 @@ systemMonitor(command := false, arguments*) {
 		local assistant, state, configuration
 
 		for key, state in getMultiMapValues(controllerState, "Race Assistants") {
-			if ((key = "Mode") || (key = "Session"))
-				info .= ("<tr><td><b>" . translate(key . ":") . "</b></td><td>" . translate(state) . "</td></tr>")
+			if ((key = "Mode") || (key = "Session")) {
+				state := values2String(A_Space, collect(string2Values(";", state), translate))
+
+				info .= ("<tr><td><b>" . translate(key . ":") . "</b></td><td>" . state . "</td></tr>")
+			}
 			else {
 				if (state = "Active") {
 					overallState := "Active"

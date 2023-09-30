@@ -263,7 +263,8 @@ initializeApplicationsConfigurator() {
 	if kConfigurationEditor {
 		editor := ConfigurationEditor.Instance
 
-		editor.registerConfigurator(translate("Applications"), ApplicationsConfigurator(editor, editor.Configuration))
+		editor.registerConfigurator(translate("Applications"), ApplicationsConfigurator(editor, editor.Configuration
+								  , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-applications"))
 	}
 }
 

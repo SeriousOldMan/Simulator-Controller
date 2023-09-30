@@ -1055,7 +1055,8 @@ initializeTeamServerConfigurator() {
 	if kConfigurationEditor {
 		editor := ConfigurationEditor.Instance
 
-		editor.registerConfigurator(translate("Team Server"), TeamServerConfigurator(editor, editor.Configuration))
+		editor.registerConfigurator(translate("Team Server"), TeamServerConfigurator(editor, editor.Configuration)
+								  , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-team-server")
 	}
 }
 

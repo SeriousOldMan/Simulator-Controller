@@ -1315,8 +1315,11 @@ setButtonIcon(buttonHandle, file, index := 1, options := "") {
 	return IL_Add(normal_il, file, index)
 }
 
-openDocumentation(dialog, url, *) {
-	Run(url)
+openDocumentation(dialog, link, arguments*) {
+	if isInstance(link, Func)
+		link.Call(arguments*)
+	else
+		Run(link)
 }
 
 window2Screen := (value) => Round(value * kScreenResolution / 96)

@@ -249,7 +249,8 @@ initializePluginsConfigurator() {
 	if kConfigurationEditor {
 		editor := ConfigurationEditor.Instance
 
-		editor.registerConfigurator(translate("Plugins"), PluginsConfigurator(editor, editor.Configuration))
+		editor.registerConfigurator(translate("Plugins"), PluginsConfigurator(editor, editor.Configuration)
+								  , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins")
 	}
 }
 

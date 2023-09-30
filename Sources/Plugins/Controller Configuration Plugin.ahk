@@ -582,7 +582,8 @@ initializeControllerConfigurator() {
 	if kConfigurationEditor {
 		editor := ConfigurationEditor.Instance
 
-		editor.registerConfigurator(translate("Controller"), ControllerConfigurator(editor, editor.Configuration))
+		editor.registerConfigurator(translate("Controller"), ControllerConfigurator(editor, editor.Configuration)
+								  , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-controller")
 	}
 }
 

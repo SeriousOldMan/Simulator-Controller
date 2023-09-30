@@ -317,7 +317,8 @@ initializeRaceEngineerConfigurator() {
 	if kConfigurationEditor {
 		editor := ConfigurationEditor.Instance
 
-		editor.registerConfigurator(translate("Race Engineer"), RaceEngineerConfigurator(editor, editor.Configuration))
+		editor.registerConfigurator(translate("Race Engineer"), RaceEngineerConfigurator(editor, editor.Configuration)
+								  , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-engineer")
 	}
 }
 

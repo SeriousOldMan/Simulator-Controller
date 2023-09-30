@@ -151,7 +151,8 @@ initializeChatMessagesConfigurator() {
 	if kConfigurationEditor {
 		editor := ConfigurationEditor.Instance
 
-		editor.registerConfigurator(translate("Chat"), ChatMessagesConfigurator(editor, editor.Configuration))
+		editor.registerConfigurator(translate("Chat"), ChatMessagesConfigurator(editor, editor.Configuration)
+								  , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-chat")
 	}
 }
 

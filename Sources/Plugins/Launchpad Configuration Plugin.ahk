@@ -173,7 +173,8 @@ initializeLaunchpadConfigurator() {
 	if kConfigurationEditor {
 		editor := ConfigurationEditor.Instance
 
-		editor.registerConfigurator(translate("Launchpad"), LaunchpadConfigurator(editor, editor.Configuration))
+		editor.registerConfigurator(translate("Launchpad"), LaunchpadConfigurator(editor, editor.Configuration)
+								  , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-launchpad")
 	}
 }
 

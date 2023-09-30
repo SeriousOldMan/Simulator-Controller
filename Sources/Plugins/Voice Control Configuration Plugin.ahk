@@ -1132,7 +1132,8 @@ initializeVoiceControlConfigurator() {
 	if kConfigurationEditor {
 		editor := ConfigurationEditor.Instance
 
-		editor.registerConfigurator(translate("Voice Control"), VoiceControlConfigurator(editor, editor.Configuration))
+		editor.registerConfigurator(translate("Voice Control"), VoiceControlConfigurator(editor, editor.Configuration)
+								  , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control")
 	}
 }
 

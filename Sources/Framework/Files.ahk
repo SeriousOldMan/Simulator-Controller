@@ -82,7 +82,10 @@ normalizeFilePath(filePath) {
 }
 
 normalizeDirectoryPath(path) {
-	return ((SubStr(path, StrLen(path)) = "\") ? SubStr(path, 1, StrLen(path) - 1) : path)
+	while (SubStr(path, StrLen(path)) = "\")
+		path := SubStr(path, 1, StrLen(path) - 1)
+
+	return path
 }
 
 temporaryFileName(name, extension) {

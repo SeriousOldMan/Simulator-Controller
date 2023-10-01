@@ -170,6 +170,8 @@ class SpeechRecognizer {
 	iEngine := false
 	iChoices := CaseInsenseMap()
 
+	iMode := "Grammar"
+
 	static sAudioRoutingInitialized := false
 	static sRecognizerAudioDevice := false
 	static sDefaultAudioDevice := false
@@ -218,7 +220,7 @@ class SpeechRecognizer {
 		}
 	}
 
-	__New(engine, recognizer := false, language := false, silent := false) {
+	__New(engine, recognizer := false, language := false, silent := false, mode := "Grammar") {
 		local dllName := "Speech.Recognizer.dll"
 		local dllFile := kBinariesDirectory . dllName
 		local instance, choices, found, ignore, recognizerDescriptor, configuration, audioDevice
@@ -226,6 +228,7 @@ class SpeechRecognizer {
 		this.iEngine := engine
 		this.Instance := false
 		this.RecognizerList := []
+		this.iMode := mode
 
 		try {
 			if (!FileExist(dllFile)) {
@@ -290,8 +293,11 @@ class SpeechRecognizer {
 
 				this.setChoices("Digit", choices)
 			}
-			else
+			else {
 				instance.SetEngine(engine)
+			}
+
+			this.setMode(mode)
 
 			if (this.Instance.OkCheck() != "OK") {
 				logMessage(kLogCritical, translate("Could not communicate with speech recognizer library (") . dllName . translate(")"))
@@ -475,6 +481,18 @@ class SpeechRecognizer {
 		this.iChoices[name] := this.newChoices(choices)
 	}
 
+	setMode(mode) {
+		this.iMode := mode
+
+		if ((mode = "Text") && this.Instance)
+			switch this.iEngine, false {
+				case "Desktop", "Server":
+					this.Instance.SetContinuous(true, this._onGrammarCallback.Bind(this))
+				case "Azure":
+					this.Instance.SetContinuous(true)
+			}
+	}
+
 	newGrammar() {
 		if this.Instance {
 			switch this.iEngine, false {
@@ -598,62 +616,73 @@ class SpeechRecognizer {
 		return bestMatch
 	}
 
+	textRecognized(text) {
+	}
+
 	_onGrammarCallback(name, wordArr) {
-		this._grammarCallbacks[name].Call(name, this.getWords(wordArr))
+		if (this.iMode = "Text")
+			this.textRecognized(values2String(A_Space, this.getWords(wordArr)*))
+		else
+			this._grammarCallbacks[name].Call(name, this.getWords(wordArr))
 	}
 
 	_onTextCallback(text) {
-		local words := string2Values(A_Space, text)
-		local ignore, name, grammar, rating, index, literal, bestRating, bestMatch, callback
+		local words, ignore, name, grammar, rating, index, literal, bestRating, bestMatch, callback
 
-		for index, literal in words {
-			literal := StrReplace(literal, ".", "")
-			literal := StrReplace(literal, ",", "")
-			literal := StrReplace(literal, ";", "")
-			literal := StrReplace(literal, "?", "")
-			literal := StrReplace(literal, "-", "")
-
-			words[index] := literal
-		}
-
-		if true {
-			bestRating := 0
-			bestMatch := false
-
-			for ignore, grammar in this._grammars {
-				rating := this.match(text, grammar.Grammar)
-
-				if (rating > bestRating) {
-					bestRating := rating
-					bestMatch := grammar
-				}
-			}
-
-			if bestMatch {
-				callback := bestMatch.Callback
-
-				callback.Call(bestMatch.Name, words)
-			}
-			else if this._grammars.Has("?") {
-				callback := this._grammars["?"].Callback
-
-				callback.Call("?", words)
-			}
-		}
+		if (this.iMode = "Text")
+			this.textRecognized(text)
 		else {
-			for name, grammar in this._grammars
-				if grammar.Grammar.match(words) {
-					callback := grammar.Callback
+			words := string2Values(A_Space, text)
 
-					callback.Call(name, words)
+			for index, literal in words {
+				literal := StrReplace(literal, ".", "")
+				literal := StrReplace(literal, ",", "")
+				literal := StrReplace(literal, ";", "")
+				literal := StrReplace(literal, "?", "")
+				literal := StrReplace(literal, "-", "")
 
-					return
+				words[index] := literal
+			}
+
+			if true {
+				bestRating := 0
+				bestMatch := false
+
+				for ignore, grammar in this._grammars {
+					rating := this.match(text, grammar.Grammar)
+
+					if (rating > bestRating) {
+						bestRating := rating
+						bestMatch := grammar
+					}
 				}
 
-			if this._grammars.Has("?") {
-				callback := this._grammars["?"].Callback
+				if bestMatch {
+					callback := bestMatch.Callback
 
-				callback.Call("?", words)
+					callback.Call(bestMatch.Name, words)
+				}
+				else if this._grammars.Has("?") {
+					callback := this._grammars["?"].Callback
+
+					callback.Call("?", words)
+				}
+			}
+			else {
+				for name, grammar in this._grammars
+					if grammar.Grammar.match(words) {
+						callback := grammar.Callback
+
+						callback.Call(name, words)
+
+						return
+					}
+
+				if this._grammars.Has("?") {
+					callback := this._grammars["?"].Callback
+
+					callback.Call("?", words)
+				}
 			}
 		}
 	}

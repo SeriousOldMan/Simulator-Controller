@@ -4,6 +4,8 @@
 #Include Conversation.en
 #Include Weather.en
 #Include Grid.en
+[Configuration]
+Recognizer=Grammar
 [Fragments]
 WeatherUpdate=weather warnings
 [Choices]

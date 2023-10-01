@@ -1,15 +1,34 @@
+## 5.4.0.0-release 10/06/23 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. Fixed a bug in "Strategy Workbench", which created a strategy with the wrong race length, when a mandatory pitstop in timed window was selected and the tyre usage forced an additional pitstop one lap before the end of the race. Certainly an edge case...
+  4. A new assistant, the Driving Coach, is available. It is based on GPT technology and allows fluent communication about driving techniques, car handling issues, car setup topics and strategy. See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach) for more information.
+     - New plugin "Driving Coach", which handles the configuration and the communication with the assistant.
+	 - "Simulator Setup" has been updated to support the new Assistant.
+	 - New controller actions are available for the "Driving Coach" plugin.
+	 - New icons have been introduced in the Stream Deck icon set.
+  5. When the name of the current driver is unknown for any reason, "John Doe" was used in the past. Now, the name of the current user of Simulator Controller is used.
+  6. The documentation link in "Simulator Configuration" is now context-aware and opens the documentation for the configuration tab, which is currently selected.
+  7. "Simulator Setup" and "Simulator Configuration" are now almost fully compatible, when using both to work on the configuration.
+  8. [Developer Only] A new library for HTTP REST calling has been implemented.
+  9. [Developer Only] The speech recognition framework now also supports free text recognition in addition to pattern based text recognition.
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-540), because you don't want to miss out the new Assistant.
+
 ## 5.3.2.0-release 09/29/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. A significant performance improvement has been achieved for the ACC Pitstop MFD handling.
   4. The detection of the last lap in timed races has been optimized.
   5. Manual installations using the ZIP file from GitHub are working again.
-  6. "Simulator Setup" now detects software that has been emoved from the PC after the last run of "Simulator Setup".
+  6. "Simulator Setup" now detects software that has been removed from the PC after the last run of "Simulator Setup".
   7. The semantics of tyre set handling in "Race Settings" has changed. Please read the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#assetto-corsa-competizione) for more information.
   8. Migrated sources to AHK 2.0.10.
   9. New car models for "Setup Workbench":
      - Assetto Corsa
        - Shelby Cobra 427 S/C
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-532), because you may want to check the definition of tyre set handling for *Assetto Corsa Competizione*.
 
 ## 5.3.1.2-release 09/26/23
   1. Fixed a critical bug which creates an infinite loop during pitstop setup by the Engineer, when wrong tyre sets had been configured in the "Race Settings".
@@ -197,7 +216,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. You can now enable an acoustic feedback for Audible feedback in the Telemetry Analyzer. Whenever a handling event is registered (over- or understeering) a short beep of varying pitch and intensity will give you some feedback. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-telemetry-analyzer) for more information.
-  4. [Experts only] It is now possible to define your own modes and layers for Button Boxes. This allows any function of your sim or other applications on your PC to be triggered by the Button Box, not only the actions supplied by the plugins. Please see the [new documentation](*) for more information.
+  4. [Experts only] It is now possible to define your own modes and layers for Button Boxes. This allows any function of your sim or other applications on your PC to be triggered by the Button Box, not only the actions supplied by the plugins. Please see the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-of-custom-modes) for more information.
   5. A new controller action function "mouse" is available, which allows you to send virtual mouse clicks to any application by a button press on your controller.
   6. [Experts only] A new controller action function "call" let's you invoke internal methods for any plugin or the Controller itself.
   7. Fixed a regression introduced in the last release, which disabled the pitstop settings preview window in "Race Center".

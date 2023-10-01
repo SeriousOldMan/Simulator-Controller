@@ -232,7 +232,7 @@ class ControllerStepWizard extends StepWizard {
 
 		widget4 := window.Add("HTMLViewer", "x" . x . " yp+245 w" . width . " h195 W:Grow Y:Move(0.66) H:Grow(0.33) VfunctionsInfoText Hidden")
 
-		html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
+		html := "<html><body style='background-color: #" . window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
 		widget4.document.write(html)
 

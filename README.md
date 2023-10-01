@@ -1,6 +1,6 @@
 # Simulator Controller
 
-Simulator Controller is a modular and extendable administration and controller application for Sim Racing. At the core is a comprehensive plugin capable automation framework, which can use almost any external controller hardware, such as Button Boxes, to control typical simulator components such as SimHub, SimFeedback and alike. Beside that, Simulator Controller also comes with several voice chat capable Assistants, which are based on artificial intelligence technologies. The first, a kind of Virtual Race Engineer, will assist you during your races to keep the hands on the wheel. It will handle all the cumbersome stuff, like preparing a pitstop, take an eye on the weather forecast, calculate damagae impact on your lap times, and so on. The second Assistant, a Virtual Race Strategist, will keep an eye on the overall race situation and will develop and adapt strategies depending on race position, traffic and weather changes. Last, but not least, a Virtual Race Spotter will watch over your race and will warn you about crtical situations with nearby cars, and so on.
+Simulator Controller is a modular and extendable administration and controller application for Sim Racing. At the core is a comprehensive plugin capable automation framework, which can use almost any external controller hardware, such as Button Boxes, to control typical simulator components such as SimHub, SimFeedback and alike. Beside that, Simulator Controller also comes with several voice chat capable Assistants, which are based on artificial intelligence technologies. The first, a kind of Virtual Race Engineer, will assist you during your races to keep the hands on the wheel. It will handle all the cumbersome stuff, like preparing a pitstop, take an eye on the weather forecast, calculate damagae impact on your lap times, and so on. The second Assistant, a Virtual Race Strategist, will keep an eye on the overall race situation and will develop and adapt strategies depending on race position, traffic and weather changes. The next assistant, a Virtual Race Spotter will watch over your race and will warn you about crtical situations with nearby cars, and so on. Last, but not least, a Virtual Driving Coach will be your invaluable source for information about car handling and everything, you want to know about racing in the real world or in a simulation.
 
 Beside that, Simulator Controller brings even a bunch of other functionality and features to make the life of all of us virtual racers even more fun and simple. You will find a [comprehensive overwiew](https://github.com/SeriousOldMan/Simulator-Controller#main-features) of all features later in this document, but first things first...
 
@@ -45,7 +45,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[5.4.0.0-dev]() (Early build for 5.4.0. Changes: New assistant "Driving Coach", New HTTP library, Added installer for .NET 6.0, Added full free text mode to speech recognition, New plugin "Driving Coach", Specific documentation links in "Simulator Configuration", Almost full compatibility between "Simulator Setup" and "Simulator Configuration", Fixed a bug in "Strategy Workbench for required pitstops in a time window, Replaced "John Doe" in many places with the user name.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-540) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 
@@ -165,6 +167,10 @@ Beside the typical duties of a Spotter, this Assistant is also able to automate 
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%2013.jpg)
 
+##### Driving Coach
+
+The most advanced Assistant is based on text-based GPT technology and uses a publically available large language model which has been trained with vasts amount of information. Using this knowledge, this Assistant behaves as your personal driving coach. Ask anything about racing, car handling and driving techniques and you will probably will get an interesting answer.
+
 #### Setup Workbench
 
 Another very useful tool of the Simulator Controller suite is the Setup Workbench. This tool is based upon the AI technology which is used by the Race Assistants and generates recommendations for changing the setup options of a car based on handling problems described by the driver.
@@ -199,6 +205,7 @@ These plugins are part of the Simulator Controller distribution. Beside providin
 | [Tactile Feedback](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-tactile-feedback) | Fully configurable support for pedal and chassis vibration using [SimHub](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications). |
 | [Motion Feedback](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-motion-feedback) | Fully configurable support for rig motion feedback using [SimFeedback](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications). |
 | [Pedal Calibration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-pedal-calibration) | Allows to choose between the different calibration curves of your high end pedals directly from the hardware controller. |
+| [Driving Coach](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-driving-coach) | This plugin integrates Aiden, the Virtual Driving Coach. If this plugin is active and correctly configured, this Assistant will be automatically available, when Simulator Controller is running. |
 | [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) | This plugin integrates Jona, the Virtual Race Engineer, with all other plugins for the simulation games, like the ACC plugin. The plugin handles the data transfer between the simulation game and the Virtual Race Engineer. |
 | [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) | This plugin integrates Cato, the Virtual Race Strategist, with all other plugins for the simulation games, like the ACC plugin. The plugin handles the data transfer between the simulation game and the Virtual Race Strategist. |
 | [Race Spotter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter) | This plugin integrates Elisa, the Virtual Race Spotter, with all other plugins for the simulation games, like the ACC plugin. The plugin handles the data transfer between the simulation game and the Virtual Race Spotter. |

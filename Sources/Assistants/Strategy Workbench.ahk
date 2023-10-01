@@ -2248,14 +2248,14 @@ class StrategyWorkbench extends ConfigurationItem {
 
 						this.DriversListView.Add("", (numPitstops = 0) ? "1+" : 1, name)
 
-						this.StintDrivers.Push((name = "John Doe (JD)") ? false : strategy.Driver)
+						this.StintDrivers.Push((InStr(name, "John Doe") = 1) ? false : strategy.Driver)
 
 						for ignore, pitstop in strategy.Pitstops {
 							name := SessionDatabase.getDriverName(simulator, pitstop.Driver)
 
 							this.DriversListView.Add("", (numPitstops = A_Index) ? ((A_Index + 1) . "+") : (A_Index + 1), name)
 
-							this.StintDrivers.Push((name = "John Doe (JD)") ? false : pitstop.Driver)
+							this.StintDrivers.Push((InStr(name, "John Doe") = 1) ? false : pitstop.Driver)
 						}
 
 						this.DriversListView.ModifyCol()

@@ -4,18 +4,10 @@ Special steps, that might be necessary for using voice control and pitstop autom
 
 ***
 
-Beginning with Version 2.0 an automatic update procedure is available to bring a local configuaration database up to the new specs. After you installed the new release package, the system will check, whether an update to the configuration database is necessary for this release (and possibly for releases, you left out) and will greet you with the following dialog:
-
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Update%20Alert.JPG)
-
-You have three possibilities here:
-
-  1. If you choose "No", the application will continue and will use the currrent configuration information. Everything should work as expected, but some of the new features introduced by this and previous releases might be passive due to missing configuration information. But: If you start the application next time, the question will reappear to give you a chance to perform the update then.
-  2. In the case of "Never", you will skip the automatic update and also all future questions. This can be undone, but requires some low level tweaking. More on that later.
-  3. If you choose "Yes", the update procedure tries to incorporate all new configuration elements from the distribution into your local configuration database in the *Simulator Controller\Config* folder in your user *Documents* folder. This process will be described in detail below.
-  
 ## Automated update procedure
 
+Beginning with Version 2.0 an automatic update procedure is available to bring a local configuaration database up to the new specs.
+  
 Let's start with some low level information, to give you an understanding, what happens in the background, when an automated update is processed. A new file has been created in the *Simulator Controller\Config* folder. It is named *UPDATES* and keeps track of already carried out updates. If it is missing or does not contain information for the current release (or releases you missed out), the update procedure will start. After the update finished sucessfully, this will be noted in the *UPDATES* file. And here is the trick, if you have chosen "Never" in the dialog above: Just open this file with a text editor and delete the lines for the releases in question and you will be fine.
 
 IMPORTANT: When you already installed and used an alpha or beta release for one of the releases described below, it might be necessary to rerun the update procedure for the final release to be sure to include all necessary updates. The procedure is the same as described above, just delete the corresponding line from the *UPDATES* file, and the update procedure will take care of the rest.
@@ -43,9 +35,15 @@ Although the code, that handles all the update tasks, is integrated into *Simula
 
 Note: Some of you might want to have more control. No problem. All the files in the *Simulator Controller\Config*, *Simulator Controller\Translations*, *Simulator Controller\Grammars* and *Simulator Controller\Rules* folders are human readable and using a text editor and some *Diff* tool, you can do everything the automated procedure does on your own. But be sure to make a backup copy of all the files, just for peace of mind. Attention: These files use a two-byte character set, so be sure to use an editor that can handle this.
 
+## Release 5.4.0
+
+Since this release introduces a new Assistant, a new plugin "Driving Coach" will be automatically added to your configuration, but it will be deactivated by default. You should run "Simulator Setup" and use the basic configuration step to include it in your setup. Then visit the configuration step for Race Assistants and create a configuration for the Driving Coach. You will need to have a subscription on [OpenAI](https://openai.com) (it is very cheap, by the way), or you will have to install the free AI runtime environment [GPT4All](https://gpt4all.io/index.html). But the LLMs (language models) of GPT4All are way behind from what OpenAI offers, and you will need a very powerful PC to run these models (and it will use your GPU, therefore it is impossible to use it alongside a running simulator).
+
+***
+
 ## Release 5.3.2
 
-No manual updates necessary.
+Tyre set handling has changed with this release. This is a specific feature for *Assetto Corsa Competizione*. You now have the choice to explicitly define the first tyre set to use for an upcoming pitstop, or you can set the tyre sets in "Race Settings" to "Auto", which will let ACC decide on its own, which tyre set to use (please be aware, that there is a bug in the automatic selection in ACC, when switching from wet to dry tyres, though). The automatic update procedure of this release will set the tyre sets to "Auto" in "Race Settings", which will be perfect for most users. If you also specified tyre sets in the settings in the "Session Database", you can remove the settings there.
 
 ***
 

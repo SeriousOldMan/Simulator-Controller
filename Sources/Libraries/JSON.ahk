@@ -133,7 +133,12 @@ class JSON {
 	static print(obj, indent:="", lvl:=1) {
 		if isObject(obj) {
 			If !(obj is Array || obj is Map || obj is String || obj is Number)
-				throw Error("Object type not supported.", -1, Format("<Object at 0x{:p}>", ObjPtr(obj)))
+				try {
+					obj := toMap(obj)
+				}
+				catch Any {
+					throw Error("Object type not supported.", -1, Format("<Object at 0x{:p}>", ObjPtr(obj)))
+				}
 
 			if isInteger(indent) {
 				if (indent < 0)
@@ -151,9 +156,9 @@ class JSON {
 			is_array := (obj is Array)
 
 			lvl += 1, out := "" ; Make #Warn happy
-			for k, v in obj {
+			for k, v in ((isInstance(obj, Map) || is_array) ? obj : obj.OwnProps()) {
 				if isObject(k) || (k == "")
-					throw Error("Invalid object key.", -1, k ? Format("<Object at 0x{:p}>", ObjPtr(obj)) : "<blank>")
+					throw Error("Invalid object key detected in JSON.print...", -1, k ? Format("<Object at 0x{:p}>", ObjPtr(obj)) : "<blank>")
 
 				if !is_array ;// key ; ObjGetCapacity([k], 1)
 					out .= (ObjGetCapacity([k]) ? JSON.print(k) : escape_str(k)) (indent ? ": " : ":") ; token + padding

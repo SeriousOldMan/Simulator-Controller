@@ -10,6 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\Libraries\Task.ahk"
+#Include "..\Libraries\CLR.ahk"
 #Include "..\Database\Libraries\SessionDatabase.ahk"
 
 
@@ -115,7 +116,7 @@ class TeamServerPlugin extends ControllerPlugin {
 			}
 			catch Any as exception {
 				logError(exception, true)
-				
+
 				logMessage(kLogCritical, translate("Cannot start the Race Settings tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (")
 									   . kBinariesDirectory . translate(")"))
 

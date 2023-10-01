@@ -209,6 +209,10 @@ class RaceAssistant extends ConfigurationItem {
 		handleVoiceCommand(phrase, words) {
 			this.RaceAssistant.handleVoiceCommand(phrase, words)
 		}
+
+		handleVoiceText(phrase, text) {
+			this.RaceAssistant.handleVoiceText(phrase, text)
+		}
 	}
 
 	class RaceKnowledgeBase extends KnowledgeBase {
@@ -230,6 +234,12 @@ class RaceAssistant extends ConfigurationItem {
 	Debug[option] {
 		Get {
 			return (this.iDebug & option)
+		}
+	}
+
+	Options {
+		Get {
+			return (this.iOptions)
 		}
 	}
 
@@ -448,11 +458,18 @@ class RaceAssistant extends ConfigurationItem {
 	__New(configuration, assistantType, remoteHandler, name := false, language := kUndefined
 		, synthesizer := false, speaker := false, vocalics := false, recognizer := false, listener := false, muted := false, voiceServer := false) {
 		global kUnknown
-		local options
+		
+		local userName := SessionDatabase.getUserName()
+		local options, forName, ignore
 
 		if !kUnknown
 			kUnknown := translate("Unknown")
+			
+		parseDriverName(userName, &forName, &ignore := false, &ignore := false)
 
+		this.iDriverForName := forName
+		this.iDriverFullName := userName
+		
 		this.iAssistantType := assistantType
 		this.iRemoteHandler := remoteHandler
 
@@ -655,6 +672,10 @@ class RaceAssistant extends ConfigurationItem {
 			default:
 				throw "Unknown grammar `"" . grammar . "`" detected in RaceAssistant.handleVoiceCommand...."
 		}
+	}
+
+	handleVoiceText(grammar, text) {
+		throw "Unknown grammar `"" . grammar . "`" detected in RaceAssistant.handleVoiceText...."
 	}
 
 	requestInformation(category, arguments*) {

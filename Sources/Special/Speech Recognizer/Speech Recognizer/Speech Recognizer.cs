@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net.Http;
+using System.Speech.Recognition;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Microsoft.CognitiveServices.Speech;
 using Microsoft.CognitiveServices.Speech.Audio;
 
@@ -28,6 +30,8 @@ namespace Speech
         private DesktopSpeechRecognizer _desktopRecognizer;
         private AzureSpeechRecognizer _azureRecognizer;
 
+        private bool _continuousMode = false;
+
         public bool Connect(string tokenIssuerEndpoint, string subscriptionKey, string language, dynamic callback)
         {
             this._engineType = "Azure";
@@ -50,6 +54,16 @@ namespace Speech
         public void SetLanguage(string language)
         {
             _azureRecognizer.SetLanguage(language);
+        }
+
+        public void SetContinuous(bool enabled, dynamic callback = null)
+        {
+            _continuousMode = enabled;
+
+            if ((_engineType == "Server") && enabled)
+                throw new Exception("Not supported");
+            else if ((_engineType == "Desktop") && enabled)
+                _desktopRecognizer.SetContinuous(callback);
         }
 
         public string OkCheck()
@@ -336,6 +350,8 @@ namespace Speech
             new Dictionary<string, Microsoft.Speech.Recognition.Choices>(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, LoadedGrammar> _loadedGrammarDictionary = new Dictionary<string, LoadedGrammar>(StringComparer.OrdinalIgnoreCase);
 
+        private dynamic _continuousCallback = null;
+
         #region Startup
         public ServerSpeechRecognizer()
         {
@@ -355,6 +371,11 @@ namespace Speech
                 digitChoices.Add(i.ToString());
 
             _choicesDictionary.Add("Digit", digitChoices);
+        }
+
+        public void SetContinuous(dynamic callback)
+        {
+            this._continuousCallback = callback;
         }
 
         /// <summary>
@@ -377,6 +398,16 @@ namespace Speech
 
             // Configure the input to the speech recognizer.
             _recognizer.SetInputToDefaultAudioDevice();
+
+            if (_continuousCallback != null)
+            {
+
+                var grammar = DictationGrammar();
+
+                _loadedGrammarDictionary.Add("Text", new LoadedGrammar { Grammar = grammar, Callback = _continuousCallback });
+                var g = new Microsoft.Speech.Recognition.Grammar(grammar.GrammarBuilder) { Name = "Text" };
+                _recognizer.LoadGrammar(g);
+            }
         }
 
         /// <summary>
@@ -388,6 +419,9 @@ namespace Speech
         /// <returns></returns>
         public string LoadGrammar(ServerGrammar grammar, string name, dynamic callback)
         {
+            if (this._continuousCallback != null)
+                throw new Exception("Not supported in continuous mode.");
+
             _loadedGrammarDictionary.Add(name, new LoadedGrammar { Grammar = grammar, Callback = callback });
             var g = new Microsoft.Speech.Recognition.Grammar(grammar.GrammarBuilder) { Name = name };
             _recognizer.LoadGrammar(g);
@@ -542,15 +576,27 @@ namespace Speech
                 words[i] = e.Result.Words[i].Text;
             }
 
-            try
-            {
-                _loadedGrammarDictionary[name].Callback(name, words);
-                //_loadedGrammarDictionary[name](name, words);
-            }
-            catch
-            {
-                // ignore for now
-            }
+            /*
+            if (_continuousCallback != null)
+                try
+                {
+                    _continuousCallback(name, words);
+                }
+                catch
+                {
+                    // ignore for now
+                }
+            else
+            */
+                try
+                {
+                    _loadedGrammarDictionary[name].Callback(name, words);
+                    //_loadedGrammarDictionary[name](name, words);
+                }
+                catch
+                {
+                    // ignore for now
+                }
         }
 
         // Write the audio level to the console when the AudioLevelUpdated event is raised.
@@ -576,6 +622,8 @@ namespace Speech
             new Dictionary<string, System.Speech.Recognition.Choices>(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, LoadedGrammar> _loadedGrammarDictionary = new Dictionary<string, LoadedGrammar>(StringComparer.OrdinalIgnoreCase);
 
+        private dynamic _continuousCallback = null;
+
         #region Startup
         public DesktopSpeechRecognizer()
         {
@@ -597,6 +645,11 @@ namespace Speech
             _choicesDictionary.Add("Digit", digitChoices);
         }
 
+        public void SetContinuous(dynamic callback)
+        {
+            this._continuousCallback = callback;
+        }
+
         /// <summary>
         /// Start the Recognizer
         /// </summary>
@@ -608,6 +661,7 @@ namespace Speech
                 StopRecognizer();
                 _recognizer.SpeechRecognized -= Recognizer_SpeechRecognized;
             }
+
             AssertRecognizerExists(recognizerId);
 
             _recognizer = new System.Speech.Recognition.SpeechRecognitionEngine(_recognizers[recognizerId].Culture);
@@ -617,6 +671,23 @@ namespace Speech
 
             // Configure the input to the speech recognizer.
             _recognizer.SetInputToDefaultAudioDevice();
+
+            if (_continuousCallback != null)
+            {
+                /*
+                DictationGrammar grammar = new DictationGrammar("grammar:dictation");
+                grammar.Name = "Text";
+                grammar.Enabled = true;
+                
+                _recognizer.LoadGrammar(grammar);
+                */
+
+                var grammar = DictationGrammar();
+
+                _loadedGrammarDictionary.Add("Text", new LoadedGrammar { Grammar = grammar, Callback = _continuousCallback });
+                var g = new System.Speech.Recognition.Grammar(grammar.GrammarBuilder) { Name = "Text" };
+                _recognizer.LoadGrammar(g);
+            }
         }
 
         /// <summary>
@@ -628,6 +699,9 @@ namespace Speech
         /// <returns></returns>
         public string LoadGrammar(DesktopGrammar grammar, string name, dynamic callback)
         {
+            if (this._continuousCallback != null)
+                throw new Exception("Not supported in continuous mode.");
+
             _loadedGrammarDictionary.Add(name, new LoadedGrammar { Grammar = grammar, Callback = callback });
             var g = new System.Speech.Recognition.Grammar(grammar.GrammarBuilder) { Name = name };
             _recognizer.LoadGrammar(g);
@@ -782,15 +856,27 @@ namespace Speech
                 words[i] = e.Result.Words[i].Text;
             }
 
-            try
-            {
-                _loadedGrammarDictionary[name].Callback(name, words);
-                //_loadedGrammarDictionary[name](name, words);
-            }
-            catch
-            {
-                // ignore for now
-            }
+            /*
+            if (_continuousCallback != null)
+                try
+                {
+                    _continuousCallback(name, words);
+                }
+                catch
+                {
+                    // ignore for now
+                }
+            else
+            */
+                try
+                {
+                    _loadedGrammarDictionary[name].Callback(name, words);
+                    //_loadedGrammarDictionary[name](name, words);
+                }
+                catch
+                {
+                    // ignore for now
+                }
         }
 
         // Write the audio level to the console when the AudioLevelUpdated event is raised.

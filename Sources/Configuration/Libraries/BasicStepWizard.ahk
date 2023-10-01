@@ -198,7 +198,7 @@ class BasicStepWizard extends StepWizard {
 
 		text := "<div style='text-align: center; font-family: Arial, Helvetica, sans-serif; font-size: 11px; font-weight: 600'>" . text . "</div>"
 
-		html := "<html><body style='background-color: #" . window.BackColor . "; overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><br>" . text . "</body></html>"
+		html := "<html><body style='background-color: #" . window.Theme.WindowBackColor . "; overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><br>" . text . "</body></html>"
 
 		widget1.document.write(html)
 
@@ -220,7 +220,7 @@ class BasicStepWizard extends StepWizard {
 
 		text := "<div style='text-align: center; font-family: Arial, Helvetica, sans-serif; font-size: 11px; font-weight: 600'>" . text . "</div>"
 
-		html := "<html><body style='background-color: #" . window.BackColor . "; overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><br>" . text . "</body></html>"
+		html := "<html><body style='background-color: #" . window.Theme.WindowBackColor . "; overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><br>" . text . "</body></html>"
 
 		widget6.document.write(html)
 
@@ -268,14 +268,14 @@ class BasicStepWizard extends StepWizard {
 
 		window.SetFont("Norm", "Arial")
 
-		widget34 := window.Add("ListView", "x" . col2X . " yp+10 w" . col2Width . " h120 W:Grow Section -Multi -LV0x10 Checked NoSort NoSortHdr Hidden", collect(["Simulation", "Path"], translate))
+		widget34 := window.Add("ListView", "x" . col2X . " yp+10 w" . col2Width . " h110 W:Grow Section -Multi -LV0x10 Checked NoSort NoSortHdr Hidden", collect(["Simulation", "Path"], translate))
 		widget34.OnEvent("Click", noSelect)
 		widget34.OnEvent("DoubleClick", noSelect)
 		widget34.OnEvent("ContextMenu", noSelect)
 
 		this.iSimulatorsListView := widget34
 
-		widget35 := window.Add("Button", "x" . (col2X + col2Width - 90) . " yp+127 w90 h23 X:Move Hidden", translate("Locate..."))
+		widget35 := window.Add("Button", "x" . (col2X + col2Width - 90) . " yp+117 w90 h23 X:Move Hidden", translate("Locate..."))
 		widget35.OnEvent("Click", locateSimulator)
 
 		window.SetFont("Bold", "Arial")
@@ -288,6 +288,17 @@ class BasicStepWizard extends StepWizard {
 		widget38 := window.Add("Text", "x" . (x + 16 + 114) . " yp+10 w96 h23 +0x200 Hidden", translate("Name"))
 		widget39 := window.Add("Text", "xp+98 yp w96 h23 +0x200 Hidden", translate("Language"))
 		widget40 := window.Add("Text", "xp+98 yp w96 h23 +0x200 Hidden", translate("Voice"))
+
+		widget41 := window.Add("CheckBox", "x" . x . " yp+24 w16 h23 vbasicDCEnabledCheck Hidden" . (wizard.isModuleSelected("Driving Coach") ? " Checked" : ""))
+		widget41.OnEvent("Click", updateAssistant.Bind("Driving Coach"))
+		widget42 := window.Add("Text", "xp+16 yp w86 h23 +0x200 Hidden", translate("Driving Coach"))
+		widget43 := window.Add("Edit", "xp+114 yp w96 VbasicDCNameEdit Hidden", "Aiden")
+		widget44 := window.Add("DropDownList", "xp+98 yp w96 VbasicDCLanguageDropDown Hidden")
+		widget44.OnEvent("Change", loadVoice.Bind("Driving Coach"))
+		widget45 := window.Add("DropDownList", "xp+98 yp w333 W:Grow VbasicDCVoiceDropDown Hidden")
+		widget46 := window.Add("Button", "xp+335 yp-1 w23 h23 X:Move vbasicDCSettingsButton Hidden")
+		widget46.OnEvent("Click", editSynthesizer.Bind("Driving Coach"))
+		setButtonIcon(widget46, kIconsDirectory . "General Settings.ico", 1)
 
 		widget14 := window.Add("CheckBox", "x" . x . " yp+24 w16 h23 vbasicREEnabledCheck Hidden" . (wizard.isModuleSelected("Race Engineer") ? " Checked" : ""))
 		widget14.OnEvent("Click", updateAssistant.Bind("Race Engineer"))
@@ -322,21 +333,21 @@ class BasicStepWizard extends StepWizard {
 		widget31.OnEvent("Click", editSynthesizer.Bind("Race Spotter"))
 		setButtonIcon(widget31, kIconsDirectory . "General Settings.ico", 1)
 
-		widget36 := window.Add("HTMLViewer", "x" . x . " yp+30 w" . width . " h105 W:Grow H:Grow(0.8) Hidden")
+		widget36 := window.Add("HTMLViewer", "x" . x . " yp+30 w" . width . " h95 W:Grow H:Grow(0.8) Hidden")
 
 		text := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Basic", "Basic.FinishFooter." . getLanguage()))
 
 		text := "<div style='text-align: center; font-family: Arial, Helvetica, sans-serif; font-size: 11px; font-weight: 600'>" . text . "</div>"
 
-		html := "<html><body style='background-color: #" . window.BackColor . "; overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><br>" . text . "</body></html>"
+		html := "<html><body style='background-color: #" . window.Theme.WindowBackColor . "; overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><br>" . text . "</body></html>"
 
 		widget36.document.write(html)
 
-		widget37 := window.Add("Button", "x" . (x + Round((width / 2) - 45)) . " yp+106 w90 h60 X:Move(0.4) W:Grow(0.2) Y:Move(0.8) H:Grow(0.2) Hidden")
+		widget37 := window.Add("Button", "x" . (x + Round((width / 2) - 45)) . " yp+96 w90 h60 X:Move(0.4) W:Grow(0.2) Y:Move(0.8) H:Grow(0.2) Hidden")
 		setButtonIcon(widget37, kResourcesDirectory . "\Setup\Images\Finish Line.png", 1, "w80 h53")
 		widget37.OnEvent("Click", finishSetup)
 
-		loop 40
+		loop 46
 			this.registerWidget(2, widget%A_Index%)
 	}
 
@@ -373,7 +384,7 @@ class BasicStepWizard extends StepWizard {
 				enabled := (enabled || wizard.isModuleSelected(assistant))
 
 			if !enabled
-				wizard.selectModule(this.Definition[1], true, false)
+				wizard.selectModule(this.Definition[2], true, false)
 
 			wizard.getGeneralConfiguration(&uiLanguage, &startWithWindows, &silentMode)
 
@@ -766,10 +777,18 @@ class BasicStepWizard extends StepWizard {
 		setMultiMapValue(voiceConfiguration, "Voice Control", "Language", getLanguage())
 		setMultiMapValue(voiceConfiguration, "Voice Control", "PushToTalk", this.Control["basicPushToTalkEdit"].Text)
 		setMultiMapValue(voiceConfiguration, "Voice Control", "PushToTalkMode", ["Hold", "Press", "Custom"][this.Control["basicPushToTalkModeDropDown"].Value])
-		setMultiMapValue(voiceConfiguration, "Voice Control", "Synthesizer", "dotNET")
-		setMultiMapValue(voiceConfiguration, "Voice Control", "Speaker", true)
-		setMultiMapValue(voiceConfiguration, "Voice Control", "Recognizer", "Desktop")
-		setMultiMapValue(voiceConfiguration, "Voice Control", "Listener", true)
+
+		if (getMultiMapValue(voiceConfiguration, "Voice Control", "Synthesizer", kUndefined) = kUndefined)
+			setMultiMapValue(voiceConfiguration, "Voice Control", "Synthesizer", "dotNET")
+
+		if (getMultiMapValue(voiceConfiguration, "Voice Control", "Speaker", kUndefined) = kUndefined)
+			setMultiMapValue(voiceConfiguration, "Voice Control", "Speaker", true)
+
+		if (getMultiMapValue(voiceConfiguration, "Voice Control", "Recognizer", kUndefined) = kUndefined)
+			setMultiMapValue(voiceConfiguration, "Voice Control", "Recognizer", "Desktop")
+
+		if (getMultiMapValue(voiceConfiguration, "Voice Control", "Listener", kUndefined) = kUndefined)
+			setMultiMapValue(voiceConfiguration, "Voice Control", "Listener", true)
 
 		writeMultiMap(kUserHomeDirectory . "Setup\Voice Control Configuration.ini", voiceConfiguration)
 

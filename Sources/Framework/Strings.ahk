@@ -9,6 +9,19 @@
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+encode(text) {
+	text := StrReplace(text, "\", "\\")
+	text := StrReplace(text, "=", "\=")
+
+	return StrReplace(text, "`n", "\n")
+}
+
+decode(text) {
+	text := StrReplace(StrReplace(StrReplace(text, "\=", "_#_EQ-#_"), "\\", "_#_AC-#_"), "\n", "_#_CR-#_")
+
+	return StrReplace(StrReplace(StrReplace(text, "_#_EQ-#_", "="), "_#_AC-#_", "\"), "_#_CR-#_", "`n")
+}
+
 substituteString(text, pattern, replacement) {
 	local result := text
 

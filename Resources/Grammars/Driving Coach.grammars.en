@@ -1,0 +1,19 @@
+[Configuration]
+Recognizer=Text
+[Listener Grammars]
+// Conversation //
+Call=[{Hi, Hey} %name%, %name% do you hear me, %name% I need you, %name% where are you, %name% come in please]
+[Speaker Phrases]
+// Conversation //
+IHearYou.1=I am here. What can I do for you?
+IHearYou.2=Yeah %driver%? Have you called me?
+IHearYou.3=I hear you. Go on.
+IHearYou.4=Yes, I hear you. What do you need?
+IHearYou.5=Reading you five by five. How can I help?
+Confirm.1=Okay, let's see.
+Confirm.2=Okay, give me a second.
+Confirm.3=Wait a minute.
+Confirm.4=Roger, will be back in a second.
+Later.1=Sorry, I'm busy right now. Please contact me later.
+Later.2=I'm currently on the other line. Give me some time.
+Later.3=I just have to evaluate some data. Get in touch again in a few minutes.

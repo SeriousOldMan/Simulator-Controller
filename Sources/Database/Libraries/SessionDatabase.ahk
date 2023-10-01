@@ -560,7 +560,7 @@ class SessionDatabase extends ConfigurationItem {
 
 		static knownDrivers := CaseInsenseMap()
 
-		if (simulator && id && name && (name != "John Doe (JD)")) {
+		if (simulator && id && name && (InStr(name, "John Doe") != 1)) {
 			key := (simulator . id . name)
 
 			if !knownDrivers.Has(key) {
@@ -590,7 +590,9 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	static getUserName() {
-		return SessionDatabase.getDriverNames(false, this.ID)[1]
+		static userName := SessionDatabase.getDriverNames(false, this.ID)[1]
+		
+		return userName
 	}
 
 	getUserName() {

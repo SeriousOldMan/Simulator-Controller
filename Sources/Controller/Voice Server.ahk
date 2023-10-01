@@ -96,6 +96,8 @@ class VoiceServer extends ConfigurationItem {
 		iRecognizer := "Desktop"
 		iListener := false
 
+		iRecognizerMode := "Grammar"
+
 		iSpeechSynthesizer := false
 
 		iMuted := false
@@ -151,6 +153,10 @@ class VoiceServer extends ConfigurationItem {
 				this.iVoiceClient := voiceClient
 
 				super.__New(arguments*)
+			}
+
+			textRecognized(text) {
+				this.VoiceClient.VoiceServer.recognizeText(this.VoiceClient, text)
 			}
 		}
 
@@ -211,6 +217,12 @@ class VoiceServer extends ConfigurationItem {
 		Listener {
 			Get {
 				return this.iListener
+			}
+		}
+
+		RecognizerMode {
+			Get {
+				return this.iRecognizerMode
 			}
 		}
 
@@ -301,7 +313,8 @@ class VoiceServer extends ConfigurationItem {
 		SpeechRecognizer[create := false] {
 			Get {
 				if (!this.iSpeechRecognizer && create && this.Listener)
-					this.iSpeechRecognizer := VoiceServer.VoiceClient.ClientSpeechRecognizer(this, this.Recognizer, this.Listener, this.Language)
+					this.iSpeechRecognizer := VoiceServer.VoiceClient.ClientSpeechRecognizer(this, this.Recognizer, this.Listener
+																						   , this.Language, false, this.RecognizerMode)
 
 				return this.iSpeechRecognizer
 			}
@@ -309,7 +322,7 @@ class VoiceServer extends ConfigurationItem {
 
 		__New(voiceServer, descriptor, routing, pid
 			, language, synthesizer, speaker, recognizer, listener
-			, speakerVolume, speakerPitch, speakerSpeed, activationCallback, deactivationCallback) {
+			, speakerVolume, speakerPitch, speakerSpeed, activationCallback, deactivationCallback, recognizerMode) {
 			this.iVoiceServer := voiceServer
 			this.iDescriptor := descriptor
 			this.iRouting := routing
@@ -319,6 +332,7 @@ class VoiceServer extends ConfigurationItem {
 			this.iSpeaker := speaker
 			this.iRecognizer := recognizer
 			this.iListener := listener
+			this.iRecognizerMode := recognizerMode
 			this.iSpeakerVolume := speakerVolume
 			this.iSpeakerPitch := speakerPitch
 			this.iSpeakerSpeed := speakerSpeed
@@ -326,7 +340,7 @@ class VoiceServer extends ConfigurationItem {
 			this.iDeactivationCallback := deactivationCallback
 		}
 
-		speak(text) {
+		speak(text, options := false) {
 			local tries := 5
 			local stopped, oldSpeaking, oldInterruptable
 
@@ -346,10 +360,10 @@ class VoiceServer extends ConfigurationItem {
 				try {
 					while (tries-- > 0) {
 						if (tries == 0)
-							this.SpeechSynthesizer[true].speak(text, true)
+							this.SpeechSynthesizer[true].speak(text, true, false, options)
 						else {
 							if !this.Interrupted
-								this.SpeechSynthesizer[true].speak(text, true)
+								this.SpeechSynthesizer[true].speak(text, true, false, options)
 
 							if this.Interrupted {
 								Sleep(2000)
@@ -468,8 +482,16 @@ class VoiceServer extends ConfigurationItem {
 			}
 
 			try {
-				if !recognizer.loadGrammar(grammar, recognizer.compileGrammar(command), ObjBindMethod(this.VoiceServer, "recognizeVoiceCommand", this))
+				if (grammar = "Text") {
+					if (this.RecognizerMode != "Text")
+						throw "Continuous text is not supported in grammar based recognition..."
+				}
+				else if (this.RecognizerMode = "Text")
+					throw "Listener grammars are not supported in continuous text recognition..."
+				else if !recognizer.loadGrammar(grammar, recognizer.compileGrammar(command), ObjBindMethod(this.VoiceServer, "recognizeVoiceCommand", this))
 					throw "Recognizer not running..."
+
+				this.VoiceCommands[grammar] := Array(command, callback)
 			}
 			catch Any as exception {
 				logError(exception, true)
@@ -479,8 +501,6 @@ class VoiceServer extends ConfigurationItem {
 				showMessage(substituteVariables(translate("Cannot register voice command `"%command%`" - please check the configuration..."), {command: command})
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
-
-			this.VoiceCommands[grammar] := Array(command, callback)
 		}
 
 		activate(words := false) {
@@ -980,16 +1000,18 @@ class VoiceServer extends ConfigurationItem {
 			this.unmute()
 	}
 
-	speak(descriptor, text, activate := false) {
+	speak(descriptor, text, activate := false, options := false) {
 		local oldSpeaking := this.Speaking
 
+		text := text
+
 		if this.Speaking
-			Task.startTask(ObjBindMethod(this, "speak", descriptor, text, activate))
+			Task.startTask(ObjBindMethod(this, "speak", descriptor, text, activate, options))
 		else {
 			this.iSpeaking := true
 
 			try {
-				this.getVoiceClient(descriptor).speak(text)
+				this.getVoiceClient(descriptor).speak(text, options ? string2Map("|", "->", options) : false)
 
 				if activate
 					this.activateVoiceClient(descriptor)
@@ -1006,7 +1028,8 @@ class VoiceServer extends ConfigurationItem {
 	registerVoiceClient(descriptor, routing, pid
 					  , activationCommand := false, activationCallback := false, deactivationCallback := false, language := false
 					  , synthesizer := true, speaker := true, recognizer := false, listener := false
-					  , speakerVolume := kUndefined, speakerPitch := kUndefined, speakerSpeed := kUndefined) {
+					  , speakerVolume := kUndefined, speakerPitch := kUndefined, speakerSpeed := kUndefined
+					  , recognizerMode := "Grammar") {
 		local grammar, client, nextCharIndex, theDescriptor, ignore
 
 		static counter := 1
@@ -1040,7 +1063,7 @@ class VoiceServer extends ConfigurationItem {
 		if (client && (this.ActiveVoiceClient == client))
 			this.deactivateVoiceClient(descriptor)
 
-		client := VoiceServer.VoiceClient(this, descriptor, routing, pid, language, synthesizer, speaker, recognizer, listener, speakerVolume, speakerPitch, speakerSpeed, activationCallback, deactivationCallback)
+		client := VoiceServer.VoiceClient(this, descriptor, routing, pid, language, synthesizer, speaker, recognizer, listener, speakerVolume, speakerPitch, speakerSpeed, activationCallback, deactivationCallback, recognizerMode)
 
 		this.VoiceClients[descriptor] := client
 
@@ -1157,6 +1180,10 @@ class VoiceServer extends ConfigurationItem {
 		this.addPendingCommand(ObjBindMethod(this, "voiceCommandRecognized", voiceClient, grammar, words))
 	}
 
+	recognizeText(voiceClient, text) {
+		this.addPendingCommand(ObjBindMethod(this, "textRecognized", voiceClient, text))
+	}
+
 	addPendingCommand(command, activation := false) {
 		if activation
 			if (activation != this.ActiveVoiceClient)
@@ -1225,6 +1252,15 @@ class VoiceServer extends ConfigurationItem {
 			showMessage("Command phrase recognized: " . grammar . " => " . values2String(A_Space, words*), false, "Information.png", 5000)
 
 		messageSend(kFileMessage, "Voice", descriptor[2] . ":" . values2String(";", grammar, descriptor[1], words*), voiceClient.PID)
+	}
+
+	textRecognized(voiceClient, text) {
+		local descriptor := voiceClient.VoiceCommands["Text"]
+
+		if this.Debug[kDebugRecognitions]
+			showMessage("Text recognized: " . text, false, "Information.png", 5000)
+
+		messageSend(kFileMessage, "Voice", descriptor[2] . ":" . values2String(";", "Text", descriptor[1], text), voiceClient.PID)
 	}
 }
 

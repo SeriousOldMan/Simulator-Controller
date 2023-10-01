@@ -865,14 +865,14 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			this.logFunctionNotFound(actionFunction)
 	}
 
-	writePluginState(configuration) {
+	writePluginState(configuration, extended := true) {
 		local tries := 10
 		local teamServer, session, information, state
 
 		static updateCycle := (getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
 																	   , "Team Server", "Update Frequency", 10) * 1000)
 
-		if this.Active {
+		if (this.Active && extended) {
 			teamServer := this.TeamServer
 
 			if (teamServer && teamServer.TeamServerActive && (A_TickCount > this.iNextSessionUpdate))
@@ -1025,7 +1025,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		RaceAssistantPlugin.sFinished := false
 	}
 
-	static requireAssistants(simulator, car, track, weather) {
+	static requireRaceAssistants(simulator, car, track, weather) {
 		local teamServer := this.TeamServer
 		local activeAssistant := false
 		local startupAssistant := false
@@ -1503,8 +1503,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			A_TrayMenu.Uncheck(label)
 	}
 
-	enableRaceAssistant(label := false, force := false) {
-		if (!this.RaceAssistantEnabled || force) {
+	enableRaceAssistant(label := false, startup := false) {
+		if (!this.RaceAssistantEnabled || startup) {
 			this.iRaceAssistantEnabled := (this.RaceAssistantName != false)
 
 			if this.RaceAssistantEnabled {
@@ -1517,10 +1517,10 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		}
 	}
 
-	disableRaceAssistant(label := false, force := false) {
+	disableRaceAssistant(label := false, startup := false) {
 		local ignore, assistant
 
-		if (this.RaceAssistantEnabled || force) {
+		if (this.RaceAssistantEnabled || startup) {
 			label := translate(this.Plugin)
 
 			trayMessage(label, translate("State: Off"))
@@ -2093,7 +2093,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					splitTime := A_TickCount
 				}
 
-				if RaceAssistantPlugin.requireAssistants(simulator, car, track, weather) {
+				if RaceAssistantPlugin.requireRaceAssistants(simulator, car, track, weather) {
 					; Car is on the track
 
 					if isDebug() {

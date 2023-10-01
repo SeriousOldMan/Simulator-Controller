@@ -3,6 +3,8 @@
 #Include Choices.en
 #Include Conversation.en
 #Include Grid.en
+[Configuration]
+Recognizer=Grammar
 [Fragments]
 GreetingDry=it is dry
 GreetingDry2Wet=it is still dry

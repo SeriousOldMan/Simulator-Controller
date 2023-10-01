@@ -36,7 +36,8 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 			local ignore, simulator
 
 			if !wizard.BasicSetup
-				if (wizard.isModuleSelected("Controller") || wizard.isModuleSelected("Race Engineer") || wizard.isModuleSelected("Race Strategist"))
+				if (wizard.isModuleSelected("Controller") || wizard.isModuleSelected("Race Engineer") || wizard.isModuleSelected("Race Strategist")
+														  || wizard.isModuleSelected("Race Spotter") || wizard.isModuleSelected("Driving Coach"))
 					for ignore, simulator in this.Definition
 						if wizard.isApplicationSelected(simulator)
 							return 1
@@ -217,7 +218,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 
 		widget10 := window.Add("HTMLViewer", "x" . x . " yp+305 w" . width . " h76 Y:Move(0.66) H:Grow(0.33) W:Grow VactionsInfoText Hidden")
 
-		html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
+		html := "<html><body style='background-color: #" . window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
 		widget10.document.write(html)
 

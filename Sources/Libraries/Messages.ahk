@@ -179,6 +179,10 @@ class MessageManager extends PeriodicTask {
 		}
 	}
 
+	static isPaused() {
+		return MessageManager.Instance.iPaused
+	}
+
 	static pause() {
 		MessageManager.Instance.iPaused := true
 	}
@@ -205,9 +209,9 @@ class MessageManager extends PeriodicTask {
 
 					messageHandler := (messageHandlers.Has(category) ? messageHandlers[category] : messageHandlers["*"])
 
-					logMessage(kLogInfo, translate("Dispatching message `"") . category . (data[2] ? translate("`": ") . data[2] : translate("`"")))
+					logMessage(kLogInfo, translate("Dispatching message `"") . category . translate("`": ") . data[2])
 
-					result.Push(Array(messageHandler, category, data[2]))
+					result.Push(Array(messageHandler, category, decode(data[2])))
 				}
 		}
 
@@ -251,7 +255,7 @@ class MessageManager extends PeriodicTask {
 
 					logMessage(kLogInfo, translate("Dispatching message `"") . category . (data[2] ? translate("`": ") . data[2] : translate("`"")))
 
-					result.Push(Array(messageHandler, category, data[2]))
+					result.Push(Array(messageHandler, category, decode(data[2])))
 				}
 			}
 
@@ -277,7 +281,7 @@ class MessageManager extends PeriodicTask {
 		DllCall("ConnectNamedPipe", "ptr", pipe, "ptr", 0)
 
 		if (true || (A_LastError = ERROR_PIPE_CONNECTED)) {
-			category := (chr(0xfeff) . (category . ":" . data))
+			category := (chr(0xfeff) . (category . ":" . encode(data)))
 
 			DllCall("WriteFile", "ptr", pipe, "str", category, "uint", (StrLen(category) + 1) * 2, "uint*", &zero, "ptr", 0)
 
@@ -290,7 +294,7 @@ class MessageManager extends PeriodicTask {
 	}
 
 	sendFileMessage(pid, category, data) {
-		local text := category . ":" . StrReplace(StrReplace(data, "`n", A_Space), "`r", "") . "`n"
+		local text := category . ":" . encode(data) . "`n"
 
 		try {
 			FileAppend(text, kTempDirectory . "Messages\" . pid . ".msg")

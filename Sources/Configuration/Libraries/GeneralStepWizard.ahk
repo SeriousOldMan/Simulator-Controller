@@ -290,7 +290,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 
 		widget16 := window.Add("HTMLViewer", "x" . x . " yp+118 w" . width . " h94 Y:Move(0.5) H:Grow(0.5) W:Grow Hidden")
 
-		html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
+		html := "<html><body style='background-color: #" . window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
 		widget16.document.write(html)
 
@@ -326,7 +326,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 	}
 
 	startSetup(new) {
-		local wizard, uiLanguage, startWithWindows, silentMode
+		local wizard, uiLanguage, startWithWindows, silentMode, voiceControlConfiguration
 
 		if !new {
 			wizard := this.SetupWizard
@@ -336,6 +336,12 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 			wizard.setGeneralConfiguration(getMultiMapValue(kSimulatorConfiguration, "Configuration", "Language", uiLanguage)
 										 , getMultiMapValue(kSimulatorConfiguration, "Configuration", "Start With Windows", startWithWindows)
 										 , getMultiMapValue(kSimulatorConfiguration, "Configuration", "Silent Mode", silentMode))
+
+			voiceControlConfiguration := readMultiMap(kUserHomeDirectory . "Setup\Voice Control Configuration.ini")
+
+			setMultiMapValues(voiceControlConfiguration, "Voice Control", getMultiMapValues(kSimulatorConfiguration, "Voice Control"), false)
+
+			writeMultiMap(kUserHomeDirectory . "Setup\Voice Control Configuration.ini", voiceControlConfiguration)
 		}
 	}
 

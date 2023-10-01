@@ -99,7 +99,7 @@ class InstallationStepWizard extends StepWizard {
 
 			widget5 := window.Add("HTMLViewer", "x" . x . " yp+33 w" . width . " h117 Y:Move(" . factor . ") W:Grow H:Grow(0.33) Hidden")
 
-			html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
+			html := "<html><body style='background-color: #" . window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
 			widget5.document.write(html)
 

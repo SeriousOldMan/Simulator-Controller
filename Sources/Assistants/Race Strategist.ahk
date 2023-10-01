@@ -67,7 +67,7 @@ showLogo(name) {
 	logoGui.AddText("w279 Center", info)
 
 	logoGui.Show("X" . x . " Y" . y)
-	
+
 	videoPlayer.Start()
 
 	WinSetTransparent(224, logoGui)
@@ -184,11 +184,11 @@ startupRaceStrategist() {
 
 	registerMessageHandler("Race Strategist", handleStrategistMessage)
 
-	if (debug && strategistSpeaker) {
+	if strategistSpeaker
 		strategist.getSpeaker()
 
+	if debug
 		strategist.updateDynamicValues({KnowledgeBase: RaceStrategist.Instance.createKnowledgeBase({})})
-	}
 
 	if (strategistLogo && !kSilentMode)
 		showLogo(strategistName)

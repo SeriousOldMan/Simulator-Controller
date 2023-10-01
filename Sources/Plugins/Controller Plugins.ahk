@@ -17,6 +17,7 @@
 #Include "Tactile Feedback Plugin.ahk"
 #Include "Pedal Calibration Plugin.ahk"
 #Include "Team Server Plugin.ahk"				; Must be loaded before the Race Assistant Plugins
+#Include "Driving Coach Plugin.ahk"				; Must be loaded before all other Race Assistant Plugins
 #Include "Race Engineer Plugin.ahk"				; Must be loaded before any other Simulator Plugins
 #Include "Race Strategist Plugin.ahk"			; Must be loaded before any other Simulator Plugins
 #Include "Race Spotter Plugin.ahk"				; Must be loaded before any other Simulator Plugins

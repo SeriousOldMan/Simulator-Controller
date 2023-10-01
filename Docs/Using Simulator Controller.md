@@ -134,6 +134,10 @@ Using the technology developed for Jona, Release 3.1 introduced an additional Ra
 
 The third Assistant, Elisa, is not so much of a dialog partner, but gives you crucial information about the traffic, your opponents and the current race situation. See the separate [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist) for more information.
 
+#### Aiden, the Virtual Driving Coach
+
+The fourth Assistant, Aiden, is a little bit different. You can talk to this Assistant after activating it and ask any question in the area of car racing, both in the real world as well as sim racing. See the separate [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach) for more information.
+
 ### Controller Commands
 
 If you have configured one or more hardware controllers (Button Boxes, Stream Decks or even your steering wheel), you will have the possibility to trigger almost all commands for the Virtual Race Assistants and other functionalities of Simulator Controller with your hardware. Sometimes it will be much more convinient (and faster) to tell Jona to plan the upcoming pitstop with a simple press of a button. You will find a complete overview and instructions on how to configure all those controller actions in the documentation about [Plugins & Modes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes) or you can use "Simulator Setup", which provides a graphical point and click environment to configure controller actions.

@@ -526,6 +526,10 @@ StrategyCancel.Activate=
 DriverSwapPlan.Activate=
 PitstopPlan.Activate=
 PitstopPrepare.Activate=
+[Driving Coach]
+RaceAssistant.Toggle=
+Call.Activate=
+SetupWorkbenchOpen.Activate=
 [Race Engineer]
 Call.Activate=
 Accept.Activate=

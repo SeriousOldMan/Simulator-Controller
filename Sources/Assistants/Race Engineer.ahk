@@ -67,7 +67,7 @@ showLogo(name) {
 	logoGui.AddText("w279 Center", info)
 
 	logoGui.Show("X" . x . " Y" . y)
-	
+
 	videoPlayer.Start()
 
 	WinSetTransparent(224, logoGui)
@@ -97,7 +97,7 @@ startupRaceEngineer() {
 	A_IconTip := "Race Engineer"
 
 	startupProcess()
-	
+
 	voiceServer := ProcessExist("Voice Server.exe")
 
 	index := 1
@@ -184,11 +184,11 @@ startupRaceEngineer() {
 
 	registerMessageHandler("Race Engineer", handleEngineerMessage)
 
-	if (debug && engineerSpeaker) {
+	if engineerSpeaker
 		engineer.getSpeaker()
 
+	if debug
 		engineer.updateDynamicValues({KnowledgeBase: RaceEngineer.Instance.createKnowledgeBase()})
-	}
 
 	if (engineerLogo && !kSilentMode)
 		showLogo(engineerName)

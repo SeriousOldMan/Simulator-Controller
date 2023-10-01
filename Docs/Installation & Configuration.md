@@ -493,6 +493,22 @@ Many simulation games provide an ingame multiplayer text based chat system. Sinc
 
 In the first field, you define the push button function for the given chat message on one of your hardware controllers. You also need to specify a small label text to display on the visual representation of your controller and you specifiy the long chat message, which will be send to the ingame chat system, when the corresponding button is pressed.
 
+### Tab *Driving Coach*
+
+The [Virtual Driving Coach](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach) can be configured on this tab.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%2012.JPG)
+
+Currently two providers are supported - "OpenAI", for which you have to register an [API account](https://openai.com) at OpenAI (it will need a little payment, but $5 will be enough for months of usage, believe me), and "GPT4ALL", which can be run locally (but unfortunately not side by side with a running simulator on todays hardware). Please not, that you **must** supply an API key for the "OpenAI" service, otherwise the coach will tell you all the time, that it is currently busy. For "GPT4All", no authentification is required, but you must enable the local API server in the settings.
+
+It is very important to choose the right LLM (aka large language model) for your coach. For "OpenAI", I recommend using "GPT 3.5 turbo". It is cheap (a typical conversation lasting around 30 minutes will cost not more than 3 cents), and it has all the knowledge about racing you'll ever need. Future extensions to the Driving Coach might utilize the extended capabilities of "GPT 4", though. "GPT4All" provide a variety of different models from different sources. Therefore you will have to conduct some experiments, which model works best for you.
+
+You **should** supply the different instructions for the chatbot, so that it knows as much as possible about its duties. Especially the "Character" instructions is important, so that the chatbot *knows* how to behave as a driving coach. Defaults will be provided here for all supported languages. Other instructions like "Simulation" or "Stint" may be used depending on the current context and the situation at the time of your conversation. You can edit the instructions to your preferences. If you ever want to return to the default, or if you have switched the language for the Driving Coach, you can revert to the default instruction by clicking on the small button with "Renew" icon.
+
+The Driving Coach will use the language and general voice control settings. It is very important, that the voice recognition is as perfect as it can be, I recommend using the "Azure" voice recognition service. If you want to use the "Desktop" recognition engine, which is quite good, when used with a headset, use the training methods of Windows, until your speech is recognized correctly. You should also enable the "Debug Recognitions" option for the "Voice Server", so that it gives you visually feedback for each recognition.
+
+The conversations you have with your coach, will be transcribed to text files. You can supply a special folder, where these transcriptions will be saved, in the first field. If you leave this field empty, the transcriptions will be saved temporarily in the *Simulator Controller\Temp\Conversations* folder which is located in the user *Documents* folder.
+
 ### Tab *Race Engineer*
 
 With the settings on this tab, the dynamic behaviour of the [Virtual Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer) and its integration with the [session database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--session-database) can be customized. All options can be chosen independently for each configured simulation game.

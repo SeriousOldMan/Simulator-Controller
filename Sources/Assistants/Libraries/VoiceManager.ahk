@@ -136,7 +136,7 @@ class VoiceManager {
 				this.iIsTalking := true
 		}
 
-		endTalk() {
+		endTalk(options := false) {
 			local text, focus
 
 			if this.Talking {
@@ -148,20 +148,23 @@ class VoiceManager {
 				this.iIsTalking := false
 
 				if (StrLen(Trim(text)) > 0)
-					this.speak(text, focus)
+					this.speak(text, focus, false, options)
 			}
 		}
 
-		speak(text, focus := false, cache := false) {
+		speak(text, focus := false, cache := false, options := false) {
 			if this.Talking {
 				this.iText .= (A_Space . text)
 				this.iFocus := (this.iFocus || focus)
+
+				if options
+					throw "Options are not supported while talking..."
 			}
 			else
-				messageSend(kFileMessage, "Voice", "speak:" . values2String(";", this.VoiceManager.Name, text, focus), this.VoiceManager.VoiceServer)
+				messageSend(kFileMessage, "Voice", "speak:" . values2String(";", this.VoiceManager.Name, text, focus, options ? map2String("|", "->", toMap(options)) : false), this.VoiceManager.VoiceServer)
 		}
 
-		speakPhrase(phrase, variables := false, focus := false, cache := false) {
+		speakPhrase(phrase, variables := false, focus := false, cache := false, options := false) {
 			local phrases := this.Phrases
 			local index
 
@@ -177,7 +180,7 @@ class VoiceManager {
 			}
 
 			if phrase
-				this.speak(phrase, focus, cache)
+				this.speak(phrase, focus, cache, options)
 		}
 
 		number2Speech(number, precision := kUndefined) {
@@ -264,7 +267,7 @@ class VoiceManager {
 				this.iIsTalking := true
 		}
 
-		endTalk() {
+		endTalk(options := false) {
 			local text, focus
 
 			if this.Talking {
@@ -276,16 +279,19 @@ class VoiceManager {
 				this.iIsTalking := false
 
 				if (StrLen(Trim(text)) > 0)
-					this.speak(text, focus)
+					this.speak(text, focus, false, options)
 			}
 		}
 
-		speak(text, focus := false, cache := false) {
+		speak(text, focus := false, cache := false, options := false) {
 			local stopped
 
 			if this.Talking {
 				this.iText .= (A_Space . text)
 				this.iFocus := (this.iFocus || focus)
+
+				if options
+					throw "Options are not supported while talking..."
 			}
 			else {
 				stopped := this.VoiceManager.stopListening()
@@ -294,7 +300,7 @@ class VoiceManager {
 					this.Speaking := true
 
 					try {
-						super.speak(text, !this.Awaitable, cache)
+						super.speak(text, !this.Awaitable, cache, options)
 					}
 					finally {
 						this.Speaking := false
@@ -307,7 +313,7 @@ class VoiceManager {
 			}
 		}
 
-		speakPhrase(phrase, variables := false, focus := false, cache := false) {
+		speakPhrase(phrase, variables := false, focus := false, cache := false, options := false) {
 			local phrases := this.Phrases
 			local index
 
@@ -323,7 +329,7 @@ class VoiceManager {
 			}
 
 			if phrase
-				this.speak(phrase, focus, cache)
+				this.speak(phrase, focus, cache, options)
 		}
 
 		number2Speech(number, precision := kUndefined) {
@@ -361,6 +367,10 @@ class VoiceManager {
 			this.iVoiceManager := voiceManager
 
 			super.__New(arguments*)
+		}
+
+		textRecognized(text) {
+			this.VoiceManager.raiseTextRecognized("Text", text)
 		}
 	}
 
@@ -845,7 +855,9 @@ class VoiceManager {
 																					, "remoteActivationRecognized", "remoteDeactivationRecognized"
 																					, this.Language, this.Synthesizer, this.Speaker
 																					, this.Recognizer, this.Listener
-																					, this.SpeakerVolume, this.SpeakerPitch, this.SpeakerSpeed)
+																					, this.SpeakerVolume, this.SpeakerPitch, this.SpeakerSpeed
+																					, getMultiMapValue(this.getGrammars(this.Language)
+																									 , "Configuration", "Recognizer", "Grammar"))
 										, this.VoiceServer)
 
 				this.iSpeechSynthesizer := VoiceManager.RemoteSpeaker(this, this.Synthesizer, this.Speaker, this.Language
@@ -869,7 +881,7 @@ class VoiceManager {
 	}
 
 	startListener() {
-		local recognizer
+		local recognizer, mode
 
 		static initialized := false
 
@@ -879,7 +891,8 @@ class VoiceManager {
 			if this.VoiceServer
 				this.buildGrammars(false, this.Language)
 			else {
-				recognizer := VoiceManager.LocalRecognizer(this, this.Recognizer, this.Listener, this.Language)
+				recognizer := VoiceManager.LocalRecognizer(this, this.Recognizer, this.Listener, this.Language, false
+														 , getMultiMapValue(this.getGrammars(this.Language), "Configuration", "Recognizer", "Grammar"))
 
 				this.buildGrammars(recognizer, this.Language)
 
@@ -898,7 +911,7 @@ class VoiceManager {
 	startListening(retry := true) {
 		static audioDevice := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Audio Settings.ini"), "Output", "Activation.AudioDevice", false)
 
-		if this.iSpeechRecognizer && !this.Listening
+		if (this.iSpeechRecognizer && !this.Listening)
 			if !this.iSpeechRecognizer.startRecognizer() {
 				if retry
 					Task.startTask(ObjBindMethod(this, "startListening", true), 200)
@@ -919,7 +932,7 @@ class VoiceManager {
 	}
 
 	stopListening(retry := false) {
-		if this.iSpeechRecognizer && this.Listening
+		if (this.iSpeechRecognizer && this.Listening)
 			if !this.iSpeechRecognizer.stopRecognizer() {
 				if retry
 					Task.startTask(ObjBindMethod(this, "stopListening", true), 200)
@@ -998,6 +1011,7 @@ class VoiceManager {
 
 	buildGrammars(speechRecognizer, language) {
 		local grammars := this.getGrammars(language)
+		local mode := getMultiMapValue(grammars, "Configuration", "Recognizer", "Grammar")
 		local grammar, definition, name, choices, nextCharIndex
 
 		for name, choices in getMultiMapValues(grammars, "Choices")
@@ -1012,6 +1026,13 @@ class VoiceManager {
 			this.Grammars[grammar] := definition
 
 			if speechRecognizer {
+				if (mode = "Text") {
+					if (grammar != "Call")
+						throw "Listener grammars are not supported in continuous text recognition..."
+
+					continue
+				}
+
 				if this.Debug[kDebugGrammars] {
 					nextCharIndex := 1
 
@@ -1031,33 +1052,46 @@ class VoiceManager {
 							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
 			}
-			else if (grammar != "Call")
+			else if (grammar != "Call") {
+				if (mode = "Text")
+					throw "Listener grammars are not supported in continuous text recognition..."
+
 				messageSend(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, grammar, definition, "remoteCommandRecognized"), this.VoiceServer)
-		}
-
-		if speechRecognizer {
-			try {
-				speechRecognizer.loadGrammar("?", speechRecognizer.compileGrammar("[Unknown]"), ObjBindMethod(this, "raisePhraseRecognized"))
-			}
-			catch Any as exception {
-				logError(exception, true)
 			}
 		}
-		else
-			messageSend(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, "?", "[Unknown]", "remoteCommandRecognized"), this.VoiceServer)
 
-		/*
-		if !speechRecognizer
-			messageSend(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, "?", "[Unknown]", "remoteCommandRecognized"), this.VoiceServer)
-		*/
+		if (mode = "Text") {
+			if !speechRecognizer
+				messageSend(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, "Text", "*", "remoteTextRecognized"), this.VoiceServer)
+		}
+		else {
+			if speechRecognizer {
+				try {
+					speechRecognizer.loadGrammar("?", speechRecognizer.compileGrammar("[Unknown]"), ObjBindMethod(this, "raisePhraseRecognized"))
+				}
+				catch Any as exception {
+					logError(exception, true)
+				}
+			}
+			else
+				messageSend(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, "?", "[Unknown]", "remoteCommandRecognized"), this.VoiceServer)
+		}
 	}
 
 	raisePhraseRecognized(grammar, words) {
 		messageSend(kLocalMessage, "Voice", "localPhraseRecognized:" . values2String(";", grammar, words*))
 	}
 
+	raiseTextRecognized(grammar, text) {
+		messageSend(kLocalMessage, "Voice", "localTextRecognized:" . values2String(";", grammar, text))
+	}
+
 	localPhraseRecognized(grammar, words*) {
 		this.phraseRecognized(grammar, words)
+	}
+
+	localTextRecognized(grammar, text) {
+		this.textRecognized(grammar, text)
 	}
 
 	remoteActivationRecognized(words*) {
@@ -1073,6 +1107,10 @@ class VoiceManager {
 		this.phraseRecognized(grammar, words, true)
 	}
 
+	remoteTextRecognized(grammar, command, text) {
+		this.textRecognized(grammar, text, true)
+	}
+
 	phraseRecognized(grammar, words, remote := false) {
 		if (this.Debug[kDebugRecognitions] && !remote)
 			showMessage("Command phrase recognized: " . grammar . " => " . values2String(A_Space, words*))
@@ -1081,6 +1119,20 @@ class VoiceManager {
 
 		try {
 			this.handleVoiceCommand(grammar, words)
+		}
+		finally {
+			protectionOff()
+		}
+	}
+
+	textRecognized(grammar, text, remote := false) {
+		if (this.Debug[kDebugRecognitions] && !remote)
+			showMessage("Text recognized: " . text)
+
+		protectionOn()
+
+		try {
+			this.handleVoiceText(grammar, text)
 		}
 		finally {
 			protectionOff()
@@ -1111,5 +1163,9 @@ class VoiceManager {
 
 	handleVoiceCommand(grammar, words) {
 		throw "Virtual method VoiceManager.handleVoiceCommand must be implemented in a subclass..."
+	}
+
+	handleVoiceText(grammar, text) {
+		throw "Virtual method VoiceManager.handleVoiceText must be implemented in a subclass..."
 	}
 }

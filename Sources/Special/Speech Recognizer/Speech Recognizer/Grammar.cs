@@ -13,6 +13,16 @@ namespace Speech
             return hg;
         }
 
+        public ServerGrammar DictationGrammar()
+        {
+            var hg = new ServerGrammar();
+
+            hg.GrammarBuilder.Culture = _recognizer.RecognizerInfo.Culture;
+            hg.GrammarBuilder.AppendDictation();
+
+            return hg;
+        }
+
         /// <summary>
         /// Creates a Choices object from a string of comma-separated text
         /// </summary>
@@ -97,6 +107,16 @@ namespace Speech
             var hg = new DesktopGrammar();
 
             hg.GrammarBuilder.Culture = _recognizer.RecognizerInfo.Culture;
+
+            return hg;
+        }
+
+        public DesktopGrammar DictationGrammar()
+        {
+            var hg = new DesktopGrammar();
+
+            hg.GrammarBuilder.Culture = _recognizer.RecognizerInfo.Culture;
+            hg.GrammarBuilder.AppendDictation();
 
             return hg;
         }

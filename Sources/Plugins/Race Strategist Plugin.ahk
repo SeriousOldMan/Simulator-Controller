@@ -971,6 +971,7 @@ initializeRaceStrategistPlugin() {
 	RaceStrategistPlugin(controller, kRaceStrategistPlugin, controller.Configuration)
 }
 
+
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;

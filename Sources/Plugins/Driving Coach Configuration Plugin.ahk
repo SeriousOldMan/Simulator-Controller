@@ -333,6 +333,9 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		for ignore, setting in ["ServiceURL", "ServiceKey", "MaxTokens", "MaxHistory"]
 			this.Control["dc" . setting . "Edit"].Text := configuration[setting]
 
+		if ((provider = "GPT4All") && (Trim(this.Control["dcServiceKeyEdit"].Text) = ""))
+			this.Control["dcServiceKeyEdit"].Text := "Any text will do the job"
+
 		this.Control["dcTemperatureEdit"].Text := Round(configuration["Temperature"] * 100)
 
 		this.loadModels(this.iCurrentProvider, configuration["Model"])
@@ -380,12 +383,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 	}
 
 	updateState() {
-		if (this.Control["dcProviderDropDown"].Text = "GPT4ALL") {
-			this.Control["dcServiceKeyEdit"].Enabled := false
-			this.Control["dcServiceKeyEdit"].Text := ""
-		}
-		else
-			this.Control["dcServiceKeyEdit"].Enabled := true
+		this.Control["dcServiceKeyEdit"].Enabled := (this.Control["dcProviderDropDown"].Text != "GPT4ALL")
 	}
 }
 

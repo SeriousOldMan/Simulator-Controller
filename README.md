@@ -45,7 +45,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[5.4.0.0-dev]() (Early build for 5.4.0. Changes: New assistant "Driving Coach", New HTTP library, Added installer for .NET 6.0, Added full free text mode to speech recognition, New plugin "Driving Coach", Specific documentation links in "Simulator Configuration", Almost full compatibility between "Simulator Setup" and "Simulator Configuration", Fixed a bug in "Strategy Workbench for required pitstops in a time window, Replaced "John Doe" in many places with the user name.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-540) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

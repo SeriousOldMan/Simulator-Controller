@@ -1,9 +1,9 @@
 [Development]
 Version=5.4.0.0-dev
 Target=5.4.0.0-release
-Date=09/30/2023
+Date=10/01/2023
 Download=
-Changes=New assistant "Driving Coach", New HTTP library, Added installer for .NET 6.0, Added full free text mode to speech recognition, New plugin "Driving Coach", Specific documentation links in "Simulator Configuration", More compatibility between "Simulator Setup" and "Simulator Configuration", Fixed a bug in "Strategy Workbench for required pitstops in a time window, Replaced "John Doe" in many places with the user name
+Changes=New assistant "Driving Coach", New HTTP library, Added installer for .NET 6.0, Added full free text mode to speech recognition, New plugin "Driving Coach", Specific documentation links in "Simulator Configuration", Almost full compatibility between "Simulator Setup" and "Simulator Configuration", Fixed a bug in "Strategy Workbench for required pitstops in a time window, Replaced "John Doe" in many places with the user name
 Components=Media->5.3.0,Configuration->5.4.0,Utilities->5.3.0
 [Release]
 Version=5.3.2.0-release

@@ -63,7 +63,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 			local field := this.Control["dcMaxTokensEdit"]
 			local value := field.Text
 
-			if (!isInteger(value) || (value < 200) || (value > 32000)) {
+			if (!isInteger(value) || (value < 32)) {
 				field.Text := (field.HasProp("ValidText") ? field.ValidText : "200")
 
 				loop 10
@@ -162,7 +162,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		widget13 := window.Add("ComboBox", "x" . x1 . " yp w" . (w1 - 64) . " vdcModelDropDown Hidden")
 		widget14 := window.Add("Edit", "x" . (x1 + (w1 - 60)) . " yp-1 w60 h23 Number vdcMaxTokensEdit Hidden")
 		widget14.OnEvent("Change", validateTokens)
-		widget15 := window.Add("UpDown", "x" . (x1 + (w1 - 60)) . " yp w60 h23 Range200-32000 Hidden")
+		widget15 := window.Add("UpDown", "x" . (x1 + (w1 - 60)) . " yp w60 h23 Range32-2048 Hidden")
 
 		window.SetFont("Italic", "Arial")
 		widget16 := window.Add("Text", "x" . x0 . " yp+40 w105 h23 Hidden", translate("Personality"))
@@ -243,7 +243,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 	loadFromConfiguration(configuration) {
 		local service, ignore, provider, setting, providerConfiguration
 
-		static defaults := CaseInsenseWeakMap("ServiceURL", false, "Model", false, "MaxTokens", 512, "MaxHistory", 3, "Temperature", 0.5)
+		static defaults := CaseInsenseWeakMap("ServiceURL", false, "Model", false, "MaxTokens", 512, "MaxHistory", 5, "Temperature", 0.5)
 
 		super.loadFromConfiguration(configuration)
 

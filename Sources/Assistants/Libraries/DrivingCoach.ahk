@@ -252,7 +252,7 @@ class DrivingCoach extends GridRaceAssistant {
 			local simulator, car, track, message, position, ignore, conversation
 
 			if (this.Instructions.Has("Character") && this.Instructions["Character"])
-				prompt .= ("### Instruction:`n" . substituteVariables(this.Instructions["Character"], {name: coach.VoiceManager.Name}))
+				prompt .= ("### Instruction:`n" . substituteVariables(this.Instructions["Character"], {name: coach.VoiceManager.Name}) . "`n")
 
 			if (this.Instructions.Has("Simulation") && this.Instructions["Simulation"])
 				if (knowledgeBase && (this.Coach.Session != kSessionFinished)) {

@@ -42,7 +42,7 @@ Since an interaction with Aiden always is kind of a free dialog, the only way to
 2. Give as much context as you have
    It is important that your coach knows as much about the background of your current situation and the purpose of your question as possible. Give this information as early as possible.
    
-   Most of the context information is provided in the initial default instructions (see the [configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-driving-coach) for more information how to provide these instructions). But you may have individual context information, which you can provide **before** your question. Example: "I am driving a Mercedes AMG GT3, which has a front motor. I have severe problems with understeering. How can I setup the car to counteract this?"
+   Most of the context information is provided in the initial default instructions (see the [configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-driving-coach) for more information how to provide these instructions). But you may have individual context information, which you can provide **before** your question. Example: "I am driving a Mercedes AMG GT3, which has a front motor. I have severe problems with understeering. How should I adopt my drving technique? And how can I setup the car to counteract this?"
 
 3. Don't hesitate to ask for more specific information
    LLM based chat bots tend to give more general information in their first answer, but you can always guide them to more specific answers with follow up questions.
@@ -54,3 +54,7 @@ Since an interaction with Aiden always is kind of a free dialog, the only way to
    If Aiden still resists to give you the desired answer, you can try to rephrase your question. Sometimes using a different word, a synonym, will do the job.
 
 The above list are only few of the rules to follow, though the most important ones, when working with an LLM based AI. There are many good articles on te web about the so called *prompt engineering*, which can give you further hints.
+
+## Troubleshooting
+
+https://support.microsoft.com/en-us/windows/use-voice-recognition-in-windows-83ff75bd-63eb-0b6c-18d4-6fae94050571

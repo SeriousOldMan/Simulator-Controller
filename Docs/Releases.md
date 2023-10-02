@@ -10,8 +10,9 @@
   5. When the name of the current driver is unknown for any reason, "John Doe" was used in the past. Now, the name of the current user of Simulator Controller is used.
   6. The documentation link in "Simulator Configuration" is now context-aware and opens the documentation for the configuration tab, which is currently selected.
   7. "Simulator Setup" and "Simulator Configuration" are now almost fully compatible, when using both to work on the configuration.
-  8. [Developer Only] A new library for HTTP REST calling has been implemented.
-  9. [Developer Only] The speech recognition framework now also supports free text recognition in addition to pattern based text recognition.
+  8. Improved the detection of outdated downloadable components.
+  9. [Developer Only] A new library for HTTP REST calling has been implemented.
+  10. [Developer Only] The speech recognition framework now also supports free text recognition in addition to pattern based text recognition.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-540), because you don't want to miss out the new Assistant.
 

@@ -39,7 +39,7 @@ loadSimulatorConfiguration() {
 	local packageInfo, type, pid, path
 
 	checkInstallation(components) {
-		local component, version, ignore, part
+		local component, version, ignore, part, type, installedVersion
 
 		for component, version in components {
 			path := Trim(getMultiMapValue(packageInfo, "Components", component . "." . version . ".Path", ""))
@@ -52,9 +52,18 @@ loadSimulatorConfiguration() {
 			if !FileExist(path)
 				return false
 
-			for ignore, part in string2Values(",", getMultiMapValue(packageInfo, "Components", component . "." . version . ".Content"))
-				if !FileExist(path . part)
+			for ignore, part in string2Values(",", getMultiMapValue(packageInfo, "Components", component . "." . version . ".Content")) {
+				type := FileExist(path . part)
+
+				if !type
 					return false
+				else if InStr(type, "D") {
+					installedVersion := getMultiMapValue(readMultiMap(path . part . "\VERSION"), "Component", "Version", false)
+
+					if (installedVersion != version)
+						return false
+				}
+			}
 		}
 
 		return true

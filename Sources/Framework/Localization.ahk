@@ -433,22 +433,24 @@ readTranslations(targetLanguageCode, withUserTranslations := true, fromEditor :=
 		loop Read, fileName {
 			translation := A_LoopReadLine
 
-			translation := StrReplace(translation, "\=", "=")
-			translation := StrReplace(translation, "\\", "\")
-			translation := StrReplace(translation, "\n", "`n")
+			if (Trim(translation) != "") {
+				translation := StrReplace(translation, "\=", "=")
+				translation := StrReplace(translation, "\\", "\")
+				translation := StrReplace(translation, "\n", "`n")
 
-			translation := StrSplit(translation, "=>")
-			enString := translation[1]
+				translation := StrSplit(translation, "=>")
+				enString := translation[1]
 
-			if ((SubStr(enString, 1, 1) != "[") && (fromEditor || (targetLanguageCode != "en")))
-				if (!fromEditor && ((translation.Length < 2) || (translations.Has(enString) && (translations[enString] != translation[2])))) {
-					if isDebug()
-						throw "Inconsistent translation encountered for `"" . enString . "`" in readTranslations..."
+				if ((SubStr(enString, 1, 1) != "[") && (fromEditor || (targetLanguageCode != "en")))
+					if (!fromEditor && ((translation.Length < 2) || (translations.Has(enString) && (translations[enString] != translation[2])))) {
+						if isDebug()
+							throw "Inconsistent translation encountered for `"" . enString . "`" in readTranslations..."
+						else
+							logError("Inconsistent translation encountered for `"" . enString . "`" in readTranslations...", true)
+					}
 					else
-						logError("Inconsistent translation encountered for `"" . enString . "`" in readTranslations...", true)
-				}
-				else
-					translations[enString] := ((translation.Length < 2) ? "" : translation[2])
+						translations[enString] := ((translation.Length < 2) ? "" : translation[2])
+			}
 		}
 
 	return translations

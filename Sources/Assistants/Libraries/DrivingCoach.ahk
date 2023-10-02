@@ -44,6 +44,18 @@ class DrivingCoach extends GridRaceAssistant {
 		iHistory := []
 		iMaxHistory := 3
 
+		static Models {
+			Get {
+				return []
+			}
+		}
+
+		Models {
+			Get {
+				return DrivingCoach.HTTPConnector.Models
+			}
+		}
+
 		Coach {
 			Get {
 				return this.iCoach
@@ -62,9 +74,16 @@ class DrivingCoach extends GridRaceAssistant {
 			}
 		}
 
-		Model[internal := false] {
+		Model[external := false] {
 			Get {
-				return this.iModel
+				if !external {
+					if inList(this.Models, this.iModel)
+						return StrLower(StrReplace(this.iModel, A_Space, "-"))
+					else
+						return this.iModel
+				}
+				else
+					return this.iModel
 			}
 		}
 
@@ -135,6 +154,17 @@ class DrivingCoach extends GridRaceAssistant {
 				this.History.RemoveAt(1)
 		}
 
+		CreateServiceURL(server) {
+			return server
+		}
+
+		CreateHeaders(headers) {
+			if (Trim(this.Token) != "")
+				headers["Authorization"] := ("Bearer " . this.Token)
+
+			return headers
+		}
+
 		CreatePrompt(body) {
 			throw "Virtual method HTTPConnector.CreatePrompt must be implemented in a subclass..."
 		}
@@ -142,13 +172,8 @@ class DrivingCoach extends GridRaceAssistant {
 		Ask(question) {
 			local coach := this.Coach
 			local speaker := coach.getSpeaker()
-			local headers := Map("Content-Type", "application/json")
-			local body := {model: this.Model, max_tokens: this.MaxTokens, temperature: this.Temperature}
-
-			if (Trim(this.Token) != "")
-				headers["Authorization"] := ("Bearer " . this.Token)
-
-			this.CreatePrompt(body, question)
+			local headers := this.CreateHeaders(Map("Content-Type", "application/json"))
+			local body := this.CreatePrompt({model: this.Model, max_tokens: this.MaxTokens, temperature: this.Temperature}, question)
 
 			body := JSON.print(body)
 
@@ -158,12 +183,22 @@ class DrivingCoach extends GridRaceAssistant {
 				FileAppend(body, kTempDirectory . "Chat.request")
 			}
 
-			answer := WinHttpRequest().POST(this.Server, body, headers, {Object: true, Encoding: "UTF-8"})
+			try {
+				answer := WinHttpRequest().POST(this.CreateServiceURL(this.Server), body, headers, {Object: true, Encoding: "UTF-8"})
 
-			if ((answer.Status >= 200) && (answer.Status < 300))
-				answer := answer.JSON
-			else
-				throw "Cannot connect to " . this.Server . "..."
+				if ((answer.Status >= 200) && (answer.Status < 300))
+					answer := answer.JSON
+				else
+					throw "Cannot connect to " . this.CreateServiceURL(this.Server) . "..."
+			}
+			catch Any as exception {
+				logError(exception)
+
+				if this.Coach.RemoteHandler
+					this.Coach.RemoteHandler.serviceState("Error:Connection")
+
+				return false
+			}
 
 			if isDebug() {
 				deleteFile(kTempDirectory . "Chat.response")
@@ -171,25 +206,37 @@ class DrivingCoach extends GridRaceAssistant {
 				FileAppend(JSON.print(answer), kTempDirectory . "Chat.response")
 			}
 
-			answer := answer["choices"][1]["message"]["content"]
+			try {
+				answer := answer["choices"][1]["message"]["content"]
 
-			this.AddConversation(question, answer)
+				this.AddConversation(question, answer)
 
-			return answer
+				if this.Coach.RemoteHandler
+					this.Coach.RemoteHandler.serviceState("Available")
+
+				return answer
+			}
+			catch Any as exception {
+				logError(exception)
+
+				if this.Coach.RemoteHandler
+					this.Coach.RemoteHandler.serviceState("Error:Answer")
+
+				return false
+			}
 		}
 	}
 
 	class OpenAIConnector extends DrivingCoach.HTTPConnector {
-		Model[external := false] {
+		static Models {
 			Get {
-				if !external {
-					if inList(["GPT 3.5 turbo", "GPT 3.5 turbo 16k", "GPT 4", "GPT 4 32k"], this.iModel)
-						return StrLower(StrReplace(super.Model, A_Space, "-"))
-					else
-						return super.Model
-				}
-				else
-					return super.Model
+				return ["GPT 3.5 turbo", "GPT 3.5 turbo 16k", "GPT 4", "GPT 4 32k"]
+			}
+		}
+
+		Models {
+			Get {
+				return DrivingCoach.OpenAIConnector.Models
 			}
 		}
 
@@ -240,6 +287,30 @@ class DrivingCoach extends GridRaceAssistant {
 			messages.Push({role: "user", content: question})
 
 			body.messages := messages
+
+			return body
+		}
+	}
+
+	class AzureConnector extends DrivingCoach.OpenAIConnector {
+		Model[external := false] {
+			Get {
+				if !external
+					return StrReplace(super.Model[external], ".", "")
+				else
+					return super.Model[external]
+			}
+		}
+
+		CreateServiceURL(server) {
+			return substituteVariables(server, {model: this.Model})
+		}
+
+		CreateHeaders(headers) {
+			if (Trim(this.Token) != "")
+				headers["api-key"] := this.Token
+
+			return headers
 		}
 	}
 
@@ -291,12 +362,24 @@ class DrivingCoach extends GridRaceAssistant {
 			prompt .= ("### Human: " . question . "`n### Assistant:")
 
 			body.prompt := prompt
+
+			return body
 		}
 	}
 
 	class DrivingCoachRemoteHandler extends RaceAssistant.RaceAssistantRemoteHandler {
 		__New(remotePID) {
 			super.__New("Driving Coach", remotePID)
+		}
+
+		serviceState(arguments*) {
+			this.callRemote("serviceState", arguments*)
+		}
+	}
+
+	Providers {
+		Get {
+			return ["OpenAI", "Azure", "GPT4All"]
 		}
 	}
 
@@ -344,34 +427,38 @@ class DrivingCoach extends GridRaceAssistant {
 	startConversation() {
 		local service := this.Options["Driving Coach.Service"]
 
+		this.iTranscript := (normalizeDirectoryPath(this.Options["Driving Coach.Archive"]) . "\" . translate("Conversation ") . A_Now . ".txt")
+
 		if service {
-			if ((InStr(service, "OpenAI") = 1) || (InStr(service, "GPT4All") = 1)) {
-				try {
-					service := string2Values("|", service)
+			service := string2Values("|", service)
 
-					this.iConnector := DrivingCoach.%service[1]%Connector(this)
-
-					this.Connector.Connect(service[2], service[3], this.Options["Driving Coach.Model"])
-
-					this.Connector.MaxTokens := this.Options["Driving Coach.MaxTokens"]
-					this.Connector.Temperature := this.Options["Driving Coach.Temperature"]
-					this.Connector.MaxHistory := this.Options["Driving Coach.MaxHistory"]
-
-					this.Connector.Instructions["Character"] := this.Options["Driving Coach.Instructions.Character"]
-					this.Connector.Instructions["Simulation"] := this.Options["Driving Coach.Instructions.Simulation"]
-					this.Connector.Instructions["Stint"] := this.Options["Driving Coach.Instructions.Stint"]
-				}
-				catch Any as exception {
-					logError(exception)
-
-					throw "Unsupported service detected in DrivingCoach.connect..."
-				}
-			}
-			else
+			if !inList(this.Providers, service[1])
 				throw "Unsupported service detected in DrivingCoach.connect..."
 
-			this.iTranscript := (normalizeDirectoryPath(this.Options["Driving Coach.Archive"]) . "\" . translate("Conversation ") . A_Now . ".txt")
+			try {
+				this.iConnector := DrivingCoach.%service[1]%Connector(this)
+
+				this.Connector.Connect(service[2], service[3], this.Options["Driving Coach.Model"])
+
+				this.Connector.MaxTokens := this.Options["Driving Coach.MaxTokens"]
+				this.Connector.Temperature := this.Options["Driving Coach.Temperature"]
+				this.Connector.MaxHistory := this.Options["Driving Coach.MaxHistory"]
+
+				this.Connector.Instructions["Character"] := this.Options["Driving Coach.Instructions.Character"]
+				this.Connector.Instructions["Simulation"] := this.Options["Driving Coach.Instructions.Simulation"]
+				this.Connector.Instructions["Stint"] := this.Options["Driving Coach.Instructions.Stint"]
+			}
+			catch Any as exception {
+				logError(exception)
+
+				if this.RemoteHandler
+					this.RemoteHandler.serviceState("Error:Configuration")
+
+				throw "Unsupported service detected in DrivingCoach.connect..."
+			}
 		}
+		else
+			throw "Unsupported service detected in DrivingCoach.connect..."
 	}
 
 	stopConversation() {
@@ -390,6 +477,9 @@ class DrivingCoach extends GridRaceAssistant {
 				this.startConversation()
 
 			answer := this.Connector.Ask(text)
+
+			if !answer
+				throw "Problems while connecting to GPT service..."
 		}
 		catch Any as exception {
 			if this.Speaker

@@ -20,7 +20,16 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 
 	Providers {
 		Get {
-			return ["OpenAI", "GPT4All"]
+			return ["OpenAI", "Azure", "GPT4All"]
+		}
+	}
+
+	Models[provider] {
+		Get {
+			if ((provider = "OpenAI") || (provider = "Azure"))
+				return ["GPT 3.5 turbo", "GPT 3.5 turbo 16k", "GPT 4", "GPT 4 32k"]
+			else
+				return []
 		}
 	}
 
@@ -140,25 +149,25 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		widget3.OnEvent("Click", chooseConversationsPath)
 
 		window.SetFont("Italic", "Arial")
-		widget4 := window.Add("Text", "x" . x0 . " yp+40 w105 h23 Hidden", translate("Service"))
+		widget4 := window.Add("Text", "x" . x0 . " yp+40 w105 h23 Hidden", translate("Service "))
 		widget5 := window.Add("Text", "x100 yp+7 w" . (width + 8 - 100) . " 0x10 W:Grow Hidden")
 		window.SetFont("Norm", "Arial")
 
 		widget6 := window.Add("Text", "x" . x0 . " yp+20 w105 h23 +0x200 Hidden", translate("Provider"))
 
- 		choices := ["OpenAI", "GPT4ALL"]
+ 		choices := ["OpenAI", "Azure", "GPT4ALL"]
 		chosen := (choices.Length > 0) ? 1 : 0
 
 		widget7 := window.Add("DropDownList", "x" . x1 . " yp w" . w1 . " Choose" . chosen . " vdcProviderDropDown Hidden", choices)
 		widget7.OnEvent("Change", chooseProvider)
 
-		widget8 := window.Add("Text", "x" . x0 . " yp+24 w80 h23 +0x200 Hidden", translate("Service URL"))
+		widget8 := window.Add("Text", "x" . x0 . " yp+24 w105 h23 +0x200 Hidden", translate("Service URL"))
 		widget9 := window.Add("Edit", "x" . x1 . " yp w" . w1 . " h23 vdcServiceURLEdit Hidden")
 
-		widget10 := window.Add("Text", "x" . x0 . " yp+24 w80 h23 +0x200 Hidden", translate("Service Key"))
+		widget10 := window.Add("Text", "x" . x0 . " yp+24 w105 h23 +0x200 Hidden", translate("Service Key"))
 		widget11 := window.Add("Edit", "x" . x1 . " yp w" . w1 . " h23 vdcServiceKeyEdit Hidden")
 
-		widget12 := window.Add("Text", "x" . x0 . " yp+30 w80 h23 +0x200 Hidden", translate("Model / # Tokens"))
+		widget12 := window.Add("Text", "x" . x0 . " yp+30 w105 h23 +0x200 Hidden", translate("Model / # Tokens"))
 		widget13 := window.Add("ComboBox", "x" . x1 . " yp w" . (w1 - 64) . " vdcModelDropDown Hidden")
 		widget14 := window.Add("Edit", "x" . (x1 + (w1 - 60)) . " yp-1 w60 h23 Number vdcMaxTokensEdit Hidden")
 		widget14.OnEvent("Change", validateTokens)
@@ -169,18 +178,18 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		widget17 := window.Add("Text", "x100 yp+7 w" . (width + 8 - 100) . " 0x10 W:Grow Hidden")
 		window.SetFont("Norm", "Arial")
 
-		widget18 := window.Add("Text", "x" . x0 . " yp+20 w80 h23 +0x200 Hidden", translate("Creativity"))
+		widget18 := window.Add("Text", "x" . x0 . " yp+20 w105 h23 +0x200 Hidden", translate("Creativity"))
 		widget19 := window.Add("Edit", "x" . x1 . " yp w40 Number Limit3 vdcTemperatureEdit Hidden")
 		widget19.OnEvent("Change", validateTemperature)
 		widget20 := window.Add("UpDown", "x" . x1 . " yp w40 h23 Range0-100 Hidden")
 		widget21 := window.Add("Text", "x" . (x1 + 45) . " yp w100 h23 +0x200 Hidden", translate("%"))
 
-		widget22 := window.Add("Text", "x" . x0 . " yp+24 w80 h23 +0x200 Hidden", translate("Memory"))
+		widget22 := window.Add("Text", "x" . x0 . " yp+24 w105 h23 +0x200 Hidden", translate("Memory"))
 		widget23 := window.Add("Edit", "x" . x1 . " yp w40 h23 Number Limit2 vdcMaxHistoryEdit Hidden")
 		widget24 := window.Add("UpDown", "x" . x1 . " yp w40 h23 Range1-10 Hidden")
 		widget25 := window.Add("Text", "x" . (x1 + 45) . " yp w100 h23 +0x200 Hidden", translate("Conversations"))
 
-		widget26 := window.Add("Text", "x" . x0 . " yp+24 w80 h23 +0x200 Hidden", translate("Instructions"))
+		widget26 := window.Add("Text", "x" . x0 . " yp+24 w105 h23 +0x200 Hidden", translate("Instructions"))
 
 		widget27 := window.Add("DropDownList", "x" . x1 . " yp w120 vdcInstructionsDropDown Hidden", collect(this.Instructions[false], translate))
 		widget27.OnEvent("Change", chooseInstructions)
@@ -205,22 +214,20 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		local index
 
 		this.Control["dcModelDropDown"].Delete()
-
-		if (provider = "OpenAI")
-			this.Control["dcModelDropDown"].Add(["GPT 3.5 turbo", "GPT 3.5 turbo 16k", "GPT 4", "GPT 4 32k"])
+		this.Control["dcModelDropDown"].Add(this.Models[provider])
 
 		if model {
-			index := inList(["GPT 3.5 turbo", "GPT 3.5 turbo 16k", "GPT 4", "GPT 4 32k"], model)
+			index := inList(this.Models[provider], model)
 
-			if ((provider != "OpenAI") || !index) {
+			if !index {
 				this.Control["dcModelDropDown"].Add([model])
-				this.Control["dcModelDropDown"].Choose(((provider = "OpenAI") ? 4 : 0) + 1)
+				this.Control["dcModelDropDown"].Choose(this.Models[provider].Length + 1)
 			}
 			else
 				this.Control["dcModelDropDown"].Choose(index)
 		}
 		else
-			this.Control["dcModelDropDown"].Choose((provider = "OpenAI") ? 1 : 0)
+			this.Control["dcModelDropDown"].Choose(inList(this.Models[provider], "GPT 3.5 turbo"))
 	}
 
 	initializeInstructions(provider, model, setting, edit := false) {
@@ -266,11 +273,13 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 				switch provider, false {
 					case "OpenAI":
 						providerConfiguration["ServiceURL"] := "https://api.openai.com/v1/chat/completions"
+					case "Azure":
+						providerConfiguration["ServiceURL"] := "__YOUR_AZURE_OPENAI_ENDPOINT__/openai/deployments/%model%/chat/completions?api-version=2023-05-15"
 					case "GPT4All":
 						providerConfiguration["ServiceURL"] := "http://localhost:4891/v1"
 				}
 
-			if ((provider = "OpenAI") && (providerConfiguration["Model"] = ""))
+			if ((providerConfiguration["Model"] = "") && inList(this.Models[provider], "GPT 3.5 turbo"))
 				providerConfiguration["Model"] := "GPT 3.5 turbo"
 
 			for ignore, setting in concatenate(["Temperature", "MaxHistory"], this.Instructions)

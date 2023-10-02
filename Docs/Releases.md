@@ -3,7 +3,7 @@
   2. Documentation updates here and there, as always
   3. Fixed a bug in "Strategy Workbench", which created a strategy with the wrong race length, when a mandatory pitstop in timed window was selected and the tyre usage forced an additional pitstop one lap before the end of the race. Certainly an edge case...
   4. A new assistant, the Driving Coach, is available. It is based on GPT technology and allows fluent communication about driving techniques, car handling issues, car setup topics and strategy. See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach) for more information.
-     - New plugin "Driving Coach", which handles the configuration and the communication with the assistant.
+     - New plugin "Driving Coach", which handles the configuration and the communication with the assistant. The configuration of the Driving Coach supports three different service providers: OpenAI, Azure and GPT4All.
 	 - "Simulator Setup" has been updated to support the new Assistant.
 	 - New controller actions are available for the "Driving Coach" plugin.
 	 - New icons have been introduced in the Stream Deck icon set.

@@ -109,6 +109,7 @@
   - [Introduction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#introduction)
   - [Installation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#installation)
   - [Interacting with Aiden](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#interacting-with-aiden)
+  - [Troubleshooting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#troubleshooting)
 
 [Virtual Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer)
 ------

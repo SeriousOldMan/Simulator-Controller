@@ -25,6 +25,8 @@ global kDrivingCoachPlugin := "Driving Coach"
 ;;;-------------------------------------------------------------------------;;;
 
 class DrivingCoachPlugin extends RaceAssistantPlugin  {
+	iServiceState := "Available"
+
 	class RemoteDrivingCoach extends RaceAssistantPlugin.RemoteRaceAssistant {
 		__New(plugin, remotePID) {
 			super.__New(plugin, "Driving Coach", remotePID)
@@ -48,17 +50,28 @@ class DrivingCoachPlugin extends RaceAssistantPlugin  {
 		return DrivingCoachPlugin.RemoteDrivingCoach(this, pid)
 	}
 
+	serviceState(health) {
+		this.iServiceState := health
+	}
+
 	writePluginState(configuration) {
+		local problem
+
 		if this.Active {
 			if this.RaceAssistantEnabled {
-				setMultiMapValue(configuration, "Race Assistants", this.Plugin, "Active")
+				setMultiMapValue(configuration, "Race Assistants", this.Plugin, (this.iServiceState = "Available") ? "Active" : "Critical")
 
-				setMultiMapValue(configuration, this.Plugin, "State", "Active")
+				setMultiMapValue(configuration, this.Plugin, "State", (this.iServiceState = "Available") ? "Active" : "Critical")
 
 				information := (translate("Started: ") . translate(this.RaceAssistant ? "Yes" : "No"))
 
-				if !this.RaceAssistantSpeaker
-					information .= ("; " . translate("Muted: ") . translate("Yes"))
+				if (this.iServiceState = "Available") {
+					if !this.RaceAssistantSpeaker
+						information .= ("; " . translate("Muted: ") . translate("Yes"))
+				}
+				else if (InStr(this.iServiceState, "Error") = 1)
+					information .= ("; " . translate("Problem: ") . translate(string2Values(":", this.iServiceState)[2]))
+
 
 				setMultiMapValue(configuration, this.Plugin, "Information", information)
 			}

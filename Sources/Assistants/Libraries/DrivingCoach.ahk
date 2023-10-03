@@ -528,3 +528,12 @@ class DrivingCoach extends GridRaceAssistant {
 		this.stopConversation()
 	}
 }
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                   Private Function Declaration Section                  ;;;
+;;;-------------------------------------------------------------------------;;;
+
+getTime(*) {
+	return A_Now
+}

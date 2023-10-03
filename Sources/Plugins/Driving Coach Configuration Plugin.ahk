@@ -153,60 +153,62 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		widget5 := window.Add("Text", "x100 yp+7 w" . (width + 8 - 100) . " 0x10 W:Grow Hidden")
 		window.SetFont("Norm", "Arial")
 
-		widget6 := window.Add("Text", "x" . x0 . " yp+20 w105 h23 +0x200 Hidden", translate("Provider"))
+		widget6 := window.Add("Text", "x" . x0 . " yp+20 w105 h23 +0x200 Hidden", translate("Provider / URL"))
 
  		choices := ["OpenAI", "Azure", "GPT4ALL"]
 		chosen := (choices.Length > 0) ? 1 : 0
 
-		widget7 := window.Add("DropDownList", "x" . x1 . " yp w" . w1 . " Choose" . chosen . " vdcProviderDropDown Hidden", choices)
+		widget7 := window.Add("DropDownList", "x" . x1 . " yp w80 Choose" . chosen . " vdcProviderDropDown Hidden", choices)
 		widget7.OnEvent("Change", chooseProvider)
 
-		widget8 := window.Add("Text", "x" . x0 . " yp+24 w105 h23 +0x200 Hidden", translate("Service URL"))
-		widget9 := window.Add("Edit", "x" . x1 . " yp w" . w1 . " h23 vdcServiceURLEdit Hidden")
+		widget8 := window.Add("Edit", "x" . (x1 + 82) . " yp w" . (w1 - 82) . " h23 vdcServiceURLEdit Hidden")
 
-		widget10 := window.Add("Text", "x" . x0 . " yp+24 w105 h23 +0x200 Hidden", translate("Service Key"))
-		widget11 := window.Add("Edit", "x" . x1 . " yp w" . w1 . " h23 vdcServiceKeyEdit Hidden")
+		widget9 := window.Add("Text", "x" . x0 . " yp+24 w105 h23 +0x200 Hidden", translate("Service Key"))
+		widget10 := window.Add("Edit", "x" . x1 . " yp w" . w1 . " h23 vdcServiceKeyEdit Hidden")
 
-		widget12 := window.Add("Text", "x" . x0 . " yp+30 w105 h23 +0x200 Hidden", translate("Model / # Tokens"))
-		widget13 := window.Add("ComboBox", "x" . x1 . " yp w" . (w1 - 64) . " vdcModelDropDown Hidden")
-		widget14 := window.Add("Edit", "x" . (x1 + (w1 - 60)) . " yp-1 w60 h23 Number vdcMaxTokensEdit Hidden")
-		widget14.OnEvent("Change", validateTokens)
-		widget15 := window.Add("UpDown", "x" . (x1 + (w1 - 60)) . " yp w60 h23 Range32-2048 Hidden")
+		widget11 := window.Add("Text", "x" . x0 . " yp+30 w105 h23 +0x200 Hidden", translate("Model / # Tokens"))
+		widget12 := window.Add("ComboBox", "x" . x1 . " yp w" . (w1 - 64) . " vdcModelDropDown Hidden")
+		widget13 := window.Add("Edit", "x" . (x1 + (w1 - 60)) . " yp-1 w60 h23 Number vdcMaxTokensEdit Hidden")
+		widget13.OnEvent("Change", validateTokens)
+		widget14 := window.Add("UpDown", "x" . (x1 + (w1 - 60)) . " yp w60 h23 Range32-2048 Hidden")
 
 		window.SetFont("Italic", "Arial")
-		widget16 := window.Add("Text", "x" . x0 . " yp+40 w105 h23 Hidden", translate("Personality"))
-		widget17 := window.Add("Text", "x100 yp+7 w" . (width + 8 - 100) . " 0x10 W:Grow Hidden")
+		widget15 := window.Add("Text", "x" . x0 . " yp+40 w105 h23 Hidden", translate("Personality"))
+		widget16 := window.Add("Text", "x100 yp+7 w" . (width + 8 - 100) . " 0x10 W:Grow Hidden")
 		window.SetFont("Norm", "Arial")
 
-		widget18 := window.Add("Text", "x" . x0 . " yp+20 w105 h23 +0x200 Hidden", translate("Creativity"))
-		widget19 := window.Add("Edit", "x" . x1 . " yp w40 Number Limit3 vdcTemperatureEdit Hidden")
-		widget19.OnEvent("Change", validateTemperature)
-		widget20 := window.Add("UpDown", "x" . x1 . " yp w40 h23 Range0-100 Hidden")
-		widget21 := window.Add("Text", "x" . (x1 + 45) . " yp w100 h23 +0x200 Hidden", translate("%"))
+		widget17 := window.Add("Text", "x" . x0 . " yp+20 w105 h23 +0x200 Hidden", translate("Creativity"))
+		widget18 := window.Add("Edit", "x" . x1 . " yp w60 Number Limit3 vdcTemperatureEdit Hidden")
+		widget18.OnEvent("Change", validateTemperature)
+		widget19 := window.Add("UpDown", "x" . x1 . " yp w60 h23 Range0-100 Hidden")
+		widget20 := window.Add("Text", "x" . (x1 + 65) . " yp w100 h23 +0x200 Hidden", translate("%"))
 
-		widget22 := window.Add("Text", "x" . x0 . " yp+24 w105 h23 +0x200 Hidden", translate("Memory"))
-		widget23 := window.Add("Edit", "x" . x1 . " yp w40 h23 Number Limit2 vdcMaxHistoryEdit Hidden")
-		widget24 := window.Add("UpDown", "x" . x1 . " yp w40 h23 Range1-10 Hidden")
-		widget25 := window.Add("Text", "x" . (x1 + 45) . " yp w100 h23 +0x200 Hidden", translate("Conversations"))
+		widget21 := window.Add("Text", "x" . x0 . " yp+24 w105 h23 +0x200 Hidden", translate("Memory"))
+		widget22 := window.Add("Edit", "x" . x1 . " yp w60 h23 Number Limit2 vdcMaxHistoryEdit Hidden")
+		widget23 := window.Add("UpDown", "x" . x1 . " yp w60 h23 Range1-10 Hidden")
+		widget24 := window.Add("Text", "x" . (x1 + 65) . " yp w100 h23 +0x200 Hidden", translate("Conversations"))
 
-		widget26 := window.Add("Text", "x" . x0 . " yp+24 w105 h23 +0x200 Hidden", translate("Instructions"))
+		widget25 := window.Add("Text", "x" . x0 . " yp+24 w105 h23 +0x200 Hidden", translate("Confirmation"))
+		widget26 := window.Add("DropDownList", "x" . x1 . " yp w60 Choose1 vdcConfirmationDropDown", collect(["Yes", "No"], translate))
 
-		widget27 := window.Add("DropDownList", "x" . x1 . " yp w120 vdcInstructionsDropDown Hidden", collect(this.Instructions[false], translate))
-		widget27.OnEvent("Change", chooseInstructions)
+		widget27 := window.Add("Text", "x" . x0 . " yp+24 w105 h23 +0x200 Hidden", translate("Instructions"))
+
+		widget28 := window.Add("DropDownList", "x" . x1 . " yp w120 vdcInstructionsDropDown Hidden", collect(this.Instructions[false], translate))
+		widget28.OnEvent("Change", chooseInstructions)
 
 		if (StrSplit(A_ScriptName, ".")[1] = "Simulator Configuration")
 			height := 140
 		else
 			height := 65
 
-		widget28 := window.Add("Edit", "x" . x1 . " yp+24 w" . w1 . " h" . height . " Multi H:Grow W:Grow vdcInstructionsEdit Hidden")
-		widget28.OnEvent("Change", updateInstructions)
+		widget29 := window.Add("Edit", "x" . x1 . " yp+24 w" . w1 . " h" . height . " Multi H:Grow W:Grow vdcInstructionsEdit Hidden")
+		widget29.OnEvent("Change", updateInstructions)
 
-		widget29 := window.Add("Button", "x" . (x1 + w1 - 23) . " yp-25 w23 h23 X:Move Hidden")
-		widget29.OnEvent("Click", reloadInstructions)
-		setButtonIcon(widget29, kIconsDirectory . "Renew.ico", 1)
+		widget30 := window.Add("Button", "x" . (x1 + w1 - 23) . " yp-25 w23 h23 X:Move Hidden")
+		widget30.OnEvent("Click", reloadInstructions)
+		setButtonIcon(widget28, kIconsDirectory . "Renew.ico", 1)
 
-		loop 29
+		loop 30
 			editor.registerWidget(this, widget%A_Index%)
 	}
 
@@ -250,7 +252,8 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 	loadFromConfiguration(configuration) {
 		local service, ignore, provider, setting, providerConfiguration
 
-		static defaults := CaseInsenseWeakMap("ServiceURL", false, "Model", false, "MaxTokens", 512, "MaxHistory", 5, "Temperature", 0.5)
+		static defaults := CaseInsenseWeakMap("ServiceURL", false, "Model", false, "MaxTokens", 512
+											, "MaxHistory", 5, "Temperature", 0.5, "Confirmation", true)
 
 		super.loadFromConfiguration(configuration)
 
@@ -282,7 +285,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 			if ((providerConfiguration["Model"] = "") && inList(this.Models[provider], "GPT 3.5 turbo"))
 				providerConfiguration["Model"] := "GPT 3.5 turbo"
 
-			for ignore, setting in concatenate(["Temperature", "MaxHistory"], this.Instructions)
+			for ignore, setting in concatenate(["Temperature", "MaxHistory", "Confirmation"], this.Instructions)
 				providerConfiguration[setting] := getMultiMapValue(configuration, "Driving Coach Personality", provider . "." . setting, defaults[setting])
 
 			this.iProviderConfigurations[provider] := providerConfiguration
@@ -309,7 +312,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 			for ignore, setting in ["ServiceURL", "ServiceKey", "Model", "MaxTokens"]
 				setMultiMapValue(configuration, "Driving Coach Service", provider . "." . setting, providerConfiguration[setting])
 
-			for ignore, setting in concatenate(["Temperature", "MaxHistory"], this.Instructions) {
+			for ignore, setting in concatenate(["Temperature", "MaxHistory", "Confirmation"], this.Instructions) {
 				setMultiMapValue(configuration, "Driving Coach Personality", provider . "." . setting, providerConfiguration[setting])
 
 				if (provider = this.iCurrentProvider)
@@ -347,6 +350,8 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 
 		this.Control["dcTemperatureEdit"].Text := Round(configuration["Temperature"] * 100)
 
+		this.Control["dcConfirmationDropDown"].Value := (configuration["Confirmation"] ? 1 : 2)
+
 		this.loadModels(this.iCurrentProvider, configuration["Model"])
 
 		this.Control["dcInstructionsDropDown"].Choose(1)
@@ -370,6 +375,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 
 		providerConfiguration["Temperature"] := Round(this.Control["dcTemperatureEdit"].Text / 100, 2)
 		providerConfiguration["MaxHistory"] := this.Control["dcMaxHistoryEdit"].Text
+		providerConfiguration["Confirmation"] := ((this.Control["dcConfirmationDropDown"].Value = 1) ? true : false)
 
 		for ignore, setting in this.Instructions
 			providerConfiguration[Setting] := this.Value[setting]

@@ -509,6 +509,8 @@ A very important setting is the Conversation Memory. You can specify, how many r
 
 You can also specify how long the answers of the Driving Coach can get ("# MaxTokens" - as a rule of thumb divide this number by 4 and you will get the maximum number of words in English), and you can also specify, how *creative* the answers will be.
 
+The "Confirmation" choice allows you to specify, whether the Assistant will give you a short notice, when it has recognized a question or a command before the actual answer is computed. This can be very helpful in cases, where the underlying model or the GPT service provider is very slow, so that you know, that you have been understood.
+
 The Driving Coach will use the language specified general voice control settings. It is very important, that the voice recognition is as perfect as it can be, I recommend using the "Azure" voice recognition service. If you want to use the "Desktop" recognition engine, which is quite good, when used with a headset, use the training methods of Windows, until your speech is recognized correctly. You can also enable the "Debug Recognitions" option for the "Voice Server", so that it gives you visually feedback for each recognition.
 
 The conversations you have with your coach, will be transcribed to text files. You can supply a special folder, where these transcriptions will be saved, in the first field. If you leave this field empty, the transcriptions will be saved temporarily in the *Simulator Controller\Temp\Conversations* folder which is located in the user *Documents* folder.

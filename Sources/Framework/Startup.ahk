@@ -81,8 +81,11 @@ loadSimulatorConfiguration() {
 
 	if type {
 		if (StrSplit(A_ScriptName, ".")[1] != "Simulator Tools")
-			if !checkInstallation(string2Map(",", "->", getMultiMapValue(packageInfo, type, "Components", "")))
-				RunWait(kBinariesDirectory . "Simulator Tools.exe -Repair")
+			if !checkInstallation(string2Map(",", "->", getMultiMapValue(packageInfo, type, "Components", ""))) {
+				Run("*RunAs " . kBinariesDirectory . "Simulator Tools.exe -Repair -Start `"" . A_ScriptName . "`"")
+
+				ExitApp(0)
+			}
 
 		kVersion := getMultiMapValue(packageInfo, type, "Version", false)
 

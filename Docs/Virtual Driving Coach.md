@@ -48,7 +48,7 @@ Remember, trail braking is a skill that takes time and practice to master. Be pa
 
 **Driver:** Can we talk about strategy?
 
-**Aiden: Certainly! I can provide some insights on race strategy. What specific aspects of strategy would you like to discuss?
+**Aiden:** Certainly! I can provide some insights on race strategy. What specific aspects of strategy would you like to discuss?
 
 **Driver:** I have a one hour race coming up. Fuel and tyres are good for the complete race, but there is a mandatory pit stop. The pit stop does not require changing tyres. What is the best strategy for this race?
 

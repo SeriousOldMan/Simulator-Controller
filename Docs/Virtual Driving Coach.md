@@ -10,6 +10,12 @@ But before we proceed to the details of the configruation and the rules how to i
  
 ### A typical dialog
 
+It is very hard to describe, how the interaction with Aiden is like. Therefore, let's take a look together at a short interaction. By the way, the Driving Coach is named "Kim" here.
+
+[![](https://img.youtube.com/vi/LBtLk_md1IE/0.jpg)](https://youtu.be/LBtLk_md1IE)
+
+And here is a transcript of a very similar conversation:
+
 **Driver:** Can you introduce yourself?
 
 **Aiden:** I am Aiden, a driving coach and expert in car handling and car physics. I specialize in circuit racing, both in simulations and real-world racing. I have experience in troubleshooting handling issues and understanding the relationship between car setup choices and handling problems. How can I assist you today?
@@ -137,4 +143,6 @@ The above list are only few of the rules to follow, though the most important on
 
 For some tips n tricks for the best voice recognition experience, see the [corresponding chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#troubleshooting) in the documentation of Jona.
 
-As said, using the "Azure" voice recognition engine is strongly recommend, because of its superior quality. When using the "Dektop" service, which is builtin to the Windows operating system, you will encounter wrong recognitions here and there, esppecially when formulating long questions. To get the best recognition quality with the "Desktop" recognition engine, you can train your computer for your pronounciation. Follow the instructions found in the [Microsoft documentation](https://support.microsoft.com/en-us/windows/use-voice-recognition-in-windows-83ff75bd-63eb-0b6c-18d4-6fae94050571).
+A typical problem, which might happen, is that the Driving Coach does not wait with its answer until you have finished your question. This happens especially, when you are formulating very long questions. In this case, use the *Push-To-Talk* method "Hold & Press", which will prevent this.
+
+As said above, using the "Azure" voice recognition engine is strongly recommend, because of its superior quality. When using the "Dektop" service, which is builtin to the Windows operating system, you will encounter wrong recognitions here and there, esppecially when formulating long questions. To get the best recognition quality with the "Desktop" recognition engine, you can train your computer for your pronounciation. Follow the instructions found in the [Microsoft documentation](https://support.microsoft.com/en-us/windows/use-voice-recognition-in-windows-83ff75bd-63eb-0b6c-18d4-6fae94050571).

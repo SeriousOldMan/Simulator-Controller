@@ -818,6 +818,8 @@ class BasicStepWizard extends StepWizard {
 
 			setup := this.assistantSetup(assistant)
 
+			setMultiMapValues(configuration, "Voice Control", getMultiMapValues(kSimulatorConfiguration, "Voice Control"), false)
+
 			setMultiMapValue(configuration, "Voice Control", "Language", setup.Language)
 			setMultiMapValue(configuration, "Voice Control", "Synthesizer", setup.Synthesizer)
 			setMultiMapValue(configuration, "Voice Control", "Speaker", setup.Voice)

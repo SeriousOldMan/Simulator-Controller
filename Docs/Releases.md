@@ -11,9 +11,10 @@
   6. The documentation link in "Simulator Configuration" is now context-aware and opens the documentation for the configuration tab, which is currently selected.
   7. "Simulator Setup" and "Simulator Configuration" are now almost fully compatible, when using both to work on the configuration.
   8. The meta model for "Setup Workbench" has been extended. It now supports non-standard setup settings for modded cars (currently only relevant for *assetto Corsa*). See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#extending-and-cutomizing-setup-workbench) for more information.
-  8. [Internal] Improved the detection of outdated downloadable components.
-  9. [Developer Only] A new library for HTTP REST calling has been implemented.
-  10. [Developer Only] The speech recognition framework now also supports free text recognition in addition to pattern based text recognition.
+  9. You can now supply your own sound files for the different notifcation sounds of Simulator Controller applications. See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#using-your-own-sounds-for-confirmation-sounds) for more information.
+  10. [Internal] Improved the detection of outdated downloadable components.
+  11. [Developer Only] A new library for HTTP REST calling has been implemented.
+  12. [Developer Only] The speech recognition framework now also supports free text recognition in addition to pattern based text recognition.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-540), because you don't want to miss out the new Assistant.
 

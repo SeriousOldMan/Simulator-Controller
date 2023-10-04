@@ -90,6 +90,10 @@ The startup process of Simulator Controller can entertain you with nice images a
 
 Note: Choosing media files depending on the currently selected simulation game is on the wish list for a future release :-)
 
+## Using your own sounds for confirmation sounds
+
+Many Simulator Controller applications use confirmation sounds to inform you of certain events. For example, if you have pressed the *Push-To-Talk* button, you will hear a silent notification tone, which informs you, that the system is listening now. These sounds are stored in the folder *Resources\Sounds*, which is located in the program folder. If you want to change the sound, you can place your own sound using the same name in the folder *Simulator Controller\Sounds*, which is located in your user *Documents* folder.
+
 ## Additional requirements for the embedded HTML browser
 
 A couple of the applications of Simulator Controller display various charts and graphs using the Google chart library in an embedded web browser. This web browser, which is part of Windows, must be configured for a given application using a setting in the Windows Registry. In most cases, this setting can be configured automatically by the given application, but in rare cases, admin privileges are required to insert the corresponding key in the registry. If you encounter an error that the Google library can not be loaded, you must run the application in question once using administrator privileges. This currently applies to "Race Reports", "Strategy Workbench", "Race Center", "Session Database" and "Setup Workbench".

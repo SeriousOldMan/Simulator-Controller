@@ -932,7 +932,7 @@ class SimulatorController extends ConfigurationItem {
 		if first
 			first := false
 		else
-			playSound("SCSoundPlayer.exe", kResourcesDirectory . "Sounds\Activated.wav", audioDevice)
+			playSound("SCSoundPlayer.exe", getFileName("Activated.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\"), audioDevice)
 	}
 
 	activationCommand(words*) {

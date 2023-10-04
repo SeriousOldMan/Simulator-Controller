@@ -145,6 +145,10 @@ According to the maturity scale of *attractive.ai* (one of several hundreds matu
 
 The Assistant is based on text-based GPT technology and uses a publically available large language model which has been trained with vasts amount of information. Using this knowledge, this Assistant behaves as your personal driving coach. Although the Driving Coach is not a part of your active crew, you can ask him anything about racing, car handling and driving techniques and you will probably will get an interesting answer.
 
+Click on the picture to hear an actual conversation with the Driving Coach:
+
+[![](https://img.youtube.com/vi/LBtLk_md1IE/0.jpg)](https://youtu.be/LBtLk_md1IE)
+
 ##### Race Engineer & Race Strategist
 
 An AI based Race Engineer with fully dialog capable voice control will guide you through your race, warn you about critical technical issues and will help you with the pitstop, whereas the Race Strategist keeps an eye on the race positions, develops a pitstop strategy, and so on. These smart chat bots are independent applications, but are integreated with the ACC and other simulation game plugins using interprocess communication right now. An integration for a new simulation games requires some effort, especially for the necessary data acquisition from the simulation game, but a knowledged programmer can manage it in about three to four hours.

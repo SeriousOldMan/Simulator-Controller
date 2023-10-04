@@ -90,6 +90,10 @@ The startup process of Simulator Controller can entertain you with nice images a
 
 Note: Choosing media files depending on the currently selected simulation game is on the wish list for a future release :-)
 
+## Using your own sounds for confirmation sounds
+
+Many Simulator Controller applications use confirmation sounds to inform you of certain events. For example, if you have pressed the *Push-To-Talk* button, you will hear a silent notification tone, which informs you, that the system is listening now. These sounds are stored in the folder *Resources\Sounds*, which is located in the program folder. If you want to change the sound, you can place your own sound using the same name in the folder *Simulator Controller\Sounds*, which is located in your user *Documents* folder.
+
 ## Additional requirements for the embedded HTML browser
 
 A couple of the applications of Simulator Controller display various charts and graphs using the Google chart library in an embedded web browser. This web browser, which is part of Windows, must be configured for a given application using a setting in the Windows Registry. In most cases, this setting can be configured automatically by the given application, but in rare cases, admin privileges are required to insert the corresponding key in the registry. If you encounter an error that the Google library can not be loaded, you must run the application in question once using administrator privileges. This currently applies to "Race Reports", "Strategy Workbench", "Race Center", "Session Database" and "Setup Workbench".
@@ -508,6 +512,8 @@ You **should** supply the different instructions for the chatbot, so that it kno
 A very important setting is the Conversation Memory. You can specify, how many recent conversations will be memorized, so that you can refer to topics mentioned in previous conversations. Please not, that a larger memory will make your conversations with Aiden more natural, but it will take a little bit longer to generate an answer and, depending on the provider, it may cost a little bit more.
 
 You can also specify how long the answers of the Driving Coach can get ("# MaxTokens" - as a rule of thumb divide this number by 4 and you will get the maximum number of words in English), and you can also specify, how *creative* the answers will be.
+
+The "Confirmation" choice allows you to specify, whether the Assistant will give you a short notice, when it has recognized a question or a command before the actual answer is computed. This can be very helpful in cases, where the underlying model or the GPT service provider is very slow, so that you know, that you have been understood.
 
 The Driving Coach will use the language specified general voice control settings. It is very important, that the voice recognition is as perfect as it can be, I recommend using the "Azure" voice recognition service. If you want to use the "Desktop" recognition engine, which is quite good, when used with a headset, use the training methods of Windows, until your speech is recognized correctly. You can also enable the "Debug Recognitions" option for the "Voice Server", so that it gives you visually feedback for each recognition.
 

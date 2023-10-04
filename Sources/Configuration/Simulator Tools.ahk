@@ -381,10 +381,10 @@ checkInstallation() {
 	global gProgressCount
 
 	local installLocation := ""
-	local installInfo, quiet, options, msgResult, hasSplash
+	local installInfo, quiet, options, msgResult, hasSplash, command, component, source
 	local install, index, options, isNew, packageLocation, ignore, directory, currentDirectory
 
-	installComponents(packageLocation, installLocation) {
+	installComponents(packageLocation, installLocation, temporary := false) {
 		global gProgressCount
 
 		local packageInfo := readMultiMap(packageLocation . "\VERSION")
@@ -393,7 +393,8 @@ checkInstallation() {
 																		  , getMultiMapValue(installInfo, "Current", "Type", "Release")
 																		  , "Components", ""))
 		local error := false
-		local component, version, type, ignore, part, path
+		local components := []
+		local component, version, type, ignore, part, path, destination
 
 		for component, version in string2Map(",", "->"
 										   , getMultiMapValue(packageInfo, getMultiMapValue(packageInfo, "Current", "Type")
@@ -416,7 +417,19 @@ checkInstallation() {
 					else
 						path := packageLocation
 
-					RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\Temp.zip' -DestinationPath '" . path . "' -Force", , "Hide")
+					if temporary {
+						destination := (A_Temp . "\SC-Component" . A_Index)
+
+						deleteFile(destination)
+						deletedirectory(destination)
+
+						for ignore, part in string2Values(",", getMultiMapValue(installInfo, "Components", component . "." . version . ".Content"))
+							components.Push([path . "\" . part, destination . "\" . part])
+					}
+					else
+						destination := path
+
+					RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\Temp.zip' -DestinationPath '" . destination . "' -Force", , "Hide")
 
 					showProgress({progress: (gProgressCount += 5)})
 				}
@@ -429,9 +442,9 @@ checkInstallation() {
 			else {
 				version := installedComponents[component]
 
-				for ignore, part in string2Values(",", getMultiMapValue(installInfo, "Components", component . "." . version . ".Content")) {
-					path := Trim(getMultiMapValue(packageInfo, "Components", component . "." . version . ".Path", ""))
+				path := Trim(getMultiMapValue(packageInfo, "Components", component . "." . version . ".Path", ""))
 
+				for ignore, part in string2Values(",", getMultiMapValue(installInfo, "Components", component . "." . version . ".Content")) {
 					if (path && (path != "") && (path != "."))
 						path := ("\" . path . "\" . part)
 					else
@@ -455,6 +468,8 @@ checkInstallation() {
 			MsgBox(translate("Cannot download additional files, because the version repository is currently unavailable. Please start `"Simulator Download`" again later."), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
 		}
+
+		return components
 	}
 
 	try {
@@ -470,9 +485,30 @@ checkInstallation() {
 	if inList(A_Args, "-Repair") {
 		showProgress({color: "Blue", title: translate("Installing Simulator Controller"), message: translate("...")})
 
-		installComponents(normalizeDirectoryPath(installLocation), normalizeDirectoryPath(installLocation))
+		deleteFile(A_Temp . "\Patch.bat")
+
+		command := "ping 127.0.0.1 -n 2 > nul`n"
+		command .= ("cd " . kHomeDirectory . "`n")
+
+		for ignore, component in installComponents(normalizeDirectoryPath(installLocation), normalizeDirectoryPath(installLocation), true) {
+			if InStr(FileExist(component[1]), "D")
+				command .= ("rmdir `"" . component[1] . "`" /s /q`n")
+			else if FileExist(component[1])
+				command .= ("del /f `"" . component[1] . "`"`n")
+
+			command .= ("xcopy `"" . component[2] . "`" `"" . component[1] . "`"  /S /E /I`n")
+		}
+
+		if inList(A_Args, "-Start") {
+			command .= ("cd " . kBinariesDirectory . "`n")
+			command .= ("`"" . kBinariesDirectory . A_Args[inList(A_Args, "-Start") + 1] . "`"`n")
+		}
+
+		FileAppend(command, A_Temp . "\Patch.bat")
 
 		hideProgress()
+
+		Run("`"" . A_Temp . "\Patch.bat`"", kHomeDirectory, "Hide")
 
 		ExitApp(0)
 	}

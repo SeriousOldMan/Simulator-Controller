@@ -91,7 +91,7 @@ class BasicStepWizard extends StepWizard {
 		getPTTHotkey(*) {
 			setPTTHotkey(hotkey) {
 				if !isInteger(hotkey) {
-					SoundPlay(kResourcesDirectory . "Sounds\Activated.wav")
+					SoundPlay(getFileName("Activated.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\"))
 
 					this.Control["basicPushToTalkEdit"].Text := hotkey
 

@@ -192,6 +192,16 @@ class AssistantsStepWizard extends ActionsStepWizard {
 		local page, assistant, labelWidth, labelX, labelY, label
 		local listX, listY, listWidth, info, html, configurator, colWidth, wddget
 
+		resizeAllowed(control, &rule) {
+			if (control.Name = "dcInstructionsEdit") {
+				rule := "H:Grow(0.66)"
+
+				return true
+			}
+			else
+				return false
+		}
+
 		noSelect(listView, *) {
 			loop listView.GetCount()
 				listView.Modify(A_Index, "-Select")
@@ -282,7 +292,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 			if configurator {
 				this.iAssistantConfigurators.Push(configurator)
 
-				window.Resizeable := false
+				window.Resizeable := resizeAllowed
 
 				configurator.createGui(this, x, listY + 30, colWidth, height)
 

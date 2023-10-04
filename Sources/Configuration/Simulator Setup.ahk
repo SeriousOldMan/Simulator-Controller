@@ -173,7 +173,7 @@ class SetupWizard extends ConfiguratorPanel {
 
 			Set {
 				if value {
-					this.iResizeEnabled := true
+					this.iResizeEnabled := value
 
 					return super.Resizeable
 				}
@@ -189,7 +189,9 @@ class SetupWizard extends ConfiguratorPanel {
 		}
 
 		DefineResizeRule(control, rule) {
-			if this.Resizeable
+			if (isInstance(this.iResizeEnabled, Func) && this.iResizeEnabled.Call(control, &rule))
+				super.DefineResizeRule(control, rule)
+			else if (!isInstance(this.iResizeEnabled, Func) && this.Resizeable)
 				super.DefineResizeRule(control, rule)
 		}
 
@@ -695,7 +697,7 @@ class SetupWizard extends ConfiguratorPanel {
 		wizardGui.Add("Text", "x16 y580 w85 h23 Y:Move +0x200", translate("Language"))
 		wizardGui.Add("DropDownList", "x100 y580 w75 Y:Move Choose" . chosen . "  VlanguageDropDown", collect(choices, translate)).OnEvent("Change", chooseLanguage)
 
-		wizardGui.Add("DropDownList", "x230 y580 w260 X:Move(0.5) Y:Move VstepDropDown").OnEvent("Change", gotoStep)
+		wizardGui.Add("DropDownList", "x238 y580 w260 X:Move(0.5) Y:Move VstepDropDown").OnEvent("Change", gotoStep)
 
 		wizardGui.Add("Button", "x535 y580 w80 h23 Y:Move X:Move Disabled VfinishButton", translate("Finish")).OnEvent("Click", finishSetup)
 		wizardGui.Add("Button", "x620 y580 w80 h23 Y:Move X:Move", translate("Cancel")).OnEvent("Click", cancelSetup)

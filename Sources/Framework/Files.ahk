@@ -88,8 +88,11 @@ normalizeDirectoryPath(path) {
 	return path
 }
 
-temporaryFileName(name, extension) {
-	return (kTempDirectory . name . "_" . Round(Random(1, 100000)) . "." . extension)
+temporaryFileName(name, extension := "") {
+	if extension != ""
+		extension := ("." . extension)
+
+	return (kTempDirectory . name . "_" . Round(Random(1, 100000)) . extension)
 }
 
 deleteFile(fileName, backup := false) {

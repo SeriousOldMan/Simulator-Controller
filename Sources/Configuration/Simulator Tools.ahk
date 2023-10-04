@@ -381,7 +381,7 @@ checkInstallation() {
 	global gProgressCount
 
 	local installLocation := ""
-	local installInfo, quiet, options, msgResult, hasSplash, command, component
+	local installInfo, quiet, options, msgResult, hasSplash, command, component, source
 	local install, index, options, isNew, packageLocation, ignore, directory, currentDirectory
 
 	installComponents(packageLocation, installLocation, temporary := false) {
@@ -394,7 +394,7 @@ checkInstallation() {
 																		  , "Components", ""))
 		local error := false
 		local components := []
-		local component, version, type, ignore, part, path
+		local component, version, type, ignore, part, path, destination
 
 		for component, version in string2Map(",", "->"
 										   , getMultiMapValue(packageInfo, getMultiMapValue(packageInfo, "Current", "Type")
@@ -417,10 +417,19 @@ checkInstallation() {
 					else
 						path := packageLocation
 
-					RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\Temp.zip' -DestinationPath '" . path . (temporary ? ".tmp" : "") . "' -Force", , "Hide")
+					if temporary {
+						destination := (A_Temp . "\SC-Component" . A_Index)
 
-					if temporary
-						components.Push(path)
+						deleteFile(destination)
+						deletedirectory(destination)
+
+						for ignore, part in string2Values(",", getMultiMapValue(installInfo, "Components", component . "." . version . ".Content"))
+							components.Push([path . "\" . part, destination . "\" . part])
+					}
+					else
+						destination := path
+
+					RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\Temp.zip' -DestinationPath '" . destination . "' -Force", , "Hide")
 
 					showProgress({progress: (gProgressCount += 5)})
 				}
@@ -433,9 +442,9 @@ checkInstallation() {
 			else {
 				version := installedComponents[component]
 
-				for ignore, part in string2Values(",", getMultiMapValue(installInfo, "Components", component . "." . version . ".Content")) {
-					path := Trim(getMultiMapValue(packageInfo, "Components", component . "." . version . ".Path", ""))
+				path := Trim(getMultiMapValue(packageInfo, "Components", component . "." . version . ".Path", ""))
 
+				for ignore, part in string2Values(",", getMultiMapValue(installInfo, "Components", component . "." . version . ".Content")) {
 					if (path && (path != "") && (path != "."))
 						path := ("\" . path . "\" . part)
 					else
@@ -482,18 +491,20 @@ checkInstallation() {
 		command .= ("cd " . kHomeDirectory . "`n")
 
 		for ignore, component in installComponents(normalizeDirectoryPath(installLocation), normalizeDirectoryPath(installLocation), true) {
-			if InStr(FileExist(component), "D")
-				command .= ("rmdir `"" . component . "`" /s /q`n")
-			else
-				command .= ("del /f `"" . component . "`"`n")
+			if InStr(FileExist(component[1]), "D")
+				command .= ("rmdir `"" . component[1] . "`" /s /q`n")
+			else if FileExist(component[1])
+				command .= ("del /f `"" . component[1] . "`"`n")
 
-			command .= ("ren `"" . component . ".tmp`" `"" . component . "`"`n")
-			}
+			command .= ("ren `"" . component[2] . "`" `"" . component[1] . "`"`n")
+		}
 
 		if inList(A_Args, "-Start") {
 			command .= ("cd " . kBinariesDirectory . "`n")
 			command .= (kBinariesDirectory . A_Args[inList(A_Args, "-Start") + 1] . "`n")
 		}
+
+		FileAppend(command, A_Temp . "\Patch.bat")
 
 		hideProgress()
 

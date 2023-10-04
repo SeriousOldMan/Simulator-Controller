@@ -496,12 +496,12 @@ checkInstallation() {
 			else if FileExist(component[1])
 				command .= ("del /f `"" . component[1] . "`"`n")
 
-			command .= ("ren `"" . component[2] . "`" `"" . component[1] . "`"`n")
+			command .= ("xcopy `"" . component[2] . "`" `"" . component[1] . "`"  /S /E /I`n")
 		}
 
 		if inList(A_Args, "-Start") {
 			command .= ("cd " . kBinariesDirectory . "`n")
-			command .= (kBinariesDirectory . A_Args[inList(A_Args, "-Start") + 1] . "`n")
+			command .= ("`"" . kBinariesDirectory . A_Args[inList(A_Args, "-Start") + 1] . "`"`n")
 		}
 
 		FileAppend(command, A_Temp . "\Patch.bat")

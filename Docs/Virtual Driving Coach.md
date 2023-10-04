@@ -1,6 +1,6 @@
 ## Introduction
 
-Aiden, The Virtual Driving Coach, is a fully AI based chatbot which plays the role of your personal driving coach. Using state of the art AI techniques (GPT = generative pretrained transformers) using an LLM (aka large language models), the Virtual Driving Coach behaves and interacts as natural as possible. It depends heavily on the concrete LLM which is used, what knowledge is available about the race driving topic and how detailed this knowledge is. Modern LLMs, like GPT 3 or GOT 4 are actually very good even in this very special domain.
+Aiden, The Virtual Driving Coach, is a fully AI based chatbot which plays the role of your personal driving coach. Implemented with state of the art AI technologiy GPT (aka generative pretrained transformer) using an LLM (aka large language model), the Virtual Driving Coach behaves and interacts as natural as possible. It depends heavily on the concrete LLM which is used, what knowledge is available about the race driving topic and how detailed this knowledge is. Modern LLMs, like GPT 3 or GOT 4 are actually very good even in this very special domain.
 
 Simulator Controller does not implement its own GPT engine, of course. And this is even not necessary, since there are a couple of service providers available, first and foremost OpenAI, the company, that created the famous ChatGPT solutions. Rather, Simulator Controller uses API calls to use the services provided by an existing GPT engine to run the LLM used by Aiden. You can choose in the configuration which provider is used and even which LLM you want to use (see below in the chapter about [configuration](*).
 
@@ -42,7 +42,7 @@ Remember, trail braking is a skill that takes time and practice to master. Be pa
 
 **Driver:** Can we talk about strategy?
 
-**Aiden: Certainly! I can provide some insights on race strategy. What specific aspects of strategy would you like to discuss?
+**Aiden:** Certainly! I can provide some insights on race strategy. What specific aspects of strategy would you like to discuss?
 
 **Driver:** I have a one hour race coming up. Fuel and tyres are good for the complete race, but there is a mandatory pit stop. The pit stop does not require changing tyres. What is the best strategy for this race?
 

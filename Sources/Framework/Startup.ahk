@@ -212,6 +212,7 @@ initializeEnvironment() {
 	DirCreate(kUserHomeDirectory . "Garage\Rules\Cars")
 	DirCreate(kUserHomeDirectory . "Validators")
 	DirCreate(kUserHomeDirectory . "Logs")
+	DirCreate(kUserHomeDirectory . "Sounds")
 	DirCreate(kUserHomeDirectory . "Splash Media")
 	DirCreate(kUserHomeDirectory . "Screen Images")
 	DirCreate(kUserHomeDirectory . "Plugins")

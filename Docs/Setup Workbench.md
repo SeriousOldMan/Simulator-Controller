@@ -190,11 +190,13 @@ Once the car is generally known to Simulator Controller, proceed to the next sec
 
 ### Introducing new car specifications
 
-Each simulator comes with a set of default settings which will be available for all cars. A specific car might restrict or change this set by using a car specific rule file. Let's start with a simple example:
+Each simulator comes with a set settings which will be available for all cars. A specific car might restrict or change this set by using a car specific rule file. Let's start with a simple example:
 
 	[?Initialize] => (Prove: removeSetting("Assetto Corsa Competizione", "McLaren 720s GT3", Aero.Splitter.Front))
 
 This rule removes the front splitter setting from the set of available settings in *Assetto Corsa Competizione* for the "McLaren 720s GT3" upon initialization of the rule set, since this car does not have an adjustable front splitter.
+
+It is also possible to change the set of settings available to the "Setup Workbench" in general, which can also be used to remove a specific setting, but especially must be used to introduce new, car specific settings. This is described below in the section about car specific definition file.
 
 Car specific rules are either located in the *Resources\Garage\Rules\Cars* folder in the program directory or in the *Simulator Controller\Garage\Rules\Cars* folder which is located in your user *Documents* folder. These files must implement the following naming scheme:
 
@@ -289,6 +291,47 @@ The most important part is the "[Setup.Settings.Handler]" section. Here you spec
 
 The sections "[Setup.Settings.Units.DE]" and "[Setup.Settings.Units.EN]" and so on allow you to supply language specific unit labels for all the settings. If an entry is missing for a given setting, the label will be "Clicks" (or a corresponding translation).
 
+#### Defining car specific setup settings
+
+This chapter is for experts only, who want to introduce settings for a modded car to the "Setup Workbench". You can safely skip this chapter, if this does not apply to you.
+
+The default set of characteristics and settings for the "Setup "Workbench" is defined in the file *Resources\Garage\Setup Workbench.ini* in the program folder. Make yourself familiar with the default set before you move ahead.
+
+Now you can alter the set of settings handled by the "Setup Workbench". You can remove settings or you can add new ones by following the steps below:
+
+- Introduce a setting by supplying the following definitions:
+
+	[Workbench.Settings]<br>
+	Aero=Splitter.Front; Wing.Front; Wing.Rear; Height: Front, Rear; Diffusor.Height
+   
+  Explanation: The default settings definition already mentions "Splitter.Front; Wing.Front; Wing.Rear; Height: Front, Rear" for the "Aero" category. We will add "Diffusor.Height" here.
+
+- Optionally you can also introduce language specific labels for the user interface using:
+
+	[Workbench.Settings.Labels.DE]<br>
+	Diffusor.Height=Diffusor Höhe
+   
+	[Workbench.Settings.Labels.EN]<br>
+	Diffusor.Height=Diffusor Height
+   
+- Once you have defined the new setting, you must define your own rules as described in [How it works](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#how-it-works), so that "Setup Workbench" *knows*, when to recommend a cerresponding setup modification.
+
+Note: Beside given these definitions for a specific car, you can also use similar definitions when introducing a complete new simulator as described below. And, using the same approach, you can modify the characteristics handled by "Simulator Workbench" for a given car or for a complete simulator. But to do this, you must have a deep understanding of the rules set, which derives setup recommendations on behalf of reported handlind problems.
+
+If you want the new setting to be available in the Setup Editor as well, you will have to define the mapping for the setting.
+
+- Example definition for *Assetto Corsa*:
+
+	[Setup.Settings]<br>
+	Diffusor.Height=DIFFUSOR_HEIGHT
+   
+  Explanation: This simply defines the field in the setup file format of the given car mod for *Assetto Corsa*. The file formats for the different simulator can be found below.
+   
+- And define your own handler for this setting:
+   
+  [Setup.Settings.Handler]<br>
+  Diffusor.Height=ClicksHandler(1, 4)
+
 ### Introducing new simulators
 
 Most of the stuff we talked about so far is independent of a specific simulator, since all of them store the setups more or less in the same way - as numbers. The file format, though, is very different. As you have seen above, the setups are stored as a JSON file in *Assetto Corsa Competizione*. INI files are supported for *assetto Corsa*. Therefore, let's take a look into the simulator specific configuration.
@@ -303,6 +346,9 @@ The access paths for the JSON-based setup files of *Assetto Corsa Competizione* 
 
 	[Simulator]
 	Simulator=Assetto Corsa Competizione
+	Analyzer=GenericTelemetryAnalyzer
+	Cars=true
+	Tracks=*
 	[Setup]
 	Editor=ACCSetupEditor
 	Comparator=ACCSetupComparator
@@ -314,6 +360,34 @@ The access paths for the JSON-based setup files of *Assetto Corsa Competizione* 
 	Brake.Balance=advancedSetup.mechanicalBalance.brakeBias
 	Brake.Duct.Front=advancedSetup.aeroBalance.brakeDuct[1]
 	Brake.Duct.Rear=advancedSetup.aeroBalance.brakeDuct[2]
+	...
+	
+### Assetto Corsa
+
+*Asseto Corsa* follows a similar approach but uses a different file format (INI) for its setup files. Here is an excerpt: 
+
+	[Simulator]
+	Simulator=Assetto Corsa
+	Analyzer=GenericTelemetryAnalyzer
+	Cars=true
+	Tracks=*
+	[Setup]
+	Editor=ACSetupEditor
+	Comparator=ACSetupComparator
+	Type=INI
+	[Setup.Settings]
+	Electronics.TC=TRACTION_CONTROL
+	Electronics.ABS=ABS
+	Brake.Pressure=BRAKE_POWER_MULT
+	Brake.Balance=FRONT_BIAS
+	Tyre.Pressure.Front.Left=PRESSURE_LF
+	Tyre.Pressure.Front.Right=PRESSURE_RF
+	Tyre.Pressure.Rear.Left=PRESSURE_LR
+	Tyre.Pressure.Rear.Right=PRESSURE_RR
+	Aero.Height.Front=ROD_LENGTH_LF
+	Aero.Height.Rear=ROD_LENGTH_LR
+	Aero.Wing.Front=WING_1
+	Aero.Wing.Rear=WING_2
 	...
 
 As you can see, the approach is quite simple, since the structure of the JSON-based setup file is very similar to the internal storage format, which is used by "Setup Workbench".

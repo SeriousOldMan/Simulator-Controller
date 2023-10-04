@@ -189,7 +189,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		widget24 := window.Add("Text", "x" . (x1 + 65) . " yp w100 h23 +0x200 Hidden", translate("Conversations"))
 
 		widget25 := window.Add("Text", "x" . x0 . " yp+24 w105 h23 +0x200 Hidden", translate("Confirmation"))
-		widget26 := window.Add("DropDownList", "x" . x1 . " yp w60 Choose1 vdcConfirmationDropDown", collect(["Yes", "No"], translate))
+		widget26 := window.Add("DropDownList", "x" . x1 . " yp w60 Choose1 vdcConfirmationDropDown Hidden", collect(["Yes", "No"], translate))
 
 		widget27 := window.Add("Text", "x" . x0 . " yp+24 w105 h23 +0x200 Hidden", translate("Instructions"))
 
@@ -206,7 +206,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 
 		widget30 := window.Add("Button", "x" . (x1 + w1 - 23) . " yp-25 w23 h23 X:Move Hidden")
 		widget30.OnEvent("Click", reloadInstructions)
-		setButtonIcon(widget28, kIconsDirectory . "Renew.ico", 1)
+		setButtonIcon(widget30, kIconsDirectory . "Renew.ico", 1)
 
 		loop 30
 			editor.registerWidget(this, widget%A_Index%)

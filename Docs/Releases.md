@@ -13,7 +13,10 @@
   8. Improved the detection of outdated downloadable components.
   9. [Developer Only] A new library for HTTP REST calling has been implemented.
   10. [Developer Only] The speech recognition framework now also supports free text recognition in addition to pattern based text recognition.
-
+  11. New car models for "Setup Workbench":
+     - Assetto Corsa
+       - Lotus Exige V6 CUP
+	   
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-540), because you don't want to miss out the new Assistant.
 
 ## 5.3.2.0-release 09/29/23

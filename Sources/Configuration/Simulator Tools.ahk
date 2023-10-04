@@ -381,10 +381,10 @@ checkInstallation() {
 	global gProgressCount
 
 	local installLocation := ""
-	local installInfo, quiet, options, msgResult, hasSplash
+	local installInfo, quiet, options, msgResult, hasSplash, command, component
 	local install, index, options, isNew, packageLocation, ignore, directory, currentDirectory
 
-	installComponents(packageLocation, installLocation) {
+	installComponents(packageLocation, installLocation, temporary := false) {
 		global gProgressCount
 
 		local packageInfo := readMultiMap(packageLocation . "\VERSION")
@@ -393,6 +393,7 @@ checkInstallation() {
 																		  , getMultiMapValue(installInfo, "Current", "Type", "Release")
 																		  , "Components", ""))
 		local error := false
+		local components := []
 		local component, version, type, ignore, part, path
 
 		for component, version in string2Map(",", "->"
@@ -416,7 +417,10 @@ checkInstallation() {
 					else
 						path := packageLocation
 
-					RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\Temp.zip' -DestinationPath '" . path . "' -Force", , "Hide")
+					RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\Temp.zip' -DestinationPath '" . path . (temporary ? ".tmp" : "") . "' -Force", , "Hide")
+
+					if temporary
+						components.Push(path)
 
 					showProgress({progress: (gProgressCount += 5)})
 				}
@@ -455,6 +459,8 @@ checkInstallation() {
 			MsgBox(translate("Cannot download additional files, because the version repository is currently unavailable. Please start `"Simulator Download`" again later."), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
 		}
+
+		return components
 	}
 
 	try {
@@ -470,9 +476,28 @@ checkInstallation() {
 	if inList(A_Args, "-Repair") {
 		showProgress({color: "Blue", title: translate("Installing Simulator Controller"), message: translate("...")})
 
-		installComponents(normalizeDirectoryPath(installLocation), normalizeDirectoryPath(installLocation))
+		deleteFile(A_Temp . "\Patch.bat")
+
+		command := "ping 127.0.0.1 -n 2 > nul`n"
+		command .= ("cd " . kHomeDirectory . "`n")
+
+		for ignore, component in installComponents(normalizeDirectoryPath(installLocation), normalizeDirectoryPath(installLocation), true) {
+			if InStr(FileExist(component), "D")
+				command .= ("rmdir `"" . component . "`" /s /q`n")
+			else
+				command .= ("del /f `"" . component . "`"`n")
+
+			command .= ("ren `"" . component . ".tmp`" `"" . component . "`"`n")
+			}
+
+		if inList(A_Args, "-Start") {
+			command .= ("cd " . kBinariesDirectory . "`n")
+			command .= (kBinariesDirectory . A_Args[inList(A_Args, "-Start") + 1] . "`n")
+		}
 
 		hideProgress()
+
+		Run("`"" . A_Temp . "\Patch.bat`"", kHomeDirectory, "Hide")
 
 		ExitApp(0)
 	}

@@ -453,10 +453,10 @@ class DrivingCoach extends GridRaceAssistant {
 
 					for ignore, lap in bubbleSort(&laps := getKeys(this.LapData)) {
 						lapData .= (translate("Lap:") . A_Space . lap . "`n`n")
-						lapData .= (values2String(";", collect(["Nr.", "Position (Overall)", "Position (Class)", "Lap Time"], translate)*) . "`n")
+						lapData .= (values2String(";", collect(["Nr.", "Class", "Position (Overall)", "Position (Class)", "Lap Time"], translate)*) . "`n")
 
 						for nr, carData in bubbleSort(&nrs := remove(this.LapData[lap], "Driver"))
-							lapData .= (values2String(";", nr, carData.OverallPosition, carData.ClassPosition, Round(carData.LapTime / 1000, 1)) . "`n")
+							lapData .= (values2String(";", nr, carData.Class, carData.OverallPosition, carData.ClassPosition, Round(carData.LapTime / 1000, 1)) . "`n")
 
 						lapData .= "`n`n"
 					}

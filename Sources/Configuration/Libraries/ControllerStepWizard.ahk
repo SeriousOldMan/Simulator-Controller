@@ -689,7 +689,7 @@ class ControllerStepWizard extends StepWizard {
 		local wizard := this.SetupWizard
 		local controller, number, buttonBoxConfiguration, streamDeckConfiguration, window
 
-		SoundPlay(kResourcesDirectory . "Sounds\Activated.wav")
+		SoundPlay(getFileName("Activated.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\"))
 
 		if (firstHotkey == true) {
 			wizard.toggleTriggerDetector()
@@ -1321,7 +1321,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 		local ignore
 
 		if (function && (function != "")) {
-			SoundPlay(kResourcesDirectory . "Sounds\Activated.wav")
+			SoundPlay(getFileName("Activated.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\"))
 
 			if isObject(function) {
 				for ignore, function in function
@@ -1352,7 +1352,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 				for action, functions in modeFunctions
 					for ignore, candidate in functions
 						if (candidate = function) {
-							SoundPlay(kResourcesDirectory . "Sounds\Activated.wav")
+							SoundPlay(getFileName("Activated.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\"))
 
 							this.clearActionFunction(mode, action, function)
 
@@ -1503,7 +1503,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 				this.createControlMenu(title, preview, element, function, row, column).Show()
 			}
 			else {
-				SoundPlay(kResourcesDirectory . "Sounds\Activated.wav")
+				SoundPlay(getFileName("Activated.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\"))
 
 				SetTimer(showSelectorHint, 0)
 

@@ -181,9 +181,9 @@ callSimulator(simulator, options := "", protocol?) {
 		return data
 	}
 	catch Any as exception {
-		logError(exception, true)
-
 		if (protocol = "EXE") {
+			logError(exception, true)
+
 			logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider (")
 													   , {simulator: simulator, protocol: protocol})
 								   . exePath . translate(") - please rebuild the applications in the binaries folder (")
@@ -195,7 +195,10 @@ callSimulator(simulator, options := "", protocol?) {
 
 			return newMultiMap()
 		}
-		else
+		else {
+			logError(exception)
+
 			return callSimulator(simulator, options, "EXE")
+		}
 	}
 }

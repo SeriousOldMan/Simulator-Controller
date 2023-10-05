@@ -76,8 +76,12 @@ class SetupWorkbench extends ConfigurationItem {
 
 	iCharacteristicsArea := false
 
+	iOriginalDefinition := false
 	iDefinition := false
+
+	iOriginalSimulatorDefinition := false
 	iSimulatorDefinition := false
+
 	iSimulatorSettings := false
 
 	iSelectedSimulator := false
@@ -179,15 +183,15 @@ class SetupWorkbench extends ConfigurationItem {
 		}
 	}
 
-	Definition {
+	Definition[original := false] {
 		Get {
-			return this.iDefinition
+			return (original ? this.iOriginalDefinition : this.iDefinition)
 		}
 	}
 
-	SimulatorDefinition {
+	SimulatorDefinition[original := false] {
 		Get {
-			return this.iSimulatorDefinition
+			return (original ? this.iOriginalSimulatorDefinition : this.iSimulatorDefinition)
 		}
 	}
 
@@ -318,7 +322,7 @@ class SetupWorkbench extends ConfigurationItem {
 
 	__New(simulator := false, car := false, track := false, weather := false) {
 		local found := false
-		local definition, section, values, key, value, ignore, rootDirectory
+		local definition, ignore, rootDirectory
 
 		if simulator {
 			this.iSelectedSimulator := simulator
@@ -333,17 +337,14 @@ class SetupWorkbench extends ConfigurationItem {
 			if FileExist(rootDirectory . "Setup Workbench." . getLanguage()) {
 				found := true
 
-				for section, values in readMultiMap(rootDirectory . "Setup Workbench." . getLanguage())
-					for key, value in values
-						setMultiMapValue(definition, section, key, value)
+				addMultiMapValues(definition, readMultiMap(rootDirectory . "Setup Workbench." . getLanguage()))
 			}
 
 		if !found
-			for section, values in readMultiMap(kTranslationsDirectory . "Setup Workbench.en")
-				for key, value in values
-					setMultiMapValue(definition, section, key, value)
+			addMultiMapValues(definition, readMultiMap(kTranslationsDirectory . "Setup Workbench.en"))
 
-		this.iDefinition := definition
+		this.iOriginalDefinition := definition
+		this.iDefinition := definition.Clone()
 
 		super.__New(kSimulatorConfiguration)
 
@@ -613,7 +614,7 @@ class SetupWorkbench extends ConfigurationItem {
 				this.loadTrack(track, false)
 				this.loadWeather(weather, false)
 
-				characteristicLabels := getMultiMapValues(this.Definition, "Setup.Characteristics.Labels")
+				characteristicLabels := getMultiMapValues(this.Definition, "Workbench.Characteristics.Labels")
 
 				characteristics := string2Values(",", getMultiMapValue(state, "Characteristics", "Characteristics"))
 
@@ -689,7 +690,7 @@ class SetupWorkbench extends ConfigurationItem {
 					width := this.SettingsViewer.getWidth() - 4
 					height := (this.SettingsViewer.getHeight() - 110 - 4)
 
-					info := getMultiMapValue(this.Definition, "Setup.Info", "ChangeWarning", "")
+					info := getMultiMapValue(this.Definition, "Workbench.Info", "ChangeWarning", "")
 
 					iWidth := width - 10
 					iHeight := 90
@@ -980,9 +981,9 @@ class SetupWorkbench extends ConfigurationItem {
 			this.compileRules(getFileName("Garage\Rules\Cars\" . simulator . "." . car . ".rules", kResourcesDirectory, kUserHomeDirectory), &productions, &reductions)
 	}
 
-	loadCharacteristics(definition, simulator := false, car := false, track := false, fast := false) {
+	loadCharacteristics(simulator := false, car := false, track := false, fast := false) {
 		local knowledgeBase := this.KnowledgeBase
-		local characteristicLabels := getMultiMapValues(this.Definition, "Setup.Characteristics.Labels")
+		local characteristicLabels := getMultiMapValues(this.Definition, "Workbench.Characteristics.Labels")
 		local compiler, group, ignore, groupOption, option, characteristic
 
 		this.iCharacteristics := []
@@ -992,7 +993,7 @@ class SetupWorkbench extends ConfigurationItem {
 
 		compiler := RuleCompiler()
 
-		for group, definition in getMultiMapValues(definition, "Setup.Characteristics")
+		for group, definition in getMultiMapValues(this.Definition, "Workbench.Characteristics")
 			for ignore, groupOption in string2Values(";", definition) {
 				if InStr(groupOption, ":") {
 					groupOption := string2Values(":", groupOption)
@@ -1046,19 +1047,43 @@ class SetupWorkbench extends ConfigurationItem {
 			}
 	}
 
-	loadSettings(definition, simulator := false, car := false, fast := false) {
+	initializeSettings(simulator, car) {
+		local fileName, carSettings
+
+		if simulator {
+			if car {
+				fileName := ("Garage\Definitions\Cars\" . simulator . "." . car . ".ini")
+				carSettings := getMultiMapValues(readMultiMap(getFileName(fileName, kResourcesDirectory, kUserHomeDirectory))
+											   , "Workbench.Settings")
+				setMultiMapValues(this.Definition, "Workbench.Settings", carSettings, false)
+			}
+		}
+	}
+
+	getSettings(simulator := false, car := false) {
+		return getMultiMapValues(this.Definition, "Workbench.Settings")
+	}
+
+	getLabel(setting) {
+		local settingLabels := getMultiMapValues(this.Definition, "Workbench.Settings.Labels")
+
+		return (settingLabels.Has(setting) ? settingLabels[setting] : setting)
+	}
+
+	loadSettings(simulator := false, car := false, fast := false) {
 		local knowledgeBase := this.KnowledgeBase
-		local settingsLabels := getMultiMapValues(this.Definition, "Setup.Settings.Labels")
-		local compiler, group, ignore, groupOption, option, setting
+		local compiler, group, ignore, groupOption, option, setting, settingLabel
 
 		this.iSettings := []
 
 		if !simulator
 			knowledgeBase.setFact("Settings.Count", 0)
 
+		this.initializeSettings(simulator, car)
+
 		compiler := RuleCompiler()
 
-		for group, definition in getMultiMapValues(definition, "Setup.Settings")
+		for group, definition in this.getSettings(simulator, car)
 			for ignore, groupOption in string2Values(";", definition) {
 				if InStr(groupOption, ":") {
 					groupOption := string2Values(":", groupOption)
@@ -1066,8 +1091,11 @@ class SetupWorkbench extends ConfigurationItem {
 					for ignore, option in string2Values(",", groupOption[2]) {
 						setting := factPath(group, groupOption[1], option)
 
+						settingLabel := this.getLabel(setting)
+
 						if !simulator {
-							showProgress({progress: ++this.ProgressCount, message: translate("Initializing Setting ")																				 . settingsLabels[setting]																				 . translate("...")})
+							showProgress({progress: ++this.ProgressCount
+										, message: translate("Initializing Setting ") . settingLabel . translate("...")})
 
 							knowledgeBase.prove(compiler.compileGoal("addSetting(" . setting . ")")).dispose()
 
@@ -1089,9 +1117,8 @@ class SetupWorkbench extends ConfigurationItem {
 					setting := factPath(group, groupOption)
 
 					if !simulator {
-						showProgress({progress: ++this.ProgressCount, message: translate("Initializing Setting ")
-																			 . settingsLabels[setting]
-																			 . translate("...")})
+						showProgress({progress: ++this.ProgressCount
+									, message: translate("Initializing Setting ") . this.getLabel(setting) . translate("...")})
 
 						knowledgeBase.prove(compiler.compileGoal("addSetting(" . setting . ")")).dispose()
 
@@ -1122,7 +1149,10 @@ class SetupWorkbench extends ConfigurationItem {
 		local simulator := getMultiMapValue(definition, "Simulator", "Simulator")
 		local cars, tracks
 
-		this.iSimulatorDefinition := definition
+		addMultiMapValues(definition, readMultiMap(kUserHomeDirectory . "Garage\Definitions\" . name . ".ini"))
+
+		this.iOriginalSimulatorDefinition := definition
+		this.iSimulatorDefinition := definition.Clone()
 
 		cars := this.getCars(simulator)
 		tracks := this.getTracks(simulator, true)
@@ -1135,14 +1165,58 @@ class SetupWorkbench extends ConfigurationItem {
 		this.iSelectedTrack := ((tracks[1] = "*") ? true : tracks[1])
 	}
 
+	resetSimulator() {
+		this.iSimulatorDefinition := this.iOriginalSimulatorDefinition.Clone()
+	}
+
 	initializeWorkbench(phase1 := "Initializing Setup Workbench", phase2 := "Starting Setup Workbench", phase3 := "Loading Car", fast := false) {
-		local knowledgeBase, simulator, x, y, productions, reductions
+		local knowledgeBase, simulator, car, x, y, productions, reductions
+		local simulatorDefinition, carDefinition, ignore, section
 
 		simulator := this.SelectedSimulator
 
 		this.ProgressCount := 0
 
 		showProgress({color: "Blue", width: 350, title: translate(phase1), message: translate("Clearing Problems...")})
+
+		this.resetWorkbench()
+		this.resetSimulator()
+
+		simulatorDefinition := readMultiMap(getFileName("Garage\Definitions\" . simulator . ".ini"
+													  , kResourcesDirectory, kUserHomeDirectory))
+
+		for ignore, section in ["Workbench.Categories", "Workbench.Settings"]
+			addMultiMapValues(this.Definition, getMultiMapValues(simulatorDefinition, section))
+
+		for ignore, section in ["Workbench.Categories.Labels", "Workbench.Settings.Labels"] {
+			values := getMultiMapValues(simulatorDefinition, section . "." . getLanguage())
+
+			if (values.Count = 0)
+				values := getMultiMapValues(simulatorDefinition, section . ".EN")
+
+			setMultiMapValues(this.Definition, section, values, false)
+		}
+
+		car := this.SelectedCar["*"]
+
+		if car {
+			car := ((car = "*") ? "Generic" : car)
+
+			carDefinition := readMultiMap(getFileName("Garage\Definitions\Cars\" . simulator . "." . car . ".ini"
+													, kResourcesDirectory, kUserHomeDirectory))
+
+			for ignore, section in ["Workbench.Categories", "Workbench.Settings"]
+				addMultiMapValues(this.Definition, getMultiMapValues(carDefinition, section))
+
+			for ignore, section in ["Workbench.Categories.Labels", "Workbench.Settings.Labels"] {
+				values := getMultiMapValues(carDefinition, section . "." . getLanguage())
+
+				if (values.Count = 0)
+					values := getMultiMapValues(carDefinition, section . ".EN")
+
+				setMultiMapValues(this.Definition, section, values, false)
+			}
+		}
 
 		Sleep(200)
 
@@ -1164,8 +1238,8 @@ class SetupWorkbench extends ConfigurationItem {
 		if this.Debug[kDebugRules]
 			this.dumpRules(this.KnowledgeBase)
 
-		this.loadCharacteristics(this.Definition, false, false, false, fast)
-		this.loadSettings(this.Definition, false, false, fast)
+		this.loadCharacteristics(false, false, false, fast)
+		this.loadSettings(false, false, fast)
 
 		showProgress({progress: this.ProgressCount++, color: "Green", title: translate(phase2), message: translate("Starting AI Kernel...")})
 
@@ -1177,11 +1251,11 @@ class SetupWorkbench extends ConfigurationItem {
 
 		showProgress({progress: this.ProgressCount++, color: "Green", title: translate(phase3), message: translate("Loading Car Settings...")})
 
-		this.loadCharacteristics(this.Definition, this.SelectedSimulator["*"], this.SelectedCar["*"], this.SelectedTrack["*"], fast)
+		this.loadCharacteristics(this.SelectedSimulator["*"], this.SelectedCar["*"], this.SelectedTrack["*"], fast)
 
 		Sleep(200)
 
-		this.loadSettings(this.Definition, this.SelectedSimulator["*"], this.SelectedCar["*"], fast)
+		this.loadSettings(this.SelectedSimulator["*"], this.SelectedCar["*"], fast)
 
 		Sleep(200)
 
@@ -1213,6 +1287,10 @@ class SetupWorkbench extends ConfigurationItem {
 		hideProgress()
 
 		this.updateState()
+	}
+
+	resetWorkbench() {
+		this.iDefinition := this.iOriginalDefinition.Clone()
 	}
 
 	loadSimulator(simulator, force := false) {
@@ -1376,7 +1454,7 @@ class SetupWorkbench extends ConfigurationItem {
 			x := (this.CharacteristicsArea.X + 8)
 			y := (this.CharacteristicsArea.Y + 8 + (numCharacteristics * kCharacteristicHeight))
 
-			characteristicLabels := getMultiMapValues(this.Definition, "Setup.Characteristics.Labels")
+			characteristicLabels := getMultiMapValues(this.Definition, "Workbench.Characteristics.Labels")
 
 			this.SelectedCharacteristics.Push(characteristic)
 
@@ -1469,11 +1547,11 @@ class SetupWorkbench extends ConfigurationItem {
 
 		characteristicsMenu := Menu()
 
-		characteristicLabels := getMultiMapValues(this.Definition, "Setup.Characteristics.Labels")
+		characteristicLabels := getMultiMapValues(this.Definition, "Workbench.Characteristics.Labels")
 
 		menuIndex := 1
 
-		groups := getMultiMapValues(this.Definition, "Setup.Characteristics")
+		groups := getMultiMapValues(this.Definition, "Workbench.Characteristics")
 		translatedGroups := CaseInsenseMap()
 
 		for group, definition in groups
@@ -1547,7 +1625,7 @@ class SetupWorkbench extends ConfigurationItem {
 
 	updateRecommendations(draw := true, update := true) {
 		local knowledgeBase := this.KnowledgeBase
-		local noProblem, ignore, characteristic, widgets, value1, value2, settingsLabels, settings
+		local noProblem, ignore, characteristic, widgets, value1, value2, settings
 		local setting, delta
 
 		this.Window.Block()
@@ -1580,15 +1658,13 @@ class SetupWorkbench extends ConfigurationItem {
 
 			if draw {
 				if knowledgeBase {
-					settingsLabels := getMultiMapValues(this.Definition, "Setup.Settings.Labels")
-
 					settings := []
 
 					for ignore, setting in this.Settings {
 						delta := knowledgeBase.getValue(setting . ".Delta", translate("n/a"))
 
 						if (isNumber(delta) && (delta != 0))
-							settings.Push(Array(settingsLabels[setting], Round(delta, 2)))
+							settings.Push(Array(this.getLabel(setting), Round(delta, 2)))
 					}
 				}
 
@@ -2072,7 +2148,7 @@ class SetupEditor extends ConfigurationItem {
 	}
 
 	__New(workbench, configuration := false) {
-		local simulator, car, section, values, key, value, fileName
+		local simulator, car, fileName
 
 		this.iWorkbench := workbench
 
@@ -2082,16 +2158,12 @@ class SetupEditor extends ConfigurationItem {
 
 			configuration := readMultiMap(kResourcesDirectory . "Garage\Definitions\" . simulator . ".ini")
 
-			for section, values in readMultiMap(kResourcesDirectory . "Garage\Definitions\Cars\" . simulator . ".Generic.ini")
-				for key, value in values
-					setMultiMapValue(configuration, section, key, value)
+			addMultiMapValues(configuration, readMultiMap(kResourcesDirectory . "Garage\Definitions\Cars\" . simulator . ".Generic.ini"))
 
 			if (car != true) {
 				fileName := ("Garage\Definitions\Cars\" . simulator . "." . car . ".ini")
 
-				for section, values in readMultiMap(getFileName(fileName, kResourcesDirectory, kUserHomeDirectory))
-					for key, value in values
-						setMultiMapValue(configuration, section, key, value)
+				addMultiMapValues(configuration, readMultiMap(getFileName(fileName, kResourcesDirectory, kUserHomeDirectory)))
 			}
 		}
 
@@ -2289,8 +2361,29 @@ class SetupEditor extends ConfigurationItem {
 		throw "Virtual method SetupEditor.chooseSetup must be implemented in a subclass..."
 	}
 
+	getLabel(setting) {
+		local settingsLabels := getMultiMapValues(this.Configuration, "Setup.Settings.Labels")
+
+		if settingsLabels.Has(setting)
+			return settingsLabels[setting]
+		else {
+			settingsLabels := getMultiMapValues(this.Workbench.Definition, "Workbench.Settings.Labels")
+
+			return (settingsLabels.Has(setting) ? settingsLabels[setting] : setting)
+		}
+	}
+
+	getUnit(setting) {
+		local settingsUnits := getMultiMapValues(this.Configuration, "Setup.Settings.Units." . getLanguage())
+
+		if (settingsUnits.Count = 0)
+			settingsUnits := getMultiMapValues(this.Configuration, "Setup.Settings.Units.EN")
+
+		return (settingsUnits.Has(setting) ? settingsUnits[setting] : translate("Click"))
+	}
+
 	loadSetup(&setup := false) {
-		local categories, categoriesLabels, settingsLabels, settingsUnits
+		local categories, categoriesLabels
 		local ignore, setting, handler, modifiedValue, originalValue, value, category, candidate, settings
 		local cSetting, label, lastCategory
 
@@ -2305,13 +2398,6 @@ class SetupEditor extends ConfigurationItem {
 		categories := getMultiMapValues(this.Workbench.Definition, "Setup.Categories")
 
 		categoriesLabels := getMultiMapValues(this.Workbench.Definition, "Setup.Categories.Labels")
-
-		settingsLabels := getMultiMapValues(this.Workbench.Definition, "Setup.Settings.Labels")
-
-		settingsUnits := getMultiMapValues(this.Configuration, "Setup.Settings.Units." . getLanguage())
-
-		if (settingsUnits.Count = 0)
-			settingsUnits := getMultiMapValues(this.Configuration, "Setup.Settings.Units.EN")
 
 		this.SettingsListView.Delete()
 
@@ -2355,9 +2441,10 @@ class SetupEditor extends ConfigurationItem {
 						break
 				}
 
-				label := settingsLabels[setting]
+				label := this.getLabel(setting)
 
-				this.SettingsListView.Add((originalValue = modifiedValue) ? "" : "Check", categoriesLabels[category], label, value, settingsUnits[setting])
+				this.SettingsListView.Add((originalValue = modifiedValue) ? "" : "Check"
+										, categoriesLabels[category], label, value, this.getUnit(setting))
 
 				this.Settings[setting] := label
 				this.Settings[label] := setting
@@ -2689,7 +2776,7 @@ class SetupComparator extends ConfigurationItem {
 	}
 
 	__New(editor, configuration := false) {
-		local workbench, simulator, car, section, values, key, value, fileName
+		local workbench, simulator, car, fileName
 
 		this.iEditor := editor
 		this.iSetupA := editor.Setup
@@ -2702,16 +2789,12 @@ class SetupComparator extends ConfigurationItem {
 
 			configuration := readMultiMap(kResourcesDirectory . "Garage\Definitions\" . simulator . ".ini")
 
-			for section, values in readMultiMap(kResourcesDirectory . "Garage\Definitions\Cars\" . simulator . ".Generic.ini")
-				for key, value in values
-					setMultiMapValue(configuration, section, key, value)
+			addMultiMapValues(configuration, readMultiMap(kResourcesDirectory . "Garage\Definitions\Cars\" . simulator . ".Generic.ini"))
 
 			if (car != true) {
 				fileName := ("Garage\Definitions\Cars\" . simulator . "." . car . ".ini")
 
-				for section, values in readMultiMap(getFileName(fileName, kResourcesDirectory, kUserHomeDirectory))
-					for key, value in values
-						setMultiMapValue(configuration, section, key, value)
+				addMultiMapValues(configuration, readMultiMap(getFileName(fileName, kResourcesDirectory, kUserHomeDirectory)))
 			}
 		}
 
@@ -2819,8 +2902,29 @@ class SetupComparator extends ConfigurationItem {
 			this.Window.Destroy()
 	}
 
+	getLabel(setting) {
+		local settingsLabels := getMultiMapValues(this.Configuration, "Setup.Settings.Labels")
+
+		if settingsLabels.Has(setting)
+			return settingsLabels[setting]
+		else {
+			settingsLabels := getMultiMapValues(this.Workbench.Definition, "Workbench.Settings.Labels")
+
+			return (settingsLabels.Has(setting) ? settingsLabels[setting] : setting)
+		}
+	}
+
+	getUnit(setting) {
+		local settingsUnits := getMultiMapValues(this.Configuration, "Setup.Settings.Units." . getLanguage())
+
+		if (settingsUnits.Count = 0)
+			settingsUnits := getMultiMapValues(this.Configuration, "Setup.Settings.Units.EN")
+
+		return (settingsUnits.Has(setting) ? settingsUnits[setting] : translate("Click"))
+	}
+
 	loadSetups(&setupA := false, &setupB := false, mix := 0) {
-		local setupClass, setupAB, categories, categoriesLabels, settingsLabels, settingsUnits
+		local setupClass, setupAB, categories, categoriesLabels
 		local ignore, setting, handler, valueA, valueB, category, candidate, settings, cSetting
 		local targetAB, valueAB, lastValueAB, delta, label, lastCategory
 
@@ -2848,13 +2952,6 @@ class SetupComparator extends ConfigurationItem {
 		categories := getMultiMapValues(this.Workbench.Definition, "Setup.Categories")
 
 		categoriesLabels := getMultiMapValues(this.Workbench.Definition, "Setup.Categories.Labels")
-
-		settingsLabels := getMultiMapValues(this.Workbench.Definition, "Setup.Settings.Labels")
-
-		settingsUnits := getMultiMapValues(this.Configuration, "Setup.Settings.Units." . getLanguage())
-
-		if (settingsUnits.Count = 0)
-			settingsUnits := getMultiMapValues(this.Configuration, "Setup.Settings.Units.EN")
 
 		this.SettingsListView.Delete()
 
@@ -2928,9 +3025,10 @@ class SetupComparator extends ConfigurationItem {
 				else
 					valueAB := displayValue("Float", valueAB)
 
-				label := settingsLabels[setting]
+				label := this.getLabel(setting)
 
-				this.SettingsListView.Add("", categoriesLabels[category], settingsLabels[setting], displayValue("Float", valueA), valueB, valueAB, settingsUnits[setting])
+				this.SettingsListView.Add("", categoriesLabels[category]
+											, label, displayValue("Float", valueA), valueB, valueAB, this.getUnit(setting))
 
 				this.Settings[setting] := label
 				this.Settings[label] := setting

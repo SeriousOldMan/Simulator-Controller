@@ -91,7 +91,7 @@ class BasicStepWizard extends StepWizard {
 		getPTTHotkey(*) {
 			setPTTHotkey(hotkey) {
 				if !isInteger(hotkey) {
-					SoundPlay(kResourcesDirectory . "Sounds\Activated.wav")
+					SoundPlay(getFileName("Activated.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\"))
 
 					this.Control["basicPushToTalkEdit"].Text := hotkey
 
@@ -817,6 +817,8 @@ class BasicStepWizard extends StepWizard {
 			configuration := newMultiMap()
 
 			setup := this.assistantSetup(assistant)
+
+			setMultiMapValues(configuration, "Voice Control", getMultiMapValues(kSimulatorConfiguration, "Voice Control"), false)
 
 			setMultiMapValue(configuration, "Voice Control", "Language", setup.Language)
 			setMultiMapValue(configuration, "Voice Control", "Synthesizer", setup.Synthesizer)

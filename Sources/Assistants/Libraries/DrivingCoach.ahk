@@ -136,7 +136,7 @@ class DrivingCoach extends GridRaceAssistant {
 			this.History.Length := 0
 		}
 
-		Restart := () => this.Connect()
+		Restart := (*) => this.Connect()
 
 		AddConversation(question, answer) {
 			this.History.Push([question, answer])
@@ -402,6 +402,7 @@ class DrivingCoach extends GridRaceAssistant {
 		options["Driving Coach.MaxTokens"] := getMultiMapValue(configuration, "Driving Coach Service", "MaxTokens", 1024)
 		options["Driving Coach.Temperature"] := getMultiMapValue(configuration, "Driving Coach Personality", "Temperature", 0.5)
 		options["Driving Coach.MaxHistory"] := getMultiMapValue(configuration, "Driving Coach Personality", "MaxHistory", 3)
+		options["Driving Coach.Confirmation"] := getMultiMapValue(configuration, "Driving Coach Personality", "Confirmation", true)
 		options["Driving Coach.Instructions.Character"] := getMultiMapValue(configuration, "Driving Coach Personality", "Instructions.Character", false)
 		options["Driving Coach.Instructions.Simulation"] := getMultiMapValue(configuration, "Driving Coach Personality", "Instructions.Simulation", false)
 		options["Driving Coach.Instructions.Session"] := getMultiMapValue(configuration, "Driving Coach Personality", "Instructions.Session", false)
@@ -516,7 +517,7 @@ class DrivingCoach extends GridRaceAssistant {
 		local answer := false
 
 		try {
-			if this.Speaker
+			if (this.Speaker && this.Options["Driving Coach.Confirmation"])
 				this.getSpeaker().speakPhrase("Confirm", false, false, false, {Noise: false})
 
 			if !this.Connector
@@ -611,4 +612,13 @@ class DrivingCoach extends GridRaceAssistant {
 
 		return result
 	}
+}
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                   Private Function Declaration Section                  ;;;
+;;;-------------------------------------------------------------------------;;;
+
+getTime(*) {
+	return A_Now
 }

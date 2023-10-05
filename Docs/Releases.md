@@ -16,6 +16,8 @@
   11. [Developer Only] A new library for HTTP REST calling has been implemented.
   12. [Developer Only] The speech recognition framework now also supports free text recognition in addition to pattern based text recognition.
   13. New car models for "Setup Workbench":
+     - Assetto Corsa Competizione
+       - McLaren 720s Evo (fixed)
      - Assetto Corsa
        - Lotus Exige V6 CUP
 

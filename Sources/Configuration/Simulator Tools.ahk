@@ -496,7 +496,7 @@ checkInstallation() {
 			else if FileExist(component[1])
 				command .= ("del /f `"" . component[1] . "`"`n")
 
-			command .= ("xcopy `"" . component[2] . "`" `"" . component[1] . "`"  /S /E /I`n")
+			command .= ("xcopy `"" . component[2] . "`" `"" . component[1] . "`" /s /e /i`n")
 		}
 
 		if inList(A_Args, "-Start") {

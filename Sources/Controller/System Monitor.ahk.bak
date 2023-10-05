@@ -86,6 +86,7 @@ getTableCSS(window) {
 	script := "
 	(
 		.table-std, .th-std, .td-std {
+			vertical-align: top;
 			border-collapse: collapse;
 			padding: .3em .5em;
 		}

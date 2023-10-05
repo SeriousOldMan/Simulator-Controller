@@ -483,11 +483,18 @@ checkInstallation() {
 	installLocation := getMultiMapValue(installInfo, "Install", "Location", installLocation)
 
 	if inList(A_Args, "-Repair") {
-		showProgress({color: "Blue", title: translate("Installing Simulator Controller"), message: translate("...")})
+		showProgress({color: "Blue", title: translate("Updating Simulator Controller"), message: translate("...")})
 
 		deleteFile(A_Temp . "\Patch.bat")
 
 		command := "ping 127.0.0.1 -n 2 > nul`n"
+
+		if inList(A_Args, "-Start")
+			command .= ("msg * " . substituteVariables(translate("Simulator Controller will be updated now. Please wait for %application% to open.")
+													 , {application: A_Args[inList(A_Args, "-Start") + 1]}) . "`n")
+		else
+			command .= ("msg * " . translate("Simulator Controller will be updated now. Please wait...") . "`n")
+
 		command .= ("cd " . kHomeDirectory . "`n")
 
 		for ignore, component in installComponents(normalizeDirectoryPath(installLocation), normalizeDirectoryPath(installLocation), true) {
@@ -496,7 +503,7 @@ checkInstallation() {
 			else if FileExist(component[1])
 				command .= ("del /f `"" . component[1] . "`"`n")
 
-			command .= ("xcopy `"" . component[2] . "`" `"" . component[1] . "`"  /S /E /I`n")
+			command .= ("xcopy `"" . component[2] . "`" `"" . component[1] . "`" /s /e /i`n")
 		}
 
 		if inList(A_Args, "-Start") {

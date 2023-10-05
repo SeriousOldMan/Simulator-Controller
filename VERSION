@@ -1,10 +1,10 @@
 [Development]
-Version=5.4.0.0-alpha
-Target=5.4.0.0-release
-Date=10/01/2023
-Download=https://www.dropbox.com/scl/fi/fjtbohgpw9dhglx27b2zo/Simulator-Controller-5.4.0.0-alpha.zip?rlkey=qxbdeeq3ng9y2kzbs8cwk4vb2&dl=1
-Changes=New assistant "Driving Coach", New HTTP library, Added installer for .NET 6.0, Added full free text mode to speech recognition, New plugin "Driving Coach", Specific documentation links in "Simulator Configuration", Almost full compatibility between "Simulator Setup" and "Simulator Configuration", Fixed a bug in "Strategy Workbench for required pitstops in a time window, Replaced "John Doe" in many places with the user name
-Components=Media->5.3.0,Configuration->5.4.0,Utilities->5.3.0
+Version=5.4.1.0-dev
+Target=5.4.1.0-release
+Date=10/05/2023
+Download=
+Changes=Driving Coach now knows a lot about the current active stint
+Components=Media->5.3.0,Configuration->5.4.1,Utilities->5.3.0
 [Release]
 Version=5.3.2.0-release
 Date=09/29/2023
@@ -27,5 +27,5 @@ Utilities.5.3.0.Download=https://www.dropbox.com/scl/fi/hlza8t9tae5d0vnd7wmqa/Ut
 [Current]
 Type=Development
 [Version]
-Development=5.4.0.0-alpha
+Development=5.4.1.0-dev
 Release=5.3.2.0-release

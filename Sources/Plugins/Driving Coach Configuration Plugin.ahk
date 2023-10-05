@@ -206,7 +206,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 
 		widget30 := window.Add("Button", "x" . (x1 + w1 - 23) . " yp-25 w23 h23 X:Move Hidden")
 		widget30.OnEvent("Click", reloadInstructions)
-		setButtonIcon(widget28, kIconsDirectory . "Renew.ico", 1)
+		setButtonIcon(widget30, kIconsDirectory . "Renew.ico", 1)
 
 		loop 30
 			editor.registerWidget(this, widget%A_Index%)

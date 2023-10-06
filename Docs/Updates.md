@@ -35,6 +35,13 @@ Although the code, that handles all the update tasks, is integrated into *Simula
 
 Note: Some of you might want to have more control. No problem. All the files in the *Simulator Controller\Config*, *Simulator Controller\Translations*, *Simulator Controller\Grammars* and *Simulator Controller\Rules* folders are human readable and using a text editor and some *Diff* tool, you can do everything the automated procedure does on your own. But be sure to make a backup copy of all the files, just for peace of mind. Attention: These files use a two-byte character set, so be sure to use an editor that can handle this.
 
+## Release 5.4.1
+
+The instructions for the LLM of the Driving Coach has been extended. You can update to the new instructions using the reload button in the configurations. Also, new instructions for extended data integration has been added, which you can also load into the configuration.
+
+***
+
+
 ## Release 5.4.0
 
 Since this release introduces a new Assistant, a new plugin "Driving Coach" will be automatically added to your configuration, but it will be deactivated by default. You should run "Simulator Setup" and use the basic configuration step to include it in your setup. Then visit the configuration step for Race Assistants and create a configuration for the Driving Coach. You will need to have a subscription on [OpenAI](https://openai.com) (it is very cheap, by the way), or you will have to install the free AI runtime environment [GPT4All](https://gpt4all.io/index.html). But the LLMs (language models) of GPT4All are way behind from what OpenAI offers, and you will need a very powerful PC to run these models (and it will use your GPU, therefore it is impossible to use it alongside a running simulator).

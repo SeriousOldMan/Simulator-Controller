@@ -423,6 +423,14 @@ class DrivingCoach extends GridRaceAssistant {
 		local settingsDB := this.SettingsDatabase
 		local simulator, car, track, position, laps, lapData, nrs, nr, carData
 
+		static sessions := false
+
+		if !sessions {
+			sessions := ["Other", "Practice", "Qualifying", "Race"]
+
+			sessions.Default := "Other"
+		}
+
 		switch category, false {
 			case "Character":
 				return substituteVariables(this.Instructions["Character"], {name: this.VoiceManager.Name})
@@ -442,7 +450,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 				if (position != 0)
 					return substituteVariables(this.Instructions["Session"]
-											 , {session: translate(session[this.Session])
+											 , {session: translate(sessions[this.Session])
 											  , carNumber: this.getNr()
 											  , classPosition: this.GridPosition["Class"], overallPosition: position})
 			case "Stint":
@@ -453,7 +461,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 					for ignore, lap in bubbleSort(&laps := getKeys(this.LapData)) {
 						lapData .= (translate("Lap:") . A_Space . lap . "`n`n")
-						lapData .= (values2String(";", collect(["Nr.", "Class", "Position (Overall)", "Position (Class)", "Lap Time"], translate)*) . "`n")
+						lapData .= (values2String(";", collect(["Race Number", "Class", "Position (Overall)", "Position (Class)", "Lap Time"], translate)*) . "`n")
 
 						for nr, carData in bubbleSort(&nrs := remove(this.LapData[lap], "Driver"))
 							lapData .= (values2String(";", nr, carData.Class, carData.OverallPosition, carData.ClassPosition, Round(carData.LapTime / 1000, 1)) . "`n")

@@ -1,3 +1,12 @@
+## 5.4.1.0-release 10/13/23 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. Many functional additions to the Driving Coach.
+     - Data for the 5 recent laps about your own performance and the performance of your opponents is available to the Driving Coach.
+	 - The instructions have been updated and extended. Please read the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-541) for instructions how to update your configuration accordingly.
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-541), if you are using the Driving Coach.
+
 ## 5.4.0.0-release 10/06/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

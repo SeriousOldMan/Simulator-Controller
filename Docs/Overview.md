@@ -1,4 +1,6 @@
-Welcome to the Simulator Controller documentation. Here you will find everything to understand, install, configure and use your complete solution for getting the best experience from your immersive simulation games. The documentation is devided into the following sections:
+Welcome to the Simulator Controller documentation. Here you will find everything to understand, install, configure and use your complete solution for getting the best experience from your immersive simulation games. If you are looking for a quick start, you can download and install the software using the instructions found [here](https://github.com/SeriousOldMan/Simulator-Controller#download-and-installation). But because the Simulator Controller suite offers such a huge amount of functions and individual applications, I recommend to take at least a *look* at the different areas of the documenation, so that you have an overview of what to expect.
+
+The documentation is devided into the following sections:
 
   - [README](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/README.md)
   

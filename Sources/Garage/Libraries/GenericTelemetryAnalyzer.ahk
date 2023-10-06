@@ -13,6 +13,9 @@
 #Include "..\..\Libraries\Messages.ahk"
 #Include "..\..\Libraries\Math.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
+#Include "TelemetryCollector.ahk"
+#Include "IRCTelemetryCollector.ahk"
+#Include "R3ETelemetryCollector.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -50,7 +53,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 	iAcousticFeedback := true
 	static sAudioDevice := false
 
-	iAnalyzerPID := false
+	iTelemetryCollector := false
 
 	Car {
 		Get {
@@ -352,89 +355,39 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 	}
 
 	startTelemetryAnalyzer(dataFile, calibrate := false) {
-		local pid, options, code, message
+		local settings := {}
+		local code, ignore, setting
 
 		this.stopTelemetryAnalyzer()
 
-		if !this.iAnalyzerPID {
-			try {
-				options := ((calibrate ? "-Calibrate `"" : "-Analyze `"") . dataFile . "`"")
+		if !this.iTelemetryCollector {
+			if !calibrate
+				for ignore, setting in ["UndersteerThresholds", "OversteerThresholds"]
+					if this.settingAvailable(setting)
+						settings.%setting% := this.%setting%
 
-				if !calibrate {
-					if this.settingAvailable("UndersteerThresholds")
-						options .= (A_Space . values2String(A_Space, this.UndersteerThresholds*))
+			for ignore, setting in ["SteerLock", "SteerRatio", "WheelBase", "TrackWidth"]
+				if this.settingAvailable(setting)
+					settings.%setting% := this.%setting%
 
-					if this.settingAvailable("OversteerThresholds")
-						options .= (A_Space . values2String(A_Space, this.OversteerThresholds*))
-				}
+			code := SessionDatabase.getSimulatorCode(this.Simulator)
 
-				if this.settingAvailable("LowspeedThreshold")
-					options .= (A_Space . this.LowspeedThreshold)
+			if isSet(%code . "TelemetryCollector"%)
+				this.iTelemetryCollector := (%code . "TelemetryCollector"%)(this.Simulator, this.Car, this.Track, settings, this.AcousticFeedback)
+			else
+				this.iTelemetryCollector := TelemetryCollector(this.Simulator, this.Car, this.Track, settings, this.AcousticFeedback)
 
-				if this.settingAvailable("SteerLock")
-					options .= (A_Space . this.SteerLock)
-
-				if this.settingAvailable("SteerRatio")
-					options .= (A_Space . this.SteerRatio)
-
-				if this.settingAvailable("Wheelbase")
-					options .= (A_Space . this.Wheelbase)
-
-				if this.settingAvailable("TrackWidth")
-					options .= (A_Space . this.TrackWidth)
-
-				if this.AcousticFeedback {
-					options .= (A_Space . "`"" . kResourcesDirectory . "Sounds`"")
-
-					if this.AudioDevice
-						options .= (A_Space . "`"" . this.AudioDevice . "`"")
-				}
-
-				code := SessionDatabase.getSimulatorCode(this.Simulator)
-
-				Run(kBinariesDirectory . code . " SHM Spotter.exe " . options, kBinariesDirectory, "Hide", &pid)
-			}
-			catch Any as exception {
-				logError(exception, true)
-
-				message := substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (%exePath%) - please check the configuration...")													   , {simulator: code, protocol: "SHM", exePath: kBinariesDirectory . code . " SHM Spotter.exe"})
-
-				logMessage(kLogCritical, message)
-
-				showMessage(message, translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-
-				pid := false
-			}
-
-			this.iAnalyzerPID := pid
+			this.iTelemetryCollector.startTelemetryCollector(datafile, calibrate)
 		}
 	}
 
 	stopTelemetryAnalyzer(*) {
-		local pid := this.iAnalyzerPID
-		local tries
+		local collector := this.iTelemetryCollector
 
-		if pid {
-			tries := 5
+		if collector
+			collector.stopTelemetryCollector()
 
-			while (tries-- > 0) {
-				if ProcessExist(pid) {
-					ProcessClose(pid)
-
-					Sleep(500)
-				}
-				else
-					break
-			}
-
-			this.iAnalyzerPID := false
-		}
-
-		return false
-	}
-
-	static acousticFeedback(soundFile) {
-		playSound("SWSoundPlayer.exe", soundFile, (GenericTelemetryAnalyzer.AudioDevice ? GenericTelemetryAnalyzer.AudioDevice : "") . " echos 1 1 1 1")
+		this.iTelemetryCollector := false
 	}
 }
 

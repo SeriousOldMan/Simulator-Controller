@@ -4,6 +4,7 @@
   3. Many functional additions to the Driving Coach.
      - Data for the 5 recent laps about your own performance and the performance of your opponents is available to the Driving Coach.
 	 - The instructions have been updated and extended. Please read the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-541) for instructions how to update your configuration accordingly.
+  4. New data categories in the telemetry analyzer of "Setup Workbench". See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-telemetry-analyzer) for more information.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-541), if you are using the Driving Coach.
 

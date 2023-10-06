@@ -99,6 +99,8 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 
 21. [Updating your configuration to 5.3](https://youtu.be/f4HuUjSW-3k) - This video shows you how to update your configuration to use the new capabilities of "Simulator Setup", which simplify many configuration tasks significantly.
 
+22. [Your personal Driving Coach](https://youtu.be/LBtLk_md1IE) - Demonstrates a general interaction with Aiden, the Virtual Driving Coach.
+
 This list will be extended from time to time to cover new functionalities.
 
 ### Discord Community

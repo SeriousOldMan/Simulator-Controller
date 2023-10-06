@@ -410,7 +410,7 @@ setAnalyzerSetting(analyzer, key, value) {
 runAnalyzer(commandOrAnalyzer := false, arguments*) {
 	local x, y, ignore, widget, workbench, row, include
 	local tries, data, type, speed, severity, key, value, newValue, characteristic, characteristicLabels, fromEdit
-	local calibration, theListView, chosen
+	local calibration, theListView, chosen, tabView
 
 	static analyzerGui
 
@@ -688,11 +688,11 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		analyzerGui.SetFont("s10 Bold", "Arial")
 
-		analyzerGui.Add("Text", "w324 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(analyzerGui, "Setup Workbench.Analyzer"))
+		analyzerGui.Add("Text", "w340 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(analyzerGui, "Setup Workbench.Analyzer"))
 
 		analyzerGui.SetFont("s9 Norm", "Arial")
 
-		analyzerGui.Add("Documentation", "x78 YP+20 w184 Center", translate("Telemetry Analyzer")
+		analyzerGui.Add("Documentation", "x86 YP+20 w192 Center", translate("Telemetry Analyzer")
 					  , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-telemetry-analyzer")
 
 		analyzerGui.SetFont("s8 Norm", "Arial")
@@ -708,21 +708,26 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 			analyzerGui.Add("Text", "x158 yp w180 h23 +0x200", SessionDatabase.getTrackName(analyzer.Simulator, analyzer.Track))
 		}
 
-		widget1 := analyzerGui.Add("Text", "x16 yp+30 w130 h23 +0x200 Section", translate("Steering Lock / Ratio"))
-		steerLockEdit := analyzerGui.Add("Edit", "x158 yp w45 h23 +0x200", analyzer.SteerLock)
-		widget2 := steerLockEdit
-		steerRatioEdit := analyzerGui.Add("Edit", "x208 yp w45 h23 Limit2 Number", analyzer.SteerRatio)
-		widget3 := steerRatioEdit
-		widget4 := analyzerGui.Add("UpDown", "x238 yp w18 h23 Range1-99", analyzer.SteerRatio)
+		tabView := analyzerGui.Add("Tab3", "x16 yp+30 w340 h348 Section", collect(["Handling", "Tyres", "Brakes"], translate))
+		widget36 := tabView
 
-		widget27 := analyzerGui.Add("Text", "x16 yp+30 w130 h23 +0x200", translate("Wheelbase / Track Width"))
-		wheelbaseEdit := analyzerGui.Add("Edit", "x158 yp w45 h23 +0x200 Number Limit3", analyzer.Wheelbase)
+		tabView .UseTab(1)
+
+		widget1 := analyzerGui.Add("Text", "x24 yp+30 w130 h23 +0x200", translate("Steering Lock / Ratio"))
+		steerLockEdit := analyzerGui.Add("Edit", "x166 yp w45 h23 +0x200", analyzer.SteerLock)
+		widget2 := steerLockEdit
+		steerRatioEdit := analyzerGui.Add("Edit", "x216 yp w45 h23 Limit2 Number", analyzer.SteerRatio)
+		widget3 := steerRatioEdit
+		widget4 := analyzerGui.Add("UpDown", "x246 yp w18 h23 Range1-99", analyzer.SteerRatio)
+
+		widget27 := analyzerGui.Add("Text", "x24 yp+30 w130 h23 +0x200", translate("Wheelbase / Track Width"))
+		wheelbaseEdit := analyzerGui.Add("Edit", "x166 yp w45 h23 +0x200 Number Limit3", analyzer.Wheelbase)
 		widget28 := wheelbaseEdit
-		widget29 := analyzerGui.Add("UpDown", "x188 yp w18 h23 Range1-999", analyzer.Wheelbase)
-		trackWidthEdit := analyzerGui.Add("Edit", "x208 yp w45 h23 +0x200 Number Limit3", analyzer.TrackWidth)
+		widget29 := analyzerGui.Add("UpDown", "x196 yp w18 h23 Range1-999", analyzer.Wheelbase)
+		trackWidthEdit := analyzerGui.Add("Edit", "x216 yp w45 h23 +0x200 Number Limit3", analyzer.TrackWidth)
 		widget30 := trackWidthEdit
-		widget31 := analyzerGui.Add("UpDown", "x238 yp w18 h23 Range1-999", analyzer.TrackWidth)
-		widget32 := analyzerGui.Add("Text", "x257 yp w50 h23 +0x200", translate("cm"))
+		widget31 := analyzerGui.Add("UpDown", "x246 yp w18 h23 Range1-999", analyzer.TrackWidth)
+		widget32 := analyzerGui.Add("Text", "x265 yp w50 h23 +0x200", translate("cm"))
 
 		if !analyzer.settingAvailable("SteerLock") {
 			steerLockEdit.Enabled := false
@@ -746,73 +751,73 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		analyzerGui.SetFont("Italic", "Arial")
 
-		widget5 := analyzerGui.Add("GroupBox", "x16 yp+34 w320 h215", translate("Thresholds"))
+		widget5 := analyzerGui.Add("GroupBox", "x24 yp+34 w320 h215", translate("Thresholds"))
 
 		analyzerGui.SetFont("Norm", "Arial")
 
-		widget6 := analyzerGui.Add("Text", "x24 yp+21 w130 h23 +0x200", translate("Consider less than"))
-		lowspeedThresholdEdit := analyzerGui.Add("Edit", "x158 yp w45 h23 +0x200 Number Limit3", analyzer.LowspeedThreshold)
+		widget6 := analyzerGui.Add("Text", "x32 yp+21 w130 h23 +0x200", translate("Consider less than"))
+		lowspeedThresholdEdit := analyzerGui.Add("Edit", "x166 yp w45 h23 +0x200 Number Limit3", analyzer.LowspeedThreshold)
 		widget7 := lowspeedThresholdEdit
-		widget33 := analyzerGui.Add("UpDown", "x188 yp w18 h23 Range1-999", analyzer.LowspeedThreshold)
-		widget8 := analyzerGui.Add("Text", "x207 yp w120 h23 +0x200", translate("km/h as low speed"))
+		widget33 := analyzerGui.Add("UpDown", "x196 yp w18 h23 Range1-999", analyzer.LowspeedThreshold)
+		widget8 := analyzerGui.Add("Text", "x215 yp w120 h23 +0x200", translate("km/h as low speed"))
 
 		if !analyzer.settingAvailable("LowspeedThreshold") {
 			lowspeedThresholdEdit.Enabled := false
 			lowspeedThresholdEdit.Text := ""
 		}
 
-		widget9 := analyzerGui.Add("Text", "x24 yp+30 w130 h20 +0x200", translate("Heavy Oversteer"))
-		heavyOversteerThresholdSlider := analyzerGui.Add("Slider", "Center Thick15 x158 yp+2 w132 0x10 Range" . kMinThreshold . "-" . kMaxThreshold . " ToolTip", analyzer.OversteerThresholds[3])
+		widget9 := analyzerGui.Add("Text", "x32 yp+30 w130 h20 +0x200", translate("Heavy Oversteer"))
+		heavyOversteerThresholdSlider := analyzerGui.Add("Slider", "Center Thick15 x166 yp+2 w132 0x10 Range" . kMinThreshold . "-" . kMaxThreshold . " ToolTip", analyzer.OversteerThresholds[3])
 		heavyOversteerThresholdSlider.OnEvent("Change", runAnalyzer.Bind("UpdateSlider", false))
 		widget10 := heavyOversteerThresholdSlider
-		heavyOversteerThresholdEdit := analyzerGui.Add("Edit", "x293 yp w35 +0x200", analyzer.OversteerThresholds[3])
+		heavyOversteerThresholdEdit := analyzerGui.Add("Edit", "x301 yp w35 +0x200", analyzer.OversteerThresholds[3])
 		heavyOversteerThresholdEdit.OnEvent("Change", runAnalyzer.Bind("UpdateSlider", true))
 		widget21 := heavyOversteerThresholdEdit
 
-		widget11 := analyzerGui.Add("Text", "x24 yp+22 w130 h20 +0x200", translate("Medium Oversteer"))
-		mediumOversteerThresholdSlider := analyzerGui.Add("Slider", "Center Thick15 x158 yp+2 w132 0x10 Range" . kMinThreshold . "-" . kMaxThreshold . " ToolTip", analyzer.OversteerThresholds[2])
+		widget11 := analyzerGui.Add("Text", "x32 yp+22 w130 h20 +0x200", translate("Medium Oversteer"))
+		mediumOversteerThresholdSlider := analyzerGui.Add("Slider", "Center Thick15 x166 yp+2 w132 0x10 Range" . kMinThreshold . "-" . kMaxThreshold . " ToolTip", analyzer.OversteerThresholds[2])
 		mediumOversteerThresholdSlider.OnEvent("Change", runAnalyzer.Bind("UpdateSlider", false))
 		widget12 := mediumOversteerThresholdSlider
-		mediumOversteerThresholdEdit := analyzerGui.Add("Edit", "x293 yp w35 +0x200", analyzer.OversteerThresholds[2])
+		mediumOversteerThresholdEdit := analyzerGui.Add("Edit", "x301 yp w35 +0x200", analyzer.OversteerThresholds[2])
 		mediumOversteerThresholdEdit.OnEvent("Change", runAnalyzer.Bind("UpdateSlider", true))
 		widget22 := mediumOversteerThresholdEdit
 
-		widget13 := analyzerGui.Add("Text", "x24 yp+22 w130 h20 +0x200", translate("Light Oversteer"))
-		lightOversteerThresholdSlider := analyzerGui.Add("Slider", "Center Thick15 x158 yp+2 w132 0x10 Range" . kMinThreshold . "-" . kMaxThreshold . " ToolTip", analyzer.OversteerThresholds[1])
+		widget13 := analyzerGui.Add("Text", "x32 yp+22 w130 h20 +0x200", translate("Light Oversteer"))
+		lightOversteerThresholdSlider := analyzerGui.Add("Slider", "Center Thick15 x166 yp+2 w132 0x10 Range" . kMinThreshold . "-" . kMaxThreshold . " ToolTip", analyzer.OversteerThresholds[1])
 		lightOversteerThresholdSlider.OnEvent("Change", runAnalyzer.Bind("UpdateSlider", false))
 		widget14 := lightOversteerThresholdSlider
-		lightOversteerThresholdEdit := analyzerGui.Add("Edit", "x293 yp w35 +0x200", analyzer.OversteerThresholds[1])
+		lightOversteerThresholdEdit := analyzerGui.Add("Edit", "x301 yp w35 +0x200", analyzer.OversteerThresholds[1])
 		lightOversteerThresholdEdit.OnEvent("Change", runAnalyzer.Bind("UpdateSlider", true))
 		widget23 := lightOversteerThresholdEdit
 
-		widget15 := analyzerGui.Add("Text", "x24 yp+30 w130 h20 +0x200", translate("Light Understeer"))
-		lightUndersteerThresholdSlider := analyzerGui.Add("Slider", "Center Thick15 x158 yp+2 w132 0x10 Range" . kMinThreshold . "-" . kMaxThreshold . " ToolTip", analyzer.UndersteerThresholds[1])
+		widget15 := analyzerGui.Add("Text", "x32 yp+30 w130 h20 +0x200", translate("Light Understeer"))
+		lightUndersteerThresholdSlider := analyzerGui.Add("Slider", "Center Thick15 x166 yp+2 w132 0x10 Range" . kMinThreshold . "-" . kMaxThreshold . " ToolTip", analyzer.UndersteerThresholds[1])
 		lightUndersteerThresholdSlider.OnEvent("Change", runAnalyzer.Bind("UpdateSlider", false))
 		widget16 := lightUndersteerThresholdSlider
-		lightUndersteerThresholdEdit := analyzerGui.Add("Edit", "x293 yp w35 +0x200", analyzer.UndersteerThresholds[1])
+		lightUndersteerThresholdEdit := analyzerGui.Add("Edit", "x301 yp w35 +0x200", analyzer.UndersteerThresholds[1])
 		lightUndersteerThresholdEdit.OnEvent("Change", runAnalyzer.Bind("UpdateSlider", true))
 		widget24 := lightUndersteerThresholdEdit
 
-		widget17 := analyzerGui.Add("Text", "x24 yp+22 w130 h20 +0x200", translate("Medium Understeer"))
-		mediumUndersteerThresholdSlider := analyzerGui.Add("Slider", "Center Thick15 x158 yp+2 w132 0x10 Range" . kMinThreshold . "-" . kMaxThreshold . " ToolTip", analyzer.UndersteerThresholds[2])
+		widget17 := analyzerGui.Add("Text", "x32 yp+22 w130 h20 +0x200", translate("Medium Understeer"))
+		mediumUndersteerThresholdSlider := analyzerGui.Add("Slider", "Center Thick15 x166 yp+2 w132 0x10 Range" . kMinThreshold . "-" . kMaxThreshold . " ToolTip", analyzer.UndersteerThresholds[2])
 		mediumUndersteerThresholdSlider.OnEvent("Change", runAnalyzer.Bind("UpdateSlider", false))
 		widget18 := mediumUndersteerThresholdSlider
-		mediumUndersteerThresholdEdit := analyzerGui.Add("Edit", "x293 yp w35 +0x200", analyzer.UndersteerThresholds[2])
+		mediumUndersteerThresholdEdit := analyzerGui.Add("Edit", "x301 yp w35 +0x200", analyzer.UndersteerThresholds[2])
 		mediumUndersteerThresholdEdit.OnEvent("Change", runAnalyzer.Bind("UpdateSlider", true))
 		widget25 := mediumUndersteerThresholdEdit
 
-		widget19 := analyzerGui.Add("Text", "x24 yp+22 w130 h20 +0x200", translate("Heavy Understeer"))
-		heavyUndersteerThresholdSlider := analyzerGui.Add("Slider", "Center Thick15 x158 yp+2 w132 0x10 Range" . kMinThreshold . "-" . kMaxThreshold . " ToolTip", analyzer.UndersteerThresholds[3])
+		widget19 := analyzerGui.Add("Text", "x32 yp+22 w130 h20 +0x200", translate("Heavy Understeer"))
+		heavyUndersteerThresholdSlider := analyzerGui.Add("Slider", "Center Thick15 x166 yp+2 w132 0x10 Range" . kMinThreshold . "-" . kMaxThreshold . " ToolTip", analyzer.UndersteerThresholds[3])
 		heavyUndersteerThresholdSlider.OnEvent("Change", runAnalyzer.Bind("UpdateSlider", false))
 		widget20 := heavyUndersteerThresholdSlider
-		heavyUndersteerThresholdEdit := analyzerGui.Add("Edit", "x293 yp w35 +0x200", analyzer.UndersteerThresholds[3])
+		heavyUndersteerThresholdEdit := analyzerGui.Add("Edit", "x301 yp w35 +0x200", analyzer.UndersteerThresholds[3])
 		heavyUndersteerThresholdEdit.OnEvent("Change", runAnalyzer.Bind("UpdateSlider", true))
 		widget26 := heavyUndersteerThresholdEdit
 
 		chosen := (analyzer.AcousticFeedback ? 1 : 2)
 
-		widget34 := analyzerGui.Add("Text", "x16 yp+42 w130 h20 +0x200", translate("Acoustic feedback"))
-		widget35 := analyzerGui.Add("DropDownList", "x158 yp w45 Choose" . chosen, [translate("Yes"), translate("No")])
+		widget34 := analyzerGui.Add("Text", "x24 yp+42 w130 h20 +0x200", translate("Acoustic feedback"))
+		widget35 := analyzerGui.Add("DropDownList", "x166 yp w45 Choose" . chosen, [translate("Yes"), translate("No")])
 		acousticFeedbackDropDown := widget35
 
 		if !analyzer.settingAvailable("OversteerThresholds") {
@@ -833,10 +838,12 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 			lightUndersteerThresholdSlider.Value := 0
 		}
 
-		loop 35
+		loop 36
 			prepareWidgets.Push(%"widget" . A_Index%)
 
-		widget1 := analyzerGui.Add("ListView", "x16 ys w320 h190 -Multi -LV0x10 NoSort NoSortHdr  Hidden", collect(["Characteristic", "Intensity", "Frequency (%)"], translate))
+		tabView .UseTab(0)
+
+		widget1 := analyzerGui.Add("ListView", "x16 ys w336 h214 -Multi -LV0x10 NoSort NoSortHdr  Hidden", collect(["Characteristic", "Intensity", "Frequency (%)"], translate))
 		widget1.OnEvent("Click", noSelect)
 		widget1.OnEvent("DoubleClick", noSelect)
 
@@ -844,20 +851,20 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		analyzerGui.SetFont("s14", "Arial")
 
-		widget2 := analyzerGui.Add("Text", "x16 ys+200 w320 h200 Wrap Hidden", translate("Go to the track and run some decent laps. Then click on `"Stop`" to analyze the telemetry data."))
+		widget2 := analyzerGui.Add("Text", "x16 ys+224 w336 h200 Wrap Hidden", translate("Go to the track and run some decent laps. Then click on `"Stop`" to analyze the telemetry data."))
 
 		analyzerGui.SetFont("Norm s8", "Arial")
 
 		loop 2
 			runWidgets.Push(%"widget" . A_Index%)
 
-		widget1 := analyzerGui.Add("ListView", "x16 ys w320 h230 -Multi -LV0x10 Checked NoSort NoSortHdr  Hidden", collect(["Characteristic", "Intensity", "Frequency (%)"], translate))
+		widget1 := analyzerGui.Add("ListView", "x16 ys w336 h254 -Multi -LV0x10 Checked NoSort NoSortHdr  Hidden", collect(["Characteristic", "Intensity", "Frequency (%)"], translate))
 		widget1.OnEvent("Click", noSelect)
 		widget1.OnEvent("DoubleClick", noSelect)
 
 		resultListView := widget1
 
-		widget2 := analyzerGui.Add("Text", "x16 yp+238 w130 h23 +0x200 Hidden", translate("Threshold"))
+		widget2 := analyzerGui.Add("Text", "x16 yp+262 w130 h23 +0x200 Hidden", translate("Threshold"))
 		applyThresholdSlider := analyzerGui.Add("Slider", "x158 yp w60 0x10 Range0-25 ToolTip Hidden", 0)
 		applyThresholdSlider.OnEvent("Change", runAnalyzer.Bind("Threshold"))
 		widget3 := applyThresholdSlider
@@ -866,9 +873,11 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		loop 4
 			analyzeWidgets.Push(%"widget" . A_Index%)
 
-		calibrateButton := analyzerGui.Add("Button", "x16 ys+328 w80 h23 ", translate("Calibrate..."))
+		tabView.UseTab(0)
+
+		calibrateButton := analyzerGui.Add("Button", "x16 ys+366 w80 h23 ", translate("Calibrate..."))
 		calibrateButton.OnEvent("Click", runAnalyzer.Bind("Calibrate"))
-		activateButton := analyzerGui.Add("Button", "x158 yp w80 h23 Default", translate("Start"))
+		activateButton := analyzerGui.Add("Button", "x176 yp w80 h23 Default", translate("Start"))
 		activateButton.OnEvent("Click", runAnalyzer.Bind("Activate"))
 		analyzerGui.Add("Button", "xp+98 yp w80 h23", translate("Cancel")).OnEvent("Click", runAnalyzer.Bind(kCancel))
 

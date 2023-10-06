@@ -910,7 +910,8 @@ class VoiceManager {
 
 	startListening(retry := true) {
 		static audioDevice := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Audio Settings.ini"), "Output", "Activation.AudioDevice", false)
-
+		static talkSound := getFileName("Talk.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\")
+		
 		if (this.iSpeechRecognizer && !this.Listening)
 			if !this.iSpeechRecognizer.startRecognizer() {
 				if retry
@@ -919,7 +920,7 @@ class VoiceManager {
 				return false
 			}
 			else {
-				playSound("VMSoundPlayer.exe", kResourcesDirectory . "Sounds\Talk.wav", audioDevice)
+				playSound("VMSoundPlayer.exe", talkSound, audioDevice)
 
 				this.iIsListening := true
 

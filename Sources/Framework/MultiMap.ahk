@@ -29,6 +29,16 @@ class MultiMap extends CaseInsenseWeakMap {
 		return parseMultiMap(text)
 	}
 
+	Clone() {
+		local newMultiMap := super.Clone()
+
+		for key, values in this
+			if isInstance(values, Map)
+				newMultiMap[key] := values.Clone()
+
+		return newMultiMap
+	}
+
 	include(path, directory?) {
 		local curWorkingDir := A_WorkingDir
 

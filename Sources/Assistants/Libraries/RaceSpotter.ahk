@@ -776,9 +776,6 @@ class RaceSpotter extends GridRaceAssistant {
 
 	iSessionDataActive := false
 
-	iOverallGridPosition := false
-	iClassGridPosition := false
-
 	iLastDeltaInformationLap := 0
 	iPositionInfos := CaseInsenseMap()
 	iTacticalAdvices := CaseInsenseMap()
@@ -906,12 +903,6 @@ class RaceSpotter extends GridRaceAssistant {
 	SessionDataActive {
 		Get {
 			return this.iSessionDataActive
-		}
-	}
-
-	GridPosition[type := "Overall"] {
-		Get {
-			return ((type = "Overall") ? this.iOverallGridPosition : this.iClassGridPosition)
 		}
 	}
 
@@ -2896,15 +2887,6 @@ class RaceSpotter extends GridRaceAssistant {
 		this.iLastPenalty := false
 	}
 
-	initializeGridPosition(data, force := false) {
-		local driver := getMultiMapValue(data, "Position Data", "Driver.Car", false)
-
-		if ((force || !this.GridPosition) && driver && (getMultiMapValue(data, "Stint Data", "Laps", 0) <= 1)) {
-			this.iOverallGridPosition := this.getPosition(driver, "Overall", data)
-			this.iClassGridPosition := this.getPosition(driver, "Class", data)
-		}
-	}
-
 	prepareSession(&settings, &data, formationLap := true) {
 		local speaker, fragments
 		local facts, weather, airTemperature, trackTemperature, weatherNow, weather10Min, weather30Min, driver
@@ -2916,8 +2898,6 @@ class RaceSpotter extends GridRaceAssistant {
 			this.updateConfigurationValues({UseTalking: getMultiMapValue(settings, "Assistant.Spotter", "Voice.UseTalking", true)})
 
 		this.initializeAnnouncements(data)
-
-		this.initializeGridPosition(data, formationLap)
 
 		if (formationLap && this.Speaker) {
 			speaker := this.getSpeaker()
@@ -3194,8 +3174,6 @@ class RaceSpotter extends GridRaceAssistant {
 
 		if (lastPitstop && (Abs(lapNumber - lastPitstop) <= 2))
 			this.initializeHistory()
-
-		this.initializeGridPosition(data)
 
 		if this.Speaker[false]
 			if (!this.Announcements["PenaltyInformation"] || !this.penaltyInformation(lapNumber, getMultiMapValue(data, "Stint Data", "Sector", 0), lastPenalty))

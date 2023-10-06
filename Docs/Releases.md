@@ -10,8 +10,11 @@
   5. When the name of the current driver is unknown for any reason, "John Doe" was used in the past. Now, the name of the current user of Simulator Controller is used.
   6. The documentation link in "Simulator Configuration" is now context-aware and opens the documentation for the configuration tab, which is currently selected.
   7. "Simulator Setup" and "Simulator Configuration" are now almost fully compatible, when using both to work on the configuration.
-  8. [Developer Only] A new library for HTTP REST calling has been implemented.
-  9. [Developer Only] The speech recognition framework now also supports free text recognition in addition to pattern based text recognition.
+  8. The meta model for "Setup Workbench" has been extended. It now supports non-standard setup settings for modded cars (currently only relevant for *assetto Corsa*). See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#extending-and-cutomizing-setup-workbench) for more information.
+  9. You can now supply your own sound files for the different notifcation sounds of Simulator Controller applications. See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#using-your-own-sounds-for-confirmation-sounds) for more information.
+  10. [Internal] Improved the detection of outdated downloadable components.
+  11. [Developer Only] A new library for HTTP REST calling has been implemented.
+  12. [Developer Only] The speech recognition framework now also supports free text recognition in addition to pattern based text recognition.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-540), because you don't want to miss out the new Assistant.
 
@@ -281,7 +284,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   13. More intelligent detection of unplanned pitstops and stops for penalties by the Race Strategist.
   14. The collaboration between the Strategist and the Engineer, when running a prepared strategy, has become more inteligent, especially for the last stint. The [documentation on strategy handliing](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-handling) has been revised.
   15. If you ask the Strategist for the next pitstop, it will give you the option to inform the Engineer right away. Helpful, if you missed the upcoming pitstop warning.
-  16. Fixed spurios input field appearing in Telemetry Analyzer, when running a recording.
+  16. Fixed spurious input field appearing in Telemetry Analyzer, when running a recording.
   17. Migrated the sources to AHK 2.03
   18. New car models for "Setup Workbench":
       - Assetto Corsa
@@ -1495,7 +1498,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. Last version introduced a critical bug in "Race Reports" when switching cars. This has been fixed.
-  4. Introduced data filtering in "Race Reports" for spurios average lap times, which origin from formation and post race laps.
+  4. Introduced data filtering in "Race Reports" for spurious average lap times, which origin from formation and post race laps.
   5. Strategy Simulation now includes a tyre degradation model based on telemetry data.
   6. Improved control for pitstop service time calculation.
   7. Improved calculation of overtake deltas.

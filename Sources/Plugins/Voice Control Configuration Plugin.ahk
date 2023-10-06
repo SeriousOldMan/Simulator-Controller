@@ -132,7 +132,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		getPTTHotkey(*) {
 			setPTTHotkey(hotkey) {
 				if !isInteger(hotkey) {
-					SoundPlay(kResourcesDirectory . "Sounds\Activated.wav")
+					SoundPlay(getFileName("Activated.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\"))
 
 					this.Control["pushToTalkEdit"].Text := hotkey
 

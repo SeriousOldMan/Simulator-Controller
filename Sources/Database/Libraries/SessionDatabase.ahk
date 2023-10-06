@@ -591,7 +591,7 @@ class SessionDatabase extends ConfigurationItem {
 
 	static getUserName() {
 		static userName := SessionDatabase.getDriverNames(false, this.ID)[1]
-		
+
 		return userName
 	}
 

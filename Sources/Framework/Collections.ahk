@@ -298,6 +298,8 @@ bubbleSort(&array, comparator := (a, b) => (isNumber(a) && isNumber(b)) ? (a > b
 
 		n := newN
 	}
+
+	return array
 }
 
 quickSort(&array, comparator?) {
@@ -417,4 +419,6 @@ quickSort(&array, comparator?) {
 		comparator := stdCompare
 
 	quickSort(array.MinIndex(), array.MaxIndex())
+
+	return array
 }

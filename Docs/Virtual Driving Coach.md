@@ -1,6 +1,6 @@
 ## Introduction
 
-Aiden, The Virtual Driving Coach, is a fully AI based chatbot which plays the role of your personal driving coach. Using state of the art AI techniques (GPT = generative pretrained transformers) using an LLM (aka large language models), the Virtual Driving Coach behaves and interacts as natural as possible. It depends heavily on the concrete LLM which is used, what knowledge is available about the race driving topic and how detailed this knowledge is. Modern LLMs, like GPT 3 or GOT 4 are actually very good even in this very special domain.
+Aiden, The Virtual Driving Coach, is a fully AI based chatbot which plays the role of your personal driving coach. Implemented with state of the art AI technologiy GPT (aka generative pretrained transformer) using an LLM (aka large language model), the Virtual Driving Coach behaves and interacts as natural as possible. It depends heavily on the concrete LLM which is used, what knowledge is available about the race driving topic and how detailed this knowledge is. Modern LLMs, like GPT 3 or GOT 4 are actually very good even in this very special domain.
 
 Simulator Controller does not implement its own GPT engine, of course. And this is even not necessary, since there are a couple of service providers available, first and foremost OpenAI, the company, that created the famous ChatGPT solutions. Rather, Simulator Controller uses API calls to use the services provided by an existing GPT engine to run the LLM used by Aiden. You can choose in the configuration which provider is used and even which LLM you want to use (see below in the chapter about [configuration](*).
 
@@ -9,6 +9,12 @@ Notes: The initial version of Aiden does not know much about your concrete drivi
 But before we proceed to the details of the configruation and the rules how to interact with your personal Driving Coach, let's take a look at a typical interaction with Aiden.
  
 ### A typical dialog
+
+It is very hard to describe, how the interaction with Aiden is like. Therefore, let's take a look together at a short interaction. By the way, the Driving Coach is named "Kim" here.
+
+[![](https://img.youtube.com/vi/LBtLk_md1IE/0.jpg)](https://youtu.be/LBtLk_md1IE)
+
+And here is a transcript of a very similar conversation:
 
 **Driver:** Can you introduce yourself?
 
@@ -42,7 +48,7 @@ Remember, trail braking is a skill that takes time and practice to master. Be pa
 
 **Driver:** Can we talk about strategy?
 
-**Aiden: Certainly! I can provide some insights on race strategy. What specific aspects of strategy would you like to discuss?
+**Aiden:** Certainly! I can provide some insights on race strategy. What specific aspects of strategy would you like to discuss?
 
 **Driver:** I have a one hour race coming up. Fuel and tyres are good for the complete race, but there is a mandatory pit stop. The pit stop does not require changing tyres. What is the best strategy for this race?
 
@@ -137,4 +143,6 @@ The above list are only few of the rules to follow, though the most important on
 
 For some tips n tricks for the best voice recognition experience, see the [corresponding chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#troubleshooting) in the documentation of Jona.
 
-As said, using the "Azure" voice recognition engine is strongly recommend, because of its superior quality. When using the "Dektop" service, which is builtin to the Windows operating system, you will encounter wrong recognitions here and there, esppecially when formulating long questions. To get the best recognition quality with the "Desktop" recognition engine, you can train your computer for your pronounciation. Follow the instructions found in the [Microsoft documentation](https://support.microsoft.com/en-us/windows/use-voice-recognition-in-windows-83ff75bd-63eb-0b6c-18d4-6fae94050571).
+A typical problem, which might happen, is that the Driving Coach does not wait with its answer until you have finished your question. This happens especially, when you are formulating very long questions. In this case, use the *Push-To-Talk* method "Hold & Press", which will prevent this.
+
+As said above, using the "Azure" voice recognition engine is strongly recommend, because of its superior quality. When using the "Dektop" service, which is builtin to the Windows operating system, you will encounter wrong recognitions here and there, esppecially when formulating long questions. To get the best recognition quality with the "Desktop" recognition engine, you can train your computer for your pronounciation. Follow the instructions found in the [Microsoft documentation](https://support.microsoft.com/en-us/windows/use-voice-recognition-in-windows-83ff75bd-63eb-0b6c-18d4-6fae94050571).

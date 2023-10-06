@@ -39,7 +39,7 @@ loadSimulatorConfiguration() {
 	local packageInfo, type, pid, path
 
 	checkInstallation(components) {
-		local component, version, ignore, part
+		local component, version, ignore, part, type, installedVersion
 
 		for component, version in components {
 			path := Trim(getMultiMapValue(packageInfo, "Components", component . "." . version . ".Path", ""))
@@ -52,9 +52,18 @@ loadSimulatorConfiguration() {
 			if !FileExist(path)
 				return false
 
-			for ignore, part in string2Values(",", getMultiMapValue(packageInfo, "Components", component . "." . version . ".Content"))
-				if !FileExist(path . part)
+			for ignore, part in string2Values(",", getMultiMapValue(packageInfo, "Components", component . "." . version . ".Content")) {
+				type := FileExist(path . part)
+
+				if !type
 					return false
+				else if InStr(type, "D") {
+					installedVersion := getMultiMapValue(readMultiMap(path . part . "\VERSION"), "Component", "Version", false)
+
+					if (installedVersion != version)
+						return false
+				}
+			}
 		}
 
 		return true
@@ -72,8 +81,11 @@ loadSimulatorConfiguration() {
 
 	if type {
 		if (StrSplit(A_ScriptName, ".")[1] != "Simulator Tools")
-			if !checkInstallation(string2Map(",", "->", getMultiMapValue(packageInfo, type, "Components", "")))
-				RunWait(kBinariesDirectory . "Simulator Tools.exe -Repair")
+			if !checkInstallation(string2Map(",", "->", getMultiMapValue(packageInfo, type, "Components", ""))) {
+				Run("*RunAs " . kBinariesDirectory . "Simulator Tools.exe -Repair -Start `"" . A_ScriptName . "`"")
+
+				ExitApp(0)
+			}
 
 		kVersion := getMultiMapValue(packageInfo, type, "Version", false)
 
@@ -200,6 +212,7 @@ initializeEnvironment() {
 	DirCreate(kUserHomeDirectory . "Garage\Rules\Cars")
 	DirCreate(kUserHomeDirectory . "Validators")
 	DirCreate(kUserHomeDirectory . "Logs")
+	DirCreate(kUserHomeDirectory . "Sounds")
 	DirCreate(kUserHomeDirectory . "Splash Media")
 	DirCreate(kUserHomeDirectory . "Screen Images")
 	DirCreate(kUserHomeDirectory . "Plugins")

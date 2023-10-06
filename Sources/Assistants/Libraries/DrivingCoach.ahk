@@ -28,7 +28,9 @@
 class DrivingCoach extends GridRaceAssistant {
 	iConnector := false
 
-	iHistory := false
+	iInstructions := CaseInsenseMap()
+
+	iLapData := Map()
 
 	class HTTPConnector {
 		iCoach := false
@@ -40,7 +42,6 @@ class DrivingCoach extends GridRaceAssistant {
 		iMaxTokens := 1024
 		iTemperature := 0.5
 
-		iInstructions := CaseInsenseMap()
 		iHistory := []
 		iMaxHistory := 3
 
@@ -120,16 +121,6 @@ class DrivingCoach extends GridRaceAssistant {
 
 			Set {
 				return (this.iMaxHistory := value)
-			}
-		}
-
-		Instructions[type?] {
-			Get {
-				return (isSet(type) ? this.iInstructions[type] : this.iInstructions)
-			}
-
-			Set {
-				return (isSet(type) ? (this.iInstructions[type] := value) : (this.iInstructions := value))
 			}
 		}
 
@@ -242,42 +233,18 @@ class DrivingCoach extends GridRaceAssistant {
 
 		CreatePrompt(body, question) {
 			local coach := this.Coach
-			local settingsDB := coach.SettingsDatabase
-			local knowledgeBase := coach.KnowledgeBase
 			local messages := []
-			local simulator, car, track, message, position, ignore, conversation
+			local ignore, instruction, conversation
 
-			if (this.Instructions.Has("Character") && this.Instructions["Character"])
-				messages.Push({role: "system", content: substituteVariables(this.Instructions["Character"], {name: coach.VoiceManager.Name})})
+			addInstruction(instruction) {
+				instruction := coach.getInstruction(coach.Instructions[instruction])
 
-			if (this.Instructions.Has("Simulation") && this.Instructions["Simulation"])
-				if (knowledgeBase && (this.Coach.Session != kSessionFinished)) {
-					simulator := knowledgeBase.getValue("Session.Simulator")
-					car := knowledgeBase.getValue("Session.Car")
-					track := knowledgeBase.getValue("Session.Track")
+				if (instruction && (Trim(instruction) != ""))
+					messages.Push({role: "system", content: instruction})
+			}
 
-					message := substituteVariables(this.Instructions["Simulation"]
-												 , {name: coach.VoiceManager.Name
-												  , driver: coach.DriverForName
-												  , simulator: settingsDB.getSimulatorName(simulator)
-												  , car: settingsDB.getCarName(simulator, car)
-												  , track: settingsDB.getTrackName(simulator, track)})
-
-					messages.Push({role: "system", content: message})
-				}
-
-			if (this.Instructions.Has("Stint") && this.Instructions["Stint"])
-				if (knowledgeBase && (this.Coach.Session != kSessionFinished)) {
-					position := coach.getPosition(false, "Class")
-
-					if (position != 0) {
-						message := substituteVariables(this.Instructions["Stint"]
-													 , {lap: knowledgeBase.getValue("Lap") + 1
-													  , position: position})
-
-						messages.Push({role: "system", content: message})
-					}
-				}
+			for ignore, instruction in coach.Instructions[true]
+				addInstruction(instruction)
 
 			for ignore, conversation in this.History {
 				messages.Push({role: "user", content: conversation[1]})
@@ -317,42 +284,19 @@ class DrivingCoach extends GridRaceAssistant {
 	class GPT4AllConnector extends DrivingCoach.HTTPConnector {
 		CreatePrompt(body, question) {
 			local coach := this.Coach
-			local settingsDB := coach.SettingsDatabase
-			local knowledgeBase := coach.KnowledgeBase
 			local prompt := ""
-			local simulator, car, track, message, position, ignore, conversation
+			local ignore, instruction, conversation
 
-			if (this.Instructions.Has("Character") && this.Instructions["Character"])
-				prompt .= ("### System:`n" . substituteVariables(this.Instructions["Character"], {name: coach.VoiceManager.Name}) . "`n")
+			addInstruction(instruction) {
+				instruction := coach.getInstruction(coach.Instructions[instruction])
 
-			if (this.Instructions.Has("Simulation") && this.Instructions["Simulation"])
-				if (knowledgeBase && (this.Coach.Session != kSessionFinished)) {
-					simulator := knowledgeBase.getValue("Session.Simulator")
-					car := knowledgeBase.getValue("Session.Car")
-					track := knowledgeBase.getValue("Session.Track")
+				if (instruction && (Trim(instruction) != "")) {
+					if (prompt = "")
+						prompt .= "### System:`n"
 
-					message := substituteVariables(this.Instructions["Simulation"]
-												 , {name: coach.VoiceManager.Name
-												  , driver: coach.DriverForName
-												  , simulator: settingsDB.getSimulatorName(simulator)
-												  , car: settingsDB.getCarName(simulator, car)
-												  , track: settingsDB.getTrackName(simulator, track)})
-
-					prompt .= (message . "`n")
+					prompt .= (instruction . "`n")
 				}
-
-			if (this.Instructions.Has("Stint") && this.Instructions["Stint"])
-				if (knowledgeBase && (this.Coach.Session != kSessionFinished)) {
-					position := coach.getPosition(false, "Class")
-
-					if (position != 0) {
-						message := substituteVariables(this.Instructions["Stint"]
-													 , {lap: knowledgeBase.getValue("Lap") + 1
-													  , position: position})
-
-						prompt .= (message . "`n")
-					}
-				}
+			}
 
 			for ignore, conversation in this.History {
 				prompt .= ("### Human: " . conversation[1] . "`n")
@@ -383,6 +327,23 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 	}
 
+	Instructions[type?] {
+		Get {
+			if isSet(type) {
+				if (type == true)
+					return ["Character", "Simulation", "Session", "Stint", "Telemetry"]
+				else
+					return this.iInstructions[type]
+			}
+			else
+				return this.iInstructions
+		}
+
+		Set {
+			return (isSet(type) ? (this.iInstructions[type] := value) : (this.iInstructions := value))
+		}
+	}
+
 	Connector {
 		Get {
 			return this.iConnector
@@ -392,6 +353,28 @@ class DrivingCoach extends GridRaceAssistant {
 	Transcript {
 		Get {
 			return this.iTranscript
+		}
+	}
+
+	LapData[lapNumber?] {
+		Get {
+			if isSet(lapNumber) {
+				lapNumber := (lapNumber + 0)
+
+				return (this.iLapData.Has(lapNumber) ? this.iLapData[lapNumber] : false)
+			}
+			else
+				return this.iLapData
+		}
+
+		Set {
+			if isSet(lapNumber) {
+				lapNumber := (lapNumber + 0)
+
+				return (this.iLapData[lapNumber] := value)
+			}
+			else
+				return this.iLapData := value
 		}
 	}
 
@@ -422,7 +405,69 @@ class DrivingCoach extends GridRaceAssistant {
 		options["Driving Coach.Confirmation"] := getMultiMapValue(configuration, "Driving Coach Personality", "Confirmation", true)
 		options["Driving Coach.Instructions.Character"] := getMultiMapValue(configuration, "Driving Coach Personality", "Instructions.Character", false)
 		options["Driving Coach.Instructions.Simulation"] := getMultiMapValue(configuration, "Driving Coach Personality", "Instructions.Simulation", false)
+		options["Driving Coach.Instructions.Session"] := getMultiMapValue(configuration, "Driving Coach Personality", "Instructions.Session", false)
 		options["Driving Coach.Instructions.Stint"] := getMultiMapValue(configuration, "Driving Coach Personality", "Instructions.Stint", false)
+	}
+
+	updateSessionValues(values) {
+		super.updateSessionValues(values)
+
+		if values.HasProp("LapData")
+			this.iLapData := values.LapData
+		else if (values.HasProp("Session") && (values.Session == kSessionFinished))
+			this.iLapData := Map()
+	}
+
+	getInstruction(category) {
+		local knowledgeBase := this.KnowledgeBase
+		local settingsDB := this.SettingsDatabase
+		local simulator, car, track, position, laps, lapData, nrs, nr, carData
+
+		switch category, false {
+			case "Character":
+				return substituteVariables(this.Instructions["Character"], {name: this.VoiceManager.Name})
+			case "Simulation":
+				simulator := knowledgeBase.getValue("Session.Simulator")
+				car := knowledgeBase.getValue("Session.Car")
+				track := knowledgeBase.getValue("Session.Track")
+
+				return substituteVariables(this.Instructions["Simulation"]
+										 , {name: this.VoiceManager.Name
+										  , driver: this.DriverForName
+										  , simulator: settingsDB.getSimulatorName(simulator)
+										  , car: settingsDB.getCarName(simulator, car)
+										  , track: settingsDB.getTrackName(simulator, track)})
+			case "Session":
+				position := this.GridPosition
+
+				if (position != 0)
+					return substituteVariables(this.Instructions["Session"]
+											 , {session: translate(session[this.Session])
+											  , carNumber: this.getNr()
+											  , classPosition: this.GridPosition["Class"], overallPosition: position})
+			case "Stint":
+				position := this.getPosition(false, "Class")
+
+				if (position != 0) {
+					lapData := ""
+
+					for ignore, lap in bubbleSort(&laps := getKeys(this.LapData)) {
+						lapData .= (translate("Lap:") . A_Space . lap . "`n`n")
+						lapData .= (values2String(";", collect(["Nr.", "Class", "Position (Overall)", "Position (Class)", "Lap Time"], translate)*) . "`n")
+
+						for nr, carData in bubbleSort(&nrs := remove(this.LapData[lap], "Driver"))
+							lapData .= (values2String(";", nr, carData.Class, carData.OverallPosition, carData.ClassPosition, Round(carData.LapTime / 1000, 1)) . "`n")
+
+						lapData .= "`n`n"
+					}
+
+					return substituteVariables(this.Instructions["Stint"]
+											 , {lap: knowledgeBase.getValue("Lap") + 1
+											  , position: position, lapData: lapData})
+				}
+		}
+
+		return false
 	}
 
 	startConversation() {
@@ -445,9 +490,10 @@ class DrivingCoach extends GridRaceAssistant {
 				this.Connector.Temperature := this.Options["Driving Coach.Temperature"]
 				this.Connector.MaxHistory := this.Options["Driving Coach.MaxHistory"]
 
-				this.Connector.Instructions["Character"] := this.Options["Driving Coach.Instructions.Character"]
-				this.Connector.Instructions["Simulation"] := this.Options["Driving Coach.Instructions.Simulation"]
-				this.Connector.Instructions["Stint"] := this.Options["Driving Coach.Instructions.Stint"]
+				this.Instructions["Character"] := this.Options["Driving Coach.Instructions.Character"]
+				this.Instructions["Simulation"] := this.Options["Driving Coach.Instructions.Simulation"]
+				this.Instructions["Session"] := this.Options["Driving Coach.Instructions.Session"]
+				this.Instructions["Stint"] := this.Options["Driving Coach.Instructions.Stint"]
 			}
 			catch Any as exception {
 				logError(exception)
@@ -514,6 +560,10 @@ class DrivingCoach extends GridRaceAssistant {
 								, BestLapTime: 0, OverallTime: 0, LastFuelAmount: 0
 								, InitialFuelAmount: 0, EnoughData: false})
 
+		this.updateSessionValues({LapData: Map()})
+
+		this.initializeGridPosition(data)
+
 		if this.Debug[kDebugKnowledgeBase]
 			this.dumpKnowledgeBase(this.KnowledgeBase)
 
@@ -524,9 +574,43 @@ class DrivingCoach extends GridRaceAssistant {
 		this.updateDynamicValues({KnowledgeBase: false, Prepared: false
 								, OverallTime: 0, BestLapTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0
 								, EnoughData: false})
-		this.updateSessionValues({Simulator: "", Session: kSessionFinished, SessionTime: false})
+		this.updateSessionValues({Simulator: "", Session: kSessionFinished, SessionTime: false, LapData: Map()})
 
 		this.stopConversation()
+	}
+
+	updataLapData(lapNumber, data) {
+		local knowledgeBase := this.KnowledgeBase
+		local driver := knowledgeBase.getValue("Driver.Car", false)
+		local lapData := CaseInsenseMap()
+		local keys, ignore, car, carData
+
+		while (this.LapData.Count > 5) {
+			keys := getKeys(this.LapData)
+
+			bubbleSort(&keys)
+
+			this.LapData.Delete(keys[1])
+		}
+
+		for ignore, car in this.getCars() {
+			carData := {Class: this.getClass(car), OverallPosition: this.getPosition(car), ClassPosition: this.getPosition(car, "Class"), LapTime: this.getLapTime(car)}
+
+			if (car = driver)
+				lapData["Driver"] := carData
+
+			lapData[this.getNr(car)] := carData
+		}
+
+		this.LapData[lapNumber] := lapData
+	}
+
+	addLap(lapNumber, &data) {
+		local result := super.addLap(lapNumber, &data)
+
+		this.updateLapData(data)
+
+		return result
 	}
 }
 

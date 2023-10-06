@@ -458,18 +458,18 @@ class RaceAssistant extends ConfigurationItem {
 	__New(configuration, assistantType, remoteHandler, name := false, language := kUndefined
 		, synthesizer := false, speaker := false, vocalics := false, recognizer := false, listener := false, muted := false, voiceServer := false) {
 		global kUnknown
-		
+
 		local userName := SessionDatabase.getUserName()
 		local options, forName, ignore
 
 		if !kUnknown
 			kUnknown := translate("Unknown")
-			
+
 		parseDriverName(userName, &forName, &ignore := false, &ignore := false)
 
 		this.iDriverForName := forName
 		this.iDriverFullName := userName
-		
+
 		this.iAssistantType := assistantType
 		this.iRemoteHandler := remoteHandler
 
@@ -1718,6 +1718,9 @@ class RaceAssistant extends ConfigurationItem {
 }
 
 class GridRaceAssistant extends RaceAssistant {
+	iOverallGridPosition := false
+	iClassGridPosition := false
+
 	iPitstops := CaseInsenseMap()
 	iLastPitstopUpdate := false
 
@@ -1789,6 +1792,12 @@ class GridRaceAssistant extends RaceAssistant {
 			}
 
 			return multiClass
+		}
+	}
+
+	GridPosition[type := "Overall"] {
+		Get {
+			return ((type = "Overall") ? this.iOverallGridPosition : this.iClassGridPosition)
 		}
 	}
 
@@ -2559,6 +2568,19 @@ class GridRaceAssistant extends RaceAssistant {
 		return classes
 	}
 
+	getNr(car := false, data := false) {
+		local carCategory := kUndefined
+		local carClass
+
+		if !car
+			car := (data ? getMultiMapValue(data, "Position Data", "Driver.Car") : this.KnowledgeBase.getValue("Driver.Car", false))
+
+		if data
+			return getMultiMapValue(data, "Position Data", "Car." . car . ".Nr", false)
+		else
+			return this.KnowledgeBase.getValue("Car." . A_Index . ".Nr", false)
+	}
+
 	getClass(car := false, data := false, categories := ["Class"]) {
 		local carCategory := kUndefined
 		local carClass
@@ -2842,6 +2864,23 @@ class GridRaceAssistant extends RaceAssistant {
 		return sessionInfo
 	}
 
+	initializeGridPosition(data, force := false) {
+		local driver := getMultiMapValue(data, "Position Data", "Driver.Car", false)
+
+		if ((force || !this.GridPosition) && driver && (getMultiMapValue(data, "Stint Data", "Laps", 0) <= 1)) {
+			this.iOverallGridPosition := this.getPosition(driver, "Overall", data)
+			this.iClassGridPosition := this.getPosition(driver, "Class", data)
+		}
+	}
+
+	prepareSession(&settings, &data, formationLap := true) {
+		local facts := super.prepareSession(&settings, &data, formationLap)
+
+		this.initializeGridPosition(data, formationLap)
+
+		return facts
+	}
+
 	addLap(lapNumber, &data) {
 		local driver, lapValid, lapPenalty
 
@@ -2859,6 +2898,8 @@ class GridRaceAssistant extends RaceAssistant {
 		}
 
 		this.updatePitstops(lapNumber, data)
+
+		this.initializeGridPosition(data)
 
 		return super.addLap(lapNumber, &data, true, lapValid, lapPenalty)
 	}

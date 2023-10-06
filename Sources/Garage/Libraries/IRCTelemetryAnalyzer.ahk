@@ -21,6 +21,12 @@
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class IRCTelemetryAnalyzer extends GenericTelemetryAnalyzer {
+	CollectorClass {
+		Get {
+			return "IRCTelemetryCollector"
+		}
+	}
+
 	settingAvailable(setting) {
 		return ((setting = "SteerLock") ? false : super.settingAvailable(setting))
 	}

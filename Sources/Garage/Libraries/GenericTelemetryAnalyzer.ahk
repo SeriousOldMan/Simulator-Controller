@@ -14,8 +14,6 @@
 #Include "..\..\Libraries\Math.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
 #Include "TelemetryCollector.ahk"
-#Include "IRCTelemetryCollector.ahk"
-#Include "R3ETelemetryCollector.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -64,6 +62,12 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 	Track {
 		Get {
 			return this.iTrack
+		}
+	}
+
+	CollectorClass {
+		Get {
+			return "TelemetryCollector"
 		}
 	}
 
@@ -356,7 +360,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 
 	startTelemetryAnalyzer(dataFile, calibrate := false) {
 		local settings := {}
-		local code, ignore, setting
+		local ignore, setting
 
 		this.stopTelemetryAnalyzer()
 
@@ -370,12 +374,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 				if this.settingAvailable(setting)
 					settings.%setting% := this.%setting%
 
-			code := SessionDatabase.getSimulatorCode(this.Simulator)
-
-			if isSet(%code . "TelemetryCollector"%)
-				this.iTelemetryCollector := (%code . "TelemetryCollector"%)(this.Simulator, this.Car, this.Track, settings, this.AcousticFeedback)
-			else
-				this.iTelemetryCollector := TelemetryCollector(this.Simulator, this.Car, this.Track, settings, this.AcousticFeedback)
+			this.iTelemetryCollector := %this.CollectorClass%(this.Simulator, this.Car, this.Track, settings, this.AcousticFeedback)
 
 			this.iTelemetryCollector.startTelemetryCollector(datafile, calibrate)
 		}

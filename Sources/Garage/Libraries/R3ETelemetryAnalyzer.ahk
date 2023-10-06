@@ -21,6 +21,12 @@
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class R3ETelemetryAnalyzer extends GenericTelemetryAnalyzer {
+	CollectorClass {
+		Get {
+			return "R3ETelemetryCollector"
+		}
+	}
+
 	settingAvailable(setting) {
 		if ((setting = "SteerLock") || (setting = "SteerRatio"))
 			return false

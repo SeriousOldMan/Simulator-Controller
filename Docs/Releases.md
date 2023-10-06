@@ -1,4 +1,4 @@
-## 5.4.0.0-release 10/06/23 (planned)
+## 5.4.0.0-release 10/06/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed a bug in "Strategy Workbench", which created a strategy with the wrong race length, when a mandatory pitstop in timed window was selected and the tyre usage forced an additional pitstop one lap before the end of the race. Certainly an edge case...

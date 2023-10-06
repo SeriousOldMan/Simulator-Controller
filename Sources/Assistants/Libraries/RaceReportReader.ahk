@@ -126,7 +126,7 @@ class RaceReportReader {
 					else {
 						driverForname := "John"
 						driverSurname := "Doe"
-						driverNickname := "JDO"
+						driverNickname := "JD"
 					}
 
 					return true
@@ -144,7 +144,7 @@ class RaceReportReader {
 				else {
 					driverForname := "John"
 					driverSurname := "Doe"
-					driverNickname := "JDO"
+					driverNickname := "JD"
 				}
 
 				return true

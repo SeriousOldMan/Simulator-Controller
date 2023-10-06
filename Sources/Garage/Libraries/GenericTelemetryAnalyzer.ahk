@@ -291,7 +291,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 
 		if telemetry {
 			workbench := this.Workbench
-			characteristicLabels := getMultiMapValues(workbench.Definition, "Setup.Characteristics.Labels")
+			characteristicLabels := getMultiMapValues(workbench.Definition, "Workbench.Characteristics.Labels")
 			severities := CaseInsenseMap("Light", 33, "Medium", 50, "Heavy", 66)
 			characteristics := CaseInsenseMap()
 			count := 0
@@ -603,7 +603,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 	}
 	else if (commandOrAnalyzer == "FilterTelemetry") {
 		workbench := analyzer.Workbench
-		characteristicLabels := getMultiMapValues(workbench.Definition, "Setup.Characteristics.Labels")
+		characteristicLabels := getMultiMapValues(workbench.Definition, "Workbench.Characteristics.Labels")
 		final := ((arguments.Length > 0) && arguments[1])
 
 		data := readMultiMap(dataFile)
@@ -644,7 +644,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 	}
 	else if (commandOrAnalyzer == "UpdateTelemetry") {
 		workbench := analyzer.Workbench
-		characteristicLabels := getMultiMapValues(workbench.Definition, "Setup.Characteristics.Labels")
+		characteristicLabels := getMultiMapValues(workbench.Definition, "Workbench.Characteristics.Labels")
 		data := arguments[1]
 
 		theListView := ((state = "Run") ? issuesListView : resultListView)

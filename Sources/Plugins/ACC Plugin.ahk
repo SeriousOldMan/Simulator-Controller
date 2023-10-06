@@ -495,7 +495,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 			driverForname := getMultiMapValue(telemetryData, "Stint Data", "DriverForname", "John")
 			driverSurname := getMultiMapValue(telemetryData, "Stint Data", "DriverSurname", "Doe")
-			driverNickname := getMultiMapValue(telemetryData, "Stint Data", "DriverNickname", "JDO")
+			driverNickname := getMultiMapValue(telemetryData, "Stint Data", "DriverNickname", "JD")
 			driverID := getMultiMapValue(telemetryData, "Session Data", "ID", kUndefined)
 
 			lapTime := getMultiMapValue(telemetryData, "Stint Data", "LapLastTime", 0)

@@ -1064,7 +1064,7 @@ class RaceAssistant extends ConfigurationItem {
 
 		driverForname := getMultiMapValue(data, "Stint Data", "DriverForname", this.DriverForName)
 		driverSurname := getMultiMapValue(data, "Stint Data", "DriverSurname", "Doe")
-		driverNickname := getMultiMapValue(data, "Stint Data", "DriverNickname", "JDO")
+		driverNickname := getMultiMapValue(data, "Stint Data", "DriverNickname", "JD")
 
 		this.updateSessionValues({Simulator: simulatorName, Session: session, TeamSession: (getMultiMapValue(data, "Session Data", "Mode", "Solo") = "Team")
 								, SessionTime: A_Now, Driver: driverForname, DriverFullName: driverName(driverForName, driverSurName, driverNickName)})
@@ -1269,7 +1269,7 @@ class RaceAssistant extends ConfigurationItem {
 
 			setMultiMapValue(sessionInfo, "Stint", "Driver", driverName(getMultiMapValue(data, "Stint Data", "DriverForname", this.DriverForName)
 																	  , getMultiMapValue(data, "Stint Data", "DriverSurname", "Doe")
-																	  , getMultiMapValue(data, "Stint Data", "DriverNickname", "JDO")))
+																	  , getMultiMapValue(data, "Stint Data", "DriverNickname", "JD")))
 			setMultiMapValue(sessionInfo, "Stint", "Laps", lapNumber)
 			setMultiMapValue(sessionInfo, "Stint", "Position", knowledgeBase.getValue("Position", 0))
 			setMultiMapValue(sessionInfo, "Stint", "Valid", valid)
@@ -1367,7 +1367,7 @@ class RaceAssistant extends ConfigurationItem {
 
 		driverForname := getMultiMapValue(data, "Stint Data", "DriverForname", this.DriverForName)
 		driverSurname := getMultiMapValue(data, "Stint Data", "DriverSurname", "Doe")
-		driverNickname := getMultiMapValue(data, "Stint Data", "DriverNickname", "JDO")
+		driverNickname := getMultiMapValue(data, "Stint Data", "DriverNickname", "JD")
 
 		this.updateSessionValues({Driver: driverForname, DriverFullName: driverName(driverForname, driverSurname, driverNickname)
 								, TeamSession: (getMultiMapValue(data, "Session Data", "Mode", "Solo") = "Team")})
@@ -2569,19 +2569,21 @@ class GridRaceAssistant extends RaceAssistant {
 	}
 
 	getNr(car := false, data := false) {
+		local knowledgeBase := this.KnowledgeBase
 		local carCategory := kUndefined
 		local carClass
 
 		if !car
-			car := (data ? getMultiMapValue(data, "Position Data", "Driver.Car") : this.KnowledgeBase.getValue("Driver.Car", false))
+			car := (data ? getMultiMapValue(data, "Position Data", "Driver.Car") : (knowledgeBase ? knowledgeBase.getValue("Driver.Car", false) : false))
 
 		if data
 			return getMultiMapValue(data, "Position Data", "Car." . car . ".Nr", false)
 		else
-			return this.KnowledgeBase.getValue("Car." . A_Index . ".Nr", false)
+			return (knowledgeBase ? knowledgeBase.getValue("Car." . A_Index . ".Nr", false) : false)
 	}
 
 	getClass(car := false, data := false, categories := ["Class"]) {
+		local knowledgeBase := this.KnowledgeBase
 		local carCategory := kUndefined
 		local carClass
 
@@ -2600,13 +2602,13 @@ class GridRaceAssistant extends RaceAssistant {
 		}
 		else {
 			if inList(categories, "Class") {
-				carClass := this.KnowledgeBase.getValue("Car." . A_Index . ".Class", kUnknown)
+				carClass := (knowledgeBase ? knowledgeBase.getValue("Car." . A_Index . ".Class", kUnknown) : kUnknown)
 
 				if inList(categories, "Cup")
-					carCategory := this.KnowledgeBase.getValue("Car." . A_Index . ".Category", kUndefined)
+					carCategory := (knowledgeBase ? knowledgeBase.getValue("Car." . A_Index . ".Category", kUndefined) : kUndefined)
 			}
 			else
-				carClass := this.KnowledgeBase.getValue("Car." . A_Index . ".Category", kUnknown)
+				carClass := (knowledgeBase ? knowledgeBase.getValue("Car." . A_Index . ".Category", kUnknown) : kUnknown)
 		}
 
 		return ((carCategory != kUndefined) ? (carClass . translate(" (") . carCategory . translate(")")) : carClass)
@@ -2636,7 +2638,7 @@ class GridRaceAssistant extends RaceAssistant {
 						if (!class || (class = this.getClass(A_Index, data)))
 							positions.Push(Array(A_Index, getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Position")))
 				}
-				else
+				else if knowledgeBase
 					loop knowledgeBase.getValue("Car.Count")
 						if (!class || (class = this.getClass(A_Index)))
 							if knowledgeBase.getValue("Car." . A_Index . ".Car", false)
@@ -2653,7 +2655,7 @@ class GridRaceAssistant extends RaceAssistant {
 						if (!class || (class = this.getClass(A_Index, data)))
 							classGrid.Push(A_Index)
 				}
-				else
+				else if knowledgeBase
 					loop knowledgeBase.getValue("Car.Count")
 						if (!class || (class = this.getClass(A_Index)))
 							if knowledgeBase.getValue("Car." . A_Index . ".Car", false)
@@ -2721,7 +2723,7 @@ class GridRaceAssistant extends RaceAssistant {
 		else {
 			knowledgeBase := this.KnowledgeBase
 
-			driver := knowledgeBase.getValue("Driver.Car", false)
+			driver := (knowledgeBase ? knowledgeBase.getValue("Driver.Car", false) : false)
 
 			if driver {
 				driverLap := knowledgeBase.getValue("Car." . driver . ".Laps", knowledgeBase.getValue("Car." . driver . ".Lap"))
@@ -2741,7 +2743,7 @@ class GridRaceAssistant extends RaceAssistant {
 		if data
 			return getMultiMapValue(data, "Position Data", "Car." . car . ".Time", false)
 		else
-			return this.KnowledgeBase.getValue("Car." . car . ".Time", false)
+			return (this.KnowledgeBase ? this.KnowledgeBase.getValue("Car." . car . ".Time", false) : false)
 	}
 
 	getDriver(car, data := false) {
@@ -2750,14 +2752,21 @@ class GridRaceAssistant extends RaceAssistant {
 		if data {
 			forName := getMultiMapValue(data, "Position Data", "Car." . car . ".Driver.ForName", "John")
 			surName := getMultiMapValue(data, "Position Data", "Car." . car . ".Driver.SurName", "Doe")
-			nickName := getMultiMapValue(data, "Position Data", "Car." . car . ".Driver.NickName", "JDO")
+			nickName := getMultiMapValue(data, "Position Data", "Car." . car . ".Driver.NickName", "JD")
 		}
 		else {
 			knowledgeBase := this.KnowledgeBase
 
-			forName := knowledgeBase.getValue("Car." . car . ".Driver.ForName", "John")
-			surName := knowledgeBase.getValue("Car." . car . ".Driver.SurName", "Doe")
-			nickName := knowledgeBase.getValue("Car." . car . ".Driver.NickName", "JDO")
+			if knowledgeBase {
+				forName := knowledgeBase.getValue("Car." . car . ".Driver.ForName", "John")
+				surName := knowledgeBase.getValue("Car." . car . ".Driver.SurName", "Doe")
+				nickName := knowledgeBase.getValue("Car." . car . ".Driver.NickName", "JD")
+			}
+			else {
+				forName := "John"
+				surName := "Doe"
+				nickName := "JD"
+			}
 		}
 
 		return driverName(forName, surName, nickName)

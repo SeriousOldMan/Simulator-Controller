@@ -1379,7 +1379,7 @@ class TeamServerPlugin extends ControllerPlugin {
 			try {
 				driverForName := getMultiMapValue(telemetryData, "Stint Data", "DriverForname", "John")
 				driverSurName := getMultiMapValue(telemetryData, "Stint Data", "DriverSurname", "Doe")
-				driverNickName := getMultiMapValue(telemetryData, "Stint Data", "DriverNickname", "JDO")
+				driverNickName := getMultiMapValue(telemetryData, "Stint Data", "DriverNickname", "JD")
 
 				if (isDebug() && isLogLevel(kLogDebug)) {
 					showMessage("Updating lap for team session: " . lapNumber)

@@ -28,7 +28,7 @@
 class DrivingCoach extends GridRaceAssistant {
 	iConnector := false
 
-	iInstructions := CaseInsenseMap()
+	iInstructions := CaseInsenseWeakMap()
 
 	iLapData := Map()
 
@@ -237,7 +237,7 @@ class DrivingCoach extends GridRaceAssistant {
 			local ignore, instruction, conversation
 
 			addInstruction(instruction) {
-				instruction := coach.getInstruction(coach.Instructions[instruction])
+				instruction := coach.getInstruction(instruction)
 
 				if (instruction && (Trim(instruction) != ""))
 					messages.Push({role: "system", content: instruction})
@@ -288,7 +288,7 @@ class DrivingCoach extends GridRaceAssistant {
 			local ignore, instruction, conversation
 
 			addInstruction(instruction) {
-				instruction := coach.getInstruction(coach.Instructions[instruction])
+				instruction := coach.getInstruction(instruction)
 
 				if (instruction && (Trim(instruction) != "")) {
 					if (prompt = "")
@@ -333,7 +333,7 @@ class DrivingCoach extends GridRaceAssistant {
 				if (type == true)
 					return ["Character", "Simulation", "Session", "Stint", "Telemetry"]
 				else
-					return this.iInstructions[type]
+					return (this.iInstructions.Has(type) ? this.iInstructions[type] : false)
 			}
 			else
 				return this.iInstructions
@@ -435,43 +435,53 @@ class DrivingCoach extends GridRaceAssistant {
 			case "Character":
 				return substituteVariables(this.Instructions["Character"], {name: this.VoiceManager.Name})
 			case "Simulation":
-				simulator := knowledgeBase.getValue("Session.Simulator")
-				car := knowledgeBase.getValue("Session.Car")
-				track := knowledgeBase.getValue("Session.Track")
+				if knowledgeBase {
+					simulator := knowledgeBase.getValue("Session.Simulator")
+					car := knowledgeBase.getValue("Session.Car")
+					track := knowledgeBase.getValue("Session.Track")
 
-				return substituteVariables(this.Instructions["Simulation"]
-										 , {name: this.VoiceManager.Name
-										  , driver: this.DriverForName
-										  , simulator: settingsDB.getSimulatorName(simulator)
-										  , car: settingsDB.getCarName(simulator, car)
-										  , track: settingsDB.getTrackName(simulator, track)})
+					if (simulator && car && track)
+						return substituteVariables(this.Instructions["Simulation"]
+												 , {name: this.VoiceManager.Name
+												  , driver: this.DriverForName
+												  , simulator: settingsDB.getSimulatorName(simulator)
+												  , car: settingsDB.getCarName(simulator, car)
+												  , track: settingsDB.getTrackName(simulator, track)})
+				}
 			case "Session":
-				position := this.GridPosition
+				if knowledgeBase {
+					position := this.GridPosition
 
-				if (position != 0)
-					return substituteVariables(this.Instructions["Session"]
-											 , {session: translate(sessions[this.Session])
-											  , carNumber: this.getNr()
-											  , classPosition: this.GridPosition["Class"], overallPosition: position})
+					if (position != 0)
+						return substituteVariables(this.Instructions["Session"]
+												 , {session: translate(sessions[this.Session])
+												  , carNumber: this.getNr()
+												  , classPosition: this.GridPosition["Class"], overallPosition: position})
+				}
 			case "Stint":
-				position := this.getPosition(false, "Class")
+				if knowledgeBase {
+					position := this.getPosition(false, "Class")
 
-				if (position != 0) {
-					lapData := ""
+					if (position != 0) {
+						lapData := ""
 
-					for ignore, lap in bubbleSort(&laps := getKeys(this.LapData)) {
-						lapData .= (translate("Lap:") . A_Space . lap . "`n`n")
-						lapData .= (values2String(";", collect(["Race Number", "Class", "Position (Overall)", "Position (Class)", "Lap Time"], translate)*) . "`n")
+						for ignore, lap in bubbleSort(&laps := getKeys(this.LapData)) {
+							lapData .= (translate("Lap:") . A_Space . lap . "`n`n")
+							lapData .= (values2String(";", collect(["Race Number", "Class", "Position (Overall)", "Position (Class)", "Lap Time"], translate)*) . "`n")
 
-						for nr, carData in bubbleSort(&nrs := remove(this.LapData[lap], "Driver"))
-							lapData .= (values2String(";", nr, carData.Class, carData.OverallPosition, carData.ClassPosition, Round(carData.LapTime / 1000, 1)) . "`n")
+							for ignore, nr in bubbleSort(&nrs := remove(getKeys(this.LapData[lap]), "Driver")) {
+								carData := this.LapData[lap][nr]
 
-						lapData .= "`n`n"
+								lapData .= (values2String(";", nr, carData.Class, carData.OverallPosition, carData.ClassPosition, Round(carData.LapTime / 1000, 1)) . "`n")
+							}
+
+							lapData .= "`n`n"
+						}
+
+						return substituteVariables(this.Instructions["Stint"]
+												 , {lap: knowledgeBase.getValue("Lap") + 1
+												  , position: position, lapData: lapData})
 					}
-
-					return substituteVariables(this.Instructions["Stint"]
-											 , {lap: knowledgeBase.getValue("Lap") + 1
-											  , position: position, lapData: lapData})
 				}
 		}
 
@@ -587,7 +597,7 @@ class DrivingCoach extends GridRaceAssistant {
 		this.stopConversation()
 	}
 
-	updataLapData(lapNumber, data) {
+	updateLapData(lapNumber, data) {
 		local knowledgeBase := this.KnowledgeBase
 		local driver := knowledgeBase.getValue("Driver.Car", false)
 		local lapData := CaseInsenseMap()
@@ -616,7 +626,7 @@ class DrivingCoach extends GridRaceAssistant {
 	addLap(lapNumber, &data) {
 		local result := super.addLap(lapNumber, &data)
 
-		this.updateLapData(data)
+		this.updateLapData(lapNumber, data)
 
 		return result
 	}

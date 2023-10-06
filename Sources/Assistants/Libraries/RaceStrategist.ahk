@@ -1736,7 +1736,7 @@ class RaceStrategist extends GridRaceAssistant {
 		if (this.Speaker && (lapNumber > 1)) {
 			driverForname := knowledgeBase.getValue("Driver.Forname", "John")
 			driverSurname := knowledgeBase.getValue("Driver.Surname", "Doe")
-			driverNickname := knowledgeBase.getValue("Driver.Nickname", "JDO")
+			driverNickname := knowledgeBase.getValue("Driver.Nickname", "JD")
 		}
 
 		if (this.Speaker && (lastLap < (lapNumber - 2))

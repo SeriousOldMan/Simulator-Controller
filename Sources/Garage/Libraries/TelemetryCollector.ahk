@@ -194,7 +194,7 @@ class TelemetryCollector {
 					if this.AudioDevice
 						options .= (A_Space . "`"" . this.AudioDevice . "`"")
 				}
-msgbox "H"
+
 				code := SessionDatabase.getSimulatorCode(this.Simulator)
 
 				Run(kBinariesDirectory . code . " SHM Spotter.exe " . options, kBinariesDirectory, "Hide", &pid)

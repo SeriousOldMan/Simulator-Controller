@@ -168,7 +168,7 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 
 		forName := getMultiMapValue(data, "Stint Data", "DriverForname", "John")
 		surName := getMultiMapValue(data, "Stint Data", "DriverSurname", "Doe")
-		nickName := getMultiMapValue(data, "Stint Data", "DriverNickname", "JDO")
+		nickName := getMultiMapValue(data, "Stint Data", "DriverNickname", "JD")
 
 		if ((forName = surName) && (surName = nickName)) {
 			name := string2Values(A_Space, forName, 2)

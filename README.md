@@ -33,7 +33,7 @@ Simply download and run [Simulator Controller.exe](https://www.dropbox.com/s/vu3
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [information about the update process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.
 
-[5.4.0.0-release]() (Changes: New assistant "Driving Coach", New HTTP library, Added installer for .NET 6.0, Added full free text mode to speech recognition, New plugin "Driving Coach", Specific documentation links in "Simulator Configuration", Almost full compatibility between "Simulator Setup" and "Simulator Configuration", Fixed a bug in "Strategy Workbench for required pitstops in a time window, Replaced "John Doe" in many places with the user name, Improved downloadable components update, Extended meta model for "Setup Workbench", Customizeable confirmation sounds.)
+[5.4.0.0-release]() (Changes: New assistant "Driving Coach", New HTTP library, Added installer for .NET 6.0, Added full free text mode to speech recognition, New plugin "Driving Coach", Specific documentation links in "Simulator Configuration", Almost full compatibility between "Simulator Setup" and "Simulator Configuration", Fixed a bug in "Strategy Workbench for required pitstops in a time window, Replaced "John Doe" in many places with the user name, Improved downloadable components update, Extended meta model for "Setup Workbench", New car models for "Setup Workbench", Customizeable confirmation sounds.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-540) of this version and all the versions you might have skipped, before installing and using this version.
 
@@ -142,6 +142,10 @@ According to the maturity scale of *attractive.ai* (one of several hundreds matu
 ##### Driving Coach
 
 The Assistant is based on text-based GPT technology and uses a publically available large language model which has been trained with vasts amount of information. Using this knowledge, this Assistant behaves as your personal driving coach. Although the Driving Coach is not a part of your active crew, you can ask him anything about racing, car handling and driving techniques and you will probably will get an interesting answer.
+
+Click on the picture to hear an actual conversation with the Driving Coach:
+
+[![](https://img.youtube.com/vi/LBtLk_md1IE/0.jpg)](https://youtu.be/LBtLk_md1IE)
 
 ##### Race Engineer & Race Strategist
 

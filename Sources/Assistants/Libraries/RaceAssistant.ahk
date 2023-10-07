@@ -2579,7 +2579,7 @@ class GridRaceAssistant extends RaceAssistant {
 		if data
 			return getMultiMapValue(data, "Position Data", "Car." . car . ".Nr", false)
 		else
-			return (knowledgeBase ? knowledgeBase.getValue("Car." . A_Index . ".Nr", false) : false)
+			return (knowledgeBase ? knowledgeBase.getValue("Car." . car . ".Nr", false) : false)
 	}
 
 	getClass(car := false, data := false, categories := ["Class"]) {

@@ -476,21 +476,20 @@ class DrivingCoach extends GridRaceAssistant {
 									break
 								}
 
+						if hasSectorTimes
+							lapData .= (values2String(";", collect(["Lap", "Race Number", "Class", "Position (Overall)", "Position (Class)", "Sector Times", "Lap Time"], translate)*) . "`n")
+						else
+							lapData .= (values2String(";", collect(["Lap", "Race Number", "Class", "Position (Overall)", "Position (Class)", "Lap Time"], translate)*) . "`n")
+
 						for ignore, lap in laps {
-							lapData .= (translate("Standings") . A_Space . translate("Lap:") . A_Space . lap . "`n`n")
-
-							if hasSectorTimes
-								lapData .= (values2String(";", collect(["Race Number", "Class", "Position (Overall)", "Position (Class)", "Sector Times", "Lap Time"], translate)*) . "`n")
-							else
-								lapData .= (values2String(";", collect(["Race Number", "Class", "Position (Overall)", "Position (Class)", "Lap Time"], translate)*) . "`n")
-
 							for ignore, nr in bubbleSort(&nrs := remove(getKeys(this.LapData[lap]), "Driver")) {
 								carData := this.LapData[lap][nr]
 
 								if hasSectorTimes
-									lapData .= (values2String(";", nr, carData.Class, carData.OverallPosition, carData.ClassPosition, carData.SectorTimes, carData.LapTime) . "`n")
+									lapData .= (values2String(";", lap, nr, carData.Class, carData.OverallPosition, carData.ClassPosition
+											  , carData.SectorTimes ? values2String(",", carData.SectorTimes*) : "", carData.LapTime) . "`n")
 								else
-									lapData .= (values2String(";", nr, carData.Class, carData.OverallPosition, carData.ClassPosition, carData.LapTime) . "`n")
+									lapData .= (values2String(";", lap, nr, carData.Class, carData.OverallPosition, carData.ClassPosition, carData.LapTime) . "`n")
 							}
 
 							lapData .= "`n`n"
@@ -636,11 +635,9 @@ class DrivingCoach extends GridRaceAssistant {
 
 				loop sectorTimes.Length
 					sectorTimes[A_Index] := Round(sectorTimes[A_Index] / 1000, 1)
-
-				sectorTimes := values2String(",", sectorTimes*)
 			}
 			else
-				sectorTimes := ""
+				sectorTimes := false
 
 			carData := {Class: this.getClass(car), OverallPosition: this.getPosition(car), ClassPosition: this.getPosition(car, "Class")
 					  , SectorTimes: sectorTimes, LapTime: Round(this.getLapTime(car) / 1000, 1)}

@@ -805,9 +805,9 @@ startSimulator() {
 			hideProgress()
 
 			if A_IsCompiled
-				Run("*RunAs `"" . A_ScriptFullPath . "`"")
+				Run((!A_IsAdmin ? "*RunAs `"" : "`"") . A_ScriptFullPath . "`"")
 			else
-				Run("*RunAs `"" . A_AhkPath . "`" `"" . A_ScriptFullPath . "`"")
+				Run((!A_IsAdmin ? "*RunAs `"" : "`"") . A_AhkPath . "`" `"" . A_ScriptFullPath . "`"")
 
 			ExitApp(0)
 		}

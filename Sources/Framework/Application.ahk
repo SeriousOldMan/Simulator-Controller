@@ -344,7 +344,7 @@ checkForUpdates() {
 						automaticUpdates := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Simulator Controller.install"), "Updates", "Automatic", true)
 
 						if automaticUpdates
-							Run("*RunAs `"" . kBinariesDirectory . "Simulator Download.exe`" -NoUpdate -Download -Update -Start `"" . A_ScriptFullPath . "`"")
+							Run((!A_IsAdmin ? "*RunAs `"" : "`"") . kBinariesDirectory . "Simulator Download.exe`" -NoUpdate -Download -Update -Start `"" . A_ScriptFullPath . "`"")
 						else
 							Run("https://github.com/SeriousOldMan/Simulator-Controller#latest-release-builds")
 

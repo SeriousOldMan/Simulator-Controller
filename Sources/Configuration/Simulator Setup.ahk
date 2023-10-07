@@ -2607,9 +2607,9 @@ class StartStepWizard extends StepWizard {
 						deleteFile(kUserHomeDirectory . "Setup\Setup.data")
 
 					if A_IsCompiled
-						Run("*RunAs `"" . A_ScriptFullPath . "`" /restart")
+						Run((!A_IsAdmin ? "*RunAs `"" : "`"") . A_ScriptFullPath . "`" /restart")
 					else
-						Run("*RunAs `"" . A_AhkPath . "`" /restart `"" . A_ScriptFullPath . "`"")
+						Run((!A_IsAdmin ? "*RunAs `"" : "`"") . A_AhkPath . "`" /restart `"" . A_ScriptFullPath . "`"")
 				}
 				catch Any as exception {
 					logError(exception)

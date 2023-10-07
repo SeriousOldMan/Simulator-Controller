@@ -43,6 +43,7 @@ class TelemetryCollector {
 
 	iDataFile := false
 	iCollectorPID := false
+	iCalibrate := false
 
 	Simulator {
 		Get {
@@ -250,6 +251,7 @@ class TelemetryCollector {
 
 				Run(kBinariesDirectory . code . " SHM Spotter.exe " . options, kBinariesDirectory, "Hide", &pid)
 
+				this.iCalibrate := calibrate
 				this.iDataFile := dataFile
 			}
 			catch Any as exception {
@@ -304,9 +306,9 @@ class TelemetryCollector {
 	getIssues() {
 		local dataFile := this.iDataFile
 		local issues := CaseInsenseMap()
-		local issues, tries, data, ignore, type, speed, severity, where, frequency, key
+		local issues, tries, data, ignore, type, speed, severity, where, frequency, key, value
 
-		issues.Default := []
+		issues.Default := (this.iCalibrate ? false : [])
 
 		if dataFile {
 			tries := 10
@@ -315,17 +317,33 @@ class TelemetryCollector {
 				data := readMultiMap(dataFile)
 
 				if (data.Count > 0) {
-					for ignore, type in ["Oversteer", "Understeer"]
-						for ignore, speed in ["Slow", "Fast"]
-							for ignore, where in ["Entry", "Apex", "Exit"] {
-								key := (type . ".Corner." . where . "." . speed)
+					if this.iCalibrate {
+						for ignore, type in ["Oversteer", "Understeer"]
+							for ignore, speed in ["Slow", "Fast"]
+								for ignore, where in ["Entry", "Apex", "Exit"] {
+									value := getMultiMapValue(data, type . "." . speed, where, false)
 
-								for ignore, severity in ["Light", "Medium", "Heavy"] {
-									frequency := getMultiMapValue(data, type . "." . speed . "." . severity, where, false)
-
-									issues[key].Push({Severity: severity, Frequency: frequency})
+									if value
+										issues[type . ".Corner." . where . "." . speed] := value
 								}
-							}
+					}
+					else {
+						for ignore, type in ["Oversteer", "Understeer"]
+							for ignore, speed in ["Slow", "Fast"]
+								for ignore, where in ["Entry", "Apex", "Exit"] {
+									key := (type . ".Corner." . where . "." . speed)
+
+									for ignore, severity in ["Light", "Medium", "Heavy"] {
+										frequency := getMultiMapValue(data, type . "." . speed . "." . severity, where, false)
+
+										if frequency
+											if issues.Has(key)
+												issues[key].Push({Severity: severity, Frequency: frequency})
+											else
+												issues[key] := [{Severity: severity, Frequency: frequency}]
+									}
+								}
+					}
 
 					break
 				}

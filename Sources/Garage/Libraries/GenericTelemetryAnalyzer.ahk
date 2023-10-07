@@ -300,7 +300,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 	}
 
 	createCharacteristics(issues := false) {
-		local workbench, severities, count, maxValue
+		local workbench, severities, count, maxFrequency
 		local characteristicLabels, characteristic, characteristics, ignore, type, severity, speed, where, value, issue
 
 		if issues {
@@ -309,7 +309,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 			severities := CaseInsenseMap("Light", 33, "Medium", 50, "Heavy", 66)
 			characteristics := CaseInsenseMap()
 			count := 0
-			maxValue := 0
+			maxFrequency := 0
 
 			workbench.clearCharacteristics()
 
@@ -321,7 +321,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 				for ignore, speed in ["Slow", "Fast"]
 					for ignore, where in ["Entry", "Apex", "Exit"]
 						for ignore, issue in issues[type . ".Corner." . where . "." . speed]
-							maxValue := Max(maxValue, issue.Value)
+							maxFrequency := Max(maxFrequency, issue.Frequency)
 
 			for ignore, type in ["Oversteer", "Understeer"]
 				for ignore, speed in ["Slow", "Fast"]
@@ -329,15 +329,15 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 						characteristic := (type . ".Corner." . where . "." . speed)
 
 						for ignore, issue in issues[characteristic] {
-							value := issue.Value
+							value := issue.Frequency
 							severity := issue.Severity
 
 							if !characteristics.Has(characteristic)
-								characteristics[characteristic] := [Round(value / maxValue * 66), severities[severity]]
+								characteristics[characteristic] := [Round(value / maxFrequency * 66), severities[severity]]
 							else {
 								characteristic := characteristics[characteristic]
 
-								characteristic[1] := Max(characteristic[1], Round(value / maxValue * 66))
+								characteristic[1] := Max(characteristic[1], Round(value / maxFrequency * 66))
 								characteristic[2] := Max(characteristic[2], severities[severity])
 							}
 						}
@@ -384,7 +384,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 					if this.settingAvailable(setting)
 						settings.%setting% := this.%setting%
 
-			for ignore, setting in ["SteerLock", "SteerRatio", "WheelBase", "TrackWidth"]
+			for ignore, setting in ["LowSpeedThreshold", "SteerLock", "SteerRatio", "WheelBase", "TrackWidth"]
 				if this.settingAvailable(setting)
 					settings.%setting% := this.%setting%
 
@@ -399,8 +399,11 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 	stopTelemetryAnalyzer(*) {
 		local collector := this.iTelemetryCollector
 
-		if collector
+		if collector {
+			this.iLastIssues := collector.Issues
+
 			collector.stopTelemetryCollector()
+		}
 
 		this.iTelemetryCollector := false
 	}
@@ -423,7 +426,8 @@ setAnalyzerSetting(analyzer, key, value) {
 
 runAnalyzer(commandOrAnalyzer := false, arguments*) {
 	local x, y, ignore, widget, workbench, row, include
-	local issues, filteredIssues, issue, type, speed, severity, where, value, newValue, characteristic, characteristicLabels, fromEdit
+	local issues, filteredIssues, issue, type, speed, severity, where, value, newValue, frequency
+	local characteristic, characteristicLabels, fromEdit
 	local calibration, theListView, chosen, tabView
 
 	static analyzerGui
@@ -609,7 +613,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		characteristicLabels := getMultiMapValues(workbench.Definition, "Workbench.Characteristics.Labels")
 		final := ((arguments.Length > 0) && arguments[1])
 
-		issues := analyzer.Issues
+		issues := analyzer.Issues.Clone()
 
 		for ignore, type in ["Oversteer", "Understeer"]
 			for ignore, speed in ["Slow", "Fast"]
@@ -618,10 +622,9 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 					filteredIssues := []
 
 					for ignore, issue in issues[where] {
-						value := issue.Value
 						severity := issue.Severity
 
-						include := (value >= applyThresholdSlider.Value)
+						include := (issue.Frequency >= applyThresholdSlider.Value)
 
 						if (include && final) {
 							include := false
@@ -668,7 +671,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 					for ignore, issue in issues[characteristic]
 						theListView.Add((state = "Analyze") ? "Check" : "", characteristicLabels[characteristic]
-																		  , translate(issue.Severity), issue.Value)
+																		  , translate(issue.Severity), issue.Frequency)
 				}
 
 		theListView.ModifyCol()
@@ -941,6 +944,8 @@ runCalibrator(commandOrAnalyzer, *) {
 		activateButton.Text := translate("Next")
 
 		state := "Clean"
+
+		analyzer.startTelemetryAnalyzer(true)
 	}
 	else if ((commandOrAnalyzer == "Activate") && (state = "Clean")) {
 		cleanValues := analyzer.Issues
@@ -1011,32 +1016,30 @@ runCalibrator(commandOrAnalyzer, *) {
 				variable := ("light" . type . "Threshold")
 
 				for ignore, speed in ["Slow", "Fast"]
-					for ignore, where in ["Entry", "Apex", "Exit"]
-						for ignore, issue in result[1][type . ".Corner." . where . "." . speed] {
-							value := issue.Value
+					for ignore, where in ["Entry", "Apex", "Exit"] {
+						value := result[1][type . ".Corner." . where . "." . speed]
 
-							if value
-								if (type = "Understeer")
-									%variable% := Max(%variable%, value)
-								else
-									%variable% := Min(%variable%, value)
-						}
+						if value
+							if (type = "Understeer")
+								%variable% := Max(%variable%, value)
+							else
+								%variable% := Min(%variable%, value)
+					}
 			}
 
 			for ignore, type in ["Oversteer", "Understeer"] {
 				variable := ("heavy" . type . "Threshold")
 
 				for ignore, speed in ["Slow", "Fast"]
-					for ignore, where in ["Entry", "Apex", "Exit"]
-						for ignore, issue in result[2][type . ".Corner." . where . "." . speed] {
-							value := issue.Value
+					for ignore, where in ["Entry", "Apex", "Exit"] {
+						value := result[2][type . ".Corner." . where . "." . speed]
 
-							if value
-								if (type = "Understeer")
-									%variable% := Max(%variable%, value)
-								else
-									%variable% := Min(%variable%, value)
-						}
+						if value
+							if (type = "Understeer")
+								%variable% := Max(%variable%, value)
+							else
+								%variable% := Min(%variable%, value)
+					}
 			}
 
 			value := Max(lightOversteerThreshold, heavyOversteerThreshold, kMinThreshold)

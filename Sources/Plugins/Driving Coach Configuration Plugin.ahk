@@ -114,17 +114,23 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		}
 
 		reloadInstructions(*) {
-			local setting := this.Instructions[true][window["dcInstructionsDropDown"].Value]
-			local oldValue := this.Value[setting]
+			local chosenSetting := this.Instructions[true][window["dcInstructionsDropDown"].Value]
+			local setting, oldValue
 
-			this.Value[setting] := ""
+			for ignore, setting in (GetKeyState("Ctrl", "P") ? this.Instructions[true] : [chosenSetting]) {
+				oldValue := this.Value[setting]
 
-			this.initializeInstructions(this.iCurrentProvider, window["dcModelDropDown"].text, setting, true)
+				this.Value[setting] := ""
 
-			if (this.Value[setting] != "")
-				window["dcInstructionsEdit"].Value := this.Value[setting]
-			else
-				this.Value[setting] := oldValue
+				this.initializeInstructions(this.iCurrentProvider, window["dcModelDropDown"].text, setting, true)
+
+				if (this.Value[setting] != "") {
+					if (setting = chosenSetting)
+						window["dcInstructionsEdit"].Value := this.Value[setting]
+				}
+				else
+					this.Value[setting] := oldValue
+			}
 		}
 
 		window.SetFont("Norm", "Arial")

@@ -421,7 +421,7 @@ class DrivingCoach extends GridRaceAssistant {
 	getInstruction(category) {
 		local knowledgeBase := this.KnowledgeBase
 		local settingsDB := this.SettingsDatabase
-		local simulator, car, track, position, laps, lapData, nrs, nr, carData, hasSectorTimes, sectorTimes
+		local simulator, car, track, position, laps, lapData, nrs, nr, carData, hasSectorTimes
 
 		static sessions := false
 
@@ -476,41 +476,27 @@ class DrivingCoach extends GridRaceAssistant {
 									break
 								}
 
+						if hasSectorTimes
+							lapData .= (values2String(";", collect(["Lap", "Race Number", "Class", "Position (Overall)", "Position (Class)", "Sector Times", "Lap Time"], translate)*) . "`n")
+						else
+							lapData .= (values2String(";", collect(["Lap", "Race Number", "Class", "Position (Overall)", "Position (Class)", "Lap Time"], translate)*) . "`n")
+
 						for ignore, lap in laps {
-							lapData .= (translate("Standings") . A_Space . translate("Lap:") . A_Space . lap . "`n`n")
-
-							if hasSectorTimes
-								lapData .= (values2String(";", collect(["Race Number", "Class", "Position (Overall)", "Position (Class)", "Sector Times", "Lap Time"], translate)*) . "`n")
-							else
-								lapData .= (values2String(";", collect(["Race Number", "Class", "Position (Overall)", "Position (Class)", "Sector Times", "Lap Time"], translate)*) . "`n")
-
 							for ignore, nr in bubbleSort(&nrs := remove(getKeys(this.LapData[lap]), "Driver")) {
 								carData := this.LapData[lap][nr]
 
-								if hasSectorTimes {
-									sectorTimes := carData.SectorTimes
-
-									if sectorTimes {
-										loop sectorTimes.Length
-											sectorTimes[A_Index] := Round(sectorTimes[A_Index] / 1000, 1)
-
-										sectorTimes := values2String(",", sectorTimes*)
-									}
-									else
-										sectorTimes := ""
-
-									lapData .= (values2String(";", nr, carData.Class, carData.OverallPosition, carData.ClassPosition, sectorTimes, Round(carData.LapTime / 1000, 1)) . "`n")
-								}
+								if hasSectorTimes
+									lapData .= (values2String(";", lap, nr, carData.Class, carData.OverallPosition, carData.ClassPosition
+											  , carData.SectorTimes ? values2String(",", carData.SectorTimes*) : "", carData.LapTime) . "`n")
 								else
-									lapData .= (values2String(";", nr, carData.Class, carData.OverallPosition, carData.ClassPosition, Round(carData.LapTime / 1000, 1)) . "`n")
+									lapData .= (values2String(";", lap, nr, carData.Class, carData.OverallPosition, carData.ClassPosition, carData.LapTime) . "`n")
 							}
 
 							lapData .= "`n`n"
 						}
 
 						return substituteVariables(this.Instructions["Stint"]
-												 , {lap: knowledgeBase.getValue("Lap") + 1
-												  , position: position, carNumber: this.getNr(), lapData: lapData})
+												 , {lap: knowledgeBase.getValue("Lap"), position: position, carNumber: this.getNr(), lapData: lapData})
 					}
 				}
 		}
@@ -631,7 +617,7 @@ class DrivingCoach extends GridRaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local driver := knowledgeBase.getValue("Driver.Car", false)
 		local lapData := CaseInsenseMap()
-		local keys, ignore, car, carData
+		local keys, ignore, car, carData, sectorTimes
 
 		while (this.LapData.Count > 5) {
 			keys := getKeys(this.LapData)
@@ -642,8 +628,19 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 
 		for ignore, car in this.getCars() {
+			sectorTimes := this.getSectorTimes(car)
+
+			if sectorTimes {
+				sectorTimes := sectorTimes.Clone()
+
+				loop sectorTimes.Length
+					sectorTimes[A_Index] := Round(sectorTimes[A_Index] / 1000, 1)
+			}
+			else
+				sectorTimes := false
+
 			carData := {Class: this.getClass(car), OverallPosition: this.getPosition(car), ClassPosition: this.getPosition(car, "Class")
-					  , SectorsTime: this.getSectorTimes(car), LapTime: this.getLapTime(car)}
+					  , SectorTimes: sectorTimes, LapTime: Round(this.getLapTime(car) / 1000, 1)}
 
 			if (car = driver)
 				lapData["Driver"] := carData

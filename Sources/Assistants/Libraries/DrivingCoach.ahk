@@ -643,7 +643,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 		for ignore, car in this.getCars() {
 			carData := {Class: this.getClass(car), OverallPosition: this.getPosition(car), ClassPosition: this.getPosition(car, "Class")
-					  , SectorsTime: this.getSectorTimes(car), LapTime: this.getLapTime(car)}
+					  , SectorTimes: this.getSectorTimes(car), LapTime: this.getLapTime(car)}
 
 			if (car = driver)
 				lapData["Driver"] := carData

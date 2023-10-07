@@ -170,6 +170,7 @@ There is also the possibility to trigger actions in Simulator Controller from ot
 Simulator Controller allows you to direct sound output (for example the voices of the different Race Assistants) to different audio devices, as long as the additional software [SoX](http://sox.sourceforge.net/) is installed and configured. This is mainly of interest to those of you, who are streaming their races, or when you want maximum immersion by directing car sound to a 5.1 sound system, but the assistant voices to your headphone. Since this if not of widespread use, there is no user interface to configure this. Instead, a simple text file is used. If you want to configure your audio routing, create a text file with the name "Audio Settings.ini" and place it in the *Simulator Controller\Config* folder which is located in your user *Documents* folder. Open it with a text editor and enter the following content:
 
 	[Output]
+	Driving Coach.AudioDevice=Headphone
 	Race Spotter.AudioDevice=Headphone
 	Race Engineer.AudioDevice=Headphone
 	Race Strategist.AudioDevice=Headphone
@@ -179,6 +180,7 @@ Supported output routes are:
 | Route           | Description                                                                                                          |
 |-----------------|----------------------------------------------------------------------------------------------------------------------|
 | Activation      | The short acknowledge sound, when the Push-2-Talk button is pressed.                                                 |
+| Driving Coach   | All voice output by the Driving Coach.                                                                               |
 | Race Spotter    | All voice output by the Race Spotter.                                                                                |
 | Race Engineer   | All voice output by the Race Engineer.                                                                               |
 | Race Strategist | All voice output by the Race Strategist.                                                                             |
@@ -192,6 +194,7 @@ As you might expect, you can configure voice input as well. There are some addit
 	[Input]
 	Default.AudioDevice=Streaming
 	Activation.AudioDevice=Headphone
+	Driving Coach.AudioDevice=Headphone
 	Race Spotter.AudioDevice=Headphone
 	Race Engineer.AudioDevice=Headphone
 	Race Strategist.AudioDevice=Headphone
@@ -203,6 +206,7 @@ Supported input routes are:
 |-----------------|----------------------------------------------------------------------------------------------------------------------|
 | Default         | Default audio input device, which should be active whenever no voice input is captured by Simulator Controller.      |
 | Activation      | Listens to the activation phrases, as you might expect. Typically you will use here the same input device here, you use to talk to the Assistants. |
+| Driving Coach   | All voice input for the Driving Coach.                                                                               |
 | Race Spotter    | All voice input for the Race Spotter.                                                                                |
 | Race Engineer   | All voice output for the Race Engineer.                                                                              |
 | Race Strategist | All voice output for the Race Strategist.                                                                            |

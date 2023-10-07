@@ -16,16 +16,6 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                        Private Constant Section                         ;;;
-;;;-------------------------------------------------------------------------;;;
-
-global kClose := "close"
-
-global kMinThreshold := -180
-global kMaxThreshold := 180
-
-
-;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -51,6 +41,7 @@ class TelemetryCollector {
 	iAcousticFeedback := true
 	static sAudioDevice := false
 
+	iDataFile := false
 	iCollectorPID := false
 
 	Simulator {
@@ -119,6 +110,12 @@ class TelemetryCollector {
 		}
 	}
 
+	Issues {
+		Get {
+			return this.getIssues()
+		}
+	}
+
 	static AudioDevice {
 		Get {
 			return TelemetryCollector.sAudioDevice
@@ -179,7 +176,7 @@ class TelemetryCollector {
 		defaultOversteerThresholds := getMultiMapValue(settings, section, prefix . "OversteerThresholds", defaultOversteerThresholds)
 		defaultLowspeedThreshold := getMultiMapValue(settings, section, prefix . "LowspeedThreshold", defaultLowspeedThreshold)
 
-		prefix := (simulator . "." . (selectedCar ? selectedCar : "*") . "." . (selectedTrack ? selectedTrack : "*") . ".")
+		prefix := (this.Simulator . "." . (this.Car ? this.Car : "*") . "." . (this.Track ? this.Track : "*") . ".")
 
 		if this.settingAvailable("SteerLock")
 			this.iSteerLock := getMultiMapValue(settings, section, prefix . "SteerLock", this.SteerLock)
@@ -209,7 +206,8 @@ class TelemetryCollector {
 		return (this.%setting% != false)
 	}
 
-	startTelemetryCollector(dataFile, calibrate := false) {
+	startTelemetryCollector(calibrate := false) {
+		local dataFile := temporaryFileName("Telemetry", "data")
 		local pid, options, code, message
 
 		this.stopTelemetryCollector()
@@ -251,11 +249,14 @@ class TelemetryCollector {
 				code := SessionDatabase.getSimulatorCode(this.Simulator)
 
 				Run(kBinariesDirectory . code . " SHM Spotter.exe " . options, kBinariesDirectory, "Hide", &pid)
+
+				this.iDataFile := dataFile
 			}
 			catch Any as exception {
 				logError(exception, true)
 
-				message := substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (%exePath%) - please check the configuration...")													   , {simulator: code, protocol: "SHM", exePath: kBinariesDirectory . code . " SHM Spotter.exe"})
+				message := substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (%exePath%) - please check the configuration...")
+											 , {simulator: code, protocol: "SHM", exePath: kBinariesDirectory . code . " SHM Spotter.exe"})
 
 				logMessage(kLogCritical, message)
 
@@ -277,7 +278,7 @@ class TelemetryCollector {
 		if pid {
 			tries := 5
 
-			while (tries-- > 0) {
+			while (tries-- > 0)
 				if ProcessExist(pid) {
 					ProcessClose(pid)
 
@@ -285,8 +286,11 @@ class TelemetryCollector {
 				}
 				else
 					break
-			}
 
+			if !isDebug()
+				deleteFile(this.iDataFile)
+
+			this.iDataFile := false
 			this.iCollectorPID := false
 		}
 
@@ -295,5 +299,41 @@ class TelemetryCollector {
 
 	static acousticFeedback(soundFile) {
 		playSound("SWSoundPlayer.exe", soundFile, (TelemetryCollector.AudioDevice ? TelemetryCollector.AudioDevice : "") . " echos 1 1 1 1")
+	}
+
+	getIssues() {
+		local dataFile := this.iDataFile
+		local issues := CaseInsenseMap()
+		local issues, tries, data, ignore, type, speed, severity, where, frequency, key
+
+		issues.Default := []
+
+		if dataFile {
+			tries := 10
+
+			while (tries-- > 0) {
+				data := readMultiMap(dataFile)
+
+				if (data.Count > 0) {
+					for ignore, type in ["Oversteer", "Understeer"]
+						for ignore, speed in ["Slow", "Fast"]
+							for ignore, where in ["Entry", "Apex", "Exit"] {
+								key := (type . ".Corner." . where . "." . speed)
+
+								for ignore, severity in ["Light", "Medium", "Heavy"] {
+									frequency := getMultiMapValue(data, type . "." . speed . "." . severity, where, false)
+
+									issues[key].Push({Severity: severity, Frequency: frequency})
+								}
+							}
+
+					break
+				}
+				else
+					Sleep(20)
+			}
+		}
+
+		return issues
 	}
 }

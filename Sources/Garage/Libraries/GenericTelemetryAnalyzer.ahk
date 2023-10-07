@@ -52,6 +52,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 	static sAudioDevice := false
 
 	iTelemetryCollector := false
+	iLastIssues := false
 
 	Car {
 		Get {
@@ -197,6 +198,19 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 		}
 	}
 
+	Issues {
+		Get {
+			if this.iTelemetryCollector
+				return (this.iLastIssues := this.iTelemetryCollector.Issues)
+			else if !this.iLastIssues {
+				this.iLastIssues := CaseInsenseMap()
+				this.iLastIssues.Default := []
+			}
+
+			return this.iLastIssues
+		}
+	}
+
 	__New(workbench, simulator) {
 		local selectedCar := workbench.SelectedCar[false]
 		local selectedTrack := workbench.SelectedTrack[false]
@@ -285,11 +299,11 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 		return true
 	}
 
-	createCharacteristics(telemetry := false) {
+	createCharacteristics(issues := false) {
 		local workbench, severities, count, maxValue
-		local characteristicLabels, characteristic, characteristics, ignore, type, severity, speed, key, value
+		local characteristicLabels, characteristic, characteristics, ignore, type, severity, speed, where, value, issue
 
-		if telemetry {
+		if issues {
 			workbench := this.Workbench
 			characteristicLabels := getMultiMapValues(workbench.Definition, "Workbench.Characteristics.Labels")
 			severities := CaseInsenseMap("Light", 33, "Medium", 50, "Heavy", 66)
@@ -305,29 +319,29 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 
 			for ignore, type in ["Oversteer", "Understeer"]
 				for ignore, speed in ["Slow", "Fast"]
-					for ignore, severity in ["Light", "Medium", "Heavy"]
-						for ignore, key in ["Entry", "Apex", "Exit"]
-							maxValue := Max(maxValue, getMultiMapValue(telemetry, type . "." . speed . "." . severity, key, 0))
+					for ignore, where in ["Entry", "Apex", "Exit"]
+						for ignore, issue in issues[type . ".Corner." . where . "." . speed]
+							maxValue := Max(maxValue, issue.Value)
 
 			for ignore, type in ["Oversteer", "Understeer"]
 				for ignore, speed in ["Slow", "Fast"]
-					for ignore, severity in ["Light", "Medium", "Heavy"]
-						for ignore, key in ["Entry", "Apex", "Exit"] {
-							value := getMultiMapValue(telemetry, type . "." . speed . "." . severity, key, false)
+					for ignore, where in ["Entry", "Apex", "Exit"] {
+						characteristic := (type . ".Corner." . where . "." . speed)
 
-							if value {
-								characteristic := (type . ".Corner." . key . "." . speed)
+						for ignore, issue in issues[characteristic] {
+							value := issue.Value
+							severity := issue.Severity
 
-								if !characteristics.Has(characteristic)
-									characteristics[characteristic] := [Round(value / maxValue * 66), severities[severity]]
-								else {
-									characteristic := characteristics[characteristic]
+							if !characteristics.Has(characteristic)
+								characteristics[characteristic] := [Round(value / maxValue * 66), severities[severity]]
+							else {
+								characteristic := characteristics[characteristic]
 
-									characteristic[1] := Max(characteristic[1], Round(value / maxValue * 66))
-									characteristic[2] := Max(characteristic[2], severities[severity])
-								}
+								characteristic[1] := Max(characteristic[1], Round(value / maxValue * 66))
+								characteristic[2] := Max(characteristic[2], severities[severity])
 							}
 						}
+					}
 
 			Sleep(500)
 
@@ -351,14 +365,14 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 			hideProgress()
 		}
 		else {
-			telemetry := runAnalyzer(this)
+			issues := runAnalyzer(this)
 
-			if telemetry
-				Task.startTask(ObjBindMethod(this, "createCharacteristics", telemetry), 100)
+			if issues
+				Task.startTask(ObjBindMethod(this, "createCharacteristics", issues), 100)
 		}
 	}
 
-	startTelemetryAnalyzer(dataFile, calibrate := false) {
+	startTelemetryAnalyzer(calibrate := false) {
 		local settings := {}
 		local ignore, setting
 
@@ -376,8 +390,10 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 
 			this.iTelemetryCollector := %this.CollectorClass%(this.Simulator, this.Car, this.Track, settings, this.AcousticFeedback)
 
-			this.iTelemetryCollector.startTelemetryCollector(datafile, calibrate)
+			this.iTelemetryCollector.startTelemetryCollector(calibrate)
 		}
+
+		return this.iTelemetryCollector
 	}
 
 	stopTelemetryAnalyzer(*) {
@@ -389,7 +405,6 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 		this.iTelemetryCollector := false
 	}
 }
-
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                        Private Function Section                         ;;;
@@ -408,7 +423,7 @@ setAnalyzerSetting(analyzer, key, value) {
 
 runAnalyzer(commandOrAnalyzer := false, arguments*) {
 	local x, y, ignore, widget, workbench, row, include
-	local tries, data, type, speed, severity, key, value, newValue, characteristic, characteristicLabels, fromEdit
+	local issues, filteredIssues, issue, type, speed, severity, where, value, newValue, characteristic, characteristicLabels, fromEdit
 	local calibration, theListView, chosen, tabView
 
 	static analyzerGui
@@ -444,7 +459,6 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 	static result := false
 	static analyzer := false
 	static state := "Prepare"
-	static dataFile := false
 
 	static prepareWidgets := []
 	static runWidgets := []
@@ -543,8 +557,6 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		analyzer.AcousticFeedback := ((acousticFeedbackDropDown.Value = 1) ? true : false)
 
-		dataFile := temporaryFileName("Analyzer", "data")
-
 		for ignore, widget in prepareWidgets {
 			widget.Enabled := false
 			widget.Visible := false
@@ -557,7 +569,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		state := "Run"
 
-		analyzer.startTelemetryAnalyzer(dataFile)
+		analyzer.startTelemetryAnalyzer()
 
 		updateTask := PeriodicTask(runAnalyzer.Bind("UpdateIssues"), 5000)
 
@@ -587,39 +599,34 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 	else if (commandOrAnalyzer == "Threshold")
 		runAnalyzer("UpdateTelemetry", runAnalyzer("FilterTelemetry"))
 	else if (commandOrAnalyzer == "UpdateIssues") {
-		tries := 10
+		issues := analyzer.Issues
 
-		while (tries-- > 0) {
-			data := readMultiMap(dataFile)
-
-			if (data.Count > 0) {
-				runAnalyzer("UpdateTelemetry", data)
-
-				break
-			}
-			else
-				Sleep(20)
-		}
+		if (issues.Count > 0)
+			runAnalyzer("UpdateTelemetry", issues)
 	}
 	else if (commandOrAnalyzer == "FilterTelemetry") {
 		workbench := analyzer.Workbench
 		characteristicLabels := getMultiMapValues(workbench.Definition, "Workbench.Characteristics.Labels")
 		final := ((arguments.Length > 0) && arguments[1])
 
-		data := readMultiMap(dataFile)
+		issues := analyzer.Issues
 
 		for ignore, type in ["Oversteer", "Understeer"]
 			for ignore, speed in ["Slow", "Fast"]
-				for ignore, severity in ["Light", "Medium", "Heavy"]
-					for ignore, key in ["Entry", "Apex", "Exit"] {
-						value := getMultiMapValue(data, type . "." . speed . "." . severity, key, kUndefined)
+				for ignore, where in ["Entry", "Apex", "Exit"] {
+					where := (type . ".Corner." . where . "." . speed)
+					filteredIssues := []
 
-						include := ((value != kUndefined) && (value >= applyThresholdSlider.Value))
+					for ignore, issue in issues[where] {
+						value := issue.Value
+						severity := issue.Severity
+
+						include := (value >= applyThresholdSlider.Value)
 
 						if (include && final) {
 							include := false
 
-							characteristic := characteristicLabels[type . ".Corner." . key . "." . speed]
+							characteristic := characteristicLabels[where]
 
 							row := resultListView.GetNext(0, "C")
 
@@ -636,16 +643,19 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 							}
 						}
 
-						if !include
-							setMultiMapValue(data, type . "." . speed . "." . severity, key, 0)
+						if include
+							filteredIssues.Push(issue)
 					}
 
-		return data
+					issues[where] := filteredIssues
+				}
+
+		return issues
 	}
 	else if (commandOrAnalyzer == "UpdateTelemetry") {
 		workbench := analyzer.Workbench
 		characteristicLabels := getMultiMapValues(workbench.Definition, "Workbench.Characteristics.Labels")
-		data := arguments[1]
+		issues := arguments[1]
 
 		theListView := ((state = "Run") ? issuesListView : resultListView)
 
@@ -653,16 +663,13 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		for ignore, type in ["Oversteer", "Understeer"]
 			for ignore, speed in ["Slow", "Fast"]
-				for ignore, severity in ["Light", "Medium", "Heavy"]
-					for ignore, key in ["Entry", "Apex", "Exit"] {
-						value := getMultiMapValue(data, type . "." . speed . "." . severity, key, false)
+				for ignore, where in ["Entry", "Apex", "Exit"] {
+					characteristic := (type . ".Corner." . where . "." . speed)
 
-						if value {
-							characteristic := (type . ".Corner." . key . "." . speed)
-
-							theListView.Add((state = "Analyze") ? "Check" : "", characteristicLabels[characteristic], translate(severity), value)
-						}
-					}
+					for ignore, issue in issues[characteristic]
+						theListView.Add((state = "Analyze") ? "Check" : "", characteristicLabels[characteristic]
+																		  , translate(issue.Severity), issue.Value)
+				}
 
 		theListView.ModifyCol()
 
@@ -676,7 +683,6 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		updateTask := false
 
 		state := "Prepare"
-		dataFile := false
 		result := false
 
 		prepareWidgets := []
@@ -892,9 +898,6 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 				Sleep(100)
 		}
 		finally {
-			if dataFile
-				deleteFile(dataFile)
-
 			if updateTask
 				updateTask.stop()
 
@@ -915,7 +918,7 @@ runCalibrator(commandOrAnalyzer, *) {
 	local lightUndersteerThreshold := 0
 	local heavyUndersteerThreshold := 0
 	local mediumOversteerThreshold, mediumUndersteerThreshold
-	local x, y, ignore, type, speed, key, value, variable
+	local x, y, ignore, type, speed, where, value, variable
 
 	static calibratorGui
 	static activateButton
@@ -924,7 +927,6 @@ runCalibrator(commandOrAnalyzer, *) {
 	static result := false
 	static analyzer := false
 	static state := "Start"
-	static dataFile := false
 
 	static cleanValues := CaseInsenseMap()
 	static overValues := CaseInsenseMap()
@@ -938,30 +940,24 @@ runCalibrator(commandOrAnalyzer, *) {
 		infoText.Text := translate("Drive at least two consecutive clean laps without under- or oversteering the car. Then press `"Next`".")
 		activateButton.Text := translate("Next")
 
-		dataFile := temporaryFileName("Calibrator", "data")
-
 		state := "Clean"
-
-		analyzer.startTelemetryAnalyzer(dataFile, true)
 	}
 	else if ((commandOrAnalyzer == "Activate") && (state = "Clean")) {
-		analyzer.stopTelemetryAnalyzer()
+		cleanValues := analyzer.Issues
 
-		cleanValues := readMultiMap(dataFile)
+		analyzer.stopTelemetryAnalyzer()
 
 		infoText.Text := translate("Drive at least two consecutive hard laps and provoke under- and oversteering to the max but stay on the track. Then press `"Finish`".")
 		activateButton.Text := translate("Finish")
 
 		state := "Push"
 
-		dataFile := temporaryFileName("Calibrator", "data")
-
-		analyzer.startTelemetryAnalyzer(dataFile, true)
+		analyzer.startTelemetryAnalyzer(true)
 	}
 	else if ((commandOrAnalyzer == "Activate") && (state = "Push")) {
-		analyzer.stopTelemetryAnalyzer()
+		overValues := analyzer.Issues
 
-		overValues := readMultiMap(dataFile)
+		analyzer.stopTelemetryAnalyzer()
 
 		result := [cleanValues, overValues]
 	}
@@ -969,7 +965,6 @@ runCalibrator(commandOrAnalyzer, *) {
 		analyzer := commandOrAnalyzer
 
 		state := "Start"
-		dataFile := false
 		result := false
 
 		cleanValues := CaseInsenseMap()
@@ -1006,9 +1001,6 @@ runCalibrator(commandOrAnalyzer, *) {
 				Sleep(100)
 		}
 		finally {
-			if dataFile
-			 	deleteFile(dataFile)
-
 			analyzer.stopTelemetryAnalyzer()
 		}
 
@@ -1019,30 +1011,32 @@ runCalibrator(commandOrAnalyzer, *) {
 				variable := ("light" . type . "Threshold")
 
 				for ignore, speed in ["Slow", "Fast"]
-					for ignore, key in ["Entry", "Apex", "Exit"] {
-						value := getMultiMapValue(result[1], type . "." . speed, key, kUndefined)
+					for ignore, where in ["Entry", "Apex", "Exit"]
+						for ignore, issue in result[1][type . ".Corner." . where . "." . speed] {
+							value := issue.Value
 
-						if (value && (value != kUndefined))
-							if (type = "Understeer")
-								%variable% := Max(%variable%, value)
-							else
-								%variable% := Min(%variable%, value)
-					}
+							if value
+								if (type = "Understeer")
+									%variable% := Max(%variable%, value)
+								else
+									%variable% := Min(%variable%, value)
+						}
 			}
 
 			for ignore, type in ["Oversteer", "Understeer"] {
 				variable := ("heavy" . type . "Threshold")
 
 				for ignore, speed in ["Slow", "Fast"]
-					for ignore, key in ["Entry", "Apex", "Exit"] {
-						value := getMultiMapValue(result[2], type . "." . speed, key, kUndefined)
+					for ignore, where in ["Entry", "Apex", "Exit"]
+						for ignore, issue in result[2][type . ".Corner." . where . "." . speed] {
+							value := issue.Value
 
-						if (value && (value != kUndefined))
-							if (type = "Understeer")
-								%variable% := Max(%variable%, value)
-							else
-								%variable% := Min(%variable%, value)
-					}
+							if value
+								if (type = "Understeer")
+									%variable% := Max(%variable%, value)
+								else
+									%variable% := Min(%variable%, value)
+						}
 			}
 
 			value := Max(lightOversteerThreshold, heavyOversteerThreshold, kMinThreshold)

@@ -2746,6 +2746,30 @@ class GridRaceAssistant extends RaceAssistant {
 			return (this.KnowledgeBase ? this.KnowledgeBase.getValue("Car." . car . ".Time", false) : false)
 	}
 
+	getSectorTimes(car, data := false) {
+		local sectorTimes
+
+		if data
+			sectorTimes := getMultiMapValue(data, "Position Data", car . ".Time.Sectors", false)
+		else
+			sectorTimes := (this.KnowledgeBase ? this.KnowledgeBase.getValue("Car." . car . ".Time.Sectors", false) : false)
+
+		if (sectorTimes && (sectorTimes != "")) {
+			sectorTimes := string2Values(",", sectorTimes)
+
+			loop sectorTimes.Length
+				if !isNumber(sectorTimes[A_Index]) {
+					sectorTimes := false
+
+					break
+				}
+		}
+		else
+			sectorTimes := false
+
+		return sectorTimes
+	}
+
 	getDriver(car, data := false) {
 		local forName, surName, nickName, knowledgeBase
 

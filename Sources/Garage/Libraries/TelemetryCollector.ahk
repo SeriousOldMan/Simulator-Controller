@@ -152,6 +152,59 @@ class TelemetryCollector {
 		}
 	}
 
+	loadFromSettings(settings := false, section := "Setup Workbench") {
+		local defaultUndersteerThresholds := "40,70,100"
+		local defaultOversteerThresholds := "-40,-70,-100"
+		local defaultLowspeedThreshold := 120
+		local prefix
+
+		if !settings
+			settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+		prefix := (this.Simulator . "." . (this.Car ? this.Car : "*") . ".*.")
+
+		if this.settingAvailable("SteerLock")
+			this.iSteerLock := getMultiMapValue(settings, section, prefix . "SteerLock", this.SteerLock)
+
+		if this.settingAvailable("SteerRatio")
+			this.iSteerRatio := getMultiMapValue(settings, section, prefix . "SteerRatio", this.SteerRatio)
+
+		if this.settingAvailable("Wheelbase")
+			this.iWheelbase := getMultiMapValue(settings, section, prefix . "Wheelbase", this.Wheelbase)
+
+		if this.settingAvailable("TrackWidth")
+			this.iTrackWidth := getMultiMapValue(settings, section, prefix . "TrackWidth", this.TrackWidth)
+
+		defaultUndersteerThresholds := getMultiMapValue(settings, section, prefix . "UndersteerThresholds", defaultUndersteerThresholds)
+		defaultOversteerThresholds := getMultiMapValue(settings, section, prefix . "OversteerThresholds", defaultOversteerThresholds)
+		defaultLowspeedThreshold := getMultiMapValue(settings, section, prefix . "LowspeedThreshold", defaultLowspeedThreshold)
+
+		prefix := (simulator . "." . (selectedCar ? selectedCar : "*") . "." . (selectedTrack ? selectedTrack : "*") . ".")
+
+		if this.settingAvailable("SteerLock")
+			this.iSteerLock := getMultiMapValue(settings, section, prefix . "SteerLock", this.SteerLock)
+
+		if this.settingAvailable("SteerRatio")
+			this.iSteerRatio := getMultiMapValue(settings, section, prefix . "SteerRatio", this.SteerRatio)
+
+		if this.settingAvailable("Wheelbase")
+			this.iWheelbase := getMultiMapValue(settings, section, prefix . "Wheelbase", this.Wheelbase)
+
+		if this.settingAvailable("TrackWidth")
+			this.iTrackWidth := getMultiMapValue(settings, section, prefix . "TrackWidth", this.TrackWidth)
+
+		if this.settingAvailable("UndersteerThresholds")
+			this.iUndersteerThresholds := string2Values(",", getMultiMapValue(settings, section
+														   , prefix . "UndersteerThresholds", defaultUndersteerThresholds))
+
+		if this.settingAvailable("OversteerThresholds")
+			this.iOversteerThresholds := string2Values(",", getMultiMapValue(settings, section
+														  , prefix . "OversteerThresholds", defaultOversteerThresholds))
+
+		if this.settingAvailable("LowspeedThreshold")
+			this.iLowspeedThreshold := getMultiMapValue(settings, section, prefix . "LowspeedThreshold", defaultLowspeedThreshold)
+	}
+
 	settingAvailable(setting) {
 		return (this.%setting% != false)
 	}

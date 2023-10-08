@@ -35,6 +35,8 @@ class DrivingCoach extends GridRaceAssistant {
 
 	iStandings := []
 
+	iTelemetryCollector := false
+
 	class HTTPConnector {
 		iCoach := false
 
@@ -334,7 +336,7 @@ class DrivingCoach extends GridRaceAssistant {
 		Get {
 			if isSet(type) {
 				if (type == true)
-					return ["Character", "Simulation", "Session", "Stint"]
+					return ["Character", "Simulation", "Session", "Stint", "Handling"]
 				else
 					return (this.iInstructions.Has(type) ? this.iInstructions[type] : false)
 			}
@@ -402,6 +404,8 @@ class DrivingCoach extends GridRaceAssistant {
 		super.__New(configuration, "Driving Coach", remoteHandler, name, language, synthesizer, speaker, vocalics, recognizer, listener, muted, voiceServer)
 
 		DirCreate(this.Options["Driving Coach.Archive"])
+
+		OnExit(ObjBindMethod(this, "stopTelemetryAnalyzer", true))
 	}
 
 	loadFromConfiguration(configuration) {
@@ -454,6 +458,7 @@ class DrivingCoach extends GridRaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local settingsDB := this.SettingsDatabase
 		local simulator, car, track, position, hasSectorTimes, laps, lapData, ignore, carData, standingsData
+		local collector, issues, handling, ignore, type, speed, where, issue, index
 
 		static sessions := false
 
@@ -494,7 +499,7 @@ class DrivingCoach extends GridRaceAssistant {
 				if knowledgeBase {
 					position := this.getPosition(false, "Class")
 
-					if (position != 0) {
+					if ((position != 0) && (this.Laps.Count > 0)) {
 						lapData := ""
 
 						laps := bubbleSort(&laps := getKeys(this.Laps))
@@ -517,7 +522,7 @@ class DrivingCoach extends GridRaceAssistant {
 							carData := this.Laps[lap]
 
 							if (A_Index > 1)
-								lapData .= "`""
+								lapData .= "`n"
 
 							if hasSectorTimes
 								lapData .= values2String(";", lap, carData.OverallPosition, carData.ClassPosition
@@ -544,7 +549,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 						for ignore, carData in this.Standings {
 							if (A_Index > 1)
-								standingsData .= "`""
+								standingsData .= "`n"
 
 							if hasSectorTimes
 								standingsData .= values2String(";", carData.OverallPosition, carData.ClassPosition, carData.Nr, carData.Class,
@@ -555,6 +560,33 @@ class DrivingCoach extends GridRaceAssistant {
 
 						return substituteVariables(this.Instructions["Stint"], {lap: knowledgeBase.getValue("Lap"), position: position, carNumber: this.getNr()
 																			  , laps: lapData, standings: standingsData})
+					}
+				}
+			case "Handling":
+				if knowledgeBase {
+					collector := this.iTelemetryCollector
+
+					if collector {
+						issues := collector.Issues
+
+						handling := ""
+						index := 0
+
+						for ignore, type in ["Oversteer", "Understeer"]
+							for ignore, speed in ["Slow", "Fast"]
+								for ignore, where in ["Entry", "Apex", "Exit"]
+									for ignore, issue in issues[type . ".Corner." . where . "." . speed] {
+										if (++index > 1)
+											handling .= "`n"
+
+										handling .= ("- " . substituteVariables(translate("%severity% %type% on %speed% corner %where%")
+																			  , {severity: translate(issue.Severity)
+																			   , type: translate(type), speed: translate(speed)
+																			   , where: where}))
+									}
+
+						if index
+							return substituteVariables(this.Instructions["Handling"], {handling: handling})
 					}
 				}
 		}
@@ -603,7 +635,7 @@ class DrivingCoach extends GridRaceAssistant {
 			throw "Unsupported service detected in DrivingCoach.connect..."
 	}
 
-	stopConversation() {
+	restartConversation() {
 		if this.Connector
 			this.Connector.Restart()
 	}
@@ -646,6 +678,37 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 	}
 
+	startTelemetryAnalyzer() {
+		this.stopTelemetryAnalyzer()
+
+		if !this.iTelemetryCollector {
+			this.iTelemetryCollector := %this.CollectorClass%(this.Simulator, this.Car, this.Track)
+
+			this.iTelemetryCollector.loadFromSettings()
+
+			this.iTelemetryCollector.startTelemetryCollector()
+		}
+
+		return this.iTelemetryCollector
+	}
+
+	stopTelemetryAnalyzer(*) {
+		local collector := this.iTelemetryCollector
+
+		if collector
+			collector.stopTelemetryCollector()
+
+		this.iTelemetryCollector := false
+	}
+
+	prepareSession(&settings, &data, formationLap := true) {
+		local facts := super.prepareSession(&settings, &data, formationLap)
+
+		this.startTelemetryAnalyzer()
+
+		return facts
+	}
+
 	startSession(settings, data) {
 		local facts := this.prepareSession(&settings, &data, false)
 
@@ -662,7 +725,7 @@ class DrivingCoach extends GridRaceAssistant {
 		if this.Debug[kDebugKnowledgeBase]
 			this.dumpKnowledgeBase(this.KnowledgeBase)
 
-		this.stopConversation()
+		this.restartConversation()
 	}
 
 	finishSession(shutdown := true) {
@@ -671,7 +734,9 @@ class DrivingCoach extends GridRaceAssistant {
 								, EnoughData: false})
 		this.updateSessionValues({Simulator: "", Session: kSessionFinished, SessionTime: false, Laps: Map()})
 
-		this.stopConversation()
+		this.stopTelemetryAnalyzer()
+
+		this.restartConversation()
 	}
 
 	updateLaps(lapNumber, data) {

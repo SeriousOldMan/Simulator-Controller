@@ -1,9 +1,9 @@
 [Development]
 Version=5.4.1.0-dev
 Target=5.4.1.0-release
-Date=10/06/2023
+Date=10/07/2023
 Download=
-Changes=Driving Coach now knows a lot about the current active stint, Updated instructions for Driving Coach, New data categories in the telemetry analyzer, New Ctrl modifier for instructions reload
+Changes=Driving Coach now knows a lot about the current active stint, Updated instructions for Driving Coach, New data categories in the telemetry analyzer, New Ctrl modifier for instructions reload, Added "Practice Center" to Windows Start menu
 Components=Media->5.3.0,Configuration->5.4.0,Utilities->5.3.0
 [Release]
 Version=5.4.0.0-release

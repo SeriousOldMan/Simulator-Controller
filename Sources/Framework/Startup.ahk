@@ -80,9 +80,9 @@ loadSimulatorConfiguration() {
 	type := getMultiMapValue(packageInfo, "Current", "Type", false)
 
 	if type {
-		if (StrSplit(A_ScriptName, ".")[1] != "Simulator Tools")
+		if ((StrSplit(A_ScriptName, ".")[1] != "Simulator Tools") && !inList(A_Args, "-Repair"))
 			if !checkInstallation(string2Map(",", "->", getMultiMapValue(packageInfo, type, "Components", ""))) {
-				Run("*RunAs " . kBinariesDirectory . "Simulator Tools.exe -Repair -Start `"" . A_ScriptName . "`"")
+				Run((!A_IsAdmin ? "*RunAs `"" : "`"") . kBinariesDirectory . "Simulator Tools.exe`" -Repair -Start `"" . A_ScriptName . "`"")
 
 				ExitApp(0)
 			}
@@ -195,7 +195,10 @@ initializeEnvironment() {
 				OnMessage(0x44, translateYesNoButtons, 0)
 
 				if (msgResult = "Yes")
-					Run("*RunAs " . kBinariesDirectory . "Simulator Tools.exe")
+					if A_IsAdmin
+						Run(kBinariesDirectory . "Simulator Tools.exe")
+					else
+						Run("*RunAs " . kBinariesDirectory . "Simulator Tools.exe")
 
 				ExitApp(0)
 			}

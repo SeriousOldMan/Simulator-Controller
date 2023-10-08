@@ -732,6 +732,7 @@ checkInstallation() {
 					fixIE(11, "Setup Workbench.exe")
 					fixIE(11, "Race Reports.exe")
 					fixIE(11, "Strategy Workbench.exe")
+					fixIE(11, "Practice Center.exe")
 					fixIE(11, "Race Center.exe")
 					fixIE(10, "Simulator Setup.exe")
 					fixIE(11, "System Monitor.exe")
@@ -983,12 +984,11 @@ createShortcuts(location, installLocation) {
 
 		FileCreateShortcut(installLocation . "\Binaries\Simulator Tools.exe", location . "\Uninstall.lnk", installLocation . "\Binaries", "-Uninstall")
 
-		for ignore, name in ["Simulator Startup", "Simulator Settings", "Simulator Setup", "Simulator Configuration", "Race Settings", "Session Database"
-						   , "Race Reports", "Strategy Workbench", "Race Center", "Server Administration", "Setup Workbench"]
+		for ignore, name in remove(kForegroundApps, "System Monitor")
 			FileCreateShortcut(installLocation . "\Binaries\" . name . ".exe", location . "\" . name . ".lnk", installLocation . "\Binaries")
 	}
 	else
-		for ignore, name in ["Simulator Startup", "Simulator Settings"]
+		for ignore, name in ["Simulator Startup"]
 			FileCreateShortcut(installLocation . "\Binaries\" . name . ".exe", location . "\" . name . ".lnk", installLocation . "\Binaries")
 
 	FileCreateShortcut(installLocation . "\Documentation.url", location . "\Documentation.lnk", installLocation)
@@ -1006,8 +1006,7 @@ deleteShortcuts(location) {
 		deleteFile(location . "\Uninstall.lnk")
 	}
 
-	for ignore, name in ["Simulator Startup", "Simulator Settings", "Simulator Setup", "Simulator Configuration", "Race Settings", "Session Database"
-					   , "Race Reports", "Strategy Workbench", "Race Center", "Server Administration", "Setup Workbench"]
+	for ignore, name in remove(kForegroundApps, "System Monitor")
 		deleteFile(location . "\" . name . ".lnk")
 
 	deleteFile(location . "\Documentation.lnk")
@@ -1596,6 +1595,24 @@ renewConsent() {
 
 		writeMultiMap(kUserConfigDirectory . "CONSENT", consent)
 	}
+}
+
+updateInstallationForV541() {
+	local installInfo := readMultiMap(kUserConfigDirectory . "Simulator Controller.install")
+	local installLocation := getMultiMapValue(installInfo, "Install", "Location")
+
+	if (getMultiMapValue(installInfo, "Shortcuts", "StartMenu", false)) {
+		installLocation := getMultiMapValue(installInfo, "Install", "Location")
+
+		try {
+			FileCreateShortcut(installLocation . "\Binaries\Practice Center.exe", A_StartMenu . "\Simulator Controller\Practice Center.lnk", installLocation . "\Binaries")
+		}
+		catch Any as exception {
+			logError(exception)
+		}
+	}
+
+	deleteFile(A_Desktop . "\Simulator Settings.lnk")
 }
 
 updateInstallationForV500() {

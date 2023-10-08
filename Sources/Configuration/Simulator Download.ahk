@@ -81,9 +81,9 @@ downloadSimulatorController() {
 
 		try {
 			if A_IsCompiled
-				Run("*RunAs `"" . A_ScriptFullPath . "`" /restart " . options)
+				Run((!A_IsAdmin ? "*RunAs `"" : "`"") . A_ScriptFullPath . "`" /restart " . options)
 			else
-				Run("*RunAs `"" . A_AhkPath . "`" /restart `"" . A_ScriptFullPath . "`" " . options)
+				Run((!A_IsAdmin ? "*RunAs `"" : "`"") . A_AhkPath . "`" /restart `"" . A_ScriptFullPath . "`" " . options)
 		}
 		catch Any as exception {
 			OnMessage(0x44, translateOkButton)

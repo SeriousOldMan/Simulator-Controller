@@ -30,7 +30,10 @@ class DrivingCoach extends GridRaceAssistant {
 
 	iInstructions := CaseInsenseWeakMap()
 
-	iLapData := Map()
+	iLaps := Map()
+	iLapsHistory := 0
+
+	iStandings := []
 
 	class HTTPConnector {
 		iCoach := false
@@ -331,7 +334,7 @@ class DrivingCoach extends GridRaceAssistant {
 		Get {
 			if isSet(type) {
 				if (type == true)
-					return ["Character", "Simulation", "Session", "Stint", "Telemetry"]
+					return ["Character", "Simulation", "Session", "Stint"]
 				else
 					return (this.iInstructions.Has(type) ? this.iInstructions[type] : false)
 			}
@@ -356,25 +359,41 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 	}
 
-	LapData[lapNumber?] {
+	Laps[lapNumber?] {
 		Get {
 			if isSet(lapNumber) {
 				lapNumber := (lapNumber + 0)
 
-				return (this.iLapData.Has(lapNumber) ? this.iLapData[lapNumber] : false)
+				return (this.iLaps.Has(lapNumber) ? this.iLaps[lapNumber] : false)
 			}
 			else
-				return this.iLapData
+				return this.iLaps
 		}
 
 		Set {
 			if isSet(lapNumber) {
 				lapNumber := (lapNumber + 0)
 
-				return (this.iLapData[lapNumber] := value)
+				return (this.iLaps[lapNumber] := value)
 			}
 			else
-				return this.iLapData := value
+				return this.iLaps := value
+		}
+	}
+
+	LapsHistory {
+		Get {
+			return this.iLapsHistory
+		}
+	}
+
+	Standings[position?] {
+		Get {
+			return (isSet(position) ? this.iStandings[position] : this.iStandings)
+		}
+
+		Set {
+			return (isSet(position) ? (this.iStandings[position] := value) : (this.iStandings := value))
 		}
 	}
 
@@ -386,7 +405,7 @@ class DrivingCoach extends GridRaceAssistant {
 	}
 
 	loadFromConfiguration(configuration) {
-		local options
+		local options, laps, ignore, instruction
 
 		super.loadFromConfiguration(configuration)
 
@@ -403,25 +422,38 @@ class DrivingCoach extends GridRaceAssistant {
 		options["Driving Coach.Temperature"] := getMultiMapValue(configuration, "Driving Coach Personality", "Temperature", 0.5)
 		options["Driving Coach.MaxHistory"] := getMultiMapValue(configuration, "Driving Coach Personality", "MaxHistory", 3)
 		options["Driving Coach.Confirmation"] := getMultiMapValue(configuration, "Driving Coach Personality", "Confirmation", true)
-		options["Driving Coach.Instructions.Character"] := getMultiMapValue(configuration, "Driving Coach Personality", "Instructions.Character", false)
-		options["Driving Coach.Instructions.Simulation"] := getMultiMapValue(configuration, "Driving Coach Personality", "Instructions.Simulation", false)
-		options["Driving Coach.Instructions.Session"] := getMultiMapValue(configuration, "Driving Coach Personality", "Instructions.Session", false)
-		options["Driving Coach.Instructions.Stint"] := getMultiMapValue(configuration, "Driving Coach Personality", "Instructions.Stint", false)
+
+		for ignore, instruction in this.Instructions[true]
+			options["Driving Coach.Instructions." . instruction] := getMultiMapValue(configuration, "Driving Coach Personality", "Instructions." . instruction, false)
+
+		laps := InStr(options["Driving Coach.Instructions.Stint"], "%laps:")
+
+		if laps {
+			laps := SubStr(options["Driving Coach.Instructions.Stint"], laps, InStr(options["Driving Coach.Instructions.Stint"], "%", false, laps + 1) - laps - 1)
+
+			options["Driving Coach.Instructions.Stint"] := StrReplace(options["Driving Coach.Instructions.Stint"], laps, "laps")
+
+			this.iLapsHistory := string2Values(":", laps)[2]
+		}
 	}
 
 	updateSessionValues(values) {
 		super.updateSessionValues(values)
 
-		if values.HasProp("LapData")
-			this.iLapData := values.LapData
-		else if (values.HasProp("Session") && (values.Session == kSessionFinished))
-			this.iLapData := Map()
+		if values.HasProp("Laps")
+			this.iLaps := values.Laps
+		else if values.HasProp("Standings")
+			this.iStandings := values.Standings
+		else if (values.HasProp("Session") && (values.Session == kSessionFinished)) {
+			this.iLaps := Map()
+			this.iStandings := []
+		}
 	}
 
 	getInstruction(category) {
 		local knowledgeBase := this.KnowledgeBase
 		local settingsDB := this.SettingsDatabase
-		local simulator, car, track, position, laps, lapData, nrs, nr, carData, hasSectorTimes
+		local simulator, car, track, position, hasSectorTimes, laps, lapData, ignore, carData, standingsData
 
 		static sessions := false
 
@@ -463,40 +495,66 @@ class DrivingCoach extends GridRaceAssistant {
 					position := this.getPosition(false, "Class")
 
 					if (position != 0) {
-						hasSectorTimes := false
 						lapData := ""
 
-						laps := bubbleSort(&laps := getKeys(this.LapData))
+						laps := bubbleSort(&laps := getKeys(this.Laps))
+
+						hasSectorTimes := false
 
 						for ignore, lap in laps
-							for ignore, nr in bubbleSort(&nrs := remove(getKeys(this.LapData[lap]), "Driver"))
-								if this.LapData[lap][nr].SectorTimes {
-									hasSectorTimes := true
+							if this.Laps[lap].SectorTimes {
+								hasSectorTimes := true
 
-									break
-								}
-
-						if hasSectorTimes
-							lapData .= (values2String(";", collect(["Lap", "Race Number", "Class", "Position (Overall)", "Position (Class)", "Sector Times", "Lap Time"], translate)*) . "`n")
-						else
-							lapData .= (values2String(";", collect(["Lap", "Race Number", "Class", "Position (Overall)", "Position (Class)", "Lap Time"], translate)*) . "`n")
-
-						for ignore, lap in laps {
-							for ignore, nr in bubbleSort(&nrs := remove(getKeys(this.LapData[lap]), "Driver")) {
-								carData := this.LapData[lap][nr]
-
-								if hasSectorTimes
-									lapData .= (values2String(";", lap, nr, carData.Class, carData.OverallPosition, carData.ClassPosition
-											  , carData.SectorTimes ? values2String(",", carData.SectorTimes*) : "", carData.LapTime) . "`n")
-								else
-									lapData .= (values2String(";", lap, nr, carData.Class, carData.OverallPosition, carData.ClassPosition, carData.LapTime) . "`n")
+								break
 							}
 
-							lapData .= "`n`n"
+						if hasSectorTimes
+							lapData .= (values2String(";", collect(["Lap", "Position (Overall)", "Position (Class)", "Sector Times", "Lap Time"], translate)*) . "`n")
+						else
+							lapData .= (values2String(";", collect(["Lap", "Position (Overall)", "Position (Class)", "Lap Time"], translate)*) . "`n")
+
+						for ignore, lap in laps {
+							carData := this.Laps[lap]
+
+							if (A_Index > 1)
+								lapData .= "`""
+
+							if hasSectorTimes
+								lapData .= values2String(";", lap, carData.OverallPosition, carData.ClassPosition
+																 , carData.SectorTimes ? values2String(",", carData.SectorTimes*) : "", carData.LapTime)
+							else
+								lapData .= values2String(";", lap, carData.OverallPosition, carData.ClassPosition, carData.LapTime)
 						}
 
-						return substituteVariables(this.Instructions["Stint"]
-												 , {lap: knowledgeBase.getValue("Lap"), position: position, carNumber: this.getNr(), lapData: lapData})
+						standingsData := ""
+
+						hasSectorTimes := false
+
+						for position, carData in this.Standings
+							if carData.SectorTimes {
+								hasSectorTimes := true
+
+								break
+							}
+
+						if hasSectorTimes
+							standingsData .= (values2String(";", collect(["Position (Overall)", "Position (Class)", "Race Number", "Class", "Sector Times", "Lap Time"], translate)*) . "`n")
+						else
+							standingsData .= (values2String(";", collect(["Position (Overall)", "Position (Class)", "Race Number", "Class", "Lap Time"], translate)*) . "`n")
+
+						for ignore, carData in this.Standings {
+							if (A_Index > 1)
+								standingsData .= "`""
+
+							if hasSectorTimes
+								standingsData .= values2String(";", carData.OverallPosition, carData.ClassPosition, carData.Nr, carData.Class,
+																  , carData.SectorTimes ? values2String(",", carData.SectorTimes*) : "", carData.LapTime)
+							else
+								standingsData .= values2String(";", carData.OverallPosition, carData.ClassPosition, carData.Nr, carData.Class, carData.LapTime)
+						}
+
+						return substituteVariables(this.Instructions["Stint"], {lap: knowledgeBase.getValue("Lap"), position: position, carNumber: this.getNr()
+																			  , laps: lapData, standings: standingsData})
 					}
 				}
 		}
@@ -506,6 +564,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 	startConversation() {
 		local service := this.Options["Driving Coach.Service"]
+		local ignore, instruction
 
 		this.iTranscript := (normalizeDirectoryPath(this.Options["Driving Coach.Archive"]) . "\" . translate("Conversation ") . A_Now . ".txt")
 
@@ -524,10 +583,12 @@ class DrivingCoach extends GridRaceAssistant {
 				this.Connector.Temperature := this.Options["Driving Coach.Temperature"]
 				this.Connector.MaxHistory := this.Options["Driving Coach.MaxHistory"]
 
-				this.Instructions["Character"] := this.Options["Driving Coach.Instructions.Character"]
-				this.Instructions["Simulation"] := this.Options["Driving Coach.Instructions.Simulation"]
-				this.Instructions["Session"] := this.Options["Driving Coach.Instructions.Session"]
-				this.Instructions["Stint"] := this.Options["Driving Coach.Instructions.Stint"]
+				for ignore, instruction in this.Instructions[true] {
+					this.Instructions[instruction] := this.Options["Driving Coach.Instructions." . instruction]
+
+					if !this.Instructions[instruction]
+						this.Instructions[instruction] := ""
+				}
 			}
 			catch Any as exception {
 				logError(exception)
@@ -594,7 +655,7 @@ class DrivingCoach extends GridRaceAssistant {
 								, BestLapTime: 0, OverallTime: 0, LastFuelAmount: 0
 								, InitialFuelAmount: 0, EnoughData: false})
 
-		this.updateSessionValues({LapData: Map()})
+		this.updateSessionValues({Laps: Map()})
 
 		this.initializeGridPosition(data)
 
@@ -608,27 +669,20 @@ class DrivingCoach extends GridRaceAssistant {
 		this.updateDynamicValues({KnowledgeBase: false, Prepared: false
 								, OverallTime: 0, BestLapTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0
 								, EnoughData: false})
-		this.updateSessionValues({Simulator: "", Session: kSessionFinished, SessionTime: false, LapData: Map()})
+		this.updateSessionValues({Simulator: "", Session: kSessionFinished, SessionTime: false, Laps: Map()})
 
 		this.stopConversation()
 	}
 
-	updateLapData(lapNumber, data) {
+	updateLaps(lapNumber, data) {
 		local knowledgeBase := this.KnowledgeBase
 		local driver := knowledgeBase.getValue("Driver.Car", false)
-		local lapData := CaseInsenseMap()
+		local standingsData := CaseInsenseMap()
+		local standings := []
 		local keys, ignore, car, carData, sectorTimes
 
-		while (this.LapData.Count > 5) {
-			keys := getKeys(this.LapData)
-
-			bubbleSort(&keys)
-
-			this.LapData.Delete(keys[1])
-		}
-
-		for ignore, car in this.getCars() {
-			sectorTimes := this.getSectorTimes(car)
+		if driver {
+			sectorTimes := this.getSectorTimes(driver)
 
 			if sectorTimes {
 				sectorTimes := sectorTimes.Clone()
@@ -639,22 +693,39 @@ class DrivingCoach extends GridRaceAssistant {
 			else
 				sectorTimes := false
 
-			carData := {Class: this.getClass(car), OverallPosition: this.getPosition(car), ClassPosition: this.getPosition(car, "Class")
-					  , SectorTimes: sectorTimes, LapTime: Round(this.getLapTime(car) / 1000, 1)}
+			this.Laps[lapNumber] := {Class: this.getClass(driver), OverallPosition: this.getPosition(driver), ClassPosition: this.getPosition(driver, "Class")
+								   , SectorTimes: sectorTimes, LapTime: Round(this.getLapTime(driver) / 1000, 1)}
 
-			if (car = driver)
-				lapData["Driver"] := carData
+			for ignore, car in this.getCars() {
+				sectorTimes := this.getSectorTimes(car)
 
-			lapData[this.getNr(car)] := carData
+				if sectorTimes {
+					sectorTimes := sectorTimes.Clone()
+
+					loop sectorTimes.Length
+						sectorTimes[A_Index] := Round(sectorTimes[A_Index] / 1000, 1)
+				}
+				else
+					sectorTimes := false
+
+				carData := {Nr: this.getNr(car), Class: this.getClass(car)
+						  , OverallPosition: this.getPosition(car), ClassPosition: this.getPosition(car, "Class")
+						  , SectorTimes: sectorTimes, LapTime: Round(this.getLapTime(car) / 1000, 1)}
+
+				standingsData[carData.OverallPosition] := carData
+			}
+
+			loop standingsData.Count
+				standings.Push(standingsData[A_Index])
+
+			this.Standings := standings
 		}
-
-		this.LapData[lapNumber] := lapData
 	}
 
 	addLap(lapNumber, &data) {
 		local result := super.addLap(lapNumber, &data)
 
-		this.updateLapData(lapNumber, data)
+		this.updateLaps(lapNumber, data)
 
 		return result
 	}

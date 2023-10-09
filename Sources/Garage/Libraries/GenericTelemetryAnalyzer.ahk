@@ -439,7 +439,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 
 	createCharacteristics(issues := false) {
 		local workbench, severities, maxFrequency
-		local characteristicLabels, characteristic, characteristics, ignore, type, severity, speed, where, value, issue
+		local characteristicLabels, key, characteristic, characteristics, ignore, type, severity, speed, where, value, issue
 		local temperature, position, category
 
 		if issues {
@@ -464,16 +464,16 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 			for ignore, type in ["Oversteer", "Understeer"]
 				for ignore, speed in ["Slow", "Fast"]
 					for ignore, where in ["Entry", "Apex", "Exit"] {
-						characteristic := (type . ".Corner." . where . "." . speed)
+						key := (type . ".Corner." . where . "." . speed)
 
-						for ignore, issue in issues[characteristic] {
+						for ignore, issue in issues[key] {
 							value := issue.Frequency
 							severity := issue.Severity
 
-							if !characteristics.Has(characteristic)
-								characteristics[characteristic] := [Round(value / maxFrequency * 66), severities[severity]]
+							if !characteristics.Has(key)
+								characteristics[key] := [Round(value / maxFrequency * 66), severities[severity]]
 							else {
-								characteristic := characteristics[characteristic]
+								characteristic := characteristics[key]
 
 								characteristic[1] := Max(characteristic[1], Round(value / maxFrequency * 66))
 								characteristic[2] := Max(characteristic[2], severities[severity])
@@ -492,16 +492,16 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 			for ignore, category in ["Around", "Inner", "Outer"]
 				for ignore, temperature in ["Cold", "Hot"]
 					for ignore, position in ["Front", "Rear"] {
-						characteristic := ("Tyre.Temperatures." . temperature . "." . position . "." . category)
+						key := ("Tyre.Temperatures." . temperature . "." . position . "." . category)
 
-						for ignore, issue in issues[characteristic] {
+						for ignore, issue in issues[key] {
 							value := issue.Frequency
 							severity := issue.Severity
 
-							if !characteristics.Has(characteristic)
-								characteristics[characteristic] := [Round(value / maxFrequency * 66), severities[severity]]
+							if !characteristics.Has(key)
+								characteristics[key] := [Round(value / maxFrequency * 66), severities[severity]]
 							else {
-								characteristic := characteristics[characteristic]
+								characteristic := characteristics[key]
 
 								characteristic[1] := Max(characteristic[1], Round(value / maxFrequency * 66))
 								characteristic[2] := Max(characteristic[2], severities[severity])
@@ -516,16 +516,16 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 					maxFrequency := Max(maxFrequency, issue.Frequency)
 
 			for ignore, category in ["Front", "Rear"] {
-				characteristic := ("Brake.Temperatures." . category)
+				key := ("Brake.Temperatures." . category)
 
-				for ignore, issue in issues[characteristic] {
+				for ignore, issue in issues[key] {
 					value := issue.Frequency
 					severity := issue.Severity
 
-					if !characteristics.Has(characteristic)
-						characteristics[characteristic] := [Round(value / maxFrequency * 66), severities[severity]]
+					if !characteristics.Has(key)
+						characteristics[key] := [Round(value / maxFrequency * 66), severities[severity]]
 					else {
-						characteristic := characteristics[characteristic]
+						characteristic := characteristics[key]
 
 						characteristic[1] := Max(characteristic[1], Round(value / maxFrequency * 66))
 						characteristic[2] := Max(characteristic[2], severities[severity])
@@ -609,8 +609,9 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 			local ignore, sample
 
 			for ignore, sample in samples
-				loop 4
-					temperatures[A_Index].Push(sample.%category%Temperatures[A_Index])
+				if sample.HasProp(category . "Temperatures")
+					loop 4
+						temperatures[A_Index].Push(sample.%category%Temperatures[A_Index])
 		}
 
 		getOIDifferences() {

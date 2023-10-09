@@ -325,9 +325,9 @@ class SetupWorkbench extends ConfigurationItem {
 		local definition, ignore, rootDirectory
 
 		if simulator {
-			this.iSelectedSimulator := simulator
-			this.iSelectedCar := car
-			this.iSelectedTrack := track
+			this.iSelectedSimulator := SessionDatabase.getSimulatorName(simulator)
+			this.iSelectedCar := (car ? SessionDatabase.getCarName(simulator, car) : false)
+			this.iSelectedTrack := (track ? SessionDatabase.getTrackName(simulator, track) : false)
 			this.iSelectedWeather := weather
 		}
 
@@ -892,7 +892,7 @@ class SetupWorkbench extends ConfigurationItem {
 				car := StrReplace(StrReplace(descriptor, simulator . ".", ""), ".ini", "")
 
 				if ((car != "Generic") && !inList(cars, car))
-					cars.Push(car)
+					cars.Push(SessionDatabase.getCarName(simulator, car))
 			}
 
 			loop Files, kUserHomeDirectory . "Garage\Definitions\Cars\" . simulator . ".*.ini", "F" {
@@ -901,7 +901,7 @@ class SetupWorkbench extends ConfigurationItem {
 				car := StrReplace(StrReplace(descriptor, simulator . ".", ""), ".ini", "")
 
 				if ((car != "Generic") && !inList(cars, car))
-					cars.Push(car)
+					cars.Push(SessionDatabase.getCarName(simulator, car))
 			}
 
 			if (this.SimulatorDefinition && (getMultiMapValue(this.SimulatorDefinition, "Simulator", "Cars", false) = "*")) {
@@ -924,6 +924,9 @@ class SetupWorkbench extends ConfigurationItem {
 
 		if (car && (car != true))
 			tracks := SessionDatabase().getTracks(simulator, car)
+
+		loop tracks.Length
+			tracks[A_Index] := SessionDatabase.getTrackName(simulator, tracks[A_Index])
 
 		tracks.InsertAt(1, "*")
 

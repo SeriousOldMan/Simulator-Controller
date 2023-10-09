@@ -51,6 +51,17 @@ average(numbers) {
 		return false
 }
 
+sum(numbers) {
+	local sum := 0
+	local ignore, value
+
+	for ignore, value in numbers
+		if isNumber(value)
+			sum += value
+
+	return sum
+}
+
 stdDeviation(numbers) {
 	local avg := average(numbers)
 	local squareSum := 0

@@ -19,6 +19,9 @@
 #Include "..\..\Libraries\JSON.ahk"
 #Include "..\..\Libraries\HTTP.ahk"
 #Include "RaceAssistant.ahk"
+#Include "..\..\Garage\Libraries\TelemetryCollector.ahk"
+#Include "..\..\Garage\Libraries\IRCTelemetryCollector.ahk"
+#Include "..\..\Garage\Libraries\R3ETelemetryCollector.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -326,6 +329,19 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 	}
 
+	CollectorClass {
+		Get {
+			switch SessionDatabase.getSimulatorCode(this.Simulator), false {
+				case "IRC":
+					return "IRCTelemetryCollector"
+				case "R3E":
+					return "R3ETelemetryCollector"
+				default:
+					return "TelemetryCollector"
+			}
+		}
+	}
+
 	Providers {
 		Get {
 			return ["OpenAI", "Azure", "GPT4All"]
@@ -433,7 +449,7 @@ class DrivingCoach extends GridRaceAssistant {
 		laps := InStr(options["Driving Coach.Instructions.Stint"], "%laps:")
 
 		if laps {
-			laps := SubStr(options["Driving Coach.Instructions.Stint"], laps, InStr(options["Driving Coach.Instructions.Stint"], "%", false, laps + 1) - laps - 1)
+			laps := SubStr(options["Driving Coach.Instructions.Stint"], laps + 1, InStr(options["Driving Coach.Instructions.Stint"], "%", false, laps + 1) - laps - 1)
 
 			options["Driving Coach.Instructions.Stint"] := StrReplace(options["Driving Coach.Instructions.Stint"], laps, "laps")
 
@@ -552,7 +568,7 @@ class DrivingCoach extends GridRaceAssistant {
 								standingsData .= "`n"
 
 							if hasSectorTimes
-								standingsData .= values2String(";", carData.OverallPosition, carData.ClassPosition, carData.Nr, carData.Class,
+								standingsData .= values2String(";", carData.OverallPosition, carData.ClassPosition, carData.Nr, carData.Class
 																  , carData.SectorTimes ? values2String(",", carData.SectorTimes*) : "", carData.LapTime)
 							else
 								standingsData .= values2String(";", carData.OverallPosition, carData.ClassPosition, carData.Nr, carData.Class, carData.LapTime)
@@ -567,7 +583,7 @@ class DrivingCoach extends GridRaceAssistant {
 					collector := this.iTelemetryCollector
 
 					if collector {
-						issues := collector.Issues
+						issues := collector.Handling
 
 						handling := ""
 						index := 0
@@ -664,9 +680,10 @@ class DrivingCoach extends GridRaceAssistant {
 			logMessage(kLogCritical, substituteVariables(translate("Cannot connect to GPT service (%service%) - please check the configuration")
 													   , {service: this.Options["Driving Coach.Service"]}))
 
-			showMessage(substituteVariables(translate("Cannot connect to GPT service (%service%) - please check the configuration...")
-										  , {service: this.Options["Driving Coach.Service"]})
-					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			if (exception != "Problems while connecting to GPT service...")
+				showMessage(substituteVariables(translate("Cannot connect to GPT service (%service%) - please check the configuration...")
+											  , {service: this.Options["Driving Coach.Service"]})
+						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 		}
 
 		if answer {
@@ -679,10 +696,13 @@ class DrivingCoach extends GridRaceAssistant {
 	}
 
 	startTelemetryAnalyzer() {
+		local knowledgeBase := this.KnowledgeBase
+
 		this.stopTelemetryAnalyzer()
 
-		if !this.iTelemetryCollector {
-			this.iTelemetryCollector := %this.CollectorClass%(this.Simulator, this.Car, this.Track, {Handling: true, Frequency: 5000})
+		if (knowledgeBase && !this.iTelemetryCollector) {
+			this.iTelemetryCollector := %this.CollectorClass%(this.Simulator, knowledgeBase.getValue("Session.Car"), knowledgeBase.getValue("Session.Track")
+															, {Handling: true, Frequency: 5000})
 
 			this.iTelemetryCollector.loadFromSettings()
 
@@ -701,14 +721,6 @@ class DrivingCoach extends GridRaceAssistant {
 		this.iTelemetryCollector := false
 	}
 
-	prepareSession(&settings, &data, formationLap := true) {
-		local facts := super.prepareSession(&settings, &data, formationLap)
-
-		this.startTelemetryAnalyzer()
-
-		return facts
-	}
-
 	startSession(settings, data) {
 		local facts := this.prepareSession(&settings, &data, false)
 
@@ -725,6 +737,7 @@ class DrivingCoach extends GridRaceAssistant {
 		if this.Debug[kDebugKnowledgeBase]
 			this.dumpKnowledgeBase(this.KnowledgeBase)
 
+		this.startTelemetryAnalyzer()
 		this.restartConversation()
 	}
 
@@ -735,14 +748,13 @@ class DrivingCoach extends GridRaceAssistant {
 		this.updateSessionValues({Simulator: "", Session: kSessionFinished, SessionTime: false, Laps: Map()})
 
 		this.stopTelemetryAnalyzer()
-
 		this.restartConversation()
 	}
 
 	updateLaps(lapNumber, data) {
 		local knowledgeBase := this.KnowledgeBase
 		local driver := knowledgeBase.getValue("Driver.Car", false)
-		local standingsData := CaseInsenseMap()
+		local standingsData := CaseInsenseWeakMap()
 		local standings := []
 		local keys, ignore, car, carData, sectorTimes
 
@@ -781,7 +793,8 @@ class DrivingCoach extends GridRaceAssistant {
 			}
 
 			loop standingsData.Count
-				standings.Push(standingsData[A_Index])
+				if standingsData.Has(A_Index)
+					standings.Push(standingsData[A_Index])
 
 			this.Standings := standings
 		}

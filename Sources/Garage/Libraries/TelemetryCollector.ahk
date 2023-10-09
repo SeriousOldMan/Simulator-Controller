@@ -10,6 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\..\Libraries\Task.ahk"
+#Include "..\..\Libraries\Math.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
 
 
@@ -146,8 +147,8 @@ class TelemetryCollector {
 		static first := true
 
 		this.iSimulator := SessionDatabase.getSimulatorName(simulator)
-		this.iCar := car
-		this.iTrack := track
+		this.iCar := (car ? SessionDatabase.getCarName(simulator, car) : false)
+		this.iTrack := (car ? SessionDatabase.getTrackName(simulator, track) : false)
 
 		this.iAcousticFeedback := acousticFeedback
 
@@ -177,17 +178,17 @@ class TelemetryCollector {
 
 		prefix := (this.Simulator . "." . (this.Car ? this.Car : "*") . ".*.")
 
-		if this.settingAvailable("SteerLock")
-			this.iSteerLock := getMultiMapValue(settings, section, prefix . "SteerLock", this.SteerLock)
+		if this.settingAvailable("SteerLock", true)
+			this.iSteerLock := getMultiMapValue(settings, section, prefix . "SteerLock", 900)
 
-		if this.settingAvailable("SteerRatio")
-			this.iSteerRatio := getMultiMapValue(settings, section, prefix . "SteerRatio", this.SteerRatio)
+		if this.settingAvailable("SteerRatio", true)
+			this.iSteerRatio := getMultiMapValue(settings, section, prefix . "SteerRatio", 12)
 
-		if this.settingAvailable("Wheelbase")
-			this.iWheelbase := getMultiMapValue(settings, section, prefix . "Wheelbase", this.Wheelbase)
+		if this.settingAvailable("Wheelbase", true)
+			this.iWheelbase := getMultiMapValue(settings, section, prefix . "Wheelbase", 270)
 
-		if this.settingAvailable("TrackWidth")
-			this.iTrackWidth := getMultiMapValue(settings, section, prefix . "TrackWidth", this.TrackWidth)
+		if this.settingAvailable("TrackWidth", true)
+			this.iTrackWidth := getMultiMapValue(settings, section, prefix . "TrackWidth", 150)
 
 		defaultUndersteerThresholds := getMultiMapValue(settings, section, prefix . "UndersteerThresholds", defaultUndersteerThresholds)
 		defaultOversteerThresholds := getMultiMapValue(settings, section, prefix . "OversteerThresholds", defaultOversteerThresholds)
@@ -195,32 +196,32 @@ class TelemetryCollector {
 
 		prefix := (this.Simulator . "." . (this.Car ? this.Car : "*") . "." . (this.Track ? this.Track : "*") . ".")
 
-		if this.settingAvailable("SteerLock")
+		if this.settingAvailable("SteerLock", true)
 			this.iSteerLock := getMultiMapValue(settings, section, prefix . "SteerLock", this.SteerLock)
 
-		if this.settingAvailable("SteerRatio")
+		if this.settingAvailable("SteerRatio", true)
 			this.iSteerRatio := getMultiMapValue(settings, section, prefix . "SteerRatio", this.SteerRatio)
 
-		if this.settingAvailable("Wheelbase")
+		if this.settingAvailable("Wheelbase", true)
 			this.iWheelbase := getMultiMapValue(settings, section, prefix . "Wheelbase", this.Wheelbase)
 
-		if this.settingAvailable("TrackWidth")
+		if this.settingAvailable("TrackWidth", true)
 			this.iTrackWidth := getMultiMapValue(settings, section, prefix . "TrackWidth", this.TrackWidth)
 
-		if this.settingAvailable("UndersteerThresholds")
+		if this.settingAvailable("UndersteerThresholds", true)
 			this.iUndersteerThresholds := string2Values(",", getMultiMapValue(settings, section
 														   , prefix . "UndersteerThresholds", defaultUndersteerThresholds))
 
-		if this.settingAvailable("OversteerThresholds")
+		if this.settingAvailable("OversteerThresholds", true)
 			this.iOversteerThresholds := string2Values(",", getMultiMapValue(settings, section
 														  , prefix . "OversteerThresholds", defaultOversteerThresholds))
 
-		if this.settingAvailable("LowspeedThreshold")
+		if this.settingAvailable("LowspeedThreshold", true)
 			this.iLowspeedThreshold := getMultiMapValue(settings, section, prefix . "LowspeedThreshold", defaultLowspeedThreshold)
 	}
 
-	settingAvailable(setting) {
-		return (this.%setting% != false)
+	settingAvailable(setting, force := false) {
+		return (force || (this.%setting% != false))
 	}
 
 	startTelemetryCollector(calibrate := false) {
@@ -397,23 +398,40 @@ class TelemetryCollector {
 	}
 
 	updateSamples() {
-		local data, tyreInnerTemperatures, tyreOuterTemperatures, sample
+		local hasValues := false
+		local data, tyreTemperatures, tyreInnerTemperatures, tyreOuterTemperatures, brakeTemperatures, sample
 
 		if inList(this.iCategories, "Temperatures") {
 			data := callSimulator(SessionDatabase.getSimulatorCode(this.Simulator))
+			tyreTemperatures := string2Values(",", getMultiMapValue(data, "Car Data", "TyreTemperature", ""))
 			tyreInnerTemperatures := string2Values(",", getMultiMapValue(data, "Car Data", "TyreInnerTemperature", ""))
 			tyreOuterTemperatures := string2Values(",", getMultiMapValue(data, "Car Data", "TyreInnerTemperature", ""))
-			sample := {TyreTemperatures: string2Values(",", getMultiMapValue(data, "Car Data", "TyreTemperature", ""))
-					 , BrakeTemperatures: string2Values(",", getMultiMapValue(data, "Car Data", "BrakeTemperature", ""))}
+			brakeTemperatures := string2Values(",", getMultiMapValue(data, "Car Data", "BrakeTemperature", ""))
+			sample := {}
+
+			if (sum(tyreTemperatures) > 0) {
+				sample.TyreTemperatures := tyreTemperatures
+
+				hasValues := true
+			}
+
+			if (sum(brakeTemperatures) > 0) {
+				sample.BrakeTemperatures := brakeTemperatures
+
+				hasValues := true
+			}
 
 			if ((tyreInnerTemperatures.Length = 4) && (tyreOuterTemperatures.Length = 4)) {
 				loop 4
 					tyreInnerTemperatures[A_Index] -= tyreOuterTemperatures[A_Index]
 
 				sample.TyreOITemperatureDifferences := tyreInnerTemperatures
+
+				hasValues := true
 			}
 
-			this.iTemperatureSamples.Push(sample)
+			if hasValues
+				this.iTemperatureSamples.Push(sample)
 		}
 	}
 }

@@ -682,7 +682,7 @@ class DrivingCoach extends GridRaceAssistant {
 		this.stopTelemetryAnalyzer()
 
 		if !this.iTelemetryCollector {
-			this.iTelemetryCollector := %this.CollectorClass%(this.Simulator, this.Car, this.Track)
+			this.iTelemetryCollector := %this.CollectorClass%(this.Simulator, this.Car, this.Track, {Handling: true, Frequency: 5000})
 
 			this.iTelemetryCollector.loadFromSettings()
 

@@ -43,6 +43,8 @@ class TelemetryCollector {
 	iCollectorPID := false
 	iCalibrate := false
 
+	iCategories := []
+
 	iSampleFrequency := false
 	iSampleTask := false
 
@@ -116,13 +118,13 @@ class TelemetryCollector {
 
 	Handling {
 		Get {
-			return this.getHandling()
+			return (inList(this.iCategories, "Handling") ? this.getHandling() : false)
 		}
 	}
 
 	Temperatures {
 		Get {
-			return this.getTemperatures()
+			return (inList(this.iCategories, "Temperatures") ? this.getTemperatures() : false)
 		}
 	}
 
@@ -150,7 +152,9 @@ class TelemetryCollector {
 		this.iAcousticFeedback := acousticFeedback
 
 		for setting, value in settings.OwnProps()
-			if (setting = "Temperatures")
+			if ((setting = "Handling") || ((setting = "Temperatures")))
+				this.iCategories.Push(setting)
+			else if (setting = "Frequency")
 				this.iSampleFrequency := value
 			else
 				this.i%setting% := value
@@ -225,7 +229,7 @@ class TelemetryCollector {
 
 		this.stopTelemetryCollector()
 
-		if !this.iCollectorPID {
+		if (!this.iCollectorPID && inList(this.iCategories, "Handling")) {
 			try {
 				options := ((calibrate ? "-Calibrate `"" : "-Analyze `"") . dataFile . "`"")
 
@@ -263,17 +267,6 @@ class TelemetryCollector {
 
 				Run(kBinariesDirectory . code . " SHM Spotter.exe " . options, kBinariesDirectory, "Hide", &pid)
 
-				this.iTemperatureSamples := []
-
-				if this.iSampleFrequency {
-					if this.iSampleTask
-						this.iSampleTask.stop()
-
-					this.iSampleTask := PeriodicTask(ObjBindMethod(this, "updateSamples"), this.iSampleFrequency, kLowPriority)
-
-					this.iSampleTask.start()
-				}
-
 				this.iCalibrate := calibrate
 				this.iDataFile := dataFile
 			}
@@ -290,9 +283,22 @@ class TelemetryCollector {
 				pid := false
 			}
 
-			this.iCollectorPID := pid
+			if pid {
+				this.iCollectorPID := pid
 
-			OnExit(ObjBindMethod(this, "stopTelemetryCollector"))
+				OnExit(ObjBindMethod(this, "stopTelemetryCollector"))
+			}
+
+			this.iTemperatureSamples := []
+
+			if this.iSampleFrequency {
+				if this.iSampleTask
+					this.iSampleTask.stop()
+
+				this.iSampleTask := PeriodicTask(ObjBindMethod(this, "updateSamples"), this.iSampleFrequency, kLowPriority)
+
+				this.iSampleTask.start()
+			}
 		}
 	}
 
@@ -391,19 +397,23 @@ class TelemetryCollector {
 	}
 
 	updateSamples() {
-		local data := callSimulator(SessionDatabase.getSimulatorCode(this.Simulator))
-		local tyreInnerTemperatures := string2Values(",", getMultiMapValue(data, "Car Data", "TyreInnerTemperature", ""))
-		local tyreOuterTemperatures := string2Values(",", getMultiMapValue(data, "Car Data", "TyreInnerTemperature", ""))
-		local sample := {TyreTemperatures: string2Values(",", getMultiMapValue(data, "Car Data", "TyreTemperature", ""))
-					   , BrakeTemperatures: string2Values(",", getMultiMapValue(data, "Car Data", "BrakeTemperature", ""))}
+		local data, tyreInnerTemperatures, tyreOuterTemperatures, sample
 
-		if ((tyreInnerTemperatures.Length = 4) && (tyreOuterTemperatures.Length = 4)) {
-			loop 4
-				tyreInnerTemperatures[A_Index] -= tyreOuterTemperatures[A_Index]
+		if inList(this.iCategories, "Temperatures") {
+			data := callSimulator(SessionDatabase.getSimulatorCode(this.Simulator))
+			tyreInnerTemperatures := string2Values(",", getMultiMapValue(data, "Car Data", "TyreInnerTemperature", ""))
+			tyreOuterTemperatures := string2Values(",", getMultiMapValue(data, "Car Data", "TyreInnerTemperature", ""))
+			sample := {TyreTemperatures: string2Values(",", getMultiMapValue(data, "Car Data", "TyreTemperature", ""))
+					 , BrakeTemperatures: string2Values(",", getMultiMapValue(data, "Car Data", "BrakeTemperature", ""))}
 
-			sample.TyreOITemperatureDifferences := tyreInnerTemperatures
+			if ((tyreInnerTemperatures.Length = 4) && (tyreOuterTemperatures.Length = 4)) {
+				loop 4
+					tyreInnerTemperatures[A_Index] -= tyreOuterTemperatures[A_Index]
+
+				sample.TyreOITemperatureDifferences := tyreInnerTemperatures
+			}
+
+			this.iTemperatureSamples.Push(sample)
 		}
-
-		this.iTemperatureSamples.Push(sample)
 	}
 }

@@ -7,29 +7,29 @@
 
 [?Tyre.Temperatures.Hot.Front.Around.Correction != 0] =>
 		(Prove: changeSetting(Brake.Duct.Front, 1, ?Tyre.Temperatures.Hot.Front.Around.Correction)),
-		(Prove: changeSetting(Tyre.Pressure.Front.Left, -0.5, ?Tyre.Temperatures.Hot.Front.Around.Correction)),
-		(Prove: changeSetting(Tyre.Pressure.Front.Right, -0.5, ?Tyre.Temperatures.Hot.Front.Around.Correction)),
+		(Prove: changeSetting(Tyre.Pressure.Front.Left, 0.5, ?Tyre.Temperatures.Hot.Front.Around.Correction)),
+		(Prove: changeSetting(Tyre.Pressure.Front.Right, 0.5, ?Tyre.Temperatures.Hot.Front.Around.Correction)),
 		(Prove: changeSetting(Damper.Compression.Fast.Front.Left, -0.25, ?Tyre.Temperatures.Hot.Front.Around.Correction)),
 		(Prove: changeSetting(Damper.Compression.Fast.Front.Right, -0.25, ?Tyre.Temperatures.Hot.Front.Around.Correction))
 
 [?Tyre.Temperatures.Hot.Rear.Around.Correction != 0] =>
 		(Prove: changeSetting(Brake.Duct.Rear, 1, ?Tyre.Temperatures.Hot.Rear.Around.Correction)),
-		(Prove: changeSetting(Tyre.Pressure.Rear.Left, -0.5, ?Tyre.Temperatures.Hot.Rear.Around.Correction)),
-		(Prove: changeSetting(Tyre.Pressure.Rear.Right, -0.5, ?Tyre.Temperatures.Hot.Rear.Around.Correction)),
+		(Prove: changeSetting(Tyre.Pressure.Rear.Left, 0.5, ?Tyre.Temperatures.Hot.Rear.Around.Correction)),
+		(Prove: changeSetting(Tyre.Pressure.Rear.Right, 0.5, ?Tyre.Temperatures.Hot.Rear.Around.Correction)),
 		(Prove: changeSetting(Damper.Compression.Fast.Rear.Left, -0.25, ?Tyre.Temperatures.Hot.Rear.Around.Correction)),
 		(Prove: changeSetting(Damper.Compression.Fast.Rear.Right, -0.25, ?Tyre.Temperatures.Hot.Rear.Around.Correction))
 
 [?Tyre.Temperatures.Cold.Front.Around.Correction != 0] =>
 		(Prove: changeSetting(Brake.Duct.Front, -1, ?Tyre.Temperatures.Cold.Front.Around.Correction)),
-		(Prove: changeSetting(Tyre.Pressure.Front.Left, 0.5, ?Tyre.Temperatures.Cold.Front.Around.Correction)),
-		(Prove: changeSetting(Tyre.Pressure.Front.Right, 0.5, ?Tyre.Temperatures.Cold.Front.Around.Correction)),
+		(Prove: changeSetting(Tyre.Pressure.Front.Left, -0.5, ?Tyre.Temperatures.Cold.Front.Around.Correction)),
+		(Prove: changeSetting(Tyre.Pressure.Front.Right, -0.5, ?Tyre.Temperatures.Cold.Front.Around.Correction)),
 		(Prove: changeSetting(Damper.Compression.Fast.Front.Left, 0.25, ?Tyre.Temperatures.Cold.Front.Around.Correction)),
 		(Prove: changeSetting(Damper.Compression.Fast.Front.Right, 0.25, ?Tyre.Temperatures.Cold.Front.Around.Correction))
 
 [?Tyre.Temperatures.Cold.Rear.Around.Correction != 0] =>
 		(Prove: changeSetting(Brake.Duct.Rear, -1, ?Tyre.Temperatures.Cold.Rear.Around.Correction)),
-		(Prove: changeSetting(Tyre.Pressure.Rear.Left, 0.5, ?Tyre.Temperatures.Cold.Rear.Around.Correction)),
-		(Prove: changeSetting(Tyre.Pressure.Rear.Right, 0.5, ?Tyre.Temperatures.Cold.Rear.Around.Correction)),
+		(Prove: changeSetting(Tyre.Pressure.Rear.Left, -0.5, ?Tyre.Temperatures.Cold.Rear.Around.Correction)),
+		(Prove: changeSetting(Tyre.Pressure.Rear.Right, -0.5, ?Tyre.Temperatures.Cold.Rear.Around.Correction)),
 		(Prove: changeSetting(Damper.Compression.Fast.Rear.Left, 0.25, ?Tyre.Temperatures.Cold.Rear.Around.Correction)),
 		(Prove: changeSetting(Damper.Compression.Fast.Rear.Right, 0.25, ?Tyre.Temperatures.Cold.Rear.Around.Correction))
 

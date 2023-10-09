@@ -48,11 +48,20 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 	iWheelBase := 270
 	iTrackWidth := 150
 
+	iFrontTyreTemperatures := [70, 80, 95]
+	iRearTyreTemperatures := [70, 80, 95]
+
+	iOITemperatureDifference := 10
+
+	iFrontBrakeTemperatures := [300, 550, 680]
+	iRearBrakeTemperatures := [300, 550, 680]
+
 	iAcousticFeedback := true
 	static sAudioDevice := false
 
 	iTelemetryCollector := false
-	iLastIssues := false
+	iLastHandling := false
+	iLastTemperatures := false
 
 	Car {
 		Get {
@@ -174,6 +183,102 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 		}
 	}
 
+	FrontTyreTemperatures[key?] {
+		Get {
+			return (isSet(key) ? this.iFrontTyreTemperatures[key] : this.iFrontTyreTemperatures)
+		}
+
+		Set {
+			if isSet(key) {
+				this.iFrontTyreTemperatures[key] := value
+
+				setAnalyzerSetting(this, "FrontTyreTemperatures", values2String(",", this.iFrontTyreTemperatures*))
+
+				return value
+			}
+			else {
+				setAnalyzerSetting(this, "FrontTyreTemperatures", values2String(",", value*))
+
+				return (this.iFrontTyreTemperatures := value)
+			}
+		}
+	}
+
+	RearTyreTemperatures[key?] {
+		Get {
+			return (isSet(key) ? this.iRearTyreTemperatures[key] : this.iRearTyreTemperatures)
+		}
+
+		Set {
+			if isSet(key) {
+				this.iRearTyreTemperatures[key] := value
+
+				setAnalyzerSetting(this, "RearTyreTemperatures", values2String(",", this.iRearTyreTemperatures*))
+
+				return value
+			}
+			else {
+				setAnalyzerSetting(this, "RearTyreTemperatures", values2String(",", value*))
+
+				return (this.iRearTyreTemperatures := value)
+			}
+		}
+	}
+
+	OITemperatureDifference {
+		Get {
+			return this.iOITemperatureDifference
+		}
+
+		Set {
+			setAnalyzerSetting(this, "TyreOITemperatureDifference", value)
+
+			return (this.iOITemperatureDifference := value)
+		}
+	}
+
+	FrontBrakeTemperatures[key?] {
+		Get {
+			return (isSet(key) ? this.iFrontBrakeTemperatures[key] : this.iFrontBrakeTemperatures)
+		}
+
+		Set {
+			if isSet(key) {
+				this.iFrontBrakeTemperatures[key] := value
+
+				setAnalyzerSetting(this, "FrontBrakeTemperatures", values2String(",", this.iFrontBrakeTemperatures*))
+
+				return value
+			}
+			else {
+				setAnalyzerSetting(this, "FrontBrakeTemperatures", values2String(",", value*))
+
+				return (this.iFrontBrakeTemperatures := value)
+			}
+		}
+	}
+
+	RearBrakeTemperatures[key?] {
+		Get {
+			return (isSet(key) ? this.iRearBrakeTemperatures[key] : this.iRearBrakeTemperatures)
+		}
+
+		Set {
+			if isSet(key) {
+				this.iRearBrakeTemperatures[key] := value
+
+				setAnalyzerSetting(this, "RearBrakeTemperatures", values2String(",", this.iRearBrakeTemperatures*))
+
+				return value
+			}
+			else {
+				setAnalyzerSetting(this, "RearBrakeTemperatures", values2String(",", value*))
+
+				return (this.iRearBrakeTemperatures := value)
+			}
+		}
+	}
+
 	AcousticFeedback {
 		Get {
 			return this.iAcousticFeedback
@@ -198,16 +303,27 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 		}
 	}
 
-	Issues {
+	Handling {
 		Get {
 			if this.iTelemetryCollector
-				return (this.iLastIssues := this.iTelemetryCollector.Issues)
-			else if !this.iLastIssues {
-				this.iLastIssues := CaseInsenseMap()
-				this.iLastIssues.Default := []
+				return (this.iLastHandling := this.iTelemetryCollector.Handling)
+			else if !this.iLastHandling {
+				this.iLastHandling := CaseInsenseMap()
+				this.iLastHandling.Default := []
 			}
 
-			return this.iLastIssues
+			return this.iLastHandling
+		}
+	}
+
+	Temperatures {
+		Get {
+			if this.iTelemetryCollector
+				this.iLastTemperatures := this.iTelemetryCollector.Temperatures
+			else if !this.iLastTemperatures
+				this.iLastTemperatures := []
+
+			return this.computeTemperatures(this.iLastTemperatures)
 		}
 	}
 
@@ -217,6 +333,11 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 		local defaultUndersteerThresholds := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "UndersteerThresholds", "40,70,100")
 		local defaultOversteerThresholds := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "OversteerThresholds", "-40,-70,-100")
 		local defaultLowspeedThreshold := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "LowspeedThreshold", 120)
+		local defaultFrontTyreTemperatures := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "FrontTyreTemperatures", "70,80,95")
+		local defaultRearTyreTemperatures := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "RearTyreTemperatures", "70,80,95")
+		local defaultOITemperatureDifference := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "TyreOITemperatureDifference", 10)
+		local defaultFrontBrakeTemperatures := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "FrontBrakeTemperatures", "300,550,680")
+		local defaultRearBrakeTemperatures := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "RearBrakeTemperatures", "300,550,680")
 		local fileName, configuration, settings, prefix
 
 		static first := true
@@ -251,6 +372,12 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 				defaultUndersteerThresholds := getMultiMapValue(configuration, "Analyzer", "UndersteerThresholds", defaultUndersteerThresholds)
 				defaultOversteerThresholds := getMultiMapValue(configuration, "Analyzer", "OversteerThresholds", defaultOversteerThresholds)
 				defaultLowspeedThreshold := getMultiMapValue(configuration, "Analyzer", "LowspeedThreshold", defaultLowspeedThreshold)
+
+				defaultFrontTyreTemperatures := getMultiMapValue(configuration, "Analyzer", "FrontTyreTemperatures", defaultFrontTyreTemperatures)
+				defaultRearTyreTemperatures := getMultiMapValue(configuration, "Analyzer", "RearTyreTemperatures", defaultRearTyreTemperatures)
+				defaultOITemperatureDifference := getMultiMapValue(configuration, "Analyzer", "TyreOITemperatureDifference", defaultOITemperatureDifference)
+				defaultFrontBrakeTemperatures := getMultiMapValue(configuration, "Analyzer", "FrontBrakeTemperatures", defaultFrontBrakeTemperatures)
+				defaultRearBrakeTemperatures := getMultiMapValue(configuration, "Analyzer", "RearBrakeTemperatures", defaultRearBrakeTemperatures)
 			}
 		}
 
@@ -281,6 +408,17 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 		this.iOversteerThresholds := string2Values(",", getMultiMapValue(settings, "Setup Workbench"
 													  , prefix . "OversteerThresholds", defaultOversteerThresholds))
 		this.iLowspeedThreshold := getMultiMapValue(settings, "Setup Workbench", prefix . "LowspeedThreshold", defaultLowspeedThreshold)
+
+		this.iFrontTyreTemperatures := string2Values(",", getMultiMapValue(settings, "Setup Workbench"
+													    , prefix . "FrontTyreTemperatures", defaultFrontTyreTemperatures))
+		this.iRearTyreTemperatures := string2Values(",", getMultiMapValue(settings, "Setup Workbench"
+													   , prefix . "RearTyreTemperatures", defaultRearTyreTemperatures))
+		this.iOITemperatureDifference := getMultiMapValue(settings, "Setup Workbench", prefix . "TyreOITemperatureDifference", defaultOITemperatureDifference)
+
+		this.iFrontBrakeTemperatures := string2Values(",", getMultiMapValue(settings, "Setup Workbench"
+														 , prefix . "FrontBrakeTemperatures", defaultFrontBrakeTemperatures))
+		this.iRearBrakeTemperatures := string2Values(",", getMultiMapValue(settings, "Setup Workbench"
+														, prefix . "RearBrakeTemperatures", defaultRearBrakeTemperatures))
 
 		super.__New(workbench, simulator)
 
@@ -373,7 +511,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 	}
 
 	startTelemetryAnalyzer(calibrate := false) {
-		local settings := {}
+		local settings := {Temperatures: 2000}
 		local ignore, setting
 
 		this.stopTelemetryAnalyzer()
@@ -400,13 +538,186 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 		local collector := this.iTelemetryCollector
 
 		if collector {
-			this.iLastIssues := collector.Issues
+			this.iLastHandling := collector.Handling
 
 			collector.stopTelemetryCollector()
 		}
 
 		this.iTelemetryCollector := false
 	}
+
+	computeTemperatures(samples) {
+		local count := samples.Length
+		local tyreTemperatures := [[], [], [], []]
+		local brakeTemperatures := [[], [], [], []]
+		local tyreOITemperatureDifferences := [[], [], [], []]
+		local issues := CaseInsenseMap()
+
+		getTemperatures(category, temperatures) {
+			local ignore, sample
+
+			for ignore, sample in samples
+				loop 4
+					temperatures[A_Index].Push(sample.%category%Temperatures[A_Index])
+		}
+
+		getOIDifferences() {
+			local ignore, sample, tyre, index
+
+			for ignore, sample in samples
+				if sample.HasProp("TyreOITemperatureDifferences")
+					loop 4
+						tyreOITemperatureDifferences[A_Index].Push(sample.TyreOITemperatureDifferences[A_Index])
+		}
+
+		computeTyreIssues(category, tyres, minThreshold, maxThreshold, idealValue) {
+			local coldHeavy := 0
+			local hotHeavy := 0
+			local coldMedium := 0
+			local hotMedium := 0
+			local coldLight := 0
+			local hotLight := 0
+			local difference, ignore, tyre, value, temperature, type, key
+
+			for ignore, tyre in tyres
+				for ignore, value in tyreTemperatures[tyre] {
+					difference := (value - idealValue)
+
+					if (value < minThreshold)
+						coldHeavy += 1
+					else if (value > maxThreshold)
+						hotHeavy += 1
+					else if ((difference < 0) && (Abs(difference) > (Abs(idealValue - minThreshold) / 4 * 3)))
+						coldMedium += 1
+					else if ((difference > 0) && (Abs(difference) > (Abs(idealValue - maxThreshold) / 4 * 3)))
+						hotMedium += 1
+					else if ((difference < 0) && (Abs(difference) > (Abs(idealValue - minThreshold) / 2)))
+						coldLight += 1
+					else if ((difference > 0) && (Abs(difference) > (Abs(idealValue - maxThreshold) / 2)))
+						hotLight += 1
+				}
+
+			for ignore, temperature in ["Cold", "Hot"] {
+				key := ("Tyre.Temperatures." . temperature . "." . category . ".Around")
+
+				for ignore, type in ["Heavy", "Medium", "Light"] {
+					%temperature%%type% /= 2
+
+					if %temperature%%type%
+						if issues.Has(key)
+							issues[key].Push({Severity: type, Frequency: Round(%temperature%%type% / count * 100)})
+						else
+							issues[key] := [{Severity: type, Frequency: Round(%temperature%%type% / count * 100)}]
+				}
+			}
+		}
+
+		computeOIIssues(category, tyres, oiThreshold) {
+			local overInner := 0
+			local overOuter := 0
+			local ignore, tyre, value, type, key, severity
+
+			getSeverity(key) {
+				local severity := 0
+				local ignore, issue
+
+				if issues.Has(key)
+					for ignore, issue in issues[key]
+						severity := Max(severity, inList(["Light", "Medium", "Heavy"], issue.Severity))
+
+				return (severity ? ["Light", "Medium", "Heavy"][severity] : false)
+			}
+
+			for ignore, tyre in tyres
+				for ignore, value in tyreOITemperatureDifferences[tyre]
+					if (Abs(value) > oiThreshold)
+						if (value < 0)
+							overOuter += 1
+						else
+							overInner += 1
+
+			for ignore, temperature in ["Cold", "Hot"]
+				for ignore, type in ["Inner", "Outer"] {
+					over%type% /= 2
+
+					if over%type% {
+						key := ("Tyre.Temperatures." . temperature . "." . category . "." . type)
+
+						severity := getSeverity("Tyre.Temperatures." . temperature . "." . category . ".Around")
+
+						if severity
+							if issues.Has(key)
+								issues[key].Push({Severity: severity, Frequency: Round(over%type% / count * 100)})
+							else
+								issues[key] := [{Severity: severity, Frequency: Round(over%type% / count * 100)}]
+					}
+				}
+		}
+
+		computeBrakeIssues(category, positions, minThreshold, maxThreshold, idealValue) {
+			local coldHeavy, hotHeavy, coldMedium, hotMedium, coldLight, hotLight, difference
+			local ignore, position, value, key, type
+
+			coldHeavy := 0
+			hotHeavy := 0
+			coldMedium := 0
+			hotMedium := 0
+			coldLight := 0
+			hotLight := 0
+
+			for ignore, position in positions
+				for ignore, value in brakeTemperatures[position] {
+					difference := (value - idealValue)
+
+					if (value < minThreshold)
+						coldHeavy += 1
+					else if (value > maxThreshold)
+						hotHeavy += 1
+					else if ((difference < 0) && (Abs(difference) > (Abs(idealValue - minThreshold) / 4 * 3)))
+						coldMedium += 1
+					else if ((difference > 0) && (Abs(difference) > (Abs(idealValue - maxThreshold) / 4 * 3)))
+						hotMedium += 1
+					else if ((difference < 0) && (Abs(difference) > (Abs(idealValue - minThreshold) / 2)))
+						coldLight += 1
+					else if ((difference > 0) && (Abs(difference) > (Abs(idealValue - maxThreshold) / 2)))
+						hotLight += 1
+				}
+
+			for ignore, temperature in ["Hot"] {
+				key := ("Brake.Temperatures." . category)
+
+				for ignore, type in ["Heavy", "Medium", "Light"] {
+					%temperature%%type% /= 2
+
+					if %temperature%%type%
+						if issues.Has(key)
+							issues[key].Push({Severity: type, Frequency: Round(%temperature%%type% / count * 100)})
+						else
+							issues[key] := [{Severity: type, Frequency: Round(%temperature%%type% / count * 100)}]
+				}
+			}
+		}
+
+		issues.Default := []
+
+		getTemperatures("Tyre", tyreTemperatures)
+
+		computeTyreIssues("Front", [1, 2], this.FrontTyreTemperatures[1], this.FrontTyreTemperatures[3], this.FrontTyreTemperatures[2])
+		computeTyreIssues("Rear", [3, 4], this.RearTyreTemperatures[1], this.RearTyreTemperatures[3], this.RearTyreTemperatures[2])
+
+		getOIDifferences()
+
+		computeOIIssues("Front", [1, 2], this.OITemperatureDifference)
+		computeOIIssues("Rear", [3, 4], this.OITemperatureDifference)
+
+		getTemperatures("Brake", brakeTemperatures)
+
+		computeBrakeIssues("Front", [1, 2], this.FrontBrakeTemperatures[1], this.FrontBrakeTemperatures[3], this.FrontBrakeTemperatures[2])
+		computeBrakeIssues("Rear", [3, 4], this.RearBrakeTemperatures[1], this.RearBrakeTemperatures[3], this.RearBrakeTemperatures[2])
+
+		return issues
+	}
+
 }
 
 ;;;-------------------------------------------------------------------------;;;
@@ -426,7 +737,7 @@ setAnalyzerSetting(analyzer, key, value) {
 
 runAnalyzer(commandOrAnalyzer := false, arguments*) {
 	local x, y, ignore, widget, workbench, row, include
-	local issues, filteredIssues, issue, type, speed, severity, where, value, newValue, frequency
+	local issues, filteredHandling, issue, temperatures, type, speed, severity, where, value, newValue, frequency
 	local characteristic, characteristicLabels, fromEdit
 	local calibration, theListView, chosen, tabView
 
@@ -455,6 +766,21 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 	static acousticFeedbackDropDown
 
+	static minFrontTyreTemperatureEdit
+	static maxFrontTyreTemperatureEdit
+	static idealFrontTyreTemperatureEdit
+	static minRearTyreTemperatureEdit
+	static maxRearTyreTemperatureEdit
+	static idealRearTyreTemperatureEdit
+	static maxOITemperatureDifferenceEdit
+
+	static minFrontBrakeTemperatureEdit
+	static maxFrontBrakeTemperatureEdit
+	static idealFrontBrakeTemperatureEdit
+	static minRearBrakeTemperatureEdit
+	static maxRearBrakeTemperatureEdit
+	static idealRearBrakeTemperatureEdit
+
 	static issuesListView
 
 	static resultListView
@@ -469,6 +795,19 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 	static analyzeWidgets := []
 
 	static updateTask := false
+
+	validateTemperature(field, *) {
+		local value := internalValue("Float", field.Text)
+
+		if (!isNumber(value) || (value <= 0)) {
+			field.Text := (field.HasProp("ValidText") ? field.ValidText : "")
+
+			loop 10
+				SendInput("{Right}")
+		}
+		else
+			field.ValidText := field.Text
+	}
 
 	noSelect(listView, *) {
 		loop listView.GetCount()
@@ -575,7 +914,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		analyzer.startTelemetryAnalyzer()
 
-		updateTask := PeriodicTask(runAnalyzer.Bind("UpdateIssues"), 5000)
+		updateTask := PeriodicTask(runAnalyzer.Bind("UpdateSamples"), 5000)
 
 		updateTask.start()
 	}
@@ -598,28 +937,24 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		state := "Analyze"
 
-		runAnalyzer("UpdateTelemetry", runAnalyzer("FilterTelemetry"))
+		runAnalyzer("UpdateTelemetry", runAnalyzer("FilterHandling"), runAnalyzer("FilterTemperatures"))
 	}
 	else if (commandOrAnalyzer == "Threshold")
-		runAnalyzer("UpdateTelemetry", runAnalyzer("FilterTelemetry"))
-	else if (commandOrAnalyzer == "UpdateIssues") {
-		issues := analyzer.Issues
-
-		if (issues.Count > 0)
-			runAnalyzer("UpdateTelemetry", issues)
-	}
-	else if (commandOrAnalyzer == "FilterTelemetry") {
+		runAnalyzer("UpdateTelemetry", runAnalyzer("FilterHandling"), runAnalyzer("FilterTemperatures"))
+	else if (commandOrAnalyzer == "UpdateSamples")
+		runAnalyzer("UpdateTelemetry", analyzer.Handling, analyzer.Temperatures)
+	else if (commandOrAnalyzer == "FilterHandling") {
 		workbench := analyzer.Workbench
 		characteristicLabels := getMultiMapValues(workbench.Definition, "Workbench.Characteristics.Labels")
 		final := ((arguments.Length > 0) && arguments[1])
 
-		issues := analyzer.Issues.Clone()
+		issues := analyzer.Handling.Clone()
 
 		for ignore, type in ["Oversteer", "Understeer"]
 			for ignore, speed in ["Slow", "Fast"]
 				for ignore, where in ["Entry", "Apex", "Exit"] {
 					where := (type . ".Corner." . where . "." . speed)
-					filteredIssues := []
+					filteredHandling := []
 
 					for ignore, issue in issues[where] {
 						severity := issue.Severity
@@ -647,10 +982,57 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 						}
 
 						if include
-							filteredIssues.Push(issue)
+							filteredHandling.Push(issue)
 					}
 
-					issues[where] := filteredIssues
+					issues[where] := filteredHandling
+				}
+
+		return issues
+	}
+	else if (commandOrAnalyzer == "FilterTemperatures") {
+		workbench := analyzer.Workbench
+		characteristicLabels := getMultiMapValues(workbench.Definition, "Workbench.Characteristics.Labels")
+		final := ((arguments.Length > 0) && arguments[1])
+
+		issues := analyzer.Handling.Clone()
+
+		for ignore, type in ["Oversteer", "Understeer"]
+			for ignore, speed in ["Slow", "Fast"]
+				for ignore, where in ["Entry", "Apex", "Exit"] {
+					where := (type . ".Corner." . where . "." . speed)
+					filteredHandling := []
+
+					for ignore, issue in issues[where] {
+						severity := issue.Severity
+
+						include := (issue.Frequency >= applyThresholdSlider.Value)
+
+						if (include && final) {
+							include := false
+
+							characteristic := characteristicLabels[where]
+
+							row := resultListView.GetNext(0, "C")
+
+							while row {
+								value := resultListView.GetText(row)
+
+								if (value = characteristic) {
+									include := true
+
+									break
+								}
+								else
+									row := resultListView.GetNext(row, "C")
+							}
+						}
+
+						if include
+							filteredHandling.Push(issue)
+					}
+
+					issues[where] := filteredHandling
 				}
 
 		return issues
@@ -659,6 +1041,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		workbench := analyzer.Workbench
 		characteristicLabels := getMultiMapValues(workbench.Definition, "Workbench.Characteristics.Labels")
 		issues := arguments[1]
+		temperatures := arguments[2]
 
 		theListView := ((state = "Run") ? issuesListView : resultListView)
 
@@ -680,7 +1063,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 			theListView.ModifyCol(A_Index, "AutoHdr")
 	}
 	else if ((commandOrAnalyzer == "Activate") && (state = "Analyze"))
-		result := runAnalyzer("FilterTelemetry", true)
+		result := combine(runAnalyzer("FilterHandling", true), runAnalyzer("FilterTemperatures", true))
 	else {
 		analyzer := commandOrAnalyzer
 		updateTask := false
@@ -716,7 +1099,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 			analyzerGui.Add("Text", "x158 yp w180 h23 +0x200", SessionDatabase.getTrackName(analyzer.Simulator, analyzer.Track))
 		}
 
-		tabView := analyzerGui.Add("Tab3", "x16 yp+30 w340 h348 Section", collect(["Handling", "Tyres", "Brakes"], translate))
+		tabView := analyzerGui.Add("Tab3", "x16 yp+30 w340 h348 Section", collect(["Handling", "Temperatures"], translate))
 		widget36 := tabView
 
 		tabView .UseTab(1)
@@ -846,7 +1229,70 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 			lightUndersteerThresholdSlider.Value := 0
 		}
 
-		loop 36
+		tabView .UseTab(2)
+
+		analyzerGui.SetFont("Italic", "Arial")
+
+		widget37 := analyzerGui.Add("GroupBox", "x24 ys+30 w320 h130", translate("Tyres"))
+
+		analyzerGui.SetFont("Norm", "Arial")
+
+		widget38 := analyzerGui.Add("Text", "x174 yp+17 w45 h23 +0x200 Center", translate("Min"))
+		widget39 := analyzerGui.Add("Text", "x224 yp w45 h23 +0x200 Center", translate("Max"))
+		widget40 := analyzerGui.Add("Text", "x274 yp w45 h23 +0x200 Center", translate("Ideal"))
+
+		widget41 := analyzerGui.Add("Text", "x32 yp+24 w130 h23 +0x200", translate("Target Front"))
+		minFrontTyreTemperatureEdit := analyzerGui.Add("Edit", "x174 yp w45 h23 +0x200", displayValue("Float", convertUnit("Temperature", 70)))
+		maxFrontTyreTemperatureEdit := analyzerGui.Add("Edit", "x224 yp w45 h23 +0x200", displayValue("Float", convertUnit("Temperature", 95)))
+		idealFrontTyreTemperatureEdit := analyzerGui.Add("Edit", "x274 yp w45 h23 +0x200", displayValue("Float", convertUnit("Temperature", 80)))
+		widget42 := minFrontTyreTemperatureEdit
+		widget43 := maxFrontTyreTemperatureEdit
+		widget44 := idealFrontTyreTemperatureEdit
+
+		widget45 := analyzerGui.Add("Text", "x32 yp+24 w130 h23 +0x200", translate("Target Rear"))
+		minRearTyreTemperatureEdit := analyzerGui.Add("Edit", "x174 yp w45 h23 +0x200", displayValue("Float", convertUnit("Temperature", 70)))
+		maxRearTyreTemperatureEdit := analyzerGui.Add("Edit", "x224 yp w45 h23 +0x200", displayValue("Float", convertUnit("Temperature", 95)))
+		idealRearTyreTemperatureEdit := analyzerGui.Add("Edit", "x274 yp w45 h23 +0x200", displayValue("Float", convertUnit("Temperature", 80)))
+		widget46 := minRearTyreTemperatureEdit
+		widget47 := maxRearTyreTemperatureEdit
+		widget48 := idealRearTyreTemperatureEdit
+
+		widget49 := analyzerGui.Add("Text", "x32 yp+30 w130 h23 +0x200", translate("Max OI difference"))
+		maxOITemperatureDifferenceEdit := analyzerGui.Add("Edit", "x174 yp w45 h23 +0x200", displayValue("Float", convertUnit("Temperature", 10)))
+		widget50 := maxOITemperatureDifferenceEdit
+
+		widget51 := analyzerGui.Add("GroupBox", "x24 yp+42 w320 h100", translate("Brakes"))
+
+		analyzerGui.SetFont("Norm", "Arial")
+
+		widget52 := analyzerGui.Add("Text", "x174 yp+17 w45 h23 +0x200 Center", translate("Min"))
+		widget53 := analyzerGui.Add("Text", "x224 yp w45 h23 +0x200 Center", translate("Max"))
+		widget54 := analyzerGui.Add("Text", "x274 yp w45 h23 +0x200 Center", translate("Ideal"))
+
+		widget55 := analyzerGui.Add("Text", "x32 yp+24 w130 h23 +0x200", translate("Target Front"))
+		minFrontBrakeTemperatureEdit := analyzerGui.Add("Edit", "x174 yp w45 h23 +0x200", displayValue("Float", convertUnit("Temperature", 300)))
+		maxFrontBrakeTemperatureEdit := analyzerGui.Add("Edit", "x224 yp w45 h23 +0x200", displayValue("Float", convertUnit("Temperature", 680)))
+		idealFrontBrakeTemperatureEdit := analyzerGui.Add("Edit", "x274 yp w45 h23 +0x200", displayValue("Float", convertUnit("Temperature", 550)))
+		widget56 := minFrontBrakeTemperatureEdit
+		widget57 := maxFrontBrakeTemperatureEdit
+		widget58 := idealFrontBrakeTemperatureEdit
+
+		widget59 := analyzerGui.Add("Text", "x32 yp+24 w130 h23 +0x200", translate("Target Rear"))
+		minRearBrakeTemperatureEdit := analyzerGui.Add("Edit", "x174 yp w45 h23 +0x200", displayValue("Float", convertUnit("Temperature", 300)))
+		maxRearBrakeTemperatureEdit := analyzerGui.Add("Edit", "x224 yp w45 h23 +0x200", displayValue("Float", convertUnit("Temperature", 680)))
+		idealRearBrakeTemperatureEdit := analyzerGui.Add("Edit", "x274 yp w45 h23 +0x200", displayValue("Float", convertUnit("Temperature", 550)))
+		widget60 := minRearBrakeTemperatureEdit
+		widget61 := maxRearBrakeTemperatureEdit
+		widget62 := idealRearBrakeTemperatureEdit
+
+		for ignore, widget in [minFrontTyreTemperatureEdit, maxFrontTyreTemperatureEdit, idealFrontTyreTemperatureEdit
+							 , minRearTyreTemperatureEdit, maxRearTyreTemperatureEdit, idealRearTyreTemperatureEdit
+							 , maxOITemperatureDifferenceEdit
+							 , minRearBrakeTemperatureEdit, maxRearBrakeTemperatureEdit, idealRearBrakeTemperatureEdit
+							 , minRearBrakeTemperatureEdit, maxRearBrakeTemperatureEdit, idealRearBrakeTemperatureEdit]
+			widget.OnEvent("Change", validateTemperature.Bind(widget))
+
+		loop 62
 			prepareWidgets.Push(%"widget" . A_Index%)
 
 		tabView .UseTab(0)
@@ -948,7 +1394,7 @@ runCalibrator(commandOrAnalyzer, *) {
 		analyzer.startTelemetryAnalyzer(true)
 	}
 	else if ((commandOrAnalyzer == "Activate") && (state = "Clean")) {
-		cleanValues := analyzer.Issues
+		cleanValues := analyzer.Handling
 
 		analyzer.stopTelemetryAnalyzer()
 
@@ -960,7 +1406,7 @@ runCalibrator(commandOrAnalyzer, *) {
 		analyzer.startTelemetryAnalyzer(true)
 	}
 	else if ((commandOrAnalyzer == "Activate") && (state = "Push")) {
-		overValues := analyzer.Issues
+		overValues := analyzer.Handling
 
 		analyzer.stopTelemetryAnalyzer()
 

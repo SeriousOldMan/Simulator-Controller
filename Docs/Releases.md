@@ -1,12 +1,13 @@
 ## 5.4.1.0-release 10/13/23 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
-  3. Many functional additions to the Driving Coach.
+  3. Fixed a critical bug, that triggered an endless loop in the isntall and update process, when the current Windows user has Admin privileges.
+  4. Many functional additions to the Driving Coach.
      - Data for the 5 recent laps about your own performance and the performance of your opponents is available to the Driving Coach.
 	 - The instructions have been updated and extended. Please read the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-541) for instructions how to update your configuration accordingly.
 	 - Extensive [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#instructions) has been added which describes in detail how to use instructions to customize the behaviour and personality of the Driving Coach to your personal taste.
-  4. New data categories in the telemetry analyzer of "Setup Workbench". See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-telemetry-analyzer) for more information.
-  5. Added "Practice Center" to Windows Start menu
+  5. New data categories in the telemetry analyzer of "Setup Workbench". See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-telemetry-analyzer) for more information.
+  6. Added "Practice Center" to Windows Start menu
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-541), if you are using the Driving Coach.
 

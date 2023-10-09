@@ -579,10 +579,10 @@ class DrivingCoach extends GridRaceAssistant {
 										if (++index > 1)
 											handling .= "`n"
 
-										handling .= ("- " . substituteVariables(translate("%severity% %type% on %speed% corner %where%")
-																			  , {severity: translate(issue.Severity)
-																			   , type: translate(type), speed: translate(speed)
-																			   , where: where}))
+										handling .= ("- " . substituteVariables(translate("%severity% %type% at %speed% corner %where%")
+																			  , {severity: translate(issue.Severity . A_Space)
+																			   , type: translate(type . A_Space), speed: translate(speed . A_Space)
+																			   , where: where . A_Space}))
 									}
 
 						if index

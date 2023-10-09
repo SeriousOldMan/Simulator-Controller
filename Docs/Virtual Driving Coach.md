@@ -165,10 +165,13 @@ Since an interaction with Aiden always is kind of a free dialog, the only way to
 3. Don't hesitate to ask for more specific information
    LLM based chat bots tend to give more general information in their first answer, but you can always guide them to more specific answers with follow up questions.
 
-4. Give instructions how the answer should look like
+4. Also don't hesitate to correct wrong or incomplete answers
+   If you think, that an answer is wrong, or that Aiden missed an important aspect or did not take data into account, which had been provided in the instructions (see above), you can mention that fact and ask for extended or corrected information.
+
+5. Give instructions how the answer should look like
    LLMs *understand* instructions like "Keep it short." or "Don't be so formal."
 
-5. Rephrase your questions
+6. Rephrase your questions
    If Aiden still resists to give you the desired answer, you can try to rephrase your question. Sometimes using a different word, a synonym, will do the job.
 
 The above list are only few of the rules to follow, though the most important ones, when working with an LLM based AI. There are many good articles on te web about the so called *prompt engineering*, which can give you further hints.

@@ -395,6 +395,12 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 		defaultOversteerThresholds := getMultiMapValue(settings, "Setup Workbench", prefix . "OversteerThresholds", defaultOversteerThresholds)
 		defaultLowspeedThreshold := getMultiMapValue(settings, "Setup Workbench", prefix . "LowspeedThreshold", defaultLowspeedThreshold)
 
+		defaultFrontTyreTemperatures := getMultiMapValue(settings, "Setup Workbench", prefix . "FrontTyreTemperatures", defaultFrontTyreTemperatures)
+		defaultRearTyreTemperatures := getMultiMapValue(settings, "Setup Workbench", prefix . "RearTyreTemperatures", defaultRearTyreTemperatures)
+		defaultOITemperatureDifference := getMultiMapValue(settings, "Setup Workbench", prefix . "TyreOITemperatureDifference", defaultOITemperatureDifference)
+		defaultFrontBrakeTemperatures := getMultiMapValue(settings, "Setup Workbench", prefix . "FrontBrakeTemperatures", defaultFrontBrakeTemperatures)
+		defaultRearBrakeTemperatures := getMultiMapValue(settings, "Setup Workbench", prefix . "RearBrakeTemperatures", defaultRearBrakeTemperatures)
+
 		prefix := (simulator . "." . (selectedCar ? selectedCar : "*") . "." . (selectedTrack ? selectedTrack : "*") . ".")
 
 		this.iSteerLock := getMultiMapValue(settings, "Setup Workbench", prefix . "SteerLock", this.SteerLock)
@@ -1373,23 +1379,23 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		widget40 := analyzerGui.Add("Text", "x274 yp w45 h23 +0x200 Center", translate("Ideal"))
 
 		widget41 := analyzerGui.Add("Text", "x32 yp+24 w130 h23 +0x200", translate("Target Front"))
-		minFrontTyreTemperatureEdit := analyzerGui.Add("Edit", "x174 yp w45 h23 +0x200", displayValue("Float", convertUnit("Temperature", 70)))
-		maxFrontTyreTemperatureEdit := analyzerGui.Add("Edit", "x224 yp w45 h23 +0x200", displayValue("Float", convertUnit("Temperature", 95)))
-		idealFrontTyreTemperatureEdit := analyzerGui.Add("Edit", "x274 yp w45 h23 +0x200", displayValue("Float", convertUnit("Temperature", 80)))
+		minFrontTyreTemperatureEdit := analyzerGui.Add("Edit", "x174 yp w45 h23 +0x200", displayValue("Float", convertUnit("Temperature", analyzer.FrontTyreTemperatures[1])))
+		maxFrontTyreTemperatureEdit := analyzerGui.Add("Edit", "x224 yp w45 h23 +0x200", displayValue("Float", convertUnit("Temperature", analyzer.FrontTyreTemperatures[3])))
+		idealFrontTyreTemperatureEdit := analyzerGui.Add("Edit", "x274 yp w45 h23 +0x200", displayValue("Float", convertUnit("Temperature", analyzer.FrontTyreTemperatures[2])))
 		widget42 := minFrontTyreTemperatureEdit
 		widget43 := maxFrontTyreTemperatureEdit
 		widget44 := idealFrontTyreTemperatureEdit
 
 		widget45 := analyzerGui.Add("Text", "x32 yp+24 w130 h23 +0x200", translate("Target Rear"))
-		minRearTyreTemperatureEdit := analyzerGui.Add("Edit", "x174 yp w45 h23 +0x200", displayValue("Float", convertUnit("Temperature", 70)))
-		maxRearTyreTemperatureEdit := analyzerGui.Add("Edit", "x224 yp w45 h23 +0x200", displayValue("Float", convertUnit("Temperature", 95)))
-		idealRearTyreTemperatureEdit := analyzerGui.Add("Edit", "x274 yp w45 h23 +0x200", displayValue("Float", convertUnit("Temperature", 80)))
+		minRearTyreTemperatureEdit := analyzerGui.Add("Edit", "x174 yp w45 h23 +0x200", displayValue("Float", convertUnit("Temperature", analyzer.RearTyreTemperatures[1])))
+		maxRearTyreTemperatureEdit := analyzerGui.Add("Edit", "x224 yp w45 h23 +0x200", displayValue("Float", convertUnit("Temperature", analyzer.RearTyreTemperatures[3])))
+		idealRearTyreTemperatureEdit := analyzerGui.Add("Edit", "x274 yp w45 h23 +0x200", displayValue("Float", convertUnit("Temperature", analyzer.RearTyreTemperatures[2])))
 		widget46 := minRearTyreTemperatureEdit
 		widget47 := maxRearTyreTemperatureEdit
 		widget48 := idealRearTyreTemperatureEdit
 
 		widget49 := analyzerGui.Add("Text", "x32 yp+30 w130 h23 +0x200", translate("Max OI difference"))
-		maxOITemperatureDifferenceEdit := analyzerGui.Add("Edit", "x174 yp w45 h23 +0x200", displayValue("Float", convertUnit("Temperature", 10)))
+		maxOITemperatureDifferenceEdit := analyzerGui.Add("Edit", "x174 yp w45 h23 +0x200", displayValue("Float", convertUnit("Temperature", analyzer.OITemperatureDifference)))
 		widget50 := maxOITemperatureDifferenceEdit
 
 		widget51 := analyzerGui.Add("GroupBox", "x24 yp+42 w320 h100", translate("Brakes"))
@@ -1401,17 +1407,17 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		widget54 := analyzerGui.Add("Text", "x274 yp w45 h23 +0x200 Center", translate("Ideal"))
 
 		widget55 := analyzerGui.Add("Text", "x32 yp+24 w130 h23 +0x200", translate("Target Front"))
-		minFrontBrakeTemperatureEdit := analyzerGui.Add("Edit", "x174 yp w45 h23 +0x200", displayValue("Float", convertUnit("Temperature", 300)))
-		maxFrontBrakeTemperatureEdit := analyzerGui.Add("Edit", "x224 yp w45 h23 +0x200", displayValue("Float", convertUnit("Temperature", 680)))
-		idealFrontBrakeTemperatureEdit := analyzerGui.Add("Edit", "x274 yp w45 h23 +0x200", displayValue("Float", convertUnit("Temperature", 550)))
+		minFrontBrakeTemperatureEdit := analyzerGui.Add("Edit", "x174 yp w45 h23 +0x200", displayValue("Float", convertUnit("Temperature", analyzer.FrontBrakeTemperatures[1])))
+		maxFrontBrakeTemperatureEdit := analyzerGui.Add("Edit", "x224 yp w45 h23 +0x200", displayValue("Float", convertUnit("Temperature", analyzer.FrontBrakeTemperatures[3])))
+		idealFrontBrakeTemperatureEdit := analyzerGui.Add("Edit", "x274 yp w45 h23 +0x200", displayValue("Float", convertUnit("Temperature", analyzer.FrontBrakeTemperatures[2])))
 		widget56 := minFrontBrakeTemperatureEdit
 		widget57 := maxFrontBrakeTemperatureEdit
 		widget58 := idealFrontBrakeTemperatureEdit
 
 		widget59 := analyzerGui.Add("Text", "x32 yp+24 w130 h23 +0x200", translate("Target Rear"))
-		minRearBrakeTemperatureEdit := analyzerGui.Add("Edit", "x174 yp w45 h23 +0x200", displayValue("Float", convertUnit("Temperature", 300)))
-		maxRearBrakeTemperatureEdit := analyzerGui.Add("Edit", "x224 yp w45 h23 +0x200", displayValue("Float", convertUnit("Temperature", 680)))
-		idealRearBrakeTemperatureEdit := analyzerGui.Add("Edit", "x274 yp w45 h23 +0x200", displayValue("Float", convertUnit("Temperature", 550)))
+		minRearBrakeTemperatureEdit := analyzerGui.Add("Edit", "x174 yp w45 h23 +0x200", displayValue("Float", convertUnit("Temperature", analyzer.RearBrakeTemperatures[1])))
+		maxRearBrakeTemperatureEdit := analyzerGui.Add("Edit", "x224 yp w45 h23 +0x200", displayValue("Float", convertUnit("Temperature", analyzer.RearBrakeTemperatures[3])))
+		idealRearBrakeTemperatureEdit := analyzerGui.Add("Edit", "x274 yp w45 h23 +0x200", displayValue("Float", convertUnit("Temperature", analyzer.RearBrakeTemperatures[2])))
 		widget60 := minRearBrakeTemperatureEdit
 		widget61 := maxRearBrakeTemperatureEdit
 		widget62 := idealRearBrakeTemperatureEdit

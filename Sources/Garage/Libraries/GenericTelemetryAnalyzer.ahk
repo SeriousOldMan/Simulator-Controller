@@ -548,37 +548,26 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 
 	computeTemperatures(samples) {
 		local count := samples.Length
-		local tyreTemperaturesFL := []
-		local tyreTemperaturesFR := []
-		local tyreTemperaturesRL := []
-		local tyreTemperaturesRR := []
-		local tyreOITemperatureDifferencesFL := []
-		local tyreOITemperatureDifferencesFR := []
-		local tyreOITemperatureDifferencesRL := []
-		local tyreOITemperatureDifferencesRR := []
-		local brakeTemperaturesFL := []
-		local brakeTemperaturesFR := []
-		local brakeTemperaturesRL := []
-		local brakeTemperaturesRR := []
+		local tyreTemperatures := [[], [], [], []]
+		local brakeTemperatures := [[], [], [], []]
+		local tyreOITemperatureDifferences := [[], [], [], []]
 		local issues := CaseInsenseMap()
 
-		getTemperatures(category) {
-			local ignore, sample, tyre, index
-			static descriptors := Map("FL", 1, "FR", 2, "RL", 3, "RR", 4)
+		getTemperatures(category, temperatures) {
+			local ignore, sample
 
 			for ignore, sample in samples
-				for tyre, index in descriptors
-					%category . "Temperatures" . tyre%.Push(sample.%category%Temperatures[index])
+				loop 4
+					temperatures[A_Index].Push(sample.%category%Temperatures[A_Index])
 		}
 
 		getOIDifferences() {
 			local ignore, sample, tyre, index
-			static descriptors := Map("FL", 1, "FR", 2, "RL", 3, "RR", 4)
 
 			for ignore, sample in samples
-				for tyre, index in descriptors
-					if sample.HasProp("TyreOITemperatureDifferences")
-						tyreOITemperatureDifferences%tyre%.Push(sample.TyreOITemperatureDifferences[index])
+				if sample.HasProp("TyreOITemperatureDifferences")
+					loop 4
+						tyreOITemperatureDifferences[A_Index].Push(sample.TyreOITemperatureDifferences[A_Index])
 		}
 
 		computeTyreIssues(category, tyres, minThreshold, maxThreshold, idealValue) {
@@ -588,28 +577,10 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 			local hotMedium := 0
 			local coldLight := 0
 			local hotLight := 0
-			local difference, ignore, tyre, value
-
-			createTyreIssues(position) {
-				local key, ignore, category, type
-
-				for ignore, category in ["Cold", "Hot"] {
-					key := ("Tyre.Temperatures." . category . "." . position . ".Around")
-
-					for ignore, type in ["Heavy", "Medium", "Light"] {
-						%category%%type% /= 2
-
-						if %category%%type%
-							if issues.Has(key)
-								issues[key].Push({Severity: type, Frequency: Round(%category%%type% / count * 100)})
-							else
-								issues[key] := [{Severity: type, Frequency: Round(%category%%type% / count * 100)}]
-					}
-				}
-			}
+			local difference, ignore, tyre, value, temperature, type, key
 
 			for ignore, tyre in tyres
-				for ignore, value in tyreTemperatures%tyre% {
+				for ignore, value in tyreTemperatures[tyre] {
 					difference := (value - idealValue)
 
 					if (value < minThreshold)
@@ -626,78 +597,66 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 						hotLight += 1
 				}
 
-			createTyreIssues(category)
+			for ignore, temperature in ["Cold", "Hot"] {
+				key := ("Tyre.Temperatures." . temperature . "." . category . ".Around")
+
+				for ignore, type in ["Heavy", "Medium", "Light"] {
+					%temperature%%type% /= 2
+
+					if %temperature%%type%
+						if issues.Has(key)
+							issues[key].Push({Severity: type, Frequency: Round(%temperature%%type% / count * 100)})
+						else
+							issues[key] := [{Severity: type, Frequency: Round(%temperature%%type% / count * 100)}]
+				}
+			}
 		}
 
 		computeOIIssues(category, tyres, oiThreshold) {
 			local overInner := 0
 			local overOuter := 0
-			local ignore, tyre, value
+			local ignore, tyre, value, type, key, severity
 
-			createOIIssues(position) {
-				local ignore, category, type, key, severity
+			getSeverity(key) {
+				local severity := 0
+				local ignore, issue
 
-				getSeverity(key) {
-					local severity := 0
-					local ignore, issue
+				if issues.Has(key)
+					for ignore, issue in issues[key]
+						severity := Max(severity, inList(["Light", "Medium", "Heavy"], issue.Severity))
 
-					if issues.Has(key)
-						for ignore, issue in issues[key]
-							severity := Max(severity, inList(["Light", "Medium", "Heavy"], issue.Severity))
-
-					return (severity ? ["Light", "Medium", "Heavy"][severity] : false)
-				}
-
-				for ignore, category in ["Cold", "Hot"]
-					for ignore, type in ["Inner", "Outer"] {
-						over%type% /= 2
-
-						if over%type% {
-							key := ("Tyre.Temperatures." . category . "." . position . "." . type)
-
-							severity := getSeverity("Tyre.Temperatures." . category . "." . position . ".Around")
-
-							if severity
-								if issues.Has(key)
-									issues[key].Push({Severity: severity, Frequency: Round(over%type% / count * 100)})
-								else
-									issues[key] := [{Severity: severity, Frequency: Round(over%type% / count * 100)}]
-						}
-					}
+				return (severity ? ["Light", "Medium", "Heavy"][severity] : false)
 			}
 
 			for ignore, tyre in tyres
-				for ignore, value in tyreOITemperatureDifferences%tyre%
+				for ignore, value in tyreOITemperatureDifferences[tyre]
 					if (Abs(value) > oiThreshold)
 						if (value < 0)
 							overOuter += 1
 						else
 							overInner += 1
 
-			createOIIssues(category)
+			for ignore, temperature in ["Cold", "Hot"]
+				for ignore, type in ["Inner", "Outer"] {
+					over%type% /= 2
+
+					if over%type% {
+						key := ("Tyre.Temperatures." . temperature . "." . category . "." . type)
+
+						severity := getSeverity("Tyre.Temperatures." . temperature . "." . category . ".Around")
+
+						if severity
+							if issues.Has(key)
+								issues[key].Push({Severity: severity, Frequency: Round(over%type% / count * 100)})
+							else
+								issues[key] := [{Severity: severity, Frequency: Round(over%type% / count * 100)}]
+					}
+				}
 		}
 
 		computeBrakeIssues(category, positions, minThreshold, maxThreshold, idealValue) {
 			local coldHeavy, hotHeavy, coldMedium, hotMedium, coldLight, hotLight, difference
-			local ignore, position, value
-
-			createBrakeIssues(position) {
-				local key, ignore, category, type
-
-				for ignore, category in ["Hot"] {
-					key := ("Brake.Temperatures." . position)
-
-					for ignore, type in ["Heavy", "Medium", "Light"] {
-						%category%%type% /= 2
-
-						if %category%%type%
-							if issues.Has(key)
-								issues[key].Push({Severity: type, Frequency: Round(%category%%type% / count * 100)})
-							else
-								issues[key] := [{Severity: type, Frequency: Round(%category%%type% / count * 100)}]
-					}
-				}
-			}
+			local ignore, position, value, key, type
 
 			coldHeavy := 0
 			hotHeavy := 0
@@ -707,7 +666,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 			hotLight := 0
 
 			for ignore, position in positions
-				for ignore, value in brakeTemperatures%position% {
+				for ignore, value in brakeTemperatures[position] {
 					difference := (value - idealValue)
 
 					if (value < minThreshold)
@@ -722,29 +681,39 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 						coldLight += 1
 					else if ((difference > 0) && (Abs(difference) > (Abs(idealValue - maxThreshold) / 2)))
 						hotLight += 1
-
-					createBrakeIssues(category)
 				}
 
-			createBrakeIssues(category)
+			for ignore, temperature in ["Hot"] {
+				key := ("Brake.Temperatures." . category)
+
+				for ignore, type in ["Heavy", "Medium", "Light"] {
+					%temperature%%type% /= 2
+
+					if %temperature%%type%
+						if issues.Has(key)
+							issues[key].Push({Severity: type, Frequency: Round(%temperature%%type% / count * 100)})
+						else
+							issues[key] := [{Severity: type, Frequency: Round(%temperature%%type% / count * 100)}]
+				}
+			}
 		}
 
 		issues.Default := []
 
-		getTemperatures("Tyre")
+		getTemperatures("Tyre", tyreTemperatures)
 
-		computeTyreIssues("Front", ["FL", "FR"], this.FrontTyreTemperatures[1], this.FrontTyreTemperatures[3], this.FrontTyreTemperatures[2])
-		computeTyreIssues("Rear", ["RL", "RR"], this.RearTyreTemperatures[1], this.RearTyreTemperatures[3], this.RearTyreTemperatures[2])
+		computeTyreIssues("Front", [1, 2], this.FrontTyreTemperatures[1], this.FrontTyreTemperatures[3], this.FrontTyreTemperatures[2])
+		computeTyreIssues("Rear", [3, 4], this.RearTyreTemperatures[1], this.RearTyreTemperatures[3], this.RearTyreTemperatures[2])
 
 		getOIDifferences()
 
-		computeOIIssues("Front", ["FL", "FR"], this.OITemperatureDifference)
-		computeOIIssues("Rear", ["RL", "RR"], this.OITemperatureDifference)
+		computeOIIssues("Front", [1, 2], this.OITemperatureDifference)
+		computeOIIssues("Rear", [3, 4], this.OITemperatureDifference)
 
-		getTemperatures("Brake")
+		getTemperatures("Brake", brakeTemperatures)
 
-		computeBrakeIssues("Front", ["FL", "FR"], this.FrontBrakeTemperatures[1], this.FrontBrakeTemperatures[3], this.FrontBrakeTemperatures[2])
-		computeBrakeIssues("Rear", ["RL", "RR"], this.RearBrakeTemperatures[1], this.RearBrakeTemperatures[3], this.RearBrakeTemperatures[2])
+		computeBrakeIssues("Front", [1, 2], this.FrontBrakeTemperatures[1], this.FrontBrakeTemperatures[3], this.FrontBrakeTemperatures[2])
+		computeBrakeIssues("Rear", [3, 4], this.RearBrakeTemperatures[1], this.RearBrakeTemperatures[3], this.RearBrakeTemperatures[2])
 
 		return issues
 	}

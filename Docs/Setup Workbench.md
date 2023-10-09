@@ -20,13 +20,13 @@ Please note, that it is possible to describe and edit several issues at once. "S
 
 Using the "Load..." and "Save..." buttons in the lower left corner of the window, you can store and retrieve your current selection of issues to your hard drive. The current state will also be stored, when you hold down the Control key, while exiting "Setup Workbench". This state can be retrieved again, when you hold down the Control key, while starting "Setup Workbench". Last, but not least, when you load a set of saved issues, you suppress the deletion of all present issues by holding down the Control key as well. But be aware, that there is a restriction for the overall number of issues.
 
-### Real-time telemetry analyzer
+### Real-time Telemetry Analyzer
 
 "Setup Workbench" provides a special tool, which analyzes the telemetry data while you are driving to detect over- or understeering corner by corner. Handling issues can then be autmatically generated from this information. To start the analyzer, choose the "Analyzer..." item from the "Problem..." menu. The following window appears:
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/Development/Docs/Images/Telemetry%20Analyzer%201.JPG)
 
-In this dialog you can initialize the analyzer for your car and your targeted driving style.
+In this dialog you can initialize the analyzer for your car and your targeted driving style. Let's start withe first tab "Handling":
 
   1. It is absolutely cruicial, that the steering lock and steering ratio information is correct, since a calculated combination of these values together with the angular velocity are used to detect over- or understeer in a corner.
   
@@ -58,6 +58,12 @@ In this dialog you can initialize the analyzer for your car and your targeted dr
 	 Technical: The sliders indicate from which value a deviation of the ideal yaw angle is considered light, medium or heavy. If there is no glide angle at all, this value is 0. In the case of oversteer, the value is negative (the larger, the more drift angle) and in the case of understeer, the value is positive, the larger, the more understeer. If the wheelbase and the track width has been set exactly as known to the simulator, the values used here are ten times that of the slip angle (aka deviation of the ideal yaw angle). Therefore an oversteer angle by 3 degrees will have a value of -30.
 
   5. Finally, you can enable a short feedback sound, which varies in frequency and volume depending on over-/understeer events and their intensity. Lower tones indicate oversteering while higher tones indicate understeering.
+
+On the second tab "Temperatures" you can specify several thresholds for tyre and brake temepratures:
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/Development/Docs/Images/Telemetry%20Analyzer%204.JPG)
+
+The *Ideal* temperatures are the values you want to target in average over the course of a complete lap, both for the tyres as well as for the brakes. Going over "Max" or going under "Min" will increase the severity of any created temperature related issues. And, last but not least, when the difference between inner and outer tyre temperatures of a given tyre exceeds the given "Max OI Difference" value, a corresponding issue will be generated as well.
 
 Note: It is recommended to choose a car before entering the analyzer mode, since then some of the values in this dialog will be initialized with car specific data, depending on the chosen simulator.
 

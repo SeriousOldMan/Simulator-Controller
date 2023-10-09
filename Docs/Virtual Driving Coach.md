@@ -116,6 +116,40 @@ The next step is to setup everything in the configuration, either in "Simulator 
 
 Since the voice recognition quality is so important for a correct dialog with Aiden, I strongly recommend to use the "Azure" voice recognition engine. The "Desktop" engine may be used as well, especially, when you are using a high quality headset. And use the training mode of the Windows speech recognition, which is available in the Windows Settings -> Time & Language -> Speech  page.
 
+#### Instructions
+
+A very important aspect in the configuration of the Driving Coach are the so called instructions. Instructions provide the LLM with important context information and specifies, how it should react to your questions. It also defines the profession and personality of the Driving Coach. Last but not least, instructions are also used to convey data from your current session in a running simulator to the Driving Coach.
+
+Simulator Controller provide default instructions for all supported languages and instruction categories, but you are free to create your own instructions. Please note, that the default instructions are optimized for OpenAI language models. If you are using LLMs provided by GPT4All, you may have to adopt or totally rewrite the default instructions to work with the chosen model.
+
+Instructions support embedded variables. These variables are automatically replaced with information about the currently running simulation, your progress in the current race, or handling issues, and so on. Whether or not the Driving Coach will understand and use this information will heavily depend on the model and the current context of your discussion with the coach. But you may be successful in most cases by explicitly asking the Driving Coach to take a look at the supplied data.
+
+Below you find all instruction categories and the supported variables:
+
+| Instruction | What              | Description |
+|-------------|-------------------|-------------|
+| Character   | Scope             | This instruction is used always and must define the profession and the personality of the Driving Coach. You can also give general instructions like "Keep your answers short and precise". The default instruction creates a driving coach specialized in car handling and car physics. |
+|             | %name%            | %name% will be replaced with the configured name of the Driving Coach.          |
+| Simulation  | Scope             | This instruction is supplied, when an active simulation is detected.            |
+|             | %simulator%       | The name of the used simulator.                                                 |
+|             | %car%             | The name of the used car.                                                       |
+|             | %track%           | The name of the used track.                                                     |
+| Session     | Scope             | When you have already started a session, information about the session is provided using this instruction. |
+|             | %session%         | Either "Practice", "Qualifying", "Race" or "Other".                             |
+|             | %carNumber%       | The race number of your car.                                                    |
+|             | %overallPosition% | Your starting position in the overall gid.                                      |
+|             | %classPosition%   | The starting position in your class.                                            |
+| Stint       | Scope             | This instruction is updated with each lap and provides information about your performance as well as the current standings. |
+|             | %carNumber%       | The race number of your car.                                                    |
+|             | %lap%             | The lap you have just finished.                                                 |
+|             | %position%        | Your position in your class at the end of the last lap.                         |
+|             | %laps%            | This variable is substituted with a CSV table of your performance during the last laps. This table contains your position (overall and class) as well as the lap time and sector times. You can define the number of laps to be reported by defining the variable as %laps:5%, for example. |
+|             | %standings%       | This variable is replaced with a CSV table containing the current standings sorted by overall position. This table contains the race number, class, position (overall and class) as well as the lap time and sector times. |
+| Handling    | Scope             | This instruction is used only when handling problems had been detected in the telemetry. See the chapter below about detecting handling problems and discussin them with Aiden. |
+|             | %handling%        | An enumeration of all detected handing problems.                                |
+
+As said, all instructions can be modified in the configuration. You can even clear a complete instruction, if you want (and don't want to dicuss the corresponding information with Aiden). I do not recommend to clear the "Character" instruction, though.
+
 ## Interacting with Aiden
 
 Since an interaction with Aiden always is kind of a free dialog, the only way to interact with Aiden is through voice. Simply call your coach, for example with "Hey Aiden", and then formulate your first question. And here the fun begins. Interacting with an LLM feels like a natural human-2-human interaction, but you need to follow some rules to get the information you want:
@@ -131,13 +165,28 @@ Since an interaction with Aiden always is kind of a free dialog, the only way to
 3. Don't hesitate to ask for more specific information
    LLM based chat bots tend to give more general information in their first answer, but you can always guide them to more specific answers with follow up questions.
 
-4. Give instructions how the answer should look like
+4. Also don't hesitate to correct wrong or incomplete answers
+   If you think, that an answer is wrong, or that Aiden missed an important aspect or did not take data into account, which had been provided in the instructions (see above), you can mention that fact and ask for extended or corrected information.
+
+5. Give instructions how the answer should look like
    LLMs *understand* instructions like "Keep it short." or "Don't be so formal."
 
-5. Rephrase your questions
+6. Rephrase your questions
    If Aiden still resists to give you the desired answer, you can try to rephrase your question. Sometimes using a different word, a synonym, will do the job.
 
 The above list are only few of the rules to follow, though the most important ones, when working with an LLM based AI. There are many good articles on te web about the so called *prompt engineering*, which can give you further hints.
+
+### Detecting and discussing handling problems
+
+The Driving Coach will try to detect possible handling problems using the same mechanism used by the "Setup Workbench". In fact, Aiden uses the same [Telemetry Analyzer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-telemetry-analyzer) as the "Setup Workbench" and will use the same settings and thresholds you have selected for the same car and track last time.
+
+When at least one handling issue had been detected, the "Handling" instruction will be used to describe the handling issues to the Driving Coach. Each issue will be described on a single line in the instructions. Example:
+ 
+	- Heavy Understeer on Slow corner Entry
+	
+Using this knowledge, Aiden should be able to give you information how to cope with the given handling issues, for example by changing your driver inputs or changes to the car setup.
+
+Information: You can disable this instruction (and every other instruction as well), by clearing it in the configuration, if you don't want Aiden to give you information regarding handling problems.
 
 ## Troubleshooting
 

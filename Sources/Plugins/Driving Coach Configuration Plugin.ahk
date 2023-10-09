@@ -36,9 +36,9 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 	Instructions[qualified := true] {
 		Get {
 			if qualified
-				return ["Instructions.Character", "Instructions.Simulation", "Instructions.Session", "Instructions.Stint"]
+				return ["Instructions.Character", "Instructions.Simulation", "Instructions.Session", "Instructions.Stint", "Instructions.Handling"]
 			else
-				return ["Character", "Simulation", "Session", "Stint"]
+				return ["Character", "Simulation", "Session", "Stint", "Handling"]
 		}
 	}
 
@@ -104,13 +104,15 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		}
 
 		chooseInstructions(*) {
-			window["dcInstructionsEdit"].Value := this.Value[this.Instructions[true][window["dcInstructionsDropDown"].Value]]
+			local value := this.Value[this.Instructions[true][window["dcInstructionsDropDown"].Value]]
+
+			window["dcInstructionsEdit"].Value := ((value != false) ? value : "")
 
 			this.updateState()
 		}
 
 		updateInstructions(*) {
-			this.Value[this.Instructions[true][window["dcInstructionsDropDown"].Value]] := window["dcInstructionsEdit"].Value
+			this.Value[this.Instructions[true][window["dcInstructionsDropDown"].Value]] := ((Trim(window["dcInstructionsEdit"].Value) != "") ? window["dcInstructionsEdit"].Value : false)
 		}
 
 		reloadInstructions(*) {
@@ -124,12 +126,12 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 
 				this.initializeInstructions(this.iCurrentProvider, window["dcModelDropDown"].text, setting, true)
 
-				if (this.Value[setting] != "") {
-					if (setting = chosenSetting)
-						window["dcInstructionsEdit"].Value := this.Value[setting]
-				}
+				if (setting = chosenSetting)
+					window["dcInstructionsEdit"].Value := ((this.Value[setting] != false) ? this.Value[setting] : "")
+				/*
 				else
 					this.Value[setting] := oldValue
+				*/
 			}
 		}
 
@@ -240,11 +242,13 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 
 	initializeInstructions(provider, model, setting, edit := false) {
 		local providerConfiguration := this.iProviderConfigurations[provider]
-		local language
+		local language, value
 
 		static templates := readMultiMap(kResourcesDirectory . "Templates\Driving Coach.instructions")
 
-		if ((edit ? this.Value[setting] : providerConfiguration[setting]) = "") {
+		value := (edit ? this.Value[setting] : providerConfiguration[setting])
+
+		if (value = "") {
 			language := (isSet(SetupWizard) ? SetupWizard.Instance.getModuleValue("Driving Coach", "Language", getLanguage())
 											: getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Language", getLanguage()))
 
@@ -292,7 +296,10 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 				providerConfiguration["Model"] := "GPT 3.5 turbo"
 
 			for ignore, setting in concatenate(["Temperature", "MaxHistory", "Confirmation"], this.Instructions)
-				providerConfiguration[setting] := getMultiMapValue(configuration, "Driving Coach Personality", provider . "." . setting, defaults[setting])
+				if getMultiMapValue(configuration, "Driving Coach Personality", provider . "." . setting . ".Active", true)
+					providerConfiguration[setting] := getMultiMapValue(configuration, "Driving Coach Personality", provider . "." . setting, defaults[setting])
+				else
+					providerConfiguration[setting] := false
 
 			this.iProviderConfigurations[provider] := providerConfiguration
 
@@ -318,8 +325,16 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 			for ignore, setting in ["ServiceURL", "ServiceKey", "Model", "MaxTokens"]
 				setMultiMapValue(configuration, "Driving Coach Service", provider . "." . setting, providerConfiguration[setting])
 
-			for ignore, setting in concatenate(["Temperature", "MaxHistory", "Confirmation"], this.Instructions) {
+			for ignore, setting in ["Temperature", "MaxHistory", "Confirmation"] {
 				setMultiMapValue(configuration, "Driving Coach Personality", provider . "." . setting, providerConfiguration[setting])
+
+				if (provider = this.iCurrentProvider)
+					setMultiMapValue(configuration, "Driving Coach Personality", setting, providerConfiguration[setting])
+			}
+
+			for ignore, setting in this.Instructions {
+				setMultiMapValue(configuration, "Driving Coach Personality", provider . "." . setting, (providerConfiguration[setting] != false) ? providerConfiguration[setting] : "")
+				setMultiMapValue(configuration, "Driving Coach Personality", provider . "." . setting . ".Active", (Trim(providerConfiguration[setting]) != false))
 
 				if (provider = this.iCurrentProvider)
 					setMultiMapValue(configuration, "Driving Coach Personality", setting, providerConfiguration[setting])
@@ -361,7 +376,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		this.loadModels(this.iCurrentProvider, configuration["Model"])
 
 		this.Control["dcInstructionsDropDown"].Choose(1)
-		this.Control["dcInstructionsEdit"].Value := configuration["Instructions.Character"]
+		this.Control["dcInstructionsEdit"].Value := ((configuration["Instructions.Character"] != false) ? configuration["Instructions.Character"] : "")
 
 		for ignore, setting in this.Instructions
 			this.Value[setting] := configuration[setting]
@@ -384,7 +399,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		providerConfiguration["Confirmation"] := ((this.Control["dcConfirmationDropDown"].Value = 1) ? true : false)
 
 		for ignore, setting in this.Instructions
-			providerConfiguration[Setting] := this.Value[setting]
+			providerConfiguration[Setting] := ((Trim(this.Value[setting]) != "") ? this.Value[setting] : false)
 	}
 
 	loadConfigurator(configuration, simulators := false) {

@@ -10,8 +10,6 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\..\Libraries\Task.ahk"
-#Include "..\..\Libraries\Messages.ahk"
-#Include "..\..\Libraries\Math.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
 
 
@@ -44,6 +42,13 @@ class TelemetryCollector {
 	iDataFile := false
 	iCollectorPID := false
 	iCalibrate := false
+
+	iCategories := []
+
+	iSampleFrequency := false
+	iSampleTask := false
+
+	iTemperatureSamples := []
 
 	Simulator {
 		Get {
@@ -111,9 +116,15 @@ class TelemetryCollector {
 		}
 	}
 
-	Issues {
+	Handling {
 		Get {
-			return this.getIssues()
+			return (inList(this.iCategories, "Handling") ? this.getHandling() : false)
+		}
+	}
+
+	Temperatures {
+		Get {
+			return (inList(this.iCategories, "Temperatures") ? this.getTemperatures() : false)
 		}
 	}
 
@@ -141,7 +152,12 @@ class TelemetryCollector {
 		this.iAcousticFeedback := acousticFeedback
 
 		for setting, value in settings.OwnProps()
-			this.i%setting% := value
+			if ((setting = "Handling") || ((setting = "Temperatures")))
+				this.iCategories.Push(setting)
+			else if (setting = "Frequency")
+				this.iSampleFrequency := value
+			else
+				this.i%setting% := value
 
 		if first {
 			TelemetryCollector.sAudioDevice := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Audio Settings.ini"), "Output", "Analyzer.AudioDevice", false)
@@ -213,7 +229,7 @@ class TelemetryCollector {
 
 		this.stopTelemetryCollector()
 
-		if !this.iCollectorPID {
+		if (!this.iCollectorPID && inList(this.iCategories, "Handling")) {
 			try {
 				options := ((calibrate ? "-Calibrate `"" : "-Analyze `"") . dataFile . "`"")
 
@@ -267,9 +283,22 @@ class TelemetryCollector {
 				pid := false
 			}
 
-			this.iCollectorPID := pid
+			if pid {
+				this.iCollectorPID := pid
 
-			OnExit(ObjBindMethod(this, "stopTelemetryCollector"))
+				OnExit(ObjBindMethod(this, "stopTelemetryCollector"))
+			}
+
+			this.iTemperatureSamples := []
+
+			if this.iSampleFrequency {
+				if this.iSampleTask
+					this.iSampleTask.stop()
+
+				this.iSampleTask := PeriodicTask(ObjBindMethod(this, "updateSamples"), this.iSampleFrequency, kLowPriority)
+
+				this.iSampleTask.start()
+			}
 		}
 	}
 
@@ -292,7 +321,15 @@ class TelemetryCollector {
 			if !isDebug()
 				deleteFile(this.iDataFile)
 
+			if this.iSampleTask {
+				this.iSampleTask.stop()
+
+				this.iSampleTask := false
+			}
+
+			this.iTemperatureSamples := []
 			this.iDataFile := false
+
 			this.iCollectorPID := false
 		}
 
@@ -303,12 +340,12 @@ class TelemetryCollector {
 		playSound("SWSoundPlayer.exe", soundFile, (TelemetryCollector.AudioDevice ? TelemetryCollector.AudioDevice : "") . " echos 1 1 1 1")
 	}
 
-	getIssues() {
+	getHandling() {
 		local dataFile := this.iDataFile
-		local issues := CaseInsenseMap()
-		local issues, tries, data, ignore, type, speed, severity, where, frequency, key, value
+		local handling := CaseInsenseMap()
+		local handling, tries, data, ignore, type, speed, severity, where, frequency, key, value
 
-		issues.Default := (this.iCalibrate ? false : [])
+		handling.Default := (this.iCalibrate ? false : [])
 
 		if dataFile {
 			tries := 10
@@ -324,7 +361,7 @@ class TelemetryCollector {
 									value := getMultiMapValue(data, type . "." . speed, where, false)
 
 									if value
-										issues[type . ".Corner." . where . "." . speed] := value
+										handling[type . ".Corner." . where . "." . speed] := value
 								}
 					}
 					else {
@@ -337,10 +374,10 @@ class TelemetryCollector {
 										frequency := getMultiMapValue(data, type . "." . speed . "." . severity, where, false)
 
 										if frequency
-											if issues.Has(key)
-												issues[key].Push({Severity: severity, Frequency: frequency})
+											if handling.Has(key)
+												handling[key].Push({Severity: severity, Frequency: frequency})
 											else
-												issues[key] := [{Severity: severity, Frequency: frequency}]
+												handling[key] := [{Severity: severity, Frequency: frequency}]
 									}
 								}
 					}
@@ -352,6 +389,31 @@ class TelemetryCollector {
 			}
 		}
 
-		return issues
+		return handling
+	}
+
+	getTemperatures() {
+		return this.iTemperatureSamples.Clone()
+	}
+
+	updateSamples() {
+		local data, tyreInnerTemperatures, tyreOuterTemperatures, sample
+
+		if inList(this.iCategories, "Temperatures") {
+			data := callSimulator(SessionDatabase.getSimulatorCode(this.Simulator))
+			tyreInnerTemperatures := string2Values(",", getMultiMapValue(data, "Car Data", "TyreInnerTemperature", ""))
+			tyreOuterTemperatures := string2Values(",", getMultiMapValue(data, "Car Data", "TyreInnerTemperature", ""))
+			sample := {TyreTemperatures: string2Values(",", getMultiMapValue(data, "Car Data", "TyreTemperature", ""))
+					 , BrakeTemperatures: string2Values(",", getMultiMapValue(data, "Car Data", "BrakeTemperature", ""))}
+
+			if ((tyreInnerTemperatures.Length = 4) && (tyreOuterTemperatures.Length = 4)) {
+				loop 4
+					tyreInnerTemperatures[A_Index] -= tyreOuterTemperatures[A_Index]
+
+				sample.TyreOITemperatureDifferences := tyreInnerTemperatures
+			}
+
+			this.iTemperatureSamples.Push(sample)
+		}
 	}
 }

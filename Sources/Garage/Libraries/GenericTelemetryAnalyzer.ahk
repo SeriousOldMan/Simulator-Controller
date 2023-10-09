@@ -862,6 +862,27 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 			field.ValidText := field.Text
 	}
 
+	createTemperatureUpdater(name, widgets) {
+		local ignore, widget
+
+		updateTemperature(widget, *) {
+			validateTemperature(widget)
+
+			analyzer.%name% := [convertUnit("Temperature", internalValue("Float", widgets[1].Text))
+							  , convertUnit("Temperature", internalValue("Float", widgets[2].Text))
+							  , convertUnit("Temperature", internalValue("Float", widgets[3].Text))]
+		}
+
+		for ignore, widget in widgets
+			widget.OnEvent("Change", updateTemperature.Bind(widget))
+	}
+
+	updateTemperature(name, widget, *) {
+		validateTemperature(widget)
+
+		analyzer.%name% := convertUnit("Temperature", internalValue("Float", widget.Text))
+	}
+
 	noSelect(listView, *) {
 		loop listView.GetCount()
 			listView.Modify(A_Index, "-Select")
@@ -1394,11 +1415,23 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		widget61 := maxRearBrakeTemperatureEdit
 		widget62 := idealRearBrakeTemperatureEdit
 
-		for ignore, widget in [minFrontTyreTemperatureEdit, maxFrontTyreTemperatureEdit, idealFrontTyreTemperatureEdit
-							 , minRearTyreTemperatureEdit, maxRearTyreTemperatureEdit, idealRearTyreTemperatureEdit
+		createTemperatureUpdater("FrontTyreTemperatures"
+							   , [minFrontTyreTemperatureEdit, idealFrontTyreTemperatureEdit, maxFrontTyreTemperatureEdit])
+		createTemperatureUpdater("RearTyreTemperatures"
+							   , [minRearTyreTemperatureEdit, idealRearTyreTemperatureEdit, maxRearTyreTemperatureEdit])
+
+		maxOITemperatureDifferenceEdit.OnEvent("Change", updateTemperature.Bind("OITemperatureDifference", maxOITemperatureDifferenceEdit))
+
+		createTemperatureUpdater("FrontBrakeTemperatures"
+							   , [minFrontBrakeTemperatureEdit, idealFrontBrakeTemperatureEdit, maxFrontBrakeTemperatureEdit])
+		createTemperatureUpdater("RearBrakeTemperatures"
+							   , [minRearBrakeTemperatureEdit, idealRearBrakeTemperatureEdit, maxRearBrakeTemperatureEdit])
+
+		for ignore, widget in [minFrontTyreTemperatureEdit, idealFrontTyreTemperatureEdit, maxFrontTyreTemperatureEdit
+							 , minRearTyreTemperatureEdit, idealRearTyreTemperatureEdit, maxRearTyreTemperatureEdit
 							 , maxOITemperatureDifferenceEdit
-							 , minRearBrakeTemperatureEdit, maxRearBrakeTemperatureEdit, idealRearBrakeTemperatureEdit
-							 , minRearBrakeTemperatureEdit, maxRearBrakeTemperatureEdit, idealRearBrakeTemperatureEdit]
+							 , minRearBrakeTemperatureEdit, idealRearBrakeTemperatureEdit, maxRearBrakeTemperatureEdit
+							 , minRearBrakeTemperatureEdit, idealRearBrakeTemperatureEdit, maxRearBrakeTemperatureEdit]
 			widget.OnEvent("Change", validateTemperature.Bind(widget))
 
 		loop 62

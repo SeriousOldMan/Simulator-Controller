@@ -1644,6 +1644,35 @@ updateInstallationForV500() {
 	}
 }
 
+updateConfigurationForV541() {
+	local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+	local deleted := []
+	local ignore, key, value, descriptor
+
+	for key, value in getMultiMapValues(settings, "Setup Workbench") {
+		descriptor := ConfigurationItem.splitDescriptor(key)
+
+		if (descriptor.Length = 4) {
+			deleted.Push(key)
+
+			if (descriptor[2] != "*")
+				descriptor[2] := SessionDatabase.getCarName(descriptor[1], descriptor[2])
+
+			if (descriptor[3] != "*")
+				descriptor[3] := SessionDatabase.getTrackName(descriptor[1], descriptor[3])
+
+			setMultiMapValue(settings, "Telemetry Collector", ConfigurationItem.descriptor(descriptor*), value)
+		}
+	}
+
+	if (deleted.Length > 0) {
+		for ignore, key in deleted
+			removeMultiMapValue(settings, "Setup Workbench", key)
+
+		writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+	}
+}
+
 updateConfigurationForV532() {
 	local settings
 

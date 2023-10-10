@@ -39,6 +39,8 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 The instructions for the LLM of the Driving Coach has been extended. You can update to the new instructions using the reload button in the configurations. Also, new instructions for extended data integration has been added, which you can also load into the configuration.
 
+Another change regards the storage of the Telemetry Analyzer settings of "Setup Workbench". These are now also used by the Driving Coach and therefore it was necessary to change their internal structure. The structural change will be handled by the update procedure, but in some rare cases, old settings will be lost and must be recreated before running the analyzer again.
+
 ***
 
 

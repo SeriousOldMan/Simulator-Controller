@@ -167,7 +167,7 @@ class TelemetryCollector {
 		}
 	}
 
-	loadFromSettings(settings := false, section := "Setup Workbench") {
+	loadFromSettings(settings := false, section := "Telemetry Collector") {
 		local defaultUndersteerThresholds := "40,70,100"
 		local defaultOversteerThresholds := "-40,-70,-100"
 		local defaultLowspeedThreshold := 120

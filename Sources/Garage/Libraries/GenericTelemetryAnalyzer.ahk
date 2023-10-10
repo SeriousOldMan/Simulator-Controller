@@ -385,45 +385,45 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 
 		prefix := (simulator . "." . (selectedCar ? selectedCar : "*") . ".*.")
 
-		this.iSteerLock := getMultiMapValue(settings, "Setup Workbench", prefix . "SteerLock", this.SteerLock)
-		this.iSteerRatio := getMultiMapValue(settings, "Setup Workbench", prefix . "SteerRatio", this.SteerRatio)
-		this.iWheelbase := getMultiMapValue(settings, "Setup Workbench", prefix . "Wheelbase", this.Wheelbase)
-		this.iTrackWidth := getMultiMapValue(settings, "Setup Workbench", prefix . "TrackWidth", this.TrackWidth)
-		this.iAcousticFeedback := getMultiMapValue(settings, "Setup Workbench", prefix . "Feedback", true)
+		this.iSteerLock := getMultiMapValue(settings, "Telemetry Collector", prefix . "SteerLock", this.SteerLock)
+		this.iSteerRatio := getMultiMapValue(settings, "Telemetry Collector", prefix . "SteerRatio", this.SteerRatio)
+		this.iWheelbase := getMultiMapValue(settings, "Telemetry Collector", prefix . "Wheelbase", this.Wheelbase)
+		this.iTrackWidth := getMultiMapValue(settings, "Telemetry Collector", prefix . "TrackWidth", this.TrackWidth)
+		this.iAcousticFeedback := getMultiMapValue(settings, "Telemetry Collector", prefix . "Feedback", true)
 
-		defaultUndersteerThresholds := getMultiMapValue(settings, "Setup Workbench", prefix . "UndersteerThresholds", defaultUndersteerThresholds)
-		defaultOversteerThresholds := getMultiMapValue(settings, "Setup Workbench", prefix . "OversteerThresholds", defaultOversteerThresholds)
-		defaultLowspeedThreshold := getMultiMapValue(settings, "Setup Workbench", prefix . "LowspeedThreshold", defaultLowspeedThreshold)
+		defaultUndersteerThresholds := getMultiMapValue(settings, "Telemetry Collector", prefix . "UndersteerThresholds", defaultUndersteerThresholds)
+		defaultOversteerThresholds := getMultiMapValue(settings, "Telemetry Collector", prefix . "OversteerThresholds", defaultOversteerThresholds)
+		defaultLowspeedThreshold := getMultiMapValue(settings, "Telemetry Collector", prefix . "LowspeedThreshold", defaultLowspeedThreshold)
 
-		defaultFrontTyreTemperatures := getMultiMapValue(settings, "Setup Workbench", prefix . "FrontTyreTemperatures", defaultFrontTyreTemperatures)
-		defaultRearTyreTemperatures := getMultiMapValue(settings, "Setup Workbench", prefix . "RearTyreTemperatures", defaultRearTyreTemperatures)
-		defaultOITemperatureDifference := getMultiMapValue(settings, "Setup Workbench", prefix . "TyreOITemperatureDifference", defaultOITemperatureDifference)
-		defaultFrontBrakeTemperatures := getMultiMapValue(settings, "Setup Workbench", prefix . "FrontBrakeTemperatures", defaultFrontBrakeTemperatures)
-		defaultRearBrakeTemperatures := getMultiMapValue(settings, "Setup Workbench", prefix . "RearBrakeTemperatures", defaultRearBrakeTemperatures)
+		defaultFrontTyreTemperatures := getMultiMapValue(settings, "Telemetry Collector", prefix . "FrontTyreTemperatures", defaultFrontTyreTemperatures)
+		defaultRearTyreTemperatures := getMultiMapValue(settings, "Telemetry Collector", prefix . "RearTyreTemperatures", defaultRearTyreTemperatures)
+		defaultOITemperatureDifference := getMultiMapValue(settings, "Telemetry Collector", prefix . "TyreOITemperatureDifference", defaultOITemperatureDifference)
+		defaultFrontBrakeTemperatures := getMultiMapValue(settings, "Telemetry Collector", prefix . "FrontBrakeTemperatures", defaultFrontBrakeTemperatures)
+		defaultRearBrakeTemperatures := getMultiMapValue(settings, "Telemetry Collector", prefix . "RearBrakeTemperatures", defaultRearBrakeTemperatures)
 
 		prefix := (simulator . "." . (selectedCar ? selectedCar : "*") . "." . (selectedTrack ? selectedTrack : "*") . ".")
 
-		this.iSteerLock := getMultiMapValue(settings, "Setup Workbench", prefix . "SteerLock", this.SteerLock)
-		this.iSteerRatio := getMultiMapValue(settings, "Setup Workbench", prefix . "SteerRatio", this.SteerRatio)
-		this.iWheelbase := getMultiMapValue(settings, "Setup Workbench", prefix . "Wheelbase", this.Wheelbase)
-		this.iTrackWidth := getMultiMapValue(settings, "Setup Workbench", prefix . "TrackWidth", this.TrackWidth)
-		this.iAcousticFeedback := getMultiMapValue(settings, "Setup Workbench", prefix . "Feedback", this.AcousticFeedback)
+		this.iSteerLock := getMultiMapValue(settings, "Telemetry Collector", prefix . "SteerLock", this.SteerLock)
+		this.iSteerRatio := getMultiMapValue(settings, "Telemetry Collector", prefix . "SteerRatio", this.SteerRatio)
+		this.iWheelbase := getMultiMapValue(settings, "Telemetry Collector", prefix . "Wheelbase", this.Wheelbase)
+		this.iTrackWidth := getMultiMapValue(settings, "Telemetry Collector", prefix . "TrackWidth", this.TrackWidth)
+		this.iAcousticFeedback := getMultiMapValue(settings, "Telemetry Collector", prefix . "Feedback", this.AcousticFeedback)
 
-		this.iUndersteerThresholds := string2Values(",", getMultiMapValue(settings, "Setup Workbench"
+		this.iUndersteerThresholds := string2Values(",", getMultiMapValue(settings, "Telemetry Collector"
 													   , prefix . "UndersteerThresholds", defaultUndersteerThresholds))
-		this.iOversteerThresholds := string2Values(",", getMultiMapValue(settings, "Setup Workbench"
+		this.iOversteerThresholds := string2Values(",", getMultiMapValue(settings, "Telemetry Collector"
 													  , prefix . "OversteerThresholds", defaultOversteerThresholds))
-		this.iLowspeedThreshold := getMultiMapValue(settings, "Setup Workbench", prefix . "LowspeedThreshold", defaultLowspeedThreshold)
+		this.iLowspeedThreshold := getMultiMapValue(settings, "Telemetry Collector", prefix . "LowspeedThreshold", defaultLowspeedThreshold)
 
-		this.iFrontTyreTemperatures := string2Values(",", getMultiMapValue(settings, "Setup Workbench"
+		this.iFrontTyreTemperatures := string2Values(",", getMultiMapValue(settings, "Telemetry Collector"
 													    , prefix . "FrontTyreTemperatures", defaultFrontTyreTemperatures))
-		this.iRearTyreTemperatures := string2Values(",", getMultiMapValue(settings, "Setup Workbench"
+		this.iRearTyreTemperatures := string2Values(",", getMultiMapValue(settings, "Telemetry Collector"
 													   , prefix . "RearTyreTemperatures", defaultRearTyreTemperatures))
-		this.iOITemperatureDifference := getMultiMapValue(settings, "Setup Workbench", prefix . "TyreOITemperatureDifference", defaultOITemperatureDifference)
+		this.iOITemperatureDifference := getMultiMapValue(settings, "Telemetry Collector", prefix . "TyreOITemperatureDifference", defaultOITemperatureDifference)
 
-		this.iFrontBrakeTemperatures := string2Values(",", getMultiMapValue(settings, "Setup Workbench"
+		this.iFrontBrakeTemperatures := string2Values(",", getMultiMapValue(settings, "Telemetry Collector"
 														 , prefix . "FrontBrakeTemperatures", defaultFrontBrakeTemperatures))
-		this.iRearBrakeTemperatures := string2Values(",", getMultiMapValue(settings, "Setup Workbench"
+		this.iRearBrakeTemperatures := string2Values(",", getMultiMapValue(settings, "Telemetry Collector"
 														, prefix . "RearBrakeTemperatures", defaultRearBrakeTemperatures))
 
 		super.__New(workbench, simulator)
@@ -789,7 +789,7 @@ setAnalyzerSetting(analyzer, key, value) {
 	local prefix := (analyzer.Simulator . "." . (car ? car : "*") . "." . (track ? track : "*") . ".")
 	local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-	setMultiMapValue(settings, "Setup Workbench", prefix . key, value)
+	setMultiMapValue(settings, "Telemetry Collector", prefix . key, value)
 
 	writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 }

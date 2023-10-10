@@ -96,7 +96,12 @@ Installation requires you to choose one of the supported large language model pr
 
 ### OpenAI
 
-When you have chosen OpenAI, which I recommend, you will have to create an account on [OpenAI](https://openai.com). You will have to invest a couple of bucks to charge up your account - $5 will be more than enough. Tnen create an API key, which you can use to establish a connection. Note down this key, since you will have to enter it into the configuration of the Virtual Driving Coach.
+When you have chosen OpenAI, which I recommend, you will have to create an account on [OpenAI](https://openai.com). You will have to invest a couple of bucks to charge up your account - $5 will be more than enough. Follow these steps:
+
+1. Create an account on [openai.com](https://openai.com).
+2. Goto the [platform page](https://platform.openai.com/) and select the "Manage account" from your account menu. There you can add a payment in the billing section.
+3. Select [API keys](https://platform.openai.com/account/api-keys) in the sidebar menu. There you can create your sectret key.
+4. Note down this key, since you will have to enter it into the configuration of the Virtual Driving Coach.
 
 ### Azure
 

@@ -174,6 +174,8 @@ class DrivingCoach extends GridRaceAssistant {
 			local headers := this.CreateHeaders(Map("Content-Type", "application/json"))
 			local body := this.CreatePrompt({model: this.Model, max_tokens: this.MaxTokens, temperature: this.Temperature}, question)
 
+			static first := true
+
 			body := JSON.print(body)
 
 			if isDebug() {
@@ -185,18 +187,24 @@ class DrivingCoach extends GridRaceAssistant {
 			try {
 				answer := WinHttpRequest().POST(this.CreateServiceURL(this.Server), body, headers, {Object: true, Encoding: "UTF-8"})
 
-				if ((answer.Status >= 200) && (answer.Status < 300))
+				if ((answer.Status >= 200) && (answer.Status < 300)) {
+					first := false
+
 					answer := answer.JSON
-				else
+				}
+				else if first {
+					first := false
+
 					throw "Cannot connect to " . this.CreateServiceURL(this.Server) . "..."
+				}
+				else
+					return false
 			}
 			catch Any as exception {
-				logError(exception)
-
 				if this.Coach.RemoteHandler
 					this.Coach.RemoteHandler.serviceState("Error:Connection")
 
-				return false
+				throw exception
 			}
 
 			if isDebug() {
@@ -216,12 +224,10 @@ class DrivingCoach extends GridRaceAssistant {
 				return answer
 			}
 			catch Any as exception {
-				logError(exception)
-
 				if this.Coach.RemoteHandler
 					this.Coach.RemoteHandler.serviceState("Error:Answer")
 
-				return false
+				throw exception
 			}
 		}
 	}
@@ -669,21 +675,22 @@ class DrivingCoach extends GridRaceAssistant {
 			answer := this.Connector.Ask(text)
 
 			if !answer
-				throw "Problems while connecting to GPT service..."
+				throw "No answer from the GPT service..."
 		}
 		catch Any as exception {
 			if this.Speaker
 				this.getSpeaker().speakPhrase("Later", false, false, false, {Noise: false})
 
-			logError(exception, true)
+			if (exception != "No answer from the GPT service...") {
+				logError(exception, true)
 
-			logMessage(kLogCritical, substituteVariables(translate("Cannot connect to GPT service (%service%) - please check the configuration")
+				logMessage(kLogCritical, substituteVariables(translate("Cannot connect to GPT service (%service%) - please check the configuration")
 													   , {service: this.Options["Driving Coach.Service"]}))
 
-			if (exception != "Problems while connecting to GPT service...")
 				showMessage(substituteVariables(translate("Cannot connect to GPT service (%service%) - please check the configuration...")
 											  , {service: this.Options["Driving Coach.Service"]})
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			}
 		}
 
 		if answer {

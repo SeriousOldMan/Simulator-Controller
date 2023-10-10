@@ -228,6 +228,12 @@ class TelemetryCollector {
 		local dataFile := temporaryFileName("Telemetry", "data")
 		local pid, options, code, message
 
+		collectSamples() {
+			this.updateSamples()
+
+			Task.CurrentTask.Sleep := this.iSampleFrequency
+		}
+
 		this.stopTelemetryCollector()
 
 		if (!this.iCollectorPID && inList(this.iCategories, "Handling")) {
@@ -292,11 +298,8 @@ class TelemetryCollector {
 
 			this.iTemperatureSamples := []
 
-			if this.iSampleFrequency {
-				if this.iSampleTask
-					this.iSampleTask.stop()
-
-				this.iSampleTask := PeriodicTask(ObjBindMethod(this, "updateSamples"), this.iSampleFrequency, kLowPriority)
+			if (!calibrate && this.iSampleFrequency) {
+				this.iSampleTask := PeriodicTask(collectSamples, 90000, kLowPriority)
 
 				this.iSampleTask.start()
 			}

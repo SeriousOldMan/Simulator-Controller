@@ -65,23 +65,25 @@ On the second tab "Temperatures" you can specify several thresholds for tyre and
 
 The *Ideal* temperatures are the values you want to target in average over the course of a complete lap, both for the tyres as well as for the brakes. Going over "Max" or going under "Min" will increase the severity of any created temperature related issues. And, last but not least, when the difference between inner and outer tyre temperatures of a given tyre exceeds the given "Max OI Difference" value, a corresponding issue will be generated as well.
 
-Note: It is recommended to choose a car before entering the analyzer mode, since then some of the values in this dialog will be initialized with car specific data, depending on the chosen simulator.
+Good to know: It is recommended to choose a car before entering the analyzer mode, since then some of the values in this dialog will be initialized with car specific data, depending on the chosen simulator.
 
 Once you have dialed your settings, you can click on "Start".
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/Development/Docs/Images/Telemetry%20Analyzer%202.JPG)
 
-Go to the track and drive acouple of laps. Always the last 2 laps will be considered by the analyzer, therefore you can "Stop" the recording, when you have run two consecutive decent laps. The analyzer will show you now, which handling issues it detected.
+Go to the track and drive a couple of laps. Always the last 2 laps will be considered for handling issues by the analyzer, therefore you can "Stop" the recording, when you have run two consecutive decent laps, if you are only interested in handling. Other issues, especially those related to temperatures, will start collecting after a warmup period, typically around 90 seconds. Therefore, if you are interested in those issues, drive a couple of more laps with a fully warmed up car.
+
+The analyzer will show you, which issues it detected, have been detected.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/Development/Docs/Images/Telemetry%20Analyzer%203.JPG)
 
-For each individual handling issue category, for example *low speed corner entry understeering*, the "Frequency" shows how often this happens related to the overall track length and the "Intensity" shows the category (*Light*, *Medium* or *Heavy*) according to your initial settings. You can use the threshold slider here to *filter* unimportant issues, which you don't want to be considered. Moving the slider to the right will remove all issues, whose frequency percentage is below the set threshold. If you want to include all issues, set the slider completely to the left. You can additionally remove those issues, which resulted from a driver error, by unchecking the check box in the issue list, before proceeding.
+For each individual issue category, for example *low speed corner entry understeering*, the "Frequency" shows how often this happens related to the overall track length and the "Intensity" shows the category (*Light*, *Medium* or *Heavy*) according to your initial settings. You can use the threshold slider here to *filter* unimportant issues, which you don't want to be considered. Moving the slider to the right will remove all issues, whose frequency percentage is below the set threshold. If you want to include all issues, set the slider completely to the left. You can additionally remove those issues, which resulted from a driver error, by unchecking the check box in the issue list, before proceeding.
 
-When you are satiesfied with the displayed handling issues, click on "Apply". The analyzer will clear all current handling issues from the left pane of the "Setup Workbench" and will create new ones for the recorded issues. Please note, that all issues for a given category, for example "Understeer on low speed corner entry", will be combined into one issue in the problem list.
+When you are satiesfied with the displayed issues, click on "Apply". The analyzer will clear all current issues from the left pane of the "Setup Workbench" and will create new ones for the recorded issues. Please note, that all issues for a given category, for example "Understeer on low speed corner entry", will be combined into one issue in the problem list.
 
 Please be aware that not every handling issue is related to problems with the car setup. Equally often they arise when you are not used to specific characteristics of the car and you are kind of *overdriving* it. The analyzer can help you here as well. Try to drive clean laps as without too much detected over- or understeering events. You will see, that this will feel slower most of the time, but in the end you will be faster.
 
-Final note: I would like to take the opportunity to thank the user "WallyM" of the *Assetto Corsa Competizione* forum, who provided parts of the algorithms used in the analyzer.
+Final note: I would like to take the opportunity to thank the user "WallyM" of the *Assetto Corsa Competizione* forum, who provided parts of the algorithms used in the handling part of the analyzer.
 
 #### Installation of Telemetry Providers
 

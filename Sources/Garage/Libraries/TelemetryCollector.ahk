@@ -299,7 +299,7 @@ class TelemetryCollector {
 			this.iTemperatureSamples := []
 
 			if (!calibrate && this.iSampleFrequency) {
-				this.iSampleTask := PeriodicTask(collectSamples, 90000, kLowPriority)
+				this.iSampleTask := PeriodicTask(collectSamples, 180000, kLowPriority)
 
 				this.iSampleTask.start()
 			}

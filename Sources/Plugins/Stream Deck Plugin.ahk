@@ -591,20 +591,10 @@ disabledIcon(fileName) {
 refreshStreamDecks() {
 	local full, ignore, fnController
 
-	static cycle := 0
-
-	if (++cycle > 1) {
-		cycle := 0
-
-		full := true
-	}
-	else
-		full := false
-
-
-	for ignore, fnController in SimulatorController.Instance.FunctionController
-		if isInstance(fnController, StreamDeck)
-			fnController.refresh(full)
+	if !MessageManager.isPaused()
+		for ignore, fnController in SimulatorController.Instance.FunctionController
+			if isInstance(fnController, StreamDeck)
+				fnController.refresh(true)
 }
 
 handleStreamDeckMessage(category, data) {

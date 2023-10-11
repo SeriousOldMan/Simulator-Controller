@@ -299,7 +299,7 @@ class TelemetryCollector {
 			this.iTemperatureSamples := []
 
 			if (!calibrate && this.iSampleFrequency) {
-				this.iSampleTask := PeriodicTask(collectSamples, 180000, kLowPriority)
+				this.iSampleTask := PeriodicTask(collectSamples, isDebug() ? this.iSampleFrequency : 180000, kLowPriority)
 
 				this.iSampleTask.start()
 			}
@@ -408,7 +408,7 @@ class TelemetryCollector {
 			data := callSimulator(SessionDatabase.getSimulatorCode(this.Simulator))
 			tyreTemperatures := string2Values(",", getMultiMapValue(data, "Car Data", "TyreTemperature", ""))
 			tyreInnerTemperatures := string2Values(",", getMultiMapValue(data, "Car Data", "TyreInnerTemperature", ""))
-			tyreOuterTemperatures := string2Values(",", getMultiMapValue(data, "Car Data", "TyreInnerTemperature", ""))
+			tyreOuterTemperatures := string2Values(",", getMultiMapValue(data, "Car Data", "TyreOuterTemperature", ""))
 			brakeTemperatures := string2Values(",", getMultiMapValue(data, "Car Data", "BrakeTemperature", ""))
 			sample := {}
 

@@ -1,14 +1,18 @@
 ## 5.4.1.0-release 10/13/23 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
-  3. Fixed a critical bug, that triggered an endless loop in the isntall and update process, when the current Windows user has Admin privileges.
+  3. Fixed a **critical** bug, that triggered an endless loop in the isntall and update process, when the current Windows user has Admin privileges.
   4. Many functional additions to the Driving Coach.
-     - Data for the 5 recent laps about your own performance and the performance of your opponents is available to the Driving Coach.
-	 - The instructions have been updated and extended. Please read the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-541) for instructions how to update your configuration accordingly.
+     - The instructions have been updated and extended. Please read the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-541) for instructions how to update your configuration accordingly.
+	 - Part of the new instructions is a data interface, that can be used to provide data about your recent laps as well as the full standings at the end of the last lap to the Driving Coach for performance analysis.
+	 - The Driving Coach can use the Telemetry Analyzer of the "Setup Workbench" during a session to acquire information about any handling issues to give you precise and context aware coaching on driving behaviour and possible car setup changes.
 	 - Extensive [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#instructions) has been added which describes in detail how to use instructions to customize the behaviour and personality of the Driving Coach to your personal taste.
-  5. New data categories in the telemetry analyzer of "Setup Workbench". See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-telemetry-analyzer) for more information.
+  5. New data categories in the Telemetry Analyzer of "Setup Workbench". See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-telemetry-analyzer) for more information.
+     - Issues for tyre temperatures outside a predefined range can be generated.
+	 - Issues can be generated when the temperature difference of the outer and the inner part of the tyre is higher than a given threshold.
+	 - Issues for brake temperatures outside a predefined range can be generated.
   6. The persistent structure of the Telemetry Analyzer settings has changed. You may have to recreate your settings in some rare cases.
-  7. Added "Practice Center" to Windows Start menu
+  7. Added "Practice Center" to Windows Start menu, which was forgotten at the initial release of "Practice Center".
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-541), especially if you are using the Driving Coach.
 

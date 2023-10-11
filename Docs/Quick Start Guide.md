@@ -10,6 +10,8 @@ You probably already have understood, that Simulator Controller is a quite sophi
    
    ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Quick%20Start%204.JPG)
    
+   Please note, that you can enable the Driving Coach here and it will react to your voice command afterwards, but for it to be fully functional, you will have to configure the GPT Service API in a later step of the full configuration. You can skip this for the moment, since the Driving Coach, although a very clever little helper, is not necessary for your initial experiences with the other Assistants.
+   
    If you don't want to use the basic configuration page, simply select "Extended" and continue to the next page. Then go through the following steps for a basic configuration.
 
 2. Select modules

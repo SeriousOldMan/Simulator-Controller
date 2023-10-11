@@ -253,9 +253,9 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 											: getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Language", getLanguage()))
 
 			if edit
-				this.Value[setting] := getMultiMapValue(templates, language, setting, "")
+				this.Value[setting] := getMultiMapValue(templates, language, setting, getMultiMapValue(templates, "EN", setting, ""))
 			else
-				providerConfiguration[setting] := getMultiMapValue(templates, language, setting, "")
+				providerConfiguration[setting] := getMultiMapValue(templates, language, setting, getMultiMapValue(templates, "EN", setting, ""))
 		}
 	}
 

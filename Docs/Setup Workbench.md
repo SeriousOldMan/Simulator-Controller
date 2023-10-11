@@ -71,7 +71,7 @@ Once you have dialed your settings, you can click on "Start".
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/Development/Docs/Images/Telemetry%20Analyzer%202.JPG)
 
-Go to the track and drive a couple of laps. Always the last 2 laps will be considered for handling issues by the analyzer, therefore you can "Stop" the recording, when you have run two consecutive decent laps, if you are only interested in handling. Other issues, especially those related to temperatures, will start collecting after a warmup period, typically around 90 seconds. Therefore, if you are interested in those issues, drive a couple of more laps with a fully warmed up car.
+Go to the track and drive a couple of laps. Always the last 2 laps will be considered for handling issues by the analyzer, therefore you can "Stop" the recording, when you have run two consecutive decent laps, if you are only interested in handling. Other issues, especially those related to temperatures, will start collecting after a warmup period, typically after 180 seconds. Therefore, if you are interested in those issues, drive a couple of more laps with a fully warmed up car.
 
 The analyzer will show you, which issues it detected, have been detected.
 

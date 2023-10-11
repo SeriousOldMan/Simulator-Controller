@@ -7,6 +7,8 @@
 	 - Part of the new instructions is a data interface, that can be used to provide data about your recent laps as well as the full standings at the end of the last lap to the Driving Coach for performance analysis.
 	 - The Driving Coach can use the Telemetry Analyzer of the "Setup Workbench" during a session to acquire information about any handling issues to give you precise and context aware coaching on driving behaviour and possible car setup changes.
 	 - Extensive [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#instructions) has been added which describes in detail how to use instructions to customize the behaviour and personality of the Driving Coach to your personal taste.
+	 
+	 You can choose in the configuration, which instructions should be used. Simply delete those instructions, you don't want or need. Please note, that it might be necessary to use a larger model like GPT 3.5 16k or GPT 4 to handle the full size of the input area, when all instructions are active.
   5. New data categories in the Telemetry Analyzer of "Setup Workbench". See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-telemetry-analyzer) for more information.
      - Issues for tyre temperatures outside a predefined range can be generated.
 	 - Issues can be generated when the temperature difference of the outer and the inner part of the tyre is higher than a given threshold.

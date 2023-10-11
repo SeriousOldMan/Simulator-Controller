@@ -39,6 +39,12 @@ class DrivingCoachPlugin extends RaceAssistantPlugin  {
 		}
 	}
 
+	RaceAssistantPersistent {
+		Get {
+			return true
+		}
+	}
+
 	createRaceAssistantAction(controller, action, actionFunction, arguments*) {
 		if (inList(["RaceAssistant", "Call", "SetupWorkbenchOpen"], action))
 			super.createRaceAssistantAction(controller, action, actionFunction, arguments*)

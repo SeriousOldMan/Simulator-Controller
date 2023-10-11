@@ -9,6 +9,12 @@
   5. New data categories in the telemetry analyzer of "Setup Workbench". See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-telemetry-analyzer) for more information.
   6. The persistent structure of the Telemetry Analyzer settings has changed. You may have to recreate your settings in some rare cases.
   7. Added "Practice Center" to Windows Start menu
+  8. New car models for "Setup Workbench":
+     - Assetto Corsa
+       - Lotus Exige Scura
+       - Lotus Exige 240 R
+       - Lotus Exige S
+       - Lotus Exige S Roadster
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-541), especially if you are using the Driving Coach.
 

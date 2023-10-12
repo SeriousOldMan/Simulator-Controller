@@ -151,7 +151,7 @@ Below you find all instruction categories and the supported variables:
 |             | %laps%            | This variable is substituted with a CSV table of your performance during the last laps. This table contains your position (overall and class) as well as the lap time and sector times. You can define the number of laps to be reported by defining the variable as %laps:5%, for example. |
 |             | %standings%       | This variable is replaced with a CSV table containing the current standings sorted by overall position. This table contains the race number, class, position (overall and class) as well as the lap time and sector times. |
 | Handling    | Scope             | This instruction is used only when handling problems had been detected in the telemetry. See the chapter below about detecting handling problems and discussin them with Aiden. |
-|             | %handling%        | An enumeration of all detected handing problems.                                |
+|             | %handling%        | An enumeration of all detected handing problems. See the [dedicated chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#detecting-and-discussing-handling-problems) below for more information. |
 
 As said, all instructions can be modified in the configuration. You can even clear a complete instruction, if you want (and don't want to dicuss the corresponding information with Aiden). I do not recommend to clear the "Character" instruction, though.
 
@@ -193,7 +193,7 @@ When at least one handling issue had been detected, the "Handling" instruction w
 	
 Using this knowledge, Aiden should be able to give you information how to cope with the given handling issues, for example by changing your driver inputs or changes to the car setup.
 
-Information: You can disable this instruction (and every other instruction as well), by clearing it in the configuration, if you don't want Aiden to give you information regarding handling problems.
+Information: You can disable this instruction (and every other instruction as well) completely, by clearing it in the configuration, if you don't want Aiden to give you information regarding handling problems. If you want to enable or disable it during a running session, you can use the voice commands below.
 
 ### List of all voice commands
 

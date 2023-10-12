@@ -8,6 +8,8 @@
 	 - The Driving Coach can use the Telemetry Analyzer of the "Setup Workbench" during a session to acquire information about any handling issues to give you precise and context aware coaching on driving behaviour and possible car setup changes.
 	 - Instructions can be deleted in the configuration, if you don't need them at all.
 	 - New [voice commands](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#enabling-and-disabling-specific-instructions-and-information-processing) for the Drivong Coach to enable / disable instructions and thereby data integration during a running session.
+	 - A couple of [new settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database" allow you to select, which instructions will be active during the different session types (Practice, Qualifying, Race).
+     - Additionally, a [new setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database" can be used to enable a mode, in which the Driving Coach will only repeat the last sentence and then continue, when the voice output is interrupted by another Assistant. Note: This setting is also available for all other Assistants.
 	 - Extensive [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#instructions) has been added which describes in detail how to use instructions to customize the behaviour and personality of the Driving Coach to your personal taste.
 	 
 	 Please note, that it might be necessary to use a larger model like GPT 3.5 16k or GPT 4 to handle the full size of the input area, when all new instructions are active.

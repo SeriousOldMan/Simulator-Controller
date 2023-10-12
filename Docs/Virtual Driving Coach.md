@@ -195,6 +195,24 @@ Using this knowledge, Aiden should be able to give you information how to cope w
 
 Information: You can disable this instruction (and every other instruction as well), by clearing it in the configuration, if you don't want Aiden to give you information regarding handling problems.
 
+#### List of all voice commands
+
+1. [English version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Driving-Coach-Commands-(EN))
+
+2. [German version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Driving-Coach-Commands-(DE))
+
+Normal you will use free conversation to interact with Aiden as shown in the example above. But there are also a couple of predefined grammar based commands available, for example to enable or disable the processing of specific information (see below in the next section). You will always find the current version of the grammar files as actually used by the software in the *Resources\Grammars* folder of the Simulator Controller distribution. Or you can take a look at the files in the [Resources\Grammars directory on GitHub](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Resources/Grammars), for example the German version [Driving Coach.grammars.de](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Grammars/Driving%20Coach.grammars.de).
+
+### Enabling and disabling specific instructions and information processing 
+
+As discussed above Aiden can process information about your current session in a simulation. This includes specific data about your own performance and the preformance of your competitors, as well as information about your recent handling issues. Since the processing of this data may sometimes confuse the AI behind the Driving Coach. Therefore you may disable specific information processing by using a special voice command:
+
+	[Please] do not pay attention *information* anymore [please]
+
+As you might expect, the word "please" is optional. Available options for *information* are: "session information", "stint information", "handling information". These options resemble, as you already may have recognized, the instructions discussed above. After you have disabled one of the information processings (all are enabled by default), you can reenable it with the following command:
+
+	[Please] pay attention to *information* again [please]
+
 ## Troubleshooting
 
 For some tips n tricks for the best voice recognition experience, see the [corresponding chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#troubleshooting) in the documentation of Jona.

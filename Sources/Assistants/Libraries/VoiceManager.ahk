@@ -55,6 +55,8 @@ class VoiceManager {
 	iRecognizer := "Desktop"
 	iListener := false
 
+	iRecognizerMode := "Grammar"
+
 	iVoiceServer := false
 	iGrammars := CaseInsenseMap()
 
@@ -840,7 +842,7 @@ class VoiceManager {
 	}
 
 	getSpeaker() {
-		local pid, activationCommand
+		local pid, activationCommand, mode
 
 		if (this.Speaker && !this.iSpeechSynthesizer) {
 			if this.VoiceServer {
@@ -849,6 +851,11 @@ class VoiceManager {
 				activationCommand := getMultiMapValue(this.getGrammars(this.Language), "Listener Grammars", "Call", false)
 				activationCommand := substituteVariables(activationCommand, {name: this.Name})
 
+				mode := getMultiMapValue(this.getGrammars(this.Language), "Configuration", "Recognizer", "Grammar")
+
+				if (mode = "Mixed")
+					mode := "Text"
+
 				messageSend(kFileMessage, "Voice"
 										, "registerVoiceClient:" . values2String(";", this.Name, this.Routing, ProcessExist()
 																					, activationCommand
@@ -856,8 +863,7 @@ class VoiceManager {
 																					, this.Language, this.Synthesizer, this.Speaker
 																					, this.Recognizer, this.Listener
 																					, this.SpeakerVolume, this.SpeakerPitch, this.SpeakerSpeed
-																					, getMultiMapValue(this.getGrammars(this.Language)
-																									 , "Configuration", "Recognizer", "Grammar"))
+																					, mode)
 										, this.VoiceServer)
 
 				this.iSpeechSynthesizer := VoiceManager.RemoteSpeaker(this, this.Synthesizer, this.Speaker, this.Language
@@ -891,8 +897,12 @@ class VoiceManager {
 			if this.VoiceServer
 				this.buildGrammars(false, this.Language)
 			else {
-				recognizer := VoiceManager.LocalRecognizer(this, this.Recognizer, this.Listener, this.Language, false
-														 , getMultiMapValue(this.getGrammars(this.Language), "Configuration", "Recognizer", "Grammar"))
+				mode := getMultiMapValue(this.getGrammars(this.Language), "Configuration", "Recognizer", "Grammar")
+
+				if (mode = "Mixed")
+					mode := "Text"
+
+				recognizer := VoiceManager.LocalRecognizer(this, this.Recognizer, this.Listener, this.Language, false, mode)
 
 				this.buildGrammars(recognizer, this.Language)
 
@@ -911,7 +921,7 @@ class VoiceManager {
 	startListening(retry := true) {
 		static audioDevice := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Audio Settings.ini"), "Output", "Activation.AudioDevice", false)
 		static talkSound := getFileName("Talk.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\")
-		
+
 		if (this.iSpeechRecognizer && !this.Listening)
 			if !this.iSpeechRecognizer.startRecognizer() {
 				if retry
@@ -1013,7 +1023,10 @@ class VoiceManager {
 	buildGrammars(speechRecognizer, language) {
 		local grammars := this.getGrammars(language)
 		local mode := getMultiMapValue(grammars, "Configuration", "Recognizer", "Grammar")
+		local compilerRecognizer := speechRecognizer
 		local grammar, definition, name, choices, nextCharIndex
+
+		this.iRecognizerMode := mode
 
 		for name, choices in getMultiMapValues(grammars, "Choices")
 			if speechRecognizer
@@ -1024,7 +1037,22 @@ class VoiceManager {
 		for grammar, definition in getMultiMapValues(grammars, "Listener Grammars") {
 			definition := substituteVariables(definition, {name: this.Name})
 
-			this.Grammars[grammar] := definition
+			if (mode = "Mixed") {
+				if !compilerRecognizer {
+					compilerRecognizer := SpeechRecognizer("Desktop", true, this.Language, false, "Text")
+
+					for name, choices in getMultiMapValues(grammars, "Choices")
+						compilerRecognizer.setChoices(name, choices)
+				}
+
+				if this.Debug[kDebugGrammars] {
+					nextCharIndex := 1
+
+					showMessage("Register command phrase: " . GrammarCompiler(compilerRecognizer).readGrammar(&definition, &nextCharIndex).toString())
+				}
+
+				this.Grammars[grammar] := compilerRecognizer.compileGrammar(definition)
+			}
 
 			if speechRecognizer {
 				if (mode = "Text") {
@@ -1041,7 +1069,7 @@ class VoiceManager {
 				}
 
 				try {
-					if !speechRecognizer.loadGrammar(grammar, speechRecognizer.compileGrammar(definition), ObjBindMethod(this, "raisePhraseRecognized"))
+					if !speechRecognizer.loadGrammar(grammar, this.Grammars[grammar], ObjBindMethod(this, "raisePhraseRecognized"))
 						throw "Recognizer not running..."
 				}
 				catch Any as exception {
@@ -1054,6 +1082,8 @@ class VoiceManager {
 				}
 			}
 			else if (grammar != "Call") {
+				this.Grammars[grammar] := speechRecognizer.compileGrammar(definition)
+
 				if (mode = "Text")
 					throw "Listener grammars are not supported in continuous text recognition..."
 
@@ -1112,6 +1142,111 @@ class VoiceManager {
 		this.textRecognized(grammar, text, true)
 	}
 
+	matchCommand(text, &words) {
+		local index, literal, bestRating, bestMatch, ignore, grammar, name
+
+		allMatches(string, minRating, maxRating, strings*) {
+			local ratings := []
+			local index, value, rating
+			local dllName, dllFile
+
+			static recognizer := false
+
+			if !recognizer {
+				dllName := "Speech.Recognizer.dll"
+				dllFile := kBinariesDirectory . dllName
+
+				try {
+					if (!FileExist(dllFile)) {
+						logMessage(kLogCritical, translate("Speech.Recognizer.dll not found in ") . kBinariesDirectory)
+
+						throw "Unable to find Speech.Recognizer.dll in " . kBinariesDirectory . "..."
+					}
+
+					recognizer := CLR_LoadLibrary(dllFile).CreateInstance("Speech.SpeechRecognizer")
+				}
+				catch Any as exception {
+					logError(exception, true)
+
+					logMessage(kLogCritical, translate("Error while initializing speech recognition module - please install the speech recognition software"))
+
+					showMessage(translate("Error while initializing speech recognition module - please install the speech recognition software") . translate("...")
+										, translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+				}
+			}
+
+			if recognizer
+				for index, value in strings {
+					rating := recognizer.Compare(string, value)
+
+					if (rating > minRating) {
+						ratings.Push({Rating: rating, Target: value})
+
+						if (rating > maxRating)
+							break
+					}
+				}
+
+			if (ratings.Length > 0) {
+				bubbleSort(&ratings, (r1, r2) => r1.Rating < r2.Rating)
+
+				return {BestMatch: ratings[1], Ratings: ratings}
+			}
+			else
+				return {Ratings: []}
+		}
+
+		match(string, grammar, minRating?, maxRating?) {
+			local matches, settings
+
+			static ratingLow := kUndefined
+			static ratingHigh := kUndefined
+
+			if (ratingLow = kUndefined) {
+				settings := readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+
+				ratingLow := getMultiMapValue(settings, "Voice", "Low Rating", 0.7)
+				ratingHigh := getMultiMapValue(settings, "Voice", "High Rating", 0.85)
+			}
+
+			matches := allMatches(string, isSet(minRating) ? minRating : ratingLow
+										, isSet(maxRating) ? maxRating : ratingHigh
+										, grammar.Phrases*)
+
+			return (matches.HasProp("BestMatch") ? matches.BestMatch.Rating : false)
+		}
+
+		bestRating := 0
+		bestMatch := false
+
+		for name, grammar in this.Grammars {
+			rating := match(text, grammar)
+
+			if (rating > bestRating) {
+				bestRating := rating
+				bestMatch := name
+			}
+		}
+
+		if bestMatch {
+			words := string2Values(A_Space, text)
+
+			for index, literal in words {
+				literal := StrReplace(literal, ".", "")
+				literal := StrReplace(literal, ",", "")
+				literal := StrReplace(literal, ";", "")
+				literal := StrReplace(literal, "?", "")
+				literal := StrReplace(literal, "-", "")
+
+				words[index] := literal
+			}
+
+			return bestMatch
+		}
+		else
+			return false
+	}
+
 	phraseRecognized(grammar, words, remote := false) {
 		if (this.Debug[kDebugRecognitions] && !remote)
 			showMessage("Command phrase recognized: " . grammar . " => " . values2String(A_Space, words*))
@@ -1127,13 +1262,20 @@ class VoiceManager {
 	}
 
 	textRecognized(grammar, text, remote := false) {
+		local words, recognizedGrammar
+
 		if (this.Debug[kDebugRecognitions] && !remote)
 			showMessage("Text recognized: " . text)
 
 		protectionOn()
 
 		try {
-			this.handleVoiceText(grammar, text)
+			recognizedGrammar := ((this.iRecognizerMode = "Mixed") ? this.matchCommand(text, &words) : "")
+
+			if recognizedGrammar
+				this.handleVoiceCommand(recognizedGrammar, words)
+			else
+				this.handleVoiceText(grammar, text)
 		}
 		finally {
 			protectionOff()

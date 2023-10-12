@@ -40,6 +40,9 @@ class DrivingCoach extends GridRaceAssistant {
 
 	iTelemetryCollector := false
 
+	class CoachVoiceManager extends RaceAssistant.RaceVoiceManager {
+	}
+
 	class HTTPConnector {
 		iCoach := false
 
@@ -425,6 +428,8 @@ class DrivingCoach extends GridRaceAssistant {
 		, synthesizer := false, speaker := false, vocalics := false, recognizer := false, listener := false, muted := false, voiceServer := false) {
 		super.__New(configuration, "Driving Coach", remoteHandler, name, language, synthesizer, speaker, vocalics, recognizer, listener, muted, voiceServer)
 
+		this.updateConfigurationValues({Announcements: {SessionInformation: true, StintInformation: true, HandlingInformation: true}})
+
 		DirCreate(this.Options["Driving Coach.Archive"])
 
 		OnExit(ObjBindMethod(this, "stopTelemetryAnalyzer", true))
@@ -461,6 +466,10 @@ class DrivingCoach extends GridRaceAssistant {
 
 			this.iLapsHistory := string2Values(":", laps)[2]
 		}
+	}
+
+	createVoiceManager(name, options) {
+		return DrivingCoach.CoachVoiceManager(this, name, options)
 	}
 
 	updateSessionValues(values) {
@@ -508,7 +517,7 @@ class DrivingCoach extends GridRaceAssistant {
 												  , track: settingsDB.getTrackName(simulator, track)})
 				}
 			case "Session":
-				if knowledgeBase {
+				if (knowledgeBase && this.Announcements["SessionInformation"]) {
 					position := this.GridPosition
 
 					if (position != 0)
@@ -518,7 +527,7 @@ class DrivingCoach extends GridRaceAssistant {
 												  , classPosition: this.GridPosition["Class"], overallPosition: position})
 				}
 			case "Stint":
-				if knowledgeBase {
+				if (knowledgeBase && this.Announcements["StintInformation"]) {
 					position := this.getPosition(false, "Class")
 
 					if ((position != 0) && (this.Laps.Count > 0)) {
@@ -585,7 +594,7 @@ class DrivingCoach extends GridRaceAssistant {
 					}
 				}
 			case "Handling":
-				if knowledgeBase {
+				if (knowledgeBase && this.Announcements["HandlingInformation"]) {
 					collector := this.iTelemetryCollector
 
 					if collector {
@@ -664,6 +673,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 	handleVoiceText(grammar, text) {
 		local answer := false
+		local ignore, part
 
 		try {
 			if (this.Speaker && this.Options["Driving Coach.Confirmation"])
@@ -695,7 +705,11 @@ class DrivingCoach extends GridRaceAssistant {
 
 		if answer {
 			if this.Speaker
-				this.getSpeaker().speak(answer, false, false, {Noise: false})
+				if this.VoiceManager.UseTalking
+					this.getSpeaker().speak(answer, false, false, {Noise: false})
+				else
+					for ignore, part in string2Values(". ", answer)
+						this.getSpeaker().speak(part . ".", false, false, {Noise: false, Click: (A_Index = 1)})
 
 			if this.Transcript
 				FileAppend(translate("-- Driver --------") . "`n`n" . text . "`n`n" . translate("-- Coach ---------") . "`n`n" . answer . "`n`n", this.Transcript)
@@ -726,6 +740,23 @@ class DrivingCoach extends GridRaceAssistant {
 			collector.stopTelemetryCollector()
 
 		this.iTelemetryCollector := false
+	}
+
+	prepareSession(&settings, &data, formationLap?) {
+		local announcements := false
+		local facts
+
+		facts := super.prepareSession(&settings, &data, formationLap?)
+
+		if settings {
+			this.updateConfigurationValues({UseTalking: getMultiMapValue(settings, "Assistant.Coach", "Voice.UseTalking", true)})
+
+			this.updateConfigurationValues({Announcements: {SessionInformation: getMultiMapValue(settings, "Assistant.Coach", "Data.Session", true)
+														  , StintInformation: getMultiMapValue(settings, "Assistant.Coach", "Data.Stint", true)
+														  , HandlingInformation: getMultiMapValue(settings, "Assistant.Coach", "Data.Handling", true)}})
+		}
+
+		return facts
 	}
 
 	startSession(settings, data) {

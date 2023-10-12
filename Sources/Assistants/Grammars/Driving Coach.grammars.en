@@ -1,8 +1,16 @@
 [Configuration]
-Recognizer=Text
+Recognizer=Mixed
+[Fragments]
+SessionInformation=session information
+StintInformation=stint information
+HandlingInformation=handling information
+[Choices]
+Announcements=session information, stint information, handling information
 [Listener Grammars]
 // Conversation //
 Call=[{Hi, Hey} %name%, %name% do you hear me, %name% I need you, %name% where are you, %name% come in please]
+AnnouncementsOff=[{Please do, Do} not {pay attention, investigate} (Announcements) anymore, {Please ignore, Ignore} (Announcements), Ignore (Announcements) please]
+AnnouncementsOn=[{Please pay attention to, Pay attention to, Please investigate, Investigate} (Announcements) again, {Please take, Take} (Announcements) into {account, account please}]
 [Speaker Phrases]
 // Conversation //
 IHearYou.1=I am here. What can I do for you?
@@ -20,6 +28,20 @@ Confirm.1=Okay, let's see.
 Confirm.2=Okay, give me a second.
 Confirm.3=Wait a minute.
 Confirm.4=Roger, will be back in a second.
+Roger.1=Okay, understood.
+Roger.2=Will do.
+Roger.3=Okay, got it.
+Roger.4=Roger, understood.
+Okay.1=Okay, maybe later.
+Okay.2=Understood, no problem.
+Repeat.1=Sorry %driver%, I did not understand. Can you repeat?
+Repeat.2=Sorry, I didn't get that. Repeat please.
+Repeat.3=Can you repeat that please?
 Later.1=Sorry, I'm busy right now. Please contact me later.
 Later.2=I'm currently on the other line. Give me some time.
 Later.3=I just have to evaluate some data. Get in touch again in a few minutes.
+// Announcement Handling //
+ConfirmAnnouncementOff.1=You don't want to talk about %announcement% anymore, is this correct?
+ConfirmAnnouncementOff.2=I will ignore %announcement% for the moment, right?
+ConfirmAnnouncementOn.1=You want me to talk about %announcement% again, right?
+ConfirmAnnouncementOn.2=I will investigate %announcement% again, is this correct?

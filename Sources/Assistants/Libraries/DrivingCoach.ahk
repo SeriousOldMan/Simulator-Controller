@@ -751,9 +751,21 @@ class DrivingCoach extends GridRaceAssistant {
 		if settings {
 			this.updateConfigurationValues({UseTalking: getMultiMapValue(settings, "Assistant.Coach", "Voice.UseTalking", true)})
 
-			this.updateConfigurationValues({Announcements: {SessionInformation: getMultiMapValue(settings, "Assistant.Coach", "Data.Session", true)
-														  , StintInformation: getMultiMapValue(settings, "Assistant.Coach", "Data.Stint", true)
-														  , HandlingInformation: getMultiMapValue(settings, "Assistant.Coach", "Data.Handling", true)}})
+			if (this.Session = kSessionPractice)
+				this.updateConfigurationValues({Announcements: {SessionInformation: getMultiMapValue(settings, "Assistant.Coach", "Data.Practice.Session", true)
+															  , StintInformation: getMultiMapValue(settings, "Assistant.Coach", "Data.Practice.Stint", true)
+															  , HandlingInformation: getMultiMapValue(settings, "Assistant.Coach", "Data.Practice.Handling", true)}})
+			else if (this.Session = kSessionQualification)
+				this.updateConfigurationValues({Announcements: {SessionInformation: getMultiMapValue(settings, "Assistant.Coach", "Data.Qualification.Session", true)
+															  , StintInformation: getMultiMapValue(settings, "Assistant.Coach", "Data.Qualification.Stint", true)
+															  , HandlingInformation: getMultiMapValue(settings, "Assistant.Coach", "Data.Qualification.Handling", false)}})
+			else if (this.Session = kSessionRace)
+				this.updateConfigurationValues({Announcements: {SessionInformation: getMultiMapValue(settings, "Assistant.Coach", "Data.Race.Session", true)
+															  , StintInformation: getMultiMapValue(settings, "Assistant.Coach", "Data.Race.Stint", true)
+															  , HandlingInformation: getMultiMapValue(settings, "Assistant.Coach", "Data.Race.Handling", false)}})
+
+			if announcements
+				this.updateConfigurationValues({Announcements: announcements})
 		}
 
 		return facts

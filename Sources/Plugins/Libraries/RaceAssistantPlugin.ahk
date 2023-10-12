@@ -613,6 +613,12 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		}
 	}
 
+	RaceAssistantPersistent {
+		Get {
+			return false
+		}
+	}
+
 	RaceAssistantName {
 		Get {
 			return this.iRaceAssistantName
@@ -1151,7 +1157,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 		if (shutdownAssistant && !restart)
 			for ignore, assistant in RaceAssistantPlugin.Assistants
-				if (assistant.RaceAssistantEnabled && assistant.RaceAssistant) {
+				if (assistant.RaceAssistantEnabled && assistant.RaceAssistant && !this.RaceAssistantPersistent) {
 					RaceAssistantPlugin.WaitForShutdown := true
 
 					break

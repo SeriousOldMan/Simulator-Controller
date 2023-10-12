@@ -591,10 +591,9 @@ disabledIcon(fileName) {
 refreshStreamDecks() {
 	local full, ignore, fnController
 
-	if !MessageManager.isPaused()
-		for ignore, fnController in SimulatorController.Instance.FunctionController
-			if isInstance(fnController, StreamDeck)
-				fnController.refresh(true)
+	for ignore, fnController in SimulatorController.Instance.FunctionController
+		if isInstance(fnController, StreamDeck)
+			fnController.refresh(true)
 }
 
 handleStreamDeckMessage(category, data) {

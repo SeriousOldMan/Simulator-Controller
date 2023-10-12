@@ -195,7 +195,7 @@ Using this knowledge, Aiden should be able to give you information how to cope w
 
 Information: You can disable this instruction (and every other instruction as well), by clearing it in the configuration, if you don't want Aiden to give you information regarding handling problems.
 
-#### List of all voice commands
+### List of all voice commands
 
 1. [English version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Driving-Coach-Commands-(EN))
 

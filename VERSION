@@ -2,7 +2,7 @@
 Version=5.4.1.0-rc
 Target=5.4.1.0-release
 Date=10/11/2023
-Download=
+Download=https://www.dropbox.com/scl/fi/jf8y6jqiuqwcbhkvebebt/Simulator-Controller-5.4.1.0-rc.zip?rlkey=uiq326ea3h3tng4u6yf2togh7&dl=1
 Changes=Driving Coach now knows a lot about the current active stint, Updated instructions for Driving Coach, New data categories in the telemetry analyzer, New Ctrl modifier for instructions reload, Added "Practice Center" to Windows Start menu, New temperature sampling in "Setup Workbench", Fixed endless loop for install and update when Windows user is Admin, New car models for "Setup Workbench", Tweaked last lap detection, New settings in "Session Database" for the Drinving Coach, Driving coach instruction can be enabled or disabled
 Components=Media->5.3.0,Configuration->5.4.0,Utilities->5.3.0
 [Release]

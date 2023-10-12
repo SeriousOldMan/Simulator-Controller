@@ -1377,7 +1377,12 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		return getMultiMapValue(data, "Stint Data", "Laps", 0)
 	}
 
+	static finished(data, leader, driver) {
+		return false
+	}
+
 	static lastLap(data, &overLap) {
+		local driverCar := getMultiMapValue(data, "Position Data", "Driver.Car")
 		local sessionTimeRemaining, driverCar, time, running
 
 		overLap := 0
@@ -1385,25 +1390,27 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		if (getMultiMapValue(data, "Session Data", "SessionFormat") = "Time") {
 			sessionTimeRemaining := getMultiMapValue(data, "Session Data", "SessionTimeRemaining", 0)
 
-			loop getMultiMapValue(data, "Position Data", "Car.Count")
-				if (getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Position") = 1) {
-					time := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Time")
-					running := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Lap.Running")
+			if (sessionTimeRemaining < (getMultiMapValue(data, "Position Data", "Car." . driverCar . ".Time", 0) * 2)) {
+				loop getMultiMapValue(data, "Position Data", "Car.Count")
+					if (getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Position") = 1) {
+						time := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Time")
+						running := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Lap.Running")
 
-					if ((sessionTimeRemaining - ((1 - running) * time)) <= 0) {
-						driverCar := getMultiMapValue(data, "Position Data", "Driver.Car")
+						if ((sessionTimeRemaining - ((1 - running) * time)) <= 0) {
+							if (driverCar != A_Index)
+								if (getMultiMapValue(data, "Position Data", "Car." . driverCar . ".Lap.Running") > running)
+									overLap := 1
 
-						if (driverCar != A_Index)
-							if (getMultiMapValue(data, "Position Data", "Car." . driverCar . ".Lap.Running") > running)
-								overLap := 1
+							return true
+						}
 
-						return true
+						break
 					}
 
-					break
-				}
-
-			return (sessionTimeRemaining <= 0)
+				return (sessionTimeRemaining <= 0)
+			}
+			else
+				return false
 		}
 		else
 			return (getMultiMapValue(data, "Session Data", "SessionLapsRemaining", 0) <= 0)
@@ -2036,9 +2043,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					if (getMultiMapValue(data, "Session Data", "SessionFormat") = "Time") {
 						if !RaceAssistantPlugin.Finished
 							if this.lastLap(data, &overLap)
-								RaceAssistantPlugin.sFinished := (dataLastLap + overLap)
-							; else
-							;	RaceAssistantPlugin.sFinished := (RaceAssistantPlugin.currentLap(data) + 1)
+								RaceAssistantPlugin.sFinished := (dataLastLap + 1)
 
 						finished := false
 					}
@@ -2183,26 +2188,13 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 							RaceAssistantPlugin.sLapRunning := 0
 
 							if RaceAssistantPlugin.Finished {
-								if (dataLastLap >= RaceAssistantPlugin.Finished) {
-
-								; if (RaceAssistantPlugin.currentLap(data) >= RaceAssistantPlugin.Finished) {
-									; Session has endedd
-
+								if (dataLastLap >= RaceAssistantPlugin.Finished)
 									finished := true
-								}
 							}
 							else {
 								if (getMultiMapValue(data, "Session Data", "SessionFormat") = "Time") {
-									/*
-									if (getMultiMapValue(data, "Session Data", "SessionTimeRemaining", 0) <= 0)
-										RaceAssistantPlugin.sFinished := (RaceAssistantPlugin.currentLap(data) + 1)
-									else
-									*/
-
 									if this.lastLap(data, &overLap)
 										RaceAssistantPlugin.sFinished := (dataLastLap + overLap)
-									; else if (getMultiMapValue(data, "Session Data", "SessionLapsRemaining", 0) < 1)
-									; 	RaceAssistantPlugin.sFinished := (RaceAssistantPlugin.currentLap(data) + 2)
 								}
 								else if (getMultiMapValue(data, "Session Data", "SessionLapsRemaining", 0) == 0)
 									RaceAssistantPlugin.sFinished := dataLastLap

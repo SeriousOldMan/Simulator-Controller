@@ -1279,19 +1279,24 @@ class RaceSpotter extends GridRaceAssistant {
 
 		if (knowledgeBase.getValue("Session.Format") = "Time") {
 			sessionTimeRemaining := knowledgeBase.getValue("Session.Time.Remaining")
+			driverCar := knowledgeBase.getValue("Driver.Car")
 
-			loop knowledgeBase.getValue("Car.Count", 0)
-				if (knowledgeBase.getValue("Car." . A_Index . ".Position") = 1) {
-					time := knowledgeBase.getValue("Car." . A_Index . ".Time")
-					running := knowledgeBase.getValue("Car." . A_Index . ".Lap.Running")
+			if (sessionTimeRemaining < (knowledgeBase.getValue("Car." . driverCar . ".Time", 0) * 2)) {
+				loop knowledgeBase.getValue("Car.Count", 0)
+					if (knowledgeBase.getValue("Car." . A_Index . ".Position") = 1) {
+						time := knowledgeBase.getValue("Car." . A_Index . ".Time")
+						running := knowledgeBase.getValue("Car." . A_Index . ".Lap.Running")
 
-					if ((sessionTimeRemaining - ((1 - running) * time)) <= 0)
-						return true
+						if ((sessionTimeRemaining - ((1 - running) * time)) <= 0)
+							return true
 
-					break
-				}
+						break
+					}
 
-			return (sessionTimeRemaining <= 0)
+				return (sessionTimeRemaining <= 0)
+			}
+			else
+				return false
 		}
 		else
 			return (knowledgeBase.getValue("Session.Lap.Remaining") <= 0)

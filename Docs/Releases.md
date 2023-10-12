@@ -13,6 +13,13 @@
 	 - Issues for brake temperatures outside a predefined range can be generated.
   6. The persistent structure of the Telemetry Analyzer settings has changed. You may have to recreate your settings in some rare cases.
   7. Added "Practice Center" to Windows Start menu, which was forgotten at the initial release of "Practice Center".
+  8. Optimized performance of icon refresh when switching profiles on Stream Deck.
+  9. New car models for "Setup Workbench":
+     - Assetto Corsa
+       - Lotus Exige Scura
+       - Lotus Exige 240 R
+       - Lotus Exige S
+       - Lotus Exige S Roadster
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-541), especially if you are using the Driving Coach.
 

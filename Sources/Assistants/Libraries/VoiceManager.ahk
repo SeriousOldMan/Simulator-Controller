@@ -1020,17 +1020,17 @@ class VoiceManager {
 		return phrases
 	}
 
-	buildGrammars(speechRecognizer, language) {
+	buildGrammars(spRecognizer, language) {
 		local grammars := this.getGrammars(language)
 		local mode := getMultiMapValue(grammars, "Configuration", "Recognizer", "Grammar")
-		local compilerRecognizer := speechRecognizer
+		local compilerRecognizer := spRecognizer
 		local grammar, definition, name, choices, nextCharIndex
 
 		this.iRecognizerMode := mode
 
 		for name, choices in getMultiMapValues(grammars, "Choices")
-			if speechRecognizer
-				speechRecognizer.setChoices(name, choices)
+			if spRecognizer
+				spRecognizer.setChoices(name, choices)
 			else
 				messageSend(kFileMessage, "Voice", "registerChoices:" . values2String(";", this.Name, name, string2Values(",", choices)*), this.VoiceServer)
 
@@ -1039,7 +1039,7 @@ class VoiceManager {
 
 			if (mode = "Mixed") {
 				if !compilerRecognizer {
-					compilerRecognizer := SpeechRecognizer("Desktop", true, this.Language, false, "Text")
+					compilerRecognizer := SpeechRecognizer("Compiler", true, this.Language, false, "Text")
 
 					for name, choices in getMultiMapValues(grammars, "Choices")
 						compilerRecognizer.setChoices(name, choices)
@@ -1054,51 +1054,53 @@ class VoiceManager {
 				this.Grammars[grammar] := compilerRecognizer.compileGrammar(definition)
 			}
 
-			if speechRecognizer {
-				if (mode = "Text") {
-					if (grammar != "Call")
+			if ((mode != "Mixed") || (grammar = "Call"))
+				if spRecognizer {
+					if (mode = "Text") {
+						if (grammar != "Call")
+							throw "Listener grammars are not supported in continuous text recognition..."
+
+						continue
+					}
+
+					if this.Debug[kDebugGrammars] {
+						nextCharIndex := 1
+
+						showMessage("Register command phrase: " . GrammarCompiler(spRecognizer).readGrammar(&definition, &nextCharIndex).toString())
+					}
+
+					if ((grammar != "Call") || (mode = "Grammar"))
+						try {
+							if !spRecognizer.loadGrammar(grammar, spRecognizer.compileGrammar(definition), ObjBindMethod(this, "raisePhraseRecognized"))
+								throw "Recognizer not running..."
+						}
+						catch Any as exception {
+							logError(exception, true)
+
+							logMessage(kLogCritical, translate("Error while registering voice command `"") . definition . translate("`" - please check the configuration"))
+
+							showMessage(substituteVariables(translate("Cannot register voice command `"%command%`" - please check the configuration..."), {command: definition})
+									  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+						}
+				}
+				else if (grammar != "Call") {
+					this.Grammars[grammar] := spRecognizer.compileGrammar(definition)
+
+					if (mode = "Text")
 						throw "Listener grammars are not supported in continuous text recognition..."
 
-					continue
+					messageSend(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, grammar, definition, "remoteCommandRecognized"), this.VoiceServer)
 				}
-
-				if this.Debug[kDebugGrammars] {
-					nextCharIndex := 1
-
-					showMessage("Register command phrase: " . GrammarCompiler(speechRecognizer).readGrammar(&definition, &nextCharIndex).toString())
-				}
-
-				try {
-					if !speechRecognizer.loadGrammar(grammar, this.Grammars[grammar], ObjBindMethod(this, "raisePhraseRecognized"))
-						throw "Recognizer not running..."
-				}
-				catch Any as exception {
-					logError(exception, true)
-
-					logMessage(kLogCritical, translate("Error while registering voice command `"") . definition . translate("`" - please check the configuration"))
-
-					showMessage(substituteVariables(translate("Cannot register voice command `"%command%`" - please check the configuration..."), {command: definition})
-							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-				}
-			}
-			else if (grammar != "Call") {
-				this.Grammars[grammar] := speechRecognizer.compileGrammar(definition)
-
-				if (mode = "Text")
-					throw "Listener grammars are not supported in continuous text recognition..."
-
-				messageSend(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, grammar, definition, "remoteCommandRecognized"), this.VoiceServer)
-			}
 		}
 
-		if (mode = "Text") {
-			if !speechRecognizer
+		if (mode != "Grammar") {
+			if !spRecognizer
 				messageSend(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, "Text", "*", "remoteTextRecognized"), this.VoiceServer)
 		}
 		else {
-			if speechRecognizer {
+			if spRecognizer {
 				try {
-					speechRecognizer.loadGrammar("?", speechRecognizer.compileGrammar("[Unknown]"), ObjBindMethod(this, "raisePhraseRecognized"))
+					spRecognizer.loadGrammar("?", spRecognizer.compileGrammar("[Unknown]"), ObjBindMethod(this, "raisePhraseRecognized"))
 				}
 				catch Any as exception {
 					logError(exception, true)

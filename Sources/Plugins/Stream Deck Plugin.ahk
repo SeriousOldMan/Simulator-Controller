@@ -636,7 +636,7 @@ initializeStreamDeckPlugin() {
 
 	registerMessageHandler("Stream Deck", handleStreamDeckMessage)
 
-	PeriodicTask(refreshStreamDecks, 5000, kLowPriority).start()
+	PeriodicTask(refreshStreamDecks, 6000, kLowPriority).start()
 }
 
 

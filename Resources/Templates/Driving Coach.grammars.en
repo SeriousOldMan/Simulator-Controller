@@ -9,6 +9,8 @@ Announcements=session information, stint information, handling information
 [Listener Grammars]
 // Conversation //
 Call=[{Hi, Hey} %name%, %name% do you hear me, %name% I need you, %name% where are you, %name% come in please]
+Yes=[Yes {please, of course}, {Yes, Perfect} go on, {Go, Okay go} {on, on please, ahead, ahead please}, I agree, Right, Correct, Confirmed, I confirm, Affirmative]
+No=[No {thank you, not now, I will call you later}, Not at the moment, Negative]
 AnnouncementsOff=[{Please do, Do} not {pay attention, investigate} (Announcements) anymore, {Please ignore, Ignore} (Announcements), Ignore (Announcements) please]
 AnnouncementsOn=[{Please pay attention to, Pay attention to, Please investigate, Investigate} (Announcements) again, {Please take, Take} (Announcements) into {account, account please}]
 [Speaker Phrases]

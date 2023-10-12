@@ -62,6 +62,10 @@ Information=session information, stint information, handling information
 1.  Conversation
 
 	[{Hi, Hey} %name%, %name% do you hear me, %name% I need you, %name% where are you, %name% come in please]
+	
+	[Yes {please, of course}, {Yes, Perfect} go on, {Go, Okay go} {on, on please, ahead, ahead please}, I agree, Right, Correct, Confirmed, I confirm, Affirmative]
+	
+	[No {thank you, not now, I will call you later}, Not at the moment, Negative]
 
 	[{Please do, Do} not {pay attention, investigate} (Information) anymore, {Please ignore, Ignore} (Information), Ignore (Information) please]
 

@@ -1157,7 +1157,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 		if (shutdownAssistant && !restart)
 			for ignore, assistant in RaceAssistantPlugin.Assistants
-				if (assistant.RaceAssistantEnabled && assistant.RaceAssistant && !this.RaceAssistantPersistent) {
+				if (assistant.RaceAssistantEnabled && assistant.RaceAssistant && !assistant.RaceAssistantPersistent) {
 					RaceAssistantPlugin.WaitForShutdown := true
 
 					break
@@ -1396,13 +1396,16 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	static lastLap(data, &state) {
-		local sessionTimeRemaining, driverCar, time, running
+		local leader, driver, sessionTimeRemaining, driverCar, time, running
 
 		if (getMultiMapValue(data, "Session Data", "SessionFormat") = "Time") {
 			driverCar := getMultiMapValue(data, "Position Data", "Driver.Car")
 			sessionTimeRemaining := getMultiMapValue(data, "Session Data", "SessionTimeRemaining", 0)
 
 			if (sessionTimeRemaining < (getMultiMapValue(data, "Position Data", "Car." . driverCar . ".Time", 0) * 2)) {
+				leader := false
+				driver := false
+
 				loop getMultiMapValue(data, "Position Data", "Car.Count")
 					if (getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Position") = 1) {
 						time := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Time")
@@ -1425,12 +1428,14 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					leader := false
 					driver := {Car: driverCar, Lap: getMultiMapValue(data, "Position Data", "Car." . driverCar . ".Laps") + 1}
 				}
-			}
 
-			if (leader || driver) {
-				state := [leader, driver]
+				if (leader || driver) {
+					state := [leader, driver]
 
-				return true
+					return true
+				}
+				else
+					return false
 			}
 			else
 				return false
@@ -2235,7 +2240,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 									return ; Oops, a different driver, might happen in some simulations after a pitstop
 						}
 
-						if (!RaceAssistantPlugin.Finish && RaceAssistantPlugin.lastLap(data, &lastLap)) {
+						if (!RaceAssistantPlugin.Finish && RaceAssistantPlugin.lastLap(data, &lastLap))
 							RaceAssistantPlugin.sFinish := lastLap
 
 						newLap := (dataLastLap > RaceAssistantPlugin.LastLap)

@@ -264,19 +264,21 @@ class SpeechRecognizer {
 
 			this.Instance := instance
 
-			if (InStr(engine, "Azure|") == 1) {
-				this.iEngine := "Azure"
-
-				engine := string2Values("|", engine)
+			if ((InStr(engine, "Azure|") == 1) || (engine = "Compiler")) {
+				this.iEngine := ((engine = "Compiler") ? "Compiler" : "Azure")
 
 				if !language
 					language := "en-US"
 
-				if !instance.Connect(engine[2], engine[3], language, ObjBindMethod(this, "_onTextCallback")) {
-					logMessage(kLogCritical, translate("Could not communicate with speech recognizer library (") . dllName . translate(")"))
-					logMessage(kLogCritical, translate("Try running the Powershell command `"Get-ChildItem -Path '.' -Recurse | Unblock-File`" in the Binaries folder"))
+				if (engine != "Compiler") {
+					engine := string2Values("|", engine)
 
-					throw "Could not communicate with speech recognizer library (" . dllName . ")..."
+					if !instance.Connect(engine[2], engine[3], language, ObjBindMethod(this, "_onTextCallback")) {
+						logMessage(kLogCritical, translate("Could not communicate with speech recognizer library (") . dllName . translate(")"))
+						logMessage(kLogCritical, translate("Try running the Powershell command `"Get-ChildItem -Path '.' -Recurse | Unblock-File`" in the Binaries folder"))
+
+						throw "Could not communicate with speech recognizer library (" . dllName . ")..."
+					}
 				}
 
 				choices := []
@@ -299,49 +301,51 @@ class SpeechRecognizer {
 
 			this.setMode(mode)
 
-			if (this.Instance.OkCheck() != "OK") {
-				logMessage(kLogCritical, translate("Could not communicate with speech recognizer library (") . dllName . translate(")"))
-				logMessage(kLogCritical, translate("Try running the Powershell command `"Get-ChildItem -Path '.' -Recurse | Unblock-File`" in the Binaries folder"))
+			if (engine != "Compiler") {
+				if (this.Instance.OkCheck() != "OK") {
+					logMessage(kLogCritical, translate("Could not communicate with speech recognizer library (") . dllName . translate(")"))
+					logMessage(kLogCritical, translate("Try running the Powershell command `"Get-ChildItem -Path '.' -Recurse | Unblock-File`" in the Binaries folder"))
 
-				throw "Could not communicate with speech recognizer library (" . dllName . ")..."
+					throw "Could not communicate with speech recognizer library (" . dllName . ")..."
+				}
+
+				this.RecognizerList := this.createRecognizerList()
+
+				if (this.RecognizerList.Length == 0) {
+					logMessage(kLogCritical, translate("No languages found while initializing speech recognition system - please install the speech recognition software"))
+
+					if !silent
+						showMessage(translate("No languages found while initializing speech recognition system - please install the speech recognition software") . translate("...")
+								  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+				}
+
+				found := false
+
+				if ((recognizer == true) && language) {
+					for ignore, recognizerDescriptor in this.getRecognizerList()
+						if (recognizerDescriptor.Language = language) {
+							recognizer := recognizerDescriptor.ID
+
+							found := true
+
+							break
+						}
+				}
+				else if (recognizer && (recognizer != true))
+					for ignore, recognizerDescriptor in this.getRecognizerList()
+						if (recognizerDescriptor.Name = recognizer) {
+							recognizer := recognizerDescriptor.ID
+
+							found := true
+
+							break
+						}
+
+				if !found
+					recognizer := 0
+
+				this.initialize(recognizer)
 			}
-
-			this.RecognizerList := this.createRecognizerList()
-
-			if (this.RecognizerList.Length == 0) {
-				logMessage(kLogCritical, translate("No languages found while initializing speech recognition system - please install the speech recognition software"))
-
-				if !silent
-					showMessage(translate("No languages found while initializing speech recognition system - please install the speech recognition software") . translate("...")
-							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-			}
-
-			found := false
-
-			if ((recognizer == true) && language) {
-				for ignore, recognizerDescriptor in this.getRecognizerList()
-					if (recognizerDescriptor.Language = language) {
-						recognizer := recognizerDescriptor.ID
-
-						found := true
-
-						break
-					}
-			}
-			else if (recognizer && (recognizer != true))
-				for ignore, recognizerDescriptor in this.getRecognizerList()
-					if (recognizerDescriptor.Name = recognizer) {
-						recognizer := recognizerDescriptor.ID
-
-						found := true
-
-						break
-					}
-
-			if !found
-				recognizer := 0
-
-			this.initialize(recognizer)
 		}
 		catch Any as exception {
 			logError(exception, true)
@@ -375,7 +379,7 @@ class SpeechRecognizer {
 		local recognizerList := []
 		local culture, name, index, language, recognizer
 
-		if (this.iEngine = "Azure") {
+		if ((this.iEngine = "Azure") || (this.iEngine = "Compiler")) {
 			for culture, name in kAzureLanguages {
 				index := A_Index - 1
 
@@ -404,7 +408,7 @@ class SpeechRecognizer {
 
 	initialize(id) {
 		if this.Instance
-			if (this.iEngine = "Azure")
+			if ((this.iEngine = "Azure") || (this.iEngine = "Compiler"))
 				this.Instance.SetLanguage(this.getRecognizerList()[id + 1].Culture)
 			else if (id > this.Instance.getRecognizerCount() - 1)
 				throw "Invalid recognizer ID (" . id . ") detected in SpeechRecognizer.initialize..."
@@ -468,7 +472,7 @@ class SpeechRecognizer {
 		if isSet(name) {
 			if this.iChoices.Has(name)
 				return this.iChoices[name]
-			else if (this.iEngine = "Azure")
+			else if ((this.iEngine = "Azure") || (this.iEngine = "Compiler"))
 				return []
 			else
 				return (this.Instance ? ((this.iEngine = "Server") ? this.Instance.GetServerChoices(name) : this.Instance.GetDesktopChoices(name)) : [])
@@ -488,7 +492,7 @@ class SpeechRecognizer {
 			switch this.iEngine, false {
 				case "Desktop", "Server":
 					this.Instance.SetContinuous(true, this._onGrammarCallback.Bind(this))
-				case "Azure":
+				case "Azure", "Compiler":
 					this.Instance.SetContinuous(true)
 			}
 	}
@@ -498,7 +502,7 @@ class SpeechRecognizer {
 			switch this.iEngine, false {
 				case "Desktop":
 					return this.Instance.NewDesktopGrammar()
-				case "Azure":
+				case "Azure", "Compiler":
 					return Grammar()
 				case "Server":
 					return this.Instance.NewServerGrammar()
@@ -513,7 +517,7 @@ class SpeechRecognizer {
 			switch this.iEngine, false {
 				case "Desktop":
 					return this.Instance.NewDesktopChoices(isObject(choices) ? values2String(", ", choices*) : choices)
-				case "Azure":
+				case "Azure", "Compiler":
 					return Grammar.Choices(!isObject(choices) ? string2Values(",", choices) : choices)
 				case "Server":
 					return this.Instance.NewServerChoices(isObject(choices) ? values2String(", ", choices*) : choices)
@@ -545,7 +549,7 @@ class SpeechRecognizer {
 
 		this._grammarCallbacks[name] := callback
 
-		if (this.iEngine = "Azure") {
+		if ((this.iEngine = "Azure") || (this.iEngine = "Compiler")) {
 			Task.startTask(prepareGrammar.Bind(name, theGrammar), 1000, kLowPriority)
 
 			theGrammar := {Name: name, Grammar: theGrammar, Callback: callback}

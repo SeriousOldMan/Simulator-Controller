@@ -148,8 +148,8 @@ Below you find all instruction categories and the supported variables:
 |             | %carNumber%       | The race number of your car.                                                    |
 |             | %lap%             | The lap you have just finished.                                                 |
 |             | %position%        | Your position in your class at the end of the last lap.                         |
-|             | %laps%            | This variable is substituted with a CSV table of your performance during the last laps. This table contains your position (overall and class) as well as the lap time and sector times. You can define the number of laps to be reported by defining the variable as %laps:5%, for example. |
-|             | %standings%       | This variable is replaced with a CSV table containing the current standings sorted by overall position. This table contains the race number, class, position (overall and class) as well as the lap time and sector times. |
+|             | %laps%            | This variable is substituted with a CSV table of your performance during the last laps. This table contains columns for your position (overall and class) as well as the lap time and sector times. You can define the number of laps to be reported by defining the variable as %laps:5%, for example. |
+|             | %standings%       | This variable is replaced with a CSV table containing the current standings sorted by overall position. This table contains columns for the race number, class, position (overall and class) as well as the lap time and sector times. |
 | Handling    | Scope             | This instruction is used only when handling problems had been detected in the telemetry. See the chapter below about detecting handling problems and discussin them with Aiden. |
 |             | %handling%        | An enumeration of all detected handing problems. See the [dedicated chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#detecting-and-discussing-handling-problems) below for more information. |
 

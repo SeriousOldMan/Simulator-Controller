@@ -1,4 +1,4 @@
-## 5.4.1.0-release 10/13/23 (planned)
+## 5.4.1.0-release 10/13/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed a **critical** bug, that triggered an endless loop in the isntall and update process, when the current Windows user has Admin privileges.

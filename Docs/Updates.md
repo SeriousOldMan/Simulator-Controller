@@ -37,7 +37,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 5.4.1
 
-The instructions for the LLM of the Driving Coach has been extended. You can update to the new instructions using the reload button in the configurations. Also, new instructions for extended data integration has been added, which you can also load into the configuration.
+The instructions for the LLM of the Driving Coach have been extended. You can update to the new instructions using the [reload button in the configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-driving-coach). Also, new instructions for extended data integration have been added, which you can also load into the configuration.
 
 Another change regards the storage of the Telemetry Analyzer settings of "Setup Workbench". These are now also used by the Driving Coach and therefore it was necessary to change their internal structure. The structural change will be handled by the update procedure, but in some rare cases, old settings will be lost and must be recreated before running the analyzer again.
 

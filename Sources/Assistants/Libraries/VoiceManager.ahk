@@ -1023,10 +1023,13 @@ class VoiceManager {
 	buildGrammars(spRecognizer, language) {
 		local grammars := this.getGrammars(language)
 		local mode := getMultiMapValue(grammars, "Configuration", "Recognizer", "Grammar")
-		local compilerRecognizer := spRecognizer
+		local compilerRecognizer := SpeechRecognizer("Compiler", true, this.Language, false, "Text")
 		local grammar, definition, name, choices, nextCharIndex
 
 		this.iRecognizerMode := mode
+
+		for name, choices in getMultiMapValues(grammars, "Choices")
+			compilerRecognizer.setChoices(name, choices)
 
 		for name, choices in getMultiMapValues(grammars, "Choices")
 			if spRecognizer
@@ -1084,7 +1087,7 @@ class VoiceManager {
 						}
 				}
 				else if (grammar != "Call") {
-					this.Grammars[grammar] := spRecognizer.compileGrammar(definition)
+					this.Grammars[grammar] := compilerRecognizer.compileGrammar(definition)
 
 					if (mode = "Text")
 						throw "Listener grammars are not supported in continuous text recognition..."

@@ -3010,7 +3010,7 @@ class Strategy extends ConfigurationItem {
 		pitstopRule := this.PitstopRule
 
 		if ((pitstopNr = 1) && ((targetLap >= remainingSessionLaps) && pitstopRule) && (pitstopRule == true))
-			targetLap := remainingSessionLaps - 2
+			targetLap := (remainingSessionLaps - 2)
 		else if isObject(pitstopRule) {
 			openingLap := (pitstopRule[1] * 60 / avgLapTime)
 			closingLap := (pitstopRule[2] * 60 / avgLapTime)

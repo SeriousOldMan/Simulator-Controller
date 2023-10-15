@@ -1,14 +1,14 @@
 [Development]
-Version=5.4.1.0-release
-Target=5.4.1.0-release
-Date=10/13/2023
-Download=https://cutt.ly/pwmNe3t5;https://www.dropbox.com/scl/fi/iho04r6p3f7urazq3wvk7/Simulator-Controller-5.4.1.0-release.zip?rlkey=ckmrvobq9tzhvo91cxq2cgkwq&dl=1
+Version=5.4.1.1-release
+Target=5.4.1.1-release
+Date=10/15/2023
+Download=https://cutt.ly/AwQoDwHA;https://www.dropbox.com/scl/fi/wi388rnpo3rk59fyw648v/Simulator-Controller-5.4.1.1-release.zip?rlkey=apqpc9puivof85e2xbt040txk&dl=1
 Changes=Driving Coach now knows a lot about the current active stint, Updated instructions for Driving Coach, New data categories in the telemetry analyzer, New Ctrl modifier for instructions reload, Added "Practice Center" to Windows Start menu, New temperature sampling in "Setup Workbench", Fixed endless loop for install and update when Windows user is Admin, New car models for "Setup Workbench", Tweaked last lap detection, New settings in "Session Database" for the Drinving Coach, Driving coach instruction can be enabled or disabled
 Components=Media->5.3.0,Configuration->5.4.0,Utilities->5.3.0
 [Release]
-Version=5.4.1.0-release
-Date=10/13/2023
-Download=https://cutt.ly/pwmNe3t5;https://www.dropbox.com/scl/fi/iho04r6p3f7urazq3wvk7/Simulator-Controller-5.4.1.0-release.zip?rlkey=ckmrvobq9tzhvo91cxq2cgkwq&dl=1
+Version=5.4.1.1-release
+Date=10/15/2023
+Download=https://cutt.ly/AwQoDwHA;https://www.dropbox.com/scl/fi/wi388rnpo3rk59fyw648v/Simulator-Controller-5.4.1.1-release.zip?rlkey=apqpc9puivof85e2xbt040txk&dl=1
 Changes=Driving Coach now knows a lot about the current active stint, Updated instructions for Driving Coach, New data categories in the telemetry analyzer, New Ctrl modifier for instructions reload, Added "Practice Center" to Windows Start menu, New temperature sampling in "Setup Workbench", Fixed endless loop for install and update when Windows user is Admin, New car models for "Setup Workbench", Tweaked last lap detection, New settings in "Session Database" for the Drinving Coach, Driving coach instruction can be enabled or disabled
 Components=Media->5.3.0,Configuration->5.4.0,Utilities->5.3.0
 [Components]
@@ -27,5 +27,5 @@ Utilities.5.3.0.Download=https://www.dropbox.com/scl/fi/hlza8t9tae5d0vnd7wmqa/Ut
 [Current]
 Type=Release
 [Version]
-Development=5.4.1.0-release
-Release=5.4.1.0-release
+Development=5.4.1.1-release
+Release=5.4.1.1-release

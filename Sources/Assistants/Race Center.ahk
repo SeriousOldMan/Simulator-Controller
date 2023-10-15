@@ -1745,7 +1745,7 @@ class RaceCenter extends ConfigurationItem {
 			copyPressure(driver, compound, pressures, *) {
 				local chosen := inList(collect(concatenate(["No Tyre Change"], center.TyreCompounds), translate), compound)
 
-				pressures := string2Values(", ", pressures)
+				pressures := string2Values(",", pressures)
 
 				centerGui["pitstopTyreCompoundDropDown"].Choose((chosen == 0) ? 1 : chosen)
 				centerGui["pitstopPressureFLEdit"].Text := pressures[1]
@@ -1779,8 +1779,10 @@ class RaceCenter extends ConfigurationItem {
 
 					tyreCompound := compound(tyreCompound, tyreCompoundColor)
 
+					pressures := values2String(", ", pressures*)
+
 					label := (translate("Session") . translate(" - ") . driver . translate(" - "))
-						   . (conditions . translate(" - ") . tyreCompound . translate(": ") . values2String(", ", pressures*))
+						   . (conditions . translate(" - ") . tyreCompound . translate(": ") . pressures)
 
 					pressuresMenu.Add(label, copyPressure.Bind(driver, tyreCompound, pressures))
 

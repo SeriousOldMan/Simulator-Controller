@@ -511,8 +511,6 @@ class RaceStrategist extends GridRaceAssistant {
 
 			this.iPitstops := pitstops
 			this.iUsedTyreSets := tyreSets
-
-			; this.iFullCourseYellow := (pitstops.Length + 1)
 		}
 
 		run() {

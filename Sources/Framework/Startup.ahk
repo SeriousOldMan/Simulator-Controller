@@ -179,7 +179,7 @@ initializeEnvironment() {
 			install := (installLocation && (installLocation != "") && (InStr(kHomeDirectory, installLocation) != 1))
 			install := (install || !installLocation || (installLocation = ""))
 
-			if install
+			if (install || inList(A_Args, "-Repair"))
 				kProperInstallation := false
 
 			if (!isProperInstallation() && inList(kForegroundApps, StrSplit(A_ScriptName, ".")[1])) {

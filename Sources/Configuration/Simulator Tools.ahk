@@ -488,10 +488,10 @@ checkInstallation() {
 				OnMessage(0x44, translateOkButton)
 				MsgBox(translate("Simulator Controller cannot request Admin priviliges. Please enable User Account Control."), translate("Error"), 262160)
 				OnMessage(0x44, translateOkButton, 0)
-				
+
 				ExitApp(0)
 			}
-		
+
 			index := inList(A_Args, "-Start")
 
 			options := (index ? ("-Start " . "`"" . A_Args[index + 1] . "`"") : "")
@@ -553,10 +553,10 @@ checkInstallation() {
 				OnMessage(0x44, translateOkButton)
 				MsgBox(translate("Simulator Controller cannot request Admin priviliges. Please enable User Account Control."), translate("Error"), 262160)
 				OnMessage(0x44, translateOkButton, 0)
-				
+
 				ExitApp(0)
 			}
-			
+
 			options := ("-Uninstall -NoUpdate" . (quiet ? " -Quiet" : ""))
 
 			try {
@@ -654,7 +654,7 @@ checkInstallation() {
 					OnMessage(0x44, translateOkButton)
 					MsgBox(translate("Simulator Controller cannot request Admin priviliges. Please enable User Account Control."), translate("Error"), 262160)
 					OnMessage(0x44, translateOkButton, 0)
-					
+
 					ExitApp(0)
 				}
 

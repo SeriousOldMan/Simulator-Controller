@@ -1481,6 +1481,8 @@ initializeGUI() {
 		return control
 	}
 
+	DllCall("SetThreadDpiAwarenessContext", "Ptr", -5, "Ptr")
+
 	Window.DefineCustomControl("Documentation", createDocumentation)
 
 	try {

@@ -758,10 +758,18 @@ startSimulator() {
 		local ignore, directory, currentDirectory, pid
 
 		if !A_IsAdmin {
+			if RegExMatch(DllCall("GetCommandLine", "Str"), " /restart(?!\S)") {
+				OnMessage(0x44, translateOkButton)
+				MsgBox(translate("Simulator Controller cannot request Admin priviliges. Please enable User Account Control."), translate("Error"), 262160)
+				OnMessage(0x44, translateOkButton, 0)
+				
+				ExitApp(0)
+			}
+			
 			if A_IsCompiled
-				Run("*RunAs `"" . A_ScriptFullPath . "`" -Unblock")
+				Run("*RunAs `"" . A_ScriptFullPath . "`" /restart -Unblock")
 			else
-				Run("*RunAs `"" . A_AhkPath . "`" `"" . A_ScriptFullPath . "`" -Unblock")
+				Run("*RunAs `"" . A_AhkPath . "`" `"" . A_ScriptFullPath . "`" /restart -Unblock")
 
 			ExitApp(0)
 		}
@@ -805,9 +813,9 @@ startSimulator() {
 			hideProgress()
 
 			if A_IsCompiled
-				Run((!A_IsAdmin ? "*RunAs `"" : "`"") . A_ScriptFullPath . "`"")
+				Run((!A_IsAdmin ? "*RunAs `"" : "`"") . A_ScriptFullPath . "`" /restart")
 			else
-				Run((!A_IsAdmin ? "*RunAs `"" : "`"") . A_AhkPath . "`" `"" . A_ScriptFullPath . "`"")
+				Run((!A_IsAdmin ? "*RunAs `"" : "`"") . A_AhkPath . "`" `"" . A_ScriptFullPath . "`" /restart")
 
 			ExitApp(0)
 		}

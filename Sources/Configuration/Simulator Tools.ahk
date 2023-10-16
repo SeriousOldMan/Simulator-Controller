@@ -483,6 +483,32 @@ checkInstallation() {
 	installLocation := getMultiMapValue(installInfo, "Install", "Location", installLocation)
 
 	if inList(A_Args, "-Repair") {
+		if !A_IsAdmin {
+			if RegExMatch(DllCall("GetCommandLine", "Str"), " /restart(?!\S)") {
+				OnMessage(0x44, translateOkButton)
+				MsgBox(translate("Simulator Controller cannot request Admin priviliges. Please enable User Account Control."), translate("Error"), 262160)
+				OnMessage(0x44, translateOkButton, 0)
+				
+				ExitApp(0)
+			}
+		
+			index := inList(A_Args, "-Start")
+
+			options := (index ? ("-Start " . "`"" . A_Args[index + 1] . "`"") : "")
+
+			try {
+				if A_IsCompiled
+					Run("*RunAs `"" . A_ScriptFullPath . "`" /restart -Repair " . options)
+				else
+					Run("*RunAs `"" . A_AhkPath . "`" /restart `"" . A_ScriptFullPath . "`" -Repair " . options)
+			}
+			catch Any as exception {
+				logError(exception)
+			}
+
+			ExitApp(0)
+		}
+
 		showProgress({color: "Blue", title: translate("Updating Simulator Controller"), message: translate("...")})
 
 		deleteFile(A_Temp . "\Patch.bat")
@@ -523,6 +549,14 @@ checkInstallation() {
 		quiet := inList(A_Args, "-Quiet")
 
 		if !A_IsAdmin {
+			if RegExMatch(DllCall("GetCommandLine", "Str"), " /restart(?!\S)") {
+				OnMessage(0x44, translateOkButton)
+				MsgBox(translate("Simulator Controller cannot request Admin priviliges. Please enable User Account Control."), translate("Error"), 262160)
+				OnMessage(0x44, translateOkButton, 0)
+				
+				ExitApp(0)
+			}
+			
 			options := ("-Uninstall -NoUpdate" . (quiet ? " -Quiet" : ""))
 
 			try {
@@ -616,6 +650,14 @@ checkInstallation() {
 			}
 
 			if !A_IsAdmin {
+				if RegExMatch(DllCall("GetCommandLine", "Str"), " /restart(?!\S)") {
+					OnMessage(0x44, translateOkButton)
+					MsgBox(translate("Simulator Controller cannot request Admin priviliges. Please enable User Account Control."), translate("Error"), 262160)
+					OnMessage(0x44, translateOkButton, 0)
+					
+					ExitApp(0)
+				}
+
 				index := inList(A_Args, "-Start")
 
 				options := (index ? ("-Start " . "`"" . A_Args[index + 1] . "`"") : "")

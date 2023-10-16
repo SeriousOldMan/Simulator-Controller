@@ -64,6 +64,8 @@ Another Windows security function is the so called User Account Control. It jump
 
 It has been reported, that the UAC can interfere in rare cases with the operation of Simulator Controller. Especially the C#-based Stream Deck plugin crashes, when the UAC is set at a too high level. If you experience such problems, try to lower the UAC. If this helps, give the respective application or library of Simulator Controller administration rights and bring the UAC level up again. This usually helps.
 
+It also has been reported, that fully disabling UAC, especially in combination with a Windows user, who has Admin priveliges can cause problems as well. In these cases, please contact me and we will find a solution to install Simulator Controller on your system as well.
+
 ## Installing Microsoft Language Runtimes
 
 Several components of Simulator Controller are based on low level language runtimes from Microsoft, namely the *.NET Framwork Runtimes* in the version 4.7.2 and 4.8 and the *Visual C++ Redistributable* for Visual Studio 2022. Normally, these runtimes will be installed on your system, but in some rare conditions they might be not of the required version. You can check whether your system has the required versions installed using the Windows settings dialog in the Apps section. If you need to install a specific version, you can find the installer at various Microsoft Websites:

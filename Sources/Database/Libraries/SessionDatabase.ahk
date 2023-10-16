@@ -462,8 +462,9 @@ class SessionDatabase extends ConfigurationItem {
 		if (simulator && car && track) {
 			simulatorCode := SessionDatabase.getSimulatorCode(simulator)
 			car := SessionDatabase.getCarCode(simulator, car)
+			track := SessionDatabase.getTrackCode(simulator, track)
 
-			if (simulatorCode && (car != true) && (track != true)) {
+			if (simulatorCode && car && track && (car != true) && (track != true)) {
 				prefix := (kDatabaseDirectory . "User\" . simulatorCode . "\")
 
 				if ((simulatorCode = "RF2") && data) {
@@ -1055,18 +1056,21 @@ class SessionDatabase extends ConfigurationItem {
 
 	static registerCar(simulator, car, name) {
 		local simulatorCode := SessionDatabase.getSimulatorCode(simulator)
+		local carCode := SessionDatabase.getCarCode(simulator, car)
 		local fileName := (kUserHomeDirectory . "Simulator Data\" . simulatorCode . "\" . "Car Data.ini")
 		local carData := readMultiMap(fileName)
 
-		DirCreate(kDatabaseDirectory . "User\" . simulatorCode . "\" . car)
+		if (simulator && simulatorCode && car && carCode) {
+			DirCreate(kDatabaseDirectory . "User\" . simulatorCode . "\" . carCode)
 
-		if (getMultiMapValue(carData, "Car Names", car, kUndefined) == kUndefined) {
-			setMultiMapValue(carData, "Car Names", car, name)
-			setMultiMapValue(carData, "Car Codes", name, car)
+			if (getMultiMapValue(carData, "Car Names", car, kUndefined) == kUndefined) {
+				setMultiMapValue(carData, "Car Names", car, name)
+				setMultiMapValue(carData, "Car Codes", name, car)
 
-			writeMultiMap(fileName, carData)
+				writeMultiMap(fileName, carData)
 
-			SessionDatabase.clearData(SessionDatabase.sCarData, SessionDatabase.getSimulatorCode(simulator))
+				SessionDatabase.clearData(SessionDatabase.sCarData, SessionDatabase.getSimulatorCode(simulator))
+			}
 		}
 	}
 
@@ -1104,20 +1108,24 @@ class SessionDatabase extends ConfigurationItem {
 
 	static registerTrack(simulator, car, track, shortName, longName) {
 		local simulatorCode := SessionDatabase.getSimulatorCode(simulator)
+		local carCode := SessionDatabase.getCarCode(simulator, car)
+		local trackCode := SessionDatabase.getTrackCode(simulator, track)
 		local fileName := (kUserHomeDirectory . "Simulator Data\" . simulatorCode . "\" . "Track Data.ini")
 		local trackData := readMultiMap(fileName)
 
-		DirCreate(kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\" . track)
+		if (simulator && simulatorCode && car && carCode && track && trackCode) {
+			DirCreate(kDatabaseDirectory . "User\" . simulatorCode . "\" . carCode . "\" . trackCode)
 
-		if (getMultiMapValue(trackData, "Track Names Long", track, kUndefined) == kUndefined) {
-			setMultiMapValue(trackData, "Track Names Long", track, longName)
-			setMultiMapValue(trackData, "Track Names Short", track, shortName)
-			setMultiMapValue(trackData, "Track Codes", longName, track)
-			setMultiMapValue(trackData, "Track Codes", shortName, track)
+			if (getMultiMapValue(trackData, "Track Names Long", track, kUndefined) == kUndefined) {
+				setMultiMapValue(trackData, "Track Names Long", track, longName)
+				setMultiMapValue(trackData, "Track Names Short", track, shortName)
+				setMultiMapValue(trackData, "Track Codes", longName, track)
+				setMultiMapValue(trackData, "Track Codes", shortName, track)
 
-			writeMultiMap(fileName, trackData)
+				writeMultiMap(fileName, trackData)
 
-			SessionDatabase.clearData(SessionDatabase.sTrackData, SessionDatabase.getSimulatorCode(simulator))
+				SessionDatabase.clearData(SessionDatabase.sTrackData, SessionDatabase.getSimulatorCode(simulator))
+			}
 		}
 	}
 

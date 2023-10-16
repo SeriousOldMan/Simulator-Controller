@@ -89,21 +89,25 @@ class TyresDatabase extends SessionDatabase {
 		local directory
 
 		car := this.getCarCode(simulator, car)
-		track := this.getCarCode(simulator, track)
+		track := this.getTrackCode(simulator, track)
 
-		directory := (this.DatabaseDirectory . scope . "\" . this.getSimulatorCode(simulator) . "\" . car . "\" . track)
+		if (simulator && car && track) {
+			directory := (this.DatabaseDirectory . scope . "\" . this.getSimulatorCode(simulator) . "\" . car . "\" . track)
 
-		DirCreate(directory)
+			DirCreate(directory)
 
-		return Database(directory . "\", kTyresSchemas)
+			return Database(directory . "\", kTyresSchemas)
+		}
+		else
+			return false
 	}
 
 	requireDatabase(simulator, car, track, scope := "User") {
 		simulator := this.getSimulatorName(simulator)
 		car := this.getCarCode(simulator, car)
-		track := this.getCarCode(simulator, track)
+		track := this.getTrackCode(simulator, track)
 
-		if ((simulator == true) || (car == true) || (track == true))
+		if (!simulator || !car || !track || (simulator == true) || (car == true) || (track == true))
 			throw "Unsupported database specification detected in TyresDatabase.requireDatabase..."
 
 		if (this.iDatabase && ((this.iLastSimulator != simulator) || (this.iLastCar != car)

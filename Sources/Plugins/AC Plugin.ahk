@@ -148,7 +148,7 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 		return true
 	}
 
-	updateSession(session, force) {
+	updateSession(session, force := false) {
 		super.updateSession(session, force)
 
 		if (session == kSessionFinished) {

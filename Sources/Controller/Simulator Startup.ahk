@@ -161,7 +161,7 @@ class SimulatorStartup extends ConfigurationItem {
 			editConfig := true
 
 		if (editConfig || noConfiguration) {
-			result := editSettings(&settings, true)
+			result := editSettings(&settings, false, true)
 
 			if (result == kCancel) {
 				exitStartup(true)

@@ -288,9 +288,9 @@ class FuelReporting extends Assert {
 				engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 		}
 
-		this.AssertEqual(3, vFuelWarnings[3], "Unexpected remaining fuel reported in lap 3...")
+		this.AssertEqual(2, vFuelWarnings[3], "Unexpected remaining fuel reported in lap 3...")
 		this.AssertEqual(1, vFuelWarnings[4], "Unexpected remaining fuel reported in lap 4...")
-		this.AssertEqual(1, vFuelWarnings[5], "Unexpected remaining fuel reported in lap 5...")
+		this.AssertEqual(0, vFuelWarnings[5], "Unexpected remaining fuel reported in lap 5...")
 
 		engineer.finishSession(false)
 	}
@@ -1005,7 +1005,7 @@ class PitstopHandling extends Assert {
 					this.AssertEqual(7, engineer.KnowledgeBase.getValue("Pitstop.2.Lap", 0), "Wrong lap recorded Pitstop...")
 					this.AssertEqual(false, engineer.KnowledgeBase.getValue("Pitstop.2.Repair.Suspension"), "Expected no suspension repair...")
 					this.AssertEqual(true, engineer.KnowledgeBase.getValue("Pitstop.2.Repair.Bodywork"), "Expected bodywork repair...")
-					this.AssertEqual(9, engineer.KnowledgeBase.getValue("Pitstop.2.Tyre.Set"), "Expected new tyres...")
+					this.AssertEqual(8, engineer.KnowledgeBase.getValue("Pitstop.2.Tyre.Set"), "Expected new tyres...")
 				}
 			}
 

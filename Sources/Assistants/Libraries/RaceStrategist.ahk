@@ -2292,7 +2292,7 @@ class RaceStrategist extends GridRaceAssistant {
 			this.RemoteHandler.computeCarStatistics(Max(1, lap - 10), lap)
 		}
 		else
-			RaceStrategist.RaceStrategySimulationTask(this, data, confirm, request).start()
+			RaceStrategist.RaceStrategySimulationTask(this, data, confirm, request, false, fullCourseYellow).start()
 	}
 
 	createStrategy(nameOrConfiguration, driver := false) {

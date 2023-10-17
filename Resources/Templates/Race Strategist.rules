@@ -347,41 +347,6 @@ createPitstopScenarios(?lap, ?fromLap, ?toLap, ?laps, ?positions, ?carsInFront, 
 		?fromLap =< ?toLap, ?nextLap = ?fromLap + 1,
 		createPitstopScenarios(?lap, ?nextLap, ?toLap, ?laps, ?positions, ?carsInFront, ?trafficDensities)
 
-pitstopDeltaTime(?lap, ?targetLap, ?pitstopDeltaTime) <= pitstopRefuelServiceTime(?lap, ?targetLap, ?refuelServiceTime),
-														 pitstopTyreServiceTime(?lap, ?targetLap, ?tyreServiceTime),
-														 ?temp1 = ?refuelServiceTime + ?tyreServiceTime,
-														 ?temp2 = !Session.Settings.Pitstop.Delta + ?temp1, ?pitstopDeltaTime = ?temp2 * 1000
-
-pitstopRefuelServiceTime(?lap, ?targetLap, ?refillTime) <=
-		?deltaLaps = ?targetLap - ?lap,
-		lapAvgConsumption(?lap, ?avgConsumption), lapRemainingFuel(?lap, ?temp1),
-		?correction = ?deltaLaps * ?avgConsumption, ?remainingFuel = ?temp1 - ?correction,
-		remainingSessionLaps(?lap, ?tempLaps), ?remainingLaps = ?tempLaps - ?deltaLaps,
-		?sessionFuel = ?avgConsumption * ?remainingLaps, safetyFuel(?avgConsumption, ?safetyFuel),
-		?neededFuel = ?sessionFuel + ?safetyFuel, ?refillAmount = ?neededFuel - ?remainingFuel,
-		min(?refillAmount, !Session.Settings.Fuel.Max, ?temp2), max(0, ?temp2, ?adjustedRefillAmount),
-		pitstopRefillServiceTime(?adjustedRefillAmount, ?refillTime)
-
-pitstopRefillServiceTime(?refillAmount, ?refillTime) <=
-		bound?(!Session.Settings.Pitstop.Service.Refuel.Rule), !,
-		pitstopRefillServiceTime(!Session.Settings.Pitstop.Service.Refuel.Rule, ?refillAmount, ?refillTime)
-pitstopRefillServiceTime(?refillAmount, ?refillTime) <= pitstopRefillServiceTime(Dynamic, ?refillAmount, ?refillTime)
-
-pitstopRefillServiceTime(Fixed, ?refillAmount, !Session.Settings.Pitstop.Service.Refuel)
-pitstopRefillServiceTime(?, ?refillAmount, ?refillTime) <=
-		?refillIncrements = ?refillAmount / 10, ?refillTime = ?refillIncrements * !Session.Settings.Pitstop.Service.Refuel
-
-pitstopTyreServiceTime(?lap, ?targetLap, !Session.Settings.Pitstop.Service.Tyres) <=
-		?deltaLaps = ?targetLap - ?lap,
-		remainingSessionLaps(?lap, ?tempLaps), ?remainingLaps = ?tempLaps - ?deltaLaps,
-		?remainingLaps > 5, ! 
-pitstopTyreServiceTime(?, ?, 0)
-
-pitstopServiceTime(?refuelServiceTime, ?tyreServiceTime, ?serviceTime) <= !Session.Settings.Pitstop.Service.Order = Simultaneous,
-																		  max(?refuelServiceTime, ?tyreServiceTime, ?serviceTime)
-pitstopServiceTime(?refuelServiceTime, ?tyreServiceTime, ?serviceTime) <= !Session.Settings.Pitstop.Service.Order = Sequential,
-																		  ?serviceTime = ?refuelServiceTime + ?tyreServiceTime
-
 evaluatePosition(?lap, ?position, ?carsAhead, ?density) <= Get(Standings.Extrapolated, ?lap, Car, !Driver.Car, Position, ?position),
 														   trafficDensity(?lap, ?carsAhead, ?density)
 
@@ -542,6 +507,13 @@ clearStanding(?lap, ?car, [?name | ?names]) <= Clear(Standings.Lap, ?lap, Car, ?
 ;;;-------------------------------------------------------------------------;;;
 
 #Include %kResourcesDirectory%Rules\Pitstop Information Retrieval.rules
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                            Pitstop Computations                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include %kResourcesDirectory%Rules\Pitstop Computations.rules
 
 
 ;;;-------------------------------------------------------------------------;;;

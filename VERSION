@@ -3,12 +3,12 @@ Version=5.4.2.0-dev
 Target=5.4.2.0-release
 Date=10/16/2023
 Download=
-Changes=Fixed transfer of tyre setup from first stint to pitstop fields in "Race Center", Another fix for the critical runaway loop during install and update, Fixed window appearance on DPI scaled monitors
+Changes=Fixed transfer of tyre setup from first stint to pitstop fields in "Race Center", Another fix for the critical runaway loop during install and update, New window appearance on DPI scaled monitors
 Components=Media->5.3.0,Configuration->5.4.0,Utilities->5.3.0
 [Release]
-Version=5.4.1.1-release
-Date=10/15/2023
-Download=https://cutt.ly/AwQoDwHA;https://www.dropbox.com/scl/fi/wi388rnpo3rk59fyw648v/Simulator-Controller-5.4.1.1-release.zip?rlkey=apqpc9puivof85e2xbt040txk&dl=1
+Version=5.4.1.2-release
+Date=10/16/2023
+Download=https://cutt.ly/fwQhyNXv;https://www.dropbox.com/scl/fi/ozz2qfqubjbommvw6ek3p/Simulator-Controller-5.4.1.2-release.zip?rlkey=dadbho3s4z560cqt45kvefpl0&dl=1
 Changes=Driving Coach now knows a lot about the current active stint, Updated instructions for Driving Coach, New data categories in the telemetry analyzer, New Ctrl modifier for instructions reload, Added "Practice Center" to Windows Start menu, New temperature sampling in "Setup Workbench", Fixed endless loop for install and update when Windows user is Admin, New car models for "Setup Workbench", Tweaked last lap detection, New settings in "Session Database" for the Drinving Coach, Driving coach instruction can be enabled or disabled
 Components=Media->5.3.0,Configuration->5.4.0,Utilities->5.3.0
 [Components]
@@ -28,4 +28,4 @@ Utilities.5.3.0.Download=https://www.dropbox.com/scl/fi/hlza8t9tae5d0vnd7wmqa/Ut
 Type=Development
 [Version]
 Development=5.4.2.0-dev
-Release=5.4.1.1-release
+Release=5.4.1.2-release

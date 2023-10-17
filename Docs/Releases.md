@@ -1,8 +1,8 @@
-## 5.4.1.1-release 10/16/23
+## 5.4.1.2-release 10/16/23
   1. Fixed a **critical** bug for *Assetto Corsa* which refuses to work after a fresh installation.
 
 ## 5.4.1.1-release 10/15/23
-  1. Fixed a couple bugs when registring voice commands in mixed (both pattern based and full-text based).
+  1. Fixed a couple bugs when registring voice commands in mixed mode (both pattern based and full-text based).
   2. Fixed a **critical** bug in strategy re-calculation which could result in a call to pit way too early.
 
 ## 5.4.1.0-release 10/13/23

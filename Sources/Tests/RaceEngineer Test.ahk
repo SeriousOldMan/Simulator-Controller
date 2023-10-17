@@ -990,6 +990,8 @@ class PitstopHandling extends Assert {
 				if (A_Index = 7) {
 					engineer.planPitstop()
 
+					engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
+
 					this.AssertEqual(2, engineer.KnowledgeBase.getValue("Pitstop.Planned.Nr", 0), "Pitstop number increment failed...")
 					this.AssertEqual(false, engineer.KnowledgeBase.getValue("Pitstop.Planned.Repair.Suspension"), "Expected no suspension repair...")
 					this.AssertEqual(true, engineer.KnowledgeBase.getValue("Pitstop.Planned.Repair.Bodywork"), "Expected bodywork repair...")
@@ -1005,7 +1007,7 @@ class PitstopHandling extends Assert {
 					this.AssertEqual(7, engineer.KnowledgeBase.getValue("Pitstop.2.Lap", 0), "Wrong lap recorded Pitstop...")
 					this.AssertEqual(false, engineer.KnowledgeBase.getValue("Pitstop.2.Repair.Suspension"), "Expected no suspension repair...")
 					this.AssertEqual(true, engineer.KnowledgeBase.getValue("Pitstop.2.Repair.Bodywork"), "Expected bodywork repair...")
-					this.AssertEqual(8, engineer.KnowledgeBase.getValue("Pitstop.2.Tyre.Set"), "Expected new tyres...")
+					this.AssertEqual(9, engineer.KnowledgeBase.getValue("Pitstop.2.Tyre.Set"), "Expected new tyres...")
 				}
 			}
 

@@ -154,7 +154,7 @@ priority: 5, {All: [?Lap], [?Tyre.Compound.Target = Dry], {None: [?Tyre.Set.Targ
 
 priority: 5, {All: [?Lap], [?Tyre.Compound.Target = Wet], {None: [?Tyre.Set.Target]}} => (Set: Tyre.Set.Target, 0)
 
-nextDryTyreSet() <= lastPitstopTyreSet(?nr), nextTyreSet(?nr, ?set), Set(Tyre.Set.Target, ?set), !
+nextDryTyreSet() <= lastPitstopTyreSet(?nr), nextDryTyreSet(?nr, ?set), Set(Tyre.Set.Target, ?set), !
 nextDryTyreSet() <= Set(Tyre.Set.Target, !Session.Setup.Tyre.Set.Fresh)
 
 nextDryTyreSet(0, 0)

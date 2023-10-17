@@ -1,0 +1,52 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;   Modular Simulator Controller System - Pitstop Computations            ;;;
+;;;                                                                         ;;;
+;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
+;;;   License:    (2023) Creative Commons - BY-NC-SA                        ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;-------------------------------------------------------------------------;;;
+;;;                            Rule Include Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include %kResourcesDirectory%Rules\Pitstop Information Retrieval.rules
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                            Public Rules Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+pitstopDeltaTime(?lap, ?targetLap, ?pitstopDeltaTime) <= pitstopRefuelServiceTime(?lap, ?targetLap, ?refuelServiceTime),
+														 pitstopTyreServiceTime(?lap, ?targetLap, ?tyreServiceTime),
+														 pitstopServiceTime(?refuelServiceTime, ?tyreServiceTime, ?temp1),
+														 ?temp2 = !Session.Settings.Pitstop.Delta + ?temp1, ?pitstopDeltaTime = ?temp2 * 1000
+
+pitstopRefuelServiceTime(?lap, ?targetLap, ?refillTime) <=
+		?deltaLaps = ?targetLap - ?lap,
+		lapAvgConsumption(?lap, ?avgConsumption), lapRemainingFuel(?lap, ?temp1),
+		?correction = ?deltaLaps * ?avgConsumption, ?remainingFuel = ?temp1 - ?correction,
+		remainingSessionLaps(?lap, ?tempLaps), ?remainingLaps = ?tempLaps - ?deltaLaps,
+		?sessionFuel = ?avgConsumption * ?remainingLaps, safetyFuel(?avgConsumption, ?safetyFuel),
+		?neededFuel = ?sessionFuel + ?safetyFuel, ?refillAmount = ?neededFuel - ?remainingFuel,
+		min(?refillAmount, !Session.Settings.Fuel.Max, ?temp2), max(0, ?temp2, ?adjustedRefillAmount),
+		pitstopRefillServiceTime(?adjustedRefillAmount, ?refillTime)
+
+pitstopRefillServiceTime(?refillAmount, ?refillTime) <=
+		bound?(!Session.Settings.Pitstop.Service.Refuel.Rule), !,
+		pitstopRefillServiceTime(!Session.Settings.Pitstop.Service.Refuel.Rule, ?refillAmount, ?refillTime)
+pitstopRefillServiceTime(?refillAmount, ?refillTime) <= pitstopRefillServiceTime(Dynamic, ?refillAmount, ?refillTime)
+
+pitstopRefillServiceTime(Fixed, ?refillAmount, !Session.Settings.Pitstop.Service.Refuel)
+pitstopRefillServiceTime(?, ?refillAmount, ?refillTime) <=
+		?refillIncrements = ?refillAmount / 10, ?refillTime = ?refillIncrements * !Session.Settings.Pitstop.Service.Refuel
+
+pitstopTyreServiceTime(?lap, ?targetLap, !Session.Settings.Pitstop.Service.Tyres) <=
+		?deltaLaps = ?targetLap - ?lap,
+		remainingSessionLaps(?lap, ?tempLaps), ?remainingLaps = ?tempLaps - ?deltaLaps,
+		?remainingLaps > 5, ! 
+pitstopTyreServiceTime(?, ?, 0)
+
+pitstopServiceTime(?refuelServiceTime, ?tyreServiceTime, ?serviceTime) <= !Session.Settings.Pitstop.Service.Order = Simultaneous,
+																		  max(?refuelServiceTime, ?tyreServiceTime, ?serviceTime)
+pitstopServiceTime(?refuelServiceTime, ?tyreServiceTime, ?serviceTime) <= !Session.Settings.Pitstop.Service.Order = Sequential,
+																		  ?serviceTime = ?refuelServiceTime + ?tyreServiceTime

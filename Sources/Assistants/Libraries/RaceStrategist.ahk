@@ -1325,18 +1325,18 @@ class RaceStrategist extends GridRaceAssistant {
 
 	readSettings(simulator, car, track, &settings) {
 		return combine(super.readSettings(simulator, car, track, &settings)
-					 , CaseInsenseMap("Session.Settings.Pitstop.Delta", getMultiMapValue(settings, "Strategy Settings", "Pitstop.Delta"
-																								 , getMultiMapValue(settings, "Session Settings"
-																															, "Pitstop.Delta", 30))
-									, "Session.Settings.Standings.Extrapolation.Laps", getMultiMapValue(settings, "Strategy Settings"
+					 , CaseInsenseMap("Session.Settings.Standings.Extrapolation.Laps", getMultiMapValue(settings, "Strategy Settings"
 																												, "Extrapolation.Laps", 2)
 									, "Session.Settings.Standings.Extrapolation.Overtake.Delta", Round(getMultiMapValue(settings
 																													  , "Strategy Settings"
 																													  , "Overtake.Delta", 1) * 1000)
 									, "Session.Settings.Strategy.Traffic.Considered", (getMultiMapValue(settings, "Strategy Settings"
 																												, "Traffic.Considered", 5) / 100)
-									, "Session.Settings.Pitstop.Service.Refuel", getMultiMapValue(settings, "Strategy Settings"
-																										  , "Service.Refuel.Rule", "Dynamic")
+									, "Session.Settings.Pitstop.Delta", getMultiMapValue(settings, "Strategy Settings", "Pitstop.Delta"
+																								 , getMultiMapValue(settings, "Session Settings"
+																															, "Pitstop.Delta", 30))
+									, "Session.Settings.Pitstop.Service.Refuel.Rule", getMultiMapValue(settings, "Strategy Settings"
+																											   , "Service.Refuel.Rule", "Dynamic")
 									, "Session.Settings.Pitstop.Service.Refuel", getMultiMapValue(settings, "Strategy Settings"
 																										  , "Service.Refuel", 1.5)
 									, "Session.Settings.Pitstop.Service.Tyres", getMultiMapValue(settings, "Strategy Settings"
@@ -2292,7 +2292,7 @@ class RaceStrategist extends GridRaceAssistant {
 			this.RemoteHandler.computeCarStatistics(Max(1, lap - 10), lap)
 		}
 		else
-			RaceStrategist.RaceStrategySimulationTask(this, data, confirm, request).start()
+			RaceStrategist.RaceStrategySimulationTask(this, data, confirm, request, false, fullCourseYellow).start()
 	}
 
 	createStrategy(nameOrConfiguration, driver := false) {

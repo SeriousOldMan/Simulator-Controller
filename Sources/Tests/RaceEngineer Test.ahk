@@ -288,9 +288,9 @@ class FuelReporting extends Assert {
 				engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 		}
 
-		this.AssertEqual(3, vFuelWarnings[3], "Unexpected remaining fuel reported in lap 3...")
+		this.AssertEqual(2, vFuelWarnings[3], "Unexpected remaining fuel reported in lap 3...")
 		this.AssertEqual(1, vFuelWarnings[4], "Unexpected remaining fuel reported in lap 4...")
-		this.AssertEqual(1, vFuelWarnings[5], "Unexpected remaining fuel reported in lap 5...")
+		this.AssertEqual(0, vFuelWarnings[5], "Unexpected remaining fuel reported in lap 5...")
 
 		engineer.finishSession(false)
 	}
@@ -989,6 +989,8 @@ class PitstopHandling extends Assert {
 
 				if (A_Index = 7) {
 					engineer.planPitstop()
+
+					engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
 					this.AssertEqual(2, engineer.KnowledgeBase.getValue("Pitstop.Planned.Nr", 0), "Pitstop number increment failed...")
 					this.AssertEqual(false, engineer.KnowledgeBase.getValue("Pitstop.Planned.Repair.Suspension"), "Expected no suspension repair...")

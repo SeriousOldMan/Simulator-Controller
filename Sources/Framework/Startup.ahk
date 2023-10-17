@@ -80,7 +80,7 @@ loadSimulatorConfiguration() {
 	type := getMultiMapValue(packageInfo, "Current", "Type", false)
 
 	if type {
-		if ((StrSplit(A_ScriptName, ".")[1] != "Simulator Tools") && !inList(A_Args, "-Repair"))
+		if (inList(kForegroundApps, StrSplit(A_ScriptName, ".")[1]) && !inList(A_Args, "-Repair"))
 			if !checkInstallation(string2Map(",", "->", getMultiMapValue(packageInfo, type, "Components", ""))) {
 				Run("`"" . kBinariesDirectory . "Simulator Tools.exe`" -Repair -Start `"" . A_ScriptName . "`"")
 

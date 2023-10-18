@@ -19,15 +19,15 @@
 pitstopDeltaTime(?lap, 0, false, ?pitstopDeltaTime) <=
 		?pitstopDeltaTime = !Session.Settings.Pitstop.Delta * 1000
 pitstopDeltaTime(?lap, 0, ?tyreCompound, ?pitstopDeltaTime) <=
-		pitstopServiceTime(0, !Session.Settings.Pitstop.Service.Tyres, ?temp1),
-		?temp2 = !Session.Settings.Pitstop.Delta + ?temp1, ?pitstopDeltaTime = ?temp2 * 1000
-pitstopDeltaTime(?lap, ?fuel, ?tyreCompound, ?pitstopDeltaTime) <=
-		pitstopRefillServiceTime(?fuel, ?refuelServiceTime),
-		pitstopServiceTime(?refuelServiceTime, !Session.Settings.Pitstop.Service.Tyres, ?temp1),
+		pitstopServiceTime(0, !Session.Settings.Pitstop.Service.Tyres.Duration, ?temp1),
 		?temp2 = !Session.Settings.Pitstop.Delta + ?temp1, ?pitstopDeltaTime = ?temp2 * 1000
 pitstopDeltaTime(?lap, ?fuel, false, ?pitstopDeltaTime) <=
 		pitstopRefillServiceTime(?fuel, ?refuelServiceTime),
 		pitstopServiceTime(?refuelServiceTime, 0, ?temp1),
+		?temp2 = !Session.Settings.Pitstop.Delta + ?temp1, ?pitstopDeltaTime = ?temp2 * 1000
+pitstopDeltaTime(?lap, ?fuel, ?tyreCompound, ?pitstopDeltaTime) <=
+		pitstopRefillServiceTime(?fuel, ?refuelServiceTime),
+		pitstopServiceTime(?refuelServiceTime, !Session.Settings.Pitstop.Service.Tyres.Duration, ?temp1),
 		?temp2 = !Session.Settings.Pitstop.Delta + ?temp1, ?pitstopDeltaTime = ?temp2 * 1000
 
 pitstopDeltaTime(?lap, ?targetLap, ?pitstopDeltaTime) <= pitstopRefuelServiceTime(?lap, ?targetLap, ?refuelServiceTime),
@@ -50,11 +50,11 @@ pitstopRefillServiceTime(?refillAmount, ?refillTime) <=
 		pitstopRefillServiceTime(!Session.Settings.Pitstop.Service.Refuel.Rule, ?refillAmount, ?refillTime)
 pitstopRefillServiceTime(?refillAmount, ?refillTime) <= pitstopRefillServiceTime(Dynamic, ?refillAmount, ?refillTime)
 
-pitstopRefillServiceTime(Fixed, ?refillAmount, !Session.Settings.Pitstop.Service.Refuel)
+pitstopRefillServiceTime(Fixed, ?refillAmount, !Session.Settings.Pitstop.Service.Refuel.Duration)
 pitstopRefillServiceTime(?, ?refillAmount, ?refillTime) <=
-		?refillIncrements = ?refillAmount / 10, ?refillTime = ?refillIncrements * !Session.Settings.Pitstop.Service.Refuel
+		?refillIncrements = ?refillAmount / 10, ?refillTime = ?refillIncrements * !Session.Settings.Pitstop.Service.Refuel.Duration
 
-pitstopTyreServiceTime(?lap, ?targetLap, !Session.Settings.Pitstop.Service.Tyres) <=
+pitstopTyreServiceTime(?lap, ?targetLap, !Session.Settings.Pitstop.Service.Tyres.Duration) <=
 		?deltaLaps = ?targetLap - ?lap,
 		remainingSessionLaps(?lap, ?tempLaps), ?remainingLaps = ?tempLaps - ?deltaLaps,
 		?remainingLaps > 5, ! 

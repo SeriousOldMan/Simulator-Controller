@@ -16,15 +16,24 @@
 ;;;                            Public Rules Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+pitstopDeltaTime(?lap, ?fuel, ?tyreCompound, ?damages, ?serviceTime, ?repairTime, ?pitlaneDelta) <=
+		?pitlaneDelta = !Session.Settings.Pitstop.Delta * 1000,
+		pitstopDeltaTime(?lap, ?fuel, ?tyreCompound, ?pitstopTime),
+		?serviceTime = ?pitstopTime - ?pitlaneDelta,
+		pitstopRepairTime(?lap, ?damages, [!Session.Settings.Pitstop.Repair.Bodywork.Duration,
+										   !Session.Settings.Pitstop.Repair.Suspension.Duration,
+										   !Session.Settings.Pitstop.Repair.Engine.Duration],
+						  ?repairTime)
+
 pitstopDeltaTime(?lap, 0, false, ?pitstopDeltaTime) <=
-		?pitstopDeltaTime = !Session.Settings.Pitstop.Delta * 1000
+		?pitstopDeltaTime = !Session.Settings.Pitstop.Delta * 1000, !
 pitstopDeltaTime(?lap, 0, ?tyreCompound, ?pitstopDeltaTime) <=
 		pitstopServiceTime(0, !Session.Settings.Pitstop.Service.Tyres.Duration, ?temp1),
-		?temp2 = !Session.Settings.Pitstop.Delta + ?temp1, ?pitstopDeltaTime = ?temp2 * 1000
+		?temp2 = !Session.Settings.Pitstop.Delta + ?temp1, ?pitstopDeltaTime = ?temp2 * 1000, !
 pitstopDeltaTime(?lap, ?fuel, false, ?pitstopDeltaTime) <=
 		pitstopRefillServiceTime(?fuel, ?refuelServiceTime),
 		pitstopServiceTime(?refuelServiceTime, 0, ?temp1),
-		?temp2 = !Session.Settings.Pitstop.Delta + ?temp1, ?pitstopDeltaTime = ?temp2 * 1000
+		?temp2 = !Session.Settings.Pitstop.Delta + ?temp1, ?pitstopDeltaTime = ?temp2 * 1000, !
 pitstopDeltaTime(?lap, ?fuel, ?tyreCompound, ?pitstopDeltaTime) <=
 		pitstopRefillServiceTime(?fuel, ?refuelServiceTime),
 		pitstopServiceTime(?refuelServiceTime, !Session.Settings.Pitstop.Service.Tyres.Duration, ?temp1),
@@ -64,3 +73,8 @@ pitstopServiceTime(?refuelServiceTime, ?tyreServiceTime, ?serviceTime) <= !Sessi
 																		  max(?refuelServiceTime, ?tyreServiceTime, ?serviceTime)
 pitstopServiceTime(?refuelServiceTime, ?tyreServiceTime, ?serviceTime) <= !Session.Settings.Pitstop.Service.Order = Sequential,
 																		  ?serviceTime = ?refuelServiceTime + ?tyreServiceTime
+
+pitstopRepairTime(?, [], ?, 0)
+pitstopRepairTime(?lap, [?damage | ?damages], [?factor | factors], ?repairTime) <=
+		?time = ?damage * ?factor, pitstopRepairTime(?lap, ?damages, ?factors, ?moreTime), ?temp = ?time + ?moreTime,
+		?repairTime = ?temp * 1000

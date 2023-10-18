@@ -1105,12 +1105,24 @@ class RaceEngineer extends RaceAssistant {
 	}
 
 	readSettings(simulator, car, track, &settings) {
-		local section := ("Simulator." . this.SettingsDatabase.getSimulatorName(simulator))
+		local simulatorName := this.SettingsDatabase.getSimulatorName(simulator)
+		local section := ("Simulator." . simulatorName)
+		local defaults := CaseInsenseMap()
+
+		defaults.Default := {Bodywork: 0.0, Suspension: 0.0, Engine: 0.0}
+
+		defaults["Assetto Corsa Competizione"] := {Bodywork: 0.141175939, Suspension: 0.141175939, Engine: 0.0}
 
 		return combine(super.readSettings(simulator, car, track, &settings)
 					 , CaseInsenseMap("Session.Settings.Pitstop.Service.Refuel", getMultiMapValue(settings, section, "Pitstop.Service.Refuel", true)
 									, "Session.Settings.Pitstop.Service.Tyres", getMultiMapValue(settings, section, "Pitstop.Service.Tyres", true)
 									, "Session.Settings.Pitstop.Service.Repairs", getMultiMapValue(settings, section, "Pitstop.Service.Repairs", true)
+									, "Session.Settings.Pitstop.Repair.Bodywork.Duration", getMultiMapValue(settings, section, "Pitstop.Repair.Bodywork.Duration"
+																										  , defaults[simulatorName].Bodywork)
+									, "Session.Settings.Pitstop.Repair.Suspension.Duration", getMultiMapValue(settings, section, "Pitstop.Repair.Suspension.Duration"
+																											, defaults[simulatorName].Suspension)
+									, "Session.Settings.Pitstop.Repair.Engine.Duration", getMultiMapValue(settings, section, "Pitstop.Repair.Engine.Duration"
+																										, defaults[simulatorName].Engine)
 									, "Session.Settings.Pitstop.Delta", getMultiMapValue(settings, "Strategy Settings", "Pitstop.Delta"
 																					   , getDeprecatedValue(settings, "Session Settings", "Race Settings", "Pitstop.Delta", 30))
 									, "Session.Settings.Pitstop.Service.Refuel.Rule", getMultiMapValue(settings, "Strategy Settings"
@@ -1413,7 +1425,7 @@ class RaceEngineer extends RaceAssistant {
 	createSessionInfo(lapNumber, valid, data, simulator, car, track) {
 		local knowledgeBase := this.KnowledgeBase
 		local sessionInfo := super.createSessionInfo(lapNumber, valid, data, simulator, car, track)
-		local planned, prepared, tyreCompound, lap, pitstopTime, pitlaneDelta
+		local planned, prepared, tyreCompound, lap
 
 		if knowledgeBase {
 			planned := this.hasPlannedPitstop()
@@ -1425,13 +1437,14 @@ class RaceEngineer extends RaceAssistant {
 				if lap
 					lap += 1
 
-				pitstopTime := Round(knowledgeBase.getValue("Pitstop.Planned.Time", 0) / 1000)
-				pitlaneDelta := knowledgeBase.getValue("Session.Settings.Pitstop.Delta")
-
 				setMultiMapValue(sessionInfo, "Pitstop", "Planned.Nr", knowledgeBase.getValue("Pitstop.Planned.Nr"))
 				setMultiMapValue(sessionInfo, "Pitstop", "Planned.Lap", lap)
-				setMultiMapValue(sessionInfo, "Pitstop", "Planned.Service.Time", pitstopTime - pitlaneDelta)
-				setMultiMapValue(sessionInfo, "Pitstop", "Planned.Pitlane.Delta", pitlaneDelta)
+
+				setMultiMapValue(sessionInfo, "Pitstop", "Planned.Time.Box", Round(knowledgeBase.getValue("Pitstop.Time.Box", 0) / 1000))
+				setMultiMapValue(sessionInfo, "Pitstop", "Planned.Time.Pitlane", Round(knowledgeBase.getValue("Pitstop.Time.Pitlane", 0) / 1000))
+				setMultiMapValue(sessionInfo, "Pitstop", "Planned.Time.Service", Round(knowledgeBase.getValue("Pitstop.Time.Service", 0) / 1000))
+				setMultiMapValue(sessionInfo, "Pitstop", "Planned.Time.Repairs", Round(knowledgeBase.getValue("Pitstop.Time.Repairs", 0) / 1000))
+
 				setMultiMapValue(sessionInfo, "Pitstop", "Planned.Refuel", knowledgeBase.getValue("Pitstop.Planned.Fuel", 0))
 
 				tyreCompound := knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound", false)

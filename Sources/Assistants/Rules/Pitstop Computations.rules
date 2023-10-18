@@ -23,7 +23,8 @@ pitstopDeltaTime(?lap, ?fuel, ?tyreCompound, ?damages, ?serviceTime, ?repairTime
 		pitstopRepairTime(?lap, ?damages, [!Session.Settings.Pitstop.Repair.Bodywork.Duration,
 										   !Session.Settings.Pitstop.Repair.Suspension.Duration,
 										   !Session.Settings.Pitstop.Repair.Engine.Duration],
-						  ?repairTime)
+						  ?temp),
+		?repairTime = ?temp * 1000
 
 pitstopDeltaTime(?lap, 0, false, ?pitstopDeltaTime) <=
 		?pitstopDeltaTime = !Session.Settings.Pitstop.Delta * 1000, !
@@ -75,6 +76,5 @@ pitstopServiceTime(?refuelServiceTime, ?tyreServiceTime, ?serviceTime) <= !Sessi
 																		  ?serviceTime = ?refuelServiceTime + ?tyreServiceTime
 
 pitstopRepairTime(?, [], ?, 0)
-pitstopRepairTime(?lap, [?damage | ?damages], [?factor | factors], ?repairTime) <=
-		?time = ?damage * ?factor, pitstopRepairTime(?lap, ?damages, ?factors, ?moreTime), ?temp = ?time + ?moreTime,
-		?repairTime = ?temp * 1000
+pitstopRepairTime(?lap, [?damage | ?damages], [?factor | ?factors], ?repairTime) <=
+		?time = ?damage * ?factor, pitstopRepairTime(?lap, ?damages, ?factors, ?moreTime), ?repairTime = ?time + ?moreTime

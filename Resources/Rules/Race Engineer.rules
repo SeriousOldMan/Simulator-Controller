@@ -42,6 +42,14 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;; If "Pitstop.Update" is set, it indicates that some settings for an      ;;;
+;;; already prepared pitstop had been changed by the user.                  ;;;
+;;;-------------------------------------------------------------------------;;;
+
+; [?Pitstop.Update] => ...
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;; "Pitstop.Lap" must be set to the lap number, where the pitstop has been ;;;
 ;;; done. It copies all the data into history memory to be used by the next ;;;
 ;;; pitstop preparation.                                                    ;;;
@@ -865,8 +873,11 @@ priority: -20, [?Pitstop.Plan] => (Set: Pitstop.Planned), (Clear: Pitstop.Plan),
 								  (Clear: Pitstop.Plan.Repair.Bodywork), (Clear: Pitstop.Plan.Repair.Suspension),
 								  (Clear: Pitstop.Plan.Repair.Engine), (Clear: Pitstop.Plan.Driver.Request)
 
-planPitstop() <= lastPitstop(?last), ?nr = ?last + 1, Set(Pitstop.Planned.Nr, ?nr)
-planPitstop() <= Set(Pitstop.Planned.Nr, 1)
+planPitstop() <= lastPitstop(?last), ?nr = ?last + 1, Set(Pitstop.Planned.Nr, ?nr), updatePitstopTime()
+planPitstop() <= Set(Pitstop.Planned.Nr, 1), updatePitstopTime()
+
+updatePitstopTime() <= pitstopDeltaTime(!Lap, !Pitstop.Planned.Fuel, !Pitstop.Planned.Tyre.Compound, ?pitstopDeltaTime),
+					   Set(Pitstop.Planned.Time, ?pitstopDeltaTime)
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -903,6 +914,8 @@ requestRepairs(?pitstopNumber) <= Call(requestPitstopRepairs, ?pitstopNumber,
 															  !Pitstop.Planned.Repair.Engine)
 
 requestDriver(?pitstopNumber) <= Call(requestPitstopDriver, ?pitstopNumber, !Pitstop.Planned.Driver.Request)
+
+[?Pitstop.Update = true] => (Prove: updatePitstopTime()), (Clear: Pitstop.Update)
 
 
 ;;;-------------------------------------------------------------------------;;;

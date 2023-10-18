@@ -16,6 +16,20 @@
 ;;;                            Public Rules Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+pitstopDeltaTime(?lap, 0, false, ?pitstopDeltaTime) <=
+		?pitstopDeltaTime = !Session.Settings.Pitstop.Delta * 1000
+pitstopDeltaTime(?lap, 0, ?tyreCompound, ?pitstopDeltaTime) <=
+		pitstopServiceTime(0, !Session.Settings.Pitstop.Service.Tyres, ?temp1),
+		?temp2 = !Session.Settings.Pitstop.Delta + ?temp1, ?pitstopDeltaTime = ?temp2 * 1000
+pitstopDeltaTime(?lap, ?fuel, ?tyreCompound, ?pitstopDeltaTime) <=
+		pitstopRefillServiceTime(?fuel, ?refuelServiceTime),
+		pitstopServiceTime(?refuelServiceTime, !Session.Settings.Pitstop.Service.Tyres, ?temp1),
+		?temp2 = !Session.Settings.Pitstop.Delta + ?temp1, ?pitstopDeltaTime = ?temp2 * 1000
+pitstopDeltaTime(?lap, ?fuel, false, ?pitstopDeltaTime) <=
+		pitstopRefillServiceTime(?fuel, ?refuelServiceTime),
+		pitstopServiceTime(?refuelServiceTime, 0, ?temp1),
+		?temp2 = !Session.Settings.Pitstop.Delta + ?temp1, ?pitstopDeltaTime = ?temp2 * 1000
+
 pitstopDeltaTime(?lap, ?targetLap, ?pitstopDeltaTime) <= pitstopRefuelServiceTime(?lap, ?targetLap, ?refuelServiceTime),
 														 pitstopTyreServiceTime(?lap, ?targetLap, ?tyreServiceTime),
 														 pitstopServiceTime(?refuelServiceTime, ?tyreServiceTime, ?temp1),

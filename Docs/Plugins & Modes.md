@@ -1328,6 +1328,8 @@ The content of the JSON file looks like this (depending on the current situation
 			"State": "Planned",
 			"Fuel": 68.0,
 			"Lap": null,
+			"ServiceTime": 30,
+			"PitlaneDelta": 23,
 			"Number": 1,
 			"Prepared": 0,
 			"Repairs": "-",

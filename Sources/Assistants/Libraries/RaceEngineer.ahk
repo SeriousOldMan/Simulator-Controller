@@ -1409,7 +1409,7 @@ class RaceEngineer extends RaceAssistant {
 	createSessionInfo(lapNumber, valid, data, simulator, car, track) {
 		local knowledgeBase := this.KnowledgeBase
 		local sessionInfo := super.createSessionInfo(lapNumber, valid, data, simulator, car, track)
-		local planned, prepared, tyreCompound, lap
+		local planned, prepared, tyreCompound, lap, pitstopTime, pitlaneDelta
 
 		if knowledgeBase {
 			planned := this.hasPlannedPitstop()
@@ -1421,8 +1421,13 @@ class RaceEngineer extends RaceAssistant {
 				if lap
 					lap += 1
 
+				pitstopTime := Round(knowledgeBase.getValue("Pitstop.Planned.Time", 0) / 1000)
+				pitlaneDelta := knowledgeBase.getValue("Session.Settings.Pitstop.Delta")
+
 				setMultiMapValue(sessionInfo, "Pitstop", "Planned.Nr", knowledgeBase.getValue("Pitstop.Planned.Nr"))
 				setMultiMapValue(sessionInfo, "Pitstop", "Planned.Lap", lap)
+				setMultiMapValue(sessionInfo, "Pitstop", "Planned.Service.Time", pitstopTime - pitlaneDelta)
+				setMultiMapValue(sessionInfo, "Pitstop", "Planned.Pitlane.Delta", pitlaneDelta)
 				setMultiMapValue(sessionInfo, "Pitstop", "Planned.Refuel", knowledgeBase.getValue("Pitstop.Planned.Fuel", 0))
 
 				tyreCompound := knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound", false)
@@ -2166,6 +2171,13 @@ class RaceEngineer extends RaceAssistant {
 				case "Repair Engine":
 					knowledgeBase.setFact("Pitstop.Planned.Repair.Engine", values[1])
 			}
+
+			knowledgeBase.setFact("Pitstop.Update", true)
+
+			knowledgeBase.produce()
+
+			if this.Debug[kDebugKnowledgeBase]
+				this.dumpKnowledgeBase(knowledgeBase)
 
 			if this.Speaker[false]
 				this.getSpeaker().speakPhrase("ConfirmPlanUpdate")

@@ -316,6 +316,8 @@ class IntegrationPlugin extends ControllerPlugin {
 		if pitstopNr {
 			state["Number"] := pitstopNr
 			state["Lap"] := ((pitstopLap != 0) ? pitstopLap : kNull)
+			state["ServiceTime"] := getMultiMapValue(sessionInfo, "Pitstop", "Planned.Service.Time", 0)
+			state["PitlaneDelta"] := getMultiMapValue(sessionInfo, "Pitstop", "Planned.Pitlane.Delta", 0)
 			state["Fuel"] := convertUnit("Volume", getMultiMapValue(sessionInfo, "Pitstop", "Planned.Refuel"))
 
 			tyreCompound := getMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Compound")

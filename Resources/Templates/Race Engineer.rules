@@ -872,8 +872,11 @@ priority: -5, {All: [?Pitstop.Plan], [?Lap.Remaining.Session <= 5], {None: [?Pit
 priority: -5, {Any: [?Pitstop.Plan], {All: [?Lap], [?Pitstop.Planned.Time]}} => (Prove: updatePitstopTime())
 
 updatePitstopTime() <= computeDamages(?damages), 
-					   pitstopDeltaTime(!Lap, !Pitstop.Planned.Fuel, !Pitstop.Planned.Tyre.Compound, ?damages, ?pitstopDeltaTime),
-					   Set(Pitstop.Planned.Time, ?pitstopDeltaTime)
+					   pitstopDeltaTime(!Lap, !Pitstop.Planned.Fuel, !Pitstop.Planned.Tyre.Compound, ?damages,
+										?pitstopServiceTime, ?pitstopRepairTime, ?pitlaneDelta),
+					   ?temp = ?pitstopServiceTime + ?pitstopRepairTime, ?pitstopTime = ?temp + ?pitlaneDelta,
+					   Set(Pitstop.Planned.Time.Box, ?pitstopTime), Set(Pitstop.Planned.Time.Pitlane, ?pitlaneDelta), 
+					   Set(Pitstop.Planned.Time.Service, ?pitstopServiceTime), Set(Pitstop.Planned.Time.Repairs, ?pitstopRepairTime)
 
 computeDamages(?damages) <= computeDamages([!Pitstop.Planned.Repair.Bodywork, !Pitstop.Planned.Repair.Suspension, Pitstop.Planned.Repair.Engine],
 										   [!Damage.Bodywork, !Damage.Suspension, Damage.Engine], ?damages)

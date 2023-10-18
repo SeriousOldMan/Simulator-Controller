@@ -1329,6 +1329,7 @@ The content of the JSON file looks like this (depending on the current situation
 			"Fuel": 68.0,
 			"Lap": null,
 			"ServiceTime": 30,
+			"RepairTime": 7,
 			"PitlaneDelta": 23,
 			"Number": 1,
 			"Prepared": 0,

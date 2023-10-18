@@ -1425,7 +1425,7 @@ class RaceEngineer extends RaceAssistant {
 	createSessionInfo(lapNumber, valid, data, simulator, car, track) {
 		local knowledgeBase := this.KnowledgeBase
 		local sessionInfo := super.createSessionInfo(lapNumber, valid, data, simulator, car, track)
-		local planned, prepared, tyreCompound, lap, pitstopTime, pitlaneDelta
+		local planned, prepared, tyreCompound, lap
 
 		if knowledgeBase {
 			planned := this.hasPlannedPitstop()
@@ -1437,13 +1437,14 @@ class RaceEngineer extends RaceAssistant {
 				if lap
 					lap += 1
 
-				pitstopTime := Round(knowledgeBase.getValue("Pitstop.Planned.Time", 0) / 1000)
-				pitlaneDelta := knowledgeBase.getValue("Session.Settings.Pitstop.Delta")
-
 				setMultiMapValue(sessionInfo, "Pitstop", "Planned.Nr", knowledgeBase.getValue("Pitstop.Planned.Nr"))
 				setMultiMapValue(sessionInfo, "Pitstop", "Planned.Lap", lap)
-				setMultiMapValue(sessionInfo, "Pitstop", "Planned.Service.Time", pitstopTime - pitlaneDelta)
-				setMultiMapValue(sessionInfo, "Pitstop", "Planned.Pitlane.Delta", pitlaneDelta)
+
+				setMultiMapValue(sessionInfo, "Pitstop", "Planned.Time.Box", Round(knowledgeBase.getValue("Pitstop.Time.Box", 0) / 1000))
+				setMultiMapValue(sessionInfo, "Pitstop", "Planned.Time.Pitlane", Round(knowledgeBase.getValue("Pitstop.Time.Pitlane", 0) / 1000))
+				setMultiMapValue(sessionInfo, "Pitstop", "Planned.Time.Service", Round(knowledgeBase.getValue("Pitstop.Time.Service", 0) / 1000))
+				setMultiMapValue(sessionInfo, "Pitstop", "Planned.Time.Repairs", Round(knowledgeBase.getValue("Pitstop.Time.Repairs", 0) / 1000))
+
 				setMultiMapValue(sessionInfo, "Pitstop", "Planned.Refuel", knowledgeBase.getValue("Pitstop.Planned.Fuel", 0))
 
 				tyreCompound := knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound", false)

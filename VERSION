@@ -3,7 +3,7 @@ Version=5.4.2.0-dev
 Target=5.4.2.0-release
 Date=10/18/2023
 Download=
-Changes=Fixed transfer of tyre setup from first stint to pitstop fields in "Race Center", Another fix for the critical runaway loop during install and update, New window appearance on DPI scaled monitors, Fixed FCY for cases without traffic simulation, Fixed a bug for explicit tyre set selection with pitstops > 2, New pitstop duration field in "System Monitor", New pitstop duration fields in state JSON
+Changes=Fixed transfer of tyre setup from first stint to pitstop fields in "Race Center", Another fix for the critical runaway loop during install and update, New window appearance on DPI scaled monitors, Fixed FCY for cases without traffic simulation, Fixed a bug for explicit tyre set selection with pitstops > 2, New pitstop duration field in "System Monitor", New pitstop duration fields in state JSON, New car models for "Setup Workbench"
 Components=Media->5.3.0,Configuration->5.4.0,Utilities->5.3.0
 [Release]
 Version=5.4.1.2-release

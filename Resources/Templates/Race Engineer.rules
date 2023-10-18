@@ -755,6 +755,9 @@ priority: 20, [?Pitstop.Plan = true] =>
 		(Clear: Pitstop.Planned.Driver.Request)
 priority: 10, [?Pitstop.Plan] => (Prove: planPitstop())
 
+planPitstop() <= lastPitstop(?last), ?nr = ?last + 1, Set(Pitstop.Planned.Nr, ?nr)
+planPitstop() <= Set(Pitstop.Planned.Nr, 1)
+
 {All: [?Pitstop.Plan],
 	  [?Session.Settings.Pitstop.Service.Refuel = false]} => (Set: Pitstop.Planned.Fuel, 0)
 {All: [?Pitstop.Plan],
@@ -865,6 +868,11 @@ priority: 10, [?Pitstop.Plan] => (Prove: planPitstop())
 priority: -5, {All: [?Pitstop.Plan], [?Lap.Remaining.Session <= 5], {None: [?Pitstop.Plan.Tyre.Change = true]}} =>
 		(Set: Pitstop.Planned.Tyre.Compound, false), (Set: Pitstop.Planned.Tyre.Compound.Color, false)
 
+priority: -5, [?Pitstop.Plan] => (Prove: updatePitstopTime())
+
+updatePitstopTime() <= pitstopDeltaTime(!Lap, !Pitstop.Planned.Fuel, !Pitstop.Planned.Tyre.Compound, ?pitstopDeltaTime),
+					   Set(Pitstop.Planned.Time, ?pitstopDeltaTime)
+
 priority: -20, [?Pitstop.Plan] => (Set: Pitstop.Planned), (Clear: Pitstop.Plan),
 								  (Clear: Pitstop.Plan.Fuel.Amount), (Clear: Pitstop.Plan.Tyre.Change), (Clear: Pitstop.Plan.Tyre.Set),
 								  (Clear: Pitstop.Plan.Tyre.Compound), (Clear: Pitstop.Plan.Tyre.Compound.Color),
@@ -872,12 +880,6 @@ priority: -20, [?Pitstop.Plan] => (Set: Pitstop.Planned), (Clear: Pitstop.Plan),
 								  (Clear: Pitstop.Plan.Tyre.Pressure.RL), (Clear: Pitstop.Plan.Tyre.Pressure.RR),
 								  (Clear: Pitstop.Plan.Repair.Bodywork), (Clear: Pitstop.Plan.Repair.Suspension),
 								  (Clear: Pitstop.Plan.Repair.Engine), (Clear: Pitstop.Plan.Driver.Request)
-
-planPitstop() <= lastPitstop(?last), ?nr = ?last + 1, Set(Pitstop.Planned.Nr, ?nr), updatePitstopTime()
-planPitstop() <= Set(Pitstop.Planned.Nr, 1), updatePitstopTime()
-
-updatePitstopTime() <= pitstopDeltaTime(!Lap, !Pitstop.Planned.Fuel, !Pitstop.Planned.Tyre.Compound, ?pitstopDeltaTime),
-					   Set(Pitstop.Planned.Time, ?pitstopDeltaTime)
 
 
 ;;;-------------------------------------------------------------------------;;;

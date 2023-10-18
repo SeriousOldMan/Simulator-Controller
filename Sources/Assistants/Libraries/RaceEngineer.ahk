@@ -1108,13 +1108,17 @@ class RaceEngineer extends RaceAssistant {
 		local section := ("Simulator." . this.SettingsDatabase.getSimulatorName(simulator))
 
 		return combine(super.readSettings(simulator, car, track, &settings)
-					 , CaseInsenseMap("Session.Settings.Pitstop.Delta", getMultiMapValue(settings, "Strategy Settings", "Pitstop.Delta"
+					 , CaseInsenseMap("Session.Settings.Pitstop.Service.Refuel", getMultiMapValue(settings, section, "Pitstop.Service.Refuel", true)
+									, "Session.Settings.Pitstop.Service.Tyres", getMultiMapValue(settings, section, "Pitstop.Service.Tyres", true)
+									, "Session.Settings.Pitstop.Service.Repairs", getMultiMapValue(settings, section, "Pitstop.Service.Repairs", true)
+									, "Session.Settings.Pitstop.Delta", getMultiMapValue(settings, "Strategy Settings", "Pitstop.Delta"
 																					   , getDeprecatedValue(settings, "Session Settings", "Race Settings", "Pitstop.Delta", 30))
 									, "Session.Settings.Pitstop.Service.Refuel.Rule", getMultiMapValue(settings, "Strategy Settings"
 																											   , "Service.Refuel.Rule", "Dynamic")
-									, "Session.Settings.Pitstop.Service.Refuel", getMultiMapValue(settings, section, "Pitstop.Service.Refuel", true)
-									, "Session.Settings.Pitstop.Service.Tyres", getMultiMapValue(settings, section, "Pitstop.Service.Tyres", true)
-									, "Session.Settings.Pitstop.Service.Repairs", getMultiMapValue(settings, section, "Pitstop.Service.Repairs", true)
+									, "Session.Settings.Pitstop.Service.Refuel.Duration", getMultiMapValue(settings, "Strategy Settings"
+																												   , "Service.Refuel", 1.5)
+									, "Session.Settings.Pitstop.Service.Tyres.Duration", getMultiMapValue(settings, "Strategy Settings"
+																											      , "Service.Tyres", 30)
 									, "Session.Settings.Pitstop.Service.Order", getMultiMapValue(settings, "Strategy Settings"
 																										 , "Service.Order", "Simultaneous")
 									, "Session.Settings.Damage.Suspension.Repair", getDeprecatedValue(settings, "Session Settings", "Race Settings"

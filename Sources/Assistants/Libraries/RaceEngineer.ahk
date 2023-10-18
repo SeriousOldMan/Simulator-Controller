@@ -1105,12 +1105,24 @@ class RaceEngineer extends RaceAssistant {
 	}
 
 	readSettings(simulator, car, track, &settings) {
-		local section := ("Simulator." . this.SettingsDatabase.getSimulatorName(simulator))
+		local simulatorName := this.SettingsDatabase.getSimulatorName(simulator)
+		local section := ("Simulator." . simulatorName)
+		local defaults := CaseInsenseMap()
+
+		defaults.Default := {Bodywork: 0.0, Suspension: 0.0, Engine: 0.0}
+
+		defaults["Assetto Corsa Competizione"] := {Bodywork: 0.141175939, Suspension: 0.141175939, Engine: 0.0}
 
 		return combine(super.readSettings(simulator, car, track, &settings)
 					 , CaseInsenseMap("Session.Settings.Pitstop.Service.Refuel", getMultiMapValue(settings, section, "Pitstop.Service.Refuel", true)
 									, "Session.Settings.Pitstop.Service.Tyres", getMultiMapValue(settings, section, "Pitstop.Service.Tyres", true)
 									, "Session.Settings.Pitstop.Service.Repairs", getMultiMapValue(settings, section, "Pitstop.Service.Repairs", true)
+									, "Session.Settings.Pitstop.Repair.Bodywork.Duration", getMultiMapValue(settings, section, "Pitstop.Repair.Bodywork.Duration"
+																										  , defaults[simulatorName].Bodywork)
+									, "Session.Settings.Pitstop.Repair.Suspension.Duration", getMultiMapValue(settings, section, "Pitstop.Repair.Suspension.Duration"
+																											, defaults[simulatorName].Suspension)
+									, "Session.Settings.Pitstop.Repair.Engine.Duration", getMultiMapValue(settings, section, "Pitstop.Repair.Engine.Duration"
+																										, defaults[simulatorName].Engine)
 									, "Session.Settings.Pitstop.Delta", getMultiMapValue(settings, "Strategy Settings", "Pitstop.Delta"
 																					   , getDeprecatedValue(settings, "Session Settings", "Race Settings", "Pitstop.Delta", 30))
 									, "Session.Settings.Pitstop.Service.Refuel.Rule", getMultiMapValue(settings, "Strategy Settings"

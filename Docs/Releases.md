@@ -11,6 +11,8 @@
   10. New simulator specific [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database", which define the conversion between internal damage values for bodywork, suspension and engine damage and the time in seconds needed for repair the damage.
   11. New car models for "Setup Workbench":
       - Assetto Corsa
+	     Lotus Evora GTE
+	     Lotus Evora GTE Carbon
 
 ## 5.4.1.2-release 10/16/23
   1. Fixed a **critical** bug for *Assetto Corsa* which refuses to work after a fresh installation.

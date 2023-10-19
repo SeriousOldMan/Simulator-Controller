@@ -265,6 +265,8 @@ class RaceCenter extends ConfigurationItem {
 	iPitstops := CaseInsenseMap()
 	iLastPitstopUpdate := false
 
+	iPendingPitstop := false
+
 	iCurrentStint := false
 	iLastLap := false
 
@@ -5612,6 +5614,8 @@ class RaceCenter extends ConfigurationItem {
 		this.iPitstops := CaseInsenseMap()
 		this.iLastPitstopUpdate := false
 
+		this.iPendingPitstop := false
+
 		this.iLastLap := false
 		this.iCurrentStint := false
 
@@ -6049,6 +6053,9 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	updatePitstopSettings(settings) {
+		if this.iPendingPitstop
+			settings := combine(settings, this.iPendingPitstop)
+
 		pitstopSettings("Update", settings)
 	}
 
@@ -7049,6 +7056,11 @@ class RaceCenter extends ConfigurationItem {
 
 
 					pitstopNr := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Nr", false)
+
+					if pitstopNr
+						this.iPendingPitstop := getMultiMapValues(state, "Pitstop Pending")
+					else
+						this.iPendingPitstop := false
 
 					if (pitstopNr && ((pitstopNr > this.PitstopsListView.GetCount()) || hasPlanned)) {
 						newData := true
@@ -12166,6 +12178,15 @@ pitstopSettings(raceCenterOrCommand := false, arguments*) {
 					settingsListView.Add("", translate("Repairs"), rCenter.computeRepairs(arguments[1].Has("RepairBodywork") ? arguments[1]["RepairBodywork"] : false
 																						, arguments[1].Has("RepairSuspension") ? arguments[1]["RepairSuspension"] : false
 																						, arguments[1].Has("RepairEngine") ? arguments[1]["RepairEngine"] : false))
+
+				if arguments[1].Has("Pitstop.Planned.Time.Service")
+					settingsListView.Add("", translate("Service"), arguments[1]["Pitstop.Planned.Time.Service"] . translate(" seconds"))
+
+				if arguments[1].Has("Pitstop.Planned.Time.Repairs")
+					settingsListView.Add("", translate("Repairs"), arguments[1]["Pitstop.Planned.Time.Repairs"] . translate(" seconds"))
+
+				if arguments[1].Has("Pitstop.Planned.Time.Pitlane")
+					settingsListView.Add("", translate("Pitlane"), arguments[1]["Pitstop.Planned.Time.Pitlane"] . translate(" seconds"))
 
 				settingsListView.ModifyCol()
 

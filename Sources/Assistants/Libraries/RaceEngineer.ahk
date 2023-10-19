@@ -1114,7 +1114,7 @@ class RaceEngineer extends RaceAssistant {
 
 		defaults.Default := {Bodywork: 0.0, Suspension: 0.0, Engine: 0.0}
 
-		defaults["Assetto Corsa Competizione"] := {Bodywork: 0.141175939, Suspension: 31.333333573, Engine: 0.0}
+		defaults["Assetto Corsa Competizione"] := {Bodywork: 0.141175939, Suspension: 31.0, Engine: 0.0}
 
 		bodyworkDuration := getMultiMapValue(settings, section, "Pitstop.Repair.Bodywork.Duration", defaults[simulatorName].Bodywork)
 		suspensionDuration := getMultiMapValue(settings, section, "Pitstop.Repair.Suspension.Duration", defaults[simulatorName].Suspension)
@@ -1127,6 +1127,15 @@ class RaceEngineer extends RaceAssistant {
 		bodyworkThreshold := getDeprecatedValue(settings, "Session Settings", "Race Settings", "Damage.Bodywork.Repair.Threshold", 1)
 		suspensionThreshold := getDeprecatedValue(settings, "Session Settings", "Race Settings", "Damage.Suspension.Repair.Threshold", 0)
 		engineThreshold := getDeprecatedValue(settings, "Session Settings", "Race Settings", "Damage.Engine.Repair.Threshold", 1)
+
+		if ((bodyworkRepair = "Threshold") && (bodyworkDuration != 0))
+			bodyworkThreshold /= bodyworkDuration
+
+		if ((suspensionRepair = "Threshold") && (suspensionDuration != 0))
+			suspensionThreshold /= suspensionDuration
+
+		if ((engineRepair = "Threshold") && (engineDuration != 0))
+			engineThreshold /= engineDuration
 
 		return combine(super.readSettings(simulator, car, track, &settings)
 					 , CaseInsenseMap("Session.Settings.Pitstop.Service.Refuel", getMultiMapValue(settings, section, "Pitstop.Service.Refuel", true)

@@ -45,7 +45,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[5.4.2.0-beta](https://www.dropbox.com/scl/fi/wxrn1xxy1q0l5nbi2ef4u/Simulator-Controller-5.4.2.0-beta.zip?rlkey=im5lwx6met67528lk6sl2uxtm&dl=1) (Test version for 5.4.2. Changes: Fixed transfer of tyre setup from first stint to pitstop fields in "Race Center", Another fix for the critical runaway loop during install and update, New window appearance on DPI scaled monitors, Fixed FCY for cases without traffic simulation, Fixed a bug for explicit tyre set selection with pitstops > 2, New pitstop duration field in "System Monitor", New pitstop duration fields in state JSON, Support for repair time calculation by the Engineer for different damages, Display of different pitstop times in "Race Center", Repair "Threshold" in "Race Settings" is now in seconds, New car models for "Setup Workbench".)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-542) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

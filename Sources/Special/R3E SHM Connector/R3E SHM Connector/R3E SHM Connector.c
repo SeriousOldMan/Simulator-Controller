@@ -349,10 +349,10 @@ extern __declspec(dllexport) int __stdcall call(char* request, char* result, int
 			writeFloat(result, normalizeDamage(map_buffer->car_damage.aerodynamics), &pos); writeLine(result, &pos);
 
 			writeString(result, "SuspensionDamage=", &pos);
-			writeFloat(result, suspDamage, &pos); writeString(result, ", ", &pos);
-			writeFloat(result, suspDamage, &pos); writeString(result, ", ", &pos);
-			writeFloat(result, suspDamage, &pos); writeString(result, ", ", &pos);
-			writeFloat(result, suspDamage, &pos); writeLine(result, &pos);
+			writeFloat(result, suspDamage / 4, &pos); writeString(result, ", ", &pos);
+			writeFloat(result, suspDamage / 4, &pos); writeString(result, ", ", &pos);
+			writeFloat(result, suspDamage / 4, &pos); writeString(result, ", ", &pos);
+			writeFloat(result, suspDamage / 4, &pos); writeLine(result, &pos);
 
 			double engineDamage = normalizeDamage(map_buffer->car_damage.engine);
 

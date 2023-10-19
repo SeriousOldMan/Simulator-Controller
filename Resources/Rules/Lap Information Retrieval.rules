@@ -43,11 +43,12 @@ lapDamage(?lap, ?damageType, ?damage) <= Get(Lap, ?lap, Damage, ?damageType, ?da
 lapDamage(?lap, Suspension, ?damage) <= lapDamage(?lap, Suspension, FL, ?fld), lapDamage(?lap, Suspension, FR, ?frd),
 										lapDamage(?lap, Suspension, RL, ?rld), lapDamage(?lap, Suspension, RR, ?rrd),
 										sum([?fld, ?frd, ?rld, ?rrd], ?damage), Set(Lap, ?lap, Damage.Suspension, ?damage)
-lapDamage(?lap, Bodywork, ?damage) <= lapDamage(?lap, Bodywork, Front, ?frontDmg), lapDamage(?lap, Bodywork, Rear, ?rearDmg),
-									  lapDamage(?lap, Bodywork, Left, ?leftDmg), lapDamage(?lap, Bodywork, Right, ?rightDmg),
-									  lapDamage(?lap, Bodywork, Center, ?centerDmg),
-									  sum([?frontDmg, ?rearDmg, ?leftDmg, ?rightDmg, ?centerDmg], ?damage),
-									  Set(Lap, ?lap, Damage.Bodywork, ?damage)
+lapDamage(?lap, Bodywork, ?damage) <= lapDamage(?lap, Bodywork, Center, ?damage), Set(Lap, ?lap, Damage.Bodywork, ?damage) 
+; lapDamage(?lap, Bodywork, ?damage) <= lapDamage(?lap, Bodywork, Front, ?frontDmg), lapDamage(?lap, Bodywork, Rear, ?rearDmg),
+;										lapDamage(?lap, Bodywork, Left, ?leftDmg), lapDamage(?lap, Bodywork, Right, ?rightDmg),
+;										lapDamage(?lap, Bodywork, Center, ?centerDmg),
+;										sum([?frontDmg, ?rearDmg, ?leftDmg, ?rightDmg, ?centerDmg], ?damage),
+;										Set(Lap, ?lap, Damage.Bodywork, ?damage)
 lapDamage(?lap, Engine, ?damage) <= Get(Lap, ?lap, Damage.Engine, ?damage)
 									  
 lapAvgConsumption(?lap, ?avgConsumption) <= Get(Lap, ?lap, Fuel.AvgConsumption, ?avgConsumption), ?avgConsumption > 0, !

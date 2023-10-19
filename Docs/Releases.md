@@ -13,8 +13,8 @@
   12. The behaviour of the "Treshold" choice for repairs in "Race Settings" has changed. Please see the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tab-pitstop) for more information.
   13. New car models for "Setup Workbench":
       - Assetto Corsa
-	     Lotus Evora GTE
-	     Lotus Evora GTE Carbon
+	    - Lotus Evora GTE
+	    - Lotus Evora GTE Carbon
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-542).
 

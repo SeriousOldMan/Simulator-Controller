@@ -307,6 +307,22 @@ The upper area with the three dropdown menus give you you control over several d
 
 In many cases it is not a good idea to decide based on the repair duration, whether a repair is useful. Sometimes a damage, for example at the side of the car, has no negative influence on lap time. Therefore I recommend to use the "Impact" rule, at least for bodywork and engine damage, whenever possible. Suspension damage is a different topic, though.
 
+The following table shows, which simulator supports which damage type:
+
+| Simulator                  | Bodywork | Suspension | Engine |
+|----------------------------|----------|------------|--------|
+| Assetto Corsa              | Yes      | No (1)     | No (1) |
+| Assetto Corsa Competizione | Yes      | Yes        | No     |
+| Automobilista 2            | Yes      | Yes        | Yes    |
+| iRacing                    | No       | No         | No     |
+| Project CARS 2             | Yes      | Yes        | Yes    |
+| RaceRoom Racing Experience | Yes      | Yes        | Yes    |
+| rFactor 2                  | Yes      | No         | No     |
+
+##### Notes
+
+(1) Supported but not reported in the data API.
+
 For tyre compound changes, you can choose between the triggers "Never", "Tyre Temperature" and "Weather". If you choose "Weather", Jona will advise wet tyres for light rain or worse and dry tyres for a dry track or drizzle. "Tyre Temperature" will allow you to enter a temperature threshold, where Jona will plan a tyre change, if the tyre temeprature falls outside its optimal temperature window by this amount. For dry tyres, the optimal temperature is considered to be above 70 Degrees and for wet tyres below 55 Degrees.
 
 In the lower area you can define the optimal or target tyre pressures. When there is a deviation larger than *Deviation Threshold* from these *Target Pressures* is detected by Jona, corresponding pressure adjustments will be applied for the next pitstop. Beside this very simple approach, there are rules in the AI kernel, which try to predict future influences by falling or rising ambient temperatures and upcoming weather changes, and Jona also might access the session database for a second opinion on target pressures, both depending on the selection of the *Correction* check boxes.

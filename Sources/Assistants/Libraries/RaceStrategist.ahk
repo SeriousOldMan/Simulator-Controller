@@ -1338,7 +1338,7 @@ class RaceStrategist extends GridRaceAssistant {
 									, "Session.Settings.Pitstop.Service.Refuel.Rule", getMultiMapValue(settings, "Strategy Settings"
 																											   , "Service.Refuel.Rule", "Dynamic")
 									, "Session.Settings.Pitstop.Service.Refuel.Duration", getMultiMapValue(settings, "Strategy Settings"
-																												   , "Service.Refuel", 1.5)
+																												   , "Service.Refuel", 1.8)
 									, "Session.Settings.Pitstop.Service.Tyres.Duration", getMultiMapValue(settings, "Strategy Settings"
 																											      , "Service.Tyres", 30)
 									, "Session.Settings.Pitstop.Service.Order", getMultiMapValue(settings, "Strategy Settings"

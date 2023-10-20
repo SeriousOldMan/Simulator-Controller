@@ -1144,7 +1144,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.Add("DropDownList", "x" . x0 . " yp+20 w110 Choose2 VpitstopFuelServiceRuleDropdown", collect(["Refuel Fixed", "Refuel Dynamic"], translate)).OnEvent("Change", chooseRefuelService)
 
-		workbenchGui.Add("Edit", "x" . x1 . " yp w50 h20 VpitstopFuelServiceEdit", displayValue("Float", 1.2)).OnEvent("Change", validatePitstopFuelService)
+		workbenchGui.Add("Edit", "x" . x1 . " yp w50 h20 VpitstopFuelServiceEdit", displayValue("Float", 1.8)).OnEvent("Change", validatePitstopFuelService)
 		workbenchGui.Add("Text", "x" . x3 . " yp+4 w220 h20 VpitstopFuelServiceLabel", translate("Seconds (Refuel of 10 liters)"))
 
 		workbenchGui.Add("Text", "x" . x . " yp+24 w160 h23", translate("Service"))
@@ -2372,7 +2372,7 @@ class StrategyWorkbench extends ConfigurationItem {
 							this.Control["pitstopDeltaEdit"].Text := getMultiMapValue(settings, "Strategy Settings", "Pitstop.Delta", 60)
 							this.Control["pitstopTyreServiceEdit"].Text := getMultiMapValue(settings, "Strategy Settings", "Service.Tyres", 30)
 
-							value := string2Values(":", getMultiMapValue(settings, "Strategy Settings", "Service.Refuel", 1.5))
+							value := string2Values(":", getMultiMapValue(settings, "Strategy Settings", "Service.Refuel", 1.8))
 
 							if (value.Length = 1) {
 								value := value[1]

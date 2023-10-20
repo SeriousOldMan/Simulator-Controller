@@ -1430,7 +1430,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		settingsGui.Add("DropDownList", "x12 yp+21 w110 Choose" . chosen . " VpitstopRefuelServiceRuleDropdown", collect(["Refuel Fixed", "Refuel Dynamic"], translate)).OnEvent("Change", chooseRefuelService)
 
 		settingsGui.Add("Edit", "x126 yp w50 h20 VpitstopRefuelServiceEdit"
-							  , displayValue("Float", getMultiMapValue(settingsOrCommand, "Strategy Settings", "Service.Refuel", 1.5), 1)).OnEvent("Change", validateNumber.Bind("pitstopRefuelServiceEdit"))
+							  , displayValue("Float", getMultiMapValue(settingsOrCommand, "Strategy Settings", "Service.Refuel", 1.8), 1)).OnEvent("Change", validateNumber.Bind("pitstopRefuelServiceEdit"))
 		settingsGui.Add("Text", "x184 yp+4 w290 h20 VpitstopRefuelServiceLabel", translate(["Seconds", "Seconds (Refuel of 10 liters)"][settingsGui["pitstopRefuelServiceRuleDropdown"].Value]))
 
 		chosen := ((getMultiMapValue(settingsOrCommand, "Strategy Settings", "Service.Order", "Simultaneous") = "Simultaneous") ? 1 : 2)

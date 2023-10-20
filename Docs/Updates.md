@@ -41,6 +41,8 @@ If you have used the "Threshold" choice for repair settings either in the "Race 
 
 You can, however, use your old threshold values, if you set the conversion factor to **1** for each damage type (bodywork, suspension, engine). However, in this case, the unit of the threshold is not "Seconds", which does no harm in the repair calculations, but will result in wrong values for pitstop duration calaculations in "System Monitor" and "Race Center".
 
+Another change regards the time need for refueling. The default value is now 1.8 seconds per 10 liter rather than 1.5 seconds. Since this value is persistents, once you have used "Race Settings" (and you don't have set your own default value in "Session Database", you might want to change it to make the pitstop duration calculation more precise.
+
 ***
 
 ## Release 5.4.1

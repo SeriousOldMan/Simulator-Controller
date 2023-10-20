@@ -6053,10 +6053,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	updatePitstopSettings(settings) {
-		if this.iPendingPitstop
-			settings := combine(settings, this.iPendingPitstop)
-
-		pitstopSettings("Update", settings)
+		pitstopSettings("Update", this.iPendingPitstop ? combine(settings, this.iPendingPitstop) : settings)
 	}
 
 	updatePitstopState(lap, data) {

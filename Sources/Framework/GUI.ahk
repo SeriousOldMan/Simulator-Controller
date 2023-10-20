@@ -465,6 +465,10 @@ class DarkTheme extends ClassicTheme {
 }
 
 class Window extends Gui {
+	static sConstrainWindow := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+											  , "Windows", "ConstrainWindow", true)
+	static sConstrainControls := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+												, "Windows", "ConstrainControls", true)
 	static sCustomControlTypes := CaseInsenseMap()
 
 	iTheme := false
@@ -1062,7 +1066,8 @@ class Window extends Gui {
 			this.iMinWidth := width
 			this.iMinHeight := height
 
-			this.Opt("MinSize" . cWidth . "x" . cHeight)
+			if Window.sConstrainWindow
+				this.Opt("MinSize" . cWidth . "x" . cHeight)
 
 			this.iWidth := width
 			this.iHeight := height
@@ -1168,7 +1173,7 @@ class Window extends Gui {
 				width := screen2Window(width)
 				height := screen2Window(height)
 
-				if (width < this.MinWidth) {
+				if (Window.sConstrainWindow && (width < this.MinWidth)) {
 					width := this.MinWidth
 					restricted := true
 				}
@@ -1177,7 +1182,7 @@ class Window extends Gui {
 					restricted := true
 				}
 
-				if (height < this.MinHeight) {
+				if (Window.sConstrainWindow && (height < this.MinHeight)) {
 					height := this.MinHeight
 					restricted := true
 				}
@@ -1186,7 +1191,7 @@ class Window extends Gui {
 					restricted := true
 				}
 
-				if this.ControlsRestrictResize(&width, &height)
+				if (Window.sConstrainControls && this.ControlsRestrictResize(&width, &height))
 					restricted := true
 
 				this.iWidth := width

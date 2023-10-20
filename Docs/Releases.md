@@ -1,4 +1,4 @@
-## 5.4.2.0-release 10/20/23 (planned)
+## 5.4.2.0-release 10/20/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed transfer of tyre setup from first stint to pitstop fields using the copy menu in "Race Center".

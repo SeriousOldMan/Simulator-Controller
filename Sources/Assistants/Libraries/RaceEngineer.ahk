@@ -1114,7 +1114,7 @@ class RaceEngineer extends RaceAssistant {
 
 		defaults.Default := {Bodywork: 0.0, Suspension: 0.0, Engine: 0.0}
 
-		defaults["Assetto Corsa Competizione"] := {Bodywork: 0.141175939, Suspension: 31.0, Engine: 0.0}
+		defaults["Assetto Corsa Competizione"] := {Bodywork: 0.282351878, Suspension: 31.0, Engine: 0.0}
 
 		bodyworkDuration := getMultiMapValue(settings, section, "Pitstop.Repair.Bodywork.Duration", defaults[simulatorName].Bodywork)
 		suspensionDuration := getMultiMapValue(settings, section, "Pitstop.Repair.Suspension.Duration", defaults[simulatorName].Suspension)

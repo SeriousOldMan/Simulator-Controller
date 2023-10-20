@@ -304,7 +304,7 @@ int main(int argc, char* argv[])
 			wprintf_s(L"ABS="); printNAValue(map_buffer->aid_settings.abs);
 
 			wprintf_s(L"BodyworkDamage=%f, %f, %f, %f, %f\n", 0.0, 0.0, 0.0, 0.0, normalizeDamage(map_buffer->car_damage.aerodynamics));
-			wprintf_s(L"SuspensionDamage=%f, %f, %f, %f\n", suspDamage, suspDamage, suspDamage, suspDamage);
+			wprintf_s(L"SuspensionDamage=%f, %f, %f, %f\n", suspDamage / 4, suspDamage / 4, suspDamage / 4, suspDamage / 4);
 
 			double engineDamage = normalizeDamage(map_buffer->car_damage.engine);
 

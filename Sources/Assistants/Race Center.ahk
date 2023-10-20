@@ -4408,10 +4408,10 @@ class RaceCenter extends ConfigurationItem {
 							this.iSynchronize := seconds
 						}
 
-						synchronizeMenu.Add(seconds . translate(" seconds"), setSynchronize.Bind(seconds))
+						synchronizeMenu.Add(seconds . translate(" Seconds"), setSynchronize.Bind(seconds))
 
 						if (seconds = this.Synchronize)
-							synchronizeMenu.Check(seconds . translate(" seconds"))
+							synchronizeMenu.Check(seconds . translate(" Seconds"))
 					}
 
 					synchronizeMenu.Show()
@@ -6053,10 +6053,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	updatePitstopSettings(settings) {
-		if this.iPendingPitstop
-			settings := combine(settings, this.iPendingPitstop)
-
-		pitstopSettings("Update", settings)
+		pitstopSettings("Update", this.iPendingPitstop ? combine(settings, this.iPendingPitstop) : settings)
 	}
 
 	updatePitstopState(lap, data) {
@@ -12156,7 +12153,7 @@ pitstopSettings(raceCenterOrCommand := false, arguments*) {
 				settingsListView.Delete()
 
 				if arguments[1].Has("FuelAmount")
-					settingsListView.Add("", translate("Refuel"), displayValue("Float", convertUnit("Volume", arguments[1]["FuelAmount"])))
+					settingsListView.Add("", translate("Refuel"), displayValue("Float", convertUnit("Volume", arguments[1]["FuelAmount"])) . A_Space . getUnit("Volume", true))
 
 				if arguments[1].Has("TyreCompound")
 					if arguments[1]["TyreCompound"]
@@ -12172,7 +12169,8 @@ pitstopSettings(raceCenterOrCommand := false, arguments*) {
 						settingsListView.Add("", translate("Tyre Pressures"), values2String(", ", displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureFL"]))
 																								, displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureFR"]))
 																								, displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureRL"]))
-																								, displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureRR"]))))
+																								, displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureRR"])))
+																			. A_Space . getUnit("Pressure", true))
 
 				if (arguments[1].Has("RepairBodywork") || arguments[1].Has("RepairSuspension") || arguments[1].Has("RepairEngine"))
 					settingsListView.Add("", translate("Repairs"), rCenter.computeRepairs(arguments[1].Has("RepairBodywork") ? arguments[1]["RepairBodywork"] : false
@@ -12180,13 +12178,13 @@ pitstopSettings(raceCenterOrCommand := false, arguments*) {
 																						, arguments[1].Has("RepairEngine") ? arguments[1]["RepairEngine"] : false))
 
 				if arguments[1].Has("Pitstop.Planned.Time.Service")
-					settingsListView.Add("", translate("Service"), arguments[1]["Pitstop.Planned.Time.Service"] . translate(" seconds"))
+					settingsListView.Add("", translate("Service"), Round(arguments[1]["Pitstop.Planned.Time.Service"] / 1000) . translate(" Seconds"))
 
 				if arguments[1].Has("Pitstop.Planned.Time.Repairs")
-					settingsListView.Add("", translate("Repairs"), arguments[1]["Pitstop.Planned.Time.Repairs"] . translate(" seconds"))
+					settingsListView.Add("", translate("Repairs"), Round(arguments[1]["Pitstop.Planned.Time.Repairs"] / 1000) . translate(" Seconds"))
 
 				if arguments[1].Has("Pitstop.Planned.Time.Pitlane")
-					settingsListView.Add("", translate("Pitlane"), arguments[1]["Pitstop.Planned.Time.Pitlane"] . translate(" seconds"))
+					settingsListView.Add("", translate("Pitlane"), Round(arguments[1]["Pitstop.Planned.Time.Pitlane"] / 1000) . translate(" Seconds"))
 
 				settingsListView.ModifyCol()
 

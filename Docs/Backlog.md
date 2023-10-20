@@ -28,6 +28,7 @@
 
 #### Plugins
   1. Definition of motion feedback settings for different tracks and cars, selectable by the touch of a button
+  2. Make the post-pitstop position prediction available in the "Session State.json" file.
 
 #### Session Database
   1. Active validation of value ranges in settings definitions

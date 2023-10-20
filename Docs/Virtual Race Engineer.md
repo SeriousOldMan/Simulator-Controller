@@ -301,11 +301,27 @@ The second tab, *Pitstop*, contains information that will be used to derived the
 
 The upper area with the three dropdown menus give you you control over several decisions, Jona will take for an upcoming pitstop. For the repair settings you can decide between "Never", "Always", "Threshold" and "Impact".
 
-  - "Threshold" will allow you to enter a value, which defines a level of damage as seconds that will be needed to repair this damage during a pitstop. . If the repair duration is above this value, Jona will advise to go for a repair on the next pitstop. The data APIs of the different simulators report damage differently. Typical are values between 0% and 100%, but *Assetto Corsa Competizione*, for example, report a meaningless, although linear rising number. To support a conversion to repair duration, you must set a conversion factor for a given simulator in the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database". The conversion factor can be set independently for bodywork, suspension and engine repair, and I will provide a growing number of defaults for the different sims.
-
-  In many cases it is not a godd idea to decide based on the repair duration, whether a repair is useful. Sometimes a damage, for example at the side of the car, has no bad influence on lap time. Therefore I recommend to use the "Impact" rule, whenever possible.
+  - "Threshold" will allow you to enter a value, which defines a level of damage as seconds that will be needed to repair this damage during a pitstop. If the repair duration is above this value, Jona will advise to go for a repair on the next pitstop. The data APIs of the different simulators report damage differently. Typical are values between 0% and 100%, but *Assetto Corsa Competizione*, for example, report a meaningless, although linear rising number. To support a conversion to repair duration, you must set a conversion factor for a given simulator in the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database". The conversion factor can be set independently for bodywork, suspension and engine repair, and I will provide a growing number of defaults for the different sims.
   
   - For "Impact" you can also enter a number of seconds. Jona will analyse your lap time and will go for a repair, if your lap time is slower by the number you entered with regards to the reference laps just before the accident. Jona will also consider the time needed for the repair with regards to the remaining session or stint time. Beside that, I advise to go always for a repair for supsension damage, since additional damage in a next accident will most likely be catastrophic.
+
+In many cases it is not a good idea to decide based on the repair duration, whether a repair is useful. Sometimes a damage, for example at the side of the car, has no negative influence on lap time. Therefore I recommend to use the "Impact" rule, at least for bodywork and engine damage, whenever possible. Suspension damage is a different topic, though.
+
+The following table shows, which simulator supports which damage type:
+
+| Simulator                  | Bodywork | Suspension | Engine |
+|----------------------------|----------|------------|--------|
+| Assetto Corsa              | Yes      | No (1)     | No (1) |
+| Assetto Corsa Competizione | Yes      | Yes        | No     |
+| Automobilista 2            | Yes      | Yes        | Yes    |
+| iRacing                    | No       | No         | No     |
+| Project CARS 2             | Yes      | Yes        | Yes    |
+| RaceRoom Racing Experience | Yes      | Yes        | Yes    |
+| rFactor 2                  | Yes      | No         | No     |
+
+##### Notes
+
+(1) Supported but not reported in the data API.
 
 For tyre compound changes, you can choose between the triggers "Never", "Tyre Temperature" and "Weather". If you choose "Weather", Jona will advise wet tyres for light rain or worse and dry tyres for a dry track or drizzle. "Tyre Temperature" will allow you to enter a temperature threshold, where Jona will plan a tyre change, if the tyre temeprature falls outside its optimal temperature window by this amount. For dry tyres, the optimal temperature is considered to be above 70 Degrees and for wet tyres below 55 Degrees.
 

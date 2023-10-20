@@ -389,7 +389,7 @@ This floating window, which can be left open all the time, will be updated once 
 
    Only chosen cold tyre pressures are available here.
 
-Most of the time, additional information will be available for the duration of the normal pitstop service (refueling and tyre change), the time needed for the repairs (whether this value will be correct, depends on correct values in the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database" for conversion between internal damage values of the simulator and the corresponding repair duration), and also the pitlane delta, which is the time difference between a drive-by and a drive-thorugh the pitlane. This value is also taken from the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database".
+Additional information will be available most of the time for the duration of the normal pitstop service (refueling and tyre change), the time needed for the repairs (whether this value will be correct, depends on correct values in the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database" for conversion between internal damage values of the simulator and the corresponding repair duration), and also the pitlane delta, which is the time difference between a drive-by and a drive-thorugh the pitlane. This value is also taken from the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database".
 
 #### Planning and preparing pitstops in a team race using the Race Assistants
 

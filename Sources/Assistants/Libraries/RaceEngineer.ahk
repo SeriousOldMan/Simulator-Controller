@@ -1114,7 +1114,7 @@ class RaceEngineer extends RaceAssistant {
 
 		defaults.Default := {Bodywork: 0.0, Suspension: 0.0, Engine: 0.0}
 
-		defaults["Assetto Corsa Competizione"] := {Bodywork: 0.141175939, Suspension: 31.0, Engine: 0.0}
+		defaults["Assetto Corsa Competizione"] := {Bodywork: 0.282351878, Suspension: 31.0, Engine: 0.0}
 
 		bodyworkDuration := getMultiMapValue(settings, section, "Pitstop.Repair.Bodywork.Duration", defaults[simulatorName].Bodywork)
 		suspensionDuration := getMultiMapValue(settings, section, "Pitstop.Repair.Suspension.Duration", defaults[simulatorName].Suspension)
@@ -1149,7 +1149,7 @@ class RaceEngineer extends RaceAssistant {
 									, "Session.Settings.Pitstop.Service.Refuel.Rule", getMultiMapValue(settings, "Strategy Settings"
 																											   , "Service.Refuel.Rule", "Dynamic")
 									, "Session.Settings.Pitstop.Service.Refuel.Duration", getMultiMapValue(settings, "Strategy Settings"
-																												   , "Service.Refuel", 1.5)
+																												   , "Service.Refuel", 1.8)
 									, "Session.Settings.Pitstop.Service.Tyres.Duration", getMultiMapValue(settings, "Strategy Settings"
 																											      , "Service.Tyres", 30)
 									, "Session.Settings.Pitstop.Service.Order", getMultiMapValue(settings, "Strategy Settings"

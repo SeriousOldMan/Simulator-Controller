@@ -232,7 +232,7 @@ class SpeechSynthesizer {
 
 				synthesizer := string2Values("|", synthesizer)
 
-				if !this.iSpeechSynthesizer.Connect(synthesizer[2], synthesizer[3]) {
+				if !this.iSpeechSynthesizer.ConnectAzure(synthesizer[2], synthesizer[3]) {
 					logMessage(kLogCritical, translate("Could not communicate with speech synthesizer library (") . dllName . translate(")"))
 					logMessage(kLogCritical, translate("Try running the Powershell command `"Get-ChildItem -Path '.' -Recurse | Unblock-File`" in the Binaries folder"))
 
@@ -257,9 +257,50 @@ class SpeechSynthesizer {
 					for ignore, voiceInfo in voiceInfos
 						this.Voices.Push(voiceInfo[2] . " (" . voiceInfo[1] . ")")
 			}
-			else {
+			else
 				this.iVoices := string2Values("|", voices)
+
+			this.setVoice(language, this.computeVoice(voice, language))
+		}
+		else if (InStr(synthesizer, "Google") == 1) {
+			this.iSynthesizer := "Google"
+
+			dllName := "Speech.Synthesizer.dll"
+			dllFile := kBinariesDirectory . dllName
+
+			try {
+				if (!FileExist(dllFile)) {
+					logMessage(kLogCritical, translate("Speech.Synthesizer.dll not found in ") . kBinariesDirectory)
+
+					throw "Unable to find Speech.Synthesizer.dll in " . kBinariesDirectory . "..."
+				}
+
+				this.iSpeechSynthesizer := CLR_LoadLibrary(dllFile).CreateInstance("Speech.SpeechSynthesizer")
+
+				if !this.iSpeechSynthesizer.ConnectGoogle(language ? language : "en") {
+					logMessage(kLogCritical, translate("Could not communicate with speech synthesizer library (") . dllName . translate(")"))
+					logMessage(kLogCritical, translate("Try running the Powershell command `"Get-ChildItem -Path '.' -Recurse | Unblock-File`" in the Binaries folder"))
+
+					throw "Could not communicate with speech synthesizer library (" . dllName . ")..."
+				}
+
+				voices := this.iSpeechSynthesizer.GetVoices()
 			}
+			catch Any as exception {
+				logError(exception, true)
+
+				logMessage(kLogCritical, translate("Error while initializing speech synthesizer module - please install the speech synthesizer software"))
+
+				showMessage(translate("Error while initializing speech synthesizer module - please install the speech synthesizer software") . translate("...")
+									, translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+
+				voices := ""
+			}
+
+			if (voices = "")
+				this.iVoices := []
+			else
+				this.iVoices := string2Values("|", voices)
 
 			this.setVoice(language, this.computeVoice(voice, language))
 		}

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Reflection;
 using System.Collections;
 using System.Net;
+using Google.Cloud.TextToSpeech.V1;
 
 // 
 // https://github.com/Azure-Samples/cognitive-services-speech-sdk/blob/master/samples/csharp/sharedcontent/console/speech_synthesis_samples.cs
@@ -97,6 +98,8 @@ namespace Speech {
         private string subscriptionKey;
         private string region = "";
 
+        private string language = "en";
+
         private SpeechConfig config = null;
         private string token = null;
 
@@ -109,7 +112,7 @@ namespace Speech {
             // ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls13;
         }
         
-        public bool Connect(string tokenIssuerEndpoint, string subscriptionKey) {
+        public bool ConnectAzure(string tokenIssuerEndpoint, string subscriptionKey) {
             this.synthesizerType = "Azure";
 
             this.tokenIssuerEndpoint = tokenIssuerEndpoint;
@@ -126,6 +129,14 @@ namespace Speech {
             catch (Exception e) {
                 return false;
             }
+        }
+
+        public bool ConnectGoogle(string language)
+        {
+            this.synthesizerType = "Google";
+            this.language = language;
+
+            return true;
         }
 
         private void RenewToken() {
@@ -200,7 +211,7 @@ namespace Speech {
             {
                 RenewToken();
 
-                using var audioConfig = AudioConfig.FromWavFileOutput(outputFile);
+                using var audioConfig = Microsoft.CognitiveServices.Speech.Audio.AudioConfig.FromWavFileOutput(outputFile);
                 using var synthesizer = new Microsoft.CognitiveServices.Speech.SpeechSynthesizer(config, audioConfig);
 
                 finished = false;
@@ -249,6 +260,21 @@ namespace Speech {
                 RenewToken();
 
                 return SynthesisGetAvailableVoicesAsync().Result;
+            }
+            else if (this.synthesizerType == "Google")
+            {
+                string voices = "";
+                var client = TextToSpeechClient.Create();
+                var response = client.ListVoices(this.language);
+                foreach (var voice in response.Voices)
+                {
+                    if (voices.Length > 0)
+                        voices += "|";
+
+                    voices += (voice.Name + " (" + voice.SsmlGender + ") (" + string.Join(", ", voice.LanguageCodes) + ")");
+                }
+
+                return voices;
             }
             else
             {

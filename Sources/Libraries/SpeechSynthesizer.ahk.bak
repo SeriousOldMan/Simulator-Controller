@@ -275,8 +275,7 @@ class SpeechSynthesizer {
 					throw "Unable to find Speech.Synthesizer.dll in " . kBinariesDirectory . "..."
 				}
 
-				this.iSpeechSynthesizer := CLR_LoadLibrary(dllFile)
-				this.iSpeechSynthesizer := this.iSpeechSynthesizer.CreateInstance("Speech.GoogleSpeechSynthesizer")
+				this.iSpeechSynthesizer := CLR_LoadLibrary(dllFile).CreateInstance("Speech.GoogleSpeechSynthesizer")
 
 				synthesizer := string2Values("|", synthesizer)
 

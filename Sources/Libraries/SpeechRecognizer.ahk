@@ -221,7 +221,7 @@ class SpeechRecognizer {
 	}
 
 	__New(engine, recognizer := false, language := false, silent := false, mode := "Grammar") {
-		local dllName := "Speech.Recognizer.dll"
+		local dllName := "Microsoft.Speech.Recognizer.dll"
 		local dllFile := kBinariesDirectory . dllName
 		local instance, choices, found, ignore, recognizerDescriptor, configuration, audioDevice
 
@@ -260,7 +260,7 @@ class SpeechRecognizer {
 				}
 			}
 
-			instance := CLR_LoadLibrary(dllFile).CreateInstance("Speech.SpeechRecognizer")
+			instance := CLR_LoadLibrary(dllFile).CreateInstance("Speech.MicrosoftSpeechRecognizer")
 
 			this.Instance := instance
 
@@ -1396,7 +1396,7 @@ matchWords(string1, string2) {
 	static recognizer := false
 
 	if !recognizer {
-		dllName := "Speech.Recognizer.dll"
+		dllName := "Microsoft.Speech.Recognizer.dll"
 		dllFile := kBinariesDirectory . dllName
 
 		try {
@@ -1406,7 +1406,7 @@ matchWords(string1, string2) {
 				throw "Unable to find Speech.Recognizer.dll in " . kBinariesDirectory . "..."
 			}
 
-			recognizer := CLR_LoadLibrary(dllFile).CreateInstance("Speech.SpeechRecognizer")
+			recognizer := CLR_LoadLibrary(dllFile).CreateInstance("Speech.MicrosoftSpeechRecognizer")
 		}
 		catch Any as exception {
 			logError(exception, true)

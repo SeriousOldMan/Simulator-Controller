@@ -40,6 +40,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 	iTopAzureCredentialsVisible := false
 	iBottomAzureCredentialsVisible := false
 
+	iTopGoogleCredentialsVisible := false
+
 	iSoundProcessingSettings := false
 
 	__New(editor, configuration := false) {
@@ -65,6 +67,10 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		updateAzureVoices(*) {
 			this.updateAzureVoices()
+		}
+
+		updateGoogleVoices(*) {
+			this.updateGoogleVoices()
 		}
 
 		chooseVoiceSynthesizer(*) {
@@ -112,7 +118,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			else if (voiceRecognizerDropDown.Value == 2)
 				this.showDesktopRecognizerEditor()
 			else {
-				recognizers := SpeechRecognizer("Azure|" . this.Control["azureTokenIssuerEdit"].Text . "|" . this.Control["azureSubscriptionKeyEdit"].Text
+				recognizers := SpeechRecognizer("Azure|" . Trim(this.Control["azureTokenIssuerEdit"].Text) . "|" . Trim(this.Control["azureSubscriptionKeyEdit"].Text)
 											  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
 
 				this.showAzureRecognizerEditor()
@@ -152,6 +158,24 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			}
 			finally {
 				protectionOff()
+			}
+		}
+
+		chooseAPIKeyFilePath(*) {
+			local file, translator
+
+			this.Window.Opt("+OwnDialogs")
+
+			translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
+
+			OnMessage(0x44, translator)
+			file := FileSelect(1, this.Control["googleAPIKeyFileEdit"].Text, translate("Select Google API Key File..."), "JSON (*.json)")
+			OnMessage(0x44, translator, 0)
+
+			if (file != "") {
+				this.Control["googleAPIKeyFileEdit"].Text := file
+
+				this.updateGoogleVoices()
 			}
 		}
 
@@ -266,7 +290,6 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		widget12 := window.Add("Slider", "Center Thick15 x" . x1 . " yp+2 w160 W:Grow(0.3) 0x10 Range-10-10 ToolTip VspeakerSpeedSlider Hidden")
 
 		this.iWindowsSynthesizerWidgets := [[window["windowsSpeakerLabel"], window["windowsSpeakerDropDown"], widget32]]
-		this.iGoogleSynthesizerWidgets := this.iWindowsSynthesizerWidgets
 
 		widget13 := window.Add("Text", "x" . x . " yp+26 w110 h23 +0x200 VsoXPathLabel1 Hidden", translate("SoX Folder (optional)"))
 
@@ -352,9 +375,28 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		this.iAzureRecognizerWidgets := [[window["azureSubscriptionKeyLabel"], window["azureSubscriptionKeyEdit"]]
 									   , [window["azureTokenIssuerLabel"], window["azureTokenIssuerEdit"]]]
 
+		widget35 := window.Add("Text", "x" . x . " ys+24 w140 h23 +0x200 VgoogleAPIKeyFileLabel Hidden", translate("API Key File"))
+		widget36 := window.Add("Edit", "x" . x1 . " yp w" . (w1 - 24) . " h21 W:Grow VgoogleAPIKeyFileEdit Hidden")
+		widget36.OnEvent("Change", updateGoogleVoices)
+
+		widget37 := window.Add("Button", "x" . (x1 + w1 - 23) . " yp w23 h23 X:Move VgoogleAPIKeyFilePathButton Hidden", translate("..."))
+		widget37.OnEvent("Click", chooseAPIKeyFilePath)
+
+		voices := [translate("Random"), translate("Deactivated")]
+
+		widget38 := window.Add("Text", "x" . x . " yp+24 w110 h23 +0x200 VgoogleSpeakerLabel Hidden", translate("Voice"))
+		widget39 := window.Add("DropDownList", "x" . (x1 + 24) . " yp w" . (w1 - 24) . " W:Grow VgoogleSpeakerDropDown Hidden", voices)
+
+		widget40 := window.Add("Button", "x" . x1 . " yp w23 h23 Default Hidden")
+		widget40.OnEvent("Click", (*) => this.test())
+		setButtonIcon(widget40, kIconsDirectory . "Start.ico", 1, "L4 T4 R4 B4")
+
+		this.iGoogleSynthesizerWidgets := [[window["googleAPIKeyFileLabel"], window["googleAPIKeyFileEdit"], widget37]
+										 , [window["googleSpeakerLabel"], window["googleSpeakerDropDown"], widget40]]
+
 		this.updateLanguage(false)
 
-		loop 34
+		loop 40
 			editor.registerWidget(this, widget%A_Index%)
 
 		this.hideControls(this.iTopWidgets)
@@ -381,10 +423,15 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 				this.Value["voiceLanguage"] := languageCode
 
 			synthesizer := getMultiMapValue(configuration, "Voice Control", "Synthesizer", "dotNET")
+
 			if (InStr(synthesizer, "Azure") == 1)
 				synthesizer := "Azure"
 
+			if (InStr(synthesizer, "Google") == 1)
+				synthesizer := "Google"
+
 			recognizer := getMultiMapValue(configuration, "Voice Control", "Recognizer", "Desktop")
+
 			if (InStr(recognizer, "Azure") == 1)
 				recognizer := "Azure"
 
@@ -398,6 +445,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 			this.Value["azureSubscriptionKey"] := getMultiMapValue(configuration, "Voice Control", "SubscriptionKey", "")
 			this.Value["azureTokenIssuer"] := getMultiMapValue(configuration, "Voice Control", "TokenIssuer", "")
+
+			this.Value["googleAPIKeyFile"] := getMultiMapValue(configuration, "Voice Control", "APIKeyFile", "")
 
 			this.Value["speakerVolume"] := getMultiMapValue(configuration, "Voice Control", "SpeakerVolume", 100)
 			this.Value["speakerPitch"] := getMultiMapValue(configuration, "Voice Control", "SpeakerPitch", 0)
@@ -441,6 +490,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 	saveToConfiguration(configuration) {
 		local windowsSpeaker := this.Control["windowsSpeakerDropDown"].Text
 		local azureSpeaker := this.Control["azureSpeakerDropDown"].Text
+		local googleSpeaker := this.Control["googleSpeakerDropDown"].Text
 		local listener := this.Control["listenerDropDown"].Text
 
 		super.saveToConfiguration(configuration)
@@ -472,23 +522,26 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Google", true)
 		}
 		else if (this.Control["voiceSynthesizerDropDown"].Value = 3) {
-			setMultiMapValue(configuration, "Voice Control", "Synthesizer", "Azure|" . this.Control["azureTokenIssuerEdit"].Text . "|" . this.Control["azureSubscriptionKeyEdit"].Text)
+			setMultiMapValue(configuration, "Voice Control", "Synthesizer", "Azure|" . Trim(this.Control["azureTokenIssuerEdit"].Text) . "|" . Trim(this.Control["azureSubscriptionKeyEdit"].Text))
 			setMultiMapValue(configuration, "Voice Control", "Speaker", azureSpeaker)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Windows", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Google", true)
 		}
 		else {
-			setMultiMapValue(configuration, "Voice Control", "Synthesizer", "Google")
-			setMultiMapValue(configuration, "Voice Control", "Speaker", windowsSpeaker)
-			setMultiMapValue(configuration, "Voice Control", "Speaker.Google", windowsSpeaker)
+			setMultiMapValue(configuration, "Voice Control", "Synthesizer", "Google|" . Trim(this.Control["googleAPIKeyFileEdit"].Text))
+			setMultiMapValue(configuration, "Voice Control", "Speaker", googleSpeaker)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.Google", googleSpeaker)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Windows", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", true)
 		}
 
 		setMultiMapValue(configuration, "Voice Control", "Speaker.Azure", azureSpeaker)
-		setMultiMapValue(configuration, "Voice Control", "SubscriptionKey", this.Control["azureSubscriptionKeyEdit"].Text)
-		setMultiMapValue(configuration, "Voice Control", "TokenIssuer", this.Control["azureTokenIssuerEdit"].Text)
+		setMultiMapValue(configuration, "Voice Control", "SubscriptionKey", Trim(this.Control["azureSubscriptionKeyEdit"].Text))
+		setMultiMapValue(configuration, "Voice Control", "TokenIssuer", Trim(this.Control["azureTokenIssuerEdit"].Text))
+
+		setMultiMapValue(configuration, "Voice Control", "Speaker.Google", googleSpeaker)
+		setMultiMapValue(configuration, "Voice Control", "APIKeyFile", Trim(this.Control["googleAPIKeyFileEdit"].Text))
 
 		setMultiMapValue(configuration, "Voice Control", "SpeakerVolume", this.Control["speakerVolumeSlider"].Value)
 		setMultiMapValue(configuration, "Voice Control", "SpeakerPitch", this.Control["speakerPitchSlider"].Value)
@@ -503,7 +556,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		if (this.Control["voiceRecognizerDropDown"].Value <= 2)
 			setMultiMapValue(configuration, "Voice Control", "Recognizer", ["Server", "Desktop"][this.Control["voiceRecognizerDropDown"].Value])
 		else
-			setMultiMapValue(configuration, "Voice Control", "Recognizer", "Azure|" . this.Control["azureTokenIssuerEdit"].Text . "|" . this.Control["azureSubscriptionKeyEdit"].Text)
+			setMultiMapValue(configuration, "Voice Control", "Recognizer", "Azure|" . Trim(this.Control["azureTokenIssuerEdit"].Text) . "|" . Trim(this.Control["azureSubscriptionKeyEdit"].Text))
 
 		setMultiMapValue(configuration, "Voice Control", "Listener", listener)
 		setMultiMapValue(configuration, "Voice Control", "PushToTalk", (Trim(this.Control["pushToTalkEdit"].Text) = "") ? false : this.Control["pushToTalkEdit"].Text)
@@ -567,14 +620,15 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		this.Control["azureSubscriptionKeyEdit"].Text := this.Value["azureSubscriptionKey"]
 		this.Control["azureTokenIssuerEdit"].Text := this.Value["azureTokenIssuer"]
 
+		this.Control["googleAPIKeyFileEdit"].Text := this.Value["googleAPIKeyFile"]
+
 		if (this.Value["voiceSynthesizer"] = 1)
 			this.updateWindowsVoices(configuration)
 		else if (this.Value["voiceSynthesizer"] = 2)
 			this.updateDotNETVoices(configuration)
-		else if (this.Value["voiceSynthesizer"] = 4)
-			this.updateGoogleVoices(configuration)
 
 		this.updateAzureVoices(configuration)
+		this.updateGoogleVoices(configuration)
 
 		this.Control["speakerVolumeSlider"].Value := this.Value["speakerVolume"]
 		this.Control["speakerPitchSlider"].Value := this.Value["speakerPitch"]
@@ -595,7 +649,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			listener := translate("Deactivated")
 
 		if (this.Control["voiceRecognizerDropDown"].Value = 3)
-			recognizers := SpeechRecognizer("Azure|" . this.Control["azureTokenIssuerEdit"].Text . "|" . this.Control["azureSubscriptionKeyEdit"].Text
+			recognizers := SpeechRecognizer("Azure|" . Trim(this.Control["azureTokenIssuerEdit"].Text) . "|" . Trim(this.Control["azureSubscriptionKeyEdit"].Text)
 										  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
 		else
 			recognizers := SpeechRecognizer((this.Control["voiceRecognizerDropDown"].Value = 1) ? "Server" : "Desktop"
@@ -692,6 +746,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		this.iTopAzureCredentialsVisible := false
 		this.iBottomAzureCredentialsVisible := false
+
+		this.iTopGoogleCredentialsVisible := false
 	}
 
 	showWindowsSynthesizerEditor() {
@@ -714,18 +770,12 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		this.iSynthesizerMode := "dotNET"
 	}
 
-	showGoogleSynthesizerEditor() {
-		this.showWindowsSynthesizerEditor()
-
-		this.iSynthesizerMode := "Google"
-	}
-
 	hideWindowsSynthesizerEditor() {
 		this.hideControls(this.iTopWidgets)
 		this.hideControls(this.iWindowsSynthesizerWidgets)
 		this.hideControls(this.iOtherWidgets)
 
-		if ((this.iSynthesizerMode == "Windows") || (this.iSynthesizerMode == "dotNET") || (this.iSynthesizerMode == "Google"))
+		if ((this.iSynthesizerMode == "Windows") || (this.iSynthesizerMode == "dotNET"))
 			this.transposeControls(this.iOtherWidgets, -24 * this.iWindowsSynthesizerWidgets.Length, this.Window.TitleBarHeight)
 		else if (this.iSynthesizerMode != "Init")
 			throw "Internal error detected in VoiceControlConfigurator.hideWindowsSynthesizerEditor..."
@@ -734,10 +784,6 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 	}
 
 	hideDotNETSynthesizerEditor() {
-		this.hideWindowsSynthesizerEditor()
-	}
-
-	hideGoogleSynthesizerEditor() {
 		this.hideWindowsSynthesizerEditor()
 	}
 
@@ -794,6 +840,59 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		this.iSynthesizerMode := false
 	}
 
+	showGoogleSynthesizerEditor() {
+		local wasOpen := false
+
+		if this.iBottomAzureCredentialsVisible {
+			wasOpen := true
+
+			this.hideAzureRecognizerEditor()
+		}
+
+		this.showControls(this.iTopWidgets)
+		this.showControls(this.iGoogleSynthesizerWidgets)
+
+		this.iTopGoogleCredentialsVisible := true
+
+		if ((this.iSynthesizerMode == false) || (this.iSynthesizerMode = "Init"))
+			this.transposeControls(this.iOtherWidgets, 24 * this.iGoogleSynthesizerWidgets.Length, this.Window.TitleBarHeight)
+		else
+			throw "Internal error detected in VoiceControlConfigurator.showGoogleSynthesizerEditor..."
+
+		if wasOpen
+			this.showAzureRecognizerEditor()
+
+		this.showControls(this.iOtherWidgets)
+
+		this.iSynthesizerMode := "Google"
+	}
+
+	hideGoogleSynthesizerEditor() {
+		local wasOpen := false
+
+		if (this.iRecognizerMode = "Azure") {
+			wasOpen := true
+
+			this.hideAzureRecognizerEditor()
+		}
+
+		this.hideControls(this.iTopWidgets)
+		this.hideControls(this.iGoogleSynthesizerWidgets)
+		this.hideControls(this.iOtherWidgets)
+
+		this.iTopGoogleCredentialsVisible := false
+
+		if (this.iSynthesizerMode == "Google")
+			this.transposeControls(this.iOtherWidgets, -24 * this.iGoogleSynthesizerWidgets.Length, this.Window.TitleBarHeight)
+		else if (this.iSynthesizerMode != "Init")
+			throw "Internal error detected in VoiceControlConfigurator.hideWindowsSynthesizerEditor..."
+
+		if wasOpen
+			this.showAzureRecognizerEditor()
+
+		this.iSynthesizerMode := false
+	}
+
 	showServerRecognizerEditor() {
 		this.iRecognizerMode := "Server"
 	}
@@ -815,7 +914,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		if !this.iTopAzureCredentialsVisible {
 			if ((this.iRecognizerMode == false) || (this.iRecognizerMode != "Init")) {
-				this.transposeControls(this.iAzureRecognizerWidgets, (24 * 7) - 3, titleBarHeight)
+				this.transposeControls(this.iAzureRecognizerWidgets, (24 * (this.iTopGoogleCredentialsVisible ? 8 : 7)) - 3, titleBarHeight)
 				this.showControls(this.iAzureRecognizerWidgets)
 				this.transposeControls(this.iBottomWidgets, 24 * this.iAzureRecognizerWidgets.Length, titleBarHeight)
 			}
@@ -834,7 +933,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		if !this.iTopAzureCredentialsVisible {
 			if (this.iRecognizerMode == "Azure") {
 				this.hideControls(this.iAzureRecognizerWidgets)
-				this.transposeControls(this.iAzureRecognizerWidgets, (-24 * 7) + 3, titleBarHeight)
+				this.transposeControls(this.iAzureRecognizerWidgets, (-24 * (this.iTopGoogleCredentialsVisible ? 8 : 7)) + 3, titleBarHeight)
 				this.transposeControls(this.iBottomWidgets, -24 * this.iAzureRecognizerWidgets.Length, titleBarHeight)
 			}
 			else if (this.iRecognizerMode != "Init")
@@ -886,17 +985,16 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			this.updateWindowsVoices()
 		else if (this.Control["voiceSynthesizerDropDown"].Value = 2)
 			this.updateDotNETVoices()
-		else if (this.Control["voiceSynthesizerDropDown"].Value = 4)
-			this.updateGoogleVoices()
 
 		this.updateAzureVoices()
+		this.updateGoogleVoices()
 
 		if recognizer {
 			if (this.Control["voiceRecognizerDropDown"].Value <= 2)
 				recognizers := SpeechRecognizer((this.Control["voiceRecognizerDropDown"].Value = 1) ? "Server" : "Desktop"
 											  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()]
 			else
-				recognizers := SpeechRecognizer("Azure|" . this.Control["azureTokenIssuerEdit"].Text . "|" . this.Control["azureSubscriptionKeyEdit"].Text
+				recognizers := SpeechRecognizer("Azure|" . Trim(this.Control["azureTokenIssuerEdit"].Text) . "|" . Trim(this.Control["azureSubscriptionKeyEdit"].Text)
 											  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()]
 
 			recognizers.InsertAt(1, translate("Deactivated"))
@@ -942,18 +1040,6 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		return this.loadVoices("dotNET", configuration)
 	}
 
-	loadGoogleVoices(configuration, &googleSpeaker)	{
-		if configuration
-			googleSpeaker := getMultiMapValue(configuration, "Voice Control", "Speaker.Google", true)
-		else {
-			googleSpeaker := this.Control["windowsSpeakerDropDown"].Text
-
-			configuration := this.Configuration
-		}
-
-		return this.loadVoices("Google", configuration)
-	}
-
 	updateWindowsVoices(configuration := false) {
 		local windowsSpeaker, voices, chosen
 
@@ -997,10 +1083,10 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		if (configuration && !azureSpeaker)
 			azureSpeaker := getMultiMapValue(configuration, "Voice Control", "Speaker.Azure", true)
 
-		if ((this.Control["azureSubscriptionKeyEdit"].Text != "") && (this.Control["azureTokenIssuerEdit"].Text != "")) {
+		if ((Trim(this.Control["azureSubscriptionKeyEdit"].Text) != "") && (Trim(this.Control["azureTokenIssuerEdit"].Text) != "")) {
 			language := this.getCurrentLanguage()
 
-			voices := SpeechSynthesizer("Azure|" . this.Control["azureTokenIssuerEdit"].Text . "|" . this.Control["azureSubscriptionKeyEdit"].Text, true, language).Voices[language].Clone()
+			voices := SpeechSynthesizer("Azure|" . Trim(this.Control["azureTokenIssuerEdit"].Text) . "|" . Trim(this.Control["azureSubscriptionKeyEdit"].Text), true, language).Voices[language].Clone()
 		}
 
 		voices.InsertAt(1, translate("Deactivated"))
@@ -1017,17 +1103,37 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 	}
 
 	updateGoogleVoices(configuration := false) {
-		local googleSpeaker, voices, chosen
+		local voices := []
+		local googleSpeaker, chosen, language
 
-		voices := this.loadGoogleVoices(configuration, &googleSpeaker)
+		if configuration
+			googleSpeaker := getMultiMapValue(configuration, "Voice Control", "Speaker.Google", true)
+		else {
+			googleSpeaker := this.Control["windowsSpeakerDropDown"].Text
+
+			configuration := this.Configuration
+		}
+
+		if (configuration && !googleSpeaker)
+			googleSpeaker := getMultiMapValue(configuration, "Voice Control", "Speaker.Google", true)
+
+		if (Trim(this.Control["googleAPIKeyFileEdit"].Text) != "") {
+			language := this.getCurrentLanguage()
+
+			voices := SpeechSynthesizer("Google|" . Trim(this.Control["googleAPIKeyFileEdit"].Text), true, language).Voices[language].Clone()
+		}
+
+		voices.InsertAt(1, translate("Deactivated"))
+		voices.InsertAt(1, translate("Random"))
+
 		chosen := inList(voices, googleSpeaker)
 
 		if (chosen == 0)
 			chosen := 1
 
-		this.Control["windowsSpeakerDropDown"].Delete()
-		this.Control["windowsSpeakerDropDown"].Add(voices)
-		this.Control["windowsSpeakerDropDown"].Choose(chosen)
+		this.Control["googleSpeakerDropDown"].Delete()
+		this.Control["googleSpeakerDropDown"].Add(voices)
+		this.Control["googleSpeakerDropDown"].Choose(chosen)
 	}
 
 	editSoundProcessing() {

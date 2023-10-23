@@ -2502,6 +2502,7 @@ checkDependencies(dependencies, modification) {
 runSpecialTargets(&buildProgress) {
 	local msBuild := kMSBuildDirectory . "MSBuild.exe"
 	local currentDirectory := A_WorkingDir
+	local mode := ((gTargetConfiguration = "Development") ? "Debug" : "Release")
 	local index, directory, file, success, solution, text, ignore, result
 
 	try {

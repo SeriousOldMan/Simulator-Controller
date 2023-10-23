@@ -262,7 +262,7 @@ class SpeechSynthesizer {
 
 			this.setVoice(language, this.computeVoice(voice, language))
 		}
-		else if (InStr(synthesizer, "Google") == 1) {
+		else if (InStr(synthesizer, "Google|") == 1) {
 			this.iSynthesizer := "Google"
 
 			dllName := "Speech.Synthesizer.dll"
@@ -277,14 +277,22 @@ class SpeechSynthesizer {
 
 				this.iSpeechSynthesizer := CLR_LoadLibrary(dllFile).CreateInstance("Speech.SpeechSynthesizer")
 
-				if !this.iSpeechSynthesizer.ConnectGoogle(language ? language : "en") {
-					logMessage(kLogCritical, translate("Could not communicate with speech synthesizer library (") . dllName . translate(")"))
-					logMessage(kLogCritical, translate("Try running the Powershell command `"Get-ChildItem -Path '.' -Recurse | Unblock-File`" in the Binaries folder"))
+				synthesizer := string2Values("|", synthesizer)
 
-					throw "Could not communicate with speech synthesizer library (" . dllName . ")..."
+				if (synthesizer[2] != "") {
+					EnvSet("GOOGLE_APPLICATION_CREDENTIALS", synthesizer[2])
+
+					if !this.iSpeechSynthesizer.ConnectGoogle(synthesizer[2]) {
+						logMessage(kLogCritical, translate("Could not communicate with speech synthesizer library (") . dllName . translate(")"))
+						logMessage(kLogCritical, translate("Try running the Powershell command `"Get-ChildItem -Path '.' -Recurse | Unblock-File`" in the Binaries folder"))
+
+						throw "Could not communicate with speech synthesizer library (" . dllName . ")..."
+					}
+
+					voices := this.iSpeechSynthesizer.GetVoices()
 				}
-
-				voices := this.iSpeechSynthesizer.GetVoices()
+				else
+					voices := ""
 			}
 			catch Any as exception {
 				logError(exception, true)

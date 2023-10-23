@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Collections;
 using System.Net;
 using Google.Cloud.TextToSpeech.V1;
+using Google.Apis.Auth.OAuth2;
 
 // 
 // https://github.com/Azure-Samples/cognitive-services-speech-sdk/blob/master/samples/csharp/sharedcontent/console/speech_synthesis_samples.cs
@@ -131,10 +132,10 @@ namespace Speech {
             }
         }
 
-        public bool ConnectGoogle(string language)
+        public bool ConnectGoogle(string credentials)
         {
             this.synthesizerType = "Google";
-            this.language = language;
+            this.token = credentials;
 
             return true;
         }
@@ -263,8 +264,10 @@ namespace Speech {
             }
             else if (this.synthesizerType == "Google")
             {
+                var credentials = GoogleCredential.FromFile(this.token);
+                TextToSpeechClient client = TextToSpeechClient.Create();
+
                 string voices = "";
-                var client = TextToSpeechClient.Create();
                 var response = client.ListVoices(this.language);
                 foreach (var voice in response.Voices)
                 {

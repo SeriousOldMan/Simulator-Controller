@@ -314,12 +314,16 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		else if (repairSuspensionDropDown == 3) {
 			settingsGui["repairSuspensionGreaterLabel"].Visible := true
 			settingsGui["repairSuspensionThresholdEdit"].Visible := true
-			settingsGui["repairSuspensionThresholdLabel"].Visible := false
+			settingsGui["repairSuspensionThresholdLabel"].Visible := true
+
+			settingsGui["repairSuspensionThresholdLabel"].Text := translate("Seconds")
 		}
 		else if (repairSuspensionDropDown == 4) {
 			settingsGui["repairSuspensionGreaterLabel"].Visible := true
 			settingsGui["repairSuspensionThresholdEdit"].Visible := true
 			settingsGui["repairSuspensionThresholdLabel"].Visible := true
+
+			settingsGui["repairSuspensionThresholdLabel"].Text := translate("Sec. p. Lap")
 		}
 	}
 
@@ -336,12 +340,16 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		else if (repairBodyworkDropDown == 3) {
 			settingsGui["repairBodyworkGreaterLabel"].Visible := true
 			settingsGui["repairBodyworkThresholdEdit"].Visible := true
-			settingsGui["repairBodyworkThresholdLabel"].Visible := false
+			settingsGui["repairBodyworkThresholdLabel"].Visible := true
+
+			settingsGui["repairBodyworkThresholdLabel"].Text := translate("Seconds")
 		}
 		else if (repairBodyworkDropDown == 4) {
 			settingsGui["repairBodyworkGreaterLabel"].Visible := true
 			settingsGui["repairBodyworkThresholdEdit"].Visible := true
 			settingsGui["repairBodyworkThresholdLabel"].Visible := true
+
+			settingsGui["repairBodyworkThresholdLabel"].Text := translate("Sec. p. Lap")
 		}
 	}
 
@@ -358,12 +366,16 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		else if (repairEngineDropDown == 3) {
 			settingsGui["repairEngineGreaterLabel"].Visible := true
 			settingsGui["repairEngineThresholdEdit"].Visible := true
-			settingsGui["repairEngineThresholdLabel"].Visible := false
+			settingsGui["repairEngineThresholdLabel"].Visible := true
+
+			settingsGui["repairEngineThresholdLabel"].Text := translate("Seconds")
 		}
 		else if (repairEngineDropDown == 4) {
 			settingsGui["repairEngineGreaterLabel"].Visible := true
 			settingsGui["repairEngineThresholdEdit"].Visible := true
 			settingsGui["repairEngineThresholdLabel"].Visible := true
+
+			settingsGui["repairEngineThresholdLabel"].Text := translate("Sec. p. Lap")
 		}
 	}
 
@@ -1418,7 +1430,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		settingsGui.Add("DropDownList", "x12 yp+21 w110 Choose" . chosen . " VpitstopRefuelServiceRuleDropdown", collect(["Refuel Fixed", "Refuel Dynamic"], translate)).OnEvent("Change", chooseRefuelService)
 
 		settingsGui.Add("Edit", "x126 yp w50 h20 VpitstopRefuelServiceEdit"
-							  , displayValue("Float", getMultiMapValue(settingsOrCommand, "Strategy Settings", "Service.Refuel", 1.5), 1)).OnEvent("Change", validateNumber.Bind("pitstopRefuelServiceEdit"))
+							  , displayValue("Float", getMultiMapValue(settingsOrCommand, "Strategy Settings", "Service.Refuel", 1.8), 1)).OnEvent("Change", validateNumber.Bind("pitstopRefuelServiceEdit"))
 		settingsGui.Add("Text", "x184 yp+4 w290 h20 VpitstopRefuelServiceLabel", translate(["Seconds", "Seconds (Refuel of 10 liters)"][settingsGui["pitstopRefuelServiceRuleDropdown"].Value]))
 
 		chosen := ((getMultiMapValue(settingsOrCommand, "Strategy Settings", "Service.Order", "Simultaneous") = "Simultaneous") ? 1 : 2)

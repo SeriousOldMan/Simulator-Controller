@@ -265,6 +265,8 @@ class RaceCenter extends ConfigurationItem {
 	iPitstops := CaseInsenseMap()
 	iLastPitstopUpdate := false
 
+	iPendingPitstop := false
+
 	iCurrentStint := false
 	iLastLap := false
 
@@ -1937,7 +1939,7 @@ class RaceCenter extends ConfigurationItem {
 
 		centerGui.Add("Text", "x24 yp+31 w356 0x10")
 
-		this.iReportsListView := centerGui.Add("ListView", "x16 yp+10 w115 h230 H:Grow(0.2) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", [translate("Report")])
+		this.iReportsListView := centerGui.Add("ListView", "x16 yp+10 w115 h180 H:Grow(0.2) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", [translate("Report")])
 		this.iReportsListView.OnEvent("Click", chooseReport)
 
 		for ignore, report in kSessionReports
@@ -1970,11 +1972,11 @@ class RaceCenter extends ConfigurationItem {
 		centerGui.Add("Button", "x1327 yp w23 h23 X:Move vreportSettingsButton").OnEvent("Click", reportSettings)
 		setButtonIcon(centerGui["reportSettingsButton"], kIconsDirectory . "General Settings.ico", 1)
 
-		this.iChartViewer := centerGui.Add("HTMLViewer", "x400 yp+24 w950 h343 W:Grow H:Grow(0.2) Border vchartViewer")
+		this.iChartViewer := centerGui.Add("HTMLViewer", "x400 yp+24 w950 h293 W:Grow H:Grow(0.2) Border vchartViewer")
 
 		centerGui.Rules := "Y:Move(0.2)"
 
-		centerGui.Add("Text", "x8 yp+351 w1350 W:Grow 0x10")
+		centerGui.Add("Text", "x8 yp+301 w1350 W:Grow 0x10")
 
 		centerGui.SetFont("s8 Norm", "Arial")
 
@@ -2966,7 +2968,7 @@ class RaceCenter extends ConfigurationItem {
 		local correct4 := (this.SelectTyreSet ? "(x) Select tyre set" : "      Select tyre set")
 
 		this.Control["pitstopMenuDropDown"].Delete()
-		this.Control["pitstopMenuDropDown"].Add(collect(["Pitstop", "---------------------------------------------", "Select Team...", "---------------------------------------------", "Initialize from Session", "Load from Database...", "Clear Setups...", "---------------------------------------------", "Setups Summary", "Pitstops Summary", "---------------------------------------------", correct1, correct2, correct3, correct4, "---------------------------------------------", "Instruct Engineer"], translate))
+		this.Control["pitstopMenuDropDown"].Add(collect(["Pitstop", "---------------------------------------------", "Select Team...", "---------------------------------------------", "Initialize from Session", "Load from Database...", "---------------------------------------------", "Save Setups", "Clear Setups...", "Import Setups...", "Export Setups...", "---------------------------------------------", "Setups Summary", "Pitstops Summary", "---------------------------------------------", correct1, correct2, correct3, correct4, "---------------------------------------------", "Instruct Engineer"], translate))
 
 		this.Control["pitstopMenuDropDown"].Choose(1)
 	}
@@ -4406,10 +4408,10 @@ class RaceCenter extends ConfigurationItem {
 							this.iSynchronize := seconds
 						}
 
-						synchronizeMenu.Add(seconds . translate(" seconds"), setSynchronize.Bind(seconds))
+						synchronizeMenu.Add(seconds . translate(" Seconds"), setSynchronize.Bind(seconds))
 
 						if (seconds = this.Synchronize)
-							synchronizeMenu.Check(seconds . translate(" seconds"))
+							synchronizeMenu.Check(seconds . translate(" Seconds"))
 					}
 
 					synchronizeMenu.Show()
@@ -4682,6 +4684,62 @@ class RaceCenter extends ConfigurationItem {
 			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 		}
 
+		uploadSetups(*) {
+			local fileName, translator, msgResult
+
+			this.Window.Opt("+OwnDialogs")
+
+			OnMessage(0x44, translateLoadCancelButtons)
+			fileName := FileSelect(1, "", translate("Import Setups..."), "Setups (*.setups)")
+			OnMessage(0x44, translateLoadCancelButtons, 0)
+
+			if (fileName != "")
+				if (this.SessionStore.Tables["Setups.Data"].Length > 0) {
+					translator := translateMsgBoxButtons.Bind(["Insert", "Replace", "Cancel"])
+
+					OnMessage(0x44, translator)
+					msgResult := MsgBox(translate("Do you want to replace all current entries or do you want to add the imported entries to the list?"), translate("Import"), 262179)
+					OnMessage(0x44, translator, 0)
+
+					if (msgResult = "Cancel")
+						return
+
+					if (msgResult = "Yes")
+						this.withExceptionhandler(ObjBindMethod(this, "importSetups", fileName, false))
+
+					if (msgResult = "No")
+						this.withExceptionhandler(ObjBindMethod(this, "importSetups", fileName, true))
+				}
+				else
+					this.withExceptionhandler(ObjBindMethod(this, "importSetups", fileName, false))
+		}
+
+		downloadSetups(*) {
+			local fileName, setups
+
+			this.Window.Opt("+OwnDialogs")
+
+			OnMessage(0x44, translateSaveCancelButtons)
+			fileName := FileSelect("S17", "", translate("Export Setups..."), "Setups (*.setups)")
+			OnMessage(0x44, translateSaveCancelButtons, 0)
+
+			if (fileName != "") {
+				if !InStr(fileName, ".setups")
+					fileName := (fileName . ".setups")
+
+				this.saveSetups(true)
+
+				setups := (this.SessionDirectory . "Setups.Data.CSV")
+
+				try {
+					FileCopy(setups, fileName, 1)
+				}
+				catch Any as exception {
+					logError(exception)
+				}
+			}
+		}
+
 		switch line {
 			case 3: ; Manage Team
 				this.manageTeam()
@@ -4715,41 +4773,47 @@ class RaceCenter extends ConfigurationItem {
 					showMessage(substituteVariables(translate("Cannot start the Session Database tool (%exePath%) - please check the configuration..."), {exePath: exePath})
 							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
-			case 7:
-				this.pushTask(ObjBindMethod(this, "clearSetups"))
+			case 8:
+				this.pushTask(ObjBindMethod(this, "releaseSetups"))
 			case 9:
+				this.pushTask(ObjBindMethod(this, "clearSetups"))
+			case 10:
+				this.pushTask(uploadSetups)
+			case 11:
+				this.pushTask(downloadSetups)
+			case 13:
 				this.showSetupsDetails()
 
 				this.iSelectedDetailReport := "Setups"
-			case 10:
+			case 14:
 				this.showPitstopsDetails()
 
 				this.iSelectedDetailReport := "Pitstops"
-			case 12:
+			case 16:
 				this.iTyrePressureMode := ((this.TyrePressureMode = "Reference") ? false : "Reference")
 
 				updateSetting("TyrePressureMode", this.TyrePressureMode)
 
 				this.updateState()
-			case 13:
+			case 17:
 				this.iTyrePressureMode := ((this.TyrePressureMode = "Relative") ? false : "Relative")
 
 				updateSetting("TyrePressureMode", this.TyrePressureMode)
 
 				this.updateState()
-			case 14:
+			case 18:
 				this.iCorrectPressureLoss := !this.CorrectPressureLoss
 
 				updateSetting("CorrectPressureLoss", this.CorrectPressureLoss)
 
 				this.updateState()
-			case 15:
+			case 19:
 				this.iSelectTyreSet := !this.SelectTyreSet
 
 				updateSetting("SelectTyreSet", this.SelectTyreSet)
 
 				this.updateState()
-			case 17:
+			case 21:
 				this.planPitstop()
 		}
 
@@ -5612,6 +5676,8 @@ class RaceCenter extends ConfigurationItem {
 		this.iPitstops := CaseInsenseMap()
 		this.iLastPitstopUpdate := false
 
+		this.iPendingPitstop := false
+
 		this.iLastLap := false
 		this.iCurrentStint := false
 
@@ -6049,7 +6115,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	updatePitstopSettings(settings) {
-		pitstopSettings("Update", settings)
+		pitstopSettings("Update", this.iPendingPitstop ? combine(settings, this.iPendingPitstop) : settings)
 	}
 
 	updatePitstopState(lap, data) {
@@ -7049,6 +7115,11 @@ class RaceCenter extends ConfigurationItem {
 
 
 					pitstopNr := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Nr", false)
+
+					if pitstopNr
+						this.iPendingPitstop := getMultiMapValues(state, "Pitstop Pending")
+					else
+						this.iPendingPitstop := false
 
 					if (pitstopNr && ((pitstopNr > this.PitstopsListView.GetCount()) || hasPlanned)) {
 						newData := true
@@ -12144,7 +12215,7 @@ pitstopSettings(raceCenterOrCommand := false, arguments*) {
 				settingsListView.Delete()
 
 				if arguments[1].Has("FuelAmount")
-					settingsListView.Add("", translate("Refuel"), displayValue("Float", convertUnit("Volume", arguments[1]["FuelAmount"])))
+					settingsListView.Add("", translate("Refuel"), displayValue("Float", convertUnit("Volume", arguments[1]["FuelAmount"])) . A_Space . getUnit("Volume", true))
 
 				if arguments[1].Has("TyreCompound")
 					if arguments[1]["TyreCompound"]
@@ -12160,12 +12231,22 @@ pitstopSettings(raceCenterOrCommand := false, arguments*) {
 						settingsListView.Add("", translate("Tyre Pressures"), values2String(", ", displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureFL"]))
 																								, displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureFR"]))
 																								, displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureRL"]))
-																								, displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureRR"]))))
+																								, displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureRR"])))
+																			. A_Space . getUnit("Pressure", true))
 
 				if (arguments[1].Has("RepairBodywork") || arguments[1].Has("RepairSuspension") || arguments[1].Has("RepairEngine"))
 					settingsListView.Add("", translate("Repairs"), rCenter.computeRepairs(arguments[1].Has("RepairBodywork") ? arguments[1]["RepairBodywork"] : false
 																						, arguments[1].Has("RepairSuspension") ? arguments[1]["RepairSuspension"] : false
 																						, arguments[1].Has("RepairEngine") ? arguments[1]["RepairEngine"] : false))
+
+				if arguments[1].Has("Pitstop.Planned.Time.Service")
+					settingsListView.Add("", translate("Service"), Round(arguments[1]["Pitstop.Planned.Time.Service"] / 1000) . translate(" Seconds"))
+
+				if arguments[1].Has("Pitstop.Planned.Time.Repairs")
+					settingsListView.Add("", translate("Repairs"), Round(arguments[1]["Pitstop.Planned.Time.Repairs"] / 1000) . translate(" Seconds"))
+
+				if arguments[1].Has("Pitstop.Planned.Time.Pitlane")
+					settingsListView.Add("", translate("Pitlane"), Round(arguments[1]["Pitstop.Planned.Time.Pitlane"] / 1000) . translate(" Seconds"))
 
 				settingsListView.ModifyCol()
 

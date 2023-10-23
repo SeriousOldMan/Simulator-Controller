@@ -35,6 +35,16 @@ Although the code, that handles all the update tasks, is integrated into *Simula
 
 Note: Some of you might want to have more control. No problem. All the files in the *Simulator Controller\Config*, *Simulator Controller\Translations*, *Simulator Controller\Grammars* and *Simulator Controller\Rules* folders are human readable and using a text editor and some *Diff* tool, you can do everything the automated procedure does on your own. But be sure to make a backup copy of all the files, just for peace of mind. Attention: These files use a two-byte character set, so be sure to use an editor that can handle this.
 
+## Release 5.4.2
+
+If you have used the "Threshold" choice for repair settings either in the "Race Settings" or as default value in the "Session Database", you may have to change this value. The "Threshold" is now labeled as seconds need to repair the given damage. The calculation uses [conversion factors](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) to derive the repair time needed from the internal damage value of the given simulator. For *Assetto Corsa Competizione*, the conversion factor are already known, for the other simulators they will be added with the next releases. If, you derive a conversion factor on your own, let me know, so that I can add them to the defaults.
+
+You can, however, use your old threshold values, if you set the conversion factor to **1** for each damage type (bodywork, suspension, engine). However, in this case, the unit of the threshold is not "Seconds", which does no harm in the repair calculations, but will result in wrong values for pitstop duration calaculations in "System Monitor" and "Race Center".
+
+Another change regards the time need for refueling. The default value is now 1.8 seconds per 10 liter rather than 1.5 seconds. Since this value is persistents, once you have used "Race Settings" (and you don't have set your own default value in "Session Database", you might want to change it to make the pitstop duration calculation more precise.
+
+***
+
 ## Release 5.4.1
 
 The instructions for the LLM of the Driving Coach have been extended. You can update to the new instructions using the [reload button in the configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-driving-coach). Also, new instructions for extended data integration have been added, which you can also load into the configuration.

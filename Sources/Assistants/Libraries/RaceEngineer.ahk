@@ -1105,26 +1105,61 @@ class RaceEngineer extends RaceAssistant {
 	}
 
 	readSettings(simulator, car, track, &settings) {
-		local section := ("Simulator." . this.SettingsDatabase.getSimulatorName(simulator))
+		local simulatorName := this.SettingsDatabase.getSimulatorName(simulator)
+		local section := ("Simulator." . simulatorName)
+		local defaults := CaseInsenseMap()
+		local bodyworkDuration, suspensionDuration, engineDuration
+		local bodyworkRepair, suspensionRepair, engineRepair
+		local bodyworkThreshold, suspensionThreshold, engineThreshold
+
+		defaults.Default := {Bodywork: 0.0, Suspension: 0.0, Engine: 0.0}
+
+		defaults["Assetto Corsa Competizione"] := {Bodywork: 0.282351878, Suspension: 31.0, Engine: 0.0}
+
+		bodyworkDuration := getMultiMapValue(settings, section, "Pitstop.Repair.Bodywork.Duration", defaults[simulatorName].Bodywork)
+		suspensionDuration := getMultiMapValue(settings, section, "Pitstop.Repair.Suspension.Duration", defaults[simulatorName].Suspension)
+		engineDuration := getMultiMapValue(settings, section, "Pitstop.Repair.Engine.Duration", defaults[simulatorName].Engine)
+
+		bodyworkRepair := getDeprecatedValue(settings, "Session Settings", "Race Settings", "Damage.Bodywork.Repair", "Impact")
+		suspensionRepair := getDeprecatedValue(settings, "Session Settings", "Race Settings", "Damage.Suspension.Repair", "Always")
+		engineRepair := getDeprecatedValue(settings, "Session Settings", "Race Settings", "Damage.Engine.Repair", "Impact")
+
+		bodyworkThreshold := getDeprecatedValue(settings, "Session Settings", "Race Settings", "Damage.Bodywork.Repair.Threshold", 1)
+		suspensionThreshold := getDeprecatedValue(settings, "Session Settings", "Race Settings", "Damage.Suspension.Repair.Threshold", 0)
+		engineThreshold := getDeprecatedValue(settings, "Session Settings", "Race Settings", "Damage.Engine.Repair.Threshold", 1)
+
+		if ((bodyworkRepair = "Threshold") && (bodyworkDuration != 0))
+			bodyworkThreshold /= bodyworkDuration
+
+		if ((suspensionRepair = "Threshold") && (suspensionDuration != 0))
+			suspensionThreshold /= suspensionDuration
+
+		if ((engineRepair = "Threshold") && (engineDuration != 0))
+			engineThreshold /= engineDuration
 
 		return combine(super.readSettings(simulator, car, track, &settings)
 					 , CaseInsenseMap("Session.Settings.Pitstop.Service.Refuel", getMultiMapValue(settings, section, "Pitstop.Service.Refuel", true)
 									, "Session.Settings.Pitstop.Service.Tyres", getMultiMapValue(settings, section, "Pitstop.Service.Tyres", true)
 									, "Session.Settings.Pitstop.Service.Repairs", getMultiMapValue(settings, section, "Pitstop.Service.Repairs", true)
+									, "Session.Settings.Pitstop.Repair.Bodywork.Duration", bodyworkDuration
+									, "Session.Settings.Pitstop.Repair.Suspension.Duration", suspensionDuration
+									, "Session.Settings.Pitstop.Repair.Engine.Duration", engineDuration
 									, "Session.Settings.Pitstop.Delta", getMultiMapValue(settings, "Strategy Settings", "Pitstop.Delta"
 																					   , getDeprecatedValue(settings, "Session Settings", "Race Settings", "Pitstop.Delta", 30))
-									, "Session.Settings.Damage.Suspension.Repair", getDeprecatedValue(settings, "Session Settings", "Race Settings"
-																											  , "Damage.Suspension.Repair", "Always")
-									, "Session.Settings.Damage.Suspension.Repair.Threshold", getDeprecatedValue(settings, "Session Settings", "Race Settings"
-																														, "Damage.Suspension.Repair.Threshold", 0)
-									, "Session.Settings.Damage.Bodywork.Repair", getDeprecatedValue(settings, "Session Settings", "Race Settings"
-																											, "Damage.Bodywork.Repair", "Impact")
-									, "Session.Settings.Damage.Bodywork.Repair.Threshold", getDeprecatedValue(settings, "Session Settings", "Race Settings"
-																													  , "Damage.Bodywork.Repair.Threshold", 1)
-									, "Session.Settings.Damage.Engine.Repair", getDeprecatedValue(settings, "Session Settings", "Race Settings"
-																										  , "Damage.Engine.Repair", "Impact")
-									, "Session.Settings.Damage.Engine.Repair.Threshold", getDeprecatedValue(settings, "Session Settings", "Race Settings"
-																													, "Damage.Engine.Repair.Threshold", 1)
+									, "Session.Settings.Pitstop.Service.Refuel.Rule", getMultiMapValue(settings, "Strategy Settings"
+																											   , "Service.Refuel.Rule", "Dynamic")
+									, "Session.Settings.Pitstop.Service.Refuel.Duration", getMultiMapValue(settings, "Strategy Settings"
+																												   , "Service.Refuel", 1.8)
+									, "Session.Settings.Pitstop.Service.Tyres.Duration", getMultiMapValue(settings, "Strategy Settings"
+																											      , "Service.Tyres", 30)
+									, "Session.Settings.Pitstop.Service.Order", getMultiMapValue(settings, "Strategy Settings"
+																										 , "Service.Order", "Simultaneous")
+									, "Session.Settings.Damage.Suspension.Repair", suspensionRepair
+									, "Session.Settings.Damage.Suspension.Repair.Threshold", suspensionThreshold
+									, "Session.Settings.Damage.Bodywork.Repair", bodyworkRepair
+									, "Session.Settings.Damage.Bodywork.Repair.Threshold", bodyworkThreshold
+									, "Session.Settings.Damage.Engine.Repair", engineRepair
+									, "Session.Settings.Damage.Engine.Repair.Threshold", engineThreshold
 									, "Session.Settings.Tyre.Compound.Change", getDeprecatedValue(settings, "Session Settings", "Race Settings"
 																										  , "Tyre.Compound.Change", "Never")
 									, "Session.Settings.Tyre.Compound.Change.Threshold", getDeprecatedValue(settings, "Session Settings", "Race Settings"
@@ -1419,6 +1454,12 @@ class RaceEngineer extends RaceAssistant {
 
 				setMultiMapValue(sessionInfo, "Pitstop", "Planned.Nr", knowledgeBase.getValue("Pitstop.Planned.Nr"))
 				setMultiMapValue(sessionInfo, "Pitstop", "Planned.Lap", lap)
+
+				setMultiMapValue(sessionInfo, "Pitstop", "Planned.Time.Box", Round(knowledgeBase.getValue("Pitstop.Planned.Time.Box", 0) / 1000))
+				setMultiMapValue(sessionInfo, "Pitstop", "Planned.Time.Pitlane", Round(knowledgeBase.getValue("Pitstop.Planned.Time.Pitlane", 0) / 1000))
+				setMultiMapValue(sessionInfo, "Pitstop", "Planned.Time.Service", Round(knowledgeBase.getValue("Pitstop.Planned.Time.Service", 0) / 1000))
+				setMultiMapValue(sessionInfo, "Pitstop", "Planned.Time.Repairs", Round(knowledgeBase.getValue("Pitstop.Planned.Time.Repairs", 0) / 1000))
+
 				setMultiMapValue(sessionInfo, "Pitstop", "Planned.Refuel", knowledgeBase.getValue("Pitstop.Planned.Fuel", 0))
 
 				tyreCompound := knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound", false)
@@ -2162,6 +2203,13 @@ class RaceEngineer extends RaceAssistant {
 				case "Repair Engine":
 					knowledgeBase.setFact("Pitstop.Planned.Repair.Engine", values[1])
 			}
+
+			knowledgeBase.setFact("Pitstop.Update", true)
+
+			knowledgeBase.produce()
+
+			if this.Debug[kDebugKnowledgeBase]
+				this.dumpKnowledgeBase(knowledgeBase)
 
 			if this.Speaker[false]
 				this.getSpeaker().speakPhrase("ConfirmPlanUpdate")

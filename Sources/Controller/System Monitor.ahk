@@ -787,6 +787,8 @@ systemMonitor(command := false, arguments*) {
 				html .= ("<tr><th class=`"th-std th-left`">" . translate("Prepared") . "</th><td class=`"td-wdg`" colspan=`"2`">"
 															 . (getMultiMapValue(sessionState, "Pitstop", "Prepared") ? translate("Yes") : translate("No"))
 															 . "</td></tr>")
+
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Time Loss") . "</th><td class=`"td-wdg`" colspan=`"2`">" . (getMultiMapValue(sessionState, "Pitstop", "Planned.Time.Box") + getMultiMapValue(sessionState, "Pitstop", "Planned.Time.Pitlane")) . translate(" Seconds") . "</td></tr>")
 			}
 			else
 				html .= ("<tr><td class=`"td-wdg`" colspan=`"3`">" . translate("No planned pitstop") . "</td></tr>")

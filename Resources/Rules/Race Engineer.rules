@@ -42,6 +42,14 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;; If "Pitstop.Update" is set, it indicates that some settings for an      ;;;
+;;; already prepared pitstop had been changed by the user.                  ;;;
+;;;-------------------------------------------------------------------------;;;
+
+; [?Pitstop.Update] => ...
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;; "Pitstop.Lap" must be set to the lap number, where the pitstop has been ;;;
 ;;; done. It copies all the data into history memory to be used by the next ;;;
 ;;; pitstop preparation.                                                    ;;;
@@ -154,7 +162,7 @@ priority: 5, {All: [?Lap], [?Tyre.Compound.Target = Dry], {None: [?Tyre.Set.Targ
 
 priority: 5, {All: [?Lap], [?Tyre.Compound.Target = Wet], {None: [?Tyre.Set.Target]}} => (Set: Tyre.Set.Target, 0)
 
-nextDryTyreSet() <= lastPitstopTyreSet(?nr), nextTyreSet(?nr, ?set), Set(Tyre.Set.Target, ?set), !
+nextDryTyreSet() <= lastPitstopTyreSet(?nr), nextDryTyreSet(?nr, ?set), Set(Tyre.Set.Target, ?set), !
 nextDryTyreSet() <= Set(Tyre.Set.Target, !Session.Setup.Tyre.Set.Fresh)
 
 nextDryTyreSet(0, 0)
@@ -744,8 +752,12 @@ priority: 20, [?Pitstop.Plan = true] =>
 		(Clear: Pitstop.Planned.Tyre.Pressure.Lost.FL), (Clear: Pitstop.Planned.Tyre.Pressure.Lost.FR),
 		(Clear: Pitstop.Planned.Tyre.Pressure.Lost.RL), (Clear: Pitstop.Planned.Tyre.Pressure.Lost.RR),
 		(Clear: Pitstop.Planned.Repair.Suspension), (Clear: Pitstop.Planned.Repair.Bodywork), (Clear: Pitstop.Planned.Repair.Engine),
+		(Clear: Pitstop.Planned.Time),
 		(Clear: Pitstop.Planned.Driver.Request)
 priority: 10, [?Pitstop.Plan] => (Prove: planPitstop())
+
+planPitstop() <= lastPitstop(?last), ?nr = ?last + 1, Set(Pitstop.Planned.Nr, ?nr)
+planPitstop() <= Set(Pitstop.Planned.Nr, 1)
 
 {All: [?Pitstop.Plan],
 	  [?Session.Settings.Pitstop.Service.Refuel = false]} => (Set: Pitstop.Planned.Fuel, 0)
@@ -857,6 +869,22 @@ priority: 10, [?Pitstop.Plan] => (Prove: planPitstop())
 priority: -5, {All: [?Pitstop.Plan], [?Lap.Remaining.Session <= 5], {None: [?Pitstop.Plan.Tyre.Change = true]}} =>
 		(Set: Pitstop.Planned.Tyre.Compound, false), (Set: Pitstop.Planned.Tyre.Compound.Color, false)
 
+priority: -5, {Any: [?Pitstop.Plan], {All: [?Lap], [?Pitstop.Planned.Time]}} => (Prove: updatePitstopTime())
+
+updatePitstopTime() <= computeDamages(?damages),
+					   pitstopDeltaTime(!Lap, !Pitstop.Planned.Fuel, !Pitstop.Planned.Tyre.Compound, ?damages,
+										?pitstopServiceTime, ?pitstopRepairTime, ?pitlaneDelta),
+					   ?pitstopTime = ?pitstopServiceTime + ?pitstopRepairTime,
+					   Set(Pitstop.Planned.Time.Box, ?pitstopTime), Set(Pitstop.Planned.Time.Pitlane, ?pitlaneDelta), 
+					   Set(Pitstop.Planned.Time.Service, ?pitstopServiceTime), Set(Pitstop.Planned.Time.Repairs, ?pitstopRepairTime)
+
+computeDamages(?damages) <= computeDamages([!Pitstop.Planned.Repair.Bodywork, !Pitstop.Planned.Repair.Suspension, Pitstop.Planned.Repair.Engine],
+										   [!Damage.Bodywork, !Damage.Suspension, !Damage.Engine], ?damages)
+
+computeDamages([], [], [])
+computeDamages([false | ?repairs], [? | ?damages], [0 | ?rest]) <= !, computeDamages(?repairs, ?damages, ?rest)
+computeDamages([? | ?repairs], [?damage | ?damages], [?damage | ?rest]) <= computeDamages(?repairs, ?damages, ?rest)
+
 priority: -20, [?Pitstop.Plan] => (Set: Pitstop.Planned), (Clear: Pitstop.Plan),
 								  (Clear: Pitstop.Plan.Fuel.Amount), (Clear: Pitstop.Plan.Tyre.Change), (Clear: Pitstop.Plan.Tyre.Set),
 								  (Clear: Pitstop.Plan.Tyre.Compound), (Clear: Pitstop.Plan.Tyre.Compound.Color),
@@ -864,9 +892,6 @@ priority: -20, [?Pitstop.Plan] => (Set: Pitstop.Planned), (Clear: Pitstop.Plan),
 								  (Clear: Pitstop.Plan.Tyre.Pressure.RL), (Clear: Pitstop.Plan.Tyre.Pressure.RR),
 								  (Clear: Pitstop.Plan.Repair.Bodywork), (Clear: Pitstop.Plan.Repair.Suspension),
 								  (Clear: Pitstop.Plan.Repair.Engine), (Clear: Pitstop.Plan.Driver.Request)
-
-planPitstop() <= lastPitstop(?last), ?nr = ?last + 1, Set(Pitstop.Planned.Nr, ?nr)
-planPitstop() <= Set(Pitstop.Planned.Nr, 1)
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -904,6 +929,8 @@ requestRepairs(?pitstopNumber) <= Call(requestPitstopRepairs, ?pitstopNumber,
 
 requestDriver(?pitstopNumber) <= Call(requestPitstopDriver, ?pitstopNumber, !Pitstop.Planned.Driver.Request)
 
+[?Pitstop.Update = true] => (Prove: updatePitstopTime()), (Clear: Pitstop.Update)
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                             Pitstop Performed                           ;;;
@@ -936,6 +963,7 @@ priority: -10, [?Pitstop.Lap] => (Set: Pitstop.Clear, ?Pitstop.Lap)
 					(Clear: Pitstop.Planned.Driver.Request),
 					(Clear: Pitstop.Planned.Repair.Suspension), (Clear: Pitstop.Planned.Repair.Bodywork),
 					(Clear: Pitstop.Planned.Repair.Engine),
+					(Clear: Pitstop.Planned.Time),
 					(Clear: Pitstop.Clear), (Clear: Pitstop.Lap), (Clear: Pitstop.Prepared), (Clear: Pitstop.Planned.Nr)
 				  
 updateDamageReported(?lap) <= ?lastLap = ?lap - 1, Set(Damage.Reported, ?lastLap), Set(Damage.Analysis.Reported, ?lap)
@@ -1003,6 +1031,13 @@ clearLaps(?lap) <= clearLap(?lap), ?pLap = ?lap - 1, clearLaps(?pLap)
 ;;;-------------------------------------------------------------------------;;;
 
 #Include %kResourcesDirectory%Rules\Pitstop Information Retrieval.rules
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                            Pitstop Computations                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include %kResourcesDirectory%Rules\Pitstop Computations.rules
 
 
 ;;;-------------------------------------------------------------------------;;;

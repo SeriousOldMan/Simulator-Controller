@@ -685,7 +685,8 @@ class DrivingCoach extends GridRaceAssistant {
 			answer := this.Connector.Ask(text)
 
 			if !answer
-				throw "No answer from the GPT service..."
+				if this.Speaker
+					this.getSpeaker().speakPhrase("Later", false, false, false, {Noise: false})
 		}
 		catch Any as exception {
 			if this.Speaker

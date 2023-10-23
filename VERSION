@@ -1,15 +1,15 @@
 [Development]
-Version=5.4.2.0-dev
+Version=5.4.3.0-dev
 Target=5.4.2.0-release
-Date=10/16/2023
+Date=10/20/2023
 Download=
-Changes=Fixed transfer of tyre setup from first stint to pitstop fields in "Race Center", Another fix for the critical runaway loop during install and update, Fixed window appearance on DPI scaled monitors
+Changes=New core settings to control window size constraints, Resized "Strategy Workbench", Extended "Pitstop" menu in "Race Center"
 Components=Media->5.3.0,Configuration->5.4.0,Utilities->5.3.0
 [Release]
-Version=5.4.1.1-release
-Date=10/15/2023
-Download=https://cutt.ly/AwQoDwHA;https://www.dropbox.com/scl/fi/wi388rnpo3rk59fyw648v/Simulator-Controller-5.4.1.1-release.zip?rlkey=apqpc9puivof85e2xbt040txk&dl=1
-Changes=Driving Coach now knows a lot about the current active stint, Updated instructions for Driving Coach, New data categories in the telemetry analyzer, New Ctrl modifier for instructions reload, Added "Practice Center" to Windows Start menu, New temperature sampling in "Setup Workbench", Fixed endless loop for install and update when Windows user is Admin, New car models for "Setup Workbench", Tweaked last lap detection, New settings in "Session Database" for the Drinving Coach, Driving coach instruction can be enabled or disabled
+Version=5.4.2.0-release
+Date=10/20/2023
+Download=https://cutt.ly/EwWqFIhz;https://www.dropbox.com/scl/fi/wyjsz5wtr03j5y7b55j60/Simulator-Controller-5.4.2.0-release.zip?rlkey=rkbd7jaebyxmuvre2nfkd2ba8&dl=1
+Changes=Fixed transfer of tyre setup from first stint to pitstop fields in "Race Center", Another fix for the critical runaway loop during install and update, New window appearance on DPI scaled monitors, Fixed FCY for cases without traffic simulation, Fixed a bug for explicit tyre set selection with pitstops > 2, New pitstop duration field in "System Monitor", New pitstop duration fields in state JSON, Support for repair time calculation by the Engineer for different damages, Display of different pitstop times in "Race Center", Repair "Threshold" in "Race Settings" is now in seconds, New car models for "Setup Workbench"
 Components=Media->5.3.0,Configuration->5.4.0,Utilities->5.3.0
 [Components]
 Media.5.3.0.Path=Resources
@@ -27,5 +27,5 @@ Utilities.5.3.0.Download=https://www.dropbox.com/scl/fi/hlza8t9tae5d0vnd7wmqa/Ut
 [Current]
 Type=Development
 [Version]
-Development=5.4.2.0-dev
-Release=5.4.1.1-release
+Development=5.4.3.0-dev
+Release=5.4.2.0-release

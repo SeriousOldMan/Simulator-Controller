@@ -1291,7 +1291,7 @@ class PracticeCenter extends ConfigurationItem {
 
 		centerGui.Add("Text", "x24 yp+31 w356 0x10")
 
-		this.iReportsListView := centerGui.Add("ListView", "x16 yp+10 w115 h230 H:Grow(0.2) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", [translate("Report")])
+		this.iReportsListView := centerGui.Add("ListView", "x16 yp+10 w115 h206 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", [translate("Report")])
 		this.iReportsListView.OnEvent("Click", chooseReport)
 
 		for ignore, report in kSessionReports
@@ -1327,11 +1327,11 @@ class PracticeCenter extends ConfigurationItem {
 		centerGui.Add("Button", "x1327 yp w23 h23 X:Move vreportSettingsButton").OnEvent("Click", reportSettings)
 		setButtonIcon(centerGui["reportSettingsButton"], kIconsDirectory . "General Settings.ico", 1)
 
-		this.iChartViewer := centerGui.Add("HTMLViewer", "x400 yp+24 w950 h343 W:Grow H:Grow(0.2) Border vchartViewer")
+		this.iChartViewer := centerGui.Add("HTMLViewer", "x400 yp+24 w950 h316 W:Grow Border vchartViewer")
 
-		centerGui.Rules := "Y:Move(0.2)"
+		; centerGui.Rules := "Y:Move(0.2)"
 
-		centerGui.Add("Text", "x8 yp+351 w1350 W:Grow 0x10")
+		centerGui.Add("Text", "x8 yp+327 w1350 W:Grow 0x10")
 
 		centerGui.SetFont("Norm")
 		centerGui.SetFont("s10 Bold", "Arial")
@@ -1353,11 +1353,11 @@ class PracticeCenter extends ConfigurationItem {
 		centerGui.Add("Text", "x619 ys+39 w80 h21", translate("Output"))
 		centerGui.Add("Text", "x700 yp+7 w651 0x10 W:Grow")
 
-		this.iDetailsViewer := centerGui.Add("HTMLViewer", "x619 yp+14 w732 h293 W:Grow H:Grow(0.8) Border vdetailsViewer")
+		this.iDetailsViewer := centerGui.Add("HTMLViewer", "x619 yp+14 w732 h293 W:Grow H:Grow Border vdetailsViewer")
 
 		centerGui.SetFont("Norm", "Arial")
 
-		centerTab := centerGui.Add("Tab3", "x16 ys+39 w593 h316 H:Grow(0.8) AltSubmit -Wrap Section vpracticeCenterTabView", collect(["Tyres", "Stints", "Laps", "Data"], translate))
+		centerTab := centerGui.Add("Tab3", "x16 ys+39 w593 h316 H:Grow AltSubmit -Wrap Section vpracticeCenterTabView", collect(["Tyres", "Stints", "Laps", "Data"], translate))
 		centerTab.OnEvent("Change", updateTelemetry)
 
 		centerTab.UseTab(1)
@@ -1465,12 +1465,12 @@ class PracticeCenter extends ConfigurationItem {
 
 		centerTab.UseTab(2)
 
-		this.iRunsListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 H:Grow(0.8) Checked -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Driver", "Weather", "Compound", "Set", "Laps", "Initial Fuel", "Consumed Fuel", "Avg. Lap Time", "Accidents", "Potential", "Race Craft", "Speed", "Consistency", "Car Control"], translate))
+		this.iRunsListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 H:Grow Checked -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Driver", "Weather", "Compound", "Set", "Laps", "Initial Fuel", "Consumed Fuel", "Avg. Lap Time", "Accidents", "Potential", "Race Craft", "Speed", "Consistency", "Car Control"], translate))
 		this.iRunsListView.OnEvent("Click", chooseRun)
 
 		centerTab.UseTab(3)
 
-		this.iLapsListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 H:Grow(0.8) Checked -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Stint", "Weather", "Grip", "Lap Time", "Sector Times", "Consumption", "Remaining", "Pressures", "Invalid", "Accident"], translate))
+		this.iLapsListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 H:Grow Checked -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Stint", "Weather", "Grip", "Lap Time", "Sector Times", "Consumption", "Remaining", "Pressures", "Invalid", "Accident"], translate))
 		this.iLapsListView.OnEvent("Click", chooseLap)
 
 		centerTab.UseTab(4)
@@ -1482,17 +1482,17 @@ class PracticeCenter extends ConfigurationItem {
 		loop columns.Length
 			columns[A_Index] := (columns[A_Index] . A_Space . SubStr(getUnit("Volume"), 1, 1))
 
-		this.iFuelDataListView := centerGui.Add("ListView", "x124 ys+33 w477 h132 H:Grow(0.4) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", concatenate([translate("Map")], columns))
+		this.iFuelDataListView := centerGui.Add("ListView", "x124 ys+33 w477 h132 H:Grow(0.5) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", concatenate([translate("Map")], columns))
 		this.iFuelDataListView.OnEvent("Click", noSelect)
 		this.iFuelDataListView.OnEvent("DoubleClick", noSelect)
 
 		centerGui.Add("Text", "x24 ys+178 w80 h21 Y:Move(0.4)", translate("Tyre Usage"))
 
-		this.iTyreDataListView := centerGui.Add("ListView", "x124 ys+171 w477 h132 Y:Move(0.4) H:Grow(0.4) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", concatenate([translate("Fuel")], kTyreLapsBuckets))
+		this.iTyreDataListView := centerGui.Add("ListView", "x124 ys+171 w477 h132 Y:Move(0.5) H:Grow(0.5) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", concatenate([translate("Fuel")], kTyreLapsBuckets))
 		this.iTyreDataListView.OnEvent("Click", noSelect)
 		this.iTyreDataListView.OnEvent("DoubleClick", noSelect)
 
-		centerGui.Rules := ""
+		; centerGui.Rules := ""
 
 		this.iReportViewer := RaceReportViewer(centerGui, this.ChartViewer)
 
@@ -3553,7 +3553,7 @@ class PracticeCenter extends ConfigurationItem {
 					catch Any as exception {
 						logError(exception)
 					}
-				
+
 				Task.CurrentTask.Critical := false
 			}
 

@@ -1,9 +1,9 @@
 [Development]
 Version=5.4.3.0-dev
 Target=5.4.2.0-release
-Date=10/20/2023
+Date=10/23/2023
 Download=
-Changes=New core settings to control window size constraints, Resized "Strategy Workbench", Extended "Pitstop" menu in "Race Center"
+Changes=New core settings to control window size constraints, Resized "Strategy Workbench", Extended "Pitstop" menu in "Race Center", Tyre set available in "System Monitor", Tyre set available in "Session State.json"
 Components=Media->5.3.0,Configuration->5.4.0,Utilities->5.3.0
 [Release]
 Version=5.4.2.0-release

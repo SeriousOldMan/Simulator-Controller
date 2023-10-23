@@ -534,11 +534,16 @@ systemMonitor(command := false, arguments*) {
 
 	createTyresWidget(sessionState) {
 		local html := ""
-		local pressures, temperatures, wear
+		local pressures, temperatures, wear, tyreSet
 
 		try {
 			html .= "<table class=`"table-std`">"
 			html .= ("<tr><th class=`"th-std th-left`" colspan=`"3`"><div id=`"header`"><i>" . translate("Tyres") . "</i></div></th></tr>")
+
+			tyreSet := getMultiMapValue(sessionState, "Tyres", "Set", false)
+
+			if tyreSet
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyre Set") . "</th><td class=`"td-wdg`" style=`"text-align: center`" colspan=`"2`">" . tyreSet . "</td></tr>")
 
 			pressures := string2Values(",", getMultiMapValue(sessionState, "Tyres", "Pressures.Hot", ""))
 

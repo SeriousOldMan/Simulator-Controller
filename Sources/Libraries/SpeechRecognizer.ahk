@@ -222,7 +222,7 @@ class SpeechRecognizer {
 
 	__New(engine, recognizer := false, language := false, silent := false, mode := "Grammar") {
 		local dllName := "Microsoft.Speech.Recognizer.dll"
-		local dllFile := kBinariesDirectory . dllName
+		local dllFile := (kBinariesDirectory . "Microsoft\" . dllName)
 		local instance, choices, found, ignore, recognizerDescriptor, configuration, audioDevice
 
 		this.iEngine := engine
@@ -1397,7 +1397,7 @@ matchWords(string1, string2) {
 
 	if !recognizer {
 		dllName := "Microsoft.Speech.Recognizer.dll"
-		dllFile := kBinariesDirectory . dllName
+		dllFile := (kBinariesDirectory . "Microsoft\" . dllName)
 
 		try {
 			if (!FileExist(dllFile)) {

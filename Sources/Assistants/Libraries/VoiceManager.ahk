@@ -1159,7 +1159,7 @@ class VoiceManager {
 
 			if !recognizer {
 				dllName := "Microsoft.Speech.Recognizer.dll"
-				dllFile := kBinariesDirectory . dllName
+				dllFile := (kBinariesDirectory . "Microsoft\" . dllName)
 
 				try {
 					if (!FileExist(dllFile)) {

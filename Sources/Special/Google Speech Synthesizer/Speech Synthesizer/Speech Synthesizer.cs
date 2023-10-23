@@ -1,13 +1,16 @@
 ﻿using Google.Cloud.TextToSpeech.V1;
 using Google.Apis.Auth.OAuth2;
 
-namespace Speech {
-    public class GoogleSpeechSynthesizer {
+namespace Speech
+{
+    public class GoogleSpeechSynthesizer
+    {
         private string synthesizerType = "Google";
 
-        private string credentials = null;
+        private string credentials = "";
 
-        public GoogleSpeechSynthesizer() {
+        public GoogleSpeechSynthesizer()
+        {
         }
 
         public bool Connect(string credentials)
@@ -18,19 +21,23 @@ namespace Speech {
             return true;
         }
 
-        private bool SynthesizeAudio(string outputFile, bool isSsml, string text) {
+        private bool SynthesizeAudio(string outputFile, bool isSsml, string text)
+        {
             return false;
         }
 
-        public bool SpeakSsmlToFile(string outputFile, string text) {
+        public bool SpeakSsmlToFile(string outputFile, string text)
+        {
             return SynthesizeAudio(outputFile, true, text);
         }
 
-        public bool SpeakTextToFile(string outputFile, string text) {
+        public bool SpeakTextToFile(string outputFile, string text)
+        {
             return SynthesizeAudio(outputFile, false, text);
         }
 
-        public string GetVoices(string language) {
+        public string GetVoices(string language)
+        {
             if (this.synthesizerType == "Google")
             {
                 var credentials = GoogleCredential.FromFile(this.credentials);

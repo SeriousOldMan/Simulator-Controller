@@ -169,7 +169,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
 
 			OnMessage(0x44, translator)
-			file := FileSelect(1, this.Control["googleAPIKeyFileEdit"].Text, translate("Select Google API Key File..."), "JSON (*.json)")
+			file := FileSelect(1, this.Control["googleAPIKeyFileEdit"].Text, translate("Select Google Credentials File..."), "JSON (*.json)")
 			OnMessage(0x44, translator, 0)
 
 			if (file != "") {
@@ -375,7 +375,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		this.iAzureRecognizerWidgets := [[window["azureSubscriptionKeyLabel"], window["azureSubscriptionKeyEdit"]]
 									   , [window["azureTokenIssuerLabel"], window["azureTokenIssuerEdit"]]]
 
-		widget35 := window.Add("Text", "x" . x . " ys+24 w140 h23 +0x200 VgoogleAPIKeyFileLabel Hidden", translate("API Key File"))
+		widget35 := window.Add("Text", "x" . x . " ys+24 w140 h23 +0x200 VgoogleAPIKeyFileLabel Hidden", translate("Credentials File"))
 		widget36 := window.Add("Edit", "x" . x1 . " yp w" . (w1 - 24) . " h21 W:Grow VgoogleAPIKeyFileEdit Hidden")
 		widget36.OnEvent("Change", updateGoogleVoices)
 
@@ -1109,7 +1109,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		if configuration
 			googleSpeaker := getMultiMapValue(configuration, "Voice Control", "Speaker.Google", true)
 		else {
-			googleSpeaker := this.Control["windowsSpeakerDropDown"].Text
+			googleSpeaker := this.Control["googleSpeakerDropDown"].Text
 
 			configuration := this.Configuration
 		}

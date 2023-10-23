@@ -2518,7 +2518,7 @@ runSpecialTargets(&buildProgress) {
 					showProgress({progress: ++buildProgress, message: translate("Compiling ") . solution . translate("...")})
 
 				try {
-					if (InStr(solution, "Speech") || InStr(solution, "AC UDP Provider"))
+					if (InStr(solution, "Microsoft Speech") || InStr(solution, "AC UDP Provider"))
 						result := RunWait(A_ComSpec . " /c `"`"" . msBuild . "`" `"" . file . "`" /p:BuildMode=Release /p:Configuration=Release /p:Platform=`"x64`" > `"" . kTempDirectory . "Special Build.out`"`"", , "Hide")
 					else
 						result := RunWait(A_ComSpec . " /c `"`"" . msBuild .  "`" `"" . file . "`" /p:BuildMode=Release /p:Configuration=Release > `"" . kTempDirectory . "Special Build.out`"`"", , "Hide")

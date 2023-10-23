@@ -187,7 +187,7 @@ class SpeechSynthesizer {
 			this.iSynthesizer := "dotNET"
 
 			dllName := "Microsoft.Speech.Synthesizer.dll"
-			dllFile := kBinariesDirectory . dllName
+			dllFile := (kBinariesDirectory . "Microsoft\" . dllName)
 
 			try {
 				if (!FileExist(dllFile)) {
@@ -219,7 +219,7 @@ class SpeechSynthesizer {
 			this.iSynthesizer := "Azure"
 
 			dllName := "Microsoft.Speech.Synthesizer.dll"
-			dllFile := kBinariesDirectory . dllName
+			dllFile := (kBinariesDirectory . "Microsoft\" . dllName)
 
 			try {
 				if (!FileExist(dllFile)) {
@@ -266,7 +266,7 @@ class SpeechSynthesizer {
 			this.iSynthesizer := "Google"
 
 			dllName := "Google.Speech.Synthesizer.dll"
-			dllFile := kBinariesDirectory . dllName
+			dllFile := (kBinariesDirectory . "Google\" . dllName)
 
 			try {
 				if (!FileExist(dllFile)) {
@@ -856,7 +856,7 @@ class SpeechSynthesizer {
 		if !voice
 			voice := 1
 
-		return voices[voice]
+		return (voices.Has(voice) ? voices[voice] : "")
 	}
 
 	setVoice(language, name) {

@@ -1180,7 +1180,7 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Google", true)
 		}
 		else {
-			setMultiMapValue(configuration, "Voice Control", "Synthesizer", "Google|" . Trim(this.Control["basicGoogleAPIKeyFileEdit"].Text))
+			setMultiMapValue(configuration, "Voice Control", "Synthesizer", "Google|" . Trim(this.Control["googleAPIKeyFileEdit"].Text))
 			setMultiMapValue(configuration, "Voice Control", "Speaker", googleSpeaker)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Windows", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", true)
@@ -1501,7 +1501,7 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 		if (configuration && !googleSpeaker)
 			googleSpeaker := getMultiMapValue(configuration, "Voice Control", "Speaker.Google", true)
 
-		if (Trim(this.Control["basicGoogleAPIKeyFileEdit"].Text) != "") {
+		if (Trim(this.Control["googleAPIKeyFileEdit"].Text) != "") {
 			language := this.getCurrentLanguage()
 
 			voices := SpeechSynthesizer("Google|" . Trim(this.Control["basicGoogleAPIKeyFileEdit"].Text), true, language).Voices[language].Clone()

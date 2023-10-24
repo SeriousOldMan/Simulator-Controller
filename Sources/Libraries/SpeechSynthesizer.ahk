@@ -71,6 +71,8 @@ class SpeechSynthesizer {
 
 	iSpeechStatusCallback := false
 
+	iGoogleMode := "HTTP"
+
 	Synthesizer {
 		Get {
 			return this.iSynthesizer
@@ -101,7 +103,7 @@ class SpeechSynthesizer {
 							voices.Push(voice.GetAttribute("Name"))
 					}
 				}
-				else if ((this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure")) {
+				else if ((this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure") || (this.Synthesizer = "Google")) {
 					for ignore, candidate in this.iVoices {
 						name := string2Values("(", candidate)
 
@@ -283,7 +285,7 @@ class SpeechSynthesizer {
 				if (synthesizer[2] != "") {
 					EnvSet("GOOGLE_APPLICATION_CREDENTIALS", synthesizer[2])
 
-					if !this.iSpeechSynthesizer.Connect(synthesizer[2]) {
+					if !this.iSpeechSynthesizer.Connect(this.iGoogleMode, synthesizer[2]) {
 						logMessage(kLogCritical, translate("Could not communicate with speech synthesizer library (") . dllName . translate(")"))
 						logMessage(kLogCritical, translate("Try running the Powershell command `"Get-ChildItem -Path '.' -Recurse | Unblock-File`" in the Binaries folder"))
 
@@ -623,7 +625,7 @@ class SpeechSynthesizer {
 		else {
 			if (this.Synthesizer = "Windows")
 				this.iSpeechSynthesizer.Speak(text, (wait ? 0x0 : 0x1))
-			else if ((this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure")) {
+			else if ((this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure") || (this.Synthesizer = "Google")) {
 				tempName := (cache ? cacheFileName : temporaryFileName("temp", "wav"))
 
 				this.SpeakToFile(tempName, text)
@@ -640,7 +642,7 @@ class SpeechSynthesizer {
 	}
 
 	speakToFile(fileName, text) {
-		local oldStream, stream, ssml
+		local oldStream, stream, ssml, name, voice
 
 		this.stop()
 
@@ -662,11 +664,19 @@ class SpeechSynthesizer {
 				this.iSpeechSynthesizer.AudioOutputStream := oldStream
 			}
 		}
-		else if ((this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure")) {
-			ssml := "<speak version=`"1.0`" xmlns=`"http://www.w3.org/2001/10/synthesis`" xml:lang=`"%language%`">"
-		    ssml .= " <voice name=`"%voice%`">"
+		else if ((this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure") || (this.Synthesizer = "Google")) {
+			if (this.Synthesizer = "Google") {
+				voice := string2Values("(", voice)
+				name := string2Values(" - ", voice[1])
 
-			if (this.Synthesizer = "Azure") {
+				this.iSpeechSynthesizer.SetVoice(name[1], name[2], SubStr(voice[2], 1, -1))
+			}
+
+			ssml := "<speak version=`"1.0`" xmlns=`"http://www.w3.org/2001/10/synthesis`" xml:lang=`"%language%`">"
+		    if (this.Synthesizer != "Google")
+				ssml .= " <voice name=`"%voice%`">"
+
+			if ((this.Synthesizer = "Azure") || (this.Synthesizer = "Google")) {
 				ssml .= "  <prosody pitch=`"%pitch%`" rate=`"%rate%`""
 
 				if !kSoX
@@ -679,7 +689,8 @@ class SpeechSynthesizer {
 
 			ssml .= "  %text%"
 			ssml .= "  </prosody>"
-			ssml .= " </voice>"
+			if (this.Synthesizer != "Google")
+				ssml .= " </voice>"
 			ssml .= "</speak>"
 
 			ssml := substituteVariables(ssml, {volume: this.iVolume, pitch: ((this.iPitch > 0) ? "+" : "-") . Abs(this.iPitch) . "st", rate: 1 + (0.05 * this.iRate)
@@ -692,6 +703,8 @@ class SpeechSynthesizer {
 			catch Any as exception {
 				if (this.Synthesizer = "Azure")
 					SpeechSynthesizer("Windows", true, "EN").speak("Error while calling Azure Cognitive Services. Maybe your monthly contingent is exhausted.")
+				else if (this.Synthesizer = "Google")
+					SpeechSynthesizer("Windows", true, "EN").speak("Error while calling Google Speech Services. Maybe your monthly contingent is exhausted.")
 			}
 		}
 	}
@@ -760,7 +773,7 @@ class SpeechSynthesizer {
 
 			return true
 		}
-		else if (this.iPlaysCacheFile || (this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure")) {
+		else if (this.iPlaysCacheFile || (this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure") || (this.Synthesizer = "Google")) {
 			try
 				playSound("System", "NonExistent.avi")
 
@@ -827,7 +840,7 @@ class SpeechSynthesizer {
 			else
 				voices := this.Voices
 		}
-		else if ((this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure")) {
+		else if ((this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure") || (this.Synthesizer = "Google")) {
 			if ((voice == true) && language) {
 				availableVoices := []
 
@@ -871,7 +884,7 @@ class SpeechSynthesizer {
 			this.iLanguage := language
 			this.iVoice := name
 		}
-		else if ((this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure")) {
+		else if ((this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure") || (this.Synthesizer = "Google")) {
 			name := string2Values("(", name)
 
 			this.iLanguage := language

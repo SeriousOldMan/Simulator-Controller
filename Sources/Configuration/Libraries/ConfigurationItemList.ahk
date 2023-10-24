@@ -53,23 +53,13 @@ class ConfigurationItemList extends ConfiguratorPanel {
 		}
 	}
 
-	ItemList[index := kUndefined] {
+	ItemList[index?] {
 		Get {
-			if (index != kUndefined) {
-				if !this.iItemList.Has(index)
-					MsgBox 1
-
-				return this.iItemList[index]
-			}
-			else
-				return this.iItemList
+			return (isSet(index) ? (this.iItemList.Has(index) ? this.iItemList[index] : false) : this.iItemList)
 		}
 
 		Set {
-			if (index != kUndefined)
-				return (this.iItemList[index] := value)
-			else
-				return (this.iItemList := value)
+			return (isSet(index) ? (this.iItemList.Has(index) ? (this.iItemList[index] := value) : value) : (this.iItemList := value))
 		}
 	}
 

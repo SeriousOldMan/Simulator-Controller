@@ -303,13 +303,27 @@ After you have sucessfully installaed all the necessary support packages, we can
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%207.JPG)
 
-You can define the spoken language you want to use for voice generation with the first dropdown menu. With the second drop down menu, you can choose the speech synthesis engine, which you want to use for voice generation. You have the choice between two different synthesizers which execute on your local PC and you can also use the voice services of the Azure Cognitive Services cloud. "Windows (Win32)" and "Windows (.NET)" are built into the Windows operating system and provide more or less the same voice quality, but you may have access to dfferent sets of available voices. If you choose "Azure Cognitive Services", two additional fields will appear, where you have to enter your Azure subscription key and the endpoint for your region.
+You can define the spoken language you want to use for voice generation with the first dropdown menu. With the second drop down menu, you can choose the speech synthesis engine, which you want to use for voice generation. You have the choice between two different synthesizers which execute on your local PC and you can also use the voice services of the Azure Cognitive Services cloud or the Google Cloud. "Windows (Win32)" and "Windows (.NET)" are built into the Windows operating system and provide more or less the same voice quality, but you may have access to dfferent sets of available voices.
+
+##### Azure Congnitive Services
+
+If you choose "Azure Cognitive Services", two additional fields will appear, where you have to enter your Azure subscription key and the endpoint for your region.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%207%20Azure%20Service.JPG)
 
 You must been registered for the Azure Cloud Services (see https://azure.microsoft.com/ for more details), and you must have configured a resource for the "Microsoft Cognitive Services Speech" API. Both is really easy and free of charge. After you have configured the resource, you will get access to the subscription key and the token issuer endpoint information. Depending on your Windows installation, you might have to install the latest .NET Runtime as well (version 4.7.2 and 4.8 are used by Simulator Controller).
 
 Please note, that although you must supply a credit card when registering, according to Microsoft you won't be charged a single cent, unless you give explicit consent for a specific resource. Regarding the Speech API resource, up to 500.000 characters of Text-to-Speech conversion are free per month in the regions "US, East", "Asia, South-East" and "Europe, West". I am quite sure, that you will never reach this limit, unless you are doing 24 h races seven times a week for the whole month, so give it a try...
+
+##### Google Speech Services
+
+If you choose "Google Speech Services", one additional field will appear. Here you have to enter the API key for accessing the Google Text to Speech service.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%207%20Google%20Service.JPG)
+
+To use the Google speech service, you must have been registered for the Google cloud (see https://console.cloud.google.com for more details). After you have created your cloud project and registered your credit card for billing services, you have to enable the text to speech in the cloud shell using the following command: "gcloud services enable texttospeech.googleapis.com". Then generate an API key in the "APIs and Services" submenu of the main menu and copy the new key to the above configuration.
+
+Please note, that although you must supply a credit card when registering, you won't be charged a single cent, since according to Google the first million characters are free of charge. I am quite sure, that you will never reach this limit, unless you are doing 24 h races seven times a week for the whole month, so give it a try...
 
 After choosing the speech synthesis method, you can choose the concrete voice to be used for voice synthesis. Be careful, a mismatch between chosen language and the selected voice generator will give you very funny results. Generally, I recommend to use the "Automatic" setting and let Simulator Controller decide which is the best voice for your current selected language. If more than one voice is available for your chosen language, each time one is selected randomly, thereby providing some variety. For voice output you can set the volume, the pitch and the speed (rate) using the three corresponding sliders.
 

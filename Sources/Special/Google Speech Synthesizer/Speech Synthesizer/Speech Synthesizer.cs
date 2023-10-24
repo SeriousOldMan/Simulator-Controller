@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Text;
 using Newtonsoft.Json.Linq;
 using System.Drawing;
+using static Google.Rpc.Context.AttributeContext.Types;
 
 namespace Speech
 {
@@ -201,9 +202,9 @@ namespace Speech
             return true;
         }
 
-        private string voice;
-        private string gender;
-        private string culture;
+        private string voice = "";
+        private string gender = "";
+        private string culture = "";
 
         public void SetVoice(string voice, string gender, string culture)
         {
@@ -247,6 +248,18 @@ namespace Speech
             return true;
         }
 
+        public void WriteAudio(string decodedAudio, string outputFile)
+        {
+            using (var output = File.Create(outputFile))
+            {
+                byte[] bytes = System.Convert.FromBase64String(decodedAudio);
+
+                output.Write(bytes, 0, bytes.Length);
+
+                output.Close();
+            }
+        }
+
         public bool SpeakSsmlToFile(string outputFile, string text)
         {
             return SynthesizeAudio(outputFile, true, text);
@@ -257,7 +270,7 @@ namespace Speech
             return SynthesizeAudio(outputFile, false, text);
         }
 
-        public string GetVoices(string language)
+        public string GetVoices()
         {
             if (this.synthesizerType == "Google")
             {
@@ -265,7 +278,7 @@ namespace Speech
                 TextToSpeechClient client = TextToSpeechClient.Create();
 
                 string voices = "";
-                var response = client.ListVoices(language);
+                var response = client.ListVoices(new ListVoicesRequest());
                 foreach (var voice in response.Voices)
                 {
                     if (voices.Length > 0)

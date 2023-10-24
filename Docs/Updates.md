@@ -35,6 +35,12 @@ Although the code, that handles all the update tasks, is integrated into *Simula
 
 Note: Some of you might want to have more control. No problem. All the files in the *Simulator Controller\Config*, *Simulator Controller\Translations*, *Simulator Controller\Grammars* and *Simulator Controller\Rules* folders are human readable and using a text editor and some *Diff* tool, you can do everything the automated procedure does on your own. But be sure to make a backup copy of all the files, just for peace of mind. Attention: These files use a two-byte character set, so be sure to use an editor that can handle this.
 
+## Release 5.4.3
+
+No manual updates necessary.
+
+***
+
 ## Release 5.4.2
 
 If you have used the "Threshold" choice for repair settings either in the "Race Settings" or as default value in the "Session Database", you may have to change this value. The "Threshold" is now labeled as seconds need to repair the given damage. The calculation uses [conversion factors](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) to derive the repair time needed from the internal damage value of the given simulator. For *Assetto Corsa Competizione*, the conversion factor are already known, for the other simulators they will be added with the next releases. If, you derive a conversion factor on your own, let me know, so that I can add them to the defaults.
@@ -52,7 +58,6 @@ The instructions for the LLM of the Driving Coach have been extended. You can up
 Another change regards the storage of the Telemetry Analyzer settings of "Setup Workbench". These are now also used by the Driving Coach and therefore it was necessary to change their internal structure. The structural change will be handled by the update procedure, but in some rare cases, old settings will be lost and must be recreated before running the analyzer again.
 
 ***
-
 
 ## Release 5.4.0
 

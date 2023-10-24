@@ -375,7 +375,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		this.iAzureRecognizerWidgets := [[window["azureSubscriptionKeyLabel"], window["azureSubscriptionKeyEdit"]]
 									   , [window["azureTokenIssuerLabel"], window["azureTokenIssuerEdit"]]]
 
-		widget35 := window.Add("Text", "x" . x . " ys+24 w140 h23 +0x200 VgoogleAPIKeyFileLabel Hidden", translate("Credentials File"))
+		widget35 := window.Add("Text", "x" . x . " ys+24 w140 h23 +0x200 VgoogleAPIKeyFileLabel Hidden", translate("API Key"))
 		widget36 := window.Add("Edit", "x" . x1 . " yp w" . (w1 - 24) . " h21 W:Grow VgoogleAPIKeyFileEdit Hidden")
 		widget36.OnEvent("Change", updateGoogleVoices)
 
@@ -621,6 +621,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		this.Control["azureTokenIssuerEdit"].Text := this.Value["azureTokenIssuer"]
 
 		this.Control["googleAPIKeyFileEdit"].Text := this.Value["googleAPIKeyFile"]
+
+		this.Control["googleAPIKeyFilePathButton"].Enabled := false
 
 		if (this.Value["voiceSynthesizer"] = 1)
 			this.updateWindowsVoices(configuration)

@@ -1062,11 +1062,11 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 										, [editorGui["basicAzureTokenIssuerLabel"], editorGui["basicAzureTokenIssuerEdit"]]
 										, [editorGui["basicAzureSpeakerLabel"], editorGui["basicAzureSpeakerDropDown"], widget18]]
 
-		widget19 := editorGui.Add("Text", "x" . x0 . " ys+24 w140 h23 +0x200 VbasicGoogleAPIKeyFileLabel Hidden", translate("Credentials File"))
+		widget19 := editorGui.Add("Text", "x" . x0 . " ys+24 w140 h23 +0x200 VbasicGoogleAPIKeyFileLabel Hidden", translate("API Key"))
 		widget20 := editorGui.Add("Edit", "x" . x1 . " yp w" . (w1 - 24) . " h21 W:Grow VbasicGoogleAPIKeyFileEdit Hidden")
 		widget20.OnEvent("Change", updateGoogleVoices)
 
-		widget21 := editorGui.Add("Button", "x" . (x1 + w1 - 23) . " yp w23 h23 X:Move VbasicGoogleAPIKeyFilePathButton Hidden", translate("..."))
+		widget21 := editorGui.Add("Button", "x" . (x1 + w1 - 23) . " yp w23 h23 X:Move Disabled VbasicGoogleAPIKeyFilePathButton Hidden", translate("..."))
 		widget21.OnEvent("Click", chooseAPIKeyFilePath)
 
 		voices := [translate("Random"), translate("Deactivated")]
@@ -1209,6 +1209,8 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 		this.Control["basicAzureTokenIssuerEdit"].Text := this.Value["azureTokenIssuer"]
 
 		this.Control["basicGoogleAPIKeyFileEdit"].Text := this.Value["googleAPIKeyFile"]
+
+		this.Control["basicGoogleAPIKeyFilePathButton"].Enabled := false
 
 		if (this.Value["voiceSynthesizer"] = 1)
 			this.updateWindowsVoices(configuration)

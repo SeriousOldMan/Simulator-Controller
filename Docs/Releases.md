@@ -1,3 +1,11 @@
+## 5.4.3.0-release 10/27/23 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. Windows size constraints can now be disabled in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration), to make windows smaller than originally designed. Usefull in environments with very small monitors.
+  4. The original size of the "Strategy Workbench" window has been reduced a little bit.
+  5. The "Pitstop" menu in "Race Center" has been extended with additional commands, which were available only as buttons before.
+  6. The voice synthesizer now also supports the Google cloud services. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#google-speech-services) for more information.
+
 ## 5.4.2.0-release 10/20/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

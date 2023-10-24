@@ -19,8 +19,8 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Libraries\CLR.ahk"
-#Include "..\Libraries\Task.ahk"
+#Include "CLR.ahk"
+#Include "Task.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;

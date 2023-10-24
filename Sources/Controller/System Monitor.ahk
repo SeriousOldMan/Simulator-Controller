@@ -534,11 +534,16 @@ systemMonitor(command := false, arguments*) {
 
 	createTyresWidget(sessionState) {
 		local html := ""
-		local pressures, temperatures, wear
+		local pressures, temperatures, wear, tyreSet
 
 		try {
 			html .= "<table class=`"table-std`">"
 			html .= ("<tr><th class=`"th-std th-left`" colspan=`"3`"><div id=`"header`"><i>" . translate("Tyres") . "</i></div></th></tr>")
+
+			tyreSet := getMultiMapValue(sessionState, "Tyres", "Set", false)
+
+			if tyreSet
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyre Set") . "</th><td class=`"td-wdg`" style=`"text-align: center`" colspan=`"2`">" . tyreSet . "</td></tr>")
 
 			pressures := string2Values(",", getMultiMapValue(sessionState, "Tyres", "Pressures.Hot", ""))
 
@@ -788,7 +793,7 @@ systemMonitor(command := false, arguments*) {
 															 . (getMultiMapValue(sessionState, "Pitstop", "Prepared") ? translate("Yes") : translate("No"))
 															 . "</td></tr>")
 
-				html .= ("<tr><th class=`"th-std th-left`">" . translate("Time loss") . "</th><td class=`"td-wdg`" colspan=`"2`">" . (getMultiMapValue(sessionState, "Pitstop", "Planned.Time.Box") + getMultiMapValue(sessionState, "Pitstop", "Planned.Time.Pitlane")) . translate(" Seconds") . "</td></tr>")
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Time Loss") . "</th><td class=`"td-wdg`" colspan=`"2`">" . (getMultiMapValue(sessionState, "Pitstop", "Planned.Time.Box") + getMultiMapValue(sessionState, "Pitstop", "Planned.Time.Pitlane")) . translate(" Seconds") . "</td></tr>")
 			}
 			else
 				html .= ("<tr><td class=`"td-wdg`" colspan=`"3`">" . translate("No planned pitstop") . "</td></tr>")

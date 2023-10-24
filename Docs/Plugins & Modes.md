@@ -256,7 +256,7 @@ Important: Please be aware, that curve names  containing spaces must be enclosed
 The "Driving Coach" plugin handles the interaction with the Virtual Driving Coach. Aiden, the coach will be automatically started, whenever Simulator Controller is running. Additional information, for example about your performance in the current race, or telemetry data of your car, might be available to the coach, if a simulation is running as well. The following configuration parameters allow you to customize Aiden to your preferences:
 
 	raceAssistant: [*initialState*] [*onOffFunction*]; raceAssistantName: *name*; raceAssistantLogo: On | Off;
-	raceAssistantLanguage: DE | EN | ...; raceAssistantSynthesizer: Windows | dotNET | Azure|tokenIssuerEndpoint|subscriptionKey;
+	raceAssistantLanguage: DE | EN | ...; raceAssistantSynthesizer: Windows | dotNET | Azure|tokenIssuerEndpoint|subscriptionKey | Google|apikey;
 	raceAssistantSpeaker: On | Off | *Microsoft Speech Generation Language*;
 	raceAssistantSpeakerVocalics: *volume* , *pitch* , *rate*;
 	raceAssistantRecognizer: Desktop | Azure|tokenIssuerEndpoint|subscriptionKey;
@@ -268,7 +268,7 @@ Last, but not least, with *openSetupWorkbench* you can open the ["Setup Workbenc
 
 With "On" (or *true*) supplied for *raceAssistantLogo*, Aiden will show a nice rotating AI brain in the lower right corner of the screen, while the AI kernel is working, but you will get a short lag in your simulation, when this window pops up.
 
-The paranmeter *raceAssistantSynthesizer* allows you to specify the speech synthesis engine, which is used for the Driving Coach. If you supply *Windows* or *dotNET*, you will use the synthesis engine on your local computer. *Windows* specifies the original solution, whereas *dotNET* specifies the enhanced version introduced with the .NET framework. If you supply *Azure|tokenIsszuerEndpoint|subscriptionKey* (with valid values for *tokenIssuerEndpoint* and *subscriptionKey*), you will use the cloud services of Microsoft to generate voice output and you will have access to more and more natural voices, but this possibly does not come for free. Please see the [Voice Control configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) for more information. Default for the *raceAssistantSynthesizer* parameter is the preconfigured engine.
+The paranmeter *raceAssistantSynthesizer* allows you to specify the speech synthesis engine, which is used for the Driving Coach. If you supply *Windows* or *dotNET*, you will use the synthesis engine on your local computer. *Windows* specifies the original solution, whereas *dotNET* specifies the enhanced version introduced with the .NET framework. If you supply *Azure|tokenIsszuerEndpoint|subscriptionKey* or *Google|apikey* (with valid values for *tokenIssuerEndpoint* and *subscriptionKey* or *apiKey*), you will use the cloud services of Microsoft or Google to generate voice output and you will have access to more and more natural voices, but this possibly does not come for free. Please see the [Voice Control configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) for more information. Default for the *raceAssistantSynthesizer* parameter is the preconfigured engine.
 
 With *raceAssistantRecognizer* you specify the engine used for voice recognition. The value *Desktop* activates the recognition engine which is part of the Windows operating system. Very good recognition quality, but it needs high quality audio input, for example from a headset microphone. You can also activate voice recognition on the Azure Cognitive Services cloud using the same syntax as described above for the *raceAssistantSynthesizer* parameter. The default value for *raceAssistantRecognizer* is also taken from the general voice configuration, when no value is supplied.
 
@@ -281,7 +281,7 @@ With *raceAssistantSpeaker* and *raceAssistantListener* you can customize the na
 The "Race Engineer" plugin handles the interaction of the currently active simulation as represented by the plugins "ACC", "RF2", "R3E", and so on, and Jona, the Virtual Race Engineer. If one of these simulation is started, the "Race Engineer" plugin will be automatically activated, and will start Jona in the background according to the configuration arguments described below. The following configuration parameters allow you to customize Jona to your preferences:
 
 	raceAssistant: [*initialState*] [*onOffFunction*]; raceAssistantName: *name*; raceAssistantLogo: On | Off;
-	raceAssistantLanguage: DE | EN | ...; raceAssistantSynthesizer: Windows | dotNET | Azure|tokenIssuerEndpoint|subscriptionKey;
+	raceAssistantLanguage: DE | EN | ...; raceAssistantSynthesizer: Windows | dotNET | Azure|tokenIssuerEndpoint|subscriptionKey | Google|apikey;
 	raceAssistantSpeaker: On | Off | *Microsoft Speech Generation Language*;
 	raceAssistantSpeakerVocalics: *volume* , *pitch* , *rate*;
 	raceAssistantRecognizer: Server | Desktop | Azure|tokenIssuerEndpoint|subscriptionKey;
@@ -302,7 +302,7 @@ Note: If you disable Jona during an active race, the Race Engineer will stop wor
 
 With "On" (or *true*) supplied for *raceAssistantLogo*, Jona will show a nice rotating AI brain in the lower right corner of the screen, while the AI kernel is working, but you will get a short lag in your simulation, when this window pops up.
 
-The paranmeter *raceAssistantSynthesizer* allows you to specify the speech synthesis engine, which is used for this Race Assistant. If you supply *Windows* or *dotNET*, you will use the synthesis engine on your local computer. *Windows* specifies the original solution, whereas *dotNET* specifies the enhanced version introduced with the .NET framework. If you supply *Azure|tokenIsszuerEndpoint|subscriptionKey* (with valid values for *tokenIssuerEndpoint* and *subscriptionKey*), you will use the cloud services of Microsoft to generate voice output and you will have access to more and more natural voices, but this possibly does not come for free. Please see the [Voice Control configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) for more information. Default for the *raceAssistantSynthesizer* parameter is the preconfigured engine.
+The paranmeter *raceAssistantSynthesizer* allows you to specify the speech synthesis engine, which is used for this Race Assistant. If you supply *Windows* or *dotNET*, you will use the synthesis engine on your local computer. *Windows* specifies the original solution, whereas *dotNET* specifies the enhanced version introduced with the .NET framework. If you supply *Azure|tokenIsszuerEndpoint|subscriptionKey* or *Google|apikey* (with valid values for *tokenIssuerEndpoint* and *subscriptionKey* or *apiKey*), you will use the cloud services of Microsoft or Google to generate voice output and you will have access to more and more natural voices, but this possibly does not come for free. Please see the [Voice Control configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) for more information. Default for the *raceAssistantSynthesizer* parameter is the preconfigured engine.
 
 With *raceAssistantRecognizer* you specify the engine used for voice recognition. The value *Server* stands for the older engine provided by Microsoft for server side solutions. It can handle low quality audio, for example from telephone calls, but the recognition quality is not the best. The value *Desktop* activates the recognition engine which is part of the Windows operating system. Very good recognition quality, but it needs high quality audio input, for example from a headset microphone. You can also activate voice recognition on the Azure Cognitive Services cloud using the same syntax as described above for the *raceAssistantSynthesizer* parameter. The default value for *raceAssistantRecognizer* is also taken from the general voice configuration, when no value is supplied.
 
@@ -352,7 +352,7 @@ Note: All these commands are also available in most of the simulation plugins, e
 The "Race Strategist" plugin handles the interaction of the currently active simulation as represented by the plugins "ACC", "RF2", "R3E", and so on, and Cato, the Virtual Race Strategist. If one of these simulation is started, the "Race Strategist" plugin will be automatically activated, and will start Cato in the background according to the configuration arguments described below. The following configuration parameters allow you to customize Cato to your preferences:
 
 	raceAssistant: [*initialState*] *onOffFunction*; raceAssistantName: *name*; raceAssistantLogo: On | Off; 
-	raceAssistantLanguage: DE | EN | ...; raceAssistantSynthesizer: Windows | dotNET | Azure|tokenIssuerEndpoint|subscriptionKey;
+	raceAssistantLanguage: DE | EN | ...; raceAssistantSynthesizer: Windows | dotNET | Azure|tokenIssuerEndpoint|subscriptionKey | Google|apikey;
 	raceAssistantSpeaker: On | Off | *Microsoft Speech Generation Language*;
 	raceAssistantSpeakerVocalics: *volume* , *pitch* , *rate*;
 	raceAssistantRecognizer: Server | Desktop | Azure|tokenIssuerEndpoint|subscriptionKey;
@@ -370,7 +370,7 @@ Hint: You can bind the activation and deactivation of all the Virtual Race Assis
 
 With "On" (or *true*) supplied for *raceAssistantLogo*, Cato will show a nice rotating AI brain in the lower left corner of the screen, while the AI kernel is working, but you will get a short lag in your simulation, when this window pops up.
 
-The paranmeter *raceAssistantSynthesizer* allows you to specify the speech synthesis engine, which is used for this Race Assistant. If you supply *Windows* or *dotNET*, you will use the synthesis engine on your local computer. *Windows* specifies the original solution, whereas *dotNET* specifies the enhanced version introduced with the .NET framework. If you supply *Azure|tokenIsszuerEndpoint|subscriptionKey* (with valid values for *tokenIssuerEndpoint* and *subscriptionKey*), you will use the cloud services of Microsoft to generate voice output and you will have access to more and more natural voices, but this possibly does not come for free. Please see the [Voice Control configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) for more information. Default for the *raceAssistantSynthesizer* parameter is the preconfigured engine.
+The paranmeter *raceAssistantSynthesizer* allows you to specify the speech synthesis engine, which is used for this Race Assistant. If you supply *Windows* or *dotNET*, you will use the synthesis engine on your local computer. *Windows* specifies the original solution, whereas *dotNET* specifies the enhanced version introduced with the .NET framework. If you supply *Azure|tokenIsszuerEndpoint|subscriptionKey* or *Google|apikey* (with valid values for *tokenIssuerEndpoint* and *subscriptionKey* or *apiKey*), you will use the cloud services of Microsoft or Google to generate voice output and you will have access to more and more natural voices, but this possibly does not come for free. Please see the [Voice Control configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) for more information. Default for the *raceAssistantSynthesizer* parameter is the preconfigured engine.
 
 With *raceAssistantRecognizer* you specify the engine used for voice recognition. The value *Server* stands for the older engine provided by Microsoft for server side solutions. It can handle low quality audio, for example from telephone calls, but the recognition quality is not the best. The value *Desktop* activates the recognition engine which is part of the Windows operating system. Very good recognition quality, but it needs high quality audio input, for example from a headset microphone.
  
@@ -436,7 +436,7 @@ Note: All these commands are also available in most of the simulation plugins, e
 The "Race Spotter" plugin handles the interaction of the currently active simulation as represented by the plugins "ACC", "RF2", "R3E", and so on, and Elisa, the Virtual Race Spotter. If one of these simulation is started, the "Race Spotter" plugin will be automatically activated, and will start Elisa in the background according to the configuration arguments described below. The following configuration parameters allow you to customize Elisa to your preferences:
 
 	raceAssistant: [*initialState*] *onOffFunction*; raceAssistantName: *name*; raceAssistantLogo: On | Off; 
-	raceAssistantLanguage: DE | EN | ...; raceAssistantSynthesizer: Windows | dotNET | Azure|tokenIssuerEndpoint|subscriptionKey;
+	raceAssistantLanguage: DE | EN | ...; raceAssistantSynthesizer: Windows | dotNET | Azure|tokenIssuerEndpoint|subscriptionKey | Google|apikey;
 	raceAssistantSpeaker: On | Off | *Microsoft Speech Generation Language*;
 	raceAssistantSpeakerVocalics: *volume* , *pitch* , *rate*;
 	raceAssistantRecognizer: Server | Desktop | Azure|tokenIssuerEndpoint|subscriptionKey;
@@ -450,7 +450,7 @@ Hint: You can bind the activation and deactivation of all the Virtual Race Assis
 
 With "On" (or *true*) supplied for *raceAssistantLogo*, Elisa will show a nice rotating AI brain in the lower left corner of the screen, while the AI kernel is working, but you will get a short lag in your simulation, when this window pops up.
 
-The paranmeter *raceAssistantSynthesizer* allows you to specify the speech synthesis engine, which is used for this Race Assistant. If you supply *Windows* or *dotNET*, you will use the synthesis engine on your local computer. *Windows* specifies the original solution, whereas *dotNET* specifies the enhanced version introduced with the .NET framework. If you supply *Azure|tokenIsszuerEndpoint|subscriptionKey* (with valid values for *tokenIssuerEndpoint* and *subscriptionKey*), you will use the cloud services of Microsoft to generate voice output and you will have access to more and more natural voices, but this possibly does not come for free. Please see the [Voice Control configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) for more information. Default for the *raceAssistantSynthesizer* parameter is the preconfigured engine.
+The paranmeter *raceAssistantSynthesizer* allows you to specify the speech synthesis engine, which is used for this Race Assistant. If you supply *Windows* or *dotNET*, you will use the synthesis engine on your local computer. *Windows* specifies the original solution, whereas *dotNET* specifies the enhanced version introduced with the .NET framework. If you supply *Azure|tokenIsszuerEndpoint|subscriptionKey* or *Google|apikey* (with valid values for *tokenIssuerEndpoint* and *subscriptionKey* or *apiKey*), you will use the cloud services of Microsoft or Google to generate voice output and you will have access to more and more natural voices, but this possibly does not come for free. Please see the [Voice Control configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) for more information. Default for the *raceAssistantSynthesizer* parameter is the preconfigured engine.
 
 With *raceAssistantRecognizer* you specify the engine used for voice recognition. The value *Server* stands for the older engine provided by Microsoft for server side solutions. It can handle low quality audio, for example from telephone calls, but the recognition quality is not the best. The value *Desktop* activates the recognition engine which is part of the Windows operating system. Very good recognition quality, but it needs high quality audio input, for example from a headset microphone.
  
@@ -1429,6 +1429,7 @@ The content of the JSON file looks like this (depending on the current situation
 				null,
 				null,
 				null
-			]
+			],
+			"TyreSet": 3
 		}
 	}

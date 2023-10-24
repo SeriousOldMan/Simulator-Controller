@@ -1939,7 +1939,7 @@ class RaceCenter extends ConfigurationItem {
 
 		centerGui.Add("Text", "x24 yp+31 w356 0x10")
 
-		this.iReportsListView := centerGui.Add("ListView", "x16 yp+10 w115 h230 H:Grow(0.2) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", [translate("Report")])
+		this.iReportsListView := centerGui.Add("ListView", "x16 yp+10 w115 h180 H:Grow(0.2) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", [translate("Report")])
 		this.iReportsListView.OnEvent("Click", chooseReport)
 
 		for ignore, report in kSessionReports
@@ -1972,11 +1972,11 @@ class RaceCenter extends ConfigurationItem {
 		centerGui.Add("Button", "x1327 yp w23 h23 X:Move vreportSettingsButton").OnEvent("Click", reportSettings)
 		setButtonIcon(centerGui["reportSettingsButton"], kIconsDirectory . "General Settings.ico", 1)
 
-		this.iChartViewer := centerGui.Add("HTMLViewer", "x400 yp+24 w950 h343 W:Grow H:Grow(0.2) Border vchartViewer")
+		this.iChartViewer := centerGui.Add("HTMLViewer", "x400 yp+24 w950 h293 W:Grow H:Grow(0.2) Border vchartViewer")
 
 		centerGui.Rules := "Y:Move(0.2)"
 
-		centerGui.Add("Text", "x8 yp+351 w1350 W:Grow 0x10")
+		centerGui.Add("Text", "x8 yp+301 w1350 W:Grow 0x10")
 
 		centerGui.SetFont("s8 Norm", "Arial")
 
@@ -2968,7 +2968,7 @@ class RaceCenter extends ConfigurationItem {
 		local correct4 := (this.SelectTyreSet ? "(x) Select tyre set" : "      Select tyre set")
 
 		this.Control["pitstopMenuDropDown"].Delete()
-		this.Control["pitstopMenuDropDown"].Add(collect(["Pitstop", "---------------------------------------------", "Select Team...", "---------------------------------------------", "Initialize from Session", "Load from Database...", "Clear Setups...", "---------------------------------------------", "Setups Summary", "Pitstops Summary", "---------------------------------------------", correct1, correct2, correct3, correct4, "---------------------------------------------", "Instruct Engineer"], translate))
+		this.Control["pitstopMenuDropDown"].Add(collect(["Pitstop", "---------------------------------------------", "Select Team...", "---------------------------------------------", "Initialize from Session", "Load from Database...", "---------------------------------------------", "Save Setups", "Clear Setups...", "Import Setups...", "Export Setups...", "---------------------------------------------", "Setups Summary", "Pitstops Summary", "---------------------------------------------", correct1, correct2, correct3, correct4, "---------------------------------------------", "Instruct Engineer"], translate))
 
 		this.Control["pitstopMenuDropDown"].Choose(1)
 	}
@@ -4684,6 +4684,62 @@ class RaceCenter extends ConfigurationItem {
 			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 		}
 
+		uploadSetups(*) {
+			local fileName, translator, msgResult
+
+			this.Window.Opt("+OwnDialogs")
+
+			OnMessage(0x44, translateLoadCancelButtons)
+			fileName := FileSelect(1, "", translate("Import Setups..."), "Setups (*.setups)")
+			OnMessage(0x44, translateLoadCancelButtons, 0)
+
+			if (fileName != "")
+				if (this.SessionStore.Tables["Setups.Data"].Length > 0) {
+					translator := translateMsgBoxButtons.Bind(["Insert", "Replace", "Cancel"])
+
+					OnMessage(0x44, translator)
+					msgResult := MsgBox(translate("Do you want to replace all current entries or do you want to add the imported entries to the list?"), translate("Import"), 262179)
+					OnMessage(0x44, translator, 0)
+
+					if (msgResult = "Cancel")
+						return
+
+					if (msgResult = "Yes")
+						this.withExceptionhandler(ObjBindMethod(this, "importSetups", fileName, false))
+
+					if (msgResult = "No")
+						this.withExceptionhandler(ObjBindMethod(this, "importSetups", fileName, true))
+				}
+				else
+					this.withExceptionhandler(ObjBindMethod(this, "importSetups", fileName, false))
+		}
+
+		downloadSetups(*) {
+			local fileName, setups
+
+			this.Window.Opt("+OwnDialogs")
+
+			OnMessage(0x44, translateSaveCancelButtons)
+			fileName := FileSelect("S17", "", translate("Export Setups..."), "Setups (*.setups)")
+			OnMessage(0x44, translateSaveCancelButtons, 0)
+
+			if (fileName != "") {
+				if !InStr(fileName, ".setups")
+					fileName := (fileName . ".setups")
+
+				this.saveSetups(true)
+
+				setups := (this.SessionDirectory . "Setups.Data.CSV")
+
+				try {
+					FileCopy(setups, fileName, 1)
+				}
+				catch Any as exception {
+					logError(exception)
+				}
+			}
+		}
+
 		switch line {
 			case 3: ; Manage Team
 				this.manageTeam()
@@ -4717,41 +4773,47 @@ class RaceCenter extends ConfigurationItem {
 					showMessage(substituteVariables(translate("Cannot start the Session Database tool (%exePath%) - please check the configuration..."), {exePath: exePath})
 							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
-			case 7:
-				this.pushTask(ObjBindMethod(this, "clearSetups"))
+			case 8:
+				this.pushTask(ObjBindMethod(this, "releaseSetups"))
 			case 9:
+				this.pushTask(ObjBindMethod(this, "clearSetups"))
+			case 10:
+				this.pushTask(uploadSetups)
+			case 11:
+				this.pushTask(downloadSetups)
+			case 13:
 				this.showSetupsDetails()
 
 				this.iSelectedDetailReport := "Setups"
-			case 10:
+			case 14:
 				this.showPitstopsDetails()
 
 				this.iSelectedDetailReport := "Pitstops"
-			case 12:
+			case 16:
 				this.iTyrePressureMode := ((this.TyrePressureMode = "Reference") ? false : "Reference")
 
 				updateSetting("TyrePressureMode", this.TyrePressureMode)
 
 				this.updateState()
-			case 13:
+			case 17:
 				this.iTyrePressureMode := ((this.TyrePressureMode = "Relative") ? false : "Relative")
 
 				updateSetting("TyrePressureMode", this.TyrePressureMode)
 
 				this.updateState()
-			case 14:
+			case 18:
 				this.iCorrectPressureLoss := !this.CorrectPressureLoss
 
 				updateSetting("CorrectPressureLoss", this.CorrectPressureLoss)
 
 				this.updateState()
-			case 15:
+			case 19:
 				this.iSelectTyreSet := !this.SelectTyreSet
 
 				updateSetting("SelectTyreSet", this.SelectTyreSet)
 
 				this.updateState()
-			case 17:
+			case 21:
 				this.planPitstop()
 		}
 
@@ -6235,7 +6297,7 @@ class RaceCenter extends ConfigurationItem {
 
 						penalty := lap.Penalty
 
-						if (penalty && this.Laps.Has(lap.Nr - 1) && (this.Laps(lap.Nr - 1).Penalty != penalty)) {
+						if (penalty && this.Laps.Has(lap.Nr - 1) && (this.Laps[lap.Nr - 1].Penalty != penalty)) {
 							if (InStr(penalty, "SG") = 1) {
 								penalty := ((StrLen(penalty) > 2) ? (A_Space . SubStr(penalty, 3)) : "")
 
@@ -7005,6 +7067,8 @@ class RaceCenter extends ConfigurationItem {
 													, "Driver.Current", currentDriver, "Driver.Next", nextDriver, "Status", "Performed"
 													, "Stint", stint.Nr + 1))
 
+						this.iPendingPitstop := false
+
 						newData := true
 
 						nextStop += 1
@@ -7021,6 +7085,8 @@ class RaceCenter extends ConfigurationItem {
 													, "Repair.Bodywork", false, "Repair.Suspension", false, "Repair.Engine", false
 													, "Driver.Current", kNull, "Driver.Next", kNull, "Status", "Performed"
 													, "Stint", "-"))
+
+						this.iPendingPitstop := false
 
 						newData := true
 
@@ -7560,7 +7626,8 @@ class RaceCenter extends ConfigurationItem {
 						if this.syncPitstops(newLaps) {
 							newData := true
 
-							nextPitstopUpdate := (this.LastLap.Nr + 2)
+							if this.LastLap
+								nextPitstopUpdate := (this.LastLap.Nr + 2)
 						}
 
 						if this.syncTelemetry()

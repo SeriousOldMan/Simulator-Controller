@@ -23,7 +23,7 @@ using Microsoft.CognitiveServices.Speech.Audio;
 
 namespace Speech
 {
-    public class SpeechRecognizer
+    public class MicrosoftSpeechRecognizer
     {
         private string _engineType = "Unknown";
         private ServerSpeechRecognizer _serverRecognizer;

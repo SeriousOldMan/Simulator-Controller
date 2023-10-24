@@ -1158,8 +1158,8 @@ class VoiceManager {
 			static recognizer := false
 
 			if !recognizer {
-				dllName := "Speech.Recognizer.dll"
-				dllFile := kBinariesDirectory . dllName
+				dllName := "Microsoft.Speech.Recognizer.dll"
+				dllFile := (kBinariesDirectory . "Microsoft\" . dllName)
 
 				try {
 					if (!FileExist(dllFile)) {
@@ -1168,7 +1168,7 @@ class VoiceManager {
 						throw "Unable to find Speech.Recognizer.dll in " . kBinariesDirectory . "..."
 					}
 
-					recognizer := CLR_LoadLibrary(dllFile).CreateInstance("Speech.SpeechRecognizer")
+					recognizer := CLR_LoadLibrary(dllFile).CreateInstance("Speech.MicrosoftSpeechRecognizer")
 				}
 				catch Any as exception {
 					logError(exception, true)

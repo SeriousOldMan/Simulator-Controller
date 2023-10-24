@@ -1,13 +1,10 @@
 ﻿using Microsoft.CognitiveServices.Speech;
-using Microsoft.CognitiveServices.Speech.Audio;
 using System;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Reflection;
 using System.Collections;
-using System.Net;
 
 // 
 // https://github.com/Azure-Samples/cognitive-services-speech-sdk/blob/master/samples/csharp/sharedcontent/console/speech_synthesis_samples.cs
@@ -90,7 +87,7 @@ namespace Speech {
         }
     }
 
-    public class SpeechSynthesizer {
+    public class MicrosoftSpeechSynthesizer {
         private string synthesizerType = "Windows";
 
         private string tokenIssuerEndpoint;
@@ -105,7 +102,7 @@ namespace Speech {
 
         private DateTimeOffset nextTokenRenewal = DateTime.Now - new TimeSpan(0, 10, 0);
 
-        public SpeechSynthesizer() {
+        public MicrosoftSpeechSynthesizer() {
             // ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls13;
         }
         
@@ -200,7 +197,7 @@ namespace Speech {
             {
                 RenewToken();
 
-                using var audioConfig = AudioConfig.FromWavFileOutput(outputFile);
+                using var audioConfig = Microsoft.CognitiveServices.Speech.Audio.AudioConfig.FromWavFileOutput(outputFile);
                 using var synthesizer = new Microsoft.CognitiveServices.Speech.SpeechSynthesizer(config, audioConfig);
 
                 finished = false;

@@ -153,7 +153,7 @@ class IntegrationPlugin extends ControllerPlugin {
 
 	createTyresState(sessionInfo) {
 		local state := Map()
-		local pressures, temperatures, wear
+		local pressures, temperatures, wear, tyreSet
 
 		pressures := string2Values(",", getMultiMapValue(sessionInfo, "Tyres", "Pressures.Hot", ""))
 
@@ -187,6 +187,10 @@ class IntegrationPlugin extends ControllerPlugin {
 			state["Wear"] := [wear[1], wear[2], wear[3], wear[4]]
 		else
 			state["Wear"] := [kNull, kNull, kNull, kNull]
+
+		tyreSet := getMultiMapValue(sessionState, "Tyres", "Set", false)
+
+		state["TyreSet"] := (tyreSet ? tyreSet : kNull)
 
 		return state
 	}

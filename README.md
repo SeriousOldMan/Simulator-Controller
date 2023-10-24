@@ -45,7 +45,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[5.4.3.0-dev](https://www.dropbox.com/scl/fi/xolo6bim63gpgrj88dykx/Simulator-Controller-5.4.3.0-dev.zip?rlkey=cj2pq3rul3q6iigop6ue0vatv&dl=1) (Early build for 5.4.3. Changes: New core settings to control window size constraints, Resized "Strategy Workbench", Extended "Pitstop" menu in "Race Center", Tyre set available in "System Monitor", Tyre set available in "Session State.json", Google TTS integration.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-543) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 
@@ -195,7 +197,7 @@ Another very useful tool of the Simulator Controller suite is the Setup Workbenc
 
 Simulator Controller has been implemented to great extent in AutoHotkey, a very sophisticated and object-oriented Windows automation and scripting language, which is capable to connect keyboard and other input devices to functions in the script with a simple macro language. On the other hand, AutoHotkey also has a lot of robotics capabilities to automate software packages, which do not provide external APIs, by simulating mouse clicks and keyboard input. You can write your own plugins using the AutoHotkey language. To get you started, full source code for all bundled plugins with different complexity from simple to advanced is included.
 
-You will also find a lot of C#, C++ and even C code for the low-level stuff like telemetry data acquisition or connecting to cloud services on the Azure cloud. Here also, all the sources are open and free to use. Last, but not least, and not for the faint-hearted, there is a hybrid, forward and backward chaining rule engine used to implement the Virtual Race Assistants. It uses a modified RETE-algorithm to be as efficient as possible when using large numbers of facts.
+You will also find a lot of C#, C++ and even C code for the low-level stuff like telemetry data acquisition or connecting to cloud services on the Azure cloud, for example. Here also, all the sources are open and free to use. Last, but not least, and not for the faint-hearted, there is a hybrid, forward and backward chaining rule engine used to implement the Virtual Race Assistants. It uses a modified RETE-algorithm to be as efficient as possible when using large numbers of facts.
 
 ### Included plugins
 

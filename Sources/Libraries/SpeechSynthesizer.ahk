@@ -22,8 +22,10 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Libraries\Task.ahk"
-#Include "..\Libraries\CLR.ahk"
+#Include "HTTP.ahk"
+#Include "JSON.ahk"
+#Include "Task.ahk"
+#Include "CLR.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -71,6 +73,9 @@ class SpeechSynthesizer {
 
 	iSpeechStatusCallback := false
 
+	iGoogleMode := "HTTP"
+	iGoogleAPIKey := ""
+
 	Synthesizer {
 		Get {
 			return this.iSynthesizer
@@ -101,7 +106,7 @@ class SpeechSynthesizer {
 							voices.Push(voice.GetAttribute("Name"))
 					}
 				}
-				else if ((this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure")) {
+				else if ((this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure") || (this.Synthesizer = "Google")) {
 					for ignore, candidate in this.iVoices {
 						name := string2Values("(", candidate)
 
@@ -176,18 +181,28 @@ class SpeechSynthesizer {
 
 		if (synthesizer = "Windows") {
 			this.iSynthesizer := "Windows"
-			this.iSpeechSynthesizer := ComObject("SAPI.SpVoice")
 
-			loop this.iSpeechSynthesizer.GetVoices.Count
-				this.Voices.Push(this.iSpeechSynthesizer.GetVoices.Item(A_Index - 1).GetAttribute("Name"))
+			try {
+				this.iSpeechSynthesizer := ComObject("SAPI.SpVoice")
 
-			this.setVoice(language, this.computeVoice(voice, language))
+				this.iVoices := this.getVoices()
+
+				this.setVoice(language, this.computeVoice(voice, language))
+			}
+			catch Any as exception {
+				logError(exception, true)
+
+				logMessage(kLogCritical, translate("Error while initializing speech synthesizer module - please install the speech synthesizer software"))
+
+				showMessage(translate("Error while initializing speech synthesizer module - please install the speech synthesizer software") . translate("...")
+									, translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			}
 		}
 		else if (synthesizer = "dotNET") {
 			this.iSynthesizer := "dotNET"
 
-			dllName := "Speech.Synthesizer.dll"
-			dllFile := kBinariesDirectory . dllName
+			dllName := "Microsoft.Speech.Synthesizer.dll"
+			dllFile := (kBinariesDirectory . "Microsoft\" . dllName)
 
 			try {
 				if (!FileExist(dllFile)) {
@@ -196,9 +211,11 @@ class SpeechSynthesizer {
 					throw "Unable to find Speech.Synthesizer.dll in " . kBinariesDirectory . "..."
 				}
 
-				this.iSpeechSynthesizer := CLR_LoadLibrary(dllFile).CreateInstance("Speech.SpeechSynthesizer")
+				this.iSpeechSynthesizer := CLR_LoadLibrary(dllFile).CreateInstance("Speech.MicrosoftSpeechSynthesizer")
 
-				voices := this.iSpeechSynthesizer.GetVoices()
+				this.iVoices := this.getVoices()
+
+				this.setVoice(language, this.computeVoice(voice, language))
 			}
 			catch Any as exception {
 				logError(exception, true)
@@ -208,18 +225,14 @@ class SpeechSynthesizer {
 				showMessage(translate("Error while initializing speech synthesizer module - please install the speech synthesizer software") . translate("...")
 									, translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 
-				voices := ""
+				voices := []
 			}
-
-			this.iVoices := string2Values("|", voices)
-
-			this.setVoice(language, this.computeVoice(voice, language))
 		}
 		else if (InStr(synthesizer, "Azure|") == 1) {
 			this.iSynthesizer := "Azure"
 
-			dllName := "Speech.Synthesizer.dll"
-			dllFile := kBinariesDirectory . dllName
+			dllName := "Microsoft.Speech.Synthesizer.dll"
+			dllFile := (kBinariesDirectory . "Microsoft\" . dllName)
 
 			try {
 				if (!FileExist(dllFile)) {
@@ -228,7 +241,7 @@ class SpeechSynthesizer {
 					throw "Unable to find Speech.Synthesizer.dll in " . kBinariesDirectory . "..."
 				}
 
-				this.iSpeechSynthesizer := CLR_LoadLibrary(dllFile).CreateInstance("Speech.SpeechSynthesizer")
+				this.iSpeechSynthesizer := CLR_LoadLibrary(dllFile).CreateInstance("Speech.MicrosoftSpeechSynthesizer")
 
 				synthesizer := string2Values("|", synthesizer)
 
@@ -239,7 +252,9 @@ class SpeechSynthesizer {
 					throw "Could not communicate with speech synthesizer library (" . dllName . ")..."
 				}
 
-				voices := this.iSpeechSynthesizer.GetVoices()
+				this.iVoices := this.getVoices()
+
+				this.setVoice(language, this.computeVoice(voice, language))
 			}
 			catch Any as exception {
 				logError(exception, true)
@@ -251,17 +266,49 @@ class SpeechSynthesizer {
 
 				voices := ""
 			}
+		}
+		else if (InStr(synthesizer, "Google|") == 1) {
+			this.iSynthesizer := "Google"
 
-			if (voices = "") {
-				for languageCode, voiceInfos in kAzureVoices
-					for ignore, voiceInfo in voiceInfos
-						this.Voices.Push(voiceInfo[2] . " (" . voiceInfo[1] . ")")
-			}
-			else {
-				this.iVoices := string2Values("|", voices)
-			}
+			dllName := "Google.Speech.Synthesizer.dll"
+			dllFile := (kBinariesDirectory . "Google\" . dllName)
 
-			this.setVoice(language, this.computeVoice(voice, language))
+			try {
+				if (!FileExist(dllFile)) {
+					logMessage(kLogCritical, translate("Speech.Synthesizer.dll not found in ") . kBinariesDirectory)
+
+					throw "Unable to find Speech.Synthesizer.dll in " . kBinariesDirectory . "..."
+				}
+
+				this.iSpeechSynthesizer := CLR_LoadLibrary(dllFile)
+				this.iSpeechSynthesizer := this.iSpeechSynthesizer.CreateInstance("Speech.GoogleSpeechSynthesizer")
+
+				synthesizer := string2Values("|", synthesizer)
+
+				if (this.iGoogleMode = "RPC")
+					EnvSet("GOOGLE_APPLICATION_CREDENTIALS", synthesizer[2])
+				else
+					this.iGoogleAPIKey := synthesizer[2]
+
+				if !this.iSpeechSynthesizer.Connect(this.iGoogleMode, synthesizer[2]) {
+					logMessage(kLogCritical, translate("Could not communicate with speech synthesizer library (") . dllName . translate(")"))
+					logMessage(kLogCritical, translate("Try running the Powershell command `"Get-ChildItem -Path '.' -Recurse | Unblock-File`" in the Binaries folder"))
+
+					throw "Could not communicate with speech synthesizer library (" . dllName . ")..."
+				}
+
+				this.iVoices := this.getVoices()
+
+				this.setVoice(language, this.computeVoice(voice, language))
+			}
+			catch Any as exception {
+				logError(exception, true)
+
+				logMessage(kLogCritical, translate("Error while initializing speech synthesizer module - please install the speech synthesizer software"))
+
+				showMessage(translate("Error while initializing speech synthesizer module - please install the speech synthesizer software") . translate("...")
+									, translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			}
 		}
 		else
 			throw "Unsupported speech synthesizer service detected in SpeechSynthesizer.__New..."
@@ -276,6 +323,52 @@ class SpeechSynthesizer {
 				SpeechSynthesizer.sAudioDevice := getMultiMapValue(configuration, "Output", this.Routing . ".AudioDevice", false)
 			}
 		}
+	}
+
+	getVoices() {
+		local result, voices, languageCode, voiceInfos, ignore, voiceInfo
+
+		if (this.Synthesizer = "Windows") {
+			result := []
+
+			loop this.iSpeechSynthesizer.GetVoices.Count
+				result.Push(this.iSpeechSynthesizer.GetVoices.Item(A_Index - 1).GetAttribute("Name"))
+
+			return result
+		}
+		else if (this.Synthesizer = "dotNET")
+			return string2Values("|", this.iSpeechSynthesizer.GetVoices())
+		else if (this.Synthesizer = "Azure") {
+			voices := this.iSpeechSynthesizer.GetVoices()
+
+			if (voices = "") {
+				result := []
+
+				for languageCode, voiceInfos in kAzureVoices
+					for ignore, voiceInfo in voiceInfos
+						result.Push(voiceInfo[2] . " (" . voiceInfo[1] . ")")
+
+				return result
+			}
+			else
+				return string2Values("|", voices)
+		}
+		else if (this.iGoogleMode = "HTTP") {
+			result := WinHttpRequest().GET("https://texttospeech.googleapis.com/v1/voices?key=" . this.iGoogleAPIKey, "", Map(), {Encoding: "UTF-8"})
+
+			if ((result.Status >= 200) && (result.Status < 300)) {
+				voices := []
+
+				for ignore, voiceInfo in result.JSON["voices"]
+					voices.Push(voiceInfo["name"] . " - " . voiceInfo["ssmlGender"] . " (" . voiceInfo["languageCodes"][1] . ")")
+
+				return voices
+			}
+			else
+				return []
+		}
+		else
+			return string2Values("|", this.iSpeechSynthesizer.GetVoices())
 	}
 
 	setPlayerLevel(level) {
@@ -573,7 +666,7 @@ class SpeechSynthesizer {
 		else {
 			if (this.Synthesizer = "Windows")
 				this.iSpeechSynthesizer.Speak(text, (wait ? 0x0 : 0x1))
-			else if ((this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure")) {
+			else if ((this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure") || (this.Synthesizer = "Google")) {
 				tempName := (cache ? cacheFileName : temporaryFileName("temp", "wav"))
 
 				this.SpeakToFile(tempName, text)
@@ -590,7 +683,7 @@ class SpeechSynthesizer {
 	}
 
 	speakToFile(fileName, text) {
-		local oldStream, stream, ssml
+		local oldStream, stream, ssml, name, voice, request, result
 
 		this.stop()
 
@@ -612,11 +705,19 @@ class SpeechSynthesizer {
 				this.iSpeechSynthesizer.AudioOutputStream := oldStream
 			}
 		}
-		else if ((this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure")) {
-			ssml := "<speak version=`"1.0`" xmlns=`"http://www.w3.org/2001/10/synthesis`" xml:lang=`"%language%`">"
-		    ssml .= " <voice name=`"%voice%`">"
+		else if ((this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure") || (this.Synthesizer = "Google")) {
+			if ((this.Synthesizer = "Google") && (this.iGoogleMode = "RPC")) {
+				name := string2Values(" - ", this.Voice)
+				voice := string2Values("-", this.Voice)
 
-			if (this.Synthesizer = "Azure") {
+				this.iSpeechSynthesizer.SetVoice(name[1], name[2], voice[1] . "-" . voice[2])
+			}
+
+			ssml := "<speak version=`"1.0`" xmlns=`"http://www.w3.org/2001/10/synthesis`" xml:lang=`"%language%`">"
+		    if (this.Synthesizer != "Google")
+				ssml .= " <voice name=`"%voice%`">"
+
+			if ((this.Synthesizer = "Azure") || (this.Synthesizer = "Google")) {
 				ssml .= "  <prosody pitch=`"%pitch%`" rate=`"%rate%`""
 
 				if !kSoX
@@ -629,19 +730,38 @@ class SpeechSynthesizer {
 
 			ssml .= "  %text%"
 			ssml .= "  </prosody>"
-			ssml .= " </voice>"
+			if (this.Synthesizer != "Google")
+				ssml .= " </voice>"
 			ssml .= "</speak>"
 
 			ssml := substituteVariables(ssml, {volume: this.iVolume, pitch: ((this.iPitch > 0) ? "+" : "-") . Abs(this.iPitch) . "st", rate: 1 + (0.05 * this.iRate)
 											 , language: this.Locale, voice: this.Voice, text: text})
 
 			try {
-				if !this.iSpeechSynthesizer.SpeakSsmlToFile(fileName, ssml)
+				if ((this.Synthesizer = "Google") && (this.iGoogleMode = "HTTP")) {
+					name := string2Values(" - ", this.Voice)
+					voice := string2Values("-", this.Voice)
+
+					request := Map("input", Map("ssml", ssml)
+								 , "voice", Map("languageCode", voice[1] . "-" . voice[2], "name", name[1], "ssmlGender", name[2])
+								 , "audioConfig", Map("audioEncoding", "LINEAR16"))
+
+					result := WinHttpRequest().POST("https://texttospeech.googleapis.com/v1/text:synthesize?key=" . this.iGoogleAPIKey
+												  , JSON.print(request), Map("Content-Type", "application/json"), {Object: true, Encoding: "UTF-8"})
+
+					if ((result.Status >= 200) && (result.Status < 300))
+						this.iSpeechSynthesizer.WriteAudio(result.JSON["audioContent"], fileName)
+					else
+						throw "Error while speech synthesizing..."
+				}
+				else if !this.iSpeechSynthesizer.SpeakSsmlToFile(fileName, ssml)
 					throw "Error while speech synthesizing..."
 			}
 			catch Any as exception {
 				if (this.Synthesizer = "Azure")
 					SpeechSynthesizer("Windows", true, "EN").speak("Error while calling Azure Cognitive Services. Maybe your monthly contingent is exhausted.")
+				else if (this.Synthesizer = "Google")
+					SpeechSynthesizer("Windows", true, "EN").speak("Error while calling Google Speech Services. Maybe your monthly contingent is exhausted.")
 			}
 		}
 	}
@@ -710,7 +830,7 @@ class SpeechSynthesizer {
 
 			return true
 		}
-		else if (this.iPlaysCacheFile || (this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure")) {
+		else if (this.iPlaysCacheFile || (this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure") || (this.Synthesizer = "Google")) {
 			try
 				playSound("System", "NonExistent.avi")
 
@@ -777,7 +897,7 @@ class SpeechSynthesizer {
 			else
 				voices := this.Voices
 		}
-		else if ((this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure")) {
+		else if ((this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure") || (this.Synthesizer = "Google")) {
 			if ((voice == true) && language) {
 				availableVoices := []
 
@@ -806,7 +926,7 @@ class SpeechSynthesizer {
 		if !voice
 			voice := 1
 
-		return voices[voice]
+		return (voices.Has(voice) ? voices[voice] : "")
 	}
 
 	setVoice(language, name) {
@@ -821,7 +941,7 @@ class SpeechSynthesizer {
 			this.iLanguage := language
 			this.iVoice := name
 		}
-		else if ((this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure")) {
+		else if ((this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure") || (this.Synthesizer = "Google")) {
 			name := string2Values("(", name)
 
 			this.iLanguage := language

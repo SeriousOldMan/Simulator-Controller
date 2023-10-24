@@ -13,7 +13,7 @@ namespace Speech
         {
         }
 
-        public bool Connect(string credentials)
+        public bool Connect(string mode, string credentials)
         {
             this.synthesizerType = "Google";
             this.credentials = credentials;

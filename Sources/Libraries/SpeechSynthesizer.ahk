@@ -71,6 +71,8 @@ class SpeechSynthesizer {
 
 	iSpeechStatusCallback := false
 
+	iGoogleMode := "HTTP"
+
 	Synthesizer {
 		Get {
 			return this.iSynthesizer
@@ -283,7 +285,7 @@ class SpeechSynthesizer {
 				if (synthesizer[2] != "") {
 					EnvSet("GOOGLE_APPLICATION_CREDENTIALS", synthesizer[2])
 
-					if !this.iSpeechSynthesizer.Connect(synthesizer[2]) {
+					if !this.iSpeechSynthesizer.Connect(this.iGoogleMode, synthesizer[2]) {
 						logMessage(kLogCritical, translate("Could not communicate with speech synthesizer library (") . dllName . translate(")"))
 						logMessage(kLogCritical, translate("Try running the Powershell command `"Get-ChildItem -Path '.' -Recurse | Unblock-File`" in the Binaries folder"))
 

@@ -6297,7 +6297,7 @@ class RaceCenter extends ConfigurationItem {
 
 						penalty := lap.Penalty
 
-						if (penalty && this.Laps.Has(lap.Nr - 1) && (this.Laps(lap.Nr - 1).Penalty != penalty)) {
+						if (penalty && this.Laps.Has(lap.Nr - 1) && (this.Laps[lap.Nr - 1].Penalty != penalty)) {
 							if (InStr(penalty, "SG") = 1) {
 								penalty := ((StrLen(penalty) > 2) ? (A_Space . SubStr(penalty, 3)) : "")
 
@@ -7067,6 +7067,8 @@ class RaceCenter extends ConfigurationItem {
 													, "Driver.Current", currentDriver, "Driver.Next", nextDriver, "Status", "Performed"
 													, "Stint", stint.Nr + 1))
 
+						this.iPendingPitstop := false
+
 						newData := true
 
 						nextStop += 1
@@ -7083,6 +7085,8 @@ class RaceCenter extends ConfigurationItem {
 													, "Repair.Bodywork", false, "Repair.Suspension", false, "Repair.Engine", false
 													, "Driver.Current", kNull, "Driver.Next", kNull, "Status", "Performed"
 													, "Stint", "-"))
+
+						this.iPendingPitstop := false
 
 						newData := true
 
@@ -7622,7 +7626,8 @@ class RaceCenter extends ConfigurationItem {
 						if this.syncPitstops(newLaps) {
 							newData := true
 
-							nextPitstopUpdate := (this.LastLap.Nr + 2)
+							if this.LastLap
+								nextPitstopUpdate := (this.LastLap.Nr + 2)
 						}
 
 						if this.syncTelemetry()

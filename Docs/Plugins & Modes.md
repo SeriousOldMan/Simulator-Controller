@@ -256,7 +256,8 @@ Important: Please be aware, that curve names  containing spaces must be enclosed
 The "Driving Coach" plugin handles the interaction with the Virtual Driving Coach. Aiden, the coach will be automatically started, whenever Simulator Controller is running. Additional information, for example about your performance in the current race, or telemetry data of your car, might be available to the coach, if a simulation is running as well. The following configuration parameters allow you to customize Aiden to your preferences:
 
 	raceAssistant: [*initialState*] [*onOffFunction*]; raceAssistantName: *name*; raceAssistantLogo: On | Off;
-	raceAssistantLanguage: DE | EN | ...; raceAssistantSynthesizer: Windows | dotNET | Azure|tokenIssuerEndpoint|subscriptionKey | Google|apikey;
+	raceAssistantLanguage: DE | EN | ...;
+	raceAssistantSynthesizer: Windows | dotNET | Azure|tokenIssuerEndpoint|subscriptionKey | Google|apikey;
 	raceAssistantSpeaker: On | Off | *Microsoft Speech Generation Language*;
 	raceAssistantSpeakerVocalics: *volume* , *pitch* , *rate*;
 	raceAssistantRecognizer: Desktop | Azure|tokenIssuerEndpoint|subscriptionKey;
@@ -281,7 +282,8 @@ With *raceAssistantSpeaker* and *raceAssistantListener* you can customize the na
 The "Race Engineer" plugin handles the interaction of the currently active simulation as represented by the plugins "ACC", "RF2", "R3E", and so on, and Jona, the Virtual Race Engineer. If one of these simulation is started, the "Race Engineer" plugin will be automatically activated, and will start Jona in the background according to the configuration arguments described below. The following configuration parameters allow you to customize Jona to your preferences:
 
 	raceAssistant: [*initialState*] [*onOffFunction*]; raceAssistantName: *name*; raceAssistantLogo: On | Off;
-	raceAssistantLanguage: DE | EN | ...; raceAssistantSynthesizer: Windows | dotNET | Azure|tokenIssuerEndpoint|subscriptionKey | Google|apikey;
+	raceAssistantLanguage: DE | EN | ...;
+	raceAssistantSynthesizer: Windows | dotNET | Azure|tokenIssuerEndpoint|subscriptionKey | Google|apikey;
 	raceAssistantSpeaker: On | Off | *Microsoft Speech Generation Language*;
 	raceAssistantSpeakerVocalics: *volume* , *pitch* , *rate*;
 	raceAssistantRecognizer: Server | Desktop | Azure|tokenIssuerEndpoint|subscriptionKey;
@@ -352,7 +354,8 @@ Note: All these commands are also available in most of the simulation plugins, e
 The "Race Strategist" plugin handles the interaction of the currently active simulation as represented by the plugins "ACC", "RF2", "R3E", and so on, and Cato, the Virtual Race Strategist. If one of these simulation is started, the "Race Strategist" plugin will be automatically activated, and will start Cato in the background according to the configuration arguments described below. The following configuration parameters allow you to customize Cato to your preferences:
 
 	raceAssistant: [*initialState*] *onOffFunction*; raceAssistantName: *name*; raceAssistantLogo: On | Off; 
-	raceAssistantLanguage: DE | EN | ...; raceAssistantSynthesizer: Windows | dotNET | Azure|tokenIssuerEndpoint|subscriptionKey | Google|apikey;
+	raceAssistantLanguage: DE | EN | ...;
+	raceAssistantSynthesizer: Windows | dotNET | Azure|tokenIssuerEndpoint|subscriptionKey | Google|apikey;
 	raceAssistantSpeaker: On | Off | *Microsoft Speech Generation Language*;
 	raceAssistantSpeakerVocalics: *volume* , *pitch* , *rate*;
 	raceAssistantRecognizer: Server | Desktop | Azure|tokenIssuerEndpoint|subscriptionKey;
@@ -436,7 +439,8 @@ Note: All these commands are also available in most of the simulation plugins, e
 The "Race Spotter" plugin handles the interaction of the currently active simulation as represented by the plugins "ACC", "RF2", "R3E", and so on, and Elisa, the Virtual Race Spotter. If one of these simulation is started, the "Race Spotter" plugin will be automatically activated, and will start Elisa in the background according to the configuration arguments described below. The following configuration parameters allow you to customize Elisa to your preferences:
 
 	raceAssistant: [*initialState*] *onOffFunction*; raceAssistantName: *name*; raceAssistantLogo: On | Off; 
-	raceAssistantLanguage: DE | EN | ...; raceAssistantSynthesizer: Windows | dotNET | Azure|tokenIssuerEndpoint|subscriptionKey | Google|apikey;
+	raceAssistantLanguage: DE | EN | ...;
+	raceAssistantSynthesizer: Windows | dotNET | Azure|tokenIssuerEndpoint|subscriptionKey | Google|apikey;
 	raceAssistantSpeaker: On | Off | *Microsoft Speech Generation Language*;
 	raceAssistantSpeakerVocalics: *volume* , *pitch* , *rate*;
 	raceAssistantRecognizer: Server | Desktop | Azure|tokenIssuerEndpoint|subscriptionKey;

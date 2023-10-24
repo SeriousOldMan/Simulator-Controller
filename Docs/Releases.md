@@ -24,8 +24,8 @@
   13. Default for refueling time has changed to 1.8 seconds per 10 liter of fuel.
   14. New car models for "Setup Workbench":
       - Assetto Corsa
-	     Lotus Evora GTE
-	     Lotus Evora GTE Carbon
+	    - Lotus Evora GTE
+	    - Lotus Evora GTE Carbon
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-542).
 

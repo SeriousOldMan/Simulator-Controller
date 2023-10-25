@@ -264,8 +264,11 @@ class SpeechRecognizer {
 
 			this.Instance := instance
 
-			if ((InStr(engine, "Azure|") == 1) || (engine = "Compiler")) {
-				this.iEngine := ((engine = "Compiler") ? "Compiler" : "Azure")
+			if ((InStr(engine, "Azure|") == 1) || (InStr(engine, "Google|") == 1) || (engine = "Compiler")) {
+				this.iEngine := ((engine = "Compiler") ? "Compiler" : string2Values("|", engine)[1])
+
+				if (this.iEngine = "Google")
+					return
 
 				if !language
 					language := "en-US"
@@ -456,7 +459,7 @@ class SpeechRecognizer {
 	}
 
 	getRecognizerList() {
-		return this.RecognizerList
+		return ((this.Engine = "Google") ? [] : this.RecognizerList)
 	}
 
 	getWords(list) {

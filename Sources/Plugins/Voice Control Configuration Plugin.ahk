@@ -35,12 +35,14 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 	iAzureSynthesizerWidgets := []
 	iGoogleSynthesizerWidgets := []
 	iAzureRecognizerWidgets := []
+	iGoogleRecognizerWidgets := []
 	iOtherWidgets := []
 
 	iTopAzureCredentialsVisible := false
 	iBottomAzureCredentialsVisible := false
 
 	iTopGoogleCredentialsVisible := false
+	iBottomGoogleCredentialsVisible := false
 
 	iSoundProcessingSettings := false
 
@@ -110,18 +112,26 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 				this.hideServerRecognizerEditor()
 			else if (oldChoice == 2)
 				this.hideDesktopRecognizerEditor()
-			else
+			else if (oldChoice == 3)
 				this.hideAzureRecognizerEditor()
+			else
+				this.hideGoogleRecognizerEditor()
 
 			if (voiceRecognizerDropDown.Value == 1)
 				this.showServerRecognizerEditor()
 			else if (voiceRecognizerDropDown.Value == 2)
 				this.showDesktopRecognizerEditor()
-			else {
+			else if (voiceRecognizerDropDown.Value == 3) {
 				recognizers := SpeechRecognizer("Azure|" . Trim(this.Control["azureTokenIssuerEdit"].Text) . "|" . Trim(this.Control["azureSubscriptionKeyEdit"].Text)
 											  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
 
 				this.showAzureRecognizerEditor()
+			}
+			else {
+				recognizers := SpeechRecognizer("Google|" . Trim(this.Control["googleAPIKeyFileEdit"].Text)
+											  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
+
+				this.showGoogleRecognizerEditor()
 			}
 
 			if (voiceRecognizerDropDown.Value <= 2)
@@ -310,7 +320,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		setButtonIcon(widget17, kIconsDirectory . "General Settings.ico", 1)
 
-		choices := ["Windows (Server)", "Windows (Desktop)", "Azure Cognitive Services"]
+		choices := ["Windows (Server)", "Windows (Desktop)", "Azure Cognitive Services", "Google Speech Services"]
 		chosen := 0
 
 		widget18 := window.Add("Text", "x" . x . " yp+42 w110 h23 +0x200 vvoiceRecognizerLabel Hidden", translate("Speech Recognizer"))
@@ -393,6 +403,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		this.iGoogleSynthesizerWidgets := [[window["googleAPIKeyFileLabel"], window["googleAPIKeyFileEdit"], widget37]
 										 , [window["googleSpeakerLabel"], window["googleSpeakerDropDown"], widget40]]
+		this.iGoogleRecognizerWidgets := [[window["googleAPIKeyFileLabel"], window["googleAPIKeyFileEdit"], widget37]]
 
 		this.updateLanguage(false)
 
@@ -434,6 +445,9 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 			if (InStr(recognizer, "Azure") == 1)
 				recognizer := "Azure"
+
+			if (InStr(recognizer, "Google") == 1)
+				recognizer := "Google"
 
 			this.Value["voiceSynthesizer"] := inList(["Windows", "dotNET", "Azure", "Google"], synthesizer)
 			this.Value["voiceRecognizer"] := inList(["Server", "Desktop", "Azure"], recognizer)
@@ -555,8 +569,10 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		if (this.Control["voiceRecognizerDropDown"].Value <= 2)
 			setMultiMapValue(configuration, "Voice Control", "Recognizer", ["Server", "Desktop"][this.Control["voiceRecognizerDropDown"].Value])
-		else
+		else if (this.Control["voiceRecognizerDropDown"].Value == 3)
 			setMultiMapValue(configuration, "Voice Control", "Recognizer", "Azure|" . Trim(this.Control["azureTokenIssuerEdit"].Text) . "|" . Trim(this.Control["azureSubscriptionKeyEdit"].Text))
+		else
+			setMultiMapValue(configuration, "Voice Control", "Recognizer", "Google|" . Trim(this.Control["googleAPIKeyFileEdit"].Text))
 
 		setMultiMapValue(configuration, "Voice Control", "Listener", listener)
 		setMultiMapValue(configuration, "Voice Control", "PushToTalk", (Trim(this.Control["pushToTalkEdit"].Text) = "") ? false : this.Control["pushToTalkEdit"].Text)
@@ -653,6 +669,9 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		if (this.Control["voiceRecognizerDropDown"].Value = 3)
 			recognizers := SpeechRecognizer("Azure|" . Trim(this.Control["azureTokenIssuerEdit"].Text) . "|" . Trim(this.Control["azureSubscriptionKeyEdit"].Text)
 										  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
+		else if (this.Control["voiceRecognizerDropDown"].Value = 4)
+			recognizers := SpeechRecognizer("Google|" . Trim(this.Control["googleAPIKeyFileEdit"].Text)
+										  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
 		else
 			recognizers := SpeechRecognizer((this.Control["voiceRecognizerDropDown"].Value = 1) ? "Server" : "Desktop"
 										  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
@@ -719,8 +738,10 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			this.showServerRecognizerEditor()
 		else if (voiceRecognizer == 2)
 			this.showDesktopRecognizerEditor()
-		else
+		else if (voiceRecognizer == 3)
 			this.showAzureRecognizerEditor()
+		else
+			this.showGoogleRecognizerEditor()
 	}
 
 	hideWidgets() {
@@ -746,11 +767,14 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			this.hideDesktopRecognizerEditor()
 		else if (this.iRecognizerMode = "Azure")
 			this.hideAzureRecognizerEditor()
+		else if (this.iRecognizerMode = "Google")
+			this.hideGoogleRecognizerEditor()
 
 		this.iTopAzureCredentialsVisible := false
 		this.iBottomAzureCredentialsVisible := false
 
 		this.iTopGoogleCredentialsVisible := false
+		this.iBottomGoogleCredentialsVisible := false
 	}
 
 	showWindowsSynthesizerEditor() {
@@ -791,12 +815,18 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 	}
 
 	showAzureSynthesizerEditor() {
-		local wasOpen := false
+		local azureWasOpen := false
+		local googleWasOpen := false
 
 		if this.iBottomAzureCredentialsVisible {
-			wasOpen := true
+			azureWasOpen := true
 
 			this.hideAzureRecognizerEditor()
+		}
+		else if this.iBottomGoogleCredentialsVisible {
+			googleWasOpen := true
+
+			this.hideGoogleRecognizerEditor()
 		}
 
 		this.showControls(this.iTopWidgets)
@@ -809,8 +839,10 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		else
 			throw "Internal error detected in VoiceControlConfigurator.showAzureSynthesizerEditor..."
 
-		if wasOpen
+		if azureWasOpen
 			this.showAzureRecognizerEditor()
+		else if googleWasOpen
+			this.showGoogleRecognizerEditor()
 
 		this.showControls(this.iOtherWidgets)
 
@@ -818,12 +850,18 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 	}
 
 	hideAzureSynthesizerEditor() {
-		local wasOpen := false
+		local azureWasOpen := false
+		local googleWasOpen := false
 
 		if (this.iRecognizerMode = "Azure") {
-			wasOpen := true
+			azureWasOpen := true
 
 			this.hideAzureRecognizerEditor()
+		}
+		else if (this.iRecognizerMode = "Google") {
+			googleWasOpen := true
+
+			this.hideGoogleRecognizerEditor()
 		}
 
 		this.hideControls(this.iTopWidgets)
@@ -837,19 +875,27 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		else if (this.iSynthesizerMode != "Init")
 			throw "Internal error detected in VoiceControlConfigurator.hideAzureSynthesizerEditor..."
 
-		if wasOpen
+		if azureWasOpen
 			this.showAzureRecognizerEditor()
+		else if googleWasOpen
+			this.showGoogleRecognizerEditor()
 
 		this.iSynthesizerMode := false
 	}
 
 	showGoogleSynthesizerEditor() {
-		local wasOpen := false
+		local azureWasOpen := false
+		local googleWasOpen := false
 
 		if this.iBottomAzureCredentialsVisible {
-			wasOpen := true
+			azureWasOpen := true
 
 			this.hideAzureRecognizerEditor()
+		}
+		else if this.iBottomGoogleCredentialsVisible {
+			googleWasOpen := true
+
+			this.hideGoogleRecognizerEditor()
 		}
 
 		this.showControls(this.iTopWidgets)
@@ -862,8 +908,10 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		else
 			throw "Internal error detected in VoiceControlConfigurator.showGoogleSynthesizerEditor..."
 
-		if wasOpen
+		if azureWasOpen
 			this.showAzureRecognizerEditor()
+		else if googleWasOpen
+			this.showGoogleRecognizerEditor()
 
 		this.showControls(this.iOtherWidgets)
 
@@ -871,12 +919,18 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 	}
 
 	hideGoogleSynthesizerEditor() {
-		local wasOpen := false
+		local azureWasOpen := false
+		local googleWasOpen := false
 
 		if (this.iRecognizerMode = "Azure") {
-			wasOpen := true
+			azureWasOpen := true
 
 			this.hideAzureRecognizerEditor()
+		}
+		else if (this.iRecognizerMode = "Google") {
+			googleWasOpen := true
+
+			this.hideGoogleRecognizerEditor()
 		}
 
 		this.hideControls(this.iTopWidgets)
@@ -890,8 +944,10 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		else if (this.iSynthesizerMode != "Init")
 			throw "Internal error detected in VoiceControlConfigurator.hideWindowsSynthesizerEditor..."
 
-		if wasOpen
+		if azureWasOpen
 			this.showAzureRecognizerEditor()
+		else if googleWasOpen
+			this.showGoogleRecognizerEditor()
 
 		this.iSynthesizerMode := false
 	}
@@ -943,6 +999,42 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 				throw "Internal error detected in VoiceControlConfigurator.hideAzureRecognizerEditor..."
 
 			this.iBottomAzureCredentialsVisible := false
+		}
+
+		this.iRecognizerMode := false
+	}
+
+	showGoogleRecognizerEditor() {
+		local titleBarHeight := this.Window.TitleBarHeight
+
+		if !this.iTopGoogleCredentialsVisible {
+			if ((this.iRecognizerMode == false) || (this.iRecognizerMode != "Init")) {
+				this.transposeControls(this.iGoogleRecognizerWidgets, (24 * (this.iTopAzureCredentialsVisible ? 9 : 7)) - 3, titleBarHeight)
+				this.showControls(this.iGoogleRecognizerWidgets)
+				this.transposeControls(this.iBottomWidgets, 24 * this.iGoogleRecognizerWidgets.Length, titleBarHeight)
+			}
+			else
+				throw "Internal error detected in VoiceControlConfigurator.showGoogleRecognizerEditor..."
+
+			this.iBottomGoogleCredentialsVisible := true
+		}
+
+		this.iRecognizerMode := "Google"
+	}
+
+	hideGoogleRecognizerEditor() {
+		local titleBarHeight := this.Window.TitleBarHeight
+
+		if !this.iTopGoogleCredentialsVisible {
+			if (this.iRecognizerMode == "Google") {
+				this.hideControls(this.iGoogleRecognizerWidgets)
+				this.transposeControls(this.iGoogleRecognizerWidgets, (-24 * (this.iTopAzureCredentialsVisible ? 9 : 7)) + 3, titleBarHeight)
+				this.transposeControls(this.iBottomWidgets, -24 * this.iGoogleRecognizerWidgets.Length, titleBarHeight)
+			}
+			else if (this.iRecognizerMode != "Init")
+				throw "Internal error detected in VoiceControlConfigurator.hideGoogleRecognizerEditor..."
+
+			this.iBottomGoogleCredentialsVisible := false
 		}
 
 		this.iRecognizerMode := false

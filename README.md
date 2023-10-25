@@ -45,7 +45,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[5.4.3.0-dev](https://www.dropbox.com/scl/fi/xolo6bim63gpgrj88dykx/Simulator-Controller-5.4.3.0-dev.zip?rlkey=cj2pq3rul3q6iigop6ue0vatv&dl=1) (Early build for 5.4.3. Changes: New core settings to control window size constraints, Resized "Strategy Workbench", Extended "Pitstop" menu in "Race Center", Tyre set available in "System Monitor", Tyre set available in "Session State.json", Google TTS integration.)
+[5.4.3.0-beta](https://www.dropbox.com/scl/fi/2xr8qkuknrizz4ltm3yby/Simulator-Controller-5.4.3.0-beta.zip?rlkey=p6udtongxz2v8u8ri48zg9xbw&dl=1) (Test build for 5.4.3. Changes: New core settings to control window size constraints, Resized "Strategy Workbench", Extended "Pitstop" menu in "Race Center", Tyre set available in "System Monitor", Tyre set available in "Session State.json", Google TTS integration, New car models for "Setup Workbench".)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-543) of this version and all the versions you might have skipped, before installing and using this version.
 

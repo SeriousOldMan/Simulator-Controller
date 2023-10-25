@@ -278,7 +278,7 @@ class RaceReportViewer extends RaceReportReader {
 		local invalids := 0
 		local raceData, drivers, categories, driver, category, positions, times, cars, carsCount, lapsCount, simulator, car
 		local class, hasClasses, classResults, valid, carClasses
-		local ignore, lap, rows, rowClasses, classRows, hasDNF, result, lapTimes, hasNull, lapTime
+		local ignore, lap, rows, rowClasses, classRows, hasDNF, hasAlphaNr, result, lapTimes, hasNull, lapTime
 		local min, avg, filteredLapTimes, nr, row, settings
 
 		comparePositions(c1, c2) {
@@ -346,6 +346,10 @@ class RaceReportViewer extends RaceReportReader {
 			rows := []
 			rowClasses := []
 			hasDNF := false
+			hasAlphaNr := false
+
+			loop carsCount
+				hasAlphaNr := (hasAlphaNr || !isNumber(cars[A_Index][1]))
 
 			loop carsCount {
 				car := A_Index
@@ -398,7 +402,7 @@ class RaceReportViewer extends RaceReportReader {
 					if (categories && (categories[1][A_Index] != "Unknown"))
 						driver .= (translate(" [") . translate(categories[1][A_Index]) . translate("]"))
 
-					rows.Push(Array("'" . class . "'", "'" . nr . "'"
+					rows.Push(Array("'" . class . "'", (hasAlphaNr ? ("'" . nr . "'") : nr)
 								  , "'" . StrReplace(SessionDatabase.getCarName(simulator, cars[A_Index][2]), "'", "\'") . "'", "'" . driver . "'"
 								  , "'" . RaceReportViewer.lapTimeDisplayValue(min) . "'"
 								  , "'" . RaceReportViewer.lapTimeDisplayValue(avg) . "'", result, result))
@@ -458,7 +462,7 @@ class RaceReportViewer extends RaceReportReader {
 			if hasClasses
 				drawChartFunction .= "`ndata.addColumn('string', '" . translate("Class") . "');"
 
-			drawChartFunction .= "`ndata.addColumn('string', '" . translate("#") . "');"
+			drawChartFunction .= "`ndata.addColumn('" . (hasAlphaNr ? "string" : "number") . "', '" . translate("#") . "');"
 			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Car") . "');"
 			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Driver (Start)") . "');"
 			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Best Lap Time") . "');"

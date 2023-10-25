@@ -188,7 +188,7 @@ class IntegrationPlugin extends ControllerPlugin {
 		else
 			state["Wear"] := [kNull, kNull, kNull, kNull]
 
-		tyreSet := getMultiMapValue(sessionState, "Tyres", "Set", false)
+		tyreSet := getMultiMapValue(sessionInfo, "Tyres", "Set", false)
 
 		state["TyreSet"] := (tyreSet ? tyreSet : kNull)
 

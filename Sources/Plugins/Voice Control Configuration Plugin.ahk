@@ -736,6 +736,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			this.hideControls(this.iTopWidgets)
 			this.hideControls(this.iWindowsSynthesizerWidgets)
 			this.hideControls(this.iAzureSynthesizerWidgets)
+			this.hideControls(this.iGoogleSynthesizerWidgets)
 			this.hideControls(this.iOtherWidgets)
 		}
 

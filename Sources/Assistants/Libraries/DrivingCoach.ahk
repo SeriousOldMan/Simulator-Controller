@@ -315,12 +315,15 @@ class DrivingCoach extends GridRaceAssistant {
 				}
 			}
 
+			for ignore, instruction in coach.Instructions[true]
+				addInstruction(instruction)
+
 			for ignore, conversation in this.History {
-				prompt .= ("### Human: " . conversation[1] . "`n")
-				prompt .= ("### Assistant: " . conversation[2] . "`n")
+				prompt .= ("### Human:`n" . conversation[1] . "`n")
+				prompt .= ("### Assistant:`n" . conversation[2] . "`n")
 			}
 
-			prompt .= ("### Human: " . question . "`n### Assistant:")
+			prompt .= ("### Human:`n" . question . "`n### Assistant:")
 
 			body.prompt := prompt
 

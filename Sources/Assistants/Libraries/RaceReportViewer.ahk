@@ -462,7 +462,7 @@ class RaceReportViewer extends RaceReportReader {
 			if hasClasses
 				drawChartFunction .= "`ndata.addColumn('string', '" . translate("Class") . "');"
 
-			drawChartFunction .= "`ndata.addColumn('" . (hasAlphaNr ? "string" : "Number") . "', '" . translate("#") . "');"
+			drawChartFunction .= "`ndata.addColumn('" . (hasAlphaNr ? "string" : "number") . "', '" . translate("#") . "');"
 			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Car") . "');"
 			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Driver (Start)") . "');"
 			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Best Lap Time") . "');"

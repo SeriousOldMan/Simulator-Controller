@@ -1,8 +1,8 @@
 [Development]
-Version=5.4.3.0-dev
+Version=5.4.3.0-beta
 Target=5.4.3.0-release
-Date=10/24/2023
-Download=https://www.dropbox.com/scl/fi/xolo6bim63gpgrj88dykx/Simulator-Controller-5.4.3.0-dev.zip?rlkey=cj2pq3rul3q6iigop6ue0vatv&dl=1
+Date=10/25/2023
+Download=https://www.dropbox.com/scl/fi/2xr8qkuknrizz4ltm3yby/Simulator-Controller-5.4.3.0-beta.zip?rlkey=p6udtongxz2v8u8ri48zg9xbw&dl=1
 Changes=New core settings to control window size constraints, Resized "Strategy Workbench", Extended "Pitstop" menu in "Race Center", Tyre set available in "System Monitor", Tyre set available in "Session State.json", Google TTS integration, New car models for "Setup Workbench"
 Components=Media->5.3.0,Configuration->5.4.0,Utilities->5.3.0
 [Release]
@@ -27,5 +27,5 @@ Utilities.5.3.0.Download=https://www.dropbox.com/scl/fi/hlza8t9tae5d0vnd7wmqa/Ut
 [Current]
 Type=Development
 [Version]
-Development=5.4.3.0-dev
+Development=5.4.3.0-beta
 Release=5.4.2.0-release

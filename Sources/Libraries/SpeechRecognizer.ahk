@@ -205,18 +205,23 @@ class SpeechRecognizer {
 
 	Recognizers[language := false] {
 		Get {
-			local result := []
-			local ignore, recognizer
+			local result, ignore, recognizer
 
-			for ignore, recognizer in this.getRecognizerList()
-				if language {
-					if (recognizer.Language = language)
+			if (this.Engine = "Google")
+				return ["Long Speech (latest_long)", "Short Speech (latest_short)", "Command (command_and_search)"]
+			else {
+				result := []
+
+				for ignore, recognizer in this.getRecognizerList()
+					if language {
+						if (recognizer.Language = language)
+							result.Push(recognizer.Name)
+					}
+					else
 						result.Push(recognizer.Name)
-				}
-				else
-					result.Push(recognizer.Name)
 
-			return result
+				return result
+			}
 		}
 	}
 

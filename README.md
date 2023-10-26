@@ -59,49 +59,51 @@ The markdown files, the so to say source code of this documentation Wiki, can be
 
 Beside the quite extensive documentation (more than 500 pages - I know, nobody reads documentation these days), we also have a list of video tutorials, which are recordings of live coaching session in our Discord community.
 
-1. [Setup and Configuration](https://youtu.be/1XFvWhg2cPw) - You will learn a lot about the general setup and configuration of the Simulator Controller suite. The Setup Wizard "Simulator Setup" is introduced, but we will also take a look at the low level configuration tool "Simulator Configuration".
+1. [Quick start guide](https://youtu.be/qLMYz1FkEGs) - This video shows you how to create your first running configuration with a few clicks.
 
-2. [Managing Button Boxes and Stream Decks](https://youtu.be/wPUnjViU15U) - Here we go a lot more into the details how to configure your available hardware controllers like Button Boxes, Stream Decks and Steering Wheels.
+2. [Setup and Configuration](https://youtu.be/1XFvWhg2cPw) - You will learn a lot about the general setup and configuration of the Simulator Controller suite. The Setup Wizard "Simulator Setup" is introduced, but we will also take a look at the low level configuration tool "Simulator Configuration".
 
-3. [Voice Control](https://youtu.be/u_2cIrZ1zFk) - In this session you will learn the capabilities of voice control, beginning with the simple standard configuration up to a full configuration with individual names, voices and languages for all the different Assistants.
+3. [Managing Button Boxes and Stream Decks](https://youtu.be/wPUnjViU15U) - Here we go a lot more into the details how to configure your available hardware controllers like Button Boxes, Stream Decks and Steering Wheels.
 
-4. [Pitstop Automation using Race Engineer](https://youtu.be/V35v0Be2nUE) - We will take a look at pitstop automation using the Race Engineer. You will learn everything about the necessary configuration and see and hear the Race Engineer in action on the track.
+4. [Voice Control](https://youtu.be/u_2cIrZ1zFk) - In this session you will learn the capabilities of voice control, beginning with the simple standard configuration up to a full configuration with individual names, voices and languages for all the different Assistants.
 
-5. [Managing Settings](https://youtu.be/Pdwpbfadd5g) - This video gives an introduction into the settings used by the Virtual Race Assistants and how to manage these settings in the most efficient way.
+5. [Pitstop Automation using Race Engineer](https://youtu.be/V35v0Be2nUE) - We will take a look at pitstop automation using the Race Engineer. You will learn everything about the necessary configuration and see and hear the Race Engineer in action on the track.
 
-6. [Using Strategy Workbench](https://youtu.be/rDlMWS5mbOM) - In this video we take a walk in "Strategy Workbench", the premium fuel calculator of the Simulator Controller suite. You will also learn, how to use the created strategies in "Race Center" and using the Virtual Race Assistents.
+6. [Managing Settings](https://youtu.be/Pdwpbfadd5g) - This video gives an introduction into the settings used by the Virtual Race Assistants and how to manage these settings in the most efficient way.
 
-7. [Introduction to Team Races](https://youtu.be/R-6mRwMv81I) - In this video, all the functionality of the Simulator Controller suite come together to manage and control your team races. You will learn how to setup everything, how to use the services of the Race Assistants during a team race and how to remote control the pitstop settings for the currently driving team mate.
+7. [Using Strategy Workbench](https://youtu.be/rDlMWS5mbOM) - In this video we take a walk in "Strategy Workbench", the premium fuel calculator of the Simulator Controller suite. You will also learn, how to use the created strategies in "Race Center" and using the Virtual Race Assistents.
 
-8. [More about the Race Assistants](https://youtu.be/AWJe7mZC2UI) - After learning a little bit here and there about the Race Assistants in the last videos, this one is completely dedicated to the Race Assistants.
+8. [Introduction to Team Races](https://youtu.be/R-6mRwMv81I) - In this video, all the functionality of the Simulator Controller suite come together to manage and control your team races. You will learn how to setup everything, how to use the services of the Race Assistants during a team race and how to remote control the pitstop settings for the currently driving team mate.
 
-9. [Working with the Setup Workbench](https://youtu.be/TqkMvOB0UWI) - The Setup Workbench is a tool which helps you with your car setup work. It takes your handling problems and comes up with recommendations how to fix those. For a couple of simulators, setup files can loaded, modified and written back after automatically having applied the recommendations.
+9. [More about the Race Assistants](https://youtu.be/AWJe7mZC2UI) - After learning a little bit here and there about the Race Assistants in the last videos, this one is completely dedicated to the Race Assistants.
 
-10. [Working with data from multiple Drivers](https://youtu.be/TK-TMtd1W9o) - This time you will learn how to work with data from multiple drivers in your telemetry database and how to create team strategies from this data. You will also see, how you can export and import data from and to your telemetry database.
+10. [Working with the Setup Workbench](https://youtu.be/TqkMvOB0UWI) - The Setup Workbench is a tool which helps you with your car setup work. It takes your handling problems and comes up with recommendations how to fix those. For a couple of simulators, setup files can loaded, modified and written back after automatically having applied the recommendations.
 
-11. [Track Mapping and Track Automation](https://youtu.be/QWJyUYdjlFg) - This video shows you how to create a track map for any track in any simulator and where you can use these track maps. A special usage is the automation of in-car settings like traction control or ABS depending on your location on the track, which will be demonstrated on-track at the end of the video.
+11. [Working with data from multiple Drivers](https://youtu.be/TK-TMtd1W9o) - This time you will learn how to work with data from multiple drivers in your telemetry database and how to create team strategies from this data. You will also see, how you can export and import data from and to your telemetry database.
 
-12. [Tyre Compounds and Weather Model](https://youtu.be/KFyhVuqojVk) - This session covers the handling of simulator specific tyre compounds. You will learn how to configure the available compounds for your car of choice and we will take a look at the weather model of Simulator Controller and learn how this is used together with the tyre compounds in strategy simulations.
+12. [Track Mapping and Track Automation](https://youtu.be/QWJyUYdjlFg) - This video shows you how to create a track map for any track in any simulator and where you can use these track maps. A special usage is the automation of in-car settings like traction control or ABS depending on your location on the track, which will be demonstrated on-track at the end of the video.
 
-13. [Team Data Replication](https://youtu.be/KgZ86YIBMOQ) - This video shows you how to share telemetry and other data in your team using the Team Server. This data can then be used to create team strategies or lookup tyre pressures for an unplanned pitstop in a team race and so on.
+13. [Tyre Compounds and Weather Model](https://youtu.be/KFyhVuqojVk) - This session covers the handling of simulator specific tyre compounds. You will learn how to configure the available compounds for your car of choice and we will take a look at the weather model of Simulator Controller and learn how this is used together with the tyre compounds in strategy simulations.
 
-14. [Analyzing Driving Style and Handling Issues](https://youtu.be/UmXMKMpGOkk) - This video shows you how to use the all new telemetry analyzer, which will automatically detect handling issues of your setup (or your driving style) while you are driving. The handling issues can then be transferred to the Setup Workbench to create a modification of the car setup.
+14. [Team Data Replication](https://youtu.be/KgZ86YIBMOQ) - This video shows you how to share telemetry and other data in your team using the Team Server. This data can then be used to create team strategies or lookup tyre pressures for an unplanned pitstop in a team race and so on.
 
-15. [Expert guide to race settings](https://youtu.be/UeD397KFEhg) - This video will give you a complete overview over all the settings used by the Race Assistants, for example all the stuff needed by the Race Engineer to handle a successful pitstop in even the worst conditions.
+15. [Analyzing Driving Style and Handling Issues](https://youtu.be/UmXMKMpGOkk) - This video shows you how to use the all new telemetry analyzer, which will automatically detect handling issues of your setup (or your driving style) while you are driving. The handling issues can then be transferred to the Setup Workbench to create a modification of the car setup.
 
-16. [Create your own voice commands](https://youtu.be/QJtKu3I75Vs) - In this video you will learn how to define your own voice commands to control not only any part of Simulator Controller, but also all functionalities of  your simulation games.
+16. [Expert guide to race settings](https://youtu.be/UeD397KFEhg) - This video will give you a complete overview over all the settings used by the Race Assistants, for example all the stuff needed by the Race Engineer to handle a successful pitstop in even the worst conditions.
 
-17. [Strategy Development Revisited](https://youtu.be/nEmH_RbX8hg) - This video covers a couple of new capabilities for strategy development and handling during the race including a demonstration in ACC.
+17. [Create your own voice commands](https://youtu.be/QJtKu3I75Vs) - In this video you will learn how to define your own voice commands to control not only any part of Simulator Controller, but also all functionalities of  your simulation games.
 
-18. [Race handled fully by AI](https://youtu.be/MlbAESpzg7Q) - This video gives you a full demonstration of a race under complete control of the AI Assistants. No driver interaction was necessary during this 3-stint race. Fully supported in solo as well as in multi player team races.
+18. [Strategy Development Revisited](https://youtu.be/nEmH_RbX8hg) - This video covers a couple of new capabilities for strategy development and handling during the race including a demonstration in ACC.
 
-19. [Defining custom Button Box Modes](https://youtu.be/CqXcjTRoLpE) - This video demonstrates how you can define your own Button Box layers with custom commands.
+19. [Race handled fully by AI](https://youtu.be/MlbAESpzg7Q) - This video gives you a full demonstration of a race under complete control of the AI Assistants. No driver interaction was necessary during this 3-stint race. Fully supported in solo as well as in multi player team races.
 
-20. [Unboxing Practice Center](https://www.youtube.com/watch?v=Qx3I0B8AvhQ) - We are taking a detailed look at the "Practice Center", which lets you organize your practice sessions and solo races, as well as the data collected during those sessions.
+20. [Defining custom Button Box Modes](https://youtu.be/CqXcjTRoLpE) - This video demonstrates how you can define your own Button Box layers with custom commands.
 
-21. [Updating your configuration to 5.3](https://youtu.be/f4HuUjSW-3k) - This video shows you how to update your configuration to use the new capabilities of "Simulator Setup", which simplify many configuration tasks significantly.
+21. [Unboxing Practice Center](https://www.youtube.com/watch?v=Qx3I0B8AvhQ) - We are taking a detailed look at the "Practice Center", which lets you organize your practice sessions and solo races, as well as the data collected during those sessions.
 
-22. [Your personal Driving Coach](https://youtu.be/LBtLk_md1IE) - Demonstrates a general interaction with Aiden, the Virtual Driving Coach.
+22. [Updating your configuration to 5.3](https://youtu.be/f4HuUjSW-3k) - This video shows you how to update your configuration to use the new capabilities of "Simulator Setup", which simplify many configuration tasks significantly.
+
+23. [Your personal Driving Coach](https://youtu.be/LBtLk_md1IE) - Demonstrates a general interaction with Aiden, the Virtual Driving Coach.
 
 This list will be extended from time to time to cover new functionalities.
 

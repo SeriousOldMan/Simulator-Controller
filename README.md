@@ -28,6 +28,10 @@ If you don't want to use the automated installer (or you can't cause of your Ant
 
 Simply download and run [Simulator Controller.exe](https://www.dropbox.com/s/vu3rah5vqxt6uev/Simulator%20Controller.exe?dl=1) (you may have to deactivate your Antivirus or Browser download protection). This small application will connect to the version repository and will download and install the latest version automatically for you. If you want to install a version other than the current one, no problem. This is possible by downloading and installing one of the versions below manually, but consult the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation) beforehand.
 
+Here is a short video which shows how to configure Simulator Controller for the first time with a few clicks:
+
+[![](https://img.youtube.com/vi/qLMYz1FkEGs/0.jpg)](https://youtu.be/qLMYz1FkEGs)
+
 #### Latest release build
 
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):

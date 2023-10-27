@@ -197,7 +197,7 @@ class SpeechRecognizer {
 
 	iGoogleMode := "HTTP"
 	iGoogleAPIKey := false
-	iGoogleCapturedAudioFile := temporaryFileName("audioCapture", "wav")
+	iGoogleCapturedAudioFile := false
 
 	static sAudioRoutingInitialized := false
 	static sRecognizerAudioDevice := false
@@ -526,7 +526,17 @@ class SpeechRecognizer {
 			}
 		}
 
-		return (this.Instance ? ((this.Engine = "Google") ? this.Instance.StartRecognizer(this.iGoogleCapturedAudioFile) : this.Instance.StartRecognizer()) : false)
+		if this.Instance {
+			if (this.Engine = "Google") {
+				this.iGoogleCapturedAudioFile := temporaryFileName("capturedAudio", "wav")
+
+				return this.Instance.StartRecognizer(this.iGoogleCapturedAudioFile)
+			}
+			else
+				return this.Instance.StartRecognizer()
+		}
+		else
+			return false
 	}
 
 	stopRecognizer() {
@@ -534,8 +544,16 @@ class SpeechRecognizer {
 
 		try {
 			if (this.Instance ? this.Instance.StopRecognizer() : false) {
-				if ((this.Engine = "Google") && (this.iGoogleMode = "HTTP"))
-					this.processAudio(this.iGoogleCapturedAudioFile)
+				if ((this.Engine = "Google") && (this.iGoogleMode = "HTTP") && this.iGoogleCapturedAudioFile)
+					try {
+						this.processAudio(this.iGoogleCapturedAudioFile)
+					}
+					finally {
+						if !isDebug()
+							deleteFile(this.iGoogleCapturedAudioFile)
+
+						this.iGoogleCapturedAudioFile := false
+					}
 
 				return true
 			}
@@ -558,9 +576,13 @@ class SpeechRecognizer {
 	}
 
 	processAudio(audioFile) {
+		showMessage("Processing")
+
 		request := Map("config", Map("languageCode", this.Instance.GetLanguage(), "model", this.Instance.GetModel()
 								   , "useEnhanced", true)
 					 , "audio", Map("content", this.Instance.ReadAudio(audioFile)))
+
+		showMessage(this.Instance.ReadAudio(audioFile))
 
 		result := WinHttpRequest().POST("https://speech.googleapis.com/v1/speech:recognize?key=" . this.iGoogleAPIKey
 									  , JSON.print(request), Map("Content-Type", "application/json"), {Object: true, Encoding: "UTF-8"})

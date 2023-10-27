@@ -93,6 +93,7 @@ namespace Speech
 
         private WaveIn waveSource = null;
         private WaveFileWriter waveFile = null;
+        private bool recording = false;
 
         private void StartRecording(string fileName)
         {
@@ -105,35 +106,36 @@ namespace Speech
                 }
             }
 
-            void waveSource_RecordingStopped(object sender, StoppedEventArgs e)
-            {
-                if (waveSource != null)
-                {
-                    waveSource.Dispose();
-                    waveSource = null;
-                }
-
-                if (waveFile != null)
-                {
-                    waveFile.Dispose();
-                    waveFile = null;
-                }
-            }
-
             waveSource = new WaveIn();
             waveSource.WaveFormat = new WaveFormat(44100, 1);
 
             waveSource.DataAvailable += new EventHandler<WaveInEventArgs>(waveSource_DataAvailable);
-            waveSource.RecordingStopped += new EventHandler<StoppedEventArgs>(waveSource_RecordingStopped);
-
+            
             waveFile = new WaveFileWriter(fileName, waveSource.WaveFormat);
+
+            recording = true;
 
             waveSource.StartRecording();
         }
 
         private void StopRecording()
         {
-            waveSource.StopRecording();
+            if ((waveSource != null) && recording)
+            {
+                waveSource.StopRecording();
+
+                waveSource.Dispose();
+
+                waveFile.Flush();
+
+                waveFile.Close();
+
+                waveFile.Dispose();
+            }
+
+            recording = false;
+            waveSource = null;
+            waveFile = null;
         }
 
         public bool StartRecognizer(string fileName)

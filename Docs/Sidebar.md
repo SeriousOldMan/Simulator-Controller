@@ -216,6 +216,7 @@
     - [Debugging](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts#debugging)
     - [Using the Build Tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts#using-the-build-tool)
     - [Customizing the Configuration Tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts#customizing-the-configuration-tool)
+	- [Localization and Translation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts#localization-and-translation)
   - [Constants Reference](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference)
     - [Installation Paths](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#installation-paths-constantsahk)
     - [Global Configuration Map](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#global-configuration-map-constantsahk)

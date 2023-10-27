@@ -223,3 +223,137 @@ The method *createGui* is called by the *editor* to create the controls for the 
 *loadFromConfiguration* (inherited from [ConfigurationItem][https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitem-configurationahk]) is called during the initialization process. It must load the initial state from the configuration. Please note, that the *createGui* method had not been called yet. The third method of the protocol, *saveToConfiguration*, will be called, whenever the user wants to save the current state of the configuration tool.
 
 Please take a look at the documentation of [ConfigurationEditor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#singleton-configurationeditor-extends-configurationitem-simulator-multimapahk) and [ConfigurationItemList](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitemlist-extends-configurationitem-simulator-multimapahk) in the classes reference on [Configuration Editor Classes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#configuration-editor-classes) for more information. Especially, if your configuration has multiple items or aspects and you want to present them using a list, the abstract class *ConfigurationItemList* will be very helpful as a building block.
+
+## Localization and Translation
+
+Simulator Controller supports multiple cultures and translations. The internal handling of textual data is based on double-byte characters and the user interface uses standard Windows widgets, which can be customized to support any script, even right to left writing. A user of the Simulator Controller applications can choose between different languages for the user interface and he also has the choice between different units for the values of temperature, pressure, and so on, as well as the display format of numbers, time, etc. during the configuration process.
+
+To support translation, all Simulator Controller applications use external, text-based files for the language specific texts of all user interface elements. The Assistants use language specific [grammar files](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Engineer-Commands-(EN)) for all voice command patterns as well as the phrases spoken by them. And there are a couple more language specific definitions, for example, for Button Box action labels, settings in the configuration and so on.
+
+For most files used in the translation process, Simulator Controller provides a kind of inheritance mechanism, which allow you to modify all or only small parts of a given translation, or to create a completely new translation not already supported by the standard distribution. To support this, the applications of Simulator Controller searches different directories and the loads the files found in these directories in specific order, so that user specific definitions can *overwrite* definitions in the standard distribution.
+
+IMPORTANT: If you want to work on translation files, be sure to use a Unicode-capable text editor, like notepad++, and be sure to save all files containing language specific texts in the "UTF-16" format with little endian byte order. You can use *\n* to represent a new line in a given text and you must use *\\* to create a backslash, of course.
+
+### Translation of the user interface
+
+The translation of the user interface elements uses a couple of different files for different purposes. Below you will find an introduction for each type of translation file.
+
+#### Texts used in windows and dialogs
+
+A file used for user interface element translation is named "Translations.LC", where *LC* stands for an ISO language code, for exmple *EN*, *DE*, and so on. The standard location of this file is *Resources\Translations* in the program installation folder. The first two lines of the file must contain the language code and the language label.
+
+	[Locale]
+	DE=>Deutsch
+
+After that you can have any number of sections with translations which look like this:
+
+	[General]
+	Yes=>Ja
+	No=>Nein
+	Always=>Immer
+	Never=>Niemals
+	Done=>Fertig
+	Ok=>Ok
+	Cancel=>Abbrechen
+	Select=>Auswählen
+
+The section "[General]" is only used to structure the content and is ignored while reading the translation file. As you can see, the original text is always in English, since the untranslated base version of Simulator Controller uses the English language.
+
+IMPORTANT: Leading and trainling spaces in the original texts are important and must be included in the translated text accordingly. Examples:
+
+	 at line => in der Zeile 
+	": =>": 
+	           Running =>           Starte 
+
+When you want substitute your own translations, you don't have to copy the whole original file of a given language translation, you only have to provide those translations, you want to change. Example:
+
+	[Locale]
+	DE=>Deutsch
+	[General]
+	Yes=>Aber natürlich
+	No=>Auf keine Fall
+
+As you can see, you have to provide the "[Locale]" header and the two line for the translations of "Yes" and "No". Store this file as "Translations.de" in the *Simulator Controller\Translations* folder in your user *Documents* folder, where it will be found during loading. You can also use the [translations editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#translations-editor) for small changes to a given language translation, but I do not recommend to use this tool to introduce a full new language. It will be way faster to use a Unicode-capable text editor like notepadd++ for this purpose.
+
+#### Consent dialog
+
+The translation of the texts in the Consent dialog are placed in a separate file named "Consent.LC", with *LC* being the language code. The location of the original file and the user specific translation is the same as for general translation files, but the structure is a little bit different. The file transatlion file introduce three different texts named "Introduction", "Information" and "Warning". If you want to create support for a new language, make a copy of the original "Consent.en" file and replace the texts accordingly.
+
+#### Button Box action labels
+
+The visual representation of a Button Box can display the names (labels) of currently available actions in a special window. The texts for these labels can be translated, of course, and are placed in a file named "Controller Action Labels.LC", where *LC* is the language code. The location of the original file and the user specific translation is the same as for general translation files, but the structure is also a little bit different. Example:
+
+	[Tactile Feedback]
+	TC.Dial=TC
+	TC.Increase=Mehr\nTC
+	TC.Decrease=Weniger\nTC
+	ABS.Dial=ABS
+	ABS.Increase=Mehr\nABS
+
+The section label "[Tactile Feedback]" here is important and names the plugin (or module), for which the following translations are for. Each line represents the label of a gicen action, where the left side is the unique, symbolic name of the action and the right side the language specific label to be used. Please note, that *\n* stands for a new line. As with all translation files, you only have to provide those lines, you want to translate, incl. section label, or you can create a translation for a complete new language.
+
+#### Handling issues and car settings in "Setup Workbench"
+
+Also a special case and maybe a candidate to keep the original English terms, since English is the language of the Engineers. The file "Setup Workbench.LC", where *LC* stands for the language code, introduces language specific labels for handling issues and car settings. If you want to supply translations or if you want to introduce a whole new language, follow the structure of the original file, similar to *Button Box action labels*.
+
+#### Settings in the "Session Database"
+
+Another special case, the translations for the (race) settings available in the "Session Database". Before you translate this stuff, make yourself familar
+
+### Translation of Assistant grammars
+
+The voice command patterns and also the phrases spoken by the Assistants can be translated as well. Also you can provide modified elements for an already available language using the same mechanism as described above, or you can introduce a whole new language.
+
+The orignal files can be found in the directory *Resources\Grammars* in the program installation folder. You can place your own tranlation files in the *Simulator Controller\Grammars* directory in your user *Documents* folder. The files follow the following naming pattern:
+
+	ASSISTANT.grammars.LC
+
+where *ASSISTANT* is the type of the Assistant, for example "Race Engineer", and where *LC* stands for the language code. The content of the grammar files introduce a couple of required sections:
+
+1. Grammar type
+
+	[Configuration]
+	Recognizer=Grammar
+	
+The value for *Recognizer* can be either "Grammar" which defines that only pattern based voice commands are used, or "Text", when the Assistant has a full understanding of language like ChatGPT, or "Mixed", when you want to use both types. If you translate a grammar filoe, don't change this.
+
+2. Text fragments
+
+	[Fragments]
+	FrontLeft=vorne links
+	FrontRight=vorne rechts
+	RearLeft=hinten links
+	RearRight=hinten rechts
+
+Introduces kind of building blocks and variables for the rest of the grammar.
+
+3. Choices of alternatives
+
+	[Choices]
+	Announcements=Benzinmangel Warnungen, Schadenswarnungen, Schadensanalysen, Wetterwarnungen, Luftdruckwarnungen
+
+Also a kind of variable, but with multiple alternative values.
+
+4. Patterns for voice commands
+
+	[Listener Grammars]
+	TyrePressures=[(GibMir) {die, die kalten, die Setup} {Reifendrücke, Reifen Drücke, aktuellen Reifendrücke, aktuellen Reifen Drücke, Drücke in den Reifen, Drücke in den kalten Reifen}, (KannstDu) (Mir) {die, die kalten, die Setup} {Reifendrücke, Reifen Drücke} {durchgeben, durchgeben bitte, bitte durchgeben}]
+	TyreTemperatures=[(GibMir) die {Reifentemperaturen, Reifen Temperaturen, Temperaturen der Reifen im Moment}, (KannstDu) (Mir) die {Reifentemperaturen, Reifen Temperaturen, Temperaturen der Reifen im Moment} {durchgeben, durchgeben bitte, bitte durchgeben}]
+	TyreWear={Sag mir, Überprüfe mal, Überprüfe bitte mal, Bitte überprüfe} {den Reifenverschleiß, den Verschleiß der Reifen, den Reifenverschleiß im Moment, den Verschleiß der Reifen im Moment}
+
+Voice commands are defined using a kind of rule based grammar. Please read the introduction to this kind of pattern grammars [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Spotter-Commands-(EN)#syntax) before creating a translation.
+
+5. Phrases for texts spoken by the Assistants
+
+	[Speaker Phrases]
+	GreetingEngineer.1=Hi %driver%, hier ist %name%. Ich bin heute für Deinen Wagen zuständig.
+	GreetingEngineer.2=Hier ist %name%. Ich kümmere mich heute um Deinen Wagen.
+	GreetingEngineer.3=Hier ist %name%.
+
+Every phrase spoken by an Assistant has a unique name, "GreetingEngineer" in this example. You can supply alternatives by appending a dot and a number to the speech name. Thos numbers must start with *1* and must be consecutive without any gap. You may use variables in the phrase. %driver% and %name% (the name of the Assistant) are always available, other variables are specific for a given phrase. Those variables may not be translated, of course.
+
+#### Modularization of grammar files
+
+You may have noticed, that the grammar files support a kind of include mechanism. This is very helpful, since the Assistants share a set of common commands and domain specific fragments. To include a language specific file use the *#Include* statement:
+
+	#Include Fragments.de

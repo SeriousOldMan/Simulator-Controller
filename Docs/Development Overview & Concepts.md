@@ -310,14 +310,14 @@ The orignal files can be found in the directory *Resources\Grammars* in the prog
 
 where *ASSISTANT* is the type of the Assistant, for example "Race Engineer", and where *LC* stands for the language code. The content of the grammar files introduce a couple of required sections:
 
-1. Grammar type
+#### Grammar type
 
 	[Configuration]
 	Recognizer=Grammar
 	
 The value for *Recognizer* can be either "Grammar" which defines that only pattern based voice commands are used, or "Text", when the Assistant has a full understanding of language like ChatGPT, or "Mixed", when you want to use both types. If you translate a grammar filoe, don't change this.
 
-2. Text fragments
+#### Text fragments
 
 	[Fragments]
 	FrontLeft=vorne links
@@ -327,14 +327,14 @@ The value for *Recognizer* can be either "Grammar" which defines that only patte
 
 Introduces kind of building blocks and variables for the rest of the grammar.
 
-3. Choices of alternatives
+#### Choices of alternatives
 
 	[Choices]
 	Announcements=Benzinmangel Warnungen, Schadenswarnungen, Schadensanalysen, Wetterwarnungen, Luftdruckwarnungen
 
 Also a kind of variable, but with multiple alternative values.
 
-4. Patterns for voice commands
+#### Patterns for voice commands
 
 	[Listener Grammars]
 	TyrePressures=[(GibMir) {die, die kalten, die Setup} {Reifendrücke, Reifen Drücke, aktuellen Reifendrücke, aktuellen Reifen Drücke, Drücke in den Reifen, Drücke in den kalten Reifen}, (KannstDu) (Mir) {die, die kalten, die Setup} {Reifendrücke, Reifen Drücke} {durchgeben, durchgeben bitte, bitte durchgeben}]
@@ -343,7 +343,7 @@ Also a kind of variable, but with multiple alternative values.
 
 Voice commands are defined using a kind of rule based grammar. Please read the introduction to this kind of pattern grammars [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Spotter-Commands-(EN)#syntax) before creating a translation.
 
-5. Phrases for texts spoken by the Assistants
+#### Phrases for texts spoken by the Assistants
 
 	[Speaker Phrases]
 	GreetingEngineer.1=Hi %driver%, hier ist %name%. Ich bin heute für Deinen Wagen zuständig.

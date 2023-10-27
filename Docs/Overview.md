@@ -51,13 +51,9 @@ The documentation is devided into the following sections:
 
     The third Assistant, Elisa, will watch your race and will warn you about nearby other cars and will give you general information about the current race situation.
 	
-  - [Virtual Driving Coach](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach)
-
-    This a very special chatbot, which behaves as your personal driving coach. Based on text-based GPT technology, it uses a publically available large language model which has been trained with vasts amount of information. Ask anything about racing, car handling and driving techniques and you will probably will get an interesting answer.
-	
   - [Team Server](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server)
 
-    If you are participating in multiplayer team-based endurance races, you use the *Team Server* to share the car state and the knowledge ot the Virtual Race Assistants between all participating drivers.
+    If you are participating in multiplayer team-based endurance races, you use the *Team Server* to share the car state and the knowledge ot the Virtual Race Assistants between all participating drivers. Using the "Race Center", a complete pitwall application, you can plan the race, prepare a strategy and based on that the stint plan for the race. All team members or even a dedicated engineer can investigate the telemetry data and gather information about the race development in general and can remote control the car, for example to prepare an upcoming pitstop, without any driver interaction. Last, but not least, if you encounter an unforeseen event during the race, you have various tools at hand to adopt the strategy to the new race situation.
 	
   - [Development Guide](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts)
 

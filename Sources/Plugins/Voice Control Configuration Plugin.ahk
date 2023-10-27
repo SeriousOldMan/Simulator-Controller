@@ -1088,8 +1088,11 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			if (this.Control["voiceRecognizerDropDown"].Value <= 2)
 				recognizers := SpeechRecognizer((this.Control["voiceRecognizerDropDown"].Value = 1) ? "Server" : "Desktop"
 											  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()]
-			else
+			else if (this.Control["voiceRecognizerDropDown"].Value == 3)
 				recognizers := SpeechRecognizer("Azure|" . Trim(this.Control["azureTokenIssuerEdit"].Text) . "|" . Trim(this.Control["azureSubscriptionKeyEdit"].Text)
+											  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()]
+			else
+				recognizers := SpeechRecognizer("Google|" . Trim(this.Control["googleAPIKeyFileEdit"].Text)
 											  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()]
 
 			recognizers.InsertAt(1, translate("Deactivated"))

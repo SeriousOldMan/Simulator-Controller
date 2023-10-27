@@ -32,13 +32,13 @@ namespace Speech
 
         private bool _continuousMode = false;
 
-        public bool Connect(string tokenIssuerEndpoint, string subscriptionKey, string language, dynamic callback)
+        public bool Connect(string tokenIssuerEndpoint, string subscriptionKey, dynamic callback)
         {
             this._engineType = "Azure";
 
             this._azureRecognizer = new AzureSpeechRecognizer();
 
-            return this._azureRecognizer.Connect(tokenIssuerEndpoint, subscriptionKey, language, callback);
+            return this._azureRecognizer.Connect(tokenIssuerEndpoint, subscriptionKey, callback);
         }
 
         public void SetEngine(string engine)
@@ -220,11 +220,10 @@ namespace Speech
 
         private Microsoft.CognitiveServices.Speech.SpeechRecognizer _activeRecognizer;
 
-        public bool Connect(string tokenIssuerEndpoint, string subscriptionKey, string language, dynamic callback)
+        public bool Connect(string tokenIssuerEndpoint, string subscriptionKey, dynamic callback)
         {
             this._tokenIssuerEndpoint = tokenIssuerEndpoint;
             this._subscriptionKey = subscriptionKey;
-            this._language = language.ToLower();
             this._callback = callback;
 
             _region = _tokenIssuerEndpoint.Substring(8);
@@ -249,7 +248,7 @@ namespace Speech
 
         public void SetLanguage(string language)
         {
-            this._language = language;
+            this._language = language.ToLower();
         }
 
         private void RenewToken()

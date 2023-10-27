@@ -15,6 +15,7 @@ namespace Speech
 
         private string _credentials;
 
+        private string _model;
         private string _language;
         private dynamic _callback;
 
@@ -22,11 +23,10 @@ namespace Speech
         {
         }
 
-        public bool Connect(string mode, string credentials, string language, dynamic callback)
+        public bool Connect(string mode, string credentials, dynamic callback)
         {
             this._engineType = "Google";
             this._credentials = credentials;
-            this._language = language.ToLower();
             this._callback = callback;
 
             return true;
@@ -37,6 +37,16 @@ namespace Speech
             _engineType = engine;
         }
 
+        public string GetModel()
+        {
+            return _model;
+        }
+
+        public void SetModel(string model)
+        {
+            _model = model;
+        }
+
         public string GetLanguage()
         {
             return _language;
@@ -44,7 +54,7 @@ namespace Speech
 
         public void SetLanguage(string language)
         {
-            _language = language;
+            _language = language.ToLower();
         }
 
         public string OkCheck()
@@ -55,6 +65,10 @@ namespace Speech
         public int GetRecognizerCount()
         {
             return 1;
+        }
+
+        public void SetContinuous(dynamic callback)
+        {
         }
 
         public string GetRecognizerName(int recognizerId)
@@ -144,6 +158,9 @@ namespace Speech
             using (var input = File.Open(audioFile, FileMode.Open))
             {
                 byte[] bytes = new byte[input.Length];
+
+                input.Position = 0;
+                input.SetLength(0);
                     
                 input.Read(bytes, 0, bytes.Length);
 

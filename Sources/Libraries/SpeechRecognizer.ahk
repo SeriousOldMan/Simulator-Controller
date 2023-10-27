@@ -20,6 +20,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "CLR.ahk"
+#Include "HTTP.ahk"
 #Include "Task.ahk"
 
 
@@ -157,6 +158,28 @@ initializeAzureLanguages() {
 
 initializeAzureLanguages()
 
+global kGoogleLanguages := Map()
+
+initializeGoogleLanguages() {
+	local ignore, culture
+
+	for ignore, culture in ["am-ET", "ar-DZ", "ar-BH", "ar-EG", "ar-IQ", "ar-IL", "ar-JO", "ar-KW", "ar-LB", "ar-LY"
+						  , "ar-MA", "ar-OM", "ar-PS", "ar-QA", "ar-SA", "ar-SY", "ar-TN", "ar-AE", "ar-YE", "bg-BG"
+						  , "my-MM", "ca-ES", "zh-HK", "zh-CN", "zh-TW", "hr-HR", "cs-CZ", "da-DK", "nl-BE", "nl-NL"
+						  , "en-AU", "en-CA", "en-GH", "en-HK", "en-IN", "en-IE", "en-KE", "en-NZ", "en-NG", "en-PH"
+						  , "en-SG", "en-ZA", "en-TZ", "en-GG", "en-US", "et-EE", "fil-PH", "fi-FI", "fr-BE", "fr-CA"
+						  , "fr-FR", "fr-CH", "de-AT", "de-DE", "de-CH", "el-GR", "gu-IN", "he-IL", "hi-IN", "hu-HU"
+						  , "is-IS", "id-ID", "ga-IE", "it-IT", "ja-JP", "jv-ID", "kn-IN", "km-KH", "ko-KR", "lo-LA"
+						  , "lv-LV", "lt-LT", "mk-MK", "ms-MY", "mt-MT", "mr-IN", "nb-NO", "fa-IR", "pl-PL", "pt-BR"
+						  , "pt-PT", "ro-RO", "ru-RU", "sr-RS", "si-LK", "sk-SK", "sl-SI", "es-AR", "es-BO", "es-CL"
+						  , "es-CO", "es-CR", "es-CU", "es-DO", "es-EC", "es-SV", "es-GQ", "es-GT", "es-HN", "es-MX"
+						  , "es-NI", "es-PA", "es-PY", "es-PE", "es-PR", "es-ES", "es-UY", "es-US", "es-VE", "sw-KE"
+						  , "sw-TZ", "sv-SE", "ta-IN", "te-IN", "th-TH", "tr-TR", "uk-UA", "uz-UZ", "vi-VN", "zu-ZA"]
+		kGoogleLanguages[culture] := ["Long Speech (latest_long)", "Short Speech (latest_short)", "Command (command_and_search)"]
+}
+
+initializeGoogleLanguages()
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Class Section                           ;;;
@@ -171,6 +194,10 @@ class SpeechRecognizer {
 	iChoices := CaseInsenseMap()
 
 	iMode := "Grammar"
+
+	iGoogleMode := "HTTP"
+	iGoogleAPIKey := false
+	iGoogleCapturedAudioFile := temporaryFileName("audioCapture", "wav")
 
 	static sAudioRoutingInitialized := false
 	static sRecognizerAudioDevice := false
@@ -205,29 +232,24 @@ class SpeechRecognizer {
 
 	Recognizers[language := false] {
 		Get {
-			local result, ignore, recognizer
+			local result := []
+			local ignore, recognizer
 
-			if (this.Engine = "Google")
-				return ["Long Speech (latest_long)", "Short Speech (latest_short)", "Command (command_and_search)"]
-			else {
-				result := []
-
-				for ignore, recognizer in this.getRecognizerList()
-					if language {
-						if (recognizer.Language = language)
-							result.Push(recognizer.Name)
-					}
-					else
+			for ignore, recognizer in this.getRecognizerList()
+				if language {
+					if (recognizer.Language = language)
 						result.Push(recognizer.Name)
+				}
+				else
+					result.Push(recognizer.Name)
 
-				return result
-			}
+			return result
 		}
 	}
 
 	__New(engine, recognizer := false, language := false, silent := false, mode := "Grammar") {
-		local dllName := "Microsoft.Speech.Recognizer.dll"
-		local dllFile := (kBinariesDirectory . "Microsoft\" . dllName)
+		local dllName := ((InStr(engine, "Google|") = 1) ? "Google.Speech.Recognizer.dll" : "Microsoft.Speech.Recognizer.dll")
+		local dllFile := (kBinariesDirectory . ((InStr(engine, "Google|") = 1) ? "Google\" : "Microsoft\") . dllName)
 		local instance, choices, found, ignore, recognizerDescriptor, configuration, audioDevice
 
 		this.iEngine := engine
@@ -265,23 +287,20 @@ class SpeechRecognizer {
 				}
 			}
 
-			instance := CLR_LoadLibrary(dllFile).CreateInstance("Speech.MicrosoftSpeechRecognizer")
+			if !language
+				language := "en"
 
-			this.Instance := instance
+			if ((InStr(engine, "Azure|") == 1) || (engine = "Compiler")) {
+				instance := CLR_LoadLibrary(dllFile).CreateInstance("Speech.MicrosoftSpeechRecognizer")
 
-			if ((InStr(engine, "Azure|") == 1) || (InStr(engine, "Google|") == 1) || (engine = "Compiler")) {
+				this.Instance := instance
+
 				this.iEngine := ((engine = "Compiler") ? "Compiler" : string2Values("|", engine)[1])
-
-				if (this.iEngine = "Google")
-					return
-
-				if !language
-					language := "en-US"
 
 				if (engine != "Compiler") {
 					engine := string2Values("|", engine)
 
-					if !instance.Connect(engine[2], engine[3], language, ObjBindMethod(this, "_onTextCallback")) {
+					if !instance.Connect(engine[2], engine[3], ObjBindMethod(this, "_onTextCallback")) {
 						logMessage(kLogCritical, translate("Could not communicate with speech recognizer library (") . dllName . translate(")"))
 						logMessage(kLogCritical, translate("Try running the Powershell command `"Get-ChildItem -Path '.' -Recurse | Unblock-File`" in the Binaries folder"))
 
@@ -303,7 +322,46 @@ class SpeechRecognizer {
 
 				this.setChoices("Digit", choices)
 			}
+			else if (InStr(engine, "Google|") == 1) {
+				instance := CLR_LoadLibrary(dllFile).CreateInstance("Speech.GoogleSpeechRecognizer")
+
+				this.Instance := instance
+
+				this.iEngine := "Google"
+
+				engine := string2Values("|", engine)
+
+				if (this.iGoogleMode = "RPC")
+					EnvSet("GOOGLE_APPLICATION_CREDENTIALS", engine[2])
+				else
+					this.iGoogleAPIKey := engine[2]
+
+				if !instance.Connect(this.iGoogleMode, engine[2], ObjBindMethod(this, "_onTextCallback")) {
+					logMessage(kLogCritical, translate("Could not communicate with speech recognizer library (") . dllName . translate(")"))
+					logMessage(kLogCritical, translate("Try running the Powershell command `"Get-ChildItem -Path '.' -Recurse | Unblock-File`" in the Binaries folder"))
+
+					throw "Could not communicate with speech recognizer library (" . dllName . ")..."
+				}
+
+				choices := []
+
+				loop 101
+					choices.Push((A_Index - 1) . "")
+
+				this.setChoices("Number", choices)
+
+				choices := []
+
+				loop 10
+					choices.Push((A_Index - 1) . "")
+
+				this.setChoices("Digit", choices)
+			}
 			else {
+				instance := CLR_LoadLibrary(dllFile).CreateInstance("Speech.MicrosoftSpeechRecognizer")
+
+				this.Instance := instance
+
 				instance.SetEngine(engine)
 			}
 
@@ -331,7 +389,7 @@ class SpeechRecognizer {
 
 				if ((recognizer == true) && language) {
 					for ignore, recognizerDescriptor in this.getRecognizerList()
-						if (recognizerDescriptor.Language = language) {
+						if ((recognizerDescriptor.Language = language) && ((this.Engine != "Google") || (recognizerDescriptor = "latest_short"))) {
 							recognizer := recognizerDescriptor.ID
 
 							found := true
@@ -385,9 +443,9 @@ class SpeechRecognizer {
 
 	createRecognizerList() {
 		local recognizerList := []
-		local culture, name, index, language, recognizer
+		local culture, name, index, language, recognizer, ignore, model
 
-		if ((this.iEngine = "Azure") || (this.iEngine = "Compiler")) {
+		if ((this.Engine = "Azure") || (this.Engine = "Compiler")) {
 			for culture, name in kAzureLanguages {
 				index := A_Index - 1
 
@@ -396,13 +454,34 @@ class SpeechRecognizer {
 				recognizerList.Push({ID: index, Name: name . " (" . culture . ")", Culture: culture, Language: language})
 			}
 		}
+		else if (this.Engine = "Google") {
+			for culture, models in kGoogleLanguages
+				for ignore, model in models {
+					index := A_Index - 1
+
+					language := StrSplit(culture, "-")[1]
+
+					name := model
+
+					switch name, false {
+						case "Long Speech (latest_long)":
+							model := "latest_long"
+						case "Short Speech (latest_short)":
+							model := "latest_short"
+						case "Command (command_and_search)":
+							model := "command_and_search"
+					}
+
+					recognizerList.Push({ID: index, Name: name . " (" . culture . ")", Culture: culture, Language: language, Model: model})
+				}
+		}
 		else if this.Instance {
 			loop this.Instance.GetRecognizerCount() {
 				index := A_Index - 1
 
 				recognizer := {ID: index, Culture: this.Instance.GetRecognizerCultureName(index), Language: this.Instance.GetRecognizerTwoLetterISOLanguageName(index)}
 
-				if (this.iEngine = "Server")
+				if (this.Engine = "Server")
 					recognizer.Name := this.Instance.GetRecognizerName(index)
 				else
 					recognizer.Name := (this.Instance.GetRecognizerName(index) . " (" . recognizer.Culture . ")")
@@ -415,9 +494,17 @@ class SpeechRecognizer {
 	}
 
 	initialize(id) {
+		local recognizer
+
 		if this.Instance
-			if ((this.iEngine = "Azure") || (this.iEngine = "Compiler"))
+			if ((this.Engine = "Azure") || (this.Engine = "Compiler"))
 				this.Instance.SetLanguage(this.getRecognizerList()[id + 1].Culture)
+			else if (this.Engine = "Google") {
+				recognizer := this.getRecognizerList()[id + 1]
+
+				this.Instance.SetLanguage(recognizer.Culture)
+				this.Instance.SetModel(recognizer.Model)
+			}
 			else if (id > this.Instance.getRecognizerCount() - 1)
 				throw "Invalid recognizer ID (" . id . ") detected in SpeechRecognizer.initialize..."
 			else
@@ -439,14 +526,21 @@ class SpeechRecognizer {
 			}
 		}
 
-		return (this.Instance ? this.Instance.StartRecognizer() : false)
+		return (this.Instance ? ((this.Engine = "Google") ? this.Instance.StartRecognizer(this.iGoogleCapturedAudioFile) : this.Instance.StartRecognizer()) : false)
 	}
 
 	stopRecognizer() {
 		local audioDevice := SpeechRecognizer.sDefaultAudioDevice
 
 		try {
-			return (this.Instance ? this.Instance.StopRecognizer() : false)
+			if (this.Instance ? this.Instance.StopRecognizer() : false) {
+				if ((this.Engine = "Google") && (this.iGoogleMode = "HTTP"))
+					this.processAudio(this.iGoogleCapturedAudioFile)
+
+				return true
+			}
+			else
+				return false
 		}
 		finally {
 			if (audioDevice && kNirCmd) {
@@ -463,8 +557,22 @@ class SpeechRecognizer {
 		}
 	}
 
+	processAudio(audioFile) {
+		request := Map("config", Map("languageCode", this.Instance.GetLanguage(), "model", this.Instance.GetModel()
+								   , "useEnhanced", true)
+					 , "audio", Map("content", this.Instance.ReadAudio(audioFile)))
+
+		result := WinHttpRequest().POST("https://speech.googleapis.com/v1/speech:recognize?key=" . this.iGoogleAPIKey
+									  , JSON.print(request), Map("Content-Type", "application/json"), {Object: true, Encoding: "UTF-8"})
+
+		if ((result.Status >= 200) && (result.Status < 300))
+			this._onTextCallback(result.JSON["results"][1]["alternatives"][1]["transcript"])
+		else
+			throw "Error while speech recognition..."
+	}
+
 	getRecognizerList() {
-		return ((this.Engine = "Google") ? [] : this.RecognizerList)
+		return this.RecognizerList
 	}
 
 	getWords(list) {
@@ -480,10 +588,10 @@ class SpeechRecognizer {
 		if isSet(name) {
 			if this.iChoices.Has(name)
 				return this.iChoices[name]
-			else if ((this.iEngine = "Azure") || (this.iEngine = "Compiler"))
+			else if ((this.Engine = "Azure") || (this.Engine = "Google") || (this.Engine = "Compiler"))
 				return []
 			else
-				return (this.Instance ? ((this.iEngine = "Server") ? this.Instance.GetServerChoices(name) : this.Instance.GetDesktopChoices(name)) : [])
+				return (this.Instance ? ((this.Engine = "Server") ? this.Instance.GetServerChoices(name) : this.Instance.GetDesktopChoices(name)) : [])
 		}
 		else
 			return this.iChoices
@@ -497,20 +605,20 @@ class SpeechRecognizer {
 		this.iMode := mode
 
 		if ((mode = "Text") && this.Instance)
-			switch this.iEngine, false {
+			switch this.Engine, false {
 				case "Desktop", "Server":
 					this.Instance.SetContinuous(true, this._onGrammarCallback.Bind(this))
-				case "Azure", "Compiler":
+				case "Azure", "Google", "Compiler":
 					this.Instance.SetContinuous(true)
 			}
 	}
 
 	newGrammar() {
 		if this.Instance {
-			switch this.iEngine, false {
+			switch this.Engine, false {
 				case "Desktop":
 					return this.Instance.NewDesktopGrammar()
-				case "Azure", "Compiler":
+				case "Azure", "Google", "Compiler":
 					return Grammar()
 				case "Server":
 					return this.Instance.NewServerGrammar()
@@ -522,10 +630,10 @@ class SpeechRecognizer {
 
 	newChoices(choices) {
 		if this.Instance {
-			switch this.iEngine, false {
+			switch this.Engine, false {
 				case "Desktop":
 					return this.Instance.NewDesktopChoices(isObject(choices) ? values2String(", ", choices*) : choices)
-				case "Azure", "Compiler":
+				case "Azure", "Google", "Compiler":
 					return Grammar.Choices(!isObject(choices) ? string2Values(",", choices) : choices)
 				case "Server":
 					return this.Instance.NewServerChoices(isObject(choices) ? values2String(", ", choices*) : choices)
@@ -557,7 +665,7 @@ class SpeechRecognizer {
 
 		this._grammarCallbacks[name] := callback
 
-		if ((this.iEngine = "Azure") || (this.iEngine = "Compiler")) {
+		if ((this.Engine = "Azure") || (this.Engine = "Google") || (this.Engine = "Compiler")) {
 			Task.startTask(prepareGrammar.Bind(name, theGrammar), 1000, kLowPriority)
 
 			theGrammar := {Name: name, Grammar: theGrammar, Callback: callback}

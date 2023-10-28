@@ -122,6 +122,32 @@ Note: If there is only *one* dialog partner configured, this will be activated f
 
 Beside the *builtin* voice recognition capabilities, you can still use specialized external voice recognition appplications like [VoiceMacro](http://www.voicemacro.net/) as an external event source for controller actions, since these specialized applications might have a better recognition quality in some cases.
 
+#### Non-standard voice configurations
+
+Normally you will use a standard configuration for voice control, which means, that voice output is enabled for the Assistants and voice input is enabled to issue commands to the Assistants. In this case, you can give your commands and answer questions of the Assistants with "Yes" or "No", dpending on the situation. But all other combinations are also possible, even using the Assistants fully silent will work, for example in a Team Race, where everything is controller by the "Race Center". Below you find a detailed description for all non-standard configurations.
+
+  1. Muted Assistant(s)
+  
+     "Simulator Setup" provide a preset for each Assistant, which will let the corresponding start in the so called muted mode. In this mode, the Assistant will not talk unless a very critical situation occurs, or if you actively address the Assistant with a command. For example, the Engineer will not inform you about damages and will not call you to the pit, when the time loss is to high. You can always unmute the Assistant later on, using the corresponding [voice command](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#enabling-and-disabling-specific-warnings-and-announcements).
+
+  2. Silent Assistant(s)
+  
+     For this purpose, "Simulator Setup" also provides a corresponding preset. Using this will completely disable voice output and input for the given Assistant. Commands issued by a Button Box or Stream Deck will still work and especially the remote control of the "Race Center" will work as well.
+
+  3. No voice control for one or more Assistant(s)
+  
+     You can disable voice input for one or more Assistants. It can either be done for all Assistants by disabling voice input on the voice control page in "Simulator Setup". Disabling it for an individual Assistant is also possible, but requires low level configuration in "Simulator Controller". When voice input is disabled, I recommand using the corresponding actions on a Button Box or a Stream Deck to interact with the Assistant. And you may want to configure the confirmation behaviour as described below.
+
+  4. Confirmation behaviour
+  
+     This is more or less independent of the voice configuration. There are many cases, in which the Assistants ask you a question and wait then for your confirmation. In this case, you can either answer using a voice command or by pressing the "ACCEPT" action button on your controller. But there are also a couple of [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database", with which you can customize the behaviour in case of a question/confirmation for different situations. For example, using the "Engineer: Confirm Pitstop Preparation", you can specify, how the Engineer should behave, when he wants to prepare a pitstop. Three options are available:
+	 
+	 | Setting Value | Description |
+	 |---------------|-------------|
+	 | Never         | The Assistant will not ask you for confirmation, but will directly perform the task, as if you have answered with "Yes". This choice is very helpful, if you have fully disabled voice control and want the Assistants to be as autonomous as possible. |
+	 | Listening     | This choice will let the Assistant ask for confirmation if, and only if voice input is enabled. If this is not the case, the corresponding task is NOT performed. This is a good setting, if you want to use the Assistants only for information purposes or if the car is fully remote controlled by the "Race Center". |
+	 | Always        | This is the default for all confirmation settings. "Always" means, that the Assistant will ask for confirmation, even if voice input is disabled. In this case, you can either ignore the question (the task is not performed by the Assistant), or you can answer using the "ACCEPT" or "CANCEL" actions on your Button Box or Stream Deck. |
+
 #### Jona, the Virtual Race Engineer
 
 Release 2.1 introduced Jona, an artificial Race Engineer as an optional component of the Simulator Controller package. Since Jona is quite a complex piece of software with its natural language interface, it is fully covered in a separate [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer).

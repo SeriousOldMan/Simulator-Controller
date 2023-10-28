@@ -42,6 +42,7 @@
 	- [More Settings & Configurations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#more-settings--configurations)
   - [Using Simulator Controller](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#using-simulator-controller)
     - [Voice Commands](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#voice-commands)
+	  - [Non-standard voice configurations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#non-standard-voice-configurations)
     - [Controller Commands](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#controller-commands)
     - [External Commands](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#external-commands)
     - [Audio Routing](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#audio-routing)

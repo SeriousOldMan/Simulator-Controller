@@ -930,6 +930,9 @@ class SpeechSynthesizer {
 	}
 
 	setVoice(language, name) {
+		if (Trim(name) = "")
+			return false
+
 		if (this.Synthesizer = "Windows") {
 			if !inList(this.Voices, name)
 				return false
@@ -943,6 +946,9 @@ class SpeechSynthesizer {
 		}
 		else if ((this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure") || (this.Synthesizer = "Google")) {
 			name := string2Values("(", name)
+
+			if !inList(this.Voices, name[1])
+				return false
 
 			this.iLanguage := language
 			this.iVoice := name[1]

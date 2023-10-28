@@ -61,7 +61,7 @@ namespace Speech
             _continuousMode = enabled;
 
             if ((_engineType == "Server") && enabled)
-                throw new Exception("Not supported");
+                _serverRecognizer.SetContinuous(callback);
             else if ((_engineType == "Desktop") && enabled)
                 _desktopRecognizer.SetContinuous(callback);
         }

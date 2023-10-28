@@ -22,7 +22,6 @@
 #Include "CLR.ahk"
 #Include "HTTP.ahk"
 #Include "Task.ahk"
-#Include "SpeechSynthesizer.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;

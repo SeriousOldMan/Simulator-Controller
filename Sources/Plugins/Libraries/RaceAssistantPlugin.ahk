@@ -1426,7 +1426,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 				if (sessionTimeRemaining <= 0) {
 					leader := false
-					driver := {Car: driverCar, Lap: getMultiMapValue(data, "Position Data", "Car." . driverCar . ".Laps") + 1}
+					driver := {Car: driverCar, Finish: getMultiMapValue(data, "Position Data", "Car." . driverCar . ".Laps") + 1}
 				}
 
 				if (leader || driver) {

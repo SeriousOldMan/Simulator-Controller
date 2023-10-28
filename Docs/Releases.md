@@ -1,4 +1,4 @@
-## 5.4.3.1-release 10/27/23
+## 5.4.3.2-release 10/27/23
   1. Fixed a **crtical** bug for the voice synthesizer handling during configuration.
 
 ## 5.4.3.0-release 10/27/23

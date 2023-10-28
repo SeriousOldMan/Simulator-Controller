@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net.Http;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
@@ -91,10 +92,36 @@ namespace Speech
             return "Universal (" + GetLanguage() + ")";
         }
 
-        private WaveIn waveSource = null;
-        private WaveFileWriter waveFile = null;
         private bool recording = false;
 
+        /*
+        private string captureFileName = "";
+        private int recCounter = 0;
+
+        [DllImport("winmm.dll", EntryPoint = "mciSendStringA", CharSet = CharSet.Ansi, SetLastError = true, ExactSpelling = true)]
+        private static extern int mciSendString(string lpstrCommand, string lpstrReturnString, int uReturnLength, int hwndCallback);
+
+        private void StartRecording(string fileName)
+        {
+            captureFileName = fileName;
+
+            mciSendString("open new Type waveaudio Alias recsound" + recCounter++, "", 0, 0);
+            mciSendString("record recsound", "", 0, 0);
+
+            recording = true;
+        }
+
+        private void StopRecording()
+        {
+            mciSendString("save recsound" + recCounter + " " + captureFileName, "", 0, 0);
+
+            recording = false;
+        }
+        */
+
+        private WaveInEvent waveSource = null;
+        private WaveFileWriter waveFile = null;
+        
         private void StartRecording(string fileName)
         {
             void waveSource_DataAvailable(object sender, WaveInEventArgs e)
@@ -106,11 +133,27 @@ namespace Speech
                 }
             }
 
-            waveSource = new WaveIn();
+            void waveSource_RecordingStopped(object sender, StoppedEventArgs e)
+            {
+                if (waveSource != null)
+                {
+                    waveSource.Dispose();
+                    waveSource = null;
+                }
+
+                if (waveFile != null)
+                {
+                    waveFile.Dispose();
+                    waveFile = null;
+                }
+            }
+
+            waveSource = new WaveInEvent();
             waveSource.WaveFormat = new WaveFormat(44100, 1);
 
             waveSource.DataAvailable += new EventHandler<WaveInEventArgs>(waveSource_DataAvailable);
-            
+            // waveSource.RecordingStopped += new EventHandler<StoppedEventArgs>(waveSource_RecordingStopped);
+
             waveFile = new WaveFileWriter(fileName, waveSource.WaveFormat);
 
             recording = true;
@@ -137,7 +180,7 @@ namespace Speech
             waveSource = null;
             waveFile = null;
         }
-
+        
         public bool StartRecognizer(string fileName)
         {
             bool stopped = StopRecognizer();
@@ -162,7 +205,6 @@ namespace Speech
                 byte[] bytes = new byte[input.Length];
 
                 input.Position = 0;
-                input.SetLength(0);
                     
                 input.Read(bytes, 0, bytes.Length);
 

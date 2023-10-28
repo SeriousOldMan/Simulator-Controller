@@ -450,7 +450,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 				recognizer := "Google"
 
 			this.Value["voiceSynthesizer"] := inList(["Windows", "dotNET", "Azure", "Google"], synthesizer)
-			this.Value["voiceRecognizer"] := inList(["Server", "Desktop", "Azure"], recognizer)
+			this.Value["voiceRecognizer"] := inList(["Server", "Desktop", "Azure", "Google"], recognizer)
 
 			this.Value["azureSpeaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker.Azure", true)
 			this.Value["windowsSpeaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker.Windows", getMultiMapValue(configuration, "Voice Control", "Speaker", true))

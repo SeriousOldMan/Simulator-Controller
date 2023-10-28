@@ -389,7 +389,7 @@ class SpeechRecognizer {
 
 				if ((recognizer == true) && language) {
 					for ignore, recognizerDescriptor in this.getRecognizerList()
-						if ((recognizerDescriptor.Language = language) && ((this.Engine != "Google") || (recognizerDescriptor = "latest_short"))) {
+						if ((recognizerDescriptor.Language = language) && ((this.Engine != "Google") || (recognizerDescriptor.Model = "latest_short"))) {
 							recognizer := recognizerDescriptor.ID
 
 							found := true
@@ -455,10 +455,11 @@ class SpeechRecognizer {
 			}
 		}
 		else if (this.Engine = "Google") {
+			index := -1
+
 			for culture, models in kGoogleLanguages
 				for ignore, model in models {
-					index := A_Index - 1
-
+					index += 1
 					language := StrSplit(culture, "-")[1]
 
 					name := model
@@ -576,19 +577,25 @@ class SpeechRecognizer {
 	}
 
 	processAudio(audioFile) {
-		showMessage("Processing")
-
 		request := Map("config", Map("languageCode", this.Instance.GetLanguage(), "model", this.Instance.GetModel()
 								   , "useEnhanced", true)
 					 , "audio", Map("content", this.Instance.ReadAudio(audioFile)))
 
-		showMessage(this.Instance.ReadAudio(audioFile))
-
 		result := WinHttpRequest().POST("https://speech.googleapis.com/v1/speech:recognize?key=" . this.iGoogleAPIKey
 									  , JSON.print(request), Map("Content-Type", "application/json"), {Object: true, Encoding: "UTF-8"})
 
-		if ((result.Status >= 200) && (result.Status < 300))
-			this._onTextCallback(result.JSON["results"][1]["alternatives"][1]["transcript"])
+		if ((result.Status >= 200) && (result.Status < 300)) {
+			try {
+				result := result.JSON["results"][1]["alternatives"][1]["transcript"]
+			}
+			catch Any {
+				result := ""
+			}
+
+			showMessage(result)
+
+			this._onTextCallback(result)
+		}
 		else
 			throw "Error while speech recognition..."
 	}

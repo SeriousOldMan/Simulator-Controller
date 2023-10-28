@@ -357,3 +357,7 @@ Every phrase spoken by an Assistant has a unique name, "GreetingEngineer" in thi
 You may have noticed, that the grammar files support a kind of include mechanism. This is very helpful, since the Assistants share a set of common commands and domain specific fragments. To include a language specific file use the *#Include* statement:
 
 	#Include Fragments.de
+
+### Translation of "Simulator Setup"
+
+The setup and configuration tool "Simulator Setup" contains lots of help texts which are not handled as part of the normal user interface translation. Fruthermore, there exists no inheritance mechanism to introduce user specific translations. And to make things a lttile bit more complicated, these texts use HTML as their representation and contain embedded pictures. Any changes to the translations of the help texts must therefore be done in the normal development process. The translation files can be fon in *Resources\Setup\Translations* in the programm installation folder.

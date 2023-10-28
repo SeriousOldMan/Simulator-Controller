@@ -35,4 +35,4 @@
   
 #### General
   1. Choosing a specific color scheme and splash screen depending on the selected simulation game
-  2. Add support for Google Cloud Text 2 Speech and Speech 2 Text
+  2. Add support for Google Cloud Speech 2 Text

@@ -1114,9 +1114,13 @@ class RaceSpotter extends GridRaceAssistant {
 				}
 
 		if (number && validCar) {
-			speaker.speakPhrase("ConfirmFocusCar", {number: number}, true)
+			if this.Listener {
+				speaker.speakPhrase("ConfirmFocusCar", {number: number}, true)
 
-			this.setContinuation(VoiceManager.ReplyContinuation(this, ObjBindMethod(this, "updateFocusCar", number), "Roger", "Okay"))
+				this.setContinuation(VoiceManager.ReplyContinuation(this, ObjBindMethod(this, "updateFocusCar", number), "Roger", "Okay"))
+			}
+			else
+				this.updateFocusCar(number)
 
 			return
 		}
@@ -3042,11 +3046,15 @@ class RaceSpotter extends GridRaceAssistant {
 				this.shutdownSession("Before")
 
 				if ((this.SaveSettings == kAsk) && (this.Session == kSessionRace)) {
-					this.getSpeaker().speakPhrase("ConfirmSaveSettings", false, true)
+					if this.Listener {
+						this.getSpeaker().speakPhrase("ConfirmSaveSettings", false, true)
 
-					this.setContinuation(ObjBindMethod(this, "shutdownSession", "After"))
+						this.setContinuation(ObjBindMethod(this, "shutdownSession", "After"))
 
-					Task.startTask(ObjBindMethod(this, "forceFinishSession"), 120000, kLowPriority)
+						Task.startTask(ObjBindMethod(this, "forceFinishSession"), 120000, kLowPriority)
+					}
+					else
+						this.shutdownSession("After")
 
 					return
 				}

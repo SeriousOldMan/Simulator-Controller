@@ -4,8 +4,8 @@
   3. Integrated the Google Cloud Services for voice recognition.
   4. Many new [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database", to control the confirmation behaviour of the Assistants.
   
-## 5.4.3.1-release 10/27/23
-  1. Fixed a **crtical** bug for the voice synthesizer handling during configuration.
+## 5.4.3.2-release 10/27/23
+  1. Fixed a **critical** bug for the voice synthesizer handling during configuration.
 
 ## 5.4.3.0-release 10/27/23
   1. Minor bugfixes, as always

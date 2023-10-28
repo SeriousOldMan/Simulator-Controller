@@ -175,7 +175,7 @@ class RaceEngineer extends RaceAssistant {
 
 				if !this.supportsPitstop()
 					this.getSpeaker().speakPhrase("NoPitstop")
-				else if this.hasPlannedPitstop() {
+				else if (this.hasPlannedPitstop() && this.Listener) {
 					this.getSpeaker().speakPhrase("ConfirmRePlan")
 
 					this.setContinuation(ObjBindMethod(this, "planPitstopRecognized", words))
@@ -198,17 +198,21 @@ class RaceEngineer extends RaceAssistant {
 				else if !this.TeamSession {
 					this.getSpeaker().speakPhrase("NoDriverSwap")
 
-					if this.supportsPitstop() {
+					if (this.supportsPitstop() && this.Listener) {
 						this.getSpeaker().speakPhrase("ConfirmPlan", {forYou: this.getSpeaker().Fragments["ForYou"]}, true)
 
 						this.setContinuation(ObjBindMethod(this, "planPitstop"))
 					}
+					else if this.supportsPitstop()
+						this.planPitstop()
 				}
-				else if this.hasPlannedPitstop() {
+				else if (this.hasPlannedPitstop() && this.Listener) {
 					this.getSpeaker().speakPhrase("ConfirmRePlan")
 
 					this.setContinuation(ObjBindMethod(this, "driverSwapRecognized", words))
 				}
+				else if this.hasPlannedPitstop()
+					this.driverSwapRecognized(words)
 				else {
 					this.getSpeaker().speakPhrase("Confirm")
 
@@ -574,7 +578,7 @@ class RaceEngineer extends RaceAssistant {
 		local fillUp := false
 		local fuel, ignore, word, lap, remainingFuel
 
-		if !this.hasPlannedPitstop() {
+		if (!this.hasPlannedPitstop() && this.Listener) {
 			speaker.beginTalk()
 
 			try {
@@ -588,6 +592,8 @@ class RaceEngineer extends RaceAssistant {
 
 			this.setContinuation(ObjBindMethod(this, "planPitstop"))
 		}
+		else if !this.hasPlannedPitstop()
+			speaker.speakPhrase("NotPossible")
 		else {
 			for ignore, word in words
 				if (InStr(word, fragments["Liter"]) || InStr(word, "litre")) {
@@ -619,15 +625,26 @@ class RaceEngineer extends RaceAssistant {
 				}
 
 				if this.isNumber(fuel, &fuel) {
-					speaker.speakPhrase("ConfirmFuelChange", {fuel: fuel, unit: fragments[convert ? "Gallon" : "Liter"]}, true)
+					if this.Listener {
+						speaker.speakPhrase("ConfirmFuelChange", {fuel: fuel, unit: fragments[convert ? "Gallon" : "Liter"]}, true)
 
-					if convert
-						if (getUnit("Volume") = "Gallon (US)")
-							fuel := Ceil(fuel * 3.785411)
-						else
-							fuel := Ceil(fuel * 4.546092)
+						if convert
+							if (getUnit("Volume") = "Gallon (US)")
+								fuel := Ceil(fuel * 3.785411)
+							else
+								fuel := Ceil(fuel * 4.546092)
 
-					this.setContinuation(ObjBindMethod(this, "updatePitstopFuel", fuel))
+						this.setContinuation(ObjBindMethod(this, "updatePitstopFuel", fuel))
+					}
+					else {
+						if convert
+							if (getUnit("Volume") = "Gallon (US)")
+								fuel := Ceil(fuel * 3.785411)
+							else
+								fuel := Ceil(fuel * 4.546092)
+
+						this.updatePitstopFuel(fuel)
+					}
 
 					return
 				}

@@ -930,6 +930,9 @@ class SpeechSynthesizer {
 	}
 
 	setVoice(language, name) {
+		if (Trim(name) = "")
+			return false
+
 		if (this.Synthesizer = "Windows") {
 			if !inList(this.Voices, name)
 				return false

@@ -2,6 +2,7 @@
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Integrated the Google Cloud Services for voice recognition.
+  4. The session info components are now aligned at the top in "System Monitor".
 
 ## 5.4.3.0-release 10/27/23
   1. Minor bugfixes, as always

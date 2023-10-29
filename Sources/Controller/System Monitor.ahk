@@ -962,7 +962,7 @@ systemMonitor(command := false, arguments*) {
 			loop 3
 				columns[A_Index] := values2String("<br>", columns[A_Index]*)
 
-			html .= ("<tr><td style=`"padding-right: 25px`">" . values2String("</td><td style=`"padding-right: 25px`">", columns*) . "</td></tr>")
+			html .= ("<tr><td style=`"padding-right: 25px; vertical-align: top`">" . values2String("</td><td style=`"padding-right: 25px; vertical-align: top`">", columns*) . "</td></tr>")
 
 			return (html . "</table")
 		}
@@ -990,7 +990,7 @@ systemMonitor(command := false, arguments*) {
 				widgets.Push(false)
 		}
 
-		if (sessionState.Count > 0) {
+		if true || (sessionState.Count > 0) {
 			html := "<style>" . getTableCSS(systemMonitorGui) . " div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { text-align: center; font-size: 12px; background-color: #" . systemMonitorGui.Theme.TableColor["Header"] . "; } </style><table>"
 
 			widgets := []

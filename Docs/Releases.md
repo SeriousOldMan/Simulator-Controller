@@ -4,6 +4,7 @@
   3. Integrated the Google Cloud Services for voice recognition. Additional info has been added to the [documentation]().
   4. The session info components are now aligned at the top in "System Monitor".
   5. Many new [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database", to control the confirmation behaviour of the Assistants. See the new [documentation about non-standard configurations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#non-standard-voice-configurations) for more information.
+  6. The actually driven time so far is now shown in the "Duration" widget on the session info page of "System Monitor".
   
 ## 5.4.3.2-release 10/27/23
   1. Fixed a **critical** bug for the voice synthesizer handling during configuration.

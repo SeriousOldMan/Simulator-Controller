@@ -29,6 +29,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	static sAssistants := []
 
 	static sSession := 0 ; kSessionFinished
+	static sStintStartTime := false
 	static sLastLap := 0
 	static sLapRunning := 0
 	static sAssistantWaitForShutdown := 0
@@ -1025,6 +1026,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 	static initializeAssistantsState() {
 		RaceAssistantPlugin.sSession := kSessionFinished
+		RaceAssistantPlugin.sStintStartTime := false
 		RaceAssistantPlugin.sLastLap := 0
 		RaceAssistantPlugin.sLapRunning := 0
 		RaceAssistantPlugin.sInPit := false
@@ -1117,6 +1119,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 		if RaceAssistantPlugin.Simulator {
 			RaceAssistantPlugin.sSession := RaceAssistantPlugin.getSession(data)
+			RaceAssistantPlugin.sStintStartTime := false
 			RaceAssistantPlugin.sFinish := false
 
 			for ignore, assistant in RaceAssistantPlugin.Assistants
@@ -1193,6 +1196,11 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	static addAssistantsLap(data, telemetryData, positionsData) {
 		local ignore, assistant
 
+		if RaceAssistantPlugin.sStintStartTime {
+			setMultiMapValue(data, "Stint Data", "StartTime", RaceAssistantPlugin.sStintStartTime)
+			setMultiMapValue(telemetryData, "Stint Data", "StartTime", RaceAssistantPlugin.sStintStartTime)
+		}
+
 		if RaceAssistantPlugin.TeamSessionActive
 			RaceAssistantPlugin.TeamServer.addLap(RaceAssistantPlugin.LastLap, telemetryData, positionsData)
 
@@ -1203,6 +1211,11 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 	static updateAssistantsLap(data, telemetryData, positionsData) {
 		local ignore, assistant
+
+		if RaceAssistantPlugin.sStintStartTime {
+			setMultiMapValue(data, "Stint Data", "StartTime", RaceAssistantPlugin.sStintStartTime)
+			setMultiMapValue(telemetryData, "Stint Data", "StartTime", RaceAssistantPlugin.sStintStartTime)
+		}
 
 		if RaceAssistantPlugin.TeamSessionActive
 			RaceAssistantPlugin.TeamServer.updateLap(RaceAssistantPlugin.LastLap, RaceAssistantPlugin.LapRunning, data, telemetryData, positionsData)
@@ -2180,6 +2193,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 						; Car is in the Pit
 
 						if !RaceAssistantPlugin.InPit {
+							RaceAssistantPlugin.sStintStartTime := false
+
 							RaceAssistantPlugin.performAssistantsPitstop(dataLastLap)
 
 							RaceAssistantPlugin.sInPit := dataLastLap
@@ -2187,6 +2202,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					}
 					else if (dataLastLap == 0) {
 						; Waiting for the car to cross the start line for the first time
+
+						RaceAssistantPlugin.sStintStartTime := false
 
 						RaceAssistantPlugin.WaitForShutdown[true] := false
 
@@ -2204,6 +2221,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 								teamSessionActive := RaceAssistantPlugin.connectTeamSession()
 
+								RaceAssistantPlugin.sStintStartTime := false
+
 								if (teamSessionActive && RaceAssistantPlugin.TeamServer.Connected) {
 									if !RaceAssistantPlugin.driverActive(data) {
 										RaceAssistantPlugin.TeamServer.State["Driver"] := "Mismatch"
@@ -2220,6 +2239,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 							}
 							else if (RaceAssistantPlugin.LastLap < (dataLastLap - 1)) {
 								; Regained the car after a driver swap, stint
+
+								RaceAssistantPlugin.sStintStartTime := false
 
 								if !RaceAssistantPlugin.driverActive(data) {
 									RaceAssistantPlugin.TeamServer.State["Driver"] := "Mismatch"
@@ -2256,6 +2277,9 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 						}
 
 						if newLap {
+							if !RaceAssistantPlugin.sStintStartTime
+								RaceAssistantPlugin.sStintStartTime := DateAdd(A_Now, - Round(getMultiMapValue(data, "Stint Data", "LapLastTime", 0) / 1000), "Seconds")
+
 							RaceAssistantPlugin.sLastLap := dataLastLap
 							RaceAssistantPlugin.sLapRunning := 0
 

@@ -1247,7 +1247,7 @@ class RaceAssistant extends ConfigurationItem {
 	createSessionInfo(lapNumber, valid, data, simulator, car, track) {
 		local knowledgeBase := this.KnowledgeBase
 		local sessionInfo := newMultiMap()
-		local tyreWear, brakeWear
+		local tyreWear, brakeWear, duration
 
 		static sessionTypes
 
@@ -1267,10 +1267,14 @@ class RaceAssistant extends ConfigurationItem {
 			setMultiMapValue(sessionInfo, "Session", "Laps.Remaining", Ceil(knowledgeBase.getValue("Lap.Remaining.Session", 0)))
 			setMultiMapValue(sessionInfo, "Session", "Time.Remaining", Round(getMultiMapValue(data, "Session Data", "SessionTimeRemaining", 0) / 1000))
 
+			duration := getMultiMapValue(data, "Stint Data", "StartTime", false)
+
+			if duration
+				setMultiMapValue(sessionInfo, "Stint", "DriveTime", DateDiff(A_Now, duration, "Seconds"))
+
 			setMultiMapValue(sessionInfo, "Stint", "Driver", driverName(getMultiMapValue(data, "Stint Data", "DriverForname", this.DriverForName)
 																	  , getMultiMapValue(data, "Stint Data", "DriverSurname", "Doe")
 																	  , getMultiMapValue(data, "Stint Data", "DriverNickname", "JD")))
-			setMultiMapValue(sessionInfo, "Stint", "Laps", lapNumber)
 			setMultiMapValue(sessionInfo, "Stint", "Position", knowledgeBase.getValue("Position", 0))
 			setMultiMapValue(sessionInfo, "Stint", "Valid", valid)
 			setMultiMapValue(sessionInfo, "Stint", "Fuel.AvgConsumption", Round(knowledgeBase.getValue("Lap." . lapNumber . ".Fuel.AvgConsumption", 0), 1))

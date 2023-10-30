@@ -387,6 +387,7 @@ systemMonitor(command := false, arguments*) {
 	}
 
 	createDurationWidget(sessionState) {
+		local driveTime := getMultiMapValue(sessionState, "Stint", "DriveTime", false)
 		local sessionTime := getMultiMapValue(sessionState, "Session", "Time.Remaining", kUndefined)
 		local stintTime := getMultiMapValue(sessionState, "Stint", "Time.Remaining.Stint", kUndefined)
 		local driverTime := getMultiMapValue(sessionState, "Stint", "Time.Remaining.Driver", kUndefined)
@@ -425,6 +426,9 @@ systemMonitor(command := false, arguments*) {
 			}
 			else
 				html .= ("<tr><th class=`"th-std th-left`">" . translate("Time Left") . "</th><td class=`"td-wdg`">" . remainingSessionTime . "</td></tr>")
+
+			if driveTime
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Drive Time") . "</th><td class=`"td-wdg`">" . displayValue("Time", driveTime) . "</td></tr>")
 
 			if (sessionLaps != stintLaps) {
 				html .= ("<tr><th class=`"th-std th-left`">" . translate("Laps Left (Session)") . "</th><td class=`"td-wdg`">" . sessionLaps . "</td></tr>")

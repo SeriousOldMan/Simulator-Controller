@@ -1,7 +1,7 @@
 ## 5.4.4.0-release 11/03/23 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
-  3. Integrated the Google Cloud Services for voice recognition. Additional info has been added to the [documentation]().
+  3. Integrated the Google Cloud Services for voice recognition. Additional info has been added to the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#google-speech-services).
   4. The session info components are now aligned at the top in "System Monitor".
   5. Many new [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database", to control the confirmation behaviour of the Assistants. See the new [documentation about non-standard configurations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#non-standard-voice-configurations) for more information.
   6. The actually driven time so far is now shown in the "Duration" widget on the session info page of "System Monitor".

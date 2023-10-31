@@ -21,25 +21,29 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\Libraries\CLR.ahk"
+#Include "..\Libraries\Messages.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-getControllerState(configuration := kUndefined) {
+getControllerState(configuration?, force := false) {
 	local load := true
 	local pid, tries, options, exePath, fileName
 
-	if (configuration == false)
-		load := false
-	else if (configuration = kUndefined)
+	if !isSet(configuration)
 		configuration := false
+	else if (configuration == false)
+		load := false
 
 	pid := ProcessExist("Simulator Controller.exe")
 
-	if (isProperInstallation() && load && !pid && (configuration || !FileExist(kTempDirectory . "Simulator Controller.state")))
-		if FileExist(kUserConfigDirectory . "Simulator Controller.install")
+	if force
+		deleteFile(kTempDirectory . "Simulator Controller.state")
+
+	if (isProperInstallation() && load && FileExist(kUserConfigDirectory . "Simulator Controller.install"))
+		if (!pid && (configuration || !FileExist(kTempDirectory . "Simulator Controller.state"))) {
 			try {
 				if configuration {
 					fileName := temporaryFileName("Config", "ini")
@@ -60,21 +64,37 @@ getControllerState(configuration := kUndefined) {
 				tries := 30
 
 				while (tries > 0) {
-					Sleep(200)
-
 					if !ProcessExist(pid)
 						break
+
+					Sleep(200)
 				}
 
 				if configuration
 					deleteFile(fileName)
+
+				pid := false
 			}
 			catch Any as exception {
 				logMessage(kLogCritical, translate("Cannot start Simulator Controller (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
 
 				return newMultiMap()
 			}
+		}
+		else if (pid && !FileExist(kTempDirectory . "Simulator Controller.state")) {
+			sendMessage(kFileMessage, "Controller", "writeControllerState", pid)
 
+			Sleep(1000)
+
+			tries := 30
+
+			while (tries > 0) {
+				if FileExist(kTempDirectory . "Simulator Controller.state")
+					break
+
+				Sleep(200)
+			}
+		}
 
 	return readMultiMap(kTempDirectory . "Simulator Controller.state")
 }

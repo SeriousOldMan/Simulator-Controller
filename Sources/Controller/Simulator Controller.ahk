@@ -2164,19 +2164,12 @@ initializeSimulatorController() {
 		updateTrayMessageState(settings)
 
 	argIndex := inList(A_Args, "-Voice")
-	voice := false
 
-	if argIndex
-		voice := A_Args[argIndex + 1]
-	else
-		voice := ProcessExist("Voice Server.exe")
-
-	configuration := kSimulatorConfiguration
+	voice := (argIndex ? A_Args[argIndex + 1] : ProcessExist("Voice Server.exe"))
 
 	argIndex := inList(A_Args, "-Configuration")
 
-	if argIndex
-		configuration := readMultiMap(A_Args[argIndex + 1])
+	configuration := (argIndex ? readMultiMap(A_Args[argIndex + 1]) : kSimulatorConfiguration)
 
 	protectionOn()
 

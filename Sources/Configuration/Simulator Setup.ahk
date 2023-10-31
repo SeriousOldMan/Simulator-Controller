@@ -2601,15 +2601,15 @@ class StartStepWizard extends StepWizard {
 		local labelWidth, labelX, labelY, info
 
 		elevateAndRestart(*) {
-			if !A_IsAdmin {				
+			if !A_IsAdmin {
 				if RegExMatch(DllCall("GetCommandLine", "Str"), " /restart(?!\S)") {
 					OnMessage(0x44, translateOkButton)
 					MsgBox(translate("Simulator Controller cannot request Admin priviliges. Please enable User Account Control."), translate("Error"), 262160)
 					OnMessage(0x44, translateOkButton, 0)
-					
+
 					ExitApp(0)
 				}
-		
+
 				try {
 					if this.SetupWizard.Initialize
 						deleteFile(kUserHomeDirectory . "Setup\Setup.data")
@@ -3004,6 +3004,10 @@ initializeSimulatorSetup() {
 
 	if wizard.Debug[kDebugKnowledgeBase]
 		SupportMenu.Check(label)
+
+	if !exitProcesses("Setup", "Before you can work on the configuration, other Simulator Controller applications must be closed."
+					, false, true, ["Simulator Setup", "Simulator Startup", "Simulator Tools"])
+		ExitApp(0)
 
 	if !isDebug()
 		showSplashScreen("Rotating Brain")

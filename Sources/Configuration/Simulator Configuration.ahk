@@ -495,6 +495,10 @@ initializeSimulatorConfiguration() {
 
 	protectionOn()
 
+	if !exitProcesses("Configuration", "Before you can work on the configuration, other Simulator Controller applications must be closed."
+					, false, true, ["Simulator Configuration", "Simulator Startup", "Simulator Tools"])
+		ExitApp(0)
+
 	if (GetKeyState("Ctrl") && GetKeyState("Shift")) {
 		OnMessage(0x44, translateYesNoButtons)
 		msgResult := MsgBox(translate("Do you really want to start with a fresh configuration?"), translate("Configuration"), 262436)

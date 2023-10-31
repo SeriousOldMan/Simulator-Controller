@@ -162,7 +162,7 @@ editModes(&settingsOrCommand, arguments*) {
 		selectedSession := false
 		simulatorSessions := []
 
-		configuration := getControllerState(false, true)
+		configuration := getControllerState(true, true)
 
 		for simulator, options in getMultiMapValues(configuration, "Simulators")
 			simulators.Push(simulator)

@@ -77,7 +77,7 @@ installTrayMenu(update := false) {
 	else {
 		A_TrayMenu.Delete()
 
-		A_TrayMenu.Add(label, exitApplication)
+		A_TrayMenu.Add(label, (*) => exitProcess())
 	}
 
 	try {

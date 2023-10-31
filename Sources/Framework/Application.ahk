@@ -31,17 +31,6 @@
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-doApplications(applications, callback) {
-	local ignore, application, pid
-
-	for ignore, application in applications {
-		pid := ProcessExist(InStr(application, ".exe") ? application : (application . ".exe"))
-
-		if pid
-			callback.Call(pid)
-	}
-}
-
 consentDialog(id, consent := false, *) {
 	local language, texts, chosen, x, y, rootDirectory, ignore, section, keyValues, key, value
 	local consentGui
@@ -386,14 +375,6 @@ checkForUpdates() {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
-
-broadcastMessage(applications, message, arguments*) {
-	if (arguments.Length > 0)
-		doApplications(applications, messageSend.Bind(kFileMessage, "Core", message . ":" . values2String(";", arguments*)))
-	else
-		doApplications(applications, messageSend.Bind(kFileMessage, "Core", message))
-
-}
 
 viewHTML(fileName, title := false, x := kUndefined, y := kUndefined, width := 800, height := 400, *) {
 	local html, innerWidth, editHeight, buttonX

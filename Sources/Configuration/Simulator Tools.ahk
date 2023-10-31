@@ -328,55 +328,6 @@ uninstallOptions(options, *) {
 	}
 }
 
-exitProcesses(silent := false, force := false) {
-	local pid, hasFGProcesses, hasBGProcesses, ignore, app, title, translator, msgResult
-
-	pid := ProcessExist()
-
-	while true {
-		hasFGProcesses := false
-		hasBGProcesses := false
-
-		for ignore, app in kForegroundApps
-			if ProcessExist(app . ".exe") {
-				hasFGProcesses := true
-
-				break
-			}
-
-		for ignore, app in kBackgroundApps
-			if (ProcessExist(app ".exe") != pid) {
-				hasBGProcesses := true
-
-				break
-			}
-
-		if (hasFGProcesses && !silent) {
-			translator := translateMsgBoxButtons.Bind(["Continue", "Cancel"])
-
-			OnMessage(0x44, translator)
-			msgResult := MsgBox(translate("Before you can run the update, you must first close all running Simulator Controller applications (not Simulator Tools)."), translate("Installation"), 8500)
-			OnMessage(0x44, translator, 0)
-
-			if (msgResult = "Yes")
-				continue
-			else
-				return false
-		}
-
-		if hasFGProcesses
-			if force
-				broadcastMessage(kForegroundApps, "exitApplication")
-			else
-				return false
-
-		if hasBGProcesses
-			broadcastMessage(remove(kBackgroundApps, "Simulator Tools"), "exitApplication")
-
-		return true
-	}
-}
-
 checkInstallation() {
 	global gProgressCount
 
@@ -572,7 +523,8 @@ checkInstallation() {
 			ExitApp(0)
 		}
 
-		if !exitProcesses()
+		if !exitProcesses("Installation", "Before you can run the update, you must first close all running Simulator Controller applications (not Simulator Tools)."
+						, false, false, ["Simulator Tools"])
 			ExitApp(1)
 
 		options := {InstallType: getMultiMapValue(installInfo, "Install", "Type", "Registry")
@@ -681,7 +633,8 @@ checkInstallation() {
 			isNew := !FileExist(installLocation)
 
 			if !isNew
-				if !exitProcesses()
+				if !exitProcesses("Installation", "Before you can run the update, you must first close all running Simulator Controller applications (not Simulator Tools)."
+								, false, false, ["Simulator Tools"])
 					ExitApp(1)
 
 			options := {InstallType: getMultiMapValue(installInfo, "Install", "Type", "Registry")
@@ -3097,7 +3050,8 @@ startupSimulatorTools() {
 
 	if !updateOnly {
 		if forceExit
-			exitProcesses(true, true)
+			exitProcesses("Installation", "Before you can run the update, you must first close all running Simulator Controller applications (not Simulator Tools)."
+						, true, true, ["Simulator Tools"])
 
 		runCleanTargets(&buildProgress)
 

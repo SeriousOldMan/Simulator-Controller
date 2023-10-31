@@ -475,7 +475,7 @@ launchPad(command := false, arguments*) {
 	else if (command = kRestart)
 		result := kRestart
 	else if (command = "Close All") {
-		broadcastMessage(concatenate(kBackgroundApps, remove(kForegroundApps, "Simulator Startup")), "exitApplication")
+		broadcastMessage(concatenate(kBackgroundApps, remove(kForegroundApps, "Simulator Startup")), "exitProcess")
 
 		Sleep(2000)
 

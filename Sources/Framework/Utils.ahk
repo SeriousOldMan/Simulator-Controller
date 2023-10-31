@@ -25,6 +25,22 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                    Private Function Declaration Section                 ;;;
+;;;-------------------------------------------------------------------------;;;
+
+doApplications(applications, callback) {
+	local ignore, application, pid
+
+	for ignore, application in applications {
+		pid := ProcessExist(InStr(application, ".exe") ? application : (application . ".exe"))
+
+		if pid
+			callback.Call(pid)
+	}
+}
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -36,6 +52,8 @@ getControllerState(configuration?, force := false) {
 		configuration := false
 	else if (configuration == false)
 		load := false
+	else if (configuration == true)
+		configuration := false
 
 	pid := ProcessExist("Simulator Controller.exe")
 
@@ -63,7 +81,7 @@ getControllerState(configuration?, force := false) {
 
 				tries := 30
 
-				while (tries > 0) {
+				while (tries-- > 0) {
 					if !ProcessExist(pid)
 						break
 
@@ -81,14 +99,15 @@ getControllerState(configuration?, force := false) {
 				return newMultiMap()
 			}
 		}
-		else if (pid && !FileExist(kTempDirectory . "Simulator Controller.state")) {
-			sendMessage(kFileMessage, "Controller", "writeControllerState", pid)
+		else if (!FileExist(kTempDirectory . "Simulator Controller.state") && pid && (StrSplit(A_ScriptName, ".")[1] != "Simulator Controller")) {
+			if (pid != ProcessExist())
+				messageSend(kFileMessage, "Controller", "writeControllerState", pid)
 
 			Sleep(1000)
 
 			tries := 30
 
-			while (tries > 0) {
+			while (tries-- > 0) {
 				if FileExist(kTempDirectory . "Simulator Controller.state")
 					break
 
@@ -220,5 +239,77 @@ callSimulator(simulator, options := "", protocol?) {
 
 			return callSimulator(simulator, options, "EXE")
 		}
+	}
+}
+
+broadcastMessage(applications, message, arguments*) {
+	if (arguments.Length > 0)
+		doApplications(applications, messageSend.Bind(kFileMessage, "Core", message . ":" . values2String(";", arguments*)))
+	else
+		doApplications(applications, messageSend.Bind(kFileMessage, "Core", message))
+
+}
+
+exitProcess() {
+	ExitApp(0)
+}
+
+exitProcesses(title, message, silent := false, force := false, excludes := []) {
+	local pid, hasFGProcesses, hasBGProcesses, ignore, app, translator, msgResult, processes
+
+	computeTargets(targets) {
+		local ignore, exclude
+
+		for ignore, exclude in excludes
+			targets := remove(targets, exclude)
+
+		return targets
+	}
+
+	pid := ProcessExist()
+
+	while true {
+		hasFGProcesses := false
+		hasBGProcesses := false
+
+		for ignore, app in kForegroundApps
+			if (ProcessExist(app . ".exe") && !inList(excludes, app)) {
+				hasFGProcesses := true
+
+				break
+			}
+
+		for ignore, app in kBackgroundApps
+			if (ProcessExist(app ".exe") && (ProcessExist(app ".exe") != pid) && !inList(excludes, app)) {
+				hasBGProcesses := true
+
+				break
+			}
+
+		if (hasFGProcesses && !silent) {
+			translator := translateMsgBoxButtons.Bind(["Continue", "Cancel"])
+
+			OnMessage(0x44, translator)
+			msgResult := MsgBox(translate(message), translate(title), 8500)
+			OnMessage(0x44, translator, 0)
+
+			if (msgResult = "Yes") {
+				if !force
+					continue
+			}
+			else
+				return false
+		}
+
+		if hasFGProcesses
+			if force
+				broadcastMessage(computeTargets(kForegroundApps), "exitProcess")
+			else
+				return false
+
+		if hasBGProcesses
+			broadcastMessage(computeTargets(kBackgroundApps), "exitProcess")
+
+		return true
 	}
 }

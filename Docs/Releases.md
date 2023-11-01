@@ -6,6 +6,7 @@
   5. Many new [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database", to control the confirmation behaviour of the Assistants. See the new [documentation about non-standard configurations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#non-standard-voice-configurations) for more information.
   6. The actually driven time so far is now shown in the "Duration" widget on the session info page of "System Monitor".
   7. It is now enforced to close other applications before working on the configuration.
+  8. [Developer only] A file "Translations.report" is now stored in the *Temp* directory with information about missing or erroneous translations, if *Debug* mode is enabled.
   
 ## 5.4.3.2-release 10/27/23
   1. Fixed a **critical** bug for the voice synthesizer handling during configuration.

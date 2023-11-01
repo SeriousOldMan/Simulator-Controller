@@ -415,7 +415,35 @@ availableLanguages() {
 readTranslations(targetLanguageCode, withUserTranslations := true, fromEditor := false) {
 	local fileNames := []
 	local fileName := (kTranslationsDirectory . "Translations." . targetLanguageCode)
-	local translations, translation, ignore, enString
+	local translations := CaseInsenseMap()
+	local translation, ignore, enString, missingTranslations, inconsistentTranslations
+
+	readOriginals() {
+		local fileNames := [kTranslationsDirectory . "Translations.EN"]
+		local fileName, orginals, translation, ignore
+
+		fileName := (kUserTranslationsDirectory . "Translations.EN")
+
+		if FileExist(fileName)
+			fileNames.Push(fileName)
+
+		originals := CaseInsenseMap()
+
+		for ignore, fileName in fileNames
+			loop Read, fileName {
+				translation := A_LoopReadLine
+
+				if ((Trim(translation) != "") && (SubStr(translation, 1, 1) != "[")) {
+					translation := StrReplace(translation, "\=", "=")
+					translation := StrReplace(translation, "\\", "\")
+					translation := StrReplace(translation, "\n", "`n")
+
+					originals[StrSplit(translation, "=>")[1]] := true
+				}
+			}
+
+		return originals
+	}
 
 	if FileExist(fileName)
 		fileNames.Push(fileName)
@@ -428,6 +456,9 @@ readTranslations(targetLanguageCode, withUserTranslations := true, fromEditor :=
 	}
 
 	translations := CaseInsenseMap()
+
+	if isDebug()
+		inconsistentTranslations := CaseInsenseMap()
 
 	for ignore, fileName in fileNames
 		loop Read, fileName {
@@ -444,14 +475,32 @@ readTranslations(targetLanguageCode, withUserTranslations := true, fromEditor :=
 				if ((SubStr(enString, 1, 1) != "[") && (fromEditor || (targetLanguageCode != "en")))
 					if (!fromEditor && ((translation.Length < 2) || (translations.Has(enString) && (translations[enString] != translation[2])))) {
 						if isDebug()
-							throw "Inconsistent translation encountered for `"" . enString . "`" in readTranslations..."
-						else
-							logError("Inconsistent translation encountered for `"" . enString . "`" in readTranslations...", true)
+							inconsistentTranslations[enString] := true
 					}
 					else
 						translations[enString] := ((translation.Length < 2) ? "" : translation[2])
 			}
 		}
+
+	if (isDebug() && (targetLanguageCode != "en")) {
+		missingTranslations := CaseInsenseMap()
+
+		for enString, ignore in readOriginals()
+			if !translations.Has(enString)
+				missingTranslations[enString] := true
+
+		deleteFile(kTempDirectory . "Translations.report")
+
+		FileAppend("Missing:`n", kTempDirectory . "Translations.report")
+
+		for enString, ignore in missingTranslations
+			FileAppend("`n" . enString, kTempDirectory . "Translations.report")
+
+		FileAppend("`n`nInconsistent:`n", kTempDirectory . "Translations.report")
+
+		for enString, ignore in inconsistentTranslations
+			FileAppend("`n" . enString, kTempDirectory . "Translations.report")
+	}
 
 	return translations
 }
@@ -514,7 +563,9 @@ translate(string, targetLanguageCode := false) {
 	static currentLanguageCode := "en"
 	static translations := false
 
-	if (targetLanguageCode && (targetLanguageCode != gTargetLanguageCode)) {
+	if (targetLanguageCode && (targetLanguageCode = "en"))
+		return string
+	else if (targetLanguageCode && (targetLanguageCode != gTargetLanguageCode)) {
 		theTranslations := readTranslations(targetLanguageCode)
 
 		if theTranslations.Has(string) {

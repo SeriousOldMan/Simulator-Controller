@@ -7,7 +7,11 @@
   6. The actually driven time so far is now shown in the "Duration" widget on the session info page of "System Monitor".
   7. It is now enforced to close other applications before working on the configuration in "Simulator Setup" or "Simulator Configuration".
   8. [Developer only] A file "Translations.report" is now stored in the *Temp* directory with information about missing or erroneous translations, if *Debug* mode is enabled.
-  
+  9. New car models for "Setup Workbench":
+     - Assetto Corsa
+	   - Toyota Supra MKIV
+	   - Toyota GT86
+		
 ## 5.4.3.2-release 10/27/23
   1. Fixed a **critical** bug for the voice synthesizer handling during configuration.
 

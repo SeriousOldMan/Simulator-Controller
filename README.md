@@ -49,7 +49,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[5.4.4.0-dev](https://www.dropbox.com/scl/fi/qrbi8lw4rg754pcaj2jyi/Simulator-Controller-5.4.4.0-dev.zip?rlkey=dy15ykm4x72zaf5zl9nkouc4n&dl=1) (Early build for 5.4.4. Changes: Google STT integration, New settings for confirmation handling by the Assistants, Optical enhancement for session info in "System Monitor", Drive time in session info widget in "System Monitor", Improved process management when working on the configuration.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-544) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

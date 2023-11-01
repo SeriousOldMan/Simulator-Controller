@@ -1,8 +1,8 @@
 [Development]
 Version=5.4.4.0-dev
 Target=5.4.4.0-release
-Date=10/31/2023
-Download=
+Date=11/01/2023
+Download=https://www.dropbox.com/scl/fi/qrbi8lw4rg754pcaj2jyi/Simulator-Controller-5.4.4.0-dev.zip?rlkey=dy15ykm4x72zaf5zl9nkouc4n&dl=1
 Changes=Google STT integration, New settings for confirmation handling by the Assistants, Optical enhancement for session info in "System Monitor", Drive time in session info widget in "System Monitor", Improved process management when working on the configuration
 Components=Media->5.3.0,Configuration->5.4.0,Utilities->5.3.0
 [Release]

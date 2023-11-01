@@ -140,13 +140,13 @@ Normally you will use a standard configuration for voice control, which means, t
 
   4. Confirmation behaviour
   
-     This is more or less independent of the voice configuration. There are many cases, in which the Assistants ask you a question and wait then for your confirmation. In this case, you can either answer using a voice command or by pressing the "ACCEPT" action button on your controller. But there are also a couple of [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database", with which you can customize the behaviour in case of a question/confirmation for different situations. For example, using the "Engineer: Confirm Pitstop Preparation", you can specify, how the Engineer should behave, when he wants to prepare a pitstop. Three options are available:
+     This is more or less independent of the voice configuration. There are many cases, in which the Assistants ask you a question and wait then for your confirmation. In this case, you can either answer using a voice command or by pressing the "Accept" action button on your controller. But there are also a couple of [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database", with which you can customize the behaviour in case of a question/confirmation for different situations. For example, using the "Engineer: Confirm Pitstop Preparation", you can specify, how the Engineer should behave, when he wants to prepare a pitstop. Three options are available:
 	 
 	 | Setting Value | Description |
 	 |---------------|-------------|
 	 | Never         | The Assistant will not ask you for confirmation, but will directly perform the task, as if you have answered with "Yes". This choice is very helpful, if you have fully disabled voice control and want the Assistants to be as autonomous as possible. |
 	 | Listening     | This choice will let the Assistant ask for confirmation if, and only if voice input is enabled. If this is not the case, the corresponding task is NOT performed. This is a good setting, if you want to use the Assistants only for information purposes or if the car is fully remote controlled by the "Race Center". |
-	 | Always        | This is the default for all confirmation settings. "Always" means, that the Assistant will ask for confirmation, even if voice input is disabled. In this case, you can either ignore the question (the task is not performed by the Assistant), or you can answer using the "ACCEPT" or "CANCEL" actions on your Button Box or Stream Deck. |
+	 | Always        | This is the default for all confirmation settings. "Always" means, that the Assistant will ask for confirmation, even if voice input is disabled. In this case, you can either ignore the question (the task is not performed by the Assistant), or you can answer using the "Accept" or "Reject" actions on your Button Box or Stream Deck. |
 
 #### Jona, the Virtual Race Engineer
 

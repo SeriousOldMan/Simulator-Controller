@@ -637,7 +637,7 @@ class ACCPitstopTester extends Plugin {
 ;;;-------------------------------------------------------------------------;;;
 
 readSimulatorData(simulator, options := "", protocol := "SHM") {
-	exePath := kBinariesDirectory . simulator . A_Space . protocol . " Provider.exe"
+	exePath := kBinariesDirectory . "Providers\" . simulator . A_Space . protocol . " Provider.exe"
 
 	FileCreateDir %kTempDirectory%%simulator% Data
 

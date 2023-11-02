@@ -62,7 +62,7 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	sendPitstopCommand(command, operation, message, arguments*) {
-		local exePath := (kBinariesDirectory . "IRC SHM Connector.dll")
+		local exePath := (kBinariesDirectory . "Connectors\" . "IRC SHM Connector.dll")
 
 		if this.iCurrentPitstopMFD
 			try {

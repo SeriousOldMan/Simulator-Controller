@@ -80,7 +80,7 @@ generatePassword(length) {
 
 administrationEditor(configurationOrCommand, arguments*) {
 	local task, ignore, identifier, type, which, contract
-	local dllName, dllFile, sessionDB, connection, administrationConfig
+	local dllFile, sessionDB, connection, administrationConfig
 	local x, y, w, h, width, x0, x1, w1, w2, x2, w4, x4, w3, x3, x4, x5, w5, x6, x7
 	local button, administrationTab, progress, compacting
 
@@ -672,8 +672,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 		}
 	}
 	else {
-		dllName := "Team Server Connector.dll"
-		dllFile := kBinariesDirectory . dllName
+		dllFile := (kBinariesDirectory . "Connectors\Team Server Connector.dll")
 
 		try {
 			if (!FileExist(dllFile)) {

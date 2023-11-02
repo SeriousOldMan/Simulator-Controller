@@ -92,14 +92,13 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 	}
 
 	__New(editor, configuration := false) {
-		local dllName, dllFile
+		local dllFile
 
 		this.Editor := editor
 
 		super.__New(configuration)
 
-		dllName := "Team Server Connector.dll"
-		dllFile := kBinariesDirectory . dllName
+		dllFile := (kBinariesDirectory . "Connectors\Team Server Connector.dll")
 
 		try {
 			if (!FileExist(dllFile)) {

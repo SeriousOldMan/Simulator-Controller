@@ -174,13 +174,12 @@ class StreamDeck extends FunctionController {
 	}
 
 	__New(name, layout, controller, configuration) {
-		local dllName, dllFile
+		local dllFile
 
 		this.iName := name
 		this.iLayout := layout
 
-		dllName := "SimulatorControllerPluginConnector.dll"
-		dllFile := kBinariesDirectory . dllName
+		dllFile := (kBinariesDirectory . "Connectors\SimulatorControllerPluginConnector.dll")
 
 		try {
 			if !FileExist(dllFile)

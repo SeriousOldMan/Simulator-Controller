@@ -1165,12 +1165,11 @@ class RaceCenter extends ConfigurationItem {
 
 	__New(configuration, raceSettings) {
 		local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-		local dllName, dllFile
+		local dllFile
 
 		this.iRaceSettings := raceSettings
 
-		dllName := "Team Server Connector.dll"
-		dllFile := kBinariesDirectory . dllName
+		dllFile := (kBinariesDirectory . "Connectors\Team Server Connector.dll")
 
 		try {
 			if !FileExist(dllFile) {

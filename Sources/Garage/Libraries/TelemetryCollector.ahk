@@ -272,7 +272,7 @@ class TelemetryCollector {
 
 				code := SessionDatabase.getSimulatorCode(this.Simulator)
 
-				Run(kBinariesDirectory . code . " SHM Spotter.exe " . options, kBinariesDirectory, "Hide", &pid)
+				Run(kBinariesDirectory . "Providers\" . code . " SHM Spotter.exe " . options, kBinariesDirectory, "Hide", &pid)
 
 				this.iCalibrate := calibrate
 				this.iDataFile := dataFile
@@ -281,7 +281,7 @@ class TelemetryCollector {
 				logError(exception, true)
 
 				message := substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (%exePath%) - please check the configuration...")
-											 , {simulator: code, protocol: "SHM", exePath: kBinariesDirectory . code . " SHM Spotter.exe"})
+											 , {simulator: code, protocol: "SHM", exePath: kBinariesDirectory . "Providers\" . code . " SHM Spotter.exe"})
 
 				logMessage(kLogCritical, message)
 

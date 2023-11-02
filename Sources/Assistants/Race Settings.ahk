@@ -190,7 +190,7 @@ loginDialog(connectorOrCommand := false, teamServerURL := false, owner := false,
 editRaceSettings(&settingsOrCommand, arguments*) {
 	global kLoad, kSave, kOk, kCancel, kConnect, kUpdate
 
-	local dllFile, dllName, names, exception, value, chosen, choices, tabs, import, simulator, ignore, option
+	local dllFile, names, exception, value, chosen, choices, tabs, import, simulator, ignore, option
 	local dirName, simulatorCode, file, tyreCompound, tyreCompoundColor, fileName, token
 	local x, y, e, directory, connection, settings, serverURLs, settingsTab
 
@@ -1031,8 +1031,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		connected := false
 
 		if gTeamMode {
-			dllName := "Team Server Connector.dll"
-			dllFile := kBinariesDirectory . dllName
+			dllFile := (kBinariesDirectory . "Connectors\Team Server Connector.dll")
 
 			try {
 				if (!FileExist(dllFile)) {

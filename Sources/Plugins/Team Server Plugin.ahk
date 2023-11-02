@@ -299,8 +299,7 @@ class TeamServerPlugin extends ControllerPlugin {
 	}
 
 	__New(controller, name, configuration := false, register := true) {
-		local dllName := "Team Server Connector.dll"
-		local dllFile := kBinariesDirectory . dllName
+		local dllFile := (kBinariesDirectory . "Connectors\Team Server Connector.dll")
 		local teamServerToggle, arguments, openRaceSettings, openRaceCenter
 
 		try {

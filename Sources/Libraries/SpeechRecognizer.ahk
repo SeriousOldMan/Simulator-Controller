@@ -1399,13 +1399,12 @@ class GrammarLiteral {
 ;;;-------------------------------------------------------------------------;;;
 
 matchWords(string1, string2) {
-	local dllName, dllFile
+	local dllFile
 
 	static recognizer := false
 
 	if !recognizer {
-		dllName := "Microsoft.Speech.Recognizer.dll"
-		dllFile := (kBinariesDirectory . "Microsoft\" . dllName)
+		dllFile := (kBinariesDirectory . "Microsoft\Microsoft.Speech.Recognizer.dll")
 
 		try {
 			if (!FileExist(dllFile)) {

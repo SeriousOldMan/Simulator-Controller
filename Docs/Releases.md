@@ -1,4 +1,4 @@
-## 5.4.4.0-release 11/03/23 (planned)
+## 5.4.4.0-release 11/03/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Integrated the Google Cloud Services for voice recognition. Additional info has been added to the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control).

@@ -416,6 +416,7 @@ readTranslations(targetLanguageCode, withUserTranslations := true, fromEditor :=
 	local fileNames := []
 	local fileName := (kTranslationsDirectory . "Translations." . targetLanguageCode)
 	local translations := CaseInsenseMap()
+	local section := false
 	local translation, ignore, enString, missingTranslations, inconsistentTranslations
 
 	readOriginals() {
@@ -433,12 +434,15 @@ readTranslations(targetLanguageCode, withUserTranslations := true, fromEditor :=
 			loop Read, fileName {
 				translation := A_LoopReadLine
 
-				if ((Trim(translation) != "") && (SubStr(translation, 1, 1) != "[")) {
+				if (SubStr(translation, 1, 1) = "[")
+					section := SubStr(translation, 2, -1)
+				else if (Trim(translation) != "") {
 					translation := StrReplace(translation, "\=", "=")
 					translation := StrReplace(translation, "\\", "\")
 					translation := StrReplace(translation, "\n", "`n")
 
-					originals[StrSplit(translation, "=>")[1]] := true
+					if (section != "Locale")
+						originals[StrSplit(translation, "=>")[1]] := true
 				}
 			}
 

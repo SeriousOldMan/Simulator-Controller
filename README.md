@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[5.4.4.0-beta](https://www.dropbox.com/scl/fi/1gtwco86m85rz35vwgss1/Simulator-Controller-5.4.4.0-beta.zip?rlkey=r2b8w3jhalf6idu9cvc6mo2cz&dl=1) (Test build for 5.4.4. Changes: Google STT integration, New settings for confirmation handling by the Assistants, Optical enhancement for session info in "System Monitor", Drive time in session info widget in "System Monitor", Improved process management when working on the configuration, New car models for "Setup Workbench", New translation report for developers.)
+[5.4.4.0-rc](https://www.dropbox.com/scl/fi/5kge0hjnlaj82z3vrjl68/Simulator-Controller-5.4.4.0-rc.zip?rlkey=t4pnkn25qz6j36yyi2nrw5fgt&dl=1) (Release candidate for 5.4.4. Changes: Google STT integration, New settings for confirmation handling by the Assistants, Optical enhancement for session info in "System Monitor", Drive time in session info widget in "System Monitor", Improved process management when working on the configuration, New car models for "Setup Workbench", New translation report for developers.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-544) of this version and all the versions you might have skipped, before installing and using this version.
 

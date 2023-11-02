@@ -510,10 +510,12 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 			DirCreate(kTempDirectory . "Race Report")
 
-			FileCopy(fileName, kTempDirectory . "Race Report\Lap." lapNumber, 1)
+			FileCopy(fileName, kTempDirectory . "Race Report\Lap." . lapNumber, 1)
 
 			if pid
 				messageSend(kFileMessage, "Practice", "updateReportLap:" . values2String(";", lapNumber, fileName), pid)
+			else
+				deleteFile(fileName)
 
 			loop {
 				lapNumber += 1

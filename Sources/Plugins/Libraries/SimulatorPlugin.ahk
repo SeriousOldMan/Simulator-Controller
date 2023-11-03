@@ -842,10 +842,10 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	supportsRaceAssistant(assistantPlugin) {
-		local hasProvider := (FileExist(kBinariesDirectory . this.Code . " SHM Provider.exe") != false)
+		local hasProvider := (FileExist(kBinariesDirectory . "Providers\" . this.Code . " SHM Provider.exe") || FileExist(kBinariesDirectory . "Connectors\" . this.Code . " SHM Connector.dll"))
 
 		if (assistantPlugin = kRaceSpotterPlugin)
-			return (hasProvider && FileExist(kBinariesDirectory . this.Code . " SHM Spotter.exe"))
+			return (hasProvider && FileExist(kBinariesDirectory . "Providers\" . this.Code . " SHM Spotter.exe"))
 		else
 			return hasProvider
 	}

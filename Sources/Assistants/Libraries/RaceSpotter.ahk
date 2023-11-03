@@ -2801,7 +2801,7 @@ class RaceSpotter extends GridRaceAssistant {
 		if !this.iSpotterPID {
 			code := this.SettingsDatabase.getSimulatorCode(this.Simulator)
 
-			exePath := (kBinariesDirectory . code . " SHM Spotter.exe")
+			exePath := (kBinariesDirectory . "Providers\" . code . " SHM Spotter.exe")
 
 			if FileExist(exePath) {
 				this.shutdownSpotter(forceShutdown)

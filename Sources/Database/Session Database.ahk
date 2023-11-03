@@ -4720,7 +4720,7 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := fa
 }
 
 editSettings(editorOrCommand, arguments*) {
-	local x, y, done, configuration, dllName, dllFile, connector, connection
+	local x, y, done, configuration, dllFile, connector, connection
 	local directory, empty, original, changed, restart, groups, replication
 	local oldConnections, ignore, group, enabled, values
 	local identifier, serverURL, serverToken, serverURLs, serverTokens
@@ -4884,8 +4884,7 @@ editSettings(editorOrCommand, arguments*) {
 			databaseLocationEdit.Text := directory
 	}
 	else if (editorOrCommand = "ValidateToken") {
-		dllName := "Data Store Connector.dll"
-		dllFile := kBinariesDirectory . dllName
+		dllFile := (kBinariesDirectory . "Connectors\Data Store Connector.dll")
 
 		try {
 			if (!FileExist(dllFile)) {

@@ -153,7 +153,7 @@ class SessionDatabase extends ConfigurationItem {
 	static Connector[identifier] {
 		Get {
 			local connector := false
-			local dllName, dllFile, connection
+			local dllFile, connection
 
 			static retry := 0
 
@@ -165,8 +165,7 @@ class SessionDatabase extends ConfigurationItem {
 				if SessionDatabase.ServerURL[identifier] {
 					retry := (A_TickCount + 10000)
 
-					dllName := "Data Store Connector.dll"
-					dllFile := kBinariesDirectory . dllName
+					dllFile := (kBinariesDirectory . "Connectors\Data Store Connector.dll")
 
 					try {
 						if (!FileExist(dllFile)) {

@@ -135,7 +135,7 @@ exitACCUDPTester() {
 }
 
 startUDPClient() {
-	exePath := kBinariesDirectory . "ACC UDP Provider.exe"
+	exePath := kBinariesDirectory . "Providers\ACC UDP Provider.exe"
 
 	try {
 		if FileExist(kTempDirectory . "ACCUDP.cmd")

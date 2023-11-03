@@ -158,7 +158,7 @@ callSimulator(simulator, options := "", protocol?) {
 			else {
 				curWorkingDir := A_WorkingDir
 
-				SetWorkingDir(kBinariesDirectory)
+				SetWorkingDir(kBinariesDirectory . "Connectors\")
 
 				try {
 					connector := DllCall("LoadLibrary", "Str", simulator . " SHM Connector.dll", "Ptr")
@@ -183,7 +183,7 @@ callSimulator(simulator, options := "", protocol?) {
 				connector := connectors[simulator . ".CLR"]
 			else {
 				dllName := (simulator . " SHM Connector.dll")
-				dllFile := (kBinariesDirectory . dllName)
+				dllFile := (kBinariesDirectory . "Connectors\" . dllName)
 
 				if (!FileExist(dllFile))
 					throw "Unable to find " . dllName . " in " . kBinariesDirectory . "..."
@@ -199,7 +199,7 @@ callSimulator(simulator, options := "", protocol?) {
 			data := parseMultiMap(connector.Call(options))
 		}
 		else if (protocol = "EXE") {
-			exePath := (kBinariesDirectory . simulator . " SHM Provider.exe")
+			exePath := (kBinariesDirectory . "Providers\" . simulator . " SHM Provider.exe")
 
 			if !FileExist(exePath)
 				throw "File not found..."

@@ -69,7 +69,7 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			simulator := this.Code
-			exePath := (kBinariesDirectory . simulator . " SHM Connector.dll")
+			exePath := (kBinariesDirectory . "Connectors\" . simulator . " SHM Connector.dll")
 
 			try {
 				callSimulator(simulator, command . "=" . operation . "=" . message . ":" . values2String(";", arguments*), "CLR")

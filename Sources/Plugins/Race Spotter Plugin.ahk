@@ -318,7 +318,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 				code := sessionDB.getSimulatorCode(simulator)
 				data := sessionDB.getTrackData(simulator, track)
 
-				exePath := (kBinariesDirectory . code . " SHM Spotter.exe")
+				exePath := (kBinariesDirectory . "Providers\" . code . " SHM Spotter.exe")
 				pid := false
 
 				try {
@@ -481,7 +481,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 					code := sessionDB.getSimulatorCode(simulator)
 					dataFile := temporaryFileName(code . " Track Mapper", "data")
 
-					exePath := (kBinariesDirectory . code . " SHM Spotter.exe")
+					exePath := (kBinariesDirectory . "Providers\" . code . " SHM Spotter.exe")
 
 					try {
 						if !FileExist(exePath)

@@ -273,7 +273,7 @@ class WebView2 extends WebView2.Base {
 	 */
 	static create(hwnd, callback := unset
 				, createdEnvironment := 0, datadir := '', edgeruntime := '', options := 0
-				, dllPath := (kBinariesDirectory . "WebView2Loader.dll")) {
+				, dllPath := (kBinariesDirectory . "Microsoft\WebView2Loader.dll")) {
 		EnvironmentCompleted_Invoke(com_this, hresult, createdEnvironment) {
 			if !createdEnvironment
 				throw OSError(hresult)

@@ -8217,7 +8217,7 @@ class RaceCenter extends ConfigurationItem {
 
 	saveSession(copy := false) {
 		saveSessionAsync(copy := false) {
-			local info, directory, translator, folder, session
+			local info, directory, translator, folder, session, configuration
 
 			this.showMessage(translate("Saving session"))
 
@@ -8241,6 +8241,14 @@ class RaceCenter extends ConfigurationItem {
 				setMultiMapValue(info, "Weather", "TrackTemperature", this.TrackTemperature)
 
 				writeMultiMap(this.SessionDirectory . "Session.info", info)
+
+				if this.Strategy {
+					configuration := newMultiMap()
+
+					this.Strategy.saveToConfiguration(configuration)
+
+					writeMultiMap(this.SessionDirectory . "Session.strategy", configuration)
+				}
 			}
 			else {
 				this.saveSetups()
@@ -8684,7 +8692,7 @@ class RaceCenter extends ConfigurationItem {
 	loadSession() {
 		loadSessionAsync() {
 			local directory := (this.SessionLoaded ? this.SessionLoaded : this.iSessionDirectory)
-			local folder, info, lastLap, currentStint, translator
+			local folder, info, lastLap, currentStint, translator, configuration
 
 			this.Window.Opt("+OwnDialogs")
 
@@ -8738,6 +8746,13 @@ class RaceCenter extends ConfigurationItem {
 					this.Control["sessionDropDownMenu"].Delete()
 					this.Control["sessionDropDownMenu"].Add([this.iSessionName])
 					this.Control["sessionDropDownMenu"].Choose(1)
+
+					if FileExist(folder . "Session.strategy") {
+						configuration := readMultiMap(folder . "Session.strategy")
+
+						if (configuration.Count > 0)
+							this.selectStrategy(this.createStrategy(configuration, false, false), true)
+					}
 
 					this.loadDrivers()
 					this.loadSessionDrivers()

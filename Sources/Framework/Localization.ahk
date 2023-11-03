@@ -416,10 +416,10 @@ readTranslations(targetLanguageCode, withUserTranslations := true, fromEditor :=
 	local fileNames := []
 	local fileName := (kTranslationsDirectory . "Translations." . targetLanguageCode)
 	local translations := CaseInsenseMap()
-	local section := false
 	local translation, ignore, enString, missingTranslations, inconsistentTranslations
 
 	readOriginals() {
+		local section := false
 		local fileNames := [kTranslationsDirectory . "Translations.EN"]
 		local fileName, orginals, translation, ignore
 
@@ -459,52 +459,66 @@ readTranslations(targetLanguageCode, withUserTranslations := true, fromEditor :=
 			fileNames.Push(fileName)
 	}
 
-	translations := CaseInsenseMap()
-
-	if isDebug()
+	if isDebug() {
 		inconsistentTranslations := CaseInsenseMap()
 
-	for ignore, fileName in fileNames
-		loop Read, fileName {
-			translation := A_LoopReadLine
+		for ignore, fileName in fileNames
+			loop Read, fileName {
+				translation := A_LoopReadLine
 
-			if (Trim(translation) != "") {
-				translation := StrReplace(translation, "\=", "=")
-				translation := StrReplace(translation, "\\", "\")
-				translation := StrReplace(translation, "\n", "`n")
+				if (Trim(translation) != "") {
+					translation := StrReplace(translation, "\=", "=")
+					translation := StrReplace(translation, "\\", "\")
+					translation := StrReplace(translation, "\n", "`n")
 
-				translation := StrSplit(translation, "=>")
-				enString := translation[1]
+					translation := StrSplit(translation, "=>")
+					enString := translation[1]
 
-				if ((SubStr(enString, 1, 1) != "[") && (fromEditor || (targetLanguageCode != "en")))
-					if (!fromEditor && ((translation.Length < 2) || (translations.Has(enString) && (translations[enString] != translation[2])))) {
-						if isDebug()
+					if ((SubStr(enString, 1, 1) != "[") && (fromEditor || (targetLanguageCode != "en")))
+						if (!fromEditor && ((translation.Length < 2) || (translations.Has(enString) && (translations[enString] != translation[2]))))
 							inconsistentTranslations[enString] := true
-					}
-					else
-						translations[enString] := ((translation.Length < 2) ? "" : translation[2])
+						else
+							translations[enString] := ((translation.Length < 2) ? "" : translation[2])
+				}
 			}
+
+		if (isDebug() && (targetLanguageCode != "en")) {
+			missingTranslations := CaseInsenseMap()
+
+			for enString, ignore in readOriginals()
+				if !translations.Has(enString)
+					missingTranslations[enString] := true
+
+			deleteFile(kTempDirectory . "Translations.report")
+
+			FileAppend("Missing:`n", kTempDirectory . "Translations.report")
+
+			for enString, ignore in missingTranslations
+				FileAppend("`n" . enString, kTempDirectory . "Translations.report")
+
+			FileAppend("`n`nInconsistent:`n", kTempDirectory . "Translations.report")
+
+			for enString, ignore in inconsistentTranslations
+				FileAppend("`n" . enString, kTempDirectory . "Translations.report")
 		}
-
-	if (isDebug() && (targetLanguageCode != "en")) {
-		missingTranslations := CaseInsenseMap()
-
-		for enString, ignore in readOriginals()
-			if !translations.Has(enString)
-				missingTranslations[enString] := true
-
-		deleteFile(kTempDirectory . "Translations.report")
-
-		FileAppend("Missing:`n", kTempDirectory . "Translations.report")
-
-		for enString, ignore in missingTranslations
-			FileAppend("`n" . enString, kTempDirectory . "Translations.report")
-
-		FileAppend("`n`nInconsistent:`n", kTempDirectory . "Translations.report")
-
-		for enString, ignore in inconsistentTranslations
-			FileAppend("`n" . enString, kTempDirectory . "Translations.report")
 	}
+	else
+		for ignore, fileName in fileNames
+			loop Read, fileName {
+				translation := A_LoopReadLine
+
+				if (Trim(translation) != "") {
+					translation := StrReplace(translation, "\=", "=")
+					translation := StrReplace(translation, "\\", "\")
+					translation := StrReplace(translation, "\n", "`n")
+
+					translation := StrSplit(translation, "=>")
+					enString := translation[1]
+
+					if ((SubStr(enString, 1, 1) != "[") && (fromEditor || (targetLanguageCode != "en")))
+						translations[enString] := ((translation.Length < 2) ? "" : translation[2])
+				}
+			}
 
 	return translations
 }

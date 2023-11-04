@@ -1,3 +1,12 @@
+## 5.4.5.0-release 11/10/23 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. Strategies are now saved together with a session in "Race Center".
+  4. [Internal] Cleanup of the Binaries folder.
+  5. New car models for "Setup Workbench":
+     - Assetto Corsa
+	   - Alfa Romeo GTA
+
 ## 5.4.4.0-release 11/03/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

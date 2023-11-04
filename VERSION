@@ -1,9 +1,9 @@
 [Development]
 Version=5.4.5.0-dev
 Target=5.4.5.0-release
-Date=11/03/2023
+Date=11/04/2023
 Download=
-Changes=Cleanup of the Binaries folder, Strategies are now preserved when saving session in "Race Center"
+Changes=Cleanup of the Binaries folder, Strategies are now preserved when saving session in "Race Center", New car models for "Setup Workbench"
 Components=Media->5.3.0,Configuration->5.4.0,Utilities->5.3.0
 [Release]
 Version=5.4.4.0-release

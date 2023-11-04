@@ -39,4 +39,13 @@ startupProcess() {
 	Task.CriticalHandler := (*) => guardExit()
 
 	OnExit(guardExit, -1)
+
+	MessageManager.resume()
 }
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                          Initialization Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+MessageManager.pause()

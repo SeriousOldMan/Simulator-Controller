@@ -8672,9 +8672,11 @@ class RaceCenter extends ConfigurationItem {
 				try {
 					this.Connector.ClearSession(session)
 
-					this.Connector.setSessionValue("Race Engineer Session Info", "")
-					this.Connector.setSessionValue("Race Strategist Session Info", "")
-					this.Connector.setSessionValue("Race Spotter Session Info", "")
+					this.Connector.DeleteSessionValue("Race Engineer Session Info")
+					this.Connector.DeleteSessionValue("Race Strategist Session Info")
+					this.Connector.DeleteSessionValue("Race Spotter Session Info")
+
+					this.Connector.DeleteSessionValue("Race Engineer State")
 				}
 				catch Any as exception {
 					logError(exception)
@@ -12498,6 +12500,8 @@ startupRaceCenter() {
 	rCenter.connect(true)
 
 	registerMessageHandler("Setup", functionMessageHandler)
+
+	startupApplication()
 }
 
 
@@ -12527,5 +12531,3 @@ setTyrePressures(tyreCompound, tyreCompoundColor, flPressure, frPressure, rlPres
 ;;;-------------------------------------------------------------------------;;;
 
 startupRaceCenter()
-
-startupApplication()

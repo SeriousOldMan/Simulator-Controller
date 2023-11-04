@@ -856,6 +856,8 @@ startupServerAdministration() {
 	TraySetIcon(icon, "1")
 	A_IconTip := "Server Administration"
 
+	startupApplication()
+
 	administrationEditor(kSimulatorConfiguration)
 
 	ExitApp(0)
@@ -867,5 +869,3 @@ startupServerAdministration() {
 ;;;-------------------------------------------------------------------------;;;
 
 startupServerAdministration()
-
-startupApplication()

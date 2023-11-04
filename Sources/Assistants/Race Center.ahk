@@ -12498,6 +12498,8 @@ startupRaceCenter() {
 	rCenter.connect(true)
 
 	registerMessageHandler("Setup", functionMessageHandler)
+
+	startupApplication()
 }
 
 
@@ -12527,5 +12529,3 @@ setTyrePressures(tyreCompound, tyreCompoundColor, flPressure, frPressure, rlPres
 ;;;-------------------------------------------------------------------------;;;
 
 startupRaceCenter()
-
-startupApplication()

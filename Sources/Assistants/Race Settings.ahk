@@ -1556,8 +1556,6 @@ showRaceSettingsEditor() {
 	TraySetIcon(icon, "1")
 	A_IconTip := "Race Settings"
 
-	startupApplication()
-
 	gSimulator := false
 	gCar := false
 	gTrack := false
@@ -1638,6 +1636,8 @@ showRaceSettingsEditor() {
 	}
 	else {
 		registerMessageHandler("Setup", functionMessageHandler)
+	
+		startupApplication()
 
 		result := editRaceSettings(&settings)
 

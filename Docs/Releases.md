@@ -4,9 +4,10 @@
   3. Fixed tyre handling for modded cars in *Assetto Corsa*.
   4. Fixed a couple of timing issues related to the Assistants startup orchestration on systems with a low-end CPU.
   5. Fixed start grid positions (lap 0) for "Race Reports".
-  6. Strategies are now saved together with a session in "Race Center".
-  7. [Internal] Cleanup of the Binaries folder.
-  8. New car models for "Setup Workbench":
+  6. Fixed a bug in "Practice Center" with data lost even if a switch to a differen simulator, car or track was rejected.
+  7. Strategies are now saved together with a session in "Race Center".
+  8. [Internal] Cleanup of the Binaries folder.
+  9. New car models for "Setup Workbench":
      - Assetto Corsa
 	   - Alfa Romeo GTA
 

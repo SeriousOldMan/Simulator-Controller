@@ -829,6 +829,8 @@ startSimulator() {
 	if (inList(A_Args, "-Unblock") || (GetKeyState("Ctrl", "P") && GetKeyState("Shift", "P")))
 		unblockExecutables()
 
+	startupApplication()
+
 	noLaunch := inList(A_Args, "-NoLaunchPad")
 
 	startupApplication()

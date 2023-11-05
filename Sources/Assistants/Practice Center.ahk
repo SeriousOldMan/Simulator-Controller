@@ -7145,6 +7145,8 @@ startupPracticeCenter() {
 	pCenter.show()
 
 	registerMessageHandler("Practice", methodMessageHandler, pCenter)
+
+	startupApplication()
 }
 
 
@@ -7153,5 +7155,3 @@ startupPracticeCenter() {
 ;;;-------------------------------------------------------------------------;;;
 
 startupPracticeCenter()
-
-startupApplication()

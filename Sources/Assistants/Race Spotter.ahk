@@ -96,8 +96,6 @@ startupRaceSpotter() {
 	TraySetIcon(icon, "1")
 	A_IconTip := "Race Spotter"
 
-	startupProcess()
-
 	voiceServer := ProcessExist("Voice Server.exe")
 
 	index := 1
@@ -203,7 +201,7 @@ startupRaceSpotter() {
 	if remotePID
 		Task.startTask(PeriodicTask(checkRemoteProcessAlive.Bind(remotePID), 10000, kLowPriority))
 
-	return
+	startupProcess()
 }
 
 

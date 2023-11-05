@@ -973,23 +973,23 @@ class PracticeCenter extends ConfigurationItem {
 		}
 
 		chooseSimulator(*) {
-			center.loadSimulator(centerGui["simulatorDropDown"].Text)
+			if center.loadSimulator(centerGui["simulatorDropDown"].Text) {
+				center.initializeSession()
 
-			center.initializeSession()
+				center.analyzeTelemetry()
 
-			center.analyzeTelemetry()
-
-			center.updateState()
+				center.updateState()
+			}
 		}
 
 		chooseCar(*) {
-			center.loadCar(this.getAvailableCars(this.Simulator)[centerGui["carDropDown"].Value])
+			if center.loadCar(this.getAvailableCars(this.Simulator)[centerGui["carDropDown"].Value]) {
+				center.initializeSession()
 
-			center.initializeSession()
+				center.analyzeTelemetry()
 
-			center.analyzeTelemetry()
-
-			center.updateState()
+				center.updateState()
+			}
 		}
 
 		chooseTrack(*) {
@@ -997,13 +997,13 @@ class PracticeCenter extends ConfigurationItem {
 			local tracks := center.getAvailableTracks(simulator, center.Car)
 			local trackNames := collect(tracks, ObjBindMethod(SessionDatabase, "getTrackName", simulator))
 
-			center.loadTrack(tracks[inList(trackNames, centerGui["trackDropDown"].Text)])
+			if center.loadTrack(tracks[inList(trackNames, centerGui["trackDropDown"].Text)]) {
+				center.initializeSession()
 
-			center.initializeSession()
+				center.analyzeTelemetry()
 
-			center.analyzeTelemetry()
-
-			center.updateState()
+				center.updateState()
+			}
 		}
 
 		chooseReport(listView, line, *) {
@@ -1563,7 +1563,7 @@ class PracticeCenter extends ConfigurationItem {
 				if (msgResult = "No") {
 					this.Control["simulatorDropDown"].Choose(inList(this.getAvailableSimulators(), this.Simulator))
 
-					return
+					return false
 				}
 			}
 
@@ -1591,7 +1591,11 @@ class PracticeCenter extends ConfigurationItem {
 			this.Control["carDropDown"].Add(carNames)
 
 			this.loadCar((cars.Length > 0) ? cars[1] : false, true)
+
+			return true
 		}
+
+		return false
 	}
 
 	loadCar(car, force := false) {
@@ -1606,7 +1610,7 @@ class PracticeCenter extends ConfigurationItem {
 				if (msgResult = "No") {
 					this.Control["carDropDown"].Choose(inList(this.getAvailableCars(this.Simulator), this.Car))
 
-					return
+					return false
 				}
 			}
 
@@ -1625,7 +1629,11 @@ class PracticeCenter extends ConfigurationItem {
 			this.Control["trackDropDown"].Add(collect(tracks, ObjBindMethod(SessionDatabase, "getTrackName", this.Simulator)))
 
 			this.loadTrack((tracks.Length > 0) ? tracks[1] : false, true)
+
+			return true
 		}
+
+		return false
 	}
 
 	loadTrack(track, force := false) {
@@ -1640,7 +1648,7 @@ class PracticeCenter extends ConfigurationItem {
 				if (msgResult = "No") {
 					this.Control["trackDropDown"].Choose(inList(this.getAvailableTracks(simulator, car), this.Track))
 
-					return
+					return false
 				}
 			}
 
@@ -1659,7 +1667,11 @@ class PracticeCenter extends ConfigurationItem {
 
 			if track
 				this.loadTyreCompounds(this.Simulator, this.Car, this.Track)
+
+			return true
 		}
+
+		return false
 	}
 
 	loadTyreCompounds(simulator, car, track) {

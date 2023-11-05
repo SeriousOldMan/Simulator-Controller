@@ -762,10 +762,10 @@ startSimulator() {
 				OnMessage(0x44, translateOkButton)
 				MsgBox(translate("Simulator Controller cannot request Admin priviliges. Please enable User Account Control."), translate("Error"), 262160)
 				OnMessage(0x44, translateOkButton, 0)
-				
+
 				ExitApp(0)
 			}
-			
+
 			if A_IsCompiled
 				Run("*RunAs `"" . A_ScriptFullPath . "`" /restart -Unblock")
 			else
@@ -832,6 +832,8 @@ startSimulator() {
 	startupApplication()
 
 	noLaunch := inList(A_Args, "-NoLaunchPad")
+
+	startupApplication()
 
 	if ((noLaunch && !GetKeyState("Shift")) || (!noLaunch && GetKeyState("Shift")))
 		startupSimulator()

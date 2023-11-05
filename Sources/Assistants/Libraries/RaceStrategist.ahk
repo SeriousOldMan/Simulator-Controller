@@ -1353,14 +1353,14 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	prepareSession(&settings, &data, formationLap?) {
-		local raceData := newMultiMap()
-		local simulatorName, carCount, carNr, carCategory
+		local raceData, simulatorName, carCount, carCategory
 		local theStrategy, applicableStrategy, simulator, car, track, facts
 		local sessionType, sessionLength, duration, laps
 
-		this.updateSessionValues({RaceInfo: false})
-
 		facts := super.prepareSession(&settings, &data, formationLap?)
+
+		if (getMultiMapValue(data, "Stint Data", "Laps", 0) = 0)
+			this.updateSessionValues({RaceInfo: false})
 
 		simulatorName := this.SettingsDatabase.getSimulatorName(this.Simulator)
 
@@ -1368,29 +1368,30 @@ class RaceStrategist extends GridRaceAssistant {
 			this.updateConfigurationValues({UseTalking: getMultiMapValue(settings, "Assistant.Strategist", "Voice.UseTalking", true)
 										  , UseTraffic: getMultiMapValue(settings, "Strategy Settings", "Traffic.Simulation", false)})
 
-		carCount := getMultiMapValue(data, "Position Data", "Car.Count")
+		if !this.RaceInfo {
+			raceData := newMultiMap()
+			carCount := getMultiMapValue(data, "Position Data", "Car.Count")
 
-		setMultiMapValue(raceData, "Cars", "Count", carCount)
-		setMultiMapValue(raceData, "Cars", "Driver", getMultiMapValue(data, "Position Data", "Driver.Car"))
+			setMultiMapValue(raceData, "Cars", "Count", carCount)
+			setMultiMapValue(raceData, "Cars", "Driver", getMultiMapValue(data, "Position Data", "Driver.Car"))
 
-		loop carCount {
-			carNr := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Nr")
+			loop carCount {
+				setMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Nr", getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Nr"))
+				setMultiMapValue(raceData, "Cars", "Car." . A_Index . ".ID"
+										 , getMultiMapValue(data, "Position Data", "Car." . A_Index . ".ID", A_Index))
+				setMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Position"
+										 , getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Position"))
+				setMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Class"
+										 , getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Class", kUnknown))
 
-			setMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Nr", carNr)
-			setMultiMapValue(raceData, "Cars", "Car." . A_Index . ".ID"
-									 , getMultiMapValue(data, "Position Data", "Car." . A_Index . ".ID", A_Index))
-			setMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Position"
-									 , getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Position"))
-			setMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Class"
-									 , getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Class", kUnknown))
+				carCategory := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Category", kUndefined)
 
-			carCategory := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Category", kUndefined)
+				if (carCategory != kUndefined)
+					setMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Category", carCategory)
+			}
 
-			if (carCategory != kUndefined)
-				setMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Category", carCategory)
+			this.updateRaceInfo(raceData)
 		}
-
-		this.updateRaceInfo(raceData)
 
 		if ((this.Session == kSessionRace) && (getMultiMapValue(data, "Stint Data", "Laps", 0) <= 1)
 										   && FileExist(kUserConfigDirectory . "Race.strategy")) {
@@ -3692,6 +3693,9 @@ class RaceStrategist extends GridRaceAssistant {
 				grid := (raceInfo ? raceInfo["Grid"] : false)
 				slots := (raceInfo ? raceInfo["Slots"] : false)
 
+				if isDebug()
+					logMessage(kLogDebug, "RaceInfo - Lap: " . lapNumber . "; Grid: " . (grid ? kTrue : kFalse) . "; Slots: " . (slots ? kTrue : kFalse))
+
 				if slots
 					setMultiMapValue(data, "Cars", "Slots", map2String("|", "->", slots))
 
@@ -3746,8 +3750,12 @@ class RaceStrategist extends GridRaceAssistant {
 							setMultiMapValue(data, "Cars", "Car." . carIndex . ".Position", grid[carIndex])
 							setMultiMapValue(data, "Cars", "Car." . carIndex . ".Position", grid[raceInfo[key]])
 
-							if (A_Index = driver)
+							if (A_Index = driver) {
 								validLap := knowledgeBase.getValue("Car." . A_Index . ".Lap.Valid")
+
+								if isDebug()
+									logMessage(kLogDebug, "RaceInfo - Driver Position: " . getMultiMapValue(data, "Cars", "Car." . carIndex . ".Position"))
+							}
 						}
 					}
 				}
@@ -3909,6 +3917,9 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	restoreRaceInfo(raceInfoFile) {
+		if isDebug()
+			logMessage(kLogDebug, "Restore Race Info...")
+
 		this.updateRaceInfo(readMultiMap(raceInfoFile))
 
 		deleteFile(raceInfoFile)

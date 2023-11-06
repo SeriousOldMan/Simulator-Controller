@@ -317,7 +317,7 @@ where *ASSISTANT* is the type of the Assistant, for example "Race Engineer", and
 	[Configuration]
 	Recognizer=Grammar
 	
-The value for *Recognizer* can be either "Grammar" which defines that only pattern based voice commands are used, or "Text", when the Assistant has a full understanding of language like ChatGPT, or "Mixed", when you want to use both types. If you translate a grammar filoe, don't change this.
+The value for *Recognizer* can be either "Grammar" which defines that only pattern based voice commands are used, or "Text", when the Assistant has a full understanding of language like ChatGPT, or "Mixed", when you want to use both types. If you translate a grammar file, don't change this.
 
 #### Text fragments
 

@@ -300,6 +300,8 @@ Last but not least, using the small button with the cog wheel icon, you can choo
      This will give you an overview for the stint, the driven laps, as well as some performance figures for the driver. Please select a stint in the list of stints to generate this report.
 	 
 	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Practice%20Center%203.JPG)
+	 
+	 While you are in an active session, you can also take notes for a selected stint, for example to remember setup changes, special weather conditions or other stuff worth to mention.
 
   2. Details for a given lap
   

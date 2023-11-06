@@ -1,9 +1,9 @@
 [Development]
 Version=5.4.5.0-dev
 Target=5.4.5.0-release
-Date=11/05/2023
+Date=11/06/2023
 Download=
-Changes=Cleanup of the Binaries folder, Strategies are now preserved when saving session in "Race Center", New car models for "Setup Workbench", Fixed tyre handling in "Assetto Corsa", Fixed timing in problem during Assistants startup, Fixed start grid positions, Fixed "Practice Center" initializing even if context change was canceled
+Changes=Cleanup of the Binaries folder, Strategies are now preserved when saving session in "Race Center", New car models for "Setup Workbench", Fixed tyre handling in "Assetto Corsa", Fixed timing in problem during Assistants startup, Fixed start grid positions, Fixed "Practice Center" initializing even if context change was canceled, New top speed info on session page of "System Monitor", New top speed fields in "State.json", Spotter now announces your best top speed, Warning on dashboard when no position infos
 Components=Media->5.3.0,Configuration->5.4.0,Utilities->5.3.0
 [Release]
 Version=5.4.4.0-release

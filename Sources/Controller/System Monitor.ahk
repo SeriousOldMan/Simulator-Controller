@@ -480,6 +480,8 @@ systemMonitor(command := false, arguments*) {
 		local lastValid := getMultiMapValue(sessionState, "Stint", "Valid", true)
 		local lastTime := getMultiMapValue(sessionState, "Stint", "Lap.Time.Last")
 		local bestTime := getMultiMapValue(sessionState, "Stint", "Lap.Time.Best")
+		local lastSpeed := getMultiMapValue(sessionState, "Stint", "Speed.Last", false)
+		local bestSpeed := getMultiMapValue(sessionState, "Stint", "Speed.Best", false)
 		local html := ""
 
 		try {
@@ -492,6 +494,9 @@ systemMonitor(command := false, arguments*) {
 			html .= ("<tr><th class=`"th-std th-left`">" . translate("Lap") . "</th><td class=`"td-wdg`">" . (lastLap + 1) . "</td></tr>")
 			html .= ("<tr><th class=`"th-std th-left`">" . translate("Position") . "</th><td class=`"td-wdg`">" . getMultiMapValue(sessionState, "Stint", "Position") . "</td></tr>")
 			html .= ("<tr><th class=`"th-std th-left`">" . translate("Lap Time (Last / Best)") . "</th><td class=`"td-wdg`">" . (!lastValid ? "<font color=`"red`">" : "") . lastTime . (!lastValid ? "</font>" : "") . translate(" / ") . bestTime . "</td></tr>")
+
+			if (lastSpeed && bestSpeed)
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Top Speed (Last / Best)") . "</th><td class=`"td-wdg`">" . displayValue("Float", convertUnit("Speed", lastSpeed)) . translate(" / ") . displayValue("Float", convertUnit("Speed", bestSpeed)) . "</td></tr>")
 
 			if (lastLap != getMultiMapValue(sessionState, "Stint", "Laps"))
 				html .= ("<tr><th class=`"th-std th-left`">" . translate("Laps (Stint)") . "</th><td class=`"td-wdg`">" . getMultiMapValue(sessionState, "Stint", "Laps") . "</td></tr>")
@@ -1026,12 +1031,16 @@ systemMonitor(command := false, arguments*) {
 		if (displayState = "Qualification")
 			displayState := "Qualifying"
 
-		if (state = "Active") {
+		if ((state = "Active") || (state = "Warning")) {
 			html := "<table>"
 			html .= ("<tr><td><b>" . translate("Simulator:") . "</b></td><td>" . getMultiMapValue(controllerState, "Simulation", "Simulator") . "</td></tr>")
 			html .= ("<tr><td><b>" . translate("Car:") . "</b></td><td>" . getMultiMapValue(controllerState, "Simulation", "Car") . "</td></tr>")
 			html .= ("<tr><td><b>" . translate("Track:") . "</b></td><td>" . getMultiMapValue(controllerState, "Simulation", "Track") . "</td></tr>")
 			html .= ("<tr><td><b>" . translate("Session:") . "</b></td><td>" . translate(displayState) . "</td></tr>")
+
+			if (getMultiMapValue(controllerState, "Simulation", "Information", kUndefined) != kUndefined)
+				html .= ("<tr><td><b>" . translate("State:") . "</b></td><td>" . getMultiMapValue(controllerState, "Simulation", "Information") . "</td></tr>")
+
 			html .= "</table>"
 		}
 		else if (state = "Passive") {

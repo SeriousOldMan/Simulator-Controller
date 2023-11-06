@@ -791,6 +791,9 @@ class RaceSpotter extends GridRaceAssistant {
 
 	iLastPenalty := false
 
+	iBestTopSpeed := false
+	iLastTopSpeed := false
+
 	class SpotterVoiceManager extends RaceAssistant.RaceVoiceManager {
 		iFastSpeechSynthesizer := false
 
@@ -978,6 +981,18 @@ class RaceSpotter extends GridRaceAssistant {
 
 		Set {
 			return (isSet(key) ? (this.iSessionInfos[key] := value) : (this.iSessionInfos := value))
+		}
+	}
+
+	BestTopSpeed {
+		Get {
+			return this.iBestTopSpeed
+		}
+	}
+
+	LastTopSpeed {
+		Get {
+			return this.iLastTopSpeed
 		}
 	}
 
@@ -1453,7 +1468,7 @@ class RaceSpotter extends GridRaceAssistant {
 		local focused := false
 		local number := false
 		local situation, sessionDuration, lapTime, sessionEnding, minute, lastTemperature, stintLaps
-		local minute, rnd, phrase, bestLapTime, ignore
+		local minute, rnd, phrase, bestLapTime, lastTopSpeed, ignore
 
 		if ((remainingSessionLaps = kUndefined) || (remainingStintLaps = kUndefined))
 			return false
@@ -1580,6 +1595,18 @@ class RaceSpotter extends GridRaceAssistant {
 					}
 					else
 						this.SessionInfos["BestLap"] := bestLapTime
+				}
+
+				if (this.LastTopSpeed > 0) {
+					lastTopSpeed := Round(this.LastTopSpeed, 1)
+
+					if (!this.SessionInfos.Has("BestSpeed") || (lastTopSpeed > this.SessionInfos["BestSpeed"])) {
+						speaker.speakPhrase("BestSpeed", {speed: speaker.number2Speech(lastTopSpeed, 1), unit: getUnit("Speed")})
+
+						this.SessionInfos["BestSpeed"] := lastTopSpeed
+
+						return true
+					}
 				}
 			}
 
@@ -2794,6 +2821,13 @@ class RaceSpotter extends GridRaceAssistant {
 				this.getSpeaker(true).speakPhrase("PitWindowClosed", false, false, "PitWindowClosed")
 	}
 
+	speedUpdate(lastSpeed) {
+		if lastSpeed {
+			this.iLastTopSpeed := Round(lastSpeed, 1)
+			this.iBestTopSpeed := Max(this.LastTopSpeed, this.BestTopSpeed)
+		}
+	}
+
 	startupSpotter(forceShutdown := false) {
 		local pid := false
 		local code, exePath
@@ -2894,6 +2928,9 @@ class RaceSpotter extends GridRaceAssistant {
 		this.SessionInfos := CaseInsenseMap()
 		this.iLastDeltaInformationLap := 0
 		this.iLastPenalty := false
+
+		this.iBestTopSpeed := false
+		this.iLastTopSpeed := false
 	}
 
 	prepareSession(&settings, &data, formationLap := true) {
@@ -3101,6 +3138,12 @@ class RaceSpotter extends GridRaceAssistant {
 				setMultiMapValue(sessionInfo, "Standings", "Focus.Delta", car.LastDelta)
 				setMultiMapValue(sessionInfo, "Standings", "Focus.InPit", car.InPit)
 			}
+
+			if this.LastTopSpeed
+				setMultiMapValue(sessionInfo, "Stint", "Speed.Last", Round(this.LastTopSpeed, 1))
+
+			if this.BestTopSpeed
+				setMultiMapValue(sessionInfo, "Stint", "Speed.Best", Round(this.BestTopSpeed, 1))
 		}
 
 		return sessionInfo

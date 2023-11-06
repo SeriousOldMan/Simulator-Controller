@@ -649,6 +649,29 @@ BOOL greenFlag() {
 		return FALSE;
 }
 
+float lastTopSpeed = 0;
+int lastLaps = 0;
+
+void updateTopSpeed() {
+	float speed = map_buffer->car_speed * 3.6f;
+
+	if (speed > lastTopSpeed)
+		lastTopSpeed = speed;
+
+	if (map_buffer->completed_laps > lastLaps) {
+		char message[40] = "speedUpdate:";
+		char numBuffer[20];
+
+		sprintf_s(numBuffer, 20, "%f", lastTopSpeed);
+		strcat_s(message, 40, numBuffer);
+
+		sendSpotterMessage(message);
+
+		lastTopSpeed = 0;
+		lastLaps = map_buffer->completed_laps;;
+	}
+}
+
 #define MAXVALUES 6
 
 float recentSteerAngles[MAXVALUES] = { 0, 0, 0, 0, 0, 0 };
@@ -1318,6 +1341,8 @@ int main(int argc, char* argv[])
 
 				if (running) {
 					if (mapped_r3e && (map_buffer->completed_laps >= 0) && !map_buffer->game_paused) {
+						updateTopSpeed();
+
 						cycle += 1;
 
 						if (!startGo || !greenFlag())

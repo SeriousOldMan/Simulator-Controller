@@ -748,6 +748,26 @@ namespace RF2SHMSpotter {
             }
         }
 
+        float lastTopSpeed = 0;
+        int lastLaps = 0;
+
+        void updateTopSpeed(ref rF2VehicleScoring playerScoring)
+        {
+            rF2Vec3 localVel = playerScoring.mLocalVel;
+            float speed = (float)Math.Sqrt(localVel.x * localVel.x + localVel.y * localVel.y + localVel.z * localVel.z) * 3.6f;
+
+            if (speed > lastTopSpeed)
+                lastTopSpeed = speed;
+
+            if (playerScoring.mTotalLaps > lastLaps)
+            {
+                SendSpotterMessage("speedUpdate:" + lastTopSpeed);
+
+                lastTopSpeed = 0;
+                lastLaps = playerScoring.mTotalLaps;
+            }
+        }
+
         const int MAXVALUES = 6;
 
         List<float> recentSteerAngles = new List<float>();
@@ -1432,6 +1452,8 @@ namespace RF2SHMSpotter {
 								if (extended.mSessionStarted != 0 && scoring.mScoringInfo.mGamePhase < (byte)SessionStopped &&
 									playerScoring.mPitState < (byte)Entering)
 								{
+									updateTopSpeed(ref playerScoring);
+
 									cycle += 1;
 
 									if (!startGo || !greenFlag())

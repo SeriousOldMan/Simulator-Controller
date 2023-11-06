@@ -722,6 +722,8 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	iCurrentTyreCompound := false
 	iRequestedTyreCompound := false
 
+	iHasPositionsData := false
+
 	RaceEngineer {
 		Get {
 			return this.iRaceEngineer
@@ -809,6 +811,20 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 			this.logFunctionNotFound(actionFunction)
 	}
 
+	writePluginState(configuration) {
+		super.writePluginState(configuration)
+
+		if (this.Active && this.runningSimulator()) {
+			if !this.iHasPositionsData {
+				setMultiMapValue(configuration, this.Plugin, "State", "Warning")
+				setMultiMapValue(configuration, this.Plugin, "Information", getMultiMapValue(configuration, this.Plugin, "Information") . translate("; ") . translate("State:") . A_Space . translate("No position information available..."))
+
+				setMultiMapValue(configuration, "Simulation", "State", "Warning")
+				setMultiMapValue(configuration, "Simulation", "Information", translate("No position information available..."))
+			}
+		}
+	}
+
 	simulatorStartup(simulator) {
 		local ignore, assistant
 
@@ -824,6 +840,8 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 					this.iRaceStrategist := assistant
 				else if isInstance(assistant, RaceSpotterPlugin)
 					this.iRaceSpotter := assistant
+
+			this.iHasPositionsData := false
 		}
 	}
 
@@ -838,6 +856,8 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 			this.iRaceEngineer := false
 			this.iRaceStrategist := false
 			this.iRaceSpotter := false
+
+			this.iHasPositionsData := false
 		}
 	}
 
@@ -1121,9 +1141,13 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	updatePositionsData(data) {
-		loop getMultiMapValue(data, "Position Data", "Car.Count", 0)
+		local count := getMultiMapValue(data, "Position Data", "Car.Count", 0)
+
+		loop count
 			setMultiMapValue(data, "Position Data", "Car." . A_Index . ".Nr"
 								 , StrReplace(getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Nr", ""), "`"", ""))
+
+		this.iHasPositionsData := (count > 0)
 	}
 
 	saveSessionState(&sessionSettings, &sessionState) {

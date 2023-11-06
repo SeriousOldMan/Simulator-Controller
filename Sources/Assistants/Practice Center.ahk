@@ -1071,6 +1071,10 @@ class PracticeCenter extends ConfigurationItem {
 						center.LapsListView.Modify(lap.Row, "-Check")
 
 				center.withExceptionhandler(ObjBindMethod(center, "showRunDetails", run))
+
+				centerGui["runNotesEdit"].Text := run.Notes
+
+				center.updateState()
 			}
 		}
 
@@ -1235,7 +1239,10 @@ class PracticeCenter extends ConfigurationItem {
 		}
 
 		updateNotes(*) {
-			this.SelectedRun.Notes := centerGui["runNotesEdit"].Text
+			local row := center.RunsListView.GetNext()
+
+			if row
+				this.Runs[center.RunsListView.GetText(row, 1)].Notes := centerGui["runNotesEdit"].Text
 		}
 
 		centerGui := PracticeCenter.PracticeCenterWindow(this)
@@ -1704,7 +1711,6 @@ class PracticeCenter extends ConfigurationItem {
 	selectRun(run, force := false) {
 		if (force || (run != this.SelectedRun)) {
 			this.Control["runDropDown"].Choose(run ? (run.Nr + 1) : 1)
-			this.Control["runNotesEdit"].Text := run.Notes
 
 			this.iSelectedRun := run
 
@@ -2089,7 +2095,7 @@ class PracticeCenter extends ConfigurationItem {
 			this.iSelectedChartType := false
 		}
 
-		if (this.RunsListView.GetNext() != 0)
+		if ((this.RunsListView.GetNext() != 0) && this.SessionActive)
 			window["runNotesEdit"].Enabled := true
 		else {
 			window["runNotesEdit"].Enabled := false
@@ -4054,7 +4060,11 @@ class PracticeCenter extends ConfigurationItem {
 
 				if (folder != "")
 					try {
-						DirCopy(directory, folder . "\Practice " . FormatTime(this.Date, "yyyy-MMM-dd"), 1)
+						folder := (folder . "\Practice " . FormatTime(this.Date, "yyyy-MMM-dd"))
+
+						DirCreate(folder)
+
+						DirCopy(directory, folder, 1)
 					}
 					catch Any as exception {
 						logError(exception)
@@ -4171,6 +4181,9 @@ class PracticeCenter extends ConfigurationItem {
 
 			if isNull(newRun.EndTime)
 				newRun.EndTime := false
+
+			if isNull(newRun.Notes)
+				newRun.Notes := ""
 
 			driver.Runs.Push(newRun)
 			laps := []

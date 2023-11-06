@@ -2152,8 +2152,6 @@ initializeSimulatorController() {
 	TraySetIcon(icon, "1")
 	A_IconTip := "Simulator Controller"
 
-	MessageManager.pause()
-
 	SetKeyDelay(10, 30)
 
 	settings := readMultiMap(kSimulatorSettingsFile)
@@ -2201,8 +2199,6 @@ startupSimulatorController() {
 		ExitApp(0)
 
 	controller.startup()
-
-	MessageManager.resume()
 
 	startupApplication()
 }

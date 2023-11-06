@@ -978,6 +978,8 @@ startupRaceReports() {
 			}
 		}
 	}
+
+	startupApplication()
 }
 
 
@@ -986,5 +988,3 @@ startupRaceReports() {
 ;;;-------------------------------------------------------------------------;;;
 
 startupRaceReports()
-
-startupApplication()

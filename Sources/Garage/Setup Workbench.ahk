@@ -3345,6 +3345,8 @@ startupSetupWorkbench() {
 			workbench.loadSimulator(true, true)
 	else
 		Task.startTask(ObjBindMethod(workbench, "restoreState"), 100)
+
+	startupApplication()
 }
 
 
@@ -3364,5 +3366,3 @@ startupSetupWorkbench() {
 ;;;-------------------------------------------------------------------------;;;
 
 startupSetupWorkbench()
-
-startupApplication()

@@ -5484,6 +5484,8 @@ startupSessionDatabase() {
 	finally {
 		protectionOff()
 	}
+
+	startupApplication()
 }
 
 
@@ -5492,5 +5494,3 @@ startupSessionDatabase() {
 ;;;-------------------------------------------------------------------------;;;
 
 startupSessionDatabase()
-
-startupApplication()

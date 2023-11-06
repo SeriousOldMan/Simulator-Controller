@@ -57,7 +57,7 @@ global kSessionDataSchemas := CaseInsenseMap("Run.Data", ["Nr", "Lap", "Driver.F
 													    , "Weather", "Tyre.Compound", "Tyre.Compound.Color", "Tyre.Set", "Tyre.Laps"
 														, "Lap.Time.Average", "Lap.Time.Best"
 														, "Fuel.Initial", "Fuel.Consumption", "Accidents"
-														, "Position.Start", "Position.End", "Time.Start", "Time.End"]
+														, "Position.Start", "Position.End", "Time.Start", "Time.End", "Notes"]
 										   , "Driver.Data", ["Forname", "Surname", "Nickname", "ID"]
 										   , "Lap.Data", ["Run", "Nr", "Lap", "Position", "Lap.Time", "Lap.State", "Lap.Valid", "Grip", "Map", "TC", "ABS"
 														, "Weather", "Temperature.Air", "Temperature.Track"
@@ -973,23 +973,23 @@ class PracticeCenter extends ConfigurationItem {
 		}
 
 		chooseSimulator(*) {
-			center.loadSimulator(centerGui["simulatorDropDown"].Text)
+			if center.loadSimulator(centerGui["simulatorDropDown"].Text) {
+				center.initializeSession()
 
-			center.initializeSession()
+				center.analyzeTelemetry()
 
-			center.analyzeTelemetry()
-
-			center.updateState()
+				center.updateState()
+			}
 		}
 
 		chooseCar(*) {
-			center.loadCar(this.getAvailableCars(this.Simulator)[centerGui["carDropDown"].Value])
+			if center.loadCar(this.getAvailableCars(this.Simulator)[centerGui["carDropDown"].Value]) {
+				center.initializeSession()
 
-			center.initializeSession()
+				center.analyzeTelemetry()
 
-			center.analyzeTelemetry()
-
-			center.updateState()
+				center.updateState()
+			}
 		}
 
 		chooseTrack(*) {
@@ -997,13 +997,13 @@ class PracticeCenter extends ConfigurationItem {
 			local tracks := center.getAvailableTracks(simulator, center.Car)
 			local trackNames := collect(tracks, ObjBindMethod(SessionDatabase, "getTrackName", simulator))
 
-			center.loadTrack(tracks[inList(trackNames, centerGui["trackDropDown"].Text)])
+			if center.loadTrack(tracks[inList(trackNames, centerGui["trackDropDown"].Text)]) {
+				center.initializeSession()
 
-			center.initializeSession()
+				center.analyzeTelemetry()
 
-			center.analyzeTelemetry()
-
-			center.updateState()
+				center.updateState()
+			}
 		}
 
 		chooseReport(listView, line, *) {
@@ -1232,6 +1232,10 @@ class PracticeCenter extends ConfigurationItem {
 			}
 
 			this.analyzeTelemetry()
+		}
+
+		updateNotes(*) {
+			this.SelectedRun.Notes := centerGui["runNotesEdit"].Text
 		}
 
 		centerGui := PracticeCenter.PracticeCenterWindow(this)
@@ -1465,8 +1469,11 @@ class PracticeCenter extends ConfigurationItem {
 
 		centerTab.UseTab(2)
 
-		this.iRunsListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 H:Grow Checked -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Driver", "Weather", "Compound", "Set", "Laps", "Initial Fuel", "Consumed Fuel", "Avg. Lap Time", "Accidents", "Potential", "Race Craft", "Speed", "Consistency", "Car Control"], translate))
+		this.iRunsListView := centerGui.Add("ListView", "x24 ys+33 w577 h175 H:Grow(0.5) Checked -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Driver", "Weather", "Compound", "Set", "Laps", "Initial Fuel", "Consumed Fuel", "Avg. Lap Time", "Accidents", "Potential", "Race Craft", "Speed", "Consistency", "Car Control"], translate))
 		this.iRunsListView.OnEvent("Click", chooseRun)
+
+		centerGui.Add("Text", "x24 yp+180 w80 h23 Y:Move(0.5)", translate("Notes"))
+		centerGui.Add("Edit", "x104 yp w497 h90 Y:Move(0.5) H:Grow(0.5) vrunNotesEdit").OnEvent("Change", updateNotes)
 
 		centerTab.UseTab(3)
 
@@ -1556,7 +1563,7 @@ class PracticeCenter extends ConfigurationItem {
 				if (msgResult = "No") {
 					this.Control["simulatorDropDown"].Choose(inList(this.getAvailableSimulators(), this.Simulator))
 
-					return
+					return false
 				}
 			}
 
@@ -1584,7 +1591,11 @@ class PracticeCenter extends ConfigurationItem {
 			this.Control["carDropDown"].Add(carNames)
 
 			this.loadCar((cars.Length > 0) ? cars[1] : false, true)
+
+			return true
 		}
+
+		return false
 	}
 
 	loadCar(car, force := false) {
@@ -1599,7 +1610,7 @@ class PracticeCenter extends ConfigurationItem {
 				if (msgResult = "No") {
 					this.Control["carDropDown"].Choose(inList(this.getAvailableCars(this.Simulator), this.Car))
 
-					return
+					return false
 				}
 			}
 
@@ -1618,7 +1629,11 @@ class PracticeCenter extends ConfigurationItem {
 			this.Control["trackDropDown"].Add(collect(tracks, ObjBindMethod(SessionDatabase, "getTrackName", this.Simulator)))
 
 			this.loadTrack((tracks.Length > 0) ? tracks[1] : false, true)
+
+			return true
 		}
+
+		return false
 	}
 
 	loadTrack(track, force := false) {
@@ -1633,7 +1648,7 @@ class PracticeCenter extends ConfigurationItem {
 				if (msgResult = "No") {
 					this.Control["trackDropDown"].Choose(inList(this.getAvailableTracks(simulator, car), this.Track))
 
-					return
+					return false
 				}
 			}
 
@@ -1652,7 +1667,11 @@ class PracticeCenter extends ConfigurationItem {
 
 			if track
 				this.loadTyreCompounds(this.Simulator, this.Car, this.Track)
+
+			return true
 		}
+
+		return false
 	}
 
 	loadTyreCompounds(simulator, car, track) {
@@ -1685,6 +1704,7 @@ class PracticeCenter extends ConfigurationItem {
 	selectRun(run, force := false) {
 		if (force || (run != this.SelectedRun)) {
 			this.Control["runDropDown"].Choose(run ? (run.Nr + 1) : 1)
+			this.Control["runNotesEdit"].Text := run.Notes
 
 			this.iSelectedRun := run
 
@@ -2067,6 +2087,13 @@ class PracticeCenter extends ConfigurationItem {
 			window["chartTypeDropDown"].Choose(0)
 
 			this.iSelectedChartType := false
+		}
+
+		if (this.RunsListView.GetNext() != 0)
+			window["runNotesEdit"].Enabled := true
+		else {
+			window["runNotesEdit"].Enabled := false
+			window["runNotesEdit"].Text := ""
 		}
 
 		this.updateSessionMenu()
@@ -2516,7 +2543,7 @@ class PracticeCenter extends ConfigurationItem {
 		local newRun := {Nr: (this.CurrentRun ? (this.CurrentRun.Nr + 1) : 1), Lap: lapNumber, StartTime: A_Now, TyreLaps: 0
 					   , Driver: "-", FuelInitial: "-", FuelConsumption: 0.0, Accidents: 0, Weather: "-", Compound: "-", TyreSet: "-"
 					   , AvgLapTime: "-", Potential: "-", RaceCraft: "-", Speed: "-", Consistency: "-", CarControl: "-"
-					   , StartPosition: "-", EndPosition: "-", Laps: []}
+					   , StartPosition: "-", EndPosition: "-", Laps: [], Notes: ""}
 
 		if (newRun.Nr = 1) {
 			if (this.Control["tyreCompoundDropDown"].Value > 2)
@@ -4137,7 +4164,7 @@ class PracticeCenter extends ConfigurationItem {
 					 , Compound: compound(run["Tyre.Compound"], run["Tyre.Compound.Color"]), TyreSet: run["Tyre.Set"], TyreLaps: run["Tyre.Laps"]
 					 , AvgLapTime: run["Lap.Time.Average"], BestLapTime: run["Lap.Time.Best"]
 					 , Accidents: run["Accidents"], StartPosition: run["Position.Start"], EndPosition: run["Position.End"]
-					 , StartTime: run["Time.Start"], EndTime: run["Time.End"]}
+					 , StartTime: run["Time.Start"], EndTime: run["Time.End"], Notes: decode(run["Notes"])}
 
 			if isNull(newRun.StartTime)
 				newRun.StartTime := false
@@ -5550,7 +5577,8 @@ class PracticeCenter extends ConfigurationItem {
 												  , "Lap.Time.Average", null(run.AvgLapTime), "Lap.Time.Best", null(run.BestLapTime)
 												  , "Fuel.Initial", null(run.FuelInitial), "Fuel.Consumption", null(run.FuelConsumption)
 												  , "Accidents", run.Accidents, "Position.Start", null(run.StartPosition), "Position.End", null(run.EndPosition)
-												  , "Time.Start", this.computeStartTime(run), "Time.End", this.computeEndTime(run))
+												  , "Time.Start", this.computeStartTime(run), "Time.End", this.computeEndTime(run)
+												  , "Notes", encode(run.Notes))
 
 							sessionStore.add("Run.Data", runData)
 						}
@@ -7145,6 +7173,8 @@ startupPracticeCenter() {
 	pCenter.show()
 
 	registerMessageHandler("Practice", methodMessageHandler, pCenter)
+
+	startupApplication()
 }
 
 
@@ -7153,5 +7183,3 @@ startupPracticeCenter() {
 ;;;-------------------------------------------------------------------------;;;
 
 startupPracticeCenter()
-
-startupApplication()

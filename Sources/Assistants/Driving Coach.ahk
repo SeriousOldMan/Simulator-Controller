@@ -96,8 +96,6 @@ startupDrivingCoach() {
 	TraySetIcon(icon, "1")
 	A_IconTip := "Driving Coach"
 
-	startupProcess()
-
 	voiceServer := ProcessExist("Voice Server.exe")
 
 	index := 1
@@ -195,6 +193,8 @@ startupDrivingCoach() {
 
 	if remotePID
 		Task.startTask(PeriodicTask(checkRemoteProcessAlive.Bind(remotePID), 10000, kLowPriority))
+
+	startupProcess()
 }
 
 

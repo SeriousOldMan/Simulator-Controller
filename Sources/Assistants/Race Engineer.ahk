@@ -96,8 +96,6 @@ startupRaceEngineer() {
 	TraySetIcon(icon, "1")
 	A_IconTip := "Race Engineer"
 
-	startupProcess()
-
 	voiceServer := ProcessExist("Voice Server.exe")
 
 	index := 1
@@ -196,7 +194,7 @@ startupRaceEngineer() {
 	if remotePID
 		Task.startTask(PeriodicTask(checkRemoteProcessAlive.Bind(remotePID), 10000, kLowPriority))
 
-	return
+	startupProcess()
 }
 
 

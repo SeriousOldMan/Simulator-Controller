@@ -3355,6 +3355,8 @@ startupStrategyWorkbench() {
 	workbench.createGui(workbench.Configuration)
 
 	workbench.show()
+
+	startupApplication()
 }
 
 
@@ -3363,5 +3365,3 @@ startupStrategyWorkbench() {
 ;;;-------------------------------------------------------------------------;;;
 
 startupStrategyWorkbench()
-
-startupApplication()

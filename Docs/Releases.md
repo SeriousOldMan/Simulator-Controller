@@ -1,3 +1,16 @@
+## 5.4.5.0-release 11/10/23 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. Fixed tyre handling for modded cars in *Assetto Corsa*.
+  4. Fixed a couple of timing issues related to the Assistants startup orchestration on systems with a low-end CPU.
+  5. Fixed start grid positions (lap 0) for "Race Reports".
+  6. Fixed a bug in "Practice Center" with data lost even if a switch to a differen simulator, car or track was rejected.
+  7. Strategies are now saved together with a session in "Race Center".
+  8. [Internal] Cleanup of the Binaries folder.
+  9. New car models for "Setup Workbench":
+     - Assetto Corsa
+	   - Alfa Romeo GTA
+
 ## 5.4.4.0-release 11/03/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

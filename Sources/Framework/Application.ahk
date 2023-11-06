@@ -472,12 +472,16 @@ startupApplication() {
 	Task.CriticalHandler := (*) => guardExit()
 
 	OnExit(guardExit, -1)
+
+	MessageManager.resume()
 }
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+MessageManager.pause()
 
 if (!isDetachedInstallation() && !isDebug() && !inList(kBackgroundApps, StrSplit(A_ScriptName, ".")[1])) {
 	checkForUpdates()

@@ -118,6 +118,8 @@ LastLapLeader.1=Leader is on last lap. Bring it home.
 // Lap Timing //
 BestLap.1=%minute% minute %seconds% seconds. This was your best lap so far.
 BestLap.2=Great, %minute% minute %seconds% seconds. Your best lap so far.
+BestSpeed.1=%speed% %unit%. Great, keep going.
+BestSpeed.2=Excellent, %speed% %unit%. Your best top speed so far.
 // Delta Information //
 GainedFront.1=You're catching up on the car ahead, gained %gained% seconds. The gap is still %delta% seconds, but you are %lapTime% seconds faster.
 GainedFront.2=You gained %gained% seconds in %deltaLaps% %laps% on the car ahead, but you still have %delta% seconds to go.

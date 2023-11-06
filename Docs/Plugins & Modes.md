@@ -1380,6 +1380,9 @@ The content of the JSON file looks like this (depending on the current situation
 			"Lap": 3,
 			"Laps": 2,
 			"LastTime": "2:21,3",
+			"BestTime": "2:20,7",
+			"LastSpeed": 270,8
+			"BestSpeed": 272,1
 			"Position": 1
 		},
 		"Strategy": {

@@ -4172,6 +4172,9 @@ class PracticeCenter extends ConfigurationItem {
 			if isNull(newRun.EndTime)
 				newRun.EndTime := false
 
+			if isNull(newRun.Notes)
+				newRun.Notes := ""
+
 			driver.Runs.Push(newRun)
 			laps := []
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.IO.MemoryMappedFiles;
 using System.Reflection;
@@ -691,9 +692,26 @@ namespace ACSHMSpotter {
 				CompletedLaps = completedLaps;
 				Phase = phase;
 			}
-		}
+        }
 
-		const int MAXVALUES = 6;
+        float lastTopSpeed = 0;
+        int lastLaps = 0;
+
+        void updateTopSpeed()
+        {
+            if (physics.SpeedKmh > lastTopSpeed)
+                lastTopSpeed = physics.SpeedKmh;
+
+            if (graphics.CompletedLaps > lastLaps)
+            {
+                SendSpotterMessage("speedUpdate:" + lastTopSpeed);
+
+                lastTopSpeed = 0;
+                lastLaps = graphics.CompletedLaps;
+            }
+        }
+
+        const int MAXVALUES = 6;
 
 		List<float> recentSteerAngles = new List<float>();
 		List<float> recentGLongs = new List<float>();
@@ -1330,6 +1348,8 @@ namespace ACSHMSpotter {
 					{
 						if ((graphics.Status == AC_STATUS.AC_LIVE) && (graphics.IsInPit == 0) && (graphics.IsInPitLane == 0))
 						{
+							updateTopSpeed();
+
 							cycle += 1;
 
 							if (!checkFlagState() && !checkPositions())

@@ -619,6 +619,30 @@ bool greenFlag() {
 		return false;
 }
 
+float lastTopSpeed = 0;
+int lastLaps = 0;
+
+void updateTopSpeed() {
+	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
+	SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
+	
+	if (pf->speedKmh > lastTopSpeed)
+		lastTopSpeed = pf->speedKmh;
+
+	if (gf->completedLaps > lastLaps) {
+		char message[40] = "speedUpdate:";
+		char numBuffer[20];
+
+		sprintf_s(numBuffer, "%f", lastTopSpeed);
+		strcat_s(message, numBuffer);
+
+		sendSpotterMessage(message);
+
+		lastTopSpeed = 0;
+		lastLaps = gf->completedLaps;
+	}
+}
+
 template <typename T> int sgn(T val) {
     return (T(0) < val) - (val < T(0));
 }
@@ -1267,6 +1291,8 @@ int main(int argc, char* argv[])
 					sessionDuration = gf->sessionTimeLeft;
 
 				if ((gf->status == AC_LIVE) && !gf->isInPit && !gf->isInPitLane) {
+					updateTopSpeed();
+
 					cycle += 1;
 
 					if (!startGo || !greenFlag())

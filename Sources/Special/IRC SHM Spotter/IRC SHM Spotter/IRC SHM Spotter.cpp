@@ -627,6 +627,37 @@ public:
 		phase(phase) {}
 };
 
+float lastTopSpeed = 0;
+int lastLaps = 0;
+
+void updateTopSpeed(const irsdk_header* header, const char* data) {
+	char* rawValue;
+
+	getRawDataValue(rawValue, header, data, "Speed");
+
+	float speed = *((float*)rawValue) * 3.6;
+
+	if (speed > lastTopSpeed)
+		lastTopSpeed = speed;
+
+	getRawDataValue(rawValue, header, data, "Lap");
+
+	int completedLaps = *((int*)rawValue);
+
+	if (completedLaps > lastLaps) {
+		char message[40] = "speedUpdate:";
+		char numBuffer[20];
+
+		sprintf_s(numBuffer, "%f", lastTopSpeed);
+		strcat_s(message, numBuffer);
+
+		sendSpotterMessage(message);
+
+		lastTopSpeed = 0;
+		lastLaps = completedLaps;
+	}
+}
+
 const int MAXVALUES = 6;
 
 std::vector<float> recentSteerAngles;
@@ -1473,6 +1504,8 @@ int main(int argc, char* argv[])
 							*/
 
 							if (onTrack && !inPit) {
+								updateTopSpeed(pHeader, g_data);
+
 								cycle += 1;
 
 								if (!greenFlag(pHeader, g_data) && !checkFlagState(pHeader, g_data) && !checkPositions(pHeader, g_data, playerCarIndex, trackLength))

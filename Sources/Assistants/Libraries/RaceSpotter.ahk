@@ -2817,9 +2817,9 @@ class RaceSpotter extends GridRaceAssistant {
 				this.getSpeaker(true).speakPhrase("PitWindowClosed", false, false, "PitWindowClosed")
 	}
 
-	topSpeedUpdate(lastTopSpeed) {
-		if lastTopSpeed
-			this.iLastTopSpeed := Round(lastTopSpeed, 1)
+	speedUpdate(lastSpeed) {
+		if lastSpeed
+			this.iLastTopSpeed := Round(lastSpeed, 1)
 	}
 
 	startupSpotter(forceShutdown := false) {

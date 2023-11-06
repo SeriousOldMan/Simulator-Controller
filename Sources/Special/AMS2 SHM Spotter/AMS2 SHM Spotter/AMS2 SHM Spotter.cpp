@@ -515,6 +515,31 @@ public:
 		phase(phase) {}
 };
 
+float lastTopSpeed = 0;
+int lastLaps = 0;
+
+void updateTopSpeed(const SharedMemory* sharedData)
+{
+	float speed = sharedData->mSpeed * 3.6;
+
+	if (speed > lastTopSpeed)
+		lastTopSpeed = speed;
+
+	if (sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mLapsCompleted > lastLaps)
+	{
+		char message[40] = "speedUpdate:";
+		char numBuffer[20];
+
+		sprintf_s(numBuffer, "%f", lastTopSpeed);
+		strcat_s(message, numBuffer);
+
+		sendSpotterMessage(message);
+
+		lastTopSpeed = 0;
+		lastLaps = sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mLapsCompleted;
+	}
+}
+
 const int MAXVALUES = 6;
 
 std::vector<float> recentSteerAngles;
@@ -1144,6 +1169,8 @@ int main(int argc, char* argv[]) {
 
 				if (running)
 					if (localCopy->mGameState != GAME_INGAME_PAUSED && localCopy->mPitMode == PIT_MODE_NONE) {
+						updateTopSpeed(localCopy);
+
 						cycle += 1;
 
 						if (!startGo || !greenFlag(localCopy))

@@ -2095,8 +2095,8 @@ class PracticeCenter extends ConfigurationItem {
 			this.iSelectedChartType := false
 		}
 
-		if ((this.RunsListView.GetNext() != 0) && this.SessionActive)
-			window["runNotesEdit"].Enabled := true
+		if (this.RunsListView.GetNext() != 0)
+			window["runNotesEdit"].Enabled := this.SessionActive
 		else {
 			window["runNotesEdit"].Enabled := false
 			window["runNotesEdit"].Text := ""

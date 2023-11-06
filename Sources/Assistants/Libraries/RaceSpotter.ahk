@@ -1468,7 +1468,7 @@ class RaceSpotter extends GridRaceAssistant {
 		local focused := false
 		local number := false
 		local situation, sessionDuration, lapTime, sessionEnding, minute, lastTemperature, stintLaps
-		local minute, rnd, phrase, bestLapTime, ignore
+		local minute, rnd, phrase, bestLapTime, lastTopSpeed, ignore
 
 		if ((remainingSessionLaps = kUndefined) || (remainingStintLaps = kUndefined))
 			return false
@@ -1597,12 +1597,16 @@ class RaceSpotter extends GridRaceAssistant {
 						this.SessionInfos["BestLap"] := bestLapTime
 				}
 
-				if (this.LastTopSpeed && (!this.BestTopSpeed || (this.LastTopSpeed > this.BestTopSpeed))) {
-					this.iBestTopSpeed := this.LastTopSpeed
+				if (this.LastTopSpeed > 0) {
+					lastTopSpeed := Round(this.LastTopSpeed, 1)
 
-					speaker.speakPhrase("BestSpeed", {speed: speaker.number2Speech(this.LastTopSpeed, 1), unit: getUnit("Speed")})
+					if (!this.SessionInfos.Has("BestSpeed") || (lastTopSpeed > this.SessionInfos["BestSpeed"])) {
+						speaker.speakPhrase("BestSpeed", {speed: speaker.number2Speech(lastTopSpeed, 1), unit: getUnit("Speed")})
 
-					return true
+						this.SessionInfos["BestSpeed"] := lastTopSpeed
+
+						return true
+					}
 				}
 			}
 
@@ -2818,8 +2822,10 @@ class RaceSpotter extends GridRaceAssistant {
 	}
 
 	speedUpdate(lastSpeed) {
-		if lastSpeed
+		if lastSpeed {
 			this.iLastTopSpeed := Round(lastSpeed, 1)
+			this.iBestTopSpeed := Max(this.LastTopSpeed, this.BestTopSpeed)
+		}
 	}
 
 	startupSpotter(forceShutdown := false) {

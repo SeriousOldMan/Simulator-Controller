@@ -1031,12 +1031,16 @@ systemMonitor(command := false, arguments*) {
 		if (displayState = "Qualification")
 			displayState := "Qualifying"
 
-		if (state = "Active") {
+		if ((state = "Active") || (state = "Warning")) {
 			html := "<table>"
 			html .= ("<tr><td><b>" . translate("Simulator:") . "</b></td><td>" . getMultiMapValue(controllerState, "Simulation", "Simulator") . "</td></tr>")
 			html .= ("<tr><td><b>" . translate("Car:") . "</b></td><td>" . getMultiMapValue(controllerState, "Simulation", "Car") . "</td></tr>")
 			html .= ("<tr><td><b>" . translate("Track:") . "</b></td><td>" . getMultiMapValue(controllerState, "Simulation", "Track") . "</td></tr>")
 			html .= ("<tr><td><b>" . translate("Session:") . "</b></td><td>" . translate(displayState) . "</td></tr>")
+
+			if (getMultiMapValue(controllerState, "Simulation", "Information", kUndefined) != kUndefined)
+				html .= ("<tr><td><b>" . translate("State:") . "</b></td><td>" . getMultiMapValue(controllerState, "Simulation", "Information") . "</td></tr>")
+
 			html .= "</table>"
 		}
 		else if (state = "Passive") {

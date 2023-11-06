@@ -8,9 +8,11 @@
   7. Strategies are now saved together with a session in "Race Center".
   8. The top speed of the last lap as well as the overall best top speed are now shown on the session info page in "System Monitor".
   9. The Spotter now informs you whenever you set a new best top speed.
-  10. [Developer only] The top speed information is also available in the "State.json".
-  11. [Internal] Cleanup of the Binaries folder.
-  12. New car models for "Setup Workbench":
+  10. You can now take notes in the "Practice Center" for each stint, for example to remember and compare any changes made to the setup.
+  11. You will now get a warning on the dashboard in "System Monitor", when no valid car position information is available in the simulation data.
+  12. [Developer only] The top speed information is also available in the "State.json".
+  13. [Internal] Cleanup of the Binaries folder.
+  14. New car models for "Setup Workbench":
       - Assetto Corsa
 	    - Alfa Romeo GTA
 

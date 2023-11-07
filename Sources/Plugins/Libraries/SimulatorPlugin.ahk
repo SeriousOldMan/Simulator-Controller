@@ -817,10 +817,10 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		if (this.Active && this.runningSimulator()) {
 			if !this.iHasPositionsData {
 				setMultiMapValue(configuration, this.Plugin, "State", "Warning")
-
-				setMultiMapValue(configuration, "Simulation", "Information", translate("No position information available..."))
-
 				setMultiMapValue(configuration, this.Plugin, "Information", getMultiMapValue(configuration, this.Plugin, "Information") . translate("; ") . translate("State:") . A_Space . translate("No position information available..."))
+
+				setMultiMapValue(configuration, "Simulation", "State", "Warning")
+				setMultiMapValue(configuration, "Simulation", "Information", translate("No position information available..."))
 			}
 		}
 	}

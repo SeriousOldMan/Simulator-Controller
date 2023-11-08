@@ -815,12 +815,12 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		super.writePluginState(configuration)
 
 		if (this.Active && this.runningSimulator()) {
-			if !this.iHasPositionsData {
+			if (this.Car && this.Track && !this.iHasPositionsData) {
 				setMultiMapValue(configuration, this.Plugin, "State", "Warning")
-				setMultiMapValue(configuration, this.Plugin, "Information", getMultiMapValue(configuration, this.Plugin, "Information") . translate("; ") . translate("State:") . A_Space . translate("No position information available..."))
+				setMultiMapValue(configuration, this.Plugin, "Information", getMultiMapValue(configuration, this.Plugin, "Information") . translate("; ") . translate("State:") . A_Space . translate("No standings information available..."))
 
 				setMultiMapValue(configuration, "Simulation", "State", "Warning")
-				setMultiMapValue(configuration, "Simulation", "Information", translate("No position information available..."))
+				setMultiMapValue(configuration, "Simulation", "Information", translate("No standings information available..."))
 			}
 		}
 	}

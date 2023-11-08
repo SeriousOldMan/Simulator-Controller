@@ -49,7 +49,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[5.4.5.0-dev](https://www.dropbox.com/scl/fi/p5h7h68szzjupxt1bsdcz/Simulator-Controller-5.4.5.0-dev.zip?rlkey=t3j8iouuvjfu109pz8e9n8q6v&dl=1) (Early build for 5.4.5. Changes: Cleanup of the Binaries folder, Strategies are now preserved when saving session in "Race Center", New car models for "Setup Workbench", Fixed tyre handling in "Assetto Corsa", Fixed timing in problem during Assistants startup, Fixed start grid positions, Fixed "Practice Center" initializing even if context change was canceled, New top speed info on session page of "System Monitor", New top speed fields in "State.json", Spotter now announces your best top speed, Warning on dashboard when no position infos are available in the data, Initial french translation, Updated Driving Coach to the OpenAI models.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-545) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

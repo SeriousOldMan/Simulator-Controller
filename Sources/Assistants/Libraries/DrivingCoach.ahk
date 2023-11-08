@@ -238,7 +238,7 @@ class DrivingCoach extends GridRaceAssistant {
 	class OpenAIConnector extends DrivingCoach.HTTPConnector {
 		static Models {
 			Get {
-				return ["GPT 3.5 turbo", "GPT 3.5 turbo 16k", "GPT 4", "GPT 4 32k"]
+				return ["GPT 3.5", "GPT 3.5 turbo", "GPT 3.5 turbo 1106", "GPT 4", "GPT 4 32k", "GPT 4 1106 preview"]
 			}
 		}
 

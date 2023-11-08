@@ -17,6 +17,7 @@
   16. New car models for "Setup Workbench":
       - Assetto Corsa
 	    - Alfa Romeo GTA
+	    - BMW M235i Racing
 
 ## 5.4.4.0-release 11/03/23
   1. Minor bugfixes, as always

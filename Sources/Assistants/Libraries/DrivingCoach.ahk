@@ -277,6 +277,12 @@ class DrivingCoach extends GridRaceAssistant {
 	}
 
 	class AzureConnector extends DrivingCoach.OpenAIConnector {
+		Models {
+			Get {
+				return ["GPT 3.5", "GPT 3.5 turbo", "GPT 4", "GPT 4 32k"]
+			}
+		}
+		
 		Model[external := false] {
 			Get {
 				if !external

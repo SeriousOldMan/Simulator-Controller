@@ -1,4 +1,4 @@
-## 5.4.5.0-release 11/10/23 (planned)
+## 5.4.5.0-release 11/10/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed tyre handling for modded cars in *Assetto Corsa*.
@@ -7,7 +7,7 @@
   6. Fixed a bug in "Practice Center" with data lost even if a switch to a differen simulator, car or track was rejected.
   7. Strategies are now saved together with a session in "Race Center".
   8. The top speed of the last lap as well as the overall best top speed are now shown on the session info page in "System Monitor".
-  9. The Spotter now informs you whenever you set a new best top speed.
+  9. The Spotter now informs you whenever you have set a new best top speed.
   10. You can now [take notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#data-analysis) in the "Practice Center" for each stint, for example to remember and compare any changes made to the setup.
   11. You will now get a warning on the dashboard in "System Monitor", when no valid participant information is available in the simulation data.
   12. Thanks to our Discord member @slatmars we will get a full translation of Simulator Controller for the French language. This release contains initial tranlsations for the UI. More translations, as well as Assistant grammars and other stuff will follow with the next relases.

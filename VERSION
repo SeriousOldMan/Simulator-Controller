@@ -1,15 +1,15 @@
 [Development]
-Version=5.4.5.0-rc
+Version=5.4.5.0-release
 Target=5.4.5.0-release
-Date=11/09/2023
-Download=https://www.dropbox.com/scl/fi/b7fi1wy2xiqikiezc2y7b/Simulator-Controller-5.4.5.0-rc.zip?rlkey=x2xd9b9mg5tce1icqrip7faih&dl=1
+Date=11/10/2023
+Download=https://cutt.ly/OwTJ0wPt;https://www.dropbox.com/scl/fi/k64sm10h9gwvb8ulbiros/Simulator-Controller-5.4.5.0-release.zip?rlkey=dafsipu91j8xp00pgf9iq2usq&dl=1
 Changes=Cleanup of the Binaries folder, Strategies are now preserved when saving session in "Race Center", New car models for "Setup Workbench", Fixed tyre handling in "Assetto Corsa", Fixed timing in problem during Assistants startup, Fixed start grid positions, Fixed "Practice Center" initializing even if context change was canceled, New top speed info on session page of "System Monitor", New top speed fields in "State.json", Spotter now announces your best top speed, Warning on dashboard when no position infos are available in the data, Initial french translation, Updated Driving Coach to the OpenAI models
 Components=Media->5.3.0,Configuration->5.4.0,Utilities->5.3.0
 [Release]
-Version=5.4.4.0-release
-Date=11/03/2023
-Download=https://cutt.ly/9wRWbHBs;https://www.dropbox.com/scl/fi/s899rkuk4rhokd8qh94pi/Simulator-Controller-5.4.4.0-release.zip?rlkey=ye3ae25s1s0sobjkii0c1k6u0&dl=1
-Changes=Google STT integration, New settings for confirmation handling by the Assistants, Optical enhancement for session info in "System Monitor", Drive time in session info widget in "System Monitor", Improved process management when working on the configuration, New car models for "Setup Workbench", New translation report for developers
+Version=5.4.5.0-release
+Date=11/10/2023
+Download=https://cutt.ly/OwTJ0wPt;https://www.dropbox.com/scl/fi/k64sm10h9gwvb8ulbiros/Simulator-Controller-5.4.5.0-release.zip?rlkey=dafsipu91j8xp00pgf9iq2usq&dl=1
+Changes=Cleanup of the Binaries folder, Strategies are now preserved when saving session in "Race Center", New car models for "Setup Workbench", Fixed tyre handling in "Assetto Corsa", Fixed timing in problem during Assistants startup, Fixed start grid positions, Fixed "Practice Center" initializing even if context change was canceled, New top speed info on session page of "System Monitor", New top speed fields in "State.json", Spotter now announces your best top speed, Warning on dashboard when no position infos are available in the data, Initial french translation, Updated Driving Coach to the OpenAI models
 Components=Media->5.3.0,Configuration->5.4.0,Utilities->5.3.0
 [Components]
 Media.5.3.0.Path=Resources
@@ -25,7 +25,7 @@ Utilities.5.3.0.Path=.
 Utilities.5.3.0.Content=Utilities
 Utilities.5.3.0.Download=https://www.dropbox.com/scl/fi/hlza8t9tae5d0vnd7wmqa/Utilities-5.3.0.zip?rlkey=ciotp2dr5u3e4rxgikf45a1dq&dl=1
 [Current]
-Type=Development
+Type=Release
 [Version]
-Development=5.4.5.0-rc
-Release=5.4.4.0-release
+Development=5.4.5.0-release
+Release=5.4.5.0-release

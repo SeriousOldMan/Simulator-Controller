@@ -2128,12 +2128,18 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	setPitstopRefuelAmount(pitstopNumber, liters) {
 		local litersIncrement
 
+		liters := Ceil(liters)
+
 		super.setPitstopRefuelAmount(pitstopNumber, liters)
 
-		litersIncrement := Round(liters - this.getPitstopOptionValues("Refuel")[1])
+		loop 3 {
+			litersIncrement := Round(liters - this.getPitstopOptionValues("Refuel")[1])
 
-		if (litersIncrement != 0)
-			changePitstopFuelAmount((litersIncrement > 0) ? "Increase" : "Decrease", Abs(litersIncrement))
+			if (litersIncrement != 0)
+				changePitstopFuelAmount((litersIncrement > 0) ? "Increase" : "Decrease", Abs(litersIncrement))
+			else
+				break
+		}
 	}
 
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {

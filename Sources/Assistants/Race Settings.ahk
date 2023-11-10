@@ -943,7 +943,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		setMultiMapValue(newSettings, "Session Settings", "Tyre.Wet.Pressure.Target.RR"
 									, convertUnit("Pressure", internalValue("Float", settingsGui["tpWetRearRightEdit"].Text), false))
 
-		setMultiMapValue(newSettings, "Session Settings", "Lap.AvgTime", settingsGui["avgLaptimeEdit"].Text)
+		setMultiMapValue(newSettings, "Session Settings", "Lap.AvgTime", Min(settingsGui["avgLaptimeEdit"].Text, 10))
 		setMultiMapValue(newSettings, "Session Settings", "Fuel.AvgConsumption", convertUnit("Volume", internalValue("Float", settingsGui["fuelConsumptionEdit"].Text), false))
 		setMultiMapValue(newSettings, "Session Settings", "Fuel.SafetyMargin", Round(convertUnit("Volume", internalValue("Float", settingsGui["safetyFuelEdit"].Text), false)))
 
@@ -1636,7 +1636,7 @@ showRaceSettingsEditor() {
 	}
 	else {
 		registerMessageHandler("Setup", functionMessageHandler)
-	
+
 		startupApplication()
 
 		result := editRaceSettings(&settings)

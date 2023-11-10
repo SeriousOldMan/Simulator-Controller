@@ -176,7 +176,7 @@ initializeGoogleLanguages() {
 						  , "es-CO", "es-CR", "es-CU", "es-DO", "es-EC", "es-SV", "es-GQ", "es-GT", "es-HN", "es-MX"
 						  , "es-NI", "es-PA", "es-PY", "es-PE", "es-PR", "es-ES", "es-UY", "es-US", "es-VE", "sw-KE"
 						  , "sw-TZ", "sv-SE", "ta-IN", "te-IN", "th-TH", "tr-TR", "uk-UA", "uz-UZ", "vi-VN", "zu-ZA"]
-		kGoogleLanguages[culture] := ["Long Speech (latest_long)", "Short Speech (latest_short)", "Command (command_and_search)"]
+		kGoogleLanguages[culture] := ["Long Speech (latest_long)", "Short Speech (latest_short)"]
 }
 
 initializeGoogleLanguages()

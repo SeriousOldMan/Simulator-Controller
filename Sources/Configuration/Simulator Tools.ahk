@@ -2870,12 +2870,15 @@ runBuildTargets(&buildProgress) {
 
 				DirCreate(targetDirectory)
 
-				try {
-					FileMove(compiledFile, targetDirectory, 1)
-				}
-				catch Any as exception {
-					logError(exception)
-				}
+				loop 2
+					try {
+						FileMove(compiledFile, targetDirectory, 1)
+
+						break
+					}
+					catch Any as exception {
+						logError(exception)
+					}
 			}
 		}
 

@@ -2781,6 +2781,8 @@ runBuildTargets(&buildProgress) {
 	if !kSilentMode
 		showProgress({progress: buildProgress, message: ""})
 
+	showProgress({progress: buildProgress, message: translate("...")})
+
 	for ignore, target in gBuildTargets {
 		targetName := target[1]
 

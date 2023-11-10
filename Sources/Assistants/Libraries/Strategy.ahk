@@ -339,10 +339,13 @@ class StrategySimulation {
 													 , &initialMap, &initialFuelConsumption, &initialAvgLapTime)
 	}
 
-	getSimulationSettings(&useInitialConditions, &useTelemetryData, &consumptionVariation, &initialFuelVariation
-						, &tyreUsageVariation, &tyreCompoundVariation) {
-		return this.StrategyManager.getSimulationSettings(&useInitialConditions, &useTelemetryData, &consumptionVariation, &initialFuelVariation
-														, &tyreUsageVariation, &tyreCompoundVariation)
+	getSimulationSettings(&useInitialConditions, &useTelemetryData
+						, &consumptionVariation, &initialFuelVariation, &tyreUsageVariation, &tyreCompoundVariation
+						, &firstStintWeight) {
+		return this.StrategyManager.getSimulationSettings(&useInitialConditions, &useTelemetryData
+														, &consumptionVariation, &initialFuelVariation
+														, &tyreUsageVariation, &tyreCompoundVariation
+														, &firstStintWeight)
 	}
 
 	getPitstopRules(&validator, &pitstopRule, &refuelRule, &tyreChangeRule, &tyreSets) {
@@ -889,6 +892,7 @@ class VariationSimulation extends StrategySimulation {
 		local consumption := 0
 		local tyreUsage := 0
 		local tyreCompoundVariation := 0
+		local firstStintWeight := 0
 		local initialFuel := 0
 		local consumptionSteps, tyreUsageSteps, tyreCompoundVariationSteps, initialFuelSteps
 		local scenarios, variation, tyreCompoundColors
@@ -909,7 +913,9 @@ class VariationSimulation extends StrategySimulation {
 		if initialLap
 			formationLap := false
 
-		this.getSimulationSettings(&useInitialConditions, &useTelemetryData, &consumption, &initialFuel, &tyreUsage, &tyreCompoundVariation)
+		this.getSimulationSettings(&useInitialConditions, &useTelemetryData
+								 , &consumption, &initialFuel, &tyreUsage, &tyreCompoundVariation
+								 , &firstStintWeight)
 
 		consumptionSteps := 1
 		tyreUsageSteps := tyreUsage * 2
@@ -1233,6 +1239,7 @@ class TrafficSimulation extends StrategySimulation {
 		local consumption := 0
 		local tyreUsage := 0
 		local tyreCompoundVariation := 0
+		local firstStintWeight := 0
 		local initialFuel := 0
 		local consumptionSteps, tyreUsageSteps, tyreCompoundVariationSteps, initialFuelSteps
 		local scenarios, variation, first, tyreCompoundColors, tyreLapsVariation
@@ -1264,7 +1271,9 @@ class TrafficSimulation extends StrategySimulation {
 		if initialLap
 			formationLap := false
 
-		this.getSimulationSettings(&useInitialConditions, &useTelemetryData, &consumption, &initialFuel, &tyreUsage, &tyreCompoundVariation)
+		this.getSimulationSettings(&useInitialConditions, &useTelemetryData
+								 , &consumption, &initialFuel, &tyreUsage, &tyreCompoundVariation
+								 , &firstStintWeight)
 
 		consumptionSteps := 1
 		tyreUsageSteps := tyreUsage * 2
@@ -1509,6 +1518,8 @@ class Strategy extends ConfigurationItem {
 	iInitialFuelVariation := 0
 	iTyreUsageVariation := 0
 	iTyreCompoundVariation := 0
+
+	iFirstStintWeight := 0
 
 	iDriver := false
 	iDriverName := SessionDatabase.getUserName()
@@ -2380,6 +2391,12 @@ class Strategy extends ConfigurationItem {
 		}
 	}
 
+	FirstStintWeight {
+		Get {
+			return this.iFirstStintWeight
+		}
+	}
+
 	__New(strategyManager, configuration := false, driver := false) {
 		local initialStint := false
 		local initialLap := false
@@ -2396,7 +2413,7 @@ class Strategy extends ConfigurationItem {
 		local pitstopFuelService, pitstopTyreService, pitstopServiceOrder
 		local validator, pitstopRule, refuelRule, tyreChangeRule, tyreSets
 		local useInitialConditions, useTelemetryData
-		local consumptionVariation, initialFuelVariation, tyreUsageVariation, tyreCompoundVariation
+		local consumptionVariation, initialFuelVariation, tyreUsageVariation, tyreCompoundVariation, firstStintWeight
 		local duration, minute, forecast, lastWeather, lastAirTemperature, lastTrackTemperature
 
 		this.iStrategyManager := strategyManager
@@ -2490,7 +2507,8 @@ class Strategy extends ConfigurationItem {
 			tyreCompoundVariation := false
 
 			this.StrategyManager.getSimulationSettings(&useInitialConditions, &useTelemetryData
-													 , &consumptionVariation, &initialFuelVariation, &tyreUsageVariation, &tyreCompoundVariation)
+													 , &consumptionVariation, &initialFuelVariation, &tyreUsageVariation, &tyreCompoundVariation
+													 , &firstStintWeight)
 
 			this.iUseInitialConditions := useInitialConditions
 			this.iUseTelemetryData := useTelemetryData
@@ -2499,6 +2517,8 @@ class Strategy extends ConfigurationItem {
 			this.iInitialFuelVariation := initialFuelVariation
 			this.iTyreUsageVariation := tyreUsageVariation
 			this.iTyreCompoundVariation := tyreCompoundVariation
+
+			this.iFirstStintWeight := firstStintWeight
 
 			this.StrategyManager.getStartConditions(&initialStint, &initialLap, &initialStintTime, &initialSessionTime
 												  , &initialTyreLaps, &initialFuelAmount, &ecuMap, &fuelConsumption, &avgLapTime)
@@ -2665,6 +2685,8 @@ class Strategy extends ConfigurationItem {
 		this.iInitialFuelVariation := getMultiMapValue(configuration, "Simulation", "InitialFuelVariation", 0)
 		this.iTyreUsageVariation := getMultiMapValue(configuration, "Simulation", "TyreUsageVariation", 0)
 		this.iTyreCompoundVariation := getMultiMapValue(configuration, "Simulation", "TyreCompoundVariation", 0)
+
+		this.iFirstStintWeight := getMultiMapValue(configuration, "Simulation", "FirstStintWeight", 0)
 	}
 
 	saveToConfiguration(configuration) {
@@ -2774,6 +2796,8 @@ class Strategy extends ConfigurationItem {
 		setMultiMapValue(configuration, "Simulation", "InitialFuelVariation", this.InitialFuelVariation)
 		setMultiMapValue(configuration, "Simulation", "TyreUsageVariation", this.TyreUsageVariation)
 		setMultiMapValue(configuration, "Simulation", "TyreCompoundVariation", this.TyreCompoundVariation)
+
+		setMultiMapValue(configuration, "Simulation", "FirstStintWeight", this.FirstStintWeight)
 	}
 
 	initializeAvailableTyreSets() {
@@ -2977,7 +3001,7 @@ class Strategy extends ConfigurationItem {
 		local weather := false
 		local airTemperature := false
 		local trackTemperature := false
-		local targetLap, pitstopRule, avgLapTime, openingLap, closingLap, time
+		local targetLap, pitstopRule, avgLapTime, openingLap, closingLap, time, halfLaps
 
 		adjusted := false
 
@@ -3009,8 +3033,11 @@ class Strategy extends ConfigurationItem {
 
 		pitstopRule := this.PitstopRule
 
-		if ((pitstopNr = 1) && ((targetLap >= remainingSessionLaps) && pitstopRule) && (pitstopRule == true))
-			targetLap := (remainingSessionLaps - 2)
+		if ((pitstopNr = 1) && (!pitstopRule || (pitstopRule == true))) {
+			halfLaps := ((targetLap - currentLap) / 2)
+
+			targetLap := Round(halfLaps + ((halfLaps / 100) * this.FirstStintWeight))
+		}
 		else if isObject(pitstopRule) {
 			openingLap := (pitstopRule[1] * 60 / avgLapTime)
 			closingLap := (pitstopRule[2] * 60 / avgLapTime)

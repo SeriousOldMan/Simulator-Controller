@@ -1277,7 +1277,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.SetFont("Italic", "Arial")
 
-		workbenchGui.Add("GroupBox", "x214 ys+34 w174 h120", translate("Optimizer"))
+		workbenchGui.Add("GroupBox", "x214 ys+34 w174 h171", translate("Optimizer"))
 
 		workbenchGui.SetFont("Norm", "Arial")
 
@@ -1291,8 +1291,9 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.Add("Slider", "Center Thick15 x" . x1 . " yp+2 w60 0x10 Range0-100 ToolTip VsimTyreUsageVariation", 0)
 
 		workbenchGui.Add("Text", "x" . x . " yp+22 w100 h20 +0x200", translate("Tyre Compound"))
-		workbenchGui.Add("Slider", "Center Thick15 x" . x1 . " yp+2 w60 0x10 Range0-100 ToolTip VsimtyreCompoundVariation", 0)
+		workbenchGui.Add("Slider", "Center Thick15 x" . x1 . " yp+2 w60 0x10 Range0-100 ToolTip VsimTyreCompoundVariation", 0)
 
+		/*
 		workbenchGui.Add("Text", "x214 yp+30 w40 h23 +0x200", translate("Use"))
 
 		choices := collect(["Initial Conditions", "Telemetry Data", "Initial Cond. + Telemetry"], translate)
@@ -1300,6 +1301,10 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.Add("DropDownList", "x250 yp w138 Choose2 VsimInputDropDown", choices).OnEvent("Change", (*) => this.updateState())
 
 		workbenchGui.Add("Button", "x214 yp+26 w174 h20", translate("Simulate!")).OnEvent("Click", runSimulation)
+		*/
+
+		workbenchGui.Add("Text", "x" . x . " yp+45 w100 h20 +0x200", translate("Pit Strategy"))
+		workbenchGui.Add("Slider", "Center Thick15 x" . x1 . " yp+2 w60 0x10 Range-100-100 ToolTip VsimFirstStintWeight", 0)
 
 		x := 407
 		x0 := x - 4
@@ -1310,7 +1315,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.SetFont("Italic", "Arial")
 
-		workbenchGui.Add("GroupBox", "x399 ys+34 w197 h171", translate("Summary"))
+		workbenchGui.Add("GroupBox", "x399 ys+34 w197 h120", translate("Summary"))
 
 		workbenchGui.SetFont("Norm", "Arial")
 
@@ -1320,9 +1325,11 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.Add("Text", "x" . x . " yp+23 w90 h20 +0x200", translate("# Tyre Changes"))
 		workbenchGui.Add("Edit", "x" . x1 . " yp+1 w40 h20 Disabled VsimNumTyreChangeResult")
 
+		/*
 		workbenchGui.Add("Text", "x" . x . " yp+23 w90 h20 +0x200", translate("Consumed Fuel"))
 		workbenchGui.Add("Edit", "x" . x1 . " yp+1 w40 h20 Disabled VsimConsumedFuelResult")
 		workbenchGui.Add("Text", "x" . x3 . " yp+2 w45 r1", getUnit("Volume", true))
+		*/
 
 		workbenchGui.Add("Text", "x" . x . " yp+21 w90 h20 +0x200", translate("@ Pitlane"))
 		workbenchGui.Add("Edit", "x" . x1 . " yp+1 w40 h20 Disabled VsimPitlaneSecondsResult")
@@ -1331,6 +1338,14 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.Add("Text", "x" . x . " yp+21 w90 h20 +0x200", translate("@ Finish"))
 		workbenchGui.Add("Edit", "x" . x1 . " yp+1 w40 h20 Disabled VsimSessionResultResult")
 		workbenchGui.Add("Text", "x" . x3 . " yp+2 w50 h20 VsimSessionResultLabel", translate("Laps"))
+
+		workbenchGui.Add("Text", "x399 yp+30 w40 h23 +0x200", translate("Use"))
+
+		choices := collect(["Initial Conditions", "Telemetry Data", "Initial Cond. + Telemetry"], translate)
+
+		workbenchGui.Add("DropDownList", "x435 yp w161 Choose2 VsimInputDropDown", choices).OnEvent("Change", (*) => this.updateState())
+
+		workbenchGui.Add("Button", "x399 yp+26 w197 h20", translate("Simulate!")).OnEvent("Click", runSimulation)
 
 		workbenchTab.UseTab(6)
 
@@ -2318,6 +2333,8 @@ class StrategyWorkbench extends ConfigurationItem {
 						this.Control["simtyreCompoundVariation"].Value := strategy.TyreCompoundVariation
 						this.Control["simInitialFuelVariation"].Value := strategy.InitialFuelVariation
 
+						this.Control["simFirstStintWeight"].Value := strategy.FirstStintWeight
+
 						if (strategy.UseInitialConditions && strategy.UseTelemetryData)
 							value := 3
 						else if strategy.UseTelemetryData
@@ -3081,13 +3098,16 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	getSimulationSettings(&useInitialConditions, &useTelemetryData
-						, &consumptionVariation, &initialFuelVariation, &tyreUsageVariation, &tyreCompoundVariation) {
+						, &consumptionVariation, &initialFuelVariation, &tyreUsageVariation, &tyreCompoundVariation
+						, &firstStintWeight) {
 		local simInputDropDown := this.Control["simInputDropDown"].Value
 
 		consumptionVariation := this.Control["simConsumptionVariation"].Value
 		initialFuelVariation := this.Control["simInitialFuelVariation"].Value
 		tyreUsageVariation := this.Control["simTyreUsageVariation"].Value
-		tyreCompoundVariation := this.Control["simtyreCompoundVariation"].Value
+		tyreCompoundVariation := this.Control["simTyreCompoundVariation"].Value
+
+		firstStintWeight := this.Control["simFirstStintWeight"].Value
 
 		useInitialConditions := ((simInputDropDown == 1) || (simInputDropDown == 3))
 		useTelemetryData := (simInputDropDown > 1)
@@ -3163,7 +3183,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 			this.Control["simNumPitstopResult"].Text := numPitstops
 			this.Control["simNumTyreChangeResult"].Text := numTyreChanges
-			this.Control["simConsumedFuelResult"].Text := displayValue("Float", convertUnit("Volume", consumedFuel), 1)
+			; this.Control["simConsumedFuelResult"].Text := displayValue("Float", convertUnit("Volume", consumedFuel), 1)
 			this.Control["simPitlaneSecondsResult"].Text := Ceil(strategy.getPitstopTime())
 
 			if (this.SelectedSessionType = "Duration")
@@ -3174,7 +3194,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		else {
 			this.Control["simNumPitstopResult"].Text := ""
 			this.Control["simNumTyreChangeResult"].Text := ""
-			this.Control["simConsumedFuelResult"].Text := ""
+			; this.Control["simConsumedFuelResult"].Text := ""
 			this.Control["simPitlaneSecondsResult"].Text := ""
 			this.Control["simSessionResultResult"].Text := ""
 		}

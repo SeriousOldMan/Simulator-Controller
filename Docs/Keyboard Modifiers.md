@@ -2,6 +2,7 @@ Many applications of Simulator Controller provide a couple of modifier keys for 
 
 | Application   | Function | Modifier | Description |
 |---------------|----------|----------|-------------|
+| Applications | Exiting an application from the tray menu | Control | When control is held down, the application will exit, even if it is still working on some background tasks. |
 | Race Assistants | Finishing a session | Control + Shift | Normally, the Race Assistants will wait for a specific cooldown time, before they startup again. While in training sessions against AI racers, you can skip this cooldown period with holding the Control together with the Shift key in the moment, when the Assistants detect a session change. But be aware, that all post-processing, like saving telemetry data or creating a race report will be skipped as well. |
 | Race Center   | Startup    | Control  | If the Control key is pressed when starting the "Race Center", it will start with session synchronzation disabled. Only the basic data (stint plan, strategy, driver selection, tyre setups and so on) is loaded, but no session data like stints, laps, telemetry information, etc. |
 |    | Login    | Control  | If you hold down the Control key while pressing on the button with a small key to connect to a session, a login dialog pops up and you can use the team manager account name and password instead of a token to connect to a team session. |

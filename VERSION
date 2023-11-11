@@ -3,7 +3,7 @@ Version=5.4.6.0-dev
 Target=5.4.6.0-release
 Date=11/11/2023
 Download=
-Changes=Weighting of 1st stint in strategy simulation, Ctrl modifier for "Exit" command, Extended UI translation for French
+Changes=Weighting of 1st stint in strategy simulation, Ctrl modifier for "Exit" command, Extended UI translation for French, Increased resilience of Pitstop MFD handling in ACC
 Components=Media->5.3.0,Configuration->5.4.0,Utilities->5.3.0
 [Release]
 Version=5.4.5.0-release

@@ -2143,46 +2143,80 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
-		local tyreSetIncrement
+		local tyreSetIncrement, finished
 
 		super.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
 
 		if compound {
-			if (this.getPitstopOptionValues("Tyre Compound")[1] != compound)
-				changePitstopTyreCompound((compound = "Wet") ? "Increase" : "Decrease")
+			loop 3 {
+				finished := true
 
-			if (set && (compound = "Dry"))
-				loop 2 {
+				if (this.getPitstopOptionValues("Tyre Compound")[1] != compound) {
+					finished := false
+
+					changePitstopTyreCompound((compound = "Wet") ? "Increase" : "Decrease")
+				}
+
+				if (set && (compound = "Dry")) {
 					tyreSetIncrement := Round(set - this.getPitstopOptionValues("Tyre Set")[1])
 
-					if (tyreSetIncrement != 0)
+					if (tyreSetIncrement != 0) {
+						finished := false
+
 						changePitstopTyreSet((tyreSetIncrement > 0) ? "Next" : "Previous", Abs(tyreSetIncrement))
+					}
 				}
+
+				if finished
+					break
+			}
 		}
 		else if this.iPSChangeTyres
 			this.toggleActivity("Change Tyres")
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
-		local pressures, pressureFLIncrement, pressureFRIncrement, pressureRLIncrement, pressureRRIncrement
+		local pressures, pressureFLIncrement, pressureFRIncrement, pressureRLIncrement, pressureRRIncrement, finished
 
 		super.setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR)
 
-		pressures := this.getPitstopOptionValues("Tyre Pressures")
+		loop 3 {
+			finished := true
 
-		pressureFLIncrement := Round(pressureFL - pressures[1], 1)
-		pressureFRIncrement := Round(pressureFR - pressures[2], 1)
-		pressureRLIncrement := Round(pressureRL - pressures[3], 1)
-		pressureRRIncrement := Round(pressureRR - pressures[4], 1)
+			pressures := this.getPitstopOptionValues("Tyre Pressures")
 
-		if (pressureFLIncrement != 0)
-			changePitstopTyrePressure("Front Left", (pressureFLIncrement > 0) ? "Increase" : "Decrease", Abs(Round(pressureFLIncrement * 10)))
-		if (pressureFRIncrement != 0)
-			changePitstopTyrePressure("Front Right", (pressureFRIncrement > 0) ? "Increase" : "Decrease", Abs(Round(pressureFRIncrement * 10)))
-		if (pressureRLIncrement != 0)
-			changePitstopTyrePressure("Rear Left", (pressureRLIncrement > 0) ? "Increase" : "Decrease", Abs(Round(pressureRLIncrement * 10)))
-		if (pressureRRIncrement != 0)
-			changePitstopTyrePressure("Rear Right", (pressureRRIncrement > 0) ? "Increase" : "Decrease", Abs(Round(pressureRRIncrement * 10)))
+			pressureFLIncrement := Round(pressureFL - pressures[1], 1)
+			pressureFRIncrement := Round(pressureFR - pressures[2], 1)
+			pressureRLIncrement := Round(pressureRL - pressures[3], 1)
+			pressureRRIncrement := Round(pressureRR - pressures[4], 1)
+
+			if (pressureFLIncrement != 0) {
+				finished := false
+
+				changePitstopTyrePressure("Front Left", (pressureFLIncrement > 0) ? "Increase" : "Decrease", Abs(Round(pressureFLIncrement * 10)))
+			}
+
+			if (pressureFRIncrement != 0) {
+				finished := false
+
+				changePitstopTyrePressure("Front Right", (pressureFRIncrement > 0) ? "Increase" : "Decrease", Abs(Round(pressureFRIncrement * 10)))
+			}
+
+			if (pressureRLIncrement != 0) {
+				finished := false
+
+				changePitstopTyrePressure("Rear Left", (pressureRLIncrement > 0) ? "Increase" : "Decrease", Abs(Round(pressureRLIncrement * 10)))
+			}
+
+			if (pressureRRIncrement != 0) {
+				finished := false
+
+				changePitstopTyrePressure("Rear Right", (pressureRRIncrement > 0) ? "Increase" : "Decrease", Abs(Round(pressureRRIncrement * 10)))
+			}
+
+			if finished
+				break
+		}
 	}
 
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine := false) {

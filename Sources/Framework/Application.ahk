@@ -458,7 +458,7 @@ startupApplication() {
 	local isCritical := Task.CriticalHandler
 
 	guardExit(*) {
-		if isCritical() {
+		if (isCritical() && !GetKeyState("Ctrl", "P")) {
 			OnMessage(0x44, translateOkButton)
 			MsgBox(translate("Please wait until all tasks have been finished."), StrSplit(A_ScriptName, ".")[1], 262192)
 			OnMessage(0x44, translateOkButton, 0)

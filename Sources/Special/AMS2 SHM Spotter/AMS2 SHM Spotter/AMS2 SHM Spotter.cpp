@@ -223,6 +223,10 @@ float vectorAngle(float x, float y) {
 	return angle;
 }
 
+bool sameHeading(float x1, float y1, float x2, float y2) {
+	return vectorLength(x1 + x2, y1 + y2) > vectorLength(x1, y1);
+}
+
 bool nearBy(float car1X, float car1Y, float car1Z,
 	float car2X, float car2Y, float car2Z) {
 	return (fabs(car1X - car2X) < nearByXYDistance) &&
@@ -302,7 +306,10 @@ bool checkPositions(const SharedMemory* sharedData) {
 				float otherSpeed = vectorLength(lastCoordinates[id][VEC_X] - sharedData->mParticipantInfo[id].mWorldPosition[VEC_X],
 												lastCoordinates[id][VEC_Z] - sharedData->mParticipantInfo[id].mWorldPosition[VEC_Z]);
 
-				if (abs(speed - otherSpeed) / speed < 0.5) {
+				if ((abs(speed - otherSpeed) / speed < 0.5) && sameHeading(lastCoordinates[carID][VEC_X] - coordinateX,
+																		   lastCoordinates[carID][VEC_Z] - coordinateY,
+																		   lastCoordinates[id][VEC_X] - sharedData->mParticipantInfo[id].mWorldPosition[VEC_X],
+																		   lastCoordinates[id][VEC_Z] - sharedData->mParticipantInfo[id].mWorldPosition[VEC_Z])) {
 					bool faster = false;
 
 					if (hasLastCoordinates)

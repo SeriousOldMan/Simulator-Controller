@@ -274,6 +274,10 @@ r3e_float32 vectorAngle(r3e_float64 x, r3e_float64 y) {
 	return (r3e_float32)angle;
 }
 
+inline BOOL sameHeading(r3e_float64 x1, r3e_float64 y1, r3e_float64 x2, r3e_float64 y2) {
+	return vectorLength(x1 + x2, y1 + y2) > vectorLength(x1, y1);
+}
+
 BOOL nearBy(r3e_float32 car1X, r3e_float32 car1Y, r3e_float32 car1Z,
 			r3e_float32 car2X, r3e_float32 car2Y, r3e_float32 car2Z) {
 	return (fabs(car1X - car2X) < nearByXYDistance) &&
@@ -361,7 +365,10 @@ BOOL checkPositions(int playerID) {
 				r3e_float64 otherSpeed = vectorLength(lastCoordinates[id][0] - map_buffer->all_drivers_data_1[id].position.x,
 													  lastCoordinates[id][2] - map_buffer->all_drivers_data_1[id].position.z);
 
-				if (fabs(speed - otherSpeed) / speed < 0.5) {
+				if ((fabs(speed - otherSpeed) / speed < 0.5) && sameHeading(lastCoordinates[index][0] - coordinateX,
+																			lastCoordinates[index][2] - coordinateY,
+																			lastCoordinates[id][0] - map_buffer->all_drivers_data_1[id].position.x,
+																			lastCoordinates[id][2] - map_buffer->all_drivers_data_1[id].position.z)) {
 					BOOL faster = FALSE;
 
 					if (hasLastCoordinates)

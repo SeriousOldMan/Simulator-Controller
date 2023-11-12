@@ -323,6 +323,11 @@ namespace RF2SHMSpotter {
 			return angle;
 		}
 
+		bool sameHeading(double x1, double y1, double x2, double y2)
+		{
+			return vectorLength(x1 + x2, y1 + y2) > vectorLength(x1, y1);
+		}
+
 		bool nearBy(double car1X, double car1Y, double car1Z,
 					double car2X, double car2Y, double car2Z)
 		{
@@ -449,7 +454,10 @@ namespace RF2SHMSpotter {
 
 								// Console.WriteLine(speed + " - " + otherSpeed);
 
-								if (Math.Abs(speed - otherSpeed) / speed < 0.5)
+								if ((Math.Abs(speed - otherSpeed) / speed < 0.5) && sameHeading(lastCoordinates[carID, 0] - coordinateX,
+																								lastCoordinates[carID, 2] - coordinateZ,
+																								lastCoordinates[i, 0] - vehicle.mPos.x,
+																								lastCoordinates[i, 2] - (-vehicle.mPos.z)))
 								{
 
 									bool faster = false;

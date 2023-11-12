@@ -413,9 +413,11 @@ int main(int argc, char* argv[])
 		_bstr_t tc(gf->tyreCompound);
 		std::string tyreCompound(tc);
 
+		/*
 		if ((gf->trackGripStatus >= ACC_DAMP) || (gf->rainIntensityIn10min >= ACC_LIGHT_RAIN))
 			wcout << "TyreCompound=Wet" << endl;
 		else
+		*/
 			wcout << "TyreCompound=" << ((tyreCompound.compare("dry_compound") == 0) ? "Dry" : "Wet") << endl;
 
 		wcout << "TyreCompoundColor=Black" << endl;

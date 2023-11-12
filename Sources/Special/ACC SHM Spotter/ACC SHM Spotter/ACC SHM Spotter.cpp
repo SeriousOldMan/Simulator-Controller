@@ -261,6 +261,10 @@ float vectorAngle(float x, float y) {
 	return angle;
 }
 
+inline bool sameHeading(float x1, float y1, float x2, float y2) {
+	return vectorLength(x1 + x2, y1 + y2) > vectorLength(x1, y1);
+}
+
 bool nearBy(float car1X, float car1Y, float car1Z,
 			float car2X, float car2Y, float car2Z) {
 	return (abs(car1X - car2X) < nearByXYDistance) &&
@@ -354,7 +358,10 @@ bool checkPositions() {
 				float otherSpeed = vectorLength(lastCoordinates[id][0] - gf->carCoordinates[id][0],
 												lastCoordinates[id][2] - gf->carCoordinates[id][2]);
 
-				if (abs(speed - otherSpeed) / speed < 0.5) {
+				if ((abs(speed - otherSpeed) / speed < 0.5) && sameHeading(lastCoordinates[carID][0] - coordinateX,
+																		   lastCoordinates[carID][2] - coordinateY,
+																		   lastCoordinates[id][0] - gf->carCoordinates[id][0],
+																		   lastCoordinates[id][2] - gf->carCoordinates[id][2])) {
 					bool faster = false;
 
 					if (hasLastCoordinates)

@@ -1963,9 +1963,13 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 					return [getMultiMapValue(data, "Setup Data", "TyreSet", 0)]
 				case "Tyre Compound":
 					if this.iPSChangeTyres {
+						return (inList(this.iPSOptions, "Tyre Set") ? ["Dry", "Black"] : ["Wet", "Black"])
+
+						/*
 						data := this.readSessionData("Setup=true")
 
 						return [getMultiMapValue(data, "Setup Data", "TyreCompound", false), getMultiMapValue(data, "Setup Data", "TyreCompoundColor", false)]
+						*/
 					}
 					else
 						return [false, false]

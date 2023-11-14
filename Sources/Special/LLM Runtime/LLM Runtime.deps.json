@@ -6,7 +6,7 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v7.0": {
-      "Gpt4All.Samples/0.6.3-alpha": {
+      "LLM Runtime/0.6.3-alpha": {
         "dependencies": {
           "Gpt4All": "0.6.3-alpha",
           "Roslynator.Analyzers": "4.2.0",
@@ -14,7 +14,7 @@
           "Roslynator.Formatting.Analyzers": "4.2.0"
         },
         "runtime": {
-          "Gpt4All.Samples.dll": {}
+          "LLM Runtime.dll": {}
         }
       },
       "Microsoft.Extensions.Logging.Abstractions/7.0.0": {
@@ -39,7 +39,7 @@
     }
   },
   "libraries": {
-    "Gpt4All.Samples/0.6.3-alpha": {
+    "LLM Runtime/0.6.3-alpha": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

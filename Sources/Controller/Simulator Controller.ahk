@@ -2030,7 +2030,7 @@ updateSimulatorState() {
 					controller.simulatorShutdown(lastSimulator)
 
 					if isDebug()
-						logMessage(kLogDebug, "Stopping " . lastSimulator . "...")
+						logMessage(kLogDebug, "Stopping simulator " . lastSimulator . "...")
 				}
 
 				lastSimulator := currentSimulator
@@ -2038,7 +2038,7 @@ updateSimulatorState() {
 				controller.simulatorStartup(currentSimulator)
 
 				if isDebug()
-					logMessage(kLogDebug, "Starting " . currentSimulator . "...")
+					logMessage(kLogDebug, "Starting simulator " . currentSimulator . "...")
 			}
 		}
 		else if lastSimulator {
@@ -2047,7 +2047,7 @@ updateSimulatorState() {
 			controller.simulatorShutdown(lastSimulator)
 
 			if isDebug()
-				logMessage(kLogDebug, "Stopping " . lastSimulator . "...")
+				logMessage(kLogDebug, "Stopping simulator " . lastSimulator . "...")
 
 			lastSimulator := false
 		}

@@ -366,13 +366,13 @@ class DrivingCoach extends GridRaceAssistant {
 			local ignore, instruction, conversation
 
 			addInstruction(instruction) {
-				instruction := StrReplace(coach.getInstruction(instruction), "`n", "\n")
+				instruction := coach.getInstruction(instruction)
 
 				if (instruction && (Trim(instruction) != "")) {
 					if (prompt = "")
-						prompt .= "### System:\n"
+						prompt .= "### System:`n"
 
-					prompt .= (instruction . "\n")
+					prompt .= (instruction . "`n")
 				}
 			}
 
@@ -380,13 +380,13 @@ class DrivingCoach extends GridRaceAssistant {
 				addInstruction(instruction)
 
 			for ignore, conversation in this.History {
-				prompt .= ("### Human:\n" . StrReplace(conversation[1], "`n", "\n") . "\n")
-				prompt .= ("### Assistant:\n" . StrReplace(conversation[2], "`n", "\n") . "\n")
+				prompt .= ("### Human:`n" . conversation[1] . "`n")
+				prompt .= ("### Assistant:`n" . conversation[2] . "`n")
 			}
 
-			prompt .= ("### Human:\n" . question . "\n### Assistant:")
+			prompt .= ("### Human:`n" . question . "`n### Assistant:")
 
-			return StrReplace(prompt, "`"", "\`"")
+			return prompt
 		}
 
 		Ask(question) {
@@ -405,6 +405,8 @@ class DrivingCoach extends GridRaceAssistant {
 			}
 
 			try {
+				prompt := StrReplace(StrReplace(prompt, "`"", "\`""), "`n", "\n")
+
 				command := (A_ComSpec . " /c `"`"" . kBinariesDirectory . "\Providers\GPT4All Provider\GPT4All Provider.exe`" `"" . this.Model . "`" `"" . prompt . "`" " . this.MaxTokens . A_Space . this.Temperature . " > `"" . answerFile . "`"`"")
 
 				RunWait(command, kBinariesDirectory . "\Providers\GPT4All Provider", "Hide")

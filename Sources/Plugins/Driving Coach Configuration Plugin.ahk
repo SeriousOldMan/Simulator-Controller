@@ -20,7 +20,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 
 	Providers {
 		Get {
-			return ["OpenAI", "Azure", "GPT4All"]
+			return ["OpenAI", "Azure", "GPT4All", "GPT4All Local"]
 		}
 	}
 
@@ -54,7 +54,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 
 	createGui(editor, x, y, width, height) {
 		local window := editor.Window
-		local x0, x1, x2, x3, x4, x5, x6, w1, w2, w3, w4, choices, chosen, lineX, lineW
+		local x0, x1, x2, x3, x4, x5, x6, w1, w2, w3, w4, lineX, lineW
 
 		validateTemperature(*) {
 			local field := this.Control["dcTemperatureEdit"]
@@ -165,13 +165,10 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 
 		widget6 := window.Add("Text", "x" . x0 . " yp+20 w105 h23 +0x200 Hidden", translate("Provider / URL"))
 
- 		choices := ["OpenAI", "Azure", "GPT4ALL"]
-		chosen := (choices.Length > 0) ? 1 : 0
-
-		widget7 := window.Add("DropDownList", "x" . x1 . " yp w80 Choose" . chosen . " vdcProviderDropDown Hidden", choices)
+		widget7 := window.Add("DropDownList", "x" . x1 . " yp w100 Choose1 vdcProviderDropDown Hidden", this.Providers)
 		widget7.OnEvent("Change", chooseProvider)
 
-		widget8 := window.Add("Edit", "x" . (x1 + 82) . " yp w" . (w1 - 82) . " h23 vdcServiceURLEdit Hidden")
+		widget8 := window.Add("Edit", "x" . (x1 + 102) . " yp w" . (w1 - 102) . " h23 vdcServiceURLEdit Hidden")
 
 		widget9 := window.Add("Text", "x" . x0 . " yp+24 w105 h23 +0x200 Hidden", translate("Service Key"))
 		widget10 := window.Add("Edit", "x" . x1 . " yp w" . w1 . " h23 vdcServiceKeyEdit Hidden")
@@ -292,6 +289,10 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 						providerConfiguration["ServiceURL"] := "__YOUR_AZURE_OPENAI_ENDPOINT__/openai/deployments/%model%/chat/completions?api-version=2023-05-15"
 					case "GPT4All":
 						providerConfiguration["ServiceURL"] := "http://localhost:4891/v1"
+						providerConfiguration["ServiceKey"] := ""
+					case "GPT4All Local":
+						providerConfiguration["ServiceURL"] := ""
+						providerConfiguration["ServiceKey"] := ""
 				}
 
 			if ((providerConfiguration["Model"] = "") && inList(this.Models[provider], "GPT 3.5 turbo 1106"))
@@ -349,9 +350,12 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		for ignore, setting in ["Model", "MaxTokens"]
 			setMultiMapValue(configuration, "Driving Coach Service", setting, providerConfiguration[setting])
 
-		setMultiMapValue(configuration, "Driving Coach Service", "Service"
-									  , values2String("|", provider, Trim(providerConfiguration["ServiceURL"])
-																   , Trim(providerConfiguration["ServiceKey"])))
+		if (provider = "GPT4All Local")
+			setMultiMapValue(configuration, "Driving Coach Service", "Service", provider)
+		else
+			setMultiMapValue(configuration, "Driving Coach Service", "Service"
+										  , values2String("|", provider, Trim(providerConfiguration["ServiceURL"])
+																	   , Trim(providerConfiguration["ServiceKey"])))
 	}
 
 	loadProviderConfiguration(provider := false) {
@@ -367,9 +371,6 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 
 		for ignore, setting in ["ServiceURL", "ServiceKey", "MaxTokens", "MaxHistory"]
 			this.Control["dc" . setting . "Edit"].Text := configuration[setting]
-
-		if ((provider = "GPT4All") && (Trim(this.Control["dcServiceKeyEdit"].Text) = ""))
-			this.Control["dcServiceKeyEdit"].Text := "Any text will do the job"
 
 		this.Control["dcTemperatureEdit"].Text := Round(configuration["Temperature"] * 100)
 
@@ -421,7 +422,8 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 	}
 
 	updateState() {
-		this.Control["dcServiceKeyEdit"].Enabled := (this.Control["dcProviderDropDown"].Text != "GPT4ALL")
+		this.Control["dcServiceURLEdit"].Enabled := (this.Control["dcProviderDropDown"].Text != "GPT4ALL Local")
+		this.Control["dcServiceKeyEdit"].Enabled := (this.Control["dcProviderDropDown"].Text != "GPT4ALL Local")
 	}
 }
 

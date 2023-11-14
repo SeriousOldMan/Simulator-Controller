@@ -43,12 +43,10 @@ class DrivingCoach extends GridRaceAssistant {
 	class CoachVoiceManager extends RaceAssistant.RaceVoiceManager {
 	}
 
-	class HTTPConnector {
+	class GPTConnector {
 		iCoach := false
 
-		iServer := ""
-		iToken := ""
-		iModel := ""
+		iModel := false
 
 		iMaxTokens := 1024
 		iTemperature := 0.5
@@ -64,7 +62,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 		Models {
 			Get {
-				return DrivingCoach.HTTPConnector.Models
+				return DrivingCoach.GPTConnector.Models
 			}
 		}
 
@@ -74,28 +72,9 @@ class DrivingCoach extends GridRaceAssistant {
 			}
 		}
 
-		Server {
+		Model {
 			Get {
-				return this.iServer
-			}
-		}
-
-		Token {
-			Get {
-				return this.iToken
-			}
-		}
-
-		Model[external := false] {
-			Get {
-				if !external {
-					if inList(this.Models, this.iModel)
-						return StrLower(StrReplace(this.iModel, A_Space, "-"))
-					else
-						return this.iModel
-				}
-				else
-					return this.iModel
+				return this.iModel
 			}
 		}
 
@@ -135,19 +114,62 @@ class DrivingCoach extends GridRaceAssistant {
 			}
 		}
 
-		__New(coach) {
+		__New(coach, model) {
 			this.iCoach := coach
+			this.iModel := model
 		}
 
-		Connect(server?, token?, model?) {
-			this.iServer := (isSet(server) ? server : this.Server)
-			this.iToken := (isSet(token) ? token : this.Token)
-			this.iModel := (isSet(model) ? model : this.Model)
-
+		Restart() {
 			this.History.Length := 0
 		}
 
-		Restart := (*) => this.Connect()
+		AddConversation(question, answer) {
+			this.History.Push([question, answer])
+
+			while (this.History.Length > this.MaxHistory)
+				this.History.RemoveAt(1)
+		}
+
+		Ask(question) {
+			throw "Virtual method HTTPConnector.Ask must be implemented in a subclass..."
+		}
+	}
+
+	class HTTPGPTConnector {
+		iCoach := false
+
+		iServer := ""
+		iToken := ""
+
+		Server {
+			Get {
+				return this.iServer
+			}
+		}
+
+		Token {
+			Get {
+				return this.iToken
+			}
+		}
+
+		Model[external := false] {
+			Get {
+				if !external {
+					if inList(this.Models, super.Model)
+						return StrLower(StrReplace(this.iModel, A_Space, "-"))
+					else
+						return super.Model
+				}
+				else
+					return super.Model
+			}
+		}
+
+		Connect(server?, token?) {
+			this.iServer := (isSet(server) ? server : this.Server)
+			this.iToken := (isSet(token) ? token : this.Token)
+		}
 
 		AddConversation(question, answer) {
 			this.History.Push([question, answer])
@@ -168,7 +190,7 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 
 		CreatePrompt(body) {
-			throw "Virtual method HTTPConnector.CreatePrompt must be implemented in a subclass..."
+			throw "Virtual method HTTPGPTConnector.CreatePrompt must be implemented in a subclass..."
 		}
 
 		Ask(question) {
@@ -235,7 +257,7 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 	}
 
-	class OpenAIConnector extends DrivingCoach.HTTPConnector {
+	class OpenAIConnector extends DrivingCoach.HTTPGPTConnector {
 		static Models {
 			Get {
 				return ["GPT 3.5", "GPT 3.5 turbo", "GPT 3.5 turbo 1106", "GPT 4", "GPT 4 32k", "GPT 4 1106 preview"]
@@ -282,7 +304,7 @@ class DrivingCoach extends GridRaceAssistant {
 				return ["GPT 3.5", "GPT 3.5 turbo", "GPT 4", "GPT 4 32k"]
 			}
 		}
-		
+
 		Model[external := false] {
 			Get {
 				if !external
@@ -304,7 +326,7 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 	}
 
-	class GPT4AllConnector extends DrivingCoach.HTTPConnector {
+	class GPT4AllConnector extends DrivingCoach.HTTPGPTConnector {
 		CreatePrompt(body, question) {
 			local coach := this.Coach
 			local prompt := ""
@@ -337,6 +359,12 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 	}
 
+	class GPT4AllProvider extends DrivingCoach.GPTConnector {
+		Ask(question) {
+			return false
+		}
+	}
+
 	class DrivingCoachRemoteHandler extends RaceAssistant.RaceAssistantRemoteHandler {
 		__New(remotePID) {
 			super.__New("Driving Coach", remotePID)
@@ -362,7 +390,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 	Providers {
 		Get {
-			return ["OpenAI", "Azure", "GPT4All"]
+			return ["OpenAI", "Azure", "GPT4All", "GPT4All Local"]
 		}
 	}
 
@@ -646,29 +674,32 @@ class DrivingCoach extends GridRaceAssistant {
 			if !inList(this.Providers, service[1])
 				throw "Unsupported service detected in DrivingCoach.connect..."
 
-			try {
-				this.iConnector := DrivingCoach.%service[1]%Connector(this)
+			if (service[1] = "GPT4All Local")
+				this.iConnector := DrivingCoach.GPT4AllProvider(this, this.Options["Driving Coach.Model"])
+			else
+				try {
+					this.iConnector := DrivingCoach.%service[1]%Connector(this, this.Options["Driving Coach.Model"])
 
-				this.Connector.Connect(service[2], service[3], this.Options["Driving Coach.Model"])
-
-				this.Connector.MaxTokens := this.Options["Driving Coach.MaxTokens"]
-				this.Connector.Temperature := this.Options["Driving Coach.Temperature"]
-				this.Connector.MaxHistory := this.Options["Driving Coach.MaxHistory"]
-
-				for ignore, instruction in this.Instructions[true] {
-					this.Instructions[instruction] := this.Options["Driving Coach.Instructions." . instruction]
-
-					if !this.Instructions[instruction]
-						this.Instructions[instruction] := ""
+					this.Connector.Connect(service[2], service[3])
 				}
-			}
-			catch Any as exception {
-				logError(exception)
+				catch Any as exception {
+					logError(exception)
 
-				if this.RemoteHandler
-					this.RemoteHandler.serviceState("Error:Configuration")
+					if this.RemoteHandler
+						this.RemoteHandler.serviceState("Error:Configuration")
 
-				throw "Unsupported service detected in DrivingCoach.connect..."
+					throw "Unsupported service detected in DrivingCoach.connect..."
+				}
+
+			this.Connector.MaxTokens := this.Options["Driving Coach.MaxTokens"]
+			this.Connector.Temperature := this.Options["Driving Coach.Temperature"]
+			this.Connector.MaxHistory := this.Options["Driving Coach.MaxHistory"]
+
+			for ignore, instruction in this.Instructions[true] {
+				this.Instructions[instruction] := this.Options["Driving Coach.Instructions." . instruction]
+
+				if !this.Instructions[instruction]
+					this.Instructions[instruction] := ""
 			}
 		}
 		else

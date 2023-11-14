@@ -289,7 +289,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 						providerConfiguration["ServiceURL"] := "__YOUR_AZURE_OPENAI_ENDPOINT__/openai/deployments/%model%/chat/completions?api-version=2023-05-15"
 					case "GPT4All":
 						providerConfiguration["ServiceURL"] := "http://localhost:4891/v1"
-						providerConfiguration["ServiceKey"] := ""
+						providerConfiguration["ServiceKey"] := "Any text will do the job"
 					case "GPT4All Local":
 						providerConfiguration["ServiceURL"] := ""
 						providerConfiguration["ServiceKey"] := ""
@@ -371,6 +371,10 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 
 		for ignore, setting in ["ServiceURL", "ServiceKey", "MaxTokens", "MaxHistory"]
 			this.Control["dc" . setting . "Edit"].Text := configuration[setting]
+
+		if ((provider = "GPT4All") && (Trim(this.Control["dcServiceKeyEdit"].Text) = "")
+								   && (Trim(this.Control["dcServiceURLEdit"].Text) = "http://localhost:4891/v1"))
+			this.Control["dcServiceKeyEdit"].Text := "Any text will do the job"
 
 		this.Control["dcTemperatureEdit"].Text := Round(configuration["Temperature"] * 100)
 

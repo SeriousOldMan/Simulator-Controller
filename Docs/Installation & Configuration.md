@@ -66,6 +66,10 @@ It has been reported, that the UAC can interfere in rare cases with the operatio
 
 It also has been reported, that fully disabling UAC, especially in combination with a Windows user, who has Admin priveliges can cause problems as well. In these cases, please contact me and we will find a solution to install Simulator Controller on your system as well.
 
+## Execution restriction of Powershell scripts
+
+*Powershell* is used in many places to handle low level stuff like ZIP file compression or extraction, or to move big chunks of data around. Depending on your security settings, the execution of *Powershell* might be restricted on your local PC. If you encounter hang ups, for example while running the automated update procedure, you can try to give Powershell more execution priveliges using the [policy management](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.security/set-executionpolicy?view=powershell-7.3). Try the *Unrestricted* policy, and if this works, lower the policy to the lowest possible level, that still works.
+
 ## Installing Microsoft Language Runtimes
 
 Several components of Simulator Controller are based on low level language runtimes from Microsoft, namely the *.NET Framwork Runtimes* in the version 4.7.2 and 4.8 and the *Visual C++ Redistributable* for Visual Studio 2022. Normally, these runtimes will be installed on your system, but in some rare conditions they might be not of the required version. You can check whether your system has the required versions installed using the Windows settings dialog in the Apps section. If you need to install a specific version, you can find the installer at various Microsoft Websites:

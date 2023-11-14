@@ -1,9 +1,9 @@
 [Development]
 Version=5.4.6.0-dev
 Target=5.4.6.0-release
-Date=11/12/2023
+Date=11/14/2023
 Download=
-Changes=Weighting of 1st stint in strategy simulation, Ctrl modifier for "Exit" command, Extended UI translation for French, Increased resilience of Pitstop MFD handling in ACC, Reliable selection of tyre compoung in ACC, Prevent superfluous Spotter proximity alerts
+Changes=Weighting of 1st stint in strategy simulation, Ctrl modifier for "Exit" command, Extended UI translation for French, Increased resilience of Pitstop MFD handling in ACC, Reliable selection of tyre compound in ACC, Prevent superfluous Spotter proximity alerts, Embedded GPT4All engine for "Driving Coach"
 Components=Media->5.3.0,Configuration->5.4.0,Utilities->5.3.0
 [Release]
 Version=5.4.5.0-release

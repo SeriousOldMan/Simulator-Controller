@@ -360,8 +360,89 @@ class DrivingCoach extends GridRaceAssistant {
 	}
 
 	class GPT4AllProvider extends DrivingCoach.GPTConnector {
+		CreatePrompt(question) {
+			local coach := this.Coach
+			local prompt := ""
+			local ignore, instruction, conversation
+
+			addInstruction(instruction) {
+				instruction := StrReplace(coach.getInstruction(instruction), "`n", "\n")
+
+				if (instruction && (Trim(instruction) != "")) {
+					if (prompt = "")
+						prompt .= "### System:\n"
+
+					prompt .= (instruction . "\n")
+				}
+			}
+
+			for ignore, instruction in coach.Instructions[true]
+				addInstruction(instruction)
+
+			for ignore, conversation in this.History {
+				prompt .= ("### Human:\n" . StrReplace(conversation[1], "`n", "\n") . "\n")
+				prompt .= ("### Assistant:\n" . StrReplace(conversation[2], "`n", "\n") . "\n")
+			}
+
+			prompt .= ("### Human:\n" . question . "\n### Assistant:")
+
+			return StrReplace(prompt, "`"", "\`"")
+		}
+
 		Ask(question) {
-			return false
+			local coach := this.Coach
+			local speaker := coach.getSpeaker()
+			local prompt := this.CreatePrompt(question)
+			local answerFile := temporaryFileName("GPT4All", "answer")
+			local command, answer
+
+			static first := true
+
+			if isDebug() {
+				deleteFile(kTempDirectory . "Chat.request")
+
+				FileAppend(prompt, kTempDirectory . "Chat.request")
+			}
+
+			try {
+				command := (A_ComSpec . " /c `"`"" . kBinariesDirectory . "\Providers\GPT4All Provider\GPT4All Provider.exe`" `"" . this.Model . "`" `"" . prompt . "`" " . this.MaxTokens . A_Space . this.Temperature . " > `"" . answerFile . "`"`"")
+
+				RunWait(command, kBinariesDirectory . "\Providers\GPT4All Provider", "Hide")
+			}
+			catch Any as exception {
+				if this.Coach.RemoteHandler
+					this.Coach.RemoteHandler.serviceState("Error:Connection")
+
+				throw exception
+			}
+
+			try {
+				answer := FileRead(answerFile)
+
+				deleteFile(answerFile)
+
+				if (Trim(answer) = "")
+					throw "Empty answer received..."
+
+				if isDebug() {
+					deleteFile(kTempDirectory . "Chat.response")
+
+					FileAppend(answer, kTempDirectory . "Chat.response")
+				}
+
+				this.AddConversation(question, answer)
+
+				if this.Coach.RemoteHandler
+					this.Coach.RemoteHandler.serviceState("Available")
+
+				return answer
+			}
+			catch Any as exception {
+				if this.Coach.RemoteHandler
+					this.Coach.RemoteHandler.serviceState("Error:Answer")
+
+				throw exception
+			}
 		}
 	}
 

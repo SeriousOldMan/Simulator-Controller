@@ -109,9 +109,17 @@ Thanks to the intensive collaboration between OpenAI and Microsoft, many OpenAI 
 
 ### GPT4All
 
-The alternative, GPT4ALL, can be downloaded from the corresponding [website](https://gpt4all.io/index.html). Install it on your PC and enable the API server in the settings. Additionally you will have to download and install one or more models, which can be done from inside the application window. At the time of this writing, the model *Wizard 1.1* ("wizardlm-13b-v1.1-superhot-8k.ggmlv3.q4_0.bin") is a very good allround model.
+The alternative, GPT4ALL, can be downloaded from the corresponding [website](https://gpt4all.io/index.html). Install it on your PC and enable the API server in the settings. Additionally you will have to download and install one or more models, which can be done from inside the application window. At the time of this writing, the model *Wizard 1.2* ("wizardlm-13b-v1.2.Q4_0.gguf") is a very good allround model. In fact you can use any model in the GGUF format supported by Llama, not only the models provided on the GPT4All website.
 
-IMPORTANT: At the time of this writing, the REST API of GPT4All is under heavy development and cannot be considered final or even stable. If you have issues establishing a connection to the local GPT4All HTTP server, take a look at this [article on GitHub](https://github.com/nomic-ai/gpt4all/issues/934).
+Please be aware, that running a GPT4All locally puts heavy load on your PC and can use quite a lot of memory (even from your GPU). Therefore do not ask any questions while driving, unless you have a really powerful configuration. Even if your PC is idle, the answer will take some time to be generated, so be patient.
+
+IMPORTANT: At the time of this writing, the integrated REST API of the GPT4All chat client is under heavy development and cannot be considered final or even stable. If you have issues establishing a connection to the local GPT4All HTTP server, take a look at this [article on GitHub](https://github.com/nomic-ai/gpt4all/issues/934). As an alternative, you can either setup a dedicated API server for GPT4All, even on a different machine, if you are a seasoned developer, or you check out the next option.
+
+### GPT4All Local
+
+This one implements an embedded GPT4All engine using the 2.5.2 version of GPT4All. You do not even have to install GPT4All on your PC, everything is already integrated into Simulator Controller. You only have to download one of the LLMs from the [GPT4All website](https://gpt4all.io/index.html). I recommend the model *Wizard 1.2* ("wizardlm-13b-v1.2.Q4_0.gguf"), which is a very good allround model. In fact you can use any model in the GGUF format supported by Llama, not only the models provided on the GPT4All website. Enter the full path to the model file into the "Model" field and your done.
+
+Please be aware, that running a large language model locally puts heavy load on your PC and can use quite a lot of memory (even from your GPU). Therefore do not ask any questions while driving, unless you have a really powerful configuration. Even if your PC is idle, the answer will take some time to be generated, so be patient.
 
 ### Configuration
 
@@ -185,7 +193,7 @@ The above list are only few of the rules to follow, though the most important on
 
 ### Detecting and discussing handling problems
 
-The Driving Coach will try to detect possible handling problems using the same mechanism used by the "Setup Workbench". In fact, Aiden uses the same [Telemetry Analyzer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-telemetry-analyzer) as the "Setup Workbench" and will use the same settings and thresholds you have selected for the same car and track last time.
+The Driving Coach will try to detect possible handling problems using the same mechanism used by the "Setup Workbench". In fact, Aiden uses the same [Telemetry Analyzer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-telemetry-analyzer) as the "Setup Workbench" and will use the same settings and thresholds you have selected for the same car and track last time. Therefore, if you want to discuss your handling issues with Aiden, be sure to have created a valid or even calibrated configuration in the Telemetry Analyzer for the given car and track.
 
 When at least one handling issue had been detected, the "Handling" instruction will be used to describe the handling issues to the Driving Coach. Each issue will be described on a single line in the instructions. Example:
  
@@ -193,7 +201,7 @@ When at least one handling issue had been detected, the "Handling" instruction w
 	
 Using this knowledge, Aiden should be able to give you information how to cope with the given handling issues, for example by changing your driver inputs or changes to the car setup.
 
-Information: You can disable this instruction (and every other instruction as well) completely, by clearing it in the configuration, if you don't want Aiden to give you information regarding handling problems. If you want to enable or disable it during a running session, you can use the voice commands below.
+Information: You can disable this instruction (and every other instruction as well) completely, by clearing it in the configuration, if you don't want Aiden to give you information regarding handling problems. If you want to temporarily enable or disable it during a running session, you can use the voice commands below.
 
 ### List of all voice commands
 

@@ -10,8 +10,6 @@
   7. You can now specify [a preference for an early or a late first pitstop](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#simulation), when running a strategy simulation in the "Strategy Workbench".
   8. An all new local large language model runtime has been integrated, which allow you to run a fully local lLM for the "Driving Coach", with installing additional software of creating an OpenAI account. Please note that this increases the performance and memory requirements for the "Driving Coach" drastically, but if your PC can handle it, then it is a great alternative. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#llm-runtime) for more information.
 
-Weighting of 1st stint in strategy simulation, Embedded GPT4All engine for "Driving Coach"
-
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-546).
 
 ## 5.4.5.0-release 11/10/23

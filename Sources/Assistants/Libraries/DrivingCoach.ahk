@@ -419,11 +419,11 @@ class DrivingCoach extends GridRaceAssistant {
 			}
 
 			try {
-				answer := FileRead(answerFile)
+				answer := Trim(FileRead(answerFile))
 
 				deleteFile(answerFile)
 
-				if (Trim(answer) = "")
+				if (answer = "")
 					throw "Empty answer received..."
 
 				if isDebug() {

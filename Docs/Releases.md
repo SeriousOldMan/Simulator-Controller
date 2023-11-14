@@ -137,7 +137,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   5. When the name of the current driver is unknown for any reason, "John Doe" was used in the past. Now, the name of the current user of Simulator Controller is used.
   6. The documentation link in "Simulator Configuration" is now context-aware and opens the documentation for the configuration tab, which is currently selected.
   7. "Simulator Setup" and "Simulator Configuration" are now almost fully compatible, when using both to work on the configuration.
-  8. The meta model for "Setup Workbench" has been extended. It now supports non-standard setup settings for modded cars (currently only relevant for *assetto Corsa*). See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#extending-and-cutomizing-setup-workbench) for more information.
+  8. The meta model for "Setup Workbench" has been extended. It now supports non-standard setup settings for modded cars (currently only relevant for *Assetto Corsa*). See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#extending-and-cutomizing-setup-workbench) for more information.
   9. You can now supply your own sound files for the different notifcation sounds of Simulator Controller applications. See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#using-your-own-sounds-for-confirmation-sounds) for more information.
   10. [Internal] Improved the detection of outdated downloadable components.
   11. [Developer Only] A new library for HTTP REST calling has been implemented.
@@ -199,7 +199,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
      - A new navigation menu at the bottom of the window allows you to go to each configuration step quickly.
 	 - You can also always jump to a specific page when "Simulator Setup" is started, by [referencing this page in "Application Settings.ini"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#running-the-setup-tool).
      - "Simulator Setup" now supports a kind of quick configuration, which allow especially new users to create a useful configuration very fast. See the extended documentation of the [quick start guide](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Quick-Start-Guide) for more information.
-	 - Full configuration of the *Names*, *Languages* and *Voices* of the Race Assistants is now possible in the "Basic" configuration page-
+	 - Full configuration of the *Names*, *Languages* and *Voices* of the Race Assistants is now possible in the "Basic" configuration page.
 	 - When a new configuration is being created, some of the changes made by the user in other application, for example in the settings of "Simulator Startup", will be preserved, if possible.
 	 - The presets "Names and voices of Assistants", "Different Speaker Voices" and "Mode Automation" have been removed, since they are no longer needed. If such a preset is in use in your configuration, it will still be active, until you remove it.
 	 - The "Push-To-Talk Behaviour" preset has been deprecated as well. This option is now available in the standard voice control configuration.

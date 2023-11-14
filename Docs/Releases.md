@@ -1,3 +1,19 @@
+## 5.4.6.0-release 11/17/23 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. A new Control modifier lets you overrule apps which resist to exit, because they are currently working on background tasks. Hold the Control key, until all applications have exited. Please note, that this may lead to a loss of data, for example the post race report.
+  4. The UI translation for the French language has been completed.
+  5. A couple of optimizations for the handling of the Pitstop settings in *Assetto Corsa Competizione* has been introduced:
+     - Every setting change will now be checked after completion of the setup process. If an unwanted difference is detected, for example, because the driver intervened with the keyboard command input, the desired change is done again.
+	 - Unfortunately, *Assetto Corsa Competizione* does not provide the information, which tyre compound is currently selected in the Pitstop MFD in the data API. A new strategy in the option walk will now detect it anyway by checking the availibilty of other settings.
+  6. Superfluous proximity alerts for cars that are actually behind a wall and driving in another direction or are not moving at all, are now supressed.
+  7. You can now specify [a preference for an early or a late first pitstop](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#simulation), when running a strategy simulation in the "Strategy Workbench".
+  8. An all new local large language model runtime has been integrated, which allow you to run a fully local lLM for the "Driving Coach", with installing additional software of creating an OpenAI account. Please note that this increases the performance and memory requirements for the "Driving Coach" drastically, but if your PC can handle it, then it is a great alternative. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#llm-runtime) for more information.
+
+Weighting of 1st stint in strategy simulation, Embedded GPT4All engine for "Driving Coach"
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-546).
+
 ## 5.4.5.0-release 11/10/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

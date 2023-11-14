@@ -115,9 +115,9 @@ Please be aware, that running a GPT4All locally puts heavy load on your PC and c
 
 IMPORTANT: At the time of this writing, the integrated REST API of the GPT4All chat client is under heavy development and cannot be considered final or even stable. If you have issues establishing a connection to the local GPT4All HTTP server, take a look at this [article on GitHub](https://github.com/nomic-ai/gpt4all/issues/934). As an alternative, you can either setup a dedicated API server for GPT4All, even on a different machine, if you are a seasoned developer, or you check out the next option.
 
-### GPT4All Local
+### LLM Runtime
 
-This one implements an embedded GPT4All engine using the 2.5.2 version of GPT4All. You do not even have to install GPT4All on your PC, everything is already integrated into Simulator Controller. You only have to download one of the LLMs from the [GPT4All website](https://gpt4all.io/index.html). I recommend the model *Wizard 1.2* ("wizardlm-13b-v1.2.Q4_0.gguf"), which is a very good allround model. In fact you can use any model in the GGUF format supported by Llama, not only the models provided on the GPT4All website. Enter the full path to the model file into the "Model" field and your done.
+This one implements an embedded runtime engine for large language models. You do not even have to install GPT4All on your PC, for example, everything is already integrated into Simulator Controller. You only have to download one of the LLMs from the [GPT4All website](https://gpt4all.io/index.html) or from an other source. I recommend the model *Wizard 1.2* ("wizardlm-13b-v1.2.Q4_0.gguf"), which is a very good allround model. In fact you can use any model in the GGUF format supported by Llama, not only the models provided on the GPT4All website. Enter the full path to the model file into the "Model" field and your done.
 
 Please be aware, that running a large language model locally puts heavy load on your PC and can use quite a lot of memory (even from your GPU). Therefore do not ask any questions while driving, unless you have a really powerful configuration. Even if your PC is idle, the answer will take some time to be generated, so be patient.
 

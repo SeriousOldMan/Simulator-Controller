@@ -20,7 +20,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 
 	Providers {
 		Get {
-			return ["OpenAI", "Azure", "GPT4All", "GPT4All Local"]
+			return ["OpenAI", "Azure", "GPT4All", "LLM Runtime"]
 		}
 	}
 
@@ -290,7 +290,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 					case "GPT4All":
 						providerConfiguration["ServiceURL"] := "http://localhost:4891/v1"
 						providerConfiguration["ServiceKey"] := "Any text will do the job"
-					case "GPT4All Local":
+					case "LLM Runtime":
 						providerConfiguration["ServiceURL"] := ""
 						providerConfiguration["ServiceKey"] := ""
 				}
@@ -350,7 +350,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		for ignore, setting in ["Model", "MaxTokens"]
 			setMultiMapValue(configuration, "Driving Coach Service", setting, providerConfiguration[setting])
 
-		if (provider = "GPT4All Local")
+		if (provider = "LLM Runtime")
 			setMultiMapValue(configuration, "Driving Coach Service", "Service", provider)
 		else
 			setMultiMapValue(configuration, "Driving Coach Service", "Service"
@@ -426,8 +426,8 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 	}
 
 	updateState() {
-		this.Control["dcServiceURLEdit"].Enabled := (this.Control["dcProviderDropDown"].Text != "GPT4ALL Local")
-		this.Control["dcServiceKeyEdit"].Enabled := (this.Control["dcProviderDropDown"].Text != "GPT4ALL Local")
+		this.Control["dcServiceURLEdit"].Enabled := (this.Control["dcProviderDropDown"].Text != "LLM Runtime")
+		this.Control["dcServiceKeyEdit"].Enabled := (this.Control["dcProviderDropDown"].Text != "LLM Runtime")
 	}
 }
 

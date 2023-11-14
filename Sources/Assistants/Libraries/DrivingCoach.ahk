@@ -43,7 +43,7 @@ class DrivingCoach extends GridRaceAssistant {
 	class CoachVoiceManager extends RaceAssistant.RaceVoiceManager {
 	}
 
-	class GPTConnector {
+	class LLMProvider {
 		iCoach := false
 
 		iModel := false
@@ -62,7 +62,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 		Models {
 			Get {
-				return DrivingCoach.GPTConnector.Models
+				return DrivingCoach.LLMProvider.Models
 			}
 		}
 
@@ -135,7 +135,7 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 	}
 
-	class HTTPGPTConnector {
+	class HTTPConnector {
 		iCoach := false
 
 		iServer := ""
@@ -190,7 +190,7 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 
 		CreatePrompt(body) {
-			throw "Virtual method HTTPGPTConnector.CreatePrompt must be implemented in a subclass..."
+			throw "Virtual method HTTPConnector.CreatePrompt must be implemented in a subclass..."
 		}
 
 		Ask(question) {
@@ -257,7 +257,7 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 	}
 
-	class OpenAIConnector extends DrivingCoach.HTTPGPTConnector {
+	class OpenAIConnector extends DrivingCoach.HTTPConnector {
 		static Models {
 			Get {
 				return ["GPT 3.5", "GPT 3.5 turbo", "GPT 3.5 turbo 1106", "GPT 4", "GPT 4 32k", "GPT 4 1106 preview"]
@@ -326,7 +326,7 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 	}
 
-	class GPT4AllConnector extends DrivingCoach.HTTPGPTConnector {
+	class GPT4AllConnector extends DrivingCoach.HTTPConnector {
 		CreatePrompt(body, question) {
 			local coach := this.Coach
 			local prompt := ""
@@ -359,7 +359,7 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 	}
 
-	class GPT4AllProvider extends DrivingCoach.GPTConnector {
+	class LLMRuntimeProvider extends DrivingCoach.LLMProvider {
 		CreatePrompt(question) {
 			local coach := this.Coach
 			local prompt := ""
@@ -407,9 +407,9 @@ class DrivingCoach extends GridRaceAssistant {
 			try {
 				prompt := StrReplace(StrReplace(prompt, "`"", "\`""), "`n", "\n")
 
-				command := (A_ComSpec . " /c `"`"" . kBinariesDirectory . "\Providers\GPT4All Provider\GPT4All Provider.exe`" `"" . this.Model . "`" `"" . prompt . "`" " . this.MaxTokens . A_Space . this.Temperature . " > `"" . answerFile . "`"`"")
+				command := (A_ComSpec . " /c `"`"" . kBinariesDirectory . "\LLM Runtime\LLM Runtime.exe`" `"" . this.Model . "`" `"" . prompt . "`" " . this.MaxTokens . A_Space . this.Temperature . " > `"" . answerFile . "`"`"")
 
-				RunWait(command, kBinariesDirectory . "\Providers\GPT4All Provider", "Hide")
+				RunWait(command, kBinariesDirectory . "\LLM Runtime", "Hide")
 			}
 			catch Any as exception {
 				if this.Coach.RemoteHandler
@@ -473,7 +473,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 	Providers {
 		Get {
-			return ["OpenAI", "Azure", "GPT4All", "GPT4All Local"]
+			return ["OpenAI", "Azure", "GPT4All", "LLM Runtime"]
 		}
 	}
 
@@ -757,8 +757,8 @@ class DrivingCoach extends GridRaceAssistant {
 			if !inList(this.Providers, service[1])
 				throw "Unsupported service detected in DrivingCoach.connect..."
 
-			if (service[1] = "GPT4All Local")
-				this.iConnector := DrivingCoach.GPT4AllProvider(this, this.Options["Driving Coach.Model"])
+			if (service[1] = "LLM Runtime")
+				this.iConnector := DrivingCoach.LLMRuntimeProvider(this, this.Options["Driving Coach.Model"])
 			else
 				try {
 					this.iConnector := DrivingCoach.%service[1]%Connector(this, this.Options["Driving Coach.Model"])

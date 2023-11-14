@@ -779,9 +779,15 @@ class SimulatorController extends ConfigurationItem {
 
 			for ignore, thePlugin in this.Plugins
 				if this.isActive(thePlugin) {
+					if isDebug()
+						logMessage(kLogDebug, "Checking " . thePlugin.Plugin . "...")
+
 					simulator := thePlugin.runningSimulator()
 
 					if (simulator != false) {
+						if isDebug()
+							logMessage(kLogDebug, "Detected " . simulator . "...")
+
 						lastSimulator := simulator
 						lastPlugin := thePlugin
 
@@ -2020,18 +2026,28 @@ updateSimulatorState() {
 			isSimulatorRunning := true
 
 			if (lastSimulator != currentSimulator) {
-				if lastSimulator
+				if lastSimulator {
 					controller.simulatorShutdown(lastSimulator)
+
+					if isDebug()
+						logMessage(kLogDebug, "Stopping " . lastSimulator . "...")
+				}
 
 				lastSimulator := currentSimulator
 
 				controller.simulatorStartup(currentSimulator)
+
+				if isDebug()
+					logMessage(kLogDebug, "Starting " . currentSimulator . "...")
 			}
 		}
 		else if lastSimulator {
 			isSimulatorRunning := false
 
 			controller.simulatorShutdown(lastSimulator)
+
+			if isDebug()
+				logMessage(kLogDebug, "Stopping " . lastSimulator . "...")
 
 			lastSimulator := false
 		}

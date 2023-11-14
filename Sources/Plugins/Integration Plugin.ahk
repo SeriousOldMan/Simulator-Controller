@@ -132,8 +132,8 @@ class IntegrationPlugin extends ControllerPlugin {
 		local lastValid := getMultiMapValue(sessionInfo, "Stint", "Valid", true)
 		local lastTime := getMultiMapValue(sessionInfo, "Stint", "Lap.Time.Last", 3600)
 		local bestTime := getMultiMapValue(sessionInfo, "Stint", "Lap.Time.Best", 3600)
-		local lastSpeed := getMultiMapValue(sessionState, "Stint", "Speed.Last", false)
-		local bestSpeed := getMultiMapValue(sessionState, "Stint", "Speed.Best", false)
+		local lastSpeed := getMultiMapValue(sessionInfo, "Stint", "Speed.Last", false)
+		local bestSpeed := getMultiMapValue(sessionInfo, "Stint", "Speed.Best", false)
 
 		return Map("Driver", getMultiMapValue(sessionInfo, "Stint", "Driver")
 				 , "Laps", getMultiMapValue(sessionInfo, "Stint", "Laps")

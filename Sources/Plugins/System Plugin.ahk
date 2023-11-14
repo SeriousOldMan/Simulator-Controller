@@ -63,6 +63,9 @@ class SystemPlugin extends ControllerPlugin {
 				stateChange := true
 
 				trayMessage(translate(kSystemPlugin), (isRunning ? translate("Start: ") : translate("Stop: ")) . this.Application)
+
+				if isDebug()
+					logMessage(kLogDebug, (isRunning ? "Startup of " : "Shutdown of ") . this.Application . " detected...")
 			}
 
 			if !stateChange {

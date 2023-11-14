@@ -1226,18 +1226,14 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 		try {
 			if (this.requirePitstopMFD() && this.selectPitstopOption("Tyre Compound"))
-				if ((InStr(selection, "Wet") = 1) && inList(this.iPSOptions, "Tyre Set"))
+				if (InStr(selection, "Wet") = 1)
 					this.changePitstopOption("Tyre Compound", "Increase")
-				else if ((InStr(selection, "Dry") = 1) && !inList(this.iPSOptions, "Tyre Set"))
+				else if (InStr(selection, "Dry") = 1)
 					this.changePitstopOption("Tyre Compound", "Decrease")
 				else
 					switch selection, false {
-						case "Increase":
-							if inList(this.iPSOptions, "Tyre Set")
-								this.changePitstopOption("Tyre Compound", selection)
-						case "Decrease":
-							if !inList(this.iPSOptions, "Tyre Set")
-								this.changePitstopOption("Tyre Compound", selection)
+						case "Increase", "Decrease":
+							this.changePitstopOption("Tyre Compound", selection)
 						default:
 							throw "Unsupported selection `"" . selection . "`" detected in ACCPlugin.changeTyreCompound..."
 					}

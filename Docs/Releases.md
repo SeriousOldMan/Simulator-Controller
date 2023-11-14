@@ -8,9 +8,7 @@
 	 - Unfortunately, *Assetto Corsa Competizione* does not provide the information, which tyre compound is currently selected in the Pitstop MFD in the data API. A new strategy in the option walk will now detect it anyway by checking the availibilty of other settings.
   6. Superfluous proximity alerts for cars that are actually behind a wall and driving in another direction or are not moving at all, are now supressed.
   7. You can now specify [a preference for an early or a late first pitstop](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#simulation), when running a strategy simulation in the "Strategy Workbench".
-  8. An all new local large language model runtime has been integrated, which allow you to run a fully local lLM for the "Driving Coach", with installing additional software of creating an OpenAI account. Please note that this increases the performance and memory requirements for the "Driving Coach" drastically, but if your PC can handle it, then it is a great alternative. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#llm-runtime) for more information.
-
-Weighting of 1st stint in strategy simulation, Embedded GPT4All engine for "Driving Coach"
+  8. An all new local large language model runtime has been integrated, which allow you to run a LLM for the "Driving Coach" local on your PC, without installing additional software or creating an OpenAI account. Please note that this increases the performance and memory requirements for the "Driving Coach" drastically, but if your PC can handle it, then it is a great alternative. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#llm-runtime) for more information.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-546).
 

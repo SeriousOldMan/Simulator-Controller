@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[5.4.6.0-alpha](https://www.dropbox.com/scl/fi/rogzffd0kgw7a6ghnk0wx/Simulator-Controller-5.4.6.0-alpha.zip?rlkey=wyno24qjxof5ay1eys6k5iyx9&dl=1) (Test build for 5.4.6. Changes: Weighting of 1st stint in strategy simulation, Ctrl modifier for "Exit" command, Extended UI translation for French, Increased resilience of Pitstop MFD handling in ACC, Reliable selection of tyre compound in ACC, Prevent superfluous Spotter proximity alerts, Embedded GPT4All engine for "Driving Coach".)
+[5.4.6.0-alpha](https://www.dropbox.com/scl/fi/rogzffd0kgw7a6ghnk0wx/Simulator-Controller-5.4.6.0-alpha.zip?rlkey=wyno24qjxof5ay1eys6k5iyx9&dl=1) (Test build for 5.4.6. Changes: Weighting of 1st stint in strategy simulation, Ctrl modifier for "Exit" command, Extended UI translation for French, Increased resilience of Pitstop MFD handling in ACC, Reliable selection of tyre compound in ACC, Prevent superfluous Spotter proximity alerts, Embedded GPT4All engine for "Driving Coach", New car models for "Setup Workbench".)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-546) of this version and all the versions you might have skipped, before installing and using this version.
 

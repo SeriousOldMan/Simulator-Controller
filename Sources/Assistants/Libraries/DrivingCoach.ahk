@@ -419,7 +419,10 @@ class DrivingCoach extends GridRaceAssistant {
 			}
 
 			try {
-				answer := Trim(FileRead(answerFile))
+				answer := Trim(FileRead(answerFile, "`n"))
+
+				while ((StrLen(answer) > 0) && (SubStr(answer, 1, 1) = "`n"))
+					answer := SubStr(answer, 2)
 
 				deleteFile(answerFile)
 
@@ -836,7 +839,7 @@ class DrivingCoach extends GridRaceAssistant {
 						this.getSpeaker().speak(part . ".", false, false, {Noise: false, Click: (A_Index = 1)})
 
 			if this.Transcript
-				FileAppend(translate("-- Driver --------") . "`n`n" . text . "`n`n" . translate("-- Coach ---------") . "`n`n" . answer . "`n`n", this.Transcript)
+				FileAppend(translate("-- Driver --------") . "`n`n" . text . "`n`n" . translate("-- Coach ---------") . "`n`n" . answer . "`n`n", this.Transcript, "UTF-16")
 		}
 	}
 

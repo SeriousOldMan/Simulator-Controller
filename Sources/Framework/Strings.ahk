@@ -37,29 +37,36 @@ substituteString(text, pattern, replacement) {
 
 substituteVariables(text, values := false) {
 	local result := text
+	local startPos := 1
 	local variable, startPos, endPos, value
 
 	loop {
-		startPos := InStr(result, "%")
+		startPos := InStr(result, "%", , startPos)
 
 		if startPos {
 			startPos += 1
-			endPos := InStr(result, "%", false, startPos)
 
-			if endPos {
-				variable := Trim(SubStr(result, startPos, endPos - startPos))
+			try {
+				endPos := InStr(result, "%", false, startPos)
 
-				if isInstance(values, Map)
-					value := (values && values.Has(variable)) ? values[variable] : %variable%
-				else if isInstance(values, Object)
-					value := (values && values.HasProp(variable)) ? values.%variable% : %variable%
+				if endPos {
+					variable := Trim(SubStr(result, startPos, endPos - startPos))
+
+					if isInstance(values, Map)
+						value := (values && values.Has(variable)) ? values[variable] : %variable%
+					else if isInstance(values, Object)
+						value := (values && values.HasProp(variable)) ? values.%variable% : %variable%
+					else
+						value := %variable%
+
+					result := StrReplace(result, "%" . variable . "%", value)
+				}
 				else
-					value := %variable%
-
-				result := StrReplace(result, "%" . variable . "%", value)
+					throw "Second % not found while scanning (" . text . ") for variables in substituteVariables..."
 			}
-			else
-				throw "Second % not found while scanning (" . text . ") for variables in substituteVariables..."
+			catch Any as exception {
+				logError(exception)
+			}
 		}
 		else
 			break

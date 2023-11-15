@@ -155,6 +155,8 @@ class VoiceManager {
 		}
 
 		speak(text, focus := false, cache := false, options := false) {
+			text := StrReplace(text, ";", ",")
+
 			if this.Talking {
 				this.iText .= (A_Space . text)
 				this.iFocus := (this.iFocus || focus)
@@ -858,7 +860,7 @@ class VoiceManager {
 
 				messageSend(kFileMessage, "Voice"
 										, "registerVoiceClient:" . values2String(";", this.Name, this.Routing, ProcessExist()
-																					, activationCommand
+																					, StrReplace(activationCommand, ";", ",")
 																					, "remoteActivationRecognized", "remoteDeactivationRecognized"
 																					, this.Language, this.Synthesizer, this.Speaker
 																					, this.Recognizer, this.Listener
@@ -1035,7 +1037,8 @@ class VoiceManager {
 			if spRecognizer
 				spRecognizer.setChoices(name, choices)
 			else
-				messageSend(kFileMessage, "Voice", "registerChoices:" . values2String(";", this.Name, name, string2Values(",", choices)*), this.VoiceServer)
+				messageSend(kFileMessage, "Voice", "registerChoices:" . values2String(";", this.Name, name, string2Values(",", StrReplace(choices, ";", ","))*)
+										, this.VoiceServer)
 
 		for grammar, definition in getMultiMapValues(grammars, "Listener Grammars") {
 			definition := substituteVariables(definition, {name: this.Name})
@@ -1092,13 +1095,15 @@ class VoiceManager {
 					if (mode = "Text")
 						throw "Listener grammars are not supported in continuous text recognition..."
 
-					messageSend(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, grammar, definition, "remoteCommandRecognized"), this.VoiceServer)
+					messageSend(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, grammar, StrReplace(definition, ";", ","), "remoteCommandRecognized")
+											, this.VoiceServer)
 				}
 		}
 
 		if (mode != "Grammar") {
 			if !spRecognizer
-				messageSend(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, "Text", "*", "remoteTextRecognized"), this.VoiceServer)
+				messageSend(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, "Text", "*", "remoteTextRecognized")
+										, this.VoiceServer)
 		}
 		else {
 			if spRecognizer {
@@ -1110,7 +1115,8 @@ class VoiceManager {
 				}
 			}
 			else
-				messageSend(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, "?", "[Unknown]", "remoteCommandRecognized"), this.VoiceServer)
+				messageSend(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, "?", "[Unknown]", "remoteCommandRecognized")
+										, this.VoiceServer)
 		}
 	}
 

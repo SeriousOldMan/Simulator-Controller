@@ -169,7 +169,8 @@ logMessage(logLevel, message, monitor := true) {
 				message := StrReplace(StrReplace(StrReplace(StrReplace(message, "`n", A_Space), "`r", A_Space), "`t", A_Space), ";", A_Space)
 
 				try {
-					messageSend(kFileMessage, "Monitoring", "logMessage:" . values2String(";", script, time, logLevel, message), pid)
+					messageSend(kFileMessage, "Monitoring", "logMessage:" . values2String(";", script, time, logLevel, StrReplace(message, ";", ","))
+											, pid)
 				}
 				finally {
 					sending := false

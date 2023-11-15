@@ -899,6 +899,8 @@ class SimulatorController extends ConfigurationItem {
 		static registered := false
 		static registeredCommands := false
 
+		command := StrReplace(command, ";", ",")
+		
 		if !registeredCommands
 			registeredCommands := CaseInsenseMap()
 
@@ -913,7 +915,7 @@ class SimulatorController extends ConfigurationItem {
 				pid := ProcessExist()
 
 				if !registered {
-					activationCommand := getMultiMapValue(this.Configuration, "Voice Control", "ActivationCommand", false)
+					activationCommand := StrReplace(getMultiMapValue(this.Configuration, "Voice Control", "ActivationCommand", false), ";", ",")
 
 					messageSend(kFileMessage, "Voice", "registerVoiceClient:" . values2String(";", "Controller", "Controller", pid
 																								 , activationCommand, "activationCommand", false
@@ -924,7 +926,8 @@ class SimulatorController extends ConfigurationItem {
 				}
 
 				if !registeredCommands.Has(command) {
-					messageSend(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", "Controller", false, command, "voiceCommand"), this.VoiceServer)
+					messageSend(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", "Controller", false, command, "voiceCommand")
+											, this.VoiceServer)
 
 					registeredCommands[command] := true
 				}

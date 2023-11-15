@@ -2757,9 +2757,9 @@ class PracticeCenter extends ConfigurationItem {
 								newRun.TyreLaps := this.UsedTyreSets[newRun.Compound . "." . tyreSet].Laps
 
 							messageSend(kFileMessage, "Race Engineer"
-									  , "performService:" . values2String(";", lap, 0
-																			 , tyreCompound, tyreCompoundColor, tyreSet, tyrePressures*)
-									  , engineerPID)
+												    , "performService:" . values2String(";", lap, 0
+																						   , tyreCompound, tyreCompoundColor, tyreSet, tyrePressures*)
+												    , engineerPID)
 						}
 					}
 				}

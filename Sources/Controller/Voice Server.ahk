@@ -1262,7 +1262,8 @@ class VoiceServer extends ConfigurationItem {
 		if this.Debug[kDebugRecognitions]
 			showMessage("Text recognized: " . text, false, "Information.png", 5000)
 
-		messageSend(kFileMessage, "Voice", descriptor[2] . ":" . values2String(";", "Text", descriptor[1], text), voiceClient.PID)
+		messageSend(kFileMessage, "Voice", descriptor[2] . ":" . values2String(";", "Text", descriptor[1], StrReplace(text, ";", ","))
+								, voiceClient.PID)
 	}
 }
 

@@ -9,6 +9,10 @@
   6. Superfluous proximity alerts for cars that are actually behind a wall and driving in another direction or are not moving at all, are now supressed.
   7. You can now specify [a preference for an early or a late first pitstop](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#simulation), when running a strategy simulation in the "Strategy Workbench".
   8. An all new local large language model runtime has been integrated, which allows you to run a LLM for the "Driving Coach" local on your PC, without installing additional software or creating an OpenAI account. Please note that this increases the performance and memory requirements for the "Driving Coach" dramatically, but if your PC can handle it, then it is a great alternative to OpenAI and Co. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#llm-runtime) for more information.
+  9. New car models for "Setup Workbench":
+     - Assetto Corsa
+       - Alfa Romeo GTA (fixed)
+	   - BMW M3 E92
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-546).
 

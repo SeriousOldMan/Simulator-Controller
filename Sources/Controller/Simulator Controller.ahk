@@ -767,7 +767,7 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	runningSimulator(&plugin := false) {
-		local ignore, thePlugin, simulator
+		local ignore, thePlugin, simulator, label
 
 		static lastSimulator := false
 		static lastPlugin := false
@@ -779,15 +779,18 @@ class SimulatorController extends ConfigurationItem {
 
 			for ignore, thePlugin in this.Plugins
 				if this.isActive(thePlugin) {
-					if isDebug()
-						logMessage(kLogDebug, "Checking " . thePlugin.Plugin . "...")
-
 					simulator := thePlugin.runningSimulator()
 
-					if (simulator != false) {
-						if isDebug()
-							logMessage(kLogDebug, "Detected " . simulator . "...")
+					if isDebug() {
+						label := thePlugin.Plugin
 
+						if (thePlugin.Simulators.Length > 0)
+							label .= (" (" . values2String(", ", thePlugin.Simulators*) . ")")
+
+						logMessage(kLogDebug, label . ": " . (simulator ? "Running" : ((thePlugin.Simulators.Length = 0) ? "Independent" : "Stopped")))
+					}
+
+					if (simulator != false) {
 						lastSimulator := simulator
 						lastPlugin := thePlugin
 
@@ -1236,7 +1239,7 @@ class SimulatorController extends ConfigurationItem {
 
 	writeControllerState(fromTask := false) {
 		local plugins := CaseInsenseMap()
-		local controller, configuration, ignore, thePlugin, modes, states, name, theMode, simulators, simulator, fnController
+		local controller, configuration, ignore, thePlugin, fnController
 
 		configuration := newMultiMap()
 
@@ -1245,29 +1248,13 @@ class SimulatorController extends ConfigurationItem {
 				plugins[thePlugin.Plugin] := true
 
 				if (this.isActive(thePlugin)) {
-					modes := []
-
-					if isSet(SimulatorPlugin) && isInstance(thePlugin, SimulatorPlugin) {
-						states := []
-
-						for ignore, name in thePlugin.Sessions[true]
-							states.Push(name)
-
+					if isSet(SimulatorPlugin) && isInstance(thePlugin, SimulatorPlugin)
 						setMultiMapValue(configuration, "Simulators", thePlugin.Simulator.Application
-									   , thePlugin.Plugin . "|" . values2String(",", states*))
-					}
-
-					for ignore, theMode in thePlugin.Modes
-						modes.Push(theMode.Mode)
-
-					simulators := []
-
-					for ignore, simulator in thePlugin.Simulators
-						simulators.Push(simulator)
+									   , thePlugin.Plugin . "|" . values2String(",", thePlugin.Sessions[true]*))
 
 					setMultiMapValue(configuration, "Plugins", thePlugin.Plugin
 								   , values2String("|", (this.isActive(thePlugin) ? kTrue : kFalse)
-								   , values2String(",", simulators*), values2String(",", modes*)))
+								   , values2String(",", thePlugin.Simulators*), values2String(",", thePlugin.Modes[true]*)))
 				}
 
 				thePlugin.writePluginState(configuration)
@@ -1617,9 +1604,20 @@ class ControllerPlugin extends Plugin {
 		}
 	}
 
-	Modes {
+	Modes[asText := false] {
 		Get {
-			return this.iModes
+			local names, ignore, mode
+
+			if asText {
+				names := []
+
+				for ignore, mode in this.iModes
+					names.Push(mode.Mode)
+
+				return names
+			}
+			else
+				return this.iModes
 		}
 	}
 
@@ -2030,7 +2028,7 @@ updateSimulatorState() {
 					controller.simulatorShutdown(lastSimulator)
 
 					if isDebug()
-						logMessage(kLogDebug, "Stopping simulator " . lastSimulator . "...")
+						logMessage(kLogDebug, "Stopping processes for " . lastSimulator . "...")
 				}
 
 				lastSimulator := currentSimulator
@@ -2038,7 +2036,7 @@ updateSimulatorState() {
 				controller.simulatorStartup(currentSimulator)
 
 				if isDebug()
-					logMessage(kLogDebug, "Starting simulator " . currentSimulator . "...")
+					logMessage(kLogDebug, "Starting processes for " . currentSimulator . "...")
 			}
 		}
 		else if lastSimulator {
@@ -2047,7 +2045,7 @@ updateSimulatorState() {
 			controller.simulatorShutdown(lastSimulator)
 
 			if isDebug()
-				logMessage(kLogDebug, "Stopping simulator " . lastSimulator . "...")
+				logMessage(kLogDebug, "Stopping processes for " . lastSimulator . "...")
 
 			lastSimulator := false
 		}

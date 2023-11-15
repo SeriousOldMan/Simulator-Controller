@@ -3006,7 +3006,7 @@ initializeSimulatorSetup() {
 		SupportMenu.Check(label)
 
 	if !exitProcesses("Setup", "Before you can work on the configuration, other Simulator Controller applications must be closed."
-					, false, true, ["Simulator Setup", "Simulator Startup", "Simulator Tools"])
+					, false, "CANCEL", ["Simulator Setup", "Simulator Startup", "Simulator Tools"])
 		ExitApp(0)
 
 	if !isDebug()

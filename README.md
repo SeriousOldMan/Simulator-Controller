@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[5.4.6.0-dev](https://www.dropbox.com/scl/fi/vquhsz4qy1tru24prggsr/Simulator-Controller-5.4.6.0-dev.zip?rlkey=632hpodpeguzb5sqdqngxgzyd&dl=1) (Early build for 5.4.6. Changes: Weighting of 1st stint in strategy simulation, Ctrl modifier for "Exit" command, Extended UI translation for French, Increased resilience of Pitstop MFD handling in ACC, Reliable selection of tyre compound in ACC, Prevent superfluous Spotter proximity alerts, Embedded GPT4All engine for "Driving Coach", New car models for "Setup Workbench".)
+[5.4.6.0-alpha](https://www.dropbox.com/scl/fi/rogzffd0kgw7a6ghnk0wx/Simulator-Controller-5.4.6.0-alpha.zip?rlkey=wyno24qjxof5ay1eys6k5iyx9&dl=1) (Test build for 5.4.6. Changes: Weighting of 1st stint in strategy simulation, Ctrl modifier for "Exit" command, Extended UI translation for French, Increased resilience of Pitstop MFD handling in ACC, Reliable selection of tyre compound in ACC, Prevent superfluous Spotter proximity alerts, Embedded GPT4All engine for "Driving Coach", New car models for "Setup Workbench".)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-546) of this version and all the versions you might have skipped, before installing and using this version.
 
@@ -156,6 +156,8 @@ The Assistant is based on text-based GPT technology and uses a publically availa
 Click on the picture to hear an actual conversation with the Driving Coach:
 
 [![](https://img.youtube.com/vi/LBtLk_md1IE/0.jpg)](https://youtu.be/LBtLk_md1IE)
+
+The Virtual Driving Coach can use LLM runtimes of OpenAI or Azure, but if your PC is powerful enough, you can also use an integrated runtime for a variety of LLM architectures, like Llama, Falcon, Mistral, GPT, and so on, as long as they are available in [GGUF format](https://github.com/ggerganov/ggml/pull/302).
 
 ##### Race Engineer & Race Strategist
 

@@ -343,13 +343,17 @@ class FCYHandling extends Assert {
 				strategist.callRecommendFullCourseYellow()
 
 			if (A_Index = 4) {
-				Sleep(1000)
+				Sleep(2000)
+
+				Task.yield()
 
 				this.AssertEqual(1, strategist.KnowledgeBase.getValue("Strategy.Pitstop.Next"), "Unexpected next pitstop detected in lap 2...")
 				this.AssertEqual(28, strategist.KnowledgeBase.getValue("Strategy.Pitstop.Lap"), "Unexpected pitstop lap detected in lap 2...")
 			}
 			else if (A_Index = 11) {
-				Sleep(1000)
+				Sleep(2000)
+
+				Task.yield()
 
 				this.AssertEqual(1, strategist.KnowledgeBase.getValue("Strategy.Pitstop.Next"), "Unexpected next pitstop detected in lap 2...")
 				this.AssertEqual(9, strategist.KnowledgeBase.getValue("Strategy.Pitstop.Lap"), "Unexpected pitstop lap detected in lap 2...")

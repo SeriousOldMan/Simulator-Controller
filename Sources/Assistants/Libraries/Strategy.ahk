@@ -3033,10 +3033,11 @@ class Strategy extends ConfigurationItem {
 
 		pitstopRule := this.PitstopRule
 
-		if ((pitstopNr = 1) && (!pitstopRule || (pitstopRule == true))) {
+		if ((pitstopNr = 1) && (!pitstopRule || (pitstopRule == true)) && (targetLap > (currentLap + 1))) {
 			halfLaps := ((targetLap - currentLap) / 2)
 
-			targetLap := Round(halfLaps + ((halfLaps / 100) * this.FirstStintWeight))
+			if (halfLaps != 0)
+				targetLap := Round(halfLaps + ((halfLaps / 100) * this.FirstStintWeight))
 		}
 		else if isObject(pitstopRule) {
 			openingLap := (pitstopRule[1] * 60 / avgLapTime)

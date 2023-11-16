@@ -1,4 +1,4 @@
-## 5.4.6.0-release 11/17/23 (planned)
+## 5.4.6.0-release 11/17/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. A new Control modifier lets you overrule apps which resist to exit, because they are currently working on background tasks. Hold the Control key, until all applications have exited. Please note, that this may lead to a loss of data, for example the post race report.

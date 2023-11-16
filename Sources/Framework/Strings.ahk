@@ -10,16 +10,13 @@
 ;;;-------------------------------------------------------------------------;;;
 
 encode(text) {
-	text := StrReplace(text, "\", "\\")
-	text := StrReplace(text, "=", "\=")
-
-	return StrReplace(text, "`n", "\n")
+	return StrReplace(StrReplace(StrReplace(text, "\", "\\"), "=", "\="), "`n", "\n")
 }
 
 decode(text) {
-	text := StrReplace(StrReplace(StrReplace(text, "\=", "_#_EQ-#_"), "\\", "_#_AC-#_"), "\n", "_#_CR-#_")
+	text := StrReplace(StrReplace(StrReplace(text, "\\", "_#_AC_#_"), "\=", "_#_EQ_#_"), "\n", "_#_CR_#_")
 
-	return StrReplace(StrReplace(StrReplace(text, "_#_EQ-#_", "="), "_#_AC-#_", "\"), "_#_CR-#_", "`n")
+	return StrReplace(StrReplace(StrReplace(text, "_#_EQ_#_", "="), "_#_AC_#_", "\"), "_#_CR_#_", "`n")
 }
 
 substituteString(text, pattern, replacement) {
@@ -41,7 +38,7 @@ substituteVariables(text, values := false) {
 	local variable, startPos, endPos, value
 
 	loop {
-		startPos := InStr(result, "%", , startPos)
+		startPos := InStr(result, "%", false, startPos)
 
 		if startPos {
 			startPos += 1

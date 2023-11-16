@@ -768,12 +768,12 @@ class SpeechSynthesizer {
 
 	speakTest() {
 		switch this.Language, false {
-			case "EN":
-				this.speak("The quick brown fox jumps over the lazy dog")
 			case "DE":
 				this.speak("Falsches Üben von Xylophonmusik quält jeden größeren Zwerg")
 			case "ES":
 				this.speak("Extraño pan de col y kiwi se quemó bajo fugaz vaho")
+			case "FR":
+				this.speak("Portez ce vieux whisky au juge blond qui fume")
 			default:
 				this.speak("The quick brown fox jumps over the lazy dog")
 		}

@@ -3009,6 +3009,9 @@ initializeSimulatorSetup() {
 					, false, "CANCEL", ["Simulator Setup", "Simulator Startup", "Simulator Tools"])
 		ExitApp(0)
 
+	if GetKeyState("Ctrl")
+		Sleep(2000)
+
 	if !isDebug()
 		showSplashScreen("Rotating Brain")
 

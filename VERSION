@@ -3,7 +3,7 @@ Version=5.4.7.0-dev
 Target=5.4.7.0-release
 Date=11/17/2023
 Download=
-Changes=Integrated language packs for French language in "Simulator Setup"
+Changes=Integrated language packs for French language in "Simulator Setup", Integrated french grammars for the Race Engineer
 Components=Media->5.3.0,Configuration->5.4.7,Utilities->5.4.7
 [Release]
 Version=5.4.5.0-release

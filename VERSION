@@ -31,7 +31,7 @@ Utilities.5.4.7.Path=.
 Utilities.5.4.7.Content=Utilities
 Utilities.5.4.7.Download=https://www.dropbox.com/scl/fi/8gi2d2smvl0aezj9pn72u/Utilities-5.4.7.zip?rlkey=tna2neld8q72581c6kpcipkma&dl=1
 [Current]
-Type=Release
+Type=Development
 [Version]
 Development=5.4.7.0-dev
 Release=5.4.6.0-release

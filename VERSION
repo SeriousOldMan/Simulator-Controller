@@ -6,10 +6,10 @@ Download=
 Changes=Integrated language packs for French language in "Simulator Setup", Integrated french grammars for the Race Engineer
 Components=Media->5.3.0,Configuration->5.4.7,Utilities->5.4.7
 [Release]
-Version=5.4.5.0-release
-Date=11/10/2023
-Download=https://cutt.ly/OwTJ0wPt;https://www.dropbox.com/scl/fi/k64sm10h9gwvb8ulbiros/Simulator-Controller-5.4.5.0-release.zip?rlkey=dafsipu91j8xp00pgf9iq2usq&dl=1
-Changes=Cleanup of the Binaries folder, Strategies are now preserved when saving session in "Race Center", New car models for "Setup Workbench", Fixed tyre handling in "Assetto Corsa", Fixed timing in problem during Assistants startup, Fixed start grid positions, Fixed "Practice Center" initializing even if context change was canceled, New top speed info on session page of "System Monitor", New top speed fields in "State.json", Spotter now announces your best top speed, Warning on dashboard when no position infos are available in the data, Initial french translation, Updated Driving Coach to the OpenAI models
+Version=5.4.6.0-release
+Date=11/17/2023
+Download=https://cutt.ly/gwUw1DIT;https://www.dropbox.com/scl/fi/ht3u1nown366zx9pim64y/Simulator-Controller-5.4.6.0-release.zip?rlkey=rbeouuoql8964wtsp54gej6us&dl=1
+Changes=Weighting of 1st stint in strategy simulation, Ctrl modifier for "Exit" command, Extended UI translation for French, Increased resilience of Pitstop MFD handling in ACC, Reliable selection of tyre compound in ACC, Prevent superfluous Spotter proximity alerts, Embedded GPT4All engine for "Driving Coach", New car models for "Setup Workbench"
 Components=Media->5.3.0,Configuration->5.4.0,Utilities->5.3.0
 [Components]
 Media.5.3.0.Path=Resources
@@ -21,11 +21,17 @@ Configuration.5.3.0.Download=https://www.dropbox.com/scl/fi/vkpggadd4rd1w9h2ow1d
 Configuration.5.4.0.Path=Resources
 Configuration.5.4.0.Content=Setup
 Configuration.5.4.0.Download=https://www.dropbox.com/scl/fi/bqoelme4t6rwg1yf54nul/Configuration-5.4.0.zip?rlkey=gicf400rk3z0d5z1k61veg63h&dl=1
+Configuration.5.4.7.Path=Resources
+Configuration.5.4.7.Content=Setup
+Configuration.5.4.7.Download=https://www.dropbox.com/scl/fi/4tn39j7l0isqod8hyvgmp/Configuration-5.4.7.zip?rlkey=tqwjeacyb1coh03eyfl594qw8&dl=1
 Utilities.5.3.0.Path=.
 Utilities.5.3.0.Content=Utilities
 Utilities.5.3.0.Download=https://www.dropbox.com/scl/fi/hlza8t9tae5d0vnd7wmqa/Utilities-5.3.0.zip?rlkey=ciotp2dr5u3e4rxgikf45a1dq&dl=1
+Utilities.5.4.7.Path=.
+Utilities.5.4.7.Content=Utilities
+Utilities.5.4.7.Download=https://www.dropbox.com/scl/fi/8gi2d2smvl0aezj9pn72u/Utilities-5.4.7.zip?rlkey=tna2neld8q72581c6kpcipkma&dl=1
 [Current]
-Type=Development
+Type=Release
 [Version]
 Development=5.4.7.0-dev
-Release=5.4.5.0-release
+Release=5.4.6.0-release

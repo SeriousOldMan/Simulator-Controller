@@ -160,7 +160,7 @@
     - [Planning and managing practice stints](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#managing-tyres-and-planning-practice-stints)
 	- [Exploring data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#exploring-data)
     - [Exporting data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#exporting-data-to-the-session-database)
-  - [Strategy Workbench](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-workbench)
+  - [Strategy Workbench](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-development)
     - [Rules & Settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#rules--settings)
     - [Pitstop & Service](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#pitstop--service)
 	- [Drivers](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#drivers)

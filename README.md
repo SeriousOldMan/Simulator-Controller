@@ -37,19 +37,21 @@ Here is a short video which shows how to configure Simulator Controller for the 
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [information about the update process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.
 
-[5.4.6.0-release](https://cutt.ly/gwUw1DIT) (Changes: Weighting of 1st stint in strategy simulation, Ctrl modifier for "Exit" command, Extended UI translation for French, Increased resilience of Pitstop MFD handling in ACC, Reliable selection of tyre compound in ACC, Prevent superfluous Spotter proximity alerts, Embedded GPT4All engine for "Driving Coach", New car models for "Setup Workbench".)
+[5.4.5.0-release](https://cutt.ly/OwTJ0wPt) (Changes: Cleanup of the Binaries folder, Strategies are now preserved when saving session in "Race Center", New car models for "Setup Workbench", Fixed tyre handling in "Assetto Corsa", Fixed timing in problem during Assistants startup, Fixed start grid positions, Fixed "Practice Center" initializing even if context change was canceled, New top speed info on session page of "System Monitor", New top speed fields in "State.json", Spotter now announces your best top speed, Warning on dashboard when no position infos are available in the data, Initial french translation, Updated Driving Coach to the OpenAI models.)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-546) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-545) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[5.4.5.0-release](https://cutt.ly/OwTJ0wPt) (Changes: Cleanup of the Binaries folder, Strategies are now preserved when saving session in "Race Center", New car models for "Setup Workbench", Fixed tyre handling in "Assetto Corsa", Fixed timing in problem during Assistants startup, Fixed start grid positions, Fixed "Practice Center" initializing even if context change was canceled, New top speed info on session page of "System Monitor", New top speed fields in "State.json", Spotter now announces your best top speed, Warning on dashboard when no position infos are available in the data, Initial french translation, Updated Driving Coach to the OpenAI models.)
-
 [5.4.4.0-release](https://cutt.ly/9wRWbHBs) (Changes: Google STT integration, New settings for confirmation handling by the Assistants, Optical enhancement for session info in "System Monitor", Drive time in session info widget in "System Monitor", Improved process management when working on the configuration, New car models for "Setup Workbench", New translation report for developers.)
+
+[5.4.3.2-release](https://cutt.ly/YwEYJTdc) (Changes: New core settings to control window size constraints, Resized "Strategy Workbench", Extended "Pitstop" menu in "Race Center", Tyre set available in "System Monitor", Tyre set available in "Session State.json", Google TTS integration, New car models for "Setup Workbench".)
 
 #### Latest development build
 
-None for the moment...
+[5.4.6.0-alpha](https://www.dropbox.com/scl/fi/rogzffd0kgw7a6ghnk0wx/Simulator-Controller-5.4.6.0-alpha.zip?rlkey=wyno24qjxof5ay1eys6k5iyx9&dl=1) (Test build for 5.4.6. Changes: Weighting of 1st stint in strategy simulation, Ctrl modifier for "Exit" command, Extended UI translation for French, Increased resilience of Pitstop MFD handling in ACC, Reliable selection of tyre compound in ACC, Prevent superfluous Spotter proximity alerts, Embedded GPT4All engine for "Driving Coach", New car models for "Setup Workbench".)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-546) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 
@@ -165,7 +167,7 @@ Based on the data sets, that are acquired during your sessions by the Virtual Ra
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Reports%202.JPG)
 
-Another capability of the Virtual Race Strategist is to support you during the [development of a strategy](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-workbench) for an upcoming race using the telemetry data of past sessions on the same track in similar conditions.
+Another capability of the Virtual Race Strategist is to support you during the [development of a strategy](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-development) for an upcoming race using the telemetry data of past sessions on the same track in similar conditions.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Workbench.JPG)
 

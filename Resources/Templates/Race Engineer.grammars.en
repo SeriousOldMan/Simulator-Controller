@@ -282,7 +282,7 @@ ConfirmNoTyreChange.1=Okay, we're not going to change the tires, is that right?
 ConfirmNoTyreChange.2=We're supposed to leave the tires on. Please confirm.
 ConfirmRepairChange.1=Okay, we will %negation% repair the %damage%, is that correct?
 ConfirmRepairChange.2=You ask me to %negation% repair the %damage% during the next pitstop. Please confirm.
-ConfirmPlanUpdate.1=Okay, I changed everything accordingly
+ConfirmPlanUpdate.1=Okay, I changed everything accordingly.
 ConfirmPlanUpdate.2=I updated the pitstop plan like you said.
 ConfirmPlanUpdate.3=The crew is informed about your change.
 // Data Update Handling //

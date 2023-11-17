@@ -1216,7 +1216,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
   1. Bugfixes, as always
   2. Documentation updates, as always
-  3. Support driver filters for telemetry in "Strategy Workbench" and "Race Center". You can now select a driver, for which the data in various reports and charts should be displayed. See the updated documentation for ["Strategy Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-workbench) and ["Race Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#data-analysis) for more information.
+  3. Support driver filters for telemetry in "Strategy Workbench" and "Race Center". You can now select a driver, for which the data in various reports and charts should be displayed. See the updated documentation for ["Strategy Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-development) and ["Race Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#data-analysis) for more information.
   4. The strategy simulation in "Race Center" has been extended to support more edge cases regarding the current traffic situation.
   5. When simulating a strategy in "Strategy Workbench", it is now possible to preselect drivers for the various stints. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#drivers) for more information.
   6. When a stint plan is created from a strategy in "Race Center", the drivers are preselected, if the strategy has been created with driver information.
@@ -1741,7 +1741,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   5. Renamed "Controller Plugin Labels" file to "Controller Action Labels". Important: Take a look at the [update notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-366), if you have changed labels in the past.
   6. Introduced "Controller Action Icons.XX" file in order to support action specific icons on the Stream Deck controller.
   7. With the new plugin parameter [*udpConnection*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-4) for the ACC plugin to support non-standard UDP connect strings for the broadcasting interface.
-  8. ["Strategy Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-workbench) supports a new command to remove faulty data from the telemetry database.
+  8. ["Strategy Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-development) supports a new command to remove faulty data from the telemetry database.
   9. Only valid laps will be written to the telemetry database and will be used for statistical tyre pressure data.
   10. Support for binary functions for the effect intensity manipulation in the "Motion Feedback" plugin. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-2) for more information.
   11. [Developer only] Full refactoring of the *ButtonBox* class which is now the [*FunctionController*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-functioncontroller-extends-configurationitem-simulator-controllerahk) in [Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk) in order to support the new Stream Deck integration.
@@ -1771,14 +1771,14 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   5. Initializing a various fields in the "Strategy Workbench" from *Race.settings* files, from a running simulation or from data acquired from the telemetry information is now supported.
   6. Comparison of strategies is now supported in the "Strategy Workbench".
   7. Defined pitstop rules are now taken into account for strategy simulations.
-  8. Expanded [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-workbench) to reflect the new functions of the "Strategy Workbench".
+  8. Expanded [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-development) to reflect the new functions of the "Strategy Workbench".
 
 ## 3.6.0-release 10/08/21
 
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. Important fix for handling startup of SimFeedback by the "Motion Feedback" plugin.
-  4. Initial strategy simulation based on telemetry data for the "Strategy Workbench". The tool is still in an early stage of development and the functionality might change with future releases. A very rudimentary [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-workbench) can be found in the chapter on the Virtual Race Strategist. This documentation will be completed with the upcoming releases.
+  4. Initial strategy simulation based on telemetry data for the "Strategy Workbench". The tool is still in an early stage of development and the functionality might change with future releases. A very rudimentary [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-development) can be found in the chapter on the Virtual Race Strategist. This documentation will be completed with the upcoming releases.
 
 ## 3.5.9-release 10/01/21
 

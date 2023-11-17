@@ -108,7 +108,7 @@ Cato will always be active during a race, even if you have disabled data collect
 
 2. Cato can simulate future race situations based on the knowledge about your driving and all the other participants. This includes the devlopment of the standings as well as a [recommendation for the best possible lap for an upcoming pitstop](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#pitstop-recommendation).
 
-3. And Cato is able to guide you through the race using a strategy that was prepared before the race using the ["Strategy Workbench" tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-workbench). This includes the announcement of an upcoming pitstop, as well as a cooperation with the Race Engineer to prepare and handle the pitstop.
+3. And Cato is able to guide you through the race using a strategy that was prepared before the race using the ["Strategy Workbench" tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-development). This includes the announcement of an upcoming pitstop, as well as a cooperation with the Race Engineer to prepare and handle the pitstop.
 
 Normally, Cato will not contact you on its own as often as Jona does. Most of the time, you must ask Cato specifically for its support. An exception is, when you have an active race strategy or when a weather change will require you to conduct an unplanned pitstop for tyre change.
 
@@ -151,7 +151,7 @@ The following statistical models are currently implemented:
 
   1. Pre-Race strategy development
   
-     Cato can import a prepared strategy model at the start of a race session and will automatically call you to the pit and collaborate with Jona to give you a real life like race crew experience. Please see the dedicated chapters on [Strategy Development](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-workbench) and [Strategy Handling](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-handling) for more information.
+     Cato can import a prepared strategy model at the start of a race session and will automatically call you to the pit and collaborate with Jona to give you a real life like race crew experience. Please see the dedicated chapters on [Strategy Development](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-development) and [Strategy Handling](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-handling) for more information.
 	 
 	 You can configure in the race settings, that this predefined strategy will be revised actively by Cato depending on the current race situation or unplanned pitstops and so on.
 

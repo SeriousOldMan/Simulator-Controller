@@ -1,14 +1,14 @@
 [Development]
-Version=5.4.6.0-release
-Target=5.4.6.0-release
-Date=11/17/2023
-Download=https://cutt.ly/gwUw1DIT;https://www.dropbox.com/scl/fi/ht3u1nown366zx9pim64y/Simulator-Controller-5.4.6.0-release.zip?rlkey=rbeouuoql8964wtsp54gej6us&dl=1
+Version=5.4.6.1-release
+Target=5.4.6.1-release
+Date=11/18/2023
+Download=https://cutt.ly/lwUnBm11;https://www.dropbox.com/scl/fi/20xozbb14sz6mwdb14sv0/Simulator-Controller-5.4.6.1-release.zip?rlkey=hccy9oi64c3ge0f4icr01i0fo&dl=1
 Changes=Weighting of 1st stint in strategy simulation, Ctrl modifier for "Exit" command, Extended UI translation for French, Increased resilience of Pitstop MFD handling in ACC, Reliable selection of tyre compound in ACC, Prevent superfluous Spotter proximity alerts, Embedded GPT4All engine for "Driving Coach", New car models for "Setup Workbench"
 Components=Media->5.3.0,Configuration->5.4.0,Utilities->5.3.0
 [Release]
-Version=5.4.6.0-release
-Date=11/17/2023
-Download=https://cutt.ly/gwUw1DIT;https://www.dropbox.com/scl/fi/ht3u1nown366zx9pim64y/Simulator-Controller-5.4.6.0-release.zip?rlkey=rbeouuoql8964wtsp54gej6us&dl=1
+Version=5.4.6.1-release
+Date=11/18/2023
+Download=https://cutt.ly/lwUnBm11;https://www.dropbox.com/scl/fi/20xozbb14sz6mwdb14sv0/Simulator-Controller-5.4.6.1-release.zip?rlkey=hccy9oi64c3ge0f4icr01i0fo&dl=1
 Changes=Weighting of 1st stint in strategy simulation, Ctrl modifier for "Exit" command, Extended UI translation for French, Increased resilience of Pitstop MFD handling in ACC, Reliable selection of tyre compound in ACC, Prevent superfluous Spotter proximity alerts, Embedded GPT4All engine for "Driving Coach", New car models for "Setup Workbench"
 Components=Media->5.3.0,Configuration->5.4.0,Utilities->5.3.0
 [Components]
@@ -27,5 +27,5 @@ Utilities.5.3.0.Download=https://www.dropbox.com/scl/fi/hlza8t9tae5d0vnd7wmqa/Ut
 [Current]
 Type=Release
 [Version]
-Development=5.4.6.0-release
-Release=5.4.6.0-release
+Development=5.4.6.1-release
+Release=5.4.6.1-release

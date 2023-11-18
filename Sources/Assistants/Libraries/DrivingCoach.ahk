@@ -131,11 +131,11 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 
 		Ask(question) {
-			throw "Virtual method HTTPConnector.Ask must be implemented in a subclass..."
+			throw "Virtual method LLMProvider.Ask must be implemented in a subclass..."
 		}
 	}
 
-	class HTTPConnector {
+	class HTTPConnector extends DrivingCoach.LLMProvider {
 		iCoach := false
 
 		iServer := ""

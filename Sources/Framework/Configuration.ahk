@@ -203,21 +203,27 @@ class Application extends ConfigurationItem {
 
 	startup(special := true, wait := false, options := "") {
 		local specialStartup := this.iSpecialStartup
+		local processID
 
 		logMessage(kLogInfo, "Starting application " . this.Application)
 
 		if (special && (specialStartup && specialStartup != "")) {
 			try {
-				return (this.iRunningPID := %specialStartup%())
+				processID := %specialStartup%()
 			}
 			catch Any as exception {
 				logError(exception)
 
-				return (this.iRunningPID := Application.run(this.Application, this.ExePath, this.WorkingDirectory, options, wait))
+				processID := Application.run(this.Application, this.ExePath, this.WorkingDirectory, options, wait)
 			}
 		}
 		else
-			return (this.iRunningPID := Application.run(this.Application, this.ExePath, this.WorkingDirectory, options, wait))
+			processID := Application.run(this.Application, this.ExePath, this.WorkingDirectory, options, wait)
+
+		if !isNumber(processID)
+			processID := 0
+
+		return (this.iRunningPID := processID)
 	}
 
 	shutdown(special := true) {
@@ -303,6 +309,9 @@ class Application extends ConfigurationItem {
 		finally {
 			DetectHiddenWindows(curDetectHiddenWindows)
 		}
+
+		if !isNumber(processID)
+			processID := 0
 
 		return (this.iRunningPID := processID)
 	}

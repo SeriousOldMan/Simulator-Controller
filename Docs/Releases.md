@@ -1,3 +1,6 @@
+## 5.4.6.1-release 11/18/23
+  1. Fixed the OpenAI connection for the Driving Coach.
+  
 ## 5.4.6.0-release 11/17/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

@@ -3511,7 +3511,7 @@ class PracticeCenter extends ConfigurationItem {
 	}
 
 	exportSession(wait := false) {
-		exportSessionAsync() {
+		exportSessionAsync(fromTask := true) {
 			local progressWindow := showProgress({color: "Green", title: translate("Export to Database")})
 			local telemetryDB := TelemetryDatabase(this.Simulator, this.Car, this.Track)
 			local tyresDB := TyresDatabase()
@@ -3523,7 +3523,8 @@ class PracticeCenter extends ConfigurationItem {
 			while (row := this.LapsListView.GetNext(row, "C"))
 				count += 1
 
-			Task.CurrentTask.Critical := true
+			if fromTask
+				Task.CurrentTask.Critical := true
 
 			try {
 				row := 0
@@ -3587,7 +3588,8 @@ class PracticeCenter extends ConfigurationItem {
 						logError(exception)
 					}
 
-				Task.CurrentTask.Critical := false
+				if fromTask
+					Task.CurrentTask.Critical := false
 			}
 
 			this.iSessionExported := true
@@ -3612,7 +3614,7 @@ class PracticeCenter extends ConfigurationItem {
 		}
 
 		if wait
-			exportSessionAsync()
+			exportSessionAsync(false)
 		else
 			this.pushTask(exportSessionAsync)
 	}

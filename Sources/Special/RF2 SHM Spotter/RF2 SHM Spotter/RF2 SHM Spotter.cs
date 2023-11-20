@@ -727,7 +727,8 @@ namespace RF2SHMSpotter {
 		bool greenFlagReported = false;
 
 		bool greenFlag() {
-			if (!greenFlagReported && (scoring.mScoringInfo.mGamePhase == (byte)rF2GamePhase.GreenFlag)) {
+			if (!greenFlagReported && (scoring.mScoringInfo.mGamePhase == (byte)rF2GamePhase.GreenFlag)
+								   && (scoring.mScoringInfo.mSession >= 10 && scoring.mScoringInfo.mSession <= 13)) {
 				greenFlagReported = true;
 				
 				SendSpotterMessage("greenFlag");
@@ -1394,7 +1395,21 @@ namespace RF2SHMSpotter {
             }
         }
 
-        public void Run(bool mapTrack, bool positionTrigger, bool analyzeTelemetry) {
+        bool started = false;
+
+        public bool active() {
+			if (started)
+				return true;
+			else if ((scoring.mScoringInfo.mSession >= 10 && scoring.mScoringInfo.mSession <= 13)
+						&& (scoring.mScoringInfo.mGamePhase != (byte)rF2GamePhase.GreenFlag) && (GetPlayerScoring(ref scoring).mTotalLaps == 0))
+				return false;
+			
+			started = true;
+
+			return true;
+		}
+
+		public void Run(bool mapTrack, bool positionTrigger, bool analyzeTelemetry) {
             bool running = false;
 			int countdown = 4000;
 			long counter = 0;
@@ -1440,7 +1455,7 @@ namespace RF2SHMSpotter {
 						}
 						else if (positionTrigger)
 							checkCoordinates(ref playerScoring);
-						else
+						else if (active())
 						{
 							bool startGo = (scoring.mScoringInfo.mGamePhase == (byte)rF2GamePhase.GreenFlag);
 
@@ -1448,8 +1463,8 @@ namespace RF2SHMSpotter {
 							{
 								countdown -= 1;
 
-								if (!greenFlagReported && (countdown <= 0))
-									greenFlagReported = true;
+								// if (!greenFlagReported && (countdown <= 0))
+								//	greenFlagReported = true;
 
 								if (startGo || (countdown <= 0))
 									running = true;

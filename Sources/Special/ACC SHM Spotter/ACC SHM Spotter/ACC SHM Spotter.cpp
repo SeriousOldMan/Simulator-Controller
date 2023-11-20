@@ -613,7 +613,9 @@ bool checkPitWindow() {
 bool greenFlagReported = false;
 
 bool greenFlag() {
-	if (!greenFlagReported && (((SPageFileGraphic*)m_graphics.mapFileBuffer)->flag == AC_GREEN_FLAG)) {
+	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
+
+	if (!greenFlagReported && (gf->flag == AC_GREEN_FLAG) && (gf->session == AC_RACE)) {
 		greenFlagReported = true;
 		
 		sendSpotterMessage("greenFlag");
@@ -1182,6 +1184,23 @@ void checkCoordinates() {
 	}
 }
 
+bool started = false;
+
+inline const bool active() {
+	if (started)
+		return true;
+	else {
+		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
+
+		if ((gf->session == AC_RACE) && (gf->flag != AC_GREEN_FLAG) && (gf->completedLaps == 0))
+			return false;
+	}
+	
+	started = true;
+
+	return true;
+}
+
 int main(int argc, char* argv[])
 {
 	initPhysics();
@@ -1269,14 +1288,14 @@ int main(int argc, char* argv[])
 		}
 		else if (positionTrigger)
 			checkCoordinates();
-		else {
+		else if (active()) {
 			bool startGo = (gf->flag == AC_GREEN_FLAG);
 			
 			if (!running) {
 				countdown -= 1;
 
-				if (!greenFlagReported && ((countdown <= 0) || (pf->speedKmh >= 200)))
-					greenFlagReported = true;
+				// if (!greenFlagReported && ((countdown <= 0) || (pf->speedKmh >= 200)))
+				//	greenFlagReported = true;
 
 				running = (startGo || (countdown <= 0) || (pf->speedKmh >= 200));
 			}

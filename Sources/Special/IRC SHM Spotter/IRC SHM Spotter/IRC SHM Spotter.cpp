@@ -593,13 +593,22 @@ bool greenFlag(const irsdk_header* header, const char* data) {
 	if (greenFlagReported)
 		return false;
 	else {
+		const char* sessionInfo = irsdk_getSessionInfoStr();
+		char sessionID[10] = "";
 		char result[64];
+		bool race = false;
 		
 		getDataValue(result, header, data, "SessionFlags");
 
 		int flags = atoi(result);
 
-		if (flags & irsdk_startGo) {
+		itoa(getCurrentSessionID(sessionInfo), sessionID, 10);
+
+		if (getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}SessionType:", sessionID))
+			if (strstr(result, "Race"))
+				race = true;
+
+		if ((flags & irsdk_startGo) && race) {
 			greenFlagReported = true;
 			
 			sendSpotterMessage("greenFlag");
@@ -1305,6 +1314,45 @@ void checkCoordinates(const irsdk_header* header, const char* data, float trackL
 	}
 }
 
+bool started = false;
+
+inline const bool active(const irsdk_header* header, const char* data) {
+	if (started)
+		return true;
+	else {
+		const char* sessionInfo = irsdk_getSessionInfoStr();
+		char playerCarIdx[10] = "";
+		char sessionID[10] = "";
+		char result[64];
+		bool race = false;
+		int laps = 0;
+
+		getYamlValue(playerCarIdx, sessionInfo, "DriverInfo:DriverCarIdx:");
+
+		itoa(getCurrentSessionID(sessionInfo), sessionID, 10);
+
+		getDataValue(result, header, data, "SessionFlags");
+
+		int flags = atoi(result);
+
+		itoa(getCurrentSessionID(sessionInfo), sessionID, 10);
+
+		if (getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}SessionType:", sessionID))
+			if (strstr(result, "Race"))
+				race = true;
+
+		if (getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:CarIdx:{%s}LapsComplete:", sessionID, playerCarIdx))
+			laps = atoi(result);
+
+		if (race && !(flags & irsdk_startGo) && (laps == 0))
+			return false;
+	}
+
+	started = true;
+
+	return true;
+}
+
 int main(int argc, char* argv[])
 {
 	// bump priority up so we get time from the sim
@@ -1447,7 +1495,7 @@ int main(int argc, char* argv[])
 					}
 					else if (positionTrigger)
 						checkCoordinates(pHeader, g_data, trackLength);
-					else {
+					else if (active(pHeader, g_data)) {
 						if (!running) {
 							countdown -= 1;
 
@@ -1455,8 +1503,8 @@ int main(int argc, char* argv[])
 
 							int flags = atoi(result);
 
-							if (!greenFlagReported && (countdown <= 0))
-								greenFlagReported = true;
+							// if (!greenFlagReported && (countdown <= 0))
+							//	greenFlagReported = true;
 
 							running = (((flags & irsdk_startGo) != 0) || ((flags & irsdk_startSet) != 0) || (countdown <= 0));
 						}

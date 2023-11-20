@@ -1059,7 +1059,12 @@ class PracticeCenter extends ConfigurationItem {
 			if line {
 				run := center.Runs[listView.GetText(line, 1)]
 
-				if center.SessionExported
+				if (run.Laps.Length = 0) {
+					listView.Modify(line, "-Select")
+
+					return
+				}
+				else if center.SessionExported
 					listView.Modify(line, "-Check")
 				else if (listView.GetNext(line - 1, "C") = line) {
 					for ignore, lap in run.Laps
@@ -1112,7 +1117,7 @@ class PracticeCenter extends ConfigurationItem {
 			local count := listView.GetText(line, 2)
 			local chosen
 
-			if line {
+			if (line && this.SessionActive) {
 				if compound
 					compound := normalizeCompound(compound)
 
@@ -1121,6 +1126,8 @@ class PracticeCenter extends ConfigurationItem {
 				centerGui["compoundDropDown"].Choose(chosen)
 				centerGui["compoundCountEdit"].Text := count
 			}
+			else if line
+				listView.Modify(line, "-Select")
 
 			center.updateState()
 		}
@@ -2519,14 +2526,12 @@ class PracticeCenter extends ConfigurationItem {
 		return false
 	}
 
-	updateUsedTyreSets(all := false) {
+	updateUsedTyreSets() {
 		local tyreSets := WeakMap()
 		local currentRun := this.CurrentRun
 		local ignore, tyreSet, run
 
 		this.UsedTyreSetsListView.Delete()
-
-		this.iUsedTyreSets := tyreSets
 
 		if currentRun
 			loop currentRun.Nr
@@ -2535,6 +2540,8 @@ class PracticeCenter extends ConfigurationItem {
 
 					tyreSets[run.Compound . "." . run.TyreSet] := {Nr: run.TyreSet, Compound: run.Compound, Laps: (run.TyreLaps + run.Laps.Length)}
 				}
+
+		this.iUsedTyreSets := tyreSets
 
 		for ignore, tyreSet in tyreSets
 			this.UsedTyreSetsListView.Add("", translate(tyreSet.Compound), tyreSet.Nr, tyreSet.Laps)
@@ -2648,6 +2655,9 @@ class PracticeCenter extends ConfigurationItem {
 					run.TyreLaps := this.UsedTyreSets[tyreCompound . "." . tyreSet].Laps
 				else
 					run.TyreLaps := 0
+
+				if isDebug()
+					logMessage(kLogDebug, "modifyRun - Run: " . run.Nr . "; TyreSet: " . tyreSet . "; TyreLaps: " . run.TyreLaps)
 			}
 		}
 
@@ -2714,13 +2724,18 @@ class PracticeCenter extends ConfigurationItem {
 
 			this.LastLap.Run := newRun
 
+			if isDebug()
+				logMessage(kLogDebug, "newRun(Transfer) - Current Run: " . currentRun.Nr . "; New Run: " . newRun.Nr . "; Lap: " . this.LastLap.Nr)
+
 			this.modifyRun(currentRun)
 		}
 
-		if (newTyres || !currentRun) {
-			tyreCompound := this.Control["tyreCompoundDropDown"].Value
+		if isDebug()
+			logMessage(kLogDebug, "newRun(Dispatch) - Run: " . newRun.Nr . "; Tyre Mode: " . newRun.TyreMode . "; NewTyres: " . newTyres . "; Current Run: " . (currentRun ? "Yes" : "No"))
 
+		if (newTyres || !currentRun) {
 			if (newRun.TyreMode = "Manual") {
+				tyreCompound := this.Control["tyreCompoundDropDown"].Value
 				tyreSet := this.Control["tyreSetEdit"].Value
 
 				newRun.Compound := this.TyreCompounds[tyreCompound - 2]
@@ -2756,6 +2771,9 @@ class PracticeCenter extends ConfigurationItem {
 							else if this.UsedTyreSets.Has(newRun.Compound . "." . tyreSet)
 								newRun.TyreLaps := this.UsedTyreSets[newRun.Compound . "." . tyreSet].Laps
 
+							if isDebug()
+								logMessage(kLogDebug, "newRun(1) - Run: " . newRun.Nr . "; TyreSet: " . tyreSet . "; TyreLaps: " . newRun.TyreLaps)
+
 							messageSend(kFileMessage, "Race Engineer"
 												    , "performService:" . values2String(";", lap, 0
 																						   , tyreCompound, tyreCompoundColor, tyreSet, tyrePressures*)
@@ -2771,6 +2789,9 @@ class PracticeCenter extends ConfigurationItem {
 			newRun.Compound := currentRun.Compound
 			newRun.TyreSet := currentRun.TyreSet
 			newRun.TyreLaps := (currentRun.TyreLaps + currentRun.Laps.Length)
+
+			if isDebug()
+				logMessage(kLogDebug, "newRun(2) - Run: " . newRun.Nr . "; TyreSet: " . newRun.TyreSet . "; TyreLaps: " . newRun.TyreLaps)
 		}
 
 		return newRun
@@ -2965,6 +2986,9 @@ class PracticeCenter extends ConfigurationItem {
 		this.iWeather30Min := lap.Weather30Min
 
 		this.iLastLap := lap
+
+		if isDebug()
+			logMessage(kLogDebug, "addLap - Lap: " . lap.Nr . "; Run: " . lap.Run.Nr)
 
 		this.modifyLap(lap)
 		this.modifyRun(lap.Run)
@@ -3228,8 +3252,12 @@ class PracticeCenter extends ConfigurationItem {
 
 		driverID := ((driver != "-") ? driver.ID : SessionDatabase.ID)
 
-		if (pitstop && (this.Control["runModeDropDown"].Value = 2))
+		if (pitstop && (this.Control["runModeDropDown"].Value = 2)) {
+			if isDebug()
+				logMessage(kLogDebug, "addTelemetry(Pitstop) - Lap: " . lap.Nr . "; Run: " . lap.Run.Nr)
+
 			this.newRun(lap.Nr, true)
+		}
 
 		if (lap.Pressures = "-,-,-,-")
 			lap.Pressures := pressures
@@ -6153,7 +6181,7 @@ class PracticeCenter extends ConfigurationItem {
 			endTime := "-"
 
 		html := "<table>"
-		html .= ("<tr><td><b>" . translate("Driver:") . "</b></div></td><td>" . StrReplace(run.Driver.FullName, "'", "\'") . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Driver:") . "</b></div></td><td>" . (isObject(run.Driver) ? StrReplace(run.Driver.FullName, "'", "\'") : run.Driver) . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Start:") . "</b></div></td><td>" . startTime . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("End:") . "</b></div></td><td>" . endTime . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Duration:") . "</b></div></td><td>" . Round(duration / 60) . A_Space . translate("Minutes") . "</td></tr>")
@@ -6163,8 +6191,8 @@ class PracticeCenter extends ConfigurationItem {
 			html .= ("<tr><td><b>" . translate("End Position:") . "</b></div></td><td>" . run.EndPosition . "</td></tr>")
 		}
 
-		html .= ("<tr><td><b>" . translate("Temperatures (A / T):") . "</b></td><td>" . displayValue("Float", convertUnit("Temperature", run.AirTemperature)) . ", " . displayValue("Float", convertUnit("Temperature", run.TrackTemperature)) . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Consumption:") . "</b></div></td><td>" . displayValue("Float", convertUnit("Volume", run.FuelConsumption)) . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Temperatures (A / T):") . "</b></td><td>" . (run.HasProp("AirTemperature") ? displayValue("Float", convertUnit("Temperature", run.AirTemperature)) : translate("-")) . ", " . (run.HasProp("TrackTemperature") ? displayValue("Float", convertUnit("Temperature", run.TrackTemperature)) : translate("-")) . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Consumption:") . "</b></div></td><td>" . (run.HasProp("FuelConsumption") ? displayValue("Float", convertUnit("Volume", run.FuelConsumption)) : translate("-")) . "</td></tr>")
 		html .= "</table>"
 
 		return html
@@ -6305,8 +6333,8 @@ class PracticeCenter extends ConfigurationItem {
 		local accidentData := []
 		local ignore, lap, fuelConsumption
 
-		html .= ("<tr><td><b>" . translate("Average:") . "</b></td><td>" . lapTimeDisplayValue(run.AvgLapTime) . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Best:") . "</b></td><td>" . lapTimeDisplayValue(run.BestLapTime) . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Average:") . "</b></td><td>" . (run.HasProp("AvgLapTime") ? lapTimeDisplayValue(run.AvgLapTime) : translate("-")) . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Best:") . "</b></td><td>" . (run.HasProp("BestLapTime") ? lapTimeDisplayValue(run.BestLapTime) : translate("-")) . "</td></tr>")
 		html .= "</table>"
 
 		for ignore, lap in run.Laps {

@@ -459,7 +459,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 
 			workbench.ProgressCount := 0
 
-			showProgress({color: "Green", width: 350, title: translate("Creating Problems"), message: translate("Preparing Characteristics...")})
+			showProgress({color: "Green", width: 350, title: translate("Creating Issues"), message: translate("Preparing Characteristics...")})
 
 			for ignore, type in ["Oversteer", "Understeer"]
 				for ignore, speed in ["Slow", "Fast"]
@@ -1348,6 +1348,10 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		widget35 := analyzerGui.Add("DropDownList", "x166 yp w45 Choose" . chosen, [translate("Yes"), translate("No")])
 		acousticFeedbackDropDown := widget35
 
+		calibrateButton := analyzerGui.Add("Button", "x264 yp w80 h23 ", translate("Calibrate..."))
+		calibrateButton.OnEvent("Click", runAnalyzer.Bind("Calibrate"))
+		widget63 := calibrateButton
+
 		if !analyzer.settingAvailable("OversteerThresholds") {
 			heavyOversteerThresholdSlider.Enabled := false
 			heavyOversteerThresholdSlider.Value := 0
@@ -1441,7 +1445,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 							 , minRearBrakeTemperatureEdit, idealRearBrakeTemperatureEdit, maxRearBrakeTemperatureEdit]
 			widget.OnEvent("Change", validateTemperature.Bind(widget))
 
-		loop 62
+		loop 63
 			prepareWidgets.Push(%"widget" . A_Index%)
 
 		tabView .UseTab(0)
@@ -1478,9 +1482,9 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		tabView.UseTab(0)
 
-		calibrateButton := analyzerGui.Add("Button", "x16 ys+366 w80 h23 ", translate("Calibrate..."))
-		calibrateButton.OnEvent("Click", runAnalyzer.Bind("Calibrate"))
-		activateButton := analyzerGui.Add("Button", "x176 yp w80 h23 Default", translate("Start"))
+		; calibrateButton := analyzerGui.Add("Button", "x16 ys+366 w80 h23 ", translate("Calibrate..."))
+		; calibrateButton.OnEvent("Click", runAnalyzer.Bind("Calibrate"))
+		activateButton := analyzerGui.Add("Button", "x176 ys+366 w80 h23 Default", translate("Start"))
 		activateButton.OnEvent("Click", runAnalyzer.Bind("Activate"))
 		analyzerGui.Add("Button", "xp+98 yp w80 h23", translate("Cancel")).OnEvent("Click", runAnalyzer.Bind(kCancel))
 

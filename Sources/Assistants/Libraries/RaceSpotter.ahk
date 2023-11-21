@@ -3018,7 +3018,7 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 
 		Task.startTask(ObjBindMethod(this, "startupSpotter", true), 1000)
-		Task.startTask(ObjBindMethod(this, "updateSessionValues", {Running: true}), 25000)
+		Task.startTask(ObjBindMethod(this, "updateSessionValues", {Running: true}), 10000)
 
 		return facts
 	}

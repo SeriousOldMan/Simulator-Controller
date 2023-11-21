@@ -1344,6 +1344,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.Add("Edit", "xp+54 yp w50 Disabled Center vrrPressure4", displayValue("Float", 0.0))
 		editorGui.Add("Edit", "xp+54 yp w50 Disabled Center vrrPressure5", displayValue("Float", 0.0))
 
+		editorGui.Add("Picture", "x440 yp+40 w158 h8 Center", kResourcesDirectory . "Icons\Pressures.png")
+		editorGui.Add("Text", "x440 yp+10 w80 h23 Left", translate("Exact"))
+		editorGui.Add("Text", "x518 yp w80 h23 Right", translate("Estimated"))
+
 		if this.RequestorPID
 			editorGui.Add("Button", "x440 yp+50 w80 h23 vtransferPressuresButton", translate("Load")).OnEvent("Click", transferPressures)
 

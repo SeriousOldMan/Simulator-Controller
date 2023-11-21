@@ -2537,6 +2537,9 @@ class PracticeCenter extends ConfigurationItem {
 			loop currentRun.Nr {
 				run := this.Runs[A_Index]
 
+				if isDebug()
+					logMessage(kLogDebug, "updateUsedTyreSets - Run: " . run.Nr . "; TyreSet: " . run.TyreSet . "; TyreLaps: " . (run.TyreLaps + run.Laps.Length))
+
 				tyreSets[run.Compound . "." . run.TyreSet] := {Nr: run.TyreSet, Compound: run.Compound, Laps: (run.TyreLaps + run.Laps.Length)}
 			}
 

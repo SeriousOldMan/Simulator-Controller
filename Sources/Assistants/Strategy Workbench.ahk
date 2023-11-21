@@ -1086,15 +1086,15 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.SetFont("Norm", "Arial")
 
 		workbenchGui.Add("Text", "x" . x5 . " yp+23 w75 h20", translate("Pitstop"))
-		workbenchGui.Add("DropDownList", "x" . x7 . " yp-4 w80 Choose3 VpitstopRequirementsDropDown", collect(["Optional", "Required", "Window"], translate)).OnEvent("Change", choosePitstopRule)
+		workbenchGui.Add("DropDownList", "x" . x7 . " yp-4 w80 Choose1 VpitstopRequirementsDropDown", collect(["Optional", "Required", "Window"], translate)).OnEvent("Change", choosePitstopRule)
 		workbenchGui.Add("Edit", "x" . x11 . " yp+1 w50 h20 VpitstopWindowEdit", "25 - 35").OnEvent("Change", updatePitstopRule)
 		workbenchGui.Add("Text", "x" . x12 . " yp+3 w120 h20 VpitstopWindowLabel", translate("Minute (From - To)"))
 
 		workbenchGui.Add("Text", "x" . x5 . " yp+22 w75 h23 +0x200 VrefuelRequirementsLabel", translate("Refuel"))
-		workbenchGui.Add("DropDownList", "x" . x7 . " yp w80 Choose2 VrefuelRequirementsDropDown", collect(["Optional", "Required", "Always", "Disallowed"], translate))
+		workbenchGui.Add("DropDownList", "x" . x7 . " yp w80 Choose1 VrefuelRequirementsDropDown", collect(["Optional", "Required", "Always", "Disallowed"], translate))
 
 		workbenchGui.Add("Text", "x" . x5 . " yp+26 w75 h23 +0x200 VtyreChangeRequirementsLabel", translate("Tyre Change"))
-		workbenchGui.Add("DropDownList", "x" . x7 . " yp w80 Choose2 VtyreChangeRequirementsDropDown", collect(["Optional", "Required", "Always", "Disallowed"], translate))
+		workbenchGui.Add("DropDownList", "x" . x7 . " yp w80 Choose1 VtyreChangeRequirementsDropDown", collect(["Optional", "Required", "Always", "Disallowed"], translate))
 
 		workbenchGui.Add("Text", "x" . x5 . " yp+26 w75 h23 +0x200", translate("Tyre Sets"))
 

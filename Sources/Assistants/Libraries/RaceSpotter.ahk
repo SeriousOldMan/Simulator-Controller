@@ -1598,7 +1598,7 @@ class RaceSpotter extends GridRaceAssistant {
 				}
 
 				if (this.LastTopSpeed > 0) {
-					lastTopSpeed := Round(this.LastTopSpeed)
+					lastTopSpeed := Round(convertUnit("Speed", this.LastTopSpeed))
 
 					if (!this.SessionInfos.Has("BestSpeed") || (lastTopSpeed > this.SessionInfos["BestSpeed"])) {
 						speaker.speakPhrase("BestSpeed", {speed: speaker.number2Speech(lastTopSpeed), unit: getUnit("Speed")})

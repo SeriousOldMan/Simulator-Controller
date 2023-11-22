@@ -1,9 +1,9 @@
 [Development]
 Version=5.4.7.0-dev
 Target=5.4.7.0-release
-Date=11/21/2023
+Date=11/22/2023
 Download=https://www.dropbox.com/scl/fi/4rgd3c4lsz3oewj030wde/Simulator-Controller-5.4.7.0-dev.zip?rlkey=6d8dfkge15pobd6guyyi3cakr&dl=1
-Changes=Integrated language packs for French language in "Simulator Setup", Integrated french grammars for the Race Engineer, Optical enhancements & clarifications in "Session Database", Fixed tyre usage counting in "Practice Center", French grammars for the Assistants, Optimized start countdown handling for the Spotter, Changed default pitstop rule in "Strategy Workbench" to optional
+Changes=Integrated language packs for French language in "Simulator Setup", Integrated french grammars for the Race Engineer, Optical enhancements & clarifications in "Session Database", Fixed tyre usage counting in "Practice Center", French grammars for the Assistants, Optimized start countdown handling for the Spotter, Changed default pitstop rule in "Strategy Workbench" to optional, New car models for "Setup Workbench"
 Components=Media->5.3.0,Configuration->5.4.7,Utilities->5.4.7
 [Release]
 Version=5.4.6.1-release

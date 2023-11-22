@@ -8,6 +8,10 @@
   7. Fixed tyre laps counting in "Practice Center" for rare cases of automated pitstops.
   8. The default pitstop rule in "Strategy Workbench" is now *fully* optional.
   9. Full rework of the handling of the start procedure incl. formation lap for the Spotter. No proximity warnings will be issued by the Spoter during the formation lap under normal circumstances.
+  10. New car models for "Setup Workbench":
+     - Assetto Corsa
+       - BMW M4 Coupe
+       - BMW M4 Coupe Akrapovic Edition
 
 ## 5.4.6.1-release 11/18/23
   1. Fixed the OpenAI connection for the Driving Coach.

@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[5.4.7.0-dev](https://www.dropbox.com/scl/fi/4rgd3c4lsz3oewj030wde/Simulator-Controller-5.4.7.0-dev.zip?rlkey=6d8dfkge15pobd6guyyi3cakr&dl=1) (Early build for 5.4.7. Changes: Integrated language packs for French language in "Simulator Setup", Integrated french grammars for the Race Engineer, Optical enhancements & clarifications in "Session Database", Fixed tyre usage counting in "Practice Center", French grammars for the Assistants, Optimized start countdown handling for the Spotter, Changed default pitstop rule in "Strategy Workbench" to optional, New car models for "Setup Workbench".)
+[5.4.7.0-alpha](https://www.dropbox.com/scl/fi/cyietsertt1latc13zsne/Simulator-Controller-5.4.7.0-alpha.zip?rlkey=1mn31mnoll94wwj3m232c73yp&dl=1) (Test version for 5.4.7. Changes: Integrated language packs for French language in "Simulator Setup", Integrated french grammars for the Race Engineer, Optical enhancements & clarifications in "Session Database", Fixed tyre usage counting in "Practice Center", French grammars for the Assistants, Optimized start countdown handling for the Spotter, Changed default pitstop rule in "Strategy Workbench" to optional, New car models for "Setup Workbench".)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-547) of this version and all the versions you might have skipped, before installing and using this version.
 

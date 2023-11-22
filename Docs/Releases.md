@@ -2,12 +2,13 @@
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. The French language pack for the voice recognition has been added to the automated installer.
-  4. Removed ".NET Runtime 6.0" from the automated installer.
-  5. Thanks to our community member @SlatMars we now have a complete translation of the Assistant grammars for the French language.
-  6. A couple of optical enhancements & clarifications in "Session Database".
-  7. Fixed tyre laps counting in "Practice Center" for rare cases of automated pitstops.
-  8. The default pitstop rule in "Strategy Workbench" is now *fully* optional.
-  9. Full rework of the handling of the start procedure incl. formation lap for the Spotter. No proximity warnings will be issued by the Spoter during the formation lap under normal circumstances.
+  4. The handling issues as well as the car setup settings in the "Setup Workbench" has been also translated to French.
+  5. Removed ".NET Runtime 6.0" from the automated installer.
+  6. Thanks to our community member @SlatMars we now have a complete translation of the Assistant grammars for the French language.
+  7. A couple of optical enhancements & clarifications in "Session Database".
+  8. Fixed tyre laps counting in "Practice Center" for rare cases of automated pitstops.
+  9. The default pitstop rule in "Strategy Workbench" is now *fully* optional.
+  10. Full rework of the handling of the start procedure incl. formation lap for the Spotter. No proximity warnings will be issued by the Spoter during the formation lap under normal circumstances.
 
 ## 5.4.6.1-release 11/18/23
   1. Fixed the OpenAI connection for the Driving Coach.

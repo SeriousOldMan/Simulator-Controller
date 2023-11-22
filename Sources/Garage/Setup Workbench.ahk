@@ -322,7 +322,7 @@ class SetupWorkbench extends ConfigurationItem {
 
 	__New(simulator := false, car := false, track := false, weather := false) {
 		local found := false
-		local definition, ignore, rootDirectory
+		local definition, ignore, fileName
 
 		if simulator {
 			this.iSelectedSimulator := SessionDatabase.getSimulatorName(simulator)
@@ -333,11 +333,11 @@ class SetupWorkbench extends ConfigurationItem {
 
 		definition := readMultiMap(kResourcesDirectory . "Garage\Setup Workbench.ini")
 
-		for ignore, rootDirectory in [kTranslationsDirectory, kUserTranslationsDirectory]
-			if FileExist(rootDirectory . "Setup Workbench." . getLanguage()) {
+		for ignore, fileName in getFileNames("Setup Workbench." . getLanguage(), kUserTranslationsDirectory, kTranslationsDirectory)
+			if FileExist(fileName) {
 				found := true
 
-				addMultiMapValues(definition, readMultiMap(rootDirectory . "Setup Workbench." . getLanguage()))
+				addMultiMapValues(definition, readMultiMap(fileName))
 			}
 
 		if !found

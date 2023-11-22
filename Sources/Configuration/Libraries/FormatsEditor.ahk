@@ -60,6 +60,8 @@ class FormatsEditor extends ConfiguratorPanel {
 
 		this.Window := formatsGui
 
+		formatsGui.SetFont("Bold", "Arial")
+
 		formatsGui.Add("Text", "w238 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(formatsGui, "Formats Editor"))
 
 		formatsGui.SetFont("Norm", "Arial")

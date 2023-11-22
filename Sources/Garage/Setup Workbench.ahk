@@ -333,12 +333,11 @@ class SetupWorkbench extends ConfigurationItem {
 
 		definition := readMultiMap(kResourcesDirectory . "Garage\Setup Workbench.ini")
 
-		for ignore, fileName in getFileNames("Setup Workbench." . getLanguage(), kUserTranslationsDirectory, kTranslationsDirectory)
-			if FileExist(fileName) {
-				found := true
+		for ignore, fileName in getFileNames("Setup Workbench." . getLanguage(), kTranslationsDirectory, kUserTranslationsDirectory) {
+			found := true
 
-				addMultiMapValues(definition, readMultiMap(fileName))
-			}
+			addMultiMapValues(definition, readMultiMap(fileName))
+		}
 
 		if !found
 			addMultiMapValues(definition, readMultiMap(kTranslationsDirectory . "Setup Workbench.en"))

@@ -3644,19 +3644,18 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	getAvailableSettings(selection := false) {
 		local found := false
 		local fileName, settingDescriptors, section, values, key, value, settings, skip, ignore
-		local available, index, candidate, rootDirectory
+		local available, index, candidate
 
 		if (this.SettingDescriptors.Count = 0) {
 			settingDescriptors := readMultiMap(kResourcesDirectory . "Database\Settings.ini")
 
-			for ignore, rootDirectory in [kTranslationsDirectory, kUserTranslationsDirectory]
-				if FileExist(rootDirectory . "Settings." . getLanguage()) {
-					found := true
+			for ignore, fileName in getFileNames("Settings." . getLanguage(), kTranslationsDirectory, kUserTranslationsDirectory) {
+				found := true
 
-					for section, values in readMultiMap(rootDirectory . "Settings." . getLanguage())
-						for key, value in values
-							setMultiMapValue(settingDescriptors, section, key, value)
-				}
+				for section, values in readMultiMap(fileName)
+					for key, value in values
+						setMultiMapValue(settingDescriptors, section, key, value)
+			}
 
 			if !found
 				for section, values in readMultiMap(kTranslationsDirectory . "Settings.en")

@@ -6,7 +6,7 @@
   5. Thanks to our community member @SlatMars we now have a complete translation of the Assistant grammars for the French language.
   6. A couple of optical enhancements & clarifications in "Session Database".
   7. Fixed tyre laps counting in "Practice Center" for rare cases of automated pitstops.
-  8. The default pitstop rule in "Strategy Workbench" is now *fully* optional.
+  8. The default pitstop rule in "Strategy Workbench" is now set to *Optional*, rather than *Window*.
   9. Full rework of the handling of the start procedure incl. formation lap for the Spotter. No proximity warnings will be issued by the Spoter during the formation lap under normal circumstances.
   10. New car models for "Setup Workbench":
      - Assetto Corsa

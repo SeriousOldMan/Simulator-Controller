@@ -1,4 +1,4 @@
-## 5.4.7.0-release 11/24/23 (planned)
+## 5.4.7.0-release 11/24/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed Spotter to announce best top speed in localized units.

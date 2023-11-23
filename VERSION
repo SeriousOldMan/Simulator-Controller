@@ -1,16 +1,16 @@
 [Development]
-Version=5.4.7.0-alpha
+Version=5.4.7.0-release
 Target=5.4.7.0-release
-Date=11/22/2023
-Download=https://www.dropbox.com/scl/fi/cyietsertt1latc13zsne/Simulator-Controller-5.4.7.0-alpha.zip?rlkey=1mn31mnoll94wwj3m232c73yp&dl=1
+Date=11/23/2023
+Download=https://cutt.ly/OwIxyaSZ;https://www.dropbox.com/scl/fi/u0qg589bm1a3tl1r1bksg/Simulator-Controller-5.4.7.0-release.zip?rlkey=1t6yw5u0fawd0vyoergf4nyyk&dl=1
 Changes=Integrated language packs for French language in "Simulator Setup", Integrated french grammars for the Race Engineer, Integrated French translation for "Setup Workbench", Optical enhancements & clarifications in "Session Database", Fixed tyre usage counting in "Practice Center", French grammars for the Assistants, Optimized start countdown handling for the Spotter, Changed default pitstop rule in "Strategy Workbench" to optional, New car models for "Setup Workbench"
 Components=Media->5.3.0,Configuration->5.4.7,Utilities->5.4.7
 [Release]
-Version=5.4.6.1-release
-Date=11/18/2023
-Download=https://cutt.ly/lwUnBm11;https://www.dropbox.com/scl/fi/20xozbb14sz6mwdb14sv0/Simulator-Controller-5.4.6.1-release.zip?rlkey=hccy9oi64c3ge0f4icr01i0fo&dl=1
-Changes=Weighting of 1st stint in strategy simulation, Ctrl modifier for "Exit" command, Extended UI translation for French, Increased resilience of Pitstop MFD handling in ACC, Reliable selection of tyre compound in ACC, Prevent superfluous Spotter proximity alerts, Embedded GPT4All engine for "Driving Coach", New car models for "Setup Workbench"
-Components=Media->5.3.0,Configuration->5.4.0,Utilities->5.3.0
+Version=5.4.7.0-release
+Date=11/23/2023
+Download=https://cutt.ly/OwIxyaSZ;https://www.dropbox.com/scl/fi/u0qg589bm1a3tl1r1bksg/Simulator-Controller-5.4.7.0-release.zip?rlkey=1t6yw5u0fawd0vyoergf4nyyk&dl=1
+Changes=Integrated language packs for French language in "Simulator Setup", Integrated french grammars for the Race Engineer, Integrated French translation for "Setup Workbench", Optical enhancements & clarifications in "Session Database", Fixed tyre usage counting in "Practice Center", French grammars for the Assistants, Optimized start countdown handling for the Spotter, Changed default pitstop rule in "Strategy Workbench" to optional, New car models for "Setup Workbench"
+Components=Media->5.3.0,Configuration->5.4.7,Utilities->5.4.7
 [Components]
 Media.5.3.0.Path=Resources
 Media.5.3.0.Content=Splash Media
@@ -31,7 +31,7 @@ Utilities.5.4.7.Path=.
 Utilities.5.4.7.Content=Utilities
 Utilities.5.4.7.Download=https://www.dropbox.com/scl/fi/8gi2d2smvl0aezj9pn72u/Utilities-5.4.7.zip?rlkey=tna2neld8q72581c6kpcipkma&dl=1
 [Current]
-Type=Development
+Type=Release
 [Version]
-Development=5.4.7.0-alpha
-Release=5.4.6.1-release
+Development=5.4.7.0-release
+Release=5.4.7.0-release

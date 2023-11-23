@@ -1,9 +1,9 @@
 [Development]
-Version=5.4.7.0-alpha
-Target=5.4.7.0-release
-Date=11/22/2023
-Download=https://www.dropbox.com/scl/fi/cyietsertt1latc13zsne/Simulator-Controller-5.4.7.0-alpha.zip?rlkey=1mn31mnoll94wwj3m232c73yp&dl=1
-Changes=Integrated language packs for French language in "Simulator Setup", Integrated french grammars for the Race Engineer, Integrated French translation for "Setup Workbench", Optical enhancements & clarifications in "Session Database", Fixed tyre usage counting in "Practice Center", French grammars for the Assistants, Optimized start countdown handling for the Spotter, Changed default pitstop rule in "Strategy Workbench" to optional, New car models for "Setup Workbench"
+Version=5.4.8.0-dev
+Target=5.4.8.0-release
+Date=11/23/2023
+Download=
+Changes=Configurable text size for session info widgets in "System Monitor"
 Components=Media->5.3.0,Configuration->5.4.7,Utilities->5.4.7
 [Release]
 Version=5.4.6.1-release
@@ -33,5 +33,5 @@ Utilities.5.4.7.Download=https://www.dropbox.com/scl/fi/8gi2d2smvl0aezj9pn72u/Ut
 [Current]
 Type=Development
 [Version]
-Development=5.4.7.0-alpha
+Development=5.4.8.0-dev
 Release=5.4.6.1-release

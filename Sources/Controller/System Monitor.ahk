@@ -80,7 +80,7 @@ updateDashboard(window, viewer, html := "") {
 	Sleep(100)
 }
 
-getTableCSS(window) {
+getTableCSS(window, textSize) {
 	local script
 
 	script := "
@@ -88,6 +88,7 @@ getTableCSS(window) {
 		.table-std, .th-std, .td-std {
 			border-collapse: collapse;
 			padding: .3em .5em;
+			font-size: %textSize%px;
 		}
 
 		.th-std, .td-std {
@@ -138,7 +139,6 @@ getTableCSS(window) {
 		}
 
 		.caption-std {
-			font-size: 1.5em;
 			border-radius: .5em .5em 0 0;
 			padding: .5em 0 0 0
 		}
@@ -150,10 +150,14 @@ getTableCSS(window) {
 		.table-std tbody tr:nth-child(odd) {
 			background-color: #%backColor%;
 		}
+
+		#header {
+			font-size: %textSize%px;
+		}
 	)"
 
 	return substituteVariables(script, {altBackColor: window.AltBackColor, backColor: window.BackColor
-									  , textColor: window.Theme.TextColor
+									  , textColor: window.Theme.TextColor, textSize: textSize
 									  , headerBackColor: window.Theme.TableColor["Header"], frameColor: window.Theme.TableColor["Frame"]})
 }
 
@@ -165,6 +169,7 @@ editSettings(settingsOrCommand, arguments*) {
 	static settings := false
 	static widgets := []
 	static cycle := 5
+	static size := 11
 
 	getChoice(descriptor) {
 		if !descriptor
@@ -192,6 +197,7 @@ editSettings(settingsOrCommand, arguments*) {
 		settings := settingsOrCommand
 		widgets := string2Values(",", getMultiMapValue(settings, "System Monitor", "Session Widgets", "Session,Stint,Duration,Conditions,Cycle,Cycle"))
 		cycle := getMultiMapValue(settings, "System Monitor", "Session Cycle", 30)
+		size := getMultiMapValue(settings, "System Monitor", "Session Size", 11)
 
 		while (widgets.Length < 9)
 			widgets.Push(false)
@@ -230,6 +236,9 @@ editSettings(settingsOrCommand, arguments*) {
 		settingsGui.Add("DropDownList", "x224 yp w100 vwidget32 Choose" . getChoice(widgets[8]), concatenate([translate("Empty"), translate("Cycle"), translate("------------------------")], collect(infoWidgets, translate))).OnEvent("Change", updateWidget)
 		settingsGui.Add("DropDownList", "x328 yp w100 vwidget33 Choose" . getChoice(widgets[9]), concatenate([translate("Empty"), translate("Cycle"), translate("------------------------")], collect(infoWidgets, translate))).OnEvent("Change", updateWidget)
 
+		settingsGui.Add("Text", "x16 yp+30 w100", translate("Size"))
+		settingsGui.Add("DropDownList", "x120 yp-4 w50 vsizeDropDown Choose" . inList([9, 10, 11, 12, 14, 16, 18, 20, 24, 28], size), [9, 10, 11, 12, 14, 16, 18, 20, 24, 28])
+
 		settingsGui.Add("Text", "x8 yp+30 w428 W:Grow 0x10")
 
 		settingsGui.Add("Button", "x142 yp+10 w80 h23 Default", translate("Ok")).OnEvent("Click", editSettings.Bind(kOk))
@@ -250,6 +259,7 @@ editSettings(settingsOrCommand, arguments*) {
 				return false
 			else if (result == kOk) {
 				setMultiMapValue(settings, "System Monitor", "Session Cycle", [5, 10, 15, 30][settingsGui["cycleDropDown"].Value])
+				setMultiMapValue(settings, "System Monitor", "Session Size", settingsGui["sizeDropDown"].Text)
 
 				loop 3 {
 					row := A_Index
@@ -345,6 +355,7 @@ systemMonitor(command := false, arguments*) {
 
 	static sessionInfoWidgets := []
 	static sessionInfoSleep := 30000
+	static sessionInfoSize := 11
 	static nextSessionUpdate := A_TickCount
 
 	modifySettings(systemMonitorGui, *) {
@@ -356,11 +367,13 @@ systemMonitor(command := false, arguments*) {
 			if editSettings(settings, infoWidgets, systemMonitorGui) {
 				sessionInfoWidgets := string2Values(",", getMultiMapValue(settings, "System Monitor", "Session Widgets", "Session,Stint,Duration,Conditions,Cycle,Cycle"))
 				sessionInfoSleep := (getMultiMapValue(settings, "System Monitor", "Session Cycle", 30) * 1000)
+				sessionInfoSize := getMultiMapValue(settings, "System Monitor", "Session Size", 11)
 
 				settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
 				setMultiMapValue(settings, "System Monitor", "Session Widgets", values2String(",", sessionInfoWidgets*))
 				setMultiMapValue(settings, "System Monitor", "Session Cycle", Round(sessionInfoSleep / 1000))
+				setMultiMapValue(settings, "System Monitor", "Session Size", sessionInfoSize)
 
 				writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 
@@ -941,7 +954,7 @@ systemMonitor(command := false, arguments*) {
 		return html
 	}
 
-	updateSessionInfo(sessionState, sessionInfoWidgets) {
+	updateSessionInfo(sessionState, sessionInfoWidgets, textSize) {
 		local staticWidgets := remove(sessionInfoWidgets, "Cycle")
 		local html
 
@@ -1000,7 +1013,7 @@ systemMonitor(command := false, arguments*) {
 		}
 
 		if (isDevelopment() || (sessionState.Count > 0)) {
-			html := "<style>" . getTableCSS(systemMonitorGui) . " div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { text-align: center; font-size: 12px; background-color: #" . systemMonitorGui.Theme.TableColor["Header"] . "; } </style><table>"
+			html := "<style>" . getTableCSS(systemMonitorGui, textSize) . " div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { text-align: center; background-color: #" . systemMonitorGui.Theme.TableColor["Header"] . "; } </style><table>"
 
 			widgets := []
 
@@ -1564,7 +1577,7 @@ systemMonitor(command := false, arguments*) {
 			for ignore, assistant in ["Race Engineer", "Race Strategist", "Race Spotter"]
 				addMultiMapValues(sessionInfo, readMultiMap(kTempDirectory . assistant . " Session.state"))
 
-			updateSessionInfo(sessionInfo, sessionInfoWidgets)
+			updateSessionInfo(sessionInfo, sessionInfoWidgets, sessionInfoSize)
 
 			nextSessionUpdate := (A_TickCount + sessionInfoSleep)
 		}
@@ -1809,6 +1822,7 @@ systemMonitor(command := false, arguments*) {
 
 		sessionInfoWidgets := string2Values(",", getMultiMapValue(settings, "System Monitor", "Session Widgets", "Session,Stint,Duration,Conditions,Cycle,Cycle"))
 		sessionInfoSleep := (getMultiMapValue(settings, "System Monitor", "Session Cycle", 30) * 1000)
+		sessionInfoSize := getMultiMapValue(settings, "System Monitor", "Session Size", 11)
 
 		PeriodicTask(systemMonitor.Bind("UpdateDashboard"), 2000, kLowPriority).start()
 		PeriodicTask(systemMonitor.Bind("UpdateModules"), 2000, kLowPriority).start()

@@ -152,6 +152,35 @@ class RaceEngineer extends RaceAssistant {
 		}
 	}
 
+	confirmAction(action) {
+		local confirmation := getMultiMapValue(this.Settings, "Assistant.Engineer", "Confirm." . action, "Always")
+
+		switch confirmation, false {
+			case "Always":
+				confirmation := true
+			case "Never":
+				confirmation := false
+			case "Listening":
+				confirmation := (this.Listener != false)
+			default:
+				throw "Unsupported action confirmation detected in RaceStrategist.confirmAction..."
+		}
+
+		switch action, false {
+			case "Pitstop.Prepare":
+				if inList(["Yes", true], this.Autonomy)
+					return false
+				else if inList(["No", false], this.Autonomy)
+					return true
+				else
+					return confirmation
+			case "Pitstop.Fuel", "Pitstop.Repair", "Pitstop.Weather":
+				return confirmation
+			default:
+				return super.confirmAction(action)
+		}
+	}
+
 	handleVoiceCommand(grammar, words) {
 		switch grammar, false {
 			case "LapsRemaining":
@@ -2133,14 +2162,13 @@ class RaceEngineer extends RaceAssistant {
 				if confirm
 					if plannedLap
 						speaker.speakPhrase("PitstopLap", {lap: plannedLap})
-					else if (getMultiMapValue(this.Settings, "Assistant.Engineer", "Confirm.Pitstop.Prepare", "Always") = "Never")
-						this.preparePitstop()
-					else if ((this.Listener && (getMultiMapValue(this.Settings, "Assistant.Engineer", "Confirm.Pitstop.Prepare", "Always") = "Listening"))
-						  || (getMultiMapValue(this.Settings, "Assistant.Engineer", "Confirm.Pitstop.Prepare", "Always") = "Always")) {
+					else if this.confirmAction("Pitstop.Prepare") {
 						speaker.speakPhrase("ConfirmPrepare", false, true)
 
 						this.setContinuation(VoiceManager.ReplyContinuation(this, ObjBindMethod(this, "preparePitstop"), false, "Okay"))
 					}
+					else
+						this.preparePitstop()
 			}
 			finally {
 				speaker.endTalk()
@@ -2653,30 +2681,27 @@ class RaceEngineer extends RaceAssistant {
 				try {
 					speaker.speakPhrase((remainingLaps <= 2) ? "VeryLowFuel" : "LowFuel", {laps: remainingLaps})
 
-					if this.supportsPitstop() {
+					if this.supportsPitstop()
 						if this.hasPreparedPitstop()
 							speaker.speakPhrase((remainingLaps <= 2) ? "LowComeIn" : "ComeIn")
 						else if !this.hasPlannedPitstop() {
-							if (getMultiMapValue(this.Settings, "Assistant.Engineer", "Confirm.Pitstop.Fuel", "Always") = "Never")
-								this.planPitstop("Now")
-							else if ((this.Listener && (getMultiMapValue(this.Settings, "Assistant.Engineer", "Confirm.Pitstop.Fuel", "Always") = "Listening"))
-								  || (getMultiMapValue(this.Settings, "Assistant.Engineer", "Confirm.Pitstop.Fuel", "Always") = "Always")) {
+							if this.confirmAction("Pitstop.Fuel") {
 								speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
 
 								this.setContinuation(ObjBindMethod(this, "planPitstop", "Now"))
 							}
+							else
+								this.planPitstop("Now")
 						}
 						else {
-							if (getMultiMapValue(this.Settings, "Assistant.Engineer", "Confirm.Pitstop.Fuel", "Always") = "Never")
-								this.preparePitstop()
-							else if ((this.Listener && (getMultiMapValue(this.Settings, "Assistant.Engineer", "Confirm.Pitstop.Fuel", "Always") = "Listening"))
-								  || (getMultiMapValue(this.Settings, "Assistant.Engineer", "Confirm.Pitstop.Fuel", "Always") = "Always")) {
+							if this.confirmAction("Pitstop.Fuel") {
 								speaker.speakPhrase("ConfirmPrepare", false, true)
 
 								this.setContinuation(VoiceManager.ReplyContinuation(this, ObjBindMethod(this, "preparePitstop"), false, "Okay"))
 							}
+							else
+								this.preparePitstop()
 						}
-					}
 				}
 				finally {
 					speaker.endTalk()
@@ -2739,16 +2764,14 @@ class RaceEngineer extends RaceAssistant {
 						try {
 							speaker.speakPhrase("RepairPitstop", {laps: stintLaps, delta: speaker.number2Speech(delta, 1)})
 
-							if this.supportsPitstop() {
-								if (getMultiMapValue(this.Settings, "Assistant.Engineer", "Confirm.Pitstop.Repair", "Always") = "Never")
-									this.planPitstop("Now")
-								else if ((this.Listener && (getMultiMapValue(this.Settings, "Assistant.Engineer", "Confirm.Pitstop.Repair", "Always") = "Listening"))
-									  || (getMultiMapValue(this.Settings, "Assistant.Engineer", "Confirm.Pitstop.Repair", "Always") = "Always")) {
+							if this.supportsPitstop()
+								if this.confirmAction("Pitstop.Repair") {
 									speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
 
 									this.setContinuation(ObjBindMethod(this, "planPitstop", "Now"))
 								}
-							}
+								else
+									this.planPitstop("Now")
 						}
 						finally {
 							speaker.endTalk()
@@ -2805,16 +2828,14 @@ class RaceEngineer extends RaceAssistant {
 																												  : "WeatherDryChange"
 									  , {minutes: minutes, compound: fragments[recommendedCompound . "Tyre"]})
 
-					if this.supportsPitstop() {
-						if (getMultiMapValue(this.Settings, "Assistant.Engineer", "Confirm.Pitstop.Weather", "Always") = "Never")
-							this.planPitstop("Now")
-						else if ((this.Listener && (getMultiMapValue(this.Settings, "Assistant.Engineer", "Confirm.Pitstop.Weather", "Always") = "Listening"))
-								  || (getMultiMapValue(this.Settings, "Assistant.Engineer", "Confirm.Pitstop.Weather", "Always") = "Always")) {
+					if this.supportsPitstop()
+						if this.confirmAction("Pitstop.Weather") {
 							speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
 
 							this.setContinuation(ObjBindMethod(this, "planPitstop", "Now"))
 						}
-					}
+						else
+							this.planPitstop("Now")
 				}
 				finally {
 					speaker.endTalk()

@@ -59,6 +59,8 @@ class RaceAssistant extends ConfigurationItem {
 
 	iAnnouncements := CaseInsenseMap()
 
+	iAutonomy := "Custom"
+
 	iRemoteHandler := false
 
 	iSessionTime := false
@@ -264,6 +266,12 @@ class RaceAssistant extends ConfigurationItem {
 	VoiceManager {
 		Get {
 			return this.iVoiceManager
+		}
+	}
+
+	Autonomy {
+		Get {
+			return this.iAutonomy
 		}
 	}
 
@@ -571,6 +579,9 @@ class RaceAssistant extends ConfigurationItem {
 		if values.HasProp("DriverFullName")
 			this.iDriverFullName := values.DriverFullName
 
+		if values.HasProp("Autonomy")
+			this.iAutonomy := values.Autonomy
+
 		if values.HasProp("Session") {
 			this.iSession := values.Session
 
@@ -582,6 +593,8 @@ class RaceAssistant extends ConfigurationItem {
 
 				this.iBaseLap := false
 				this.iInitialFuelAmount := 0
+
+				this.iAutonomy := "Custom"
 
 				this.updateConfigurationValues({Settings: false})
 			}
@@ -1129,8 +1142,14 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	readSettings(simulator, car, track, &settings) {
+		local autonomy
+
 		if !isObject(settings)
 			settings := readMultiMap(settings)
+
+		autonomy := getMultiMapValue(settings, "Strategy Settings", "Strategy.Autonomy", "Custom")
+
+		this.updateSessionValues({Autonomy: autonomy})
 
 		return CaseInsenseMap("Session.Simulator", simulator
 							, "Session.Car", car
@@ -1151,6 +1170,17 @@ class RaceAssistant extends ConfigurationItem {
 			for key, value in this.readSettings(knowledgeBase.getValue("Session.Simulator"), knowledgeBase.getValue("Session.Car")
 											  , knowledgeBase.getValue("Session.Track"), &settings)
 				knowledgeBase.setFact(key, value)
+	}
+
+	confirmAction(action) {
+		switch this.Autonomy, false {
+			case "Yes", true:
+				return false
+			case "No", false:
+				return true
+			default:
+				throw "Unhandled autonomy mode detected in RaceAssistant.confirmAction..."
+		}
 	}
 
 	createFacts(settings, data) {

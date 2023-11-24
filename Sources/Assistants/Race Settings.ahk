@@ -977,6 +977,9 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		setMultiMapValue(newSettings, "Strategy Settings", "Traffic.Considered", settingsGui["trafficConsideredEdit"].Text)
 		setMultiMapValue(newSettings, "Strategy Settings", "Strategy.Window.Considered", settingsGui["pitstopStrategyWindowEdit"].Text)
 
+		setMultiMapValue(newSettings, "Strategy Settings", "Strategy.Autonomy"
+									, ["Yes", "No", "Custom"][settingsGui["strategyAutonomyDropDown"].Value])
+
 		setMultiMapValue(newSettings, "Strategy Settings", "Strategy.Update.Laps"
 									, settingsGui["strategyUpdateLapsCheck"].Value ? settingsGui["strategyUpdateLapsEdit"].Text : false)
 
@@ -1374,6 +1377,11 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		settingsGui.Add("Edit", "x126 yp w50 h20 Limit3 Number VtrafficConsideredEdit", value)
 		settingsGui.Add("UpDown", "x158 yp-2 w18 h20 Range1-100 0x80", value)
 		settingsGui.Add("Text", "x184 yp+4 w290 h20", translate("% track length"))
+
+		chosen := inList(["Yes", "No", "Custom"], getMultiMapValue(settingsOrCommand, "Strategy Settings", "Strategy.Autonomy", "Custom"))
+
+		settingsGui.Add("Text", "x16 yp+30 w110 h23", translate("Autonomous Mode"))
+		settingsGui.Add("DropDownList", "x126 yp-3 w100 Choose" . chosen . " vstrategyAutonomyDropDown", collect(["Yes", "No", "Custom"], translate))
 
 		value := getMultiMapValue(settingsOrCommand, "Strategy Settings", "Strategy.Update.Laps", false)
 

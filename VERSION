@@ -1,9 +1,9 @@
 [Development]
-Version=5.4.7.0-release
-Target=5.4.7.0-release
-Date=11/23/2023
-Download=https://cutt.ly/OwIxyaSZ;https://www.dropbox.com/scl/fi/u0qg589bm1a3tl1r1bksg/Simulator-Controller-5.4.7.0-release.zip?rlkey=1t6yw5u0fawd0vyoergf4nyyk&dl=1
-Changes=Integrated language packs for French language in "Simulator Setup", Integrated french grammars for the Race Engineer, Integrated French translation for "Setup Workbench", Optical enhancements & clarifications in "Session Database", Fixed tyre usage counting in "Practice Center", French grammars for the Assistants, Optimized start countdown handling for the Spotter, Changed default pitstop rule in "Strategy Workbench" to optional, New car models for "Setup Workbench"
+Version=5.4.8.0-dev
+Target=5.4.8.0-release
+Date=11/24/2023
+Download=
+Changes=Configurable text size for session info widgets in "System Monitor", New session info widget with forecast values of the different Assistants
 Components=Media->5.3.0,Configuration->5.4.7,Utilities->5.4.7
 [Release]
 Version=5.4.7.0-release
@@ -15,23 +15,14 @@ Components=Media->5.3.0,Configuration->5.4.7,Utilities->5.4.7
 Media.5.3.0.Path=Resources
 Media.5.3.0.Content=Splash Media
 Media.5.3.0.Download=https://www.dropbox.com/scl/fi/s4uchdrhdm0m4giiix86k/Media-5.3.0.zip?rlkey=t9lkkd9nj4koxyaaqa2h6i8nx&dl=1
-Configuration.5.3.0.Path=Resources
-Configuration.5.3.0.Content=Setup
-Configuration.5.3.0.Download=https://www.dropbox.com/scl/fi/vkpggadd4rd1w9h2ow1dv/Configuration-5.3.0.zip?rlkey=hqr342uzalm1dqd6v710ccjr3&dl=1
-Configuration.5.4.0.Path=Resources
-Configuration.5.4.0.Content=Setup
-Configuration.5.4.0.Download=https://www.dropbox.com/scl/fi/bqoelme4t6rwg1yf54nul/Configuration-5.4.0.zip?rlkey=gicf400rk3z0d5z1k61veg63h&dl=1
 Configuration.5.4.7.Path=Resources
 Configuration.5.4.7.Content=Setup
 Configuration.5.4.7.Download=https://www.dropbox.com/scl/fi/4tn39j7l0isqod8hyvgmp/Configuration-5.4.7.zip?rlkey=tqwjeacyb1coh03eyfl594qw8&dl=1
-Utilities.5.3.0.Path=.
-Utilities.5.3.0.Content=Utilities
-Utilities.5.3.0.Download=https://www.dropbox.com/scl/fi/hlza8t9tae5d0vnd7wmqa/Utilities-5.3.0.zip?rlkey=ciotp2dr5u3e4rxgikf45a1dq&dl=1
 Utilities.5.4.7.Path=.
 Utilities.5.4.7.Content=Utilities
 Utilities.5.4.7.Download=https://www.dropbox.com/scl/fi/8gi2d2smvl0aezj9pn72u/Utilities-5.4.7.zip?rlkey=tna2neld8q72581c6kpcipkma&dl=1
 [Current]
 Type=Release
 [Version]
-Development=5.4.7.0-release
+Development=5.4.8.0-dev
 Release=5.4.7.0-release

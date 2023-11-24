@@ -320,6 +320,10 @@ The "System Monitor" is divided into several pages of information:
 	 
 	   When an upcoming pitstop has been planned, this component will show you all relevant settings like fuel amount, tyre compound and pressures, as well as selected repairs.
 	 
+	 - Forecast
+	 
+	   Very similar to the *Pitstop* component, this one shows the values for refueling and tyre pressures the Engineer currently would apply for an immediate pitstop.
+	 
 	 In most cases, redundant information is suppressed. For example, if the remaining session, stint and driver time are identical, only the remaining time is shown.
 	 
 	 The components, that will be shown, as well as the update frequency of the information can be configured by clicking on the settings button in the upper right corner of the "System Monitor" window.

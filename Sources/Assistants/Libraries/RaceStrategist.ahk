@@ -1795,14 +1795,13 @@ class RaceStrategist extends GridRaceAssistant {
 
 			if (!this.StrategyReported && this.hasEnoughData(false) && (this.Strategy == this.Strategy[true])) {
 				if this.Speaker[false]
-					if (getMultiMapValue(this.Settings, "Assistant.Strategist", "Confirm.Strategy.Explain", "Always") = "Never")
-						this.reportStrategy()
-					else if ((this.Listener && (getMultiMapValue(this.Settings, "Assistant.Strategist", "Confirm.Strategy.Explain", "Always") = "Listening"))
-						  || (getMultiMapValue(this.Settings, "Assistant.Strategist", "Confirm.Strategy.Explain", "Always") = "Always")) {
+					if this.confirmAction("Strategy.Explain") {
 						this.getSpeaker().speakPhrase("ConfirmReportStrategy", false, true)
 
 						this.setContinuation(ObjBindMethod(this, "reportStrategy"))
 					}
+					else
+						this.reportStrategy()
 
 				this.updateDynamicValues({StrategyReported: lapNumber})
 			}

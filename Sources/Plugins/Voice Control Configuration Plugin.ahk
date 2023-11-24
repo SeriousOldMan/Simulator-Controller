@@ -122,21 +122,43 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			else if (voiceRecognizerDropDown.Value == 2)
 				this.showDesktopRecognizerEditor()
 			else if (voiceRecognizerDropDown.Value == 3) {
-				recognizers := SpeechRecognizer("Azure|" . Trim(this.Control["azureTokenIssuerEdit"].Text) . "|" . Trim(this.Control["azureSubscriptionKeyEdit"].Text)
+
+				try {
+					recognizers := SpeechRecognizer("Azure|" . Trim(this.Control["azureTokenIssuerEdit"].Text) . "|" . Trim(this.Control["azureSubscriptionKeyEdit"].Text)
 											  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
+				}
+				catch Any as exception {
+					logError(exception)
+
+					recognizers := []
+				}
 
 				this.showAzureRecognizerEditor()
 			}
 			else {
-				recognizers := SpeechRecognizer("Google|" . Trim(this.Control["googleAPIKeyFileEdit"].Text)
-											  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
+				try {
+					recognizers := SpeechRecognizer("Google|" . Trim(this.Control["googleAPIKeyFileEdit"].Text)
+												  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
+				}
+				catch Any as exception {
+					logError(exception)
+
+					recognizers := []
+				}
 
 				this.showGoogleRecognizerEditor()
 			}
 
 			if (voiceRecognizerDropDown.Value <= 2)
-				recognizers := SpeechRecognizer((voiceRecognizerDropDown.Value = 1) ? "Server" : "Desktop"
-											  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
+				try {
+					recognizers := SpeechRecognizer((voiceRecognizerDropDown.Value = 1) ? "Server" : "Desktop"
+												  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
+				}
+				catch Any as exception {
+					logError(exception)
+
+					recognizers := []
+				}
 
 			recognizers.InsertAt(1, translate("Deactivated"))
 			recognizers.InsertAt(1, translate("Automatic"))
@@ -666,15 +688,22 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		else if (listener == false)
 			listener := translate("Deactivated")
 
-		if (this.Control["voiceRecognizerDropDown"].Value = 3)
-			recognizers := SpeechRecognizer("Azure|" . Trim(this.Control["azureTokenIssuerEdit"].Text) . "|" . Trim(this.Control["azureSubscriptionKeyEdit"].Text)
-										  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
-		else if (this.Control["voiceRecognizerDropDown"].Value = 4)
-			recognizers := SpeechRecognizer("Google|" . Trim(this.Control["googleAPIKeyFileEdit"].Text)
-										  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
-		else
-			recognizers := SpeechRecognizer((this.Control["voiceRecognizerDropDown"].Value = 1) ? "Server" : "Desktop"
-										  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
+		try {
+			if (this.Control["voiceRecognizerDropDown"].Value = 3)
+				recognizers := SpeechRecognizer("Azure|" . Trim(this.Control["azureTokenIssuerEdit"].Text) . "|" . Trim(this.Control["azureSubscriptionKeyEdit"].Text)
+											  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
+			else if (this.Control["voiceRecognizerDropDown"].Value = 4)
+				recognizers := SpeechRecognizer("Google|" . Trim(this.Control["googleAPIKeyFileEdit"].Text)
+											  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
+			else
+				recognizers := SpeechRecognizer((this.Control["voiceRecognizerDropDown"].Value = 1) ? "Server" : "Desktop"
+											  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
+		}
+		catch Any as exception {
+			logError(exception)
+
+			recognizers := []
+		}
 
 		recognizers.InsertAt(1, translate("Deactivated"))
 		recognizers.InsertAt(1, translate("Automatic"))
@@ -1085,15 +1114,22 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		this.updateGoogleVoices()
 
 		if recognizer {
-			if (this.Control["voiceRecognizerDropDown"].Value <= 2)
-				recognizers := SpeechRecognizer((this.Control["voiceRecognizerDropDown"].Value = 1) ? "Server" : "Desktop"
-											  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()]
-			else if (this.Control["voiceRecognizerDropDown"].Value == 3)
-				recognizers := SpeechRecognizer("Azure|" . Trim(this.Control["azureTokenIssuerEdit"].Text) . "|" . Trim(this.Control["azureSubscriptionKeyEdit"].Text)
-											  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()]
-			else
-				recognizers := SpeechRecognizer("Google|" . Trim(this.Control["googleAPIKeyFileEdit"].Text)
-											  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()]
+			try {
+				if (this.Control["voiceRecognizerDropDown"].Value <= 2)
+					recognizers := SpeechRecognizer((this.Control["voiceRecognizerDropDown"].Value = 1) ? "Server" : "Desktop"
+												  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
+				else if (this.Control["voiceRecognizerDropDown"].Value == 3)
+					recognizers := SpeechRecognizer("Azure|" . Trim(this.Control["azureTokenIssuerEdit"].Text) . "|" . Trim(this.Control["azureSubscriptionKeyEdit"].Text)
+												  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
+				else
+					recognizers := SpeechRecognizer("Google|" . Trim(this.Control["googleAPIKeyFileEdit"].Text)
+												  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
+			}
+			catch Any as exception {
+				logError(exception)
+
+				recognizers := []
+			}
 
 			recognizers.InsertAt(1, translate("Deactivated"))
 			recognizers.InsertAt(1, translate("Automatic"))
@@ -1106,7 +1142,16 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 	loadVoices(synthesizer, configuration) {
 		local language := this.getCurrentLanguage()
-		local voices := SpeechSynthesizer(synthesizer, true, language).Voices[language].Clone()
+		local voices
+
+		try {
+			voices := SpeechSynthesizer(synthesizer, true, language).Voices[language].Clone()
+		}
+		catch Any as exception {
+			logError(exception)
+
+			voices := []
+		}
 
 		voices.InsertAt(1, translate("Deactivated"))
 		voices.InsertAt(1, translate("Random"))
@@ -1184,7 +1229,14 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		if ((Trim(this.Control["azureSubscriptionKeyEdit"].Text) != "") && (Trim(this.Control["azureTokenIssuerEdit"].Text) != "")) {
 			language := this.getCurrentLanguage()
 
-			voices := SpeechSynthesizer("Azure|" . Trim(this.Control["azureTokenIssuerEdit"].Text) . "|" . Trim(this.Control["azureSubscriptionKeyEdit"].Text), true, language).Voices[language].Clone()
+			try {
+				voices := SpeechSynthesizer("Azure|" . Trim(this.Control["azureTokenIssuerEdit"].Text) . "|" . Trim(this.Control["azureSubscriptionKeyEdit"].Text), true, language).Voices[language].Clone()
+			}
+			catch Any as exception {
+				logError(exception)
+
+				voices := []
+			}
 		}
 
 		voices.InsertAt(1, translate("Deactivated"))
@@ -1218,7 +1270,14 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		if (Trim(this.Control["googleAPIKeyFileEdit"].Text) != "") {
 			language := this.getCurrentLanguage()
 
-			voices := SpeechSynthesizer("Google|" . Trim(this.Control["googleAPIKeyFileEdit"].Text), true, language).Voices[language].Clone()
+			try {
+				voices := SpeechSynthesizer("Google|" . Trim(this.Control["googleAPIKeyFileEdit"].Text), true, language).Voices[language].Clone()
+			}
+			catch Any as exception {
+				logError(exception)
+
+				voices := []
+			}
 		}
 
 		voices.InsertAt(1, translate("Deactivated"))

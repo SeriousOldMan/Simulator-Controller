@@ -1,4 +1,10 @@
-## 5.4.7.0-release 11/24/23 (planned)
+## 5.4.8.0-release 12/01/23 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. The text size of the info components in the "System Monitor" can now be configured.
+  4. The pitstop info component will show you a forecast of the settings for a pitstop, when no pitstop has been planned by the Race Engineer yet.
+
+## 5.4.7.0-release 11/24/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed Spotter to announce best top speed in localized units.

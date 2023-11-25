@@ -773,9 +773,9 @@ systemMonitor(command := false, arguments*) {
 
 		try {
 			html .= "<table class=`"table-std`">"
-			html .= ("<tr><th class=`"th-std th-left`" colspan=`"3`"><div id=`"header`"><i>" . translate("Pitstop") . "</i></div></th></tr>")
 
 			if pitstopNr {
+				html .= ("<tr><th class=`"th-std th-left`" colspan=`"3`"><div id=`"header`"><i>" . translate("Pitstop") . "</i></div></th></tr>")
 				html .= ("<tr><th class=`"th-std th-left`">" . translate("Nr.") . "</th><td class=`"td-wdg`" colspan=`"2`">" . pitstopNr . "</td></tr>")
 
 				if pitstopLap
@@ -817,8 +817,35 @@ systemMonitor(command := false, arguments*) {
 
 				html .= ("<tr><th class=`"th-std th-left`">" . translate("Time Loss") . "</th><td class=`"td-wdg`" colspan=`"2`">" . (getMultiMapValue(sessionState, "Pitstop", "Planned.Time.Box") + getMultiMapValue(sessionState, "Pitstop", "Planned.Time.Pitlane")) . translate(" Seconds") . "</td></tr>")
 			}
-			else
-				html .= ("<tr><td class=`"td-wdg`" colspan=`"3`">" . translate("No planned pitstop") . "</td></tr>")
+			else {
+				html .= ("<tr><th class=`"th-std th-left`" colspan=`"3`"><div id=`"header`"><i>" . translate("Pitstop") . translate(" (") . translate("Forecast") . translate(")") . "</i></div></th></tr>")
+
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Fuel") . "</th><td class=`"td-wdg`" colspan=`"2`">" . displayValue("Float", convertUnit("Volume", getMultiMapValue(sessionState, "Pitstop", "Target.Fuel.Amount"))) . "</td></tr>")
+
+				tyreCompound := getMultiMapValue(sessionState, "Pitstop", "Target.Tyre.Compound")
+
+				if tyreCompound {
+					tyreCompound := translate(normalizeCompound(tyreCompound))
+
+					html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyres") . "</th><td class=`"td-wdg`" colspan=`"2`">" . tyreCompound . "</td></tr>")
+
+					tyreSet := getMultiMapValue(sessionState, "Pitstop", "Target.Tyre.Set")
+
+					if tyreSet
+						html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyre Set") . "</th><td class=`"td-wdg`" colspan=`"2`">" . tyreSet . "</td></tr>")
+
+					html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Pressures") . "</th><td class=`"td-wdg`" style=`"text-align: right`">"
+						   . displayValue("Float", convertUnit("Pressure", getMultiMapValue(sessionState, "Pitstop", "Target.Tyre.Pressure.FL"))) . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
+						   . displayValue("Float", convertUnit("Pressure", getMultiMapValue(sessionState, "Pitstop", "Target.Tyre.Pressure.FR"))) . "</td></tr>")
+					html .= ("<tr><td class=`"td-wdg`" style=`"text-align: right`">"
+						   . displayValue("Float", convertUnit("Pressure", getMultiMapValue(sessionState, "Pitstop", "Target.Tyre.Pressure.RL"))) . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
+						   . displayValue("Float", convertUnit("Pressure", getMultiMapValue(sessionState, "Pitstop", "Target.Tyre.Pressure.RL"))) . "</td></tr>")
+				}
+				else
+					html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyres") . "</th><td class=`"td-wdg`">" . translate("No") . "</td></tr>")
+
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Time Loss") . "</th><td class=`"td-wdg`" colspan=`"2`">" . (getMultiMapValue(sessionState, "Pitstop", "Target.Time.Box") + getMultiMapValue(sessionState, "Pitstop", "Target.Time.Pitlane")) . translate(" Seconds") . "</td></tr>")
+			}
 		}
 		catch Any as exception {
 			logError(exception)

@@ -1,0 +1,46 @@
+{
+  "ChannelSettings": {
+    "$type": "SimHub.Plugins.DataPlugins.ShakeItV3.Settings.Vibrations.ArduinoChannelSettings, SimHub.Plugins",
+    "ArduinoPluginDisabled": false,
+    "MaxChannels": 12,
+    "DeviceType": 1,
+    "IsEnabled": true,
+    "MinimumForce": 0,
+    "Threshold": 0,
+    "EffectToChannelsMapStore": {
+      "TCActiveEffectContainer": {
+        "All": {
+          "MapsStore": "0;1;100;;;|1;0;100;;;|2;0;100;;;|3;0;100;;;|4;0;100;;;|5;0;100;;;|6;0;100;;;|7;0;100;;;|8;0;100;;;|9;0;100;;;|10;0;100;;;|11;0;100;;;"
+        }
+      },
+      "WheelsSlipContainer": {
+        "Front": {
+          "MapsStore": "0;0;100;;;|1;0;100;;;|2;0;100;;;|3;0;100;;;|4;0;100;;;|5;0;100;;;|6;0;100;;;|7;0;100;;;|8;0;100;;;|9;0;100;;;|10;0;100;;;|11;0;100;;;"
+        },
+        "Rear": {
+          "MapsStore": "0;0;100;;;|1;0;100;;;|2;0;100;;;|3;0;100;;;|4;0;100;;;|5;0;100;;;|6;0;100;;;|7;0;100;;;|8;0;100;;;|9;0;100;;;|10;0;100;;;|11;0;100;;;"
+        }
+      },
+      "WheelsLockContainer": {
+        "All": {
+          "MapsStore": "0;0;100;;;|1;0;100;;;|2;0;100;;;|3;0;100;;;|4;0;100;;;|5;0;100;;;|6;0;100;;;|7;0;100;;;|8;0;100;;;|9;0;100;;;|10;0;100;;;|11;0;100;;;"
+        }
+      },
+      "ABSActiveEffectContainer": {
+        "All": {
+          "MapsStore": "0;0;100;;;|1;1;100;;;|2;0;100;;;|3;0;100;;;|4;0;100;;;|5;0;100;;;|6;0;100;;;|7;0;100;;;|8;0;100;;;|9;0;100;;;|10;0;100;;;|11;0;100;;;"
+        }
+      }
+    },
+    "GlobalChannelsSettings": {
+      "Custom": {
+        "MapsStore": "0;0;100;;;|1;0;100;;;|2;0;100;;;|3;0;100;;;|4;0;100;;;|5;0;100;;;|6;0;100;;;|7;0;100;;;|8;0;100;;;|9;0;100;;;|10;0;100;;;|11;0;100;;;"
+      }
+    },
+    "IsOrphan": false,
+    "Name": "Arduino motors and fans",
+    "OutputId": "Arduino",
+    "ShowPerEffectsLevels": false,
+    "IsFavorite": false
+  }
+}

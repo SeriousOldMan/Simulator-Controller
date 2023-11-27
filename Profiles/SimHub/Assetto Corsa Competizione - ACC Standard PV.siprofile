@@ -163,6 +163,22 @@
             "FilterType": "PulseFilter"
           },
           "IsMuted": false,
+          "IncrementGainAction": {
+            "Triggers": [
+              {
+                "Trigger": "CLI.increasePedalABSVibration",
+                "PressType": 4
+              }
+            ]
+          },
+          "DecrementGainAction": {
+            "Triggers": [
+              {
+                "Trigger": "CLI.decreasePedalABSVibration",
+                "PressType": 4
+              }
+            ]
+          },
           "ContainerId": "f0ea7acb-b543-414f-a50c-adb4f58b8a87",
           "ContainerType": "ABSActiveEffectContainer",
           "Description": "Provides feedback when ABS is currently active",
@@ -240,11 +256,27 @@
             "FilterType": "PulseFilter"
           },
           "IsMuted": false,
+          "IncrementGainAction": {
+            "Triggers": [
+              {
+                "Trigger": "CLI.increasePedalTCVibration",
+                "PressType": 4
+              }
+            ]
+          },
+          "DecrementGainAction": {
+            "Triggers": [
+              {
+                "Trigger": "CLI.decreasePedalTCVibration",
+                "PressType": 4
+              }
+            ]
+          },
           "ContainerId": "cd83d521-bcc0-416b-b0ab-30a406129f46",
           "ContainerType": "TCActiveEffectContainer",
           "Description": "Provides feedback when TC is currently active",
           "AggregationMode": null,
-          "Gain": 100.0,
+          "Gain": 90.000000000000114,
           "IsEnabled": true,
           "Output": {
             "AssignToChannelGroup": false,
@@ -286,7 +318,7 @@
       "ContainerType": "GroupContainer",
       "Description": "Pedal Vibration",
       "AggregationMode": null,
-      "Gain": 84.666666666666629,
+      "Gain": 100.0,
       "IsEnabled": true,
       "Output": null
     }

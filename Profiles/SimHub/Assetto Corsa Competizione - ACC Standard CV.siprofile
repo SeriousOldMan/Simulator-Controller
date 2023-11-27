@@ -43,6 +43,22 @@
             "CurveFitting": 0,
             "FilterType": "SplineFilter"
           },
+          "IncrementGainAction": {
+            "Triggers": [
+              {
+                "Trigger": "CLI.increaseFrontChassisRPMSVibration",
+                "PressType": 4
+              }
+            ]
+          },
+          "DecrementGainAction": {
+            "Triggers": [
+              {
+                "Trigger": "CLI.decreaseFrontChassisRPMSVibration",
+                "PressType": 4
+              }
+            ]
+          },
           "ContainerId": "2f068d4b-9213-480d-bf2d-5e2bd7611268",
           "ContainerType": "RPMContainer",
           "Description": "Simulates engine RPMS with a full customizable RPM/response curve",
@@ -83,6 +99,22 @@
             "Duration": 80,
             "FilterType": "PulseFilter"
           },
+          "IncrementGainAction": {
+            "Triggers": [
+              {
+                "Trigger": "CLI.increaseFrontChassisGearShiftVibration",
+                "PressType": 4
+              }
+            ]
+          },
+          "DecrementGainAction": {
+            "Triggers": [
+              {
+                "Trigger": "CLI.decreaseFrontChassisGearShiftVibration",
+                "PressType": 4
+              }
+            ]
+          },
           "ContainerId": "265217f9-cc3b-45ec-b1fe-adb9e0eaa048",
           "ContainerType": "GearEffectContainer",
           "Description": "Provides a pulse effect for gear shifting",
@@ -112,6 +144,22 @@
             "MinimumForce": 0,
             "Threshold": 0,
             "FilterType": "GammaFilter"
+          },
+          "IncrementGainAction": {
+            "Triggers": [
+              {
+                "Trigger": "CLI.increaseFrontChassisWheelsLockVibration",
+                "PressType": 4
+              }
+            ]
+          },
+          "DecrementGainAction": {
+            "Triggers": [
+              {
+                "Trigger": "CLI.decreaseFrontChassisWheelsLockVibration",
+                "PressType": 4
+              }
+            ]
           },
           "ContainerId": "266b1272-1b6b-452d-9e96-ba577085c2fe",
           "ContainerType": "WheelsLockContainer",
@@ -153,6 +201,22 @@
           "ThrottleFilter": 20,
           "UseBrakeFilter": false,
           "UseThrottleFilter": false,
+          "IncrementGainAction": {
+            "Triggers": [
+              {
+                "Trigger": "CLI.increaseFrontChassisWheelsSlipVibration",
+                "PressType": 4
+              }
+            ]
+          },
+          "DecrementGainAction": {
+            "Triggers": [
+              {
+                "Trigger": "CLI.decreaseFrontChassisWheelsSlipVibration",
+                "PressType": 4
+              }
+            ]
+          },
           "ContainerId": "98de00a5-a889-42f1-875c-8a70173e5800",
           "ContainerType": "WheelsSlipContainer",
           "Description": "Provide localized wheel slip feedback",
@@ -255,6 +319,22 @@
             "CurveFitting": 0,
             "FilterType": "SplineFilter"
           },
+          "IncrementGainAction": {
+            "Triggers": [
+              {
+                "Trigger": "CLI.increaseRearChassisRPMSVibration",
+                "PressType": 4
+              }
+            ]
+          },
+          "DecrementGainAction": {
+            "Triggers": [
+              {
+                "Trigger": "CLI.decreaseRearChassisRPMSVibration",
+                "PressType": 4
+              }
+            ]
+          },
           "ContainerId": "aa324646-220d-4bcf-a2a7-7aebe2bf4af6",
           "ContainerType": "RPMContainer",
           "Description": "Simulates engine RPMS with a full customizable RPM/response curve copy",
@@ -295,6 +375,22 @@
             "Duration": 80,
             "FilterType": "PulseFilter"
           },
+          "IncrementGainAction": {
+            "Triggers": [
+              {
+                "Trigger": "CLI.increaseRearChassisGearShiftVibration",
+                "PressType": 4
+              }
+            ]
+          },
+          "DecrementGainAction": {
+            "Triggers": [
+              {
+                "Trigger": "CLI.decreaseRearChassisGearShiftVibration",
+                "PressType": 4
+              }
+            ]
+          },
           "ContainerId": "55b19024-9c0f-485d-95a5-a7a658d2043c",
           "ContainerType": "GearEffectContainer",
           "Description": "Provides a pulse effect for gear shifting copy",
@@ -324,6 +420,22 @@
             "MinimumForce": 0,
             "Threshold": 0,
             "FilterType": "GammaFilter"
+          },
+          "IncrementGainAction": {
+            "Triggers": [
+              {
+                "Trigger": "CLI.increaseRearChassisWheelsLockVibration",
+                "PressType": 4
+              }
+            ]
+          },
+          "DecrementGainAction": {
+            "Triggers": [
+              {
+                "Trigger": "CLI.decreaseRearChassisWheelsLockVibration",
+                "PressType": 4
+              }
+            ]
           },
           "ContainerId": "7107f766-36dd-4d38-9d61-0ebbe53f2d23",
           "ContainerType": "WheelsLockContainer",
@@ -365,6 +477,22 @@
           "ThrottleFilter": 20,
           "UseBrakeFilter": false,
           "UseThrottleFilter": false,
+          "IncrementGainAction": {
+            "Triggers": [
+              {
+                "Trigger": "CLI.increaseRearChassisWheelsSlipVibration",
+                "PressType": 4
+              }
+            ]
+          },
+          "DecrementGainAction": {
+            "Triggers": [
+              {
+                "Trigger": "CLI.decreaseRearChassisWheelsSlipVibration",
+                "PressType": 4
+              }
+            ]
+          },
           "ContainerId": "bae128cf-fe68-40f0-995d-27435d8d9de0",
           "ContainerType": "WheelsSlipContainer",
           "Description": "Provide localized wheel slip feedback copy",

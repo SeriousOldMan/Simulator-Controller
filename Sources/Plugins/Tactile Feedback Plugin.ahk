@@ -100,30 +100,30 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 	}
 
 	class SimHub2WayAction extends TactileFeedbackPlugin.SimHubAction {
-		iUpCommand := false
-		iDownCommand := false
+		iUpCommands := []
+		iDownCommands := []
 
-		UpCommand {
+		UpCommands {
 			Get {
 				return this.iUpCommand
 			}
 		}
 
-		DownCommand {
+		DownCommands {
 			Get {
 				return this.iDownCommand
 			}
 		}
 
-		__New(function, label, icon, upCommand, downCommand) {
-			this.iUpCommand := upCommand
-			this.iDownCommand := downCommand
+		__New(function, label, icon, upCommands, downCommands) {
+			this.iUpCommands := upCommands
+			this.iDownCommands := downCommands
 
 			super.__New(function, label, icon)
 		}
 
 		fireAction(function, trigger) {
-			callSimHub(((trigger = "On") || (trigger = kIncrease) || (trigger == "Push")) ? this.UpCommand : this.DownCommand)
+			do(((trigger = "On") || (trigger = kIncrease) || (trigger == "Push")) ? this.UpCommands : this.DownCommands, callSimHub)
 		}
 	}
 
@@ -216,20 +216,29 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 			}
 		}
 
-		__New(function, label, icon, effect, upChange, downChange := false) {
-			this.iEffect := effect
+		__New(function, label, icon, categoy, effect, upChange, downChange := false) {
 			this.iUpChange := upChange
 			this.iDownChange := downChange
 
 			upChange := StrLower(upChange)
 
-			upChange := upChange . effect . "Vibration"
-
-			if downChange {
-				downChange := StrLower(downChange)
-
-				downChange := downChange . effect . "Vibration"
+			if (category = "Pedal") {
+				upChange := [upChange . category . effect . "Vibration"]
+				downChange := (downChange ? [StrLower(downChange) . category . effect . "Vibration"] : [])
 			}
+			else if (category = "Chassis") {
+				upChange := [upChange . "FrontChassis" . effect . "Vibration", upChange . "RearChassis" . effect . "Vibration"]
+				downChange := (downChange ? [StrLower(downChange) . "FrontChassis" . effect . "Vibration"
+										   , StrLower(downChange) . "RearChassis" . effect . "Vibration"] : [])
+			}
+			else if (effect = "") {
+				upChange := [upChange . category . "Vibration"]
+				downChange := (downChange ? [StrLower(downChange) . category . "Vibration"] : [])
+
+				effect := category
+			}
+
+			this.iEffect := effect
 
 			super.__New(function, label, icon, upChange, downChange)
 		}
@@ -318,7 +327,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 				this.createDialAction(pedalMode, "Pedal", pedalVibrationArguments[3])
 
 			for ignore, effect in string2Values(",", this.getArgumentValue("pedalEffects", ""))
-				this.createEffectAction(controller, pedalMode, string2Values(A_Space, effect)*)
+				this.createEffectAction(controller, pedalMode, "Pedal", string2Values(A_Space, effect)*)
 
 			chassisMode := TactileFeedbackPlugin.ChassisVibrationMode(this)
 
@@ -331,7 +340,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 				this.createDialAction(chassisMode, "RearChassis", rearChassisVibrationArguments[3])
 
 			for ignore, effect in string2Values(",", this.getArgumentValue("chassisEffects", ""))
-				this.createEffectAction(controller, chassisMode, string2Values(A_Space, effect)*)
+				this.createEffectAction(controller, chassisMode, "Chassis", string2Values(A_Space, effect)*)
 
 			if register
 				controller.registerPlugin(this)
@@ -380,13 +389,13 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		if (function != false) {
 			descriptor := ConfigurationItem.descriptor(effect, "Dial")
 
-			mode.registerAction(TactileFeedbackPlugin.FXChangeAction(function, this.getLabel(descriptor, effect), this.getIcon(descriptor), effect, kIncrease, kDecrease))
+			mode.registerAction(TactileFeedbackPlugin.FXChangeAction(function, this.getLabel(descriptor, effect), this.getIcon(descriptor), effect, "", kIncrease, kDecrease))
 		}
 		else
 			this.logFunctionNotFound(descriptor)
 	}
 
-	createEffectAction(controller, mode, effect, increaseFunction, decreaseFunction := false) {
+	createEffectAction(controller, mode, category, effect, increaseFunction, decreaseFunction := false) {
 		local function := this.Controller.findFunction(increaseFunction)
 		local descriptor
 
@@ -394,7 +403,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 			if (function != false) {
 				descriptor := ConfigurationItem.descriptor(effect, "Dial")
 
-				mode.registerAction(TactileFeedbackPlugin.FXChangeAction(function, this.getLabel(descriptor, effect), this.getIcon(descriptor), effect, kIncrease, kDecrease))
+				mode.registerAction(TactileFeedbackPlugin.FXChangeAction(function, this.getLabel(descriptor, effect), this.getIcon(descriptor), category, effect, kIncrease, kDecrease))
 			}
 			else
 				this.logFunctionNotFound(increaseFunction)
@@ -403,7 +412,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 			if (function != false) {
 				descriptor := ConfigurationItem.descriptor(effect, "Increase")
 
-				mode.registerAction(TactileFeedbackPlugin.FXChangeAction(function, this.getLabel(descriptor, effect), this.getIcon(descriptor), effect, kIncrease))
+				mode.registerAction(TactileFeedbackPlugin.FXChangeAction(function, this.getLabel(descriptor, effect), this.getIcon(descriptor), category, effect, kIncrease))
 			}
 			else
 				this.logFunctionNotFound(increaseFunction)
@@ -413,7 +422,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 			if (function != false) {
 				descriptor := ConfigurationItem.descriptor(effect, "Decrease")
 
-				mode.registerAction(TactileFeedbackPlugin.FXChangeAction(function, this.getLabel(descriptor, effect), this.getIcon(descriptor), effect, kDecrease))
+				mode.registerAction(TactileFeedbackPlugin.FXChangeAction(function, this.getLabel(descriptor, effect), this.getIcon(descriptor), category, effect, kDecrease))
 			}
 			else
 				this.logFunctionNotFound(decreaseFunction)
@@ -717,7 +726,7 @@ callSimHub(command) {
 	}
 	catch Any as exception {
 		logError(exception, true)
-					
+
 		message := (isObject(exception) ? exception.Message : exception)
 
 		logMessage(kLogCritical, translate("Error while connecting to SimHub (") . kSimHub . translate("): ") . message . translate(" - please check the configuration"))

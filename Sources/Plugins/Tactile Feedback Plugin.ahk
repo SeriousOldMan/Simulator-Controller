@@ -105,13 +105,13 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 
 		UpCommands {
 			Get {
-				return this.iUpCommand
+				return this.iUpCommands
 			}
 		}
 
 		DownCommands {
 			Get {
-				return this.iDownCommand
+				return this.iDownCommands
 			}
 		}
 
@@ -216,26 +216,32 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 			}
 		}
 
-		__New(function, label, icon, categoy, effect, upChange, downChange := false) {
+		__New(function, label, icon, category, effect, upChange, downChange := false) {
 			this.iUpChange := upChange
 			this.iDownChange := downChange
 
 			upChange := StrLower(upChange)
 
-			if (category = "Pedal") {
-				upChange := [upChange . category . effect . "Vibration"]
-				downChange := (downChange ? [StrLower(downChange) . category . effect . "Vibration"] : [])
-			}
-			else if (category = "Chassis") {
-				upChange := [upChange . "FrontChassis" . effect . "Vibration", upChange . "RearChassis" . effect . "Vibration"]
-				downChange := (downChange ? [StrLower(downChange) . "FrontChassis" . effect . "Vibration"
-										   , StrLower(downChange) . "RearChassis" . effect . "Vibration"] : [])
-			}
-			else if (effect = "") {
+			if ((effect = "") || (category = effect)) {
 				upChange := [upChange . category . "Vibration"]
 				downChange := (downChange ? [StrLower(downChange) . category . "Vibration"] : [])
 
 				effect := category
+			}
+			else if (category = "Pedal") {
+				upChange := [upChange . category . effect . "Vibration"]
+				downChange := (downChange ? [StrLower(downChange) . category . effect . "Vibration"] : [])
+			}
+			else if (category = "Chassis") {
+				if ((effect = "FrontChassis") || (effect = "RearChassis")) {
+					upChange := [upChange . effect . "Vibration"]
+					downChange := (downChange ? [StrLower(downChange) . effect . "Vibration"] : [])
+				}
+				else {
+					upChange := [upChange . "FrontChassis" . effect . "Vibration", upChange . "RearChassis" . effect . "Vibration"]
+					downChange := (downChange ? [StrLower(downChange) . "FrontChassis" . effect . "Vibration"
+											   , StrLower(downChange) . "RearChassis" . effect . "Vibration"] : [])
+				}
 			}
 
 			this.iEffect := effect

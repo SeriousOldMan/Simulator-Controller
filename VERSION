@@ -1,9 +1,9 @@
 [Development]
 Version=5.4.8.0-dev
 Target=5.4.8.0-release
-Date=11/25/2023
+Date=11/27/2023
 Download=
-Changes=Configurable text size for session info widgets in "System Monitor", Pitstip info widget shows forecast values
+Changes=Configurable text size for session info widgets in "System Monitor", Pitstip info widget shows forecast values, Updated Tactile Feedback SimHub connector, Updated SimHub profiles
 Components=Media->5.3.0,Configuration->5.4.7,Utilities->5.4.7
 [Release]
 Version=5.4.7.0-release
@@ -22,7 +22,7 @@ Utilities.5.4.7.Path=.
 Utilities.5.4.7.Content=Utilities
 Utilities.5.4.7.Download=https://www.dropbox.com/scl/fi/8gi2d2smvl0aezj9pn72u/Utilities-5.4.7.zip?rlkey=tna2neld8q72581c6kpcipkma&dl=1
 [Current]
-Type=Release
+Type=Development
 [Version]
 Development=5.4.8.0-dev
 Release=5.4.7.0-release

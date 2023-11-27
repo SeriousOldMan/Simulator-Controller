@@ -1766,15 +1766,15 @@ class RaceStrategist extends GridRaceAssistant {
 			}
 
 			if (!this.StrategyReported && this.hasEnoughData(false) && (this.Strategy == this.Strategy[true])) {
-				if this.Speaker[false] {
-					if this.Listener {
+				if this.Speaker[false]
+					if (getMultiMapValue(this.Settings, "Assistant.Strategist", "Confirm.Strategy.Explain", "Always") = "Never")
+						this.reportStrategy()
+					else if ((this.Listener && (getMultiMapValue(this.Settings, "Assistant.Strategist", "Confirm.Strategy.Explain", "Always") = "Listening"))
+						  || (getMultiMapValue(this.Settings, "Assistant.Strategist", "Confirm.Strategy.Explain", "Always") = "Always")) {
 						this.getSpeaker().speakPhrase("ConfirmReportStrategy", false, true)
 
 						this.setContinuation(ObjBindMethod(this, "reportStrategy"))
 					}
-					else
-						this.reportStrategy()
-				}
 
 				this.updateDynamicValues({StrategyReported: lapNumber})
 			}
@@ -2550,14 +2550,14 @@ class RaceStrategist extends GridRaceAssistant {
 			consumptionVariation := strategy.ConsumptionVariation
 			tyreUsageVariation := strategy.TyreUsageVariation
 			tyreCompoundVariation := strategy.TyreCompoundVariation
-			
+
 			firstStintWeight := strategy.FirstStintWeight
 		}
 		else {
 			consumptionVariation := 0
 			tyreUsageVariation := 0
 			tyreCompoundVariation := 0
-			
+
 			firstStintWeight := 0
 		}
 

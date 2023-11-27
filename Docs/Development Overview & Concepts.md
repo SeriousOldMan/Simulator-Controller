@@ -300,7 +300,7 @@ Also a special case and maybe a candidate to keep the original English terms, si
 
 #### Settings in the "Session Database"
 
-Another special case, the translations for the (race) settings available in the "Session Database". Before you translate this stuff, make yourself familar
+Another special case, the translations for the (race) settings available in the "Session Database". Before you translate this stuff, make yourself familar with the "Race Settings" area in the "Session Database" and read the documentation about the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings). The original translation files are named "Settings.LC", where *LC* again is the language code. 
 
 ### Translation of Assistant grammars
 

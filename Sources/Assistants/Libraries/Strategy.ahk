@@ -2533,7 +2533,7 @@ class Strategy extends ConfigurationItem {
 			lastTrackTemperature := this.TrackTemperature
 
 			loop {
-				minute := (A_Index * 10)
+				minute := ((A_Index - 1) * 5)
 
 				if (minute > duration)
 					break
@@ -3036,8 +3036,11 @@ class Strategy extends ConfigurationItem {
 		if ((pitstopNr = 1) && ((!pitstopRule && (targetLap < remainingSessionLaps)) || isNumber(pitstopRule)) && (targetLap > (currentLap + 1)) && !adjusted) {
 			halfLaps := ((targetLap - currentLap) / 2)
 
-			if ((halfLaps != 0) && (Abs(this.FirstStintWeight) >= 5))
+			if ((halfLaps != 0) && (Abs(this.FirstStintWeight) >= 5)) {
 				targetLap := Round(halfLaps + ((halfLaps / 100) * this.FirstStintWeight))
+
+				adjusted := true
+			}
 		}
 		else if isObject(pitstopRule) {
 			openingLap := (pitstopRule[1] * 60 / avgLapTime)

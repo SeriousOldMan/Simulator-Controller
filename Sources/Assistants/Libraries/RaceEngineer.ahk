@@ -1196,6 +1196,7 @@ class RaceEngineer extends RaceAssistant {
 
 		defaults.Default := {Bodywork: 0.0, Suspension: 0.0, Engine: 0.0}
 
+		defaults["Unknown"] := {Bodywork: 0.282351878, Suspension: 31.0, Engine: 0.0}
 		defaults["Assetto Corsa Competizione"] := {Bodywork: 0.282351878, Suspension: 31.0, Engine: 0.0}
 
 		bodyworkDuration := getMultiMapValue(settings, section, "Pitstop.Repair.Bodywork.Duration", defaults[simulatorName].Bodywork)
@@ -1533,6 +1534,18 @@ class RaceEngineer extends RaceAssistant {
 		local planned, prepared, tyreCompound, lap
 
 		if knowledgeBase {
+			setMultiMapValue(sessionInfo, "Pitstop", "Target.Fuel.Amount", knowledgeBase.getValue("Fuel.Amount.Target", 0))
+			setMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Compound", knowledgeBase.getValue("Tyre.Compound.Target", "-"))
+			setMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Pressure.FL", Round(knowledgeBase.getValue("Tyre.Pressure.Target.FL", 0), 1))
+			setMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Pressure.FR", Round(knowledgeBase.getValue("Tyre.Pressure.Target.FR", 0), 1))
+			setMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Pressure.RL", Round(knowledgeBase.getValue("Tyre.Pressure.Target.RL", 0), 1))
+			setMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Pressure.RR", Round(knowledgeBase.getValue("Tyre.Pressure.Target.RR", 0), 1))
+			setMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Set", knowledgeBase.getValue("Tyre.Set.Target", 0))
+			setMultiMapValue(sessionInfo, "Pitstop", "Target.Time.Box", Round(knowledgeBase.getValue("Target.Time.Box", 0) / 1000))
+			setMultiMapValue(sessionInfo, "Pitstop", "Target.Time.Pitlane", Round(knowledgeBase.getValue("Target.Time.Pitlane", 0) / 1000))
+			setMultiMapValue(sessionInfo, "Pitstop", "Target.Time.Service", Round(knowledgeBase.getValue("Target.Time.Service", 0) / 1000))
+			setMultiMapValue(sessionInfo, "Pitstop", "Target.Time.Repairs", Round(knowledgeBase.getValue("Target.Time.Repairs", 0) / 1000))
+
 			planned := this.hasPlannedPitstop()
 			prepared := this.hasPreparedPitstop()
 

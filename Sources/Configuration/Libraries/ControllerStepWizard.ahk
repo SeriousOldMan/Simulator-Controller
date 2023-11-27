@@ -325,14 +325,15 @@ class ControllerStepWizard extends StepWizard {
 						streamDeckFunctions += 1
 		}
 
-		if ((this.iFunctionsListView.GetCount() - streamDeckFunctions) != this.iFunctionTriggers.Count) {
-			OnMessage(0x44, translateYesNoButtons)
-			msgResult := MsgBox(translate("Not all functions have been assigned to physical controls. Do you really want to proceed?"), translate("Warning"), 262436)
-			OnMessage(0x44, translateYesNoButtons, 0)
+		if this.iFunctionTriggers
+			if ((this.iFunctionsListView.GetCount() - streamDeckFunctions) != this.iFunctionTriggers.Count) {
+				OnMessage(0x44, translateYesNoButtons)
+				msgResult := MsgBox(translate("Not all functions have been assigned to physical controls. Do you really want to proceed?"), translate("Warning"), 262436)
+				OnMessage(0x44, translateYesNoButtons, 0)
 
-			if (msgResult = "No")
-				return false
-		}
+				if (msgResult = "No")
+					return false
+			}
 
 		if super.hidePage(page) {
 			this.iControllerEditor.close(true)
@@ -602,50 +603,52 @@ class ControllerStepWizard extends StepWizard {
 
 			function := (type . "." . number)
 
-			trigger := (this.iFunctionTriggers.Has(function) ? this.iFunctionTriggers[function] : false)
+			if this.iFunctionTriggers {
+				trigger := (this.iFunctionTriggers.Has(function) ? this.iFunctionTriggers[function] : false)
 
-			key1 := ""
-			key2 := ""
+				key1 := ""
+				key2 := ""
 
-			if trigger {
-				if (trigger.Length > 0)
-					key1 := trigger[1]
+				if trigger {
+					if (trigger.Length > 0)
+						key1 := trigger[1]
 
-				if (trigger.Length > 1)
-					key2 := trigger[2]
-			}
+					if (trigger.Length > 1)
+						key2 := trigger[2]
+				}
 
-			result := InputBox(translate(double ? "Please enter the first Hotkey:" : "Please enter a Hotkey:")
-							 , translate("Modular Simulator Controller System"), "w200 h150", key1)
-
-			if (result.Result = "Ok")
-				key1 := result.Value
-			else
-				return
-
-			if double {
-				result := InputBox(translate("Please enter the second Hotkey:"), translate("Modular Simulator Controller System"), "w200 h150", key2)
+				result := InputBox(translate(double ? "Please enter the first Hotkey:" : "Please enter a Hotkey:")
+								 , translate("Modular Simulator Controller System"), "w200 h150", key1)
 
 				if (result.Result = "Ok")
-					key2 := result.Value
+					key1 := result.Value
 				else
 					return
 
-				if ((key1 = "") && (key2 = ""))
-					this.iFunctionTriggers.Delete(function)
+				if double {
+					result := InputBox(translate("Please enter the second Hotkey:"), translate("Modular Simulator Controller System"), "w200 h150", key2)
+
+					if (result.Result = "Ok")
+						key2 := result.Value
+					else
+						return
+
+					if ((key1 = "") && (key2 = ""))
+						this.iFunctionTriggers.Delete(function)
+					else
+						this.iFunctionTriggers[function] := [key1, key2]
+				}
 				else
-					this.iFunctionTriggers[function] := [key1, key2]
+					this.iFunctionTriggers[function] := [key1]
+
+				buttonBoxConfiguration := readMultiMap(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
+				streamDeckConfiguration := readMultiMap(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini")
+
+				this.saveFunctions(buttonBoxConfiguration, streamDeckConfiguration)
+				this.loadFunctions(buttonBoxConfiguration, streamDeckConfiguration)
+
+				this.iFunctionsListView.Modify(row, "Vis")
 			}
-			else
-				this.iFunctionTriggers[function] := [key1]
-
-			buttonBoxConfiguration := readMultiMap(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
-			streamDeckConfiguration := readMultiMap(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini")
-
-			this.saveFunctions(buttonBoxConfiguration, streamDeckConfiguration)
-			this.loadFunctions(buttonBoxConfiguration, streamDeckConfiguration)
-
-			this.iFunctionsListView.Modify(row, "Vis")
 		}
 	}
 
@@ -677,11 +680,13 @@ class ControllerStepWizard extends StepWizard {
 
 			function := (type . "." . number)
 
-			this.iFunctionTriggers.Delete(function)
+			if this.iFunctionTriggers {
+				this.iFunctionTriggers.Delete(function)
 
-			this.iFunctionTriggers.Modify(row, "Col5", "")
+				this.iFunctionsListView.Modify(row, "Col5", "")
 
-			this.saveFunctions()
+				this.saveFunctions()
+			}
 		}
 	}
 
@@ -689,34 +694,36 @@ class ControllerStepWizard extends StepWizard {
 		local wizard := this.SetupWizard
 		local controller, number, buttonBoxConfiguration, streamDeckConfiguration, window
 
-		SoundPlay(getFileName("Activated.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\"))
+		if this.iFunctionTriggers {
+			SoundPlay(getFileName("Activated.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\"))
 
-		if (firstHotkey == true) {
+			if (firstHotkey == true) {
+				wizard.toggleTriggerDetector()
+
+				Sleep(2000)
+
+				wizard.toggleTriggerDetector(ObjBindMethod(this, "registerHotkey", function, row, hotkey))
+
+				return
+			}
+			else if (firstHotkey != false) {
+				this.iFunctionTriggers[function] := [firstHotkey, hotkey]
+
+				hotkey := firstHotkey . " | " . hotkey
+			}
+			else
+				this.iFunctionTriggers[function] := [hotkey]
+
 			wizard.toggleTriggerDetector()
 
-			Sleep(2000)
+			buttonBoxConfiguration := readMultiMap(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
+			streamDeckConfiguration := readMultiMap(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini")
 
-			wizard.toggleTriggerDetector(ObjBindMethod(this, "registerHotkey", function, row, hotkey))
+			this.saveFunctions(buttonBoxConfiguration, streamDeckConfiguration)
+			this.loadFunctions(buttonBoxConfiguration, streamDeckConfiguration)
 
-			return
+			this.iFunctionsListView.Modify(row, "Vis")
 		}
-		else if (firstHotkey != false) {
-			this.iFunctionTriggers[function] := [firstHotkey, hotkey]
-
-			Hotkey(":= firstHotkey . `" | `" . hotkey")
-		}
-		else
-			this.iFunctionTriggers[function] := [hotkey]
-
-		wizard.toggleTriggerDetector()
-
-		buttonBoxConfiguration := readMultiMap(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
-		streamDeckConfiguration := readMultiMap(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini")
-
-		this.saveFunctions(buttonBoxConfiguration, streamDeckConfiguration)
-		this.loadFunctions(buttonBoxConfiguration, streamDeckConfiguration)
-
-		this.iFunctionsListView.Modify(row, "Vis")
 	}
 }
 

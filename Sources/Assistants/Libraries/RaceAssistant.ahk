@@ -54,7 +54,7 @@ class RaceAssistant extends ConfigurationItem {
 	iOptions := CaseInsenseMap()
 
 	iAssistantType := ""
-	iSettings := false
+	iSettings := newMultiMap()
 	iVoiceManager := false
 
 	iAnnouncements := CaseInsenseMap()
@@ -536,8 +536,12 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	updateConfigurationValues(values) {
-		if values.HasProp("Settings")
+		if values.HasProp("Settings") {
 			this.iSettings := values.Settings
+
+			if !this.Settings
+				this.iSettings := newMultiMap()
+		}
 
 		if values.HasProp("UseTalking")
 			this.VoiceManager.UseTalking := values.UseTalking
@@ -583,7 +587,7 @@ class RaceAssistant extends ConfigurationItem {
 				this.iBaseLap := false
 				this.iInitialFuelAmount := 0
 
-				this.updateConfigurationValues({Settings: false})
+				this.updateConfigurationValues({Settings: newMultiMap()})
 			}
 		}
 
@@ -1043,7 +1047,7 @@ class RaceAssistant extends ConfigurationItem {
 		if (data && !isObject(data))
 			data := readMultiMap(data)
 
-		if (settings && (formationLap || !this.Settings))
+		if (settings && (formationLap || (this.Settings.Count = 0)))
 			this.updateConfigurationValues({Settings: settings})
 
 		settings := this.Settings
@@ -1232,6 +1236,9 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	loadSessionSettings(settings) {
+		if !settings
+			settings := newMultiMap()
+
 		this.updateSettings(settings)
 
 		this.updateConfigurationValues({Settings: settings})

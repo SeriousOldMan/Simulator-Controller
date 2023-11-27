@@ -340,7 +340,7 @@ class ACCPitstopTester extends Plugin {
 			}
 		}
 
-		if (getLogLevel() <= kLogInfo)
+		if isLogLevel(kLogInfo)
 			if !this.iPSImageSearchArea
 				this.logMessage(substituteVariables("Full search for '%image%' took %ticks% ms", {image: "Pit Strategy", ticks: A_TickCount - curTickCount}))
 			else
@@ -403,7 +403,7 @@ class ACCPitstopTester extends Plugin {
 			}
 		}
 
-		if (getLogLevel() <= kLogInfo)
+		if isLogLevel(kLogInfo)
 			if !this.iPSImageSearchArea
 				this.logMessage(substituteVariables("Full search for '%image%' took %ticks% ms", {image: "Refuel", ticks: A_TickCount - curTickCount}))
 			else
@@ -507,7 +507,7 @@ class ACCPitstopTester extends Plugin {
 			}
 		}
 
-		if (getLogLevel() <= kLogInfo)
+		if isLogLevel(kLogInfo)
 			if !this.iPSImageSearchArea
 				this.logMessage(substituteVariables("Full search for '%image%' took %ticks% ms", {image: "Tyre Set", ticks: A_TickCount - curTickCount}))
 			else
@@ -555,7 +555,7 @@ class ACCPitstopTester extends Plugin {
 			}
 		}
 
-		if (getLogLevel() <= kLogInfo)
+		if isLogLevel(kLogInfo)
 			if !this.iPSImageSearchArea
 				this.logMessage(substituteVariables("Full search for '%image%' took %ticks% ms", {image: "Front Brake", ticks: A_TickCount - curTickCount}))
 			else
@@ -599,7 +599,7 @@ class ACCPitstopTester extends Plugin {
 			}
 		}
 
-		if (getLogLevel() <= kLogInfo)
+		if isLogLevel(kLogInfo)
 			if !this.iPSImageSearchArea
 				this.logMessage(substituteVariables("Full search for '%image%' took %ticks% ms", {image: "Select Driver", ticks: A_TickCount - curTickCount}))
 			else

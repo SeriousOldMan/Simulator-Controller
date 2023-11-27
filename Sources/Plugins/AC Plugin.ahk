@@ -173,8 +173,13 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 		if ((forName = surName) && (surName = nickName)) {
 			name := string2Values(A_Space, forName, 2)
 
-			setMultiMapValue(data, "Stint Data", "DriverForname", name[1])
-			setMultiMapValue(data, "Stint Data", "DriverSurname", (name.Length > 1) ? name[2] : "")
+			if isObject(name) {
+				setMultiMapValue(data, "Stint Data", "DriverForname", name[1])
+				setMultiMapValue(data, "Stint Data", "DriverSurname", (name.Length > 1) ? name[2] : "")
+			}
+			else
+				setMultiMapValue(data, "Stint Data", "DriverSurname", "")
+
 			setMultiMapValue(data, "Stint Data", "DriverNickname", "")
 		}
 

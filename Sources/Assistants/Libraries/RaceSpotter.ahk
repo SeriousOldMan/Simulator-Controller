@@ -666,11 +666,12 @@ class PositionInfo {
 		local car := this.Car
 		local positions := spotter.Positions
 		local position := positions["Position.Class"]
+		local carPosition := car.Position["Class"]
 
-		if (car.Class = spotter.DriverCar.Class) {
-			if ((position - car.Position["Class"]) == 1)
+		if ((car.Class = spotter.DriverCar.Class) && isNumber(position) && isNumber(carPosition)) {
+			if ((position - carPosition) == 1)
 				return "Ahead"
-			else if ((position - car.Position["Class"]) == -1)
+			else if ((position - carPosition) == -1)
 				return "Behind"
 			else
 				return false

@@ -104,7 +104,7 @@ namespace RF2SHMProvider {
         {
 			if (carName.Contains(carClass))
 			{
-				if (carName[0] == '#')
+				if ((carName.Length > 0) && (carName[0] == '#'))
 				{
 					char[] delims = { ' ' };
 					string[] parts = carName.Split(delims, 2);

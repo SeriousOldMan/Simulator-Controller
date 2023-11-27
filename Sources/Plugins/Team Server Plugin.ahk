@@ -673,7 +673,7 @@ class TeamServerPlugin extends ControllerPlugin {
 		this.keepAlive()
 
 		if this.Connected {
-			if (getLogLevel() <= kLogInfo)
+			if isLogLevel(kLogInfo)
 				logMessage(kLogInfo, translate("Connected to the Team Server (URL: ") . serverURL . translate(", Token: ") . serverToken
 								   . translate(", Team: ") . team . translate(", Driver: ") . driver . translate(", Session: ") . session . translate(")"))
 
@@ -758,7 +758,7 @@ class TeamServerPlugin extends ControllerPlugin {
 				this.iDriverSurName := driver["SurName"]
 				this.iDriverNickName := driver["NickName"]
 
-				if (getLogLevel() <= kLogInfo)
+				if isLogLevel(kLogInfo)
 					logMessage(kLogInfo, translate("Fetching Driver (Driver: ") . this.Driver . translate(", Name: ") . driver["ForName"] . A_Space . driver["SurName"] . translate(")"))
 			}
 			catch Any as exception {
@@ -813,7 +813,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 						this.iSessionActive := true
 
-						if (getLogLevel() <= kLogInfo)
+						if isLogLevel(kLogInfo)
 							logMessage(kLogInfo, translate("Starting session (Session: ") . this.Session . translate(", Car: ") . car . translate(", Track: ") . track . translate(")"))
 
 						break
@@ -850,7 +850,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 					this.Connector.FinishSession(this.Session)
 
-					if (getLogLevel() <= kLogInfo)
+					if isLogLevel(kLogInfo)
 						logMessage(kLogInfo, translate("Finishing session (Session: ") . this.Session . translate(")"))
 				}
 			}
@@ -892,7 +892,7 @@ class TeamServerPlugin extends ControllerPlugin {
 				}
 
 				if this.SessionActive {
-					if (getLogLevel() <= kLogInfo)
+					if isLogLevel(kLogInfo)
 						logMessage(kLogInfo, translate("Starting stint (Session: ") . this.Session . translate(", Lap: ") . lapNumber . translate(")"))
 
 					return this.addStint(lapNumber)
@@ -908,7 +908,7 @@ class TeamServerPlugin extends ControllerPlugin {
 			if (isDebug() && isLogLevel(kLogDebug))
 				showMessage("Leaving team session")
 
-			if (getLogLevel() <= kLogInfo)
+			if isLogLevel(kLogInfo)
 				logMessage(kLogInfo, translate("Leaving team session (Session: ") . this.Session . translate(")"))
 
 			this.finishSession()
@@ -929,7 +929,7 @@ class TeamServerPlugin extends ControllerPlugin {
 					try {
 						driver := this.Connector.GetSessionDriver(this.Session)
 
-						if (getLogLevel() <= kLogInfo)
+						if isLogLevel(kLogInfo)
 							logMessage(kLogInfo, translate("Requesting current driver (Session: ") . this.Session . translate(", Driver: ") . driver . translate(")"))
 
 						return driver
@@ -968,7 +968,7 @@ class TeamServerPlugin extends ControllerPlugin {
 						if (isDebug() && isLogLevel(kLogDebug))
 							showMessage("Fetching session value: " . name . " => " . value)
 
-						if ((getLogLevel() <= kLogInfo) && value && (value != ""))
+						if (isLogLevel(kLogInfo) && value && (value != ""))
 							logMessage(kLogInfo, translate("Fetching session data (Session: ") . this.Session . translate(", Name: ") . name . translate("), Value:`n`n") . value . "`n")
 
 						return value
@@ -1004,13 +1004,13 @@ class TeamServerPlugin extends ControllerPlugin {
 						if (!value || (value == "")) {
 							this.Connector.DeleteSessionValue(this.Session, name)
 
-							if (getLogLevel() <= kLogInfo)
+							if isLogLevel(kLogInfo)
 								logMessage(kLogInfo, translate("Deleting session data (Session: ") . this.Session . translate(", Name: ") . name . translate(")"))
 						}
 						else {
 							this.Connector.SetSessionValue(this.Session, name, value)
 
-							if (getLogLevel() <= kLogInfo)
+							if isLogLevel(kLogInfo)
 								logMessage(kLogInfo, translate("Storing session data (Session: ") . this.Session . translate(", Name: ") . name . translate("), Value:`n`n") . value . "`n")
 						}
 
@@ -1052,7 +1052,7 @@ class TeamServerPlugin extends ControllerPlugin {
 						if (isDebug() && isLogLevel(kLogDebug))
 							showMessage("Fetching value for " . stint . ": " . name . " => " . value)
 
-						if ((getLogLevel() <= kLogInfo) && value && (value != ""))
+						if (isLogLevel(kLogInfo) && value && (value != ""))
 							logMessage(kLogInfo, translate("Fetching stint data (Session: ") . this.Session . translate(", Name: ") . name . translate("), Value:`n`n") . value . "`n")
 
 						return value
@@ -1101,7 +1101,7 @@ class TeamServerPlugin extends ControllerPlugin {
 								this.Connector.SetStintValue(stint, name, value)
 						}
 
-						if (getLogLevel() <= kLogInfo)
+						if isLogLevel(kLogInfo)
 							logMessage(kLogInfo, translate("Storing stint data (Session: ") . this.Session . translate(", Name: ") . name . translate("), Value:`n`n") . value . "`n")
 
 						break
@@ -1175,7 +1175,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 							lapNr := this.iCachedObjects[lap]["Nr"]
 
-							if (getLogLevel() <= kLogInfo)
+							if isLogLevel(kLogInfo)
 								logMessage(kLogInfo, translate("Fetching lap number (Session: ") . this.Session . translate(", Lap: ") . lap . translate(", Number: ") . lapNr . translate(")"))
 
 							return lapNr
@@ -1209,6 +1209,9 @@ class TeamServerPlugin extends ControllerPlugin {
 
 		if session {
 			try {
+				if (lap = kNull)
+					throw "Not a valid lap..."
+
 				loop 5
 					try {
 						if isInteger(lap)
@@ -1244,6 +1247,9 @@ class TeamServerPlugin extends ControllerPlugin {
 
 		if session {
 			try {
+				if (lap = kNull)
+					throw "Not a valid lap..."
+
 				loop 5
 					try {
 						if isInteger(lap)
@@ -1254,7 +1260,7 @@ class TeamServerPlugin extends ControllerPlugin {
 						if (isDebug() && isLogLevel(kLogDebug))
 							showMessage("Fetching value for " . lap . ": " . name . " => " . value)
 
-						if ((getLogLevel() <= kLogInfo) && value && (value != ""))
+						if (isLogLevel(kLogInfo) && value && (value != ""))
 							logMessage(kLogInfo, translate("Fetching lap data (Session: ") . this.Session . translate(", Lap: ") . lap . translate(", Name: ") . name . translate("), Value:`n`n") . value . "`n")
 
 						return value
@@ -1296,7 +1302,7 @@ class TeamServerPlugin extends ControllerPlugin {
 							else
 								this.Connector.DeleteLapValue(lap, name, value)
 
-							if (getLogLevel() <= kLogInfo)
+							if isLogLevel(kLogInfo)
 								logMessage(kLogInfo, translate("Deleting lap data (Session: ") . this.Session . translate(", Lap: ") . lap . translate(", Name: ") . name . translate(")"))
 						}
 						else {
@@ -1305,7 +1311,7 @@ class TeamServerPlugin extends ControllerPlugin {
 							else
 								this.Connector.SetLapValue(lap, name, value)
 
-							if (getLogLevel() <= kLogInfo)
+							if isLogLevel(kLogInfo)
 								logMessage(kLogInfo, translate("Storing lap data (Session: ") . this.Session . translate(", Lap: ") . lap . translate(", Name: ") . name . translate("), Value:`n`n") . value . "`n")
 						}
 

@@ -1777,7 +1777,7 @@ class RaceEngineer extends RaceAssistant {
 				fact := ("Lap." . lapNumber . ".Tyre.Pressure." . tyreType)
 				oldValue := knowledgeBase.getValue(fact, false)
 
-				if (oldValue && (Abs(oldValue - newValue) > threshold)) {
+				if (isNumber(oldValue) && isNumber(newValue) && oldValue && (Abs(oldValue - newValue) > threshold)) {
 					knowledgeBase.setValue(fact, newValue)
 
 					changed := true
@@ -1803,7 +1803,7 @@ class RaceEngineer extends RaceAssistant {
 				fact := ("Lap." . lapNumber . ".Damage.Bodywork." . position)
 				oldValue := knowledgeBase.getValue(fact, 0)
 
-				if (oldValue < newValue)
+				if (isNumber(oldValue) && isNumber(newValue) && (oldValue < newValue))
 					knowledgeBase.setFact(fact, newValue)
 
 				changed := (changed || (Round(oldValue) < Round(newValue)))
@@ -1824,7 +1824,7 @@ class RaceEngineer extends RaceAssistant {
 				fact := ("Lap." . lapNumber . ".Damage.Suspension." . position)
 				oldValue := knowledgeBase.getValue(fact, 0)
 
-				if (oldValue < newValue)
+				if (isNumber(oldValue) && isNumber(newValue) && (oldValue < newValue))
 					knowledgeBase.setFact(fact, newValue)
 
 				changed := (changed || (Round(oldValue) < Round(newValue)))

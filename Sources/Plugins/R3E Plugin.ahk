@@ -766,7 +766,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 				if !this.iPSImageSearchArea {
 					ImageSearch(&imageX, &imageY, 0, 0, A_ScreenWidth, A_ScreenHeight, "*100 " . pitstopImage)
 
-					if (getLogLevel() <= kLogInfo)
+					if isLogLevel(kLogInfo)
 						logMessage(kLogInfo, substituteVariables(translate("Full search for '%image%' took %ticks% ms"), {image: imageName, ticks: A_TickCount - curTickCount}))
 
 					if isInteger(imageX)
@@ -776,12 +776,12 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 				else {
 					ImageSearch(&imageX, &imageY, this.iPSImageSearchArea[1], this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], "*100 " . pitstopImage)
 
-					if (getLogLevel() <= kLogInfo)
+					if isLogLevel(kLogInfo)
 						logMessage(kLogInfo, substituteVariables(translate("Fast search for '%image%' took %ticks% ms"), {image: imageName, ticks: A_TickCount - curTickCount}))
 				}
 
 				if isInteger(imageX) {
-					if (getLogLevel() <= kLogInfo)
+					if isLogLevel(kLogInfo)
 						logMessage(kLogInfo, substituteVariables(translate("'%image%' found at %x%, %y%"), {image: imageName, x: imageX, y: imageY}))
 
 					return true
@@ -789,7 +789,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 			}
 		}
 
-		if (getLogLevel() <= kLogInfo)
+		if isLogLevel(kLogInfo)
 			logMessage(kLogInfo, substituteVariables(translate("'%image%' not found"), {image: imageName}))
 
 		return false

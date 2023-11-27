@@ -5280,14 +5280,14 @@ class RaceCenter extends ConfigurationItem {
 			consumptionVariation := strategy.ConsumptionVariation
 			tyreUsageVariation := strategy.TyreUsageVariation
 			tyreCompoundVariation := strategy.TyreCompoundVariation
-			
+
 			firstStintWeight := strategy.FirstStintWeight
 		}
 		else {
 			consumptionVariation := 0
 			tyreUsageVariation := 0
 			tyreCompoundVariation := 0
-			
+
 			firstStintWeight := 0
 		}
 
@@ -5858,6 +5858,7 @@ class RaceCenter extends ConfigurationItem {
 				stint.StartPosition := "-"
 				stint.EndPosition := "-"
 				stint.AvgLaptime := "-"
+				stint.BestLaptime := "-"
 				stint.Potential := "-"
 				stint.RaceCraft := "-"
 				stint.Speed := "-"
@@ -5926,7 +5927,7 @@ class RaceCenter extends ConfigurationItem {
 				else {
 					this.showMessage(translate("Load lap data (Lap: ") . lap.Nr . translate(")"))
 
-					if (getLogLevel() <= kLogInfo)
+					if isLogLevel(kLogInfo)
 						logMessage(kLogInfo, translate("Load lap data (Lap: ") . lap.Nr . translate("), Data: `n`n") . rawData . "`n")
 
 					break
@@ -6232,7 +6233,7 @@ class RaceCenter extends ConfigurationItem {
 
 		this.showMessage(message)
 
-		if (getLogLevel() <= kLogInfo)
+		if isLogLevel(kLogInfo)
 			logMessage(kLogInfo, message)
 
 		currentStint := this.Connector.GetSessionCurrentStint(session)
@@ -6438,7 +6439,7 @@ class RaceCenter extends ConfigurationItem {
 
 			this.showMessage(message)
 
-			if (getLogLevel() <= kLogInfo)
+			if isLogLevel(kLogInfo)
 				logMessage(kLogInfo, message)
 		}
 
@@ -6456,7 +6457,7 @@ class RaceCenter extends ConfigurationItem {
 				if (lapData && (lapData != "")) {
 					this.showMessage(translate("Updating race report (Lap: ") . lap . translate(")"))
 
-					if (getLogLevel() <= kLogInfo)
+					if isLogLevel(kLogInfo)
 						logMessage(kLogInfo, translate("Updating race report (Lap: ") . lap . translate("), Data: `n`n") . lapData . "`n")
 
 					lapData := parseMultiMap(lapData)
@@ -6596,7 +6597,7 @@ class RaceCenter extends ConfigurationItem {
 
 			this.showMessage(message)
 
-			if (getLogLevel() <= kLogInfo)
+			if isLogLevel(kLogInfo)
 				logMessage(kLogInfo, message)
 
 			session := this.SelectedSession[true]
@@ -6632,7 +6633,7 @@ class RaceCenter extends ConfigurationItem {
 					else {
 						this.showMessage(translate("Updating telemetry data (Lap: ") . lap . translate(")"))
 
-						if (getLogLevel() <= kLogInfo)
+						if isLogLevel(kLogInfo)
 							logMessage(kLogInfo, translate("Updating telemetry data (Lap: ") . lap . translate("), Data: `n`n") . telemetryData . "`n")
 					}
 
@@ -6816,7 +6817,7 @@ class RaceCenter extends ConfigurationItem {
 
 			this.showMessage(message)
 
-			if (getLogLevel() <= kLogInfo)
+			if isLogLevel(kLogInfo)
 				logMessage(kLogInfo, message)
 
 			pressuresTable := pressuresDB.Database.Tables["Tyres.Pressures"]
@@ -6844,7 +6845,7 @@ class RaceCenter extends ConfigurationItem {
 					else {
 						this.showMessage(translate("Updating tyre pressures (Lap: ") . lap . translate(")"))
 
-						if (getLogLevel() <= kLogInfo)
+						if isLogLevel(kLogInfo)
 							logMessage(kLogInfo, translate("Updating tyre pressures (Lap: ") . lap . translate("), Data: `n`n") . lapPressures . "`n")
 
 						fails := 0
@@ -6952,7 +6953,7 @@ class RaceCenter extends ConfigurationItem {
 			}
 
 			if (state && (state != "")) {
-				if (getLogLevel() <= kLogInfo)
+				if isLogLevel(kLogInfo)
 					logMessage(kLogInfo, translate("Updating pitstops, State: `n`n") . state . "`n")
 
 				state := parseMultiMap(state)
@@ -7377,14 +7378,14 @@ class RaceCenter extends ConfigurationItem {
 				if (!this.Strategy || !this.Strategy.Version || (version > this.Strategy.Version)) {
 					this.showMessage(translate("Syncing session strategy"))
 
-					if (getLogLevel() <= kLogInfo)
+					if isLogLevel(kLogInfo)
 						logMessage(kLogInfo, translate("Syncing session strategy (Version: ") . version . translate(")"))
 
 					strategy := this.Connector.GetSessionValue(session, "Race Strategy")
 
 					this.showMessage(translate("Updating session strategy"))
 
-					if (getLogLevel() <= kLogInfo)
+					if isLogLevel(kLogInfo)
 						logMessage(kLogInfo, translate("Updating session strategy, Strategy: `n`n") . strategy . "`n")
 
 					this.selectStrategy((strategy = "CANCEL") ? false : this.createStrategy(parseMultiMap(strategy), false, false))
@@ -7418,7 +7419,7 @@ class RaceCenter extends ConfigurationItem {
 				if (!this.SetupsVersion || (this.SetupsVersion < version)) {
 					this.showMessage(translate("Syncing setups"))
 
-					if (getLogLevel() <= kLogInfo)
+					if isLogLevel(kLogInfo)
 						logMessage(kLogInfo, translate("Syncing setups (Version: ") . version . translate(")"))
 
 					info := this.Connector.GetSessionValue(session, "Setups Info")
@@ -7428,7 +7429,7 @@ class RaceCenter extends ConfigurationItem {
 						if (this.SetupsVersion && (this.SetupsListView.GetCount() > 0)) {
 							this.showMessage(translate("Clearing setups"))
 
-							if (getLogLevel() <= kLogInfo)
+							if isLogLevel(kLogInfo)
 								logMessage(kLogInfo, translate("Clearing setups, Info: `n`n") . info . "`n")
 
 							this.clearSetups(false)
@@ -7439,7 +7440,7 @@ class RaceCenter extends ConfigurationItem {
 					else {
 						this.showMessage(translate("Updating setups"))
 
-						if (getLogLevel() <= kLogInfo)
+						if isLogLevel(kLogInfo)
 							logMessage(kLogInfo, translate("Updating setups, Info: `n`n") . info . translate(" `nSetups: `n`n") . setups . "`n")
 
 						this.loadSetups(info, setups)
@@ -7466,7 +7467,7 @@ class RaceCenter extends ConfigurationItem {
 				if (!this.TeamDriversVersion || (this.TeamDriversVersion < version)) {
 					this.showMessage(translate("Syncing team drivers"))
 
-					if (getLogLevel() <= kLogInfo)
+					if isLogLevel(kLogInfo)
 						logMessage(kLogInfo, translate("Syncing team drivers (Version: ") . version . translate(")"))
 
 					this.iTeamDriversVersion := version
@@ -7508,7 +7509,7 @@ class RaceCenter extends ConfigurationItem {
 				if (!this.PlanVersion || (this.PlanVersion < version)) {
 					this.showMessage(translate("Syncing stint plan"))
 
-					if (getLogLevel() <= kLogInfo)
+					if isLogLevel(kLogInfo)
 						logMessage(kLogInfo, translate("Syncing stint plan (Version: ") . version . translate(")"))
 
 					info := this.Connector.GetSessionValue(session, "Stint Plan Info")
@@ -7518,7 +7519,7 @@ class RaceCenter extends ConfigurationItem {
 						if (this.PlanVersion && (this.PlanListView.GetCount() > 0)) {
 							this.showMessage(translate("Clearing stint plan"))
 
-							if (getLogLevel() <= kLogInfo)
+							if isLogLevel(kLogInfo)
 								logMessage(kLogInfo, translate("Clearing stint plan, Info: `n`n") . info . "`n")
 
 							this.PlanListView.Delete()
@@ -7527,7 +7528,7 @@ class RaceCenter extends ConfigurationItem {
 					else {
 						this.showMessage(translate("Updating stint plan"))
 
-						if (getLogLevel() <= kLogInfo)
+						if isLogLevel(kLogInfo)
 							logMessage(kLogInfo, translate("Updating stint plan, Info: `n`n") . info . translate(" `nPlan: `n`n") . plan . "`n")
 
 						this.loadPlan(info, plan)
@@ -7558,7 +7559,7 @@ class RaceCenter extends ConfigurationItem {
 
 				this.showMessage(translate("Syncing session"))
 
-				if (getLogLevel() <= kLogInfo)
+				if isLogLevel(kLogInfo)
 					logMessage(kLogInfo, translate("Syncing session"))
 
 				if sessionActive {

@@ -103,9 +103,9 @@ If you want to create your SimHub profiles from scratch, you can create the exte
 
 Click the desired input, then open a command shell, go to the SimHub programm directory and execute the following command:
 
-	SimHubWPF.exe -triggerinput [command][EFFECT]Vibration
+	SimHubWPF.exe -triggerinput [command][CATEGORY][EFFECT]Vibration
 
-[command] must be one of "toggle", "increase" or "decrease" and [EFFECT] the name of the effect you want to control, for example "WHEELSLIP". You can name the effects as you like, but the names here and in the configuration below must match.
+[command] must be one of "toggle", "increase" or "decrease", [CATEGORY] must be either "Pedal", "FrontChassis" or "RearChassis" and [EFFECT] the name of the effect you want to control, for example "WheelSlip". You can name the effects as you like, but the names here and in the configuration below must match. You can also leave the [Effect] empty to control the overall category.
 
 ### Mode *Pedal Vibration*
 

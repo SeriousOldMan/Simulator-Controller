@@ -37,7 +37,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 5.4.8
 
-Everything handled automatically.
+The "Tactile Feedback" plugin has been updated to work with the latest version of *SimHub*. This requires, that the triggers for the effect settings in *SimHub* must be recreated. You can either load the standard profiles from the *Profiles* directory, or you follow the instructions found [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-tactile-feedback).
 
 ***
 

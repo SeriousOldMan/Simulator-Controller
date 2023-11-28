@@ -1,12 +1,13 @@
 ## 5.4.8.0-release 12/01/23 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
-  3. The [text size of the info components](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#monitoring-health-and-activities) in the "System Monitor" can now be configured.
-  4. The pitstop info component will show you a forecast of the settings for a pitstop, when no pitstop has been planned by the Race Engineer yet.
-  5. An installer for the .NET 7 Runtime has been added to the automated installation process.
-  6. The "Tactile Feedback" plugin has been updated to work with the latest version of *SimHub*. Please take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-548), if you are using this plugin, since you have to update the triggers in *SimHub*.
-  7. The *SimHub* profiles provided in the *Profiles* directory has been updated to reflect the changes mentioned above.
-  8. More translations for the French language has been provided by our community member @SlatMars. This time translations has been added for the settings in "Session Database" as well as all the action labels used for Button Boxes and Stream Decks.
+  3. Fixed a bug in Google speech recognizers which raised a spoken error message, when effectively no command was recognized.
+  4. The [text size of the info components](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#monitoring-health-and-activities) in the "System Monitor" can now be configured.
+  5. The pitstop info component will show you a forecast of the settings for a pitstop, when no pitstop has been planned by the Race Engineer yet.
+  6. An installer for the .NET 7 Runtime has been added to the automated installation process.
+  7. The "Tactile Feedback" plugin has been updated to work with the latest version of *SimHub*. Please take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-548), if you are using this plugin, since you have to update the triggers in *SimHub*.
+  8. The *SimHub* profiles provided in the *Profiles* directory has been updated to reflect the changes mentioned above.
+  9. More translations for the French language has been provided by our community member @SlatMars. This time translations has been added for the settings in "Session Database" as well as all the action labels used for Button Boxes and Stream Decks.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-548), especially if you are using the *SimHub* integration with the "Tactile Feedback" plugin.
 

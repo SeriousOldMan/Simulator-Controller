@@ -1060,7 +1060,7 @@ class RaceAssistant extends ConfigurationItem {
 		if (data && !isObject(data))
 			data := readMultiMap(data)
 
-		if (settings && (formationLap || (this.Settings.Count = 0)))
+		if (settings && (formationLap || !this.Settings || (this.Settings.Count = 0)))
 			this.updateConfigurationValues({Settings: settings})
 
 		settings := this.Settings

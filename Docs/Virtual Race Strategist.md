@@ -747,11 +747,9 @@ Remarks:
 
 ### Autonomous Mode
 
-If you have chosen *Autonomous Mode* in the [*Strategy* tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#tab-strategy) of the "Race Settings" described above, the Strategist and the Engineer will work together using the selected strategy in such way, that no further interaction or decisions are needed from the drivers side regarding strategy updates, pitstop handling, and so on.
+If you have chosen *Autonomous Mode* in the [*Strategy* tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#tab-strategy) of the "Race Settings" as described above, the Strategist and the Engineer will work together using the selected strategy in such a way, that no further interaction or decisions are needed from the drivers side regarding strategy updates, pitstop handling, and so on. Both Assistants will exhibit the same behaviour as in the non-autonomous mode, but they will not ask for confirmation, if they think that an action is required. Instead of asking for confirmation, the corresponding action is performed immediately and you are notified about that. As a result, the two Assistants now act as Agents, which feels very natural, very much like a real pit crew.
 
-Both Assistants will exhibit the same behaviour as in the non-autonomous mode, but the will not ask for confirmation, if they think, that an action is required. Instead of asking for confirmation, the corresponding action is performed immediately and you are notified about that.
-
-The Strateist will not ask for ask confirmation, when:
+The Strateist will not ask for confirmation for the following actions:
 
 1. Give an introduction for the race strategy at the beginning of a session.
 2. Alter the strategy due to fuel requirements or changing conditions.
@@ -759,7 +757,9 @@ The Strateist will not ask for ask confirmation, when:
 4. Explain a changed strategy and the result of the corresponding traffic and position simulation.
 4. Calling you to the pit, thereby informing the Engineer to plan the pitstop.
 
-Additionally, the Engineer will not ask for confirmation to prepare an already planned pitstop, when it is time to come to the pit. Both Assistants will still ask for confirmation when changes are necessary due to weather changes, damages caused by accidents, and so on, although it is possible to disable those confirmations as well. Take a look at the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings) in the "Session Database" and search there for "Confirm" to see all the available settings.
+Additionally, the Engineer will not ask for confirmation to prepare an already planned pitstop, when it is time to come to the pit.
+
+Both Assistants will still ask for confirmation when actions are necessary due to weather changes, damages caused by accidents, and so on. It is possible to disable those confirmations as well, though. For this, take a look at the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings) in the "Session Database" and search there for "Confirm" to see all the available settings.
 
 ## Technical information
 

@@ -1,7 +1,7 @@
 [Development]
-Version=5.4.9.0-dev
-Target=5.4.9.0-release
-Date=11/27/2023
+Version=5.5.0.0-dev
+Target=5.5.0.0-release
+Date=11/28/2023
 Download=
 Changes=Added autonomous mode in "Race Settings"
 Components=Media->5.3.0,Configuration->5.4.8,Utilities->5.4.8
@@ -30,5 +30,5 @@ Utilities.5.4.8.Download=https://www.dropbox.com/scl/fi/5nduffajjm3x6rhsxr1nk/Ut
 [Current]
 Type=Development
 [Version]
-Development=5.4.9.0-dev
+Development=5.5.0.0-dev
 Release=5.4.7.0-release

@@ -1,7 +1,7 @@
 ## 5.4.8.0-release 12/01/23 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
-  3. Fixed a bug in Google speech recognizers which raised a spoken error message, when effectively no command was recognized.
+  3. Fixed a bug in Google speech recognizers which raised a spoken error message, when effectively only silence was recognized.
   4. The [text size of the info components](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#monitoring-health-and-activities) in the "System Monitor" can now be configured.
   5. The pitstop info component will show you a forecast of the settings for a pitstop, when no pitstop has been planned by the Race Engineer yet.
   6. An installer for the .NET 7 Runtime has been added to the automated installation process.

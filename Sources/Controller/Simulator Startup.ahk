@@ -432,13 +432,8 @@ launchPad(command := false, arguments*) {
 	}
 
 	launchSimulatorDownload(*) {
-		local msgResult
-
-		OnMessage(0x44, translateYesNoButtons)
-		msgResult := MsgBox(translate("Do you really want to download and install the latest version? You must close all applications before running the update."), translate("Update"), 262436)
-		OnMessage(0x44, translateYesNoButtons, 0)
-
-		if (msgResult = "Yes")
+		if exitProcesses("Update", "Do you really want to download and install the latest version? You must close all applications before running the update."
+					   , false, "CANCEL")
 			launchPad("Launch", "Simulator Download.exe", true)
 	}
 

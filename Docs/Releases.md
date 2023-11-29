@@ -11,7 +11,6 @@
   10. New car models for "Setup Workbench":
      - Assetto Corsa
        - BMW M3 E30
-       - BMW M4 Coupe Akrapovic Edition
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-548), especially if you are using the *SimHub* integration with the "Tactile Feedback" plugin.
 

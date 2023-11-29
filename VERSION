@@ -1,8 +1,8 @@
 [Development]
-Version=5.4.8.0-dev
+Version=5.4.8.0-alpha
 Target=5.4.8.0-release
 Date=11/29/2023
-Download=https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.4.8.0-dev.zip
+Download=https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.4.8.0-alpha.zip
 Changes=Configurable text size for session info widgets in "System Monitor", Pitstip info widget shows forecast values, Updated Tactile Feedback SimHub connector, Updated SimHub profiles, Added .NET 7.01 runtime to the installer, New French translations for "Settings", "Consent" and "Controller Action Labels", New car models for "Setup Workbench"
 Components=Media->5.3.0,Configuration->5.4.8,Utilities->5.4.8
 [Release]
@@ -30,5 +30,5 @@ Utilities.5.4.8.Download=https://simulatorcontroller.s3.eu-central-1.amazonaws.c
 [Current]
 Type=Development
 [Version]
-Development=5.4.8.0-dev
+Development=5.4.8.0-alpha
 Release=5.4.7.0-release

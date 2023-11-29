@@ -49,7 +49,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[5.4.8.0-alpha](https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.4.8.0-alpha.zip) (Test build for 5.4.8. Changes: Configurable text size for session info widgets in "System Monitor", Pitstip info widget shows forecast values, Updated Tactile Feedback SimHub connector, Updated SimHub profiles, Added .NET 7.01 runtime to the installer, New French translations for "Settings", "Consent" and "Controller Action Labels", New car models for "Setup Workbench")
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-548) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

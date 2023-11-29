@@ -8,6 +8,10 @@
   7. The "Tactile Feedback" plugin has been updated to work with the latest version of *SimHub*. Please take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-548), if you are using this plugin, since you have to update the triggers in *SimHub*.
   8. The *SimHub* profiles provided in the *Profiles* directory has been updated to reflect the changes mentioned above.
   9. More translations for the French language has been provided by our community member @SlatMars. This time translations has been added for the settings in "Session Database" as well as all the action labels used for Button Boxes and Stream Decks.
+  10. New car models for "Setup Workbench":
+     - Assetto Corsa
+       - BMW M3 E30
+       - BMW M4 Coupe Akrapovic Edition
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-548), especially if you are using the *SimHub* integration with the "Tactile Feedback" plugin.
 

@@ -1,5 +1,5 @@
 ## 5.5.0.0-release 12/06/23 (planned)
-  1. Added a setting to the "Race Settings" which allow you to set the Assistants into autonomous mode for strategy and pitstop handling. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#autonomous-mode) for more information.
+  1. Added a setting to the "Race Settings" which allow you to promote the Assistants into fully autonomous mode for strategy and pitstop handling. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#autonomous-mode) for more information.
 
 ## 5.4.8.0-release 12/01/23
   1. Minor bugfixes, as always

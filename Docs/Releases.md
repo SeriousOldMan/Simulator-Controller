@@ -1,4 +1,4 @@
-## 5.4.8.0-release 12/01/23 (planned)
+## 5.4.8.0-release 12/01/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed a bug in Google speech recognizers which raised a spoken error message, when effectively only silence was recognized.

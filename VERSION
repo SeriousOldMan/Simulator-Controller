@@ -1,16 +1,16 @@
 [Development]
 Version=5.5.0.0-dev
 Target=5.5.0.0-release
-Date=11/28/2023
+Date=11/30/2023
 Download=
 Changes=Added autonomous mode in "Race Settings"
 Components=Media->5.3.0,Configuration->5.4.8,Utilities->5.4.8
 [Release]
-Version=5.4.7.0-release
-Date=11/23/2023
-Download=https://cutt.ly/OwIxyaSZ;https://www.dropbox.com/scl/fi/u0qg589bm1a3tl1r1bksg/Simulator-Controller-5.4.7.0-release.zip?rlkey=1t6yw5u0fawd0vyoergf4nyyk&dl=1
-Changes=Integrated language packs for French language in "Simulator Setup", Integrated french grammars for the Race Engineer, Integrated French translation for "Setup Workbench", Optical enhancements & clarifications in "Session Database", Fixed tyre usage counting in "Practice Center", French grammars for the Assistants, Optimized start countdown handling for the Spotter, Changed default pitstop rule in "Strategy Workbench" to optional, New car models for "Setup Workbench"
-Components=Media->5.3.0,Configuration->5.4.7,Utilities->5.4.7
+Version=5.4.8.0-release
+Date=12/01/2023
+Download=https://cutt.ly/TwOPFmNC;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.4.8.0-release.zip
+Changes=Configurable text size for session info widgets in "System Monitor", Pitstip info widget shows forecast values, Updated Tactile Feedback SimHub connector, Updated SimHub profiles, Added .NET 7.01 runtime to the installer, New French translations for "Settings", "Consent" and "Controller Action Labels", New car models for "Setup Workbench"
+Components=Media->5.3.0,Configuration->5.4.8,Utilities->5.4.8
 [Components]
 Media.5.3.0.Path=Resources
 Media.5.3.0.Content=Splash Media
@@ -20,15 +20,15 @@ Configuration.5.4.7.Content=Setup
 Configuration.5.4.7.Download=https://www.dropbox.com/scl/fi/4tn39j7l0isqod8hyvgmp/Configuration-5.4.7.zip?rlkey=tqwjeacyb1coh03eyfl594qw8&dl=1
 Configuration.5.4.8.Path=Resources
 Configuration.5.4.8.Content=Setup
-Configuration.5.4.8.Download=https://www.dropbox.com/scl/fi/1b59d2rbjkio4vm961d3n/Configuration-5.4.8.zip?rlkey=hb7pf0qlkgu9y4kl196w3b2ff&dl=1
+Configuration.5.4.8.Download=https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+5.4.8.zip
 Utilities.5.4.7.Path=.
 Utilities.5.4.7.Content=Utilities
 Utilities.5.4.7.Download=https://www.dropbox.com/scl/fi/8gi2d2smvl0aezj9pn72u/Utilities-5.4.7.zip?rlkey=tna2neld8q72581c6kpcipkma&dl=1
 Utilities.5.4.8.Path=.
 Utilities.5.4.8.Content=Utilities
-Utilities.5.4.8.Download=https://www.dropbox.com/scl/fi/5nduffajjm3x6rhsxr1nk/Utilities-5.4.8.zip?rlkey=alrj8l2z205dd2vm9cu6hbsot&dl=1
+Utilities.5.4.8.Download=https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+5.4.8.zip
 [Current]
-Type=Development
+Type=Release
 [Version]
 Development=5.5.0.0-dev
-Release=5.4.7.0-release
+Release=5.4.8.0-release

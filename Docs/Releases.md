@@ -1,15 +1,19 @@
 ## 5.5.0.0-release 12/06/23 (planned)
   1. Added a setting to the "Race Settings" which allow you to set the Assistants into autonomous mode for strategy and pitstop handling. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#autonomous-mode) for more information.
 
-## 5.4.8.0-release 12/01/23 (planned)
+## 5.4.8.0-release 12/01/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
-  3. The text size of the info components in the "System Monitor" can now be configured.
-  4. The pitstop info component will show you a forecast of the settings for a pitstop, when no pitstop has been planned by the Race Engineer yet.
-  5. An installer for the .NET 7 Runtime has been added to the automated installation process.
-  6. The "Tactile Feedback" plugin has been updated to work with the latest version of *SimHub*. Please take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-548), if you are using this plugin, since you have to update the triggers in *SimHub*.
-  7. The *SimHub* profiles provided in the *Profiles* directory has been updated to reflect the changes mentioned above.
-  8. More translations for the French language has been provided by our community member @SlatMars. This time translations has been added for the settings in "Session Database" as well as all the action labels used for Button Boxes and Stream Decks.
+  3. Fixed a bug in Google speech recognizers which raised a spoken error message, when effectively only silence was recognized.
+  4. The [text size of the info components](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#monitoring-health-and-activities) in the "System Monitor" can now be configured.
+  5. The pitstop info component will show you a forecast of the settings for a pitstop, when no pitstop has been planned by the Race Engineer yet.
+  6. An installer for the .NET 7 Runtime has been added to the automated installation process.
+  7. The "Tactile Feedback" plugin has been updated to work with the latest version of *SimHub*. Please take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-548), if you are using this plugin, since you have to update the triggers in *SimHub*.
+  8. The *SimHub* profiles provided in the *Profiles* directory has been updated to reflect the changes mentioned above.
+  9. More translations for the French language has been provided by our community member @SlatMars. This time translations has been added for the settings in "Session Database" as well as all the action labels used for Button Boxes and Stream Decks.
+  10. New car models for "Setup Workbench":
+      - Assetto Corsa
+        - BMW M3 E30
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-548), especially if you are using the *SimHub* integration with the "Tactile Feedback" plugin.
 
@@ -26,9 +30,9 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   10. The default pitstop rule in "Strategy Workbench" is now set to *Optional*, rather than *Window*.
   11. Full rework of the handling of the start procedure incl. formation lap for the Spotter. No proximity warnings will be issued by the Spoter during the formation lap under normal circumstances.
   12. New car models for "Setup Workbench":
-     - Assetto Corsa
-       - BMW M4 Coupe
-       - BMW M4 Coupe Akrapovic Edition
+      - Assetto Corsa
+        - BMW M4 Coupe
+        - BMW M4 Coupe Akrapovic Edition
 
 ## 5.4.6.1-release 11/18/23
   1. Fixed the OpenAI connection for the Driving Coach.
@@ -46,9 +50,9 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   8. A runtime for large language models has been integrated into Simulator Controller, which allows you to run a LLM for the "Driving Coach" locally on your PC, without installing additional software or creating an OpenAI account. Please note that this increases the performance and memory requirements for the "Driving Coach" dramatically, but if your PC can handle it, then it is a great alternative to OpenAI and Co. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#llm-runtime) for more information about the configuration requirements.
   9. New [control key modifiers](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Keyboard-Modifiers) for "Simulator Configuration" and "Simulator Setup" let you decide whether other applications will be terminated before working on the configuration.
   10. New car models for "Setup Workbench":
-     - Assetto Corsa
-       - Alfa Romeo GTA (fixed)
-	   - BMW M3 E92
+      - Assetto Corsa
+        - Alfa Romeo GTA (fixed)
+	    - BMW M3 E92
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-546).
 

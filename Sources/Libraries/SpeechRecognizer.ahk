@@ -586,8 +586,12 @@ class SpeechRecognizer {
 									  , JSON.print(request), Map("Content-Type", "application/json"), {Object: true, Encoding: "UTF-8"})
 
 		try {
-			if ((result.Status >= 200) && (result.Status < 300))
-				this._onTextCallback(result.JSON["results"][1]["alternatives"][1]["transcript"])
+			if ((result.Status >= 200) && (result.Status < 300)) {
+				result := result.JSON
+
+				if result.Has("results")
+					this._onTextCallback(result["results"][1]["alternatives"][1]["transcript"])
+			}
 			else
 				throw "Error while speech recognition..."
 		}

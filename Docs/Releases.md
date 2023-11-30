@@ -1,4 +1,4 @@
-## 5.4.8.0-release 12/01/23 (planned)
+## 5.4.8.0-release 12/01/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed a bug in Google speech recognizers which raised a spoken error message, when effectively only silence was recognized.
@@ -11,7 +11,6 @@
   10. New car models for "Setup Workbench":
       - Assetto Corsa
         - BMW M3 E30
-        - BMW M4 Coupe Akrapovic Edition
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-548), especially if you are using the *SimHub* integration with the "Tactile Feedback" plugin.
 

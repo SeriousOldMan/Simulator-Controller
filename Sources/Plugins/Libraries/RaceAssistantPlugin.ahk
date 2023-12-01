@@ -1368,10 +1368,19 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		return getMultiMapValue(data, "Session Data", "Active", false)
 	}
 
-	static activeSession(data) {
-		local ignore
+	static sessionActive(data) {
+		local ignore, simulator, car, track
 
-		return (getDataSession(data, &ignore) >= kSessionPractice)
+		if (getDataSession(data, &ignore) >= kSessionPractice) {
+			if RaceAssistantPlugin.Simulator
+				return ((SessionDatabase.getSimulatorName(getMultiMapValue(data, "Session Data", "Simulator", "Unknown")) = RaceAssistantPlugin.Simulator.Simulator[true])
+					 && (getMultiMapValue(data, "Session Data", "Car", "Unknown") = RaceAssistantPlugin.Simulator.Car)
+					 && (getMultiMapValue(data, "Session Data", "Track", "Unknown") = RaceAssistantPlugin.Simulator.Track))
+			else
+				return true
+		}
+		else
+			return false
 	}
 
 	static driverActive(data) {
@@ -2151,7 +2160,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					return
 				}
 
-				if !RaceAssistantPlugin.activeSession(data) {
+				if !RaceAssistantPlugin.sessionActive(data) {
 					; Not in a supported session
 
 					RaceAssistantPlugin.finishAssistantsSession()

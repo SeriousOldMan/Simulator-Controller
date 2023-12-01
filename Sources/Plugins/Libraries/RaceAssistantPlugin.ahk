@@ -1369,13 +1369,15 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	static sessionActive(data) {
-		local ignore, simulator, car, track
+		local ignore, simulator
 
 		if (getDataSession(data, &ignore) >= kSessionPractice) {
-			if RaceAssistantPlugin.Simulator
-				return ((SessionDatabase.getSimulatorName(getMultiMapValue(data, "Session Data", "Simulator", "Unknown")) = RaceAssistantPlugin.Simulator.Simulator[true])
-					 && (getMultiMapValue(data, "Session Data", "Car", "Unknown") = RaceAssistantPlugin.Simulator.Car)
-					 && (getMultiMapValue(data, "Session Data", "Track", "Unknown") = RaceAssistantPlugin.Simulator.Track))
+			simulator := RaceAssistantPlugin.Simulator
+
+			if simulator
+				return ((SessionDatabase.getSimulatorName(getMultiMapValue(data, "Session Data", "Simulator", "Unknown")) = simulator.Simulator[true])
+					 && (!simulator.Car || (getMultiMapValue(data, "Session Data", "Car", "Unknown") = simulator.Car))
+					 && (!simulator.Track || (getMultiMapValue(data, "Session Data", "Track", "Unknown") = simulator.Track)))
 			else
 				return true
 		}

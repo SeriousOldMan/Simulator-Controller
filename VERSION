@@ -28,7 +28,7 @@ Utilities.5.4.8.Path=.
 Utilities.5.4.8.Content=Utilities
 Utilities.5.4.8.Download=https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+5.4.8.zip
 [Current]
-Type=Release
+Type=Development
 [Version]
 Development=5.5.0.0-dev
 Release=5.4.8.0-release

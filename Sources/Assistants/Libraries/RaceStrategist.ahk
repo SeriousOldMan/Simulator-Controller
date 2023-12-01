@@ -1800,8 +1800,11 @@ class RaceStrategist extends GridRaceAssistant {
 
 						this.setContinuation(ObjBindMethod(this, "reportStrategy"))
 					}
-					else
+					else {
+						this.getSpeaker().speakPhrase("ReportStrategy")
+
 						this.reportStrategy()
+					}
 
 				this.updateDynamicValues({StrategyReported: lapNumber})
 			}

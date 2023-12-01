@@ -209,6 +209,8 @@ class SimulatorStartup extends ConfigurationItem {
 
 			Run(exePath, kBinariesDirectory, , &pid)
 
+			Sleep(1000)
+
 			exePath := kBinariesDirectory . "Simulator Controller.exe -Startup -Voice " . pid
 
 			Run(exePath, kBinariesDirectory, , &pid)

@@ -501,13 +501,16 @@ class SimulatorPlugin extends ControllerPlugin {
 		if !WinExist(window) {
 			if isDebug()
 				showMessage(this.Simulator[true] . " not found...")
+
+			return false
 		}
-		else if !WinActive(window)
+		else if !WinActive(window) {
 			WinActivate(window)
+			
+			return WinActive(window)
+		}
 		else
 			return true
-
-		return false
 	}
 
 	sendCommand(command, delay?) {

@@ -25,6 +25,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	static sTeamServerCooldown := kUndefined
 
 	static sCollectorTask := false
+	static sReplayDirectory := false
 
 	static sAssistants := []
 
@@ -417,6 +418,18 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	CollectorTask {
 		Get {
 			return RaceAssistantPlugin.CollectorTask
+		}
+	}
+
+	static ReplayDirectory {
+		Get {
+			return RaceAssistantPlugin.sReplayDirectory
+		}
+	}
+
+	ReplayDirectory {
+		Get {
+			return RaceAssistantPlugin.ReplayDirectory
 		}
 	}
 
@@ -818,6 +831,13 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		}
 
 		if !RaceAssistantPlugin.sCollectorTask {
+			index := inList(A_Args, "-Replay")
+
+			if index
+				RaceAssistantPlugin.sReplayDirectory := A_Args[index + 1]
+
+			RaceAssistantPlugin.sReplayDirectory := "D:\Temp\ACC Data\"
+
 			RaceAssistantPlugin.sCollectorTask
 				:= PeriodicTask(ObjBindMethod(RaceAssistantPlugin, "collectSessionData"), 1000, kHighPriority)
 
@@ -2059,6 +2079,9 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		local newLap, firstLap, ignore, assistant, hasAssistant, lastLap
 		local simulator, car, track, weather
 
+		static replayLap := false
+		static replayIndex := false
+
 		if (RaceAssistantPlugin.Finish = "Finished")
 			RaceAssistantPlugin.finishAssistantsSession()
 
@@ -2083,11 +2106,41 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			splitTime := A_TickCount
 		}
 
+		if (RaceAssistantPlugin.ReplayDirectory && !RaceAssistantPlugin.Simulator) {
+			data := readMultiMap(RaceAssistantPlugin.ReplayDirectory . "Race Engineer Lap 1.1.data")
+
+			simulator := getMultiMapValue(data, "Session Data", "Simulator", "Unknown")
+
+			SimulatorController.Instance.simulatorStartup(SessionDatabase.getSimulatorName(simulator))
+		}
+
 		if RaceAssistantPlugin.Simulator {
 			telemetryData := true
 			positionsData := true
 
-			data := RaceAssistantPlugin.Simulator.acquireSessionData(&telemetryData, &positionsData)
+			if RaceAssistantPlugin.ReplayDirectory {
+				replayIndex += 1
+
+				if !FileExist(RaceAssistantPlugin.ReplayDirectory . "Race Engineer Lap " . replayLap . "." . replayIndex . ".data") {
+					replayLap += 1
+					replayIndex := 1
+
+					if !FileExist(RaceAssistantPlugin.ReplayDirectory . "Race Engineer Lap " . replayLap . "." . replayIndex . ".data")
+						ExitApp(0)
+				}
+
+				data := readMultiMap(RaceAssistantPlugin.ReplayDirectory . "Race Engineer Lap " . replayLap . "." . replayIndex . ".data")
+
+				telemetryData := data.Clone()
+
+				removeMultiMapValues(telemetryData, "Position Data")
+
+				positionsData := newMultiMap()
+
+				addMultiMapValues(positionsData, "Position Data", getMultiMapValues(data, "Position Data"))
+			}
+			else
+				data := RaceAssistantPlugin.Simulator.acquireSessionData(&telemetryData, &positionsData)
 
 			if isDebug() {
 				logMessage(kLogInfo, "Collect session data (Data Acquisition):" . (A_TickCount - splitTime) . " ms...")

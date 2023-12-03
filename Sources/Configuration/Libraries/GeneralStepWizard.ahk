@@ -125,7 +125,15 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 			arguments .= ("launchApplications: " . values2String(", ", launchApplications*))
 		}
 
-		Plugin("System", false, true, "", arguments).saveToConfiguration(configuration)
+		thePlugin := Plugin("System", false, true, "", arguments)
+
+		if (modeSelectors.Length = 0)
+			thePlugin.removeArgument("modeSelector")
+
+		if (launchApplications.Length = 0)
+			thePlugin.removeArgument("launchApplications")
+
+		thePlugin.saveToConfiguration(configuration)
 
 		Plugin("Integration", false, false).saveToConfiguration(configuration)
 	}

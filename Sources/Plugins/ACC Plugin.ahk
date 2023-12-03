@@ -269,7 +269,11 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			if this.iChatMode
 				this.registerMode(this.iChatMode)
 
-			this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", false)
+			if !inList(A_Args, "-Replay")
+				this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", false)
+			else
+				this.iOpenPitstopMFDHotkey := "Off"
+			
 			this.iClosePitstopMFDHotkey := this.getArgumentValue("closePitstopMFD", false)
 
 			this.iUDPConnection := this.getArgumentValue("udpConnection", false)

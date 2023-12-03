@@ -199,7 +199,7 @@ class PitstopToggleAction extends PitstopAction {
 
 class SimulatorPlugin extends ControllerPlugin {
 	static sActiveSimulator := false
-	static sActiveimulation := false
+	static sActiveSimulation := false
 
 	iCommandMode := "Event"
 	iCommandDelay := kUndefined
@@ -533,7 +533,8 @@ class SimulatorPlugin extends ControllerPlugin {
 	}
 
 	runningSimulator() {
-		return (this.Simulator.isRunning() ? this.Simulator.Application : false)
+		return (this.Simulator.isRunning() ? this.Simulator.Application
+										   : ((SimulatorPlugin.ActiveSimulation = this.Simulator.Application) ? SimulatorPlugin.ActiveSimulation : false))
 	}
 
 	simulatorStartup(simulator) {

@@ -57,7 +57,7 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 			arguments .= ("pedalCalibrations: " . values2String(", ", calibrations*))
 		}
 
-		Plugin("Pedal Calibration", false, wizard.isModuleSelected("Pedal Calibration"), "", arguments).saveToConfiguration(configuration)
+		Plugin("Pedal Calibration", false, wizard.isModuleSelected("Pedal Calibration"), "", arguments).saveToConfiguration(configuration, false)
 	}
 
 	createGui(wizard, x, y, width, height) {

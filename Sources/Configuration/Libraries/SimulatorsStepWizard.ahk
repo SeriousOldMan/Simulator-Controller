@@ -99,15 +99,15 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 						}
 					}
 
-					Plugin(code, false, true, simulator, arguments).saveToConfiguration(configuration)
+					Plugin(code, false, true, simulator, arguments).saveToConfiguration(configuration, false)
 				}
 				else
-					Plugin(code, false, false, simulator, "").saveToConfiguration(configuration)
+					Plugin(code, false, false, simulator, "").saveToConfiguration(configuration, false)
 			}
 			catch Any as exception {
 				logError(exception)
 
-				Plugin(code, false, false, simulator, "").saveToConfiguration(configuration)
+				Plugin(code, false, false, simulator, "").saveToConfiguration(configuration, false)
 			}
 		}
 

@@ -104,7 +104,10 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 		super.__New(controller, name, simulator, configuration)
 
 		if (this.Active || (isDebug() && isDevelopment())) {
-			this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", "{Down}")
+			if !inList(A_Args, "-Replay")
+				this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", "{Down}")
+			else
+				this.iOpenPitstopMFDHotkey := "Off"
 
 			this.iPreviousOptionHotkey := this.getArgumentValue("previousOption", "{Up}")
 			this.iNextOptionHotkey := this.getArgumentValue("nextOption", "{Down}")

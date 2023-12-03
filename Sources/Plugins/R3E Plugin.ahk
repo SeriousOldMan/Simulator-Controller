@@ -100,7 +100,11 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 		super.__New(controller, name, simulator, configuration)
 
 		if (this.Active || (isDebug() && isDevelopment())) {
-			this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", false)
+			if !inList(A_Args, "-Replay")
+				this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", false)
+			else
+				this.iOpenPitstopMFDHotkey := "Off"
+			
 			this.iClosePitstopMFDHotkey := this.getArgumentValue("closePitstopMFD", false)
 
 			this.iPreviousOptionHotkey := this.getArgumentValue("previousOption", "W")

@@ -86,10 +86,10 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 				}
 			}
 
-			Plugin("Tactile Feedback", false, true, "", arguments).saveToConfiguration(configuration)
+			Plugin("Tactile Feedback", false, true, "", arguments).saveToConfiguration(configuration, false)
 		}
 		else
-			Plugin("Tactile Feedback", false, false, "", "").saveToConfiguration(configuration)
+			Plugin("Tactile Feedback", false, false, "", "").saveToConfiguration(configuration, false)
 	}
 
 	createGui(wizard, x, y, width, height) {

@@ -73,7 +73,10 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 		super.__New(controller, name, simulator, configuration)
 
 		if (this.Active || (isDebug() && isDevelopment())) {
-			this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", "I")
+			if !inList(A_Args, "-Replay")
+				this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", "I")
+			else
+				this.iOpenPitstopMFDHotkey := "Off"
 
 			this.iPreviousOptionHotkey := this.getArgumentValue("previousOption", "Z")
 			this.iNextOptionHotkey := this.getArgumentValue("nextOption", "H")

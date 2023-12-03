@@ -498,12 +498,16 @@ class SimulatorPlugin extends ControllerPlugin {
 	activateWindow() {
 		local window := this.Simulator.WindowTitle
 
-		if !WinExist(window)
+		if !WinExist(window) {
 			if isDebug()
 				showMessage(this.Simulator[true] . " not found...")
-
-		if !WinActive(window)
+		}
+		else if !WinActive(window)
 			WinActivate(window)
+		else
+			return true
+
+		return false
 	}
 
 	sendCommand(command, delay?) {
@@ -1078,13 +1082,12 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 			action := this.TrackAutomation.Actions[actionNr]
 
 			if (action.Type = "Hotkey") {
-				this.activateWindow()
+				if this.activateWindow()
+					for ignore, theHotkey in string2Values("|", action.Action) {
+						this.sendCommand(theHotKey)
 
-				for ignore, theHotkey in string2Values("|", action.Action) {
-					this.sendCommand(theHotKey)
-
-					Sleep(25)
-				}
+						Sleep(25)
+					}
 			}
 			else if (action.Type = "Command")
 				execute(action.Action)

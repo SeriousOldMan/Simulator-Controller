@@ -836,8 +836,6 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			if index
 				RaceAssistantPlugin.sReplayDirectory := A_Args[index + 1]
 
-			RaceAssistantPlugin.sReplayDirectory := "D:\Temp\ACC Data\"
-
 			RaceAssistantPlugin.sCollectorTask
 				:= PeriodicTask(ObjBindMethod(RaceAssistantPlugin, "collectSessionData"), 1000, kHighPriority)
 
@@ -2148,7 +2146,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 				positionsData := newMultiMap()
 
-				addMultiMapValues(positionsData, "Position Data", getMultiMapValues(data, "Position Data"))
+				setMultiMapValues(positionsData, "Position Data", getMultiMapValues(data, "Position Data"))
 			}
 			else
 				data := RaceAssistantPlugin.Simulator.acquireSessionData(&telemetryData, &positionsData)

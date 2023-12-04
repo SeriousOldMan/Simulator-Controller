@@ -94,11 +94,12 @@ namespace SHMConnector {
 				request = request.Split(new char[] { '=' }, 2)[1];
 
                 string[] arguments = request.Split('=');
+                string[] message = arguments[1].Split(':');
 
                 if (arguments[0] == "Set")
-                    this.ExecutePitstopSetCommand(arguments[1], arguments[2].Split(';'));
+                    this.ExecutePitstopSetCommand(message[0], message[1].Split(';'));
                 else if ((arguments[0] == "Increase") || (arguments[0] == "Decrease"))
-                    this.ExecutePitstopChangeCommand(arguments[1], arguments[0], arguments[2].Split(';'));
+                    this.ExecutePitstopChangeCommand(message[0], arguments[0], message[1].Split(';'));
 
 				return "";
             }

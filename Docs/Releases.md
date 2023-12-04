@@ -1,13 +1,15 @@
 ## 5.5.0.0-release 12/06/23 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
-  3. Added a setting to the "Race Settings" which allow you to promote the Assistants into fully autonomous mode for strategy and pitstop handling. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#autonomous-mode) for more information.
-  4. A corresponding setting is available in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) of the "Session Database".
-  5. The Assistants now detect correctly that you have have quitted a session in the formation lap and started a new session.
-  6. The compatibility of "Simulator Setup" and "Simulator Configuration" has been increased further.
-  7. Increased reliability for position and standings calculations for retired cars.
-  8. [Developer only] You can now run a replay of a recorded session for debugging purposes. Make a copy of the *Temp\XXX Data* folder, with *XXX* the three-letter code for the given simulator. Then start "Simulator Controller" with arguments "-replay *dataFolder*" (*dataFolder* points to the beforementioned data folder.
-  9. [Internal] Finalized migration of all Simulator Controller downloadable components to AWS.
+  3. Fixed a couple of bugs in the handling of the *rFactor 2* pitstop setup.
+  4. Fixed a couple of bugs in the handling of the *RaceRoom Racing Experience* pitstop setup.
+  5. Added a setting to the "Race Settings" which allow you to promote the Assistants into fully autonomous mode for strategy and pitstop handling. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#autonomous-mode) for more information.
+  6. A corresponding setting is available in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) of the "Session Database".
+  7. The Assistants now detect correctly that you have have quitted a session in the formation lap and started a new session.
+  8. The compatibility of "Simulator Setup" and "Simulator Configuration" has been increased further.
+  9. Increased reliability for position and standings calculations for retired cars.
+  10. [Developer only] You can now run a replay of a recorded session for debugging purposes. Make a copy of the *Temp\XXX Data* folder, with *XXX* the three-letter code for the given simulator. Then start "Simulator Controller" with arguments "-replay *dataFolder*" (*dataFolder* points to the beforementioned data folder.
+  11. [Internal] Finalized migration of all Simulator Controller downloadable components to AWS.
 
 ## 5.4.8.0-release 12/01/23
   1. Minor bugfixes, as always

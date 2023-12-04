@@ -831,7 +831,7 @@ namespace RF2SHMProvider {
 		private void SendPitstopCommand(string command) {
 			var now = DateTime.Now;
 			if (now < this.nextKeyHandlingTime)
-				Thread.Sleep(100);
+				Thread.Sleep(200);
 
 			for (int i = 0; i < command.Length; i++) {
 				byte[] commandStr = null;
@@ -848,7 +848,7 @@ namespace RF2SHMProvider {
 
 				this.SendPitMenuCmd(commandStr, fRetVal);
 
-				Thread.Sleep(100);
+				Thread.Sleep(200);
 			}
 
 			this.nextKeyHandlingTime = now + TimeSpan.FromMilliseconds(100);

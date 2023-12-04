@@ -860,7 +860,7 @@ namespace SHMConnector {
 		private void SendPitstopCommand(string command) {
 			var now = DateTime.Now;
 			if (now < this.nextKeyHandlingTime)
-				Thread.Sleep(100);
+				Thread.Sleep(200);
 
 			for (int i = 0; i < command.Length; i++) {
 				byte[] commandStr = null;
@@ -880,7 +880,7 @@ namespace SHMConnector {
 				Thread.Sleep(100);
 			}
 
-			this.nextKeyHandlingTime = now + TimeSpan.FromMilliseconds(100);
+			this.nextKeyHandlingTime = now + TimeSpan.FromMilliseconds(200);
 		}
 
 		public string ReadSetup() {

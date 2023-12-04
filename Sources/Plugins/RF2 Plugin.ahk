@@ -136,7 +136,7 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	requirePitstopMFD() {
-		return this.activateWindow()
+		return true
 	}
 
 	selectPitstopOption(option) {

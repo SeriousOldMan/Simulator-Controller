@@ -1361,18 +1361,20 @@ openPitstopMFD(descriptor := false) {
 			if descriptor {
 				plugin.resetPitstopMFD(descriptor)
 
-				plugin.openPitstopMFD(descriptor)
+				return plugin.openPitstopMFD(descriptor)
 			}
 			else {
 				plugin.resetPitstopMFD()
 
-				plugin.openPitstopMFD()
+				return plugin.openPitstopMFD()
 			}
 		}
 		finally {
 			protectionOff()
 		}
 	}
+	else
+		return false
 }
 
 closePitstopMFD() {

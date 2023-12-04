@@ -126,16 +126,21 @@ class ACCPitstopTester extends Plugin {
 				this.iPSIsOpen := true
 
 				if this.iImageMode
-					if (update || !wasOpen) {
+					if (update || !wasOpen)
 						if this.updatePitStopState()
 							this.openPitstopMFD(false, false)
-					}
+				
+				return this.iPSIsOpen
 			}
+			else
+				return false
 		}
 		else if !reported {
 			reported := true
 
 			this.logMessage("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration")
+			
+			return false
 		}
 	}
 

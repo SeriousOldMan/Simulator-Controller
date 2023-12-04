@@ -707,8 +707,14 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 						if this.iPSIsOpen
 							Task.startTask("updatePitstopState", 5000, kLowPriority)
 					}
+					
+					return this.iPSIsOpen
 				}
+				else
+					return false
 			}
+			else
+				return false
 		}
 		else if !reported {
 			reported := true
@@ -717,6 +723,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 			showMessage(translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration...")
 					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			
+			return false
 		}
 	}
 
@@ -756,7 +764,9 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 		if (this.OpenPitstopMFDHotkey = "Off")
 			return false
-		else if !this.iPSIsOpen {
+		else if this.iPSIsOpen
+			return true
+		else {
 			if !reported {
 				reported := true
 
@@ -774,8 +784,6 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 			return this.iPSIsOpen
 		}
-		else
-			return true
 	}
 
 	checkRestart() {

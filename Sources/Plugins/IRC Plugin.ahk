@@ -122,6 +122,8 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 				return false
 			}
 		}
+		else
+			return true
 	}
 
 	closePitstopMFD() {

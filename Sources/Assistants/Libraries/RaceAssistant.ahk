@@ -1151,7 +1151,7 @@ class RaceAssistant extends ConfigurationItem {
 		if !isObject(settings)
 			settings := readMultiMap(settings)
 
-		autonomy := getMultiMapValue(settings, "Strategy Settings", "Strategy.Autonomy", "Custom")
+		autonomy := getMultiMapValue(settings, "Assistant", "Assistant.Autonomy", "Custom")
 
 		this.updateSessionValues({Autonomy: autonomy})
 

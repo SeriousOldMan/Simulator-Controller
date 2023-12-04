@@ -348,7 +348,7 @@ The "System Monitor" is divided into several pages of information:
 	 
 	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/System%20Monitor%205.JPG)
 
-Final note: The information provided by "System Monitor" is asynchronous by nature, in order to not interfere with some time critical operations of other parts of the system. Therefore it can take a couple of seconds before problem will be visible. If you loose the connection to the Team Server, for example, it might not become evident, when no requests against against the Server are currently being issued. Also it is possible that state information is not updated anymore, when central backgroud processes, first and formost "Simulator Controller.exe" have been terminated manually.
+Final note: The information provided by "System Monitor" is asynchronous by nature, in order to not interfere with some time critical operations of other parts of the system. Therefore it can take a couple of seconds before problems will be visible. If you loose the connection to the Team Server, for example, it might not become evident, when no requests against against the Server are currently being issued. Also it is possible that state information is not updated anymore, when central backgroud processes, first and formost "Simulator Controller.exe" have been terminated manually.
 
 ## And now it's time
 

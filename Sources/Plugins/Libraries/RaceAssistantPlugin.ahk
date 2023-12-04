@@ -836,8 +836,6 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			if index
 				RaceAssistantPlugin.sReplayDirectory := A_Args[index + 1]
 
-			RaceAssistantPlugin.sReplayDirectory := "D:\Temp\ACC Data\"
-
 			RaceAssistantPlugin.sCollectorTask
 				:= PeriodicTask(ObjBindMethod(RaceAssistantPlugin, "collectSessionData"), 1000, kHighPriority)
 
@@ -1388,10 +1386,21 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		return getMultiMapValue(data, "Session Data", "Active", false)
 	}
 
-	static activeSession(data) {
-		local ignore
+	static sessionActive(data) {
+		local ignore, simulator
 
-		return (getDataSession(data, &ignore) >= kSessionPractice)
+		if (getDataSession(data, &ignore) >= kSessionPractice) {
+			simulator := RaceAssistantPlugin.Simulator
+
+			if simulator
+				return ((SessionDatabase.getSimulatorName(getMultiMapValue(data, "Session Data", "Simulator", "Unknown")) = simulator.Simulator[true])
+					 && (!simulator.Car || (getMultiMapValue(data, "Session Data", "Car", "Unknown") = simulator.Car))
+					 && (!simulator.Track || (getMultiMapValue(data, "Session Data", "Track", "Unknown") = simulator.Track)))
+			else
+				return true
+		}
+		else
+			return false
 	}
 
 	static driverActive(data) {
@@ -2137,7 +2146,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 				positionsData := newMultiMap()
 
-				addMultiMapValues(positionsData, "Position Data", getMultiMapValues(data, "Position Data"))
+				setMultiMapValues(positionsData, "Position Data", getMultiMapValues(data, "Position Data"))
 			}
 			else
 				data := RaceAssistantPlugin.Simulator.acquireSessionData(&telemetryData, &positionsData)
@@ -2204,7 +2213,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					return
 				}
 
-				if !RaceAssistantPlugin.activeSession(data) {
+				if !RaceAssistantPlugin.sessionActive(data) {
 					; Not in a supported session
 
 					RaceAssistantPlugin.finishAssistantsSession()

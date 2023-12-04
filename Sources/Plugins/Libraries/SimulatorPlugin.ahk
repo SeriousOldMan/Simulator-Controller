@@ -498,12 +498,19 @@ class SimulatorPlugin extends ControllerPlugin {
 	activateWindow() {
 		local window := this.Simulator.WindowTitle
 
-		if !WinExist(window)
+		if !WinExist(window) {
 			if isDebug()
 				showMessage(this.Simulator[true] . " not found...")
 
-		if !WinActive(window)
+			return false
+		}
+		else if !WinActive(window) {
 			WinActivate(window)
+			
+			return WinActive(window)
+		}
+		else
+			return true
 	}
 
 	sendCommand(command, delay?) {
@@ -1078,13 +1085,12 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 			action := this.TrackAutomation.Actions[actionNr]
 
 			if (action.Type = "Hotkey") {
-				this.activateWindow()
+				if this.activateWindow()
+					for ignore, theHotkey in string2Values("|", action.Action) {
+						this.sendCommand(theHotKey)
 
-				for ignore, theHotkey in string2Values("|", action.Action) {
-					this.sendCommand(theHotKey)
-
-					Sleep(25)
-				}
+						Sleep(25)
+					}
 			}
 			else if (action.Type = "Command")
 				execute(action.Action)
@@ -1355,18 +1361,20 @@ openPitstopMFD(descriptor := false) {
 			if descriptor {
 				plugin.resetPitstopMFD(descriptor)
 
-				plugin.openPitstopMFD(descriptor)
+				return plugin.openPitstopMFD(descriptor)
 			}
 			else {
 				plugin.resetPitstopMFD()
 
-				plugin.openPitstopMFD()
+				return plugin.openPitstopMFD()
 			}
 		}
 		finally {
 			protectionOff()
 		}
 	}
+	else
+		return false
 }
 
 closePitstopMFD() {

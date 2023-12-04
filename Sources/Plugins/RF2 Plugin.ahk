@@ -62,6 +62,7 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	activateWindow() {
+		return true
 	}
 
 	sendPitstopCommand(command, operation, message, arguments*) {
@@ -93,11 +94,13 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 
 		if this.OpenPitstopMFDHotkey {
 			if (this.OpenPitstopMFDHotkey != "Off") {
-				this.activateWindow()
+				if this.activateWindow() {
+					this.sendCommand(this.OpenPitstopMFDHotkey)
 
-				this.sendCommand(this.OpenPitstopMFDHotkey)
-
-				return true
+					return true
+				}
+				else
+					return false
 			}
 			else
 				return false
@@ -118,11 +121,9 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 		static reported := false
 
 		if this.ClosePitstopMFDHotkey {
-			if (this.OpenPitstopMFDHotkey != "Off") {
-				this.activateWindow()
-
-				this.sendCommand(this.ClosePitstopMFDHotkey)
-			}
+			if (this.OpenPitstopMFDHotkey != "Off")
+				if this.activateWindow()
+					this.sendCommand(this.ClosePitstopMFDHotkey)
 		}
 		else if !reported {
 			reported := true

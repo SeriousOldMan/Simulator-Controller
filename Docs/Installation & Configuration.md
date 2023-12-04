@@ -4,7 +4,7 @@ Before we go into the full details of the complete installation and configuratio
 
 # Installation
 
-Installation is easy and fully automatic for the current version. Simply download and run the installer from the [GitHub project page](https://github.com/SeriousOldMan/Simulator-Controller#download-and-installation) (or simply click [here](https://bit.ly/3vCSIa1)) and follow the instructions. You will have the option to install the Simulator Controller package in any location on your hard disks and you can decide to fully register Simulator Controller in Windows or to use a portable installation without updating the Registry. You may also create Start Menu and Desktop shortcuts according to your preferences. I strongly recommend to leave automatic updates ticked, unless you have a very unusual installation location.
+Installation is easy and fully automatic for the current version. Simply download and run the installer from the [GitHub project page](https://github.com/SeriousOldMan/Simulator-Controller#download-and-installation) (or simply click [here](https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Simulator+Controller.exe)) and follow the instructions. You will have the option to install the Simulator Controller package in any location on your hard disks and you can decide to fully register Simulator Controller in Windows or to use a portable installation without updating the Registry. You may also create Start Menu and Desktop shortcuts according to your preferences. I strongly recommend to leave automatic updates ticked, unless you have a very unusual installation location.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Installation.JPG)
 

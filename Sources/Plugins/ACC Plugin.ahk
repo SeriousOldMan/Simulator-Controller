@@ -207,13 +207,13 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		fireAction(function, trigger) {
 			local message := this.Message
 
-			this.Controller.findPlugin(kACCPlugin).activateWindow()
-
-			Send("{Enter}")
-			Sleep(100)
-			Send(message)
-			Sleep(100)
-			Send("{Enter}")
+			if this.Controller.findPlugin(kACCPlugin).activateWindow() {
+				Send("{Enter}")
+				Sleep(100)
+				Send(message)
+				Sleep(100)
+				Send("{Enter}")
+			}
 		}
 	}
 
@@ -520,28 +520,38 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 					setMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Car", car)
 
-					if !driverCar
-						if (getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".ID", false) = driverID) {
-							driverCar := A_Index
+					if (getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".ID", false) = driverID) {
+						driverCar := A_Index
 
-							lastDriverCar := driverCar
-						}
-						else if ((getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Forname") = driverForname)
+						lastDriverCar := driverCar
+					}
+					else if !driverCar
+						if ((getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Forname") = driverForname)
 						 && (getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Surname") = driverSurname)) {
 							driverCar := A_Index
 
 							lastDriverCar := driverCar
 						}
-						else if (getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Position")
-							   = getMultiMapValue(telemetryData, "Stint Data", "Position", kUndefined)) {
-							driverCar := A_Index
-
-							lastDriverCar := driverCar
-						}
-						else if (getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Time") = lapTime)
-							driverCarCandidate := A_Index
 				}
 			}
+			
+			if !driverCar
+				loop {
+					carID := getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Car", kUndefined)
+
+					if (carID == kUndefined)
+						break
+					else if (getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Position")
+						   = getMultiMapValue(telemetryData, "Stint Data", "Position", kUndefined)) {
+						driverCar := A_Index
+
+						lastDriverCar := driverCar
+						
+						break
+					}
+					else if (getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Time") = lapTime)
+						driverCarCandidate := A_Index
+				}
 
 			if !driverCar
 				driverCar := (lastDriverCar ? lastDriverCar : driverCarCandidate)
@@ -668,37 +678,43 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 		if this.OpenPitstopMFDHotkey {
 			if (this.OpenPitstopMFDHotkey != "Off") {
-				this.activateWindow()
+				if this.activateWindow() {
+					this.sendCommand(this.OpenPitstopMFDHotkey)
 
-				this.sendCommand(this.OpenPitstopMFDHotkey)
+					Sleep(200)
 
-				Sleep(200)
+					this.sendCommand(this.OpenPitstopMFDHotkey)
 
-				this.sendCommand(this.OpenPitstopMFDHotkey)
+					if !imgSearch {
+						if update {
+							this.initializePitstopMFD()
 
-				if !imgSearch {
-					if update {
-						this.initializePitstopMFD()
+							update := false
+						}
 
-						update := false
+						this.iPSIsOpen := true
 					}
 
+					wasOpen := this.iPSIsOpen
+
 					this.iPSIsOpen := true
+					this.iPSSelectedOption := 1
+
+					if (imgSearch && (update || !wasOpen)) {
+						if this.updatePitStopState()
+							this.openPitstopMFD(false, false)
+
+						if this.iPSIsOpen
+							Task.startTask("updatePitstopState", 5000, kLowPriority)
+					}
+					
+					return this.iPSIsOpen
 				}
-
-				wasOpen := this.iPSIsOpen
-
-				this.iPSIsOpen := true
-				this.iPSSelectedOption := 1
-
-				if (imgSearch && (update || !wasOpen)) {
-					if this.updatePitStopState()
-						this.openPitstopMFD(false, false)
-
-					if this.iPSIsOpen
-						Task.startTask("updatePitstopState", 5000, kLowPriority)
-				}
+				else
+					return false
 			}
+			else
+				return false
 		}
 		else if !reported {
 			reported := true
@@ -707,6 +723,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 			showMessage(translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration...")
 					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			
+			return false
 		}
 	}
 
@@ -719,11 +737,11 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 		if this.ClosePitstopMFDHotkey {
 			if (this.OpenPitstopMFDHotkey != "Off") {
-				this.activateWindow()
+				if this.activateWindow() {
+					this.sendCommand(this.ClosePitstopMFDHotkey)
 
-				this.sendCommand(this.ClosePitstopMFDHotkey)
-
-				this.iPSIsOpen := false
+					this.iPSIsOpen := false
+				}
 			}
 		}
 		else if !reported {
@@ -746,7 +764,9 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 		if (this.OpenPitstopMFDHotkey = "Off")
 			return false
-		else if !this.iPSIsOpen {
+		else if this.iPSIsOpen
+			return true
+		else {
 			if !reported {
 				reported := true
 
@@ -762,10 +782,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 			this.openPitstopMFD(false, true)
 
-			return true
+			return this.iPSIsOpen
 		}
-		else
-			return true
 	}
 
 	checkRestart() {
@@ -1051,24 +1069,26 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 						targetSelectedOption += delta
 
-						this.activateWindow()
+						if this.activateWindow() {
+							delta := ((this.iPSOptions.Length - (this.iPSChangeTyres ? 0 : this.iPSTyreOptions)
+															  - (this.iPSChangeBrakes ? 0 : this.iPSBrakeOptions))
+									- targetSelectedOption + this.iPSSelectedOption)
 
-						delta := ((this.iPSOptions.Length - (this.iPSChangeTyres ? 0 : this.iPSTyreOptions)
-														  - (this.iPSChangeBrakes ? 0 : this.iPSBrakeOptions))
-								- targetSelectedOption + this.iPSSelectedOption)
-
-						if (Abs(targetSelectedOption - this.iPSSelectedOption) <= delta) {
-							if (targetSelectedOption > this.iPSSelectedOption)
-								this.sendCommand("{Down}", targetSelectedOption - this.iPSSelectedOption)
+							if (Abs(targetSelectedOption - this.iPSSelectedOption) <= delta) {
+								if (targetSelectedOption > this.iPSSelectedOption)
+									this.sendCommand("{Down}", targetSelectedOption - this.iPSSelectedOption)
+								else
+									this.sendCommand("{Up}", this.iPSSelectedOption - targetSelectedOption)
+							}
 							else
-								this.sendCommand("{Up}", this.iPSSelectedOption - targetSelectedOption)
+								this.sendCommand("{Up}", delta)
+
+							this.iPSSelectedOption := targetSelectedOption
+
+							return true
 						}
 						else
-							this.sendCommand("{Up}", delta)
-
-						this.iPSSelectedOption := targetSelectedOption
-
-						return true
+							return false
 					}
 					else
 						return false
@@ -1092,13 +1112,11 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				else {
 					switch direction, false {
 						case "Increase":
-							this.activateWindow()
-
-							this.sendCommand("{Right}", steps)
+							if this.activateWindow()
+								this.sendCommand("{Right}", steps)
 						case "Decrease":
-							this.activateWindow()
-
-							this.sendCommand("{Left}", steps)
+							if this.activateWindow()
+								this.sendCommand("{Left}", steps)
 						default:
 							throw "Unsupported change operation `"" . direction . "`" detected in ACCPlugin.changePitstopOption..."
 					}
@@ -1416,71 +1434,73 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		if !pitstopLabels
 			pitstopLabels := this.getLabelFileNames("PITSTOP")
 
-		this.activateWindow()
+		if this.activateWindow() {
+			curTickCount := A_TickCount
 
-		curTickCount := A_TickCount
+			imageX := kUndefined
+			imageY := kUndefined
 
-		imageX := kUndefined
-		imageY := kUndefined
+			localLabels := false
 
-		localLabels := false
-
-		for ignore, fileName in pitstopLabels
-			if InStr(fileName, kUserScreenImagesDirectory) {
-				localLabels := true
-
-				break
-			}
-
-		loop (localLabels ? 3 : 1) {
-			loop pitstopLabels.Length {
-				pitstopLabel := pitstopLabels[A_Index]
-
-				if !this.iPSImageSearchArea {
-					ImageSearch(&imageX, &imageY, 0, 0, A_ScreenWidth, A_ScreenHeight, "*100 " . pitstopLabel)
-
-					if isLogLevel(kLogInfo)
-						logMessage(kLogInfo, substituteVariables(translate("Full search for '%image%' took %ticks% ms"), {image: "PITSTOP", ticks: A_TickCount - curTickCount}))
-				}
-				else {
-					ImageSearch(&imageX, &imageY
-							  , this.iPSImageSearchArea[1], this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4]
-							  , "*100 " . pitstopLabel)
-
-					if isLogLevel(kLogInfo)
-						logMessage(kLogInfo, substituteVariables(translate("Fast search for '%image%' took %ticks% ms"), {image: "PITSTOP", ticks: A_TickCount - curTickCount}))
-				}
-
-				if isInteger(imageX) {
-					if isDebug() {
-						images.Push(pitstopLabel)
-
-						this.markFoundLabel(pitstopLabel, imageX, imageY)
-					}
+			for ignore, fileName in pitstopLabels
+				if InStr(fileName, kUserScreenImagesDirectory) {
+					localLabels := true
 
 					break
 				}
+
+			loop (localLabels ? 3 : 1) {
+				loop pitstopLabels.Length {
+					pitstopLabel := pitstopLabels[A_Index]
+
+					if !this.iPSImageSearchArea {
+						ImageSearch(&imageX, &imageY, 0, 0, A_ScreenWidth, A_ScreenHeight, "*100 " . pitstopLabel)
+
+						if isLogLevel(kLogInfo)
+							logMessage(kLogInfo, substituteVariables(translate("Full search for '%image%' took %ticks% ms"), {image: "PITSTOP", ticks: A_TickCount - curTickCount}))
+					}
+					else {
+						ImageSearch(&imageX, &imageY
+								  , this.iPSImageSearchArea[1], this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4]
+								  , "*100 " . pitstopLabel)
+
+						if isLogLevel(kLogInfo)
+							logMessage(kLogInfo, substituteVariables(translate("Fast search for '%image%' took %ticks% ms"), {image: "PITSTOP", ticks: A_TickCount - curTickCount}))
+					}
+
+					if isInteger(imageX) {
+						if isDebug() {
+							images.Push(pitstopLabel)
+
+							this.markFoundLabel(pitstopLabel, imageX, imageY)
+						}
+
+						break
+					}
+				}
+
+				if isInteger(imageX)
+					break
+				else
+					Sleep(500)
 			}
 
-			if isInteger(imageX)
-				break
-			else
-				Sleep(500)
+			lastY := false
+
+			if isInteger(imageX) {
+				lastY := imageY
+
+				if !this.iPSImageSearchArea
+					this.iPSImageSearchArea := [Max(0, imageX - kSearchAreaLeft), 0, Min(imageX + kSearchAreaRight, A_ScreenWidth), A_ScreenHeight]
+			}
+			else {
+				this.iPSIsOpen := false
+			}
+
+			return lastY
 		}
-
-		lastY := false
-
-		if isInteger(imageX) {
-			lastY := imageY
-
-			if !this.iPSImageSearchArea
-				this.iPSImageSearchArea := [Max(0, imageX - kSearchAreaLeft), 0, Min(imageX + kSearchAreaRight, A_ScreenWidth), A_ScreenHeight]
-		}
-		else {
-			this.iPSIsOpen := false
-		}
-
-		return lastY
+		else
+			return false
 	}
 
 	searchStrategyLabel(&lastY, images) {
@@ -1494,70 +1514,72 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		if !pitStrategyLabels
 			pitStrategyLabels := this.getLabelFileNames("Pit Strategy 1", "Pit Strategy 2")
 
-		this.activateWindow()
+		if this.activateWindow() {
+			imageX := kUndefined
+			imageY := kUndefined
 
-		imageX := kUndefined
-		imageY := kUndefined
+			loop pitStrategyLabels.Length {
+				pitStrategyLabel := pitStrategyLabels[A_Index]
 
-		loop pitStrategyLabels.Length {
-			pitStrategyLabel := pitStrategyLabels[A_Index]
+				if !this.iPSImageSearchArea
+					ImageSearch(&imageX, &imageY, 0, lastY ? lastY : 0, A_ScreenWidth, A_ScreenHeight, "*100 " . pitStrategyLabel)
+				else
+					ImageSearch(&imageX, &imageY
+							  , this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4]
+							  , "*100 " . pitStrategyLabel)
 
-			if !this.iPSImageSearchArea
-				ImageSearch(&imageX, &imageY, 0, lastY ? lastY : 0, A_ScreenWidth, A_ScreenHeight, "*100 " . pitStrategyLabel)
-			else
-				ImageSearch(&imageX, &imageY
-						  , this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4]
-						  , "*100 " . pitStrategyLabel)
+				if isInteger(imageX) {
+					if isDebug() {
+						images.Push(pitStrategyLabel)
+
+						this.markFoundLabel(pitStrategyLabel, imageX, imageY)
+					}
+
+					break
+				}
+			}
+
+			if isLogLevel(kLogInfo)
+				if !this.iPSImageSearchArea
+					logMessage(kLogInfo, substituteVariables(translate("Full search for '%image%' took %ticks% ms"), {image: "Pit Strategy", ticks: A_TickCount - curTickCount}))
+				else
+					logMessage(kLogInfo, substituteVariables(translate("Fast search for '%image%' took %ticks% ms"), {image: "Pit Strategy", ticks: A_TickCount - curTickCount}))
 
 			if isInteger(imageX) {
-				if isDebug() {
-					images.Push(pitStrategyLabel)
+				if !inList(this.iPSOptions, "Strategy") {
+					this.iPSOptions.InsertAt(inList(this.iPSOptions, "Pit Limiter") + 1, "Strategy")
 
-					this.markFoundLabel(pitStrategyLabel, imageX, imageY)
+					this.iPSTyreOptionPosition := inList(this.iPSOptions, "Change Tyres")
+					this.iPSBrakeOptionPosition := inList(this.iPSOptions, "Change Brakes")
+
+					reload := true
 				}
 
-				break
+				lastY := imageY
+
+				if isLogLevel(kLogInfo)
+					logMessage(kLogInfo, translate("'Pit Strategy' detected, adjusting pitstop options: ") . values2String(", ", this.iPSOptions*))
 			}
-		}
+			else {
+				position := inList(this.iPSOptions, "Strategy")
 
-		if isLogLevel(kLogInfo)
-			if !this.iPSImageSearchArea
-				logMessage(kLogInfo, substituteVariables(translate("Full search for '%image%' took %ticks% ms"), {image: "Pit Strategy", ticks: A_TickCount - curTickCount}))
-			else
-				logMessage(kLogInfo, substituteVariables(translate("Fast search for '%image%' took %ticks% ms"), {image: "Pit Strategy", ticks: A_TickCount - curTickCount}))
+				if position {
+					this.iPSOptions.RemoveAt(position)
 
-		if isInteger(imageX) {
-			if !inList(this.iPSOptions, "Strategy") {
-				this.iPSOptions.InsertAt(inList(this.iPSOptions, "Pit Limiter") + 1, "Strategy")
+					this.iPSTyreOptionPosition := inList(this.iPSOptions, "Change Tyres")
+					this.iPSBrakeOptionPosition := inList(this.iPSOptions, "Change Brakes")
 
-				this.iPSTyreOptionPosition := inList(this.iPSOptions, "Change Tyres")
-				this.iPSBrakeOptionPosition := inList(this.iPSOptions, "Change Brakes")
+					reload := true
+				}
 
-				reload := true
-			}
-
-			lastY := imageY
-
-			if isLogLevel(kLogInfo)
-				logMessage(kLogInfo, translate("'Pit Strategy' detected, adjusting pitstop options: ") . values2String(", ", this.iPSOptions*))
-		}
-		else {
-			position := inList(this.iPSOptions, "Strategy")
-
-			if position {
-				this.iPSOptions.RemoveAt(position)
-
-				this.iPSTyreOptionPosition := inList(this.iPSOptions, "Change Tyres")
-				this.iPSBrakeOptionPosition := inList(this.iPSOptions, "Change Brakes")
-
-				reload := true
+				if isLogLevel(kLogInfo)
+					logMessage(kLogInfo, translate("'Pit Strategy' not detected, adjusting pitstop options: ") . values2String(", ", this.iPSOptions*))
 			}
 
-			if isLogLevel(kLogInfo)
-				logMessage(kLogInfo, translate("'Pit Strategy' not detected, adjusting pitstop options: ") . values2String(", ", this.iPSOptions*))
+			return reload
 		}
-
-		return reload
+		else
+			return false
 	}
 
 	searchNoRefuelLabel(&lastY, images) {
@@ -1570,70 +1592,72 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		if !noRefuelLabels
 			noRefuelLabels := this.getLabelFileNames("No Refuel")
 
-		this.activateWindow()
+		if this.activateWindow() {
+			imageX := kUndefined
+			imageY := kUndefined
 
-		imageX := kUndefined
-		imageY := kUndefined
+			loop noRefuelLabels.Length {
+				noRefuelLabel := noRefuelLabels[A_Index]
 
-		loop noRefuelLabels.Length {
-			noRefuelLabel := noRefuelLabels[A_Index]
+				if !this.iPSImageSearchArea
+					ImageSearch(&imageX, &imageY, 0, lastY ? lastY : 0, A_ScreenWidth, A_ScreenHeight, "*25 " . noRefuelLabel)
+				else
+					ImageSearch(&imageX, &imageY
+							  , this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4]
+							  , "*25 " . noRefuelLabel)
 
-			if !this.iPSImageSearchArea
-				ImageSearch(&imageX, &imageY, 0, lastY ? lastY : 0, A_ScreenWidth, A_ScreenHeight, "*25 " . noRefuelLabel)
-			else
-				ImageSearch(&imageX, &imageY
-						  , this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4]
-						  , "*25 " . noRefuelLabel)
+				if isInteger(imageX) {
+					if isDebug() {
+						images.Push(noRefuelLabel)
+
+						this.markFoundLabel(noRefuelLabel, imageX, imageY)
+					}
+
+					break
+				}
+			}
+
+			if isLogLevel(kLogInfo)
+				if !this.iPSImageSearchArea
+					logMessage(kLogInfo, substituteVariables(translate("Full search for '%image%' took %ticks% ms"), {image: "Refuel", ticks: A_TickCount - curTickCount}))
+				else
+					logMessage(kLogInfo, substituteVariables(translate("Fast search for '%image%' took %ticks% ms"), {image: "Refuel", ticks: A_TickCount - curTickCount}))
 
 			if isInteger(imageX) {
-				if isDebug() {
-					images.Push(noRefuelLabel)
+				position := inList(this.iPSOptions, "Refuel")
 
-					this.markFoundLabel(noRefuelLabel, imageX, imageY)
+				if position {
+					this.iPSOptions.RemoveAt(position)
+
+					this.iPSTyreOptionPosition := inList(this.iPSOptions, "Change Tyres")
+					this.iPSBrakeOptionPosition := inList(this.iPSOptions, "Change Brakes")
+
+					reload := true
 				}
 
-				break
+				lastY := imageY
+
+				if isLogLevel(kLogInfo)
+					logMessage(kLogInfo, translate("'Refuel' not detected, adjusting pitstop options: ") . values2String(", ", this.iPSOptions*))
 			}
-		}
+			else {
+				if !inList(this.iPSOptions, "Refuel") {
+					this.iPSOptions.InsertAt(inList(this.iPSOptions, "Change Tyres"), "Refuel")
 
-		if isLogLevel(kLogInfo)
-			if !this.iPSImageSearchArea
-				logMessage(kLogInfo, substituteVariables(translate("Full search for '%image%' took %ticks% ms"), {image: "Refuel", ticks: A_TickCount - curTickCount}))
-			else
-				logMessage(kLogInfo, substituteVariables(translate("Fast search for '%image%' took %ticks% ms"), {image: "Refuel", ticks: A_TickCount - curTickCount}))
+					this.iPSTyreOptionPosition := inList(this.iPSOptions, "Change Tyres")
+					this.iPSBrakeOptionPosition := inList(this.iPSOptions, "Change Brakes")
 
-		if isInteger(imageX) {
-			position := inList(this.iPSOptions, "Refuel")
+					reload := true
+				}
 
-			if position {
-				this.iPSOptions.RemoveAt(position)
-
-				this.iPSTyreOptionPosition := inList(this.iPSOptions, "Change Tyres")
-				this.iPSBrakeOptionPosition := inList(this.iPSOptions, "Change Brakes")
-
-				reload := true
+				if isLogLevel(kLogInfo)
+					logMessage(kLogInfo, translate("'Refuel' detected, adjusting pitstop options: ") . values2String(", ", this.iPSOptions*))
 			}
 
-			lastY := imageY
-
-			if isLogLevel(kLogInfo)
-				logMessage(kLogInfo, translate("'Refuel' not detected, adjusting pitstop options: ") . values2String(", ", this.iPSOptions*))
+			return reload
 		}
-		else {
-			if !inList(this.iPSOptions, "Refuel") {
-				this.iPSOptions.InsertAt(inList(this.iPSOptions, "Change Tyres"), "Refuel")
-
-				this.iPSTyreOptionPosition := inList(this.iPSOptions, "Change Tyres")
-				this.iPSBrakeOptionPosition := inList(this.iPSOptions, "Change Brakes")
-
-				reload := true
-			}
-
-			if isLogLevel(kLogInfo)
-				logMessage(kLogInfo, translate("'Refuel' detected, adjusting pitstop options: ") . values2String(", ", this.iPSOptions*))
-		}
-
-		return reload
+		else
+			return false
 	}
 
 	searchTyreLabel(&lastY, images) {
@@ -1649,101 +1673,103 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			compoundLabels := this.getLabelFileNames("Compound 1", "Compound 2")
 		}
 
-		this.activateWindow()
-
-		imageX := kUndefined
-		imageY := kUndefined
-
-		loop wetLabels.Length {
-			wetLabel := wetLabels[A_Index]
-
-			if !this.iPSImageSearchArea
-				ImageSearch(&imageX, &imageY, 0, lastY ? lastY : 0, A_ScreenWidth, A_ScreenHeight, "*100 " . wetLabel)
-			else
-				ImageSearch(&imageX, &imageY
-						  , this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4]
-						  , "*100 " . wetLabel)
-
-			if isInteger(imageX) {
-				if isDebug() {
-					images.Push(wetLabel)
-
-					this.markFoundLabel(wetLabel, imageX, imageY)
-				}
-
-				break
-			}
-		}
-
-		if isInteger(imageX) {
-			position := inList(this.iPSOptions, "Tyre Set")
-
-			if position {
-				this.iPSOptions.RemoveAt(position)
-				this.iPSTyreOptions := 6
-
-				this.iPSBrakeOptionPosition := inList(this.iPSOptions, "Change Brakes")
-
-				reload := true
-			}
-		}
-		else {
-			if !inList(this.iPSOptions, "Tyre Set") {
-				this.iPSOptions.InsertAt(inList(this.iPSOptions, "Tyre Compound"), "Tyre Set")
-				this.iPSTyreOptions := 7
-
-				this.iPSBrakeOptionPosition := inList(this.iPSOptions, "Change Brakes")
-
-				reload := true
-			}
-
+		if this.activateWindow() {
 			imageX := kUndefined
 			imageY := kUndefined
 
-			loop compoundLabels.Length {
-				compoundLabel := compoundLabels[A_Index]
+			loop wetLabels.Length {
+				wetLabel := wetLabels[A_Index]
 
 				if !this.iPSImageSearchArea
-					ImageSearch(&imageX, &imageY, 0, lastY ? lastY : 0, A_ScreenWidth, A_ScreenHeight, "*100 " . compoundLabel)
+					ImageSearch(&imageX, &imageY, 0, lastY ? lastY : 0, A_ScreenWidth, A_ScreenHeight, "*100 " . wetLabel)
 				else
 					ImageSearch(&imageX, &imageY
 							  , this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4]
-							  , "*100 " . compoundLabel)
+							  , "*100 " . wetLabel)
 
 				if isInteger(imageX) {
 					if isDebug() {
-						images.Push(compoundLabel)
+						images.Push(wetLabel)
 
-						this.markFoundLabel(compoundLabel, imageX, imageY)
+						this.markFoundLabel(wetLabel, imageX, imageY)
 					}
 
 					break
 				}
 			}
-		}
 
-		if isLogLevel(kLogInfo)
-			if !this.iPSImageSearchArea
-				logMessage(kLogInfo, substituteVariables(translate("Full search for '%image%' took %ticks% ms"), {image: "Tyre Set", ticks: A_TickCount - curTickCount}))
-			else
-				logMessage(kLogInfo, substituteVariables(translate("Fast search for '%image%' took %ticks% ms"), {image: "Tyre Set", ticks: A_TickCount - curTickCount}))
+			if isInteger(imageX) {
+				position := inList(this.iPSOptions, "Tyre Set")
 
-		if isInteger(imageX) {
-			this.iPSChangeTyres := true
+				if position {
+					this.iPSOptions.RemoveAt(position)
+					this.iPSTyreOptions := 6
 
-			lastY := imageY
+					this.iPSBrakeOptionPosition := inList(this.iPSOptions, "Change Brakes")
+
+					reload := true
+				}
+			}
+			else {
+				if !inList(this.iPSOptions, "Tyre Set") {
+					this.iPSOptions.InsertAt(inList(this.iPSOptions, "Tyre Compound"), "Tyre Set")
+					this.iPSTyreOptions := 7
+
+					this.iPSBrakeOptionPosition := inList(this.iPSOptions, "Change Brakes")
+
+					reload := true
+				}
+
+				imageX := kUndefined
+				imageY := kUndefined
+
+				loop compoundLabels.Length {
+					compoundLabel := compoundLabels[A_Index]
+
+					if !this.iPSImageSearchArea
+						ImageSearch(&imageX, &imageY, 0, lastY ? lastY : 0, A_ScreenWidth, A_ScreenHeight, "*100 " . compoundLabel)
+					else
+						ImageSearch(&imageX, &imageY
+								  , this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4]
+								  , "*100 " . compoundLabel)
+
+					if isInteger(imageX) {
+						if isDebug() {
+							images.Push(compoundLabel)
+
+							this.markFoundLabel(compoundLabel, imageX, imageY)
+						}
+
+						break
+					}
+				}
+			}
 
 			if isLogLevel(kLogInfo)
-				logMessage(kLogInfo, translate("Pitstop: Tyres are selected for change"))
-		}
-		else {
-			this.iPSChangeTyres := false
+				if !this.iPSImageSearchArea
+					logMessage(kLogInfo, substituteVariables(translate("Full search for '%image%' took %ticks% ms"), {image: "Tyre Set", ticks: A_TickCount - curTickCount}))
+				else
+					logMessage(kLogInfo, substituteVariables(translate("Fast search for '%image%' took %ticks% ms"), {image: "Tyre Set", ticks: A_TickCount - curTickCount}))
 
-			if isLogLevel(kLogInfo)
-				logMessage(kLogInfo, translate("Pitstop: Tyres are not selected for change"))
-		}
+			if isInteger(imageX) {
+				this.iPSChangeTyres := true
 
-		return reload
+				lastY := imageY
+
+				if isLogLevel(kLogInfo)
+					logMessage(kLogInfo, translate("Pitstop: Tyres are selected for change"))
+			}
+			else {
+				this.iPSChangeTyres := false
+
+				if isLogLevel(kLogInfo)
+					logMessage(kLogInfo, translate("Pitstop: Tyres are not selected for change"))
+			}
+
+			return reload
+		}
+		else
+			return false
 	}
 
 	searchBrakeLabel(&lastY, images) {
@@ -1756,52 +1782,54 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		if !frontBrakeLabels
 			frontBrakeLabels := this.getLabelFileNames("Front Brake 1", "Front Brake 2")
 
-		this.activateWindow()
+		if this.activateWindow() {
+			imageX := kUndefined
+			imageY := kUndefined
 
-		imageX := kUndefined
-		imageY := kUndefined
+			loop frontBrakeLabels.Length {
+				frontBrakeLabel := frontBrakeLabels[A_Index]
 
-		loop frontBrakeLabels.Length {
-			frontBrakeLabel := frontBrakeLabels[A_Index]
+				if !this.iPSImageSearchArea
+					ImageSearch(&imageX, &imageY, 0, lastY ? lastY : 0, A_ScreenWidth, A_ScreenHeight, "*100 " . frontBrakeLabel)
+				else
+					ImageSearch(&imageX, &imageY
+							  , this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4]
+							  , "*100 " . frontBrakeLabel)
 
-			if !this.iPSImageSearchArea
-				ImageSearch(&imageX, &imageY, 0, lastY ? lastY : 0, A_ScreenWidth, A_ScreenHeight, "*100 " . frontBrakeLabel)
-			else
-				ImageSearch(&imageX, &imageY
-						  , this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4]
-						  , "*100 " . frontBrakeLabel)
+				if isInteger(imageX) {
+					if isDebug() {
+						images.Push(frontBrakeLabel)
+
+						this.markFoundLabel(frontBrakeLabel, imageX, imageY)
+					}
+
+					break
+				}
+			}
+
+			if isLogLevel(kLogInfo)
+				if !this.iPSImageSearchArea
+					logMessage(kLogInfo, substituteVariables(translate("Full search for '%image%' took %ticks% ms"), {image: "Front Brake", ticks: A_TickCount - curTickCount}))
+				else
+					logMessage(kLogInfo, substituteVariables(translate("Fast search for '%image%' took %ticks% ms"), {image: "Front Brake", ticks: A_TickCount - curTickCount}))
 
 			if isInteger(imageX) {
-				if isDebug() {
-					images.Push(frontBrakeLabel)
+				this.iPSChangeBrakes := true
 
-					this.markFoundLabel(frontBrakeLabel, imageX, imageY)
-				}
-
-				break
+				if isLogLevel(kLogInfo)
+					logMessage(kLogInfo, translate("Pitstop: Brakes are selected for change"))
 			}
+			else {
+				this.iPSChangeBrakes := false
+
+				if isLogLevel(kLogInfo)
+					logMessage(kLogInfo, translate("Pitstop: Brakes are not selected for change"))
+			}
+
+			return reload
 		}
-
-		if isLogLevel(kLogInfo)
-			if !this.iPSImageSearchArea
-				logMessage(kLogInfo, substituteVariables(translate("Full search for '%image%' took %ticks% ms"), {image: "Front Brake", ticks: A_TickCount - curTickCount}))
-			else
-				logMessage(kLogInfo, substituteVariables(translate("Fast search for '%image%' took %ticks% ms"), {image: "Front Brake", ticks: A_TickCount - curTickCount}))
-
-		if isInteger(imageX) {
-			this.iPSChangeBrakes := true
-
-			if isLogLevel(kLogInfo)
-				logMessage(kLogInfo, translate("Pitstop: Brakes are selected for change"))
-		}
-		else {
-			this.iPSChangeBrakes := false
-
-			if isLogLevel(kLogInfo)
-				logMessage(kLogInfo, translate("Pitstop: Brakes are not selected for change"))
-		}
-
-		return reload
+		else
+			return false
 	}
 
 	searchDriverLabel(&lastY, images) {
@@ -1814,62 +1842,64 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		if !selectDriverLabels
 			selectDriverLabels := this.getLabelFileNames("Select Driver 1", "Select Driver 2")
 
-		this.activateWindow()
+		if this.activateWindow() {
+			imageX := kUndefined
+			imageY := kUndefined
 
-		imageX := kUndefined
-		imageY := kUndefined
+			loop selectDriverLabels.Length {
+				selectDriverLabel := selectDriverLabels[A_Index]
 
-		loop selectDriverLabels.Length {
-			selectDriverLabel := selectDriverLabels[A_Index]
+				if !this.iPSImageSearchArea
+					ImageSearch(&imageX, &imageY, 0, lastY ? lastY : 0, A_ScreenWidth, A_ScreenHeight, "*100 " . selectDriverLabel)
+				else
+					ImageSearch(&imageX, &imageY
+							  , this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4]
+							  , "*100 " . selectDriverLabel)
 
-			if !this.iPSImageSearchArea
-				ImageSearch(&imageX, &imageY, 0, lastY ? lastY : 0, A_ScreenWidth, A_ScreenHeight, "*100 " . selectDriverLabel)
-			else
-				ImageSearch(&imageX, &imageY
-						  , this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4]
-						  , "*100 " . selectDriverLabel)
+				if isInteger(imageX) {
+					if isDebug() {
+						images.Push(selectDriverLabel)
+
+						this.markFoundLabel(selectDriverLabel, imageX, imageY)
+					}
+
+					break
+				}
+			}
+
+			if isLogLevel(kLogInfo)
+				if !this.iPSImageSearchArea
+					logMessage(kLogInfo, substituteVariables(translate("Full search for '%image%' took %ticks% ms"), {image: "Select Driver", ticks: A_TickCount - curTickCount}))
+				else
+					logMessage(kLogInfo, substituteVariables(translate("Fast search for '%image%' took %ticks% ms"), {image: "Select Driver", ticks: A_TickCount - curTickCount}))
 
 			if isInteger(imageX) {
-				if isDebug() {
-					images.Push(selectDriverLabel)
+				if !inList(this.iPSOptions, "Driver") {
+					this.iPSOptions.InsertAt(inList(this.iPSOptions, "Repair Suspension"), "Driver")
 
-					this.markFoundLabel(selectDriverLabel, imageX, imageY)
+					reload := true
 				}
 
-				break
+				if isLogLevel(kLogInfo)
+					logMessage(kLogInfo, translate("'Select Driver' detected, adjusting pitstop options: ") . values2String(", ", this.iPSOptions*))
 			}
-		}
+			else {
+				position := inList(this.iPSOptions, "Driver")
 
-		if isLogLevel(kLogInfo)
-			if !this.iPSImageSearchArea
-				logMessage(kLogInfo, substituteVariables(translate("Full search for '%image%' took %ticks% ms"), {image: "Select Driver", ticks: A_TickCount - curTickCount}))
-			else
-				logMessage(kLogInfo, substituteVariables(translate("Fast search for '%image%' took %ticks% ms"), {image: "Select Driver", ticks: A_TickCount - curTickCount}))
+				if position {
+					this.iPSOptions.RemoveAt(position)
 
-		if isInteger(imageX) {
-			if !inList(this.iPSOptions, "Driver") {
-				this.iPSOptions.InsertAt(inList(this.iPSOptions, "Repair Suspension"), "Driver")
+					reload := true
+				}
 
-				reload := true
-			}
-
-			if isLogLevel(kLogInfo)
-				logMessage(kLogInfo, translate("'Select Driver' detected, adjusting pitstop options: ") . values2String(", ", this.iPSOptions*))
-		}
-		else {
-			position := inList(this.iPSOptions, "Driver")
-
-			if position {
-				this.iPSOptions.RemoveAt(position)
-
-				reload := true
+				if isLogLevel(kLogInfo)
+					logMessage(kLogInfo, translate("'Select Driver' not detected, adjusting pitstop options: ") . values2String(", ", this.iPSOptions*))
 			}
 
-			if isLogLevel(kLogInfo)
-				logMessage(kLogInfo, translate("'Select Driver' not detected, adjusting pitstop options: ") . values2String(", ", this.iPSOptions*))
+			return reload
 		}
-
-		return reload
+		else
+			return false
 	}
 
 	updatePitstopState(fromTask := false) {
@@ -2279,14 +2309,14 @@ startACC() {
 
 stopACC() {
 	if isACCRunning() {
-		SimulatorController.Instance.findPlugin(kACCPlugin).activateWindow()
-
-		MouseClick("Left", 2093, 1052)
-		Sleep(500)
-		MouseClick("Left", 2614, 643)
-		Sleep(500)
-		MouseClick("Left", 2625, 619)
-		Sleep(500)
+		if SimulatorController.Instance.findPlugin(kACCPlugin).activateWindow() {
+			MouseClick("Left", 2093, 1052)
+			Sleep(500)
+			MouseClick("Left", 2614, 643)
+			Sleep(500)
+			MouseClick("Left", 2625, 619)
+			Sleep(500)
+		}
 	}
 }
 

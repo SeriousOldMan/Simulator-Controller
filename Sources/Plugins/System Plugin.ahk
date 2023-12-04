@@ -737,17 +737,15 @@ execute(command) {
 
 	SimulatorController.Instance.runningSimulator(&thePlugin)
 
-	if thePlugin
-		thePlugin.activateWindow()
+	if (thePlugin && thePlugin.activateWindow())
+		try {
+			Run(substituteVariables(command))
+		}
+		catch Any as exception {
+			logError(exception, true)
 
-	try {
-		Run(substituteVariables(command))
-	}
-	catch Any as exception {
-		logError(exception, true)
-
-		logMessage(kLogWarn, substituteVariables(translate("Cannot execute command (%command%) - please check the configuration"), {command: command}))
-	}
+			logMessage(kLogWarn, substituteVariables(translate("Cannot execute command (%command%) - please check the configuration"), {command: command}))
+		}
 }
 
 trigger(hotkeys, method := "Event") {
@@ -756,29 +754,27 @@ trigger(hotkeys, method := "Event") {
 
 	SimulatorController.Instance.runningSimulator(&thePlugin)
 
-	if thePlugin
-		thePlugin.activateWindow()
-
-	for ignore, theHotkey in string2Values("|", hotkeys)
-		try {
-			switch method, false {
-				case "Event":
-					SendEvent(theHotkey)
-				case "Input":
-					SendInput(theHotkey)
-				case "Play":
-					SendPlay(theHotkey)
-				case "Raw":
-					Send("{Raw}" . theHotkey)
-				default:
-					Send(theHotkey)
+	if (thePlugin && thePlugin.activateWindow())
+		for ignore, theHotkey in string2Values("|", hotkeys)
+			try {
+				switch method, false {
+					case "Event":
+						SendEvent(theHotkey)
+					case "Input":
+						SendInput(theHotkey)
+					case "Play":
+						SendPlay(theHotkey)
+					case "Raw":
+						Send("{Raw}" . theHotkey)
+					default:
+						Send(theHotkey)
+				}
 			}
-		}
-		catch Any as exception {
-			logError(exception, true)
+			catch Any as exception {
+				logError(exception, true)
 
-			logMessage(kLogWarn, substituteVariables(translate("Cannot send command (%hotkey%) - please check the configuration"), {command: theHotkey}))
-		}
+				logMessage(kLogWarn, substituteVariables(translate("Cannot send command (%hotkey%) - please check the configuration"), {command: theHotkey}))
+			}
 }
 
 mouse(button, x, y, count := 1, window := false) {

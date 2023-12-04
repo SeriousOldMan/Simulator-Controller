@@ -1,9 +1,9 @@
 [Development]
-Version=5.4.8.0-release	
-Target=5.4.8.0-release
-Date=12/01/2023
-Download=https://cutt.ly/TwOPFmNC;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.4.8.0-release.zip
-Changes=Configurable text size for session info widgets in "System Monitor", Pitstip info widget shows forecast values, Updated Tactile Feedback SimHub connector, Updated SimHub profiles, Added .NET 7.01 runtime to the installer, New French translations for "Settings", "Consent" and "Controller Action Labels", New car models for "Setup Workbench"
+Version=5.5.0.0-dev
+Target=5.5.0.0-release
+Date=12/04/2023
+Download=
+Changes=Added autonomous mode in "Race Settings", Detect simulator, car and track change during the first lap by the Assistants, New Replay mode for Developer, Increased compatibility of "Simulator Setup" and "Simulator Configuration", Increased reliability for position and standings calculations for retired cars, Fixed Pitstop MFD for rF2, Fixed Pitstop MFD for R3E
 Components=Media->5.3.0,Configuration->5.4.8,Utilities->5.4.8
 [Release]
 Version=5.4.8.0-release
@@ -28,7 +28,7 @@ Utilities.5.4.8.Path=.
 Utilities.5.4.8.Content=Utilities
 Utilities.5.4.8.Download=https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+5.4.8.zip
 [Current]
-Type=Release
+Type=Development
 [Version]
-Development=5.4.8.0-release
+Development=5.5.0.0-dev
 Release=5.4.8.0-release

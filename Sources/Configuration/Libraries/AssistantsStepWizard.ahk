@@ -178,10 +178,10 @@ class AssistantsStepWizard extends ActionsStepWizard {
 							}
 					}
 
-				Plugin(assistant, false, true, "", arguments).saveToConfiguration(configuration)
+				Plugin(assistant, false, true, "", arguments).saveToConfiguration(configuration, false)
 			}
 			else
-				Plugin(assistant, false, false, "", "").saveToConfiguration(configuration)
+				Plugin(assistant, false, false, "", "").saveToConfiguration(configuration, false)
 
 		Plugin("Team Server", false, assistantActive, "", "").saveToConfiguration(configuration)
 	}

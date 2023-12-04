@@ -73,8 +73,11 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 		super.__New(controller, name, simulator, configuration)
 
 		if (this.Active || (isDebug() && isDevelopment())) {
-			this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", "I")
-
+			if !inList(A_Args, "-Replay")
+				this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", "I")
+			else
+				this.iOpenPitstopMFDHotkey := "Off"
+				
 			this.iPreviousOptionHotkey := this.getArgumentValue("previousOption", "Z")
 			this.iNextOptionHotkey := this.getArgumentValue("nextOption", "H")
 			this.iPreviousChoiceHotkey := this.getArgumentValue("previousChoice", "G")
@@ -112,10 +115,14 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 			return false
 		}
 
-		if (this.OpenPitstopMFDHotkey != "Off") {
-			this.sendCommand(this.OpenPitstopMFDHotkey)
+		if this.activateWindow() {
+			if (this.OpenPitstopMFDHotkey != "Off") {
+				this.sendCommand(this.OpenPitstopMFDHotkey)
 
-			return true
+				return true
+			}
+			else
+				return false
 		}
 		else
 			return false
@@ -262,16 +269,14 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 	setPitstopRefuelAmount(pitstopNumber, liters) {
 		super.setPitstopRefuelAmount(pitstopNumber, liters)
 
-		if (this.OpenPitstopMFDHotkey != "Off") {
-			this.requirePitstopMFD()
+		if (this.OpenPitstopMFDHotkey != "Off")
+			if this.requirePitstopMFD()
+				if this.selectPitstopOption("Refuel") {
+					this.dialPitstopOption("Refuel", "Decrease", 250)
+					this.dialPitstopOption("Refuel", "Increase", Round(liters))
 
-			if this.selectPitstopOption("Refuel") {
-				this.dialPitstopOption("Refuel", "Decrease", 250)
-				this.dialPitstopOption("Refuel", "Increase", Round(liters))
-
-				this.closePitstopMFD("Refuel")
-			}
-		}
+					this.closePitstopMFD("Refuel")
+				}
 	}
 
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
@@ -282,19 +287,17 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			delta := this.tyreCompoundIndex(compound, compoundColor)
 
-			if (!compound || delta) {
-				this.requirePitstopMFD()
+			if (!compound || delta)
+				if this.requirePitstopMFD()
+					if this.selectPitstopOption("Tyre Compound") {
+						this.dialPitstopOption("Tyre Compound", "Decrease", 10)
 
-				if this.selectPitstopOption("Tyre Compound") {
-					this.dialPitstopOption("Tyre Compound", "Decrease", 10)
+						this.iTyreCompoundChosen := delta
 
-					this.iTyreCompoundChosen := delta
+						this.dialPitstopOption("Tyre Compound", "Increase", this.iTyreCompoundChosen)
 
-					this.dialPitstopOption("Tyre Compound", "Increase", this.iTyreCompoundChosen)
-
-					this.closePitstopMFD("Tyre Compound")
-				}
-			}
+						this.closePitstopMFD("Tyre Compound")
+					}
 		}
 	}
 
@@ -302,19 +305,15 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 		super.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine)
 
 		if (this.OpenPitstopMFDHotkey != "Off") {
-			if (this.iRepairSuspensionChosen != repairSuspension) {
-				this.requirePitstopMFD()
+			if (this.iRepairSuspensionChosen != repairSuspension)
+				if this.requirePitstopMFD()
+					if this.selectPitstopOption("Repair Suspension")
+						this.changePitstopOption("Repair Suspension")
 
-				if this.selectPitstopOption("Repair Suspension")
-					this.changePitstopOption("Repair Suspension")
-			}
-
-			if (this.iRepairBodyworkChosen != repairBodywork) {
-				this.requirePitstopMFD()
-
-				if this.selectPitstopOption("Repair Bodywork")
-					this.changePitstopOption("Repair Bodywork")
-			}
+			if (this.iRepairBodyworkChosen != repairBodywork)
+				if this.requirePitstopMFD()
+					if this.selectPitstopOption("Repair Bodywork")
+						this.changePitstopOption("Repair Bodywork")
 		}
 	}
 

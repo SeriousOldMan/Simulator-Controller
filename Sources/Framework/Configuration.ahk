@@ -860,14 +860,14 @@ class Plugin extends ConfigurationItem {
 		}
 	}
 
-	saveToConfiguration(configuration) {
+	saveToConfiguration(configuration, merge := true) {
 		local descriptor, arguments, key, value, result, argument, values
 
 		super.saveToConfiguration(configuration)
 
 		descriptor := getMultiMapValue(configuration, "Plugins", this.Plugin, "")
 
-		if (StrLen(descriptor) > 0) {
+		if (merge && (StrLen(descriptor) > 0)) {
 			descriptor := StrSplit(descriptor, "|", " `t", 3)
 
 			if (descriptor.Length > 0) {
@@ -922,6 +922,11 @@ class Plugin extends ConfigurationItem {
 
 	setArgumentValue(argument, value) {
 		this.iArguments[argument] := value
+	}
+
+	removeArgument(argument) {
+		if this.hasArgument(argument)
+			return this.iArguments.Delete(argument)
 	}
 
 	parseValues(delimiter, string) {

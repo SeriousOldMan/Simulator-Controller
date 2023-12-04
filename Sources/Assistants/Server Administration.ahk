@@ -828,7 +828,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 
 		administrationGui.Add("Button", "x" . x0 . " y430 w80 h23 Y:Move vrefreshObjectsListButton", translate("Refresh")).OnEvent("Click", administrationEditor.Bind(kEvent, "LoadObjects"))
 
-		administrationGui.Add("Button", "x" . (x0 + 372 - 80) . " y430 w80 h23 Y:Move vcleanupDatabaseButton", translate("Compact...")).OnEvent("Click", administrationEditor.Bind(kEvent, "CompactDatabase"))
+		administrationGui.Add("Button", "x" . (x0 + 372 - 80) . " y430 w80 h23 Y:Move X:Move vcleanupDatabaseButton", translate("Compact...")).OnEvent("Click", administrationEditor.Bind(kEvent, "CompactDatabase"))
 
 		administrationGui.Add(AdministrationResizer(administrationGui))
 

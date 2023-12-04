@@ -199,7 +199,7 @@ class PitstopToggleAction extends PitstopAction {
 
 class SimulatorPlugin extends ControllerPlugin {
 	static sActiveSimulator := false
-	static sActiveimulation := false
+	static sActiveSimulation := false
 
 	iCommandMode := "Event"
 	iCommandDelay := kUndefined
@@ -498,12 +498,19 @@ class SimulatorPlugin extends ControllerPlugin {
 	activateWindow() {
 		local window := this.Simulator.WindowTitle
 
-		if !WinExist(window)
+		if !WinExist(window) {
 			if isDebug()
 				showMessage(this.Simulator[true] . " not found...")
 
-		if !WinActive(window)
+			return false
+		}
+		else if !WinActive(window) {
 			WinActivate(window)
+			
+			return WinActive(window)
+		}
+		else
+			return true
 	}
 
 	sendCommand(command, delay?) {
@@ -533,7 +540,8 @@ class SimulatorPlugin extends ControllerPlugin {
 	}
 
 	runningSimulator() {
-		return (this.Simulator.isRunning() ? this.Simulator.Application : false)
+		return (this.Simulator.isRunning() ? this.Simulator.Application
+										   : ((SimulatorPlugin.ActiveSimulation = this.Simulator.Application) ? SimulatorPlugin.ActiveSimulation : false))
 	}
 
 	simulatorStartup(simulator) {
@@ -1077,13 +1085,12 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 			action := this.TrackAutomation.Actions[actionNr]
 
 			if (action.Type = "Hotkey") {
-				this.activateWindow()
+				if this.activateWindow()
+					for ignore, theHotkey in string2Values("|", action.Action) {
+						this.sendCommand(theHotKey)
 
-				for ignore, theHotkey in string2Values("|", action.Action) {
-					this.sendCommand(theHotKey)
-
-					Sleep(25)
-				}
+						Sleep(25)
+					}
 			}
 			else if (action.Type = "Command")
 				execute(action.Action)

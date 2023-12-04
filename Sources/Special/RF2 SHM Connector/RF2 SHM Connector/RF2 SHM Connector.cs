@@ -107,7 +107,7 @@ namespace SHMConnector {
             else if (request.StartsWith("Standings"))
                 return this.ReadStandings();
             else
-                return this.ReadData() + this.ReadSetup();
+                return this.ReadData(); // + this.ReadSetup();
         }
 
         public string GetForname(byte[] name) {
@@ -811,7 +811,7 @@ namespace SHMConnector {
 		}
 		
 		private bool SelectPitstopOption(string option, string direction) {
-			int tries = 5;
+			int tries = 2;
 
 			pitInfoBuffer.GetMappedData(ref pitInfo);
 
@@ -833,7 +833,7 @@ namespace SHMConnector {
 		}
 
 		private bool SelectPitstopCategory(string category) {
-			int tries = 5;
+			int tries = 2;
 
 			pitInfoBuffer.GetMappedData(ref pitInfo);
 

@@ -76,7 +76,7 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 			}
 			catch Any as exception {
 				logError(exception, true)
-					
+
 				logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider ("), {simulator: simulator, protocol: "SHM"})
 									   . exePath . translate(") - please rebuild the applications in the binaries folder (")
 									   . kBinariesDirectory . translate(")"))
@@ -304,6 +304,29 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 
 			this.iSelectedDriver := nextDriver[2]
 		}
+	}
+
+	acquireTelemetryData() {
+		local telemetryData := super.acquireTelemetryData()
+
+		static lastSimulator := false
+		static lastCar := false
+		static lastTrack := false
+
+		static loadSetup := false
+
+		if ((this.Simulator[true] != lastSimulator) || (this.Car != lastCar) || (this.Track != lastTrack)) {
+			lastSimulator := this.Simulator[true]
+			lastCar := this.Car
+			lastTrack := this.Track
+
+			loadSetup := SettingsDatabase().readSettingValue(lastSimulator, lastCar, lastTrack, "*", "Simulator.rFactor 2", "Session.Data.Setup", false)
+		}
+
+		if loadSetup
+			addMultiMapValues(telemetryData, this.readSessionData("Setup=true"))
+
+		return telemetryData
 	}
 
 	updateTelemetryData(data) {

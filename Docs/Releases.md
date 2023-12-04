@@ -7,6 +7,7 @@
   6. The compatibility of "Simulator Setup" and "Simulator Configuration" has been increased further.
   7. Increased reliability for position and standings calculations for retired cars.
   8. [Developer only] You can now run a replay of a recorded session for debugging purposes. Make a copy of the *Temp\XXX Data* folder, with *XXX* the three-letter code for the given simulator. Then start "Simulator Controller" with arguments "-replay *dataFolder*" (*dataFolder* points to the beforementioned data folder.
+  9. [Internal] Finalized migration of all Simulator Controller downloadable components to AWS.
 
 ## 5.4.8.0-release 12/01/23
   1. Minor bugfixes, as always

@@ -2,14 +2,16 @@
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed a couple of bugs in the handling of the *rFactor 2* pitstop setup.
-  4. The handling of the *Automobilista 2* ICM has changed. You must now [set the ICM to the Pitstop page](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#special-requirements-when-using-the-pitstop-automation-1) before using any of the automation auf Simulator Controller.
-  5. Added a setting to the "Race Settings" which allow you to promote the Assistants into fully autonomous mode for strategy and pitstop handling. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#autonomous-mode) for more information.
-  6. A corresponding setting is available in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) of the "Session Database".
-  7. The Assistants now detect correctly that you have have quitted a session in the formation lap and started a new session.
-  8. The compatibility of "Simulator Setup" and "Simulator Configuration" has been increased further.
+  4. The handling of the *Automobilista 2* ICM has changed. You must now [set the ICM to the Pitstop page](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#special-requirements-when-using-the-pitstop-automation-1) before using any of the automation of Simulator Controller.
+  5. A new setting in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database" allows you to set the interval, in which pitstop setup information is requested from *rFactor 2*. Default is once per minute.
+  6. Added a setting to the "Race Settings" which allow you to promote the Assistants into fully autonomous mode for strategy and pitstop handling. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#autonomous-mode) for more information.
+  7. A corresponding setting is available in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) of the "Session Database".
+  8. The Assistants now detect correctly that you have have quitted a session in the formation lap and started a new session with a different car or a different track.
   9. Increased reliability for position and standings calculations for retired cars.
-  10. [Developer only] You can now run a replay of a recorded session for debugging purposes. Make a copy of the *Temp\XXX Data* folder, with *XXX* the three-letter code for the given simulator. Then start "Simulator Controller" with arguments "-replay *dataFolder*" (*dataFolder* points to the beforementioned data folder.
-  11. [Internal] Finalized migration of all Simulator Controller downloadable components to AWS.
+  10. The compatibility of "Simulator Setup" and "Simulator Configuration" has been increased further.
+  11. It is no longer necessary to hold down the Control key, if you want to revisit the "Basic" configuration step in "Simulator Setup".
+  12. [Developer only] You can now run a replay of a recorded session for debugging purposes. Make a copy of the *Temp\XXX Data* folder, with *XXX* the three-letter code for the given simulator. Then start "Simulator Controller" with arguments "-replay *dataFolder*" (*dataFolder* points to the beforementioned data folder.
+  13. [Internal] Finalized migration of all Simulator Controller downloadable components to AWS.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-550).
 

@@ -1,4 +1,4 @@
-## 5.5.0.0-release 12/06/23 (planned)
+## 5.5.0.0-release 12/06/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed a couple of bugs in the handling of the *rFactor 2* pitstop setup.

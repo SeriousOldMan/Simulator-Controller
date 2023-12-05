@@ -569,7 +569,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 				if this.optionChosen("Refuel")
 					this.sendCommand(this.AcceptChoiceHotkey)
 
-				this.changeFuelAmount("Decrease", 200, false, true, false)
+				this.changeFuelAmount("Decrease", 250, false, true, false)
 
 				this.changeFuelAmount("Increase", liters + 3, false, false, false)
 

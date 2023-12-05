@@ -315,6 +315,7 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 		static lastTrack := false
 
 		static loadSetup := false
+		static nextSetupUpdate := false
 
 		if ((this.Simulator[true] != lastSimulator) || (this.Car != lastCar) || (this.Track != lastTrack)) {
 			lastSimulator := this.Simulator[true]
@@ -324,8 +325,13 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 			loadSetup := SettingsDatabase().readSettingValue(lastSimulator, lastCar, lastTrack, "*", "Simulator.rFactor 2", "Session.Data.Setup", false)
 		}
 
-		if loadSetup
+		if (loadSetup == true)
 			addMultiMapValues(telemetryData, this.readSessionData("Setup=true"))
+		else if (loadSetup && (A_TickCount > nextSetupUpdate)) {
+			addMultiMapValues(telemetryData, this.readSessionData("Setup=true"))
+
+			nextSetupUpdate := (A_TickCount + (loadSetup * 1000))
+		}
 
 		return telemetryData
 	}

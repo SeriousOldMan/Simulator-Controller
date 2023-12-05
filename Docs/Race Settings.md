@@ -162,7 +162,16 @@ The following settings are only available, if you have selected the correspondin
 |            | Repair duration for suspension damage    | Float   | 31.0                            | This value is multiplied with the internal damage percentage to compute the number of seconds need to repair the suspension at a pitstop. |
 |            | Repair duration for engine damage        | Float   | 0.0                             | This value is multiplied with the internal damage percentage to compute the number of seconds need to repair the engine at a pitstop. |
 
-3. *Automobilista 2*, *Project Cars 2*, *iRacing* and *RaceRoom Racing Experience*
+3. *rFactor 2*
+
+| Category   | Setting                                  | Type    | Default                         | Description  |
+|------------|------------------------------------------|---------|---------------------------------|--------------|
+| Data       | Pitstop setup update interval            | Integer | 60                              | Specifies how often the current choices in the Pitstop menu are requested. Since the API call moves the cursor in the menu, it can be very annoying for the driver, when this is done to often. If 0, the data is never requested. Otherwise specify a number of seconds to wait between each request. Default is 60 seconds. |
+| Pitstop    | Repair duration for bodywork damage      | Float   | 0.0                             | This value is multiplied with the internal damage percentage to compute the number of seconds need to repair the bodywork at a pitstop. |
+|            | Repair duration for suspension damage    | Float   | 0.0                             | This value is multiplied with the internal damage percentage to compute the number of seconds need to repair the suspension at a pitstop. |
+|            | Repair duration for engine damage        | Float   | 0.0                             | This value is multiplied with the internal damage percentage to compute the number of seconds need to repair the engine at a pitstop. |
+
+4. *Automobilista 2*, *Project Cars 2*, *iRacing* and *RaceRoom Racing Experience*
 
 | Category   | Setting                                  | Type    | Default                         | Description  |
 |------------|------------------------------------------|---------|---------------------------------|--------------|

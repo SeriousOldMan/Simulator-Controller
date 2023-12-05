@@ -3,7 +3,7 @@ Version=5.5.0.0-dev
 Target=5.5.0.0-release
 Date=12/05/2023
 Download=
-Changes=Added autonomous mode in "Race Settings", Detect simulator, car and track change during the first lap by the Assistants, New Replay mode for Developer, Increased compatibility of "Simulator Setup" and "Simulator Configuration", Increased reliability for position and standings calculations for retired cars, Fixed Pitstop MFD for rF2, Fixed Pitstop MFD for R3E
+Changes=Added autonomous mode in "Race Settings", Detect simulator, car and track change during the first lap by the Assistants, New Replay mode for Developer, Increased compatibility of "Simulator Setup" and "Simulator Configuration", Increased reliability for position and standings calculations for retired cars, Fixed Pitstop MFD for AMS2, Fixed Pitstop MFD for rF2, Fixed Pitstop MFD for R3E, Optimized rFactor 2 pitstop settings acquisition
 Components=Media->5.3.0,Configuration->5.4.8,Utilities->5.4.8
 [Release]
 Version=5.4.8.0-release

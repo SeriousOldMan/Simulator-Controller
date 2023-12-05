@@ -506,7 +506,7 @@ class SimulatorPlugin extends ControllerPlugin {
 		}
 		else if !WinActive(window) {
 			WinActivate(window)
-			
+
 			return WinActive(window)
 		}
 		else
@@ -539,9 +539,12 @@ class SimulatorPlugin extends ControllerPlugin {
 			Sleep(delay)
 	}
 
-	runningSimulator() {
-		return (this.Simulator.isRunning() ? this.Simulator.Application
-										   : ((SimulatorPlugin.ActiveSimulation = this.Simulator.Application) ? SimulatorPlugin.ActiveSimulation : false))
+	runningSimulator(active := false) {
+		if active
+			return (this.Simulator.isRunning() ? this.Simulator.Application : false)
+		else
+			return (this.Simulator.isRunning() ? this.Simulator.Application
+											   : ((SimulatorPlugin.ActiveSimulation = this.Simulator.Application) ? SimulatorPlugin.ActiveSimulation : false))
 	}
 
 	simulatorStartup(simulator) {

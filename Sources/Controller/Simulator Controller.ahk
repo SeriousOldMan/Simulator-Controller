@@ -562,7 +562,7 @@ class SimulatorController extends ConfigurationItem {
 
 	ActiveSimulator {
 		Get {
-			return this.runningSimulator()
+			return this.runningSimulator(true)
 		}
 	}
 
@@ -779,7 +779,7 @@ class SimulatorController extends ConfigurationItem {
 
 			for ignore, thePlugin in this.Plugins
 				if this.isActive(thePlugin) {
-					simulator := thePlugin.runningSimulator()
+					simulator := thePlugin.runningSimulator(true)
 
 					if isDebug() {
 						label := thePlugin.Plugin

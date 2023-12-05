@@ -141,7 +141,7 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 		local steps
 
 		if (this.OpenPitstopMFDHotkey != "Off") {
-			this.sendCommand(this.NextChoiceHotkey)
+			; this.sendCommand(this.NextChoiceHotkey)
 
 			steps := false
 
@@ -193,7 +193,7 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 			loop steps
 				this.sendCommand(this.NextOptionHotkey)
 
-			this.sendCommand(this.NextChoiceHotkey)
+			; this.sendCommand(this.NextChoiceHotkey)
 		}
 	}
 

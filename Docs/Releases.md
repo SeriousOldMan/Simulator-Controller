@@ -4,7 +4,7 @@
   3. Fixed a couple of bugs in the handling of the *rFactor 2* pitstop setup.
   4. Fixed position and standings handling for *rFactor 2*.
   5. A new setting in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database" allows you to set the interval, in which pitstop setup information is requested from *rFactor 2*. Default is once per minute.
-  6. The handling of the *Automobilista 2* ICM has changed. You must now [set the ICM to the Pitstop page](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#special-requirements-when-using-the-pitstop-automation-1) before using any of the automation of Simulator Controller.
+  6. The handling of the *Automobilista 2* ICM has changed. You must now [set the ICM to the Pitstop page](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#special-requirements-when-using-the-pitstop-automation-1) and select the line at the bottom before using any of the automation of Simulator Controller.
   7. Added a switch in the "Race Settings" app which allows you to promote the Assistants into fully autonomous mode for strategy and pitstop handling. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#autonomous-mode) for more information.
   8. A corresponding setting is available in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) of the "Session Database".
   9. The Assistants now detect correctly that you have have quitted a session in the formation lap and started a new session with a different car or a different track.

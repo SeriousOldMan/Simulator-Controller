@@ -37,7 +37,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 5.5.0
 
-The handling of the *Automobilista 2* ICM has changed. You must now [set the ICM to the Pitstop page](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#special-requirements-when-using-the-pitstop-automation-1) before using any of the automation auf Simulator Controller.
+The handling of the *Automobilista 2* ICM has changed. You must now [set the ICM to the Pitstop page](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#special-requirements-when-using-the-pitstop-automation-1) and select the line at the bottom before using any of the automation auf Simulator Controller.
 
 ***
 

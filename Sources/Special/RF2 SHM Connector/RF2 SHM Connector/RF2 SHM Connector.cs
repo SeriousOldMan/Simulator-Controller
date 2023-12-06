@@ -228,8 +228,8 @@ namespace SHMConnector {
 					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".InPitLane="); strWriter.WriteLine(vehicle.mInPits != 0 ? "true" : "false");
 					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".InPit="); strWriter.WriteLine(vehicle.mPitState == (byte)Stopped ? "true" : "false");
 
-					if (Object.ReferenceEquals(vehicle, playerVehicle))
-					{
+					if (vehicle.mIsPlayer == 1)
+                    {
 						strWriter.Write("Driver.Car=");
 						strWriter.WriteLine(i);
 					}
@@ -489,9 +489,9 @@ namespace SHMConnector {
 			return nullIdx >= 0 ? Encoding.Default.GetString(bytes, 0, nullIdx) : Encoding.Default.GetString(bytes);
 		}
 
-		public static rF2VehicleScoring GetPlayerScoring(ref rF2Scoring scoring) {
-			var playerVehScoring = new rF2VehicleScoring();
+        static rF2VehicleScoring noPlayer = new rF2VehicleScoring();
 
+        public static ref rF2VehicleScoring GetPlayerScoring(ref rF2Scoring scoring) {
 			for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i) {
 				var vehicle = scoring.mVehicles[i];
 
@@ -500,7 +500,7 @@ namespace SHMConnector {
 					case rFactor2Constants.rF2Control.Player:
 					case rFactor2Constants.rF2Control.Remote:
 						if (vehicle.mIsPlayer == 1)
-							playerVehScoring = vehicle;
+							break;
 
 						break;
 
@@ -508,11 +508,11 @@ namespace SHMConnector {
 						continue;
 				}
 
-				if (playerVehScoring.mIsPlayer == 1)
+				if (vehicle.mIsPlayer == 1)
 					break;
 			}
 
-			return playerVehScoring;
+			return ref noPlayer;
 		}
 
 		public static rF2VehicleTelemetry GetPlayerTelemetry(int id, ref rF2Telemetry telemetry) {

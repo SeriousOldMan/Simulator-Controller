@@ -562,7 +562,7 @@ class SimulatorController extends ConfigurationItem {
 
 	ActiveSimulator {
 		Get {
-			return this.runningSimulator(true)
+			return this.runningSimulator()
 		}
 	}
 
@@ -900,7 +900,7 @@ class SimulatorController extends ConfigurationItem {
 		static registeredCommands := false
 
 		command := StrReplace(command, ";", ",")
-		
+
 		if !registeredCommands
 			registeredCommands := CaseInsenseMap()
 
@@ -1708,7 +1708,7 @@ class ControllerPlugin extends Plugin {
 			controller.disconnectAction(this, theAction.Function, theAction)
 	}
 
-	runningSimulator() {
+	runningSimulator(active := false) {
 		return false
 	}
 

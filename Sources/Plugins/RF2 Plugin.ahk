@@ -326,7 +326,7 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 			lastCar := this.Car
 			lastTrack := this.Track
 
-			loadSetup := SettingsDatabase().readSettingValue(lastSimulator, lastCar, lastTrack, "*", "Simulator.rFactor 2", "Session.Data.Setup", false)
+			loadSetup := SettingsDatabase().readSettingValue(lastSimulator, lastCar, lastTrack, "*", "Simulator.rFactor 2", "Session.Data.Setup", 60)
 		}
 
 		if (loadSetup == true)

@@ -998,8 +998,11 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	static stopSimulation(simulator) {
-		if (RaceAssistantPlugin.Simulator == simulator)
+		if (RaceAssistantPlugin.Simulator == simulator) {
+			RaceAssistantPlugin.finishAssistantsSession()
+
 			RaceAssistantPlugin.sSimulator := false
+		}
 	}
 
 	static connectTeamSession() {

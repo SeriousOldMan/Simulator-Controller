@@ -857,8 +857,6 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	simulatorShutdown(simulator) {
-		local raceEngineer, raceStrategist, raceSpotter
-
 		super.simulatorShutdown(simulator)
 
 		if (simulator = this.Simulator.Application) {

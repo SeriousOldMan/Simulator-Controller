@@ -753,7 +753,7 @@ checkInstallation() {
 					logError(exception, true)
 
 					OnMessage(0x44, translateOkButton)
-					MsgBox(translate("An error occured while updating. The current installation files may be corrupted. Please retry the update or run a manual installation."), translate("Error"), 262160)
+					MsgBox(translate("An error occured during installation. The current installation files may be corrupted. Please retry the installation or run a manual installation."), translate("Error"), 262160)
 					OnMessage(0x44, translateOkButton, 0)
 
 					ExitApp(0)

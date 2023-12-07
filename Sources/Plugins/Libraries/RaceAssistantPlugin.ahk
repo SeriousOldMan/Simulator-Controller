@@ -833,8 +833,14 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		if !RaceAssistantPlugin.sCollectorTask {
 			index := inList(A_Args, "-Replay")
 
+			MsgBox(values2String("   ", A_Args*))
+
 			if index
-				RaceAssistantPlugin.sReplayDirectory := A_Args[index + 1]
+				RaceAssistantPlugin.sReplayDirectory := (normalizeDirectoryPath(A_Args[index + 1]) . "\")
+
+			MsgBox(RaceAssistantPlugin.sReplayDirectory)
+
+			RaceAssistantPlugin.sReplayDirectory := "C:\Users\juwig\Documents\Development\ACC Data\"
 
 			RaceAssistantPlugin.sCollectorTask
 				:= PeriodicTask(ObjBindMethod(RaceAssistantPlugin, "collectSessionData"), 1000, kHighPriority)

@@ -5555,12 +5555,15 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	chooseScenario(strategy) {
-		if strategy {
-			if this.Strategy
-				strategy.PitstopRule := this.Strategy.PitstopRule
+		if strategy
+			if (this.LastLap && (strategy.Pitstops.Length > 0) && (strategy.Pitstops[1].Lap < (this.LastLap.Nr + 1)))
+				return
+			else {
+				if this.Strategy
+					strategy.PitstopRule := this.Strategy.PitstopRule
 
-			this.selectStrategy(strategy, true)
-		}
+				this.selectStrategy(strategy, true)
+			}
 	}
 
 	startWorking(state := true) {

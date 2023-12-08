@@ -2726,6 +2726,11 @@ class StrategyWorkbench extends ConfigurationItem {
 						}
 					}
 				}
+				else {
+					OnMessage(0x44, translateOkButton)
+					MsgBox(translate("There is no current Strategy."), translate("Information"), 262192)
+					OnMessage(0x44, translateOkButton, 0)
+				}
 			case 7: ; "Compare Strategies..."
 				this.Window.Opt("+OwnDialogs")
 
@@ -2751,6 +2756,11 @@ class StrategyWorkbench extends ConfigurationItem {
 					this.SelectedStrategy.saveToConfiguration(configuration)
 
 					writeMultiMap(kUserConfigDirectory . "Race.strategy", configuration)
+				}
+				else {
+					OnMessage(0x44, translateOkButton)
+					MsgBox(translate("There is no current Strategy."), translate("Information"), 262192)
+					OnMessage(0x44, translateOkButton, 0)
 				}
 			case 10: ; "Clear Strategy..."
 				deleteFile(kUserConfigDirectory . "Race.strategy")

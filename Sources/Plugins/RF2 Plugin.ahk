@@ -52,7 +52,7 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 				this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", false)
 			else
 				this.iOpenPitstopMFDHotkey := "Off"
-				
+
 			this.iClosePitstopMFDHotkey := this.getArgumentValue("closePitstopMFD", false)
 		}
 	}
@@ -248,44 +248,48 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 	setPitstopRefuelAmount(pitstopNumber, liters) {
 		super.setPitstopRefuelAmount(pitstopNumber, liters)
 
-		this.sendPitstopCommand("Pitstop", "Set", "Refuel", Round(liters))
+		if (this.OpenPitstopMFDHotkey && (this.OpenPitstopMFDHotkey != "Off"))
+			this.sendPitstopCommand("Pitstop", "Set", "Refuel", Round(liters))
 	}
 
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
 		super.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
 
-		if compound {
-			compound := this.tyreCompoundCode(compound, compoundColor)
-
+		if (this.OpenPitstopMFDHotkey && (this.OpenPitstopMFDHotkey != "Off"))
 			if compound {
-				this.sendPitstopCommand("Pitstop", "Set", "Tyre Compound", compound)
+				compound := this.tyreCompoundCode(compound, compoundColor)
 
-				if set
-					this.sendPitstopCommand("Pitstop", "Set", "Tyre Set", Round(set))
+				if compound {
+					this.sendPitstopCommand("Pitstop", "Set", "Tyre Compound", compound)
+
+					if set
+						this.sendPitstopCommand("Pitstop", "Set", "Tyre Set", Round(set))
+				}
 			}
-		}
-		else
-			this.sendPitstopCommand("Pitstop", "Set", "Tyre Compound", "None")
+			else
+				this.sendPitstopCommand("Pitstop", "Set", "Tyre Compound", "None")
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
 		super.setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR)
 
-		this.sendPitstopCommand("Pitstop", "Set", "Tyre Pressure"
-							  , Round(pressureFL, 1), Round(pressureFR, 1), Round(pressureRL, 1), Round(pressureRR, 1))
+		if (this.OpenPitstopMFDHotkey && (this.OpenPitstopMFDHotkey != "Off"))
+			this.sendPitstopCommand("Pitstop", "Set", "Tyre Pressure"
+								  , Round(pressureFL, 1), Round(pressureFR, 1), Round(pressureRL, 1), Round(pressureRR, 1))
 	}
 
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine := false) {
 		super.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine)
 
-		if (repairBodywork && repairSuspension)
-			this.sendPitstopCommand("Pitstop", "Set", "Repair", "Both")
-		else if repairSuspension
-			this.sendPitstopCommand("Pitstop", "Set", "Repair", "Suspension")
-		else if repairBodywork
-			this.sendPitstopCommand("Pitstop", "Set", "Repair", "Bodywork")
-		else
-			this.sendPitstopCommand("Pitstop", "Set", "Repair", "Nothing")
+		if (this.OpenPitstopMFDHotkey && (this.OpenPitstopMFDHotkey != "Off"))
+			if (repairBodywork && repairSuspension)
+				this.sendPitstopCommand("Pitstop", "Set", "Repair", "Both")
+			else if repairSuspension
+				this.sendPitstopCommand("Pitstop", "Set", "Repair", "Suspension")
+			else if repairBodywork
+				this.sendPitstopCommand("Pitstop", "Set", "Repair", "Bodywork")
+			else
+				this.sendPitstopCommand("Pitstop", "Set", "Repair", "Nothing")
 	}
 
 	requestPitstopDriver(pitstopNumber, driver) {
@@ -293,22 +297,23 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 
 		super.requestPitstopDriver(pitstopNumber, driver)
 
-		if driver {
-			driver := string2Values("|", driver)
+		if (this.OpenPitstopMFDHotkey && (this.OpenPitstopMFDHotkey != "Off"))
+			if driver {
+				driver := string2Values("|", driver)
 
-			nextDriver := string2Values(":", driver[2])
-			currentDriver := string2Values(":", driver[1])
+				nextDriver := string2Values(":", driver[2])
+				currentDriver := string2Values(":", driver[1])
 
-			if !this.iSelectedDriver
-				this.iSelectedDriver := currentDriver[2]
+				if !this.iSelectedDriver
+					this.iSelectedDriver := currentDriver[2]
 
-			delta := (nextDriver[2] - this.iSelectedDriver)
+				delta := (nextDriver[2] - this.iSelectedDriver)
 
-			loop Abs(delta)
-				this.changePitstopOption("Driver", (delta < 0) ? "Decrease" : "Increase")
+				loop Abs(delta)
+					this.changePitstopOption("Driver", (delta < 0) ? "Decrease" : "Increase")
 
-			this.iSelectedDriver := nextDriver[2]
-		}
+				this.iSelectedDriver := nextDriver[2]
+			}
 	}
 
 	acquireTelemetryData() {

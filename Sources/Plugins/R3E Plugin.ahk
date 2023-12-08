@@ -543,7 +543,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	startPitstopSetup(pitstopNumber) {
 		super.startPitstopSetup(pitstopNumber)
 
-		if (this.OpenPitstopMFDHotkey != "Off")
+		if (this.OpenPitstopMFDHotkey && (this.OpenPitstopMFDHotkey != "Off"))
 			if this.requirePitstopMFD()
 				if this.optionChosen("Request Pitstop")
 					this.toggleActivity("Request Pitstop", false, true)
@@ -552,7 +552,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	finishPitstopSetup(pitstopNumber) {
 		super.finishPitstopSetup(pitstopNumber)
 
-		if (this.OpenPitstopMFDHotkey != "Off")
+		if (this.OpenPitstopMFDHotkey && (this.OpenPitstopMFDHotkey != "Off"))
 			if this.activateWindow() {
 				loop 10
 					this.sendCommand(this.NextOptionHotkey)
@@ -564,7 +564,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	setPitstopRefuelAmount(pitstopNumber, liters) {
 		super.setPitstopRefuelAmount(pitstopNumber, liters)
 
-		if (this.OpenPitstopMFDHotkey != "Off") {
+		if (this.OpenPitstopMFDHotkey && (this.OpenPitstopMFDHotkey != "Off")) {
 			if this.optionAvailable("Refuel") {
 				if this.optionChosen("Refuel")
 					this.sendCommand(this.AcceptChoiceHotkey)
@@ -583,7 +583,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 
 		super.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
 
-		if (this.OpenPitstopMFDHotkey != "Off")
+		if (this.OpenPitstopMFDHotkey && (this.OpenPitstopMFDHotkey != "Off"))
 			if this.optionAvailable("Change Front Tyres")
 				if compound {
 					changed := false
@@ -623,7 +623,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine := false) {
 		super.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine)
 
-		if (this.OpenPitstopMFDHotkey != "Off") {
+		if (this.OpenPitstopMFDHotkey && (this.OpenPitstopMFDHotkey != "Off")) {
 			if this.optionAvailable("Repair Suspension")
 				if (repairSuspension != this.optionChosen("Repair Suspension"))
 					this.toggleActivity("Repair Suspension", false, true)

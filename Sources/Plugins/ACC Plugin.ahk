@@ -2094,7 +2094,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 						if !listEqual(pitstopState["tyreToChange"], [false, false, false, false]) {
 							pitstopData["Service.Tyre.Compound"] := ((pitstopState["newTyreCompound"] = 0) ? "Dry" : "Wet")
 							pitstopData["Service.Tyre.Compound.Color"] := "Black"
-							pitstopData["Service.Tyre.Set"] := ((pitstopState["newTyreCompound"] = 0) ? pitstopState["tyreSet"] : false)
+							; pitstopData["Service.Tyre.Set"] := ((pitstopState["newTyreCompound"] = 0) ? pitstopState["tyreSet"] : false)
 
 							pressures := pitstopState["tyrePressures"]
 
@@ -2130,7 +2130,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 									pitstopData["Tyre.Laps"] := false
 									pitstopData["Tyre.Compound"] := "Dry"
 									pitstopData["Tyre.Compound.Color"] := "Black"
-									pitstopData["Tyre.Set"] := (currentTyreSet + 1)
+									pitstopData["Tyre.Set"] := currentTyreSet
 
 									break
 								}

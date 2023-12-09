@@ -11342,7 +11342,7 @@ class RaceCenter extends ConfigurationItem {
 
 				tyreCompoundData.Push("<td class=`"td-std`">" . tyreCompound . "</td>")
 
-				tyreSet := serviceData["Tyre.Set"]
+				tyreSet := (serviceData["Tyre.Set"] ? serviceData["Tyre.Set"] : pitstopData["Tyre.Set"])
 				tyrePressures := serviceData["Tyre.Pressures"]
 
 				if (tyreCompound = "-") {

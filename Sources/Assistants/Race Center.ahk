@@ -11064,7 +11064,10 @@ class RaceCenter extends ConfigurationItem {
 				html .= ("<tr><td><b>" . translate("Tyre Compound:") . "</b></div></td><td>" . tyreCompound . "</td></tr>")
 
 				if ((tyreSet != false) && (tyreSet != "-"))
-					html .= ("<tr><td><b>" . translate("Tyre Set:") . "</b></div></td><td>" . serviceData["Tyre.Set"] . "</td></tr>")
+					if (serviceData["Tyre.Set"] && (serviceData["Tyre.Set"] != kNull) && (serviceData["Tyre.Set"] != "-"))
+						html .= ("<tr><td><b>" . translate("Tyre Set:") . "</b></div></td><td>" . serviceData["Tyre.Set"] . "</td></tr>")
+					else
+						html .= ("<tr><td><b>" . translate("Tyre Set:") . "</b></div></td><td>" . tyreSet . "</td></tr>")
 
 				html .= ("<tr><td><b>" . translate("Tyre Pressures:") . "</b></div></td><td>" . pressures . "</td></tr>")
 			}
@@ -11342,7 +11345,11 @@ class RaceCenter extends ConfigurationItem {
 
 				tyreCompoundData.Push("<td class=`"td-std`">" . tyreCompound . "</td>")
 
-				tyreSet := (serviceData["Tyre.Set"] ? serviceData["Tyre.Set"] : pitstopData["Tyre.Set"])
+				tyreSet := serviceData["Tyre.Set"]
+
+				if (!tyreSet || (tyreSet = kNull) || (tyreSet = "-"))
+					tyreSet := pitstopData["Tyre.Set"]
+
 				tyrePressures := serviceData["Tyre.Pressures"]
 
 				if (tyreCompound = "-") {
@@ -11350,6 +11357,9 @@ class RaceCenter extends ConfigurationItem {
 					tyrePressures := "-, -, -, -"
 				}
 				else {
+					if (!tyreSet || (tyreSet = kNull))
+						tyreSet := "-"
+
 					tyrePressures := string2Values(",", tyrePressures)
 
 					loop 4 {

@@ -2089,7 +2089,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 													, "Service.Refuel", pitstopState["fuelToAdd"]
 													, "Service.Bodywork.Repair", (pitstopState["repairBody"] ? true : false)
 													, "Service.Suspension.Repair", (pitstopState["repairSuspension"] ? true : false)
-													, "Service.Engine.Repair", false)
+													, "Service.Engine.Repair", (pitstopState["repairEngine"] ? true : false))
 
 						if !listEqual(pitstopState["tyreToChange"], [false, false, false, false]) {
 							pitstopData["Service.Tyre.Compound"] := ((pitstopState["newTyreCompound"] = 0) ? "Dry" : "Wet")

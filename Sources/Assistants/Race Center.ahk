@@ -6134,19 +6134,19 @@ class RaceCenter extends ConfigurationItem {
 			pitstop := pitstop[1]
 
 			if pitstopData.Has("Pitstop.Planned.Time.Service") {
-				pitstop["Time.Service"] := pitstopData["Pitstop.Planned.Time.Service"]
+				pitstop["Time.Service"] := Round(pitstopData["Pitstop.Planned.Time.Service"] / 1000)
 
 				sessionStore.changed("Pitstop.Data")
 			}
 
 			if pitstopData.Has("Pitstop.Planned.Time.Repairs") {
-				pitstop["Time.Repairs"] := pitstopData["Pitstop.Planned.Time.Repairs"]
+				pitstop["Time.Repairs"] := Round(pitstopData["Pitstop.Planned.Time.Repairs"] / 1000)
 
 				sessionStore.changed("Pitstop.Data")
 			}
 
 			if pitstopData.Has("Pitstop.Planned.Time.Pitlane") {
-				pitstop["Time.Pitlane"] := pitstopData["Pitstop.Planned.Time.Pitlane"]
+				pitstop["Time.Pitlane"] := Round(pitstopData["Pitstop.Planned.Time.Pitlane"] / 1000)
 
 				sessionStore.changed("Pitstop.Data")
 			}
@@ -7199,6 +7199,15 @@ class RaceCenter extends ConfigurationItem {
 						repairsTime := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Time.Repairs", kNull)
 						pitlaneTime := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Time.Pitlane", kNull)
 
+						if (serviceTime != kNull)
+							serviceTime := Round(serviceTime / 1000)
+
+						if (repairsTime != kNull)
+							repairsTime := Round(repairsTime / 1000)
+
+						if (pitlaneTime != kNull)
+							pitlaneTime := Round(pitlaneTime / 1000)
+
 						if (tyreCompound && (tyreCompound != "-")) {
 							pressures := values2String(", ", Round(pressureFL, 1), Round(pressureFR, 1)
 														   , Round(pressureRL, 1), Round(pressureRR, 1))
@@ -7256,7 +7265,8 @@ class RaceCenter extends ConfigurationItem {
 													, "Tyre.Pressure.Cold.Rear.Left", pressures[3], "Tyre.Pressure.Cold.Rear.Right", pressures[4]
 													, "Repair.Bodywork", repairBodywork, "Repair.Suspension", repairSuspension, "Repair.Engine", repairEngine
 													, "Driver.Current", currentDriver, "Driver.Next", nextDriver, "Status", "Planned"
-													, "Stint", this.CurrentStint.Nr + 1, "Time.Service", serviceTime, "Time.Repairs", repairsTime, "Time.Pitlane", pitlaneTime))
+													, "Stint", this.CurrentStint.Nr + 1
+													, "Time.Service", serviceTime, "Time.Repairs", repairsTime, "Time.Pitlane", pitlaneTime))
 					}
 				}
 			}
@@ -11026,20 +11036,20 @@ class RaceCenter extends ConfigurationItem {
 
 		html .= ("<tr><td><b>" . translate("Lap:") . "</b></div></td><td>" . ((pitstopData["Lap"] = "-") ? "-" : (pitstopData["Lap"] + 1)) . "</td></tr>")
 
-		time := ((pitstopData["Time.Service"] != kNull) ? displayValue("Float", pitstopData["Time.Service"], 1) : "")
+		time := ((pitstopData["Time.Service"] != kNull) ? displayValue("Float", pitstopData["Time.Service"], 0) : "")
 
 		if (pitstopData["Time.Repairs"] != kNull) {
 			if (time != "")
 				time .= translate(" / ")
 
-			time .= displayValue("Float", pitstopData["Time.Repairs"], 1)
+			time .= displayValue("Float", pitstopData["Time.Repairs"], 0)
 		}
 
 		if (pitstopData["Time.Pitlane"] != kNull) {
 			if (time != "")
 				time .= translate(" / ")
 
-			time .= displayValue("Float", pitstopData["Time.Pitlane"], 1)
+			time .= displayValue("Float", pitstopData["Time.Pitlane"], 0)
 		}
 
 		if (time != "")

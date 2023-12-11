@@ -769,9 +769,9 @@ priority: 20, [?Pitstop.Plan = true] =>
 		(Clear: Pitstop.Planned.Tyre.Pressure.Correction),
 		(Clear: Pitstop.Planned.Tyre.Pressure.Lost.FL), (Clear: Pitstop.Planned.Tyre.Pressure.Lost.FR),
 		(Clear: Pitstop.Planned.Tyre.Pressure.Lost.RL), (Clear: Pitstop.Planned.Tyre.Pressure.Lost.RR),
+		(Clear: Pitstop.Planned.Driver.Request),
 		(Clear: Pitstop.Planned.Repair.Suspension), (Clear: Pitstop.Planned.Repair.Bodywork), (Clear: Pitstop.Planned.Repair.Engine),
-		(Clear: Pitstop.Planned.Time),
-		(Clear: Pitstop.Planned.Driver.Request)
+		(Clear: Pitstop.Planned.Time)
 priority: 10, [?Pitstop.Plan] => (Prove: planPitstop())
 
 planPitstop() <= lastPitstop(?last), ?nr = ?last + 1, Set(Pitstop.Planned.Nr, ?nr)
@@ -918,7 +918,8 @@ priority: -20, [?Pitstop.Plan] => (Set: Pitstop.Planned), (Clear: Pitstop.Plan),
 {All: [?Pitstop.Planned], [?Pitstop.Planned.Lap > 0], [?Pitstop.Planned.Lap <= ?Lap]} => (Set: Pitstop.Prepare)
 
 {All: [?Pitstop.Planned], [?Pitstop.Prepare]} => (ProveAll: preparePitstop(!Pitstop.Planned.Nr))
-priority: -20, {All: [?Pitstop.Planned], [?Pitstop.Prepare]} => (Clear: Pitstop.Planned), (Clear: Pitstop.Prepare), (Set: Pitstop.Prepared)
+priority: -20, {All: [?Pitstop.Planned], [?Pitstop.Prepare]} => (Clear: Pitstop.Planned), (Clear: Pitstop.Prepare),
+																(Clear: Pitstop.Planned.Adjusted), (Set: Pitstop.Prepared)
 
 preparePitstop(?pitstopNumber) <= Call(startPitstopSetup, ?pitstopNumber)
 preparePitstop(?pitstopNumber) <= setRefuelAmount(?pitstopNumber),
@@ -979,7 +980,8 @@ priority: -10, [?Pitstop.Lap] => (Set: Pitstop.Clear, ?Pitstop.Lap)
 					(Clear: Pitstop.Planned.Repair.Suspension), (Clear: Pitstop.Planned.Repair.Bodywork),
 					(Clear: Pitstop.Planned.Repair.Engine),
 					(Clear: Pitstop.Planned.Time),
-					(Clear: Pitstop.Clear), (Clear: Pitstop.Lap), (Clear: Pitstop.Prepared), (Clear: Pitstop.Planned.Nr)
+					(Clear: Pitstop.Clear), (Clear: Pitstop.Lap), (Clear: Pitstop.Prepared),
+					(Clear: Pitstop.Planned.Nr), (Clear: Pitstop.Planned.Adjusted)
 				  
 updateDamageReported(?lap) <= ?lastLap = ?lap - 1, Set(Damage.Reported, ?lastLap), Set(Damage.Analysis.Reported, ?lap)
 

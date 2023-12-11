@@ -342,9 +342,9 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 		RaceAssistantPlugin.CollectorTask.Sleep := 10000
 	}
 
-	pitstopOptionChanged(option, values*) {
+	pitstopOptionChanged(option, verbose, values*) {
 		if this.RaceEngineer
-			this.RaceEngineer.pitstopOptionChanged(option, values*)
+			this.RaceEngineer.pitstopOptionChanged(option, verbose, values*)
 	}
 
 	pitstopPlanned(pitstopNumber, plannedLap := false) {

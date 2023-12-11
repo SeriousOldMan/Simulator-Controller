@@ -956,13 +956,14 @@ class RaceEngineer extends RaceAssistant {
 	updatePitstop(data) {
 		local knowledgeBase := this.KnowledgeBase
 		local result := false
+		local verbose := knowledgeBase.getValue("Pitstop.Planned.Adjusted", false)
 		local index, suffix, prssKey, changed, values
 
 		if this.hasPreparedPitstop() {
 			value := getMultiMapValue(data, "Setup Data", "FuelAmount", kUndefined)
 
 			if ((value != kUndefined) && (Round(knowledgeBase.getValue("Pitstop.Planned.Fuel"), 1) != Round(value, 1))) {
-				this.pitstopOptionChanged("Refuel", Round(value, 1))
+				this.pitstopOptionChanged("Refuel", verbose, Round(value, 1))
 
 				result := true
 			}
@@ -970,7 +971,15 @@ class RaceEngineer extends RaceAssistant {
 			value := getMultiMapValue(data, "Setup Data", "TyreCompound", kUndefined)
 
 			if ((value != kUndefined) && (knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound") != value)) {
-				this.pitstopOptionChanged("Tyre Compound", value, getMultiMapValue(data, "Setup Data", "TyreCompoundColor"))
+				this.pitstopOptionChanged("Tyre Compound", verbose, value, getMultiMapValue(data, "Setup Data", "TyreCompoundColor"))
+
+				result := true
+			}
+
+			value := getMultiMapValue(data, "Setup Data", "TyreSet", kUndefined)
+
+			if ((value != kUndefined) && (knowledgeBase.getValue("Pitstop.Planned.Tyre.Set") != value)) {
+				this.pitstopOptionChanged("Tyre Set", verbose, value)
 
 				result := true
 			}
@@ -989,7 +998,7 @@ class RaceEngineer extends RaceAssistant {
 			}
 
 			if changed {
-				this.pitstopOptionChanged("Tyre Pressures", values*)
+				this.pitstopOptionChanged("Tyre Pressures", verbose, values*)
 
 				result := true
 			}
@@ -997,7 +1006,7 @@ class RaceEngineer extends RaceAssistant {
 			value := getMultiMapValue(data, "Setup Data", "RepairSupension", kUndefined)
 
 			if ((value != kUndefined) && (knowledgeBase.getValue("Pitstop.Planned.Repair.Suspension") != value)) {
-				this.pitstopOptionChanged("Repair Suspension", value)
+				this.pitstopOptionChanged("Repair Suspension", verbose, value)
 
 				result := true
 			}
@@ -1005,7 +1014,7 @@ class RaceEngineer extends RaceAssistant {
 			value := getMultiMapValue(data, "Setup Data", "RepairBodywork", kUndefined)
 
 			if ((value != kUndefined) && (knowledgeBase.getValue("Pitstop.Planned.Repair.Bodywork") != value)) {
-				this.pitstopOptionChanged("Repair Bodywork", value)
+				this.pitstopOptionChanged("Repair Bodywork", verbose, value)
 
 				result := true
 			}
@@ -1013,10 +1022,12 @@ class RaceEngineer extends RaceAssistant {
 			value := getMultiMapValue(data, "Setup Data", "RepairEngine", kUndefined)
 
 			if ((value != kUndefined) && (knowledgeBase.getValue("Pitstop.Planned.Repair.Engine") != value)) {
-				this.pitstopOptionChanged("Repair Engine", value)
+				this.pitstopOptionChanged("Repair Engine", verbose, value)
 
 				result := true
 			}
+
+			knowledgeBase.setFact("Pitstop.Planned.Adjusted", true)
 		}
 
 		return result
@@ -2396,7 +2407,7 @@ class RaceEngineer extends RaceAssistant {
 		}
 	}
 
-	pitstopOptionChanged(option, values*) {
+	pitstopOptionChanged(option, verbose, values*) {
 		local knowledgeBase := this.KnowledgeBase
 		local prssKey, incrKey, targetPressure, index, suffix
 

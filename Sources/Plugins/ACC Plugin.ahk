@@ -67,6 +67,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	iPSChangeTyres := false
 	iPSChangeBrakes := false
 
+	iOldChangeBrakes := false
+
 	iLastTyreCompound := false
 
 	iPSImageSearchArea := false
@@ -432,6 +434,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			if (session == kSessionFinished) {
 				this.iRepairSuspensionChosen := true
 				this.iRepairBodyworkChosen := true
+
+				this.iLastTyreCompound := false
 			}
 
 			if (session != kSessionPaused)
@@ -1992,6 +1996,12 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		return true
 	}
 
+	restoreSessionState(&sessionSettings, &sessionState) {
+		super.restoreSessionState(&sessionSettings, &sessionState)
+
+		this.iLastTyreCompound := false
+	}
+
 	supportsRaceAssistant(assistantPlugin) {
 		if ((assistantPlugin = kRaceStrategistPlugin) || (assistantPlugin = kRaceSpotterPlugin))
 			return ((FileExist(kBinariesDirectory . "Providers\ACC UDP Provider.exe") != false) && super.supportsRaceAssistant(assistantPlugin))
@@ -2055,17 +2065,23 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		super.startPitstopSetup(pitstopNumber)
 
 		withProtection(ObjBindMethod(this, "requirePitstopMFD", this.iNoImageSearch))
+
+		this.iOldChangeBrakes := this.iPSChangeBrakes
 	}
 
 	finishPitstopSetup(pitstopNumber) {
 		super.finishPitstopSetup(pitstopNumber)
+
+		if (this.iOldChangeBrakes != this.iPSChangeBrakes)
+			loop 3
+				SoundPlay(kResourcesDirectory . "Sounds\Critical.wav", "Wait")
 
 		closePitstopMFD()
 	}
 
 	pitstopFinished(pitstopNumber, async := false) {
 		local retry, updateTime, carState, pitstopState, currentDriver, currentTyreSet, tyreStates, pitstopData
-		local pressures, index, pressure, ignore, tyreSet, wearState, tread, section, grain, blister, flatSpot
+		local pressures, index, pressure, ignore, tyreSet, wearState, tread, section, grain, blister, flatSpot, marbles
 		local data, tyre, key, value, wear
 
 		static updateTask := false
@@ -2107,20 +2123,20 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 						currentDriver := pitstopState["driversNames"][pitstopState["currentDriverIndex"] + 1]
 
-						pitstopData := CaseInsenseMap("Pitstop", pitstopNumber
-													, "Service.Time", pitstopState["timeRequired"]
-													, "Service.Lap", carState["lapCount"]
-													, "Service.Driver.Previous", currentDriver
-													, "Service.Driver.Next", pitstopState["newDriverNameToDisplay"]
-													, "Service.Refuel", pitstopState["fuelToAdd"]
-													, "Service.Bodywork.Repair", (pitstopState["repairBody"] ? true : false)
-													, "Service.Suspension.Repair", (pitstopState["repairSuspension"] ? true : false)
-													, "Service.Engine.Repair", (pitstopState["repairEngine"] ? true : false))
+						pitstopData := newSectionMap("Pitstop", pitstopNumber
+												   , "Service.Time", pitstopState["timeRequired"]
+												   , "Service.Lap", carState["lapCount"]
+												   , "Service.Driver.Previous", currentDriver
+												   , "Service.Driver.Next", pitstopState["newDriverNameToDisplay"]
+												   , "Service.Refuel", pitstopState["fuelToAdd"]
+												   , "Service.Bodywork.Repair", (pitstopState["repairBody"] ? true : false)
+												   , "Service.Suspension.Repair", (pitstopState["repairSuspension"] ? true : false)
+												   , "Service.Engine.Repair", (pitstopState["repairEngine"] ? true : false))
 
 						if !listEqual(pitstopState["tyreToChange"], [false, false, false, false]) {
 							pitstopData["Service.Tyre.Compound"] := ((pitstopState["newTyreCompound"] = 0) ? "Dry" : "Wet")
 							pitstopData["Service.Tyre.Compound.Color"] := "Black"
-							; pitstopData["Service.Tyre.Set"] := ((pitstopState["newTyreCompound"] = 0) ? pitstopState["tyreSet"] : false)
+							pitstopData["Service.Tyre.Set"] := ((pitstopState["newTyreCompound"] = 0) ? pitstopState["tyreSet"] : false)
 
 							pressures := pitstopState["tyrePressures"]
 
@@ -2130,9 +2146,11 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 							pitstopData["Service.Tyre.Pressures"] := values2String(",", pressures*)
 						}
 
+						data := newMultiMap()
+						tyreStates := []
+
 						if (carState["currentTyreCompound"] = 0) {
 							currentTyreSet := carState["currentTyreSet"]
-							tyreStates := []
 
 							for ignore, tyreSet in carState["tyreSets"]
 								if (tyreSet["tyreSet"] = currentTyreSet) {
@@ -2145,11 +2163,13 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 										for index, section in tread
 											tread[index] := Round(section, 2)
 
+										marbles := Round(wearState["marblesLevel"], 2)
 										grain := Round(wearState["grain"], 2)
 										blister := Round(wearState["blister"], 2)
 										flatSpot := Round(wearState["flatSpot"], 2)
 
-										tyreStates.Push(CaseInsenseMap("Tyre", tyre, "Tread", tread, "Wear", wear, "Grain", grain, "Blister", blister, "FlatSpot", flatSpot))
+										tyreStates.Push(CaseInsenseMap("Tyre", tyre, "Tread", tread, "Wear", wear
+																	 , "Grain", grain, "Blister", blister, "FlatSpot", flatSpot, "Marbles", marbles))
 									}
 
 									pitstopData["Tyre.Driver"] := currentDriver
@@ -2157,18 +2177,23 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 									pitstopData["Tyre.Compound"] := "Dry"
 									pitstopData["Tyre.Compound.Color"] := "Black"
 									pitstopData["Tyre.Set"] := currentTyreSet
+									pitstopData["Tyre.State"] := tyreSet["state"]
+
+									for ignore, tyre in ["Front.Left", "Front.Right", "Rear.Left", "Rear.Right"]
+										for key, value in tyreStates[A_Index]
+											setMultiMapValue(data, "Pitstop Data", "Tyre." . key . "." . tyre, isObject(value) ? values2String(",", value*) : value)
 
 									break
 								}
 						}
+						else {
+							pitstopData["Tyre.Driver"] := currentDriver
+							pitstopData["Tyre.Laps"] := false
+							pitstopData["Tyre.Compound"] := "Wet"
+							pitstopData["Tyre.Compound.Color"] := "Black"
+						}
 
-						data := newMultiMap()
-
-						setMultiMapValues(data, "Pitstop Data", pitstopData)
-
-						for ignore, tyre in ["Front.Left", "Front.Right", "Rear.Left", "Rear.Right"]
-							for key, value in tyreStates[A_Index]
-								setMultiMapValue(data, "Pitstop Data", "Tyre." . key . "." . tyre, isObject(value) ? values2String(",", value*) : value)
+						setMultiMapValues(data, "Pitstop Data", pitstopData, false)
 
 						writeMultiMap(kTempDirectory . "Pitstop " . pitstopNumber . ".ini", data)
 
@@ -2362,6 +2387,8 @@ isACCRunning() {
 			if (thePlugin && SimulatorController.Instance.isActive(thePlugin)) {
 				thePlugin.iRepairSuspensionChosen := true
 				thePlugin.iRepairBodyworkChosen := true
+
+				thePlugin.iLastTyreCompound := false
 			}
 		}
 		catch Any as exception {

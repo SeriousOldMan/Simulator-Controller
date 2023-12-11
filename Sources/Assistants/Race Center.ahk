@@ -6127,6 +6127,8 @@ class RaceCenter extends ConfigurationItem {
 		local pitstopData := (this.iPendingPitstop ? combine(settings, this.iPendingPitstop) : settings)
 		local sessionStore := this.SessionStore
 		local pitstop := sessionStore.query("Pitstop.Data", {Where: {Status: "Planned"}})
+		local changed := false
+		local redraw := false
 
 		pitstopSettings("Update", pitstopData)
 
@@ -6136,20 +6138,34 @@ class RaceCenter extends ConfigurationItem {
 			if pitstopData.Has("Pitstop.Planned.Time.Service") {
 				pitstop["Time.Service"] := pitstopData["Pitstop.Planned.Time.Service"]
 
-				sessionStore.changed("Pitstop.Data")
+				changed := true
 			}
 
 			if pitstopData.Has("Pitstop.Planned.Time.Repairs") {
 				pitstop["Time.Repairs"] := pitstopData["Pitstop.Planned.Time.Repairs"]
 
-				sessionStore.changed("Pitstop.Data")
+				changed := true
 			}
 
 			if pitstopData.Has("Pitstop.Planned.Time.Pitlane") {
 				pitstop["Time.Pitlane"] := pitstopData["Pitstop.Planned.Time.Pitlane"]
 
-				sessionStore.changed("Pitstop.Data")
+				changed := true
 			}
+
+			if ((pitstop["Tyre.Set"] = 0) && pitstopData.Has("TyreSet"))
+				if (pitstopData.Has("TyreCompound") && pitstopData["TyreCompound"] && pitstopData["TyreSet"]) {
+					pitstop["Tyre.Set"] := pitstopData["TyreSet"]
+
+					changed := true
+					redraw := true
+				}
+
+			if changed
+				sessionStore.changed("Pitstop.Data")
+
+			if redraw
+				KKKK LLLL
 		}
 	}
 

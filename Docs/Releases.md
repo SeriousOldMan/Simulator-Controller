@@ -1,3 +1,16 @@
+## 5.5.1.0-release 12/15/23 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. The automatic updater now checks, whether the update was successful for all files. A warning is emitted, if any files had been skipped, for example, because they are in use by another software at the time of the update.
+  4. The "Edit Labels & Icons..." button is now also available on the simulators page in "Simulator Setup".
+  5. The actions to change the front and rear brake pads in *Assetto Corsa Competizione* has been added to "Simulator Setup".
+  6. A sanity check has been integrated in the automatic setup of the pitstop settings for *Assetto Corsa Competizione*. A warning sound is emitted, if incorrect values have been entered, for example, if a brake pad change has been activated.
+  7. The application of the preference slide for an early or a late pitstop has been optimized for the automatic recalculation of a strategy by the Strategist or in the "Race Center".
+  8. Fixed an off by one error for the post pitstop tyre set information for *Asseto Corsa Competizione* in "Race Center".
+  9. Corrected several values in the *Service* section of the Pitstop report in "Race Center".
+  10. Separate values for service time, repairs time and pitlane time loss are now displayed in the Pitstop report in "Race Center".
+  11. Most changes to the pitstop settings, that are made using the game controls will be correctly detected now by the Race Engineer in *rFactor 2* and *Assetto Corsa Competizione*, as long as a pitstop has been already planned and prepared. The changed settings will be automatically integrated in the active pitstop plan of the Engineer and will also update the planned pitstop in the "Race Center". Exception is the choice of the tyre compound in *Assetto Corsa Competizione*, since this value is unfortunately not available in the data API.
+
 ## 5.5.0.0-release 12/06/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

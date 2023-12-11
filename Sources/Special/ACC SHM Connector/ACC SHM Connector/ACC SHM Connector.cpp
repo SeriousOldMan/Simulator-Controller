@@ -412,10 +412,10 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 		if ((gf->trackGripStatus >= ACC_DAMP) || (gf->rainIntensityIn10min >= ACC_LIGHT_RAIN))
 			output << "TyreCompound=Wet" << endl;
 		else
-		*/
 			output << "TyreCompound=" << ((tyreCompound.compare("dry_compound") == 0) ? "Dry" : "Wet") << endl;
 
 		output << "TyreCompoundColor=Black" << endl;
+		*/
 
 		printData(&output, "TyreSet", gf->mfdTyreSet + 1);
 		printData(&output, "TyreSetCurrent", gf->currentTyreSet + 1);

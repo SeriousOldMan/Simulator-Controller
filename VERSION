@@ -1,9 +1,9 @@
 [Development]
 Version=5.5.1.0-dev
 Target=5.5.1.0-release
-Date=12/06/2023
+Date=12/11/2023
 Download=
-Changes=Check for incomplete automatic update, Fixed post pitstop tyre set info in "Race Center" for ACC, Fixed display of pitstop service information in "Race Center", New display of pitstop time loss in "Race Center"
+Changes=Check for incomplete automatic update, Fixed post pitstop tyre set info in "Race Center" for ACC, Fixed display of pitstop service information in "Race Center", New display of pitstop time loss in "Race Center", Optimized application of pitstop preference in strategy recalculation, Added FrontBrake and RearBrake to "Simulator Setup"
 Components=Media->5.3.0,Configuration->5.4.8,Utilities->5.4.8
 [Release]
 Version=5.5.0.0-release

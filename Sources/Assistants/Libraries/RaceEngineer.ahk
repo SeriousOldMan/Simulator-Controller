@@ -953,6 +953,75 @@ class RaceEngineer extends RaceAssistant {
 		}
 	}
 
+	updatePitstop(data) {
+		local knowledgeBase := this.KnowledgeBase
+		local result := false
+		local index, suffix, prssKey, changed, values
+
+		if this.hasPreparedPitstop() {
+			value := getMultiMapValue(data, "Setup Data", "FuelAmount", kUndefined)
+
+			if ((value != kUndefined) && (Round(knowledgeBase.getValue("Pitstop.Planned.Fuel"), 1) != Round(value, 1))) {
+				this.pitstopOptionChanged("Refuel", Round(value, 1))
+
+				result := true
+			}
+
+			value := getMultiMapValue(data, "Setup Data", "TyreCompound", kUndefined)
+
+			if ((value != kUndefined) && (knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound") != value)) {
+				this.pitstopOptionChanged("Tyre Compound", value, getMultiMapValue(data, "Setup Data", "TyreCompoundColor"))
+
+				result := true
+			}
+
+			changed := false
+			values := []
+
+			for index, suffix in ["FL", "FR", "RL", "RR"] {
+				prssKey := ("Pitstop.Planned.Tyre.Pressure." . suffix)
+				value := getMultiMapValue(data, "Setup Data", "TyrePressure" . suffix, false)
+
+				values.Push(value)
+
+				if (value && (Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure." . suffix), 1) != Round(value, 1)))
+					changed := true
+			}
+
+			if changed {
+				this.pitstopOptionChanged("Tyre Pressures", values*)
+
+				result := true
+			}
+
+			value := getMultiMapValue(data, "Setup Data", "RepairSupension", kUndefined)
+
+			if ((value != kUndefined) && (knowledgeBase.getValue("Pitstop.Planned.Repair.Suspension") != value)) {
+				this.pitstopOptionChanged("Repair Suspension", value)
+
+				result := true
+			}
+
+			value := getMultiMapValue(data, "Setup Data", "RepairBodywork", kUndefined)
+
+			if ((value != kUndefined) && (knowledgeBase.getValue("Pitstop.Planned.Repair.Bodywork") != value)) {
+				this.pitstopOptionChanged("Repair Bodywork", value)
+
+				result := true
+			}
+
+			value := getMultiMapValue(data, "Setup Data", "RepairEngine", kUndefined)
+
+			if ((value != kUndefined) && (knowledgeBase.getValue("Pitstop.Planned.Repair.Engine") != value)) {
+				this.pitstopOptionChanged("Repair Engine", value)
+
+				result := true
+			}
+		}
+
+		return result
+	}
+
 	updatePitstopFuel(fuel) {
 		local speaker := this.getSpeaker()
 
@@ -1630,7 +1699,7 @@ class RaceEngineer extends RaceAssistant {
 		local driverNickname := ""
 		local result, currentCompound, currentCompoundColor, targetCompound, targetCompoundColor, prefix
 		local coldPressures, hotPressures, pressuresLosses, airTemperature, trackTemperature, weatherNow
-		local savedKnowledgeBase, stateFile, key, value
+		local pitstopState, stateFile, key, value, learningLaps
 		local simulator, car, track
 
 		static lastLap := 0
@@ -1640,31 +1709,40 @@ class RaceEngineer extends RaceAssistant {
 		else if ((lastLap == 0) && (lapNumber > 1))
 			lastLap := (lapNumber - 1)
 
-		if knowledgeBase {
-			if (this.Speaker && (lapNumber > 1)) {
-				driverForname := knowledgeBase.getValue("Driver.Forname", "John")
-				driverSurname := knowledgeBase.getValue("Driver.Surname", "Doe")
-				driverNickname := knowledgeBase.getValue("Driver.Nickname", "JD")
-			}
-
-			if (this.RemoteHandler && knowledgeBase.getValue("Pitstop.Planned.Nr", false)) {
-				savedKnowledgeBase := newMultiMap()
-
-				for key, value in this.KnowledgeBase.Facts.Facts
-					if (InStr(key, "Pitstop") = 1)
-						setMultiMapValue(savedKnowledgeBase, "Pitstop Pending", key, value)
-
-				stateFile := temporaryFileName(this.AssistantType . " Pitstop Pending", "state")
-
-				writeMultiMap(stateFile, savedKnowledgeBase)
-
-				this.RemoteHandler.saveLapState(lapNumber, stateFile)
-			}
+		if (knowledgeBase && this.Speaker && (lapNumber > 1)) {
+			driverForname := knowledgeBase.getValue("Driver.Forname", "John")
+			driverSurname := knowledgeBase.getValue("Driver.Surname", "Doe")
+			driverNickname := knowledgeBase.getValue("Driver.Nickname", "JD")
 		}
 
 		result := super.addLap(lapNumber, &data)
 
 		knowledgeBase := this.KnowledgeBase
+		learningLaps := knowledgeBase.getValue("Session.Settings.Lap.Learning.Laps", 2)
+
+		if (result && ((lapNumber <= learningLaps) || !this.TeamSession || (lapNumber > (this.BaseLap + learningLaps)))) {
+			if (this.hasPreparedPitstop() && getMultiMapValues(data, "Setup Data", false) && this.updatePitstop(data)) {
+				if !knowledgeBase.produce()
+					result := false
+
+				if this.Debug[kDebugKnowledgeBase]
+					this.dumpKnowledgeBase(this.KnowledgeBase)
+			}
+
+			if (this.RemoteHandler && knowledgeBase.getValue("Pitstop.Planned.Nr", false)) {
+				pitstopState := newMultiMap()
+
+				for key, value in this.KnowledgeBase.Facts.Facts
+					if (InStr(key, "Pitstop") = 1)
+						setMultiMapValue(pitstopState, "Pitstop Pending", key, value)
+
+				stateFile := temporaryFileName(this.AssistantType . " Pitstop Pending", "state")
+
+				writeMultiMap(stateFile, pitstopState)
+
+				this.RemoteHandler.saveLapState(lapNumber, stateFile)
+			}
+		}
 
 		if (this.Speaker && (lastLap < (lapNumber - 2)) && (driverName(driverForname, driverSurname, driverNickname) != this.DriverFullName))
 			this.getSpeaker().speakPhrase("WelcomeBack")
@@ -1691,7 +1769,7 @@ class RaceEngineer extends RaceAssistant {
 			}
 
 			if currentCompound {
-				if (lapNumber <= (((this.Session = kSessionRace) ? 0 : this.BaseLap) + knowledgeBase.getValue("Session.Settings.Lap.Learning.Laps", 2))) {
+				if (lapNumber <= (((this.Session = kSessionRace) ? 0 : this.BaseLap) + learningLaps)) {
 					if (currentCompound = "Dry")
 						prefix := "Session.Setup.Tyre.Dry.Pressure."
 					else
@@ -1767,7 +1845,7 @@ class RaceEngineer extends RaceAssistant {
 		local suspensionDamage := string2Values(",", getMultiMapValue(data, "Car Data", "SuspensionDamage", ""))
 		local threshold := knowledgeBase.getValue("Session.Settings.Tyre.Pressure.Deviation")
 		local changed := false
-		local fact, index, tyreType, oldValue, newValue, position
+		local fact, index, tyreType, oldValue, newValue, position, learningLaps
 		local simulator, car, track
 
 		if (tyrePressures.Length >= 4) {
@@ -1846,6 +1924,12 @@ class RaceEngineer extends RaceAssistant {
 
 			needProduce := true
 		}
+
+		learningLaps := knowledgeBase.getValue("Session.Settings.Lap.Learning.Laps", 2)
+
+		if (this.hasPreparedPitstop() && getMultiMapValues(data, "Setup Data", false))
+			if ((lapNumber <= learningLaps) || !this.TeamSession || (lapNumber > (this.BaseLap + learningLaps)))
+				needProduce := this.updatePitstop(data)
 
 		if needProduce {
 			if knowledgeBase.produce()

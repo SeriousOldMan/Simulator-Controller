@@ -67,6 +67,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	iPSChangeTyres := false
 	iPSChangeBrakes := false
 
+	iLastTyreCompound := false
+
 	iPSImageSearchArea := false
 
 	iChatMode := false
@@ -435,6 +437,17 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			if (session != kSessionPaused)
 				this.shutdownUDPClient(true)
 		}
+	}
+
+	acquireTelemetryData() {
+		local telemetryData := super.acquireTelemetryData()
+
+		if (getMultiMapValues(telemetryData, "Setup Data", false) && (this.iLastTyreCompound && this.iPSChangeTyres)) {
+			setMultiMapValue(telemetryData, "Setup Data", "TyreCompound", this.iLastTyreCompound)
+			setMultiMapValue(telemetryData, "Setup Data", "TyreCompoundColor", "Black")
+		}
+
+		return telemetryData
 	}
 
 	acquireSessionData(&telemetryData, &positionsData) {
@@ -873,6 +886,11 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				this.iRepairSuspensionChosen := repairSuspensionChosen
 				this.iRepairBodyworkChosen := (repairBodyworkChosen || repairSuspensionChosen)
 
+				if this.iPSChangeTyres
+					this.iLastTyreCompound := (inList(this.iPSOptions, "Tyre Set") ? "Dry" : "Wet")
+				else
+					this.iLastTyreCompound := false
+
 				break
 			}
 			catch Any as exception {
@@ -1248,14 +1266,22 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 		try {
 			if (this.requirePitstopMFD() && this.selectPitstopOption("Tyre Compound"))
-				if (InStr(selection, "Wet") = 1)
+				if (InStr(selection, "Wet") = 1) {
 					this.changePitstopOption("Tyre Compound", "Increase")
-				else if (InStr(selection, "Dry") = 1)
+
+					this.iLastTyreCompound := "Wet"
+				}
+				else if (InStr(selection, "Dry") = 1) {
 					this.changePitstopOption("Tyre Compound", "Decrease")
+
+					this.iLastTyreCompound := "Dry"
+				}
 				else
 					switch selection, false {
 						case "Increase", "Decrease":
 							this.changePitstopOption("Tyre Compound", selection)
+
+							this.iLastTyreCompound := ((selection = "Increase") ? "Wet" : "Dry")
 						default:
 							throw "Unsupported selection `"" . selection . "`" detected in ACCPlugin.changeTyreCompound..."
 					}

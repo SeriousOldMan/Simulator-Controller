@@ -417,10 +417,10 @@ int main(int argc, char* argv[])
 		if ((gf->trackGripStatus >= ACC_DAMP) || (gf->rainIntensityIn10min >= ACC_LIGHT_RAIN))
 			wcout << "TyreCompound=Wet" << endl;
 		else
-		*/
 			wcout << "TyreCompound=" << ((tyreCompound.compare("dry_compound") == 0) ? "Dry" : "Wet") << endl;
 
 		wcout << "TyreCompoundColor=Black" << endl;
+		*/
 		
 		printData("TyreSet", gf->mfdTyreSet + 1);
 		printData("TyreSetCurrent", gf->currentTyreSet);

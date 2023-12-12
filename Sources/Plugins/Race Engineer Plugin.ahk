@@ -123,6 +123,10 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 		pitstopOptionChanged(arguments*) {
 			this.callRemote("pitstopOptionChanged", arguments*)
 		}
+
+		pitstopPrepared(arguments*) {
+			this.callRemote("pitstopPrepared", arguments*)
+		}
 	}
 
 	class RaceEngineerAction extends RaceAssistantPlugin.RaceAssistantAction {
@@ -332,6 +336,11 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 	preparePitstop(lap := false) {
 		if this.RaceEngineer
 			this.RaceEngineer.preparePitstop(lap)
+	}
+
+	pitstopSetupFinished() {
+		if this.RaceEngineer
+			this.RaceEngineer.pitstopPrepared()
 	}
 
 	performPitstop(lapNumber, options) {

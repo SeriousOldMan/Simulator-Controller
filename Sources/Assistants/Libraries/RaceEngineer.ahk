@@ -1721,13 +1721,8 @@ class RaceEngineer extends RaceAssistant {
 		learningLaps := knowledgeBase.getValue("Session.Settings.Lap.Learning.Laps", 2)
 
 		if (result && ((lapNumber <= learningLaps) || !this.TeamSession || (lapNumber > (this.BaseLap + learningLaps)))) {
-			if (this.hasPreparedPitstop() && getMultiMapValues(data, "Setup Data", false) && this.updatePitstop(data)) {
-				if !knowledgeBase.produce()
-					result := false
-
-				if this.Debug[kDebugKnowledgeBase]
-					this.dumpKnowledgeBase(this.KnowledgeBase)
-			}
+			if (this.hasPreparedPitstop() && getMultiMapValues(data, "Setup Data", false))
+				this.updatePitstop(data)
 
 			if (this.RemoteHandler && knowledgeBase.getValue("Pitstop.Planned.Nr", false)) {
 				pitstopState := newMultiMap()
@@ -1929,7 +1924,7 @@ class RaceEngineer extends RaceAssistant {
 
 		if (this.hasPreparedPitstop() && getMultiMapValues(data, "Setup Data", false))
 			if ((lapNumber <= learningLaps) || !this.TeamSession || (lapNumber > (this.BaseLap + learningLaps)))
-				needProduce := this.updatePitstop(data)
+				this.updatePitstop(data)
 
 		if needProduce {
 			if knowledgeBase.produce()

@@ -9,7 +9,8 @@
   8. Fixed an off by one error for the post pitstop tyre set information for *Asseto Corsa Competizione* in "Race Center".
   9. Corrected several values in the *Service* section of the Pitstop report in "Race Center".
   10. Separate values for service time, repairs time and pitlane time loss are now displayed in the Pitstop report in "Race Center".
-  11. Most changes to the pitstop settings, that are made using the game controls will be correctly detected now by the Race Engineer in *rFactor 2* and *Assetto Corsa Competizione*, as long as a pitstop has been already planned and prepared. The changed settings will be automatically integrated in the active pitstop plan of the Engineer and will also update the planned pitstop in the "Race Center". Exception is the choice of the tyre compound in *Assetto Corsa Competizione*, since this value is unfortunately not available in the data API.
+  11. Most changes to the pitstop settings, that are made using the game controls will be correctly detected now by the Race Engineer in *rFactor 2* and *Assetto Corsa Competizione*, as long as a pitstop has been already planned and prepared. The changed settings will be automatically integrated in the active pitstop plan of the Engineer and will also update the planned pitstop in the "Race Center". Exception is, for example, the choice of the tyre compound or the repair options in *Assetto Corsa Competizione*, since these values are unfortunately not available in the data API.
+  12. Changes in the pitstop settings are now almost immediately reflected in the "Race Center", independent how the change was initiated.
 
 ## 5.5.0.0-release 12/06/23
   1. Minor bugfixes, as always

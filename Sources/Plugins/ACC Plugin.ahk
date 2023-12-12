@@ -1226,7 +1226,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 					newValues := this.getPitstopOptionValues("Tyre Compound")
 
 					if newValues
-						this.RaceEngineer.pitstopOptionChanged("Tyre Compound", newValues*)
+						this.RaceEngineer.pitstopOptionChanged("Tyre Compound", true, newValues*)
 				default:
 					super.notifyPitstopChanged((option = "No Refuel") ? "Refuel" : option)
 			}

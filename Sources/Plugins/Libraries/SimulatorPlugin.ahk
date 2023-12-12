@@ -613,12 +613,12 @@ class SimulatorPlugin extends ControllerPlugin {
 					newValues := this.getPitstopOptionValues(option)
 
 					if newValues
-						this.RaceEngineer.pitstopOptionChanged(option, newValues*)
+						this.RaceEngineer.pitstopOptionChanged(option, true, newValues*)
 				case "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right":
 					newValues := this.getPitstopOptionValues("Tyre Pressures")
 
 					if newValues
-						this.RaceEngineer.pitstopOptionChanged("Tyre Pressures", newValues*)
+						this.RaceEngineer.pitstopOptionChanged("Tyre Pressures", true, newValues*)
 			}
 	}
 
@@ -1102,6 +1102,8 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	finishPitstopSetup(pitstopNumber) {
+		if this.RaceEngineer
+			this.RaceEngineer.pitstopSetupFinished()
 	}
 
 	setPitstopRefuelAmount(pitstopNumber, liters) {

@@ -37,7 +37,7 @@ Here is a short video which shows how to configure Simulator Controller for the 
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [information about the update process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.
 
-[5.5.0.0-release](https://cutt.ly/QwPW4fZU) (Changes: Added autonomous mode in "Race Settings", Detect simulator, car and track change during the first lap by the Assistants, New Replay mode for Developer, Increased compatibility of "Simulator Setup" and "Simulator Configuration", Increased reliability for position and standings calculations for retired cars, Fixed Pitstop MFD for AMS2, Fixed Pitstop MFD for rF2, Fixed Pitstop MFD for R3E, Optimized rFactor 2 pitstop settings acquisition)
+[5.5.0.0-release](https://cutt.ly/QwPW4fZU) (Changes: Added autonomous mode in "Race Settings", Detect simulator, car and track change during the first lap by the Assistants, New Replay mode for Developer, Increased compatibility of "Simulator Setup" and "Simulator Configuration", Increased reliability for position and standings calculations for retired cars, Fixed Pitstop MFD for AMS2, Fixed Pitstop MFD for rF2, Fixed Pitstop MFD for R3E, Optimized rFactor 2 pitstop settings acquisition.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-550) of this version and all the versions you might have skipped, before installing and using this version.
 
@@ -49,7 +49,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[5.5.1.0-release](https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.5.1.0-dev.zip) (Early build for 5.5.1. Changes: heck for incomplete automatic update, Fixed post pitstop tyre set info in "Race Center" for ACC, Fixed display of pitstop service information in "Race Center", New display of pitstop time loss in "Race Center", Optimized application of pitstop preference in strategy recalculation, Added FrontBrake and RearBrake to "Simulator Setup", Sanity check after pitstop setup in ACC, "Edit Labels & Icons" now also available on the simulator page in "Simulator Setup", Detection of changed pitstop settings made outside the control of Simulator Controller.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-551) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

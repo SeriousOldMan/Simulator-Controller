@@ -728,10 +728,12 @@ void writeData(std::ostringstream * output, const irsdk_header *header, const ch
 
 		printLine(output, "[Setup Data]");
 
-		float pressureFL = GetPsi(getDataFloat(header, data, "LFcoldPressure"));
-		float pressureFR = GetPsi(getDataFloat(header, data, "RFcoldPressure"));
-		float pressureRL = GetPsi(getDataFloat(header, data, "LRcoldPressure"));
-		float pressureRR = GetPsi(getDataFloat(header, data, "RRcoldPressure"));
+		printLine(output, "FuelAmount=" + std::to_string(getDataFloat(header, data, "PitSvFuel")));
+
+		float pressureFL = GetPsi(getDataFloat(header, data, "PitSvLFP"));
+		float pressureFR = GetPsi(getDataFloat(header, data, "PitSvRFP"));
+		float pressureRL = GetPsi(getDataFloat(header, data, "PitSvLRP"));
+		float pressureRR = GetPsi(getDataFloat(header, data, "PitSvRRP"));
 
 		printLine(output, "TyrePressureFL=" + std::to_string(pressureFL));
 		printLine(output, "TyrePressureFR=" + std::to_string(pressureFR));

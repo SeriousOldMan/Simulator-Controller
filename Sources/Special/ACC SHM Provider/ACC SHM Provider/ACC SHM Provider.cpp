@@ -399,8 +399,6 @@ int main(int argc, char* argv[])
 
 	if (strlen(request) == 0 || getArgument(request, "Setup") != "")
 	{
-		wcout << "[Setup Data]" << endl;
-
 		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 		SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
 
@@ -409,6 +407,8 @@ int main(int argc, char* argv[])
 
 			printData("TyreSet", gf->currentTyreSet);
 		}
+
+		wcout << "[Setup Data]" << endl;
 
 		_bstr_t tc(gf->tyreCompound);
 		std::string tyreCompound(tc);

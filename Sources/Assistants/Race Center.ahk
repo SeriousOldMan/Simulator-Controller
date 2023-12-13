@@ -11276,7 +11276,7 @@ class RaceCenter extends ConfigurationItem {
 	showPitstopDetails(pitstopNr) {
 		showPitstopDetailsAsync(pitstopNr) {
 			local pitstopData := this.SessionStore.Tables["Pitstop.Data"][pitstopNr]
-			local html, tyreCompound, tyreCompoundColor
+			local html, tyreCompound, tyreCompoundColor, tyreWearDetails
 
 			if (pitstopData["Lap"] != "-") {
 				html := ("<div id=`"header`"><b>" . translate("Pitstop: ") . pitstopNr . "</b></div>")
@@ -11288,14 +11288,15 @@ class RaceCenter extends ConfigurationItem {
 					html .= ("<br>" . this.createPitstopPlanDetails(pitstopNr))
 
 				if (this.SessionStore.query("Pitstop.Tyre.Data", {Where: {Pitstop: pitstopNr}}).Length > 0) {
-					html .= ("<br><br><div id=`"header`"><i>" . translate("Tyre Wear") . "</i></div>")
-
 					if this.Stints.Has(pitstopData["Stint"] - 1)
 						tyreCompound := this.Stints[pitstopData["Stint"] - 1].Compound
 					else
 						tyreCompound := false
 
-					html .= ("<br>" . this.createTyreWearDetails(pitstopNr, tyreCompound))
+					tyreWearDetails := this.createTyreWearDetails(pitstopNr, tyreCompound)
+
+					if (Trim(tyreWearDetails) != "")
+						html .= ("<br><br><div id=`"header`"><i>" . translate("Tyre Wear") . "</i></div><br>" . tyreWearDetails)
 				}
 
 				this.showDetails("Pitstop", html)
@@ -11453,7 +11454,7 @@ class RaceCenter extends ConfigurationItem {
 	showPitstopsDetails() {
 		showPitstopsDetailsAsync() {
 			local html := ("<div id=`"header`"><b>" . translate("Pitstops Summary") . "</b></div>")
-			local pitstopData, tyreCompound
+			local pitstopData, tyreCompound, tyreWearDetails
 
 			html .= ("<br><br><div id=`"header`"><i>" . translate("Service") . "</i></div>")
 
@@ -11464,14 +11465,16 @@ class RaceCenter extends ConfigurationItem {
 					if (this.SessionStore.query("Pitstop.Tyre.Data", {Where: {Pitstop: A_Index}}).Length > 0) {
 						pitstopData := this.SessionStore.Tables["Pitstop.Data"][A_Index]
 
-						html .= ("<br><br><div id=`"header`"><i>" . translate("Tyre Wear (Pitstop: ") . A_Index . translate(")") . "</i></div>")
-
 						if this.Stints.Has(pitstopData["Stint"] - 1)
 							tyreCompound := this.Stints[pitstopData["Stint"] - 1].Compound
 						else
 							tyreCompound := false
 
-						html .= ("<br>" . this.createTyreWearDetails(A_Index, tyreCompound))
+						tyreWearDetails := this.createTyreWearDetails(A_Index, tyreCompound)
+
+						if (Trim(tyreWearDetails) != "")
+							html .= ("<br><br><div id=`"header`"><i>" . translate("Tyre Wear (Pitstop: ") . A_Index . translate(")")
+																	  . "</i></div><br>" . tyreWearDetails)
 					}
 
 			this.showDetails("Pitstops", html)

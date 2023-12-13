@@ -11,6 +11,9 @@
   10. Separate values for service time, repairs time and pitlane time loss are now displayed in the Pitstop report in "Race Center".
   11. Many [changes to the pitstop settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#the-pitstop), that are made using the game controls will be correctly detected now by the Race Engineer in *rFactor 2*, *Assetto Corsa Competizione* and *iRacing*, as long as a pitstop has been already planned and prepared. The changed settings will be automatically integrated in the active pitstop plan of the Engineer and will also update the planned pitstop in the "Race Center". Exception is, for example, the choice of the tyre compound or the repair options in *Assetto Corsa Competizione*, since these values are unfortunately not available in the data API. More information can be found [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#the-pitstop).
   12. Changes in the pitstop settings are now almost immediately reflected in the "Race Center", independent how the change was initiated.
+  13. New car models for "Setup Workbench":
+      - Assetto Corsa
+        - BMW M3 E30 Group A
 
 ## 5.5.0.0-release 12/06/23
   1. Minor bugfixes, as always

@@ -1740,7 +1740,7 @@ class RaceEngineer extends RaceAssistant {
 		knowledgeBase := this.KnowledgeBase
 		learningLaps := knowledgeBase.getValue("Session.Settings.Lap.Learning.Laps", 2)
 
-		if ((lapNumber <= learningLaps) || !this.TeamSession || (lapNumber >= (this.BaseLap + learningLaps))) {
+		if (result && ((lapNumber <= learningLaps) || !this.TeamSession || (lapNumber >= (this.BaseLap + learningLaps)))) {
 			if (this.hasPreparedPitstop() && getMultiMapValues(data, "Setup Data", false))
 				this.updatePitstop(data)
 

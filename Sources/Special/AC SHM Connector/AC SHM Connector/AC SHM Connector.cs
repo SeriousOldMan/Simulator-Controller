@@ -303,7 +303,7 @@ namespace SHMConnector
 
         public string ReadSetup()
         {
-            return "[Setup Data]\n";
+            return "";
         }
 
         public string ReadData() {

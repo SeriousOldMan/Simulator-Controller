@@ -290,7 +290,7 @@ checkForUpdates() {
 
 		if check {
 			try {
-				Download("https://www.dropbox.com/s/txa8muw9j3g66tl/VERSION?dl=1", kUserConfigDirectory . "VERSION")
+				Download("https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/VERSION", kUserConfigDirectory . "VERSION")
 			}
 			catch Any as exception {
 				check := false

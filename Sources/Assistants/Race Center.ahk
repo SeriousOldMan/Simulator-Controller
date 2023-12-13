@@ -6188,7 +6188,7 @@ class RaceCenter extends ConfigurationItem {
 			if lap.Accident
 				stint.Accidents += 1
 
-			if (lap.Penalty && this.Laps.Has(lap.Nr - 1) && (this.Laps(lap.Nr - 1).Penalty != lap.Penalty))
+			if (lap.Penalty && this.Laps.Has(lap.Nr - 1) && (this.Laps[lap.Nr - 1].Penalty != lap.Penalty))
 				stint.Penalties += 1
 
 			lapTimes.Push(lap.Laptime)
@@ -8076,7 +8076,7 @@ class RaceCenter extends ConfigurationItem {
 			if lap.Accident
 				accidents += 1
 
-			if (lap.Penalty && this.Laps.Has(lap.Nr - 1) && (this.Laps(lap.Nr - 1).Penalty != lap.Penalty))
+			if (lap.Penalty && this.Laps.Has(lap.Nr - 1) && (this.Laps[lap.Nr - 1].Penalty != lap.Penalty))
 				penalties += 1
 		}
 
@@ -8533,7 +8533,7 @@ class RaceCenter extends ConfigurationItem {
 
 					penalty := lap.Penalty
 
-					if (penalty && this.Laps.Has(lap.Nr - 1) && (this.Laps(lap.Nr - 1).Penalty != penalty)) {
+					if (penalty && this.Laps.Has(lap.Nr - 1) && (this.Laps[lap.Nr - 1].Penalty != penalty)) {
 						if (InStr(penalty, "SG") = 1) {
 							penalty := ((StrLen(penalty) > 2) ? (A_Space . SubStr(penalty, 3)) : "")
 
@@ -10534,7 +10534,7 @@ class RaceCenter extends ConfigurationItem {
 
 			penalty := lap.Penalty
 
-			if (penalty && this.Laps.Has(lap.Nr - 1) && (this.Laps(lap.Nr - 1).Penalty != penalty)) {
+			if (penalty && this.Laps.Has(lap.Nr - 1) && (this.Laps[lap.Nr - 1].Penalty != penalty)) {
 				if (InStr(penalty, "SG") = 1) {
 					penalty := ((StrLen(penalty) > 2) ? (A_Space . SubStr(penalty, 3)) : "")
 
@@ -11175,6 +11175,14 @@ class RaceCenter extends ConfigurationItem {
 		local hasFlatSpot := false
 		local tyres := CaseInsenseWeakMap()
 		local ignore, tyreData, tyre, key, wear, tread, grain, blister, flatSpot
+		local lastDriver, lastFuel, lastTyreCompound, lastTyreCompoundColor, lastTyreSet, lastTyrePressures
+
+		if inList(["ACC", "Assetto Corsa Competizione"], this.Simulator) {
+			this.getStintSetup(pitstopNr, true, &lastDriver, &lastFuel, &lastTyreCompound, &lastTyreCompoundColor, &lastTyreSet, &lastTyrePressures)
+
+			if (lastTyreCompound = "Wet")
+				return ""
+		}
 
 		for ignore, tyreData in this.SessionStore.query("Pitstop.Tyre.Data", {Where: {Pitstop: pitstopNr}})
 			tyres[tyreData["Tyre"]] := tyreData
@@ -11502,7 +11510,7 @@ class RaceCenter extends ConfigurationItem {
 				if lap.Accident
 					lapAccidents += 1
 
-				if (lap.Penalty && this.Laps.Has(lap.Nr - 1) && (this.Laps(lap.Nr - 1).Penalty != lap.Penalty))
+				if (lap.Penalty && this.Laps.Has(lap.Nr - 1) && (this.Laps[lap.Nr - 1].Penalty != lap.Penalty))
 					lapPenalties += 1
 			}
 

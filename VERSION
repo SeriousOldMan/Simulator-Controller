@@ -1,15 +1,15 @@
 [Development]
-Version=5.5.1.0-beta
+Version=5.5.1.0-release
 Target=5.5.1.0-release
-Date=12/13/2023
-Download=https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.5.1.0-dev.zip
+Date=12/15/2023
+Download=https://cutt.ly/XwSfgai2;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.5.1.0-release.zip
 Changes=Check for incomplete automatic update, Fixed post pitstop tyre set info in "Race Center" for ACC, Fixed display of pitstop service information in "Race Center", New display of pitstop time loss in "Race Center", Optimized application of pitstop preference in strategy recalculation, Added FrontBrake and RearBrake to "Simulator Setup", Sanity check after pitstop setup in ACC, "Edit Labels & Icons" now also available on the simulator page in "Simulator Setup", Detection of changed pitstop settings made outside the control of Simulator Controller, New car models for "Setup Workbench"
 Components=Media->5.3.0,Configuration->5.4.8,Utilities->5.4.8
 [Release]
-Version=5.5.0.0-release
-Date=12/06/2023
-Download=https://cutt.ly/QwPW4fZU;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.5.0.0-release.zip
-Changes=Added autonomous mode in "Race Settings", Detect simulator, car and track change during the first lap by the Assistants, New Replay mode for Developer, Increased compatibility of "Simulator Setup" and "Simulator Configuration", Increased reliability for position and standings calculations for retired cars, Fixed Pitstop MFD for AMS2, Fixed Pitstop MFD for rF2, Fixed Pitstop MFD for R3E, Optimized rFactor 2 pitstop settings acquisition
+Version=5.5.1.0-release
+Date=12/15/2023
+Download=https://cutt.ly/XwSfgai2;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.5.1.0-release.zip
+Changes=Check for incomplete automatic update, Fixed post pitstop tyre set info in "Race Center" for ACC, Fixed display of pitstop service information in "Race Center", New display of pitstop time loss in "Race Center", Optimized application of pitstop preference in strategy recalculation, Added FrontBrake and RearBrake to "Simulator Setup", Sanity check after pitstop setup in ACC, "Edit Labels & Icons" now also available on the simulator page in "Simulator Setup", Detection of changed pitstop settings made outside the control of Simulator Controller, New car models for "Setup Workbench"
 Components=Media->5.3.0,Configuration->5.4.8,Utilities->5.4.8
 [Components]
 Media.5.3.0.Path=Resources
@@ -22,7 +22,7 @@ Utilities.5.4.8.Path=.
 Utilities.5.4.8.Content=Utilities
 Utilities.5.4.8.Download=https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+5.4.8.zip
 [Current]
-Type=Development
+Type=Release
 [Version]
-Development=5.5.1.0-beta
-Release=5.5.0.0-release
+Development=5.5.1.0-release
+Release=5.5.1.0-release

@@ -11177,12 +11177,12 @@ class RaceCenter extends ConfigurationItem {
 		local ignore, tyreData, tyre, key, wear, tread, grain, blister, flatSpot
 		local lastDriver, lastFuel, lastTyreCompound, lastTyreCompoundColor, lastTyreSet, lastTyrePressures
 
-		if inList(["ACC", "Assetto Corsa Competizione"], this.Simulator) {
-			this.getStintSetup(pitstopNr, true, &lastDriver, &lastFuel, &lastTyreCompound, &lastTyreCompoundColor, &lastTyreSet, &lastTyrePressures)
+		this.getStintSetup(pitstopNr, true, &lastDriver, &lastFuel, &lastTyreCompound, &lastTyreCompoundColor, &lastTyreSet, &lastTyrePressures)
 
-			if (lastTyreCompound = "Wet")
-				return ""
-		}
+		if (inList(["ACC", "Assetto Corsa Competizione"], this.Simulator) && (lastTyreCompound = "Wet"))
+			return ""
+		else if lastTyreCompound
+			tyreCompound := compound(lastTyreCompound, lastTyreCompoundColor)
 
 		for ignore, tyreData in this.SessionStore.query("Pitstop.Tyre.Data", {Where: {Pitstop: pitstopNr}})
 			tyres[tyreData["Tyre"]] := tyreData
@@ -11195,7 +11195,7 @@ class RaceCenter extends ConfigurationItem {
 				laps := tyres[key]["Laps"]
 
 			if !tyreCompound
-				tyreCompound := translate(compound(tyres[key]["Compound"], tyres[key]["Compound.Color"]))
+				tyreCompound := compound(tyres[key]["Compound"], tyres[key]["Compound.Color"])
 
 			if !tyreSet
 				tyreSet := tyres[key]["Set"]
@@ -11244,7 +11244,7 @@ class RaceCenter extends ConfigurationItem {
 			html .= ("<tr><td><b>" . translate("Laps:") . "</b></div></td><td>" . laps . "</td></tr>")
 
 		if tyreCompound
-			html .= ("<tr><td><b>" . translate("Tyre Compound:") . "</b></div></td><td>" . tyreCompound . "</td></tr>")
+			html .= ("<tr><td><b>" . translate("Tyre Compound:") . "</b></div></td><td>" . translate(tyreCompound) . "</td></tr>")
 
 		if tyreSet
 			html .= ("<tr><td><b>" . translate("Tyre Set:") . "</b></div></td><td>" . tyreSet . "</td></tr>")

@@ -5,7 +5,7 @@
   4. The "Edit Labels & Icons..." button is now also available on the simulators page in "Simulator Setup".
   5. The actions to select the front and rear brake pads for service has been added for *Assetto Corsa Competizione* to "Simulator Setup".
   6. A sanity check has been integrated in the automatic setup of the pitstop settings for *Assetto Corsa Competizione*. A warning sound is emitted, if incorrect values have been entered, for example, if a brake pad change has been activated.
-  7. The application of the preference slide for an early or a late pitstop has been optimized for the automatic recalculation of a strategy by the Strategist or in the "Race Center".
+  7. The application of the preference slider for an early or a late pitstop has been optimized for the automatic recalculation of a strategy by the Strategist or in the "Race Center".
   8. Fixed an off by one error for the post pitstop tyre set information for *Asseto Corsa Competizione* in "Race Center".
   9. Corrected several values in the *Service* section of the Pitstop report in "Race Center".
   10. Separate values for service time, repairs time and pitlane time loss are now displayed in the Pitstop report in "Race Center".

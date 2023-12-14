@@ -620,8 +620,10 @@ launchPad(command := false, arguments*) {
 		launchPadGui.SetFont("s7 Norm", "Arial")
 
 		launchPadGui.Add("Picture", "x16 yp+24 w60 h60 Section vStartup", kIconsDirectory . "Startup.ico").OnEvent("Click", launchStartup.Bind(false))
+		widget := launchPadGui.Add("Picture", "x59 yp+43 w14 h14 BackgroundTrans", kIconsDirectory . "General Settings White.ico")
+		widget.OnEvent("Click", launchStartup.Bind(true))
 
-		launchPadGui.Add("Picture", "xp+90 yp w60 h60 vRaceSettings", kIconsDirectory . "Race Settings.ico").OnEvent("Click", launchApplication.Bind("RaceSettings"))
+		launchPadGui.Add("Picture", "xp+90 ys w60 h60 vRaceSettings", kIconsDirectory . "Race Settings.ico").OnEvent("Click", launchApplication.Bind("RaceSettings"))
 		launchPadGui.Add("Picture", "xp+74 yp w60 h60 vSessionDatabase", kIconsDirectory . "Session Database.ico").OnEvent("Click", launchApplication.Bind("SessionDatabase"))
 
 		launchPadGui.Add("Picture", "xp+90 yp w60 h60 vPracticeCenter", kIconsDirectory . "Practice.ico").OnEvent("Click", launchApplication.Bind("PracticeCenter"))
@@ -633,7 +635,7 @@ launchPad(command := false, arguments*) {
 		launchPadGui.Add("Picture", "xp+90 yp w60 h60 vRaceReports", kIconsDirectory . "Chart.ico").OnEvent("Click", launchApplication.Bind("RaceReports"))
 		; launchPadGui.Add("Picture", "xp+184 yp w60 h60 vSystemMonitor", kIconsDirectory . "Monitoring.ico").OnEvent("Click", launchApplication.Bind("SystemMonitor"))
 
-		launchPadGui.Add("Button", "x16 yp+64 w60 h23 Center", "Startup...").OnEvent("Click", launchStartup.Bind(true))
+		launchPadGui.Add("Text", "x16 yp+64 w60 h23 Center", "Startup")
 		launchPadGui.Add("Text", "xp+90 yp w60 h40 Center", "Race Settings")
 		launchPadGui.Add("Text", "xp+74 yp w60 h40 Center", "Session Database")
 		launchPadGui.Add("Text", "xp+90 yp w60 h40 Center", "Practice Center")

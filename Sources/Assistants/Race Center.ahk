@@ -11326,14 +11326,31 @@ class RaceCenter extends ConfigurationItem {
 		local repairsData := []
 		local tyreCompound, tyreSet, index, pitstopData, serviceData, pressures, repairBodywork, repairSuspension, repairs, fuel
 		local name, key, tyrePressures, header, repairEngine
+		local time
 
 		for index, pitstopData in this.SessionStore.Tables["Pitstop.Data"] {
 			pitstopNRs.Push("<th class=`"th-std`">" . index . "</th>")
 
 			serviceData := this.SessionStore.query("Pitstop.Service.Data", {Where: {Pitstop: index}})
 
-			if (serviceData.Length = 0) {
-				timeData.Push("<td class=`"td-std`">" . "-" . "</td>")
+			if (true || (serviceData.Length = 0)) {
+				time := ((pitstopData["Time.Service"] != kNull) ? displayValue("Float", pitstopData["Time.Service"], 0) : "")
+
+				if (pitstopData["Time.Repairs"] != kNull) {
+					if (time != "")
+						time .= translate(" / ")
+
+					time .= displayValue("Float", pitstopData["Time.Repairs"], 0)
+				}
+
+				if (pitstopData["Time.Pitlane"] != kNull) {
+					if (time != "")
+						time .= translate(" / ")
+
+					time .= displayValue("Float", pitstopData["Time.Pitlane"], 0)
+				}
+
+				timeData.Push("<td class=`"td-std`">" . ((time != "") ? time : "-") . "</td>")
 				previousDriverData.Push("<td class=`"td-std`">" . displayNullValue(pitstopData["Driver.Current"]) . "</td>")
 				nextDriverData.Push("<td class=`"td-std`">" . displayNullValue(pitstopData["Driver.Next"]) . "</td>")
 

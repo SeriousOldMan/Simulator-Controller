@@ -33,6 +33,8 @@ global kTeamServerPlugin := "Team Server"
 ;;;-------------------------------------------------------------------------;;;
 
 class TeamServerPlugin extends ControllerPlugin {
+	static sStartupSettings := kUndefined
+
 	iConnector := false
 
 	iServerURL := false
@@ -302,6 +304,12 @@ class TeamServerPlugin extends ControllerPlugin {
 		local dllFile := (kBinariesDirectory . "Connectors\Team Server Connector.dll")
 		local teamServerToggle, arguments, openRaceSettings, openRaceCenter
 
+		if (TeamServerPlugin.sStartupSettings = kUndefined)
+			if FileExist(kUserConfigDirectory . "Simulator Startup.ini")
+				TeamServerPlugin.sStartupSettings := readMultiMap(kUserConfigDirectory . "Simulator Startup.ini")
+			else
+				TeamServerPlugin.sStartupSettings := false
+
 		try {
 			if (!FileExist(dllFile)) {
 				logMessage(kLogCritical, translate("Team Server Connector.dll not found in ") . kBinariesDirectory)
@@ -341,6 +349,9 @@ class TeamServerPlugin extends ControllerPlugin {
 			}
 			else
 				this.iTeamServerEnabled := false
+
+			if TeamServerPlugin.sStartupSettings
+				this.iTeamServerEnabled := getMultiMapValue(TeamServerPlugin.sStartupSettings, "Team Server", "Enabled", this.iTeamServerEnabled)
 
 			openRaceSettings := this.getArgumentValue("openRaceSettings", false)
 

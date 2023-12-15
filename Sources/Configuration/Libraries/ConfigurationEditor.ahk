@@ -262,7 +262,24 @@ class ConfigurationEditor extends ConfigurationItem {
 
 	Configurators[key?] {
 		Get {
-			return (isSet(key) ? this.iConfigurators[key] : this.iConfigurators)
+			local result, ignore, configurator
+
+			if isSet(key) {
+				if isNumber(key)
+					return this.iConfigurators[key]
+				else if (key = "OBJECT") {
+					result := []
+
+					for ignore, configurator in this.iConfigurators
+						result.Push(configurator[2])
+
+					return result
+				}
+				else
+					throw "Unknown argument detected in ConfigurationEditor.Configurators..."
+			}
+			else
+				return this.iConfigurators
 		}
 	}
 

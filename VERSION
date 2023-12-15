@@ -1,9 +1,9 @@
 [Development]
-Version=5.5.0.0-dev
-Target=5.5.0.0-release
-Date=12/04/2023
+Version=5.5.2.0-dev
+Target=5.5.2.0-release
+Date=12/15/2023
 Download=
-Changes=Added autonomous mode in "Race Settings", Detect simulator, car and track change during the first lap by the Assistants, New Replay mode for Developer, Increased compatibility of "Simulator Setup" and "Simulator Configuration", Increased reliability for position and standings calculations for retired cars
+Changes=New startup wizard in "Simulator Startup"
 Components=Media->5.3.0,Configuration->5.4.8,Utilities->5.4.8
 [Release]
 Version=5.4.8.0-release
@@ -30,5 +30,5 @@ Utilities.5.4.8.Download=https://simulatorcontroller.s3.eu-central-1.amazonaws.c
 [Current]
 Type=Development
 [Version]
-Development=5.5.0.0-dev
+Development=5.5.2.0-dev
 Release=5.4.8.0-release

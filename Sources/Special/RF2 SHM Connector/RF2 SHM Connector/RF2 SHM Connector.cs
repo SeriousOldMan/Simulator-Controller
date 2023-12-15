@@ -94,11 +94,12 @@ namespace SHMConnector {
 				request = request.Split(new char[] { '=' }, 2)[1];
 
                 string[] arguments = request.Split('=');
+                string[] message = arguments[1].Split(':');
 
                 if (arguments[0] == "Set")
-                    this.ExecutePitstopSetCommand(arguments[1], arguments[2].Split(';'));
+                    this.ExecutePitstopSetCommand(message[0], message[1].Split(';'));
                 else if ((arguments[0] == "Increase") || (arguments[0] == "Decrease"))
-                    this.ExecutePitstopChangeCommand(arguments[1], arguments[0], arguments[2].Split(';'));
+                    this.ExecutePitstopChangeCommand(message[0], arguments[0], message[1].Split(';'));
 
 				return "";
             }
@@ -107,7 +108,7 @@ namespace SHMConnector {
             else if (request.StartsWith("Standings"))
                 return this.ReadStandings();
             else
-                return this.ReadData() + this.ReadSetup();
+                return this.ReadData(); // + this.ReadSetup();
         }
 
         public string GetForname(byte[] name) {
@@ -227,8 +228,8 @@ namespace SHMConnector {
 					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".InPitLane="); strWriter.WriteLine(vehicle.mInPits != 0 ? "true" : "false");
 					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".InPit="); strWriter.WriteLine(vehicle.mPitState == (byte)Stopped ? "true" : "false");
 
-					if (Object.ReferenceEquals(vehicle, playerVehicle))
-					{
+					if (vehicle.mIsPlayer == 1)
+                    {
 						strWriter.Write("Driver.Car=");
 						strWriter.WriteLine(i);
 					}
@@ -488,9 +489,9 @@ namespace SHMConnector {
 			return nullIdx >= 0 ? Encoding.Default.GetString(bytes, 0, nullIdx) : Encoding.Default.GetString(bytes);
 		}
 
-		public static rF2VehicleScoring GetPlayerScoring(ref rF2Scoring scoring) {
-			var playerVehScoring = new rF2VehicleScoring();
+        static rF2VehicleScoring noPlayer = new rF2VehicleScoring();
 
+        public static ref rF2VehicleScoring GetPlayerScoring(ref rF2Scoring scoring) {
 			for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i) {
 				var vehicle = scoring.mVehicles[i];
 
@@ -499,7 +500,7 @@ namespace SHMConnector {
 					case rFactor2Constants.rF2Control.Player:
 					case rFactor2Constants.rF2Control.Remote:
 						if (vehicle.mIsPlayer == 1)
-							playerVehScoring = vehicle;
+							break;
 
 						break;
 
@@ -507,11 +508,11 @@ namespace SHMConnector {
 						continue;
 				}
 
-				if (playerVehScoring.mIsPlayer == 1)
+				if (vehicle.mIsPlayer == 1)
 					break;
 			}
 
-			return playerVehScoring;
+			return ref noPlayer;
 		}
 
 		public static rF2VehicleTelemetry GetPlayerTelemetry(int id, ref rF2Telemetry telemetry) {
@@ -811,7 +812,7 @@ namespace SHMConnector {
 		}
 		
 		private bool SelectPitstopOption(string option, string direction) {
-			int tries = 5;
+			int tries = 2;
 
 			pitInfoBuffer.GetMappedData(ref pitInfo);
 
@@ -833,7 +834,7 @@ namespace SHMConnector {
 		}
 
 		private bool SelectPitstopCategory(string category) {
-			int tries = 5;
+			int tries = 2;
 
 			pitInfoBuffer.GetMappedData(ref pitInfo);
 
@@ -859,7 +860,7 @@ namespace SHMConnector {
 		private void SendPitstopCommand(string command) {
 			var now = DateTime.Now;
 			if (now < this.nextKeyHandlingTime)
-				Thread.Sleep(100);
+				Thread.Sleep(200);
 
 			for (int i = 0; i < command.Length; i++) {
 				byte[] commandStr = null;
@@ -879,7 +880,7 @@ namespace SHMConnector {
 				Thread.Sleep(100);
 			}
 
-			this.nextKeyHandlingTime = now + TimeSpan.FromMilliseconds(100);
+			this.nextKeyHandlingTime = now + TimeSpan.FromMilliseconds(200);
 		}
 
 		public string ReadSetup() {

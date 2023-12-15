@@ -180,8 +180,8 @@ namespace RF2SHMProvider {
 				Console.Write("Car."); Console.Write(i); Console.Write(".InPitLane="); Console.WriteLine(vehicle.mInPits != 0 ? "true" : "false");
 				Console.Write("Car."); Console.Write(i); Console.Write(".InPit="); Console.WriteLine(vehicle.mPitState == (byte)Stopped ? "true" : "false");
 
-				if (Object.ReferenceEquals(vehicle, playerVehicle))
-				{
+				if (vehicle.mIsPlayer == 1)
+                {
 					Console.Write("Driver.Car=");
 					Console.WriteLine(i);
 				}
@@ -460,33 +460,36 @@ namespace RF2SHMProvider {
 			return nullIdx >= 0 ? Encoding.Default.GetString(bytes, 0, nullIdx) : Encoding.Default.GetString(bytes);
 		}
 
-		public static rF2VehicleScoring GetPlayerScoring(ref rF2Scoring scoring) {
-			var playerVehScoring = new rF2VehicleScoring();
+        static rF2VehicleScoring noPlayer = new rF2VehicleScoring();
 
-			for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i) {
-				var vehicle = scoring.mVehicles[i];
+        public static ref rF2VehicleScoring GetPlayerScoring(ref rF2Scoring scoring)
+        {
+            for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)
+            {
+                var vehicle = scoring.mVehicles[i];
 
-				switch ((rFactor2Constants.rF2Control)vehicle.mControl) {
-					case rFactor2Constants.rF2Control.AI:
-					case rFactor2Constants.rF2Control.Player:
-					case rFactor2Constants.rF2Control.Remote:
-						if (vehicle.mIsPlayer == 1)
-							playerVehScoring = vehicle;
+                switch ((rFactor2Constants.rF2Control)vehicle.mControl)
+                {
+                    case rFactor2Constants.rF2Control.AI:
+                    case rFactor2Constants.rF2Control.Player:
+                    case rFactor2Constants.rF2Control.Remote:
+                        if (vehicle.mIsPlayer == 1)
+                            break;
 
-						break;
+                        break;
 
-					default:
-						continue;
-				}
+                    default:
+                        continue;
+                }
 
-				if (playerVehScoring.mIsPlayer == 1)
-					break;
-			}
+                if (vehicle.mIsPlayer == 1)
+                    break;
+            }
 
-			return playerVehScoring;
-		}
+            return ref noPlayer;
+        }
 
-		public static rF2VehicleTelemetry GetPlayerTelemetry(int id, ref rF2Telemetry telemetry) {
+        public static rF2VehicleTelemetry GetPlayerTelemetry(int id, ref rF2Telemetry telemetry) {
 			var playerVehTelemetry = new rF2VehicleTelemetry();
 
 			for (int i = 0; i < telemetry.mNumVehicles; ++i) {
@@ -831,7 +834,7 @@ namespace RF2SHMProvider {
 		private void SendPitstopCommand(string command) {
 			var now = DateTime.Now;
 			if (now < this.nextKeyHandlingTime)
-				Thread.Sleep(100);
+				Thread.Sleep(200);
 
 			for (int i = 0; i < command.Length; i++) {
 				byte[] commandStr = null;
@@ -848,7 +851,7 @@ namespace RF2SHMProvider {
 
 				this.SendPitMenuCmd(commandStr, fRetVal);
 
-				Thread.Sleep(100);
+				Thread.Sleep(200);
 			}
 
 			this.nextKeyHandlingTime = now + TimeSpan.FromMilliseconds(100);

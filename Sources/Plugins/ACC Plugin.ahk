@@ -67,6 +67,10 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	iPSChangeTyres := false
 	iPSChangeBrakes := false
 
+	iOldChangeBrakes := false
+
+	iLastTyreCompound := false
+
 	iPSImageSearchArea := false
 
 	iChatMode := false
@@ -273,7 +277,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", false)
 			else
 				this.iOpenPitstopMFDHotkey := "Off"
-			
+
 			this.iClosePitstopMFDHotkey := this.getArgumentValue("closePitstopMFD", false)
 
 			this.iUDPConnection := this.getArgumentValue("udpConnection", false)
@@ -430,6 +434,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			if (session == kSessionFinished) {
 				this.iRepairSuspensionChosen := true
 				this.iRepairBodyworkChosen := true
+
+				this.iLastTyreCompound := false
 			}
 
 			if (session != kSessionPaused)
@@ -437,14 +443,25 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	acquireSessionData(&telemetryData, &positionsData) {
+	acquireTelemetryData() {
+		local telemetryData := super.acquireTelemetryData()
+
+		if (getMultiMapValues(telemetryData, "Setup Data", false) && (this.iLastTyreCompound && this.iPSChangeTyres)) {
+			setMultiMapValue(telemetryData, "Setup Data", "TyreCompound", this.iLastTyreCompound)
+			setMultiMapValue(telemetryData, "Setup Data", "TyreCompoundColor", "Black")
+		}
+
+		return telemetryData
+	}
+
+	acquireSessionData(&telemetryData, &positionsData, finished := false) {
 		if !this.iPositionsDataFuture
 			this.iPositionsDataFuture := ACCPlugin.PositionsDataFuture(this)
 
-		return super.acquireSessionData(&telemetryData, &positionsData)
+		return super.acquireSessionData(&telemetryData, &positionsData, finished)
 	}
 
-	acquirePositionsData(telemetryData) {
+	acquirePositionsData(telemetryData, finished := false) {
 		local positionsData, session
 		local lap, restart, fileName, tries
 		local driverID, driverForname, driverSurname, driverNickname, lapTime, driverCar, driverCarCandidate, carID, car
@@ -534,7 +551,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 						}
 				}
 			}
-			
+
 			if !driverCar
 				loop {
 					carID := getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Car", kUndefined)
@@ -546,7 +563,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 						driverCar := A_Index
 
 						lastDriverCar := driverCar
-						
+
 						break
 					}
 					else if (getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Time") = lapTime)
@@ -558,7 +575,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 			setMultiMapValue(positionsData, "Position Data", "Driver.Car", driverCar)
 
-			return this.correctPositionsData(positionsData)
+			return (finished ? positionsData : this.correctPositionsData(positionsData))
 		}
 		else {
 			this.shutdownUDPClient(true)
@@ -707,7 +724,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 						if this.iPSIsOpen
 							Task.startTask("updatePitstopState", 5000, kLowPriority)
 					}
-					
+
 					return this.iPSIsOpen
 				}
 				else
@@ -723,7 +740,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 			showMessage(translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration...")
 					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-			
+
 			return false
 		}
 	}
@@ -872,6 +889,11 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 				this.iRepairSuspensionChosen := repairSuspensionChosen
 				this.iRepairBodyworkChosen := (repairBodyworkChosen || repairSuspensionChosen)
+
+				if this.iPSChangeTyres
+					this.iLastTyreCompound := (inList(this.iPSOptions, "Tyre Set") ? "Dry" : "Wet")
+				else
+					this.iLastTyreCompound := false
 
 				break
 			}
@@ -1204,7 +1226,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 					newValues := this.getPitstopOptionValues("Tyre Compound")
 
 					if newValues
-						this.RaceEngineer.pitstopOptionChanged("Tyre Compound", newValues*)
+						this.RaceEngineer.pitstopOptionChanged("Tyre Compound", true, newValues*)
 				default:
 					super.notifyPitstopChanged((option = "No Refuel") ? "Refuel" : option)
 			}
@@ -1248,14 +1270,22 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 		try {
 			if (this.requirePitstopMFD() && this.selectPitstopOption("Tyre Compound"))
-				if (InStr(selection, "Wet") = 1)
+				if (InStr(selection, "Wet") = 1) {
 					this.changePitstopOption("Tyre Compound", "Increase")
-				else if (InStr(selection, "Dry") = 1)
+
+					this.iLastTyreCompound := "Wet"
+				}
+				else if (InStr(selection, "Dry") = 1) {
 					this.changePitstopOption("Tyre Compound", "Decrease")
+
+					this.iLastTyreCompound := "Dry"
+				}
 				else
 					switch selection, false {
 						case "Increase", "Decrease":
 							this.changePitstopOption("Tyre Compound", selection)
+
+							this.iLastTyreCompound := ((selection = "Increase") ? "Wet" : "Dry")
 						default:
 							throw "Unsupported selection `"" . selection . "`" detected in ACCPlugin.changeTyreCompound..."
 					}
@@ -1966,6 +1996,12 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		return true
 	}
 
+	restoreSessionState(&sessionSettings, &sessionState) {
+		super.restoreSessionState(&sessionSettings, &sessionState)
+
+		this.iLastTyreCompound := false
+	}
+
 	supportsRaceAssistant(assistantPlugin) {
 		if ((assistantPlugin = kRaceStrategistPlugin) || (assistantPlugin = kRaceSpotterPlugin))
 			return ((FileExist(kBinariesDirectory . "Providers\ACC UDP Provider.exe") != false) && super.supportsRaceAssistant(assistantPlugin))
@@ -2029,17 +2065,23 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		super.startPitstopSetup(pitstopNumber)
 
 		withProtection(ObjBindMethod(this, "requirePitstopMFD", this.iNoImageSearch))
+
+		this.iOldChangeBrakes := this.iPSChangeBrakes
 	}
 
 	finishPitstopSetup(pitstopNumber) {
 		super.finishPitstopSetup(pitstopNumber)
+
+		if (this.iOldChangeBrakes != this.iPSChangeBrakes)
+			loop 3
+				SoundPlay(kResourcesDirectory . "Sounds\Critical.wav", "Wait")
 
 		closePitstopMFD()
 	}
 
 	pitstopFinished(pitstopNumber, async := false) {
 		local retry, updateTime, carState, pitstopState, currentDriver, currentTyreSet, tyreStates, pitstopData
-		local pressures, index, pressure, ignore, tyreSet, wearState, tread, section, grain, blister, flatSpot
+		local pressures, index, pressure, ignore, tyreSet, wearState, tread, section, grain, blister, flatSpot, marbles
 		local data, tyre, key, value, wear
 
 		static updateTask := false
@@ -2081,15 +2123,15 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 						currentDriver := pitstopState["driversNames"][pitstopState["currentDriverIndex"] + 1]
 
-						pitstopData := CaseInsenseMap("Pitstop", pitstopNumber
-													, "Service.Time", pitstopState["timeRequired"]
-													, "Service.Lap", carState["lapCount"]
-													, "Service.Driver.Previous", currentDriver
-													, "Service.Driver.Next", pitstopState["newDriverNameToDisplay"]
-													, "Service.Refuel", pitstopState["fuelToAdd"]
-													, "Service.Bodywork.Repair", (pitstopState["repairBody"] ? true : false)
-													, "Service.Suspension.Repair", (pitstopState["repairSuspension"] ? true : false)
-													, "Service.Engine.Repair", false)
+						pitstopData := newSectionMap("Pitstop", pitstopNumber
+												   , "Service.Time", pitstopState["timeRequired"]
+												   , "Service.Lap", carState["lapCount"]
+												   , "Service.Driver.Previous", currentDriver
+												   , "Service.Driver.Next", pitstopState["newDriverNameToDisplay"]
+												   , "Service.Refuel", pitstopState["fuelToAdd"]
+												   , "Service.Bodywork.Repair", (pitstopState["repairBody"] ? true : false)
+												   , "Service.Suspension.Repair", (pitstopState["repairSuspension"] ? true : false)
+												   , "Service.Engine.Repair", (pitstopState["repairEngine"] ? true : false))
 
 						if !listEqual(pitstopState["tyreToChange"], [false, false, false, false]) {
 							pitstopData["Service.Tyre.Compound"] := ((pitstopState["newTyreCompound"] = 0) ? "Dry" : "Wet")
@@ -2104,9 +2146,11 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 							pitstopData["Service.Tyre.Pressures"] := values2String(",", pressures*)
 						}
 
+						data := newMultiMap()
+						tyreStates := []
+
 						if (carState["currentTyreCompound"] = 0) {
 							currentTyreSet := carState["currentTyreSet"]
-							tyreStates := []
 
 							for ignore, tyreSet in carState["tyreSets"]
 								if (tyreSet["tyreSet"] = currentTyreSet) {
@@ -2119,30 +2163,37 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 										for index, section in tread
 											tread[index] := Round(section, 2)
 
+										marbles := Round(wearState["marblesLevel"], 2)
 										grain := Round(wearState["grain"], 2)
 										blister := Round(wearState["blister"], 2)
 										flatSpot := Round(wearState["flatSpot"], 2)
 
-										tyreStates.Push(CaseInsenseMap("Tyre", tyre, "Tread", tread, "Wear", wear, "Grain", grain, "Blister", blister, "FlatSpot", flatSpot))
+										tyreStates.Push(CaseInsenseMap("Tyre", tyre, "Tread", tread, "Wear", wear
+																	 , "Grain", grain, "Blister", blister, "FlatSpot", flatSpot, "Marbles", marbles))
 									}
 
 									pitstopData["Tyre.Driver"] := currentDriver
 									pitstopData["Tyre.Laps"] := false
 									pitstopData["Tyre.Compound"] := "Dry"
 									pitstopData["Tyre.Compound.Color"] := "Black"
-									pitstopData["Tyre.Set"] := (currentTyreSet + 1)
+									pitstopData["Tyre.Set"] := currentTyreSet
+									pitstopData["Tyre.State"] := tyreSet["state"]
+
+									for ignore, tyre in ["Front.Left", "Front.Right", "Rear.Left", "Rear.Right"]
+										for key, value in tyreStates[A_Index]
+											setMultiMapValue(data, "Pitstop Data", "Tyre." . key . "." . tyre, isObject(value) ? values2String(",", value*) : value)
 
 									break
 								}
 						}
+						else {
+							pitstopData["Tyre.Driver"] := currentDriver
+							pitstopData["Tyre.Laps"] := false
+							pitstopData["Tyre.Compound"] := "Wet"
+							pitstopData["Tyre.Compound.Color"] := "Black"
+						}
 
-						data := newMultiMap()
-
-						setMultiMapValues(data, "Pitstop Data", pitstopData)
-
-						for ignore, tyre in ["Front.Left", "Front.Right", "Rear.Left", "Rear.Right"]
-							for key, value in tyreStates[A_Index]
-								setMultiMapValue(data, "Pitstop Data", "Tyre." . key . "." . tyre, isObject(value) ? values2String(",", value*) : value)
+						setMultiMapValues(data, "Pitstop Data", pitstopData, false)
 
 						writeMultiMap(kTempDirectory . "Pitstop " . pitstopNumber . ".ini", data)
 
@@ -2170,14 +2221,15 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 		super.setPitstopRefuelAmount(pitstopNumber, liters)
 
-		loop 3 {
-			litersIncrement := Round(liters - this.getPitstopOptionValues("Refuel")[1])
+		if this.requirePitstopMFD()
+			loop 3 {
+				litersIncrement := Round(liters - this.getPitstopOptionValues("Refuel")[1])
 
-			if (litersIncrement != 0)
-				changePitstopFuelAmount((litersIncrement > 0) ? "Increase" : "Decrease", Abs(litersIncrement))
-			else
-				break
-		}
+				if (litersIncrement != 0)
+					changePitstopFuelAmount((litersIncrement > 0) ? "Increase" : "Decrease", Abs(litersIncrement))
+				else
+					break
+			}
 	}
 
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
@@ -2185,32 +2237,33 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 		super.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
 
-		if compound {
-			loop 3 {
-				finished := true
+		if this.requirePitstopMFD()
+			if compound {
+				loop 3 {
+					finished := true
 
-				if (this.getPitstopOptionValues("Tyre Compound")[1] != compound) {
-					finished := false
-
-					changePitstopTyreCompound((compound = "Wet") ? "Increase" : "Decrease")
-				}
-
-				if (set && (compound = "Dry")) {
-					tyreSetIncrement := Round(set - this.getPitstopOptionValues("Tyre Set")[1])
-
-					if (tyreSetIncrement != 0) {
+					if (this.getPitstopOptionValues("Tyre Compound")[1] != compound) {
 						finished := false
 
-						changePitstopTyreSet((tyreSetIncrement > 0) ? "Next" : "Previous", Abs(tyreSetIncrement))
+						changePitstopTyreCompound((compound = "Wet") ? "Increase" : "Decrease")
 					}
-				}
 
-				if finished
-					break
+					if (set && (compound = "Dry")) {
+						tyreSetIncrement := Round(set - this.getPitstopOptionValues("Tyre Set")[1])
+
+						if (tyreSetIncrement != 0) {
+							finished := false
+
+							changePitstopTyreSet((tyreSetIncrement > 0) ? "Next" : "Previous", Abs(tyreSetIncrement))
+						}
+					}
+
+					if finished
+						break
+				}
 			}
-		}
-		else if this.iPSChangeTyres
-			this.toggleActivity("Change Tyres")
+			else if this.iPSChangeTyres
+				this.toggleActivity("Change Tyres")
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
@@ -2218,60 +2271,63 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 		super.setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR)
 
-		loop 3 {
-			finished := true
+		if this.requirePitstopMFD()
+			loop 3 {
+				finished := true
 
-			pressures := this.getPitstopOptionValues("Tyre Pressures")
+				pressures := this.getPitstopOptionValues("Tyre Pressures")
 
-			pressureFLIncrement := Round(pressureFL - pressures[1], 1)
-			pressureFRIncrement := Round(pressureFR - pressures[2], 1)
-			pressureRLIncrement := Round(pressureRL - pressures[3], 1)
-			pressureRRIncrement := Round(pressureRR - pressures[4], 1)
+				pressureFLIncrement := Round(pressureFL - pressures[1], 1)
+				pressureFRIncrement := Round(pressureFR - pressures[2], 1)
+				pressureRLIncrement := Round(pressureRL - pressures[3], 1)
+				pressureRRIncrement := Round(pressureRR - pressures[4], 1)
 
-			if (pressureFLIncrement != 0) {
-				finished := false
+				if (pressureFLIncrement != 0) {
+					finished := false
 
-				changePitstopTyrePressure("Front Left", (pressureFLIncrement > 0) ? "Increase" : "Decrease", Abs(Round(pressureFLIncrement * 10)))
+					changePitstopTyrePressure("Front Left", (pressureFLIncrement > 0) ? "Increase" : "Decrease", Abs(Round(pressureFLIncrement * 10)))
+				}
+
+				if (pressureFRIncrement != 0) {
+					finished := false
+
+					changePitstopTyrePressure("Front Right", (pressureFRIncrement > 0) ? "Increase" : "Decrease", Abs(Round(pressureFRIncrement * 10)))
+				}
+
+				if (pressureRLIncrement != 0) {
+					finished := false
+
+					changePitstopTyrePressure("Rear Left", (pressureRLIncrement > 0) ? "Increase" : "Decrease", Abs(Round(pressureRLIncrement * 10)))
+				}
+
+				if (pressureRRIncrement != 0) {
+					finished := false
+
+					changePitstopTyrePressure("Rear Right", (pressureRRIncrement > 0) ? "Increase" : "Decrease", Abs(Round(pressureRRIncrement * 10)))
+				}
+
+				if finished
+					break
 			}
-
-			if (pressureFRIncrement != 0) {
-				finished := false
-
-				changePitstopTyrePressure("Front Right", (pressureFRIncrement > 0) ? "Increase" : "Decrease", Abs(Round(pressureFRIncrement * 10)))
-			}
-
-			if (pressureRLIncrement != 0) {
-				finished := false
-
-				changePitstopTyrePressure("Rear Left", (pressureRLIncrement > 0) ? "Increase" : "Decrease", Abs(Round(pressureRLIncrement * 10)))
-			}
-
-			if (pressureRRIncrement != 0) {
-				finished := false
-
-				changePitstopTyrePressure("Rear Right", (pressureRRIncrement > 0) ? "Increase" : "Decrease", Abs(Round(pressureRRIncrement * 10)))
-			}
-
-			if finished
-				break
-		}
 	}
 
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine := false) {
 		super.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine)
 
-		this.toggleActivity("Repair Suspension")
-		this.toggleActivity("Repair Suspension")
-		this.toggleActivity("Repair Bodywork")
-
-		if repairBodywork
+		if this.requirePitstopMFD() {
+			this.toggleActivity("Repair Suspension")
+			this.toggleActivity("Repair Suspension")
 			this.toggleActivity("Repair Bodywork")
 
-		if repairSuspension
-			this.toggleActivity("Repair Suspension")
+			if repairBodywork
+				this.toggleActivity("Repair Bodywork")
 
-		this.iRepairSuspensionChosen := repairSuspension
-		this.iRepairBodyworkChosen := (repairBodywork || repairSuspension)
+			if repairSuspension
+				this.toggleActivity("Repair Suspension")
+
+			this.iRepairSuspensionChosen := repairSuspension
+			this.iRepairBodyworkChosen := (repairBodywork || repairSuspension)
+		}
 	}
 
 	requestPitstopDriver(pitstopNumber, driver) {
@@ -2279,22 +2335,23 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 		super.requestPitstopDriver(pitstopNumber, driver)
 
-		if driver {
-			driver := string2Values("|", driver)
+		if this.requirePitstopMFD()
+			if driver {
+				driver := string2Values("|", driver)
 
-			nextDriver := string2Values(":", driver[2])
-			currentDriver := string2Values(":", driver[1])
+				nextDriver := string2Values(":", driver[2])
+				currentDriver := string2Values(":", driver[1])
 
-			if !this.iSelectedDriver
-				this.iSelectedDriver := currentDriver[2]
+				if !this.iSelectedDriver
+					this.iSelectedDriver := currentDriver[2]
 
-			delta := (nextDriver[2] - this.iSelectedDriver)
+				delta := (nextDriver[2] - this.iSelectedDriver)
 
-			loop Abs(delta)
-				this.changeDriver((delta < 0) ? "Previous" : "Next")
+				loop Abs(delta)
+					this.changeDriver((delta < 0) ? "Previous" : "Next")
 
-			this.iSelectedDriver := nextDriver[2]
-		}
+				this.iSelectedDriver := nextDriver[2]
+			}
 	}
 }
 
@@ -2330,6 +2387,8 @@ isACCRunning() {
 			if (thePlugin && SimulatorController.Instance.isActive(thePlugin)) {
 				thePlugin.iRepairSuspensionChosen := true
 				thePlugin.iRepairBodyworkChosen := true
+
+				thePlugin.iLastTyreCompound := false
 			}
 		}
 		catch Any as exception {

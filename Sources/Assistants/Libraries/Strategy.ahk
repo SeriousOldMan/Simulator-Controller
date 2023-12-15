@@ -701,9 +701,13 @@ class StrategySimulation {
 
 		result := (this.scenarioCoefficient("PitstopsCount", scenario2.Pitstops.Length - scenario1.Pitstops.Length, 1)
 				 + this.scenarioCoefficient("FuelMax", cFuel - sFuel, 10)
-				 + this.scenarioCoefficient("TyreSetsCount", sTSets - cTSets, 1)
-				 + this.scenarioCoefficient("TyreLapsMax", cTLaps - sTLaps, 10)
-				 + this.scenarioCoefficient("PitstopsPostLaps", sPLaps - cPLaps, 10))
+				 + this.scenarioCoefficient("TyreSetsCount", sTSets - cTSets, 1))
+
+		if ((Abs(scenario1.FirstStintWeight) < 5) && (Abs(scenario2.FirstStintWeight) < 5))
+			result += (this.scenarioCoefficient("TyreLapsMax", cTLaps - sTLaps, 10)
+					 + this.scenarioCoefficient("PitstopsPostLaps", sPLaps - cPLaps, 10))
+		; else
+		;	MsgBox("Inspect")
 
 		if (this.SessionType = "Duration") {
 			sLaps := scenario1.getSessionLaps()
@@ -3037,7 +3041,7 @@ class Strategy extends ConfigurationItem {
 			halfLaps := ((targetLap - currentLap) / 2)
 
 			if ((halfLaps != 0) && (Abs(this.FirstStintWeight) >= 5)) {
-				targetLap := Round(halfLaps + ((halfLaps / 100) * this.FirstStintWeight))
+				targetLap := (currentLap + Round(halfLaps + ((halfLaps / 100) * this.FirstStintWeight)))
 
 				adjusted := true
 			}

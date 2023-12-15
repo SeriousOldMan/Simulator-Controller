@@ -34,3 +34,4 @@
   
 #### General
   1. Choosing a specific color scheme and splash screen depending on the selected simulation game
+  2. Interview based startup dialog to prepare the required configuration for the next session.

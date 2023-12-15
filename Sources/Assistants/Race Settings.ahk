@@ -1356,31 +1356,9 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		settingsTab.UseTab(3)
 
-		value := getMultiMapValue(settingsOrCommand, "Strategy Settings", "Extrapolation.Laps", 3)
-
-		settingsGui.Add("Text", "x16 y82 w105 h20 Section", translate("Race positions"))
-		settingsGui.Add("Edit", "x126 yp-2 w50 h20 Limit1 Number VextrapolationLapsEdit", value)
-		settingsGui.Add("UpDown", "x158 yp-2 w18 h20 Range1-9", value)
-		settingsGui.Add("Text", "x184 yp+2 w290 h20", translate("simulated future laps"))
-
-		value := getMultiMapValue(settingsOrCommand, "Strategy Settings", "Overtake.Delta", 1)
-
-		settingsGui.Add("Text", "x16 yp+20 w85 h23 +0x200", translate("Overtake"))
-		settingsGui.Add("Text", "x100 yp w28 h23 +0x200", translate("Abs("))
-		settingsGui.Add("Edit", "x126 yp w50 h20 Limit2 Number VovertakeDeltaEdit", value)
-		settingsGui.Add("UpDown", "x158 yp-2 w18 h20 Range1-99 0x80", value)
-		settingsGui.Add("Text", "x184 yp+4 w290 h20", translate("/ laptime difference) Seconds"))
-
-		value := getMultiMapValue(settingsOrCommand, "Strategy Settings", "Traffic.Considered", 5)
-
-		settingsGui.Add("Text", "x16 yp+20 w85 h23 +0x200", translate("Traffic"))
-		settingsGui.Add("Edit", "x126 yp w50 h20 Limit3 Number VtrafficConsideredEdit", value)
-		settingsGui.Add("UpDown", "x158 yp-2 w18 h20 Range1-100 0x80", value)
-		settingsGui.Add("Text", "x184 yp+4 w290 h20", translate("% track length"))
-
 		chosen := inList(["Yes", "No", "Custom"], getMultiMapValue(settingsOrCommand, "Assistant", "Assistant.Autonomy", "Custom"))
 
-		settingsGui.Add("Text", "x16 yp+30 w110 h23", translate("Autonomous Mode"))
+		settingsGui.Add("Text", "x16 y82 w110 h23", translate("Autonomous Mode"))
 		settingsGui.Add("DropDownList", "x126 yp-3 w100 Choose" . chosen . " vstrategyAutonomyDropDown", collect(["Yes", "No", "Custom"], translate))
 
 		value := getMultiMapValue(settingsOrCommand, "Strategy Settings", "Strategy.Update.Laps", false)
@@ -1408,6 +1386,28 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		settingsGui.Add("Text", "x16 yp+30 w105 h20", translate("Dynamic Traffic"))
 		settingsGui.Add("CheckBox", "x126 yp-4 w17 h23 Checked" . chosen . " VtrafficSimulationCheck", chosen)
 		settingsGui.Add("Text", "x184 yp+2 w290 h20", translate("using Monte Carlo simulation"))
+
+		value := getMultiMapValue(settingsOrCommand, "Strategy Settings", "Extrapolation.Laps", 3)
+
+		settingsGui.Add("Text", "x16 yp+30 w105 h20 Section", translate("Race positions"))
+		settingsGui.Add("Edit", "x126 yp-2 w50 h20 Limit1 Number VextrapolationLapsEdit", value)
+		settingsGui.Add("UpDown", "x158 yp-2 w18 h20 Range1-9", value)
+		settingsGui.Add("Text", "x184 yp+2 w290 h20", translate("simulated future laps"))
+
+		value := getMultiMapValue(settingsOrCommand, "Strategy Settings", "Overtake.Delta", 1)
+
+		settingsGui.Add("Text", "x16 yp+20 w85 h23 +0x200", translate("Overtake"))
+		settingsGui.Add("Text", "x100 yp w28 h23 +0x200", translate("Abs("))
+		settingsGui.Add("Edit", "x126 yp w50 h20 Limit2 Number VovertakeDeltaEdit", value)
+		settingsGui.Add("UpDown", "x158 yp-2 w18 h20 Range1-99 0x80", value)
+		settingsGui.Add("Text", "x184 yp+4 w290 h20", translate("/ laptime difference) Seconds"))
+
+		value := getMultiMapValue(settingsOrCommand, "Strategy Settings", "Traffic.Considered", 5)
+
+		settingsGui.Add("Text", "x16 yp+20 w85 h23 +0x200", translate("Traffic"))
+		settingsGui.Add("Edit", "x126 yp w50 h20 Limit3 Number VtrafficConsideredEdit", value)
+		settingsGui.Add("UpDown", "x158 yp-2 w18 h20 Range1-100 0x80", value)
+		settingsGui.Add("Text", "x184 yp+4 w290 h20", translate("% track length"))
 
 		settingsGui.Add("Text", "x66 yp+28 w270 0x10")
 

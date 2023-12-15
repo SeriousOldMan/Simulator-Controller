@@ -132,10 +132,14 @@ class BasicStepWizard extends StepWizard {
 
 		chooseMethod(method, *) {
 			if (method = "Basic") {
+				/*
 				if (wizard.isBasicSetupAvailable() || GetKeyState("Ctrl", "P"))
 					this.BasicSetup := (GetKeyState("Ctrl", "P") ? "Force" : true)
 				else
 					this.BasicSetup := false
+				*/
+				
+				this.BasicSetup := "Force"
 			}
 			else
 				this.BasicSetup := false

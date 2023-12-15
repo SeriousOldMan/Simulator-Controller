@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace TeamServer.Model {
     [Table("Teams")]
     public class Team : ModelObject {
-[Indexed]
+        [Indexed]
         public int AccountID { get; set; }
 
         [Ignore]

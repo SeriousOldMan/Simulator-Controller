@@ -135,7 +135,8 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 
 		thePlugin.saveToConfiguration(configuration)
 
-		Plugin("Integration", false, false).saveToConfiguration(configuration)
+		if !getMultiMapValue(configuration, "Plugins", "Integration", false)
+			Plugin("Integration", false, false).saveToConfiguration(configuration)
 	}
 
 	createGui(wizard, x, y, width, height) {

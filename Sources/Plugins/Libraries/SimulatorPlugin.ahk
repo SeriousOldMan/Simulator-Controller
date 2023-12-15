@@ -506,7 +506,7 @@ class SimulatorPlugin extends ControllerPlugin {
 		}
 		else if !WinActive(window) {
 			WinActivate(window)
-			
+
 			return WinActive(window)
 		}
 		else
@@ -539,9 +539,12 @@ class SimulatorPlugin extends ControllerPlugin {
 			Sleep(delay)
 	}
 
-	runningSimulator() {
-		return (this.Simulator.isRunning() ? this.Simulator.Application
-										   : ((SimulatorPlugin.ActiveSimulation = this.Simulator.Application) ? SimulatorPlugin.ActiveSimulation : false))
+	runningSimulator(active := false) {
+		if active
+			return (this.Simulator.isRunning() ? this.Simulator.Application : false)
+		else
+			return (this.Simulator.isRunning() ? this.Simulator.Application
+											   : ((SimulatorPlugin.ActiveSimulation = this.Simulator.Application) ? SimulatorPlugin.ActiveSimulation : false))
 	}
 
 	simulatorStartup(simulator) {
@@ -610,12 +613,12 @@ class SimulatorPlugin extends ControllerPlugin {
 					newValues := this.getPitstopOptionValues(option)
 
 					if newValues
-						this.RaceEngineer.pitstopOptionChanged(option, newValues*)
+						this.RaceEngineer.pitstopOptionChanged(option, true, newValues*)
 				case "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right":
 					newValues := this.getPitstopOptionValues("Tyre Pressures")
 
 					if newValues
-						this.RaceEngineer.pitstopOptionChanged("Tyre Pressures", newValues*)
+						this.RaceEngineer.pitstopOptionChanged("Tyre Pressures", true, newValues*)
 			}
 	}
 
@@ -854,8 +857,6 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	simulatorShutdown(simulator) {
-		local raceEngineer, raceStrategist, raceSpotter
-
 		super.simulatorShutdown(simulator)
 
 		if (simulator = this.Simulator.Application) {
@@ -1101,6 +1102,8 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	finishPitstopSetup(pitstopNumber) {
+		if this.RaceEngineer
+			this.RaceEngineer.pitstopSetupFinished()
 	}
 
 	setPitstopRefuelAmount(pitstopNumber, liters) {
@@ -1261,7 +1264,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		return this.readSessionData(trackData ? ("Track=" . trackData) : "")
 	}
 
-	acquirePositionsData(telemetryData) {
+	acquirePositionsData(telemetryData, finished := false) {
 		local positions := Map()
 		local needCorrection := false
 		local cars := []
@@ -1275,7 +1278,8 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		else
 			positionsData := this.readSessionData("Standings=true")
 
-		positionsData := this.correctPositionsData(positionsData)
+		if !finished
+			positionsData := this.correctPositionsData(positionsData)
 
 		if telemetryData.Has("Position Data")
 			telemetryData["Position Data"] := positionsData["Position Data"]
@@ -1283,14 +1287,14 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		return positionsData
 	}
 
-	acquireSessionData(&telemetryData, &positionsData) {
+	acquireSessionData(&telemetryData, &positionsData, finished := false) {
 		local data := newMultiMap()
 		local section, values, driver
 
 		setMultiMapValue(data, "System", "Time", A_TickCount)
 
 		telemetryData := this.acquireTelemetryData()
-		positionsData := this.acquirePositionsData(telemetryData)
+		positionsData := this.acquirePositionsData(telemetryData, finished)
 
 		RaceAssistantPlugin.updateAssistantsTelemetryData(telemetryData)
 		RaceAssistantPlugin.updateAssistantsPositionsData(positionsData)

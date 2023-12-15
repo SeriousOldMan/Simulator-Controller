@@ -1,12 +1,38 @@
-## 5.5.0.0-release 12/06/23 (planned)
+## 5.5.1.0-release 12/15/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
-  3. Added a setting to the "Race Settings" which allow you to promote the Assistants into fully autonomous mode for strategy and pitstop handling. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#autonomous-mode) for more information.
-  4. A corresponding setting is available in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) of the "Session Database".
-  5. The Assistants now detect correctly that you have have quitted a session in the formation lap and started a new session.
-  6. The compatibility of "Simulator Setup" and "Simulator Configuration" has been increased further.
-  7. Increased reliability for position and standings calculations for retired cars.
-  8. [Developer only] You can now run a replay of a recorded session for debugging purposes. Make a copy of the *Temp\XXX Data* folder, with *XXX* the three-letter code for the given simulator. Then start "Simulator Controller" with arguments "-replay *dataFolder*" (*dataFolder* points to the beforementioned data folder.
+  3. The automatic updater now checks, whether the update was successful for all files. A warning is emitted, if any files had been skipped, for example, because they are in use by another software at the time of the update.
+  4. The "Edit Labels & Icons..." button is now also available on the simulators page in "Simulator Setup".
+  5. The actions to select the front and rear brake pads for service has been added for *Assetto Corsa Competizione* to "Simulator Setup".
+  6. A sanity check has been integrated in the automatic setup of the pitstop settings for *Assetto Corsa Competizione*. A warning sound is emitted, if incorrect values have been entered, for example, if a brake pad change has been activated.
+  7. The application of the preference slider for an early or a late pitstop has been optimized for the automatic recalculation of a strategy by the Strategist or in the "Race Center".
+  8. Fixed an off by one error for the post pitstop tyre set information for *Asseto Corsa Competizione* in "Race Center".
+  9. Corrected several values in the *Service* section of the Pitstop report in "Race Center".
+  10. Separate values for service time, repairs time and pitlane time loss are now displayed in the Pitstop report in "Race Center".
+  11. Many [changes to the pitstop settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#the-pitstop), that are made using the game controls, will be correctly detected now by the Race Engineer in *rFactor 2*, *Assetto Corsa Competizione* and *iRacing*, as long as a pitstop has been already planned and prepared. The changed settings will be automatically integrated in the active pitstop plan of the Engineer and will also update the planned pitstop in the "Race Center". Exceptions are, for example, the choice of the tyre compound or the repair options in *Assetto Corsa Competizione*, since these values are unfortunately not available in the data API. More information can be found [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#the-pitstop).
+  12. Changes in the pitstop settings are now almost immediately reflected in the "Race Center", independent how the change was initiated.
+  13. Potential fix for scrambled result in "Race Reports", when drivers quit in the post-race lap, before the current driver has finished.
+  14. New car models for "Setup Workbench":
+      - Assetto Corsa
+        - BMW M3 E30 Group A
+
+## 5.5.0.0-release 12/06/23
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. Fixed a couple of bugs in the handling of the *rFactor 2* pitstop setup.
+  4. Fixed position and standings handling for *rFactor 2*.
+  5. A new setting in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database" allows you to set the interval, in which pitstop setup information is requested from *rFactor 2*. Default is once per minute.
+  6. The handling of the *Automobilista 2* ICM has changed. You must now [set the ICM to the Pitstop page](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#special-requirements-when-using-the-pitstop-automation-1) and select the line at the bottom before using any of the automation of Simulator Controller.
+  7. Added a switch in the "Race Settings" app which allows you to promote the Assistants into fully autonomous mode for strategy and pitstop handling. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#autonomous-mode) for more information.
+  8. A corresponding setting is available in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) of the "Session Database".
+  9. The Assistants now detect correctly that you have have quitted a session in the formation lap and started a new session with a different car or a different track.
+  10. Increased reliability for position and standings calculations for retired cars.
+  11. The compatibility of "Simulator Setup" and "Simulator Configuration" has been increased further.
+  12. It is no longer necessary to hold down the Control key, if you want to revisit the "Basic" configuration step in "Simulator Setup".
+  13. [Developer only] You can now run a replay of a recorded session for debugging purposes. Make a copy of the *Temp\XXX Data* folder, with *XXX* the three-letter code for the given simulator. Then start "Simulator Controller" with arguments "-replay *dataFolder*" (with *dataFolder* pointing to the beforementioned copy of the data folder).
+  14. [Internal] Finalized migration of all Simulator Controller downloadable components to AWS.
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-550).
 
 ## 5.4.8.0-release 12/01/23
   1. Minor bugfixes, as always

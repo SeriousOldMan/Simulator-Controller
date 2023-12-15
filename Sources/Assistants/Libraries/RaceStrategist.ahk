@@ -2968,7 +2968,9 @@ class RaceStrategist extends GridRaceAssistant {
 		else
 			result += StrategySimulation.scenarioCoefficient("ResultMajor", cDuration - sDuration, (strategy.AvgLapTime + scenario.AvgLapTime) / 4)
 
-		if (result > 0)
+		if ((cPitstops > 0) && (scenario.Pitstops[1].Lap <= (knowledgeBase.getValue("Lap") + 1)))
+			result := false
+		else if (result > 0)
 			result := false
 		else if (result < 0)
 			result := true

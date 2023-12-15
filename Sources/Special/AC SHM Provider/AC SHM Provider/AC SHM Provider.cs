@@ -304,10 +304,12 @@ namespace ACSHMProvider
 
         public void ReadSetup()
         {
+            /*
             Console.WriteLine("[Setup Data]");
             if (connected)
             {
             }
+            */
         }
 
         public void ReadData() {

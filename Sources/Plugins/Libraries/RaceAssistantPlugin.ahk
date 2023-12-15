@@ -869,7 +869,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			index := inList(A_Args, "-Replay")
 
 			if index
-				RaceAssistantPlugin.sReplayDirectory := A_Args[index + 1]
+				RaceAssistantPlugin.sReplayDirectory := (normalizeDirectoryPath(A_Args[index + 1]) . "\")
 
 			RaceAssistantPlugin.sCollectorTask
 				:= PeriodicTask(ObjBindMethod(RaceAssistantPlugin, "collectSessionData"), 1000, kHighPriority)
@@ -1033,8 +1033,11 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	static stopSimulation(simulator) {
-		if (RaceAssistantPlugin.Simulator == simulator)
+		if (RaceAssistantPlugin.Simulator == simulator) {
+			RaceAssistantPlugin.finishAssistantsSession()
+
 			RaceAssistantPlugin.sSimulator := false
+		}
 	}
 
 	static connectTeamSession() {
@@ -2390,6 +2393,9 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 							else if ((getMultiMapValue(data, "Session Data", "SessionFormat") != "Time")
 								  && (getMultiMapValue(data, "Session Data", "SessionLapsRemaining", 0) == 0))
 								finished := true
+
+							if finished
+								data := RaceAssistantPlugin.Simulator.acquireSessionData(&telemetryData, &positionsData, true)
 						}
 
 						if firstLap {

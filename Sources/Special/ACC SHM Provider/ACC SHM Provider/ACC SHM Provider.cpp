@@ -399,8 +399,6 @@ int main(int argc, char* argv[])
 
 	if (strlen(request) == 0 || getArgument(request, "Setup") != "")
 	{
-		wcout << "[Setup Data]" << endl;
-
 		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 		SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
 
@@ -410,6 +408,8 @@ int main(int argc, char* argv[])
 			printData("TyreSet", gf->currentTyreSet);
 		}
 
+		wcout << "[Setup Data]" << endl;
+
 		_bstr_t tc(gf->tyreCompound);
 		std::string tyreCompound(tc);
 
@@ -417,10 +417,10 @@ int main(int argc, char* argv[])
 		if ((gf->trackGripStatus >= ACC_DAMP) || (gf->rainIntensityIn10min >= ACC_LIGHT_RAIN))
 			wcout << "TyreCompound=Wet" << endl;
 		else
-		*/
 			wcout << "TyreCompound=" << ((tyreCompound.compare("dry_compound") == 0) ? "Dry" : "Wet") << endl;
 
 		wcout << "TyreCompoundColor=Black" << endl;
+		*/
 		
 		printData("TyreSet", gf->mfdTyreSet + 1);
 		printData("TyreSetCurrent", gf->currentTyreSet);

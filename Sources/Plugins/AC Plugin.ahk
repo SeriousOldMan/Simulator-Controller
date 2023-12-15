@@ -390,12 +390,11 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 	setPitstopRefuelAmount(pitstopNumber, liters) {
 		super.setPitstopRefuelAmount(pitstopNumber, liters)
 
-		if (this.OpenPitstopMFDHotkey != "Off")
-			if this.requirePitstopMFD()
-				if this.selectPitstopOption("Refuel") {
-					this.dialPitstopOption("Refuel", "Decrease", 250)
-					this.dialPitstopOption("Refuel", "Increase", Round(liters))
-				}
+		if this.requirePitstopMFD()
+			if this.selectPitstopOption("Refuel") {
+				this.dialPitstopOption("Refuel", "Decrease", 250)
+				this.dialPitstopOption("Refuel", "Increase", Round(liters))
+			}
 	}
 
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
@@ -403,17 +402,15 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 
 		super.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
 
-		if (this.OpenPitstopMFDHotkey != "Off") {
-			delta := this.tyreCompoundIndex(compound, compoundColor)
+		delta := this.tyreCompoundIndex(compound, compoundColor)
 
-			if (!compound || delta)
-				if this.requirePitstopMFD()
-					if this.selectPitstopOption("Tyre Compound") {
-						this.dialPitstopOption("Tyre Compound", "Decrease", 10)
+		if (!compound || delta)
+			if this.requirePitstopMFD()
+				if this.selectPitstopOption("Tyre Compound") {
+					this.dialPitstopOption("Tyre Compound", "Decrease", 10)
 
-						this.dialPitstopOption("Tyre Compound", "Increase", delta)
-					}
-		}
+					this.dialPitstopOption("Tyre Compound", "Increase", delta)
+				}
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
@@ -421,35 +418,32 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 
 		super.setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR)
 
-		if (this.OpenPitstopMFDHotkey != "Off")
-			if this.requirePitstopMFD()
-				for postFix, tyre in Map("FL", "Front Left", "FR", "Front Right", "RL", "Rear Left", "RR", "Rear Right")
-					if this.selectPitstopOption(tyre) {
-						this.dialPitstopOption(tyre, "Decrease", 60)
+		if this.requirePitstopMFD()
+			for postFix, tyre in Map("FL", "Front Left", "FR", "Front Right", "RL", "Rear Left", "RR", "Rear Right")
+				if this.selectPitstopOption(tyre) {
+					this.dialPitstopOption(tyre, "Decrease", 60)
 
-						this.dialPitstopOption(tyre, "Increase", Round(pressure%postFix% - this.getCarMetaData("TyrePressureMin" . postFix, 15)))
-					}
+					this.dialPitstopOption(tyre, "Increase", Round(pressure%postFix% - this.getCarMetaData("TyrePressureMin" . postFix, 15)))
+				}
 	}
 
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine := false) {
 		super.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine)
 
-		if (this.OpenPitstopMFDHotkey != "Off") {
-			if (this.iRepairSuspensionChosen != repairSuspension)
-				if this.requirePitstopMFD()
-					if this.selectPitstopOption("Repair Suspension")
-						this.changePitstopOption("Repair Suspension")
+		if (this.iRepairSuspensionChosen != repairSuspension)
+			if this.requirePitstopMFD()
+				if this.selectPitstopOption("Repair Suspension")
+					this.changePitstopOption("Repair Suspension")
 
-			if (this.iRepairBodyworkChosen != repairBodywork)
-				if this.requirePitstopMFD()
-					if this.selectPitstopOption("Repair Bodywork")
-						this.changePitstopOption("Repair Bodywork")
+		if (this.iRepairBodyworkChosen != repairBodywork)
+			if this.requirePitstopMFD()
+				if this.selectPitstopOption("Repair Bodywork")
+					this.changePitstopOption("Repair Bodywork")
 
-			if (this.iRepairEngineChosen != repairEngine)
-				if this.requirePitstopMFD()
-					if this.selectPitstopOption("Repair Engine")
-						this.changePitstopOption("Repair Engine")
-		}
+		if (this.iRepairEngineChosen != repairEngine)
+			if this.requirePitstopMFD()
+				if this.selectPitstopOption("Repair Engine")
+					this.changePitstopOption("Repair Engine")
 	}
 }
 

@@ -123,6 +123,10 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 		pitstopOptionChanged(arguments*) {
 			this.callRemote("pitstopOptionChanged", arguments*)
 		}
+
+		pitstopPrepared(arguments*) {
+			this.callRemote("pitstopPrepared", arguments*)
+		}
 	}
 
 	class RaceEngineerAction extends RaceAssistantPlugin.RaceAssistantAction {
@@ -334,6 +338,11 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 			this.RaceEngineer.preparePitstop(lap)
 	}
 
+	pitstopSetupFinished() {
+		if this.RaceEngineer
+			this.RaceEngineer.pitstopPrepared()
+	}
+
 	performPitstop(lapNumber, options) {
 		super.performPitstop(lapNumber, options)
 
@@ -342,9 +351,9 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 		RaceAssistantPlugin.CollectorTask.Sleep := 10000
 	}
 
-	pitstopOptionChanged(option, values*) {
+	pitstopOptionChanged(option, verbose, values*) {
 		if this.RaceEngineer
-			this.RaceEngineer.pitstopOptionChanged(option, values*)
+			this.RaceEngineer.pitstopOptionChanged(option, verbose, values*)
 	}
 
 	pitstopPlanned(pitstopNumber, plannedLap := false) {

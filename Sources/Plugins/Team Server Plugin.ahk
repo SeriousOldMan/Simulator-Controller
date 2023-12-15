@@ -305,8 +305,8 @@ class TeamServerPlugin extends ControllerPlugin {
 		local teamServerToggle, arguments, openRaceSettings, openRaceCenter
 
 		if (TeamServerPlugin.sStartupSettings = kUndefined)
-			if FileExist(kUserConfigDirectory . "Simulator Startup.ini")
-				TeamServerPlugin.sStartupSettings := readMultiMap(kUserConfigDirectory . "Simulator Startup.ini")
+			if FileExist(kUserConfigDirectory . "Startup.settings")
+				TeamServerPlugin.sStartupSettings := readMultiMap(kUserConfigDirectory . "Startup.settings")
 			else
 				TeamServerPlugin.sStartupSettings := false
 

@@ -700,8 +700,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		deleteFile(kTempDirectory . this.Plugin . " Session.state")
 
 		if (RaceAssistantPlugin.sStartupSettings = kUndefined)
-			if FileExist(kUserConfigDirectory . "Simulator Startup.ini")
-				RaceAssistantPlugin.sStartupSettings := readMultiMap(kUserConfigDirectory . "Simulator Startup.ini")
+			if FileExist(kUserConfigDirectory . "Startup.settings")
+				RaceAssistantPlugin.sStartupSettings := readMultiMap(kUserConfigDirectory . "Startup.settings")
 			else
 				RaceAssistantPlugin.sStartupSettings := false
 

@@ -656,11 +656,20 @@ class TeamServerPlugin extends ControllerPlugin {
 
 		if !this.Connected {
 			settings := readMultiMap(getFileName("Race.settings", kUserConfigDirectory))
+
 			serverURL := getMultiMapValue(settings, "Team Settings", "Server.URL", "")
 			serverToken := getMultiMapValue(settings, "Team Settings", "Server.Token", "")
 			teamIdentifier := getMultiMapValue(settings, "Team Settings", "Team.Identifier", false)
 			driverIdentifier := getMultiMapValue(settings, "Team Settings", "Driver.Identifier", false)
 			sessionIdentifier := getMultiMapValue(settings, "Team Settings", "Session.Identifier", false)
+
+			if TeamServerPlugin.sStartupSettings {
+				serverURL := getMultiMapValue(TeamServerPlugin.sStartupSettings, "Team Server", "Server.URL", serverURL)
+				serverToken := getMultiMapValue(TeamServerPlugin.sStartupSettings, "Team Server", "Server.Token", serverToken)
+				teamIdentifier := getMultiMapValue(TeamServerPlugin.sStartupSettings, "Team Server", "Team.Identifier", teamIdentifier)
+				driverIdentifier := getMultiMapValue(TeamServerPlugin.sStartupSettings, "Team Server", "Driver.Identifier", driverIdentifier)
+				sessionIdentifier := getMultiMapValue(TeamServerPlugin.sStartupSettings, "Team Server", "Session.Identifier", sessionIdentifier)
+			}
 
 			this.connect(serverURL, serverToken, teamIdentifier, driverIdentifier, sessionIdentifier, !kSilentMode)
 

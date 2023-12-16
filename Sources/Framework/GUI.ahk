@@ -1061,7 +1061,7 @@ class Window extends Gui {
 			cWidth := screen2Window(cWidth)
 			cHeight := screen2Window(cHeight)
 
-			this.iTitleBarHeight := height - cHeight
+			this.iTitleBarHeight := (height - cHeight)
 
 			this.iMinWidth := width
 			this.iMinHeight := height

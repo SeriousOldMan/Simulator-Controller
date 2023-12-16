@@ -49,6 +49,7 @@
 
 global kClose := "Close"
 global kRestart := "Restart"
+global kEvent := "Event"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -402,7 +403,33 @@ launchPad(command := false, arguments*) {
 	}
 
 	launchStartup(configure, *) {
-		launchPad("Startup")
+		local x, y, w, h, mX, mY
+		local curCoordMode
+
+		if !configure {
+			launchPadGui["launchProfilesButton"].GetPos(&x, &y, &w, &h)
+
+			curCoordMode := A_CoordModeMouse
+
+			CoordMode("Mouse", "Client")
+
+			try {
+				MouseGetPos(&mX, &mY)
+			}
+			finally {
+				CoordMode("Mouse", curCoordMode)
+			}
+
+			if ((mX >= x) && (mX <= (x + w)) && (mY >= y) && (mY <= (y + h)))
+				configure := true
+		}
+
+		if configure {
+			if launchProfilesEditor(launchPadGui)
+				launchPad("Startup")
+		}
+		else
+			launchPad("Startup")
 	}
 
 	launchApplication(application, *) {
@@ -620,10 +647,10 @@ launchPad(command := false, arguments*) {
 		launchPadGui.SetFont("s7 Norm", "Arial")
 
 		launchPadGui.Add("Picture", "x16 yp+24 w60 h60 Section vStartup", kIconsDirectory . "Startup.ico").OnEvent("Click", launchStartup.Bind(false))
-		widget := launchPadGui.Add("Picture", "x59 yp+43 w14 h14 BackgroundTrans", kIconsDirectory . "General Settings White.ico")
+		widget := launchPadGui.Add("Picture", "x59 yp+43 w14 h14 BackgroundTrans vlaunchProfilesButton", kIconsDirectory . "General Settings White.ico")
 		widget.OnEvent("Click", launchStartup.Bind(true))
 
-		launchPadGui.Add("Picture", "xp+90 ys w60 h60 vRaceSettings", kIconsDirectory . "Race Settings.ico").OnEvent("Click", launchApplication.Bind("RaceSettings"))
+		launchPadGui.Add("Picture", "xp+47 ys w60 h60 vRaceSettings", kIconsDirectory . "Race Settings.ico").OnEvent("Click", launchApplication.Bind("RaceSettings"))
 		launchPadGui.Add("Picture", "xp+74 yp w60 h60 vSessionDatabase", kIconsDirectory . "Session Database.ico").OnEvent("Click", launchApplication.Bind("SessionDatabase"))
 
 		launchPadGui.Add("Picture", "xp+90 yp w60 h60 vPracticeCenter", kIconsDirectory . "Practice.ico").OnEvent("Click", launchApplication.Bind("PracticeCenter"))
@@ -702,6 +729,126 @@ closeLaunchPad(*) {
 	}
 	else
 		launchPad(kClose)
+}
+
+launchProfilesEditor(launchPadOrCommand, arguments*) {
+	local x, y, w, h, width, x0, x1, w1, w2, x2, w4, x4, w3, x3, x4, x5, w5, x6, x7
+
+	static launchProfiles
+	static profilesEditorGui
+	static profilesListView
+
+	static done := false
+	static profiles := []
+
+	loadProfiles() {
+		profilesListView.Delete()
+
+		profilesListView.Add("", translate("Standard"), translate("-"), translate("-"))
+
+		loop 3
+			profilesListView.ModifyCol(A_Index, "AutoHdr")
+	}
+
+	chooseProfile(listView, line, *) {
+	}
+
+	if (launchPadOrCommand == kSave)
+		done := kSave
+	else if (launchPadOrCommand == kCancel)
+		done := kCancel
+	else if (launchPadOrCommand == kEvent) {
+
+	}
+	else {
+		done := false
+
+		launchProfiles := readMultiMap(kUserConfigDirectory . "Startup.settings")
+
+		profilesEditorGui := Window({Descriptor: "Simulator Startup.Profiles", Options: "ToolWindow 0x400000"})
+
+		profilesEditorGui.SetFont("Bold", "Arial")
+
+		profilesEditorGui.Add("Text", "w388 Center H:Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(profilesEditorGui, "Startup Profiles"))
+
+		profilesEditorGui.SetFont("Norm", "Arial")
+
+		profilesEditorGui.Add("Documentation", "x118 YP+20 w168 Center H:Center", translate("Startup Profiles")
+							, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles")
+
+		profilesEditorGui.Add("Text", "x8 yp+26 w388 0x10")
+
+		profilesEditorGui.SetFont("Norm", "Arial")
+
+		x := 8
+		y := 48
+		width := 388
+
+		x0 := x + 8
+		x1 := x + 132
+
+		w1 := width - (x1 - x + 8)
+
+		w2 := w1 - 70
+
+		x2 := x1 - 25
+
+		w4 := w1 - 25
+		x4 := x1 + w4 + 2
+
+		w3 := Round((w4 / 2) - 3)
+		x3 := x1 + w3 + 6
+
+		x4 := x3 + 64
+
+		x5 := x3 + w3 + 2
+		w5 := w3 - 25
+
+		profilesListView := profilesEditorGui.Add("ListView", "x" . x0 . " yp+10 w372 h146 Checked -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Name", "Type", "Mode"], translate))
+		profilesListView.OnEvent("Click", chooseProfile)
+		profilesListView.OnEvent("DoubleClick", chooseProfile)
+
+		profilesEditorGui.Add("Text", "x" . x0 . " yp+150 w90 h23 Y:Move +0x200", translate("Name"))
+		profilesEditorGui.Add("Edit", "x" . x1 . " yp+1 w" . w3 . " W:Grow(0.5) Y:Move vprofileNameEdit")
+
+		x5 := x4 - 1 + 24
+		x6 := x5 + 24
+		x7 := x6 + 24
+
+		profilesEditorGui.Add("Button", "x" . x5 . " yp+30 w23 h23 X:Move Y:Move Center +0x200 vaddProfileButton").OnEvent("Click", launchProfilesEditor.Bind(kEvent, "ProfileNew"))
+		setButtonIcon(profilesEditorGui["addProfileButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
+		profilesEditorGui.Add("Button", "x" . x6 . " yp w23 h23 X:Move Y:Move Center +0x200 vdeleteProfileButton").OnEvent("Click", launchProfilesEditor.Bind(kEvent, "ProfileDelete"))
+		setButtonIcon(profilesEditorGui["deleteProfileButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
+
+		profilesEditorGui.Add("Text", "x8 yp+26 w388 0x10")
+
+		profilesEditorGui.Add("Button", "Default X120 YP+10 w80", translate("Save")).OnEvent("Click", launchProfilesEditor.Bind(kSave))
+		profilesEditorGui.Add("Button", "X+10 w80", translate("&Cancel")).OnEvent("Click", launchProfilesEditor.Bind(kCancel))
+
+		loadProfiles()
+
+		profilesEditorGui.Opt("+Owner" . launchPadOrCommand.Hwnd)
+
+		launchPadOrCommand.Block()
+
+		try {
+			if getWindowPosition("Simulator Startup.Profiles", &x, &y)
+				profilesEditorGui.Show("x" . x . " y" . y)
+			else
+				profilesEditorGui.Show()
+
+			loop
+				Sleep(1000)
+			until done
+
+			profilesEditorGui.Destroy()
+		}
+		finally {
+			launchPadOrCommand.Unblock()
+		}
+
+		return (done = kSave)
+	}
 }
 
 startupSimulator() {

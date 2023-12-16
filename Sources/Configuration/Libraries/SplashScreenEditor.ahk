@@ -301,6 +301,11 @@ class SplashScreensList extends ConfigurationItemList {
 			}
 		}
 
+		noSelect(listView, *) {
+			loop listView.GetCount()
+				listView.Modify(A_Index, "-Select")
+		}
+
 		window.Add("ListView", "x16 yp+24 w377 h140 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr VsplashScreensListView", collect(["Splash Screen", "Media", "Sound File"], translate))
 		window.Add("Text", "x16 yp+150 w86 h23 +0x200 Y:Move", translate("Splash Screen"))
 		window.Add("Edit", "x110 yp w140 h21 Y:Move W:Grow(0.5) VsplashScreenNameEdit")
@@ -323,7 +328,9 @@ class SplashScreensList extends ConfigurationItemList {
 		setButtonIcon(window["addPictureButton"], kIconsDirectory . "Plus.ico", 1)
 
 		window.Add("ListView", "x110 yp w284 h112 Y:Move W:Grow -Multi -LV0x10 Checked -Hdr NoSort NoSortHdr VpicturesListView", [translate("Picture")])
-
+		window["picturesListView"].OnEvent("Click", noSelect)
+		window["picturesListView"].OnEvent("DoubleClick", noSelect)
+		
 		window.Add("Text", "x16 yp+114 w80 h23 +0x200 Y:Move VpicturesDurationLabel", translate("Display Duration"))
 		window.Add("Edit", "x110 yp w40 h21 Y:Move Limit5 Number VpicturesDurationEdit")
 

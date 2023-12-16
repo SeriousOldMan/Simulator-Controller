@@ -42,6 +42,11 @@ editModes(&settingsOrCommand, arguments*) {
 	static modeSessionDropDown
 	static modesListView
 
+	noSelect(listView, *) {
+		loop listView.GetCount()
+			listView.Modify(A_Index, "-Select")
+	}
+
 	getSelectedModes(modesListView) {
 		local rowNumber := 0
 		local modes := []
@@ -177,7 +182,9 @@ editModes(&settingsOrCommand, arguments*) {
 
 		modesEditorGui.Add("Text", "x8 y108 w80 h23 +0x200", translate("Modes"))
 		modesListView := modesEditorGui.Add("ListView", "x100 y108 w240 h162 -Multi -LV0x10 Checked NoSort NoSortHdr", [translate("Plugin"), translate("Mode"), translate("Simulator(s)")])
-
+		modesListView.OnEvent("Click", noSelect)
+		modesListView.OnEvent("DoubleClick", noSelect)
+		
 		defaultModes := string2Values(",", getMultiMapValue(newSettings, "Modes", "Default", ""))
 
 		for thePlugin, pluginConfiguration in getMultiMapValues(configuration, "Plugins") {

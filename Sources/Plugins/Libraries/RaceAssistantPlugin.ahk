@@ -2351,7 +2351,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 							if RaceAssistantPlugin.Finish
 								finished := RaceAssistantPlugin.finished(data, RaceAssistantPlugin.Finish)
 							else if ((getMultiMapValue(data, "Session Data", "SessionFormat") != "Time")
-								  && (getMultiMapValue(data, "Session Data", "SessionLapsRemaining", 0) == 0))
+								  && (getMultiMapValue(data, "Session Data", "SessionLapsRemaining", 0) <= 0))
 								finished := true
 
 							if finished

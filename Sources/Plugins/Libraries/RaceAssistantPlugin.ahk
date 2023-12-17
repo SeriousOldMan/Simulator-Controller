@@ -831,7 +831,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			if assistantSpeaker {
 				this.iRaceAssistantSpeaker := (((assistantSpeaker = kTrue) || (assistantSpeaker = "On")) ? true : assistantSpeaker)
 
-				if RaceAssistantPlugin.sStartupSettings
+				if (RaceAssistantPlugin.sStartupSettings && (getMultiMapValue(RaceAssistantPlugin.sStartupSettings, this.Plugin, "Silent", kUndefined) != kUndefined))
 					if getMultiMapValue(RaceAssistantPlugin.sStartupSettings, this.Plugin, "Silent", false) {
 						this.iRaceAssistantSpeaker := false
 

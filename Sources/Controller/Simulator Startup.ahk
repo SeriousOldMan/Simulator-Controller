@@ -191,7 +191,7 @@ class SimulatorStartup extends ConfigurationItem {
 	}
 
 	startSimulatorController() {
-		local title, exePath, pid
+		local title, exePath, pid, ignore, tool
 
 		try {
 			logMessage(kLogInfo, translate("Starting ") . translate("Simulator Controller"))
@@ -209,6 +209,14 @@ class SimulatorStartup extends ConfigurationItem {
 			exePath := kBinariesDirectory . "Voice Server.exe"
 
 			Run(exePath, kBinariesDirectory, , &pid)
+
+			for ignore, tool in string2Values(",", getMultiMapValue(readMultiMap(kUserConfigDirectory . "Startup.settings"), "Tools", ""))
+				try {
+					Run(kBinariesDirectory . tool . ".exe", kBinariesDirectory)
+				}
+				catch Any as exception {
+					logError(exception)
+				}
 
 			Sleep(1000)
 
@@ -733,37 +741,237 @@ closeLaunchPad(*) {
 
 launchProfilesEditor(launchPadOrCommand, arguments*) {
 	local x, y, w, h, width, x0, x1, w1, w2, x2, w4, x4, w3, x3, x4, x5, w5, x6, x7
+	local checkedRows, checked
 
-	static launchProfiles
+	static profiles
 	static profilesEditorGui
 	static profilesListView
 
 	static done := false
-	static profiles := []
+
+	static selectedProfile := false
+	static checkedProfile := false
 
 	loadProfiles() {
+		local settings := readMultiMap(kUserConfigDirectory . "Startup.settings")
+		local ignore, profile, name, assistant, property
+
+		profiles := []
+
+		for ignore, name in string2Values(";|;", getMultiMapValue(settings, "Profiles", "Profiles", "")) {
+			profile := CaseInsenseMap("Name", name
+									, "Type", getMultiMapValue(settings, "Profiles", name . ".Type", "Practice")
+									, "Mode", getMultiMapValue(settings, "Profiles", name . ".Mode", "Solo")
+									, "Tools", string2Values(",", getMultiMapValue(settings, "Profiles", name . ".Tools", "Solo")))
+
+			for ignore, assistant in ["Driving Coach", "Race Engineer", "Race Strategist", "Race Spotter"]
+				profile[assistant] := getMultiMapValue(settings, "Profiles", name . "." . assistant, "Active")
+
+			if (profile["Mode"] = "Team") {
+				profile["Team.Mode"] := getMultiMapValue(settings, "Profiles", name . ".Team.Mode", "Settings")
+
+				if (profile["Team.Mode"] = "Local") {
+					for ignore, property in ["Server URL", "Session Token", "Team.Name", "Team.Identifier"
+										   , "Driver.Name", "Driver.Identifier", "Session.Name", "Session.Identifier"]
+						profile[property] := getMultiMapValue(settings, "Profiles", name . "." . property, "")
+				}
+			}
+
+			profiles.Push(profile)
+		}
+
 		profilesListView.Delete()
 
 		profilesListView.Add("", translate("Standard"), translate("-"), translate("-"))
+
+		for ignore, profile in profiles
+			profilesListView.Add("", profile["Name"], translate(profile["Type"]), translate(profile["Mode"]))
 
 		loop 3
 			profilesListView.ModifyCol(A_Index, "AutoHdr")
 	}
 
-	chooseProfile(listView, line, *) {
+	saveProfiles() {
+		local settings := newMultiMap()
+		local activeProfiles := []
+		local ignore, profile, assistant, property, name
+
+		for ignore, profile in profiles {
+			name := profile["Name"]
+
+			activeProfiles.Push(name)
+
+			setMultiMapValue(settings, "Profiles", name . ".Type", profile["Type"])
+			setMultiMapValue(settings, "Profiles", name . ".Mode", profile["Mode"])
+			setMultiMapValue(settings, "Profiles", name . ".Tools", values2String(",", profile["Tools"]*))
+
+			for ignore, assistant in ["Driving Coach", "Race Engineer", "Race Strategist", "Race Spotter"]
+				setMultiMapValue(settings, "Profiles", name . "." . assistant, profile[assistant])
+
+			if (profile["Mode"] = "Team") {
+				setMultiMapValue(settings, "Profiles", name . ".Team.Mode", profile["Team.Mode"])
+
+				if (profile["Team.Mode"] = "Local")
+					for ignore, property in ["Server URL", "Session Token", "Team.Name", "Team.Identifier"
+										   , "Driver.Name", "Driver.Identifier", "Session.Name", "Session.Identifier"]
+						setMultiMapValue(settings, "Profiles", name . "." . property, profile[property])
+			}
+		}
+
+		setMultiMapValue(settings, "Profiles", "Profiles", values2String(";|;", activeProfiles*))
+
+		profile := profilesListView.GetNext(0, "C")
+
+		if (profile > 1) {
+			profile := profiles[profile - 1]
+
+			setMultiMapValue(settings, "Session", "Type", profile["Type"])
+			setMultiMapValue(settings, "Session", "Mode", profile["Mode"])
+			setMultiMapValue(settings, "Session", "Tools", values2String(",", profile["Tools"]*))
+
+			for ignore, assistant in ["Driving Coach", "Race Engineer", "Race Strategist", "Race Spotter"] {
+				setMultiMapValue(settings, assistant, "Enabled", profile[assistant] != "Disabled")
+				setMultiMapValue(settings, assistant, "Silent", profile[assistant] = "Silent")
+				setMultiMapValue(settings, assistant, "Muted", profile[assistant] = "Muted")
+			}
+
+			if (profile["Mode"] = "Team")
+				for ignore, property in ["Server URL", "Session Token", "Team.Name", "Team.Identifier"
+									   , "Driver.Name", "Driver.Identifier", "Session.Name", "Session.Identifier"]
+					setMultiMapValue(settings, "Team Session", property, profile[property])
+		}
+
+		writeMultiMap(kUserConfigDirectory . "Startup.settings", settings)
 	}
 
-	if (launchPadOrCommand == kSave)
+	chooseProfile(listView, line, *) {
+		if (selectedProfile > 1)
+			launchProfilesEditor(kEvent, "ProfileSave")
+
+		if (line > 1)
+			launchProfilesEditor(kEvent, "ProfileLoad", line)
+		else if (line = 1) {
+			profilesListView.Modify(1, "-Select")
+
+			if selectedProfile
+				profilesListView.Modify(selectedProfile, "Select")
+		}
+		else
+			selectedProfile := false
+
+		launchProfilesEditor("Update State")
+	}
+
+	if (launchPadOrCommand == kSave) {
+		if selectedProfile
+			launchProfilesEditor(kEvent, "ProfileSave")
+
+		saveProfiles()
+
 		done := kSave
+	}
 	else if (launchPadOrCommand == kCancel)
 		done := kCancel
 	else if (launchPadOrCommand == kEvent) {
+		if (arguments[1] = "ProfileNew") {
+			if (selectedProfile > 1)
+				launchProfilesEditor(kEvent, "ProfileSave")
 
+			profile := CaseInsenseMap("Name", "", "Type", "Practice", "Mode", "Solo", "Tools", "Practice Center")
+
+			for ignore, assistant in ["Driving Coach", "Race Engineer", "Race Strategist", "Race Spotter"]
+				profile[assistant] := "Active"
+
+			profiles.Push(profile)
+
+			profilesListView.Add("", profile["Name"], translate(profile["Type"]), translate(profile["Mode"]))
+
+			profilesEditorGui["profileNameEdit"].Text := profile["Name"]
+
+			selectedProfile := (profiles.Length + 1)
+
+			profilesListView.Modify(selectedProfile, "Vis Select")
+
+			launchProfilesEditor("Update State")
+		}
+		else if (arguments[1] = "ProfileDelete") {
+
+			launchProfilesEditor("Update State")
+		}
+		else if (arguments[1] = "ProfileLoad") {
+			if (selectedProfile > 1)
+				launchProfilesEditor(kEvent, "ProfileSave")
+
+			selectedProfile := arguments[2]
+
+			if (selectedProfile > 1) {
+				profilesEditorGui["profileNameEdit"].Text := profiles[selectedProfile - 1]["Name"]
+
+				profilesListView.Modify(selectedProfile, "Vis Select")
+			}
+
+			launchProfilesEditor("Update State")
+		}
+		else if (arguments[1] = "ProfileSave") {
+			if (selectedProfile > 1) {
+				profiles[selectedProfile - 1]["Name"] := profilesEditorGui["profileNameEdit"].Text
+
+				profilesListView.Modify(selectedProfile, "", profilesEditorGui["profileNameEdit"].Text)
+			}
+		}
+	}
+	else if (launchPadOrCommand == "Update State") {
+		if (profilesListView.GetNext() = 1)
+			profilesListView.Modify(1, "-Select")
+
+		checkedRows := []
+		checked := profilesListView.GetNext(0, "C")
+
+		while checked {
+			checkedRows.Push(checked)
+
+			checked := profilesListView.GetNext(checked, "C")
+		}
+
+		if (checkedRows.Length = 0) {
+			profilesListView.Modify(1, "Check")
+
+			checkedProfile := false
+		}
+		else if (checkedRows.Length > 1) {
+			loop profilesListView.GetCount()
+				profilesListView.Modify(A_Index, "-Check")
+
+			if (inList(checkedRows, selectedProfile) &&  (checkedProfile != selectedProfile)) {
+				profilesListView.Modify(selectedProfile, "Check")
+
+				checkedProfile := selectedProfile
+			}
+			else {
+				profilesListView.Modify(1, "Check")
+
+				checkedProfile := false
+			}
+		}
+
+		profilesEditorGui["addProfileButton"].Enabled := true
+
+		if (profilesListView.GetNext() > 1) {
+			profilesEditorGui["deleteProfileButton"].Enabled := true
+
+			profilesEditorGui["profileNameEdit"].Enabled := true
+		}
+		else {
+			profilesEditorGui["deleteProfileButton"].Enabled := false
+
+			profilesEditorGui["profileNameEdit"].Enabled := false
+			profilesEditorGui["profileNameEdit"].Text := ""
+		}
 	}
 	else {
 		done := false
-
-		launchProfiles := readMultiMap(kUserConfigDirectory . "Startup.settings")
+		selectedProfile := false
+		checkedProfile := false
 
 		profilesEditorGui := Window({Descriptor: "Simulator Startup.Profiles", Options: "ToolWindow 0x400000"})
 
@@ -807,6 +1015,7 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 		profilesListView := profilesEditorGui.Add("ListView", "x" . x0 . " yp+10 w372 h146 Checked -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Name", "Type", "Mode"], translate))
 		profilesListView.OnEvent("Click", chooseProfile)
 		profilesListView.OnEvent("DoubleClick", chooseProfile)
+		profilesListView.OnEvent("ItemCheck", chooseProfile)
 
 		profilesEditorGui.Add("Text", "x" . x0 . " yp+150 w90 h23 Y:Move +0x200", translate("Name"))
 		profilesEditorGui.Add("Edit", "x" . x1 . " yp+1 w" . w3 . " W:Grow(0.5) Y:Move vprofileNameEdit")
@@ -826,6 +1035,8 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 		profilesEditorGui.Add("Button", "X+10 w80", translate("&Cancel")).OnEvent("Click", launchProfilesEditor.Bind(kCancel))
 
 		loadProfiles()
+
+		launchProfilesEditor("Update State")
 
 		profilesEditorGui.Opt("+Owner" . launchPadOrCommand.Hwnd)
 

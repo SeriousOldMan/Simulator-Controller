@@ -792,8 +792,17 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 
 		profilesListView.Add("", translate("Standard"), translate("-"), translate("-"))
 
-		for ignore, profile in profiles
+		checkedProfile := getMultiMapValue(settings, "Profiles", "Profile", false)
+
+		for ignore, profile in profiles {
 			profilesListView.Add("", profile["Name"], translate(profile["Type"]), translate(profile["Mode"]))
+
+			if (checkedProfile = profile["Name"]) {
+				profilesListView.Modify(profilesListView.GetCount(), "Check")
+
+				checkedProfile := (A_Index +  1)
+			}
+		}
 
 		loop 3
 			profilesListView.ModifyCol(A_Index, "AutoHdr")
@@ -829,6 +838,9 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 		}
 
 		setMultiMapValue(settings, "Profiles", "Profiles", values2String(";|;", activeProfiles*))
+
+		if checkedProfile
+			setMultiMapValue(settings, "Profiles", "Profile", profiles[checkedProfile - 1]["Name"])
 
 		profile := profilesListView.GetNext(0, "C")
 
@@ -889,7 +901,8 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 			if (selectedProfile > 1)
 				launchProfilesEditor(kEvent, "ProfileSave")
 
-			profile := CaseInsenseMap("Name", "", "Type", "Practice", "Mode", "Solo", "Tools", "Practice Center")
+			profile := CaseInsenseMap("Name", "", "Type", "Practice", "Mode", "Solo", "Tools", ["Practice Center"]
+									, "Assistant.Autonomy", "Custom")
 
 			for ignore, assistant in ["Driving Coach", "Race Engineer", "Race Strategist", "Race Spotter"]
 				profile[assistant] := "Active"
@@ -898,15 +911,18 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 
 			profilesListView.Add("", profile["Name"], translate(profile["Type"]), translate(profile["Mode"]))
 
-			profilesEditorGui["profileNameEdit"].Text := profile["Name"]
-
-			selectedProfile := (profiles.Length + 1)
-
 			profilesListView.Modify(selectedProfile, "Vis Select")
 
-			launchProfilesEditor("Update State")
+			launchProfilesEditor(kEvent, "ProfileLoad", profiles.Length + 1)
 		}
 		else if (arguments[1] = "ProfileDelete") {
+			if selectedProfile {
+				profiles.RemoveAt(selectedProfile - 1)
+
+				profilesListView.Delete(selectedProfile)
+
+				selectedProfile := false
+			}
 
 			launchProfilesEditor("Update State")
 		}
@@ -918,6 +934,8 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 
 			if (selectedProfile > 1) {
 				profilesEditorGui["profileNameEdit"].Text := profiles[selectedProfile - 1]["Name"]
+				profilesEditorGui["profileTypeDropDown"].Value := inList(["Practice", "Qualifying", "Race"], profiles[selectedProfile - 1]["Type"])
+				profilesEditorGui["profileModeDropDown"].Value := inList(["Solo", "Team"], profiles[selectedProfile - 1]["Mode"])
 
 				profilesListView.Modify(selectedProfile, "Vis Select")
 			}
@@ -927,8 +945,10 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 		else if (arguments[1] = "ProfileSave") {
 			if (selectedProfile > 1) {
 				profiles[selectedProfile - 1]["Name"] := profilesEditorGui["profileNameEdit"].Text
+				profiles[selectedProfile - 1]["Type"] :=  ["Practice", "Qualifying", "Race"][profilesEditorGui["profileTypeDropDown"].Value]
+				profiles[selectedProfile - 1]["Mode"] :=  ["Solo", "Team"][profilesEditorGui["profileModeDropDown"].Value]
 
-				profilesListView.Modify(selectedProfile, "", profilesEditorGui["profileNameEdit"].Text)
+				profilesListView.Modify(selectedProfile, "", profilesEditorGui["profileNameEdit"].Text, profilesEditorGui["profileTypeDropDown"].Text, profilesEditorGui["profileModeDropDown"].Text)
 			}
 		}
 	}
@@ -972,12 +992,18 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 			profilesEditorGui["deleteProfileButton"].Enabled := true
 
 			profilesEditorGui["profileNameEdit"].Enabled := true
+			profilesEditorGui["profileTypeDropDown"].Enabled := true
+			profilesEditorGui["profileModeDropDown"].Enabled := true
 		}
 		else {
 			profilesEditorGui["deleteProfileButton"].Enabled := false
 
 			profilesEditorGui["profileNameEdit"].Enabled := false
 			profilesEditorGui["profileNameEdit"].Text := ""
+			profilesEditorGui["profileTypeDropDown"].Enabled := false
+			profilesEditorGui["profileTypeDropDown"].Value := 0
+			profilesEditorGui["profileModeDropDown"].Enabled := false
+			profilesEditorGui["profileModeDropDown"].Value := 0
 		}
 	}
 	else {
@@ -1029,8 +1055,14 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 		profilesListView.OnEvent("DoubleClick", chooseProfile)
 		profilesListView.OnEvent("ItemCheck", chooseProfile)
 
-		profilesEditorGui.Add("Text", "x" . x0 . " yp+150 w90 h23 Y:Move +0x200", translate("Name"))
-		profilesEditorGui.Add("Edit", "x" . x1 . " yp+1 w" . w3 . " W:Grow(0.5) Y:Move vprofileNameEdit")
+		profilesEditorGui.Add("Text", "x" . x0 . " yp+150 w90 h23 +0x200", translate("Name"))
+		profilesEditorGui.Add("Edit", "x" . x1 . " yp+1 w" . (372 - (x1 - x0)) . " vprofileNameEdit")
+
+		profilesEditorGui.Add("Text", "x" . x0 . " yp+24 w90 h23 +0x200", translate("Type"))
+		profilesEditorGui.Add("DropDownList", "x" . x1 . " yp+1 w" . w3 . " vprofileTypeDropDown", collect(["Practice", "Qualifying", "Race"], translate))
+
+		profilesEditorGui.Add("Text", "x" . x0 . " yp+24 w90 h23 +0x200", translate("Mode"))
+		profilesEditorGui.Add("DropDownList", "x" . x1 . " yp+1 w" . w3 . " vprofileModeDropDown", collect(["Solo", "Team"], translate))
 
 		x5 := x4 - 1 + 24
 		x6 := x5 + 24

@@ -191,14 +191,14 @@ class SimulatorStartup extends ConfigurationItem {
 	}
 
 	startSimulatorController() {
-		local title, exePath, pid, ignore, tool
+		local title, exePath, pid, ignore, tool, startup
 
 		try {
 			logMessage(kLogInfo, translate("Starting ") . translate("Simulator Controller"))
 
 			if getMultiMapValue(this.Settings, "Core", "System Monitor", false) {
 				if !ProcessExist("System Monitor.exe") {
-					exePath := kBinariesDirectory . "System Monitor.exe"
+					exePath := (kBinariesDirectory . "System Monitor.exe")
 
 					Run(exePath, kBinariesDirectory)
 
@@ -206,21 +206,27 @@ class SimulatorStartup extends ConfigurationItem {
 				}
 			}
 
-			exePath := kBinariesDirectory . "Voice Server.exe"
+			exePath := (kBinariesDirectory . "Voice Server.exe")
 
 			Run(exePath, kBinariesDirectory, , &pid)
 
-			for ignore, tool in string2Values(",", getMultiMapValue(readMultiMap(kUserConfigDirectory . "Startup.settings"), "Tools", ""))
-				try {
-					Run(kBinariesDirectory . tool . ".exe", kBinariesDirectory)
-				}
-				catch Any as exception {
-					logError(exception)
-				}
+			if FileExist(kUserConfigDirectory . "Startup.settings") {
+				startup := (" -Startup `"" . kUserConfigDirectory . "Startup.settings`"")
+
+				for ignore, tool in string2Values(",", getMultiMapValue(readMultiMap(kUserConfigDirectory . "Startup.settings"), "Session", "Tools", ""))
+					try {
+						Run(kBinariesDirectory . tool . ".exe" . startup, kBinariesDirectory)
+					}
+					catch Any as exception {
+						logError(exception)
+					}
+			}
+			else
+				startup := ""
 
 			Sleep(1000)
 
-			exePath := kBinariesDirectory . "Simulator Controller.exe -Startup -Voice " . pid
+			exePath := (kBinariesDirectory . "Simulator Controller.exe -Start -Voice " . pid . startup)
 
 			Run(exePath, kBinariesDirectory, , &pid)
 
@@ -433,7 +439,7 @@ launchPad(command := false, arguments*) {
 		}
 
 		if configure {
-			if launchProfilesEditor(launchPadGui)
+			if (launchProfilesEditor(launchPadGui) = "Startup")
 				launchPad("Startup")
 		}
 		else
@@ -767,11 +773,13 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 			for ignore, assistant in ["Driving Coach", "Race Engineer", "Race Strategist", "Race Spotter"]
 				profile[assistant] := getMultiMapValue(settings, "Profiles", name . "." . assistant, "Active")
 
+			profile["Assistant.Autonomy"] := getMultiMapValue(settings, "Profiles", name . ".Assistant.Autonomy")
+
 			if (profile["Mode"] = "Team") {
 				profile["Team.Mode"] := getMultiMapValue(settings, "Profiles", name . ".Team.Mode", "Settings")
 
 				if (profile["Team.Mode"] = "Local") {
-					for ignore, property in ["Server URL", "Session Token", "Team.Name", "Team.Identifier"
+					for ignore, property in ["Server.URL", "Server.Token", "Team.Name", "Team.Identifier"
 										   , "Driver.Name", "Driver.Identifier", "Session.Name", "Session.Identifier"]
 						profile[property] := getMultiMapValue(settings, "Profiles", name . "." . property, "")
 				}
@@ -808,11 +816,13 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 			for ignore, assistant in ["Driving Coach", "Race Engineer", "Race Strategist", "Race Spotter"]
 				setMultiMapValue(settings, "Profiles", name . "." . assistant, profile[assistant])
 
+			setMultiMapValue(settings, "Profiles", name . ".Assistant.Autonomy", profile["Assistant.Autonomy"])
+
 			if (profile["Mode"] = "Team") {
 				setMultiMapValue(settings, "Profiles", name . ".Team.Mode", profile["Team.Mode"])
 
 				if (profile["Team.Mode"] = "Local")
-					for ignore, property in ["Server URL", "Session Token", "Team.Name", "Team.Identifier"
+					for ignore, property in ["Server.URL", "Server.Token", "Team.Name", "Team.Identifier"
 										   , "Driver.Name", "Driver.Identifier", "Session.Name", "Session.Identifier"]
 						setMultiMapValue(settings, "Profiles", name . "." . property, profile[property])
 			}
@@ -835,8 +845,10 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 				setMultiMapValue(settings, assistant, "Muted", profile[assistant] = "Muted")
 			}
 
+			setMultiMapValue(settings, "Race Assistant", "Autonomy", profile["Assistant.Autonomy"])
+
 			if (profile["Mode"] = "Team")
-				for ignore, property in ["Server URL", "Session Token", "Team.Name", "Team.Identifier"
+				for ignore, property in ["Server.URL", "Server.Token", "Team.Name", "Team.Identifier"
 									   , "Driver.Name", "Driver.Identifier", "Session.Name", "Session.Identifier"]
 					setMultiMapValue(settings, "Team Session", property, profile[property])
 		}
@@ -868,7 +880,7 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 
 		saveProfiles()
 
-		done := kSave
+		done := (GetKeyState("Alt", "P") ? "Startup" : kSave)
 	}
 	else if (launchPadOrCommand == kCancel)
 		done := kCancel
@@ -1031,7 +1043,7 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 
 		profilesEditorGui.Add("Text", "x8 yp+26 w388 0x10")
 
-		profilesEditorGui.Add("Button", "Default X120 YP+10 w80", translate("Save")).OnEvent("Click", launchProfilesEditor.Bind(kSave))
+		profilesEditorGui.Add("Button", "Default X120 YP+10 w80 vsaveButton", translate("Save")).OnEvent("Click", launchProfilesEditor.Bind(kSave))
 		profilesEditorGui.Add("Button", "X+10 w80", translate("&Cancel")).OnEvent("Click", launchProfilesEditor.Bind(kCancel))
 
 		loadProfiles()
@@ -1048,8 +1060,14 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 			else
 				profilesEditorGui.Show()
 
-			loop
-				Sleep(1000)
+			loop {
+				Sleep(200)
+
+				if GetKeyState("Alt", "P")
+					profilesEditorGui["saveButton"].Text := translate("Startup")
+				else
+					profilesEditorGui["saveButton"].Text := translate("Save")
+			}
 			until done
 
 			profilesEditorGui.Destroy()
@@ -1058,7 +1076,7 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 			launchPadOrCommand.Unblock()
 		}
 
-		return (done = kSave)
+		return ((done = "Startup") ? done : (done = kSave))
 	}
 }
 

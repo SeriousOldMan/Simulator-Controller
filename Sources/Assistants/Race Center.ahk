@@ -12577,13 +12577,30 @@ loadDrivers(connector, team) {
 }
 
 startupRaceCenter() {
+	local raceSettings := readMultiMap(kUserConfigDirectory . "Race.settings")
+	local index := inList(A_Args, "-Startup")
 	local icon := kIconsDirectory . "Console.ico"
-	local rCenter
+	local rCenter, startupSettings, ignore, property
 
 	TraySetIcon(icon, "1")
 	A_IconTip := "Race Center"
 
-	rCenter := RaceCenter(kSimulatorConfiguration, readMultiMap(kUserConfigDirectory . "Race.settings"))
+	if index {
+		startupSettings := (index ? readMultiMap(A_Args[index + 1]) : false)
+
+		for ignore, property in ["Server.URL", "Team.Name", "Team.Identifier"
+							   , "Driver.Name", "Driver.Identifier", "Session.Name", "Session.Identifier"]
+			setMultiMapValue(raceSettings, "Team Settings", property
+										 , getMultiMapValue(startupSettings, "Team Session", property
+																		   , getMultiMapValue(raceSettings, "Team Settings", property, "")))
+
+		setMultiMapValue(raceSettings, "Team Settings", "Server.Token"
+									 , getMultiMapValue(startupSettings, "Team Session", "Server.Token"
+																	   , getMultiMapValue(raceSettings, "Team Settings", "Server.Token"
+																									  , RaceCenter.kInvalidToken)))
+	}
+
+	rCenter := RaceCenter(kSimulatorConfiguration, raceSettings)
 
 	if GetKeyState("Ctrl", "P")
 		rCenter.iSynchronize := "Off"

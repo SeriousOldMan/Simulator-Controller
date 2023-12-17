@@ -252,7 +252,7 @@ class SystemPlugin extends ControllerPlugin {
 	__New(controller, name, configuration := false, register := true) {
 		local function, action, ignore, descriptor, arguments, commands, mode, modeCommands
 
-		if inList(A_Args, "-Startup")
+		if inList(A_Args, "-Start")
 			this.iChildProcess := true
 
 		super.__New(controller, name, configuration, false)

@@ -896,7 +896,6 @@ copyDirectory(source, destination, progressStep, &count) {
 
 			showProgress({progress: Round(gProgressCount + (count * progressStep)), message: translate("Copying ") . file . translate("...")})
 
-		if (file != "desktop.ini")
 			if InStr(FileExist(fileName), "D") {
 				SplitPath(fileName, &subDirectory)
 
@@ -904,6 +903,7 @@ copyDirectory(source, destination, progressStep, &count) {
 			}
 			else
 				FileCopy(fileName, destination, 1)
+		}
 	}
 }
 

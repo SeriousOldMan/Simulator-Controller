@@ -1004,6 +1004,12 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 													 , translate("Mode: ") . translate(this.TeamSessionActive ? "Team" : "Solo"))
 
 					if !this.RaceAssistantSpeaker {
+						information .= ("; " . translate("Silent: ") . translate("Yes"))
+
+						setMultiMapValue(configuration, this.Plugin, "Silent", true)
+					}
+
+					if this.RaceAssistantMuted {
 						information .= ("; " . translate("Muted: ") . translate("Yes"))
 
 						setMultiMapValue(configuration, this.Plugin, "Muted", true)

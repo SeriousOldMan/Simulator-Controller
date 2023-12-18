@@ -40,6 +40,7 @@
 
 #Include "..\Libraries\Task.ahk"
 #Include "..\Libraries\Messages.ahk"
+#Include "..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\Configuration\Libraries\SettingsEditor.ahk"
 
 
@@ -47,6 +48,8 @@
 ;;;                        Private Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+global kOk := "Ok"
+global kCancel := "Cancel"
 global kClose := "Close"
 global kRestart := "Restart"
 global kEvent := "Event"
@@ -154,7 +157,7 @@ class SimulatorStartup extends ConfigurationItem {
 
 	prepareConfiguration() {
 		local noConfiguration := (this.Configuration.Count == 0)
-		local editConfig := GetKeyState("Ctrl")
+		local editConfig := GetKeyState("Alt")
 		local settings := this.Settings
 		local result
 
@@ -747,9 +750,14 @@ closeLaunchPad(*) {
 
 launchProfilesEditor(launchPadOrCommand, arguments*) {
 	local x, y, w, h, width, x0, x1, w1, w2, x2, w4, x4, w3, x3, x4, x5, w5, x6, x7
-	local checkedRows, checked
+	local checkedRows, checked, settingsTab, first
+	local profile, plugin, pluginConfiguration, ignore, lastModified, configuration
+	local hasTeamServer, dllFile, connection
+	local names, exception, chosen
 
 	static profiles
+	static activeAssistants
+
 	static profilesEditorGui
 	static profilesListView
 
@@ -757,6 +765,101 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 
 	static selectedProfile := false
 	static checkedProfile := false
+
+	static connector := false
+	static connected := false
+	static keepAliveTask := false
+	static serverURLs := []
+
+	static serverURL, serverToken, teamName, theDriverName, sessionName, teamIdentifier, driverIdentifier, sessionIdentifier
+
+	static teams := CaseInsenseMap()
+	static drivers := CaseInsenseMap()
+	static sessions := CaseInsenseMap()
+
+	parseObject(properties) {
+		local result := CaseInsenseMap()
+		local property
+
+		properties := StrReplace(properties, "`r", "")
+
+		loop Parse, properties, "`n" {
+			property := string2Values("=", A_LoopField)
+
+			result[property[1]] := property[2]
+		}
+
+		return result
+	}
+
+	loadTeams(connector) {
+		local teams := CaseInsenseMap()
+		local identifiers, ignore, identifier, team
+
+		try {
+			identifiers := string2Values(";", connector.GetAllTeams())
+		}
+		catch Any as exception {
+			identifiers := []
+		}
+
+		for ignore, identifier in identifiers {
+			team := parseObject(connector.GetTeam(identifier))
+
+			teams[team["Name"]] := team["Identifier"]
+		}
+
+		return teams
+	}
+
+	loadDrivers(connector, team) {
+		local drivers := CaseInsenseMap()
+		local identifiers, ignore, identifier, driver
+
+		if team {
+			try {
+				identifiers := string2Values(";", connector.GetTeamDrivers(team))
+			}
+			catch Any as exception {
+				identifiers := []
+			}
+
+			for ignore, identifier in identifiers {
+				driver := parseObject(connector.GetDriver(identifier))
+
+				drivers[driverName(driver["ForName"], driver["SurName"], driver["NickName"])] := driver["Identifier"]
+			}
+		}
+
+		return drivers
+	}
+
+	loadSessions(connector, team) {
+		local sessions := CaseInsenseMap()
+		local identifiers, ignore, identifier, session
+
+		if team {
+			try {
+				identifiers := string2Values(";", connector.GetTeamSessions(team))
+			}
+			catch Any as exception {
+				identifiers := []
+			}
+
+			for ignore, identifier in identifiers {
+				try {
+					session := parseObject(connector.GetSession(identifier))
+
+					sessions[session["Name"]] := session["Identifier"]
+				}
+				catch Any as exception {
+					logError(exception)
+				}
+			}
+		}
+
+		return sessions
+	}
 
 	loadProfiles() {
 		local settings := readMultiMap(kUserConfigDirectory . "Startup.settings")
@@ -766,11 +869,10 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 
 		for ignore, name in string2Values(";|;", getMultiMapValue(settings, "Profiles", "Profiles", "")) {
 			profile := CaseInsenseMap("Name", name
-									, "Type", getMultiMapValue(settings, "Profiles", name . ".Type", "Practice")
 									, "Mode", getMultiMapValue(settings, "Profiles", name . ".Mode", "Solo")
 									, "Tools", string2Values(",", getMultiMapValue(settings, "Profiles", name . ".Tools", "Solo")))
 
-			for ignore, assistant in ["Driving Coach", "Race Engineer", "Race Strategist", "Race Spotter"]
+			for ignore, assistant in kRaceAssistants
 				profile[assistant] := getMultiMapValue(settings, "Profiles", name . "." . assistant, "Active")
 
 			profile["Assistant.Autonomy"] := getMultiMapValue(settings, "Profiles", name . ".Assistant.Autonomy")
@@ -778,7 +880,7 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 			if (profile["Mode"] = "Team") {
 				profile["Team.Mode"] := getMultiMapValue(settings, "Profiles", name . ".Team.Mode", "Settings")
 
-				if (profile["Team.Mode"] = "Local") {
+				if (profile["Team.Mode"] = "Profile") {
 					for ignore, property in ["Server.URL", "Server.Token", "Team.Name", "Team.Identifier"
 										   , "Driver.Name", "Driver.Identifier", "Session.Name", "Session.Identifier"]
 						profile[property] := getMultiMapValue(settings, "Profiles", name . "." . property, "")
@@ -790,12 +892,12 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 
 		profilesListView.Delete()
 
-		profilesListView.Add("", translate("Standard"), translate("-"), translate("-"))
+		profilesListView.Add("", translate("Standard"), translate("-"))
 
 		checkedProfile := getMultiMapValue(settings, "Profiles", "Profile", false)
 
 		for ignore, profile in profiles {
-			profilesListView.Add("", profile["Name"], translate(profile["Type"]), translate(profile["Mode"]))
+			profilesListView.Add("", profile["Name"], translate(profile["Mode"]))
 
 			if (checkedProfile = profile["Name"]) {
 				profilesListView.Modify(profilesListView.GetCount(), "Check")
@@ -804,7 +906,7 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 			}
 		}
 
-		loop 3
+		loop 2
 			profilesListView.ModifyCol(A_Index, "AutoHdr")
 	}
 
@@ -818,11 +920,10 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 
 			activeProfiles.Push(name)
 
-			setMultiMapValue(settings, "Profiles", name . ".Type", profile["Type"])
 			setMultiMapValue(settings, "Profiles", name . ".Mode", profile["Mode"])
-			setMultiMapValue(settings, "Profiles", name . ".Tools", values2String(",", profile["Tools"]*))
+			setMultiMapValue(settings, "Profiles", name . ".Tools", profile["Tools"])
 
-			for ignore, assistant in ["Driving Coach", "Race Engineer", "Race Strategist", "Race Spotter"]
+			for ignore, assistant in kRaceAssistants
 				setMultiMapValue(settings, "Profiles", name . "." . assistant, profile[assistant])
 
 			setMultiMapValue(settings, "Profiles", name . ".Assistant.Autonomy", profile["Assistant.Autonomy"])
@@ -830,7 +931,7 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 			if (profile["Mode"] = "Team") {
 				setMultiMapValue(settings, "Profiles", name . ".Team.Mode", profile["Team.Mode"])
 
-				if (profile["Team.Mode"] = "Local")
+				if (profile["Team.Mode"] = "Profile")
 					for ignore, property in ["Server.URL", "Server.Token", "Team.Name", "Team.Identifier"
 										   , "Driver.Name", "Driver.Identifier", "Session.Name", "Session.Identifier"]
 						setMultiMapValue(settings, "Profiles", name . "." . property, profile[property])
@@ -847,11 +948,10 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 		if (profile > 1) {
 			profile := profiles[profile - 1]
 
-			setMultiMapValue(settings, "Session", "Type", profile["Type"])
 			setMultiMapValue(settings, "Session", "Mode", profile["Mode"])
-			setMultiMapValue(settings, "Session", "Tools", values2String(",", profile["Tools"]*))
+			setMultiMapValue(settings, "Session", "Tools", profile["Tools"])
 
-			for ignore, assistant in ["Driving Coach", "Race Engineer", "Race Strategist", "Race Spotter"] {
+			for ignore, assistant in kRaceAssistants {
 				setMultiMapValue(settings, assistant, "Enabled", profile[assistant] != "Disabled")
 				setMultiMapValue(settings, assistant, "Silent", profile[assistant] = "Silent")
 				setMultiMapValue(settings, assistant, "Muted", profile[assistant] = "Muted")
@@ -866,6 +966,101 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 		}
 
 		writeMultiMap(kUserConfigDirectory . "Startup.settings", settings)
+	}
+
+	newProfile() {
+		profile := CaseInsenseMap("Name", "", "Mode", "Solo", "Tools", "", "Assistant.Autonomy", "Custom")
+
+		for ignore, assistant in kRaceAssistants
+			profile[assistant] := "Active"
+
+		if keepAliveTask {
+			keepAliveTask.stop()
+
+			keepAliveTask := false
+		}
+
+		serverURL := ""
+		serverToken := ""
+		teamName := ""
+		teamIdentifier := false
+		theDriverName := ""
+		driverIdentifier := false
+		sessionName := ""
+		sessionIdentifier := false
+
+		return profile
+	}
+
+	loadProfile(profile) {
+		profilesEditorGui["profileNameEdit"].Text := profile["Name"]
+		profilesEditorGui["profileModeDropDown"].Value := inList(["Solo", "Team"], profile["Mode"])
+		profilesEditorGui["profilePitwallDropDown"].Value := (1 + inList(["Practice Center", "Race Center"], profile["Tools"]))
+
+		profilesEditorGui["profileAutonomyDropDown"].Value := inList(["Yes", "No", "Custom"], profile["Assistant.Autonomy"])
+
+		for ignore, plugin in activeAssistants
+			plugin[2].Value := inList(["Disabled", "Silent", "Muted", "Active"], profile[plugin[1]])
+
+		if keepAliveTask {
+			keepAliveTask.stop()
+
+			keepAliveTask := false
+		}
+
+		if (profile["Mode"] = "Team") {
+			profilesEditorGui["profileCredentialsDropDown"].Value := inList(["Profile", "Settings"], profile["Team.Mode"])
+
+			if (profile["Team.Mode"] = "Profile") {
+				profilesEditorGui["profileServerURLEdit"].Text := profile["Server.URL"]
+				profilesEditorGui["profileServerTokenEdit"].Text := profile["Server.Token"]
+
+				profilesEditorGui["profileTeamDropDown"].Delete()
+				profilesEditorGui["profileTeamDropDown"].Add([profile["Team.Name"]])
+				profilesEditorGui["profileTeamDropDown"].Choose(1)
+				teamName := profile["Team.Name"]
+				teamIdentifier := profile["Team.Identifier"]
+
+				profilesEditorGui["profileDriverDropDown"].Delete()
+				profilesEditorGui["profileDriverDropDown"].Add([profile["Driver.Name"]])
+				profilesEditorGui["profileDriverDropDown"].Choose(1)
+				theDriverName := profile["Driver.Name"]
+				driverIdentifier := profile["Driver.Identifier"]
+
+				profilesEditorGui["profileSessionDropDown"].Delete()
+				profilesEditorGui["profileSessionDropDown"].Add([profile["Session.Name"]])
+				profilesEditorGui["profileSessionDropDown"].Choose(1)
+				sessionName := profile["Session.Name"]
+				sessionIdentifier := profile["Session.Identifier"]
+			}
+		}
+	}
+
+	saveProfile(profile) {
+		profile["Name"] := profilesEditorGui["profileNameEdit"].Text
+		profile["Mode"] :=  ["Solo", "Team"][profilesEditorGui["profileModeDropDown"].Value]
+		profile["Tools"] := ["", "Practice Center", "Race Center"][profilesEditorGui["profilePitwallDropDown"].Value]
+
+		profile["Assistant.Autonomy"] := ["Yes", "No", "Custom"][profilesEditorGui["profileAutonomyDropDown"].Value]
+
+		for ignore, plugin in activeAssistants
+			profile[plugin[1]] := ["Disabled", "Silent", "Muted", "Active"][plugin[2].Value]
+
+		if (profile["Mode"] = "Team") {
+			profile["Team.Mode"] := ["Profile", "Settings"][profilesEditorGui["profileCredentialsDropDown"].Value]
+
+			if (profile["Team.Mode"] = "Profile") {
+				profile["Server.URL"] := profilesEditorGui["profileServerURLEdit"].Text
+				profile["Server.Token"] := profilesEditorGui["profileServerTokenEdit"].Text
+
+				profile["Team.Name"] := profilesEditorGui["profileTeamDropDown"].Text
+				profile["Team.Identifier"] := teamIdentifier
+				profile["Driver.Name"] := profilesEditorGui["profileDriverDropDown"].Text
+				profile["Driver.Identifier"] := driverIdentifier
+				profile["Session.Name"] := profilesEditorGui["profileSessionDropDown"].Text
+				profile["Session.Identifier"] := sessionIdentifier
+			}
+		}
 	}
 
 	chooseProfile(listView, line, *) {
@@ -892,7 +1087,7 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 
 		saveProfiles()
 
-		done := (GetKeyState("Alt", "P") ? "Startup" : kSave)
+		done := (GetKeyState("Ctrl", "P") ? "Startup" : kSave)
 	}
 	else if (launchPadOrCommand == kCancel)
 		done := kCancel
@@ -901,15 +1096,11 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 			if (selectedProfile > 1)
 				launchProfilesEditor(kEvent, "ProfileSave")
 
-			profile := CaseInsenseMap("Name", "", "Type", "Practice", "Mode", "Solo", "Tools", ["Practice Center"]
-									, "Assistant.Autonomy", "Custom")
-
-			for ignore, assistant in ["Driving Coach", "Race Engineer", "Race Strategist", "Race Spotter"]
-				profile[assistant] := "Active"
+			profile := newProfile()
 
 			profiles.Push(profile)
 
-			profilesListView.Add("", profile["Name"], translate(profile["Type"]), translate(profile["Mode"]))
+			profilesListView.Add("", profile["Name"], translate(profile["Mode"]))
 
 			profilesListView.Modify(selectedProfile, "Vis Select")
 
@@ -933,9 +1124,7 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 			selectedProfile := arguments[2]
 
 			if (selectedProfile > 1) {
-				profilesEditorGui["profileNameEdit"].Text := profiles[selectedProfile - 1]["Name"]
-				profilesEditorGui["profileTypeDropDown"].Value := inList(["Practice", "Qualifying", "Race"], profiles[selectedProfile - 1]["Type"])
-				profilesEditorGui["profileModeDropDown"].Value := inList(["Solo", "Team"], profiles[selectedProfile - 1]["Mode"])
+				loadProfile(profiles[selectedProfile - 1])
 
 				profilesListView.Modify(selectedProfile, "Vis Select")
 			}
@@ -944,11 +1133,262 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 		}
 		else if (arguments[1] = "ProfileSave") {
 			if (selectedProfile > 1) {
-				profiles[selectedProfile - 1]["Name"] := profilesEditorGui["profileNameEdit"].Text
-				profiles[selectedProfile - 1]["Type"] :=  ["Practice", "Qualifying", "Race"][profilesEditorGui["profileTypeDropDown"].Value]
-				profiles[selectedProfile - 1]["Mode"] :=  ["Solo", "Team"][profilesEditorGui["profileModeDropDown"].Value]
+				saveProfile(profiles[selectedProfile - 1])
 
-				profilesListView.Modify(selectedProfile, "", profilesEditorGui["profileNameEdit"].Text, profilesEditorGui["profileTypeDropDown"].Text, profilesEditorGui["profileModeDropDown"].Text)
+				profilesListView.Modify(selectedProfile, "", profilesEditorGui["profileNameEdit"].Text, profilesEditorGui["profileModeDropDown"].Text)
+			}
+		}
+		else if (arguments[1] = "ManageSession") {
+			launchProfilesEditor(kEvent, "ProfileSave")
+
+			profilesEditorGui.Block()
+
+			try {
+				if FileExist(kUserConfigDirectory . "Team Server.ini")
+					lastModified := FileGetTime(kUserConfigDirectory . "Team Server.ini", "M")
+				else
+					lastModified := false
+
+				RunWait(kBinariesDirectory . "Simulator Configuration.exe -Team")
+
+				if (FileExist(kUserConfigDirectory . "Team Server.ini") && (!lastModified || (lastModified != FileGetTime(kUserConfigDirectory . "Team Server.ini", "M")))) {
+					profile := profiles[selectedProfile - 1]
+
+					configuration := readMultiMap(kUserConfigDirectory . "Team Server.ini")
+
+					if (getMultiMapValue(configuration, "Team Server", "Team.Identifier", false)
+					 && getMultiMapValue(configuration, "Team Server", "Driver.Identifier", false)
+					 && getMultiMapValue(configuration, "Team Server", "Session.Identifier", false)) {
+						profile["Team.Mode"] := "Profile"
+						profile["Server.URL"] :=  getMultiMapValue(configuration, "Team Server", "Server.URL")
+						profile["Server.Token"] :=  getMultiMapValue(configuration, "Team Server", "Session.Token")
+						profile["Team.Name"] :=  getMultiMapValue(configuration, "Team Server", "Team.Name")
+						profile["Team.Identifier"] :=  getMultiMapValue(configuration, "Team Server", "Team.Identifier")
+						profile["Driver.Name"] :=  getMultiMapValue(configuration, "Team Server", "Driver.Name")
+						profile["Driver.Identifier"] :=  getMultiMapValue(configuration, "Team Server", "Driver.Identifier")
+						profile["Session.Name"] :=  getMultiMapValue(configuration, "Team Server", "Session.Name")
+						profile["Session.Identifier"] :=  getMultiMapValue(configuration, "Team Server", "Session.Identifier")
+
+						profile := selectedProfile
+						selectedProfile := false
+
+						launchProfilesEditor(kEvent, "ProfileLoad", profile)
+					}
+				}
+			}
+			catch Any as exception {
+				logError(exception, true)
+
+				OnMessage(0x44, translateOkButton)
+				MsgBox(translate("Cannot start the configuration tool - please check the installation..."), translate("Error"), 262160)
+				OnMessage(0x44, translateOkButton, 0)
+			}
+			finally {
+				profilesEditorGui.Unblock()
+			}
+		}
+		else if (arguments[1] = "ManageDriver") {
+			profilesEditorGui.Block()
+
+			try {
+				RunWait(kBinariesDirectory . "Race Settings.exe -Team")
+			}
+			catch Any as exception {
+				logError(exception, true)
+
+				OnMessage(0x44, translateOkButton)
+				MsgBox(substituteVariables(translate("Cannot start the Race Settings tool (%exePath%) - please check the configuration..."), {exePath: kBinariesDirectory . "Race Settings.exe"}), translate("Error"), 262160)
+				OnMessage(0x44, translateOkButton, 0)
+			}
+			finally {
+				profilesEditorGui.Unblock()
+			}
+		}
+		else if (arguments[1] = "Update") {
+			if connected
+				if (arguments[2] == "Team") {
+					if ((teams.Count > 0) && (profilesEditorGui["profileTeamDropDown"].Value != 0)) {
+						teamName := getKeys(teams)[profilesEditorGui["profileTeamDropDown"].Value]
+						teamIdentifier := teams[teamName]
+
+						exception := false
+
+						try {
+							drivers := loadDrivers(connector, teamIdentifier)
+						}
+						catch Any as e {
+							drivers := CaseInsenseMap()
+
+							exception := e
+						}
+					}
+					else {
+						teamName := ""
+						teamIdentifier := false
+						drivers := CaseInsenseMap()
+					}
+
+					names := getKeys(drivers)
+					chosen := inList(getValues(drivers), driverIdentifier)
+
+					if ((chosen == 0) && (names.Length > 0))
+						chosen := 1
+
+					if (chosen == 0) {
+						theDriverName := ""
+						driverIdentifier := false
+					}
+					else {
+						theDriverName := names[chosen]
+						driverIdentifier := drivers[theDriverName]
+					}
+
+					profilesEditorGui["profileDriverDropDown"].Delete()
+					profilesEditorGui["profileDriverDropDown"].Add(names)
+					profilesEditorGui["profileDriverDropDown"].Choose(chosen)
+
+					try {
+						sessions := loadSessions(connector, teamIdentifier)
+					}
+					catch Any as e {
+						sessions := CaseInsenseMap()
+
+						exception := e
+					}
+
+					names := getKeys(sessions)
+					chosen := inList(getValues(sessions), sessionIdentifier)
+
+					if ((chosen == 0) && (names.Length > 0))
+						chosen := 1
+
+					if (chosen == 0) {
+						sessionName := ""
+						sessionIdentifier := false
+					}
+					else {
+						sessionName := names[chosen]
+						sessionIdentifier := sessions[sessionName]
+					}
+
+					profilesEditorGui["profileSessionDropDown"].Delete()
+					profilesEditorGui["profileSessionDropDown"].Add(names)
+					profilesEditorGui["profileSessionDropDown"].Choose(chosen)
+
+					if exception
+						throw exception
+				}
+				else if (arguments[2] == "Driver") {
+					if ((drivers.Count > 0) && (profilesEditorGui["profileDriverDropDown"].Value != 0)) {
+						theDriverName := getKeys(drivers)[profilesEditorGui["profileDriverDropDown"].Value]
+						driverIdentifier := drivers[theDriverName]
+					}
+					else {
+						theDriverName := ""
+						driverIdentifier := false
+					}
+				}
+				else if (arguments[2] == "Session") {
+					if ((sessions.Count > 0) && (profilesEditorGui["profileSessionDropDown"].Value != 0)) {
+						sessionName := getKeys(sessions)[profilesEditorGui["profileSessionDropDown"].Value]
+						sessionIdentifier := sessions[sessionName]
+					}
+					else {
+						sessionName := ""
+						sessionIdentifier := false
+					}
+				}
+		}
+		else if (arguments[1] = "Connect") {
+			serverURL := profilesEditorGui["profileServerURLEdit"].Text
+			serverToken := profilesEditorGui["profileServerTokenEdit"].Text
+
+			if connector {
+				if GetKeyState("Ctrl", "P") {
+					profilesEditorGui.Block()
+
+					try {
+						token := loginDialog(connector, serverURL, profilesEditorGui)
+
+						if token {
+							serverToken := token
+
+							profilesEditorGui["profileServerTokenEdit"].Text := token
+						}
+						else
+							return
+					}
+					finally {
+						profilesEditorGui.Unblock()
+					}
+				}
+
+				try {
+					connector.Initialize(serverURL, serverToken)
+
+					connection := connector.Connect(serverToken, SessionDatabase.ID, SessionDatabase.getUserName(), "Driver")
+
+					if (connection && (connection != "")) {
+						settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+						serverURLs := string2Values(";", getMultiMapValue(settings, "Team Server", "Server URLs", ""))
+
+						if !inList(serverURLs, serverURL) {
+							serverURLs.Push(serverURL)
+
+							setMultiMapValue(settings, "Team Server", "Server URLs", values2String(";", serverURLs*))
+
+							writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+
+							profilesEditorGui["profileServerURLEdit"].Delete()
+							profilesEditorGui["profileServerURLEdit"].Add(serverURLs)
+							profilesEditorGui["profileServerURLEdit"].Choose(inList(serverURLs, serverURL))
+						}
+
+						connector.ValidateSessionToken()
+
+						if keepAliveTask
+							keepAliveTask.stop()
+
+						keepAliveTask := PeriodicTask(ObjBindMethod(connector, "KeepAlive", connection), 120000, kLowPriority)
+
+						keepAliveTask.start()
+
+						teams := loadTeams(connector)
+
+						names := getKeys(teams)
+						chosen := inList(getValues(teams), teamIdentifier)
+
+						if ((chosen == 0) && (names.Length > 0))
+							chosen := 1
+
+						if (chosen == 0) {
+							teamName := ""
+							teamIdentifier := false
+						}
+						else {
+							teamName := names[chosen]
+							teamIdentifier := teams[teamName]
+						}
+
+						profilesEditorGui["profileTeamDropDown"].Delete()
+						profilesEditorGui["profileTeamDropDown"].Add(names)
+						profilesEditorGui["profileTeamDropDown"].Choose(chosen)
+
+						connected := true
+
+						launchProfilesEditor(kEvent, "Update", "Team")
+
+						showMessage(translate("Successfully connected to the Team Server."))
+					}
+					else
+						throw "Invalid or missing token..."
+				}
+				catch Any as exception {
+					OnMessage(0x44, translateOkButton)
+					MsgBox((translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
+					OnMessage(0x44, translateOkButton, 0)
+				}
 			}
 		}
 	}
@@ -992,18 +1432,83 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 			profilesEditorGui["deleteProfileButton"].Enabled := true
 
 			profilesEditorGui["profileNameEdit"].Enabled := true
-			profilesEditorGui["profileTypeDropDown"].Enabled := true
 			profilesEditorGui["profileModeDropDown"].Enabled := true
+			profilesEditorGui["profilePitwallDropDown"].Enabled := true
+
+			profilesEditorGui["profileAutonomyDropDown"].Enabled := true
+
+			for ignore, plugin in activeAssistants
+				plugin[2].Enabled := true
+
+			if (profilesEditorGui["profileModeDropDown"].Value = 2) {
+				profile := profiles[selectedProfile - 1]
+
+				profilesEditorGui["profileCredentialsDropDown"].Enabled := true
+
+				if (profilesEditorGui["profileCredentialsDropDown"].Value = 0)
+					profilesEditorGui["profileCredentialsDropDown"].Value := 2
+
+				profilesEditorGui["profileTeamButton"].Enabled := (profilesEditorGui["profileCredentialsDropDown"].Value = 2)
+				profilesEditorGui["profileSessionButton"].Enabled := true
+
+				if (profilesEditorGui["profileCredentialsDropDown"].Value = 1) {
+					profilesEditorGui["profileServerURLEdit"].Enabled := true
+
+					if ((profilesEditorGui["profileServerURLEdit"].Text = "") && (serverURLS.Length > 0))
+						profilesEditorGui["profileServerURLEdit"].Text := serverURLs[1]
+
+					profilesEditorGui["profileServerTokenEdit"].Enabled := true
+					profilesEditorGui["profileConnectButton"].Enabled := true
+					profilesEditorGui["profileTeamDropDown"].Enabled := true
+					profilesEditorGui["profileDriverDropDown"].Enabled := true
+					profilesEditorGui["profileSessionDropDown"].Enabled := true
+				}
+			}
 		}
 		else {
 			profilesEditorGui["deleteProfileButton"].Enabled := false
 
 			profilesEditorGui["profileNameEdit"].Enabled := false
 			profilesEditorGui["profileNameEdit"].Text := ""
-			profilesEditorGui["profileTypeDropDown"].Enabled := false
-			profilesEditorGui["profileTypeDropDown"].Value := 0
 			profilesEditorGui["profileModeDropDown"].Enabled := false
 			profilesEditorGui["profileModeDropDown"].Value := 0
+			profilesEditorGui["profilePitwallDropDown"].Enabled := false
+			profilesEditorGui["profilePitwallDropDown"].Value := 0
+
+			profilesEditorGui["profileAutonomyDropDown"].Enabled := false
+			profilesEditorGui["profileAutonomyDropDown"].Value := 0
+
+			for ignore, plugin in activeAssistants {
+				plugin[2].Enabled := false
+				plugin[2].Value := 0
+			}
+		}
+
+		if ((profilesListView.GetNext() <= 1) || (profilesEditorGui["profileModeDropDown"].Value != 2)) {
+			profilesEditorGui["profileCredentialsDropDown"].Enabled := false
+			profilesEditorGui["profileCredentialsDropDown"].Value := 0
+			profilesEditorGui["profileTeamButton"].Enabled := false
+			profilesEditorGui["profileSessionButton"].Enabled := false
+		}
+
+		if (profilesEditorGui["profileCredentialsDropDown"].Value != 1) {
+			profilesEditorGui["profileServerURLEdit"].Enabled := false
+			profilesEditorGui["profileServerURLEdit"].Text := ""
+			profilesEditorGui["profileServerTokenEdit"].Enabled := false
+			profilesEditorGui["profileServerTokenEdit"].Value := ""
+			profilesEditorGui["profileConnectButton"].Enabled := false
+			profilesEditorGui["profileTeamDropDown"].Enabled := false
+			profilesEditorGui["profileTeamDropDown"].Value := 0
+			profilesEditorGui["profileDriverDropDown"].Enabled := false
+			profilesEditorGui["profileDriverDropDown"].Value := 0
+			profilesEditorGui["profileSessionDropDown"].Enabled := false
+			profilesEditorGui["profileSessionDropDown"].Value := 0
+
+			if keepAliveTask {
+				keepAliveTask.stop()
+
+				keepAliveTask := false
+			}
 		}
 	}
 	else {
@@ -1011,24 +1516,58 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 		selectedProfile := false
 		checkedProfile := false
 
+		activeAssistants := []
+
+		configuration := getControllerState(true, true)
+
+		hasTeamServer := getMultiMapValue(configuration, "Plugins", "Team Server", false)
+
+		keepAliveTask := false
+
+		if hasTeamServer
+			hasTeamServer := string2Values("|", hasTeamServer)[1]
+
+		if hasTeamServer {
+			connector := false
+			connected := false
+
+			dllFile := (kBinariesDirectory . "Connectors\Team Server Connector.dll")
+
+			try {
+				if (!FileExist(dllFile)) {
+					logMessage(kLogCritical, translate("Team Server Connector.dll not found in ") . kBinariesDirectory)
+
+					throw "Unable to find Team Server Connector.dll in " . kBinariesDirectory . "..."
+				}
+
+				connector := CLR_LoadLibrary(dllFile).CreateInstance("TeamServer.TeamServerConnector")
+			}
+			catch Any as exception {
+				logMessage(kLogCritical, translate("Error while initializing Team Server Connector - please rebuild the applications"))
+
+				showMessage(translate("Error while initializing Team Server Connector - please rebuild the applications") . translate("...")
+						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			}
+		}
+
 		profilesEditorGui := Window({Descriptor: "Simulator Startup.Profiles", Options: "ToolWindow 0x400000"})
 
 		profilesEditorGui.SetFont("Bold", "Arial")
 
-		profilesEditorGui.Add("Text", "w388 Center H:Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(profilesEditorGui, "Startup Profiles"))
+		profilesEditorGui.Add("Text", "w408 Center H:Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(profilesEditorGui, "Startup Profiles"))
 
 		profilesEditorGui.SetFont("Norm", "Arial")
 
-		profilesEditorGui.Add("Documentation", "x118 YP+20 w168 Center H:Center", translate("Startup Profiles")
+		profilesEditorGui.Add("Documentation", "x128 YP+20 w178 Center H:Center", translate("Startup Profiles")
 							, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles")
 
-		profilesEditorGui.Add("Text", "x8 yp+26 w388 0x10")
+		profilesEditorGui.Add("Text", "x8 yp+26 w408 0x10")
 
 		profilesEditorGui.SetFont("Norm", "Arial")
 
 		x := 8
 		y := 48
-		width := 388
+		width := 408
 
 		x0 := x + 8
 		x1 := x + 132
@@ -1042,38 +1581,83 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 		w4 := w1 - 25
 		x4 := x1 + w4 + 2
 
-		w3 := Round((w4 / 2) - 3)
+		w3 := Round(w4 / 2)
 		x3 := x1 + w3 + 6
 
 		x4 := x3 + 64
-
-		x5 := x3 + w3 + 2
-		w5 := w3 - 25
-
-		profilesListView := profilesEditorGui.Add("ListView", "x" . x0 . " yp+10 w372 h146 Checked -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Name", "Type", "Mode"], translate))
-		profilesListView.OnEvent("Click", chooseProfile)
-		profilesListView.OnEvent("DoubleClick", chooseProfile)
-		profilesListView.OnEvent("ItemCheck", chooseProfile)
-
-		profilesEditorGui.Add("Text", "x" . x0 . " yp+150 w90 h23 +0x200", translate("Name"))
-		profilesEditorGui.Add("Edit", "x" . x1 . " yp+1 w" . (372 - (x1 - x0)) . " vprofileNameEdit")
-
-		profilesEditorGui.Add("Text", "x" . x0 . " yp+24 w90 h23 +0x200", translate("Type"))
-		profilesEditorGui.Add("DropDownList", "x" . x1 . " yp+1 w" . w3 . " vprofileTypeDropDown", collect(["Practice", "Qualifying", "Race"], translate))
-
-		profilesEditorGui.Add("Text", "x" . x0 . " yp+24 w90 h23 +0x200", translate("Mode"))
-		profilesEditorGui.Add("DropDownList", "x" . x1 . " yp+1 w" . w3 . " vprofileModeDropDown", collect(["Solo", "Team"], translate))
 
 		x5 := x4 - 1 + 24
 		x6 := x5 + 24
 		x7 := x6 + 24
 
-		profilesEditorGui.Add("Button", "x" . x5 . " yp+30 w23 h23 X:Move Y:Move Center +0x200 vaddProfileButton").OnEvent("Click", launchProfilesEditor.Bind(kEvent, "ProfileNew"))
+		profilesListView := profilesEditorGui.Add("ListView", "x" . x0 . " yp+10 w392 h146 Checked -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Name", "Mode"], translate))
+		profilesListView.OnEvent("Click", chooseProfile)
+		profilesListView.OnEvent("DoubleClick", chooseProfile)
+		profilesListView.OnEvent("ItemCheck", chooseProfile)
+
+		profilesEditorGui.Add("Button", "x" . x5 . " yp+150 w23 h23 X:Move Y:Move Center +0x200 vaddProfileButton").OnEvent("Click", launchProfilesEditor.Bind(kEvent, "ProfileNew"))
 		setButtonIcon(profilesEditorGui["addProfileButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
 		profilesEditorGui.Add("Button", "x" . x6 . " yp w23 h23 X:Move Y:Move Center +0x200 vdeleteProfileButton").OnEvent("Click", launchProfilesEditor.Bind(kEvent, "ProfileDelete"))
 		setButtonIcon(profilesEditorGui["deleteProfileButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 
-		profilesEditorGui.Add("Text", "x8 yp+26 w388 0x10")
+		profilesEditorGui.Add("Text", "x" . x0 . " yp+30 w90 h23 +0x200", translate("Name"))
+		profilesEditorGui.Add("Edit", "x" . x1 . " yp+1 w" . (392 - (x1 - x0)) . " vprofileNameEdit")
+
+		profilesEditorGui.Add("Text", "x" . x0 . " yp+24 w90 h23 +0x200", translate("Mode"))
+		profilesEditorGui.Add("DropDownList", "x" . x1 . " yp+1 w" . w3 . " vprofileModeDropDown", collect(hasTeamServer ? ["Solo", "Team"] : ["Solo"], translate)).OnEvent("Change", launchProfilesEditor.Bind("Update State"))
+
+		profilesEditorGui.Add("Text", "x" . x0 . " yp+23 w90 h23 +0x200", translate("Control Center"))
+		profilesEditorGui.Add("DropDownList", "x" . x1 . " yp+1 w" . w3 . " vprofilePitwallDropDown", collect(hasTeamServer ? ["None", "Practice Center", "Race Center"] : ["None", "Practice Center"], translate))
+
+		settingsTab := profilesEditorGui.Add("Tab3", "x" . x0 . " yp+30 w392 h180 Section", collect(hasTeamServer ? ["Assistants", "Team"] : ["Assistants"], translate))
+
+		settingsTab.UseTab(1)
+
+		profilesEditorGui.Add("Text", "x" . (x0 + 8) . " ys+36 w110 h23", translate("Autonomous Mode"))
+		profilesEditorGui.Add("DropDownList", "x" . x1 . " yp-3 w" . w3 . " Choose3 vprofileAutonomyDropDown", collect(["Yes", "No", "Custom"], translate))
+
+		first := true
+
+		for plugin, pluginConfiguration in getMultiMapValues(configuration, "Plugins")
+			if inList(kRaceAssistants, plugin)
+				if string2Values("|", pluginConfiguration)[1] {
+					profilesEditorGui.Add("Text", "x" . (x0 + 8) . (first ? " yp+32" : " yp+27") . " w110 h23", translate(plugin))
+
+					first := false
+
+					activeAssistants.Push(Array(plugin, profilesEditorGui.Add("DropDownList", "x" . x1 . " yp-3 w" . w3 . " Choose4", collect(["Disabled", "Silent", "Muted", "Active"], translate))))
+				}
+
+		settingsTab.UseTab(2)
+
+		profilesEditorGui.Add("Text", "x" . (x0 + 8) . " ys+36 w90 h23 +0x200", translate("Credentials"))
+		profilesEditorGui.Add("DropDownList", "x" . x1 . " yp w" . w3 . " vprofileCredentialsDropDown", collect(["Save with Profile", "Load from Settings"], translate)).OnEvent("Change", launchProfilesEditor.Bind("Update State"))
+
+		profilesEditorGui.Add("Button", "x" . ((x0 + 8) + 240) . " yp-1 w23 h23 Center +0x200 vprofileTeamButton").OnEvent("Click", launchProfilesEditor.Bind(kEvent, "ManageDriver"))
+		setButtonIcon(profilesEditorGui["profileTeamButton"], kIconsDirectory . "Pencil.ico", 1, "L4 T4 R4 B4")
+
+		profilesEditorGui.Add("Button", "x" . ((x0 + 8) + 286) . " yp w86 h23 Center +0x200 vprofileSessionButton", translate("Manage...")).OnEvent("Click", launchProfilesEditor.Bind(kEvent, "ManageSession"))
+
+		serverURLs := string2Values(";", getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini"), "Team Server", "Server URLs", ""))
+
+		profilesEditorGui.Add("Text", "x" . (x0 + 8) . " yp+30 w90 h23 +0x200", translate("Server URL"))
+		profilesEditorGui.Add("ComboBox", "x" . x1 . " yp+1 w256 vprofileServerURLEdit", serverURLs)
+
+		profilesEditorGui.Add("Text", "x" . (x0 + 8) . " yp+23 w90 h23 +0x200", translate("Session Token"))
+		profilesEditorGui.Add("Edit", "x" . x1 . " yp w256 h21 vprofileServerTokenEdit")
+		profilesEditorGui.Add("Button", "x" . (x1 - 24) . " yp-1 w23 h23 Center +0x200 vprofileConnectButton").OnEvent("Click", launchProfilesEditor.Bind(kEvent, "Connect"))
+		setButtonIcon(profilesEditorGui["profileConnectButton"], kIconsDirectory . "Authorize.ico", 1, "L4 T4 R4 B4")
+
+		profilesEditorGui.Add("Text", "x" . (x0 + 8) . " yp+30 w90 h23 +0x200", translate("Team / Driver"))
+		profilesEditorGui.Add("DropDownList", "x" . x1 . " yp w" . w3 . " vprofileTeamDropDown").OnEvent("Change", launchProfilesEditor.Bind(kEvent, "Update", "Team"))
+		profilesEditorGui.Add("DropDownList", "x" . ((x0 + 8) + 243) . " yp w" . (w3 + 6) . " vprofileDriverDropDown").OnEvent("Change", launchProfilesEditor.Bind(kEvent, "Update", "Driver"))
+
+		profilesEditorGui.Add("Text", "x" . (x0 + 8) . " yp+24 w90 h23 +0x200", translate("Session"))
+		profilesEditorGui.Add("DropDownList", "x" . x1 . " yp w" . w3 . " vprofileSessionDropDown").OnEvent("Change", launchProfilesEditor.Bind(kEvent, "Update", "Session"))
+
+		settingsTab.UseTab(0)
+
+		profilesEditorGui.Add("Text", "x8 ys+190 w408 0x10")
 
 		profilesEditorGui.Add("Button", "Default X120 YP+10 w80 vsaveButton", translate("Save")).OnEvent("Click", launchProfilesEditor.Bind(kSave))
 		profilesEditorGui.Add("Button", "X+10 w80", translate("&Cancel")).OnEvent("Click", launchProfilesEditor.Bind(kCancel))
@@ -1095,7 +1679,7 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 			loop {
 				Sleep(200)
 
-				if GetKeyState("Alt", "P")
+				if GetKeyState("Ctrl", "P")
 					profilesEditorGui["saveButton"].Text := translate("Startup")
 				else
 					profilesEditorGui["saveButton"].Text := translate("Save")
@@ -1108,7 +1692,79 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 			launchPadOrCommand.Unblock()
 		}
 
+		if keepAliveTask
+			keepAliveTask.stop()
+
 		return ((done = "Startup") ? done : (done = kSave))
+	}
+}
+
+loginDialog(connectorOrCommand := false, teamServerURL := false, owner := false, *) {
+	local loginGui
+
+	static name := ""
+	static password := ""
+
+	static result := false
+	static nameEdit
+	static passwordEdit
+
+	if (connectorOrCommand == kOk)
+		result := kOk
+	else if (connectorOrCommand == kCancel)
+		result := kCancel
+	else {
+		result := false
+
+		loginGui := Window()
+
+		loginGui.SetFont("Norm", "Arial")
+
+		loginGui.Add("Text", "x16 y16 w90 h23 +0x200", translate("Server URL"))
+		loginGui.Add("Text", "x110 yp w160 h23 +0x200", teamServerURL)
+
+		loginGui.Add("Text", "x16 yp+30 w90 h23 +0x200", translate("Name"))
+		nameEdit := loginGui.Add("Edit", "x110 yp+1 w160 h21", name)
+
+		loginGui.Add("Text", "x16 yp+23 w90 h23 +0x200", translate("Password"))
+		passwordEdit := loginGui.Add("Edit", "x110 yp+1 w160 h21 Password", password)
+
+		loginGui.Add("Button", "x60 yp+35 w80 h23 Default", translate("Ok")).OnEvent("Click", loginDialog.Bind(kOk))
+		loginGui.Add("Button", "x146 yp w80 h23", translate("&Cancel")).OnEvent("Click", loginDialog.Bind(kCancel))
+
+		loginGui.Opt("+Owner" . owner.Hwnd)
+
+		loginGui.Show("AutoSize Center")
+
+		while !result
+			Sleep(100)
+
+		try {
+			if (result == kCancel)
+				return false
+			else if (result == kOk) {
+				name := nameEdit.Text
+				password := passwordEdit.Text
+
+				try {
+					connectorOrCommand.Initialize(teamServerURL)
+
+					connectorOrCommand.Login(name, password)
+
+					return connectorOrCommand.GetSessionToken()
+				}
+				catch Any as exception {
+					OnMessage(0x44, translateOkButton)
+					MsgBox((translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
+					OnMessage(0x44, translateOkButton, 0)
+
+					return false
+				}
+			}
+		}
+		finally {
+			loginGui.Destroy()
+		}
 	}
 }
 

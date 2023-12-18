@@ -320,15 +320,22 @@ editSettings(&settingsOrCommand, owner := false, withContinue := false, fromSetu
 	startConfiguration(*) {
 		local restart := "Restart"
 
+		settingsEditorGui.Block()
+
 		try {
 			RunWait(kBinariesDirectory . "Simulator Configuration.exe")
 
 			editSettings(&restart)
 		}
 		catch Any as exception {
+			logError(exception, true)
+
 			OnMessage(0x44, translateOkButton)
 			MsgBox(translate("Cannot start the configuration tool - please check the installation..."), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
+		}
+		finally {
+			settingsEditorGui.Unblock()
 		}
 	}
 

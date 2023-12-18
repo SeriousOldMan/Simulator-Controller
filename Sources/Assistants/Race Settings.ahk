@@ -693,7 +693,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 	else if (settingsOrCommand == kUpdate) {
 		if connected
 			if (arguments[1] == "Team") {
-				if ((teams.Count > 0) || (settingsGui["teamDropDownMenu"].Value = 0)) {
+				if ((teams.Count > 0) && (settingsGui["teamDropDownMenu"].Value != 0)) {
 					teamName := getKeys(teams)[settingsGui["teamDropDownMenu"].Value]
 					teamIdentifier := teams[teamName]
 
@@ -765,7 +765,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 					throw exception
 			}
 			else if (arguments[1] == "Driver") {
-				if ((drivers.Count > 0) || (settingsGui["driverDropDownMenu"].Value = 0)) {
+				if ((drivers.Count > 0) && (settingsGui["driverDropDownMenu"].Value != 0)) {
 					theDriverName := getKeys(drivers)[settingsGui["driverDropDownMenu"].Value]
 					driverIdentifier := drivers[theDriverName]
 				}
@@ -775,7 +775,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 				}
 			}
 			else if (arguments[1] == "Session") {
-				if ((sessions.Count > 0) || (settingsGui["sessionDropDownMenu"].Value = 0)) {
+				if ((sessions.Count > 0) && (settingsGui["sessionDropDownMenu"].Value != 0)) {
 					sessionName := getKeys(sessions)[settingsGui["sessionDropDownMenu"].Value]
 					sessionIdentifier := sessions[sessionName]
 				}

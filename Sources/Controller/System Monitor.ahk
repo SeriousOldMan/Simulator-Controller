@@ -1601,7 +1601,7 @@ systemMonitor(command := false, arguments*) {
 		if (A_TickCount > nextSessionUpdate) {
 			sessionInfo := newMultiMap()
 
-			for ignore, assistant in ["Race Engineer", "Race Strategist", "Race Spotter"]
+			for ignore, assistant in kRaceAssistants
 				addMultiMapValues(sessionInfo, readMultiMap(kTempDirectory . assistant . " Session.state"))
 
 			updateSessionInfo(sessionInfo, sessionInfoWidgets, sessionInfoSize)
@@ -1894,7 +1894,7 @@ startupSystemMonitor() {
 	deleteFile(kTempDirectory . "Database Synchronizer.state")
 	deleteFile(kTempDirectory . "Track Mapper.state")
 
-	for ignore, assistant in ["Race Engineer", "Race Strategist", "Race Spotter"]
+	for ignore, assistant in kRaceAssistants
 		deleteFile(kTempDirectory . assistant . " Session.state")
 
 	PeriodicTask(clearOrphaneStateFiles, 60000, kLowPriority).start()

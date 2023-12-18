@@ -68,6 +68,8 @@ global kBackgroundApps := ["Simulator Tools", "Simulator Download", "Database Sy
 
 global kForegroundApps := ["Simulator Startup", "System Monitor", "Simulator Setup", "Simulator Configuration", "Simulator Settings", "Server Administration", "Session Database", "Race Reports", "Race Settings", "Practice Center", "Race Center", "Strategy Workbench", "Setup Workbench"]
 
+global kRaceAssistants := ["Driving Coach", "Race Engineer", "Race Strategist", "Race Spotter"]
+
 global k1WayToggleType := "1WayToggle"
 global k2WayToggleType := "2WayToggle"
 global kButtonType := "Button"

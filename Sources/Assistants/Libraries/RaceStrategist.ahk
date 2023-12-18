@@ -3013,6 +3013,11 @@ class RaceStrategist extends GridRaceAssistant {
 		local dispose := true
 		local request, fullCourseYellow, report
 
+		static wasSkipped := false
+
+		if scenario
+			wasSkipped := false
+
 		try {
 			if !isSet(confirm) {
 				request := Task.CurrentTask.Request
@@ -3113,10 +3118,22 @@ class RaceStrategist extends GridRaceAssistant {
 						}
 					}
 					else {
-						if ((request != "Pitstop") || (this.Strategy["Rejected"] = "CANCEL"))
+						if (this.Strategy["Rejected"] = "CANCEL")
 							return
-						else
-							confirm := true
+						else if (request != "Pitstop")
+							return
+						else {
+							if wasSkipped {
+								wasSkipped := false
+
+								confirm := true
+							}
+							else {
+								wasSkipped := true
+
+								return
+							}
+						}
 					}
 				}
 			}

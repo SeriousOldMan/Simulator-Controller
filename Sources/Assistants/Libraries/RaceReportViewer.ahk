@@ -1640,6 +1640,7 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 
 			driversListView := reportSettingsGui.Add("ListView", "x90 yp-2 w264 h300 AltSubmit -Multi -LV0x10 Checked NoSort NoSortHdr", collect(headers, translate))
 			driversListView.OnEvent("Click", selectDriver)
+			driversListView.OnEvent("DoubleClick", selectDriver)
 
 			driverSelectCheck := reportSettingsGui.Add("CheckBox", "Check3 x72 yp+2 w15 h23")
 			driverSelectCheck.OnEvent("Click", selectDrivers)

@@ -12586,7 +12586,7 @@ startupRaceCenter() {
 	A_IconTip := "Race Center"
 
 	if index {
-		startupSettings := (index ? readMultiMap(A_Args[index + 1]) : false)
+		startupSettings := readMultiMap(A_Args[index + 1])
 
 		for ignore, property in ["Server.URL", "Team.Name", "Team.Identifier"
 							   , "Driver.Name", "Driver.Identifier", "Session.Name", "Session.Identifier"]

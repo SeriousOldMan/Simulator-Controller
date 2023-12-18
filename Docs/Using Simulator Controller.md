@@ -66,6 +66,26 @@ Here is an overview for the all settings and configuration options for the vario
   
      Maintained by the "Race Settings" and "Session Database" applications and stored in the *Race.settings* file in the *Simulator Controller\Config* folder in your user *Documents* folder. Whenever you start a race (or even a training session), the Virtual Race Assistants will use these settings to control various functionality, for example, how to react to damages, when to change tyres after a severe weather change, and so on. You can edit these settings with the "Race Settings" application just before each session, or you can manage a lot of the setting values by using the "Session Database" application and store default values depending on a given car / track / weather combination. See the [corresponding documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings) for more information.
 
+### Startup Profiles
+
+As you have seen, managing the different settings can be quite time-consuming, when you participate in very different kind of sessions. The setup for a team race using the [Team Server](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server) is very different from running a local practice session or a race against the AI of a given simulator. Therefore, Simulator Controller provides the possibility to manage the most common settings as a profile and you can choose and activate a given profile while starting Simulator Controller by clicking on the green triangle. You can open the startup profiles editor by either exactly hitting the small cog wheel icon in the "Startup" button or by holding down the Control key while clicking on the "Startup" button. The following window appears:
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Startup%20Profiles%201.JPG)
+
+In this editor you create as many different startup profiles as you want. Only one of them will be active as indicated by the checkmark in the list and will be used during the startup process. The profile named "Standard" is special, as it indicates **no** startup profile (all settings will be loaded *normally* from the sources described above).
+
+If you want to create a startup profile, click on the button with the small "+" and give this profile a unique name. You can choose whether this profile will start a solo or a team session. You can furthermore specifiy, which Assistants will be available and whether they will talk and listen to you. And you can activate the ["Autonomous Mode" for strategy handling](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#tab-strategy) by the Assistants, if required.
+
+If you want to start the "Practice Center" or the "Race Center" automatically you can choose that as well. Please note, that running the "Race Center" is only useful in a team session.
+
+If you have chosen "Team" as the *Mode* of the startup profile, you can configure all [team session](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server) related stuff on the second tab.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Startup%20Profiles%201.JPG)
+
+If you are the team manager, you can open up the [team configuration editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-team-server) in "Simulator Configuration" by clicking on the "Manage..." button. When you have created and saved a new team session there it will be loaded into the startup profile automatically. Otherwise, if you participate as a driver in a team session, you can either use the application "Race Settings" to manage your driver credentials, or you can enter them directly into the startup profile by chosing "Save with Profile" in the *Credential* drop down. The input fields below have the same meaning and behaviour as those in the ["Race Settings"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#preparing-a-team-session) application.
+
+If you are ready to start, you can close the startup profiles editor and click then again on the green triangle to start Simulator Controller. As a shortcut, you can hold down the Control key while saving and closing the startup profiles editor, which will trigger the startup process automatically.
+
 ## Using Simulator Controller
 
 After closing the configuration dialog, the actual startup process begins. Normally, you will be greeted by a splash screen and will see a pogress bar which informs you about what the system is currently doing. If you decide to stop the startup process, you can do this by pressing Escape anytime. If you decide that you want to start your favorite simulation (the first one in the Simulators list (see the [General tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-general) in the configuration tool) after the startup process has finished, you can do this by holding down the Control key during the startup process, even if you haven't checked the startup option in the configuration dialog above.

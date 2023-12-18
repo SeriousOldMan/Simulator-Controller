@@ -1,3 +1,12 @@
+## 5.5.2.0-release 01/05/24 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. "Simulator Startup" now supports the so-called startup profiles, which let you manage and activate the most important configuration settings for solo and team races in a matter of seconds. See the all new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles) for more information.
+  4. New [control key modifiers](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Keyboard-Modifiers) for "Simulator Startup" allow you to quickly open the startup profiles editor and run the startup process automatically when closing the editor.
+  5. A couple of presets, that were used to disable voice handling completely or to start the Assistants muted, has been deprecated in "Simulator Setup". The functionality is now available in the [startup profiles](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles).
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-552), since a couple of presets were deprecated.
+
 ## 5.5.1.0-release 12/15/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

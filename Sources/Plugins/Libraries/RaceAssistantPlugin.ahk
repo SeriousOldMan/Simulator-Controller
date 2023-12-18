@@ -775,7 +775,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				}
 
 				if (RaceAssistantPlugin.sStartupSettings && (getMultiMapValue(RaceAssistantPlugin.sStartupSettings, "Session", "Mode", kUndefined) != kUndefined))
-					if (getMultiMapValue(RaceAssistantPlugin.sStartupSettings, "Session", "Mode", "Solo") = "Team")
+					if (getMultiMapValue(RaceAssistantPlugin.sStartupSettings, "Session", "Mode") = "Team")
 						this.enableTeamServer()
 					else
 						this.disableTeamServer()
@@ -1061,11 +1061,11 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				driverIdentifier := getMultiMapValue(settings, "Team Settings", "Driver.Identifier", false)
 
 				if RaceAssistantPlugin.sStartupSettings {
-					serverURL := getMultiMapValue(TeamServerPlugin.sStartupSettings, "Team Session", "Server.URL", serverURL)
-					accessToken := getMultiMapValue(TeamServerPlugin.sStartupSettings, "Team Session", "Server.Token", serverToken)
-					teamIdentifier := getMultiMapValue(TeamServerPlugin.sStartupSettings, "Team Session", "Team.Identifier", teamIdentifier)
-					driverIdentifier := getMultiMapValue(TeamServerPlugin.sStartupSettings, "Team Session", "Driver.Identifier", driverIdentifier)
-					sessionIdentifier := getMultiMapValue(TeamServerPlugin.sStartupSettings, "Team Session", "Session.Identifier", sessionIdentifier)
+					serverURL := getMultiMapValue(RaceAssistantPlugin.sStartupSettings, "Team Session", "Server.URL", serverURL)
+					accessToken := getMultiMapValue(RaceAssistantPlugin.sStartupSettings, "Team Session", "Server.Token", serverToken)
+					teamIdentifier := getMultiMapValue(RaceAssistantPlugin.sStartupSettings, "Team Session", "Team.Identifier", teamIdentifier)
+					driverIdentifier := getMultiMapValue(RaceAssistantPlugin.sStartupSettings, "Team Session", "Driver.Identifier", driverIdentifier)
+					sessionIdentifier := getMultiMapValue(RaceAssistantPlugin.sStartupSettings, "Team Session", "Session.Identifier", sessionIdentifier)
 				}
 
 				RaceAssistantPlugin.sTeamSessionActive

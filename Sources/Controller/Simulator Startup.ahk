@@ -423,6 +423,9 @@ launchPad(command := false, arguments*) {
 		local x, y, w, h, mX, mY
 		local curCoordMode
 
+		if !configure
+			configure := GetKeyState("Ctrl", "P")
+
 		if !configure {
 			launchPadGui["launchProfilesButton"].GetPos(&x, &y, &w, &h)
 
@@ -870,7 +873,7 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 		for ignore, name in string2Values(";|;", getMultiMapValue(settings, "Profiles", "Profiles", "")) {
 			profile := CaseInsenseMap("Name", name
 									, "Mode", getMultiMapValue(settings, "Profiles", name . ".Mode", "Solo")
-									, "Tools", string2Values(",", getMultiMapValue(settings, "Profiles", name . ".Tools", "Solo")))
+									, "Tools", getMultiMapValue(settings, "Profiles", name . ".Tools", ""))
 
 			for ignore, assistant in kRaceAssistants
 				profile[assistant] := getMultiMapValue(settings, "Profiles", name . "." . assistant, "Active")
@@ -959,7 +962,7 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 
 			setMultiMapValue(settings, "Race Assistant", "Autonomy", profile["Assistant.Autonomy"])
 
-			if (profile["Mode"] = "Team")
+			if ((profile["Mode"] = "Team") && (profile["Team.Mode"] = "Profile"))
 				for ignore, property in ["Server.URL", "Server.Token", "Team.Name", "Team.Identifier"
 									   , "Driver.Name", "Driver.Identifier", "Session.Name", "Session.Identifier"]
 					setMultiMapValue(settings, "Team Session", property, profile[property])

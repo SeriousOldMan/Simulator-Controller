@@ -1154,14 +1154,10 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	readSettings(simulator, car, track, &settings) {
-		local autonomy
-
 		if !isObject(settings)
 			settings := readMultiMap(settings)
 
-		autonomy := getMultiMapValue(settings, "Assistant", "Assistant.Autonomy", "Custom")
-
-		this.updateSessionValues({Autonomy: autonomy})
+		this.updateSessionValues({Autonomy: getMultiMapValue(settings, "Assistant", "Assistant.Autonomy", "Custom")})
 
 		return CaseInsenseMap("Session.Simulator", simulator
 							, "Session.Car", car

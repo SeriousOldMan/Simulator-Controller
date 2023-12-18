@@ -469,6 +469,12 @@ class RaceAssistant extends ConfigurationItem {
 
 		local userName := SessionDatabase.getUserName()
 		local options, forName, ignore
+		
+		deleteState(*) {
+			deleteFile(kTempDirectory . assistantType . ".state")
+			
+			return false
+		}
 
 		if !kUnknown
 			kUnknown := translate("Unknown")
@@ -518,6 +524,8 @@ class RaceAssistant extends ConfigurationItem {
 
 		if muted
 			this.Muted := true
+			
+		OnExit(deleteState)
 	}
 
 	loadFromConfiguration(configuration) {

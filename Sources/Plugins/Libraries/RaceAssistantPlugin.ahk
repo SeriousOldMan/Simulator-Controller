@@ -2353,6 +2353,9 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 							else if ((getMultiMapValue(data, "Session Data", "SessionFormat") != "Time")
 								  && (getMultiMapValue(data, "Session Data", "SessionLapsRemaining", 0) == 0))
 								finished := true
+
+							if finished
+								data := RaceAssistantPlugin.Simulator.acquireSessionData(&telemetryData, &positionsData, true)
 						}
 
 						if firstLap {

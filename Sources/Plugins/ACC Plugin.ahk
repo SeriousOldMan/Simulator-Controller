@@ -454,14 +454,14 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		return telemetryData
 	}
 
-	acquireSessionData(&telemetryData, &positionsData) {
+	acquireSessionData(&telemetryData, &positionsData, finished := false) {
 		if !this.iPositionsDataFuture
 			this.iPositionsDataFuture := ACCPlugin.PositionsDataFuture(this)
 
-		return super.acquireSessionData(&telemetryData, &positionsData)
+		return super.acquireSessionData(&telemetryData, &positionsData, finished)
 	}
 
-	acquirePositionsData(telemetryData) {
+	acquirePositionsData(telemetryData, finished := false) {
 		local positionsData, session
 		local lap, restart, fileName, tries
 		local driverID, driverForname, driverSurname, driverNickname, lapTime, driverCar, driverCarCandidate, carID, car
@@ -575,7 +575,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 			setMultiMapValue(positionsData, "Position Data", "Driver.Car", driverCar)
 
-			return this.correctPositionsData(positionsData)
+			return (finished ? positionsData : this.correctPositionsData(positionsData))
 		}
 		else {
 			this.shutdownUDPClient(true)

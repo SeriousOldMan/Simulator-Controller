@@ -1485,6 +1485,7 @@ class PracticeCenter extends ConfigurationItem {
 
 		this.iRunsListView := centerGui.Add("ListView", "x24 ys+33 w577 h175 H:Grow(0.5) Checked -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Driver", "Weather", "Compound", "Set", "Laps", "Initial Fuel", "Consumed Fuel", "Avg. Lap Time", "Accidents", "Potential", "Race Craft", "Speed", "Consistency", "Car Control"], translate))
 		this.iRunsListView.OnEvent("Click", chooseRun)
+		this.iRunsListView.OnEvent("DoubleClick", chooseRun)
 
 		centerGui.Add("Text", "x24 yp+180 w80 h23 Y:Move(0.5)", translate("Notes"))
 		centerGui.Add("Edit", "x104 yp w497 h90 Y:Move(0.5) H:Grow(0.5) vrunNotesEdit").OnEvent("Change", updateNotes)
@@ -1493,6 +1494,7 @@ class PracticeCenter extends ConfigurationItem {
 
 		this.iLapsListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 H:Grow Checked -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Stint", "Weather", "Grip", "Lap Time", "Sector Times", "Consumption", "Remaining", "Pressures", "Invalid", "Accident"], translate))
 		this.iLapsListView.OnEvent("Click", chooseLap)
+		this.iLapsListView.OnEvent("DoubleClick", chooseLap)
 
 		centerTab.UseTab(4)
 
@@ -6783,7 +6785,7 @@ class PracticeCenter extends ConfigurationItem {
 			local data := readMultiMap(fileName)
 
 			try {
-				if (this.HasData && !this.SessionExported && (this.SesssionMode != "Loaded"))
+				if (this.HasData && !this.SessionExported && (this.SessionMode != "Loaded"))
 					this.iSessionMode := "Finished"
 				else {
 					this.initializeSession(getMultiMapValue(data, "Session Data", "Session", "Practice"))

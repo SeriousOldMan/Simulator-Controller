@@ -2258,6 +2258,7 @@ class RaceCenter extends ConfigurationItem {
 
 		this.iPitstopsListView := centerGui.Add("ListView", "x270 ys+34 w331 h269 H:Grow(0.8) -Multi -LV0x10 AltSubmit Checked NoSort NoSortHdr", collect(["#", "Lap", "Driver", "Refuel", "Compound", "Set", "Pressures", "Repairs"], translate))
 		this.iPitstopsListView.OnEvent("Click", choosePitstop)
+		this.iPitstopsListView.OnEvent("DoubleClick", choosePitstop)
 
 		centerGui.Rules := ""
 

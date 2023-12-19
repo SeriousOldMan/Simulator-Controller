@@ -696,6 +696,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		super.__New(controller, name, configuration, register)
 
 		deleteFile(kTempDirectory . this.Plugin . " Session.state")
+		deleteFile(kTempDirectory - this.Plugin . ".state")
 
 		if !RaceAssistantPlugin.sTeamServer {
 			if isSet(kTeamServerPlugin) {
@@ -963,6 +964,12 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 													 , translate("Mode: ") . translate(this.TeamSessionActive ? "Team" : "Solo"))
 
 					if !this.RaceAssistantSpeaker {
+						information .= ("; " . translate("Silent: ") . translate("Yes"))
+
+						setMultiMapValue(configuration, this.Plugin, "Silent", true)
+					}
+
+					if this.RaceAssistantMuted {
 						information .= ("; " . translate("Muted: ") . translate("Yes"))
 
 						setMultiMapValue(configuration, this.Plugin, "Muted", true)
@@ -2351,7 +2358,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 							if RaceAssistantPlugin.Finish
 								finished := RaceAssistantPlugin.finished(data, RaceAssistantPlugin.Finish)
 							else if ((getMultiMapValue(data, "Session Data", "SessionFormat") != "Time")
-								  && (getMultiMapValue(data, "Session Data", "SessionLapsRemaining", 0) == 0))
+								  && (getMultiMapValue(data, "Session Data", "SessionLapsRemaining", 0) <= 0))
 								finished := true
 
 							if finished

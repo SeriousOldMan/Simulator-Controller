@@ -2242,6 +2242,7 @@ class SetupEditor extends ConfigurationItem {
 
 		this.iSettingsListView := editorGui.Add("ListView", "x16 ys+40 w344 h320 H:Grow W:Grow(0.5) -Multi -LV0x10 Checked AltSubmit NoSort NoSortHdr", collect(["Category", "Setting", "Value", "Unit"], translate))
 		this.iSettingsListView.OnEvent("Click", selectSetting)
+		this.iSettingsListView.OnEvent("DoubleClick", selectSetting)
 
 		editorGui.Add("Button", "x16 yp+324 w80 Disabled Y:Move vdecreaseSettingButton", translate("Decrease")).OnEvent("Click", decreaseSetting)
 		editorGui.Add("Button", "x280 yp w80 Y:Move X:Move(0.5) Disabled vincreaseSettingButton", translate("Increase")).OnEvent("Click", increaseSetting)

@@ -2171,53 +2171,75 @@ initializeSimulatorController() {
 
 	SetKeyDelay(10, 30)
 
-	settings := readMultiMap(kSimulatorSettingsFile)
-
-	if inList(A_Args, "-NoStartup")
-		disableTrayMessages()
-	else
-		updateTrayMessageState(settings)
-
-	argIndex := inList(A_Args, "-Voice")
-
-	voice := (argIndex ? A_Args[argIndex + 1] : ProcessExist("Voice Server.exe"))
-
-	argIndex := inList(A_Args, "-Configuration")
-
-	configuration := (argIndex ? readMultiMap(A_Args[argIndex + 1]) : kSimulatorConfiguration)
-
-	protectionOn()
-
 	try {
-		SimulatorController(configuration, settings, voice)
-	}
-	finally {
-		protectionOff()
-	}
+		settings := readMultiMap(kSimulatorSettingsFile)
 
-	registerMessageHandler("Controller", functionMessageHandler)
-	registerMessageHandler("Voice", methodMessageHandler, SimulatorController.Instance)
+		if inList(A_Args, "-NoStartup")
+			disableTrayMessages()
+		else
+			updateTrayMessageState(settings)
+
+		argIndex := inList(A_Args, "-Voice")
+
+		voice := (argIndex ? A_Args[argIndex + 1] : ProcessExist("Voice Server.exe"))
+
+		argIndex := inList(A_Args, "-Configuration")
+
+		configuration := (argIndex ? readMultiMap(A_Args[argIndex + 1]) : kSimulatorConfiguration)
+
+		protectionOn()
+
+		try {
+			SimulatorController(configuration, settings, voice)
+		}
+		finally {
+			protectionOff()
+		}
+
+		registerMessageHandler("Controller", functionMessageHandler)
+		registerMessageHandler("Voice", methodMessageHandler, SimulatorController.Instance)
+	}
+	catch Any as exception {
+		logError(exception, true)
+
+		OnMessage(0x44, translateOkButton)
+		MsgBox(substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Simulator Controller"}), translate("Error"), 262160)
+		OnMessage(0x44, translateOkButton, 0)
+
+		ExitApp(1)
+	}
 }
 
 startupSimulatorController() {
 	local controller := SimulatorController.Instance
 	local noStartup := ((A_Args.Length > 0) && (A_Args[1] = "-NoStartup"))
 
-	if noStartup
-		controller.writeControllerState()
-	else
-		PeriodicTask(ObjBindMethod(controller, "writeControllerState", true), 0, kLowPriority).start()
+	try {
+		if noStartup
+			controller.writeControllerState()
+		else
+			PeriodicTask(ObjBindMethod(controller, "writeControllerState", true), 0, kLowPriority).start()
 
-	controller.computeControllerModes()
+		controller.computeControllerModes()
 
-	controller.updateLastEvent()
+		controller.updateLastEvent()
 
-	if noStartup
-		ExitApp(0)
+		if noStartup
+			ExitApp(0)
 
-	controller.startup()
+		controller.startup()
 
-	startupApplication()
+		startupApplication()
+	}
+	catch Any as exception {
+		logError(exception, true)
+
+		OnMessage(0x44, translateOkButton)
+		MsgBox(substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Simulator Controller"}), translate("Error"), 262160)
+		OnMessage(0x44, translateOkButton, 0)
+
+		ExitApp(1)
+	}
 }
 
 
@@ -2325,18 +2347,7 @@ writeControllerState() {
 ;;;                       Initialization Section Part 1                     ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-try {
-	initializeSimulatorController()
-}
-catch Any as e {
-	logError(e, true)
-
-	OnMessage(0x44, translateOkButton)
-	MsgBox(substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Simulator Controller"}), translate("Error"), 262160)
-	OnMessage(0x44, translateOkButton, 0)
-
-	ExitApp(1)
-}
+initializeSimulatorController()
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -2351,15 +2362,4 @@ catch Any as e {
 ;;;                       Initialization Section Part 2                     ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-try {
-	startupSimulatorController()
-}
-catch Any as e {
-	logError(e, true)
-
-	OnMessage(0x44, translateOkButton)
-	MsgBox(substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Simulator Controller"}), translate("Error"), 262160)
-	OnMessage(0x44, translateOkButton, 0)
-
-	ExitApp(1)
-}
+startupSimulatorController()

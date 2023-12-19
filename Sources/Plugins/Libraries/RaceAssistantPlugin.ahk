@@ -1071,7 +1071,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 				if RaceAssistantPlugin.sStartupSettings {
 					serverURL := getMultiMapValue(RaceAssistantPlugin.sStartupSettings, "Team Session", "Server.URL", serverURL)
-					accessToken := getMultiMapValue(RaceAssistantPlugin.sStartupSettings, "Team Session", "Server.Token", serverToken)
+					accessToken := getMultiMapValue(RaceAssistantPlugin.sStartupSettings, "Team Session", "Server.Token", accessToken)
 					teamIdentifier := getMultiMapValue(RaceAssistantPlugin.sStartupSettings, "Team Session", "Team.Identifier", teamIdentifier)
 					driverIdentifier := getMultiMapValue(RaceAssistantPlugin.sStartupSettings, "Team Session", "Driver.Identifier", driverIdentifier)
 					sessionIdentifier := getMultiMapValue(RaceAssistantPlugin.sStartupSettings, "Team Session", "Session.Identifier", sessionIdentifier)

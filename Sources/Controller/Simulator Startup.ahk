@@ -260,7 +260,7 @@ class SimulatorStartup extends ConfigurationItem {
 			if this.Canceled
 				break
 
-			startSimulator := (startSimulator || (GetKeyState("Ctrl") || GetKeyState("MButton")))
+			startSimulator := (startSimulator || GetKeyState("MButton")))
 
 			if getMultiMapValue(this.Settings, section, component, false) {
 				if !kSilentMode
@@ -300,7 +300,7 @@ class SimulatorStartup extends ConfigurationItem {
 		}
 
 		if this.prepareConfiguration() {
-			startSimulator := ((this.iStartupOption != false) || GetKeyState("Ctrl") || GetKeyState("MButton"))
+			startSimulator := ((this.iStartupOption != false) || GetKeyState("MButton"))
 
 			this.iControllerPID := this.startSimulatorController()
 
@@ -338,7 +338,7 @@ class SimulatorStartup extends ConfigurationItem {
 			hidden := false
 			hasSplashScreen := this.iSplashScreen
 
-			if (startSimulator || (GetKeyState("Ctrl") || GetKeyState("MButton"))) {
+			if (startSimulator || GetKeyState("MButton"))) {
 				if (!kSilentMode && hasSplashScreen) {
 					this.hideSplashScreen()
 

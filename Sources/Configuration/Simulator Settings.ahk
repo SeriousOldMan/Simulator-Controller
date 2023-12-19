@@ -46,12 +46,23 @@ startupSimulatorSettings() {
 	TraySetIcon(icon, "1")
 	A_IconTip := "Simulator Settings"
 
-	settings := readMultiMap(kSimulatorSettingsFile)
+	try {
+		settings := readMultiMap(kSimulatorSettingsFile)
 
-	startupApplication()
+		startupApplication()
 
-	if (editSettings(&settings) == kSave)
-		writeMultiMap(kSimulatorSettingsFile, settings)
+		if (editSettings(&settings) == kSave)
+			writeMultiMap(kSimulatorSettingsFile, settings)
+	}
+	catch Any as exception {
+		logError(exception, true)
+
+		OnMessage(0x44, translateOkButton)
+		MsgBox(substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Simulator Settings"}), translate("Error"), 262160)
+		OnMessage(0x44, translateOkButton, 0)
+
+		ExitApp(1)
+	}
 
 	ExitApp(0)
 }

@@ -1278,47 +1278,58 @@ startupVoiceServer() {
 	TraySetIcon(icon, "1")
 	A_IconTip := "Voice Server"
 
-	debug := false
+	try {
+		debug := false
 
-	index := 1
+		index := 1
 
-	while (index < A_Args.Length) {
-		switch A_Args[index], false {
-			case "-Debug":
-				debug := (((A_Args[index + 1] = kTrue) || (A_Args[index + 1] = true)) ? true : false)
-				index += 2
-			default:
-				index += 1
+		while (index < A_Args.Length) {
+			switch A_Args[index], false {
+				case "-Debug":
+					debug := (((A_Args[index + 1] = kTrue) || (A_Args[index + 1] = true)) ? true : false)
+					index += 2
+				default:
+					index += 1
+			}
 		}
+
+		if debug {
+			setDebug(true)
+
+			setLogLevel(kLogDebug)
+		}
+
+		server := VoiceServer(kSimulatorConfiguration)
+
+		SupportMenu.Insert("1&")
+
+		label := translate("Debug Recognitions")
+
+		SupportMenu.Insert("1&", label, ObjBindMethod(server, "toggleDebug", kDebugRecognitions))
+
+		if server.Debug[kDebugRecognitions]
+			SupportMenu.Check(label)
+
+		label := translate("Debug Grammars")
+
+		SupportMenu.Insert("1&", label, ObjBindMethod(server, "toggleDebug", kDebugGrammars))
+
+		if server.Debug[kDebugGrammars]
+			SupportMenu.Check(label)
+
+		registerMessageHandler("Voice", handleVoiceMessage)
+
+		startupProcess()
 	}
+	catch Any as exception {
+		logError(exception, true)
 
-	if debug {
-		setDebug(true)
+		OnMessage(0x44, translateOkButton)
+		MsgBox(substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Voice Server"}), translate("Error"), 262160)
+		OnMessage(0x44, translateOkButton, 0)
 
-		setLogLevel(kLogDebug)
+		ExitApp(1)
 	}
-
-	server := VoiceServer(kSimulatorConfiguration)
-
-	SupportMenu.Insert("1&")
-
-	label := translate("Debug Recognitions")
-
-	SupportMenu.Insert("1&", label, ObjBindMethod(server, "toggleDebug", kDebugRecognitions))
-
-	if server.Debug[kDebugRecognitions]
-		SupportMenu.Check(label)
-
-	label := translate("Debug Grammars")
-
-	SupportMenu.Insert("1&", label, ObjBindMethod(server, "toggleDebug", kDebugGrammars))
-
-	if server.Debug[kDebugGrammars]
-		SupportMenu.Check(label)
-
-	registerMessageHandler("Voice", handleVoiceMessage)
-
-	startupProcess()
 }
 
 

@@ -606,7 +606,18 @@ startupSimulatorConfiguration() {
 ;;;                       Initialization Section Part 1                     ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-initializeSimulatorConfiguration()
+try {
+	initializeSimulatorConfiguration()
+}
+catch Any as e {
+	logError(e, true)
+
+	OnMessage(0x44, translateOkButton)
+	MsgBox(substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Simulator Configuration"}), translate("Error"), 262160)
+	OnMessage(0x44, translateOkButton, 0)
+
+	ExitApp(1)
+}
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -621,4 +632,15 @@ initializeSimulatorConfiguration()
 ;;;                       Initialization Section Part 2                     ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-startupSimulatorConfiguration()
+try {
+	startupSimulatorConfiguration()
+}
+catch Any as e {
+	logError(e, true)
+
+	OnMessage(0x44, translateOkButton)
+	MsgBox(substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Simulator Configuration"}), translate("Error"), 262160)
+	OnMessage(0x44, translateOkButton, 0)
+
+	ExitApp(1)
+}

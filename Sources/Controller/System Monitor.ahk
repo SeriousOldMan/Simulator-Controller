@@ -1897,20 +1897,31 @@ startupSystemMonitor() {
 	TraySetIcon(icon, "1")
 	A_IconTip := "System Monitor"
 
-	registerMessageHandler("Monitoring", monitoringMessageHandler)
+	try {
+		registerMessageHandler("Monitoring", monitoringMessageHandler)
 
-	deleteFile(kTempDirectory . "Simulator Controller.state")
-	deleteFile(kTempDirectory . "Database Synchronizer.state")
-	deleteFile(kTempDirectory . "Track Mapper.state")
+		deleteFile(kTempDirectory . "Simulator Controller.state")
+		deleteFile(kTempDirectory . "Database Synchronizer.state")
+		deleteFile(kTempDirectory . "Track Mapper.state")
 
-	for ignore, assistant in kRaceAssistants
-		deleteFile(kTempDirectory . assistant . " Session.state")
+		for ignore, assistant in kRaceAssistants
+			deleteFile(kTempDirectory . assistant . " Session.state")
 
-	PeriodicTask(clearOrphaneStateFiles, 60000, kLowPriority).start()
+		PeriodicTask(clearOrphaneStateFiles, 60000, kLowPriority).start()
 
-	startupApplication()
+		startupApplication()
 
-	systemMonitor()
+		systemMonitor()
+	}
+	catch Any as exception {
+		logError(exception, true)
+
+		OnMessage(0x44, translateOkButton)
+		MsgBox(substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "System Monitor"}), translate("Error"), 262160)
+		OnMessage(0x44, translateOkButton, 0)
+
+		ExitApp(1)
+	}
 }
 
 ;;;-------------------------------------------------------------------------;;;

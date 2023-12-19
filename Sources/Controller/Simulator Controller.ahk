@@ -2325,7 +2325,18 @@ writeControllerState() {
 ;;;                       Initialization Section Part 1                     ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-initializeSimulatorController()
+try {
+	initializeSimulatorController()
+}
+catch Any as e {
+	logError(e, true)
+
+	OnMessage(0x44, translateOkButton)
+	MsgBox(substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Simulator Controller"}), translate("Error"), 262160)
+	OnMessage(0x44, translateOkButton, 0)
+
+	ExitApp(1)
+}
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -2340,4 +2351,15 @@ initializeSimulatorController()
 ;;;                       Initialization Section Part 2                     ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-startupSimulatorController()
+try {
+	startupSimulatorController()
+}
+catch Any as e {
+	logError(e, true)
+
+	OnMessage(0x44, translateOkButton)
+	MsgBox(substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Simulator Controller"}), translate("Error"), 262160)
+	OnMessage(0x44, translateOkButton, 0)
+
+	ExitApp(1)
+}

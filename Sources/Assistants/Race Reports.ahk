@@ -918,68 +918,79 @@ startupRaceReports() {
 	TraySetIcon(icon, "1")
 	A_IconTip := "Race Reports"
 
-	while (index < A_Args.Length) {
-		switch A_Args[index], false {
-			case "-Simulator":
-				simulator := A_Args[index + 1]
-				index += 2
-			case "-Car":
-				car := A_Args[index + 1]
-				index += 2
-			case "-Track":
-				track := A_Args[index + 1]
-				index += 2
-			default:
-				index += 1
-		}
-	}
-
-	if !reportsDirectory {
-		OnMessage(0x44, translateYesNoButtons)
-		msgResult := MsgBox(translate("The Reports folder has not been configured yet. Do you want to start the Configuration tool now?"), translate("Configuration"), 262436)
-		OnMessage(0x44, translateYesNoButtons, 0)
-
-		if (msgResult = "Yes")
-			Run(kBinariesDirectory . "Simulator Configuration.exe")
-
-		ExitApp(0)
-	}
-
-	reports := RaceReports(reportsDirectory, kSimulatorConfiguration)
-
-	reports.show()
-
-	simulators := reports.getSimulators()
-
-	if (simulators.Length > 0) {
-		simulator := (inList(simulators, simulator) ? simulator : simulators[1])
-
-		reports.loadSimulator(simulator)
-
-		cars := reports.getCars(simulator)
-
-		if (cars.Length > 0) {
-			if car
-				car := SessionDatabase.getCarCode(simulator, car)
-
-			car := (inList(cars, car) ? car : cars[1])
-
-			reports.loadCar(car)
-
-			tracks := reports.getTracks(simulator, car)
-
-			if (tracks.Length > 0) {
-				if track
-					track := SessionDatabase.getTrackCode(simulator, track)
-
-				track := (inList(tracks, track) ? track : tracks[1])
-
-				reports.loadTrack(track)
+	try {
+		while (index < A_Args.Length) {
+			switch A_Args[index], false {
+				case "-Simulator":
+					simulator := A_Args[index + 1]
+					index += 2
+				case "-Car":
+					car := A_Args[index + 1]
+					index += 2
+				case "-Track":
+					track := A_Args[index + 1]
+					index += 2
+				default:
+					index += 1
 			}
 		}
-	}
 
-	startupApplication()
+		if !reportsDirectory {
+			OnMessage(0x44, translateYesNoButtons)
+			msgResult := MsgBox(translate("The Reports folder has not been configured yet. Do you want to start the Configuration tool now?"), translate("Configuration"), 262436)
+			OnMessage(0x44, translateYesNoButtons, 0)
+
+			if (msgResult = "Yes")
+				Run(kBinariesDirectory . "Simulator Configuration.exe")
+
+			ExitApp(0)
+		}
+
+		reports := RaceReports(reportsDirectory, kSimulatorConfiguration)
+
+		reports.show()
+
+		simulators := reports.getSimulators()
+
+		if (simulators.Length > 0) {
+			simulator := (inList(simulators, simulator) ? simulator : simulators[1])
+
+			reports.loadSimulator(simulator)
+
+			cars := reports.getCars(simulator)
+
+			if (cars.Length > 0) {
+				if car
+					car := SessionDatabase.getCarCode(simulator, car)
+
+				car := (inList(cars, car) ? car : cars[1])
+
+				reports.loadCar(car)
+
+				tracks := reports.getTracks(simulator, car)
+
+				if (tracks.Length > 0) {
+					if track
+						track := SessionDatabase.getTrackCode(simulator, track)
+
+					track := (inList(tracks, track) ? track : tracks[1])
+
+					reports.loadTrack(track)
+				}
+			}
+		}
+
+		startupApplication()
+	}
+	catch Any as exception {
+		logError(exception, true)
+
+		OnMessage(0x44, translateOkButton)
+		MsgBox(substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Race Reports"}), translate("Error"), 262160)
+		OnMessage(0x44, translateOkButton, 0)
+
+		ExitApp(1)
+	}
 }
 
 

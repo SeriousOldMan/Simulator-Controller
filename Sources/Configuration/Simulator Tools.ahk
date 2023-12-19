@@ -3020,27 +3020,38 @@ startupSimulatorTools() {
 
 	checkInstallation()
 
-	readToolsConfiguration(&gUpdateSettings, &gCleanupSettings, &gCopySettings, &gBuildSettings, &gSplashScreen, &gTargetConfiguration)
+	try {
+		readToolsConfiguration(&gUpdateSettings, &gCleanupSettings, &gCopySettings, &gBuildSettings, &gSplashScreen, &gTargetConfiguration)
 
-	if (A_Args.Length > 0)
-		if (A_Args[1] = "-Update")
-			updateOnly := true
+		if (A_Args.Length > 0)
+			if (A_Args[1] = "-Update")
+				updateOnly := true
 
-	if updateOnly {
-		gCleanupSettings := CaseInsenseMap()
-		gCopySettings := CaseInsenseMap()
-		gBuildSettings := CaseInsenseMap()
-	}
-	else {
-		if !FileExist(kAHKDirectory)
+		if updateOnly {
+			gCleanupSettings := CaseInsenseMap()
+			gCopySettings := CaseInsenseMap()
 			gBuildSettings := CaseInsenseMap()
+		}
+		else {
+			if !FileExist(kAHKDirectory)
+				gBuildSettings := CaseInsenseMap()
 
-		if (!FileExist(getFileName(kToolsConfigurationFile, kUserConfigDirectory, kConfigDirectory)) || GetKeyState("Ctrl"))
-			if !editTargets()
-				ExitApp(0)
+			if (!FileExist(getFileName(kToolsConfigurationFile, kUserConfigDirectory, kConfigDirectory)) || GetKeyState("Ctrl"))
+				if !editTargets()
+					ExitApp(0)
+		}
+
+		startupApplication()
 	}
+	catch Any as exception {
+		logError(exception, true)
 
-	startupApplication()
+		OnMessage(0x44, translateOkButton)
+		MsgBox(substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Simulator Tools"}), translate("Error"), 262160)
+		OnMessage(0x44, translateOkButton, 0)
+
+		ExitApp(1)
+	}
 
 	if (!kSilentMode && gSplashScreen)
 		showSplashScreen(gSplashScreen, false, false)

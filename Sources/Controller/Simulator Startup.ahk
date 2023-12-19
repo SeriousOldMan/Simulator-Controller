@@ -1895,17 +1895,28 @@ startSimulator() {
 	if (inList(A_Args, "-Unblock") || (GetKeyState("Ctrl", "P") && GetKeyState("Shift", "P")))
 		unblockExecutables()
 
-	startupApplication()
+	try {
+		startupApplication()
 
-	noLaunch := inList(A_Args, "-NoLaunchPad")
+		noLaunch := inList(A_Args, "-NoLaunchPad")
 
-	startupApplication()
+		startupApplication()
 
-	if ((noLaunch && !GetKeyState("Shift")) || (!noLaunch && GetKeyState("Shift")))
-		startupSimulator()
-	else
-		while launchPad()
-			ignore := 1
+		if ((noLaunch && !GetKeyState("Shift")) || (!noLaunch && GetKeyState("Shift")))
+			startupSimulator()
+		else
+			while launchPad()
+				ignore := 1
+	}
+	catch Any as exception {
+		logError(exception, true)
+
+		OnMessage(0x44, translateOkButton)
+		MsgBox(substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Simulator Startup"}), translate("Error"), 262160)
+		OnMessage(0x44, translateOkButton, 0)
+
+		ExitApp(1)
+	}
 
 	if (!SimulatorStartup.Instance || SimulatorStartup.Instance.Finished)
 		ExitApp(0)

@@ -7215,31 +7215,42 @@ startupPracticeCenter() {
 	TraySetIcon(icon, "1")
 	A_IconTip := "Practice Center"
 
-	while (index < A_Args.Length) {
-		switch A_Args[index], false {
-			case "-Simulator":
-				simulator := A_Args[index + 1]
-				index += 2
-			case "-Car":
-				car := A_Args[index + 1]
-				index += 2
-			case "-Track":
-				track := A_Args[index + 1]
-				index += 2
-			default:
-				index += 1
+	try {
+		while (index < A_Args.Length) {
+			switch A_Args[index], false {
+				case "-Simulator":
+					simulator := A_Args[index + 1]
+					index += 2
+				case "-Car":
+					car := A_Args[index + 1]
+					index += 2
+				case "-Track":
+					track := A_Args[index + 1]
+					index += 2
+				default:
+					index += 1
+			}
 		}
+
+		pCenter := PracticeCenter(kSimulatorConfiguration, readMultiMap(kUserConfigDirectory . "Race.settings"), simulator, car, track)
+
+		pCenter.createGui(pCenter.Configuration)
+
+		pCenter.show()
+
+		registerMessageHandler("Practice", methodMessageHandler, pCenter)
+
+		startupApplication()
 	}
+	catch Any as exception {
+		logError(exception, true)
 
-	pCenter := PracticeCenter(kSimulatorConfiguration, readMultiMap(kUserConfigDirectory . "Race.settings"), simulator, car, track)
+		OnMessage(0x44, translateOkButton)
+		MsgBox(substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Practice Center"}), translate("Error"), 262160)
+		OnMessage(0x44, translateOkButton, 0)
 
-	pCenter.createGui(pCenter.Configuration)
-
-	pCenter.show()
-
-	registerMessageHandler("Practice", methodMessageHandler, pCenter)
-
-	startupApplication()
+		ExitApp(1)
+	}
 }
 
 

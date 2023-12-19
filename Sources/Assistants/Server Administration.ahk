@@ -858,7 +858,18 @@ startupServerAdministration() {
 
 	startupApplication()
 
-	administrationEditor(kSimulatorConfiguration)
+	try {
+		administrationEditor(kSimulatorConfiguration)
+	}
+	catch Any as exception {
+		logError(exception, true)
+
+		OnMessage(0x44, translateOkButton)
+		MsgBox(substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Server Administration"}), translate("Error"), 262160)
+		OnMessage(0x44, translateOkButton, 0)
+
+		ExitApp(1)
+	}
 
 	ExitApp(0)
 }

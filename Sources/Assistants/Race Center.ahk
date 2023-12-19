@@ -12586,35 +12586,46 @@ startupRaceCenter() {
 	TraySetIcon(icon, "1")
 	A_IconTip := "Race Center"
 
-	if index {
-		startupSettings := readMultiMap(A_Args[index + 1])
+	try {
+		if index {
+			startupSettings := readMultiMap(A_Args[index + 1])
 
-		for ignore, property in ["Server.URL", "Team.Name", "Team.Identifier"
-							   , "Driver.Name", "Driver.Identifier", "Session.Name", "Session.Identifier"]
-			setMultiMapValue(raceSettings, "Team Settings", property
-										 , getMultiMapValue(startupSettings, "Team Session", property
-																		   , getMultiMapValue(raceSettings, "Team Settings", property, "")))
+			for ignore, property in ["Server.URL", "Team.Name", "Team.Identifier"
+								   , "Driver.Name", "Driver.Identifier", "Session.Name", "Session.Identifier"]
+				setMultiMapValue(raceSettings, "Team Settings", property
+											 , getMultiMapValue(startupSettings, "Team Session", property
+																			   , getMultiMapValue(raceSettings, "Team Settings", property, "")))
 
-		setMultiMapValue(raceSettings, "Team Settings", "Server.Token"
-									 , getMultiMapValue(startupSettings, "Team Session", "Server.Token"
-																	   , getMultiMapValue(raceSettings, "Team Settings", "Server.Token"
-																									  , RaceCenter.kInvalidToken)))
+			setMultiMapValue(raceSettings, "Team Settings", "Server.Token"
+										 , getMultiMapValue(startupSettings, "Team Session", "Server.Token"
+																		   , getMultiMapValue(raceSettings, "Team Settings", "Server.Token"
+																										  , RaceCenter.kInvalidToken)))
+		}
+
+		rCenter := RaceCenter(kSimulatorConfiguration, readMultiMap(kUserConfigDirectory . "Race.settings"))
+
+		if GetKeyState("Ctrl", "P")
+			rCenter.iSynchronize := "Off"
+
+		rCenter.createGui(rCenter.Configuration)
+
+		rCenter.show()
+
+		rCenter.connect(true)
+
+		registerMessageHandler("Setup", functionMessageHandler)
+
+		startupApplication()
 	}
+	catch Any as exception {
+		logError(exception, true)
 
-	rCenter := RaceCenter(kSimulatorConfiguration, raceSettings)
+		OnMessage(0x44, translateOkButton)
+		MsgBox(substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Race Center"}), translate("Error"), 262160)
+		OnMessage(0x44, translateOkButton, 0)
 
-	if GetKeyState("Ctrl", "P")
-		rCenter.iSynchronize := "Off"
-
-	rCenter.createGui(rCenter.Configuration)
-
-	rCenter.show()
-
-	rCenter.connect(true)
-
-	registerMessageHandler("Setup", functionMessageHandler)
-
-	startupApplication()
+		ExitApp(1)
+	}
 }
 
 

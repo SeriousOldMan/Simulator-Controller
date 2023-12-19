@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - AI Race Assistant               ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2023) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2024) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -469,12 +469,6 @@ class RaceAssistant extends ConfigurationItem {
 
 		local userName := SessionDatabase.getUserName()
 		local options, forName, ignore
-		
-		deleteState(*) {
-			deleteFile(kTempDirectory . assistantType . ".state")
-			
-			return false
-		}
 
 		if !kUnknown
 			kUnknown := translate("Unknown")
@@ -524,8 +518,6 @@ class RaceAssistant extends ConfigurationItem {
 
 		if muted
 			this.Muted := true
-			
-		OnExit(deleteState)
 	}
 
 	loadFromConfiguration(configuration) {
@@ -1154,10 +1146,14 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	readSettings(simulator, car, track, &settings) {
+		local autonomy
+
 		if !isObject(settings)
 			settings := readMultiMap(settings)
 
-		this.updateSessionValues({Autonomy: getMultiMapValue(settings, "Assistant", "Assistant.Autonomy", "Custom")})
+		autonomy := getMultiMapValue(settings, "Assistant", "Assistant.Autonomy", "Custom")
+
+		this.updateSessionValues({Autonomy: autonomy})
 
 		return CaseInsenseMap("Session.Simulator", simulator
 							, "Session.Car", car

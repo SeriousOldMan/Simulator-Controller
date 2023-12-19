@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Build & Maintenance Tool        ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2023) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2024) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -891,19 +891,17 @@ copyDirectory(source, destination, progressStep, &count) {
 	for ignore, fileName in files {
 		SplitPath(fileName, &file)
 
-		if (file != "desktop.ini") {
-			count += 1
+		count += 1
 
-			showProgress({progress: Round(gProgressCount + (count * progressStep)), message: translate("Copying ") . file . translate("...")})
+		showProgress({progress: Round(gProgressCount + (count * progressStep)), message: translate("Copying ") . file . translate("...")})
 
-			if InStr(FileExist(fileName), "D") {
-				SplitPath(fileName, &subDirectory)
+		if InStr(FileExist(fileName), "D") {
+			SplitPath(fileName, &subDirectory)
 
-				copyDirectory(fileName, destination . "\" . subDirectory, progressStep, &count)
-			}
-			else
-				FileCopy(fileName, destination, 1)
+			copyDirectory(fileName, destination . "\" . subDirectory, progressStep, &count)
 		}
+		else
+			FileCopy(fileName, destination, 1)
 	}
 }
 
@@ -3020,38 +3018,27 @@ startupSimulatorTools() {
 
 	checkInstallation()
 
-	try {
-		readToolsConfiguration(&gUpdateSettings, &gCleanupSettings, &gCopySettings, &gBuildSettings, &gSplashScreen, &gTargetConfiguration)
+	readToolsConfiguration(&gUpdateSettings, &gCleanupSettings, &gCopySettings, &gBuildSettings, &gSplashScreen, &gTargetConfiguration)
 
-		if (A_Args.Length > 0)
-			if (A_Args[1] = "-Update")
-				updateOnly := true
+	if (A_Args.Length > 0)
+		if (A_Args[1] = "-Update")
+			updateOnly := true
 
-		if updateOnly {
-			gCleanupSettings := CaseInsenseMap()
-			gCopySettings := CaseInsenseMap()
+	if updateOnly {
+		gCleanupSettings := CaseInsenseMap()
+		gCopySettings := CaseInsenseMap()
+		gBuildSettings := CaseInsenseMap()
+	}
+	else {
+		if !FileExist(kAHKDirectory)
 			gBuildSettings := CaseInsenseMap()
-		}
-		else {
-			if !FileExist(kAHKDirectory)
-				gBuildSettings := CaseInsenseMap()
 
-			if (!FileExist(getFileName(kToolsConfigurationFile, kUserConfigDirectory, kConfigDirectory)) || GetKeyState("Ctrl"))
-				if !editTargets()
-					ExitApp(0)
-		}
-
-		startupApplication()
+		if (!FileExist(getFileName(kToolsConfigurationFile, kUserConfigDirectory, kConfigDirectory)) || GetKeyState("Ctrl"))
+			if !editTargets()
+				ExitApp(0)
 	}
-	catch Any as exception {
-		logError(exception, true)
 
-		OnMessage(0x44, translateOkButton)
-		MsgBox(substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Simulator Tools"}), translate("Error"), 262160)
-		OnMessage(0x44, translateOkButton, 0)
-
-		ExitApp(1)
-	}
+	startupApplication()
 
 	if (!kSilentMode && gSplashScreen)
 		showSplashScreen(gSplashScreen, false, false)

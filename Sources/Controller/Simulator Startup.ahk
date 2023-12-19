@@ -674,6 +674,9 @@ launchPad(command := false, arguments*) {
 		widget.OnEvent("Click", launchStartup.Bind(true))
 		*/
 
+		/* Profiles
+		launchPadGui.Add("Picture", "xp+47 ys w60 h60 vRaceSettings", kIconsDirectory . "Race Settings.ico").OnEvent("Click", launchApplication.Bind("RaceSettings"))
+		*/
 		launchPadGui.Add("Picture", "xp+90 ys w60 h60 vRaceSettings", kIconsDirectory . "Race Settings.ico").OnEvent("Click", launchApplication.Bind("RaceSettings"))
 		launchPadGui.Add("Picture", "xp+74 yp w60 h60 vSessionDatabase", kIconsDirectory . "Session Database.ico").OnEvent("Click", launchApplication.Bind("SessionDatabase"))
 

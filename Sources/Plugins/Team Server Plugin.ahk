@@ -517,7 +517,7 @@ class TeamServerPlugin extends ControllerPlugin {
 						setMultiMapValue(configuration, this.Plugin, "Information"
 													  , values2String("; ", translate("Team: ") . this.Team[true]
 																		  , translate("Driver: ") . this.Driver[true] . (driverMismatch ? translate(" (No match)") : "")
-																		  , translate("Session: ") . ((this.Session[true] = "Qualification") ? "Qualifiying" : "Qualification")))
+																		  , translate("Session: ") . this.Session[true]))
 					}
 				}
 				else if this.Session {

@@ -690,18 +690,21 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	__New(controller, name, configuration := false, register := true) {
-		local teamServer, raceAssistantToggle, teamServerToggle, arguments, ignore, theAction
+		local teamServer, raceAssistantToggle, teamServerToggle, arguments, ignore, theAction, assistant
 		local openRaceSettings, openRaceReports, openSessionDatabase, openSetupWorkbench
 		local openPracticeCenter, openRaceCenter, openStrategyWorkbench, importSetup
 		local assistantSpeaker, assistantListener, first, index, startupSettings
 
 		super.__New(controller, name, configuration, register)
 
-		deleteFile(kTempDirectory . this.Plugin . " Session.state")
-
 		if (RaceAssistantPlugin.sStartupSettings = kUndefined) {
+			for ignore, assistant in kRaceAssistants {
+				deleteFile(kTempDirectory . assistant . ".state")
+				deleteFile(kTempDirectory . assistant . " Session.state")
+			}
+
 			index := inList(A_Args, "-Startup")
-	
+
 			if index
 				RaceAssistantPlugin.sStartupSettings := readMultiMap(A_Args[index + 1])
 			else
@@ -1001,6 +1004,12 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 													 , translate("Mode: ") . translate(this.TeamSessionActive ? "Team" : "Solo"))
 
 					if !this.RaceAssistantSpeaker {
+						information .= ("; " . translate("Silent: ") . translate("Yes"))
+
+						setMultiMapValue(configuration, this.Plugin, "Silent", true)
+					}
+
+					if this.RaceAssistantMuted {
 						information .= ("; " . translate("Muted: ") . translate("Yes"))
 
 						setMultiMapValue(configuration, this.Plugin, "Muted", true)
@@ -2402,7 +2411,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 							if RaceAssistantPlugin.Finish
 								finished := RaceAssistantPlugin.finished(data, RaceAssistantPlugin.Finish)
 							else if ((getMultiMapValue(data, "Session Data", "SessionFormat") != "Time")
-								  && (getMultiMapValue(data, "Session Data", "SessionLapsRemaining", 0) == 0))
+								  && (getMultiMapValue(data, "Session Data", "SessionLapsRemaining", 0) <= 0))
 								finished := true
 
 							if finished

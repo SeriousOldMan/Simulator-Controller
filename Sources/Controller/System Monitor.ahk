@@ -1112,15 +1112,18 @@ systemMonitor(command := false, arguments*) {
 
 					state := translate("Active")
 
-					if getMultiMapValue(controllerState, key, "Muted", false)
-						state .= translate(" (Muted)")
-					else {
-						configuration := readMultiMap(kTempDirectory . key . ".state")
+					configuration := readMultiMap(kTempDirectory . key . ".state")
 
-						if (getMultiMapValue(configuration, "Voice", "Muted", false)
-						 || !getMultiMapValue(configuration, "Voice", "Speaker", true))
+					if getMultiMapValue(controllerState, key, "Silent", false)
+						state .= translate(" (Silent)")
+					else if !getMultiMapValue(configuration, "Voice", "Speaker", true)
+						state .= translate(" (Silent)")
+					else if (getMultiMapValue(configuration, "Voice", "Muted", kUndefined) != kUndefined) {
+						if getMultiMapValue(configuration, "Voice", "Muted")
 							state .= translate(" (Muted)")
 					}
+					else if getMultiMapValue(controllerState, key, "Muted", false)
+						state .= translate(" (Muted)")
 				}
 				else if (state = "Waiting") {
 					if (overallState = "Disabled")
@@ -1861,24 +1864,30 @@ systemMonitor(command := false, arguments*) {
 }
 
 clearOrphaneStateFiles() {
-	local ignore, fileName, modTime
+	local ignore, assistant, fileName, modTime
 
 	static stateFiles := false
+	static excludedFiles := []
 
-	if !stateFiles
+	if !stateFiles {
 		stateFiles := CaseInsenseMap()
 
-	for ignore, fileName in getFileNames("*.state", kTempDirectory) {
-		if !stateFiles.Has(fileName)
-			stateFiles[fileName] := 0
-
-		modTime := FileGetTime(fileName, "M")
-
-		if (stateFiles[fileName] != modTime)
-			stateFiles[fileName] := modTime
-		else
-			deleteFile(fileName)
+		for ignore, assistant in kRaceAssistants
+			excludedFiles.Push(kTempDirectory . assistant . ".state")
 	}
+
+	for ignore, fileName in getFileNames("*.state", kTempDirectory)
+		if !inList(excludedFiles, fileName) {
+			if !stateFiles.Has(fileName)
+				stateFiles[fileName] := 0
+
+			modTime := FileGetTime(fileName, "M")
+
+			if (stateFiles[fileName] != modTime)
+				stateFiles[fileName] := modTime
+			else
+				deleteFile(fileName)
+		}
 }
 
 startupSystemMonitor() {

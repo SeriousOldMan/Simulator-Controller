@@ -469,6 +469,12 @@ class RaceAssistant extends ConfigurationItem {
 
 		local userName := SessionDatabase.getUserName()
 		local options, forName, ignore
+		
+		deleteState(*) {
+			deleteFile(kTempDirectory . assistantType . ".state")
+			
+			return false
+		}
 
 		if !kUnknown
 			kUnknown := translate("Unknown")
@@ -518,6 +524,8 @@ class RaceAssistant extends ConfigurationItem {
 
 		if muted
 			this.Muted := true
+			
+		OnExit(deleteState)
 	}
 
 	loadFromConfiguration(configuration) {
@@ -1146,14 +1154,10 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	readSettings(simulator, car, track, &settings) {
-		local autonomy
-
 		if !isObject(settings)
 			settings := readMultiMap(settings)
 
-		autonomy := getMultiMapValue(settings, "Assistant", "Assistant.Autonomy", "Custom")
-
-		this.updateSessionValues({Autonomy: autonomy})
+		this.updateSessionValues({Autonomy: getMultiMapValue(settings, "Assistant", "Assistant.Autonomy", "Custom")})
 
 		return CaseInsenseMap("Session.Simulator", simulator
 							, "Session.Car", car

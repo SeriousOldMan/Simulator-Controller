@@ -73,6 +73,9 @@ class DrivingCoachPlugin extends RaceAssistantPlugin  {
 
 				if (this.iServiceState = "Available") {
 					if !this.RaceAssistantSpeaker
+						information .= ("; " . translate("Silent: ") . translate("Yes"))
+						
+					if this.RaceAssistantMuted
 						information .= ("; " . translate("Muted: ") . translate("Yes"))
 				}
 				else if (InStr(this.iServiceState, "Error") = 1)

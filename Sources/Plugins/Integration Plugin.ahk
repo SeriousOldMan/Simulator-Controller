@@ -424,11 +424,15 @@ class IntegrationPlugin extends ControllerPlugin {
 				else
 					assistantsState[key]["State"] := "Disabled"
 
+				assistantsState[key]["Silent"] := (getMultiMapValue(controllerState, key, "Silent", false) ? kTrue : kFalse)
 				assistantsState[key]["Muted"] := (getMultiMapValue(controllerState, key, "Muted", false) ? kTrue : kFalse)
 
 				configuration := readMultiMap(kTempDirectory . key . ".state")
 
-				if (getMultiMapValue(configuration, "Voice", "Muted", false) || !getMultiMapValue(configuration, "Voice", "Speaker", true))
+				if !getMultiMapValue(configuration, "Voice", "Speaker", true)
+					assistantsState[key]["Silent"] := kTrue
+				
+				if getMultiMapValue(configuration, "Voice", "Muted", false)
 					assistantsState[key]["Muted"] := kTrue
 			}
 		}
@@ -436,9 +440,9 @@ class IntegrationPlugin extends ControllerPlugin {
 		if (assistantsState.Count == 0) {
 			assistantsState["Mode"] := kNull
 			assistantsState["Session"] := kNull
-			assistantsState["Race Engineer"] := Map("State", "Disabled", "Muted", kNull)
-			assistantsState["Race Strategist"] := Map("State", "Disabled", "Muted", kNull)
-			assistantsState["Race Spotter"] := Map("State", "Disabled", "Muted", kNull)
+			assistantsState["Race Engineer"] := Map("State", "Disabled", "Silent", kNull, "Muted", kNull)
+			assistantsState["Race Strategist"] := Map("State", "Disabled", "Silent", kNull, "Muted", kNull)
+			assistantsState["Race Spotter"] := Map("State", "Disabled", "Silent", kNull, "Muted", kNull)
 		}
 
 		sessionState["Assistants"] := assistantsState

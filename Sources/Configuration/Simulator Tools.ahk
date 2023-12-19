@@ -891,17 +891,19 @@ copyDirectory(source, destination, progressStep, &count) {
 	for ignore, fileName in files {
 		SplitPath(fileName, &file)
 
-		count += 1
+		if (file != "desktop.ini") {
+			count += 1
 
-		showProgress({progress: Round(gProgressCount + (count * progressStep)), message: translate("Copying ") . file . translate("...")})
+			showProgress({progress: Round(gProgressCount + (count * progressStep)), message: translate("Copying ") . file . translate("...")})
 
-		if InStr(FileExist(fileName), "D") {
-			SplitPath(fileName, &subDirectory)
+			if InStr(FileExist(fileName), "D") {
+				SplitPath(fileName, &subDirectory)
 
-			copyDirectory(fileName, destination . "\" . subDirectory, progressStep, &count)
+				copyDirectory(fileName, destination . "\" . subDirectory, progressStep, &count)
+			}
+			else
+				FileCopy(fileName, destination, 1)
 		}
-		else
-			FileCopy(fileName, destination, 1)
 	}
 }
 

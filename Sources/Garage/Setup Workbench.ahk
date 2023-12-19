@@ -322,7 +322,7 @@ class SetupWorkbench extends ConfigurationItem {
 
 	__New(simulator := false, car := false, track := false, weather := false) {
 		local found := false
-		local definition, ignore, rootDirectory
+		local definition, ignore, fileName
 
 		if simulator {
 			this.iSelectedSimulator := SessionDatabase.getSimulatorName(simulator)
@@ -333,12 +333,11 @@ class SetupWorkbench extends ConfigurationItem {
 
 		definition := readMultiMap(kResourcesDirectory . "Garage\Setup Workbench.ini")
 
-		for ignore, rootDirectory in [kTranslationsDirectory, kUserTranslationsDirectory]
-			if FileExist(rootDirectory . "Setup Workbench." . getLanguage()) {
-				found := true
+		for ignore, fileName in getFileNames("Setup Workbench." . getLanguage(), kTranslationsDirectory, kUserTranslationsDirectory) {
+			found := true
 
-				addMultiMapValues(definition, readMultiMap(rootDirectory . "Setup Workbench." . getLanguage()))
-			}
+			addMultiMapValues(definition, readMultiMap(fileName))
+		}
 
 		if !found
 			addMultiMapValues(definition, readMultiMap(kTranslationsDirectory . "Setup Workbench.en"))
@@ -394,7 +393,7 @@ class SetupWorkbench extends ConfigurationItem {
 			workbenchGui.Opt("+OwnDialogs")
 
 			OnMessage(0x44, translateLoadCancelButtons)
-			fileName := FileSelect(1, "", translate("Load Problems..."), "Problems (*.setup)")
+			fileName := FileSelect(1, "", translate("Load Issues..."), "Issues (*.setup)")
 			OnMessage(0x44, translateLoadCancelButtons, 0)
 
 			if (fileName != "")
@@ -407,7 +406,7 @@ class SetupWorkbench extends ConfigurationItem {
 			workbenchGui.Opt("+OwnDialogs")
 
 			OnMessage(0x44, translateSaveCancelButtons)
-			fileName := FileSelect("S17", "", translate("Save Problems..."), "Problems (*.setup)")
+			fileName := FileSelect("S17", "", translate("Save Issues..."), "Issues (*.setup)")
 			OnMessage(0x44, translateSaveCancelButtons, 0)
 
 			if (fileName != "") {
@@ -499,7 +498,9 @@ class SetupWorkbench extends ConfigurationItem {
 
 		this.iCharacteristicsArea := {X: 16, Y: 262, Width: 382, W: 482, Height: 439, H: 439}
 
-		workbenchGui.Add("Button", "x280 yp-32 w70 h23 vcharacteristicsButton", translate("Problem...")).OnEvent("Click", chooseCharacteristic)
+		workbenchGui.Add("Button", "x208 yp-32 w70 h23 vanalyzerButton Hidden", translate("Analyzer...")).OnEvent("Click", (*) => this.startTelemetryAnalyzer())
+
+		workbenchGui.Add("Button", "x280 yp w70 h23 vcharacteristicsButton", translate("Issue...")).OnEvent("Click", chooseCharacteristic)
 		button := workbenchGui.Add("Button", "x352 yp w23 h23")
 		button.OnEvent("Click", loadSetup)
 		setButtonIcon(button, kIconsDirectory . "Load.ico", 1, "L2 T2 R2 B2")
@@ -621,7 +622,7 @@ class SetupWorkbench extends ConfigurationItem {
 				if (characteristics.Length > 0) {
 					this.ProgressCount := 0
 
-					showProgress({color: "Green", width: 350, title: translate("Loading Problems"), message: translate("Preparing Characteristics...")})
+					showProgress({color: "Green", width: 350, title: translate("Loading Issues"), message: translate("Preparing Characteristics...")})
 
 					Sleep(200)
 
@@ -659,7 +660,7 @@ class SetupWorkbench extends ConfigurationItem {
 		local isChart, before, after, width, height, info, html, index, message, iWidth, iHeight, document
 
 		if !content
-			content := [translate("Please describe your car handling problems.")]
+			content := [translate("Please describe your car handling issues.")]
 
 		isChart := !isObject(content)
 
@@ -959,6 +960,11 @@ class SetupWorkbench extends ConfigurationItem {
 		else
 			this.Control["editSetupButton"].Enabled := false
 
+		if (!this.SimulatorDefinition || !getMultiMapValue(this.SimulatorDefinition, "Simulator", "Analyzer", false)
+									  || !inList(getKeys(getMultiMapValues(getControllerState(), "Simulators")), this.SelectedSimulator))
+			this.Control["analyzerButton"].Enabled := false
+		else
+			this.Control["analyzerButton"].Enabled := true
 	}
 
 	compileRules(fileName, &productions, &reductions) {
@@ -1180,7 +1186,7 @@ class SetupWorkbench extends ConfigurationItem {
 
 		this.ProgressCount := 0
 
-		showProgress({color: "Blue", width: 350, title: translate(phase1), message: translate("Clearing Problems...")})
+		showProgress({color: "Blue", width: 350, title: translate(phase1), message: translate("Clearing Issues...")})
 
 		this.resetWorkbench()
 		this.resetSimulator()
@@ -1628,17 +1634,17 @@ class SetupWorkbench extends ConfigurationItem {
 
 	updateRecommendations(draw := true, update := true) {
 		local knowledgeBase := this.KnowledgeBase
-		local noProblem, ignore, characteristic, widgets, value1, value2, settings
+		local noIssue, ignore, characteristic, widgets, value1, value2, settings
 		local setting, delta
 
 		this.Window.Block()
 
 		try {
-			noProblem := true
+			noIssue := true
 
 			if knowledgeBase {
 				for ignore, characteristic in this.SelectedCharacteristics {
-					noProblem := false
+					noIssue := false
 
 					widgets := this.SelectedCharacteristicsWidgets[characteristic]
 
@@ -1649,7 +1655,7 @@ class SetupWorkbench extends ConfigurationItem {
 					knowledgeBase.setFact(characteristic . ".Value", value2, true)
 				}
 
-				if !noProblem {
+				if !noIssue {
 					knowledgeBase.setFact("Calculate", true)
 
 					this.KnowledgeBase.produce()
@@ -1671,7 +1677,7 @@ class SetupWorkbench extends ConfigurationItem {
 					}
 				}
 
-				if noProblem
+				if noIssue
 					this.showSettingsChart(false)
 				else
 					this.showSettingsDeltas(settings)

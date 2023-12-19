@@ -120,7 +120,7 @@ Please, note that all of this also applies to all other Virtual Race Assistants,
   
   2. *rFactor 2*
   
-     You can find the plugin *rFactor2SharedMemoryMapPlugin64.dll* in *Utilities\Plugins* folder the Simulator Controller installation or you can load the [latest version](https://github.com/TheIronWolfModding/rF2SharedMemoryMapPlugin) from GitHub. Copy the DLL file to the *Bin64\Plugins* folder in the Steam installation directory of *rFactor 2*.
+     You can find the plugin *rFactor2SharedMemoryMapPlugin64.dll* in *Utilities\Plugins* folder the Simulator Controller installation or you can load the [latest version](https://github.com/TheIronWolfModding/rF2SharedMemoryMapPlugin) from GitHub. Copy the DLL file to the *Bin64\Plugins* folder in the Steam installation directory of *rFactor 2*. You will have to enable this plugin in the *rFactor 2* settings afterwards.
 
   3. *Automobilista 2* and *Project CARS 2*
   
@@ -357,7 +357,19 @@ The pitstop is handled by Jona in two phases. In the first phase, the planning p
 
 Good to know: If Jona has planned the pitstop based on a request from Cato, the Virtual Race Engineer, the lap in which you should come to the pit is already known. In this case, the preparation phase does not have to be triggered explicitly, since the preparation for the pitstop takes place automatically when you start the selected lap.
 
-A final warning: If you ever perform a pitstop, which has not been planned and prepared by Jona, Jona will be very confused, say the least. You can do this, but please double check the recommendations of Jona for each subsequent pitstop, especially the chosen tyre set, if you don't want to end up with worn out tyres for your last stint. Also be very careful, when using the "Pitstop" mode on your Button Box to change the pitstop settings. Jona will not know about your changes, and might overwrite them during the pitstop preparation. There is one notable exception, if Jona has planned and prepared a pitstop, but this pitstop has not been carried out yet, every change to the pitstop settings using the "Pitstop" mode will be recognized and taken into account by Jona. However, this only applies to *Assetto Corsa Competizione* and *rFactor 2*, since these simulations will give other applications access to the current pitstop settings.
+Some final notes: If you ever perform a pitstop, which has not been planned and prepared by Jona, Jona will be very confused, say the least. You can do this, but please double check the recommendations of Jona for each subsequent pitstop, especially the chosen tyre set, if you don't want to end up with worn out tyres for your last stint. Also be very careful, when using the "Pitstop" mode on your Button Box to change the pitstop settings. Jona will not know about your changes, and might overwrite them during the pitstop preparation. There is one notable exception, if Jona has planned and prepared a pitstop, but this pitstop has not been carried out yet, every change to the pitstop settings using the "Pitstop" mode will be recognized and taken into account by Jona. If you change pitstop settings using the pitstop menu in the simulation directly, it depends on the data integration support of the given simulator, whether this change is recognized by Jona or not. Please see the following table:
+
+| Simulator                  | Fuel | Tyre Compound | Tyre Set | Tyre Pressures | Repairs |
+| -------------------------- | ---- | ------------- | -------- | -------------- | ------- |
+| Assetto Corsa              | No   | No            | -        | No             | No      |
+| Assetto Corsa Competizione | Yes  | No            | Yes      | Yes            | No      |
+| Automobilista 2            | No   | No            | -        | No             | No      |
+| iRacing                    | Yes  | No            | -        | Yes            | No      |
+| Projects CARS 2            | No   | No            | -        | No             | No      |
+| RaceRoom Racing Experience | No   | No            | -        | No             | No      |
+| rFactor 2                  | Yes  | Yes           | -        | Yes            | Yes     |
+
+It is no problem to change the settings marked above with "No" in a case of urgency, but be aware that this might lead to wrong subsequent recommendations by Jona, since the knowledge is not in sync with the reality.
 
 #### *Assetto Corsa Competizione*
 

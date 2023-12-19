@@ -445,22 +445,26 @@ class IntegrationPlugin extends ControllerPlugin {
 
 		state := getMultiMapValue(controllerState, "Team Server", "State", "Disabled")
 
-		if ((state != "Unknown") && (state != "Disabled")) {
-			state := CaseInsenseMap()
+		try {
+			if ((state != "Unknown") && (state != "Disabled")) {
+				state := CaseInsenseMap()
 
-			for ignore, property in string2Values(";", getMultiMapValue(controllerState, "Team Server", "Properties")) {
-				property := StrSplit(property, ":", " `t", 2)
+				for ignore, property in string2Values(";", getMultiMapValue(controllerState, "Team Server", "Properties")) {
+					property := StrSplit(property, ":", " `t", 2)
 
-				state[property[1]] := property[2]
+					state[property[1]] := property[2]
+				}
+
+				teamServerState["Server"] := state["ServerURL"]
+				teamServerState["Token"] := state["SessionToken"]
+				teamServerState["Team"] := state["Team"]
+				teamServerState["Driver"] := state["Driver"]
+				teamServerState["Session"] := state["Session"]
 			}
-
-			teamServerState["Server"] := state["ServerURL"]
-			teamServerState["Token"] := state["SessionToken"]
-			teamServerState["Team"] := state["Team"]
-			teamServerState["Driver"] := state["Driver"]
-			teamServerState["Session"] := state["Session"]
+			else
+				throw "Unknown Team Server state..."
 		}
-		else {
+		catch Any as exception {
 			teamServerState["Server"] := kNull
 			teamServerState["Token"] := kNull
 			teamServerState["Team"] := kNull

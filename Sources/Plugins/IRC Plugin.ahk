@@ -48,8 +48,14 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 		super.__New(controller, name, simulator, configuration)
 
 		if (this.Active || (isDebug() && isDevelopment())) {
-			this.iPitstopFuelMFDHotkey := this.getArgumentValue("togglePitstopFuelMFD", false)
-			this.iPitstopTyreMFDHotkey := this.getArgumentValue("togglePitstopTyreMFD", false)
+			if !inList(A_Args, "-Replay") {
+				this.iPitstopFuelMFDHotkey := this.getArgumentValue("togglePitstopFuelMFD", false)
+				this.iPitstopTyreMFDHotkey := this.getArgumentValue("togglePitstopTyreMFD", false)
+			}
+			else {
+				this.iPitstopFuelMFDHotkey := "Off"
+				this.iPitstopTyreMFDHotkey := "Off"
+			}
 		}
 	}
 
@@ -70,7 +76,7 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 			}
 			catch Any as exception {
 				logError(exception, true)
-					
+
 				logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider ("), {simulator: this.Code, protocol: "SHM"})
 									   . exePath . translate(") - please rebuild the applications in the binaries folder (")
 									   . kBinariesDirectory . translate(")"))
@@ -122,6 +128,8 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 				return false
 			}
 		}
+		else
+			return true
 	}
 
 	closePitstopMFD() {
@@ -231,34 +239,30 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 	setPitstopRefuelAmount(pitstopNumber, liters) {
 		super.setPitstopRefuelAmount(pitstopNumber, liters)
 
-		this.openPitstopMFD("Fuel")
-
-		this.sendPitstopCommand("Pitstop", "Set", "Refuel", Round(liters))
+		if this.openPitstopMFD("Fuel")
+			this.sendPitstopCommand("Pitstop", "Set", "Refuel", Round(liters))
 	}
 
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
 		super.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
 
-		this.openPitstopMFD("Tyre")
-
-		this.sendPitstopCommand("Pitstop", "Set", "Tyre Change", compound ? "true" : "false")
+		if this.openPitstopMFD("Tyre")
+			this.sendPitstopCommand("Pitstop", "Set", "Tyre Change", compound ? "true" : "false")
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
 		super.setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR)
 
-		this.openPitstopMFD("Tyre")
-
-		this.sendPitstopCommand("Pitstop", "Set", "Tyre Pressure"
-							  , Round(pressureFL, 1), Round(pressureFR, 1), Round(pressureRL, 1), Round(pressureRR, 1))
+		if this.openPitstopMFD("Tyre")
+			this.sendPitstopCommand("Pitstop", "Set", "Tyre Pressure"
+								  , Round(pressureFL, 1), Round(pressureFR, 1), Round(pressureRL, 1), Round(pressureRR, 1))
 	}
 
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine := false) {
 		super.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine)
 
-		this.openPitstopMFD("Fuel")
-
-		this.sendPitstopCommand("Pitstop", "Set", "Repair", (repairBodywork || repairSuspension) ? "true" : "false")
+		if this.openPitstopMFD("Fuel")
+			this.sendPitstopCommand("Pitstop", "Set", "Repair", (repairBodywork || repairSuspension) ? "true" : "false")
 	}
 
 	updatePositionsData(data) {

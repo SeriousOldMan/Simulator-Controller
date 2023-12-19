@@ -54,10 +54,12 @@ class RaceAssistant extends ConfigurationItem {
 	iOptions := CaseInsenseMap()
 
 	iAssistantType := ""
-	iSettings := false
+	iSettings := newMultiMap()
 	iVoiceManager := false
 
 	iAnnouncements := CaseInsenseMap()
+
+	iAutonomy := "Custom"
 
 	iRemoteHandler := false
 
@@ -264,6 +266,12 @@ class RaceAssistant extends ConfigurationItem {
 	VoiceManager {
 		Get {
 			return this.iVoiceManager
+		}
+	}
+
+	Autonomy {
+		Get {
+			return this.iAutonomy
 		}
 	}
 
@@ -536,8 +544,12 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	updateConfigurationValues(values) {
-		if values.HasProp("Settings")
+		if values.HasProp("Settings") {
 			this.iSettings := values.Settings
+
+			if !this.Settings
+				this.iSettings := newMultiMap()
+		}
 
 		if values.HasProp("UseTalking")
 			this.VoiceManager.UseTalking := values.UseTalking
@@ -571,6 +583,9 @@ class RaceAssistant extends ConfigurationItem {
 		if values.HasProp("DriverFullName")
 			this.iDriverFullName := values.DriverFullName
 
+		if values.HasProp("Autonomy")
+			this.iAutonomy := values.Autonomy
+
 		if values.HasProp("Session") {
 			this.iSession := values.Session
 
@@ -583,7 +598,9 @@ class RaceAssistant extends ConfigurationItem {
 				this.iBaseLap := false
 				this.iInitialFuelAmount := 0
 
-				this.updateConfigurationValues({Settings: false})
+				this.iAutonomy := "Custom"
+
+				this.updateConfigurationValues({Settings: newMultiMap()})
 			}
 		}
 
@@ -1043,7 +1060,7 @@ class RaceAssistant extends ConfigurationItem {
 		if (data && !isObject(data))
 			data := readMultiMap(data)
 
-		if (settings && (formationLap || !this.Settings))
+		if (settings && (formationLap || !this.Settings || (this.Settings.Count = 0)))
 			this.updateConfigurationValues({Settings: settings})
 
 		settings := this.Settings
@@ -1129,8 +1146,14 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	readSettings(simulator, car, track, &settings) {
+		local autonomy
+
 		if !isObject(settings)
 			settings := readMultiMap(settings)
+
+		autonomy := getMultiMapValue(settings, "Assistant", "Assistant.Autonomy", "Custom")
+
+		this.updateSessionValues({Autonomy: autonomy})
 
 		return CaseInsenseMap("Session.Simulator", simulator
 							, "Session.Car", car
@@ -1151,6 +1174,17 @@ class RaceAssistant extends ConfigurationItem {
 			for key, value in this.readSettings(knowledgeBase.getValue("Session.Simulator"), knowledgeBase.getValue("Session.Car")
 											  , knowledgeBase.getValue("Session.Track"), &settings)
 				knowledgeBase.setFact(key, value)
+	}
+
+	confirmAction(action) {
+		switch this.Autonomy, false {
+			case "Yes", true:
+				return false
+			case "No", false:
+				return true
+			default:
+				throw "Unhandled autonomy mode detected in RaceAssistant.confirmAction..."
+		}
 	}
 
 	createFacts(settings, data) {
@@ -1232,6 +1266,9 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	loadSessionSettings(settings) {
+		if !settings
+			settings := newMultiMap()
+
 		this.updateSettings(settings)
 
 		this.updateConfigurationValues({Settings: settings})

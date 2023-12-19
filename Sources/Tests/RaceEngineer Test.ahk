@@ -1041,12 +1041,15 @@ if !GetKeyState("Ctrl") {
 }
 else {
 	raceNr := (GetKeyState("Alt") ? 18 : ((GetKeyState("Shift") ? 2 : 1)))
+
 	engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Engineer.settings")
 							   , TestPitStopHandler(), "Jona", "EN", true, true, true, true)
 
 	engineer.VoiceManager.setDebug(kDebugGrammars, false)
 
 	if (raceNr == 1) {
+		engineer.setDebug(kDebugKnowledgeBase, true)
+
 		loop {
 			data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
 

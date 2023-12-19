@@ -779,7 +779,7 @@ class SimulatorController extends ConfigurationItem {
 
 			for ignore, thePlugin in this.Plugins
 				if this.isActive(thePlugin) {
-					simulator := thePlugin.runningSimulator()
+					simulator := thePlugin.runningSimulator(true)
 
 					if isDebug() {
 						label := thePlugin.Plugin
@@ -900,7 +900,7 @@ class SimulatorController extends ConfigurationItem {
 		static registeredCommands := false
 
 		command := StrReplace(command, ";", ",")
-		
+
 		if !registeredCommands
 			registeredCommands := CaseInsenseMap()
 
@@ -1708,7 +1708,7 @@ class ControllerPlugin extends Plugin {
 			controller.disconnectAction(this, theAction.Function, theAction)
 	}
 
-	runningSimulator() {
+	runningSimulator(active := false) {
 		return false
 	}
 

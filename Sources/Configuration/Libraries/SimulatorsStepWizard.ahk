@@ -99,15 +99,15 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 						}
 					}
 
-					Plugin(code, false, true, simulator, arguments).saveToConfiguration(configuration)
+					Plugin(code, false, true, simulator, arguments).saveToConfiguration(configuration, false)
 				}
 				else
-					Plugin(code, false, false, simulator, "").saveToConfiguration(configuration)
+					Plugin(code, false, false, simulator, "").saveToConfiguration(configuration, false)
 			}
 			catch Any as exception {
 				logError(exception)
 
-				Plugin(code, false, false, simulator, "").saveToConfiguration(configuration)
+				Plugin(code, false, false, simulator, "").saveToConfiguration(configuration, false)
 			}
 		}
 
@@ -197,6 +197,11 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 				logError(exception)
 			}
 		}
+
+		widget := window.Add("Button", "x" . x . " ys+307 w" . col1Width . " h23 Y:Move(0.66) Hidden", translate("Edit Labels && Icons..."))
+		widget.OnEvent("Click", openLabelsAndIconsEditor)
+
+		this.registerWidgets(1, widget)
 
 		listX := x + 250
 		listWidth := width - 250

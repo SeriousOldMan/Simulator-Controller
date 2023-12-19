@@ -643,7 +643,7 @@ BOOL checkPitWindow() {
 BOOL greenFlagReported = FALSE;
 
 BOOL greenFlag() {
-	if (!greenFlagReported && (map_buffer->start_lights >= R3E_SESSION_PHASE_GREEN)) {
+	if (!greenFlagReported && (map_buffer->start_lights >= R3E_SESSION_PHASE_GREEN) && (map_buffer->session_type == R3E_SESSION_RACE)) {
 		greenFlagReported = TRUE;
 		
 		sendSpotterMessage("greenFlag");
@@ -1251,6 +1251,19 @@ void checkCoordinates(int playerID) {
 	}
 }
 
+BOOL started = FALSE;
+
+inline const BOOL active() {
+	if (started)
+		return TRUE;
+	else if ((map_buffer->session_type == R3E_SESSION_RACE) && (map_buffer->start_lights < R3E_SESSION_PHASE_GREEN) && (map_buffer->completed_laps <= 0))
+		return FALSE;
+	
+	started = TRUE;
+
+	return TRUE;
+}
+
 int main(int argc, char* argv[])
 {
     BOOL mapped_r3e = FALSE;
@@ -1334,14 +1347,14 @@ int main(int argc, char* argv[])
 			}
 			else if (positionTrigger)
 				checkCoordinates(playerID);
-			else {
+			else if (active()) {
 				BOOL startGo = (map_buffer->start_lights >= R3E_SESSION_PHASE_GREEN);
 				
 				if (!running) {
 					countdown -= 1;
 
-					if (!greenFlagReported && (countdown <= 0))
-						greenFlagReported = TRUE;
+					// if (!greenFlagReported && (countdown <= 0))
+					//	greenFlagReported = TRUE;
 
 					running = (startGo || (countdown <= 0));
 				}

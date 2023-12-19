@@ -664,7 +664,7 @@ checkInstallation() {
 				try {
 					installComponents(packageLocation, installLocation)
 
-					for ignore, directory in [kBinariesDirectory, kResourcesDirectory . "Setup\Installer\"] {
+					for ignore, directory in [kBinariesDirectory, kResourcesDirectory . "Setup\Installer\", kResourcesDirectory . "Setup\Windows Runtimes\"] {
 						gProgressCount += 1
 
 						showProgress({progress: gProgressCount, message: translate("Unblocking Applications and DLLs...")})
@@ -750,7 +750,13 @@ checkInstallation() {
 					}
 				}
 				catch Any as exception {
-					logError(exception)
+					logError(exception, true)
+
+					OnMessage(0x44, translateOkButton)
+					MsgBox(translate("An error occured during installation. The current installation files may be corrupted. Please retry the installation or run a manual installation."), translate("Error"), 262160)
+					OnMessage(0x44, translateOkButton, 0)
+
+					ExitApp(0)
 				}
 
 				showProgress({progress: 100, message: translate("Finished...")})
@@ -889,13 +895,14 @@ copyDirectory(source, destination, progressStep, &count) {
 
 		showProgress({progress: Round(gProgressCount + (count * progressStep)), message: translate("Copying ") . file . translate("...")})
 
-		if InStr(FileExist(fileName), "D") {
-			SplitPath(fileName, &subDirectory)
+		if (file != "desktop.ini")
+			if InStr(FileExist(fileName), "D") {
+				SplitPath(fileName, &subDirectory)
 
-			copyDirectory(fileName, destination . "\" . subDirectory, progressStep, &count)
-		}
-		else
-			FileCopy(fileName, destination, 1)
+				copyDirectory(fileName, destination . "\" . subDirectory, progressStep, &count)
+			}
+			else
+				FileCopy(fileName, destination, 1)
 	}
 }
 

@@ -16,6 +16,10 @@
 ;;;                            Public Rules Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+computeDamages([], [], [])
+computeDamages([false | ?repairs], [? | ?damages], [0 | ?rest]) <= !, computeDamages(?repairs, ?damages, ?rest)
+computeDamages([? | ?repairs], [?damage | ?damages], [?damage | ?rest]) <= computeDamages(?repairs, ?damages, ?rest)
+
 pitstopDeltaTime(?lap, ?fuel, ?tyreCompound, ?damages, ?serviceTime, ?repairTime, ?pitlaneDelta) <=
 		?pitlaneDelta = !Session.Settings.Pitstop.Delta * 1000,
 		pitstopDeltaTime(?lap, ?fuel, ?tyreCompound, ?pitstopTime),

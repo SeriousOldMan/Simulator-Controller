@@ -495,7 +495,7 @@ bool checkPitWindow(const SharedMemory* sharedData) {
 bool greenFlagReported = false;
 
 bool greenFlag(SharedMemory* shm) {
-	if (!greenFlagReported && (shm->mHighestFlagColour == FLAG_COLOUR_GREEN)) {
+	if (!greenFlagReported && (shm->mHighestFlagColour == FLAG_COLOUR_GREEN) && ((shm->mSessionState == SESSION_FORMATION_LAP) || (shm->mSessionState == SESSION_RACE))) {
 		greenFlagReported = true;
 		
 		sendSpotterMessage("greenFlag");
@@ -1043,6 +1043,21 @@ void checkCoordinates(const SharedMemory* sharedData) {
 	}
 }
 
+bool started = false;
+
+inline const bool active(SharedMemory* shm) {
+	if (started)
+		return true;
+	else if (((shm->mSessionState == SESSION_FORMATION_LAP) || (shm->mSessionState == SESSION_RACE))
+				&& (shm->mHighestFlagColour != FLAG_COLOUR_GREEN)
+				&& ((long)normalize(shm->mParticipantInfo[shm->mViewedParticipantIndex].mLapsCompleted) == 0))
+		return false;
+
+	started = true;
+
+	return true;
+}
+
 int main(int argc, char* argv[]) {
 	// Open the memory-mapped file
 	HANDLE fileHandle = OpenFileMappingA(PAGE_READONLY, FALSE, MAP_OBJECT_NAME);
@@ -1162,14 +1177,14 @@ int main(int argc, char* argv[]) {
 			}
 			else if (positionTrigger)
 				checkCoordinates(sharedData);
-			else {
+			else if (active(localCopy)) {
 				bool startGo = (localCopy->mHighestFlagColour == FLAG_COLOUR_GREEN);
 				
 				if (!running) {
 					countdown -= 1;
 
-					if (!greenFlagReported && (countdown <= 0))
-						greenFlagReported = true;
+					// if (!greenFlagReported && (countdown <= 0))
+					//	greenFlagReported = true;
 
 					running = (startGo || (countdown <= 0));
 				}

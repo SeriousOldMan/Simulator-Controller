@@ -701,9 +701,13 @@ class StrategySimulation {
 
 		result := (this.scenarioCoefficient("PitstopsCount", scenario2.Pitstops.Length - scenario1.Pitstops.Length, 1)
 				 + this.scenarioCoefficient("FuelMax", cFuel - sFuel, 10)
-				 + this.scenarioCoefficient("TyreSetsCount", sTSets - cTSets, 1)
-				 + this.scenarioCoefficient("TyreLapsMax", cTLaps - sTLaps, 10)
-				 + this.scenarioCoefficient("PitstopsPostLaps", sPLaps - cPLaps, 10))
+				 + this.scenarioCoefficient("TyreSetsCount", sTSets - cTSets, 1))
+
+		if ((Abs(scenario1.FirstStintWeight) < 5) && (Abs(scenario2.FirstStintWeight) < 5))
+			result += (this.scenarioCoefficient("TyreLapsMax", cTLaps - sTLaps, 10)
+					 + this.scenarioCoefficient("PitstopsPostLaps", sPLaps - cPLaps, 10))
+		; else
+		;	MsgBox("Inspect")
 
 		if (this.SessionType = "Duration") {
 			sLaps := scenario1.getSessionLaps()
@@ -2533,7 +2537,7 @@ class Strategy extends ConfigurationItem {
 			lastTrackTemperature := this.TrackTemperature
 
 			loop {
-				minute := (A_Index * 10)
+				minute := ((A_Index - 1) * 5)
 
 				if (minute > duration)
 					break
@@ -3033,11 +3037,14 @@ class Strategy extends ConfigurationItem {
 
 		pitstopRule := this.PitstopRule
 
-		if ((pitstopNr = 1) && (!pitstopRule || (pitstopRule == true)) && (targetLap > (currentLap + 1))) {
+		if ((pitstopNr = 1) && ((!pitstopRule && (targetLap < remainingSessionLaps)) || isNumber(pitstopRule)) && (targetLap > (currentLap + 1)) && !adjusted) {
 			halfLaps := ((targetLap - currentLap) / 2)
 
-			if (halfLaps != 0)
-				targetLap := Round(halfLaps + ((halfLaps / 100) * this.FirstStintWeight))
+			if ((halfLaps != 0) && (Abs(this.FirstStintWeight) >= 5)) {
+				targetLap := (currentLap + Round(halfLaps + ((halfLaps / 100) * this.FirstStintWeight)))
+
+				adjusted := true
+			}
 		}
 		else if isObject(pitstopRule) {
 			openingLap := (pitstopRule[1] * 60 / avgLapTime)

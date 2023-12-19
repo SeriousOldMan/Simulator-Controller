@@ -126,16 +126,21 @@ class ACCPitstopTester extends Plugin {
 				this.iPSIsOpen := true
 
 				if this.iImageMode
-					if (update || !wasOpen) {
+					if (update || !wasOpen)
 						if this.updatePitStopState()
 							this.openPitstopMFD(false, false)
-					}
+				
+				return this.iPSIsOpen
 			}
+			else
+				return false
 		}
 		else if !reported {
 			reported := true
 
 			this.logMessage("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration")
+			
+			return false
 		}
 	}
 
@@ -340,7 +345,7 @@ class ACCPitstopTester extends Plugin {
 			}
 		}
 
-		if (getLogLevel() <= kLogInfo)
+		if isLogLevel(kLogInfo)
 			if !this.iPSImageSearchArea
 				this.logMessage(substituteVariables("Full search for '%image%' took %ticks% ms", {image: "Pit Strategy", ticks: A_TickCount - curTickCount}))
 			else
@@ -403,7 +408,7 @@ class ACCPitstopTester extends Plugin {
 			}
 		}
 
-		if (getLogLevel() <= kLogInfo)
+		if isLogLevel(kLogInfo)
 			if !this.iPSImageSearchArea
 				this.logMessage(substituteVariables("Full search for '%image%' took %ticks% ms", {image: "Refuel", ticks: A_TickCount - curTickCount}))
 			else
@@ -507,7 +512,7 @@ class ACCPitstopTester extends Plugin {
 			}
 		}
 
-		if (getLogLevel() <= kLogInfo)
+		if isLogLevel(kLogInfo)
 			if !this.iPSImageSearchArea
 				this.logMessage(substituteVariables("Full search for '%image%' took %ticks% ms", {image: "Tyre Set", ticks: A_TickCount - curTickCount}))
 			else
@@ -555,7 +560,7 @@ class ACCPitstopTester extends Plugin {
 			}
 		}
 
-		if (getLogLevel() <= kLogInfo)
+		if isLogLevel(kLogInfo)
 			if !this.iPSImageSearchArea
 				this.logMessage(substituteVariables("Full search for '%image%' took %ticks% ms", {image: "Front Brake", ticks: A_TickCount - curTickCount}))
 			else
@@ -599,7 +604,7 @@ class ACCPitstopTester extends Plugin {
 			}
 		}
 
-		if (getLogLevel() <= kLogInfo)
+		if isLogLevel(kLogInfo)
 			if !this.iPSImageSearchArea
 				this.logMessage(substituteVariables("Full search for '%image%' took %ticks% ms", {image: "Select Driver", ticks: A_TickCount - curTickCount}))
 			else

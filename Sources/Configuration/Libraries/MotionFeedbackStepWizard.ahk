@@ -121,10 +121,10 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 				}
 			}
 
-			Plugin("Motion Feedback", false, true, "", arguments).saveToConfiguration(configuration)
+			Plugin("Motion Feedback", false, true, "", arguments).saveToConfiguration(configuration, false)
 		}
 		else
-			Plugin("Motion Feedback", false, false, "", "").saveToConfiguration(configuration)
+			Plugin("Motion Feedback", false, false, "", "").saveToConfiguration(configuration, false)
 	}
 
 	createGui(wizard, x, y, width, height) {

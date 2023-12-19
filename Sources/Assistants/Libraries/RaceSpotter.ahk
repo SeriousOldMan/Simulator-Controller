@@ -666,11 +666,12 @@ class PositionInfo {
 		local car := this.Car
 		local positions := spotter.Positions
 		local position := positions["Position.Class"]
+		local carPosition := car.Position["Class"]
 
-		if (car.Class = spotter.DriverCar.Class) {
-			if ((position - car.Position["Class"]) == 1)
+		if ((car.Class = spotter.DriverCar.Class) && isNumber(position) && isNumber(carPosition)) {
+			if ((position - carPosition) == 1)
 				return "Ahead"
-			else if ((position - car.Position["Class"]) == -1)
+			else if ((position - carPosition) == -1)
 				return "Behind"
 			else
 				return false
@@ -1547,7 +1548,6 @@ class RaceSpotter extends GridRaceAssistant {
 				}
 			}
 
-
 		if (enoughData && (lastLap > (this.BaseLap + 2))) {
 			if ((remainingSessionLaps <= 3) && (Floor(remainingSessionLaps) > 1) && (this.Session = kSessionRace)) {
 				situation := "FinalLaps"
@@ -1561,52 +1561,50 @@ class RaceSpotter extends GridRaceAssistant {
 				}
 			}
 
-			if (InStr(sector, "1") = 1) {
-				stintLaps := Floor(remainingStintLaps)
+			stintLaps := Floor(remainingStintLaps)
 
-				if ((this.Session = kSessionRace) && (stintLaps < 5) && (Abs(remainingStintLaps - remainingSessionLaps) > 2)) {
-					if (stintLaps > 0) {
-						situation := ("StintEnding " . Ceil(lastLap + stintLaps))
+			if ((this.Session = kSessionRace) && (stintLaps < 5) && (Abs(remainingStintLaps - remainingSessionLaps) > 2)) {
+				if (stintLaps > 0) {
+					situation := ("StintEnding " . Ceil(lastLap + stintLaps))
 
-						if !this.SessionInfos.Has(situation) {
-							this.SessionInfos[situation] := true
+					if !this.SessionInfos.Has(situation) {
+						this.SessionInfos[situation] := true
 
-							speaker.speakPhrase("StintEnding", {laps: stintLaps})
-
-							return true
-						}
-					}
-				}
-
-				if (this.BestLapTime > 0) {
-					bestLapTime := Round(this.BestLapTime, 2)
-
-					if (!this.SessionInfos.Has("BestLap") || (bestLapTime < this.SessionInfos["BestLap"])) {
-						lapTime := (bestLapTime / 1000)
-
-						minute := Floor(lapTime / 60)
-
-						speaker.speakPhrase("BestLap", {time: speaker.number2Speech(lapTime, 1)
-													  , minute: minute, seconds: speaker.number2Speech((lapTime - (minute * 60)), 1)})
-
-						this.SessionInfos["BestLap"] := bestLapTime
+						speaker.speakPhrase("StintEnding", {laps: stintLaps})
 
 						return true
 					}
-					else
-						this.SessionInfos["BestLap"] := bestLapTime
 				}
+			}
 
-				if (this.LastTopSpeed > 0) {
-					lastTopSpeed := Round(this.LastTopSpeed)
+			if (this.BestLapTime > 0) {
+				bestLapTime := Round(this.BestLapTime, 2)
 
-					if (!this.SessionInfos.Has("BestSpeed") || (lastTopSpeed > this.SessionInfos["BestSpeed"])) {
-						speaker.speakPhrase("BestSpeed", {speed: speaker.number2Speech(lastTopSpeed), unit: getUnit("Speed")})
+				if (!this.SessionInfos.Has("BestLap") || (bestLapTime < this.SessionInfos["BestLap"])) {
+					lapTime := (bestLapTime / 1000)
 
-						this.SessionInfos["BestSpeed"] := lastTopSpeed
+					minute := Floor(lapTime / 60)
 
-						return true
-					}
+					speaker.speakPhrase("BestLap", {time: speaker.number2Speech(lapTime, 1)
+												  , minute: minute, seconds: speaker.number2Speech((lapTime - (minute * 60)), 1)})
+
+					this.SessionInfos["BestLap"] := bestLapTime
+
+					return true
+				}
+				else
+					this.SessionInfos["BestLap"] := bestLapTime
+			}
+
+			if (this.LastTopSpeed > 0) {
+				lastTopSpeed := Round(convertUnit("Speed", this.LastTopSpeed))
+
+				if (!this.SessionInfos.Has("BestSpeed") || (lastTopSpeed > this.SessionInfos["BestSpeed"])) {
+					speaker.speakPhrase("BestSpeed", {speed: speaker.number2Speech(lastTopSpeed), unit: getUnit("Speed")})
+
+					this.SessionInfos["BestSpeed"] := lastTopSpeed
+
+					return true
 				}
 			}
 
@@ -1676,7 +1674,7 @@ class RaceSpotter extends GridRaceAssistant {
 				}
 			}
 
-			if ((InStr(sector, "1") = 1) && (lastLap > 2)) {
+			if (lastLap > 2) {
 				this.getPositionInfos(&standingsAhead, &standingsBehind, &trackAhead, &trackBehind, &leader, &focused)
 
 				lapTime := false
@@ -2611,6 +2609,8 @@ class RaceSpotter extends GridRaceAssistant {
 		local hadInfo := false
 		local deltaInformation
 
+		static sessionInfo := true
+
 		if this.Speaker[false] {
 			if (lastLap > 1)
 				this.updatePositionInfos(lastLap, sector, positions)
@@ -2630,8 +2630,14 @@ class RaceSpotter extends GridRaceAssistant {
 						hadInfo := false
 				}
 
-				if (!hadInfo && this.Announcements["SessionInformation"])
+				if (sessionInfo && !hadInfo && this.Announcements["SessionInformation"]) {
 					hadInfo := this.sessionInformation(lastLap, sector, positions, true)
+
+					if hadInfo
+						sessionInfo := false
+				}
+				else
+					sessionInfo := true
 
 				if (!hadInfo && raceInfo && this.Announcements["TacticalAdvices"])
 					hadInfo := this.tacticalAdvice(lastLap, sector, positions, true)
@@ -3018,7 +3024,7 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 
 		Task.startTask(ObjBindMethod(this, "startupSpotter", true), 1000)
-		Task.startTask(ObjBindMethod(this, "updateSessionValues", {Running: true}), 25000)
+		Task.startTask(ObjBindMethod(this, "updateSessionValues", {Running: true}), 10000)
 
 		return facts
 	}

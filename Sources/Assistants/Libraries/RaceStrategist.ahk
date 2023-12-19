@@ -825,6 +825,35 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 	}
 
+	confirmAction(action) {
+		local confirmation := getMultiMapValue(this.Settings, "Assistant.Strategist", "Confirm." . action, "Always")
+
+		switch confirmation, false {
+			case "Always":
+				confirmation := true
+			case "Never":
+				confirmation := false
+			case "Listening":
+				confirmation := (this.Listener != false)
+			default:
+				throw "Unsupported action confirmation detected in RaceStrategist.confirmAction..."
+		}
+
+		switch action, false {
+			case "Pitstop.Plan", "Strategy.Update", "Strategy.Explain":
+				if inList(["Yes", true], this.Autonomy)
+					return false
+				else if inList(["No", false], this.Autonomy)
+					return true
+				else
+					return confirmation
+			case "Strategy.Weather", "Strategy.Cancel":
+				return confirmation
+			default:
+				return super.confirmAction(action)
+		}
+	}
+
 	hasEnoughData(inform := true) {
 		if !inform
 			return super.hasEnoughData(false)
@@ -1134,14 +1163,13 @@ class RaceStrategist extends GridRaceAssistant {
 			if (knowledgeBase.getValue("Strategy.Pitstop.Count") > nextPitstop)
 				refuel := ("!" . refuel)
 
-			if (getMultiMapValue(this.Settings, "Assistant.Strategist", "Confirm.Pitstop.Plan", "Always") = "Never")
-				this.planPitstop(pitstopLap, refuel, "!" . tyreChange, tyreCompound, tyreCompoundColor)
-			else if ((this.Listener && (getMultiMapValue(this.Settings, "Assistant.Strategist", "Confirm.Pitstop.Plan", "Always") = "Listening"))
-				  || (getMultiMapValue(this.Settings, "Assistant.Strategist", "Confirm.Pitstop.Plan", "Always") = "Always")) {
+			if this.confirmAction("Pitstop.Plan") {
 				this.getSpeaker().speakPhrase("ConfirmInformEngineer", false, true)
 
 				this.setContinuation(ObjBindMethod(this, "planPitstop", pitstopLap, refuel, "!" . tyreChange, tyreCompound, tyreCompoundColor))
 			}
+			else
+				this.planPitstop(pitstopLap, refuel, "!" . tyreChange, tyreCompound, tyreCompoundColor)
 		}
 	}
 
@@ -1766,15 +1794,17 @@ class RaceStrategist extends GridRaceAssistant {
 			}
 
 			if (!this.StrategyReported && this.hasEnoughData(false) && (this.Strategy == this.Strategy[true])) {
-				if this.Speaker[false] {
-					if this.Listener {
+				if this.Speaker[false]
+					if this.confirmAction("Strategy.Explain") {
 						this.getSpeaker().speakPhrase("ConfirmReportStrategy", false, true)
 
 						this.setContinuation(ObjBindMethod(this, "reportStrategy"))
 					}
-					else
+					else {
+						this.getSpeaker().speakPhrase("ReportStrategy")
+
 						this.reportStrategy()
-				}
+					}
 
 				this.updateDynamicValues({StrategyReported: lapNumber})
 			}
@@ -2118,14 +2148,13 @@ class RaceStrategist extends GridRaceAssistant {
 
 		if (this.Speaker && confirm) {
 			if hasStrategy {
-				if (getMultiMapValue(this.Settings, "Assistant.Strategist", "Confirm.Strategy.Cancel", "Always") = "Never")
-					cancelStrategy()
-				else if ((this.Listener && (getMultiMapValue(this.Settings, "Assistant.Strategist", "Confirm.Srategy.Cancel", "Always") = "Listening"))
-					  || (getMultiMapValue(this.Settings, "Assistant.Strategist", "Confirm.Strategy.Cancel", "Always") = "Always")) {
+				if this.confirmAction("Strategy.Cancel") {
 					this.getSpeaker().speakPhrase("ConfirmCancelStrategy", false, true)
 
 					this.setContinuation(cancelStrategy)
 				}
+				else
+					cancelStrategy()
 			}
 			else
 				this.getSpeaker().speakPhrase("NoStrategy")
@@ -2550,14 +2579,14 @@ class RaceStrategist extends GridRaceAssistant {
 			consumptionVariation := strategy.ConsumptionVariation
 			tyreUsageVariation := strategy.TyreUsageVariation
 			tyreCompoundVariation := strategy.TyreCompoundVariation
-			
+
 			firstStintWeight := strategy.FirstStintWeight
 		}
 		else {
 			consumptionVariation := 0
 			tyreUsageVariation := 0
 			tyreCompoundVariation := 0
-			
+
 			firstStintWeight := 0
 		}
 
@@ -2939,7 +2968,9 @@ class RaceStrategist extends GridRaceAssistant {
 		else
 			result += StrategySimulation.scenarioCoefficient("ResultMajor", cDuration - sDuration, (strategy.AvgLapTime + scenario.AvgLapTime) / 4)
 
-		if (result > 0)
+		if ((cPitstops > 0) && (scenario.Pitstops[1].Lap <= (knowledgeBase.getValue("Lap") + 1)))
+			result := false
+		else if (result > 0)
 			result := false
 		else if (result < 0)
 			result := true
@@ -3006,14 +3037,13 @@ class RaceStrategist extends GridRaceAssistant {
 												   , TyreChange: true, Refuel: true}, scenario)
 
 								if this.Speaker {
-									if (getMultiMapValue(this.Settings, "Assistant.Strategist", "Confirm.Strategy.Update", "Always") = "Never")
-										this.chooseScenario(scenario, false)
-									else if ((this.Listener && (getMultiMapValue(this.Settings, "Assistant.Strategist", "Confirm.Srategy.Update", "Always") = "Listening"))
-										  || (getMultiMapValue(this.Settings, "Assistant.Strategist", "Confirm.Strategy.Update", "Always") = "Always")) {
+									if this.confirmAction("Strategy.Update") {
 										speaker.speakPhrase("ConfirmUpdateStrategy", false, true)
 
 										this.setContinuation(RaceStrategist.ConfirmStrategyUpdateContinuation(this, scenario, false))
 									}
+									else
+										this.chooseScenario(scenario, false)
 
 									dispose := false
 
@@ -3031,14 +3061,13 @@ class RaceStrategist extends GridRaceAssistant {
 								this.explainStrategyRecommendation(scenario)
 
 							if this.Speaker {
-								if (getMultiMapValue(this.Settings, "Assistant.Strategist", "Confirm.Strategy.Update", "Always") = "Never")
-									this.chooseScenario(scenario, false)
-								else if ((this.Listener && (getMultiMapValue(this.Settings, "Assistant.Strategist", "Confirm.Srategy.Update", "Always") = "Listening"))
-									  || (getMultiMapValue(this.Settings, "Assistant.Strategist", "Confirm.Strategy.Update", "Always") = "Always")) {
+								if this.confirmAction("Strategy.Update") {
 									speaker.speakPhrase("ConfirmUpdateStrategy", false, true)
 
 									this.setContinuation(RaceStrategist.ConfirmStrategyUpdateContinuation(this, scenario, false))
 								}
+								else
+									this.chooseScenario(scenario, false)
 
 								dispose := false
 
@@ -3069,16 +3098,13 @@ class RaceStrategist extends GridRaceAssistant {
 								this.explainStrategyRecommendation(scenario)
 
 							if Task.CurrentTask.Confirm {
-								if (getMultiMapValue(this.Settings, "Assistant.Strategist", "Confirm.Strategy.Update", "Always") = "Never")
-									this.chooseScenario(scenario, false)
-								else if ((this.Listener && (getMultiMapValue(this.Settings, "Assistant.Strategist", "Confirm.Srategy.Update", "Always") = "Listening"))
-									  || (getMultiMapValue(this.Settings, "Assistant.Strategist", "Confirm.Strategy.Update", "Always") = "Always")) {
+								if this.confirmAction("Strategy.Update") {
 									speaker.speakPhrase("ConfirmUpdateStrategy", false, true)
 
 									this.setContinuation(RaceStrategist.ConfirmStrategyUpdateContinuation(this, scenario, true))
 								}
 								else
-									this.Manager.updateDynamicValues({RejectedStrategy: scenario})
+									this.chooseScenario(scenario, false)
 
 								dispose := false
 
@@ -3188,14 +3214,13 @@ class RaceStrategist extends GridRaceAssistant {
 			if (hasEngineer && strategyLap) {
 				speaker.speakPhrase("PitstopLap", {lap: (Max(strategyLap, lastLap) + 1)})
 
-				if (getMultiMapValue(this.Settings, "Assistant.Strategist", "Confirm.Pitstop.Plan", "Always") = "Never")
-					this.planPitstop(strategyLap, refuel, tyreChange, tyreCompound, tyreCompoundColor)
-				else if ((this.Listener && (getMultiMapValue(this.Settings, "Assistant.Strategist", "Confirm.Pitstop.Plan", "Always") = "Listening"))
-					  || (getMultiMapValue(this.Settings, "Assistant.Strategist", "Confirm.Pitstop.Plan", "Always") = "Always")) {
+				if this.confirmAction("Pitstop.Plan") {
 					speaker.speakPhrase("ConfirmInformEngineer", false, true)
 
 					this.setContinuation(ObjBindMethod(this, "planPitstop", strategyLap, refuel, tyreChange, tyreCompound, tyreCompoundColor))
 				}
+				else
+					this.planPitstop(strategyLap, refuel, tyreChange, tyreCompound, tyreCompoundColor)
 			}
 			else
 				speaker.speakPhrase("NoPlannedPitstop")
@@ -3213,14 +3238,7 @@ class RaceStrategist extends GridRaceAssistant {
 			try {
 				speaker.speakPhrase("PitstopLap", {lap: plannedLap})
 
-				if (getMultiMapValue(this.Settings, "Assistant.Strategist", "Confirm.Strategy.Explain", "Always") = "Never") {
-					if hasEngineer
-						this.explainPitstopRecommendation(plannedLap, pitstopOptions)
-					else
-						this.explainPitstopRecommendation(plannedLap)
-				}
-				else if ((this.Listener && (getMultiMapValue(this.Settings, "Assistant.Strategist", "Confirm.Strategy.Explain", "Always") = "Listening"))
-					  || (getMultiMapValue(this.Settings, "Assistant.Strategist", "Confirm.Strategy.Explain", "Always") = "Always")) {
+				if this.confirmAction("Strategy.Explain") {
 					speaker.speakPhrase("Explain", false, true)
 
 					if hasEngineer
@@ -3230,6 +3248,10 @@ class RaceStrategist extends GridRaceAssistant {
 					else
 						this.setContinuation(ObjBindMethod(this, "explainPitstopRecommendation", plannedLap))
 				}
+				else if hasEngineer
+					this.explainPitstopRecommendation(plannedLap, pitstopOptions)
+				else
+					this.explainPitstopRecommendation(plannedLap)
 			}
 			finally {
 				speaker.endTalk()
@@ -3312,16 +3334,14 @@ class RaceStrategist extends GridRaceAssistant {
 				speaker.endTalk()
 			}
 
-			if ProcessExist("Race Engineer.exe") {
-				if (getMultiMapValue(this.Settings, "Assistant.Strategist", "Confirm.Pitstop.Plan", "Always") = "Never")
-					this.planPitstop(plannedLap, pitstopOptions*)
-				else if ((this.Listener && (getMultiMapValue(this.Settings, "Assistant.Strategist", "Confirm.Pitstop.Plan", "Always") = "Listening"))
-					  || (getMultiMapValue(this.Settings, "Assistant.Strategist", "Confirm.Pitstop.Plan", "Always") = "Always")) {
+			if ProcessExist("Race Engineer.exe")
+				if this.confirmAction("Pitstop.Plan") {
 					speaker.speakPhrase("ConfirmInformEngineer", false, true)
 
 					this.setContinuation(ObjBindMethod(this, "planPitstop", plannedLap, pitstopOptions*))
 				}
-			}
+				else
+					this.planPitstop(plannedLap, pitstopOptions*)
 		}
 	}
 
@@ -3454,25 +3474,22 @@ class RaceStrategist extends GridRaceAssistant {
 									  , {minutes: minutes, compound: fragments[recommendedCompound . "Tyre"]})
 
 					if this.Strategy {
-						if (getMultiMapValue(this.Settings, "Assistant.Strategist", "Confirm.Strategy.Weather", "Always") = "Never")
-							this.recommendStrategy()
-						else if ((this.Listener && (getMultiMapValue(this.Settings, "Assistant.Strategist", "Confirm.Strategy.Weather", "Always") = "Listening"))
-							  || (getMultiMapValue(this.Settings, "Assistant.Strategist", "Confirm.Strategy.Weather", "Always") = "Always")) {
+						if this.confirmAction("Strategy.Weather") {
 							speaker.speakPhrase("ConfirmUpdateStrategy", false, true)
 
 							this.setContinuation(RaceStrategist.TyreChangeContinuation(this, ObjBindMethod(this, "recommendStrategy"), "Confirm", "Okay"))
 						}
+						else
+							this.recommendStrategy()
 					}
-					else if ProcessExist("Race Engineer.exe") {
-						if (getMultiMapValue(this.Settings, "Assistant.Strategist", "Confirm.Strategy.Weather", "Always") = "Never")
-							this.planPitstop()
-						else if ((this.Listener && (getMultiMapValue(this.Settings, "Assistant.Strategist", "Confirm.Strategy.Weather", "Always") = "Listening"))
-							  || (getMultiMapValue(this.Settings, "Assistant.Strategist", "Confirm.Strategy.Weather", "Always") = "Always")) {
+					else if ProcessExist("Race Engineer.exe")
+						if this.confirmAction("Strategy.Weather") {
 							speaker.speakPhrase("ConfirmInformEngineer", false, true)
 
 							this.setContinuation(ObjBindMethod(this, "planPitstop"))
 						}
-					}
+						else
+							this.planPitstop()
 				}
 				finally {
 					speaker.endTalk()

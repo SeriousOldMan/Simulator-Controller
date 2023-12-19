@@ -64,10 +64,10 @@ downloadSimulatorController() {
 			OnMessage(0x44, translateOkButton)
 			MsgBox(translate("Simulator Controller cannot request Admin priviliges. Please enable User Account Control."), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
-			
+
 			ExitApp(0)
 		}
-			
+
 		options := ""
 
 		if inList(A_Args, "-NoUpdate")
@@ -105,7 +105,7 @@ downloadSimulatorController() {
 	devVersion := (cState || inList(A_Args, "-Development"))
 
 	try {
-		Download("https://www.dropbox.com/s/txa8muw9j3g66tl/VERSION?dl=1", kTempDirectory . "VERSION")
+		Download("https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/VERSION", kTempDirectory . "VERSION")
 	}
 	catch Any as exception {
 		logError(exception, true)

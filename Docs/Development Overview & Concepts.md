@@ -161,6 +161,10 @@ As capable, as the AutoHotkey language is, as bad is it, when it comes to avoidi
 
 Therefore it can be very annoying to track down errors in AutoHotkey. But there is help available. First of all, use one of the AutoHotkey aware editors with debugging, inspection and single-stepping support. You will find an overview of the available editors [here](https://www.autohotkey.com/docs/AHKL_DBGPClients.htm). Second, and maybe even more important, the Simulator Controller has extensive logging capabilties integrated. Most of the time you can detect a coding error in your plugin simply by looking at the activity trace in the log file. Log files reside in the *Simulator Controller\Logs* folder found in your user *Documents* folder and the log level can be changed using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). But be careful, since at log level *Info*, the log files can grow quite fast.
 
+You can also choose the log level and toogle the debugging mode for a currently running application using the tray context menu of the application. And you can run the ["System Monitor"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#monitoring-health-and-activities) to inspect the logging information during runtime.
+
+It can be very difficult to find problems with the system in full fligt, especially for issues that showed during a session while on the track. For these situations, Simulator Controller provides a kind of replay mode. Make a copy of the *Temp\XXX Data* folder, with *XXX* the three-letter code for the given simulator. Then start "Simulator Controller" with the argument "-replay *dataFolder*" (with *dataFolder* pointing to the beforementioned copy of the data folder).
+
 ## Using the Build Tool
 
 A simple build tool is part of the Simulator Controller distribution. It is rule based like the good old Unix make tool and will compile all the applications, that are part of Simulator Controller and put them in the *Binaries* folder. Additionaly, you can define cleanup tasks, for example to clear the *Logs* folder or removing backup files and copy tasks to move files around. You can find the build tool in the *Binaries* folder, it is named *Simulator Tools.exe*. Simply start it with a double click and it will scan all source files and will recreate all outdated executables..
@@ -300,7 +304,7 @@ Also a special case and maybe a candidate to keep the original English terms, si
 
 #### Settings in the "Session Database"
 
-Another special case, the translations for the (race) settings available in the "Session Database". Before you translate this stuff, make yourself familar
+Another special case, the translations for the (race) settings available in the "Session Database". Before you translate this stuff, make yourself familar with the "Race Settings" area in the "Session Database" and read the documentation about the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings). The original translation files are named "Settings.LC", where *LC* again is the language code. 
 
 ### Translation of Assistant grammars
 

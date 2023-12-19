@@ -32,9 +32,8 @@
 ;;;-------------------------------------------------------------------------;;;
 
 consentDialog(id, consent := false, *) {
-	local language, texts, chosen, x, y, rootDirectory, ignore, section, keyValues, key, value
-	local consentGui
-
+	local consentGui, texts, chosen, x, y, fileName, ignore, section, keyValues, key, value
+	
 	static tyrePressuresConsentDropDown
 	static carSetupsConsentDropDown
 	static raceStrategiesConsentDropDown
@@ -50,16 +49,13 @@ consentDialog(id, consent := false, *) {
 
 	texts := false
 
-	language := getLanguage()
-
-	for ignore, rootDirectory in [kTranslationsDirectory, kUserTranslationsDirectory]
-		if FileExist(rootDirectory . "Consent." . language)
-			if !texts
-				texts := readMultiMap(rootDirectory . "Consent." . language)
-			else
-				for section, keyValues in readMultiMap(rootDirectory . "Consent." . language)
-					for key, value in keyValues
-						setMultiMapValue(texts, section, key, value)
+	for ignore, fileName in getFileNames("Consent." . getLanguage(), kTranslationsDirectory, kUserTranslationsDirectory)
+		if !texts
+			texts := readMultiMap(fileName)
+		else
+			for section, keyValues in readMultiMap(fileName)
+				for key, value in keyValues
+					setMultiMapValue(texts, section, key, value)
 
 	if !texts
 		texts := readMultiMap(kTranslationsDirectory . "Consent.en")
@@ -294,7 +290,7 @@ checkForUpdates() {
 
 		if check {
 			try {
-				Download("https://www.dropbox.com/s/txa8muw9j3g66tl/VERSION?dl=1", kUserConfigDirectory . "VERSION")
+				Download("https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/VERSION", kUserConfigDirectory . "VERSION")
 			}
 			catch Any as exception {
 				check := false

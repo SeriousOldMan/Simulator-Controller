@@ -405,6 +405,24 @@ updateEngineRepair(?lap) <= lapDamage(?lap, Engine, ?damage), Set(Damage.Engine,
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                        Pitstop Target Calculation                       ;;;
+;;;                                                                         ;;;
+;;; Computes the time potentially required for an upcoming pitstop.         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+priority: -20, {All: [?Lap], [?Fuel.Amount.Target], [?Tyre.Compound.Target]} => (Prove: updatePitstopTargetTime())
+
+updatePitstopTargetTime() <= computeTargetDamages(?damages),
+							 pitstopDeltaTime(!Lap, !Fuel.Amount.Target, !Tyre.Compound.Target, ?damages,
+											  ?targetServiceTime, ?targetRepairTime, ?pitlaneDelta),
+							 ?targetTime = ?targetServiceTime + ?targetRepairTime,
+							 Set(Target.Time.Box, ?targetTime), Set(Target.Time.Pitlane, ?pitlaneDelta), 
+							 Set(Target.Time.Service, ?targetServiceTime), Set(Target.Time.Repairs, ?targetRepairTime)
+
+computeTargetDamages(?damages) <= computeDamages([true, true, true], [!Damage.Bodywork, !Damage.Suspension, !Damage.Engine], ?damages)
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                          Damage Impact Analysis                         ;;;
 ;;;                                                                         ;;;
 ;;; The following rules permanently observes the laptime development with   ;;;
@@ -751,9 +769,9 @@ priority: 20, [?Pitstop.Plan = true] =>
 		(Clear: Pitstop.Planned.Tyre.Pressure.Correction),
 		(Clear: Pitstop.Planned.Tyre.Pressure.Lost.FL), (Clear: Pitstop.Planned.Tyre.Pressure.Lost.FR),
 		(Clear: Pitstop.Planned.Tyre.Pressure.Lost.RL), (Clear: Pitstop.Planned.Tyre.Pressure.Lost.RR),
+		(Clear: Pitstop.Planned.Driver.Request),
 		(Clear: Pitstop.Planned.Repair.Suspension), (Clear: Pitstop.Planned.Repair.Bodywork), (Clear: Pitstop.Planned.Repair.Engine),
-		(Clear: Pitstop.Planned.Time),
-		(Clear: Pitstop.Planned.Driver.Request)
+		(Clear: Pitstop.Planned.Time)
 priority: 10, [?Pitstop.Plan] => (Prove: planPitstop())
 
 planPitstop() <= lastPitstop(?last), ?nr = ?last + 1, Set(Pitstop.Planned.Nr, ?nr)
@@ -871,19 +889,16 @@ priority: -5, {All: [?Pitstop.Plan], [?Lap.Remaining.Session <= 5], {None: [?Pit
 
 priority: -5, {Any: [?Pitstop.Plan], {All: [?Lap], [?Pitstop.Planned.Time]}} => (Prove: updatePitstopTime())
 
-updatePitstopTime() <= computeDamages(?damages),
+updatePitstopTime() <= computePitstopDamages(?damages),
 					   pitstopDeltaTime(!Lap, !Pitstop.Planned.Fuel, !Pitstop.Planned.Tyre.Compound, ?damages,
 										?pitstopServiceTime, ?pitstopRepairTime, ?pitlaneDelta),
 					   ?pitstopTime = ?pitstopServiceTime + ?pitstopRepairTime,
 					   Set(Pitstop.Planned.Time.Box, ?pitstopTime), Set(Pitstop.Planned.Time.Pitlane, ?pitlaneDelta), 
 					   Set(Pitstop.Planned.Time.Service, ?pitstopServiceTime), Set(Pitstop.Planned.Time.Repairs, ?pitstopRepairTime)
 
-computeDamages(?damages) <= computeDamages([!Pitstop.Planned.Repair.Bodywork, !Pitstop.Planned.Repair.Suspension, Pitstop.Planned.Repair.Engine],
-										   [!Damage.Bodywork, !Damage.Suspension, !Damage.Engine], ?damages)
-
-computeDamages([], [], [])
-computeDamages([false | ?repairs], [? | ?damages], [0 | ?rest]) <= !, computeDamages(?repairs, ?damages, ?rest)
-computeDamages([? | ?repairs], [?damage | ?damages], [?damage | ?rest]) <= computeDamages(?repairs, ?damages, ?rest)
+computePitstopDamages(?damages) <=
+		computeDamages([!Pitstop.Planned.Repair.Bodywork, !Pitstop.Planned.Repair.Suspension, Pitstop.Planned.Repair.Engine],
+					   [!Damage.Bodywork, !Damage.Suspension, !Damage.Engine], ?damages)
 
 priority: -20, [?Pitstop.Plan] => (Set: Pitstop.Planned), (Clear: Pitstop.Plan),
 								  (Clear: Pitstop.Plan.Fuel.Amount), (Clear: Pitstop.Plan.Tyre.Change), (Clear: Pitstop.Plan.Tyre.Set),
@@ -903,7 +918,8 @@ priority: -20, [?Pitstop.Plan] => (Set: Pitstop.Planned), (Clear: Pitstop.Plan),
 {All: [?Pitstop.Planned], [?Pitstop.Planned.Lap > 0], [?Pitstop.Planned.Lap <= ?Lap]} => (Set: Pitstop.Prepare)
 
 {All: [?Pitstop.Planned], [?Pitstop.Prepare]} => (ProveAll: preparePitstop(!Pitstop.Planned.Nr))
-priority: -20, {All: [?Pitstop.Planned], [?Pitstop.Prepare]} => (Clear: Pitstop.Planned), (Clear: Pitstop.Prepare), (Set: Pitstop.Prepared)
+priority: -20, {All: [?Pitstop.Planned], [?Pitstop.Prepare]} => (Clear: Pitstop.Planned), (Clear: Pitstop.Prepare),
+																(Clear: Pitstop.Planned.Adjusted), (Set: Pitstop.Prepared)
 
 preparePitstop(?pitstopNumber) <= Call(startPitstopSetup, ?pitstopNumber)
 preparePitstop(?pitstopNumber) <= setRefuelAmount(?pitstopNumber),
@@ -964,7 +980,8 @@ priority: -10, [?Pitstop.Lap] => (Set: Pitstop.Clear, ?Pitstop.Lap)
 					(Clear: Pitstop.Planned.Repair.Suspension), (Clear: Pitstop.Planned.Repair.Bodywork),
 					(Clear: Pitstop.Planned.Repair.Engine),
 					(Clear: Pitstop.Planned.Time),
-					(Clear: Pitstop.Clear), (Clear: Pitstop.Lap), (Clear: Pitstop.Prepared), (Clear: Pitstop.Planned.Nr)
+					(Clear: Pitstop.Clear), (Clear: Pitstop.Lap), (Clear: Pitstop.Prepared),
+					(Clear: Pitstop.Planned.Nr), (Clear: Pitstop.Planned.Adjusted)
 				  
 updateDamageReported(?lap) <= ?lastLap = ?lap - 1, Set(Damage.Reported, ?lastLap), Set(Damage.Analysis.Reported, ?lap)
 

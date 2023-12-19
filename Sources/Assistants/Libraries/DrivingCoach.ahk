@@ -43,7 +43,7 @@ class DrivingCoach extends GridRaceAssistant {
 	class CoachVoiceManager extends RaceAssistant.RaceVoiceManager {
 	}
 
-	class LLMProvider {
+	class LLMConnector {
 		iCoach := false
 
 		iModel := false
@@ -62,7 +62,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 		Models {
 			Get {
-				return DrivingCoach.LLMProvider.Models
+				return DrivingCoach.LLMConnector.Models
 			}
 		}
 
@@ -131,11 +131,11 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 
 		Ask(question) {
-			throw "Virtual method LLMProvider.Ask must be implemented in a subclass..."
+			throw "Virtual method LLMConnector.Ask must be implemented in a subclass..."
 		}
 	}
 
-	class HTTPConnector extends DrivingCoach.LLMProvider {
+	class HTTPConnector extends DrivingCoach.LLMConnector {
 		iCoach := false
 
 		iServer := ""
@@ -359,7 +359,7 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 	}
 
-	class LLMRuntimeProvider extends DrivingCoach.LLMProvider {
+	class LLMRuntimeConnector extends DrivingCoach.LLMConnector {
 		CreatePrompt(question) {
 			local coach := this.Coach
 			local prompt := ""
@@ -761,7 +761,7 @@ class DrivingCoach extends GridRaceAssistant {
 				throw "Unsupported service detected in DrivingCoach.connect..."
 
 			if (service[1] = "LLM Runtime")
-				this.iConnector := DrivingCoach.LLMRuntimeProvider(this, this.Options["Driving Coach.Model"])
+				this.iConnector := DrivingCoach.LLMRuntimeConnector(this, this.Options["Driving Coach.Model"])
 			else
 				try {
 					this.iConnector := DrivingCoach.%service[1]%Connector(this, this.Options["Driving Coach.Model"])

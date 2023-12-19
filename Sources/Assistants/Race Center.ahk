@@ -93,7 +93,8 @@ global kSessionDataSchemas := CaseInsenseMap("Stint.Data", ["Nr", "Lap", "Driver
 															, "Tyre.Pressure.Cold.Front.Left", "Tyre.Pressure.Cold.Front.Right"
 															, "Tyre.Pressure.Cold.Rear.Left", "Tyre.Pressure.Cold.Rear.Right"
 															, "Repair.Bodywork", "Repair.Suspension", "Repair.Engine"
-															, "Driver.Current", "Driver.Next", "Status", "Stint"]
+															, "Driver.Current", "Driver.Next", "Status", "Stint"
+															, "Time.Service", "Time.Repairs", "Time.Pitlane"]
 										   , "Pitstop.Service.Data", ["Pitstop", "Lap", "Time", "Driver.Previous", "Driver.Next", "Fuel"
 																	, "Tyre.Compound", "Tyre.Compound.Color", "Tyre.Set", "Tyre.Pressures"
 																	, "Bodywork.Repair", "Suspension.Repair", "Engine.Repair"]
@@ -5280,14 +5281,14 @@ class RaceCenter extends ConfigurationItem {
 			consumptionVariation := strategy.ConsumptionVariation
 			tyreUsageVariation := strategy.TyreUsageVariation
 			tyreCompoundVariation := strategy.TyreCompoundVariation
-			
+
 			firstStintWeight := strategy.FirstStintWeight
 		}
 		else {
 			consumptionVariation := 0
 			tyreUsageVariation := 0
 			tyreCompoundVariation := 0
-			
+
 			firstStintWeight := 0
 		}
 
@@ -5555,12 +5556,15 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	chooseScenario(strategy) {
-		if strategy {
-			if this.Strategy
-				strategy.PitstopRule := this.Strategy.PitstopRule
+		if strategy
+			if (this.LastLap && (strategy.Pitstops.Length > 0) && (strategy.Pitstops[1].Lap < (this.LastLap.Nr + 1)))
+				return
+			else {
+				if this.Strategy
+					strategy.PitstopRule := this.Strategy.PitstopRule
 
-			this.selectStrategy(strategy, true)
-		}
+				this.selectStrategy(strategy, true)
+			}
 	}
 
 	startWorking(state := true) {
@@ -5858,6 +5862,7 @@ class RaceCenter extends ConfigurationItem {
 				stint.StartPosition := "-"
 				stint.EndPosition := "-"
 				stint.AvgLaptime := "-"
+				stint.BestLaptime := "-"
 				stint.Potential := "-"
 				stint.RaceCraft := "-"
 				stint.Speed := "-"
@@ -5926,7 +5931,7 @@ class RaceCenter extends ConfigurationItem {
 				else {
 					this.showMessage(translate("Load lap data (Lap: ") . lap.Nr . translate(")"))
 
-					if (getLogLevel() <= kLogInfo)
+					if isLogLevel(kLogInfo)
 						logMessage(kLogInfo, translate("Load lap data (Lap: ") . lap.Nr . translate("), Data: `n`n") . rawData . "`n")
 
 					break
@@ -6183,7 +6188,7 @@ class RaceCenter extends ConfigurationItem {
 			if lap.Accident
 				stint.Accidents += 1
 
-			if (lap.Penalty && this.Laps.Has(lap.Nr - 1) && (this.Laps(lap.Nr - 1).Penalty != lap.Penalty))
+			if (lap.Penalty && this.Laps.Has(lap.Nr - 1) && (this.Laps[lap.Nr - 1].Penalty != lap.Penalty))
 				stint.Penalties += 1
 
 			lapTimes.Push(lap.Laptime)
@@ -6232,7 +6237,7 @@ class RaceCenter extends ConfigurationItem {
 
 		this.showMessage(message)
 
-		if (getLogLevel() <= kLogInfo)
+		if isLogLevel(kLogInfo)
 			logMessage(kLogInfo, message)
 
 		currentStint := this.Connector.GetSessionCurrentStint(session)
@@ -6438,7 +6443,7 @@ class RaceCenter extends ConfigurationItem {
 
 			this.showMessage(message)
 
-			if (getLogLevel() <= kLogInfo)
+			if isLogLevel(kLogInfo)
 				logMessage(kLogInfo, message)
 		}
 
@@ -6456,7 +6461,7 @@ class RaceCenter extends ConfigurationItem {
 				if (lapData && (lapData != "")) {
 					this.showMessage(translate("Updating race report (Lap: ") . lap . translate(")"))
 
-					if (getLogLevel() <= kLogInfo)
+					if isLogLevel(kLogInfo)
 						logMessage(kLogInfo, translate("Updating race report (Lap: ") . lap . translate("), Data: `n`n") . lapData . "`n")
 
 					lapData := parseMultiMap(lapData)
@@ -6596,7 +6601,7 @@ class RaceCenter extends ConfigurationItem {
 
 			this.showMessage(message)
 
-			if (getLogLevel() <= kLogInfo)
+			if isLogLevel(kLogInfo)
 				logMessage(kLogInfo, message)
 
 			session := this.SelectedSession[true]
@@ -6632,7 +6637,7 @@ class RaceCenter extends ConfigurationItem {
 					else {
 						this.showMessage(translate("Updating telemetry data (Lap: ") . lap . translate(")"))
 
-						if (getLogLevel() <= kLogInfo)
+						if isLogLevel(kLogInfo)
 							logMessage(kLogInfo, translate("Updating telemetry data (Lap: ") . lap . translate("), Data: `n`n") . telemetryData . "`n")
 					}
 
@@ -6816,7 +6821,7 @@ class RaceCenter extends ConfigurationItem {
 
 			this.showMessage(message)
 
-			if (getLogLevel() <= kLogInfo)
+			if isLogLevel(kLogInfo)
 				logMessage(kLogInfo, message)
 
 			pressuresTable := pressuresDB.Database.Tables["Tyres.Pressures"]
@@ -6844,7 +6849,7 @@ class RaceCenter extends ConfigurationItem {
 					else {
 						this.showMessage(translate("Updating tyre pressures (Lap: ") . lap . translate(")"))
 
-						if (getLogLevel() <= kLogInfo)
+						if isLogLevel(kLogInfo)
 							logMessage(kLogInfo, translate("Updating tyre pressures (Lap: ") . lap . translate("), Data: `n`n") . lapPressures . "`n")
 
 						fails := 0
@@ -6933,6 +6938,7 @@ class RaceCenter extends ConfigurationItem {
 		local session, lap, fuel, tyreCompound, tyreCompoundColor, tyreSet
 		local pressureFL, pressureFR, pressureRL, pressureRR, repairBodywork, repairSuspension, repairEngine
 		local pressures, displayPressures, displayFuel, driverRequest, tries, pitstopNr, stint, hasPlanned
+		local pitstop, serviceTime, repairsTime, pitlaneTime
 
 		loop this.PitstopsListView.GetCount()
 			if (this.PitstopsListView.GetNext(A_Index - 1, "C") != A_Index) {
@@ -6952,7 +6958,7 @@ class RaceCenter extends ConfigurationItem {
 			}
 
 			if (state && (state != "")) {
-				if (getLogLevel() <= kLogInfo)
+				if isLogLevel(kLogInfo)
 					logMessage(kLogInfo, translate("Updating pitstops, State: `n`n") . state . "`n")
 
 				state := parseMultiMap(state)
@@ -7056,6 +7062,21 @@ class RaceCenter extends ConfigurationItem {
 
 						pressures := string2Values(",", pressures)
 
+						pitstop := sessionStore.query("Pitstop.Data", {Where: {Status: "Planned"}})
+
+						if (pitstop.Length > 0) {
+							pitstop := pitstop[1]
+
+							serviceTime := pitstop["Time.Service"]
+							repairsTime := pitstop["Time.Repairs"]
+							pitlaneTime := pitstop["Time.Pitlane"]
+						}
+						else {
+							serviceTime := kNull
+							repairsTime := kNull
+							pitlaneTime := kNull
+						}
+
 						sessionStore.remove("Pitstop.Data", {Status: "Planned"}, always.Bind(true))
 
 						if this.Laps.Has(lap)
@@ -7069,7 +7090,7 @@ class RaceCenter extends ConfigurationItem {
 													, "Tyre.Pressure.Cold.Rear.Left", pressures[3], "Tyre.Pressure.Cold.Rear.Right", pressures[4]
 													, "Repair.Bodywork", repairBodywork, "Repair.Suspension", repairSuspension, "Repair.Engine", repairEngine
 													, "Driver.Current", currentDriver, "Driver.Next", nextDriver, "Status", "Performed"
-													, "Stint", stint.Nr + 1))
+													, "Stint", stint.Nr + 1, "Time.Service", serviceTime, "Time.Repairs", repairsTime, "Time.Pitlane", pitlaneTime))
 
 						this.iPendingPitstop := false
 
@@ -7121,7 +7142,6 @@ class RaceCenter extends ConfigurationItem {
 							break
 						}
 
-
 					pitstopNr := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Nr", false)
 
 					if pitstopNr
@@ -7149,6 +7169,18 @@ class RaceCenter extends ConfigurationItem {
 						repairSuspension := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Repair.Suspension", false)
 						repairEngine := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Repair.Engine", false)
 						driverRequest := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Driver.Request", false)
+						serviceTime := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Time.Service", kNull)
+						repairsTime := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Time.Repairs", kNull)
+						pitlaneTime := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Time.Pitlane", kNull)
+
+						if (serviceTime != kNull)
+							serviceTime := Round(serviceTime / 1000)
+
+						if (repairsTime != kNull)
+							repairsTime := Round(repairsTime / 1000)
+
+						if (pitlaneTime != kNull)
+							pitlaneTime := Round(pitlaneTime / 1000)
 
 						if (tyreCompound && (tyreCompound != "-")) {
 							pressures := values2String(", ", Round(pressureFL, 1), Round(pressureFR, 1)
@@ -7207,7 +7239,8 @@ class RaceCenter extends ConfigurationItem {
 													, "Tyre.Pressure.Cold.Rear.Left", pressures[3], "Tyre.Pressure.Cold.Rear.Right", pressures[4]
 													, "Repair.Bodywork", repairBodywork, "Repair.Suspension", repairSuspension, "Repair.Engine", repairEngine
 													, "Driver.Current", currentDriver, "Driver.Next", nextDriver, "Status", "Planned"
-													, "Stint", this.CurrentStint.Nr + 1))
+													, "Stint", this.CurrentStint.Nr + 1
+													, "Time.Service", serviceTime, "Time.Repairs", repairsTime, "Time.Pitlane", pitlaneTime))
 					}
 				}
 			}
@@ -7377,14 +7410,14 @@ class RaceCenter extends ConfigurationItem {
 				if (!this.Strategy || !this.Strategy.Version || (version > this.Strategy.Version)) {
 					this.showMessage(translate("Syncing session strategy"))
 
-					if (getLogLevel() <= kLogInfo)
+					if isLogLevel(kLogInfo)
 						logMessage(kLogInfo, translate("Syncing session strategy (Version: ") . version . translate(")"))
 
 					strategy := this.Connector.GetSessionValue(session, "Race Strategy")
 
 					this.showMessage(translate("Updating session strategy"))
 
-					if (getLogLevel() <= kLogInfo)
+					if isLogLevel(kLogInfo)
 						logMessage(kLogInfo, translate("Updating session strategy, Strategy: `n`n") . strategy . "`n")
 
 					this.selectStrategy((strategy = "CANCEL") ? false : this.createStrategy(parseMultiMap(strategy), false, false))
@@ -7418,7 +7451,7 @@ class RaceCenter extends ConfigurationItem {
 				if (!this.SetupsVersion || (this.SetupsVersion < version)) {
 					this.showMessage(translate("Syncing setups"))
 
-					if (getLogLevel() <= kLogInfo)
+					if isLogLevel(kLogInfo)
 						logMessage(kLogInfo, translate("Syncing setups (Version: ") . version . translate(")"))
 
 					info := this.Connector.GetSessionValue(session, "Setups Info")
@@ -7428,7 +7461,7 @@ class RaceCenter extends ConfigurationItem {
 						if (this.SetupsVersion && (this.SetupsListView.GetCount() > 0)) {
 							this.showMessage(translate("Clearing setups"))
 
-							if (getLogLevel() <= kLogInfo)
+							if isLogLevel(kLogInfo)
 								logMessage(kLogInfo, translate("Clearing setups, Info: `n`n") . info . "`n")
 
 							this.clearSetups(false)
@@ -7439,7 +7472,7 @@ class RaceCenter extends ConfigurationItem {
 					else {
 						this.showMessage(translate("Updating setups"))
 
-						if (getLogLevel() <= kLogInfo)
+						if isLogLevel(kLogInfo)
 							logMessage(kLogInfo, translate("Updating setups, Info: `n`n") . info . translate(" `nSetups: `n`n") . setups . "`n")
 
 						this.loadSetups(info, setups)
@@ -7466,7 +7499,7 @@ class RaceCenter extends ConfigurationItem {
 				if (!this.TeamDriversVersion || (this.TeamDriversVersion < version)) {
 					this.showMessage(translate("Syncing team drivers"))
 
-					if (getLogLevel() <= kLogInfo)
+					if isLogLevel(kLogInfo)
 						logMessage(kLogInfo, translate("Syncing team drivers (Version: ") . version . translate(")"))
 
 					this.iTeamDriversVersion := version
@@ -7508,7 +7541,7 @@ class RaceCenter extends ConfigurationItem {
 				if (!this.PlanVersion || (this.PlanVersion < version)) {
 					this.showMessage(translate("Syncing stint plan"))
 
-					if (getLogLevel() <= kLogInfo)
+					if isLogLevel(kLogInfo)
 						logMessage(kLogInfo, translate("Syncing stint plan (Version: ") . version . translate(")"))
 
 					info := this.Connector.GetSessionValue(session, "Stint Plan Info")
@@ -7518,7 +7551,7 @@ class RaceCenter extends ConfigurationItem {
 						if (this.PlanVersion && (this.PlanListView.GetCount() > 0)) {
 							this.showMessage(translate("Clearing stint plan"))
 
-							if (getLogLevel() <= kLogInfo)
+							if isLogLevel(kLogInfo)
 								logMessage(kLogInfo, translate("Clearing stint plan, Info: `n`n") . info . "`n")
 
 							this.PlanListView.Delete()
@@ -7527,7 +7560,7 @@ class RaceCenter extends ConfigurationItem {
 					else {
 						this.showMessage(translate("Updating stint plan"))
 
-						if (getLogLevel() <= kLogInfo)
+						if isLogLevel(kLogInfo)
 							logMessage(kLogInfo, translate("Updating stint plan, Info: `n`n") . info . translate(" `nPlan: `n`n") . plan . "`n")
 
 						this.loadPlan(info, plan)
@@ -7558,7 +7591,7 @@ class RaceCenter extends ConfigurationItem {
 
 				this.showMessage(translate("Syncing session"))
 
-				if (getLogLevel() <= kLogInfo)
+				if isLogLevel(kLogInfo)
 					logMessage(kLogInfo, translate("Syncing session"))
 
 				if sessionActive {
@@ -8043,7 +8076,7 @@ class RaceCenter extends ConfigurationItem {
 			if lap.Accident
 				accidents += 1
 
-			if (lap.Penalty && this.Laps.Has(lap.Nr - 1) && (this.Laps(lap.Nr - 1).Penalty != lap.Penalty))
+			if (lap.Penalty && this.Laps.Has(lap.Nr - 1) && (this.Laps[lap.Nr - 1].Penalty != lap.Penalty))
 				penalties += 1
 		}
 
@@ -8500,7 +8533,7 @@ class RaceCenter extends ConfigurationItem {
 
 					penalty := lap.Penalty
 
-					if (penalty && this.Laps.Has(lap.Nr - 1) && (this.Laps(lap.Nr - 1).Penalty != penalty)) {
+					if (penalty && this.Laps.Has(lap.Nr - 1) && (this.Laps[lap.Nr - 1].Penalty != penalty)) {
 						if (InStr(penalty, "SG") = 1) {
 							penalty := ((StrLen(penalty) > 2) ? (A_Space . SubStr(penalty, 3)) : "")
 
@@ -10501,7 +10534,7 @@ class RaceCenter extends ConfigurationItem {
 
 			penalty := lap.Penalty
 
-			if (penalty && this.Laps.Has(lap.Nr - 1) && (this.Laps(lap.Nr - 1).Penalty != penalty)) {
+			if (penalty && this.Laps.Has(lap.Nr - 1) && (this.Laps[lap.Nr - 1].Penalty != penalty)) {
 				if (InStr(penalty, "SG") = 1) {
 					penalty := ((StrLen(penalty) > 2) ? (A_Space . SubStr(penalty, 3)) : "")
 
@@ -10964,7 +10997,7 @@ class RaceCenter extends ConfigurationItem {
 		local repairSuspension := pitstopData["Repair.Suspension"]
 		local repairEngine := pitstopData["Repair.Engine"]
 		local repairs := this.computeRepairs(repairBodyWork, repairSuspension, repairEngine)
-		local tyreCompound, tyreSet, pressure
+		local tyreCompound, tyreSet, pressure, time
 
 		loop 4 {
 			pressure := pressures[A_Index]
@@ -10976,6 +11009,25 @@ class RaceCenter extends ConfigurationItem {
 		pressures := values2String(", ", pressures*)
 
 		html .= ("<tr><td><b>" . translate("Lap:") . "</b></div></td><td>" . ((pitstopData["Lap"] = "-") ? "-" : (pitstopData["Lap"] + 1)) . "</td></tr>")
+
+		time := ((pitstopData["Time.Service"] != kNull) ? displayValue("Float", pitstopData["Time.Service"], 0) : "")
+
+		if (pitstopData["Time.Repairs"] != kNull) {
+			if (time != "")
+				time .= translate(" / ")
+
+			time .= displayValue("Float", pitstopData["Time.Repairs"], 0)
+		}
+
+		if (pitstopData["Time.Pitlane"] != kNull) {
+			if (time != "")
+				time .= translate(" / ")
+
+			time .= displayValue("Float", pitstopData["Time.Pitlane"], 0)
+		}
+
+		if (time != "")
+			html .= ("<tr><td><b>" . translate("Time Loss") . translate(":") . "</b></div></td><td>" . time . translate(" Seconds") . "</td></tr>")
 
 		if (pitstopData["Driver.Current"] != kNull)
 			html .= ("<tr><td><b>" . translate("Last Driver:") . "</b></div></td><td>" . pitstopData["Driver.Current"] . "</td></tr>")
@@ -11060,7 +11112,10 @@ class RaceCenter extends ConfigurationItem {
 				html .= ("<tr><td><b>" . translate("Tyre Compound:") . "</b></div></td><td>" . tyreCompound . "</td></tr>")
 
 				if ((tyreSet != false) && (tyreSet != "-"))
-					html .= ("<tr><td><b>" . translate("Tyre Set:") . "</b></div></td><td>" . serviceData["Tyre.Set"] . "</td></tr>")
+					if (serviceData["Tyre.Set"] && (serviceData["Tyre.Set"] != kNull) && (serviceData["Tyre.Set"] != "-"))
+						html .= ("<tr><td><b>" . translate("Tyre Set:") . "</b></div></td><td>" . serviceData["Tyre.Set"] . "</td></tr>")
+					else
+						html .= ("<tr><td><b>" . translate("Tyre Set:") . "</b></div></td><td>" . tyreSet . "</td></tr>")
 
 				html .= ("<tr><td><b>" . translate("Tyre Pressures:") . "</b></div></td><td>" . pressures . "</td></tr>")
 			}
@@ -11120,6 +11175,14 @@ class RaceCenter extends ConfigurationItem {
 		local hasFlatSpot := false
 		local tyres := CaseInsenseWeakMap()
 		local ignore, tyreData, tyre, key, wear, tread, grain, blister, flatSpot
+		local lastDriver, lastFuel, lastTyreCompound, lastTyreCompoundColor, lastTyreSet, lastTyrePressures
+
+		this.getStintSetup(pitstopNr, true, &lastDriver, &lastFuel, &lastTyreCompound, &lastTyreCompoundColor, &lastTyreSet, &lastTyrePressures)
+
+		if (inList(["ACC", "Assetto Corsa Competizione"], this.Simulator) && (lastTyreCompound = "Wet"))
+			return ""
+		else if lastTyreCompound
+			tyreCompound := compound(lastTyreCompound, lastTyreCompoundColor)
 
 		for ignore, tyreData in this.SessionStore.query("Pitstop.Tyre.Data", {Where: {Pitstop: pitstopNr}})
 			tyres[tyreData["Tyre"]] := tyreData
@@ -11132,7 +11195,7 @@ class RaceCenter extends ConfigurationItem {
 				laps := tyres[key]["Laps"]
 
 			if !tyreCompound
-				tyreCompound := translate(compound(tyres[key]["Compound"], tyres[key]["Compound.Color"]))
+				tyreCompound := compound(tyres[key]["Compound"], tyres[key]["Compound.Color"])
 
 			if !tyreSet
 				tyreSet := tyres[key]["Set"]
@@ -11181,7 +11244,7 @@ class RaceCenter extends ConfigurationItem {
 			html .= ("<tr><td><b>" . translate("Laps:") . "</b></div></td><td>" . laps . "</td></tr>")
 
 		if tyreCompound
-			html .= ("<tr><td><b>" . translate("Tyre Compound:") . "</b></div></td><td>" . tyreCompound . "</td></tr>")
+			html .= ("<tr><td><b>" . translate("Tyre Compound:") . "</b></div></td><td>" . translate(tyreCompound) . "</td></tr>")
 
 		if tyreSet
 			html .= ("<tr><td><b>" . translate("Tyre Set:") . "</b></div></td><td>" . tyreSet . "</td></tr>")
@@ -11213,26 +11276,27 @@ class RaceCenter extends ConfigurationItem {
 	showPitstopDetails(pitstopNr) {
 		showPitstopDetailsAsync(pitstopNr) {
 			local pitstopData := this.SessionStore.Tables["Pitstop.Data"][pitstopNr]
-			local html, tyreCompound, tyreCompoundColor
+			local html, tyreCompound, tyreCompoundColor, tyreWearDetails
 
 			if (pitstopData["Lap"] != "-") {
 				html := ("<div id=`"header`"><b>" . translate("Pitstop: ") . pitstopNr . "</b></div>")
 				html .= ("<br><br><div id=`"header`"><i>" . translate("Service") . "</i></div>")
 
-				if (this.SessionStore.query("Pitstop.Service.Data", {Where: {Pitstop: pitstopNr}}).Length = 0)
-					html .= ("<br>" . this.createPitstopPlanDetails(pitstopNr))
-				else
+				if (false && (this.SessionStore.query("Pitstop.Service.Data", {Where: {Pitstop: pitstopNr}}).Length != 0))
 					html .= ("<br>" . this.createPitstopServiceDetails(pitstopNr))
+				else
+					html .= ("<br>" . this.createPitstopPlanDetails(pitstopNr))
 
 				if (this.SessionStore.query("Pitstop.Tyre.Data", {Where: {Pitstop: pitstopNr}}).Length > 0) {
-					html .= ("<br><br><div id=`"header`"><i>" . translate("Tyre Wear") . "</i></div>")
-
 					if this.Stints.Has(pitstopData["Stint"] - 1)
 						tyreCompound := this.Stints[pitstopData["Stint"] - 1].Compound
 					else
 						tyreCompound := false
 
-					html .= ("<br>" . this.createTyreWearDetails(pitstopNr, tyreCompound))
+					tyreWearDetails := this.createTyreWearDetails(pitstopNr, tyreCompound)
+
+					if (Trim(tyreWearDetails) != "")
+						html .= ("<br><br><div id=`"header`"><i>" . translate("Tyre Wear") . "</i></div><br>" . tyreWearDetails)
 				}
 
 				this.showDetails("Pitstop", html)
@@ -11262,14 +11326,31 @@ class RaceCenter extends ConfigurationItem {
 		local repairsData := []
 		local tyreCompound, tyreSet, index, pitstopData, serviceData, pressures, repairBodywork, repairSuspension, repairs, fuel
 		local name, key, tyrePressures, header, repairEngine
+		local time
 
 		for index, pitstopData in this.SessionStore.Tables["Pitstop.Data"] {
 			pitstopNRs.Push("<th class=`"th-std`">" . index . "</th>")
 
 			serviceData := this.SessionStore.query("Pitstop.Service.Data", {Where: {Pitstop: index}})
 
-			if (serviceData.Length = 0) {
-				timeData.Push("<td class=`"td-std`">" . "-" . "</td>")
+			if (true || (serviceData.Length = 0)) {
+				time := ((pitstopData["Time.Service"] != kNull) ? displayValue("Float", pitstopData["Time.Service"], 0) : "")
+
+				if (pitstopData["Time.Repairs"] != kNull) {
+					if (time != "")
+						time .= translate(" / ")
+
+					time .= displayValue("Float", pitstopData["Time.Repairs"], 0)
+				}
+
+				if (pitstopData["Time.Pitlane"] != kNull) {
+					if (time != "")
+						time .= translate(" / ")
+
+					time .= displayValue("Float", pitstopData["Time.Pitlane"], 0)
+				}
+
+				timeData.Push("<td class=`"td-std`">" . ((time != "") ? time : "-") . "</td>")
 				previousDriverData.Push("<td class=`"td-std`">" . displayNullValue(pitstopData["Driver.Current"]) . "</td>")
 				nextDriverData.Push("<td class=`"td-std`">" . displayNullValue(pitstopData["Driver.Next"]) . "</td>")
 
@@ -11339,6 +11420,10 @@ class RaceCenter extends ConfigurationItem {
 				tyreCompoundData.Push("<td class=`"td-std`">" . tyreCompound . "</td>")
 
 				tyreSet := serviceData["Tyre.Set"]
+
+				if (!tyreSet || (tyreSet = kNull) || (tyreSet = "-"))
+					tyreSet := pitstopData["Tyre.Set"]
+
 				tyrePressures := serviceData["Tyre.Pressures"]
 
 				if (tyreCompound = "-") {
@@ -11346,6 +11431,9 @@ class RaceCenter extends ConfigurationItem {
 					tyrePressures := "-, -, -, -"
 				}
 				else {
+					if (!tyreSet || (tyreSet = kNull))
+						tyreSet := "-"
+
 					tyrePressures := string2Values(",", tyrePressures)
 
 					loop 4 {
@@ -11383,7 +11471,7 @@ class RaceCenter extends ConfigurationItem {
 	showPitstopsDetails() {
 		showPitstopsDetailsAsync() {
 			local html := ("<div id=`"header`"><b>" . translate("Pitstops Summary") . "</b></div>")
-			local pitstopData, tyreCompound
+			local pitstopData, tyreCompound, tyreWearDetails
 
 			html .= ("<br><br><div id=`"header`"><i>" . translate("Service") . "</i></div>")
 
@@ -11394,14 +11482,16 @@ class RaceCenter extends ConfigurationItem {
 					if (this.SessionStore.query("Pitstop.Tyre.Data", {Where: {Pitstop: A_Index}}).Length > 0) {
 						pitstopData := this.SessionStore.Tables["Pitstop.Data"][A_Index]
 
-						html .= ("<br><br><div id=`"header`"><i>" . translate("Tyre Wear (Pitstop: ") . A_Index . translate(")") . "</i></div>")
-
 						if this.Stints.Has(pitstopData["Stint"] - 1)
 							tyreCompound := this.Stints[pitstopData["Stint"] - 1].Compound
 						else
 							tyreCompound := false
 
-						html .= ("<br>" . this.createTyreWearDetails(A_Index, tyreCompound))
+						tyreWearDetails := this.createTyreWearDetails(A_Index, tyreCompound)
+
+						if (Trim(tyreWearDetails) != "")
+							html .= ("<br><br><div id=`"header`"><i>" . translate("Tyre Wear (Pitstop: ") . A_Index . translate(")")
+																	  . "</i></div><br>" . tyreWearDetails)
 					}
 
 			this.showDetails("Pitstops", html)
@@ -11440,7 +11530,7 @@ class RaceCenter extends ConfigurationItem {
 				if lap.Accident
 					lapAccidents += 1
 
-				if (lap.Penalty && this.Laps.Has(lap.Nr - 1) && (this.Laps(lap.Nr - 1).Penalty != lap.Penalty))
+				if (lap.Penalty && this.Laps.Has(lap.Nr - 1) && (this.Laps[lap.Nr - 1].Penalty != lap.Penalty))
 					lapPenalties += 1
 			}
 

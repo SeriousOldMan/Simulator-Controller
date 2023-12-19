@@ -351,32 +351,43 @@ updateSessionDatabase() {
 	TraySetIcon(icon, "1")
 	A_IconTip := "Database Synchronizer"
 
-	startupProcess()
+	try {
+		startupProcess()
 
-	usePressures := (inList(A_Args, "-Pressures") != 0)
-	useSetups := (inList(A_Args, "-Setups") != 0)
-	useStrategies := (inList(A_Args, "-Strategies") != 0)
+		usePressures := (inList(A_Args, "-Pressures") != 0)
+		useSetups := (inList(A_Args, "-Setups") != 0)
+		useStrategies := (inList(A_Args, "-Strategies") != 0)
 
-	id := inList(A_Args, "-ID")
+		id := inList(A_Args, "-ID")
 
-	if id
-		PeriodicTask(synchronizeCommunityDatabase.Bind(A_Args[id + 1], usePressures, useSetups, useStrategies), 10000, kLowPriority).start()
+		if id
+			PeriodicTask(synchronizeCommunityDatabase.Bind(A_Args[id + 1], usePressures, useSetups, useStrategies), 10000, kLowPriority).start()
 
-	minutes := inList(A_Args, "-Synchronize")
+		minutes := inList(A_Args, "-Synchronize")
 
-	if minutes {
-		minutes := A_Args[minutes + 1]
+		if minutes {
+			minutes := A_Args[minutes + 1]
 
-		if (minutes && (minutes != kFalse)) {
-			if ((minutes == true) || (minutes = kTrue))
-				minutes := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Session Database.ini")
-										  , "Team Server", "Replication", 30)
+			if (minutes && (minutes != kFalse)) {
+				if ((minutes == true) || (minutes = kTrue))
+					minutes := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Session Database.ini")
+											  , "Team Server", "Replication", 30)
 
-			if !isInteger(minutes)
-				minutes := 30
+				if !isInteger(minutes)
+					minutes := 30
 
-			Task.startTask(synchronizeSessionDatabase.Bind(minutes), 1000, kLowPriority)
+				Task.startTask(synchronizeSessionDatabase.Bind(minutes), 1000, kLowPriority)
+			}
 		}
+	}
+	catch Any as exception {
+		logError(exception, true)
+
+		OnMessage(0x44, translateOkButton)
+		MsgBox(substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Database Synchronizer"}), translate("Error"), 262160)
+		OnMessage(0x44, translateOkButton, 0)
+
+		ExitApp(1)
 	}
 }
 

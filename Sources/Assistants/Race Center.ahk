@@ -12583,20 +12583,31 @@ startupRaceCenter() {
 	TraySetIcon(icon, "1")
 	A_IconTip := "Race Center"
 
-	rCenter := RaceCenter(kSimulatorConfiguration, readMultiMap(kUserConfigDirectory . "Race.settings"))
+	try {
+		rCenter := RaceCenter(kSimulatorConfiguration, readMultiMap(kUserConfigDirectory . "Race.settings"))
 
-	if GetKeyState("Ctrl", "P")
-		rCenter.iSynchronize := "Off"
+		if GetKeyState("Ctrl", "P")
+			rCenter.iSynchronize := "Off"
 
-	rCenter.createGui(rCenter.Configuration)
+		rCenter.createGui(rCenter.Configuration)
 
-	rCenter.show()
+		rCenter.show()
 
-	rCenter.connect(true)
+		rCenter.connect(true)
 
-	registerMessageHandler("Setup", functionMessageHandler)
+		registerMessageHandler("Setup", functionMessageHandler)
 
-	startupApplication()
+		startupApplication()
+	}
+	catch Any as exception {
+		logError(exception, true)
+
+		OnMessage(0x44, translateOkButton)
+		MsgBox(substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Race Center"}), translate("Error"), 262160)
+		OnMessage(0x44, translateOkButton, 0)
+
+		ExitApp(1)
+	}
 }
 
 

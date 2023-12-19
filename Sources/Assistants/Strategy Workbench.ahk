@@ -3380,13 +3380,24 @@ startupStrategyWorkbench() {
 	if (trackTemperature <= 0)
 		trackTemperature := 27
 
-	workbench := StrategyWorkbench(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor)
+	try {
+		workbench := StrategyWorkbench(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor)
 
-	workbench.createGui(workbench.Configuration)
+		workbench.createGui(workbench.Configuration)
 
-	workbench.show()
+		workbench.show()
 
-	startupApplication()
+		startupApplication()
+	}
+	catch Any as exception {
+		logError(exception, true)
+
+		OnMessage(0x44, translateOkButton)
+		MsgBox(substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Strategy Workbench"}), translate("Error"), 262160)
+		OnMessage(0x44, translateOkButton, 0)
+
+		ExitApp(1)
+	}
 }
 
 

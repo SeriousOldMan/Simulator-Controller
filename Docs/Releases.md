@@ -1,8 +1,9 @@
-## 5.5.1.1-release 12/22/23 (planned)
+## 5.5.1.2-release 12/22/23 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed incorrect information given by the Strategist, when no valid strategy can be computed in autonomous mode.
   4. Fixed a couple of permission errors when accessing the installation and update download repository in the Amazon cloud.
+  5. Introduced special handling for errors raised during application startup.
 
 ## 5.5.1.0-release 12/15/23
   1. Minor bugfixes, as always

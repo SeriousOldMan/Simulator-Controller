@@ -5484,6 +5484,15 @@ startupSessionDatabase() {
 
 		editor.show()
 	}
+	catch Any as exception {
+		logError(exception, true)
+
+		OnMessage(0x44, translateOkButton)
+		MsgBox(substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Session Database"}), translate("Error"), 262160)
+		OnMessage(0x44, translateOkButton, 0)
+
+		ExitApp(1)
+	}
 	finally {
 		protectionOff()
 	}

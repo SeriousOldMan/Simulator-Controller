@@ -357,15 +357,18 @@ startupTrackMapper() {
 		}
 		finally {
 			Task.CurrentTask.Critical := false
-		}
 
-		ExitApp(0)
+			ExitApp(0)
+		}
 	}
 
 	recreateMaps() {
-		recreateTrackMaps()
-
-		ExitApp(0)
+		try {
+			recreateTrackMaps()
+		}
+		finally {
+			ExitApp(0)
+		}
 	}
 
 	TraySetIcon(icon, "1")

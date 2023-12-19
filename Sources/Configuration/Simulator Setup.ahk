@@ -3286,7 +3286,18 @@ resetVolume(masterVolume) {
 ;;;                       Initialization Section Part 1                     ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-initializeSimulatorSetup()
+try {
+	initializeSimulatorSetup()
+}
+catch Any as e {
+	logError(exception, true)
+
+	OnMessage(0x44, translateOkButton)
+	MsgBox(substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Simulator Setup"}), translate("Error"), 262160)
+	OnMessage(0x44, translateOkButton, 0)
+
+	ExitApp(1)
+}
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -3310,4 +3321,15 @@ initializeSimulatorSetup()
 ;;;                       Initialization Section Part 2                     ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-startupSimulatorSetup()
+try {
+	startupSimulatorSetup()
+}
+catch Any as e {
+	logError(e, true)
+
+	OnMessage(0x44, translateOkButton)
+	MsgBox(substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Simulator Setup"}), translate("Error"), 262160)
+	OnMessage(0x44, translateOkButton, 0)
+
+	ExitApp(1)
+}

@@ -3283,76 +3283,87 @@ startupSetupWorkbench() {
 	TraySetIcon(icon, "1")
 	A_IconTip := "Setup Workbench"
 
-	while (index < A_Args.Length) {
-		switch A_Args[index], false {
-			case "-Simulator":
-				simulator := A_Args[index + 1]
-				index += 2
-			case "-Car":
-				car := A_Args[index + 1]
-				index += 2
-			case "-Track":
-				track := A_Args[index + 1]
-				index += 2
-			case "-Weather":
-				weather := A_Args[index + 1]
-				index += 2
-			default:
-				index += 1
-		}
-	}
-
-	if car
-		car := SessionDatabase.getCarName(simulator, car)
-
-	workbench := SetupWorkbench(simulator, car, track, weather)
-
-	SupportMenu.Insert("1&")
-
-	label := translate("Debug Rule System")
-
-	SupportMenu.Insert("1&", label, ObjBindMethod(workbench, "toggleDebug", kDebugRules))
-
-	if workbench.Debug[kDebugRules]
-		SupportMenu.Check(label)
-
-	label := translate("Debug Knowledgebase")
-
-	SupportMenu.Insert("1&", label, ObjBindMethod(workbench, "toggleDebug", kDebugKnowledgeBase))
-
-	if workbench.Debug[kDebugKnowledgebase]
-		SupportMenu.Check(label)
-
-	workbench.createGui(workbench.Configuration)
-
-	workbench.show()
-
-	if !GetKeyState("Ctrl", "P")
-		if simulator {
-			workbench.Window.Block()
-
-			try {
-				workbench.loadSimulator(simulator, true)
-
-				if inList(workbench.AvailableCars, car)
-					workbench.loadCar(car, false)
-
-				if track
-					workbench.loadTrack(track, false)
-
-				if weather
-					workbench.loadWeather(weather, false)
-			}
-			finally {
-				workbench.Window.Unblock()
+	try {
+		while (index < A_Args.Length) {
+			switch A_Args[index], false {
+				case "-Simulator":
+					simulator := A_Args[index + 1]
+					index += 2
+				case "-Car":
+					car := A_Args[index + 1]
+					index += 2
+				case "-Track":
+					track := A_Args[index + 1]
+					index += 2
+				case "-Weather":
+					weather := A_Args[index + 1]
+					index += 2
+				default:
+					index += 1
 			}
 		}
+
+		if car
+			car := SessionDatabase.getCarName(simulator, car)
+
+		workbench := SetupWorkbench(simulator, car, track, weather)
+
+		SupportMenu.Insert("1&")
+
+		label := translate("Debug Rule System")
+
+		SupportMenu.Insert("1&", label, ObjBindMethod(workbench, "toggleDebug", kDebugRules))
+
+		if workbench.Debug[kDebugRules]
+			SupportMenu.Check(label)
+
+		label := translate("Debug Knowledgebase")
+
+		SupportMenu.Insert("1&", label, ObjBindMethod(workbench, "toggleDebug", kDebugKnowledgeBase))
+
+		if workbench.Debug[kDebugKnowledgebase]
+			SupportMenu.Check(label)
+
+		workbench.createGui(workbench.Configuration)
+
+		workbench.show()
+
+		if !GetKeyState("Ctrl", "P")
+			if simulator {
+				workbench.Window.Block()
+
+				try {
+					workbench.loadSimulator(simulator, true)
+
+					if inList(workbench.AvailableCars, car)
+						workbench.loadCar(car, false)
+
+					if track
+						workbench.loadTrack(track, false)
+
+					if weather
+						workbench.loadWeather(weather, false)
+				}
+				finally {
+					workbench.Window.Unblock()
+				}
+			}
+			else
+				workbench.loadSimulator(true, true)
 		else
-			workbench.loadSimulator(true, true)
-	else
-		Task.startTask(ObjBindMethod(workbench, "restoreState"), 100)
+			Task.startTask(ObjBindMethod(workbench, "restoreState"), 100)
 
-	startupApplication()
+		startupApplication()
+	}
+	catch Any as exception {
+		logError(exception, true)
+
+		OnMessage(0x44, translateOkButton)
+		MsgBox(substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Setup Workbench"}), translate("Error"), 262160)
+		OnMessage(0x44, translateOkButton, 0)
+
+		ExitApp(1)
+	}
 }
 
 

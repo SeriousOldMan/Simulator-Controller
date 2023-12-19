@@ -228,7 +228,7 @@ class SimulatorStartup extends ConfigurationItem {
 					showProgress({color: "Green", message: translate("Applying profile ") . profile . translate("...")})
 
 					loop 50 {
-						showProgress({progress: A_Index})
+						showProgress({progress: A_Index + 50})
 
 						Sleep 50
 					}

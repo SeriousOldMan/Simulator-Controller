@@ -338,7 +338,7 @@ class SimulatorStartup extends ConfigurationItem {
 			hidden := false
 			hasSplashScreen := this.iSplashScreen
 
-			if (startSimulator || GetKeyState("MButton"))) {
+			if (startSimulator || GetKeyState("MButton")) {
 				if (!kSilentMode && hasSplashScreen) {
 					this.hideSplashScreen()
 

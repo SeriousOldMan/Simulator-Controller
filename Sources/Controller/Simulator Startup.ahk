@@ -466,13 +466,11 @@ launchPad(command := false, arguments*) {
 				configure := true
 		}
 
-		/* Profiles
 		if configure {
 			if (launchProfilesEditor(launchPadGui) = "Startup")
 				launchPad("Startup")
 		}
 		else
-		*/
 			launchPad("Startup")
 	}
 
@@ -691,15 +689,10 @@ launchPad(command := false, arguments*) {
 		launchPadGui.SetFont("s7 Norm", "Arial")
 
 		launchPadGui.Add("Picture", "x16 yp+24 w60 h60 Section vStartup", kIconsDirectory . "Startup.ico").OnEvent("Click", launchStartup.Bind(false))
-		/* Profiles
 		widget := launchPadGui.Add("Picture", "x59 yp+43 w14 h14 BackgroundTrans vlaunchProfilesButton", kIconsDirectory . "General Settings White.ico")
 		widget.OnEvent("Click", launchStartup.Bind(true))
-		*/
 
-		/* Profiles
 		launchPadGui.Add("Picture", "xp+47 ys w60 h60 vRaceSettings", kIconsDirectory . "Race Settings.ico").OnEvent("Click", launchApplication.Bind("RaceSettings"))
-		*/
-		launchPadGui.Add("Picture", "xp+90 ys w60 h60 vRaceSettings", kIconsDirectory . "Race Settings.ico").OnEvent("Click", launchApplication.Bind("RaceSettings"))
 		launchPadGui.Add("Picture", "xp+74 yp w60 h60 vSessionDatabase", kIconsDirectory . "Session Database.ico").OnEvent("Click", launchApplication.Bind("SessionDatabase"))
 
 		launchPadGui.Add("Picture", "xp+90 yp w60 h60 vPracticeCenter", kIconsDirectory . "Practice.ico").OnEvent("Click", launchApplication.Bind("PracticeCenter"))
@@ -779,7 +772,7 @@ closeLaunchPad(*) {
 	else
 		launchPad(kClose)
 }
-/* Profiles
+
 launchProfilesEditor(launchPadOrCommand, arguments*) {
 	local x, y, w, h, width, x0, x1, w1, w2, x2, w4, x4, w3, x3, x4, x5, w5, x6, x7
 	local checkedRows, checked, settingsTab, first
@@ -1799,7 +1792,7 @@ loginDialog(connectorOrCommand := false, teamServerURL := false, owner := false,
 		}
 	}
 }
-*/
+
 startupSimulator() {
 	local fileName
 

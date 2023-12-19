@@ -1,14 +1,14 @@
 [Development]
 Version=5.5.2.0-dev
 Target=5.5.2.0-release
-Date=12/18/2023
+Date=12/19/2023
 Download=
 Changes=New startup wizard in "Simulator Startup", Deprecated silent and muted presets from "Simulator Setup", New keyboard modifiers for "Simulator Startup"
 Components=Media->5.3.0,Configuration->5.4.8,Utilities->5.4.8
 [Release]
-Version=5.5.1.0-release
-Date=12/15/2023
-Download=https://cutt.ly/XwSfgai2;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.5.1.0-release.zip
+Version=5.5.1.1-release
+Date=12/19/2023
+Download=https://cutt.ly/jwS71Ghl;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.5.1.1-release.zip
 Changes=Check for incomplete automatic update, Fixed post pitstop tyre set info in "Race Center" for ACC, Fixed display of pitstop service information in "Race Center", New display of pitstop time loss in "Race Center", Optimized application of pitstop preference in strategy recalculation, Added FrontBrake and RearBrake to "Simulator Setup", Sanity check after pitstop setup in ACC, "Edit Labels & Icons" now also available on the simulator page in "Simulator Setup", Detection of changed pitstop settings made outside the control of Simulator Controller, New car models for "Setup Workbench"
 Components=Media->5.3.0,Configuration->5.4.8,Utilities->5.4.8
 [Components]
@@ -25,4 +25,4 @@ Utilities.5.4.8.Download=https://simulatorcontroller.s3.eu-central-1.amazonaws.c
 Type=Development
 [Version]
 Development=5.5.2.0-dev
-Release=5.5.1.0-release
+Release=5.5.1.1-release

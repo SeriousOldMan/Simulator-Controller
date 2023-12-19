@@ -85,34 +85,37 @@ namespace RF2SHMSpotter {
             this.telemetryBuffer.Disconnect();
 
             this.connected = false;
-		}
-		public static rF2VehicleScoring GetPlayerScoring(ref rF2Scoring scoring)
-		{
-			var playerVehScoring = new rF2VehicleScoring();
+        }
 
+        static rF2VehicleScoring noPlayer = new rF2VehicleScoring();
+
+        public static rF2VehicleScoring GetPlayerScoring(ref rF2Scoring scoring)
+		{
 			for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)
 			{
 				var vehicle = scoring.mVehicles[i];
 
+				/*
 				switch ((rFactor2Constants.rF2Control)vehicle.mControl)
 				{
 					case rFactor2Constants.rF2Control.AI:
 					case rFactor2Constants.rF2Control.Player:
 					case rFactor2Constants.rF2Control.Remote:
 						if (vehicle.mIsPlayer == 1)
-							playerVehScoring = vehicle;
+							return vehicle;
 
-						break;
+						continue;
 
 					default:
 						continue;
 				}
+				*/
 
-				if (playerVehScoring.mIsPlayer == 1)
-					break;
+				if (vehicle.mIsPlayer == 1)
+					return vehicle;
 			}
 
-			return playerVehScoring;
+			return noPlayer;
 		}
 
 		const int WM_COPYDATA = 0x004A;

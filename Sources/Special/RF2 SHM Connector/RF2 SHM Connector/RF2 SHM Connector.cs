@@ -491,28 +491,30 @@ namespace SHMConnector {
 
         static rF2VehicleScoring noPlayer = new rF2VehicleScoring();
 
-        public static ref rF2VehicleScoring GetPlayerScoring(ref rF2Scoring scoring) {
+        public static rF2VehicleScoring GetPlayerScoring(ref rF2Scoring scoring) {
 			for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i) {
 				var vehicle = scoring.mVehicles[i];
 
+				/*
 				switch ((rFactor2Constants.rF2Control)vehicle.mControl) {
 					case rFactor2Constants.rF2Control.AI:
 					case rFactor2Constants.rF2Control.Player:
 					case rFactor2Constants.rF2Control.Remote:
 						if (vehicle.mIsPlayer == 1)
-							break;
+							return vehicle;
 
-						break;
+						continue;
 
 					default:
 						continue;
 				}
+				*/
 
 				if (vehicle.mIsPlayer == 1)
-					break;
-			}
+                    return vehicle;
+            }
 
-			return ref noPlayer;
+			return noPlayer;
 		}
 
 		public static rF2VehicleTelemetry GetPlayerTelemetry(int id, ref rF2Telemetry telemetry) {

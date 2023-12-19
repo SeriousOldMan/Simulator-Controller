@@ -62,7 +62,7 @@ class Database {
 
 	Tables[name := false] {
 		Get {
-			local tries := 10
+			local tries := 100
 			local schema, data, row, values, length, ignore, column
 			local file, line
 
@@ -298,7 +298,7 @@ class Database {
 	}
 
 	add(name, values, flush := false) {
-		local tries := 10
+		local tries := 100
 		local row, directory, fileName, ignore, column, value, newValues, file
 
 		if !isInstance(values, Database.Row)

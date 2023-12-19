@@ -3028,64 +3028,75 @@ initializeSimulatorSetup() {
 startupSimulatorSetup() {
 	local wizard := SetupWizard.Instance
 
-	wizard.loadDefinition()
+	try {
+		wizard.loadDefinition()
 
-	if wizard.Debug[kDebugRules]
-		wizard.dumpRules(wizard.KnowledgeBase)
+		if wizard.Debug[kDebugRules]
+			wizard.dumpRules(wizard.KnowledgeBase)
 
-	loop {
-		wizard.createGui(wizard.Configuration)
+		loop {
+			wizard.createGui(wizard.Configuration)
 
-		wizard.startSetup()
+			wizard.startSetup()
 
-		while (wizard.ProgressCount < 100) {
-			showProgress({progress: ++wizard.ProgressCount, message: translate("Starting UI...")})
+			while (wizard.ProgressCount < 100) {
+				showProgress({progress: ++wizard.ProgressCount, message: translate("Starting UI...")})
 
-			Sleep(5)
-		}
-
-		showProgress({progress: 100, message: translate("Finished...")})
-
-		Sleep(1000)
-
-		if !isDebug()
-			hideSplashScreen()
-
-		hideProgress()
-
-		wizard.show()
-
-		startupApplication()
-
-		try {
-			loop {
-				wizard.Working := false
-
-				Sleep(200)
+				Sleep(5)
 			}
-			until (wizard.Result == kLanguage)
-		}
-		finally {
-			wizard.hide()
-		}
 
-		if (wizard.Result == kLanguage) {
-			wizard.Result := false
+			showProgress({progress: 100, message: translate("Finished...")})
 
-			wizard.close()
-			wizard.reset(false)
-
-			setMultiMapValue(kSimulatorConfiguration, "Splash Window", "Title", translate("Modular Simulator Controller System") . translate(" - ") . translate("Setup && Configuration"))
-
-			wizard.ProgressCount := 0
+			Sleep(1000)
 
 			if !isDebug()
-				showSplashScreen("Rotating Brain")
+				hideSplashScreen()
 
-			showProgress({color: "Blue", title: translate("Initializing Setup Wizard"), message: translate("")})
+			hideProgress()
+
+			wizard.show()
+
+			startupApplication()
+
+			try {
+				loop {
+					wizard.Working := false
+
+					Sleep(200)
+				}
+				until (wizard.Result == kLanguage)
+			}
+			finally {
+				wizard.hide()
+			}
+
+			if (wizard.Result == kLanguage) {
+				wizard.Result := false
+
+				wizard.close()
+				wizard.reset(false)
+
+				setMultiMapValue(kSimulatorConfiguration, "Splash Window", "Title", translate("Modular Simulator Controller System") . translate(" - ") . translate("Setup && Configuration"))
+
+				wizard.ProgressCount := 0
+
+				if !isDebug()
+					showSplashScreen("Rotating Brain")
+
+				showProgress({color: "Blue", title: translate("Initializing Setup Wizard"), message: translate("")})
+			}
+			else
+				break
 		}
-		else
-			break
+	}
+	catch Any as exception {
+		logError(exception, true)
+
+		OnMessage(0x44, translateOkButton)
+		MsgBox(substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Simulator Setup"}), translate("Error"), 262160)
+		OnMessage(0x44, translateOkButton, 0)
+
+		ExitApp(1)
 	}
 }
 
@@ -3321,15 +3332,4 @@ catch Any as e {
 ;;;                       Initialization Section Part 2                     ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-try {
-	startupSimulatorSetup()
-}
-catch Any as e {
-	logError(e, true)
-
-	OnMessage(0x44, translateOkButton)
-	MsgBox(substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Simulator Setup"}), translate("Error"), 262160)
-	OnMessage(0x44, translateOkButton, 0)
-
-	ExitApp(1)
-}
+startupSimulatorSetup()

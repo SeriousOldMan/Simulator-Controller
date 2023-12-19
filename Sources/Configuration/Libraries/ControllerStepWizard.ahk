@@ -127,6 +127,9 @@ class ControllerStepWizard extends StepWizard {
 				}
 			}
 
+			removeMultiMapValue(configuration, "Controller Layouts", "Button Boxes")
+			removeMultiMapValue(configuration, "Controller Layouts", "Stream Decks")
+
 			if (buttonBoxControllers.Length > 0) {
 				loop buttonBoxControllers.Length
 					buttonBoxControllers[A_Index] := (buttonBoxControllers[A_Index] . ":" . buttonBoxControllers[A_Index])

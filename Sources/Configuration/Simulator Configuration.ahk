@@ -491,40 +491,49 @@ initializeSimulatorConfiguration() {
 	TraySetIcon(icon, "1")
 	A_IconTip := "Simulator Configuration"
 
-	kConfigurationEditor := true
+	try {
+		kConfigurationEditor := true
 
-	protectionOn()
+		protectionOn()
 
-	if !exitProcesses("Configuration", "Before you can work on the configuration, other Simulator Controller applications must be closed."
-					, false, "CANCEL", ["Simulator Configuration", "Simulator Startup", "Simulator Tools"])
-		ExitApp(0)
+		if !exitProcesses("Configuration", "Before you can work on the configuration, other Simulator Controller applications must be closed."
+						, false, "CANCEL", ["Simulator Configuration", "Simulator Startup", "Simulator Tools"])
+			ExitApp(0)
 
-	if GetKeyState("Ctrl")
-		Sleep(2000)
+		if GetKeyState("Ctrl")
+			Sleep(2000)
 
-	if (GetKeyState("Ctrl") && GetKeyState("Shift")) {
-		OnMessage(0x44, translateYesNoButtons)
-		msgResult := MsgBox(translate("Do you really want to start with a fresh configuration?"), translate("Configuration"), 262436)
-		OnMessage(0x44, translateYesNoButtons, 0)
+		if (GetKeyState("Ctrl") && GetKeyState("Shift")) {
+			OnMessage(0x44, translateYesNoButtons)
+			msgResult := MsgBox(translate("Do you really want to start with a fresh configuration?"), translate("Configuration"), 262436)
+			OnMessage(0x44, translateYesNoButtons, 0)
 
-		if (msgResult = "Yes")
-			initialize := true
+			if (msgResult = "Yes")
+				initialize := true
+			else
+				initialize := false
+		}
 		else
 			initialize := false
-	}
-	else
-		initialize := false
 
-	try {
-		ConfigurationEditor(FileExist("C:\Program Files\AutoHotkey") || GetKeyState("Ctrl")
-						 || (getMultiMapValue(kSimulatorConfiguration, "Configuration", "AHK Path", "") != "")
-						  , initialize ? newMultiMap() : kSimulatorConfiguration)
+		try {
+			ConfigurationEditor(FileExist("C:\Program Files\AutoHotkey") || GetKeyState("Ctrl")
+							 || (getMultiMapValue(kSimulatorConfiguration, "Configuration", "AHK Path", "") != "")
+							  , initialize ? newMultiMap() : kSimulatorConfiguration)
+		}
+		finally {
+			protectionOff()
+		}
 	}
-	finally {
-		protectionOff()
-	}
+	catch Any as exception {
+		logError(exception, true)
 
-	return
+		OnMessage(0x44, translateOkButton)
+		MsgBox(substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Simulator Configuration"}), translate("Error"), 262160)
+		OnMessage(0x44, translateOkButton, 0)
+
+		ExitApp(1)
+	}
 }
 
 startupSimulatorConfiguration() {
@@ -558,47 +567,58 @@ startupSimulatorConfiguration() {
 		kSimulatorConfiguration := configuration
 	}
 
-	editor.createGui(editor.Configuration)
-
-	done := false
-	saved := false
-
-	editor.show()
-
-	startupApplication()
-
 	try {
-		loop {
-			Sleep(200)
+		editor.createGui(editor.Configuration)
 
-			result := editor.Result
+		done := false
+		saved := false
 
-			if (result == kApply) {
-				saved := true
+		editor.show()
 
-				editor.Result := false
+		startupApplication()
 
-				saveConfiguration(kSimulatorConfigurationFile, editor)
+		try {
+			loop {
+				Sleep(200)
+
+				result := editor.Result
+
+				if (result == kApply) {
+					saved := true
+
+					editor.Result := false
+
+					saveConfiguration(kSimulatorConfigurationFile, editor)
+				}
+				else if (result == kCancel)
+					done := true
+				else if (result == kOk) {
+					saved := true
+					done := true
+
+					saveConfiguration(kSimulatorConfigurationFile, editor)
+				}
 			}
-			else if (result == kCancel)
-				done := true
-			else if (result == kOk) {
-				saved := true
-				done := true
-
-				saveConfiguration(kSimulatorConfigurationFile, editor)
-			}
+			until done
 		}
-		until done
-	}
-	finally {
-		editor.hide()
-	}
+		finally {
+			editor.hide()
+		}
 
-	if saved
+		if saved
+			ExitApp(1)
+		else
+			ExitApp(0)
+	}
+	catch Any as exception {
+		logError(exception, true)
+
+		OnMessage(0x44, translateOkButton)
+		MsgBox(substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Simulator Configuration"}), translate("Error"), 262160)
+		OnMessage(0x44, translateOkButton, 0)
+
 		ExitApp(1)
-	else
-		ExitApp(0)
+	}
 }
 
 
@@ -606,18 +626,7 @@ startupSimulatorConfiguration() {
 ;;;                       Initialization Section Part 1                     ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-try {
-	initializeSimulatorConfiguration()
-}
-catch Any as e {
-	logError(e, true)
-
-	OnMessage(0x44, translateOkButton)
-	MsgBox(substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Simulator Configuration"}), translate("Error"), 262160)
-	OnMessage(0x44, translateOkButton, 0)
-
-	ExitApp(1)
-}
+initializeSimulatorConfiguration()
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -632,15 +641,4 @@ catch Any as e {
 ;;;                       Initialization Section Part 2                     ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-try {
-	startupSimulatorConfiguration()
-}
-catch Any as e {
-	logError(e, true)
-
-	OnMessage(0x44, translateOkButton)
-	MsgBox(substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Simulator Configuration"}), translate("Error"), 262160)
-	OnMessage(0x44, translateOkButton, 0)
-
-	ExitApp(1)
-}
+startupSimulatorConfiguration()

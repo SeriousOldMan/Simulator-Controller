@@ -1,3 +1,6 @@
+## 5.5.1.1-release 12/19/23
+  1. Fixed a critical bug in the telemetry providers for rFactor 2.
+
 ## 5.5.1.0-release 12/15/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

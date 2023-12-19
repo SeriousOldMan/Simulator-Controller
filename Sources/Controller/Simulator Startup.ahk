@@ -194,7 +194,7 @@ class SimulatorStartup extends ConfigurationItem {
 	}
 
 	startSimulatorController() {
-		local title, exePath, pid, ignore, tool, startup
+		local title, exePath, pid, ignore, tool, startup, profile
 
 		try {
 			logMessage(kLogInfo, translate("Starting ") . translate("Simulator Controller"))
@@ -214,15 +214,37 @@ class SimulatorStartup extends ConfigurationItem {
 			Run(exePath, kBinariesDirectory, , &pid)
 
 			if FileExist(kUserConfigDirectory . "Startup.settings") {
-				startup := (" -Startup `"" . kUserConfigDirectory . "Startup.settings`"")
+				profile := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Startup.settings"), "Profiles", "Profile", false)
 
-				for ignore, tool in string2Values(",", getMultiMapValue(readMultiMap(kUserConfigDirectory . "Startup.settings"), "Session", "Tools", ""))
-					try {
-						Run(kBinariesDirectory . tool . ".exe" . startup, kBinariesDirectory)
+				if profile {
+					showProgress({color: "Blue", message: translate("Loading profile ") . profile . translate("..."), title: translate("Preparing startup profile")})
+
+					loop 50 {
+						showProgress({progress: A_Index})
+
+						Sleep 50
 					}
-					catch Any as exception {
-						logError(exception)
+
+					showProgress({color: "Green", message: translate("Applying profile ") . profile . translate("...")})
+
+					loop 50 {
+						showProgress({progress: A_Index})
+
+						Sleep 50
 					}
+
+					startup := (" -Startup `"" . kUserConfigDirectory . "Startup.settings`"")
+
+					for ignore, tool in string2Values(",", getMultiMapValue(readMultiMap(kUserConfigDirectory . "Startup.settings"), "Session", "Tools", ""))
+						try {
+							Run(kBinariesDirectory . tool . ".exe" . startup, kBinariesDirectory)
+						}
+						catch Any as exception {
+							logError(exception)
+						}
+				}
+				else
+					startup := ""
 			}
 			else
 				startup := ""
@@ -1634,7 +1656,7 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 		settingsTab.UseTab(2)
 
 		profilesEditorGui.Add("Text", "x" . (x0 + 8) . " ys+36 w90 h23 +0x200", translate("Credentials"))
-		profilesEditorGui.Add("DropDownList", "x" . x1 . " yp w" . w3 . " vprofileCredentialsDropDown", collect(["Save with Profile", "Load from Settings"], translate)).OnEvent("Change", launchProfilesEditor.Bind("Update State"))
+		profilesEditorGui.Add("DropDownList", "x" . x1 . " yp w" . w3 . " vprofileCredentialsDropDown", collect(["Load from Profile", "Load from Settings"], translate)).OnEvent("Change", launchProfilesEditor.Bind("Update State"))
 
 		profilesEditorGui.Add("Button", "x" . ((x0 + 8) + 240) . " yp-1 w23 h23 Center +0x200 vprofileTeamButton").OnEvent("Click", launchProfilesEditor.Bind(kEvent, "ManageDriver"))
 		setButtonIcon(profilesEditorGui["profileTeamButton"], kIconsDirectory . "Pencil.ico", 1, "L4 T4 R4 B4")
@@ -1662,7 +1684,7 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 
 		profilesEditorGui.Add("Text", "x8 ys+190 w408 0x10")
 
-		profilesEditorGui.Add("Button", "Default X120 YP+10 w80 vsaveButton", translate("Save")).OnEvent("Click", launchProfilesEditor.Bind(kSave))
+		profilesEditorGui.Add("Button", "Default X130 YP+10 w80 vsaveButton", translate("Save")).OnEvent("Click", launchProfilesEditor.Bind(kSave))
 		profilesEditorGui.Add("Button", "X+10 w80", translate("&Cancel")).OnEvent("Click", launchProfilesEditor.Bind(kCancel))
 
 		loadProfiles()

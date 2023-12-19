@@ -260,7 +260,7 @@ class SimulatorStartup extends ConfigurationItem {
 			if this.Canceled
 				break
 
-			startSimulator := (startSimulator || GetKeyState("MButton")))
+			startSimulator := (startSimulator || GetKeyState("MButton"))
 
 			if getMultiMapValue(this.Settings, section, component, false) {
 				if !kSilentMode

@@ -229,89 +229,91 @@ class StreamDeck extends FunctionController {
 
 		layout := string2Values("x", getMultiMapValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Layout, "Layout"), ""))
 
-		this.iRows := layout[1]
-		this.iColumns := layout[2]
+		if (layout.Length > 1) {
+			this.iRows := layout[1]
+			this.iColumns := layout[2]
 
-		loop {
-			special := getMultiMapValue(configuration, "Icons", this.Layout . ".Icon.Mode." . A_Index, kUndefined)
+			loop {
+				special := getMultiMapValue(configuration, "Icons", this.Layout . ".Icon.Mode." . A_Index, kUndefined)
 
-			if (special == kUndefined)
-				break
-			else {
-				special := string2values(";", special)
+				if (special == kUndefined)
+					break
+				else {
+					special := string2values(";", special)
 
-				this.iModes[special[1]] := special[2]
+					this.iModes[special[1]] := special[2]
+				}
 			}
-		}
 
-		rows := []
+			rows := []
 
-		loop this.Rows {
-			row := string2Values(";", getMultiMapValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Layout, A_Index), ""))
+			loop this.Rows {
+				row := string2Values(";", getMultiMapValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Layout, A_Index), ""))
 
-			for ignore, function in row
-				if (function != "") {
-					this.Functions.Push(function)
+				for ignore, function in row
+					if (function != "") {
+						this.Functions.Push(function)
 
-					icon := getMultiMapValue(configuration, "Buttons", this.Layout . "." . function . ".Icon", true)
-					label := getMultiMapValue(configuration, "Buttons", this.Layout . "." . function . ".Label", true)
-					mode := getMultiMapValue(configuration, "Buttons", this.Layout . "." . function . ".Mode", kIconOrLabel)
+						icon := getMultiMapValue(configuration, "Buttons", this.Layout . "." . function . ".Icon", true)
+						label := getMultiMapValue(configuration, "Buttons", this.Layout . "." . function . ".Label", true)
+						mode := getMultiMapValue(configuration, "Buttons", this.Layout . "." . function . ".Mode", kIconOrLabel)
 
-					isRunning := this.isRunning()
+						isRunning := this.isRunning()
 
-					if isRunning {
-						this.setFunctionTitle(function, "")
-						this.setFunctionImage(function, "clear")
-					}
+						if isRunning {
+							this.setFunctionTitle(function, "")
+							this.setFunctionImage(function, "clear")
+						}
 
-					if (mode != kIconOrLabel) {
-						this.iModes[function] := mode
-					}
+						if (mode != kIconOrLabel) {
+							this.iModes[function] := mode
+						}
 
-					if (icon != true) {
-						this.iIcons[function] := icon
+						if (icon != true) {
+							this.iIcons[function] := icon
 
-						if (icon && (icon != "") && isRunning)
-							this.setControlIcon(function, icon)
-					}
+							if (icon && (icon != "") && isRunning)
+								this.setControlIcon(function, icon)
+						}
 
-					if (label != true) {
-						this.iLabels[function] := label
+						if (label != true) {
+							this.iLabels[function] := label
 
-						if (label && isRunning)
-							this.setControlLabel(function, label)
-					}
+							if (label && isRunning)
+								this.setControlLabel(function, label)
+						}
 
-					loop {
-						special := getMultiMapValue(configuration, "Buttons", this.Layout . "." . function . ".Mode.Icon." . A_Index, kUndefined)
+						loop {
+							special := getMultiMapValue(configuration, "Buttons", this.Layout . "." . function . ".Mode.Icon." . A_Index, kUndefined)
 
-						if (special == kUndefined)
-							break
-						else {
-							special := string2values(";", special)
+							if (special == kUndefined)
+								break
+							else {
+								special := string2values(";", special)
 
-							this.iModes[function . "." . special[1]] := special[2]
+								this.iModes[function . "." . special[1]] := special[2]
+							}
+						}
+
+						switch ConfigurationItem.splitDescriptor(function)[1], false {
+							case k1WayToggleType:
+								num1WayToggles += 1
+							case k2WayToggleType:
+								num2WayToggles += 1
+							case kButtonType:
+								numButtons += 1
+							case kDialType:
+								numDials += 1
+							default:
+								throw "Unknown controller function type (" . ConfigurationItem.splitDescriptor(function)[1] . ") detected in StreamDeck.loadFromConfiguration..."
 						}
 					}
 
-					switch ConfigurationItem.splitDescriptor(function)[1], false {
-						case k1WayToggleType:
-							num1WayToggles += 1
-						case k2WayToggleType:
-							num2WayToggles += 1
-						case kButtonType:
-							numButtons += 1
-						case kDialType:
-							numDials += 1
-						default:
-							throw "Unknown controller function type (" . ConfigurationItem.splitDescriptor(function)[1] . ") detected in StreamDeck.loadFromConfiguration..."
-					}
-				}
+				rows.Push(row)
+			}
 
-			rows.Push(row)
+			this.iRowDefinitions := rows
 		}
-
-		this.iRowDefinitions := rows
 
 		this.setControls(num1WayToggles, num2WayToggles, numButtons, numDials)
 	}
@@ -630,7 +632,12 @@ initializeStreamDeckPlugin() {
 	for ignore, strmDeck in string2Values("|", getMultiMapValue(controller.Configuration, "Controller Layouts", "Stream Decks", "")) {
 		strmDeck := string2Values(":", strmDeck)
 
-		StreamDeck(strmDeck[1], strmDeck[2], controller, configuration)
+		try {
+			StreamDeck(strmDeck[1], strmDeck[2], controller, configuration)
+		}
+		catch Any as exception {
+			logError(exception, true)
+		}
 	}
 
 	registerMessageHandler("Stream Deck", handleStreamDeckMessage)

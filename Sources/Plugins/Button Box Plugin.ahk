@@ -118,29 +118,30 @@ class GridButtonBox extends ButtonBox {
 
 		layout := string2Values(",", getMultiMapValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Layout, "Layout"), ""))
 
-		if (layout.Length > 1)
+		if (layout.Length > 1) {
 			this.iRowMargin := layout[2]
 
-		if (layout.Length > 2)
-			this.iColumnMargin := layout[3]
+			if (layout.Length > 2)
+				this.iColumnMargin := layout[3]
 
-		if (layout.Length > 3)
-			this.iSidesMargin := layout[4]
+			if (layout.Length > 3)
+				this.iSidesMargin := layout[4]
 
-		if (layout.Length > 4)
-			this.iBottomMargin := layout[5]
+			if (layout.Length > 4)
+				this.iBottomMargin := layout[5]
 
-		layout := string2Values("x", layout[1])
+			layout := string2Values("x", layout[1])
 
-		this.iRows := layout[1]
-		this.iColumns := layout[2]
+			this.iRows := layout[1]
+			this.iColumns := layout[2]
 
-		rows := []
+			rows := []
 
-		loop this.Rows
-			rows.Push(string2Values(";", getMultiMapValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Layout, A_Index), ""), false, WeakArray))
+			loop this.Rows
+				rows.Push(string2Values(";", getMultiMapValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Layout, A_Index), ""), false, WeakArray))
 
-		this.iRowDefinitions := rows
+			this.iRowDefinitions := rows
+		}
 	}
 
 	createGui() {
@@ -351,7 +352,7 @@ controlEvent(window, control, *) {
 	local function, x, y, descriptor
 
 	MouseGetPos(&x, &y)
-			
+
 	x := screen2Window(x)
 	y := screen2Window(y)
 
@@ -359,7 +360,7 @@ controlEvent(window, control, *) {
 
 	if function {
 		MouseGetPos(&x, &y)
-			
+
 		x := screen2Window(x)
 		y := screen2Window(y)
 
@@ -387,7 +388,12 @@ initializeButtonBoxPlugin() {
 		btnBox := string2Values(":", btnBox)
 
 		if getMultiMapValue(configuration, "Layouts", btnBox[2] . ".Visible", true)
-			GridButtonBox(btnBox[1], btnBox[2], controller, configuration)
+			try {
+				GridButtonBox(btnBox[1], btnBox[2], controller, configuration)
+			}
+			catch Any as exception {
+				logError(exception, true)
+			}
 	}
 }
 

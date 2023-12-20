@@ -1508,6 +1508,9 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 			}
 		}
 
+		if profilesListView.GetNext()
+			profilesListView.Modify(profilesListView.GetNext(), "", profilesEditorGui["profileNameEdit"].Text, profilesEditorGui["profileModeDropDown"].Text)
+
 		profilesEditorGui["addProfileButton"].Enabled := true
 		profilesEditorGui["profilesUploadButton"].Enabled := true
 		profilesEditorGui["profilesDownloadButton"].Enabled := (profilesListView.GetCount() > 1)
@@ -1690,7 +1693,7 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 		setButtonIcon(profilesEditorGui["deleteProfileButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 
 		profilesEditorGui.Add("Text", "x" . x0 . " yp+30 w90 h23 +0x200", translate("Name"))
-		profilesEditorGui.Add("Edit", "x" . x1 . " yp+1 w" . (392 - (x1 - x0)) . " vprofileNameEdit")
+		profilesEditorGui.Add("Edit", "x" . x1 . " yp+1 w" . (392 - (x1 - x0)) . " vprofileNameEdit").OnEvent("Change", launchProfilesEditor.Bind("Update State"))
 
 		profilesEditorGui.Add("Text", "x" . x0 . " yp+24 w90 h23 +0x200", translate("Mode"))
 		profilesEditorGui.Add("DropDownList", "x" . x1 . " yp+1 w" . w3 . " vprofileModeDropDown", collect(hasTeamServer ? ["Solo", "Team"] : ["Solo"], translate)).OnEvent("Change", launchProfilesEditor.Bind("Update State"))

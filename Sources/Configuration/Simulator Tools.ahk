@@ -1647,6 +1647,22 @@ updateInstallationForV500() {
 	}
 }
 
+updateConfigurationForV552() {
+	local configuration, subtitle
+
+	if FileExist(kUserConfigDirectory . "Simulator Configuration.ini") {
+		configuration := readMultiMap(kUserConfigDirectory . "Simulator Configuration.ini")
+
+		subtitle := getMultiMapValue(configuration, "Splash Window", "Subtitle", false)
+
+		if subtitle {
+			setMultiMapValue(configuration, "Splash Window", "Subtitle", StrReplace(subtitle, "2023", "2024"))
+
+			writeMultiMap(kUserConfigDirectory . "Simulator Configuration.ini", configuration)
+		}
+	}
+}
+
 updateConfigurationForV541() {
 	local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 	local deleted := []

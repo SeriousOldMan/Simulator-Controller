@@ -1,9 +1,9 @@
 [Development]
 Version=5.5.1.2-dev
 Target=5.5.1.2-release
-Date=12/19/2023
-Download=
-Changes=The Strategist behaves more consistent in autonomy mode when no valid strategy can be computed, Fixed permission in AWS repository access, Introduced startup error handling in all applications, Removed controller binding artefacts for removed controllers
+Date=12/20/2023
+Download=https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.5.1.2-dev.zip
+Changes=The Strategist behaves more consistent in autonomy mode when no valid strategy can be computed, Fixed permission in AWS repository access, Introduced startup error handling in all applications, Removed controller binding artefacts for removed controllers, Fixed unknown tyre compound handling
 Components=Media->5.3.0,Configuration->5.4.8,Utilities->5.4.8
 [Release]
 Version=5.5.1.1-release

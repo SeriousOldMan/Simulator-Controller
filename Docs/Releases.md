@@ -5,6 +5,9 @@
   4. Fixed a couple of permission errors when accessing the installation and update download repository in the Amazon cloud.
   5. Controller binding artefacts are now handled correctly for controllers that have been removed from the configuration.
   6. Introduced special handling for errors raised during application startup.
+  7. New car models for "Setup Workbench":
+     - Assetto Corsa
+       - BMW M1
 
 ## 5.5.1.1-release 12/19/23
   1. Fixed a critical bug in the telemetry providers for rFactor 2.

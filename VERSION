@@ -1,9 +1,9 @@
 [Development]
 Version=5.5.1.2-dev
 Target=5.5.1.2-release
-Date=12/19/2023
+Date=12/20/2023
 Download=
-Changes=The Strategist behaves more consistent in autonomy mode when no valid strategy can be computed, Fixed permission in AWS repository access, Introduced startup error handling in all applications, Removed controller binding artefacts for removed controllers
+Changes=The Strategist behaves more consistent in autonomy mode when no valid strategy can be computed, Fixed permission in AWS repository access, Introduced startup error handling in all applications, Removed controller binding artefacts for removed controllers, New car models for "Setup Workbench"
 Components=Media->5.3.0,Configuration->5.4.8,Utilities->5.4.8
 [Release]
 Version=5.5.1.1-release

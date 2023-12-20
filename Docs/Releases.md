@@ -15,6 +15,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   4. Fixed a couple of permission errors when accessing the installation and update download repository in the Amazon cloud.
   5. Controller binding artefacts are now handled correctly for controllers that have been removed from the configuration.
   6. Introduced special handling for errors raised during application startup.
+  7. Fixed handling of unknown tyre compound for any simulator. Unknown tyre compounds are now mapped always to "Dry (Black)".
 
 ## 5.5.1.1-release 12/19/23
   1. Fixed a critical bug in the telemetry providers for rFactor 2.

@@ -5,7 +5,8 @@
   4. Fixed a couple of permission errors when accessing the installation and update download repository in the Amazon cloud.
   5. Controller binding artefacts are now handled correctly for controllers that have been removed from the configuration.
   6. Introduced special handling for errors raised during application startup.
-  7. New car models for "Setup Workbench":
+  7. Fixed handling of unknown tyre compound for any simulator. Unknown tyre compounds are now mapped always to "Dry (Black)".
+  8. New car models for "Setup Workbench":
      - Assetto Corsa
        - BMW M1
 

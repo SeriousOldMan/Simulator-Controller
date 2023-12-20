@@ -778,7 +778,7 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 	local checkedRows, checked, settingsTab, first
 	local profile, plugin, pluginConfiguration, ignore, lastModified, configuration
 	local hasTeamServer, dllFile, connection
-	local names, exception, chosen
+	local names, exception, chosen, fileName, selected, translator, msgResult
 
 	static profiles
 	static activeAssistants
@@ -886,11 +886,12 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 		return sessions
 	}
 
-	loadProfiles() {
-		local settings := readMultiMap(kUserConfigDirectory . "Startup.settings")
+	loadProfiles(fileName := false, delete := true) {
+		local settings := readMultiMap(fileName ? fileName : (kUserConfigDirectory . "Startup.settings"))
 		local ignore, profile, name, assistant, property
 
-		profiles := []
+		if delete
+			profiles := []
 
 		for ignore, name in string2Values(";|;", getMultiMapValue(settings, "Profiles", "Profiles", "")) {
 			profile := CaseInsenseMap("Name", name
@@ -935,12 +936,15 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 			profilesListView.ModifyCol(A_Index, "AutoHdr")
 	}
 
-	saveProfiles() {
+	saveProfiles(fileName := false, theProfiles?, checked?) {
 		local settings := newMultiMap()
 		local activeProfiles := []
 		local ignore, profile, assistant, property, name
 
-		for ignore, profile in profiles {
+		if !isSet(theProfiles)
+			theProfiles := profiles
+
+		for ignore, profile in theProfiles {
 			name := profile["Name"]
 
 			activeProfiles.Push(name)
@@ -965,13 +969,10 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 
 		setMultiMapValue(settings, "Profiles", "Profiles", values2String(";|;", activeProfiles*))
 
-		if checkedProfile
-			setMultiMapValue(settings, "Profiles", "Profile", profiles[checkedProfile - 1]["Name"])
+		if ((!isSet(checked) || checked) && checkedProfile) {
+			profile := theProfiles[checkedProfile - 1]
 
-		profile := profilesListView.GetNext(0, "C")
-
-		if (profile > 1) {
-			profile := profiles[profile - 1]
+			setMultiMapValue(settings, "Profiles", "Profile", profile["Name"])
 
 			setMultiMapValue(settings, "Session", "Mode", profile["Mode"])
 			setMultiMapValue(settings, "Session", "Tools", profile["Tools"])
@@ -990,7 +991,7 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 					setMultiMapValue(settings, "Team Session", property, profile[property])
 		}
 
-		writeMultiMap(kUserConfigDirectory . "Startup.settings", settings)
+		writeMultiMap(fileName ? fileName : (kUserConfigDirectory . "Startup.settings"), settings)
 	}
 
 	newProfile() {
@@ -1117,7 +1118,63 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 	else if (launchPadOrCommand == kCancel)
 		done := kCancel
 	else if (launchPadOrCommand == kEvent) {
-		if (arguments[1] = "ProfileNew") {
+		if (arguments[1] = "ProfilesUpload") {
+			if (selectedProfile > 1)
+				launchProfilesEditor(kEvent, "ProfileSave")
+
+			profilesEditorGui.Opt("+OwnDialogs")
+
+			OnMessage(0x44, translateLoadCancelButtons)
+			fileName := FileSelect(1, "", translate("Import Profiles..."), "Profiles (*.profiles)")
+			OnMessage(0x44, translateLoadCancelButtons, 0)
+
+			if (fileName != "")
+				if (profiles.Length > 0) {
+					translator := translateMsgBoxButtons.Bind(["Insert", "Replace", "Cancel"])
+
+					OnMessage(0x44, translator)
+					msgResult := MsgBox(translate("Do you want to replace all current entries or do you want to add the imported entries to the list?"), translate("Import"), 262179)
+					OnMessage(0x44, translator, 0)
+
+					if (msgResult = "Cancel")
+						return
+
+					if (msgResult = "Yes")
+						loadProfiles(fileName, false)
+
+					if (msgResult = "No")
+						loadProfiles(fileName, true)
+				}
+				else
+					loadProfiles(fileName, false)
+
+			launchProfilesEditor("Update State")
+		}
+		else if (arguments[1] = "ProfilesDownload") {
+			if (selectedProfile > 1)
+				launchProfilesEditor(kEvent, "ProfileSave")
+
+			profilesEditorGui.Opt("+OwnDialogs")
+
+			selected := GetKeyState("Ctrl", "P")
+
+			if (selected && !selectedProfile)
+				return
+
+			OnMessage(0x44, translateSaveCancelButtons)
+			fileName := FileSelect("S17", "", translate("Export Profiles..."), "Profiles (*.profiles)")
+			OnMessage(0x44, translateSaveCancelButtons, 0)
+
+			if (fileName != "") {
+				if !InStr(fileName, ".profiles")
+					fileName := (fileName . ".profiles")
+
+				saveProfiles(fileName, selected ? [profiles[selectedProfile - 1]] : profiles, false)
+			}
+
+			launchProfilesEditor("Update State")
+		}
+		else if (arguments[1] = "ProfileNew") {
 			if (selectedProfile > 1)
 				launchProfilesEditor(kEvent, "ProfileSave")
 
@@ -1452,6 +1509,8 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 		}
 
 		profilesEditorGui["addProfileButton"].Enabled := true
+		profilesEditorGui["profilesUploadButton"].Enabled := true
+		profilesEditorGui["profilesDownloadButton"].Enabled := (profilesListView.GetCount() > 1)
 
 		if (profilesListView.GetNext() > 1) {
 			profilesEditorGui["deleteProfileButton"].Enabled := true
@@ -1620,7 +1679,12 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 		profilesListView.OnEvent("DoubleClick", chooseProfile)
 		profilesListView.OnEvent("ItemCheck", chooseProfile)
 
-		profilesEditorGui.Add("Button", "x" . x5 . " yp+150 w23 h23 X:Move Y:Move Center +0x200 vaddProfileButton").OnEvent("Click", launchProfilesEditor.Bind(kEvent, "ProfileNew"))
+		profilesEditorGui.Add("Button", "x" . (x5 - 52) . " yp+150 w23 h23 Center +0x200 vprofilesUploadButton").OnEvent("Click", launchProfilesEditor.Bind(kEvent, "ProfilesUpload"))
+		setButtonIcon(profilesEditorGui["profilesUploadButton"], kIconsDirectory . "Upload.ico", 1, "L4 T4 R4 B4")
+		profilesEditorGui.Add("Button", "x" . (x5 - 28) . " yp w23 h23 Center +0x200 vprofilesDownloadButton").OnEvent("Click", launchProfilesEditor.Bind(kEvent, "ProfilesDownload"))
+		setButtonIcon(profilesEditorGui["profilesDownloadButton"], kIconsDirectory . "Download.ico", 1, "L4 T4 R4 B4")
+
+		profilesEditorGui.Add("Button", "x" . x5 . " yp w23 h23 X:Move Y:Move Center +0x200 vaddProfileButton").OnEvent("Click", launchProfilesEditor.Bind(kEvent, "ProfileNew"))
 		setButtonIcon(profilesEditorGui["addProfileButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
 		profilesEditorGui.Add("Button", "x" . x6 . " yp w23 h23 X:Move Y:Move Center +0x200 vdeleteProfileButton").OnEvent("Click", launchProfilesEditor.Bind(kEvent, "ProfileDelete"))
 		setButtonIcon(profilesEditorGui["deleteProfileButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")

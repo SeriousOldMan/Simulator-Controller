@@ -184,6 +184,7 @@ Driving Coach Configuration.5=%kGrammarsDirectory%Driving Coach.grammars.de <- %
 Driving Coach Configuration.6=%kGrammarsDirectory%Driving Coach.grammars.es <- %kSourcesDirectory%Assistants\Grammars\Driving Coach.grammars.es
 Driving Coach Configuration.7=%kGrammarsDirectory%Driving Coach.grammars.fr <- %kSourcesDirectory%Assistants\Grammars\Driving Coach.grammars.fr
 Driving Coach Configuration.8=%kBinariesDirectory%LLM Runtime\ <- %kSourcesDirectory%Special\LLM Runtime\*.*
+Driving Coach Configuration.9=%kResourcesDirectory%Translations\ <- %kSourcesDirectory%Assistants\Instructions\*.*
 Team Server.1=%kBinariesDirectory%Connectors\Team Server Connector.dll <- %kSourcesDirectory%Special\Team Server\Release\\net471\Team Server Connector.dll
 Team Server.2=%kBinariesDirectory%Connectors\Data Store Connector.dll <- %kSourcesDirectory%Special\Team Server\Release\\net471\Data Store Connector.dll
 Team Server.3=%kBinariesDirectory%Team Server <- %kSourcesDirectory%Special\Team Server\Release\\net6.0

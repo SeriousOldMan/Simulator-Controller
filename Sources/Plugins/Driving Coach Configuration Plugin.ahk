@@ -241,20 +241,35 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 
 	initializeInstructions(provider, model, setting, edit := false) {
 		local providerConfiguration := this.iProviderConfigurations[provider]
-		local language, value
+		local language, value, instructions
 
-		static templates := readMultiMap(kResourcesDirectory . "Templates\Driving Coach.instructions")
+		static templates := false
+
+		if !templates {
+			templates := CaseInsenseMap()
+
+			for code, language in availableLanguages() {
+				fileName := getFileName("Driving Coach.instructions." . code, kUserTranslationsDirectory, kTranslationsDirectory)
+
+				if FileExist(fileName)
+					templates[code] := readMultiMap(fileName)
+			}
+		}
 
 		value := (edit ? this.Value[setting] : providerConfiguration[setting])
 
 		if (value = "") {
-			language := (isSet(SetupWizard) ? SetupWizard.Instance.getModuleValue("Driving Coach", "Language", getLanguage())
-											: getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Language", getLanguage()))
+			if isSet(SetupWizard)
+				language := SetupWizard.Instance.getModuleValue("Driving Coach", "Language", getLanguage())
+			else if isSet(VoiceControlConfigurator)
+				language := VoiceControlConfigurator.Instance.getCurrentLanguage()
+			else
+				language := getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Language", getLanguage())
 
 			if edit
-				this.Value[setting] := getMultiMapValue(templates, language, setting, getMultiMapValue(templates, "EN", setting, ""))
+				this.Value[setting] := getMultiMapValue(templates[templates.Has(language) ? language : "EN"], "Instructions", StrReplace(setting, "Instructions.", ""))
 			else
-				providerConfiguration[setting] := getMultiMapValue(templates, language, setting, getMultiMapValue(templates, "EN", setting, ""))
+				providerConfiguration[setting] := getMultiMapValue(templates[templates.Has(language) ? language : "EN"], "Instructions", StrReplace(setting, "Instructions.", ""))
 		}
 	}
 

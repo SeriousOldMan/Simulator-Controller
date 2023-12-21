@@ -780,14 +780,21 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 	local dllFile, connection
 	local names, exception, chosen, fileName, selected, translator, msgResult
 
+	static done := false
+
+	static hasTeamServer := false
+	static hasRaceSpotter := false
+	static hasChassisVibration := false
+	static hasPedalVibration := false
+	static hasMotionFeedback := false
+
 	static profiles
+	static functions
 	static activeAssistants
 
 	static profilesEditorGui
 	static profilesListView
-
-	static hasTeamServer := false
-	static done := false
+	static functionsListView
 
 	static selectedProfile := false
 	static checkedProfile := false
@@ -889,7 +896,7 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 
 	loadProfiles(fileName := false, delete := true) {
 		local settings := readMultiMap(fileName ? fileName : (kUserConfigDirectory . "Startup.settings"))
-		local ignore, profile, name, assistant, property
+		local ignore, profile, name, assistant, property, function
 
 		if delete
 			profiles := []
@@ -917,6 +924,9 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 				}
 			}
 
+			for ignore, function in functions
+				profile["Function." . function] := getMultiMapValue(settings, "Profiles", "Function." . function, false)
+
 			profiles.Push(profile)
 		}
 
@@ -943,7 +953,7 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 	saveProfiles(fileName := false, theProfiles?, checked?) {
 		local settings := newMultiMap()
 		local activeProfiles := []
-		local ignore, profile, assistant, property, name
+		local ignore, profile, assistant, property, name, function
 
 		if !isSet(theProfiles)
 			theProfiles := profiles
@@ -969,6 +979,10 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 										   , "Driver.Name", "Driver.Identifier", "Session.Name", "Session.Identifier"]
 						setMultiMapValue(settings, "Profiles", name . "." . property, profile[property])
 			}
+
+			for ignore, function in functions
+				if profile.Has("Function." . function)
+					setMultiMapValue(settings, "Profiles", "Function." . function, profile["Function." . function])
 		}
 
 		setMultiMapValue(settings, "Profiles", "Profiles", values2String(";|;", activeProfiles*))
@@ -993,6 +1007,10 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 				for ignore, property in ["Server.URL", "Server.Token", "Team.Name", "Team.Identifier"
 									   , "Driver.Name", "Driver.Identifier", "Session.Name", "Session.Identifier"]
 					setMultiMapValue(settings, "Team Session", property, profile[property])
+
+			for ignore, function in functions
+				setMultiMapValue(settings, "Functions", function, profile.Has("Function." . function) && profile["Function." . function])
+
 		}
 
 		writeMultiMap(fileName ? fileName : (kUserConfigDirectory . "Startup.settings"), settings)
@@ -1023,6 +1041,8 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 	}
 
 	loadProfile(profile) {
+		local ignore, plugin, function, index
+
 		profilesEditorGui["profileNameEdit"].Text := profile["Name"]
 		profilesEditorGui["profileModeDropDown"].Value := Max(1, inList(hasTeamServer ? ["Solo", "Team"] : ["Solo"], profile["Mode"]))
 		profilesEditorGui["profilePitwallDropDown"].Value := (1 + inList(hasTeamServer ? ["Practice Center", "Race Center"] : ["Practice Center"], profile["Tools"]))
@@ -1064,9 +1084,17 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 				sessionIdentifier := profile["Session.Identifier"]
 			}
 		}
+
+		for index, function in functions
+			if profile.Has("Function." . function)
+				functionsListView.Modify(index, profile["Function." . function] ? "Check" : "-Check")
+			else
+				functionsListView.Modify(index, "-Check")
 	}
 
 	saveProfile(profile) {
+		local ignore, plugin, function, index
+
 		profile["Name"] := profilesEditorGui["profileNameEdit"].Text
 		profile["Mode"] :=  ["Solo", "Team"][profilesEditorGui["profileModeDropDown"].Value]
 		profile["Tools"] := ["", "Practice Center", "Race Center"][profilesEditorGui["profilePitwallDropDown"].Value]
@@ -1091,6 +1119,17 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 				profile["Session.Identifier"] := sessionIdentifier
 			}
 		}
+
+		for ignore, function in functions
+			profile["Function." . function] := false
+
+		index := functionsListView.GetNext(0, "C")
+
+		while index {
+			profile["Function." . functions[index]] := true
+
+			index := functionsListView.GetNext(index, "C")
+		}
 	}
 
 	chooseProfile(listView, line, *) {
@@ -1109,6 +1148,21 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 			selectedProfile := false
 
 		launchProfilesEditor("Update State")
+	}
+
+	chooseFunction(listView, line, *) {
+		if !selectedProfile
+			noCheck(listView)
+	}
+
+	noSelect(listView, *) {
+		loop listView.GetCount()
+			listView.Modify(A_Index, "-Select")
+	}
+
+	noCheck(listView, *) {
+		loop listView.GetCount()
+			listView.Modify(A_Index, "-Check")
 	}
 
 	if (launchPadOrCommand == kSave) {
@@ -1557,6 +1611,8 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 			}
 		}
 		else {
+			noCheck(functionsListView)
+
 			profilesEditorGui["deleteProfileButton"].Enabled := false
 
 			profilesEditorGui["profileNameEdit"].Enabled := false
@@ -1608,17 +1664,40 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 		done := false
 		selectedProfile := false
 		checkedProfile := false
+		keepAliveTask := false
 
+		functions := []
 		activeAssistants := []
 
 		configuration := getControllerState(true, true)
 
 		hasTeamServer := getMultiMapValue(configuration, "Plugins", "Team Server", false)
 
-		keepAliveTask := false
-
 		if hasTeamServer
 			hasTeamServer := string2Values("|", hasTeamServer)[1]
+
+		hasRaceSpotter := getMultiMapValue(configuration, "Plugins", "Race Spotter", false)
+
+		if hasRaceSpotter
+			hasRaceSpotter := string2Values("|", hasRaceSpotter)[1]
+
+		hasMotionFeedback := getMultiMapValue(configuration, "Plugins", "Motion Feedback", false)
+
+		if hasMotionFeedback
+			hasMotionFeedback := string2Values("|", hasMotionFeedback)[1]
+
+		hasChassisVibration := getMultiMapValue(configuration, "Plugins", "Tactile Feedback", false)
+
+		if (hasChassisVibration && string2Values("|", hasChassisVibration)[1]) {
+			hasChassisVibration := string2Values(",", string2Values("|", hasChassisVibration)[3])
+
+			hasPedalVibration := inList(hasChassisVibration, "Pedal Vibration")
+			hasChassisVibration := inList(hasChassisVibration, "Chassis Vibration")
+		}
+		else {
+			hasChassisVibration := false
+			hasPedalVibration := false
+		}
 
 		if hasTeamServer {
 			connector := false
@@ -1757,17 +1836,34 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 
 		settingsTab.UseTab(hasTeamServer ? 3 : 2)
 
-		profilesEditorGui.Add("Text", "x" . (x0 + 8) . " ys+36 w110 h23", translate("Track Automation"))
-		profilesEditorGui.Add("DropDownList", "x" . x1 . " yp-3 w" . w3 . " Choose2", collect(["Yes", "No"], translate))
+		functionsListView := profilesEditorGui.Add("ListView", "x" . (x0 + 8) . " ys+36 w372 h134 Checked -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Function"], translate))
+		functionsListView .OnEvent("Click", noSelect)
+		functionsListView .OnEvent("DoubleClick", noSelect)
+		functionsListView .OnEvent("ItemCheck", chooseFunction)
 
-		profilesEditorGui.Add("Text", "x" . (x0 + 8) . " yp+33 w110 h23", translate("Motion Feedback"))
-		profilesEditorGui.Add("DropDownList", "x" . x1 . " yp-3 w" . w3 . " Choose1", collect(["Yes", "No"], translate))
+		if hasRaceSpotter {
+			functions.Push("Track Automation")
 
-		profilesEditorGui.Add("Text", "x" . (x0 + 8) . " yp+33 w110 h23", translate("Chassis Vibration"))
-		profilesEditorGui.Add("DropDownList", "x" . x1 . " yp-3 w" . w3 . " Choose1", collect(["Yes", "No"], translate))
+			functionsListView.Add("", translate("Track Automation"))
+		}
 
-		profilesEditorGui.Add("Text", "x" . (x0 + 8) . " yp+27 w110 h23", translate("Pedal Vibration"))
-		profilesEditorGui.Add("DropDownList", "x" . x1 . " yp-3 w" . w3 . " Choose1", collect(["Yes", "No"], translate))
+		if hasMotionFeedback {
+			functions.Push("Motion")
+
+			functionsListView.Add("", translate("Motion"))
+		}
+
+		if hasPedalVibration {
+			functions.Push("Pedal Vibration")
+
+			functionsListView.Add("", translate("Pedal Vibration"))
+		}
+
+		if hasChassisVibration {
+			functions.Push("Chassis Vibration")
+
+			functionsListView.Add("", translate("Chassis Vibration"))
+		}
 
 		settingsTab.UseTab(0)
 

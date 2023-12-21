@@ -96,7 +96,9 @@ In this editor you create as many different startup profiles as you want. Only o
 
 If you want to create a startup profile, click on the button with the small "+" and give this profile a unique name. You can also export and import profiles to share them with your team mates, for example, using the corresponding buttons. If you hold down the Control key when clicking on the "Download" button, only the currently selected profile will be exported, otherwise all your profiles will be in the export file.
 
-You can choose whether a profile will start a solo or a team session. You can furthermore specifiy, which Assistants will be available and whether they will talk and listen to you.
+You can choose whether a profile will start a solo or a team session and you can decide whether you want to run the "Practice Center" or the "Race Center" automatically during startup. Please note, that running the "Race Center" is only useful in a team session.
+
+You can furthermore choose, which Assistants will be available and whether they will talk and listen to you.
 
 | Setting  | Description |
 | -------- | ----------- |
@@ -109,15 +111,17 @@ Note: Although it is technically possible to configure an Assistant with enabled
 
 Additionally, you can activate the ["Autonomous Mode" for strategy handling](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#tab-strategy) by the Assistants, if required.
 
-If you want to start the "Practice Center" or the "Race Center" automatically you can choose that as well. Please note, that running the "Race Center" is only useful in a team session.
+If the Team Server is part of your configuration and if you have chosen "Team" as the *Mode* of the startup profile, you can configure all [team session](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server) related stuff on the second tab.
 
-If you have chosen "Team" as the *Mode* of the startup profile, you can configure all [team session](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server) related stuff on the second tab.
-
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Startup%20Profiles%201.JPG)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Startup%20Profiles%202.JPG)
 
 If you are the team manager, you can open up the [team configuration editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-team-server) in "Simulator Configuration" by clicking on the "Manage..." button. When you have created and saved a new team session there it will be loaded into the startup profile automatically. Otherwise, if you participate as a driver in a team session, you can either use the application "Race Settings" to manage your driver credentials, or you can enter them directly into the startup profile by chosing "Save with Profile" in the *Credential* drop down. The input fields below have the same meaning and behaviour as those in the ["Race Settings"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#preparing-a-team-session) application.
 
-If you are ready to start, you can close the startup profiles editor and click then again on the green triangle to start Simulator Controller. As a shortcut, you can hold down the Control key while saving and closing the startup profiles editor, which will trigger the startup process automatically.
+On the last tab you can select or deselect several functions provided by the different plugins of Simulator Controller. What is available here, totally depends on your overall configuration.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Startup%20Profiles%203.JPG)
+
+Finally, if you are ready to start, choose the profile you want to start with and close the startup profiles editor. Then click again on the green triangle to start Simulator Controller with the selected profile. As a shortcut, you can hold down the Control key while saving and closing the startup profiles editor, which will trigger the startup process automatically.
 
 ### Fixing problems
 

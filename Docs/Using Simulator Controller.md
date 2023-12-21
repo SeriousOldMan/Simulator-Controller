@@ -66,9 +66,29 @@ Here is an overview for the all settings and configuration options for the vario
   
      Maintained by the "Race Settings" and "Session Database" applications and stored in the *Race.settings* file in the *Simulator Controller\Config* folder in your user *Documents* folder. Whenever you start a race (or even a training session), the Virtual Race Assistants will use these settings to control various functionality, for example, how to react to damages, when to change tyres after a severe weather change, and so on. You can edit these settings with the "Race Settings" application just before each session, or you can manage a lot of the setting values by using the "Session Database" application and store default values depending on a given car / track / weather combination. See the [corresponding documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings) for more information.
 
+## Using Simulator Controller
+
+After closing the configuration dialog, the actual startup process begins. Normally, you will be greeted by a splash screen and will see a pogress bar which informs you about what the system is currently doing. If you decide to stop the startup process, you can do this by pressing Escape anytime. If you decide that you want to start your favorite simulation (the first one in the Simulators list (see the [General tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-general) in the configuration tool) after the startup process has finished, you can do this by holding down the Control key during the startup process, even if you haven't checked the startup option in the configuration dialog above.
+
+After the startup process has completed, the splash screen of *Simulator Startup* may stay open still playing a video or showing pictures, unless a simulation has been started as well. You can close it anytime by pressing Escape or it will disappear automatically, when a simulator starts up. But the background process *Simulator Controller.exe* including all the configured [plugins](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes) will keep running and now is in complete control of your simulation rig. Depending on your configuration, you will see the visual representation of your controller hardware, i.e. a Button Box.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%201.JPG)
+
+Normally, the active mode on your hardware controller will be the "Launch" mode, so that you can launch additional applications by the touch of a button. For a complete documentation on everything available in the "Simulator Controller" application, please consult the documentation about [Plugins & Modes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes).
+
+Normally, it is not necessary to close *Simulator Controller.exe*, since it is very efficient and does not use many system resources. But if necessary, you can locate its icon, a small orange cog wheel, in the System Tray (at the lower right side of the Windows taskbar), right click the icon and choose Exit.
+
+### Enabling and disabling features
+
+Simulataor Controller is a modular software and consists of many functions, which can be enabled or disabled during runtime. Beside using buttons on your hardware controller to enable or disable these functions, for example the connection to the Team Server or whether Track Automations will be active during the current session, you can also control most of them from the tray menu of the "Simulator Controller" application. Please don't touch the options in the "Support" submenu, unless told you so when tracking down problems.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Simulator%20Controller%20Menu.JPG)
+
+Beside manually enabling and disabling features when enterring a session, you can also manage your preferences using the so called startup profiles as described in the following section.
+
 ### Startup Profiles
 
-As you have seen, managing the different settings can be quite time-consuming, when you participate in very different kind of sessions. The setup for a team race using the [Team Server](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server) is very different from running a local practice session or a race against the AI of a given simulator. Therefore, Simulator Controller provides the possibility to manage the most common settings as a profile and you can choose and activate a given profile while starting Simulator Controller by clicking on the green triangle. You can open the startup profiles editor by either exactly hitting the small cog wheel icon in the "Startup" button or by holding down the Control key while clicking on the "Startup" button. The following window appears:
+Managing the different features, as well as some feature specific configurations and settings can be quite time-consuming, when you participate in very different kind of sessions. The setup for a team race using the [Team Server](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server) is very different from running a local practice session or a race against the AI of a given simulator. Therefore, Simulator Controller provides the possibility to manage the most common settings as a profile and you can choose and activate a given profile while starting Simulator Controller by clicking on the green triangle. You can open the startup profiles editor by either exactly hitting the small cog wheel icon in the "Startup" button or by holding down the Control key while clicking on the "Startup" button. The following window appears:
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Startup%20Profiles%201.JPG)
 
@@ -87,24 +107,6 @@ If you have chosen "Team" as the *Mode* of the startup profile, you can configur
 If you are the team manager, you can open up the [team configuration editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-team-server) in "Simulator Configuration" by clicking on the "Manage..." button. When you have created and saved a new team session there it will be loaded into the startup profile automatically. Otherwise, if you participate as a driver in a team session, you can either use the application "Race Settings" to manage your driver credentials, or you can enter them directly into the startup profile by chosing "Save with Profile" in the *Credential* drop down. The input fields below have the same meaning and behaviour as those in the ["Race Settings"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#preparing-a-team-session) application.
 
 If you are ready to start, you can close the startup profiles editor and click then again on the green triangle to start Simulator Controller. As a shortcut, you can hold down the Control key while saving and closing the startup profiles editor, which will trigger the startup process automatically.
-
-## Using Simulator Controller
-
-After closing the configuration dialog, the actual startup process begins. Normally, you will be greeted by a splash screen and will see a pogress bar which informs you about what the system is currently doing. If you decide to stop the startup process, you can do this by pressing Escape anytime. If you decide that you want to start your favorite simulation (the first one in the Simulators list (see the [General tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-general) in the configuration tool) after the startup process has finished, you can do this by holding down the Control key during the startup process, even if you haven't checked the startup option in the configuration dialog above.
-
-After the startup process has completed, the splash screen of *Simulator Startup* may stay open still playing a video or showing pictures, unless a simulation has been started as well. You can close it anytime by pressing Escape or it will disappear automatically, when a simulator starts up. But the background process *Simulator Controller.exe* including all the configured [plugins](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes) will keep running and now is in complete control of your simulation rig. Depending on your configuration, you will see the visual representation of your controller hardware, i.e. a Button Box.
-
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%201.JPG)
-
-Normally, the active mode on your hardware controller will be the "Launch" mode, so that you can launch additional applications by the touch of a button. For a complete documentation on everything available in the "Simulator Controller" application, please consult the documentation about [Plugins & Modes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes).
-
-Normally, it is not necessary to close *Simulator Controller.exe*, since it is very efficient and does not use many system resources. But if necessary, you can locate its icon, a small orange cog wheel, in the System Tray (at the lower right side of the Windows taskbar), right click the icon and choose Exit.
-
-### Enabling and disabling features
-
-Simulataor Controller is a modular software and consists of many functions, which can be enabled or disabled during runtime. Beside using buttons on your hardware controller to enable or disable these functions, for example the connection to the Team Server or whether Track Automations will be active during the current session, you can also control most of them from the tray menu of the "Simulator Controller" application. Please don't touch the options in the "Support" submenu, unless told you so when tracking down problems.
-
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Simulator%20Controller%20Menu.JPG)
 
 ### Fixing problems
 

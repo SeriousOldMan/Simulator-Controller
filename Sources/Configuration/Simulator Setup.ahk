@@ -2959,70 +2959,79 @@ initializeSimulatorSetup() {
 	TraySetIcon(icon, "1")
 	A_IconTip := "Simulator Setup"
 
-	DirCreate(kUserHomeDirectory "Setup")
+	try {
+		DirCreate(kUserHomeDirectory "Setup")
 
-	definition := readMultiMap(kResourcesDirectory . "Setup\Simulator Setup.ini")
+		definition := readMultiMap(kResourcesDirectory . "Setup\Simulator Setup.ini")
 
-	languages := string2Values("|", getMultiMapValue(definition, "Setup", "Languages"))
+		languages := string2Values("|", getMultiMapValue(definition, "Setup", "Languages"))
 
-	if FileExist(kUserTranslationsDirectory . "Setup\Simulator Setup.ini") {
-		for ignore, language in string2Values("|", getMultiMapValue(readMultiMap(kUserTranslationsDirectory . "Setup\Simulator Setup.ini"), "Setup", "Languages"))
-			if !inList(languages, language)
-				languages.Push(language)
+		if FileExist(kUserTranslationsDirectory . "Setup\Simulator Setup.ini") {
+			for ignore, language in string2Values("|", getMultiMapValue(readMultiMap(kUserTranslationsDirectory . "Setup\Simulator Setup.ini"), "Setup", "Languages"))
+				if !inList(languages, language)
+					languages.Push(language)
+		}
+
+		setMultiMapValue(definition, "Setup", "Languages", values2String("|", languages*))
+
+		for language, ignore in languages
+			for ignore, root in [kResourcesDirectory, kUserTranslationsDirectory]
+				if FileExist(kUserHomeDirectory . "Setup\Simulator Setup." . language)
+					for section, keyValues in readMultiMap(kUserHomeDirectory . "Setup\Simulator Setup." . language)
+						for key, value in keyValues
+							setMultiMapValue(definition, section, key, value)
+
+		setMultiMapValues(kSimulatorConfiguration, "Splash Window", getMultiMapValues(definition, "Splash Window"))
+		setMultiMapValues(kSimulatorConfiguration, "Splash Screens", getMultiMapValues(definition, "Splash Screens"))
+
+		setMultiMapValue(kSimulatorConfiguration, "Splash Window", "Title"
+												, translate("Modular Simulator Controller System") . translate(" - ") . translate("Setup && Configuration"))
+
+		wizard := SetupWizard(kSimulatorConfiguration, definition)
+
+		SupportMenu.Insert("1&")
+
+		label := translate("Debug Rule System")
+
+		SupportMenu.Insert("1&", label, (*) => wizard.toggleDebug(kDebugRules))
+
+		if wizard.Debug[kDebugRules]
+			SupportMenu.Check(label)
+
+		label := translate("Debug Knowledgebase")
+		callback :=
+
+		SupportMenu.Insert("1&", label, (*) => wizard.toggleDebug(kDebugKnowledgeBase))
+
+		if wizard.Debug[kDebugKnowledgeBase]
+			SupportMenu.Check(label)
+
+		if !exitProcesses("Setup", "Before you can work on the configuration, other Simulator Controller applications must be closed."
+						, false, "CANCEL", ["Simulator Setup", "Simulator Startup", "Simulator Tools"])
+			ExitApp(0)
+
+		if GetKeyState("Ctrl")
+			Sleep(2000)
+
+		if !isDebug()
+			showSplashScreen("Rotating Brain")
+
+		wizard.ProgressCount := 0
+
+		showProgress({color: "Blue", title: translate("Initializing Setup Wizard"), message: translate("Preparing Configuration Steps...")})
+
+		wizard.registerStepWizard(StartStepWizard(wizard, "Start", kSimulatorConfiguration))
+		wizard.registerStepWizard(FinishStepWizard(wizard, "Finish", kSimulatorConfiguration))
 	}
+	catch Any as exception {
+		logError(exception, true)
 
-	setMultiMapValue(definition, "Setup", "Languages", values2String("|", languages*))
+		OnMessage(0x44, translateOkButton)
+		MsgBox(substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Simulator Setup"}), translate("Error"), 262160)
+		OnMessage(0x44, translateOkButton, 0)
 
-	for language, ignore in languages
-		for ignore, root in [kResourcesDirectory, kUserTranslationsDirectory]
-			if FileExist(kUserHomeDirectory . "Setup\Simulator Setup." . language)
-				for section, keyValues in readMultiMap(kUserHomeDirectory . "Setup\Simulator Setup." . language)
-					for key, value in keyValues
-						setMultiMapValue(definition, section, key, value)
-
-	setMultiMapValues(kSimulatorConfiguration, "Splash Window", getMultiMapValues(definition, "Splash Window"))
-	setMultiMapValues(kSimulatorConfiguration, "Splash Screens", getMultiMapValues(definition, "Splash Screens"))
-
-	setMultiMapValue(kSimulatorConfiguration, "Splash Window", "Title"
-											, translate("Modular Simulator Controller System") . translate(" - ") . translate("Setup && Configuration"))
-
-	wizard := SetupWizard(kSimulatorConfiguration, definition)
-
-	SupportMenu.Insert("1&")
-
-	label := translate("Debug Rule System")
-
-	SupportMenu.Insert("1&", label, (*) => wizard.toggleDebug(kDebugRules))
-
-	if wizard.Debug[kDebugRules]
-		SupportMenu.Check(label)
-
-	label := translate("Debug Knowledgebase")
-	callback :=
-
-	SupportMenu.Insert("1&", label, (*) => wizard.toggleDebug(kDebugKnowledgeBase))
-
-	if wizard.Debug[kDebugKnowledgeBase]
-		SupportMenu.Check(label)
-
-	if !exitProcesses("Setup", "Before you can work on the configuration, other Simulator Controller applications must be closed."
-					, false, "CANCEL", ["Simulator Setup", "Simulator Startup", "Simulator Tools"])
-		ExitApp(0)
-
-	if GetKeyState("Ctrl")
-		Sleep(2000)
-
-	if !isDebug()
-		showSplashScreen("Rotating Brain")
-
-	wizard.ProgressCount := 0
-
-	showProgress({color: "Blue", title: translate("Initializing Setup Wizard"), message: translate("Preparing Configuration Steps...")})
-
-	wizard.registerStepWizard(StartStepWizard(wizard, "Start", kSimulatorConfiguration))
-	wizard.registerStepWizard(FinishStepWizard(wizard, "Finish", kSimulatorConfiguration))
-
-	return
+		ExitApp(1)
+	}
 }
 
 startupSimulatorSetup() {
@@ -3297,18 +3306,7 @@ resetVolume(masterVolume) {
 ;;;                       Initialization Section Part 1                     ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-try {
-	initializeSimulatorSetup()
-}
-catch Any as e {
-	logError(exception, true)
-
-	OnMessage(0x44, translateOkButton)
-	MsgBox(substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Simulator Setup"}), translate("Error"), 262160)
-	OnMessage(0x44, translateOkButton, 0)
-
-	ExitApp(1)
-}
+initializeSimulatorSetup()
 
 
 ;;;-------------------------------------------------------------------------;;;

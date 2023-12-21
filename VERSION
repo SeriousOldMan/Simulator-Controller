@@ -1,15 +1,15 @@
 [Development]
-Version=5.5.1.2-beta
+Version=5.5.1.2-release
 Target=5.5.1.2-release
-Date=12/21/2023
-Download=https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.5.1.2-beta.zip
+Date=12/22/2023
+Download=https://cutt.ly/4wDUsrhC;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.5.1.2-release.zip
 Changes=The Strategist behaves more consistent in autonomy mode when no valid strategy can be computed, Fixed permission in AWS repository access, Introduced startup error handling in all applications, Removed controller binding artefacts for removed controllers, Fixed unknown tyre compound handling, Translatable Driving Coach instructions, New car models for "Setup Workbench"
 Components=Media->5.3.0,Configuration->5.4.8,Utilities->5.4.8
 [Release]
-Version=5.5.1.1-release
-Date=12/19/2023
-Download=https://cutt.ly/jwS71Ghl;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.5.1.1-release.zip
-Changes=Check for incomplete automatic update, Fixed post pitstop tyre set info in "Race Center" for ACC, Fixed display of pitstop service information in "Race Center", New display of pitstop time loss in "Race Center", Optimized application of pitstop preference in strategy recalculation, Added FrontBrake and RearBrake to "Simulator Setup", Sanity check after pitstop setup in ACC, "Edit Labels & Icons" now also available on the simulator page in "Simulator Setup", Detection of changed pitstop settings made outside the control of Simulator Controller, New car models for "Setup Workbench"
+Version=5.5.1.2-release
+Date=12/22/2023
+Download=https://cutt.ly/4wDUsrhC;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.5.1.2-release.zip
+Changes=The Strategist behaves more consistent in autonomy mode when no valid strategy can be computed, Fixed permission in AWS repository access, Introduced startup error handling in all applications, Removed controller binding artefacts for removed controllers, Fixed unknown tyre compound handling, Translatable Driving Coach instructions, New car models for "Setup Workbench"
 Components=Media->5.3.0,Configuration->5.4.8,Utilities->5.4.8
 [Components]
 Media.5.3.0.Path=Resources
@@ -22,7 +22,7 @@ Utilities.5.4.8.Path=.
 Utilities.5.4.8.Content=Utilities
 Utilities.5.4.8.Download=https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+5.4.8.zip
 [Current]
-Type=Development
+Type=Release
 [Version]
-Development=5.5.1.2-beta
-Release=5.5.1.1-release
+Development=5.5.1.2-release
+Release=5.5.1.2-release

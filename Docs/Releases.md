@@ -7,6 +7,9 @@
   6. Introduced special handling for errors raised during application startup.
   7. Fixed handling of unknown tyre compound for any simulator. Unknown tyre compounds are now mapped always to "Dry (Black)".
   8. [Developer only] The language-specific default instructions for the Driving Coach have been made translatable.
+  9. New car models for "Setup Workbench":
+     - Assetto Corsa
+       - BMW M1
 
 ## 5.5.1.1-release 12/19/23
   1. Fixed a critical bug in the telemetry providers for rFactor 2.

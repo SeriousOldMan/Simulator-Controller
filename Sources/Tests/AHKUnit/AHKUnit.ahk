@@ -456,7 +456,7 @@ class AhkUnit_Runner {
 				testInstance.AuInit(key)
 				method := GetMethod(testInstance, key)
 				method.Call(testInstance)
-				/*
+			/*
 			} catch Any as e {
 				thrownClass := (!isObject(e) || (e.__Class == "")) ? "Exception" : e.__Class
 				expectedClass := testInstance[key . "_throws"]

@@ -9,7 +9,7 @@
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-552), since a couple of presets were deprecated.
 
-## 5.5.1.2-release 12/22/23 (planned)
+## 5.5.1.2-release 12/22/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed incorrect information given by the Strategist, when no valid strategy can be computed in autonomous mode.

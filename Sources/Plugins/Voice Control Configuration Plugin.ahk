@@ -1076,7 +1076,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		local found := false
 		local code, language, ignore, grammarFile, grammarLanguageCode
 
-		for code, language in availableLanguages()
+		for code, language in languages
 			if (language = voiceLanguage) {
 				found := true
 

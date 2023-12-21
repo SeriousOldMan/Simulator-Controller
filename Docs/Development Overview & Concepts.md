@@ -364,6 +364,14 @@ You may have noticed, that the grammar files support a kind of include mechanism
 
 	#Include Fragments.de
 
+### Instructions for the GPT-based Driving Coach
+
+The instructions are used to provide the LLM of the Driving Coach with information about the personality of the coach or to transfer context specific data to the LLM. All instructions are used as defaults in the configuration for the Driving Coach and can be altered by the user. The language specific default instructions can be found in *Resources\Translations* in the programm installation folder. They are named 
+
+	Driving Coach.instructions.LC
+
+where *LC* stands for the language code.
+
 ### Translation of "Simulator Setup"
 
-The setup and configuration tool "Simulator Setup" contains lots of help texts which are not handled as part of the normal user interface translation. Fruthermore, there exists no inheritance mechanism to introduce user specific translations. And to make things a lttile bit more complicated, these texts use HTML as their representation and contain embedded pictures. Any changes to the translations of the help texts must therefore be done in the normal development process. The translation files can be fon in *Resources\Setup\Translations* in the programm installation folder.
+The setup and configuration tool "Simulator Setup" contains lots of help texts which are not handled as part of the normal user interface translation. Fruthermore, there exists no inheritance mechanism to introduce user specific translations. And to make things a lttile bit more complicated, these texts use HTML as their representation and contain embedded pictures. Any changes to the translations of the help texts must therefore be done in the normal development process. The translation files can be found in *Resources\Setup\Translations* in the programm installation folder.

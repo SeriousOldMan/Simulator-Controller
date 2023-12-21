@@ -421,6 +421,29 @@ class P2TConfiguration extends NamedPreset {
 	}
 }
 
+class StartupProfiles extends NamedPreset {
+	__New(name, *) {
+		super.__New(name)
+	}
+
+	getArguments() {
+		return concatenate(super.getArguments(), Array(kResourcesDirectory . "Setup\Presets\Startup.settings"))
+	}
+
+	install(wizard, edit := true) {
+		try {
+			FileCopy(kResourcesDirectory . "Setup\Presets\Startup.settings", kUserConfigDirectory . "Startup.settings", 1)
+		}
+		catch Any as exception {
+			logError(exception)
+		}
+	}
+
+	uninstall(wizard) {
+		deleteFile(kUserConfigDirectory . "Startup.settings")
+	}
+}
+
 class SetupPatch extends NamedPreset {
 	iFile := false
 

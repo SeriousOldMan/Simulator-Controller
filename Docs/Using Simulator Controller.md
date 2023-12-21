@@ -96,7 +96,18 @@ In this editor you create as many different startup profiles as you want. Only o
 
 If you want to create a startup profile, click on the button with the small "+" and give this profile a unique name. You can also export and import profiles to share them with your team mates, for example, using the corresponding buttons. If you hold down the Control key when clicking on the "Download" button, only the currently selected profile will be exported, otherwise all your profiles will be in the export file.
 
-You can choose whether a profile will start a solo or a team session. You can furthermore specifiy, which Assistants will be available and whether they will talk and listen to you. And you can activate the ["Autonomous Mode" for strategy handling](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#tab-strategy) by the Assistants, if required.
+You can choose whether a profile will start a solo or a team session. You can furthermore specifiy, which Assistants will be available and whether they will talk and listen to you.
+
+| Setting  | Description |
+| -------- | ----------- |
+| Disabled | The Assistant is fully disabled (i.e. will not be started when you enter a session). But: This also disables all their services like collecting telemetry data, calculating ideal cold tyre pressures or handling track automation events. Therefore, this is not recommended, with the exception of the Driving Coach, which does not participate in this stuff.
+| Silent   | Using "Silent" disables the voice interaction of the given Assistant completely. The Assistant will perform its actions normally, as long as no permission must be granted by the driver (unless fully autonomous mode is enabled). |
+| Muted    | "Muted" means, that the Assistant is fully active, including voice capabilities. But the Assistant will not contact the driver pro-actively, for example, to inform about an upcoming weather change. The Assistant will, however, react to voice commands and will allow full voice interaction, as long as the dialog is opened by the driver. |
+| Active   | This is the normal operation mode of the Assistant with all voice capabilities enabled. |
+
+Note: Although it is technically possible to configure an Assistant with enabled voice output, but disabled voice recognition, this kind of configuration is not offered in the startup profiles, since in environment with an active Push-To-Talk button, this configuration is not necessary.
+
+Additionally, you can activate the ["Autonomous Mode" for strategy handling](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#tab-strategy) by the Assistants, if required.
 
 If you want to start the "Practice Center" or the "Race Center" automatically you can choose that as well. Please note, that running the "Race Center" is only useful in a team session.
 

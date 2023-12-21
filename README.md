@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[5.5.1.2-dev](https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.5.1.2-dev.zip) (Early build for 5.5.1.2. Changes: The Strategist behaves more consistent in autonomy mode when no valid strategy can be computed, Fixed permission in AWS repository access, Introduced startup error handling in all applications, Removed controller binding artefacts for removed controllers, Fixed unknown tyre compound handling, Translatable Driving Coach instructions.)
+[5.5.1.2-dev](https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.5.1.2-dev.zip) (Early build for 5.5.1.2. Changes: The Strategist behaves more consistent in autonomy mode when no valid strategy can be computed, Fixed permission in AWS repository access, Introduced startup error handling in all applications, Removed controller binding artefacts for removed controllers, Fixed unknown tyre compound handling, Translatable Driving Coach instructions, New car models for "Setup Workbench".)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-551) of this version and all the versions you might have skipped, before installing and using this version.
 

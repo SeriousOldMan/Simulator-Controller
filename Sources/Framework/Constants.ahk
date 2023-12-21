@@ -95,5 +95,3 @@ global kLogOff := 5
 
 global kLogLevels := Map("Off", kLogOff, "Debug", kLogDebug, "Info", kLogInfo, "Warn", kLogWarn, "Critical", kLogCritical)
 global kLogLevelNames := ["Debug", "Info", "Warn", "Critical", "Off"]
-
-global kRaceAssistants := ["Driving Coach", "Race Engineer", "Race Strategist", "Race Spotter"]

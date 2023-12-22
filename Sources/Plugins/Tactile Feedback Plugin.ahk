@@ -295,8 +295,11 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 	__New(controller, name, configuration := false, register := true) {
 		global kSimHub
 
+		local pedalVibrationEnabled := false
+		local frontVibrationEnabled := false
+		local rearVibrationEnabled := false
 		local simFeedbackApplication, pedalVibrationArguments, frontChassisVibrationArguments, rearChassisVibrationArguments
-		local pedalMode, chassisMode, ignore, effect
+		local pedalMode, chassisMode, ignore, effect, toggle
 
 		super.__New(controller, name, configuration, false)
 
@@ -351,20 +354,26 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 			if register
 				controller.registerPlugin(this)
 
-			if this.RearVibrationEnabled
-				this.enableRearVibration(false, true, false)
-			else
-				this.disableRearVibration(false, true, false)
+			for ignore, toggle in ["Pedal", "Front", "Rear"]
+				if (this.StartupSettings && (getMultiMapValue(this.StartupSettings, "Function", toggle . " Vibration", kUndefined) != kUndefined))
+					%toggle . "VibrationEnabled"% := getMultiMapValue(this.StartupSettings, "Function", toggle . " Vibration")
+				else
+					%toggle . "VibrationEnabled"% := this.%toggle . "VibrationEnabled"%
 
-			if this.FrontVibrationEnabled
-				this.enableFrontVibration(false, true, false)
+			if rearVibrationEnabled
+				this.enableRearVibration(false, true, rearVibrationEnabled != this.RearVibrationEnabled)
 			else
-				this.disableFrontVibration(false, true, false)
+				this.disableRearVibration(false, true, rearVibrationEnabled != this.RearVibrationEnabled)
 
-			if this.PedalVibrationEnabled
-				this.enablePedalVibration(false, true, false)
+			if frontVibrationEnabled
+				this.enableFrontVibration(false, true, frontVibrationEnabled != this.FrontVibrationEnabled)
 			else
-				this.disablePedalVibration(false, true, false)
+				this.disableFrontVibration(false, true, frontVibrationEnabled != this.FrontVibrationEnabled)
+
+			if pedalVibrationEnabled
+				this.enablePedalVibration(false, true, pedalVibrationEnabled != this.PedalVibrationEnabled)
+			else
+				this.disablePedalVibration(false, true, pedalVibrationEnabled != this.PedalVibrationEnabled)
 
 			if register
 				controller.registerPlugin(this)

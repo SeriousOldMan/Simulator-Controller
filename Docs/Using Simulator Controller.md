@@ -94,7 +94,9 @@ Managing the different features, as well as some feature specific configurations
 
 In this editor you create as many different startup profiles as you want. Only one of them will be active as indicated by the checkmark in the list and will be used during the startup process. The profile named "Standard" is special, as it indicates **no** startup profile (all settings will be loaded *normally* from the sources described above).
 
-If you want to create a startup profile, click on the button with the small "+" and give this profile a unique name. You can also export and import profiles to share them with your team mates, for example, using the corresponding buttons. If you hold down the Control key when clicking on the "Download" button, only the currently selected profile will be exported, otherwise all your profiles will be in the export file.
+If you want to create a startup profile, click on the button with the small "+" and give this profile a unique name. You may also use the copy button to create a copy of an already existing profile, but make sure that you change the name afterwards, so that all profile names are unique. And you can also export and import profiles to share them with your team mates, for example, using the corresponding buttons. Also take care here that all your profile names are unique before leaving the dialog.
+
+Good to know: If you hold down the Control key when clicking on the "Download" button, only the currently selected profile will be exported, otherwise all your profiles will be in the export file.
 
 You can choose whether a profile will start a solo or a team session and you can decide whether you want to run the "Practice Center" or the "Race Center" automatically during startup. Please note, that running the "Race Center" is only useful in a team session.
 

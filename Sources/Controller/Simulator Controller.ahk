@@ -1594,12 +1594,26 @@ class ControllerCustomFunction extends ControllerFunction {
 }
 
 class ControllerPlugin extends Plugin {
+	static sStartupSettings := kUndefined
+
 	static sLabelsDatabase := false
 	static sIconsDatabase := false
 
 	iController := false
 	iModes := []
 	iActions := []
+
+	static StartupSettings {
+		Get {
+			return ControllerPlugin.sStartupSettings
+		}
+	}
+
+	StartupSettings {
+		Get {
+			return ControllerPlugin.StartupSettings
+		}
+	}
 
 	Controller {
 		Get {
@@ -1631,9 +1645,20 @@ class ControllerPlugin extends Plugin {
 	}
 
 	__New(controller, name, configuration := false, register := true) {
+		local index
+
 		this.iController := controller
 
 		super.__New(name, configuration)
+
+		if (ControllerPlugin.sStartupSettings = kUndefined) {
+			index := inList(A_Args, "-Startup")
+
+			if index
+				ControllerPlugin.sStartupSettings := readMultiMap(A_Args[index + 1])
+			else
+				ControllerPlugin.sStartupSettings := false
+		}
 
 		if (this.Active || isDebug())
 			if register

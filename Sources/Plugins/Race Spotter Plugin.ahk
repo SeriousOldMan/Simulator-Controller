@@ -107,6 +107,9 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 			else
 				this.iTrackAutomationEnabled := false
 
+			if (this.StartupSettings && (getMultiMapValue(this.StartupSettings, "Functions", "Track Automation", kUndefined) != kUndefined))
+				this.iTrackAutomationEnabled := getMultiMapValue(this.StartupSettings, "Functions", "Track Automation")
+
 			OnExit(ObjBindMethod(this, "shutdownTrackAutomation", true))
 			OnExit(ObjBindMethod(this, "shutdownTrackMapper", true))
 

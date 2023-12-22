@@ -925,7 +925,7 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 			}
 
 			for ignore, function in functions
-				profile["Function." . function] := getMultiMapValue(settings, "Profiles", "Function." . function, false)
+				profile["Function." . function] := getMultiMapValue(settings, "Profiles", name . ".Function." . function, false)
 
 			profiles.Push(profile)
 		}
@@ -982,7 +982,7 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 
 			for ignore, function in functions
 				if profile.Has("Function." . function)
-					setMultiMapValue(settings, "Profiles", "Function." . function, profile["Function." . function])
+					setMultiMapValue(settings, "Profiles", name . ".Function." . function, profile["Function." . function])
 		}
 
 		setMultiMapValue(settings, "Profiles", "Profiles", values2String(";|;", activeProfiles*))
@@ -1237,6 +1237,20 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 				launchProfilesEditor(kEvent, "ProfileSave")
 
 			profile := newProfile()
+
+			profiles.Push(profile)
+
+			profilesListView.Add("", profile["Name"], translate(profile["Mode"]))
+
+			profilesListView.Modify(selectedProfile, "Vis Select")
+
+			launchProfilesEditor(kEvent, "ProfileLoad", profiles.Length + 1)
+		}
+		else if (arguments[1] = "ProfileCopy") {
+			if (selectedProfile > 1)
+				launchProfilesEditor(kEvent, "ProfileSave")
+
+			profile := profiles[selectedProfile - 1].Clone()
 
 			profiles.Push(profile)
 
@@ -1575,6 +1589,7 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 
 		if (profilesListView.GetNext() > 1) {
 			profilesEditorGui["deleteProfileButton"].Enabled := true
+			profilesEditorGui["copyProfileButton"].Enabled := true
 
 			profilesEditorGui["profileNameEdit"].Enabled := true
 			profilesEditorGui["profileModeDropDown"].Enabled := true
@@ -1614,6 +1629,7 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 			noCheck(functionsListView)
 
 			profilesEditorGui["deleteProfileButton"].Enabled := false
+			profilesEditorGui["copyProfileButton"].Enabled := false
 
 			profilesEditorGui["profileNameEdit"].Enabled := false
 			profilesEditorGui["profileNameEdit"].Text := ""
@@ -1758,7 +1774,7 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 
 		x4 := x3 + 64
 
-		x5 := x4 - 1 + 24
+		x5 := x4 - 1
 		x6 := x5 + 24
 		x7 := x6 + 24
 
@@ -1774,7 +1790,9 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 
 		profilesEditorGui.Add("Button", "x" . x5 . " yp w23 h23 X:Move Y:Move Center +0x200 vaddProfileButton").OnEvent("Click", launchProfilesEditor.Bind(kEvent, "ProfileNew"))
 		setButtonIcon(profilesEditorGui["addProfileButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
-		profilesEditorGui.Add("Button", "x" . x6 . " yp w23 h23 X:Move Y:Move Center +0x200 vdeleteProfileButton").OnEvent("Click", launchProfilesEditor.Bind(kEvent, "ProfileDelete"))
+		profilesEditorGui.Add("Button", "x" . x6 . " yp w23 h23 X:Move Y:Move Center +0x200 vcopyProfileButton").OnEvent("Click", launchProfilesEditor.Bind(kEvent, "ProfileCopy"))
+		setButtonIcon(profilesEditorGui["copyProfileButton"], kIconsDirectory . "Copy.ico", 1, "L4 T4 R4 B4")
+		profilesEditorGui.Add("Button", "x" . x7 . " yp w23 h23 X:Move Y:Move Center +0x200 vdeleteProfileButton").OnEvent("Click", launchProfilesEditor.Bind(kEvent, "ProfileDelete"))
 		setButtonIcon(profilesEditorGui["deleteProfileButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 
 		profilesEditorGui.Add("Text", "x" . x0 . " yp+30 w90 h23 +0x200", translate("Name"))
@@ -1836,7 +1854,7 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 
 		settingsTab.UseTab(hasTeamServer ? 3 : 2)
 
-		functionsListView := profilesEditorGui.Add("ListView", "x" . (x0 + 8) . " ys+36 w372 h134 Checked -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Function"], translate))
+		functionsListView := profilesEditorGui.Add("ListView", "x" . (x0 + 8) . " ys+36 w372 h134 Checked -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Module", "Function"], translate))
 		functionsListView .OnEvent("Click", noSelect)
 		functionsListView .OnEvent("DoubleClick", noSelect)
 		functionsListView .OnEvent("ItemCheck", chooseFunction)
@@ -1844,26 +1862,31 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 		if hasRaceSpotter {
 			functions.Push("Track Automation")
 
-			functionsListView.Add("", translate("Track Automation"))
+			functionsListView.Add("", translate("Race Spotter"), translate("Track Automation"))
 		}
 
 		if hasMotionFeedback {
 			functions.Push("Motion")
 
-			functionsListView.Add("", translate("Motion"))
+			functionsListView.Add("", translate("Motion Feedback"), translate("Motion"))
 		}
 
 		if hasPedalVibration {
 			functions.Push("Pedal Vibration")
 
-			functionsListView.Add("", translate("Pedal Vibration"))
+			functionsListView.Add("", translate("Tactile Feedback"), translate("Pedal Vibration"))
 		}
 
 		if hasChassisVibration {
-			functions.Push("Chassis Vibration")
+			functions.Push("Front Vibration")
+			functions.Push("Rear Vibration")
 
-			functionsListView.Add("", translate("Chassis Vibration"))
+			functionsListView.Add("", translate("Tactile Feedback"), translate("Front Vibration"))
+			functionsListView.Add("", translate("Tactile Feedback"), translate("Rear Vibration"))
 		}
+
+		loop 2
+			functionsListView.ModifyCol(A_Index, "AutoHdr")
 
 		settingsTab.UseTab(0)
 

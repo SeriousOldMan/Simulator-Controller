@@ -33,8 +33,6 @@ global kTeamServerPlugin := "Team Server"
 ;;;-------------------------------------------------------------------------;;;
 
 class TeamServerPlugin extends ControllerPlugin {
-	static sStartupSettings := kUndefined
-
 	iConnector := false
 
 	iServerURL := false
@@ -304,15 +302,6 @@ class TeamServerPlugin extends ControllerPlugin {
 		local dllFile := (kBinariesDirectory . "Connectors\Team Server Connector.dll")
 		local teamServerToggle, arguments, openRaceSettings, openRaceCenter
 
-		if (TeamServerPlugin.sStartupSettings = kUndefined) {
-			index := inList(A_Args, "-Startup")
-	
-			if index
-				TeamServerPlugin.sStartupSettings := readMultiMap(A_Args[index + 1])
-			else
-				TeamServerPlugin.sStartupSettings := false
-		}
-
 		try {
 			if (!FileExist(dllFile)) {
 				logMessage(kLogCritical, translate("Team Server Connector.dll not found in ") . kBinariesDirectory)
@@ -353,8 +342,8 @@ class TeamServerPlugin extends ControllerPlugin {
 			else
 				this.iTeamServerEnabled := false
 
-			if (TeamServerPlugin.sStartupSettings && (getMultiMapValue(TeamServerPlugin.sStartupSettings, "Session", "Mode", kUndefined) != kUndefined))
-				this.iTeamServerEnabled := (getMultiMapValue(TeamServerPlugin.sStartupSettings, "Session", "Mode") = "Team")
+			if (this.StartupSettings && (getMultiMapValue(this.StartupSettings, "Session", "Mode", kUndefined) != kUndefined))
+				this.iTeamServerEnabled := (getMultiMapValue(this.StartupSettings, "Session", "Mode") = "Team")
 
 			openRaceSettings := this.getArgumentValue("openRaceSettings", false)
 
@@ -666,12 +655,12 @@ class TeamServerPlugin extends ControllerPlugin {
 			driverIdentifier := getMultiMapValue(settings, "Team Settings", "Driver.Identifier", false)
 			sessionIdentifier := getMultiMapValue(settings, "Team Settings", "Session.Identifier", false)
 
-			if TeamServerPlugin.sStartupSettings {
-				serverURL := getMultiMapValue(TeamServerPlugin.sStartupSettings, "Team Session", "Server.URL", serverURL)
-				serverToken := getMultiMapValue(TeamServerPlugin.sStartupSettings, "Team Session", "Server.Token", serverToken)
-				teamIdentifier := getMultiMapValue(TeamServerPlugin.sStartupSettings, "Team Session", "Team.Identifier", teamIdentifier)
-				driverIdentifier := getMultiMapValue(TeamServerPlugin.sStartupSettings, "Team Session", "Driver.Identifier", driverIdentifier)
-				sessionIdentifier := getMultiMapValue(TeamServerPlugin.sStartupSettings, "Team Session", "Session.Identifier", sessionIdentifier)
+			if this.StartupSettings {
+				serverURL := getMultiMapValue(this.StartupSettings, "Team Session", "Server.URL", serverURL)
+				serverToken := getMultiMapValue(this.StartupSettings, "Team Session", "Server.Token", serverToken)
+				teamIdentifier := getMultiMapValue(this.StartupSettings, "Team Session", "Team.Identifier", teamIdentifier)
+				driverIdentifier := getMultiMapValue(this.StartupSettings, "Team Session", "Driver.Identifier", driverIdentifier)
+				sessionIdentifier := getMultiMapValue(this.StartupSettings, "Team Session", "Session.Identifier", sessionIdentifier)
 			}
 
 			this.connect(serverURL, serverToken, teamIdentifier, driverIdentifier, sessionIdentifier, !kSilentMode)

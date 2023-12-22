@@ -414,7 +414,9 @@ closeApplication(application) {
 }
 
 launchPad(command := false, arguments*) {
-	local ignore, application, startupConfig, x, y, settingsButton, name, options
+	global kSimulatorConfiguration
+
+	local ignore, application, startupConfig, x, y, settingsButton, name, options, lastModified
 
 	static result := false
 
@@ -582,7 +584,29 @@ launchPad(command := false, arguments*) {
 							  . " -Car `"" . getMultiMapValue(startupConfig, "Simulator", "Car") . "`""
 							  . " -Track `"" . getMultiMapValue(startupConfig, "Simulator", "Track") . "`"")
 
-			Run(kBinariesDirectory . application)
+			if inList(["Simulator Setup.exe", "Simulator Configuration.exe"], application) {
+				launchPadGui.Block()
+
+				try {
+					lastModified := FileGetTime(getFileName(kSimulatorConfigurationFile, kUserConfigDirectory, kConfigDirectory), "M")
+
+					Run(kBinariesDirectory . application)
+
+					while ProcessExist(application)
+						Sleep(1000)
+
+					if (lastModified != FileGetTime(getFileName(kSimulatorConfigurationFile, kUserConfigDirectory, kConfigDirectory), "M")) {
+						loadSimulatorConfiguration()
+
+						launchPad(kRestart)
+					}
+				}
+				finally {
+					launchPadGui.Unblock()
+				}
+			}
+			else
+				Run(kBinariesDirectory . application)
 		}
 
 		if ((arguments.Length > 1) && arguments[2])

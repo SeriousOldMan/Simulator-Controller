@@ -355,8 +355,8 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 				controller.registerPlugin(this)
 
 			for ignore, toggle in ["Pedal", "Front", "Rear"]
-				if (this.StartupSettings && (getMultiMapValue(this.StartupSettings, "Function", toggle . " Vibration", kUndefined) != kUndefined))
-					%toggle . "VibrationEnabled"% := getMultiMapValue(this.StartupSettings, "Function", toggle . " Vibration")
+				if (this.StartupSettings && (getMultiMapValue(this.StartupSettings, "Functions", toggle . " Vibration", kUndefined) != kUndefined))
+					%toggle . "VibrationEnabled"% := getMultiMapValue(this.StartupSettings, "Functions", toggle . " Vibration")
 				else
 					%toggle . "VibrationEnabled"% := this.%toggle . "VibrationEnabled"%
 

@@ -1033,7 +1033,8 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 					setMultiMapValue(settings, "Team Session", property, profile[property])
 
 			for ignore, function in functions
-				setMultiMapValue(settings, "Functions", function, profile.Has("Function." . function) && profile["Function." . function])
+				if profile.Has("Function." . function)
+					setMultiMapValue(settings, "Functions", function, profile["Function." . function])
 
 		}
 

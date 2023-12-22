@@ -407,6 +407,11 @@ class SystemPlugin extends ControllerPlugin {
 			setMultiMapValue(configuration, this.Plugin, "State", "Active")
 		else
 			super.writePluginState(configuration)
+
+		if (this.StartupSettings && getMultiMapValue(this.StartupSettings, "Profiles", "Profile", false))
+			setMultiMapValue(configuration, this.Plugin, "Information", translate("Profile: ") . getMultiMapValue(this.StartupSettings, "Profiles", "Profile"))
+		else
+			setMultiMapValue(configuration, this.Plugin, "Information", translate("Profile: ") . translate("Standard"))
 	}
 
 	simulatorStartup(simulator) {

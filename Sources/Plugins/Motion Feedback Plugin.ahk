@@ -559,8 +559,8 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			else
 				motionEnabled := false
 
-			if (this.StartupSettings && (getMultiMapValue(this.StartupSettings, "Function", "Motion", kUndefined) != kUndefined))
-				motionEnabled := getMultiMapValue(this.StartupSettings, "Function", "Motion")
+			if (this.StartupSettings && (getMultiMapValue(this.StartupSettings, "Functions", "Motion", kUndefined) != kUndefined))
+				motionEnabled := getMultiMapValue(this.StartupSettings, "Functions", "Motion")
 
 			if motionEnabled
 				this.startMotion(false, true)

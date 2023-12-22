@@ -486,6 +486,11 @@ class SimulatorPlugin extends ControllerPlugin {
 								   , values2String("; ", translate("Simulator: ") . simulator
 								   , translate("Car: ") . car
 								   , translate("Track: ") . track))
+
+					if (this.StartupSettings && getMultiMapValue(this.StartupSettings, "Profiles", "Profile", false))
+						setMultiMapValue(configuration, "Simulation", "Profile", getMultiMapValue(this.StartupSettings, "Profiles", "Profile"))
+					else
+						setMultiMapValue(configuration, "Simulation", "Profile", translate("Standard"))
 				}
 				else
 					setMultiMapValue(configuration, "Simulation", "State", "Passive")

@@ -1080,6 +1080,8 @@ systemMonitor(command := false, arguments*) {
 
 			if (getMultiMapValue(controllerState, "Simulation", "Information", kUndefined) != kUndefined)
 				html .= ("<tr><td><b>" . translate("State:") . "</b></td><td>" . getMultiMapValue(controllerState, "Simulation", "Information") . "</td></tr>")
+			else if (getMultiMapValue(controllerState, "Simulation", "Profile", kUndefined) != kUndefined)
+				html .= ("<tr><td><b>" . translate("Profile: ") . "</b></td><td>" . getMultiMapValue(controllerState, "Simulation", "Profile") . "</td></tr>")
 
 			html .= "</table>"
 		}

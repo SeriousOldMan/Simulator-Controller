@@ -72,10 +72,19 @@ class IntegrationPlugin extends ControllerPlugin {
 	}
 
 	createSessionState(sessionInfo) {
-		return Map("Simulator", getMultiMapValue(sessionInfo, "Session", "Simulator", kNull)
-				 , "Car", getMultiMapValue(sessionInfo, "Session", "Car", kNull)
-				 , "Track", getMultiMapValue(sessionInfo, "Session", "Track", kNull)
-				 , "Session", translate(getMultiMapValue(sessionInfo, "Session", "Type", kNull)))
+		local state := Map("Simulator", getMultiMapValue(sessionInfo, "Session", "Simulator", kNull)
+						 , "Car", getMultiMapValue(sessionInfo, "Session", "Car", kNull)
+						 , "Track", getMultiMapValue(sessionInfo, "Session", "Track", kNull)
+						 , "Session", translate(getMultiMapValue(sessionInfo, "Session", "Type", kNull)))
+
+		if (getMultiMapValue(sessionInfo, "Session", "Simulator", kNull) = kNull)
+			state["Profile"] := kNull
+		else if (getMultiMapValue(sessionInfo, "Session", "Profile", kUndefined) != kUndefined)
+			state["Profile"] := getMultiMapValue(sessionInfo, "Session", "Profile")
+		else
+			state["Profile"] := translate("Standard")
+
+		return state
 	}
 
 	createDurationState(sessionInfo) {
@@ -431,7 +440,7 @@ class IntegrationPlugin extends ControllerPlugin {
 
 				if !getMultiMapValue(configuration, "Voice", "Speaker", true)
 					assistantsState[key]["Silent"] := kTrue
-				
+
 				if getMultiMapValue(configuration, "Voice", "Muted", false)
 					assistantsState[key]["Muted"] := kTrue
 			}

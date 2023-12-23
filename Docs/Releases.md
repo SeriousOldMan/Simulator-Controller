@@ -7,7 +7,9 @@
   6. New [control key modifiers](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Keyboard-Modifiers) for "Simulator Startup" allow you to quickly open the startup profiles editor and run the startup process automatically when closing the editor. Some of the former keyboard modifiers for "Simulator Startup" have changed, therefore take a close look the [list of modifiers](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Keyboard-Modifiers).
   7. A couple of presets, that were used to disable voice handling completely or to start the Assistants muted, has been deprecated in "Simulator Setup". The functionality is now available in the [startup profiles](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles).
   8. A new preset has been added to "Simulator Setup" that installs a set of predefined startup profiles for you.
-  9. [Internal] Migrated to AHK version 2.0.11.
+  9. Information about the active startup profile has been added to the "System Monitor".
+  10. [Developer only] Information about the active startup profile has been added to the "Session.state" file.
+  11. [Internal] Migrated to AHK version 2.0.11.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-552), since a couple of presets were deprecated.
 

@@ -394,6 +394,12 @@ systemMonitor(command := false, arguments*) {
 		html .= ("<tr><th class=`"th-std th-left`">" . translate("Car") . "</th><td class=`"td-wdg`">" . getMultiMapValue(sessionState, "Session", "Car") . "</td></tr>")
 		html .= ("<tr><th class=`"th-std th-left`">" . translate("Track") . "</th><td class=`"td-wdg`">" . getMultiMapValue(sessionState, "Session", "Track") . "</td></tr>")
 		html .= ("<tr><th class=`"th-std th-left`">" . translate("Session") . "</th><td class=`"td-wdg`">" . translate(getMultiMapValue(sessionState, "Session", "Type")) . "</td></tr>")
+
+		if (getMultiMapValue(sessionState, "Session", "Profile", kUndefined) != kUndefined)
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Profile") . "</th><td class=`"td-wdg`">" . getMultiMapValue(sessionState, "Session", "Profile") . "</td></tr>")
+		else
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Profile") . "</th><td class=`"td-wdg`">" . translate("Standard") . "</td></tr>")
+
 		html .= "</table>"
 
 		return html

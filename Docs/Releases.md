@@ -8,8 +8,9 @@
   7. A couple of presets, that were used to disable voice handling completely or to start the Assistants muted, has been deprecated in "Simulator Setup". The functionality is now available in the [startup profiles](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles).
   8. A new preset has been added to "Simulator Setup" that installs a set of predefined startup profiles for you.
   9. Information about the active startup profile has been added to the "System Monitor".
-  10. [Developer only] Information about the active startup profile has been added to the "Session.state" file.
-  11. [Internal] Migrated to AHK version 2.0.11.
+  10. [Developer only] Information about the active startup profile has been added to the "Session State.json" file.
+  11. [Developer only] Information about the pitstop forecast has been added to the "Session State.json" file.
+  12. [Internal] Migrated to AHK version 2.0.11.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-552), since a couple of presets were deprecated.
 
@@ -134,7 +135,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   11. You will now get a warning on the dashboard in "System Monitor", when no valid participant information is available in the simulation data.
   12. Thanks to our Discord member @slatmars we will get a full translation of Simulator Controller for the French language. This release contains initial tranlsations for the UI. More translations, as well as Assistant grammars and other stuff will follow with the next releases.
   13. Added configuration support for the newly released GPT models by OpenAI for the "Driving Coach".
-  14. [Developer only] The top speed information is also available in the "State.json".
+  14. [Developer only] The top speed information is also available in the "Session State.json".
   15. [Internal] Cleanup of the Binaries folder.
   16. New car models for "Setup Workbench":
       - Assetto Corsa

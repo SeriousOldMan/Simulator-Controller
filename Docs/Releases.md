@@ -11,6 +11,9 @@
   10. [Developer only] Information about the active startup profile has been added to the "Session State.json" file.
   11. [Developer only] Information about the pitstop forecast has been added to the "Session State.json" file.
   12. [Internal] Migrated to AHK version 2.0.11.
+  13. New car models for "Setup Workbench":
+      - Assetto Corsa
+        - BMW M1
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-552), since a couple of presets were deprecated.
 

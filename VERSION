@@ -14,16 +14,16 @@ Components=Media->5.3.0,Configuration->5.4.8,Utilities->5.4.8
 [Components]
 Media.5.3.0.Path=Resources
 Media.5.3.0.Content=Splash Media
-Media.5.3.0.Download=https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Media+5.3.0.zip
+Media.5.3.0.Download=https://www.dropbox.com/scl/fi/s4uchdrhdm0m4giiix86k/Media-5.3.0.zip?rlkey=t9lkkd9nj4koxyaaqa2h6i8nx&dl=1
 Configuration.5.4.8.Path=Resources
 Configuration.5.4.8.Content=Setup
-Configuration.5.4.8.Download=https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+5.4.8.zip
+Configuration.5.4.8.Download=https://www.dropbox.com/scl/fi/1b59d2rbjkio4vm961d3n/Configuration-5.4.8.zip?rlkey=hb7pf0qlkgu9y4kl196w3b2ff&dl=1
 Configuration.5.5.2.Path=Resources
 Configuration.5.5.2.Content=Setup
-Configuration.5.5.2.Download=https://www.dropbox.com/scl/fi/5cfljumm3d9v8bfazxlxp/Configuration-5.5.2.zip?rlkey=0axory858k403nltuqgqhukfx&dl=0
+Configuration.5.5.2.Download=https://www.dropbox.com/scl/fi/5cfljumm3d9v8bfazxlxp/Configuration-5.5.2.zip?rlkey=0axory858k403nltuqgqhukfx&dl=1
 Utilities.5.4.8.Path=.
 Utilities.5.4.8.Content=Utilities
-Utilities.5.4.8.Download=https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+5.4.8.zip
+Utilities.5.4.8.Download=https://www.dropbox.com/scl/fi/5nduffajjm3x6rhsxr1nk/Utilities-5.4.8.zip?rlkey=alrj8l2z205dd2vm9cu6hbsot&dl=1
 [Current]
 Type=Development
 [Version]

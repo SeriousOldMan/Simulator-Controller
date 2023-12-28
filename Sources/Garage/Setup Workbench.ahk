@@ -1194,10 +1194,10 @@ class SetupWorkbench extends ConfigurationItem {
 		simulatorDefinition := readMultiMap(getFileName("Garage\Definitions\" . simulator . ".ini"
 													  , kResourcesDirectory, kUserHomeDirectory))
 
-		for ignore, section in ["Workbench.Categories", "Workbench.Settings"]
+		for ignore, section in ["Workbench.Characteristics", "Workbench.Categories", "Workbench.Settings"]
 			addMultiMapValues(this.Definition, getMultiMapValues(simulatorDefinition, section))
 
-		for ignore, section in ["Workbench.Categories.Labels", "Workbench.Settings.Labels"] {
+		for ignore, section in ["Workbench.Characteristics.Labels", "Workbench.Categories.Labels", "Workbench.Settings.Labels"] {
 			values := getMultiMapValues(simulatorDefinition, section . "." . getLanguage())
 
 			if (values.Count = 0)
@@ -1214,10 +1214,10 @@ class SetupWorkbench extends ConfigurationItem {
 			carDefinition := readMultiMap(getFileName("Garage\Definitions\Cars\" . simulator . "." . car . ".ini"
 													, kResourcesDirectory, kUserHomeDirectory))
 
-			for ignore, section in ["Workbench.Categories", "Workbench.Settings"]
-				addMultiMapValues(this.Definition, getMultiMapValues(carDefinition, section))
+			for ignore, section in ["Workbench.Characteristics", "Workbench.Categories", "Workbench.Settings"]
+				setMultiMapValues(this.Definition, section, getMultiMapValues(carDefinition, section), false)
 
-			for ignore, section in ["Workbench.Categories.Labels", "Workbench.Settings.Labels"] {
+			for ignore, section in ["Workbench.Characteristics.Labels", "Workbench.Categories.Labels", "Workbench.Settings.Labels"] {
 				values := getMultiMapValues(carDefinition, section . "." . getLanguage())
 
 				if (values.Count = 0)
@@ -2405,9 +2405,9 @@ class SetupEditor extends ConfigurationItem {
 		this.Control["setupNameViewer"].Text := (setup ? setup.Name : "")
 		this.Control["setupViewer"].Value := (setup ? setup.Setup : "")
 
-		categories := getMultiMapValues(this.Workbench.Definition, "Setup.Categories")
+		categories := getMultiMapValues(this.Workbench.Definition, "Workbench.Categories")
 
-		categoriesLabels := getMultiMapValues(this.Workbench.Definition, "Setup.Categories.Labels")
+		categoriesLabels := getMultiMapValues(this.Workbench.Definition, "Workbench.Categories.Labels")
 
 		this.SettingsListView.Delete()
 
@@ -2959,9 +2959,9 @@ class SetupComparator extends ConfigurationItem {
 
 		this.SetupAB := setupAB
 
-		categories := getMultiMapValues(this.Workbench.Definition, "Setup.Categories")
+		categories := getMultiMapValues(this.Workbench.Definition, "Workbench.Categories")
 
-		categoriesLabels := getMultiMapValues(this.Workbench.Definition, "Setup.Categories.Labels")
+		categoriesLabels := getMultiMapValues(this.Workbench.Definition, "Workbench.Categories.Labels")
 
 		this.SettingsListView.Delete()
 

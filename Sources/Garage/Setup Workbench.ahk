@@ -1215,7 +1215,7 @@ class SetupWorkbench extends ConfigurationItem {
 													, kResourcesDirectory, kUserHomeDirectory))
 
 			for ignore, section in ["Workbench.Categories", "Workbench.Settings"]
-				addMultiMapValues(this.Definition, getMultiMapValues(carDefinition, section))
+				setMultiMapValues(this.Definition, section, getMultiMapValues(carDefinition, section), false)
 
 			for ignore, section in ["Workbench.Categories.Labels", "Workbench.Settings.Labels"] {
 				values := getMultiMapValues(carDefinition, section . "." . getLanguage())
@@ -2405,9 +2405,9 @@ class SetupEditor extends ConfigurationItem {
 		this.Control["setupNameViewer"].Text := (setup ? setup.Name : "")
 		this.Control["setupViewer"].Value := (setup ? setup.Setup : "")
 
-		categories := getMultiMapValues(this.Workbench.Definition, "Setup.Categories")
+		categories := getMultiMapValues(this.Workbench.Definition, "Workbench.Categories")
 
-		categoriesLabels := getMultiMapValues(this.Workbench.Definition, "Setup.Categories.Labels")
+		categoriesLabels := getMultiMapValues(this.Workbench.Definition, "Workbench.Categories.Labels")
 
 		this.SettingsListView.Delete()
 
@@ -2959,9 +2959,9 @@ class SetupComparator extends ConfigurationItem {
 
 		this.SetupAB := setupAB
 
-		categories := getMultiMapValues(this.Workbench.Definition, "Setup.Categories")
+		categories := getMultiMapValues(this.Workbench.Definition, "Workbench.Categories")
 
-		categoriesLabels := getMultiMapValues(this.Workbench.Definition, "Setup.Categories.Labels")
+		categoriesLabels := getMultiMapValues(this.Workbench.Definition, "Workbench.Categories.Labels")
 
 		this.SettingsListView.Delete()
 

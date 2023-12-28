@@ -277,11 +277,11 @@ The most important part is the "[Setup.Settings.Handler]" section. Here you spec
 
   - **RawHandler(increment, minValue, maxValue)**
   
-    This handler implements a range of numbers. The valid range of setting values goes from minValue to maxValue with each step defined be *increment*. The values will be used as such in the underlying simulator specific setup file.
+    This handler implements a range of numbers. The valid range of setting values goes from *minValue* to *maxValue* with each step defined be *increment*. The values will be used as such in the underlying simulator specific setup file.
 
   - **ClicksHandler(minValue, maxValue)**
   
-    Available values for this setting range from *minValue* to *maxValue* and are incremented by **1**. *minValue* and *maxValue* must be both integers.
+    Available values for this setting range from *minValue* to *maxValue* and are incremented by **1**. *minValue* and *maxValue* must be both integers, where *minValue* is mapped to **0** in the underlying simulator specific setup file.
 
   - **IntegerHandler(baseValue, increment, minValue, maxValue)**
   

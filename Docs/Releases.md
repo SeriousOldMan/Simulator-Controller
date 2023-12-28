@@ -4,16 +4,17 @@
   3. The copyright information has been updated to 2024 in all parts of the software.
   4. Fixed recurring installation of the French speech recognition library.
   5. Fixed controller preview windows forgetting their last position in "Simulator Setup".
-  6. "Simulator Startup" now supports the so-called startup profiles, which let you manage and activate the most important configuration settings for solo and team races in a matter of seconds. See the all new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles) for more information.
-  7. New [control key modifiers](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Keyboard-Modifiers) for "Simulator Startup" allow you to quickly open the startup profiles editor and run the startup process automatically when closing the editor. Some of the former keyboard modifiers for "Simulator Startup" have changed, therefore take a close look the [list of modifiers](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Keyboard-Modifiers).
-  8. A couple of presets, that were used to disable voice handling completely or to start the Assistants muted, has been deprecated in "Simulator Setup". The functionality is now available in the [startup profiles](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles).
-  9. A new preset has been added to "Simulator Setup" that installs a set of predefined startup profiles for you.
-  10. Information about the active startup profile has been added to the "System Monitor".
-  11. The Button Box visual representation got a little bit slicker.
-  12. [Developer only] Information about the active startup profile has been added to the "Session State.json" file.
-  13. [Developer only] Information about the pitstop forecast has been added to the "Session State.json" file.
-  14. [Internal] Migrated to AHK version 2.0.11.
-  15. New car models for "Setup Workbench":
+  6. Fixed setup category display in "Setup Workbench".
+  7. "Simulator Startup" now supports the so-called startup profiles, which let you manage and activate the most important configuration settings for solo and team races in a matter of seconds. See the all new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles) for more information.
+  8. New [control key modifiers](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Keyboard-Modifiers) for "Simulator Startup" allow you to quickly open the startup profiles editor and run the startup process automatically when closing the editor. Some of the former keyboard modifiers for "Simulator Startup" have changed, therefore take a close look the [list of modifiers](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Keyboard-Modifiers).
+  9. A couple of presets, that were used to disable voice handling completely or to start the Assistants muted, has been deprecated in "Simulator Setup". The functionality is now available in the [startup profiles](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles).
+  10. A new preset has been added to "Simulator Setup" that installs a set of predefined startup profiles for you.
+  11. Information about the active startup profile has been added to the "System Monitor".
+  12. The Button Box visual representation got a little bit slicker.
+  13. [Developer only] Information about the active startup profile has been added to the "Session State.json" file.
+  14. [Developer only] Information about the pitstop forecast has been added to the "Session State.json" file.
+  15. [Internal] Migrated to AHK version 2.0.11.
+  16. New car models for "Setup Workbench":
       - Assetto Corsa
         - BMW M1
 

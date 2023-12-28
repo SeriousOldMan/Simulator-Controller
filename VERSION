@@ -20,7 +20,7 @@ Configuration.5.4.8.Content=Setup
 Configuration.5.4.8.Download=https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+5.4.8.zip
 Configuration.5.5.2.Path=Resources
 Configuration.5.5.2.Content=Setup
-Configuration.5.5.2.Download=https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+5.5.2.zip
+Configuration.5.5.2.Download=https://www.dropbox.com/scl/fi/5cfljumm3d9v8bfazxlxp/Configuration-5.5.2.zip?rlkey=0axory858k403nltuqgqhukfx&dl=0
 Utilities.5.4.8.Path=.
 Utilities.5.4.8.Content=Utilities
 Utilities.5.4.8.Download=https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+5.4.8.zip

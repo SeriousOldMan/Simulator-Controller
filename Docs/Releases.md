@@ -17,7 +17,8 @@
   16. [Internal] The copyright information has been updated to 2024 in all parts of the software.
   17. New car models for "Setup Workbench":
       - Assetto Corsa
-        - BMW M1
+        - BMW M3 E30 (fixed)
+		- McLaren F1 GTR
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-552), since a couple of presets were deprecated.
 

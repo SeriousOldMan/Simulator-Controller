@@ -90,6 +90,9 @@ class MultiMap extends CaseInsenseWeakMap {
 	}
 }
 
+class SectionMap extends CaseInsenseWeakMap {
+}
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Public Function Declaration Section                  ;;;
@@ -100,7 +103,7 @@ newMultiMap(arguments*) {
 }
 
 newSectionMap(arguments*) {
-	return CaseInsenseWeakMap(arguments*)
+	return SectionMap(arguments*)
 }
 
 readMultiMap(multiMapFile, class?) {

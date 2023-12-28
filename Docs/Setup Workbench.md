@@ -309,18 +309,18 @@ Now you can alter the set of settings handled by the "Setup Workbench". You can 
 
 - Introduce a setting by supplying the following definitions:
 
-	[Workbench.Settings]<br>
-	Aero=Splitter.Front; Wing.Front; Wing.Rear; Height: Front, Rear; Diffusor.Height
+		[Workbench.Settings]
+		Aero=Splitter.Front; Wing.Front; Wing.Rear; Height: Front, Rear; Diffusor.Height
    
   Explanation: The default settings definition already mentions "Splitter.Front; Wing.Front; Wing.Rear; Height: Front, Rear" for the "Aero" category. We will add "Diffusor.Height" here.
 
 - Optionally you can also introduce language specific labels for the user interface using:
 
-	[Workbench.Settings.Labels.DE]<br>
-	Aero.Diffusor.Height=Diffusor Höhe
+		[Workbench.Settings.Labels.DE]
+		Aero.Diffusor.Height=Diffusor Höhe
    
-	[Workbench.Settings.Labels.EN]<br>
-	Aero.Diffusor.Height=Diffusor Height
+		[Workbench.Settings.Labels.EN]
+		Aero.Diffusor.Height=Diffusor Height
    
 - Once you have defined the new setting, you must define your own rules as described in [How it works](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#how-it-works), so that "Setup Workbench" *knows*, when to recommend a cerresponding setup modification.
 
@@ -330,15 +330,15 @@ If you want the new setting to be available in the Setup Editor as well, you wil
 
 - Example definition for *Assetto Corsa*:
 
-	[Setup.Settings]<br>
-	Aero.Diffusor.Height=DIFFUSOR_HEIGHT
+		[Setup.Settings]
+		Aero.Diffusor.Height=DIFFUSOR_HEIGHT
    
   Explanation: This simply defines the field in the setup file format of the given car mod for *Assetto Corsa*. The file formats for the different simulator can be found below.
    
-- And define your own handler for this setting:
+  After you have defined the setting itself, define your own handler for this setting:
    
-  [Setup.Settings.Handler]<br>
-  Aero.Diffusor.Height=ClicksHandler(1, 4)
+		[Setup.Settings.Handler]
+		Aero.Diffusor.Height=ClicksHandler(1, 4)
   
 Optionally, you have to ativate the setting in the rules system, if you want to automatically create adjustments based on handling issues. Example:
 
@@ -351,12 +351,12 @@ Optionally, you have to ativate the setting in the rules system, if you want to 
 
 Introducing handling characteristics, which are used to describe the issues you have with the car, follows a very similar pattern. Define the characteristics you want to add in the simulator or car configuration file by adding a section like
 
-	[Workbench.Characteristics]<br>
+	[Workbench.Characteristics]
 	Battery=Depletion: Low, High
 
 And you can introduce language specific labels here as well:
 
-	[Workbench.Characteristics.Labels.DE]<br>
+	[Workbench.Characteristics.Labels.DE]
 	Battery=Batterie
 	Depletion=Nutzung
 	Low=Niedrig
@@ -364,7 +364,7 @@ And you can introduce language specific labels here as well:
 	Battery.Depletion.Low=Batterie Nutzung zu Niedrig
 	Battery.Depletion.High=Batterie Nutzung zu Hoch
 
-	[Workbench.Characteristics.Labels.EN]<br>
+	[Workbench.Characteristics.Labels.EN]
 	Battery=Battery
 	Depletion=Usage
 	Low=Low

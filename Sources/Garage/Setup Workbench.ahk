@@ -64,6 +64,22 @@ global kDebugRules := 2
 ;;;-------------------------------------------------------------------------;;;
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; LabelsMap                                                               ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class LabelsMap extends SectionMap {
+	__Item[key] {
+		Get {
+			return (this.Has(key) ? super.__Item[key] : key)
+		}
+
+		Set {
+			return (super.__Item[key] := value)
+		}
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; SetupWorkbench                                                          ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
@@ -615,7 +631,7 @@ class SetupWorkbench extends ConfigurationItem {
 				this.loadTrack(track, false)
 				this.loadWeather(weather, false)
 
-				characteristicLabels := getMultiMapValues(this.Definition, "Workbench.Characteristics.Labels")
+				characteristicLabels := toMap(getMultiMapValues(this.Definition, "Workbench.Characteristics.Labels"), LabelsMap)
 
 				characteristics := string2Values(",", getMultiMapValue(state, "Characteristics", "Characteristics"))
 
@@ -992,7 +1008,7 @@ class SetupWorkbench extends ConfigurationItem {
 
 	loadCharacteristics(simulator := false, car := false, track := false, fast := false) {
 		local knowledgeBase := this.KnowledgeBase
-		local characteristicLabels := getMultiMapValues(this.Definition, "Workbench.Characteristics.Labels")
+		local characteristicLabels := toMap(getMultiMapValues(this.Definition, "Workbench.Characteristics.Labels"), LabelsMap)
 		local compiler, group, ignore, groupOption, option, characteristic
 
 		this.iCharacteristics := []
@@ -1074,9 +1090,7 @@ class SetupWorkbench extends ConfigurationItem {
 	}
 
 	getLabel(setting) {
-		local settingLabels := getMultiMapValues(this.Definition, "Workbench.Settings.Labels")
-
-		return (settingLabels.Has(setting) ? settingLabels[setting] : setting)
+		return toMap(getMultiMapValues(this.Definition, "Workbench.Settings.Labels"), LabelsMap)[setting]
 	}
 
 	loadSettings(simulator := false, car := false, fast := false) {
@@ -1204,6 +1218,8 @@ class SetupWorkbench extends ConfigurationItem {
 				values := getMultiMapValues(simulatorDefinition, section . ".EN")
 
 			setMultiMapValues(this.Definition, section, values, false)
+
+			setMultiMapValues(this.Definition, section, toMap(getMultiMapValues(this.Definition, section), LabelsMap))
 		}
 
 		car := this.SelectedCar["*"]
@@ -1463,7 +1479,7 @@ class SetupWorkbench extends ConfigurationItem {
 			x := (this.CharacteristicsArea.X + 8)
 			y := (this.CharacteristicsArea.Y + 8 + (numCharacteristics * kCharacteristicHeight))
 
-			characteristicLabels := getMultiMapValues(this.Definition, "Workbench.Characteristics.Labels")
+			characteristicLabels := toMap(getMultiMapValues(this.Definition, "Workbench.Characteristics.Labels"), LabelsMap)
 
 			this.SelectedCharacteristics.Push(characteristic)
 
@@ -1556,7 +1572,7 @@ class SetupWorkbench extends ConfigurationItem {
 
 		characteristicsMenu := Menu()
 
-		characteristicLabels := getMultiMapValues(this.Definition, "Workbench.Characteristics.Labels")
+		characteristicLabels := toMap(getMultiMapValues(this.Definition, "Workbench.Characteristics.Labels"), LabelsMap)
 
 		menuIndex := 1
 
@@ -2372,12 +2388,12 @@ class SetupEditor extends ConfigurationItem {
 	}
 
 	getLabel(setting) {
-		local settingsLabels := getMultiMapValues(this.Configuration, "Setup.Settings.Labels")
+		local settingsLabels := toMap(getMultiMapValues(this.Configuration, "Setup.Settings.Labels"), LabelsMap)
 
 		if settingsLabels.Has(setting)
 			return settingsLabels[setting]
 		else {
-			settingsLabels := getMultiMapValues(this.Workbench.Definition, "Workbench.Settings.Labels")
+			settingsLabels := toMap(getMultiMapValues(this.Workbench.Definition, "Workbench.Settings.Labels"), LabelsMap)
 
 			return (settingsLabels.Has(setting) ? settingsLabels[setting] : setting)
 		}
@@ -2407,7 +2423,7 @@ class SetupEditor extends ConfigurationItem {
 
 		categories := getMultiMapValues(this.Workbench.Definition, "Workbench.Categories")
 
-		categoriesLabels := getMultiMapValues(this.Workbench.Definition, "Workbench.Categories.Labels")
+		categoriesLabels := toMap(getMultiMapValues(this.Workbench.Definition, "Workbench.Categories.Labels"), LabelsMap)
 
 		this.SettingsListView.Delete()
 
@@ -2913,7 +2929,7 @@ class SetupComparator extends ConfigurationItem {
 	}
 
 	getLabel(setting) {
-		local settingsLabels := getMultiMapValues(this.Configuration, "Setup.Settings.Labels")
+		local settingsLabels := toMap(getMultiMapValues(this.Configuration, "Setup.Settings.Labels"), LabelsMap)
 
 		if settingsLabels.Has(setting)
 			return settingsLabels[setting]
@@ -2961,7 +2977,7 @@ class SetupComparator extends ConfigurationItem {
 
 		categories := getMultiMapValues(this.Workbench.Definition, "Workbench.Categories")
 
-		categoriesLabels := getMultiMapValues(this.Workbench.Definition, "Workbench.Categories.Labels")
+		categoriesLabels := toMap(getMultiMapValues(this.Workbench.Definition, "Workbench.Categories.Labels"), LabelsMap)
 
 		this.SettingsListView.Delete()
 

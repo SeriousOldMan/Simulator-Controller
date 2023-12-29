@@ -401,6 +401,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 
 		local function, motionArguments, motionEffectsArguments, motionEffectIntensityArguments, initialIntensity
 		local effectFunctions, ignore, index, effect, descriptor, motionMode, increaseAction, decreaseAction, intensityDialAction
+		local motionEnabled
 
 		super.__New(controller, name, configuration, false)
 
@@ -547,13 +548,24 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 				controller.registerPlugin(this)
 
 			if (motionArguments.Length > 0) {
-				if ((motionArguments[1] = "On") && !this.MotionActive && !this.Application.isRunning())
-					this.startMotion(false, true)
-				else if ((motionArguments[1] = "Off") && this.Application.isRunning())
-					this.stopMotion(false, true)
-				else
-					this.stopMotion(false, true, false)
+				if ((motionArguments[1] == true) || (motionArguments[1] = kTrue))
+					motionArguments[1] := "On"
+
+				if ((motionArguments[1] == false) || (motionArguments[1] = kFalse))
+					motionArguments[1] := "Off"
+
+				motionEnabled := (motionArguments[1] = "On")
 			}
+			else
+				motionEnabled := false
+
+			if (this.StartupSettings && (getMultiMapValue(this.StartupSettings, "Functions", "Motion", kUndefined) != kUndefined))
+				motionEnabled := getMultiMapValue(this.StartupSettings, "Functions", "Motion")
+
+			if motionEnabled
+				this.startMotion(false, true)
+			else if this.Application.isRunning()
+				this.stopMotion(false, true)
 			else
 				this.stopMotion(false, true, false)
 

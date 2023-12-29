@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Controller Step Wizard          ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2023) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2024) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -801,7 +801,7 @@ class ControllerPreviewStepWizard extends StepWizard {
 			x := screen2Window(x)
 			y := screen2Window(y)
 
-			this.setPreviewCenter(window, x + Round(width / 2), y + Round(height / 2))
+			this.setPreviewCenter(window.ControllerPreview.Name, x + Round(width / 2), y + Round(height / 2))
 		}
 
 		return moveControllerPreview

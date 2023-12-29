@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Build & Maintenance Tool        ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2023) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2024) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -1647,6 +1647,22 @@ updateInstallationForV500() {
 	}
 }
 
+updateConfigurationForV552() {
+	local configuration, subtitle
+
+	if FileExist(kUserConfigDirectory . "Simulator Configuration.ini") {
+		configuration := readMultiMap(kUserConfigDirectory . "Simulator Configuration.ini")
+
+		subtitle := getMultiMapValue(configuration, "Splash Window", "Subtitle", false)
+
+		if subtitle {
+			setMultiMapValue(configuration, "Splash Window", "Subtitle", StrReplace(subtitle, "2023", "2024"))
+
+			writeMultiMap(kUserConfigDirectory . "Simulator Configuration.ini", configuration)
+		}
+	}
+}
+
 updateConfigurationForV541() {
 	local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 	local deleted := []
@@ -3020,38 +3036,27 @@ startupSimulatorTools() {
 
 	checkInstallation()
 
-	try {
-		readToolsConfiguration(&gUpdateSettings, &gCleanupSettings, &gCopySettings, &gBuildSettings, &gSplashScreen, &gTargetConfiguration)
+	readToolsConfiguration(&gUpdateSettings, &gCleanupSettings, &gCopySettings, &gBuildSettings, &gSplashScreen, &gTargetConfiguration)
 
-		if (A_Args.Length > 0)
-			if (A_Args[1] = "-Update")
-				updateOnly := true
+	if (A_Args.Length > 0)
+		if (A_Args[1] = "-Update")
+			updateOnly := true
 
-		if updateOnly {
-			gCleanupSettings := CaseInsenseMap()
-			gCopySettings := CaseInsenseMap()
+	if updateOnly {
+		gCleanupSettings := CaseInsenseMap()
+		gCopySettings := CaseInsenseMap()
+		gBuildSettings := CaseInsenseMap()
+	}
+	else {
+		if !FileExist(kAHKDirectory)
 			gBuildSettings := CaseInsenseMap()
-		}
-		else {
-			if !FileExist(kAHKDirectory)
-				gBuildSettings := CaseInsenseMap()
 
-			if (!FileExist(getFileName(kToolsConfigurationFile, kUserConfigDirectory, kConfigDirectory)) || GetKeyState("Ctrl"))
-				if !editTargets()
-					ExitApp(0)
-		}
-
-		startupApplication()
+		if (!FileExist(getFileName(kToolsConfigurationFile, kUserConfigDirectory, kConfigDirectory)) || GetKeyState("Ctrl"))
+			if !editTargets()
+				ExitApp(0)
 	}
-	catch Any as exception {
-		logError(exception, true)
 
-		OnMessage(0x44, translateOkButton)
-		MsgBox(substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Simulator Tools"}), translate("Error"), 262160)
-		OnMessage(0x44, translateOkButton, 0)
-
-		ExitApp(1)
-	}
+	startupApplication()
 
 	if (!kSilentMode && gSplashScreen)
 		showSplashScreen(gSplashScreen, false, false)

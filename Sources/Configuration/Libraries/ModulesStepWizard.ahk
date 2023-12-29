@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Mudules Step Wizard             ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2023) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2024) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -418,6 +418,29 @@ class P2TConfiguration extends NamedPreset {
 
 	uninstall(wizard) {
 		deleteFile(kUserConfigDirectory . "P2T Configuration.ini")
+	}
+}
+
+class StartupProfiles extends NamedPreset {
+	__New(name, *) {
+		super.__New(name)
+	}
+
+	getArguments() {
+		return concatenate(super.getArguments(), Array(kResourcesDirectory . "Setup\Presets\Startup.settings"))
+	}
+
+	install(wizard, edit := true) {
+		try {
+			FileCopy(kResourcesDirectory . "Setup\Presets\Startup.settings", kUserConfigDirectory . "Startup.settings", 1)
+		}
+		catch Any as exception {
+			logError(exception)
+		}
+	}
+
+	uninstall(wizard) {
+		deleteFile(kUserConfigDirectory . "Startup.settings")
 	}
 }
 

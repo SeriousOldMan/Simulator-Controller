@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Database                        ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2023) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2024) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -151,10 +151,12 @@ class Database {
 
 		if name {
 			if !this.Files.Has(name) {
+				directory := this.Directory
+				
+				DirCreate(directory)
+					
 				while !done {
-					directory := this.Directory
-
-					DirCreate(directory)
+					file := false
 
 					try {
 						file := FileOpen(directory . name . ".CSV", "rw-rwd")
@@ -163,6 +165,9 @@ class Database {
 						if !wait
 							logError(exception)
 
+						if file
+							file.Close()
+							
 						file := false
 					}
 

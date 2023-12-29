@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Controller Editor               ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2023) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2024) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -204,19 +204,19 @@ class ControllerEditor extends ConfiguratorPanel {
 		this.LayoutsList.saveToConfiguration(buttonBoxConfiguration, streamDeckConfiguration, save)
 	}
 
-	setPreviewCenter(window, centerX, centerY) {
-		if window
-			ControllerEditor.sPreviewCenters[window] := [centerX, centerY]
+	setPreviewCenter(descriptor, centerX, centerY) {
+		if descriptor
+			ControllerEditor.sPreviewCenters[descriptor] := [centerX, centerY]
 
 		this.iPreviewCenterX := centerX
 		this.iPreviewCenterY := centerY
 	}
 
-	getPreviewCenter(window, &centerX, &centerY) {
+	getPreviewCenter(descriptor, &centerX, &centerY) {
 		local center
 
-		if (window && ControllerEditor.sPreviewCenters.Has(window)) {
-			center := ControllerEditor.sPreviewCenters[window]
+		if (descriptor && ControllerEditor.sPreviewCenters.Has(descriptor)) {
+			center := ControllerEditor.sPreviewCenters[descriptor]
 
 			centerX := center[1]
 			centerY := center[2]
@@ -240,7 +240,7 @@ class ControllerEditor extends ConfiguratorPanel {
 
 			preview := ControllerPreview.ControllerPreviews[window]
 
-			preview.PreviewManager.setPreviewCenter(window, x + Round(width / 2), y + Round(height / 2))
+			preview.PreviewManager.setPreviewCenter(window.Name, x + Round(width / 2), y + Round(height / 2))
 		}
 
 		return moveControllerPreview
@@ -1571,6 +1571,8 @@ class ControllerPreview extends ConfigurationItem {
 
 		this.createGui(configuration)
 
+		this.Window.ControllerPreview := this
+
 		this.createBackground(configuration)
 	}
 
@@ -1647,7 +1649,7 @@ class ControllerPreview extends ConfigurationItem {
 		local window, x, y
 		local mainScreen, mainScreenLeft, mainScreenRight, mainScreenTop, mainScreenBottom
 
-		this.PreviewManager.getPreviewCenter(this.Window, &centerX, &centerY)
+		this.PreviewManager.getPreviewCenter(this.Name, &centerX, &centerY)
 
 		MonitorGetWorkArea(, &mainScreenLeft, &mainScreenTop, &mainScreenRight, &mainScreenBottom)
 

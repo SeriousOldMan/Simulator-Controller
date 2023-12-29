@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Session Database                ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2023) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2024) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -1056,13 +1056,17 @@ class SessionDatabase extends ConfigurationItem {
 	static registerCar(simulator, car, name) {
 		local simulatorCode := SessionDatabase.getSimulatorCode(simulator)
 		local carCode := SessionDatabase.getCarCode(simulator, car)
-		local fileName := (kUserHomeDirectory . "Simulator Data\" . simulatorCode . "\" . "Car Data.ini")
-		local carData := readMultiMap(fileName)
+		local carData, fileName
 
 		if (simulator && simulatorCode && car && carCode) {
 			DirCreate(kDatabaseDirectory . "User\" . simulatorCode . "\" . carCode)
 
+			carData := SessionDatabase.loadData(SessionDatabase.sCarData, simulatorCode, "Car Data.ini")
+
 			if (getMultiMapValue(carData, "Car Names", car, kUndefined) == kUndefined) {
+				fileName := (kUserHomeDirectory . "Simulator Data\" . simulatorCode . "\" . "Car Data.ini")
+				carData := readMultiMap(fileName)
+
 				setMultiMapValue(carData, "Car Names", car, name)
 				setMultiMapValue(carData, "Car Codes", name, car)
 
@@ -1109,13 +1113,17 @@ class SessionDatabase extends ConfigurationItem {
 		local simulatorCode := SessionDatabase.getSimulatorCode(simulator)
 		local carCode := SessionDatabase.getCarCode(simulator, car)
 		local trackCode := SessionDatabase.getTrackCode(simulator, track)
-		local fileName := (kUserHomeDirectory . "Simulator Data\" . simulatorCode . "\" . "Track Data.ini")
-		local trackData := readMultiMap(fileName)
+		local trackData, fileName
 
 		if (simulator && simulatorCode && car && carCode && track && trackCode) {
 			DirCreate(kDatabaseDirectory . "User\" . simulatorCode . "\" . carCode . "\" . trackCode)
 
+			trackData := SessionDatabase.loadData(SessionDatabase.sTrackData, simulatorCode, "Track Data.ini")
+
 			if (getMultiMapValue(trackData, "Track Names Long", track, kUndefined) == kUndefined) {
+				fileName := (kUserHomeDirectory . "Simulator Data\" . simulatorCode . "\" . "Track Data.ini")
+				trackData := readMultiMap(fileName)
+
 				setMultiMapValue(trackData, "Track Names Long", track, longName)
 				setMultiMapValue(trackData, "Track Names Short", track, shortName)
 				setMultiMapValue(trackData, "Track Codes", longName, track)

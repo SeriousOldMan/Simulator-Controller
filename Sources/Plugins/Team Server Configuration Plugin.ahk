@@ -3,7 +3,7 @@
 ;;;                                         Plugin                          ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2023) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2024) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -514,6 +514,23 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 		setMultiMapValue(configuration, "Team Server", "Data.Token", this.Control["teamServerDataTokenEdit"].Text)
 		setMultiMapValue(configuration, "Team Server", "Account.Name", this.Control["teamServerNameEdit"].Text)
 		setMultiMapValue(configuration, "Team Server", "Account.Token", this.Token)
+
+		if this.SelectedTeam {
+			setMultiMapValue(configuration, "Team Server", "Team.Name", this.SelectedTeam)
+			setMultiMapValue(configuration, "Team Server", "Team.Identifier", this.Teams[this.SelectedTeam])
+		}
+
+		if this.SelectedDriver {
+			setMultiMapValue(configuration, "Team Server", "Driver.Name", this.SelectedDriver)
+			setMultiMapValue(configuration, "Team Server", "Driver.Identifier", this.Drivers[this.SelectedDriver])
+		}
+
+		if this.SelectedSession {
+			setMultiMapValue(configuration, "Team Server", "Session.Name", this.SelectedSession)
+			setMultiMapValue(configuration, "Team Server", "Session.Identifier", this.Sessions[this.SelectedSession])
+		}
+
+
 
 		setMultiMapValue(configuration, "Team Server", "Session.Folder", this.Control["sessionStorePathEdit"].Text)
 
@@ -1049,13 +1066,27 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 ;;;-------------------------------------------------------------------------;;;
 
 initializeTeamServerConfigurator() {
-	local editor
+	local editor, configurator
+
+	launchTeam() {
+		if editor.Window {
+			editor.Control["configuratorTabView"].Value := inList(editor.Configurators["OBJECT"], configurator)
+
+			configurator.activate()
+		}
+		else
+			return Task.CurrentTask
+	}
 
 	if kConfigurationEditor {
 		editor := ConfigurationEditor.Instance
+		configurator := TeamServerConfigurator(editor, editor.Configuration)
 
-		editor.registerConfigurator(translate("Team Server"), TeamServerConfigurator(editor, editor.Configuration)
+		editor.registerConfigurator(translate("Team Server"), configurator
 								  , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-team-server")
+
+		if inList(A_Args, "-Team")
+			Task.startTask(launchTeam, 2000)
 	}
 }
 

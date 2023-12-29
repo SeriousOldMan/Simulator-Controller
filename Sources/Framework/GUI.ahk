@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - GUI Functions                   ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2023) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2024) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -1061,7 +1061,7 @@ class Window extends Gui {
 			cWidth := screen2Window(cWidth)
 			cHeight := screen2Window(cHeight)
 
-			this.iTitleBarHeight := height - cHeight
+			this.iTitleBarHeight := (height - cHeight)
 
 			this.iMinWidth := width
 			this.iMinHeight := height

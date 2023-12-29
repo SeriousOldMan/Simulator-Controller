@@ -277,11 +277,11 @@ The most important part is the "[Setup.Settings.Handler]" section. Here you spec
 
   - **RawHandler(increment, minValue, maxValue)**
   
-    This handler implements a range of numbers. The valid range of setting values goes from minValue to maxValue with each step defined be *increment*. The values will be used as such in the underlying simulator specific setup file.
+    This handler implements a range of numbers. The valid range of setting values goes from *minValue* to *maxValue* with each step defined be *increment*. The values will be used as such in the underlying simulator specific setup file.
 
   - **ClicksHandler(minValue, maxValue)**
   
-    Available values for this setting range from *minValue* to *maxValue* and are incremented by **1**. *minValue* and *maxValue* must be both integers.
+    Available values for this setting range from *minValue* to *maxValue* and are incremented by **1**. *minValue* and *maxValue* must be both integers, where *minValue* is mapped to **0** in the underlying simulator specific setup file.
 
   - **IntegerHandler(baseValue, increment, minValue, maxValue)**
   
@@ -309,18 +309,18 @@ Now you can alter the set of settings handled by the "Setup Workbench". You can 
 
 - Introduce a setting by supplying the following definitions:
 
-	[Workbench.Settings]<br>
-	Aero=Splitter.Front; Wing.Front; Wing.Rear; Height: Front, Rear; Diffusor.Height
+		[Workbench.Settings]
+		Aero=Splitter.Front; Wing.Front; Wing.Rear; Height: Front, Rear; Diffusor.Height
    
   Explanation: The default settings definition already mentions "Splitter.Front; Wing.Front; Wing.Rear; Height: Front, Rear" for the "Aero" category. We will add "Diffusor.Height" here.
 
 - Optionally you can also introduce language specific labels for the user interface using:
 
-	[Workbench.Settings.Labels.DE]<br>
-	Diffusor.Height=Diffusor Höhe
+		[Workbench.Settings.Labels.DE]
+		Aero.Diffusor.Height=Diffusor Höhe
    
-	[Workbench.Settings.Labels.EN]<br>
-	Diffusor.Height=Diffusor Height
+		[Workbench.Settings.Labels.EN]
+		Aero.Diffusor.Height=Diffusor Height
    
 - Once you have defined the new setting, you must define your own rules as described in [How it works](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#how-it-works), so that "Setup Workbench" *knows*, when to recommend a cerresponding setup modification.
 
@@ -330,19 +330,51 @@ If you want the new setting to be available in the Setup Editor as well, you wil
 
 - Example definition for *Assetto Corsa*:
 
-	[Setup.Settings]<br>
-	Diffusor.Height=DIFFUSOR_HEIGHT
+		[Setup.Settings]
+		Aero.Diffusor.Height=DIFFUSOR_HEIGHT
    
   Explanation: This simply defines the field in the setup file format of the given car mod for *Assetto Corsa*. The file formats for the different simulator can be found below.
    
-- And define your own handler for this setting:
+  After you have defined the setting itself, define your own handler for this setting:
    
-  [Setup.Settings.Handler]<br>
-  Diffusor.Height=ClicksHandler(1, 4)
+		[Setup.Settings.Handler]
+		Aero.Diffusor.Height=ClicksHandler(1, 4)
+  
+Optionally, you have to ativate the setting in the rules system, if you want to automatically create adjustments based on handling issues. Example:
+
+	[?Initialize] => (Prove: addSettings("Assetto Corsa", "My race car", [Aero.Diffusor.Height]))
+	
+	[?Speed.Corner.Fast.Correction != 0] =>
+		(Prove: changeSetting(Aero.Diffusor.Height, -1, ?Speed.Corner.Fast.Correction))
+
+### Defining simulator or car specific characteristics
+
+Introducing handling characteristics, which are used to describe the issues you have with the car, follows a very similar pattern. Define the characteristics you want to add in the simulator or car configuration file by adding a section like
+
+	[Workbench.Characteristics]
+	Battery=Depletion: Low, High
+
+And you can introduce language specific labels here as well:
+
+	[Workbench.Characteristics.Labels.DE]
+	Battery=Batterie
+	Depletion=Nutzung
+	Low=Niedrig
+	High=Hoch
+	Battery.Depletion.Low=Batterie Nutzung zu Niedrig
+	Battery.Depletion.High=Batterie Nutzung zu Hoch
+
+	[Workbench.Characteristics.Labels.EN]
+	Battery=Battery
+	Depletion=Usage
+	Low=Low
+	High=High
+	Battery.Depletion.Low=Battery Usage to Low
+	Battery.Depletion.High=Battery Usage to High
 
 ### Introducing new simulators
 
-Most of the stuff we talked about so far is independent of a specific simulator, since all of them store the setups more or less in the same way - as numbers. The file format, though, is very different. As you have seen above, the setups are stored as a JSON file in *Assetto Corsa Competizione*. INI files are supported for *assetto Corsa*. Therefore, let's take a look into the simulator specific configuration.
+Most of the stuff we talked about so far is independent of a specific simulator, since all of them store the setups more or less in the same way - as numbers. The file format, though, is very different. As you have seen above, the setups are stored as a JSON file in *Assetto Corsa Competizione*, whereas INI files are used by *Assetto Corsa*. Therefore, let's take a look into the simulator specific configuration.
 
 Similar to cars, each simulator has a definition file which is located in the *Resources\Garage\Definitions* folder in the program directory. You can add your own, as mentioned above, by adding them to *Simulator Controller\Garage\Definitions* folder in your local *Documents* folder. A rule file for a given simulator is also available, which is located (I think you can guess it) in the *Resources\Garage\Rules* folder in the program directory. You can also add your own here by adding them to *Simulator Controller\Garage\Rules* folder in your local *Documents* folder.
 

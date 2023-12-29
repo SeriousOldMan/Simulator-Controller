@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Race Assistant Plugin           ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2023) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2024) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -38,7 +38,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	static sInPit := false
 	static sFinish := false
 
-	static sTeamServer := false
+	static sTeamServer := kUndefined
 	static sTeamSession := false
 	static sTeamSessionActive := false
 
@@ -688,27 +688,29 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	__New(controller, name, configuration := false, register := true) {
-		local teamServer, raceAssistantToggle, teamServerToggle, arguments, ignore, theAction
+		local teamServer, raceAssistantToggle, teamServerToggle, arguments, ignore, theAction, assistant
 		local openRaceSettings, openRaceReports, openSessionDatabase, openSetupWorkbench
 		local openPracticeCenter, openRaceCenter, openStrategyWorkbench, importSetup
-		local assistantSpeaker, assistantListener, first
+		local assistantSpeaker, assistantListener, first, index, startupSettings
 
 		super.__New(controller, name, configuration, register)
 
-		deleteFile(kTempDirectory . this.Plugin . " Session.state")
-		deleteFile(kTempDirectory . this.Plugin . ".state")
+		if (RaceAssistantPlugin.sTeamServer = kUndefined) {
+			for ignore, assistant in kRaceAssistants {
+				deleteFile(kTempDirectory . assistant . ".state")
+				deleteFile(kTempDirectory . assistant . " Session.state")
+			}
 
-		if !RaceAssistantPlugin.sTeamServer {
 			if isSet(kTeamServerPlugin) {
 				teamServer := this.Controller.findPlugin(kTeamServerPlugin)
 
-				if (teamServer && this.Controller.isActive(teamServer))
-					RaceAssistantPlugin.sTeamServer := teamServer
-				else
+				if (!teamServer || !this.Controller.isActive(teamServer))
 					teamServer := false
 			}
 			else
 				teamServer := false
+
+			RaceAssistantPlugin.sTeamServer := teamServer
 		}
 		else
 			teamServer := RaceAssistantPlugin.TeamServer
@@ -739,24 +741,36 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			else
 				this.iRaceAssistantEnabled := (this.iRaceAssistantName != false)
 
-			teamServerToggle := this.getArgumentValue("teamServer", false)
+			if this.StartupSettings
+				this.iRaceAssistantEnabled := getMultiMapValue(this.StartupSettings, this.Plugin, "Enabled", this.iRaceAssistantEnabled)
 
-			if (teamServerToggle && teamServer && teamServer.Active) {
-				arguments := string2Values(A_Space, substituteString(teamServerToggle, "  ", A_Space))
+			if (teamServer && teamServer.Active) {
+				teamServerToggle := this.getArgumentValue("teamServer", false)
 
-				if (arguments.Length == 0)
-					arguments := ["Off"]
+				if teamServerToggle {
+					arguments := string2Values(A_Space, substituteString(teamServerToggle, "  ", A_Space))
 
-				if ((arguments.Length == 1) && !inList(["On", "Off"], arguments[1]))
-					arguments.InsertAt(1, "Off")
+					if (arguments.Length == 0)
+						arguments := ["Off"]
 
-				if (arguments[1] = "On")
-					this.enableTeamServer()
-				else
-					this.disableTeamServer()
+					if ((arguments.Length == 1) && !inList(["On", "Off"], arguments[1]))
+						arguments.InsertAt(1, "Off")
 
-				if (arguments.Length > 1)
-					this.createRaceAssistantAction(controller, "TeamServer", arguments[2])
+					if (!this.StartupSettings || (getMultiMapValue(this.StartupSettings, "Session", "Mode", kUndefined) = kUndefined))
+						if (arguments[1] = "On")
+							this.enableTeamServer()
+						else
+							this.disableTeamServer()
+
+					if (arguments.Length > 1)
+						this.createRaceAssistantAction(controller, "TeamServer", arguments[2])
+				}
+
+				if (this.StartupSettings && (getMultiMapValue(this.StartupSettings, "Session", "Mode", kUndefined) != kUndefined))
+					if (getMultiMapValue(this.StartupSettings, "Session", "Mode") = "Team")
+						this.enableTeamServer()
+					else
+						this.disableTeamServer()
 			}
 
 			openRaceSettings := this.getArgumentValue("openRaceSettings", false)
@@ -806,20 +820,35 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 			assistantSpeaker := this.getArgumentValue("raceAssistantSpeaker", false)
 
-			if ((assistantSpeaker != false) && (assistantSpeaker != kFalse) && (assistantSpeaker != "Off")) {
+			if ((assistantSpeaker = kFalse) || (assistantSpeaker = "Off"))
+				assistantSpeaker := false
+
+			if assistantSpeaker {
 				this.iRaceAssistantSpeaker := (((assistantSpeaker = kTrue) || (assistantSpeaker = "On")) ? true : assistantSpeaker)
 
-				this.iRaceAssistantSpeakerVocalics := this.getArgumentValue("raceAssistantSpeakerVocalics", false)
+				if (this.StartupSettings && (getMultiMapValue(this.StartupSettings, this.Plugin, "Silent", kUndefined) != kUndefined))
+					if getMultiMapValue(this.StartupSettings, this.Plugin, "Silent", false) {
+						this.iRaceAssistantSpeaker := false
 
-				this.iRaceAssistantRecognizer := this.getArgumentValue("raceAssistantRecognizer", false)
+						assistantSpeaker := false
+					}
 
-				assistantListener := this.getArgumentValue("raceAssistantListener", false)
+				if assistantSpeaker {
+					this.iRaceAssistantSpeakerVocalics := this.getArgumentValue("raceAssistantSpeakerVocalics", false)
 
-				if ((assistantListener != false) && (assistantListener != kFalse) && (assistantListener != "Off"))
-					this.iRaceAssistantListener := (((assistantListener = kTrue) || (assistantListener = "On")) ? true : assistantListener)
+					this.iRaceAssistantRecognizer := this.getArgumentValue("raceAssistantRecognizer", false)
+
+					assistantListener := this.getArgumentValue("raceAssistantListener", false)
+
+					if ((assistantListener != false) && (assistantListener != kFalse) && (assistantListener != "Off"))
+						this.iRaceAssistantListener := (((assistantListener = kTrue) || (assistantListener = "On")) ? true : assistantListener)
+				}
 			}
 
 			this.iRaceAssistantMuted := this.getArgumentValue("raceAssistantMuted", false)
+
+			if this.StartupSettings
+				this.iRaceAssistantMuted := getMultiMapValue(this.StartupSettings, this.Plugin, "Muted", this.iRaceAssistantMuted)
 
 			controller.registerPlugin(this)
 
@@ -1020,14 +1049,22 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 		if (teamServer && teamServer.TeamServerEnabled && !RaceAssistantPlugin.WaitForShutdown[true]) {
 			settings := readMultiMap(getFileName("Race.settings", kUserConfigDirectory))
+
 			sessionIdentifier := getMultiMapValue(settings, "Team Settings", "Session.Identifier", false)
 
 			if !teamServer.Connected {
 				serverURL := getMultiMapValue(settings, "Team Settings", "Server.URL", "")
 				accessToken := getMultiMapValue(settings, "Team Settings", "Server.Token", "")
-
 				teamIdentifier := getMultiMapValue(settings, "Team Settings", "Team.Identifier", false)
 				driverIdentifier := getMultiMapValue(settings, "Team Settings", "Driver.Identifier", false)
+
+				if this.StartupSettings {
+					serverURL := getMultiMapValue(this.StartupSettings, "Team Session", "Server.URL", serverURL)
+					accessToken := getMultiMapValue(this.StartupSettings, "Team Session", "Server.Token", accessToken)
+					teamIdentifier := getMultiMapValue(this.StartupSettings, "Team Session", "Team.Identifier", teamIdentifier)
+					driverIdentifier := getMultiMapValue(this.StartupSettings, "Team Session", "Driver.Identifier", driverIdentifier)
+					sessionIdentifier := getMultiMapValue(this.StartupSettings, "Team Session", "Session.Identifier", sessionIdentifier)
+				}
 
 				RaceAssistantPlugin.sTeamSessionActive
 					:= teamServer.connect(serverURL, accessToken, teamIdentifier, driverIdentifier, sessionIdentifier)
@@ -1778,6 +1815,11 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 														 , getMultiMapValue(data, "Weather Data", "Weather", "Dry"))
 				for key, value in values
 					setMultiMapValue(settings, section, key, value)
+
+		if this.StartupSettings
+			setMultiMapValue(settings, "Assistant", "Assistant.Autonomy"
+									 , getMultiMapValue(this.StartupSettings, "Race Assistant", "Autonomy"
+													  , getMultiMapValue(settings, "Assistant", "Assistant.Autonomy", "Custom")))
 
 		if isDebug()
 			writeMultiMap(kTempDirectory . this.Plugin . ".settings", settings)

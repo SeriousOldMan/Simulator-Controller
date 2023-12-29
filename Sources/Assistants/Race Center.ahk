@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Race Center Tool                ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2023) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2024) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -12578,13 +12578,30 @@ loadDrivers(connector, team) {
 }
 
 startupRaceCenter() {
+	local raceSettings := readMultiMap(kUserConfigDirectory . "Race.settings")
+	local index := inList(A_Args, "-Startup")
 	local icon := kIconsDirectory . "Console.ico"
-	local rCenter
+	local rCenter, startupSettings, ignore, property
 
 	TraySetIcon(icon, "1")
 	A_IconTip := "Race Center"
 
 	try {
+		if index {
+			startupSettings := readMultiMap(A_Args[index + 1])
+
+			for ignore, property in ["Server.URL", "Team.Name", "Team.Identifier"
+								   , "Driver.Name", "Driver.Identifier", "Session.Name", "Session.Identifier"]
+				setMultiMapValue(raceSettings, "Team Settings", property
+											 , getMultiMapValue(startupSettings, "Team Session", property
+																			   , getMultiMapValue(raceSettings, "Team Settings", property, "")))
+
+			setMultiMapValue(raceSettings, "Team Settings", "Server.Token"
+										 , getMultiMapValue(startupSettings, "Team Session", "Server.Token"
+																		   , getMultiMapValue(raceSettings, "Team Settings", "Server.Token"
+																										  , RaceCenter.kInvalidToken)))
+		}
+
 		rCenter := RaceCenter(kSimulatorConfiguration, readMultiMap(kUserConfigDirectory . "Race.settings"))
 
 		if GetKeyState("Ctrl", "P")

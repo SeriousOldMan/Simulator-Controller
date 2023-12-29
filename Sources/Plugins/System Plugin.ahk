@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - System Plugin (required)        ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2023) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2024) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -252,7 +252,7 @@ class SystemPlugin extends ControllerPlugin {
 	__New(controller, name, configuration := false, register := true) {
 		local function, action, ignore, descriptor, arguments, commands, mode, modeCommands
 
-		if inList(A_Args, "-Startup")
+		if inList(A_Args, "-Start")
 			this.iChildProcess := true
 
 		super.__New(controller, name, configuration, false)
@@ -407,6 +407,11 @@ class SystemPlugin extends ControllerPlugin {
 			setMultiMapValue(configuration, this.Plugin, "State", "Active")
 		else
 			super.writePluginState(configuration)
+
+		if (this.StartupSettings && getMultiMapValue(this.StartupSettings, "Profiles", "Profile", false))
+			setMultiMapValue(configuration, this.Plugin, "Information", translate("Profile: ") . getMultiMapValue(this.StartupSettings, "Profiles", "Profile"))
+		else
+			setMultiMapValue(configuration, this.Plugin, "Information", translate("Profile: ") . translate("Standard"))
 	}
 
 	simulatorStartup(simulator) {

@@ -84,6 +84,47 @@ Simulataor Controller is a modular software and consists of many functions, whic
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Simulator%20Controller%20Menu.JPG)
 
+Beside manually enabling and disabling features when enterring a session, you can also manage your preferences using the so called startup profiles as described in the following section.
+
+### Startup Profiles
+
+Managing the different features, as well as some feature specific configurations and settings can be quite time-consuming, when you participate in very different kind of sessions. The setup for a team race using the [Team Server](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server) is very different from running a local practice session or a race against the AI of a given simulator. Therefore, Simulator Controller provides the possibility to manage the most common settings as a profile and you can choose and activate a given profile while starting Simulator Controller by clicking on the green triangle. You can open the startup profiles editor by either exactly hitting the small cog wheel icon in the "Startup" button or by holding down the Control key while clicking on the "Startup" button. The following window appears:
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Startup%20Profiles%201.JPG)
+
+In this editor you create as many different startup profiles as you want. Only one of them will be active as indicated by the checkmark in the list and will be used during the startup process. The profile named "Standard" is special, as it indicates **no** startup profile (all settings will be loaded *normally* from the sources described above).
+
+If you want to create a startup profile, click on the button with the small "+" and give this profile a unique name. You may also use the copy button to create a copy of an already existing profile, but make sure that you change the name afterwards, so that all profile names are unique. And you can also export and import profiles to share them with your team mates, for example, using the corresponding buttons. Also take care here that all your profile names are unique before leaving the dialog.
+
+Good to know: If you hold down the Control key when clicking on the "Download" button, only the currently selected profile will be exported, otherwise all your profiles will be in the export file.
+
+You can choose whether a profile will start a solo or a team session and you can decide whether you want to run the "Practice Center" or the "Race Center" automatically during startup. Please note, that running the "Race Center" is only useful in a team session.
+
+You can furthermore choose, which Assistants will be available and whether they will talk and listen to you.
+
+| Setting  | Description |
+| -------- | ----------- |
+| Disabled | The Assistant is fully disabled (i.e. will not be started when you enter a session). But: This also disables all their services like collecting telemetry data, calculating ideal cold tyre pressures or handling track automation events. Therefore, this is not recommended, with the exception of the Driving Coach, which does not participate in this stuff.
+| Silent   | Using "Silent" disables the voice interaction of the given Assistant completely. The Assistant will perform its actions normally, as long as no permission must be granted by the driver (unless fully autonomous mode is enabled). |
+| Muted    | "Muted" means, that the Assistant is fully active, including voice capabilities. But the Assistant will not contact the driver pro-actively, for example, to inform about an upcoming weather change. The Assistant will, however, react to voice commands and will allow full voice interaction, as long as the dialog is opened by the driver. |
+| Active   | This is the normal operation mode of the Assistant with all voice capabilities enabled. |
+
+Note: Although it is technically possible to configure an Assistant with enabled voice output, but disabled voice recognition, this kind of configuration is not offered in the startup profiles, since in environment with an active Push-To-Talk button, this configuration is not necessary.
+
+Additionally, you can activate the ["Autonomous Mode" for strategy handling](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#tab-strategy) by the Assistants, if required.
+
+If the Team Server is part of your configuration and if you have chosen "Team" as the *Mode* of the startup profile, you can configure all [team session](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server) related stuff on the second tab.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Startup%20Profiles%202.JPG)
+
+If you are the team manager, you can open up the [team configuration editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-team-server) in "Simulator Configuration" by clicking on the "Manage..." button. When you have created and saved a new team session there it will be loaded into the startup profile automatically. Otherwise, if you participate as a driver in a team session, you can either use the application "Race Settings" to manage your driver credentials, or you can enter them directly into the startup profile by chosing "Save with Profile" in the *Credential* drop down. The input fields below have the same meaning and behaviour as those in the ["Race Settings"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#preparing-a-team-session) application.
+
+On the last tab you can select or deselect several functions provided by the different plugins of Simulator Controller. What is available here, totally depends on your overall configuration.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Startup%20Profiles%203.JPG)
+
+Finally, if you are ready to start, choose the profile you want to start with and close the startup profiles editor. Then click again on the green triangle to start Simulator Controller with the selected profile. As a shortcut, you can hold down the Control key while saving and closing the startup profiles editor, which will trigger the startup process automatically.
+
 ### Fixing problems
 
 Windows is an operating system with many, and sometimes confusing, security features. In many situations, Windows will prevent execution of executables and DLLs, which have been downloaded from an *unknown* location. This can be prevented by digitally signing those files, but this comes with some cost and is therefore not an option for free Open Source software.

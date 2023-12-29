@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Integration Plugin              ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2023) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2024) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -72,10 +72,19 @@ class IntegrationPlugin extends ControllerPlugin {
 	}
 
 	createSessionState(sessionInfo) {
-		return Map("Simulator", getMultiMapValue(sessionInfo, "Session", "Simulator", kNull)
-				 , "Car", getMultiMapValue(sessionInfo, "Session", "Car", kNull)
-				 , "Track", getMultiMapValue(sessionInfo, "Session", "Track", kNull)
-				 , "Session", translate(getMultiMapValue(sessionInfo, "Session", "Type", kNull)))
+		local state := Map("Simulator", getMultiMapValue(sessionInfo, "Session", "Simulator", kNull)
+						 , "Car", getMultiMapValue(sessionInfo, "Session", "Car", kNull)
+						 , "Track", getMultiMapValue(sessionInfo, "Session", "Track", kNull)
+						 , "Session", translate(getMultiMapValue(sessionInfo, "Session", "Type", kNull)))
+
+		if (getMultiMapValue(sessionInfo, "Session", "Simulator", kNull) = kNull)
+			state["Profile"] := kNull
+		else if (getMultiMapValue(sessionInfo, "Session", "Profile", kUndefined) != kUndefined)
+			state["Profile"] := getMultiMapValue(sessionInfo, "Session", "Profile")
+		else
+			state["Profile"] := translate("Standard")
+
+		return state
 	}
 
 	createDurationState(sessionInfo) {
@@ -357,6 +366,37 @@ class IntegrationPlugin extends ControllerPlugin {
 
 			state["Prepared"] := getMultiMapValue(sessionInfo, "Pitstop", "Prepared")
 		}
+		else if (getMultiMapValue(sessionInfo, "Pitstop", "Target.Fuel.Amount", kUndefined) != kUndefined) {
+			state["State"] := "Forecast"
+			state["Number"] := kNull
+			state["Lap"] := kNull
+			state["Repairs"] := kNull
+			state["Prepared"] := kNull
+
+			state["Fuel"] := convertUnit("Volume", getMultiMapValue(sessionInfo, "Pitstop", "Target.Fuel.Amount"))
+
+			tyreCompound := getMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Compound")
+
+			if tyreCompound {
+				tyreCompound := translate(compound(tyreCompound, getMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Compound.Color")))
+
+				state["TyreCompound"] := tyreCompound
+
+				tyreSet := getMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Set")
+
+				state["TyreSet"] := (tyreSet ? tyreSet : kNull)
+
+				state["TyrePressures"] := [convertUnit("Pressure", getMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Pressure.FL"))
+										 , convertUnit("Pressure", getMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Pressure.FR"))
+										 , convertUnit("Pressure", getMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Pressure.RL"))
+										 , convertUnit("Pressure", getMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Pressure.RR"))]
+			}
+			else {
+				state["TyreCompound"] := kNull
+				state["TyreSet"] := kNull
+				state["TyrePressures"] := [kNull, kNull, kNull, kNull]
+			}
+		}
 		else {
 			state["Number"] := kNull
 			state["Lap"] := kNull
@@ -431,7 +471,7 @@ class IntegrationPlugin extends ControllerPlugin {
 
 				if !getMultiMapValue(configuration, "Voice", "Speaker", true)
 					assistantsState[key]["Silent"] := kTrue
-				
+
 				if getMultiMapValue(configuration, "Voice", "Muted", false)
 					assistantsState[key]["Muted"] := kTrue
 			}
@@ -511,7 +551,7 @@ class IntegrationPlugin extends ControllerPlugin {
 
 		static lastUpdate := A_Now
 
-		for ignore, assistant in ["Race Engineer", "Race Strategist", "Race Spotter"] {
+		for ignore, assistant in kRaceAssistants {
 			fileName := (kTempDirectory . assistant . " Session.state")
 
 			if (FileExist(fileName) && (FileGetTime(fileName, "M") > lastUpdate)) {
@@ -530,7 +570,7 @@ class IntegrationPlugin extends ControllerPlugin {
 			lastUpdate := A_Now
 			sessionInfo := newMultiMap()
 
-			for ignore, assistant in ["Race Engineer", "Race Strategist", "Race Spotter"]
+			for ignore, assistant in kRaceAssistants
 				addMultiMapValues(sessionInfo, readMultiMap(kTempDirectory . assistant . " Session.state"))
 
 			sessionState := Map("Session", this.createSessionState(sessionInfo)

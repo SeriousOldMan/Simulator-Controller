@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - System Monitor                  ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2023) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2024) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -394,6 +394,12 @@ systemMonitor(command := false, arguments*) {
 		html .= ("<tr><th class=`"th-std th-left`">" . translate("Car") . "</th><td class=`"td-wdg`">" . getMultiMapValue(sessionState, "Session", "Car") . "</td></tr>")
 		html .= ("<tr><th class=`"th-std th-left`">" . translate("Track") . "</th><td class=`"td-wdg`">" . getMultiMapValue(sessionState, "Session", "Track") . "</td></tr>")
 		html .= ("<tr><th class=`"th-std th-left`">" . translate("Session") . "</th><td class=`"td-wdg`">" . translate(getMultiMapValue(sessionState, "Session", "Type")) . "</td></tr>")
+
+		if (getMultiMapValue(sessionState, "Session", "Profile", kUndefined) != kUndefined)
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Profile") . "</th><td class=`"td-wdg`">" . getMultiMapValue(sessionState, "Session", "Profile") . "</td></tr>")
+		else
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Profile") . "</th><td class=`"td-wdg`">" . translate("Standard") . "</td></tr>")
+
 		html .= "</table>"
 
 		return html
@@ -1080,6 +1086,8 @@ systemMonitor(command := false, arguments*) {
 
 			if (getMultiMapValue(controllerState, "Simulation", "Information", kUndefined) != kUndefined)
 				html .= ("<tr><td><b>" . translate("State:") . "</b></td><td>" . getMultiMapValue(controllerState, "Simulation", "Information") . "</td></tr>")
+			else if (getMultiMapValue(controllerState, "Simulation", "Profile", kUndefined) != kUndefined)
+				html .= ("<tr><td><b>" . translate("Profile: ") . "</b></td><td>" . getMultiMapValue(controllerState, "Simulation", "Profile") . "</td></tr>")
 
 			html .= "</table>"
 		}

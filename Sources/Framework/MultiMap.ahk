@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Multi Map Functions             ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2023) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2024) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -90,6 +90,9 @@ class MultiMap extends CaseInsenseWeakMap {
 	}
 }
 
+class SectionMap extends CaseInsenseWeakMap {
+}
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Public Function Declaration Section                  ;;;
@@ -100,7 +103,7 @@ newMultiMap(arguments*) {
 }
 
 newSectionMap(arguments*) {
-	return CaseInsenseWeakMap(arguments*)
+	return SectionMap(arguments*)
 }
 
 readMultiMap(multiMapFile, class?) {

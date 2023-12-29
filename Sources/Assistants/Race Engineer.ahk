@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Race Engineer                   ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2023) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2024) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -44,7 +44,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 showLogo(name) {
-	local info := kVersion . " - 2023, Oliver Juwig`nCreative Commons - BY-NC-SA"
+	local info := kVersion . " - 2024, Oliver Juwig`nCreative Commons - BY-NC-SA"
 	local logo := kResourcesDirectory . "Rotating Brain.gif"
 	local title1 := translate("Modular Simulator Controller System")
 	local title2 := substituteVariables(translate("%name% - The Virtual Race Engineer"), {name: name})

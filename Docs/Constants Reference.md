@@ -72,3 +72,9 @@ If this is *true*, most applications of Simulator Controller will adopt accordin
 
 #### *kTrue, kFalse, kActivate, kDeactivate, kIncrease, kDecrease*
 Miscellaneous constants, which define string representations for often used code constants.
+
+#### *kForegroundApps*, *kBackgroundApps*
+The names of the different applications (without the ".exe" extension). Foreground applications can have an UI, background applications will normally execute without an UI.
+
+#### *kRaceAssistants*
+The names of all Race Assistants, for example ["Driving Coach", "Race Engineer", ...].

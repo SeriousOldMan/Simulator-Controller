@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Button Box Plugin               ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2023) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2024) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -257,7 +257,7 @@ class GridButtonBox extends ButtonBox {
 							x := horizontal + Round((columnWidth - labelWidth) / 2)
 							y := vertical + rowHeight - labelHeight
 
-							control := buttonBoxGui.Add("Text", "x" . x . " y" . y . " w" . labelWidth . " h" . labelHeight . " +Border -Background  +0x1000 +0x1")
+							control := buttonBoxGui.Add("Text", "x" . x . " y" . y . " w" . labelWidth . " h" . labelHeight . " -Background  +0x1000 +0x1")
 
 							this.registerControlLabel(function, control)
 						}

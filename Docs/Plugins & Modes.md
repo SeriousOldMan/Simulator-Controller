@@ -1351,7 +1351,8 @@ The content of the JSON file looks like this (depending on the current situation
 			"Car": "McLaren 720S GT3",
 			"Session": "Race",
 			"Simulator": "Assetto Corsa Competizione",
-			"Track": "Circuit de Spa-Franchorchamps"
+			"Track": "Circuit de Spa-Franchorchamps",
+			"Profile": "Standard"
 		},
 		"Standings": {
 			"Ahead": null,

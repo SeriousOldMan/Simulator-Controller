@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Team Server Plugin              ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2023) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2024) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -342,6 +342,9 @@ class TeamServerPlugin extends ControllerPlugin {
 			else
 				this.iTeamServerEnabled := false
 
+			if (this.StartupSettings && (getMultiMapValue(this.StartupSettings, "Session", "Mode", kUndefined) != kUndefined))
+				this.iTeamServerEnabled := (getMultiMapValue(this.StartupSettings, "Session", "Mode") = "Team")
+
 			openRaceSettings := this.getArgumentValue("openRaceSettings", false)
 
 			if openRaceSettings
@@ -645,11 +648,20 @@ class TeamServerPlugin extends ControllerPlugin {
 
 		if !this.Connected {
 			settings := readMultiMap(getFileName("Race.settings", kUserConfigDirectory))
+
 			serverURL := getMultiMapValue(settings, "Team Settings", "Server.URL", "")
 			serverToken := getMultiMapValue(settings, "Team Settings", "Server.Token", "")
 			teamIdentifier := getMultiMapValue(settings, "Team Settings", "Team.Identifier", false)
 			driverIdentifier := getMultiMapValue(settings, "Team Settings", "Driver.Identifier", false)
 			sessionIdentifier := getMultiMapValue(settings, "Team Settings", "Session.Identifier", false)
+
+			if this.StartupSettings {
+				serverURL := getMultiMapValue(this.StartupSettings, "Team Session", "Server.URL", serverURL)
+				serverToken := getMultiMapValue(this.StartupSettings, "Team Session", "Server.Token", serverToken)
+				teamIdentifier := getMultiMapValue(this.StartupSettings, "Team Session", "Team.Identifier", teamIdentifier)
+				driverIdentifier := getMultiMapValue(this.StartupSettings, "Team Session", "Driver.Identifier", driverIdentifier)
+				sessionIdentifier := getMultiMapValue(this.StartupSettings, "Team Session", "Session.Identifier", sessionIdentifier)
+			}
 
 			this.connect(serverURL, serverToken, teamIdentifier, driverIdentifier, sessionIdentifier, !kSilentMode)
 

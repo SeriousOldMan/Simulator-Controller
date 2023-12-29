@@ -275,4 +275,4 @@ After firing out one release per week during the last few weeks, the project wil
 
 This software is provided as is. You are free to use it for any purpose and modify it to your needs, as long as you do not use it for any commercial purposes.
 
-(2023) Creative Commons - BY-NC-SA - by Oliver Juwig (TheBigO)
+(2024) Creative Commons - BY-NC-SA - by Oliver Juwig (TheBigO)

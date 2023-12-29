@@ -141,7 +141,7 @@ The rules for the recommendations have been compiled from different sources, abo
 
 "Setup Workbench" uses the same rule engine, that is used by the Virtual Race Assistants. A generic set of rules handle the overall computation and the analysis of the problem descriptions given by the driver. Each problem is identified by a descriptor, for example "Understeer.Corner.Exit.Fast" for understeering while accelerating out of fast corners. For each setup option, a descriptor exists as well, for example "Bumpstop.Range.Front.Left" for the length of the bumpstop rubber in the front left spring damper.
 
-During the first phase, the rule engine analyses all given problems and their "Importance" and "Severity" settings. A resulting correction value is derived, while handling contradictory requirements. The a long list of rules are evaluated that look like this:
+During the first phase, the rule engine analyses all given problems and their "Importance" and "Severity" settings. A resulting correction value is derived, while handling contradictory requirements. Then a long list of rules are evaluated that look like this:
 
 	[?Understeer.Corner.Exit.Fast.Correction != 0] =>
 			(Prove: changeSetting(Electronics.TC, -0.5, ?Understeer.Corner.Exit.Fast.Correction)),
@@ -297,6 +297,16 @@ The most important part is the "[Setup.Settings.Handler]" section. Here you spec
 	
 	will create a continuous range of -35 to 1 in the simulator specific setup file, where -35 equals the display value -3.5 and 1 equals the display value 0.1.
 
+  - **EnumerationHandler(baseValue, increment, value1, value2, ...)**
+  
+    Using this handler, you can define a set of discrete values, which will then be mapped to a value in the underlying simulator specific setup file. *baseValue* will be used as the anchor, which corresponds to the first *value1* and *increment* specify the change of the underlying value for each step in supplied list of discrete values.
+	
+	Example:
+	
+		Electronics.MGUK.Delivery=EnumerationHandler(0, 1, No Deploy, Build, Low, Balanced, High, Attack)
+	
+	defines six discrete values. *No Deploy* will be mapped to **0** and *Attack* will be mapped to **5**.
+
 The sections "[Setup.Settings.Units.DE]" and "[Setup.Settings.Units.EN]" and so on allow you to supply language specific unit labels for all the settings. If an entry is missing for a given setting, the label will be "Clicks" (or a corresponding translation).
 
 #### Defining car specific setup settings
@@ -322,7 +332,12 @@ Now you can alter the set of settings handled by the "Setup Workbench". You can 
 		[Workbench.Settings.Labels.EN]
 		Aero.Diffusor.Height=Diffusor Height
    
-- Once you have defined the new setting, you must define your own rules as described in [How it works](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#how-it-works), so that "Setup Workbench" *knows*, when to recommend a cerresponding setup modification.
+- Once you have defined the new setting, you must define your own rules as described in [How it works](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#how-it-works), so that "Setup Workbench" *knows*, when to recommend a cerresponding setup modification. Example:
+
+		[?Initialize] => (Prove: addSettings("Assetto Corsa", "My race car", [Aero.Diffusor.Height]))
+		
+		[?Speed.Corner.Fast.Correction != 0] =>
+			(Prove: changeSetting(Aero.Diffusor.Height, -1, ?Speed.Corner.Fast.Correction))
 
 Note: Beside given these definitions for a specific car, you can also use similar definitions when introducing a complete new simulator as described below. And, using the same approach, you can modify the characteristics handled by "Simulator Workbench" for a given car or for a complete simulator. But to do this, you must have a deep understanding of the rules set, which derives setup recommendations on behalf of reported handlind problems.
 
@@ -339,13 +354,6 @@ If you want the new setting to be available in the Setup Editor as well, you wil
    
 		[Setup.Settings.Handler]
 		Aero.Diffusor.Height=ClicksHandler(1, 4)
-  
-Optionally, you have to ativate the setting in the rules system, if you want to automatically create adjustments based on handling issues. Example:
-
-	[?Initialize] => (Prove: addSettings("Assetto Corsa", "My race car", [Aero.Diffusor.Height]))
-	
-	[?Speed.Corner.Fast.Correction != 0] =>
-		(Prove: changeSetting(Aero.Diffusor.Height, -1, ?Speed.Corner.Fast.Correction))
 
 ### Defining simulator or car specific characteristics
 

@@ -2080,6 +2080,65 @@ class ClicksHandler extends IntegerHandler {
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; ClicksHandler                                                           ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class EnumerationHandler extends SettingHandler {
+	iZero := 0
+	iIncrement := 1
+	iValuea := []
+
+	Zero {
+		Get {
+			return this.iZero
+		}
+	}
+
+	Increment {
+		Get {
+			return this.iIncrement
+		}
+	}
+
+	Values {
+		Get {
+			return this.iValues
+		}
+	}
+	__New(zero := 0, increment := 1, values*) {
+		this.iZero := zero
+		this.iIncrement := increment
+		this.iValues := values
+	}
+
+	validValue(displayValue) {
+		return inList(this.Values, displayValue)
+	}
+
+	convertToDisplayValue(value) {
+		local index := Round(this.Zero + ((value / this.Increment) + 1))
+
+		return (this.Values.Has(index) ? this.Values[index] : "-")
+	}
+
+	convertToRawValue(value) {
+		return (this.Zero + (this.Increment * (inList(this.Values, value) - 1)))
+	}
+
+	increaseValue(displayValue) {
+		local index := (inList(this.Values, displayValue) + 1)
+
+		return (this.Values.Has(index) ? this.Values[index] : displayValue)
+	}
+
+	decreaseValue(displayValue) {
+		local index := (inList(this.Values, displayValue) - 1)
+
+		return (this.Values.Has(index) ? this.Values[index] : displayValue)
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; SetupEditor                                                             ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
@@ -2438,19 +2497,30 @@ class SetupEditor extends ConfigurationItem {
 				originalValue := handler.convertToDisplayValue(setup.getValue(setting, true))
 				modifiedValue := handler.convertToDisplayValue(setup.getValue(setting, false))
 
-				if (originalValue = modifiedValue)
-					value := displayValue("Float", handler.formatValue(originalValue))
-				else if (modifiedValue > originalValue) {
-					value := (displayValue("Float", modifiedValue) . A_Space . translate("(") . "+"
-							. displayValue("Float", handler.formatValue(Abs(originalValue - modifiedValue))) . translate(")"))
+				if (isNumber(originalValue) && isNumber(modifiedValue)) {
+					if (originalValue = modifiedValue)
+						value := displayValue("Float", handler.formatValue(originalValue))
+					else if (modifiedValue > originalValue) {
+						value := (displayValue("Float", modifiedValue) . A_Space . translate("(") . "+"
+								. displayValue("Float", handler.formatValue(Abs(originalValue - modifiedValue))) . translate(")"))
 
-					setup.enable(setting)
+						setup.enable(setting)
+					}
+					else {
+						value := (displayValue("Float", modifiedValue) . A_Space . translate("(") . "-"
+								. displayValue("Float", handler.formatValue(Abs(originalValue - modifiedValue))) . translate(")"))
+
+						setup.enable(setting)
+					}
 				}
 				else {
-					value := (displayValue("Float", modifiedValue) . A_Space . translate("(") . "-"
-							. displayValue("Float", handler.formatValue(Abs(originalValue - modifiedValue))) . translate(")"))
+					if (originalValue = modifiedValue)
+						value := originalValue
+					else {
+						value := modifiedValue
 
-					setup.enable(setting)
+						setup.enable(setting)
+					}
 				}
 
 				category := ""
@@ -2637,22 +2707,36 @@ class SetupEditor extends ConfigurationItem {
 		originalValue := handler.convertToDisplayValue(setup.getValue(setting, true))
 		modifiedValue := handler.convertToDisplayValue(setup.getValue(setting, false))
 
-		if (originalValue = modifiedValue) {
-			value := displayValue("Float", handler.formatValue(originalValue))
+		if (isNumber(originalValue) && isNumber(modifiedValue)) {
+			if (originalValue = modifiedValue) {
+				value := displayValue("Float", handler.formatValue(originalValue))
 
-			setup.disable(setting)
-		}
-		else if (modifiedValue > originalValue) {
-			value := (displayValue("Float", modifiedValue) . A_Space . translate("(") . "+"
-					. displayValue("Float", handler.formatValue(Abs(originalValue - modifiedValue))) . translate(")"))
+				setup.disable(setting)
+			}
+			else if (modifiedValue > originalValue) {
+				value := (displayValue("Float", modifiedValue) . A_Space . translate("(") . "+"
+						. displayValue("Float", handler.formatValue(Abs(originalValue - modifiedValue))) . translate(")"))
 
-			setup.enable(setting)
+				setup.enable(setting)
+			}
+			else {
+				value := (displayValue("Float", modifiedValue) . A_Space . translate("(") . "-"
+						. displayValue("Float", handler.formatValue(Abs(originalValue - modifiedValue))) . translate(")"))
+
+				setup.enable(setting)
+			}
 		}
 		else {
-			value := (displayValue("Float", modifiedValue) . A_Space . translate("(") . "-"
-					. displayValue("Float", handler.formatValue(Abs(originalValue - modifiedValue))) . translate(")"))
+			if (originalValue = modifiedValue) {
+				value := originalValue
 
-			setup.enable(setting)
+				setup.disable(setting)
+			}
+			else {
+				value := modifiedValue
+
+				setup.enable(setting)
+			}
 		}
 
 		this.SettingsListView.Modify(row, "Vis Col3", value)
@@ -3004,57 +3088,65 @@ class SetupComparator extends ConfigurationItem {
 						break
 				}
 
-				targetAB := ((valueA * (((mix * -1) + 100) / 200)) + (valueB * (mix + 100) / 200))
-				valueAB := ((valueA < valueB) ? valueA : valueB)
-				lastValueAB := kUndefined
+				if (isNumber(valueB) && isNumber(valueA)) {
+					targetAB := ((valueA * (((mix * -1) + 100) / 200)) + (valueB * (mix + 100) / 200))
+					valueAB := ((valueA < valueB) ? valueA : valueB)
+					lastValueAB := kUndefined
 
-				loop {
-					if (valueAB >= targetAB) {
-						if (lastValueAB != kUndefined) {
-							delta := (valueAB - lastValueAB)
+					loop {
+						if (valueAB >= targetAB) {
+							if (lastValueAB != kUndefined) {
+								delta := (valueAB - lastValueAB)
 
-							if ((lastValueAB + (delta / 2)) > targetAB)
-								valueAB := lastValueAB
-						}
+								if ((lastValueAB + (delta / 2)) > targetAB)
+									valueAB := lastValueAB
+							}
 
-						break
-					}
-					else {
-						lastValueAB := valueAB
-
-						valueAB := handler.increaseValue(valueAB)
-
-						if (valueAB = lastValueAB)
 							break
+						}
+						else {
+							lastValueAB := valueAB
+
+							valueAB := handler.increaseValue(valueAB)
+
+							if (valueAB = lastValueAB)
+								break
+						}
 					}
+
+					setupAB.setValue(setting, handler.convertToRawValue(valueAB))
+
+					valueAB := handler.formatValue(valueAB)
+
+					if (valueB > valueA)
+						valueB := (displayValue("Float", valueB) . A_Space . translate("(") . "+"
+								 . displayValue("Float", handler.formatValue(Abs(valueA - valueB))) . translate(")"))
+					else if (valueB < valueA)
+						valueB := (displayValue("Float", valueB) . A_Space . translate("(") . "-"
+								 . displayValue("Float", handler.formatValue(Abs(valueA - valueB))) . translate(")"))
+					else
+						valueB := displayValue("Float", valueB)
+
+					if (valueAB > valueA)
+						valueAB := (displayValue("Float", valueAB) . A_Space . translate("(") . "+"
+								  . displayValue("Float", handler.formatValue(Abs(valueA - valueAB))) . translate(")"))
+					else if (valueAB < valueA)
+						valueAB := (displayValue("Float", valueAB) . A_Space . translate("(") . "-"
+								  . displayValue("Float", handler.formatValue(Abs(valueA - valueAB))) . translate(")"))
+					else
+						valueAB := displayValue("Float", valueAB)
 				}
-
-				setupAB.setValue(setting, handler.convertToRawValue(valueAB))
-
-				valueAB := handler.formatValue(valueAB)
-
-				if (valueB > valueA)
-					valueB := (displayValue("Float", valueB) . A_Space . translate("(") . "+"
-							 . displayValue("Float", handler.formatValue(Abs(valueA - valueB))) . translate(")"))
-				else if (valueB < valueA)
-					valueB := (displayValue("Float", valueB) . A_Space . translate("(") . "-"
-							 . displayValue("Float", handler.formatValue(Abs(valueA - valueB))) . translate(")"))
-				else
-					valueB := displayValue("Float", valueB)
-
-				if (valueAB > valueA)
-					valueAB := (displayValue("Float", valueAB) . A_Space . translate("(") . "+"
-							  . displayValue("Float", handler.formatValue(Abs(valueA - valueAB))) . translate(")"))
-				else if (valueAB < valueA)
-					valueAB := (displayValue("Float", valueAB) . A_Space . translate("(") . "-"
-							  . displayValue("Float", handler.formatValue(Abs(valueA - valueAB))) . translate(")"))
-				else
-					valueAB := displayValue("Float", valueAB)
+				else {
+					if (mix < 0)
+						valueAB := valueA
+					else
+						valueAB := valueB
+				}
 
 				label := this.getLabel(setting)
 
 				this.SettingsListView.Add("", categoriesLabels[category]
-											, label, displayValue("Float", valueA), valueB, valueAB, this.getUnit(setting))
+											, label, isNumber(valueA) ? displayValue("Float", valueA) : valueA, valueB, valueAB, this.getUnit(setting))
 
 				this.Settings[setting] := label
 				this.Settings[label] := setting
@@ -3124,14 +3216,22 @@ class SetupComparator extends ConfigurationItem {
 		originalValue := handler.convertToDisplayValue(this.SetupA.getValue(setting, false))
 		modifiedValue := handler.convertToDisplayValue(setup.getValue(setting, false))
 
-		if (originalValue = modifiedValue)
-			value := displayValue("Float", handler.formatValue(originalValue))
-		else if (modifiedValue > originalValue)
-			value := (displayValue("Float", modifiedValue) . A_Space . translate("(") . "+"
-					. displayValue("Float", handler.formatValue(Abs(originalValue - modifiedValue))) . translate(")"))
-		else
-			value := (displayValue("Float", modifiedValue) . A_Space . translate("(") . "-"
-					. displayValue("Float", handler.formatValue(Abs(originalValue - modifiedValue))) . translate(")"))
+		if (isNumber(originalValue) && isNumber(modifiedValue)) {
+			if (originalValue = modifiedValue)
+				value := displayValue("Float", handler.formatValue(originalValue))
+			else if (modifiedValue > originalValue)
+				value := (displayValue("Float", modifiedValue) . A_Space . translate("(") . "+"
+						. displayValue("Float", handler.formatValue(Abs(originalValue - modifiedValue))) . translate(")"))
+			else
+				value := (displayValue("Float", modifiedValue) . A_Space . translate("(") . "-"
+						. displayValue("Float", handler.formatValue(Abs(originalValue - modifiedValue))) . translate(")"))
+		}
+		else {
+			if (originalValue = modifiedValue)
+				value := originalValue
+			else
+				value := modifiedValue
+		}
 
 		this.SettingsListView.Modify(row, "Vis Col5", value)
 		this.SettingsListView.ModifyCol(5, "AutoHdr")

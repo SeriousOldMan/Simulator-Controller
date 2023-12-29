@@ -555,7 +555,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 		DirCreate(this.Options["Driving Coach.Archive"])
 
-		OnExit(ObjBindMethod(this, stopTelemetryCollector))
+		OnExit(ObjBindMethod(this, "stopTelemetryCollector"))
 	}
 
 	loadFromConfiguration(configuration) {
@@ -873,21 +873,19 @@ class DrivingCoach extends GridRaceAssistant {
 			this.iTelemetryCollector.stopTelemetryCollector()
 	}
 
-	prepareSession(&settings, &data, formationLap?) {
+	prepareSession(&settings, &data, formationLap := true) {
 		local announcements := false
 		local facts
 
 		if formationLap {
 			this.updateDynamicValues({KnowledgeBase: false
-									, OverallTime: 0, BestLapTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0
-									, EnoughData: false})
-			this.updateSessionValues({Simulator: "", Session: kSessionFinished, SessionTime: false
-									, Laps: Map(), Standings: []})
+									, OverallTime: 0, BestLapTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
+			this.updateSessionValues({Simulator: "", Session: kSessionFinished, SessionTime: false, Laps: Map(), Standings: []})
 		}
 
 		this.restartConversation()
 
-		facts := super.prepareSession(&settings, &data, formationLap?)
+		facts := super.prepareSession(&settings, &data, formationLap)
 
 		if settings {
 			this.updateConfigurationValues({UseTalking: getMultiMapValue(settings, "Assistant.Coach", "Voice.UseTalking", true)})

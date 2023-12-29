@@ -1,9 +1,9 @@
 [Development]
 Version=5.5.2.0-dev
 Target=5.5.2.0-release
-Date=12/28/2023
+Date=12/29/2023
 Download=
-Changes=New startup wizard in "Simulator Startup", Deprecated silent and muted presets from "Simulator Setup", New keyboard modifiers for "Simulator Startup", New preset in "Simulator Setup" for startup profiles, New fields in "Session State.json", Migrated to AHK 2.0.11, New car models for "Setup Workbench"
+Changes=New startup wizard in "Simulator Startup", Deprecated silent and muted presets from "Simulator Setup", New keyboard modifiers for "Simulator Startup", New preset in "Simulator Setup" for startup profiles, New fields in "Session State.json", Migrated to AHK 2.0.11, New car models for "Setup Workbench", New EnumerationHandler in "Setup Workbench", Driving Coach preserves memory between sessions
 Components=Media->5.3.0,Configuration->5.5.2,Utilities->5.4.8
 [Release]
 Version=5.5.1.2-release

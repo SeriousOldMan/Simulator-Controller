@@ -121,7 +121,7 @@ This one implements an embedded runtime engine for large language models. You do
 
 Please be aware, that running a large language model locally puts heavy load on your PC and can use quite a lot of memory (even from your GPU). Therefore do not ask any questions while driving, unless you have a really powerful configuration. Even if your PC is idle, the answer will take some time to be generated, so be patient.
 
-### Configuration
+## Configuration
 
 The next step is to setup everything in the configuration, either in "Simulator Setup" or "Simulator Configuration". Please follow the instructions in the [Installation & Configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-driving-coach) chapter.
 
@@ -129,7 +129,7 @@ The next step is to setup everything in the configuration, either in "Simulator 
 
 Since the voice recognition quality is so important for a correct dialog with Aiden, I strongly recommend to use the "Azure" voice recognition engine. The "Desktop" engine may be used as well, especially, when you are using a high quality headset. And use the training mode of the Windows speech recognition, which is available in the Windows Settings -> Time & Language -> Speech  page.
 
-#### Instructions
+### Instructions
 
 A very important aspect in the configuration of the Driving Coach are the so called instructions. Instructions provide the LLM with important context information and specifies, how it should react to your questions. It also defines the profession and personality of the Driving Coach. Last but not least, instructions are also used to convey data from your current session in a running simulator to the Driving Coach.
 
@@ -221,6 +221,12 @@ As you might expect, the word "please" is optional. Available options for *infor
 
 	[Please] pay attention to *information* again [please]
 
+### How it works
+
+Beside using an LLM to interact with the driver, the Driving Coach uses the same rule-based AI engine as the other Assistants. Therefore, the Driving Coach has the same understanding of the current race situation as the other Assistants. As you already might have guessed, this knowledge is used to supply the data to the LLM using the [Instructions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#instructions) described above.
+
+Unlike the other assistants, whose knowledge base, i.e. their memory, is deleted at the end of a session, with Aiden this remains until the start of the next session. This makes it possible to analyze and discuss various aspects of the session with Aiden after the end of a session. This retained memory covers everything from the performance information like lap and sector times, as well as position information and also includes handling information, if this was enabled during the session.
+ 
 ## Troubleshooting
 
 For some tips n tricks for the best voice recognition experience, see the [corresponding chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#troubleshooting) in the documentation of Jona.

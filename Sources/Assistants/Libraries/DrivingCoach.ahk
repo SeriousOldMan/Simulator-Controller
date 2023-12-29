@@ -555,7 +555,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 		DirCreate(this.Options["Driving Coach.Archive"])
 
-		OnExit(ObjBindMethod(this, "stopTelemetryAnalyzer", true))
+		OnExit(ObjBindMethod(this, stopTelemetryCollector))
 	}
 
 	loadFromConfiguration(configuration) {
@@ -602,10 +602,6 @@ class DrivingCoach extends GridRaceAssistant {
 			this.iLaps := values.Laps
 		else if values.HasProp("Standings")
 			this.iStandings := values.Standings
-		else if (values.HasProp("Session") && (values.Session == kSessionFinished)) {
-			this.iLaps := Map()
-			this.iStandings := []
-		}
 	}
 
 	getInstruction(category) {
@@ -843,12 +839,24 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 	}
 
+	stopTelemetryCollector(*) {
+		this.stopTelemetryAnalyzer()
+
+		if this.iTelemetryCollector {
+			this.iTelemetryCollector.deleteSamples()
+
+			this.iTelemetryCollector := false
+		}
+
+		return false
+	}
+
 	startTelemetryAnalyzer() {
 		local knowledgeBase := this.KnowledgeBase
 
-		this.stopTelemetryAnalyzer()
+		this.stopTelemetryCollector()
 
-		if (knowledgeBase && !this.iTelemetryCollector) {
+		if knowledgeBase {
 			this.iTelemetryCollector := %this.CollectorClass%(this.Simulator, knowledgeBase.getValue("Session.Car"), knowledgeBase.getValue("Session.Track")
 															, {Handling: true, Frequency: 5000})
 
@@ -860,18 +868,24 @@ class DrivingCoach extends GridRaceAssistant {
 		return this.iTelemetryCollector
 	}
 
-	stopTelemetryAnalyzer(*) {
-		local collector := this.iTelemetryCollector
-
-		if collector
-			collector.stopTelemetryCollector()
-
-		this.iTelemetryCollector := false
+	stopTelemetryAnalyzer() {
+		if this.iTelemetryCollector
+			this.iTelemetryCollector.stopTelemetryCollector()
 	}
 
 	prepareSession(&settings, &data, formationLap?) {
 		local announcements := false
 		local facts
+
+		if formationLap {
+			this.updateDynamicValues({KnowledgeBase: false
+									, OverallTime: 0, BestLapTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0
+									, EnoughData: false})
+			this.updateSessionValues({Simulator: "", Session: kSessionFinished, SessionTime: false
+									, Laps: Map(), Standings: []})
+		}
+
+		this.restartConversation()
 
 		facts := super.prepareSession(&settings, &data, formationLap?)
 
@@ -907,7 +921,7 @@ class DrivingCoach extends GridRaceAssistant {
 								, BestLapTime: 0, OverallTime: 0, LastFuelAmount: 0
 								, InitialFuelAmount: 0, EnoughData: false})
 
-		this.updateSessionValues({Laps: Map()})
+		this.updateSessionValues({Standings: [], Laps: Map()})
 
 		this.initializeGridPosition(data)
 
@@ -915,10 +929,10 @@ class DrivingCoach extends GridRaceAssistant {
 			this.dumpKnowledgeBase(this.KnowledgeBase)
 
 		this.startTelemetryAnalyzer()
-		this.restartConversation()
 	}
 
 	finishSession(shutdown := true) {
+		/*
 		this.updateDynamicValues({KnowledgeBase: false, Prepared: false
 								, OverallTime: 0, BestLapTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0
 								, EnoughData: false})
@@ -926,6 +940,10 @@ class DrivingCoach extends GridRaceAssistant {
 
 		this.stopTelemetryAnalyzer()
 		this.restartConversation()
+		*/
+
+		this.stopTelemetryAnalyzer()
+		this.updateDynamicValues({Prepared: false})
 	}
 
 	updateLaps(lapNumber, data) {

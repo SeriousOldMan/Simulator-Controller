@@ -224,6 +224,16 @@ class TelemetryCollector {
 		return (force || (this.%setting% != false))
 	}
 
+	deleteSamples() {
+		if this.iDataFile {
+			deleteFile(this.iDataFile)
+
+			this.iDataFile
+		}
+
+		this.iTemperatureSamples := []
+	}
+
 	startTelemetryCollector(calibrate := false) {
 		local dataFile := temporaryFileName("Telemetry", "data")
 		local pid, options, code, message
@@ -235,6 +245,7 @@ class TelemetryCollector {
 		}
 
 		this.stopTelemetryCollector()
+		this.deleteSamples()
 
 		if (!this.iCollectorPID && inList(this.iCategories, "Handling")) {
 			try {
@@ -296,8 +307,6 @@ class TelemetryCollector {
 				OnExit(ObjBindMethod(this, "stopTelemetryCollector"))
 			}
 
-			this.iTemperatureSamples := []
-
 			if (!calibrate && this.iSampleFrequency) {
 				this.iSampleTask := PeriodicTask(collectSamples, isDebug() ? this.iSampleFrequency : 180000, kLowPriority)
 
@@ -322,17 +331,11 @@ class TelemetryCollector {
 				else
 					break
 
-			if !isDebug()
-				deleteFile(this.iDataFile)
-
 			if this.iSampleTask {
 				this.iSampleTask.stop()
 
 				this.iSampleTask := false
 			}
-
-			this.iTemperatureSamples := []
-			this.iDataFile := false
 
 			this.iCollectorPID := false
 		}

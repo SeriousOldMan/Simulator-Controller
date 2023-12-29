@@ -2464,7 +2464,7 @@ class SetupEditor extends ConfigurationItem {
 		if (settingsUnits.Count = 0)
 			settingsUnits := getMultiMapValues(this.Configuration, "Setup.Settings.Units.EN")
 
-		return (settingsUnits.Has(setting) ? settingsUnits[setting] : translate("Click"))
+		return (settingsUnits.Has(setting) ? settingsUnits[setting] : translate("Clicks"))
 	}
 
 	loadSetup(&setup := false) {
@@ -3030,7 +3030,7 @@ class SetupComparator extends ConfigurationItem {
 		if (settingsUnits.Count = 0)
 			settingsUnits := getMultiMapValues(this.Configuration, "Setup.Settings.Units.EN")
 
-		return (settingsUnits.Has(setting) ? settingsUnits[setting] : translate("Click"))
+		return (settingsUnits.Has(setting) ? settingsUnits[setting] : translate("Clicks"))
 	}
 
 	loadSetups(&setupA := false, &setupB := false, mix := 0) {

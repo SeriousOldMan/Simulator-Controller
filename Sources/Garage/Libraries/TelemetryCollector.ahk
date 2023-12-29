@@ -228,7 +228,7 @@ class TelemetryCollector {
 		if this.iDataFile {
 			deleteFile(this.iDataFile)
 
-			this.iDataFile
+			this.iDataFile := false
 		}
 
 		this.iTemperatureSamples := []

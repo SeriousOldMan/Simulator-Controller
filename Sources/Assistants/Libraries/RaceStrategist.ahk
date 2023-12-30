@@ -1396,7 +1396,7 @@ class RaceStrategist extends GridRaceAssistant {
 			this.updateConfigurationValues({UseTalking: getMultiMapValue(settings, "Assistant.Strategist", "Voice.UseTalking", true)
 										  , UseTraffic: getMultiMapValue(settings, "Strategy Settings", "Traffic.Simulation", false)})
 
-		if !this.RaceInfo {
+		if (!this.RaceInfo || (isSet(formationLap) && formationLap)) {
 			raceData := newMultiMap()
 			carCount := getMultiMapValue(data, "Position Data", "Car.Count")
 

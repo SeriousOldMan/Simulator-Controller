@@ -125,12 +125,6 @@ On the last tab you can select or deselect several functions provided by the dif
 
 Finally, if you are ready to start, choose the profile you want to start with and close the startup profiles editor. Then click again on the green triangle to start Simulator Controller with the selected profile. As a shortcut, you can hold down the Control key while saving and closing the startup profiles editor, which will trigger the startup process automatically.
 
-### Fixing problems
-
-Windows is an operating system with many, and sometimes confusing, security features. In many situations, Windows will prevent execution of executables and DLLs, which have been downloaded from an *unknown* location. This can be prevented by digitally signing those files, but this comes with some cost and is therefore not an option for free Open Source software.
-
-If you encounter problems during runtime, for example, that application cannot be started or that voice commands cannot be registered, this can be due to WIndows preventing the execution of components of Simulator Controller, especially, if you have downloaded the software as a ZIP and installed it manually. In this case start "Simulator Setup" and unblock the files following the instructions on the second page of the wizard, or start "Simulator Startup" while holding down the Control together with the Shift key. In both cases, the software will elevate the privileges (you will be asked to run the software in Admin mode) and the runtime components will be unblocked.
-
 ### Voice Commands
 
 The Simulator Controller framework supports a sophisticated natural language interface. This capability is used by the Race Assistants Jona and Cato, thereby allowing a fully voice enabled dialog between you and these Assistants, but the voice recognition can also be used to control parts of your controller hardware by voice commands.
@@ -285,9 +279,15 @@ All other input routes are typically set to the same input device, normally the 
 
 A final note here: Make sure, that all your audio devices are named differently, even when they belong to the same type of equipment, for example a headset. Otherwise you will have unwanted effects. Example: Name the speakers of your headset "HeadsetSpeaker" and the microphone of your headset "HeadsetMic" in your Windows sound settings. Doing this you can activate them seperately.
 
-## Keyboard shortcuts & modifiers
+### Keyboard shortcuts & modifiers
 
 Many applications of Simulator Controller provide modifier keys for several functions. You can find a list of all modifiers and their functionalities [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Keyboard-Modifiers).
+
+### Fixing problems
+
+Windows is an operating system with many, and sometimes confusing, security features. In many situations, Windows will prevent execution of executables and DLLs, which have been downloaded from an *unknown* location. This can be prevented by digitally signing those files, but this comes with some cost and is therefore not an option for free Open Source software.
+
+If you encounter problems during runtime, for example, that application cannot be started or that voice commands cannot be registered, this can be due to WIndows preventing the execution of components of Simulator Controller, especially, if you have downloaded the software as a ZIP and installed it manually. In this case start "Simulator Setup" and unblock the files following the instructions on the second page of the wizard, or start "Simulator Startup" while holding down the Control together with the Shift key. In both cases, the software will elevate the privileges (you will be asked to run the software in Admin mode) and the runtime components will be unblocked.
    
 ## Monitoring health and activities
 

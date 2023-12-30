@@ -210,6 +210,27 @@ namespace TeamServer.Controllers {
             }
         }
 
+        [HttpGet("warmup")]
+        public string Warmup([FromQuery(Name = "token")] string token)
+        {
+            try
+            {
+                Token theToken = Server.TeamServer.TokenIssuer.ValidateToken(token);
+                
+                new ModelManager(Server.TeamServer.ObjectManager.Connection).GetObjectCounts();
+
+                return "Ok";
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
+            }
+            catch (Exception exception)
+            {
+                return "Error: " + exception.Message;
+            }
+        }
+
         [HttpGet("allconnections")]
         public string GetConnections([FromQuery(Name = "token")] string token)
         {

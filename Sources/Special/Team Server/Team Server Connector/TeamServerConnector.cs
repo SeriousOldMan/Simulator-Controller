@@ -228,6 +228,11 @@ namespace TeamServer {
 			return Get("login/validatetoken");
         }
 
+        public string Warmup()
+        {
+            return Get("login/warmup");
+        }
+
         public string ValidateSessionToken()
         {
             return Get("session/validatetoken");

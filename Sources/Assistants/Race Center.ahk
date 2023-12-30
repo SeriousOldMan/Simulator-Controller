@@ -2297,6 +2297,15 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	connect(silent := false) {
+		warmup() {
+			try {
+				this.Connector.Warmup()
+			}
+			catch Any as exception {
+				logError(exception, true)
+			}
+		}
+
 		connectAsync(silent) {
 			local window := this.Window
 			local token, connection, serverURLs, settings, chosen
@@ -2354,6 +2363,8 @@ class RaceCenter extends ConfigurationItem {
 					}
 
 					showMessage(translate("Successfully connected to the Team Server."))
+
+					Task.startTask(warmup, 0, kLowPriority)
 
 					this.iSyncTask.resume()
 				}

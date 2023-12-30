@@ -39,6 +39,8 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 Updates are handled automatically, but a couple of presets has been deprecated in "Simulator Setup". The functionality to disable voice handling completely or to start the Assistants muted is now available in the [startup profiles](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles). You may want to create a couple of profiles for this purpose, if you have used the mentioned presets in the past, and you want to remove the presets from your list of active presets, to keep things clean and tidy.
 
+Additionally, this release brings a new version of the Team Server with some internal optimizations. Although it will be compatible with the current release, I recommend updating your installation, if you are running your own Team Server. Database files are compatible.
+
 ***
 
 ## Release 5.5.1

@@ -14,11 +14,12 @@
   13. Information about the active startup profile has been added to the "System Monitor".
   14. The Button Box visual representation got a little bit slicker.
   15. The memory of the Driving Coach is not cleared any longer after the end of a session, so that ou can talk about our recent race after crossing the finish line, for example.
-  16. [Developer only] Information about the active startup profile has been added to the "Session State.json" file.
-  17. [Developer only] Information about the pitstop forecast has been added to the "Session State.json" file.
-  18. [Internal] Migrated to AHK version 2.0.11.
-  19. [Internal] The copyright information has been updated to 2024 in all parts of the software.
-  20. New car models for "Setup Workbench":
+  16. New version of the Team Server with some internal changes. If you are running your onw Team Server, you have to redeploy it.
+  17. [Developer only] Information about the active startup profile has been added to the "Session State.json" file.
+  18. [Developer only] Information about the pitstop forecast has been added to the "Session State.json" file.
+  19. [Internal] Migrated to AHK version 2.0.11.
+  20. [Internal] The copyright information has been updated to 2024 in all parts of the software.
+  21. New car models for "Setup Workbench":
       - Assetto Corsa
         - BMW M3 E30 (fixed)
 		- McLaren F1 GTR

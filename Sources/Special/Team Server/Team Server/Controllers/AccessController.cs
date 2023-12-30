@@ -216,8 +216,8 @@ namespace TeamServer.Controllers {
             try
             {
                 Token theToken = Server.TeamServer.TokenIssuer.ValidateToken(token);
-                
-                new ModelManager(Server.TeamServer.ObjectManager.Connection).GetObjectCounts();
+
+                System.Threading.Tasks.Task.Run(() => new ModelManager(Server.TeamServer.ObjectManager.Connection).GetObjectCounts());
 
                 return "Ok";
             }

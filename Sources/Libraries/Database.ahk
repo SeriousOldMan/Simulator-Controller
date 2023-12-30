@@ -49,6 +49,12 @@ class Database {
 			return (name ? this.iSchemas[name] : this.iSchemas)
 		}
 	}
+	
+	Schema[name := false] {
+		Get {
+			return this.Schemas[name]
+		}
+	}
 
 	Files[name := false] {
 		Get {
@@ -57,6 +63,12 @@ class Database {
 
 		Set {
 			return (name ? (this.iFiles[name] := value) : this.iFiles := value)
+		}
+	}
+	
+	File[name := false] {
+		Get {
+			return this.Files[name]
 		}
 	}
 
@@ -132,6 +144,12 @@ class Database {
 			}
 			else
 				return this.iTables
+		}
+	}
+	
+	Table[name := false] {
+		Get {
+			return this.Tables[name]
 		}
 	}
 

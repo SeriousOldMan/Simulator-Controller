@@ -4212,7 +4212,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		OnMessage(0x44, translateLoadCancelButtons, 0)
 
 		if (fileName != "") {
-			file := FileOpen(fileName, "r")
+			file := FileOpen(fileName, "r-wd")
 
 			if file {
 				size := file.Length

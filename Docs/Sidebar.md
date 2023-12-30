@@ -111,9 +111,12 @@
 ------
   - [Introduction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#introduction)
   - [Installation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#installation)
+  - [Configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#configuration)
+    - [Instructions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#instructions)
   - [Interacting with Aiden](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#interacting-with-aiden)
     - [List of all voice commands](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#list-of-all-voice-commands)
     - [Managing instructions and information processing](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#enabling-and-disabling-specific-instructions-and-information-processing)
+    - [How it works](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#how-it-works)
   - [Troubleshooting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#troubleshooting)
 
 [Virtual Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer)

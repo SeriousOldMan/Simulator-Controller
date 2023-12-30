@@ -3705,7 +3705,7 @@ class RaceStrategist extends GridRaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local validLap := true
 		local driver, driverID, carCount, data, raceInfo, slots, grid, carNr, carID, key, fileName, slotsString
-		local data, pitstop, pitstops, prefix, times, positions, drivers, laps, carPrefix, carIndex
+		local data, pitstop, pitstops, prefix, times, position, positions, drivers, laps, carPrefix, carIndex
 		local driverForname, driverSurname, driverNickname, driverCategory, carCar, carCategory, lapState
 
 		if this.RemoteHandler {
@@ -3786,8 +3786,15 @@ class RaceStrategist extends GridRaceAssistant {
 							if (carCategory != kUndefined)
 								setMultiMapValue(data, "Cars", "Car." . carIndex . ".Category", carCategory)
 
-							setMultiMapValue(data, "Cars", "Car." . carIndex . ".Position", grid[carIndex])
-							setMultiMapValue(data, "Cars", "Car." . carIndex . ".Position", grid[raceInfo[key]])
+							position := A_Index
+
+							if grid
+								if (raceInfo && raceInfo.Has(key) && grid.Has(raceInfo[key]))
+									position := grid[raceInfo[key]]
+								else if grid.Has(carIndex)
+									position := grid[carIndex]
+
+							setMultiMapValue(data, "Cars", "Car." . carIndex . ".Position", position)
 
 							if (A_Index = driver) {
 								validLap := knowledgeBase.getValue("Car." . A_Index . ".Lap.Valid")

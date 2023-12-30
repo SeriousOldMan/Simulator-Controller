@@ -1449,7 +1449,7 @@ class SessionDatabase extends ConfigurationItem {
 			fileName := kDatabaseDirectory . "Community\" . simulatorCode . "\" . car . "\" . track . "\Car Setups\" . type . "\" . name
 
 		if FileExist(fileName) {
-			file := FileOpen(fileName, "r")
+			file := FileOpen(fileName, "r-wd")
 
 			if file {
 				size := file.Length

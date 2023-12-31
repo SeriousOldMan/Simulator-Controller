@@ -807,7 +807,10 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 	static done := false
 
 	static hasTeamServer := false
+	static hasDrivingCoach := false
 	static hasRaceSpotter := false
+	static hasRaceStrategist := false
+	static hasRaceEngineer := false
 	static hasChassisVibration := false
 	static hasPedalVibration := false
 	static hasMotionFeedback := false
@@ -1717,10 +1720,25 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 		if hasTeamServer
 			hasTeamServer := string2Values("|", hasTeamServer)[1]
 
+		hasDrivingCoach := getMultiMapValue(configuration, "Plugins", "Driving Coach", false)
+
+		if hasDrivingCoach
+			hasDrivingCoach := string2Values("|", hasDrivingCoach)[1]
+
 		hasRaceSpotter := getMultiMapValue(configuration, "Plugins", "Race Spotter", false)
 
 		if hasRaceSpotter
 			hasRaceSpotter := string2Values("|", hasRaceSpotter)[1]
+
+		hasRaceStrategist := getMultiMapValue(configuration, "Plugins", "Race Strategist", false)
+
+		if hasRaceStrategist
+			hasRaceStrategist := string2Values("|", hasRaceStrategist)[1]
+
+		hasRaceEngineer := getMultiMapValue(configuration, "Plugins", "Race Engineer", false)
+
+		if hasRaceEngineer
+			hasRaceEngineer := string2Values("|", hasRaceEngineer)[1]
 
 		hasMotionFeedback := getMultiMapValue(configuration, "Plugins", "Motion Feedback", false)
 
@@ -1884,10 +1902,36 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 		functionsListView .OnEvent("DoubleClick", noSelect)
 		functionsListView .OnEvent("ItemCheck", chooseFunction)
 
+		if hasDrivingCoach {
+			functions.Push("Performance Analysis")
+
+			functionsListView.Add("", translate("Driving Coach"), translate("Performance Analysis"))
+
+			functions.Push("Handling Analysis")
+
+			functionsListView.Add("", translate("Driving Coach"), translate("Handling Analysis"))
+		}
+
 		if hasRaceSpotter {
 			functions.Push("Track Automation")
 
 			functionsListView.Add("", translate("Race Spotter"), translate("Track Automation"))
+		}
+
+		if hasRaceStrategist {
+			functions.Push("Telemetry Collection")
+
+			functionsListView.Add("", translate("Race Strategist"), translate("Telemetry Collection"))
+		}
+
+		if hasRaceStrategist {
+			functions.Push("Pressure Collection")
+
+			functionsListView.Add("", translate("Race Engineer"), translate("Pressure Collection"))
+
+			functions.Push("Pitstop Service")
+
+			functionsListView.Add("", translate("Race Engineer"), translate("Pitstop Service"))
 		}
 
 		if hasMotionFeedback {

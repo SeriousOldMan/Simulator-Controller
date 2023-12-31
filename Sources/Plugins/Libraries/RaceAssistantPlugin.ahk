@@ -866,6 +866,10 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			if index
 				RaceAssistantPlugin.sReplayDirectory := (normalizeDirectoryPath(A_Args[index + 1]) . "\")
 
+			if !FileExist(RaceAssistantPlugin.sReplayDirectory)
+				RaceAssistantPlugin.sReplayDirectory := false
+
+
 			RaceAssistantPlugin.sCollectorTask
 				:= PeriodicTask(ObjBindMethod(RaceAssistantPlugin, "collectSessionData"), 1000, kHighPriority)
 

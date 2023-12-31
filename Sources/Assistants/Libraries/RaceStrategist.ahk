@@ -3786,7 +3786,7 @@ class RaceStrategist extends GridRaceAssistant {
 							if (carCategory != kUndefined)
 								setMultiMapValue(data, "Cars", "Car." . carIndex . ".Category", carCategory)
 
-							position := A_Index
+							position := knowledgeBase.getValue("Car." . A_Index . ".Position", A_Index)
 
 							if grid
 								if (raceInfo && raceInfo.Has(key) && grid.Has(raceInfo[key]))

@@ -135,8 +135,12 @@ readMultiMap(multiMapFile, class?) {
 					throw "File not found..."
 			}
 			catch Any as exception {
-				if (tries-- <= 0)
+				if (tries-- <= 0) {
+					if isDebug()
+						logMessage(kLogInfo, "Waiting for file `"" . multiMapFile . "`"...")
+					
 					return isSet(class) ? class() : newMultiMap()
+				}
 				else
 					Sleep(10)
 			}

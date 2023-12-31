@@ -2048,7 +2048,9 @@ class WebView2Viewer extends HTMLViewer {
 				if !FileExist(this.iHTMLFile)
 					FileAppend(html, this.iHTMLFile, "UTF-8")
 				else
-					loop
+					loop {
+						file := false
+						
 						try {
 							file := FileOpen(this.iHTMLFile, "w-rwd", "UTF-8")
 
@@ -2061,9 +2063,14 @@ class WebView2Viewer extends HTMLViewer {
 						}
 						catch Any as exception {
 							logError(exception)
+							
+							if file
+								try
+									file.Close()
 
 							Sleep(100)
 						}
+					}
 
 				this.WebView2.CoreWebView2.Navigate(this.iHTMLFile)
 				this.WebView2.CoreWebView2.Resume()

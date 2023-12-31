@@ -184,7 +184,8 @@ class Database {
 							logError(exception)
 
 						if file
-							file.Close()
+							try
+								file.Close()
 							
 						file := false
 					}
@@ -196,7 +197,7 @@ class Database {
 						if (isDebug() && (counter++ > 20)) {
 							counter := 0
 
-							logMessage(kLogInfo, "Waiting for file `"" . name "`"...")
+							logMessage(kLogInfo, "Waiting for file `"" . name . ".CSV`"...")
 						}
 
 						Sleep(100)
@@ -442,6 +443,7 @@ class Database {
 							bakFile.Write(file.Read())
 						}
 						catch Any as exception {
+							logError(exception)
 						}
 						finally {
 							if bakFile

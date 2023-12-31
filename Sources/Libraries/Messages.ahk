@@ -236,6 +236,8 @@ class MessageManager extends PeriodicTask {
 					return result
 			}
 			catch Any as exception {
+				logError(exception)
+				
 				return result
 			}
 

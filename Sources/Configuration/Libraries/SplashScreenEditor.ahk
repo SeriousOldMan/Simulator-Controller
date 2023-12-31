@@ -263,7 +263,7 @@ class SplashScreensList extends ConfigurationItemList {
 				this.Window.Opt("+OwnDialogs")
 
 				OnMessage(0x44, translateSelectCancelButtons)
-				soundFile := FileSelect(1, "*" . path, translate("Select Sound File..."), "Audio (*.wav; *.mp3)")
+				soundFile := FileSelect(1, path, translate("Select Sound File..."), "Audio (*.wav; *.mp3)")
 				OnMessage(0x44, translateSelectCancelButtons, 0)
 
 				if (soundFile != "")
@@ -290,7 +290,7 @@ class SplashScreensList extends ConfigurationItemList {
 				this.Window.Opt("+OwnDialogs")
 
 				OnMessage(0x44, translateSelectCancelButtons)
-				videoFile := FileSelect(1, "*" . path, translate("Select Video (GIF) File..."), "Video (*.gif)")
+				videoFile := FileSelect(1, path, translate("Select Video (GIF) File..."), "Video (*.gif)")
 				OnMessage(0x44, translateSelectCancelButtons, 0)
 
 				if (videoFile != "")
@@ -330,7 +330,7 @@ class SplashScreensList extends ConfigurationItemList {
 		window.Add("ListView", "x110 yp w284 h112 Y:Move W:Grow -Multi -LV0x10 Checked -Hdr NoSort NoSortHdr VpicturesListView", [translate("Picture")])
 		window["picturesListView"].OnEvent("Click", noSelect)
 		window["picturesListView"].OnEvent("DoubleClick", noSelect)
-		
+
 		window.Add("Text", "x16 yp+114 w80 h23 +0x200 Y:Move VpicturesDurationLabel", translate("Display Duration"))
 		window.Add("Edit", "x110 yp w40 h21 Y:Move Limit5 Number VpicturesDurationEdit")
 

@@ -136,8 +136,8 @@ readMultiMap(multiMapFile, class?) {
 			}
 			catch Any as exception {
 				if (tries-- <= 0) {
-					if isDebug()
-						logMessage(kLogInfo, "Waiting for file `"" . multiMapFile . "`"...")
+					if isDevelopment()
+						logMessage(kLogWarn, "Waiting for file `"" . multiMapFile . "`"...")
 					
 					return isSet(class) ? class() : newMultiMap()
 				}
@@ -233,8 +233,12 @@ writeMultiMap(multiMapFile, multiMap, symbolic := true) {
 		catch Any as exception {
 			logError(exception, false, (tries = 1))
 
-			if (tries-- <= 0)
+			if (tries-- <= 0) {
+				if isDevelopment()
+					logMessage(kLogWarn, "Waiting for file `"" . multiMapFile . "`"...")
+											
 				break
+			}
 		}
 }
 

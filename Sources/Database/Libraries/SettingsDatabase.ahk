@@ -238,6 +238,11 @@ class SettingsDatabase extends SessionDatabase {
 					return ((rows.Length > 0) ? rows[1]["Value"] : default)
 				}
 				catch Any as exception {
+					logError(exception)
+
+					if isDevelopment()
+						logMessage(kLogWarn, "Waiting for file `"Settings.CSV`"...")
+
 					return default
 				}
 				finally {
@@ -246,6 +251,9 @@ class SettingsDatabase extends SessionDatabase {
 
 			Sleep(200)
 		}
+
+		if isDevelopment()
+			logMessage(kLogWarn, "Waiting for file `"Settings.CSV`"...")
 
 		return default
 	}
@@ -277,6 +285,11 @@ class SettingsDatabase extends SessionDatabase {
 					return
 				}
 				catch Any as exception {
+					logError(exception)
+
+					if isDevelopment()
+						logMessage(kLogWarn, "Waiting for file `"Settings.CSV`"...")
+
 					return
 				}
 				finally {
@@ -285,6 +298,9 @@ class SettingsDatabase extends SessionDatabase {
 
 			Sleep(200)
 		}
+
+		if isDevelopment()
+			logMessage(kLogWarn, "Waiting for file `"Settings.CSV`"...")
 	}
 
 	removeSettingValue(simulator, car, track, weather, section, key) {
@@ -330,8 +346,9 @@ constraintSettings(constraints, row) {
 
 readSetting(database, simulator, owner, user, community, car, track, weather
 		  , section, key, default := false) {
-	local rows, ignore, row, settingsDB
 	local tries := 5
+	local success := false
+	local rows, ignore, row, settingsDB
 
 	if user {
 		settingsDB := database.getSettingsDatabase(simulator, "User")
@@ -344,12 +361,15 @@ readSetting(database, simulator, owner, user, community, car, track, weather
 																, Section: section, Key: key
 																, Owner: owner}})
 
+					success := true
+
 					if (rows.Length > 0)
 						return rows[1]["Value"]
 					else
 						break
 				}
-				catch Any {
+				catch Any as exception {
+					logError(exception)
 				}
 				finally {
 					settingsDB.unlock("Settings")
@@ -357,6 +377,9 @@ readSetting(database, simulator, owner, user, community, car, track, weather
 
 			Sleep(200)
 		}
+
+		if (!success && isDevelopment())
+			logMessage(kLogWarn, "Waiting for file `"Settings.CSV`"...")
 	}
 
 	if community
@@ -373,6 +396,7 @@ readSetting(database, simulator, owner, user, community, car, track, weather
 readSettings(database, simulator, settings, owner, user, community, car, track, weather) {
 	local result := []
 	local tries := 5
+	local success := false
 	local ignore, row, filtered, visited, key
 	local settingsDB
 
@@ -392,9 +416,12 @@ readSettings(database, simulator, settings, owner, user, community, car, track, 
 																		   , Weather: weather, Owner: owner}})
 						result.Push(row)
 
+					success := true
+
 					break
 				}
-				catch Any {
+				catch Any as exception {
+					logError(exception)
 				}
 				finally {
 					settingsDB.unlock("Settings")
@@ -402,6 +429,9 @@ readSettings(database, simulator, settings, owner, user, community, car, track, 
 
 			Sleep(200)
 		}
+
+		if (!success && isDevelopment())
+			logMessage(kLogWarn, "Waiting for file `"Settings.CSV`"...")
 	}
 
 	filtered := []

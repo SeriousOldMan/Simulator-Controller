@@ -49,7 +49,7 @@ class Database {
 			return (name ? this.iSchemas[name] : this.iSchemas)
 		}
 	}
-	
+
 	Schema[name := false] {
 		Get {
 			return this.Schemas[name]
@@ -65,7 +65,7 @@ class Database {
 			return (name ? (this.iFiles[name] := value) : this.iFiles := value)
 		}
 	}
-	
+
 	File[name := false] {
 		Get {
 			return this.Files[name]
@@ -131,8 +131,12 @@ class Database {
 
 									if (tries-- > 0)
 										Sleep(200)
-									else
+									else {
+										if isDevelopment()
+											logMessage(kLogWarn, "Waiting for file `"" . this.Directory . name . ".CSV" . "`"...")
+
 										throw exception
+									}
 								}
 							}
 					}
@@ -146,7 +150,7 @@ class Database {
 				return this.iTables
 		}
 	}
-	
+
 	Table[name := false] {
 		Get {
 			return this.Tables[name]
@@ -170,9 +174,9 @@ class Database {
 		if name {
 			if !this.Files.Has(name) {
 				directory := this.Directory
-				
+
 				DirCreate(directory)
-					
+
 				while !done {
 					file := false
 
@@ -186,7 +190,7 @@ class Database {
 						if file
 							try
 								file.Close()
-							
+
 						file := false
 					}
 
@@ -194,10 +198,10 @@ class Database {
 						if !isSet(counter)
 							counter := 0
 
-						if (isDebug() && (counter++ > 20)) {
+						if (isDevelopment() && (counter++ > 20)) {
 							counter := 0
 
-							logMessage(kLogInfo, "Waiting for file `"" . name . ".CSV`"...")
+							logMessage(kLogWarn, "Waiting for file `"" . directory . name  . ".CSV`"...")
 						}
 
 						Sleep(100)
@@ -360,8 +364,12 @@ class Database {
 					catch Any as exception {
 						if (tries-- > 0)
 							Sleep(200)
-						else
+						else {
+							if isDevelopment()
+								logMessage(kLogWarn, "Waiting for file `"" . fileName . "`"...")
+
 							throw exception
+						}
 					}
 			}
 		}

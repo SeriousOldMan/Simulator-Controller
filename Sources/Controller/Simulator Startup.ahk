@@ -1209,9 +1209,9 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 			loadFunctions(profile)
 
 			functionsListView.Modify(line, "Vis Select")
-
-			noSelect(functionsListView)
 		}
+
+		noSelect(functionsListView)
 	}
 
 	noSelect(listView, *) {

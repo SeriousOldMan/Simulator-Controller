@@ -952,7 +952,8 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 			}
 
 			for ignore, function in functions
-				profile["Function." . function[2]] := getMultiMapValue(settings, "Profiles", name . ".Function." . function[2], false)
+				if (getMultiMapValue(settings, "Profiles", name . ".Function." . function[2], kUndefined) != kUndefined)
+					profile["Function." . function[2]] := getMultiMapValue(settings, "Profiles", name . ".Function." . function[2])
 
 			profiles.Push(profile)
 		}
@@ -1882,7 +1883,7 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 		settingsTab.UseTab(1)
 
 		profilesEditorGui.Add("Text", "x" . (x0 + 8) . " ys+36 w110 h23", translate("Autonomous Mode"))
-		profilesEditorGui.Add("DropDownList", "x" . x1 . " yp-3 w" . w3 . " Choose3 vprofileAutonomyDropDown", collect(["Yes", "No", "Custom"], translate))
+		profilesEditorGui.Add("DropDownList", "x" . x1 . " yp-3 w" . w3 . " Choose3 vprofileAutonomyDropDown", collect(["Yes", "No", "Default"], translate))
 
 		first := true
 

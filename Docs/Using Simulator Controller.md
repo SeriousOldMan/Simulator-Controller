@@ -100,7 +100,7 @@ Good to know: If you hold down the Control key when clicking on the "Download" b
 
 You can choose whether a profile will start a solo or a team session and you can decide whether you want to run the "Practice Center" or the "Race Center" automatically during startup. Please note, that running the "Race Center" is only useful in a team session.
 
-You can furthermore choose, which Assistants will be available and whether they will talk and listen to you.
+You can choose furthermore, which Assistants will be available and whether they will talk and listen to you.
 
 | Setting  | Description |
 | -------- | ----------- |
@@ -122,6 +122,8 @@ If you are the team manager, you can open up the [team configuration editor](htt
 On the last tab you can select or deselect several functions provided by the different plugins of Simulator Controller. What is available here, totally depends on your overall configuration.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Startup%20Profiles%203.JPG)
+
+The checkbox for each function has three states - selected, deselected and indeterminated. The later means that the setting for this function will be used that has been defined elsewhere in your configuration (for example, in the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database").
 
 Finally, if you are ready to start, choose the profile you want to start with and close the startup profiles editor. Then click again on the green triangle to start Simulator Controller with the selected profile. As a shortcut, you can hold down the Control key while saving and closing the startup profiles editor, which will trigger the startup process automatically.
 

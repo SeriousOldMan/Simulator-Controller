@@ -952,7 +952,7 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 			}
 
 			for ignore, function in functions
-				profile["Function." . function] := getMultiMapValue(settings, "Profiles", name . ".Function." . function, false)
+				profile["Function." . function[2]] := getMultiMapValue(settings, "Profiles", name . ".Function." . function[2], false)
 
 			profiles.Push(profile)
 		}
@@ -1008,8 +1008,8 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 			}
 
 			for ignore, function in functions
-				if profile.Has("Function." . function)
-					setMultiMapValue(settings, "Profiles", name . ".Function." . function, profile["Function." . function])
+				if profile.Has("Function." . function[2])
+					setMultiMapValue(settings, "Profiles", name . ".Function." . function[2], profile["Function." . function[2]])
 		}
 
 		setMultiMapValue(settings, "Profiles", "Profiles", values2String(";|;", activeProfiles*))
@@ -1036,8 +1036,8 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 					setMultiMapValue(settings, "Team Session", property, profile[property])
 
 			for ignore, function in functions
-				if profile.Has("Function." . function)
-					setMultiMapValue(settings, "Functions", function, profile["Function." . function])
+				if profile.Has("Function." . function[2])
+					setMultiMapValue(settings, "Functions", function[2], profile["Function." . function[2]])
 
 		}
 
@@ -1045,6 +1045,8 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 	}
 
 	newProfile() {
+		local index, function
+
 		profile := CaseInsenseMap("Name", "", "Mode", "Solo", "Tools", "", "Assistant.Autonomy", "Custom")
 
 		for ignore, assistant in kRaceAssistants
@@ -1069,7 +1071,7 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 	}
 
 	loadProfile(profile) {
-		local ignore, plugin, function, index
+		local ignore, plugin
 
 		profilesEditorGui["profileNameEdit"].Text := profile["Name"]
 		profilesEditorGui["profileModeDropDown"].Value := Max(1, inList(hasTeamServer ? ["Solo", "Team"] : ["Solo"], profile["Mode"]))
@@ -1113,11 +1115,7 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 			}
 		}
 
-		for index, function in functions
-			if profile.Has("Function." . function)
-				functionsListView.Modify(index, profile["Function." . function] ? "Check" : "-Check")
-			else
-				functionsListView.Modify(index, "-Check")
+		loadFunctions(profile)
 	}
 
 	saveProfile(profile) {
@@ -1147,17 +1145,30 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 				profile["Session.Identifier"] := sessionIdentifier
 			}
 		}
+	}
+
+	loadFunctions(profile) {
+		local listViewIcons := IL_Create(functions.Length)
+		local picture, ignore, function
+
+		functionsListView.Delete()
+
+		for index, function in functions {
+			if (profile && profile.Has("Function." . function[2]))
+				picture := (kIconsDirectory . (profile["Function." . function[2]] ? "Checked.ico" : "Unchecked.ico"))
+			else
+				picture := (kIconsDirectory . "Indeterminate.ico")
+
+			IL_Add(listViewIcons, picture)
+		}
+
+		listViewIcons := functionsListView.SetImageList(listViewIcons)
+
+		if listViewIcons
+			IL_Destroy(listViewIcons)
 
 		for ignore, function in functions
-			profile["Function." . function] := false
-
-		index := functionsListView.GetNext(0, "C")
-
-		while index {
-			profile["Function." . functions[index]] := true
-
-			index := functionsListView.GetNext(index, "C")
-		}
+			functionsListView.Add("Icon" . A_Index, translate(function[1]), translate(function[2]))
 	}
 
 	chooseProfile(listView, line, *) {
@@ -1179,8 +1190,27 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 	}
 
 	chooseFunction(listView, line, *) {
-		if !selectedProfile
-			noCheck(listView)
+		local profile, function
+
+		if (selectedProfile && line) {
+			profile := profiles[selectedProfile - 1]
+			function := functions[line][2]
+
+			if profile.Has("Function." . function) {
+				if profile["Function." . function]
+					profile.Delete("Function." . function)
+				else
+					profile["Function." . function] := true
+			}
+			else
+				profile["Function." . function] := false
+
+			loadFunctions(profile)
+
+			functionsListView.Modify(line, "Vis Select")
+
+			noSelect(functionsListView)
+		}
 	}
 
 	noSelect(listView, *) {
@@ -1654,7 +1684,7 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 			}
 		}
 		else {
-			noCheck(functionsListView)
+			loadFunctions(false)
 
 			profilesEditorGui["deleteProfileButton"].Enabled := false
 			profilesEditorGui["copyProfileButton"].Enabled := false
@@ -1897,58 +1927,57 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 
 		settingsTab.UseTab(hasTeamServer ? 3 : 2)
 
-		functionsListView := profilesEditorGui.Add("ListView", "x" . (x0 + 8) . " ys+36 w372 h134 Checked -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Module", "Function"], translate))
-		functionsListView .OnEvent("Click", noSelect)
-		functionsListView .OnEvent("DoubleClick", noSelect)
-		functionsListView .OnEvent("ItemCheck", chooseFunction)
+		functionsListView := profilesEditorGui.Add("ListView", "x" . (x0 + 8) . " ys+36 w372 h134 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Module", "Function"], translate))
+		functionsListView .OnEvent("Click", chooseFunction)
+		functionsListView .OnEvent("DoubleClick", chooseFunction)
 
 		if hasDrivingCoach {
-			functions.Push("Performance Analysis")
+			functions.Push(Array("Driving Coach", "Performance Analysis"))
 
 			functionsListView.Add("", translate("Driving Coach"), translate("Performance Analysis"))
 
-			functions.Push("Handling Analysis")
+			functions.Push(Array("Driving Coach", "Handling Analysis"))
 
 			functionsListView.Add("", translate("Driving Coach"), translate("Handling Analysis"))
 		}
 
 		if hasRaceSpotter {
-			functions.Push("Track Automation")
+			functions.Push(Array("Race Spotter", "Track Automation"))
 
 			functionsListView.Add("", translate("Race Spotter"), translate("Track Automation"))
 		}
 
 		if hasRaceStrategist {
-			functions.Push("Telemetry Collection")
+			functions.Push(Array("Race Strategist", "Telemetry Collection"))
 
 			functionsListView.Add("", translate("Race Strategist"), translate("Telemetry Collection"))
 		}
 
-		if hasRaceStrategist {
-			functions.Push("Pressure Collection")
+		if hasRaceEngineer {
+			functions.Push(Array("Race Engineer", "Pressure Collection"))
 
 			functionsListView.Add("", translate("Race Engineer"), translate("Pressure Collection"))
 
-			functions.Push("Pitstop Service")
+			functions.Push(Array("Race Engineer", "Pitstop Service"))
 
 			functionsListView.Add("", translate("Race Engineer"), translate("Pitstop Service"))
 		}
 
 		if hasMotionFeedback {
-			functions.Push("Motion")
+			functions.Push(Array("Motion Feedback", "Motion"))
 
 			functionsListView.Add("", translate("Motion Feedback"), translate("Motion"))
 		}
 
 		if hasPedalVibration {
-			functions.Push("Pedal Vibration")
+			functions.Push(Array("Tactile Feedback", "Pedal Vibration"))
 
 			functionsListView.Add("", translate("Tactile Feedback"), translate("Pedal Vibration"))
 		}
 
 		if hasChassisVibration {
-			functions.Push("Front Vibration")
-			functions.Push("Rear Vibration")
+			functions.Push(Array("Tactile Feedback", "Front Vibration"))
+			functions.Push(Array("Tactile Feedback", "Rear Vibration"))
 
 			functionsListView.Add("", translate("Tactile Feedback"), translate("Front Vibration"))
 			functionsListView.Add("", translate("Tactile Feedback"), translate("Rear Vibration"))

@@ -199,7 +199,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 		local compound := getMultiMapValue(data, "Car Data", "TyreCompound", "Dry")
 		local compoundColor := getMultiMapValue(data, "Car Data", "TyreCompoundColor", "Black")
 		local tpSetting := getMultiMapValue(this.Configuration, "Race Engineer Startup", simulatorName . ".LoadTyrePressures", "Default")
-		local airTemperature, trackTemperature, pressures, certainty
+		local airTemperature, trackTemperature, pressures, certainty, collectPressure, pitstopService, ignore, session
 
 		if ((tpSetting = "TyresDatabase") || (tpSetting = "SetupDatabase")) {
 			trackTemperature := getMultiMapValue(data, "Track Data", "Temperature", 23)
@@ -235,6 +235,23 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 			setMultiMapValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.RL", Round(pressures[3], 1))
 			setMultiMapValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.RR", Round(pressures[4], 1))
 		}
+
+		if this.StartupSettings {
+			collectPressure := getMultiMapValue(this.StartupSettings, "Race Engineer", "Pressure Collection", kUndefined)
+
+			if (collectPressure != kUndefined)
+				for ignore, session in ["Practice", "Qualification", "Race"]
+					setMultiMapValue(settings, "Session Settings", "Telemetry." . session, collectPressure)
+
+			pitstopService := getMultiMapValue(this.StartupSettings, "Race Engineer", "Pitstop Service", kUndefined)
+
+			if (pitstopService != kUndefined)
+				for ignore, session in ["Practice", "Qualification", "Race"]
+					setMultiMapValue(settings, "Session Settings", "Pitstop." . session, pitstopService)
+		}
+
+		if isDebug()
+			writeMultiMap(kTempDirectory . this.Plugin . ".settings", settings)
 
 		return settings
 	}

@@ -313,6 +313,24 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 			this.RaceStrategist.cancelStrategy()
 	}
 
+	prepareSettings(data) {
+		local settings := super.prepareSettings(data)
+		local collectTelemetry, ignore, session
+
+		if this.StartupSettings {
+			collectTelemetry := getMultiMapValue(this.StartupSettings, "Race Strategist", "Telemetry Collection", kUndefined)
+
+			if (collectTelemetry != kUndefined)
+				for ignore, session in ["Practice", "Qualification", "Race"]
+					setMultiMapValue(settings, "Session Settings", "Telemetry." . session, collectTelemetry)
+		}
+
+		if isDebug()
+			writeMultiMap(kTempDirectory . this.Plugin . ".settings", settings)
+
+		return settings
+	}
+
 	saveTelemetryData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
 					, fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
 					, compound, compoundColor, pressures, temperatures, wear, lapState) {

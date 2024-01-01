@@ -78,17 +78,17 @@ Normally, the active mode on your hardware controller will be the "Launch" mode,
 
 Normally, it is not necessary to close *Simulator Controller.exe*, since it is very efficient and does not use many system resources. But if necessary, you can locate its icon, a small orange cog wheel, in the System Tray (at the lower right side of the Windows taskbar), right click the icon and choose Exit.
 
-### Enabling and disabling features
+### Enabling and disabling functions
 
 Simulataor Controller is a modular software and consists of many functions, which can be enabled or disabled during runtime. Beside using buttons on your hardware controller to enable or disable these functions, for example the connection to the Team Server or whether Track Automations will be active during the current session, you can also control most of them from the tray menu of the "Simulator Controller" application. Please don't touch the options in the "Support" submenu, unless told you so when tracking down problems.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Simulator%20Controller%20Menu.JPG)
 
-Beside manually enabling and disabling features when enterring a session, you can also manage your preferences using the so called startup profiles as described in the following section.
+Beside manually enabling and disabling functions when enterring a session, you can also manage your preferences using the so called startup profiles as described in the following section.
 
 ### Startup Profiles
 
-Managing the different features, as well as some feature specific configurations and settings can be quite time-consuming, when you participate in very different kind of sessions. The setup for a team race using the [Team Server](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server) is very different from running a local practice session or a race against the AI of a given simulator. Therefore, Simulator Controller provides the possibility to manage the most common settings as a profile and you can choose and activate a given profile while starting Simulator Controller by clicking on the green triangle. You can open the startup profiles editor by either exactly hitting the small cog wheel icon in the "Startup" button or by holding down the Control key while clicking on the "Startup" button. The following window appears:
+Managing the different functions, as well as some function specific configurations and settings can be quite time-consuming, when you participate in very different kind of sessions. The setup for a team race using the [Team Server](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server) is very different from running a local practice session or a race against the AI of a given simulator. Therefore, Simulator Controller provides the possibility to manage the most common settings as a profile and you can choose and activate a given profile while starting Simulator Controller by clicking on the green triangle. You can open the startup profiles editor by either exactly hitting the small cog wheel icon in the "Startup" button or by holding down the Control key while clicking on the "Startup" button. The following window appears:
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Startup%20Profiles%201.JPG)
 

@@ -56,6 +56,31 @@ class DrivingCoachPlugin extends RaceAssistantPlugin  {
 		return DrivingCoachPlugin.RemoteDrivingCoach(this, pid)
 	}
 
+	prepareSettings(data) {
+		local settings := super.prepareSettings(data)
+		local analyzePerformance, analyzeHandling, ignore, session, instruction
+
+		if this.StartupSettings {
+			analyzePerformance := getMultiMapValue(this.StartupSettings, "Driving Coach", "Performance Analysis", kUndefined)
+
+			if (analyzePerformance != kUndefined)
+				for ignore, instruction in ["Session", "Stint"]
+					for ignore, session in ["Practice", "Qualification", "Race"]
+						setMultiMapValue(settings, "Assistant.Coach", "Data." . session . "." . instruction, analyzePerformance)
+
+			analyzeHandling := getMultiMapValue(this.StartupSettings, "Driving Coach", "Handling Analysis", kUndefined)
+
+			if (analyzeHandling != kUndefined)
+				for ignore, session in ["Practice", "Qualification", "Race"]
+					setMultiMapValue(settings, "Assistant.Coach", "Data." . session . ".Handling", analyzeHandling)
+		}
+
+		if isDebug()
+			writeMultiMap(kTempDirectory . this.Plugin . ".settings", settings)
+
+		return settings
+	}
+
 	serviceState(health) {
 		this.iServiceState := health
 	}
@@ -74,7 +99,7 @@ class DrivingCoachPlugin extends RaceAssistantPlugin  {
 				if (this.iServiceState = "Available") {
 					if !this.RaceAssistantSpeaker
 						information .= ("; " . translate("Silent: ") . translate("Yes"))
-						
+
 					if this.RaceAssistantMuted
 						information .= ("; " . translate("Muted: ") . translate("Yes"))
 				}

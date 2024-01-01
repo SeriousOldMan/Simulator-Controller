@@ -590,7 +590,7 @@ class PluginActionsList extends ConfigurationItemList {
 			picturesListViewImages := IL_Create(length)
 
 			for ignore, item in items {
-				picture := LoadPicture(item[1] ? item[1] : (kIconsDirectory . "Empty.png"),"W43 H43")
+				picture := LoadPicture(item[1] ? item[1] : (kIconsDirectory . "Empty.png"), "W43 H43")
 
 				IL_Add(picturesListViewImages, picture)
 			}

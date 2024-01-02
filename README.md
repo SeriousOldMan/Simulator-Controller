@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[5.5.2.0-beta](https://www.dropbox.com/scl/fi/adjaw92uaoxlnwync3pko/Simulator-Controller-5.5.2.0-beta.zip?rlkey=gkw954pqxaf4cwwualgr588p5&dl=1) (Test build for 5.5.2. Changes: New startup wizard in "Simulator Startup", Deprecated silent and muted presets from "Simulator Setup", New keyboard modifiers for "Simulator Startup", New preset in "Simulator Setup" for startup profiles, New fields in "Session State.json", Migrated to AHK 2.0.11, New car models for "Setup Workbench", New EnumerationHandler in "Setup Workbench", Driving Coach preserves memory between sessions, Performance optimization in Team Server.)
+[5.5.2.0-beta](https://www.dropbox.com/scl/fi/adjaw92uaoxlnwync3pko/Simulator-Controller-5.5.2.0-beta.zip?rlkey=gkw954pqxaf4cwwualgr588p5&dl=1) (Test build for 5.5.2. Changes: New startup wizard in "Simulator Startup", Deprecated silent and muted presets from "Simulator Setup", New keyboard modifiers for "Simulator Startup", New preset in "Simulator Setup" for startup profiles, New fields in "Session State.json", Migrated to AHK 2.0.11, New car models for "Setup Workbench", New EnumerationHandler in "Setup Workbench", Driving Coach preserves memory between sessions, Performance optimization in Team Server, Adopted Automibilsta 2 V 1.5.5 changes.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-552) of this version and all the versions you might have skipped, before installing and using this version.
 

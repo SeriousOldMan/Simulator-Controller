@@ -2176,19 +2176,20 @@ fixIE(version := 0, exeName := "") {
 		logError(exception, false, false)
 	}
 
-	try {
-		if (version = "") {
-			RegDelete("HKCU\" . key, exeName)
-			RegDelete("HKLM\" . key, exeName)
+	if A_IsAdmin
+		try {
+			if (version = "") {
+				RegDelete("HKCU\" . key, exeName)
+				RegDelete("HKLM\" . key, exeName)
+			}
+			else {
+				RegWrite(version, "REG_DWORD", "HKCU\" . key, exeName)
+				RegWrite(version, "REG_DWORD", "HKLM\" . key, exeName)
+			}
 		}
-		else {
-			RegWrite(version, "REG_DWORD", "HKCU\" . key, exeName)
-			RegWrite(version, "REG_DWORD", "HKLM\" . key, exeName)
+		catch Any as exception {
+			logError(exception, false, false)
 		}
-	}
-	catch Any as exception {
-		logError(exception, false, false)
-	}
 
 	return previousValue
 }

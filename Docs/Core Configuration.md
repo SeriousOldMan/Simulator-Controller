@@ -28,8 +28,8 @@ The next group of settings are used mainly for development purposes. It allows t
 | Category | Setting | Default | Description |
 |----------|---------|---------|-------------|
 | Build     | Configuration | Production | Chooses the runtime mode (*Production* or *Development*) of the framework. This normaly determined during compile time, but it is possible to activate parts of the *Development* mode even for production code.  |
-| Debug     | Debug | *depending on configuration* | Specifies, whether the framework is running in a special debug mode. Default is *false* for a production (release) configuration and *true* for a development configuration. This optiona can be switched using the application menu. |
-|      | LogLevel | *depending on configuration* | Defines the level of verbosity of the logging messages. Allowed values are *Debug*, *Info*, *Warn*, *Critical* and *Off*. Defult is *Warn* for production configuration and *Debug* for devlopment configuration. This optiona can be switched using the application menu. |
+| Debug     | Debug | *depending on configuration* | Specifies, whether the framework is running in a special debug mode. Default is *false* for a production (release) configuration and *true* for a development configuration. This option overwrites the choice as set in "Simulator Configuration" and it can be switched using the application menu. |
+|      | LogLevel | *depending on configuration* | Defines the level of verbosity of the logging messages. Allowed values are *Debug*, *Info*, *Warn*, *Critical* and *Off*. Defult is *Warn* for production configuration and *Debug* for devlopment configuration. This option overwrites the choice as set in "Simulator Configuration" and it can be switched using the application menu. |
 |      | Verbose | *depending on configuration* | Enables or disables additional and very verbose diagnostic output. Never use it in a real race, since error dialogs might popup while driving. Default is *true* for non-compiled code, when *Debug* is enabled, *false* otherwise. |
 
 The following group let's you control a couple of aspects of the voice recognition engine.

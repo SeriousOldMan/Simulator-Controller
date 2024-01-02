@@ -1152,24 +1152,34 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 		local listViewIcons := IL_Create(functions.Length)
 		local picture, ignore, function
 
-		functionsListView.Delete()
+		functionsListView.Opt("-Redraw")
 
-		for index, function in functions {
-			if (profile && profile.Has("Function." . function[2]))
-				picture := (kIconsDirectory . (profile["Function." . function[2]] ? "Checked.ico" : "Unchecked.ico"))
-			else
-				picture := (kIconsDirectory . "Indeterminate.ico")
+		try {
+			functionsListView.Delete()
 
-			IL_Add(listViewIcons, picture)
+			for index, function in functions {
+				if (profile && profile.Has("Function." . function[2]))
+					picture := (kIconsDirectory . (profile["Function." . function[2]] ? "Checked.ico" : "Unchecked.ico"))
+				else
+					picture := (kIconsDirectory . "Indeterminate.ico")
+
+				IL_Add(listViewIcons, picture)
+			}
+
+			listViewIcons := functionsListView.SetImageList(listViewIcons)
+
+			if listViewIcons
+				IL_Destroy(listViewIcons)
+
+			for ignore, function in functions
+				functionsListView.Add("Icon" . A_Index, translate(function[1]), translate(function[2]))
+
+			loop 2
+				functionsListView.ModifyCol(A_Index, "AutoHdr")
 		}
-
-		listViewIcons := functionsListView.SetImageList(listViewIcons)
-
-		if listViewIcons
-			IL_Destroy(listViewIcons)
-
-		for ignore, function in functions
-			functionsListView.Add("Icon" . A_Index, translate(function[1]), translate(function[2]))
+		finally {
+			functionsListView.Opt("+Redraw")
+		}
 	}
 
 	chooseProfile(listView, line, *) {
@@ -1848,7 +1858,7 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 
 		x4 := x3 + 64
 
-		x5 := x4 - 1
+		x5 := x4 + 6
 		x6 := x5 + 24
 		x7 := x6 + 24
 
@@ -1928,7 +1938,7 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 
 		settingsTab.UseTab(hasTeamServer ? 3 : 2)
 
-		functionsListView := profilesEditorGui.Add("ListView", "x" . (x0 + 8) . " ys+36 w372 h134 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Module", "Function"], translate))
+		functionsListView := profilesEditorGui.Add("ListView", "x" . (x0 + 8) . " ys+36 w372 h134 -Multi -LV0x10 -LV0x20 AltSubmit NoSort NoSortHdr", collect(["Module", "Function"], translate))
 		functionsListView .OnEvent("Click", chooseFunction)
 		functionsListView .OnEvent("DoubleClick", chooseFunction)
 
@@ -1984,9 +1994,6 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 			functionsListView.Add("", translate("Tactile Feedback"), translate("Rear Vibration"))
 		}
 
-		loop 2
-			functionsListView.ModifyCol(A_Index, "AutoHdr")
-
 		settingsTab.UseTab(0)
 
 		profilesEditorGui.Add("Text", "x8 ys+190 w408 0x10")
@@ -1995,6 +2002,7 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 		profilesEditorGui.Add("Button", "X+10 w80", translate("&Cancel")).OnEvent("Click", launchProfilesEditor.Bind(kCancel))
 
 		loadProfiles()
+		loadFunctions(false)
 
 		launchProfilesEditor("Update State")
 

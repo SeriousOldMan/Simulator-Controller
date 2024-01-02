@@ -1229,11 +1229,6 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 			listView.Modify(A_Index, "-Select")
 	}
 
-	noCheck(listView, *) {
-		loop listView.GetCount()
-			listView.Modify(A_Index, "-Check")
-	}
-
 	if (launchPadOrCommand == kSave) {
 		if selectedProfile
 			launchProfilesEditor(kEvent, "ProfileSave")

@@ -75,23 +75,7 @@ getControllerState(configuration?, force := false) {
 
 				exePath := ("`"" . kBinariesDirectory . "Simulator Controller.exe`" -NoStartup -NoUpdate" .  options)
 
-				Run(exePath, kBinariesDirectory, , &pid)
-
-				Sleep(1000)
-
-				tries := 30
-
-				while (tries-- > 0) {
-					if !ProcessExist(pid)
-						break
-
-					Sleep(200)
-				}
-
-				if configuration
-					deleteFile(fileName)
-
-				pid := false
+				RunWait(exePath, kBinariesDirectory)
 			}
 			catch Any as exception {
 				logMessage(kLogCritical, translate("Cannot start Simulator Controller (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))

@@ -72,7 +72,8 @@ class DrivingCoachPlugin extends RaceAssistantPlugin  {
 
 			if (analyzeHandling != kUndefined)
 				for ignore, session in ["Practice", "Qualification", "Race"]
-					setMultiMapValue(settings, "Assistant.Coach", "Data." . session . ".Handling", analyzeHandling)
+					for ignore, instruction in ["Session", "Handling"]
+						setMultiMapValue(settings, "Assistant.Coach", "Data." . session . "." . instruction, analyzeHandling)
 		}
 
 		if isDebug()

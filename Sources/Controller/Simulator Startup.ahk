@@ -937,9 +937,12 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 				profile["Mode"] := "Solo"
 
 			for ignore, assistant in kRaceAssistants
-				profile[assistant] := getMultiMapValue(settings, "Profiles", name . "." . assistant, "Active")
+				profile[assistant] := getMultiMapValue(settings, "Profiles", name . "." . assistant, "Default")
 
-			profile["Assistant.Autonomy"] := getMultiMapValue(settings, "Profiles", name . ".Assistant.Autonomy")
+			profile["Assistant.Autonomy"] := getMultiMapValue(settings, "Profiles", name . ".Assistant.Autonomy", "Default")
+
+			if (profile["Assistant.Autonomy"] = "Custom")
+				profile["Assistant.Autonomy"] := "Default"
 
 			if (profile["Mode"] = "Team") {
 				profile["Team.Mode"] := getMultiMapValue(settings, "Profiles", name . ".Team.Mode", "Settings")
@@ -995,9 +998,11 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 			setMultiMapValue(settings, "Profiles", name . ".Tools", profile["Tools"])
 
 			for ignore, assistant in kRaceAssistants
-				setMultiMapValue(settings, "Profiles", name . "." . assistant, profile[assistant])
+				if (profile[assistant] != "Default")
+					setMultiMapValue(settings, "Profiles", name . "." . assistant, profile[assistant])
 
-			setMultiMapValue(settings, "Profiles", name . ".Assistant.Autonomy", profile["Assistant.Autonomy"])
+			if (profile["Assistant.Autonomy"] != "Default")
+				setMultiMapValue(settings, "Profiles", name . ".Assistant.Autonomy", profile["Assistant.Autonomy"])
 
 			if (profile["Mode"] = "Team") {
 				setMultiMapValue(settings, "Profiles", name . ".Team.Mode", profile["Team.Mode"])
@@ -1023,13 +1028,15 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 			setMultiMapValue(settings, "Session", "Mode", profile["Mode"])
 			setMultiMapValue(settings, "Session", "Tools", profile["Tools"])
 
-			for ignore, assistant in kRaceAssistants {
-				setMultiMapValue(settings, assistant, "Enabled", profile[assistant] != "Disabled")
-				setMultiMapValue(settings, assistant, "Silent", profile[assistant] = "Silent")
-				setMultiMapValue(settings, assistant, "Muted", profile[assistant] = "Muted")
-			}
+			for ignore, assistant in kRaceAssistants
+				if (profile[assistant] != "Default") {
+					setMultiMapValue(settings, assistant, "Enabled", profile[assistant] != "Disabled")
+					setMultiMapValue(settings, assistant, "Silent", profile[assistant] = "Silent")
+					setMultiMapValue(settings, assistant, "Muted", profile[assistant] = "Muted")
+				}
 
-			setMultiMapValue(settings, "Race Assistant", "Autonomy", profile["Assistant.Autonomy"])
+			if (profile["Assistant.Autonomy"] != "Default")
+				setMultiMapValue(settings, "Race Assistant", "Autonomy", profile["Assistant.Autonomy"])
 
 			if ((profile["Mode"] = "Team") && (profile["Team.Mode"] = "Profile"))
 				for ignore, property in ["Server.URL", "Server.Token", "Team.Name", "Team.Identifier"
@@ -1048,10 +1055,10 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 	newProfile() {
 		local index, function
 
-		profile := CaseInsenseMap("Name", "", "Mode", "Solo", "Tools", "", "Assistant.Autonomy", "Custom")
+		profile := CaseInsenseMap("Name", "", "Mode", "Solo", "Tools", "", "Assistant.Autonomy", "Default")
 
 		for ignore, assistant in kRaceAssistants
-			profile[assistant] := "Active"
+			profile[assistant] := "Default"
 
 		if keepAliveTask {
 			keepAliveTask.stop()
@@ -1078,10 +1085,10 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 		profilesEditorGui["profileModeDropDown"].Value := Max(1, inList(hasTeamServer ? ["Solo", "Team"] : ["Solo"], profile["Mode"]))
 		profilesEditorGui["profilePitwallDropDown"].Value := (1 + inList(hasTeamServer ? ["Practice Center", "Race Center"] : ["Practice Center"], profile["Tools"]))
 
-		profilesEditorGui["profileAutonomyDropDown"].Value := inList(["Yes", "No", "Custom"], profile["Assistant.Autonomy"])
+		profilesEditorGui["profileAutonomyDropDown"].Value := inList(["Yes", "No", "Default"], profile["Assistant.Autonomy"])
 
 		for ignore, plugin in activeAssistants
-			plugin[2].Value := inList(["Disabled", "Silent", "Muted", "Active"], profile[plugin[1]])
+			plugin[2].Value := inList(["Default", "Disabled", "Silent", "Muted", "Active"], profile[plugin[1]])
 
 		if keepAliveTask {
 			keepAliveTask.stop()
@@ -1126,10 +1133,10 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 		profile["Mode"] :=  ["Solo", "Team"][profilesEditorGui["profileModeDropDown"].Value]
 		profile["Tools"] := ["", "Practice Center", "Race Center"][profilesEditorGui["profilePitwallDropDown"].Value]
 
-		profile["Assistant.Autonomy"] := ["Yes", "No", "Custom"][profilesEditorGui["profileAutonomyDropDown"].Value]
+		profile["Assistant.Autonomy"] := ["Yes", "No", "Default"][profilesEditorGui["profileAutonomyDropDown"].Value]
 
 		for ignore, plugin in activeAssistants
-			profile[plugin[1]] := ["Disabled", "Silent", "Muted", "Active"][plugin[2].Value]
+			profile[plugin[1]] := ["Default", "Disabled", "Silent", "Muted", "Active"][plugin[2].Value]
 
 		if (profile["Mode"] = "Team") {
 			profile["Team.Mode"] := ["Profile", "Settings"][profilesEditorGui["profileCredentialsDropDown"].Value]
@@ -1889,7 +1896,7 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 
 					first := false
 
-					activeAssistants.Push(Array(plugin, profilesEditorGui.Add("DropDownList", "x" . x1 . " yp-3 w" . w3 . " Choose4", collect(["Disabled", "Silent", "Muted", "Active"], translate))))
+					activeAssistants.Push(Array(plugin, profilesEditorGui.Add("DropDownList", "x" . x1 . " yp-3 w" . w3 . " Choose4", collect(["Default", "Disabled", "Silent", "Muted", "Active"], translate))))
 				}
 
 		if hasTeamServer {

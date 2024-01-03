@@ -9,8 +9,10 @@
 ;;;                        Private Variable Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global gDebug := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory)), "Debug", "Debug", kBuildConfiguration = "Development")
-global gLogLevel := kLogLevels[getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory)), "Debug", "LogLevel", (kBuildConfiguration = "Development") ? "Debug" : "Warn")]
+global gDebug := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+								, "Debug", "Debug", kBuildConfiguration = "Development")
+global gLogLevel := kLogLevels[getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+											  , "Debug", "LogLevel", (kBuildConfiguration = "Development") ? "Debug" : "Warn")]
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -195,10 +197,10 @@ logError(exception, unhandled := false, report := true) {
 
 
 		if exception.HasProp("Stack")
-			logMessage(unhandled ? kLogCritical : kLogDebug, "`n`nStack:`n`n" . exception.Stack, false)
+			logMessage((unhandled || isDevelopment()) ? kLogCritical : kLogDebug, "`n`nStack:`n`n" . exception.Stack, false)
 	}
 	else
-		logMessage((unhandled || isDevelopment()) ? kLogCritical : kLogDebug
+		logMessage(((unhandled || isDevelopment()) || isDevelopment()) ? kLogCritical : kLogDebug
 				 , translate(unhandled ? "Unhandled exception encountered: " : "Handled exception encountered: ") . exception)
 
 	if (verbose && (unhandled || report))

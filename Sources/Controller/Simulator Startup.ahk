@@ -1946,54 +1946,34 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 
 		if hasDrivingCoach {
 			functions.Push(Array("Driving Coach", "Performance Analysis"))
-
-			functionsListView.Add("", translate("Driving Coach"), translate("Performance Analysis"))
-
 			functions.Push(Array("Driving Coach", "Handling Analysis"))
-
-			functionsListView.Add("", translate("Driving Coach"), translate("Handling Analysis"))
 		}
 
-		if hasRaceSpotter {
+		if hasRaceSpotter
 			functions.Push(Array("Race Spotter", "Track Automation"))
-
-			functionsListView.Add("", translate("Race Spotter"), translate("Track Automation"))
-		}
 
 		if hasRaceStrategist {
 			functions.Push(Array("Race Strategist", "Telemetry Collection"))
-
-			functionsListView.Add("", translate("Race Strategist"), translate("Telemetry Collection"))
+			functions.Push(Array("Race Strategist", "Traffic Analysis"))
 		}
 
 		if hasRaceEngineer {
 			functions.Push(Array("Race Engineer", "Pressure Collection"))
-
-			functionsListView.Add("", translate("Race Engineer"), translate("Pressure Collection"))
-
+			functions.Push(Array("Race Engineer", "Fuel Warning"))
+			functions.Push(Array("Race Engineer", "Damage Warning"))
+			functions.Push(Array("Race Engineer", "Pressure Warning"))
 			functions.Push(Array("Race Engineer", "Pitstop Service"))
-
-			functionsListView.Add("", translate("Race Engineer"), translate("Pitstop Service"))
 		}
 
-		if hasMotionFeedback {
+		if hasMotionFeedback
 			functions.Push(Array("Motion Feedback", "Motion"))
 
-			functionsListView.Add("", translate("Motion Feedback"), translate("Motion"))
-		}
-
-		if hasPedalVibration {
+		if hasPedalVibration
 			functions.Push(Array("Tactile Feedback", "Pedal Vibration"))
-
-			functionsListView.Add("", translate("Tactile Feedback"), translate("Pedal Vibration"))
-		}
 
 		if hasChassisVibration {
 			functions.Push(Array("Tactile Feedback", "Front Vibration"))
 			functions.Push(Array("Tactile Feedback", "Rear Vibration"))
-
-			functionsListView.Add("", translate("Tactile Feedback"), translate("Front Vibration"))
-			functionsListView.Add("", translate("Tactile Feedback"), translate("Rear Vibration"))
 		}
 
 		settingsTab.UseTab(0)

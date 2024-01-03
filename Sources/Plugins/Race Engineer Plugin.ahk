@@ -200,6 +200,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 		local compoundColor := getMultiMapValue(data, "Car Data", "TyreCompoundColor", "Black")
 		local tpSetting := getMultiMapValue(this.Configuration, "Race Engineer Startup", simulatorName . ".LoadTyrePressures", "Default")
 		local airTemperature, trackTemperature, pressures, certainty, collectPressure, pitstopService, ignore, session
+		local fuelWarning, damageWarning, pressureWarning
 
 		if ((tpSetting = "TyresDatabase") || (tpSetting = "SetupDatabase")) {
 			trackTemperature := getMultiMapValue(data, "Track Data", "Temperature", 23)
@@ -248,6 +249,24 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 			if (pitstopService != kUndefined)
 				for ignore, session in ["Practice", "Qualification", "Race"]
 					setMultiMapValue(settings, "Session Settings", "Pitstop." . session, pitstopService)
+
+			fuelWarning := getMultiMapValue(this.StartupSettings, "Race Engineer", "Fuel Warning", kUndefined)
+
+			if (fuelWarning != kUndefined)
+				for ignore, session in ["Practice", "Qualification", "Race"]
+					setMultiMapValue(settings, "Assistant.Engineer", "Announcement." . session . ".LowFuel", fuelWarning)
+
+			damageWarning := getMultiMapValue(this.StartupSettings, "Race Engineer", "Damage Warning", kUndefined)
+
+			if (damageWarning != kUndefined)
+				for ignore, session in ["Practice", "Qualification", "Race"]
+					setMultiMapValue(settings, "Assistant.Engineer", "Announcement." . session . ".Damage", damageWarning)
+
+			pressureWarning := getMultiMapValue(this.StartupSettings, "Race Engineer", "Pressure Warning", kUndefined)
+
+			if (pressureWarning != kUndefined)
+				for ignore, session in ["Practice", "Qualification", "Race"]
+					setMultiMapValue(settings, "Assistant.Engineer", "Announcement." . session . ".Pressure", pressureWarning)
 		}
 
 		if isDebug()

@@ -315,7 +315,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 	prepareSettings(data) {
 		local settings := super.prepareSettings(data)
-		local collectTelemetry, ignore, session
+		local collectTelemetry, trafficAnalysis, ignore, session
 
 		if this.StartupSettings {
 			collectTelemetry := getMultiMapValue(this.StartupSettings, "Race Strategist", "Telemetry Collection", kUndefined)
@@ -323,6 +323,11 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 			if (collectTelemetry != kUndefined)
 				for ignore, session in ["Practice", "Qualification", "Race"]
 					setMultiMapValue(settings, "Session Settings", "Telemetry." . session, collectTelemetry)
+
+			trafficAnalysis := getMultiMapValue(this.StartupSettings, "Race Strategist", "Traffic Analysis", kUndefined)
+
+			if (trafficAnalysis != kUndefined)
+				setMultiMapValue(settings, "Strategy Settings", "Traffic.Simulation", trafficAnalysis)
 		}
 
 		if isDebug()

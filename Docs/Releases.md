@@ -25,7 +25,7 @@
         - BMW M3 E30 (fixed)
 		- McLaren F1 GTR
 
-Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-552), since a couple of presets were deprecated.
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-552), since a couple of presets were deprecated, but also, if you are running your own Team Server.
 
 ## 5.5.1.2-release 12/22/23
   1. Minor bugfixes, as always

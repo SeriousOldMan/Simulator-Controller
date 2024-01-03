@@ -928,12 +928,12 @@ class Window extends Gui {
 		this.OnEvent("Close", this.Close)
 
 		if this.Resizeable {
-			this.Opt("+Resize")
+			this.Opt("+Resize +OwnDialogs")
 
 			this.OnEvent("Size", this.Resize)
 		}
 		else
-			this.Opt("-SysMenu -Border -Caption +0x800000")
+			this.Opt("+OwnDialogs -SysMenu -Border -Caption +0x800000")
 
 		if !isObject(options)
 			this.Opt("-DPIScale " . options)
@@ -965,6 +965,16 @@ class Window extends Gui {
 
 		if (InStr(options, "-Disabled") && this.AutoActivate)
 			this.Show("NA")
+	}
+
+	OnEvent(type, handler) {
+		handleEvent(arguments*) {
+			this.Opt("+OwnDialogs")
+
+			handler(arguments*)
+		}
+
+		super.OnEvent(type, handleEvent)
 	}
 
 	SetFont(options?, font?) {

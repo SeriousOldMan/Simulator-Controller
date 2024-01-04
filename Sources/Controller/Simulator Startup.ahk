@@ -1188,6 +1188,11 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 			functionsListView.Opt("+Redraw")
 		}
 	}
+	
+	selectProfile(listView, line, selected) {
+		if selected
+			chooseProfile(listView, line)
+	}
 
 	chooseProfile(listView, line, *) {
 		if (selectedProfile > 1)
@@ -1868,7 +1873,7 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 		profilesListView.OnEvent("Click", chooseProfile)
 		profilesListView.OnEvent("DoubleClick", chooseProfile)
 		profilesListView.OnEvent("ItemCheck", chooseProfile)
-		profilesListView.OnEvent("ItemSelect", chooseProfile)
+		profilesListView.OnEvent("ItemSelect", selectProfile)
 
 		profilesEditorGui.Add("Button", "x" . (x5 - 52) . " yp+150 w23 h23 Center +0x200 vprofilesUploadButton").OnEvent("Click", launchProfilesEditor.Bind(kEvent, "ProfilesUpload"))
 		setButtonIcon(profilesEditorGui["profilesUploadButton"], kIconsDirectory . "Upload.ico", 1, "L4 T4 R4 B4")

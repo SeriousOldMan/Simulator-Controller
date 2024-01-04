@@ -1006,13 +1006,17 @@ class PracticeCenter extends ConfigurationItem {
 			}
 		}
 
+		selectReport(listView, line, selected) {
+			if selected
+				chooseReport(listView, line)
+		}
+
 		chooseReport(listView, line, *) {
 			if center.HasData {
 				if center.isWorking()
 					return
 
-				if line
-					center.showReport(kSessionReports[line])
+				center.showReport(line ? kSessionReports[line] : false)
 			}
 			else
 				loop listView.GetCount()
@@ -1053,6 +1057,11 @@ class PracticeCenter extends ConfigurationItem {
 			center.withExceptionhandler(ObjBindMethod(center, "chooseRunMenu", centerGui["runMenuDropDown"].Value))
 		}
 
+		selectRun(listView, line, selected) {
+			if selected
+				chooseRun(listView, line)
+		}
+
 		chooseRun(listView, line, *) {
 			local run
 
@@ -1083,6 +1092,11 @@ class PracticeCenter extends ConfigurationItem {
 			}
 		}
 
+		selectLap(listView, line, selected) {
+			if selected
+				chooseLap(listView, line)
+		}
+
 		chooseLap(listView, line, *) {
 			if line {
 				if center.SessionExported
@@ -1110,6 +1124,11 @@ class PracticeCenter extends ConfigurationItem {
 				MsgBox(translate("You must first select a simulation."), translate("Information"), 262192)
 				OnMessage(0x44, translateOkButton, 0)
 			}
+		}
+
+		selectTyreCompound(listView, line, selected) {
+			if selected
+				chooseTyreCompound(listView, line)
 		}
 
 		chooseTyreCompound(listView, line, *) {
@@ -1312,7 +1331,7 @@ class PracticeCenter extends ConfigurationItem {
 		this.iReportsListView := centerGui.Add("ListView", "x16 yp+10 w115 h206 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", [translate("Report")])
 		this.iReportsListView.OnEvent("Click", chooseReport)
 		this.iReportsListView.OnEvent("DoubleClick", chooseReport)
-		this.iReportsListView.OnEvent("ItemSelect", chooseReport)
+		this.iReportsListView.OnEvent("ItemSelect", selectReport)
 
 		for ignore, report in kSessionReports
 			if (report = "Drivers")
@@ -1458,7 +1477,7 @@ class PracticeCenter extends ConfigurationItem {
 		this.iTyreCompoundsListView := centerGui.Add("ListView", "x" . x7 . " yp w" . w12 . " h90 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Compound", "#"], translate))
 		this.iTyreCompoundsListView.OnEvent("Click", chooseTyreCompound)
 		this.iTyreCompoundsListView.OnEvent("DoubleClick", chooseTyreCompound)
-		this.iTyreCompoundsListView.OnEvent("ItemSelect", chooseTyreCompound)
+		this.iTyreCompoundsListView.OnEvent("ItemSelect", selectTyreCompound)
 
 		x13 := (x7 + w12 + 5)
 
@@ -1489,7 +1508,7 @@ class PracticeCenter extends ConfigurationItem {
 		this.iRunsListView := centerGui.Add("ListView", "x24 ys+33 w577 h175 H:Grow(0.5) Checked -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Driver", "Weather", "Compound", "Set", "Laps", "Initial Fuel", "Consumed Fuel", "Avg. Lap Time", "Accidents", "Potential", "Race Craft", "Speed", "Consistency", "Car Control"], translate))
 		this.iRunsListView.OnEvent("Click", chooseRun)
 		this.iRunsListView.OnEvent("DoubleClick", chooseRun)
-		this.iRunsListView.OnEvent("ItemSelect", chooseRun)
+		this.iRunsListView.OnEvent("ItemSelect", selectRun)
 
 		centerGui.Add("Text", "x24 yp+180 w80 h23 Y:Move(0.5)", translate("Notes"))
 		centerGui.Add("Edit", "x104 yp w497 h90 Y:Move(0.5) H:Grow(0.5) vrunNotesEdit").OnEvent("Change", updateNotes)
@@ -1499,7 +1518,7 @@ class PracticeCenter extends ConfigurationItem {
 		this.iLapsListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 H:Grow Checked -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Stint", "Weather", "Grip", "Lap Time", "Sector Times", "Consumption", "Remaining", "Pressures", "Invalid", "Accident"], translate))
 		this.iLapsListView.OnEvent("Click", chooseLap)
 		this.iLapsListView.OnEvent("DoubleClick", chooseLap)
-		this.iLapsListView.OnEvent("ItemSelect", chooseLap)
+		this.iLapsListView.OnEvent("ItemSelect", selectLap)
 
 		centerTab.UseTab(4)
 
@@ -5724,6 +5743,13 @@ class PracticeCenter extends ConfigurationItem {
 				this.showTemperaturesReport()
 			else if (report = "Free")
 				this.showCustomReport()
+			else {
+				this.selectReport(false)
+
+				this.showChart(false)
+
+				this.updateState()
+			}
 		}
 
 		if (force || (report != this.SelectedReport)) {

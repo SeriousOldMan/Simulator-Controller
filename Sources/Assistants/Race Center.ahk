@@ -1277,13 +1277,17 @@ class RaceCenter extends ConfigurationItem {
 			connectServer()
 		}
 
+		selectReport(listView, line, selected) {
+			if selected
+				chooseReport(listView, line)
+		}
+
 		chooseReport(listView, line, *) {
 			if center.HasData {
 				if center.isWorking()
 					return
 
-				if line
-					center.showReport(kSessionReports[line])
+				center.showReport(line ? kSessionReports[line] : false)
 			}
 			else
 				loop listView.GetCount()
@@ -1344,6 +1348,11 @@ class RaceCenter extends ConfigurationItem {
 			center.updateState()
 		}
 
+		selectPlan(listView, line, selected) {
+			if selected
+				choosePlan(listView, line)
+		}
+
 		choosePlan(listView, line, *) {
 			local stint, driver, timePlanned, timeActual, lapPlanned, lapActual, refuelAmount, tyreChange, time, currentTime
 
@@ -1390,9 +1399,11 @@ class RaceCenter extends ConfigurationItem {
 				centerGui["actLapEdit"].Text := lapActual
 				centerGui["planRefuelEdit"].Text := refuelAmount
 				centerGui["planTyreCompoundDropDown"].Choose((tyreChange = "x") ? 1 : 2)
-
-				center.updateState()
 			}
+			else
+				this.iSelectedPlanStint := false
+
+			center.updateState()
 		}
 
 		updatePlan(*) {
@@ -1494,9 +1505,19 @@ class RaceCenter extends ConfigurationItem {
 			center.withExceptionhandler(ObjBindMethod(center, "releasePlan"))
 		}
 
+		selectStint(listView, line, selected) {
+			if selected
+				chooseStint(listView, line)
+		}
+
 		chooseStint(listView, line, *) {
 			if line
 				center.withExceptionhandler(ObjBindMethod(center, "showStintDetails", center.Stints[listView.GetText(line, 1)]))
+		}
+
+		selectLap(listView, line, selected) {
+			if selected
+				chooseLap(listView, line)
 		}
 
 		chooseLap(listView, line, *) {
@@ -1633,6 +1654,11 @@ class RaceCenter extends ConfigurationItem {
 			}
 		}
 
+		selectSetup(listView, line, selected) {
+			if selected
+				chooseSetup(listView, line)
+		}
+
 		chooseSetup(listView, line, *) {
 			local driver, conditions, tyreCompound, pressures, temperatures
 
@@ -1664,9 +1690,11 @@ class RaceCenter extends ConfigurationItem {
 				centerGui["setupBasePressureRREdit"].Text := pressures[4]
 
 				centerGui["setupNotesEdit"].Text := center.SetupsListView.GetText(line, 5)
-
-				center.updateState()
 			}
+			else
+				center.iSelectedSetup := false
+
+			center.updateState()
 		}
 
 		releaseSetups(*) {
@@ -1845,6 +1873,11 @@ class RaceCenter extends ConfigurationItem {
 			center.withExceptionhandler(ObjBindMethod(center, "planPitstop"))
 		}
 
+		selectPitstop(listView, line, selected) {
+			if selected
+				choosePitstop(listView, line)
+		}
+
 		choosePitstop(listView, line, *) {
 			local sessionStore := center.SessionStore
 			local pitstops := sessionStore.Tables["Pitstop.Data"]
@@ -1941,6 +1974,8 @@ class RaceCenter extends ConfigurationItem {
 
 		this.iReportsListView := centerGui.Add("ListView", "x16 yp+10 w115 h180 H:Grow(0.2) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", [translate("Report")])
 		this.iReportsListView.OnEvent("Click", chooseReport)
+		this.iReportsListView.OnEvent("DoubleClick", chooseReport)
+		this.iReportsListView.OnEvent("ItemSelect", selectReport)
 
 		for ignore, report in kSessionReports
 			if (report = "Drivers")
@@ -2037,6 +2072,8 @@ class RaceCenter extends ConfigurationItem {
 
 		this.iPlanListView := centerGui.Add("ListView", "x24 ys+63 w344 h240 H:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Stint", "Driver", "Time (est.)", "Time (act.)", "Lap (est.)", "Lap (act.)", "Refuel", "Tyre Change"], translate))
 		this.iPlanListView.OnEvent("Click", choosePlan)
+		this.iPlanListView.OnEvent("DoubleClick", choosePlan)
+		this.iPlanListView.OnEvent("ItemSelect", selectPlan)
 
 		centerGui.Add("Text", "x378 ys+68 w90 h23 +0x200", translate("Driver"))
 		centerGui.Add("DropDownList", "x474 yp w126 vplanDriverDropDownMenu").OnEvent("Change", updatePlan)
@@ -2073,11 +2110,15 @@ class RaceCenter extends ConfigurationItem {
 
 		this.iStintsListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 H:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Driver", "Weather", "Compound", "Laps", "Pos. (Start)", "Pos. (End)", "Avg. Lap Time", "Consumption", "Accidents", "Penalties", "Potential", "Race Craft", "Speed", "Consistency", "Car Control"], translate))
 		this.iStintsListView.OnEvent("Click", chooseStint)
+		this.iStintsListView.OnEvent("DoubleClick", chooseStint)
+		this.iStintsListView.OnEvent("ItemSelect", selectStint)
 
 		centerTab.UseTab(3)
 
 		this.iLapsListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 H:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Stint", "Driver", "Position", "Weather", "Grip", "Lap Time", "Sector Times", "Consumption", "Remaining", "Pressures", "Invalid", "Accident", "Penalty"], translate))
 		this.iLapsListView.OnEvent("Click", chooseLap)
+		this.iLapsListView.OnEvent("DoubleClick", chooseLap)
+		this.iLapsListView.OnEvent("ItemSelect", selectLap)
 
 		centerTab.UseTab(4)
 
@@ -2156,6 +2197,8 @@ class RaceCenter extends ConfigurationItem {
 
 		this.iSetupsListView := centerGui.Add("ListView", "x24 ys+33 w344 h270 H:Grow(0.8) -Multi -LV0x10 AltSubmit", collect(["Driver", "Conditions", "Compound", "Pressures", "Notes"], translate))
 		this.iSetupsListView.OnEvent("Click", chooseSetup)
+		this.iSetupsListView.OnEvent("DoubleClick", chooseSetup)
+		this.iSetupsListView.OnEvent("ItemSelect", selectSetup)
 
 		centerGui.Add("Text", "x378 ys+38 w90 h23 +0x200", translate("Driver"))
 		centerGui.Add("DropDownList", "x474 yp w126 vsetupDriverDropDownMenu").OnEvent("Change", updateSetup)
@@ -2259,6 +2302,7 @@ class RaceCenter extends ConfigurationItem {
 		this.iPitstopsListView := centerGui.Add("ListView", "x270 ys+34 w331 h269 H:Grow(0.8) -Multi -LV0x10 AltSubmit Checked NoSort NoSortHdr", collect(["#", "Lap", "Driver", "Refuel", "Compound", "Set", "Pressures", "Repairs"], translate))
 		this.iPitstopsListView.OnEvent("Click", choosePitstop)
 		this.iPitstopsListView.OnEvent("DoubleClick", choosePitstop)
+		this.iPitstopsListView.OnEvent("ItemSelect", selectPitstop)
 
 		centerGui.Rules := ""
 
@@ -10341,6 +10385,13 @@ class RaceCenter extends ConfigurationItem {
 				this.showTemperaturesReport()
 			else if (report = "Free")
 				this.showCustomReport()
+			else {
+				this.selectReport(false)
+
+				this.showChart(false)
+
+				this.updateState()
+			}
 		}
 
 		if (force || (report != this.SelectedReport)) {
@@ -12236,6 +12287,8 @@ manageTeam(raceCenterOrCommand, teamDrivers := false, arguments*) {
 
 		availableDriversListView := teamGui.Add("ListView", "x16 yp+30 w160 h184 AltSubmit -Multi -LV0x10 NoSort NoSortHdr  Section", collect(["Available Driver", "Online"], translate))
 		availableDriversListView.OnEvent("Click", manageTeam.Bind("UpdateState"))
+		availableDriversListView.OnEvent("DoubleClick", manageTeam.Bind("UpdateState"))
+		availableDriversListView.OnEvent("ItemSelect", manageTeam.Bind("UpdateState"))
 
 		if !teamDrivers
 			teamDrivers := raceCenterOrCommand.TeamDrivers
@@ -12250,6 +12303,8 @@ manageTeam(raceCenterOrCommand, teamDrivers := false, arguments*) {
 
 		selectedDriversListView := teamGui.Add("ListView", "x230 ys w160 h184 AltSubmit -Multi -LV0x10 NoSort NoSortHdr", collect(["Selected Driver", "Online"], translate))
 		selectedDriversListView.OnEvent("Click", manageTeam.Bind("UpdateState"))
+		selectedDriversListView.OnEvent("DoubleClick", manageTeam.Bind("UpdateState"))
+		selectedDriversListView.OnEvent("ItemSelect", manageTeam.Bind("UpdateState"))
 
 		for ignore, name in teamDrivers
 			selectedDriversListView.Add("", name, inList(connectedDrivers, name) ? translate("x") : "")

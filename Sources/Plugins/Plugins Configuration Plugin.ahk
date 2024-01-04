@@ -183,6 +183,7 @@ class PluginsConfigurator extends ConfigurationItemList {
 
 		this.ItemList := items
 
+		/*
 		count := this.Control["pluginsListView"].GetCount()
 
 		for index, thePlugin in items {
@@ -200,6 +201,16 @@ class PluginsConfigurator extends ConfigurationItemList {
 		if (items.Length < count)
 			loop count - items.Length
 				this.Control["pluginsListView"].Delete(count - A_Index - 1)
+		*/
+
+		this.Control["pluginsListView"].Delete()
+
+		for index, thePlugin in items {
+			name := thePlugin.Plugin
+
+			this.Control["pluginsListView"].Add("", thePlugin.Active ? ((name = translate("System")) ? translate("Always") : translate("Yes")) : translate("No")
+												  , name, values2String(", ", thePlugin.Simulators*), thePlugin.Arguments[true])
+		}
 
 		if first {
 			this.Control["pluginsListView"].ModifyCol()

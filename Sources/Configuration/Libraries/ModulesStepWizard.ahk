@@ -580,8 +580,18 @@ class ModulesStepWizard extends StepWizard {
 			this.updatePresetState()
 		}
 
+		selectAvailablePreset(listView, line, selected) {
+			if selected
+				chooseAvailablePreset()
+		}
+
 		chooseAvailablePreset(*) {
 			choosePreset(this.SelectedPresetsListView, this.AvailablePresetsListView)
+		}
+
+		selectSelectedPreset(listView, line, selected) {
+			if selected
+				chooseSelectedPreset()
 		}
 
 		chooseSelectedPreset(*) {
@@ -659,12 +669,14 @@ class ModulesStepWizard extends StepWizard {
 		widget3 := window.Add("ListView", "x" . x . " yp+30 w" . listWidth . " h224 X:Move(0.5) H:Grow(0.7) AltSubmit -Multi -LV0x10 NoSort NoSortHdr Hidden Section", collect(["Available Presets"], translate))
 		widget3.OnEvent("Click", chooseAvailablePreset)
 		widget3.OnEvent("DoubleClick", compose(chooseAvailablePreset, installPreset))
+		widget3.OnEvent("ItemSelect", selectAvailablePreset)
 
 		this.iAvailablePresetsListView := widget3
 
 		widget4 := window.Add("ListView", "x" . x2 . " ys w" . listWidth . " h224 X:Move(0.5) H:Grow(0.7) AltSubmit -Multi -LV0x10 NoSort NoSortHdr Hidden", collect(["Selected Presets"], translate))
 		widget4.OnEvent("Click", chooseSelectedPreset)
 		widget4.OnEvent("DoubleClick", compose(chooseSelectedPreset, editSelectedPreset))
+		widget4.OnEvent("ItemSelect", selectSelectedPreset)
 
 		this.iSelectedPresetsListView := widget4
 

@@ -399,8 +399,16 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			editor.updateNotes(editor.Control["notesEdit"].Text)
 		}
 
-		chooseSetting(*) {
-			this.chooseSetting()
+		navSetting(listView, line, selected) {
+			if selected
+				chooseSetting(listView, line)
+		}
+
+		chooseSetting(listView, line) {
+			if line
+				this.chooseSetting()
+			else
+				this.updateState()
 		}
 
 		addSetting(*) {
@@ -669,9 +677,16 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			Task.startTask(changeSettingAsync)
 		}
 
+		navStrategy(listView, line, selected) {
+			if selected
+				chooseStrategy(listView, line)
+		}
+
 		chooseStrategy(listView, line, *) {
 			if line
 				SessionDatabaseEditor.Instance.selectStrategy(line)
+			else
+				editor.updateState()
 		}
 
 		updateStrategyAccess(*) {
@@ -713,9 +728,16 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			editor.loadSetups(kSetupTypes[dropDown.Value])
 		}
 
+		navSetup(listView, line, selected) {
+			if selected
+				chooseSetup(listView, line)
+		}
+
 		chooseSetup(listView, line, *) {
 			if line
 				editor.selectSetup(line)
+			else
+				editor.updateState()
 		}
 
 		updateSetupAccess(*) {
@@ -828,6 +850,11 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			}
 		}
 
+		navTrackAutomation(listView, line, selected) {
+			if selected
+				selectTrackAutomation(listView, line)
+		}
+
 		selectTrackAutomation(listView, line, *) {
 			local index, trackAutomation, checkedRows, checked, changed, ignore, row
 
@@ -887,6 +914,11 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				}
 
 				editor.TrackAutomationsListView.Modify(line, "Select Vis")
+			}
+			else {
+				editor.iSelectedTrackAutomation := false
+
+				editor.updateState()
 			}
 		}
 
@@ -1228,6 +1260,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		this.iSettingsListView := editorGui.Add("ListView", "x296 ys w360 h326 H:Grow W:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Setting", "Value"], translate))
 		this.iSettingsListView.OnEvent("Click", chooseSetting)
+		this.iSettingsListView.OnEvent("DoubleClick", chooseSetting)
+		this.iSettingsListView.OnEvent("ItemSelect", navSetting)
 
 		editorGui.Add("Text", "x296 yp+332 w80 h23 Y:Move +0x200", translate("Setting"))
 		editorGui.Add("DropDownList", "xp+90 yp w270 Y:Move W:Grow vsettingDropDown").OnEvent("Change", selectSetting)
@@ -1249,6 +1283,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		this.iStrategyListView := editorGui.Add("ListView", "x296 ys w360 h326 H:Grow W:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Name"], translate))
 		this.iStrategyListView.OnEvent("Click", chooseStrategy)
+		this.iStrategyListView.OnEvent("DoubleClick", chooseStrategy)
+		this.iStrategyListView.OnEvent("ItemSelect", navStrategy)
 
 		editorGui.Add("Button", "xp+260 yp+328 w23 h23 X:Move Y:Move vuploadStrategyButton").OnEvent("Click", uploadStrategy)
 		editorGui.Add("Button", "xp+25 yp w23 h23 X:Move Y:Move vdownloadStrategyButton").OnEvent("Click", downloadStrategy)
@@ -1271,6 +1307,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		this.iSetupListView := editorGui.Add("ListView", "x296 yp+24 w360 h302 H:Grow W:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Name"], translate))
 		this.iSetupListView.OnEvent("Click", chooseSetup)
+		this.iSetupListView.OnEvent("DoubleClick", chooseSetup)
+		this.iSetupListView.OnEvent("ItemSelect", navSetup)
 
 		this.iSelectedSetupType := kDryRaceSetup
 
@@ -1362,6 +1400,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		this.iTrackAutomationsListView := editorGui.Add("ListView", "x296 y597 w110 h85 Y:Move(0.9) W:Grow(0.3) H:Grow(0.1) -Multi -LV0x10 Checked AltSubmit NoSort NoSortHdr", collect(["Name", "#"], translate))
 		this.iTrackAutomationsListView.OnEvent("Click", selectTrackAutomation)
 		this.iTrackAutomationsListView.OnEvent("DoubleClick", selectTrackAutomation)
+		this.iTrackAutomationsListView.OnEvent("ItemSelect", navTrackAutomation)
 
 		editorGui.Add("Text", "x415 yp w60 h23 Y:Move(0.9) X:Move(0.8) +0x200", translate("Name"))
 		editorGui.Add("Edit", "xp+60 yp w109 Y:Move(0.9) X:Move(0.8) W:Grow(0.2) vtrackAutomationNameEdit")
@@ -1849,6 +1888,11 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			window["trackAutomationNameEdit"].Enabled := false
 			window["deleteTrackAutomationButton"].Enabled := false
 			window["saveTrackAutomationButton"].Enabled := false
+
+			this.clearTrackAutomationEditor()
+
+			if this.TrackMap
+				this.createTrackMap()
 		}
 	}
 

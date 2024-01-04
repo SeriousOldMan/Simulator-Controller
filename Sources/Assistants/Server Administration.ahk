@@ -272,9 +272,16 @@ administrationEditor(configurationOrCommand, arguments*) {
 		}
 	}
 
+	selectAccount(listView, line, selected) {
+		if selected
+			chooseAccount(listView, line)
+	}
+
 	chooseAccount(listView, line, *) {
 		if line
 			administrationEditor(kEvent, "AccountLoad", line)
+		else
+			administrationEditor(kEvent, "AccountClear")
 	}
 
 	deleteAccount(*) {
@@ -758,6 +765,8 @@ administrationEditor(configurationOrCommand, arguments*) {
 
 		accountsListView := administrationGui.Add("ListView", "x" . x0 . " y" . y . " w372 h146 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Account", "E-Mail", "Session", "Data", "Quota", "Available"], translate))
 		accountsListView.OnEvent("Click", chooseAccount)
+		accountsListView.OnEvent("DoubleClick", chooseAccount)
+		accountsListView.OnEvent("ItemSelect", selectAccount)
 
 		administrationGui.Add("Text", "x" . x0 . " yp+150 w90 h23 Y:Move +0x200", translate("Name"))
 		administrationGui.Add("Edit", "x" . x1 . " yp+1 w" . w3 . " W:Grow(0.5) Y:Move vaccountNameEdit")

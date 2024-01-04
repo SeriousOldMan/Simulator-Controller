@@ -74,7 +74,10 @@ class ConfigurationItemList extends ConfiguratorPanel {
 	}
 
 	initializeList(editor, listView, addButton := false, deleteButton := false, updateButton := false, upButton := false, downButton := false) {
-		listEvent(type, control, line, *) {
+		listEvent(type, control, line, arguments*) {
+			if (isInstance(listView, Gui.ListView) && (type = "Select") && !arguments[1])
+				return
+
 			protectionOn()
 
 			try {
@@ -232,7 +235,7 @@ class ConfigurationItemList extends ConfiguratorPanel {
 				}
 		}
 
-		if (line != this.CurrentItem)
+		if (line != this.CurrentItem) {
 			if (line != 0) {
 				this.openEditor(line)
 
@@ -240,7 +243,7 @@ class ConfigurationItemList extends ConfiguratorPanel {
 			}
 			else {
 				if isInstance(this.ListView, Gui.ListView) {
-					loop this.ListView.GetCount(0)
+					loop this.ListView.GetCount()
 						this.ListView.Modify(A_Index, "-Select")
 				}
 				else
@@ -249,7 +252,10 @@ class ConfigurationItemList extends ConfiguratorPanel {
 				this.clearEditor()
 			}
 
-		this.updateState()
+			this.selectItem(line)
+		}
+		else
+			this.updateState()
 	}
 
 	processListEvent() {
@@ -261,10 +267,18 @@ class ConfigurationItemList extends ConfiguratorPanel {
 
 		try {
 			if this.processListEvent() {
-				if (type == "DoubleClick")
-					this.clickEvent(line, 2)
-				else if (type == "Click")
-					this.clickEvent(line, 1)
+				if (type == "DoubleClick") {
+					if line
+						this.clickEvent(line, 2)
+					else if this.CurrentItem
+						this.selectEvent(false)
+				}
+				else if (type == "Click") {
+					if line
+						this.clickEvent(line, 1)
+					else if this.CurrentItem
+						this.selectEvent(false)
+				}
 				else if ((type == "Select") && line && (line = (isInstance(this.ListView, Gui.ListView) ? this.ListView.GetNext(0) : this.ListView.Value)))
 					this.selectEvent(line)
 			}
@@ -370,7 +384,7 @@ class ConfigurationItemList extends ConfiguratorPanel {
 
 		this.clearEditor()
 
-		this.CurrentItem := 0
+		this.selectItem(false)
 
 		this.updateState()
 	}

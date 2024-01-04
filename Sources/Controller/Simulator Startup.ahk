@@ -1868,6 +1868,7 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 		profilesListView.OnEvent("Click", chooseProfile)
 		profilesListView.OnEvent("DoubleClick", chooseProfile)
 		profilesListView.OnEvent("ItemCheck", chooseProfile)
+		profilesListView.OnEvent("ItemSelect", chooseProfile)
 
 		profilesEditorGui.Add("Button", "x" . (x5 - 52) . " yp+150 w23 h23 Center +0x200 vprofilesUploadButton").OnEvent("Click", launchProfilesEditor.Bind(kEvent, "ProfilesUpload"))
 		setButtonIcon(profilesEditorGui["profilesUploadButton"], kIconsDirectory . "Upload.ico", 1, "L4 T4 R4 B4")

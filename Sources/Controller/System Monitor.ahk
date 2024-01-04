@@ -1782,8 +1782,8 @@ systemMonitor(command := false, arguments*) {
 		systemMonitorGui.SetFont("Norm", "Arial")
 
 		driversListView := systemMonitorGui.Add("ListView", "x24 yp+21 w375 h120 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Driver", "Active"], translate))
-		driversListView.OnEvent("Click", noSelect.Bind(driversListView))
-		driversListView.OnEvent("DoubleClick", noSelect.Bind(driversListView))
+		driversListView.OnEvent("Click", noSelect)
+		driversListView.OnEvent("DoubleClick", noSelect)
 
 		systemMonitorGui.SetFont("Italic", "Arial")
 
@@ -1803,16 +1803,16 @@ systemMonitor(command := false, arguments*) {
 		monitorTabView.UseTab(4)
 
 		stateListView := systemMonitorGui.Add("ListView", "x24 ys+28 w756 h336 H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Module", "Information"], translate))
-		stateListView.OnEvent("Click", noSelect.Bind(stateListView))
-		stateListView.OnEvent("DoubleClick", noSelect.Bind(stateListView))
+		stateListView.OnEvent("Click", noSelect)
+		stateListView.OnEvent("DoubleClick", noSelect)
 
 		monitorTabView.UseTab(5)
 
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
 		logMessageListView := systemMonitorGui.Add("ListView", "x24 ys+28 w756 h312 H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Application", "Time", "Category", "Message"], translate))
-		logMessageListView.OnEvent("Click", noSelect.Bind(logMessageListView))
-		logMessageListView.OnEvent("DoubleClick", noSelect.Bind(logMessageListView))
+		logMessageListView.OnEvent("Click", noSelect)
+		logMessageListView.OnEvent("DoubleClick", noSelect)
 
 		systemMonitorGui.Add("Text", "x24 yp+320 w95 h20 Y:Move", translate("Log Buffer"))
 		logBufferEdit := systemMonitorGui.Add("Edit", "x120 yp-2 w50 h20 Y:Move Limit3 Number", "999")

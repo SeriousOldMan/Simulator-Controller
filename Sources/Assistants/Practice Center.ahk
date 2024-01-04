@@ -1311,6 +1311,8 @@ class PracticeCenter extends ConfigurationItem {
 
 		this.iReportsListView := centerGui.Add("ListView", "x16 yp+10 w115 h206 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", [translate("Report")])
 		this.iReportsListView.OnEvent("Click", chooseReport)
+		this.iReportsListView.OnEvent("DoubleClick", chooseReport)
+		this.iReportsListView.OnEvent("ItemSelect", chooseReport)
 
 		for ignore, report in kSessionReports
 			if (report = "Drivers")
@@ -1456,6 +1458,7 @@ class PracticeCenter extends ConfigurationItem {
 		this.iTyreCompoundsListView := centerGui.Add("ListView", "x" . x7 . " yp w" . w12 . " h90 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Compound", "#"], translate))
 		this.iTyreCompoundsListView.OnEvent("Click", chooseTyreCompound)
 		this.iTyreCompoundsListView.OnEvent("DoubleClick", chooseTyreCompound)
+		this.iTyreCompoundsListView.OnEvent("ItemSelect", chooseTyreCompound)
 
 		x13 := (x7 + w12 + 5)
 
@@ -1486,6 +1489,7 @@ class PracticeCenter extends ConfigurationItem {
 		this.iRunsListView := centerGui.Add("ListView", "x24 ys+33 w577 h175 H:Grow(0.5) Checked -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Driver", "Weather", "Compound", "Set", "Laps", "Initial Fuel", "Consumed Fuel", "Avg. Lap Time", "Accidents", "Potential", "Race Craft", "Speed", "Consistency", "Car Control"], translate))
 		this.iRunsListView.OnEvent("Click", chooseRun)
 		this.iRunsListView.OnEvent("DoubleClick", chooseRun)
+		this.iRunsListView.OnEvent("ItemSelect", chooseRun)
 
 		centerGui.Add("Text", "x24 yp+180 w80 h23 Y:Move(0.5)", translate("Notes"))
 		centerGui.Add("Edit", "x104 yp w497 h90 Y:Move(0.5) H:Grow(0.5) vrunNotesEdit").OnEvent("Change", updateNotes)
@@ -1495,6 +1499,7 @@ class PracticeCenter extends ConfigurationItem {
 		this.iLapsListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 H:Grow Checked -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Stint", "Weather", "Grip", "Lap Time", "Sector Times", "Consumption", "Remaining", "Pressures", "Invalid", "Accident"], translate))
 		this.iLapsListView.OnEvent("Click", chooseLap)
 		this.iLapsListView.OnEvent("DoubleClick", chooseLap)
+		this.iLapsListView.OnEvent("ItemSelect", chooseLap)
 
 		centerTab.UseTab(4)
 
@@ -7128,12 +7133,14 @@ recommendDataRun(centerOrCommand := false, arguments*) {
 			recoGui.Add("ListView", "x45 yp w320 h135 -Multi -LV0x10 AltSubmit NoSort NoSortHdr vfuelListView", collect(["Map", "Fuel Level"], translate))
 			recoGui["fuelListView"].OnEvent("Click", recommendDataRun.Bind("Recommend", "Fuel"))
 			recoGui["fuelListView"].OnEvent("DoubleClick", recommendDataRun.Bind("Recommend", "Fuel"))
+			recoGui["fuelListView"].OnEvent("ItemSelect", recommendDataRun.Bind("Recommend", "Fuel"))
 
 			recoGui.Add("Picture", "x8 yp+140 w32 h32", kIconsDirectory . "Wheel.ico")
 
 			recoGui.Add("ListView", "x45 yp w320 h135 -Multi -LV0x10 AltSubmit NoSort NoSortHdr vtyreLapsListView", collect(["Fuel Level", "Tyre Laps"], translate))
 			recoGui["tyreLapsListView"].OnEvent("Click", recommendDataRun.Bind("Recommend", "TyreLaps"))
 			recoGui["tyreLapsListView"].OnEvent("DoubleClick", recommendDataRun.Bind("Recommend", "TyreLaps"))
+			recoGui["tyreLapsListView"].OnEvent("ItemSelect", recommendDataRun.Bind("Recommend", "TyreLaps"))
 
 			recoGui.SetFont("Bold", "Arial")
 

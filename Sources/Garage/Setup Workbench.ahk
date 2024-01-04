@@ -2318,6 +2318,7 @@ class SetupEditor extends ConfigurationItem {
 		this.iSettingsListView := editorGui.Add("ListView", "x16 ys+40 w344 h320 H:Grow W:Grow(0.5) -Multi -LV0x10 Checked AltSubmit NoSort NoSortHdr", collect(["Category", "Setting", "Value", "Unit"], translate))
 		this.iSettingsListView.OnEvent("Click", selectSetting)
 		this.iSettingsListView.OnEvent("DoubleClick", selectSetting)
+		this.iSettingsListView.OnEvent("ItemSelect", selectSetting)
 
 		editorGui.Add("Button", "x16 yp+324 w80 Disabled Y:Move vdecreaseSettingButton", translate("Decrease")).OnEvent("Click", decreaseSetting)
 		editorGui.Add("Button", "x280 yp w80 Y:Move X:Move(0.5) Disabled vincreaseSettingButton", translate("Increase")).OnEvent("Click", increaseSetting)
@@ -2974,6 +2975,8 @@ class SetupComparator extends ConfigurationItem {
 
 		this.iSettingsListView := comparatorGui.Add("ListView", "x16 ys+64 w784 h350 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Category", "Setting", "Value (A)", "Value (B)", "Value (A/B)", "Unit"], translate))
 		this.iSettingsListView.OnEvent("Click", selectABSetting)
+		this.iSettingsListView.OnEvent("DoubleClick", selectABSetting)
+		this.iSettingsListView.OnEvent("ItemSelect", selectABSetting)
 
 		comparatorGui.Add("Button", "x16 yp+354 w80 Disabled Y:Move vdecreaseABSettingButton", translate("Decrease")).OnEvent("Click", decreaseABSetting)
 		comparatorGui.Add("Button", "x720 yp w80 Disabled X:Move Y:Move vincreaseABSettingButton", translate("Increase")).OnEvent("Click", increaseABSetting)

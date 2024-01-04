@@ -1,4 +1,4 @@
-## 5.5.2.0-release 01/05/24 (planned)
+## 5.5.2.0-release 01/05/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed recurring installation of the French speech recognition library.

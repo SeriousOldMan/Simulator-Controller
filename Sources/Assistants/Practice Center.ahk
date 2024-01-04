@@ -1136,7 +1136,7 @@ class PracticeCenter extends ConfigurationItem {
 			local count := listView.GetText(line, 2)
 			local chosen
 
-			if (line && this.SessionActive) {
+			if (line && !this.SessionLoaded) {
 				if compound
 					compound := normalizeCompound(compound)
 

@@ -190,6 +190,8 @@ class PressuresEditor {
 
 		this.iPressuresListView := pressuresEditorGui.Add("ListView", "x16 yp+170 w394 h160 -Multi -LV0x10 AltSubmit", collect(["Tyre", "Pressure", "#"], translate))
 		this.iPressuresListView.OnEvent("Click", choosePressure)
+		this.iPressuresListView.OnEvent("DoubleClick", choosePressure)
+		this.iPressuresListView.OnEvent("ItemSelect", choosePressure)
 
 		pressuresEditorGui.Add("Button", "x338 yp+162 w23 h23 vupPressureButton").OnEvent("Click", upPressure)
 		pressuresEditorGui.Add("Button", "xp+24 yp w23 h23 vdownPressureButton").OnEvent("Click", downPressure)

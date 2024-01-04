@@ -967,16 +967,6 @@ class Window extends Gui {
 			this.Show("NA")
 	}
 
-	OnEvent(type, handler) {
-		handleEvent(arguments*) {
-			this.Opt("+OwnDialogs")
-
-			handler(arguments*)
-		}
-
-		super.OnEvent(type, handleEvent)
-	}
-
 	SetFont(options?, font?) {
 		if isSet(options)
 			this.iCurrentFontOptions := options

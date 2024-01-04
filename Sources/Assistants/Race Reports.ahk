@@ -227,8 +227,7 @@ class RaceReports extends ConfigurationItem {
 		}
 
 		chooseRace(listView, line, *) {
-			if line
-				reports.loadRace(line)
+			reports.loadRace(line)
 		}
 
 		chooseReport(*) {
@@ -291,6 +290,8 @@ class RaceReports extends ConfigurationItem {
 
 		this.iRacesListView := raceReportsGui.Add("ListView", "x90 yp-2 w180 h252 W:Grow(0.25) H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Date", "Time", "Duration", "Starting Grid"], translate))
 		this.iRacesListView.OnEvent("Click", chooseRace)
+		this.iRacesListView.OnEvent("DoubleClick", chooseRace)
+		this.iRacesListView.OnEvent("ItemSelect", chooseRace)
 
 		raceReportsGui.Add("Button", "x62 yp+205 w23 h23 Y:Move vreloadReportsButton").OnEvent("Click", reloadRaceReports)
 		setButtonIcon(raceReportsGui["reloadReportsButton"], kIconsDirectory . "Renew.ico", 1)

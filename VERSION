@@ -1,7 +1,7 @@
 [Development]
 Version=5.5.2.0-beta
 Target=5.5.2.0-release
-Date=01/03/2024
+Date=01/04/2024
 Download=https://www.dropbox.com/scl/fi/adjaw92uaoxlnwync3pko/Simulator-Controller-5.5.2.0-beta.zip?rlkey=gkw954pqxaf4cwwualgr588p5&dl=1
 Changes=New startup wizard in "Simulator Startup", Deprecated silent and muted presets from "Simulator Setup", New keyboard modifiers for "Simulator Startup", New preset in "Simulator Setup" for startup profiles, New fields in "Session State.json", Migrated to AHK 2.0.11, New car models for "Setup Workbench", New EnumerationHandler in "Setup Workbench", Driving Coach preserves memory between sessions, Performance optimization in Team Server, Adopted Automibilsta 2 V 1.5.5 changes
 Components=Media->5.3.0,Configuration->5.5.2,Utilities->5.4.8

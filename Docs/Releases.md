@@ -5,8 +5,8 @@
   4. Fixed controller preview windows forgetting their last position in "Simulator Setup".
   5. Fixed setup category display in "Setup Workbench".
   6. Fixed a bug for "Race Center", "Race Reports" and the Race Strategist where starting position were missing in big grid multiclass races.
-  7. Clarified several aspects in the documentation about [car meta data definition](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#introducing-a-new-car) for "Setup Workbench".
-  8. New [EnumerationHandler](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#introducing-new-car-specifications) for car meta data definition in "Setup Workbench".
+  7. [Expert] Clarified several aspects in the documentation about [car meta data definition](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#introducing-a-new-car) for "Setup Workbench".
+  8. [Expert] New [EnumerationHandler](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#introducing-new-car-specifications) for car meta data definition in "Setup Workbench".
   9. "Simulator Startup" now supports the so-called startup profiles, which let you manage and activate the most important configuration settings for solo and team races in a matter of seconds. See the all new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles) for more information.
   10. New [control key modifiers](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Keyboard-Modifiers) for "Simulator Startup" allow you to quickly open the startup profiles editor and run the startup process automatically when closing the editor. Some of the former keyboard modifiers for "Simulator Startup" have changed, therefore take a close look at the [list of modifiers](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Keyboard-Modifiers).
   11. Some presets, that were used to disable voice handling completely or to start the Assistants muted, has been deprecated in "Simulator Setup". The functionality is now available in the [startup profiles](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles).
@@ -18,9 +18,9 @@
   17. Added support for new AI driver swap in Automobilista 2.
   18. Optimized keyboard navigation in list views.
   19. All dialog boxes like alerts, file selectors, and so on, now fully shield their underlying windows against user interaction.
-  20. [Developer only] Information about the active startup profile has been added to the "Session State.json" file.
-  21. [Developer only] Information about the pitstop forecast has been added to the "Session State.json" file.
-  22. [Developer Only] The new function *withBlockedWindows* allows you to execute a function with all open windows blocked against interaction.
+  20. [Developer] Information about the active startup profile has been added to the "Session State.json" file.
+  21. [Developer] Information about the pitstop forecast has been added to the "Session State.json" file.
+  22. [Developer] The new function *withBlockedWindows* allows you to execute a function with all open windows blocked against interaction.
   23. [Internal] Migrated to AHK version 2.0.11.
   24. [Internal] The copyright information has been updated to 2024 in all parts of the software.
   25. New car models for "Setup Workbench":

@@ -96,7 +96,7 @@ class ApplicationsStepWizard extends StepWizard {
 			window.Opt("+OwnDialogs")
 
 			OnMessage(0x44, translateSelectCancelButtons)
-			fileName := FileSelect(1, "", substituteVariables(translate("Select %name% executable..."), {name: translate("Simulator")}), "Executable (*.exe)")
+			fileName := withBlockedWindows(FileSelect, 1, "", substituteVariables(translate("Select %name% executable..."), {name: translate("Simulator")}), "Executable (*.exe)")
 			OnMessage(0x44, translateSelectCancelButtons, 0)
 
 			if (fileName != "") {
@@ -113,7 +113,7 @@ class ApplicationsStepWizard extends StepWizard {
 			window.Opt("+OwnDialogs")
 
 			OnMessage(0x44, translateSelectCancelButtons)
-			fileName := FileSelect(1, "", substituteVariables(translate("Select %name% executable..."), {name: translate("Application")}), "Executable (*.exe)")
+			fileName := withBlockedWindows(FileSelect, 1, "", substituteVariables(translate("Select %name% executable..."), {name: translate("Application")}), "Executable (*.exe)")
 			OnMessage(0x44, translateSelectCancelButtons, 0)
 
 			if (fileName != "") {

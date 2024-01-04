@@ -80,7 +80,7 @@ class GeneralTab extends ConfiguratorPanel {
 				translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
 
 				OnMessage(0x44, translator)
-				directory := DirSelect("*" . window["homePathEdit"].Text, 0, translate("Select Installation folder..."))
+				directory := withBlockedWindows(DirSelect, "*" . window["homePathEdit"].Text, 0, translate("Select Installation folder..."))
 				OnMessage(0x44, translator, 0)
 
 				if (directory != "")
@@ -102,7 +102,7 @@ class GeneralTab extends ConfiguratorPanel {
 				translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
 
 				OnMessage(0x44, translator)
-				directory := DirSelect("*" . window["nirCmdPathEdit"].Text, 0, translate("Select NirCmd folder..."))
+				directory := withBlockedWindows(DirSelect, "*" . window["nirCmdPathEdit"].Text, 0, translate("Select NirCmd folder..."))
 				OnMessage(0x44, translator, 0)
 
 				if (directory != "")
@@ -124,7 +124,7 @@ class GeneralTab extends ConfiguratorPanel {
 				translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
 
 				OnMessage(0x44, translator)
-				directory := DirSelect("*" . window["ahkPathEdit"].Text, 0, translate("Select AutoHotkey folder..."))
+				directory := withBlockedWindows(DirSelect, "*" . window["ahkPathEdit"].Text, 0, translate("Select AutoHotkey folder..."))
 				OnMessage(0x44, translator, 0)
 
 				if (directory != "")
@@ -146,7 +146,7 @@ class GeneralTab extends ConfiguratorPanel {
 				translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
 
 				OnMessage(0x44, translator)
-				directory := DirSelect("*" . window["msBuildPathEdit"].Text, 0, translate("Select MSBuild Bin folder..."))
+				directory := withBlockedWindows(DirSelect, "*" . window["msBuildPathEdit"].Text, 0, translate("Select MSBuild Bin folder..."))
 				OnMessage(0x44, translator, 0)
 
 				if (directory != "")
@@ -505,7 +505,7 @@ initializeSimulatorConfiguration() {
 
 		if (GetKeyState("Ctrl") && GetKeyState("Shift")) {
 			OnMessage(0x44, translateYesNoButtons)
-			msgResult := MsgBox(translate("Do you really want to start with a fresh configuration?"), translate("Configuration"), 262436)
+			msgResult := withBlockedWindows(MsgBox, translate("Do you really want to start with a fresh configuration?"), translate("Configuration"), 262436)
 			OnMessage(0x44, translateYesNoButtons, 0)
 
 			if (msgResult = "Yes")
@@ -529,7 +529,7 @@ initializeSimulatorConfiguration() {
 		logError(exception, true)
 
 		OnMessage(0x44, translateOkButton)
-		MsgBox(substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Simulator Configuration"}), translate("Error"), 262160)
+		withBlockedWindows(MsgBox, substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Simulator Configuration"}), translate("Error"), 262160)
 		OnMessage(0x44, translateOkButton, 0)
 
 		ExitApp(1)
@@ -614,7 +614,7 @@ startupSimulatorConfiguration() {
 		logError(exception, true)
 
 		OnMessage(0x44, translateOkButton)
-		MsgBox(substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Simulator Configuration"}), translate("Error"), 262160)
+		withBlockedWindows(MsgBox, substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Simulator Configuration"}), translate("Error"), 262160)
 		OnMessage(0x44, translateOkButton, 0)
 
 		ExitApp(1)

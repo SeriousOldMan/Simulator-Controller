@@ -142,7 +142,7 @@ class ACSetupEditor extends FileSetupEditor {
 			this.Workbench.Window.Opt("+OwnDialogs")
 
 		OnMessage(0x44, translateLoadCancelButtons)
-		fileName := FileSelect(1, directory, translate("Load AC Setup File..."), "Setup (*.ini)")
+		fileName := withBlockedWindows(FileSelect, 1, directory, translate("Load AC Setup File..."), "Setup (*.ini)")
 		OnMessage(0x44, translateLoadCancelButtons, 0)
 
 		if fileName {
@@ -170,7 +170,7 @@ class ACSetupEditor extends FileSetupEditor {
 			this.Window.Opt("+OwnDialogs")
 
 		OnMessage(0x44, translateSaveCancelButtons)
-		fileName := FileSelect("S17", directory, translate("Save AC Setup File..."), "Setup (*.ini)")
+		fileName := withBlockedWindows(FileSelect, "S17", directory, translate("Save AC Setup File..."), "Setup (*.ini)")
 		OnMessage(0x44, translateSaveCancelButtons, 0)
 
 		if (fileName != "") {
@@ -216,7 +216,7 @@ class ACSetupComparator extends FileSetupComparator {
 			this.Editor.Window.Opt("+OwnDialogs")
 
 		OnMessage(0x44, translateLoadCancelButtons)
-		fileName := FileSelect(1, directory, (translate("Load ") . translate((type = "A") ? "first" : "second") . translate(" AC Setup File...")), "Setup (*.ini)")
+		fileName := withBlockedWindows(FileSelect, 1, directory, (translate("Load ") . translate((type = "A") ? "first" : "second") . translate(" AC Setup File...")), "Setup (*.ini)")
 		OnMessage(0x44, translateLoadCancelButtons, 0)
 
 		if fileName {

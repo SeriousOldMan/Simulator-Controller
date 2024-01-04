@@ -321,6 +321,9 @@ This function helps you to translate the button labels for standard dialogs like
 
 As you can see, this dialog will show three buttons which will be labeled "Yes", "No" and "Never" in the English language setting. *translateMsgBoxButtons* will call the *translate* function automatically for these labels, before they will be set as labels for the different buttons.
 
+#### *withBlockedWindows(function :: Function, argument1, argument2, ...)*
+Calls the given function on the given arguments and returns the return value of the *function*. All windows of the current application are locked for the time of the execution of *function* and all subsequent dialogs are owned by the topmost window. This is very useful for alert boxes, file selector dialogs and so on.
+
 ***
 
 ## Splash Screens ([Splash.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Splash.ahk))

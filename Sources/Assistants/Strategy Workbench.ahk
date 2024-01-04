@@ -393,7 +393,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			if (dataTypeDropDown > 2) {
 				if ((dataTypeDropDown = 4) && (workbench.SelectedSimulator && workbench.SelectedCar && workbench.SelectedTrack)) {
 					OnMessage(0x44, translateYesNoButtons)
-					msgResult := MsgBox(translate("Entries with lap times or fuel consumption outside the standard deviation will be deleted. Do you want to proceed?")
+					msgResult := withBlockedWindows(MsgBox, translate("Entries with lap times or fuel consumption outside the standard deviation will be deleted. Do you want to proceed?")
 									  , translate("Delete"), 262436)
 					OnMessage(0x44, translateYesNoButtons, 0)
 
@@ -674,7 +674,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				translator := translateMsgBoxButtons.Bind(["Before", "After", "Cancel"])
 
 				OnMessage(0x44, translator)
-				msgResult := MsgBox(translate("Do you want to add the new entry before or after the currently selected entry?"), translate("Insert"), 262179)
+				msgResult := withBlockedWindows(MsgBox, translate("Do you want to add the new entry before or after the currently selected entry?"), translate("Insert"), 262179)
 				OnMessage(0x44, translator, 0)
 
 				if (msgResult = "Cancel")
@@ -718,7 +718,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 			if row {
 				OnMessage(0x44, translateYesNoButtons)
-				msgResult := MsgBox(translate("Do you really want to delete the selected driver?"), translate("Delete"), 262436)
+				msgResult := withBlockedWindows(MsgBox, translate("Do you really want to delete the selected driver?"), translate("Delete"), 262436)
 				OnMessage(0x44, translateYesNoButtons, 0)
 
 				if (msgResult = "Yes") {
@@ -791,7 +791,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				translator := translateMsgBoxButtons.Bind(["Before", "After", "Cancel"])
 
 				OnMessage(0x44, translator)
-				msgResult := MsgBox(translate("Do you want to add the new entry before or after the currently selected entry?"), translate("Insert"), 262179)
+				msgResult := withBlockedWindows(MsgBox, translate("Do you want to add the new entry before or after the currently selected entry?"), translate("Insert"), 262179)
 				OnMessage(0x44, translator, 0)
 
 				if (msgResult = "Cancel")
@@ -861,7 +861,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 			if row {
 				OnMessage(0x44, translateYesNoButtons)
-				msgResult := MsgBox(translate("Do you really want to delete the selected change of weather?"), translate("Delete"), 262436)
+				msgResult := withBlockedWindows(MsgBox, translate("Do you really want to delete the selected change of weather?"), translate("Delete"), 262436)
 				OnMessage(0x44, translateYesNoButtons, 0)
 
 				if (msgResult = "Yes") {
@@ -2374,13 +2374,13 @@ class StrategyWorkbench extends ConfigurationItem {
 					}
 					else {
 						OnMessage(0x44, translateOkButton)
-						MsgBox(translate("There is no current Strategy."), translate("Information"), 262192)
+						withBlockedWindows(MsgBox, translate("There is no current Strategy."), translate("Information"), 262192)
 						OnMessage(0x44, translateOkButton, 0)
 					}
 				}
 				else {
 					OnMessage(0x44, translateOkButton)
-					MsgBox(translate("You must first select a car and a track."), translate("Information"), 262192)
+					withBlockedWindows(MsgBox, translate("You must first select a car and a track."), translate("Information"), 262192)
 					OnMessage(0x44, translateOkButton, 0)
 				}
 			case 4: ; "Load from Settings..."
@@ -2396,7 +2396,7 @@ class StrategyWorkbench extends ConfigurationItem {
 						this.Window.Opt("+OwnDialogs")
 
 						OnMessage(0x44, translateLoadCancelButtons)
-						file := FileSelect(1, dirName, translate("Load Race Settings..."), "Settings (*.settings)")
+						file := withBlockedWindows(FileSelect, 1, dirName, translate("Load Race Settings..."), "Settings (*.settings)")
 						OnMessage(0x44, translateLoadCancelButtons, 0)
 					}
 					else
@@ -2449,7 +2449,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				}
 				else {
 					OnMessage(0x44, translateOkButton)
-					MsgBox(translate("You must first select a car and a track."), translate("Information"), 262192)
+					withBlockedWindows(MsgBox, translate("You must first select a car and a track."), translate("Information"), 262192)
 					OnMessage(0x44, translateOkButton, 0)
 				}
 			case 5:
@@ -2514,7 +2514,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				}
 				else {
 					OnMessage(0x44, translateOkButton)
-					MsgBox(translate("You must first select a car and a track."), translate("Information"), 262192)
+					withBlockedWindows(MsgBox, translate("You must first select a car and a track."), translate("Information"), 262192)
 					OnMessage(0x44, translateOkButton, 0)
 				}
 			case 6: ; "Update from Telemetry..."
@@ -2539,7 +2539,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				}
 				else {
 					OnMessage(0x44, translateOkButton)
-					MsgBox(translate("You must first select a car and a track."), translate("Information"), 262192)
+					withBlockedWindows(MsgBox, translate("You must first select a car and a track."), translate("Information"), 262192)
 					OnMessage(0x44, translateOkButton, 0)
 				}
 			case 7: ; "Import from Simulation..."
@@ -2548,7 +2548,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 					if !prefix {
 						OnMessage(0x44, translateOkButton)
-						MsgBox(translate("This is not supported for the selected simulator..."), translate("Warning"), 262192)
+						withBlockedWindows(MsgBox, translate("This is not supported for the selected simulator..."), translate("Warning"), 262192)
 						OnMessage(0x44, translateOkButton, 0)
 
 						return
@@ -2595,7 +2595,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				}
 				else {
 					OnMessage(0x44, translateOkButton)
-					MsgBox(translate("You must first select a simulation."), translate("Information"), 262192)
+					withBlockedWindows(MsgBox, translate("You must first select a simulation."), translate("Information"), 262192)
 					OnMessage(0x44, translateOkButton, 0)
 				}
 			default:
@@ -2662,7 +2662,7 @@ class StrategyWorkbench extends ConfigurationItem {
 					this.selectStrategy(strategy)
 				else {
 					OnMessage(0x44, translateOkButton)
-					MsgBox(translate("There is no current scenario. Please run a simulation first..."), translate("Warning"), 262192)
+					withBlockedWindows(MsgBox, translate("There is no current scenario. Please run a simulation first..."), translate("Warning"), 262192)
 					OnMessage(0x44, translateOkButton, 0)
 				}
 		}
@@ -2698,14 +2698,14 @@ class StrategyWorkbench extends ConfigurationItem {
 				}
 				else {
 					OnMessage(0x44, translateOkButton)
-					MsgBox(translate("There is no active Race Strategy."), translate("Information"), 262192)
+					withBlockedWindows(MsgBox, translate("There is no active Race Strategy."), translate("Information"), 262192)
 					OnMessage(0x44, translateOkButton, 0)
 				}
 			case 4: ; "Load Strategy..."
 				this.Window.Opt("+OwnDialogs")
 
 				OnMessage(0x44, translateLoadCancelButtons)
-				fileName := FileSelect(1, dirName, translate("Load Race Strategy..."), "Strategy (*.strategy)")
+				fileName := withBlockedWindows(FileSelect, 1, dirName, translate("Load Race Strategy..."), "Strategy (*.strategy)")
 				OnMessage(0x44, translateLoadCancelButtons, 0)
 
 				if (fileName != "") {
@@ -2723,7 +2723,7 @@ class StrategyWorkbench extends ConfigurationItem {
 					this.Window.Opt("+OwnDialogs")
 
 					OnMessage(0x44, translateSaveCancelButtons)
-					fileName := FileSelect("S17", fileName, translate("Save Race Strategy..."), "Strategy (*.strategy)")
+					fileName := withBlockedWindows(FileSelect, "S17", fileName, translate("Save Race Strategy..."), "Strategy (*.strategy)")
 					OnMessage(0x44, translateSaveCancelButtons, 0)
 
 					if (fileName != "") {
@@ -2753,7 +2753,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				}
 				else {
 					OnMessage(0x44, translateOkButton)
-					MsgBox(translate("There is no current Strategy."), translate("Information"), 262192)
+					withBlockedWindows(MsgBox, translate("There is no current Strategy."), translate("Information"), 262192)
 					OnMessage(0x44, translateOkButton, 0)
 				}
 			case 7: ; "Compare Strategies..."
@@ -2762,7 +2762,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				translator := translateMsgBoxButtons.Bind(["Compare", "Cancel"])
 
 				OnMessage(0x44, translator)
-				files := FileSelect("M1", dirName, translate("Choose two or more Race Strategies for comparison..."), "Strategy (*.strategy)")
+				files := withBlockedWindows(FileSelect, "M1", dirName, translate("Choose two or more Race Strategies for comparison..."), "Strategy (*.strategy)")
 				OnMessage(0x44, translator, 0)
 
 				if (files != "") {
@@ -2784,7 +2784,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				}
 				else {
 					OnMessage(0x44, translateOkButton)
-					MsgBox(translate("There is no current Strategy."), translate("Information"), 262192)
+					withBlockedWindows(MsgBox, translate("There is no current Strategy."), translate("Information"), 262192)
 					OnMessage(0x44, translateOkButton, 0)
 				}
 			case 10: ; "Clear Strategy..."
@@ -3418,7 +3418,7 @@ startupStrategyWorkbench() {
 		logError(exception, true)
 
 		OnMessage(0x44, translateOkButton)
-		MsgBox(substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Strategy Workbench"}), translate("Error"), 262160)
+		withBlockedWindows(MsgBox, substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Strategy Workbench"}), translate("Error"), 262160)
 		OnMessage(0x44, translateOkButton, 0)
 
 		ExitApp(1)

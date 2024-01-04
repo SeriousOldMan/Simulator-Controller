@@ -45,7 +45,7 @@ class InstallationStepWizard extends StepWizard {
 				window.Opt("+OwnDialogs")
 
 				OnMessage(0x44, translateSelectCancelButtons)
-				fileName := FileSelect(1, "", substituteVariables(translate("Select %name% executable..."), {name: software}), "Executable (*.exe)")
+				fileName := withBlockedWindows(FileSelect, 1, "", substituteVariables(translate("Select %name% executable..."), {name: software}), "Executable (*.exe)")
 				OnMessage(0x44, translateSelectCancelButtons, 0)
 
 				if (fileName != "")
@@ -245,7 +245,7 @@ class InstallationStepWizard extends StepWizard {
 
 		if !done {
 			OnMessage(0x44, translateYesNoButtons)
-			msgResult := MsgBox(translate("Not all required software components have been installed. Do you really want to proceed?"), translate("Setup "), 262436)
+			msgResult := withBlockedWindows(MsgBox, translate("Not all required software components have been installed. Do you really want to proceed?"), translate("Setup "), 262436)
 			OnMessage(0x44, translateYesNoButtons, 0)
 
 			if (msgResult = "No")

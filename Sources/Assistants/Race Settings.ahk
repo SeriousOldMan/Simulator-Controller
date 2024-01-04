@@ -174,7 +174,7 @@ loginDialog(connectorOrCommand := false, teamServerURL := false, owner := false,
 				}
 				catch Any as exception {
 					OnMessage(0x44, translateOkButton)
-					MsgBox((translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
+					withBlockedWindows(MsgBox, (translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
 					OnMessage(0x44, translateOkButton, 0)
 
 					return false
@@ -654,7 +654,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		settingsGui.Opt("+OwnDialogs")
 
 		OnMessage(0x44, translateLoadCancelButtons)
-		file := FileSelect(1, dirName, translate("Load Race Settings..."), "Settings (*.settings)")
+		file := withBlockedWindows(FileSelect, 1, dirName, translate("Load Race Settings..."), "Settings (*.settings)")
 		OnMessage(0x44, translateLoadCancelButtons, 0)
 
 		if (file != "") {
@@ -874,7 +874,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 			}
 			catch Any as exception {
 				OnMessage(0x44, translateOkButton)
-				MsgBox((translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
+				withBlockedWindows(MsgBox, (translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
 				OnMessage(0x44, translateOkButton, 0)
 			}
 		}
@@ -897,7 +897,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 							, settingsGui["repairSuspensionThresholdEdit"].Text, settingsGui["repairBodyworkThresholdEdit"].Text, settingsGui["repairEngineThresholdEdit"].Text)
 		 || (!isInteger(settingsGui["trafficConsideredEdit"].Text) || (settingsGui["trafficConsideredEdit"].Text < 1) || (settingsGui["trafficConsideredEdit"].Text > 100))) {
 			OnMessage(0x44, translateOkButton)
-			MsgBox(translate("Invalid values detected - please correct..."), translate("Error"), 262160)
+			withBlockedWindows(MsgBox, translate("Invalid values detected - please correct..."), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
 
 			return false
@@ -1018,7 +1018,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 			settingsGui.Opt("+OwnDialogs")
 
 			OnMessage(0x44, translateSaveCancelButtons)
-			file := FileSelect("S17", fileName, translate("Save Race Settings..."), "Settings (*.settings)")
+			file := withBlockedWindows(FileSelect, "S17", fileName, translate("Save Race Settings..."), "Settings (*.settings)")
 			OnMessage(0x44, translateSaveCancelButtons, 0)
 
 			if (file != "") {

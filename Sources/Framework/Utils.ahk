@@ -274,7 +274,7 @@ exitProcesses(title, message, silent := false, force := false, excludes := []) {
 			translator := translateMsgBoxButtons.Bind(["Continue", "Cancel"])
 
 			OnMessage(0x44, translator)
-			msgResult := MsgBox(translate(message), translate(title), 8500)
+			msgResult := withBlockedWindows(MsgBox, translate(message), translate(title), 8500)
 			OnMessage(0x44, translator, 0)
 
 			if (msgResult = "Yes") {

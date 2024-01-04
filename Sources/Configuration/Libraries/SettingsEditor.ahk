@@ -338,7 +338,7 @@ editSettings(&settingsOrCommand, owner := false, withContinue := false, fromSetu
 			logError(exception, true)
 
 			OnMessage(0x44, translateOkButton)
-			MsgBox(translate("Cannot start the configuration tool - please check the installation..."), translate("Error"), 262160)
+			withBlockedWindows(MsgBox, translate("Cannot start the configuration tool - please check the installation..."), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
 		}
 		finally {

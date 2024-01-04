@@ -4462,7 +4462,7 @@ class NilParser extends Parser {
 ;;;-------------------------------------------------------------------------;;;
 
 messageBox(ignore, args*) {
-	MsgBox(values2String(A_Space, args*))
+	withBlockedWindows(MsgBox, values2String(A_Space, args*))
 
 	return true
 }

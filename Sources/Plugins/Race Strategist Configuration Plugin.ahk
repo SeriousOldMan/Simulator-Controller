@@ -60,7 +60,7 @@ class RaceStrategistConfigurator extends ConfiguratorPanel {
 			translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
 
 			OnMessage(0x44, translator)
-			directory := DirSelect("*" . window["raceReportsPathEdit"].Text, 0, translate("Select Race Reports Folder..."))
+			directory := withBlockedWindows(DirSelect, "*" . window["raceReportsPathEdit"].Text, 0, translate("Select Race Reports Folder..."))
 			OnMessage(0x44, translator, 0)
 
 			if (directory != "")

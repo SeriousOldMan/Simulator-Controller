@@ -201,7 +201,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
 
 			OnMessage(0x44, translator)
-			file := FileSelect(1, this.Control["googleAPIKeyFileEdit"].Text, translate("Select Google Credentials File..."), "JSON (*.json)")
+			file := withBlockedWindows(FileSelect, 1, this.Control["googleAPIKeyFileEdit"].Text, translate("Select Google Credentials File..."), "JSON (*.json)")
 			OnMessage(0x44, translator, 0)
 
 			if (file != "") {
@@ -219,7 +219,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
 
 			OnMessage(0x44, translator)
-			directory := DirSelect("*" . this.Control["soXPathEdit"].Text, 0, translate("Select SoX folder..."))
+			directory := withBlockedWindows(DirSelect, "*" . this.Control["soXPathEdit"].Text, 0, translate("Select SoX folder..."))
 			OnMessage(0x44, translator, 0)
 
 			if (directory != "") {

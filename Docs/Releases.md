@@ -17,11 +17,13 @@
   16. New version of the Team Server with some internal changes. If you are running your onw Team Server, you have to redeploy it.
   17. Added support for new AI driver swap in Automobilista 2.
   18. Optimized keyboard navigation in list views.
-  19. [Developer only] Information about the active startup profile has been added to the "Session State.json" file.
-  20. [Developer only] Information about the pitstop forecast has been added to the "Session State.json" file.
-  21. [Internal] Migrated to AHK version 2.0.11.
-  22. [Internal] The copyright information has been updated to 2024 in all parts of the software.
-  23. New car models for "Setup Workbench":
+  19. All dialog boxes like alerts, file selectors, and so on, now fully shield their underlying windows against user interaction.
+  20. [Developer only] Information about the active startup profile has been added to the "Session State.json" file.
+  21. [Developer only] Information about the pitstop forecast has been added to the "Session State.json" file.
+  22. [Developer Only] The new function *withBlockedWindows* allows you to execute a function with all open windows blocked against interaction.
+  23. [Internal] Migrated to AHK version 2.0.11.
+  24. [Internal] The copyright information has been updated to 2024 in all parts of the software.
+  25. New car models for "Setup Workbench":
       - Assetto Corsa
         - BMW M3 E30 (fixed)
 		- McLaren F1 GTR

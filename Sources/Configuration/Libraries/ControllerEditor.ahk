@@ -518,7 +518,7 @@ class ControlsList extends ConfigurationItemList {
 		if ((Trim(this.Control["controlNameEdit"].Text) = "") || !inList([1, 2, 3, 4], this.Control["controlTypeDropDown"].Value)
 		 || (Trim(this.Control["imageFilePathEdit"].Text) = "")  || (this.Control["imageWidthEdit"].Text = 0) || (this.Control["imageHeightEdit"].Text = 0)) {
 			OnMessage(0x44, translateOkButton)
-			MsgBox(translate("Invalid values detected - please correct..."), translate("Error"), 262160)
+			withBlockedWindows(MsgBox, translate("Invalid values detected - please correct..."), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
 
 			return false
@@ -655,7 +655,7 @@ class LabelsList extends ConfigurationItemList {
 	buildItemFromEditor(isNew := false) {
 		if ((Trim(this.Control["labelNameEdit"].Text) = "") || (this.Control["labelWidthEdit"].Text = 0) || (this.Control["labelHeightEdit"].Text = 0)) {
 			OnMessage(0x44, translateOkButton)
-			MsgBox(translate("Invalid values detected - please correct..."), translate("Error"), 262160)
+			withBlockedWindows(MsgBox, translate("Invalid values detected - please correct..."), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
 
 			return false
@@ -1096,7 +1096,7 @@ class LayoutsList extends ConfigurationItemList {
 
 		if ((name = "") || (this.Control["layoutRowsEdit"].Text = 0) || (this.Control["layoutColumnsEdit"].Text = 0)) {
 			OnMessage(0x44, translateOkButton)
-			MsgBox(translate("Invalid values detected - please correct..."), translate("Error"), 262160)
+			withBlockedWindows(MsgBox, translate("Invalid values detected - please correct..."), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
 
 			return false
@@ -1116,7 +1116,7 @@ class LayoutsList extends ConfigurationItemList {
 
 			if duplicate {
 				OnMessage(0x44, translateOkButton)
-				MsgBox(translate("Invalid values detected - please correct..."), translate("Error"), 262160)
+				withBlockedWindows(MsgBox, translate("Invalid values detected - please correct..."), translate("Error"), 262160)
 				OnMessage(0x44, translateOkButton, 0)
 
 				return false
@@ -1345,7 +1345,7 @@ class LayoutsList extends ConfigurationItemList {
 		else if (control = "__Text_Label__") {
 			oldLabel := (oldButton ? oldButton.Label : false)
 
-			result := InputBox(translate("Please enter a button label:"), translate("Button Label"), "w200 h150", ((oldLabel && (oldLabel != true)) ? oldLabel : ""))
+			result := withBlockedWindows(InputBox, translate("Please enter a button label:"), translate("Button Label"), "w200 h150", ((oldLabel && (oldLabel != true)) ? oldLabel : ""))
 
 			if (result.Result = "Ok")
 				oldButton.Label := result.Value
@@ -1385,7 +1385,7 @@ class LayoutsList extends ConfigurationItemList {
 				else
 					number := ""
 
-				result := InputBox(translate("Please enter a controller function number:")
+				result := withBlockedWindows(InputBox, translate("Please enter a controller function number:")
 								 , translate("Function Number"), "w200 h150", number)
 
 				if (result.Result = "Ok")
@@ -2143,7 +2143,7 @@ chooseImageFile(window, path) {
 	window.Opt("+OwnDialogs")
 
 	OnMessage(0x44, translateSelectCancelButtons)
-	pictureFile := FileSelect(1, path, translate("Select Image..."), "Image (*.jpg; *.png; *.gif; *.ico)")
+	pictureFile := withBlockedWindows(FileSelect, 1, path, translate("Select Image..."), "Image (*.jpg; *.png; *.gif; *.ico)")
 	OnMessage(0x44, translateSelectCancelButtons, 0)
 
 	return ((pictureFile != "") ? pictureFile : false)

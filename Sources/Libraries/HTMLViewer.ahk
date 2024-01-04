@@ -52,7 +52,7 @@ class ComVariable {
 		 * Construction VARIANT struct, `ptr` property points to the address, `__Item` property returns var's Value
 		 * @param vVal Values that need to be wrapped, supports String, Integer, Double, Array, ComValue, ComObjArray
 		 * ### example
-		 * `var1 := ComVariable('string'), MsgBox(var1[])`
+		 * `var1 := ComVariable('string'), withBlockedWindows(MsgBox, var1[])`
 		 *
 		 * `var2 := ComVariable([1,2,3,4], , true)`
 		 *

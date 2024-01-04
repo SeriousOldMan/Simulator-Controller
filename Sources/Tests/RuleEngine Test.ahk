@@ -615,11 +615,11 @@ else {
 	rs := kb.prove(g)
 
 	while (rs != false) {
-		MsgBox(g.toString(rs))
+		withBlockedWindows(MsgBox, g.toString(rs))
 
 		if !rs.nextResult()
 			rs := false
 	}
 
-	MsgBox("Done")
+	withBlockedWindows(MsgBox, "Done")
 }

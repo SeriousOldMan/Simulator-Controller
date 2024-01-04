@@ -170,7 +170,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 				label := this.iLaunchApplicationsListView.GetText(row, 2)
 				function := this.iLaunchApplicationsListView.GetText(row, 3)
 
-				result := InputBox(translate("Please enter a label:"), translate("Modular Simulator Controller System"), "w200 h150", label)
+				result := withBlockedWindows(InputBox, translate("Please enter a label:"), translate("Modular Simulator Controller System"), "w200 h150", label)
 
 				if (result.Result != "Ok")
 					return

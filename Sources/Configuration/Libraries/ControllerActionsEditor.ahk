@@ -448,7 +448,7 @@ class PluginActionsList extends ConfigurationItemList {
 					window.Opt("+OwnDialogs")
 
 					OnMessage(0x44, translateSelectCancelButtons)
-					pictureFile := FileSelect(1, pictureFile, translate("Select Image..."), "Image (*.ico; *.png; *.jpg; *.gif)")
+					pictureFile := withBlockedWindows(FileSelect, 1, pictureFile, translate("Select Image..."), "Image (*.ico; *.png; *.jpg; *.gif)")
 					OnMessage(0x44, translateSelectCancelButtons, 0)
 
 					if (pictureFile != "")

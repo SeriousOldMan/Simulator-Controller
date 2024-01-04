@@ -1445,6 +1445,32 @@ translateLoadCancelButtons := translateMsgBoxButtons.Bind(["Load", "Cancel"])
 translateSaveCancelButtons := translateMsgBoxButtons.Bind(["Save", "Cancel"])
 translateSelectCancelButtons := translateMsgBoxButtons.Bind(["Select", "Cancel"])
 
+withBlockedWindows(function, arguments*) {
+	local windows := []
+	local ignore, hwnd, theWindow
+
+	for ignore, hwnd in WinGetList("ahk_exe " . A_ScriptName) {
+		theWindow := GuiFromHwnd(hwnd)
+
+		if (isObject(theWindow) && isInstance(theWindow, Window)) {
+			theWindow.Opt("+OwnDialogs")
+
+			windows.Push(theWindow)
+		}
+	}
+
+	for ignore, theWindow in windows
+		theWindow.Block()
+
+	try {
+		return function(arguments*)
+	}
+	finally {
+		for ignore, theWindow in windows
+			theWindow.Unblock()
+	}
+}
+
 getControllerActionLabels() {
 	return getControllerActionDefinitions("Labels")
 }

@@ -250,7 +250,7 @@ class TranslationsEditor extends ConfiguratorPanel {
 		local msgResult, languageCode, code, language, ignore, fileName
 
 		OnMessage(0x44, translateYesNoButtons)
-		msgResult := MsgBox(translate("Do you really want to delete this translation?"), translate("Delete"), 262436)
+		msgResult := withBlockedWindows(MsgBox, translate("Do you really want to delete this translation?"), translate("Delete"), 262436)
 		OnMessage(0x44, translateYesNoButtons, 0)
 
 		if (msgResult = "Yes") {
@@ -441,7 +441,7 @@ class TranslationsList extends ConfigurationItemList {
 				return index
 
 		OnMessage(0x44, translateOkButton)
-		MsgBox(translate("There is no missing translation..."), translate("Information"), 262192)
+		withBlockedWindows(MsgBox, translate("There is no missing translation..."), translate("Information"), 262192)
 		OnMessage(0x44, translateOkButton, 0)
 
 		return false
@@ -487,7 +487,7 @@ class TranslationsList extends ConfigurationItemList {
 
 		if this.iChanged {
 			OnMessage(0x44, translateYesNoButtons)
-			msgResult := MsgBox(translate("Do you want to save your changes? Any existing translations will be overwritten."), translate("Save"), 262436)
+			msgResult := withBlockedWindows(MsgBox, translate("Do you want to save your changes? Any existing translations will be overwritten."), translate("Save"), 262436)
 			OnMessage(0x44, translateYesNoButtons, 0)
 
 			if (msgResult = "Yes") {
@@ -503,7 +503,7 @@ class TranslationsList extends ConfigurationItemList {
 
 					if (translations.Has(original) && (translated != translations[original])) {
 						OnMessage(0x44, translateOkButton)
-						MsgBox(translate("Inconsistent translations detected - please correct..."), translate("Error"), 262160)
+						withBlockedWindows(MsgBox, translate("Inconsistent translations detected - please correct..."), translate("Error"), 262160)
 						OnMessage(0x44, translateOkButton, 0)
 
 						return false

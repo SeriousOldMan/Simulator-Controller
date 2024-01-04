@@ -193,7 +193,7 @@ initializeEnvironment() {
 					setLanguage(getMultiMapValue(kSimulatorConfiguration, "Configuration", "Language", getSystemLanguage()))
 
 				OnMessage(0x44, translateYesNoButtons)
-				msgResult := MsgBox(translate("You have to install Simulator Controller before starting any of the applications. Do you want run the Setup now?"), translate("Installation"), 262436)
+				msgResult := withBlockedWindows(MsgBox, translate("You have to install Simulator Controller before starting any of the applications. Do you want run the Setup now?"), translate("Installation"), 262436)
 				OnMessage(0x44, translateYesNoButtons, 0)
 
 				if (msgResult = "Yes")

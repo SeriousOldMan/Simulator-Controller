@@ -203,7 +203,7 @@ class ControllerList extends ConfigurationItemList {
 	buildItemFromEditor(isNew := false) {
 		if ((Trim(this.Control["controllerEdit"].Text) = "") || (this.Control["controllerLayoutDropDown"].Text = "") || !this.Control["controllerLayoutDropDown"].Value) {
 			OnMessage(0x44, translateOkButton)
-			MsgBox(translate("Invalid values detected - please correct..."), translate("Error"), 262160)
+			withBlockedWindows(MsgBox, translate("Invalid values detected - please correct..."), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
 
 			return false
@@ -521,7 +521,7 @@ class FunctionsList extends ConfigurationItemList {
 		}
 		else {
 			OnMessage(0x44, translateOkButton)
-			MsgBox(translate("Invalid values detected - please correct..."), translate("Error"), 262160)
+			withBlockedWindows(MsgBox, translate("Invalid values detected - please correct..."), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
 
 			return false
@@ -534,7 +534,7 @@ class FunctionsList extends ConfigurationItemList {
 		if function
 			if this.Functions.Has(function.Descriptor) {
 				OnMessage(0x44, translateOkButton)
-				MsgBox(translate("This function already exists - please use different values..."), translate("Error"), 262160)
+				withBlockedWindows(MsgBox, translate("This function already exists - please use different values..."), translate("Error"), 262160)
 				OnMessage(0x44, translateOkButton, 0)
 			}
 			else {
@@ -558,7 +558,7 @@ class FunctionsList extends ConfigurationItemList {
 		if function
 			if (function.Descriptor != this.ItemList[this.CurrentItem].Descriptor) {
 				OnMessage(0x44, translateOkButton)
-				MsgBox(translate("The type and number of an existing function may not be changed..."), translate("Error"), 262160)
+				withBlockedWindows(MsgBox, translate("The type and number of an existing function may not be changed..."), translate("Error"), 262160)
 				OnMessage(0x44, translateOkButton, 0)
 
 				return false

@@ -311,7 +311,7 @@ class ControllerStepWizard extends StepWizard {
 
 		if (this.conflictingFunctions(buttonBoxConfiguration) || this.conflictingTriggers(buttonBoxConfiguration)) {
 			OnMessage(0x44, translateOkButton)
-			MsgBox(translate("There are still duplicate functions or duplicate triggers - please correct..."), translate("Error"), 262160)
+			withBlockedWindows(MsgBox, translate("There are still duplicate functions or duplicate triggers - please correct..."), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
 
 			return false
@@ -331,7 +331,7 @@ class ControllerStepWizard extends StepWizard {
 		if this.iFunctionTriggers
 			if ((this.iFunctionsListView.GetCount() - streamDeckFunctions) != this.iFunctionTriggers.Count) {
 				OnMessage(0x44, translateYesNoButtons)
-				msgResult := MsgBox(translate("Not all functions have been assigned to physical controls. Do you really want to proceed?"), translate("Warning"), 262436)
+				msgResult := withBlockedWindows(MsgBox, translate("Not all functions have been assigned to physical controls. Do you really want to proceed?"), translate("Warning"), 262436)
 				OnMessage(0x44, translateYesNoButtons, 0)
 
 				if (msgResult = "No")
@@ -620,7 +620,7 @@ class ControllerStepWizard extends StepWizard {
 						key2 := trigger[2]
 				}
 
-				result := InputBox(translate(double ? "Please enter the first Hotkey:" : "Please enter a Hotkey:")
+				result := withBlockedWindows(InputBox, translate(double ? "Please enter the first Hotkey:" : "Please enter a Hotkey:")
 								 , translate("Modular Simulator Controller System"), "w200 h150", key1)
 
 				if (result.Result = "Ok")
@@ -629,7 +629,7 @@ class ControllerStepWizard extends StepWizard {
 					return
 
 				if double {
-					result := InputBox(translate("Please enter the second Hotkey:"), translate("Modular Simulator Controller System"), "w200 h150", key2)
+					result := withBlockedWindows(InputBox, translate("Please enter the second Hotkey:"), translate("Modular Simulator Controller System"), "w200 h150", key2)
 
 					if (result.Result = "Ok")
 						key2 := result.Value
@@ -1075,7 +1075,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 
 		if !this.validateActions() {
 			OnMessage(0x44, translateYesNoButtons)
-			msgResult := MsgBox(translate("Not all chosen functions has been completely configured. Do you really want to proceed?"), translate("Warning"), 262436)
+			msgResult := withBlockedWindows(MsgBox, translate("Not all chosen functions has been completely configured. Do you really want to proceed?"), translate("Warning"), 262436)
 			OnMessage(0x44, translateYesNoButtons, 0)
 
 			if (msgResult = "No")
@@ -1459,7 +1459,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 				translator := translateMsgBoxButtons.Bind(["Increase", "Decrease", "Cancel"])
 
 			OnMessage(0x44, translator)
-			msgResult := MsgBox(translate("Trigger for ") . action . translate("?"), translate("Trigger"), 262179)
+			msgResult := withBlockedWindows(MsgBox, translate("Trigger for ") . action . translate("?"), translate("Trigger"), 262179)
 			OnMessage(0x44, translator, 0)
 
 			currentFunction := this.getActionFunction(mode, action)

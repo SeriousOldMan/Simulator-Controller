@@ -804,7 +804,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				if action {
 					if GetKeyState("Ctrl", "P") {
 						OnMessage(0x44, translateYesNoButtons)
-						msgResult := MsgBox(translate("Do you really want to delete the selected action?"), translate("Delete"), 262436)
+						msgResult := withBlockedWindows(MsgBox, translate("Do you really want to delete the selected action?"), translate("Delete"), 262436)
 						OnMessage(0x44, translateYesNoButtons, 0)
 
 						if (msgResult = "Yes")
@@ -930,7 +930,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			local msgResult
 
 			OnMessage(0x44, translateYesNoButtons)
-			msgResult := MsgBox(translate("Do you really want to delete the selected automation?"), translate("Delete"), 262436)
+			msgResult := withBlockedWindows(MsgBox, translate("Do you really want to delete the selected automation?"), translate("Delete"), 262436)
 			OnMessage(0x44, translateYesNoButtons, 0)
 
 			if (msgResult = "Yes")
@@ -968,7 +968,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			editor.Window.Opt("+OwnDialogs")
 
 			OnMessage(0x44, translator)
-			folder := DirSelect("*" . kDatabaseDirectory, 0, translate("Select target folder..."))
+			folder := withBlockedWindows(DirSelect, "*" . kDatabaseDirectory, 0, translate("Select target folder..."))
 			OnMessage(0x44, translator, 0)
 
 			if (folder != "")
@@ -982,7 +982,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			editorGui.Opt("+OwnDialogs")
 
 			OnMessage(0x44, translator)
-			folder := DirSelect("*" . kDatabaseDirectory, 0, translate("Select export folder..."))
+			folder := withBlockedWindows(DirSelect, "*" . kDatabaseDirectory, 0, translate("Select export folder..."))
 			OnMessage(0x44, translator, 0)
 
 			if (folder != "")
@@ -1004,13 +1004,13 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					}
 					else {
 						OnMessage(0x44, translateOkButton)
-						MsgBox(translate("The data has not been exported for the currently selected simulator."), translate("Error"), 262160)
+						withBlockedWindows(MsgBox, translate("The data has not been exported for the currently selected simulator."), translate("Error"), 262160)
 						OnMessage(0x44, translateOkButton, 0)
 					}
 				}
 				else {
 					OnMessage(0x44, translateOkButton)
-					MsgBox(translate("This is not a valid folder with exported data."), translate("Error"), 262160)
+					withBlockedWindows(MsgBox, translate("This is not a valid folder with exported data."), translate("Error"), 262160)
 					OnMessage(0x44, translateOkButton, 0)
 				}
 		}
@@ -1019,7 +1019,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			local msgResult
 
 			OnMessage(0x44, translateYesNoButtons)
-			msgResult := MsgBox(translate("Do you really want to delete the selected data?"), translate("Delete"), 262436)
+			msgResult := withBlockedWindows(MsgBox, translate("Do you really want to delete the selected data?"), translate("Delete"), 262436)
 			OnMessage(0x44, translateYesNoButtons, 0)
 
 			if (msgResult = "Yes")
@@ -1038,7 +1038,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			if GetKeyState("Ctrl", "P") {
 				OnMessage(0x44, translateYesNoButtons)
-				msgResult := MsgBox(translate("Do you really want to change the scope for all applications?"), translate("Modular Simulator Controller System"), 262436)
+				msgResult := withBlockedWindows(MsgBox, translate("Do you really want to change the scope for all applications?"), translate("Modular Simulator Controller System"), 262436)
 				OnMessage(0x44, translateYesNoButtons, 0)
 
 				if (msgResult = "Yes")
@@ -4178,7 +4178,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		window.Opt("+OwnDialogs")
 
 		OnMessage(0x44, translateLoadCancelButtons)
-		fileName := FileSelect(1, "", translate("Upload Strategy File..."))
+		fileName := withBlockedWindows(FileSelect, 1, "", translate("Upload Strategy File..."))
 		OnMessage(0x44, translateLoadCancelButtons, 0)
 
 		if (fileName != "") {
@@ -4199,7 +4199,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		window.Opt("+OwnDialogs")
 
 		OnMessage(0x44, translateSaveCancelButtons)
-		fileName := FileSelect("S16", strategyName, translate("Download Strategy File..."), "Strategy (*.strategy)")
+		fileName := withBlockedWindows(FileSelect, "S16", strategyName, translate("Download Strategy File..."), "Strategy (*.strategy)")
 		OnMessage(0x44, translateSaveCancelButtons, 0)
 
 		if (fileName != "") {
@@ -4213,7 +4213,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local msgResult
 
 		OnMessage(0x44, translateYesNoButtons)
-		msgResult := MsgBox(translate("Do you really want to delete the selected strategy?"), translate("Delete"), 262436)
+		msgResult := withBlockedWindows(MsgBox, translate("Do you really want to delete the selected strategy?"), translate("Delete"), 262436)
 		OnMessage(0x44, translateYesNoButtons, 0)
 
 		if (msgResult = "Yes") {
@@ -4231,7 +4231,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		SplitPath(strategyName, , , &curExtension, &curName)
 
-		result := InputBox(translate("Please enter the new name for the selected strategy:"), translate("Rename"), "w300 h200", curName)
+		result := withBlockedWindows(InputBox, translate("Please enter the new name for the selected strategy:"), translate("Rename"), "w300 h200", curName)
 
 		if (result.Result = "Ok") {
 			newName := result.Value
@@ -4252,7 +4252,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		window.Opt("+OwnDialogs")
 
 		OnMessage(0x44, translateLoadCancelButtons)
-		fileName := FileSelect(1, "", translate("Upload Setup File..."))
+		fileName := withBlockedWindows(FileSelect, 1, "", translate("Upload Setup File..."))
 		OnMessage(0x44, translateLoadCancelButtons, 0)
 
 		if (fileName != "") {
@@ -4283,7 +4283,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		window.Opt("+OwnDialogs")
 
 		OnMessage(0x44, translateSaveCancelButtons)
-		fileName := FileSelect("S16", setupName, translate("Download Setup File..."))
+		fileName := withBlockedWindows(FileSelect, "S16", setupName, translate("Download Setup File..."))
 		OnMessage(0x44, translateSaveCancelButtons, 0)
 
 		if (fileName != "") {
@@ -4307,7 +4307,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local msgResult
 
 		OnMessage(0x44, translateYesNoButtons)
-		msgResult := MsgBox(translate("Do you really want to delete the selected setup?"), translate("Delete"), 262436)
+		msgResult := withBlockedWindows(MsgBox, translate("Do you really want to delete the selected setup?"), translate("Delete"), 262436)
 		OnMessage(0x44, translateYesNoButtons, 0)
 
 		if (msgResult = "Yes") {
@@ -4325,7 +4325,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		SplitPath(setupName, , , &curExtension, &curName)
 
-		result := InputBox(translate("Please enter the new name for the selected setup:"), translate("Rename"), "w300 h200", curName)
+		result := withBlockedWindows(InputBox, translate("Please enter the new name for the selected setup:"), translate("Rename"), "w300 h200", curName)
 
 		if (result.Result = "Ok") {
 			newName := result.Value
@@ -4438,7 +4438,7 @@ actionDialog(xOrCommand := false, y := false, action := false, *) {
 		translator := translateMsgBoxButtons.Bind(["Select", "Cancel"])
 
 		OnMessage(0x44, translator)
-		fileName := FileSelect(1, actionEdit.Text, translate("Select executable file..."), "Script (*.*)")
+		fileName := withBlockedWindows(FileSelect, 1, actionEdit.Text, translate("Select executable file..."), "Script (*.*)")
 		OnMessage(0x44, translator, 0)
 
 		if fileName
@@ -4803,7 +4803,7 @@ editSettings(editorOrCommand, arguments*) {
 		local msgResult
 
 		OnMessage(0x44, translateYesNoButtons)
-		msgResult := MsgBox(translate("Do you really want to rebuild the local database?"), translate("Team Server"), 262436)
+		msgResult := withBlockedWindows(MsgBox, translate("Do you really want to rebuild the local database?"), translate("Team Server"), 262436)
 		OnMessage(0x44, translateYesNoButtons, 0)
 
 		if (msgResult = "Yes")
@@ -4826,7 +4826,7 @@ editSettings(editorOrCommand, arguments*) {
 
 		if ((groups.Count != connections.Length) || (serverURLs.Count != connections.Length) || (serverTokens.Count != connections.Length)) {
 			OnMessage(0x44, translateOkButton)
-			MsgBox(translate("Invalid values detected - please correct..."), translate("Error"), 262160)
+			withBlockedWindows(MsgBox, translate("Invalid values detected - please correct..."), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
 		}
 		else
@@ -4925,7 +4925,7 @@ editSettings(editorOrCommand, arguments*) {
 		translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
 
 		OnMessage(0x44, translator)
-		directory := DirSelect("*" kDatabaseDirectory, 0, translate("Select Session Database folder..."))
+		directory := withBlockedWindows(DirSelect, "*" kDatabaseDirectory, 0, translate("Select Session Database folder..."))
 		OnMessage(0x44, translator, 0)
 
 		if (directory != "")
@@ -4999,7 +4999,7 @@ editSettings(editorOrCommand, arguments*) {
 		}
 		catch Any as exception {
 			OnMessage(0x44, translateOkButton)
-			MsgBox((translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
+			withBlockedWindows(MsgBox, (translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
 
 			return false
@@ -5252,7 +5252,7 @@ editSettings(editorOrCommand, arguments*) {
 
 				if (databaseLocationEdit.Text = "") {
 					OnMessage(0x44, translateOkButton)
-					MsgBox(translate("You must enter a valid directory."), translate("Error"), 262160)
+					withBlockedWindows(MsgBox, translate("You must enter a valid directory."), translate("Error"), 262160)
 					OnMessage(0x44, translateOkButton, 0)
 
 					continue
@@ -5264,7 +5264,7 @@ editSettings(editorOrCommand, arguments*) {
 						}
 						catch Any as exception {
 							OnMessage(0x44, translateOkButton)
-							MsgBox(translate("You must enter a valid directory."), translate("Error"), 262160)
+							withBlockedWindows(MsgBox, translate("You must enter a valid directory."), translate("Error"), 262160)
 							OnMessage(0x44, translateOkButton, 0)
 
 							continue
@@ -5273,7 +5273,7 @@ editSettings(editorOrCommand, arguments*) {
 					translator := translateMsgBoxButtons.Bind(["Yes", "No", "Cancel"])
 
 					OnMessage(0x44, translator)
-					msgResult := MsgBox(translate("You are about to change the session database location. Do you want to transfer the current content to the new location?")
+					msgResult := withBlockedWindows(MsgBox, translate("You are about to change the session database location. Do you want to transfer the current content to the new location?")
 									  , translate("Session Database"), 262179)
 					OnMessage(0x44, translator, 0)
 
@@ -5291,7 +5291,7 @@ editSettings(editorOrCommand, arguments*) {
 
 						if !empty {
 							OnMessage(0x44, translateOkButton)
-							MsgBox(translate("The new database folder must be empty."), translate("Error"), 262160)
+							withBlockedWindows(MsgBox, translate("The new database folder must be empty."), translate("Error"), 262160)
 							OnMessage(0x44, translateOkButton, 0)
 
 							continue
@@ -5373,7 +5373,7 @@ editSettings(editorOrCommand, arguments*) {
 
 					if restart {
 						OnMessage(0x44, translateOkButton)
-						MsgBox(translate("The session database configuration has been updated and the application will exit now. Make sure to restart all other applications as well.")
+						withBlockedWindows(MsgBox, translate("The session database configuration has been updated and the application will exit now. Make sure to restart all other applications as well.")
 							 , translate("Information"), 262192)
 						OnMessage(0x44, translateOkButton, 0)
 
@@ -5449,7 +5449,7 @@ loginDialog(connectorOrCommand := false, teamServerURL := false, owner := false,
 				}
 				catch Any as exception {
 					OnMessage(0x44, translateOkButton)
-					MsgBox((translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
+					withBlockedWindows(MsgBox, (translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
 					OnMessage(0x44, translateOkButton, 0)
 
 					return false
@@ -5533,7 +5533,7 @@ startupSessionDatabase() {
 		logError(exception, true)
 
 		OnMessage(0x44, translateOkButton)
-		MsgBox(substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Session Database"}), translate("Error"), 262160)
+		withBlockedWindows(MsgBox, substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Session Database"}), translate("Error"), 262160)
 		OnMessage(0x44, translateOkButton, 0)
 
 		ExitApp(1)

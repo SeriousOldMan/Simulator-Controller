@@ -132,7 +132,7 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 			translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
 
 			OnMessage(0x44, translator)
-			directory := DirSelect("*" window["sessionStorePathEdit"].Text, 0, translate("Select local Session Folder..."))
+			directory := withBlockedWindows(DirSelect, "*" window["sessionStorePathEdit"].Text, 0, translate("Select local Session Folder..."))
 			OnMessage(0x44, translator, 0)
 
 			if (directory != "")
@@ -152,14 +152,14 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 
 			errorMessage(message) {
 				OnMessage(0x44, translateOkButton)
-				MsgBox(message, translate("Error"), 262160)
+				withBlockedWindows(MsgBox, message, translate("Error"), 262160)
 				OnMessage(0x44, translateOkButton, 0)
 			}
 
 			if this.Token {
 				window.Opt("+OwnDialogs")
 
-				result := InputBox(translate("Please enter your current password:"), translate("Team Server"), "Password w200 h150")
+				result := withBlockedWindows(InputBox, translate("Please enter your current password:"), translate("Team Server"), "Password w200 h150")
 
 				password := this.Control["teamServerPasswordEdit"].Text
 
@@ -171,14 +171,14 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 					return
 				}
 
-				result := InputBox(translate("Please enter your new password:"), translate("Team Server"), "Password w200 h150")
+				result := withBlockedWindows(InputBox, translate("Please enter your new password:"), translate("Team Server"), "Password w200 h150")
 
 				if (result.Result != "Ok")
 					return
 				else
 					firstPassword := result.Value
 
-				result := InputBox(translate("Please re-enter your new password:"), translate("Team Server"), "Password w200 h150")
+				result := withBlockedWindows(InputBox, translate("Please re-enter your new password:"), translate("Team Server"), "Password w200 h150")
 
 				if (result.Result != "Ok")
 					return
@@ -202,7 +202,7 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 			}
 			else {
 				OnMessage(0x44, translateOkButton)
-				MsgBox(translate("You must be connected to the Server to change your password."), translate("Error"), 262160)
+				withBlockedWindows(MsgBox, translate("You must be connected to the Server to change your password."), translate("Error"), 262160)
 				OnMessage(0x44, translateOkButton, 0)
 			}
 		}
@@ -231,7 +231,7 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 			local msgResult
 
 			OnMessage(0x44, translateYesNoButtons)
-			msgResult := MsgBox(translate("Do you really want to renew the data token? The current token will become invalid for all users."), translate("Renew"), 262436)
+			msgResult := withBlockedWindows(MsgBox, translate("Do you really want to renew the data token? The current token will become invalid for all users."), translate("Renew"), 262436)
 			OnMessage(0x44, translateYesNoButtons, 0)
 
 			if (msgResult = "Yes")
@@ -249,7 +249,7 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 		}
 
 		newTeam(*) {
-			local result := InputBox(translate("Please enter the name of the new team:"), translate("Team Server"), "w300 h200")
+			local result := withBlockedWindows(InputBox, translate("Please enter the name of the new team:"), translate("Team Server"), "w300 h200")
 
 			if ((result.Result = "Ok") && (StrLen(Trim(result.Value)) > 0))
 				this.withExceptionHandler(ObjBindMethod(this, "addTeam"), Trim(result.Value))
@@ -259,7 +259,7 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 			local msgResult
 
 			OnMessage(0x44, translateYesNoButtons)
-			msgResult := MsgBox(translate("Do you really want to delete the selected team?"), translate("Delete"), 262436)
+			msgResult := withBlockedWindows(MsgBox, translate("Do you really want to delete the selected team?"), translate("Delete"), 262436)
 			OnMessage(0x44, translateYesNoButtons, 0)
 
 			if (msgResult = "Yes")
@@ -267,7 +267,7 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 		}
 
 		renameTeam(*) {
-			local result := InputBox(translate("Please enter the new name for the selected team:"), translate("Team Server"), "w300 h200", this.SelectedTeam)
+			local result := withBlockedWindows(InputBox, translate("Please enter the new name for the selected team:"), translate("Team Server"), "w300 h200", this.SelectedTeam)
 
 			if ((result.Result = "Ok") && (StrLen(Trim(result.Value)) > 0))
 				this.withExceptionHandler(ObjBindMethod(this, "renameTeam"), this.SelectedTeam, Trim(result.Value))
@@ -284,7 +284,7 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 		}
 
 		newDriver(*) {
-			local result := InputBox(translate("Please enter the name of the new driver (Format: FirstName LastName (NickName)):"), translate("Team Server"), "w300 h200")
+			local result := withBlockedWindows(InputBox, translate("Please enter the name of the new driver (Format: FirstName LastName (NickName)):"), translate("Team Server"), "w300 h200")
 
 			if ((result.Result = "Ok") && (StrLen(Trim(result.Value)) > 0))
 				this.withExceptionHandler(ObjBindMethod(this, "addDriver"), Trim(result.Value))
@@ -294,7 +294,7 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 			local msgResult
 
 			OnMessage(0x44, translateYesNoButtons)
-			msgResult := MsgBox(translate("Do you really want to delete the selected driver?"), translate("Delete"), 262436)
+			msgResult := withBlockedWindows(MsgBox, translate("Do you really want to delete the selected driver?"), translate("Delete"), 262436)
 			OnMessage(0x44, translateYesNoButtons, 0)
 
 			if (msgResult = "Yes")
@@ -302,7 +302,7 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 		}
 
 		renameDriver(*) {
-			local result := InputBox(translate("Please enter the new name for the selected driver (Format: FirstName LastName (NickName)):"), translate("Team Server"), "w300 h200", this.SelectedDriver)
+			local result := withBlockedWindows(InputBox, translate("Please enter the new name for the selected driver (Format: FirstName LastName (NickName)):"), translate("Team Server"), "w300 h200", this.SelectedDriver)
 
 			if ((result.Result = "Ok") && (StrLen(Trim(result.Value)) > 0))
 				this.withExceptionHandler(ObjBindMethod(this, "renameDriver"), this.SelectedDriver, Trim(result.Value))
@@ -319,14 +319,14 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 		}
 
 		newSession(*) {
-			local result := InputBox(translate("Please enter the name of the new session:"), translate("Team Server"), "w300 h200")
+			local result := withBlockedWindows(InputBox, translate("Please enter the name of the new session:"), translate("Team Server"), "w300 h200")
 
 			if ((result.Result = "Ok") && (StrLen(Trim(result.Value)) > 0))
 				this.withExceptionHandler(ObjBindMethod(this, "addSession"), Trim(result.Value))
 		}
 
 		renameSession(*) {
-			local result := InputBox(translate("Please enter the new name for the selected session:"), translate("Team Server"), "w300 h200", this.SelectedSession)
+			local result := withBlockedWindows(InputBox, translate("Please enter the new name for the selected session:"), translate("Team Server"), "w300 h200", this.SelectedSession)
 
 			if ((result.Result = "Ok") && (StrLen(Trim(result.Value)) > 0))
 				this.withExceptionHandler(ObjBindMethod(this, "renameSession"), this.SelectedSession, Trim(result.Value))
@@ -336,7 +336,7 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 			local msgResult
 
 			OnMessage(0x44, translateYesNoButtons)
-			msgResult := MsgBox(translate("Do you really want to delete the selected session?"), translate("Delete"), 262436)
+			msgResult := withBlockedWindows(MsgBox, translate("Do you really want to delete the selected session?"), translate("Delete"), 262436)
 			OnMessage(0x44, translateYesNoButtons, 0)
 
 			if (msgResult = "Yes")
@@ -632,7 +632,7 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 
 				if message {
 					OnMessage(0x44, translateOkButton)
-					MsgBox((translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
+					withBlockedWindows(MsgBox, (translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
 					OnMessage(0x44, translateOkButton, 0)
 				}
 
@@ -1054,7 +1054,7 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 				message := message.Message
 
 			OnMessage(0x44, translateOkButton)
-			MsgBox((translate("Error while executing command.") . "`n`n" . translate("Error: ") . message), translate("Error"), 262160)
+			withBlockedWindows(MsgBox, (translate("Error while executing command.") . "`n`n" . translate("Error: ") . message), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
 		}
 	}

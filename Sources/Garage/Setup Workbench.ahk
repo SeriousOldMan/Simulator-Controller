@@ -409,7 +409,7 @@ class SetupWorkbench extends ConfigurationItem {
 			workbenchGui.Opt("+OwnDialogs")
 
 			OnMessage(0x44, translateLoadCancelButtons)
-			fileName := FileSelect(1, "", translate("Load Issues..."), "Issues (*.setup)")
+			fileName := withBlockedWindows(FileSelect, 1, "", translate("Load Issues..."), "Issues (*.setup)")
 			OnMessage(0x44, translateLoadCancelButtons, 0)
 
 			if (fileName != "")
@@ -422,7 +422,7 @@ class SetupWorkbench extends ConfigurationItem {
 			workbenchGui.Opt("+OwnDialogs")
 
 			OnMessage(0x44, translateSaveCancelButtons)
-			fileName := FileSelect("S17", "", translate("Save Issues..."), "Issues (*.setup)")
+			fileName := withBlockedWindows(FileSelect, "S17", "", translate("Save Issues..."), "Issues (*.setup)")
 			OnMessage(0x44, translateSaveCancelButtons, 0)
 
 			if (fileName != "") {
@@ -3489,7 +3489,7 @@ startupSetupWorkbench() {
 		logError(exception, true)
 
 		OnMessage(0x44, translateOkButton)
-		MsgBox(substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Setup Workbench"}), translate("Error"), 262160)
+		withBlockedWindows(MsgBox, substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Setup Workbench"}), translate("Error"), 262160)
 		OnMessage(0x44, translateOkButton, 0)
 
 		ExitApp(1)

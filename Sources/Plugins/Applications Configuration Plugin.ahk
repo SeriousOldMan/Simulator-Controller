@@ -50,7 +50,7 @@ class ApplicationsConfigurator extends ConfigurationItemList {
 				window.Opt("+OwnDialogs")
 
 				OnMessage(0x44, translateSelectCancelButtons)
-				fileName := FileSelect(1, window["applicationExePathEdit"].Text, translate("Select application executable..."), "Executable (*.exe)")
+				fileName := withBlockedWindows(FileSelect, 1, window["applicationExePathEdit"].Text, translate("Select application executable..."), "Executable (*.exe)")
 				OnMessage(0x44, translateSelectCancelButtons, 0)
 
 				if (fileName != "") {
@@ -74,7 +74,7 @@ class ApplicationsConfigurator extends ConfigurationItemList {
 				translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
 
 				OnMessage(0x44, translator)
-				directory := DirSelect("*" . window["applicationWorkingDirectoryPathEdit"].Text, 0, translate("Select working directory..."))
+				directory := withBlockedWindows(DirSelect, "*" . window["applicationWorkingDirectoryPathEdit"].Text, 0, translate("Select working directory..."))
 				OnMessage(0x44, translator, 0)
 
 				if (directory != "")

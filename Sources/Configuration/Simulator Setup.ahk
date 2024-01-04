@@ -485,7 +485,7 @@ class SetupWizard extends ConfiguratorPanel {
 
 		if (GetKeyState("Ctrl") && GetKeyState("Shift")) {
 			OnMessage(0x44, translateYesNoButtons)
-			msgResult := MsgBox(translate("Do you really want to start with a fresh configuration?"), translate("Setup "), 262436)
+			msgResult := withBlockedWindows(MsgBox, translate("Do you really want to start with a fresh configuration?"), translate("Setup "), 262436)
 			OnMessage(0x44, translateYesNoButtons, 0)
 
 			if (msgResult = "Yes")
@@ -624,7 +624,7 @@ class SetupWizard extends ConfiguratorPanel {
 				this.WizardWindow.Show()
 
 				OnMessage(0x44, translateYesNoButtons)
-				msgResult := MsgBox((translate("Do you want to generate the new configuration?") . "`n`n" . translate("Backup files will be saved for your current configuration in the `"Simulator Controller\Config`" folder in your user `"Documents`" folder.")), translate("Setup "), 262436)
+				msgResult := withBlockedWindows(MsgBox, (translate("Do you want to generate the new configuration?") . "`n`n" . translate("Backup files will be saved for your current configuration in the `"Simulator Controller\Config`" folder in your user `"Documents`" folder.")), translate("Setup "), 262436)
 				OnMessage(0x44, translateYesNoButtons, 0)
 
 				if (msgResult = "Yes")
@@ -2604,7 +2604,7 @@ class StartStepWizard extends StepWizard {
 			if !A_IsAdmin {
 				if RegExMatch(DllCall("GetCommandLine", "Str"), " /restart(?!\S)") {
 					OnMessage(0x44, translateOkButton)
-					MsgBox(translate("Simulator Controller cannot request Admin privileges. Please enable User Account Control."), translate("Error"), 262160)
+					withBlockedWindows(MsgBox, translate("Simulator Controller cannot request Admin privileges. Please enable User Account Control."), translate("Error"), 262160)
 					OnMessage(0x44, translateOkButton, 0)
 
 					ExitApp(0)
@@ -3027,7 +3027,7 @@ initializeSimulatorSetup() {
 		logError(exception, true)
 
 		OnMessage(0x44, translateOkButton)
-		MsgBox(substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Simulator Setup"}), translate("Error"), 262160)
+		withBlockedWindows(MsgBox, substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Simulator Setup"}), translate("Error"), 262160)
 		OnMessage(0x44, translateOkButton, 0)
 
 		ExitApp(1)
@@ -3102,7 +3102,7 @@ startupSimulatorSetup() {
 		logError(exception, true)
 
 		OnMessage(0x44, translateOkButton)
-		MsgBox(substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Simulator Setup"}), translate("Error"), 262160)
+		withBlockedWindows(MsgBox, substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Simulator Setup"}), translate("Error"), 262160)
 		OnMessage(0x44, translateOkButton, 0)
 
 		ExitApp(1)

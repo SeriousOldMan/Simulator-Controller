@@ -243,7 +243,7 @@ class PluginsConfigurator extends ConfigurationItemList {
 		}
 		catch Any as exception {
 			OnMessage(0x44, translateOkButton)
-			MsgBox(translate("Invalid values detected - please correct..."), translate("Error"), 262160)
+			withBlockedWindows(MsgBox, translate("Invalid values detected - please correct..."), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
 
 			return false

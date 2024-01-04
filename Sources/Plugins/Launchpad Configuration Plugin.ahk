@@ -129,7 +129,7 @@ class LaunchpadConfigurator extends ConfigurationItemList {
 
 		if ((Trim(this.Control["launchpadLabelEdit"].Text) = "") || (Trim(this.Control["launchpadApplicationDropDown"].Text) = "")) {
 			OnMessage(0x44, translateOkButton)
-			MsgBox(translate("Invalid values detected - please correct..."), translate("Error"), 262160)
+			withBlockedWindows(MsgBox, translate("Invalid values detected - please correct..."), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
 
 			return false
@@ -138,7 +138,7 @@ class LaunchpadConfigurator extends ConfigurationItemList {
 			for ignore, item in this.ItemList
 				if (item[1] = this.Control["launchpadNumberEdit"].Text) {
 					OnMessage(0x44, translateOkButton)
-					MsgBox(translate("An application launcher for this button already exists - please use different values..."), translate("Error"), 262160)
+					withBlockedWindows(MsgBox, translate("An application launcher for this button already exists - please use different values..."), translate("Error"), 262160)
 					OnMessage(0x44, translateOkButton, 0)
 
 					return false
@@ -152,7 +152,7 @@ class LaunchpadConfigurator extends ConfigurationItemList {
 
 		if (launchApplication && (launchApplication[1] != this.ItemList[this.CurrentItem][1])) {
 			OnMessage(0x44, translateOkButton)
-			MsgBox(translate("The button number of an existing application launcher may not be changed..."), translate("Error"), 262160)
+			withBlockedWindows(MsgBox, translate("The button number of an existing application launcher may not be changed..."), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
 			
 			return false

@@ -229,7 +229,7 @@ class SplashScreensList extends ConfigurationItemList {
 				this.Window.Opt("+OwnDialogs")
 
 				OnMessage(0x44, translateSaveCancelButtons)
-				pictureFile := FileSelect(1, "", translate("Select Image..."), "Image (*.jpg; *.gif)")
+				pictureFile := withBlockedWindows(FileSelect, 1, "", translate("Select Image..."), "Image (*.jpg; *.gif)")
 				OnMessage(0x44, translateSaveCancelButtons, 0)
 
 				if (pictureFile != "") {
@@ -263,7 +263,7 @@ class SplashScreensList extends ConfigurationItemList {
 				this.Window.Opt("+OwnDialogs")
 
 				OnMessage(0x44, translateSelectCancelButtons)
-				soundFile := FileSelect(1, path, translate("Select Sound File..."), "Audio (*.wav; *.mp3)")
+				soundFile := withBlockedWindows(FileSelect, 1, path, translate("Select Sound File..."), "Audio (*.wav; *.mp3)")
 				OnMessage(0x44, translateSelectCancelButtons, 0)
 
 				if (soundFile != "")
@@ -290,7 +290,7 @@ class SplashScreensList extends ConfigurationItemList {
 				this.Window.Opt("+OwnDialogs")
 
 				OnMessage(0x44, translateSelectCancelButtons)
-				videoFile := FileSelect(1, path, translate("Select Video (GIF) File..."), "Video (*.gif)")
+				videoFile := withBlockedWindows(FileSelect, 1, path, translate("Select Video (GIF) File..."), "Video (*.gif)")
 				OnMessage(0x44, translateSelectCancelButtons, 0)
 
 				if (videoFile != "")
@@ -549,7 +549,7 @@ class SplashScreensList extends ConfigurationItemList {
 		}
 		else {
 			OnMessage(0x44, translateOkButton)
-			MsgBox(translate("Invalid values detected - please correct..."), translate("Error"), 262160)
+			withBlockedWindows(MsgBox, translate("Invalid values detected - please correct..."), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
 
 			return false

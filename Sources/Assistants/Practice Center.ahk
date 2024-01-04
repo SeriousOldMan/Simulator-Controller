@@ -235,7 +235,7 @@ class PracticeCenter extends ConfigurationItem {
 					local translator := translateMsgBoxButtons.Bind(["Yes", "No", "Cancel"])
 
 					OnMessage(0x44, translator)
-					msgResult := MsgBox(translate("Do you want to transfer your data to the session database before closing?"), translate("Export"), 262179)
+					msgResult := withBlockedWindows(MsgBox, translate("Do you want to transfer your data to the session database before closing?"), translate("Export"), 262179)
 					OnMessage(0x44, translator, 0)
 
 					if (msgResult = "Yes")
@@ -1121,7 +1121,7 @@ class PracticeCenter extends ConfigurationItem {
 				center.withExceptionhandler(ObjBindMethod(center, "importFromSimulation", center.Simulator))
 			else {
 				OnMessage(0x44, translateOkButton)
-				MsgBox(translate("You must first select a simulation."), translate("Information"), 262192)
+				withBlockedWindows(MsgBox, translate("You must first select a simulation."), translate("Information"), 262192)
 				OnMessage(0x44, translateOkButton, 0)
 			}
 		}
@@ -1597,7 +1597,7 @@ class PracticeCenter extends ConfigurationItem {
 		if (force || (simulator != this.Simulator)) {
 			if (!force && this.SessionActive && this.HasData && !this.SessionExported) {
 				OnMessage(0x44, translateYesNoButtons)
-				msgResult := MsgBox(translate("You have unsaved data. Do you really want to continue?"), translate("Information"), 262436)
+				msgResult := withBlockedWindows(MsgBox, translate("You have unsaved data. Do you really want to continue?"), translate("Information"), 262436)
 				OnMessage(0x44, translateYesNoButtons, 0)
 
 				if (msgResult = "No") {
@@ -1644,7 +1644,7 @@ class PracticeCenter extends ConfigurationItem {
 		if (force || (car != this.Car)) {
 			if (!force && this.SessionActive && this.HasData && !this.SessionExported) {
 				OnMessage(0x44, translateYesNoButtons)
-				msgResult := MsgBox(translate("You have unsaved data. Do you really want to continue?"), translate("Information"), 262436)
+				msgResult := withBlockedWindows(MsgBox, translate("You have unsaved data. Do you really want to continue?"), translate("Information"), 262436)
 				OnMessage(0x44, translateYesNoButtons, 0)
 
 				if (msgResult = "No") {
@@ -1682,7 +1682,7 @@ class PracticeCenter extends ConfigurationItem {
 		if (force || (track != this.Track)) {
 			if (!force && this.SessionActive && this.HasData && !this.SessionExported) {
 				OnMessage(0x44, translateYesNoButtons)
-				msgResult := MsgBox(translate("You have unsaved data. Do you really want to continue?"), translate("Information"), 262436)
+				msgResult := withBlockedWindows(MsgBox, translate("You have unsaved data. Do you really want to continue?"), translate("Information"), 262436)
 				OnMessage(0x44, translateYesNoButtons, 0)
 
 				if (msgResult = "No") {
@@ -1829,7 +1829,7 @@ class PracticeCenter extends ConfigurationItem {
 
 		if !prefix {
 			OnMessage(0x44, translateOkButton)
-			MsgBox(translate("This is not supported for the selected simulator..."), translate("Warning"), 262192)
+			withBlockedWindows(MsgBox, translate("This is not supported for the selected simulator..."), translate("Warning"), 262192)
 			OnMessage(0x44, translateOkButton, 0)
 
 			return
@@ -2195,7 +2195,7 @@ class PracticeCenter extends ConfigurationItem {
 			case 3: ; Clear...
 				if this.SessionActive {
 					OnMessage(0x44, translateYesNoButtons)
-					msgResult := MsgBox(translate("Do you really want to delete all data from the currently active session? This cannot be undone."), translate("Delete"), 262436)
+					msgResult := withBlockedWindows(MsgBox, translate("Do you really want to delete all data from the currently active session? This cannot be undone."), translate("Delete"), 262436)
 					OnMessage(0x44, translateYesNoButtons, 0)
 
 					if (msgResult = "Yes")
@@ -2211,13 +2211,13 @@ class PracticeCenter extends ConfigurationItem {
 						this.saveSession()
 					else {
 						OnMessage(0x44, translateOkButton)
-						MsgBox(translate("You are not connected to an active session. Use `"Save a Copy...`" instead."), translate("Information"), 262192)
+						withBlockedWindows(MsgBox, translate("You are not connected to an active session. Use `"Save a Copy...`" instead."), translate("Information"), 262192)
 						OnMessage(0x44, translateOkButton, 0)
 					}
 				}
 				else {
 					OnMessage(0x44, translateOkButton)
-					MsgBox(translate("There is no session data to be saved."), translate("Information"), 262192)
+					withBlockedWindows(MsgBox, translate("There is no session data to be saved."), translate("Information"), 262192)
 					OnMessage(0x44, translateOkButton, 0)
 				}
 			case 7: ; Save Session Copy...
@@ -2225,7 +2225,7 @@ class PracticeCenter extends ConfigurationItem {
 					this.saveSession(true)
 				else {
 					OnMessage(0x44, translateOkButton)
-					MsgBox(translate("There is no session data to be saved."), translate("Information"), 262192)
+					withBlockedWindows(MsgBox, translate("There is no session data to be saved."), translate("Information"), 262192)
 					OnMessage(0x44, translateOkButton, 0)
 				}
 			case 9: ; Update Statistics
@@ -2235,7 +2235,7 @@ class PracticeCenter extends ConfigurationItem {
 			case 13: ; Export data
 				if (this.HasData && !this.SessionExported) {
 					OnMessage(0x44, translateYesNoButtons)
-					msgResult := MsgBox(translate("Do you want to transfer the selected data to the session database? This is only possible once."), translate("Delete"), 262436)
+					msgResult := withBlockedWindows(MsgBox, translate("Do you want to transfer the selected data to the session database? This is only possible once."), translate("Delete"), 262436)
 					OnMessage(0x44, translateYesNoButtons, 0)
 
 					if (msgResult = "Yes")
@@ -2243,7 +2243,7 @@ class PracticeCenter extends ConfigurationItem {
 				}
 				else {
 					OnMessage(0x44, translateOkButton)
-					MsgBox(translate("There is no session data to be exported or the session already been exported."), translate("Information"), 262192)
+					withBlockedWindows(MsgBox, translate("There is no session data to be exported or the session already been exported."), translate("Information"), 262192)
 					OnMessage(0x44, translateOkButton, 0)
 				}
 		}
@@ -2317,7 +2317,7 @@ class PracticeCenter extends ConfigurationItem {
 					}
 					else {
 						OnMessage(0x44, translateOkButton)
-						MsgBox(translate("You must have manual stint mode enabled to create a new stint manually."), translate("Information"), 262192)
+						withBlockedWindows(MsgBox, translate("You must have manual stint mode enabled to create a new stint manually."), translate("Information"), 262192)
 						OnMessage(0x44, translateOkButton, 0)
 					}
 				case 5:
@@ -2341,7 +2341,7 @@ class PracticeCenter extends ConfigurationItem {
 				logError(exception, true)
 
 				OnMessage(0x44, translateOkButton)
-				MsgBox((translate("Error while executing command.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
+				withBlockedWindows(MsgBox, (translate("Error while executing command.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
 				OnMessage(0x44, translateOkButton, 0)
 			}
 	}
@@ -4138,7 +4138,7 @@ class PracticeCenter extends ConfigurationItem {
 				translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
 
 				OnMessage(0x44, translator)
-				folder := DirSelect("*" directory, 0, translate("Select target folder..."))
+				folder := withBlockedWindows(DirSelect, "*" directory, 0, translate("Select target folder..."))
 				OnMessage(0x44, translator, 0)
 
 				if (folder != "")
@@ -4429,7 +4429,7 @@ class PracticeCenter extends ConfigurationItem {
 			translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
 
 			OnMessage(0x44, translator)
-			folder := DirSelect("*" . directory, 0, translate("Select Practice folder..."))
+			folder := withBlockedWindows(DirSelect, "*" . directory, 0, translate("Select Practice folder..."))
 			OnMessage(0x44, translator, 0)
 
 			if (folder != "") {
@@ -4439,7 +4439,7 @@ class PracticeCenter extends ConfigurationItem {
 
 				if (info.Count == 0) {
 					OnMessage(0x44, translateOkButton)
-					MsgBox(translate("This is not a valid folder with a saved session."), translate("Error"), 262160)
+					withBlockedWindows(MsgBox, translate("This is not a valid folder with a saved session."), translate("Error"), 262160)
 					OnMessage(0x44, translateOkButton, 0)
 				}
 				else {
@@ -7279,7 +7279,7 @@ startupPracticeCenter() {
 		logError(exception, true)
 
 		OnMessage(0x44, translateOkButton)
-		MsgBox(substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Practice Center"}), translate("Error"), 262160)
+		withBlockedWindows(MsgBox, substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Practice Center"}), translate("Error"), 262160)
 		OnMessage(0x44, translateOkButton, 0)
 
 		ExitApp(1)

@@ -1037,7 +1037,7 @@ if !GetKeyState("Ctrl") {
 
 	AHKUnit.Run()
 
-	MsgBox("Full run took " . (A_TickCount - startTime) . " ms")
+	withBlockedWindows(MsgBox, "Full run took " . (A_TickCount - startTime) . " ms")
 }
 else {
 	raceNr := (GetKeyState("Alt") ? 18 : ((GetKeyState("Shift") ? 2 : 1)))
@@ -1071,7 +1071,7 @@ else {
 					engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
 				if isDebug()
-					MsgBox("Lap " . A_Index . " loaded - Continue?")
+					withBlockedWindows(MsgBox, "Lap " . A_Index . " loaded - Continue?")
 			}
 		}
 
@@ -1222,7 +1222,7 @@ else {
 						engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
 					if (lap = 8)
-						MsgBox("Pitstop")
+						withBlockedWindows(MsgBox, "Pitstop")
 
 					if isDebug()
 						showMessage("Data " lap . "." . A_Index . " loaded...")
@@ -1258,7 +1258,7 @@ else {
 						if engineer.Debug[kDebugKnowledgeBase]
 							engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
-						MsgBox("Pitstop")
+						withBlockedWindows(MsgBox, "Pitstop")
 					}
 
 					if isDebug()
@@ -1294,13 +1294,13 @@ else {
 							engineer.planPitstop()
 							engineer.preparePitstop()
 
-							MsgBox("Pitstop Prepare")
+							withBlockedWindows(MsgBox, "Pitstop Prepare")
 						}
 
 						if (lap = 24) {
 							engineer.performPitstop(23)
 
-							MsgBox("Pitstop Perform")
+							withBlockedWindows(MsgBox, "Pitstop Perform")
 						}
 					}
 					else if (raceNr = 11) {
@@ -1308,34 +1308,34 @@ else {
 							engineer.planPitstop()
 							engineer.preparePitstop()
 
-							MsgBox("Pitstop Prepare")
+							withBlockedWindows(MsgBox, "Pitstop Prepare")
 						}
 
 						if (lap = 11) {
 							engineer.performPitstop(11)
 
-							MsgBox("Pitstop Perform")
+							withBlockedWindows(MsgBox, "Pitstop Perform")
 						}
 
 						if (lap = 19)
-							MsgBox("Inspect")
+							withBlockedWindows(MsgBox, "Inspect")
 					}
 					else if (raceNr = 12) {
 						if (lap = 21) {
 							engineer.planPitstop()
 							engineer.preparePitstop()
 
-							MsgBox("Pitstop Prepare")
+							withBlockedWindows(MsgBox, "Pitstop Prepare")
 						}
 
 						if (lap = 22) {
 							engineer.performPitstop(22)
 
-							MsgBox("Pitstop Perform")
+							withBlockedWindows(MsgBox, "Pitstop Perform")
 						}
 
 						if (lap = 24)
-							MsgBox("Inspect")
+							withBlockedWindows(MsgBox, "Inspect")
 					}
 
 					if isDebug()
@@ -1403,7 +1403,7 @@ else {
 	}
 
 	if isDebug()
-		MsgBox("Done...")
+		withBlockedWindows(MsgBox, "Done...")
 
 	ExitApp()
 }

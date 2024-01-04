@@ -1463,7 +1463,7 @@ class RaceCenter extends ConfigurationItem {
 				translator := translateMsgBoxButtons.Bind(["Before", "After", "Cancel"])
 
 				OnMessage(0x44, translator)
-				msgResult := MsgBox(translate("Do you want to add the new entry before or after the currently selected entry?"), translate("Insert"), 262179)
+				msgResult := withBlockedWindows(MsgBox, translate("Do you want to add the new entry before or after the currently selected entry?"), translate("Insert"), 262179)
 				OnMessage(0x44, translator, 0)
 
 				if (msgResult = "Cancel")
@@ -1493,7 +1493,7 @@ class RaceCenter extends ConfigurationItem {
 
 			if row {
 				OnMessage(0x44, translateYesNoButtons)
-				msgResult := MsgBox(translate("Do you really want to delete the selected plan entry?"), translate("Delete"), 262436)
+				msgResult := withBlockedWindows(MsgBox, translate("Do you really want to delete the selected plan entry?"), translate("Delete"), 262436)
 				OnMessage(0x44, translateYesNoButtons, 0)
 
 				if (msgResult = "Yes")
@@ -1575,7 +1575,7 @@ class RaceCenter extends ConfigurationItem {
 				center.withExceptionhandler(ObjBindMethod(center, "addSetup"))
 			else {
 				OnMessage(0x44, translateOkButton)
-				MsgBox(translate("There are no drivers available. Please select a valid session first."), translate("Information"), 262192)
+				withBlockedWindows(MsgBox, translate("There are no drivers available. Please select a valid session first."), translate("Information"), 262192)
 				OnMessage(0x44, translateOkButton, 0)
 			}
 		}
@@ -1607,7 +1607,7 @@ class RaceCenter extends ConfigurationItem {
 
 			if row {
 				OnMessage(0x44, translateYesNoButtons)
-				msgResult := MsgBox(translate("Do you really want to delete the current driver specific setup?"), translate("Delete"), 262436)
+				msgResult := withBlockedWindows(MsgBox, translate("Do you really want to delete the current driver specific setup?"), translate("Delete"), 262436)
 				OnMessage(0x44, translateYesNoButtons, 0)
 
 				if (msgResult = "Yes")
@@ -1702,7 +1702,7 @@ class RaceCenter extends ConfigurationItem {
 				center.withExceptionhandler(ObjBindMethod(center, "releaseSetups"))
 			else {
 				OnMessage(0x44, translateOkButton)
-				MsgBox(translate("You are not connected to an active session."), translate("Information"), 262192)
+				withBlockedWindows(MsgBox, translate("You are not connected to an active session."), translate("Information"), 262192)
 				OnMessage(0x44, translateOkButton, 0)
 			}
 		}
@@ -1713,7 +1713,7 @@ class RaceCenter extends ConfigurationItem {
 			centerGui.Opt("+OwnDialogs")
 
 			OnMessage(0x44, translateLoadCancelButtons)
-			fileName := FileSelect(1, "", translate("Import Setups..."), "Setups (*.setups)")
+			fileName := withBlockedWindows(FileSelect, 1, "", translate("Import Setups..."), "Setups (*.setups)")
 			OnMessage(0x44, translateLoadCancelButtons, 0)
 
 			if (fileName != "")
@@ -1721,7 +1721,7 @@ class RaceCenter extends ConfigurationItem {
 					translator := translateMsgBoxButtons.Bind(["Insert", "Replace", "Cancel"])
 
 					OnMessage(0x44, translator)
-					msgResult := MsgBox(translate("Do you want to replace all current entries or do you want to add the imported entries to the list?"), translate("Import"), 262179)
+					msgResult := withBlockedWindows(MsgBox, translate("Do you want to replace all current entries or do you want to add the imported entries to the list?"), translate("Import"), 262179)
 					OnMessage(0x44, translator, 0)
 
 					if (msgResult = "Cancel")
@@ -1743,7 +1743,7 @@ class RaceCenter extends ConfigurationItem {
 			centerGui.Opt("+OwnDialogs")
 
 			OnMessage(0x44, translateSaveCancelButtons)
-			fileName := FileSelect("S17", "", translate("Export Setups..."), "Setups (*.setups)")
+			fileName := withBlockedWindows(FileSelect, "S17", "", translate("Export Setups..."), "Setups (*.setups)")
 			OnMessage(0x44, translateSaveCancelButtons, 0)
 
 			if (fileName != "") {
@@ -2425,7 +2425,7 @@ class RaceCenter extends ConfigurationItem {
 
 				if !silent {
 					OnMessage(0x44, translateOkButton)
-					MsgBox((translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
+					withBlockedWindows(MsgBox, (translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
 					OnMessage(0x44, translateOkButton, 0)
 				}
 
@@ -3195,7 +3195,7 @@ class RaceCenter extends ConfigurationItem {
 
 			if verbose {
 				OnMessage(0x44, translateYesNoButtons)
-				msgResult := MsgBox(translate("Do you really want to delete all driver specific setups?"), translate("Delete"), 262436)
+				msgResult := withBlockedWindows(MsgBox, translate("Do you really want to delete all driver specific setups?"), translate("Delete"), 262436)
 				OnMessage(0x44, translateYesNoButtons, 0)
 
 				if (msgResult = "Yes")
@@ -3258,7 +3258,7 @@ class RaceCenter extends ConfigurationItem {
 		}
 		else if verbose {
 			OnMessage(0x44, translateOkButton)
-			MsgBox(translate("You are not connected to an active session."), translate("Information"), 262192)
+			withBlockedWindows(MsgBox, translate("You are not connected to an active session."), translate("Information"), 262192)
 			OnMessage(0x44, translateOkButton, 0)
 		}
 	}
@@ -3300,7 +3300,7 @@ class RaceCenter extends ConfigurationItem {
 				translator := translateMsgBoxButtons.Bind(["Beginning", "End", "Cancel"])
 
 				OnMessage(0x44, translator)
-				msgResult := MsgBox(translate("The plan has more stints than the strategy. Do you want to remove surplus stints from the beginning or from the end of the plan?"), translate("Plan"), 262179)
+				msgResult := withBlockedWindows(MsgBox, translate("The plan has more stints than the strategy. Do you want to remove surplus stints from the beginning or from the end of the plan?"), translate("Plan"), 262179)
 				OnMessage(0x44, translator, 0)
 
 				if (msgResult = "Cancel")
@@ -3322,7 +3322,7 @@ class RaceCenter extends ConfigurationItem {
 			if (this.PlanListView.GetCount() < numStints) {
 				if (this.PlanListView.GetCount() > 0) {
 					OnMessage(0x44, translateOkButton)
-					MsgBox(translate("The plan has less stints than the strategy. Additional stints will be added at the end of the plan."), translate("Information"), 262192)
+					withBlockedWindows(MsgBox, translate("The plan has less stints than the strategy. Additional stints will be added at the end of the plan."), translate("Information"), 262192)
 					OnMessage(0x44, translateOkButton, 0)
 				}
 
@@ -3440,7 +3440,7 @@ class RaceCenter extends ConfigurationItem {
 
 			if verbose {
 				OnMessage(0x44, translateYesNoButtons)
-				msgResult := MsgBox(translate("Do you really want to delete the current plan?"), translate("Delete"), 262436)
+				msgResult := withBlockedWindows(MsgBox, translate("Do you really want to delete the current plan?"), translate("Delete"), 262436)
 				OnMessage(0x44, translateYesNoButtons, 0)
 
 				if (msgResult = "Yes")
@@ -3648,7 +3648,7 @@ class RaceCenter extends ConfigurationItem {
 		}
 		else if verbose {
 			OnMessage(0x44, translateOkButton)
-			MsgBox(translate("You are not connected to an active session."), translate("Information"), 262192)
+			withBlockedWindows(MsgBox, translate("You are not connected to an active session."), translate("Information"), 262192)
 			OnMessage(0x44, translateOkButton, 0)
 		}
 	}
@@ -4379,7 +4379,7 @@ class RaceCenter extends ConfigurationItem {
 				logError(exception, true)
 
 			OnMessage(0x44, translateOkButton)
-			MsgBox(translate("You must be connected to an active session to plan a pitstop."), translate("Error"), 262192)
+			withBlockedWindows(MsgBox, translate("You must be connected to an active session to plan a pitstop."), translate("Error"), 262192)
 			OnMessage(0x44, translateOkButton, 0)
 		}
 	}
@@ -4434,7 +4434,7 @@ class RaceCenter extends ConfigurationItem {
 			case 4: ; Clear...
 				if this.SessionActive {
 					OnMessage(0x44, translateYesNoButtons)
-					msgResult := MsgBox(translate("Do you really want to delete all data from the currently active session? This can take quite a while..."), translate("Delete"), 262436)
+					msgResult := withBlockedWindows(MsgBox, translate("Do you really want to delete all data from the currently active session? This can take quite a while..."), translate("Delete"), 262436)
 					OnMessage(0x44, translateYesNoButtons, 0)
 
 					if (msgResult = "Yes")
@@ -4442,7 +4442,7 @@ class RaceCenter extends ConfigurationItem {
 				}
 				else {
 					OnMessage(0x44, translateOkButton)
-					MsgBox(translate("You are not connected to an active session."), translate("Information"), 262192)
+					withBlockedWindows(MsgBox, translate("You are not connected to an active session."), translate("Information"), 262192)
 					OnMessage(0x44, translateOkButton, 0)
 				}
 			case 6: ; Synchronize
@@ -4488,13 +4488,13 @@ class RaceCenter extends ConfigurationItem {
 						this.saveSession()
 					else {
 						OnMessage(0x44, translateOkButton)
-						MsgBox(translate("You are not connected to an active session. Use `"Save a Copy...`" instead."), translate("Information"), 262192)
+						withBlockedWindows(MsgBox, translate("You are not connected to an active session. Use `"Save a Copy...`" instead."), translate("Information"), 262192)
 						OnMessage(0x44, translateOkButton, 0)
 					}
 				}
 				else {
 					OnMessage(0x44, translateOkButton)
-					MsgBox(translate("There is no session data to be saved."), translate("Information"), 262192)
+					withBlockedWindows(MsgBox, translate("There is no session data to be saved."), translate("Information"), 262192)
 					OnMessage(0x44, translateOkButton, 0)
 				}
 			case 12: ; Save Session Copy...
@@ -4502,7 +4502,7 @@ class RaceCenter extends ConfigurationItem {
 					this.saveSession(true)
 				else {
 					OnMessage(0x44, translateOkButton)
-					MsgBox(translate("There is no session data to be saved."), translate("Information"), 262192)
+					withBlockedWindows(MsgBox, translate("There is no session data to be saved."), translate("Information"), 262192)
 					OnMessage(0x44, translateOkButton, 0)
 				}
 			case 14: ; Update Statistics
@@ -4562,7 +4562,7 @@ class RaceCenter extends ConfigurationItem {
 					}
 					else {
 						OnMessage(0x44, translateOkButton)
-						MsgBox(translate("There is no active Race Strategy."), translate("Information"), 262192)
+						withBlockedWindows(MsgBox, translate("There is no active Race Strategy."), translate("Information"), 262192)
 						OnMessage(0x44, translateOkButton, 0)
 					}
 				}
@@ -4570,7 +4570,7 @@ class RaceCenter extends ConfigurationItem {
 				this.Window.Opt("+OwnDialogs")
 
 				OnMessage(0x44, translateLoadCancelButtons)
-				fileName := FileSelect(1, dirName, translate("Load Race Strategy..."), "Strategy (*.strategy)")
+				fileName := withBlockedWindows(FileSelect, 1, dirName, translate("Load Race Strategy..."), "Strategy (*.strategy)")
 				OnMessage(0x44, translateLoadCancelButtons, 0)
 
 				if (fileName != "") {
@@ -4584,7 +4584,7 @@ class RaceCenter extends ConfigurationItem {
 					this.Window.Opt("+OwnDialogs")
 
 					OnMessage(0x44, translateYesNoButtons)
-					fileName := FileSelect("S17", dirName . "\" . this.Strategy.Name . ".strategy", translate("Save Race Strategy..."), "Strategy (*.strategy)")
+					fileName := withBlockedWindows(FileSelect, "S17", dirName . "\" . this.Strategy.Name . ".strategy", translate("Save Race Strategy..."), "Strategy (*.strategy)")
 					OnMessage(0x44, translateYesNoButtons, 0)
 
 					if (fileName != "") {
@@ -4604,7 +4604,7 @@ class RaceCenter extends ConfigurationItem {
 				}
 				else {
 					OnMessage(0x44, translateOkButton)
-					MsgBox(translate("There is no current Strategy."), translate("Information"), 262192)
+					withBlockedWindows(MsgBox, translate("There is no current Strategy."), translate("Information"), 262192)
 					OnMessage(0x44, translateOkButton, 0)
 				}
 			case 7: ; Strategy Summary
@@ -4615,7 +4615,7 @@ class RaceCenter extends ConfigurationItem {
 				}
 				else {
 					OnMessage(0x44, translateOkButton)
-					MsgBox(translate("There is no current Strategy."), translate("Information"), 262192)
+					withBlockedWindows(MsgBox, translate("There is no current Strategy."), translate("Information"), 262192)
 					OnMessage(0x44, translateOkButton, 0)
 				}
 			case 9: ; Use Session Data
@@ -4646,7 +4646,7 @@ class RaceCenter extends ConfigurationItem {
 				if this.Strategy {
 					if (this.UseTraffic && !this.SessionActive) {
 						OnMessage(0x44, translateOkButton)
-						MsgBox(translate("A traffic-based strategy simulation is only possible in an active session."), translate("Information"), 262192)
+						withBlockedWindows(MsgBox, translate("A traffic-based strategy simulation is only possible in an active session."), translate("Information"), 262192)
 						OnMessage(0x44, translateOkButton, 0)
 
 						this.iUseTraffic := false
@@ -4658,7 +4658,7 @@ class RaceCenter extends ConfigurationItem {
 				}
 				else {
 					OnMessage(0x44, translateOkButton)
-					MsgBox(translate("There is no current Strategy."), translate("Information"), 262192)
+					withBlockedWindows(MsgBox, translate("There is no current Strategy."), translate("Information"), 262192)
 					OnMessage(0x44, translateOkButton, 0)
 				}
 			case 16, 19: ; Release Strategy
@@ -4667,20 +4667,20 @@ class RaceCenter extends ConfigurationItem {
 						this.updateStrategy(line == 19)
 					else {
 						OnMessage(0x44, translateOkButton)
-						MsgBox(translate("You are not connected to an active session."), translate("Information"), 262192)
+						withBlockedWindows(MsgBox, translate("You are not connected to an active session."), translate("Information"), 262192)
 						OnMessage(0x44, translateOkButton, 0)
 					}
 				}
 				else {
 					OnMessage(0x44, translateOkButton)
-					MsgBox(translate("There is no current Strategy."), translate("Information"), 262192)
+					withBlockedWindows(MsgBox, translate("There is no current Strategy."), translate("Information"), 262192)
 					OnMessage(0x44, translateOkButton, 0)
 				}
 			case 17: ; Discard Strategy
 				if this.Strategy {
 					if this.SessionActive {
 						OnMessage(0x44, translateYesNoButtons)
-						msgResult := MsgBox(translate("Do you really want to discard the active strategy? Strategist will be instructed immediately..."), translate("Strategy"), 262436)
+						msgResult := withBlockedWindows(MsgBox, translate("Do you really want to discard the active strategy? Strategist will be instructed immediately..."), translate("Strategy"), 262436)
 						OnMessage(0x44, translateYesNoButtons, 0)
 
 						if (msgResult = "Yes") {
@@ -4692,13 +4692,13 @@ class RaceCenter extends ConfigurationItem {
 					}
 					else {
 						OnMessage(0x44, translateOkButton)
-						MsgBox(translate("You are not connected to an active session."), translate("Information"), 262192)
+						withBlockedWindows(MsgBox, translate("You are not connected to an active session."), translate("Information"), 262192)
 						OnMessage(0x44, translateOkButton, 0)
 					}
 				}
 				else {
 					OnMessage(0x44, translateOkButton)
-					MsgBox(translate("There is no current Strategy."), translate("Information"), 262192)
+					withBlockedWindows(MsgBox, translate("There is no current Strategy."), translate("Information"), 262192)
 					OnMessage(0x44, translateOkButton, 0)
 				}
 		}
@@ -4721,7 +4721,7 @@ class RaceCenter extends ConfigurationItem {
 					this.releasePlan()
 				else {
 					OnMessage(0x44, translateOkButton)
-					MsgBox(translate("You are not connected to an active session."), translate("Information"), 262192)
+					withBlockedWindows(MsgBox, translate("You are not connected to an active session."), translate("Information"), 262192)
 					OnMessage(0x44, translateOkButton, 0)
 				}
 		}
@@ -4746,7 +4746,7 @@ class RaceCenter extends ConfigurationItem {
 			this.Window.Opt("+OwnDialogs")
 
 			OnMessage(0x44, translateLoadCancelButtons)
-			fileName := FileSelect(1, "", translate("Import Setups..."), "Setups (*.setups)")
+			fileName := withBlockedWindows(FileSelect, 1, "", translate("Import Setups..."), "Setups (*.setups)")
 			OnMessage(0x44, translateLoadCancelButtons, 0)
 
 			if (fileName != "")
@@ -4754,7 +4754,7 @@ class RaceCenter extends ConfigurationItem {
 					translator := translateMsgBoxButtons.Bind(["Insert", "Replace", "Cancel"])
 
 					OnMessage(0x44, translator)
-					msgResult := MsgBox(translate("Do you want to replace all current entries or do you want to add the imported entries to the list?"), translate("Import"), 262179)
+					msgResult := withBlockedWindows(MsgBox, translate("Do you want to replace all current entries or do you want to add the imported entries to the list?"), translate("Import"), 262179)
 					OnMessage(0x44, translator, 0)
 
 					if (msgResult = "Cancel")
@@ -4776,7 +4776,7 @@ class RaceCenter extends ConfigurationItem {
 			this.Window.Opt("+OwnDialogs")
 
 			OnMessage(0x44, translateSaveCancelButtons)
-			fileName := FileSelect("S17", "", translate("Export Setups..."), "Setups (*.setups)")
+			fileName := withBlockedWindows(FileSelect, "S17", "", translate("Export Setups..."), "Setups (*.setups)")
 			OnMessage(0x44, translateSaveCancelButtons, 0)
 
 			if (fileName != "") {
@@ -4887,7 +4887,7 @@ class RaceCenter extends ConfigurationItem {
 				logError(exception, true)
 
 				OnMessage(0x44, translateOkButton)
-				MsgBox((translate("Error while executing command.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
+				withBlockedWindows(MsgBox, (translate("Error while executing command.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
 				OnMessage(0x44, translateOkButton, 0)
 			}
 	}
@@ -8358,7 +8358,7 @@ class RaceCenter extends ConfigurationItem {
 				translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
 
 				OnMessage(0x44, translator)
-				folder := DirSelect("*" directory, 0, translate("Select target folder..."))
+				folder := withBlockedWindows(DirSelect, "*" directory, 0, translate("Select target folder..."))
 				OnMessage(0x44, translator, 0)
 
 				if (folder != "")
@@ -8794,7 +8794,7 @@ class RaceCenter extends ConfigurationItem {
 			translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
 
 			OnMessage(0x44, translator)
-			folder := DirSelect("*" . directory, 0, translate("Select Session folder..."))
+			folder := withBlockedWindows(DirSelect, "*" . directory, 0, translate("Select Session folder..."))
 			OnMessage(0x44, translator, 0)
 
 			if (folder != "") {
@@ -8804,7 +8804,7 @@ class RaceCenter extends ConfigurationItem {
 
 				if (info.Count == 0) {
 					OnMessage(0x44, translateOkButton)
-					MsgBox(translate("This is not a valid folder with a saved session."), translate("Error"), 262160)
+					withBlockedWindows(MsgBox, translate("This is not a valid folder with a saved session."), translate("Error"), 262160)
 					OnMessage(0x44, translateOkButton, 0)
 				}
 				else {
@@ -12543,7 +12543,7 @@ loginDialog(connectorOrCommand := false, teamServerURL := false, owner := false,
 					logError(exception, true)
 
 					OnMessage(0x44, translateOkButton)
-					MsgBox((translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
+					withBlockedWindows(MsgBox, (translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
 					OnMessage(0x44, translateOkButton, 0)
 
 					return false
@@ -12687,7 +12687,7 @@ startupRaceCenter() {
 		logError(exception, true)
 
 		OnMessage(0x44, translateOkButton)
-		MsgBox(substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Race Center"}), translate("Error"), 262160)
+		withBlockedWindows(MsgBox, substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Race Center"}), translate("Error"), 262160)
 		OnMessage(0x44, translateOkButton, 0)
 
 		ExitApp(1)

@@ -107,7 +107,7 @@ class ChatMessagesConfigurator extends ConfigurationItemList {
 
 		if ((Trim(this.Control["chatMessageLabelEdit"].Text) = "") || (Trim(this.Control["chatMessageMessageEdit"].Text) = "")) {
 			OnMessage(0x44, translateOkButton)
-			MsgBox(translate("Invalid values detected - please correct..."), translate("Error"), 262160)
+			withBlockedWindows(MsgBox, translate("Invalid values detected - please correct..."), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
 
 			return false
@@ -116,7 +116,7 @@ class ChatMessagesConfigurator extends ConfigurationItemList {
 			for ignore, item in this.ItemList
 				if (item[1] = this.Control["chatMessageNumberEdit"].Text) {
 					OnMessage(0x44, translateOkButton)
-					MsgBox(translate("A chat message for this button already exists - please use different values..."), translate("Error"), 262160)
+					withBlockedWindows(MsgBox, translate("A chat message for this button already exists - please use different values..."), translate("Error"), 262160)
 					OnMessage(0x44, translateOkButton, 0)
 
 					return false
@@ -130,7 +130,7 @@ class ChatMessagesConfigurator extends ConfigurationItemList {
 
 		if (chatMessage && (chatMessage[1] != this.ItemList[this.CurrentItem][1])) {
 			OnMessage(0x44, translateOkButton)
-			MsgBox(translate("The button number of an existing chat message may not be changed..."), translate("Error"), 262160)
+			withBlockedWindows(MsgBox, translate("The button number of an existing chat message may not be changed..."), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
 
 			return false

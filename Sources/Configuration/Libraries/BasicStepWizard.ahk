@@ -115,7 +115,7 @@ class BasicStepWizard extends StepWizard {
 			window.Opt("+OwnDialogs")
 
 			OnMessage(0x44, translateSelectCancelButtons)
-			fileName := FileSelect(1, "", substituteVariables(translate("Select %name% executable..."), {name: translate("Simulator")}), "Executable (*.exe)")
+			fileName := withBlockedWindows(FileSelect, 1, "", substituteVariables(translate("Select %name% executable..."), {name: translate("Simulator")}), "Executable (*.exe)")
 			OnMessage(0x44, translateSelectCancelButtons, 0)
 
 			if (fileName != "") {
@@ -153,7 +153,7 @@ class BasicStepWizard extends StepWizard {
 			wizard.Window.Show()
 
 			OnMessage(0x44, translateYesNoButtons)
-			msgResult := MsgBox((translate("Do you want to generate the new configuration?") . "`n`n" . translate("Backup files will be saved for your current configuration in the `"Simulator Controller\Config`" folder in your user `"Documents`" folder.")), translate("Setup "), 262436)
+			msgResult := withBlockedWindows(MsgBox, (translate("Do you want to generate the new configuration?") . "`n`n" . translate("Backup files will be saved for your current configuration in the `"Simulator Controller\Config`" folder in your user `"Documents`" folder.")), translate("Setup "), 262436)
 			OnMessage(0x44, translateYesNoButtons, 0)
 
 			if (msgResult = "Yes")
@@ -964,7 +964,7 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 			translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
 
 			OnMessage(0x44, translator)
-			file := FileSelect(1, this.Control["basicGoogleAPIKeyFileEdit"].Text, translate("Select Google Credentials File..."), "JSON (*.json)")
+			file := withBlockedWindows(FileSelect, 1, this.Control["basicGoogleAPIKeyFileEdit"].Text, translate("Select Google Credentials File..."), "JSON (*.json)")
 			OnMessage(0x44, translator, 0)
 
 			if (file != "") {

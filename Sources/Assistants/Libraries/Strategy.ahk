@@ -135,7 +135,7 @@ class StrategySimulation {
 			message := (isObject(exception) ? exception.Message : exception)
 
 			OnMessage(0x44, translateOkButton)
-			MsgBox(translate("Cannot load the custom validation rules.") . "`n`n" . message, translate("Error"), 262192)
+			withBlockedWindows(MsgBox, translate("Cannot load the custom validation rules.") . "`n`n" . message, translate("Error"), 262192)
 			OnMessage(0x44, translateOkButton, 0)
 		}
 	}
@@ -707,7 +707,7 @@ class StrategySimulation {
 			result += (this.scenarioCoefficient("TyreLapsMax", cTLaps - sTLaps, 10)
 					 + this.scenarioCoefficient("PitstopsPostLaps", sPLaps - cPLaps, 10))
 		; else
-		;	MsgBox("Inspect")
+		;	withBlockedWindows(MsgBox, "Inspect")
 
 		if (this.SessionType = "Duration") {
 			sLaps := scenario1.getSessionLaps()

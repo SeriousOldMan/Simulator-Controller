@@ -90,7 +90,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 			translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
 
 			OnMessage(0x44, translator)
-			directory := DirSelect("*" . window["dcConversationsPathEdit"].Text, 0, translate("Select Conversations Folder..."))
+			directory := withBlockedWindows(DirSelect, "*" . window["dcConversationsPathEdit"].Text, 0, translate("Select Conversations Folder..."))
 			OnMessage(0x44, translator, 0)
 
 			if (directory != "")

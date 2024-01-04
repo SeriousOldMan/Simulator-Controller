@@ -229,32 +229,32 @@ administrationEditor(configurationOrCommand, arguments*) {
 
 			administrationGui.Opt("+OwnDialogs")
 
-			result := InputBox(translate("Please enter your current password:"), title, "Password w200 h150")
+			result := withBlockedWindows(InputBox, translate("Please enter your current password:"), title, "Password w200 h150")
 
 			if (result.Result = "Ok") {
 				password := result.Value
 
 				if (teamServerPasswordEdit != password) {
 					OnMessage(0x44, translateOkButton)
-					MsgBox(translate("Invalid password."), translate("Error"), 262160)
+					withBlockedWindows(MsgBox, translate("Invalid password."), translate("Error"), 262160)
 					OnMessage(0x44, translateOkButton, 0)
 
 					return
 				}
 
-				result := InputBox(translate("Please enter your new password:"), title, "Password w200 h150")
+				result := withBlockedWindows(InputBox, translate("Please enter your new password:"), title, "Password w200 h150")
 
 				if (result.Result = "Ok") {
 					firstPassword := result.Value
 
-					InputBox(translate("Please re-enter your new password:"), title, "Password w200 h150")
+					withBlockedWindows(InputBox, translate("Please re-enter your new password:"), title, "Password w200 h150")
 
 					if (result.Result = "Ok") {
 						secondPassword := result.Value
 
 						if (firstPassword != secondPassword) {
 							OnMessage(0x44, translateOkButton)
-							MsgBox(translate("The passwords do not match."), translate("Error"), 262160)
+							withBlockedWindows(MsgBox, translate("The passwords do not match."), translate("Error"), 262160)
 							OnMessage(0x44, translateOkButton, 0)
 
 							return
@@ -267,7 +267,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 		}
 		else {
 			OnMessage(0x44, translateOkButton)
-			MsgBox(translate("You must be connected to the Server to change your password."), translate("Error"), 262160)
+			withBlockedWindows(MsgBox, translate("You must be connected to the Server to change your password."), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
 		}
 	}
@@ -288,7 +288,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 		local msgResult
 
 		OnMessage(0x44, translateYesNoButtons)
-		msgResult := MsgBox(translate("Do you really want to delete the selected account?"), translate("Delete"), 262436)
+		msgResult := withBlockedWindows(MsgBox, translate("Do you really want to delete the selected account?"), translate("Delete"), 262436)
 		OnMessage(0x44, translateYesNoButtons, 0)
 
 		if (msgResult = "Yes")
@@ -350,7 +350,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 			administrationEditor(kEvent, "AccountClear")
 
 			OnMessage(0x44, translateOkButton)
-			MsgBox((translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
+			withBlockedWindows(MsgBox, (translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
 		}
 	}
@@ -514,13 +514,13 @@ administrationEditor(configurationOrCommand, arguments*) {
 			else if (arguments[1] = "UpdateAvailableMinutes") {
 				if (account == true) {
 					OnMessage(0x44, translateOkButton)
-					MsgBox(translate("You must save the account before you can change the number of available minutes."), translate("Error"), 262160)
+					withBlockedWindows(MsgBox, translate("You must save the account before you can change the number of available minutes."), translate("Error"), 262160)
 					OnMessage(0x44, translateOkButton, 0)
 				}
 				else {
 					administrationGui.Opt("+OwnDialogs")
 
-					result := InputBox(translate("Please enter the amount of available minutes:"), translate("Team Server"), "w200 h150", account["AvailableMinutes"])
+					result := withBlockedWindows(InputBox, translate("Please enter the amount of available minutes:"), translate("Team Server"), "w200 h150", account["AvailableMinutes"])
 
 					if (result.Result = "Ok") {
 						connector.SetAccountMinutes(account.Identifier, result.Value)
@@ -631,7 +631,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 				loadObjects(connector, objectsListView)
 			else if (arguments[1] = "CompactDatabase") {
 				OnMessage(0x44, translateYesNoButtons)
-				msgResult := MsgBox(translate("Do you really want to compact the database? This can take quite a while and cannot be interrupted..."), translate("Compact"), 262436)
+				msgResult := withBlockedWindows(MsgBox, translate("Do you really want to compact the database? This can take quite a while and cannot be interrupted..."), translate("Compact"), 262436)
 				OnMessage(0x44, translateYesNoButtons, 0)
 
 				if (msgResult = "Yes")
@@ -674,7 +674,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 		}
 		catch Any as exception {
 			OnMessage(0x44, translateOkButton)
-			MsgBox((translate("Error while executing command.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
+			withBlockedWindows(MsgBox, (translate("Error while executing command.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
 		}
 	}
@@ -874,7 +874,7 @@ startupServerAdministration() {
 		logError(exception, true)
 
 		OnMessage(0x44, translateOkButton)
-		MsgBox(substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Server Administration"}), translate("Error"), 262160)
+		withBlockedWindows(MsgBox, substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Server Administration"}), translate("Error"), 262160)
 		OnMessage(0x44, translateOkButton, 0)
 
 		ExitApp(1)

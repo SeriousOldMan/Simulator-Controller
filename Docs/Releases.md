@@ -1,3 +1,9 @@
+## 5.5.3.0-release 01/12/24 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. Fixed selection of driver and session on the *Team Server* tab in "Simulator Configuration".
+  4. The default for save mode in "Simulator Configuration" is now "Auto".
+
 ## 5.5.2.0-release 01/05/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

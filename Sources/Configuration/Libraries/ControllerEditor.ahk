@@ -125,7 +125,7 @@ class ControllerEditor extends ConfiguratorPanel {
 			if (isSet(ConfigurationEditor) && ConfigurationEditor.hasProp("Instance"))
 				return ConfigurationEditor.Instance.AutoSave
 			else
-				return false
+				return true
 		}
 	}
 
@@ -1943,6 +1943,8 @@ class DisplayRulesList extends ConfigurationItemList {
 		Get {
 			if ControllerEditor.HasProp("Instance")
 				return ControllerEditor.Instance.AutoSave
+			else
+				return true
 		}
 	}
 

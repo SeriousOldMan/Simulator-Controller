@@ -45,10 +45,10 @@ class ConfigurationItemList extends ConfiguratorPanel {
 				if (isSet(ConfigurationEditor) && ConfigurationEditor.hasOwnProp("Instance"))
 					return ConfigurationEditor.Instance.AutoSave
 				else
-					return false
+					return true
 			}
 			catch Any as exception {
-				return false
+				return true
 			}
 		}
 	}

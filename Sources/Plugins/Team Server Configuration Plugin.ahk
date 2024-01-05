@@ -451,6 +451,7 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 
 		widget29:= window.Add("ListBox", "x" . x1 . " yp w" . w3 . " h96 AltSubmit H:Grow(0.3) W:Grow(0.5) vdriverListBox Hidden")
 		widget29.OnEvent("DoubleClick", selectDriver)
+		widget29.OnEvent("Change", selectDriver)
 
 		widget30 := window.Add("Button", "x" . x5 . " yp w23 h23 Center +0x200 X:Move(0.5) vaddDriverButton Hidden")
 		widget30.OnEvent("Click", newDriver)
@@ -466,6 +467,7 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 
 		widget34 := window.Add("ListBox", "x" . x1 . " yp w" . w3 . " h72 AltSubmit Y:Move(0.3) H:Grow(0.7) W:Grow(0.5) vsessionListBox Hidden")
 		widget34.OnEvent("DoubleClick", selectSession)
+		widget34.OnEvent("Change", selectSession)
 
 		widget35 := window.Add("Button", "x" . x5 . " yp w23 h23 Center +0x200 X:Move(0.5) Y:Move(0.3) vaddSessionButton Hidden")
 		widget35.OnEvent("Click", newSession)

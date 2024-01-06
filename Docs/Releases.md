@@ -1,3 +1,6 @@
+## 5.5.2.1-release 01/06/24
+  1. Fixed several bugs for function setting application in the new startup profiles.
+
 ## 5.5.2.0-release 01/05/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

@@ -515,22 +515,27 @@ launchPad(command := false, arguments*) {
 
 		static prevHwnd := 0
 
-		if (WinActive(launchPadGui) && (hwnd != prevHwnd)) {
-			text := "", ToolTip()
+		try {
+			if (WinActive(launchPadGui) && (hwnd != prevHwnd)) {
+				text := "", ToolTip()
 
-			curControl := GuiCtrlFromHwnd(hwnd)
+				curControl := GuiCtrlFromHwnd(hwnd)
 
-			if curControl {
-				text := launchPad("ToolTip", curControl)
+				if curControl {
+					text := launchPad("ToolTip", curControl)
 
-				if !text
-					return
+					if !text
+						return
 
-				SetTimer () => ToolTip(text), -1000
-				SetTimer () => ToolTip(), -8000
+					SetTimer () => ToolTip(text), -1000
+					SetTimer () => ToolTip(), -8000
+				}
+
+				prevHwnd := hwnd
 			}
-
-			prevHwnd := hwnd
+		}
+		catch Any as exception {
+			logError(exception)
 		}
 	}
 

@@ -192,24 +192,33 @@ downloadSimulatorController() {
 
 			currentDirectory := A_WorkingDir
 
-			try {
-				SetWorkingDir(directory "\Binaries")
+			if DirExist(directory . "\Binaries") {
+				try {
+					SetWorkingDir(directory . "\Binaries")
 
-				RunWait("Powershell -Command Get-ChildItem -Path '.' | Unblock-File", , "Hide")
+					RunWait("Powershell -Command Get-ChildItem -Path '.' | Unblock-File", , "Hide")
+				}
+				catch Any as exception {
+					logError(exception, true)
+
+					OnMessage(0x44, translateOkButton)
+					withBlockedWindows(MsgBox, translate("An error occured while starting the automatic instalation due to Windows security restrictions. You can try a manual installation."), translate("Error"), 262160)
+					OnMessage(0x44, translateOkButton, 0)
+
+					Run("https://github.com/SeriousOldMan/Simulator-Controller#latest-release-builds")
+
+					ExitApp(0)
+				}
+				finally {
+					SetWorkingDir(currentDirectory)
+				}
 			}
-			catch Any as exception {
-				logError(exception, true)
-
+			else {
 				OnMessage(0x44, translateOkButton)
-				withBlockedWindows(MsgBox, translate("An error occured while starting the automatic instalation due to Windows security restrictions. You can try a manual installation."), translate("Error"), 262160)
+				withBlockedWindows(MsgBox, translate("The version repository is currently unavailable. Please try again later."), translate("Error"), 262160)
 				OnMessage(0x44, translateOkButton, 0)
 
-				Run("https://github.com/SeriousOldMan/Simulator-Controller#latest-release-builds")
-
 				ExitApp(0)
-			}
-			finally {
-				SetWorkingDir(currentDirectory)
 			}
 
 			updateTask.stop()

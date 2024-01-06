@@ -1616,7 +1616,7 @@ launchProfilesEditor(launchPadOrCommand, arguments*) {
 				}
 				catch Any as exception {
 					OnMessage(0x44, translateOkButton)
-					showAlert((translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
+					withBlockedWindows(MsgBox, (translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
 					OnMessage(0x44, translateOkButton, 0)
 				}
 			}
@@ -2083,7 +2083,7 @@ loginDialog(connectorOrCommand := false, teamServerURL := false, owner := false,
 				}
 				catch Any as exception {
 					OnMessage(0x44, translateOkButton)
-					showAlert((translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
+					withBlockedWindows(MsgBox, (translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
 					OnMessage(0x44, translateOkButton, 0)
 
 					return false

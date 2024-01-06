@@ -61,14 +61,14 @@ class DrivingCoachPlugin extends RaceAssistantPlugin  {
 		local analyzePerformance, analyzeHandling, ignore, session, instruction
 
 		if this.StartupSettings {
-			analyzePerformance := getMultiMapValue(this.StartupSettings, "Driving Coach", "Performance Analysis", kUndefined)
+			analyzePerformance := getMultiMapValue(this.StartupSettings, "Functions", "Performance Analysis", kUndefined)
 
 			if (analyzePerformance != kUndefined)
 				for ignore, instruction in ["Session", "Stint"]
 					for ignore, session in ["Practice", "Qualification", "Race"]
 						setMultiMapValue(settings, "Assistant.Coach", "Data." . session . "." . instruction, analyzePerformance)
 
-			analyzeHandling := getMultiMapValue(this.StartupSettings, "Driving Coach", "Handling Analysis", kUndefined)
+			analyzeHandling := getMultiMapValue(this.StartupSettings, "Functions", "Handling Analysis", kUndefined)
 
 			if (analyzeHandling != kUndefined)
 				for ignore, session in ["Practice", "Qualification", "Race"]

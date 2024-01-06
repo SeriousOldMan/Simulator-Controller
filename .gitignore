@@ -16,3 +16,5 @@ Sources/Special/**/**/bin/
 profile.arm.json
 TeamServer.db
 Sources/*/*.exe
+Binaries
+Releases

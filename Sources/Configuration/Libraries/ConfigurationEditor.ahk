@@ -219,7 +219,7 @@ class ConfiguratorPanel extends ConfigurationItem {
 
 	AutoSave {
 		Get {
-			return false
+			return true
 		}
 	}
 
@@ -246,7 +246,7 @@ class ConfigurationEditor extends ConfigurationItem {
 	iConfigurators := []
 
 	iDevelopment := false
-	iSaveMode := false
+	iSaveMode := true
 
 	Window {
 		Get {
@@ -415,7 +415,7 @@ class ConfigurationEditor extends ConfigurationItem {
 	loadFromConfiguration(configuration) {
 		super.loadFromConfiguration(configuration)
 
-		this.iSaveMode := getMultiMapValue(configuration, "General", "Save", "Manual")
+		this.iSaveMode := getMultiMapValue(configuration, "General", "Save", "Auto")
 	}
 
 	saveToConfiguration(configuration) {

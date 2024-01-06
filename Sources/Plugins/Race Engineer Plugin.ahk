@@ -238,31 +238,31 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 		}
 
 		if this.StartupSettings {
-			collectPressure := getMultiMapValue(this.StartupSettings, "Race Engineer", "Pressure Collection", kUndefined)
+			collectPressure := getMultiMapValue(this.StartupSettings, "Functions", "Pressure Collection", kUndefined)
 
 			if (collectPressure != kUndefined)
 				for ignore, session in ["Practice", "Qualification", "Race"]
 					setMultiMapValue(settings, "Session Settings", "Telemetry." . session, collectPressure)
 
-			pitstopService := getMultiMapValue(this.StartupSettings, "Race Engineer", "Pitstop Service", kUndefined)
+			pitstopService := getMultiMapValue(this.StartupSettings, "Functions", "Pitstop Service", kUndefined)
 
 			if (pitstopService != kUndefined)
 				for ignore, session in ["Practice", "Qualification", "Race"]
 					setMultiMapValue(settings, "Session Settings", "Pitstop." . session, pitstopService)
 
-			fuelWarning := getMultiMapValue(this.StartupSettings, "Race Engineer", "Fuel Warning", kUndefined)
+			fuelWarning := getMultiMapValue(this.StartupSettings, "Functions", "Fuel Warning", kUndefined)
 
 			if (fuelWarning != kUndefined)
 				for ignore, session in ["Practice", "Qualification", "Race"]
 					setMultiMapValue(settings, "Assistant.Engineer", "Announcement." . session . ".LowFuel", fuelWarning)
 
-			damageWarning := getMultiMapValue(this.StartupSettings, "Race Engineer", "Damage Warning", kUndefined)
+			damageWarning := getMultiMapValue(this.StartupSettings, "Functions", "Damage Warning", kUndefined)
 
 			if (damageWarning != kUndefined)
 				for ignore, session in ["Practice", "Qualification", "Race"]
 					setMultiMapValue(settings, "Assistant.Engineer", "Announcement." . session . ".Damage", damageWarning)
 
-			pressureWarning := getMultiMapValue(this.StartupSettings, "Race Engineer", "Pressure Warning", kUndefined)
+			pressureWarning := getMultiMapValue(this.StartupSettings, "Functions", "Pressure Warning", kUndefined)
 
 			if (pressureWarning != kUndefined)
 				for ignore, session in ["Practice", "Qualification", "Race"]

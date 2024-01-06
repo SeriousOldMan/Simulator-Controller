@@ -318,13 +318,13 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		local collectTelemetry, trafficAnalysis, ignore, session
 
 		if this.StartupSettings {
-			collectTelemetry := getMultiMapValue(this.StartupSettings, "Race Strategist", "Telemetry Collection", kUndefined)
+			collectTelemetry := getMultiMapValue(this.StartupSettings, "Functions", "Telemetry Collection", kUndefined)
 
 			if (collectTelemetry != kUndefined)
 				for ignore, session in ["Practice", "Qualification", "Race"]
 					setMultiMapValue(settings, "Session Settings", "Telemetry." . session, collectTelemetry)
 
-			trafficAnalysis := getMultiMapValue(this.StartupSettings, "Race Strategist", "Traffic Analysis", kUndefined)
+			trafficAnalysis := getMultiMapValue(this.StartupSettings, "Functions", "Traffic Analysis", kUndefined)
 
 			if (trafficAnalysis != kUndefined)
 				setMultiMapValue(settings, "Strategy Settings", "Traffic.Simulation", trafficAnalysis)

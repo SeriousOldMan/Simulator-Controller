@@ -1357,27 +1357,34 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	readSettings(simulator, car, track, &settings) {
-		return combine(super.readSettings(simulator, car, track, &settings)
-					 , CaseInsenseMap("Session.Settings.Standings.Extrapolation.Laps", getMultiMapValue(settings, "Strategy Settings"
-																												, "Extrapolation.Laps", 2)
-									, "Session.Settings.Standings.Extrapolation.Overtake.Delta", Round(getMultiMapValue(settings
-																													  , "Strategy Settings"
-																													  , "Overtake.Delta", 1) * 1000)
-									, "Session.Settings.Strategy.Traffic.Considered", (getMultiMapValue(settings, "Strategy Settings"
-																												, "Traffic.Considered", 5) / 100)
-									, "Session.Settings.Pitstop.Delta", getMultiMapValue(settings, "Strategy Settings", "Pitstop.Delta"
-																								 , getMultiMapValue(settings, "Session Settings"
+		local facts
+
+		facts := combine(super.readSettings(simulator, car, track, &settings)
+					   , CaseInsenseMap("Session.Settings.Standings.Extrapolation.Laps", getMultiMapValue(settings, "Strategy Settings"
+																												  , "Extrapolation.Laps", 2)
+									  , "Session.Settings.Standings.Extrapolation.Overtake.Delta", Round(getMultiMapValue(settings
+																													    , "Strategy Settings"
+																													    , "Overtake.Delta", 1) * 1000)
+									  , "Session.Settings.Strategy.Traffic.Considered", (getMultiMapValue(settings, "Strategy Settings"
+																												  , "Traffic.Considered", 5) / 100)
+									  , "Session.Settings.Pitstop.Delta", getMultiMapValue(settings, "Strategy Settings", "Pitstop.Delta"
+																								   , getMultiMapValue(settings, "Session Settings"
 																															, "Pitstop.Delta", 30))
-									, "Session.Settings.Pitstop.Service.Refuel.Rule", getMultiMapValue(settings, "Strategy Settings"
-																											   , "Service.Refuel.Rule", "Dynamic")
-									, "Session.Settings.Pitstop.Service.Refuel.Duration", getMultiMapValue(settings, "Strategy Settings"
-																												   , "Service.Refuel", 1.8)
-									, "Session.Settings.Pitstop.Service.Tyres.Duration", getMultiMapValue(settings, "Strategy Settings"
-																											      , "Service.Tyres", 30)
-									, "Session.Settings.Pitstop.Service.Order", getMultiMapValue(settings, "Strategy Settings"
-																										 , "Service.Order", "Simultaneous")
-									, "Session.Settings.Pitstop.Strategy.Window.Considered", getMultiMapValue(settings, "Strategy Settings"
+									  , "Session.Settings.Pitstop.Service.Refuel.Rule", getMultiMapValue(settings, "Strategy Settings"
+																											     , "Service.Refuel.Rule", "Dynamic")
+									  , "Session.Settings.Pitstop.Service.Refuel.Duration", getMultiMapValue(settings, "Strategy Settings"
+																												     , "Service.Refuel", 1.8)
+									  , "Session.Settings.Pitstop.Service.Tyres.Duration", getMultiMapValue(settings, "Strategy Settings"
+																											        , "Service.Tyres", 30)
+									  , "Session.Settings.Pitstop.Service.Order", getMultiMapValue(settings, "Strategy Settings"
+																										   , "Service.Order", "Simultaneous")
+									  , "Session.Settings.Pitstop.Strategy.Window.Considered", getMultiMapValue(settings, "Strategy Settings"
 																													  , "Strategy.Window.Considered", 3)))
+
+		this.updateConfigurationValues({UseTalking: getMultiMapValue(settings, "Assistant.Strategist", "Voice.UseTalking", true)
+									  , UseTraffic: getMultiMapValue(settings, "Strategy Settings", "Traffic.Simulation", false)})
+
+		return facts
 	}
 
 	prepareSession(&settings, &data, formationLap?) {
@@ -1462,6 +1469,13 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 
 		return facts
+	}
+
+	updateSettings(settings, edit := false) {
+		super.updateSettings(settings)
+
+		if (settings && edit)
+			this.updateConfigurationValues({UseTraffic: getMultiMapValue(settings, "Strategy Settings", "Traffic.Simulation", false)})
 	}
 
 	startSession(settings, data) {

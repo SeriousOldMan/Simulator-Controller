@@ -103,7 +103,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		}
 
 		updateSettings(arguments*) {
-			this.callRemote("updateSettings", arguments*)
+			this.callRemote("callUpdateSettings", arguments*)
 		}
 
 		prepareSession(arguments*) {

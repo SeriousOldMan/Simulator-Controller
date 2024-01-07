@@ -1098,6 +1098,8 @@ class RaceAssistant extends ConfigurationItem {
 
 		facts := this.createFacts(settings, data)
 
+		this.updateSessionValues({Autonomy: getMultiMapValue(settings, "Assistant", "Assistant.Autonomy", "Custom")})
+
 		this.initializeSessionFormat(facts, settings, data, lapTime)
 
 		return facts
@@ -1146,14 +1148,8 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	readSettings(simulator, car, track, &settings) {
-		local autonomy
-
 		if !isObject(settings)
 			settings := readMultiMap(settings)
-
-		autonomy := getMultiMapValue(settings, "Assistant", "Assistant.Autonomy", "Custom")
-
-		this.updateSessionValues({Autonomy: autonomy})
 
 		return CaseInsenseMap("Session.Simulator", simulator
 							, "Session.Car", car
@@ -1166,7 +1162,11 @@ class RaceAssistant extends ConfigurationItem {
 							, "Session.Settings.Fuel.SafetyMargin", getDeprecatedValue(settings, "Session Settings", "Race Settings", "Fuel.SafetyMargin", 5))
 	}
 
-	updateSettings(settings) {
+	callUpdateSettings(fileName) {
+		this.updateSettings(readMultiMap(fileName), true)
+	}
+
+	updateSettings(settings, edit := false) {
 		local knowledgeBase := this.KnowledgeBase
 		local facts, key, value
 
@@ -1174,6 +1174,11 @@ class RaceAssistant extends ConfigurationItem {
 			for key, value in this.readSettings(knowledgeBase.getValue("Session.Simulator"), knowledgeBase.getValue("Session.Car")
 											  , knowledgeBase.getValue("Session.Track"), &settings)
 				knowledgeBase.setFact(key, value)
+
+		if edit
+			this.updateSessionValues({Autonomy: getMultiMapValue(settings, "Assistant", "Assistant.Autonomy", "Custom")})
+
+		this.updateSessionValues({Settings: settings})
 	}
 
 	confirmAction(action) {
@@ -1204,6 +1209,7 @@ class RaceAssistant extends ConfigurationItem {
 									, "Session.Settings.Lap.History.Considered", getMultiMapValue(configuration, this.AssistantType . " Analysis", simulatorName . ".ConsideredHistoryLaps", 5)
 									, "Session.Settings.Lap.History.Damping", getMultiMapValue(configuration, this.AssistantType . " Analysis", simulatorName . ".HistoryLapsDamping", 0.2)))
 	}
+
 
 	callStartSession(settings, data) {
 		if (settings && !isObject(settings))
@@ -1270,8 +1276,6 @@ class RaceAssistant extends ConfigurationItem {
 			settings := newMultiMap()
 
 		this.updateSettings(settings)
-
-		this.updateConfigurationValues({Settings: settings})
 	}
 
 	prepareData(lapNumber, data) {

@@ -187,55 +187,62 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 		return RaceEngineerPlugin.RemoteRaceEngineer(this, pid)
 	}
 
-	prepareSettings(data) {
-		local settings := super.prepareSettings(data)
-		local tyresDB := TyresDatabase()
-		local simulator := getMultiMapValue(data, "Session Data", "Simulator")
-		local car := getMultiMapValue(data, "Session Data", "Car")
-		local track := getMultiMapValue(data, "Session Data", "Track")
-		local simulatorName := tyresDB.getSimulatorName(simulator)
-		local duration := Round((getMultiMapValue(data, "Stint Data", "LapLastTime") - getMultiMapValue(data, "Session Data", "SessionTimeRemaining")) / 1000)
-		local weather := getMultiMapValue(data, "Weather Data", "Weather", "Dry")
-		local compound := getMultiMapValue(data, "Car Data", "TyreCompound", "Dry")
-		local compoundColor := getMultiMapValue(data, "Car Data", "TyreCompoundColor", "Black")
-		local tpSetting := getMultiMapValue(this.Configuration, "Race Engineer Startup", simulatorName . ".LoadTyrePressures", "Default")
-		local airTemperature, trackTemperature, pressures, certainty, collectPressure, pitstopService, ignore, session
+	loadSettings(simulator, car, track, data := false, fileName := false) {
+		local settings := super.loadSettings(simulator, car, track, data, fileName)
+		local tyresDB, simulatorName, compound, compoundColor
+		local tpSettings, pressures, certainty, collectPressure, pitstopService, ignore, session
 		local fuelWarning, damageWarning, pressureWarning
 
-		if ((tpSetting = "TyresDatabase") || (tpSetting = "SetupDatabase")) {
-			trackTemperature := getMultiMapValue(data, "Track Data", "Temperature", 23)
-			airTemperature := getMultiMapValue(data, "Weather Data", "Temperature", 27)
+		if data {
+			local weather := getMultiMapValue(data, "Weather Data", "Weather", "Dry")
+			local airTemperature := getMultiMapValue(data, "Weather Data", "Temperature", 27)
+			local trackTemperature := getMultiMapValue(data, "Track Data", "Temperature", 23)
 
-			compound := false
-			compoundColor := false
-			pressures := []
-			certainty := 1.0
+			tyresDB := TyresDatabase()
 
-			if tyresDB.getTyreSetup(simulatorName, car, track, weather, airTemperature, trackTemperature, &compound, &compoundColor, &pressures, &certainty, true) {
-				setMultiMapValue(settings, "Session Setup", "Tyre.Compound", compound)
-				setMultiMapValue(settings, "Session Setup", "Tyre.Compound.Color", compoundColor)
+			simulatorName := tyresDB.getSimulatorName(simulator)
 
-				setMultiMapValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.FL", Round(pressures[1], 1))
-				setMultiMapValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.FR", Round(pressures[2], 1))
-				setMultiMapValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.RL", Round(pressures[3], 1))
-				setMultiMapValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.RR", Round(pressures[4], 1))
+			tpSetting := getMultiMapValue(this.Configuration, "Race Engineer Startup", simulatorName . ".LoadTyrePressures", "Default")
+
+			if ((tpSetting = "TyresDatabase") || (tpSetting = "SetupDatabase")) {
+				compound := false
+				compoundColor := false
+
+				pressures := []
+				certainty := 1.0
+
+				if tyresDB.getTyreSetup(simulatorName, car, track
+									  , getMultiMapValue(data, "Weather Data", "Weather", "Dry")
+									  , getMultiMapValue(data, "Weather Data", "Temperature", 23)
+									  , getMultiMapValue(data, "Track Data", "Temperature", 27)
+									  , &compound, &compoundColor, &pressures, &certainty, true) {
+					setMultiMapValue(settings, "Session Setup", "Tyre.Compound", compound)
+					setMultiMapValue(settings, "Session Setup", "Tyre.Compound.Color", compoundColor)
+
+					setMultiMapValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.FL", Round(pressures[1], 1))
+					setMultiMapValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.FR", Round(pressures[2], 1))
+					setMultiMapValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.RL", Round(pressures[3], 1))
+					setMultiMapValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.RR", Round(pressures[4], 1))
+				}
 			}
-		}
-		else if (tpSetting = "Import") {
-			writeMultiMap(kTempDirectory . "Race Engineer.settings", settings)
+			else if (tpSetting = "Import") {
+				writeMultiMap(kTempDirectory . "Race Engineer.settings", settings)
 
-			openRaceSettings(true, true, false, kTempDirectory . "Race Engineer.settings")
+				openRaceSettings(true, true, false, kTempDirectory . "Race Engineer.settings")
 
-			settings := readMultiMap(kTempDirectory . "Race Engineer.settings")
-		}
-		else if (tpSetting = "Setup") {
-			pressures := string2Values(",", getMultiMapValue(data, "Car Data", "TyrePressure", ""))
+				settings := readMultiMap(kTempDirectory . "Race Engineer.settings")
+			}
+			else if (data && (tpSetting = "Setup")) {
+				compound := getMultiMapValue(data, "Car Data", "TyreCompound", "Dry")
+				compoundColor := getMultiMapValue(data, "Car Data", "TyreCompoundColor", "Black")
+				pressures := string2Values(",", getMultiMapValue(data, "Car Data", "TyrePressure", ""))
 
-			if (pressures.Length >= 4) {
-				setMultiMapValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.FL", Round(pressures[1], 1))
-				setMultiMapValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.FR", Round(pressures[2], 1))
-				setMultiMapValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.RL", Round(pressures[3], 1))
-				setMultiMapValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.RR", Round(pressures[4], 1))
+				if (pressures.Length >= 4) {
+					setMultiMapValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.FL", Round(pressures[1], 1))
+					setMultiMapValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.FR", Round(pressures[2], 1))
+					setMultiMapValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.RL", Round(pressures[3], 1))
+					setMultiMapValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.RR", Round(pressures[4], 1))
+				}
 			}
 		}
 
@@ -270,9 +277,6 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 				for ignore, session in ["Practice", "Qualification", "Race"]
 					setMultiMapValue(settings, "Assistant.Engineer", "Announcement." . session . ".Pressure", pressureWarning)
 		}
-
-		if isDebug()
-			writeMultiMap(kTempDirectory . this.Plugin . ".settings", settings)
 
 		return settings
 	}

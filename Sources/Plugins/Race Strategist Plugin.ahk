@@ -313,8 +313,8 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 			this.RaceStrategist.cancelStrategy()
 	}
 
-	prepareSettings(data) {
-		local settings := super.prepareSettings(data)
+	loadSettings(simulator, car, track, data := false, fileName := false) {
+		local settings := super.loadSettings(simulator, car, track, data, fileName)
 		local collectTelemetry, trafficAnalysis, ignore, session
 
 		if this.StartupSettings {
@@ -329,9 +329,6 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 			if (trafficAnalysis != kUndefined)
 				setMultiMapValue(settings, "Strategy Settings", "Traffic.Simulation", trafficAnalysis)
 		}
-
-		if isDebug()
-			writeMultiMap(kTempDirectory . this.Plugin . ".settings", settings)
 
 		return settings
 	}

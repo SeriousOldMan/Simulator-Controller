@@ -437,7 +437,6 @@ Beside using the standard Hotkey syntax of AutoHotkey, you can use a special *Ho
 
 Note: The handling of voice hotkeys follow the general rules of voice commands. Therefore you might need to use *Push To Talk* and also activation commands, if you have more than one voice dialog partner configured, for example the Virtual Race Assistants. Please see the documentation on [Voice Commands](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#voice-commands) for more information.
 
-
 #### Actions
 
 An action is simply a textual representation of a call to a function in the scripting language. It simply looks like this: "setMode(Pedal Vibration)", which means, that the "Pedal Vibration" mode should be selected as the active layer for your hardware controller. You can provide zero or more arguments to the function call. All arguments will be passed as strings to the function with the exception of *true* and *false*, which will be passed as literal values (1 and 0).

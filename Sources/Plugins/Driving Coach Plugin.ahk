@@ -56,8 +56,8 @@ class DrivingCoachPlugin extends RaceAssistantPlugin  {
 		return DrivingCoachPlugin.RemoteDrivingCoach(this, pid)
 	}
 
-	prepareSettings(data) {
-		local settings := super.prepareSettings(data)
+	loadSettings(simulator, car, track, data := false, fileName := false) {
+		local settings := super.loadSettings(simulator, car, track, data, fileName)
 		local analyzePerformance, analyzeHandling, ignore, session, instruction
 
 		if this.StartupSettings {
@@ -75,9 +75,6 @@ class DrivingCoachPlugin extends RaceAssistantPlugin  {
 					for ignore, instruction in ["Session", "Handling"]
 						setMultiMapValue(settings, "Assistant.Coach", "Data." . session . "." . instruction, analyzeHandling)
 		}
-
-		if isDebug()
-			writeMultiMap(kTempDirectory . this.Plugin . ".settings", settings)
 
 		return settings
 	}

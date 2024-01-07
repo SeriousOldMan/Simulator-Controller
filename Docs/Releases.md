@@ -2,7 +2,9 @@
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed selection of driver and session on the *Team Server* tab in "Simulator Configuration".
-  4. The default for save mode in "Simulator Configuration" is now "Auto".
+  4. Fixed a misleading error message that indicates a security problem, although the download file simply was not available.
+  5. Fixed a critical bug for initial tyre setup import in non-dry weather conditions.
+  6. The default for *Save* mode in "Simulator Configuration" is now "Auto".
 
 ## 5.5.2.0-release 01/05/24
   1. Minor bugfixes, as always

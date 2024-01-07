@@ -468,8 +468,8 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 					setMultiMapValue(settings, "Session Setup", "Tyre.Set", setupTyreSet)
 			}
 
-			tyreCompound := getMultiMapValue(data, "Setup Data", "TyreCompound", setupTyreCompound)
-			tyreCompoundColor := getMultiMapValue(data, "Setup Data", "TyreCompoundColor", setupTyreCompoundColor)
+			tyreCompound := getMultiMapValue(data, "Setup Data", "TyreCompound", getMultiMapValue(data, "Car Data", "TyreCompound", setupTyreCompound))
+			tyreCompoundColor := getMultiMapValue(data, "Setup Data", "TyreCompoundColor", getMultiMapValue(data, "Car Data", "TyreCompoundColor", setupTyreCompoundColor))
 
 			if (tyreCompound = "Dry") {
 				dryFrontLeft := displayValue("Float", convertUnit("Pressure", getMultiMapValue(data, "Setup Data", "TyrePressureFL", dryFrontLeft)))

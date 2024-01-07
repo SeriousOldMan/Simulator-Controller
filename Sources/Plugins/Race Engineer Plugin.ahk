@@ -231,10 +231,12 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 		else if (tpSetting = "Setup") {
 			pressures := string2Values(",", getMultiMapValue(data, "Car Data", "TyrePressure", ""))
 
-			setMultiMapValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.FL", Round(pressures[1], 1))
-			setMultiMapValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.FR", Round(pressures[2], 1))
-			setMultiMapValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.RL", Round(pressures[3], 1))
-			setMultiMapValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.RR", Round(pressures[4], 1))
+			if (pressures.Length >= 4) {
+				setMultiMapValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.FL", Round(pressures[1], 1))
+				setMultiMapValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.FR", Round(pressures[2], 1))
+				setMultiMapValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.RL", Round(pressures[3], 1))
+				setMultiMapValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.RR", Round(pressures[4], 1))
+			}
 		}
 
 		if this.StartupSettings {

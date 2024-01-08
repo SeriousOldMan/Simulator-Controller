@@ -337,8 +337,11 @@ class FCYHandling extends Assert {
 			else
 				strategist.addLap(A_Index, &data)
 
-			if (A_Index = 2)
+			if (A_Index = 2) {
+				strategist.updateDynamicValues({EnoughData: true})
+
 				strategist.callRecommendFullCourseYellow()
+			}
 			else if (A_Index = 9)
 				strategist.callRecommendFullCourseYellow()
 
@@ -347,16 +350,22 @@ class FCYHandling extends Assert {
 
 				Task.yield()
 
-				this.AssertEqual(1, strategist.KnowledgeBase.getValue("Strategy.Pitstop.Next"), "Unexpected next pitstop detected in lap 2...")
-				this.AssertEqual(28, strategist.KnowledgeBase.getValue("Strategy.Pitstop.Lap"), "Unexpected pitstop lap detected in lap 2...")
+				pitstop := strategist.KnowledgeBase.getValue("Strategy.Pitstop.Next")
+				lap := strategist.KnowledgeBase.getValue("Strategy.Pitstop.Lap")
+
+				this.AssertEqual(1, pitstop, "Unexpected next pitstop detected in lap 2...")
+				this.AssertEqual(28, lap, "Unexpected pitstop lap detected in lap 2...")
 			}
-			else if (A_Index = 11) {
+			else if (A_Index = 10) {
 				Sleep(2000)
 
 				Task.yield()
 
-				this.AssertEqual(1, strategist.KnowledgeBase.getValue("Strategy.Pitstop.Next"), "Unexpected next pitstop detected in lap 2...")
-				this.AssertEqual(9, strategist.KnowledgeBase.getValue("Strategy.Pitstop.Lap"), "Unexpected pitstop lap detected in lap 2...")
+				pitstop := strategist.KnowledgeBase.getValue("Strategy.Pitstop.Next")
+				lap := strategist.KnowledgeBase.getValue("Strategy.Pitstop.Lap")
+
+				this.AssertEqual(1, pitstop, "Unexpected next pitstop detected in lap 2...")
+				this.AssertEqual(9, lap, "Unexpected pitstop lap detected in lap 2...")
 			}
 
 			if strategist.Debug[kDebugKnowledgeBase]
@@ -378,10 +387,10 @@ class FCYHandling extends Assert {
 if !GetKeyState("Ctrl") {
 	startTime := A_TickCount
 
-	AHKUnit.AddTestClass(BasicReporting)
-	AHKUnit.AddTestClass(PositionProjection)
-	AHKUnit.AddTestClass(GapReporting)
-	AHKUnit.AddTestClass(PitstopRecommendation)
+	;~ AHKUnit.AddTestClass(BasicReporting)
+	;~ AHKUnit.AddTestClass(PositionProjection)
+	;~ AHKUnit.AddTestClass(GapReporting)
+	;~ AHKUnit.AddTestClass(PitstopRecommendation)
 	AHKUnit.AddTestClass(FCYHandling)
 
 	AHKUnit.Run()

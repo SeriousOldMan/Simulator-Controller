@@ -6,6 +6,7 @@
   5. Fixed a critical bug for initial tyre setup import in non-dry weather conditions.
   6. The default for *Save* mode in "Simulator Configuration" is now "Auto".
   7. When the race settings are modified with "Race Settings" app while already being in a session, all choices of the active startup profile are also incorporated.
+  8. Fixed some edge cases for Full Course Yellow handling by the Strategist.
 
 ## 5.5.2.0-release 01/05/24
   1. Minor bugfixes, as always

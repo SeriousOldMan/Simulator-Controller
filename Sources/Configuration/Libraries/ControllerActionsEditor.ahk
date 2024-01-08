@@ -392,9 +392,17 @@ class ControllerActionsEditor extends ConfiguratorPanel {
 class PluginActionsList extends ConfigurationItemList {
 	iCurrentIcon := false
 
+	iPicturesList := false
+
 	AutoSave {
 		Get {
 			return false
+		}
+	}
+
+	PicturesList {
+		Get {
+			return this.iPicturesList
 		}
 	}
 
@@ -433,6 +441,8 @@ class PluginActionsList extends ConfigurationItemList {
 				this.CurrentIcon := false
 
 				window["iconEdit"].Value := ("*w43 *h43 " . kIconsDirectory . "Empty.png")
+
+				this.Control["pluginActionsListView"].Modify(this.CurrentItem, "Icon" . IL_Add(this.PicturesList, kIconsDirectory . "Empty.png"))
 			}
 		}
 
@@ -451,8 +461,11 @@ class PluginActionsList extends ConfigurationItemList {
 					pictureFile := withBlockedWindows(FileSelect, 1, pictureFile, translate("Select Image..."), "Image (*.ico; *.png; *.jpg; *.gif)")
 					OnMessage(0x44, translateSelectCancelButtons, 0)
 
-					if (pictureFile != "")
+					if (pictureFile != "") {
 						this.CurrentIcon := pictureFile
+
+						this.Control["pluginActionsListView"].Modify(this.CurrentItem, "Icon" . IL_Add(this.PicturesList, pictureFile))
+					}
 				}
 		}
 
@@ -580,14 +593,14 @@ class PluginActionsList extends ConfigurationItemList {
 	}
 
 	loadList(items) {
-		local action, length, picturesListViewImages, ignore, item, picture
+		local action, picturesListViewImages, ignore, item, picture
 
 		this.Control["pluginActionsListView"].Delete()
 
 		if true {
-			length := items.Length
+			picturesListViewImages := IL_Create(items.Length)
 
-			picturesListViewImages := IL_Create(length)
+			this.iPicturesList := picturesListViewImages
 
 			for ignore, item in items {
 				picture := (item[1] ? substituteVariables(item[1]) : (kIconsDirectory . "Empty.png")) ; , "W43 H43")
@@ -595,7 +608,10 @@ class PluginActionsList extends ConfigurationItemList {
 				IL_Add(picturesListViewImages, picture)
 			}
 
-			this.Control["pluginActionsListView"].SetImageList(picturesListViewImages)
+			picturesListViewImages := this.Control["pluginActionsListView"].SetImageList(picturesListViewImages)
+
+			if picturesListViewImages
+				IL_Destroy(picturesListViewImages)
 		}
 
 		for ignore, action in items

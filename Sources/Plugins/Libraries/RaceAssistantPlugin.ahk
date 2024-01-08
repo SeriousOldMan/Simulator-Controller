@@ -1852,7 +1852,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	reloadSettings(pid, settingsFileName) {
-		local simulator
+		local simulator, settings
 
 		if ProcessExist(pid)
 			Task.startTask(ObjBindMethod(this, "reloadSettings", pid, settingsFileName), 1000, kLowPriority)
@@ -1860,10 +1860,11 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			simulator := RaceAssistantPlugin.Simulator
 
 			if (simulator && simulator.Car && simulator.Track) {
-				writeMultiMap(kTempDirectory . this.Plugin . ".settings"
-							, this.loadSettings(simulator.Simulator[true], simulator.Car, simulator.Track, false, settingsFileName))
+				settings := this.loadSettings(simulator.Simulator[true], simulator.Car, simulator.Track, false, settingsFileName)
 
 				settingsFileName := (kTempDirectory . this.Plugin . ".settings")
+
+				writeMultiMap(settingsFileName, settings)
 			}
 
 			this.RaceAssistant.updateSettings(settingsFileName)

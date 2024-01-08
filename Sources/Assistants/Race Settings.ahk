@@ -205,6 +205,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 	static settingsGui
 
 	static result
+	static oldSettings
 	static newSettings
 
 	static connector
@@ -882,8 +883,6 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 	else if (settingsOrCommand = "TyrePressures")
 		setTyrePressures(arguments*)
 	else if ((settingsOrCommand == kSave) || (settingsOrCommand == kOk)) {
-		newSettings := newMultiMap()
-
 		if (!isPositiveFloat(settingsGui["tyrePressureDeviationEdit"].Text
 						   , settingsGui["tpDryFrontLeftEdit"].Text, settingsGui["tpDryFrontRightEdit"].Text
 						   , settingsGui["tpDryRearLeftEdit"].Text, settingsGui["tpDryRearRightEdit"].Text
@@ -902,6 +901,8 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 			return false
 		}
+
+		newSettings := oldSettings.Clone()
 
 		setMultiMapValue(newSettings, "Session Settings", "Lap.PitstopWarning", settingsGui["pitstopWarningEdit"].Text)
 
@@ -1030,6 +1031,8 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		}
 	}
 	else {
+		oldSettings := settingsOrCommand
+
 		connector := false
 		connected := false
 

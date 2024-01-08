@@ -233,7 +233,7 @@ class SplashScreensList extends ConfigurationItemList {
 				OnMessage(0x44, translateSaveCancelButtons, 0)
 
 				if (pictureFile != "") {
-					IL_Add(this.PicturesList, LoadPicture(pictureFile, "W32 H32"), 0xFFFFFF, false)
+					IL_Add(this.PicturesList, pictureFile) ; LoadPicture(pictureFile, "W32 H32"), 0xFFFFFF, false)
 
 					this.Control["picturesListView"].Add("Check Icon" . (this.Control["picturesListView"].GetCount() + 1)
 													   , StrReplace(StrReplace(pictureFile, kUserSplashMediaDirectory, ""), kSplashMediaDirectory, ""))
@@ -475,10 +475,15 @@ class SplashScreensList extends ConfigurationItemList {
 
 		picturesListViewImages := IL_Create(pictures.Length)
 
+		this.iPicturesList := picturesListViewImages
+
 		for ignore, picture in pictures
 			IL_Add(picturesListViewImages, getFileName(picture, kUserSplashMediaDirectory, kSplashMediaDirectory))
 
-		this.Control["picturesListView"].SetImageList(picturesListViewImages)
+		picturesListViewImages := this.Control["picturesListView"].SetImageList(picturesListViewImages)
+
+		if picturesListViewImages
+			IL_Destroy(picturesListViewImages)
 
 		loop pictures.Length
 			this.Control["picturesListView"].Add("Check Icon" . A_Index, pictures[A_Index])

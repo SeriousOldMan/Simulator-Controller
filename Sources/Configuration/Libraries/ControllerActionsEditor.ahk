@@ -584,13 +584,13 @@ class PluginActionsList extends ConfigurationItemList {
 
 		this.Control["pluginActionsListView"].Delete()
 
-		if false {
+		if true {
 			length := items.Length
 
 			picturesListViewImages := IL_Create(length)
 
 			for ignore, item in items {
-				picture := LoadPicture(item[1] ? item[1] : (kIconsDirectory . "Empty.png"), "W43 H43")
+				picture := (item[1] ? substituteVariables(item[1]) : (kIconsDirectory . "Empty.png")) ; , "W43 H43")
 
 				IL_Add(picturesListViewImages, picture)
 			}
@@ -599,7 +599,7 @@ class PluginActionsList extends ConfigurationItemList {
 		}
 
 		for ignore, action in items
-			this.Control["pluginActionsListView"].Add("", action[2], action[3], StrReplace(StrReplace(action[4], "`n", A_Space), "`r", ""), action[1] ? action[1] : "")
+			this.Control["pluginActionsListView"].Add("Icon" . A_Index, action[2], action[3], StrReplace(StrReplace(action[4], "`n", A_Space), "`r", ""), action[1] ? action[1] : "")
 
 		this.Control["pluginActionsListView"].ModifyCol(1, 100)
 		this.Control["pluginActionsListView"].ModifyCol(2, "AutoHdr")

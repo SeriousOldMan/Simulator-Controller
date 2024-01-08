@@ -1813,16 +1813,13 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		}
 	}
 
-	loadSettings(simulator, car, track, data := false, fileName := false) {
+	loadSettings(simulator, car, track, data := false, settings := false) {
 		local settingsDB := SettingsDatabase()
-		local settings, load, section, values, key, value
+		local simulatorName := settingsDB.getSimulatorName(simulator)
+		local load, section, values, key, value
 
-		simulatorName := settingsDB.getSimulatorName(simulator)
-
-		if !fileName
-			fileName := (kUserConfigDirectory . "Race.settings")
-
-		settings := readMultiMap(fileName)
+		if !settings
+			settings := readMultiMap(kUserConfigDirectory . "Race.settings")
 
 		load := getMultiMapValue(this.Configuration, this.Plugin . " Startup", simulatorName . ".LoadSettings", "Default")
 		load := getMultiMapValue(this.Configuration, "Race Assistant Startup", simulatorName . ".LoadSettings", load)
@@ -1851,26 +1848,20 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		return settings
 	}
 
-	reloadSettings(pid, settingsFileName) {
-		local simulator, settings
+	reloadSettings(settings) {
+		local settingsFileName := (kTempDirectory . this.Plugin . ".settings")
+		local simulator
 
-		if ProcessExist(pid)
-			Task.startTask(ObjBindMethod(this, "reloadSettings", pid, settingsFileName), 1000, kLowPriority)
-		else if this.RaceAssistant {
+		if this.RaceAssistant {
 			simulator := RaceAssistantPlugin.Simulator
 
-			if (simulator && simulator.Car && simulator.Track) {
-				settings := this.loadSettings(simulator.Simulator[true], simulator.Car, simulator.Track, false, settingsFileName)
+			if (simulator && simulator.Car && simulator.Track)
+				settings := this.loadSettings(simulator.Simulator[true], simulator.Car, simulator.Track, false, settings)
 
-				settingsFileName := (kTempDirectory . this.Plugin . ".settings")
-
-				writeMultiMap(settingsFileName, settings)
-			}
+			writeMultiMap(settingsFileName, settings)
 
 			this.RaceAssistant.updateSettings(settingsFileName)
 		}
-
-		return false
 	}
 
 	prepareSession(settings, data) {
@@ -2624,7 +2615,27 @@ getSimulatorOptions(plugin := false) {
 openRaceSettings(import := false, silent := false, plugin := false, fileName := false) {
 	local exePath := kBinariesDirectory . "Race Settings.exe"
 	local controller := SimulatorController.Instance
+	local temporary := false
 	local pid, ignore, options
+
+	reloadSettings() {
+		local ignore, assistant, settings
+
+		if ProcessExist(pid)
+			return Task.CurrentTask
+		else {
+			settings := readMultiMap(fileName)
+
+			for ignore, assistant in RaceAssistantPlugin.Assistants
+				if (assistant && controller.isActive(assistant) && assistant.RaceAssistantEnabled)
+					assistant.reloadSettings(settings)
+
+			if temporary
+				deleteFile(fileName)
+
+			return false
+		}
+	}
 
 	plugin := findActivePlugin(plugin)
 
@@ -2635,7 +2646,10 @@ openRaceSettings(import := false, silent := false, plugin := false, fileName := 
 			if (plugin && controller.isActive(plugin) && plugin.RaceAssistantEnabled
 			 && FileExist(kTempDirectory . plugin.Plugin . ".settings"))
 				try {
-					FileCopy(kTempDirectory . plugin.Plugin . ".settings", kUserConfigDirectory . "Race.settings", 1)
+					fileName := temporaryFileName("Race", "settings")
+					temporary := true
+
+					FileCopy(kTempDirectory . plugin.Plugin . ".settings", fileName, 1)
 
 					break
 				}
@@ -2662,10 +2676,7 @@ openRaceSettings(import := false, silent := false, plugin := false, fileName := 
 			Run("`"" . exePath . "`" " . options, kBinariesDirectory, , &pid)
 
 			if pid
-				for ignore, plugin in RaceAssistantPlugin.Assistants {
-					if (plugin && controller.isActive(plugin) && plugin.RaceAssistantEnabled)
-						Task.startTask(ObjBindMethod(plugin, "reloadSettings", pid, fileName), 1000, kLowPriority)
-				}
+				Task.startTask(reloadSettings, 1000, kLowPriority)
 		}
 	}
 	catch Any as exception {

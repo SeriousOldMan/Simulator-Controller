@@ -56,10 +56,11 @@ class DrivingCoachPlugin extends RaceAssistantPlugin  {
 		return DrivingCoachPlugin.RemoteDrivingCoach(this, pid)
 	}
 
-	loadSettings(simulator, car, track, data := false, fileName := false) {
-		local settings := super.loadSettings(simulator, car, track, data, fileName)
+	loadSettings(simulator, car, track, data := false, settings := false) {
 		local analyzePerformance, analyzeHandling, ignore, session, instruction
 
+		settings := super.loadSettings(simulator, car, track, data, settings)
+		
 		if this.StartupSettings {
 			analyzePerformance := getMultiMapValue(this.StartupSettings, "Functions", "Performance Analysis", kUndefined)
 

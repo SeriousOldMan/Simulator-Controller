@@ -187,12 +187,13 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 		return RaceEngineerPlugin.RemoteRaceEngineer(this, pid)
 	}
 
-	loadSettings(simulator, car, track, data := false, fileName := false) {
-		local settings := super.loadSettings(simulator, car, track, data, fileName)
+	loadSettings(simulator, car, track, data := false, settings := false) {
 		local tyresDB, simulatorName, compound, compoundColor
 		local tpSettings, pressures, certainty, collectPressure, pitstopService, ignore, session
 		local fuelWarning, damageWarning, pressureWarning
 
+		settings := super.loadSettings(simulator, car, track, data, settings)
+		
 		if data {
 			local weather := getMultiMapValue(data, "Weather Data", "Weather", "Dry")
 			local airTemperature := getMultiMapValue(data, "Weather Data", "Temperature", 27)

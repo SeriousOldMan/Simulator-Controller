@@ -40,6 +40,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 	iUseTraffic := false
 
+	iCollectTelemetry := true
 	iSaveTelemetry := kAlways
 	iSaveRaceReport := false
 	iRaceReview := false
@@ -698,6 +699,12 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 	}
 
+	CollectTelemetry {
+		Get {
+			return this.iCollectTelemetry
+		}
+	}
+
 	SaveTelemetry {
 		Get {
 			return this.iSaveTelemetry
@@ -764,6 +771,9 @@ class RaceStrategist extends GridRaceAssistant {
 
 		if values.HasProp("SessionReportsDatabase")
 			this.iSessionReportsDatabase := values.SessionReportsDatabase
+
+		if values.HasProp("CollectTelemetry")
+			this.iCollectTelemetry := values.CollectTelemetry
 
 		if values.HasProp("SaveTelemetry")
 			this.iSaveTelemetry := values.SaveTelemetry
@@ -1496,10 +1506,12 @@ class RaceStrategist extends GridRaceAssistant {
 
 		this.updateConfigurationValues({LearningLaps: getMultiMapValue(configuration, "Race Strategist Analysis", simulatorName . ".LearningLaps", 1)
 									  , SessionReportsDatabase: getMultiMapValue(configuration, "Race Strategist Reports", "Database", false)
+									  , CollectTelemetry: this.collectTelemetryData()
 									  , SaveTelemetry: getMultiMapValue(configuration, "Race Strategist Shutdown", simulatorName . ".SaveTelemetry", kAlways)
 									  , SaveRaceReport: getMultiMapValue(configuration, "Race Strategist Shutdown", simulatorName . ".SaveRaceReport", kNever)
 									  , RaceReview: (getMultiMapValue(configuration, "Race Strategist Shutdown", simulatorName . ".RaceReview", "Yes") = "Yes")
 									  , SaveSettings: saveSettings})
+
 
 		telemetryDB := RaceStrategist.SessionTelemetryDatabase(this)
 
@@ -1559,13 +1571,13 @@ class RaceStrategist extends GridRaceAssistant {
 					}
 					else {
 						if ((((this.SaveSettings = kAsk) && (this.Session == kSessionRace))
-						  || (this.collectTelemetryData() && (this.SaveTelemetry = kAsk) && this.HasTelemetryData))
+						  || (this.CollectTelemetry && (this.SaveTelemetry = kAsk) && this.HasTelemetryData))
 						 && ((this.SaveRaceReport = kAsk) && (this.Session == kSessionRace)))
 							this.getSpeaker().speakPhrase("ConfirmSaveSettingsAndRaceReport", false, true)
 						else if ((this.SaveRaceReport = kAsk) && (this.Session == kSessionRace))
 							this.getSpeaker().speakPhrase("ConfirmSaveRaceReport", false, true)
 						else if (((this.SaveSettings = kAsk) && (this.Session == kSessionRace))
-							  || (this.collectTelemetryData() && (this.SaveTelemetry = kAsk) && this.HasTelemetryData))
+							  || (this.CollectTelemetry && (this.SaveTelemetry = kAsk) && this.HasTelemetryData))
 							this.getSpeaker().speakPhrase("ConfirmSaveSettings", false, true)
 						else
 							asked := false
@@ -1648,7 +1660,7 @@ class RaceStrategist extends GridRaceAssistant {
 				}
 
 			if (((phase = "After") && (this.SaveTelemetry = kAsk)) || ((phase = "Before") && (this.SaveTelemetry = kAlways)))
-				if (this.HasTelemetryData && this.collectTelemetryData() && !ProcessExist("Practice Center.exe"))
+				if (this.HasTelemetryData && this.CollectTelemetry && !ProcessExist("Practice Center.exe"))
 					this.updateTelemetryDatabase()
 		}
 		finally {
@@ -1871,7 +1883,7 @@ class RaceStrategist extends GridRaceAssistant {
 				this.updateDynamicValues({EnoughData: false})
 		}
 
-		if this.collectTelemetryData() {
+		if this.CollectTelemetry {
 			prefix := "Lap." . lapNumber
 
 			if validLap
@@ -4017,7 +4029,7 @@ class RaceStrategist extends GridRaceAssistant {
 									   , fuelConsumption, fuelRemaining, lapTime)
 		}
 
-		if (this.RemoteHandler && this.collectTelemetryData()) {
+		if (this.RemoteHandler && this.CollectTelemetry) {
 			this.updateDynamicValues({HasTelemetryData: true})
 
 			this.RemoteHandler.saveTelemetryData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
@@ -4029,7 +4041,7 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	updateTelemetryDatabase() {
-		if (this.RemoteHandler && this.collectTelemetryData())
+		if (this.RemoteHandler && this.CollectTelemetry)
 			this.RemoteHandler.updateTelemetryDatabase()
 
 		this.updateDynamicValues({HasTelemetryData: false})

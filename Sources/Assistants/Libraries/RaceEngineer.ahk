@@ -29,6 +29,8 @@
 class RaceEngineer extends RaceAssistant {
 	iAdjustLapTime := true
 
+	iCollectTyrePressures := true
+
 	iSaveTyrePressures := kAsk
 
 	iHasPressureData := false
@@ -106,6 +108,12 @@ class RaceEngineer extends RaceAssistant {
 		}
 	}
 
+	CollectTyrePressures {
+		Get {
+			return this.iCollectTyrePressures
+		}
+	}
+
 	SaveTyrePressures {
 		Get {
 			return this.iSaveTyrePressures
@@ -136,6 +144,12 @@ class RaceEngineer extends RaceAssistant {
 
 		if values.HasProp("AdjustLapTime")
 			this.iAdjustLapTime := values.AdjustLapTime
+
+		if values.HasProp("CollectTyrePressures") {
+			this.iCollectTyrePressures := values.CollectTyrePressures
+
+			logMessage(kLogDebug, "CollectTyrePressures is now " . this.iCollectTyrePressures)
+		}
 
 		if values.HasProp("SaveTyrePressures") {
 			this.iSaveTyrePressures := values.SaveTyrePressures
@@ -1411,9 +1425,7 @@ class RaceEngineer extends RaceAssistant {
 
 	prepareSession(&settings, &data, formationLap?) {
 		local announcements := false
-		local facts
-
-		facts := super.prepareSession(&settings, &data, formationLap?)
+		local facts := super.prepareSession(&settings, &data, formationLap?)
 
 		if settings {
 			this.updateConfigurationValues({UseTalking: getMultiMapValue(settings, "Assistant.Engineer", "Voice.UseTalking", true)})
@@ -1466,11 +1478,9 @@ class RaceEngineer extends RaceAssistant {
 
 	startSession(settings, data) {
 		local configuration := this.Configuration
-		local simulatorName, configuration, deprecated, saveSettings, speaker, strategistPlugin, strategistName, facts
-
-		facts := this.prepareSession(&settings, &data, false)
-
-		simulatorName := this.Simulator
+		local facts := this.prepareSession(&settings, &data, false)
+		local simulatorName := this.Simulator
+		local deprecated, saveSettings, speaker, strategistPlugin, strategistName
 
 		deprecated := getMultiMapValue(configuration, "Race Engineer Shutdown", simulatorName . ".SaveSettings", kNever)
 		saveSettings := getMultiMapValue(configuration, "Race Assistant Shutdown", simulatorName . ".SaveSettings", deprecated)
@@ -1478,6 +1488,7 @@ class RaceEngineer extends RaceAssistant {
 		this.updateConfigurationValues({LearningLaps: getMultiMapValue(configuration, "Race Engineer Analysis", simulatorName . ".LearningLaps", 1)
 									  , AdjustLapTime: getMultiMapValue(configuration, "Race Engineer Analysis", simulatorName . ".AdjustLapTime", true)
 									  , SaveSettings: saveSettings
+									  , CollectTyrePressures: this.collectTyrePressures()
 									  , SaveTyrePressures: getMultiMapValue(configuration, "Race Engineer Shutdown", simulatorName . ".SaveTyrePressures", kAsk)})
 
 		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(facts), HasPressureData: false
@@ -1523,7 +1534,7 @@ class RaceEngineer extends RaceAssistant {
 			logMessage(kLogDebug, "Finish: Listener is " . this.Listener)
 			logMessage(kLogDebug, "Finish: SaveTyrePressures is " . this.SaveTyrePressures)
 			logMessage(kLogDebug, "Finish: HasPressureData is " . this.HasPressureData)
-			logMessage(kLogDebug, "Finish: collectTyrePressures() is " . this.collectTyrePressures())
+			logMessage(kLogDebug, "Finish: CollectTyrePressures is " . this.CollectTyrePressures)
 
 			if (this.Session == kSessionRace)
 				if ProcessExist("Race Strategist.exe")
@@ -1551,7 +1562,7 @@ class RaceEngineer extends RaceAssistant {
 					}
 				}
 				else {
-					if (((this.SaveTyrePressures = kAsk) && this.collectTyrePressures() && this.HasPressureData) || (this.SaveSettings = kAsk)) {
+					if (((this.SaveTyrePressures = kAsk) && this.CollectTyrePressures && this.HasPressureData) || (this.SaveSettings = kAsk)) {
 						if this.Listener {
 							this.getSpeaker().speakPhrase("ConfirmDataUpdate", false, true)
 
@@ -1598,7 +1609,7 @@ class RaceEngineer extends RaceAssistant {
 					this.saveSessionSettings()
 
 			if (((phase = "After") && (this.SaveTyrePressures = kAsk)) || ((phase = "Before") && (this.SaveTyrePressures = kAlways)))
-				if (this.HasPressureData && this.collectTyrePressures() && !ProcessExist("Practice Center.exe"))
+				if (this.HasPressureData && this.CollectTyrePressures && !ProcessExist("Practice Center.exe"))
 					this.updateTyresDatabase()
 		}
 		finally {
@@ -1994,7 +2005,7 @@ class RaceEngineer extends RaceAssistant {
 		this.iSessionDataActive := true
 
 		try {
-			if (this.RemoteHandler && this.collectTyrePressures()) {
+			if (this.RemoteHandler && this.CollectTyrePressures) {
 				this.updateDynamicValues({HasPressureData: true})
 
 				this.RemoteHandler.savePressureData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
@@ -2007,7 +2018,7 @@ class RaceEngineer extends RaceAssistant {
 	}
 
 	updateTyresDatabase() {
-		if (this.RemoteHandler && this.collectTyrePressures())
+		if (this.RemoteHandler && this.CollectTyrePressures)
 			this.RemoteHandler.updateTyresDatabase()
 
 		this.updateDynamicValues({HasPressureData: false})

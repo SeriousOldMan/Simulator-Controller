@@ -3014,7 +3014,7 @@ initializeSimulatorSetup() {
 			Sleep(2000)
 
 		if !isDebug()
-			showSplashScreen("Rotating Brain")
+			showSplashScreen("Logo")
 
 		wizard.ProgressCount := 0
 
@@ -3090,7 +3090,7 @@ startupSimulatorSetup() {
 				wizard.ProgressCount := 0
 
 				if !isDebug()
-					showSplashScreen("Rotating Brain")
+					showSplashScreen("Logo")
 
 				showProgress({color: "Blue", title: translate("Initializing Setup Wizard"), message: translate("")})
 			}

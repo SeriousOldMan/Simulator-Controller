@@ -9,6 +9,7 @@
   8. When the race settings are modified with "Race Settings" app while already being in a session, all choices of the active startup profile are also incorporated.
   9. The translation for the French language has been finalized by @SlatMars, with "Simulator Setup" now also available with a user interface in French.
   10. The "Controller Actions Editor" now shows preview icons in the list of available actions.
+  11. The new logo for Simulator Controller has been added to the splash screens.
 
 ## 5.5.2.0-release 01/05/24
   1. Minor bugfixes, as always

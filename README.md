@@ -107,6 +107,8 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 
 23. [Your personal Driving Coach](https://youtu.be/LBtLk_md1IE) - Demonstrates a general interaction with Aiden, the Virtual Driving Coach.
 
+24. [Car meta data](https://youtu.be/oKq8k9VZ2jU) - This video introduces you to car meta data and all the secret knowledge needed when extending the "Setup Workbench" for modded cars.
+
 This list will be extended from time to time to cover new functionalities.
 
 ### Discord Community

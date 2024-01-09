@@ -1647,6 +1647,14 @@ updateInstallationForV500() {
 	}
 }
 
+updateConfigurationForV553() {
+	setMultiMapValue(kSimulatorConfiguration, "Splash Screens", "Logo.Type", "Picture Carousel")
+	setMultiMapValue(kSimulatorConfiguration, "Splash Screens", "Logo.Duration", 24 * 60 * 60 * 1000)
+	setMultiMapValue(kSimulatorConfiguration, "Splash Screens", "Logo.Images", "%kResourcesDirectory%Logo.JPG")
+
+	writeMultiMap(kSimulatorConfigurationFile, kSimulatorConfiguration)
+}
+
 updateConfigurationForV552() {
 	local configuration, subtitle
 

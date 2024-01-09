@@ -171,6 +171,7 @@ showSplashScreen(splashScreen := unset, songHandler := false, alwaysOnTop := tru
 
 	song := false
 	duration := 3000
+	config := kSimulatorConfiguration
 	type := getMultiMapValue(kSimulatorConfiguration, "Splash Screens", splashScreen . ".Type", false)
 
 	if (type == "Video") {
@@ -189,7 +190,7 @@ showSplashScreen(splashScreen := unset, songHandler := false, alwaysOnTop := tru
 	else if (type == "Picture Carousel") {
 		duration := getMultiMapValue(kSimulatorConfiguration, "Splash Screens", splashScreen . ".Duration", 5000)
 		song := getMultiMapValue(kSimulatorConfiguration, "Splash Screens", splashScreen . ".Song", false)
-		images := string2Values(",", getMultiMapValue(kSimulatorConfiguration, "Splash Screens", splashScreen . ".Images", false))
+		images := collect(string2Values(",", getMultiMapValue(kSimulatorConfiguration, "Splash Screens", splashScreen . ".Images", false)), substituteVariables)
 	}
 	else {
 		logMessage(kLogCritical, translate("SplashScreen `"") . splashScreen . translate("`" not found - please check the configuration"))

@@ -434,7 +434,7 @@ class SetupWizard extends ConfiguratorPanel {
 
 	loadDefinition(definition := false) {
 		local knowledgeBase, stepWizard, count, descriptor, step, stepDefinition, msgResult, initialize
-		local ignore, fileName, language, rootDirectory, section, keyValues, key, value
+		local ignore, fileName, language, rootDirectory
 
 		if !definition
 			definition := this.Definition
@@ -478,13 +478,7 @@ class SetupWizard extends ConfiguratorPanel {
 						if inList(["EN", getLanguage()], language)
 							for ignore, rootDirectory in [kResourcesDirectory . "Setup\Translations\", kUserTranslationsDirectory . "Setup\"]
 								if FileExist(rootDirectory . step.Step . " Step." . language)
-									for section, keyValues in readMultiMap(rootDirectory . step.Step . " Step." . language)
-										for key, value in keyValues {
-											if (key = "​Modules.Presets.R3EFullHDTripleNoHDREN.Info.FR")
-												MsgBox "Here"
-
-											setMultiMapValue(definition, section, key, value)
-										}
+									addMultiMapValues(definition, readMultiMap(rootDirectory . step.Step . " Step." . language))
 
 					step.loadDefinition(definition, getMultiMapValue(definition, "Setup." . step.Step, step.Step . ".Definition", ""))
 				}
@@ -2964,7 +2958,7 @@ findInstallProperty(name, property) {
 loadDefinition() {
 	local definition := readMultiMap(kResourcesDirectory . "Setup\Simulator Setup.ini")
 	local languages := string2Values("|", getMultiMapValue(definition, "Setup", "Languages"))
-	local ignore, languages, language, section, keyValues, key, value
+	local ignore, languages, language
 
 	if FileExist(kUserTranslationsDirectory . "Setup\Simulator Setup.ini") {
 		for ignore, language in string2Values("|", getMultiMapValue(readMultiMap(kUserTranslationsDirectory . "Setup\Simulator Setup.ini"), "Setup", "Languages"))
@@ -2978,9 +2972,7 @@ loadDefinition() {
 		if inList(["EN", getLanguage()], language)
 			for ignore, root in [kResourcesDirectory, kUserTranslationsDirectory]
 				if FileExist(kUserHomeDirectory . "Setup\Simulator Setup." . language)
-					for section, keyValues in readMultiMap(kUserHomeDirectory . "Setup\Simulator Setup." . language)
-						for key, value in keyValues
-							setMultiMapValue(definition, section, key, value)
+					addMultiMapValues(definition, readMultiMap(kUserHomeDirectory . "Setup\Simulator Setup." . language))
 
 	setMultiMapValues(kSimulatorConfiguration, "Splash Window", getMultiMapValues(definition, "Splash Window"))
 	setMultiMapValues(kSimulatorConfiguration, "Splash Screens", getMultiMapValues(definition, "Splash Screens"))

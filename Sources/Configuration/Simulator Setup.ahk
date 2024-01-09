@@ -324,6 +324,10 @@ class SetupWizard extends ConfiguratorPanel {
 		Get {
 			return this.iDefinition
 		}
+
+		Set {
+			return (this.iDefinition := value)
+		}
 	}
 
 	KnowledgeBase {
@@ -401,7 +405,7 @@ class SetupWizard extends ConfiguratorPanel {
 		}
 	}
 
-	__New(configuration, definition) {
+	__New(configuration, definition := false) {
 		this.iDefinition := definition
 
 		super.__New(configuration)
@@ -471,11 +475,16 @@ class SetupWizard extends ConfiguratorPanel {
 					setMultiMapValues(definition, "Setup." . step.Step, getMultiMapValues(stepDefinition, "Setup." . step.Step))
 
 					for language, ignore in availableLanguages()
-						for ignore, rootDirectory in [kResourcesDirectory . "Setup\Translations\", kUserTranslationsDirectory . "Setup\"]
-							if FileExist(rootDirectory . step.Step . " Step." . language)
-								for section, keyValues in readMultiMap(rootDirectory . step.Step . " Step." . language)
-									for key, value in keyValues
-										setMultiMapValue(definition, section, key, value)
+						if inList(["EN", getLanguage()], language)
+							for ignore, rootDirectory in [kResourcesDirectory . "Setup\Translations\", kUserTranslationsDirectory . "Setup\"]
+								if FileExist(rootDirectory . step.Step . " Step." . language)
+									for section, keyValues in readMultiMap(rootDirectory . step.Step . " Step." . language)
+										for key, value in keyValues {
+											if (key = "​Modules.Presets.R3EFullHDTripleNoHDREN.Info.FR")
+												MsgBox "Here"
+
+											setMultiMapValue(definition, section, key, value)
+										}
 
 					step.loadDefinition(definition, getMultiMapValue(definition, "Setup." . step.Step, step.Step . ".Definition", ""))
 				}
@@ -2952,42 +2961,47 @@ findInstallProperty(name, property) {
 		return value
 }
 
-initializeSimulatorSetup() {
-	local icon := kIconsDirectory . "Configuration Wand.ico"
-	local definition, wizard, label, callback, ignore, languages, language, section, keyValues, key, value
+loadDefinition() {
+	local definition := readMultiMap(kResourcesDirectory . "Setup\Simulator Setup.ini")
+	local languages := string2Values("|", getMultiMapValue(definition, "Setup", "Languages"))
+	local ignore, languages, language, section, keyValues, key, value
 
-	TraySetIcon(icon, "1")
-	A_IconTip := "Simulator Setup"
+	if FileExist(kUserTranslationsDirectory . "Setup\Simulator Setup.ini") {
+		for ignore, language in string2Values("|", getMultiMapValue(readMultiMap(kUserTranslationsDirectory . "Setup\Simulator Setup.ini"), "Setup", "Languages"))
+			if !inList(languages, language)
+				languages.Push(language)
+	}
 
-	try {
-		DirCreate(kUserHomeDirectory "Setup")
+	setMultiMapValue(definition, "Setup", "Languages", values2String("|", languages*))
 
-		definition := readMultiMap(kResourcesDirectory . "Setup\Simulator Setup.ini")
-
-		languages := string2Values("|", getMultiMapValue(definition, "Setup", "Languages"))
-
-		if FileExist(kUserTranslationsDirectory . "Setup\Simulator Setup.ini") {
-			for ignore, language in string2Values("|", getMultiMapValue(readMultiMap(kUserTranslationsDirectory . "Setup\Simulator Setup.ini"), "Setup", "Languages"))
-				if !inList(languages, language)
-					languages.Push(language)
-		}
-
-		setMultiMapValue(definition, "Setup", "Languages", values2String("|", languages*))
-
-		for language, ignore in languages
+	for language, ignore in languages
+		if inList(["EN", getLanguage()], language)
 			for ignore, root in [kResourcesDirectory, kUserTranslationsDirectory]
 				if FileExist(kUserHomeDirectory . "Setup\Simulator Setup." . language)
 					for section, keyValues in readMultiMap(kUserHomeDirectory . "Setup\Simulator Setup." . language)
 						for key, value in keyValues
 							setMultiMapValue(definition, section, key, value)
 
-		setMultiMapValues(kSimulatorConfiguration, "Splash Window", getMultiMapValues(definition, "Splash Window"))
-		setMultiMapValues(kSimulatorConfiguration, "Splash Screens", getMultiMapValues(definition, "Splash Screens"))
+	setMultiMapValues(kSimulatorConfiguration, "Splash Window", getMultiMapValues(definition, "Splash Window"))
+	setMultiMapValues(kSimulatorConfiguration, "Splash Screens", getMultiMapValues(definition, "Splash Screens"))
 
-		setMultiMapValue(kSimulatorConfiguration, "Splash Window", "Title"
-												, translate("Modular Simulator Controller System") . translate(" - ") . translate("Setup && Configuration"))
+	setMultiMapValue(kSimulatorConfiguration, "Splash Window", "Title"
+											, translate("Modular Simulator Controller System") . translate(" - ") . translate("Setup && Configuration"))
 
-		wizard := SetupWizard(kSimulatorConfiguration, definition)
+	return definition
+}
+
+initializeSimulatorSetup() {
+	local icon := kIconsDirectory . "Configuration Wand.ico"
+	local wizard, label
+
+	TraySetIcon(icon, "1")
+	A_IconTip := "Simulator Setup"
+
+	try {
+		DirCreate(kUserHomeDirectory . "Setup")
+
+		wizard := SetupWizard(kSimulatorConfiguration)
 
 		SupportMenu.Insert("1&")
 
@@ -2999,7 +3013,6 @@ initializeSimulatorSetup() {
 			SupportMenu.Check(label)
 
 		label := translate("Debug Knowledgebase")
-		callback :=
 
 		SupportMenu.Insert("1&", label, (*) => wizard.toggleDebug(kDebugKnowledgeBase))
 
@@ -3038,12 +3051,14 @@ startupSimulatorSetup() {
 	local wizard := SetupWizard.Instance
 
 	try {
-		wizard.loadDefinition()
-
-		if wizard.Debug[kDebugRules]
-			wizard.dumpRules(wizard.KnowledgeBase)
-
 		loop {
+			wizard.Definition := loadDefinition()
+
+			wizard.loadDefinition()
+
+			if wizard.Debug[kDebugRules]
+				wizard.dumpRules(wizard.KnowledgeBase)
+
 			wizard.createGui(wizard.Configuration)
 
 			wizard.startSetup()

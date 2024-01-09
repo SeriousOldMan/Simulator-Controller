@@ -810,6 +810,14 @@ class ModulesStepWizard extends StepWizard {
 		return false
 	}
 
+	presetInfo(preset) {
+		local entries := getMultiMapValues(this.SetupWizard.Definition, "Setup.Modules")
+		local keys := getKeys(entries)
+		local index := inList(keys, "Modules.Presets." . preset . ".Info." . getLanguage())
+
+		return (index ? substituteVariables(getValues(entries)[index]) : false)
+	}
+
 	updatePresetState() {
 		local info := false
 		local preset, selected, enable, ignore, candidate, info, html
@@ -836,7 +844,7 @@ class ModulesStepWizard extends StepWizard {
 			if enable
 				this.Control["installPresetButton"].Enabled := true
 
-			info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . ".Info." . getLanguage()))
+			info := this.presetInfo(preset)
 		}
 
 		selected := this.SelectedPresetsListView.GetNext()
@@ -849,7 +857,7 @@ class ModulesStepWizard extends StepWizard {
 
 				preset := this.presetName(preset)
 
-				info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . ".Info." . getLanguage()))
+				info := this.presetInfo(preset)
 			}
 		}
 

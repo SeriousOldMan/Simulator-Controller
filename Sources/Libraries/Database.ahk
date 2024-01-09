@@ -338,7 +338,7 @@ class Database {
 			row := []
 
 			for ignore, column in this.Schemas[name]
-				row.Push(values.Has(column) ? values[column] : kNull)
+				row.Push(values.Has(column) ? StrReplace(StrReplace(StrReplace(values[column], ";", ","), "`n", A_Space), "|", "-") : kNull)
 
 			file := this.Files[name]
 
@@ -466,7 +466,7 @@ class Database {
 						values := []
 
 						for ignore, column in schema
-							values.Push(row.Has(column) ? row[column] : kNull)
+							values.Push(row.Has(column) ? StrReplace(StrReplace(StrReplace(row[column], ";", ","), "`n", A_Space), "|", "-") : kNull)
 
 						file.WriteLine(values2String(";", values*))
 					}
@@ -485,7 +485,7 @@ class Database {
 						values := []
 
 						for ignore, column in schema
-							values.Push(row.Has(column) ? row[column] : kNull)
+							values.Push(row.Has(column) ? StrReplace(StrReplace(StrReplace(row[column], ";", ","), "`n", A_Space), "|", "-") : kNull)
 
 						row := (values2String(";", values*) . "`n")
 
@@ -548,7 +548,7 @@ groupRows(groupedByColumns, groupedColumns, rows) {
 		key := []
 
 		for ignore, column in groupedByColumns
-			key.Push(row[column])
+			key.Push(StrReplace(StrReplace(StrReplace(row[column], ";", ","), "`n", A_Space), "|", "-"))
 
 		key := values2String("|", key*)
 

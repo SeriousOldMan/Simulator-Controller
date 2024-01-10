@@ -6,9 +6,9 @@ Download=https://www.dropbox.com/scl/fi/laml429e932qycyu5yrsb/Simulator-Controll
 Changes=Changed save mode default to "Auto" in "Simulator Configuration", Fixed selection of driver and session on the "Team Server" tab in "Simulator Configuration", Fixed initial tyre setup import in "Wet" conditions^, Startup profile aware reload of race settings, Fixed some edge cases in FCY handling, French translation of "Simulator Setup", Icon preview in "Controller Actions Editor", New logo for Simulator Controller
 Components=Media->5.3.0,Configuration->5.5.3,Utilities->5.4.8
 [Release]
-Version=5.5.2.0-release
-Date=01/05/2024
-Download=https://cutt.ly/iwHtI8Yt;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.5.2.0-release.zip
+Version=5.5.2.1-release
+Date=01/06/2024
+Download=https://cutt.ly/owHvhBQn;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.5.2.1-release.zip
 Changes=New startup wizard in "Simulator Startup", Deprecated silent and muted presets from "Simulator Setup", New keyboard modifiers for "Simulator Startup", New preset in "Simulator Setup" for startup profiles, New fields in "Session State.json", Migrated to AHK 2.0.11, New car models for "Setup Workbench", New EnumerationHandler in "Setup Workbench", Driving Coach preserves memory between sessions, Performance optimization in Team Server, Adopted Automibilsta 2 V 1.5.5 changes
 Components=Media->5.3.0,Configuration->5.5.2,Utilities->5.4.8
 [Components]
@@ -28,4 +28,4 @@ Utilities.5.4.8.Download=https://www.dropbox.com/scl/fi/5nduffajjm3x6rhsxr1nk/Ut
 Type=Development
 [Version]
 Development=5.5.3.0-dev
-Release=5.5.2.0-release
+Release=5.5.2.1-release

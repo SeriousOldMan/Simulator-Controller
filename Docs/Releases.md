@@ -10,6 +10,7 @@
   9. The translation for the French language has been finalized by @SlatMars, with "Simulator Setup" now also available with a user interface in French.
   10. The "Controller Actions Editor" now shows preview icons in the list of available actions.
   11. The new logo for Simulator Controller has been added to the splash screens.
+  12. The preset "Race Engineer w/o Pitstop Control" has been deprecated because this setting is now available in the startup profiles (named "Pitstop Service").
 
 ## 5.5.2.1-release 01/06/24
   1. Fixed several bugs for function setting application in the new startup profiles.

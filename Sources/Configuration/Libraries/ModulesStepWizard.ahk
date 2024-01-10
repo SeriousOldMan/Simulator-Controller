@@ -815,6 +815,12 @@ class ModulesStepWizard extends StepWizard {
 		local keys := getKeys(entries)
 		local index := inList(keys, "Modules.Presets." . preset . ".Info." . getLanguage())
 
+		if !index
+			if (preset = "ACCDualQHDSingleNoHDRDE")
+				index := inList(keys, "Buggy1")
+			else if (preset = "R3EFullHDTripleNoHDREN")
+				index := inList(keys, "Buggy2")
+
 		return (index ? substituteVariables(getValues(entries)[index]) : false)
 	}
 

@@ -11,6 +11,9 @@
   10. The "Controller Actions Editor" now shows preview icons in the list of available actions.
   11. The new logo for Simulator Controller has been added to the splash screens.
   12. The preset "Race Engineer w/o Pitstop Control" has been deprecated because this setting is now available in the startup profiles (named "Pitstop Service").
+  13. New car models for "Setup Workbench":
+      - Assetto Corsa
+        - BMW Z4 E89
 
 ## 5.5.2.1-release 01/06/24
   1. Fixed several bugs for function setting application in the new startup profiles.

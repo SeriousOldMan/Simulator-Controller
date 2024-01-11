@@ -2,14 +2,19 @@
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed selection of driver and session on the *Team Server* tab in "Simulator Configuration".
-  4. Fixed a misleading error message that indicates a security problem, although the download file simply was not available.
-  5. Fixed a critical bug for initial tyre setup import in non-dry weather conditions.
+  4. Fixed a misleading error message in the automatic update procedure that indicates a security problem, although the download file simply was not available.
+  5. Fixed a critical bug for initial tyre setup import in non-dry weather conditions (especially for *Assetto Corsa Competizione*).
   6. Fixed some edge cases for Full Course Yellow handling by the Strategist.
-  7. The default for *Save* mode in "Simulator Configuration" is now "Auto".
-  8. When the race settings are modified with "Race Settings" app while already being in a session, all choices of the active startup profile are also incorporated.
+  7. The default for *Save* mode in "Simulator Configuration" is now "Auto". If you changed the setting already, your choice will be preserved.
+  8. When the race settings are modified with the "Race Settings" app while already being in a session, all choices of the active startup profile are also incorporated.
   9. The translation for the French language has been finalized by @SlatMars, with "Simulator Setup" now also available with a user interface in French.
   10. The "Controller Actions Editor" now shows preview icons in the list of available actions.
   11. The new logo for Simulator Controller has been added to the splash screens.
+  12. The preset "Race Engineer w/o Pitstop Control" has been deprecated because this setting is now available in the startup profiles (named "Pitstop Service").
+  13. The Stream Deck Icons are now also available when the French language is selected.
+  14. New car models for "Setup Workbench":
+      - Assetto Corsa
+        - BMW Z4 E89
 
 ## 5.5.2.1-release 01/06/24
   1. Fixed several bugs for function setting application in the new startup profiles.

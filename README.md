@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[5.5.3.0-dev](https://www.dropbox.com/scl/fi/laml429e932qycyu5yrsb/Simulator-Controller-5.5.3.0-dev.zip?rlkey=m8eq2xd7y8e94r4uq48x1r6ef&dl=1) (Early build for 5.5.3. Changes: Changed save mode default to "Auto" in "Simulator Configuration", Fixed selection of driver and session on the "Team Server" tab in "Simulator Configuration", Fixed initial tyre setup import in "Wet" conditions^, Startup profile aware reload of race settings, Fixed some edge cases in FCY handling, French translation of "Simulator Setup", Icon preview in "Controller Actions Editor", New logo for Simulator Controller.)
+[5.5.3.0-beta](https://www.dropbox.com/scl/fi/j6ijfm6v0tnoyif2cmoeh/Simulator-Controller-5.5.3.0-beta.zip?rlkey=gaz1bkbapyo5cmhkq8b7pghqy&dl=1) (Test version for 5.5.3. Changes: Changed save mode default to "Auto" in "Simulator Configuration", Fixed selection of driver and session on the "Team Server" tab in "Simulator Configuration", Fixed initial tyre setup import in "Wet" conditions^, Startup profile aware reload of race settings, Fixed some edge cases in FCY handling, French translation of "Simulator Setup", Icon preview in "Controller Actions Editor", New logo for Simulator Controller, New car models for "Setup Workbench".)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-553) of this version and all the versions you might have skipped, before installing and using this version.
 

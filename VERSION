@@ -1,9 +1,9 @@
 [Development]
-Version=5.5.3.0-dev
+Version=5.5.3.0-beta
 Target=5.5.3.0-release
-Date=01/10/2024
-Download=https://www.dropbox.com/scl/fi/laml429e932qycyu5yrsb/Simulator-Controller-5.5.3.0-dev.zip?rlkey=m8eq2xd7y8e94r4uq48x1r6ef&dl=1
-Changes=Changed save mode default to "Auto" in "Simulator Configuration", Fixed selection of driver and session on the "Team Server" tab in "Simulator Configuration", Fixed initial tyre setup import in "Wet" conditions^, Startup profile aware reload of race settings, Fixed some edge cases in FCY handling, French translation of "Simulator Setup", Icon preview in "Controller Actions Editor", New logo for Simulator Controller
+Date=01/11/2024
+Download=https://www.dropbox.com/scl/fi/j6ijfm6v0tnoyif2cmoeh/Simulator-Controller-5.5.3.0-beta.zip?rlkey=gaz1bkbapyo5cmhkq8b7pghqy&dl=1
+Changes=Changed save mode default to "Auto" in "Simulator Configuration", Fixed selection of driver and session on the "Team Server" tab in "Simulator Configuration", Fixed initial tyre setup import in "Wet" conditions^, Startup profile aware reload of race settings, Fixed some edge cases in FCY handling, French translation of "Simulator Setup", Icon preview in "Controller Actions Editor", New logo for Simulator Controller, New car models for "Setup Workbench"
 Components=Media->5.3.0,Configuration->5.5.3,Utilities->5.4.8
 [Release]
 Version=5.5.2.1-release
@@ -27,5 +27,5 @@ Utilities.5.4.8.Download=https://www.dropbox.com/scl/fi/5nduffajjm3x6rhsxr1nk/Ut
 [Current]
 Type=Development
 [Version]
-Development=5.5.3.0-dev
+Development=5.5.3.0-beta
 Release=5.5.2.1-release

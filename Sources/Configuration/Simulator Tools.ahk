@@ -1648,11 +1648,26 @@ updateInstallationForV500() {
 }
 
 updateConfigurationForV553() {
+	local text
+
 	setMultiMapValue(kSimulatorConfiguration, "Splash Screens", "Logo.Type", "Picture Carousel")
 	setMultiMapValue(kSimulatorConfiguration, "Splash Screens", "Logo.Duration", 24 * 60 * 60 * 1000)
 	setMultiMapValue(kSimulatorConfiguration, "Splash Screens", "Logo.Images", "%kResourcesDirectory%Logo.JPG")
 
 	writeMultiMap(kSimulatorConfigurationFile, kSimulatorConfiguration)
+
+	if FileExist(kUserHomeDirectory . "Setup\Setup.data") {
+		text := FileRead(kUserHomeDirectory . "Setup\Setup.data", "`n")
+
+		if InStr(text, "Class=StreamDeckIcons")
+			try {
+				FileCopy(kResourcesDirectory . "Setup\Presets\Controller Action Icons.fr"
+					   , kUserHomeDirectory . "Translations\Controller Action Icons.fr")
+			}
+			catch Any as exception {
+				logError(exception)
+			}
+	}
 }
 
 updateConfigurationForV552() {

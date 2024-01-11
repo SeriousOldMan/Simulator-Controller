@@ -11,7 +11,7 @@
   10. The "Controller Actions Editor" now shows preview icons in the list of available actions.
   11. The new logo for Simulator Controller has been added to the splash screens.
   12. The preset "Race Engineer w/o Pitstop Control" has been deprecated because this setting is now available in the startup profiles (named "Pitstop Service").
-  13. The Stream Deck Icons are now also available for French language. Deselect the preset and select it again in "Simulator Setup" will copy the icons to your configuration.
+  13. The Stream Deck Icons are now also available when the French language is selected.
   14. New car models for "Setup Workbench":
       - Assetto Corsa
         - BMW Z4 E89

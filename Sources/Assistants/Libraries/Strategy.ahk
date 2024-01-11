@@ -2942,9 +2942,9 @@ class Strategy extends ConfigurationItem {
 			avgLapTime := this.AvgLapTime["Session"]
 
 		if (this.SessionType = "Duration")
-			return Ceil(((sessionLength * 60) / avgLapTime) + ((formationLap && hasFormationLap) ? 1 : 0) + ((postRaceLap && hasPostRaceLap) ? 1 : 0))
+			return Ceil(((sessionLength * 60) / avgLapTime) + ((postRaceLap && hasPostRaceLap) ? 1 : 0)) ; + ((formationLap && hasFormationLap) ? 1 : 0)
 		else
-			return (sessionLength + ((formationLap && hasFormationLap) ? 1 : 0) + ((postRaceLap && hasPostRaceLap) ? 1 : 0))
+			return (sessionLength + ((postRaceLap && hasPostRaceLap) ? 1 : 0)) ;  + ((formationLap && hasFormationLap) ? 1 : 0)
 	}
 
 	calcSessionTime(avgLapTime := false, formationLap := true, postRaceLap := true) {
@@ -2956,9 +2956,9 @@ class Strategy extends ConfigurationItem {
 			avgLapTime := this.AvgLapTime["Session"]
 
 		if (this.SessionType = "Duration")
-			return ((sessionLength * 60) + (((formationLap && hasFormationLap) ? 1 : 0) * avgLapTime) + (((postRaceLap && hasPostRaceLap) ? 1 : 0) * avgLapTime))
+			return ((sessionLength * 60) + (((postRaceLap && hasPostRaceLap) ? 1 : 0) * avgLapTime)) ;  + (((formationLap && hasFormationLap) ? 1 : 0) * avgLapTime)
 		else
-			return ((sessionLength + ((formationLap && hasFormationLap) ? 1 : 0) + ((postRaceLap && hasPostRaceLap) ? 1 : 0)) * avgLapTime)
+			return ((sessionLength + ((postRaceLap && hasPostRaceLap) ? 1 : 0)) * avgLapTime) ; + ((formationLap && hasFormationLap) ? 1 : 0)
 	}
 
 	calcRefuelAmount(targetFuel, startFuel, remainingSessionLaps, stintLaps) {

@@ -5,14 +5,15 @@
   4. Fixed a misleading error message in the automatic update procedure that indicates a security problem, although the download file simply was not available.
   5. Fixed a critical bug for initial tyre setup import in non-dry weather conditions (especially for *Assetto Corsa Competizione*).
   6. Fixed some edge cases for Full Course Yellow handling by the Strategist.
-  7. The default for *Save* mode in "Simulator Configuration" is now "Auto". If you changed the setting already, your choice will be preserved.
-  8. When the race settings are modified with the "Race Settings" app while already being in a session, all choices of the active startup profile are also incorporated.
-  9. The translation for the French language has been finalized by @SlatMars, with "Simulator Setup" now also available with a user interface in French.
-  10. The "Controller Actions Editor" now shows preview icons in the list of available actions.
-  11. The new logo for Simulator Controller has been added to the splash screens.
-  12. The preset "Race Engineer w/o Pitstop Control" has been deprecated because this setting is now available in the startup profiles (named "Pitstop Service").
-  13. The Stream Deck Icons are now also available when the French language is selected.
-  14. New car models for "Setup Workbench":
+  7. Fixed a bug in "Strategy Workbench", where in some cases the fuel calculation for races with formation lap was too high, resulting in too much fuel left at the end of the race.
+  8. The default for *Save* mode in "Simulator Configuration" is now "Auto". If you changed the setting already, your choice will be preserved.
+  9. When the race settings are modified with the "Race Settings" app while already being in a session, all choices of the active startup profile are also incorporated.
+  10. The translation for the French language has been finalized by @SlatMars, with "Simulator Setup" now also available with a user interface in French.
+  11. The "Controller Actions Editor" now shows preview icons in the list of available actions.
+  12. The new logo for Simulator Controller has been added to the splash screens.
+  13. The preset "Race Engineer w/o Pitstop Control" has been deprecated because this setting is now available in the startup profiles (named "Pitstop Service").
+  14. The Stream Deck Icons are now also available when the French language is selected.
+  15. New car models for "Setup Workbench":
       - Assetto Corsa
         - BMW Z4 E89
 

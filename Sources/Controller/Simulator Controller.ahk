@@ -663,7 +663,7 @@ class SimulatorController extends ConfigurationItem {
 			function.setLabel(text, color, overlay)
 	}
 
-	setFunctionIcon(descriptor) {
+	setFunctionIcon(descriptor, icon) {
 		local function := this.findFunction(descriptor)
 
 		if function

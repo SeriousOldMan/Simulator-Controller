@@ -557,10 +557,12 @@ class SessionDatabase extends ConfigurationItem {
 
 	static registerDriver(simulator, id, name) {
 		local sessionDB, forName, surName, nickName, key
-
+		
 		static knownDrivers := CaseInsenseMap()
 
 		if (simulator && id && name && (InStr(name, "John Doe") != 1)) {
+			name := StrReplace(StrReplace(StrReplace(name, ";", ","), "`n", A_Space), "|", "-")
+
 			key := (simulator . id . name)
 
 			if !knownDrivers.Has(key) {

@@ -1,4 +1,4 @@
-## 5.5.3.0-release 01/12/24 (planned)
+## 5.5.3.0-release 01/12/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed selection of driver and session on the *Team Server* tab in "Simulator Configuration".

@@ -1,16 +1,16 @@
 [Development]
-Version=5.5.3.0-beta
+Version=5.5.3.0-release
 Target=5.5.3.0-release
-Date=01/11/2024
-Download=https://www.dropbox.com/scl/fi/j6ijfm6v0tnoyif2cmoeh/Simulator-Controller-5.5.3.0-beta.zip?rlkey=gaz1bkbapyo5cmhkq8b7pghqy&dl=1
+Date=01/12/2024
+Download=https://cutt.ly/CwJEikw2;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.5.3.0-release.zip
 Changes=Changed save mode default to "Auto" in "Simulator Configuration", Fixed selection of driver and session on the "Team Server" tab in "Simulator Configuration", Fixed initial tyre setup import in "Wet" conditions^, Startup profile aware reload of race settings, Fixed some edge cases in FCY handling, French translation of "Simulator Setup", Icon preview in "Controller Actions Editor", New logo for Simulator Controller, New car models for "Setup Workbench"
 Components=Media->5.3.0,Configuration->5.5.3,Utilities->5.4.8
 [Release]
-Version=5.5.2.1-release
-Date=01/06/2024
-Download=https://cutt.ly/owHvhBQn;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.5.2.1-release.zip
-Changes=New startup wizard in "Simulator Startup", Deprecated silent and muted presets from "Simulator Setup", New keyboard modifiers for "Simulator Startup", New preset in "Simulator Setup" for startup profiles, New fields in "Session State.json", Migrated to AHK 2.0.11, New car models for "Setup Workbench", New EnumerationHandler in "Setup Workbench", Driving Coach preserves memory between sessions, Performance optimization in Team Server, Adopted Automibilsta 2 V 1.5.5 changes
-Components=Media->5.3.0,Configuration->5.5.2,Utilities->5.4.8
+Version=5.5.3.0-release
+Date=01/12/2024
+Download=https://cutt.ly/CwJEikw2;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.5.3.0-release.zip
+Changes=Changed save mode default to "Auto" in "Simulator Configuration", Fixed selection of driver and session on the "Team Server" tab in "Simulator Configuration", Fixed initial tyre setup import in "Wet" conditions^, Startup profile aware reload of race settings, Fixed some edge cases in FCY handling, French translation of "Simulator Setup", Icon preview in "Controller Actions Editor", New logo for Simulator Controller, New car models for "Setup Workbench"
+Components=Media->5.3.0,Configuration->5.5.3,Utilities->5.4.8
 [Components]
 Media.5.3.0.Path=Resources
 Media.5.3.0.Content=Splash Media
@@ -25,7 +25,7 @@ Utilities.5.4.8.Path=.
 Utilities.5.4.8.Content=Utilities
 Utilities.5.4.8.Download=https://www.dropbox.com/scl/fi/5nduffajjm3x6rhsxr1nk/Utilities-5.4.8.zip?rlkey=alrj8l2z205dd2vm9cu6hbsot&dl=1
 [Current]
-Type=Development
+Type=Release
 [Version]
-Development=5.5.3.0-beta
-Release=5.5.2.1-release
+Development=5.5.3.0-release
+Release=5.5.3.0-release

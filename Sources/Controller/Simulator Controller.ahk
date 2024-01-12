@@ -656,6 +656,20 @@ class SimulatorController extends ConfigurationItem {
 		return (functions.Has(descriptor) ? functions[descriptor] : false)
 	}
 
+	setFunctionLabel(descriptor, text, color := "Black", overlay := false) {
+		local function := this.findFunction(descriptor)
+
+		if function
+			function.setLabel(text, color, overlay)
+	}
+
+	setFunctionIcon(descriptor) {
+		local function := this.findFunction(descriptor)
+
+		if function
+			function.setIcon(icon)
+	}
+
 	getActions(function, trigger) {
 		if this.iFunctionActions.Has(function)
 			return this.iFunctionActions[function]
@@ -2180,6 +2194,8 @@ externalCommandManager() {
 					pushButton(descriptor[2], false)
 				case kDialType:
 					rotateDial(descriptor[2], command[2], false)
+				case kCustomType:
+					callCustom(descriptor[2], false)
 				default:
 					throw "Unknown controller function type (" . descriptor[1] . ") detected in externalCommand..."
 			}

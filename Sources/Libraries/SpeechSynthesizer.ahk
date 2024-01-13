@@ -49,6 +49,7 @@ global kAzureVoices := Map("de", [["de-AT", "de-AT-IngridNeural"], ["de-AT", "de
 
 class SpeechSynthesizer {
 	iSynthesizer := "Windows"
+	iSpeechSynthesizer := false
 	iVoices := []
 
 	iLanguage := ""
@@ -97,23 +98,24 @@ class SpeechSynthesizer {
 			else {
 				voices := []
 
-				if (this.Synthesizer = "Windows") {
-					loop this.iSpeechSynthesizer.GetVoices.Count {
-						voice := this.iSpeechSynthesizer.GetVoices.Item(A_Index - 1)
-						lcid := voice.GetAttribute("Language")
+				if this.iSpeechSynthesizer
+					if (this.Synthesizer = "Windows") {
+						loop this.iSpeechSynthesizer.GetVoices.Count {
+							voice := this.iSpeechSynthesizer.GetVoices.Item(A_Index - 1)
+							lcid := voice.GetAttribute("Language")
 
-						if (getLanguageFromLCID(lcid) = language)
-							voices.Push(voice.GetAttribute("Name"))
+							if (getLanguageFromLCID(lcid) = language)
+								voices.Push(voice.GetAttribute("Name"))
+						}
 					}
-				}
-				else if ((this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure") || (this.Synthesizer = "Google")) {
-					for ignore, candidate in this.iVoices {
-						name := string2Values("(", candidate)
+					else if ((this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure") || (this.Synthesizer = "Google")) {
+						for ignore, candidate in this.iVoices {
+							name := string2Values("(", candidate)
 
-						if (InStr(name[2], language) == 1)
-							voices.Push(candidate)
+							if (InStr(name[2], language) == 1)
+								voices.Push(candidate)
+						}
 					}
-				}
 
 				return voices
 			}

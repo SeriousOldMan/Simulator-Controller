@@ -12365,6 +12365,8 @@ manageTeam(raceCenterOrCommand, teamDrivers := false, arguments*) {
 }
 
 pitstopSettings(raceCenterOrCommand := false, arguments*) {
+	local tyreChange := false
+
 	static rCenter := false
 	static isOpen := false
 
@@ -12400,22 +12402,33 @@ pitstopSettings(raceCenterOrCommand := false, arguments*) {
 				if arguments[1].Has("FuelAmount")
 					settingsListView.Add("", translate("Refuel"), displayValue("Float", convertUnit("Volume", arguments[1]["FuelAmount"])) . A_Space . getUnit("Volume", true))
 
-				if arguments[1].Has("TyreCompound")
-					if arguments[1]["TyreCompound"]
-						settingsListView.Add("", translate("Tyre Compound"), compound(arguments[1]["TyreCompound"], arguments[1]["TyreCompoundColor"])
-											   . (inList(["ACC", "Assetto Corsa Competizione"], rCenter.Simulator) ? translate(" (probably)") : ""))
+				if inList(["ACC", "Assetto Corsa Competizione"], rCenter.Simulator) && arguments[1].Has("Pitstop.Planned.Tyre.Compound") {
+					settingsListView.Add("", translate("Tyre Compound")
+										   , (arguments[1]["Pitstop.Planned.Tyre.Compound"] ? compound(arguments[1]["Pitstop.Planned.Tyre.Compound"]
+																									 , arguments[1]["Pitstop.Planned.Tyre.Compound.Color"])
+																							: translate("-")) . translate(" (probably)"))
 
-				if arguments[1].Has("TyreSet")
-					if (arguments[1].Has("TyreCompound") && arguments[1]["TyreCompound"])
-						settingsListView.Add("", translate("Tyre Set"), arguments[1]["TyreSet"] ? arguments[1]["TyreSet"] : "-")
+					tyreChange := true
+				}
+				else if arguments[1].Has("TyreCompound") && arguments[1]["TyreCompound"] {
+					settingsListView.Add("", translate("Tyre Compound"), compound(arguments[1]["TyreCompound"], arguments[1]["TyreCompoundColor"]))
 
-				if arguments[1].Has("TyrePressureFL")
-					if (arguments[1].Has("TyreCompound") && arguments[1]["TyreCompound"])
-						settingsListView.Add("", translate("Tyre Pressures"), values2String(", ", displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureFL"]))
-																								, displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureFR"]))
-																								, displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureRL"]))
-																								, displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureRR"])))
+					tyreChange := true
+				}
+
+				if tyreChange {
+					if arguments[1].Has("TyreSet")
+						if (arguments[1].Has("TyreCompound") && arguments[1]["TyreCompound"])
+							settingsListView.Add("", translate("Tyre Set"), arguments[1]["TyreSet"] ? arguments[1]["TyreSet"] : "-")
+
+					if arguments[1].Has("TyrePressureFL")
+						if (arguments[1].Has("TyreCompound") && arguments[1]["TyreCompound"])
+							settingsListView.Add("", translate("Tyre Pressures"), values2String(", ", displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureFL"]))
+																									, displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureFR"]))
+																									, displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureRL"]))
+																									, displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureRR"])))
 																			. A_Space . getUnit("Pressure", true))
+				}
 
 				if (arguments[1].Has("RepairBodywork") || arguments[1].Has("RepairSuspension") || arguments[1].Has("RepairEngine"))
 					settingsListView.Add("", translate("Repairs"), rCenter.computeRepairs(arguments[1].Has("RepairBodywork") ? arguments[1]["RepairBodywork"] : false

@@ -138,7 +138,7 @@ class BasicStepWizard extends StepWizard {
 				else
 					this.BasicSetup := false
 				*/
-				
+
 				this.BasicSetup := "Force"
 			}
 			else
@@ -375,7 +375,7 @@ class BasicStepWizard extends StepWizard {
 		local enIndex := 0
 		local enabled := false
 		local fullInstall := false
-		local code, language, uiLanguage, startWithWindows, silentMode, configuration
+		local code, language, uiLanguage, startWithWindows, silentMode, configuration, pushToTalk
 
 		static installed := false
 
@@ -406,7 +406,12 @@ class BasicStepWizard extends StepWizard {
 
 			configuration := readMultiMap(kUserHomeDirectory . "Setup\Voice Control Configuration.ini")
 
-			this.Control["basicPushToTalkEdit"].Text := getMultiMapValue(configuration, "Voice Control", "PushToTalk", "")
+			pushToTalk := getMultiMapValue(configuration, "Voice Control", "PushToTalk", false)
+
+			if (pushToTalk = false)
+				pushToTalk := ""
+
+			this.Control["basicPushToTalkEdit"].Text := pushToTalk
 			this.Control["basicPushToTalkModeDropDown"].Choose(inList(["Hold", "Press", "Custom"]
 																	, getMultiMapValue(configuration, "Voice Control"
 																					 , "PushToTalkMode", "Hold")))

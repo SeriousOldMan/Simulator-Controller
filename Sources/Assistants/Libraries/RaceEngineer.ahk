@@ -1010,20 +1010,22 @@ class RaceEngineer extends RaceAssistant {
 			changed := false
 			values := []
 
-			for index, suffix in ["FL", "FR", "RL", "RR"] {
-				prssKey := ("Pitstop.Planned.Tyre.Pressure." . suffix)
-				value := getMultiMapValue(data, "Setup Data", "TyrePressure" . suffix, false)
+			if knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound", false) {
+				for index, suffix in ["FL", "FR", "RL", "RR"] {
+					prssKey := ("Pitstop.Planned.Tyre.Pressure." . suffix)
+					value := getMultiMapValue(data, "Setup Data", "TyrePressure" . suffix, false)
 
-				values.Push(value)
+					values.Push(value)
 
-				if (value && (Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure." . suffix), 1) != Round(value, 1)))
-					changed := true
-			}
+					if (value && (Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure." . suffix, false), 1) != Round(value, 1)))
+						changed := true
+				}
 
-			if changed {
-				this.pitstopOptionChanged("Tyre Pressures", verbose, values*)
+				if changed {
+					this.pitstopOptionChanged("Tyre Pressures", verbose, values*)
 
-				result := true
+					result := true
+				}
 			}
 
 			value := getMultiMapValue(data, "Setup Data", "RepairSupension", kUndefined)
@@ -2469,7 +2471,11 @@ class RaceEngineer extends RaceAssistant {
 
 						targetPressure := values[index]
 
-						knowledgeBase.setFact(incrKey, knowledgeBase.getValue(incrKey) + (targetPressure - knowledgeBase.getValue(prssKey)))
+						if knowledgeBase.getValue(incrKey, false)
+							knowledgeBase.setFact(incrKey, knowledgeBase.getValue(incrKey) + (targetPressure - knowledgeBase.getValue(prssKey)))
+						else
+							knowledgeBase.setFact(incrKey, 0)
+
 						knowledgeBase.setFact(prssKey, targetPressure)
 					}
 				case "Repair Suspension":

@@ -1985,7 +1985,7 @@ class DiscreteValuesHandler extends NumberHandler {
 		if this.validValue(value)
 			return value
 		else
-			return displayValue
+			return Min(this.MaxValue, Max(this.MinValue, displayValue))
 	}
 
 	decreaseValue(displayValue) {
@@ -1994,7 +1994,7 @@ class DiscreteValuesHandler extends NumberHandler {
 		if this.validValue(value)
 			return value
 		else
-			return displayValue
+			return Max(this.MinValue, Min(this.MaxValue, displayValue))
 	}
 }
 
@@ -2128,13 +2128,27 @@ class EnumerationHandler extends SettingHandler {
 	increaseValue(displayValue) {
 		local index := (inList(this.Values, displayValue) + 1)
 
-		return (this.Values.Has(index) ? this.Values[index] : displayValue)
+		if this.Values.Has(index)
+			return this.Values[index]
+		else if this.validValue(displayValue)
+			return displayValue
+		else if (this.Values.Length > 0)
+			return this.Values[1]
+		else
+			return "-"
 	}
 
 	decreaseValue(displayValue) {
 		local index := (inList(this.Values, displayValue) - 1)
 
-		return (this.Values.Has(index) ? this.Values[index] : displayValue)
+		if this.Values.Has(index)
+			return this.Values[index]
+		else if this.validValue(displayValue)
+			return displayValue
+		else if (this.Values.Length > 0)
+			return this.Values[1]
+		else
+			return "-"
 	}
 }
 
@@ -2274,7 +2288,7 @@ class SetupEditor extends ConfigurationItem {
 			if selected
 				selectSetting(listView, line)
 		}
-		
+
 		selectSetting(*) {
 			editor.updateState()
 		}
@@ -2377,6 +2391,21 @@ class SetupEditor extends ConfigurationItem {
 			this.Window.Destroy()
 	}
 
+	displaySetup(setup) {
+		local viewer := this.Control["setupViewer"]
+		local scrollPos
+
+		if setup {
+			scrollPos := getScrollPosition(viewer)
+
+			viewer.Value := setup.Setup
+
+			setScrollPosition(viewer, scrollPos)
+		}
+		else
+			viewer.Value := ""
+	}
+
 	editSetup(setup := false) {
 		this.Setup := (setup ? setup.Clone() : Setup())
 		this.Setup.Editor := this
@@ -2429,7 +2458,7 @@ class SetupEditor extends ConfigurationItem {
 			}
 
 			if changed
-				this.Control["setupViewer"].Value := this.Setup.Setup
+				this.displaySetup(this.Setup)
 		}
 	}
 
@@ -2484,7 +2513,8 @@ class SetupEditor extends ConfigurationItem {
 			this.Setup := setup
 
 		this.Control["setupNameViewer"].Text := (setup ? setup.Name : "")
-		this.Control["setupViewer"].Value := (setup ? setup.Setup : "")
+
+		this.displaySetup(setup)
 
 		categories := getMultiMapValues(this.Workbench.Definition, "Workbench.Categories")
 
@@ -2606,7 +2636,7 @@ class SetupEditor extends ConfigurationItem {
 
 			this.updateSetting(setting, handler.convertToRawValue(handler.increaseValue(handler.convertToDisplayValue(this.Setup.getValue(setting)))))
 
-			this.Control["setupViewer"].Value := (this.Setup ? this.Setup.Setup : "")
+			this.displaySetup(this.Setup)
 		}
 
 		this.updateState()
@@ -2640,7 +2670,7 @@ class SetupEditor extends ConfigurationItem {
 
 			this.updateSetting(setting, handler.convertToRawValue(handler.decreaseValue(handler.convertToDisplayValue(this.Setup.getValue(setting)))))
 
-			this.Control["setupViewer"].Value := (this.Setup ? this.Setup.Setup : "")
+			this.displaySetup(this.Setup)
 		}
 
 		this.updateState()

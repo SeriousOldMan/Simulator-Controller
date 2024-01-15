@@ -4,6 +4,8 @@
   3. Fixed crash in "Simulator Configuration" when the internal voice synthesizer of Windows is not available.
   4. Support for Custom functions in external command loop of Simulator Controller. See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#external-commands) for more information.
   5. Optimized the pitstop preview information in "Race Center". No tyre change is now displayed correctly and settings changes done by the driver **after** a pitstop has already been prepared, are reflected as well.
+  6. Better handling of invalid values in the setup editor of the "Setup Workbench".
+  7. The scroll position of the setup viewer in the "Setup Workbench" is retained when a setting value is changed.
   
 ## 5.5.3.0-release 01/12/24
   1. Minor bugfixes, as always

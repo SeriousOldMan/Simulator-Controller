@@ -1425,12 +1425,8 @@ getScrollPosition(edit) {
 setScrollPosition(edit, pos) {
 	local WM_VSCROLL := 0x0115
 	local SB_THUMBPOSITION := 4
-	local SB_THUMBTRACK := 5
-	local SB_VERT := 1
 
-	; DllCall("SetScrollPos", "UInt", edit.Hwnd, "Int", SB_VERT, "Int", pos, "UInt", 0)
-
-	SendMessage(WM_VSCROLL, (pos * 2 * 32768) + SB_THUMBPOSITION, , edit)
+	SendMessage(WM_VSCROLL, (pos * 65536) + SB_THUMBPOSITION, , edit)
 }
 
 translateMsgBoxButtons(buttonLabels, *) {

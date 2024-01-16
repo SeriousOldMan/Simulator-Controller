@@ -1416,6 +1416,19 @@ getWindowSize(descriptor, &width, &height) {
 		return true
 }
 
+getScrollPosition(edit) {
+	local SB_VERT := 1
+
+	return DllCall("GetScrollPos", "UInt", edit.Hwnd, "Int", SB_VERT)
+}
+
+setScrollPosition(edit, pos) {
+	local WM_VSCROLL := 0x0115
+	local SB_THUMBPOSITION := 4
+
+	SendMessage(WM_VSCROLL, (pos * 65536) + SB_THUMBPOSITION, , edit)
+}
+
 translateMsgBoxButtons(buttonLabels, *) {
 	local curDetectHiddenWindows := A_DetectHiddenWindows
 	local index, label

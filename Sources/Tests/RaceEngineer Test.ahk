@@ -462,6 +462,18 @@ class DamageAnalysis extends Assert {
 					this.AssertEqual(true, vDamageRepair, "Expected pitstop to be recommended...")
 					this.AssertEqual(1.7, Round(vDamageLapDelta, 1), "Expected lap delta to be 1.7...")
 					this.AssertEqual(16, Round(vDamageStintLaps), "Expected remaining stints to be 16...")
+
+					if engineer.Debug[kDebugKnowledgeBase]
+						engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
+
+					engineer.planPitstop()
+
+					if engineer.Debug[kDebugKnowledgeBase]
+						engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
+
+					this.AssertEqual(true, Round(engineer.KnowledgeBase.getValue("Pitstop.Planned")), "Pitstop not flagged as Planned...")
+					this.AssertEqual(false, engineer.KnowledgeBase.getValue("Pitstop.Planned.Repair.Suspension"), "Expected no suspension repair...")
+					this.AssertEqual(true, engineer.KnowledgeBase.getValue("Pitstop.Planned.Repair.Bodywork"), "Expected bodywork repair...")
 				}
 				else if ((lap == 5) && (A_Index == 4)) {
 					this.AssertEqual(false, vSuspensionDamage, "Expected suspension damage not to be reported...")

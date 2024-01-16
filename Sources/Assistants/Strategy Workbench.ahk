@@ -2267,10 +2267,20 @@ class StrategyWorkbench extends ConfigurationItem {
 						this.Control["pitstopWindowEdit"].Text := value
 
 						if pitstopRule {
+							this.Control["tyreChangeRequirementsDropDown"].Delete()
+							this.Control["tyreChangeRequirementsDropDown"].Add(collect(["Optional", "Required", "Always", "Disallowed"], translate))
+							this.Control["refuelRequirementsDropDown"].Delete()
+							this.Control["refuelRequirementsDropDown"].Add(collect(["Optional", "Required", "Always", "Disallowed"], translate))
+
 							this.Control["refuelRequirementsDropDown"].Choose(inList(["Optional", "Required", "Always", "Disallowed"], strategy.RefuelRule))
 							this.Control["tyreChangeRequirementsDropDown"].Choose(inList(["Optional", "Required", "Always", "Disallowed"], strategy.TyreChangeRule))
 						}
 						else {
+							this.Control["tyreChangeRequirementsDropDown"].Delete()
+							this.Control["tyreChangeRequirementsDropDown"].Add(collect(["Optional", "Always", "Disallowed"], translate))
+							this.Control["refuelRequirementsDropDown"].Delete()
+							this.Control["refuelRequirementsDropDown"].Add(collect(["Optional", "Always", "Disallowed"], translate))
+
 							this.Control["refuelRequirementsDropDown"].Choose(inList(["Optional", "Always", "Disallowed"], strategy.RefuelRule))
 							this.Control["tyreChangeRequirementsDropDown"].Choose(inList(["Optional", "Always", "Disallowed"], strategy.TyreChangeRule))
 						}

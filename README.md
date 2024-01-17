@@ -49,7 +49,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[5.5.4.0-release](https://www.dropbox.com/scl/fi/9a97k39sklge5x67gzqrz/Simulator-Controller-5.5.4.0-dev.zip?rlkey=f7d8iklgeu4xplba78t8exw2q&dl=1) (Early build for 5.5.4. Changes: Support for Custom functions in external event loop of Simulator Controller, Fixed crash in "Simulator Configuration" when the internal voice synthesizer of Windows is not available, Optimized pitstop settings preview in "Race Center", Invalid value handling in "Setup Workbench", Retain setup display field scroll position in "Setup Workbench".)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-554) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

@@ -5,7 +5,7 @@
   4. Fixed refule rule not initializing correctly from a loaded strategy in "Strategy Workbench".
   5. Fixed a bug for Race Engineer, who didn't ask to save the pressures at the end of a session with a pitstop without a tyre change.
   6. Support for Custom functions in external command loop of Simulator Controller. See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#external-commands) for more information.
-  7. Optimized the pitstop preview information in "Race Center". No tyre change is now displayed correctly and settings changes done by the driver **after** a pitstop has already been prepared, are reflected as well.
+  7. Optimized the pitstop preview information in "Race Center". No tyre change is now displayed correctly and settings modified by the driver **after** a pitstop has already been prepared, are reflected as well.
   8. Better handling of invalid values in the setup editor of the "Setup Workbench".
   9. The "Pit Strategy" slider can now also be used to optimize the last two stints in longer races in the "Strategy Workbench". Please read the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#simulation) for more information.
   10. The scroll position of the setup viewer in the "Setup Workbench" is retained when a setting value is changed.

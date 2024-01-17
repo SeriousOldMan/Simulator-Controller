@@ -1,9 +1,9 @@
 [Development]
 Version=5.5.4.0-dev
 Target=5.5.4.0-release
-Date=01/15/2024
+Date=01/17/2024
 Download=
-Changes=Support for Custom functions in external event loop of Simulator Controller, Fixed crash in "Simulator Configuration" when the internal voice synthesizer of Windows is not available, Optimized pitstop settings preview in "Race Center", Invalid value handling in "Setup Workbench", Retain setup display field scroll position in "Setup Workbench"
+Changes=Support for Custom functions in external event loop of Simulator Controller, Fixed crash in "Simulator Configuration" when the internal voice synthesizer of Windows is not available, Optimized pitstop settings preview in "Race Center", Invalid value handling in "Setup Workbench", Retain setup display field scroll position in "Setup Workbench", Pit strategy for longer races in "Strategy Workbench"
 Components=Media->5.3.0,Configuration->5.5.3,Utilities->5.4.8
 [Release]
 Version=5.5.3.0-release

@@ -3037,13 +3037,17 @@ class Strategy extends ConfigurationItem {
 
 		pitstopRule := this.PitstopRule
 
-		if ((pitstopNr = 1) && ((!pitstopRule && (targetLap < remainingSessionLaps)) || isNumber(pitstopRule)) && (targetLap > (currentLap + 1)) && !adjusted) {
-			halfLaps := ((targetLap - currentLap) / 2)
+		if ((pitstopNr = 1) && ((!pitstopRule && (targetLap < remainingSessionLaps)) || isNumber(pitstopRule))
+							&& (targetLap > (currentLap + 1)) && !adjusted) {
+			if ((Abs(this.FirstStintWeight) >= 5)
+			 && (this.getSessionLaps() < (this.getMaxFuelLaps(this.FuelCapacity, this.FuelConsumption[true]) * 2))) {
+				halfLaps := ((targetLap - currentLap) / 2)
 
-			if ((halfLaps != 0) && (Abs(this.FirstStintWeight) >= 5)) {
-				targetLap := (currentLap + Round(halfLaps + ((halfLaps / 100) * this.FirstStintWeight)))
+				if (halfLaps != 0) {
+					targetLap := (currentLap + Round(halfLaps + ((halfLaps / 100) * this.FirstStintWeight)))
 
-				adjusted := true
+					adjusted := true
+				}
 			}
 		}
 		else if isObject(pitstopRule) {
@@ -3356,6 +3360,7 @@ class Strategy extends ConfigurationItem {
 		local pitstops := this.Pitstops
 		local numPitstops := pitstops.Length
 		local remainingSessionLaps, refuelAmount, stintLaps, adjustments, adjustment, ignore, pitstop, key, value, pitstopNr, fixedLapTime
+		local halfLaps, fullLaps
 
 		if ((numPitstops > 1) && !pitstops[numPitstops].Fixed && !this.ConsumptionVariation && !this.InitialFuelVariation
 															  && !this.TyreUsageVariation && !this.TyreCompoundVariation
@@ -3367,8 +3372,19 @@ class Strategy extends ConfigurationItem {
 				stintLaps := pitstops[numPitstops - 1].StintLaps
 			}
 			else {
-				refuelAmount := Ceil((pitstops[numPitstops - 1].RefuelAmount + pitstops[numPitstops].RefuelAmount) / 2)
-				stintLaps := Ceil(remainingSessionLaps / 2)
+				fullLaps := this.getMaxFuelLaps(this.FuelCapacity, this.FuelConsumption[true])
+
+				if ((Abs(this.FirstStintWeight) >= 5) && (this.getSessionLaps() > (fullLaps * 2))) {
+					halfLaps := (Min(remainingSessionLaps, fullLaps) / 2)
+					stintLaps := Floor(Max((remainingSessionLaps - (this.FuelCapacity / this.FuelConsumption[true]))
+										 , Round(halfLaps + ((halfLaps / 100) * this.FirstStintWeight))))
+					refuelAmount := ((pitstops[numPitstops - 1].RefuelAmount + pitstops[numPitstops].RefuelAmount)
+								   / remainingSessionLaps * stintLaps)
+				}
+				else {
+					refuelAmount := Ceil((pitstops[numPitstops - 1].RefuelAmount + pitstops[numPitstops].RefuelAmount) / 2)
+					stintLaps := Ceil(remainingSessionLaps / 2)
+				}
 			}
 
 			adjustments := Map()
@@ -3392,7 +3408,7 @@ class Strategy extends ConfigurationItem {
 			adjustment.RemainingSessionLaps := remainingSessionLaps
 			adjustment.StintLaps := stintLaps
 
-			adjustments[pitstops[numPitstops].Nr].StintLaps := stintLaps
+			adjustments[pitstops[numPitstops].Nr].StintLaps := (remainingSessionLaps - stintLaps)
 			adjustments[pitstops[numPitstops].Nr].Lap := (pitstops[numPitstops - 1].Lap + stintLaps)
 
 			this.initializeAvailableTyreSets()

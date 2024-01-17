@@ -683,7 +683,13 @@ Enter the required values in the *Initial Conditions* group, choose the data to 
 
   - Pit Strategy
     
-	This slider let you define the weight of the first stint. Move it to the left and an early first stop is preferred, move it to the right and a late stop will be preferred. This is a useful setting for sprint races with one required pitstop, to get out of traffic as early as possible or to create a splash n dash strategy for races without a required tyre change.
+	This slider has two different functions, depending on the length of the race and the number of pitstops.
+	
+	*Sprint race with one pitstop*<br>
+	In this case, the slider let you define the weight of the first stint. Move it to the left and an early pitstop is preferred, move it to the right and a late stop will be preferred. This is a useful setting for sprint races with one required pitstop, to get out of traffic as early as possible or to create a splash n dash strategy for races without a required tyre change.
+	
+	*Longer races with two or more pitstops*<br>
+	In this case, you can adjust the length of the last two stints depending on the position of the slider.
 
 For every slider not at the zero position, different variations of the underlying value will be created as strategy sceanrios, which will be compared at the end for better results. The number of variations depend on the slider position. The slider more to the right will result in more variations.
 

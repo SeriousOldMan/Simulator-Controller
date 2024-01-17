@@ -33,7 +33,7 @@
 
 consentDialog(id, consent := false, *) {
 	local consentGui, texts, chosen, x, y, fileName, ignore, section, keyValues, key, value
-	
+
 	static tyrePressuresConsentDropDown
 	static carSetupsConsentDropDown
 	static raceStrategiesConsentDropDown
@@ -483,6 +483,7 @@ if (!isDetachedInstallation() && !isDebug() && !inList(kBackgroundApps, StrSplit
 	checkForUpdates()
 
 	requestShareSessionDatabaseConsent()
-	startDatabaseSynchronizer()
 	checkForNews()
+
+	Task.startTask(startDatabaseSynchronizer, 20000, kLowPriority)
 }

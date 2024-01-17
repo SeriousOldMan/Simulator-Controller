@@ -1,0 +1,70 @@
+[?Initialize] => (Prove: removeSettings("Assetto Corsa", "Tatuus FA01",
+										[Electronics.TC, Aero.Height.Rear,
+										 Spring.Rate.Front.Left, Spring.Rate.Front.Right,
+										 Bumpstop.Rate.Front.Left, Bumpstop.Rate.Front.Right,
+										 Bumpstop.Rate.Rear.Left, Bumpstop.Rate.Rear.Right,
+										 Damper.Compression.Slow.Front.Left, Damper.Compression.Slow.Front.Right,
+										 Damper.Compression.Fast.Front.Left, Damper.Compression.Fast.Front.Right,
+										 Damper.Rebound.Slow.Front.Left, Damper.Rebound.Slow.Front.Right,
+										 Damper.Rebound.Fast.Front.Left, Damper.Rebound.Fast.Front.Left])),
+				 (Prove: addSettings("Assetto Corsa", "Tatuus FA01",
+									 [Aero.Height.Front, Aero.Height.Rear.Left, Aero.Height.Rear.Right,
+									  Differential.Coast,
+									  Spring.Rate.Front,
+									  Damper.Compression.Slow.Front, Damper.Compression.Fast.Front,
+									  Damper.Rebound.Slow.Front, Damper.Rebound.Fast.Front]))
+					
+[?Speed.Straight.Correction != 0] =>
+		(Prove: changeSetting(Aero.Height.Rear.Left, -1, ?Speed.Straight.Correction)),
+		(Prove: changeSetting(Aero.Height.Rear.Right, -1, ?Speed.Straight.Correction))
+[?Speed.Corner.Fast.Correction != 0] =>
+		(Prove: changeSetting(Aero.Height.Rear.Left, -1, ?Speed.Corner.Fast.Correction)),
+		(Prove: changeSetting(Aero.Height.Rear.Right, -1, ?Speed.Corner.Fast.Correction))
+[?Understeer.Corner.Entry.Fast.Correction != 0] =>
+		(Prove: changeSetting(Aero.Height.Rear.Left, 0.5, ?Understeer.Corner.Entry.Fast.Correction)),
+		(Prove: changeSetting(Aero.Height.Rear.Right, 0.5, ?Understeer.Corner.Entry.Fast.Correction))
+[?Oversteer.Corner.Entry.Fast.Correction != 0] =>
+		(Prove: changeSetting(Aero.Height.Rear.Left, -0.5, ?Oversteer.Corner.Entry.Fast.Correction)),
+		(Prove: changeSetting(Aero.Height.Rear.Right, -0.5, ?Oversteer.Corner.Entry.Fast.Correction))
+[?Understeer.Corner.Apex.Fast.Correction != 0] =>
+		(Prove: changeSetting(Aero.Height.Rear.Left, 0.5, ?Understeer.Corner.Apex.Fast.Correction)),
+		(Prove: changeSetting(Aero.Height.Rear.Right, 0.5, ?Understeer.Corner.Apex.Fast.Correction))
+[?Oversteer.Corner.Apex.Fast.Correction != 0] =>
+		(Prove: changeSetting(Aero.Height.Rear.Left, -0.5, ?Oversteer.Corner.Apex.Fast.Correction)),
+		(Prove: changeSetting(Aero.Height.Rear.Right, -0.5, ?Oversteer.Corner.Apex.Fast.Correction))
+[?Understeer.Corner.Exit.Fast.Correction != 0] =>
+		(Prove: changeSetting(Aero.Height.Rear.Left, 0.5, ?Understeer.Corner.Exit.Fast.Correction)),
+		(Prove: changeSetting(Aero.Height.Rear.Right, 0.5, ?Understeer.Corner.Exit.Fast.Correction))
+[?Oversteer.Corner.Exit.Fast.Correction != 0] =>
+		(Prove: changeSetting(Aero.Height.Rear.Left, -0.5, ?Oversteer.Corner.Exit.Fast.Correction)),
+		(Prove: changeSetting(Aero.Height.Rear.Right, -0.5, ?Oversteer.Corner.Exit.Fast.Correction))
+{All: [?Speed.Corner.Fast.Correction != 0], [?Speed.Corner.Fast.Value > 50]} =>
+		(Prove: changeSetting(Spring.Rate, [Front, Rear.Left, Rear.Right], 0.5, ?Speed.Corner.Fast.Correction))
+{All: [?Understeer.Corner.Entry.Slow.Correction != 0], [?Understeer.Corner.Entry.Slow.Value > 50]} =>
+		(Prove: changeSetting(Spring.Rate.Front, -1, ?Understeer.Corner.Entry.Slow.Correction))
+{All: [?Oversteer.Corner.Entry.Slow.Correction != 0], [?Oversteer.Corner.Entry.Slow.Value > 50]} =>
+		(Prove: changeSetting(Spring.Rate.Front, 1, ?Oversteer.Corner.Entry.Slow.Correction))
+[?Understeer.Corner.Apex.Slow.Correction != 0] =>
+		(Prove: changeSetting(Spring.Rate.Front, -1, ?Understeer.Corner.Apex.Slow.Correction))
+[?Oversteer.Corner.Apex.Slow.Correction != 0] =>
+		(Prove: changeSetting(Spring.Rate.Front, 1, ?Oversteer.Corner.Apex.Slow.Correction))
+{All: [?Understeer.Corner.Exit.Slow.Correction != 0], [?Understeer.Corner.Exit.Slow.Value > 50]} =>
+		(Prove: changeSetting(Spring.Rate.Front, -1, ?Understeer.Corner.Exit.Slow.Correction))
+{All: [?Oversteer.Corner.Exit.Slow.Correction != 0], [?Oversteer.Corner.Exit.Slow.Value > 50]} =>
+		(Prove: changeSetting(Spring.Rate.Front, 1, ?Oversteer.Corner.Exit.Slow.Correction))
+{All: [?Brake.Stability.Straight.Correction != 0], [?Brake.Stability.Straight.Value > 0]} =>
+		(Prove: changeSetting(Damper.Compression.Slow.Front, 0.5, ?Brake.Stability.Straight.Correction))
+[?Brake.Stability.Corner.Fast.Correction != 0] =>
+		(Prove: changeSetting(Damper.Compression.Slow.Front, 0.5, ?Brake.Stability.Corner.Fast.Correction))
+{All: [?Brake.Stability.Corner.Slow.Correction != 0], [?Brake.Stability.Corner.Slow.Value > 50]} =>
+		(Prove: changeSetting(Damper.Compression.Slow.Front, -0.25, ?Brake.Stability.Corner.Slow.Correction))
+{All: [?Speed.Corner.Slow.Correction != 0], [?Speed.Corner.Slow.Value > 50]} =>
+		(Prove: changeSetting(Damper.Compression.Slow.Front, 0.5, ?Speed.Corner.Slow.Correction))
+
+[?Tyre.Temperatures.Hot.Front.Around.Correction != 0] =>
+		(Prove: changeSetting(Damper.Compression.Fast.Front, -0.25, ?Tyre.Temperatures.Hot.Front.Around.Correction))
+[?Tyre.Temperatures.Cold.Front.Around.Correction != 0] =>
+		(Prove: changeSetting(Damper.Compression.Fast.Front, 0.25, ?Tyre.Temperatures.Cold.Front.Around.Correction))
+[?Curbs.Stability.Correction != 0] =>
+		(Prove: changeSetting(Damper.Compression.Fast, [Front, Rear.Left, Rear.Right], -1, ?Curbs.Stability.Correction)),
+		(Prove: changeSetting(Damper.Rebound.Fast, [Front, Rear.Left, Rear.Right], 0.5, ?Curbs.Stability.Correction))

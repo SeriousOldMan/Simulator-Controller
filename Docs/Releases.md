@@ -9,6 +9,9 @@
   8. Better handling of invalid values in the setup editor of the "Setup Workbench".
   9. The "Pit Strategy" slider can now also be used to optimize the last two stints in longer races in the "Strategy Workbench". Please read the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#simulation) for more information.
   10. The scroll position of the setup viewer in the "Setup Workbench" is retained when a setting value is changed.
+  11. New car models for "Setup Workbench":
+      - Assetto Corsa
+        - Tatuus FA01 (by @mirko_lesko)
   
 ## 5.5.3.0-release 01/12/24
   1. Minor bugfixes, as always

@@ -382,7 +382,7 @@ And you can introduce language specific labels here as well:
 
 ### Example and further information
 
-Most of the concepts discussed above can be seen *in action* in the "Tatuus FA01" specification, a car of the *Assetto Corsa* simulation.
+Most of the concepts discussed above can be seen *in action* in the "Tatuus FA01" specification (created by @mirko_lesko), a car of the *Assetto Corsa* simulation.
 
 1. [Definition file](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Garage/Definitions/Cars/Assetto%20Corsa.Tatuus%20FA01.ini)
 2. [Rule file](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Garage/Rules/Cars/Assetto%20Corsa.Tatuus%20FA01.rules)

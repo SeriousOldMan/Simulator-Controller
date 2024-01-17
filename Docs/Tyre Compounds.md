@@ -65,7 +65,7 @@ A special meta data file can be created for each simulator, which contains the t
 	Compounds.6=Slick Soft (S)->Dry (S);Slick Medium (M)->Dry (M);Slick Hard (H)->Dry (H)
 	Compounds.7=Slicks (H)->Dry (H)
 	[Cars]
-	*.*=*->Dry
+	*;*=*->Dry
 	ferrari_458;*=Compounds.1
 	ferrari_458_gt2;*=Compounds.2
 	ferrari_laferrari;*=Compounds.3
@@ -78,7 +78,7 @@ The first section which is named "[Compounds]" defines a list of different tyre 
 
 A car rule defines a pattern to identify a car / track combination (where a "*" stands for all possible matches). On the right side of the car rule you can then give a list of tyre compound mappings or reference an identifier of a predefined tyre compound mapping from the first section.
 
-In the above example you see a couple of car specific rules and a *match all* rule "*.*=*->Dry", which is used, when no specific car rule is available. This *match all* rule will map the first compound of the given unknown car to a generic Dry tyre compound. Even if the car has more compounds available, only the first one will be usable in the Simulator Controller applications and it will be named always "Dry".
+In the above example you see a couple of car specific rules and a *match all* rule "*;*=*->Dry", which is used, when no specific car rule is available. This *match all* rule will map the first compound of the given unknown car to a generic Dry tyre compound. Even if the car has more compounds available, only the first one will be usable in the Simulator Controller applications and it will be named always "Dry".
 
 Here is another example, this time for *rFactor 2*:
 
@@ -86,7 +86,7 @@ Here is another example, this time for *rFactor 2*:
 	GT3=S7M (Soft)->Dry (S);S8M (Medium)->Dry (M);S9M (Hard)->Dry (H);P2M (Rain)->Wet
 	F1 2012=Wet->Wet;Intermediate->Intermediate;SuperSoft->Dry (SuperSoft);Soft->Dry (S);Medium->Dry (M);Hard->Dry (H)
 	[Cars]
-	*.*=*->Dry
+	*;*=*->Dry
 	McLaren 720S GT3;*=GT3
 	Formula ISI 2012;*=F1 2012
 
@@ -104,7 +104,7 @@ For some simulators, a third section is part of the "Tyre Data.ini" file.
 	ferrari_488_gt3;Wet=30.1
 	...
 
-In this section, tyre compound specific target pressures for hot tyres are configured. This information, if available, will be used by various parts of the Simulator Controller suite, for example the Race Engineer, and it will overwrite the information provided in the "Race Settings".
+In this section, tyre compound specific target pressures for hot tyres are configured. This information, if available, will be used by various parts of the Simulator Controller suite, for example the Race Engineer, and it will overwrite the information provided in the "Race Settings" (but not values configured in the "Session Database").
 
 ### Creating own Compound Rules
 

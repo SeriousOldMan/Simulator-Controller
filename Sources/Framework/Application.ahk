@@ -223,7 +223,7 @@ checkForNews() {
 startDatabaseSynchronizer() {
 	local idFileName, ID, dbIDFileName, dbID, shareTyrePressures, shareCarSetups, shareRaceStrategies, options, consent
 
-	if (isProperInstallation() && (StrSplit(A_ScriptName, ".")[1] = "Simulator Startup") && !ProcessExist("Database Synchronizer.exe")) {
+	if (!ProcessExist("Database Synchronizer.exe") && inList(kForegroundApps, StrSplit(A_ScriptName, ".")[1]) && isProperInstallation()) {
 		idFileName := kUserConfigDirectory . "ID"
 
 		ID := StrSplit(FileRead(idFileName), "`n", "`r")[1]
@@ -485,5 +485,5 @@ if (!isDetachedInstallation() && !isDebug() && !inList(kBackgroundApps, StrSplit
 	requestShareSessionDatabaseConsent()
 	checkForNews()
 
-	Task.startTask(startDatabaseSynchronizer, 20000, kLowPriority)
+	Task.startTask(startDatabaseSynchronizer, 30000, kLowPriority)
 }

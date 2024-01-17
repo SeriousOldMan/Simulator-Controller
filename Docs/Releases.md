@@ -8,6 +8,9 @@
   7. Optimized the pitstop preview information in "Race Center". No tyre change is now displayed correctly and settings changes done by the driver **after** a pitstop has already been prepared, are reflected as well.
   8. Better handling of invalid values in the setup editor of the "Setup Workbench".
   9. The scroll position of the setup viewer in the "Setup Workbench" is retained when a setting value is changed.
+  10. New car models for "Setup Workbench":
+      - Assetto Corsa
+        - Tatuus FA01 (by @mirko_lesko)
   
 ## 5.5.3.0-release 01/12/24
   1. Minor bugfixes, as always

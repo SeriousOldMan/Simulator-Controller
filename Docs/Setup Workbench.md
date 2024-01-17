@@ -380,6 +380,15 @@ And you can introduce language specific labels here as well:
 	Battery.Depletion.Low=Battery Usage to Low
 	Battery.Depletion.High=Battery Usage to High
 
+### Example and further information
+
+Most of the concepts discussed above can be seen *in action* in the "Tatuus FA01" specification, a car of the *Assetto Corsa* simulation.
+
+1. [Definition file](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Garage/Definitions/Cars/Assetto%20Corsa.Tatuus%20FA01.ini)
+2. [Rule file](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Garage/Rules/Cars/Assetto%20Corsa.Tatuus%20FA01.rules)
+
+I also recommend to take a look at this [video](https://youtu.be/oKq8k9VZ2jU), which covers the complete process step by step.
+
 ### Introducing new simulators
 
 Most of the stuff we talked about so far is independent of a specific simulator, since all of them store the setups more or less in the same way - as numbers. The file format, though, is very different. As you have seen above, the setups are stored as a JSON file in *Assetto Corsa Competizione*, whereas INI files are used by *Assetto Corsa*. Therefore, let's take a look into the simulator specific configuration.
@@ -388,7 +397,7 @@ Similar to cars, each simulator has a definition file which is located in the *R
 
 "Setup Workbench" scans both directories at startup and compiles the list of available simulators. Let's now take a look at the simulator specific configuration.
 
-### Assetto Corsa Competizione
+#### Assetto Corsa Competizione
 
 The access paths for the JSON-based setup files of *Assetto Corsa Competizione* are stored in the *Assetto Corsa Competizione.ini* file. Here is excerpt from this file:
 
@@ -410,7 +419,7 @@ The access paths for the JSON-based setup files of *Assetto Corsa Competizione* 
 	Brake.Duct.Rear=advancedSetup.aeroBalance.brakeDuct[2]
 	...
 	
-### Assetto Corsa
+#### Assetto Corsa
 
 *Asseto Corsa* follows a similar approach but uses a different file format (INI) for its setup files. Here is an excerpt: 
 

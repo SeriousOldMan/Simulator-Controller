@@ -60,7 +60,6 @@
 		(Prove: changeSetting(Damper.Compression.Slow.Front, -0.25, ?Brake.Stability.Corner.Slow.Correction))
 {All: [?Speed.Corner.Slow.Correction != 0], [?Speed.Corner.Slow.Value > 50]} =>
 		(Prove: changeSetting(Damper.Compression.Slow.Front, 0.5, ?Speed.Corner.Slow.Correction))
-
 [?Tyre.Temperatures.Hot.Front.Around.Correction != 0] =>
 		(Prove: changeSetting(Damper.Compression.Fast.Front, -0.25, ?Tyre.Temperatures.Hot.Front.Around.Correction))
 [?Tyre.Temperatures.Cold.Front.Around.Correction != 0] =>

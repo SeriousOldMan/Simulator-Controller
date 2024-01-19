@@ -30,6 +30,7 @@
 
 class DrivingCoach extends GridRaceAssistant {
 	iConnector := false
+	iConnectionState := "Active"
 
 	iInstructions := CaseInsenseWeakMap()
 
@@ -215,12 +216,14 @@ class DrivingCoach extends GridRaceAssistant {
 				if ((answer.Status >= 200) && (answer.Status < 300)) {
 					first := false
 
+					this.iConnectionState := "Active"
+
 					answer := answer.JSON
 				}
 				else if first {
 					first := false
 
-					throw "Cannot connect to " . this.CreateServiceURL(this.Server) . "..."
+					throw ("Cannot connect to " . this.CreateServiceURL(this.Server) . "...")
 				}
 				else
 					return false
@@ -228,6 +231,8 @@ class DrivingCoach extends GridRaceAssistant {
 			catch Any as exception {
 				if this.Coach.RemoteHandler
 					this.Coach.RemoteHandler.serviceState("Error:Connection")
+
+				this.iConnectionState := "Error:Connection"
 
 				throw exception
 			}
@@ -415,6 +420,8 @@ class DrivingCoach extends GridRaceAssistant {
 				if this.Coach.RemoteHandler
 					this.Coach.RemoteHandler.serviceState("Error:Connection")
 
+				this.iConnectionState := "Error:Connection"
+
 				throw exception
 			}
 
@@ -428,6 +435,8 @@ class DrivingCoach extends GridRaceAssistant {
 
 				if (answer = "")
 					throw "Empty answer received..."
+				else
+					this.iConnectionState := "Active"
 
 				if isDebug() {
 					deleteFile(kTempDirectory . "Chat.response")
@@ -763,12 +772,16 @@ class DrivingCoach extends GridRaceAssistant {
 					this.iConnector := DrivingCoach.%service[1]%Connector(this, this.Options["Driving Coach.Model"])
 
 					this.Connector.Connect(service[2], service[3])
+
+					this.iConnectionState := "Active"
 				}
 				catch Any as exception {
 					logError(exception)
 
 					if this.RemoteHandler
 						this.RemoteHandler.serviceState("Error:Configuration")
+
+					this.iConnectionState := "Error:Configuration"
 
 					throw "Unsupported service detected in DrivingCoach.connect..."
 				}
@@ -797,8 +810,10 @@ class DrivingCoach extends GridRaceAssistant {
 		local answer := false
 		local ignore, part
 
+		static first := true
+
 		try {
-			if (this.Speaker && this.Options["Driving Coach.Confirmation"])
+			if (this.Speaker && this.Options["Driving Coach.Confirmation"] && (this.iConnectionState = "Active"))
 				this.getSpeaker().speakPhrase("Confirm", false, false, false, {Noise: false})
 
 			if !this.Connector
@@ -807,22 +822,29 @@ class DrivingCoach extends GridRaceAssistant {
 			answer := this.Connector.Ask(text)
 
 			if !answer
-				if this.Speaker
+				if (this.Speaker && first) {
 					this.getSpeaker().speakPhrase("Later", false, false, false, {Noise: false})
+
+					first := false
+				}
 		}
 		catch Any as exception {
-			if this.Speaker
-				this.getSpeaker().speakPhrase("Later", false, false, false, {Noise: false})
+			if first {
+				if this.Speaker
+					this.getSpeaker().speakPhrase("Later", false, false, false, {Noise: false})
 
-			if (exception != "No answer from the GPT service...") {
-				logError(exception, true)
+				first := false
 
-				logMessage(kLogCritical, substituteVariables(translate("Cannot connect to GPT service (%service%) - please check the configuration")
-													   , {service: this.Options["Driving Coach.Service"]}))
+				if (exception != "No answer from the GPT service...") {
+					logError(exception, true)
 
-				showMessage(substituteVariables(translate("Cannot connect to GPT service (%service%) - please check the configuration...")
-											  , {service: this.Options["Driving Coach.Service"]})
-						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+					logMessage(kLogCritical, substituteVariables(translate("Cannot connect to GPT service (%service%) - please check the configuration")
+														   , {service: this.Options["Driving Coach.Service"]}))
+
+					showMessage(substituteVariables(translate("Cannot connect to GPT service (%service%) - please check the configuration...")
+												  , {service: this.Options["Driving Coach.Service"]})
+							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+				}
 			}
 		}
 

@@ -1,9 +1,9 @@
 [Development]
-Version=5.5.4.0-release
-Target=5.5.4.0-release
+Version=5.5.5.0-dev
+Target=5.5.5.0-release
 Date=01/19/2024
-Download=https://cutt.ly/dwKLHzog;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.5.4.0-release.zip
-Changes=Support for Custom functions in external event loop of Simulator Controller, Fixed crash in "Simulator Configuration" when the internal voice synthesizer of Windows is not available, Optimized pitstop settings preview in "Race Center", Invalid value handling in "Setup Workbench", Retain setup display field scroll position in "Setup Workbench", Pit strategy for longer races in "Strategy Workbench"
+Download=
+Changes=Chnaged Driving Coach behaviour in case of configuration or connection error
 Components=Media->5.3.0,Configuration->5.5.3,Utilities->5.4.8
 [Release]
 Version=5.5.4.0-release
@@ -25,7 +25,7 @@ Utilities.5.4.8.Path=.
 Utilities.5.4.8.Content=Utilities
 Utilities.5.4.8.Download=https://www.dropbox.com/scl/fi/5nduffajjm3x6rhsxr1nk/Utilities-5.4.8.zip?rlkey=alrj8l2z205dd2vm9cu6hbsot&dl=1
 [Current]
-Type=Release
+Type=Development
 [Version]
-Development=5.5.4.0-release
+Development=5.5.5.0-dev
 Release=5.5.4.0-release

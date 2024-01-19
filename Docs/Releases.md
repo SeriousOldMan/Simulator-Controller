@@ -1,3 +1,8 @@
+## 5.5.5.0-release 01/26/24 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. The Driving Coach will not inform you over and over again, when there is a problem with the configuration or the connection. This is especially useful, when running an initial setup without a configured Push-To-Talk button.
+
 ## 5.5.4.0-release 01/19/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

@@ -387,7 +387,9 @@ Most of the concepts discussed above can be seen *in action* in the "Tatuus FA01
 1. [Definition file](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Garage/Definitions/Cars/Assetto%20Corsa.Tatuus%20FA01.ini)
 2. [Rule file](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Garage/Rules/Cars/Assetto%20Corsa.Tatuus%20FA01.rules)
 
-I also recommend to take a look at this [video](https://youtu.be/oKq8k9VZ2jU), which covers the complete process step by step.
+I also recommend to take a look at this video, which covers the complete process step by step:
+
+[![](https://img.youtube.com/vi/oKq8k9VZ2jU/0.jpg)](https://www.youtube.com/watch?v=oKq8k9VZ2jU)
 
 ### Introducing new simulators
 

@@ -690,6 +690,16 @@ Enter the required values in the *Initial Conditions* group, choose the data to 
 	
 	*Longer races with two or more pitstops*<br>
 	In this case, you can adjust the length of the last two stints depending on the position of the slider.
+	
+	Example:
+	
+	Normally, when you create a strategy for an endurance race, the strategy simulation tries to evenly distribute the last two stints, when not enough tyre degredation and fuel related lap time data is available in the database, like in this case:
+	
+	![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Pit%20Strategy%201.png)
+	
+	If you now move the *Pit Strategy* slider completely to the right, the resulting strategy will create a splash n dash scenario, most likely without a driver change:
+	
+	![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Pit%20Strategy%202.png)
 
 For every slider not at the zero position, different variations of the underlying value will be created as strategy sceanrios, which will be compared at the end for better results. The number of variations depend on the slider position. The slider more to the right will result in more variations.
 

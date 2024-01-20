@@ -154,7 +154,8 @@
 		
 {All: [?Brake.Stability.Straight.Correction != 0], [?Brake.Stability.Straight.Value > 0]} =>
 		(Prove: changeSetting(Damper.Compression.Slow, [Front.Left, Front.Right], 0.5, ?Brake.Stability.Straight.Correction)),
-		(Prove: changeSetting(Damper.Rebound.Slow, [Rear.Left, Rear.Right], 0.5, ?Brake.Stability.Straight.Correction))
+		(Prove: changeSetting(Damper.Rebound.Slow, [Rear.Left, Rear.Right], 0.5, ?Brake.Stability.Straight.Correction)),
+		(Prove: changeSetting(Differential.Coast, 1.0, ?Brake.Stability.Straight.Correction))
 
 [?Brake.Stability.Corner.Fast.Correction != 0] =>
 		(Prove: changeSetting(Damper.Compression.Slow, [Front.Left, Front.Right], 0.5, ?Brake.Stability.Corner.Fast.Correction)),
@@ -164,7 +165,8 @@
 		(Prove: changeSetting(Electronics.ABS, 0.5, ?Brake.Stability.Corner.Fast.Correction)),
 		(Prove: changeSetting(Brake.Balance, 0.5, ?Brake.Stability.Corner.Fast.Correction)),
 		(Prove: changeSetting(Bumpstop.Range, [Front.Left, Front.Right], -1, ?Brake.Stability.Corner.Fast.Correction)),
-		(Prove: changeSetting(Bumpstop.Rate, [Front.Left, Front.Right], 0.5, ?Brake.Stability.Corner.Fast.Correction))
+		(Prove: changeSetting(Bumpstop.Rate, [Front.Left, Front.Right], 0.5, ?Brake.Stability.Corner.Fast.Correction)),
+		(Prove: changeSetting(Differential.Coast, -1.0, ?Brake.Stability.Corner.Fast.Correction))
 
 [?Brake.Stability.Corner.Slow.Correction != 0] =>
 		(Prove: changeSetting(Electronics.ABS, 1, ?Brake.Stability.Corner.Slow.Correction)),
@@ -173,7 +175,8 @@
 
 {All: [?Brake.Stability.Corner.Slow.Correction != 0], [?Brake.Stability.Corner.Slow.Value > 50]} =>
 		(Prove: changeSetting(Damper.Compression.Slow, [Front.Left, Front.Right], -0.25, ?Brake.Stability.Corner.Slow.Correction)),
-		(Prove: changeSetting(Damper.Compression.Slow, [Rear.Left, Rear.Right], -0.5, ?Brake.Stability.Corner.Slow.Correction))		
+		(Prove: changeSetting(Damper.Compression.Slow, [Rear.Left, Rear.Right], -0.5, ?Brake.Stability.Corner.Slow.Correction)),
+		(Prove: changeSetting(Differential.Coast, -0.5, ?Brake.Stability.Corner.Corner.Correction))	
 
 [?Brake.Temperatures.Front.Correction != 0] =>
 		(Prove: changeSetting(Brake.Duct.Front, 1, ?Brake.Temperatures.Front.Correction))
@@ -287,7 +290,8 @@
 		
 {All: [?Understeer.Corner.Apex.Slow.Correction != 0], [?Understeer.Corner.Apex.Slow.Value > 50]} =>
 		(Prove: changeSetting(Bumpstop.Range, [Front.Left, Front.Right], 1, ?Understeer.Corner.Apex.Slow.Correction)),
-		(Prove: changeSetting(Bumpstop.Rate, [Front.Left, Front.Right], -1, ?Understeer.Corner.Apex.Slow.Correction))
+		(Prove: changeSetting(Bumpstop.Rate, [Front.Left, Front.Right], -1, ?Understeer.Corner.Apex.Slow.Correction)),
+		(Prove: changeSetting(Differential.Coast, -0.5, ?Understeer.Corner.Apex.Slow.Correction))
 
 [?Oversteer.Corner.Apex.Slow.Correction != 0] =>
 		(Prove: changeSetting(Spring.Rate, [Front.Left, Front.Right], 1, ?Oversteer.Corner.Apex.Slow.Correction)),
@@ -308,7 +312,8 @@
 {All: [?Understeer.Corner.Apex.Fast.Correction != 0], [?Understeer.Corner.Apex.Fast.Value > 50]} =>
 		(Prove: changeSetting(Bumpstop.Range, [Front.Left, Front.Right], 1, ?Understeer.Corner.Apex.Fast.Correction)),
 		(Prove: changeSetting(Bumpstop.Rate, [Front.Left, Front.Right], -1, ?Understeer.Corner.Apex.Fast.Correction)),
-		(Prove: changeSetting(Differential.Preload, -0.5, ?Understeer.Corner.Apex.Slow.Correction))
+		(Prove: changeSetting(Differential.Preload, -0.5, ?Understeer.Corner.Apex.Fast.Correction)),
+		(Prove: changeSetting(Differential.Coast, -1.0, ?Understeer.Corner.Apex.Fast.Correction))
 
 [?Oversteer.Corner.Apex.Fast.Correction != 0] =>
 		(Prove: changeSetting(Aero.Wing.Rear, 1, ?Oversteer.Corner.Apex.Fast.Correction)),
@@ -320,7 +325,8 @@
 {All: [?Oversteer.Corner.Apex.Fast.Correction != 0], [?Oversteer.Corner.Apex.Fast.Value > 50]} =>
 		(Prove: changeSetting(Bumpstop.Range, [Front.Left, Front.Right], -1, ?Oversteer.Corner.Apex.Fast.Correction)),
 		(Prove: changeSetting(Bumpstop.Rate, [Front.Left, Front.Right], 1, ?Oversteer.Corner.Apex.Fast.Correction)),
-		(Prove: changeSetting(Differential.Preload, 0.5, ?Oversteer.Corner.Apex.Slow.Correction))
+		(Prove: changeSetting(Differential.Preload, 0.5, ?Oversteer.Corner.Apex.Fast.Correction)),
+		(Prove: changeSetting(Differential.Coast, 1.0, ?Oversteer.Corner.Apex.Fast.Correction))
 
 [?Understeer.Corner.Exit.Slow.Correction != 0] =>
 		(Prove: changeSetting(Electronics.TC, -1, ?Understeer.Corner.Exit.Slow.Correction)),

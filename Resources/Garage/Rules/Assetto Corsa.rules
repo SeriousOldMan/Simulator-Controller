@@ -13,7 +13,7 @@
 				 (Prove: addCharacteristics("Assetto Corsa", *, *, *)),
 				 (Prove: addSettings("Assetto Corsa", *, *)),
 				 (Prove: removeSettings("Assetto Corsa", *, [Aero.Splitter.Front, Brake.Duct.Front, Brake.Duct.Rear,
-															 Electronics.Map,
+															 Electronics.Map, Differential.Coast,
 															 Geometry.Caster.Left, Geometry.Caster.Right]))
 
 

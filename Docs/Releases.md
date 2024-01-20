@@ -1,3 +1,8 @@
+## 5.5.5.0-release 01/26/24 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. New standard setup setting "Differential Coast" for *Assetto Corsa* in "Setup Workbench". Please note, that this setting is not enabled by default, since only a few cars provide this setup option.
+
 ## 5.5.4.0-release 01/19/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

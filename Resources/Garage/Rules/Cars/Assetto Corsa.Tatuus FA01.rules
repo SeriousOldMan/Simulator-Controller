@@ -13,7 +13,7 @@
 									  Spring.Rate.Front,
 									  Damper.Compression.Slow.Front, Damper.Compression.Fast.Front,
 									  Damper.Rebound.Slow.Front, Damper.Rebound.Fast.Front]))
-					
+
 [?Speed.Straight.Correction != 0] =>
 		(Prove: changeSetting(Aero.Height.Rear.Left, -1, ?Speed.Straight.Correction)),
 		(Prove: changeSetting(Aero.Height.Rear.Right, -1, ?Speed.Straight.Correction))

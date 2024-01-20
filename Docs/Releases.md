@@ -9,7 +9,7 @@
   8. Better handling of invalid values in the setup editor of the "Setup Workbench".
   9. The "Pit Strategy" slider can now also be used to optimize the last two stints in longer races in the "Strategy Workbench". Please read the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#simulation) for more information.
   10. The scroll position of the setup viewer in the "Setup Workbench" is retained when a setting value is changed.
-  11. Thanks to @mirk_lesko, we now have a great example for non-standard car meta data in the "Setup Workbench". This car, the *Tatuus FA01* in *Assetto Corsa* demonstrates the use of custom setup options as well as extended rules for the handling issue recommendations. Links to the car meta data specification files can be found [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#example-and-further-information).
+  11. Thanks to @mirk_lesko, we now have a great example for non-standard car meta data in the "Setup Workbench". This car, the *Tatuus FA01* in *Assetto Corsa*, demonstrates the use of custom setup options as well as extended rules for the handling issue recommendations. Links to the car meta data specification files can be found [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#example-and-further-information).
   12. [Internal] The "Database Synchronizer" is now started deferred, so that occasional file locks occur less often.
   13. New car models for "Setup Workbench":
       - Assetto Corsa

@@ -2234,9 +2234,16 @@ startSimulator() {
 
 		if ((noLaunch && !GetKeyState("Shift")) || (!noLaunch && GetKeyState("Shift")))
 			startupSimulator()
-		else
+		else {
+			showSplashScreen("Logo")
+
+			Sleep(2000)
+
+			hideSplashScreen()
+
 			while launchPad()
 				ignore := 1
+		}
 	}
 	catch Any as exception {
 		logError(exception, true)

@@ -11,12 +11,13 @@
 ;;;-------------------------------------------------------------------------;;;
 
 [?Initialize] => (Prove: addSimulator("Assetto Corsa Competizione")),
-				 (Prove: addCharacteristics("Assetto Corsa Competizione", *, *, *))
+				 (Prove: addCharacteristics("Assetto Corsa Competizione", *, *, *)),
+				 (Prove: removeCharacteristics("Assetto Corsa Competizione", *, *, [Battery.Depletion.Low, Battery.Depletion.High]))
 
 [?Initialize] => (Prove: addSettings("Assetto Corsa Competizione", *, *)),
 				 (Prove: removeSetting("Assetto Corsa Competizione", *, Aero.Wing.Front)),
-				 (Prove: removeSetting("Assetto Corsa Competizione", *, Electronics.MGUK)),
-				 (Prove: removeSetting("Assetto Corsa Competizione", *, Differential.Coast, Differential.Power))
+				 (Prove: removeSetting("Assetto Corsa Competizione", *, Electronics.MGUK.Delivery)),
+				 (Prove: removeSettings("Assetto Corsa Competizione", *, [Differential.Coast, Differential.Power]))
 
 
 ;;;-------------------------------------------------------------------------;;;

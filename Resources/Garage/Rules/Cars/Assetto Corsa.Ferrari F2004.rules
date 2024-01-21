@@ -12,4 +12,4 @@
 ;;;-------------------------------------------------------------------------;;;
 
 [?Initialize] => (Prove: addSettings("Assetto Corsa", "Ferrari F2004",
-									 [Differential.Coast]))
+									 [Differential.Coast, Differential.Power]))

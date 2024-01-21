@@ -12,9 +12,7 @@
 [?Initialize] => (Prove: addSimulator("rFactor 2")),
 				 (Prove: addCharacteristics("rFactor 2", *, *, *)),
 				 (Prove: addSettings("rFactor 2", *, *)),
-				 (Prove: removeSettings("rFactor 2", *, [Aero.Splitter.Front])),
-				 (Prove: removeSetting("rFactor 2", *, Electronics.MGUK)),
-				 (Prove: removeSetting("rFactor 2", *, Differential.Coast, Differential.Power))
+				 (Prove: removeSettings("rFactor 2", *, [Aero.Splitter.Front]))
 
 
 ;;;-------------------------------------------------------------------------;;;

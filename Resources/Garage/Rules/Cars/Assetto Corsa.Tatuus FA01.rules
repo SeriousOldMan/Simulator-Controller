@@ -1,3 +1,16 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;   Modular Simulator Controller System - Assetto Corsa Competitizione    ;;;
+;;;                                         Tatuus FA01                     ;;;
+;;;                                         Setup Rules                     ;;;
+;;;                                                                         ;;;
+;;;   Author:     Mirko Lesko, Oliver Juwig (TheBigO)                       ;;;
+;;;   License:    (2024) Creative Commons - BY-NC-SA                        ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;-------------------------------------------------------------------------;;;
+;;;                            Initialization                               ;;;
+;;;-------------------------------------------------------------------------;;;
+
 [?Initialize] => (Prove: removeSettings("Assetto Corsa", "Tatuus FA01",
 										[Electronics.TC, Aero.Height.Rear,
 										 Spring.Rate.Front.Left, Spring.Rate.Front.Right,
@@ -13,6 +26,11 @@
 									  Spring.Rate.Front,
 									  Damper.Compression.Slow.Front, Damper.Compression.Fast.Front,
 									  Damper.Rebound.Slow.Front, Damper.Rebound.Fast.Front]))
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                        Setup Recommendations                            ;;;
+;;;-------------------------------------------------------------------------;;;
 
 [?Speed.Straight.Correction != 0] =>
 		(Prove: changeSetting(Aero.Height.Rear.Left, -1, ?Speed.Straight.Correction)),

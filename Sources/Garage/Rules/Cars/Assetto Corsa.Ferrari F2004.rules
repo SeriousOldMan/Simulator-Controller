@@ -1,5 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Assetto Corsa Competitizione    ;;;
+;;;                                         Ferrari F2004                   ;;;
 ;;;                                         Setup Rules                     ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -10,16 +11,5 @@
 ;;;                            Initialization                               ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Initialize] => (Prove: addSimulator("Assetto Corsa Competizione")),
-				 (Prove: addCharacteristics("Assetto Corsa Competizione", *, *, *))
-
-[?Initialize] => (Prove: addSettings("Assetto Corsa Competizione", *, *)),
-				 (Prove: removeSetting("Assetto Corsa Competizione", *, Aero.Wing.Front)),
-				 (Prove: removeSetting("Assetto Corsa Competizione", *, Differential.Coast))
-
-
-;;;-------------------------------------------------------------------------;;;
-;;;                         Setup Recommendations                           ;;;
-;;;-------------------------------------------------------------------------;;;
-
-#Include %kResourcesDirectory%Garage\Rules\Generic Recommendations.rules
+[?Initialize] => (Prove: addSettings("Assetto Corsa", "Ferrari F2004",
+									 [Differential.Coast]))

@@ -3,7 +3,7 @@ Version=5.5.5.0-dev
 Target=5.5.5.0-release
 Date=01/20/2024
 Download=
-Changes=Changed Driving Coach behaviour in case of configuration or connection error, New standard setup setting "Differential Coast" in "Assetto Corsa"
+Changes=Changed Driving Coach behaviour in case of configuration or connection error, New standard setup setting "Differential Coast" in "Assetto Corsa", New car models for "Setup Workbench"
 Components=Media->5.3.0,Configuration->5.5.3,Utilities->5.4.8
 [Release]
 Version=5.5.4.0-release

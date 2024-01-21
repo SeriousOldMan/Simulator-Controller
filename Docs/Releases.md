@@ -1,7 +1,13 @@
 ## 5.5.5.0-release 01/26/24 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
-  3. New standard setup setting "Differential Coast" for *Assetto Corsa* in "Setup Workbench". Please note, that this setting is not enabled by default, since only a few cars provide this setup option.
+  3. Driving Coach now complains only one, if not configured correctly.
+  4. New standard setup setting "Differential Coast" for *Assetto Corsa* in "Setup Workbench". Please note, that this setting is not enabled by default, since only a few cars provide this setup option.
+  5. New car models for "Setup Workbench":
+     - Assetto Corsa
+       - Ferrari F2004 (added Diff Coast)
+       - Lotus Exos T125 (added Diff Coast)
+       - Porsche 919 Hybrid 2015 (by @mirko_lesko)
 
 ## 5.5.4.0-release 01/19/24
   1. Minor bugfixes, as always

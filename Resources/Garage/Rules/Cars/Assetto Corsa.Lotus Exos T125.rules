@@ -1,5 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Assetto Corsa Competitizione    ;;;
+;;;                                         Lotus Exos T125                 ;;;
 ;;;                                         Setup Rules                     ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -10,16 +11,7 @@
 ;;;                            Initialization                               ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Initialize] => (Prove: addSimulator("Assetto Corsa Competizione")),
-				 (Prove: addCharacteristics("Assetto Corsa Competizione", *, *, *))
-
-[?Initialize] => (Prove: addSettings("Assetto Corsa Competizione", *, *)),
-				 (Prove: removeSetting("Assetto Corsa Competizione", *, Aero.Wing.Front)),
-				 (Prove: removeSetting("Assetto Corsa Competizione", *, Differential.Coast))
-
-
-;;;-------------------------------------------------------------------------;;;
-;;;                         Setup Recommendations                           ;;;
-;;;-------------------------------------------------------------------------;;;
-
-#Include %kResourcesDirectory%Garage\Rules\Generic Recommendations.rules
+[?Initialize] => (Prove: removeSettings("Assetto Corsa", "Lotus Exos T125",
+										[Differential.Preload])),
+				 (Prove: addSettings("Assetto Corsa", "Lotus Exos T125",
+									 [Differential.Coast]))

@@ -15,6 +15,7 @@
 
 [?Initialize] => (Prove: addSettings("Assetto Corsa Competizione", *, *)),
 				 (Prove: removeSetting("Assetto Corsa Competizione", *, Aero.Wing.Front))
+				 (Prove: removeSetting("Assetto Corsa Competizione", *, Differential.Coast))
 
 
 ;;;-------------------------------------------------------------------------;;;

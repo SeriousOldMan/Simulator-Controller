@@ -20,10 +20,11 @@
 									 [Aero.Height.Front.Left, Aero.Height.Front.Right, 
 									  Aero.Height.Rear.Left, Aero.Height.Rear.Right,
 									  Electronics.MGUK.Delivery, Differential.Coast, Differential.Power,
-									  Heave.Bump.Slow.Front, Heave.Bump.Slow.Rear, Heave.Bump.Fast.Front,
-									  Heave.Bump.Fast.Rear, Heave.Rebound.Slow.Front, Heave.Rebound.Slow.Rear,
-									  Heave.Rebound.Fast.Front, Heave.Rebound.Fast.Rear, Heave.Spring.Rate.Front,
-									  Heave.Spring.Rate.Rear]))
+									  Damper.Compression.Slow.Front.Heave, Damper.Compression.Slow.Rear.Heave,
+									  Damper.Compression.Fast.Front.Heave, Damper.Compression.Fast.Rear.Heave,
+									  Damper.Rebound.Slow.Front.Heave, Damper.Rebound.Slow.Rear.Heave,
+									  Damper.Rebound.Fast.Front.Heave, Damper.Rebound.Fast.Rear.Heave,
+									  Spring.Rate.Front.Heave, Spring.Rate.Rear.Heave]))
 
 					
 ;;;-------------------------------------------------------------------------;;;

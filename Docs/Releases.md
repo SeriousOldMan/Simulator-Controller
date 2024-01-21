@@ -1,15 +1,15 @@
 ## 5.5.5.0-release 01/26/24 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
-  3. Driving Coach now complains only one, if not configured correctly.
+  3. Driving Coach now complains only once, if not configured correctly.
   4. New standard setup setting "Differential Coast" for "Setup Workbench". Please note, that this setting is not enabled by default in *Assetto Corsa*, since only a few cars provide this setup option.
   5. New standard setup setting "Differential Power" for "Setup Workbench". Please note, that this setting is not enabled by default in *Assetto Corsa*, since only a few cars provide this setup option.
   6. New standard characteristic "Battery Depletion" for "Setup Workbench". Please note, that this setting is not enabled by default in *Assetto Corsa*, since only a few cars provide this characteristic.
   7. New standard setup setting "MGUK Delivery" for "Setup Workbench". Please note, that this setting is not enabled by default in *Assetto Corsa*, since only a few cars provide this setup option.
   8. New car models for "Setup Workbench":
      - Assetto Corsa
-       - Ferrari F2004 (added Diff Coast)
-       - Lotus Exos T125 (added Diff Coast)
+       - Ferrari F2004 (added Diff Coast & Power)
+       - Lotus Exos T125 (added Diff Coast & Power)
        - Porsche 919 Hybrid 2015 (by @mirko_lesko)
 
 ## 5.5.4.0-release 01/19/24

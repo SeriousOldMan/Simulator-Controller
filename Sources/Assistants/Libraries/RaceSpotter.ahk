@@ -1578,7 +1578,7 @@ class RaceSpotter extends GridRaceAssistant {
 			}
 
 			if (this.BestLapTime > 0) {
-				bestLapTime := Round(this.BestLapTime, 2)
+				bestLapTime := Round(this.BestLapTime, 1)
 
 				if (!this.SessionInfos.Has("BestLap") || (bestLapTime < this.SessionInfos["BestLap"])) {
 					lapTime := (bestLapTime / 1000)

@@ -12,7 +12,9 @@
 [?Initialize] => (Prove: addSimulator(*)),
 				 (Prove: addCharacteristics(*, *, *, *)),
 				 (Prove: addSettings(*, *, *)),
-				 (Prove: removeSetting(*, *, Aero.Splitter.Front))
+				 (Prove: removeSetting(*, *, Aero.Splitter.Front)),
+				 (Prove: removeSetting(*, *, Electronics.MGUK)),
+				 (Prove: removeSetting(*, *, Differential.Coast, Differential.Power))
 
 
 ;;;-------------------------------------------------------------------------;;;

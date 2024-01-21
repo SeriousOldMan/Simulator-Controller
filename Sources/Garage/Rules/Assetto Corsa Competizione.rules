@@ -14,8 +14,9 @@
 				 (Prove: addCharacteristics("Assetto Corsa Competizione", *, *, *))
 
 [?Initialize] => (Prove: addSettings("Assetto Corsa Competizione", *, *)),
-				 (Prove: removeSetting("Assetto Corsa Competizione", *, Aero.Wing.Front))
-				 (Prove: removeSetting("Assetto Corsa Competizione", *, Differential.Coast))
+				 (Prove: removeSetting("Assetto Corsa Competizione", *, Aero.Wing.Front)),
+				 (Prove: removeSetting("Assetto Corsa Competizione", *, Electronics.MGUK)),
+				 (Prove: removeSetting("Assetto Corsa Competizione", *, Differential.Coast, Differential.Power))
 
 
 ;;;-------------------------------------------------------------------------;;;

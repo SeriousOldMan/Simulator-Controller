@@ -17,7 +17,9 @@
 																		  Bumpstop.Range.Front.Left, Bumpstop.Range.Front.Right,
 																		  Bumpstop.Rate.Front.Left, Bumpstop.Rate.Front.Right,
 																		  Bumpstop.Rate.Rear.Left, Bumpstop.Rate.Rear.Right,
-																		  Geometry.Caster.Left, Geometry.Caster.Right]))
+																		  Geometry.Caster.Left, Geometry.Caster.Right])),
+				 (Prove: removeSetting("RaceRoom Racing Experience", *, Electronics.MGUK)),
+				 (Prove: removeSetting("RaceRoom Racing Experience", *, Differential.Coast, Differential.Power))
 
 
 ;;;-------------------------------------------------------------------------;;;

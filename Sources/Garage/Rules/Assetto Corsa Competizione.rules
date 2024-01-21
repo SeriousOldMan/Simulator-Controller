@@ -18,6 +18,8 @@
 				 (Prove: removeSettings("Assetto Corsa Competizione", *,
 										[Aero.Wing.Front, Electronics.MGUK.Delivery,
 										 Differential.Coast, Differential.Power,
+										 Aero.Height.Front.Left, Aero.Height.Front.Right,
+										 Aero.Height.Rear.Left, Aero.Height.Rear.Right,
 										 Spring.Rate.Front.Heave, Spring.Rate.Rear.Heave,
 										 Damper.Compression.Slow.Front.Heave, Damper.Compression.Slow.Rear.Heave,
 										 Damper.Compression.Fast.Front.Heave, Damper.Compression.Fast.Rear.Heave,

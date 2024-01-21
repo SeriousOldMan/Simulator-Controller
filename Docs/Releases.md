@@ -7,11 +7,14 @@
   6. New standard characteristic "Battery Depletion" for "Setup Workbench". Please note, that this setting is not enabled by default in *Assetto Corsa*, since only a few cars provide this characteristic.
   7. New standard setup settings "MGUK Delivery", "MGUK Recovery", "MGUH Mode" and "Brake Engine" for "Setup Workbench". Please note, that this setting is not enabled by default in *Assetto Corsa*, since only a few cars provide this setup option.
   8. New standard setup settings for *Heave Suspensions* (Spring Rate and Damping) for "Setup Workbench". Please note, that this setting is not enabled by default in *Assetto Corsa*, since only a few cars provide this setup option.
-  9. New car models for "Setup Workbench":
-     - Assetto Corsa
-       - Ferrari F2004 (added Diff Coast & Power)
-       - Lotus Exos T125 (added Diff Coast & Power)
-       - Porsche 919 Hybrid 2015 (by @mirko_lesko)
+  9. New standard setup settings for separate left / right aero height for "Setup Workbench". Please note, that this setting is not enabled by default in *Assetto Corsa*, since only a few cars provide this setup option.
+  10. New car models for "Setup Workbench":
+      - Assetto Corsa
+        - Ferrari F2004 (added Diff Coast & Power)
+        - Lotus Exos T125 (added Diff Coast & Power)
+        - Tatuus FA01 (updated for new settings)
+		- All cars (updated Differential settings)
+        - Porsche 919 Hybrid 2015 (by @mirko_lesko)
 
 ## 5.5.4.0-release 01/19/24
   1. Minor bugfixes, as always

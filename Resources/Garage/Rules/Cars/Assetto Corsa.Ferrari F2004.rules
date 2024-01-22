@@ -12,4 +12,9 @@
 ;;;-------------------------------------------------------------------------;;;
 
 [?Initialize] => (Prove: addSettings("Assetto Corsa", "Ferrari F2004",
-									 [Differential.Coast, Differential.Power]))
+									 [Differential.Coast, Differential.Power,
+									  Damper.Compression.Slow.Front.Heave, Damper.Compression.Slow.Rear.Heave,
+									  Damper.Compression.Fast.Front.Heave, Damper.Compression.Fast.Rear.Heave,
+									  Damper.Rebound.Slow.Front.Heave, Damper.Rebound.Slow.Rear.Heave,
+									  Damper.Rebound.Fast.Front.Heave, Damper.Rebound.Fast.Rear.Heave,
+									  Spring.Rate.Front.Heave, Spring.Rate.Rear.Heave]))

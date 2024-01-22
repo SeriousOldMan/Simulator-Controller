@@ -22,7 +22,7 @@
 										 Damper.Rebound.Fast.Front.Left, Damper.Rebound.Fast.Front.Left])),
 				 (Prove: addSettings("Assetto Corsa", "Tatuus FA01",
 									 [Aero.Height.Front, Aero.Height.Rear.Left, Aero.Height.Rear.Right,
-									  Differential.Coast,
+									  Differential.Coast, Differential.Power,
 									  Spring.Rate.Front,
 									  Damper.Compression.Slow.Front, Damper.Compression.Fast.Front,
 									  Damper.Rebound.Slow.Front, Damper.Rebound.Fast.Front]))

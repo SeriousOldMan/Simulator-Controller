@@ -16,7 +16,8 @@
 
 [?Initialize] => (Prove: addSettings("Assetto Corsa Competizione", *, *)),
 				 (Prove: removeSettings("Assetto Corsa Competizione", *,
-										[Aero.Wing.Front, Electronics.MGUK.Delivery,
+										[Aero.Wing.Front,
+										 Electronics.MGUK.Delivery, Electronics.MGUK.Recovery, Electronics.MGUH.Mode,
 										 Differential.Coast, Differential.Power,
 										 Aero.Height.Front.Left, Aero.Height.Front.Right,
 										 Aero.Height.Rear.Left, Aero.Height.Rear.Right,

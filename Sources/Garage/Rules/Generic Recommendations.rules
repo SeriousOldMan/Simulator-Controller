@@ -146,7 +146,8 @@
 [?Brake.Performance.Straight.Correction != 0] =>
 		(Prove: changeSetting(Electronics.ABS, -1, ?Brake.Performance.Straight.Correction)),
 		(Prove: changeSetting(Geometry.Camber, [Front.Left, Front.Right, Rear.Left, Rear.Right], 1, ?Brake.Performance.Straight.Correction)),
-		(Prove: changeSetting(Brake.Balance, -1, ?Brake.Performance.Straight.Correction))
+		(Prove: changeSetting(Brake.Balance, -1, ?Brake.Performance.Straight.Correction)),
+		(Prove: changeSetting(Electronics.MGUK.Recovery, -0.5, ?Brake.Performance.Straight.Correction))
 
 {All: [?Brake.Performance.Straight.Correction != 0], [?Brake.Performance.Straight.Value > 50]} =>
 		(Prove: changeSetting(Geometry.Camber, [Front.Left, Front.Right, Rear.Left, Rear.Right], 1, ?Brake.Performance.Straight.Correction))
@@ -161,23 +162,31 @@
 {All: [?Brake.Stability.Straight.Correction != 0], [?Brake.Stability.Straight.Value > 0]} =>
 		(Prove: changeSetting(Damper.Compression.Slow, [Front.Left, Front.Right], 0.5, ?Brake.Stability.Straight.Correction)),
 		(Prove: changeSetting(Damper.Rebound.Slow, [Rear.Left, Rear.Right], 0.5, ?Brake.Stability.Straight.Correction)),
-		(Prove: changeSetting(Differential.Coast, 1.0, ?Brake.Stability.Straight.Correction))
+		(Prove: changeSetting(Differential.Coast, 1.0, ?Brake.Stability.Straight.Correction)),
+		(Prove: changeSetting(Damper.Compression.Slow.Front.Heave, -0.25, ?Brake.Stability.Straight.Correction)),
+		(Prove: changeSetting(Damper.Compression.Slow.Rear.Heave, -0.25, ?Brake.Stability.Straight.Correction)),
+		(Prove: changeSetting(Damper.Compression.Fast.Front.Heave, -0.5, ?Brake.Stability.Straight.Correction)),
+		(Prove: changeSetting(Damper.Compression.Fast.Rear.Heave, -0.5, ?Brake.Stability.Straight.Correction))
 
 [?Brake.Stability.Corner.Fast.Correction != 0] =>
 		(Prove: changeSetting(Damper.Compression.Slow, [Front.Left, Front.Right], 0.5, ?Brake.Stability.Corner.Fast.Correction)),
-		(Prove: changeSetting(Damper.Rebound.Slow, [Rear.Left, Rear.Right], 0.5, ?Brake.Stability.Corner.Fast.Correction))
+		(Prove: changeSetting(Damper.Rebound.Slow, [Rear.Left, Rear.Right], 0.5, ?Brake.Stability.Corner.Fast.Correction)),
+		(Prove: changeSetting(Electronics.MGUK.Recovery, -0.5, ?Brake.Stability.Corner.Fast.Correction))
 
 {All: [?Brake.Stability.Corner.Fast.Correction != 0], [?Brake.Stability.Corner.Fast.Value > 50]} =>
 		(Prove: changeSetting(Electronics.ABS, 0.5, ?Brake.Stability.Corner.Fast.Correction)),
 		(Prove: changeSetting(Brake.Balance, 0.5, ?Brake.Stability.Corner.Fast.Correction)),
 		(Prove: changeSetting(Bumpstop.Range, [Front.Left, Front.Right], -1, ?Brake.Stability.Corner.Fast.Correction)),
 		(Prove: changeSetting(Bumpstop.Rate, [Front.Left, Front.Right], 0.5, ?Brake.Stability.Corner.Fast.Correction)),
-		(Prove: changeSetting(Differential.Coast, -1.0, ?Brake.Stability.Corner.Fast.Correction))
+		(Prove: changeSetting(Differential.Coast, -1.0, ?Brake.Stability.Corner.Fast.Correction)),
+		(Prove: changeSetting(Damper.Compression.Slow.Front.Heave, 0.75, ?Brake.Stability.Corner.Fast.Correction)),
+		(Prove: changeSetting(Damper.Rebound.Slow.Rear.Heave, -0.5, ?Brake.Stability.Corner.Fast.Correction))
 
 [?Brake.Stability.Corner.Slow.Correction != 0] =>
 		(Prove: changeSetting(Electronics.ABS, 1, ?Brake.Stability.Corner.Slow.Correction)),
 		(Prove: changeSetting(AntiRollBar.Front, 0.5, ?Brake.Stability.Corner.Slow.Correction)),
-		(Prove: changeSetting(AntiRollBar.Rear, -0.25, ?Brake.Stability.Corner.Slow.Correction))
+		(Prove: changeSetting(AntiRollBar.Rear, -0.25, ?Brake.Stability.Corner.Slow.Correction)),
+		(Prove: changeSetting(Electronics.MGUK.Recovery, -0.25, ?Brake.Stability.Corner.Slow.Correction))
 
 {All: [?Brake.Stability.Corner.Slow.Correction != 0], [?Brake.Stability.Corner.Slow.Value > 50]} =>
 		(Prove: changeSetting(Damper.Compression.Slow, [Front.Left, Front.Right], -0.25, ?Brake.Stability.Corner.Slow.Correction)),
@@ -197,13 +206,19 @@
 {All: [?Curbs.Stability.Correction != 0], [?Curbs.Stability.Value > 50]} =>
 		(Prove: changeSetting(Bumpstop.Range, [Front.Left, Front.Right], 1, ?Curbs.Stability.Correction)),
 		(Prove: changeSetting(Bumpstop.Rate, [Front.Left, Front.Right], -1, ?Curbs.Stability.Correction)),
-		(Prove: changeSetting(AntiRollBar, [Front, Rear], -1, ?Curbs.Stability.Correction))
+		(Prove: changeSetting(AntiRollBar, [Front, Rear], -1, ?Curbs.Stability.Correction)),
+		(Prove: changeSetting(Damper.Compression.Fast.Front.Heave, -0.5, ?Curbs.Stability.Correction)),
+		(Prove: changeSetting(Damper.Compression.Fast.Rear.Heave, -0.5, ?Curbs.Stability.Correction))
 
 [?Speed.Straight.Correction != 0] =>
 		(Prove: changeSetting(Aero.Wing.Rear, -1, ?Speed.Straight.Correction)),
 		(Prove: changeSetting(Aero.Height.Rear, -1, ?Speed.Straight.Correction)),
 		(Prove: changeSetting(Aero.Height.Rear.Left, -1, ?Speed.Straight.Correction)),
 		(Prove: changeSetting(Aero.Height.Rear.Right, -1, ?Speed.Straight.Correction))
+
+{All: [?Speed.Straight.Correction != 0], [?Speed.Straight.Value > 50]} =>
+		(Prove: changeSetting(Spring.Rate.Front.Heave, -0.5, ?Speed.Straight.Correction)),
+		(Prove: changeSetting(Spring.Rate.Rear.Heave, -0.5, ?Speed.Straight.Correction))
 
 [?Speed.Corner.Slow.Correction != 0] =>
 		(Prove: changeSetting(AntiRollBar.Front, -0.5, ?Speed.Corner.Slow.Correction)),

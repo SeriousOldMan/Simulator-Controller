@@ -2,6 +2,19 @@
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. The Driving Coach will not inform you over and over again, when there is a problem with the configuration or the connection. This is especially useful, when running an initial setup without a configured Push-To-Talk button.
+  4. New standard setup setting "Differential Coast" for "Setup Workbench". Please note, that this setting is not enabled by default in *Assetto Corsa*, since only a few cars provide this setup option.
+  5. New standard setup setting "Differential Power" for "Setup Workbench". Please note, that this setting is not enabled by default in *Assetto Corsa*, since only a few cars provide this setup option.
+  6. New standard characteristic "Battery Depletion" for "Setup Workbench". Please note, that this setting is not enabled by default in *Assetto Corsa*, since only a few cars provide this characteristic.
+  7. New standard setup settings "MGUK Delivery", "MGUK Recovery", "MGUH Mode" and "Brake Engine" for "Setup Workbench". Please note, that this setting is not enabled by default in *Assetto Corsa*, since only a few cars provide this setup option.
+  8. New standard setup settings for *Heave Suspensions* (Spring Rate and Damping) for "Setup Workbench". Please note, that this setting is not enabled by default in *Assetto Corsa*, since only a few cars provide this setup option.
+  9. New standard setup settings for separate left / right aero height for "Setup Workbench". Please note, that this setting is not enabled by default in *Assetto Corsa*, since only a few cars provide this setup option.
+  10. New car models for "Setup Workbench":
+      - Assetto Corsa
+        - Ferrari F2004 (added Diff Coast & Power)
+        - Lotus Exos T125 (added Diff Coast & Power)
+        - Tatuus FA01 (updated for new settings)
+		- All cars (updated Differential settings)
+        - Porsche 919 Hybrid 2015 (by @mirko_lesko)
 
 ## 5.5.4.0-release 01/19/24
   1. Minor bugfixes, as always
@@ -14,7 +27,7 @@
   8. Better handling of invalid values in the setup editor of the "Setup Workbench".
   9. The "Pit Strategy" slider can now also be used to optimize the last two stints in longer races in the "Strategy Workbench". Please read the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#simulation) for more information.
   10. The scroll position of the setup viewer in the "Setup Workbench" is retained when a setting value is changed.
-  11. Thanks to @mirk_lesko, we now have a great example for non-standard car meta data in the "Setup Workbench". This car, the *Tatuus FA01* in *Assetto Corsa* demonstrates the use of custom setup options as well as extended rules for the handling issue recommendations. Links to the car meta data specification files can be found [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#example-and-further-information).
+  11. Thanks to @mirk_lesko, we now have a great example for non-standard car meta data in the "Setup Workbench". This car, the *Tatuus FA01* in *Assetto Corsa*, demonstrates the use of custom setup options as well as extended rules for the handling issue recommendations. Links to the car meta data specification files can be found [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#example-and-further-information).
   12. [Internal] The "Database Synchronizer" is now started deferred, so that occasional file locks occur less often.
   13. New car models for "Setup Workbench":
       - Assetto Corsa

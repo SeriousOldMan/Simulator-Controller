@@ -3620,7 +3620,7 @@ class PracticeCenter extends ConfigurationItem {
 					lap := this.LapsListView.GetText(row, 1)
 					lap := (this.Laps.Has(lap) ? this.Laps[lap] : false)
 
-					if lap {
+					if (lap && lap.HasProp("TelemetryData")) {
 						driver := lap.Run.Driver.ID
 
 						telemetryData := string2Values("|||", lap.TelemetryData)
@@ -4398,11 +4398,13 @@ class PracticeCenter extends ConfigurationItem {
 				if this.Laps.Has(A_Index) {
 					lap := this.Laps[A_Index]
 
-					telemetryData := string2Values("|||", lap.TelemetryData)
+					if lap.HasProp("TelemetryData") {
+						telemetryData := string2Values("|||", lap.TelemetryData)
 
-					telemetryData.RemoveAt(16)
+						telemetryData.RemoveAt(16)
 
-					this.addTelemetry(lap, telemetryData*)
+						this.addTelemetry(lap, telemetryData*)
+					}
 				}
 	}
 

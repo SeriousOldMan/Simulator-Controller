@@ -36,12 +36,17 @@ class ACSetup extends FileSetup {
 		}
 
 		Set {
-			local setup
+			local setup, settings
 
 			setup := parseMultiMap(value)
 
-			setMultiMapValue(setup, "ROD_LENGTH_RF", "VALUE", getMultiMapValue(setup, "ROD_LENGTH_LF", "VALUE"))
-			setMultiMapValue(setup, "ROD_LENGTH_RR", "VALUE", getMultiMapValue(setup, "ROD_LENGTH_LR", "VALUE"))
+			settings := this.Editor.Settings
+
+			if !settings.Has("Aero.Height.Front.Right")
+				setMultiMapValue(setup, "ROD_LENGTH_RF", "VALUE", getMultiMapValue(setup, "ROD_LENGTH_LF", "VALUE"))
+
+			if !settings.Has("Aero.Height.Rear.Right")
+				setMultiMapValue(setup, "ROD_LENGTH_RR", "VALUE", getMultiMapValue(setup, "ROD_LENGTH_LR", "VALUE"))
 
 			value := printMultiMap(setup)
 

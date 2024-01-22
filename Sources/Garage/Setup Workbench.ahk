@@ -2229,7 +2229,7 @@ class SetupEditor extends ConfigurationItem {
 		}
 	}
 
-	Setings[key?] {
+	Settings[key?] {
 		Get {
 			return (isSet(key) ? this.iSettings[key] : this.iSettings)
 		}
@@ -2905,7 +2905,7 @@ class SetupComparator extends ConfigurationItem {
 		}
 	}
 
-	Setings[key?] {
+	Settings[key?] {
 		Get {
 			return (isSet(key) ? this.iSettings[key] : this.iSettings)
 		}

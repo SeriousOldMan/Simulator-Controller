@@ -73,6 +73,16 @@ class DrivingCoach extends GridRaceAssistant {
 			}
 		}
 
+		ConnectionState {
+			Get {
+				return this.Coach.ConnectionState
+			}
+
+			Set {
+				return (this.Coach.ConnectionState := value)
+			}
+		}
+
 		Model {
 			Get {
 				return this.iModel
@@ -137,8 +147,6 @@ class DrivingCoach extends GridRaceAssistant {
 	}
 
 	class HTTPConnector extends DrivingCoach.LLMConnector {
-		iCoach := false
-
 		iServer := ""
 		iToken := ""
 
@@ -216,7 +224,7 @@ class DrivingCoach extends GridRaceAssistant {
 				if ((answer.Status >= 200) && (answer.Status < 300)) {
 					first := false
 
-					this.iConnectionState := "Active"
+					this.ConnectionState := "Active"
 
 					answer := answer.JSON
 				}
@@ -225,14 +233,17 @@ class DrivingCoach extends GridRaceAssistant {
 
 					throw ("Cannot connect to " . this.CreateServiceURL(this.Server) . "...")
 				}
-				else
+				else {
+					this.ConnectionState := "Error:Connection"
+
 					return false
+				}
 			}
 			catch Any as exception {
 				if this.Coach.RemoteHandler
 					this.Coach.RemoteHandler.serviceState("Error:Connection")
 
-				this.iConnectionState := "Error:Connection"
+				this.ConnectionState := "Error:Connection"
 
 				throw exception
 			}
@@ -420,7 +431,7 @@ class DrivingCoach extends GridRaceAssistant {
 				if this.Coach.RemoteHandler
 					this.Coach.RemoteHandler.serviceState("Error:Connection")
 
-				this.iConnectionState := "Error:Connection"
+				this.ConnectionState := "Error:Connection"
 
 				throw exception
 			}
@@ -436,7 +447,7 @@ class DrivingCoach extends GridRaceAssistant {
 				if (answer = "")
 					throw "Empty answer received..."
 				else
-					this.iConnectionState := "Active"
+					this.ConnectionState := "Active"
 
 				if isDebug() {
 					deleteFile(kTempDirectory . "Chat.response")
@@ -509,6 +520,16 @@ class DrivingCoach extends GridRaceAssistant {
 	Connector {
 		Get {
 			return this.iConnector
+		}
+	}
+
+	ConnectionState {
+		Get {
+			return this.iConnectionState
+		}
+
+		Set {
+			return (this.iConnectionState := value)
 		}
 	}
 
@@ -773,7 +794,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 					this.Connector.Connect(service[2], service[3])
 
-					this.iConnectionState := "Active"
+					this.ConnectionState := "Active"
 				}
 				catch Any as exception {
 					logError(exception)
@@ -781,7 +802,7 @@ class DrivingCoach extends GridRaceAssistant {
 					if this.RemoteHandler
 						this.RemoteHandler.serviceState("Error:Configuration")
 
-					this.iConnectionState := "Error:Configuration"
+					this.ConnectionState := "Error:Configuration"
 
 					throw "Unsupported service detected in DrivingCoach.connect..."
 				}
@@ -813,7 +834,7 @@ class DrivingCoach extends GridRaceAssistant {
 		static first := true
 
 		try {
-			if (this.Speaker && this.Options["Driving Coach.Confirmation"] && (this.iConnectionState = "Active"))
+			if (this.Speaker && this.Options["Driving Coach.Confirmation"] && (this.ConnectionState = "Active"))
 				this.getSpeaker().speakPhrase("Confirm", false, false, false, {Noise: false})
 
 			if !this.Connector

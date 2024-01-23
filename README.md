@@ -109,6 +109,8 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 
 24. [Car meta data](https://youtu.be/oKq8k9VZ2jU) - This video introduces you to car meta data and all the secret knowledge needed when extending the "Setup Workbench" for modded cars.
 
+25. [Using the Startup Profiles](https://youtu.be/2L0lH8J1Cac) - This video explains the Startup Profiles in detail, which let you define configuration and enable or disable many important functions for different types of sessions.
+
 This list will be extended from time to time to cover new functionalities.
 
 ### Discord Community

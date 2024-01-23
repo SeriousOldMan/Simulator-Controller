@@ -12,7 +12,11 @@
 [?Initialize] => (Prove: addSimulator("rFactor 2")),
 				 (Prove: addCharacteristics("rFactor 2", *, *, *)),
 				 (Prove: addSettings("rFactor 2", *, *)),
-				 (Prove: removeSettings("rFactor 2", *, [Aero.Splitter.Front]))
+				 (Prove: removeSettings("rFactor 2", *, [Aero.Splitter.Front,
+														 Aero.Wing.Front.Left, Aero.Wing.Front.Right,
+														 Aero.Wing.Rear.Left, Aero.Wing.Rear.Right,
+														 Aero.Height.Front.Left, Aero.Height.Front.Right,
+														 Aero.Height.Rear.Left, Aero.Height.Rear.Right]))
 
 
 ;;;-------------------------------------------------------------------------;;;

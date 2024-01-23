@@ -11,6 +11,7 @@
      - New standard setup settings "MGUK Delivery", "MGUK Recovery", "MGUH Mode" and "Brake Engine" for "Setup Workbench". Please note, that this setting is not enabled by default in *Assetto Corsa*, since only a few cars provide this setup option.
      - New standard setup settings for *Heave Suspensions* (Spring Rate and Damping) for "Setup Workbench". Please note, that this setting is not enabled by default in *Assetto Corsa*, since only a few cars provide this setup option.
      - New standard setup settings for separate left / right aero height for "Setup Workbench". Please note, that this setting is not enabled by default in *Assetto Corsa*, since only a few cars provide this setup option.
+     - New standard setup settings for separate left / right aero wings for "Setup Workbench". Please note, that this setting is not enabled by default in *Assetto Corsa*, since only a few cars provide this setup option.
   7. New "-Startup" argument for "Simulator Startup", which let's you choose the startup profile to launch independent of what has been configured.
   8. New car models for "Setup Workbench":
      - Assetto Corsa

@@ -16,6 +16,7 @@
 				 (Prove: addSettings("Assetto Corsa", "Ferrari SF15-T",
 									 [Electronics.MGUK.Delivery, Electronics.MGUK.Recovery,
 									  Electronics.MGUH.Mode, Electronics.Engine.Brake,
+									  Aero.Wing.Front.Left, Aero.Wing.Front.Right,
 									  Damper.Compression.Slow.Front.Heave, Damper.Compression.Slow.Rear.Heave,
 									  Damper.Compression.Fast.Front.Heave, Damper.Compression.Fast.Rear.Heave,
 									  Damper.Rebound.Slow.Front.Heave, Damper.Rebound.Slow.Rear.Heave,

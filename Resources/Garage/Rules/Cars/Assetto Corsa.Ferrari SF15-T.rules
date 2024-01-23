@@ -12,4 +12,12 @@
 ;;;-------------------------------------------------------------------------;;;
 
 [?Initialize] => (Prove: removeSettings("Assetto Corsa", "Ferrari SF15-T",
-										[Electronics.TC, Aero.Wing.Front, Differential.Preload]))
+										[Electronics.TC, Aero.Wing.Front, Differential.Preload])),
+				 (Prove: addSettings("Assetto Corsa", "Ferrari SF15-T",
+									 [Electronics.MGUK.Delivery, Electronics.MGUK.Recovery,
+									  Electronics.MGUH.Mode, Electronics.Engine.Brake,
+									  Damper.Compression.Slow.Front.Heave, Damper.Compression.Slow.Rear.Heave,
+									  Damper.Compression.Fast.Front.Heave, Damper.Compression.Fast.Rear.Heave,
+									  Damper.Rebound.Slow.Front.Heave, Damper.Rebound.Slow.Rear.Heave,
+									  Damper.Rebound.Fast.Front.Heave, Damper.Rebound.Fast.Rear.Heave,
+									  Spring.Rate.Front.Heave, Spring.Rate.Rear.Heave]))

@@ -472,6 +472,9 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 			tyreCompound := getMultiMapValue(data, "Setup Data", "TyreCompound", getMultiMapValue(data, "Car Data", "TyreCompound", setupTyreCompound))
 			tyreCompoundColor := getMultiMapValue(data, "Setup Data", "TyreCompoundColor", getMultiMapValue(data, "Car Data", "TyreCompoundColor", setupTyreCompoundColor))
 
+			setMultiMapValue(data, "Setup Data", "TyreCompound", tyreCompound)
+			setMultiMapValue(data, "Setup Data", "TyreCompoundColor", tyreCompoundColor)
+
 			if (tyreCompound = "Dry") {
 				dryFrontLeft := displayValue("Float", convertUnit("Pressure", getMultiMapValue(data, "Setup Data", "TyrePressureFL", dryFrontLeft)))
 				dryFrontRight := displayValue("Float", convertUnit("Pressure", getMultiMapValue(data, "Setup Data", "TyrePressureFR", dryFrontRight)))
@@ -1536,25 +1539,25 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 readSimulatorData(simulator) {
 	local data := callSimulator(simulator, "Setup=true")
-	local tyreCompound, tyreCompoundColor
+	local ignore, section, tyreCompound, tyreCompoundColor
 
+	for ignore, section in ["Car Data", "Setup Data"]
+		if (getMultiMapValue(data, section, "TyreCompound", kUndefined) = kUndefined) {
+			tyreCompound := getMultiMapValue(data, section, "TyreCompoundRaw", kUndefined)
 
-	if (getMultiMapValue(data, "Car Data", "TyreCompound", kUndefined) = kUndefined) {
-		tyreCompound := getMultiMapValue(data, "Car Data", "TyreCompoundRaw", kUndefined)
+			if (tyreCompound && (tyreCompound != kUndefined)) {
+				tyreCompound := SessionDatabase.getTyreCompoundName(simulator, gCar, gTrack, tyreCompound, false)
 
-		if (tyreCompound && (tyreCompound != kUndefined)) {
-			tyreCompound := SessionDatabase.getTyreCompoundName(simulator, gCar, gTrack, tyreCompound, false)
+				if tyreCompound {
+					tyreCompoundColor := false
 
-			if tyreCompound {
-				tyreCompoundColor := false
+					splitCompound(tyreCompound, &tyreCompound, &tyreCompoundColor)
 
-				splitCompound(tyreCompound, &tyreCompound, &tyreCompoundColor)
-
-				setMultiMapValue(data, "Car Data", "TyreCompound", tyreCompound)
-				setMultiMapValue(data, "Car Data", "TyreCompoundColor", tyreCompoundColor)
+					setMultiMapValue(data, section, "TyreCompound", tyreCompound)
+					setMultiMapValue(data, section, "TyreCompoundColor", tyreCompoundColor)
+				}
 			}
 		}
-	}
 
 	return data
 }

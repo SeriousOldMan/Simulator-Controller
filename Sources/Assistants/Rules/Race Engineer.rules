@@ -983,7 +983,7 @@ priority: -10, [?Pitstop.Lap] => (Set: Pitstop.Clear, ?Pitstop.Lap)
 					(Clear: Pitstop.Planned.Repair.Suspension), (Clear: Pitstop.Planned.Repair.Bodywork),
 					(Clear: Pitstop.Planned.Repair.Engine),
 					(Clear: Pitstop.Planned.Time),
-					(Clear: Pitstop.Clear), (Clear: Pitstop.Lap), (Clear: Pitstop.Prepared),
+					(Clear: Pitstop.Clear), (Clear: Pitstop.Lap), (Clear: Pitstop.Planned), (Clear: Pitstop.Prepared),
 					(Clear: Pitstop.Planned.Nr), (Clear: Pitstop.Planned.Adjusted)
 				  
 updateDamageReported(?lap) <= ?lastLap = ?lap - 1, Set(Damage.Reported, ?lastLap), Set(Damage.Analysis.Reported, ?lap)

@@ -823,8 +823,94 @@ closeLaunchPad(*) {
 		launchPad(kClose)
 }
 
+availableFunctions(configuration, &hasTeamServer := false
+								, &hasDrivingCoach := false,  &hasRaceSpotter := false
+								, &hasRaceStrategist := false, &hasRaceEngineer := false
+								, &hasMotionFeedback := false, &hasChassisVibration := false, &hasPedalVibration := false) {
+	local functions := []
+
+	hasTeamServer := getMultiMapValue(configuration, "Plugins", "Team Server", false)
+
+	if hasTeamServer
+		hasTeamServer := string2Values("|", hasTeamServer)[1]
+
+	hasDrivingCoach := getMultiMapValue(configuration, "Plugins", "Driving Coach", false)
+
+	if hasDrivingCoach
+		hasDrivingCoach := string2Values("|", hasDrivingCoach)[1]
+
+	hasRaceSpotter := getMultiMapValue(configuration, "Plugins", "Race Spotter", false)
+
+	if hasRaceSpotter
+		hasRaceSpotter := string2Values("|", hasRaceSpotter)[1]
+
+	hasRaceStrategist := getMultiMapValue(configuration, "Plugins", "Race Strategist", false)
+
+	if hasRaceStrategist
+		hasRaceStrategist := string2Values("|", hasRaceStrategist)[1]
+
+	hasRaceEngineer := getMultiMapValue(configuration, "Plugins", "Race Engineer", false)
+
+	if hasRaceEngineer
+		hasRaceEngineer := string2Values("|", hasRaceEngineer)[1]
+
+	hasMotionFeedback := getMultiMapValue(configuration, "Plugins", "Motion Feedback", false)
+
+	if hasMotionFeedback
+		hasMotionFeedback := string2Values("|", hasMotionFeedback)[1]
+
+	hasChassisVibration := getMultiMapValue(configuration, "Plugins", "Tactile Feedback", false)
+
+	if (hasChassisVibration && string2Values("|", hasChassisVibration)[1]) {
+		hasChassisVibration := string2Values(",", string2Values("|", hasChassisVibration)[3])
+
+		hasPedalVibration := inList(hasChassisVibration, "Pedal Vibration")
+		hasChassisVibration := inList(hasChassisVibration, "Chassis Vibration")
+	}
+	else {
+		hasChassisVibration := false
+		hasPedalVibration := false
+	}
+
+	if hasDrivingCoach {
+		functions.Push(Array("Driving Coach", "Performance Analysis"))
+		functions.Push(Array("Driving Coach", "Handling Analysis"))
+	}
+
+	if hasRaceSpotter
+		functions.Push(Array("Race Spotter", "Track Automation"))
+
+	if hasRaceStrategist {
+		functions.Push(Array("Race Strategist", "Telemetry Collection"))
+		functions.Push(Array("Race Strategist", "Traffic Analysis"))
+	}
+
+	if hasRaceEngineer {
+		functions.Push(Array("Race Engineer", "Pressure Collection"))
+		functions.Push(Array("Race Engineer", "Fuel Warning"))
+		functions.Push(Array("Race Engineer", "Damage Warning"))
+		functions.Push(Array("Race Engineer", "Pressure Warning"))
+		functions.Push(Array("Race Engineer", "Pitstop Service"))
+	}
+
+	if hasMotionFeedback
+		functions.Push(Array("Motion Feedback", "Motion"))
+
+	if hasPedalVibration
+		functions.Push(Array("Tactile Feedback", "Pedal Vibration"))
+
+	if hasChassisVibration {
+		functions.Push(Array("Tactile Feedback", "Front Vibration"))
+		functions.Push(Array("Tactile Feedback", "Rear Vibration"))
+	}
+
+	return functions
+}
+
 loadStartupProfiles(target, fileName := false) {
 	local settings := readMultiMap(fileName ? fileName : (kUserConfigDirectory . "Startup.settings"))
+	local hasTeamServer := false
+	local functions := availableFunctions(getControllerState(true, true), &hasTeamServer)
 	local profiles := []
 	local selected := false
 	local activeProfiles := []
@@ -832,7 +918,7 @@ loadStartupProfiles(target, fileName := false) {
 
 	for ignore, name in string2Values(";|;", getMultiMapValue(settings, "Profiles", "Profiles", "")) {
 		profile := CaseInsenseMap("Name", name
-								, "Mode", getMultiMapValue(settings, "Profiles", name . ".Mode", "Solo")
+								, "Mode", hasTeamServer ? getMultiMapValue(settings, "Profiles", name . ".Mode", "Solo") : false
 								, "Tools", getMultiMapValue(settings, "Profiles", name . ".Tools", ""))
 
 		for ignore, assistant in kRaceAssistants
@@ -1059,11 +1145,8 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 
 		for ignore, name in string2Values(";|;", getMultiMapValue(settings, "Profiles", "Profiles", "")) {
 			profile := CaseInsenseMap("Name", name
-									, "Mode", getMultiMapValue(settings, "Profiles", name . ".Mode", "Solo")
+									, "Mode", hasTeamServer ? getMultiMapValue(settings, "Profiles", name . ".Mode", "Solo") : false
 									, "Tools", getMultiMapValue(settings, "Profiles", name . ".Tools", ""))
-
-			if !hasTeamServer
-				profile["Mode"] := "Solo"
 
 			for ignore, assistant in kRaceAssistants
 				profile[assistant] := getMultiMapValue(settings, "Profiles", name . "." . assistant, "Default")
@@ -1892,48 +1975,8 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 
 		configuration := getControllerState(true, true)
 
-		hasTeamServer := getMultiMapValue(configuration, "Plugins", "Team Server", false)
-
-		if hasTeamServer
-			hasTeamServer := string2Values("|", hasTeamServer)[1]
-
-		hasDrivingCoach := getMultiMapValue(configuration, "Plugins", "Driving Coach", false)
-
-		if hasDrivingCoach
-			hasDrivingCoach := string2Values("|", hasDrivingCoach)[1]
-
-		hasRaceSpotter := getMultiMapValue(configuration, "Plugins", "Race Spotter", false)
-
-		if hasRaceSpotter
-			hasRaceSpotter := string2Values("|", hasRaceSpotter)[1]
-
-		hasRaceStrategist := getMultiMapValue(configuration, "Plugins", "Race Strategist", false)
-
-		if hasRaceStrategist
-			hasRaceStrategist := string2Values("|", hasRaceStrategist)[1]
-
-		hasRaceEngineer := getMultiMapValue(configuration, "Plugins", "Race Engineer", false)
-
-		if hasRaceEngineer
-			hasRaceEngineer := string2Values("|", hasRaceEngineer)[1]
-
-		hasMotionFeedback := getMultiMapValue(configuration, "Plugins", "Motion Feedback", false)
-
-		if hasMotionFeedback
-			hasMotionFeedback := string2Values("|", hasMotionFeedback)[1]
-
-		hasChassisVibration := getMultiMapValue(configuration, "Plugins", "Tactile Feedback", false)
-
-		if (hasChassisVibration && string2Values("|", hasChassisVibration)[1]) {
-			hasChassisVibration := string2Values(",", string2Values("|", hasChassisVibration)[3])
-
-			hasPedalVibration := inList(hasChassisVibration, "Pedal Vibration")
-			hasChassisVibration := inList(hasChassisVibration, "Chassis Vibration")
-		}
-		else {
-			hasChassisVibration := false
-			hasPedalVibration := false
-		}
+		functions := availableFunctions(configuration, &hasTeamServer, &hasDrivingCoach, &hasRaceSpotter, &hasRaceStrategist, &hasRaceEngineer
+													 , &hasMotionFeedback, &hasChassisVibration, &hasPedalVibration)
 
 		if hasTeamServer {
 			connector := false

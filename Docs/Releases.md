@@ -12,14 +12,15 @@
      - New standard setup settings for *Heave Suspensions* (Spring Rate and Damping) for "Setup Workbench". Please note, that this setting is not enabled by default in *Assetto Corsa*, since only a few cars provide this setup option.
      - New standard setup settings for separate left / right aero height for "Setup Workbench". Please note, that this setting is not enabled by default in *Assetto Corsa*, since only a few cars provide this setup option.
      - New standard setup settings for separate left / right aero wings for "Setup Workbench". Please note, that this setting is not enabled by default in *Assetto Corsa*, since only a few cars provide this setup option.
-  7. New "-Startup" argument for "Simulator Startup", which let's you choose the startup profile to launch independent of what has been configured.
+  7. New "-Startup" argument for "Simulator Startup", which let's you choose the [startup profile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles) to launch independent of what has been configured.
   8. New car models for "Setup Workbench":
      - Assetto Corsa
        - Ferrari F2004 (added Diff Coast & Power)
+       - Ferrari SF15-T (added Heave Suspension and electrical system)
        - Lotus Exos T125 (added Diff Coast & Power)
-       - Tatuus FA01 (updated for new settings)
-       - All cars (updated Differential settings)
+       - Tatuus FA01 (updated for new settings as well)
        - Porsche 919 Hybrid 2015 (by @mirko_lesko)
+       - All other cars (updated Differential settings where necessary)
 
 ## 5.5.4.0-release 01/19/24
   1. Minor bugfixes, as always

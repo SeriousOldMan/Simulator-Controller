@@ -1,6 +1,5 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Rennsport                       ;;;
-;;;                                         Setup Rules                     ;;;
+;;;   Modular Simulator Controller System - Project CARS 2 Setup Rules      ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2024) Creative Commons - BY-NC-SA                        ;;;
@@ -10,13 +9,15 @@
 ;;;                            Initialization                               ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Initialize] => (Prove: addSimulator("Rennsport")),
-				 (Prove: addCharacteristics("Rennsport", *, *, *)),
-				 (Prove: addSettings("Rennsport", *, *)),
-				 (Prove: removeSettings("Rennsport", *, [Aero.Wing.Front.Left, Aero.Wing.Front.Right,
-														 Aero.Wing.Rear.Left, Aero.Wing.Rear.Right,
-														 Aero.Height.Front.Left, Aero.Height.Front.Right,
-														 Aero.Height.Rear.Left, Aero.Height.Rear.Right]))
+[?Initialize] => (Prove: addSimulator("Project CARS 2")),
+				 (Prove: addCharacteristics("Project CARS 2", *, *, *)),
+				 (Prove: addSettings("Project CARS 2", *, *)),
+				 (Prove: removeSettings("Project CARS 2", *, [Bumpstop.Rate.Front.Left, Bumpstop.Rate.Front.Right,
+															  Bumpstop.Rate.Rear.Left, Bumpstop.Rate.Rear.Right,
+															  Aero.Wing.Front.Left, Aero.Wing.Front.Right,
+															  Aero.Wing.Rear.Left, Aero.Wing.Rear.Right,
+															  Aero.Height.Front.Left, Aero.Height.Front.Right,
+															  Aero.Height.Rear.Left, Aero.Height.Rear.Right]))
 
 
 ;;;-------------------------------------------------------------------------;;;

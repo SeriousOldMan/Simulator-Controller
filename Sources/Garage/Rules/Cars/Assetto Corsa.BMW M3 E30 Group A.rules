@@ -1,6 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Assetto Corsa Competitizione    ;;;
-;;;                                         BMW M3 E30                      ;;;
+;;;                                         BMW M3 E30 Group A              ;;;
 ;;;                                         Setup Rules                     ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -11,7 +11,7 @@
 ;;;                            Initialization                               ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Initialize] => (Prove: removeSettings("Assetto Corsa", "BMW M3 E30",
+[?Initialize] => (Prove: removeSettings("Assetto Corsa", "BMW M3 E30 Group A",
 										[Electronics.TC, Differential.Preload,
 										 Bumpstop.Rate.Front.Left, Bumpstop.Rate.Front.Right,
 										 Bumpstop.Rate.Rear.Left, Bumpstop.Rate.Rear.Right,
@@ -21,5 +21,5 @@
 										 Damper.Compression.Fast.Rear.Left, Damper.Compression.Fast.Rear.Right,
 										 Damper.Rebound.Fast.Front.Left, Damper.Rebound.Fast.Front.Right,
 										 Damper.Rebound.Fast.Rear.Left, Damper.Rebound.Fast.Rear.Right])),
-				 (Prove: addSettings("Assetto Corsa", "BMW M3 E30",
+				 (Prove: addSettings("Assetto Corsa", "BMW M3 E30 Group A",
 									 [Differential.Coast, Differential.Power]))

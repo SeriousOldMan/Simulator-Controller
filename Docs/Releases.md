@@ -3,22 +3,25 @@
   2. Documentation updates here and there, as always
   3. Fixed a critical bug in Race Engineer for wet cold tyre pressure calculation.
   4. Fixed a bug in Race Engineer, where a planned but not prepared pitstop was not cleared after a manual pitstop had been performed.
-  5. The Driving Coach will not inform you over and over again, when there is a problem with the configuration or the connection. This is especially helpful, when running an initial setup without a configured Push-To-Talk button.
-  6. Several improvements for the "Setup Workbench", which now supports many more unconventional setup options and is fully prepared to handle hybrid cars with electrical power units and energy recovery systems:
-     - New standard setup setting "Differential Coast" for "Setup Workbench". Please note, that this setting is not enabled by default in *Assetto Corsa*, since only a few cars provide this setup option.
-     - New standard setup setting "Differential Power" for "Setup Workbench". Please note, that this setting is not enabled by default in *Assetto Corsa*, since only a few cars provide this setup option.
+  5. Fixed many errors in the car meta data definitions for *Assetto Corsa* in "Setup Workbench".
+  6. The Driving Coach will not inform you over and over again, when there is a problem with the configuration or the connection. This is especially helpful, when running an initial setup without a configured Push-To-Talk button.
+  7. Several improvements for the "Setup Workbench", which now supports many more unconventional setup options and is fully prepared to handle hybrid cars with electrical power units and energy recovery systems:
+     - New standard setup setting "Differential Coast" for "Setup Workbench". Please note, that this setting is not enabled by default in *Assetto Corsa*.
+     - New standard setup setting "Differential Power" for "Setup Workbench". Please note, that this setting is not enabled by default in *Assetto Corsa*.
      - New standard characteristic "Battery Depletion" for "Setup Workbench". Please note, that this setting is not enabled by default in *Assetto Corsa*, since only a few cars provide this characteristic.
      - New standard setup settings "MGUK Delivery", "MGUK Recovery", "MGUH Mode" and "Brake Engine" for "Setup Workbench". Please note, that this setting is not enabled by default in *Assetto Corsa*, since only a few cars provide this setup option.
      - New standard setup settings for *Heave Suspensions* (Spring Rate and Damping) for "Setup Workbench". Please note, that this setting is not enabled by default in *Assetto Corsa*, since only a few cars provide this setup option.
-     - New standard setup settings for separate left / right aero height for "Setup Workbench". Please note, that this setting is not enabled by default in *Assetto Corsa*, since only a few cars provide this setup option.
-  7. New "-Startup" argument for "Simulator Startup", which let's you choose the startup profile to launch independent of what has been configured.
-  8. New car models for "Setup Workbench":
+     - New standard setup settings for separate left / right aero height for "Setup Workbench". Please note, that this setting is not enabled by default in *Assetto Corsa*.
+     - New standard setup settings for separate left / right aero wings for "Setup Workbench". Please note, that this setting is not enabled by default in *Assetto Corsa*.
+  8. New "-Startup" argument for "Simulator Startup", which let's you choose the [startup profile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles) to launch independent of what has been configured.
+  9. New car models for "Setup Workbench":
      - Assetto Corsa
        - Ferrari F2004 (added Diff Coast & Power)
+       - Ferrari SF15-T (added Heave Suspension and electrical system)
        - Lotus Exos T125 (added Diff Coast & Power)
-       - Tatuus FA01 (updated for new settings)
-       - All cars (updated Differential settings)
+       - Tatuus FA01 (updated for new settings as well)
        - Porsche 919 Hybrid 2015 (by @mirko_lesko)
+       - All other cars (updated Differential settings where necessary)
 
 ## 5.5.4.0-release 01/19/24
   1. Minor bugfixes, as always

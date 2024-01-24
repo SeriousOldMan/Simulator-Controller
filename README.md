@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[5.5.5.0-dev](https://www.dropbox.com/scl/fi/5pdjs8166kgg7ih5lc5fo/Simulator-Controller-5.5.5.0-dev.zip?rlkey=3nyu66zx0i59ug2wr8psm2yv7&dl=1) (Early build for 5.5.5. Changes: Changed Driving Coach behaviour in case of configuration or connection error, New standard setup setting "Differential Coast" for "Setup Workbench", New standard setup setting "Differential Power" for "Setup Workbench", New standard setup setting "MGUK Delivery" for "Setup Workbench", New standard characteristic "Bettery Depletion" for "Setup Workbench", New standard setup settings for hybrid cars in "Setup Workbench", New standard setup settings for Heave suspensions in "Setup Workbench", New standard setup settings for separate left / right aero height in "Setup Workbench", New car models for "Setup Workbench", New "-Startup" option for "Simulator Startup", Fixed wet cold tyre pressure calculation for the Race Engineer.)
+[5.5.5.0-alpha](https://www.dropbox.com/scl/fi/ig6f1uch3a86axrcss2xx/Simulator-Controller-5.5.5.0-alpha.zip?rlkey=c0z6nmzceoa6hjfwik6yucrgw&dl=1) (Test build for 5.5.5. Changes: Changed Driving Coach behaviour in case of configuration or connection error, New standard setup setting "Differential Coast" for "Setup Workbench", New standard setup setting "Differential Power" for "Setup Workbench", New standard setup setting "MGUK Delivery" for "Setup Workbench", New standard characteristic "Bettery Depletion" for "Setup Workbench", New standard setup settings for hybrid cars in "Setup Workbench", New standard setup settings for Heave suspensions in "Setup Workbench", New standard setup settings for separate left / right aero height in "Setup Workbench", New car models for "Setup Workbench", New "-Startup" option for "Simulator Startup", Fixed wet cold tyre pressure calculation for the Race Engineer.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-555) of this version and all the versions you might have skipped, before installing and using this version.
 
@@ -110,6 +110,8 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 23. [Your personal Driving Coach](https://youtu.be/LBtLk_md1IE) - Demonstrates a general interaction with Aiden, the Virtual Driving Coach.
 
 24. [Car meta data](https://youtu.be/oKq8k9VZ2jU) - This video introduces you to car meta data and all the secret knowledge needed when extending the "Setup Workbench" for modded cars.
+
+25. [Using the Startup Profiles](https://youtu.be/2L0lH8J1Cac) - This video explains the Startup Profiles in detail, which let you define configuration and enable or disable many important functions for different types of sessions.
 
 This list will be extended from time to time to cover new functionalities.
 

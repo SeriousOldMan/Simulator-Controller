@@ -20,6 +20,8 @@
 										 Electronics.MGUK.Delivery, Electronics.MGUK.Recovery,
 										 Electronics.MGUH.Mode, Electronics.Engine.Brake,
 										 Differential.Coast, Differential.Power,
+										 Aero.Wing.Front.Left, Aero.Wing.Front.Right,
+										 Aero.Wing.Rear.Left, Aero.Wing.Rear.Right,
 										 Aero.Height.Front.Left, Aero.Height.Front.Right,
 										 Aero.Height.Rear.Left, Aero.Height.Rear.Right,
 										 Spring.Rate.Front.Heave, Spring.Rate.Rear.Heave,

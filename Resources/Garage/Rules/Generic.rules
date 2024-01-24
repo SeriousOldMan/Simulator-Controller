@@ -12,7 +12,10 @@
 [?Initialize] => (Prove: addSimulator(*)),
 				 (Prove: addCharacteristics(*, *, *, *)),
 				 (Prove: addSettings(*, *, *)),
-				 (Prove: removeSetting(*, *, Aero.Splitter.Front))
+				 (Prove: removeSettings(*, *, [Aero.Wing.Front.Left, Aero.Wing.Front.Right,
+											   Aero.Wing.Rear.Left, Aero.Wing.Rear.Right,
+											   Aero.Height.Front.Left, Aero.Height.Front.Right,
+											   Aero.Height.Rear.Left, Aero.Height.Rear.Right]))
 
 
 ;;;-------------------------------------------------------------------------;;;

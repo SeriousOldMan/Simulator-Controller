@@ -13,6 +13,7 @@
 
 [?Initialize] => (Prove: removeSettings("Assetto Corsa", "BMW Z4 E89",
 										[Brake.Balance,
+										 Aero.Wing.Front, Aero.Wing.Rear,
 										 Aero.Height.Front, Aero.Height.Rear,
 										 AntiRollBar.Front, AntiRollBar.Rear, Differential.Preload,
 										 Spring.Rate.Front.Left, Spring.Rate.Front.Right,

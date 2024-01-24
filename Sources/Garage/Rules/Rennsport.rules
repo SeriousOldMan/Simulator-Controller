@@ -12,7 +12,11 @@
 
 [?Initialize] => (Prove: addSimulator("Rennsport")),
 				 (Prove: addCharacteristics("Rennsport", *, *, *)),
-				 (Prove: addSettings("Rennsport", *, *))
+				 (Prove: addSettings("Rennsport", *, *)),
+				 (Prove: removeSettings("Rennsport", *, [Aero.Wing.Front.Left, Aero.Wing.Front.Right,
+														 Aero.Wing.Rear.Left, Aero.Wing.Rear.Right,
+														 Aero.Height.Front.Left, Aero.Height.Front.Right,
+														 Aero.Height.Rear.Left, Aero.Height.Rear.Right]))
 
 
 ;;;-------------------------------------------------------------------------;;;

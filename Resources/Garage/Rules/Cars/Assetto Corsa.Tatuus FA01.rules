@@ -13,6 +13,7 @@
 
 [?Initialize] => (Prove: removeSettings("Assetto Corsa", "Tatuus FA01",
 										[Electronics.TC, Aero.Height.Rear,
+										 Differential.Preload,
 										 Spring.Rate.Front.Left, Spring.Rate.Front.Right,
 										 Bumpstop.Rate.Front.Left, Bumpstop.Rate.Front.Right,
 										 Bumpstop.Rate.Rear.Left, Bumpstop.Rate.Rear.Right,

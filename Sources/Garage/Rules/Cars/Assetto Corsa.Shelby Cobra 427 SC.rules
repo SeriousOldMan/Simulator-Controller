@@ -12,8 +12,11 @@
 ;;;-------------------------------------------------------------------------;;;
 
 [?Initialize] => (Prove: removeSettings("Assetto Corsa", "Shelby Cobra 427 S/C",
-										[Electronics.TC, Aero.Wing.Front, Aero.Wing.Rear,
+										[Electronics.TC, Differential.Preload,
+										 Aero.Wing.Front, Aero.Wing.Rear,
 										 Bumpstop.Rate.Front.Left, Bumpstop.Rate.Front.Right,
 										 Bumpstop.Rate.Rear.Left, Bumpstop.Rate.Rear.Right,
 										 Bumpstop.Range.Front.Left, Bumpstop.Range.Front.Right,
-										 Bumpstop.Range.Rear.Left, Bumpstop.Range.Rear.Right]))
+										 Bumpstop.Range.Rear.Left, Bumpstop.Range.Rear.Right])),
+				 (Prove: addSettings("Assetto Corsa", "Shelby Cobra 427 S/C",
+									 [Differential.Coast, Differential.Power]))

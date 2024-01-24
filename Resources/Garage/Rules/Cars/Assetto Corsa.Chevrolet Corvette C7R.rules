@@ -1,6 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Assetto Corsa Competitizione    ;;;
-;;;                                         McLaren MP4-12C GT3             ;;;
+;;;                                         Chevrolet Corvette C7R          ;;;
 ;;;                                         Setup Rules                     ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -11,9 +11,7 @@
 ;;;                            Initialization                               ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Initialize] => (Prove: removeSettings("Assetto Corsa", "McLaren MP4-12C GT3",
-										[Differential.Preload,
-										 Bumpstop.Rate.Front.Left, Bumpstop.Rate.Front.Right,
-										 Bumpstop.Rate.Rear.Left, Bumpstop.Rate.Rear.Right])),
-				 (Prove: addSettings("Assetto Corsa", "McLaren MP4-12C GT3",
+[?Initialize] => (Prove: removeSettings("Assetto Corsa", "Chevrolet Corvette C7R",
+										[Differential.Preload])),
+				 (Prove: addSettings("Assetto Corsa", "Chevrolet Corvette C7R",
 									 [Differential.Coast, Differential.Power]))

@@ -12,7 +12,8 @@
 ;;;-------------------------------------------------------------------------;;;
 
 [?Initialize] => (Prove: removeSettings("Assetto Corsa", "Maserati MC12 GT1",
-										[Bumpstop.Rate.Front.Left, Bumpstop.Rate.Front.Right,
+										[Differential.Preload,
+										 Bumpstop.Rate.Front.Left, Bumpstop.Rate.Front.Right,
 										 Bumpstop.Rate.Rear.Left, Bumpstop.Rate.Rear.Right,
 										 Bumpstop.Range.Front.Left, Bumpstop.Range.Front.Right,
 										 Bumpstop.Range.Rear.Left, Bumpstop.Range.Rear.Right,
@@ -23,4 +24,6 @@
 										 Damper.Rebound.Slow.Front.Left, Damper.Rebound.Slow.Front.Right,
 										 Damper.Rebound.Slow.Rear.Left, Damper.Rebound.Slow.Rear.Right,
 										 Damper.Rebound.Fast.Front.Left, Damper.Rebound.Fast.Front.Right,
-										 Damper.Rebound.Fast.Rear.Left, Damper.Rebound.Fast.Rear.Right]))
+										 Damper.Rebound.Fast.Rear.Left, Damper.Rebound.Fast.Rear.Right])),
+				 (Prove: addSettings("Assetto Corsa", "Maserati MC12 GT1",
+									 [Differential.Coast, Differential.Power]))

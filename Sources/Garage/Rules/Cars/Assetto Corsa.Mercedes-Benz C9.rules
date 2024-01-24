@@ -12,4 +12,6 @@
 ;;;-------------------------------------------------------------------------;;;
 
 [?Initialize] => (Prove: removeSettings("Assetto Corsa", "Mercedes-Benz C9",
-										[Electronics.TC, Aero.Wing.Front]))
+										[Electronics.TC, Aero.Wing.Front])),
+				 (Prove: addSettings("Assetto Corsa", "Mercedes-Benz C9",
+									 [Differential.Coast, Differential.Power]))

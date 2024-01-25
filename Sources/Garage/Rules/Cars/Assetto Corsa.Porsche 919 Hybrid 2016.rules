@@ -1,0 +1,27 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;   Modular Simulator Controller System - Assetto Corsa                   ;;;
+;;;                                         Porsche 919 Hybrid 2016         ;;;
+;;;                                         Setup Rules                     ;;;
+;;;                                                                         ;;;
+;;;   Author:     Mirko Lesko, Oliver Juwig (TheBigO)                       ;;;
+;;;   License:    (2024) Creative Commons - BY-NC-SA                        ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;-------------------------------------------------------------------------;;;
+;;;                            Initialization                               ;;;
+;;;-------------------------------------------------------------------------;;;
+
+[?Initialize] => (Prove: addCharacteristics("Assetto Corsa", "Porsche 919 Hybrid 2016", *,
+											[Battery.Depletion.Low, Battery.Depletion.High]))
+											
+[?Initialize] => (Prove: removeSettings("Assetto Corsa", "Porsche 919 Hybrid 2016",
+										[Aero.Height.Front, Aero.Height.Rear, Electronics.ABS, Differential.Preload])),
+				 (Prove: addSettings("Assetto Corsa", "Porsche 919 Hybrid 2016",
+									 [Aero.Height.Front.Left, Aero.Height.Front.Right, 
+									  Aero.Height.Rear.Left, Aero.Height.Rear.Right,
+									  Electronics.MGUK.Delivery, Differential.Coast, Differential.Power,
+									  Damper.Compression.Slow.Front.Heave, Damper.Compression.Slow.Rear.Heave,
+									  Damper.Compression.Fast.Front.Heave, Damper.Compression.Fast.Rear.Heave,
+									  Damper.Rebound.Slow.Front.Heave, Damper.Rebound.Slow.Rear.Heave,
+									  Damper.Rebound.Fast.Front.Heave, Damper.Rebound.Fast.Rear.Heave,
+									  Spring.Rate.Front.Heave, Spring.Rate.Rear.Heave]))

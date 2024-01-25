@@ -2331,26 +2331,26 @@ class SetupEditor extends ConfigurationItem {
 		editorGui.Add("Text", "x8 yp+30 w800 0x10 W:Grow Section")
 
 		editorGui.Add("Button", "x16 ys+10 w60", translate("Setup:")).OnEvent("Click", chooseSetupFile)
-		editorGui.Add("Text", "x85 ys+14 w193 vsetupNameViewer")
-		editorGui.Add("Button", "x280 ys+10 w80 X:Move(0.5) vresetSetupButton", translate("&Reset")).OnEvent("Click", resetSetup)
+		editorGui.Add("Text", "x85 ys+14 w293 vsetupNameViewer")
+		editorGui.Add("Button", "x380 ys+10 w80 X:Move(0.5) vresetSetupButton", translate("&Reset")).OnEvent("Click", resetSetup)
 
-		this.iSettingsListView := editorGui.Add("ListView", "x16 ys+40 w344 h320 H:Grow W:Grow(0.5) -Multi -LV0x10 Checked AltSubmit NoSort NoSortHdr", collect(["Category", "Setting", "Value", "Unit"], translate))
+		this.iSettingsListView := editorGui.Add("ListView", "x16 ys+40 w444 h320 H:Grow W:Grow(0.5) -Multi -LV0x10 Checked AltSubmit NoSort NoSortHdr", collect(["Category", "Setting", "Value", "Unit"], translate))
 		this.iSettingsListView.OnEvent("Click", selectSetting)
 		this.iSettingsListView.OnEvent("DoubleClick", selectSetting)
 		this.iSettingsListView.OnEvent("ItemSelect", navSetting)
 
 		editorGui.Add("Button", "x16 yp+324 w80 Disabled Y:Move vdecreaseSettingButton", translate("Decrease")).OnEvent("Click", decreaseSetting)
-		editorGui.Add("Button", "x280 yp w80 Y:Move X:Move(0.5) Disabled vincreaseSettingButton", translate("Increase")).OnEvent("Click", increaseSetting)
+		editorGui.Add("Button", "x380 yp w80 Y:Move X:Move(0.5) Disabled vincreaseSettingButton", translate("Increase")).OnEvent("Click", increaseSetting)
 
-		editorGui.Add("Button", "x280 yp+29 w80 Y:Move X:Move(0.5)", translate("Compare...")).OnEvent("Click", compareSetup)
+		editorGui.Add("Button", "x380 yp+29 w80 Y:Move X:Move(0.5)", translate("Compare...")).OnEvent("Click", compareSetup)
 
 		editorGui.Add("Button", "x16 ys+420 w80 Y:Move", translate("&Apply")).OnEvent("Click", applyRecommendations)
 		editorGui.Add("Slider", "x100 ys+422 w60 0x10 Y:Move Range20-100 ToolTip vapplyStrengthSlider", 100)
 		editorGui.Add("Text", "x162 ys+425 Y:Move", translate("%"))
 
-		editorGui.Add("Button", "x280 ys+420 w80 Y:Move X:Move(0.5)", translate("&Save...")).OnEvent("Click", saveModifiedSetup)
+		editorGui.Add("Button", "x380 ys+420 w80 Y:Move X:Move(0.5)", translate("&Save...")).OnEvent("Click", saveModifiedSetup)
 
-		editorGui.Add("Edit", "x374 ys+10 w423 h433 T8 X:Move(0.5) W:Grow(0.5) H:Grow ReadOnly -Wrap HScroll vsetupViewer")
+		editorGui.Add("Edit", "x474 ys+10 w323 h433 T8 X:Move(0.5) W:Grow(0.5) H:Grow ReadOnly -Wrap HScroll vsetupViewer")
 
 		/*
 		editorGui.Add("Text", "x8 y506 w800 0x10 Y:Move W:Grow")
@@ -2474,7 +2474,7 @@ class SetupEditor extends ConfigurationItem {
 			return %handlerClass%(string2Values(",", handler[2])*)
 		}
 		else
-			throw "Unknown handler encountered in SetupEditor.createSettingHandler..."
+			throw ("Unknown handler encountered for " . setting . " in SetupEditor.createSettingHandler...")
 	}
 
 	chooseSetup() {

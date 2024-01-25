@@ -1,9 +1,9 @@
 [Development]
 Version=5.5.5.0-alpha
 Target=5.5.5.0-release
-Date=01/24/2024
+Date=01/25/2024
 Download=https://www.dropbox.com/scl/fi/ig6f1uch3a86axrcss2xx/Simulator-Controller-5.5.5.0-alpha.zip?rlkey=c0z6nmzceoa6hjfwik6yucrgw&dl=1
-Changes=Changed Driving Coach behaviour in case of configuration or connection error, New standard setup setting "Differential Coast" for "Setup Workbench", New standard setup setting "Differential Power" for "Setup Workbench", New standard setup setting "MGUK Delivery" for "Setup Workbench", New standard characteristic "Bettery Depletion" for "Setup Workbench", New standard setup settings for hybrid cars in "Setup Workbench", New standard setup settings for Heave suspensions in "Setup Workbench", New standard setup settings for separate left / right aero height in "Setup Workbench", New car models for "Setup Workbench", New "-Startup" option for "Simulator Startup", Fixed wet cold tyre pressure calculation for the Race Engineer
+Changes=Changed Driving Coach behaviour in case of configuration or connection error, New standard setup setting "Differential Coast" for "Setup Workbench", New standard setup setting "Differential Power" for "Setup Workbench", New standard setup setting "MGUK Delivery" for "Setup Workbench", New standard characteristic "Bettery Depletion" for "Setup Workbench", New standard setup settings for hybrid cars in "Setup Workbench", New standard setup settings for Heave suspensions in "Setup Workbench", New standard setup settings for separate left / right aero height in "Setup Workbench", New car models for "Setup Workbench", New "-Startup" option for "Simulator Startup", Fixed wet cold tyre pressure calculation for the Race Engineer, Optimized setup editor layout in "Setup Workbench"
 Components=Media->5.3.0,Configuration->5.5.3,Utilities->5.4.8
 [Release]
 Version=5.5.4.0-release

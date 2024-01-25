@@ -20,8 +20,11 @@
        - Ferrari SF15-T (added Heave Suspension and electrical system)
        - Lotus Exos T125 (added Diff Coast & Power)
        - Tatuus FA01 (updated for new settings as well)
-       - Porsche 919 Hybrid 2015 (by @mirko_lesko)
        - All other cars (updated Differential settings where necessary)
+       - Porsche 919 Hybrid 2015 (by @mirko_lesko)
+       - Porsche 919 Hybrid 2016 (by @mirko_lesko)
+       - Audi R18 e-tron 2014 (by @mirko_lesko)
+       - Toyota TS040 Hybrid (by @mirko_lesko)
 
 ## 5.5.4.0-release 01/19/24
   1. Minor bugfixes, as always

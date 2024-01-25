@@ -2474,7 +2474,7 @@ class SetupEditor extends ConfigurationItem {
 			return %handlerClass%(string2Values(",", handler[2])*)
 		}
 		else
-			throw "Unknown handler encountered in SetupEditor.createSettingHandler..."
+			throw ("Unknown handler encountered for " . setting . " in SetupEditor.createSettingHandler...")
 	}
 
 	chooseSetup() {

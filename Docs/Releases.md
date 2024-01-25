@@ -1,4 +1,4 @@
-## 5.5.5.0-release 01/26/24 (planned)
+## 5.5.5.0-release 01/26/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed a critical bug in Race Engineer for wet cold tyre pressure calculation.

@@ -1,15 +1,15 @@
 [Development]
-Version=5.5.5.0-alpha
+Version=5.5.5.0-release
 Target=5.5.5.0-release
-Date=01/25/2024
-Download=https://www.dropbox.com/scl/fi/ig6f1uch3a86axrcss2xx/Simulator-Controller-5.5.5.0-alpha.zip?rlkey=c0z6nmzceoa6hjfwik6yucrgw&dl=1
+Date=01/26/2024
+Download=https://cutt.ly/NwLVrO9P;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.5.5.0-release.zip
 Changes=Changed Driving Coach behaviour in case of configuration or connection error, New standard setup setting "Differential Coast" for "Setup Workbench", New standard setup setting "Differential Power" for "Setup Workbench", New standard setup setting "MGUK Delivery" for "Setup Workbench", New standard characteristic "Bettery Depletion" for "Setup Workbench", New standard setup settings for hybrid cars in "Setup Workbench", New standard setup settings for Heave suspensions in "Setup Workbench", New standard setup settings for separate left / right aero height in "Setup Workbench", New car models for "Setup Workbench", New "-Startup" option for "Simulator Startup", Fixed wet cold tyre pressure calculation for the Race Engineer, Optimized setup editor layout in "Setup Workbench"
 Components=Media->5.3.0,Configuration->5.5.3,Utilities->5.4.8
 [Release]
-Version=5.5.4.0-release
-Date=01/19/2024
-Download=https://cutt.ly/dwKLHzog;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.5.4.0-release.zip
-Changes=Support for Custom functions in external event loop of Simulator Controller, Fixed crash in "Simulator Configuration" when the internal voice synthesizer of Windows is not available, Optimized pitstop settings preview in "Race Center", Invalid value handling in "Setup Workbench", Retain setup display field scroll position in "Setup Workbench", Pit strategy for longer races in "Strategy Workbench"
+Version=5.5.5.0-release
+Date=01/26/2024
+Download=https://cutt.ly/NwLVrO9P;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.5.5.0-release.zip
+Changes=Changed Driving Coach behaviour in case of configuration or connection error, New standard setup setting "Differential Coast" for "Setup Workbench", New standard setup setting "Differential Power" for "Setup Workbench", New standard setup setting "MGUK Delivery" for "Setup Workbench", New standard characteristic "Bettery Depletion" for "Setup Workbench", New standard setup settings for hybrid cars in "Setup Workbench", New standard setup settings for Heave suspensions in "Setup Workbench", New standard setup settings for separate left / right aero height in "Setup Workbench", New car models for "Setup Workbench", New "-Startup" option for "Simulator Startup", Fixed wet cold tyre pressure calculation for the Race Engineer, Optimized setup editor layout in "Setup Workbench"
 Components=Media->5.3.0,Configuration->5.5.3,Utilities->5.4.8
 [Components]
 Media.5.3.0.Path=Resources
@@ -25,7 +25,7 @@ Utilities.5.4.8.Path=.
 Utilities.5.4.8.Content=Utilities
 Utilities.5.4.8.Download=https://www.dropbox.com/scl/fi/5nduffajjm3x6rhsxr1nk/Utilities-5.4.8.zip?rlkey=alrj8l2z205dd2vm9cu6hbsot&dl=1
 [Current]
-Type=Development
+Type=Release
 [Version]
-Development=5.5.5.0-alpha
-Release=5.5.4.0-release
+Development=5.5.5.0-release
+Release=5.5.5.0-release

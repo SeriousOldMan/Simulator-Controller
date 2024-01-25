@@ -14,17 +14,19 @@
      - New standard setup settings for separate left / right aero height for "Setup Workbench". Please note, that this setting is not enabled by default in *Assetto Corsa*.
      - New standard setup settings for separate left / right aero wings for "Setup Workbench". Please note, that this setting is not enabled by default in *Assetto Corsa*.
   8. New "-Startup" argument for "Simulator Startup", which let's you choose the [startup profile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles) to launch independent of what has been configured.
-  9. New car models for "Setup Workbench":
-     - Assetto Corsa
-       - Ferrari F2004 (added Diff Coast & Power)
-       - Ferrari SF15-T (added Heave Suspension and electrical system)
-       - Lotus Exos T125 (added Diff Coast & Power)
-       - Tatuus FA01 (updated for new settings as well)
-       - All other cars (updated Differential settings where necessary)
-       - Porsche 919 Hybrid 2015 (by @mirko_lesko)
-       - Porsche 919 Hybrid 2016 (by @mirko_lesko)
-       - Audi R18 e-tron 2014 (by @mirko_lesko)
-       - Toyota TS040 Hybrid (by @mirko_lesko)
+  9. Added track meta data for Spielberg in *Assetto Corsa Competizione*.
+  10. Added basic car meta data for the new cars in *Assetto Corsa Competizione*. Setup meta data for the "Setup Workbench" will follow with the next release.
+  11. New car models for "Setup Workbench":
+      - Assetto Corsa
+        - Ferrari F2004 (added Diff Coast & Power)
+        - Ferrari SF15-T (added Heave Suspension and electrical system)
+        - Lotus Exos T125 (added Diff Coast & Power)
+        - Tatuus FA01 (updated for new settings as well)
+        - All other cars (updated Differential settings where necessary)
+        - Porsche 919 Hybrid 2015 (by @mirko_lesko)
+        - Porsche 919 Hybrid 2016 (by @mirko_lesko)
+        - Audi R18 e-tron 2014 (by @mirko_lesko)
+        - Toyota TS040 Hybrid (by @mirko_lesko)
 
 ## 5.5.4.0-release 01/19/24
   1. Minor bugfixes, as always

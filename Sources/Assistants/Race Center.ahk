@@ -12681,7 +12681,7 @@ startupRaceCenter() {
 																										  , RaceCenter.kInvalidToken)))
 		}
 
-		rCenter := RaceCenter(kSimulatorConfiguration, readMultiMap(kUserConfigDirectory . "Race.settings"))
+		rCenter := RaceCenter(kSimulatorConfiguration, raceSettings)
 
 		if GetKeyState("Ctrl", "P")
 			rCenter.iSynchronize := "Off"

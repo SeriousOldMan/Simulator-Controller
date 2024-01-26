@@ -1,3 +1,13 @@
+## 5.5.6.0-release 02/02/24 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. Fixed several bugs for the Race Assistants in conjunction with a deactivated voice listener.
+  4. A pre-configured Stream Deck profile is now available in the *Profiles* folder.
+  5. A new module entry shows the voice configuration status in the "System Monitor".
+  6. Again improvements for the "Setup Workbench":
+     - New standard setup setting "Turbo" for "Setup Workbench". Please note, that this setting is not enabled by default in *Assetto Corsa*.
+     - New standard setup setting "Limiter" for "Setup Workbench". Please note, that this setting is not enabled by default in *Assetto Corsa*.
+
 ## 5.5.5.0-release 01/26/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

@@ -691,7 +691,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		local teamServer, raceAssistantToggle, teamServerToggle, arguments, ignore, theAction, assistant
 		local openRaceSettings, openRaceReports, openSessionDatabase, openSetupWorkbench
 		local openPracticeCenter, openRaceCenter, openStrategyWorkbench, importSetup
-		local assistantSpeaker, assistantListener, first, index, startupSettings
+		local assistantSpeaker, assistantListener, first, index
 
 		deleteSettings(*) {
 			if !isDebug()

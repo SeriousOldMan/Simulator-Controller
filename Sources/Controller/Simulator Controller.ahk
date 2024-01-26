@@ -925,7 +925,8 @@ class SimulatorController extends ConfigurationItem {
 
 			this.iVoiceCommands[command] := descriptor
 
-			if this.VoiceServer {
+			if (this.VoiceServer && getMultiMapValue(this.Configuration, "Voice Control", "Recognizer", false)
+								 && getMultiMapValue(this.Configuration, "Voice Control", "Listener", false)) {
 				pid := ProcessExist()
 
 				if !registered {

@@ -20,7 +20,7 @@
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class RaceAssistantPlugin extends ControllerPlugin  {
+class RaceAssistantPlugin extends ControllerPlugin {
 	static sAssistantCooldown := kUndefined
 	static sTeamServerCooldown := kUndefined
 

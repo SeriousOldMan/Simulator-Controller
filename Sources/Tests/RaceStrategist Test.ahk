@@ -387,10 +387,10 @@ class FCYHandling extends Assert {
 if !GetKeyState("Ctrl") {
 	startTime := A_TickCount
 
-	;~ AHKUnit.AddTestClass(BasicReporting)
-	;~ AHKUnit.AddTestClass(PositionProjection)
-	;~ AHKUnit.AddTestClass(GapReporting)
-	;~ AHKUnit.AddTestClass(PitstopRecommendation)
+	AHKUnit.AddTestClass(BasicReporting)
+	AHKUnit.AddTestClass(PositionProjection)
+	AHKUnit.AddTestClass(GapReporting)
+	AHKUnit.AddTestClass(PitstopRecommendation)
 	AHKUnit.AddTestClass(FCYHandling)
 
 	AHKUnit.Run()

@@ -30,7 +30,7 @@ global kRaceStrategistPlugin := "Race Strategist"
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class RaceStrategistPlugin extends RaceAssistantPlugin  {
+class RaceStrategistPlugin extends RaceAssistantPlugin {
 	static kLapDataSchemas := CaseInsenseMap("Telemetry", ["Lap", "Simulator", "Car", "Track", "Weather", "Temperature.Air", "Temperature.Track"
 														 , "Fuel.Consumption", "Fuel.Remaining", "LapTime", "Pitstop", "Map", "TC", "ABS"
 														 , "Compound", "Compound.Color", "Pressures", "Temperatures", "Wear", "State"])

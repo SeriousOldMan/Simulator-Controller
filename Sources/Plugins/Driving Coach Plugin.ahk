@@ -24,7 +24,7 @@ global kDrivingCoachPlugin := "Driving Coach"
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class DrivingCoachPlugin extends RaceAssistantPlugin  {
+class DrivingCoachPlugin extends RaceAssistantPlugin {
 	iServiceState := "Available"
 
 	class RemoteDrivingCoach extends RaceAssistantPlugin.RemoteRaceAssistant {
@@ -60,7 +60,7 @@ class DrivingCoachPlugin extends RaceAssistantPlugin  {
 		local analyzePerformance, analyzeHandling, ignore, session, instruction
 
 		settings := super.loadSettings(simulator, car, track, data, settings)
-		
+
 		if this.StartupSettings {
 			analyzePerformance := getMultiMapValue(this.StartupSettings, "Functions", "Performance Analysis", kUndefined)
 

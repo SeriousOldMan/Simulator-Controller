@@ -1,4 +1,4 @@
-## 5.5.5.0-release 01/26/24 (planned)
+## 5.5.5.0-release 01/26/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed a critical bug in Race Engineer for wet cold tyre pressure calculation.
@@ -13,15 +13,21 @@
      - New standard setup settings for *Heave Suspensions* (Spring Rate and Damping) for "Setup Workbench". Please note, that this setting is not enabled by default in *Assetto Corsa*, since only a few cars provide this setup option.
      - New standard setup settings for separate left / right aero height for "Setup Workbench". Please note, that this setting is not enabled by default in *Assetto Corsa*.
      - New standard setup settings for separate left / right aero wings for "Setup Workbench". Please note, that this setting is not enabled by default in *Assetto Corsa*.
-  8. New "-Startup" argument for "Simulator Startup", which let's you choose the [startup profile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles) to launch independent of what has been configured.
-  9. New car models for "Setup Workbench":
-     - Assetto Corsa
-       - Ferrari F2004 (added Diff Coast & Power)
-       - Ferrari SF15-T (added Heave Suspension and electrical system)
-       - Lotus Exos T125 (added Diff Coast & Power)
-       - Tatuus FA01 (updated for new settings as well)
-       - Porsche 919 Hybrid 2015 (by @mirko_lesko)
-       - All other cars (updated Differential settings where necessary)
+  8. Optimized layout of the setup editor in "Setup Workbench" to give the settings editor more room.
+  9. New "-Startup" argument for "Simulator Startup", which let's you choose the [startup profile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles) to launch independent of what has been configured.
+  10. Added track meta data for Spielberg in *Assetto Corsa Competizione*.
+  11. Added basic car meta data for the new cars in *Assetto Corsa Competizione*. Setup meta data for the "Setup Workbench" will follow with the next release.
+  12. New car models for "Setup Workbench":
+      - Assetto Corsa
+        - Ferrari F2004 (added Diff Coast & Power)
+        - Ferrari SF15-T (added Heave Suspension and electrical system)
+        - Lotus Exos T125 (added Diff Coast & Power)
+        - Tatuus FA01 (updated for new settings as well)
+        - All other cars (updated Differential settings where necessary)
+        - Porsche 919 Hybrid 2015 (by @mirko_lesko)
+        - Porsche 919 Hybrid 2016 (by @mirko_lesko)
+        - Audi R18 e-tron 2014 (by @mirko_lesko)
+        - Toyota TS040 Hybrid (by @mirko_lesko)
 
 ## 5.5.4.0-release 01/19/24
   1. Minor bugfixes, as always

@@ -12,7 +12,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 [?Initialize] => (Prove: removeSettings("Assetto Corsa", "Abarth 500 Assetto Corse",
-										[Electronics.ABS, Aero.Wing.Front,
+										[Electronics.TC, Aero.Wing.Front,
 										 Differential.Preload,
 										 Bumpstop.Rate.Front.Left, Bumpstop.Rate.Front.Right,
 										 Bumpstop.Rate.Rear.Left, Bumpstop.Rate.Rear.Right,

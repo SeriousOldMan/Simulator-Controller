@@ -4361,6 +4361,9 @@ class RaceCenter extends ConfigurationItem {
 				lap := this.Connector.GetSessionLastLap(session)
 
 				if (lap && (lap != "")) {
+					if isDevelopment()
+						logMessage(kLogInfo, "Instruct Engineer - Session: " . session . "; Lap: " . lap)
+
 					this.Connector.SetLapValue(lap, "Pitstop Plan", printMultiMap(pitstopPlan))
 					this.Connector.SetSessionValue(session, "Pitstop Plan", lap)
 

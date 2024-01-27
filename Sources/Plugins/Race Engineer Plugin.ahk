@@ -300,11 +300,17 @@ class RaceEngineerPlugin extends RaceAssistantPlugin {
 			pitstopSettings := this.TeamServer.getSessionValue("Pitstop Plan", false)
 
 			if (pitstopSettings && (pitstopSettings != "")) {
+				if isDevelopment()
+					logMessage(kLogInfo, "Engineer instructions found - Lap: " . pitstopSettings)
+
 				this.TeamServer.setSessionValue("Pitstop Plan", "")
 
 				pitstopSettings := this.TeamServer.getLapValue(pitstopSettings, "Pitstop Plan")
 
 				if (pitstopSettings && (pitstopSettings != "")) {
+					if isDevelopment()
+						logMessage(kLogInfo, "Instructions:`n" . pitstopSettings)
+
 					pitstopSettings := parseMultiMap(pitstopSettings)
 
 					requestDriver := getMultiMapValue(pitstopSettings, "Pitstop", "Driver", false)

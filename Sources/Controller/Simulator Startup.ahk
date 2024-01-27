@@ -1672,6 +1672,12 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 						drivers := CaseInsenseMap()
 					}
 
+					if ((drivers.Count > 0) && (profilesEditorGui["profileDriverDropDown"].Value != 0)
+											&& drivers.Has(profilesEditorGui["profileDriverDropDown"].Text))
+						driverIdentifier := drivers[profilesEditorGui["profileDriverDropDown"].Text]
+					else
+						driverIdentifier := false
+
 					names := getKeys(drivers)
 					chosen := inList(getValues(drivers), driverIdentifier)
 
@@ -1699,6 +1705,12 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 
 						exception := e
 					}
+
+					if ((sessions.Count > 0) && (profilesEditorGui["profileSessionDropDown"].Value != 0)
+											 && sessions.Has(profilesEditorGui["profileSessionDropDown"].Text))
+						sessionIdentifier := sessions[profilesEditorGui["profileSessionDropDown"].Text]
+					else
+						sessionIdentifier := false
 
 					names := getKeys(sessions)
 					chosen := inList(getValues(sessions), sessionIdentifier)
@@ -1799,6 +1811,12 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 						keepAliveTask.start()
 
 						teams := loadTeams(connector)
+
+						if ((teams.Count > 0) && (profilesEditorGui["profileTeamDropDown"].Value != 0)
+											  && teams.Has(profilesEditorGui["profileTeamDropDown"].Text))
+							teamIdentifier := teams[profilesEditorGui["profileTeamDropDown"].Text]
+						else
+							teamIdentifier := false
 
 						names := getKeys(teams)
 						chosen := inList(getValues(teams), teamIdentifier)

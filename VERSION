@@ -3,7 +3,7 @@ Version=5.5.6.0-dev
 Target=5.5.5.0-release
 Date=01/26/2024
 Download=
-Changes=Added default profile for Stream Deck to the Profiles collection, Fixes for the Assistants with deactivated listeners
+Changes=Added default profile for Stream Deck to the Profiles collection, Fixes for the Assistants with deactivated listeners, Fixed default connections in Startup Profiles, Added voice control status to "System Monitor", New settings "Engine.Limiter" and "Turbo" in "Setup Workbench"
 Components=Media->5.3.0,Configuration->5.5.3,Utilities->5.4.8
 [Release]
 Version=5.5.5.0-release

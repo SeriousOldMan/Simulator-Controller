@@ -94,7 +94,6 @@ class IntegrationPlugin extends ControllerPlugin {
 		local sessionLaps := getMultiMapValue(sessionInfo, "Session", "Laps.Remaining", 0)
 		local stintLaps := getMultiMapValue(sessionInfo, "Stint", "Laps.Remaining.Stint", 0)
 		local lastValid := getMultiMapValue(sessionInfo, "Stint", "Valid", true)
-		local lastTime := getMultiMapValue(sessionInfo, "Stint", "Lap.Time.Last", kUndefined)
 		local state := Map()
 		local remainingStintTime, remainingSessionTime, remainingDriverTime
 
@@ -103,13 +102,13 @@ class IntegrationPlugin extends ControllerPlugin {
 		else
 			remainingSessionTime := kNull
 
-		if (isNumber(stintTime) && isNumber(lastTime))
-			remainingStintTime := ((((stintTime / lastTime) < 4) ? "<font color=`"red`">" : "") . displayValue("Time", stintTime) . (((stintTime / lastTime) < 4) ? "</font>" : ""))
+		if isNumber(stintTime)
+			remainingStintTime := displayValue("Time", stintTime)
 		else
 			remainingStintTime := kNull
 
-		if (isNumber(driverTime) && isNumber(lastTime))
-			remainingDriverTime := ((((driverTime / lastTime) < 4) ? "<font color=`"red`">" : "") . displayValue("Time", driverTime) . (((driverTime / lastTime) < 4) ? "</font>" : ""))
+		if isNumber(driverTime)
+			remainingDriverTime := displayValue("Time", driverTime)
 		else
 			remainingDriverTime := kNull
 

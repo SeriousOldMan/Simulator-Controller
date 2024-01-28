@@ -1,0 +1,20 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;   Modular Simulator Controller System - Assetto Corsa Competitizione    ;;;
+;;;                                         Audi R8 LMS GT2                 ;;;
+;;;                                         Setup Rules                     ;;;
+;;;                                                                         ;;;
+;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
+;;;   License:    (2024) Creative Commons - BY-NC-SA                        ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;-------------------------------------------------------------------------;;;
+;;;                            Initialization                               ;;;
+;;;-------------------------------------------------------------------------;;;
+
+[?Initialize] => (Prove: removeSettings("Assetto Corsa Competizione", "Audi R8 LMS GT2",
+										[Electronics.Map, Aero.Splitter.Front,
+										 Bumpstop.Range.Front.Left, Bumpstop.Range.Front.Right,
+										 Bumpstop.Range.Rear.Left, Bumpstop.Range.Rear.Right,
+										 Damper.Compression.Fast.Front.Left, Damper.Compression.Fast.Front.Right,
+										 Damper.Compression.Fast.Rear.Left, Damper.Compression.Fast.Rear.Right,
+										 AntiRollBar.Rear]))

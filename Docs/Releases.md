@@ -8,6 +8,11 @@
   7. Again improvements for the "Setup Workbench":
      - New standard setup setting "Turbo" for "Setup Workbench". Please note, that this setting is not enabled by default in *Assetto Corsa*.
      - New standard setup setting "Limiter" for "Setup Workbench". Please note, that this setting is not enabled by default in *Assetto Corsa*.
+  8. New car models for "Setup Workbench":
+     - Assetto Corsa Competizione
+	   - Audi R8 LMS GT2
+	   - KTM X-BOW GT2
+	   - Maserati GT2
 
 ## 5.5.5.0-release 01/26/24
   1. Minor bugfixes, as always

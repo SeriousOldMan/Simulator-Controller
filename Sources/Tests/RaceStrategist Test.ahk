@@ -338,12 +338,15 @@ class FCYHandling extends Assert {
 				strategist.addLap(A_Index, &data)
 
 			if (A_Index = 2) {
+				; strategist.updateDynamicValues({EnoughData: true})
+
+				strategist.callRecommendFullCourseYellow()
+			}
+			else if (A_Index = 9) {
 				strategist.updateDynamicValues({EnoughData: true})
 
 				strategist.callRecommendFullCourseYellow()
 			}
-			else if (A_Index = 9)
-				strategist.callRecommendFullCourseYellow()
 
 			if (A_Index = 4) {
 				Sleep(2000)

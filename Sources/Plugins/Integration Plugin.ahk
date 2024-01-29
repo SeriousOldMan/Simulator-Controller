@@ -602,6 +602,13 @@ class IntegrationPlugin extends ControllerPlugin {
 				}
 		}
 	}
+
+	writePluginState(configuration) {
+		if this.Active
+			setMultiMapValue(configuration, this.Plugin, "State", "Active")
+		else
+			super.writePluginState(configuration)
+	}
 }
 
 

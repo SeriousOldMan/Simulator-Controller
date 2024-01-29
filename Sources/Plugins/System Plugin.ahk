@@ -11,6 +11,7 @@
 
 #Include "..\Libraries\Task.ahk"
 #Include "..\Libraries\Messages.ahk"
+#Include "..\Libraries\SpeechRecognizer.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -403,6 +404,10 @@ class SystemPlugin extends ControllerPlugin {
 	}
 
 	writePluginState(configuration) {
+		local listener, pushToTalk
+
+		static recognizerAvailable := kUndefined
+
 		if this.Active
 			setMultiMapValue(configuration, this.Plugin, "State", "Active")
 		else
@@ -412,6 +417,49 @@ class SystemPlugin extends ControllerPlugin {
 			setMultiMapValue(configuration, this.Plugin, "Information", translate("Profile: ") . getMultiMapValue(this.StartupSettings, "Profiles", "Profile"))
 		else
 			setMultiMapValue(configuration, this.Plugin, "Information", translate("Profile: ") . translate("Standard"))
+
+		if getMultiMapValue(this.Configuration, "Voice Control", "Recognizer", false) {
+			listener := getMultiMapValue(this.Configuration, "Voice Control", "Listener", false)
+			pushToTalk := getMultiMapValue(this.Configuration, "Voice Control", "PushToTalk", false)
+
+			if listener {
+				if (recognizerAvailable == kUndefined)
+					try {
+						SpeechRecognizer(getMultiMapValue(this.Configuration, "Voice Control", "Recognizer"), listener
+									   , getMultiMapValue(this.Configuration, "Voice Control", "Language"), true)
+
+						recognizerAvailable := true
+					}
+					catch Any {
+						recognizerAvailable := false
+					}
+
+				if !recognizerAvailable {
+					setMultiMapValue(configuration, "Voice Recognition", "State", "Critical")
+
+					setMultiMapValue(configuration, "Voice Recognition", "Information", translate("Recognizer Engine: ") . ((listener == true) ? translate("Automatic") : listener)
+																					  . translate("; Error in Speech Recognizer configuration..."))
+				}
+				else if (pushToTalk && (Trim(pushToTalk) != "")) {
+					setMultiMapValue(configuration, "Voice Recognition", "State", "Active")
+
+					setMultiMapValue(configuration, "Voice Recognition", "Information", translate("Recognizer Engine: ") . ((listener == true) ? translate("Automatic") : listener))
+				}
+				else {
+					setMultiMapValue(configuration, "Voice Recognition", "State", "Warning")
+
+					setMultiMapValue(configuration, "Voice Recognition", "Information", translate("Recognizer Engine: ") . ((listener == true) ? translate("Automatic") : listener)
+																					  . translate("; No Push-To-Talk button configured..."))
+				}
+			}
+			else {
+				setMultiMapValue(configuration, "Voice Recognition", "State", "Disabled")
+
+				setMultiMapValue(configuration, "Voice Recognition", "Information", translate("Recognizer Engine: ") . translate("Deactivated"))
+			}
+		}
+		else
+			setMultiMapValue(configuration, "Voice Recognition", "State", "Disabled")
 	}
 
 	simulatorStartup(simulator) {

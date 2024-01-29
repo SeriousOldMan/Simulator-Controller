@@ -125,7 +125,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 				try {
 					recognizers := SpeechRecognizer("Azure|" . Trim(this.Control["azureTokenIssuerEdit"].Text) . "|" . Trim(this.Control["azureSubscriptionKeyEdit"].Text)
-											  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
+												  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
 				}
 				catch Any as exception {
 					logError(exception)

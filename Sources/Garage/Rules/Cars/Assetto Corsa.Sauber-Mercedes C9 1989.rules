@@ -1,6 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Assetto Corsa                   ;;;
-;;;                                         Mazda 787B                      ;;;
+;;;                                         Sauber-Mercedes C9 1989         ;;;
 ;;;                                         Setup Rules                     ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Mirko Lesko, Oliver Juwig (TheBigO)                       ;;;
@@ -11,10 +11,10 @@
 ;;;                            Initialization                               ;;;
 ;;;-------------------------------------------------------------------------;;;
 										
-[?Initialize] =>    (Prove: removeSettings("Assetto Corsa", "Mazda 787B",
-										   [Aero.Height.Front, Aero.Height.Rear, Electronics.TC, Electronics.ABS])),
-					(Prove: addSettings("Assetto Corsa", "Mazda 787B",
-										[Aero.Height.Front.Left, Aero.Height.Front.Right, 
-										 Aero.Height.Rear.Left, Aero.Height.Rear.Right,
-										 Differential.Coast, Differential.Power,
-										 Electronics.Engine.Limiter]))
+[?Initialize] => (Prove: removeSettings("Assetto Corsa", "Sauber-Mercedes C9 1989",
+										[Aero.Height.Front, Aero.Height.Rear, Aero.Wing.Front, Electronics.TC, Electronics.ABS])),
+				 (Prove: addSettings("Assetto Corsa", "Sauber-Mercedes C9 1989",
+									 [Aero.Height.Front.Left, Aero.Height.Front.Right, 
+									  Aero.Height.Rear.Left, Aero.Height.Rear.Right,
+									  Differential.Coast, Differential.Power,
+									  Electronics.Turbo]))

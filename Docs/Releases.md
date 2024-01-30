@@ -20,7 +20,7 @@
 	    - Mercedes-AMG GT2
 	  - Assetto Corsa
 	    - Mazda 787B (by @mirko_lesko)
-	    - Mercedes-Benz C9 (by @mirko_lesko)
+	    - Sauber-Mercedes C9 (by @mirko_lesko)
 	    - Porsche 962C Long Tail (by @mirko_lesko)
 	    - Porsche 962C Short Tail (by @mirko_lesko)
 

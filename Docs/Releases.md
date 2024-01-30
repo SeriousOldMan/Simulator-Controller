@@ -7,11 +7,12 @@
   6. Added title bars to a couple of more windows to make them moveable.
   7. A pre-configured Stream Deck profile is now available in the *Profiles* folder.
   8. A new module entry shows the voice configuration status in the "System Monitor".
-  9. Again improvements for the "Setup Workbench":
-     - New standard setup setting "Boost" for "Setup Workbench". Please note, that this setting is not enabled by default in *Assetto Corsa*.
-	 - Several new rules for handling issue recommendations with regards to turbo boost settings.
-     - New standard setup setting "Limiter" for "Setup Workbench". Please note, that this setting is not enabled by default in *Assetto Corsa*.
-  10. New car models for "Setup Workbench":
+  9. Several new settings in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database" allow you to customize the strategy summary given the the Strategist, when running a race with a pre-configured strategy.
+  10. Again improvements for the "Setup Workbench":
+      - New standard setup setting "Boost" for "Setup Workbench". Please note, that this setting is not enabled by default in *Assetto Corsa*.
+	  - Several new rules for handling issue recommendations with regards to turbo boost settings.
+      - New standard setup setting "Limiter" for "Setup Workbench". Please note, that this setting is not enabled by default in *Assetto Corsa*.
+  11. New car models for "Setup Workbench":
       - Assetto Corsa Competizione
 	    - Audi R8 LMS GT2
 	    - KTM X-BOW GT2

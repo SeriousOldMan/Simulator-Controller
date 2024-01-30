@@ -53,7 +53,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		local wizard := this.SetupWizard
 		local application, function, path, directory, voiceControlConfiguration, ignore, section, subConfiguration
 		local modeSelectors, arguments, launchApplications, descriptor, label, language, startWithWindows, silentMode
-		local values, key, value
+		local values, key, value, excludes
 
 		super.saveToConfiguration(configuration)
 
@@ -127,13 +127,15 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 
 		thePlugin := Plugin("System", false, true, "", arguments)
 
+		excludes := []
+		
 		if (modeSelectors.Length = 0)
-			thePlugin.removeArgument("modeSelector")
+			excludes.Push("modeSelector")
 
 		if (launchApplications.Length = 0)
-			thePlugin.removeArgument("launchApplications")
+			excludes.Push("launchApplications")
 
-		thePlugin.saveToConfiguration(configuration)
+		thePlugin.saveToConfiguration(configuration, true, excludes)
 
 		if !getMultiMapValue(configuration, "Plugins", "Integration", false)
 			Plugin("Integration", false, false).saveToConfiguration(configuration)

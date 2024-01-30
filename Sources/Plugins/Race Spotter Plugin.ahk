@@ -25,7 +25,7 @@ global kRaceSpotterPlugin := "Race Spotter"
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class RaceSpotterPlugin extends RaceAssistantPlugin  {
+class RaceSpotterPlugin extends RaceAssistantPlugin {
 	iTrackAutomationEnabled := false
 	iAutomationPID := false
 

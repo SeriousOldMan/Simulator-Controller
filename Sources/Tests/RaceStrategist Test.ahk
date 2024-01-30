@@ -338,12 +338,15 @@ class FCYHandling extends Assert {
 				strategist.addLap(A_Index, &data)
 
 			if (A_Index = 2) {
+				; strategist.updateDynamicValues({EnoughData: true})
+
+				strategist.callRecommendFullCourseYellow()
+			}
+			else if (A_Index = 9) {
 				strategist.updateDynamicValues({EnoughData: true})
 
 				strategist.callRecommendFullCourseYellow()
 			}
-			else if (A_Index = 9)
-				strategist.callRecommendFullCourseYellow()
 
 			if (A_Index = 4) {
 				Sleep(2000)
@@ -387,10 +390,10 @@ class FCYHandling extends Assert {
 if !GetKeyState("Ctrl") {
 	startTime := A_TickCount
 
-	;~ AHKUnit.AddTestClass(BasicReporting)
-	;~ AHKUnit.AddTestClass(PositionProjection)
-	;~ AHKUnit.AddTestClass(GapReporting)
-	;~ AHKUnit.AddTestClass(PitstopRecommendation)
+	AHKUnit.AddTestClass(BasicReporting)
+	AHKUnit.AddTestClass(PositionProjection)
+	AHKUnit.AddTestClass(GapReporting)
+	AHKUnit.AddTestClass(PitstopRecommendation)
 	AHKUnit.AddTestClass(FCYHandling)
 
 	AHKUnit.Run()

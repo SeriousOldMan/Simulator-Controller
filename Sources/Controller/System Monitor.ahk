@@ -289,7 +289,7 @@ systemMonitor(command := false, arguments*) {
 
 	local x, y, w, h, time, logLevel
 	local controllerState, databaseState, trackMapperState, sessionInfo, ignore, assistant, plugin, icons, modules, key, value
-	local icon, state, property, drivers, choices, chosen, settings
+	local icon, state, property, drivers, choices, chosen, settings, plugins
 
 	local serverURLValue, serverTokenValue, serverDriverValue, serverTeamValue, serverSessionValue
 	local stintNrValue, stintLapValue, stintDriverValue
@@ -1437,7 +1437,15 @@ systemMonitor(command := false, arguments*) {
 				modules := []
 				messages := []
 
-				for ignore, plugin in string2Values("|", getMultiMapValue(controllerState, "Modules", "Plugins")) {
+				plugins := string2Values("|", getMultiMapValue(controllerState, "Modules", "Plugins"))
+
+				if (controllerState.Count > 0) {
+					plugins := concatenate(plugins, ["Voice Recognition"])
+
+					bubbleSort(&plugins)
+				}
+
+				for ignore, plugin in plugins {
 					if plugin {
 						state := getMultiMapValue(controllerState, plugin, "State")
 

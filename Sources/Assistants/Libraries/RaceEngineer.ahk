@@ -1550,34 +1550,32 @@ class RaceEngineer extends RaceAssistant {
 
 				if ProcessExist("Practice Center.exe") {
 					if (this.SaveSettings = kAsk) {
-						if this.Listener {
+						if this.Speaker {
 							this.getSpeaker().speakPhrase("ConfirmDataUpdate", false, true)
 
-							this.setContinuation(ObjBindMethod(this, "shutdownSession", "After"))
+							this.setContinuation(ObjBindMethod(this, "shutdownSession", "After", true))
 
 							Task.startTask(ObjBindMethod(this, "forceFinishSession"), 120000, kLowPriority)
-						}
-						else
-							this.shutdownSession("After")
 
-						return
+							return
+						}
 					}
 				}
 				else {
 					if (((this.SaveTyrePressures = kAsk) && this.CollectTyrePressures && this.HasPressureData) || (this.SaveSettings = kAsk)) {
-						if this.Listener {
+						if this.Speaker {
 							this.getSpeaker().speakPhrase("ConfirmDataUpdate", false, true)
 
-							this.setContinuation(ObjBindMethod(this, "shutdownSession", "After"))
+							this.setContinuation(ObjBindMethod(this, "shutdownSession", "After", true))
 
 							Task.startTask(ObjBindMethod(this, "forceFinishSession"), 120000, kLowPriority)
-						}
-						else
-							this.shutdownSession("After")
 
-						return
+							return
+						}
 					}
 				}
+
+				this.shutdownSession("After")
 			}
 
 			this.updateDynamicValues({KnowledgeBase: false, Prepared: false})
@@ -1602,24 +1600,29 @@ class RaceEngineer extends RaceAssistant {
 		}
 	}
 
-	shutdownSession(phase) {
+	shutdownSession(phase, confirmed := false) {
+		local pressuresSaved := false
+
 		this.iSessionDataActive := true
 
 		try {
-			if (((phase = "After") && (this.SaveSettings = kAsk)) || ((phase = "Before") && (this.SaveSettings = kAlways)))
+			if (((phase = "After") && (this.SaveSettings = kAsk) && confirmed) || ((phase = "Before") && (this.SaveSettings = kAlways)))
 				if (this.Session == kSessionRace)
 					this.saveSessionSettings()
 
-			if (((phase = "After") && (this.SaveTyrePressures = kAsk)) || ((phase = "Before") && (this.SaveTyrePressures = kAlways)))
-				if (this.HasPressureData && this.CollectTyrePressures && !ProcessExist("Practice Center.exe"))
+			if (((phase = "After") && (this.SaveTyrePressures = kAsk) && confirmed) || ((phase = "Before") && (this.SaveTyrePressures = kAlways)))
+				if (this.HasPressureData && this.CollectTyrePressures && !ProcessExist("Practice Center.exe")) {
 					this.updateTyresDatabase()
+
+					pressuresSaved := true
+				}
 		}
 		finally {
 			this.iSessionDataActive := false
 		}
 
 		if (phase = "After") {
-			if this.Speaker
+			if (this.Speaker && pressuresSaved)
 				this.getSpeaker().speakPhrase("DataUpdated")
 
 			this.updateDynamicValues({KnowledgeBase: false})

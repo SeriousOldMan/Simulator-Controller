@@ -1,3 +1,29 @@
+## 5.5.6.0-release 02/02/24 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. Fixed several bugs for the Race Assistants in conjunction with a deactivated voice listener.
+  4. Fixed a bug in the handling of Team Server default connections for the Startup Profiles.
+  5. Fixed a (critical) bug in "Simulator Configuration", which didn't open its main window, when one or more Asistants had been disabled.
+  6. Added title bars to a couple of more windows to make them moveable.
+  7. A pre-configured Stream Deck profile is now available in the *Profiles* folder.
+  8. A new module entry shows the voice configuration status in the "System Monitor".
+  9. Several new settings in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database" allow you to customize the strategy summary given the the Strategist, when running a race with a pre-configured strategy.
+  10. Again improvements for the "Setup Workbench":
+      - New standard setup setting "Boost" for "Setup Workbench". Please note, that this setting is not enabled by default in *Assetto Corsa*.
+	  - Several new rules for handling issue recommendations with regards to turbo boost settings.
+      - New standard setup setting "Limiter" for "Setup Workbench". Please note, that this setting is not enabled by default in *Assetto Corsa*.
+  11. New car models for "Setup Workbench":
+      - Assetto Corsa Competizione
+	    - Audi R8 LMS GT2
+	    - KTM X-BOW GT2
+	    - Maserati GT2
+	    - Mercedes-AMG GT2
+	  - Assetto Corsa
+	    - Mazda 787B (by @mirko_lesko)
+	    - Mercedes-Benz C9 (by @mirko_lesko)
+	    - Porsche 962C Long Tail (by @mirko_lesko)
+	    - Porsche 962C Short Tail (by @mirko_lesko)
+
 ## 5.5.5.0-release 01/26/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

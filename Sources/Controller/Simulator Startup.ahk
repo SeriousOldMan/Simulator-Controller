@@ -1294,13 +1294,14 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 		local ignore, plugin
 
 		profilesEditorGui["profileNameEdit"].Text := profile["Name"]
-		profilesEditorGui["profileModeDropDown"].Value := Max(1, inList(hasTeamServer ? ["Solo", "Team"] : ["Solo"], profile["Mode"]))
-		profilesEditorGui["profilePitwallDropDown"].Value := (1 + inList(hasTeamServer ? ["Practice Center", "Race Center"] : ["Practice Center"], profile["Tools"]))
+		profilesEditorGui["profileModeDropDown"].Choose(Max(1, inList(hasTeamServer ? ["Solo", "Team"] : ["Solo"], profile["Mode"])))
+		profilesEditorGui["profilePitwallDropDown"].Choose((1 + inList(hasTeamServer ? ["Practice Center", "Race Center"] : ["Practice Center"], profile["Tools"])))
 
-		profilesEditorGui["profileAutonomyDropDown"].Value := inList(["Yes", "No", "Default"], profile["Assistant.Autonomy"])
+		profilesEditorGui["profileAutonomyDropDown"].Choose(inList(["Yes", "No", "Default"], profile["Assistant.Autonomy"]))
 
 		for ignore, plugin in activeAssistants
-			plugin[2].Value := inList(["Default", "Disabled", "Silent", "Muted", "Active"], profile[plugin[1]])
+			if profile.Has(plugin[1])
+				plugin[2].Choose(inList(["Default", "Disabled", "Silent", "Muted", "Active"], profile[plugin[1]]))
 
 		if keepAliveTask {
 			keepAliveTask.stop()
@@ -1309,7 +1310,7 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 		}
 
 		if (profile["Mode"] = "Team") {
-			profilesEditorGui["profileCredentialsDropDown"].Value := inList(["Profile", "Settings"], profile["Team.Mode"])
+			profilesEditorGui["profileCredentialsDropDown"].Choose(inList(["Profile", "Settings"], profile["Team.Mode"]))
 
 			if (profile["Team.Mode"] = "Profile") {
 				profilesEditorGui["profileServerURLEdit"].Text := profile["Server.URL"]
@@ -1348,7 +1349,8 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 		profile["Assistant.Autonomy"] := ["Yes", "No", "Default"][profilesEditorGui["profileAutonomyDropDown"].Value]
 
 		for ignore, plugin in activeAssistants
-			profile[plugin[1]] := ["Default", "Disabled", "Silent", "Muted", "Active"][plugin[2].Value]
+			if plugin[2].Value
+				profile[plugin[1]] := ["Default", "Disabled", "Silent", "Muted", "Active"][plugin[2].Value]
 
 		if (profile["Mode"] = "Team") {
 			profile["Team.Mode"] := ["Profile", "Settings"][profilesEditorGui["profileCredentialsDropDown"].Value]
@@ -1670,6 +1672,12 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 						drivers := CaseInsenseMap()
 					}
 
+					if ((drivers.Count > 0) && (profilesEditorGui["profileDriverDropDown"].Value != 0)
+											&& drivers.Has(profilesEditorGui["profileDriverDropDown"].Text))
+						driverIdentifier := drivers[profilesEditorGui["profileDriverDropDown"].Text]
+					else
+						driverIdentifier := false
+
 					names := getKeys(drivers)
 					chosen := inList(getValues(drivers), driverIdentifier)
 
@@ -1697,6 +1705,12 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 
 						exception := e
 					}
+
+					if ((sessions.Count > 0) && (profilesEditorGui["profileSessionDropDown"].Value != 0)
+											 && sessions.Has(profilesEditorGui["profileSessionDropDown"].Text))
+						sessionIdentifier := sessions[profilesEditorGui["profileSessionDropDown"].Text]
+					else
+						sessionIdentifier := false
 
 					names := getKeys(sessions)
 					chosen := inList(getValues(sessions), sessionIdentifier)
@@ -1798,6 +1812,12 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 
 						teams := loadTeams(connector)
 
+						if ((teams.Count > 0) && (profilesEditorGui["profileTeamDropDown"].Value != 0)
+											  && teams.Has(profilesEditorGui["profileTeamDropDown"].Text))
+							teamIdentifier := teams[profilesEditorGui["profileTeamDropDown"].Text]
+						else
+							teamIdentifier := false
+
 						names := getKeys(teams)
 						chosen := inList(getValues(teams), teamIdentifier)
 
@@ -1894,7 +1914,7 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 				profilesEditorGui["profileCredentialsDropDown"].Enabled := true
 
 				if (profilesEditorGui["profileCredentialsDropDown"].Value = 0)
-					profilesEditorGui["profileCredentialsDropDown"].Value := 2
+					profilesEditorGui["profileCredentialsDropDown"].Choose(2)
 
 				profilesEditorGui["profileTeamButton"].Enabled := (profilesEditorGui["profileCredentialsDropDown"].Value = 2)
 				profilesEditorGui["profileSessionButton"].Enabled := true
@@ -1922,23 +1942,23 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 			profilesEditorGui["profileNameEdit"].Enabled := false
 			profilesEditorGui["profileNameEdit"].Text := ""
 			profilesEditorGui["profileModeDropDown"].Enabled := false
-			profilesEditorGui["profileModeDropDown"].Value := 0
+			profilesEditorGui["profileModeDropDown"].Choose(0)
 			profilesEditorGui["profilePitwallDropDown"].Enabled := false
-			profilesEditorGui["profilePitwallDropDown"].Value := 0
+			profilesEditorGui["profilePitwallDropDown"].Choose(0)
 
 			profilesEditorGui["profileAutonomyDropDown"].Enabled := false
-			profilesEditorGui["profileAutonomyDropDown"].Value := 0
+			profilesEditorGui["profileAutonomyDropDown"].Choose(0)
 
 			for ignore, plugin in activeAssistants {
 				plugin[2].Enabled := false
-				plugin[2].Value := 0
+				plugin[2].Choose(0)
 			}
 		}
 
 		if hasTeamServer {
 			if ((profilesListView.GetNext() <= 1) || (profilesEditorGui["profileModeDropDown"].Value != 2)) {
 				profilesEditorGui["profileCredentialsDropDown"].Enabled := false
-				profilesEditorGui["profileCredentialsDropDown"].Value := 0
+				profilesEditorGui["profileCredentialsDropDown"].Choose(0)
 				profilesEditorGui["profileTeamButton"].Enabled := false
 				profilesEditorGui["profileSessionButton"].Enabled := false
 			}
@@ -1950,11 +1970,11 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 				profilesEditorGui["profileServerTokenEdit"].Value := ""
 				profilesEditorGui["profileConnectButton"].Enabled := false
 				profilesEditorGui["profileTeamDropDown"].Enabled := false
-				profilesEditorGui["profileTeamDropDown"].Value := 0
+				profilesEditorGui["profileTeamDropDown"].Choose(0)
 				profilesEditorGui["profileDriverDropDown"].Enabled := false
-				profilesEditorGui["profileDriverDropDown"].Value := 0
+				profilesEditorGui["profileDriverDropDown"].Choose(0)
 				profilesEditorGui["profileSessionDropDown"].Enabled := false
-				profilesEditorGui["profileSessionDropDown"].Value := 0
+				profilesEditorGui["profileSessionDropDown"].Choose(0)
 
 				if keepAliveTask {
 					keepAliveTask.stop()
@@ -2216,7 +2236,7 @@ loginDialog(connectorOrCommand := false, teamServerURL := false, owner := false,
 	else {
 		result := false
 
-		loginGui := Window()
+		loginGui := Window({Options: "0x400000"}, "")
 
 		loginGui.SetFont("Norm", "Arial")
 

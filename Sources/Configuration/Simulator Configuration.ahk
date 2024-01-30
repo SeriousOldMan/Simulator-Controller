@@ -248,7 +248,7 @@ class GeneralTab extends ConfiguratorPanel {
 
 			window.Add("Text", "x24 y477 w160 h23 +0x200", translate("Log Level"))
 
-			choices := ["Info", "Warn", "Critical", "Off"]
+			choices := kLogLevelNames
 
 			chosen := inList(choices, this.Value["logLevel"])
 

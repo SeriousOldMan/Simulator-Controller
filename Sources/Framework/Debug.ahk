@@ -10,9 +10,9 @@
 ;;;-------------------------------------------------------------------------;;;
 
 global gDebug := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
-								, "Debug", "Debug", kBuildConfiguration = "Development")
+								, "Debug", "Debug", (kBuildConfiguration = "Development") && !A_IsCompiled)
 global gLogLevel := kLogLevels[getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
-											  , "Debug", "LogLevel", (kBuildConfiguration = "Development") ? "Debug" : "Warn")]
+											  , "Debug", "LogLevel", ((kBuildConfiguration = "Development") && !A_IsCompiled) ? "Debug" : "Warn")]
 
 
 ;;;-------------------------------------------------------------------------;;;

@@ -20,7 +20,7 @@
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class RaceAssistantPlugin extends ControllerPlugin  {
+class RaceAssistantPlugin extends ControllerPlugin {
 	static sAssistantCooldown := kUndefined
 	static sTeamServerCooldown := kUndefined
 
@@ -691,7 +691,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		local teamServer, raceAssistantToggle, teamServerToggle, arguments, ignore, theAction, assistant
 		local openRaceSettings, openRaceReports, openSessionDatabase, openSetupWorkbench
 		local openPracticeCenter, openRaceCenter, openStrategyWorkbench, importSetup
-		local assistantSpeaker, assistantListener, first, index, startupSettings
+		local assistantSpeaker, assistantListener, first, index
 
 		deleteSettings(*) {
 			if !isDebug()
@@ -1064,6 +1064,9 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			settings := readMultiMap(getFileName("Race.settings", kUserConfigDirectory))
 
 			sessionIdentifier := getMultiMapValue(settings, "Team Settings", "Session.Identifier", false)
+
+			if this.StartupSettings
+				sessionIdentifier := getMultiMapValue(this.StartupSettings, "Team Session", "Session.Identifier", sessionIdentifier)
 
 			if !teamServer.Connected {
 				serverURL := getMultiMapValue(settings, "Team Settings", "Server.URL", "")

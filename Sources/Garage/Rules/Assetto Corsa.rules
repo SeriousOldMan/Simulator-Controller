@@ -17,6 +17,7 @@
 															 Electronics.Map,
 															 Electronics.MGUK.Delivery, Electronics.MGUK.Recovery,
 															 Electronics.MGUH.Mode, Electronics.Engine.Brake,
+															 Electronics.Engine.Limiter, Electronics.Turbo,
 															 Differential.Coast, Differential.Power,
 															 Geometry.Caster.Left, Geometry.Caster.Right,
 															 Aero.Wing.Front.Left, Aero.Wing.Front.Right,

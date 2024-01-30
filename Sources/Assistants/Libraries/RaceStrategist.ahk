@@ -757,7 +757,7 @@ class RaceStrategist extends GridRaceAssistant {
 		, synthesizer := false, speaker := false, vocalics := false, recognizer := false, listener := false, muted := false, voiceServer := false) {
 		super.__New(configuration, "Race Strategist", remoteHandler, name, language, synthesizer, speaker, vocalics, recognizer, listener, muted, voiceServer)
 
-		this.updateConfigurationValues({Announcements: {WeatherUpdate: true}})
+		this.updateConfigurationValues({Announcements: {WeatherUpdate: true, StrategySummary: true, StrategyUpdate: true, StrategyPitstop: false}})
 
 		deleteDirectory(kTempDirectory . "Race Strategist")
 
@@ -1557,7 +1557,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 				asked := true
 
-				if this.Listener
+				if this.Speaker {
 					if ProcessExist("Practice Center.exe") {
 						if (((this.SaveSettings = kAsk) && (this.Session == kSessionRace))
 						 && ((this.SaveRaceReport = kAsk) && (this.Session == kSessionRace)))
@@ -1582,18 +1582,19 @@ class RaceStrategist extends GridRaceAssistant {
 						else
 							asked := false
 					}
+				}
+				else
+					asked := false
 
 				if asked {
-					if this.Listener {
-						this.setContinuation(ObjBindMethod(this, "shutdownSession", "After"))
+					this.setContinuation(ObjBindMethod(this, "shutdownSession", "After", true))
 
-						Task.startTask(ObjBindMethod(this, "forceFinishSession"), 120000, kLowPriority)
-					}
-					else
-						this.shutdownSession("After")
+					Task.startTask(ObjBindMethod(this, "forceFinishSession"), 120000, kLowPriority)
 
 					return
 				}
+				else
+					this.shutdownSession("After")
 			}
 
 			this.updateDynamicValues({KnowledgeBase: false, Prepared: false})
@@ -1642,24 +1643,24 @@ class RaceStrategist extends GridRaceAssistant {
 			this.finishSession(shutdown, false)
 	}
 
-	shutdownSession(phase) {
+	shutdownSession(phase, confirmed := false) {
 		local reportSaved := false
 
 		this.iSessionDataActive := true
 
 		try {
-			if (((phase = "After") && (this.SaveSettings = kAsk)) || ((phase = "Before") && (this.SaveSettings = kAlways)))
+			if (((phase = "After") && (this.SaveSettings = kAsk) && confirmed) || ((phase = "Before") && (this.SaveSettings = kAlways)))
 				if (this.Session == kSessionRace)
 					this.saveSessionSettings()
 
-			if (((phase = "After") && (this.SaveRaceReport = kAsk)) || ((phase = "Before") && (this.SaveRaceReport = kAlways)))
+			if (((phase = "After") && (this.SaveRaceReport = kAsk) && confirmed) || ((phase = "Before") && (this.SaveRaceReport = kAlways)))
 				if (this.Session == kSessionRace) {
 					reportSaved := true
 
 					this.createRaceReport()
 				}
 
-			if (((phase = "After") && (this.SaveTelemetry = kAsk)) || ((phase = "Before") && (this.SaveTelemetry = kAlways)))
+			if (((phase = "After") && (this.SaveTelemetry = kAsk) && confirmed) || ((phase = "Before") && (this.SaveTelemetry = kAlways)))
 				if (this.HasTelemetryData && this.CollectTelemetry && !ProcessExist("Practice Center.exe"))
 					this.updateTelemetryDatabase()
 		}
@@ -1668,11 +1669,8 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 
 		if (phase = "After") {
-			if this.Speaker
-				if reportSaved
-					this.getSpeaker().speakPhrase("RaceReportSaved")
-				else
-					this.getSpeaker().speakPhrase("Roger")
+			if (this.Speaker && reportSaved)
+				this.getSpeaker().speakPhrase("RaceReportSaved")
 
 			this.updateDynamicValues({KnowledgeBase: false, HasTelemetryData: false})
 
@@ -1820,7 +1818,7 @@ class RaceStrategist extends GridRaceAssistant {
 			}
 
 			if (!this.StrategyReported && this.hasEnoughData(false) && (this.Strategy == this.Strategy[true])) {
-				if this.Speaker[false]
+				if (this.Speaker[false] && this.Announcements["StrategySummary"])
 					if this.confirmAction("Strategy.Explain") {
 						this.getSpeaker().speakPhrase("ConfirmReportStrategy", false, true)
 
@@ -2307,7 +2305,8 @@ class RaceStrategist extends GridRaceAssistant {
 					this.updateSessionValues({Strategy: newStrategy})
 
 				if (report && (this.StrategyReported || this.hasEnoughData(false) || !original)) {
-					this.reportStrategy({Strategy: true, Pitstops: false, NextPitstop: true, TyreChange: true, Refuel: true, Map: true})
+					if this.Announcements["StrategyUpdate"]
+						this.reportStrategy({Strategy: true, Pitstops: false, NextPitstop: true, TyreChange: true, Refuel: true, Map: true})
 
 					this.updateDynamicValues({StrategyReported: true})
 				}
@@ -3120,13 +3119,15 @@ class RaceStrategist extends GridRaceAssistant {
 								return
 
 						if (report && this.Speaker) {
-							speaker.speakPhrase("StrategyUpdate")
+							if this.Announcements["StrategyUpdate"] {
+								speaker.speakPhrase("StrategyUpdate")
 
-							this.reportStrategy({Strategy: false, Pitstops: true, NextPitstop: true
-											   , TyreChange: true, Refuel: true, Map: true, Active: this.Strategy}, scenario)
+								this.reportStrategy({Strategy: false, Pitstops: true, NextPitstop: true
+												   , TyreChange: true, Refuel: true, Map: true, Active: this.Strategy}, scenario)
 
-							if ((this.Strategy != this.Strategy[true]) || isDebug())
-								this.explainStrategyRecommendation(scenario)
+								if ((this.Strategy != this.Strategy[true]) || isDebug())
+									this.explainStrategyRecommendation(scenario)
+							}
 
 							if Task.CurrentTask.Confirm {
 								if this.confirmAction("Strategy.Update") {
@@ -3577,9 +3578,13 @@ class RaceStrategist extends GridRaceAssistant {
 			speaker.beginTalk()
 
 			try {
-				if !fullCourseYellow
+				if !fullCourseYellow {
+					if this.Announcements["StrategyPitstop"]
+						this.reportStrategy({Strategy: true, Pitstops: true, NextPitstop: false, TyreChange: true, Refuel: true})
+
 					speaker.speakPhrase("PitstopAhead", {lap: plannedPitstopLap
 													   , laps: (plannedPitstopLap - knowledgeBase.getValue("Lap"))})
+				}
 
 				if ProcessExist("Race Engineer.exe")
 					if fullCourseYellow {

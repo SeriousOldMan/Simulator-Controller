@@ -25,7 +25,7 @@ global kRaceEngineerPlugin := "Race Engineer"
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class RaceEngineerPlugin extends RaceAssistantPlugin  {
+class RaceEngineerPlugin extends RaceAssistantPlugin {
 	static kLapDataSchemas := CaseInsenseMap("Pressures", ["Lap", "Simulator", "Car", "Track", "Weather", "Temperature.Air", "Temperature.Track"
 														 , "Compound", "Compound.Color", "Pressures.Cold", "Pressures.Hot", "Pressures.Losses"])
 
@@ -193,7 +193,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 		local fuelWarning, damageWarning, pressureWarning
 
 		settings := super.loadSettings(simulator, car, track, data, settings)
-		
+
 		if data {
 			local weather := getMultiMapValue(data, "Weather Data", "Weather", "Dry")
 			local airTemperature := getMultiMapValue(data, "Weather Data", "Temperature", 27)
@@ -300,11 +300,17 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 			pitstopSettings := this.TeamServer.getSessionValue("Pitstop Plan", false)
 
 			if (pitstopSettings && (pitstopSettings != "")) {
+				if isDevelopment()
+					logMessage(kLogInfo, "Engineer instructions found - Lap: " . pitstopSettings)
+
 				this.TeamServer.setSessionValue("Pitstop Plan", "")
 
 				pitstopSettings := this.TeamServer.getLapValue(pitstopSettings, "Pitstop Plan")
 
 				if (pitstopSettings && (pitstopSettings != "")) {
+					if isDevelopment()
+						logMessage(kLogInfo, "Instructions:`n" . pitstopSettings)
+
 					pitstopSettings := parseMultiMap(pitstopSettings)
 
 					requestDriver := getMultiMapValue(pitstopSettings, "Pitstop", "Driver", false)

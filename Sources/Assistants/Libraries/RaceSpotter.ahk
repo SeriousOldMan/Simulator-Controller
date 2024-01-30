@@ -3089,18 +3089,18 @@ class RaceSpotter extends GridRaceAssistant {
 				this.shutdownSession("Before")
 
 				if ((this.SaveSettings == kAsk) && (this.Session == kSessionRace)) {
-					if this.Listener {
+					if this.Speaker {
 						this.getSpeaker().speakPhrase("ConfirmSaveSettings", false, true)
 
-						this.setContinuation(ObjBindMethod(this, "shutdownSession", "After"))
+						this.setContinuation(ObjBindMethod(this, "shutdownSession", "After", true))
 
 						Task.startTask(ObjBindMethod(this, "forceFinishSession"), 120000, kLowPriority)
-					}
-					else
-						this.shutdownSession("After")
 
-					return
+						return
+					}
 				}
+
+				this.shutdownSession("After")
 			}
 
 			this.shutdownSpotter(true)
@@ -3519,12 +3519,13 @@ class RaceSpotter extends GridRaceAssistant {
 		return super.executePitstop(lapNumber)
 	}
 
-	shutdownSession(phase) {
+	shutdownSession(phase, confirmed := false) {
 		this.iSessionDataActive := true
 
 		try {
-			if ((this.Session == kSessionRace) && (this.SaveSettings = ((phase = "Before") ? kAlways : kAsk)))
-				this.saveSessionSettings()
+			if (((phase = "After") && (this.SaveSettings = kAsk) && confirmed) || ((phase = "Before") && (this.SaveSettings = kAlways)))
+				if (this.Session == kSessionRace)
+					this.saveSessionSettings()
 		}
 		finally {
 			this.iSessionDataActive := false

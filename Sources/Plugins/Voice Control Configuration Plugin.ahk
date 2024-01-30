@@ -125,7 +125,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 				try {
 					recognizers := SpeechRecognizer("Azure|" . Trim(this.Control["azureTokenIssuerEdit"].Text) . "|" . Trim(this.Control["azureSubscriptionKeyEdit"].Text)
-											  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
+												  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
 				}
 				catch Any as exception {
 					logError(exception)
@@ -1070,11 +1070,17 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 	}
 
 	getCurrentLanguage() {
-		local voiceLanguage := this.Control["voiceLanguageDropDown"].Text
 		local languageCode := "en"
 		local languages := availableLanguages()
 		local found := false
-		local code, language, ignore, grammarFile, grammarLanguageCode
+		local voiceLanguage, code, language, ignore, grammarFile, grammarLanguageCode
+
+		try {
+			voiceLanguage := this.Control["voiceLanguageDropDown"].Text
+		}
+		catch Any as exception {
+			voiceLanguage := getMultiMapValue(this.Configuration, "Voice Control", "Language", getLanguage())
+		}
 
 		for code, language in languages
 			if (language = voiceLanguage) {
@@ -1402,7 +1408,7 @@ editSoundProcessing(editorOrCommand := false, settings := false, *) {
 	else {
 		result := false
 
-		editorGui := Window()
+		editorGui := Window({Options: "0x400000"}, "")
 
 		editorGui.SetFont("Norm", "Arial")
 

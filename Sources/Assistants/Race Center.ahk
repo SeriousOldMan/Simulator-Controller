@@ -4207,6 +4207,8 @@ class RaceCenter extends ConfigurationItem {
 
 		if (!isNumber(pitstopLap) || (pitstopLap <= 0))
 			pitstopLap := (this.LastLap ? (this.LastLap.Nr + 1) : 1)
+		else if (this.LastLap && (pitstopLap < this.LastLap.Nr))
+			pitstopLap := (this.LastLap.Nr + 1)
 
 		if !isNumber(pitstopRefuel)
 			pitstopRefuel := 0
@@ -4222,14 +4224,20 @@ class RaceCenter extends ConfigurationItem {
 		driverSelected := false
 
 		if (stint && pitstopDriver) {
+			currentDriver := stint.Driver.Fullname
+
+			setMultiMapValue(pitstopPlan, "Pitstop", "Driver.Current", currentDriver)
+			setMultiMapValue(pitstopPlan, "Pitstop", "Driver.Next", pitstopDriver)
+
+			currentNr := inList(this.TeamDrivers, currentDriver)
 			nextNr := inList(this.TeamDrivers, pitstopDriver)
 
 			if nextNr {
-				currentDriver := stint.Driver.Fullname
-				currentNr := inList(this.TeamDrivers, currentDriver)
+				if currentNr {
+					setMultiMapValue(pitstopPlan, "Pitstop", "Driver.Current", currentDriver)
 
-				if currentNr
 					setMultiMapValue(pitstopPlan, "Pitstop", "Driver", currentDriver . ":" . currentNr . "|" . pitstopDriver . ":" . nextNr)
+				}
 				else {
 					drivers := this.getPlanDrivers()
 
@@ -4237,11 +4245,18 @@ class RaceCenter extends ConfigurationItem {
 						currentDriver := drivers[stint.Nr]
 						currentNr := inList(this.TeamDrivers, currentDriver)
 
-						if currentNr
+						if currentNr {
+							setMultiMapValue(pitstopPlan, "Pitstop", "Driver.Current", currentDriver)
+
 							setMultiMapValue(pitstopPlan, "Pitstop", "Driver", currentDriver . ":" . currentNr . "|" . pitstopDriver . ":" . nextNr)
+						}
 					}
 				}
 			}
+		}
+		else if stint {
+			setMultiMapValue(pitstopPlan, "Pitstop", "Driver.Current", stint.Driver.Fullname)
+			setMultiMapValue(pitstopPlan, "Pitstop", "Driver.Next", stint.Driver.Fullname)
 		}
 
 		if pitstopTyreCompound {
@@ -4317,6 +4332,10 @@ class RaceCenter extends ConfigurationItem {
 
 			currentDriver := string2Values(":", requestDriver[1])[1]
 			nextDriver := string2Values(":", requestDriver[2])[1]
+		}
+		else {
+			currentDriver := getMultiMapValue(pitstopPlan, "Pitstop", "Driver.Current", kNull)
+			nextDriver := getMultiMapValue(pitstopPlan, "Pitstop", "Driver.Next", kNull)
 		}
 
 		if isNumber(fuel) {
@@ -12352,11 +12371,8 @@ manageTeam(raceCenterOrCommand, teamDrivers := false, arguments*) {
 		if (result = kOk) {
 			result := []
 
-			loop selectedDriversListView.GetCount() {
-				driver := selectedDriversListView.GetText(A_Index, 1)
-
-				result.Push(driver)
-			}
+			loop selectedDriversListView.GetCount()
+				result.Push(selectedDriversListView.GetText(A_Index, 1))
 		}
 		else
 			result := false

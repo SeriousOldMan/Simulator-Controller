@@ -287,6 +287,8 @@ exitProcesses(title, message, silent := false, force := false, excludes := []) {
 			if (msgResult = "Yes") {
 				if (GetKeyState("Ctrl", "P") && (force = "CANCEL"))
 					return true
+				else if !force
+					continue
 			}
 			else
 				return false

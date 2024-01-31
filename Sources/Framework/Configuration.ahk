@@ -860,8 +860,8 @@ class Plugin extends ConfigurationItem {
 		}
 	}
 
-	saveToConfiguration(configuration, merge := true) {
-		local descriptor, arguments, key, value, result, argument, values
+	saveToConfiguration(configuration, merge := true, excludes := []) {
+		local descriptor, arguments, key, value, result, argument, values, ignore
 
 		super.saveToConfiguration(configuration)
 
@@ -891,6 +891,10 @@ class Plugin extends ConfigurationItem {
 		}
 		else
 			arguments := this.Arguments[true]
+
+		for ignore, argument in excludes
+			if arguments.Has(argument)
+				arguments.Delete(argument)
 
 		setMultiMapValue(configuration, "Plugins", this.Plugin, (this.Active ? kTrue : kFalse) . "|" . values2String(", ", this.Simulators*) . "|" . arguments)
 	}

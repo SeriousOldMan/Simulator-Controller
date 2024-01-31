@@ -757,7 +757,7 @@ class RaceStrategist extends GridRaceAssistant {
 		, synthesizer := false, speaker := false, vocalics := false, recognizer := false, listener := false, muted := false, voiceServer := false) {
 		super.__New(configuration, "Race Strategist", remoteHandler, name, language, synthesizer, speaker, vocalics, recognizer, listener, muted, voiceServer)
 
-		this.updateConfigurationValues({Announcements: {WeatherUpdate: true}})
+		this.updateConfigurationValues({Announcements: {WeatherUpdate: true, StrategySummary: true, StrategyUpdate: true, StrategyPitstop: false}})
 
 		deleteDirectory(kTempDirectory . "Race Strategist")
 
@@ -1818,7 +1818,7 @@ class RaceStrategist extends GridRaceAssistant {
 			}
 
 			if (!this.StrategyReported && this.hasEnoughData(false) && (this.Strategy == this.Strategy[true])) {
-				if this.Speaker[false]
+				if (this.Speaker[false] && this.Announcements["StrategySummary"])
 					if this.confirmAction("Strategy.Explain") {
 						this.getSpeaker().speakPhrase("ConfirmReportStrategy", false, true)
 
@@ -2305,7 +2305,8 @@ class RaceStrategist extends GridRaceAssistant {
 					this.updateSessionValues({Strategy: newStrategy})
 
 				if (report && (this.StrategyReported || this.hasEnoughData(false) || !original)) {
-					this.reportStrategy({Strategy: true, Pitstops: false, NextPitstop: true, TyreChange: true, Refuel: true, Map: true})
+					if this.Announcements["StrategyUpdate"]
+						this.reportStrategy({Strategy: true, Pitstops: false, NextPitstop: true, TyreChange: true, Refuel: true, Map: true})
 
 					this.updateDynamicValues({StrategyReported: true})
 				}
@@ -3118,13 +3119,15 @@ class RaceStrategist extends GridRaceAssistant {
 								return
 
 						if (report && this.Speaker) {
-							speaker.speakPhrase("StrategyUpdate")
+							if this.Announcements["StrategyUpdate"] {
+								speaker.speakPhrase("StrategyUpdate")
 
-							this.reportStrategy({Strategy: false, Pitstops: true, NextPitstop: true
-											   , TyreChange: true, Refuel: true, Map: true, Active: this.Strategy}, scenario)
+								this.reportStrategy({Strategy: false, Pitstops: true, NextPitstop: true
+												   , TyreChange: true, Refuel: true, Map: true, Active: this.Strategy}, scenario)
 
-							if ((this.Strategy != this.Strategy[true]) || isDebug())
-								this.explainStrategyRecommendation(scenario)
+								if ((this.Strategy != this.Strategy[true]) || isDebug())
+									this.explainStrategyRecommendation(scenario)
+							}
 
 							if Task.CurrentTask.Confirm {
 								if this.confirmAction("Strategy.Update") {
@@ -3575,9 +3578,13 @@ class RaceStrategist extends GridRaceAssistant {
 			speaker.beginTalk()
 
 			try {
-				if !fullCourseYellow
+				if !fullCourseYellow {
+					if this.Announcements["StrategyPitstop"]
+						this.reportStrategy({Strategy: true, Pitstops: true, NextPitstop: false, TyreChange: true, Refuel: true})
+
 					speaker.speakPhrase("PitstopAhead", {lap: plannedPitstopLap
 													   , laps: (plannedPitstopLap - knowledgeBase.getValue("Lap"))})
+				}
 
 				if ProcessExist("Race Engineer.exe")
 					if fullCourseYellow {

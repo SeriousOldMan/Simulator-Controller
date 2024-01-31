@@ -371,7 +371,10 @@ class RaceReportReader {
 
 		positions := this.getDriverPositions(raceData, positions, car)
 
-		return Max(0, cars - numberValue(positions[1])) + Max(0, cars - numberValue(positions[positions.Length]))
+		if (positions.Length > 0)
+			return Max(0, cars - numberValue(positions[1])) + Max(0, cars - numberValue(positions[positions.Length]))
+		else
+			return 0
 	}
 
 	getDriverRaceCraft(raceData, positions, car) {

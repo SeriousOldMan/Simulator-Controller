@@ -1067,6 +1067,9 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 			sessionIdentifier := getMultiMapValue(settings, "Team Settings", "Session.Identifier", false)
 
+			if this.StartupSettings
+				sessionIdentifier := getMultiMapValue(this.StartupSettings, "Team Session", "Session.Identifier", sessionIdentifier)
+
 			if !teamServer.Connected {
 				serverURL := getMultiMapValue(settings, "Team Settings", "Server.URL", "")
 				accessToken := getMultiMapValue(settings, "Team Settings", "Server.Token", "")

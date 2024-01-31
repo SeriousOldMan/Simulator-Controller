@@ -4361,6 +4361,9 @@ class RaceCenter extends ConfigurationItem {
 				lap := this.Connector.GetSessionLastLap(session)
 
 				if (lap && (lap != "")) {
+					if isDevelopment()
+						logMessage(kLogInfo, "Instruct Engineer - Session: " . session . "; Lap: " . lap)
+
 					this.Connector.SetLapValue(lap, "Pitstop Plan", printMultiMap(pitstopPlan))
 					this.Connector.SetSessionValue(session, "Pitstop Plan", lap)
 
@@ -5974,7 +5977,7 @@ class RaceCenter extends ConfigurationItem {
 
 					this.showMessage(translate("Waiting for data"))
 
-					if (tries <= 0) {
+					if ((tries <= 0) || GetKeyState("ESC", "P")) {
 						this.showMessage(translate("Give up - use default values"))
 
 						newLaps.RemoveAt(lap.Nr, newLaps.Length - lap.Nr + 1)
@@ -6079,7 +6082,7 @@ class RaceCenter extends ConfigurationItem {
 
 						this.showMessage(translate("Waiting for data"))
 
-						if (tries <= 0) {
+						if ((tries <= 0) || GetKeyState("ESC", "P")) {
 							this.showMessage(translate("Give up - use default values"))
 
 							throw "No data..."
@@ -10177,7 +10180,7 @@ class RaceCenter extends ConfigurationItem {
 
 								this.showMessage(translate("Waiting for data"))
 
-								if (tries <= 0) {
+								if ((tries <= 0) || GetKeyState("ESC", "P")) {
 									this.showMessage(translate("Give up - use default values"))
 
 									throw "No data..."

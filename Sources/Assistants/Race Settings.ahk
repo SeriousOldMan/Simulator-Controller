@@ -1538,7 +1538,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 }
 
 readSimulatorData(simulator) {
-	local data := callSimulator(simulator, "Setup=true")
+	local data := callSimulator(simulator)
 	local ignore, section, tyreCompound, tyreCompoundColor
 
 	for ignore, section in ["Car Data", "Setup Data"]

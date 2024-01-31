@@ -524,7 +524,7 @@ checkInstallation() {
 		}
 
 		if !exitProcesses("Installation", "Before you can run the update, you must first close all running Simulator Controller applications (not Simulator Tools)."
-						, false, false, ["Simulator Tools"])
+						, false, true, ["Simulator Tools"])
 			ExitApp(1)
 
 		options := {InstallType: getMultiMapValue(installInfo, "Install", "Type", "Registry")
@@ -634,7 +634,7 @@ checkInstallation() {
 
 			if !isNew
 				if !exitProcesses("Installation", "Before you can run the update, you must first close all running Simulator Controller applications (not Simulator Tools)."
-								, false, false, ["Simulator Tools"])
+								, false, true, ["Simulator Tools"])
 					ExitApp(1)
 
 			options := {InstallType: getMultiMapValue(installInfo, "Install", "Type", "Registry")

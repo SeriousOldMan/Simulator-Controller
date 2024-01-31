@@ -315,7 +315,7 @@ class GeneralTab extends ConfiguratorPanel {
 			setMultiMapValue(configuration, "Configuration", "MSBuild Path", this.Control["msBuildPathEdit"].Text)
 			setMultiMapValue(configuration, "Configuration", "Debug", this.Control["debugEnabledCheck"].Value)
 
-			choices := ["Info", "Warn", "Critical", "Off"]
+			choices := kLogLevelNames
 
 			setMultiMapValue(configuration, "Configuration", "Log Level", choices[inList(collect(choices, translate), this.Control["logLevelDropDown"].Text)])
 		}

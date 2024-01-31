@@ -122,7 +122,9 @@ Important: "Race Center" displays various graphs using the Google chart library 
 
 To use the "Race Center", you must have a valid connection to a team session. This is normally handled by entering the corresponding Server URL and session token into the ["Race Settings" application](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#preparing-a-team-session), but you can even connect to a team session without being an active driver in the session by entering the session token supplied by your team manager directly into the field at the top of the "Race Center" window. Then either click on the small button with the key on the left of the token field or choose "Connect" from the "Session" menu. As an alternative, you can hold down the Control key, while pressing on the "Key" button or choosing the menu command, which will open a login dialog where you can enter the login credentials of the team manager. Please do not use a refresh cycle smaller than 10 seconds when connected to a managed Team Server, since this will increase the running costs on Azure dramatically.
 
-Once you are connected to an active session on the Team Server, all the data in "Race Center" will be updated every 10 seconds. During this time the user interface is looked to ensure the integrity of the data. This can be somewhat annoying. Therefore you can disable the synchronization temporarily using the corresponding command from the "Session" menu. Furthermore, you can select the update frequency by holding down the control key, when selecting the "Synchronize" menu item.
+Once you are connected to an active session on the Team Server, all the data in "Race Center" will be updated every 10 seconds. During this time the user interface is locked to ensure the integrity of the data. This can be somewhat annoying. Therefore you can disable the synchronization temporarily using the corresponding command from the "Session" menu. Furthermore, you can select the update frequency by holding down the control key, when selecting the "Synchronize" menu item.
+
+It can happen that some data is not available when requested by the "Race Center". Most of the time, the data will be available after a few seconds, because it simply wasn't yet ready at he time when it was requested. Therefore, the "Race Center" will be waiting some time when requesting any kind of data. It will eventually give up, if the data is not available at all for some reason, but you can use the Escape key to terminate the waiting prematurely. In general you should do this only, if you are sure that the data is not available at all, for example while the current driver has encountered a disconnection.
 
 You can reload the data stored on the server for the currently selected session by clicking on the small button with the "Reload" icon. This can be helpful, when data seems to be missin, or when you have made changes, you want to discard.
 
@@ -379,7 +381,7 @@ This floating window, which can be left open all the time, will be updated once 
 
 1. *Assetto Corsa Competizione*
 
-   Information about a tyre change is really selected and the chosen tyre compound is not available. The most probable tyre compound will be derived from current and future weather conditions. Also, information about the chosen repair settings and the chosen next driver is not available. Refuel amount, tyre pressures and tyre set are exact.
+   Information about a tyre change is really selected and the chosen tyre compound is not available. The most probable tyre compound will be derived from current and future weather conditions. Also, information about the chosen repair settings (although the time needed for the repair may be computed) and the chosen next driver is not available. Refuel amount, tyre pressures and tyre set are exact.
 
 2. *rFactor 2*
 

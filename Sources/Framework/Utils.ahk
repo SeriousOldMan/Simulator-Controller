@@ -239,6 +239,8 @@ exitProcess() {
 }
 
 exitProcesses(title, message, silent := false, force := false, excludes := []) {
+	local foregroundApps := kForegroundApps
+	local backgroundApps := kBackgroundApps
 	local pid, hasFGProcesses, hasBGProcesses, ignore, app, translator, msgResult, processes
 
 	computeTargets(targets) {
@@ -252,19 +254,24 @@ exitProcesses(title, message, silent := false, force := false, excludes := []) {
 
 	pid := ProcessExist()
 
+	for ignore, app in excludes {
+		foregroundApps := remove(foregroundApps, app)
+		backgroundApps := remove(backgroundApps, app)
+	}
+
 	while true {
 		hasFGProcesses := false
 		hasBGProcesses := false
 
-		for ignore, app in kForegroundApps
-			if (ProcessExist(app . ".exe") && !inList(excludes, app)) {
+		for ignore, app in foregroundApps
+			if ProcessExist(app . ".exe") {
 				hasFGProcesses := true
 
 				break
 			}
 
-		for ignore, app in kBackgroundApps
-			if (ProcessExist(app ".exe") && (ProcessExist(app ".exe") != pid) && !inList(excludes, app)) {
+		for ignore, app in backgroundApps
+			if ProcessExist(app ".exe") {
 				hasBGProcesses := true
 
 				break
@@ -278,10 +285,13 @@ exitProcesses(title, message, silent := false, force := false, excludes := []) {
 			OnMessage(0x44, translator, 0)
 
 			if (msgResult = "Yes") {
-				if !force
-					continue
-				else if ((force = "CANCEL") && GetKeyState("Ctrl", "P"))
+				if ((force = "CANCEL") && GetKeyState("Ctrl", "P"))
 					return true
+				else {
+					force := true
+
+					continue
+				}
 			}
 			else
 				return false
@@ -289,12 +299,12 @@ exitProcesses(title, message, silent := false, force := false, excludes := []) {
 
 		if hasFGProcesses
 			if force
-				broadcastMessage(computeTargets(kForegroundApps), "exitProcess")
+				broadcastMessage(computeTargets(foregroundApps), "exitProcess")
 			else
 				return false
 
 		if hasBGProcesses
-			broadcastMessage(computeTargets(kBackgroundApps), "exitProcess")
+			broadcastMessage(computeTargets(backgroundApps), "exitProcess")
 
 		return true
 	}

@@ -3103,8 +3103,7 @@ startupSimulatorTools() {
 
 	if !updateOnly {
 		if forceExit
-			exitProcesses("Installation", "Before you can run the update, you must first close all running Simulator Controller applications (not Simulator Tools)."
-						, true, true, ["Simulator Tools"])
+			exitProcesses("", "", true, true, ["Simulator Tools"])
 
 		runCleanTargets(&buildProgress)
 

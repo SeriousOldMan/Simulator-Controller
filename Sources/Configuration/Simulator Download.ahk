@@ -158,6 +158,12 @@ downloadSimulatorController() {
 				ExitApp(0)
 			}
 
+			loop 10
+				if exitProcesses("", "", true, true, ["Simulator Download"])
+					break
+				else
+					Sleep(1000)
+
 			updateTask.stop()
 
 			updateTask := PeriodicTask(updateProgress.Bind(90), 1000)

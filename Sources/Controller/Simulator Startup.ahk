@@ -527,7 +527,7 @@ launchPad(command := false, arguments*) {
 
 	launchSimulatorDownload(*) {
 		if exitProcesses("Update", "Do you really want to download and install the latest version? You must close all applications before running the update."
-					   , false, "CANCEL")
+					   , false, true, ["Simulator Startup"])
 			launchPad("Launch", "Simulator Download.exe", true)
 	}
 

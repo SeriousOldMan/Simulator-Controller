@@ -497,7 +497,7 @@ initializeSimulatorConfiguration() {
 		protectionOn()
 
 		if !exitProcesses("Configuration", "Before you can work on the configuration, other Simulator Controller applications must be closed."
-						, false, "CANCEL", ["Simulator Configuration", "Simulator Startup", "Simulator Tools"])
+						, false, "CANCEL", ["Simulator Configuration", "Simulator Startup"])
 			ExitApp(0)
 
 		if GetKeyState("Ctrl")

@@ -21,6 +21,8 @@
 	    - KTM X-BOW GT2
 	    - Maserati GT2
 	    - Mercedes-AMG GT2
+		- Porsche 935
+		- Porsche 991II GT2 RS CS Evo
 	  - Assetto Corsa
 	    - Mazda 787B (by @mirko_lesko)
 	    - Sauber-Mercedes C9 (by @mirko_lesko)

@@ -18,17 +18,17 @@
       - New standard setup setting "Limiter" for "Setup Workbench". Please note, that this setting is not enabled by default in *Assetto Corsa*.
   15. New car models for "Setup Workbench":
       - Assetto Corsa Competizione
-	    - Audi R8 LMS GT2
-	    - KTM X-BOW GT2
-	    - Maserati GT2
-	    - Mercedes-AMG GT2
-		- Porsche 935
-		- Porsche 991II GT2 RS CS Evo
-	  - Assetto Corsa
-	    - Mazda 787B (by @mirko_lesko)
-	    - Sauber-Mercedes C9 (by @mirko_lesko)
-	    - Porsche 962C Long Tail (by @mirko_lesko)
-	    - Porsche 962C Short Tail (by @mirko_lesko)
+        - Audi R8 LMS GT2
+        - KTM X-BOW GT2
+        - Maserati GT2
+        - Mercedes-AMG GT2
+        - Porsche 935
+        - Porsche 991II GT2 RS CS Evo
+      - Assetto Corsa
+        - Mazda 787B (by @mirko_lesko)
+        - Sauber-Mercedes C9 (by @mirko_lesko)
+        - Porsche 962C Long Tail (by @mirko_lesko)
+        - Porsche 962C Short Tail (by @mirko_lesko)
 
 ## 5.5.5.0-release 01/26/24
   1. Minor bugfixes, as always

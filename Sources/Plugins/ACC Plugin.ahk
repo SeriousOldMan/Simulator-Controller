@@ -285,8 +285,16 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			this.iUDPConnection := this.getArgumentValue("udpConnection", false)
 
 			if FileExist(A_MyDocuments . "\Assetto Corsa Competizione\Config\broadcasting.json") {
-				accUdpConfig := JSON.parse(StrReplace(StrGet(FileRead(A_MyDocuments . "\Assetto Corsa Competizione\Config\broadcasting.json", "Raw"))
-													, "`r`n", "`n"))
+				try {
+					accUdpConfig := JSON.parse(StrReplace(StrGet(FileRead(A_MyDocuments . "\Assetto Corsa Competizione\Config\broadcasting.json", "Raw"))
+														, "`r`n", "`n"))
+				}
+				catch Any as exception {
+					logError(exception, true)
+
+					accUdpConfig := CaseInsenseMap()
+				}
+
 				udpConfig := (this.iUDPConnection ? string2Values(",", this.iUDPConnection) : ["127.0.0.1", 9000, "asd", ""])
 
 				if (accUdpConfig.Has("udpListenerPort") && (accUdpConfig["udpListenerPort"] = udpConfig[2]))

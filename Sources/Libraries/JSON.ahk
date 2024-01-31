@@ -27,7 +27,7 @@ class JSON {
 		next := '"{[01234567890-tfn'
 		pos := 0
 
-		while ((ch := SubStr(src, ++pos, 1)) != "" ) {
+		while ((ch := SubStr(src, ++pos, 1)) != "") {
 			if InStr(" `t`n`r", ch)
 				continue
 			if !InStr(next, ch, true) {

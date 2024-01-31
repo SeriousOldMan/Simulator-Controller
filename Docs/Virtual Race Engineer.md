@@ -539,7 +539,7 @@ Note: The database is stored in the *Simulator Controller\Database* folder, whic
 
 ### Using the Practice Center
 
-As mentioned above, the Race Engineer can store information about your tyre pressures (both hot pressures and recommended cold pressures) in the session database depending on your ["Race Engineer" configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-engineer). But you can also collect your data during a practice run or even a solo race in a special application name "Practice Center", which allows you to inspect the data after your session and finally select the data that should be stored into your database. See the [documentation for the "Practice Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#practice-center) for more information.
+As mentioned above, the Race Engineer can store information about your tyre pressures (both hot pressures and recommended cold pressures) in the session database depending on your ["Race Engineer" configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-engineer). But you can also collect your data during a practice run or even a solo race in a special application named "Practice Center", which allows you to inspect the data after your session and finally select the data that should be stored into your database. See the [documentation for the "Practice Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#practice-center) for more information.
 
 ### Managing the Session Database
 

@@ -52,6 +52,14 @@ downloadSimulatorController() {
 	local options, index, cState, devVersion, release, version, package, updateTask
 	local directory, currentDirectory, start, ignore, url, error
 
+	exitOthers() {
+		loop 20
+			if exitProcesses("", "", true, true, ["Simulator Download"])
+				break
+			else
+				Sleep(1000)
+	}
+
 	cState := GetKeyState("Ctrl", "P")
 
 	TraySetIcon(icon, "1")
@@ -158,6 +166,8 @@ downloadSimulatorController() {
 				ExitApp(0)
 			}
 
+			exitOthers()
+
 			updateTask.stop()
 
 			updateTask := PeriodicTask(updateProgress.Bind(90), 1000)
@@ -180,6 +190,8 @@ downloadSimulatorController() {
 
 				ExitApp(0)
 			}
+
+			exitOthers()
 
 			deleteFile(A_Temp . "\Simulator Controller.zip")
 
@@ -226,6 +238,8 @@ downloadSimulatorController() {
 			showProgress({progress: 90, message: translate("Preparing installation...")})
 
 			Sleep(1000)
+
+			exitOthers()
 
 			showProgress({progress: 100, message: translate("Starting installation...")})
 

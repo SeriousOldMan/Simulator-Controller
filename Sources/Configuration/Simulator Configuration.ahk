@@ -315,7 +315,7 @@ class GeneralTab extends ConfiguratorPanel {
 			setMultiMapValue(configuration, "Configuration", "MSBuild Path", this.Control["msBuildPathEdit"].Text)
 			setMultiMapValue(configuration, "Configuration", "Debug", this.Control["debugEnabledCheck"].Value)
 
-			choices := ["Info", "Warn", "Critical", "Off"]
+			choices := kLogLevelNames
 
 			setMultiMapValue(configuration, "Configuration", "Log Level", choices[inList(collect(choices, translate), this.Control["logLevelDropDown"].Text)])
 		}
@@ -497,7 +497,7 @@ initializeSimulatorConfiguration() {
 		protectionOn()
 
 		if !exitProcesses("Configuration", "Before you can work on the configuration, other Simulator Controller applications must be closed."
-						, false, "CANCEL", ["Simulator Configuration", "Simulator Startup", "Simulator Tools"])
+						, false, "CANCEL", ["Simulator Configuration", "Simulator Startup"])
 			ExitApp(0)
 
 		if GetKeyState("Ctrl")

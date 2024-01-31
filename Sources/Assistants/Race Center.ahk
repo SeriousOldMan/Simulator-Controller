@@ -5967,7 +5967,7 @@ class RaceCenter extends ConfigurationItem {
 
 			lap.Stint := stint
 
-			tries := ((A_Index == count) ? ((isDebug() || (lap.Nr = 1)) ? 160 : 20) : 1)
+			tries := ((A_Index == count) ? ((isDebug() || (lap.Nr = 1)) ? 40 : 20) : 1)
 
 			while (tries > 0) {
 				rawData := this.Connector.GetLapValue(identifier, "Telemetry Data")
@@ -5977,7 +5977,7 @@ class RaceCenter extends ConfigurationItem {
 
 					this.showMessage(translate("Waiting for data"))
 
-					if (tries <= 0) {
+					if ((tries <= 0) || GetKeyState("ESC", "P")) {
 						this.showMessage(translate("Give up - use default values"))
 
 						newLaps.RemoveAt(lap.Nr, newLaps.Length - lap.Nr + 1)
@@ -6072,7 +6072,7 @@ class RaceCenter extends ConfigurationItem {
 			lap.TyreSet := getMultiMapValue(data, "Car Data", "TyreSet", false)
 
 			try {
-				tries := ((A_Index == count) ? ((isDebug() || (lap.Nr = 1)) ? 160 : 20) : 1)
+				tries := ((A_Index == count) ? ((isDebug() || (lap.Nr = 1)) ? 40 : 20) : 1)
 
 				while (tries > 0) {
 					rawData := this.Connector.GetLapValue(identifier, "Positions Data")
@@ -6082,7 +6082,7 @@ class RaceCenter extends ConfigurationItem {
 
 						this.showMessage(translate("Waiting for data"))
 
-						if (tries <= 0) {
+						if ((tries <= 0) || GetKeyState("ESC", "P")) {
 							this.showMessage(translate("Give up - use default values"))
 
 							throw "No data..."
@@ -10170,7 +10170,7 @@ class RaceCenter extends ConfigurationItem {
 					}
 
 					try {
-						tries := ((lap == lastLap) ? ((isDebug() || (lap = 1)) ? 160 : 20) : 1)
+						tries := ((lap == lastLap) ? ((isDebug() || (lap = 1)) ? 40 : 20) : 1)
 
 						while (tries > 0) {
 							standingsData := this.Connector.GetSessionLapValue(session, lap, "Race Strategist Race Standings")
@@ -10180,7 +10180,7 @@ class RaceCenter extends ConfigurationItem {
 
 								this.showMessage(translate("Waiting for data"))
 
-								if (tries <= 0) {
+								if ((tries <= 0) || GetKeyState("ESC", "P")) {
 									this.showMessage(translate("Give up - use default values"))
 
 									throw "No data..."

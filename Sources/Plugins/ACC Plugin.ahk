@@ -262,6 +262,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	__New(controller, name, simulator, configuration := false) {
+		local accUdpConfig, udpConfig, udpConfigValid
+
 		if !ACCPlugin.kUnknown
 			ACCPlugin.kUnknown := translate("Unknown")
 
@@ -281,6 +283,31 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			this.iClosePitstopMFDHotkey := this.getArgumentValue("closePitstopMFD", false)
 
 			this.iUDPConnection := this.getArgumentValue("udpConnection", false)
+
+			if FileExist(A_MyDocuments . "\Assetto Corsa Competizione\Config\broadcasting.json") {
+				accUdpConfig := JSON.parse(StrReplace(StrGet(FileRead(A_MyDocuments . "\Assetto Corsa Competizione\Config\broadcasting.json", "Raw"))
+													, "`r`n", "`n"))
+				udpConfig := (this.iUDPConnection ? string2Values(",", this.iUDPConnection) : ["127.0.0.1", 9000, "asd", ""])
+
+				if (accUdpConfig.Has("udpListenerPort") && (accUdpConfig["udpListenerPort"] = udpConfig[2]))
+					udpConfigValid := true
+				else if (accUdpConfig.Has("updListenerPort") && (accUdpConfig["updListenerPort"] = udpConfig[2]))
+					udpConfigValid := true
+				else
+					udpConfigValid := false
+
+				if (!accUdpConfig.Has("connectionPassword") || (accUdpConfig["connectionPassword"] != udpConfig[3]))
+					udpConfigValid := false
+				else if (!accUdpConfig.Has("commandPassword") || (accUdpConfig["commandPassword"] != udpConfig[4]))
+					udpConfigValid := false
+
+				if !udpConfigValid {
+					logMessage(kLogCritical, translate("The UDP configuration for Assetto Corsa Competizione is not valid - please consult the documentation for the ACC plugin"))
+
+				showMessage(translate("The UDP configuration for Assetto Corsa Competizione is not valid - please consult the documentation for the ACC plugin") . translate("...")
+						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+				}
+			}
 
 			controller.registerPlugin(this)
 

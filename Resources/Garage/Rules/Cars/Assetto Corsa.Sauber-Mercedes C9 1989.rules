@@ -1,6 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Assetto Corsa                   ;;;
-;;;                                         Mercedes-Benz C9 1989           ;;;
+;;;                                         Sauber-Mercedes C9 1989         ;;;
 ;;;                                         Setup Rules                     ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Mirko Lesko, Oliver Juwig (TheBigO)                       ;;;
@@ -11,9 +11,9 @@
 ;;;                            Initialization                               ;;;
 ;;;-------------------------------------------------------------------------;;;
 										
-[?Initialize] => (Prove: removeSettings("Assetto Corsa", "Mercedes-Benz C9 1989",
+[?Initialize] => (Prove: removeSettings("Assetto Corsa", "Sauber-Mercedes C9 1989",
 										[Aero.Height.Front, Aero.Height.Rear, Aero.Wing.Front, Electronics.TC, Electronics.ABS])),
-				 (Prove: addSettings("Assetto Corsa", "Mercedes C9 1989",
+				 (Prove: addSettings("Assetto Corsa", "Sauber-Mercedes C9 1989",
 									 [Aero.Height.Front.Left, Aero.Height.Front.Right, 
 									  Aero.Height.Rear.Left, Aero.Height.Rear.Right,
 									  Differential.Coast, Differential.Power,

@@ -2637,7 +2637,7 @@ class Strategy extends ConfigurationItem {
 		else if (this.iTyreChangeRule == true)
 			this.iTyreChangeRule := "Required"
 
-		tyreSets := string2Values(";", getMultiMapValue(configuration, "Settings", "TyreSets", []))
+		tyreSets := string2Values(";", getMultiMapValue(configuration, "Settings", "TyreSets", ""))
 
 		loop tyreSets.Length
 			tyreSets[A_Index] := string2Values(":", tyreSets[A_Index])

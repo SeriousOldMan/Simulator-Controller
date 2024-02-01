@@ -1392,7 +1392,7 @@ class RaceCenter extends ConfigurationItem {
 
 				timeActual := currentTime
 
-				centerGui["planDriverDropDownMenu"].Choose(inList(getKeys(center.SessionDrivers), driver) + 1)
+				centerGui["planDriverDropDownMenu"].Choose(inDrivers(getKeys(center.SessionDrivers), driver) + 1)
 				centerGui["planTimeEdit"].Value := timePlanned
 				centerGui["actTimeEdit"].Value := timeActual
 				centerGui["planLapEdit"].Text := lapPlanned
@@ -1672,7 +1672,7 @@ class RaceCenter extends ConfigurationItem {
 
 				conditions := string2Values(translate("("), conditions)
 
-				centerGui["setupDriverDropDownMenu"].Choose(inList(getKeys(center.SessionDrivers), driver))
+				centerGui["setupDriverDropDownMenu"].Choose(inDrivers(getKeys(center.SessionDrivers), driver))
 
 				centerGui["setupWeatherDropDownMenu"].Choose(inList(collect(kWeatherConditions, translate), conditions[1]))
 				centerGui["setupCompoundDropDownMenu"].Choose(inList(collect(center.TyreCompounds, translate), normalizeCompound(tyreCompound)))
@@ -1784,7 +1784,7 @@ class RaceCenter extends ConfigurationItem {
 				centerGui["pitstopPressureRREdit"].Text := pressures[4]
 
 				if driver {
-					driver := inList(center.TeamDrivers, driver)
+					driver := inDrivers(center.TeamDrivers, driver)
 
 					if driver
 						centerGui["pitstopDriverDropDownMenu"].Choose(driver + 1)
@@ -3718,14 +3718,14 @@ class RaceCenter extends ConfigurationItem {
 			drivers := this.getPlanDrivers()
 
 			if remote {
-				if (drivers.Has(stint.Nr + 1) && inList(this.TeamDrivers, drivers[stint.Nr + 1]))
+				if (drivers.Has(stint.Nr + 1) && inDrivers(this.TeamDrivers, drivers[stint.Nr + 1]))
 					pitstopDriver := drivers[stint.Nr + 1]
 				else
 					pitstopDriver := false
 			}
 			else
 				if drivers.Has(stint.Nr + 1)
-					this.Control["pitstopDriverDropDownMenu"].Choose(inList(this.TeamDrivers, drivers[stint.Nr + 1]) + 1)
+					this.Control["pitstopDriverDropDownMenu"].Choose(inDrivers(this.TeamDrivers, drivers[stint.Nr + 1]) + 1)
 				else
 					this.Control["pitstopDriverDropDownMenu"].Choose(1)
 		}
@@ -4197,7 +4197,6 @@ class RaceCenter extends ConfigurationItem {
 			repairBodywork := ((pitstopRepairsDropDown = 2) || (pitstopRepairsDropDown = 5))
 			repairSuspension := ((pitstopRepairsDropDown = 3) || (pitstopRepairsDropDown = 5))
 			repairEngine := ((pitstopRepairsDropDown = 4) || (pitstopRepairsDropDown = 5))
-
 		}
 		else {
 			repairBodywork := inList(pitstopRepairs, "Bodywork")
@@ -4229,8 +4228,8 @@ class RaceCenter extends ConfigurationItem {
 			setMultiMapValue(pitstopPlan, "Pitstop", "Driver.Current", currentDriver)
 			setMultiMapValue(pitstopPlan, "Pitstop", "Driver.Next", pitstopDriver)
 
-			currentNr := inList(this.TeamDrivers, currentDriver)
-			nextNr := inList(this.TeamDrivers, pitstopDriver)
+			currentNr := inDrivers(this.TeamDrivers, currentDriver)
+			nextNr := inDrivers(this.TeamDrivers, pitstopDriver)
 
 			if nextNr {
 				if currentNr {
@@ -4243,7 +4242,7 @@ class RaceCenter extends ConfigurationItem {
 
 					if (drivers.Has(stint.Nr)) {
 						currentDriver := drivers[stint.Nr]
-						currentNr := inList(this.TeamDrivers, currentDriver)
+						currentNr := inDrivers(this.TeamDrivers, currentDriver)
 
 						if currentNr {
 							setMultiMapValue(pitstopPlan, "Pitstop", "Driver.Current", currentDriver)
@@ -12216,7 +12215,7 @@ manageTeam(raceCenterOrCommand, teamDrivers := false, arguments*) {
 		driver := availableDriversListView.GetText(row, 1)
 		availableDriversListView.Delete(row)
 
-		selectedDriversListView.Modify(selectedDriversListView.Add("", driver, inList(connectedDrivers, driver) ? translate("x") : ""), "Select Vis")
+		selectedDriversListView.Modify(selectedDriversListView.Add("", driver, inDrivers(connectedDrivers, driver) ? translate("x") : ""), "Select Vis")
 
 		manageTeam("UpdateState")
 	}
@@ -12226,7 +12225,7 @@ manageTeam(raceCenterOrCommand, teamDrivers := false, arguments*) {
 		driver := selectedDriversListView.GetText(row, 1)
 		selectedDriversListView.Delete(row)
 
-		availableDriversListView.Modify(availableDriversListView.Add("", driver, inList(connectedDrivers, driver) ? translate("x") : ""), "Vis")
+		availableDriversListView.Modify(availableDriversListView.Add("", driver, inDrivers(connectedDrivers, driver) ? translate("x") : ""), "Vis")
 
 		manageTeam("UpdateState")
 	}
@@ -12236,7 +12235,7 @@ manageTeam(raceCenterOrCommand, teamDrivers := false, arguments*) {
 		driver := selectedDriversListView.GetText(row, 1)
 		selectedDriversListView.Delete(row)
 
-		selectedDriversListView.Insert(row - 1, "", driver, inList(connectedDrivers, driver) ? translate("x") : "")
+		selectedDriversListView.Insert(row - 1, "", driver, inDrivers(connectedDrivers, driver) ? translate("x") : "")
 		selectedDriversListView.Modify(row - 1, "Select Vis")
 
 		manageTeam("UpdateState")
@@ -12247,7 +12246,7 @@ manageTeam(raceCenterOrCommand, teamDrivers := false, arguments*) {
 		driver := selectedDriversListView.GetText(row, 1)
 		selectedDriversListView.Delete(row)
 
-		selectedDriversListView.Insert(row + 1, "", driver, inList(connectedDrivers, driver) ? translate("x") : "")
+		selectedDriversListView.Insert(row + 1, "", driver, inDrivers(connectedDrivers, driver) ? translate("x") : "")
 		selectedDriversListView.Modify(row + 1, "Select Vis")
 
 		manageTeam("UpdateState")
@@ -12316,8 +12315,8 @@ manageTeam(raceCenterOrCommand, teamDrivers := false, arguments*) {
 			teamDrivers := raceCenterOrCommand.TeamDrivers
 
 		for name, ignore in raceCenterOrCommand.SessionDrivers
-			if !inList(teamDrivers, name)
-				availableDriversListView.Add("", name, inList(connectedDrivers, name) ? translate("x") : "")
+			if !inDrivers(teamDrivers, name)
+				availableDriversListView.Add("", name, inDrivers(connectedDrivers, name) ? translate("x") : "")
 
 		availableDriversListView.ModifyCol()
 		availableDriversListView.ModifyCol(1, "AutoHdr")
@@ -12329,7 +12328,7 @@ manageTeam(raceCenterOrCommand, teamDrivers := false, arguments*) {
 		selectedDriversListView.OnEvent("ItemSelect", manageTeam.Bind("UpdateState"))
 
 		for ignore, name in teamDrivers
-			selectedDriversListView.Add("", name, inList(connectedDrivers, name) ? translate("x") : "")
+			selectedDriversListView.Add("", name, inDrivers(connectedDrivers, name) ? translate("x") : "")
 
 		selectedDriversListView.ModifyCol()
 		selectedDriversListView.ModifyCol(1, "AutoHdr")
@@ -12586,6 +12585,20 @@ loginDialog(connectorOrCommand := false, teamServerURL := false, owner := false,
 			loginGui.Destroy()
 		}
 	}
+}
+
+inDrivers(drivers, driver) {
+	local index := InStr(driver, " (")
+	local candidate
+
+	if index
+		driver := SubStr(driver, 1, index - 1)
+
+	for index, candidate in drivers
+		if (InStr(candidate, driver) = 1)
+			return index
+
+	return false
 }
 
 lapTimeDisplayValue(lapTime) {

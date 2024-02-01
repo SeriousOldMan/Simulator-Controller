@@ -1,9 +1,9 @@
 [Development]
 Version=5.5.6.0-beta
 Target=5.5.6.0-release
-Date=01/31/2024
+Date=02/01/2024
 Download=https://www.dropbox.com/scl/fi/579imbvvzrqb99ayr73es/Simulator-Controller-5.5.6.0-beta.zip?rlkey=jfo8lo0p4rgzcvdnb5ptdg6jv&dl=1
-Changes=Added default profile for Stream Deck to the Profiles collection, Fixes for the Assistants with deactivated listeners, Fixed default connections in Startup Profiles, Added voice control status to "System Monitor", New settings "Engine.Limiter" and "Turbo" in "Setup Workbench", New car models for "Setup Workbench", Fixed "Simulator Configuration" not open its main window, Added title bar to some windows to make them moveable, New settings that allow to configure the strategy announcements of the Strategist, Startup check for UDP configuration
+Changes=Added default profile for Stream Deck to the Profiles collection, Fixes for the Assistants with deactivated listeners, Fixed default connections in Startup Profiles, Added voice control status to "System Monitor", New settings "Engine.Limiter" and "Turbo" in "Setup Workbench", New car models for "Setup Workbench", Fixed "Simulator Configuration" not open its main window, Added title bar to some windows to make them moveable, New settings that allow to configure the strategy announcements of the Strategist, Startup check for UDP configuration, Consumables chart now included in strategy comparison report
 Components=Media->5.3.0,Configuration->5.5.3,Utilities->5.4.8
 [Release]
 Version=5.5.5.0-release

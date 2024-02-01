@@ -6,17 +6,20 @@
   5. Fixed a (critical) bug in "Simulator Configuration", which didn't open its main window, when one or more Asistants had been disabled.
   6. Fixed all applications terminating correctly when "Simulator Download" is started manually.
   7. Fixed Franch grammar files for the Spotter.
-  8. The ACC plugin for Assetto Corsa Competizione now checks the UDP configuration at startup and warns you, if an invalid configuration is detected.
-  9. Added title bars to a couple of more windows to make them moveable.
-  10. A pre-configured Stream Deck profile is now available in the *Profiles* folder.
-  11. A new module entry shows the voice configuration status in the "System Monitor".
-  12. It is now possible to use the Escape key to stop the "Race Center" waiting for data. Use with caution, because this data object will never be requested again and might therefore be missing then. Use only, if you know that one of your team mates does not send poosition data, for example, due to a configuration error.
-  13. Several new settings in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database" allow you to customize the strategy summary given the the Strategist, when running a race with a pre-configured strategy.
-  14. Again improvements for the "Setup Workbench":
+  8. Fixed pitstop plan to display the wrong driver name when planning a pitstop without a stint plan in "Race Center".
+  9. When a pitstop is planned in "Race Center" without a stint plan, the planned lap will be set to the current lap, when no future lap has been specified.
+  10. The ACC plugin for Assetto Corsa Competizione now checks the UDP configuration at startup and warns you, if an invalid configuration is detected.
+  11. Added title bars to a couple of more windows to make them moveable.
+  12. A pre-configured Stream Deck profile is now available in the *Profiles* folder.
+  13. A new module entry shows the voice configuration status in the "System Monitor".
+  14. It is now possible to use the Escape key to stop the "Race Center" waiting for data. Use with caution, because this data object will never be requested again and might therefore be missing then. Use only, if you know that one of your team mates does not send poosition data, for example, due to a configuration error.
+  15. Several new settings in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database" allow you to customize the strategy summary given the the Strategist, when running a race with a pre-configured strategy.
+  16. The strategy comparison report in the "Strategy Workbench" now also includes the *Consumables* chart for each indivdual strategy.
+  17. Again improvements for the "Setup Workbench":
       - New standard setup setting "Boost" for "Setup Workbench". Please note, that this setting is not enabled by default in *Assetto Corsa*.
 	  - Several new rules for handling issue recommendations with regards to turbo boost settings.
       - New standard setup setting "Limiter" for "Setup Workbench". Please note, that this setting is not enabled by default in *Assetto Corsa*.
-  15. New car models for "Setup Workbench":
+  18. New car models for "Setup Workbench":
       - Assetto Corsa Competizione
         - Audi R8 LMS GT2
         - KTM X-BOW GT2

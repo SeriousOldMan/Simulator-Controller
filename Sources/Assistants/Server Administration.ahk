@@ -532,8 +532,6 @@ administrationEditor(configurationOrCommand, arguments*) {
 				}
 			}
 			else if (arguments[1] = "UpdateState") {
-				administrationGui["copyPasswordButton"].Enabled := false
-
 				if token {
 					administrationGui["changePasswordButton"].Enabled := true
 					administrationGui["addAccountButton"].Enabled := true
@@ -590,6 +588,8 @@ administrationEditor(configurationOrCommand, arguments*) {
 						administrationGui["accountMinutesEdit"].Enabled := false
 					}
 
+					administrationGui["copyPasswordButton"].Enabled := true
+
 					administrationGui["createPasswordButton"].Enabled := true
 
 					administrationGui["deleteAccountButton"].Enabled := true
@@ -603,6 +603,8 @@ administrationEditor(configurationOrCommand, arguments*) {
 					administrationGui["accountDataAccessCheck"].Enabled := false
 					administrationGui["accountContractDropDown"].Enabled := false
 					administrationGui["accountMinutesEdit"].Enabled := false
+
+					administrationGui["copyPasswordButton"].Enabled := false
 
 					administrationGui["createPasswordButton"].Enabled := false
 					administrationGui["availableMinutesButton"].Enabled := false

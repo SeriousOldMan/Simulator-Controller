@@ -14,11 +14,12 @@
   13. A new module entry shows the voice configuration status in the "System Monitor".
   14. It is now possible to use the Escape key to stop the "Race Center" waiting for data. Use with caution, because this data object will never be requested again and might therefore be missing then. Use only, if you know that one of your team mates does not send poosition data, for example, due to a configuration error.
   15. Several new settings in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database" allow you to customize the strategy summary given the the Strategist, when running a race with a pre-configured strategy.
-  16. Again improvements for the "Setup Workbench":
+  16. The strategy comparison report in the "Strategy Workbench" now also includes the *Consumables* chart for each indivdual strategy.
+  17. Again improvements for the "Setup Workbench":
       - New standard setup setting "Boost" for "Setup Workbench". Please note, that this setting is not enabled by default in *Assetto Corsa*.
 	  - Several new rules for handling issue recommendations with regards to turbo boost settings.
       - New standard setup setting "Limiter" for "Setup Workbench". Please note, that this setting is not enabled by default in *Assetto Corsa*.
-  17. New car models for "Setup Workbench":
+  18. New car models for "Setup Workbench":
       - Assetto Corsa Competizione
         - Audi R8 LMS GT2
         - KTM X-BOW GT2

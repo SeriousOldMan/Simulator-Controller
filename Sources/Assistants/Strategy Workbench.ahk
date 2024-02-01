@@ -1731,6 +1731,10 @@ class StrategyWorkbench extends ConfigurationItem {
 		return this.StrategyViewer.createStintsInfo(strategy, &timeSeries, &lapSeries, &fuelSeries, &tyreSeries)
 	}
 
+	createConsumablesChart(strategy, width, height, timeSeries, lapSeries, fuelSeries, tyreSeries, &drawChartFunction, &chartID) {
+		return this.StrategyViewer.createConsumablesChart(strategy, width, height, timeSeries, lapSeries, fuelSeries, tyreSeries, &drawChartFunction, &chartID)
+	}
+
 	showStrategyInfo(strategy) {
 		this.StrategyViewer.showStrategyInfo(strategy)
 	}
@@ -2839,6 +2843,10 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	compareStrategies(strategies*) {
+		local charts := ""
+		local drawChartFunction := ""
+		local drawChartsFunction := "function drawCharts() {"
+		local chartID := false
 		local strategy, before, after, chart, ignore, laps, exhausted, index, hasData
 		local sLaps, html, timeSeries, lapSeries, fuelSeries, tyreSeries, width, chartArea, tableCSS
 
@@ -2853,7 +2861,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				</style>
 				<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 				<script type="text/javascript">
-					google.charts.load('current', {'packages':['corechart', 'table', 'scatter']}).then(drawChart);
+					google.charts.load('current', {'packages':['corechart', 'table', 'scatter']}).then(drawCharts);
 		)"
 
 		before := substituteVariables(before, {headerBackColor: this.Window.Theme.ListBackColor["Header"]
@@ -2924,17 +2932,32 @@ class StrategyWorkbench extends ConfigurationItem {
 			html .= ("<br>" . this.createSetupInfo(strategy))
 
 			html .= ("<br>" . this.createStintsInfo(strategy, &timeSeries, &lapSeries, &fuelSeries, &tyreSeries))
+
+			html .= ("<br><br><div id=`"header`"><i>" . translate("Consumables") . "</i></div>")
+
+			drawChartFunction := false
+			chartID := false
+
+			width := (this.ChartViewer.getWidth() - 4)
+
+			html .= this.createConsumablesChart(strategy, width, width / 2, timeSeries, lapSeries, fuelSeries, tyreSeries, &drawChartFunction, &chartID)
+
+			charts .= (";`n" . drawChartFunction)
+
+			drawChartsFunction .=  (A_Space . "drawChart" . chartID . "();")
 		}
+
+		drawChartsFunction .= (A_Space . "drawChart(); }`n")
 
 		chart .= ("]);`nvar options = { curveType: 'function', legend: { position: 'Right' }, chartArea: { left: '10%', top: '5%', right: '25%', bottom: '20%' }, hAxis: { title: '" . translate("Minute") . "' }, vAxis: { title: '" . translate("Lap") . "', viewWindow: { min: 0 } }, backgroundColor: '" . this.Window.AltBackColor . "' };`n")
 
 		chart .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_id')); chart.draw(data, options); }")
 
-		chartArea := ("<div id=`"header`"><i><b>" . translate("Performance") . "</b></i></div><br><div id=`"chart_id`" style=`"width: " . (this.ChartViewer.getWidth() - 24) . "px; height: 348px`">")
+		chartArea := ("<div id=`"header`"><i><b>" . translate("Performance") . "</b></i></div><br><div id=`"chart_id`" style=`"width: " . (this.ChartViewer.getWidth() - 24) . "px; height: 348px`"></div>")
 
 		tableCSS := this.StrategyViewer.getTableCSS()
 
-		html := ("<html>" . before . chart . after . "<body style='background-color: #" . this.Window.AltBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style>" . tableCSS . "</style><style> #header { font-size: 12px; } </style>" . html . "<br><hr style=`"width: 50%`"><br>" . chartArea . "</body></html>")
+		html := ("<html>" . before . chart . charts . ";`n" . drawChartsFunction . after . "<body style='background-color: #" . this.Window.AltBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style>" . tableCSS . "</style><style> #header { font-size: 12px; } </style>" . html . "<br><hr style=`"width: 50%`"><br>" . chartArea . "</body></html>")
 
 		this.showComparisonChart(html)
 	}

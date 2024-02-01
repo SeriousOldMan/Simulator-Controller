@@ -263,7 +263,7 @@ class StrategyViewer {
 
 		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_" . chartID . "')); chart.draw(data, options); }")
 
-		return ("<div id=`"chart_" . chartID . "`" style=`"width: " . (width - 120) . "px; height: " . height . "px`">")
+		return ("<div id=`"chart_" . chartID . "`" style=`"width: " . Round(width - 120) . "px; height: " . Round(height) . "px`"></div>")
 	}
 
 	showStrategyInfo(strategy) {

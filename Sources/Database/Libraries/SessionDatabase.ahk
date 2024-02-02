@@ -557,7 +557,7 @@ class SessionDatabase extends ConfigurationItem {
 
 	static registerDriver(simulator, id, name) {
 		local sessionDB, forName, surName, nickName, key
-		
+
 		static knownDrivers := CaseInsenseMap()
 
 		if (simulator && id && name && (InStr(name, "John Doe") != 1)) {
@@ -2149,15 +2149,19 @@ synchronizeDrivers(groups, sessionDB, connector, simulators, timestamp, lastSync
 					db.changed("Drivers")
 					modified := true
 
-					if (connector.CountData("License", "Identifier = '" . driver["Identifier"] . "'") = 0) {
-						connector.CreateData("License"
-										   , substituteVariables("Identifier=%Identifier%`nSimulator=%Simulator%`n"
-															   . "Driver=%Driver%`nForname=%Forname%`nSurname=%Surname%`nNickname=%Nickname%"
-															   , {Identifier: driver["Identifier"], Simulator: simulator
-																, Driver: driver["ID"], Forname: driver["Forname"]
-																, Surname: driver["Surname"], Nickname: driver["Nickname"]}))
-						counter += 1
-					}
+					if (connector.CountData("License", "Identifier = '" . driver["Identifier"] . "'") = 0)
+						try {
+							connector.CreateData("License"
+											   , substituteVariables("Identifier=%Identifier%`nSimulator=%Simulator%`n"
+																   . "Driver=%Driver%`nForname=%Forname%`nSurname=%Surname%`nNickname=%Nickname%"
+																   , {Identifier: driver["Identifier"], Simulator: simulator
+																	, Driver: driver["ID"], Forname: driver["Forname"]
+																	, Surname: driver["Surname"], Nickname: driver["Nickname"]}))
+							counter += 1
+						}
+						catch Any as exception {
+							logError(exception)
+						}
 				}
 			}
 			finally {
@@ -2238,24 +2242,29 @@ synchronizeSetups(groups, sessionDB, connector, simulators, timestamp, lastSynch
 									if (setup && (size > 0)) {
 										identifier := getMultiMapValue(info, "Setup", "Identifier")
 
-										if (connector.CountData("Document", "Identifier = '" . identifier . "'") = 0)
-											connector.CreateData("Document"
-															   , substituteVariables("Type=Setup`n"
-																				   . "Identifier=%Identifier%`nDriver=%Driver%`n"
-																				   . "Simulator=%Simulator%`nCar=%Car%`nTrack=%Track%"
-																				   , {Identifier: identifier
-																					, Driver: getMultiMapValue(info, "Origin", "Driver")
-																					, Simulator: simulator, Car: car, Track: track}))
+										try {
+											if (connector.CountData("Document", "Identifier = '" . identifier . "'") = 0)
+												connector.CreateData("Document"
+																   , substituteVariables("Type=Setup`n"
+																					   . "Identifier=%Identifier%`nDriver=%Driver%`n"
+																					   . "Simulator=%Simulator%`nCar=%Car%`nTrack=%Track%"
+																					   , {Identifier: identifier
+																						, Driver: getMultiMapValue(info, "Origin", "Driver")
+																						, Simulator: simulator, Car: car, Track: track}))
 
-										counter += 1
+											counter += 1
 
-										connector.SetDataValue("Document", identifier, "Setup", StrGet(setup, "UTF-8"))
+											connector.SetDataValue("Document", identifier, "Setup", StrGet(setup, "UTF-8"))
 
-										setMultiMapValue(info, "Setup", "Synchronized", true)
+											setMultiMapValue(info, "Setup", "Synchronized", true)
 
-										connector.SetDataValue("Document", identifier, "Info", printMultiMap(info))
+											connector.SetDataValue("Document", identifier, "Info", printMultiMap(info))
 
-										writeMultiMap(A_LoopFilePath, info)
+											writeMultiMap(A_LoopFilePath, info)
+										}
+										catch Any as exception {
+											logError(exception)
+										}
 									}
 								}
 							}
@@ -2343,25 +2352,30 @@ synchronizeStrategies(groups, sessionDB, connector, simulators, timestamp, lastS
 									if (strategy.Count > 0) {
 										identifier := getMultiMapValue(info, "Strategy", "Identifier", false)
 
-										if (connector.CountData("Document", "Identifier = '" . identifier . "'") = 0)
-											connector.CreateData("Document"
-															   , substituteVariables("Type=Strategy`n"
-																				   . "Identifier=%Identifier%`nDriver=%Driver%`n"
-																				   . "Simulator=%Simulator%`nCar=%Car%`nTrack=%Track%"
-																				   , {Identifier: identifier
-																					, Driver: getMultiMapValue(info, "Access", "Driver")
-																					, Simulator: simulator, Car: car, Track: track}))
+										try {
+											if (connector.CountData("Document", "Identifier = '" . identifier . "'") = 0)
+												connector.CreateData("Document"
+																   , substituteVariables("Type=Strategy`n"
+																					   . "Identifier=%Identifier%`nDriver=%Driver%`n"
+																					   . "Simulator=%Simulator%`nCar=%Car%`nTrack=%Track%"
+																					   , {Identifier: identifier
+																						, Driver: getMultiMapValue(info, "Access", "Driver")
+																						, Simulator: simulator, Car: car, Track: track}))
 
 
-										counter += 1
+											counter += 1
 
-										connector.SetDataValue("Document", identifier, "Strategy", printMultiMap(strategy))
+											connector.SetDataValue("Document", identifier, "Strategy", printMultiMap(strategy))
 
-										setMultiMapValue(info, "Strategy", "Synchronized", true)
+											setMultiMapValue(info, "Strategy", "Synchronized", true)
 
-										connector.SetDataValue("Document", identifier, "Info", printMultiMap(info))
+											connector.SetDataValue("Document", identifier, "Info", printMultiMap(info))
 
-										writeMultiMap(A_LoopFilePath, info)
+											writeMultiMap(A_LoopFilePath, info)
+										}
+										catch Any as exception {
+											logError(exception)
+										}
 									}
 								}
 							}

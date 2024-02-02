@@ -673,38 +673,42 @@ synchronizeTyresPressures(groups, sessionDB, connector, simulators, timestamp, l
 									db.changed("Tyres.Pressures")
 									modified := true
 
-									if (connector.CountData("TyresPressures", "Identifier = '" . pressures["Identifier"] . "'") = 0) {
-										connector.CreateData("TyresPressures"
-														   , substituteVariables("Identifier=%Identifier%`nDriver=%Driver%`n"
-																			   . "Simulator=%Simulator%`nCar=%Car%`nTrack=%Track%`n"
-																			   . "Weather=%Weather%`nAirTemperature=%AirTemperature%`n"
-																			   . "TrackTemperature=%TrackTemperature%`n"
-																			   . "TyreCompound=%TyreCompound%`nTyreCompoundColor=%TyreCompoundColor%`n"
-																			   . "HotPressureFrontLeft=%HotPressureFrontLeft%`n"
-																			   . "HotPressureFrontRight=%HotPressureFrontRight%`n"
-																			   . "HotPressureRearLeft=%HotPressureRearLeft%`n"
-																			   . "HotPressureRearRight=%HotPressureRearRight%`n"
-																			   . "ColdPressureFrontLeft=%ColdPressureFrontLeft%`n"
-																			   . "ColdPressureFrontRight=%ColdPressureFrontRight%`n"
-																			   . "ColdPressureRearLeft=%ColdPressureRearLeft%`n"
-																			   . "ColdPressureRearRight=%ColdPressureRearRight%"
-																			   , {Identifier: pressures["Identifier"], Driver: pressures["Driver"]
-																				, Simulator: simulator, Car: car, Track: track
-																				, Weather: pressures["Weather"]
-																				, AirTemperature: pressures["Temperature.Air"]
-																				, TrackTemperature: pressures["Temperature.Track"]
-																				, TyreCompound: pressures["Compound"], TyreCompoundColor: pressures["Compound.Color"]
-																				, HotPressureFrontLeft: pressures["Tyre.Pressure.Hot.Front.Left"]
-																				, HotPressureFrontRight: pressures["Tyre.Pressure.Hot.Front.Right"]
-																				, HotPressureRearLeft: pressures["Tyre.Pressure.Hot.Rear.Left"]
-																				, HotPressureRearRight: pressures["Tyre.Pressure.Hot.Rear.Right"]
-																				, ColdPressureFrontLeft: pressures["Tyre.Pressure.Cold.Front.Left"]
-																				, ColdPressureFrontRight: pressures["Tyre.Pressure.Cold.Front.Right"]
-																				, ColdPressureRearLeft: pressures["Tyre.Pressure.Cold.Rear.Left"]
-																				, ColdPressureRearRight: pressures["Tyre.Pressure.Cold.Rear.Right"]}))
+									if (connector.CountData("TyresPressures", "Identifier = '" . pressures["Identifier"] . "'") = 0)
+										try {
+											connector.CreateData("TyresPressures"
+															   , substituteVariables("Identifier=%Identifier%`nDriver=%Driver%`n"
+																				   . "Simulator=%Simulator%`nCar=%Car%`nTrack=%Track%`n"
+																				   . "Weather=%Weather%`nAirTemperature=%AirTemperature%`n"
+																				   . "TrackTemperature=%TrackTemperature%`n"
+																				   . "TyreCompound=%TyreCompound%`nTyreCompoundColor=%TyreCompoundColor%`n"
+																				   . "HotPressureFrontLeft=%HotPressureFrontLeft%`n"
+																				   . "HotPressureFrontRight=%HotPressureFrontRight%`n"
+																				   . "HotPressureRearLeft=%HotPressureRearLeft%`n"
+																				   . "HotPressureRearRight=%HotPressureRearRight%`n"
+																				   . "ColdPressureFrontLeft=%ColdPressureFrontLeft%`n"
+																				   . "ColdPressureFrontRight=%ColdPressureFrontRight%`n"
+																				   . "ColdPressureRearLeft=%ColdPressureRearLeft%`n"
+																				   . "ColdPressureRearRight=%ColdPressureRearRight%"
+																				   , {Identifier: pressures["Identifier"], Driver: pressures["Driver"]
+																					, Simulator: simulator, Car: car, Track: track
+																					, Weather: pressures["Weather"]
+																					, AirTemperature: pressures["Temperature.Air"]
+																					, TrackTemperature: pressures["Temperature.Track"]
+																					, TyreCompound: pressures["Compound"], TyreCompoundColor: pressures["Compound.Color"]
+																					, HotPressureFrontLeft: pressures["Tyre.Pressure.Hot.Front.Left"]
+																					, HotPressureFrontRight: pressures["Tyre.Pressure.Hot.Front.Right"]
+																					, HotPressureRearLeft: pressures["Tyre.Pressure.Hot.Rear.Left"]
+																					, HotPressureRearRight: pressures["Tyre.Pressure.Hot.Rear.Right"]
+																					, ColdPressureFrontLeft: pressures["Tyre.Pressure.Cold.Front.Left"]
+																					, ColdPressureFrontRight: pressures["Tyre.Pressure.Cold.Front.Right"]
+																					, ColdPressureRearLeft: pressures["Tyre.Pressure.Cold.Rear.Left"]
+																					, ColdPressureRearRight: pressures["Tyre.Pressure.Cold.Rear.Right"]}))
 
-										counter += 1
-									}
+											counter += 1
+										}
+										catch Any as exception {
+											logError(exception)
+										}
 								}
 							}
 							finally {
@@ -753,7 +757,12 @@ synchronizeTyresPressures(groups, sessionDB, connector, simulators, timestamp, l
 									if identifier
 										connector.UpdateData("TyresPressuresDistribution", identifier, properties)
 									else
-										connector.CreateData("TyresPressuresDistribution", properties)
+										try {
+											connector.CreateData("TyresPressuresDistribution", properties)
+										}
+										catch Any as exception {
+											logError(exception)
+										}
 								}
 							}
 							finally {

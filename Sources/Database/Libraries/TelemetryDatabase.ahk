@@ -669,29 +669,33 @@ synchronizeTelemetry(groups, sessionDB, connector, simulators, timestamp, lastSy
 									db.changed("Electronics")
 									modified := true
 
-									if (connector.CountData("Electronics", "Identifier = '" . telemetry["Identifier"] . "'") = 0) {
-										connector.CreateData("Electronics"
-														   , substituteVariables("Identifier=%Identifier%`nDriver=%Driver%`n"
-																			   . "Simulator=%Simulator%`nCar=%Car%`nTrack=%Track%`n"
-																			   . "Weather=%Weather%`nAirTemperature=%AirTemperature%`n"
-																			   . "TrackTemperature=%TrackTemperature%`n"
-																			   . "TyreCompound=%TyreCompound%`nTyreCompoundColor=%TyreCompoundColor%`n"
-																			   . "FuelRemaining=%FuelRemaining%`nFuelConsumption=%FuelConsumption%`n"
-																			   . "LapTime=%LapTime%`nMap=%Map%`nTC=%TC%`nABS=%ABS%"
-																			   , {Identifier: telemetry["Identifier"], Driver: telemetry["Driver"]
-																				, Simulator: simulator, Car: car, Track: track
-																				, Weather: telemetry["Weather"]
-																				, AirTemperature: telemetry["Temperature.Air"]
-																				, TrackTemperature: telemetry["Temperature.Track"]
-																				, TyreCompound: telemetry["Tyre.Compound"]
-																				, TyreCompoundColor: telemetry["Tyre.Compound.Color"]
-																				, FuelConsumption: telemetry["Fuel.Consumption"]
-																				, FuelRemaining: telemetry["Fuel.Remaining"]
-																				, LapTime: telemetry["Lap.Time"], Map: telemetry["Map"]
-																				, TC: telemetry["TC"], ABS: telemetry["ABS"]}))
+									if (connector.CountData("Electronics", "Identifier = '" . telemetry["Identifier"] . "'") = 0)
+										try {
+											connector.CreateData("Electronics"
+															   , substituteVariables("Identifier=%Identifier%`nDriver=%Driver%`n"
+																				   . "Simulator=%Simulator%`nCar=%Car%`nTrack=%Track%`n"
+																				   . "Weather=%Weather%`nAirTemperature=%AirTemperature%`n"
+																				   . "TrackTemperature=%TrackTemperature%`n"
+																				   . "TyreCompound=%TyreCompound%`nTyreCompoundColor=%TyreCompoundColor%`n"
+																				   . "FuelRemaining=%FuelRemaining%`nFuelConsumption=%FuelConsumption%`n"
+																				   . "LapTime=%LapTime%`nMap=%Map%`nTC=%TC%`nABS=%ABS%"
+																				   , {Identifier: telemetry["Identifier"], Driver: telemetry["Driver"]
+																					, Simulator: simulator, Car: car, Track: track
+																					, Weather: telemetry["Weather"]
+																					, AirTemperature: telemetry["Temperature.Air"]
+																					, TrackTemperature: telemetry["Temperature.Track"]
+																					, TyreCompound: telemetry["Tyre.Compound"]
+																					, TyreCompoundColor: telemetry["Tyre.Compound.Color"]
+																					, FuelConsumption: telemetry["Fuel.Consumption"]
+																					, FuelRemaining: telemetry["Fuel.Remaining"]
+																					, LapTime: telemetry["Lap.Time"], Map: telemetry["Map"]
+																					, TC: telemetry["TC"], ABS: telemetry["ABS"]}))
 
-										counter += 1
-									}
+											counter += 1
+										}
+										catch Any as exception {
+											logError(exception)
+										}
 								}
 							}
 							finally {
@@ -715,48 +719,52 @@ synchronizeTelemetry(groups, sessionDB, connector, simulators, timestamp, lastSy
 									db.changed("Tyres")
 									modified := true
 
-									if (connector.CountData("Tyres", "Identifier = '" . telemetry["Identifier"] . "'") = 0) {
-										connector.CreateData("Tyres"
-														   , substituteVariables("Identifier=%Identifier%`nDriver=%Driver%`n"
-																			   . "Simulator=%Simulator%`nCar=%Car%`nTrack=%Track%`n"
-																			   . "Weather=%Weather%`nAirTemperature=%AirTemperature%`n"
-																			   . "TrackTemperature=%TrackTemperature%`n"
-																			   . "TyreCompound=%TyreCompound%`nTyreCompoundColor=%TyreCompoundColor%`n"
-																			   . "FuelRemaining=%FuelRemaining%`nFuelConsumption=%FuelConsumption%`n"
-																			   . "LapTime=%LapTime%`nLaps=%Laps%`n"
-																			   . "PressureFrontLeft=%PressureFrontLeft%`nPressureFrontRight=%PressureFrontRight%`n"
-																			   . "PressureRearLeft=%PressureRearLeft%`nPressureRearRight=%PressureRearRight%`n"
-																			   . "TemperatureFrontLeft=%TemperatureFrontLeft%`n"
-																			   . "TemperatureFrontRight=%TemperatureFrontRight%`n"
-																			   . "TemperatureRearLeft=%TemperatureRearLeft%`n"
-																			   . "TemperatureRearRight=%TemperatureRearRight%`n"
-																			   . "WearFrontLeft=%WearFrontLeft%`nWearFrontRight=%WearFrontRight%`n"
-																			   . "WearRearLeft=%WearRearLeft%`nWearRearRight=%WearRearRight%"
-																			   , {Identifier: telemetry["Identifier"], Driver: telemetry["Driver"]
-																				, Simulator: simulator, Car: car, Track: track
-																				, Weather: telemetry["Weather"]
-																				, AirTemperature: telemetry["Temperature.Air"]
-																				, TrackTemperature: telemetry["Temperature.Track"]
-																				, TyreCompound: telemetry["Tyre.Compound"]
-																				, TyreCompoundColor: telemetry["Tyre.Compound.Color"]
-																				, FuelConsumption: telemetry["Fuel.Consumption"]
-																				, FuelRemaining: telemetry["Fuel.Remaining"]
-																				, LapTime: telemetry["Lap.Time"], Laps: telemetry["Tyre.Laps"]
-																				, PressureFrontLeft: telemetry["Tyre.Pressure.Front.Left"]
-																				, PressureFrontRight: telemetry["Tyre.Pressure.Front.Right"]
-																				, PressureRearLeft: telemetry["Tyre.Pressure.Rear.Left"]
-																				, PressureRearRight: telemetry["Tyre.Pressure.Rear.Right"]
-																				, TemperatureFrontLeft: telemetry["Tyre.Temperature.Front.Left"]
-																				, TemperatureFrontRight: telemetry["Tyre.Temperature.Front.Right"]
-																				, TemperatureRearLeft: telemetry["Tyre.Temperature.Rear.Left"]
-																				, TemperatureRearRight: telemetry["Tyre.Temperature.Rear.Right"]
-																				, WearFrontLeft: telemetry["Tyre.Wear.Front.Left"]
-																				, WearFrontRight: telemetry["Tyre.Wear.Front.Right"]
-																				, WearRearLeft: telemetry["Tyre.Wear.Rear.Left"]
-																				, WearRearRight: telemetry["Tyre.Wear.Rear.Right"]}))
+									if (connector.CountData("Tyres", "Identifier = '" . telemetry["Identifier"] . "'") = 0)
+										try {
+											connector.CreateData("Tyres"
+															   , substituteVariables("Identifier=%Identifier%`nDriver=%Driver%`n"
+																				   . "Simulator=%Simulator%`nCar=%Car%`nTrack=%Track%`n"
+																				   . "Weather=%Weather%`nAirTemperature=%AirTemperature%`n"
+																				   . "TrackTemperature=%TrackTemperature%`n"
+																				   . "TyreCompound=%TyreCompound%`nTyreCompoundColor=%TyreCompoundColor%`n"
+																				   . "FuelRemaining=%FuelRemaining%`nFuelConsumption=%FuelConsumption%`n"
+																				   . "LapTime=%LapTime%`nLaps=%Laps%`n"
+																				   . "PressureFrontLeft=%PressureFrontLeft%`nPressureFrontRight=%PressureFrontRight%`n"
+																				   . "PressureRearLeft=%PressureRearLeft%`nPressureRearRight=%PressureRearRight%`n"
+																				   . "TemperatureFrontLeft=%TemperatureFrontLeft%`n"
+																				   . "TemperatureFrontRight=%TemperatureFrontRight%`n"
+																				   . "TemperatureRearLeft=%TemperatureRearLeft%`n"
+																				   . "TemperatureRearRight=%TemperatureRearRight%`n"
+																				   . "WearFrontLeft=%WearFrontLeft%`nWearFrontRight=%WearFrontRight%`n"
+																				   . "WearRearLeft=%WearRearLeft%`nWearRearRight=%WearRearRight%"
+																				   , {Identifier: telemetry["Identifier"], Driver: telemetry["Driver"]
+																					, Simulator: simulator, Car: car, Track: track
+																					, Weather: telemetry["Weather"]
+																					, AirTemperature: telemetry["Temperature.Air"]
+																					, TrackTemperature: telemetry["Temperature.Track"]
+																					, TyreCompound: telemetry["Tyre.Compound"]
+																					, TyreCompoundColor: telemetry["Tyre.Compound.Color"]
+																					, FuelConsumption: telemetry["Fuel.Consumption"]
+																					, FuelRemaining: telemetry["Fuel.Remaining"]
+																					, LapTime: telemetry["Lap.Time"], Laps: telemetry["Tyre.Laps"]
+																					, PressureFrontLeft: telemetry["Tyre.Pressure.Front.Left"]
+																					, PressureFrontRight: telemetry["Tyre.Pressure.Front.Right"]
+																					, PressureRearLeft: telemetry["Tyre.Pressure.Rear.Left"]
+																					, PressureRearRight: telemetry["Tyre.Pressure.Rear.Right"]
+																					, TemperatureFrontLeft: telemetry["Tyre.Temperature.Front.Left"]
+																					, TemperatureFrontRight: telemetry["Tyre.Temperature.Front.Right"]
+																					, TemperatureRearLeft: telemetry["Tyre.Temperature.Rear.Left"]
+																					, TemperatureRearRight: telemetry["Tyre.Temperature.Rear.Right"]
+																					, WearFrontLeft: telemetry["Tyre.Wear.Front.Left"]
+																					, WearFrontRight: telemetry["Tyre.Wear.Front.Right"]
+																					, WearRearLeft: telemetry["Tyre.Wear.Rear.Left"]
+																					, WearRearRight: telemetry["Tyre.Wear.Rear.Right"]}))
 
-										counter += 1
-									}
+											counter += 1
+										}
+										catch Any as exception {
+											logError(exception)
+										}
 								}
 							}
 							finally {

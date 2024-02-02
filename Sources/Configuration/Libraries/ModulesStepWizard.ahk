@@ -29,6 +29,12 @@ class NamedPreset extends Preset {
 		}
 	}
 
+	Installable {
+		Get {
+			return true
+		}
+	}
+
 	__New(name) {
 		this.iName := name
 	}
@@ -37,7 +43,7 @@ class NamedPreset extends Preset {
 		return Array(this.Name)
 	}
 
-	edit() {
+	edit(wizard) {
 	}
 }
 
@@ -366,7 +372,7 @@ class TeamServerAlwaysOn extends NamedPreset {
 }
 
 class ConfigurationPatch extends NamedPreset {
-	edit() {
+	edit(wizard) {
 		try {
 			Run("notepad " . kUserHomeDirectory . "Setup\Configuration Patch.ini")
 		}
@@ -396,7 +402,7 @@ class ConfigurationPatch extends NamedPreset {
 		}
 
 		if edit
-			this.edit()
+			this.edit(wizard)
 	}
 
 	uninstall(wizard) {
@@ -463,7 +469,7 @@ class SetupPatch extends NamedPreset {
 		return concatenate(super.getArguments(), Array(this.File))
 	}
 
-	edit() {
+	edit(wizard) {
 		local file := this.File
 		local name
 
@@ -491,7 +497,7 @@ class SetupPatch extends NamedPreset {
 		}
 
 		if edit
-			this.edit()
+			this.edit(wizard)
 	}
 
 	uninstall(wizard) {
@@ -507,6 +513,28 @@ class SetupPatch extends NamedPreset {
 		}
 
 		deleteFile(kUserHomeDirectory . "Setup\" . name)
+	}
+}
+
+class InstallDLC extends NamedPreset {
+	iURL := false
+
+	URL {
+		Get {
+			return this.iURL
+		}
+	}
+
+	Installable {
+		Get {
+			return false
+		}
+	}
+
+	__New(name, url) {
+		super.__New(name)
+
+		this.iURL := substituteVariables(url)
 	}
 }
 
@@ -810,15 +838,15 @@ class ModulesStepWizard extends StepWizard {
 		return false
 	}
 
-	presetInfo(preset) {
+	presetInfo(name) {
 		local entries := getMultiMapValues(this.SetupWizard.Definition, "Setup.Modules")
 		local keys := getKeys(entries)
-		local index := inList(keys, "Modules.Presets." . preset . ".Info." . getLanguage())
+		local index := inList(keys, "Modules.Presets." . name . ".Info." . getLanguage())
 
 		if !index
-			if (preset = "ACCDualQHDSingleNoHDRDE")
+			if (name = "ACCDualQHDSingleNoHDRDE")
 				index := inList(keys, "Buggy1")
-			else if (preset = "R3EFullHDTripleNoHDREN")
+			else if (name = "R3EFullHDTripleNoHDREN")
 				index := inList(keys, "Buggy2")
 
 		return (index ? substituteVariables(getValues(entries)[index]) : false)
@@ -838,19 +866,26 @@ class ModulesStepWizard extends StepWizard {
 
 			preset := this.presetName(preset)
 
-			enable := true
+			class := getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . ".Class")
+			arguments := string2Values(",", getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . ".Arguments", ""))
 
-			for ignore, candidate in this.SetupWizard.Presets
-				if (candidate.Name = preset) {
-					enable := false
+			preset := %class%(preset, arguments*)
 
-					break
-				}
+			if preset.Installable {
+				enable := true
 
-			if enable
-				this.Control["installPresetButton"].Enabled := true
+				for ignore, candidate in this.SetupWizard.Presets
+					if (candidate.Name = preset.Name) {
+						enable := false
 
-			info := this.presetInfo(preset)
+						break
+					}
+
+				if enable
+					this.Control["installPresetButton"].Enabled := true
+			}
+
+			info := this.presetInfo(preset.Name)
 		}
 
 		selected := this.SelectedPresetsListView.GetNext()
@@ -892,18 +927,22 @@ class ModulesStepWizard extends StepWizard {
 			class := getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . ".Class")
 			arguments := string2Values(",", getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . ".Arguments", ""))
 
-			this.SetupWizard.installPreset(%class%(preset, arguments*))
+			preset := %class%(preset, arguments*)
 
-			this.loadSelectedPresets()
+			if preset.Installable {
+				this.SetupWizard.installPreset(preset)
+
+				this.loadSelectedPresets()
+			}
+			else
+				preset.edit(this.SetupWizard)
 
 			this.updatePresetState()
 		}
 	}
 
 	uninstallPreset() {
-		local selected
-
-		selected := this.SelectedPresetsListView.GetNext()
+		local selected := this.SelectedPresetsListView.GetNext()
 
 		if selected {
 			this.SetupWizard.uninstallPreset(this.SetupWizard.Presets[selected])
@@ -915,12 +954,10 @@ class ModulesStepWizard extends StepWizard {
 	}
 
 	editPreset() {
-		local selected
-
-		selected := this.SelectedPresetsListView.GetNext()
+		local selected := this.SelectedPresetsListView.GetNext()
 
 		if selected
-			this.SetupWizard.Presets[selected].edit()
+			this.SetupWizard.Presets[selected].edit(this.SetupWizard)
 	}
 }
 

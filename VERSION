@@ -1,14 +1,14 @@
 [Development]
-Version=5.5.6.0-release
-Target=5.5.6.0-release
+Version=5.5.6.1-release
+Target=5.5.6.1-release
 Date=02/02/2024
-Download=https://cutt.ly/pwZ7AoTB;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.5.6.0-release.zip
+Download=https://cutt.ly/qwXf9X7e;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.5.6.1-release.zip
 Changes=Added default profile for Stream Deck to the Profiles collection, Fixes for the Assistants with deactivated listeners, Fixed default connections in Startup Profiles, Added voice control status to "System Monitor", New settings "Engine.Limiter" and "Turbo" in "Setup Workbench", New car models for "Setup Workbench", Fixed "Simulator Configuration" not open its main window, Added title bar to some windows to make them moveable, New settings that allow to configure the strategy announcements of the Strategist, Startup check for UDP configuration, Consumables chart now included in strategy comparison report
 Components=Media->5.3.0,Configuration->5.5.3,Utilities->5.4.8
 [Release]
-Version=5.5.6.0-release
+Version=5.5.6.1-release
 Date=02/02/2024
-Download=https://cutt.ly/pwZ7AoTB;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.5.6.0-release.zip
+Download=https://cutt.ly/qwXf9X7e;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.5.6.1-release.zip
 Changes=Added default profile for Stream Deck to the Profiles collection, Fixes for the Assistants with deactivated listeners, Fixed default connections in Startup Profiles, Added voice control status to "System Monitor", New settings "Engine.Limiter" and "Turbo" in "Setup Workbench", New car models for "Setup Workbench", Fixed "Simulator Configuration" not open its main window, Added title bar to some windows to make them moveable, New settings that allow to configure the strategy announcements of the Strategist, Startup check for UDP configuration, Consumables chart now included in strategy comparison report
 Components=Media->5.3.0,Configuration->5.5.3,Utilities->5.4.8
 [Components]
@@ -27,5 +27,5 @@ Utilities.5.4.8.Download=https://www.dropbox.com/scl/fi/5nduffajjm3x6rhsxr1nk/Ut
 [Current]
 Type=Release
 [Version]
-Development=5.5.6.0-release
-Release=5.5.6.0-release
+Development=5.5.6.1-release
+Release=5.5.6.1-release

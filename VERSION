@@ -1,15 +1,15 @@
 [Development]
-Version=5.5.6.0-beta
+Version=5.5.6.0-release
 Target=5.5.6.0-release
-Date=02/01/2024
-Download=https://www.dropbox.com/scl/fi/579imbvvzrqb99ayr73es/Simulator-Controller-5.5.6.0-beta.zip?rlkey=jfo8lo0p4rgzcvdnb5ptdg6jv&dl=1
+Date=02/02/2024
+Download=https://cutt.ly/pwZ7AoTB;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.5.6.0-release.zip
 Changes=Added default profile for Stream Deck to the Profiles collection, Fixes for the Assistants with deactivated listeners, Fixed default connections in Startup Profiles, Added voice control status to "System Monitor", New settings "Engine.Limiter" and "Turbo" in "Setup Workbench", New car models for "Setup Workbench", Fixed "Simulator Configuration" not open its main window, Added title bar to some windows to make them moveable, New settings that allow to configure the strategy announcements of the Strategist, Startup check for UDP configuration, Consumables chart now included in strategy comparison report
 Components=Media->5.3.0,Configuration->5.5.3,Utilities->5.4.8
 [Release]
-Version=5.5.5.0-release
-Date=01/26/2024
-Download=https://cutt.ly/NwLVrO9P;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.5.5.0-release.zip
-Changes=Changed Driving Coach behaviour in case of configuration or connection error, New standard setup setting "Differential Coast" for "Setup Workbench", New standard setup setting "Differential Power" for "Setup Workbench", New standard setup setting "MGUK Delivery" for "Setup Workbench", New standard characteristic "Bettery Depletion" for "Setup Workbench", New standard setup settings for hybrid cars in "Setup Workbench", New standard setup settings for Heave suspensions in "Setup Workbench", New standard setup settings for separate left / right aero height in "Setup Workbench", New car models for "Setup Workbench", New "-Startup" option for "Simulator Startup", Fixed wet cold tyre pressure calculation for the Race Engineer, Optimized setup editor layout in "Setup Workbench"
+Version=5.5.6.0-release
+Date=02/02/2024
+Download=https://cutt.ly/pwZ7AoTB;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.5.6.0-release.zip
+Changes=Added default profile for Stream Deck to the Profiles collection, Fixes for the Assistants with deactivated listeners, Fixed default connections in Startup Profiles, Added voice control status to "System Monitor", New settings "Engine.Limiter" and "Turbo" in "Setup Workbench", New car models for "Setup Workbench", Fixed "Simulator Configuration" not open its main window, Added title bar to some windows to make them moveable, New settings that allow to configure the strategy announcements of the Strategist, Startup check for UDP configuration, Consumables chart now included in strategy comparison report
 Components=Media->5.3.0,Configuration->5.5.3,Utilities->5.4.8
 [Components]
 Media.5.3.0.Path=Resources
@@ -25,7 +25,7 @@ Utilities.5.4.8.Path=.
 Utilities.5.4.8.Content=Utilities
 Utilities.5.4.8.Download=https://www.dropbox.com/scl/fi/5nduffajjm3x6rhsxr1nk/Utilities-5.4.8.zip?rlkey=alrj8l2z205dd2vm9cu6hbsot&dl=1
 [Current]
-Type=Development
+Type=Release
 [Version]
-Development=5.5.6.0-beta
-Release=5.5.5.0-release
+Development=5.5.6.0-release
+Release=5.5.6.0-release

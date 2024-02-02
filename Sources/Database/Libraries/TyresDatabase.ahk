@@ -534,7 +534,7 @@ synchronizeTyresPressures(groups, sessionDB, connector, simulators, timestamp, l
 	local lastSimulator := false
 	local lastCar := false
 	local lastTrack := false
-	local ignore, simulator, car, track, db, modified, identifier, pressures, oldPressures, properties, count, pressuresLocked
+	local ignore, simulator, car, track, db, modified, identifier, pressures, oldPressures, properties, count, pressuresLocked, wasNull
 
 	if inList(groups, "Pressures")
 		try {
@@ -664,17 +664,17 @@ synchronizeTyresPressures(groups, sessionDB, connector, simulators, timestamp, l
 								modified := false
 
 								for ignore, pressures in db.query("Tyres.Pressures", {Where: force ? {Driver: sessionDB.ID}
-																								   : {Synchronized: kNull, Driver: sessionDB.ID} }) {
-									if (pressures["Identifier"] = kNull)
-										pressures["Identifier"] := createGUID()
+																								   : {Synchronized: kNull, Driver: sessionDB.ID} })
+									try {
+										if (pressures["Identifier"] = kNull) {
+											pressures["Identifier"] := createGUID()
 
-									pressures["Synchronized"] := timestamp
+											wasNull := true
+										}
+										else
+											wasNull := false
 
-									db.changed("Tyres.Pressures")
-									modified := true
-
-									if (connector.CountData("TyresPressures", "Identifier = '" . pressures["Identifier"] . "'") = 0)
-										try {
+										if (connector.CountData("TyresPressures", "Identifier = '" . pressures["Identifier"] . "'") = 0) {
 											connector.CreateData("TyresPressures"
 															   , substituteVariables("Identifier=%Identifier%`nDriver=%Driver%`n"
 																				   . "Simulator=%Simulator%`nCar=%Car%`nTrack=%Track%`n"
@@ -706,10 +706,18 @@ synchronizeTyresPressures(groups, sessionDB, connector, simulators, timestamp, l
 
 											counter += 1
 										}
-										catch Any as exception {
-											logError(exception)
-										}
-								}
+
+										pressures["Synchronized"] := timestamp
+
+										db.changed("Tyres.Pressures")
+										modified := true
+									}
+									catch Any as exception {
+										logError(exception)
+
+										if wasNull
+											pressures["Identifier"] := kNull
+									}
 							}
 							finally {
 								if modified
@@ -723,47 +731,54 @@ synchronizeTyresPressures(groups, sessionDB, connector, simulators, timestamp, l
 								modified := false
 
 								for ignore, pressures in db.query("Tyres.Pressures.Distribution", {Where: force ? {Driver: sessionDB.ID}
-																												: {Synchronized: kNull, Driver: sessionDB.ID} }) {
-									if (pressures["Identifier"] = kNull) {
-										identifier := createGUID()
+																												: {Synchronized: kNull, Driver: sessionDB.ID} })
+									try {
+										if (pressures["Identifier"] = kNull) {
+											identifier := createGUID()
 
-										pressures["Identifier"] := identifier
-									}
-									else
-										identifier := pressures["Identifier"]
+											pressures["Identifier"] := identifier
 
-									pressures["Synchronized"] := timestamp
+											wasNull := true
+										}
+										else {
+											identifier := pressures["Identifier"]
 
-									db.changed("Tyres.Pressures.Distribution")
-									modified := true
+											wasNull := false
+										}
 
-									counter += 1
+										if (connector.CountData("TyresPressuresDistribution", "Identifier = '" . identifier . "'") = 0)
+											identifier := false
 
-									if (connector.CountData("TyresPressuresDistribution", "Identifier = '" . identifier . "'") = 0)
-										identifier := false
+										properties := substituteVariables("Identifier=%Identifier%`nDriver=%Driver%`nSimulator=%Simulator%`nCar=%Car%`nTrack=%Track%`n"
+																		. "Weather=%Weather%`nAirTemperature=%AirTemperature%`nTrackTemperature=%TrackTemperature%`n"
+																		. "TyreCompound=%TyreCompound%`nTyreCompoundColor=%TyreCompoundColor%`n"
+																		. "Type=%Type%`nTyre=%Tyre%`nPressure=%Pressure%`nCount=%Count%"
+																		, {Identifier: pressures["Identifier"], Driver: pressures["Driver"]
+																		 , Simulator: simulator, Car: car, Track: track
+																		 , Weather: pressures["Weather"]
+																		 , AirTemperature: pressures["Temperature.Air"], TrackTemperature: pressures["Temperature.Track"]
+																		 , TyreCompound: pressures["Compound"], TyreCompoundColor: pressures["Compound.Color"]
+																		 , Type: pressures["Type"], Tyre: pressures["Tyre"]
+																		 , Pressure: pressures["Pressure"], Count: pressures["Count"]})
 
-									properties := substituteVariables("Identifier=%Identifier%`nDriver=%Driver%`nSimulator=%Simulator%`nCar=%Car%`nTrack=%Track%`n"
-																	. "Weather=%Weather%`nAirTemperature=%AirTemperature%`nTrackTemperature=%TrackTemperature%`n"
-																	. "TyreCompound=%TyreCompound%`nTyreCompoundColor=%TyreCompoundColor%`n"
-																	. "Type=%Type%`nTyre=%Tyre%`nPressure=%Pressure%`nCount=%Count%"
-																	, {Identifier: pressures["Identifier"], Driver: pressures["Driver"]
-																	 , Simulator: simulator, Car: car, Track: track
-																	 , Weather: pressures["Weather"]
-																	 , AirTemperature: pressures["Temperature.Air"], TrackTemperature: pressures["Temperature.Track"]
-																	 , TyreCompound: pressures["Compound"], TyreCompoundColor: pressures["Compound.Color"]
-																	 , Type: pressures["Type"], Tyre: pressures["Tyre"]
-																	 , Pressure: pressures["Pressure"], Count: pressures["Count"]})
-
-									if identifier
-										connector.UpdateData("TyresPressuresDistribution", identifier, properties)
-									else
-										try {
+										if identifier
+											connector.UpdateData("TyresPressuresDistribution", identifier, properties)
+										else
 											connector.CreateData("TyresPressuresDistribution", properties)
-										}
-										catch Any as exception {
-											logError(exception)
-										}
-								}
+
+										counter += 1
+
+										pressures["Synchronized"] := timestamp
+
+										db.changed("Tyres.Pressures.Distribution")
+										modified := true
+									}
+									catch Any as exception {
+										logError(exception)
+
+										if wasNull
+											pressures["Identifier"] := kNull
+									}
 							}
 							finally {
 								if modified

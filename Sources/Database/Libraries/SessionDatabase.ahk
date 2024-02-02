@@ -2107,7 +2107,7 @@ parseData(properties) {
 }
 
 synchronizeDrivers(groups, sessionDB, connector, simulators, timestamp, lastSynchronization, force, &counter) {
-	local ignore, simulator, db, modified, identifier, driver, drivers
+	local ignore, simulator, db, modified, identifier, driver, drivers, wasNull
 
 	for ignore, simulator in simulators {
 		simulator := sessionDB.getSimulatorCode(simulator)
@@ -2140,29 +2140,38 @@ synchronizeDrivers(groups, sessionDB, connector, simulators, timestamp, lastSync
 					}
 				}
 
-				for ignore, driver in db.query("Drivers", {Where: force ? {ID: sessionDB.ID} : {Synchronized: kNull, ID: sessionDB.ID} }) {
-					if (driver["Identifier"] = kNull)
-						driver["Identifier"] := createGUID()
+				for ignore, driver in db.query("Drivers", {Where: force ? {ID: sessionDB.ID} : {Synchronized: kNull, ID: sessionDB.ID} })
+					try {
+						if (driver["Identifier"] = kNull) {
+							wasNull := true
 
-					driver["Synchronized"] := timestamp
+							driver["Identifier"] := createGUID()
+						}
+						else
+							wasNull := false
 
-					db.changed("Drivers")
-					modified := true
-
-					if (connector.CountData("License", "Identifier = '" . driver["Identifier"] . "'") = 0)
-						try {
+						if (connector.CountData("License", "Identifier = '" . driver["Identifier"] . "'") = 0) {
 							connector.CreateData("License"
 											   , substituteVariables("Identifier=%Identifier%`nSimulator=%Simulator%`n"
 																   . "Driver=%Driver%`nForname=%Forname%`nSurname=%Surname%`nNickname=%Nickname%"
 																   , {Identifier: driver["Identifier"], Simulator: simulator
 																	, Driver: driver["ID"], Forname: driver["Forname"]
 																	, Surname: driver["Surname"], Nickname: driver["Nickname"]}))
+
 							counter += 1
 						}
-						catch Any as exception {
-							logError(exception)
-						}
-				}
+
+						driver["Synchronized"] := timestamp
+
+						db.changed("Drivers")
+						modified := true
+					}
+					catch Any as exception {
+						logError(exception)
+
+						if wasNull
+							driver["Identifier"] := kNull
+					}
 			}
 			finally {
 				if modified
@@ -2174,6 +2183,7 @@ synchronizeDrivers(groups, sessionDB, connector, simulators, timestamp, lastSync
 }
 
 synchronizeSetups(groups, sessionDB, connector, simulators, timestamp, lastSynchronization, force, &counter) {
+	local hasError := false
 	local start, lastRun, ignore, identifier, document, name, type, info, simulator, car, track, setup, size
 
 	if inList(groups, "Setups") {
@@ -2264,6 +2274,8 @@ synchronizeSetups(groups, sessionDB, connector, simulators, timestamp, lastSynch
 										}
 										catch Any as exception {
 											logError(exception)
+
+											hasError := true
 										}
 									}
 								}
@@ -2273,15 +2285,18 @@ synchronizeSetups(groups, sessionDB, connector, simulators, timestamp, lastSynch
 			}
 		}
 
-		info := readMultiMap(kDatabaseDirectory . "SYNCHRONIZE")
+		if !hasError {
+			info := readMultiMap(kDatabaseDirectory . "SYNCHRONIZE")
 
-		setMultiMapValue(info, "Setups", "Synchronization", start)
+			setMultiMapValue(info, "Setups", "Synchronization", start)
 
-		writeMultiMap(kDatabaseDirectory . "SYNCHRONIZE", info)
+			writeMultiMap(kDatabaseDirectory . "SYNCHRONIZE", info)
+		}
 	}
 }
 
 synchronizeStrategies(groups, sessionDB, connector, simulators, timestamp, lastSynchronization, force, &counter) {
+	local hasError := false
 	local start, lastRun, ignore, identifier, document, name, type, info, simulator, car, track, strategy
 	local directory, extension
 
@@ -2375,6 +2390,8 @@ synchronizeStrategies(groups, sessionDB, connector, simulators, timestamp, lastS
 										}
 										catch Any as exception {
 											logError(exception)
+
+											hasError := true
 										}
 									}
 								}
@@ -2385,11 +2402,13 @@ synchronizeStrategies(groups, sessionDB, connector, simulators, timestamp, lastS
 			}
 		}
 
-		info := readMultiMap(kDatabaseDirectory . "SYNCHRONIZE")
+		if !hasError {
+			info := readMultiMap(kDatabaseDirectory . "SYNCHRONIZE")
 
-		setMultiMapValue(info, "Strategies", "Synchronization", start)
+			setMultiMapValue(info, "Strategies", "Synchronization", start)
 
-		writeMultiMap(kDatabaseDirectory . "SYNCHRONIZE", info)
+			writeMultiMap(kDatabaseDirectory . "SYNCHRONIZE", info)
+		}
 	}
 }
 

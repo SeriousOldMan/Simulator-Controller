@@ -854,7 +854,7 @@ class ModulesStepWizard extends StepWizard {
 
 	updatePresetState() {
 		local info := false
-		local preset, selected, enable, ignore, candidate, info, html
+		local preset, selected, enable, ignore, candidate, info, html, class, arguments
 
 		this.Control["installPresetButton"].Enabled := false
 		this.Control["uninstallPresetButton"].Enabled := false

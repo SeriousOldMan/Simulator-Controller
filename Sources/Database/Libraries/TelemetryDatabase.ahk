@@ -556,7 +556,7 @@ synchronizeTelemetry(groups, sessionDB, connector, simulators, timestamp, lastSy
 	local lastSimulator := false
 	local lastCar := false
 	local lastTrack := false
-	local ignore, simulator, car, track, db, modified, identifier, telemetry, properties
+	local ignore, simulator, car, track, db, modified, identifier, telemetry, properties, wasNull
 
 	if inList(groups, "Telemetry")
 		try {
@@ -660,17 +660,17 @@ synchronizeTelemetry(groups, sessionDB, connector, simulators, timestamp, lastSy
 								modified := false
 
 								for ignore, telemetry in db.query("Electronics", {Where: force ? {Driver: sessionDB.ID}
-																							   : {Synchronized: kNull, Driver: sessionDB.ID} }) {
-									if (telemetry["Identifier"] = kNull)
-										telemetry["Identifier"] := createGUID()
+																							   : {Synchronized: kNull, Driver: sessionDB.ID} })
+									try {
+										if (telemetry["Identifier"] = kNull) {
+											telemetry["Identifier"] := createGUID()
 
-									telemetry["Synchronized"] := timestamp
+											wasNull := true
+										}
+										else
+											wasNull := false
 
-									db.changed("Electronics")
-									modified := true
-
-									if (connector.CountData("Electronics", "Identifier = '" . telemetry["Identifier"] . "'") = 0)
-										try {
+										if (connector.CountData("Electronics", "Identifier = '" . telemetry["Identifier"] . "'") = 0) {
 											connector.CreateData("Electronics"
 															   , substituteVariables("Identifier=%Identifier%`nDriver=%Driver%`n"
 																				   . "Simulator=%Simulator%`nCar=%Car%`nTrack=%Track%`n"
@@ -693,10 +693,18 @@ synchronizeTelemetry(groups, sessionDB, connector, simulators, timestamp, lastSy
 
 											counter += 1
 										}
-										catch Any as exception {
-											logError(exception)
-										}
-								}
+
+										telemetry["Synchronized"] := timestamp
+
+										db.changed("Electronics")
+										modified := true
+									}
+									catch Any as exception {
+										logError(exception)
+
+										if wasNull
+											telemetry["Identifier"] := kNull
+									}
 							}
 							finally {
 								if modified
@@ -710,17 +718,17 @@ synchronizeTelemetry(groups, sessionDB, connector, simulators, timestamp, lastSy
 								modified := false
 
 								for ignore, telemetry in db.query("Tyres", {Where: force ? {Driver: sessionDB.ID}
-																						 : {Synchronized: kNull, Driver: sessionDB.ID} }) {
-									if (telemetry["Identifier"] = kNull)
-										telemetry["Identifier"] := createGUID()
+																						 : {Synchronized: kNull, Driver: sessionDB.ID} })
+									try {
+										if (telemetry["Identifier"] = kNull) {
+											telemetry["Identifier"] := createGUID()
 
-									telemetry["Synchronized"] := timestamp
+											wasNull := true
+										}
+										else
+											wasNull := false
 
-									db.changed("Tyres")
-									modified := true
-
-									if (connector.CountData("Tyres", "Identifier = '" . telemetry["Identifier"] . "'") = 0)
-										try {
+										if (connector.CountData("Tyres", "Identifier = '" . telemetry["Identifier"] . "'") = 0) {
 											connector.CreateData("Tyres"
 															   , substituteVariables("Identifier=%Identifier%`nDriver=%Driver%`n"
 																				   . "Simulator=%Simulator%`nCar=%Car%`nTrack=%Track%`n"
@@ -762,10 +770,18 @@ synchronizeTelemetry(groups, sessionDB, connector, simulators, timestamp, lastSy
 
 											counter += 1
 										}
-										catch Any as exception {
-											logError(exception)
-										}
-								}
+
+										telemetry["Synchronized"] := timestamp
+
+										db.changed("Tyres")
+										modified := true
+									}
+									catch Any as exception {
+										logError(exception)
+
+										if wasNull
+											telemetry["Identifier"] := kNull
+									}
 							}
 							finally {
 								if modified

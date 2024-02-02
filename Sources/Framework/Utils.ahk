@@ -14,6 +14,7 @@
 #Include "Debug.ahk"
 #Include "MultiMap.ahk"
 #Include "Files.ahk"
+#Include "Startup.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -234,11 +235,16 @@ broadcastMessage(applications, message, arguments*) {
 
 }
 
-exitProcess() {
+exitProcess(urgent := false) {
+	global kGuardExit
+
+	if urgent
+		kGuardExit := false
+
 	ExitApp(0)
 }
 
-exitProcesses(title, message, silent := false, force := false, excludes := []) {
+exitProcesses(title, message, silent := false, force := false, excludes := [], urgent := false) {
 	local foregroundApps := kForegroundApps
 	local backgroundApps := kBackgroundApps
 	local pid, hasFGProcesses, hasBGProcesses, ignore, app, translator, msgResult, processes
@@ -295,13 +301,20 @@ exitProcesses(title, message, silent := false, force := false, excludes := []) {
 		}
 
 		if hasFGProcesses
-			if force
-				broadcastMessage(computeTargets(foregroundApps), "exitProcess")
+			if force {
+				if (urgent = "Kill")
+					doApplications(computeTargets(foregroundApps), ProcessClose)
+				else
+					broadcastMessage(computeTargets(foregroundApps), "exitProcess", urgent)
+			}
 			else
 				return false
 
 		if hasBGProcesses
-			broadcastMessage(computeTargets(backgroundApps), "exitProcess")
+			if (urgent = "Kill")
+				doApplications(computeTargets(foregroundApps), ProcessClose)
+			else
+				broadcastMessage(computeTargets(backgroundApps), "exitProcess", urgent)
 
 		return true
 	}

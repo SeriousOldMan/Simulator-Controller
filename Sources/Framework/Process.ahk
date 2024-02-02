@@ -25,7 +25,7 @@ startupProcess() {
 	local isCritical := Task.CriticalHandler
 
 	guardExit(*) {
-		if (isCritical() && !GetKeyState("Ctrl", "P")) {
+		if (isCritical() && kGuardExit && !GetKeyState("Ctrl", "P")) {
 			OnMessage(0x44, translateOkButton)
 			withBlockedWindows(MsgBox, translate("Please wait until all tasks have been finished."), StrSplit(A_ScriptName, ".")[1], 262192)
 			OnMessage(0x44, translateOkButton, 0)

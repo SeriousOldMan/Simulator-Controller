@@ -524,7 +524,7 @@ checkInstallation() {
 		}
 
 		if !exitProcesses("Installation", "Before you can run the update, you must first close all running Simulator Controller applications (not Simulator Tools)."
-						, false, true, ["Simulator Tools"])
+						, false, true, ["Simulator Tools"], true)
 			ExitApp(1)
 
 		options := {InstallType: getMultiMapValue(installInfo, "Install", "Type", "Registry")
@@ -634,7 +634,7 @@ checkInstallation() {
 
 			if !isNew
 				if !exitProcesses("Installation", "Before you can run the update, you must first close all running Simulator Controller applications (not Simulator Tools)."
-								, false, true, ["Simulator Tools"])
+								, false, true, ["Simulator Tools"], true)
 					ExitApp(1)
 
 			options := {InstallType: getMultiMapValue(installInfo, "Install", "Type", "Registry")
@@ -753,7 +753,7 @@ checkInstallation() {
 					logError(exception, true)
 
 					OnMessage(0x44, translateOkButton)
-					withBlockedWindows(MsgBox, translate("An error occured during installation. The current installation files may be corrupted. Please retry the installation or run a manual installation."), translate("Error"), 262160)
+					withBlockedWindows(MsgBox, translate("An error occured during installation. The current installation files may be corrupted. Please retry the installation or run a manual installation."), translate("Error"), 262160)
 					OnMessage(0x44, translateOkButton, 0)
 
 					ExitApp(0)
@@ -902,7 +902,21 @@ copyDirectory(source, destination, progressStep, &count) {
 				copyDirectory(fileName, destination . "\" . subDirectory, progressStep, &count)
 			}
 			else
-				FileCopy(fileName, destination, 1)
+				loop 5
+					try {
+						FileCopy(fileName, destination, 1)
+
+						break
+					}
+					catch Any as exception {
+						if (A_Index < 5) {
+							exitProcesses("", "", true, true, ["Simulator Tools"], (A_Index > 3) ? "Kill" : true)
+
+							Sleep(5000)
+						}
+						else
+							throw exception
+					}
 		}
 	}
 }

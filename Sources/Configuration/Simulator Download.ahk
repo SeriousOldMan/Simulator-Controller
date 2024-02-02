@@ -54,7 +54,7 @@ downloadSimulatorController() {
 
 	exitOthers() {
 		loop 20
-			if exitProcesses("", "", true, true, ["Simulator Download"])
+			if exitProcesses("", "", true, true, ["Simulator Download"], true)
 				break
 			else
 				Sleep(1000)

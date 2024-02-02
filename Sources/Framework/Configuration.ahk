@@ -875,26 +875,26 @@ class Plugin extends ConfigurationItem {
 
 				for key, value in this.Arguments
 					arguments[key] := value
-
-				result := []
-
-				for argument, values in arguments
-					if (values == "")
-						result.Push(argument)
-					else
-						result.Push(argument . ": " . values)
-
-				arguments := values2String("; ", result*)
 			}
 			else
-				arguments := this.Arguments[true]
+				arguments := this.Arguments.Clone()
+
+			for ignore, argument in excludes
+				if arguments.Has(argument)
+					arguments.Delete(argument)
+
+			result := []
+
+			for argument, values in arguments
+				if (values == "")
+					result.Push(argument)
+				else
+					result.Push(argument . ": " . values)
+
+			arguments := values2String("; ", result*)
 		}
 		else
 			arguments := this.Arguments[true]
-
-		for ignore, argument in excludes
-			if arguments.Has(argument)
-				arguments.Delete(argument)
 
 		setMultiMapValue(configuration, "Plugins", this.Plugin, (this.Active ? kTrue : kFalse) . "|" . values2String(", ", this.Simulators*) . "|" . arguments)
 	}

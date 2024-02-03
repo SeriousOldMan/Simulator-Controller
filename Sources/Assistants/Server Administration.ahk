@@ -523,7 +523,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 					result := withBlockedWindows(InputBox, translate("Please enter the amount of available minutes:"), translate("Team Server"), "w200 h150", account["AvailableMinutes"])
 
 					if (result.Result = "Ok") {
-						connector.SetAccountMinutes(account.Identifier, result.Value)
+						connector.SetAccountMinutes(account["Identifier"], result.Value)
 
 						accounts := loadAccounts(connector, accountsListView)
 

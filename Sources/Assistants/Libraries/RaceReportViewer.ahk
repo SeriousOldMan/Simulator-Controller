@@ -440,7 +440,7 @@ class RaceReportViewer extends RaceReportReader {
 				if inList(carClasses, rowClasses[A_Index]) {
 					row := rows[A_Index]
 
-					if hasClasses
+					if (hasClasses && classResults.Has(A_Index))
 						row[8] := classResults[A_Index]
 
 					if hasDNF {

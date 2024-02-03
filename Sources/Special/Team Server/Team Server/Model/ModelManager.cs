@@ -79,8 +79,10 @@ namespace TeamServer.Model {
             result["Stints"] = objectManager.GetCount(typeof(Stint));
             result["Laps"] = objectManager.GetCount(typeof(Lap));
 
+            result["Documents"] = objectManager.GetCount(typeof(Data.Document));
             result["Attributes"] = objectManager.GetCount(typeof(Attribute));
-            result["Licenses"] = objectManager.GetCount(typeof(Data.Document));
+
+            result["Licenses"] = objectManager.GetCount(typeof(Data.License));
             result["Electronics"] = objectManager.GetCount(typeof(Data.Electronics));
             result["Tyres"] = objectManager.GetCount(typeof(Data.Tyres));
             result["Brakes"] = objectManager.GetCount(typeof(Data.Brakes));

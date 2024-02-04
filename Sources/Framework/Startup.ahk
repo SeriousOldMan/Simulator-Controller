@@ -76,7 +76,9 @@ loadSimulatorConfiguration() {
 		return true
 	}
 
-	kSimulatorConfiguration := readMultiMap(kSimulatorConfigurationFile)
+	kSimulatorConfiguration := readMultiMap(kConfigDirectory . "Simulator Configuration.ini")
+
+	addMultiMapValues(kSimulatorConfiguration, readMultiMap(kSimulatorConfigurationFile))
 
 	if !FileExist(getFileName(kSimulatorConfigurationFile, kUserConfigDirectory))
 		setLanguage(getSystemLanguage())

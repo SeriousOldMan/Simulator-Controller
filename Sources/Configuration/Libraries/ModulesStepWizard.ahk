@@ -517,6 +517,8 @@ class SetupPatch extends NamedPreset {
 }
 
 class DownloadablePreset extends NamedPreset {
+	iWizard := false
+
 	iURL := false
 	iDefnition := false
 
@@ -524,6 +526,12 @@ class DownloadablePreset extends NamedPreset {
 	iClosed := false
 
 	iObjectsListView := false
+
+	Wizard {
+		Get {
+			return this.iWizard
+		}
+	}
 
 	Installable {
 		Get {
@@ -540,6 +548,10 @@ class DownloadablePreset extends NamedPreset {
 	Definition {
 		Get {
 			return this.iDefinition
+		}
+
+		Set {
+			return (this.iDefinition := value)
 		}
 	}
 
@@ -618,9 +630,11 @@ class DownloadablePreset extends NamedPreset {
 		local window := false
 		local x, y, w, h
 
+		this.iWizard := wizard
+		this.iClosed := false
+
 		try {
-			this.iClosed := false
-			this.iDefinition := this.loadDefinition(this.URL)
+			this.Definition := this.loadDefinition(this.URL)
 
 			this.createGui(this.Definition)
 
@@ -673,9 +687,22 @@ class DownloadablePreset extends NamedPreset {
 		local installed := this.installedObjects()
 		local ignore, object
 
-		for ignore, object in this.availableObjects()
-			if ((name = this.objectName(object)) && !inList(installed, object))
-				this.installObject(object)
+		try {
+			for ignore, object in this.availableObjects()
+				if ((name = this.objectName(object)) && !inList(installed, object))
+					this.installObject(object)
+		}
+		catch Any as exception {
+			logError(exception, true)
+
+			loop this.ObjectsListView.GetCount()
+				if (this.ObjectsListView.GetText(A_Index) = name)
+					this.ObjectsListView.Modify(A_Index, "-Check")
+
+			OnMessage(0x44, translateOkButton)
+			withBlockedWindows(MsgBox, translate("The download repository is currently unavailable. Please try again later."), translate("Error"), 262160)
+			OnMessage(0x44, translateOkButton, 0)
+		}
 	}
 
 	uninstall(name) {
@@ -718,7 +745,7 @@ class DownloadablePreset extends NamedPreset {
 class AssettoCorsaCarMetas extends DownloadablePreset {
 	loadDefinition(url) {
 		if (Trim(url) != "") {
-			deleteFile(A_Temp . "\Simulator Controller.zip")
+			deleteFile(A_Temp . "\Simulator Controller DLC.zip")
 
 			Download(url, A_Temp . "\Simulator Controller DLC.zip")
 
@@ -733,7 +760,7 @@ class AssettoCorsaCarMetas extends DownloadablePreset {
 	}
 
 	className() {
-		return translate("Car")
+		return translate("Cars")
 	}
 
 	availableObjects() {
@@ -797,6 +824,100 @@ class AssettoCorsaCarMetas extends DownloadablePreset {
 
 		deleteFile(kUserHomeDirectory . "Garage\Definitions\Cars\" . getMultiMapValue(this.Definition, car, "Definition"))
 		deleteFile(kUserHomeDirectory . "Garage\Rules\Cars\" . getMultiMapValue(this.Definition, car, "Rules"))
+	}
+}
+
+class SplashMedia extends DownloadablePreset {
+	loadDefinition(url) {
+		return false
+	}
+
+	loadMedia() {
+		local url := this.URL
+
+		if (Trim(url) != "") {
+			deleteFile(A_Temp . "\Simulator Controller.zip")
+
+			Download(url, A_Temp . "\Simulator Controller DLC.zip")
+
+			deleteDirectory(A_Temp . "\Simulator Controller DLC")
+
+			DirCreate(A_Temp . "\Simulator Controller DLC")
+
+			RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\Simulator Controller DLC.zip' -DestinationPath '" . A_Temp . "\Simulator Controller DLC' -Force", , "Hide")
+		}
+msgbox "Here"
+		if FileExist(A_Temp . "\Simulator Controller DLC\Splash Media.ini") {
+			this.Definition := readMultiMap(A_Temp . "\Simulator Controller DLC\Splash Media.ini")
+
+			return true
+		}
+		else
+			return false
+	}
+
+	className() {
+		return translate("Splash Screens")
+	}
+
+	availableObjects() {
+		return ["Blancpain GT3 Pictures", "Blancpain GT3 Video", "McLaren 720s GT3 Pictures"]
+	}
+
+	installedObjects() {
+		return getAllSplashScreens(readMultiMap(kSimulatorConfigurationFile))
+	}
+
+	installObject(splashScreen) {
+		local configuration, key, value, type
+
+		if (this.Definition || this.loadMedia()) {
+			configuration := readMultiMap(kSimulatorConfigurationFile)
+
+			for key, value in getMultiMapValues(this.Definition, "Splash Screens")
+				if (InStr(key, splashScreen) = 1)
+					setMultiMapValue(configuration, "Splash Screens", key, value)
+
+			writeMultiMap(kSimulatorConfigurationFile, configuration)
+
+			type := FileExist(kUserHomeDirectory . "Splash Media\" . splashScreen)
+
+			if InStr(type, "D")
+				deleteDirectory(kUserHomeDirectory . "Splash Media\" . splashScreen)
+			else if type
+				deleteFile(kUserHomeDirectory . "Splash Media\" . splashScreen)
+
+			type := FileExist(A_Temp . "\Simulator Controller DLC\" . splashScreen)
+
+			if InStr(type, "D")
+				DirCopy(A_Temp . "\Simulator Controller DLC\" . splashScreen
+					  , kUserHomeDirectory . "Splash Media\" . splashScreen, 1)
+			else if type
+				FileCopy(A_Temp . "\Simulator Controller DLC\" . splashScreen
+					   , kUserHomeDirectory . "Splash Media", 1)
+		}
+	}
+
+	uninstallObject(splashScreen) {
+		local configuration := readMultiMap(kSimulatorConfigurationFile)
+		local keys := []
+		local key, value, type
+
+		for key, value in getMultiMapValues(configuration, "Splash Screens")
+			if (InStr(key, splashScreen) = 1)
+				keys.Push(key)
+
+		for ignore, key in keys
+			removeMultiMapValue(configuration, "Splash Screens", key)
+
+		writeMultiMap(kSimulatorConfigurationFile, configuration)
+
+		type := FileExist(kUserHomeDirectory . "Splash Media\" . splashScreen)
+
+		if InStr(type, "D")
+			deleteDirectory(kUserHomeDirectory . "Splash Media\" . splashScreen)
+		else if type
+			deleteFile(kUserHomeDirectory . "Splash Media\" . splashScreen)
 	}
 }
 

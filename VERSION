@@ -3,7 +3,7 @@ Version=5.5.7.0-dev
 Target=5.5.7.0-release
 Date=02/04/2024
 Download=
-Changes=Increased resilience against corrupted data in "Database Synchronizer", Downloadable components in "Simulator Setup", Small fixes in the objects list of the Team Server, Fixed manual available minutes update in "Server Administration", Fixed adding a new Server URL in team server tab in "Simulator Configuration", Fixed duplicate object creation in session database rebuild
+Changes=Increased resilience against corrupted data in "Database Synchronizer", Downloadable components in "Simulator Setup", Added AC car meta DLC, Added Splash Media DLC, Small fixes in the objects list of the Team Server, Fixed manual available minutes update in "Server Administration", Fixed adding a new Server URL in team server tab in "Simulator Configuration", Fixed duplicate object creation in session database rebuild
 Components=Media->5.3.0,Configuration->5.5.3,Utilities->5.4.8
 [Release]
 Version=5.5.6.0-release

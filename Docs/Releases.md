@@ -7,6 +7,7 @@
   5. When a session database is being rebuild by the "Database Synchronizer", no more duplicate objects are created on the Team Server.
   6. The "Database Synchronizer" has become much more resilient against corrupted data in the local database.
   7. Downloadable components are now available as presets in "Simulator Setup". The first DLC let you download car meta data for "Setup Workbench" for non-standard cars in *Assetto Corsa*. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#presets--special-configurations) for more information how to use the DLCs.
+  8. Many car meta data for *Assetto Corsa* has been corrected to not longer provide ABS settings, if these are not part of the *Factory* definition.
   
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-557), if you are running your own Team Server.
 

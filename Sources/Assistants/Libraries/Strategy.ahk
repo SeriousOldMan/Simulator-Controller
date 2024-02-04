@@ -3040,7 +3040,7 @@ class Strategy extends ConfigurationItem {
 		if ((pitstopNr = 1) && ((!pitstopRule && (targetLap < remainingSessionLaps)) || isNumber(pitstopRule))
 							&& (targetLap > (currentLap + 1)) && !adjusted) {
 			if ((Abs(this.FirstStintWeight) >= 5)
-			 && (this.getSessionLaps() < (this.getMaxFuelLaps(this.FuelCapacity, this.FuelConsumption[true]) * 2))) {
+			 && (this.getSessionLaps() < (this.getMaxFuelLaps(this.FuelCapacity, this.FuelConsumption[true]) * 2 * 0.9))) {
 				halfLaps := ((targetLap - currentLap) / 2)
 
 				if (halfLaps != 0) {
@@ -3374,7 +3374,7 @@ class Strategy extends ConfigurationItem {
 			else {
 				fullLaps := this.getMaxFuelLaps(this.FuelCapacity, this.FuelConsumption[true])
 
-				if ((Abs(this.FirstStintWeight) >= 5) && (this.getSessionLaps() > (fullLaps * 2))) {
+				if ((Abs(this.FirstStintWeight) >= 5) && (this.getSessionLaps() > ((fullLaps * 2 * 0.9)))) {
 					halfLaps := (Min(remainingSessionLaps, fullLaps) / 2)
 					stintLaps := Floor(Max((remainingSessionLaps - (this.FuelCapacity / this.FuelConsumption[true]))
 										 , Round(halfLaps + ((halfLaps / 100) * this.FirstStintWeight))))

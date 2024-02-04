@@ -674,7 +674,7 @@ synchronizeTyresPressures(groups, sessionDB, connector, simulators, timestamp, l
 										else
 											wasNull := false
 
-										if (connector.CountData("TyresPressures", "Identifier = '" . pressures["Identifier"] . "'") = 0) {
+										if (connector.CountData("TyresPressures", "Identifier = '" . StrLower(pressures["Identifier"]) . "'") = 0) {
 											connector.CreateData("TyresPressures"
 															   , substituteVariables("Identifier=%Identifier%`nDriver=%Driver%`n"
 																				   . "Simulator=%Simulator%`nCar=%Car%`nTrack=%Track%`n"
@@ -689,7 +689,7 @@ synchronizeTyresPressures(groups, sessionDB, connector, simulators, timestamp, l
 																				   . "ColdPressureFrontRight=%ColdPressureFrontRight%`n"
 																				   . "ColdPressureRearLeft=%ColdPressureRearLeft%`n"
 																				   . "ColdPressureRearRight=%ColdPressureRearRight%"
-																				   , {Identifier: pressures["Identifier"], Driver: pressures["Driver"]
+																				   , {Identifier: StrLower(pressures["Identifier"]), Driver: pressures["Driver"]
 																					, Simulator: simulator, Car: car, Track: track
 																					, Weather: pressures["Weather"]
 																					, AirTemperature: pressures["Temperature.Air"]
@@ -746,14 +746,14 @@ synchronizeTyresPressures(groups, sessionDB, connector, simulators, timestamp, l
 											wasNull := false
 										}
 
-										if (connector.CountData("TyresPressuresDistribution", "Identifier = '" . identifier . "'") = 0)
+										if (connector.CountData("TyresPressuresDistribution", "Identifier = '" . StrLower(identifier) . "'") = 0)
 											identifier := false
 
 										properties := substituteVariables("Identifier=%Identifier%`nDriver=%Driver%`nSimulator=%Simulator%`nCar=%Car%`nTrack=%Track%`n"
 																		. "Weather=%Weather%`nAirTemperature=%AirTemperature%`nTrackTemperature=%TrackTemperature%`n"
 																		. "TyreCompound=%TyreCompound%`nTyreCompoundColor=%TyreCompoundColor%`n"
 																		. "Type=%Type%`nTyre=%Tyre%`nPressure=%Pressure%`nCount=%Count%"
-																		, {Identifier: pressures["Identifier"], Driver: pressures["Driver"]
+																		, {Identifier: StrLower(pressures["Identifier"]), Driver: pressures["Driver"]
 																		 , Simulator: simulator, Car: car, Track: track
 																		 , Weather: pressures["Weather"]
 																		 , AirTemperature: pressures["Temperature.Air"], TrackTemperature: pressures["Temperature.Track"]

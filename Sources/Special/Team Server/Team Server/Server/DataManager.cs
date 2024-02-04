@@ -114,7 +114,7 @@ namespace TeamServer.Server
 			if (where.Length == 0)
 				return "AccountID = '" + Token.AccountID + "'";
 			else
-				return "AccountID = '" + Token.AccountID + "' And " + where;
+				return "AccountID = '" + Token.AccountID + "' And " + where + " COLLATE NOCASE";
         }
 
         public string GetDataValue(CarObject carObject, string name)

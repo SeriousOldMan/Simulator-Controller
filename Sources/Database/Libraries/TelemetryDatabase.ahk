@@ -670,7 +670,7 @@ synchronizeTelemetry(groups, sessionDB, connector, simulators, timestamp, lastSy
 										else
 											wasNull := false
 
-										if (connector.CountData("Electronics", "Identifier = '" . telemetry["Identifier"] . "'") = 0) {
+										if (connector.CountData("Electronics", "Identifier = '" . StrLower(telemetry["Identifier"]) . "'") = 0) {
 											connector.CreateData("Electronics"
 															   , substituteVariables("Identifier=%Identifier%`nDriver=%Driver%`n"
 																				   . "Simulator=%Simulator%`nCar=%Car%`nTrack=%Track%`n"
@@ -679,7 +679,7 @@ synchronizeTelemetry(groups, sessionDB, connector, simulators, timestamp, lastSy
 																				   . "TyreCompound=%TyreCompound%`nTyreCompoundColor=%TyreCompoundColor%`n"
 																				   . "FuelRemaining=%FuelRemaining%`nFuelConsumption=%FuelConsumption%`n"
 																				   . "LapTime=%LapTime%`nMap=%Map%`nTC=%TC%`nABS=%ABS%"
-																				   , {Identifier: telemetry["Identifier"], Driver: telemetry["Driver"]
+																				   , {Identifier: StrLower(telemetry["Identifier"]), Driver: telemetry["Driver"]
 																					, Simulator: simulator, Car: car, Track: track
 																					, Weather: telemetry["Weather"]
 																					, AirTemperature: telemetry["Temperature.Air"]
@@ -728,7 +728,7 @@ synchronizeTelemetry(groups, sessionDB, connector, simulators, timestamp, lastSy
 										else
 											wasNull := false
 
-										if (connector.CountData("Tyres", "Identifier = '" . telemetry["Identifier"] . "'") = 0) {
+										if (connector.CountData("Tyres", "Identifier = '" . StrLower(telemetry["Identifier"]) . "'") = 0) {
 											connector.CreateData("Tyres"
 															   , substituteVariables("Identifier=%Identifier%`nDriver=%Driver%`n"
 																				   . "Simulator=%Simulator%`nCar=%Car%`nTrack=%Track%`n"
@@ -745,7 +745,7 @@ synchronizeTelemetry(groups, sessionDB, connector, simulators, timestamp, lastSy
 																				   . "TemperatureRearRight=%TemperatureRearRight%`n"
 																				   . "WearFrontLeft=%WearFrontLeft%`nWearFrontRight=%WearFrontRight%`n"
 																				   . "WearRearLeft=%WearRearLeft%`nWearRearRight=%WearRearRight%"
-																				   , {Identifier: telemetry["Identifier"], Driver: telemetry["Driver"]
+																				   , {Identifier: StrLower(telemetry["Identifier"]), Driver: telemetry["Driver"]
 																					, Simulator: simulator, Car: car, Track: track
 																					, Weather: telemetry["Weather"]
 																					, AirTemperature: telemetry["Temperature.Air"]

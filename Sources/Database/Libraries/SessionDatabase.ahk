@@ -2150,11 +2150,11 @@ synchronizeDrivers(groups, sessionDB, connector, simulators, timestamp, lastSync
 						else
 							wasNull := false
 
-						if (connector.CountData("License", "Identifier = '" . driver["Identifier"] . "'") = 0) {
+						if (connector.CountData("License", "Identifier = '" . StrLower(driver["Identifier"]) . "'") = 0) {
 							connector.CreateData("License"
 											   , substituteVariables("Identifier=%Identifier%`nSimulator=%Simulator%`n"
 																   . "Driver=%Driver%`nForname=%Forname%`nSurname=%Surname%`nNickname=%Nickname%"
-																   , {Identifier: driver["Identifier"], Simulator: simulator
+																   , {Identifier: StrLower(driver["Identifier"]), Simulator: simulator
 																	, Driver: driver["ID"], Forname: driver["Forname"]
 																	, Surname: driver["Surname"], Nickname: driver["Nickname"]}))
 
@@ -2250,7 +2250,7 @@ synchronizeSetups(groups, sessionDB, connector, simulators, timestamp, lastSynch
 																  , getMultiMapValue(info, "Setup", "Name"))
 
 									if (setup && (size > 0)) {
-										identifier := getMultiMapValue(info, "Setup", "Identifier")
+										identifier := StrLower(getMultiMapValue(info, "Setup", "Identifier"))
 
 										try {
 											if (connector.CountData("Document", "Identifier = '" . identifier . "'") = 0)
@@ -2365,7 +2365,7 @@ synchronizeStrategies(groups, sessionDB, connector, simulators, timestamp, lastS
 									strategy := readMultiMap(directory . getMultiMapValue(info, "Strategy", "Name"))
 
 									if (strategy.Count > 0) {
-										identifier := getMultiMapValue(info, "Strategy", "Identifier", false)
+										identifier := StrLower(getMultiMapValue(info, "Strategy", "Identifier", false))
 
 										try {
 											if (connector.CountData("Document", "Identifier = '" . identifier . "'") = 0)

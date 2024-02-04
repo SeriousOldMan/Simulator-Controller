@@ -619,7 +619,7 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 
 					writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 
-					this.Control["teamServerURLEdit"].Delete
+					this.Control["teamServerURLEdit"].Delete()
 					this.Control["teamServerURLEdit"].Add(serverURLs)
 					this.Control["teamServerURLEdit"].Choose(serverURLs.Length)
 				}

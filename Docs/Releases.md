@@ -1,3 +1,15 @@
+## 5.5.7.0-release 02/09/24 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. Fixed entering available minutes manually in "Server Administration".
+  3. The list of server objects has been extended in the "Server Administration" application.
+  4. The Server URL drop down list does not jump to the first entry anymore, when a previously unknown URL has been entered.
+  5. When a session database is being rebuild by the "Database Synchronizer", no more duplicate objects are created on the Team Server.
+  6. The "Database Synchronizer" has become much more resilient against corrupted data in the local database.
+  7. Downloadable components are now available as presets in "Simulator Setup". The first DLC let you download car meta data for "Setup Workbench" for non-standard cars in *Assetto Corsa*. See the [revised documentation](*) for more information how to use the DLCs.
+  
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-557), if you are running your own Team Server.
+
 ## 5.5.6.0-release 02/02/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

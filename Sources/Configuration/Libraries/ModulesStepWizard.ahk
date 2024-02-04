@@ -595,7 +595,7 @@ class DownloadablePreset extends NamedPreset {
 
 		dlcGui.SetFont("Norm", "Arial")
 
-		dlcGui.Add("Documentation", "x108 YP+20 w88 H:Center Center", translate("DLC Manager")
+		dlcGui.Add("Documentation", "x58 YP+20 w188 H:Center Center", translate("Downloadable Components")
 						 , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#presets--special-configurations")
 
 		dlcGui.SetFont("Norm", "Arial")
@@ -615,33 +615,43 @@ class DownloadablePreset extends NamedPreset {
 	}
 
 	edit(wizard) {
-		local window, x, y, w, h
-
-		this.iClosed := false
-		this.iDefinition := this.loadDefinition(this.URL)
-
-		this.createGui(this.Definition)
-
-		wizard.Window.Block()
+		local window := false
+		local x, y, w, h
 
 		try {
+			this.iClosed := false
+			this.iDefinition := this.loadDefinition(this.URL)
+
+			this.createGui(this.Definition)
+
 			window := this.Window
 
-			window.Opt("+Owner" . wizard.Window.Hwnd)
+			wizard.Window.Block()
 
-			if getWindowPosition("DLC Manager", &x, &y)
-				window.Show("x" . x . " y" . y)
-			else
-				window.Show()
+			try {
+				window.Opt("+Owner" . wizard.Window.Hwnd)
 
-			loop
-				Sleep(200)
-			until this.iClosed
+				if getWindowPosition("DLC Manager", &x, &y)
+					window.Show("x" . x . " y" . y)
+				else
+					window.Show()
 
-			window.Destroy()
+				loop
+					Sleep(200)
+				until this.iClosed
+			}
+			finally {
+				window.Destroy()
+
+				wizard.Window.Unblock()
+			}
 		}
-		finally {
-			wizard.Window.Unblock()
+		catch Any as exception {
+			logError(exception, true)
+
+			OnMessage(0x44, translateOkButton)
+			withBlockedWindows(MsgBox, translate("The download repository is currently unavailable. Please try again later."), translate("Error"), 262160)
+			OnMessage(0x44, translateOkButton, 0)
 		}
 	}
 

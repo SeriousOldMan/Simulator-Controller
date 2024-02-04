@@ -416,7 +416,7 @@ checkInstallation() {
 
 		if error {
 			OnMessage(0x44, translateOkButton)
-			withBlockedWindows(MsgBox, translate("Cannot download additional files, because the version repository is currently unavailable. Please start `"Simulator Download`" again later."), translate("Error"), 262160)
+			withBlockedWindows(MsgBox, translate("Cannot download additional files, because the download repository is currently unavailable. Please start `"Simulator Download`" again later."), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
 		}
 

@@ -184,6 +184,10 @@ Replace *X* with the number of the page you want to jump to on startup. As an al
 
 You will also find a couple of packages in the list of available presets for the so called search images, which are used by Simulator Controller to *understand* the state and available option in the Pitstop MFD *RaceRoom Racing Experience*. Detailed instructions for these search images can be found in the documentation for the [*RaceRoom Racing Experience* plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#important-preparation-for-the-pitstop-mfd-handling-1). The same applies here: If you don't find your specific language and/or screen resolution here, start with one which fits best and apply your changes afterwards.
 
+Most presets must simply be moved to the right list to become active. But there are also presets, that require you to give additional information. These presets must be double-clicked to open up an additional window, which let you choose more preset specific options, like the preset for downloadable meta data for additional cars in *Assetto Corsa*:
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Setup%204.JPG)
+
 And last but not least, some very special configuration options are provided that cannot otherwise be created using the Setup Wizard. Although you can use "Simulator Configuration", the low level configuration tool, to achieve the same results, it requires a lot of knowledge about the inner workings of Simulator Controller.
 
 Please note, that you can remove presets later on. But depending on the type of the preset, the side effects will still remain, since you might have changed the underlying configuration in the meantime, for example a specific Button Box configuration.

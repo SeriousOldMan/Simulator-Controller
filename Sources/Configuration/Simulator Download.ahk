@@ -119,7 +119,7 @@ downloadSimulatorController() {
 		logError(exception, true)
 
 		OnMessage(0x44, translateOkButton)
-		withBlockedWindows(MsgBox, translate("The version repository is currently unavailable. Please try again later."), translate("Error"), 262160)
+		withBlockedWindows(MsgBox, translate("The download repository is currently unavailable. Please try again later."), translate("Error"), 262160)
 		OnMessage(0x44, translateOkButton, 0)
 
 		ExitApp(0)
@@ -160,7 +160,7 @@ downloadSimulatorController() {
 				logError(error, true)
 
 				OnMessage(0x44, translateOkButton)
-				withBlockedWindows(MsgBox, translate("The version repository is currently unavailable. Please try again later."), translate("Error"), 262160)
+				withBlockedWindows(MsgBox, translate("The download repository is currently unavailable. Please try again later."), translate("Error"), 262160)
 				OnMessage(0x44, translateOkButton, 0)
 
 				ExitApp(0)
@@ -185,7 +185,7 @@ downloadSimulatorController() {
 				logError(exception, true)
 
 				OnMessage(0x44, translateOkButton)
-				withBlockedWindows(MsgBox, translate("The version repository is currently unavailable. Please try again later."), translate("Error"), 262160)
+				withBlockedWindows(MsgBox, translate("The download repository is currently unavailable. Please try again later."), translate("Error"), 262160)
 				OnMessage(0x44, translateOkButton, 0)
 
 				ExitApp(0)
@@ -227,7 +227,7 @@ downloadSimulatorController() {
 			}
 			else {
 				OnMessage(0x44, translateOkButton)
-				withBlockedWindows(MsgBox, translate("The version repository is currently unavailable. Please try again later."), translate("Error"), 262160)
+				withBlockedWindows(MsgBox, translate("The download repository is currently unavailable. Please try again later."), translate("Error"), 262160)
 				OnMessage(0x44, translateOkButton, 0)
 
 				ExitApp(0)

@@ -6,7 +6,7 @@
   4. The Server URL drop down list does not jump to the first entry anymore, when a previously unknown URL has been entered.
   5. When a session database is being rebuild by the "Database Synchronizer", no more duplicate objects are created on the Team Server.
   6. The "Database Synchronizer" has become much more resilient against corrupted data in the local database.
-  7. Downloadable components are now available as presets in "Simulator Setup". The first DLC let you download car meta data for "Setup Workbench" for non-standard cars in *Assetto Corsa*. See the [revised documentation](*) for more information how to use the DLCs.
+  7. Downloadable components are now available as presets in "Simulator Setup". The first DLC let you download car meta data for "Setup Workbench" for non-standard cars in *Assetto Corsa*. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#presets--special-configurations) for more information how to use the DLCs.
   
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-557), if you are running your own Team Server.
 

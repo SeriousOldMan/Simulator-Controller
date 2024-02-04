@@ -516,14 +516,14 @@ class SetupPatch extends NamedPreset {
 	}
 }
 
-class InstallDLC extends NamedPreset {
+class DownloadablePreset extends NamedPreset {
 	iURL := false
+	iDefnition := false
 
-	URL {
-		Get {
-			return this.iURL
-		}
-	}
+	iWindow := false
+	iClosed := false
+
+	iObjectsListView := false
 
 	Installable {
 		Get {
@@ -531,10 +531,262 @@ class InstallDLC extends NamedPreset {
 		}
 	}
 
-	__New(name, url) {
-		super.__New(name)
+	URL {
+		Get {
+			return this.iURL
+		}
+	}
 
-		this.iURL := substituteVariables(url)
+	Definition {
+		Get {
+			return this.iDefinition
+		}
+	}
+
+	Window {
+		Get {
+			return this.iWindow
+		}
+	}
+
+	ObjectsListView {
+		Get {
+			return this.iObjectsListView
+		}
+
+		Set {
+			return (this.iObjectsListView := value)
+		}
+	}
+
+	__New(name, url) {
+		this.iURL := url
+
+		super.__New(name)
+	}
+
+	createGui(definition) {
+		local choices, chosen, code, language, languageName, isoCode
+		local dlcGui
+
+		noSelect(listView, *) {
+			loop listView.GetCount()
+				listView.Modify(A_Index, "-Select")
+		}
+
+		close(*) {
+			this.iClosed := true
+		}
+
+		chooseObject(listView, line, checked) {
+			if checked
+				this.install(listView.GetText(line))
+			else
+				this.uninstall(listView.GetText(line))
+		}
+
+		dlcGui := Window({Descriptor: "DLC Manager", Options: "0x400000"}, "")
+
+		this.iWindow := dlcGui
+
+		dlcGui.SetFont("Bold", "Arial")
+
+		dlcGui.Add("Text", "w288 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(dlcGui, "DLC Manager"))
+
+		dlcGui.SetFont("Norm", "Arial")
+
+		dlcGui.Add("Documentation", "x108 YP+20 w88 H:Center Center", translate("DLC Manager")
+						 , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#presets--special-configurations")
+
+		dlcGui.SetFont("Norm", "Arial")
+
+		dlcGui.Add("Text", "x8 y+10 w294 W:Grow 0x10")
+
+		this.iObjectsListView := dlcGui.Add("ListView", "x16 y+10 w277 h340 W:Grow H:Grow -Multi -LV0x10 Checked AltSubmit NoSort NoSortHdr", collect([this.className()], translate))
+		this.iObjectsListView.OnEvent("Click", noSelect)
+		this.iObjectsListView.OnEvent("DoubleClick", noSelect)
+		this.iObjectsListView.OnEvent("ItemCheck", chooseObject)
+
+		dlcGui.Add("Text", "x8 y+10 w294 W:Grow 0x10")
+
+		dlcGui.Add("Button", "x118 yp+10 w80 h23 Default", translate("Close")).OnEvent("Click", close)
+
+		this.loadObjects()
+	}
+
+	edit(wizard) {
+		local window, x, y, w, h
+
+		this.iClosed := false
+		this.iDefinition := this.loadDefinition(this.URL)
+
+		this.createGui(this.Definition)
+
+		wizard.Window.Block()
+
+		try {
+			window := this.Window
+
+			window.Opt("+Owner" . wizard.Window.Hwnd)
+
+			if getWindowPosition("DLC Manager", &x, &y)
+				window.Show("x" . x . " y" . y)
+			else
+				window.Show()
+
+			loop
+				Sleep(200)
+			until this.iClosed
+
+			window.Destroy()
+		}
+		finally {
+			wizard.Window.Unblock()
+		}
+	}
+
+	loadDefinition(url) {
+		throw "Virtual method DownloadablePreset.loadDefinition must be implemented in a subclass..."
+	}
+
+	loadObjects() {
+		local installed := this.installedObjects()
+		local ignore, object
+
+		this.ObjectsListView.Delete()
+
+		for ignore, object in this.availableObjects()
+			this.ObjectsListView.Add(inList(installed, this.objectName(object)) ? "Check" : "", this.objectName(object))
+	}
+
+	install(name) {
+		local installed := this.installedObjects()
+		local ignore, object
+
+		for ignore, object in this.availableObjects()
+			if ((name = this.objectName(object)) && !inList(installed, object))
+				this.installObject(object)
+	}
+
+	uninstall(name) {
+		local installed := this.installedObjects()
+		local ignore, object
+
+		for ignore, object in this.availableObjects()
+			if ((name = this.objectName(object)) && inList(installed, object))
+				this.uninstallObject(object)
+	}
+
+	className() {
+		return translate("Object")
+	}
+
+	objectName(object) {
+		if this.Definition
+			return getMultiMapValue(this.Definition, object, "Name", object)
+		else
+			return Object
+	}
+
+	availableObjects() {
+		throw "Virtual method DownloadablePreset.availableObjects must be implemented in a subclass..."
+	}
+
+	installedObjects() {
+		throw "Virtual method DownloadablePreset.installedObjects must be implemented in a subclass..."
+	}
+
+	installObject(object) {
+		throw "Virtual method DownloadablePreset.installObject must be implemented in a subclass..."
+	}
+
+	uninstallObject(object) {
+		throw "Virtual method DownloadablePreset.uninstallObject must be implemented in a subclass..."
+	}
+}
+
+class AssettoCorsaCarMetas extends DownloadablePreset {
+	loadDefinition(url) {
+		if (Trim(url) != "") {
+			deleteFile(A_Temp . "\Simulator Controller.zip")
+
+			Download(url, A_Temp . "\Simulator Controller DLC.zip")
+
+			deleteDirectory(A_Temp . "\Simulator Controller DLC")
+
+			DirCreate(A_Temp . "\Simulator Controller DLC")
+
+			RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\Simulator Controller DLC.zip' -DestinationPath '" . A_Temp . "\Simulator Controller DLC' -Force", , "Hide")
+		}
+
+		return readMultiMap(A_Temp . "\Simulator Controller DLC\Cars.ini")
+	}
+
+	className() {
+		return translate("Car")
+	}
+
+	availableObjects() {
+		return getKeys(this.Definition)
+	}
+
+	installedObjects() {
+		return getKeys(getMultiMapValues(readMultiMap(kUserHomeDirectory . "Simulator Data\AC\Car Data.ini"), "Car Codes"))
+	}
+
+	installObject(car) {
+		local carName := getMultiMapValue(this.Definition, car, "Name")
+		local carCode := getMultiMapValue(this.Definition, car, "Code")
+		local carData := readMultiMap(kUserHomeDirectory . "Simulator Data\AC\Car Data.ini")
+		local tyreData := readMultiMap(kUserHomeDirectory . "Simulator Data\AC\Tyre Data.ini")
+		local setting
+
+		setMultiMapValue(carData, "Car Codes", carName, carCode)
+		setMultiMapValue(carData, "Car Names", carCode, carName)
+
+		loop {
+			setting := getMultiMapValue(this.Definition, car, "Pitstop Settings." . A_Index, kUndefined)
+
+			if (setting = kUndefined)
+				break
+			else {
+				setting := string2Values("=", setting)
+
+				setMultiMapValue(carData, "Pitstop Settings", carCode . "." . setting[1], setting[2])
+			}
+		}
+
+		writeMultiMap(kUserHomeDirectory . "Simulator Data\AC\Car Data.ini", carData)
+
+		setMultiMapValue(tyreData, "Cars", carCode . ";*", getMultiMapValue(this.Definition, car, "Tyres"))
+
+		writeMultiMap(kUserHomeDirectory . "Simulator Data\AC\Tyre Data.ini", tyreData)
+
+		FileCopy(A_Temp . "\Simulator Controller DLC\" . getMultiMapValue(this.Definition, car, "Definition")
+			   , kUserHomeDirectory . "Garage\Definitions\Cars", 1)
+
+		FileCopy(A_Temp . "\Simulator Controller DLC\" . getMultiMapValue(this.Definition, car, "Rules")
+			   , kUserHomeDirectory . "Garage\Rules\Cars", 1)
+	}
+
+	uninstallObject(car) {
+		local carName := getMultiMapValue(this.Definition, car, "Name")
+		local carCode := getMultiMapValue(this.Definition, car, "Code")
+		local carData := readMultiMap(kUserHomeDirectory . "Simulator Data\AC\Car Data.ini")
+		local tyreData := readMultiMap(kUserHomeDirectory . "Simulator Data\AC\Tyre Data.ini")
+		local setting
+
+		removeMultiMapValue(carData, "Car Codes", carName)
+		removeMultiMapValue(carData, "Car Names", carCode)
+
+		writeMultiMap(kUserHomeDirectory . "Simulator Data\AC\Car Data.ini", carData)
+
+		removeMultiMapValue(tyreData, "Cars", carCode . ";*")
+
+		writeMultiMap(kUserHomeDirectory . "Simulator Data\AC\Tyre Data.ini", tyreData)
+
+		deleteFile(kUserHomeDirectory . "Garage\Definitions\Cars\" . getMultiMapValue(this.Definition, car, "Definition"))
+		deleteFile(kUserHomeDirectory . "Garage\Rules\Cars\" . getMultiMapValue(this.Definition, car, "Rules"))
 	}
 }
 

@@ -591,10 +591,14 @@ class DownloadablePreset extends NamedPreset {
 		}
 
 		chooseObject(listView, line, checked) {
-			if checked
-				this.install(listView.GetText(line))
-			else
-				this.uninstall(listView.GetText(line))
+			if checked {
+				if !this.install(listView.GetText(line))
+					listView.Modify(line, "-Check")
+			}
+			else {
+				if !this.uninstall(listView.GetText(line))
+					listView.Modify(line, "Check")
+			}
 		}
 
 		dlcGui := Window({Descriptor: "DLC Manager", Options: "0x400000"}, "")
@@ -687,21 +691,26 @@ class DownloadablePreset extends NamedPreset {
 		local installed := this.installedObjects()
 		local ignore, object
 
+		this.Window.Block()
+
 		try {
 			for ignore, object in this.availableObjects()
 				if ((name = this.objectName(object)) && !inList(installed, object))
 					this.installObject(object)
+
+			return true
 		}
 		catch Any as exception {
 			logError(exception, true)
 
-			loop this.ObjectsListView.GetCount()
-				if (this.ObjectsListView.GetText(A_Index) = name)
-					this.ObjectsListView.Modify(A_Index, "-Check")
-
 			OnMessage(0x44, translateOkButton)
 			withBlockedWindows(MsgBox, translate("The download repository is currently unavailable. Please try again later."), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
+
+			return false
+		}
+		finally {
+			this.Window.Unblock()
 		}
 	}
 
@@ -709,9 +718,27 @@ class DownloadablePreset extends NamedPreset {
 		local installed := this.installedObjects()
 		local ignore, object
 
-		for ignore, object in this.availableObjects()
-			if ((name = this.objectName(object)) && inList(installed, object))
-				this.uninstallObject(object)
+		this.Window.Block()
+
+		try {
+			for ignore, object in this.availableObjects()
+				if ((name = this.objectName(object)) && inList(installed, object))
+					this.uninstallObject(object)
+
+			return true
+		}
+		catch Any as exception {
+			logError(exception, true)
+
+			OnMessage(0x44, translateOkButton)
+			withBlockedWindows(MsgBox, translate("The download repository is currently unavailable. Please try again later."), translate("Error"), 262160)
+			OnMessage(0x44, translateOkButton, 0)
+
+			return false
+		}
+		finally {
+			this.Window.Unblock()
+		}
 	}
 
 	className() {
@@ -744,7 +771,22 @@ class DownloadablePreset extends NamedPreset {
 
 class AssettoCorsaCarMetas extends DownloadablePreset {
 	loadDefinition(url) {
+		local counter :=  0
+		local updateTask
+
+		updateProgress() {
+			counter := Min(counter + 1, 100)
+
+			showProgress({progress: counter})
+		}
+
 		if (Trim(url) != "") {
+			updateTask := PeriodicTask(updateProgress, 50, kInterruptPriority)
+
+			showProgress({title: translate("Downloading component"), message: translate("Downloading...")})
+
+			updateTask.start()
+
 			deleteFile(A_Temp . "\Simulator Controller DLC.zip")
 
 			Download(url, A_Temp . "\Simulator Controller DLC.zip")
@@ -753,7 +795,13 @@ class AssettoCorsaCarMetas extends DownloadablePreset {
 
 			DirCreate(A_Temp . "\Simulator Controller DLC")
 
+			showProgress({message: translate("Extracting...")})
+
 			RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\Simulator Controller DLC.zip' -DestinationPath '" . A_Temp . "\Simulator Controller DLC' -Force", , "Hide")
+
+			updateTask.stop()
+
+			hideProgress()
 		}
 
 		return readMultiMap(A_Temp . "\Simulator Controller DLC\Cars.ini")
@@ -833,9 +881,23 @@ class SplashMedia extends DownloadablePreset {
 	}
 
 	loadMedia() {
+		local counter :=  0
 		local url := this.URL
+		local updateTask
+
+		updateProgress() {
+			counter := Min(counter + 1, 100)
+
+			showProgress({progress: counter})
+		}
 
 		if (Trim(url) != "") {
+			updateTask := PeriodicTask(updateProgress, 50, kInterruptPriority)
+
+			showProgress({title: translate("Downloading component"), message: translate("Downloading...")})
+
+			updateTask.start()
+
 			deleteFile(A_Temp . "\Simulator Controller.zip")
 
 			Download(url, A_Temp . "\Simulator Controller DLC.zip")
@@ -844,9 +906,15 @@ class SplashMedia extends DownloadablePreset {
 
 			DirCreate(A_Temp . "\Simulator Controller DLC")
 
+			showProgress({message: translate("Extracting...")})
+
 			RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\Simulator Controller DLC.zip' -DestinationPath '" . A_Temp . "\Simulator Controller DLC' -Force", , "Hide")
+
+			updateTask.stop()
+
+			hideProgress()
 		}
-msgbox "Here"
+
 		if FileExist(A_Temp . "\Simulator Controller DLC\Splash Media.ini") {
 			this.Definition := readMultiMap(A_Temp . "\Simulator Controller DLC\Splash Media.ini")
 

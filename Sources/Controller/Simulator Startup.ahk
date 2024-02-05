@@ -2142,6 +2142,7 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 		functionsListView .OnEvent("Click", chooseFunction)
 		functionsListView .OnEvent("DoubleClick", chooseFunction)
 
+		/*
 		if hasDrivingCoach {
 			functions.Push(Array("Driving Coach", "Performance Analysis"))
 			functions.Push(Array("Driving Coach", "Handling Analysis"))
@@ -2173,6 +2174,7 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 			functions.Push(Array("Tactile Feedback", "Front Vibration"))
 			functions.Push(Array("Tactile Feedback", "Rear Vibration"))
 		}
+		*/
 
 		settingsTab.UseTab(0)
 

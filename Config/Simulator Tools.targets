@@ -34,6 +34,7 @@ Release 5.4.0=Release 5.3.2 -> updatePluginsForV540, updateStreamDeckIconPreset
 Release 5.4.1=Release 5.4.0 -> updateInstallationForV541, updateConfigurationForV541
 Release 5.5.2=Release 5.4.1 -> updateConfigurationForV552
 Release 5.5.3=Release 5.5.2 -> updateConfigurationForV553
+Release 5.5.7=Release 5.5.3 -> updateConfigurationForV557
 [Cleanup]
 Binaries Folder=%kBinariesDirectory%
 Logs Folder=%kLogsDirectory%

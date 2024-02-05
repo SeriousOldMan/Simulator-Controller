@@ -37,7 +37,7 @@ Here is a short video which shows how to configure Simulator Controller for the 
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [information about the update process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.
 
-[5.5.6.0-release](https://cutt.ly/pwZ7AoTB) (Changes: Added default profile for Stream Deck to the Profiles collection, Fixes for the Assistants with deactivated listeners, Fixed default connections in Startup Profiles, Added voice control status to "System Monitor", New settings "Engine.Limiter" and "Turbo" in "Setup Workbench", New car models for "Setup Workbench", Fixed "Simulator Configuration" not open its main window, Added title bar to some windows to make them moveable, New settings that allow to configure the strategy announcements of the Strategist, Startup check for UDP configuration, Consumables chart now included in strategy comparison report.)
+[5.5.6.1-release](https://cutt.ly/qwXf9X7e) (Changes: Added default profile for Stream Deck to the Profiles collection, Fixes for the Assistants with deactivated listeners, Fixed default connections in Startup Profiles, Added voice control status to "System Monitor", New settings "Engine.Limiter" and "Turbo" in "Setup Workbench", New car models for "Setup Workbench", Fixed "Simulator Configuration" not open its main window, Added title bar to some windows to make them moveable, New settings that allow to configure the strategy announcements of the Strategist, Startup check for UDP configuration, Consumables chart now included in strategy comparison report.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-556) of this version and all the versions you might have skipped, before installing and using this version.
 
@@ -49,7 +49,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[5.5.7.0-dev](https://www.dropbox.com/scl/fi/n9ajaci0caq5uq6kzcv72/Simulator-Controller-5.5.7.0-dev.zip?rlkey=wmiu59l241krmn2b7a8r3j9z6&dl=1) (Early build for 5.5.7. Changes: Increased resilience against corrupted data in "Database Synchronizer", Downloadable components in "Simulator Setup", Small fixes in the objects list of the Team Server, Fixed manual available minutes update in "Server Administration", Fixed adding a new Server URL in team server tab in "Simulator Configuration", Fixed duplicate object creation in session database rebuild, New car models for the "Setup Workbench", New Server URL combo box in "Server Administration".)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-557) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

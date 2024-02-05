@@ -1,0 +1,22 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;   Modular Simulator Controller System - Assetto Corsa                   ;;;
+;;;                                         Audi R8 LMS 2016                ;;;
+;;;                                         Setup Rules                     ;;;
+;;;                                                                         ;;;
+;;;   Author:     Mirko Lesko, Oliver Juwig (TheBigO)                       ;;;
+;;;   License:    (2024) Creative Commons - BY-NC-SA                        ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;-------------------------------------------------------------------------;;;
+;;;                            Initialization                               ;;;
+;;;-------------------------------------------------------------------------;;;
+										
+[?Initialize] =>    (Prove: removeSettings("Assetto Corsa", "Audi R8 LMS 2016",
+										   [Aero.Height.Front, Aero.Height.Rear,
+										   Bumpstop.Rate.Front.Left, Bumpstop.Rate.Front.Right, Bumpstop.Rate.Rear.Left, Bumpstop.Rate.Rear.Right,
+										   Differential.Preload])),
+					(Prove: addSettings("Assetto Corsa", "Audi R8 LMS 2016",
+										[Aero.Height.Front.Left, Aero.Height.Front.Right, 
+										 Aero.Height.Rear.Left, Aero.Height.Rear.Right,
+										 Differential.Power, Differential.Coast,
+										 Electronics.TC, Electronics.ABS, Electronics.Engine.Limiter]))

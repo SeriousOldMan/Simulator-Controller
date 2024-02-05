@@ -37,7 +37,9 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 5.5.7
 
-This release comes with a new version of the Team Server with some minor fixes. Although it will be compatible with the current release, I recommend updating your installation, if you are running your own Team Server. Database files are compatible.
+The splash screen media has been made a downloadable component. You may want to check your splash screen settings, if you have used some of the formerly builtin splash screens. If your preferred splash screen is missing, use "Simlator Setup" to download the required media files.
+
+This release also comes with a new version of the Team Server with some minor fixes. Although it will be compatible with the current release, I recommend updating your installation, if you are running your own Team Server. Database files are compatible.
 
 ***
 

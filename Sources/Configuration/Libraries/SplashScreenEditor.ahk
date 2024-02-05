@@ -348,7 +348,7 @@ class SplashScreensList extends ConfigurationItemList {
 	loadFromConfiguration(configuration) {
 		local definition := getMultiMapValues(configuration, "Splash Screens")
 		local splashScreens := CaseInsenseMap()
-		local descriptor, value, splashScreen, type, media, duration, songFile
+		local descriptor, value, splashScreen, type, media, duration, songFile, builtin
 
 		super.loadFromConfiguration(configuration)
 
@@ -360,13 +360,14 @@ class SplashScreensList extends ConfigurationItemList {
 				media := ((type == ("Picture Carousel")) ? definition[splashScreen . ".Images"] : definition[splashScreen . ".Video"])
 				duration := ((type == ("Picture Carousel")) ? definition[splashScreen . ".Duration"] : false)
 				songFile := (definition.Has(splashScreen . ".Song") ? definition[splashScreen . ".Song"] : false)
+				builtin := (definition.Has(splashScreen . ".Builtin") ? definition[splashScreen . ".Builtin"] : false)
 
 				if !songFile
 					songFile := ""
 
 				splashScreens[splashScreen] := true
 
-				this.ItemList.Push([type, splashScreen, media, songFile, duration])
+				this.ItemList.Push(Array(type, splashScreen, media, songFile, duration, builtin))
 			}
 		}
 	}
@@ -464,6 +465,33 @@ class SplashScreensList extends ConfigurationItemList {
 			this.Control["videoFilePathEdit"].Visible := false
 			this.Control["videoFilePathButton"].Visible := false
 		}
+
+		if (this.CurrentItem && (this.ItemList[this.CurrentItem][6])) {
+			this.Control["soundFilePathEdit"].Enabled := false
+			this.Control["splashScreenNameEdit"].Enabled := false
+			this.Control["splashScreenNameEdit"].Enabled := false
+			this.Control["splashScreenDeleteButton"].Enabled := false
+			this.Control["splashScreenUpdateButton"].Enabled := false
+			this.Control["splashScreenTypeDropDown"].Enabled := false
+			this.Control["addPictureButton"].Enabled := false
+			this.Control["picturesListView"].Enabled := false
+			this.Control["picturesDurationEdit"].Enabled := false
+			this.Control["picturesDurationPostfix"].Enabled := false
+			this.Control["videoFilePathEdit"].Enabled := false
+			this.Control["videoFilePathButton"].Enabled := false
+		}
+		else {
+			this.Control["soundFilePathEdit"].Enabled := true
+			this.Control["splashScreenNameEdit"].Enabled := true
+			this.Control["splashScreenNameEdit"].Enabled := true
+			this.Control["splashScreenTypeDropDown"].Enabled := true
+			this.Control["addPictureButton"].Enabled := true
+			this.Control["picturesListView"].Enabled := true
+			this.Control["picturesDurationEdit"].Enabled := true
+			this.Control["picturesDurationPostfix"].Enabled := true
+			this.Control["videoFilePathEdit"].Enabled := true
+			this.Control["videoFilePathButton"].Enabled := true
+		}
 	}
 
 	initializePicturesList(pictures := "") {
@@ -560,7 +588,8 @@ class SplashScreensList extends ConfigurationItemList {
 			return false
 		}
 
-		return Array(type, this.Control["splashScreenNameEdit"].Text, media, this.Control["soundFilePathEdit"].Text, this.Control["picturesDurationEdit"].Text)
+		return Array(type, this.Control["splashScreenNameEdit"].Text, media, this.Control["soundFilePathEdit"].Text, this.Control["picturesDurationEdit"].Text
+				   , isNew ? false : this.ItemList[this.CurrentItem][6])
 	}
 
 	togglePlaySoundFile(stop := false) {

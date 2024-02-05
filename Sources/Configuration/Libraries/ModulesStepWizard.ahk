@@ -780,18 +780,17 @@ class AssettoCorsaCarMetas extends DownloadablePreset {
 			showProgress({progress: counter})
 		}
 
+		deleteFile(A_Temp . "\Simulator Controller DLC.zip")
+		deleteDirectory(A_Temp . "\Simulator Controller DLC")
+
 		if (Trim(url) != "") {
 			updateTask := PeriodicTask(updateProgress, 50, kInterruptPriority)
 
-			showProgress({title: translate("Downloading component"), message: translate("Downloading...")})
+			showProgress({title: translate("Downloading Components"), message: translate("Downloading...")})
 
 			updateTask.start()
 
-			deleteFile(A_Temp . "\Simulator Controller DLC.zip")
-
 			Download(url, A_Temp . "\Simulator Controller DLC.zip")
-
-			deleteDirectory(A_Temp . "\Simulator Controller DLC")
 
 			DirCreate(A_Temp . "\Simulator Controller DLC")
 
@@ -876,13 +875,39 @@ class AssettoCorsaCarMetas extends DownloadablePreset {
 }
 
 class SplashMedia extends DownloadablePreset {
+	iContentURL := false
+	iLoaded := false
+
+	ContentURL {
+		Get {
+			return this.iContentURL
+		}
+	}
+
+	Loaded {
+		Get {
+			return this.iLoaded
+		}
+	}
+
+	__New(name, definitionURL, contentURL) {
+		this.iContentURL := contentURL
+
+		super.__New(name, definitionURL)
+	}
+
 	loadDefinition(url) {
-		return false
+		deleteFile(A_Temp . "\Splash Media.ini")
+
+		if (Trim(url) != "")
+			Download(url, A_Temp . "\Splash Media.ini")
+
+		return readMultiMap(A_Temp . "\Splash Media.ini")
 	}
 
 	loadMedia() {
 		local counter :=  0
-		local url := this.URL
+		local url := this.ContentURL
 		local updateTask
 
 		updateProgress() {
@@ -891,18 +916,17 @@ class SplashMedia extends DownloadablePreset {
 			showProgress({progress: counter})
 		}
 
+		deleteFile(A_Temp . "\Simulator Controller.zip")
+		deleteDirectory(A_Temp . "\Simulator Controller DLC")
+
 		if (Trim(url) != "") {
 			updateTask := PeriodicTask(updateProgress, 50, kInterruptPriority)
 
-			showProgress({title: translate("Downloading component"), message: translate("Downloading...")})
+			showProgress({title: translate("Downloading Components"), message: translate("Downloading...")})
 
 			updateTask.start()
 
-			deleteFile(A_Temp . "\Simulator Controller.zip")
-
 			Download(url, A_Temp . "\Simulator Controller DLC.zip")
-
-			deleteDirectory(A_Temp . "\Simulator Controller DLC")
 
 			DirCreate(A_Temp . "\Simulator Controller DLC")
 
@@ -912,11 +936,9 @@ class SplashMedia extends DownloadablePreset {
 
 			updateTask.stop()
 
-			hideProgress()
-		}
+			this.iLoaded := true
 
-		if FileExist(A_Temp . "\Simulator Controller DLC\Splash Media.ini") {
-			this.Definition := readMultiMap(A_Temp . "\Simulator Controller DLC\Splash Media.ini")
+			hideProgress()
 
 			return true
 		}
@@ -929,7 +951,7 @@ class SplashMedia extends DownloadablePreset {
 	}
 
 	availableObjects() {
-		return ["Blancpain GT3 Pictures", "Blancpain GT3 Video", "McLaren 720s GT3 Pictures"]
+		return getAllSplashScreens(this.Definition)
 	}
 
 	installedObjects() {
@@ -939,7 +961,7 @@ class SplashMedia extends DownloadablePreset {
 	installObject(splashScreen) {
 		local configuration, key, value, type
 
-		if (this.Definition || this.loadMedia()) {
+		if (this.Loaded || this.loadMedia()) {
 			configuration := readMultiMap(kSimulatorConfigurationFile)
 
 			for key, value in getMultiMapValues(this.Definition, "Splash Screens")

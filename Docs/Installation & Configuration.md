@@ -184,7 +184,7 @@ Replace *X* with the number of the page you want to jump to on startup. As an al
 
 You will also find a couple of packages in the list of available presets for the so called search images, which are used by Simulator Controller to *understand* the state and available option in the Pitstop MFD *RaceRoom Racing Experience*. Detailed instructions for these search images can be found in the documentation for the [*RaceRoom Racing Experience* plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#important-preparation-for-the-pitstop-mfd-handling-1). The same applies here: If you don't find your specific language and/or screen resolution here, start with one which fits best and apply your changes afterwards.
 
-Most presets must simply be moved to the right list to become active. But there are also presets, that require you to give additional information. These presets must be double-clicked to open up an additional window, which let you choose more preset specific options, like the preset for downloadable meta data for additional cars in *Assetto Corsa*:
+Most presets must simply be moved to the right list to become active. But there are also presets, that require you to give additional information. These presets must be double-clicked to open up an additional window, which let you choose more preset specific options, like the preset for downloadable media files for additional splash screens:
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Setup%204.JPG)
 

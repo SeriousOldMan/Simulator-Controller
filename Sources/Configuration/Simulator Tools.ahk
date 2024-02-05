@@ -1661,6 +1661,20 @@ updateInstallationForV500() {
 	}
 }
 
+updateConfigurationForV557() {
+	local configuration := readMultiMap(kSimulatorConfigurationFile)
+
+	removeMultiMapValues(configuration, "Splash Screens")
+
+	writeMultiMap(kSimulatorConfigurationFile, configuration)
+
+	configuration := readMultiMap(kSimulatorSettingsFile)
+
+	setMultiMapValue(configuration, "Startup", "Splash Screen", getMultiMapValue(configuration, "Startup", "Splash Screen") ? "Logo" : false)
+
+	writeMultiMap(kSimulatorSettingsFile, configuration)
+}
+
 updateConfigurationForV553() {
 	local text
 

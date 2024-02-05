@@ -16,7 +16,7 @@
       - Assetto Corsa
         - Audi R8 LMS 2016 (by @mirko_lesko)
         - Mazda MX5 Cup (by @mirko_lesko)
-        - Nissan GT-R NISMO 2014 GT3 (updated)
+        - Nissan GT-R GT3 (updated)
   
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-557), especially if you are running your own Team Server.
 

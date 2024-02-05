@@ -2,7 +2,7 @@
 Version=5.5.7.0-dev
 Target=5.5.7.0-release
 Date=02/05/2024
-Download=
+Download=https://www.dropbox.com/scl/fi/n9ajaci0caq5uq6kzcv72/Simulator-Controller-5.5.7.0-dev.zip?rlkey=wmiu59l241krmn2b7a8r3j9z6&dl=1
 Changes=Increased resilience against corrupted data in "Database Synchronizer", Downloadable components in "Simulator Setup", Small fixes in the objects list of the Team Server, Fixed manual available minutes update in "Server Administration", Fixed adding a new Server URL in team server tab in "Simulator Configuration", Fixed duplicate object creation in session database rebuild, New car models for the "Setup Workbench"
 Components=Media->5.5.7,Configuration->5.5.7,Utilities->5.4.8
 [Release]

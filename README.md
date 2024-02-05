@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[5.5.7.0-dev](https://www.dropbox.com/scl/fi/n9ajaci0caq5uq6kzcv72/Simulator-Controller-5.5.7.0-dev.zip?rlkey=wmiu59l241krmn2b7a8r3j9z6&dl=1) (Early build for 5.5.7. Changes: Increased resilience against corrupted data in "Database Synchronizer", Downloadable components in "Simulator Setup", Small fixes in the objects list of the Team Server, Fixed manual available minutes update in "Server Administration", Fixed adding a new Server URL in team server tab in "Simulator Configuration", Fixed duplicate object creation in session database rebuild, New car models for the "Setup Workbench".)
+[5.5.7.0-dev](https://www.dropbox.com/scl/fi/n9ajaci0caq5uq6kzcv72/Simulator-Controller-5.5.7.0-dev.zip?rlkey=wmiu59l241krmn2b7a8r3j9z6&dl=1) (Early build for 5.5.7. Changes: Increased resilience against corrupted data in "Database Synchronizer", Downloadable components in "Simulator Setup", Small fixes in the objects list of the Team Server, Fixed manual available minutes update in "Server Administration", Fixed adding a new Server URL in team server tab in "Simulator Configuration", Fixed duplicate object creation in session database rebuild, New car models for the "Setup Workbench", New Server URL combo box in "Server Administration".)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-557) of this version and all the versions you might have skipped, before installing and using this version.
 

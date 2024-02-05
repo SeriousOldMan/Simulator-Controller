@@ -11,8 +11,13 @@
 	 - The second DLC let you download additional media data for custom splash screens.
   8. Previously bundled splash screen media has been removed from the standard distribution and has become a downloadable component (see above).
   9. Many car meta data for *Assetto Corsa* has been corrected to not longer provide ABS settings, if these are not part of the *Factory* definition.
+  10. New car models for "Setup Workbench":
+      - Assetto Corsa
+        - Audi R8 LMS 2016 (by @mirko_lesko)
+        - Mazda MX5 Cup (by @mirko_lesko)
+        - Nissan GT-R NISMO 2014 GT3 (updated)
   
-Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-557), if you are running your own Team Server.
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-557), especially if you are running your own Team Server.
 
 ## 5.5.6.0-release 02/02/24
   1. Minor bugfixes, as always

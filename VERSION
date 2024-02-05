@@ -6,9 +6,9 @@ Download=
 Changes=Increased resilience against corrupted data in "Database Synchronizer", Downloadable components in "Simulator Setup", Small fixes in the objects list of the Team Server, Fixed manual available minutes update in "Server Administration", Fixed adding a new Server URL in team server tab in "Simulator Configuration", Fixed duplicate object creation in session database rebuild, New car models for the "Setup Workbench"
 Components=Media->5.5.7,Configuration->5.5.7,Utilities->5.4.8
 [Release]
-Version=5.5.6.0-release
+Version=5.5.6.1-release
 Date=02/02/2024
-Download=https://cutt.ly/pwZ7AoTB;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.5.6.0-release.zip
+Download=https://cutt.ly/qwXf9X7e;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.5.6.1-release.zip
 Changes=Added default profile for Stream Deck to the Profiles collection, Fixes for the Assistants with deactivated listeners, Fixed default connections in Startup Profiles, Added voice control status to "System Monitor", New settings "Engine.Limiter" and "Turbo" in "Setup Workbench", New car models for "Setup Workbench", Fixed "Simulator Configuration" not open its main window, Added title bar to some windows to make them moveable, New settings that allow to configure the strategy announcements of the Strategist, Startup check for UDP configuration, Consumables chart now included in strategy comparison report
 Components=Media->5.3.0,Configuration->5.5.3,Utilities->5.4.8
 [Components]
@@ -31,4 +31,4 @@ Utilities.5.4.8.Download=https://www.dropbox.com/scl/fi/5nduffajjm3x6rhsxr1nk/Ut
 Type=Development
 [Version]
 Development=5.5.7.0-dev
-Release=5.5.6.0-release
+Release=5.5.6.1-release

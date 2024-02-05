@@ -19,6 +19,9 @@
   
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-557), especially if you are running your own Team Server.
 
+## 5.5.6.1-release 02/02/24
+  1. Fixed a freeze in "Simulator Setup".
+
 ## 5.5.6.0-release 02/02/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

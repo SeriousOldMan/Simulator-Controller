@@ -4,7 +4,7 @@ Target=5.5.7.0-release
 Date=02/05/2024
 Download=
 Changes=Increased resilience against corrupted data in "Database Synchronizer", Downloadable components in "Simulator Setup", Small fixes in the objects list of the Team Server, Fixed manual available minutes update in "Server Administration", Fixed adding a new Server URL in team server tab in "Simulator Configuration", Fixed duplicate object creation in session database rebuild, New car models for the "Setup Workbench"
-Components=Media->5.5.7,Configuration->5.5.3,Utilities->5.4.8
+Components=Media->5.5.7,Configuration->5.5.7,Utilities->5.4.8
 [Release]
 Version=5.5.6.0-release
 Date=02/02/2024
@@ -17,10 +17,13 @@ Media.5.3.0.Content=Splash Media
 Media.5.3.0.Download=https://www.dropbox.com/scl/fi/s4uchdrhdm0m4giiix86k/Media-5.3.0.zip?rlkey=t9lkkd9nj4koxyaaqa2h6i8nx&dl=1
 Media.5.5.7.Path=Resources
 Media.5.5.7.Content=Splash Media
-Media.5.5.7.Download=
+Media.5.5.7.Download=https://www.dropbox.com/scl/fi/j1p9a61y83180ctsr8f18/Media-5.5.7.zip?rlkey=6c72qsss7ijrvzpnjk2ho3h4k&dl=1
 Configuration.5.5.3.Path=Resources
 Configuration.5.5.3.Content=Setup
 Configuration.5.5.3.Download=https://www.dropbox.com/scl/fi/ap6yjq2vpfd531gt0raq0/Configuration-5.5.3.zip?rlkey=tayjja9gpiwxumwv7ywmbw705&dl=1
+Configuration.5.5.7.Path=Resources
+Configuration.5.5.7.Content=Setup
+Configuration.5.5.7.Download=https://www.dropbox.com/scl/fi/xv1g3vb5c3dzuluw50tf2/Configuration-5.5.7.zip?rlkey=kuai5d48islfuboio2wyi0d95&dl=1
 Utilities.5.4.8.Path=.
 Utilities.5.4.8.Content=Utilities
 Utilities.5.4.8.Download=https://www.dropbox.com/scl/fi/5nduffajjm3x6rhsxr1nk/Utilities-5.4.8.zip?rlkey=alrj8l2z205dd2vm9cu6hbsot&dl=1

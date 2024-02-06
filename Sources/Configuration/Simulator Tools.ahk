@@ -1662,17 +1662,31 @@ updateInstallationForV500() {
 }
 
 updateConfigurationForV557() {
-	local configuration := readMultiMap(kSimulatorConfigurationFile)
+	local configuration
 
-	removeMultiMapValues(configuration, "Splash Screens")
+	if FileExist(getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)) {
+		configuration := readMultiMap(kSimulatorConfigurationFile)
 
-	writeMultiMap(kSimulatorConfigurationFile, configuration)
+		removeMultiMapValues(configuration, "Splash Screens")
 
-	configuration := readMultiMap(kSimulatorSettingsFile)
+		writeMultiMap(kSimulatorConfigurationFile, configuration)
+	}
 
-	setMultiMapValue(configuration, "Startup", "Splash Screen", getMultiMapValue(configuration, "Startup", "Splash Screen") ? "Logo" : false)
+	if FileExist(getFileName(kSimulatorSettingsFile, kUserConfigDirectory)) {
+		configuration := readMultiMap(kSimulatorSettingsFile)
 
-	writeMultiMap(kSimulatorSettingsFile, configuration)
+		setMultiMapValue(configuration, "Startup", "Splash Screen", getMultiMapValue(configuration, "Startup", "Splash Screen") ? "Logo" : false)
+
+		writeMultiMap(kSimulatorSettingsFile, configuration)
+	}
+
+	if FileExist(kUserHomeDirectory . "Setup\Simulator Settings.ini") {
+		configuration := readMultiMap(kUserHomeDirectory . "Setup\Simulator Settings.ini")
+
+		setMultiMapValue(configuration, "Startup", "Splash Screen", getMultiMapValue(configuration, "Startup", "Splash Screen") ? "Logo" : false)
+
+		writeMultiMap(kSimulatorSettingsFile, configuration)
+	}
 }
 
 updateConfigurationForV553() {

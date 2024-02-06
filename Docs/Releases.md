@@ -8,12 +8,13 @@
   7. The Server URL drop down list does not jump to the first entry anymore in "Simulator Configuration", when a previously unknown URL has been entered.
   8. When a session database is being rebuild by the "Database Synchronizer", no more duplicate objects are created on the Team Server.
   9. The "Database Synchronizer" has become much more resilient against corrupted data in the local database.
-  10. Downloadable components are now available as presets in "Simulator Setup". See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#presets--special-configurations) for more information how to use the DLCs.
+  10. The lap time of the first lap of a stint is now ignored in all computations of "Race Center" and "Practice Center".
+  11. Downloadable components are now available as presets in "Simulator Setup". See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#presets--special-configurations) for more information how to use the DLCs.
       - A new DLC let you download car meta data for "Setup Workbench" for non-standard cars in *Assetto Corsa*.
 	  - Another DLC let you download additional media data for custom splash screens.
-  11. Previously bundled splash screen media has been removed from the standard distribution and has become a downloadable component (see above).
-  12. Many car meta data for *Assetto Corsa* has been corrected to not longer provide ABS settings, if these are not part of the *Factory* definition.
-  13. New car models for "Setup Workbench":
+  12. Previously bundled splash screen media has been removed from the standard distribution and has become a downloadable component (see above).
+  13. Many car meta data for *Assetto Corsa* has been corrected to not longer provide ABS settings, if these are not part of the *Factory* definition.
+  14. New car models for "Setup Workbench":
       - Assetto Corsa
         - Audi R8 LMS 2016 (by @mirko_lesko)
         - Mazda MX5 Cup (by @mirko_lesko)

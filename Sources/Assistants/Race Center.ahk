@@ -5480,7 +5480,11 @@ class RaceCenter extends ConfigurationItem {
 			if positions {
 				startLap := lastLap.Nr
 				endLap := targetLap
-				avgLapTime := Min(lastLap.Laptime, this.CurrentStint.AvgLapTime)
+
+				if isNumber(lastLap.Laptime)
+					avgLapTime := Min(lastLap.Laptime, this.CurrentStint.AvgLapTime)
+				else
+					avgLapTime := this.CurrentStint.AvgLapTime
 
 				positions := parseMultiMap(positions)
 
@@ -6060,7 +6064,11 @@ class RaceCenter extends ConfigurationItem {
 				lap.FuelConsumption := ((fuelConsumption > 0) ? Round(fuelConsumption, 2) : "-")
 			}
 
-			lap.Laptime := Round(getMultiMapValue(data, "Stint Data", "LapLastTime") / 1000, 1)
+			if (stint.Laps.Length == 0)
+				lap.LapTime := kNull
+			else
+				lap.Laptime := Round(getMultiMapValue(data, "Stint Data", "LapLastTime") / 1000, 1)
+
 			lap.SectorsTime := ["-"]
 
 			lap.RemainingSessionTime := getMultiMapValue(data, "Session Data", "SessionTimeRemaining")
@@ -6268,7 +6276,9 @@ class RaceCenter extends ConfigurationItem {
 			if (lap.Penalty && this.Laps.Has(lap.Nr - 1) && (this.Laps[lap.Nr - 1].Penalty != lap.Penalty))
 				stint.Penalties += 1
 
-			lapTimes.Push(lap.Laptime)
+			if isNumber(lap.Laptime)
+				lapTimes.Push(lap.Laptime)
+
 			airTemperatures.Push(lap.AirTemperature)
 			trackTemperatures.Push(lap.TrackTemperature)
 
@@ -8013,7 +8023,8 @@ class RaceCenter extends ConfigurationItem {
 			duration := 0
 
 			for ignore, lap in stint.Laps
-				duration += lap.LapTime
+				if isNumber(lap.LapTime)
+					duration += lap.LapTime
 
 			if (stint != this.CurrentStint)
 				stint.Duration := duration
@@ -8446,9 +8457,6 @@ class RaceCenter extends ConfigurationItem {
 
 			if isNull(newLap.Position)
 				newLap.Position := "-"
-
-			if isNull(newLap.Laptime)
-				newLap.Laptime := "-"
 
 			if isNull(newLap.SectorsTime)
 				newLap.SectorsTime := ["-"]
@@ -10439,7 +10447,8 @@ class RaceCenter extends ConfigurationItem {
 		local ignore, lap, html
 
 		for ignore, lap in stint.Laps
-			duration += lap.Laptime
+			if isNumber(lap.Laptime)
+				duration += lap.Laptime
 
 		if startTime
 			startTime := FormatTime(startTime, "Time")
@@ -11913,7 +11922,8 @@ class RaceCenter extends ConfigurationItem {
 				duration := 0
 
 				for ignore, lap in stint.Laps
-					duration += lap.Laptime
+					if isNumber(lap.Laptime)
+						duration += lap.Laptime
 
 				durations.Push("<td class=`"td-std`">" . Round(duration / 60) . "</td>")
 				numLaps.Push("<td class=`"td-std`">" . stint.Laps.Length . "</td>")
@@ -12602,7 +12612,10 @@ inDrivers(drivers, driver) {
 }
 
 lapTimeDisplayValue(lapTime) {
-	return RaceReportViewer.lapTimeDisplayValue(lapTime)
+	if ((lapTime = "-") || isNull(lapTime))
+		return "-"
+	else
+		return RaceReportViewer.lapTimeDisplayValue(lapTime)
 }
 
 displayNullValue(value, null := "-") {

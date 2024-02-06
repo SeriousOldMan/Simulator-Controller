@@ -1077,7 +1077,7 @@ class PracticeCenter extends ConfigurationItem {
 					listView.Modify(line, "-Check")
 				else if (listView.GetNext(line - 1, "C") = line) {
 					for ignore, lap in run.Laps
-						if (lap.State = "Valid")
+						if ((lap.State = "Valid") && isNumber(lap.LapTime))
 							center.LapsListView.Modify(lap.Row, "Check")
 				}
 				else
@@ -1095,6 +1095,16 @@ class PracticeCenter extends ConfigurationItem {
 		selectLap(listView, line, selected) {
 			if selected
 				chooseLap(listView, line)
+		}
+
+		checkLap(listView, line, selected) {
+			if line {
+				if center.SessionExported
+					listView.Modify(line, "-Check")
+
+				if !isNumber(center.Laps[listView.GetText(line, 1)].LapTime)
+					listView.Modify(line, "-Check")
+			}
 		}
 
 		chooseLap(listView, line, *) {
@@ -1519,6 +1529,7 @@ class PracticeCenter extends ConfigurationItem {
 		this.iLapsListView.OnEvent("Click", chooseLap)
 		this.iLapsListView.OnEvent("DoubleClick", chooseLap)
 		this.iLapsListView.OnEvent("ItemSelect", selectLap)
+		this.iLapsListView.OnEvent("ItemCheck", checkLap)
 
 		centerTab.UseTab(4)
 
@@ -2984,7 +2995,7 @@ class PracticeCenter extends ConfigurationItem {
 
 		lap.FuelRemaining := Round(getMultiMapValue(data, "Car Data", "FuelRemaining"), 1)
 
-		if ((lap.Nr == 1) || ((lap.Run.Laps.Length > 0) && (lap.Run.Laps[1] == lap)))
+		if ((lap.Nr == 1) || ((run.Laps.Length > 0) && (run.Laps[1] == lap)))
 			lap.FuelConsumption := "-"
 		else {
 			pLap := this.getPreviousLap(lap)
@@ -2994,7 +3005,7 @@ class PracticeCenter extends ConfigurationItem {
 			lap.FuelConsumption := ((fuelConsumption > 0) ? Round(fuelConsumption, 2) : "-")
 		}
 
-		lap.LapTime := Round(getMultiMapValue(data, "Stint Data", "LapLastTime") / 1000, 1)
+		lap.LapTime := ((lap.Nr == run.Lap) ? kNull : Round(getMultiMapValue(data, "Stint Data", "LapLastTime") / 1000, 1))
 
 		lap.RemainingSessionTime := getMultiMapValue(data, "Session Data", "SessionTimeRemaining")
 		lap.RemainingDriverTime := getMultiMapValue(data, "Stint Data", "DriverTimeRemaining", "-")
@@ -3620,7 +3631,7 @@ class PracticeCenter extends ConfigurationItem {
 					lap := this.LapsListView.GetText(row, 1)
 					lap := (this.Laps.Has(lap) ? this.Laps[lap] : false)
 
-					if (lap && lap.HasProp("TelemetryData")) {
+					if (lap && isNumber(lap.LapTime) && lap.HasProp("TelemetryData")) {
 						driver := lap.Run.Driver.ID
 
 						telemetryData := string2Values("|||", lap.TelemetryData)
@@ -3907,7 +3918,8 @@ class PracticeCenter extends ConfigurationItem {
 			duration := 0
 
 			for ignore, lap in run.Laps
-				duration += lap.LapTime
+				if isNumber(lap.LapTime)
+					duration += lap.LapTime
 
 			if (run != this.CurrentRun)
 				run.Duration := duration
@@ -4216,9 +4228,6 @@ class PracticeCenter extends ConfigurationItem {
 			if isNull(newLap.Position)
 				newLap.Position := "-"
 
-			if isNull(newLap.LapTime)
-				newLap.LapTime := "-"
-
 			if isNull(newLap.SectorsTime)
 				newLap.SectorsTime := ["-"]
 			else if isObject(newLap.SectorsTime)
@@ -4284,6 +4293,9 @@ class PracticeCenter extends ConfigurationItem {
 					break
 
 				lap := this.Laps[runLap]
+
+				if (runLap == newRun.Lap)
+					lap.LapTime := kNull
 
 				airTemperatures.Push(lap.AirTemperature)
 				trackTemperatures.Push(lap.TrackTemperature)
@@ -4375,7 +4387,7 @@ class PracticeCenter extends ConfigurationItem {
 					if isNumber(fuelConsumption)
 						fuelConsumption := displayValue("Float", convertUnit("Volume", fuelConsumption))
 
-					this.LapsListView.Add((this.SessionExported || (lap.State != "Valid")) ? "" : "Check"
+					this.LapsListView.Add((this.SessionExported || (lap.State != "Valid") || !isNumber(lap.LapTime)) ? "" : "Check"
 										, lap.Nr, lap.Run.Nr, translate(lap.Weather), translate(lap.Grip)
 										, lapTimeDisplayValue(lap.LapTime)
 										, values2String(", ", collect(lap.SectorsTime, lapTimeDisplayValue)*)
@@ -5977,7 +5989,8 @@ class PracticeCenter extends ConfigurationItem {
 				duration := 0
 
 				for ignore, lap in run.Laps
-					duration += lap.LapTime
+					if isNumber(lap.LapTime)
+						duration += lap.LapTime
 
 				durations.Push("<td class=`"td-std`">" . Round(duration / 60) . "</td>")
 				numLaps.Push("<td class=`"td-std`">" . run.Laps.Length . "</td>")
@@ -6108,11 +6121,12 @@ class PracticeCenter extends ConfigurationItem {
 
 				bestLapTime := 999999
 
-				for ignore, lap in run.Laps {
-					bestLapTime := Min(bestLapTime, lap.LapTime)
+				for ignore, lap in run.Laps
+					if isNumber(lap.LapTime) {
+						bestLapTime := Min(bestLapTime, lap.LapTime)
 
-					duration += lap.LapTime
-				}
+						duration += lap.LapTime
+					}
 
 				durations.Push("<td class=`"td-std`">" . Round(duration / 60) . "</td>")
 				numLaps.Push("<td class=`"td-std`">" . run.Laps.Length . "</td>")
@@ -6223,7 +6237,8 @@ class PracticeCenter extends ConfigurationItem {
 		local ignore, lap, html
 
 		for ignore, lap in run.Laps
-			duration += lap.LapTime
+			if isNumber(lap.LapTime)
+				duration += lap.LapTime
 
 		if startTime
 			startTime := FormatTime(startTime, "Time")
@@ -7220,7 +7235,7 @@ convertValue(name, value) {
 }
 
 lapTimeDisplayValue(lapTime) {
-	if (lapTime = "-")
+	if ((lapTime = "-") || isNull(lapTime))
 		return "-"
 	else
 		return RaceReportViewer.lapTimeDisplayValue(lapTime)

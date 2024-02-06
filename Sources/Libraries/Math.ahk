@@ -89,7 +89,7 @@ count(values, null := true) {
 		result := 0
 
 		for ignore, value in values
-			if (value != kNull)
+			if isNumber(value)
 				result += 1
 
 		return result

@@ -2,21 +2,22 @@
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed entering available minutes manually in "Server Administration".
-  4. The list of server objects has been extended in the "Server Administration" application.
-  5. "Server Administration" now also conviniently uses a Server URL drop down list to select the server from a list of all recently used servers.
-  6. The Server URL drop down list does not jump to the first entry anymore in "Simulator Configuration", when a previously unknown URL has been entered.
-  7. When a session database is being rebuild by the "Database Synchronizer", no more duplicate objects are created on the Team Server.
-  8. The "Database Synchronizer" has become much more resilient against corrupted data in the local database.
-  9. Downloadable components are now available as presets in "Simulator Setup". See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#presets--special-configurations) for more information how to use the DLCs.
-     - The first DLC let you download car meta data for "Setup Workbench" for non-standard cars in *Assetto Corsa*.
-	 - The second DLC let you download additional media data for custom splash screens.
-  10. Previously bundled splash screen media has been removed from the standard distribution and has become a downloadable component (see above).
-  11. Many car meta data for *Assetto Corsa* has been corrected to not longer provide ABS settings, if these are not part of the *Factory* definition.
-  12. New car models for "Setup Workbench":
+  4. Functions in the Startup Profiles are no longer listed twice.
+  5. The list of server objects has been extended in the "Server Administration" application.
+  6. "Server Administration" now also conviniently uses a Server URL drop down list to select the server from a list of all recently used servers.
+  7. The Server URL drop down list does not jump to the first entry anymore in "Simulator Configuration", when a previously unknown URL has been entered.
+  8. When a session database is being rebuild by the "Database Synchronizer", no more duplicate objects are created on the Team Server.
+  9. The "Database Synchronizer" has become much more resilient against corrupted data in the local database.
+  10. Downloadable components are now available as presets in "Simulator Setup". See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#presets--special-configurations) for more information how to use the DLCs.
+      - A new DLC let you download car meta data for "Setup Workbench" for non-standard cars in *Assetto Corsa*.
+	  - Another DLC let you download additional media data for custom splash screens.
+  11. Previously bundled splash screen media has been removed from the standard distribution and has become a downloadable component (see above).
+  12. Many car meta data for *Assetto Corsa* has been corrected to not longer provide ABS settings, if these are not part of the *Factory* definition.
+  13. New car models for "Setup Workbench":
       - Assetto Corsa
         - Audi R8 LMS 2016 (by @mirko_lesko)
         - Mazda MX5 Cup (by @mirko_lesko)
-        - Nissan GT-R NISMO 2014 GT3 (updated)
+        - Nissan GT-R GT3 (updated)
   
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-557), especially if you are running your own Team Server.
 

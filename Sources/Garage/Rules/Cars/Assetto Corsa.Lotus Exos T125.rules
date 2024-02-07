@@ -12,6 +12,6 @@
 ;;;-------------------------------------------------------------------------;;;
 
 [?Initialize] => (Prove: removeSettings("Assetto Corsa", "Lotus Exos T125",
-										[Differential.Preload])),
+										[Electronics.ABS, Differential.Preload])),
 				 (Prove: addSettings("Assetto Corsa", "Lotus Exos T125",
 									 [Differential.Coast, Differential.Power]))

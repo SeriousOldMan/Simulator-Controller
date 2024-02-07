@@ -13,7 +13,7 @@
       - A new DLC let you download car meta data for "Setup Workbench" for non-standard cars in *Assetto Corsa*.
 	  - Another DLC let you download additional media data for custom splash screens.
   12. Previously bundled splash screen media has been removed from the standard distribution and has become a downloadable component (see above).
-  13. Many car meta data for *Assetto Corsa* has been corrected to not longer provide ABS settings, if these are not part of the *Factory* definition.
+  13. All car meta data for *Assetto Corsa* has been corrected to not longer provide ABS settings, if these are not part of the *Factory* definition.
   14. New car models for "Setup Workbench":
       - Assetto Corsa
         - Audi R8 LMS 2016 (by @mirko_lesko)

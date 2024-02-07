@@ -18,7 +18,11 @@
       - Assetto Corsa
         - Audi R8 LMS 2016 (by @mirko_lesko)
         - Mazda MX5 Cup (by @mirko_lesko)
+        - Ferrari F138 (by @mirko_lesko)
+        - Ferrari SF70H (by @mirko_lesko)
         - Nissan GT-R GT3 (updated)
+        - Toyota MKIV Time Attack (updated)
+        - RUF CTR Yellow Bird (updated)
   
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-557), especially if you are running your own Team Server.
 

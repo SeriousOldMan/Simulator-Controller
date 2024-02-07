@@ -1567,18 +1567,31 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 showSelectorHint() {
 	local hint
 
-	if (GetKeyState("Esc", "P") || !ActionsStepWizard.CurrentActionsStep) {
-		SetTimer(showSelectorHint, 0)
+	try {
+		if (GetKeyState("Esc", "P") || !ActionsStepWizard.CurrentActionsStep) {
+			SetTimer(showSelectorHint, 0)
 
-		ActionsStepWizard.CurrentActionsStep.iPendingFunctionRegistration := false
-		ActionsStepWizard.CurrentActionsStep.iPendingActionRegistration := false
+			if ActionsStepWizard.CurrentActionsStep {
+				ActionsStepWizard.CurrentActionsStep.iPendingFunctionRegistration := false
+				ActionsStepWizard.CurrentActionsStep.iPendingActionRegistration := false
+			}
+
+			ToolTip( , , 1)
+		}
+		else if ActionsStepWizard.CurrentActionsStep {
+			if ActionsStepWizard.CurrentActionsStep.iPendingFunctionRegistration
+				ToolTip(translate("Click on a controller function..."), , , 1)
+			else if ActionsStepWizard.CurrentActionsStep.iPendingActionRegistration
+				ToolTip(translate("Click on an action..."), , , 1)
+		}
+	}
+	catch Any as exception {
+		logError(exception)
+
+		SetTimer(showSelectorHint, 0)
 
 		ToolTip( , , 1)
 	}
-	else if ActionsStepWizard.CurrentActionsStep.iPendingFunctionRegistration
-		ToolTip(translate("Click on a controller function..."), , , 1)
-	else if ActionsStepWizard.CurrentActionsStep.iPendingActionRegistration
-		ToolTip(translate("Click on an action..."), , , 1)
 }
 
 

@@ -22,4 +22,4 @@
 										 Damper.Rebound.Fast.Front.Left, Damper.Rebound.Fast.Front.Right,
 										 Damper.Rebound.Fast.Rear.Left, Damper.Rebound.Fast.Rear.Right])),
 				 (Prove: addSettings("Assetto Corsa", "Toyota Supra MKIV Time Attack",
-									 [Differential.Coast, Differential.Power]))
+									 [Differential.Coast, Differential.Power, Electronics.Turbo]))

@@ -2142,40 +2142,6 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 		functionsListView .OnEvent("Click", chooseFunction)
 		functionsListView .OnEvent("DoubleClick", chooseFunction)
 
-		/*
-		if hasDrivingCoach {
-			functions.Push(Array("Driving Coach", "Performance Analysis"))
-			functions.Push(Array("Driving Coach", "Handling Analysis"))
-		}
-
-		if hasRaceSpotter
-			functions.Push(Array("Race Spotter", "Track Automation"))
-
-		if hasRaceStrategist {
-			functions.Push(Array("Race Strategist", "Telemetry Collection"))
-			functions.Push(Array("Race Strategist", "Traffic Analysis"))
-		}
-
-		if hasRaceEngineer {
-			functions.Push(Array("Race Engineer", "Pressure Collection"))
-			functions.Push(Array("Race Engineer", "Fuel Warning"))
-			functions.Push(Array("Race Engineer", "Damage Warning"))
-			functions.Push(Array("Race Engineer", "Pressure Warning"))
-			functions.Push(Array("Race Engineer", "Pitstop Service"))
-		}
-
-		if hasMotionFeedback
-			functions.Push(Array("Motion Feedback", "Motion"))
-
-		if hasPedalVibration
-			functions.Push(Array("Tactile Feedback", "Pedal Vibration"))
-
-		if hasChassisVibration {
-			functions.Push(Array("Tactile Feedback", "Front Vibration"))
-			functions.Push(Array("Tactile Feedback", "Rear Vibration"))
-		}
-		*/
-
 		settingsTab.UseTab(0)
 
 		profilesEditorGui.Add("Text", "x8 ys+190 w408 0x10")

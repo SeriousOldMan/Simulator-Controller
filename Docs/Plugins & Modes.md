@@ -512,7 +512,7 @@ This is a supporting plugin for the Virtual Race Assistants. It supports the con
 	
 You can define a function on your hardware controller with the parameter *teamServer*, to enable or disable the connection to the *Team Server* dynamically. The *onOffFunction* may be ommited, if you only want to enable or disable the *Team Server* connection for all your sessions. The also optional *initialState* must be either "On" or "Off" (default is "On") and for *onOffFunction* unary and binary functions are supported. The function will be bound to a plugin action. If you don't supply an argument for this parameter, the *Team Server* connection will always be active, but whether you join a session depends on the settings in the "Race Settings" (see the next parameter).
 
-The parameter *openRaceSettings* allows you to bind a plugin action to your hardware controller, which opens the [settings dialog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings), which you will use before a race to choose your driver and session settings for a team session. Please note, that this parameter is also available in the plugins for the Virtual Race Assistants. You only have to declare it once, if you want to use it. Last, but not least, you can open the "Race Center" using the function supplied to the *openRaceCenter* parameter. This parameter is available for you convinience in the plugins for the Virtual Race Assistants as well.
+The parameter *openRaceSettings* allows you to bind a plugin action to your hardware controller, which opens the [settings dialog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings), which you will use before a race to choose your driver and session settings for a team session. Please note, that this parameter is also available in the plugins for the Virtual Race Assistants. You only have to declare it once, if you want to use it. Last, but not least, you can open the "Race Center" using the function supplied to the *openRaceCenter* parameter. This parameter is available for you convenience in the plugins for the Virtual Race Assistants as well.
 
 ## Plugin *ACC*
 
@@ -620,7 +620,7 @@ See the following table for the supported Assistant commands.
 
 See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *DriverSwapPlan*, *PitstopPrepare*, *Accept* and *Reject* and the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin above for more information on *PitstopRecommend* or *StrategyCancel*.
 
-Note: For convinience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
+Note: For convenience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
 
 ### Important preparation for the Pitstop MFD handling
 
@@ -741,7 +741,7 @@ See the following table for the supported Assistant commands.
 
 See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *DriverSwapPlan*, *PitstopPrepare*, *Accept* and *Reject* and the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin above for more information on *PitstopRecommend* or *StrategyCancel*.
 
-Note: For convinience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
+Note: For convenience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
 
 ### Special requirements when using the Pitstop automation
 
@@ -846,7 +846,7 @@ See the following table for the supported Assistant commands.
 
 See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *DriverSwapPlan*, *PitstopPrepare*, *Accept* and *Reject* and the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin above for more information on *PitstopRecommend* or *StrategyCancel*.
 
-Note: For convinience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
+Note: For convenience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
 
 ## Plugin *RF2*
 
@@ -938,7 +938,7 @@ See the following table for the supported Assistant commands.
 
 See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *DriverSwapPlan*, *PitstopPrepare*, *Accept* and *Reject* and the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin above for more information on *PitstopRecommend* or *StrategyCancel*.
 
-Note: For convinience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
+Note: For convenience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
 
 ### Installation of the *rFactor 2* Pitstop Interface
 
@@ -1034,7 +1034,7 @@ See the following table for the supported Assistant commands.
 
 See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *DriverSwapPlan*, *PitstopPrepare*, *Accept* and *Reject* and the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin above for more information on *PitstopRecommend* or *StrategyCancel*.
 
-Note: For convinience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
+Note: For convenience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
 
 ### Important preparation for the Pitstop MFD handling
 
@@ -1140,7 +1140,7 @@ See the following table for the supported Assistant commands.
 
 See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *DriverSwapPlan*, *PitstopPrepare*, *Accept* and *Reject* and the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin above for more information on *PitstopRecommend* amd *StrategyCancel*.
 
-Note: For convinience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
+Note: For convenience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
 
 ### Special requirements when using the Pitstop automation
 
@@ -1237,7 +1237,7 @@ See the following table for the supported assistant commands.
 
 See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *DriverSwapPlan*, *PitstopPrepare*, *Accept* and *Reject* and the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin above for more information on *PitstopRecommend* amd *StrategyCancel*.
 
-Note: For convinience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
+Note: For convenience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
 
 ### Special requirements when using the Pitstop automation
 

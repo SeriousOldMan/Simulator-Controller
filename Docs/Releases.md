@@ -4,7 +4,7 @@
   3. Fixed entering available minutes manually in "Server Administration".
   4. Functions in the Startup Profiles are no longer listed twice.
   5. The list of server objects has been extended in the "Server Administration" application.
-  6. "Server Administration" now also conviniently uses a Server URL drop down list to select the server from a list of all recently used servers.
+  6. "Server Administration" now also conveniently uses a Server URL drop down list to select the server from a list of all recently used servers.
   7. The Server URL drop down list does not jump to the first entry anymore in "Simulator Configuration", when a previously unknown URL has been entered.
   8. When a session database is being rebuild by the "Database Synchronizer", no more duplicate objects are created on the Team Server.
   9. The "Database Synchronizer" has become much more resilient against corrupted data in the local database.
@@ -1916,7 +1916,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. Added support for pre-race stint planning in "Race Center". See the new [Session & Stint planning](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#session--stint-planning) documentation for more information.
-  4. New [plugin parameter "openRaceCenter"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-team-server) for the "Team Server" plugin. This parameter is identical to the same parameter already defined for the "Race Strategist" and "Race Engineer" plugins and is therfore not much more than a convinience feature.
+  4. New [plugin parameter "openRaceCenter"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-team-server) for the "Team Server" plugin. This parameter is identical to the same parameter already defined for the "Race Strategist" and "Race Engineer" plugins and is therfore not much more than a convenience feature.
   5. "Strategy Workbench" can now create strategies even without telemetry data for a specific car and track.
   6. Fixed a bug, where telemetry data were not collected during practice sessions.
 

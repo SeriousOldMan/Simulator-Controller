@@ -120,7 +120,7 @@ Note: Once you have created your own sets of car and tyre compound definitions, 
 
 #### Settings in the "Session Database"
 
-The other - and to be honest much more convinient - possibility to create a tyre compound mapping for a given car, is by using the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--session-database). Insert a new setting for the car in question and enter the tyre compound mapping as follows:
+The other - and to be honest much more convenient - possibility to create a tyre compound mapping for a given car, is by using the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--session-database). Insert a new setting for the car in question and enter the tyre compound mapping as follows:
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%2012.jpg)
 

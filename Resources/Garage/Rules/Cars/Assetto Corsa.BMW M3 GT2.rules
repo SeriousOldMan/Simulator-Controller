@@ -12,6 +12,6 @@
 ;;;-------------------------------------------------------------------------;;;
 
 [?Initialize] => (Prove: removeSettings("Assetto Corsa", "BMW M3 GT2",
-										[Differential.Preload])),
+										[Electronics.ABS, Differential.Preload])),
 				 (Prove: addSettings("Assetto Corsa", "BMW M3 GT2",
 									 [Differential.Coast, Differential.Power]))

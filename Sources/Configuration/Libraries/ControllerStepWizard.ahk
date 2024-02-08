@@ -1565,6 +1565,8 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 showSelectorHint(state?) {
 	local hint
 
+	static running := false
+
 	if isSet(state) {
 		if state
 			SetTimer(showSelectorHint, 100)
@@ -1573,19 +1575,34 @@ showSelectorHint(state?) {
 
 			ToolTip( , , 1)
 		}
-	}
-	else if (GetKeyState("Esc", "P") || !ActionsStepWizard.CurrentActionsStep) {
-		SetTimer(showSelectorHint, 0)
 
-		ActionsStepWizard.CurrentActionsStep.iPendingFunctionRegistration := false
-		ActionsStepWizard.CurrentActionsStep.iPendingActionRegistration := false
-
-		ToolTip( , , 1)
+		running := state
 	}
-	else if ActionsStepWizard.CurrentActionsStep.iPendingFunctionRegistration
-		ToolTip(translate("Click on a controller function..."), , , 1)
-	else if ActionsStepWizard.CurrentActionsStep.iPendingActionRegistration
-		ToolTip(translate("Click on an action..."), , , 1)
+	else if running {
+		try {
+			if (GetKeyState("Esc", "P") || !ActionsStepWizard.CurrentActionsStep) {
+				showSelectorHint(false)
+
+				if ActionsStepWizard.CurrentActionsStep {
+					ActionsStepWizard.CurrentActionsStep.iPendingFunctionRegistration := false
+					ActionsStepWizard.CurrentActionsStep.iPendingActionRegistration := false
+				}
+			}
+			else if ActionsStepWizard.CurrentActionsStep {
+				if ActionsStepWizard.CurrentActionsStep.iPendingFunctionRegistration
+					ToolTip(translate("Click on a controller function..."), , , 1)
+				else if ActionsStepWizard.CurrentActionsStep.iPendingActionRegistration
+					ToolTip(translate("Click on an action..."), , , 1)
+			}
+		}
+		catch Any as exception {
+			logError(exception)
+
+			showSelectorHint(false)
+		}
+	}
+	else
+		showSelectorHint(false)
 }
 
 

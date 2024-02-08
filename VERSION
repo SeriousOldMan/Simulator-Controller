@@ -1,9 +1,9 @@
 [Development]
-Version=5.5.7.0-alpha
+Version=5.5.7.0-beta
 Target=5.5.7.0-release
-Date=02/07/2024
-Download=https://www.dropbox.com/scl/fi/15hobwuixgiaeh36gzurr/Simulator-Controller-5.5.7.0-alpha.zip?rlkey=3cvse61c6pn1jywz0nqeie6oc&dl=1
-Changes=Increased resilience against corrupted data in "Database Synchronizer", Downloadable components in "Simulator Setup", Added AC car meta DLC, Added Splash Media DLC, Small fixes in the objects list of the Team Server, Fixed manual available minutes update in "Server Administration", Fixed adding a new Server URL in team server tab in "Simulator Configuration", Fixed duplicate object creation in session database rebuild, New car models for the "Setup Workbench", New Server URL combo box in "Server Administration", Ignore time of first lap in "Race Center" and "Practice Center"
+Date=02/08/2024
+Download=https://www.dropbox.com/scl/fi/dwckcwshlcyu7pjsyltan/Simulator-Controller-5.5.7.0-beta.zip?rlkey=kpdhpnl7asp6m71bexymeufwu&dl=1
+Changes=Increased resilience against corrupted data in "Database Synchronizer", Downloadable components in "Simulator Setup", Added AC car meta DLC, Added Splash Media DLC, Small fixes in the objects list of the Team Server, Fixed manual available minutes update in "Server Administration", Fixed adding a new Server URL in team server tab in "Simulator Configuration", Fixed duplicate object creation in session database rebuild, New car models for the "Setup Workbench", New Server URL combo box in "Server Administration", Ignore time of first lap in "Race Center" and "Practice Center", Optimized handling of background processes in "Simulator Setup"
 Components=Media->5.5.7,Configuration->5.5.7,Utilities->5.4.8
 [Release]
 Version=5.5.6.1-release
@@ -30,5 +30,5 @@ Utilities.5.4.8.Download=https://www.dropbox.com/scl/fi/5nduffajjm3x6rhsxr1nk/Ut
 [Current]
 Type=Development
 [Version]
-Development=5.5.7.0-alpha
+Development=5.5.7.0-beta
 Release=5.5.6.1-release

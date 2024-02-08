@@ -309,6 +309,8 @@ class ControllerStepWizard extends StepWizard {
 		local streamDeckConfiguration := readMultiMap(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini")
 		local function, streamDeckFunctions, controller, definition, ignore, msgResult
 
+		showSelectorHint(false)
+
 		if (this.conflictingFunctions(buttonBoxConfiguration) || this.conflictingTriggers(buttonBoxConfiguration)) {
 			OnMessage(0x44, translateOkButton)
 			withBlockedWindows(MsgBox, translate("There are still duplicate functions or duplicate triggers - please correct..."), translate("Error"), 262160)
@@ -1311,16 +1313,14 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 			this.iPendingActionRegistration := false
 			this.iPendingFunctionRegistration := row
 
-			SetTimer(showSelectorHint, 0)
-
-			ToolTip( , , 1)
+			showSelectorHint(false)
 
 			this.controlClick(arguments*)
 		}
 		else {
 			this.iPendingFunctionRegistration := row
 
-			SetTimer(showSelectorHint, 100)
+			showSelectorHint(true)
 		}
 	}
 
@@ -1347,7 +1347,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 	setFunctionAction(arguments) {
 		this.iPendingActionRegistration := arguments
 
-		SetTimer(showSelectorHint, 100)
+		showSelectorHint(true)
 	}
 
 	clearFunctionAction(preview, function, control, row, column) {
@@ -1515,9 +1515,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 			else {
 				SoundPlay(getFileName("Activated.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\"))
 
-				SetTimer(showSelectorHint, 0)
-
-				ToolTip( , , 1)
+				showSelectorHint(false)
 
 				actionRow := this.iPendingFunctionRegistration
 
@@ -1564,10 +1562,19 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 ;;;                   Public Function Declaration Section                   ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-showSelectorHint() {
+showSelectorHint(state?) {
 	local hint
 
-	if (GetKeyState("Esc", "P") || !ActionsStepWizard.CurrentActionsStep) {
+	if isSet(state) {
+		if state
+			SetTimer(showSelectorHint, 100)
+		else {
+			SetTimer(showSelectorHint, 0)
+
+			ToolTip( , , 1)
+		}
+	}
+	else if (GetKeyState("Esc", "P") || !ActionsStepWizard.CurrentActionsStep) {
 		SetTimer(showSelectorHint, 0)
 
 		ActionsStepWizard.CurrentActionsStep.iPendingFunctionRegistration := false

@@ -311,6 +311,8 @@ class ControllerStepWizard extends StepWizard {
 
 		showSelectorHint(false)
 
+		this.SetupWizard.toggleTriggerDetector("Stop")
+
 		if (this.conflictingFunctions(buttonBoxConfiguration) || this.conflictingTriggers(buttonBoxConfiguration)) {
 			OnMessage(0x44, translateOkButton)
 			withBlockedWindows(MsgBox, translate("There are still duplicate functions or duplicate triggers - please correct..."), translate("Error"), 262160)
@@ -1563,10 +1565,6 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 ;;;-------------------------------------------------------------------------;;;
 
 showSelectorHint(state?) {
-	local hint
-
-	static running := false
-
 	if isSet(state) {
 		if state
 			SetTimer(showSelectorHint, 100)
@@ -1575,10 +1573,8 @@ showSelectorHint(state?) {
 
 			ToolTip( , , 1)
 		}
-
-		running := state
 	}
-	else if running {
+	else
 		try {
 			if (GetKeyState("Esc", "P") || !ActionsStepWizard.CurrentActionsStep) {
 				showSelectorHint(false)
@@ -1588,21 +1584,17 @@ showSelectorHint(state?) {
 					ActionsStepWizard.CurrentActionsStep.iPendingActionRegistration := false
 				}
 			}
-			else if ActionsStepWizard.CurrentActionsStep {
+			else if ActionsStepWizard.CurrentActionsStep
 				if ActionsStepWizard.CurrentActionsStep.iPendingFunctionRegistration
 					ToolTip(translate("Click on a controller function..."), , , 1)
 				else if ActionsStepWizard.CurrentActionsStep.iPendingActionRegistration
 					ToolTip(translate("Click on an action..."), , , 1)
-			}
 		}
 		catch Any as exception {
 			logError(exception)
 
 			showSelectorHint(false)
 		}
-	}
-	else
-		showSelectorHint(false)
 }
 
 

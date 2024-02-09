@@ -357,6 +357,8 @@ class ConfigurationEditor extends ConfigurationItem {
 
 			if configurator.HasProp("activate")
 				configurator.activate()
+
+			this.toggleTriggerDetector("Stop")
 		}
 
 		openDocumentation(*) {

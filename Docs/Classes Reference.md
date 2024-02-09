@@ -124,7 +124,7 @@ Called during resizing to redraw parts of the window. If you want the redraw to 
 
 # Collections Classes
 
-This part of the framework define a couple of convinience collection classes to achieve special behaviour when accessing collection elements. Some of this bahviour mimics that of the previous AutoHotkey language version, thereby preserving the functionality of the applications implementation.
+This part of the framework define a couple of convenience collection classes to achieve special behaviour when accessing collection elements. Some of this bahviour mimics that of the previous AutoHotkey language version, thereby preserving the functionality of the applications implementation.
 
 ## CaseSenseMap ([Collections.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Collections.ahk))
 Defines a hash map, that uses case sensitive keys. Actually the standard of the builtin *Map* class, but the name of the class documments this property.

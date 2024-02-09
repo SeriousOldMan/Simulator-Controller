@@ -248,7 +248,7 @@ A simple translation support is built into Simulator Controller. Every text, tha
 Returns a map, where the key defines the [ISO language code](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) and the value the language name (example: *{en: English, de: Deutsch}*. The map is populated with all available translations.
 
 #### *readTranslations(languageCode :: String)*
-Returns a translation map for the given [ISO language code](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes). Keys are the original texts in English with the translated texts as their values. Normally, it is much more convinient to use the *translate* function below.
+Returns a translation map for the given [ISO language code](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes). Keys are the original texts in English with the translated texts as their values. Normally, it is much more convenient to use the *translate* function below.
 
 #### *writeTranslations(languageCode :: String, languageName :: String, translations :: Map)*
 Saves a translation map for the given [ISO language code](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) and language name. The format of the *translations* map must be according to the description in *readTranslations*. The translation map is stored in the *Simulator Controller\Translations* folder in your user *Documents* folder in a file named "Translations.LC", where LC is the given ISO language code.

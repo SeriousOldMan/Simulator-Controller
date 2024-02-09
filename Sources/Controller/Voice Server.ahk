@@ -58,6 +58,8 @@ class VoiceServer extends ConfigurationItem {
 	iVoiceClients := CaseInsenseMap()
 	iActiveVoiceClient := false
 
+	iActivationGrammars := []
+
 	iLanguage := "en"
 	iSynthesizer := "dotNET"
 	iSpeaker := true
@@ -504,6 +506,10 @@ class VoiceServer extends ConfigurationItem {
 			}
 		}
 
+		registerRecognitionHandler(handler) {
+			this.SpeechRecognizer[true].registerRecognitionHandler(this, handler)
+		}
+
 		activate(words := false) {
 			if this.ActivationCallback {
 				if !words
@@ -554,6 +560,12 @@ class VoiceServer extends ConfigurationItem {
 	ActiveVoiceClient {
 		Get {
 			return this.iActiveVoiceClient
+		}
+	}
+
+	ActivationGrammars {
+		Get {
+			return this.iActivationGrammars
 		}
 	}
 
@@ -1032,7 +1044,7 @@ class VoiceServer extends ConfigurationItem {
 					  , synthesizer := true, speaker := true, recognizer := false, listener := false
 					  , speakerVolume := kUndefined, speakerPitch := kUndefined, speakerSpeed := kUndefined
 					  , recognizerMode := "Grammar") {
-		local grammar, client, nextCharIndex, theDescriptor, ignore
+		local grammar, client, nextCharIndex, theDescriptor, ignore, compiledGrammar
 
 		static counter := 1
 
@@ -1069,6 +1081,8 @@ class VoiceServer extends ConfigurationItem {
 
 		this.VoiceClients[descriptor] := client
 
+		client.registerRecognitionHandler(ObjBindMethod(this, "handleActivationCommand"))
+
 		if (activationCommand && (StrLen(Trim(activationCommand)) > 0) && listener) {
 			recognizer := this.SpeechRecognizer[true]
 
@@ -1081,7 +1095,11 @@ class VoiceServer extends ConfigurationItem {
 			}
 
 			try {
-				if !recognizer.loadGrammar(grammar, recognizer.compileGrammar(activationCommand), ObjBindMethod(this, "recognizeActivationCommand", client))
+				compiledGrammar := recognizer.compileGrammar(activationCommand)
+
+				this.ActivationGrammars.Push({Descriptor: descriptor, Client: client, Grammar: compiledGrammar})
+
+				if !recognizer.loadGrammar(grammar, compiledGrammar, ObjBindMethod(this, "recognizeActivationCommand", client))
 					throw "Recognizer not running..."
 			}
 			catch Any as exception {
@@ -1108,12 +1126,20 @@ class VoiceServer extends ConfigurationItem {
 
 	unregisterVoiceClient(descriptor, pid) {
 		local client := (this.VoiceClients.Has(descriptor) ? this.VoiceClients[descriptor] : false)
-		local theDescriptor, ignore
+		local grammars := this.ActivationGrammars
+		local theDescriptor, ignore, grammars
 
 		if (client && (this.ActiveVoiceClient == client))
 			this.deactivateVoiceClient(descriptor)
 
 		this.VoiceClients.Delete(descriptor)
+
+		for ignore, grammar in grammars
+			if (grammar.Client = client) {
+				grammars.Delete(grammar)
+
+				break
+			}
 
 		if (this.VoiceClients.Count = 1) {
 			for theDescriptor, ignore in this.VoiceClients
@@ -1153,6 +1179,36 @@ class VoiceServer extends ConfigurationItem {
 
 	registerVoiceCommand(descriptor, grammar, command, callback) {
 		this.getVoiceClient(descriptor).registerVoiceCommand(grammar, command, callback)
+	}
+
+	handleActivationCommand(client, words*) {
+		local recognizer := client.SpeechRecognizer[true]
+		local text := values2String(A_Space, words*)
+		local bestRating := 0
+		local ignore, grammar, rating
+
+		static ratingHigh := kUndefined
+
+		if (ratingLow = kUndefined) {
+			settings := readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+
+			ratingHigh := getMultiMapValue(settings, "Voice", "High Rating", 0.85)
+		}
+
+		for ignore, grammar in this.ActivationGrammars {
+			rating := recognizer.match(text, grammar.Grammar)
+
+			if (rating > bestRating)
+				bestRating := rating
+		}
+
+		if (bestRating >= ratingHigh) {
+			this.recognizeActivationCommand(grammar.Client, grammar.Descriptor, words)
+
+			return true
+		}
+		else
+			return false
 	}
 
 	recognizeActivation(descriptor, grammar, words*) {

@@ -207,6 +207,8 @@ class SpeechRecognizer {
 	_grammarCallbacks := CaseInsenseMap()
 	_grammars := CaseInsenseMap()
 
+	_recognitionHandlers := []
+
 	Routing {
 		Get {
 			return "Standard"
@@ -674,6 +676,11 @@ class SpeechRecognizer {
 			return false
 	}
 
+	registerRecognitionHandler(owner, handler) {
+		if inList(["Azure", "Google"], this.Engine)
+			this._recognitionHandlers.Push(Array(owner, handler))
+	}
+
 	loadGrammar(name, theGrammar, callback) {
 		prepareGrammar(theName, theGrammar) {
 			local start := A_TickCount
@@ -780,60 +787,62 @@ class SpeechRecognizer {
 	_onTextCallback(text) {
 		local words, ignore, name, grammar, rating, index, literal, bestRating, bestMatch, callback
 
+		words := string2Values(A_Space, text)
+
+		for index, literal in words {
+			literal := StrReplace(literal, ".", "")
+			literal := StrReplace(literal, ",", "")
+			literal := StrReplace(literal, ";", "")
+			literal := StrReplace(literal, "?", "")
+			literal := StrReplace(literal, "-", "")
+
+			words[index] := literal
+		}
+
+		for ignore, handler in this._recognitionHandlers
+			if handler[2](handler[1], words*)
+				return
+
 		if (this.iMode = "Text")
 			this.textRecognized(text)
+		else if true {
+			bestRating := 0
+			bestMatch := false
+
+			for ignore, grammar in this._grammars {
+				rating := this.match(text, grammar.Grammar)
+
+				if (rating > bestRating) {
+					bestRating := rating
+					bestMatch := grammar
+				}
+			}
+
+			if bestMatch {
+				callback := bestMatch.Callback
+
+				callback.Call(bestMatch.Name, words)
+			}
+			else if this._grammars.Has("?") {
+				callback := this._grammars["?"].Callback
+
+				callback.Call("?", words)
+			}
+		}
 		else {
-			words := string2Values(A_Space, text)
+			for name, grammar in this._grammars
+				if grammar.Grammar.match(words) {
+					callback := grammar.Callback
 
-			for index, literal in words {
-				literal := StrReplace(literal, ".", "")
-				literal := StrReplace(literal, ",", "")
-				literal := StrReplace(literal, ";", "")
-				literal := StrReplace(literal, "?", "")
-				literal := StrReplace(literal, "-", "")
+					callback.Call(name, words)
 
-				words[index] := literal
-			}
-
-			if true {
-				bestRating := 0
-				bestMatch := false
-
-				for ignore, grammar in this._grammars {
-					rating := this.match(text, grammar.Grammar)
-
-					if (rating > bestRating) {
-						bestRating := rating
-						bestMatch := grammar
-					}
+					return
 				}
 
-				if bestMatch {
-					callback := bestMatch.Callback
+			if this._grammars.Has("?") {
+				callback := this._grammars["?"].Callback
 
-					callback.Call(bestMatch.Name, words)
-				}
-				else if this._grammars.Has("?") {
-					callback := this._grammars["?"].Callback
-
-					callback.Call("?", words)
-				}
-			}
-			else {
-				for name, grammar in this._grammars
-					if grammar.Grammar.match(words) {
-						callback := grammar.Callback
-
-						callback.Call(name, words)
-
-						return
-					}
-
-				if this._grammars.Has("?") {
-					callback := this._grammars["?"].Callback
-
-					callback.Call("?", words)
-				}
+				callback.Call("?", words)
 			}
 		}
 	}

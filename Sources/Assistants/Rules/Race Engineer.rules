@@ -771,7 +771,7 @@ priority: 20, [?Pitstop.Plan = true] =>
 		(Clear: Pitstop.Planned.Tyre.Pressure.Lost.RL), (Clear: Pitstop.Planned.Tyre.Pressure.Lost.RR),
 		(Clear: Pitstop.Planned.Driver.Request),
 		(Clear: Pitstop.Planned.Repair.Suspension), (Clear: Pitstop.Planned.Repair.Bodywork), (Clear: Pitstop.Planned.Repair.Engine),
-		(Clear: Pitstop.Planned.Time)
+		(Clear: Pitstop.Planned.Time), (Clear: Pitstop.Prepared)
 priority: 10, [?Pitstop.Plan] => (Prove: planPitstop())
 
 planPitstop() <= lastPitstop(?last), ?nr = ?last + 1, Set(Pitstop.Planned.Nr, ?nr)

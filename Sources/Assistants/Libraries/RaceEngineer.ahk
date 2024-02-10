@@ -985,7 +985,7 @@ class RaceEngineer extends RaceAssistant {
 		if (this.iPitstopAdjustments && this.hasPreparedPitstop()) {
 			value := getMultiMapValue(data, "Setup Data", "FuelAmount", kUndefined)
 
-			if ((value != kUndefined) && (Round(knowledgeBase.getValue("Pitstop.Planned.Fuel"), 1) != Round(value, 1))) {
+			if ((value != kUndefined) && (Abs(Floor(knowledgeBase.getValue("Pitstop.Planned.Fuel")) - Floor(value)) > 2)) {
 				this.pitstopOptionChanged("Refuel", verbose, Round(value, 1))
 
 				result := true
@@ -1017,7 +1017,7 @@ class RaceEngineer extends RaceAssistant {
 
 					values.Push(value)
 
-					if (value && (Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure." . suffix, false), 1) != Round(value, 1)))
+					if (value && ((Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure." . suffix, false), 1) - Round(value, 1)) > 0.2))
 						changed := true
 				}
 

@@ -1017,7 +1017,7 @@ class RaceEngineer extends RaceAssistant {
 
 					values.Push(value)
 
-					if (value && ((Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure." . suffix, false), 1) - Round(value, 1)) > 0.2))
+					if (value && (Abs(Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure." . suffix, false), 1) - Round(value, 1)) > 0.2))
 						changed := true
 				}
 

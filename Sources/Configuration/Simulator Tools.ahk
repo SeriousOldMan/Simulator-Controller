@@ -3100,6 +3100,7 @@ startupSimulatorTools() {
 	A_IconTip := "Simulator Tools"
 
 	setDebug(false)
+	setLogLevel(kLogWarn)
 
 	checkInstallation()
 

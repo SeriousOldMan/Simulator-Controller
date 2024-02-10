@@ -3099,6 +3099,8 @@ startupSimulatorTools() {
 	TraySetIcon(icon, "1")
 	A_IconTip := "Simulator Tools"
 
+	setDebug(false)
+
 	checkInstallation()
 
 	readToolsConfiguration(&gUpdateSettings, &gCleanupSettings, &gCopySettings, &gBuildSettings, &gSplashScreen, &gTargetConfiguration)

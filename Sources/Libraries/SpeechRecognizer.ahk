@@ -785,7 +785,7 @@ class SpeechRecognizer {
 	}
 
 	_onTextCallback(text) {
-		local words, ignore, name, grammar, rating, index, literal, bestRating, bestMatch, callback
+		local words, ignore, name, grammar, rating, index, literal, bestRating, bestMatch, callback, handler
 
 		words := string2Values(A_Space, text)
 
@@ -800,7 +800,7 @@ class SpeechRecognizer {
 		}
 
 		for ignore, handler in this._recognitionHandlers
-			if handler[2](handler[1], words*)
+			if handler[2].Call(handler[1], words*)
 				return
 
 		if (this.iMode = "Text")

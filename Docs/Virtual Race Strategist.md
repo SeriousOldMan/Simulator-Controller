@@ -381,7 +381,7 @@ The choices (except tyre compounds) will be remembered between different runs of
 
 ### Exporting data to the session database
 
-At the end of your session, you can decide which data should be transfered to the session database by clicking the small check marks for each lap in the list of driven laps. "Practice Center" will already have selected by default all valid laps for your convinience. Then choose the command "Export to Database" from the "Session" menu.
+At the end of your session, you can decide which data should be transfered to the session database by clicking the small check marks for each lap in the list of driven laps. "Practice Center" will already have selected by default all valid laps for your convenience. Then choose the command "Export to Database" from the "Session" menu.
 
 Please note, that this export is possible only once, to prevent duplicate data entries in your database, and cannot be undone. Therefore check your selection carefully beforehand.
 
@@ -551,7 +551,7 @@ Although the logical predicates in *Prolog* look like function calls, the semant
   
   6. *refuels(?refuels)*
   
-     Convinience predicate for: "refuels(?refuels) <= totalFuel(?, ?refuels)"
+     Convenience predicate for: "refuels(?refuels) <= totalFuel(?, ?refuels)"
 
   7. *tyreSets(?tyreSets)*
   
@@ -627,7 +627,7 @@ Beside these predicates, which access the data of the current scenario, you have
 
 ##### Integrating into Strategy Workbench
 
-Once you have created a set of validation rules similar to the examples above, you can put the script in a file with the ".rules" extension and place this file in the *Validators* folder which is located in the *Simulator Controller* folder in your user *Documents* folder. For your convinience, this folder opens when you choose the "Rules:" item in the "Settings" menu. Once you have done this, you can activate the *validator* in the "Settings" menu of "Simulator Workbench". And from now on, you can hold down the control key while selecting the validator from the menu to start a text editor for this file.
+Once you have created a set of validation rules similar to the examples above, you can put the script in a file with the ".rules" extension and place this file in the *Validators* folder which is located in the *Simulator Controller* folder in your user *Documents* folder. For your convenience, this folder opens when you choose the "Rules:" item in the "Settings" menu. Once you have done this, you can activate the *validator* in the "Settings" menu of "Simulator Workbench". And from now on, you can hold down the control key while selecting the validator from the menu to start a text editor for this file.
 
 ### Pitstop & Service
 

@@ -1,26 +1,20 @@
 [Development]
-Version=5.5.7.0-alpha
-Target=5.5.7.0-release
-Date=02/07/2024
-Download=https://www.dropbox.com/scl/fi/15hobwuixgiaeh36gzurr/Simulator-Controller-5.5.7.0-alpha.zip?rlkey=3cvse61c6pn1jywz0nqeie6oc&dl=1
-Changes=Increased resilience against corrupted data in "Database Synchronizer", Downloadable components in "Simulator Setup", Added AC car meta DLC, Added Splash Media DLC, Small fixes in the objects list of the Team Server, Fixed manual available minutes update in "Server Administration", Fixed adding a new Server URL in team server tab in "Simulator Configuration", Fixed duplicate object creation in session database rebuild, New car models for the "Setup Workbench", New Server URL combo box in "Server Administration", Ignore time of first lap in "Race Center" and "Practice Center"
+Version=5.5.8.0-dev
+Target=5.5.8.0-release
+Date=02/09/2024
+Download=
+Changes=Support activation commands without double-press for cloud based voice recognition services
 Components=Media->5.5.7,Configuration->5.5.7,Utilities->5.4.8
 [Release]
-Version=5.5.6.1-release
-Date=02/02/2024
-Download=https://cutt.ly/qwXf9X7e;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.5.6.1-release.zip
-Changes=Added default profile for Stream Deck to the Profiles collection, Fixes for the Assistants with deactivated listeners, Fixed default connections in Startup Profiles, Added voice control status to "System Monitor", New settings "Engine.Limiter" and "Turbo" in "Setup Workbench", New car models for "Setup Workbench", Fixed "Simulator Configuration" not open its main window, Added title bar to some windows to make them moveable, New settings that allow to configure the strategy announcements of the Strategist, Startup check for UDP configuration, Consumables chart now included in strategy comparison report
-Components=Media->5.3.0,Configuration->5.5.3,Utilities->5.4.8
+Version=5.5.7.0-release
+Date=02/09/2024
+Download=https://cutt.ly/0wCcAb0U;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.5.7.0-release.zip
+Changes=Increased resilience against corrupted data in "Database Synchronizer", Downloadable components in "Simulator Setup", Added AC car meta DLC, Added Splash Media DLC, Small fixes in the objects list of the Team Server, Fixed manual available minutes update in "Server Administration", Fixed adding a new Server URL in team server tab in "Simulator Configuration", Fixed duplicate object creation in session database rebuild, New car models for the "Setup Workbench", New Server URL combo box in "Server Administration", Ignore time of first lap in "Race Center" and "Practice Center", Optimized handling of background processes in "Simulator Setup"
+Components=Media->5.5.7,Configuration->5.5.7,Utilities->5.4.8
 [Components]
-Media.5.3.0.Path=Resources
-Media.5.3.0.Content=Splash Media
-Media.5.3.0.Download=https://www.dropbox.com/scl/fi/s4uchdrhdm0m4giiix86k/Media-5.3.0.zip?rlkey=t9lkkd9nj4koxyaaqa2h6i8nx&dl=1
 Media.5.5.7.Path=Resources
 Media.5.5.7.Content=Splash Media
 Media.5.5.7.Download=https://www.dropbox.com/scl/fi/j1p9a61y83180ctsr8f18/Media-5.5.7.zip?rlkey=6c72qsss7ijrvzpnjk2ho3h4k&dl=1
-Configuration.5.5.3.Path=Resources
-Configuration.5.5.3.Content=Setup
-Configuration.5.5.3.Download=https://www.dropbox.com/scl/fi/ap6yjq2vpfd531gt0raq0/Configuration-5.5.3.zip?rlkey=tayjja9gpiwxumwv7ywmbw705&dl=1
 Configuration.5.5.7.Path=Resources
 Configuration.5.5.7.Content=Setup
 Configuration.5.5.7.Download=https://www.dropbox.com/scl/fi/xv1g3vb5c3dzuluw50tf2/Configuration-5.5.7.zip?rlkey=kuai5d48islfuboio2wyi0d95&dl=1
@@ -30,5 +24,5 @@ Utilities.5.4.8.Download=https://www.dropbox.com/scl/fi/5nduffajjm3x6rhsxr1nk/Ut
 [Current]
 Type=Development
 [Version]
-Development=5.5.7.0-alpha
-Release=5.5.6.1-release
+Development=5.5.8.0-dev
+Release=5.5.7.0-release

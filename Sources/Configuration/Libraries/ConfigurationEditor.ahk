@@ -357,6 +357,8 @@ class ConfigurationEditor extends ConfigurationItem {
 
 			if configurator.HasProp("activate")
 				configurator.activate()
+
+			this.toggleTriggerDetector("Stop")
 		}
 
 		openDocumentation(*) {
@@ -483,7 +485,7 @@ triggerDetector(callback := false) {
 
 			detectorTask := false
 		}
-		else {
+		else if (callback != "Stop") {
 			detectorTask := TriggerDetectorTask(callback, 100)
 
 			detectorTask.start()

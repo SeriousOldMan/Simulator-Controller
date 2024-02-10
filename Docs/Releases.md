@@ -1,20 +1,21 @@
-## 5.5.7.0-release 02/09/24 (planned)
+## 5.5.7.0-release 02/09/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed entering available minutes manually in "Server Administration".
   4. Functions in the Startup Profiles are no longer listed twice.
   5. The list of server objects has been extended in the "Server Administration" application.
-  6. "Server Administration" now also conviniently uses a Server URL drop down list to select the server from a list of all recently used servers.
+  6. "Server Administration" now also conveniently uses a Server URL drop down list to select the server from a list of all recently used servers.
   7. The Server URL drop down list does not jump to the first entry anymore in "Simulator Configuration", when a previously unknown URL has been entered.
   8. When a session database is being rebuild by the "Database Synchronizer", no more duplicate objects are created on the Team Server.
   9. The "Database Synchronizer" has become much more resilient against corrupted data in the local database.
-  10. The lap time of the first lap of a stint is now ignored in all computations of "Race Center" and "Practice Center".
-  11. Downloadable components are now available as presets in "Simulator Setup". See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#presets--special-configurations) for more information how to use the DLCs.
+  10. Handling and performance of background processes has been optimized for "Simulator Setup".
+  11. The lap time of the first lap of a stint is now ignored in all computations of "Race Center" and "Practice Center".
+  12. Downloadable components are now available as presets in "Simulator Setup". See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#presets--special-configurations) for more information how to use the DLCs.
       - A new DLC let you download car meta data for "Setup Workbench" for non-standard cars in *Assetto Corsa*.
 	  - Another DLC let you download additional media data for custom splash screens.
-  12. Previously bundled splash screen media has been removed from the standard distribution and has become a downloadable component (see above).
-  13. Many car meta data for *Assetto Corsa* has been corrected to not longer provide ABS settings, if these are not part of the *Factory* definition.
-  14. New car models for "Setup Workbench":
+  13. Previously bundled splash screen media has been removed from the standard distribution and has become a downloadable component (see above).
+  14. All car meta data for *Assetto Corsa* has been corrected to not longer provide ABS settings, if these are not part of the *Factory* definition.
+  15. New car models for "Setup Workbench":
       - Assetto Corsa
         - Audi R8 LMS 2016 (by @mirko_lesko)
         - Mazda MX5 Cup (by @mirko_lesko)
@@ -1915,7 +1916,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. Added support for pre-race stint planning in "Race Center". See the new [Session & Stint planning](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#session--stint-planning) documentation for more information.
-  4. New [plugin parameter "openRaceCenter"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-team-server) for the "Team Server" plugin. This parameter is identical to the same parameter already defined for the "Race Strategist" and "Race Engineer" plugins and is therfore not much more than a convinience feature.
+  4. New [plugin parameter "openRaceCenter"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-team-server) for the "Team Server" plugin. This parameter is identical to the same parameter already defined for the "Race Strategist" and "Race Engineer" plugins and is therfore not much more than a convenience feature.
   5. "Strategy Workbench" can now create strategies even without telemetry data for a specific car and track.
   6. Fixed a bug, where telemetry data were not collected during practice sessions.
 

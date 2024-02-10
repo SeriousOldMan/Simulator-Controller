@@ -12,6 +12,6 @@
 ;;;-------------------------------------------------------------------------;;;
 
 [?Initialize] => (Prove: removeSettings("Assetto Corsa", "Chevrolet Corvette C7R",
-										[Differential.Preload])),
+										[Electronics.ABS, Differential.Preload])),
 				 (Prove: addSettings("Assetto Corsa", "Chevrolet Corvette C7R",
 									 [Differential.Coast, Differential.Power]))

@@ -128,7 +128,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		thePlugin := Plugin("System", false, true, "", arguments)
 
 		excludes := []
-		
+
 		if (modeSelectors.Length = 0)
 			excludes.Push("modeSelector")
 
@@ -448,6 +448,8 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		local wizard, window, languageCode, code, language, configuration, voiceControlConfiguration
 		local ignore, section, subConfiguration
 
+		showLaunchHint(false)
+
 		this.iVoiceControlConfigurator.hideWidgets()
 
 		if super.hidePage(page) {
@@ -606,7 +608,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 	setLaunchApplication(arguments) {
 		this.iPendingApplicationRegistration := arguments
 
-		SetTimer(showLaunchHint, 100)
+		showLaunchHint(true)
 	}
 
 	clearLaunchApplication(preview, function, control, row, column) {
@@ -646,7 +648,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		else {
 			this.iPendingFunctionRegistration := row
 
-			SetTimer(showLaunchHint, 100)
+			showLaunchHint(true)
 		}
 	}
 
@@ -736,9 +738,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 					this.iLaunchApplicationsListView.Modify(this.iPendingFunctionRegistration, "Vis")
 				}
 
-				SetTimer(showLaunchHint, 0)
-
-				ToolTip( , , 1)
+				showLaunchHint(false)
 
 				this.iPendingFunctionRegistration := false
 			}
@@ -784,29 +784,37 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-showLaunchHint() {
-	local hint
+showLaunchHint(state?) {
+	if isSet(state) {
+		if state
+			SetTimer(showLaunchHint, 100)
+		else {
+			SetTimer(showLaunchHint, 0)
 
-	if (GetKeyState("Esc", "P") || !GeneralStepWizard.CurrentGeneralStep) {
-		SetTimer(showSelectorHint, 0)
-
-		if GeneralStepWizard.CurrentGeneralStep {
-			GeneralStepWizard.CurrentGeneralStep.iPendingApplicationRegistration := false
-			GeneralStepWizard.CurrentGeneralStep.iPendingFunctionRegistration := false
+			ToolTip( , , 1)
 		}
-
-		ToolTip( , , 1)
 	}
-	else if GeneralStepWizard.CurrentGeneralStep.iPendingFunctionRegistration {
-		hint := translate("Click on a controller function...")
+	else
+		try {
+			if (GetKeyState("Esc", "P") || !GeneralStepWizard.CurrentGeneralStep) {
+				showLaunchHint(false)
 
-		ToolTip(hint, , , 1)
-	}
-	else if GeneralStepWizard.CurrentGeneralStep.iPendingApplicationRegistration {
-		hint := translate("Click on an application...")
+				if GeneralStepWizard.CurrentGeneralStep {
+					GeneralStepWizard.CurrentGeneralStep.iPendingApplicationRegistration := false
+					GeneralStepWizard.CurrentGeneralStep.iPendingFunctionRegistration := false
+				}
+			}
+			else if GeneralStepWizard.CurrentGeneralStep
+				if GeneralStepWizard.CurrentGeneralStep.iPendingFunctionRegistration
+					ToolTip(translate("Click on a controller function..."), , , 1)
+				else if GeneralStepWizard.CurrentGeneralStep.iPendingApplicationRegistration
+					ToolTip(translate("Click on an application..."), , , 1)
+		}
+		catch Any as exception {
+			logError(exception)
 
-		ToolTip(hint, , , 1)
-	}
+			showLaunchHint(false)
+		}
 }
 
 initializeGeneralStepWizard() {

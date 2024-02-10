@@ -428,12 +428,14 @@ checkInstallation() {
 	}
 	catch Any as exception {
 		logError(exception, false, false)
+
+		installLocation := false
 	}
 
 	installInfo := readMultiMap(kUserConfigDirectory . "Simulator Controller.install")
 	installLocation := getMultiMapValue(installInfo, "Install", "Location", installLocation)
 
-	if inList(A_Args, "-Repair") {
+	if (installLocation && inList(A_Args, "-Repair")) {
 		if !A_IsAdmin {
 			if RegExMatch(DllCall("GetCommandLine", "Str"), " /restart(?!\S)") {
 				OnMessage(0x44, translateOkButton)
@@ -496,7 +498,7 @@ checkInstallation() {
 
 		ExitApp(0)
 	}
-	else if inList(A_Args, "-Uninstall") {
+	else if (installLocation && inList(A_Args, "-Uninstall")) {
 		quiet := inList(A_Args, "-Quiet")
 
 		if !A_IsAdmin {

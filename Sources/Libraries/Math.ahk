@@ -37,7 +37,8 @@ maximum(numbers) {
 
 average(numbers) {
 	local avg := 0
-	local ignore, value, cnt
+	local cnt := 0
+	local ignore, value
 
 	for ignore, value in numbers
 		if isNumber(value) {
@@ -65,7 +66,8 @@ sum(numbers) {
 stdDeviation(numbers) {
 	local avg := average(numbers)
 	local squareSum := 0
-	local ignore, value, cnt
+	local cnt := 0
+	local ignore, value
 
 	for ignore, value in numbers
 		if isNumber(value) {

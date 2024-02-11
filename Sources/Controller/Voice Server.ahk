@@ -83,6 +83,8 @@ class VoiceServer extends ConfigurationItem {
 	class VoiceClient {
 		iRouting := false
 
+		iActive := true
+
 		iCounter := 1
 
 		iVoiceServer := false
@@ -165,6 +167,16 @@ class VoiceServer extends ConfigurationItem {
 		Routing {
 			Get {
 				return this.iRouting
+			}
+		}
+
+		Active {
+			Get {
+				return this.iActive
+			}
+
+			Set {
+				return (this.iActive := value)
 			}
 		}
 
@@ -1044,7 +1056,7 @@ class VoiceServer extends ConfigurationItem {
 					  , synthesizer := true, speaker := true, recognizer := false, listener := false
 					  , speakerVolume := kUndefined, speakerPitch := kUndefined, speakerSpeed := kUndefined
 					  , recognizerMode := "Grammar") {
-		local grammar, client, nextCharIndex, theDescriptor, ignore
+		local grammar, client, nextCharIndex, theDescriptor, ignore, voiceClient, clientRecognizer
 
 		static compiler := SpeechRecognizer("Compiler")
 		static counter := 1
@@ -1096,7 +1108,25 @@ class VoiceServer extends ConfigurationItem {
 			}
 
 			try {
-				this.ActivationGrammars.Push({Descriptor: grammar, Client: client, Grammar: compiler.compileGrammar(activationCommand)})
+				for ignore, voiceClient in this.VoiceClients
+					if (voiceClient != client) {
+						clientRecognizer := voiceClient.SpeechRecognizer[true]
+
+						if clientRecognizer.loadGrammar(grammar, clientRecognizer.compileGrammar(activationCommand)
+													  , ObjBindMethod(this, "recognizeActivationCommand", client))
+							throw "Recognizer not running..."
+					}
+
+				clientRecognizer := client.SpeechRecognizer[true]
+
+				for ignore, activationGrammer in this.ActivationGrammars
+					if clientRecognizer.loadGrammar(activationGrammer.Descriptor, clientRecognizer.compileGrammar(activationGrammer.Command)
+												  , ObjBindMethod(this, "recognizeActivationCommand", activationGrammer.Client))
+						throw "Recognizer not running..."
+
+				this.ActivationGrammars.Push({Descriptor: grammar, Client: client
+											, Grammar: compiler.compileGrammar(activationCommand)
+											, Command: activationCommand})
 
 				if !recognizer.loadGrammar(grammar, recognizer.compileGrammar(activationCommand), ObjBindMethod(this, "recognizeActivationCommand", client))
 					throw "Recognizer not running..."
@@ -1132,6 +1162,9 @@ class VoiceServer extends ConfigurationItem {
 			this.deactivateVoiceClient(descriptor)
 
 		this.VoiceClients.Delete(descriptor)
+
+		if client
+			client.Active := false
 
 		for ignore, grammar in grammars
 			if (grammar.Client = client) {
@@ -1233,7 +1266,8 @@ class VoiceServer extends ConfigurationItem {
 	}
 
 	recognizeActivationCommand(voiceClient, grammar, words) {
-		this.addPendingCommand(ObjBindMethod(this, "activationCommandRecognized", voiceClient, grammar, words), voiceClient)
+		if voiceClient.Active
+			this.addPendingCommand(ObjBindMethod(this, "activationCommandRecognized", voiceClient, grammar, words), voiceClient)
 	}
 
 	recognizeVoiceCommand(voiceClient, grammar, words) {

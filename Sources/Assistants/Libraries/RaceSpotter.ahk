@@ -1992,7 +1992,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 					if ((carPosition < driverPosition) && (carInfo.AvgLapTime > driverLapTime))
 						if (!slowerCar || (carPosition < slowerCar.Position["Class"]))
-							if (((carInfo.AvgLapTime - driverLapTime) / driverLapTime) < 0.005)
+							if ((carInfo.AvgLapTime - driverLapTime) < 0.5)
 								slowerCar := carInfo
 				}
 

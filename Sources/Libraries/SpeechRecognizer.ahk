@@ -221,6 +221,12 @@ class SpeechRecognizer {
 		}
 	}
 
+	Method {
+		Get {
+			return (inList(["Azure", "Google"], this.Engine) ? "Text" : "Pattern")
+		}
+	}
+
 	Choices[name?] {
 		Get {
 			return this.getChoices(name?)

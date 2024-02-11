@@ -1109,7 +1109,7 @@ class VoiceServer extends ConfigurationItem {
 
 			try {
 				for ignore, voiceClient in this.VoiceClients
-					if (voiceClient != client) {
+					if ((voiceClient.Method = "Pattern") && (voiceClient != client)) {
 						clientRecognizer := voiceClient.SpeechRecognizer[true]
 
 						if clientRecognizer.loadGrammar(grammar, clientRecognizer.compileGrammar(activationCommand)
@@ -1119,10 +1119,11 @@ class VoiceServer extends ConfigurationItem {
 
 				clientRecognizer := client.SpeechRecognizer[true]
 
-				for ignore, activationGrammer in this.ActivationGrammars
-					if clientRecognizer.loadGrammar(activationGrammer.Descriptor, clientRecognizer.compileGrammar(activationGrammer.Command)
-												  , ObjBindMethod(this, "recognizeActivationCommand", activationGrammer.Client))
-						throw "Recognizer not running..."
+				if (clientRecognizer.Method = "Pattern")
+					for ignore, activationGrammer in this.ActivationGrammars
+						if clientRecognizer.loadGrammar(activationGrammer.Descriptor, clientRecognizer.compileGrammar(activationGrammer.Command)
+													  , ObjBindMethod(this, "recognizeActivationCommand", activationGrammer.Client))
+							throw "Recognizer not running..."
 
 				this.ActivationGrammars.Push({Descriptor: grammar, Client: client
 											, Grammar: compiler.compileGrammar(activationCommand)

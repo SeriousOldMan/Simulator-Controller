@@ -298,6 +298,9 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				try {
 					udpConfig := (this.iUDPConnection ? string2Values(",", this.iUDPConnection) : ["127.0.0.1", 9000, "asd", ""])
 
+					if (udpConfig.Length = 3)
+						udpConfig.Push("")
+
 					if (accUdpConfig.Has("udpListenerPort") && (accUdpConfig["udpListenerPort"] = udpConfig[2]))
 						udpConfigValid := true
 					else if (accUdpConfig.Has("updListenerPort") && (accUdpConfig["updListenerPort"] = udpConfig[2]))
@@ -2074,15 +2077,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 					return [getMultiMapValue(data, "Setup Data", "TyreSet", 0)]
 				case "Tyre Compound":
-					if this.iPSChangeTyres {
+					if this.iPSChangeTyres
 						return (inList(this.iPSOptions, "Tyre Set") ? ["Dry", "Black"] : ["Wet", "Black"])
-
-						/*
-						data := this.readSessionData("Setup=true")
-
-						return [getMultiMapValue(data, "Setup Data", "TyreCompound", false), getMultiMapValue(data, "Setup Data", "TyreCompoundColor", false)]
-						*/
-					}
 					else
 						return [false, false]
 				case "Repair Suspension":

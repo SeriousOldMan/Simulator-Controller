@@ -1,10 +1,12 @@
 ## 5.5.8.0-release 02/16/24 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
-  3. Fixed several bug for manual adjustments of an already prepared pitstop.
-  4. (Re-)Planning a pitstop will now always clear an already prepared pitstop. The settings transferred to the simulator will be preserved, though.
-  5. When using the Azure or Google voice recognition services, it is no longer need to double-press the Push-To-Talk button to initiate an activation command like "Hey Jona".
-  6. The capabilities of the Driving Coach to discuss with you after a session your performance and possible handling issues of the car, has been greatly improved.
+  3. Fixed several bugs for manual adjustments of an already prepared pitstop.
+  4. Fixed a bug in the laptime comparison of the Spotter, which resulted in the Spotter reporting driver to be faster although he in fact wasn't.
+  5. Reading the *udpConnection* argument for the "ACC" plugin now ignores errors.
+  6. (Re-)Planning a pitstop will now always clear an already prepared pitstop. The settings transferred to the simulator will be preserved, though.
+  7. **Important:** When using the Azure or Google voice recognition services, it is no longer need to double-press the Push-To-Talk button to initiate an activation command like "Hey Jona".
+  8. The capabilities of the Driving Coach to discuss with you after a session your performance and possible handling issues of the car, has been greatly improved.
 
 ## 5.5.7.0-release 02/09/24
   1. Minor bugfixes, as always

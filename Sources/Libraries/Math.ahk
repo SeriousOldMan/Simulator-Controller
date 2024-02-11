@@ -40,10 +40,10 @@ average(numbers) {
 	local ignore, value, cnt
 
 	for ignore, value in numbers
-		if isNumber(value)
+		if isNumber(value) {
 			avg += value
-
-	cnt := count(numbers, false)
+			cnt += 1
+		}
 
 	if (cnt > 0)
 		return (avg / cnt)
@@ -67,15 +67,14 @@ stdDeviation(numbers) {
 	local squareSum := 0
 	local ignore, value, cnt
 
-	cnt := count(numbers, false)
+	for ignore, value in numbers
+		if isNumber(value) {
+			squareSum += ((value - avg) * (value - avg))
+			cnt += 1
+		}
 
-	if (cnt > 0) {
-		for ignore, value in numbers
-			if isNumber(value)
-				squareSum += ((value - avg) * (value - avg))
-
+	if (cnt > 0)
 		squareSum := (squareSum / cnt)
-	}
 
 	return Sqrt(squareSum)
 }

@@ -295,19 +295,26 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 					accUdpConfig := CaseInsenseMap()
 				}
 
-				udpConfig := (this.iUDPConnection ? string2Values(",", this.iUDPConnection) : ["127.0.0.1", 9000, "asd", ""])
+				try {
+					udpConfig := (this.iUDPConnection ? string2Values(",", this.iUDPConnection) : ["127.0.0.1", 9000, "asd", ""])
 
-				if (accUdpConfig.Has("udpListenerPort") && (accUdpConfig["udpListenerPort"] = udpConfig[2]))
-					udpConfigValid := true
-				else if (accUdpConfig.Has("updListenerPort") && (accUdpConfig["updListenerPort"] = udpConfig[2]))
-					udpConfigValid := true
-				else
-					udpConfigValid := false
+					if (accUdpConfig.Has("udpListenerPort") && (accUdpConfig["udpListenerPort"] = udpConfig[2]))
+						udpConfigValid := true
+					else if (accUdpConfig.Has("updListenerPort") && (accUdpConfig["updListenerPort"] = udpConfig[2]))
+						udpConfigValid := true
+					else
+						udpConfigValid := false
 
-				if (!accUdpConfig.Has("connectionPassword") || (accUdpConfig["connectionPassword"] != udpConfig[3]))
+					if (!accUdpConfig.Has("connectionPassword") || (accUdpConfig["connectionPassword"] != udpConfig[3]))
+						udpConfigValid := false
+					else if (!accUdpConfig.Has("commandPassword") || (accUdpConfig["commandPassword"] != udpConfig[4]))
+						udpConfigValid := false
+				}
+				catch Any as exception {
+					logError(exception, true)
+
 					udpConfigValid := false
-				else if (!accUdpConfig.Has("commandPassword") || (accUdpConfig["commandPassword"] != udpConfig[4]))
-					udpConfigValid := false
+				}
 
 				if !udpConfigValid {
 					logMessage(kLogCritical, translate("The UDP configuration for Assetto Corsa Competizione is not valid - please consult the documentation for the ACC plugin"))

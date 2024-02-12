@@ -88,11 +88,11 @@ class SystemPlugin extends ControllerPlugin {
 
 				if (inList(controller.ActiveModes, controller.findMode(kSystemPlugin, kLaunchMode)))
 					if transition {
-						this.LaunchpadFunction.setLabel(this.LaunchpadAction.Label, "Gray")
+						this.LaunchpadFunction.setLabel(plugin.actionLabel(this.LaunchpadAction), "Gray")
 						this.LaunchpadFunction.setIcon(plugin.actionIcon(this.LaunchpadAction), "Disabled")
 					}
 					else {
-						this.LaunchpadFunction.setLabel(this.LaunchpadAction.Label, isRunning ? "Green" : "Black")
+						this.LaunchpadFunction.setLabel(plugin.actionLabel(this.LaunchpadAction), isRunning ? "Green" : "Black")
 						this.LaunchpadFunction.setIcon(plugin.actionIcon(this.LaunchpadAction), isRunning ? "Activated" : "Deactivated")
 					}
 			}

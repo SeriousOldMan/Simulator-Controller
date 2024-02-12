@@ -556,7 +556,7 @@ class TeamServerPlugin extends ControllerPlugin {
 			}
 			else if isInstance(theAction, TeamServerPlugin.RaceSettingsAction) {
 				theAction.Function.enable(kAllTrigger, theAction)
-				theAction.Function.setLabel(theAction.Label)
+				theAction.Function.setLabel(this.actionLanbel(theAction))
 			}
 	}
 

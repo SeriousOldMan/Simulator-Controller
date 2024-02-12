@@ -5,8 +5,9 @@
   4. Fixed a bug in the laptime comparison of the Spotter, which resulted in the Spotter reporting driver to be faster although he in fact wasn't.
   5. Reading the *udpConnection* argument for the "ACC" plugin now ignores errors.
   6. (Re-)Planning a pitstop will now always clear an already prepared pitstop. The settings transferred to the simulator will be preserved, though.
-  7. **Important:** It is no longer need to double-press the Push-To-Talk button to [initiate an activation command](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#voice-commands) like "Hey Jona".
-  8. The capabilities of the Driving Coach to discuss with you after a session your performance and possible handling issues of the car, has been greatly improved.
+  7. **Important:** It is no longer necessary to double-press the Push-To-Talk button to [initiate an activation command](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#voice-commands) like "Hey Jona".
+  8. The setting "Activation Speed" is deprecated in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration), as it is used only to control the speed of the no longer needed double press for the "Push-To-Talk" button.
+  9. The capabilities of the Driving Coach to discuss with you after a session your performance and possible handling issues of the car, has been greatly improved.
 
 ## 5.5.7.0-release 02/09/24
   1. Minor bugfixes, as always

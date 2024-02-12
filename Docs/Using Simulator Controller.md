@@ -138,11 +138,7 @@ With the introduction of a new Race Assistant in Release 3.1 there are now sever
 
 #### Activation commands vs. *normal* commands
 
-In order to reduce confusion of an activation command with a normal command given to the currently active *dialog partner*, it is required for the Windows builtion voice recognition services that the [Push To Talk](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) control has two different behaviours. If you simply press the configured control, for example a button on your steering wheel, you will talk to the currently active *dialog partner*. Whenever you press the control twice like double-clicking a mouse button, you will activate a special listener, which only accepts the activation phrases. The last button press of the *double press* must be held down as long as you speak.
-
-Good to know: You can alter the speed for the two clicks or presses (Windows default is 500 ms) in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration).
-
-As said, this way to initiate an activation command is *only* required for the voice recognition services that are run locally (part of the Windows operating system). When using Azure or Google voice recognition, you can simply push the Push-To-Talk button once and issue a normal command or an activation command as you like. The double-press method is supported as well, though, to keep things consistent. 
+Before version 5.5.8 of Simulator Controller, it was necessary to press the Push-To-Talk twice (like a double click with the mouse) to initiate an activation command. This is no longer necessary, but the *old* method is still supported for backward compatibility reasons. 
 
 #### Push-To-Talk Behaviour
 

@@ -1099,7 +1099,7 @@ class VoiceServer extends ConfigurationItem {
 		if (activationCommand && (StrLen(Trim(activationCommand)) > 0) && listener) {
 			recognizer := this.SpeechRecognizer[true]
 
-			grammar := (descriptor . "." . counter++)
+			grammar := ConfigurationItem.descriptor(descriptor, counter++)
 
 			if this.Debug[kDebugGrammars] {
 				nextCharIndex := 1
@@ -1108,26 +1108,28 @@ class VoiceServer extends ConfigurationItem {
 			}
 
 			try {
-				for ignore, voiceClient in this.VoiceClients
-					if ((voiceClient.Method = "Pattern") && (voiceClient != client)) {
-						clientRecognizer := voiceClient.SpeechRecognizer[true]
+				for ignore, voiceClient in this.VoiceClients {
+					clientRecognizer := voiceClient.SpeechRecognizer[true]
 
-						if clientRecognizer.loadGrammar(grammar, clientRecognizer.compileGrammar(activationCommand)
-													  , ObjBindMethod(this, "recognizeActivationCommand", client))
+					if ((clientRecognizer.Method = "Pattern") && (voiceClient != client))
+						if !clientRecognizer.loadGrammar(ConfigurationItem.descriptor(descriptor, counter++)
+													   , clientRecognizer.compileGrammar(activationCommand)
+													   , ObjBindMethod(this, "recognizeActivationCommand", client))
 							throw "Recognizer not running..."
-					}
+				}
 
 				clientRecognizer := client.SpeechRecognizer[true]
 
 				if (clientRecognizer.Method = "Pattern")
 					for ignore, activationGrammer in this.ActivationGrammars
-						if clientRecognizer.loadGrammar(activationGrammer.Descriptor, clientRecognizer.compileGrammar(activationGrammer.Command)
-													  , ObjBindMethod(this, "recognizeActivationCommand", activationGrammer.Client))
+						if !clientRecognizer.loadGrammar(activationGrammer.Descriptor, clientRecognizer.compileGrammar(activationGrammer.Command)
+													   , ObjBindMethod(this, "recognizeActivationCommand", activationGrammer.Client))
 							throw "Recognizer not running..."
 
 				this.ActivationGrammars.Push({Descriptor: grammar, Client: client
 											, Grammar: compiler.compileGrammar(activationCommand)
 											, Command: activationCommand})
+
 
 				if !recognizer.loadGrammar(grammar, recognizer.compileGrammar(activationCommand), ObjBindMethod(this, "recognizeActivationCommand", client))
 					throw "Recognizer not running..."

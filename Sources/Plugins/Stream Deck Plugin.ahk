@@ -541,6 +541,49 @@ class StreamDeck extends FunctionController {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+activeIcon(fileName) {
+	local extension, name, disabledFileName, token, bitmap, graphics, x, y, value
+
+	SplitPath(fileName, , , &extension, &name)
+
+	disabledFileName := (kTempDirectory . "Icons\" . name . "_Dsbld." . extension)
+
+	if !FileExist(disabledFileName) {
+		DirCreate(kTempDirectory . "Icons")
+
+		token := Gdip_Startup()
+
+		bitmap := Gdip_CreateBitmapFromFile(fileName)
+
+		graphics := Gdip_GraphicsFromImage(bitmap)
+
+		loop Gdip_GetImageHeight(bitmap) {
+			x := A_Index - 1
+
+			loop Gdip_GetImageWidth(bitmap) {
+				y := A_Index - 1
+
+				value := Gdip_GetPixel(bitmap, x, y)
+
+				if (y < 20)
+					Gdip_SetPixel(bitmap, x, y, ((value & 0xFF000000) + (0xFF << 8)))
+				else
+					break
+			}
+		}
+
+		Gdip_SaveBitmapToFile(bitmap, disabledFileName)
+
+		Gdip_DisposeImage(bitmap)
+
+		Gdip_DeleteGraphics(graphics)
+
+		Gdip_Shutdown(token)
+	}
+
+	return disabledFileName
+}
+
 disabledIcon(fileName) {
 	local extension, name, disabledFileName, token, bitmap, graphics, x, y, value, red, green, blue, gray
 

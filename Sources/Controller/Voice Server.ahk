@@ -1108,23 +1108,27 @@ class VoiceServer extends ConfigurationItem {
 			}
 
 			try {
-				for ignore, voiceClient in this.VoiceClients {
-					clientRecognizer := voiceClient.SpeechRecognizer[true]
+				for ignore, voiceClient in this.VoiceClients
+					if (voiceClient.Listener && (voiceClient.RecognizerMode = "Grammar")) {
+						clientRecognizer := voiceClient.SpeechRecognizer[true]
 
-					if ((clientRecognizer.Method = "Pattern") && (voiceClient != client))
-						if !clientRecognizer.loadGrammar(ConfigurationItem.descriptor(descriptor, counter++)
-													   , clientRecognizer.compileGrammar(activationCommand)
-													   , ObjBindMethod(this, "recognizeActivationCommand", client))
-							throw "Recognizer not running..."
+						if ((clientRecognizer.Method = "Pattern") && (voiceClient != client))
+							if !clientRecognizer.loadGrammar(ConfigurationItem.descriptor(descriptor, counter++)
+														   , clientRecognizer.compileGrammar(activationCommand)
+														   , ObjBindMethod(this, "recognizeActivationCommand", client))
+								throw "Recognizer not running..."
+					}
+
+				if (client.RecognizerMode = "Grammar") {
+					clientRecognizer := client.SpeechRecognizer[true]
+
+					if (clientRecognizer.Method = "Pattern")
+						for ignore, activationGrammer in this.ActivationGrammars
+							if !clientRecognizer.loadGrammar(ConfigurationItem.descriptor(ConfigurationItem.splitDescriptor(activationGrammer.Descriptor)[1], counter++)
+														   , clientRecognizer.compileGrammar(activationGrammer.Command)
+														   , ObjBindMethod(this, "recognizeActivationCommand", activationGrammer.Client))
+								throw "Recognizer not running..."
 				}
-
-				clientRecognizer := client.SpeechRecognizer[true]
-
-				if (clientRecognizer.Method = "Pattern")
-					for ignore, activationGrammer in this.ActivationGrammars
-						if !clientRecognizer.loadGrammar(activationGrammer.Descriptor, clientRecognizer.compileGrammar(activationGrammer.Command)
-													   , ObjBindMethod(this, "recognizeActivationCommand", activationGrammer.Client))
-							throw "Recognizer not running..."
 
 				this.ActivationGrammars.Push({Descriptor: grammar, Client: client
 											, Grammar: compiler.compileGrammar(activationCommand)

@@ -168,7 +168,7 @@ You may want to check your preset choices in "Simulator Setup" and use the new "
   3. Note your changes (names, voices, vocalics, ...) and store the file in a safe location.
   4. Note down the other presets you used, then remove all from the right list.
   5. Go to the beginning, choose "Basic" as setup method (if not possible, press the Control key while clicking on the *Basic* icon) and continue to the next page.
-  6. Configure the Language, *Push To Talk* and your Assistants as in the "Names and Voices of the Assistants" preset. You can click on the settings button on the right of the voice drop down menu to select different synthesizers, vocalics, etc.
+  6. Configure the Language, *Push-To-Talk* and your Assistants as in the "Names and Voices of the Assistants" preset. You can click on the settings button on the right of the voice drop down menu to select different synthesizers, vocalics, etc.
   7. Go back to the preset page and add all other presets you have used (if any).
   8. [Optional] If you had additional entries in the "Configuration Patch.ini" file, choose the "Custom Configuration..." preset and add them back in.
   9. Go to the last page and create a new configuration.
@@ -985,7 +985,7 @@ And, last but not least, the support for multiple button boxes has been extended
 
 ## Release 2.5
 
-A new tab in the configuration tool allows you to configure the language to be used for voice generation and recognition and also introduces a *Push To Talk* functionality for voice recognition. Please read the corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control), if you want to use the new features.
+A new tab in the configuration tool allows you to configure the language to be used for voice generation and recognition and also introduces a *Push-To-Talk* functionality for voice recognition. Please read the corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control), if you want to use the new features.
 
 Another important change in this release is the introduction of a configuration based approach for Button Box layouts. The automatic update procedure will take care, that the predfiend Button Box visual representation will function as before, but you will want to have a look into the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#button-box-layouts), if you had defined your own Button Box with the API based approach. Because of this new feature, Release 2.5 introduces changes in the format of the *Simulator Settings.ini* file, but the automated update procedure will take care of most of that. Nevertheless, you might have to reposition your Button Boxes, since the old saved positions will be lost after the update.
 

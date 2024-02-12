@@ -319,11 +319,13 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				plugin.disableTeamServer(plugin.actionLabel(this))
 
 				function.setLabel(plugin.actionLabel(this), "Black")
+				function.setIcon(plugin.actionIcon(this), "Deactivated")
 			}
 			else if (!plugin.TeamServer.TeamServerEnabled && ((trigger = "On") || (trigger == "Push"))) {
 				plugin.enableTeamServer(plugin.actionLabel(this))
 
 				function.setLabel(plugin.actionLabel(this), "Green")
+				function.setIcon(plugin.actionIcon(this), "Activated")
 			}
 		}
 	}
@@ -1635,15 +1637,18 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				 || (theAction.Action = "RaceCenterOpen")) {
 					theAction.Function.enable(kAllTrigger, theAction)
 					theAction.Function.setLabel(this.actionLabel(theAction))
+					theAction.Function.setIcon(this.actionIcon(theAction))
 				}
 				else if (theAction.Action = "SetupImport") {
 					if this.supportsSetupImport() {
 						theAction.Function.enable(kAllTrigger, theAction)
-						theAction.Function.setLabel(theAction.Label)
+						theAction.Function.setLabel(this.actionLabel(theAction))
+						theAction.Function.setIcon(this.actionIcon(theAction))
 					}
 					else {
 						theAction.Function.disable(kAllTrigger, theAction)
-						theAction.Function.setLabel(theAction.Label, "Gray")
+						theAction.Function.setLabel(this.actionLabel(theAction), "Gray")
+						theAction.Function.setIcon(this.actionIcon(theAction), "Disabled")
 					}
 				}
 			}
@@ -1651,15 +1656,18 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				if (((theAction.Action = "Accept") || (theAction.Action = "Reject") || (theAction.Action = "Call"))
 				 && (this.RaceAssistant[true] != false)) {
 					theAction.Function.enable(kAllTrigger, theAction)
-					theAction.Function.setLabel(theAction.Label)
+					theAction.Function.setLabel(this.actionLabel(theAction))
+					theAction.Function.setIcon(this.actionIcon(theAction))
 				}
 				else if this.RaceAssistantActive {
 					theAction.Function.enable(kAllTrigger, theAction)
-					theAction.Function.setLabel(theAction.Label)
+					theAction.Function.setLabel(this.actionLabel(theAction))
+					theAction.Function.setIcon(this.actionIcon(theAction))
 				}
 				else {
 					theAction.Function.disable(kAllTrigger, theAction)
-					theAction.Function.setLabel(theAction.Label, "Gray")
+					theAction.Function.setLabel(this.actionLabel(theAction), "Gray")
+					theAction.Function.setIcon(this.actionIcon(theAction), "Disabled")
 				}
 	}
 

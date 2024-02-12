@@ -147,6 +147,7 @@ class SystemPlugin extends ControllerPlugin {
 			controller.rotateMode(((trigger == "Off") || (trigger = kDecrease)) ? -1 : 1, Array(controller.findFunctionController(function)))
 
 			this.Function.setLabel(controller.findPlugin(kSystemPlugin).actionLabel(this))
+			this.Function.setIcon(controller.findPlugin(kSystemPlugin).actionIcon(this))
 		}
 	}
 

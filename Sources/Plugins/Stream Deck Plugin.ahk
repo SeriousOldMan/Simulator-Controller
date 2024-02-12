@@ -461,14 +461,15 @@ class StreamDeck extends FunctionController {
 	}
 
 	setFunctionImage(function, icon, type := "Normal", refresh := false) {
-		local displayIcon
+		local displayIcon := icon
 
-		if (type = "Disabled")
-			displayIcon := disabledIcon(icon)
-		else if (type = "Activated")
-			displayIcon := activatedIcon(icon)
-		else if (type = "Deactivated")
-			displayIcon := deactivatedIcon(icon)
+		if (icon && (icon != "clear"))
+			if (type = "Disabled")
+				displayIcon := disabledIcon(icon)
+			else if (type = "Activated")
+				displayIcon := activatedIcon(icon)
+			else if (type = "Deactivated")
+				displayIcon := deactivatedIcon(icon)
 
 		if refresh
 			this.Connector.SetImage(function, displayIcon)
@@ -479,7 +480,7 @@ class StreamDeck extends FunctionController {
 		}
 		else {
 			if this.iFunctionImages.Has(function) {
-				if ((this.iFunctionImages[function][1] != icon) && (this.iFunctionImages[function][2] != type))
+				if ((this.iFunctionImages[function][1] != icon) || (this.iFunctionImages[function][2] != type))
 					this.iChangedFunctionImages[function] := true
 				else
 					return
@@ -509,10 +510,10 @@ class StreamDeck extends FunctionController {
 				controller := this.Controller
 
 				for theFunction, image in this.iFunctionImages
-					if (full || (this.iChangedFunctionImages.Has(theFunction[1]) && this.iChangedFunctionImages[theFunction[1]])) {
+					if (full || (this.iChangedFunctionImages.Has(theFunction) && this.iChangedFunctionImages[theFunction])) {
 						enabled := false
 
-						function := controller.findFunction(theFunction[1])
+						function := controller.findFunction(theFunction)
 
 						if function {
 							actions := this.Actions[function]
@@ -528,7 +529,7 @@ class StreamDeck extends FunctionController {
 							else
 								enabled := true
 
-							this.setFunctionImage(theFunction, image, enabled ? theFunction[2] : "Disabled", true)
+							this.setFunctionImage(theFunction, image[1], enabled ? image[2] : "Disabled", true)
 						}
 					}
 
@@ -553,7 +554,7 @@ class StreamDeck extends FunctionController {
 ;;;-------------------------------------------------------------------------;;;
 
 activatedIcon(fileName) {
-	local extension, name, activatedFileName, token, bitmap, graphics, x, y, value
+	local extension, name, activatedFileName, token, bitmap, graphics, x, y, value, height
 
 	SplitPath(fileName, , , &extension, &name)
 
@@ -567,20 +568,22 @@ activatedIcon(fileName) {
 		bitmap := Gdip_CreateBitmapFromFile(fileName)
 
 		graphics := Gdip_GraphicsFromImage(bitmap)
+		height := Gdip_GetImageHeight(bitmap)
 
-		loop Gdip_GetImageHeight(bitmap) {
-			x := A_Index - 1
+		loop height {
+			y := A_Index - 1
 
-			loop Gdip_GetImageWidth(bitmap) {
-				y := A_Index - 1
+			if (y < (height / 10)) {
+				loop Gdip_GetImageWidth(bitmap) {
+					x := A_Index - 1
 
-				value := Gdip_GetPixel(bitmap, x, y)
+					value := Gdip_GetPixel(bitmap, x, y)
 
-				if (y < 20)
-					Gdip_SetPixel(bitmap, x, y, ((value & 0xFF000000) + (0xFF << 8)))
-				else
-					break
+					Gdip_SetPixel(bitmap, x, y, ((value & 0xFF000000) + (0x9F << 8)))
+				}
 			}
+			else
+				break
 		}
 
 		Gdip_SaveBitmapToFile(bitmap, activatedFileName)
@@ -596,7 +599,7 @@ activatedIcon(fileName) {
 }
 
 deactivatedIcon(fileName) {
-	local extension, name, deactivatedFileName, token, bitmap, graphics, x, y, value
+	local extension, name, deactivatedFileName, token, bitmap, graphics, x, y, value, height
 
 	SplitPath(fileName, , , &extension, &name)
 
@@ -610,20 +613,23 @@ deactivatedIcon(fileName) {
 		bitmap := Gdip_CreateBitmapFromFile(fileName)
 
 		graphics := Gdip_GraphicsFromImage(bitmap)
+		height := Gdip_GetImageHeight(bitmap)
 
-		loop Gdip_GetImageHeight(bitmap) {
-			x := A_Index - 1
+		loop height {
+			y := A_Index - 1
 
-			loop Gdip_GetImageWidth(bitmap) {
-				y := A_Index - 1
+			if (y < (height / 10)) {
+				loop Gdip_GetImageWidth(bitmap) {
+					x := A_Index - 1
 
-				value := Gdip_GetPixel(bitmap, x, y)
+					value := Gdip_GetPixel(bitmap, x, y)
 
-				if (y < 20)
-					Gdip_SetPixel(bitmap, x, y, ((value & 0xFF000000) + (0xA0 << 16) + (0xA0 << 8) + 0xA0))
-				else
-					break
+					Gdip_SetPixel(bitmap, x, y, ((value & 0xFF000000) + (0x9F << 16) + (0x9F << 8) + 0x9F))
+				}
 			}
+			else
+				break
+
 		}
 
 		Gdip_SaveBitmapToFile(bitmap, deactivatedFileName)
@@ -655,10 +661,10 @@ disabledIcon(fileName) {
 		graphics := Gdip_GraphicsFromImage(bitmap)
 
 		loop Gdip_GetImageHeight(bitmap) {
-			x := A_Index - 1
+			y := A_Index - 1
 
 			loop Gdip_GetImageWidth(bitmap) {
-				y := A_Index - 1
+				x := A_Index - 1
 
 				value := Gdip_GetPixel(bitmap, x, y)
 

@@ -56,7 +56,7 @@ class SystemPlugin extends ControllerPlugin {
 			local isRunning := this.isRunning()
 			local stateChange := false
 			local transition := false
-			local controller
+			local controller, plugin
 
 			if (isRunning != this.iIsRunning) {
 				this.iIsRunning := isRunning
@@ -84,15 +84,16 @@ class SystemPlugin extends ControllerPlugin {
 
 			if (this.LaunchpadFunction != false) {
 				controller := SimulatorController.Instance
+				plugin := controller.findPlugin(kSystemPlugin)
 
 				if (inList(controller.ActiveModes, controller.findMode(kSystemPlugin, kLaunchMode)))
 					if transition {
 						this.LaunchpadFunction.setLabel(this.LaunchpadAction.Label, "Gray")
-						this.LaunchpadFunction.setIcon(this.actionIcon(this.LaunchpadAction), "Disabled")
+						this.LaunchpadFunction.setIcon(plugin.actionIcon(this.LaunchpadAction), "Disabled")
 					}
 					else {
 						this.LaunchpadFunction.setLabel(this.LaunchpadAction.Label, isRunning ? "Green" : "Black")
-						this.LaunchpadFunction.setIcon(this.actionIcon(this.LaunchpadAction), isRunning ? "Activated" : "Deactivated")
+						this.LaunchpadFunction.setIcon(plugin.actionIcon(this.LaunchpadAction), isRunning ? "Activated" : "Deactivated")
 					}
 			}
 		}

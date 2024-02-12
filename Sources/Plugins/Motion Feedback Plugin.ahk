@@ -694,10 +694,9 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	}
 
 	actionLabel(action) {
-		if isInstance(action, MotionFeedbackPlugin.EffectToggleAction)
-			return action.Label
-		else
-			return translate(super.actionLabel(action))
+		local label := super.actionLabel(action)
+		
+		return (isInstance(action, MotionFeedbackPlugin.EffectToggleAction) ? label : translate(label))
 	}
 
 	callSimFeedback(arguments*) {

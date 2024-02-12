@@ -1634,7 +1634,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				 || (theAction.Action = "StrategyWorkbenchOpen") || (theAction.Action = "PracticeCenterOpen")
 				 || (theAction.Action = "RaceCenterOpen")) {
 					theAction.Function.enable(kAllTrigger, theAction)
-					theAction.Function.setLabel(theAction.Label)
+					theAction.Function.setLabel(this.actionLabel(theAction))
 				}
 				else if (theAction.Action = "SetupImport") {
 					if this.supportsSetupImport() {

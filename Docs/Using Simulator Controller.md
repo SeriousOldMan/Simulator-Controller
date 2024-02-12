@@ -140,13 +140,13 @@ With the introduction of a new Race Assistant in Release 3.1 there are now sever
 
 In order to reduce confusion of an activation command with a normal command given to the currently active *dialog partner*, it is required for the Windows builtion voice recognition services that the [Push To Talk](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) control has two different behaviours. If you simply press the configured control, for example a button on your steering wheel, you will talk to the currently active *dialog partner*. Whenever you press the control twice like double-clicking a mouse button, you will activate a special listener, which only accepts the activation phrases. The last button press of the *double press* must be held down as long as you speak.
 
+Good to know: You can alter the speed for the two clicks or presses (Windows default is 500 ms) in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration).
+
 As said, this way to initiate an activation command is *only* required for the voice recognition services that are run locally (part of the Windows operating system). When using Azure or Google voice recognition, you can simply push the Push-To-Talk button once and issue a normal command or an activation command as you like. The double-press method is supported as well, though, to keep things consistent. 
 
 #### Push-To-Talk Behaviour
 
 Beside the behaviour of the *Push To Talk* button described above, where you need to hold down the button as long as your are talking, there is an alternative mode available. This mode allows you to release the button while you are talking. Once, you have finished your voice command, you press the *Push To Talk* button again, to indicate that you have finished and that the command should be executed. This alternative mode can be enabled [voice control configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control).
-
-Good to know: You can also alter the speed for the two clicks or presses (Windows default is 500 ms) in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration).
 	
 Please don't forget to press the *Push To Talk* button at the end of your speech, even, if the command had already been recognized, because you made a long pause. If you don't push the button, the sequence will get out of sync and you will end up being very confused.
 

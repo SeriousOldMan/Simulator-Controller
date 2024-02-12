@@ -61,11 +61,13 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 				plugin.disableTrackAutomation(plugin.actionLabel(this))
 
 				function.setLabel(plugin.actionLabel(this), "Black")
+				function.setIcon(plugin.actionIcon(this), "Deactivated")
 			}
 			else if (!plugin.TrackAutomationEnabled && ((trigger = "On") || (trigger == "Push"))) {
 				plugin.enableTrackAutomation(plugin.actionLabel(this))
 
 				function.setLabel(plugin.actionLabel(this), "Green")
+				function.setIcon(plugin.actionIcon(this), "Activated")
 			}
 		}
 	}
@@ -193,6 +195,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 		for ignore, theAction in this.Actions
 			if isInstance(theAction, RaceSpotterPlugin.TrackAutomationToggleAction) {
 				theAction.Function.setLabel(this.actionLabel(theAction), this.TrackAutomationEnabled ? "Green" : "Black")
+				theAction.Function.setIcon(this.actionIcon(theAction), this.TrackAutomationEnabled ? "Activated" : "Deactivated")
 
 				theAction.Function.enable(kAllTrigger, theAction)
 			}

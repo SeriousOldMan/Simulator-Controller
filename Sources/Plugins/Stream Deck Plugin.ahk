@@ -391,7 +391,7 @@ class StreamDeck extends FunctionController {
 		}
 	}
 
-	setControlIcon(function, icon) {
+	setControlIcon(function, icon, type := "Normal") {
 		local controller := this.Controller
 		local enabled, displayMode, iconMode, ignore, theAction, actions
 
@@ -425,11 +425,11 @@ class StreamDeck extends FunctionController {
 				iconMode := this.Icon[function.Descriptor]
 
 				if (iconMode == true)
-					this.setFunctionImage(function.Descriptor, icon, enabled)
+					this.setFunctionImage(function.Descriptor, icon, enabled ? type : "Disabled")
 				else if (iconMode == false)
 					this.setFunctionImage(function.Descriptor, "clear")
 				else
-					this.setFunctionImage(function.Descriptor, iconMode, enabled)
+					this.setFunctionImage(function.Descriptor, iconMode, enabled ? type : "Disabled")
 			}
 		}
 	}
@@ -460,25 +460,36 @@ class StreamDeck extends FunctionController {
 		}
 	}
 
-	setFunctionImage(function, icon, enabled := false, refresh := false) {
+	setFunctionImage(function, icon, type := "Normal", refresh := false) {
+		local displayIcon
+
+		if (type = "Disabled")
+			displayIcon := disabledIcon(icon)
+		else if (type = "Activated")
+			displayIcon := activatedIcon(icon)
+		else if (type = "Deactivated")
+			displayIcon := deactivatedIcon(icon)
+
 		if refresh
-			this.Connector.SetImage(function, ((icon = "clear") || enabled) ? icon : disabledIcon(icon))
+			this.Connector.SetImage(function, displayIcon)
 		else if this.RefreshActive {
-			this.iPendingUpdates.Push(ObjBindMethod(this, "setFunctionImage", function, icon, enabled))
+			this.iPendingUpdates.Push(ObjBindMethod(this, "setFunctionImage", function, icon, type))
 
 			return
 		}
 		else {
 			if this.iFunctionImages.Has(function) {
-				if (this.iFunctionImages[function] != icon)
+				if ((this.iFunctionImages[function][1] != icon) && (this.iFunctionImages[function][2] != type))
 					this.iChangedFunctionImages[function] := true
+				else
+					return
 			}
 			else
 				this.iChangedFunctionImages[function] := true
 
-			this.iFunctionImages[function] := icon
+			this.iFunctionImages[function] := [icon, type]
 
-			this.Connector.SetImage(function, ((icon = "clear") || enabled) ? icon : disabledIcon(icon))
+			this.Connector.SetImage(function, displayIcon)
 		}
 	}
 
@@ -498,10 +509,10 @@ class StreamDeck extends FunctionController {
 				controller := this.Controller
 
 				for theFunction, image in this.iFunctionImages
-					if (full || (this.iChangedFunctionImages.Has(theFunction) && this.iChangedFunctionImages[theFunction])) {
+					if (full || (this.iChangedFunctionImages.Has(theFunction[1]) && this.iChangedFunctionImages[theFunction[1]])) {
 						enabled := false
 
-						function := controller.findFunction(theFunction)
+						function := controller.findFunction(theFunction[1])
 
 						if function {
 							actions := this.Actions[function]
@@ -517,7 +528,7 @@ class StreamDeck extends FunctionController {
 							else
 								enabled := true
 
-							this.setFunctionImage(theFunction, image, enabled, true)
+							this.setFunctionImage(theFunction, image, enabled ? theFunction[2] : "Disabled", true)
 						}
 					}
 
@@ -541,14 +552,14 @@ class StreamDeck extends FunctionController {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-activeIcon(fileName) {
-	local extension, name, disabledFileName, token, bitmap, graphics, x, y, value
+activatedIcon(fileName) {
+	local extension, name, activatedFileName, token, bitmap, graphics, x, y, value
 
 	SplitPath(fileName, , , &extension, &name)
 
-	disabledFileName := (kTempDirectory . "Icons\" . name . "_Dsbld." . extension)
+	activatedFileName := (kTempDirectory . "Icons\" . name . "_On." . extension)
 
-	if !FileExist(disabledFileName) {
+	if !FileExist(activatedFileName) {
 		DirCreate(kTempDirectory . "Icons")
 
 		token := Gdip_Startup()
@@ -572,7 +583,7 @@ activeIcon(fileName) {
 			}
 		}
 
-		Gdip_SaveBitmapToFile(bitmap, disabledFileName)
+		Gdip_SaveBitmapToFile(bitmap, activatedFileName)
 
 		Gdip_DisposeImage(bitmap)
 
@@ -581,7 +592,50 @@ activeIcon(fileName) {
 		Gdip_Shutdown(token)
 	}
 
-	return disabledFileName
+	return activatedFileName
+}
+
+deactivatedIcon(fileName) {
+	local extension, name, deactivatedFileName, token, bitmap, graphics, x, y, value
+
+	SplitPath(fileName, , , &extension, &name)
+
+	deactivatedFileName := (kTempDirectory . "Icons\" . name . "_Off." . extension)
+
+	if !FileExist(deactivatedFileName) {
+		DirCreate(kTempDirectory . "Icons")
+
+		token := Gdip_Startup()
+
+		bitmap := Gdip_CreateBitmapFromFile(fileName)
+
+		graphics := Gdip_GraphicsFromImage(bitmap)
+
+		loop Gdip_GetImageHeight(bitmap) {
+			x := A_Index - 1
+
+			loop Gdip_GetImageWidth(bitmap) {
+				y := A_Index - 1
+
+				value := Gdip_GetPixel(bitmap, x, y)
+
+				if (y < 20)
+					Gdip_SetPixel(bitmap, x, y, ((value & 0xFF000000) + (0xA0 << 16) + (0xA0 << 8) + 0xA0))
+				else
+					break
+			}
+		}
+
+		Gdip_SaveBitmapToFile(bitmap, deactivatedFileName)
+
+		Gdip_DisposeImage(bitmap)
+
+		Gdip_DeleteGraphics(graphics)
+
+		Gdip_Shutdown(token)
+	}
+
+	return deactivatedFileName
 }
 
 disabledIcon(fileName) {

@@ -84,11 +84,13 @@ class TeamServerPlugin extends ControllerPlugin {
 				plugin.disableTeamServer(plugin.actionLabel(this))
 
 				function.setLabel(plugin.actionLabel(this), "Black")
+				function.setIcon(plugin.actionIcon(this), "Deactivated")
 			}
 			else if (!plugin.TeamServerEnabled && ((trigger = "On") || (trigger == "Push"))) {
 				plugin.enableTeamServer(plugin.actionLabel(this))
 
 				function.setLabel(plugin.actionLabel(this), "Green")
+				function.setIcon(plugin.actionIcon(this), "Activated")
 			}
 		}
 	}
@@ -550,6 +552,7 @@ class TeamServerPlugin extends ControllerPlugin {
 			if isInstance(theAction, TeamServerPlugin.TeamServerToggleAction) {
 				theAction.Function.enable(kAllTrigger, theAction)
 				theAction.Function.setLabel(this.actionLabel(theAction), this.TeamServerEnabled ? "Green" : "Black")
+				theAction.Function.setIcon(this.actionIcon(theAction), this.TeamServerEnabled ? "Activated" : "Deactivated")
 			}
 			else if isInstance(theAction, TeamServerPlugin.RaceSettingsAction) {
 				theAction.Function.enable(kAllTrigger, theAction)

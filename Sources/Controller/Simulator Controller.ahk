@@ -124,7 +124,7 @@ class FunctionController extends ConfigurationItem {
 	setControlLabel(function, text, color := "Black", overlay := false) {
 	}
 
-	setControlIcon(function, icon) {
+	setControlIcon(function, icon, type := "Normal") {
 	}
 
 	connectAction(plugin, function, action) {
@@ -1397,12 +1397,12 @@ class ControllerFunction {
 				fnController.setControlLabel(this, text, color, overlay)
 	}
 
-	setIcon(icon) {
+	setIcon(icon, type := "Normal") {
 		local controller, ignore, fnController
 
 		for ignore, fnController in this.Controller.FunctionController
 			if fnController.hasFunction(this)
-				fnController.setControlIcon(this, icon)
+				fnController.setControlIcon(this, icon, type)
 	}
 
 	enable(trigger := "__All Trigger__", action := false) {

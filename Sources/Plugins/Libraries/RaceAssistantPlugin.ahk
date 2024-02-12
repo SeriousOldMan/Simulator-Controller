@@ -286,11 +286,13 @@ class RaceAssistantPlugin extends ControllerPlugin {
 					plugin.disableRaceAssistant(plugin.actionLabel(this))
 
 					function.setLabel(plugin.actionLabel(this), "Black")
+					function.setIcon(plugin.actionIcon(this), "Deactivated")
 				}
 				else if (!plugin.RaceAssistantEnabled && ((trigger = "On") || (trigger == "Push"))) {
 					plugin.enableRaceAssistant(plugin.actionLabel(this))
 
 					function.setLabel(plugin.actionLabel(this), "Green")
+					function.setIcon(plugin.actionIcon(this), "Activated")
 				}
 		}
 	}
@@ -1605,6 +1607,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		for ignore, theAction in this.Actions
 			if isInstance(theAction, RaceAssistantPlugin.RaceAssistantToggleAction) {
 				theAction.Function.setLabel(this.actionLabel(theAction), this.RaceAssistantName ? (this.RaceAssistantEnabled ? "Green" : "Black") : "Gray")
+				theAction.Function.setIcon(this.actionIcon(theAction), this.RaceAssistantName ? (this.RaceAssistantEnabled ? "Activated" : "Deactivated") : "Disabled")
 
 				if this.RaceAssistantName
 					theAction.Function.enable(kAllTrigger, theAction)
@@ -1616,10 +1619,12 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 				if teamServer {
 					theAction.Function.setLabel(this.actionLabel(theAction), (teamServer.TeamServerEnabled ? "Green" : "Black"))
+					theAction.Function.setIcon(this.actionIcon(theAction), (teamServer.TeamServerEnabled ? "Activated" : "Deactivated"))
 					theAction.Function.enable(kAllTrigger, theAction)
 				}
 				else {
 					theAction.Function.setLabel(this.actionLabel(theAction), "Gray")
+					theAction.Function.setIcon(this.actionIcon(theAction), "Disabled")
 					theAction.Function.disable(kAllTrigger, theAction)
 				}
 			}

@@ -3,7 +3,7 @@ Version=5.5.8.0-dev
 Target=5.5.8.0-release
 Date=02/11/2024
 Download=
-Changes=Support activation commands without double-press for cloud based voice recognition services, Extended Driving Coach analytic capabilities, Fixed laptime comparison for the Spotter, Reading the udpConnection parameter for the ACC plugin not ignores errors
+Changes=Support activation commands without double-press for cloud based voice recognition services, Extended Driving Coach analytic capabilities, Fixed laptime comparison for the Spotter, Reading the udpConnection parameter for the ACC plugin not ignores errors, Active/Deactive controller action icons for Stream Deck
 Components=Media->5.5.7,Configuration->5.5.7,Utilities->5.4.8
 [Release]
 Version=5.5.7.0-release

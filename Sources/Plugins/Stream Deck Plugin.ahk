@@ -463,6 +463,9 @@ class StreamDeck extends FunctionController {
 	setFunctionImage(function, icon, type := "Normal", refresh := false) {
 		local displayIcon := icon
 
+		if (type = "Deactivated")
+			type := "Normal"
+
 		if (icon && (icon != "clear"))
 			if (type = "Disabled")
 				displayIcon := disabledIcon(icon)
@@ -553,14 +556,14 @@ class StreamDeck extends FunctionController {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-activatedIcon(fileName) {
-	local extension, name, activatedFileName, token, bitmap, graphics, x, y, value, height
+modifiedIcon(fileName, postFix, modifier) {
+	local extension, name, modifiedFileName, token, bitmap, graphics
 
 	SplitPath(fileName, , , &extension, &name)
 
-	activatedFileName := (kTempDirectory . "Icons\" . name . "_On." . extension)
+	modifiedFileName := (kTempDirectory . "Icons\" . name . "_" . postFix . "." . extension)
 
-	if !FileExist(activatedFileName) {
+	if !FileExist(modifiedFileName) {
 		DirCreate(kTempDirectory . "Icons")
 
 		token := Gdip_Startup()
@@ -568,7 +571,25 @@ activatedIcon(fileName) {
 		bitmap := Gdip_CreateBitmapFromFile(fileName)
 
 		graphics := Gdip_GraphicsFromImage(bitmap)
-		height := Gdip_GetImageHeight(bitmap)
+
+		modifier(graphics, bitmap)
+
+		Gdip_SaveBitmapToFile(bitmap, modifiedFileName)
+
+		Gdip_DisposeImage(bitmap)
+
+		Gdip_DeleteGraphics(graphics)
+
+		Gdip_Shutdown(token)
+	}
+
+	return modifiedFileName
+}
+
+activatedIcon(fileName) {
+	addGreenBar(graphics, bitmap) {
+		local height := Gdip_GetImageHeight(bitmap)
+		local x, y, value
 
 		loop height {
 			y := A_Index - 1
@@ -579,41 +600,21 @@ activatedIcon(fileName) {
 
 					value := Gdip_GetPixel(bitmap, x, y)
 
-					Gdip_SetPixel(bitmap, x, y, ((value & 0xFF000000) + (0x9F << 8)))
+					Gdip_SetPixel(bitmap, x, y, (value & 0xFF000000) + (0x9F << 8))
 				}
 			}
 			else
 				break
 		}
-
-		Gdip_SaveBitmapToFile(bitmap, activatedFileName)
-
-		Gdip_DisposeImage(bitmap)
-
-		Gdip_DeleteGraphics(graphics)
-
-		Gdip_Shutdown(token)
 	}
 
-	return activatedFileName
+	return modifiedIcon(fileName, "Actv", addGreenBar)
 }
 
 deactivatedIcon(fileName) {
-	local extension, name, deactivatedFileName, token, bitmap, graphics, x, y, value, height
-
-	SplitPath(fileName, , , &extension, &name)
-
-	deactivatedFileName := (kTempDirectory . "Icons\" . name . "_Off." . extension)
-
-	if !FileExist(deactivatedFileName) {
-		DirCreate(kTempDirectory . "Icons")
-
-		token := Gdip_Startup()
-
-		bitmap := Gdip_CreateBitmapFromFile(fileName)
-
-		graphics := Gdip_GraphicsFromImage(bitmap)
-		height := Gdip_GetImageHeight(bitmap)
+	addGrayBar(graphics, bitmap) {
+		local height := Gdip_GetImageHeight(bitmap)
+		local x, y, value
 
 		loop height {
 			y := A_Index - 1
@@ -629,36 +630,15 @@ deactivatedIcon(fileName) {
 			}
 			else
 				break
-
 		}
-
-		Gdip_SaveBitmapToFile(bitmap, deactivatedFileName)
-
-		Gdip_DisposeImage(bitmap)
-
-		Gdip_DeleteGraphics(graphics)
-
-		Gdip_Shutdown(token)
 	}
 
-	return deactivatedFileName
+	return modifiedIcon(fileName, "Dactv", addGrayBar)
 }
 
 disabledIcon(fileName) {
-	local extension, name, disabledFileName, token, bitmap, graphics, x, y, value, red, green, blue, gray
-
-	SplitPath(fileName, , , &extension, &name)
-
-	disabledFileName := (kTempDirectory . "Icons\" . name . "_Dsbld." . extension)
-
-	if !FileExist(disabledFileName) {
-		DirCreate(kTempDirectory . "Icons")
-
-		token := Gdip_Startup()
-
-		bitmap := Gdip_CreateBitmapFromFile(fileName)
-
-		graphics := Gdip_GraphicsFromImage(bitmap)
+	grayIcon(graphics, bitmap) {
+		local x, y, value, red, green, blue, gray
 
 		loop Gdip_GetImageHeight(bitmap) {
 			y := A_Index - 1
@@ -679,17 +659,9 @@ disabledIcon(fileName) {
 				Gdip_SetPixel(bitmap, x, y, ((value & 0xFF000000) + (gray << 16) + (gray << 8) + gray))
 			}
 		}
-
-		Gdip_SaveBitmapToFile(bitmap, disabledFileName)
-
-		Gdip_DisposeImage(bitmap)
-
-		Gdip_DeleteGraphics(graphics)
-
-		Gdip_Shutdown(token)
 	}
 
-	return disabledFileName
+	return modifiedIcon(fileName, "Dsbld", grayIcon)
 }
 
 refreshStreamDecks() {

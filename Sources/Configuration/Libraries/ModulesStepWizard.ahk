@@ -811,7 +811,13 @@ class AssettoCorsaCarMetas extends DownloadablePreset {
 	}
 
 	availableObjects() {
-		return getKeys(this.Definition)
+		local cars := []
+
+		for car, keyValues in this.Definition
+			if keyValues.Has("Name")
+				cars.Push(getMultiMapValue(this.Definition,car, "Name"))
+
+		return cars
 	}
 
 	installedObjects() {

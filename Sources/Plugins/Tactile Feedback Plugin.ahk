@@ -470,8 +470,10 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		for ignore, theAction in this.Actions {
 			function := theAction.Function
 
-			if function
+			if function {
 				function.setLabel(translate(this.actionLabel(theAction)), isRunning ? (theAction.Active ? "Green" : "Black") : "Olive")
+				function.setIcon(this.actionIcon(theAction), isRunning ? (theAction.Active ? "Activated" : "Deactivated") : "Disabled")
+			}
 		}
 	}
 

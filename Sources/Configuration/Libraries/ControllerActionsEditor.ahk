@@ -661,7 +661,7 @@ class PluginActionsList extends ConfigurationItemList {
 		local action := this.ItemList[this.CurrentItem].Clone()
 
 		action[4] := this.Control["labelEdit"].Text
-		action[1] := this.CurrentIcon
+		action[1] := ((this.CurrentIcon = (kIconsDirectory . "Empty.png")) ? "" : this.CurrentIcon)
 
 		return action
 	}

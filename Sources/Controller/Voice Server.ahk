@@ -1175,7 +1175,7 @@ class VoiceServer extends ConfigurationItem {
 
 		for ignore, grammar in grammars
 			if (grammar.Client = client) {
-				grammars.Delete(grammar)
+				grammars.RemoveAt(A_Index)
 
 				break
 			}

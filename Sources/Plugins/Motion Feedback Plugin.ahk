@@ -673,8 +673,10 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 
 		action := this.findAction(this.getLabel(ConfigurationItem.descriptor("Motion", "Toggle"), "Motion"))
 
-		if action
+		if action {
 			action.Function.setLabel(this.actionLabel(action), isRunning ? (action.Active ? "Green" : "Black") : "Olive")
+			action.Function.setIcon(this.actionIcon(action), isRunning ? (action.Active ? "Activated" : "Deactivated") : "Disabled")
+		}
 
 		if !this.iUpdateMotionStateTask {
 			this.iUpdateMotionStateTask := PeriodicTask(ObjBindMethod(this, "updateMotionState"), 30000, kLowPriority)
@@ -695,7 +697,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 
 	actionLabel(action) {
 		local label := super.actionLabel(action)
-		
+
 		return (isInstance(action, MotionFeedbackPlugin.EffectToggleAction) ? label : translate(label))
 	}
 
@@ -1148,10 +1150,15 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	}
 
 	updateMotionState() {
+		local first := false
+
 		static isRunning := kUndefined
 
-		if (isRunning == kUndefined)
+		if (isRunning == kUndefined) {
 			isRunning := this.Application.isRunning()
+
+			first := true
+		}
 
 		protectionOn()
 
@@ -1166,6 +1173,8 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			}
 			else if (isRunning && kSimFeedbackConnector)
 				this.loadFromSimFeedback()
+			else if first
+				this.updatePluginState()
 		}
 		finally {
 			protectionOff()

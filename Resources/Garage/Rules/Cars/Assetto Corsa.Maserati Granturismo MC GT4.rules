@@ -19,6 +19,6 @@
 										 Bumpstop.Range.Front.Left, Bumpstop.Range.Front.Right,
 										 Bumpstop.Range.Rear.Left, Bumpstop.Range.Rear.Right,
 										 Damper.Compression.Fast.Front.Left, Damper.Compression.Fast.Front.Right,
-										 Damper.Compression.Fast.Rear.Left, Damper.Compression.Rear.Front.Right,
+										 Damper.Compression.Fast.Rear.Left, Damper.Compression.Fast.Rear.Right,
 										 Damper.Rebound.Fast.Front.Left, Damper.Rebound.Fast.Front.Right,
-										 Damper.Rebound.Fast.Rear.Left, Damper.Rebound.Rear.Front.Right]))
+										 Damper.Rebound.Fast.Rear.Left, Damper.Rebound.Fast.Rear.Right]))

@@ -274,7 +274,7 @@ class Application extends ConfigurationItem {
 
 		if (special && specialIsRunning && (specialIsRunning != ""))
 			try {
-				if %specialIsRunning%()
+				if (isSet(%specialIsRunning%) && %specialIsRunning%())
 					return true
 				else if (this.getProcessID() != 0)
 					return true

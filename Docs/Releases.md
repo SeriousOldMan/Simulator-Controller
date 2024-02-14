@@ -8,7 +8,7 @@
   7. **Important:** In most cases, it is no longer necessary to double-press the Push-To-Talk button to [initiate an activation command](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#voice-commands) like "Hey Jona". There is one exception, so please check the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#activation-commands-vs-normal-commands).
   9. The capabilities of the Driving Coach to discuss with you after a session your performance and possible handling issues of the car, has been greatly improved.
   10. The Stream Deck icons now show a small colored bar at their top for toggleable controller actions to indicate, whether the corresponding function has been activated.
-  11. New cars, e.g. the Golf GTI MK2 and new RSS Formula cars, have been included in the car meta data DLC.
+  11. New cars, e.g. the Golf GTI MK2, some new RSS Formula cars and all TCR cars have been included in the car meta data DLC.
   12. New car models for "Setup Workbench":
       - Assetto Corsa Competizione
 	    - BMW M2 CS (fixed)

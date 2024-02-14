@@ -179,9 +179,9 @@ class ACCSetupEditor extends FileSetupEditor {
 			theSetup := ACCSetup(this, fileName)
 
 			if load
-				this.loadSetup(&theSetup)
-			else
-				return theSetup
+				return this.loadSetup(&theSetup)
+
+			return theSetup
 		}
 		else
 			return false
@@ -253,8 +253,8 @@ class ACCSetupComparator extends FileSetupComparator {
 				else
 					this.loadSetups(&ignore := false, &theSetup)
 			}
-			else
-				return theSetup
+
+			return theSetup
 		}
 		else
 			return false

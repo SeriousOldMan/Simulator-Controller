@@ -1639,11 +1639,11 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				else if (theAction.Action = "SetupImport") {
 					if this.supportsSetupImport() {
 						theAction.Function.enable(kAllTrigger, theAction)
-						theAction.Function.setLabel(theAction.Label)
+						theAction.Function.setLabel(this.actionLabel(theAction))
 					}
 					else {
 						theAction.Function.disable(kAllTrigger, theAction)
-						theAction.Function.setLabel(theAction.Label, "Gray")
+						theAction.Function.setLabel(this.actionLabel(theAction), "Gray")
 					}
 				}
 			}
@@ -1651,15 +1651,15 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				if (((theAction.Action = "Accept") || (theAction.Action = "Reject") || (theAction.Action = "Call"))
 				 && (this.RaceAssistant[true] != false)) {
 					theAction.Function.enable(kAllTrigger, theAction)
-					theAction.Function.setLabel(theAction.Label)
+					theAction.Function.setLabel(this.actionLabel(theAction))
 				}
 				else if this.RaceAssistantActive {
 					theAction.Function.enable(kAllTrigger, theAction)
-					theAction.Function.setLabel(theAction.Label)
+					theAction.Function.setLabel(this.actionLabel(theAction))
 				}
 				else {
 					theAction.Function.disable(kAllTrigger, theAction)
-					theAction.Function.setLabel(theAction.Label, "Gray")
+					theAction.Function.setLabel(this.actionLabel(theAction), "Gray")
 				}
 	}
 

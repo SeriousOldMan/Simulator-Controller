@@ -71,15 +71,15 @@ class AssistantMode extends ControllerMode {
 			if (isInstance(theAction, RaceAssistantAction) && inList(this.Controller.ActiveModes, this))
 				if inList(kAssistantAnswerActions, theAction.Action) {
 					theAction.Function.enable(kAllTrigger, theAction)
-					theAction.Function.setLabel(theAction.Label)
+					theAction.Function.setLabel(this.actionLabel(theAction))
 				}
 				else if inList([kSessionPractice, kSessionRace], session) {
 					theAction.Function.enable(kAllTrigger, theAction)
-					theAction.Function.setLabel(theAction.Label)
+					theAction.Function.setLabel(this.actionLabel(theAction))
 				}
 				else {
 					theAction.Function.disable(kAllTrigger, theAction)
-					theAction.Function.setLabel(theAction.Label, "Gray")
+					theAction.Function.setLabel(this.actionLabel(theAction), "Gray")
 				}
 	}
 }
@@ -104,11 +104,11 @@ class PitstopMode extends AssistantMode {
 			if (isInstance(theAction, PitstopAction) && inList(this.Controller.ActiveModes, this))
 				if ((session != kSessionFinished) && (session != kSessionPaused)) {
 					theAction.Function.enable(kAllTrigger, theAction)
-					theAction.Function.setLabel(theAction.Label)
+					theAction.Function.setLabel(this.actionLabel(theAction))
 				}
 				else {
 					theAction.Function.disable(kAllTrigger, theAction)
-					theAction.Function.setLabel(theAction.Label, "Gray")
+					theAction.Function.setLabel(this.actionLabel(theAction), "Gray")
 				}
 	}
 }

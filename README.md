@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[5.5.8.0-dev](https://www.dropbox.com/scl/fi/yjz4axgqtzj94y7u54vnv/Simulator-Controller-5.5.8.0-dev.zip?rlkey=cad6k2jqrabxcelu3qso3i1o2&dl=1) (Early build for 5.5.8. Changes: Support activation commands without double-press for cloud based voice recognition services, Extended Driving Coach analytic capabilities, Fixed laptime comparison for the Spotter, Reading the udpConnection parameter for the ACC plugin not ignores errors, Active/Deactive controller action icons for Stream Deck, Extended car meta DLC.)
+[5.5.8.0-beta](https://www.dropbox.com/scl/fi/0fcavgwavqhnwsggqb8fp/Simulator-Controller-5.5.8.0-beta.zip?rlkey=2dz0cfkn4h0rt2xwsc6fjm0pj&dl=1) (Test build for 5.5.8. Changes: Support activation commands without double-press for cloud based voice recognition services, Extended Driving Coach analytic capabilities, Fixed laptime comparison for the Spotter, Reading the udpConnection parameter for the ACC plugin not ignores errors, Active/Deactive controller action icons for Stream Deck, Extended car meta DLC, New car models for "Setup Workbench".)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-558) of this version and all the versions you might have skipped, before installing and using this version.
 

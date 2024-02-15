@@ -989,28 +989,96 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				if FileExist(folder . "\Export.info") {
 					info := readMultiMap(folder . "\Export.info")
 
-					if (getMultiMapValue(info, "General", "Simulator") = editor.SelectedSimulator) {
-						editorGui.Block()
+					if (getMultiMapValue(info, "General", "Type", "Data") = "Data") {
+						if (getMultiMapValue(info, "General", "Simulator") = editor.SelectedSimulator) {
+							editorGui.Block()
 
-						try {
-							selection := selectImportData(editor, folder, editorGui)
+							try {
+								selection := selectImportData(editor, folder, editorGui)
 
-							if selection
-								editor.importData(folder, selection)
+								if selection
+									editor.importData(folder, selection)
+							}
+							finally {
+								editorGui.Unblock()
+							}
 						}
-						finally {
-							editorGui.Unblock()
+						else {
+							OnMessage(0x44, translateOkButton)
+							withBlockedWindows(MsgBox, translate("The data has not been exported for the currently selected simulator."), translate("Error"), 262160)
+							OnMessage(0x44, translateOkButton, 0)
 						}
 					}
 					else {
 						OnMessage(0x44, translateOkButton)
-						withBlockedWindows(MsgBox, translate("The data has not been exported for the currently selected simulator."), translate("Error"), 262160)
+						withBlockedWindows(MsgBox, translate("This is not a valid folder with exported data."), translate("Error"), 262160)
 						OnMessage(0x44, translateOkButton, 0)
 					}
 				}
 				else {
 					OnMessage(0x44, translateOkButton)
 					withBlockedWindows(MsgBox, translate("This is not a valid folder with exported data."), translate("Error"), 262160)
+					OnMessage(0x44, translateOkButton, 0)
+				}
+		}
+
+		exportSettings(*) {
+			local translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
+			local folder
+
+			editor.Window.Opt("+OwnDialogs")
+
+			OnMessage(0x44, translator)
+			folder := withBlockedWindows(DirSelect, "*" . kDatabaseDirectory, 0, translate("Select target folder..."))
+			OnMessage(0x44, translator, 0)
+
+			if (folder != "")
+				editor.exportSettings(folder . "\Export_" . A_Now)
+		}
+
+		importSettings(*) {
+			local translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
+			local folder, info, selection
+
+			editorGui.Opt("+OwnDialogs")
+
+			OnMessage(0x44, translator)
+			folder := withBlockedWindows(DirSelect, "*" . kDatabaseDirectory, 0, translate("Select export folder..."))
+			OnMessage(0x44, translator, 0)
+
+			if (folder != "")
+				if FileExist(folder . "\Export.info") {
+					info := readMultiMap(folder . "\Export.info")
+
+					if (getMultiMapValue(info, "General", "Type", "Data") = "Settings") {
+						if (getMultiMapValue(info, "General", "Simulator") = editor.SelectedSimulator) {
+							editorGui.Block()
+
+							try {
+								selection := selectImportSettings(editor, folder, editorGui)
+
+								if selection
+									editor.importSettings(folder, selection)
+							}
+							finally {
+								editorGui.Unblock()
+							}
+						}
+						else {
+							OnMessage(0x44, translateOkButton)
+							withBlockedWindows(MsgBox, translate("The settings has not been exported for the currently selected simulator."), translate("Error"), 262160)
+							OnMessage(0x44, translateOkButton, 0)
+						}
+					}
+					else {
+						OnMessage(0x44, translateOkButton)
+						withBlockedWindows(MsgBox, translate("This is not a valid folder with exported settings."), translate("Error"), 262160)
+						OnMessage(0x44, translateOkButton, 0)
+					}
+				}
+				else {
+					OnMessage(0x44, translateOkButton)
+					withBlockedWindows(MsgBox, translate("This is not a valid folder with exported settings."), translate("Error"), 262160)
 					OnMessage(0x44, translateOkButton, 0)
 				}
 		}
@@ -1277,7 +1345,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		setButtonIcon(editorGui["addSettingButton"], kIconsDirectory . "Plus.ico", 1)
 		setButtonIcon(editorGui["deleteSettingButton"], kIconsDirectory . "Minus.ico", 1)
 
-		editorGui.Add("Button", "x440 yp+30 w80 h23 Y:Move X:Move(0.5)", translate("Test...")).OnEvent("Click", testSettings)
+		editorGui.Add("Button", "x296 yp+30 w90 h23 Y:Move vexportSettingsButton", translate("Export...")).OnEvent("Click", exportSettings)
+		editorGui.Add("Button", "xp+95 yp w90 h23 Y:Move vimportSettingsButton", translate("Import...")).OnEvent("Click", importSettings)
+
+		editorGui.Add("Button", "x574 yp w80 h23 Y:Move X:Move", translate("Test...")).OnEvent("Click", testSettings)
 
 		editorGui["settingsTab"].UseTab(2)
 
@@ -1849,6 +1920,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		else
 			window["addSettingButton"].Enabled := true
 
+		window["exportSettingsButton"].Enabled := (this.SettingsListView.GetCount() > 0)
+
 		selectedEntries := 0
 
 		row := this.AdministrationListView.GetNext(0, "C")
@@ -2109,6 +2182,103 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				this.selectSetup(select)
 			else
 				this.updateState()
+		}
+	}
+
+	exportSettings(directory) {
+		local window := this.Window
+		local progressWindow := showProgress({color: "Green", title: translate("Exporting Settings")})
+		local settings := newMultiMap()
+		local progress := 0
+		local simulator, car, track, weather, section, key, value, count
+
+		directory := normalizeDirectoryPath(directory)
+
+		progressWindow.Opt("+Owner" . window.Hwnd)
+		window.Block()
+
+		try {
+			simulator := this.SelectedSimulator
+			car := this.SelectedCar["*"]
+			track := this.SelectedTrack["*"]
+			weather := this.SelectedWeather["*"]
+
+			count := this.SettingsListView.GetCount()
+
+			for ignore, setting in SettingsDatabase().readSettings(simulator, car, track, weather, false, false) {
+				section := setting["Section"]
+				key := setting["Key"]
+				value := setting["Value"]
+
+				showProgress({progress: Round((++progress / count) * 100), message: this.getSettingLabel(section, key) . translate("...")})
+
+				Sleep(50)
+
+				setMultiMapValue(settings, section, key, value)
+			}
+
+			info := newMultiMap()
+
+			setMultiMapValue(info, "General", "Type", "Settings")
+			setMultiMapValue(info, "General", "Simulator", simulator)
+			setMultiMapValue(info, "General", "Car", car)
+			setMultiMapValue(info, "General", "Track", track)
+			setMultiMapValue(info, "General", "Weather", weather)
+			setMultiMapValue(info, "General", "Creator", this.SessionDatabase.ID)
+			setMultiMapValue(info, "General", "Origin", this.SessionDatabase.DatabaseID)
+
+			writeMultiMap(directory . "\Export.info", info)
+
+			writeMultiMap(directory . "\Export.settings", settings)
+		}
+		catch Any as exception {
+			logError(exception)
+		}
+		finally {
+			window.Unblock()
+
+			hideProgress()
+		}
+	}
+
+	importSettings(directory, selection) {
+		local window := this.Window
+		local simulator := this.SelectedSimulator
+		local info := readMultiMap(directory . "\Export.info")
+		local car, track, weather, progressWindow, ignore, setting, settingsDB
+
+		directory := normalizeDirectoryPath(directory)
+
+		if ((this.SessionDatabase.getSimulatorName(getMultiMapValue(info, "General", "Simulator", "")) = simulator)
+		 && (getMultiMapValue(info, "General", "Type", "Data") = "Settings")) {
+			progressWindow := showProgress({color: "Green", title: translate("Importing Settings")})
+
+			progressWindow.Opt("+Owner" . window.Hwnd)
+			window.Block()
+
+			car := getMultiMapValue(info, "General", "Car")
+			track := getMultiMapValue(info, "General", "Track")
+			weather := getMultiMapValue(info, "General", "Weather")
+
+			try {
+				settingsDB := SettingsDatabase()
+
+				for ignore, setting in selection {
+					showProgress({progress: ++progress, message: this.getSettingLabel(setting[1], setting[2]) . translate("...")})
+
+					settingsDB.setSettingValue(simulator, car, track, weather, setting[1], setting[2], setting[3])
+				}
+			}
+			catch Any as exception {
+				logError(exception)
+			}
+			finally {
+				window.Unblock()
+
+				hideProgress()
+			}
+
+			this.selectSettings()
 		}
 	}
 
@@ -2931,6 +3101,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			info := newMultiMap()
 
+			setMultiMapValue(info, "General", "Type", "Data")
 			setMultiMapValue(info, "General", "Simulator", simulator)
 			setMultiMapValue(info, "General", "Creator", this.SessionDatabase.ID)
 			setMultiMapValue(info, "General", "Origin", this.SessionDatabase.DatabaseID)
@@ -2963,7 +3134,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		directory := normalizeDirectoryPath(directory)
 
-		if (this.SessionDatabase.getSimulatorName(getMultiMapValue(info, "General", "Simulator", "")) = simulator) {
+		if ((this.SessionDatabase.getSimulatorName(getMultiMapValue(info, "General", "Simulator", "")) = simulator)
+		 && (getMultiMapValue(info, "General", "Type", "Data") = "Data")) {
 			progressWindow := showProgress({color: "Green", title: translate("Importing Data")})
 
 			progressWindow.Opt("+Owner" . window.Hwnd)
@@ -4506,6 +4678,166 @@ actionDialog(xOrCommand := false, y := false, action := false, *) {
 	}
 }
 
+selectImportSettings(sessionDatabaseEditorOrCommand, directory := false, owner := false, *) {
+	local x, y, w, h, editor, simulator, code, info, progressWindow, section, key, values, value, type
+	local settings, row, selection
+
+	static importSettingsGui
+	static importSelectCheck
+	static importListView := false
+	static result := false
+
+	selectAllImportEntries(*) {
+		if (importSelectCheck.Value == -1) {
+			importSelectCheck.Value := 0
+
+			importSelectCheck.Value := 0
+		}
+
+		loop importListView.GetCount()
+			importListView.Modify(A_Index, importSelectCheck.Value ? "Check" : "-Check")
+	}
+
+	selectImportEntry(*) {
+		local selected := 0
+		local row := 0
+
+		loop {
+			row := importListView.GetNext(row, "C")
+
+			if row
+				selected += 1
+			else
+				break
+		}
+
+		if (selected == 0)
+			importSelectCheck.Value := 0
+		else if (selected < importListView.GetCount())
+			importSelectCheck.Value := -1
+		else
+			importSelectCheck.Value := 1
+	}
+
+	if (sessionDatabaseEditorOrCommand = kCancel)
+		result := kCancel
+	else if (sessionDatabaseEditorOrCommand = kOk)
+		result := kOk
+	else {
+		result := false
+
+		importSettingsGui := Window({Descriptor: "Session Database.ImportSettings", Resizeable: true, Options: "-MaximizeBox"}, translate("Import"))
+
+		importSettingsGui.SetFont("s10 Bold", "Arial")
+
+		importSettingsGui.Add("Text", "w394 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(importSettingsGui, "Session Database.ImportSettings"))
+
+		importSettingsGui.SetFont("s9 Norm", "Arial")
+
+		importSettingsGui.Add("Documentation", "x153 YP+20 w104 H:Center Center", translate("Import")
+							, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database")
+
+		importSettingsGui.SetFont("s8 Norm", "Arial")
+
+		importSettingsGui.Add("Text", "x8 yp+30 w410 W:Grow 0x10")
+
+		importSelectCheck := importSettingsGui.Add("CheckBox", "Check3 x16 yp+12 w15 h23 vimportSelectCheck")
+		importSelectCheck.OnEvent("Click", selectAllImportEntries)
+
+		importListView := importSettingsGui.Add("ListView", "x34 yp-2 w375 h400 H:Grow W:Grow -Multi -LV0x10 Checked AltSubmit", collect(["Setting", "Value"], translate))
+		importListView.OnEvent("Click", noSelect)
+		importListView.OnEvent("DoubleClick", noSelect)
+		importListView.OnEvent("ItemCheck", selectImportEntry)
+
+		directory := normalizeDirectoryPath(directory)
+		editor := sessionDatabaseEditorOrCommand
+
+		simulator := editor.SelectedSimulator
+		code := editor.SessionDatabase.getSimulatorCode(simulator)
+
+		settings := []
+
+		info := readMultiMap(directory . "\Export.info")
+
+		if (getMultiMapValue(info, "General", "Simulator") = simulator) {
+			progressWindow := showProgress({color: "Green", title: translate("Analyzing Data")})
+
+			progressWindow.Opt("+Owner" . owner.Hwnd)
+
+			try {
+				for section, values in readMultiMap(directory . "\Export.settings")
+					for key, value in values {
+						settings.Push(Array(section, key, value))
+
+						type := editor.getSettingType(section, key, &default)
+
+						if isObject(type)
+							value := translate(value)
+						else if (type = "Boolean")
+							value := (value ? translate("x") : "")
+						else if (type = "Text")
+							value := StrReplace(StrReplace(value, "`n", A_Space), "`r", "")
+						else
+							value := displayValue("Float", value)
+
+						importListView.Add("Check", editor.getSettingLabel(section, key), value)
+					}
+			}
+			finally {
+				hideProgress()
+			}
+		}
+
+		importSelectCheck.Value := ((importListView.GetCount() > 0) ? 1 : 0)
+
+		importListView.ModifyCol()
+
+		loop 4
+			importListView.ModifyCol(A_Index, 10)
+
+		loop 4
+			importListView.ModifyCol(A_Index, "AutoHdr")
+
+		importSettingsGui.SetFont("s8 Norm", "Arial")
+
+		importSettingsGui.Add("Text", "x8 yp+410 w410 W:Grow Y:Move 0x10")
+
+		importSettingsGui.Add("Button", "x123 yp+10 w80 h23 Y:Move X:Move(0.5) Default", translate("Ok")).OnEvent("Click", selectImportSettings.Bind(kOk))
+		importSettingsGui.Add("Button", "x226 yp w80 h23 Y:Move X:Move(0.5)", translate("&Cancel")).OnEvent("Click", selectImportSettings.Bind(kCancel))
+
+		importSettingsGui.Opt("+Owner" . owner.Hwnd)
+
+		if getWindowPosition("Session Database.ImportSettings", &x, &y)
+			importSettingsGui.Show("x" . x . " y" . y)
+		else
+			importSettingsGui.Show()
+
+		if getWindowSize("Session Database.ImportSettings", &w, &h)
+			importSettingsGui.Resize("Initialize", w, h)
+
+		loop
+			Sleep(100)
+		until result
+
+		if (result = kOk) {
+			row := 0
+
+			selection := []
+
+			while (row := importListView.GetNext(row, "C"))
+				selection.Push(settings[row])
+
+			result := selection
+		}
+		else
+			result := false
+
+		importSettingsGui.Destroy()
+
+		return result
+	}
+}
+
 selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := false, *) {
 	local x, y, w, h, editor, simulator, code, info, drivers, id, name, progressWindow, tracks, progress
 	local car, carName, track, trackName, sourceDirectory, found, telemetryDB, tyresDB, driver, driverName, rows
@@ -4555,11 +4887,11 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := fa
 	else {
 		result := false
 
-		importDataGui := Window({Descriptor: "Session Database.Import", Resizeable: true, Options: "-MaximizeBox"}, translate("Import"))
+		importDataGui := Window({Descriptor: "Session Database.ImportData", Resizeable: true, Options: "-MaximizeBox"}, translate("Import"))
 
 		importDataGui.SetFont("s10 Bold", "Arial")
 
-		importDataGui.Add("Text", "w394 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(importDataGui, "Session Database.Import"))
+		importDataGui.Add("Text", "w394 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(importDataGui, "Session Database.ImportData"))
 
 		importDataGui.SetFont("s9 Norm", "Arial")
 
@@ -4699,12 +5031,12 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := fa
 
 		importDataGui.Opt("+Owner" . owner.Hwnd)
 
-		if getWindowPosition("Session Database.Import", &x, &y)
+		if getWindowPosition("Session Database.ImportData", &x, &y)
 			importDataGui.Show("x" . x . " y" . y)
 		else
 			importDataGui.Show()
 
-		if getWindowSize("Session Database.Import", &w, &h)
+		if getWindowSize("Session Database.ImportData", &w, &h)
 			importDataGui.Resize("Initialize", w, h)
 
 		loop

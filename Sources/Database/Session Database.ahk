@@ -1024,6 +1024,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		exportSettings(*) {
 			local translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
+			local full := GetKeyState("Ctrl", "P")
 			local folder
 
 			editor.Window.Opt("+OwnDialogs")
@@ -1033,7 +1034,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			OnMessage(0x44, translator, 0)
 
 			if (folder != "")
-				editor.exportSettings(folder . "\Export_" . A_Now)
+				editor.exportSettings(folder . "\Export_" . A_Now, full || GetKeyState("Ctrl", "P"))
 		}
 
 		importSettings(*) {
@@ -2185,12 +2186,13 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 	}
 
-	exportSettings(directory) {
+	exportSettings(directory, full := false) {
 		local window := this.Window
-		local progressWindow := showProgress({color: "Green", title: translate("Exporting Settings")})
+		local progressWindow := showProgress({color: "Blue", title: translate("Exporting Settings")})
 		local settings := newMultiMap()
 		local progress := 0
-		local simulator, car, track, weather, section, key, value, count
+		local count := 0
+		local overall, simulator, ignore, car, track, weather, section, key, value
 
 		directory := normalizeDirectoryPath(directory)
 
@@ -2199,31 +2201,61 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		try {
 			simulator := this.SelectedSimulator
-			car := this.SelectedCar["*"]
-			track := this.SelectedTrack["*"]
-			weather := this.SelectedWeather["*"]
 
-			count := this.SettingsListView.GetCount()
+			if full {
+				overall := (this.getCars(simulator).Length * this.getTracks(simulator, "*").Length * kWeatherConditions.Length)
 
-			for ignore, setting in SettingsDatabase().readSettings(simulator, car, track, weather, false, false) {
-				section := setting["Section"]
-				key := setting["Key"]
-				value := setting["Value"]
+				showProgress({message: translate("Parsing database...")})
 
-				showProgress({progress: Round((++progress / count) * 100), message: this.getSettingLabel(section, key) . translate("...")})
+				for ignore, car in concatenate(["*"], this.getCars(simulator))
+					for ignore, track in concatenate(["*"], this.getTracks(simulator, "*"))
+						for ignore, weather in concatenate(["*"], kWeatherConditions) {
+							count += SettingsDatabase().readSettings(simulator, car, track, weather, false, false).Length
 
-				Sleep(50)
+							showProgress({progress: Round((++progress / overall) * 100)})
+						}
 
-				setMultiMapValue(settings, section, key, value)
+				showProgress({Progress: (progress := 0), Color: "Green"})
+
+				for ignore, car in concatenate(["*"], this.getCars(simulator))
+					for ignore, track in concatenate(["*"], this.getTracks(simulator, "*"))
+						for ignore, weather in concatenate(["*"], kWeatherConditions)
+							for ignore, setting in SettingsDatabase().readSettings(simulator, car, track, weather, false, false) {
+								section := setting["Section"]
+								key := setting["Key"]
+								value := setting["Value"]
+
+								showProgress({progress: Round((++progress / count) * 100), message: this.getSettingLabel(section, key) . translate("...")})
+
+								Sleep(50)
+
+								setMultiMapValue(settings, values2String(" | ", section, car, track, weather), key, value)
+							}
+			}
+			else {
+				car := this.SelectedCar["*"]
+				track := this.SelectedTrack["*"]
+				weather := this.SelectedWeather["*"]
+
+				count := this.SettingsListView.GetCount()
+
+				for ignore, setting in SettingsDatabase().readSettings(simulator, car, track, weather, false, false) {
+					section := setting["Section"]
+					key := setting["Key"]
+					value := setting["Value"]
+
+					showProgress({progress: Round((++progress / count) * 100), message: this.getSettingLabel(section, key) . translate("...")})
+
+					Sleep(50)
+
+					setMultiMapValue(settings, values2String(";;;", section, car, track, weather), key, value)
+				}
 			}
 
 			info := newMultiMap()
 
 			setMultiMapValue(info, "General", "Type", "Settings")
 			setMultiMapValue(info, "General", "Simulator", simulator)
-			setMultiMapValue(info, "General", "Car", car)
-			setMultiMapValue(info, "General", "Track", track)
-			setMultiMapValue(info, "General", "Weather", weather)
 			setMultiMapValue(info, "General", "Creator", this.SessionDatabase.ID)
 			setMultiMapValue(info, "General", "Origin", this.SessionDatabase.DatabaseID)
 
@@ -2245,7 +2277,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local window := this.Window
 		local simulator := this.SelectedSimulator
 		local info := readMultiMap(directory . "\Export.info")
-		local car, track, weather, progressWindow, ignore, setting, settingsDB
+		local progressWindow, ignore, setting, settingsDB
 
 		directory := normalizeDirectoryPath(directory)
 
@@ -2256,17 +2288,15 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			progressWindow.Opt("+Owner" . window.Hwnd)
 			window.Block()
 
-			car := getMultiMapValue(info, "General", "Car")
-			track := getMultiMapValue(info, "General", "Track")
-			weather := getMultiMapValue(info, "General", "Weather")
-
 			try {
 				settingsDB := SettingsDatabase()
 
 				for ignore, setting in selection {
-					showProgress({progress: ++progress, message: this.getSettingLabel(setting[1], setting[2]) . translate("...")})
+					showProgress({progress: ++progress, message: this.getSettingLabel(setting[4], setting[5]) . translate("...")})
 
-					settingsDB.setSettingValue(simulator, car, track, weather, setting[1], setting[2], setting[3])
+					Sleep(50)
+
+					settingsDB.setSettingValue(simulator, setting[1], setting[2], setting[3], setting[4], setting[5], setting[6])
 				}
 			}
 			catch Any as exception {
@@ -4680,7 +4710,7 @@ actionDialog(xOrCommand := false, y := false, action := false, *) {
 
 selectImportSettings(sessionDatabaseEditorOrCommand, directory := false, owner := false, *) {
 	local x, y, w, h, editor, simulator, code, info, progressWindow, section, key, values, value, type
-	local settings, row, selection
+	local settings, row, selection, car, track, weather
 
 	static importSettingsGui
 	static importSelectCheck
@@ -4744,7 +4774,7 @@ selectImportSettings(sessionDatabaseEditorOrCommand, directory := false, owner :
 		importSelectCheck := importSettingsGui.Add("CheckBox", "Check3 x16 yp+12 w15 h23 vimportSelectCheck")
 		importSelectCheck.OnEvent("Click", selectAllImportEntries)
 
-		importListView := importSettingsGui.Add("ListView", "x34 yp-2 w375 h400 H:Grow W:Grow -Multi -LV0x10 Checked AltSubmit", collect(["Setting", "Value"], translate))
+		importListView := importSettingsGui.Add("ListView", "x34 yp-2 w375 h400 H:Grow W:Grow -Multi -LV0x10 Checked AltSubmit", collect(["Car", "Track", "Weather", "Setting", "Value"], translate))
 		importListView.OnEvent("Click", noSelect)
 		importListView.OnEvent("DoubleClick", noSelect)
 		importListView.OnEvent("ItemCheck", selectImportEntry)
@@ -4765,9 +4795,16 @@ selectImportSettings(sessionDatabaseEditorOrCommand, directory := false, owner :
 			progressWindow.Opt("+Owner" . owner.Hwnd)
 
 			try {
-				for section, values in readMultiMap(directory . "\Export.settings")
+				for section, values in readMultiMap(directory . "\Export.settings") {
+					section := string2Values(" | ", section)
+
+					car := section[2]
+					track := section[3]
+					weather := section[4]
+					section := section[1]
+
 					for key, value in values {
-						settings.Push(Array(section, key, value))
+						settings.Push(Array(car, track, weather, section, key, value))
 
 						type := editor.getSettingType(section, key, &default)
 
@@ -4780,8 +4817,12 @@ selectImportSettings(sessionDatabaseEditorOrCommand, directory := false, owner :
 						else
 							value := displayValue("Float", value)
 
-						importListView.Add("Check", editor.getSettingLabel(section, key), value)
+						importListView.Add("Check", (car = "*") ? translate("All") : SessionDatabase.getCarName(simulator, car)
+												  , (track = "*") ? translate("All") : SessionDatabase.getTrackName(simulator, track, false)
+												  , (weather = "*") ? translate("All") : weather
+												  , editor.getSettingLabel(section, key), value)
 					}
+				}
 			}
 			finally {
 				hideProgress()
@@ -4792,10 +4833,10 @@ selectImportSettings(sessionDatabaseEditorOrCommand, directory := false, owner :
 
 		importListView.ModifyCol()
 
-		loop 4
+		loop 5
 			importListView.ModifyCol(A_Index, 10)
 
-		loop 4
+		loop 5
 			importListView.ModifyCol(A_Index, "AutoHdr")
 
 		importSettingsGui.SetFont("s8 Norm", "Arial")

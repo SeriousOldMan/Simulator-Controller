@@ -1065,7 +1065,7 @@ class SessionDatabase extends ConfigurationItem {
 
 			carData := SessionDatabase.loadData(SessionDatabase.sCarData, simulatorCode, "Car Data.ini")
 
-			if (getMultiMapValue(carData, "Car Names", car, kUndefined) == kUndefined) {
+			if ((simulatorCode != "ACC") && (getMultiMapValue(carData, "Car Names", car, kUndefined) == kUndefined)) {
 				fileName := (kUserHomeDirectory . "Simulator Data\" . simulatorCode . "\" . "Car Data.ini")
 				carData := readMultiMap(fileName)
 
@@ -1122,7 +1122,7 @@ class SessionDatabase extends ConfigurationItem {
 
 			trackData := SessionDatabase.loadData(SessionDatabase.sTrackData, simulatorCode, "Track Data.ini")
 
-			if (getMultiMapValue(trackData, "Track Names Long", track, kUndefined) == kUndefined) {
+			if ((simulatorCode != "ACC") && (getMultiMapValue(trackData, "Track Names Long", track, kUndefined) == kUndefined)) {
 				fileName := (kUserHomeDirectory . "Simulator Data\" . simulatorCode . "\" . "Track Data.ini")
 				trackData := readMultiMap(fileName)
 

@@ -1,7 +1,7 @@
 [Development]
 Version=5.5.8.0-beta
 Target=5.5.8.0-release
-Date=02/14/2024
+Date=02/15/2024
 Download=https://www.dropbox.com/scl/fi/0fcavgwavqhnwsggqb8fp/Simulator-Controller-5.5.8.0-beta.zip?rlkey=2dz0cfkn4h0rt2xwsc6fjm0pj&dl=1
 Changes=Support activation commands without double-press for cloud based voice recognition services, Extended Driving Coach analytic capabilities, Fixed laptime comparison for the Spotter, Reading the udpConnection parameter for the ACC plugin not ignores errors, Active/Deactive controller action icons for Stream Deck, Extended car meta DLC, New car models for "Setup Workbench"
 Components=Media->5.5.7,Configuration->5.5.7,Utilities->5.4.8

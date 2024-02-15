@@ -1663,6 +1663,16 @@ updateInstallationForV500() {
 	}
 }
 
+updateConfigurationForV558() {
+	try {
+		deleteFile(kUserHomeDirectory . "Simulator Data\ACC\Car Data.ini")
+		deleteFile(kUserHomeDirectory . "Simulator Data\ACC\Track Data.ini")
+	}
+	catch Any as exception {
+		logError(exception)
+	}
+}
+
 updateConfigurationForV557() {
 	local configuration
 

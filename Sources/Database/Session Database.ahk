@@ -4803,6 +4803,8 @@ selectImportSettings(sessionDatabaseEditorOrCommand, directory := false, owner :
 					weather := section[4]
 					section := section[1]
 
+					showProgress({Progress: Min(A_Index, 100)})
+
 					for key, value in values {
 						settings.Push(Array(car, track, weather, section, key, value))
 

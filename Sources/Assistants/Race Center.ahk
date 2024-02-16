@@ -5345,8 +5345,9 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	getSimulationSettings(&useInitialConditions, &useTelemetryData
-						, &consumptionVariation, &initialFuelVariation, &tyreUsageVariation, &tyreCompoundVariation
-						, &firstStintWeight) {
+						, &consumptionVariation, &initialFuelVariation, &refuelVariation
+						, &tyreUsageVariation, &tyreCompoundVariation
+						, &firstStintWeight, &lastStintWeight) {
 		local strategy := this.Strategy
 
 		useInitialConditions := false
@@ -5356,17 +5357,23 @@ class RaceCenter extends ConfigurationItem {
 
 		if strategy {
 			consumptionVariation := strategy.ConsumptionVariation
+			refuelVariation := strategy.RefuelVariation
+			
 			tyreUsageVariation := strategy.TyreUsageVariation
 			tyreCompoundVariation := strategy.TyreCompoundVariation
 
 			firstStintWeight := strategy.FirstStintWeight
+			lastStintWeight := strategy.LastStintWeight
 		}
 		else {
 			consumptionVariation := 0
+			refuelVariation := 0
+			
 			tyreUsageVariation := 0
 			tyreCompoundVariation := 0
 
 			firstStintWeight := 0
+			lastStintWeight := 0
 		}
 
 		if (tyreUsageVariation = 0)

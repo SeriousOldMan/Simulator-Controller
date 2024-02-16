@@ -340,12 +340,13 @@ class StrategySimulation {
 	}
 
 	getSimulationSettings(&useInitialConditions, &useTelemetryData
-						, &consumptionVariation, &initialFuelVariation, &tyreUsageVariation, &tyreCompoundVariation
-						, &firstStintWeight) {
+						, &consumptionVariation, &initialFuelVariation, &refuelVariation
+						, &tyreUsageVariation, &tyreCompoundVariation
+						, &firstStintWeight, &lastStintWeight) {
 		return this.StrategyManager.getSimulationSettings(&useInitialConditions, &useTelemetryData
-														, &consumptionVariation, &initialFuelVariation
+														, &consumptionVariation, &initialFuelVariation, &refuelVariation
 														, &tyreUsageVariation, &tyreCompoundVariation
-														, &firstStintWeight)
+														, &firstStintWeight, &lastStintWeight)
 	}
 
 	getPitstopRules(&validator, &pitstopRule, &refuelRule, &tyreChangeRule, &tyreSets) {
@@ -513,7 +514,7 @@ class StrategySimulation {
 						 , initialTyreLaps, maxTyreLaps, tyreLapsVariation
 						 , stintLaps, formationLap, avgLapTime
 						 , ecuMap, fuelConsumption, consumptionVariation
-						 , initialFuelAmount, initialFuelVariation, fuelCapacity
+						 , initialFuelAmount, initialFuelVariation, refuelVariation, fuelCapacity
 						 , weather, tyreCompound, tyreCompoundColor) {
 		local driverID := false
 		local driverName := false
@@ -543,17 +544,17 @@ class StrategySimulation {
 									, weather, tyreCompound, tyreCompoundColor, 0, avgLapTime)
 
 		this.createStints(strategy, initialStint, initialLap, initialStintTime, initialSessionTime, initialTyreLaps
-						, startFuelAmount, initialFuelVariation, fuelAmount
+						, startFuelAmount, initialFuelVariation, refuelVariation, fuelAmount
 						, stintLaps, maxTyreLaps, tyreLapsVariation, ecuMap, currentConsumption, lapTime)
 
 		return strategy
 	}
 
 	createStints(strategy, initialStint, initialLap, initialStintTime, initialSessionTime, initialTyreLaps
-			   , startFuelAmount, startFuelVariation, fuelAmount
+			   , startFuelAmount, startFuelVariation, startRefuelVariation, fuelAmount
 			   , stintLaps, maxTyreLaps, tyreLapsVariation, ecuMap, consumption, lapTime) {
 		strategy.createStints(initialStint, initialLap, initialStintTime, initialSessionTime, initialTyreLaps
-							, startFuelAmount, startFuelVariation, fuelAmount
+							, startFuelAmount, startFuelVariation, startRefuelVariation, fuelAmount
 							, stintLaps, maxTyreLaps, tyreLapsVariation, ecuMap, consumption, lapTime)
 	}
 
@@ -703,7 +704,8 @@ class StrategySimulation {
 				 + this.scenarioCoefficient("FuelMax", cFuel - sFuel, 10)
 				 + this.scenarioCoefficient("TyreSetsCount", sTSets - cTSets, 1))
 
-		if ((Abs(scenario1.FirstStintWeight) < 5) && (Abs(scenario2.FirstStintWeight) < 5))
+		if ((Abs(scenario1.FirstStintWeight) < 5) && (Abs(scenario2.FirstStintWeight) < 5)
+		 && (Abs(scenario1.LastStintWeight) < 5) && (Abs(scenario2.LastStintWeight) < 5))
 			result += (this.scenarioCoefficient("TyreLapsMax", cTLaps - sTLaps, 10)
 					 + this.scenarioCoefficient("PitstopsPostLaps", sPLaps - cPLaps, 10))
 		; else
@@ -897,10 +899,12 @@ class VariationSimulation extends StrategySimulation {
 		local tyreUsage := 0
 		local tyreCompoundVariation := 0
 		local firstStintWeight := 0
+		local lastStintWeight := 0
 		local initialFuel := 0
-		local consumptionSteps, tyreUsageSteps, tyreCompoundVariationSteps, initialFuelSteps
+		local refuel := 0
+		local consumptionSteps, tyreUsageSteps, tyreCompoundVariationSteps, initialFuelSteps, refuelSteps
 		local scenarios, variation, tyreCompoundColors
-		local consumptionRound, initialFuelRound, tyreUsageRound, tyreCompoundVariationRound, tyreLapsVariation
+		local consumptionRound, initialFuelRound, refuelRound, tyreUsageRound, tyreCompoundVariationRound, tyreLapsVariation
 		local message, stintLaps, name, driverID, driverName
 		local ignore, mapData, scenarioMap, scenarioFuelConsumption, scenarioAvgLapTime
 		local candidate, targetTyreCompound, targetTyreCompoundColor
@@ -918,13 +922,15 @@ class VariationSimulation extends StrategySimulation {
 			formationLap := false
 
 		this.getSimulationSettings(&useInitialConditions, &useTelemetryData
-								 , &consumption, &initialFuel, &tyreUsage, &tyreCompoundVariation
-								 , &firstStintWeight)
+								 , &consumption, &initialFuel, &refuel
+								 , &tyreUsage, &tyreCompoundVariation
+								 , &firstStintWeight, &lastStintWeight)
 
 		consumptionSteps := 1
 		tyreUsageSteps := tyreUsage * 2
 		tyreCompoundVariationSteps := tyreCompoundVariation / 4
 		initialFuelSteps := initialFuel / 5
+		refuelSteps := 1
 
 		scenarios := CaseInsenseMap()
 		variation := 1
@@ -952,6 +958,7 @@ class VariationSimulation extends StrategySimulation {
 
 		consumptionRound := 0
 		initialFuelRound := 0
+		refuelRound := 0
 		tyreUsageRound := 0
 		tyreCompoundVariationRound := 0
 
@@ -970,88 +977,91 @@ class VariationSimulation extends StrategySimulation {
 
 		loop { ; consumption
 			loop { ; initialFuel
-				loop { ; tyreUsage
-					loop { ; tyreCompoundVariation
-						if (verbose && GetKeyState("Escape", "P"))
-							throw StrategySimulation.CancelSimulation()
+				loop { ; refuel
+					loop { ; tyreUsage
+						loop { ; tyreCompoundVariation
+							if (verbose && GetKeyState("Escape", "P"))
+								throw StrategySimulation.CancelSimulation()
 
-						if useInitialConditions {
-							if verbose {
-								message := (translate("Creating Initial Scenario with Map ") . ecuMap . translate(":") . variation++ . translate("..."))
-
-								showProgress({progress: progress, message: message})
-							}
-
-							stintLaps := Floor((stintLength * 60) / avgLapTime)
-
-							name := (translate("Initial Conditions - Map ") . ecuMap)
-
-							this.setFixedLapTime(avgLapTime)
-
-							try {
-								scenarios[name . translate(":") . variation]
-									:= this.createScenarioStrategy(name
-																 , initialStint, initialLap, initialStintTime, initialSessionTime
-																 , initialTyreLaps, maxTyreLaps, tyreLapsVariation
-																 , stintLaps, formationLap, avgLapTime
-																 , ecuMap, fuelConsumption, consumption
-																 , initialFuelAmount, initialFuelRound * 5, fuelCapacity
-																 , weather, tyreCompound, tyreCompoundColor)
-							}
-							finally {
-								this.setFixedLapTime(false)
-							}
-
-							if verbose
-								progress += 1
-						}
-
-						if useTelemetryData {
-							driverID := false
-							driverName := false
-
-							this.getStintDriver(initialStint, &driverID, &driverName)
-
-							this.setStintDriver(initialStint, driverID)
-
-							for ignore, mapData in this.acquireElectronicsData(weather, targetTyreCompound, targetTyreCompoundColor) {
-								scenarioMap := mapData["Map"]
-								scenarioFuelConsumption := mapData["Fuel.Consumption"]
-								scenarioAvgLapTime := mapData["Lap.Time"]
-
+							if useInitialConditions {
 								if verbose {
-									message := (translate("Creating Telemetry Scenario with Map ") . scenarioMap . translate(":") . variation++ . translate("..."))
+									message := (translate("Creating Initial Scenario with Map ") . ecuMap . translate(":") . variation++ . translate("..."))
 
 									showProgress({progress: progress, message: message})
 								}
 
-								stintLaps := Floor((stintLength * 60) / scenarioAvgLapTime)
+								stintLaps := Floor((stintLength * 60) / avgLapTime)
 
-								name := (translate("Telemetry - Map ") . scenarioMap)
+								name := (translate("Initial Conditions - Map ") . ecuMap)
 
-								scenarios[name . translate(":") . variation]
-									:= this.createScenarioStrategy(name
-																 , initialStint, initialLap, initialStintTime, initialSessionTime
-																 , initialTyreLaps, maxTyreLaps, tyreLapsVariation
-																 , stintLaps, formationLap, scenarioAvgLapTime
-																 , scenarioMap, scenarioFuelConsumption, consumption
-																 , initialFuelAmount, initialFuelRound * 5, fuelCapacity
-																 , weather, tyreCompound, tyreCompoundColor)
+								this.setFixedLapTime(avgLapTime)
+
+								try {
+									scenarios[name . translate(":") . variation]
+										:= this.createScenarioStrategy(name
+																	 , initialStint, initialLap, initialStintTime, initialSessionTime
+																	 , initialTyreLaps, maxTyreLaps, tyreLapsVariation
+																	 , stintLaps, formationLap, avgLapTime
+																	 , ecuMap, fuelConsumption, consumption
+																	 , initialFuelAmount, initialFuelRound * 5, refuel, fuelCapacity
+																	 , weather, tyreCompound, tyreCompoundColor)
+								}
+								finally {
+									this.setFixedLapTime(false)
+								}
 
 								if verbose
 									progress += 1
 							}
+
+							if useTelemetryData {
+								driverID := false
+								driverName := false
+
+								this.getStintDriver(initialStint, &driverID, &driverName)
+
+								this.setStintDriver(initialStint, driverID)
+
+								for ignore, mapData in this.acquireElectronicsData(weather, targetTyreCompound, targetTyreCompoundColor) {
+									scenarioMap := mapData["Map"]
+									scenarioFuelConsumption := mapData["Fuel.Consumption"]
+									scenarioAvgLapTime := mapData["Lap.Time"]
+
+									if verbose {
+										message := (translate("Creating Telemetry Scenario with Map ") . scenarioMap . translate(":") . variation++ . translate("..."))
+
+										showProgress({progress: progress, message: message})
+									}
+
+									stintLaps := Floor((stintLength * 60) / scenarioAvgLapTime)
+
+									name := (translate("Telemetry - Map ") . scenarioMap)
+
+									scenarios[name . translate(":") . variation]
+										:= this.createScenarioStrategy(name
+																	 , initialStint, initialLap, initialStintTime, initialSessionTime
+																	 , initialTyreLaps, maxTyreLaps, tyreLapsVariation
+																	 , stintLaps, formationLap, scenarioAvgLapTime
+																	 , scenarioMap, scenarioFuelConsumption, consumption
+																	 , initialFuelAmount, initialFuelRound * 5, refuel, fuelCapacity
+																	 , weather, tyreCompound, tyreCompoundColor)
+
+									if verbose
+										progress += 1
+								}
+							}
+
+							if (++tyreCompoundVariationRound >= tyreCompoundVariationSteps)
+								break
 						}
 
-						if (++tyreCompoundVariationRound >= tyreCompoundVariationSteps)
+						if (++tyreUsageRound >= tyreUsageSteps)
 							break
 					}
 
-					if (++tyreUsageRound >= tyreUsageSteps)
+					if (++refuelRound >= refuelSteps)
 						break
 				}
-
-				initialFuel -= initialFuelSteps
 
 				if (++initialFuelRound >= initialFuelSteps)
 					break
@@ -1244,10 +1254,12 @@ class TrafficSimulation extends StrategySimulation {
 		local tyreUsage := 0
 		local tyreCompoundVariation := 0
 		local firstStintWeight := 0
+		local lastStintWeight := 0
 		local initialFuel := 0
-		local consumptionSteps, tyreUsageSteps, tyreCompoundVariationSteps, initialFuelSteps
+		local refuel := 0
+		local consumptionSteps, tyreUsageSteps, tyreCompoundVariationSteps, initialFuelSteps, refuelSteps
 		local scenarios, variation, first, tyreCompoundColors, tyreLapsVariation
-		local consumptionRound, initialFuelRound, tyreUsageRound, tyreCompoundVariationRound
+		local consumptionRound, initialFuelRound, refuelRound, tyreUsageRound, tyreCompoundVariationRound
 		local message, stintLaps, name, driverID, driverName, strategy, currentConsumption
 		local ignore, mapData, scenarioMap, scenarioFuelConsumption, scenarioAvgLapTime
 		local candidate, targetTyreCompound, targetTyreCompoundColor
@@ -1276,13 +1288,15 @@ class TrafficSimulation extends StrategySimulation {
 			formationLap := false
 
 		this.getSimulationSettings(&useInitialConditions, &useTelemetryData
-								 , &consumption, &initialFuel, &tyreUsage, &tyreCompoundVariation
-								 , &firstStintWeight)
+								 , &consumption, &initialFuel, &refuel
+								 , &tyreUsage, &tyreCompoundVariation
+								 , &firstStintWeight, &lastStintWeight)
 
 		consumptionSteps := 1
 		tyreUsageSteps := tyreUsage * 2
 		tyreCompoundVariationSteps := tyreCompoundVariation / 4
 		initialFuelSteps := initialFuel / 5
+		refuelSteps := 1
 
 		scenarios := CaseInsenseMap()
 		variation := 0
@@ -1336,101 +1350,109 @@ class TrafficSimulation extends StrategySimulation {
 
 			consumptionRound := 0
 			initialFuelRound := 0
+			refuelRound := 0
 			tyreUsageRound := 0
 			tyreCompoundVariationRound := 0
 
 			loop { ; consumption
 				loop { ; initialFuel
-					loop { ; tyreUsage
-						tyreLapsVariation := tyreUsage
+					loop { ; refuel
+						loop { ; tyreUsage
+							tyreLapsVariation := tyreUsage
 
-						loop { ; tyreCompoundVariation
-							if (verbose && GetKeyState("Escape", "P"))
-								throw StrategySimulation.CancelSimulation()
+							loop { ; tyreCompoundVariation
+								if (verbose && GetKeyState("Escape", "P"))
+									throw StrategySimulation.CancelSimulation()
 
-							if useInitialConditions {
-								if verbose {
-									message := (translate("Creating Initial Scenario with Map ") . ecuMap  . translate(":") . variation++ . translate("..."))
-
-									showProgress({progress: progress, message: message})
-								}
-
-								stintLaps := Floor((stintLength * 60) / avgLapTime)
-
-								name := (translate("Initial Conditions - Map ") . ecuMap)
-
-								this.setFixedLapTime(avgLapTime)
-
-								try {
-									scenarios[name . translate(":") . variation]
-										:= this.createScenarioStrategy(name
-																	 , initialStint, initialLap, initialStintTime, initialSessionTime
-																	 , initialTyreLaps, maxTyreLaps, tyreLapsVariation
-																	 , stintLaps, formationLap, avgLapTime
-																	 , ecuMap, fuelConsumption, consumption
-																	 , initialFuelAmount, initialFuelRound * 5, fuelCapacity
-																	 , weather, tyreCompound, tyreCompoundColor)
-								}
-								finally {
-									this.setFixedLapTime(false)
-								}
-
-								if verbose
-									progress += 1
-							}
-
-							if useTelemetryData {
-								driverID := false
-								driverName := false
-
-								this.getStintDriver(initialStint, &driverID, &driverName)
-
-								this.setStintDriver(initialStint, driverID)
-
-								for ignore, mapData in this.acquireElectronicsData(weather, targetTyreCompound, targetTyreCompoundColor) {
-									this.getStintDriver(initialStint, &driverID, &driverName)
-
-									this.setStintDriver(initialStint, driverID)
-
-									scenarioMap := mapData["Map"]
-									scenarioFuelConsumption := mapData["Fuel.Consumption"]
-									scenarioAvgLapTime := mapData["Lap.Time"]
-
+								if useInitialConditions {
 									if verbose {
-										message := (translate("Creating Telemetry Scenario with Map ") . scenarioMap . translate(":") . variation++ . translate("..."))
+										message := (translate("Creating Initial Scenario with Map ") . ecuMap  . translate(":") . variation++ . translate("..."))
 
 										showProgress({progress: progress, message: message})
 									}
 
-									stintLaps := Floor((stintLength * 60) / scenarioAvgLapTime)
+									stintLaps := Floor((stintLength * 60) / avgLapTime)
 
-									name := (translate("Telemetry - Map ") . scenarioMap)
+									name := (translate("Initial Conditions - Map ") . ecuMap)
 
-									scenarios[name . translate(":") . variation]
-										:= this.createScenarioStrategy(name
-																	 , initialStint, initialLap, initialStintTime, initialSessionTime
-																	 , initialTyreLaps, maxTyreLaps, tyreLapsVariation
-																	 , stintLaps, formationLap, scenarioAvgLapTime
-																	 , scenarioMap, scenarioFuelConsumption, consumption
-																	 , initialFuelAmount, initialFuelRound * 5, fuelCapacity
-																	 , weather, tyreCompound, tyreCompoundColor)
+									this.setFixedLapTime(avgLapTime)
+
+									try {
+										scenarios[name . translate(":") . variation]
+											:= this.createScenarioStrategy(name
+																		 , initialStint, initialLap, initialStintTime, initialSessionTime
+																		 , initialTyreLaps, maxTyreLaps, tyreLapsVariation
+																		 , stintLaps, formationLap, avgLapTime
+																		 , ecuMap, fuelConsumption, consumption
+																		 , initialFuelAmount, initialFuelRound * 5, refuel, fuelCapacity
+																		 , weather, tyreCompound, tyreCompoundColor)
+									}
+									finally {
+										this.setFixedLapTime(false)
+									}
 
 									if verbose
 										progress += 1
 								}
+
+								if useTelemetryData {
+									driverID := false
+									driverName := false
+
+									this.getStintDriver(initialStint, &driverID, &driverName)
+
+									this.setStintDriver(initialStint, driverID)
+
+									for ignore, mapData in this.acquireElectronicsData(weather, targetTyreCompound, targetTyreCompoundColor) {
+										this.getStintDriver(initialStint, &driverID, &driverName)
+
+										this.setStintDriver(initialStint, driverID)
+
+										scenarioMap := mapData["Map"]
+										scenarioFuelConsumption := mapData["Fuel.Consumption"]
+										scenarioAvgLapTime := mapData["Lap.Time"]
+
+										if verbose {
+											message := (translate("Creating Telemetry Scenario with Map ") . scenarioMap . translate(":") . variation++ . translate("..."))
+
+											showProgress({progress: progress, message: message})
+										}
+
+										stintLaps := Floor((stintLength * 60) / scenarioAvgLapTime)
+
+										name := (translate("Telemetry - Map ") . scenarioMap)
+
+										scenarios[name . translate(":") . variation]
+											:= this.createScenarioStrategy(name
+																		 , initialStint, initialLap, initialStintTime, initialSessionTime
+																		 , initialTyreLaps, maxTyreLaps, tyreLapsVariation
+																		 , stintLaps, formationLap, scenarioAvgLapTime
+																		 , scenarioMap, scenarioFuelConsumption, consumption
+																		 , initialFuelAmount, initialFuelRound * 5, refuel, fuelCapacity
+																		 , weather, tyreCompound, tyreCompoundColor)
+
+										if verbose
+											progress += 1
+									}
+								}
+
+								if (++tyreCompoundVariationRound >= tyreCompoundVariationSteps)
+									break
 							}
 
-							if (++tyreCompoundVariationRound >= tyreCompoundVariationSteps)
+							if (++tyreUsageRound >= tyreUsageSteps)
 								break
 						}
 
-						if (++tyreUsageRound >= tyreUsageSteps)
+						if (++refuelRound >= refuelSteps)
 							break
 					}
 
 					if (++initialFuelRound >= initialFuelSteps)
 						break
 				}
+
+				consumption -= consumptionSteps
 
 				if (++consumptionRound >= consumptionSteps)
 					break
@@ -1520,10 +1542,12 @@ class Strategy extends ConfigurationItem {
 
 	iConsumptionVariation := 0
 	iInitialFuelVariation := 0
+	iRefuelVariation := 0
 	iTyreUsageVariation := 0
 	iTyreCompoundVariation := 0
 
 	iFirstStintWeight := 0
+	iLastStintWeight := 0
 
 	iDriver := false
 	iDriverName := SessionDatabase.getUserName()
@@ -1759,8 +1783,12 @@ class Strategy extends ConfigurationItem {
 
 			if (refuelRule = "Disallowed")
 				refuelAmount := 0
-			else
+			else {
 				refuelAmount := strategy.calcRefuelAmount(stintLaps * fuelConsumption, remainingFuel, remainingSessionLaps, lastStintLaps)
+
+				if strategy.RefuelVariation
+					refuelAmount -= ((Random(0, 100) / strategy.RefuelVariation) * 0.2 * refuelAmount)
+			}
 
 			tyreChange := kUndefined
 
@@ -2383,6 +2411,12 @@ class Strategy extends ConfigurationItem {
 		}
 	}
 
+	RefuelVariation {
+		Get {
+			return this.iRefuelVariation
+		}
+	}
+
 	TyreUsageVariation {
 		Get {
 			return this.iTyreUsageVariation
@@ -2398,6 +2432,12 @@ class Strategy extends ConfigurationItem {
 	FirstStintWeight {
 		Get {
 			return this.iFirstStintWeight
+		}
+	}
+
+	LastStintWeight {
+		Get {
+			return this.iLastStintWeight
 		}
 	}
 
@@ -2417,7 +2457,8 @@ class Strategy extends ConfigurationItem {
 		local pitstopFuelService, pitstopTyreService, pitstopServiceOrder
 		local validator, pitstopRule, refuelRule, tyreChangeRule, tyreSets
 		local useInitialConditions, useTelemetryData
-		local consumptionVariation, initialFuelVariation, tyreUsageVariation, tyreCompoundVariation, firstStintWeight
+		local consumptionVariation, initialFuelVariation, refuelVariation, tyreUsageVariation, tyreCompoundVariation
+		local firstStintWeight, lastStintWeight
 		local duration, minute, forecast, lastWeather, lastAirTemperature, lastTrackTemperature
 
 		this.iStrategyManager := strategyManager
@@ -2507,22 +2548,26 @@ class Strategy extends ConfigurationItem {
 			useTelemetryData := false
 			consumptionVariation := false
 			initialFuelVariation := false
+			refuelVariation := false
 			tyreUsageVariation := false
 			tyreCompoundVariation := false
 
 			this.StrategyManager.getSimulationSettings(&useInitialConditions, &useTelemetryData
-													 , &consumptionVariation, &initialFuelVariation, &tyreUsageVariation, &tyreCompoundVariation
-													 , &firstStintWeight)
+													 , &consumptionVariation, &initialFuelVariation, &refuelVariation
+													 , &tyreUsageVariation, &tyreCompoundVariation
+													 , &firstStintWeight, &lastStintWeight)
 
 			this.iUseInitialConditions := useInitialConditions
 			this.iUseTelemetryData := useTelemetryData
 
 			this.iConsumptionVariation := consumptionVariation
 			this.iInitialFuelVariation := initialFuelVariation
+			this.iRefuelVariation := refuelVariation
 			this.iTyreUsageVariation := tyreUsageVariation
 			this.iTyreCompoundVariation := tyreCompoundVariation
 
 			this.iFirstStintWeight := firstStintWeight
+			this.iLastStintWeight := lastStintWeight
 
 			this.StrategyManager.getStartConditions(&initialStint, &initialLap, &initialStintTime, &initialSessionTime
 												  , &initialTyreLaps, &initialFuelAmount, &ecuMap, &fuelConsumption, &avgLapTime)
@@ -2687,10 +2732,12 @@ class Strategy extends ConfigurationItem {
 
 		this.iConsumptionVariation := getMultiMapValue(configuration, "Simulation", "ConsumptionVariation", 0)
 		this.iInitialFuelVariation := getMultiMapValue(configuration, "Simulation", "InitialFuelVariation", 0)
+		this.iRefuelVariation := getMultiMapValue(configuration, "Simulation", "RefuelVariation", 0)
 		this.iTyreUsageVariation := getMultiMapValue(configuration, "Simulation", "TyreUsageVariation", 0)
 		this.iTyreCompoundVariation := getMultiMapValue(configuration, "Simulation", "TyreCompoundVariation", 0)
 
 		this.iFirstStintWeight := getMultiMapValue(configuration, "Simulation", "FirstStintWeight", 0)
+		this.iLastStintWeight := getMultiMapValue(configuration, "Simulation", "LastStintWeight", 0)
 	}
 
 	saveToConfiguration(configuration) {
@@ -2798,10 +2845,12 @@ class Strategy extends ConfigurationItem {
 
 		setMultiMapValue(configuration, "Simulation", "ConsumptionVariation", this.ConsumptionVariation)
 		setMultiMapValue(configuration, "Simulation", "InitialFuelVariation", this.InitialFuelVariation)
+		setMultiMapValue(configuration, "Simulation", "RefuelVariation", this.RefuelVariation)
 		setMultiMapValue(configuration, "Simulation", "TyreUsageVariation", this.TyreUsageVariation)
 		setMultiMapValue(configuration, "Simulation", "TyreCompoundVariation", this.TyreCompoundVariation)
 
 		setMultiMapValue(configuration, "Simulation", "FirstStintWeight", this.FirstStintWeight)
+		setMultiMapValue(configuration, "Simulation", "LastStintWeight", this.LastStintWeight)
 	}
 
 	initializeAvailableTyreSets() {
@@ -3039,8 +3088,7 @@ class Strategy extends ConfigurationItem {
 
 		if ((pitstopNr = 1) && ((!pitstopRule && (targetLap < remainingSessionLaps)) || isNumber(pitstopRule))
 							&& (targetLap > (currentLap + 1)) && !adjusted) {
-			if ((Abs(this.FirstStintWeight) >= 5)
-			 && (this.getSessionLaps() < (this.getMaxFuelLaps(this.FuelCapacity, this.FuelConsumption[true]) * 2 * 0.9))) {
+			if (Abs(this.FirstStintWeight) >= 5) {
 				halfLaps := ((targetLap - currentLap) / 2)
 
 				if (halfLaps != 0) {
@@ -3132,7 +3180,7 @@ class Strategy extends ConfigurationItem {
 	}
 
 	createStints(currentStint, currentLap, currentStintTime, currentSessionTime
-			   , currentTyreLaps, startFuel, startFuelVariation, currentFuel
+			   , currentTyreLaps, startFuel, startFuelVariation, startRefuelVariation, currentFuel
 			   , stintLaps, maxTyreLaps, tyreLapsVariation
 			   , ecuMap, fuelConsumption, avgLapTime, adjustments := false) {
 		local valid := true
@@ -3362,7 +3410,7 @@ class Strategy extends ConfigurationItem {
 		local remainingSessionLaps, refuelAmount, stintLaps, adjustments, adjustment, ignore, pitstop, key, value, pitstopNr, fixedLapTime
 		local halfLaps, fullLaps
 
-		if ((numPitstops > 1) && !pitstops[numPitstops].Fixed && !this.ConsumptionVariation && !this.InitialFuelVariation
+		if ((numPitstops > 1) && !pitstops[numPitstops].Fixed && !this.ConsumptionVariation && !this.InitialFuelVariation && !this.RefuelVariation
 															  && !this.TyreUsageVariation && !this.TyreCompoundVariation
 															  && !isInstance(this, TrafficStrategy)) {
 			remainingSessionLaps := Ceil(pitstops[numPitstops - 1].StintLaps + pitstops[numPitstops].StintLaps)
@@ -3374,10 +3422,10 @@ class Strategy extends ConfigurationItem {
 			else {
 				fullLaps := this.getMaxFuelLaps(this.FuelCapacity, this.FuelConsumption[true])
 
-				if ((Abs(this.FirstStintWeight) >= 5) && (this.getSessionLaps() > ((fullLaps * 2 * 0.9)))) {
+				if (Abs(this.LastStintWeight) >= 5) {
 					halfLaps := (Min(remainingSessionLaps, fullLaps) / 2)
 					stintLaps := Floor(Max((remainingSessionLaps - (this.FuelCapacity / this.FuelConsumption[true]))
-										 , Round(halfLaps + ((halfLaps / 100) * this.FirstStintWeight))))
+										 , Round(halfLaps + ((halfLaps / 100) * this.LastStintWeight))))
 					refuelAmount := ((pitstops[numPitstops - 1].RefuelAmount + pitstops[numPitstops].RefuelAmount)
 								   / remainingSessionLaps * stintLaps)
 				}
@@ -3420,7 +3468,7 @@ class Strategy extends ConfigurationItem {
 
 			try {
 				this.createStints(this.StartStint, this.StartLap, this.StintStartTime, this.SessionStartTime
-								, this.StartTyreLaps, this.StartFuel, this.InitialFuelVariation, this.RemainingFuel
+								, this.StartTyreLaps, this.StartFuel, this.InitialFuelVariation, this.RefuelVariation, this.RemainingFuel
 								, this.StintLaps, this.MaxTyreLaps, this.TyreLapsVariation, this.Map, this.FuelConsumption
 								, this.AvgLapTime, adjustments)
 			}

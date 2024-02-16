@@ -963,7 +963,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.Add("DropDownList", "x12 yp+28 w76 Choose1 vdataTypeDropDown  +0x200", collect(["Electronics", "Tyres", "-----------------", "Cleanup Data"], translate)).OnEvent("Change", chooseDataType)
 
-		this.iDataListView := workbenchGui.Add("ListView", "x12 yp+24 w170 h171 W:Grow(0.1) H:Grow(0.2) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Compound", "Map", "#"], translate))
+		this.iDataListView := workbenchGui.Add("ListView", "x12 yp+24 w170 h172 W:Grow(0.1) H:Grow(0.2) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Compound", "Map", "#"], translate))
 		this.iDataListView.OnEvent("Click", noSelect)
 		this.iDataListView.OnEvent("DoubleClick", noSelect)
 
@@ -1032,7 +1032,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.Add("Text", "x619 ys+39 w80 h21", translate("Strategy"))
 		workbenchGui.Add("Text", "x700 yp+7 w646 0x10 W:Grow")
 
-		workbenchGui.Add("HTMLViewer", "x619 yp+14 w727 h193 Border vstratViewer H:Grow(0.8) W:Grow")
+		workbenchGui.Add("HTMLViewer", "x619 yp+14 w727 h202 Border vstratViewer H:Grow(0.8) W:Grow")
 
 		this.iStrategyViewer := StrategyViewer(workbenchGui, workbenchGui["stratViewer"])
 
@@ -1046,7 +1046,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.Add("Button", "x649 y824 w80 h23 Y:Move H:Center", translate("Close")).OnEvent("Click", closeWorkbench)
 		*/
 
-		workbenchTab := workbenchGui.Add("Tab3", "x16 ys+39 w593 h216 H:Grow(0.8) -Wrap Section", collect(["Rules && Settings", "Pitstop && Service", "Drivers", "Weather", "Simulation", "Strategy"], translate))
+		workbenchTab := workbenchGui.Add("Tab3", "x16 ys+39 w593 h225 H:Grow(0.8) -Wrap Section", collect(["Rules && Settings", "Pitstop && Service", "Drivers", "Weather", "Simulation", "Strategy"], translate))
 
 		workbenchTab.UseTab(1)
 
@@ -1070,7 +1070,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.SetFont("Norm", "Arial")
 		workbenchGui.SetFont("Italic", "Arial")
 
-		workbenchGui.Add("GroupBox", "x24 ys+34 w209 h171", translate("Race"))
+		workbenchGui.Add("GroupBox", "x24 ys+34 w209 h181", translate("Race"))
 
 		workbenchGui.SetFont("Norm", "Arial")
 
@@ -1095,7 +1095,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.SetFont("Norm", "Arial")
 		workbenchGui.SetFont("Italic", "Arial")
 
-		workbenchGui.Add("GroupBox", "x243 ys+34 w354 h171", translate("Pitstop"))
+		workbenchGui.Add("GroupBox", "x243 ys+34 w354 h181", translate("Pitstop"))
 
 		workbenchGui.SetFont("Norm", "Arial")
 
@@ -1146,7 +1146,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.SetFont("Italic", "Arial")
 
-		workbenchGui.Add("GroupBox", "x24 ys+34 w410 h171", translate("Pitstop"))
+		workbenchGui.Add("GroupBox", "x24 ys+34 w410 h181", translate("Pitstop"))
 
 		workbenchGui.SetFont("Norm", "Arial")
 
@@ -1186,7 +1186,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		x4 := x3 + w3 - 50
 		x5 := x4 + 25
 
-		this.iDriversListView := workbenchGui.Add("ListView", "x24 ys+34 w216 h171 H:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Stint", "Driver"], translate))
+		this.iDriversListView := workbenchGui.Add("ListView", "x24 ys+34 w216 h181 H:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Stint", "Driver"], translate))
 		this.iDriversListView.OnEvent("Click", chooseSimDriver)
 		this.iDriversListView.OnEvent("DoubleClick", chooseSimDriver)
 		this.iDriversListView.OnEvent("ItemSelect", selectSimDriver)
@@ -1212,7 +1212,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		x7 := x6 + 47
 		x8 := x7 + 52
 
-		this.iWeatherListView := workbenchGui.Add("ListView", "x24 ys+34 w216 h171 H:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Time", "Weather", "T Air", "T Track"], translate))
+		this.iWeatherListView := workbenchGui.Add("ListView", "x24 ys+34 w216 h181 H:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Time", "Weather", "T Air", "T Track"], translate))
 		this.iWeatherListView.OnEvent("Click", chooseSimWeather)
 		this.iWeatherListView.OnEvent("DoubleClick", chooseSimWeather)
 		this.iWeatherListView.OnEvent("ItemSelect", selectSimWeather)
@@ -1246,7 +1246,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.SetFont("Italic", "Arial")
 
-		workbenchGui.Add("GroupBox", "x24 ys+34 w179 h171", translate("Initial Conditions"))
+		workbenchGui.Add("GroupBox", "x24 ys+34 w179 h181", translate("Initial Conditions"))
 
 		workbenchGui.SetFont("Norm", "Arial")
 
@@ -1295,15 +1295,18 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.SetFont("Italic", "Arial")
 
-		workbenchGui.Add("GroupBox", "x214 ys+34 w174 h171", translate("Optimizer"))
+		workbenchGui.Add("GroupBox", "x214 ys+34 w174 h181", translate("Optimizer"))
 
 		workbenchGui.SetFont("Norm", "Arial")
 
-		workbenchGui.Add("Text", "x" . x . " yp+21 w100 h20 +0x200", translate("Consumption"))
-		workbenchGui.Add("Slider", "Center Thick15 x" . x1 . " yp+2 w60 0x10 Range0-10 ToolTip VsimConsumptionVariation", 0)
-
-		workbenchGui.Add("Text", "x" . x . " yp+22 w100 h20 +0x200", translate("Initial Fuel"))
+		workbenchGui.Add("Text", "x" . x . " yp+21 w100 h20 +0x200", translate("Initial Fuel"))
 		workbenchGui.Add("Slider", "Center Thick15 x" . x1 . " yp+2 w60 0x10 Range0-100 ToolTip VsimInitialFuelVariation", 0)
+
+		workbenchGui.Add("Text", "x" . x . " yp+22 w100 h20 +0x200", translate("Refuel"))
+		workbenchGui.Add("Slider", "Center Thick15 x" . x1 . " yp+2 w60 0x10 Range0-100 ToolTip VsimRefuelVariation", 0)
+
+		; workbenchGui.Add("Text", "x" . x . " yp+22 w100 h20 +0x200", translate("Consumption"))
+		; workbenchGui.Add("Slider", "Center Thick15 x" . x1 . " yp+2 w60 0x10 Range0-10 ToolTip VsimConsumptionVariation", 0)
 
 		workbenchGui.Add("Text", "x" . x . " yp+22 w100 h20 +0x200", translate("Tyre Usage"))
 		workbenchGui.Add("Slider", "Center Thick15 x" . x1 . " yp+2 w60 0x10 Range0-100 ToolTip VsimTyreUsageVariation", 0)
@@ -1321,8 +1324,11 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.Add("Button", "x214 yp+26 w174 h20", translate("Simulate!")).OnEvent("Click", runSimulation)
 		*/
 
-		workbenchGui.Add("Text", "x" . x . " yp+45 w100 h20 +0x200", translate("Pit Strategy"))
+		workbenchGui.Add("Text", "x" . x . " yp+35 w100 h20 +0x200", translate("First Stint"))
 		workbenchGui.Add("Slider", "Center Thick15 x" . x1 . " yp+2 w60 0x10 Range-100-100 ToolTip VsimFirstStintWeight", 0)
+
+		workbenchGui.Add("Text", "x" . x . " yp+22 w100 h20 +0x200", translate("Last Stint"))
+		workbenchGui.Add("Slider", "Center Thick15 x" . x1 . " yp+2 w60 0x10 Range-100-100 ToolTip VsimLastStintWeight", 0)
 
 		x := 407
 		x0 := x - 4
@@ -1387,7 +1393,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.SetFont("Norm", "Arial")
 		workbenchGui.SetFont("Italic", "Arial")
 
-		workbenchGui.Add("GroupBox", "x24 ys+34 w143 h171", translate("Electronics"))
+		workbenchGui.Add("GroupBox", "x24 ys+34 w143 h181", translate("Electronics"))
 
 		workbenchGui.SetFont("Norm", "Arial")
 
@@ -1412,7 +1418,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.SetFont("Italic", "Arial")
 
-		workbenchGui.Add("GroupBox", "x178 ys+34 w174 h171", translate("Tyres"))
+		workbenchGui.Add("GroupBox", "x178 ys+34 w174 h181", translate("Tyres"))
 
 		workbenchGui.SetFont("Norm", "Arial")
 
@@ -1455,11 +1461,11 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.SetFont("Italic", "Arial")
 
-		workbenchGui.Add("GroupBox", "x363 ys+34 w233 h171", translate("Pitstops"))
+		workbenchGui.Add("GroupBox", "x363 ys+34 w233 h181", translate("Pitstops"))
 
 		workbenchGui.SetFont("Norm", "Arial")
 
-		this.iPitstopListView := workbenchGui.Add("ListView", "x" . x . " yp+21 w216 h139 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Lap", "Driver", "Fuel", "Tyres", "Map"], translate))
+		this.iPitstopListView := workbenchGui.Add("ListView", "x" . x . " yp+21 w216 h148 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Lap", "Driver", "Fuel", "Tyres", "Map"], translate))
 		this.iPitstopListView.OnEvent("Click", noSelect)
 		this.iPitstopListView.OnEvent("DoubleClick", noSelect)
 
@@ -2367,12 +2373,14 @@ class StrategyWorkbench extends ConfigurationItem {
 						this.Control["simInitialFuelAmountEdit"].Text := displayValue("Float", convertUnit("Volume", strategy.StartFuel), 0)
 						this.Control["simMapEdit"].Text := strategy.Map
 
-						this.Control["simConsumptionVariation"].Value := strategy.ConsumptionVariation
+						; this.Control["simConsumptionVariation"].Value := strategy.ConsumptionVariation
 						this.Control["simTyreUsageVariation"].Value := strategy.TyreUsageVariation
 						this.Control["simtyreCompoundVariation"].Value := strategy.TyreCompoundVariation
 						this.Control["simInitialFuelVariation"].Value := strategy.InitialFuelVariation
+						this.Control["simRefuelVariation"].Value := strategy.RefuelVariation
 
 						this.Control["simFirstStintWeight"].Value := strategy.FirstStintWeight
+						this.Control["simLastStintWeight"].Value := strategy.LastStintWeight
 
 						if (strategy.UseInitialConditions && strategy.UseTelemetryData)
 							value := 3
@@ -3166,16 +3174,19 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	getSimulationSettings(&useInitialConditions, &useTelemetryData
-						, &consumptionVariation, &initialFuelVariation, &tyreUsageVariation, &tyreCompoundVariation
-						, &firstStintWeight) {
+						, &consumptionVariation, &initialFuelVariation, &refuelVariation
+						, &tyreUsageVariation, &tyreCompoundVariation
+						, &firstStintWeight, &lastStintWeight) {
 		local simInputDropDown := this.Control["simInputDropDown"].Value
 
-		consumptionVariation := this.Control["simConsumptionVariation"].Value
+		consumptionVariation := 0 ; this.Control["simConsumptionVariation"].Value
 		initialFuelVariation := this.Control["simInitialFuelVariation"].Value
+		refuelVariation := this.Control["simRefuelVariation"].Value
 		tyreUsageVariation := this.Control["simTyreUsageVariation"].Value
 		tyreCompoundVariation := this.Control["simTyreCompoundVariation"].Value
 
 		firstStintWeight := this.Control["simFirstStintWeight"].Value
+		lastStintWeight := this.Control["simLastStintWeight"].Value
 
 		useInitialConditions := ((simInputDropDown == 1) || (simInputDropDown == 3))
 		useTelemetryData := (simInputDropDown > 1)

@@ -1,4 +1,4 @@
-## 5.5.8.0-release 02/16/24 (planned)
+## 5.5.8.0-release 02/16/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed several bugs for manual adjustments of an already prepared pitstop.
@@ -10,7 +10,7 @@
   9. **Important:** In most cases, it is no longer necessary to double-press the Push-To-Talk button to [initiate an activation command](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#voice-commands) like "Hey Jona". There is one exception, so please check the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#activation-commands-vs-normal-commands).
   10. The capabilities of the Driving Coach to discuss with you after a session your performance and possible handling issues of the car, has been greatly improved.
   11. The Stream Deck icons now show a small colored bar at their top for toggleable controller actions to indicate, whether the corresponding function has been activated.
-  12. New cars, e.g. the Golf GTI MK2, some new RSS Formula cars and all TCR cars have been included in the car meta data DLC.
+  12. New modded cars, e.g. the Golf GTI MK2, some new RSS Formula cars and all TCR cars have been included in the car meta data DLC.
   13. New car models for "Setup Workbench":
       - Assetto Corsa Competizione
 	    - BMW M2 CS (fixed)

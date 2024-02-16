@@ -190,7 +190,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin {
 	loadSettings(simulator, car, track, data := false, settings := false) {
 		local tyresDB, simulatorName, compound, compoundColor
 		local tpSettings, pressures, certainty, collectPressure, pitstopService, ignore, session
-		local fuelWarning, damageWarning, pressureWarning
+		local fuelWarning, damageWarning, pressureWarning, correctByTemperatures, correctByDatabase, correctForPressureLoss
 
 		settings := super.loadSettings(simulator, car, track, data, settings)
 
@@ -277,6 +277,24 @@ class RaceEngineerPlugin extends RaceAssistantPlugin {
 			if (pressureWarning != kUndefined)
 				for ignore, session in ["Practice", "Qualification", "Race"]
 					setMultiMapValue(settings, "Assistant.Engineer", "Announcement." . session . ".Pressure", pressureWarning)
+
+			correctByTemperatures := getMultiMapValue(this.StartupSettings, "Functions", "Correct Pressures by Temperature", kUndefined)
+
+			if (correctByTemperatures != kUndefined)
+				for ignore, session in ["Practice", "Qualification", "Race"]
+					setMultiMapValue(settings, "Session Settings", "Tyre.Pressure.Correction.Temperature", correctByTemperatures)
+
+			correctByDatabase := getMultiMapValue(this.StartupSettings, "Functions", "Correct Pressures from Database", kUndefined)
+
+			if (correctByDatabase != kUndefined)
+				for ignore, session in ["Practice", "Qualification", "Race"]
+					setMultiMapValue(settings, "Session Settings", "Tyre.Pressure.Correction.Setup", correctByDatabase)
+
+			correctForPressureLoss := getMultiMapValue(this.StartupSettings, "Functions", "Correct Pressures for Pressure Loss", kUndefined)
+
+			if (correctForPressureLoss != kUndefined)
+				for ignore, session in ["Practice", "Qualification", "Race"]
+					setMultiMapValue(settings, "Session Settings", "Tyre.Pressure.Correction.Pressure", correctForPressureLoss)
 		}
 
 		return settings

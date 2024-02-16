@@ -1100,9 +1100,14 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.SetFont("Norm", "Arial")
 
 		workbenchGui.Add("Text", "x" . x5 . " yp+23 w75 h20", translate("Pitstop"))
-		workbenchGui.Add("DropDownList", "x" . x7 . " yp-4 w80 Choose1 VpitstopRequirementsDropDown", collect(["Optional", "Required", "Window"], translate)).OnEvent("Change", choosePitstopRule)
+		workbenchGui.Add("DropDownList", "x" . x7 . " yp-4 w80 Choose1 VpitstopRequirementsDropDown", collect(["Optional", "Required"], translate)).OnEvent("Change", choosePitstopRule)
 		workbenchGui.Add("Edit", "x" . x11 . " yp+1 w50 h20 VpitstopWindowEdit", "25 - 35").OnEvent("Change", updatePitstopRule)
 		workbenchGui.Add("Text", "x" . x12 . " yp+3 w120 h20 VpitstopWindowLabel", translate("Minute (From - To)"))
+
+		workbenchGui.Add("Text", "x" . x5 . " yp+26 w75 h20", translate("Time"))
+		workbenchGui.Add("DropDownList", "x" . x7 . " yp-4 w80 Choose1", collect(["Always", "Window"], translate)) ; .OnEvent("Change", choosePitstopRule)
+		workbenchGui.Add("Edit", "x" . x11 . " yp+1 w50 h20 ", "25 - 35") ; .OnEvent("Change", updatePitstopRule)
+		workbenchGui.Add("Text", "x" . x12 . " yp+3 w120 h20", translate("Minute (From - To)"))
 
 		workbenchGui.Add("Text", "x" . x5 . " yp+22 w75 h23 +0x200 VrefuelRequirementsLabel", translate("Refuel"))
 		workbenchGui.Add("DropDownList", "x" . x7 . " yp w80 Choose1 VrefuelRequirementsDropDown", collect(["Optional", "Required", "Always", "Disallowed"], translate))
@@ -1114,7 +1119,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		w12 := (x11 + 50 - x7)
 
-		this.iTyreSetListView := workbenchGui.Add("ListView", "x" . x7 . " yp w" . w12 . " h65 -Multi -Hdr -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Compound", "#"], translate))
+		this.iTyreSetListView := workbenchGui.Add("ListView", "x" . x7 . " yp w" . w12 . " h44 -Multi -Hdr -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Compound", "#"], translate))
 		this.iTyreSetListView.OnEvent("Click", chooseTyreSet)
 		this.iTyreSetListView.OnEvent("DoubleClick", chooseTyreSet)
 		this.iTyreSetListView.OnEvent("ItemSelect", selectTyreSet)

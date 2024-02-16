@@ -1524,6 +1524,7 @@ class Strategy extends ConfigurationItem {
 	iValidator := false
 
 	iPitstopRule := false
+	iPitstopWindow := false
 	iRefuelRule := false
 	iTyreChangeRule := false
 	iTyreSets := []
@@ -2200,6 +2201,16 @@ class Strategy extends ConfigurationItem {
 
 		Set {
 			return (this.iPitstopRule := value)
+		}
+	}
+
+	PitstopWindow {
+		Get {
+			return this.iPitstopWindow
+		}
+
+		Set {
+			return (this.iPitstopWindow := value)
 		}
 	}
 

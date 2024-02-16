@@ -1363,7 +1363,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.Add("Edit", "x" . x1 . " yp+1 w40 h20 Disabled VsimSessionResultResult")
 		workbenchGui.Add("Text", "x" . x3 . " yp+2 w50 h20 VsimSessionResultLabel", translate("Laps"))
 
-		workbenchGui.Add("Text", "x399 yp+30 w40 h23 +0x200", translate("Use"))
+		workbenchGui.Add("Text", "x399 yp+39 w40 h23 +0x200", translate("Use"))
 
 		choices := collect(["Initial Conditions", "Telemetry Data", "Initial Cond. + Telemetry"], translate)
 

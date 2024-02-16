@@ -1758,7 +1758,7 @@ class Strategy extends ConfigurationItem {
 			local fuelConsumption := strategy.FuelConsumption[true]
 			local lastStintLaps := Floor(Min(remainingFuel / fuelConsumption, strategy.LastPitstop ? (lap - strategy.LastPitstop.Lap) : ((strategy.StartLap = 0) ? lap : (lap - strategy.StartLap))))
 			local stintLaps, refuelAmount, tyreChange, remainingTyreLaps, freshTyreLaps, lastPitstop, delta
-			local avgLapTime, openingLap, closingLap, weather, airTemperature, trackTemperature
+			local avgLapTime, openingLap, closingLap, weather, airTemperature, trackTemperature, lessFuel
 
 			if (adjustments && adjustments.Has(nr) && adjustments[nr].HasProp("RemainingSessionLaps"))
 				remainingSessionLaps := (adjustments[nr].RemainingSessionLaps + lastStintLaps)
@@ -1786,8 +1786,13 @@ class Strategy extends ConfigurationItem {
 			else {
 				refuelAmount := strategy.calcRefuelAmount(stintLaps * fuelConsumption, remainingFuel, remainingSessionLaps, lastStintLaps)
 
-				if strategy.RefuelVariation
-					refuelAmount -= ((Random(0, 100) / strategy.RefuelVariation) * 0.2 * refuelAmount)
+				if strategy.RefuelVariation {
+					lessFuel := ((Random(0, strategy.RefuelVariation) / strategy.RefuelVariation) * 0.2 * refuelAmount)
+
+					refuelAmount -= lessFuel
+
+					stintLaps -= Ceil(lessFuel / fuelConsumption)
+				}
 			}
 
 			tyreChange := kUndefined

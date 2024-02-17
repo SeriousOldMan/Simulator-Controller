@@ -1723,6 +1723,9 @@ class StrategyWorkbench extends ConfigurationItem {
 		if (this.Control["pitstopRuleDropDown"].Value = 2) {
 			this.Control["pitstopRuleEdit"].Visible := true
 
+			if (Trim(this.Control["pitstopRuleEdit"].Text) = "")
+				this.Control["pitstopRuleEdit"].Text := 1
+
 			oldTChoice := ["Always", "Window"][this.Control["pitstopWindowDropDown"].Value]
 
 			this.Control["pitstopWindowDropDown"].Delete()

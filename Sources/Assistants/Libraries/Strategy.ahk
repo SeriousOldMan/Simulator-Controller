@@ -620,7 +620,8 @@ class StrategySimulation {
 				if (superfluousLaps > 0)
 					strategy.adjustLastPitstop(superfluousLaps, (strategy.Pitstops.Length > reqPitstops) || !reqPitstops)
 
-				strategy.adjustLastPitstopRefuelAmount()
+				if (strategy.PitstopPreferences.Count = 0)
+					strategy.adjustLastPitstopRefuelAmount()
 
 				if verbose
 					progress += 1
@@ -1782,6 +1783,8 @@ class Strategy extends ConfigurationItem {
 
 			if (adjustments && adjustments.Has(nr) && adjustments[nr].HasProp("StintLaps"))
 				stintLaps := adjustments[nr].StintLaps
+			else if strategy.PitstopPreferences.Has(nr + 1)
+				stintLaps := (strategy.PitstopPreferences[nr + 1].Lap - lap)
 			else
 				stintLaps := Floor(Min(remainingSessionLaps - lastStintLaps, strategy.StintLaps
 									 , strategy.getMaxFuelLaps(strategy.FuelCapacity, fuelConsumption)))
@@ -1805,6 +1808,8 @@ class Strategy extends ConfigurationItem {
 
 				stintLaps -= Ceil((refuelAmount - Min(refuelAmount, strategy.PitstopPreferences[nr].Refuel)) / fuelConsumption)
 				refuelAmount := Min(refuelAmount, strategy.PitstopPreferences[nr].Refuel)
+
+				; refuelAmount := Min(strategy.FuelCapacity - remainingFuel, strategy.PitstopPreferences[nr].Refuel)
 			}
 			else if (refuelRule = "Disallowed")
 				refuelAmount := 0
@@ -3111,7 +3116,7 @@ class Strategy extends ConfigurationItem {
 
 		currentFuel := Max(0, startFuel - (stintLaps * fuelConsumption))
 
-		return Min(this.FuelCapacity, targetFuel + this.SafetyFuel) - currentFuel
+		return Max(0, Min(this.FuelCapacity, targetFuel + this.SafetyFuel) - currentFuel)
 	}
 
 	calcPitstopDuration(refuelAmount, changeTyres) {
@@ -3376,7 +3381,7 @@ class Strategy extends ConfigurationItem {
 													, &adjusted)
 
 				if adjusted
-					if this.LastPitstop {
+					if (this.LastPitstop && (this.PitstopPreferences.Count = 0)) {
 						lastPitstop := pitstops.Pop()
 
 						lastPitstop.initialize(lastPitstop.TyreCompound, lastPitstop.TyreCompoundColor

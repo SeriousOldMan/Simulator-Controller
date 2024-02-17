@@ -620,8 +620,7 @@ class StrategySimulation {
 				if (superfluousLaps > 0)
 					strategy.adjustLastPitstop(superfluousLaps, (strategy.Pitstops.Length > reqPitstops) || !reqPitstops)
 
-				if (strategy.PitstopPreferences.Count = 0)
-					strategy.adjustLastPitstopRefuelAmount()
+				strategy.adjustLastPitstopRefuelAmount()
 
 				if verbose
 					progress += 1
@@ -1783,8 +1782,6 @@ class Strategy extends ConfigurationItem {
 
 			if (adjustments && adjustments.Has(nr) && adjustments[nr].HasProp("StintLaps"))
 				stintLaps := adjustments[nr].StintLaps
-			else if strategy.PitstopPreferences.Has(nr + 1)
-				stintLaps := (strategy.PitstopPreferences[nr + 1].Lap - lap)
 			else
 				stintLaps := Floor(Min(remainingSessionLaps - lastStintLaps, strategy.StintLaps
 									 , strategy.getMaxFuelLaps(strategy.FuelCapacity, fuelConsumption)))
@@ -1803,15 +1800,7 @@ class Strategy extends ConfigurationItem {
 			this.iMap := strategy.Map[true]
 			this.iFuelConsumption := fuelConsumption
 
-			if strategy.PitstopPreferences.Has(nr) {
-				refuelAmount := strategy.calcRefuelAmount(stintLaps * fuelConsumption, remainingFuel, remainingSessionLaps, lastStintLaps)
-
-				stintLaps -= Ceil((refuelAmount - Min(refuelAmount, strategy.PitstopPreferences[nr].Refuel)) / fuelConsumption)
-				refuelAmount := Min(refuelAmount, strategy.PitstopPreferences[nr].Refuel)
-
-				; refuelAmount := Min(strategy.FuelCapacity - remainingFuel, strategy.PitstopPreferences[nr].Refuel)
-			}
-			else if (refuelRule = "Disallowed")
+			if (refuelRule = "Disallowed")
 				refuelAmount := 0
 			else {
 				refuelAmount := strategy.calcRefuelAmount(stintLaps * fuelConsumption, remainingFuel, remainingSessionLaps, lastStintLaps)
@@ -2820,7 +2809,6 @@ class Strategy extends ConfigurationItem {
 			loop count
 				preferences[Integer(getMultiMapValue(configuration, "Preferences", "Pitstop." . A_Index))]
 					:= {Lap: getMultiMapValue(configuration, "Preferences", "Lap." . A_Index)
-					  , Refuel: getMultiMapValue(configuration, "Preferences", "Refuel." . A_Index)
 					  , Compound: getMultiMapValue(configuration, "Preferences", "Compound." . A_Index)}
 
 			this.iPitstopPreferences := preferences
@@ -2945,7 +2933,6 @@ class Strategy extends ConfigurationItem {
 		for pitstop, preference in this.PitstopPreferences {
 			setMultiMapValue(configuration, "Preferences", "Pitstop." . A_Index, pitstop)
 			setMultiMapValue(configuration, "Preferences", "Lap." . A_Index, preference.Lap)
-			setMultiMapValue(configuration, "Preferences", "Refuel." . A_Index, preference.Refuel)
 			setMultiMapValue(configuration, "Preferences", "Compound." . A_Index, preference.Compound)
 		}
 	}
@@ -3381,7 +3368,7 @@ class Strategy extends ConfigurationItem {
 													, &adjusted)
 
 				if adjusted
-					if (this.LastPitstop && (this.PitstopPreferences.Count = 0)) {
+					if this.LastPitstop {
 						lastPitstop := pitstops.Pop()
 
 						lastPitstop.initialize(lastPitstop.TyreCompound, lastPitstop.TyreCompoundColor

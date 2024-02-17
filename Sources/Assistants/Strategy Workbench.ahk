@@ -90,6 +90,8 @@ class StrategyWorkbench extends ConfigurationItem {
 	iAirTemperature := 23
 	iTrackTemperature := 27
 
+	iPreferencesEnabled := false
+
 	iPreferencesListView := false
 	iDriversListView := false
 	iWeatherListView := false
@@ -282,6 +284,12 @@ class StrategyWorkbench extends ConfigurationItem {
 	TyreSetListView {
 		Get {
 			return this.iTyreSetListView
+		}
+	}
+
+	PreferencesEnabled {
+		Get {
+			return this.iPreferencesEnabled
 		}
 	}
 
@@ -644,17 +652,14 @@ class StrategyWorkbench extends ConfigurationItem {
 		}
 
 		chooseSimPreference(listView, line, *) {
-			local pitstop := (line ? workbench.PreferencesListView.GetText(line) : false)
-
 			if line {
 				workbenchGui["simPreferencePitstopEdit"].Text := workbench.PreferencesListView.GetText(line)
 				workbenchGui["simPreferenceLapEdit"].Text := workbench.PreferencesListView.GetText(line, 2)
-				workbenchGui["simPreferenceRefuelEdit"].Text := workbench.PreferencesListView.GetText(line, 3)
 
-				if (workbench.PreferencesListView.GetText(line, 4) = translate("-"))
+				if (workbench.PreferencesListView.GetText(line, 3) = translate("-"))
 					workbenchGui["simPreferenceCompoundDropDown"].Choose(1)
 				else
-					workbenchGui["simPreferenceCompoundDropDown"].Choose(inList(collect(this.TyreCompounds, translate), workbench.PreferencesListView.GetText(line, 4)) + 1)
+					workbenchGui["simPreferenceCompoundDropDown"].Choose(inList(collect(this.TyreCompounds, translate), workbench.PreferencesListView.GetText(line, 3)) + 1)
 			}
 
 			workbench.updateState()
@@ -666,17 +671,15 @@ class StrategyWorkbench extends ConfigurationItem {
 			if (row > 0)
 				workbench.PreferencesListView.Modify(row, "", workbenchGui["simPreferencePitstopEdit"].Text
 															, workbenchGui["simPreferenceLapEdit"].Text
-															, workbenchGui["simPreferenceRefuelEdit"].Text
 															, (workbenchGui["simPreferenceCompoundDropDown"].Value = 1) ? translate("-")
 																														: translate(this.TyreCompounds[workbenchGui["simPreferenceCompoundDropDown"].Value - 1]))
 		}
 
 		addSimPreference(*) {
-			workbench.PreferencesListView.Add("Vis Select", 1, 1, 0, translate("-"))
+			workbench.PreferencesListView.Add("Vis Select", 1, 1, translate("-"))
 
 			workbenchGui["simPreferencePitstopEdit"].Text := 1
 			workbenchGui["simPreferenceLapEdit"].Text := 1
-			workbenchGui["simPreferenceRefuelEdit"].Text := 0
 			workbenchGui["simPreferenceCompoundDropDown"].Choose(1)
 
 			workbench.updateState()
@@ -689,7 +692,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 			if row {
 				OnMessage(0x44, translateYesNoButtons)
-				msgResult := withBlockedWindows(MsgBox, translate("Do you really want to delete the selected pitstop preference?"), translate("Delete"), 262436)
+				msgResult := withBlockedWindows(MsgBox, translate("Do you really want to delete the selected fixed pitstop?"), translate("Delete"), 262436)
 				OnMessage(0x44, translateYesNoButtons, 0)
 
 				if (msgResult = "Yes") {
@@ -1121,7 +1124,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.Add("Button", "x649 y824 w80 h23 Y:Move H:Center", translate("Close")).OnEvent("Click", closeWorkbench)
 		*/
 
-		workbenchTab := workbenchGui.Add("Tab3", "x16 ys+39 w593 h225 H:Grow(0.8) -Wrap Section", collect(["Rules && Settings", "Pitstop && Service", "Preferences", "Drivers", "Weather", "Simulation", "Strategy"], translate))
+		workbenchTab := workbenchGui.Add("Tab3", "x16 ys+39 w593 h225 H:Grow(0.8) -Wrap Section", collect(["Rules && Settings", "Pitstop && Service", "Pitstops (fixed)", "Drivers", "Weather", "Simulation", "Strategy"], translate))
 
 		workbenchTab.UseTab(1)
 
@@ -1265,25 +1268,20 @@ class StrategyWorkbench extends ConfigurationItem {
 		x4 := x3 + w3 - 50
 		x5 := x4 + 25
 
-		this.iPreferencesListView := workbenchGui.Add("ListView", "x24 ys+34 w216 h181 H:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Pitstop", "Lap", "Refuel", "Tyres"], translate))
+		this.iPreferencesListView := workbenchGui.Add("ListView", "x24 ys+34 w216 h181 H:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Pitstop", "Lap", "Tyres"], translate))
 		this.iPreferencesListView.OnEvent("Click", chooseSimPreference)
 		this.iPreferencesListView.OnEvent("DoubleClick", chooseSimPreference)
 		this.iPreferencesListView.OnEvent("ItemSelect", selectSimPreference)
 
-		workbenchGui.Add("Text", "x" . x2 . " ys+34 w90 +0x200", translate("Pitstop"))
-		workbenchGui.Add("Edit", "x" . x3 . " yp-2 w50 Limit3 Number vsimPreferencePitstopEdit").OnEvent("Change", updateSimPreference)
+		workbenchGui.Add("Text", "x" . x2 . " ys+34 w90 h23 +0x200", translate("Pitstop"))
+		workbenchGui.Add("Edit", "x" . x3 . " yp-1 w50 Limit3 Number vsimPreferencePitstopEdit").OnEvent("Change", updateSimPreference)
 		workbenchGui.Add("UpDown", "x138 yp-2 w18 Range1-999")
 
-		workbenchGui.Add("Text", "x" . x2 . " yp+26 w90 +0x200", translate("Lap"))
-		workbenchGui.Add("Edit", "x" . x3 . " yp-2 w50 Limit3 Number vsimPreferenceLapEdit").OnEvent("Change", updateSimPreference)
+		workbenchGui.Add("Text", "x" . x2 . " yp+25 w90 h23 +0x200", translate("Lap"))
+		workbenchGui.Add("Edit", "x" . x3 . " yp-1 w50 Limit3 Number vsimPreferenceLapEdit").OnEvent("Change", updateSimPreference)
 		workbenchGui.Add("UpDown", "x138 yp-2 w18 Range1-999")
 
-		workbenchGui.Add("Text", "x" . x2 . " yp+26 w90 +0x200", translate("Refuel"))
-		workbenchGui.Add("Edit", "x" . x3 . " yp-2 w50 Limit3 Number vsimPreferenceRefuelEdit").OnEvent("Change", updateSimPreference)
-		workbenchGui.Add("UpDown", "xp yp-2 w18 Range1-999")
-		workbenchGui.Add("Text", "x" . (x3 + 55) . " yp+3 w80 h20", getUnit("Volume", true))
-
-		workbenchGui.Add("Text", "x" . x2 . " yp+24 w90 +0x200", translate("Compound"))
+		workbenchGui.Add("Text", "x" . x2 . " yp+25 w90 h23 +0x200", translate("Compound"))
 
 		compound := this.SelectedCompound[true]
 		choices := [translate(normalizeCompound("Dry"))]
@@ -1294,7 +1292,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			chosen := 2
 		}
 
-		workbenchGui.Add("DropDownList", "x" . x3 . " yp-2 w" . w3 . " Choose" . chosen . " VsimPreferenceCompoundDropDown", concatenate([translate("No Tyre Change")], choices)).OnEvent("Change", updateSimPreference)
+		workbenchGui.Add("DropDownList", "x" . x3 . " yp-1 w" . w3 . " Choose" . chosen . " VsimPreferenceCompoundDropDown", concatenate([translate("No Tyre Change")], choices)).OnEvent("Change", updateSimPreference)
 
 		workbenchGui.Add("Button", "x" . x4 . " yp+24 w23 h23 Center +0x200 vaddPreferenceButton").OnEvent("Click", addSimPreference)
 		setButtonIcon(workbenchGui["addPreferenceButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
@@ -1784,27 +1782,28 @@ class StrategyWorkbench extends ConfigurationItem {
 		this.Control["tyreChangeRequirementsDropDown"].Choose(oldTChoice ? oldTChoice : 1)
 		this.Control["refuelRequirementsDropDown"].Choose(oldFChoice ? oldFChoice : 1)
 
-		this.Control["addPreferenceButton"].Enabled := true
+		this.Control["addPreferenceButton"].Enabled := this.PreferencesEnabled
 
-		if this.PreferencesListView.GetNext(0) {
+		if (this.PreferencesEnabled && this.PreferencesListView.GetNext(0)) {
 			this.Control["deletePreferenceButton"].Enabled := true
 
 			this.Control["simPreferencePitstopEdit"].Enabled := true
 			this.Control["simPreferenceLapEdit"].Enabled := true
-			this.Control["simPreferenceRefuelEdit"].Enabled := true
 			this.Control["simPreferenceCompoundDropDown"].Enabled := true
 		}
 		else {
+			if this.PreferencesListView.GetNext(0)
+				loop this.PreferencesListView.GetCount()
+							this.PreferencesListView.Modify(A_Index, "-Select")
+
 			this.Control["deletePreferenceButton"].Enabled := false
 
 			this.Control["simPreferencePitstopEdit"].Enabled := false
 			this.Control["simPreferenceLapEdit"].Enabled := false
-			this.Control["simPreferenceRefuelEdit"].Enabled := false
 			this.Control["simPreferenceCompoundDropDown"].Enabled := false
 
 			this.Control["simPreferencePitstopEdit"].Text := ""
 			this.Control["simPreferenceLapEdit"].Text := ""
-			this.Control["simPreferenceRefuelEdit"].Text := ""
 			this.Control["simPreferenceCompoundDropDown"].Choose(0)
 		}
 
@@ -1852,9 +1851,14 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	updateSettingsMenu() {
-		local settingsMenu := collect(["Settings", "---------------------------------------------", "Initialize from Strategy", "Initialize from Settings...", "Initialize from Database", "Initialize from Telemetry", "Initialize from Simulation"], translate)
+		local settingsMenu := collect(["Settings", "---------------------------------------------", "Initialize from Strategy", "Initialize from Settings...", "Initialize from Database", "Initialize from Telemetry", "Initialize from Simulation", "---------------------------------------------"], translate)
 		local fileNames := getFileNames("*.rules", kResourcesDirectory . "Strategy\Validators\", kUserHomeDirectory . "Validators\")
 		local validators, ignore, fileName, validator
+
+		if this.PreferencesEnabled
+			settingsMenu.Push(translate("(x) Fixed Pitstops"))
+		else
+			settingsMenu.Push(translate("      Fixed Pitstops"))
 
 		if (fileNames.Length > 0) {
 			settingsMenu.Push(translate("---------------------------------------------"))
@@ -2381,7 +2385,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		local track := this.SelectedTrack
 		local strategy, pitstopRule, pitstopWindow
 		local ignore, descriptor, directory, numPitstops, name, pitstop, tyreCompound, tyreCompoundColor
-		local simulator, car, track, simulatorCode, dirName, file, settings, settingsDB
+		local simulator, car, track, simulatorCode, dirName, file, settings, settingsDB, msgResult
 		local telemetryDB, fastestLapTime, row, lapTime, prefix, data, fuelCapacity, initialFuelAmount, map
 		local validators, index, fileName, validator, index, forecast, time, hour, minute, value, preference
 
@@ -2484,7 +2488,6 @@ class StrategyWorkbench extends ConfigurationItem {
 
 						for pitstop, preference in strategy.PitstopPreferences
 							this.PreferencesListView.Add("", pitstop, preference.Lap
-														   , displayValue("Float", convertUnit("Volume", preference.Refuel), 0)
 														   , preference.Compound ? translate(preference.Compound) : translate("-"))
 
 						this.DriversListView.Delete()
@@ -2799,10 +2802,27 @@ class StrategyWorkbench extends ConfigurationItem {
 					withBlockedWindows(MsgBox, translate("You must first select a simulation."), translate("Information"), 262192)
 					OnMessage(0x44, translateOkButton, 0)
 				}
+			case 9:
+				if this.PreferencesEnabled {
+					this.iPreferencesEnabled := false
+
+					this.updateState()
+				}
+				else {
+					OnMessage(0x44, translateYesNoButtons)
+					msgResult := withBlockedWindows(MsgBox, translate("Do you really want to use fixed pitstops? Using fixed pitstops can result in invalid strategies."), translate("Warning"), 262436)
+					OnMessage(0x44, translateYesNoButtons, 0)
+
+					if (msgResult = "Yes") {
+						this.iPreferencesEnabled := true
+
+						this.updateState()
+					}
+				}
 			default:
-				if (line = 9)
+				if (line = 11)
 					Run(kUserHomeDirectory . "Validators")
-				else if (line > 9) {
+				else if (line > 11) {
 					validators := []
 
 					if GetKeyState("Ctrl", "P") {
@@ -2812,7 +2832,7 @@ class StrategyWorkbench extends ConfigurationItem {
 							SplitPath(fileName, , , , &validator)
 
 							if !inList(validators, validator) {
-								if ((++index = (line - 9)) && !InStr(fileName, kResourcesDirectory)) {
+								if ((++index = (line - 11)) && !InStr(fileName, kResourcesDirectory)) {
 									Run("notepad " fileName)
 
 									break
@@ -2830,7 +2850,7 @@ class StrategyWorkbench extends ConfigurationItem {
 								validators.Push(validator)
 						}
 
-						validator := validators[line - 9]
+						validator := validators[line - 11]
 
 						if (this.iSelectedValidator = validator)
 							this.iSelectedValidator := false
@@ -3293,17 +3313,17 @@ class StrategyWorkbench extends ConfigurationItem {
 		local preferences := CaseInsenseMap()
 		local preference
 
-		loop this.PreferencesListView.GetCount() {
-			preference := {Lap: this.PreferencesListView.GetText(A_Index, 2)
-						 , Refuel: Round(convertUnit("Volume", internalValue("Float", this.PreferencesListView.GetText(A_Index, 3)), false))}
+		if this.PreferencesEnabled
+			loop this.PreferencesListView.GetCount() {
+				preference := {Lap: this.PreferencesListView.GetText(A_Index, 2)}
 
-			if (this.PreferencesListView.GetText(A_Index, 4) = translate("-"))
-				preference.Compound := false
-			else
-				preference.Compound := this.TyreCompounds[inList(collect(this.TyreCompounds, translate), this.PreferencesListView.GetText(A_Index, 4))]
+				if (this.PreferencesListView.GetText(A_Index, 3) = translate("-"))
+					preference.Compound := false
+				else
+					preference.Compound := this.TyreCompounds[inList(collect(this.TyreCompounds, translate), this.PreferencesListView.GetText(A_Index, 3))]
 
-			preferences[Integer(this.PreferencesListView.GetText(A_Index))] := preference
-		}
+				preferences[Integer(this.PreferencesListView.GetText(A_Index))] := preference
+			}
 
 		return preferences
 	}

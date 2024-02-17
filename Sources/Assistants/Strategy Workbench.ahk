@@ -2297,6 +2297,9 @@ class StrategyWorkbench extends ConfigurationItem {
 							value := ""
 						}
 						else {
+							this.Control["pitstopWindowDropDown"].Delete()
+							this.Control["pitstopWindowDropDown"].Add(collect(["Always", "Window"], translate))
+
 							this.Control["pitstopWindowDropDown"].Choose(2)
 
 							value := values2String("-", pitstopWindow*)

@@ -494,11 +494,9 @@ Loading of settings is supported for:
 
 Notes:
 
-  1. If you specify a required pitstop window, this will be applied for the first pitstop only, of course. When a mandatory pitstop with required refueling has been defined, but actually there is no need for a tyre change or even for refueling, the pitstop is planned as late as possible and only 1 liter will be refueled. All these are common scenarios for a GT3 solo or team sprint races.
-  2. If you have to perform a number of required pitstops, enter the number of pitstops and choose "Refuel" and/or "Tyre Change" as required. If you don't choose either "Refuel" or "Tyre Change", the simulation engige might be confused, because there is no reason to go to the pits, right?
+  1. If you have set a number of required pitstops **and** a pitstop window, it depends on the starting fuel, whether the requirements can be met.
+  2. If you have set a pitstop window, it is possible that some settings of the optimizer settings will be ignored to fullfil the pitstop window requirements.
   3. If you choose "Disallowed" for refueling or tyre change, this restriction applies to the whole session. If you have to apply more context specific restrictions, this can be achieved using the rule based validations, which are described in the next section.
-  4. If you **have entered** tyre sets in the "Pitstop" group, only these tyre compounds will be used by the simulation, except for the first stint, for which the tyre compound, which has been chosen in the "Initial Conditions" (see below), is used. Please be aware, that only those tyre compounds can be handled by the simulation engine, for which corresponding is available. If there is no data available for a given compound, either by the "Initial Conditions" or by the telemetry data, the simulation will fail and no valid scenario will be created. 
-  5. If you **don't have entered** any tyre sets in the "Pitstop" group, the simulation will be restricted to the tyre compound chosen in the "Initial Conditions" (see below), if you are not running a tyre compound variation simulation. However, when you run a tyre compound variation simulation using telemetry data, all tyre compounds for which data is available are used.
   
 #### Scenario validation
 

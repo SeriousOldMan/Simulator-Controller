@@ -2604,7 +2604,7 @@ class RaceStrategist extends GridRaceAssistant {
 		if strategy {
 			consumptionVariation := strategy.ConsumptionVariation
 			refuelVariation := strategy.RefuelVariation
-			
+
 			tyreUsageVariation := strategy.TyreUsageVariation
 			tyreCompoundVariation := strategy.TyreCompoundVariation
 
@@ -2614,7 +2614,7 @@ class RaceStrategist extends GridRaceAssistant {
 		else {
 			consumptionVariation := 0
 			refuelVariation := 0
-			
+
 			tyreUsageVariation := 0
 			tyreCompoundVariation := 0
 
@@ -2625,19 +2625,19 @@ class RaceStrategist extends GridRaceAssistant {
 		return (strategy != false)
 	}
 
-	getPitstopRules(&validator, &pitstopRule, &refuelRule, &tyreChangeRule, &tyreSets) {
+	getPitstopRules(&validator, &pitstopRule, &pitstopWindow, &refuelRule, &tyreChangeRule, &tyreSets) {
 		local strategy := this.Strategy
 
 		if strategy {
 			validator := strategy.Validator
 			pitstopRule := strategy.PitstopRule
+			pitstopWindow := strategy.PitstopWindow
 			refuelRule := strategy.RefuelRule
 			tyreChangeRule := strategy.TyreChangeRule
 			tyreSets := strategy.TyreSets
 
-			if isInteger(pitstopRule)
-				if (pitstopRule > 0)
-					pitstopRule := Max(0, pitstopRule - Task.CurrentTask.Pitstops.Length)
+			if (pitstopRule > 0)
+				pitstopRule := Max(0, pitstopRule - Task.CurrentTask.Pitstops.Length)
 
 			return true
 		}

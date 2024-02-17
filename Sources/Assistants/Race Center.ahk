@@ -5358,7 +5358,7 @@ class RaceCenter extends ConfigurationItem {
 		if strategy {
 			consumptionVariation := strategy.ConsumptionVariation
 			refuelVariation := strategy.RefuelVariation
-			
+
 			tyreUsageVariation := strategy.TyreUsageVariation
 			tyreCompoundVariation := strategy.TyreCompoundVariation
 
@@ -5368,7 +5368,7 @@ class RaceCenter extends ConfigurationItem {
 		else {
 			consumptionVariation := 0
 			refuelVariation := 0
-			
+
 			tyreUsageVariation := 0
 			tyreCompoundVariation := 0
 
@@ -5385,19 +5385,19 @@ class RaceCenter extends ConfigurationItem {
 		return (strategy != false)
 	}
 
-	getPitstopRules(&validator, &pitstopRule, &refuelRule, &tyreChangeRule, &tyreSets) {
+	getPitstopRules(&validator, &pitstopRule, &pitstopWindow, &refuelRule, &tyreChangeRule, &tyreSets) {
 		local strategy := this.Strategy
 
 		if strategy {
 			validator := strategy.Validator
 			pitstopRule := strategy.PitstopRule
+			pitstopWindow := strategy.PitstopWindow
 			refuelRule := strategy.RefuelRule
 			tyreChangeRule := strategy.TyreChangeRule
 			tyreSets := strategy.TyreSets
 
-			if isInteger(pitstopRule)
-				if (pitstopRule > 0)
-					pitstopRule := Max(0, pitstopRule - this.PitstopsListView.GetCount())
+			if (pitstopRule > 0)
+				pitstopRule := Max(0, pitstopRule - this.PitstopsListView.GetCount())
 
 			return true
 		}

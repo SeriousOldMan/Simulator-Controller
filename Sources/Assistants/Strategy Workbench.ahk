@@ -480,6 +480,14 @@ class StrategyWorkbench extends ConfigurationItem {
 			workbench.validatePitstopRule()
 		}
 
+		choosePitstopWindow(*) {
+			workbench.updateState()
+		}
+
+		updatePitstopWindow(*) {
+			workbench.validatePitstopWindow()
+		}
+
 		selectTyreSet(listView, line, selected) {
 			if selected
 				chooseTyreSet(listView, line)
@@ -1100,14 +1108,13 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.SetFont("Norm", "Arial")
 
 		workbenchGui.Add("Text", "x" . x5 . " yp+23 w75 h20", translate("Pitstop"))
-		workbenchGui.Add("DropDownList", "x" . x7 . " yp-4 w80 Choose1 VpitstopRequirementsDropDown", collect(["Optional", "Required"], translate)).OnEvent("Change", choosePitstopRule)
-		workbenchGui.Add("Edit", "x" . x11 . " yp+1 w50 h20 VpitstopWindowEdit", "25 - 35").OnEvent("Change", updatePitstopRule)
-		workbenchGui.Add("Text", "x" . x12 . " yp+3 w120 h20 VpitstopWindowLabel", translate("Minute (From - To)"))
+		workbenchGui.Add("DropDownList", "x" . x7 . " yp-4 w80 Choose1 VpitstopRuleDropDown", collect(["Optional", "Required"], translate)).OnEvent("Change", choosePitstopRule)
+		workbenchGui.Add("Edit", "x" . x11 . " yp+1 w50 h20 VpitstopRuleEdit", 1).OnEvent("Change", updatePitstopRule)
 
-		workbenchGui.Add("Text", "x" . x5 . " yp+26 w75 h20", translate("Time"))
-		workbenchGui.Add("DropDownList", "x" . x7 . " yp-4 w80 Choose1", collect(["Always", "Window"], translate)) ; .OnEvent("Change", choosePitstopRule)
-		workbenchGui.Add("Edit", "x" . x11 . " yp+1 w50 h20 ", "25 - 35") ; .OnEvent("Change", updatePitstopRule)
-		workbenchGui.Add("Text", "x" . x12 . " yp+3 w120 h20", translate("Minute (From - To)"))
+		workbenchGui.Add("Text", "x" . x5 . " yp+28 w75 h20", translate("Regular"))
+		workbenchGui.Add("DropDownList", "x" . x7 . " yp-4 w80 Choose1  VpitstopWindowDropDown", collect(["Always", "Window"], translate)).OnEvent("Change", choosePitstopWindow)
+		workbenchGui.Add("Edit", "x" . x11 . " yp+1 w50 h20 VpitstopWindowEdit", "25 - 35").OnEvent("Change", updatePitstopWindow)
+		workbenchGui.Add("Text", "x" . x12 . " yp+3 w120 h20 VpitstopWindowLabel", translate("Minute (From - To)"))
 
 		workbenchGui.Add("Text", "x" . x5 . " yp+22 w75 h23 +0x200 VrefuelRequirementsLabel", translate("Refuel"))
 		workbenchGui.Add("DropDownList", "x" . x7 . " yp w80 Choose1 VrefuelRequirementsDropDown", collect(["Optional", "Required", "Always", "Disallowed"], translate))
@@ -1132,7 +1139,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		x13 := (x7 + w12 + 5 + 116 - 48)
 
-		workbenchGui.Add("Button", "x" . x13 . " yp+18 w23 h23 Center +0x200 vtyreSetAddButton").OnEvent("Click", addTyreSet)
+		workbenchGui.Add("Button", "x" . x13 . " yp+6 w23 h23 Center +0x200 vtyreSetAddButton").OnEvent("Click", addTyreSet)
 		setButtonIcon(workbenchGui["tyreSetAddButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
 
 		x13 += 25
@@ -1601,23 +1608,29 @@ class StrategyWorkbench extends ConfigurationItem {
 			this.Control["tyreSetCountEdit"].Text := ""
 		}
 
-		if (this.Control["pitstopRequirementsDropDown"].Value = 3) {
+		if (this.Control["pitstopRuleDropDown"].Value = 2) {
+			this.Control["pitstopRuleEdit"].Visible := true
+
+			oldTChoice := ["Always", "Window"][this.Control["pitstopWindowDropDown"].Value]
+
+			this.Control["pitstopWindowDropDown"].Delete()
+			this.Control["pitstopWindowDropDown"].Add(collect(["Always", "Window"], translate))
+			this.Control["pitstopWindowDropDown"].Choose(oldTChoice)
+		}
+		else {
+			this.Control["pitstopRuleEdit"].Visible := false
+
+			this.Control["pitstopWindowDropDown"].Delete()
+			this.Control["pitstopWindowDropDown"].Add(collect(["Always"], translate))
+			this.Control["pitstopWindowDropDown"].Choose(1)
+		}
+
+		if (this.Control["pitstopWindowDropDown"].Value = 2) {
 			this.Control["pitstopWindowEdit"].Visible := true
 			this.Control["pitstopWindowLabel"].Visible := true
-
-			this.Control["pitstopWindowLabel"].Text := translate("Minute (From - To)")
 
 			if !InStr(this.Control["pitstopWindowEdit"].Text, "-")
 				this.Control["pitstopWindowEdit"].Text := "25 - 35"
-		}
-		else if (this.Control["pitstopRequirementsDropDown"].Value = 2) {
-			this.Control["pitstopWindowEdit"].Visible := true
-			this.Control["pitstopWindowLabel"].Visible := true
-
-			this.Control["pitstopWindowLabel"].Text := ""
-
-			if InStr(this.Control["pitstopWindowEdit"].Text, "-")
-				this.Control["pitstopWindowEdit"].Text := 1
 		}
 		else {
 			this.Control["pitstopWindowEdit"].Visible := false
@@ -1634,7 +1647,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		else
 			oldFChoice := false
 
-		if (this.Control["pitstopRequirementsDropDown"].Value = 1) {
+		if (this.Control["pitstopRuleDropDown"].Value = 1) {
 			this.Control["tyreChangeRequirementsDropDown"].Delete()
 			this.Control["tyreChangeRequirementsDropDown"].Add(collect(["Optional", "Always", "Disallowed"], translate))
 			this.Control["refuelRequirementsDropDown"].Delete()
@@ -2225,7 +2238,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		local simulator := this.SelectedSimulator
 		local car := this.SelectedCar
 		local track := this.SelectedTrack
-		local strategy, pitstopRule
+		local strategy, pitstopRule, pitstopWindow
 		local ignore, descriptor, directory, numPitstops, name, pitstop, tyreCompound, tyreCompoundColor
 		local simulator, car, track, simulatorCode, dirName, file, settings, settingsDB
 		local telemetryDB, fastestLapTime, row, lapTime, prefix, data, fuelCapacity, initialFuelAmount, map
@@ -2264,19 +2277,29 @@ class StrategyWorkbench extends ConfigurationItem {
 						pitstopRule := strategy.PitstopRule
 
 						if !pitstopRule {
-							this.Control["pitstopRequirementsDropDown"].Choose(1)
+							this.Control["pitstopRuleDropDown"].Choose(1)
 
 							value := ""
 						}
-						else if isObject(pitstopRule) {
-							this.Control["pitstopRequirementsDropDown"].Choose(3)
-
-							value := values2String("-", pitstopRule*)
-						}
 						else {
-							this.Control["pitstopRequirementsDropDown"].Choose(2)
+							this.Control["pitstopRuleDropDown"].Choose(2)
 
 							value := pitstopRule
+						}
+
+						this.Control["pitstopRuleEdit"].Text := value
+
+						pitstopWindow := strategy.PitstopWindow
+
+						if !pitstopWindow {
+							this.Control["pitstopWindowDropDown"].Choose(1)
+
+							value := ""
+						}
+						else {
+							this.Control["pitstopWindowDropDown"].Choose(2)
+
+							value := values2String("-", pitstopWindow*)
 						}
 
 						this.Control["pitstopWindowEdit"].Text := value
@@ -3054,38 +3077,44 @@ class StrategyWorkbench extends ConfigurationItem {
 		}
 	}
 
-	getPitstopRules(&validator, &pitstopRule, &refuelRule, &tyreChangeRule, &tyreSets) {
+	getPitstopRules(&validator, &pitstopRule, &pitstopWindow, &refuelRule, &tyreChangeRule, &tyreSets) {
 		local result := true
-		local tyreCompound, tyreCompoundColor, translatedCompounds, count, pitstopWindow
+		local tyreCompound, tyreCompoundColor, translatedCompounds, count
 
 		this.validatePitstopRule("Full")
+		this.validatePitstopWindow("Full")
 
 		validator := this.SelectedValidator
 
-		switch this.Control["pitstopRequirementsDropDown"].Value {
+		switch this.Control["pitstopRuleDropDown"].Value {
 			case 1:
 				pitstopRule := false
 			case 2:
-				if isInteger(this.Control["pitstopWindowEdit"].Text)
-					pitstopRule := Max(this.Control["pitstopWindowEdit"].Text, 1)
+				if isInteger(this.Control["pitstopRuleEdit"].Text)
+					pitstopRule := Max(this.Control["pitstopRuleEdit"].Text, 1)
 				else {
 					pitstopRule := 1
 
 					result := false
 				}
-			case 3:
+		}
+
+		switch this.Control["pitstopWindowDropDown"].Value {
+			case 1:
+				pitstopWindow := false
+			case 2:
 				pitstopWindow := string2Values("-", this.Control["pitstopWindowEdit"].Text)
 
 				if (pitstopWindow.Length = 2)
-					pitstopRule := [Round(pitstopWindow[1]), Round(pitstopWindow[2])]
+					pitstopWindow := [Round(pitstopWindow[1]), Round(pitstopWindow[2])]
 				else {
-					pitstopRule := [25, 35]
+					pitstopWindow := [25, 35]
 
 					result := false
 				}
 		}
 
-		if (this.Control["pitstopRequirementsDropDown"].Value > 1) {
+		if (this.Control["pitstopRuleDropDown"].Value > 1) {
 			refuelRule := ["Optional", "Required", "Always", "Disallowed"][this.Control["refuelRequirementsDropDown"].Value]
 			tyreChangeRule := ["Optional", "Required", "Always", "Disallowed"][this.Control["tyreChangeRequirementsDropDown"].Value]
 		}
@@ -3287,20 +3316,29 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	validatePitstopRule(full := false) {
-		local reset, count, pitOpen, pitClose
-		local pitstopWindowEdit := this.Control["pitstopWindowEdit"].Text
-		local pitstopRequirementsDropDown := this.Control["pitstopRequirementsDropDown"].Value
+		local pitstopRuleEdit := this.Control["pitstopRuleEdit"].Text
 
-		if (StrLen(Trim(pitstopWindowEdit)) > 0) {
-			if (pitstopRequirementsDropDown == 2) {
-				if isInteger(pitstopWindowEdit) {
-					if (pitstopWindowEdit < 1)
-						this.Control["pitstopWindowEdit"].Text := 1
+		if (StrLen(Trim(pitstopRuleEdit)) > 0) {
+			if (this.Control["pitstopRuleDropDown"].Value == 2) {
+				if isInteger(pitstopRuleEdit) {
+					if (pitstopRuleEdit < 1)
+						this.Control["pitstopRuleEdit"].Text := 1
 				}
 				else
-					this.Control["pitstopWindowEdit"].Value := 1
+					this.Control["pitstopRuleEdit"].Value := 1
 			}
-			else if (pitstopRequirementsDropDown == 3) {
+		}
+	}
+
+	validatePitstopWindow(full := false) {
+		local reset, count, pitOpen, pitClose
+		local pitstopWindowEdit := this.Control["pitstopWindowEdit"].Text
+		local pitstopWindowDropDown := this.Control["pitstopWindowDropDown"].Value
+
+		if (StrLen(Trim(pitstopWindowEdit)) > 0) {
+			if (pitstopWindowDropDown == 1)
+				this.Control["pitstopWindowEdit"].Text := ""
+			else if (pitstopWindowDropDown == 2) {
 				reset := false
 
 				StrReplace(pitstopWindowEdit, "-", "-", , &count)

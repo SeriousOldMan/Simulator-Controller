@@ -4,6 +4,8 @@
   3. Race setting can now be exported and imported in the "Session Database". See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings-1) for more information.
   4. You now have fine-grained control over the length of the first and also the length of the last stint in the strategy simulation. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#simulation) for more information.
   5. And you can vary the fuel amount added at a pitstop to some extent in the strategy simulation. This is helpful to reduce the car weight over the full race and even out the stint lengths in cases where otherwise a short last stint would have been used. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#simulation) for more information.
+  6. In the Pitstop rules in the "Strategy Workbench", the regular pitstop window is now a separate entry. You now can have 2 required pitstops in this window, for example.
+  7. The default for the automatic pressure loss correction is now *Off* in the "Race Center".
   
 ## 5.5.8.0-release 02/16/24
   1. Minor bugfixes, as always

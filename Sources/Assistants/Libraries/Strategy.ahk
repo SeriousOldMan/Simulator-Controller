@@ -359,6 +359,10 @@ class StrategySimulation {
 		return this.StrategyManager.getPitstopRules(&validator, &pitstopRule, &pitstopWindow, &refuelRule, &tyreChangeRule, &tyreSets)
 	}
 
+	getPitstopPreferences() {
+		return this.StrategyManager.getPitstopPreferences()
+	}
+
 	getStintDriver(stintNumber, &driverID, &driverName) {
 		return this.StrategyManager.getStintDriver(stintNumber, &driverID, &driverName)
 	}
@@ -1488,6 +1492,7 @@ class Strategy extends ConfigurationItem {
 	iAirTemperature := 23
 	iTrackTemperature := 27
 
+	iPitstopPreferences := Map()
 	iWeatherForecast := []
 
 	iSimulator := false
@@ -1795,7 +1800,13 @@ class Strategy extends ConfigurationItem {
 			this.iMap := strategy.Map[true]
 			this.iFuelConsumption := fuelConsumption
 
-			if (refuelRule = "Disallowed")
+			if strategy.PitstopPreferences.Has(nr) {
+				refuelAmount := strategy.calcRefuelAmount(stintLaps * fuelConsumption, remainingFuel, remainingSessionLaps, lastStintLaps)
+
+				stintLaps -= Ceil((refuelAmount - Min(refuelAmount, strategy.PitstopPreferences[nr].Refuel)) / fuelConsumption)
+				refuelAmount := Min(refuelAmount, strategy.PitstopPreferences[nr].Refuel)
+			}
+			else if (refuelRule = "Disallowed")
 				refuelAmount := 0
 			else {
 				refuelAmount := strategy.calcRefuelAmount(stintLaps * fuelConsumption, remainingFuel, remainingSessionLaps, lastStintLaps)
@@ -1811,20 +1822,28 @@ class Strategy extends ConfigurationItem {
 
 			tyreChange := kUndefined
 
-			if (adjustments && adjustments.Has(nr)) {
-				if adjustments[nr].HasProp("RefuelAmount")
-					refuelAmount := adjustments[nr].RefuelAmount
+			if strategy.PitstopPreferences.Has(nr) {
+				tyreChange := (strategy.PitstopPreferences[nr].Compound != false)
 
-				if adjustments[nr].HasProp("TyreChange")
-					tyreChange := (adjustments[nr].TyreChange != false)
+				if tyreChange
+					splitCompound(strategy.PitstopPreferences[nr].Compound, &tyreCompound, &tyreCompoundColor)
 			}
+			else {
+				if (adjustments && adjustments.Has(nr)) {
+					if adjustments[nr].HasProp("RefuelAmount")
+						refuelAmount := adjustments[nr].RefuelAmount
 
-			if ((this.Fixed || (nr <= numPitstops)) && (refuelRule = "Required") && (refuelAmount <= 0))
-				refuelAmount := 1
-			else if ((refuelRule = "Always") && (refuelAmount <= 0))
-				refuelAmount := 1
-			else if (refuelAmount <= 0)
-				refuelAmount := 0
+					if adjustments[nr].HasProp("TyreChange")
+						tyreChange := (adjustments[nr].TyreChange != false)
+				}
+
+				if ((this.Fixed || (nr <= numPitstops)) && (refuelRule = "Required") && (refuelAmount <= 0))
+					refuelAmount := 1
+				else if ((refuelRule = "Always") && (refuelAmount <= 0))
+					refuelAmount := 1
+				else if (refuelAmount <= 0)
+					refuelAmount := 0
+			}
 
 			this.iRemainingSessionLaps := (remainingSessionLaps - lastStintLaps)
 			this.iRemainingFuel := (remainingFuel - (lastStintLaps * fuelConsumption) + refuelAmount)
@@ -1833,17 +1852,25 @@ class Strategy extends ConfigurationItem {
 
 			freshTyreLaps := (strategy.MaxTyreLaps + (strategy.MaxTyreLaps * strategy.TyreLapsVariation / 100 * (Min(100 - Sqrt(Random(0, 10000)), 100) / 100)))
 
-			if (tyreChangeRule = "Always") {
+			if ((tyreChange = kUndefined) && (tyreChangeRule = "Always")) {
 				this.iTyreChange := true
 				this.iRemainingTyreLaps := freshTyreLaps
 			}
-			else if (tyreChangeRule = "Disallowed") {
+			else if ((tyreChange = kUndefined) && (tyreChangeRule = "Disallowed")) {
 				this.iTyreChange := false
 				this.iRemainingTyreLaps := remainingTyreLaps
 			}
 			else if (tyreChange != kUndefined) {
 				this.iTyreChange := tyreChange
-				this.iRemainingTyreLaps := (tyreChange ? adjustments[nr].RemainingTyreLaps : remainingTyreLaps)
+
+				if adjustments {
+					if adjustments[nr].HasProp("RemainingTyreLaps")
+						this.iRemainingTyreLaps := (tyreChange ? adjustments[nr].RemainingTyreLaps : remainingTyreLaps)
+					else
+						this.iRemainingTyreLaps := (tyreChange ? freshTyreLaps : remainingTyreLaps)
+				}
+				else
+					this.iRemainingTyreLaps := freshTyreLaps
 			}
 			else if (!tyreCompound && !tyreCompoundColor) {
 				this.iTyreChange := false
@@ -2045,6 +2072,12 @@ class Strategy extends ConfigurationItem {
 				return this.LastPitstop.TrackTemperature
 			else
 				return this.iTrackTemperature
+		}
+	}
+
+	PitstopPreferences[key?] {
+		Get {
+			return (isSet(key) ? (this.iPitstopPreferences.Has(key) ? this.iPitstopPreferences[key] : false) : this.iPitstopPreferences)
 		}
 	}
 
@@ -2627,6 +2660,8 @@ class Strategy extends ConfigurationItem {
 			}
 
 			this.iWeatherForecast := forecast
+
+			this.iPitstopPreferences := this.StrategyManager.getPitstopPreferences()
 		}
 	}
 
@@ -2643,7 +2678,7 @@ class Strategy extends ConfigurationItem {
 	}
 
 	loadFromConfiguration(configuration) {
-		local tyreSets, defaultPressure, ignore, lap, weatherForecast
+		local tyreSets, defaultPressure, ignore, lap, weatherForecast, preferences, preference, count
 
 		super.loadFromConfiguration(configuration)
 
@@ -2771,10 +2806,24 @@ class Strategy extends ConfigurationItem {
 
 		this.iFirstStintWeight := getMultiMapValue(configuration, "Simulation", "FirstStintWeight", 0)
 		this.iLastStintWeight := getMultiMapValue(configuration, "Simulation", "LastStintWeight", 0)
+
+		count := getMultiMapValue(configuration, "Preferences", "Count", false)
+
+		if count {
+			preferences := CaseInsenseMap()
+
+			loop count
+				preferences[Integer(getMultiMapValue(configuration, "Preferences", "Pitstop." . A_Index))]
+					:= {Lap: getMultiMapValue(configuration, "Preferences", "Lap." . A_Index)
+					  , Refuel: getMultiMapValue(configuration, "Preferences", "Refuel." . A_Index)
+					  , Compound: getMultiMapValue(configuration, "Preferences", "Compound." . A_Index)}
+
+			this.iPitstopPreferences := preferences
+		}
 	}
 
 	saveToConfiguration(configuration) {
-		local pitstopWindow, tyreSets, ignore, descriptor, pitstops, ignore, pitstop
+		local pitstopWindow, tyreSets, ignore, descriptor, pitstops, ignore, pitstop, preference
 
 		super.saveToConfiguration(configuration)
 
@@ -2885,6 +2934,15 @@ class Strategy extends ConfigurationItem {
 
 		setMultiMapValue(configuration, "Simulation", "FirstStintWeight", this.FirstStintWeight)
 		setMultiMapValue(configuration, "Simulation", "LastStintWeight", this.LastStintWeight)
+
+		setMultiMapValue(configuration, "Preferences", "Count", this.PitstopPreferences.Count)
+
+		for pitstop, preference in this.PitstopPreferences {
+			setMultiMapValue(configuration, "Preferences", "Pitstop." . A_Index, pitstop)
+			setMultiMapValue(configuration, "Preferences", "Lap." . A_Index, preference.Lap)
+			setMultiMapValue(configuration, "Preferences", "Refuel." . A_Index, preference.Refuel)
+			setMultiMapValue(configuration, "Preferences", "Compound." . A_Index, preference.Compound)
+		}
 	}
 
 	initializeAvailableTyreSets() {
@@ -3091,6 +3149,12 @@ class Strategy extends ConfigurationItem {
 		local targetLap, newTargetLap, pitstopRule, pitstopWindow, avgLapTime, openingLap, closingLap, time, halfLaps
 
 		adjusted := false
+
+		if this.PitstopPreferences.Has(pitstopNr) {
+			adjusted := true
+
+			return this.PitstopPreferences[pitstopNr].Lap
+		}
 
 		if (this.LastPitstop && !this.LastPitstop.TyreChange)
 			remainingTyreLaps := this.MaxTyreLaps

@@ -2644,6 +2644,10 @@ class RaceStrategist extends GridRaceAssistant {
 		else
 			return false
 	}
+	
+	getPitstopPreferences() {
+		return Map()
+	}
 
 	getAvgLapTime(numLaps, map, remainingFuel, fuelConsumption, weather, tyreCompound, tyreCompoundColor, tyreLaps, default := false) {
 		return Task.CurrentTask.Simulation.calcAvgLapTime(numLaps, map, remainingFuel, fuelConsumption, weather

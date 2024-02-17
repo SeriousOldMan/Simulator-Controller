@@ -37,7 +37,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 5.5.8
 
-Nothing to do.
+Everything handled automatically.
 
 ***
 

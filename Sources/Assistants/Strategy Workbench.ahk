@@ -1180,7 +1180,8 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.Add("Text", "x" . x5 . " yp+23 w75 h20", translate("Pitstop"))
 		workbenchGui.Add("DropDownList", "x" . x7 . " yp-4 w80 Choose1 VpitstopRuleDropDown", collect(["Optional", "Required"], translate)).OnEvent("Change", choosePitstopRule)
-		workbenchGui.Add("Edit", "x" . x11 . " yp+1 w50 h20 VpitstopRuleEdit", 1).OnEvent("Change", updatePitstopRule)
+		workbenchGui.Add("Edit", "x" . x11 . " yp+1 w50 h20 Number Limit2 VpitstopRuleEdit", 1).OnEvent("Change", updatePitstopRule)
+		workbenchGui.Add("UpDown", "x" . x11 . " yp+1 w50 h20 Range0-99 VpitstopRuleUpDown")
 
 		workbenchGui.Add("Text", "x" . x5 . " yp+28 w75 h20", translate("Regular"))
 		workbenchGui.Add("DropDownList", "x" . x7 . " yp-4 w80 Choose1  VpitstopWindowDropDown", collect(["Always", "Window"], translate)).OnEvent("Change", choosePitstopWindow)
@@ -1282,7 +1283,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.Add("Edit", "x" . x3 . " yp-1 w50 Limit3 Number vsimFixedPitstopLapEdit").OnEvent("Change", updateSimFixedPitstop)
 		workbenchGui.Add("UpDown", "x138 yp-2 w18 Range1-999")
 
-		workbenchGui.Add("Text", "x" . x2 . " yp+25 w90 h23 +0x200", translate("Compound"))
+		workbenchGui.Add("Text", "x" . x2 . " yp+25 w90 h23 +0x200", translate("Tyres"))
 
 		compound := this.SelectedCompound[true]
 		choices := [translate(normalizeCompound("Dry"))]
@@ -1721,6 +1722,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		if (this.Control["pitstopRuleDropDown"].Value = 2) {
 			this.Control["pitstopRuleEdit"].Visible := true
+			this.Control["pitstopRuleUpDown"].Visible := true
 
 			if (Trim(this.Control["pitstopRuleEdit"].Text) = "")
 				this.Control["pitstopRuleEdit"].Text := 1
@@ -1733,6 +1735,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		}
 		else {
 			this.Control["pitstopRuleEdit"].Visible := false
+			this.Control["pitstopRuleUpDown"].Visible := false
 
 			this.Control["pitstopWindowDropDown"].Delete()
 			this.Control["pitstopWindowDropDown"].Add(collect(["Always"], translate))

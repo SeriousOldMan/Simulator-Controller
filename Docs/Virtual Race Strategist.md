@@ -401,7 +401,7 @@ The "Strategy Workbench" is divided into two main areas. The upper area allows y
 
 Each group provide data sets for all tyre compounds which have been used in the selected conditions. You can choose between the different tyre compounds and you can select up to four different series of values, that are to be plotted against each other in the chart.
 
-If you have data for different drivers available in your telemetry database, you switch between the dfferent drivers yusing the "Driver" menu. Only data of the selected driver will then be visible in the various charts.
+If you have data for different drivers available in your telemetry database, you switch between the dfferent drivers using the "Driver" menu. Only data of the selected driver will then be visible in the various charts.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Chart%20Selector%202.JPG)
 
@@ -417,7 +417,7 @@ Loading of settings is supported for:
 
   1. The currently loaded Strategy:
   
-     This is the most complete method for initialization of the Rules & Settings. It is most useful, after you restarted "Simulator Workbench" and want to continue your work on a Strategy. Simply load it using the *Strategy* menu and than choose this command. The following fields are loaded from the strategy:
+     This is the most complete method for initialization of the Rules & Settings. It is most useful, after you restarted "Simulator Workbench" and want to continue your work on a Strategy. Simply load it using the "Strategy" menu and than choose this command. The following fields are loaded from the strategy:
 	 
 	 - Rules & Settings
 	   - Race Duration
@@ -632,6 +632,18 @@ Once you have created a set of validation rules similar to the examples above, y
 In this tab you have to enter the time required for several pitstop activities, as well as the pitstop window, in which the best pitstop lap will be derived. With the value of Pitstop Delta, you supply the difference time needed for a normal pitstop (time for pit in and pit out but without any service time minus the time to pass the pit area on the track, i.e. Drive through vs. Drive by), The fields below specify the time required for the various pit services, like changing tyres, refueling, and so on. As you can see, this is very similar to the settings in the [*Strategy* tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#tab-strategy) of the "Race Settings" described above. In fact, the values you enter here will be used later on, if you export the strategy to be used for the upcoming race.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Settings%202.JPG)
+
+### Pitstops (fixed)
+
+In very rare cases it might be beneficial to define one or more fixed pitstops before running a simulation. Because it is possible to create invalid strategies using this functionality, it is necessary to explicitly enable fixed pitstops, before you can enter any fixed pitstops at this tab. This can be done in the "Session" menu.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Settings%207.JPG)
+
+Enter the number of the pitstop that should be fixed at the specified lap and choose whether you want to change tyres at this pitstop.
+
+Important: It is not checked during strategy simulation whether the available fuel in a stint is sufficient to extent this stint up to the fixed pitstop. Also, any additional restrictions like stint timers, tyre life, pitstop rules, and so on, might be ignored as well. Therefore it is possible that the simulation will come up with an invalid strategy, which might not be detected correctly.
+
+Good to know: When a strategy, that originally was created using fixed pitstops, is adjusted in the "Race Center" or is revised by the Strategist, the fixed pitstops will not be taken into account. There is a reason, why the strategy needs a revison, isn't it?
 
 ### Drivers
 

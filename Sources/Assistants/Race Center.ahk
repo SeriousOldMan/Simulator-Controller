@@ -5404,8 +5404,8 @@ class RaceCenter extends ConfigurationItem {
 		else
 			return false
 	}
-	
-	getPitstopPreferences() {
+
+	getFixedPitstops() {
 		return Map()
 	}
 

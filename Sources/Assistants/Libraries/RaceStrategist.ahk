@@ -2644,8 +2644,8 @@ class RaceStrategist extends GridRaceAssistant {
 		else
 			return false
 	}
-	
-	getPitstopPreferences() {
+
+	getFixedPitstops() {
 		return Map()
 	}
 

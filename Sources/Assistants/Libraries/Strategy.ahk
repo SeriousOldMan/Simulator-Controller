@@ -2679,7 +2679,7 @@ class Strategy extends ConfigurationItem {
 	}
 
 	loadFromConfiguration(configuration) {
-		local tyreSets, defaultPressure, ignore, lap, weatherForecast, preferences, preference, count
+		local tyreSets, defaultPressure, ignore, lap, weatherForecast, fixedPitstops, fixedPitstop, count
 
 		super.loadFromConfiguration(configuration)
 
@@ -2811,19 +2811,24 @@ class Strategy extends ConfigurationItem {
 		count := getMultiMapValue(configuration, "Fixed", "Count", false)
 
 		if count {
-			preferences := CaseInsenseMap()
+			fixedPitstops := CaseInsenseMap()
 
-			loop count
-				preferences[Integer(getMultiMapValue(configuration, "Fixed", "Pitstop." . A_Index))]
-					:= {Lap: getMultiMapValue(configuration, "Fixed", "Lap." . A_Index)
-					  , Compound: getMultiMapValue(configuration, "Fixed", "Compound." . A_Index)}
+			loop count {
+				fixedPitstop := {Lap: getMultiMapValue(configuration, "Fixed", "Lap." . A_Index)
+							   , Compound: getMultiMapValue(configuration, "Fixed", "Compound." . A_Index)}
 
-			this.iFixedPitstops := preferences
+				if (getMultiMapValue(configuration, "Fixed", "Refuel." . A_Index, kUndefined) != kUndefined)
+					fixedPitstop.Refuel := getMultiMapValue(configuration, "Fixed", "Refuel." . A_Index)
+
+				fixedPitstops[Integer(getMultiMapValue(configuration, "Fixed", "Pitstop." . A_Index))] := fixedPitstop
+			}
+
+			this.iFixedPitstops := fixedPitstops
 		}
 	}
 
 	saveToConfiguration(configuration) {
-		local pitstopWindow, tyreSets, ignore, descriptor, pitstops, ignore, pitstop, preference
+		local pitstopWindow, tyreSets, ignore, descriptor, pitstops, ignore, pitstop, fixedPitstop
 
 		super.saveToConfiguration(configuration)
 
@@ -2937,10 +2942,13 @@ class Strategy extends ConfigurationItem {
 
 		setMultiMapValue(configuration, "Fixed", "Count", this.FixedPitstops.Count)
 
-		for pitstop, preference in this.FixedPitstops {
+		for pitstop, fixedPitstop in this.FixedPitstops {
 			setMultiMapValue(configuration, "Fixed", "Pitstop." . A_Index, pitstop)
-			setMultiMapValue(configuration, "Fixed", "Lap." . A_Index, preference.Lap)
-			setMultiMapValue(configuration, "Fixed", "Compound." . A_Index, preference.Compound)
+			setMultiMapValue(configuration, "Fixed", "Lap." . A_Index, fixedPitstop.Lap)
+			setMultiMapValue(configuration, "Fixed", "Compound." . A_Index, fixedPitstop.Compound)
+
+			if fixedPitstop.HasProp("Refuel")
+				setMultiMapValue(configuration, "Fixed", "Refuel." . A_Index, fixedPitstop.Refuel)
 		}
 	}
 

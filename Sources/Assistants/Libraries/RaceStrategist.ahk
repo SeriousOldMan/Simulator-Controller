@@ -2591,8 +2591,9 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	getSimulationSettings(&useInitialConditions, &useTelemetryData
-						, &consumptionVariation, &initialFuelVariation, &tyreUsageVariation, &tyreCompoundVariation
-						, &firstStintWeight) {
+						, &consumptionVariation, &initialFuelVariation, &refuelVariation
+						, &tyreUsageVariation, &tyreCompoundVariation
+						, &firstStintWeight, &lastStintWeight) {
 		local strategy := this.Strategy[true]
 
 		useInitialConditions := false
@@ -2602,40 +2603,50 @@ class RaceStrategist extends GridRaceAssistant {
 
 		if strategy {
 			consumptionVariation := strategy.ConsumptionVariation
+			refuelVariation := strategy.RefuelVariation
+
 			tyreUsageVariation := strategy.TyreUsageVariation
 			tyreCompoundVariation := strategy.TyreCompoundVariation
 
 			firstStintWeight := strategy.FirstStintWeight
+			lastStintWeight := strategy.LastStintWeight
 		}
 		else {
 			consumptionVariation := 0
+			refuelVariation := 0
+
 			tyreUsageVariation := 0
 			tyreCompoundVariation := 0
 
 			firstStintWeight := 0
+			lastStintWeight := 0
 		}
 
 		return (strategy != false)
 	}
 
-	getPitstopRules(&validator, &pitstopRule, &refuelRule, &tyreChangeRule, &tyreSets) {
+	getPitstopRules(&validator, &pitstopRule, &pitstopWindow, &refuelRule, &tyreChangeRule, &tyreSets) {
 		local strategy := this.Strategy
 
 		if strategy {
 			validator := strategy.Validator
 			pitstopRule := strategy.PitstopRule
+			pitstopWindow := strategy.PitstopWindow
 			refuelRule := strategy.RefuelRule
 			tyreChangeRule := strategy.TyreChangeRule
 			tyreSets := strategy.TyreSets
 
-			if isInteger(pitstopRule)
-				if (pitstopRule > 0)
-					pitstopRule := Max(0, pitstopRule - Task.CurrentTask.Pitstops.Length)
+			if (pitstopRule > 0)
+				pitstopRule := Max(0, pitstopRule - Task.CurrentTask.Pitstops.Length)
 
 			return true
 		}
 		else
 			return false
+	}
+
+	getFixedPitstops() {
+		return Map()
 	}
 
 	getAvgLapTime(numLaps, map, remainingFuel, fuelConsumption, weather, tyreCompound, tyreCompoundColor, tyreLaps, default := false) {

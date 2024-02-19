@@ -401,7 +401,7 @@ The "Strategy Workbench" is divided into two main areas. The upper area allows y
 
 Each group provide data sets for all tyre compounds which have been used in the selected conditions. You can choose between the different tyre compounds and you can select up to four different series of values, that are to be plotted against each other in the chart.
 
-If you have data for different drivers available in your telemetry database, you switch between the dfferent drivers yusing the "Driver" menu. Only data of the selected driver will then be visible in the various charts.
+If you have data for different drivers available in your telemetry database, you switch between the dfferent drivers using the "Driver" menu. Only data of the selected driver will then be visible in the various charts.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Chart%20Selector%202.JPG)
 
@@ -417,7 +417,7 @@ Loading of settings is supported for:
 
   1. The currently loaded Strategy:
   
-     This is the most complete method for initialization of the Rules & Settings. It is most useful, after you restarted "Simulator Workbench" and want to continue your work on a Strategy. Simply load it using the *Strategy* menu and than choose this command. The following fields are loaded from the strategy:
+     This is the most complete method for initialization of the Rules & Settings. It is most useful, after you restarted "Simulator Workbench" and want to continue your work on a Strategy. Simply load it using the "Strategy" menu and than choose this command. The following fields are loaded from the strategy:
 	 
 	 - Rules & Settings
 	   - Race Duration
@@ -494,11 +494,9 @@ Loading of settings is supported for:
 
 Notes:
 
-  1. If you specify a required pitstop window, this will be applied for the first pitstop only, of course. When a mandatory pitstop with required refueling has been defined, but actually there is no need for a tyre change or even for refueling, the pitstop is planned as late as possible and only 1 liter will be refueled. All these are common scenarios for a GT3 solo or team sprint races.
-  2. If you have to perform a number of required pitstops, enter the number of pitstops and choose "Refuel" and/or "Tyre Change" as required. If you don't choose either "Refuel" or "Tyre Change", the simulation engige might be confused, because there is no reason to go to the pits, right?
+  1. If you have set a number of required pitstops **and** a pitstop window, it depends on the starting fuel, whether the requirements can be met.
+  2. If you have set a pitstop window, it is possible that some settings of the optimizer settings will be ignored to fullfil the pitstop window requirements.
   3. If you choose "Disallowed" for refueling or tyre change, this restriction applies to the whole session. If you have to apply more context specific restrictions, this can be achieved using the rule based validations, which are described in the next section.
-  4. If you **have entered** tyre sets in the "Pitstop" group, only these tyre compounds will be used by the simulation, except for the first stint, for which the tyre compound, which has been chosen in the "Initial Conditions" (see below), is used. Please be aware, that only those tyre compounds can be handled by the simulation engine, for which corresponding is available. If there is no data available for a given compound, either by the "Initial Conditions" or by the telemetry data, the simulation will fail and no valid scenario will be created. 
-  5. If you **don't have entered** any tyre sets in the "Pitstop" group, the simulation will be restricted to the tyre compound chosen in the "Initial Conditions" (see below), if you are not running a tyre compound variation simulation. However, when you run a tyre compound variation simulation using telemetry data, all tyre compounds for which data is available are used.
   
 #### Scenario validation
 
@@ -635,6 +633,18 @@ In this tab you have to enter the time required for several pitstop activities, 
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Settings%202.JPG)
 
+### Pitstops (fixed)
+
+In very rare cases it might be beneficial to define one or more fixed pitstops before running a simulation. Because it is possible to create invalid strategies using this functionality, it is necessary to explicitly enable fixed pitstops, before you can enter any fixed pitstops at this tab. This can be done in the "Session" menu.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Settings%207.JPG)
+
+Enter the number of the pitstop that should be fixed at the specified lap, the amount of fuel to be added and choose whether you want to change tyres at this pitstop.
+
+Important: The strategy simulation tries to compensate for the intervention as best as possible. But there are limits. For example, it is not checked whether the available fuel in the stint before a fixed pitstop is sufficient to extent this stint up to the fixed lap. Also, any additional restrictions like stint timers, tyre life, pitstop rules, and so on, might be ignored as well. Therefore it is possible that the simulation will come up with an invalid strategy, which, even worse, might not be detected correctly.
+
+Good to know: When a strategy, that originally was created using fixed pitstops, is adjusted in the "Race Center" or is revised by the Strategist, the fixed pitstops will not be taken into account. There is a reason, why the strategy needs a revison, isn't it?
+
 ### Drivers
 
 Using this tab, you can create a kind of a stint plan for the simulated session. You can use every driver, which is known in the current telemetry database. When the simulation runs, the drivers are picked up for each stint in the order, in which they appear in this list and the simulation will use the driver specific data for all simulation relevant aspects like lap times, fuel consumption, tyre degredation, and so on. If no such data is available, the simulation ight fail to create a valid strategy. In that case, use for the corresponding stint.
@@ -661,15 +671,15 @@ This is the central functionality for strategy development. Using the fields in 
 
 Enter the required values in the *Initial Conditions* group, choose the data to use and click on the "Simulate!" button. A summary of the strategy will be shown in fields in the *Summary* group. Use the sliders in the *Optimizer* group to define weights for diffferent variations of the simulation algorithm. These has the following meanings:
 
-  - Fuel Consumption
-  
-	The slider defines a range between 0 and 10%, in which the simulation will decrease the fuel consumption, which has been derived from past telemetry data or from the values entered into the *Initial Conditions* group. This can be beneficial in endirance races for example, if you think, that you are able to save additional fuel by applying some lift n cost techniques or if you want to use a fuel saving engine map, for which no telemetry data is available yet.
-	
   - Initial fuel
   
 	Perhaps the most tricky one and it needs a lot of historical telemetry data to create sensible results. Using the slider, you can optimize the amount of fuel to be used for the first stint, thereby influencing the car weight and in the end the resulting lap times in the critical first phase of a race. For some cars, for example, lap times increase significantly, if the amount of fuel and therefore the car weight is above a specific threshold. This can be derived from the telemtry data. If you set the slider completely to the left, the initial fuel amount entered in the *Initial Conditions* field group will be used only, whereas, if you set the slider to the right, you specify, how much of the fuel capacity of the car might be used as additional fuel for the simulation variations.
 	
 	Hint: If you want to simulate the whole range of initial fuel levels, enter **0** for the initial fuel level in the *Initial Conditions* field group and set the slider completely to the right.
+	
+  - Refuel
+  
+	Using this slider, it is possible to give the amount of fuel added at each pitstop some variation. The maximum variation with the slider at the far right is 20% of the fuel amount which have to be added to refill the car up to its fuel capacity at a given pitstop. You can use this optimization in races where the last stint otherwise will become very short (and a splash n dash stop is not beneficial for other reasons) to bring the max. fuel level down over the whole race.
 	
   - Tyre Usage
   
@@ -681,15 +691,13 @@ Enter the required values in the *Initial Conditions* group, choose the data to 
 	
 	Important to understand: The simulation will use only those tyre compounds, for which telemtry data is available. So even, if you enetered a soft dry compound into the list of available tyre sets for example, it might never be used, if there is no data available. So be sure to have driven and recorded at least a couple of laps in varying conditions with all tyre compounds, which are available for the given car / track combination.
 
-  - Pit Strategy
+  - First Stint
     
-	This slider has two different functions, depending on the length of the race and the number of pitstops.
+	This slider let you define the weight of the first stint. Move it to the left and an early pitstop is preferred, move it to the right and a late stop will be preferred. This is a useful setting for sprint races with one required pitstop, to get out of traffic as early as possible or to create a splash n dash strategy for races without a required tyre change.
 	
-	*Sprint race with one pitstop*<br>
-	In this case, the slider let you define the weight of the first stint. Move it to the left and an early pitstop is preferred, move it to the right and a late stop will be preferred. This is a useful setting for sprint races with one required pitstop, to get out of traffic as early as possible or to create a splash n dash strategy for races without a required tyre change.
-	
-	*Longer races with two or more pitstops*<br>
-	In this case, you can adjust the length of the last two stints depending on the position of the slider.
+  - Last Stint
+  
+	Very similar to the *First Stint* optimization, but here you can adjust the length of the last two stints depending on the position of the slider.
 	
 	Example:
 	
@@ -697,7 +705,7 @@ Enter the required values in the *Initial Conditions* group, choose the data to 
 	
 	![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Pit%20Strategy%201.png)
 	
-	If you now move the *Pit Strategy* slider completely to the right, the resulting strategy will create a splash n dash scenario, most likely without a driver change:
+	If you now move the *Last Stint* slider completely to the right, the resulting strategy will create a splash n dash scenario, most likely without a driver change:
 	
 	![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Pit%20Strategy%202.png)
 

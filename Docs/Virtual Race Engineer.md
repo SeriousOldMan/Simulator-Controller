@@ -599,6 +599,14 @@ The default values for all these settings may not only be used to initialize the
 
 A detailed overview and description for all available settings and their usage can be found [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings).
 
+##### Exporting and importing settings
+
+You can use the "Export..." button below the settings list to export a set of settings to your hard drive, for example, to share them with your team mates. Normally, only the current list of visible settings will be exported, but if you hold down the Control key, all settings from your database will be exported.
+
+When clicking on "Import...", you can select a folder with recently exported settings. A window will open up, which let you choose the settings you want to import into your database.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%2017.jpg)
+
 #### Strategies
 
 This tab shows you a list of race stratagies, which are stored in the database. Note: Race strategies can be created and stored in the session database using the "Strategy Workbench".

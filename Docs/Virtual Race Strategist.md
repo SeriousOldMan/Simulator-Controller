@@ -639,9 +639,9 @@ In very rare cases it might be beneficial to define one or more fixed pitstops b
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Settings%207.JPG)
 
-Enter the number of the pitstop that should be fixed at the specified lap and choose whether you want to change tyres at this pitstop.
+Enter the number of the pitstop that should be fixed at the specified lap, the amount of fuel to be added and choose whether you want to change tyres at this pitstop.
 
-Important: It is not checked during strategy simulation whether the available fuel in a stint is sufficient to extent this stint up to the fixed pitstop. Also, any additional restrictions like stint timers, tyre life, pitstop rules, and so on, might be ignored as well. Therefore it is possible that the simulation will come up with an invalid strategy, which might not be detected correctly.
+Important: The strategy simulation tries to compensate for the intervention as best as possible. But there are limits. For example, it is not checked whether the available fuel in the stint before a fixed pitstop is sufficient to extent this stint up to the fixed lap. Also, any additional restrictions like stint timers, tyre life, pitstop rules, and so on, might be ignored as well. Therefore it is possible that the simulation will come up with an invalid strategy, which, even worse, might not be detected correctly.
 
 Good to know: When a strategy, that originally was created using fixed pitstops, is adjusted in the "Race Center" or is revised by the Strategist, the fixed pitstops will not be taken into account. There is a reason, why the strategy needs a revison, isn't it?
 

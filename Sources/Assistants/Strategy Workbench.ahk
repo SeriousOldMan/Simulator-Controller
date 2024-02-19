@@ -46,7 +46,7 @@
 global kOk := "Ok"
 global kCancel := "Cancel"
 
-global kFixedPitstopRefuel := false
+global kFixedPitstopRefuel := true
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -1751,7 +1751,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			this.Control["pitstopRuleEdit"].Visible := true
 			this.Control["pitstopRuleUpDown"].Visible := true
 
-			if (Trim(this.Control["pitstopRuleEdit"].Text) = "")
+			if ((Trim(this.Control["pitstopRuleEdit"].Text) = "") || !this.Control["pitstopRuleEdit"].Value)
 				this.Control["pitstopRuleEdit"].Text := 1
 
 			oldTChoice := ["Always", "Window"][this.Control["pitstopWindowDropDown"].Value]

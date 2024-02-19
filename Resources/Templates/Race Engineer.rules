@@ -94,7 +94,7 @@ updateFuelTarget(?lap) <= Clear(Fuel.Amount.Target)
 priority: 20, [?Lap] => (Prove: currentTyreCompound()), (Prove: currentTyreSet())
 
 currentTyreCompound() <= currentTyreCompound(?compound, ?color), Set(Tyre.Compound, ?compound), Set(Tyre.Compound.Color, ?color)
-currentTyreSet() <= currentTyreCompound(?tyreSet), Set(Tyre.Set, ?tyreSet)
+currentTyreSet() <= currentTyreSet(?tyreSet), Set(Tyre.Set, ?tyreSet)
 
 priority: 5, {All: [?Lap], [?Session.Settings.Tyre.Compound.Change = Temperature]} => (Prove: updateTyreTemperatureWindow(?Lap, !Tyre.Compound))
 

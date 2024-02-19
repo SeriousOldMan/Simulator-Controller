@@ -3368,10 +3368,15 @@ class StrategyWorkbench extends ConfigurationItem {
 			loop this.FixedPitstopsListView.GetCount() {
 				fixedPitstop := {Lap: this.FixedPitstopsListView.GetText(A_Index, 2)}
 
-				if (this.FixedPitstopsListView.GetText(A_Index, 3) = translate("-"))
+				if kFixedPitstopRefuel
+					fixedPitstop.Refuel := Round(convertUnit("Volume"
+														   , internalValue("Float", this.FixedPitstopsListView.GetText(A_Index, 3))
+														   , false), 1)
+
+				if (this.FixedPitstopsListView.GetText(A_Index, 3 + kFixedPitstopRefuel) = translate("-"))
 					fixedPitstop.Compound := false
 				else
-					fixedPitstop.Compound := this.TyreCompounds[inList(collect(this.TyreCompounds, translate), this.FixedPitstopsListView.GetText(A_Index, 3))]
+					fixedPitstop.Compound := this.TyreCompounds[inList(collect(this.TyreCompounds, translate), this.FixedPitstopsListView.GetText(A_Index, 3 + kFixedPitstopRefuel))]
 
 				fixedPitstops[Integer(this.FixedPitstopsListView.GetText(A_Index))] := fixedPitstop
 			}

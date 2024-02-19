@@ -1813,6 +1813,8 @@ class Strategy extends ConfigurationItem {
 
 			if (refuelRule = "Disallowed")
 				refuelAmount := 0
+			else if (this.FixedPitstops.Has(nr) && this.FixedPitstops[nr].HasProp("Refuel"))
+				refuelAmount := this.FixedPitstops[nr].Refuel
 			else {
 				refuelAmount := strategy.calcRefuelAmount(stintLaps * fuelConsumption, remainingFuel, remainingSessionLaps, lastStintLaps)
 
@@ -1832,7 +1834,8 @@ class Strategy extends ConfigurationItem {
 
 			if (adjustments && adjustments.Has(nr)) {
 				if adjustments[nr].HasProp("RefuelAmount")
-					refuelAmount := adjustments[nr].RefuelAmount
+					if !(this.FixedPitstops.Has(nr) && this.FixedPitstops[nr].HasProp("Refuel"))
+						refuelAmount := adjustments[nr].RefuelAmount
 
 				if adjustments[nr].HasProp("TyreChange")
 					tyreChange := (adjustments[nr].TyreChange != false)

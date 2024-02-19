@@ -3262,7 +3262,7 @@ class Strategy extends ConfigurationItem {
 		local stintLaps := this.StintLaps
 		local pitstopRule := this.PitstopRule
 
-		if pitstopRule {
+		if (pitstopRule = 1) {
 			fuelLaps := Max(0, (remainingFuel / fuelConsumption) - 1)
 			canonicalStintLaps := Round(sessionLaps / (pitstopRule + 1))
 
@@ -3495,8 +3495,7 @@ class Strategy extends ConfigurationItem {
 		numPitstops := this.PitstopRule
 		pitstopWindow := this.PitstopWindow
 
-		/*
-		if numPitstops {
+		if (numPitstops > 1) {
 			fuelLaps := Max(0, (currentFuel / fuelConsumption) - 1)
 			canonicalStintLaps := Round(sessionLaps / (numPitstops + 1))
 
@@ -3505,7 +3504,6 @@ class Strategy extends ConfigurationItem {
 			else
 				this.iStintLaps := Min(stintLaps, canonicalStintLaps)
 		}
-		*/
 
 		if pitstopWindow
 			valid := false

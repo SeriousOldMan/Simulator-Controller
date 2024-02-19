@@ -3258,7 +3258,21 @@ class Strategy extends ConfigurationItem {
 	}
 
 	calcRemainingLaps(pitstopNr, currentLap, remainingStintLaps, remainingTyreLaps, remainingFuel, fuelConsumption) {
-		return Floor(Min(this.StintLaps, remainingStintLaps, remainingTyreLaps
+		local sessionLaps := this.RemainingSessionLaps
+		local stintLaps := this.StintLaps
+		local pitstopRule := this.PitstopRule
+
+		if pitstopRule {
+			fuelLaps := Max(0, (remainingFuel / fuelConsumption) - 1)
+			canonicalStintLaps := Round(sessionLaps / (pitstopRule + 1))
+
+			if (fuelLaps < canonicalStintLaps)
+				stintLaps := Min(stintLaps, Round((sessionLaps - fuelLaps) / pitstopRule))
+			else
+				stintLaps := Min(stintLaps, canonicalStintLaps)
+		}
+
+		return Floor(Min(stintLaps, remainingStintLaps, remainingTyreLaps
 					   , this.getMaxFuelLaps(remainingFuel, fuelConsumption)))
 	}
 
@@ -3314,13 +3328,13 @@ class Strategy extends ConfigurationItem {
 		pitstopRule := this.PitstopRule
 		pitstopWindow := this.PitstopWindow
 
-		if ((pitstopNr = 1) && ((!pitstopRule && (targetLap < remainingSessionLaps)) || isNumber(pitstopRule))
+		if ((pitstopNr = 1) && !pitstopWindow && (targetLap < remainingSessionLaps)
 							&& (targetLap > (currentLap + 1)) && !adjusted) {
 			if (Abs(this.FirstStintWeight) >= 5) {
 				halfLaps := ((targetLap - currentLap) / 2)
 
 				if (halfLaps != 0) {
-					targetLap := (currentLap + Round(halfLaps + ((halfLaps / 100) * this.FirstStintWeight)))
+					targetLap := (targetLap + Round((halfLaps / 100) * this.FirstStintWeight))
 
 					adjusted := true
 				}
@@ -3337,7 +3351,7 @@ class Strategy extends ConfigurationItem {
 			}
 		}
 
-		return targetLap
+		return Floor(Min(targetLap, currentLap + remainingStintLaps, currentLap + (remainingFuel / fuelConsumption)))
 	}
 
 	availableTyreCompounds() {
@@ -3481,6 +3495,7 @@ class Strategy extends ConfigurationItem {
 		numPitstops := this.PitstopRule
 		pitstopWindow := this.PitstopWindow
 
+		/*
 		if numPitstops {
 			fuelLaps := Max(0, (currentFuel / fuelConsumption) - 1)
 			canonicalStintLaps := Round(sessionLaps / (numPitstops + 1))
@@ -3490,6 +3505,7 @@ class Strategy extends ConfigurationItem {
 			else
 				this.iStintLaps := Min(stintLaps, canonicalStintLaps)
 		}
+		*/
 
 		if pitstopWindow
 			valid := false
@@ -3913,7 +3929,7 @@ class TrafficStrategy extends Strategy {
 																	: (rnd * variationWindow)))))
 		}
 		else
-			return targetLap
+			return Floor(Min(targetLap, currentLap + remainingStintLaps, currentLap + (remainingFuel / fuelConsumption)))
 	}
 }
 

@@ -506,9 +506,9 @@ Beside the session rules, you can enter into the fields in the "Rules & Settings
 
 Every validation script has to define a "validScenario()" rule, which is invoked by the simulation engine. When this rule returns logical *true*, the current scenario is considered to be a valid strategy. In this simple example, this is the case, when at least one pitstop with refueling has been planned. Let's take a look at another example:
 
-	validScenario() <= pitstopTyreSets(?tyreSets), length(?tyreSets, ?length), ?length > 0
+	validScenario() <= pitstopTyreCompounds(?tyreSets), length(?tyreSets, ?length), ?length > 0
 
-In this case, the current scenario is considered valid, when the tyres will be changed at least once. As yu can see, you have different so called logical predicates like *pitstopFuel* or *pitstopTyreSets* at hand, which you can use to implement your "validScenario()" rule. The available predicates are described below.
+In this case, the current scenario is considered valid, when the tyres will be changed at least once. As yu can see, you have different so called logical predicates like *pitstopFuel* or *pitstopTyreCompounds* at hand, which you can use to implement your "validScenario()" rule. The available predicates are described below.
 
 The previous examples are of course very simple. Therefore, before presenting the available predicates, let's take a look at a more complex example.
 
@@ -539,25 +539,37 @@ Although the logical predicates in *Prolog* look like function calls, the semant
   
      *?refuelAmount* is unified with amount of fuel which will be refilled at the pitstops and *?numRefuels* will be unified with the number of refuels at the pitstops.
   
-  4. *startTyreSet(?tyreCompound, ?tyreCompoundColor)*
+  4. *startTyreCompound(?tyreCompound, ?tyreCompoundColor)*
   
      *?tyreCompound* and *?tyreCompoundColor* are unified with the info for the tyre set which has been mounted at the start of the session. Please note, that for *simple* "Wet", "Intermediate" and "Dry" compounds the color will always be "Black".
+	 
+  5. *startTyreSet(?tyreSet)*
+  
+     Same as the previous one, but you retrieve the number of the mounted tyre set in *?tyreSet*.
 
-  5. *pitstopTyreSets(?tyreSets)*
+  6. *pitstopTyreCompounds(?tyreCompounds)*
   
-     *?tyreSets* is unified with a list of tyre compounds mounted in the various pitstops of the session. A list has the syntactical structure "[element1, element2, ...]". A tyre compound is represented as a pair of compound and color, like "[Dry | White]". Example for two different tyre sets used in a session: "[ [Dry | White], [Wet | Black] ]"
+     *?tyreCompounds* is unified with a list of tyre compounds mounted in the various pitstops of the session. A list has the syntactical structure "[element1, element2, ...]". A tyre compound is represented as a pair of compound and color, like "[Dry | White]". Example for two different tyre sets used in a session: "[ [Dry | White], [Wet | Black] ]"
+
+  7. *pitstopTyreSets(?tyreSets)*
   
-  6. *refuels(?refuels)*
+     *?tyreSets* is unified with a list of the numbers of the tyre sets  mounted in the various pitstops of the session. A list has the syntactical structure "[tyreSet1, tyreSet2, ...]". The tyre set may be false, if no tyre sets are supported or not known for the used tyre compound.
+  
+  8. *refuels(?refuels)*
   
      Convenience predicate for: "refuels(?refuels) <= totalFuel(?, ?refuels)"
 
-  7. *tyreSets(?tyreSets)*
+  9. *tyreCompounds(?tyreCompounds)*
   
-     Similar to *pitstopTyreSets*, but also include the info for the tyres mounted at the start of the session.
+     Similar to *pitstopTyreCompounds*, but also include the info for the tyres mounted at the start of the session.
+
+  10. *tyreSets(?tyreSets)*
   
-  8. *tyreCompounds(?tyreSets, ?tyreCompound, ?tyreCompoundColors)*
+      Similar to *pitstopTyreSets*, but also include the info for the tyres mounted at the start of the session.
   
-     Use this predicate to query the different mixtures (colors) for a given tyre compound. *?tyreSets* is a list of tyre sets as *returned* for example by the *tyreSets* predicate. *?tyreCompound* is identified with the base compound, for example "Dry", "Wet" and so on. For each base compound the list of unique tyre compound colors is unified with *?tyreCompoundColors*. Take a look at the "Formula 1" example, to see how this predicate can be used.
+  11. *tyreCompounds(?tyreCompounds, ?tyreCompound, ?tyreCompoundColors)*
+  
+      Use this predicate to query the used different mixtures (colors) for a given tyre compound. *?tyreCompounds* is a list of tyre sets as *returned* for example by the *tyreCompounds* predicate. *?tyreCompound* is identified with the base compound, for example "Dry", "Wet" and so on. For each base compound the list of unique tyre compound colors is unified with *?tyreCompoundColors*. Take a look at the "Formula 1" example, to see how this predicate can be used.
 
 The above predicates will give you summarized information about all pitstops, which will be sufficient in most cases. But you can also acquire informations about each individual pitstop.
 
@@ -580,8 +592,12 @@ The above predicates will give you summarized information about all pitstops, wh
   5. *pitstopTyreCompound(?nr, ?tyreCompound, ?tyreCompoundColor)*
   
      Gives you access to the tyre compound and mixture to be mounted at the pitstop with *?nr*. When no tyre change is planned, *?tyreCompound* will be unified with false.
+	 
+  6. *pitstopTyreSet(?nr, ?tyreSet)*
+  
+     Gives you access to the tyre set to be mounted at the pitstop with *?nr*. When no tyre change is planned, *?tyreSet* will be unified with false.
 
-  6. *pitstop(?nr, ?lap, ?minute, ?fuelAmount, ?tyreCompound, ?tyreCompoundColor)*
+  7. *pitstop(?nr, ?lap, ?minute, ?fuelAmount, ?tyreCompound, ?tyreCompoundColor)*
   
      This predicate combines all indivdual ones from above like *pitstopLap* into one single predicate which gives you access too all aspects of the pitstop with *?nr* at once.
   

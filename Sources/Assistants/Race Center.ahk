@@ -634,18 +634,18 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	class SessionStrategy extends Strategy {
-		initializeAvailableTyreSets() {
-			super.initializeAvailableTyreSets()
+		initializeTyreSets() {
+			super.initializeTyreSets()
 
-			RaceCenter.Instance.initializeAvailableTyreSets(this)
+			RaceCenter.Instance.initializeTyreSets(this)
 		}
 	}
 
 	class SessionTrafficStrategy extends TrafficStrategy {
-		initializeAvailableTyreSets() {
-			super.initializeAvailableTyreSets()
+		initializeTyreSets() {
+			super.initializeTyreSets()
 
-			RaceCenter.Instance.initializeAvailableTyreSets(this)
+			RaceCenter.Instance.initializeTyreSets(this)
 		}
 	}
 
@@ -5442,7 +5442,7 @@ class RaceCenter extends ConfigurationItem {
 		return availableTyreSets
 	}
 
-	initializeAvailableTyreSets(strategy) {
+	initializeTyreSets(strategy) {
 		strategy.AvailableTyreSets := this.computeAvailableTyreSets(strategy.AvailableTyreSets)
 	}
 

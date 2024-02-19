@@ -588,10 +588,10 @@ class RaceStrategist extends GridRaceAssistant {
 			super.__New(strategyManager, configuration, driver)
 		}
 
-		initializeAvailableTyreSets() {
-			super.initializeAvailableTyreSets()
+		initializeTyreSets() {
+			super.initializeTyreSets()
 
-			this.StrategyManager.StrategyManager.initializeAvailableTyreSets(this)
+			this.StrategyManager.StrategyManager.initializeTyreSets(this)
 		}
 
 		calcRemainingLaps(pitstopNr, currentLap, remainingStintLaps, remainingTyreLaps, remainingFuel, fuelConsumption) {
@@ -658,10 +658,10 @@ class RaceStrategist extends GridRaceAssistant {
 			super.__New(strategyManager, configuration, driver)
 		}
 
-		initializeAvailableTyreSets() {
-			super.initializeAvailableTyreSets()
+		initializeTyreSets() {
+			super.initializeTyreSets()
 
-			this.StrategyManager.StrategyManager.initializeAvailableTyreSets(this)
+			this.StrategyManager.StrategyManager.initializeTyreSets(this)
 		}
 
 		calcRemainingLaps(pitstopNr, currentLap, remainingStintLaps, remainingTyreLaps, remainingFuel, fuelConsumption) {
@@ -2687,7 +2687,7 @@ class RaceStrategist extends GridRaceAssistant {
 		return availableTyreSets
 	}
 
-	initializeAvailableTyreSets(strategy) {
+	initializeTyreSets(strategy) {
 		strategy.AvailableTyreSets := this.computeAvailableTyreSets(strategy.AvailableTyreSets, Task.CurrentTask.UsedTyreSets)
 	}
 

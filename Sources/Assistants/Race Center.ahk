@@ -5416,11 +5416,35 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	computeAvailableTyreSets(availableTyreSets) {
+		local lastTyreSet := 0
+		local stint, driver, fuel, tyreCompound, tyreCompoundColor, tyreSet, tyrePressures
+
+		if this.CurrentStint
+			loop this.CurrentStint.Nr {
+				stint := (this.CurrentStint.Nr - (A_Index - 1))
+
+				if this.Stints.Has(stint) {
+					this.getStintSetup(stint, true, &driver, &fuel
+												  , &tyreCompound, &tyreCompoundColor, &tyreSet, &tyrePressures)
+
+					if (tyreSet && (tyreSet != lastTyreSet)) {
+						tyreCompound := compound(tyreCompound, tyreCompoundColor)
+
+						if (availableTyreSets.Has(tyreCompound) && availableTyreSets[tyreCompound].Has(tyreSet))
+							availableTyreSets[tyreCompound][tyreSet] += this.Stints[A_Index].Laps.Length
+					}
+
+					lastTyreSet := tyreSet
+				}
+			}
+
+		/*
 		local compound, translatedCompounds, index, count
 
 		availableTyreSets := availableTyreSets.Clone()
 
 		translatedCompounds := collect(this.TyreCompounds, translate)
+
 
 		loop this.PitstopsListView.GetCount() {
 			index := inList(translatedCompounds, this.PitstopsListView.GetText(A_Index, 5))
@@ -5438,6 +5462,7 @@ class RaceCenter extends ConfigurationItem {
 				}
 			}
 		}
+		*/
 
 		return availableTyreSets
 	}

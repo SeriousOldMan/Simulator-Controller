@@ -495,8 +495,9 @@ Loading of settings is supported for:
 Notes:
 
   1. If you have set a number of required pitstops **and** a pitstop window, it depends on the starting fuel, whether the requirements can be met.
-  2. If you have set a pitstop window, it is possible that some settings of the optimizer settings will be ignored to fullfil the pitstop window requirements.
+  2. If you have set a pitstop window, it is possible that some settings of the optimizer will be ignored to fullfil the pitstop window requirements.
   3. If you choose "Disallowed" for refueling or tyre change, this restriction applies to the whole session. If you have to apply more context specific restrictions, this can be achieved using the rule based validations, which are described in the next section.
+  4. If you are simulating a session with a restricted number of tyre sets, the simulation will kepp track of the the tyre usage and may reuse a tyre set, when necessary. In this case, the tyre set with the least amount of usage will always be used next.
   
 #### Scenario validation
 
@@ -512,14 +513,14 @@ In this case, the current scenario is considered valid, when the tyres will be c
 
 The previous examples are of course very simple. Therefore, before presenting the available predicates, let's take a look at a more complex example.
 
-	validScenario() <= refuels(0), tyreSets(?tyreSets), validTyreSets(?tyreSets)
+	validScenario() <= refuels(0), tyreCompounds(?tyreCompounds), validTyreCompounds(?tyreCompounds)
 
-	validTyreSets(?tyreSets) <= any?([Wet | ?], ?tyreSets)
-	validTyreSets(?tyreSets) <= any?([Intermediate | ?], ?tyreSets)
-	validTyreSets(?tyreSets) <= tyreCompounds(?tyreSets, Dry, ?temp),
-								unique(?temp, ?compounds),
-								length(?compounds, ?length),
-								?length > 1
+	validTyreCompounds(?tyreCompounds) <= any?([Wet | ?], ?tyreCompounds)
+	validTyreCompounds(?tyreCompounds) <= any?([Intermediate | ?], ?tyreCompounds)
+	validTyreCompounds(?tyreCompounds) <= tyreCompounds(?tyreCompounds, Dry, ?temp),
+										  unique(?temp, ?compounds),
+										  length(?compounds, ?length),
+										  ?length > 1
 
 This validation script implements the current pitstop rules in Formula 1 races. In such a race, you are not allowed to refuel the car and you have to use at least two different dry tyre compounds, unless you have a used a wet or an intermediate tyre set during the race.
 

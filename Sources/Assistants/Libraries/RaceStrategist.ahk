@@ -2667,6 +2667,16 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	computeAvailableTyreSets(availableTyreSets, usedTyreSets) {
+		local tyreCompound, ignore, tyreSet
+
+		for ignore, tyreSet in usedTyreSets {
+			tyreCompound := compound(tyreSet.Compound, tyreSet.CompoundColor)
+
+			if (availableTyreSets.Has(tyreCompound) && availableTyreSets[tyreCompound].Has(tyreSet.Set))
+				availableTyreSets[tyreCompound][tyreSet.Set] += tyreSet.Laps
+		}
+
+		/*
 		local tyreCompound, ignore, tyreSet, count
 
 		availableTyreSets := availableTyreSets.Clone()
@@ -2683,6 +2693,7 @@ class RaceStrategist extends GridRaceAssistant {
 					availableTyreSets.Delete(tyreCompound)
 			}
 		}
+		*/
 
 		return availableTyreSets
 	}

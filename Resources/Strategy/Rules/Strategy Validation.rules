@@ -66,9 +66,9 @@ pitstopTyreCompounds(?pitstop, [[?tyreCompound | ?tyreCompoundColor] | ?tyreComp
 pitstopTyreCompounds(?, [])
 
 pitstopTyreSets(?pitstop, ?tyreSets) <= pitstop(?pitstop, ?, ?, ?, false, ?, ?), !, ?nextPitstop = ?pitstop + 1, pitstopTyreSets(?nextPitstop, ?tyreSets)
-pitstopTyreCompounds(?pitstop, [?tyreSet | ?tyreSets]) <=
-		pitstop(?pitstop, ?, ?, ?, ?, ?, ?tyreSet), !, ?nextPitstop = ?pitstop +1, pitstopTyreCompounds(?nextPitstop, ?tyreSets)
-pitstopTyreCompounds(?, [])
+pitstopTyreSets(?pitstop, [?tyreSet | ?tyreSets]) <=
+		pitstop(?pitstop, ?, ?, ?, ?, ?, ?tyreSet), !, ?nextPitstop = ?pitstop +1, pitstopTyreSets(?nextPitstop, ?tyreSets)
+pitstopTyreSets(?, [])
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -3316,7 +3316,7 @@ class PracticeCenter extends ConfigurationItem {
 
 		driverID := ((driver != "-") ? driver.ID : SessionDatabase.ID)
 
-		if (pitstop && (this.Control["runModeDropDown"].Value = 2) && (lap.Run.Laps.Length <= 1)) {
+		if (pitstop && (this.Control["runModeDropDown"].Value = 2) && (lap.Run.Laps.Length > 2)) { ; && (lap.Run.Laps.Length <= 1)) {
 			if isDebug()
 				logMessage(kLogDebug, "addTelemetry(Pitstop) - Lap: " . lap.Nr . "; Run: " . lap.Run.Nr)
 

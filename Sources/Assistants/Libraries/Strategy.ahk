@@ -947,7 +947,7 @@ class VariationSimulation extends StrategySimulation {
 								 , &firstStintWeight, &lastStintWeight)
 
 		consumptionSteps := 1
-		tyreUsageSteps := tyreUsage * 2
+		tyreUsageSteps := tyreUsage ; * 2
 		tyreCompoundVariationSteps := tyreCompoundVariation / 4
 		initialFuelSteps := initialFuel / 5
 		refuelSteps := 1
@@ -1314,7 +1314,7 @@ class TrafficSimulation extends StrategySimulation {
 								 , &firstStintWeight, &lastStintWeight)
 
 		consumptionSteps := 1
-		tyreUsageSteps := tyreUsage * 2
+		tyreUsageSteps := tyreUsage ; * 2
 		tyreCompoundVariationSteps := tyreCompoundVariation / 4
 		initialFuelSteps := initialFuel / 5
 		refuelSteps := 1
@@ -1358,6 +1358,8 @@ class TrafficSimulation extends StrategySimulation {
 			this.TyreCompoundColor := tyreCompoundColor
 			this.TyreCompoundVariation := tyreCompoundVariation
 
+			tyreLapsVariation := tyreUsage
+
 			targetTyreCompound := tyreCompound
 			targetTyreCompoundColor := tyreCompoundColor
 
@@ -1379,8 +1381,6 @@ class TrafficSimulation extends StrategySimulation {
 				loop { ; initialFuel
 					loop { ; refuel
 						loop { ; tyreUsage
-							tyreLapsVariation := tyreUsage
-
 							loop { ; tyreCompoundVariation
 								if (verbose && GetKeyState("Escape", "P"))
 									throw StrategySimulation.CancelSimulation()

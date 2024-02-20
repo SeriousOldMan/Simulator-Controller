@@ -124,7 +124,27 @@ On the last tab you can select or deselect several functions provided by the dif
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Startup%20Profiles%203.JPG)
 
-The checkbox for each function has three states - selected, deselected and indeterminated. The later means that the setting for this function will be used that has been defined elsewhere in your configuration (for example, in the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database").
+The checkbox for each function has three states - selected, deselected and indeterminated. The later means that the setting for this function will be used that has been defined elsewhere in your configuration (for example, in the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database"). See the following list for a description of each function:
+
+| Module           | Function                              | Type              | Description |
+|------------------|---------------------------------------|-------------------|-------------|
+| Driving Coach    | Performance Analysis                  | Setting           | If enabled, the standings data, lap and sector times and so on are collected and are provided to the Driving Coach for further analysis. |
+|                  | Handling Anlaysis                     | Setting           | If enabled, information about over- and understeering are collected during driving and are provided to the Driving Coach for further analysis. |
+| Race Spotter     | Track Automation                      | Controller Action | Enables or disables the Track Automation for the given session. |
+| Race Strategist  | Telemetry Collection                  | Setting           | If enabled, general telemetry data is collected by the Strategist during the given session. |
+|                  | Traffic Analysis                      | Setting           | If this setting is enabled, the Strategist will use a Monte Carlo simulation model to create a probability distribution for the further race development, thereby finding the best possible lap for the next pitstop (see this [Wikipedia](https://en.wikipedia.org/wiki/Monte_Carlo_method) entry for an introduction to Monte Carlo methods). WARNING: This will consume lots of CPU cycles and can take quite some time. It is strongly advised, to let this setting disabled, unless you own a really powerful PC. In team races, it is possible to run the Monte Carlo simulation in the "Race Center", thereby offloading the computational load from the drivers PC. |
+| Race Engineer    | Pressure Collection                   | Setting           | If enabled, pressures (hot and cold) are collected by the Engineer during the given session. |
+|                  | Fuel Warning                          | Setting           | If enabled, the Engineer will issue fuel warnings during the given session. |
+|                  | Damage Warning                        | Setting           | If enabled, the Engineer will issue damage warnings during the given session. |
+|                  | Pressure Warning                      | Setting           |If enabled, the Engineer will issue pressure loss warnings during the given session. |
+|                  | Pressure Correction by Temperature    | Setting           | If enabled, the trend of the air temperature will be considered to apply a small correction to the setup pressures at the next pitstop. |
+|                  | Pressure Correction from Database     | Setting           | If enabled and if cold tyre pressures are available in the pressure database for the current environmental conditions, these values will also be used to calculate the setup pressures at the next pitstop. |
+|                  | Pressure Correction for Pressure Loss | Setting           | If enabled, a detected pressure loss of a tyre will be considered and a correction to the setup pressure at the next pitstop will be automatically applied. |
+|                  | Pitstop Service                       | Setting           | If enabled, pitstop service handling will be available during the given session. You won't want to disable this, right?
+| Motion Feedback  | Motion                                | Controller Action | Enables or disables the motion of a motion rig. |
+| Tactile Feedback | Pedal Vibration                       | Controller Action | Enables or disables the pedal vibration motors. |
+|                  | Front Vibration                       | Controller Action | Enables or disables the the vibration motors at the front of the rig. |
+|                  | Rear Vibration                        | Controller Action | Enables or disables the the vibration motors at the rear of the rig. |
 
 Finally, if you are ready to start, choose the profile you want to start with and close the startup profiles editor. Then click again on the green triangle to start Simulator Controller with the selected profile. As a shortcut, you can hold down the Control key while saving and closing the startup profiles editor, which will trigger the startup process automatically.
 

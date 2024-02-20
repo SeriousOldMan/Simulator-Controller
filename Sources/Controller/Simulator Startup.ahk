@@ -890,9 +890,9 @@ availableFunctions(configuration, &hasTeamServer := false
 		functions.Push(Array("Race Engineer", "Fuel Warning"))
 		functions.Push(Array("Race Engineer", "Damage Warning"))
 		functions.Push(Array("Race Engineer", "Pressure Warning"))
-		functions.Push(Array("Race Engineer", "Correct Pressures by Temperature"))
-		functions.Push(Array("Race Engineer", "Correct Pressures from Database"))
-		functions.Push(Array("Race Engineer", "Correct Pressures for Pressure Loss"))
+		functions.Push(Array("Race Engineer", "Pressure Correction by Temperature"))
+		functions.Push(Array("Race Engineer", "Pressure Correction from Database"))
+		functions.Push(Array("Race Engineer", "Pressure Correction for Pressure Loss"))
 		functions.Push(Array("Race Engineer", "Pitstop Service"))
 	}
 

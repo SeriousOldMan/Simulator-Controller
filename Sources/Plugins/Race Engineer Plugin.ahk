@@ -278,19 +278,19 @@ class RaceEngineerPlugin extends RaceAssistantPlugin {
 				for ignore, session in ["Practice", "Qualification", "Race"]
 					setMultiMapValue(settings, "Assistant.Engineer", "Announcement." . session . ".Pressure", pressureWarning)
 
-			correctByTemperatures := getMultiMapValue(this.StartupSettings, "Functions", "Correct Pressures by Temperature", kUndefined)
+			correctByTemperatures := getMultiMapValue(this.StartupSettings, "Functions", "Pressure Correction by Temperature", kUndefined)
 
 			if (correctByTemperatures != kUndefined)
 				for ignore, session in ["Practice", "Qualification", "Race"]
 					setMultiMapValue(settings, "Session Settings", "Tyre.Pressure.Correction.Temperature", correctByTemperatures)
 
-			correctByDatabase := getMultiMapValue(this.StartupSettings, "Functions", "Correct Pressures from Database", kUndefined)
+			correctByDatabase := getMultiMapValue(this.StartupSettings, "Functions", "Pressure Correction from Database", kUndefined)
 
 			if (correctByDatabase != kUndefined)
 				for ignore, session in ["Practice", "Qualification", "Race"]
 					setMultiMapValue(settings, "Session Settings", "Tyre.Pressure.Correction.Setup", correctByDatabase)
 
-			correctForPressureLoss := getMultiMapValue(this.StartupSettings, "Functions", "Correct Pressures for Pressure Loss", kUndefined)
+			correctForPressureLoss := getMultiMapValue(this.StartupSettings, "Functions", "Pressure Correction for Pressure Loss", kUndefined)
 
 			if (correctForPressureLoss != kUndefined)
 				for ignore, session in ["Practice", "Qualification", "Race"]

@@ -17,6 +17,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\..\Libraries\JSON.ahk"
+#Include "..\..\Libraries\Task.ahk"
 #Include "..\..\Libraries\RuleEngine.ahk"
 #Include "VoiceManager.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
@@ -988,36 +989,40 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	setDebug(option, enabled, *) {
-		local label := false
+		setDebugAsync() {
+			local label := false
 
-		if enabled
-			this.iDebug := (this.iDebug | option)
-		else if (this.Debug[option] == option)
-			this.iDebug := (this.iDebug - option)
+			if enabled
+				this.iDebug := (this.iDebug | option)
+			else if (this.Debug[option] == option)
+				this.iDebug := (this.iDebug - option)
 
-		switch option {
-			case kDebugKnowledgeBase:
-				label := translate("Debug Knowledgebase")
+			switch option {
+				case kDebugKnowledgeBase:
+					label := translate("Debug Knowledgebase")
 
-				if (enabled && this.KnowledgeBase)
-					this.dumpKnowledgeBase(this.KnowledgeBase)
-			case kDebugRules:
-				label := translate("Debug Rule System")
+					if (enabled && this.KnowledgeBase)
+						this.dumpKnowledgeBase(this.KnowledgeBase)
+				case kDebugRules:
+					label := translate("Debug Rule System")
 
-				if (enabled && this.KnowledgeBase)
-					this.dumpRules(this.KnowledgeBase)
+					if (enabled && this.KnowledgeBase)
+						this.dumpRules(this.KnowledgeBase)
+			}
+
+			try {
+				if label
+					if enabled
+						SupportMenu.Check(label)
+					else
+						SupportMenu.Uncheck(label)
+			}
+			catch Any as exception {
+				logError(exception, false, false)
+			}
 		}
 
-		try {
-			if label
-				if enabled
-					SupportMenu.Check(label)
-				else
-					SupportMenu.Uncheck(label)
-		}
-		catch Any as exception {
-			logError(exception, false, false)
-		}
+		Task.startTask(setDebugAsync)
 	}
 
 	toggleDebug(option, *) {

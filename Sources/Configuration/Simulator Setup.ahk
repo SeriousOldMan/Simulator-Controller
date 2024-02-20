@@ -775,31 +775,35 @@ class SetupWizard extends ConfiguratorPanel {
 	}
 
 	setDebug(option, enabled, *) {
-		local label := false
+		setDebugAsync() {
+			local label := false
 
-		if enabled
-			this.iDebug := (this.iDebug | option)
-		else if (this.Debug[option] == option)
-			this.iDebug := (this.iDebug - option)
-
-		switch option {
-			case kDebugKnowledgeBase:
-				label := translate("Debug Knowledgebase")
-
-				if enabled
-					this.dumpKnowledgeBase(this.KnowledgeBase)
-			case kDebugRules:
-				label := translate("Debug Rule System")
-
-				if enabled
-					this.dumpRules(this.KnowledgeBase)
-		}
-
-		if label
 			if enabled
-				SupportMenu.Check(label)
-			else
-				SupportMenu.Uncheck(label)
+				this.iDebug := (this.iDebug | option)
+			else if (this.Debug[option] == option)
+				this.iDebug := (this.iDebug - option)
+
+			switch option {
+				case kDebugKnowledgeBase:
+					label := translate("Debug Knowledgebase")
+
+					if enabled
+						this.dumpKnowledgeBase(this.KnowledgeBase)
+				case kDebugRules:
+					label := translate("Debug Rule System")
+
+					if enabled
+						this.dumpRules(this.KnowledgeBase)
+			}
+
+			if label
+				if enabled
+					SupportMenu.Check(label)
+				else
+					SupportMenu.Uncheck(label)
+		}
+		
+		Task.startTask(setDebugAsync)
 	}
 
 	toggleDebug(option, *) {

@@ -1,9 +1,9 @@
 [Development]
 Version=5.6.0.0-dev
 Target=5.6.0.0-release
-Date=02/18/2024
+Date=02/19/2024
 Download=
-Changes=Support for ex- and import of settings in the "Session Database", New configurable functions for the Startup profiles, Precise control over first and last stint in strategy simulation, Refuel variabtion in "Strategy Simulation", Separate pitstop windows and pitstop rule in strategy simulation, Default for presssure loss correction in "Race Center" is false, Support for fixed pitstops in "Strategy Workbench"
+Changes=Support for ex- and import of settings in the "Session Database", New configurable functions for the Startup profiles, Precise control over first and last stint in strategy simulation, Refuel variabtion in "Strategy Simulation", Separate pitstop windows and pitstop rule in strategy simulation, Default for presssure loss correction in "Race Center" is false, Support for fixed pitstops in "Strategy Workbench", Full tyre set management in the "Strategy Workbench"
 Components=Media->5.5.7,Configuration->5.5.7,Utilities->5.4.8
 [Release]
 Version=5.5.8.0-release

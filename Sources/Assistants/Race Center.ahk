@@ -634,18 +634,18 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	class SessionStrategy extends Strategy {
-		initializeAvailableTyreSets() {
-			super.initializeAvailableTyreSets()
+		initializeTyreSets() {
+			super.initializeTyreSets()
 
-			RaceCenter.Instance.initializeAvailableTyreSets(this)
+			RaceCenter.Instance.initializeTyreSets(this)
 		}
 	}
 
 	class SessionTrafficStrategy extends TrafficStrategy {
-		initializeAvailableTyreSets() {
-			super.initializeAvailableTyreSets()
+		initializeTyreSets() {
+			super.initializeTyreSets()
 
-			RaceCenter.Instance.initializeAvailableTyreSets(this)
+			RaceCenter.Instance.initializeTyreSets(this)
 		}
 	}
 
@@ -5271,7 +5271,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	getStartConditions(&initialStint, &initialLap, &initialStintTime, &initialSessionTime
-					 , &initialTyreLaps, &initialFuelAmount
+					 , &initialTyreSet, &initialTyreLaps, &initialFuelAmount
 					 , &initialMap, &initialFuelConsumption, &initialAvgLapTime) {
 		local lastLap, tyresTable, lap, ignore, stint, telemetryDB
 		local strategy, simulator, car, track, weather, tyreCompound, tyreCompoundColor
@@ -5282,6 +5282,7 @@ class RaceCenter extends ConfigurationItem {
 		initialLap := 0
 		initialSessionTime := 0
 		initialStintTime := 0
+		initialTyreSet := false
 		initialTyreLaps := 0
 		initialFuelAmount := 0
 		initialMap := "n/a"
@@ -5330,6 +5331,8 @@ class RaceCenter extends ConfigurationItem {
 				tyreCompound := strategy.TyreCompound
 				tyreCompoundColor := strategy.TyreCompoundColor
 			}
+
+			initialTyreSet := lastLap.TyreSet
 
 			if !telemetryDB.suitableTyreCompound(simulator, car, track, weather, compound(tyreCompound, tyreCompoundColor))
 				initialTyreLaps := 999
@@ -5416,11 +5419,35 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	computeAvailableTyreSets(availableTyreSets) {
+		local lastTyreSet := 0
+		local stint, driver, fuel, tyreCompound, tyreCompoundColor, tyreSet, tyrePressures
+
+		if this.CurrentStint
+			loop this.CurrentStint.Nr {
+				stint := (this.CurrentStint.Nr - (A_Index - 1))
+
+				if this.Stints.Has(stint) {
+					this.getStintSetup(stint, true, &driver, &fuel
+												  , &tyreCompound, &tyreCompoundColor, &tyreSet, &tyrePressures)
+
+					if (tyreSet && (tyreSet != lastTyreSet)) {
+						tyreCompound := compound(tyreCompound, tyreCompoundColor)
+
+						if (availableTyreSets.Has(tyreCompound) && availableTyreSets[tyreCompound].Has(tyreSet))
+							availableTyreSets[tyreCompound][tyreSet] += this.Stints[A_Index].Laps.Length
+					}
+
+					lastTyreSet := tyreSet
+				}
+			}
+
+		/*
 		local compound, translatedCompounds, index, count
 
 		availableTyreSets := availableTyreSets.Clone()
 
 		translatedCompounds := collect(this.TyreCompounds, translate)
+
 
 		loop this.PitstopsListView.GetCount() {
 			index := inList(translatedCompounds, this.PitstopsListView.GetText(A_Index, 5))
@@ -5438,11 +5465,12 @@ class RaceCenter extends ConfigurationItem {
 				}
 			}
 		}
+		*/
 
 		return availableTyreSets
 	}
 
-	initializeAvailableTyreSets(strategy) {
+	initializeTyreSets(strategy) {
 		strategy.AvailableTyreSets := this.computeAvailableTyreSets(strategy.AvailableTyreSets)
 	}
 

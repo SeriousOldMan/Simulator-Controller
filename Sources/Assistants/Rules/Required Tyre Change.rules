@@ -1,1 +1,1 @@
-validScenario() <= pitstopTyreSets(?tyreSets), length(?tyreSets, ?length), ?length > 0
+validScenario() <= pitstopTyreCompounds(?tyreCompounds), length(?tyreCompounds, ?length), ?length > 0

@@ -495,8 +495,9 @@ Loading of settings is supported for:
 Notes:
 
   1. If you have set a number of required pitstops **and** a pitstop window, it depends on the starting fuel, whether the requirements can be met.
-  2. If you have set a pitstop window, it is possible that some settings of the optimizer settings will be ignored to fullfil the pitstop window requirements.
+  2. If you have set a pitstop window, it is possible that some settings of the optimizer will be ignored to fullfil the pitstop window requirements.
   3. If you choose "Disallowed" for refueling or tyre change, this restriction applies to the whole session. If you have to apply more context specific restrictions, this can be achieved using the rule based validations, which are described in the next section.
+  4. If you are simulating a session with a restricted number of tyre sets, the simulation will keep track of the the tyre usage and may reuse a tyre set, when necessary. In this case, the tyre set with the least amount of usage will always be used next.
   
 #### Scenario validation
 
@@ -506,20 +507,20 @@ Beside the session rules, you can enter into the fields in the "Rules & Settings
 
 Every validation script has to define a "validScenario()" rule, which is invoked by the simulation engine. When this rule returns logical *true*, the current scenario is considered to be a valid strategy. In this simple example, this is the case, when at least one pitstop with refueling has been planned. Let's take a look at another example:
 
-	validScenario() <= pitstopTyreSets(?tyreSets), length(?tyreSets, ?length), ?length > 0
+	validScenario() <= pitstopTyreCompounds(?tyreSets), length(?tyreSets, ?length), ?length > 0
 
-In this case, the current scenario is considered valid, when the tyres will be changed at least once. As yu can see, you have different so called logical predicates like *pitstopFuel* or *pitstopTyreSets* at hand, which you can use to implement your "validScenario()" rule. The available predicates are described below.
+In this case, the current scenario is considered valid, when the tyres will be changed at least once. As yu can see, you have different so called logical predicates like *pitstopFuel* or *pitstopTyreCompounds* at hand, which you can use to implement your "validScenario()" rule. The available predicates are described below.
 
 The previous examples are of course very simple. Therefore, before presenting the available predicates, let's take a look at a more complex example.
 
-	validScenario() <= refuels(0), tyreSets(?tyreSets), validTyreSets(?tyreSets)
+	validScenario() <= refuels(0), tyreCompounds(?tyreCompounds), validTyreCompounds(?tyreCompounds)
 
-	validTyreSets(?tyreSets) <= any?([Wet | ?], ?tyreSets)
-	validTyreSets(?tyreSets) <= any?([Intermediate | ?], ?tyreSets)
-	validTyreSets(?tyreSets) <= tyreCompounds(?tyreSets, Dry, ?temp),
-								unique(?temp, ?compounds),
-								length(?compounds, ?length),
-								?length > 1
+	validTyreCompounds(?tyreCompounds) <= any?([Wet | ?], ?tyreCompounds)
+	validTyreCompounds(?tyreCompounds) <= any?([Intermediate | ?], ?tyreCompounds)
+	validTyreCompounds(?tyreCompounds) <= tyreCompounds(?tyreCompounds, Dry, ?temp),
+										  unique(?temp, ?compounds),
+										  length(?compounds, ?length),
+										  ?length > 1
 
 This validation script implements the current pitstop rules in Formula 1 races. In such a race, you are not allowed to refuel the car and you have to use at least two different dry tyre compounds, unless you have a used a wet or an intermediate tyre set during the race.
 
@@ -539,25 +540,37 @@ Although the logical predicates in *Prolog* look like function calls, the semant
   
      *?refuelAmount* is unified with amount of fuel which will be refilled at the pitstops and *?numRefuels* will be unified with the number of refuels at the pitstops.
   
-  4. *startTyreSet(?tyreCompound, ?tyreCompoundColor)*
+  4. *startTyreCompound(?tyreCompound, ?tyreCompoundColor)*
   
      *?tyreCompound* and *?tyreCompoundColor* are unified with the info for the tyre set which has been mounted at the start of the session. Please note, that for *simple* "Wet", "Intermediate" and "Dry" compounds the color will always be "Black".
+	 
+  5. *startTyreSet(?tyreSet)*
+  
+     Same as the previous one, but you retrieve the number of the mounted tyre set in *?tyreSet*.
 
-  5. *pitstopTyreSets(?tyreSets)*
+  6. *pitstopTyreCompounds(?tyreCompounds)*
   
-     *?tyreSets* is unified with a list of tyre compounds mounted in the various pitstops of the session. A list has the syntactical structure "[element1, element2, ...]". A tyre compound is represented as a pair of compound and color, like "[Dry | White]". Example for two different tyre sets used in a session: "[ [Dry | White], [Wet | Black] ]"
+     *?tyreCompounds* is unified with a list of tyre compounds mounted in the various pitstops of the session. A list has the syntactical structure "[element1, element2, ...]". A tyre compound is represented as a pair of compound and color, like "[Dry | White]". Example for two different tyre sets used in a session: "[ [Dry | White], [Wet | Black] ]"
+
+  7. *pitstopTyreSets(?tyreSets)*
   
-  6. *refuels(?refuels)*
+     *?tyreSets* is unified with a list of the numbers of the tyre sets  mounted in the various pitstops of the session. A list has the syntactical structure "[tyreSet1, tyreSet2, ...]". The tyre set may be false, if no tyre sets are supported or not known for the used tyre compound.
+  
+  8. *refuels(?refuels)*
   
      Convenience predicate for: "refuels(?refuels) <= totalFuel(?, ?refuels)"
 
-  7. *tyreSets(?tyreSets)*
+  9. *tyreCompounds(?tyreCompounds)*
   
-     Similar to *pitstopTyreSets*, but also include the info for the tyres mounted at the start of the session.
+     Similar to *pitstopTyreCompounds*, but also include the info for the tyres mounted at the start of the session.
+
+  10. *tyreSets(?tyreSets)*
   
-  8. *tyreCompounds(?tyreSets, ?tyreCompound, ?tyreCompoundColors)*
+      Similar to *pitstopTyreSets*, but also include the info for the tyres mounted at the start of the session.
   
-     Use this predicate to query the different mixtures (colors) for a given tyre compound. *?tyreSets* is a list of tyre sets as *returned* for example by the *tyreSets* predicate. *?tyreCompound* is identified with the base compound, for example "Dry", "Wet" and so on. For each base compound the list of unique tyre compound colors is unified with *?tyreCompoundColors*. Take a look at the "Formula 1" example, to see how this predicate can be used.
+  11. *tyreCompounds(?tyreCompounds, ?tyreCompound, ?tyreCompoundColors)*
+  
+      Use this predicate to query the used different mixtures (colors) for a given tyre compound. *?tyreCompounds* is a list of tyre sets as *returned* for example by the *tyreCompounds* predicate. *?tyreCompound* is identified with the base compound, for example "Dry", "Wet" and so on. For each base compound the list of unique tyre compound colors is unified with *?tyreCompoundColors*. Take a look at the "Formula 1" example, to see how this predicate can be used.
 
 The above predicates will give you summarized information about all pitstops, which will be sufficient in most cases. But you can also acquire informations about each individual pitstop.
 
@@ -580,8 +593,12 @@ The above predicates will give you summarized information about all pitstops, wh
   5. *pitstopTyreCompound(?nr, ?tyreCompound, ?tyreCompoundColor)*
   
      Gives you access to the tyre compound and mixture to be mounted at the pitstop with *?nr*. When no tyre change is planned, *?tyreCompound* will be unified with false.
+	 
+  6. *pitstopTyreSet(?nr, ?tyreSet)*
+  
+     Gives you access to the tyre set to be mounted at the pitstop with *?nr*. When no tyre change is planned, *?tyreSet* will be unified with false.
 
-  6. *pitstop(?nr, ?lap, ?minute, ?fuelAmount, ?tyreCompound, ?tyreCompoundColor)*
+  7. *pitstop(?nr, ?lap, ?minute, ?fuelAmount, ?tyreCompound, ?tyreCompoundColor)*
   
      This predicate combines all indivdual ones from above like *pitstopLap* into one single predicate which gives you access too all aspects of the pitstop with *?nr* at once.
   
@@ -748,6 +765,8 @@ The video has jump marks, so you can skip the boring time in between the interes
 If there is a need to revise the selected strategy later on, for example due to an accident with an unplanned repair pitstop or also due to severe wether changes, you can instruct the Strategist to recalculate and adjust the currently active strategy using a voice command or the ["StrategyRecommend" controller action](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist). In this case, the currently active strategy will be taken as a template incl. all original settings like pitstop rules, available tyre sets, and so on, but other aspects like starting fuel level or the current weather conditions, will be taken from the actual race situation. Based on this conditions a new strategy will be derived for the remaining race. The Strategist will inform you about the new strategy and will give you as much information as possible about the differences between the currently active and the new strategy. If it is not possible to calculate a new strategy, for example, when too few laps remain or if there is no telemetry data available for the requested weather conditions and tyre compound, the currently active strategy will be canceled upon your decision.
 
 The weather forecast will be taken into account for the new strategy. If the currently mounted tyres are not suitable for the upcoming weather, the new strategy will start with a pitstop to change tyres. For additional information, how tyre compounds are chosen during weather changes, see the [corresponding documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds#using-tyre-compounds) about weather specific tyre compounds.
+
+The Race Strategist will also keep track of all already used tyre sets and will consider this, when running a strategy simulation. However, this only covers tyre set usage in the current session. If there are tyre sets that already have been used in a previous session, for example in a qualifying run, this information is not available.
 
 It is possible to enable a dynamic traffic simulation method, which uses a probabilistic method to predict future race development based on data collected during the race. You can enable or disable this method in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#tab-strategy) or using default settings in ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database). Here you will also find a couple of settings to fine tune various aspects of the algorithm. These [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings) are similar to the [options documented for the stratagy handling in the "Race Center](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#monte-carlo-traffic-model), so please take a look there for more information about the Monte Carlo method.
 

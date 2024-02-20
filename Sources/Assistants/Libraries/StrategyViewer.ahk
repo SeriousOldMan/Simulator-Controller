@@ -88,7 +88,7 @@ class StrategyViewer {
 			pressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressures[A_Index]))
 
 		html .= ("<tr><td><b>" . translate("Fuel:") . "</b></td><td>" . displayValue("Float", convertUnit("Volume", strategy.StartFuel)) . A_Space . getUnit("Volume", true) . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Compound:") . "</b></td><td>" . translate(compound(strategy.TyreCompound, strategy.TyreCompoundColor)) . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Compound:") . "</b></td><td>" . translate(compound(strategy.TyreCompound, strategy.TyreCompoundColor)) . (strategy.TyreSet ? (translate(" [") . strategy.TyreSet . translate("]")) : "") . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Pressures (hot):") . "</b></td><td>" . values2String(", ", pressures*) . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Map:") . "</b></td><td>" . strategy.Map . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("TC:") . "</b></td><td>" . strategy.TC . "</td></tr>")
@@ -173,7 +173,7 @@ class StrategyViewer {
 				lastWeather := (translate(pitstop.Weather) . translate(" (") . displayValue("Float", convertUnit("Temperature", pitstop.AirTemperature)) . translate(" / ") . displayValue("Float", convertUnit("Temperature", pitstop.TrackTemperature), 1) . translate(")"))
 				lastRefuel := pitstop.RefuelAmount
 				lastPitstopInfo := (Format("{1:3}", pitstop.Lap + 1) . translate(" - ") . displayValue("Time", pitstop.Time, true, false, false))
-				lastTyreChange := (pitstop.TyreChange ? translate(compound(pitstop.TyreCompound, pitstop.TyreCompoundColor)) : translate("No"))
+				lastTyreChange := (pitstop.TyreChange ? translate(compound(pitstop.TyreCompound, pitstop.TyreCompoundColor)) . (pitstop.TyreSet ? (translate(" [") . pitstop.TyreSet . translate("]")) : "") : translate("No"))
 				lastTyreLaps := pitstop.RemainingTyreLaps
 
 				timeSeries.Push((pitstop.Time + pitStop.Duration) / 60)

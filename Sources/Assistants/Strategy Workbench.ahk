@@ -3440,12 +3440,13 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	getStartConditions(&initialStint, &initialLap, &initialStintTime, &initialSessionTime
-					 , &initialTyreLaps, &initialFuelAmount
+					 , &initialTyreSet, &initialTyreLaps, &initialFuelAmount
 					 , &initialMap, &initialFuelConsumption, &initialAvgLapTime) {
 		initialStint := 1
 		initialLap := 0
 		initialStintTime := 0
 		initialSessionTime := 0
+		initialTyreSet := false
 		initialTyreLaps := 0
 		initialFuelAmount := convertUnit("Volume", internalValue("Float", this.Control["simInitialFuelAmountEdit"].Text), false)
 		initialMap := this.Control["simMapEdit"].Text

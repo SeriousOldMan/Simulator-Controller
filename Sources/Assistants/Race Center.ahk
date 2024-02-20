@@ -5271,7 +5271,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	getStartConditions(&initialStint, &initialLap, &initialStintTime, &initialSessionTime
-					 , &initialTyreLaps, &initialFuelAmount
+					 , &initialTyreSet, &initialTyreLaps, &initialFuelAmount
 					 , &initialMap, &initialFuelConsumption, &initialAvgLapTime) {
 		local lastLap, tyresTable, lap, ignore, stint, telemetryDB
 		local strategy, simulator, car, track, weather, tyreCompound, tyreCompoundColor
@@ -5282,6 +5282,7 @@ class RaceCenter extends ConfigurationItem {
 		initialLap := 0
 		initialSessionTime := 0
 		initialStintTime := 0
+		initialTyreSet := false
 		initialTyreLaps := 0
 		initialFuelAmount := 0
 		initialMap := "n/a"
@@ -5330,6 +5331,8 @@ class RaceCenter extends ConfigurationItem {
 				tyreCompound := strategy.TyreCompound
 				tyreCompoundColor := strategy.TyreCompoundColor
 			}
+
+			initialTyreSet := lastLap.TyreSet
 
 			if !telemetryDB.suitableTyreCompound(simulator, car, track, weather, compound(tyreCompound, tyreCompoundColor))
 				initialTyreLaps := 999

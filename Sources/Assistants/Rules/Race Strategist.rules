@@ -274,9 +274,10 @@ carLapAvgTime(?lap, ?car, ?times, ?avgTime) <= sum(?times, ?sTimes), length(?tim
 ;;; made.                                                                   ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-priority: 20, [?Lap] => (Prove: currentTyreCompound())
+priority: 20, [?Lap] => (Prove: currentTyreCompound()), (Prove: currentTyreSet())
 
 currentTyreCompound() <= currentTyreCompound(?compound, ?color), Set(Tyre.Compound, ?compound), Set(Tyre.Compound.Color, ?color)
+currentTyreSet() <= currentTyreSet(?tyreSet), Set(Tyre.Set, ?tyreSet)
 
 #Include %kResourcesDirectory%Rules\Weather Notifications.rules
 

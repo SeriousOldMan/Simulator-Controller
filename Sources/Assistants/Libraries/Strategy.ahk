@@ -342,9 +342,9 @@ class StrategySimulation {
 	}
 
 	getStartConditions(&initialStint, &initialLap, &initialStintTime, &initialSessionTime
-					 , &initialTyreLaps, &initialFuelAmount, &initialMap, &initialFuelConsumption, &initialAvgLapTime) {
-		return this.StrategyManager.getStartConditions(&initialStint, &initialLap, &initialStintTime
-													 , &initialSessionTime, &initialTyreLaps, &initialFuelAmount
+					 , &initialTyreSet, &initialTyreLaps, &initialFuelAmount, &initialMap, &initialFuelConsumption, &initialAvgLapTime) {
+		return this.StrategyManager.getStartConditions(&initialStint, &initialLap, &initialStintTime, &initialSessionTime
+													 , &initialTyreSet, &initialTyreLaps, &initialFuelAmount
 													 , &initialMap, &initialFuelConsumption, &initialAvgLapTime)
 	}
 
@@ -524,7 +524,7 @@ class StrategySimulation {
 	}
 
 	createScenarioStrategy(name, initialStint, initialLap, initialStintTime, initialSessionTime
-						 , initialTyreLaps, maxTyreLaps, tyreLapsVariation
+						 , initialTyreSet, initialTyreLaps, maxTyreLaps, tyreLapsVariation
 						 , stintLaps, formationLap, avgLapTime
 						 , ecuMap, fuelConsumption, consumptionVariation
 						 , initialFuelAmount, initialFuelVariation, refuelVariation, fuelCapacity
@@ -556,17 +556,17 @@ class StrategySimulation {
 		lapTime := this.getAvgLapTime(stintLaps, ecuMap, fuelAmount, currentConsumption
 									, weather, tyreCompound, tyreCompoundColor, 0, avgLapTime)
 
-		this.createStints(strategy, initialStint, initialLap, initialStintTime, initialSessionTime, initialTyreLaps
+		this.createStints(strategy, initialStint, initialLap, initialStintTime, initialSessionTime, initialTyreSet, initialTyreLaps
 						, startFuelAmount, initialFuelVariation, refuelVariation, fuelAmount
 						, stintLaps, maxTyreLaps, tyreLapsVariation, ecuMap, currentConsumption, lapTime)
 
 		return strategy
 	}
 
-	createStints(strategy, initialStint, initialLap, initialStintTime, initialSessionTime, initialTyreLaps
+	createStints(strategy, initialStint, initialLap, initialStintTime, initialSessionTime, initialTyreSet, initialTyreLaps
 			   , startFuelAmount, startFuelVariation, startRefuelVariation, fuelAmount
 			   , stintLaps, maxTyreLaps, tyreLapsVariation, ecuMap, consumption, lapTime) {
-		strategy.createStints(initialStint, initialLap, initialStintTime, initialSessionTime, initialTyreLaps
+		strategy.createStints(initialStint, initialLap, initialStintTime, initialSessionTime, initialTyreSet, initialTyreLaps
 							, startFuelAmount, startFuelVariation, startRefuelVariation, fuelAmount
 							, stintLaps, maxTyreLaps, tyreLapsVariation, ecuMap, consumption, lapTime)
 	}
@@ -907,6 +907,7 @@ class VariationSimulation extends StrategySimulation {
 		local initialLap := false
 		local initialStintTime := false
 		local initialSessionTime := false
+		local initialTyreSet := false
 		local initialTyreLaps := false
 		local initialFuelAmount := false
 		local ecuMap := false
@@ -935,7 +936,7 @@ class VariationSimulation extends StrategySimulation {
 							  , &pitstopDelta, &pitstopFuelService, &pitstopTyreService, &pitstopServiceOrder)
 
 		this.getStartConditions(&initialStint, &initialLap, &initialStintTime, &initialSessionTime
-							  , &initialTyreLaps, &initialFuelAmount, &ecuMap, &fuelConsumption, &avgLapTime)
+							  , &initialTyreSet, &initialTyreLaps, &initialFuelAmount, &ecuMap, &fuelConsumption, &avgLapTime)
 
 		if initialLap
 			formationLap := false
@@ -1019,7 +1020,7 @@ class VariationSimulation extends StrategySimulation {
 									scenarios[name . translate(":") . variation]
 										:= this.createScenarioStrategy(name
 																	 , initialStint, initialLap, initialStintTime, initialSessionTime
-																	 , initialTyreLaps, maxTyreLaps, tyreLapsVariation
+																	 , initialTyreSet, initialTyreLaps, maxTyreLaps, tyreLapsVariation
 																	 , stintLaps, formationLap, avgLapTime
 																	 , ecuMap, fuelConsumption, consumption
 																	 , initialFuelAmount, initialFuelRound * 5, refuel, fuelCapacity
@@ -1059,7 +1060,7 @@ class VariationSimulation extends StrategySimulation {
 									scenarios[name . translate(":") . variation]
 										:= this.createScenarioStrategy(name
 																	 , initialStint, initialLap, initialStintTime, initialSessionTime
-																	 , initialTyreLaps, maxTyreLaps, tyreLapsVariation
+																	 , initialTyreSet, initialTyreLaps, maxTyreLaps, tyreLapsVariation
 																	 , stintLaps, formationLap, scenarioAvgLapTime
 																	 , scenarioMap, scenarioFuelConsumption, consumption
 																	 , initialFuelAmount, initialFuelRound * 5, refuel, fuelCapacity
@@ -1262,6 +1263,7 @@ class TrafficSimulation extends StrategySimulation {
 		local initialLap := false
 		local initialStintTime := false
 		local initialSessionTime := false
+		local initialTyreSet := false
 		local initialTyreLaps := false
 		local initialFuelAmount := false
 		local ecuMap := false
@@ -1301,7 +1303,7 @@ class TrafficSimulation extends StrategySimulation {
 							  , overTakeDelta, consideredTraffic)
 
 		this.getStartConditions(&initialStint, &initialLap, &initialStintTime, &initialSessionTime
-							  , &initialTyreLaps, &initialFuelAmount, &ecuMap, &fuelConsumption, &avgLapTime)
+							  , &initialTyreSet, &initialTyreLaps, &initialFuelAmount, &ecuMap, &fuelConsumption, &avgLapTime)
 
 		if initialLap
 			formationLap := false
@@ -1400,7 +1402,7 @@ class TrafficSimulation extends StrategySimulation {
 										scenarios[name . translate(":") . variation]
 											:= this.createScenarioStrategy(name
 																		 , initialStint, initialLap, initialStintTime, initialSessionTime
-																		 , initialTyreLaps, maxTyreLaps, tyreLapsVariation
+																		 , initialTyreSet, initialTyreLaps, maxTyreLaps, tyreLapsVariation
 																		 , stintLaps, formationLap, avgLapTime
 																		 , ecuMap, fuelConsumption, consumption
 																		 , initialFuelAmount, initialFuelRound * 5, refuel, fuelCapacity
@@ -1444,7 +1446,7 @@ class TrafficSimulation extends StrategySimulation {
 										scenarios[name . translate(":") . variation]
 											:= this.createScenarioStrategy(name
 																		 , initialStint, initialLap, initialStintTime, initialSessionTime
-																		 , initialTyreLaps, maxTyreLaps, tyreLapsVariation
+																		 , initialTyreSet, initialTyreLaps, maxTyreLaps, tyreLapsVariation
 																		 , stintLaps, formationLap, scenarioAvgLapTime
 																		 , scenarioMap, scenarioFuelConsumption, consumption
 																		 , initialFuelAmount, initialFuelRound * 5, refuel, fuelCapacity
@@ -1513,6 +1515,7 @@ class Strategy extends ConfigurationItem {
 
 	iStartStint := 1
 	iStartLap := 0
+	iStartTyreSet := false
 	iStartTyreLaps := 0
 	iStintStartTime := 0
 	iSessionStartTime := 0
@@ -2344,6 +2347,12 @@ class Strategy extends ConfigurationItem {
 		}
 	}
 
+	StartTyreSet {
+		Get {
+			return this.iStartTyreSet
+		}
+	}
+
 	StartTyreLaps {
 		Get {
 			return this.iStartTyreLaps
@@ -2569,6 +2578,7 @@ class Strategy extends ConfigurationItem {
 		local initialLap := false
 		local initialStintTime := false
 		local initialSessionTime := false
+		local initialTyreSet := false
 		local initialTyreLaps := false
 		local initialFuelAmount := false
 		local ecuMap := false
@@ -2696,7 +2706,7 @@ class Strategy extends ConfigurationItem {
 			this.iLastStintWeight := lastStintWeight
 
 			this.StrategyManager.getStartConditions(&initialStint, &initialLap, &initialStintTime, &initialSessionTime
-												  , &initialTyreLaps, &initialFuelAmount, &ecuMap, &fuelConsumption, &avgLapTime)
+												  , &initialTyreSet, &initialTyreLaps, &initialFuelAmount, &ecuMap, &fuelConsumption, &avgLapTime)
 
 			duration := ((sessionType = "Duration") ? sessionLength : (sessionLength * avgLapTime))
 			forecast := []
@@ -2841,6 +2851,7 @@ class Strategy extends ConfigurationItem {
 
 		this.iStartStint := getMultiMapValue(configuration, "Session", "StartStint", 1)
 		this.iStartLap := getMultiMapValue(configuration, "Session", "StartLap", 0)
+		this.iStartTyreSet := getMultiMapValue(configuration, "Session", "StartTyreSet", false)
 		this.iStartTyreLaps := getMultiMapValue(configuration, "Session", "StartTyreLaps", 0)
 		this.iStintStartTime := getMultiMapValue(configuration, "Session", "StintStartTime", 0)
 		this.iSessionStartTime := getMultiMapValue(configuration, "Session", "SessionStartTime"
@@ -2984,6 +2995,7 @@ class Strategy extends ConfigurationItem {
 
 		setMultiMapValue(configuration, "Session", "StartStint", this.StartStint)
 		setMultiMapValue(configuration, "Session", "StartLap", this.StartLap)
+		setMultiMapValue(configuration, "Session", "StartTyreSet", this.StartTyreSet)
 		setMultiMapValue(configuration, "Session", "StartTyreLaps", this.StartTyreLaps)
 		setMultiMapValue(configuration, "Session", "StintStartTime", this.StintStartTime)
 		setMultiMapValue(configuration, "Session", "SessionStartTime", this.SessionStartTime)
@@ -3246,7 +3258,21 @@ class Strategy extends ConfigurationItem {
 	}
 
 	calcRemainingLaps(pitstopNr, currentLap, remainingStintLaps, remainingTyreLaps, remainingFuel, fuelConsumption) {
-		return Floor(Min(this.StintLaps, remainingStintLaps, remainingTyreLaps
+		local sessionLaps := this.RemainingSessionLaps
+		local stintLaps := this.StintLaps
+		local pitstopRule := this.PitstopRule
+
+		if (pitstopRule = 1) {
+			fuelLaps := Max(0, (remainingFuel / fuelConsumption) - 1)
+			canonicalStintLaps := Round(sessionLaps / (pitstopRule + 1))
+
+			if (fuelLaps < canonicalStintLaps)
+				stintLaps := Min(stintLaps, Round((sessionLaps - fuelLaps) / pitstopRule))
+			else
+				stintLaps := Min(stintLaps, canonicalStintLaps)
+		}
+
+		return Floor(Min(stintLaps, remainingStintLaps, remainingTyreLaps
 					   , this.getMaxFuelLaps(remainingFuel, fuelConsumption)))
 	}
 
@@ -3302,13 +3328,13 @@ class Strategy extends ConfigurationItem {
 		pitstopRule := this.PitstopRule
 		pitstopWindow := this.PitstopWindow
 
-		if ((pitstopNr = 1) && ((!pitstopRule && (targetLap < remainingSessionLaps)) || isNumber(pitstopRule))
+		if ((pitstopNr = 1) && !pitstopWindow && (targetLap < remainingSessionLaps)
 							&& (targetLap > (currentLap + 1)) && !adjusted) {
 			if (Abs(this.FirstStintWeight) >= 5) {
 				halfLaps := ((targetLap - currentLap) / 2)
 
 				if (halfLaps != 0) {
-					targetLap := (currentLap + Round(halfLaps + ((halfLaps / 100) * this.FirstStintWeight)))
+					targetLap := (targetLap + Round((halfLaps / 100) * this.FirstStintWeight))
 
 					adjusted := true
 				}
@@ -3325,7 +3351,7 @@ class Strategy extends ConfigurationItem {
 			}
 		}
 
-		return targetLap
+		return Floor(Min(targetLap, currentLap + remainingStintLaps, currentLap + (remainingFuel / fuelConsumption)))
 	}
 
 	availableTyreCompounds() {
@@ -3427,7 +3453,7 @@ class Strategy extends ConfigurationItem {
 	}
 
 	createStints(currentStint, currentLap, currentStintTime, currentSessionTime
-			   , currentTyreLaps, startFuel, startFuelVariation, startRefuelVariation, currentFuel
+			   , currentTyreSet, currentTyreLaps, startFuel, startFuelVariation, startRefuelVariation, currentFuel
 			   , stintLaps, maxTyreLaps, tyreLapsVariation
 			   , ecuMap, fuelConsumption, avgLapTime, adjustments := false) {
 		local pitstopLaps := []
@@ -3443,18 +3469,17 @@ class Strategy extends ConfigurationItem {
 
 		this.iStartStint := currentStint
 		this.iStartLap := currentLap
+		this.iStartTyreSet := currentTyreSet
 		this.iStartTyreLaps := currentTyreLaps
 		this.iStintStartTime := currentStintTime
 		this.iSessionStartTime := currentSessionTime
-		this.iTyreLaps := Max(maxTyreLaps - currentTyreLaps, 0)
+		this.iTyreLaps := Max((maxTyreLaps + (maxTyreLaps * tyreLapsVariation / 100 * (Min(100 - Sqrt(Random(0, 10000)), 100) / 100))) - currentTyreLaps, 0)
 		this.iStartFuelAmount := startFuel
 		this.iFuelAmount := currentFuel
 
 		this.iStintLaps := stintLaps
 		this.iMaxTyreLaps := maxTyreLaps
 		this.iTyreLapsVariation := tyreLapsVariation
-
-		this.iTyreLaps := Max((maxTyreLaps + (maxTyreLaps * tyreLapsVariation / 100 * (Min(100 - Sqrt(Random(0, 10000)), 100) / 100))) - currentTyreLaps, 0)
 
 		this.iMap := ecuMap
 		this.iFuelConsumption := fuelConsumption
@@ -3470,7 +3495,7 @@ class Strategy extends ConfigurationItem {
 		numPitstops := this.PitstopRule
 		pitstopWindow := this.PitstopWindow
 
-		if numPitstops {
+		if (numPitstops > 1) {
 			fuelLaps := Max(0, (currentFuel / fuelConsumption) - 1)
 			canonicalStintLaps := Round(sessionLaps / (numPitstops + 1))
 
@@ -3605,7 +3630,10 @@ class Strategy extends ConfigurationItem {
 			this.StrategyManager.setStintDriver(pitstopNr + 1, driverID)
 
 			if ((A_Index = 1) && !this.TyreSet)
-				this.iTyreSet := this.availableTyreSet(this.TyreCompound, this.TyreCompoundColor, &ignore := false, true)
+				if currentTyreSet
+					this.iTyreSet := currentTyreSet
+				else
+					this.iTyreSet := this.availableTyreSet(this.TyreCompound, this.TyreCompoundColor, &ignore := false, true)
 
 			pitstop := this.createPitstop(pitstopNr, pitstopLap, driverID
 										, forcedTyreCompound ? (tyreCompound ? ("!" . tyreCompound) : "!") : tyreCompound
@@ -3760,7 +3788,7 @@ class Strategy extends ConfigurationItem {
 
 			try {
 				this.createStints(this.StartStint, this.StartLap, this.StintStartTime, this.SessionStartTime
-								, this.StartTyreLaps, this.StartFuel, this.InitialFuelVariation, this.RefuelVariation, this.RemainingFuel
+								, this.StartTyreSet, this.StartTyreLaps, this.StartFuel, this.InitialFuelVariation, this.RefuelVariation, this.RemainingFuel
 								, this.StintLaps, this.MaxTyreLaps, this.TyreLapsVariation, this.Map, this.FuelConsumption
 								, this.AvgLapTime, adjustments)
 			}
@@ -3899,7 +3927,7 @@ class TrafficStrategy extends Strategy {
 																	: (rnd * variationWindow)))))
 		}
 		else
-			return targetLap
+			return Floor(Min(targetLap, currentLap + remainingStintLaps, currentLap + (remainingFuel / fuelConsumption)))
 	}
 }
 

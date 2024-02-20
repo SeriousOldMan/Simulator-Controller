@@ -2540,7 +2540,7 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	getStartConditions(&initialStint, &initialLap, &initialStintTime, &initialSessionTime
-					 , &initialTyreLaps, &initialFuelAmount
+					 , &initialTyreSet, &initialTyreLaps, &initialFuelAmount
 					 , &initialMap, &initialFuelConsumption, &initialAvgLapTime) {
 		local knowledgeBase := this.KnowledgeBase
 		local strategy := this.Strategy[true]
@@ -2553,16 +2553,17 @@ class RaceStrategist extends GridRaceAssistant {
 
 			telemetryDB := Task.CurrentTask.TelemetryDatabase
 
+			initialTyreSet := knowledgeBase.getValue("Tyre.Set", "false")
+
 			if !telemetryDB.suitableTyreCompound(strategy.Simulator, strategy.Car, strategy.Track
 											   , knowledgeBase.getValue("Weather.Weather.10Min", strategy.Weather)
 											   , compound(knowledgeBase.getValue("Tyre.Compound", "Dry")
 														, knowledgeBase.getValue("Tyre.Compound.Color", "Black")))
 				initialTyreLaps := 999
-			else {
-				tyreSets := Task.CurrentTask.UsedTyreSets
-
-				initialTyreLaps := tyreSets[tyreSets.Length].Laps
-			}
+			else if (initialStint > 1)
+				initialTyreLaps := Max(0, (knowledgeBase.getValue("Lap", 0) - Task.CurrentTask.Pitstops[initialStint - 1].Lap))
+			else
+				initialTyreLaps := knowledgeBase.getValue("Lap", 0)
 
 			initialFuelAmount := knowledgeBase.getValue("Lap." . initialLap . ".Fuel.Remaining")
 			initialMap := knowledgeBase.getValue("Lap." . initialLap . ".Map")

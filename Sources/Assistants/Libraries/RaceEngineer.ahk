@@ -2770,11 +2770,11 @@ class RaceEngineer extends RaceAssistant {
 
 			setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".Lap", pitstopLap)
 			setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".Refuel"
-						   , knowledgeBase.getValue("Pitstop." . A_Index . ".Fuel"))
+						   , knowledgeBase.getValue("Pitstop." . A_Index . ".Fuel", 0))
 
-			tyreCompound := knowledgeBase.getValue("Pitstop." . A_Index . ".Tyre.Compound")
-			tyreCompoundColor := knowledgeBase.getValue("Pitstop." . A_Index . ".Tyre.Compound.Color")
-			tyreSet := knowledgeBase.getValue("Pitstop." . A_Index . ".Tyre.Set")
+			tyreCompound := knowledgeBase.getValue("Pitstop." . A_Index . ".Tyre.Compound", false)
+			tyreCompoundColor := knowledgeBase.getValue("Pitstop." . A_Index . ".Tyre.Compound.Color", false)
+			tyreSet := knowledgeBase.getValue("Pitstop." . A_Index . ".Tyre.Set", false)
 
 			if tyreCompound {
 				setMultiMapValue(pitstopHistory, "TyreSets", numTyreSets . ".Laps", pitstopLap - lastLap)
@@ -2795,9 +2795,9 @@ class RaceEngineer extends RaceAssistant {
 				setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreChange", false)
 
 			setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".RepairBodywork"
-						   , knowledgeBase.getValue("Pitstop." . A_Index . ".Repair.Bodywork"))
+						   , knowledgeBase.getValue("Pitstop." . A_Index . ".Repair.Bodywork", false))
 			setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".RepairSuspension"
-						   , knowledgeBase.getValue("Pitstop." . A_Index . ".Repair.Suspension"))
+						   , knowledgeBase.getValue("Pitstop." . A_Index . ".Repair.Suspension", false))
 			setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".RepairEngine"
 						   , knowledgeBase.getValue("Pitstop." . A_Index . ".Repair.Engine", false))
 		}

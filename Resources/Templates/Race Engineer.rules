@@ -990,6 +990,7 @@ priority: -10, [?Pitstop.Lap] => (Set: Pitstop.Clear, ?Pitstop.Lap)
 updateDamageReported(?lap) <= ?lastLap = ?lap - 1, Set(Damage.Reported, ?lastLap), Set(Damage.Analysis.Reported, ?lap)
 
 pitstopPerformed(?lap) <= unbound?(!Pitstop.Prepared), !, unpreparedPitstopPerformed(?lap), fail
+
 pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Lap, ?lap)
 pitstopPerformed(?lap) <= Get(Lap, ?lap, Time.End, ?time), Set(Pitstop, !Pitstop.Planned.Nr, Time, ?time)
 pitstopPerformed(?lap) <= Get(Lap, ?lap, Temperature.Air, ?temp), Set(Pitstop, !Pitstop.Planned.Nr, Temperature.Air, ?temp)

@@ -1848,7 +1848,8 @@ class Strategy extends ConfigurationItem {
 				refuelAmount := strategy.calcRefuelAmount(stintLaps * fuelConsumption, remainingFuel, remainingSessionLaps, lastStintLaps)
 
 				if strategy.RefuelVariation {
-					lessFuel := ((Random(0, strategy.RefuelVariation) / strategy.RefuelVariation) * 0.2 * refuelAmount)
+					; lessFuel := ((Random(0, strategy.RefuelVariation) / 100) * 0.5 * refuelAmount)
+					lessFuel := ((Sqrt(Random(0, 10000)) / 100) * (strategy.RefuelVariation / 100) * 0.5 * refuelAmount)
 
 					refuelAmount -= lessFuel
 

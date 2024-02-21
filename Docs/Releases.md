@@ -1,7 +1,7 @@
 ## 5.6.0.0-release 02/23/24 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
-  3. Fixed auto stint creation in "Practice Center", when a pitsopt has been performed without a tyre change.
+  3. Fixed auto stint creation in "Practice Center", when a *normal* pitstop has been performed without a tyre change in any type of session.
   4. New functions are available in the Startup Profiles and the corresponding documentation has been extended with an [overview](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles) of all available functions.
   5. Race settings can now be exported and imported in the "Session Database". See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings-1) for more information.
   6. The consumption option has been removed from the optimizer in "Strategy Workbench". The main idea behind this option was to lower the fuel consumption a little bit, for example, when the driver implements a lift and coast driving style, but the results were not convincing.

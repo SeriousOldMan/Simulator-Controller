@@ -1,0 +1,25 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;   Modular Simulator Controller System - Assetto Corsa Competitizione    ;;;
+;;;                                         Lotus 72D                       ;;;
+;;;                                         Setup Rules                     ;;;
+;;;                                                                         ;;;
+;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
+;;;   License:    (2024) Creative Commons - BY-NC-SA                        ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;-------------------------------------------------------------------------;;;
+;;;                            Initialization                               ;;;
+;;;-------------------------------------------------------------------------;;;
+
+[?Initialize] => (Prove: removeSettings("Assetto Corsa", "Lotus 72D",
+										[Electronics.TC, Electronics.ABS,
+										 Damper.Compression.Fast.Front.Left, Damper.Compression.Fast.Front.Right,
+										 Damper.Compression.Fast.Rear.Left, Damper.Compression.Fast.Rear.Right,
+										 Damper.Rebound.Fast.Front.Left, Damper.Rebound.Fast.Front.Right,
+										 Damper.Rebound.Fast.Rear.Left, Damper.Rebound.Fast.Rear.Right,
+										 Bumpstop.Rate.Front.Left, Bumpstop.Rate.Front.Right,
+										 Bumpstop.Rate.Rear.Left, Bumpstop.Rate.Rear.Right,
+										 Bumpstop.Range.Front.Left, Bumpstop.Range.Front.Right,
+										 Bumpstop.Range.Rear.Left, Bumpstop.Range.Rear.Right])),
+				 (Prove: addSettings("Assetto Corsa", "Lotus 72D",
+									 [Electronics.Turbo, Electronics.Engine.Limiter, Differential.Coast, Differential.Power]))

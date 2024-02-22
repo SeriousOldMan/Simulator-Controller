@@ -29,6 +29,8 @@
 #Include "RF2 Plugin.ahk"
 #Include "PCARS2 Plugin.ahk"
 #Include "RSP Plugin.ahk"
+#Include "LMU Plugin.ahk"
+
 #Include "RST Plugin.ahk"
 
 #include "Integration Plugin.ahk"				; Must be loaded last, if at all

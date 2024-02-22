@@ -2018,8 +2018,12 @@ class StrategyWorkbench extends ConfigurationItem {
 
 			this.showStrategyChart(html)
 		}
-		else
-			this.showStrategyChart(substituteVariables("<html><body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>", {backColor: this.Window.AltBackColor}))
+		else {
+			html := substituteVariables("<html><body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>", {backColor: this.Window.AltBackColor})
+
+			if (this.Control["chartTypeDropDown"].Value = 2)
+				this.showStrategyChart(html)
+		}
 	}
 
 	showDataPlot(data, xAxis, yAxises) {
@@ -3180,6 +3184,21 @@ class StrategyWorkbench extends ConfigurationItem {
 		local chartID := false
 		local strategy, before, after, chart, ignore, laps, exhausted, index, hasData
 		local sLaps, html, timeSeries, lapSeries, fuelSeries, tyreSeries, width, chartArea, tableCSS
+
+		compare(a, b) {
+			if ((a.SessionType = "Duration") && (b.SessionType = "Duration")) {
+				if (a.getSessionLaps() < b.getSessionLaps())
+					return true
+				else if (a.getSessionLaps() > b.getSessionLaps())
+					return false
+				else
+					return (a.getSessionDuration() > b.getSessionDuration())
+			}
+			else
+				return (a.getSessionDuration() > b.getSessionDuration())
+		}
+
+		bubbleSort(&strategies, compare)
 
 		before := "
 		(

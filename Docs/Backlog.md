@@ -7,7 +7,7 @@
 	 - Relative performance
 
 #### Simulation Support
-  1. Better integration with the weather forecast data of *rFactor 2*
+  1. Better integration with the weather forecast data of *rFactor 2* and *Le Mans Ultimate*
   2. Support for new and also historic simulators (coming: Le Mans Ultimate)
 
 #### Assistants

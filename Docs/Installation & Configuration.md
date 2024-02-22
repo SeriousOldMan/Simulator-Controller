@@ -196,16 +196,17 @@ Please note, that you can remove presets later on. But depending on the type of 
 
 "Simulator Setup" scans various locations to auto detect the installed games and other applications which might be useful. However, sometimes it might be necessary to locate a software manually, especially, if this software has been installed in an uncommon location. You can use the "Locate..." button to manually identify the desired software in this case. For simulation games, this file must be a special one, which identifies the given software. Please consult the following table:
 
-| Simulator                   | File             | Comments                                        |
-|-----------------------------|------------------|-------------------------------------------------|
-| Assetto Corsa               | AssettoCorsa.exe |                                                 |
-| Assetto Corsa  Competizione | acc.exe          |                                                 |
-| rFactor 2                   | rFactor2.exe     |                                                 |
-| RaceRoom Racing Experience  | RRRE.exe         |                                                 |
-| iRacing                     | iRacingUI.exe    | This file is located in a subfolder named "ui". |
-| Automobilista 2             | AMS2.exe         |                                                 |
-| Project Cars 2              | pcars2avx.exe    |                                                 |
-| Rennsport                   | Rennsport.exe    |                                                 |
+| Simulator                   | File                 | Comments                                        |
+|-----------------------------|----------------------|-------------------------------------------------|
+| Assetto Corsa               | AssettoCorsa.exe     |                                                 |
+| Assetto Corsa  Competizione | acc.exe              |                                                 |
+| rFactor 2                   | rFactor2.exe         |                                                 |
+| Le Mans Ultimate            | Le Mans Ultimate.exe |                                                 |
+| RaceRoom Racing Experience  | RRRE.exe             |                                                 |
+| iRacing                     | iRacingUI.exe        | This file is located in a subfolder named "ui". |
+| Automobilista 2             | AMS2.exe             |                                                 |
+| Project Cars 2              | pcars2avx.exe        |                                                 |
+| Rennsport                   | Rennsport.exe        |                                                 |
 
 #### Patching the configuration
 

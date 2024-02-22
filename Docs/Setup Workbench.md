@@ -95,9 +95,13 @@ Please, note that all of this also applies to the Virtual Race Assistants, but y
   
      Please copy the complete *SimlatorController* folder, which is located in the *Utilities\Plugins* folder of the Simulator Controller installation, to the Steam installation folder of *Assetto Corsa* and there into the *apps\python* folder. You will have to enable this plugin in the *Asseto Corsa* settings afterwards. This plugin uses code originally developed by *Sparten* which can be found at [GitHub](https://github.com/Sparten/ACInternalMemoryReader).
   
-  2. *rFactor 2*
+  2. *rFactor 2* and *Le Mans Ultimate*
   
-     You can find the plugin *rFactor2SharedMemoryMapPlugin64.dll* in *Utilities\Plugins* folder the Simulator Controller installation or you can load the [latest version](https://github.com/TheIronWolfModding/rF2SharedMemoryMapPlugin) from GitHub. Copy the DLL file to the *Bin64\Plugins* folder in the Steam installation directory of *rFactor 2*.
+     You can find the plugin *rFactor2SharedMemoryMapPlugin64.dll* in *Utilities\Plugins* folder the Simulator Controller installation or you can load the [latest version](https://github.com/TheIronWolfModding/rF2SharedMemoryMapPlugin) from GitHub.
+	 
+	 *rFactor 2*: Copy the DLL file to the *Bin64\Plugins* folder in the Steam installation directory of *rFactor 2*.
+	 
+	 *Le Mans Ultimate*: Copy the DLL to the *Plugins* folder in the Steam installation directory of *Le Mans Ultimate*. Then start the game once, go to the track and rive out the pit. Leave the game and open the file *UserData\player\CustomPluginVariables.JSON* with a text editor and set " Enabled:" to **1**.
 
   3. *Automobilista 2* and *Project CARS 2*
   

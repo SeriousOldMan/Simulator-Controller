@@ -153,22 +153,22 @@ Please note, that the corresponding settings in the ["Session Database"](https:/
 
 As mentioned, each simulator is different. The Spotter will make as much out of the data supplied by the simulation as possible, as long as a specific information is available, even if it is somewhat restricted. The following table shows you which capability of the Spotter is available in the different simulators.
 
-| Capability                      | Assetto Corsa | Assetto Corsa Competizione | Automobilista 2 | iRacing | RaceRoom Racing Experience | rFactor 2 | Project CARS 2 |
-| ------------------------------- | --------------| -------------------------- | --------------- | ------- | -------------------------- | --------- | -------------- |
-| Side Alert                      | Yes (1)       | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
-| Behind Alert                    | Yes           | Yes                        | Yes             | Yes (2) | Yes                        | Yes       | Yes            |
-| Yellow Flag                     | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
-| Full Course Yellow              | No            | No                         | No              | No      | No                         | No        | No             |
-| Sector Yellow                   | No            | Yes                        | No              | No      | Yes                        | Yes       | No             |
-| Yellow Distance                 | No            | No                         | No              | No      | Yes                        | No        | No             |
-| Blue Flag                       | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
-| Track Cuts (Invalid Laps)       | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
-| Penalty Information             | No            | Yes                        | No              | No      | Yes                        | Yes (6)   | No             |
-| Pit Window                      | No            | Yes (by time)              | Yes (by lap)    | No      | Yes (by time and lap)      | No        | Yes (by lap)   |
-| Race Start (Green Flag)         | No            | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
-| Delta Information               | Yes           | Yes (3)                    | Yes             | Yes     | Yes                        | Yes       | Yes            |
-| Tactical Advices (4)            | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
-| General Session Information (5) | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
+| Capability                      | Assetto Corsa | Assetto Corsa Competizione | Automobilista 2 | iRacing | RaceRoom Racing Experience | rFactor 2 | Project CARS 2 | Le Mans Ultimate |
+| ------------------------------- | --------------| -------------------------- | --------------- | ------- | -------------------------- | --------- | -------------- | ---------------- |
+| Side Alert                      | Yes (1)       | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              |
+| Behind Alert                    | Yes           | Yes                        | Yes             | Yes (2) | Yes                        | Yes       | Yes            | Yes              |
+| Yellow Flag                     | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              |
+| Full Course Yellow              | No            | No                         | No              | No      | No                         | No        | No             | No               |
+| Sector Yellow                   | No            | Yes                        | No              | No      | Yes                        | Yes       | No             | Yes              |
+| Yellow Distance                 | No            | No                         | No              | No      | Yes                        | No        | No             | No               |
+| Blue Flag                       | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              |
+| Track Cuts (Invalid Laps)       | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              |
+| Penalty Information             | No            | Yes                        | No              | No      | Yes                        | Yes (6)   | No             | Yes (6)          |
+| Pit Window                      | No            | Yes (by time)              | Yes (by lap)    | No      | Yes (by time and lap)      | No        | Yes (by lap)   | No               |
+| Race Start (Green Flag)         | No            | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              |
+| Delta Information               | Yes           | Yes (3)                    | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              |
+| Tactical Advices (4)            | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              |
+| General Session Information (5) | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              |
 
 ##### Notes
 

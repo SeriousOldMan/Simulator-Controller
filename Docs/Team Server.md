@@ -360,7 +360,7 @@ A menu appears, which let you choose one of the tyre pressure setups from the "S
 
 #### Automatically select the next driver
 
-The automatic selection of the next driver is supported for *Assetto Corsa Competizione* and *rFactor 2*, as long as the following apply:
+The automatic selection of the next driver is supported for *Assetto Corsa Competizione*, *rFactor 2* and *Le Mans Ultimate* (in the future), as long as the following apply:
 
   1. A stint plan is available and is up to date, at least for the driver of the current and the driver for the next stint.
   2. You selected the participating drivers from all available drivers of your team and ordered them according to the entry list of the event using "Select Team..." command in the "Session" or in the "Pitstop" menu. Once you have done this, you can choose the next driver when planning a pitstop using the correspnding drop down menu.
@@ -385,7 +385,7 @@ This floating window, which can be left open all the time, will be updated once 
 
    Information about a tyre change is really selected and the chosen tyre compound is not available. The most probable tyre compound will be derived from current and future weather conditions. Also, information about the chosen repair settings (although the time needed for the repair may be computed) and the chosen next driver is not available. Refuel amount, tyre pressures and tyre set are exact.
 
-2. *rFactor 2*
+2. *rFactor 2* and *Le Mans Ultimate*
 
    Refuel amount, chosen tyre compound and pressures, as well as the repair settings are exact.
 

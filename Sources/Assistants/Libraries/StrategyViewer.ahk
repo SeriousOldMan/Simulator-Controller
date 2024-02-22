@@ -66,12 +66,12 @@ class StrategyViewer {
 		html .= ("<tr><td><b>" . translate("Track:") . "</b></td><td>" . sessionDB.getTrackName(simulator, track) . "</td></tr>")
 
 		if (strategy.SessionType = "Duration") {
-			html .= ("<tr><td><b>" . translate("Duration:") . "</b></td><td>" . strategy.SessionLength . A_Space . translate("Minutes") . "</td></tr>")
+			html .= ("<tr><td><b>" . translate("Duration:") . "</b></td><td>" . strategy.SessionLength . A_Space . translate("(") . Round(strategy.getSessionDuration() / 60, 1) . translate(")") . A_Space . translate("Minutes") . "</td></tr>")
 			html .= ("<tr><td><b>" . translate("Laps:") . "</b></td><td>" . displayValue("Float", strategy.getSessionLaps(), 1) . A_Space . translate("Laps") . "</td></tr>")
 		}
 		else {
 			html .= ("<tr><td><b>" . translate("Laps:") . "</b></td><td>" . strategy.SessionLength . A_Space . translate("Laps") . "</td></tr>")
-			html .= ("<tr><td><b>" . translate("Duration:") . "</b></td><td>" . Round(strategy.getSessionDuration() / 60) . A_Space . translate("Minutes") . "</td></tr>")
+			html .= ("<tr><td><b>" . translate("Duration:") . "</b></td><td>" . Round(strategy.getSessionDuration() / 60, 1) . A_Space . translate("Minutes") . "</td></tr>")
 		}
 
 		html .= ("<tr><td><b>" . translate("Weather:") . "</b></td><td>" . translate(strategy.Weather) . translate(" (") . displayValue("Float", convertUnit("Temperature", strategy.AirTemperature)) . translate(" / ") . displayValue("Float", convertUnit("Temperature", strategy.TrackTemperature)) . translate(")") . "</td></tr>")

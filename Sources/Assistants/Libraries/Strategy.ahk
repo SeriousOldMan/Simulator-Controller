@@ -3332,7 +3332,10 @@ class Strategy extends ConfigurationItem {
 		if ((pitstopNr = 1) && !pitstopWindow && (targetLap < remainingSessionLaps)
 							&& (targetLap > (currentLap + 1)) && !adjusted) {
 			if (Abs(this.FirstStintWeight) >= 5) {
-				halfLaps := ((targetLap - currentLap) / 2)
+				if (currentLap != 0)
+					halfLaps := ((targetLap - currentLap) / 2)
+				else
+					halfLaps := (targetLap * 0.9)
 
 				if (halfLaps != 0) {
 					targetLap := (targetLap + Round((halfLaps / 100) * this.FirstStintWeight))
@@ -3352,7 +3355,7 @@ class Strategy extends ConfigurationItem {
 			}
 		}
 
-		return Floor(Min(targetLap, currentLap + remainingStintLaps, currentLap + (remainingFuel / fuelConsumption)))
+		return Floor(Min(targetLap, currentLap + remainingStintLaps, currentLap + ((remainingFuel - this.SafetyFuel) / fuelConsumption)))
 	}
 
 	availableTyreCompounds() {
@@ -3743,7 +3746,7 @@ class Strategy extends ConfigurationItem {
 			else {
 				fullLaps := this.getMaxFuelLaps(this.FuelCapacity, this.FuelConsumption[true])
 
-				if ((Abs(this.LastStintWeight) >= 5) && !this.PitstopWindow) {
+				if (Abs(this.LastStintWeight) >= 5) { ; && !this.PitstopWindow) {
 					halfLaps := (Min(remainingSessionLaps, fullLaps) / 2)
 					stintLaps := Floor(Max((remainingSessionLaps - (this.FuelCapacity / this.FuelConsumption[true]))
 										 , Round(halfLaps + ((halfLaps / 100) * this.LastStintWeight))))

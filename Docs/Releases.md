@@ -10,11 +10,13 @@
   9. The regular pitstop window is now a separate entry in the pitstop rules in the "Strategy Workbench". You now can have 2 required pitstops in this window, for example.
   10. There is a new tab "Pitstops (fixed)" available in the "Strategy Workbench", which allows you to fix the lap for one or more pitstops during strategy simulation. But there are some drawbacks, so read the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#pitstops-fixed) carefully.
   11. The strategy simulation in the "Strategy Workbench" and the "Race Center" and also, when run by the Race Strategist, now keep track of tyre usage for all tyre sets. Tyre sets will appropriately be re-used in sessions with a restricted number of tyre sets and the strategy simulation will try to optimize the overall utilization of tyre sets for the whole session.
-  12. Tyre set numbers are display in the strategy summary report in the "Strategy Workbench" and also in the "Race Center".
-  13. The default for the automatic pressure loss correction is now *Off* in the "Race Center".
-  14. Several new RSS Formula cars have been included in the car meta data DLC by @mirko_lesko.
-  15. [Experts only] The rules for strategy validation in the "Strategy Workbench" have been revised and extended. Full information about tyre sets are now available for each pitstop. Please see the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#scenario-validation) for more information.
-  16. New car models for "Setup Workbench":
+  12. Tyre set numbers are displayed in the strategy summary report in the "Strategy Workbench" and also in the "Race Center".
+  13. For sessions with a fixed time, the strategy report now displays the full session time (enclosed in paranthesis) in the "Duration" field of the report.
+  14. The strategy chart (fuel and tyre diagram) can now also be displayed in the upper area of the "Strategy Workbench". Choose "Strategy" from the "Chart" drop down menu located above the chart area.
+  15. The default for the automatic pressure loss correction is now *Off* in the "Race Center".
+  16. Several new RSS Formula cars have been included in the car meta data DLC by @mirko_lesko.
+  17. [Experts only] The rules for strategy validation in the "Strategy Workbench" have been revised and extended. Full information about tyre sets are now available for each pitstop. Please see the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#scenario-validation) for more information.
+  18. New car models for "Setup Workbench":
       - Assetto Corsa
         - Lotus 72D
         - Lotus 98T

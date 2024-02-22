@@ -407,6 +407,8 @@ If you have data for different drivers available in your telemetry database, you
 
 The lower area allows you to create a race strategy. You have to enter the race rules and various settings before you can use the simulation tool to create the required pitstops based partly on your entered settings and also on the telemetry information. In the lower left part of the window, you find a tabbed pane with several input sections.
 
+Good to know: The chart in the upper area of the "Strategy Workbench" allows you to display different information. You can choose between "Telemetry", "Strategy" and "Comparison" in the "Chart" menu located above the chart area. The default, "Telemetry", displays the information for the currently selected set of data. "Strategy" will display the consumption graph of the currently selected strategy and "Comparison" displays the report of the last strategy comparison, if any.
+
 ### Rules & Settings
 
 In the first tab you enter the rules and settings for the upcoming event. Using the *Settings* drop down menu directly above the tabbed area, you can load settings values from different sources, for example from the Session Database or the from the currently active simulation.

@@ -83,6 +83,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 	iTelemetryChartHTML := false
 	iStrategyChartHTML := false
+	iComparisonChartHTML := false
 
 	iTyreSetListView := false
 
@@ -111,14 +112,14 @@ class StrategyWorkbench extends ConfigurationItem {
 		__New(arguments*) {
 			super.__New(arguments*)
 
-			Task.startTask(ObjBindMethod(this, "RedrawHTMLViwer"), 500, kLowPriority)
+			Task.startTask(ObjBindMethod(this, "RedrawHTMLViewer"), 500, kLowPriority)
 		}
 
 		Redraw() {
 			this.iRedraw := true
 		}
 
-		RedrawHTMLViwer() {
+		RedrawHTMLViewer() {
 			if this.iRedraw {
 				local workbench := StrategyWorkbench.Instance
 				local ignore, button
@@ -138,7 +139,7 @@ class StrategyWorkbench extends ConfigurationItem {
 					workbench.loadChart(["Scatter", "Bar", "Bubble", "Line"][workbench.Control["chartTypeDropDown"].Value])
 				else {
 					workbench.ChartViewer.document.open()
-					workbench.ChartViewer.document.write(workbench.iStrategyChartHTML)
+					workbench.ChartViewer.document.write((workbench.Control["chartSourceDropDown"].Value = 2) ? workbench.iStrategyChartHTML : workbench.iComparisonChartHTML)
 					workbench.ChartViewer.document.close()
 				}
 			}
@@ -459,7 +460,16 @@ class StrategyWorkbench extends ConfigurationItem {
 				workbenchGui["chartTypeDropDown"].Visible := false
 
 			workbench.ChartViewer.document.open()
-			workbench.ChartViewer.document.write((chartSourceDropDown = 1) ? workbench.iTelemetryChartHTML : workbench.iStrategyChartHTML)
+
+			switch chartSourceDropDown {
+				case 1:
+					workbench.ChartViewer.document.write(workbench.iTelemetryChartHTML)
+				case 2:
+					workbench.ChartViewer.document.write(workbench.iStrategyChartHTML)
+				case 3:
+					workbench.ChartViewer.document.write(workbench.iComparisonChartHTML)
+			}
+
 			workbench.ChartViewer.document.close()
 		}
 
@@ -986,6 +996,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		this.iTelemetryChartHTML := substituteVariables("<html><body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>", {backColor: workbenchGui.AltBackColor})
 		this.iStrategyChartHTML := this.iTelemetryChartHTML
+		this.iComparisonChartHTML := this.iTelemetryChartHTML
 
 		workbenchGui.SetFont("s10 Bold", "Arial")
 
@@ -1101,7 +1112,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.Add("DropDownList", "x250 yp+24 w130 X:Move(0.1) Choose1 vdataY3DropDown", schema).OnEvent("Change", chooseAxis)
 
 		workbenchGui.Add("Text", "x400 ys w40 h23 X:Move(0.1) +0x200", translate("Chart"))
-		workbenchGui.Add("DropDownList", "x444 yp w80 X:Move(0.1) Choose1 +0x200 vchartSourceDropDown", collect(["Telemetry", "Comparison"], translate)).OnEvent("Change", chooseChartSource)
+		workbenchGui.Add("DropDownList", "x444 yp w80 X:Move(0.1) Choose1 +0x200 vchartSourceDropDown", collect(["Telemetry", "Strategy", "Comparison"], translate)).OnEvent("Change", chooseChartSource)
 		workbenchGui.Add("DropDownList", "x529 yp w80 X:Move(0.1) Choose1 vchartTypeDropDown", collect(["Scatter", "Bar", "Bubble", "Line"], translate)).OnEvent("Change", chooseChartType)
 
 		this.iChartViewer := workbenchGui.Add("HTMLViewer", "x400 yp+24 w950 h350 Border vchartViewer X:Move(0.1) W:Grow(0.9) H:Grow(0.2)")
@@ -1706,7 +1717,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		this.Control["chartTypeDropDown"].Visible := true
 	}
 
-	showComparisonChart(html) {
+	showStrategyChart(html) {
 		this.ChartViewer.document.open()
 		this.ChartViewer.document.write(html)
 		this.ChartViewer.document.close()
@@ -1714,6 +1725,17 @@ class StrategyWorkbench extends ConfigurationItem {
 		this.iStrategyChartHTML := html
 
 		this.Control["chartSourceDropDown"].Choose(2)
+		this.Control["chartTypeDropDown"].Visible := false
+	}
+
+	showComparisonChart(html) {
+		this.ChartViewer.document.open()
+		this.ChartViewer.document.write(html)
+		this.ChartViewer.document.close()
+
+		this.iComparisonChartHTML := html
+
+		this.Control["chartSourceDropDown"].Choose(3)
 		this.Control["chartTypeDropDown"].Visible := false
 	}
 
@@ -1758,7 +1780,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 			this.Control["pitstopWindowDropDown"].Delete()
 			this.Control["pitstopWindowDropDown"].Add(collect(["Always", "Window"], translate))
-			this.Control["pitstopWindowDropDown"].Choose(oldTChoice)
+			this.Control["pitstopWindowDropDown"].Choose(inList(["Always", "Window"], oldTChoice))
 		}
 		else {
 			this.Control["pitstopRuleEdit"].Visible := false
@@ -1946,7 +1968,58 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	showStrategyInfo(strategy) {
+		local html, drawChartFunction, chartID, width, before, after
+		local timeSeries, lapSeries, fuelSeries, tyreSeries
+
 		this.StrategyViewer.showStrategyInfo(strategy)
+
+		if strategy {
+			before := "
+			(
+				<meta charset='utf-8'>
+				<head>
+					<style>
+						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
+						.rowStyle { font-size: 11px; background-color: #%evenRowBackColor%; }
+						.oddRowStyle { font-size: 11px; background-color: #%oddRowBackColor%; }
+					</style>
+					<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+					<script type="text/javascript">
+						google.charts.load('current', {'packages':['corechart', 'table']}).then(drawChart);
+			)"
+
+			before := substituteVariables(before, {headerBackColor: this.Window.Theme.ListBackColor["Header"]
+												 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
+												 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
+
+			after := "
+			(
+					</script>
+				</head>
+			)"
+
+			timeSeries := []
+			lapSeries := []
+			fuelSeries := []
+			tyreSeries := []
+
+			this.createStintsInfo(strategy, &timeSeries, &lapSeries, &fuelSeries, &tyreSeries)
+
+			drawChartFunction := false
+			chartID := false
+
+			width := (this.ChartViewer.getWidth() - 4)
+
+			html := this.createConsumablesChart(strategy, width, width / 2, timeSeries, lapSeries, fuelSeries, tyreSeries, &drawChartFunction, &chartID)
+
+			tableCSS := this.StrategyViewer.getTableCSS()
+
+			html := ("<html>" . before . drawChartFunction . "; function drawChart() { drawChart" . chartID . "(); }" . after . "<body style='background-color: #" . this.Window.AltBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style>" . tableCSS . "</style><style> #header { font-size: 12px; } </style>" . html . "</body></html>")
+
+			this.showStrategyChart(html)
+		}
+		else
+			this.showStrategyChart(substituteVariables("<html><body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>", {backColor: this.Window.AltBackColor}))
 	}
 
 	showDataPlot(data, xAxis, yAxises) {

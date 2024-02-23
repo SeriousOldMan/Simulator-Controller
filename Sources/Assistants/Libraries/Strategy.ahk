@@ -947,7 +947,7 @@ class VariationSimulation extends StrategySimulation {
 								 , &firstStintWeight, &lastStintWeight)
 
 		consumptionSteps := 1
-		tyreUsageSteps := tyreUsage * 2
+		tyreUsageSteps := tyreUsage ; * 2
 		tyreCompoundVariationSteps := tyreCompoundVariation / 4
 		initialFuelSteps := initialFuel / 5
 		refuelSteps := 1
@@ -1314,7 +1314,7 @@ class TrafficSimulation extends StrategySimulation {
 								 , &firstStintWeight, &lastStintWeight)
 
 		consumptionSteps := 1
-		tyreUsageSteps := tyreUsage * 2
+		tyreUsageSteps := tyreUsage ; * 2
 		tyreCompoundVariationSteps := tyreCompoundVariation / 4
 		initialFuelSteps := initialFuel / 5
 		refuelSteps := 1
@@ -1358,6 +1358,8 @@ class TrafficSimulation extends StrategySimulation {
 			this.TyreCompoundColor := tyreCompoundColor
 			this.TyreCompoundVariation := tyreCompoundVariation
 
+			tyreLapsVariation := tyreUsage
+
 			targetTyreCompound := tyreCompound
 			targetTyreCompoundColor := tyreCompoundColor
 
@@ -1379,8 +1381,6 @@ class TrafficSimulation extends StrategySimulation {
 				loop { ; initialFuel
 					loop { ; refuel
 						loop { ; tyreUsage
-							tyreLapsVariation := tyreUsage
-
 							loop { ; tyreCompoundVariation
 								if (verbose && GetKeyState("Escape", "P"))
 									throw StrategySimulation.CancelSimulation()
@@ -1848,7 +1848,8 @@ class Strategy extends ConfigurationItem {
 				refuelAmount := strategy.calcRefuelAmount(stintLaps * fuelConsumption, remainingFuel, remainingSessionLaps, lastStintLaps)
 
 				if strategy.RefuelVariation {
-					lessFuel := ((Random(0, strategy.RefuelVariation) / strategy.RefuelVariation) * 0.2 * refuelAmount)
+					; lessFuel := ((Random(0, strategy.RefuelVariation) / 100) * 0.5 * refuelAmount)
+					lessFuel := ((Sqrt(Random(0, 10000)) / 100) * (strategy.RefuelVariation / 100) * 0.5 * refuelAmount)
 
 					refuelAmount -= lessFuel
 
@@ -3331,7 +3332,10 @@ class Strategy extends ConfigurationItem {
 		if ((pitstopNr = 1) && !pitstopWindow && (targetLap < remainingSessionLaps)
 							&& (targetLap > (currentLap + 1)) && !adjusted) {
 			if (Abs(this.FirstStintWeight) >= 5) {
-				halfLaps := ((targetLap - currentLap) / 2)
+				if (currentLap != 0)
+					halfLaps := ((targetLap - currentLap) / 2)
+				else
+					halfLaps := (targetLap * 0.9)
 
 				if (halfLaps != 0) {
 					targetLap := (targetLap + Round((halfLaps / 100) * this.FirstStintWeight))
@@ -3351,7 +3355,7 @@ class Strategy extends ConfigurationItem {
 			}
 		}
 
-		return Floor(Min(targetLap, currentLap + remainingStintLaps, currentLap + (remainingFuel / fuelConsumption)))
+		return Floor(Min(targetLap, currentLap + remainingStintLaps, currentLap + ((remainingFuel - this.SafetyFuel) / fuelConsumption)))
 	}
 
 	availableTyreCompounds() {
@@ -3742,7 +3746,7 @@ class Strategy extends ConfigurationItem {
 			else {
 				fullLaps := this.getMaxFuelLaps(this.FuelCapacity, this.FuelConsumption[true])
 
-				if ((Abs(this.LastStintWeight) >= 5) && !this.PitstopWindow) {
+				if (Abs(this.LastStintWeight) >= 5) { ; && !this.PitstopWindow) {
 					halfLaps := (Min(remainingSessionLaps, fullLaps) / 2)
 					stintLaps := Floor(Max((remainingSessionLaps - (this.FuelCapacity / this.FuelConsumption[true]))
 										 , Round(halfLaps + ((halfLaps / 100) * this.LastStintWeight))))

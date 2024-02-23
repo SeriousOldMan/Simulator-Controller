@@ -37,7 +37,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 5.6.0
 
-No manual updates necessary.
+Only relevant, if you have used strategy scnerio validation rules: The capabilities of the rule engine for strategy scenario validation has been extended in the "Strategy Workbench". Tyre set information is now available for the first stint and also for each pitstop with a tyre change. To keep thiings tidy and clean, some rules have been renamed. You must adopt your own validation rules to reflect the new naming scheme. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#scenario-validation) for more information.
 
 ***
 

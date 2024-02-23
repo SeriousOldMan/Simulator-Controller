@@ -1189,7 +1189,7 @@ class RaceCenter extends ConfigurationItem {
 		}
 
 		this.iTyrePressureMode := getMultiMapValue(settings, "Race Center", "TyrePressureMode", "Reference")
-		this.iCorrectPressureLoss := getMultiMapValue(settings, "Race Center", "CorrectPressureLoss", "Reference")
+		this.iCorrectPressureLoss := getMultiMapValue(settings, "Race Center", "CorrectPressureLoss", false)
 		this.iSelectTyreSet := getMultiMapValue(settings, "Race Center", "SelectTyreSet", true)
 
 		this.iUseSessionData := getMultiMapValue(settings, "Race Center", "UseSessionData", true)

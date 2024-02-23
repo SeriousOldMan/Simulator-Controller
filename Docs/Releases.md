@@ -1,4 +1,4 @@
-## 5.6.0.0-release 02/23/24 (planned)
+## 5.6.0.0-release 02/23/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed auto stint creation in "Practice Center", when a *normal* pitstop has been performed without a tyre change in any type of session.

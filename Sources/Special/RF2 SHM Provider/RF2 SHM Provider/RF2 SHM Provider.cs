@@ -101,9 +101,8 @@ namespace RF2SHMProvider {
 		}
 
 		public string GetCarName(string carClass, string carName)
-        {
-			if (carName.Contains(carClass))
-			{
+		{
+			if (carName.Trim().Length > 0) {
 				if ((carName.Length > 0) && (carName[0] == '#'))
 				{
 					char[] delims = { ' ' };

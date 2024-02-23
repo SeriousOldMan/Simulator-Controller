@@ -21,13 +21,13 @@ namespace RF2SHMProvider {
             Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("en-US");
             string request = args.Length > 0 ? args[0] : "";
             SHMProvider provider = new SHMProvider();
-
+            request = "Standings";
             if (request.StartsWith("Pitstop"))
             {
                 request = request.Split(new char[] { '=' }, 2)[1];
 
                 string[] arguments = request.Split('=');
-                string[] message = arguments[1].Split(':');
+                string[] message = arguments[2].Split(':');
 
                 if (arguments[0] == "Set")
                     provider.ExecutePitstopSetCommand(message[0], message[1].Split(';'));

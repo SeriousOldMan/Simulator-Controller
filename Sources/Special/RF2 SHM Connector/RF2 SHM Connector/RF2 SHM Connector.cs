@@ -94,7 +94,7 @@ namespace SHMConnector {
 				request = request.Split(new char[] { '=' }, 2)[1];
 
                 string[] arguments = request.Split('=');
-                string[] message = arguments[1].Split(':');
+                string[] message = arguments[2].Split(':');
 
                 if (arguments[0] == "Set")
                     this.ExecutePitstopSetCommand(message[0], message[1].Split(';'));
@@ -146,23 +146,23 @@ namespace SHMConnector {
 
 		public string GetCarName(string carClass, string carName)
         {
-			if (carName.Contains(carClass))
-			{
-				if ((carName.Length > 0) && (carName[0] == '#'))
-				{
-					char[] delims = { ' ' };
-					string[] parts = carName.Split(delims, 2);
+            if (carName.Trim().Length > 0)
+            {
+                if ((carName.Length > 0) && (carName[0] == '#'))
+                {
+                    char[] delims = { ' ' };
+                    string[] parts = carName.Split(delims, 2);
 
-					if (parts.Length > 1)
-						carName = parts[1].Trim();
-				}
-				else if (carName.Contains("#"))
-					carName = carName.Split('#')[0].Trim();
-			}
-			else
-				carName = carClass;
+                    if (parts.Length > 1)
+                        carName = parts[1].Trim();
+                }
+                else if (carName.Contains("#"))
+                    carName = carName.Split('#')[0].Trim();
+            }
+            else
+                carName = carClass;
 
-			return carName;
+            return carName;
 		}
 
 		public string GetCarNr(int id, string carClass, string carName)

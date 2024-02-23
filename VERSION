@@ -3,7 +3,7 @@ Version=5.7.0.0-dev
 Target=5.7.0.0-release
 Date=02/23/2024
 Download=
-Changes=Full integration of Le Mans Ultimate
+Changes=Full integration of Le Mans Ultimate, Fixed pitstop tyre pressure change update for rFactor 2
 Components=Media->5.7.0,Configuration->5.7.0,Utilities->5.4.8
 [Release]
 Version=5.6.0.0-release

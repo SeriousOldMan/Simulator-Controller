@@ -36,6 +36,7 @@ Release 5.5.2=Release 5.4.1 -> updateConfigurationForV552
 Release 5.5.3=Release 5.5.2 -> updateConfigurationForV553
 Release 5.5.7=Release 5.5.3 -> updateConfigurationForV557
 Release 5.5.8=Release 5.5.7 -> updateConfigurationForV558
+Release 5.6.0=Release 5.5.8 -> updateStreamDeckIconPreset, updateActionLabels, updateActionIcons
 [Cleanup]
 Binaries Folder=%kBinariesDirectory%
 Logs Folder=%kLogsDirectory%

@@ -128,7 +128,7 @@ callSimulator(simulator, options := "", protocol?) {
 
 	static defaultProtocol := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory)), "Simulator", "Data Provider", "DLL")
 	static protocols := CaseInsenseMap("AC", "CLR", "ACC", "DLL", "R3E", "DLL", "IRC", "DLL"
-									 , "AMS2", "DLL", "PCARS2", "DLL", "RF2", "CLR")
+									 , "AMS2", "DLL", "PCARS2", "DLL", "RF2", "CLR", "LMU", "CLR")
 	static connectors := CaseInsenseMap()
 
 	if (defaultProtocol = "EXE")

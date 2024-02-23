@@ -1,0 +1,26 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;   Modular Simulator Controller System - Le Mans Ultimate Setup Rules    ;;;
+;;;                                                                         ;;;
+;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
+;;;   License:    (2024) Creative Commons - BY-NC-SA                        ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;-------------------------------------------------------------------------;;;
+;;;                            Initialization                               ;;;
+;;;-------------------------------------------------------------------------;;;
+
+[?Initialize] => (Prove: addSimulator("Le Mans Ultimate")),
+				 (Prove: addCharacteristics("Le Mans Ultimate", *, *, *)),
+				 (Prove: addSettings("Le Mans Ultimate", *, *)),
+				 (Prove: removeSettings("Le Mans Ultimate", *, [Aero.Splitter.Front,
+																Aero.Wing.Front.Left, Aero.Wing.Front.Right,
+																Aero.Wing.Rear.Left, Aero.Wing.Rear.Right,
+																Aero.Height.Front.Left, Aero.Height.Front.Right,
+																Aero.Height.Rear.Left, Aero.Height.Rear.Right]))
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                         Setup Recommendations                           ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include %kResourcesDirectory%Garage\Rules\Generic Recommendations.rules

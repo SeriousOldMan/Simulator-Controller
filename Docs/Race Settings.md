@@ -165,7 +165,7 @@ The following settings are only available, if you have selected the correspondin
 |            | Repair duration for suspension damage    | Float   | 31.0                            | This value is multiplied with the internal damage percentage to compute the number of seconds need to repair the suspension at a pitstop. |
 |            | Repair duration for engine damage        | Float   | 0.0                             | This value is multiplied with the internal damage percentage to compute the number of seconds need to repair the engine at a pitstop. |
 
-3. *rFactor 2*
+3. *rFactor 2* and *Le Mans Ultimate*
 
 | Category   | Setting                                  | Type    | Default                         | Description  |
 |------------|------------------------------------------|---------|---------------------------------|--------------|

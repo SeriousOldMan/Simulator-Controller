@@ -47,6 +47,15 @@ global kSessionSchemas := CaseInsenseMap("Drivers", ["ID", "Forname", "Surname",
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                        Private Constant Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+global kSimulatorCodes := Map("Assetto Corsa", "AC", "Assetto Corsa Competizione", "ACC", "Automobilista 2", "AMS2"
+							, "iRacing", "IRC", "RaceRoom Racing Experience", "R3E", "rFactor 2", "RF2", "Project CARS 2", "PCARS2"
+							, "Rennsport", "RSP", "Le Mans Ultimate", "LMU")
+							
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -466,7 +475,7 @@ class SessionDatabase extends ConfigurationItem {
 			if (simulatorCode && car && track && (car != true) && (track != true)) {
 				prefix := (kDatabaseDirectory . "User\" . simulatorCode . "\")
 
-				if ((simulatorCode = "RF2") && data) {
+				if (((simulatorCode = "RF2") || (simulatorCode = "LMU")) && data) {
 					carName := getMultiMapValue(data, "Session Data", "CarName")
 
 					if (car != carName) {
@@ -931,9 +940,7 @@ class SessionDatabase extends ConfigurationItem {
 					if ((simulatorCode = name) || (simulatorCode = string2Values("|", description)[1]))
 						return name
 
-			for name, code in Map("Assetto Corsa", "AC", "Assetto Corsa Competizione", "ACC", "Automobilista 2", "AMS2"
-								, "iRacing", "IRC", "RaceRoom Racing Experience", "R3E", "rFactor 2", "RF2", "Project CARS 2", "PCARS2"
-								, "Rennsport", "RSP")
+			for name, code in kSimulatorCodes
 				if ((simulatorCode = name) || (simulatorCode = code))
 					return name
 
@@ -960,9 +967,7 @@ class SessionDatabase extends ConfigurationItem {
 					if (simulatorName = string2Values("|", description)[1])
 						return simulatorName
 
-				for name, code in Map("Assetto Corsa", "AC", "Assetto Corsa Competizione", "ACC", "Automobilista 2", "AMS2"
-									, "iRacing", "IRC", "RaceRoom Racing Experience", "R3E", "rFactor 2", "RF2", "Project CARS 2", "PCARS2"
-									, "Rennsport", "RSP")
+				for name, code in kSimulatorCodes
 					if ((simulatorName = name) || (simulatorName = code))
 						return code
 
@@ -990,9 +995,7 @@ class SessionDatabase extends ConfigurationItem {
 				simulators.Push(simulator)
 
 		if (force || (simulators.Length = 0))
-			for name, code in Map("Assetto Corsa", "AC", "Assetto Corsa Competizione", "ACC", "Automobilista 2", "AMS2"
-								, "iRacing", "IRC", "RaceRoom Racing Experience", "R3E", "rFactor 2", "RF2", "Project CARS 2", "PCARS2"
-								, "Rennsport", "RSP")
+			for name, code in kSimulatorCodes
 				if (force || FileExist(kDatabaseDirectory . "User\" . code))
 					simulators.Push(name)
 

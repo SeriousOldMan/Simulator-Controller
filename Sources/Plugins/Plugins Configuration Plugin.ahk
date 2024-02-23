@@ -89,6 +89,8 @@ class PluginsConfigurator extends ConfigurationItemList {
 					Run("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-9")
 				case "PCARS2":
 					Run("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-10")
+				case "LMU":
+					Run("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-11")
 				default:
 					Run("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes")
 			}

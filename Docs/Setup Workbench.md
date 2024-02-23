@@ -87,7 +87,7 @@ Final note: I would like to take the opportunity to thank the user "WallyM" of t
 
 #### Installation of Telemetry Providers
 
-The analyzer acquires telemetry data from the different simulation games using so called telemtry providers, which in most cases read the required data from a shared memory interface. In general these are already included in Simulator Controller and there is nothing to do, but for *Assetto Corsa* and *rFactor 2*, you need to install a plugin into a special location for the telemetry interface to work and for *Automobilista 2* and *Project CARS 2* a change in the settings is necessary.
+The analyzer acquires telemetry data from the different simulation games using so called telemtry providers, which in most cases read the required data from a shared memory interface. In general these are already included in Simulator Controller and there is nothing to do, but for *Assetto Corsa*, *rFactor 2* and *Le Mans Ultimate*, you need to install a plugin into a special location for the telemetry interface to work and for *Automobilista 2* and *Project CARS 2* a change in the settings is necessary.
 
 Please, note that all of this also applies to the Virtual Race Assistants, but you have to do it only once, of course.
 
@@ -99,9 +99,9 @@ Please, note that all of this also applies to the Virtual Race Assistants, but y
   
      You can find the plugin *rFactor2SharedMemoryMapPlugin64.dll* in *Utilities\Plugins* folder the Simulator Controller installation or you can load the [latest version](https://github.com/TheIronWolfModding/rF2SharedMemoryMapPlugin) from GitHub.
 	 
-	 *rFactor 2*: Copy the DLL file to the *Bin64\Plugins* folder in the Steam installation directory of *rFactor 2*.
+	 *rFactor 2*: Copy the DLL file to the *Bin64\Plugins* folder in the Steam installation directory of *rFactor 2*. You will have to enable this plugin in the *rFactor 2* settings afterwards.
 	 
-	 *Le Mans Ultimate*: Copy the DLL to the *Plugins* folder in the Steam installation directory of *Le Mans Ultimate*. Then start the game once, go to the track and rive out the pit. Leave the game and open the file *UserData\player\CustomPluginVariables.JSON* with a text editor and set " Enabled:" to **1**.
+	 *Le Mans Ultimate*: Copy the DLL to the *Plugins* folder in the Steam installation directory of *Le Mans Ultimate*. As the time of this writing, there is no way to enable the plugin in the UI of *le Mans Ultimate*. Therefore start the game once, go to the track and drive out the pit. Exit the game and open the file *UserData\player\CustomPluginVariables.JSON* with a text editor and set " Enabled:" to **1**.
 
   3. *Automobilista 2* and *Project CARS 2*
   

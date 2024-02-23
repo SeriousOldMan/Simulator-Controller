@@ -387,7 +387,7 @@ This floating window, which can be left open all the time, will be updated once 
 
 2. *rFactor 2* and *Le Mans Ultimate*
 
-   Refuel amount, chosen tyre compound and pressures, as well as the repair settings are exact.
+   Refuel amount, the chosen tyre compound and pressures, as well as the repair settings are exact.
 
 3. *iRacing*
 

@@ -21,6 +21,7 @@ The distribution of Simulator Controller includes a set of predefined plugins, w
 | [R3E](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-rre) | Similar to the ACC, IRC and RF2 plugins provides this plugin start and stop support for *RaceRoom Racing Experience*. A "Pitstop" mode is available to control the pitstop settings from your controller hardware and an integration with Jona, the Virtual Race Engineer, with Cato, the Virtual Race Strategist and also with Elisa, the Virtual Race Spotter is available as well. The "Assistant" mode can handle most of the Race Assistant commands from your hardware controller. |
 | RSP | Simple integration for Rennsport. No functionality beside starting and stopping from a hardware controller. |
 | [PCARS2](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-PCARS2) | Integration for *Project CARS 2*, which supports  Jona, the Virtual Race Engineer, Cato, the Virtual Race Strategist and also Elisa, the Virtual Race Spotter. The plugin also supports a "Pitstop" mode for adjusting pitstop settings and a "Assistant" mode to interact with the Race Assistants. |
+| [LMU](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-lmu) | Full support for *Le Mans Ultimate* incl. pitstop automation and integration of the Race Assistants. Functionality is identical to that of the plugin for *rFactor 2*, since *Le Mans Ultimate* is based on the same engine. |
 | [Integration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) | This plugin implements interoperability with other applications like SimHub. |
 
 All plugins can be configured in the [Plugins tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) of the configuration tool.
@@ -852,7 +853,7 @@ Note: For convenience, all commands available for the *assistantCommands* parame
 
 This plugin handles the *rFactor 2* simulation game. An application with the name "rFactor 2" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startRF2" as a special function hook in this configuration. The plugin supports a "Pitstop" mode to control the pitstop settings and an integration with Jona is available through the "Race Engineer" plugin, an integration with Cato through the plugin "Race Strategist", and an integration with Elisa through the plugin "Race Spotter".
 
-Important: You must install a plugin into *rFactor 2* plugins directory ([rF2]\Bin64\Plugins\) for the telemetry interface and the pitstop mode to work. You can find the plugin in the *Utilities\3rd Part\rf2_sm_tools_3.7.14.2.zip*. A Readme file is included.
+Important: You must install a plugin into *rFactor 2* plugins directory ([rF2]\Bin64\Plugins\) for the telemetry interface and the pitstop mode to work. You can find the plugin in the *Utilities\3rd Part\rf2_sm_tools_3.7.14.2.zip*. Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#installation-of-telemetry-providers) for installation instructions.
 
 ### Mode *Pitstop*
 
@@ -942,7 +943,7 @@ Note: For convenience, all commands available for the *assistantCommands* parame
 
 ### Installation of the *rFactor 2* Pitstop Interface
 
-For *rFactor 2*, you need to install a plugin into a special location for the pitstop interface to work. You can find the plugin in the *Utilities\3rd Part\rf2_sm_tools_3.7.14.2.zip* or you can load the [latest version](https://github.com/TheIronWolfModding/rF2SharedMemoryMapPlugin) from GitHub. A Readme file is included.
+For *rFactor 2*, you need to install a plugin into a special location for the pitstop interface to work. You can find the plugin in the *Utilities\3rd Part\rf2_sm_tools_3.7.14.2.zip* or you can load the [latest version](https://github.com/TheIronWolfModding/rF2SharedMemoryMapPlugin) from GitHub. Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#installation-of-telemetry-providers) for installation instructions.
 
 ## Plugin *R3E*
 
@@ -1242,6 +1243,102 @@ Note: For convenience, all commands available for the *assistantCommands* parame
 ### Special requirements when using the Pitstop automation
 
 It is very important, that you do not use the *Project CARS 2* ICM on your own, when you want to control the pitstop settings using the "Pitstop" mode, or if you want Jona to control the pitstop settings. Furthermore, you must leave *all* repairs selected in the default pitstop strategy and select *no tyre change* in the default pitstop strategy as well.
+
+## Plugin *LMU*
+
+This plugin handles the *Le Mans Ultimate* simulation game. An application with the name "Le Mans Ultimate" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startLMU" as a special function hook in this configuration. The plugin supports a "Pitstop" mode to control the pitstop settings and an integration with Jona is available through the "Race Engineer" plugin, an integration with Cato through the plugin "Race Strategist", and an integration with Elisa through the plugin "Race Spotter".
+
+Important: You must install a plugin into *Le Mans Ultimate* plugins directory ([LMU]\Plugins\) for the telemetry interface and the pitstop mode to work. You can find the plugin in the *Utilities\3rd Part\rf2_sm_tools_3.7.14.2.zip*. Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#installation-of-telemetry-providers) for installation instructions.
+
+### Mode *Pitstop*
+
+Similar to the pitstop mode the plugin for *Assetto Corsa Competizione*, you can control most of the pitstop settings of *Le Mans Ultimate*. 
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%208.JPG)
+
+All this will be achieved using the following plugin arguments:
+
+	openPitstopMFD: p; closePitstopMFD: p;
+	pitstopCommands: Refuel Dial.1 5, TyreAllAround Dial.2, PitstopPlan Button.1, PitstopPrepare Button.5,
+					 TyreCompound Button.2 Button.6, RepairRequest Button.3 Button.7, DriverSelect Button.4 Button.8
+
+### Mode *Assistant*
+
+This mode allows you to group all the available actions of the active Race Assistants into one layer of controls on your hardware controller. Although all these actions are also available as plugin actions of the "Race Engineer" and "Race Strategist" plugins, it may be more practicle to use the "Assistant" mode, when your set of available hardware controls is limited, since plugin actions always occupy a given control.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%2012.JPG)
+
+The above will be achieved using the following plugin argument:
+
+	assistantCommands: InformationRequest Position Button.1, InformationRequest LapTimes Button.2,
+					   InformationRequest LapsRemaining Button.3, InformationRequest Weather Button.4,
+					   InformationRequest GapToAhead Standings Button.5, InformationRequest GapToBehind Standings Button.6,
+					   Accept Button.7, Reject Button.8
+
+Note: You can use all these commands in the *pitstopCommands* list as well, which will generate one giant controller mode.
+
+### Configuration
+
+First, you need to define, how to open and close the Pitstop MFD (aka HUD) in *Le Mans Ultimate*. Please supply the bindings you have defined in the controller setup in *Le Mans Ultimate*.
+
+	openPitstopMFD: *openHotkey*; closePitstopMFD: *closeHotkey*;
+	pitstopMFDMode: Event | Input | Play | Raw | Default
+
+The parameter *pitstopMFDMode* determines, how the communication to the simulator is handled. You can try different values for this parameter, if the Pitstop MFD does not open. Simulator Controller simulates keyboard input for the simulator and there are different ways to do that. These are named "Event", Input", "Play", "Raw" and "Default". For whatever reason, there is not the one method, which works for every Windows installation. For me, "Event" works best and is therefore the standard, if you don't supply the parameter.
+
+As a special case, you can provide "Off" as the argument to *openPitstopMFD*. This will disable the opening and thereby the complete control of the Pitstop MFD. The software, and especially the *Race Assistants* still *think*, that the pitstop settings had been changed, which is helpful, if you only want to get the target settings by voice, but want to dial them into the Pitstop MFD by your own.
+	
+With the plugin parameter *pitstopCommands* you can supply a list of the settings, you want to tweak from your hardware controller, when the "Pitstop" mode is active. For most settings, you can supply either one binary or two unary controller function to control the setting, depending on the available buttons or dials. For *stepped* settings (for example tyre pressure and fuel amount) you can supply an additional argument to define the number of increments you want change in one step.
+
+	pitstopCommands: *setting1* *settingsFunction1* [*settingSteps1*],
+					 *setting2* *settingsFunction2* [*settingSteps2*], ...
+					 
+See the following table for the supported settings:
+
+| Setting | Description |
+| ------ | ------ |
+| Refuel | Increment or decrement the refuel amount. Supports the additional increments argument. |
+| NoRefuel | Sets the refuel amount to zero, thereby skipping refueling. |
+| TyreCompound | Cycles through the available tyre compounds. |
+| TyreAllAround | Change the pressure for all tyres at once. Supports the additional increments argument. |
+| TyreFrontLeft | Change the pressure for the front left tyre. Supports the additional increments argument. |
+| TyreFrontRight | Change the pressure for the front right tyre. Supports the additional increments argument. |
+| TyreRearLeft | Change the pressure for the rear left tyre. Supports the additional increments argument. |
+| TyreRearRight | Change the pressure for the rear right tyre. Supports the additional increments argument. |
+| DriverSelect | Selects the driver for the next stint in a multiplayer team race. |
+| RepairRequest | Cycles through the available repair options. |
+
+Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) for more information.
+
+Note: Be careful, when you change pitstop settings while Jona is active, the Race Engineer will at least be very confused. There is one notable exception, if Jona has planned and prepared a pitstop, but this pitstop has not been carried out yet, every change to the pitstop settings using the "Pitstop" mode will be recognized and taken into account by Jona in the *Le Mans Ultimate* simulation.
+
+With the plugin parameter *assistantCommands* you can supply a list of the commands you want to trigger, when the "Assistant" mode is active. Only unary controller functions are allowed here.
+
+	assistantCommands: PitstopRecommend *function*, StrategyCancel *function*,
+					   PitstopPlan *function*, PitstopPrepare *function*,
+					   Accept *acceptFunction*, Reject *rejectFunction*,
+					   InformationRequest *requestFunction* *command* [*arguments*], ...
+					 
+See the following table for the supported Assistant commands.
+
+| Command | Description |
+| ------ | ------ |
+| InformationRequest {command} | With *InformationRequest*, you can request a lot of information from your Race Assistants without using voice commands. Please see the documentation for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin and for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugin, for an overview what information can be requested. |
+| PitstopRecommend | Asks the Virtual Race Strategist for a recommendation for the next pitstop. |
+| StrategyCancel | Asks the Virtual Race Strategist to drop the currently active strategy. |
+| PitstopPlan | Requests a pitstop plan from the Virtual Race Engineer. |
+| DriverSwapPlan | Requests a pitstop plan for the next driver in a team session from the Virtual Race Engineer. |
+| PitstopPrepare | Requests Jona to transfer the values from the current pitstop plan to the Pitstop MFD. |
+| Accept | Accepts the last recommendation by one of the Virtual Race Assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
+| Reject | Cancels or rejects the last recommendation by one of the Virtual Race Assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
+
+See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *DriverSwapPlan*, *PitstopPrepare*, *Accept* and *Reject* and the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin above for more information on *PitstopRecommend* or *StrategyCancel*.
+
+Note: For convenience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
+
+### Installation of the *Le Mans Ultimate* Pitstop Interface
+
+For *Le Mans Ultimate*, you need to install a plugin into a special location for the pitstop interface to work. You can find the plugin in the *Utilities\3rd Part\rf2_sm_tools_3.7.14.2.zip* or you can load the [latest version](https://github.com/TheIronWolfModding/rF2SharedMemoryMapPlugin) from GitHub. Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#installation-of-telemetry-providers) for installation instructions.
 
 ## Plugin *Integration*
 

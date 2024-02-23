@@ -23,7 +23,7 @@
         - Lotus 72D
         - Lotus 98T
   
-Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-558), when you have defined your own scenario validation rules in the "Strategy Workbench".
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-558), if you have defined your own scenario validation rules in the "Strategy Workbench".
   
 ## 5.5.8.0-release 02/16/24
   1. Minor bugfixes, as always

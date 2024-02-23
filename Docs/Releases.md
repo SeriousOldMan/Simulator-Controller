@@ -1,3 +1,6 @@
+## 5.6.0.1-release 02/23/24
+  1. Fixed a critical bug when save strategies with tyre set information.
+
 ## 5.6.0.0-release 02/23/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
@@ -23,7 +26,7 @@
         - Lotus 72D
         - Lotus 98T
   
-Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-558), when you have defined your own scenario validation rules in the "Strategy Workbench".
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-558), if you have defined your own scenario validation rules in the "Strategy Workbench".
   
 ## 5.5.8.0-release 02/16/24
   1. Minor bugfixes, as always

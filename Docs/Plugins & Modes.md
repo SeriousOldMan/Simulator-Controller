@@ -1250,6 +1250,10 @@ This plugin handles the *Le Mans Ultimate* simulation game. An application with 
 
 Important: You must install a plugin into *Le Mans Ultimate* plugins directory ([LMU]\Plugins\) for the telemetry interface and the pitstop mode to work. You can find the plugin in the *Utilities\3rd Part\rf2_sm_tools_3.7.14.2.zip*. Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#installation-of-telemetry-providers) for installation instructions.
 
+### Disclaimer
+
+The *Le Mans Ultimate* game is under heavy development by the studio at the time of this writing. It is marketed as early access and many things are still not working. This also affects the data API and the integration with Simulator Controller. For example, pitstop settings handling is not supported yet and there are problems with driver names and car model names. I will continiously improve on that as far as there are improvements on the side of the *Le Mans Ultimate* data API.
+
 ### Mode *Pitstop*
 
 Similar to the pitstop mode the plugin for *Assetto Corsa Competizione*, you can control most of the pitstop settings of *Le Mans Ultimate*. 

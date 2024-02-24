@@ -452,6 +452,9 @@ class Database {
 						}
 						catch Any as exception {
 							logError(exception)
+							
+							if isDevelopment()
+								logMessage(kLogWarn, "Waiting for file `"" . fileName . ".bak`"...")
 						}
 						finally {
 							if bakFile

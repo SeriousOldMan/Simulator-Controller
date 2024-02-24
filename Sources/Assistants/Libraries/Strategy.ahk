@@ -2953,19 +2953,19 @@ class Strategy extends ConfigurationItem {
 		tyreSets := []
 
 		for ignore, descriptor in this.TyreSets {
-			if (descriptor.Length > 3) {
-				loop descriptor[4].Length
-					if (descriptor[4][A_Index] != 0) {
-						tyreSets.Push(values2String(":", descriptor[1], descriptor[2], descriptor[3], values2String("|", descriptor[4]*)))
-
-						descriptor := false
-
-						break
-					}
-			}
-
 			if descriptor
-				tyreSets.Push(values2String(":", descriptor*))
+				if (descriptor.Length > 3) {
+					loop descriptor[4].Length
+						if (descriptor[4][A_Index] != 0) {
+							tyreSets.Push(values2String(":", descriptor[1], descriptor[2], descriptor[3], values2String("|", descriptor[4]*)))
+
+							descriptor := false
+
+							break
+						}
+				}
+				else
+					tyreSets.Push(values2String(":", descriptor*))
 		}
 
 		setMultiMapValue(configuration, "Settings", "TyreSets", values2String(";", tyreSets*))

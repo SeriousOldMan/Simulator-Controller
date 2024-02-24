@@ -2963,6 +2963,9 @@ class Strategy extends ConfigurationItem {
 
 							break
 						}
+
+					if descriptor
+						tyreSets.Push(values2String(":", descriptor[1], descriptor[2], descriptor[3]))
 				}
 				else
 					tyreSets.Push(values2String(":", descriptor*))

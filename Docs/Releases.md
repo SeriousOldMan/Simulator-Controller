@@ -1,3 +1,9 @@
+## 5.6.1.0-release 03/01/24 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-561), if you are running *Le Mans Ultimate* and want to activate the integration for this title.
+
 ## 5.6.0.1-release 02/23/24
   1. Fixed a critical bug when save strategies with tyre set information.
 

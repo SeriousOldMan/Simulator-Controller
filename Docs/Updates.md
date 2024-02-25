@@ -35,6 +35,12 @@ Although the code, that handles all the update tasks, is integrated into *Simula
 
 Note: Some of you might want to have more control. No problem. All the files in the *Simulator Controller\Config*, *Simulator Controller\Translations*, *Simulator Controller\Grammars* and *Simulator Controller\Rules* folders are human readable and using a text editor and some *Diff* tool, you can do everything the automated procedure does on your own. But be sure to make a backup copy of all the files, just for peace of mind. Attention: These files use a two-byte character set, so be sure to use an editor that can handle this.
 
+## Release 5.6.1
+
+This release introduces the integration for *Le Mans Ultimate*. This title is still under development as you know.  Currently there is no way to enable new plugins in the user interface of *Le Mans Ultimate*. Please follow the instructions for the ["LMU" plugin]((https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-lmu) to enable the integration for *Le Mans Ultimate*.
+
+***
+
 ## Release 5.6.0
 
 Only relevant, if you have used strategy scnerio validation rules: The capabilities of the rule engine for strategy scenario validation has been extended in the "Strategy Workbench". Tyre set information is now available for the first stint and also for each pitstop with a tyre change. To keep thiings tidy and clean, some rules have been renamed. You must adopt your own validation rules to reflect the new naming scheme. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#scenario-validation) for more information.

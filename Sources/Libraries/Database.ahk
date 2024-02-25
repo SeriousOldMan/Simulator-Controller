@@ -99,7 +99,7 @@ class Database {
 
 								for ignore, column in schema
 									if (length >= A_Index)
-										row[column] := values[A_Index]
+										row[column] := this.decode(values[A_Index])
 									else
 										row[column] := kNull
 
@@ -117,7 +117,7 @@ class Database {
 
 										for ignore, column in schema
 											if (length >= A_Index)
-												row[column] := values[A_Index]
+												row[column] := this.decode(values[A_Index])
 											else
 												row[column] := kNull
 
@@ -161,6 +161,14 @@ class Database {
 		this.iDirectory := (normalizeDirectoryPath(directory) . "\")
 
 		this.iSchemas := toMap(schemas, CaseInsenseMap)
+	}
+
+	encode(value) {
+		return  StrReplace(StrReplace(StrReplace(value, ";", "##c##"), "`n", "##n##"), "|", "##b##")
+	}
+
+	decode(value) {
+		return StrReplace(StrReplace(StrReplace(value, "##b##", "|"), "##n##", "`n"), "##c##", ";")
 	}
 
 	lock(name := false, wait := true) {
@@ -338,7 +346,7 @@ class Database {
 			row := []
 
 			for ignore, column in this.Schemas[name]
-				row.Push(values.Has(column) ? StrReplace(StrReplace(StrReplace(values[column], ";", ","), "`n", A_Space), "|", "-") : kNull)
+				row.Push(values.Has(column) ? this.encode(values[column]) : kNull)
 
 			file := this.Files[name]
 

@@ -3634,7 +3634,10 @@ class PracticeCenter extends ConfigurationItem {
 					if (lap && isNumber(lap.LapTime) && lap.HasProp("TelemetryData")) {
 						driver := lap.Run.Driver.ID
 
-						telemetryData := string2Values("|||", lap.TelemetryData)
+						if InStr(lap.TelemetryData, "|||")
+							telemetryData := string2Values("|||", lap.TelemetryData)
+						else
+							telemetryData := string2Values("---", lap.TelemetryData)
 
 						telemetryDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15]
 													 , telemetryData[11], telemetryData[12], telemetryData[13], telemetryData[7], telemetryData[8], telemetryData[9]
@@ -3652,7 +3655,10 @@ class PracticeCenter extends ConfigurationItem {
 											   , telemetryData[7], telemetryData[8], telemetryData[9]
 											   , driver)
 
-						pressuresData := string2Values("|||", lap.PressuresData)
+						if InStr(lap.PressuresData, "|||")
+							pressuresData := string2Values("|||", lap.PressuresData)
+						else
+							pressuresData := string2Values("---", lap.PressuresData)
 
 						if !locked
 							if tyresDB.lock(pressuresData[1], pressuresData[2], pressuresData[3], false)
@@ -4411,7 +4417,10 @@ class PracticeCenter extends ConfigurationItem {
 					lap := this.Laps[A_Index]
 
 					if lap.HasProp("TelemetryData") {
-						telemetryData := string2Values("|||", lap.TelemetryData)
+						if InStr(lap.TelemetryData, "|||")
+							telemetryData := string2Values("|||", lap.TelemetryData)
+						else
+							telemetryData := string2Values("---", lap.TelemetryData)
 
 						telemetryData.RemoveAt(16)
 
@@ -4429,7 +4438,10 @@ class PracticeCenter extends ConfigurationItem {
 				if this.Laps.Has(A_Index) {
 					lap := this.Laps[A_Index]
 
-					this.addPressures(lap, string2Values("|||", lap.PressuresData)*)
+					if InStr(lap.PressuresData, "|||")
+						this.addPressures(lap, string2Values("|||", lap.PressuresData)*)
+					else
+						this.addPressures(lap, string2Values("---", lap.PressuresData)*)
 				}
 	}
 

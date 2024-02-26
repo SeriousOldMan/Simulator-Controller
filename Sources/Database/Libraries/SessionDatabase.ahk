@@ -53,7 +53,7 @@ global kSessionSchemas := CaseInsenseMap("Drivers", ["ID", "Forname", "Surname",
 global kSimulatorCodes := Map("Assetto Corsa", "AC", "Assetto Corsa Competizione", "ACC", "Automobilista 2", "AMS2"
 							, "iRacing", "IRC", "RaceRoom Racing Experience", "R3E", "rFactor 2", "RF2", "Project CARS 2", "PCARS2"
 							, "Rennsport", "RSP", "Le Mans Ultimate", "LMU")
-							
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
@@ -405,13 +405,16 @@ class SessionDatabase extends ConfigurationItem {
 
 	static ControllerState {
 		Get {
+			if !SessionDatabase.sControllerState
+				SessionDatabase.sControllerState := getControllerState()
+
 			return SessionDatabase.sControllerState
 		}
 	}
 
 	ControllerState {
 		Get {
-			return SessionDatabase.sControllerState
+			return SessionDatabase.ControllerState
 		}
 	}
 
@@ -441,8 +444,6 @@ class SessionDatabase extends ConfigurationItem {
 			SessionDatabase.sConfiguration := readMultiMap(kUserConfigDirectory . "Session Database.ini")
 
 			SessionDatabase.sID := FileRead(kUserConfigDirectory . "ID")
-
-			SessionDatabase.sControllerState := getControllerState()
 		}
 
 		super.__New(SessionDatabase.sConfiguration)
@@ -958,6 +959,10 @@ class SessionDatabase extends ConfigurationItem {
 		if (simulatorName = "Unknown")
 			return "Unknown"
 		else {
+			for name, code in kSimulatorCodes
+				if ((simulatorName = name) || (simulatorName = code))
+					return code
+
 			code := getMultiMapValue(this.ControllerState, "Simulators", simulatorName, false)
 
 			if code
@@ -966,10 +971,6 @@ class SessionDatabase extends ConfigurationItem {
 				for ignore, description in getMultiMapValues(this.ControllerState, "Simulators")
 					if (simulatorName = string2Values("|", description)[1])
 						return simulatorName
-
-				for name, code in kSimulatorCodes
-					if ((simulatorName = name) || (simulatorName = code))
-						return code
 
 				return false
 			}

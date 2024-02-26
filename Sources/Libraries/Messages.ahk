@@ -238,6 +238,9 @@ class MessageManager extends PeriodicTask {
 			catch Any as exception {
 				logError(exception)
 				
+				if isDevelopment()
+					logMessage(kLogWarn, "Waiting for file `"" . fileName . "`"...")
+				
 				return result
 			}
 

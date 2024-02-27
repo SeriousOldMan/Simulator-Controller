@@ -37,7 +37,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 5.6.1
 
-This release introduces the integration for *Le Mans Ultimate*. This title is still under development as you know.  Currently there is no way to enable new plugins in the user interface of *Le Mans Ultimate*. Please follow the instructions for the ["LMU" plugin]((https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-lmu) to enable the integration for *Le Mans Ultimate*.
+This release introduces the integration for *Le Mans Ultimate*. This title is still under development as you know. Currently there is no way to enable new plugins in the user interface of *Le Mans Ultimate*. Therefore, please follow the [special instructions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#installation-of-telemetry-providers) for more information on how to install and configure the data integration plugin (*rFactor2SharedMemoryMapPlugin64.dll*) in the *Le Mans Ultimate* installation directory. Once the data integration has been activated, you can configure the actions of ["LMU" plugin]((https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-lmu) to control *Le Mans Ultimate* from you hardware controller, if you like. All actions are also available in "Simulator Setup" for configuration.
 
 ***
 

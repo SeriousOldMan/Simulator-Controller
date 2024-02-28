@@ -4,9 +4,9 @@
   3. Fixed a bug in the "Practice Center" that prevented tyre pressures to be displayed in the *Laps* list, when a session is loaded after being saved to disk.
   4. Fixed a bug for *rFactor 2* which prevented tyre pressures to be initialized correctly during pitstop automation.
   5. Integrated support for *Le Mans Ultimate*:
-     - New plugin "LMU", which provides the same level of integration and similar controller actions as the "RF2" plugin for *rFactor 2*.
+     - [New plugin "LMU"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-lmu), which provides the same level of integration and similar controller actions as the "RF2" plugin for *rFactor 2*.
 	 - Full support in "Simulator Setup" to configure the "LMU" plugin.
-	 - See the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-lmu) for more information on how to install and configure the data integration plugin (*rFactor2SharedMemoryMapPlugin64.dll*) in the *Le Mans Ultimate* installation directory.
+	 - Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#installation-of-telemetry-providers) for more information on how to install and configure the data integration plugin (*rFactor2SharedMemoryMapPlugin64.dll*) in the *Le Mans Ultimate* installation directory.
 	 - *Le Mans Ultimate* is still under heavy development. Although it uses the same engine as *rFactor 2*, it looks like that several aspects of the shared memory API have changed. This is what has been achieved so far and what is not working:
 	   - General telemetry is working
        - Pressures, temperatures, and so on are all there

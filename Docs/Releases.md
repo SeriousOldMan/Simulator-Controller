@@ -1,7 +1,21 @@
 ## 5.6.1.0-release 03/01/24 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
-
+  3. Fixed a bug in the "Practice Center" that prevented tyre pressures to be displayed in the *Laps* list, when a session is loaded after being saved to disk.
+  4. Fixed a bug for *rFactor 2* which prevented tyre pressures to be initialized correctly during pitstop automation.
+  5. Integrated support for *Le Mans Ultimate*:
+     - [New plugin "LMU"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-lmu), which provides the same level of integration and similar controller actions as the "RF2" plugin for *rFactor 2*.
+	 - Full support in "Simulator Setup" to configure the "LMU" plugin.
+	 - Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#installation-of-telemetry-providers) for more information on how to install and configure the data integration plugin (*rFactor2SharedMemoryMapPlugin64.dll*) in the *Le Mans Ultimate* installation directory.
+	 - *Le Mans Ultimate* is still under heavy development. Although it uses the same engine as *rFactor 2*, it looks like that several aspects of the shared memory API have changed. This is what has been achieved so far and what is not working:
+	   - General telemetry is working
+       - Pressures, temperatures, and so on are all there
+	   - Car positions and timings also
+       - The standings information seems to be broken in the API
+	   - Driver names sometimes contain glitch characters; looks like an 8bit / 16bit charset bug
+	   - Car names do not contain the model of the car, but the name of the team and other weird stuff
+	   - Pitstop data input (normally a strength of the *rFactor 2* API) is not working at all
+  
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-561), if you are running *Le Mans Ultimate* and want to activate the integration for this title.
 
 ## 5.6.0.1-release 02/23/24

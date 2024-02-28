@@ -8,7 +8,7 @@
 
 #### Simulation Support
   1. Better integration with the weather forecast data of *rFactor 2* and *Le Mans Ultimate*
-  2. Support for new and also historic simulators (coming: Le Mans Ultimate)
+  2. Support for new and also historic simulators
 
 #### Assistants
   1. (Optional) support for an LLM-based pipeline for voice recognition and voice output

@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[5.6.1.0-dev](https://www.dropbox.com/scl/fi/wn61gre68xwsfla16thpw/Simulator-Controller-5.6.1.0-dev.zip?rlkey=h05qgchrwqjqw6dl5ltq9n2wo&dl=1) (Early build for 5.6.1. Changes: Full integration of Le Mans Ultimate, Fixed pitstop tyre pressure change update for rFactor 2, Fixed initialization of tyre pressures for loaded sessions in the "Practice Center".)
+[5.6.1.0-beta](https://www.dropbox.com/scl/fi/k7z251jmkiiipn7gwu53h/Simulator-Controller-5.6.1.0-beta.zip?rlkey=p04gga8y4jxis5y1kozj00r3w&dl=1) (Test build for 5.6.1. Changes: Full integration of Le Mans Ultimate, Fixed pitstop tyre pressure change update for rFactor 2, Fixed initialization of tyre pressures for loaded sessions in the "Practice Center".)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-561) of this version and all the versions you might have skipped, before installing and using this version.
 

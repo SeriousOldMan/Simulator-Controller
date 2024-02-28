@@ -113,7 +113,7 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 
 25. [Using the Startup Profiles](https://youtu.be/2L0lH8J1Cac) - This video explains the Startup Profiles in detail, which let you define configuration and enable or disable many important functions for different types of sessions.
 
-26. [Strategy simulation revisited again](https://youtu.be/rCnYFTLX2L4) - This video will take another look at the "Strategy Workbench" and demonstrates a couple of new options, which allow you to create very special strategies.
+26. [Strategy Development Revisited again](https://youtu.be/rCnYFTLX2L4) - This video will take another look at the "Strategy Workbench" and demonstrates a couple of new options, which allow you to create very special strategies.
 
 This list will be extended from time to time to cover new functionalities.
 

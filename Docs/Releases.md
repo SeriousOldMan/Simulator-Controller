@@ -1,4 +1,4 @@
-## 5.6.1.0-release 03/01/24 (planned)
+## 5.6.1.0-release 03/01/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed a bug in the "Practice Center" that prevented tyre pressures to be displayed in the *Laps* list, when a session is loaded after being saved to disk.

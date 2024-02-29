@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[5.6.1.0-dev](https://www.dropbox.com/scl/fi/wn61gre68xwsfla16thpw/Simulator-Controller-5.6.1.0-dev.zip?rlkey=h05qgchrwqjqw6dl5ltq9n2wo&dl=1) (Early build for 5.6.1. Changes: Full integration of Le Mans Ultimate, Fixed pitstop tyre pressure change update for rFactor 2, Fixed initialization of tyre pressures for loaded sessions in the "Practice Center".)
+[5.6.1.0-beta](https://www.dropbox.com/scl/fi/k7z251jmkiiipn7gwu53h/Simulator-Controller-5.6.1.0-beta.zip?rlkey=p04gga8y4jxis5y1kozj00r3w&dl=1) (Test build for 5.6.1. Changes: Full integration of Le Mans Ultimate, Fixed pitstop tyre pressure change update for rFactor 2, Fixed initialization of tyre pressures for loaded sessions in the "Practice Center".)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-561) of this version and all the versions you might have skipped, before installing and using this version.
 
@@ -112,6 +112,8 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 24. [Car meta data](https://youtu.be/oKq8k9VZ2jU) - This video introduces you to car meta data and all the secret knowledge needed when extending the "Setup Workbench" for modded cars.
 
 25. [Using the Startup Profiles](https://youtu.be/2L0lH8J1Cac) - This video explains the Startup Profiles in detail, which let you define configuration and enable or disable many important functions for different types of sessions.
+
+26. [Strategy Development Revisited again](https://youtu.be/rCnYFTLX2L4) - This video will take another look at the "Strategy Workbench" and demonstrates a couple of new options, which allow you to create very special strategies.
 
 This list will be extended from time to time to cover new functionalities.
 

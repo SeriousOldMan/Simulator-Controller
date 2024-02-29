@@ -1,8 +1,8 @@
 [Development]
-Version=5.6.1.0-dev
+Version=5.6.1.0-beta
 Target=5.6.1.0-release
-Date=02/26/2024
-Download=https://www.dropbox.com/scl/fi/wn61gre68xwsfla16thpw/Simulator-Controller-5.6.1.0-dev.zip?rlkey=h05qgchrwqjqw6dl5ltq9n2wo&dl=1
+Date=02/28/2024
+Download=https://www.dropbox.com/scl/fi/k7z251jmkiiipn7gwu53h/Simulator-Controller-5.6.1.0-beta.zip?rlkey=p04gga8y4jxis5y1kozj00r3w&dl=1
 Changes=Full integration of Le Mans Ultimate, Fixed pitstop tyre pressure change update for rFactor 2, Fixed initialization of tyre pressures for loaded sessions in the "Practice Center"
 Components=Media->5.6.1,Configuration->5.6.1,Utilities->5.4.8
 [Release]
@@ -30,5 +30,5 @@ Utilities.5.4.8.Download=https://www.dropbox.com/scl/fi/5nduffajjm3x6rhsxr1nk/Ut
 [Current]
 Type=Development
 [Version]
-Development=5.6.1.0-dev
+Development=5.6.1.0-beta
 Release=5.6.0.1-release

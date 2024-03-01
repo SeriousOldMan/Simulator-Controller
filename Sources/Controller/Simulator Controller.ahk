@@ -2398,6 +2398,9 @@ initializeSimulatorController()
 ;;;                          Plugin Include Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+if kLogStartup
+	logMessage(kLogOff, "Loading plugins...")
+
 #Include "..\Plugins\Controller Plugins.ahk"
 #Include "%A_MyDocuments%\Simulator Controller\Plugins\Controller Plugins.ahk"
 
@@ -2405,5 +2408,8 @@ initializeSimulatorController()
 ;;;-------------------------------------------------------------------------;;;
 ;;;                       Initialization Section Part 2                     ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+if kLogStartup
+	logMessage(kLogOff, "Starting controller...")
 
 startupSimulatorController()

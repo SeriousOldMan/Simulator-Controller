@@ -2395,8 +2395,6 @@ startSimulator() {
 
 		noLaunch := inList(A_Args, "-NoLaunchPad")
 
-		startupApplication()
-
 		if ((noLaunch && !GetKeyState("Shift")) || (!noLaunch && GetKeyState("Shift")))
 			startupSimulator()
 		else {

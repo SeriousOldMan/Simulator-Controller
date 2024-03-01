@@ -49,58 +49,67 @@ getControllerState(configuration?, force := false) {
 	local load := true
 	local pid, tries, options, exePath, fileName
 
-	if !isSet(configuration)
-		configuration := false
-	else if (configuration == false)
-		load := false
-	else if (configuration == true)
-		configuration := false
+	if kLogStartup
+		logMessage(kLogOff, "Requesting controller configuration - Start...")
 
-	pid := ProcessExist("Simulator Controller.exe")
+	try {
+		if !isSet(configuration)
+			configuration := false
+		else if (configuration == false)
+			load := false
+		else if (configuration == true)
+			configuration := false
 
-	if force
-		deleteFile(kTempDirectory . "Simulator Controller.state")
+		pid := ProcessExist("Simulator Controller.exe")
 
-	if (isSet(isProperInstallation) && isProperInstallation() && load && FileExist(kUserConfigDirectory . "Simulator Controller.install"))
-		if (!pid && (configuration || !FileExist(kTempDirectory . "Simulator Controller.state"))) {
-			try {
-				if configuration {
-					fileName := temporaryFileName("Config", "ini")
+		if force
+			deleteFile(kTempDirectory . "Simulator Controller.state")
 
-					writeMultiMap(fileName, configuration)
+		if (isSet(isProperInstallation) && isProperInstallation() && load && FileExist(kUserConfigDirectory . "Simulator Controller.install"))
+			if (!pid && (configuration || !FileExist(kTempDirectory . "Simulator Controller.state"))) {
+				try {
+					if configuration {
+						fileName := temporaryFileName("Config", "ini")
 
-					options := (" -Configuration `"" . fileName . "`"")
+						writeMultiMap(fileName, configuration)
+
+						options := (" -Configuration `"" . fileName . "`"")
+					}
+					else
+						options := ""
+
+					exePath := ("`"" . kBinariesDirectory . "Simulator Controller.exe`" -NoStartup -NoUpdate" .  options)
+
+					RunWait(exePath, kBinariesDirectory)
 				}
-				else
-					options := ""
+				catch Any as exception {
+					logMessage(kLogCritical, translate("Cannot start Simulator Controller (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
 
-				exePath := ("`"" . kBinariesDirectory . "Simulator Controller.exe`" -NoStartup -NoUpdate" .  options)
-
-				RunWait(exePath, kBinariesDirectory)
+					return newMultiMap()
+				}
 			}
-			catch Any as exception {
-				logMessage(kLogCritical, translate("Cannot start Simulator Controller (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
+			else if (!FileExist(kTempDirectory . "Simulator Controller.state") && pid && (StrSplit(A_ScriptName, ".")[1] != "Simulator Controller")) {
+				if (pid != ProcessExist())
+					messageSend(kFileMessage, "Controller", "writeControllerState", pid)
 
-				return newMultiMap()
+				Sleep(1000)
+
+				tries := 30
+
+				while (tries-- > 0) {
+					if FileExist(kTempDirectory . "Simulator Controller.state")
+						break
+
+					Sleep(200)
+				}
 			}
-		}
-		else if (!FileExist(kTempDirectory . "Simulator Controller.state") && pid && (StrSplit(A_ScriptName, ".")[1] != "Simulator Controller")) {
-			if (pid != ProcessExist())
-				messageSend(kFileMessage, "Controller", "writeControllerState", pid)
 
-			Sleep(1000)
-
-			tries := 30
-
-			while (tries-- > 0) {
-				if FileExist(kTempDirectory . "Simulator Controller.state")
-					break
-
-				Sleep(200)
-			}
-		}
-
-	return readMultiMap(kTempDirectory . "Simulator Controller.state")
+		return readMultiMap(kTempDirectory . "Simulator Controller.state")
+	}
+	finally {
+		if kLogStartup
+			logMessage(kLogOff, "Requesting controller configuration - Done...")
+	}
 }
 
 createGUID() {

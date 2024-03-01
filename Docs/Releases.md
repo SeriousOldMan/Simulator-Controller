@@ -3,7 +3,8 @@
   2. Documentation updates here and there, as always
   3. Fixed a bug in the "Practice Center" that prevented tyre pressures to be displayed in the *Laps* list, when a session is loaded after being saved to disk.
   4. Fixed a bug for *rFactor 2* which prevented tyre pressures to be initialized correctly during pitstop automation.
-  5. Integrated support for *Le Mans Ultimate*:
+  5. Fixed a bug in strategy simulation, which in rare cases caused failures when re-calculating a strategy using traffic scenarios in the "Race Center" or by the Strategist.
+  6. Integrated support for *Le Mans Ultimate*:
      - [New plugin "LMU"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-lmu), which provides the same level of integration and similar controller actions as the "RF2" plugin for *rFactor 2*.
 	 - Full support in "Simulator Setup" to configure the "LMU" plugin.
 	 - Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#installation-of-telemetry-providers) for more information on how to install and configure the data integration plugin (*rFactor2SharedMemoryMapPlugin64.dll*) in the *Le Mans Ultimate* installation directory.

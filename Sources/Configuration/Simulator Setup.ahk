@@ -462,7 +462,7 @@ class SetupWizard extends ConfiguratorPanel {
 		}
 
 		loop count
-			if this.Steps.Has(A_index) {
+			if this.Steps.Has(A_Index) {
 				step := this.Steps[A_Index]
 
 				this.ProgressCount += 2

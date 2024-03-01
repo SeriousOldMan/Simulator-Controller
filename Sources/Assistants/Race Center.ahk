@@ -634,6 +634,12 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	class SessionStrategy extends Strategy {
+		CompletedPitstops {
+			Get {
+				return RaceCenter.Instance.getCompletedPitstops()
+			}
+		}
+
 		initializeTyreSets() {
 			super.initializeTyreSets()
 
@@ -642,6 +648,12 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	class SessionTrafficStrategy extends TrafficStrategy {
+		CompletedPitstops {
+			Get {
+				return RaceCenter.Instance.getCompletedPitstops()
+			}
+		}
+
 		initializeTyreSets() {
 			super.initializeTyreSets()
 
@@ -3364,7 +3376,7 @@ class RaceCenter extends ConfigurationItem {
 				else if ((A_Index = 1) && (pitstops.Count > 0) && !pitstops.Has(1))
 					continue
 
-				if this.Stints.Has(A_index) {
+				if this.Stints.Has() {
 					this.getStintSetup(A_Index, false, &driver)
 
 					driver := driver.FullName
@@ -4353,7 +4365,7 @@ class RaceCenter extends ConfigurationItem {
 		this.PitstopsListView.ModifyCol()
 
 		loop this.PitstopsListView.GetCount("Col")
-			this.PitstopsListView.ModifyCol(A_index, "AutoHdr")
+			this.PitstopsListView.ModifyCol(A_Index, "AutoHdr")
 
 		pressures := string2Values(",", pressures)
 
@@ -5139,6 +5151,30 @@ class RaceCenter extends ConfigurationItem {
 
 			stintNr -= 1
 		}
+	}
+
+	getCompletedPitstops() {
+		local pitstops := []
+		local stint, driver, fuel, tyreCompound, tyreCompoundColor, tyreSet, tyrePressures
+
+		loop this.CurrentStint.Nr
+			if ((A_Index > 1) && this.Stints.Has(A_Index)) {
+				this.getStintSetup(A_Index, false, &driver, &fuel
+												 , &tyreCompound, &tyreCompoundColor, &tyreSet, &tyrePressures)
+
+				try {
+					pitstops.Push({Nr: (A_Index - 1)
+								 , Time: Round(DateDiff(this.computeStartTime(this.Stints[A_Index]), this.computeStartTime(this.Stints[1]), "Seconds"))
+								 , Lap: this.Stints[A_Index].Lap, RefuelAmount: fuel
+								 , TyreChange: (tyreCompound != false)
+								 , TyreCompound: tyreCompound, TyreCompoundColor: tyreCompoundColor, TyreSet:tyreSet})
+				}
+				catch Any as exception {
+					logError(exception)
+				}
+			}
+
+		return pitstops
 	}
 
 	getStrategySettings(&simulator, &car, &track, &weather, &airTemperature, &trackTemperature

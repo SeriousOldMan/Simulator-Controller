@@ -2769,6 +2769,8 @@ class RaceEngineer extends RaceAssistant {
 			pitstopLap := knowledgeBase.getValue("Pitstop." . A_Index . ".Lap")
 
 			setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".Lap", pitstopLap)
+			setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".Time"
+						   , Round(knowledgeBase.getValue("Pitstop." . A_Index . ".Time", 0) / 1000))
 			setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".Refuel"
 						   , knowledgeBase.getValue("Pitstop." . A_Index . ".Fuel", 0))
 

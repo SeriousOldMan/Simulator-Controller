@@ -2,7 +2,7 @@
 Version=5.6.1.0-release
 Target=5.6.2.0-dev
 Date=03/01/2024
-Download=New startup logging
+Download=New startup logging, Strategy recalculation now incorporates completed pitstops for validation, Pitstop window as well as refuel and tyre rules relate only required pitstops
 Changes=
 Components=Media->5.6.1,Configuration->5.6.1,Utilities->5.4.8
 [Release]

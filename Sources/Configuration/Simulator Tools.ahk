@@ -2361,6 +2361,38 @@ updateConfigurationForV400() {
 	deleteFile(kDatabaseDirectory . "User\UPLOAD")
 }
 
+updatePluginsForV561() {
+	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	local userConfiguration := readMultiMap(userConfigurationFile)
+	local changed, rsp
+
+	if (userConfiguration.Count > 0) {
+		changed := false
+
+		if getMultiMapValue(userConfiguration, "Plugins", "LMU", false) {
+			rsp := Plugin("LMU", userConfiguration)
+
+			if (rsp.Simulators.Length = 0) {
+				rsp.iSimulators := ["Le Mans Ultimate"]
+
+				rsp.saveToConfiguration(userConfiguration)
+
+				changed := true
+			}
+		}
+		else {
+			rsp := Plugin("LMU", false, false, "Le Mans Ultimate")
+
+			rsp.saveToConfiguration(userConfiguration)
+
+			changed := true
+		}
+
+		if changed
+			writeMultiMap(userConfigurationFile, userConfiguration)
+	}
+}
+
 updatePluginsForV540() {
 	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
 	local userConfiguration := readMultiMap(userConfigurationFile)

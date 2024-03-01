@@ -3918,10 +3918,10 @@ class TrafficStrategy extends Strategy {
 					 , &adjusted) {
 		local targetLap := super.calcNextPitstopLap(pitstopNr, currentLap, remainingStintLaps, remainingSessionLaps
 												  , remainingTyreLaps, remainingFuel, &adjusted)
-		local variationWindow, moreLaps, rnd, avgLapTime, openingLap, closingLap, fuelConsumption
+		local fuelConsumption := this.FuelConsumption[true]
+		local variationWindow, moreLaps, rnd, avgLapTime, openingLap, closingLap
 
 		if !adjusted {
-			fuelConsumption := this.FuelConsumption[true]
 			variationWindow := this.StrategyManager.VariationWindow
 
 			adjusted := true

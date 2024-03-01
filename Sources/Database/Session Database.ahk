@@ -2248,7 +2248,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 					Sleep(50)
 
-					setMultiMapValue(settings, values2String(";;;", section, car, track, weather), key, value)
+					setMultiMapValue(settings, values2String(" | ", section, car, track, weather), key, value)
 				}
 			}
 

@@ -2277,6 +2277,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local window := this.Window
 		local simulator := this.SelectedSimulator
 		local info := readMultiMap(directory . "\Export.info")
+		local progress := 0
 		local progressWindow, ignore, setting, settingsDB
 
 		directory := normalizeDirectoryPath(directory)

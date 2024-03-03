@@ -1760,7 +1760,7 @@ class Strategy extends ConfigurationItem {
 					tyreChange := (adjustments[nr].TyreChange != false)
 			}
 
-			if ((refuelRule = "Required") && (refuelAmount <= 0) && ((nr <= numPitstops) || (numPitstops && !strategy.isValid())))
+			if ((refuelRule = "Required") && (refuelAmount <= 0) && !strategy.isValid())
 				refuelAmount := 1
 			else if ((refuelRule = "Always") && (refuelAmount <= 0))
 				refuelAmount := 1
@@ -1814,7 +1814,7 @@ class Strategy extends ConfigurationItem {
 				this.iRemainingTyreLaps := freshTyreLaps
 			}
 			else if (this.TyreChange != "Forced") {
-				if ((tyreChangeRule = "Required") && ((nr <= numPitstops) || (numPitstops && !strategy.isValid()))) {
+				if ((tyreChangeRule = "Required") && !strategy.isValid()) {
 					this.iTyreChange := true
 					this.iRemainingTyreLaps := freshTyreLaps
 				}

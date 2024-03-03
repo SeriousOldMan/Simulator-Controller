@@ -6265,13 +6265,22 @@ class RaceCenter extends ConfigurationItem {
 			identifier := lap.Identifier
 
 			try {
-				rawData := this.Connector.GetLapValue(identifier, "Positions Data")
+				try {
+					rawData := this.Connector.GetLapValue(identifier, "Data Update")
+				}
+				catch Any as exception {
+					rawData := ""
+				}
+
+				if (!rawData || (rawData = ""))
+					rawData := this.Connector.GetLapValue(identifier, "Positions Data")
 
 				if (rawData && (rawData != ""))
 					this.updatePitstopState(lap, parseMultiMap(rawData))
 
 				if pitstopSettings("Visible") {
-					rawData := this.Connector.GetLapValue(identifier, "Telemetry Data")
+					if (!rawData || (rawData = "") || !InStr(rawData, "[Setup Data]"))
+						rawData := this.Connector.GetLapValue(identifier, "Telemetry Data")
 
 					if (rawData && (rawData != "") && InStr(rawData, "[Setup Data]"))
 						this.updatePitstopSettings(getMultiMapValues(parseMultiMap(rawData), "Setup Data"))

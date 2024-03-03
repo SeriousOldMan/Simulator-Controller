@@ -3657,7 +3657,7 @@ class Strategy extends ConfigurationItem {
 				}
 
 			if ((numPitstops && (pitstopNr <= numPitstops)) || ((pitstop.StintLaps > 0) && ((pitstop.RefuelAmount > 0) || pitstop.TyreChange))) {
-				if (!isValid && numPitstops && (pitstopNr > numPitstops))
+				if (!isValid && (pitstopNr > numPitstops))
 					surplusPitstops +=1
 
 				if (pitstopNr = 1)

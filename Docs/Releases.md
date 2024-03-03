@@ -1,3 +1,15 @@
+## 5.6.2.0-release 03/08/24 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. Fixed import of (race) settings in the "Session Database".
+  4. Fixed export of (race) settings in the "Session Database" in case the Ctrl key is NOT held down.
+  5. All already completed pitstops will be taken into account when it comes to race rules validation, when a strategy is being re-calculated by the Strategist or in the "Race Center".
+  6. The pitstop window and also the "Required" refueling and "Required" tyre change now only relate to the required pitstops.
+  7. The reliability of the pitstop information of all opponents has been increased in the "Race Center".
+  8. {Experts Only] Special logging has been implemented which helps when tracking down start performance problems. It can be activated in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration).
+
+New startup logging, 
+
 ## 5.6.1.0-release 03/01/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

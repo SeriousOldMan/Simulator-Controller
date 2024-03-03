@@ -35,6 +35,12 @@ Although the code, that handles all the update tasks, is integrated into *Simula
 
 Note: Some of you might want to have more control. No problem. All the files in the *Simulator Controller\Config*, *Simulator Controller\Translations*, *Simulator Controller\Grammars* and *Simulator Controller\Rules* folders are human readable and using a text editor and some *Diff* tool, you can do everything the automated procedure does on your own. But be sure to make a backup copy of all the files, just for peace of mind. Attention: These files use a two-byte character set, so be sure to use an editor that can handle this.
 
+## Release 5.6.2
+
+Nothing to do this time.
+
+***
+
 ## Release 5.6.1
 
 This release introduces the integration for *Le Mans Ultimate*. This title is still under development as you know. Currently there is no way to enable new plugins in the user interface of *Le Mans Ultimate*. Therefore, please follow the [special instructions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#installation-of-telemetry-providers) for more information on how to install and configure the data integration plugin (*rFactor2SharedMemoryMapPlugin64.dll*) in the *Le Mans Ultimate* installation directory. Once the data integration has been activated, you can configure the actions of ["LMU" plugin]((https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-lmu) to control *Le Mans Ultimate* from you hardware controller, if you like. All actions are also available in "Simulator Setup" for configuration.

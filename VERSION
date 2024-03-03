@@ -1,6 +1,6 @@
 [Development]
 Version=5.6.2.0-dev
-Target=5.6.2.0-dev
+Target=5.6.2.0-release
 Date=03/03/2024
 Download=
 Changes=New startup logging, Strategy recalculation now incorporates completed pitstops for validation, Pitstop window as well as refuel and tyre rules relate only required pitstops, Settings export file format in "Session Database" fixed, Fixed import settings in "Session Database", Increased reliability of opponent pitstop information in "Race Center"

@@ -3376,7 +3376,7 @@ class RaceCenter extends ConfigurationItem {
 				else if ((A_Index = 1) && (pitstops.Count > 0) && !pitstops.Has(1))
 					continue
 
-				if this.Stints.Has() {
+				if this.Stints.Has(A_Index) {
 					this.getStintSetup(A_Index, false, &driver)
 
 					driver := driver.FullName
@@ -12696,9 +12696,10 @@ inDrivers(drivers, driver) {
 	if index
 		driver := SubStr(driver, 1, index - 1)
 
-	for index, candidate in drivers
-		if (InStr(candidate, driver) = 1)
-			return index
+	if (driver != "")
+		for index, candidate in drivers
+			if (InStr(candidate, driver) = 1)
+				return index
 
 	return false
 }

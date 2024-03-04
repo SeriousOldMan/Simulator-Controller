@@ -6258,6 +6258,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	updatePitstops() {
+		local data := false
 		local lap, identifier, rawData
 
 		if this.LastLap {
@@ -6275,15 +6276,22 @@ class RaceCenter extends ConfigurationItem {
 				if (!rawData || (rawData = ""))
 					rawData := this.Connector.GetLapValue(identifier, "Positions Data")
 
-				if (rawData && (rawData != ""))
-					this.updatePitstopState(lap, parseMultiMap(rawData))
+				if (rawData && (rawData != "")) {
+					data := parseMultiMap(rawData)
+
+					this.updatePitstopState(lap, data)
+				}
 
 				if pitstopSettings("Visible") {
-					if (!rawData || (rawData = "") || !InStr(rawData, "[Setup Data]"))
+					if (!data || !data.Has("Setup Data")) {
 						rawData := this.Connector.GetLapValue(identifier, "Telemetry Data")
 
-					if (rawData && (rawData != "") && InStr(rawData, "[Setup Data]"))
-						this.updatePitstopSettings(getMultiMapValues(parseMultiMap(rawData), "Setup Data"))
+						if (rawData && (rawData != ""))
+							data := parseMultiMap(rawData)
+					}
+
+					if (data && data.Has("Setup Data"))
+						this.updatePitstopSettings(getMultiMapValues(data, "Setup Data"))
 				}
 			}
 			catch Any as exception {

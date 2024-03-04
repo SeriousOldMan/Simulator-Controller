@@ -132,7 +132,7 @@ namespace RF2SHMProvider {
 			else if (carName.Contains("#"))
 				return carName.Split('#')[1].Trim().Split(' ')[0].Trim();
 			else
-				return id.ToString();
+				return (id + 1).ToString();
 		}
 
 		public void ReadStandings()

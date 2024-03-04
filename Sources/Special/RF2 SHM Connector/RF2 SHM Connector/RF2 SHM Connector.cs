@@ -177,7 +177,7 @@ namespace SHMConnector {
 			else if (carName.Contains("#"))
 				return carName.Split('#')[1].Trim().Split(' ')[0].Trim();
 			else
-				return id.ToString();
+				return (id + 1).ToString();
 		}
 
 		public string ReadStandings()

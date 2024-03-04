@@ -81,7 +81,7 @@ Announcements=Wetterwarnungen
 
 	[{Wie viele, Sag mir wie viele, Sag mir bitte wie viele} Runden {bleiben, gehen} noch, Für wie viele Runden reicht der {Sprit, Sprit noch}, (KannstDu) (Mir) sagen {wie viele Runden noch gehen, wie viele Runden noch bleiben, für wie viele Runden der Sprit noch reicht}]
 
-	[Wie wird das Wetter, Wird es regnen, Kommmt ein Wetterwechsel, Sag (Mir) ob {es regnen wird, ein Wetterwechsel kommt, wie das Wetter wird}]
+	[Wie wird das Wetter, Wird es regnen, Kommt ein Wetterwechsel, Sag (Mir) ob {es regnen wird, ein Wetterwechsel kommt, wie das Wetter wird}]
 
 	[(KannstDu) {das Rennen, den Stand} in (Number) Runden simulieren, Wie ist meine Position in (Number) Runden, Gib mir meine Position in (Number) Runden]
 

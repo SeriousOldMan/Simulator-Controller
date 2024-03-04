@@ -2,7 +2,7 @@
 Version=5.6.2.0-dev
 Target=5.6.2.0-release
 Date=03/03/2024
-Download=
+Download=https://www.dropbox.com/scl/fi/a86tfufudhno2j7tr2poq/Simulator-Controller-5.6.2.0-dev.zip?rlkey=mxhh8bl3l4ws0platucbv8wws&dl=1
 Changes=New startup logging, Strategy recalculation now incorporates completed pitstops for validation, Pitstop window as well as refuel and tyre rules relate only required pitstops, Settings export file format in "Session Database" fixed, Fixed import settings in "Session Database", Increased reliability of opponent pitstop information in "Race Center"
 Components=Media->5.6.1,Configuration->5.6.1,Utilities->5.4.8
 [Release]

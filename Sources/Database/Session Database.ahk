@@ -2274,42 +2274,65 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	importSettings(directory, selection) {
-		local window := this.Window
-		local simulator := this.SelectedSimulator
 		local info := readMultiMap(directory . "\Export.info")
-		local progress := 0
-		local progressWindow, ignore, setting, settingsDB
+		local window, simulator, progress, progressWindow, ignore, setting, settingsDB
+		local section, values, key, value
 
 		directory := normalizeDirectoryPath(directory)
 
-		if ((this.SessionDatabase.getSimulatorName(getMultiMapValue(info, "General", "Simulator", "")) = simulator)
-		 && (getMultiMapValue(info, "General", "Type", "Data") = "Settings")) {
-			progressWindow := showProgress({color: "Green", title: translate("Importing Settings")})
+		if (selection == true) {
+			if (getMultiMapValue(info, "General", "Type", "Data") = "Settings") {
+				simulator := getMultiMapValue(info, "General", "Simulator", "")
 
-			progressWindow.Opt("+Owner" . window.Hwnd)
-			window.Block()
+				try {
+					settingsDB := SettingsDatabase()
 
-			try {
-				settingsDB := SettingsDatabase()
+					for section, values in readMultiMap(directory . "\Export.settings") {
+						section := string2Values(" | ", section)
 
-				for ignore, setting in selection {
-					showProgress({progress: ++progress, message: this.getSettingLabel(setting[4], setting[5]) . translate("...")})
-
-					Sleep(50)
-
-					settingsDB.setSettingValue(simulator, setting[1], setting[2], setting[3], setting[4], setting[5], setting[6])
+						for key, value in values
+							settingsDB.setSettingValue(simulator, section[2], section[3], section[4], section[1], key, value)
+					}
+				}
+				catch Any as exception {
+					logError(exception, true)
 				}
 			}
-			catch Any as exception {
-				logError(exception)
-			}
-			finally {
-				window.Unblock()
+		}
+		else {
+			window := this.Window
+			simulator := this.SelectedSimulator
+			progress := 0
 
-				hideProgress()
-			}
+			if ((this.SessionDatabase.getSimulatorName(getMultiMapValue(info, "General", "Simulator", "")) = simulator)
+			 && (getMultiMapValue(info, "General", "Type", "Data") = "Settings")) {
+				progressWindow := showProgress({color: "Green", title: translate("Importing Settings")})
 
-			this.selectSettings()
+				progressWindow.Opt("+Owner" . window.Hwnd)
+				window.Block()
+
+				try {
+					settingsDB := SettingsDatabase()
+
+					for ignore, setting in selection {
+						showProgress({progress: ++progress, message: this.getSettingLabel(setting[4], setting[5]) . translate("...")})
+
+						Sleep(50)
+
+						settingsDB.setSettingValue(simulator, setting[1], setting[2], setting[3], setting[4], setting[5], setting[6])
+					}
+				}
+				catch Any as exception {
+					logError(exception)
+				}
+				finally {
+					window.Unblock()
+
+					hideProgress()
+				}
+
+				this.selectSettings()
+			}
 		}
 	}
 
@@ -5850,6 +5873,7 @@ startupSessionDatabase() {
 	local compound := false
 	local compoundColor := false
 	local requestorPID := false
+	local import := false
 	local index := 1
 	local editor
 
@@ -5885,6 +5909,9 @@ startupSessionDatabase() {
 			case "-Setup":
 				requestorPID := A_Args[index + 1]
 				index += 2
+			case "-Import":
+				import := A_Args[index + 1]
+				index += 2
 			default:
 				index += 1
 		}
@@ -5896,29 +5923,36 @@ startupSessionDatabase() {
 	if (trackTemperature <= 0)
 		trackTemperature := 27
 
-	protectionOn()
+	if import {
+		SessionDatabaseEditor().importSettings(import, true)
 
-	try {
-		editor := SessionDatabaseEditor(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor, requestorPID)
-
-		editor.createGui(editor.Configuration)
-
-		editor.show()
+		Exit(0)
 	}
-	catch Any as exception {
-		logError(exception, true)
+	else {
+		protectionOn()
 
-		OnMessage(0x44, translateOkButton)
-		withBlockedWindows(MsgBox, substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Session Database"}), translate("Error"), 262160)
-		OnMessage(0x44, translateOkButton, 0)
+		try {
+			editor := SessionDatabaseEditor(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor, requestorPID)
 
-		ExitApp(1)
+			editor.createGui(editor.Configuration)
+
+			editor.show()
+		}
+		catch Any as exception {
+			logError(exception, true)
+
+			OnMessage(0x44, translateOkButton)
+			withBlockedWindows(MsgBox, substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Session Database"}), translate("Error"), 262160)
+			OnMessage(0x44, translateOkButton, 0)
+
+			ExitApp(1)
+		}
+		finally {
+			protectionOff()
+		}
+
+		startupApplication()
 	}
-	finally {
-		protectionOff()
-	}
-
-	startupApplication()
 }
 
 

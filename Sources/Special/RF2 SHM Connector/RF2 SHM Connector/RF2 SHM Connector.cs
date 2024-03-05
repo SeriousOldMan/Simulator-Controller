@@ -146,9 +146,11 @@ namespace SHMConnector {
 
 		public string GetCarName(string carClass, string carName)
         {
-            if (carName.Trim().Length > 0)
+			carName = carName.Trim();
+
+            if (carName.Length > 0)
             {
-                if ((carName.Length > 0) && (carName[0] == '#'))
+                if (carName[0] == '#')
                 {
                     char[] delims = { ' ' };
                     string[] parts = carName.Split(delims, 2);
@@ -167,18 +169,25 @@ namespace SHMConnector {
 
 		public string GetCarNr(int id, string carClass, string carName)
 		{
-			if (carName[0] == '#')
-			{
-				char[] delims = { ' ' };
-				string[] parts = carName.Split(delims, 2);
+            carName = carName.Trim();
 
-				return parts[0].Split('#')[1].Trim();
+			if (carName.Length > 0)
+			{
+				if (carName[0] == '#')
+				{
+					char[] delims = { ' ' };
+					string[] parts = carName.Split(delims, 2);
+
+					return parts[0].Split('#')[1].Trim();
+				}
+				else if (carName.Contains("#"))
+					return carName.Split('#')[1].Trim().Split(' ')[0].Trim();
+				else
+					return (id + 1).ToString();
 			}
-			else if (carName.Contains("#"))
-				return carName.Split('#')[1].Trim().Split(' ')[0].Trim();
 			else
-				return (id + 1).ToString();
-		}
+                return (id + 1).ToString();
+        }
 
 		public string ReadStandings()
 		{

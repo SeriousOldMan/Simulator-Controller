@@ -204,7 +204,8 @@ namespace SHMConnector {
 				{
 					rF2VehicleScoring vehicle = scoring.mVehicles[i - 1];
 
-					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Position="); strWriter.WriteLine(vehicle.mPlace);
+                    strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".ID="); strWriter.WriteLine(i);
+                    strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Position="); strWriter.WriteLine(vehicle.mPlace);
 
 					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Laps="); strWriter.WriteLine(vehicle.mTotalLaps);
 					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Lap.Running="); strWriter.WriteLine(vehicle.mLapDist / scoring.mScoringInfo.mLapDist);

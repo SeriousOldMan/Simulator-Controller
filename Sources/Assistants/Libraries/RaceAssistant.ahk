@@ -2349,13 +2349,15 @@ class GridRaceAssistant extends RaceAssistant {
 					}
 					else if ((knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap")) < lap)
 						  && (Abs(delta) > (knowledgeBase.getValue("Lap." . lap . ".Time") / 1000))) {
-						speaker.speakPhrase((delta < 0) ? "FocusBehindLapped" : "FocusAheadLapped", {number: number})
+						speaker.speakPhrase((delta < 0) ? "FocusBehindLapped" : "FocusAheadLapped", {indicator: speaker.Fragments["CarNumber"]
+																								   , number: number})
 
 						lapped := true
 					}
 					else
 						speaker.speakPhrase((delta < 0) ? "FocusGapToBehind" : "FocusGapToAhead"
-										  , {number: number, delta: speaker.number2Speech(Abs(delta), 1)})
+										  , {indicator: speaker.Fragments["CarNumber"]
+										   , number: number, delta: speaker.number2Speech(Abs(delta), 1)})
 
 					if (!lapped && inPit)
 						speaker.speakPhrase("GapCarInPit")
@@ -2398,7 +2400,9 @@ class GridRaceAssistant extends RaceAssistant {
 					minute := Floor(lapTime / 60)
 					seconds := (lapTime - (minute * 60))
 
-					speaker.speakPhrase("FocusLapTime", {number: number, time: speaker.number2Speech(lapTime, 1), minute: minute, seconds: speaker.number2Speech(seconds, 1)})
+					speaker.speakPhrase("FocusLapTime", {indicator: speaker.Fragments["CarNumber"]
+													   , number: number, time: speaker.number2Speech(lapTime, 1)
+													   , minute: minute, seconds: speaker.number2Speech(seconds, 1)})
 				}
 			}
 			else if number

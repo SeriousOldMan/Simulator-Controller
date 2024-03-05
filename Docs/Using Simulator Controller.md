@@ -174,7 +174,7 @@ The content of a typical folder of common team settings should look like this:
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Team%20Settings%20Package.JPG)
 
-Now you can zip this folder and send it to your team mates. The have to unzip it, start "Simulator Setup" and use the special preset "Import Settings for your team" to import the stuff.
+Now you can zip this folder and send it to your team mates. They have to unzip it, start "Simulator Setup" and use the special preset "Import Settings for your team" to import the stuff.
 
 ### Voice Commands
 

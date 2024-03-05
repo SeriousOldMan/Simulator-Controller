@@ -150,6 +150,32 @@ Finally, if you are ready to start, choose the profile you want to start with an
 
 Note: If you want "Simulator Startup" to use a specific startup profile independent from what is chosen in the configuration of the startup profiles, you can run "Simulator Startup.exe" with the "-Startup [Profile]" option, where *[Profile]* is the name of the profile you want to use (possibly enclosed in quotes). This is especially helpful together with the "-NoLaunchPad" option, when running "Simulator Startup" from a Stream Deck, for example.
 
+### Managing common team settings
+
+In many cases all drivers in a given team want to share the same configuration. And in many cases, there is a member of the team, who took the role of the team manager. He will prepare races, configure the [Team Server](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server) and will have the deepest understanding of Simulator Controller in his team. This team manager can prepare a package for all his team mates which can be imported by every driver using a [special preset](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#presets--special-configurations) in "Simulator Setup". This package must be a folder, which can contain the following components:
+
+1. *Startup.settings*
+
+   This file contains the Startup Profiles as described above. It can be found in the *Simulator Controller\Config* folder in your user *Documents* folder.
+
+2. *Race.settings*
+
+   This file contains all the choices you have made in the "Race Settings" application. It can also be found in the *Simulator Controller\Config* folder in your user *Documents* folder.
+
+3. *Session Database.ini*
+
+   Contains information about the Team Server connection of the local telemetry database. If you have configured a data replication with the Team Server, you will want to enable it for all your team mates as well. This file can also be found in the *Simulator Controller\Config* folder in your user *Documents* folder.
+
+4. *Export of the (race) settings from the "Session Database"*
+
+   You can prepare an export of all the settings you want to share with your team mates. Normally you want to export all your settings using the Control key while exporting the settings from your "Session Database". Then put the files from the export folder into the folder of the team package.
+   
+The content of a typical folder of common team settings should look like this:
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Team%20Settings%20Package.JPG)
+
+Now you can zip this folder and send it to your team mates. The have to unzip it, start "Simulator Setup" and use the special preset "Import Settings for your team" to import the stuff.
+
 ### Voice Commands
 
 The Simulator Controller framework supports a sophisticated natural language interface. This capability is used by the Race Assistants Jona and Cato, thereby allowing a fully voice enabled dialog between you and these Assistants, but the voice recognition can also be used to control parts of your controller hardware by voice commands.

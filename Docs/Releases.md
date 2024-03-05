@@ -9,7 +9,7 @@
   8. The reliability of the pitstop information of all opponents has been increased in the "Race Center".
   9. It is now possible to choose how the spotter refers to a specific vehicle, like "Car number 7 had a problem" or "The car in P 5 had a problem". A new setting had been introduced in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database". Default is indication by position.
   10. The Spotter now can interrupt itself, when a more urgent information must be communicated, for example whe he is informing the driver about the lap time of an opponent and an attack happens from behind.
-  11. [Experts Only] Team specific settings can now be assembled by a team manager and can be imported by every team member in "Simulator Setup" using a special preset. Please take a look at the [new documentation](*) for more information how to assemble such a package.
+  11. [Experts Only] Team specific settings can now be assembled by a team manager and can be imported by every team member in "Simulator Setup" using a special preset. Please take a look at the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#managing-common-team-settings) for more information how to assemble such a package.
   12. [Experts Only] Special logging has been implemented which helps when tracking down startup performance problems. It can be activated in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration).
 
 ## 5.6.1.0-release 03/01/24

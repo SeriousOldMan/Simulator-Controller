@@ -1112,7 +1112,7 @@ class SettingsImport extends NamedPreset {
 
 		if (FileExist(directory . "Export.info") && FileExist(directory . "Export.settings")) {
 			try {
-				RunWait(kBinariesDirectory . "Session Database.exe -Import `"" . directory . "`"", kBinariesDirectory)
+				RunWait(kBinariesDirectory . "Session Database.exe -Import `"" . normalizeDirectoryPath(directory) . "`"", kBinariesDirectory)
 			}
 			catch Any as exception {
 				logError(exception, true)

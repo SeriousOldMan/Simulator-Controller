@@ -320,8 +320,7 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 		local index
 
 		parseNr(candidate, &rest) {
-			local temp := ""
-			local char
+			local temp, char
 
 			candidate := Trim(candidate)
 
@@ -331,6 +330,8 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 				return candidate
 			}
 			else {
+				temp := ""
+
 				loop StrLen(candidate) {
 					char := SubStr(candidate, A_Index, 1)
 
@@ -342,11 +343,11 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 						return temp
 					}
 				}
+
+				rest := ""
+
+				return ((temp != "") ? temp : false)
 			}
-
-			rest := ""
-
-			return ((temp != "") ? temp : false)
 		}
 
 		parseCategory(candidate, &rest) {
@@ -370,8 +371,6 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 			return ((temp != "") ? temp : false)
 		}
 
-		carName := Trim(carName)
-
 		if isSet(model)
 			model := false
 
@@ -384,6 +383,7 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 		if isSet(category)
 			category := false
 
+		carName := Trim(carName)
 		index := InStr(carName, "#")
 
 		if (index = 1) {
@@ -417,11 +417,15 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 				parseNr(carName[2], &carName)
 
 			if (InStr(carName, ":") = 1)
-				if isSet(category)
+				if isSet(category) {
 					category := parseCategory(SubStr(carName, 2), &carName)
-				else
-					parseCategory(SubStr(carName, 2), &carName)
+
+					if (category = "")
+						category := false
+				}
 		}
+		else if (isSet(model) && (carName != ""))
+			model := carName
 	}
 
 	acquirePositionsData(telemetryData, finished := false) {

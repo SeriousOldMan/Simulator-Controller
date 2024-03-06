@@ -28,6 +28,15 @@ global kLMUPlugin := "LMU"
 ;;;-------------------------------------------------------------------------;;;
 
 class LMUPlugin extends RF2Plugin {
+	parseCarName(carName, &model?, &nr?, &category?, &team?) {
+		if ((carName != "") && isNumber(SubStr(carName, 1, 1))) {
+			nr := this.parseNr(carName, &carName)
+
+			super.parseCarName(carName, &model, , &category, &team)
+		}
+		else
+			super.parseCarName(carName, &model, &nr, &category, &team)
+	}
 }
 
 

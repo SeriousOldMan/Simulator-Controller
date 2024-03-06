@@ -223,14 +223,14 @@ namespace SHMConnector {
 					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Time.Sectors="); strWriter.WriteLine(sector1Time + "," + sector2Time + "," + sector3Time);
 
 					string carClass = GetStringFromBytes(vehicle.mVehicleClass);
-					string carModel = GetCarName(carClass, GetStringFromBytes(vehicle.mVehicleName));
-					string carNr = GetCarNr(vehicle.mID, carClass, GetStringFromBytes(vehicle.mVehicleName));
+                    string carName = GetStringFromBytes(vehicle.mVehicleName);
 
-					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Nr="); strWriter.WriteLine(carNr);
-					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Class="); strWriter.WriteLine(carClass);
-					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Car="); strWriter.WriteLine(carModel);
+                    strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Nr="); strWriter.WriteLine(GetCarNr(vehicle.mID, carClass, carName));
+                    strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Class="); strWriter.WriteLine(carClass);
+                    strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Car="); strWriter.WriteLine(GetCarName(carClass, carName));
+                    strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".CarRaw="); strWriter.WriteLine(carName);
 
-					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Driver.Forname="); strWriter.WriteLine(GetForname(vehicle.mDriverName));
+                    strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Driver.Forname="); strWriter.WriteLine(GetForname(vehicle.mDriverName));
 					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Driver.Surname="); strWriter.WriteLine(GetSurname(vehicle.mDriverName));
 					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Driver.Nickname="); strWriter.WriteLine(GetNickname(vehicle.mDriverName));
 
@@ -289,8 +289,9 @@ namespace SHMConnector {
 				string vehicleClass = GetStringFromBytes(playerScoring.mVehicleClass);
 				string vehicleName = GetStringFromBytes(playerScoring.mVehicleName);
 
-				strWriter.Write("Car="); strWriter.WriteLine(GetCarName(vehicleClass, vehicleName));
-				strWriter.Write("CarName="); strWriter.WriteLine(vehicleName);
+                strWriter.Write("Car="); strWriter.WriteLine(GetCarName(vehicleClass, vehicleName));
+                strWriter.Write("CarRaw="); strWriter.WriteLine(vehicleName);
+                strWriter.Write("CarName="); strWriter.WriteLine(vehicleName);
 				strWriter.Write("CarClass="); strWriter.WriteLine(vehicleClass);
 				strWriter.Write("Track="); strWriter.WriteLine(GetStringFromBytes(playerTelemetry.mTrackName));
 				strWriter.Write("SessionFormat="); strWriter.WriteLine((scoring.mScoringInfo.mEndET <= 0.0) ? "Laps" : "Time");

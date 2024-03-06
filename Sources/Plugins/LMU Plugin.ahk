@@ -316,8 +316,161 @@ class LMUPlugin extends RaceAssistantSimulatorPlugin {
 			}
 	}
 
+	parseCarName(carName, &model?, &nr?, &category?, &team?) {
+		local index
+
+		parseNr(candidate, &rest) {
+			local temp := ""
+			local char
+
+			candidate := Trim(candidate)
+
+			if isNumber(candidate) {
+				rest := ""
+
+				return candidate
+			}
+			else {
+				loop StrLen(candidate) {
+					char := SubStr(candidate, A_Index, 1)
+
+					if isNumber(char)
+						temp .= char
+					else if (char != A_Space) {
+						rest := SubStr(candidate, A_Index)
+
+						return temp
+					}
+				}
+			}
+
+			rest := ""
+
+			return ((temp != "") ? temp : false)
+		}
+
+		parseCategory(candidate, &rest) {
+			local temp := ""
+			local char
+
+			loop StrLen(candidate) {
+				char := SubStr(candidate, A_Index, 1)
+
+				if (char != A_Space)
+					temp .= char
+				else {
+					rest := SubStr(candidate, A_Index)
+
+					return temp
+				}
+			}
+
+			rest := ""
+
+			return ((temp != "") ? temp : false)
+		}
+
+		carName := Trim(carName)
+
+		if isSet(model)
+			model := false
+
+		if isSet(team)
+			team := false
+
+		if isSet(nr)
+			nr := false
+
+		if isSet(category)
+			category := false
+
+		index := InStr(carName, "#")
+
+		if (index = 1) {
+			if isSet(nr)
+				nr := parseNr(SubStr(carName, 2), &carName)
+			else
+				parseNr(SubStr(carName, 2), &carName)
+
+			if (InStr(carName, ":") = 1)
+				if isSet(category)
+					category := parseCategory(SubStr(carName, 2), &carName)
+				else
+					parseCategory(SubStr(carName, 2), &carName)
+
+			if isSet(model)
+				model := carName
+		}
+		else if index {
+			carName := StrSplit(carName, "#", , 2)
+
+			if isSet(model) {
+				model := Trim(carName[1])
+
+				if (model = "")
+					model := false
+			}
+
+			if isSet(nr)
+				nr := parseNr(carName[2], &carName)
+			else
+				parseNr(carName[2], &carName)
+
+			if (InStr(carName, ":") = 1)
+				if isSet(category)
+					category := parseCategory(SubStr(carName, 2), &carName)
+				else
+					parseCategory(SubStr(carName, 2), &carName)
+		}
+	}
+
+	acquirePositionsData(telemetryData, finished := false) {
+		local positionsData := super.acquirePositionsData(telemetryData, finished)
+		local numbers := Map()
+		local duplicateNrs := false
+		local carRaw, carID, model, category, nr
+
+		loop {
+			carRaw := getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".CarRaw", kUndefined)
+
+			if (carRaw == kUndefined)
+				break
+			else {
+				this.parseCarName(carRaw, &model, &nr, &category)
+
+				if model
+					setMultiMapValue(telemetryData, "Position Data", "Car." . A_Index . ".Car", model)
+
+				nr := Integer(nr ? nr : getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".ID"))
+
+				setMultiMapValue(telemetryData, "Position Data", "Car." . A_Index . ".Nr", nr)
+
+				if category
+					setMultiMapValue(telemetryData, "Position Data", "Car." . A_Index . ".Category", category)
+
+				if numbers.Has(nr)
+					duplicateNrs := true
+				else
+					numbers[nr] := true
+			}
+		}
+
+		if duplicateNrs
+			loop {
+				carID := getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".CarID", kUndefined)
+
+				if (carID == kUndefined)
+					break
+				else
+					getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Nr", carID)
+			}
+
+		return positionsData
+	}
+
 	acquireTelemetryData() {
 		local telemetryData := super.acquireTelemetryData()
+		local model
 
 		static lastSimulator := false
 		static lastCar := false
@@ -333,6 +486,11 @@ class LMUPlugin extends RaceAssistantSimulatorPlugin {
 
 			loadSetup := SettingsDatabase().readSettingValue(lastSimulator, lastCar, lastTrack, "*", "Simulator.Le Mans Ultimate", "Session.Data.Setup", 60)
 		}
+
+		this.parseCarName(getMultiMapValue(telemetryData, "Session Data", "CarRaw"), &model)
+
+		if model
+			setMultiMapValue(telemetryData, "Session Data", "Car", model)
 
 		if (loadSetup == true)
 			addMultiMapValues(telemetryData, this.readSessionData("Setup=true"))

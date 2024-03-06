@@ -1694,7 +1694,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 					if (lapTime = focused.LastLapTime) {
 						phrase := "FocusBestLap"
-						indicator := getMultiMapValue(this.Settings, "Assistant.Spotter", "CarIndicator", "Number")
+						indicator := getMultiMapValue(this.Settings, "Assistant.Spotter", "CarIndicator", "Position")
 						position := focused.Car.Position["Class"]
 						number := focused.Car.Nr
 					}
@@ -1737,7 +1737,7 @@ class RaceSpotter extends GridRaceAssistant {
 								if ((rnd > 66) && (rnd <= 100)) {
 									lapTime := focused.LastLapTime
 									phrase := "FocusLapTime"
-									indicator := getMultiMapValue(this.Settings, "Assistant.Spotter", "CarIndicator", "Number")
+									indicator := getMultiMapValue(this.Settings, "Assistant.Spotter", "CarIndicator", "Position")
 									position := focused.Car.Position["Class"]
 									number := focused.Car.Nr
 								}
@@ -1759,7 +1759,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 					speaker.speakPhrase(phrase, {time: speaker.number2Speech(lapTime, 1), minute: minute
 											   , seconds: speaker.number2Speech(lapTime - (minute * 60), 1)
-											   , indicator: "Car" . indicator
+											   , indicator: speaker.Fragments["Car" . indicator]
 											   , number: (indicator = "Number") ? number : position})
 
 					return true
@@ -1856,9 +1856,9 @@ class RaceSpotter extends GridRaceAssistant {
 				if !this.TacticalAdvices.Has(situation) {
 					this.TacticalAdvices[situation] := true
 
-					indicator := getMultiMapValue(this.Settings, "Assistant.Spotter", "CarIndicator", "Number")
+					indicator := getMultiMapValue(this.Settings, "Assistant.Spotter", "CarIndicator", "Position")
 
-					speaker.speakPhrase("FocusPitting", {indicator: "Car" . indicator
+					speaker.speakPhrase("FocusPitting", {indicator: speaker.Fragments["Car" . indicator]
 													   , number: (indicator = "Number") ? focused.Car.Nr : focused.Car.Position["Class"]})
 
 					return true
@@ -1909,9 +1909,9 @@ class RaceSpotter extends GridRaceAssistant {
 				if !this.TacticalAdvices.Has(situation) {
 					this.TacticalAdvices[situation] := true
 
-					indicator := getMultiMapValue(this.Settings, "Assistant.Spotter", "CarIndicator", "Number")
+					indicator := getMultiMapValue(this.Settings, "Assistant.Spotter", "CarIndicator", "Position")
 
-					speaker.speakPhrase("FocusProblem", {indicator: "Car" . indicator
+					speaker.speakPhrase("FocusProblem", {indicator: speaker.Fragments["Car" . indicator]
 													   , number: (indicator = "Number") ? focused.Car.Nr : focused.Car.Position["Class"]})
 
 					return true
@@ -2034,9 +2034,9 @@ class RaceSpotter extends GridRaceAssistant {
 						if !situation {
 							this.TacticalAdvices["FasterThan"] := {Key: key, Lap: lastLap}
 
-							indicator := getMultiMapValue(this.Settings, "Assistant.Spotter", "CarIndicator", "Number")
+							indicator := getMultiMapValue(this.Settings, "Assistant.Spotter", "CarIndicator", "Position")
 
-							speaker.speakPhrase("FasterThan", {indicator: "Car" . indicator
+							speaker.speakPhrase("FasterThan", {indicator: speaker.Fragments["Car" . indicator]
 															 , number: (indicator = "Number") ? slowerCar.Nr : slowerCar.Position["Class"]
 															 , delta: speaker.number2Speech(delta, 1)
 															 , lapTime: speaker.number2Speech(lapTimeDifference, 1)})
@@ -2143,7 +2143,7 @@ class RaceSpotter extends GridRaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker := this.getSpeaker()
 		local talking := false
-		local number, focusedCar, delta, car, driver, inPit, lap, ignore, candidate
+		local number, focusedCar, delta, car, driver, inPit, lap, ignore, candidate, indicator
 
 		if (this.getPosition(false, "Class") = this.getCars("Class").Length)
 			return false
@@ -2153,6 +2153,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 				if (lap > 0) {
 					number := this.FocusedCar
+					car := false
 
 					for ignore, candidate in this.getCars()
 						if (knowledgeBase.getValue("Car." . candidate . ".Nr", false) = number) {
@@ -2161,24 +2162,30 @@ class RaceSpotter extends GridRaceAssistant {
 							break
 						}
 
-					delta := (this.getDelta(car) / 1000)
-					inPit := (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false))
+					if car {
+						delta := (this.getDelta(car) / 1000)
+						inPit := (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false))
 
-					if ((delta = 0) || (inPit && (Abs(delta) < 30)))
-						return false
-					else if ((knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap", 0)) < lap)
-						  && (Abs(delta) > (knowledgeBase.getValue("Lap." . lap . ".Time", 0) / 1000)))
-						return false
-					else {
-						speaker.beginTalk()
+						if ((delta = 0) || (inPit && (Abs(delta) < 30)))
+							return false
+						else if ((knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap", 0)) < lap)
+							  && (Abs(delta) > (knowledgeBase.getValue("Lap." . lap . ".Time", 0) / 1000)))
+							return false
+						else {
+							speaker.beginTalk()
 
-						speaker.speakPhrase((delta < 0) ? "FocusGapToBehind" : "FocusGapToAhead"
-										  , {number: number, delta: speaker.number2Speech(Abs(delta), 1)})
+							indicator := getMultiMapValue(this.Settings, "Assistant.Spotter", "CarIndicator", "Position")
 
-						talking := true
+							speaker.speakPhrase((delta < 0) ? "FocusGapToBehind" : "FocusGapToAhead"
+											  , {indicator: speaker.Fragments["Car" . indicator]
+											   , number: (indicator = "Number") ? number : this.FocusedCar[true].Car.Position["Class"]
+											   , delta: speaker.number2Speech(Abs(delta), 1)})
 
-						if inPit
-							speaker.speakPhrase("GapCarInPit")
+							talking := true
+
+							if inPit
+								speaker.speakPhrase("GapCarInPit")
+						}
 					}
 
 					return talking
@@ -2503,7 +2510,7 @@ class RaceSpotter extends GridRaceAssistant {
 				focused := false
 
 			if focused {
-				indicator := getMultiMapValue(this.Settings, "Assistant.Spotter", "CarIndicator", "Number")
+				indicator := getMultiMapValue(this.Settings, "Assistant.Spotter", "CarIndicator", "Position")
 				position := focused.Car.Position["Class"]
 				number := focused.Car.Nr
 				delta := focused.Delta[false, true, 1]
@@ -2535,14 +2542,14 @@ class RaceSpotter extends GridRaceAssistant {
 						delta := Abs(delta)
 
 						if (focused.closingIn(sector, behindLostThreshold) && !focused.Reported) {
-							indicator := getMultiMapValue(this.Settings, "Assistant.Spotter", "CarIndicator", "Number")
+							indicator := getMultiMapValue(this.Settings, "Assistant.Spotter", "CarIndicator", "Position")
 
 							speaker.speakPhrase("LostFocusBehind", {delta: (delta > 5) ? Round(delta) : speaker.number2Speech(delta, 1)
 																  , lost: speaker.number2Speech(deltaDifference, 1)
 																  , lapTime: speaker.number2Speech(lapTimeDifference, 1)
 																  , deltaLaps: lapDifference
 																  , laps: speaker.Fragments[(lapDifference > 1) ? "Laps" : "Lap"]
-																  , indicator: "Car" . indicator
+																  , indicator: speaker.Fragments["Car" . indicator]
 																  , number: (indicator = "Number") ? number : position})
 
 							if !informed
@@ -2558,7 +2565,7 @@ class RaceSpotter extends GridRaceAssistant {
 																	, lapTime: speaker.number2Speech(lapTimeDifference, 1)
 																	, deltaLaps: lapDifference
 																	, laps: speaker.Fragments[(lapDifference > 1) ? "Laps" : "Lap"]
-																	, indicator: "Car" . indicator
+																	, indicator: speaker.Fragments["Car" . indicator]
 																	, number: (indicator = "Number") ? number : position})
 
 							focused.reset(sector, true, true)
@@ -2573,7 +2580,7 @@ class RaceSpotter extends GridRaceAssistant {
 																   , lapTime: speaker.number2Speech(lapTimeDifference, 1)
 																   , deltaLaps: lapDifference
 																   , laps: speaker.Fragments[(lapDifference > 1) ? "Laps" : "Lap"]
-																   , indicator: "Car" . indicator
+																   , indicator: speaker.Fragments["Car" . indicator]
 																   , number: (indicator = "Number") ? number : position})
 
 							remaining := Min(knowledgeBase.getValue("Session.Time.Remaining"), knowledgeBase.getValue("Driver.Time.Stint.Remaining"))
@@ -2594,7 +2601,7 @@ class RaceSpotter extends GridRaceAssistant {
 																 , lapTime: speaker.number2Speech(lapTimeDifference, 1)
 																 , deltaLaps: lapDifference
 																 , laps: speaker.Fragments[(lapDifference > 1) ? "Laps" : "Lap"]
-																 , indicator: "Car" . indicator
+																 , indicator: speaker.Fragments["Car" . indicator]
 																 , number: (indicator = "Number") ? number : position})
 
 							focused.reset(sector, true, true)

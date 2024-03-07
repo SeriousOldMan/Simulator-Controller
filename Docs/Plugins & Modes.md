@@ -945,6 +945,10 @@ Note: For convenience, all commands available for the *assistantCommands* parame
 
 For *rFactor 2*, you need to install a plugin into a special location for the pitstop interface to work. You can find the plugin in the *Utilities\3rd Part\rf2_sm_tools_3.7.14.2.zip* or you can load the [latest version](https://github.com/TheIronWolfModding/rF2SharedMemoryMapPlugin) from GitHub. Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#installation-of-telemetry-providers) for installation instructions.
 
+### Special notes for *rFactor 2*
+
+The *rFactor 2* data API does not provide a car model field and also no dedicated race number for each car. There is only one field that provides a combination of car model, team name, race number and other information. Not all components are there all the time and the format of the field content is not consistent. The "RF2" plugin parses this field and extracts as much information as possible. But it can happen, that several cars with the same race number are on the grid. In this case, the plugin generates synthetical race numbers starting from **1** to keep things working. Also it is possible that the car model is more like the team name and so on. Please blame the developers of *rFactor 2* for this mess.
+
 ## Plugin *R3E*
 
 This plugin handles the *RaceRoom Racing Experience* simulation game. An application with the name "RaceRoom Racing Experience" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startR3E" as a special function hook in this configuration and define "ahk_exe RRRE64.exe" (yes, three "R"s) as the window title. The plugin supports a "Pitstop" mode to control the pitstop settings and an integration with Jona is available through the "Race Engineer" plugin, an integration with Cato through the plugin "Race Strategist", and an integration with Elisa through the plugin "Race Spotter".
@@ -1343,6 +1347,10 @@ Note: For convenience, all commands available for the *assistantCommands* parame
 ### Installation of the *Le Mans Ultimate* Pitstop Interface
 
 For *Le Mans Ultimate*, you need to install a plugin into a special location for the pitstop interface to work. You can find the plugin in the *Utilities\3rd Part\rf2_sm_tools_3.7.14.2.zip* or you can load the [latest version](https://github.com/TheIronWolfModding/rF2SharedMemoryMapPlugin) from GitHub. Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#installation-of-telemetry-providers) for installation instructions.
+
+### Special notes for *Le Mans Ultimate*
+
+The *Le Mans Ultimate* data API (similar to *rFactor 2*) does not provide a car model field and also no dedicated race number for each car. There is only one field that provides a combination of car model, team name, race number and other information. Not all components are there all the time and the format of the field content is not consistent. The "LMU" plugin parses this field and extracts as much information as possible. But it can happen, that several cars with the same race number are on the grid. In this case, the plugin generates synthetical race numbers starting from **1** to keep things working. Also it is possible that the car model is more like the team name and so on. Please blame the developers of *rFactor 2* and *Le Mans Ultimate* for this mess.
 
 ## Plugin *Integration*
 

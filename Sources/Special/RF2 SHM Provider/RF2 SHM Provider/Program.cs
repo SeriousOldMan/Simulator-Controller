@@ -21,7 +21,7 @@ namespace RF2SHMProvider {
             Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("en-US");
             string request = args.Length > 0 ? args[0] : "";
             SHMProvider provider = new SHMProvider();
-            request = "Standings";
+            
             if (request.StartsWith("Pitstop"))
             {
                 request = request.Split(new char[] { '=' }, 2)[1];

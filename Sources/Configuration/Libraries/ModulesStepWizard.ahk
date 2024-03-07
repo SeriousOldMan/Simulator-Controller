@@ -1068,9 +1068,13 @@ class SettingsImport extends NamedPreset {
 	}
 
 	importSettings(directory, &progress) {
+		local count := 0
 		local settings
 
 		directory := (normalizeDirectoryPath(directory) . "\")
+
+		loop Files (directory . "*.*")
+			count += 1
 
 		if FileExist(directory . "Startup.settings") {
 			settings := readMultiMap(kUserConfigDirectory . "Startup.settings")
@@ -1079,7 +1083,7 @@ class SettingsImport extends NamedPreset {
 
 			writeMultiMap(kUserConfigDirectory . "Startup.settings", settings)
 
-			showProgress({progress: (progress += 25)})
+			showProgress({progress: (progress += Round(100 / count))})
 
 			Sleep(500)
 		}
@@ -1092,7 +1096,7 @@ class SettingsImport extends NamedPreset {
 
 			writeMultiMap(kUserConfigDirectory . "Session Database.ini", settings)
 
-			showProgress({progress: (progress += 25)})
+			showProgress({progress: (progress += Round(100 / count))})
 
 			Sleep(500)
 		}
@@ -1105,23 +1109,24 @@ class SettingsImport extends NamedPreset {
 				logError(exception, true)
 			}
 
-			showProgress({progress: (progress += 25)})
+			showProgress({progress: (progress += Round(100 / count))})
 
 			Sleep(500)
 		}
 
-		if (FileExist(directory . "Export.info") && FileExist(directory . "Export.settings")) {
-			try {
-				RunWait(kBinariesDirectory . "Session Database.exe -Import `"" . normalizeDirectoryPath(directory) . "`"", kBinariesDirectory)
-			}
-			catch Any as exception {
-				logError(exception, true)
-			}
+		loop Files (directory . "*.*"), "D"
+			if FileExist(A_LoopFilePath . "\Export.info") {
+				try {
+					RunWait(kBinariesDirectory . "Session Database.exe -Import `"" . A_LoopFilePath . "`"", kBinariesDirectory)
+				}
+				catch Any as exception {
+					logError(exception, true)
+				}
 
-			showProgress({progress: (progress += 25)})
+				showProgress({progress: (progress += Round(100 / count))})
 
-			Sleep(500)
-		}
+				Sleep(500)
+			}
 	}
 }
 

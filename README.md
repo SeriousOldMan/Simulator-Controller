@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[5.6.2.0-dev](https://www.dropbox.com/scl/fi/a86tfufudhno2j7tr2poq/Simulator-Controller-5.6.2.0-dev.zip?rlkey=mxhh8bl3l4ws0platucbv8wws&dl=1) (Early build for 5.6.2. Changes: Full integration of Le Mans Ultimate, Fixed pitstop tyre pressure change update for rFactor 2, Fixed initialization of tyre pressures for loaded sessions in the "Practice Center".)
+[5.6.2.0-dev](https://www.dropbox.com/scl/fi/a86tfufudhno2j7tr2poq/Simulator-Controller-5.6.2.0-dev.zip?rlkey=mxhh8bl3l4ws0platucbv8wws&dl=1) (Early build for 5.6.2. Changes: New startup logging, Strategy recalculation now incorporates completed pitstops for validation, Pitstop window as well as refuel and tyre rules relate only required pitstops, Settings export file format in "Session Database" fixed, Fixed import settings in "Session Database", Increased reliability of opponent pitstop information in "Race Center", Choice for car indication by the Spotter, The Spotter now interrupts itself more often, Import of team specific settings as a special preset in "Simulator Setup", Improved car name parsing fo Le Mans Ultimate.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-562) of this version and all the versions you might have skipped, before installing and using this version.
 

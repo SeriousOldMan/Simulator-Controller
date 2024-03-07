@@ -316,8 +316,152 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 			}
 	}
 
+	parseNr(candidate, &rest) {
+		local temp, char
+
+		candidate := Trim(candidate)
+
+		if isNumber(candidate) {
+			rest := ""
+
+			return candidate
+		}
+		else {
+			temp := ""
+
+			loop StrLen(candidate) {
+				char := SubStr(candidate, A_Index, 1)
+
+				if isNumber(char)
+					temp .= char
+				else if (char != A_Space) {
+					rest := SubStr(candidate, A_Index)
+
+					return temp
+				}
+			}
+
+			rest := ""
+
+			return ((temp != "") ? temp : false)
+		}
+	}
+
+	parseCategory(candidate, &rest) {
+		local temp := ""
+		local char
+
+		loop StrLen(candidate) {
+			char := SubStr(candidate, A_Index, 1)
+
+			if (char != A_Space)
+				temp .= char
+			else {
+				rest := SubStr(candidate, A_Index)
+
+				return temp
+			}
+		}
+
+		rest := ""
+
+		return ((temp != "") ? temp : false)
+	}
+
+	parseCarName(carName, &model?, &nr?, &category?, &team?) {
+		local index
+
+		model := false
+		team := false
+		nr := false
+		category := false
+
+		carName := Trim(carName)
+		index := InStr(carName, "#")
+
+		if (index = 1) {
+			nr := this.parseNr(SubStr(carName, 2), &carName)
+
+			if (InStr(carName, ":") = 1)
+				category := this.parseCategory(SubStr(carName, 2), &carName)
+
+			model := carName
+		}
+		else if index {
+			carName := StrSplit(carName, "#", , 2)
+
+			model := Trim(carName[1])
+
+			if (model = "")
+				model := false
+
+			nr := this.parseNr(carName[2], &carName)
+
+			if (InStr(carName, ":") = 1) {
+				category := this.parseCategory(SubStr(carName, 2), &carName)
+
+				if (category = "")
+					category := false
+			}
+		}
+		else if (carName != "")
+			model := carName
+
+		if (InStr(model, ":") && !category) {
+			carName := StrSplit(model, ":", , 2)
+
+			model := Trim(carName[1])
+			category := Trim(carName[2])
+		}
+	}
+
+	acquirePositionsData(telemetryData, finished := false) {
+		local positionsData := super.acquirePositionsData(telemetryData, finished)
+		local numbers := Map()
+		local duplicateNrs := false
+		local carRaw, carID, model, category, nr
+
+		loop {
+			carRaw := getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".CarRaw", kUndefined)
+
+			if (carRaw == kUndefined)
+				break
+			else {
+				this.parseCarName(carRaw, &model, &nr, &category)
+
+				if model
+					setMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Car", model)
+
+				nr := Integer(nr ? nr : getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".ID"))
+
+				setMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Nr", nr)
+
+				if category
+					setMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Category", category)
+
+				if numbers.Has(nr)
+					duplicateNrs := true
+				else
+					numbers[nr] := true
+			}
+		}
+
+		if duplicateNrs
+			loop {
+				carID := getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".ID", kUndefined)
+
+				if (carID == kUndefined)
+					break
+				else
+					setMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Nr", carID)
+			}
+
+		return positionsData
+	}
+
 	acquireTelemetryData() {
 		local telemetryData := super.acquireTelemetryData()
+		local model
 
 		static lastSimulator := false
 		static lastCar := false
@@ -333,6 +477,11 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 
 			loadSetup := SettingsDatabase().readSettingValue(lastSimulator, lastCar, lastTrack, "*", "Simulator.rFactor 2", "Session.Data.Setup", 60)
 		}
+
+		this.parseCarName(getMultiMapValue(telemetryData, "Session Data", "CarRaw"), &model)
+
+		if model
+			setMultiMapValue(telemetryData, "Session Data", "Car", model)
 
 		if (loadSetup == true)
 			addMultiMapValues(telemetryData, this.readSessionData("Setup=true"))

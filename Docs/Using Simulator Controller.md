@@ -166,15 +166,15 @@ In many cases all drivers in a given team want to share the same configuration. 
 
    Contains information about the Team Server connection of the local telemetry database. If you have configured a data replication with the Team Server, you will want to enable it for all your team mates as well. This file can also be found in the *Simulator Controller\Config* folder in your user *Documents* folder.
 
-4. *Export of the (race) settings from the "Session Database"*
+4. *Exports from the "Session Database"*
 
-   You can prepare an export of all the settings you want to share with your team mates. Normally you want to export all your settings using the Control key while exporting the settings from your "Session Database". Then put the files from the export folder into the folder of the team package.
+   You can prepare any number of exports from your session database you want to share with your team mates. Normally you want to use the Control key while exporting the settings from your "Session Database", so that everythig is included. You can also export telemetry data, track maps and other stuff from the [administration page](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#administration) of the "Session Database". Put all the export folders into the folder of the team package.
    
 The content of a typical folder of common team settings should look like this:
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Team%20Settings%20Package.JPG)
 
-Now you can zip this folder and send it to your team mates. The have to unzip it, start "Simulator Setup" and use the special preset "Import Settings for your team" to import the stuff.
+Now you can zip this folder and send it to your team mates. They have to unzip it, start "Simulator Setup" and use the special preset "Import Settings for your team" to import the stuff. For settings, telemetry data and so on, you can select item by item, which you want to import.
 
 ### Voice Commands
 

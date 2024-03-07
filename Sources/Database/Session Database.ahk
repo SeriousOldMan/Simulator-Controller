@@ -3186,17 +3186,20 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local simulator := this.SelectedSimulator
 		local info := readMultiMap(directory . "\Export.info")
 		local progressWindow, schemas, schema, fields, id, name, progress, tracks, code, ignore, row, field, type
-		local targetDirectory, car, carName, track, trackName, key, sourceDirectory, driver, sourceDB, targetDB
+		local targetDirectory, car, carName, track, trackName, key, sourceDirectory, drivers, driver, sourceDB, targetDB
 		local tyresDB, data, targetName, name, fileName, automations, automation, trackAutomations, trackName, extension
 
 		directory := normalizeDirectoryPath(directory)
 
-		if ((this.SessionDatabase.getSimulatorName(getMultiMapValue(info, "General", "Simulator", "Unknown")) = simulator)
+		if ((!window || (this.SessionDatabase.getSimulatorName(getMultiMapValue(info, "General", "Simulator", "Unknown")) = simulator))
 		 && (getMultiMapValue(info, "General", "Type", "Data") = "Data")) {
 			progressWindow := showProgress({color: "Green", title: translate("Importing Data")})
 
-			progressWindow.Opt("+Owner" . window.Hwnd)
-			window.Block()
+			if window {
+				progressWindow.Opt("+Owner" . window.Hwnd)
+
+				window.Block()
+			}
 
 			schemas := CaseInsenseMap()
 
@@ -3260,7 +3263,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 							sourceDirectory := (A_LoopFileDir . "\" . track)
 
 							if selection.Has(key . "Telemetry") {
-								driver := selection[key . "Telemetry"]
+								drivers := selection[key . "Telemetry"]
 
 								sourceDB := Database(sourceDirectory . "\", schemas)
 								targetDB := TelemetryDatabase(simulator, car, track).Database
@@ -3268,14 +3271,15 @@ class SessionDatabaseEditor extends ConfigurationItem {
 								targetDB.lock("Electronics")
 
 								try {
-									for ignore, row in sourceDB.query("Electronics", {Where: {Driver: driver}}) {
-										data := Database.Row()
+									for ignore, driver in drivers
+										for ignore, row in sourceDB.query("Electronics", {Where: {Driver: driver}}) {
+											data := Database.Row()
 
-										for ignore, field in schemas["Electronics"]
-											data[field] := row[field]
+											for ignore, field in schemas["Electronics"]
+												data[field] := row[field]
 
-										targetDB.add("Electronics", data, true)
-									}
+											targetDB.add("Electronics", data, true)
+										}
 								}
 								finally {
 									targetDB.unlock("Electronics")
@@ -3284,14 +3288,15 @@ class SessionDatabaseEditor extends ConfigurationItem {
 								targetDB.lock("Tyres")
 
 								try {
-									for ignore, row in sourceDB.query("Tyres", {Where: {Driver: driver}}) {
-										data := Database.Row()
+									for ignore, driver in drivers
+										for ignore, row in sourceDB.query("Tyres", {Where: {Driver: driver}}) {
+											data := Database.Row()
 
-										for ignore, field in schemas["Tyres"]
-											data[field] := row[field]
+											for ignore, field in schemas["Tyres"]
+												data[field] := row[field]
 
-										targetDB.add("Tyres", data, true)
-									}
+											targetDB.add("Tyres", data, true)
+										}
 								}
 								finally {
 									targetDB.unlock("Tyres")
@@ -3299,27 +3304,29 @@ class SessionDatabaseEditor extends ConfigurationItem {
 							}
 
 							if selection.Has(key . "Pressures") {
-								driver := selection[key . "Pressures"]
+								drivers := selection[key . "Pressures"]
 
 								tyresDB := TyresDatabase()
 								sourceDB := Database(sourceDirectory . "\", schemas)
 								targetDB := tyresDB.lock(simulator, car, track)
 
 								try {
-									for ignore, row in sourceDB.query("Tyres.Pressures", {Where: {Driver: driver}}) {
-										data := Database.Row()
+									for ignore, driver in drivers {
+										for ignore, row in sourceDB.query("Tyres.Pressures", {Where: {Driver: driver}}) {
+											data := Database.Row()
 
-										for ignore, field in schemas["Tyres.Pressures"]
-											data[field] := row[field]
+											for ignore, field in schemas["Tyres.Pressures"]
+												data[field] := row[field]
 
-										targetDB.add("Tyres.Pressures", data, true)
-									}
+											targetDB.add("Tyres.Pressures", data, true)
+										}
 
-									for ignore, row in sourceDB.query("Tyres.Pressures.Distribution", {Where: {Driver: driver}}) {
-										tyresDB.updatePressure(simulator, car, track, row["Weather"], row["Temperature.Air"], row["Temperature.Track"]
-															 , row["Compound"], row["Compound.Color"]
-															 , row["Type"], row["Tyre"], row["Pressure"], row["Count"]
-															 , false, true, "User", driver)
+										for ignore, row in sourceDB.query("Tyres.Pressures.Distribution", {Where: {Driver: driver}}) {
+											tyresDB.updatePressure(simulator, car, track, row["Weather"], row["Temperature.Air"], row["Temperature.Track"]
+																 , row["Compound"], row["Compound.Color"]
+																 , row["Type"], row["Tyre"], row["Pressure"], row["Count"]
+																 , false, true, "User", driver)
+										}
 									}
 								}
 								finally {
@@ -3414,12 +3421,14 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				logError(exception)
 			}
 			finally {
-				window.Unblock()
+				if window
+					window.Unblock()
 
 				hideProgress()
 			}
 
-			this.selectData()
+			if window
+				this.selectData()
 		}
 	}
 
@@ -4913,7 +4922,7 @@ selectImportSettings(sessionDatabaseEditorOrCommand, directory := false, owner :
 selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := false, *) {
 	local x, y, w, h, editor, simulator, code, info, drivers, id, name, progressWindow, tracks, progress
 	local car, carName, track, trackName, sourceDirectory, found, telemetryDB, tyresDB, driver, driverName, rows
-	local strategies, automations, row, selection, data, type, number
+	local strategies, automations, row, selection, data, type, number, key
 
 	static importDataGui
 	static importSelectCheck
@@ -5001,7 +5010,8 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := fa
 
 		progressWindow := showProgress({color: "Green", title: translate("Analyzing Data")})
 
-		progressWindow.Opt("+Owner" . owner.Hwnd)
+		if owner
+			progressWindow.Opt("+Owner" . owner.Hwnd)
 
 		try {
 			tracks := []
@@ -5101,7 +5111,8 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := fa
 		importDataGui.Add("Button", "x123 yp+10 w80 h23 Y:Move X:Move(0.5) Default", translate("Ok")).OnEvent("Click", selectImportData.Bind(kOk))
 		importDataGui.Add("Button", "x226 yp w80 h23 Y:Move X:Move(0.5)", translate("&Cancel")).OnEvent("Click", selectImportData.Bind(kCancel))
 
-		importDataGui.Opt("+Owner" . owner.Hwnd)
+		if owner
+			importDataGui.Opt("+Owner" . owner.Hwnd)
 
 		if getWindowPosition("Session Database.ImportData", &x, &y)
 			importDataGui.Show("x" . x . " y" . y)
@@ -5153,11 +5164,16 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := fa
 				}
 
 				if ((car = "-") && (track = "-"))
-					selection["-.-." . type] := drivers[driver]
+					key := ("-.-." . type)
 				else if (car = "-")
-					selection["-." . editor.getTrackCode(simulator, track) . "." . type] := drivers[driver]
+					key := ("-." . editor.getTrackCode(simulator, track) . "." . type)
 				else
-					selection[editor.getCarCode(simulator, car) . "." . editor.getTrackCode(simulator, track) . "." . type] := drivers[driver]
+					key := (editor.getCarCode(simulator, car) . "." . editor.getTrackCode(simulator, track) . "." . type)
+
+				if selection.Has(key)
+					selection[key].Push(drivers[driver])
+				else
+					selection[key] := [drivers[driver]]
 			}
 
 			result := selection
@@ -5880,7 +5896,7 @@ startupSessionDatabase() {
 	local requestorPID := false
 	local import := false
 	local index := 1
-	local editor, selection
+	local editor, selection, info
 
 	TraySetIcon(icon, "1")
 	A_IconTip := "Session Database"
@@ -5933,13 +5949,22 @@ startupSessionDatabase() {
 	try {
 		if import {
 			import := (normalizeDirectoryPath(import) . "\")
+			info := readMultiMap(import . "Export.info")
 
-			editor := SessionDatabaseEditor(getMultiMapValue(readMultiMap(import . "Export.info"), "General", "Simulator", "Unknown"))
+			editor := SessionDatabaseEditor(getMultiMapValue(info, "General", "Simulator", "Unknown"))
 
-			selection := selectImportSettings(editor, import)
+			if (getMultiMapValue(info, "General", "Type", "Data") = "Settings") {
+				selection := selectImportSettings(editor, import)
 
-			if selection
-				editor.importSettings(import, selection)
+				if selection
+					editor.importSettings(import, selection)
+			}
+			else if (getMultiMapValue(info, "General", "Type", "Data") = "Data") {
+				selection := selectImportData(editor, import)
+
+				if selection
+					editor.importData(import, selection)
+			}
 
 			ExitApp(0)
 		}

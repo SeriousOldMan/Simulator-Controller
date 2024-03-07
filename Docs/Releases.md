@@ -1,4 +1,4 @@
-## 5.6.2.0-release 03/08/24 (planned)
+## 5.6.2.0-release 03/08/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed import of (race) settings in the "Session Database".

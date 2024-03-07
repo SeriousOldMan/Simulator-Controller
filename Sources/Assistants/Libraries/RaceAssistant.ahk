@@ -120,6 +120,10 @@ class RaceAssistant extends ConfigurationItem {
 			messageSend(kFileMessage, this.Event, function . ":" . values2String(";", arguments*), this.RemotePID)
 		}
 
+		savePitstopState(arguments*) {
+			this.callRemote("savePitstopState", arguments*)
+		}
+
 		saveSessionState(arguments*) {
 			this.callRemote("callSaveSessionState", arguments*)
 		}
@@ -1747,6 +1751,18 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
+	savePitstops(lapNumber, pitstopState) {
+		local fileName
+
+		if this.RemoteHandler {
+			fileName := temporaryFileName("Pitstops." . lapNumber, "state")
+
+			writeMultiMap(fileName, pitstopState)
+
+			this.RemoteHandler.savePitstopState(lapNumber, fileName)
+		}
+	}
+
 	saveSessionInfo(lapNumber, simulator, car, track, sessionInfo) {
 		local fileName
 
@@ -2558,9 +2574,10 @@ class GridRaceAssistant extends RaceAssistant {
 			this.getSpeaker().speakPhrase("NoTrackGap")
 	}
 
-	createSessionState() {
-		local state := super.createSessionState()
-		local data := CaseInsenseMap()
+	savePitstopState(state := false) {
+		if !state
+			state := newMultiMap()
+
 		local id, pitstops, index, pitstop
 
 		for id, pitstops in this.Pitstops {
@@ -2574,6 +2591,14 @@ class GridRaceAssistant extends RaceAssistant {
 		}
 
 		setMultiMapValue(state, "Pitstop State", "Pitstop.Count", this.Pitstops.Count)
+
+		return state
+	}
+
+	createSessionState() {
+		local state := super.createSessionState()
+
+		this.savePitstopState(state)
 
 		if isDevelopment()
 			writeMultiMap(temporaryFileName(this.AssistantType, "pitstops"), state)
@@ -2992,7 +3017,11 @@ class GridRaceAssistant extends RaceAssistant {
 
 		this.initializeGridPosition(data)
 
-		return super.addLap(lapNumber, &data, true, lapValid, lapPenalty)
+		result := super.addLap(lapNumber, &data, true, lapValid, lapPenalty)
+
+		this.savePitstops(lapNumber, this.savePitstopState())
+
+		return result
 	}
 
 	updateLap(lapNumber, &data) {

@@ -2135,6 +2135,15 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			teamServer.setSessionValue(this.Plugin . " Session Info", false)
 	}
 
+	savePitstopState(lapNumber, fileName) {
+		local teamServer := this.TeamServer
+
+		if (FileExist(fileName) && teamServer && teamServer.SessionActive && this.TeamSessionActive)
+			teamServer.setSessionValue("Pitstop State", FileRead(fileName))
+
+		deleteFile(fileName)
+	}
+
 	saveSessionInfo(lapNumber, fileName) {
 		local teamServer := this.TeamServer
 		local tries := 10

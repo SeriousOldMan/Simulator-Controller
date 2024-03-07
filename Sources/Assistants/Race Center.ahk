@@ -696,10 +696,11 @@ class RaceCenter extends ConfigurationItem {
 			}
 		}
 
-		__New(id, time, lap) {
+		__New(id, time, lap, duration := 0) {
 			this.iID := id
 			this.iTime := time
 			this.iLap := lap
+			this.iDuration := duration
 		}
 	}
 
@@ -7757,7 +7758,7 @@ class RaceCenter extends ConfigurationItem {
 	syncSession() {
 		local initial := !this.LastLap
 		local strategy, session, lastLap, simulator, car, track, newLaps, newData, newReports, finished, message, forcePitstopUpdate
-		local selectedLap, selectedStint, currentStint, driverSwapRequest, sessionActive
+		local selectedLap, selectedStint, currentStint, driverSwapRequest, sessionActive, state
 
 		static hadLastLap := false
 		static nextPitstopUpdate := false
@@ -7853,6 +7854,18 @@ class RaceCenter extends ConfigurationItem {
 							newData := true
 
 						this.updatePitstops()
+
+						if initial {
+							try {
+								state := this.Connector.GetSessionValue(session, "Pitstop State")
+
+								if (state && (state != ""))
+									this.loadPitstopState(parseMultiMap(state))
+							}
+							catch Any as exception {
+								logError(exception)
+							}
+						}
 
 						forcePitstopUpdate := (this.LastLap && (this.LastLap.Nr = nextPitstopUpdate))
 
@@ -8366,6 +8379,25 @@ class RaceCenter extends ConfigurationItem {
 		this.pushTask(updateStatisticsAsync)
 	}
 
+	createPitstopState() {
+		local state := newMultiMap()
+		local id, index, pitstops
+
+		for id, pitstops in this.Pitstops {
+			setMultiMapValue(state, "Pitstop State", "Pitstop." . A_Index . ".ID", id)
+
+			for index, pitstop in pitstops
+				setMultiMapValue(state, "Pitstop State", "Pitstop." . id . "." . index
+							   , values2String(";", pitstop.Time, pitstop.Lap, pitstop.Duration))
+
+			setMultiMapValue(state, "Pitstop State", "Pitstop." . id . ".Count", pitstops.Length)
+		}
+
+		setMultiMapValue(state, "Pitstop State", "Pitstop.Count", this.Pitstops.Count)
+
+		return state
+	}
+
 	saveSetups(flush := false) {
 		local sessionStore := this.SessionStore
 		local driver, conditions, tyreCompound, tyreCompoundColor, pressures, notes, temperatures
@@ -8458,6 +8490,8 @@ class RaceCenter extends ConfigurationItem {
 				setMultiMapValue(info, "Weather", "TrackTemperature", this.TrackTemperature)
 
 				writeMultiMap(this.SessionDirectory . "Session.info", info)
+
+				writeMultiMap(this.SessionDirectory . "Pitstop.state", this.createPitstopState())
 
 				if this.Strategy {
 					configuration := newMultiMap()
@@ -8739,6 +8773,20 @@ class RaceCenter extends ConfigurationItem {
 			this.LapsListView.ModifyCol(A_Index, "AutoHdr")
 	}
 
+	loadPitstopState(state) {
+		local carID, pitstops
+
+		this.iPitstops := CaseInsenseMap()
+
+		loop getMultiMapValue(state, "Pitstop State", "Pitstop.Count", 0) {
+			carID := getMultiMapValue(state, "Pitstop State", "Pitstop." . A_Index . ".ID")
+			pitstops := this.Pitstops[carID]
+
+			loop getMultiMapValue(state, "Pitstop State", "Pitstop." . carID . ".Count", 0)
+				pitstops.Push(RaceCenter.Pitstop(carID, string2Values(";", getMultiMapValue(state, "Pitstop State", "Pitstop." . carID . "." . A_Index))*))
+		}
+	}
+
 	loadSetups(info := false, setups := false) {
 		local fileName, ignore, setup, conditions
 
@@ -8908,7 +8956,7 @@ class RaceCenter extends ConfigurationItem {
 	loadSession() {
 		loadSessionAsync() {
 			local directory := (this.SessionLoaded ? this.SessionLoaded : this.iSessionDirectory)
-			local folder, info, lastLap, currentStint, translator, configuration
+			local folder, info, lastLap, currentStint, translator, configuration, state
 
 			this.Window.Opt("+OwnDialogs")
 
@@ -8977,6 +9025,11 @@ class RaceCenter extends ConfigurationItem {
 					this.loadLaps()
 					this.loadStints()
 					this.loadPitstops()
+
+					state := readMultiMap(folder . "Pitstop.state")
+
+					if (state.Count > 0)
+						this.loadPitstopState(state)
 
 					this.syncTelemetry(true)
 					this.syncTyrePressures(true)

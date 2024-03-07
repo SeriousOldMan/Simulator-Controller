@@ -3750,20 +3750,18 @@ class RaceStrategist extends GridRaceAssistant {
 				if raceInfo.Has(nrKey)
 					raceInfo.Delete(nrKey)
 
-				if slots && slots.Has(nrKey)
+				if (slots && slots.Has(nrKey))
 					slots.Delete(nrKey)
 			}
 
 		if duplicateID
 			loop raceInfo["Cars"] {
-				carID := getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".ID", A_Index)
-
-				idKey := ("!" . carID)
+				idKey := ("!" . getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".ID", A_Index))
 
 				if raceInfo.Has(idKey)
 					raceInfo.Delete(idKey)
 
-				if slots && slots.Has(idKey)
+				if (slots && slots.Has(idKey))
 					slots.Delete(idKey)
 			}
 

@@ -7888,7 +7888,7 @@ class RaceCenter extends ConfigurationItem {
 					if newLaps {
 						this.showMessage(translate("Saving session"))
 
-						this.syncSessionStore()
+						this.syncSessionStore(initial)
 					}
 
 					if (newData || newLaps)

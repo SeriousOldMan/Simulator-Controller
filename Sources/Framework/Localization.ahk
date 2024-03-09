@@ -31,7 +31,7 @@ global kMassUnits := ["Kilogram", "Pound"]
 global kTemperatureUnits := ["Celsius", "Fahrenheit"]
 global kPressureUnits := ["Bar", "PSI", "KPa"]
 global kVolumeUnits := ["Liter", "Gallon (US)", "Gallon (GB)"]
-global kLengthUnits := ["Meter", "Foot"]
+global kLengthUnits := ["Meter", "Yard"]
 global kSpeedUnits := ["km/h", "mph"]
 
 global kNumberFormats := ["#.##", "#,##"]
@@ -147,8 +147,8 @@ displayLengthValue(meter, rnd) {
 	switch gLengthUnit, false {
 		case "Meter":
 			return (rnd ? Round(meter, 1) : meter)
-		case "Foot":
-			return (rnd ? Round(meter * 3.280840) : (meter * 3.280840))
+		case "Yard":
+			return (rnd ? Round(meter * 0.9144) : (meter * 0.9144))
 		default:
 			throw "Unknown length unit detected in displayLengthValue..."
 	}
@@ -278,8 +278,8 @@ internalLengthValue(value, rnd) {
 	switch gLengthUnit, false {
 		case "Meter":
 			return (rnd ? Round(value, 1) : value)
-		case "Foot":
-			return (rnd ? Round(value / 3.280840) : (value / 3.280840))
+		case "Yard":
+			return (rnd ? Round(value / 0.9144) : (value / 0.9144))
 		default:
 			throw "Unknown length unit detected in internalLengthValue..."
 	}

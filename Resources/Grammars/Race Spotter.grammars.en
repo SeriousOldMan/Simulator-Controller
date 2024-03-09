@@ -262,6 +262,22 @@ BehindRight.1=Behind on the right.
 BehindRight.2=Car on the right behind you.
 BehindLeft.1=Behind on the left.
 BehindLeft.2=Car on the left behind you.
+// Accidents //
+SlowCarAhead.1=Slow car ahead in %distance% %unit%.
+SlowCarAhead.2=Attention, slow car in %distance% %unit%.
+SlowCarAhead.3=In %distance% %unit% is a slow car on the track.
+SlowCarAheadSide.1=Slow car ahead on the %side% in %distance% %unit%.
+SlowCarAheadSide.2=Attention on the %side% in %distance% %unit%, slow car.
+SlowCarAheadSide.3=In %distance% %unit% is a slow car on the %side%.
+AccidentAhead.1=Attention, there is an accident ahead.
+AccidentAhead.2=Accident ahead.
+AccidentAhead.3=Attention ahead.
+AccidentAheadDistance.1=Attention, there is an accident in %distance% %unit%.
+AccidentAheadDistance.2=Accident ahead in %distance% %unit%.
+AccidentAheadDistance.3=Attention in %distance% %unit%, accident.
+AccidentBehind.1=There was an accident behind.
+AccidentBehind.2=Accident behind, this will give you some air.
+AccidentBehind.3=Behind was an accident. This will help us.
 // Flag Warnings //
 YellowFull.1=Full course yellow, full course yellow.
 YellowFull.2=Attention full course yellow.

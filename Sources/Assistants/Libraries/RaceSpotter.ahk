@@ -1004,6 +1004,7 @@ class RaceSpotter extends GridRaceAssistant {
 		this.updateConfigurationValues({Announcements: {DeltaInformation: 2, TacticalAdvices: true
 									  , SideProximity: true, RearProximity: true
 									  , YellowFlags: true, BlueFlags: true, PitWindow: true
+									  , SlowCars: true, AccidentsAhead: true, AccidentsBehind: true
 									  , SessionInformation: true, CutWarnings: true, PenaltyInformation: true}})
 
 		OnExit(ObjBindMethod(this, "shutdownSpotter", true))
@@ -2770,6 +2771,48 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 
 		return false
+	}
+
+	slowCarAlert(distance, arguments*) {
+		local side := false
+		local speaker
+
+		if (this.Announcements["SlowCars"] && this.Speaker[false] && this.Running) {
+			speaker := this.getSpeaker(true)
+
+			if (arguments.Length > 0) {
+				side := arguments[1]
+
+				switch side, false {
+					case "Left":
+						side := string2Values(",", speaker.Fragments["Sides"])[1]
+					case "Right":
+						side := string2Values(",", speaker.Fragments["Sides"])[2]
+					default:
+				}
+
+				speaker.speakPhrase(side ? "SlowCarAheadSide" : "SlowCarAhead", {distance: Round(convertUnit("Length", distance))
+																			   , unit: speaker.Fragments[getUnit("Length")], side: side})
+			}
+		}
+	}
+
+	accidentAlert(type, arguments*) {
+		local distance := false
+		local speaker
+
+		if (this.Announcements["Accidents" . type] && this.Speaker[false] && this.Running) {
+			speaker := this.getSpeaker(true)
+
+			if ((arguments.Length > 0) && (type = "Ahead")) {
+				distance := arguments[1]
+
+				speaker.speakPhrase("Accident" . type . "Distance", {distance: Round(convertUnit("Length", distance))
+																   , unit: speaker.Fragments[getUnit("Length")]})
+			}
+			else
+				speaker.speakPhrase("Accident" . type, false, false, "Accident" . type)
+		}
 	}
 
 	greenFlag(arguments*) {

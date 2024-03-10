@@ -53,6 +53,9 @@ global kLogLevels := {Off: kLogOff, Debug: kLogDebug, Info: kLogInfo, Warn: kLog
 global kLogLevelNames := ["Debug", "Info", "Warn", "Critical", "Off"]
 */
 
+global kLogStartup := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+									 , "Debug", "LogStartup", false)
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Private Function Declaration Section                 ;;;
@@ -72,6 +75,16 @@ reportNonObjectUsage(reference, p1 := "", p2 := "", p3 := "", p4 := "") {
 }
 
 initializeDebugging() {
+	local pid
+
+	if kLogStartup {
+		pid := ProcessExist()
+
+		logMessage(kLogOff, "-----------------------------------------------------------------")
+		logMessage(kLogOff, translate("      Starting ") . StrSplit(A_ScriptName, ".")[1] . " [" . pid . "]")
+		logMessage(kLogOff, "-----------------------------------------------------------------")
+	}
+
 	String.__Call := reportNonObjectUsage
 	String.__Get := reportNonObjectUsage
 	String.__Set := reportNonObjectUsage
@@ -80,6 +93,9 @@ initializeDebugging() {
 	Number.__Set := reportNonObjectUsage
 
 	OnError(logUnhandledError)
+
+	if kLogStartup
+		logMessage(kLogOff, "Debugger initialized...")
 }
 
 logUnhandledError(error, *) {

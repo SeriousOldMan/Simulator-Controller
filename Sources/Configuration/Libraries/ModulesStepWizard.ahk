@@ -1017,6 +1017,119 @@ class SplashMedia extends DownloadablePreset {
 	}
 }
 
+class SettingsImport extends NamedPreset {
+	iWizard := false
+
+	Wizard {
+		Get {
+			return this.iWizard
+		}
+	}
+
+	Installable {
+		Get {
+			return false
+		}
+	}
+
+	edit(wizard) {
+		local progress := 0
+		local translator, folder
+
+		this.iWizard := wizard
+
+		try {
+			wizard.Window.Block()
+
+			try {
+				wizard.Window.Opt("+OwnDialogs")
+
+				translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
+
+				OnMessage(0x44, translator)
+				folder := withBlockedWindows(DirSelect, "", 0, translate("Select export folder..."))
+				OnMessage(0x44, translator, 0)
+
+				if (folder != "") {
+					showProgress({title: translate("Importing settings")})
+
+					this.importSettings(folder, &progress)
+
+					hideProgress()
+				}
+			}
+			finally {
+				wizard.Window.Unblock()
+			}
+		}
+		catch Any as exception {
+			logError(exception, true)
+		}
+	}
+
+	importSettings(directory, &progress) {
+		local count := 0
+		local settings
+
+		directory := (normalizeDirectoryPath(directory) . "\")
+
+		loop Files (directory . "*.*")
+			count += 1
+
+		if FileExist(directory . "Startup.settings") {
+			settings := readMultiMap(kUserConfigDirectory . "Startup.settings")
+
+			addMultiMapValues(settings, readMultiMap(directory . "Startup.settings"))
+
+			writeMultiMap(kUserConfigDirectory . "Startup.settings", settings)
+
+			showProgress({progress: (progress += Round(100 / count))})
+
+			Sleep(500)
+		}
+
+		if FileExist(directory . "Session Database.ini") {
+			settings := readMultiMap(kUserConfigDirectory . "Session Database.ini")
+
+			setMultiMapValues(settings, "Team Server", getMultiMapValues(readMultiMap(directory . "Session Database.ini"), "Team Server"))
+			removeMultiMapValue(settings, "Team Server", "Synchronization")
+
+			writeMultiMap(kUserConfigDirectory . "Session Database.ini", settings)
+
+			showProgress({progress: (progress += Round(100 / count))})
+
+			Sleep(500)
+		}
+
+		if FileExist(directory . "Race.settings") {
+			try {
+				FileCopy(directory . "Race.settings", kUserConfigDirectory . "Race.settings", 1)
+			}
+			catch Any as exception {
+				logError(exception, true)
+			}
+
+			showProgress({progress: (progress += Round(100 / count))})
+
+			Sleep(500)
+		}
+
+		loop Files (directory . "*.*"), "D"
+			if FileExist(A_LoopFilePath . "\Export.info") {
+				try {
+					RunWait(kBinariesDirectory . "Session Database.exe -Import `"" . A_LoopFilePath . "`"", kBinariesDirectory)
+				}
+				catch Any as exception {
+					logError(exception, true)
+				}
+
+				showProgress({progress: (progress += Round(100 / count))})
+
+				Sleep(500)
+			}
+	}
+}
+
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; ModulesStepWizard                                                       ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;

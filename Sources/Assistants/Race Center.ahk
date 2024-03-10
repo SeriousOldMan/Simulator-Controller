@@ -634,6 +634,12 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	class SessionStrategy extends Strategy {
+		CompletedPitstops {
+			Get {
+				return RaceCenter.Instance.getCompletedPitstops()
+			}
+		}
+
 		initializeTyreSets() {
 			super.initializeTyreSets()
 
@@ -642,6 +648,12 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	class SessionTrafficStrategy extends TrafficStrategy {
+		CompletedPitstops {
+			Get {
+				return RaceCenter.Instance.getCompletedPitstops()
+			}
+		}
+
 		initializeTyreSets() {
 			super.initializeTyreSets()
 
@@ -684,10 +696,11 @@ class RaceCenter extends ConfigurationItem {
 			}
 		}
 
-		__New(id, time, lap) {
+		__New(id, time, lap, duration := 0) {
 			this.iID := id
 			this.iTime := time
 			this.iLap := lap
+			this.iDuration := duration
 		}
 	}
 
@@ -3364,7 +3377,7 @@ class RaceCenter extends ConfigurationItem {
 				else if ((A_Index = 1) && (pitstops.Count > 0) && !pitstops.Has(1))
 					continue
 
-				if this.Stints.Has(A_index) {
+				if this.Stints.Has(A_Index) {
 					this.getStintSetup(A_Index, false, &driver)
 
 					driver := driver.FullName
@@ -4353,7 +4366,7 @@ class RaceCenter extends ConfigurationItem {
 		this.PitstopsListView.ModifyCol()
 
 		loop this.PitstopsListView.GetCount("Col")
-			this.PitstopsListView.ModifyCol(A_index, "AutoHdr")
+			this.PitstopsListView.ModifyCol(A_Index, "AutoHdr")
 
 		pressures := string2Values(",", pressures)
 
@@ -5139,6 +5152,30 @@ class RaceCenter extends ConfigurationItem {
 
 			stintNr -= 1
 		}
+	}
+
+	getCompletedPitstops() {
+		local pitstops := []
+		local stint, driver, fuel, tyreCompound, tyreCompoundColor, tyreSet, tyrePressures
+
+		loop this.CurrentStint.Nr
+			if ((A_Index > 1) && this.Stints.Has(A_Index)) {
+				this.getStintSetup(A_Index, false, &driver, &fuel
+												 , &tyreCompound, &tyreCompoundColor, &tyreSet, &tyrePressures)
+
+				try {
+					pitstops.Push({Nr: (A_Index - 1)
+								 , Time: Round(DateDiff(this.computeStartTime(this.Stints[A_Index]), this.computeStartTime(this.Stints[1]), "Seconds"))
+								 , Lap: this.Stints[A_Index].Lap, RefuelAmount: fuel
+								 , TyreChange: (tyreCompound != false)
+								 , TyreCompound: tyreCompound, TyreCompoundColor: tyreCompoundColor, TyreSet:tyreSet})
+				}
+				catch Any as exception {
+					logError(exception)
+				}
+			}
+
+		return pitstops
 	}
 
 	getStrategySettings(&simulator, &car, &track, &weather, &airTemperature, &trackTemperature
@@ -6222,6 +6259,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	updatePitstops() {
+		local data := false
 		local lap, identifier, rawData
 
 		if this.LastLap {
@@ -6229,16 +6267,32 @@ class RaceCenter extends ConfigurationItem {
 			identifier := lap.Identifier
 
 			try {
-				rawData := this.Connector.GetLapValue(identifier, "Positions Data")
+				try {
+					rawData := this.Connector.GetLapValue(identifier, "Data Update")
+				}
+				catch Any as exception {
+					rawData := ""
+				}
 
-				if (rawData && (rawData != ""))
-					this.updatePitstopState(lap, parseMultiMap(rawData))
+				if (!rawData || (rawData = ""))
+					rawData := this.Connector.GetLapValue(identifier, "Positions Data")
+
+				if (rawData && (rawData != "")) {
+					data := parseMultiMap(rawData)
+
+					this.updatePitstopState(lap, data)
+				}
 
 				if pitstopSettings("Visible") {
-					rawData := this.Connector.GetLapValue(identifier, "Telemetry Data")
+					if (!data || !data.Has("Setup Data")) {
+						rawData := this.Connector.GetLapValue(identifier, "Telemetry Data")
 
-					if (rawData && (rawData != "") && InStr(rawData, "[Setup Data]"))
-						this.updatePitstopSettings(getMultiMapValues(parseMultiMap(rawData), "Setup Data"))
+						if (rawData && (rawData != ""))
+							data := parseMultiMap(rawData)
+					}
+
+					if (data && data.Has("Setup Data"))
+						this.updatePitstopSettings(getMultiMapValues(data, "Setup Data"))
 				}
 			}
 			catch Any as exception {
@@ -7704,7 +7758,7 @@ class RaceCenter extends ConfigurationItem {
 	syncSession() {
 		local initial := !this.LastLap
 		local strategy, session, lastLap, simulator, car, track, newLaps, newData, newReports, finished, message, forcePitstopUpdate
-		local selectedLap, selectedStint, currentStint, driverSwapRequest, sessionActive
+		local selectedLap, selectedStint, currentStint, driverSwapRequest, sessionActive, state
 
 		static hadLastLap := false
 		static nextPitstopUpdate := false
@@ -7801,6 +7855,18 @@ class RaceCenter extends ConfigurationItem {
 
 						this.updatePitstops()
 
+						if initial {
+							try {
+								state := this.Connector.GetSessionValue(session, "Pitstop State")
+
+								if (state && (state != ""))
+									this.loadPitstopState(parseMultiMap(state))
+							}
+							catch Any as exception {
+								logError(exception)
+							}
+						}
+
 						forcePitstopUpdate := (this.LastLap && (this.LastLap.Nr = nextPitstopUpdate))
 
 						if this.syncPitstopsDetails(forcePitstopUpdate || initial)
@@ -7822,7 +7888,7 @@ class RaceCenter extends ConfigurationItem {
 					if newLaps {
 						this.showMessage(translate("Saving session"))
 
-						this.syncSessionStore()
+						this.syncSessionStore(initial)
 					}
 
 					if (newData || newLaps)
@@ -8313,6 +8379,25 @@ class RaceCenter extends ConfigurationItem {
 		this.pushTask(updateStatisticsAsync)
 	}
 
+	createPitstopState() {
+		local state := newMultiMap()
+		local id, index, pitstops
+
+		for id, pitstops in this.Pitstops {
+			setMultiMapValue(state, "Pitstop State", "Pitstop." . A_Index . ".ID", id)
+
+			for index, pitstop in pitstops
+				setMultiMapValue(state, "Pitstop State", "Pitstop." . id . "." . index
+							   , values2String(";", pitstop.Time, pitstop.Lap, pitstop.Duration))
+
+			setMultiMapValue(state, "Pitstop State", "Pitstop." . id . ".Count", pitstops.Length)
+		}
+
+		setMultiMapValue(state, "Pitstop State", "Pitstop.Count", this.Pitstops.Count)
+
+		return state
+	}
+
 	saveSetups(flush := false) {
 		local sessionStore := this.SessionStore
 		local driver, conditions, tyreCompound, tyreCompoundColor, pressures, notes, temperatures
@@ -8405,6 +8490,8 @@ class RaceCenter extends ConfigurationItem {
 				setMultiMapValue(info, "Weather", "TrackTemperature", this.TrackTemperature)
 
 				writeMultiMap(this.SessionDirectory . "Session.info", info)
+
+				writeMultiMap(this.SessionDirectory . "Pitstop.state", this.createPitstopState())
 
 				if this.Strategy {
 					configuration := newMultiMap()
@@ -8686,6 +8773,20 @@ class RaceCenter extends ConfigurationItem {
 			this.LapsListView.ModifyCol(A_Index, "AutoHdr")
 	}
 
+	loadPitstopState(state) {
+		local carID, pitstops
+
+		this.iPitstops := CaseInsenseMap()
+
+		loop getMultiMapValue(state, "Pitstop State", "Pitstop.Count", 0) {
+			carID := getMultiMapValue(state, "Pitstop State", "Pitstop." . A_Index . ".ID")
+			pitstops := this.Pitstops[carID]
+
+			loop getMultiMapValue(state, "Pitstop State", "Pitstop." . carID . ".Count", 0)
+				pitstops.Push(RaceCenter.Pitstop(carID, string2Values(";", getMultiMapValue(state, "Pitstop State", "Pitstop." . carID . "." . A_Index))*))
+		}
+	}
+
 	loadSetups(info := false, setups := false) {
 		local fileName, ignore, setup, conditions
 
@@ -8855,7 +8956,7 @@ class RaceCenter extends ConfigurationItem {
 	loadSession() {
 		loadSessionAsync() {
 			local directory := (this.SessionLoaded ? this.SessionLoaded : this.iSessionDirectory)
-			local folder, info, lastLap, currentStint, translator, configuration
+			local folder, info, lastLap, currentStint, translator, configuration, state
 
 			this.Window.Opt("+OwnDialogs")
 
@@ -8924,6 +9025,11 @@ class RaceCenter extends ConfigurationItem {
 					this.loadLaps()
 					this.loadStints()
 					this.loadPitstops()
+
+					state := readMultiMap(folder . "Pitstop.state")
+
+					if (state.Count > 0)
+						this.loadPitstopState(state)
 
 					this.syncTelemetry(true)
 					this.syncTyrePressures(true)
@@ -12643,9 +12749,10 @@ inDrivers(drivers, driver) {
 	if index
 		driver := SubStr(driver, 1, index - 1)
 
-	for index, candidate in drivers
-		if (InStr(candidate, driver) = 1)
-			return index
+	if (driver != "")
+		for index, candidate in drivers
+			if (InStr(candidate, driver) = 1)
+				return index
 
 	return false
 }

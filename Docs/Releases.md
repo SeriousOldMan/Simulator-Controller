@@ -1,7 +1,38 @@
-## 5.6.1.0-release 03/01/24 (planned)
+## 5.6.2.0-release 03/08/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
+  3. Fixed import of (race) settings in the "Session Database".
+  4. Fixed export of (race) settings in the "Session Database" in case the Ctrl key is NOT held down.
+  5. Fixed several grammar glitches in the Spotter phrases for the French language.
+  6. All already completed pitstops will be taken into account when it comes to race rules validation, when a strategy is being re-calculated by the Strategist or in the "Race Center".
+  7. The pitstop window and also the "Required" refueling and "Required" tyre change now only relate to the required pitstops.
+  8. The reliability of the pitstop information of all opponents has been increased in the "Race Center".
+  9. It is now possible to choose how the Spotter refers to a specific vehicle, like "Car number 7 had a problem" or "The car in P 5 had a problem". A new setting had been introduced in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database". Default is indication by position.
+  10. The Spotter now can interrupt itself, when a more urgent information must be communicated, for example when he is informing the driver about the lap time of an opponent and an attack happens from behind.
+  11. Parsing of the car name has been improved for *Le Mans Ultimate* - race numbers and cup category will be detected.
+  12. If duplicate race numbers are detected in *rFactor 2* or *Le Mans Ultimate*, synthetical race numbers starting from **1** will be used instead. This will fix many internal problems with race standings, race reports, and so on. Please note, that the Assistants will also use these synthetical race numbers when refering to cars, which will make it difficult for you to name a specific car by voice command in this case. But it was a problem anyway with the duplicate numbers before.
+  13. [Experts Only] Team specific settings can now be assembled by a team manager and can be imported by every team member using a special preset in "Simulator Setup". Please take a look at the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#managing-common-team-settings) for more information how to assemble such a package.
+  14. [Experts Only] Special logging has been implemented which helps tracking down startup performance problems. It can be activated in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration).
 
+## 5.6.1.0-release 03/01/24
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. Fixed a bug in the "Practice Center" that prevented tyre pressures to be displayed in the *Laps* list, when a session is loaded after being saved to disk.
+  4. Fixed a bug for *rFactor 2* which prevented tyre pressures to be initialized correctly during pitstop automation.
+  5. Fixed a bug in strategy simulation, which in rare cases caused failures when re-calculating a strategy using traffic scenarios in the "Race Center" or by the Strategist.
+  6. Integrated support for *Le Mans Ultimate*:
+     - [New plugin "LMU"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-lmu), which provides the same level of integration and similar controller actions as the "RF2" plugin for *rFactor 2*.
+	 - Full support in "Simulator Setup" to configure the "LMU" plugin.
+	 - Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#installation-of-telemetry-providers) for more information on how to install and configure the data integration plugin (*rFactor2SharedMemoryMapPlugin64.dll*) in the *Le Mans Ultimate* installation directory.
+	 - *Le Mans Ultimate* is still under heavy development. Although it uses the same engine as *rFactor 2*, it looks like that several aspects of the shared memory API have changed. This is what has been achieved so far and what is not working:
+	   - General telemetry is working
+       - Pressures, temperatures, and so on are all there
+	   - Car positions and timings also
+       - The standings information seems to be broken in the API
+	   - Driver names sometimes contain glitch characters; looks like an 8bit / 16bit charset bug
+	   - Car names do not contain the model of the car, but the name of the team and other weird stuff
+	   - Pitstop data input (normally a strength of the *rFactor 2* API) is not working at all
+  
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-561), if you are running *Le Mans Ultimate* and want to activate the integration for this title.
 
 ## 5.6.0.1-release 02/23/24

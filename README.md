@@ -37,15 +37,15 @@ Here is a short video which shows how to configure Simulator Controller for the 
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [information about the update process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.
 
-[5.6.0.1-release](https://cutt.ly/bwNueVwa) (Changes: Support for ex- and import of settings in the "Session Database", New configurable functions for the Startup profiles, Precise control over first and last stint in strategy simulation, Refuel variabtion in "Strategy Simulation", Separate pitstop windows and pitstop rule in strategy simulation, Default for presssure loss correction in "Race Center" is false, Support for fixed pitstops in "Strategy Workbench", Full tyre set management in the "Strategy Workbench", New car models for "Setup Workbench", Strategy graph can now also be displayed in the uper area of "Strategy Workbench".)
+[5.6.2.0-release](https://cutt.ly/Pw1nfWZ2) (Changes: New startup logging, Strategy recalculation now incorporates completed pitstops for validation, Pitstop window as well as refuel and tyre rules relate only required pitstops, Settings export file format in "Session Database" fixed, Fixed import settings in "Session Database", Increased reliability of opponent pitstop information in "Race Center", Choice for car indication by the Spotter, The Spotter now interrupts itself more often, Import of team specific settings as a special preset in "Simulator Setup", Improved car name parsing fo Le Mans Ultimate.)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-560) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-562) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[5.5.8.0-release](https://cutt.ly/CwVGSJ7e) (Changes: Support activation commands without double-press for cloud based voice recognition services, Extended Driving Coach analytic capabilities, Fixed laptime comparison for the Spotter, Reading the udpConnection parameter for the ACC plugin not ignores errors, Active/Deactive controller action icons for Stream Deck, Extended car meta DLC, New car models for "Setup Workbench".)
+[5.6.1.0-release](https://cutt.ly/ZwMicrZA) (Changes: Full integration of Le Mans Ultimate, Fixed pitstop tyre pressure change update for rFactor 2, Fixed initialization of tyre pressures for loaded sessions in the "Practice Center".)
 
-[5.5.7.0-release](https://cutt.ly/0wCcAb0U) (Changes: Increased resilience against corrupted data in "Database Synchronizer", Downloadable components in "Simulator Setup", Added AC car meta DLC, Added Splash Media DLC, Small fixes in the objects list of the Team Server, Fixed manual available minutes update in "Server Administration", Fixed adding a new Server URL in team server tab in "Simulator Configuration", Fixed duplicate object creation in session database rebuild, New car models for the "Setup Workbench", New Server URL combo box in "Server Administration", Ignore time of first lap in "Race Center" and "Practice Center".)
+[5.6.0.1-release](https://cutt.ly/bwNueVwa) (Changes: Support for ex- and import of settings in the "Session Database", New configurable functions for the Startup profiles, Precise control over first and last stint in strategy simulation, Refuel variabtion in "Strategy Simulation", Separate pitstop windows and pitstop rule in strategy simulation, Default for presssure loss correction in "Race Center" is false, Support for fixed pitstops in "Strategy Workbench", Full tyre set management in the "Strategy Workbench", New car models for "Setup Workbench", Strategy graph can now also be displayed in the uper area of "Strategy Workbench".)
 
 #### Latest development build
 
@@ -110,6 +110,8 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 24. [Car meta data](https://youtu.be/oKq8k9VZ2jU) - This video introduces you to car meta data and all the secret knowledge needed when extending the "Setup Workbench" for modded cars.
 
 25. [Using the Startup Profiles](https://youtu.be/2L0lH8J1Cac) - This video explains the Startup Profiles in detail, which let you define configuration and enable or disable many important functions for different types of sessions.
+
+26. [Strategy Development Revisited again](https://youtu.be/rCnYFTLX2L4) - This video will take another look at the "Strategy Workbench" and demonstrates a couple of new options, which allow you to create very special strategies.
 
 This list will be extended from time to time to cover new functionalities.
 

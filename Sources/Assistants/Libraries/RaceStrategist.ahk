@@ -483,8 +483,10 @@ class RaceStrategist extends GridRaceAssistant {
 			local knowledgeBase, lapNumber
 
 			loop getMultiMapValue(configuration, "Pitstops", "Count", 0)
-				pitstops.Push({Lap: getMultiMapValue(configuration, "Pitstops", A_Index . ".Lap")
-							 , Refuel: getMultiMapValue(configuration, "Pitstops", A_Index . ".Refuel", 0)
+				pitstops.Push({Nr: A_Index
+							 , Time: getMultiMapValue(configuration, "Pitstops", A_Index . ".Time")
+							 , Lap: getMultiMapValue(configuration, "Pitstops", A_Index . ".Lap")
+							 , RefuelAmount: getMultiMapValue(configuration, "Pitstops", A_Index . ".Refuel", 0)
 							 , TyreChange: getMultiMapValue(configuration, "Pitstops", A_Index . ".TyreChange")
 							 , TyreCompound: getMultiMapValue(configuration, "Pitstops", A_Index . ".TyreCompound", false)
 							 , TyreCompoundColor: getMultiMapValue(configuration, "Pitstops", A_Index . ".TyreCompoundColor", false)
@@ -536,11 +538,19 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	class RaceStrategy extends Strategy {
+		iCompletedPitstops := []
+
 		iRunningPitstops := 0
 		iRunningLaps := 0
 		iRunningTime := 0
 
 		iFullCourseYellow := false
+
+		CompletedPitstops {
+			Get {
+				return this.iCompletedPitstops
+			}
+		}
 
 		RunningPitstops {
 			Get {
@@ -582,7 +592,8 @@ class RaceStrategist extends GridRaceAssistant {
 			}
 		}
 
-		__New(strategyManager, configuration, driver, fullCourseYellow) {
+		__New(strategyManager, configuration, driver, completedPitstops, fullCourseYellow) {
+			this.iCompletedPitstops := completedPitstops
 			this.iFullCourseYellow := fullCourseYellow
 
 			super.__New(strategyManager, configuration, driver)
@@ -606,11 +617,19 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	class TrafficRaceStrategy extends TrafficStrategy {
+		iCompletedPitstops := []
+
 		iRunningPitstops := 0
 		iRunningLaps := 0
 		iRunningTime := 0
 
 		iFullCourseYellow := false
+
+		CompletedPitstops {
+			Get {
+				return this.iCompletedPitstops
+			}
+		}
 
 		RunningPitstops {
 			Get {
@@ -652,7 +671,8 @@ class RaceStrategist extends GridRaceAssistant {
 			}
 		}
 
-		__New(strategyManager, configuration, driver, fullCourseYellow) {
+		__New(strategyManager, configuration, driver, completedPitstops, fullCourseYellow) {
+			this.iCompletedPitstops := completedPitstops
 			this.iFullCourseYellow := fullCourseYellow
 
 			super.__New(strategyManager, configuration, driver)
@@ -1440,7 +1460,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 		if ((this.Session == kSessionRace) && (getMultiMapValue(data, "Stint Data", "Laps", 0) <= 1)
 										   && FileExist(kUserConfigDirectory . "Race.strategy")) {
-			theStrategy := RaceStrategist.RaceStrategy(this, readMultiMap(kUserConfigDirectory . "Race.strategy"), SessionDatabase.ID, false)
+			theStrategy := RaceStrategist.RaceStrategy(this, readMultiMap(kUserConfigDirectory . "Race.strategy"), SessionDatabase.ID, [], false)
 
 			applicableStrategy := false
 
@@ -2288,7 +2308,7 @@ class RaceStrategist extends GridRaceAssistant {
 		if newStrategy {
 			if (this.Session == kSessionRace) {
 				if !isObject(newStrategy)
-					newStrategy := RaceStrategist.RaceStrategy(this, readMultiMap(newStrategy), SessionDatabase.ID, false)
+					newStrategy := RaceStrategist.RaceStrategy(this, readMultiMap(newStrategy), SessionDatabase.ID, [], false)
 
 				this.clearStrategy()
 
@@ -2380,8 +2400,8 @@ class RaceStrategist extends GridRaceAssistant {
 		if !isObject(nameOrConfiguration)
 			nameOrConfiguration := false
 
-		theStrategy := (this.UseTraffic ? RaceStrategist.TrafficRaceStrategy(this, nameOrConfiguration, driver, Task.CurrentTask.FullCourseYellow)
-										: RaceStrategist.RaceStrategy(this, nameOrConfiguration, driver, Task.CurrentTask.FullCourseYellow))
+		theStrategy := (this.UseTraffic ? RaceStrategist.TrafficRaceStrategy(this, nameOrConfiguration, driver, Task.CurrentTask.Pitstops, Task.CurrentTask.FullCourseYellow)
+										: RaceStrategist.RaceStrategy(this, nameOrConfiguration, driver, Task.CurrentTask.Pitstops, Task.CurrentTask.FullCourseYellow))
 
 		if (name && !isObject(name))
 			theStrategy.setName(name)
@@ -3730,20 +3750,18 @@ class RaceStrategist extends GridRaceAssistant {
 				if raceInfo.Has(nrKey)
 					raceInfo.Delete(nrKey)
 
-				if slots && slots.Has(nrKey)
+				if (slots && slots.Has(nrKey))
 					slots.Delete(nrKey)
 			}
 
 		if duplicateID
 			loop raceInfo["Cars"] {
-				carID := getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".ID", A_Index)
-
-				idKey := ("!" . carID)
+				idKey := ("!" . getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".ID", A_Index))
 
 				if raceInfo.Has(idKey)
 					raceInfo.Delete(idKey)
 
-				if slots && slots.Has(idKey)
+				if (slots && slots.Has(idKey))
 					slots.Delete(idKey)
 			}
 

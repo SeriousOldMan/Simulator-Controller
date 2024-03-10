@@ -24,6 +24,9 @@
 startupProcess() {
 	local isCritical := Task.CriticalHandler
 
+	if kLogStartup
+		logMessage(kLogOff, "Starting process...")
+
 	guardExit(*) {
 		if (isCritical() && kGuardExit && !GetKeyState("Ctrl", "P")) {
 			OnMessage(0x44, translateOkButton)
@@ -39,6 +42,9 @@ startupProcess() {
 	Task.CriticalHandler := (*) => guardExit()
 
 	OnExit(guardExit, -1)
+
+	if kLogStartup
+		logMessage(kLogOff, "Starting message handler...")
 
 	MessageManager.resume()
 }

@@ -453,6 +453,9 @@ viewHTML(fileName, title := false, x := kUndefined, y := kUndefined, width := 80
 startupApplication() {
 	local isCritical := Task.CriticalHandler
 
+	if kLogStartup
+		logMessage(kLogOff, "Starting application...")
+
 	guardExit(*) {
 		if (isCritical() && kGuardExit && !GetKeyState("Ctrl", "P")) {
 			OnMessage(0x44, translateOkButton)
@@ -469,6 +472,9 @@ startupApplication() {
 
 	OnExit(guardExit, -1)
 
+	if kLogStartup
+		logMessage(kLogOff, "Starting message handler...")
+
 	MessageManager.resume()
 }
 
@@ -480,10 +486,23 @@ startupApplication() {
 MessageManager.pause()
 
 if (!isDetachedInstallation() && !isDebug() && !inList(kBackgroundApps, StrSplit(A_ScriptName, ".")[1])) {
+	if kLogStartup
+		logMessage(kLogOff, "Checking for updates...")
+
 	checkForUpdates()
 
+	if kLogStartup
+		logMessage(kLogOff, "Ensuring database consent...")
+
 	requestShareSessionDatabaseConsent()
+
+	if kLogStartup
+		logMessage(kLogOff, "Checking for news...")
+
 	checkForNews()
+
+	if kLogStartup
+		logMessage(kLogOff, "Starting database synchronizer...")
 
 	Task.startTask(startDatabaseSynchronizer, 30000, kLowPriority)
 }

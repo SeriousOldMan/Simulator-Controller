@@ -100,42 +100,52 @@ namespace RF2SHMProvider {
 				return "";
 		}
 
-		public string GetCarName(string carClass, string carName)
-		{
-			if (carName.Trim().Length > 0) {
-				if ((carName.Length > 0) && (carName[0] == '#'))
-				{
-					char[] delims = { ' ' };
-					string[] parts = carName.Split(delims, 2);
+        public string GetCarName(string carClass, string carName)
+        {
+            carName = carName.Trim();
 
-					if (parts.Length > 1)
-						carName = parts[1].Trim();
-				}
-				else if (carName.Contains("#"))
-					carName = carName.Split('#')[0].Trim();
-			}
-			else
-				carName = carClass;
+            if (carName.Length > 0)
+            {
+                if (carName[0] == '#')
+                {
+                    char[] delims = { ' ' };
+                    string[] parts = carName.Split(delims, 2);
 
-			return carName;
-		}
+                    if (parts.Length > 1)
+                        carName = parts[1].Trim();
+                }
+                else if (carName.Contains("#"))
+                    carName = carName.Split('#')[0].Trim();
+            }
+            else
+                carName = carClass;
 
-		public string GetCarNr(int id, string carClass, string carName)
-		{
-			if (carName[0] == '#')
-			{
-				char[] delims = { ' ' };
-				string[] parts = carName.Split(delims, 2);
+            return carName;
+        }
 
-				return parts[0].Split('#')[1].Trim();
-			}
-			else if (carName.Contains("#"))
-				return carName.Split('#')[1].Trim().Split(' ')[0].Trim();
-			else
-				return id.ToString();
-		}
+        public string GetCarNr(int id, string carClass, string carName)
+        {
+            carName = carName.Trim();
 
-		public void ReadStandings()
+            if (carName.Length > 0)
+            {
+                if (carName[0] == '#')
+                {
+                    char[] delims = { ' ' };
+                    string[] parts = carName.Split(delims, 2);
+
+                    return parts[0].Split('#')[1].Trim();
+                }
+                else if (carName.Contains("#"))
+                    return carName.Split('#')[1].Trim().Split(' ')[0].Trim();
+                else
+                    return (id + 1).ToString();
+            }
+            else
+                return (id + 1).ToString();
+        }
+
+        public void ReadStandings()
         {
             rF2VehicleScoring playerVehicle = GetPlayerScoring(ref scoring);
 
@@ -146,6 +156,7 @@ namespace RF2SHMProvider {
 			for (int i = 1; i <= scoring.mScoringInfo.mNumVehicles; ++i) {
 				rF2VehicleScoring vehicle = scoring.mVehicles[i - 1];
 
+                Console.Write("Car."); Console.Write(i); Console.Write(".ID="); Console.WriteLine(i);
                 Console.Write("Car."); Console.Write(i); Console.Write(".Position="); Console.WriteLine(vehicle.mPlace);
 
                 Console.Write("Car."); Console.Write(i); Console.Write(".Laps="); Console.WriteLine(vehicle.mTotalLaps);
@@ -165,14 +176,14 @@ namespace RF2SHMProvider {
 				Console.Write("Car."); Console.Write(i); Console.Write(".Time.Sectors="); Console.WriteLine(sector1Time + "," + sector2Time + "," + sector3Time);
 
 				string carClass = GetStringFromBytes(vehicle.mVehicleClass);
-                string carModel = GetCarName(carClass, GetStringFromBytes(vehicle.mVehicleName));
-				string carNr = GetCarNr(vehicle.mID, carClass, GetStringFromBytes(vehicle.mVehicleName));
+				string carName = GetStringFromBytes(vehicle.mVehicleName);
 				
-				Console.Write("Car."); Console.Write(i); Console.Write(".Nr="); Console.WriteLine(carNr);
+				Console.Write("Car."); Console.Write(i); Console.Write(".Nr="); Console.WriteLine(GetCarNr(vehicle.mID, carClass, carName));
                 Console.Write("Car."); Console.Write(i); Console.Write(".Class="); Console.WriteLine(carClass);
-                Console.Write("Car."); Console.Write(i); Console.Write(".Car="); Console.WriteLine(carModel);
+                Console.Write("Car."); Console.Write(i); Console.Write(".Car="); Console.WriteLine(GetCarName(carClass, carName));
+                Console.Write("Car."); Console.Write(i); Console.Write(".CarRaw="); Console.WriteLine(carName);
 
-				Console.Write("Car."); Console.Write(i); Console.Write(".Driver.Forname="); Console.WriteLine(GetForname(vehicle.mDriverName));
+                Console.Write("Car."); Console.Write(i); Console.Write(".Driver.Forname="); Console.WriteLine(GetForname(vehicle.mDriverName));
 				Console.Write("Car."); Console.Write(i); Console.Write(".Driver.Surname="); Console.WriteLine(GetSurname(vehicle.mDriverName));
 				Console.Write("Car."); Console.Write(i); Console.Write(".Driver.Nickname="); Console.WriteLine(GetNickname(vehicle.mDriverName));
 
@@ -225,7 +236,8 @@ namespace RF2SHMProvider {
 				string vehicleName = GetStringFromBytes(playerScoring.mVehicleName);
 
 				Console.Write("Car="); Console.WriteLine(GetCarName(vehicleClass, vehicleName));
-				Console.Write("CarName="); Console.WriteLine(vehicleName);
+                Console.Write("CarRaw="); Console.WriteLine(vehicleName);
+                Console.Write("CarName="); Console.WriteLine(vehicleName);
 				Console.Write("CarClass="); Console.WriteLine(vehicleClass);
 				Console.Write("Track="); Console.WriteLine(GetStringFromBytes(playerTelemetry.mTrackName));
 				Console.Write("SessionFormat="); Console.WriteLine((scoring.mScoringInfo.mEndET <= 0.0) ? "Laps" : "Time");

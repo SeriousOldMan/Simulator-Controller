@@ -95,7 +95,7 @@ Announcements=Benzinmangel Warnungen, Schadenswarnungen, Schadensanalysen, Wette
 
 	[Wie viel {Benzin, Sprit} {ist noch da, haben wir noch, ist noch im Tank, ist noch übrig, bleibt noch}, Sag (Mir) wie viel {Benzin, Sprit} {noch da ist, wir noch haben, noch im Tank ist, noch übrig ist, noch bleibt}]
 
-	[Wie wird das Wetter, Wird es regnen, Kommmt ein Wetterwechsel, Sag (Mir) ob {es regnen wird, ein Wetterwechsel kommt, wie das Wetter wird}]
+	[Wie wird das Wetter, Wird es regnen, Kommt ein Wetterwechsel, Sag (Mir) ob {es regnen wird, ein Wetterwechsel kommt, wie das Wetter wird}]
 
 3.  Boxenstopp
 

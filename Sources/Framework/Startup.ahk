@@ -45,6 +45,9 @@ loadSimulatorConfiguration() {
 
 	local packageInfo, type, pid, path
 
+	if kLogStartup
+		logMessage(kLogOff, "Loading configuration...")
+
 	checkInstallation(components) {
 		local component, version, ignore, part, type, installedVersion
 
@@ -76,6 +79,9 @@ loadSimulatorConfiguration() {
 		return true
 	}
 
+	if kLogStartup
+		logMessage(kLogOff, "Checking downloadable component versions...")
+
 	kSimulatorConfiguration := readMultiMap(kConfigDirectory . "Simulator Configuration.ini")
 
 	addMultiMapValues(kSimulatorConfiguration, readMultiMap(kSimulatorConfigurationFile))
@@ -103,6 +109,9 @@ loadSimulatorConfiguration() {
 	}
 	else
 		kVersion := getMultiMapValue(packageInfo, "Current", "Version", getMultiMapValue(packageInfo, "Version", "Current", "0.0.0.0-dev"))
+
+	if kLogStartup
+		logMessage(kLogOff, "Starting common runtime...")
 
 	pid := ProcessExist()
 
@@ -166,11 +175,17 @@ loadSimulatorConfiguration() {
 	if (getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory)), "Debug", "LogLevel", kUndefined) = kUndefined)
 		if !isDevelopment()
 			setLogLevel(inList(kLogLevelNames, getMultiMapValue(kSimulatorConfiguration, "Configuration", "Log Level", "Warn")))
+
+	if kLogStartup
+		logMessage(kLogOff, "Common runtime started...")
 }
 
 initializeEnvironment() {
 	global kSimulatorConfiguration, kDetachedInstallation, kProperInstallation
 	local installOptions, installLocation, install, newID, idFileName, ID, ticks, wait, major, minor, msgResult
+
+	if kLogStartup
+		logMessage(kLogOff, "Initializing environment...")
 
 	if !isDebug() {
 		if FileExist(kConfigDirectory . "Simulator Controller.install") {
@@ -182,6 +197,9 @@ initializeEnvironment() {
 		}
 
 		if !isDetachedInstallation() {
+			if kLogStartup
+				logMessage(kLogOff, "Ensuring correct installation...")
+
 			installLocation := RegRead("HKLM\" . kUninstallKey, "InstallLocation", "")
 
 			installOptions := readMultiMap(kUserConfigDirectory . "Simulator Controller.install")
@@ -212,6 +230,9 @@ initializeEnvironment() {
 			}
 		}
 	}
+
+	if kLogStartup
+		logMessage(kLogOff, "Preparing standard folders...")
 
 	DirCreate(A_MyDocuments . "\Simulator Controller")
 	DirCreate(kUserHomeDirectory . "Config")

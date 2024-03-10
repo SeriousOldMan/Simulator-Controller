@@ -1,16 +1,16 @@
 [Development]
-Version=5.6.1.0-dev
-Target=5.6.1.0-release
-Date=02/25/2024
+Version=5.6.3.0-dev
+Target=5.6.3.0-release
+Date=03/09/2024
 Download=
-Changes=Full integration of Le Mans Ultimate, Fixed pitstop tyre pressure change update for rFactor 2, Fixed initialization of tyre pressures for loaded sessions in the "Practice Center"
+Changes=Added customizing for "Simulator Setup"
 Components=Media->5.6.1,Configuration->5.6.1,Utilities->5.4.8
 [Release]
-Version=5.6.0.1-release
-Date=02/23/2024
-Download=https://cutt.ly/bwNueVwa;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.6.0.1-release.zip
-Changes=Support for ex- and import of settings in the "Session Database", New configurable functions for the Startup profiles, Precise control over first and last stint in strategy simulation, Refuel variabtion in "Strategy Simulation", Separate pitstop windows and pitstop rule in strategy simulation, Default for presssure loss correction in "Race Center" is false, Support for fixed pitstops in "Strategy Workbench", Full tyre set management in the "Strategy Workbench", New car models for "Setup Workbench", Strategy graph can now also be displayed in the uper area of "Strategy Workbench"
-Components=Media->5.5.7,Configuration->5.5.7,Utilities->5.4.8
+Version=5.6.2.0-release
+Date=03/08/2024
+Download=https://cutt.ly/Pw1nfWZ2;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.6.2.0-release.zip
+Changes=New startup logging, Strategy recalculation now incorporates completed pitstops for validation, Pitstop window as well as refuel and tyre rules relate only required pitstops, Settings export file format in "Session Database" fixed, Fixed import settings in "Session Database", Increased reliability of opponent pitstop information in "Race Center", Choice for car indication by the Spotter, The Spotter now interrupts itself more often, Import of team specific settings as a special preset in "Simulator Setup", Improved car name parsing fo Le Mans Ultimate
+Components=Media->5.6.1,Configuration->5.6.1,Utilities->5.4.8
 [Components]
 Media.5.5.7.Path=Resources
 Media.5.5.7.Content=Splash Media
@@ -30,5 +30,5 @@ Utilities.5.4.8.Download=https://www.dropbox.com/scl/fi/5nduffajjm3x6rhsxr1nk/Ut
 [Current]
 Type=Development
 [Version]
-Development=5.6.1.0-dev
-Release=5.6.0.1-release
+Development=5.6.3.0-dev
+Release=5.6.2.0-release

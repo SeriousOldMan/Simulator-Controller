@@ -414,7 +414,9 @@ namespace ACCUDPProvider {
                                         }
 
                                         outStream.Write("Car."); outStream.Write(index); outStream.Write(".InPitlane=");
-                                        outStream.WriteLine((location == CarLocationEnum.Pitlane) ? "true" : "false");
+                                        outStream.WriteLine(((location == CarLocationEnum.PitEntry) ||
+															 (location == CarLocationEnum.Pitlane) ||
+															 (location == CarLocationEnum.PitExit)) ? "true" : "false");
 
                                         index += 1;
                                     }

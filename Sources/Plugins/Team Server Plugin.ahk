@@ -1475,7 +1475,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 	updateLap(lapNumber, running, data, telemetryData, positionsData) {
 		if this.TeamServerActive
-			this.setLapValue(lapNumber, "Telemetry Update", printMultiMap(data))
+			this.setLapValue(lapNumber, "Data Update", printMultiMap(data))
 	}
 
 	keepAlive(start := false) {

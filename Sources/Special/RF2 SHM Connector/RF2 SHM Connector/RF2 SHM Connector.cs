@@ -146,9 +146,11 @@ namespace SHMConnector {
 
 		public string GetCarName(string carClass, string carName)
         {
-            if (carName.Trim().Length > 0)
+			carName = carName.Trim();
+
+            if (carName.Length > 0)
             {
-                if ((carName.Length > 0) && (carName[0] == '#'))
+                if (carName[0] == '#')
                 {
                     char[] delims = { ' ' };
                     string[] parts = carName.Split(delims, 2);
@@ -167,18 +169,25 @@ namespace SHMConnector {
 
 		public string GetCarNr(int id, string carClass, string carName)
 		{
-			if (carName[0] == '#')
-			{
-				char[] delims = { ' ' };
-				string[] parts = carName.Split(delims, 2);
+            carName = carName.Trim();
 
-				return parts[0].Split('#')[1].Trim();
+			if (carName.Length > 0)
+			{
+				if (carName[0] == '#')
+				{
+					char[] delims = { ' ' };
+					string[] parts = carName.Split(delims, 2);
+
+					return parts[0].Split('#')[1].Trim();
+				}
+				else if (carName.Contains("#"))
+					return carName.Split('#')[1].Trim().Split(' ')[0].Trim();
+				else
+					return (id + 1).ToString();
 			}
-			else if (carName.Contains("#"))
-				return carName.Split('#')[1].Trim().Split(' ')[0].Trim();
 			else
-				return id.ToString();
-		}
+                return (id + 1).ToString();
+        }
 
 		public string ReadStandings()
 		{
@@ -195,7 +204,8 @@ namespace SHMConnector {
 				{
 					rF2VehicleScoring vehicle = scoring.mVehicles[i - 1];
 
-					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Position="); strWriter.WriteLine(vehicle.mPlace);
+                    strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".ID="); strWriter.WriteLine(i);
+                    strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Position="); strWriter.WriteLine(vehicle.mPlace);
 
 					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Laps="); strWriter.WriteLine(vehicle.mTotalLaps);
 					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Lap.Running="); strWriter.WriteLine(vehicle.mLapDist / scoring.mScoringInfo.mLapDist);
@@ -214,14 +224,14 @@ namespace SHMConnector {
 					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Time.Sectors="); strWriter.WriteLine(sector1Time + "," + sector2Time + "," + sector3Time);
 
 					string carClass = GetStringFromBytes(vehicle.mVehicleClass);
-					string carModel = GetCarName(carClass, GetStringFromBytes(vehicle.mVehicleName));
-					string carNr = GetCarNr(vehicle.mID, carClass, GetStringFromBytes(vehicle.mVehicleName));
+                    string carName = GetStringFromBytes(vehicle.mVehicleName);
 
-					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Nr="); strWriter.WriteLine(carNr);
-					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Class="); strWriter.WriteLine(carClass);
-					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Car="); strWriter.WriteLine(carModel);
+                    strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Nr="); strWriter.WriteLine(GetCarNr(vehicle.mID, carClass, carName));
+                    strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Class="); strWriter.WriteLine(carClass);
+                    strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Car="); strWriter.WriteLine(GetCarName(carClass, carName));
+                    strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".CarRaw="); strWriter.WriteLine(carName);
 
-					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Driver.Forname="); strWriter.WriteLine(GetForname(vehicle.mDriverName));
+                    strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Driver.Forname="); strWriter.WriteLine(GetForname(vehicle.mDriverName));
 					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Driver.Surname="); strWriter.WriteLine(GetSurname(vehicle.mDriverName));
 					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Driver.Nickname="); strWriter.WriteLine(GetNickname(vehicle.mDriverName));
 
@@ -280,8 +290,9 @@ namespace SHMConnector {
 				string vehicleClass = GetStringFromBytes(playerScoring.mVehicleClass);
 				string vehicleName = GetStringFromBytes(playerScoring.mVehicleName);
 
-				strWriter.Write("Car="); strWriter.WriteLine(GetCarName(vehicleClass, vehicleName));
-				strWriter.Write("CarName="); strWriter.WriteLine(vehicleName);
+                strWriter.Write("Car="); strWriter.WriteLine(GetCarName(vehicleClass, vehicleName));
+                strWriter.Write("CarRaw="); strWriter.WriteLine(vehicleName);
+                strWriter.Write("CarName="); strWriter.WriteLine(vehicleName);
 				strWriter.Write("CarClass="); strWriter.WriteLine(vehicleClass);
 				strWriter.Write("Track="); strWriter.WriteLine(GetStringFromBytes(playerTelemetry.mTrackName));
 				strWriter.Write("SessionFormat="); strWriter.WriteLine((scoring.mScoringInfo.mEndET <= 0.0) ? "Laps" : "Time");

@@ -2924,7 +2924,10 @@ class RaceSpotter extends GridRaceAssistant {
 				this.shutdownSpotter(forceShutdown)
 
 				try {
-					Run(exePath, kBinariesDirectory, "Hide", &pid)
+					Run("`"" . exePath . "`" " . getMultiMapValue(this.Settings, "Assistant.Spotter", "Accident.Distance.Ahead.Threshold", 800) . A_Space
+											   . getMultiMapValue(this.Settings, "Assistant.Spotter", "Accident.Distance.Behind.Threshold", 500) . A_Space
+											   . getMultiMapValue(this.Settings, "Assistant.Spotter", "SlowCar.Distance.Ahead.Threshold", 500)
+					  , kBinariesDirectory, "Hide", &pid)
 				}
 				catch Any as exception {
 					logError(exception, true)

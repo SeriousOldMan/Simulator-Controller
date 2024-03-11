@@ -232,9 +232,9 @@ namespace RF2SHMSpotter {
 		int lastFlagState = 0;
 		int waitYellowFlagState = 0;
 
-        int aheadAccidentDistance = 800;
-        int behindAccidentDistance = 500;
-        int slowCarDistance = 500;
+		int aheadAccidentDistance = 800;
+		int behindAccidentDistance = 500;
+		int slowCarDistance = 500;
 
         long nextSlowCarAhead = 0;
         long nextAccidentAhead = 0;
@@ -581,9 +581,8 @@ namespace RF2SHMSpotter {
 
         List<IdealLine> idealLine = new List<IdealLine>(1000);
 
-		void updateIdealLine(ref rF2VehicleScoring vehicle, double speed) {
-			double running = vehicle.mLapDist / scoring.mScoringInfo.mLapDist;
-            IdealLine slot = idealLine[(int)Math.Round(running * 1000)];
+		void updateIdealLine(ref rF2VehicleScoring vehicle, double running, double speed) {
+			IdealLine slot = idealLine[(int)Math.Round(running * 999)];
 
 			if (slot.count < 100)
 				if (slot.count == 0)
@@ -624,40 +623,44 @@ namespace RF2SHMSpotter {
             List<SlowCarInfo> accidentsBehind = new List<SlowCarInfo>();
             List<SlowCarInfo> slowCarsAhead = new List<SlowCarInfo>();
 
-            for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)
+			try
 			{
-				ref rF2VehicleScoring vehicle = ref scoring.mVehicles[i];
-				double speed = vehicleSpeed(ref vehicle);
-
-				updateIdealLine(ref vehicle, speed);
-
-				if (vehicle.mIsPlayer != 1)
+				for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)
 				{
-                    double running = vehicle.mLapDist / scoring.mScoringInfo.mLapDist;
-                    IdealLine slot = idealLine[(int)Math.Round(running * 1000)];
+					ref rF2VehicleScoring vehicle = ref scoring.mVehicles[i];
+					double speed = vehicleSpeed(ref vehicle);
+					double running = Math.Max(0, Math.Min(1, Math.Abs(vehicle.mLapDist / scoring.mScoringInfo.mLapDist)));
 
-					if ((slot.count > 20) && (speed < (slot.speed / 2)))
+					updateIdealLine(ref vehicle, running, speed);
+
+					if (vehicle.mIsPlayer != 1)
 					{
-						int distanceAhead = (int)(((vehicle.mLapDist > playerScoring.mLapDist) ? vehicle.mLapDist
-																							   : (vehicle.mLapDist + scoring.mScoringInfo.mLapDist)) - playerScoring.mLapDist);
-												
-						if (distanceAhead < slowCarDistance)
-							slowCarsAhead.Add(new SlowCarInfo(i, distanceAhead));
+						IdealLine slot = idealLine[(int)Math.Round(running * 999)];
 
-						if (speed < (slot.speed / 4))
+						if ((slot.count > 20) && (speed < (slot.speed / 2)))
 						{
-							if (distanceAhead < aheadAccidentDistance)
-								accidentsAhead.Add(new SlowCarInfo(i, distanceAhead));
+							int distanceAhead = (int)(((vehicle.mLapDist > playerScoring.mLapDist) ? vehicle.mLapDist
+																								   : (vehicle.mLapDist + scoring.mScoringInfo.mLapDist)) - playerScoring.mLapDist);
 
-							int distanceBehind = (int)(((vehicle.mLapDist < playerScoring.mLapDist) ? playerScoring.mLapDist
-																								    : (playerScoring.mLapDist + scoring.mScoringInfo.mLapDist)) - vehicle.mLapDist);
+							if (distanceAhead < slowCarDistance)
+								slowCarsAhead.Add(new SlowCarInfo(i, distanceAhead));
 
-							if (distanceBehind < behindAccidentDistance)
-								accidentsBehind.Add(new SlowCarInfo(i, distanceBehind));
+							if (speed < (slot.speed / 4))
+							{
+								if (distanceAhead < aheadAccidentDistance)
+									accidentsAhead.Add(new SlowCarInfo(i, distanceAhead));
+
+								int distanceBehind = (int)(((vehicle.mLapDist < playerScoring.mLapDist) ? playerScoring.mLapDist
+																										: (playerScoring.mLapDist + scoring.mScoringInfo.mLapDist)) - vehicle.mLapDist);
+
+								if (distanceBehind < behindAccidentDistance)
+									accidentsBehind.Add(new SlowCarInfo(i, distanceBehind));
+							}
 						}
-                    }
-                }
+					}
+				}
 			}
+			catch (Exception e) { }
 
 			if (accidentsAhead.Count > 0)
 			{
@@ -665,17 +668,17 @@ namespace RF2SHMSpotter {
 				{
 					int distance = int.MaxValue;
 
-                    nextAccidentAhead = cycle + 400;
-                    nextSlowCarAhead = cycle + 400;
+					nextAccidentAhead = cycle + 400;
+					nextSlowCarAhead = cycle + 400;
 
-                    foreach (SlowCarInfo i in accidentsAhead)
+					foreach (SlowCarInfo i in accidentsAhead)
 						distance = Math.Min(distance, i.distance);
 
 					SendSpotterMessage("accidentAlert:Ahead;" + distance);
 
 					return true;
 				}
-            }
+			}
 
 			if (slowCarsAhead.Count > 0)
 			{
@@ -691,7 +694,7 @@ namespace RF2SHMSpotter {
 					SendSpotterMessage("slowCarAlert:" + distance);
 
 					return true;
-                }
+				}
 			}
 
 			if (accidentsBehind.Count > 0)
@@ -700,16 +703,16 @@ namespace RF2SHMSpotter {
 				{
 					int distance = int.MaxValue;
 
-                    nextAccidentBehind = cycle + 400;
+					nextAccidentBehind = cycle + 400;
 
-                    foreach (SlowCarInfo i in accidentsAhead)
+					foreach (SlowCarInfo i in accidentsAhead)
 						distance = Math.Min(distance, i.distance);
 
 					SendSpotterMessage("accidentAlert:Behind;" + distance);
 
 					return true;
 				}
-            }
+			}
 
             return false;
 		}
@@ -1662,15 +1665,17 @@ namespace RF2SHMSpotter {
 									cycle += 1;
 
 									if (!startGo || !greenFlag())
-										if (!checkAccident(ref playerScoring) && !checkFlagState(ref playerScoring) && !checkPositions(ref playerScoring))
-											wait = !checkPitWindow(ref playerScoring);
-										else
+										if (checkFlagState(ref playerScoring) || checkPositions(ref playerScoring))
 											wait = false;
+										else if (checkAccident(ref playerScoring))
+                                            wait = false;
+										else
+											wait = !checkPitWindow(ref playerScoring);
 								}
 								else
 								{
 									longitudinalRearDistance = 5;
-									
+
 									lastSituation = CLEAR;
 									carBehind = false;
 									carBehindReported = false;
@@ -1678,7 +1683,7 @@ namespace RF2SHMSpotter {
 									lastFlagState = 0;
 								}
 							}
-						}
+                        }
 
                         if (analyzeTelemetry)
                             Thread.Sleep(10);

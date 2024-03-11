@@ -1,6 +1,12 @@
 ## 5.6.3.0-release 03/15/24 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
+  3. A new customization method allows to introduce support for user specific applications in "Simulator Setup".
+  4. The minimum window height of "Simulator Setup" has been increased.
+  5. The Spotter can now inform about accidents and slow cars ahead and also about accidents behind. The Spotter will learn the track layout and the typical speed and position of a car at each part of the track during the first few laps. When one or more cars are way slower or are at positions far away from the ideal line, this will be counted as an accident.
+	 - "Simulator Configuration" and "Simulator Setup" has been extended to allow enabling / disabling of the new announcements.
+	 - The announcements voice command of the Spotter has been extended to allow to enable / disable the new announcements while driving. Example: ["Please no more slow car warnings"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Strategist-Commands-(EN)).
+	 - New settings for the Spotter in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database" allow you to configure the distance before and behind the car, which should be analyzed for accidents.
 
 ## 5.6.2.0-release 03/08/24
   1. Minor bugfixes, as always

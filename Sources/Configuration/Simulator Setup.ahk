@@ -195,6 +195,18 @@ class SetupWizard extends ConfiguratorPanel {
 				super.DefineResizeRule(control, rule)
 		}
 
+		ControlsRestrictResize(&width, &height) {
+			local restricted := super.ControlsRestrictResize(&width, &height)
+
+			if (height < (this.MinHeight + 80)) {
+				height := (this.MinHeight + 80)
+
+				restricted := true
+			}
+
+			return restricted
+		}
+
 		Close(*) {
 			if (this.Closeable && this.SetupWizard.finishSetup(false))
 				ExitApp(0)
@@ -818,11 +830,6 @@ class SetupWizard extends ConfiguratorPanel {
 		local helpWindow := this.HelpWindow
 		local x, y, w, h, posX, page, step
 
-		updateMinHeight() {
-			helpWindow.MinHeight[false] := (helpWindow.MinHeight + 72)
-			wizardWindow.MinHeight[false] := (wizardWindow.MinHeight + 72)
-		}
-
 		if getWindowPosition("Simulator Setup.Help", &x, &y)
 			helpWindow.Show("x" . x . " y" . y)
 		else {
@@ -832,7 +839,7 @@ class SetupWizard extends ConfiguratorPanel {
 		}
 
 		if getWindowSize("Simulator Setup.Help", &w, &h)
-			helpWindow.Resize("Initialize", w, Max(h, helpWindow.MinHeight + 72))
+			helpWindow.Resize("Initialize", w, Max(h, helpWindow.MinHeight + 80))
 
 		if getWindowPosition("Simulator Setup", &x, &y)
 			wizardWindow.Show("x" . x . " y" . y)
@@ -843,7 +850,7 @@ class SetupWizard extends ConfiguratorPanel {
 		}
 
 		if getWindowSize("Simulator Setup", &w, &h) {
-			wizardWindow.Resize("Initialize", w, Max(h, wizardWindow.MinHeight + 72))
+			wizardWindow.Resize("Initialize", w, Max(h, wizardWindow.MinHeight + 80))
 
 			Sleep(500)
 
@@ -866,8 +873,6 @@ class SetupWizard extends ConfiguratorPanel {
 					if (step.Active && (step.Step = page))
 						this.showPage(step, 1)
 				}
-
-		; Task.startTask(updateMinHeight, 5000)
 	}
 
 	hide() {

@@ -312,7 +312,15 @@ namespace ACSHMSpotter {
 		int lastFlagState = 0;
 		int waitYellowFlagState = 0;
 
-		string computeAlert(int newSituation)
+        int aheadAccidentDistance = 800;
+        int behindAccidentDistance = 500;
+        int slowCarDistance = 500;
+
+        long nextSlowCarAhead = 0;
+        long nextAccidentAhead = 0;
+        long nextAccidentBehind = 0;
+
+        string computeAlert(int newSituation)
 		{
 			string alert = noAlert;
 
@@ -594,7 +602,156 @@ namespace ACSHMSpotter {
 			return false;
 		}
 
-		bool checkFlagState()
+        class IdealLine
+        {
+            public int count = 0;
+
+            public double speed = 0;
+            public double posX = 0;
+            public double posY = 0;
+        }
+
+        List<IdealLine> idealLine = new List<IdealLine>(1000);
+
+        void updateIdealLine(ref AcCarInfo car, double speed)
+        {
+            double running = car.splinePosition;
+            IdealLine slot = idealLine[(int)Math.Round(running * 1000)];
+
+            if (slot.count < 100)
+                if (slot.count == 0)
+                {
+                    slot.count = 1;
+
+                    slot.speed = speed;
+
+                    slot.posX = car.worldPosition.x;
+                    slot.posY = car.worldPosition.z;
+                }
+                else
+                {
+                    slot.count += 1;
+
+                    slot.speed = (slot.speed * (slot.count - 1) + speed) / slot.count;
+
+                    slot.posX = ((slot.posX * (slot.count - 1)) + car.worldPosition.x) / slot.count;
+                    slot.posY = ((slot.posY * (slot.count - 1)) + car.worldPosition.z) / slot.count;
+                }
+        }
+
+        class SlowCarInfo
+        {
+            public int vehicle;
+            public int distance;
+
+            public SlowCarInfo(int vehicle, int distance)
+            {
+                this.vehicle = vehicle;
+                this.distance = distance;
+            }
+        }
+
+        bool checkAccident()
+        {
+			if (cars.numVehicles > 0)
+			{
+				List<SlowCarInfo> accidentsAhead = new List<SlowCarInfo>();
+				List<SlowCarInfo> accidentsBehind = new List<SlowCarInfo>();
+				List<SlowCarInfo> slowCarsAhead = new List<SlowCarInfo>();
+
+				ref AcCarInfo driver = ref cars.cars[0];
+				double driverLapDistance = driver.splinePosition * staticInfo.TrackSPlineLength;
+
+                for (int i = 1; i < cars.numVehicles; ++i)
+				{
+					ref AcCarInfo car = ref cars.cars[i];
+					double speed = car.speedMS * 3.6;
+
+					updateIdealLine(ref car, speed);
+
+					double running = car.splinePosition;
+					IdealLine slot = idealLine[(int)Math.Round(running * 1000)];
+
+					if ((slot.count > 20) && (speed < (slot.speed / 2)))
+					{
+						double carLapDistance = car.splinePosition * staticInfo.TrackSPlineLength;
+                        int distanceAhead = (int)(((carLapDistance > driverLapDistance) ? carLapDistance
+                                                                                        : (carLapDistance + staticInfo.TrackSPlineLength)) - driverLapDistance);
+
+						if (distanceAhead < slowCarDistance)
+							slowCarsAhead.Add(new SlowCarInfo(i, distanceAhead));
+
+						if (speed < (slot.speed / 4))
+						{
+							if (distanceAhead < aheadAccidentDistance)
+								accidentsAhead.Add(new SlowCarInfo(i, distanceAhead));
+
+							int distanceBehind = (int)(((carLapDistance < driverLapDistance) ? driverLapDistance
+                                                                                             : (driverLapDistance + staticInfo.TrackSPlineLength)) - carLapDistance);
+
+							if (distanceBehind < behindAccidentDistance)
+								accidentsBehind.Add(new SlowCarInfo(i, distanceBehind));
+						}
+					}
+				}
+
+				if (accidentsAhead.Count > 0)
+				{
+					if (cycle > nextAccidentAhead)
+					{
+						int distance = int.MaxValue;
+
+						nextAccidentAhead = cycle + 400;
+						nextSlowCarAhead = cycle + 400;
+
+						foreach (SlowCarInfo i in accidentsAhead)
+							distance = Math.Min(distance, i.distance);
+
+						SendSpotterMessage("accidentAlert:Ahead;" + distance);
+
+						return true;
+					}
+				}
+
+				if (slowCarsAhead.Count > 0)
+				{
+					if (cycle > nextSlowCarAhead)
+					{
+						int distance = int.MaxValue;
+
+						nextSlowCarAhead = cycle + 400;
+
+						foreach (SlowCarInfo i in slowCarsAhead)
+							distance = Math.Min(distance, i.distance);
+
+						SendSpotterMessage("slowCarAlert:" + distance);
+
+						return true;
+					}
+				}
+
+				if (accidentsBehind.Count > 0)
+				{
+					if (cycle > nextAccidentBehind)
+					{
+						int distance = int.MaxValue;
+
+						nextAccidentBehind = cycle + 400;
+
+						foreach (SlowCarInfo i in accidentsAhead)
+							distance = Math.Min(distance, i.distance);
+
+						SendSpotterMessage("accidentAlert:Behind;" + distance);
+
+						return true;
+					}
+				}
+			}
+
+            return false;
+        }
+
+        bool checkFlagState()
 		{
 			if ((waitYellowFlagState & YELLOW) != 0)
 			{
@@ -1295,6 +1452,21 @@ namespace ACSHMSpotter {
             }
         }
 
+        public void initializeSpotter(string[] args)
+        {
+            for (int i = 0; i < 1000; i++)
+                idealLine.Add(new IdealLine());
+
+            if (args.Length > 0)
+                aheadAccidentDistance = int.Parse(args[0]);
+
+            if (args.Length > 1)
+                behindAccidentDistance = int.Parse(args[1]);
+
+            if (args.Length > 2)
+                slowCarDistance = int.Parse(args[2]);
+        }
+
         public void Run(bool mapTrack, bool positionTrigger, bool analyzeTelemetry)
 		{
 			bool running = false;
@@ -1360,7 +1532,7 @@ namespace ACSHMSpotter {
 
 							cycle += 1;
 
-							if (!checkFlagState() && !checkPositions())
+							if (!checkAccident() && !checkFlagState() && !checkPositions())
 								wait = !checkPitWindow();
 							else
 								wait = false;

@@ -39,8 +39,14 @@ namespace RF2SHMSpotter {
 
                 spotter.Run(false, false, true);
             }
+            else if (args.Length > 0 && args[0] == "-Map")
+                new SHMSpotter().Run(true, false, false);
             else
-                new SHMSpotter().Run(args.Length > 0 && args[0] == "-Map", false, false);
+            {
+                spotter.initializeSpotter(args);
+
+                spotter.Run(false, false, false);
+            }
         }
     }
 }

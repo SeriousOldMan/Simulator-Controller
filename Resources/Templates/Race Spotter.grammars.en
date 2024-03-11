@@ -18,11 +18,14 @@ SideProximity=side alerts
 RearProximity=rear alerts
 BlueFlags=blue flag warnings
 YellowFlags=yellow flag warnings
+SlowCars=slow car warnings
+AccidentsAhead=ahead accidents warnings
+AccidentsBehind=behind accidents information
 SG=Stop and Go
 DT=Drive Through
 Time=Time
 [Choices]
-Announcements=delta information, tactical advice, side alerts, rear alerts, blue flag warnings, yellow flag warnings, cut warnings, penalty information
+Announcements=delta information, tactical advice, side alerts, rear alerts, blue flag warnings, yellow flag warnings, cut warnings, penalty information, slow car warnings, ahead accidents warnings, behind accidents information
 [Listener Grammars]
 // Information //
 FocusCar=[(CanYou) {focus on, observe} {car, car number, number} (Number), (CanYou) give {me, me more} information about {car, car number, number} (Number)]

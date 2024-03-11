@@ -1002,10 +1002,10 @@ class RaceSpotter extends GridRaceAssistant {
 		super.__New(configuration, "Race Spotter", remoteHandler, name, language, synthesizer, speaker, vocalics, recognizer, listener, muted, voiceServer)
 
 		this.updateConfigurationValues({Announcements: {DeltaInformation: 2, TacticalAdvices: true
-									  , SideProximity: true, RearProximity: true
-									  , YellowFlags: true, BlueFlags: true, PitWindow: true
-									  , SlowCars: true, AccidentsAhead: true, AccidentsBehind: true
-									  , SessionInformation: true, CutWarnings: true, PenaltyInformation: true}})
+													  , SideProximity: true, RearProximity: true
+													  , YellowFlags: true, BlueFlags: true, PitWindow: true
+													  , SlowCars: true, AccidentsAhead: true, AccidentsBehind: true
+													  , SessionInformation: true, CutWarnings: true, PenaltyInformation: true}})
 
 		OnExit(ObjBindMethod(this, "shutdownSpotter", true))
 	}
@@ -2709,7 +2709,9 @@ class RaceSpotter extends GridRaceAssistant {
 	}
 
 	skipAlert(alert) {
-		if ((alert = "Hold") && this.pendingAlert("Clear", true))
+		if this.pendingAlerts(["AccidentAhead", "SlowCarAhead"], true)
+			return true
+		else if ((alert = "Hold") && this.pendingAlert("Clear", true))
 			return true
 		else if ((alert = "Left") && (this.pendingAlerts(["ClearAll", "ClearLeft", "Left", "Three"])))
 			return true
@@ -2986,7 +2988,8 @@ class RaceSpotter extends GridRaceAssistant {
 		local ignore, key, default
 
 		for ignore, key in ["TacticalAdvices", "SideProximity", "RearProximity", "YellowFlags", "BlueFlags"
-						  , "PitWindow", "SessionInformation", "CutWarnings", "PenaltyInformation"]
+						  , "PitWindow", "SessionInformation", "CutWarnings", "PenaltyInformation"
+						  , "SlowCars", "AccidentsAhead", "AccidentsBehind"]
 			announcements[key] := getMultiMapValue(configuration, "Race Spotter Announcements", simulatorName . "." . key, true)
 
 		default := getMultiMapValue(configuration, "Race Spotter Announcements", simulatorName . ".PerformanceUpdates", 2)

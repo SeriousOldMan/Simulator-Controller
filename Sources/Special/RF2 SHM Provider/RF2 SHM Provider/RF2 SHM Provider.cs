@@ -154,7 +154,7 @@ namespace RF2SHMProvider {
 			Console.Write("Car.Count="); Console.WriteLine(scoring.mScoringInfo.mNumVehicles);
 
 			for (int i = 1; i <= scoring.mScoringInfo.mNumVehicles; ++i) {
-				rF2VehicleScoring vehicle = scoring.mVehicles[i - 1];
+				ref rF2VehicleScoring vehicle = ref scoring.mVehicles[i - 1];
 
                 Console.Write("Car."); Console.Write(i); Console.Write(".ID="); Console.WriteLine(i);
                 Console.Write("Car."); Console.Write(i); Console.Write(".Position="); Console.WriteLine(vehicle.mPlace);
@@ -352,7 +352,7 @@ namespace RF2SHMProvider {
 				Console.Write("Temperature="); Console.WriteLine(scoring.mScoringInfo.mTrackTemp);
 
 				for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)	{
-					var vehicle = scoring.mVehicles[i];
+					ref rF2VehicleScoring vehicle = ref scoring.mVehicles[i];
 
 					Console.WriteLine("Car." + (i + 1) + ".Position=" + vehicle.mPos.x + "," + (- vehicle.mPos.z));
 				}
@@ -477,7 +477,7 @@ namespace RF2SHMProvider {
         {
             for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)
             {
-                var vehicle = scoring.mVehicles[i];
+                ref rF2VehicleScoring vehicle = ref scoring.mVehicles[i];
 
 				/*
                 switch ((rFactor2Constants.rF2Control)vehicle.mControl)
@@ -506,7 +506,7 @@ namespace RF2SHMProvider {
 			var playerVehTelemetry = new rF2VehicleTelemetry();
 
 			for (int i = 0; i < telemetry.mNumVehicles; ++i) {
-				var vehicle = telemetry.mVehicles[i];
+                ref rF2VehicleTelemetry vehicle = ref telemetry.mVehicles[i];
 
 				if (vehicle.mID == id) {
 					playerVehTelemetry = vehicle;

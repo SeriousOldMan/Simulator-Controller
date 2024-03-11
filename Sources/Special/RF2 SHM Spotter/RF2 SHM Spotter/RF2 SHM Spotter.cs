@@ -232,7 +232,16 @@ namespace RF2SHMSpotter {
 		int lastFlagState = 0;
 		int waitYellowFlagState = 0;
 
-		string computeAlert(int newSituation) {
+        int aheadAccidentDistance = 800;
+        int behindAccidentDistance = 500;
+        int slowCarDistance = 500;
+
+        long nextSlowCarAhead = 0;
+        long nextAccidentAhead = 0;
+        long nextAccidentBehind = 0;
+
+
+        string computeAlert(int newSituation) {
 			string alert = noAlert;
 
 			if (lastSituation == newSituation)
@@ -462,7 +471,6 @@ namespace RF2SHMSpotter {
 																								lastCoordinates[i, 0] - vehicle.mPos.x,
 																								lastCoordinates[i, 2] - (-vehicle.mPos.z)))
 								{
-
 									bool faster = false;
 
 									if (hasLastCoordinates)
@@ -546,9 +554,167 @@ namespace RF2SHMSpotter {
 			}
 
 			return false;
+        }
+
+        double vehicleSpeed(ref rF2VehicleScoring vehicle)
+        {
+            rF2Vec3 localVel = vehicle.mLocalVel;
+
+            return Math.Sqrt(localVel.x * localVel.x + localVel.y * localVel.y + localVel.z * localVel.z) * 3.6;
+        }
+
+        double vehicleSpeed(ref rF2VehicleTelemetry vehicle)
+        {
+            rF2Vec3 localVel = vehicle.mLocalVel;
+
+            return Math.Sqrt(localVel.x * localVel.x + localVel.y * localVel.y + localVel.z * localVel.z) * 3.6;
+        }
+
+        class IdealLine
+		{
+			public int count = 0;
+			
+			public double speed = 0;
+            public double posX = 0;
+            public double posY = 0;
+        }
+
+        List<IdealLine> idealLine = new List<IdealLine>(1000);
+
+		void updateIdealLine(ref rF2VehicleScoring vehicle, double speed) {
+			double running = vehicle.mLapDist / scoring.mScoringInfo.mLapDist;
+            IdealLine slot = idealLine[(int)Math.Round(running * 1000)];
+
+			if (slot.count < 100)
+				if (slot.count == 0)
+				{
+					slot.count = 1;
+
+					slot.speed = speed;
+
+                    slot.posX = vehicle.mPos.x;
+                    slot.posY = vehicle.mPos.z;
+                }
+				else
+				{
+					slot.count += 1;
+
+                    slot.speed = (slot.speed * (slot.count - 1) + speed) / slot.count;
+
+                    slot.posX = ((slot.posX * (slot.count - 1)) + vehicle.mPos.x) / slot.count;
+                    slot.posY = ((slot.posY * (slot.count - 1)) + vehicle.mPos.z) / slot.count;
+                }
 		}
 
-		bool checkFlagState(ref rF2VehicleScoring playerScoring)
+        class SlowCarInfo
+        {
+			public int vehicle;
+			public int distance;
+
+			public SlowCarInfo(int vehicle, int distance)
+			{
+				this.vehicle = vehicle;
+				this.distance = distance;
+			}
+        }
+
+        bool checkAccident(ref rF2VehicleScoring playerScoring)
+        {
+            List<SlowCarInfo> accidentsAhead = new List<SlowCarInfo>();
+            List<SlowCarInfo> accidentsBehind = new List<SlowCarInfo>();
+            List<SlowCarInfo> slowCarsAhead = new List<SlowCarInfo>();
+
+            for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)
+			{
+				ref rF2VehicleScoring vehicle = ref scoring.mVehicles[i];
+				double speed = vehicleSpeed(ref vehicle);
+
+				updateIdealLine(ref vehicle, speed);
+
+				if (vehicle.mIsPlayer != 1)
+				{
+                    double running = vehicle.mLapDist / scoring.mScoringInfo.mLapDist;
+                    IdealLine slot = idealLine[(int)Math.Round(running * 1000)];
+
+					if ((slot.count > 20) && (speed < (slot.speed / 2)))
+					{
+						int distanceAhead = (int)(((vehicle.mLapDist > playerScoring.mLapDist) ? vehicle.mLapDist
+																							   : (vehicle.mLapDist + scoring.mScoringInfo.mLapDist)) - playerScoring.mLapDist);
+												
+						if (distanceAhead < slowCarDistance)
+							slowCarsAhead.Add(new SlowCarInfo(i, distanceAhead));
+
+						if (speed < (slot.speed / 4))
+						{
+							if (distanceAhead < aheadAccidentDistance)
+								accidentsAhead.Add(new SlowCarInfo(i, distanceAhead));
+
+							int distanceBehind = (int)(((vehicle.mLapDist < playerScoring.mLapDist) ? playerScoring.mLapDist
+																								    : (playerScoring.mLapDist + scoring.mScoringInfo.mLapDist)) - vehicle.mLapDist);
+
+							if (distanceBehind < behindAccidentDistance)
+								accidentsBehind.Add(new SlowCarInfo(i, distanceBehind));
+						}
+                    }
+                }
+			}
+
+			if (accidentsAhead.Count > 0)
+			{
+				if (cycle > nextAccidentAhead)
+				{
+					int distance = int.MaxValue;
+
+                    nextAccidentAhead = cycle + 400;
+                    nextSlowCarAhead = cycle + 400;
+
+                    foreach (SlowCarInfo i in accidentsAhead)
+						distance = Math.Min(distance, i.distance);
+
+					SendSpotterMessage("accidentAlert:Ahead;" + distance);
+
+					return true;
+				}
+            }
+
+			if (slowCarsAhead.Count > 0)
+			{
+				if (cycle > nextSlowCarAhead)
+				{
+					int distance = int.MaxValue;
+
+					nextSlowCarAhead = cycle + 400;
+
+					foreach (SlowCarInfo i in slowCarsAhead)
+						distance = Math.Min(distance, i.distance);
+
+					SendSpotterMessage("slowCarAlert:" + distance);
+
+					return true;
+                }
+			}
+
+			if (accidentsBehind.Count > 0)
+			{
+				if (cycle > nextAccidentBehind)
+				{
+					int distance = int.MaxValue;
+
+                    nextAccidentBehind = cycle + 400;
+
+                    foreach (SlowCarInfo i in accidentsAhead)
+						distance = Math.Min(distance, i.distance);
+
+					SendSpotterMessage("accidentAlert:Behind;" + distance);
+
+					return true;
+				}
+            }
+
+            return false;
+		}
+
+        bool checkFlagState(ref rF2VehicleScoring playerScoring)
 		{
 			if ((waitYellowFlagState & YELLOW_SECTOR_1) != 0 || (waitYellowFlagState & YELLOW_SECTOR_2) != 0 || (waitYellowFlagState & YELLOW_SECTOR_3) != 0)
 			{
@@ -765,8 +931,7 @@ namespace RF2SHMSpotter {
 
         void updateTopSpeed(ref rF2VehicleScoring playerScoring)
         {
-            rF2Vec3 localVel = playerScoring.mLocalVel;
-            float speed = (float)Math.Sqrt(localVel.x * localVel.x + localVel.y * localVel.y + localVel.z * localVel.z) * 3.6f;
+            float speed = (float)vehicleSpeed(ref playerScoring);
 
             if (speed > lastTopSpeed)
                 lastTopSpeed = speed;
@@ -888,9 +1053,8 @@ namespace RF2SHMSpotter {
 
 			float steerAngle = smoothValue(recentSteerAngles, (float)telemetry.mVehicles[carID].mFilteredSteering);
 
-            rF2Vec3 localVel = telemetry.mVehicles[carID].mLocalVel;
-            float speed = (float)Math.Sqrt(localVel.x * localVel.x + localVel.y * localVel.y + localVel.z * localVel.z) * 3.6f;
-			float acceleration = (float)speed - lastSpeed;
+            float speed = (float)vehicleSpeed(ref telemetry.mVehicles[carID]);
+            float acceleration = (float)speed - lastSpeed;
 
 			lastSpeed = speed;
 
@@ -1398,6 +1562,21 @@ namespace RF2SHMSpotter {
             }
         }
 
+        public void initializeSpotter(string[] args)
+        {
+			for (int i = 0; i < 1000; i++)
+				idealLine.Add(new IdealLine());
+
+            if (args.Length > 0)
+                aheadAccidentDistance = int.Parse(args[0]);
+
+            if (args.Length > 1)
+                behindAccidentDistance = int.Parse(args[1]);
+
+            if (args.Length > 2)
+                slowCarDistance = int.Parse(args[2]);
+        }
+
         bool started = false;
 
         public bool active() {
@@ -1483,7 +1662,7 @@ namespace RF2SHMSpotter {
 									cycle += 1;
 
 									if (!startGo || !greenFlag())
-										if (!checkFlagState(ref playerScoring) && !checkPositions(ref playerScoring))
+										if (!checkAccident(ref playerScoring) && !checkFlagState(ref playerScoring) && !checkPositions(ref playerScoring))
 											wait = !checkPitWindow(ref playerScoring);
 										else
 											wait = false;

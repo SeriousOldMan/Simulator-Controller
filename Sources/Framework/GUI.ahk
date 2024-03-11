@@ -755,37 +755,43 @@ class Window extends Gui {
 		}
 	}
 
-	MinWidth {
+	MinWidth[resize := true] {
 		Get {
 			return this.iMinWidth
 		}
 
 		Set {
 			try {
+				this.Opt("+MinSize" . value . "x" . this.MinHeight)
+
 				return (this.iMinWidth := value)
 			}
 			finally {
-				this.Resize("Auto", this.Width, this.Height)
+				if resize
+					this.Resize("Auto", this.Width, this.Height)
 			}
 		}
 	}
 
-	MinHeight {
+	MinHeight[resize := true] {
 		Get {
 			return this.iMinHeight
 		}
 
 		Set {
 			try {
+				this.Opt("+MinSize" . this.MinWidth . "x" . value)
+
 				return (this.iMinHeight := value)
 			}
 			finally {
-				this.Resize("Auto", this.Width, this.Height)
+				if resize
+					this.Resize("Auto", this.Width, this.Height)
 			}
 		}
 	}
 
-	MaxWidth {
+	MaxWidth[resize := true] {
 		Get {
 			return this.iMaxWidth
 		}
@@ -800,12 +806,13 @@ class Window extends Gui {
 				else
 					this.Opt("-MaxSize")
 
-				this.Resize("Auto", this.Width, this.Height)
+				if resize
+					this.Resize("Auto", this.Width, this.Height)
 			}
 		}
 	}
 
-	MaxHeight {
+	MaxHeight[resize := true] {
 		Get {
 			return this.iMaxHeight
 		}
@@ -820,7 +827,8 @@ class Window extends Gui {
 				else
 					this.Opt("-MaxSize")
 
-				this.Resize("Auto", this.Width, this.Height)
+				if resize
+					this.Resize("Auto", this.Width, this.Height)
 			}
 		}
 	}

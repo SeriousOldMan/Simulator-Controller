@@ -45,7 +45,7 @@ Nachfolgend ist eine vollständige Liste aller von Elisa, dem virtuellen Rennbeo
 
 #### Vordefinierte Auswahlmöglichkeiten
 
-Announcements=Abstandsinformationen, Taktische Hinweise, Seitenwarnungen, Heckwarnungen, Blaue Flagge Warnungen, Gelbe Flagge Warnungen, Abkürzungswarnungen, Strafeninformationen
+Announcements=Abstandsinformationen, Taktische Hinweise, Seitenwarnungen, Heckwarnungen, Blaue Flagge Warnungen, Gelbe Flagge Warnungen, Abkürzungswarnungen, Strafeninformationen, Langsame Wagen Warnungen, Unfälle voraus Warnungen, Unfälle zurückliegend Informationen
 
 KannstDu=Kannst Du, Kannst Du bitte
 

@@ -202,7 +202,7 @@ namespace SHMConnector {
 
 				for (int i = 1; i <= scoring.mScoringInfo.mNumVehicles; ++i)
 				{
-					rF2VehicleScoring vehicle = scoring.mVehicles[i - 1];
+					ref rF2VehicleScoring vehicle = ref scoring.mVehicles[i - 1];
 
                     strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".ID="); strWriter.WriteLine(i);
                     strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Position="); strWriter.WriteLine(vehicle.mPlace);
@@ -380,7 +380,7 @@ namespace SHMConnector {
 				strWriter.Write("Temperature="); strWriter.WriteLine(scoring.mScoringInfo.mTrackTemp);
 
 				for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)	{
-					var vehicle = scoring.mVehicles[i];
+                    ref rF2VehicleScoring vehicle = ref scoring.mVehicles[i];
 
 					strWriter.WriteLine("Car." + (i + 1) + ".Position=" + vehicle.mPos.x + "," + (- vehicle.mPos.z));
 				}
@@ -504,7 +504,7 @@ namespace SHMConnector {
 
         public static rF2VehicleScoring GetPlayerScoring(ref rF2Scoring scoring) {
 			for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i) {
-				var vehicle = scoring.mVehicles[i];
+                ref rF2VehicleScoring vehicle = ref scoring.mVehicles[i];
 
 				/*
 				switch ((rFactor2Constants.rF2Control)vehicle.mControl) {
@@ -532,7 +532,7 @@ namespace SHMConnector {
 			var playerVehTelemetry = new rF2VehicleTelemetry();
 
 			for (int i = 0; i < telemetry.mNumVehicles; ++i) {
-				var vehicle = telemetry.mVehicles[i];
+                ref rF2VehicleTelemetry vehicle = ref telemetry.mVehicles[i];
 
 				if (vehicle.mID == id) {
 					playerVehTelemetry = vehicle;

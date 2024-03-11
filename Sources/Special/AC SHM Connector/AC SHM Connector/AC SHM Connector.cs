@@ -258,7 +258,7 @@ namespace SHMConnector
 
                 for (int i = 1; i <= cars.numVehicles; ++i)
                 {
-                    AcCarInfo car = cars.cars[i - 1];
+                    ref AcCarInfo car = ref cars.cars[i - 1];
 
                     strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Nr="); strWriter.WriteLine(car.carId);
                     strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Position="); strWriter.WriteLine(car.carRealTimeLeaderboardPosition + 1);

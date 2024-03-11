@@ -1,3 +1,9 @@
+## 5.6.3.0-release 03/15/24 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. A new customization method allows to introduce support for user specific applications in "Simulator Setup".
+  4. Initial support for rain and wet tracks for iRacing.
+  
 ## 5.6.2.0-release 03/08/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

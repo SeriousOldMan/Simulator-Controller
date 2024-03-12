@@ -192,6 +192,21 @@ long getRemainingTime(const char* sessionInfo, bool practice, int sessionLaps, l
 		return (getRemainingLaps(sessionInfo, practice, sessionLaps, sessionTime, lap, lastTime, bestTime) * lastTime);
 }
 
+const char* getWeather(const char* gripLevel) {
+	if ((strcmp(gripLevel, "Green") == 0) || (strcmp(gripLevel, "Fast") == 0) || (strcmp(gripLevel, "Optimumn") == 0))
+		return "Dry";
+	else if (strcmp(gripLevel, "Greasy") == 0)
+		return "Drizzle";
+	else if (strcmp(gripLevel, "Damp") == 0)
+		return "LightRain";
+	else if (strcmp(gripLevel, "Wet") == 0)
+		return "MediumRain";
+	else if (strcmp(gripLevel, "Flooded") == 0)
+		return "HeavyRain";
+	else
+		return "Dry";
+}
+
 void printDataValue(std::ostringstream * output, const irsdk_header* header, const char* data, const irsdk_varHeader* rec) {
 	if (header && data) {
 		int count = rec->count;
@@ -286,6 +301,15 @@ float getDataFloat(const irsdk_header* header, const char* data, const char* var
 
 	if (getDataValue(result, header, data, variable))
 		return atof(result);
+	else
+		return 0;
+}
+
+int getDataInt(const irsdk_header* header, const char* data, const char* variable) {
+	char result[32];
+
+	if (getDataValue(result, header, data, variable))
+		return atoi(result);
 	else
 		return 0;
 }
@@ -728,6 +752,10 @@ void writeData(std::ostringstream * output, const irsdk_header *header, const ch
 
 		printLine(output, "[Setup Data]");
 
+		int compound = getDataInt(header, data, "PitSvTireCompound");
+
+		printLine(output, "TyreCompoundRaw=" + std::to_string((compound == -1) ? 1 : compound));
+
 		printLine(output, "FuelAmount=" + std::to_string(getDataFloat(header, data, "PitSvFuel")));
 
 		float pressureFL = GetPsi(getDataFloat(header, data, "PitSvLFP"));
@@ -871,8 +899,9 @@ void writeData(std::ostringstream * output, const irsdk_header *header, const ch
 
 			printLine(output, "FuelRemaining=" + std::to_string(getDataFloat(header, data, "FuelLevel")));
 
-			printLine(output, "TyreCompound=Dry");
-			printLine(output, "TyreCompoundColor=Black");
+			int compound = getDataInt(header, data, "PlayerTireCompound");
+
+			printLine(output, "TyreCompoundRaw=" + std::to_string((compound == -1) ? 1 : compound));
 
 			printLine(output, "TyrePressure=" +
 				std::to_string(GetPsi(getTyrePressure(header, sessionInfo, data, "CarSetup:Suspension:LeftFront:LastHotPressure:", "LFpressure"))) + "," +
@@ -966,23 +995,38 @@ void writeData(std::ostringstream * output, const irsdk_header *header, const ch
 			else
 				printLine(output, "Temperature=24");
 
+			int wetness = irsdk_TrackWetness_Dry;
+
+			if (getDataValue(result, header, data, "TrackWetness"))
+				wetness = atoi(result);
+
 			char gripLevel[32] = "Green";
 
-			int id = atoi(sessionID);
+			if (wetness <= irsdk_TrackWetness_Dry) {
+				int id = atoi(sessionID);
 
-			while (id >= 0) {
-				char session[32];
+				while (id >= 0) {
+					char session[32];
 
-				if (getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}SessionTrackRubberState:", itoa(id, session, 10)))
-					if (strstr(result, "moderate") || strstr(result, "moderately"))
-						strcpy(gripLevel, "Fast");
-					else if (strstr(result, "high"))
-						strcpy(gripLevel, "Optimum");
-					else if (!strstr(result, "carry over"))
-						break;
+					if (getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}SessionTrackRubberState:", itoa(id, session, 10)))
+						if (strstr(result, "moderate") || strstr(result, "moderately"))
+							strcpy(gripLevel, "Fast");
+						else if (strstr(result, "high"))
+							strcpy(gripLevel, "Optimum");
+						else if (!strstr(result, "carry over"))
+							break;
 
-				id -= 1;
+					id -= 1;
+				}
 			}
+			else if (wetness == irsdk_TrackWetness_MostlyDry)
+				strcpy(gripLevel, "Greasy");
+			else if (wetness == irsdk_TrackWetness_VeryLightlyWet)
+				strcpy(gripLevel, "Damp");
+			else if (wetness == irsdk_TrackWetness_ModeratelyWet)
+				strcpy(gripLevel, "Wet");
+			else if (wetness == irsdk_TrackWetness_ExtremelyWet)
+				strcpy(gripLevel, "Flooded");
 
 			printLine(output, "Grip=" + std::string(gripLevel));
 
@@ -1023,13 +1067,13 @@ void writeData(std::ostringstream * output, const irsdk_header *header, const ch
 			else
 				printLine(output, "Temperature=24");
 
-			printLine(output, "Weather=Dry");
-			printLine(output, "Weather10Min=Dry");
-			printLine(output, "Weather30Min=Dry");
+			printLine(output, "Weather=" + std::string(getWeather(gripLevel)));
+			printLine(output, "Weather10Min=" + std::string(getWeather(gripLevel)));
+			printLine(output, "Weather30Min=" + std::string(getWeather(gripLevel)));
 
 			printLine(output, "[Test Data]");
 			
-			id = atoi(sessionID);
+			int id = atoi(sessionID);
 
 			printLine(output, "Driver.Car=" + std::string(playerCarIdx));
 

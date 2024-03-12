@@ -1250,13 +1250,17 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	static getTyreCompoundName(simulator, car, track, compound, default?) {
+		local compounds := SessionDatabase.getTyreCompounds(simulator, car, track, true)
 		local index, code
 
-		for index, code in SessionDatabase.getTyreCompounds(simulator, car, track, true)
+		for index, code in compounds
 			if (code = compound)
 				return SessionDatabase.getTyreCompounds(simulator, car, track)[index]
 
-		return (isSet(default) ? default : compound)
+		if (isInteger(compound) && compounds.Has(compound))
+			return compounds[compound]
+		else
+			return (isSet(default) ? default : compound)
 	}
 
 	getTyreCompoundName(simulator, car, track, compound, default := kUndefined) {

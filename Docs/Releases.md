@@ -2,7 +2,10 @@
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. A new customization method allows to introduce support for user specific applications in "Simulator Setup".
-  4. Initial support for rain and wet tracks for iRacing.
+  4. Initial support for rain and wet tracks for iRacing. Make sure to read at least the new document about [tyre compound handling in iRacing](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds#special-notes-for-iracing).
+     - The grip level of the track now covers the full range from "Optimum" to "Flooded".
+	 - Unfortunately iRacing does not provide any information about the actual weather, only about the level of water on the track. The make things working as good as possible, the track wetness is mapped to the current weather.
+	 - Changing the tyre compound during a pitstop is not supported yet by the iRacing API at the moment. It will be added with a later release.
   
 ## 5.6.2.0-release 03/08/24
   1. Minor bugfixes, as always

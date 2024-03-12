@@ -8,6 +8,7 @@
 	 - "Simulator Configuration" and "Simulator Setup" has been extended to allow enabling / disabling of the new alerts.
 	 - The announcements voice command of the Spotter has been extended to allow to enable / disable the new alerts while driving. Example: ["Please no more slow car warnings"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Strategist-Commands-(EN)).
 	 - New settings for the Spotter in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database" allow you to configure the distance before and behind the car, for which the traffic should be analyzed for accidents.
+	 - Please note that both *Assetto Corsa Competizione* and *iRacing* do not support accident detection yet for different reasons. Support may be added with a future release.
   6. Initial support for rain and wet tracks for iRacing. Make sure to read at least the new document about [tyre compound handling in iRacing](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds#special-notes-for-iracing).
      - The grip level of the track now covers the full range from "Optimum" to "Flooded".
 	 - Unfortunately iRacing does not provide any information about the actual weather, only about the level of water on the track. The make things working as good as possible, the track wetness is mapped to the current weather.

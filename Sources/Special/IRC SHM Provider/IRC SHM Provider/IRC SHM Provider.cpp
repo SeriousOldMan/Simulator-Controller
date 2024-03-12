@@ -733,7 +733,7 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 
 		int compound = getDataInt(header, data, "PitSvTireCompound");
 
-		printf("TyreCompoundRaw=%d\n", (compound == -1) ? 1 : compound);
+		printf("TyreCompoundRaw=%d\n", (compound == -1) ? 1 : compound + 1);
 
 		printf("FuelAmount=%f\n", getDataFloat(header, data, "PitSvFuel"));
 
@@ -896,7 +896,7 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 
 			int compound = getDataInt(header, data, "PlayerTireCompound");
 
-			printf("TyreCompoundRaw=%d\n", (compound == -1) ? 1 : compound);
+			printf("TyreCompoundRaw=%d\n", (compound == -1) ? 1 : compound + 1);
 
 			printf("TyrePressure=%f,%f,%f,%f\n",
 				GetPsi(getTyrePressure(header, sessionInfo, data, "CarSetup:Suspension:LeftFront:LastHotPressure:", "LFpressure")),
@@ -1172,8 +1172,10 @@ int main(int argc, char* argv[])
 					else {
 						if (getArgument(request, "Standings") != "")
 							writePositions(pHeader, g_data);
-						else
+						else {
+							writePositions(pHeader, g_data);
 							writeData(pHeader, g_data, false);
+						}
 					}
 				}
 

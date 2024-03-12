@@ -67,6 +67,9 @@ class RaceAssistant extends ConfigurationItem {
 	iSessionTime := false
 
 	iSimulator := ""
+	iCar := ""
+	iTrack := ""
+
 	iSession := kSessionFinished
 	iTeamSession := false
 
@@ -348,6 +351,18 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
+	Car {
+		Get {
+			return this.iCar
+		}
+	}
+
+	Track {
+		Get {
+			return this.iTrack
+		}
+	}
+
 	Session {
 		Get {
 			return this.iSession
@@ -581,6 +596,12 @@ class RaceAssistant extends ConfigurationItem {
 
 		if values.HasProp("Simulator")
 			this.iSimulator := values.Simulator
+
+		if values.HasProp("Car")
+			this.iCar := values.Car
+
+		if values.HasProp("Track")
+			this.iTrack := values.Track
 
 		if values.HasProp("Driver")
 			this.iDriverForName := values.Driver
@@ -1092,7 +1113,9 @@ class RaceAssistant extends ConfigurationItem {
 		driverSurname := getMultiMapValue(data, "Stint Data", "DriverSurname", "Doe")
 		driverNickname := getMultiMapValue(data, "Stint Data", "DriverNickname", "JD")
 
-		this.updateSessionValues({Simulator: simulatorName, Session: session, TeamSession: (getMultiMapValue(data, "Session Data", "Mode", "Solo") = "Team")
+		this.updateSessionValues({Simulator: simulatorName, Car: getMultiMapValue(data, "Session Data", "Car", "Unknown")
+								, Track: getMultiMapValue(data, "Session Data", "Track", "Unknown")
+								, Session: session, TeamSession: (getMultiMapValue(data, "Session Data", "Mode", "Solo") = "Team")
 								, SessionTime: A_Now, Driver: driverForname, DriverFullName: driverName(driverForName, driverSurName, driverNickName)})
 		this.updateDynamicValues({Prepared: true})
 

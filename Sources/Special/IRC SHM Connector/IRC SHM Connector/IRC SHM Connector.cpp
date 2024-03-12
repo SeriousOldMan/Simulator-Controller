@@ -753,7 +753,7 @@ void writeData(std::ostringstream * output, const irsdk_header *header, const ch
 
 		int compound = getDataInt(header, data, "PitSvTireCompound");
 
-		printLine(output, "TyreCompoundRaw=" + std::to_string((compound == -1) ? 1 : compound));
+		printLine(output, "TyreCompoundRaw=" + std::to_string((compound == -1) ? 1 : compound + 1));
 
 		printLine(output, "FuelAmount=" + std::to_string(getDataFloat(header, data, "PitSvFuel")));
 
@@ -900,7 +900,7 @@ void writeData(std::ostringstream * output, const irsdk_header *header, const ch
 
 			int compound = getDataInt(header, data, "PlayerTireCompound");
 
-			printLine(output, "TyreCompoundRaw=" + std::to_string((compound == -1) ? 1 : compound));
+			printLine(output, "TyreCompoundRaw=" + std::to_string((compound == -1) ? 1 : compound + 1));
 
 			printLine(output, "TyrePressure=" +
 				std::to_string(GetPsi(getTyrePressure(header, sessionInfo, data, "CarSetup:Suspension:LeftFront:LastHotPressure:", "LFpressure"))) + "," +

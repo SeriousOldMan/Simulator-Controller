@@ -1582,7 +1582,7 @@ class RaceEngineer extends RaceAssistant {
 		}
 
 		this.updateDynamicValues({BestLapTime: 0, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false, HasPressureData: false})
-		this.updateSessionValues({Simulator: "", Session: kSessionFinished, SessionTime: false})
+		this.updateSessionValues({Simulator: "", Car: "", Track: "", Session: kSessionFinished, SessionTime: false})
 	}
 
 	forceFinishSession() {

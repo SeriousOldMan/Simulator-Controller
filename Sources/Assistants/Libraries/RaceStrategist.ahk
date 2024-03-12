@@ -1622,7 +1622,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 		this.updateDynamicValues({OverallTime: 0, BestLapTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false
 								, StrategyReported: false, RejectedStrategy: false, HasTelemetryData: false})
-		this.updateSessionValues({Simulator: "", Session: kSessionFinished, OriginalStrategy: false, Strategy: false, SessionTime: false})
+		this.updateSessionValues({Simulator: "", Car: "", Track: "", Session: kSessionFinished, OriginalStrategy: false, Strategy: false, SessionTime: false})
 	}
 
 	forceFinishSession() {

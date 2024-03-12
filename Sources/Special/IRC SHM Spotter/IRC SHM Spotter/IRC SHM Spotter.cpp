@@ -405,92 +405,92 @@ bool checkPositions(const irsdk_header* header, const char* data, const int play
 
 	itoa(getCurrentSessionID(sessionInfo), sessionID, 10);
 
-	getDataValue(buffer, header, data, "CarLeftRight");
+	if (getDataValue(buffer, header, data, "CarLeftRight")) {
+		int newSituation = atoi(buffer);
 
-	int newSituation = atoi(buffer);
+		if (newSituation <= CLEAR)
+			newSituation = CLEAR;
+		else if (newSituation == 5)
+			newSituation = LEFT;
+		else if (newSituation == 6)
+			newSituation = RIGHT;
+		else if (newSituation >= THREE)
+			newSituation = THREE;
 
-	if (newSituation < CLEAR)
-		newSituation = CLEAR;
-	else if (newSituation == 5)
-		newSituation = LEFT;
-	else if (newSituation == 6)
-		newSituation = RIGHT;
-	else if (newSituation >= THREE)
-		newSituation = THREE;
+		carBehind = false;
 
-	carBehind = false;
+		if (newSituation == CLEAR) {
+			char* trackPositions;
+			char* pitLaneStates;
 
-	if (newSituation == CLEAR) {
-		char* trackPositions;
-		char* pitLaneStates;
-
-		if (getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct") &&
+			if (getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct") &&
 				getRawDataValue(pitLaneStates, header, data, "CarIdxOnPitRoad")) {
-			float playerRunning = ((float*)trackPositions)[playerCarIndex];
+				float playerRunning = ((float*)trackPositions)[playerCarIndex];
 
-			for (int i = 1; ; i++) {
-				char posIdx[10];
-				char carIdx[10];
+				for (int i = 1; ; i++) {
+					char posIdx[10];
+					char carIdx[10];
 
-				itoa(i, posIdx, 10);
+					itoa(i, posIdx, 10);
 
-				if (getYamlValue(carIdx, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:Position:{%s}CarIdx:", sessionID, posIdx)) {
-					int carIndex = atoi(carIdx);
-					
-					if ((carIndex != playerCarIndex) && !((bool*)pitLaneStates)[carIndex]) {
-						float carRunning = ((float*)trackPositions)[carIndex];
+					if (getYamlValue(carIdx, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:Position:{%s}CarIdx:", sessionID, posIdx)) {
+						int carIndex = atoi(carIdx);
 
-						if (carRunning < playerRunning)
-							if (abs(carRunning - playerRunning) < (nearByDistance / trackLength)) {
-								carBehind = true;
+						if ((carIndex != playerCarIndex) && !((bool*)pitLaneStates)[carIndex]) {
+							float carRunning = ((float*)trackPositions)[carIndex];
 
-								break;
-							}
+							if (carRunning < playerRunning)
+								if (abs(carRunning - playerRunning) < (nearByDistance / trackLength)) {
+									carBehind = true;
+
+									break;
+								}
+						}
 					}
+					else
+						break;
 				}
-				else
-					break;
 			}
 		}
-	}
-	else
-		carBehindReported = false;
+		else
+			carBehindReported = false;
 
-	if (carBehindCount++ > 200)
-		carBehindCount = 0;
+		if (carBehindCount++ > 200)
+			carBehindCount = 0;
 
-	const char* alert = computeAlert(newSituation);
+		const char* alert = computeAlert(newSituation);
 
-	if (alert != noAlert) {
-		if (strcmp(alert, "Hold") == 0)
-			carBehindReported = FALSE;
+		if (alert != noAlert) {
+			if (strcmp(alert, "Hold") == 0)
+				carBehindReported = FALSE;
 
-		char buffer2[128];
-		int offset = 0;
+			char buffer2[128];
+			int offset = 0;
 
-		strcpy_s(buffer2, 128, "proximityAlert:");
-		offset = strlen("proximityAlert:");
-		strcpy_s(buffer2 + offset, 128 - offset, alert);
+			strcpy_s(buffer2, 128, "proximityAlert:");
+			offset = strlen("proximityAlert:");
+			strcpy_s(buffer2 + offset, 128 - offset, alert);
 
-		sendSpotterMessage(buffer2);
+			sendSpotterMessage(buffer2);
 
-		return true;
-	}
-	else if (carBehind)
-	{
-		if (!carBehindReported) {
-			if (carBehindCount < 20 && cycle > nextCarBehind) {
-				nextCarBehind = cycle + 200;
-				carBehindReported = true;
+			return true;
+		}
+		else if (carBehind)
+		{
+			if (!carBehindReported) {
+				if (carBehindCount < 20 && cycle > nextCarBehind) {
+					nextCarBehind = cycle + 200;
+					carBehindReported = true;
 
-				sendSpotterMessage("proximityAlert:Behind");
+					sendSpotterMessage("proximityAlert:Behind");
 
-				return true;
+					return true;
+				}
 			}
 		}
+		else
+			carBehindReported = false;
 	}
-	else
-		carBehindReported = false;
 
 	return false;
 }

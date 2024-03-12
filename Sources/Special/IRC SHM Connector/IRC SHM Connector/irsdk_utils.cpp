@@ -338,12 +338,7 @@ unsigned int irsdk_getBroadcastMsgID()
 
 void irsdk_broadcastMsg(irsdk_BroadcastMsg msg, int var1, int var2, int var3)
 {
-	static unsigned int msgId = irsdk_getBroadcastMsgID();
-
-	if (msgId && msg >= 0 && msg < irsdk_BroadcastLast)
-	{
-		SendNotifyMessage(HWND_BROADCAST, msgId, MAKELONG(msg, var1), MAKELONG(var2, var3));
-	}
+	irsdk_broadcastMsg(msg, var1, (int)MAKELONG(var2, var3));
 }
 
 void irsdk_broadcastMsg(irsdk_BroadcastMsg msg, int var1, float var2)

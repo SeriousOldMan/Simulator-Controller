@@ -224,6 +224,43 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 		super.prepareSession(settings, data)
 	}
 
+	getPitstopOptionValues(option) {
+		local data, compound, compoundColor
+
+		if (this.OpenPitstopMFDHotkey != "Off") {
+			switch option, false {
+				case "Refuel":
+					data := this.readSessionData("Setup=true")
+
+					return [getMultiMapValue(data, "Setup Data", "FuelAmount", 0)]
+				case "Tyre Pressures":
+					data := this.readSessionData("Setup=true")
+
+					return [getMultiMapValue(data, "Setup Data", "TyrePressureFL", 26.1), getMultiMapValue(data, "Setup Data", "TyrePressureFR", 26.1)
+						  , getMultiMapValue(data, "Setup Data", "TyrePressureRL", 26.1), getMultiMapValue(data, "Setup Data", "TyrePressureRR", 26.1)]
+				case "Tyre Compound":
+					data := this.readSessionData("Setup=true")
+
+					compound := getMultiMapValue(data, "Setup Data", "TyreCompoundRaw")
+					compound := SessionDatabase.getTyreCompoundName(this.Simulator[true], this.Car, this.Track, compound, kUndefined)
+
+					if (compound = kUndefined)
+						compound := normalizeCompound("Dry")
+
+					compoundColor := false
+
+					if compound
+						splitCompound(compound, &compound, &compoundColor)
+
+					return [compound, compoundColor]
+				default:
+					return super.getPitstopOptionValues(option)
+			}
+		}
+		else
+			return false
+	}
+
 	startPitstopSetup(pitstopNumber) {
 		super.startPitstopSetup(pitstopNumber)
 

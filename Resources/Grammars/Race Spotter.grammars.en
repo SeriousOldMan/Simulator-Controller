@@ -276,9 +276,12 @@ BehindRight.2=Car on the right behind you.
 BehindLeft.1=Behind on the left.
 BehindLeft.2=Car on the left behind you.
 // Accidents //
-SlowCarAhead.1=Slow car ahead in %distance% %unit%.
-SlowCarAhead.2=Attention, slow car in %distance% %unit%.
-SlowCarAhead.3=In %distance% %unit% is a slow car on the track.
+SlowCarAhead.1=Slow car ahead.
+SlowCarAhead.2=Attention, slow car ahead.
+SlowCarAhead.3=Slow car on the track.
+SlowCarAheadDistance.1=Slow car ahead in %distance% %unit%.
+SlowCarAheadDistance.2=Attention, slow car in %distance% %unit%.
+SlowCarAheadDistance.3=In %distance% %unit% is a slow car on the track.
 SlowCarAheadSide.1=Slow car ahead on the %side% in %distance% %unit%.
 SlowCarAheadSide.2=Attention on the %side% in %distance% %unit%, slow car.
 SlowCarAheadSide.3=In %distance% %unit% is a slow car on the %side%.

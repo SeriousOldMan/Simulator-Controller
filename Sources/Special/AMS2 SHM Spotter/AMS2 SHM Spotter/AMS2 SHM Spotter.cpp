@@ -136,6 +136,14 @@ long nextBlueFlag = 0;
 int lastFlagState = 0;
 int waitYellowFlagState = 0;
 
+int aheadAccidentDistance = 800;
+int behindAccidentDistance = 500;
+int slowCarDistance = 500;
+
+long nextSlowCarAhead = 0;
+long nextAccidentAhead = 0;
+long nextAccidentBehind = 0;
+
 bool pitWindowOpenReported = false;
 bool pitWindowClosedReported = true;
 
@@ -369,8 +377,8 @@ bool checkPositions(const SharedMemory* sharedData) {
 						nextCarBehind = cycle + 200;
 						carBehindReported = true;
 
-						sendSpotterMessage(carBehindLeft ? "proximityAlert:BehindLeft" :
-							(carBehindRight ? "proximityAlert:BehindRight" : "proximityAlert:Behind"));
+						sendSpotterMessage(carBehindLeft ? "proximityAlert:BehindLeft"
+														 : (carBehindRight ? "proximityAlert:BehindRight" : "proximityAlert:Behind"));
 
 						return true;
 					}
@@ -388,6 +396,185 @@ bool checkPositions(const SharedMemory* sharedData) {
 		carBehindLeft = false;
 		carBehindRight = false;
 		carBehindReported = false;
+	}
+
+	return false;
+}
+
+class IdealLine
+{
+public:
+	int count = 0;
+
+	double speed = 0;
+	double posX = 0;
+	double posY = 0;
+};
+
+std::vector<IdealLine> idealLine;
+
+void updateIdealLine(ParticipantInfo vehicle, double running, double speed) {
+	IdealLine slot = idealLine[(int)std::round(running * 999)];
+
+	if (slot.count < 100)
+		if (slot.count == 0)
+		{
+			slot.count = 1;
+
+			slot.speed = speed;
+
+			slot.posX = vehicle.mWorldPosition[VEC_X];
+			slot.posY = vehicle.mWorldPosition[VEC_Z];
+		}
+		else
+		{
+			slot.count += 1;
+
+			slot.speed = (slot.speed * (slot.count - 1) + speed) / slot.count;
+
+			slot.posX = ((slot.posX * (slot.count - 1)) + vehicle.mWorldPosition[VEC_X]) / slot.count;
+			slot.posY = ((slot.posY * (slot.count - 1)) + vehicle.mWorldPosition[VEC_Z]) / slot.count;
+		}
+}
+
+class SlowCarInfo
+{
+public:
+	int vehicle;
+	int distance;
+
+public:
+	SlowCarInfo() :
+		vehicle(0),
+		distance(0) {}
+
+	SlowCarInfo(int v, int d) :
+		vehicle(v),
+		distance(d) {}
+};
+
+std::vector<SlowCarInfo> accidentsAhead;
+std::vector<SlowCarInfo> accidentsBehind;
+std::vector<SlowCarInfo> slowCarsAhead;
+
+bool checkAccident(const SharedMemory* sharedData)
+{
+	accidentsAhead.resize(0);
+	accidentsBehind.resize(0);
+	slowCarsAhead.resize(0);
+
+	try
+	{
+		ParticipantInfo driver = sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex];
+
+		for (int i = 0; i < sharedData->mNumParticipants; i++)
+		{
+			ParticipantInfo vehicle = sharedData->mParticipantInfo[i];
+			double speed = sharedData->mSpeeds[i] * 3.6;
+			double running = std::abs(vehicle.mCurrentLapDistance / sharedData->mTrackLength);
+			
+			running = ((1.0 < running) ? 1.0 : running);
+			running = ((0.0 > running) ? 0.0 : running);
+
+			updateIdealLine(vehicle, running, speed);
+
+			if (sharedData->mViewedParticipantIndex != i)
+			{
+				IdealLine slot = idealLine[(int)std::round(running * 999)];
+
+				if ((slot.count > 20) && (speed < (slot.speed / 2)))
+				{
+					int distanceAhead = (int)(((vehicle.mCurrentLapDistance > driver.mCurrentLapDistance) ? vehicle.mCurrentLapDistance
+																										  : (vehicle.mCurrentLapDistance + sharedData->mTrackLength)) - driver.mCurrentLapDistance);
+
+					if (distanceAhead < slowCarDistance)
+						slowCarsAhead.push_back(SlowCarInfo(i, distanceAhead));
+
+					if (speed < (slot.speed / 4))
+					{
+						if (distanceAhead < aheadAccidentDistance)
+							accidentsAhead.push_back(SlowCarInfo(i, distanceAhead));
+
+						int distanceBehind = (int)(((vehicle.mCurrentLapDistance < driver.mCurrentLapDistance) ? driver.mCurrentLapDistance
+																											   : (driver.mCurrentLapDistance + sharedData->mTrackLength)) - vehicle.mCurrentLapDistance);
+
+						if (distanceBehind < behindAccidentDistance)
+							accidentsBehind.push_back(SlowCarInfo(i, distanceBehind));
+					}
+				}
+			}
+		}
+	}
+	catch (...) {}
+
+	if (accidentsAhead.size() > 0)
+	{
+		if (cycle > nextAccidentAhead)
+		{
+			long distance = LONG_MAX;
+
+			nextAccidentAhead = cycle + 400;
+			nextSlowCarAhead = cycle + 400;
+
+			for (int i = 0; i < accidentsAhead.size(); i++)
+				distance = ((distance < accidentsAhead[i].distance) ? distance : accidentsAhead[i].distance);
+
+			char message[40] = "accidentAlert:Ahead;";
+			char numBuffer[20];
+
+			sprintf_s(numBuffer, "%d", distance);
+			strcat_s(message, numBuffer);
+
+			sendSpotterMessage(message);
+
+			return true;
+		}
+	}
+
+	if (slowCarsAhead.size() > 0)
+	{
+		if (cycle > nextSlowCarAhead)
+		{
+			long distance = LONG_MAX;
+
+			nextSlowCarAhead = cycle + 400;
+
+			for (int i = 0; i < slowCarsAhead.size(); i++)
+				distance = ((distance < slowCarsAhead[i].distance) ? distance : slowCarsAhead[i].distance);
+
+			char message[40] = "slowCarAlert:";
+			char numBuffer[20];
+
+			sprintf_s(numBuffer, "%d", distance);
+			strcat_s(message, numBuffer);
+
+			sendSpotterMessage(message);
+
+			return true;
+		}
+	}
+
+	if (accidentsBehind.size() > 0)
+	{
+		if (cycle > nextAccidentBehind)
+		{
+			long distance = LONG_MAX;
+
+			nextAccidentBehind = cycle + 400;
+
+			for (int i = 0; i < accidentsBehind.size(); i++)
+				distance = ((distance < accidentsBehind[i].distance) ? distance : accidentsBehind[i].distance);
+
+			char message[40] = "accidentAlert:Behind;";
+			char numBuffer[20];
+
+			sprintf_s(numBuffer, "%d", distance);
+			strcat_s(message, numBuffer);
+
+			sendSpotterMessage(message);
+
+			return true;
+		}
 	}
 
 	return false;
@@ -673,8 +860,8 @@ bool collectTelemetry(const SharedMemory* sharedData, std::string soundsDirector
 		}
 
 		CornerDynamics cd = CornerDynamics(sharedData->mSpeed * 3.6, 0,
-			sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mLapsCompleted,
-			phase);
+										   sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mLapsCompleted,
+										   phase);
 
 		if (fabs(angularVelocity * 57.2958) > 0.1) {
 			double slip = fabs(idealAngularVelocity - angularVelocity);
@@ -1117,6 +1304,21 @@ int main(int argc, char* argv[]) {
 				numCoordinates += 1;
 			}
 		}
+		else {
+			idealLine.reserve(1000);
+
+			for (int i = 0; i < 1000; i++)
+				idealLine.push_back(IdealLine());
+
+			if (argc > 1)
+				aheadAccidentDistance = atoi(argv[1]);
+
+			if (argc > 2)
+				behindAccidentDistance = atoi(argv[2]);
+
+			if (argc > 3)
+				slowCarDistance = atoi(argv[3]);
+		}
 	}
 
 	if (fileHandle != NULL) {
@@ -1196,10 +1398,12 @@ int main(int argc, char* argv[]) {
 						cycle += 1;
 
 						if (!startGo || !greenFlag(localCopy))
-							if (!checkFlagState(localCopy) && !checkPositions(localCopy))
-								wait = !checkPitWindow(localCopy);
-							else
+							if (checkAccident(localCopy))
 								wait = false;
+							else if (checkFlagState(localCopy) || checkPositions(localCopy))
+								wait = false;
+							else
+								wait = !checkPitWindow(localCopy);
 					}
 					else {
 						longitudinalRearDistance = 5;

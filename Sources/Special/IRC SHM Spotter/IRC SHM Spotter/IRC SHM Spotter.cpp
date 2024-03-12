@@ -298,6 +298,14 @@ long nextBlueFlag = 0;
 int lastFlagState = 0;
 int waitYellowFlagState = 0;
 
+int aheadAccidentDistance = 800;
+int behindAccidentDistance = 500;
+int slowCarDistance = 500;
+
+long nextSlowCarAhead = 0;
+long nextAccidentAhead = 0;
+long nextAccidentBehind = 0;
+
 bool pitWindowOpenReported = false;
 bool pitWindowClosedReported = true;
 
@@ -305,13 +313,12 @@ float rXCoordinates[1000];
 float rYCoordinates[1000];
 bool hasTrackCoordinates = false;
 
-bool getCarCoordinates(const irsdk_header* header, const char* data, const char* sessionInfo,
-	const int carIdx, float& coordinateX, float& coordinateY) {
+bool getCarCoordinates(const irsdk_header* header, const char* data, const int carIdx, float& coordinateX, float& coordinateY) {
 	char* trackPositions;
 
 	if (hasTrackCoordinates) {
 		if (getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct")) {
-			int index = min((int)round(((float*)trackPositions)[carIdx] * 1000), 999);
+			int index = max(0, min((int)round(((float*)trackPositions)[carIdx] * 1000), 999));
 
 			coordinateX = rXCoordinates[index];
 			coordinateY = rYCoordinates[index];
@@ -484,6 +491,83 @@ bool checkPositions(const irsdk_header* header, const char* data, const int play
 	}
 	else
 		carBehindReported = false;
+
+	return false;
+}
+
+class IdealLine
+{
+public:
+	int count = 0;
+
+	double speed = 0;
+	double posX = 0;
+	double posY = 0;
+};
+
+std::vector<IdealLine> idealLine;
+
+void updateIdealLine(const irsdk_header* header, const char* data, int carIndex, double running, double speed) {
+	IdealLine slot = idealLine[(int)std::round(running * 999)];
+	float coordinateX;
+	float coordinateY;
+
+	if (slot.count < 100)
+		if (getCarCoordinates(header, data, carIndex, coordinateX, coordinateY))
+			if (slot.count == 0)
+			{
+				slot.count = 1;
+
+				slot.speed = speed;
+
+				slot.posX = coordinateX;
+				slot.posY = coordinateY;
+			}
+			else
+			{
+				slot.count += 1;
+
+				slot.speed = (slot.speed * (slot.count - 1) + speed) / slot.count;
+
+				slot.posX = ((slot.posX * (slot.count - 1)) + coordinateX) / slot.count;
+				slot.posY = ((slot.posY * (slot.count - 1)) + coordinateY) / slot.count;
+			}
+}
+
+class SlowCarInfo
+{
+public:
+	int vehicle;
+	int distance;
+
+public:
+	SlowCarInfo() :
+		vehicle(0),
+		distance(0) {}
+
+	SlowCarInfo(int v, int d) :
+		vehicle(v),
+		distance(d) {}
+};
+
+std::vector<SlowCarInfo> accidentsAhead;
+std::vector<SlowCarInfo> accidentsBehind;
+std::vector<SlowCarInfo> slowCarsAhead;
+
+bool checkAccident(const irsdk_header* header, const char* data, const int playerCarIndex, float trackLength)
+{
+	char buffer[64];
+
+	getDataValue(buffer, header, data, "SessionFlags");
+
+	if ((atoi(buffer) & irsdk_white) && (cycle > nextSlowCarAhead))
+	{
+		nextSlowCarAhead = cycle + 400;
+
+		sendSpotterMessage("slowCarAlert");
+
+		return true;
+	}
 
 	return false;
 }
@@ -1439,6 +1523,24 @@ int main(int argc, char* argv[])
 			if (numCoordinates == 0)
 				positionTrigger = false;
 		}
+		else {
+			idealLine.reserve(1000);
+
+			for (int i = 0; i < 1000; i++)
+				idealLine.push_back(IdealLine());
+
+			if (argc > 1)
+				aheadAccidentDistance = atoi(argv[1]);
+
+			if (argc > 2)
+				behindAccidentDistance = atoi(argv[2]);
+
+			if (argc > 3)
+				slowCarDistance = atoi(argv[3]);
+
+			if (argc > 4)
+				loadTrackCoordinates(argv[4]);
+		}
 	}
 
 	float trackLength = 0.0;
@@ -1556,10 +1658,14 @@ int main(int argc, char* argv[])
 
 								cycle += 1;
 
-								if (!greenFlag(pHeader, g_data) && !checkFlagState(pHeader, g_data) && !checkPositions(pHeader, g_data, playerCarIndex, trackLength))
-									wait = !checkPitWindow(pHeader, g_data);
-								else
+								if (greenFlag(pHeader, g_data))
 									wait = false;
+								else if (checkAccident(pHeader, g_data, playerCarIndex, trackLength))
+									wait = false;
+								else if (checkFlagState(pHeader, g_data) || checkPositions(pHeader, g_data, playerCarIndex, trackLength))
+									wait = false;
+								else
+									wait = !checkPitWindow(pHeader, g_data);
 
 								continue;
 							}

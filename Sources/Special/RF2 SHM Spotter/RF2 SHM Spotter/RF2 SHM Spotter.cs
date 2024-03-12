@@ -705,7 +705,7 @@ namespace RF2SHMSpotter {
 
 					nextAccidentBehind = cycle + 400;
 
-					foreach (SlowCarInfo i in accidentsAhead)
+					foreach (SlowCarInfo i in accidentsBehind)
 						distance = Math.Min(distance, i.distance);
 
 					SendSpotterMessage("accidentAlert:Behind;" + distance);
@@ -1665,10 +1665,10 @@ namespace RF2SHMSpotter {
 									cycle += 1;
 
 									if (!startGo || !greenFlag())
-										if (checkFlagState(ref playerScoring) || checkPositions(ref playerScoring))
-											wait = false;
-										else if (checkAccident(ref playerScoring))
+                                        if (checkAccident(ref playerScoring))
                                             wait = false;
+										else if(checkFlagState(ref playerScoring) || checkPositions(ref playerScoring))
+											wait = false;
 										else
 											wait = !checkPitWindow(ref playerScoring);
 								}

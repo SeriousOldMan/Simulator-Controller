@@ -174,6 +174,14 @@ long nextBlueFlag = 0;
 int lastFlagState = 0;
 int waitYellowFlagState = 0;
 
+int aheadAccidentDistance = 800;
+int behindAccidentDistance = 500;
+int slowCarDistance = 500;
+
+long nextSlowCarAhead = 0;
+long nextAccidentAhead = 0;
+long nextAccidentBehind = 0;
+
 bool pitWindowOpenReported = false;
 bool pitWindowClosedReported = true;
 
@@ -431,6 +439,21 @@ bool checkPositions() {
 		carBehindLeft = false;
 		carBehindRight = false;
 		carBehindReported = false;
+	}
+
+	return false;
+}
+
+bool checkAccident() {
+	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
+
+	if (gf->GlobalWhite && (cycle > nextSlowCarAhead))
+	{
+		nextSlowCarAhead = cycle + 400;
+
+		sendSpotterMessage("slowCarAlert");
+
+		return true;
 	}
 
 	return false;
@@ -1261,6 +1284,16 @@ int main(int argc, char* argv[])
 				numCoordinates += 1;
 			}
 		}
+		else {
+			if (argc > 1)
+				aheadAccidentDistance = atoi(argv[1]);
+
+			if (argc > 2)
+				behindAccidentDistance = atoi(argv[2]);
+
+			if (argc > 3)
+				slowCarDistance = atoi(argv[3]);
+		}
 	}
 
 	SPageFileStatic* sf = (SPageFileStatic*)m_static.mapFileBuffer;
@@ -1322,10 +1355,12 @@ int main(int argc, char* argv[])
 					cycle += 1;
 
 					if (!startGo || !greenFlag())
-						if (!checkFlagState() && !checkPositions())
-							wait = !checkPitWindow();
-						else
+						if (checkAccident())
 							wait = false;
+						else if (checkFlagState() || checkPositions())
+							wait = false;
+						else
+							wait = !checkPitWindow();
 				}
 				else {
 					longitudinalRearDistance = 5;

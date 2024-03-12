@@ -546,13 +546,12 @@ bool hasTrackCoordinates = false;
 float rXCoordinates[1000];
 float rYCoordinates[1000];
 
-bool getCarCoordinates(const irsdk_header* header, const char* data, const char* sessionInfo,
-					  const int carIdx, float& coordinateX, float& coordinateY) {
+bool getCarCoordinates(const irsdk_header* header, const char* data, const int carIdx, float& coordinateX, float& coordinateY) {
 	char* trackPositions;
 
 	if (hasTrackCoordinates) {
 		if (getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct")) {
-			int index = min((int)round(((float*)trackPositions)[carIdx] * 1000), 999);
+			int index = max(0, min((int)round(((float*)trackPositions)[carIdx] * 1000), 999));
 
 			coordinateX = rXCoordinates[index];
 			coordinateY = rYCoordinates[index];
@@ -990,7 +989,7 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 					float coordinateX;
 					float coordinateY;
 
-					if (getCarCoordinates(header, data, sessionInfo, carIndex, coordinateX, coordinateY)) {
+					if (getCarCoordinates(header, data, carIndex, coordinateX, coordinateY)) {
 						char carIdx1[10];
 
 						itoa(carIndex + 1, carIdx1, 10);

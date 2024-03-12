@@ -187,6 +187,14 @@ long nextBlueFlag = 0;
 int lastFlagState = 0;
 int waitYellowFlagState = 0;
 
+int aheadAccidentDistance = 800;
+int behindAccidentDistance = 500;
+int slowCarDistance = 500;
+
+long nextSlowCarAhead = 0;
+long nextAccidentAhead = 0;
+long nextAccidentBehind = 0;
+
 BOOL pitWindowOpenReported = FALSE;
 BOOL pitWindowClosedReported = TRUE;
 
@@ -445,6 +453,177 @@ BOOL checkPositions(int playerID) {
 		carBehindLeft = FALSE;
 		carBehindRight = FALSE;
 		carBehindReported = FALSE;
+	}
+
+	return FALSE;
+}
+
+#define NumIdealLines 1000
+typedef struct {
+	int count;
+
+	double speed;
+	double posX;
+	double posY;
+} ideal_line;
+ideal_line idealLine[NumIdealLines];
+
+void updateIdealLine(int vehicleId, double running, double speed) {
+	ideal_line* slot = &idealLine[(int)round(running * 999)];
+
+	if (slot->count < 100)
+		if (slot->count == 0)
+		{
+			slot->count = 1;
+
+			slot->speed = speed;
+
+			slot->posX = map_buffer->all_drivers_data_1[vehicleId].position.x;
+			slot->posY = -map_buffer->all_drivers_data_1[vehicleId].position.z;
+		}
+		else
+		{
+			slot->count += 1;
+
+			slot->speed = (slot->speed * (slot->count - 1) + speed) / slot->count;
+
+			slot->posX = ((slot->posX * (slot->count - 1)) + map_buffer->all_drivers_data_1[vehicleId].position.x) / slot->count;
+			slot->posY = ((slot->posY * (slot->count - 1)) + -map_buffer->all_drivers_data_1[vehicleId].position.z) / slot->count;
+		}
+}
+
+typedef struct
+{
+	int vehicle;
+	int distance;
+} slow_car_info;
+
+slow_car_info accidentsAhead[10];
+slow_car_info accidentsBehind[10];
+slow_car_info slowCarsAhead[10];
+
+BOOL checkAccident(int playerID) {
+	int accidentsAheadCount = 0;
+	int accidentsBehindCount = 0;
+	int slowCarsAheadCount = 0;
+
+	double driverDistance = map_buffer->all_drivers_data_1[playerID].lap_distance;
+
+	for (int id = 0; id < map_buffer->num_cars; id++) {
+		double speed = map_buffer->all_drivers_data_1[id].car_speed * 3.6;
+		double carDistance = map_buffer->all_drivers_data_1[id].lap_distance;
+		double running = fabs(carDistance / map_buffer->layout_length);
+
+		running = ((1.0 < running) ? 1.0 : running);
+		running = ((0.0 > running) ? 0.0 : running);
+
+		updateIdealLine(id, running, speed);
+
+
+		if (id != playerID) {
+			ideal_line* slot = &idealLine[(int)round(running * 999)];
+
+			if ((slot->count > 20) && (speed < (slot->speed / 2)))
+			{
+				int distanceAhead = (int)(((carDistance > driverDistance) ? carDistance : (carDistance + map_buffer->layout_length)) - driverDistance);
+
+				if ((distanceAhead < slowCarDistance) && (slowCarsAheadCount < 10)) {
+					slowCarsAhead[slowCarsAheadCount].vehicle = id;
+					slowCarsAhead[slowCarsAheadCount].distance = distanceAhead;
+
+					slowCarsAheadCount += 1;
+				}
+
+				if (speed < (slot->speed / 4))
+				{
+					if ((distanceAhead < aheadAccidentDistance) && (accidentsAheadCount < 10)) {
+						accidentsAhead[accidentsAheadCount].vehicle = id;
+						accidentsAhead[accidentsAheadCount].distance = distanceAhead;
+
+						accidentsAheadCount += 1;
+					}
+
+					int distanceBehind = (int)(((carDistance < driverDistance) ? driverDistance : (driverDistance + map_buffer->layout_length)) - carDistance);
+
+					if ((distanceBehind < behindAccidentDistance) && (accidentsBehindCount < 10)) {
+						accidentsBehind[accidentsBehindCount].vehicle = id;
+						accidentsBehind[accidentsBehindCount].distance = distanceBehind;
+
+						accidentsBehindCount += 1;
+					}
+				}
+			}
+		}
+	}
+	
+	if (accidentsAheadCount > 0)
+	{
+		if (cycle > nextAccidentAhead)
+		{
+			long distance = LONG_MAX;
+
+			nextAccidentAhead = cycle + 400;
+			nextSlowCarAhead = cycle + 400;
+
+			for (int i = 0; i < accidentsAheadCount; i++)
+				distance = ((distance < accidentsAhead[i].distance) ? distance : accidentsAhead[i].distance);
+
+			char message[40] = "accidentAlert:Ahead;";
+			char numBuffer[20];
+
+			sprintf_s(numBuffer, 20, "%d", distance);
+			strcat_s(message, 40, numBuffer);
+
+			sendSpotterMessage(message);
+
+			return TRUE;
+		}
+	}
+
+	if (slowCarsAheadCount > 0)
+	{
+		if (cycle > nextSlowCarAhead)
+		{
+			long distance = LONG_MAX;
+
+			nextSlowCarAhead = cycle + 400;
+
+			for (int i = 0; i < slowCarsAheadCount; i++)
+				distance = ((distance < slowCarsAhead[i].distance) ? distance : slowCarsAhead[i].distance);
+
+			char message[40] = "slowCarAlert:";
+			char numBuffer[20];
+
+			sprintf_s(numBuffer, 20, "%d", distance);
+			strcat_s(message, 40, numBuffer);
+
+			sendSpotterMessage(message);
+
+			return TRUE;
+		}
+	}
+
+	if (accidentsBehindCount > 0)
+	{
+		if (cycle > nextAccidentBehind)
+		{
+			long distance = LONG_MAX;
+
+			nextAccidentBehind = cycle + 400;
+
+			for (int i = 0; i < accidentsBehindCount; i++)
+				distance = ((distance < accidentsBehind[i].distance) ? distance : accidentsBehind[i].distance);
+
+			char message[40] = "accidentAlert:Behind;";
+			char numBuffer[20];
+
+			sprintf_s(numBuffer, 20, "%d", distance);
+			strcat_s(message, 40, numBuffer);
+
+			sendSpotterMessage(message);
+
+			return TRUE;
+		}
 	}
 
 	return FALSE;
@@ -721,8 +900,6 @@ float smoothValue(float* values, int* count, float value) {
 	else
 		return value;
 }
-
-
 
 #define NumCornerDynamics 4096
 typedef struct {
@@ -1320,6 +1497,16 @@ int main(int argc, char* argv[])
 				numCoordinates += 1;
 			}
 		}
+		else {
+			if (argc > 1)
+				aheadAccidentDistance = atoi(argv[1]);
+
+			if (argc > 2)
+				behindAccidentDistance = atoi(argv[2]);
+
+			if (argc > 3)
+				slowCarDistance = atoi(argv[3]);
+		}
 	}
 
 	while (++counter) {
@@ -1366,10 +1553,12 @@ int main(int argc, char* argv[])
 						cycle += 1;
 
 						if (!startGo || !greenFlag())
-							if (!checkFlagState() && !checkPositions(playerID))
-								wait = !checkPitWindow();
-							else
+							if (checkAccident(playerID))
 								wait = FALSE;
+							else if (checkFlagState() || checkPositions(playerID))
+								wait = FALSE;
+							else
+								wait = !checkPitWindow();
 					}
 					else {
 						longitudinalRearDistance = 5;

@@ -3136,7 +3136,6 @@ class SessionDatabaseEditor extends ConfigurationItem {
 						DirCreate(directory . "\.Tracks")
 
 						loop Files, kDatabaseDirectory . "User\Tracks\" . code . "\*.*", "F" {
-
 							SplitPath(A_LoopFileName, , , , &candidate)
 
 							if (candidate = track)

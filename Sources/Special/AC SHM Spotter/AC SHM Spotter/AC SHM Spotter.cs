@@ -613,10 +613,9 @@ namespace ACSHMSpotter {
 
         List<IdealLine> idealLine = new List<IdealLine>(1000);
 
-        void updateIdealLine(ref AcCarInfo car, double speed)
+        void updateIdealLine(ref AcCarInfo car, double running, double speed)
         {
-            double running = car.splinePosition;
-            IdealLine slot = idealLine[(int)Math.Round(running * 1000)];
+            IdealLine slot = idealLine[(int)Math.Round(running * 999)];
 
             if (slot.count < 100)
                 if (slot.count == 0)
@@ -662,38 +661,42 @@ namespace ACSHMSpotter {
 				ref AcCarInfo driver = ref cars.cars[0];
 				double driverLapDistance = driver.splinePosition * staticInfo.TrackSPlineLength;
 
-                for (int i = 1; i < cars.numVehicles; ++i)
+				try
 				{
-					ref AcCarInfo car = ref cars.cars[i];
-					double speed = car.speedMS * 3.6;
-
-					updateIdealLine(ref car, speed);
-
-					double running = car.splinePosition;
-					IdealLine slot = idealLine[(int)Math.Round(running * 1000)];
-
-					if ((slot.count > 20) && (speed < (slot.speed / 2)))
+					for (int i = 1; i < cars.numVehicles; ++i)
 					{
-						double carLapDistance = car.splinePosition * staticInfo.TrackSPlineLength;
-                        int distanceAhead = (int)(((carLapDistance > driverLapDistance) ? carLapDistance
-                                                                                        : (carLapDistance + staticInfo.TrackSPlineLength)) - driverLapDistance);
+						ref AcCarInfo car = ref cars.cars[i];
+						double running = Math.Max(0, Math.Min(1, car.splinePosition));
+						double speed = car.speedMS * 3.6;
 
-						if (distanceAhead < slowCarDistance)
-							slowCarsAhead.Add(new SlowCarInfo(i, distanceAhead));
+						updateIdealLine(ref car, running, speed);
 
-						if (speed < (slot.speed / 4))
+						IdealLine slot = idealLine[(int)Math.Round(running * 999)];
+
+						if ((slot.count > 20) && (speed < (slot.speed / 2)))
 						{
-							if (distanceAhead < aheadAccidentDistance)
-								accidentsAhead.Add(new SlowCarInfo(i, distanceAhead));
+							double carLapDistance = car.splinePosition * staticInfo.TrackSPlineLength;
+							int distanceAhead = (int)(((carLapDistance > driverLapDistance) ? carLapDistance
+																							: (carLapDistance + staticInfo.TrackSPlineLength)) - driverLapDistance);
 
-							int distanceBehind = (int)(((carLapDistance < driverLapDistance) ? driverLapDistance
-                                                                                             : (driverLapDistance + staticInfo.TrackSPlineLength)) - carLapDistance);
+							if (distanceAhead < slowCarDistance)
+								slowCarsAhead.Add(new SlowCarInfo(i, distanceAhead));
 
-							if (distanceBehind < behindAccidentDistance)
-								accidentsBehind.Add(new SlowCarInfo(i, distanceBehind));
+							if (speed < (slot.speed / 4))
+							{
+								if (distanceAhead < aheadAccidentDistance)
+									accidentsAhead.Add(new SlowCarInfo(i, distanceAhead));
+
+								int distanceBehind = (int)(((carLapDistance < driverLapDistance) ? driverLapDistance
+																								 : (driverLapDistance + staticInfo.TrackSPlineLength)) - carLapDistance);
+
+								if (distanceBehind < behindAccidentDistance)
+									accidentsBehind.Add(new SlowCarInfo(i, distanceBehind));
+							}
 						}
 					}
 				}
+				catch (Exception e) { }
 
 				if (accidentsAhead.Count > 0)
 				{
@@ -738,7 +741,7 @@ namespace ACSHMSpotter {
 
 						nextAccidentBehind = cycle + 400;
 
-						foreach (SlowCarInfo i in accidentsAhead)
+						foreach (SlowCarInfo i in accidentsBehind)
 							distance = Math.Min(distance, i.distance);
 
 						SendSpotterMessage("accidentAlert:Behind;" + distance);
@@ -1532,11 +1535,13 @@ namespace ACSHMSpotter {
 
 							cycle += 1;
 
-							if (!checkAccident() && !checkFlagState() && !checkPositions())
+							if (checkAccident())
+                                wait = false;
+                            else if (checkFlagState() || checkPositions())
+                                wait = false;
+                            else 
 								wait = !checkPitWindow();
-							else
-								wait = false;
-						}
+                        }
 						else
 						{
 							longitudinalRearDistance = 5;

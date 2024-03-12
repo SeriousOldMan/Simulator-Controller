@@ -2824,9 +2824,11 @@ class RaceSpotter extends GridRaceAssistant {
 					default:
 				}
 
-				speaker.speakPhrase(side ? "SlowCarAheadSide" : "SlowCarAhead", {distance: Round(convertUnit("Length", distance))
-																			   , unit: speaker.Fragments[getUnit("Length")], side: side})
+				speaker.speakPhrase(side ? "SlowCarAheadSide" : "SlowCarAheadDistance", {distance: Round(convertUnit("Length", distance))
+																					  , unit: speaker.Fragments[getUnit("Length")], side: side})
 			}
+			else
+				speaker.speakPhrase("SlowCarAhead", false, false, "SlowCarAhead")
 		}
 	}
 
@@ -2913,7 +2915,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 	startupSpotter(forceShutdown := false) {
 		local pid := false
-		local code, exePath
+		local code, exePath, trackData
 
 		if !this.iSpotterPID {
 			code := this.SettingsDatabase.getSimulatorCode(this.Simulator)
@@ -2923,10 +2925,13 @@ class RaceSpotter extends GridRaceAssistant {
 			if FileExist(exePath) {
 				this.shutdownSpotter(forceShutdown)
 
+				trackData := this.SettingsDatabase.getTrackData(this.Simulator, this.KnowledgeBase.getValue("Session.Track"))
+
 				try {
 					Run("`"" . exePath . "`" " . getMultiMapValue(this.Settings, "Assistant.Spotter", "Accident.Distance.Ahead.Threshold", 800) . A_Space
 											   . getMultiMapValue(this.Settings, "Assistant.Spotter", "Accident.Distance.Behind.Threshold", 500) . A_Space
 											   . getMultiMapValue(this.Settings, "Assistant.Spotter", "SlowCar.Distance.Ahead.Threshold", 500)
+											   . (trackData ? (" `"" . trackData . "`"") : "")
 					  , kBinariesDirectory, "Hide", &pid)
 				}
 				catch Any as exception {

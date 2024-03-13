@@ -666,7 +666,11 @@ namespace ACSHMSpotter {
 					for (int i = 1; i < cars.numVehicles; ++i)
 					{
 						ref AcCarInfo car = ref cars.cars[i];
-						double running = Math.Max(0, Math.Min(1, car.splinePosition));
+
+						if (car.isCarInPitline + car.isCarInPit > 0)
+							continue;
+
+                        double running = Math.Max(0, Math.Min(1, car.splinePosition));
 						double speed = car.speedMS * 3.6;
 
 						updateIdealLine(ref car, running, speed);

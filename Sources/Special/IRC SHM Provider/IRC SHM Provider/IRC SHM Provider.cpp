@@ -173,19 +173,19 @@ long getRemainingTime(const char* sessionInfo, bool practice, int sessionLaps, l
 		return (getRemainingLaps(sessionInfo, practice, sessionLaps, sessionTime, lap, lastTime, bestTime) * lastTime);
 }
 
-const char* getWeather(const char* gripLevel) {
-	if ((strcmp(gripLevel, "Green") == 0) || (strcmp(gripLevel, "Fast") == 0) || (strcmp(gripLevel, "Optimumn") == 0))
+const char* getWeather(float percentage) {
+	if (percentage == 0.0)
 		return "Dry";
-	else if (strcmp(gripLevel, "Greasy") == 0)
+	else if (percentage <= 0.15)
 		return "Drizzle";
-	else if (strcmp(gripLevel, "Damp") == 0)
+	else if (percentage <= 0.3)
 		return "LightRain";
-	else if (strcmp(gripLevel, "Wet") == 0)
+	else if (percentage <= 0.5)
 		return "MediumRain";
-	else if (strcmp(gripLevel, "Flooded") == 0)
+	else if (percentage <= 0.8)
 		return "HeavyRain";
 	else
-		return "Dry";
+		return "Thunderstorm";
 }
 
 void printDataValue(const irsdk_header* header, const char* data, const irsdk_varHeader* rec) {
@@ -1055,9 +1055,11 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 			else
 				printf("Temperature=24\n");
 
-			printf("Weather=%s\n", getWeather(gripLevel));
-			printf("Weather10Min=%s\n", getWeather(gripLevel));
-			printf("Weather30Min=%s\n", getWeather(gripLevel));
+			const char* weather = getWeather(getDataFloat(header, data, "Precipitation"));
+			
+			printf("Weather=%s\n", weather);
+			printf("Weather10Min=%s\n", weather);
+			printf("Weather30Min=%s\n", weather);
 
 			printf("[Test Data]\n");
 			

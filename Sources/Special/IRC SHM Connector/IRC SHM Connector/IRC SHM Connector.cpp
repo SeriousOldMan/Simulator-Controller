@@ -192,19 +192,19 @@ long getRemainingTime(const char* sessionInfo, bool practice, int sessionLaps, l
 		return (getRemainingLaps(sessionInfo, practice, sessionLaps, sessionTime, lap, lastTime, bestTime) * lastTime);
 }
 
-const char* getWeather(const char* gripLevel) {
-	if ((strcmp(gripLevel, "Green") == 0) || (strcmp(gripLevel, "Fast") == 0) || (strcmp(gripLevel, "Optimumn") == 0))
+const char* getWeather(float percentage) {
+	if (percentage == 0.0)
 		return "Dry";
-	else if (strcmp(gripLevel, "Greasy") == 0)
+	else if (percentage <= 0.15)
 		return "Drizzle";
-	else if (strcmp(gripLevel, "Damp") == 0)
+	else if (percentage <= 0.3)
 		return "LightRain";
-	else if (strcmp(gripLevel, "Wet") == 0)
+	else if (percentage <= 0.5)
 		return "MediumRain";
-	else if (strcmp(gripLevel, "Flooded") == 0)
+	else if (percentage <= 0.8)
 		return "HeavyRain";
 	else
-		return "Dry";
+		return "Thunderstorm";
 }
 
 void printDataValue(std::ostringstream * output, const irsdk_header* header, const char* data, const irsdk_varHeader* rec) {
@@ -1066,9 +1066,11 @@ void writeData(std::ostringstream * output, const irsdk_header *header, const ch
 			else
 				printLine(output, "Temperature=24");
 
-			printLine(output, "Weather=" + std::string(getWeather(gripLevel)));
-			printLine(output, "Weather10Min=" + std::string(getWeather(gripLevel)));
-			printLine(output, "Weather30Min=" + std::string(getWeather(gripLevel)));
+			const char* weather = getWeather(getDataFloat(header, data, "Precipitation"));
+			
+			printLine(output, "Weather=" + std::string(weather));
+			printLine(output, "Weather10Min=" + std::string(weather));
+			printLine(output, "Weather30Min=" + std::string(weather));
 
 			printLine(output, "[Test Data]");
 			

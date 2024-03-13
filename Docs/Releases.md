@@ -16,8 +16,8 @@
       - New settings for the Spotter in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database" allow you to configure the distance before and behind the car, for which the traffic should be analyzed for accidents.
       - Please note that both *Assetto Corsa Competizione* and *iRacing* do not support accident detection yet for different reasons. Support may be added with a future release.
   12. Initial support for rain and wet tracks for iRacing. Make sure to read at least the new document about [tyre compound handling in iRacing](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds#special-notes-for-iracing).
-      - The grip level of the track will cover the full range from "Optimum" to "Flooded" with one of the next iRacing patches.
-      - Unfortunately iRacing does not provide any information about the actual weather. The make things working as good as possible, the track wetness (once implemented in iRacing) is mapped to the current weather. Currently the Assistants will still assume a dry track, even it is pouring heavily.
+      - The current weather will be correct. Unfortunately iRacing does not provide any information about the future weather yet. Therefore, the Assistants cannot react to upcoming weather changes.
+      - The code for handling the grip level of the track is already in included and will cover the full range from "Optimum" to "Flooded" with one of the next iRacing patches.
       - Changing the tyre compound during a pitstop is not supported yet by the iRacing API at the moment. This will be added with a later release.
   
 ## 5.6.2.0-release 03/08/24

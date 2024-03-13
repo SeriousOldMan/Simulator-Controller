@@ -511,6 +511,9 @@ BOOL checkAccident() {
 	double driverDistance = map_buffer->all_drivers_data_1[playerIdx].lap_distance;
 
 	for (int id = 0; id < map_buffer->num_cars; id++) {
+		if (map_buffer->all_drivers_data_1[id].in_pitlane > 0)
+			continue;
+
 		double speed = map_buffer->all_drivers_data_1[id].car_speed * 3.6;
 		double carDistance = map_buffer->all_drivers_data_1[id].lap_distance;
 		double running = fabs(carDistance / map_buffer->layout_length);

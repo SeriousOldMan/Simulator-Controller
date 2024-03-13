@@ -9,14 +9,15 @@
   8. A new customization method allows to introduce support for user specific applications in "Simulator Setup".
   9. The minimum window height of "Simulator Setup" has been increased.
   10. The Spotter can now inform about accidents and slow cars ahead and also about accidents behind. The Spotter will learn the track layout and the typical speed and position of a car at each part of the track during the first few laps. When one or more cars are way slower or are at positions far away from the ideal line, this will be counted as an accident.
-     - The support for these alerts vary between the different simulators. Be sure to check out the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#alerts--information).
-	 - "Simulator Configuration" and "Simulator Setup" has been extended to allow enabling / disabling of the new alerts.
-	 - The announcements voice command of the Spotter has been extended to allow to enable / disable the new alerts while driving. Example: ["Please no more slow car warnings"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Strategist-Commands-(EN)).
-	 - New settings for the Spotter in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database" allow you to configure the distance before and behind the car, for which the traffic should be analyzed for accidents.
+      - The support for these alerts vary between the different simulators. Be sure to check out the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#alerts--information).
+      - "Simulator Configuration" and "Simulator Setup" has been extended to allow enabling / disabling of the new alerts.
+      - The announcements voice command of the Spotter has been extended to allow to enable / disable the new alerts while driving. Example: ["Please no more slow car warnings"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Strategist-Commands-(EN)).
+      - New settings for the Spotter in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database" allow you to configure the distance before and behind the car, for which the traffic should be analyzed for accidents.
+      - Please note that both *Assetto Corsa Competizione* and *iRacing* do not support accident detection yet for different reasons. Support may be added with a future release.
   11. Initial support for rain and wet tracks for iRacing. Make sure to read at least the new document about [tyre compound handling in iRacing](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds#special-notes-for-iracing).
-     - The grip level of the track now covers the full range from "Optimum" to "Flooded".
-	 - Unfortunately iRacing does not provide any information about the actual weather, only about the level of water on the track. The make things working as good as possible, the track wetness is mapped to the current weather.
-	 - Changing the tyre compound during a pitstop is not supported yet by the iRacing API at the moment. It will be added with a later release.
+      - The grip level of the track will cover the full range from "Optimum" to "Flooded" with one of the next iRacing patches.
+      - Unfortunately iRacing does not provide any information about the actual weather. The make things working as good as possible, the track wetness (once implemented in iRacing) is mapped to the current weather. Currently the Assistants will still assume a dry track, even it is pouring heavily.
+      - Changing the tyre compound during a pitstop is not supported yet by the iRacing API at the moment. This will be added with a later release.
   
 ## 5.6.2.0-release 03/08/24
   1. Minor bugfixes, as always

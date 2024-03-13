@@ -49,8 +49,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[5.6.3.0-beta](https://www.dropbox.com/scl/fi/3ydavny6wfg51nziy7hhj/Simulator-Controller-5.6.3.0-beta.zip?rlkey=iyeqzsxky4q7880zywu16h25r&dl=1) (Test build for 5.6.3. Changes: Added customizing for "Simulator Setup", Initial support for rain and track wetness for iRacing, Spotter informs about accidents and slow cars, Extended configuration for the Spotter in "Simulator Setup" and "Simulator Configuration", Extended announcements voice command for Spotter, New settings in the "Session Database" to define the distance for slow cars and accidents.)
 
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-563) of this version and all the versions you might have skipped, before installing and using this version.
 ### Documentation
 
 A very [extensive documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki) of roughly 400 pages will guide you through the configuration process and will help you to understand the inner concepts and all the functions & features of Simulator Controller. For developers, who want to create their own plugins, a complete [developers guide & reference](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts) is available as well.

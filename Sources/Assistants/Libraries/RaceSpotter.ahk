@@ -2810,7 +2810,9 @@ class RaceSpotter extends GridRaceAssistant {
 		local side := false
 		local speaker
 
-		if (this.Announcements["SlowCars"] && this.Speaker[false] && this.Running) {
+		distance := (Round(distance / 50) * 50)
+
+		if ((distance > 0) && this.Announcements["SlowCars"] && this.Speaker[false] && this.Running) {
 			speaker := this.getSpeaker(true)
 
 			if (arguments.Length > 0) {
@@ -2840,10 +2842,11 @@ class RaceSpotter extends GridRaceAssistant {
 			speaker := this.getSpeaker(true)
 
 			if ((arguments.Length > 0) && (type = "Ahead")) {
-				distance := arguments[1]
+				distance := (Round(arguments[1] / 50) * 50)
 
-				speaker.speakPhrase("Accident" . type . "Distance", {distance: Round(convertUnit("Length", distance))
-																   , unit: speaker.Fragments[getUnit("Length")]})
+				if (distance > 0)
+					speaker.speakPhrase("Accident" . type . "Distance", {distance: Round(convertUnit("Length", distance))
+																	   , unit: speaker.Fragments[getUnit("Length")]})
 			}
 			else
 				speaker.speakPhrase("Accident" . type, false, false, "Accident" . type)

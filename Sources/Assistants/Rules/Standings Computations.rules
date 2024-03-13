@@ -33,7 +33,9 @@ priority: 5, {Any: [?Lap], [?Sector], [?Standings]} =>
 		(Clear: Position.Track.Ahead.Car), (Clear: Position.Track.Ahead.Distance), (Clear: Position.Track.Ahead.Delta),
 		(Clear: Position.Track.Behind.Car), (Clear: Position.Track.Behind.Distance), (Clear: Position.Track.Behind.Delta)
 [?Lap] => (Prove: updateGrid(?Lap))
-{Any: [?Lap], [?Sector], [?Standings]} => (Prove: updatePositions(!Lap)), (Prove: updateTrackAhead(!Lap)), (Prove: updateTrackBehind(!Lap))
+[?Grid] => (Prove: updateGrid(?Grid))
+{Any: [?Lap], [?Sector], [?Standings], [?Grid]} => (Prove: updatePositions(!Lap)), (Prove: updateTrackAhead(!Lap)), (Prove: updateTrackBehind(!Lap))
+priority: -5, [?Grid] => (Clear: Grid)
 priority: -5, [?Sector] => (Clear: Sector)
 priority: -5, [?Standings] => (Clear: Standings)
 

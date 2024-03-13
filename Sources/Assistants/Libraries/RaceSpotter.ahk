@@ -3081,7 +3081,7 @@ class RaceSpotter extends GridRaceAssistant {
 					driver := getMultiMapValue(data, "Position Data", "Driver.Car", false)
 					position := this.getPosition(driver, "Overall", data)
 
-					if (driver && position)
+					if (driver && position && this.GridPosition)
 						speaker.speakPhrase("GreetingPosition", {position: position
 															   , overall: this.MultiClass[data] ? speaker.Fragments["Overall"] : ""})
 

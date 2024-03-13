@@ -14,7 +14,7 @@
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class IRCTelemetryCollector extends TelemetryCollector {
-	settingAvailable(setting) {
-		return ((setting = "SteerLock") ? false : super.settingAvailable(setting))
+	settingAvailable(setting, force := false) {
+		return ((setting = "SteerLock") ? false : super.settingAvailable(setting, force))
 	}
 }

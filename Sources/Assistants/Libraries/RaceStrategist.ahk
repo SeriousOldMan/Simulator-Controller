@@ -1417,9 +1417,34 @@ class RaceStrategist extends GridRaceAssistant {
 		return facts
 	}
 
+	createRaceData(data) {
+		local raceData := newMultiMap()
+		local carCount := getMultiMapValue(data, "Position Data", "Car.Count")
+		local carCategory
+
+		setMultiMapValue(raceData, "Cars", "Count", carCount)
+		setMultiMapValue(raceData, "Cars", "Driver", getMultiMapValue(data, "Position Data", "Driver.Car"))
+
+		loop carCount {
+			setMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Nr", getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Nr"))
+			setMultiMapValue(raceData, "Cars", "Car." . A_Index . ".ID"
+									 , getMultiMapValue(data, "Position Data", "Car." . A_Index . ".ID", A_Index))
+			setMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Position"
+									 , getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Position"))
+			setMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Class"
+									 , getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Class", kUnknown))
+
+			carCategory := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Category", kUndefined)
+
+			if (carCategory != kUndefined)
+				setMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Category", carCategory)
+		}
+
+		return raceData
+	}
+
 	prepareSession(&settings, &data, formationLap?) {
-		local raceData, simulatorName, carCount, carCategory
-		local theStrategy, applicableStrategy, simulator, car, track, facts
+		local simulatorName, theStrategy, applicableStrategy, simulator, car, track, facts
 		local sessionType, sessionLength, duration, laps
 
 		facts := super.prepareSession(&settings, &data, formationLap?)
@@ -1433,30 +1458,8 @@ class RaceStrategist extends GridRaceAssistant {
 			this.updateConfigurationValues({UseTalking: getMultiMapValue(settings, "Assistant.Strategist", "Voice.UseTalking", true)
 										  , UseTraffic: getMultiMapValue(settings, "Strategy Settings", "Traffic.Simulation", false)})
 
-		if (!this.RaceInfo || (isSet(formationLap) && formationLap)) {
-			raceData := newMultiMap()
-			carCount := getMultiMapValue(data, "Position Data", "Car.Count")
-
-			setMultiMapValue(raceData, "Cars", "Count", carCount)
-			setMultiMapValue(raceData, "Cars", "Driver", getMultiMapValue(data, "Position Data", "Driver.Car"))
-
-			loop carCount {
-				setMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Nr", getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Nr"))
-				setMultiMapValue(raceData, "Cars", "Car." . A_Index . ".ID"
-										 , getMultiMapValue(data, "Position Data", "Car." . A_Index . ".ID", A_Index))
-				setMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Position"
-										 , getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Position"))
-				setMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Class"
-										 , getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Class", kUnknown))
-
-				carCategory := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Category", kUndefined)
-
-				if (carCategory != kUndefined)
-					setMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Category", carCategory)
-			}
-
-			this.updateRaceInfo(raceData)
-		}
+		if (!this.RaceInfo || (isSet(formationLap) && formationLap))
+			this.updateRaceInfo(this.createRaceData(data))
 
 		if ((this.Session == kSessionRace) && (getMultiMapValue(data, "Stint Data", "Laps", 0) <= 1)
 										   && FileExist(kUserConfigDirectory . "Race.strategy")) {
@@ -1790,6 +1793,7 @@ class RaceStrategist extends GridRaceAssistant {
 		local driverForname := ""
 		local driverSurname := ""
 		local driverNickname := ""
+		local noGrid := !this.GridPosition
 		local knowledgeBase, compound, result, lap, simulator, car, track, frequency, curContinuation
 		local pitstop, prefix, validLap, lapState, weather, airTemperature, trackTemperature, compound, compoundColor
 		local fuelConsumption, fuelRemaining, lapTime, map, tc, antiBS, pressures, temperatures, wear, multiClass
@@ -1888,7 +1892,6 @@ class RaceStrategist extends GridRaceAssistant {
 
 			if pitstop
 				pitstop := (lapNumber = (knowledgeBase.getValue("Pitstop." . pitstop . ".Lap") + 1))
-				; pitstop := (Abs(lapNumber - knowledgeBase.getValue("Pitstop." . pitstop . ".Lap")) <= 2)
 		}
 		else {
 			pitstop := false
@@ -1964,7 +1967,10 @@ class RaceStrategist extends GridRaceAssistant {
 				this.iLastStrategyUpdate := (lapNumber - 1)
 		}
 
-		if this.GridPosition
+		if (!this.RaceInfo || (this.RaceInfo["Cars"] = 0))
+			this.updateRaceInfo(this.createRaceData(data))
+
+		if (this.GridPosition && knowledgeBase.getValue("Car.Count", false))
 			this.saveStandingsData(lapNumber, simulator, car, track)
 
 		Task.startTask((*) => this.saveSessionInfo(lapNumber, simulator, car, track
@@ -2016,7 +2022,10 @@ class RaceStrategist extends GridRaceAssistant {
 		car := knowledgeBase.getValue("Session.Car")
 		track := knowledgeBase.getValue("Session.Track")
 
-		if (!noGrid && this.GridPosition)
+		if (!this.RaceInfo || (this.RaceInfo["Cars"] = 0))
+			this.updateRaceInfo(this.createRaceData(data))
+
+		if (noGrid && this.GridPosition)
 			this.saveStandingsData(lapNumber, simulator, car, track)
 
 		Task.startTask((*) => this.saveSessionInfo(lapNumber, simulator, car, track
@@ -3778,7 +3787,8 @@ class RaceStrategist extends GridRaceAssistant {
 		if slots
 			raceInfo["Slots"] := slots
 
-		this.updateSessionValues({RaceInfo: raceInfo})
+		if (raceInfo["Cars"] > 0)
+			this.updateSessionValues({RaceInfo: raceInfo})
 	}
 
 	saveStandingsData(lapNumber, simulator, car, track) {
@@ -4008,6 +4018,9 @@ class RaceStrategist extends GridRaceAssistant {
 							carIndex := raceInfo[key]
 					}
 				}
+
+				if !carIndex
+					carIndex := A_Index
 
 				if (carIndex && times.Has(carIndex)) {
 					times[carIndex] := knowledgeBase.getValue(carPrefix . ".Time", "-")

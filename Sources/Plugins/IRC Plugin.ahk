@@ -227,7 +227,7 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 	getPitstopOptionValues(option) {
 		local data, compound, compoundColor
 
-		if (this.OpenPitstopMFDHotkey != "Off") {
+		if (this.PitstopFuelMFDHotkey != "Off") {
 			switch option, false {
 				case "Refuel":
 					data := this.readSessionData("Setup=true")

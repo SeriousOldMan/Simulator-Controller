@@ -14,10 +14,10 @@
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class R3ETelemetryCollector extends TelemetryCollector {
-	settingAvailable(setting) {
+	settingAvailable(setting, force := false) {
 		if ((setting = "SteerLock") || (setting = "SteerRatio"))
 			return false
 		else
-			return super.settingAvailable(setting)
+			return super.settingAvailable(setting, force)
 	}
 }

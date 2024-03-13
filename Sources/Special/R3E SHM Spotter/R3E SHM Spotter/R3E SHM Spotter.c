@@ -502,12 +502,13 @@ slow_car_info accidentsAhead[10];
 slow_car_info accidentsBehind[10];
 slow_car_info slowCarsAhead[10];
 
-BOOL checkAccident(int playerID) {
+BOOL checkAccident() {
 	int accidentsAheadCount = 0;
 	int accidentsBehindCount = 0;
 	int slowCarsAheadCount = 0;
+	int playerIdx = getPlayerIndex();
 
-	double driverDistance = map_buffer->all_drivers_data_1[playerID].lap_distance;
+	double driverDistance = map_buffer->all_drivers_data_1[playerIdx].lap_distance;
 
 	for (int id = 0; id < map_buffer->num_cars; id++) {
 		double speed = map_buffer->all_drivers_data_1[id].car_speed * 3.6;
@@ -519,8 +520,7 @@ BOOL checkAccident(int playerID) {
 
 		updateIdealLine(id, running, speed);
 
-
-		if (id != playerID) {
+		if (id != playerIdx) {
 			ideal_line* slot = &idealLine[(int)round(running * 999)];
 
 			if ((slot->count > 20) && (speed < (slot->speed / 2)))
@@ -1513,13 +1513,15 @@ int main(int argc, char* argv[])
 		BOOL wait = TRUE;
 
 		if (!mapped_r3e && map_exists())
-			if (!map_init()) {
+			if (!map_init())
 				mapped_r3e = TRUE;
 
-				playerID = getPlayerID();
-			}
-
 		if (mapped_r3e) {
+			playerID = getPlayerID();
+
+			if (playerID == -1)
+				continue;
+
 			if (analyzeTelemetry) {
 				if (collectTelemetry(soundsDirectory, audioDevice, calibrateTelemetry)) {
 					if (remainder(counter, 20) == 0)
@@ -1553,7 +1555,7 @@ int main(int argc, char* argv[])
 						cycle += 1;
 
 						if (!startGo || !greenFlag())
-							if (checkAccident(playerID))
+							if (checkAccident())
 								wait = FALSE;
 							else if (checkFlagState() || checkPositions(playerID))
 								wait = FALSE;

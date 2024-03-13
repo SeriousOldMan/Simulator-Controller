@@ -1172,10 +1172,8 @@ int main(int argc, char* argv[])
 					else {
 						if (getArgument(request, "Standings") != "")
 							writePositions(pHeader, g_data);
-						else {
-							writePositions(pHeader, g_data);
+						else
 							writeData(pHeader, g_data, false);
-						}
 					}
 				}
 

@@ -1964,7 +1964,8 @@ class RaceStrategist extends GridRaceAssistant {
 				this.iLastStrategyUpdate := (lapNumber - 1)
 		}
 
-		this.saveStandingsData(lapNumber, simulator, car, track)
+		if this.GridPosition
+			this.saveStandingsData(lapNumber, simulator, car, track)
 
 		Task.startTask((*) => this.saveSessionInfo(lapNumber, simulator, car, track
 												 , this.createSessionInfo(lapNumber, validLap, data, simulator, car, track))
@@ -1977,9 +1978,11 @@ class RaceStrategist extends GridRaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local updateStrategy := false
 		local sector, result, valid
-		local simulator, car, track
+		local simulator, car, track, noGrid
 
 		static lastSector := 1
+
+		noGrid := !this.GridPosition
 
 		if !isObject(data)
 			data := readMultiMap(data)
@@ -2012,6 +2015,9 @@ class RaceStrategist extends GridRaceAssistant {
 		simulator := knowledgeBase.getValue("Session.Simulator")
 		car := knowledgeBase.getValue("Session.Car")
 		track := knowledgeBase.getValue("Session.Track")
+
+		if (!noGrid && this.GridPosition)
+			this.saveStandingsData(lapNumber, simulator, car, track)
 
 		Task.startTask((*) => this.saveSessionInfo(lapNumber, simulator, car, track
 												 , this.createSessionInfo(lapNumber, knowledgeBase.getValue("Lap." . lapNumber . ".Valid", true)

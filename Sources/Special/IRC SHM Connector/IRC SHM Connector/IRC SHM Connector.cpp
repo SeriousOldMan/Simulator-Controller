@@ -622,7 +622,7 @@ void writePositions(std::ostringstream* output, const irsdk_header *header, cons
 		char posIdx[10];
 		char carIdx[10];
 		char carIdx1[10];
-		
+
 		printLine(output, "[Position Data]");
 		
 		itoa(atoi(playerCarIdx) + 1, carIdx1, 10);
@@ -1150,6 +1150,12 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 	g_data = NULL;
 	int tries = 3;
 
+	output << "[Debug]" << std::endl;
+	output << "Request=" << request << std::endl;
+	output << "Standings=" << getArgument(request, "Standings") << std::endl;
+	output << "Setup=" << getArgument(request, "Setup") << std::endl;
+	output << "Track=" << getArgument(request, "Track") << std::endl;
+
 	while (tries-- > 0) {
 		// wait for new data and copy it into the g_data buffer, if g_data is not null
 		if (irsdk_waitForDataReady(TIMEOUT, g_data)) {
@@ -1180,13 +1186,21 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 					}
 				}
 				else {
-					if (getArgument(request, "Setup") != "")
+					output << "[Debug]" << std::endl;
+					
+					if (getArgument(request, "Setup") != "") {
+						output << "Action=Setup" << std::endl;
 						writeData(&output, pHeader, g_data, true);
+					}
 					else {
-						if (getArgument(request, "Standings") != "")
+						if (getArgument(request, "Standings") != "") {
+							output << "Action=Standings" << std::endl;
 							writePositions(&output, pHeader, g_data);
-						else
+						}
+						else {
+							output << "Action=Telemetry" << std::endl;
 							writeData(&output, pHeader, g_data, false);
+						}
 					}
 				}
 

@@ -469,6 +469,9 @@ bool checkAccident(const SharedMemory* sharedData)
 
 		for (int i = 0; i < sharedData->mNumParticipants; i++)
 		{
+			if (sharedData->mPitModes[i] > PIT_MODE_NONE)
+				continue;
+
 			ParticipantInfo vehicle = sharedData->mParticipantInfo[i];
 			double speed = sharedData->mSpeeds[i] * 3.6;
 			double running = std::abs(vehicle.mCurrentLapDistance / sharedData->mTrackLength);

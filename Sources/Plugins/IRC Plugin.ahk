@@ -162,44 +162,47 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 		local ignore := false
 		local candidate
 
-		this.getPitstopActions(&actions, &ignore)
+		if (this.PitstopFuelMFDHotkey && (this.PitstopFuelMFDHotkey != "Off")) {
+			this.getPitstopActions(&actions, &ignore)
 
-		for ignore, candidate in actions
-			if (candidate = option)
-				return true
+			for ignore, candidate in actions
+				if (candidate = option)
+					return true
+		}
 
 		return false
 	}
 
 	changePitstopOption(option, action, steps := 1) {
-		switch option, false {
-			case "Refuel":
-				if ((steps == 1) && (getUnit("Volume") = "Liter"))
-					steps := 4
+		if (this.PitstopFuelMFDHotkey && (this.PitstopFuelMFDHotkey != "Off"))
+			switch option, false {
+				case "Refuel":
+					if ((steps == 1) && (getUnit("Volume") = "Liter"))
+						steps := 4
 
-				this.openPitstopMFD("Fuel")
+					this.openPitstopMFD("Fuel")
 
-				this.sendPitstopCommand("Pitstop", "Change", "Refuel", (action = kIncrease) ? Round(steps) : Round(steps * -1))
-			case "No Refuel":
-				if ((steps == 1) && (getUnit("Volume") = "Liter"))
-					steps := 4
+					this.sendPitstopCommand("Pitstop", "Change", "Refuel", (action = kIncrease) ? Round(steps) : Round(steps * -1))
+				case "No Refuel":
+					if ((steps == 1) && (getUnit("Volume") = "Liter"))
+						steps := 4
 
-				this.openPitstopMFD("Fuel")
+					this.openPitstopMFD("Fuel")
 
-				this.sendPitstopCommand("Pitstop", "Change", "Refuel", -250)
-			case "Change Tyres":
-				this.openPitstopMFD("Tyre")
+					this.sendPitstopCommand("Pitstop", "Change", "Refuel", -250)
+				case "Change Tyres":
+					this.openPitstopMFD("Tyre")
 
-				this.sendPitstopCommand("Pitstop", "Change", "Tyre Change", (action = kIncrease) ? "true" : "false")
-			case "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right":
-				this.openPitstopMFD("Tyre")
+					this.sendPitstopCommand("Pitstop", "Change", "Tyre Change", (action = kIncrease) ? "true" : "false")
+				case "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right":
+					this.openPitstopMFD("Tyre")
 
-				this.sendPitstopCommand("Pitstop", "Change", option, Round(steps * 0.1 * ((action = kIncrease) ? 1 : -1), 1))
-			case "Repair":
-				this.openPitstopMFD("Fuel")
+					this.sendPitstopCommand("Pitstop", "Change", option, Round(steps * 0.1 * ((action = kIncrease) ? 1 : -1), 1))
+				case "Repair":
+					this.openPitstopMFD("Fuel")
 
-				this.sendPitstopCommand("Pitstop", "Change", "Repair", (action = kIncrease) ? "true" : "false")
-		}
+					this.sendPitstopCommand("Pitstop", "Change", "Repair", (action = kIncrease) ? "true" : "false")
+			}
 	}
 
 	supportsPitstop() {
@@ -227,7 +230,7 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 	getPitstopOptionValues(option) {
 		local data, compound, compoundColor
 
-		if (this.OpenPitstopMFDHotkey != "Off") {
+		if (this.PitstopFuelMFDHotkey && (this.PitstopFuelMFDHotkey != "Off")) {
 			switch option, false {
 				case "Refuel":
 					data := this.readSessionData("Setup=true")

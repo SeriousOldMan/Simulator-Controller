@@ -627,7 +627,11 @@ namespace RF2SHMSpotter {
 			{
 				for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)
 				{
-					ref rF2VehicleScoring vehicle = ref scoring.mVehicles[i];
+                    ref rF2VehicleScoring vehicle = ref scoring.mVehicles[i];
+                    
+					if (vehicle.mInPits != 0)
+						continue;
+
 					double speed = vehicleSpeed(ref vehicle);
 					double running = Math.Max(0, Math.Min(1, Math.Abs(vehicle.mLapDist / scoring.mScoringInfo.mLapDist)));
 

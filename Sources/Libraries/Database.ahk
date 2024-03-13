@@ -163,8 +163,16 @@ class Database {
 		this.iSchemas := toMap(schemas, CaseInsenseMap)
 	}
 
+	static encode(value) {
+		return  StrReplace(StrReplace(StrReplace(value, ";", "##c##"), "`n", "##n##"), "|", "##b##")
+	}
+
 	encode(value) {
 		return  StrReplace(StrReplace(StrReplace(value, ";", "##c##"), "`n", "##n##"), "|", "##b##")
+	}
+
+	static decode(value) {
+		return StrReplace(StrReplace(StrReplace(value, "##b##", "|"), "##n##", "`n"), "##c##", ";")
 	}
 
 	decode(value) {
@@ -460,7 +468,7 @@ class Database {
 						}
 						catch Any as exception {
 							logError(exception)
-							
+
 							if isDevelopment()
 								logMessage(kLogWarn, "Waiting for file `"" . fileName . ".bak`"...")
 						}
@@ -477,7 +485,7 @@ class Database {
 						values := []
 
 						for ignore, column in schema
-							values.Push(row.Has(column) ? StrReplace(StrReplace(StrReplace(row[column], ";", ","), "`n", A_Space), "|", "-") : kNull)
+							values.Push(row.Has(column) ? this.encode(row[column]) : kNull)
 
 						file.WriteLine(values2String(";", values*))
 					}
@@ -496,7 +504,7 @@ class Database {
 						values := []
 
 						for ignore, column in schema
-							values.Push(row.Has(column) ? StrReplace(StrReplace(StrReplace(row[column], ";", ","), "`n", A_Space), "|", "-") : kNull)
+							values.Push(row.Has(column) ? this.encode(row[column]) : kNull)
 
 						row := (values2String(";", values*) . "`n")
 
@@ -559,7 +567,7 @@ groupRows(groupedByColumns, groupedColumns, rows) {
 		key := []
 
 		for ignore, column in groupedByColumns
-			key.Push(StrReplace(StrReplace(StrReplace(row[column], ";", ","), "`n", A_Space), "|", "-"))
+			key.Push(Database.encode(row[column]))
 
 		key := values2String("|", key*)
 
@@ -577,7 +585,7 @@ groupRows(groupedByColumns, groupedColumns, rows) {
 		resultRow := Database.Row()
 
 		for ignore, column in groupedByColumns
-			resultRow[column] := group[A_Index]
+			resultRow[column] := Database.decode(group[A_Index])
 
 		for ignore, columnDescriptor in groupedColumns {
 			valueColumn := columnDescriptor[1]

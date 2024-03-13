@@ -1227,7 +1227,12 @@ class SessionDatabase extends ConfigurationItem {
 			cds := []
 			nms := []
 
-			for ignore, compound in string2Values(";", compounds) {
+			if InStr(compounds, ";")
+				compounds := string2Values(";", compounds)
+			else
+				compounds := string2Values(",", compounds)
+
+			for ignore, compound in compounds {
 				compound := string2Values("->", compound)
 
 				cds.Push(compound[1])
@@ -1258,7 +1263,7 @@ class SessionDatabase extends ConfigurationItem {
 				return SessionDatabase.getTyreCompounds(simulator, car, track)[index]
 
 		if (isInteger(compound) && compounds.Has(compound))
-			return compounds[compound]
+			return SessionDatabase.getTyreCompounds(simulator, car, track)[compound]
 		else
 			return (isSet(default) ? default : compound)
 	}

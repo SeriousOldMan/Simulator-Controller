@@ -923,7 +923,7 @@ class DrivingCoach extends GridRaceAssistant {
 		if formationLap {
 			this.updateDynamicValues({KnowledgeBase: false
 									, OverallTime: 0, BestLapTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
-			this.updateSessionValues({Simulator: "", Session: kSessionFinished, SessionTime: false, Laps: Map(), Standings: []})
+			this.updateSessionValues({Simulator: "", Car: "", Track: "", Session: kSessionFinished, SessionTime: false, Laps: Map(), Standings: []})
 		}
 
 		this.restartConversation()
@@ -977,7 +977,7 @@ class DrivingCoach extends GridRaceAssistant {
 		this.updateDynamicValues({KnowledgeBase: false, Prepared: false
 								, OverallTime: 0, BestLapTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0
 								, EnoughData: false})
-		this.updateSessionValues({Simulator: "", Session: kSessionFinished, SessionTime: false, Laps: Map()})
+		this.updateSessionValues({Simulator: "", Car: "", Track: "", Session: kSessionFinished, SessionTime: false, Laps: Map()})
 
 		this.stopTelemetryAnalyzer()
 		this.restartConversation()

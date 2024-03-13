@@ -2925,7 +2925,7 @@ class RaceSpotter extends GridRaceAssistant {
 			if FileExist(exePath) {
 				this.shutdownSpotter(forceShutdown)
 
-				trackData := this.SettingsDatabase.getTrackData(this.Simulator, this.KnowledgeBase.getValue("Session.Track"))
+				trackData := this.SettingsDatabase.getTrackData(this.Simulator, this.Track)
 
 				try {
 					Run("`"" . exePath . "`" " . getMultiMapValue(this.Settings, "Assistant.Spotter", "Accident.Distance.Ahead.Threshold", 800) . A_Space
@@ -3081,7 +3081,7 @@ class RaceSpotter extends GridRaceAssistant {
 					driver := getMultiMapValue(data, "Position Data", "Driver.Car", false)
 					position := this.getPosition(driver, "Overall", data)
 
-					if (driver && position)
+					if (driver && position && this.GridPosition)
 						speaker.speakPhrase("GreetingPosition", {position: position
 															   , overall: this.MultiClass[data] ? speaker.Fragments["Overall"] : ""})
 
@@ -3195,7 +3195,7 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 
 		this.updateDynamicValues({OverallTime: 0, BestLapTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
-		this.updateSessionValues({Simulator: "", Session: kSessionFinished, SessionTime: false})
+		this.updateSessionValues({Simulator: "", Car: "", Track: "", Session: kSessionFinished, SessionTime: false})
 	}
 
 	forceFinishSession() {

@@ -2949,15 +2949,9 @@ class RaceEngineer extends RaceAssistant {
 	}
 
 	weatherChangeNotification(change, minutes) {
-		local knowledgeBase := this.KnowledgeBase
-		local speaker
-
-		if !ProcessExist("Race Strategist.exe")
-			if (this.hasEnoughData(false) && this.Speaker[false] && (this.Session == kSessionRace) && this.Announcements["WeatherUpdate"]) {
-				speaker := this.getSpeaker()
-
-				speaker.speakPhrase(change ? "WeatherChange" : "WeatherNoChange", {minutes: minutes})
-			}
+		if (!ProcessExist("Race Strategist.exe") && this.Speaker[false]
+												 && (this.Session == kSessionRace) && this.Announcements["WeatherUpdate"])
+			this.getSpeaker().speakPhrase(change ? "WeatherChange" : "WeatherNoChange", {minutes: minutes})
 	}
 
 	weatherTyreChangeRecommendation(minutes, recommendedCompound) {
@@ -2965,7 +2959,7 @@ class RaceEngineer extends RaceAssistant {
 		local speaker, fragments
 
 		if (!ProcessExist("Race Strategist.exe") && (knowledgeBase.getValue("Lap.Remaining.Session", knowledgeBase.getValue("Lap.Remaining", 0)) > 3))
-			if (this.hasEnoughData(false) && this.Speaker[false] && (this.Session == kSessionRace)) {
+			if (this.Speaker[false] && (this.Session == kSessionRace)) {
 				speaker := this.getSpeaker()
 				fragments := speaker.Fragments
 
@@ -2976,7 +2970,7 @@ class RaceEngineer extends RaceAssistant {
 																												  : "WeatherDryChange"
 									  , {minutes: minutes, compound: fragments[recommendedCompound . "Tyre"]})
 
-					if this.supportsPitstop()
+					if (this.hasEnoughData(false) && this.supportsPitstop())
 						if this.confirmAction("Pitstop.Weather") {
 							speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
 

@@ -3551,14 +3551,8 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	weatherChangeNotification(change, minutes) {
-		local knowledgeBase := this.KnowledgeBase
-		local speaker
-
-		if (this.hasEnoughData(false) && this.Speaker[false] && (this.Session == kSessionRace) && this.Announcements["WeatherUpdate"]) {
-			speaker := this.getSpeaker()
-
-			speaker.speakPhrase(change ? "WeatherChange" : "WeatherNoChange", {minutes: minutes})
-		}
+		if (this.Speaker[false] && (this.Session == kSessionRace) && this.Announcements["WeatherUpdate"])
+			this.getSpeaker().speakPhrase(change ? "WeatherChange" : "WeatherNoChange", {minutes: minutes})
 	}
 
 	weatherTyreChangeRecommendation(minutes, recommendedCompound) {
@@ -3566,7 +3560,7 @@ class RaceStrategist extends GridRaceAssistant {
 		local speaker, fragments
 
 		if (knowledgeBase.getValue("Lap.Remaining.Session", knowledgeBase.getValue("Lap.Remaining", 0)) > 3)
-			if (this.hasEnoughData(false) && this.Speaker[false] && (this.Session == kSessionRace)) {
+			if (this.Speaker[false] && (this.Session == kSessionRace)) {
 				speaker := this.getSpeaker()
 				fragments := speaker.Fragments
 
@@ -3577,23 +3571,24 @@ class RaceStrategist extends GridRaceAssistant {
 																												  : "WeatherDryChange"
 									  , {minutes: minutes, compound: fragments[recommendedCompound . "Tyre"]})
 
-					if this.Strategy {
-						if this.confirmAction("Strategy.Weather") {
-							speaker.speakPhrase("ConfirmUpdateStrategy", false, true)
+					if this.hasEnoughData(false)
+						if this.Strategy {
+							if this.confirmAction("Strategy.Weather") {
+								speaker.speakPhrase("ConfirmUpdateStrategy", false, true)
 
-							this.setContinuation(RaceStrategist.TyreChangeContinuation(this, ObjBindMethod(this, "recommendStrategy"), "Confirm", "Okay"))
+								this.setContinuation(RaceStrategist.TyreChangeContinuation(this, ObjBindMethod(this, "recommendStrategy"), "Confirm", "Okay"))
+							}
+							else
+								this.recommendStrategy()
 						}
-						else
-							this.recommendStrategy()
-					}
-					else if ProcessExist("Race Engineer.exe")
-						if this.confirmAction("Strategy.Weather") {
-							speaker.speakPhrase("ConfirmInformEngineer", false, true)
+						else if ProcessExist("Race Engineer.exe")
+							if this.confirmAction("Strategy.Weather") {
+								speaker.speakPhrase("ConfirmInformEngineer", false, true)
 
-							this.setContinuation(ObjBindMethod(this, "planPitstop"))
-						}
-						else
-							this.planPitstop()
+								this.setContinuation(ObjBindMethod(this, "planPitstop"))
+							}
+							else
+								this.planPitstop()
 				}
 				finally {
 					speaker.endTalk()

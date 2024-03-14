@@ -112,12 +112,14 @@ priority: 1,
 			[?Weather.Change.Notified > ?Weather.Weather.30Min.Index]}} =>
 		(Prove: weatherChangeNotification(?Lap, !Weather.Weather.30Min, 30))
 		
-updateWeatherTyreCompoundColorTarget(?compound) <= availableTyreCompounds(?compound, ?compoundColor), Set(Weather.Tyre.Compound.Color.Target, ?compoundColor)
+updateWeatherTyreCompoundColorTarget(?compound) <= availableTyreCompounds(?compound, ?compoundColor),
+												   Set(Weather.Tyre.Compound.Color.Target, ?compoundColor)
 
 priority: -10, [?Pitstop.Lap = ?Lap] => (Prove: clearWeatherTyreChangeNotification(?Lap)),
 										(Clear: Weather.Tyre.Compound.Target), (Clear: Weather.Tyre.Compound.Color.Target)
 
-clearWeatherTyreChangeNotification(?lap) <= ?clearLap = ?lap + 5, Set(Weather.Tyre.Change.Clear, ?clearLap)
+clearWeatherTyreChangeNotification(?lap) <= ?temp = ?lap + 2, ?clearLap = ?temp + !Session.Settings.Lap.Learning.Laps,
+											Set(Weather.Tyre.Change.Clear, ?clearLap)
 
 priority: -10, [?Weather.Tyre.Change.Clear = ?Lap] => (Clear: Weather.Tyre.Change.Recommended)
 
@@ -127,7 +129,7 @@ weatherChangeNotification(?lap, ?weather, ?minutes) <= remainingStintTime(?lap, 
 weatherChangeNotification(?lap, ?weather, ?minutes) <= remainingStintTime(?lap, ?stintTime), ?remainingMinutes = ?stintTime / 60000,
 													   =<(?remainingMinutes, ?minutes), Call(weatherChangeNotification, false, ?minutes),
 													   weatherIndex(?weather, ?index), Set(Weather.Change.Notified, ?index)
-											 
+
 weatherTyreChangeRecommendation(?lap, ?weather, ?minutes, ?compound) <=
 		remainingStintTime(?lap, ?stintTime), ?remainingMinutes = ?stintTime / 60000, ?remainingMinutes > ?minutes,
 		Call(weatherTyreChangeRecommendation, ?minutes, ?compound),

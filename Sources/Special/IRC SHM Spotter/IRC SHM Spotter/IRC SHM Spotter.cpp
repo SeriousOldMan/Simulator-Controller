@@ -54,6 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fstream>
 #include <vector>
 
+
 // for timeBeginPeriod
 #pragma comment(lib, "Winmm")
 
@@ -554,8 +555,12 @@ std::vector<SlowCarInfo> accidentsAhead;
 std::vector<SlowCarInfo> accidentsBehind;
 std::vector<SlowCarInfo> slowCarsAhead;
 
+long lastTickCount = 0;
+double lastRunnings[256];
+
 bool checkAccident(const irsdk_header* header, const char* data, const int playerCarIndex, float trackLength)
 {
+	/*
 	char buffer[64];
 
 	getDataValue(buffer, header, data, "SessionFlags");
@@ -567,6 +572,154 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 		sendSpotterMessage("slowCarAlert");
 
 		return true;
+	}
+
+	return false;
+	*/
+
+	accidentsAhead.resize(0);
+	accidentsBehind.resize(0);
+	slowCarsAhead.resize(0);
+
+	const char* sessionInfo = irsdk_getSessionInfoStr();
+	char result[64];
+	char posIdx[10];
+	char carIdx[10];
+	char sessionID[10];
+	bool first = lastTickCount == 0;
+	char* trackPositions;
+
+	itoa(getCurrentSessionID(sessionInfo), sessionID, 10);
+
+	int milliSeconds = GetTickCount() - lastTickCount;
+
+	lastTickCount += milliSeconds;
+
+	if (getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct")) {
+		float driverRunning = ((float*)trackPositions)[playerCarIndex];
+
+		try
+		{
+			for (int i = 1; ; i++) {
+				itoa(i, posIdx, 10);
+
+				if (getYamlValue(carIdx, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:Position:{%s}CarIdx:", sessionID, posIdx)) {
+					int carIndex = atoi(carIdx);
+					char carIdx1[10];
+					float running = ((float*)trackPositions)[carIndex];
+					float speed;
+
+					running = ((1.0 < running) ? 1.0 : running);
+					running = ((0.0 > running) ? 0.0 : running);
+
+					if (first)
+						lastRunnings[carIndex] = running;
+					else if (milliSeconds < 200) {
+						if (running >= lastRunnings[carIndex])
+							speed = ((running - lastRunnings[carIndex]) * trackLength / (milliSeconds / 1000)) * 3.6;
+						else
+							speed = (((running + 1) - lastRunnings[carIndex]) * trackLength / (milliSeconds / 1000)) * 3.6;
+
+						updateIdealLine(header, data, carIndex, running, speed);
+
+						if (carIndex != playerCarIndex)
+						{
+							IdealLine slot = idealLine[(int)std::round(running * 999)];
+
+							if ((slot.count > 20) && (speed < (slot.speed / 2)))
+							{
+								int distanceAhead = (int)(((running > driverRunning) ? running : (running + trackLength)) - driverRunning);
+
+								if (distanceAhead < slowCarDistance)
+									slowCarsAhead.push_back(SlowCarInfo(i, distanceAhead));
+
+								if (speed < (slot.speed / 4))
+								{
+									if (distanceAhead < aheadAccidentDistance)
+										accidentsAhead.push_back(SlowCarInfo(i, distanceAhead));
+
+									int distanceBehind = (int)(((running < driverRunning) ? driverRunning : (driverRunning + trackLength)) - running);
+
+									if (distanceBehind < behindAccidentDistance)
+										accidentsBehind.push_back(SlowCarInfo(i, distanceBehind));
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		catch (...) {}
+	}
+
+	if (accidentsAhead.size() > 0)
+	{
+		if (cycle > nextAccidentAhead)
+		{
+			long distance = LONG_MAX;
+
+			nextAccidentAhead = cycle + 400;
+			nextSlowCarAhead = cycle + 400;
+
+			for (int i = 0; i < accidentsAhead.size(); i++)
+				distance = ((distance < accidentsAhead[i].distance) ? distance : accidentsAhead[i].distance);
+
+			char message[40] = "accidentAlert:Ahead;";
+			char numBuffer[20];
+
+			sprintf_s(numBuffer, "%d", distance);
+			strcat_s(message, numBuffer);
+
+			sendSpotterMessage(message);
+
+			return true;
+		}
+	}
+
+	if (slowCarsAhead.size() > 0)
+	{
+		if (cycle > nextSlowCarAhead)
+		{
+			long distance = LONG_MAX;
+
+			nextSlowCarAhead = cycle + 400;
+
+			for (int i = 0; i < slowCarsAhead.size(); i++)
+				distance = ((distance < slowCarsAhead[i].distance) ? distance : slowCarsAhead[i].distance);
+
+			char message[40] = "slowCarAlert:";
+			char numBuffer[20];
+
+			sprintf_s(numBuffer, "%d", distance);
+			strcat_s(message, numBuffer);
+
+			sendSpotterMessage(message);
+
+			return true;
+		}
+	}
+
+	if (accidentsBehind.size() > 0)
+	{
+		if (cycle > nextAccidentBehind)
+		{
+			long distance = LONG_MAX;
+
+			nextAccidentBehind = cycle + 400;
+
+			for (int i = 0; i < accidentsBehind.size(); i++)
+				distance = ((distance < accidentsBehind[i].distance) ? distance : accidentsBehind[i].distance);
+
+			char message[40] = "accidentAlert:Behind;";
+			char numBuffer[20];
+
+			sprintf_s(numBuffer, "%d", distance);
+			strcat_s(message, numBuffer);
+
+			sendSpotterMessage(message);
+
+			return true;
+		}
 	}
 
 	return false;

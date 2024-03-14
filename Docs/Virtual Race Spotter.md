@@ -157,9 +157,9 @@ As mentioned, each simulator is different. The Spotter will make as much out of 
 | ------------------------------- | --------------| -------------------------- | --------------- | ------- | -------------------------- | --------- | -------------- | ---------------- |
 | Side Alert                      | Yes (1)       | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              |
 | Behind Alert                    | Yes           | Yes                        | Yes             | Yes (2) | Yes                        | Yes       | Yes            | Yes              |
-| Accidents Ahead                 | Yes           | No                         | Yes             | No      | Yes                        | Yes       | Yes            | Yes              |
-| Accidents Behind                | Yes           | No                         | Yes             | No      | Yes                        | Yes       | Yes            | Yes              |
-| Slow Cars                       | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              |
+| Accidents Ahead (7)             | Yes           | No                         | Yes             | Yes      | Yes                        | Yes       | Yes            | Yes              |
+| Accidents Behind (7)            | Yes           | No                         | Yes             | Yes      | Yes                        | Yes       | Yes            | Yes              |
+| Slow Cars (7)                   | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              |
 | Yellow Flag                     | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              |
 | Full Course Yellow              | No            | No                         | No              | No      | No                         | No        | No             | No               |
 | Sector Yellow                   | No            | Yes                        | No              | No      | Yes                        | Yes       | No             | Yes              |
@@ -186,6 +186,8 @@ As mentioned, each simulator is different. The Spotter will make as much out of 
 (5) This includes a summary of the start performance, final laps announcement, weather updates, best lap acknowledgement and general information about stint, session and fuel limits.
 
 (6) No detailed information for the concrete penalty available.
+
+(7) The distance ahead or behind, for which this is checked and reported can be defined in the [race settings] (https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database". Default is 800 meter for accidents ahead and 500 meter for slow cars and accidents behind.
 
 ## Track Mapping
 

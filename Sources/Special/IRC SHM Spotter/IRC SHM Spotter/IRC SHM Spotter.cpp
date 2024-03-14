@@ -512,7 +512,7 @@ void updateIdealLine(const irsdk_header* header, const char* data, int carIndex,
 	float coordinateX;
 	float coordinateY;
 
-	if (slot.count < 100)
+	if (slot.count < 1000)
 		if (getCarCoordinates(header, data, carIndex, coordinateX, coordinateY))
 			if (slot.count == 0)
 			{

@@ -617,7 +617,7 @@ namespace ACSHMSpotter {
         {
             IdealLine slot = idealLine[(int)Math.Round(running * 999)];
 
-            if (slot.count < 100)
+            if (slot.count < 1000)
                 if (slot.count == 0)
                 {
                     slot.count = 1;

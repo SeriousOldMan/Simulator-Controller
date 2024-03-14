@@ -416,7 +416,7 @@ std::vector<IdealLine> idealLine;
 void updateIdealLine(ParticipantInfo vehicle, double running, double speed) {
 	IdealLine slot = idealLine[(int)std::round(running * 999)];
 
-	if (slot.count < 100)
+	if (slot.count < 1000)
 		if (slot.count == 0)
 		{
 			slot.count = 1;

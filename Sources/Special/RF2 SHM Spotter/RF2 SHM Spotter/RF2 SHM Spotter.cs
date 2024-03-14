@@ -584,7 +584,7 @@ namespace RF2SHMSpotter {
 		void updateIdealLine(ref rF2VehicleScoring vehicle, double running, double speed) {
 			IdealLine slot = idealLine[(int)Math.Round(running * 999)];
 
-			if (slot.count < 100)
+			if (slot.count < 1000)
 				if (slot.count == 0)
 				{
 					slot.count = 1;

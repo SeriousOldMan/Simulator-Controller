@@ -471,7 +471,7 @@ ideal_line idealLine[NumIdealLines];
 void updateIdealLine(int vehicleId, double running, double speed) {
 	ideal_line* slot = &idealLine[(int)round(running * 999)];
 
-	if (slot->count < 100)
+	if (slot->count < 1000)
 		if (slot->count == 0)
 		{
 			slot->count = 1;

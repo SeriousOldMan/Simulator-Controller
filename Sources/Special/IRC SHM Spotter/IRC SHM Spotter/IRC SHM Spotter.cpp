@@ -593,6 +593,9 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 
 	int milliSeconds = GetTickCount() - lastTickCount;
 
+	if (milliSeconds < 10)
+		return false;
+
 	lastTickCount += milliSeconds;
 
 	if (getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct")) {

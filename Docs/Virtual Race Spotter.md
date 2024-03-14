@@ -157,8 +157,8 @@ As mentioned, each simulator is different. The Spotter will make as much out of 
 | ------------------------------- | --------------| -------------------------- | --------------- | ------- | -------------------------- | --------- | -------------- | ---------------- |
 | Side Alert                      | Yes (1)       | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              |
 | Behind Alert                    | Yes           | Yes                        | Yes             | Yes (2) | Yes                        | Yes       | Yes            | Yes              |
-| Accidents Ahead (7)             | Yes           | No                         | Yes             | Yes      | Yes                        | Yes       | Yes            | Yes              |
-| Accidents Behind (7)            | Yes           | No                         | Yes             | Yes      | Yes                        | Yes       | Yes            | Yes              |
+| Accidents Ahead (7)             | Yes           | No                         | Yes             | Yes (8) | Yes                        | Yes       | Yes            | Yes              |
+| Accidents Behind (7)            | Yes           | No                         | Yes             | Yes (8) | Yes                        | Yes       | Yes            | Yes              |
 | Slow Cars (7)                   | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              |
 | Yellow Flag                     | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              |
 | Full Course Yellow              | No            | No                         | No              | No      | No                         | No        | No             | No               |
@@ -188,6 +188,8 @@ As mentioned, each simulator is different. The Spotter will make as much out of 
 (6) No detailed information for the concrete penalty available.
 
 (7) The distance ahead or behind, for which this is checked and reported can be defined in the [race settings] (https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database". Default is 800 meter for accidents ahead and 500 meter for slow cars and accidents behind.
+
+(8) The *iRacing* API does not provide any information about the current speed of all cars on the track, only for the drivers car. Since the crash detection is implemented using an integral over track distance and speed, the algorithm tries to learn the typical speed for each car over time. The detection is therefore not reliable during the first laps.
 
 ## Track Mapping
 

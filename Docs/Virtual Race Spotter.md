@@ -159,7 +159,7 @@ As mentioned, each simulator is different. The Spotter will make as much out of 
 | Behind Alert                    | Yes           | Yes                        | Yes             | Yes (2) | Yes                        | Yes       | Yes            | Yes              |
 | Accidents Ahead (7)             | Yes           | No                         | Yes             | Yes (8) | Yes                        | Yes       | Yes            | Yes              |
 | Accidents Behind (7)            | Yes           | No                         | Yes             | Yes (8) | Yes                        | Yes       | Yes            | Yes              |
-| Slow Cars (7)                   | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              |
+| Slow Cars (7)                   | Yes           | No                         | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              |
 | Yellow Flag                     | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              |
 | Full Course Yellow              | No            | No                         | No              | No      | No                         | No        | No             | No               |
 | Sector Yellow                   | No            | Yes                        | No              | No      | Yes                        | Yes       | No             | Yes              |

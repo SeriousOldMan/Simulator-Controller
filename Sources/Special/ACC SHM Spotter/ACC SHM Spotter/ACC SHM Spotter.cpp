@@ -445,17 +445,6 @@ bool checkPositions() {
 }
 
 bool checkAccident() {
-	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
-
-	if (gf->GlobalWhite && (cycle > nextSlowCarAhead))
-	{
-		nextSlowCarAhead = cycle + 400;
-
-		sendSpotterMessage("slowCarAlert");
-
-		return true;
-	}
-
 	return false;
 }
 

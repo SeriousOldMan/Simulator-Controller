@@ -138,7 +138,8 @@ weatherTyreChangeRecommendation(?lap, ?weather, ?minutes, ?compound) <=
 		Call(weatherChangeNotification, false, ?minutes),
 		updateWeatherNotified(?compound, ?weather), updateTyreChangeRecommended(?lap, ?weather)
 
-updateTyreChangeRecommended(?lap, ?weather) <= ?lap > 1, !, weatherIndex(?weather, ?index), Set(Weather.Tyre.Change.Recommended, ?index)
+updateTyreChangeRecommended(?lap, ?weather) <= ?lap > !Session.Settings.Lap.Learning.Laps, !,
+											   weatherIndex(?weather, ?index), Set(Weather.Tyre.Change.Recommended, ?index)
 updateTyreChangeRecommended(?, ?)
 
 updateWeatherNotified(?, ?weather) <=

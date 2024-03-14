@@ -17,8 +17,8 @@
       - Please note that both *Assetto Corsa Competizione* and in parts also *iRacing* do not support accident detection yet for different reasons. Support will be added with future releases.
   12. Initial support for rain and wet tracks for iRacing. Not everything is working yet, since the iRacing API extensions are still under development. The system will get smarter with each season patch being rolled out.
       - Tyre compound information for the currently mounted tyres as well as the tyre compounds selected for the next pitstop are already available. Make sure to read at least the new documentation about [tyre compound handling in iRacing](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds#special-notes-for-iracing).
-      - The current weather will be correct (when the next iRacing patch has arrived). Unfortunately iRacing does not provide any information about the future weather yet. Therefore, the Assistants cannot react to upcoming weather changes.
-      - The code for handling the grip level of the track is already in included and will cover the full range from "Optimum" to "Flooded" with one of the next iRacing patches.
+      - The current weather will be correct in most cases, only fixed weather seams to be making problems. Unfortunately iRacing does not provide any information about the future weather yet. Therefore, the Assistants cannot react to upcoming weather changes, but will call you in when it starts raining.
+      - The code for handling the grip level of the track is already in included and will cover the full range from "Optimum" to "Flooded".
       - Changing the tyre compound during a pitstop is not supported yet by the iRacing API at the moment. This will be added with a later release.
   
 ## 5.6.2.0-release 03/08/24

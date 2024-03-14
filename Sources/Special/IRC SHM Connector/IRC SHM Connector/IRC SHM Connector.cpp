@@ -1001,7 +1001,7 @@ void writeData(std::ostringstream * output, const irsdk_header *header, const ch
 
 			char gripLevel[32] = "Green";
 
-			if (wetness <= irsdk_TrackWetness_Dry) {
+			if (wetness <= irsdk_TrackWetness_MostlyDry) {
 				int id = atoi(sessionID);
 
 				while (id >= 0) {
@@ -1018,13 +1018,13 @@ void writeData(std::ostringstream * output, const irsdk_header *header, const ch
 					id -= 1;
 				}
 			}
-			else if (wetness == irsdk_TrackWetness_MostlyDry)
+			else if (wetness <= irsdk_TrackWetness_VeryLightlyWet)
 				strcpy(gripLevel, "Greasy");
-			else if (wetness == irsdk_TrackWetness_VeryLightlyWet)
+			else if (wetness <= irsdk_TrackWetness_LightlyWet)
 				strcpy(gripLevel, "Damp");
-			else if (wetness == irsdk_TrackWetness_ModeratelyWet)
+			else if (wetness <= irsdk_TrackWetness_VeryWet)
 				strcpy(gripLevel, "Wet");
-			else if (wetness == irsdk_TrackWetness_ExtremelyWet)
+			else if (wetness <= irsdk_TrackWetness_ExtremelyWet)
 				strcpy(gripLevel, "Flooded");
 
 			printLine(output, "Grip=" + std::string(gripLevel));

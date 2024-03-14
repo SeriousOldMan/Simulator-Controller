@@ -990,7 +990,7 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 
 			char gripLevel[32] = "Green";
 
-			if (wetness <= irsdk_TrackWetness_Dry) {
+			if (wetness <= irsdk_TrackWetness_MostlyDry) {
 				int id = atoi(sessionID);
 
 				while (id >= 0) {
@@ -1007,13 +1007,13 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 					id -= 1;
 				}
 			}
-			else if (wetness == irsdk_TrackWetness_MostlyDry)
+			else if (wetness <= irsdk_TrackWetness_VeryLightlyWet)
 				strcpy(gripLevel, "Greasy");
-			else if (wetness == irsdk_TrackWetness_VeryLightlyWet)
+			else if (wetness <= irsdk_TrackWetness_LightlyWet)
 				strcpy(gripLevel, "Damp");
-			else if (wetness == irsdk_TrackWetness_ModeratelyWet)
+			else if (wetness <= irsdk_TrackWetness_VeryWet)
 				strcpy(gripLevel, "Wet");
-			else if (wetness == irsdk_TrackWetness_ExtremelyWet)
+			else if (wetness <= irsdk_TrackWetness_ExtremelyWet)
 				strcpy(gripLevel, "Flooded");
 
 			printf("Grip=%s\n", gripLevel);

@@ -1,15 +1,15 @@
 [Development]
-Version=5.6.3.0-beta
+Version=5.6.3.0-release
 Target=5.6.3.0-release
-Date=03/14/2024
-Download=https://www.dropbox.com/scl/fi/3ydavny6wfg51nziy7hhj/Simulator-Controller-5.6.3.0-beta.zip?rlkey=iyeqzsxky4q7880zywu16h25r&dl=1
+Date=03/15/2024
+Download=https://cutt.ly/7w0JJ37a;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.6.3.0-release.zip
 Changes=Added customizing for "Simulator Setup", Initial support for rain and track wetness for iRacing, Spotter informs about accidents and slow cars, Extended configuration for the Spotter in "Simulator Setup" and "Simulator Configuration", Extended announcements voice command for Spotter, New settings in the "Session Database" to define the distance for slow cars and accidents
 Components=Media->5.6.1,Configuration->5.6.1,Utilities->5.4.8
 [Release]
-Version=5.6.2.0-release
-Date=03/08/2024
-Download=https://cutt.ly/Pw1nfWZ2;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.6.2.0-release.zip
-Changes=New startup logging, Strategy recalculation now incorporates completed pitstops for validation, Pitstop window as well as refuel and tyre rules relate only required pitstops, Settings export file format in "Session Database" fixed, Fixed import settings in "Session Database", Increased reliability of opponent pitstop information in "Race Center", Choice for car indication by the Spotter, The Spotter now interrupts itself more often, Import of team specific settings as a special preset in "Simulator Setup", Improved car name parsing fo Le Mans Ultimate
+Version=5.6.3.0-release
+Date=03/15/2024
+Download=https://cutt.ly/7w0JJ37a;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.6.3.0-release.zip
+Changes=Added customizing for "Simulator Setup", Initial support for rain and track wetness for iRacing, Spotter informs about accidents and slow cars, Extended configuration for the Spotter in "Simulator Setup" and "Simulator Configuration", Extended announcements voice command for Spotter, New settings in the "Session Database" to define the distance for slow cars and accidents
 Components=Media->5.6.1,Configuration->5.6.1,Utilities->5.4.8
 [Components]
 Media.5.5.7.Path=Resources
@@ -28,7 +28,7 @@ Utilities.5.4.8.Path=.
 Utilities.5.4.8.Content=Utilities
 Utilities.5.4.8.Download=https://www.dropbox.com/scl/fi/5nduffajjm3x6rhsxr1nk/Utilities-5.4.8.zip?rlkey=alrj8l2z205dd2vm9cu6hbsot&dl=1
 [Current]
-Type=Development
+Type=Release
 [Version]
-Development=5.6.3.0-beta
-Release=5.6.2.0-release
+Development=5.6.3.0-release
+Release=5.6.3.0-release

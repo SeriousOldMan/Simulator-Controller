@@ -627,7 +627,8 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 
 							if ((slot.count > 20) && (speed < (slot.speed / 2)))
 							{
-								int distanceAhead = (int)(((running > driverRunning) ? running : (running + trackLength)) - driverRunning);
+								int distanceAhead = (int)(((running > driverRunning) ? (running * trackLength)
+																					 : ((running * trackLength) + trackLength)) - (driverRunning * trackLength));
 
 								if (distanceAhead < slowCarDistance)
 									slowCarsAhead.push_back(SlowCarInfo(i, distanceAhead));
@@ -637,7 +638,8 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 									if (distanceAhead < aheadAccidentDistance)
 										accidentsAhead.push_back(SlowCarInfo(i, distanceAhead));
 
-									int distanceBehind = (int)(((running < driverRunning) ? driverRunning : (driverRunning + trackLength)) - running);
+									int distanceBehind = (int)(((running < driverRunning) ? (driverRunning * trackLength)
+																						  : ((driverRunning * trackLength) + trackLength)) - (running * trackLength));
 
 									if (distanceBehind < behindAccidentDistance)
 										accidentsBehind.push_back(SlowCarInfo(i, distanceBehind));
@@ -665,15 +667,17 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 			for (int i = 0; i < accidentsAhead.size(); i++)
 				distance = ((distance < accidentsAhead[i].distance) ? distance : accidentsAhead[i].distance);
 
-			char message[40] = "accidentAlert:Ahead;";
-			char numBuffer[20];
+			if (distance > 100) {
+				char message[40] = "accidentAlert:Ahead;";
+				char numBuffer[20];
 
-			sprintf_s(numBuffer, "%d", distance);
-			strcat_s(message, numBuffer);
+				sprintf_s(numBuffer, "%d", distance);
+				strcat_s(message, numBuffer);
 
-			sendSpotterMessage(message);
+				sendSpotterMessage(message);
 
-			return true;
+				return true;
+			}
 		}
 	}
 
@@ -688,15 +692,17 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 			for (int i = 0; i < slowCarsAhead.size(); i++)
 				distance = ((distance < slowCarsAhead[i].distance) ? distance : slowCarsAhead[i].distance);
 
-			char message[40] = "slowCarAlert:";
-			char numBuffer[20];
+			if (distance > 100) {
+				char message[40] = "slowCarAlert:";
+				char numBuffer[20];
 
-			sprintf_s(numBuffer, "%d", distance);
-			strcat_s(message, numBuffer);
+				sprintf_s(numBuffer, "%d", distance);
+				strcat_s(message, numBuffer);
 
-			sendSpotterMessage(message);
+				sendSpotterMessage(message);
 
-			return true;
+				return true;
+			}
 		}
 	}
 
@@ -711,15 +717,17 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 			for (int i = 0; i < accidentsBehind.size(); i++)
 				distance = ((distance < accidentsBehind[i].distance) ? distance : accidentsBehind[i].distance);
 
-			char message[40] = "accidentAlert:Behind;";
-			char numBuffer[20];
+			if (distance > 100) {
+				char message[40] = "accidentAlert:Behind;";
+				char numBuffer[20];
 
-			sprintf_s(numBuffer, "%d", distance);
-			strcat_s(message, numBuffer);
+				sprintf_s(numBuffer, "%d", distance);
+				strcat_s(message, numBuffer);
 
-			sendSpotterMessage(message);
+				sendSpotterMessage(message);
 
-			return true;
+				return true;
+			}
 		}
 	}
 

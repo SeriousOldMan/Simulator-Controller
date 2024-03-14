@@ -678,9 +678,12 @@ namespace RF2SHMSpotter {
 					foreach (SlowCarInfo i in accidentsAhead)
 						distance = Math.Min(distance, i.distance);
 
-					SendSpotterMessage("accidentAlert:Ahead;" + distance);
+					if (distance > 100)
+					{
+						SendSpotterMessage("accidentAlert:Ahead;" + distance);
 
-					return true;
+						return true;
+					}
 				}
 			}
 
@@ -695,9 +698,12 @@ namespace RF2SHMSpotter {
 					foreach (SlowCarInfo i in slowCarsAhead)
 						distance = Math.Min(distance, i.distance);
 
-					SendSpotterMessage("slowCarAlert:" + distance);
+					if (distance > 100)
+					{
+						SendSpotterMessage("slowCarAlert:" + distance);
 
-					return true;
+						return true;
+					}
 				}
 			}
 
@@ -712,9 +718,12 @@ namespace RF2SHMSpotter {
 					foreach (SlowCarInfo i in accidentsBehind)
 						distance = Math.Min(distance, i.distance);
 
-					SendSpotterMessage("accidentAlert:Behind;" + distance);
+					if (distance > 100)
+					{
+						SendSpotterMessage("accidentAlert:Behind;" + distance);
 
-					return true;
+						return true;
+					}
 				}
 			}
 

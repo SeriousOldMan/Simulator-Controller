@@ -571,15 +571,17 @@ BOOL checkAccident() {
 			for (int i = 0; i < accidentsAheadCount; i++)
 				distance = ((distance < accidentsAhead[i].distance) ? distance : accidentsAhead[i].distance);
 
-			char message[40] = "accidentAlert:Ahead;";
-			char numBuffer[20];
+			if (distance > 100) {
+				char message[40] = "accidentAlert:Ahead;";
+				char numBuffer[20];
 
-			sprintf_s(numBuffer, 20, "%d", distance);
-			strcat_s(message, 40, numBuffer);
+				sprintf_s(numBuffer, 20, "%d", distance);
+				strcat_s(message, 40, numBuffer);
 
-			sendSpotterMessage(message);
+				sendSpotterMessage(message);
 
-			return TRUE;
+				return TRUE;
+			}
 		}
 	}
 
@@ -594,15 +596,17 @@ BOOL checkAccident() {
 			for (int i = 0; i < slowCarsAheadCount; i++)
 				distance = ((distance < slowCarsAhead[i].distance) ? distance : slowCarsAhead[i].distance);
 
-			char message[40] = "slowCarAlert:";
-			char numBuffer[20];
+			if (distance > 100) {
+				char message[40] = "slowCarAlert:";
+				char numBuffer[20];
 
-			sprintf_s(numBuffer, 20, "%d", distance);
-			strcat_s(message, 40, numBuffer);
+				sprintf_s(numBuffer, 20, "%d", distance);
+				strcat_s(message, 40, numBuffer);
 
-			sendSpotterMessage(message);
+				sendSpotterMessage(message);
 
-			return TRUE;
+				return TRUE;
+			}
 		}
 	}
 
@@ -617,15 +621,17 @@ BOOL checkAccident() {
 			for (int i = 0; i < accidentsBehindCount; i++)
 				distance = ((distance < accidentsBehind[i].distance) ? distance : accidentsBehind[i].distance);
 
-			char message[40] = "accidentAlert:Behind;";
-			char numBuffer[20];
+			if (distance > 100) {
+				char message[40] = "accidentAlert:Behind;";
+				char numBuffer[20];
 
-			sprintf_s(numBuffer, 20, "%d", distance);
-			strcat_s(message, 40, numBuffer);
+				sprintf_s(numBuffer, 20, "%d", distance);
+				strcat_s(message, 40, numBuffer);
 
-			sendSpotterMessage(message);
+				sendSpotterMessage(message);
 
-			return TRUE;
+				return TRUE;
+			}
 		}
 	}
 

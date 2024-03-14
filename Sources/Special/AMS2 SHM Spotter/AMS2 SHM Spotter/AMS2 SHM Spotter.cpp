@@ -522,15 +522,17 @@ bool checkAccident(const SharedMemory* sharedData)
 			for (int i = 0; i < accidentsAhead.size(); i++)
 				distance = ((distance < accidentsAhead[i].distance) ? distance : accidentsAhead[i].distance);
 
-			char message[40] = "accidentAlert:Ahead;";
-			char numBuffer[20];
+			if (distance > 100) {
+				char message[40] = "accidentAlert:Ahead;";
+				char numBuffer[20];
 
-			sprintf_s(numBuffer, "%d", distance);
-			strcat_s(message, numBuffer);
+				sprintf_s(numBuffer, "%d", distance);
+				strcat_s(message, numBuffer);
 
-			sendSpotterMessage(message);
+				sendSpotterMessage(message);
 
-			return true;
+				return true;
+			}
 		}
 	}
 
@@ -545,15 +547,17 @@ bool checkAccident(const SharedMemory* sharedData)
 			for (int i = 0; i < slowCarsAhead.size(); i++)
 				distance = ((distance < slowCarsAhead[i].distance) ? distance : slowCarsAhead[i].distance);
 
-			char message[40] = "slowCarAlert:";
-			char numBuffer[20];
+			if (distance > 100) {
+				char message[40] = "slowCarAlert:";
+				char numBuffer[20];
 
-			sprintf_s(numBuffer, "%d", distance);
-			strcat_s(message, numBuffer);
+				sprintf_s(numBuffer, "%d", distance);
+				strcat_s(message, numBuffer);
 
-			sendSpotterMessage(message);
+				sendSpotterMessage(message);
 
-			return true;
+				return true;
+			}
 		}
 	}
 
@@ -568,15 +572,17 @@ bool checkAccident(const SharedMemory* sharedData)
 			for (int i = 0; i < accidentsBehind.size(); i++)
 				distance = ((distance < accidentsBehind[i].distance) ? distance : accidentsBehind[i].distance);
 
-			char message[40] = "accidentAlert:Behind;";
-			char numBuffer[20];
+			if (distance > 100) {
+				char message[40] = "accidentAlert:Behind;";
+				char numBuffer[20];
 
-			sprintf_s(numBuffer, "%d", distance);
-			strcat_s(message, numBuffer);
+				sprintf_s(numBuffer, "%d", distance);
+				strcat_s(message, numBuffer);
 
-			sendSpotterMessage(message);
+				sendSpotterMessage(message);
 
-			return true;
+				return true;
+			}
 		}
 	}
 

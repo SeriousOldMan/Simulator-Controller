@@ -1,7 +1,7 @@
 [Development]
-Version=5.6.3.0-dev
+Version=5.6.3.0-beta
 Target=5.6.3.0-release
-Date=03/13/2024
+Date=03/14/2024
 Download=https://www.dropbox.com/scl/fi/3ydavny6wfg51nziy7hhj/Simulator-Controller-5.6.3.0-beta.zip?rlkey=iyeqzsxky4q7880zywu16h25r&dl=1
 Changes=Added customizing for "Simulator Setup", Initial support for rain and track wetness for iRacing, Spotter informs about accidents and slow cars, Extended configuration for the Spotter in "Simulator Setup" and "Simulator Configuration", Extended announcements voice command for Spotter, New settings in the "Session Database" to define the distance for slow cars and accidents
 Components=Media->5.6.1,Configuration->5.6.1,Utilities->5.4.8
@@ -30,5 +30,5 @@ Utilities.5.4.8.Download=https://www.dropbox.com/scl/fi/5nduffajjm3x6rhsxr1nk/Ut
 [Current]
 Type=Development
 [Version]
-Development=5.6.3.0-dev
+Development=5.6.3.0-beta
 Release=5.6.2.0-release

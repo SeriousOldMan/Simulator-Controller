@@ -560,7 +560,6 @@ double lastRunnings[256];
 
 bool checkAccident(const irsdk_header* header, const char* data, const int playerCarIndex, float trackLength)
 {
-	/*
 	char buffer[64];
 
 	getDataValue(buffer, header, data, "SessionFlags");
@@ -573,9 +572,6 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 
 		return true;
 	}
-
-	return false;
-	*/
 
 	accidentsAhead.resize(0);
 	accidentsBehind.resize(0);
@@ -591,7 +587,7 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 
 	itoa(getCurrentSessionID(sessionInfo), sessionID, 10);
 
-	int milliSeconds = GetTickCount() - lastTickCount;
+	float milliSeconds = GetTickCount() - lastTickCount;
 
 	lastTickCount += milliSeconds;
 
@@ -616,9 +612,9 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 						lastRunnings[carIndex] = running;
 					else if (milliSeconds < 200) {
 						if (running >= lastRunnings[carIndex])
-							speed = ((running - lastRunnings[carIndex]) * trackLength / (milliSeconds / 1000)) * 3.6;
+							speed = (((running - lastRunnings[carIndex]) * trackLength) / (milliSeconds / 1000.0f)) * 3.6f;
 						else
-							speed = (((running + 1) - lastRunnings[carIndex]) * trackLength / (milliSeconds / 1000)) * 3.6;
+							continue;
 
 						updateIdealLine(header, data, carIndex, running, speed);
 
@@ -647,6 +643,8 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 						}
 					}
 				}
+				else
+					break;
 			}
 		}
 		catch (...) {}
@@ -1598,6 +1596,11 @@ int main(int argc, char* argv[])
 	// ask for 1ms timer so sleeps are more precise
 	timeBeginPeriod(1);
 
+	idealLine.reserve(1000);
+
+	for (int i = 0; i < 1000; i++)
+		idealLine.push_back(IdealLine());
+
 	bool running = false;
 	int countdown = 1000;
 	bool mapTrack = false;
@@ -1677,11 +1680,6 @@ int main(int argc, char* argv[])
 				positionTrigger = false;
 		}
 		else {
-			idealLine.reserve(1000);
-
-			for (int i = 0; i < 1000; i++)
-				idealLine.push_back(IdealLine());
-
 			if (argc > 1)
 				aheadAccidentDistance = atoi(argv[1]);
 
@@ -1761,7 +1759,7 @@ int main(int argc, char* argv[])
 							// if (!greenFlagReported && (countdown <= 0))
 							//	greenFlagReported = true;
 
-							running = (((flags & irsdk_startGo) != 0) || ((flags & irsdk_startSet) != 0) || (countdown <= 0));
+							running = (((flags& irsdk_startGo) != 0) || ((flags & irsdk_startSet) != 0) || (countdown <= 0));
 						}
 
 						if (running) {

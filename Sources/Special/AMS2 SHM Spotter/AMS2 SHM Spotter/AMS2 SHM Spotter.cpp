@@ -1262,6 +1262,11 @@ int main(int argc, char* argv[]) {
 	char* soundsDirectory = "";
 	char* audioDevice = "";
 
+	idealLine.reserve(1000);
+
+	for (int i = 0; i < 1000; i++)
+		idealLine.push_back(IdealLine());
+
 	if (argc > 1) {
 		calibrateTelemetry = (strcmp(argv[1], "-Calibrate") == 0);
 		analyzeTelemetry = calibrateTelemetry || (strcmp(argv[1], "-Analyze") == 0);
@@ -1308,11 +1313,6 @@ int main(int argc, char* argv[]) {
 			}
 		}
 		else {
-			idealLine.reserve(1000);
-
-			for (int i = 0; i < 1000; i++)
-				idealLine.push_back(IdealLine());
-
 			if (argc > 1)
 				aheadAccidentDistance = atoi(argv[1]);
 

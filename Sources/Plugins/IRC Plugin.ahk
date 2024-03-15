@@ -174,35 +174,29 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	changePitstopOption(option, action, steps := 1) {
-		if (this.PitstopFuelMFDHotkey && (this.PitstopFuelMFDHotkey != "Off"))
-			switch option, false {
-				case "Refuel":
-					if ((steps == 1) && (getUnit("Volume") = "Liter"))
-						steps := 4
+		switch option, false {
+			case "Refuel":
+				if ((steps == 1) && (getUnit("Volume") = "Liter"))
+					steps := 4
 
-					this.openPitstopMFD("Fuel")
-
+				if this.openPitstopMFD("Fuel")
 					this.sendPitstopCommand("Pitstop", "Change", "Refuel", (action = kIncrease) ? Round(steps) : Round(steps * -1))
-				case "No Refuel":
-					if ((steps == 1) && (getUnit("Volume") = "Liter"))
-						steps := 4
+			case "No Refuel":
+				if ((steps == 1) && (getUnit("Volume") = "Liter"))
+					steps := 4
 
-					this.openPitstopMFD("Fuel")
-
+				if this.openPitstopMFD("Fuel")
 					this.sendPitstopCommand("Pitstop", "Change", "Refuel", -250)
-				case "Change Tyres":
-					this.openPitstopMFD("Tyre")
-
+			case "Change Tyres":
+				if this.openPitstopMFD("Tyre")
 					this.sendPitstopCommand("Pitstop", "Change", "Tyre Change", (action = kIncrease) ? "true" : "false")
-				case "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right":
-					this.openPitstopMFD("Tyre")
-
+			case "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right":
+				if this.openPitstopMFD("Tyre")
 					this.sendPitstopCommand("Pitstop", "Change", option, Round(steps * 0.1 * ((action = kIncrease) ? 1 : -1), 1))
-				case "Repair":
-					this.openPitstopMFD("Fuel")
-
+			case "Repair":
+				if this.openPitstopMFD("Fuel")
 					this.sendPitstopCommand("Pitstop", "Change", "Repair", (action = kIncrease) ? "true" : "false")
-			}
+		}
 	}
 
 	supportsPitstop() {
@@ -230,38 +224,34 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 	getPitstopOptionValues(option) {
 		local data, compound, compoundColor
 
-		if (this.PitstopFuelMFDHotkey && (this.PitstopFuelMFDHotkey != "Off")) {
-			switch option, false {
-				case "Refuel":
-					data := this.readSessionData("Setup=true")
+		switch option, false {
+			case "Refuel":
+				data := this.readSessionData("Setup=true")
 
-					return [getMultiMapValue(data, "Setup Data", "FuelAmount", 0)]
-				case "Tyre Pressures":
-					data := this.readSessionData("Setup=true")
+				return [getMultiMapValue(data, "Setup Data", "FuelAmount", 0)]
+			case "Tyre Pressures":
+				data := this.readSessionData("Setup=true")
 
-					return [getMultiMapValue(data, "Setup Data", "TyrePressureFL", 26.1), getMultiMapValue(data, "Setup Data", "TyrePressureFR", 26.1)
-						  , getMultiMapValue(data, "Setup Data", "TyrePressureRL", 26.1), getMultiMapValue(data, "Setup Data", "TyrePressureRR", 26.1)]
-				case "Tyre Compound":
-					data := this.readSessionData("Setup=true")
+				return [getMultiMapValue(data, "Setup Data", "TyrePressureFL", 26.1), getMultiMapValue(data, "Setup Data", "TyrePressureFR", 26.1)
+					  , getMultiMapValue(data, "Setup Data", "TyrePressureRL", 26.1), getMultiMapValue(data, "Setup Data", "TyrePressureRR", 26.1)]
+			case "Tyre Compound":
+				data := this.readSessionData("Setup=true")
 
-					compound := getMultiMapValue(data, "Setup Data", "TyreCompoundRaw")
-					compound := SessionDatabase.getTyreCompoundName(this.Simulator[true], this.Car, this.Track, compound, kUndefined)
+				compound := getMultiMapValue(data, "Setup Data", "TyreCompoundRaw")
+				compound := SessionDatabase.getTyreCompoundName(this.Simulator[true], this.Car, this.Track, compound, kUndefined)
 
-					if (compound = kUndefined)
-						compound := normalizeCompound("Dry")
+				if (compound = kUndefined)
+					compound := normalizeCompound("Dry")
 
-					compoundColor := false
+				compoundColor := false
 
-					if compound
-						splitCompound(compound, &compound, &compoundColor)
+				if compound
+					splitCompound(compound, &compound, &compoundColor)
 
-					return [compound, compoundColor]
-				default:
-					return super.getPitstopOptionValues(option)
-			}
+				return [compound, compoundColor]
+			default:
+				return super.getPitstopOptionValues(option)
 		}
-		else
-			return false
 	}
 
 	startPitstopSetup(pitstopNumber) {
@@ -303,6 +293,15 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 
 		if this.openPitstopMFD("Fuel")
 			this.sendPitstopCommand("Pitstop", "Set", "Repair", (repairBodywork || repairSuspension) ? "true" : "false")
+	}
+
+	updateTelemetryData(data) {
+		super.updateTelemetryData(data)
+
+		if (getMultiMapValue(data, "Stint Data", "Laps", 0) = 0) {
+			setMultiMapValue(data, "Session Data", "SessionTimeRemaining", 0)
+			setMultiMapValue(data, "Session Data", "SessionLapsRemaining", 0)
+		}
 	}
 
 	updatePositionsData(data) {

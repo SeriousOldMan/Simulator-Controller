@@ -944,8 +944,8 @@ void writeData(std::ostringstream * output, const irsdk_header *header, const ch
 
 			bool valid = true;
 			
-			if (getDataValue(result, header, data, "LapDeltaToBestLap_OK"))
-				valid = (atoi(result) > 0);
+			// if (getDataValue(result, header, data, "LapDeltaToBestLap_OK"))
+			//	valid = (atoi(result) > 0);
 
 			if (valid)
 				printLine(output, "LapValid=true");

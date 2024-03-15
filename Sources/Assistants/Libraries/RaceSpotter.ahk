@@ -3094,21 +3094,22 @@ class RaceSpotter extends GridRaceAssistant {
 						speaker.speakPhrase("GreetingPosition", {position: position
 															   , overall: this.MultiClass[data] ? speaker.Fragments["Overall"] : ""})
 
-					if (getMultiMapValue(data, "Session Data", "SessionFormat", "Time") = "Time") {
-						length := Round(getMultiMapValue(data, "Session Data", "SessionTimeRemaining", 0) / 60000)
+					if (this.SettingsDatabase.getSimulatorCode(this.Simulator) != "IRC")
+						if (getMultiMapValue(data, "Session Data", "SessionFormat", "Time") = "Time") {
+							length := Round(getMultiMapValue(data, "Session Data", "SessionTimeRemaining", 0) / 60000)
 
-						if (length > 0)
-							speaker.speakPhrase("GreetingDuration", {minutes: length})
-					}
-					else {
-						length := this.SessionLaps
+							if (length > 0)
+								speaker.speakPhrase("GreetingDuration", {minutes: length})
+						}
+						else {
+							length := this.SessionLaps
 
-						if (length = 0)
-							length := getMultiMapValue(data, "Session Data", "SessionLapsRemaining", 0)
+							if (length = 0)
+								length := getMultiMapValue(data, "Session Data", "SessionLapsRemaining", 0)
 
-						if (length > 0)
-							speaker.speakPhrase("GreetingLaps", {laps: length})
-					}
+							if (length > 0)
+								speaker.speakPhrase("GreetingLaps", {laps: length})
+						}
 				}
 			}
 			finally {

@@ -940,8 +940,8 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 
 			bool valid = true;
 			
-			if (getDataValue(result, header, data, "LapDeltaToBestLap_OK"))
-				valid = (result > 0);
+			// if (getDataValue(result, header, data, "LapDeltaToBestLap_OK"))
+			//	valid = (result > 0);
 
 			printf("LapValid=%s\n", valid ? "true" : "false");
 

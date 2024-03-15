@@ -560,19 +560,6 @@ double lastRunnings[256];
 
 bool checkAccident(const irsdk_header* header, const char* data, const int playerCarIndex, float trackLength)
 {
-	char buffer[64];
-
-	getDataValue(buffer, header, data, "SessionFlags");
-
-	if ((atoi(buffer) & irsdk_white) && (cycle > nextSlowCarAhead))
-	{
-		nextSlowCarAhead = cycle + 400;
-
-		sendSpotterMessage("slowCarAlert");
-
-		return true;
-	}
-
 	accidentsAhead.resize(0);
 	accidentsBehind.resize(0);
 	slowCarsAhead.resize(0);

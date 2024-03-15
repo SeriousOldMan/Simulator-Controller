@@ -3086,7 +3086,7 @@ class RaceSpotter extends GridRaceAssistant {
 													  , track: displayValue("Float", convertUnit("Temperature", trackTemperature), 0)
 													  , unit: fragments[getUnit("Temperature")]})
 
-				if (this.Session = kSessionRace) {
+				if ((this.Session = kSessionRace) && (getMultiMapValue(data, "Position Data", "Car.Count", 0) > 0)) {
 					driver := getMultiMapValue(data, "Position Data", "Driver.Car", false)
 					position := this.getPosition(driver, "Overall", data)
 
@@ -3094,22 +3094,24 @@ class RaceSpotter extends GridRaceAssistant {
 						speaker.speakPhrase("GreetingPosition", {position: position
 															   , overall: this.MultiClass[data] ? speaker.Fragments["Overall"] : ""})
 
-					if (this.SettingsDatabase.getSimulatorCode(this.Simulator) != "IRC")
-						if (getMultiMapValue(data, "Session Data", "SessionFormat", "Time") = "Time") {
+					if (getMultiMapValue(data, "Session Data", "SessionFormat", "Time") = "Time") {
+						length := Round(this.SessionDuration / 60000)
+
+						if (length = 0)
 							length := Round(getMultiMapValue(data, "Session Data", "SessionTimeRemaining", 0) / 60000)
 
-							if (length > 0)
-								speaker.speakPhrase("GreetingDuration", {minutes: length})
-						}
-						else {
-							length := this.SessionLaps
+						if (length > 0)
+							speaker.speakPhrase("GreetingDuration", {minutes: length})
+					}
+					else {
+						length := this.SessionLaps
 
-							if (length = 0)
-								length := getMultiMapValue(data, "Session Data", "SessionLapsRemaining", 0)
+						if (length = 0)
+							length := getMultiMapValue(data, "Session Data", "SessionLapsRemaining", 0)
 
-							if (length > 0)
-								speaker.speakPhrase("GreetingLaps", {laps: length})
-						}
+						if (length > 0)
+							speaker.speakPhrase("GreetingLaps", {laps: length})
+					}
 				}
 			}
 			finally {

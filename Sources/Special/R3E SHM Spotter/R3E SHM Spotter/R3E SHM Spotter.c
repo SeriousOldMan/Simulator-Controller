@@ -1547,12 +1547,12 @@ int main(int argc, char* argv[])
 				checkCoordinates(playerID);
 			else if (active()) {
 				BOOL startGo = (map_buffer->start_lights >= R3E_SESSION_PHASE_GREEN);
+
+				if (!greenFlagReported && (counter > 8000))
+					greenFlagReported = TRUE;
 				
 				if (!running) {
 					countdown -= 1;
-
-					// if (!greenFlagReported && (countdown <= 0))
-					//	greenFlagReported = TRUE;
 
 					running = (startGo || (countdown <= 0));
 				}

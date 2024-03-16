@@ -1,14 +1,14 @@
 [Development]
 Version=5.6.4.0-dev
-Target=5.6.3.0-release
-Date=03/15/2024
+Target=5.6.4.0-release
+Date=03/16/2024
 Download=
-Changes=Fixed session time and laps for iRacing
+Changes=Fixed starting position for iRacing
 Components=Media->5.6.1,Configuration->5.6.1,Utilities->5.4.8
 [Release]
-Version=5.6.3.0-release
-Date=03/15/2024
-Download=https://cutt.ly/7w0JJ37a;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.6.3.0-release.zip
+Version=5.6.3.1-release
+Date=03/16/2024
+Download=https://cutt.ly/Pw06N805;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.6.3.1-release.zip
 Changes=Added customizing for "Simulator Setup", Initial support for rain and track wetness for iRacing, Spotter informs about accidents and slow cars, Extended configuration for the Spotter in "Simulator Setup" and "Simulator Configuration", Extended announcements voice command for Spotter, New settings in the "Session Database" to define the distance for slow cars and accidents
 Components=Media->5.6.1,Configuration->5.6.1,Utilities->5.4.8
 [Components]
@@ -30,5 +30,5 @@ Utilities.5.4.8.Download=https://www.dropbox.com/scl/fi/5nduffajjm3x6rhsxr1nk/Ut
 [Current]
 Type=Development
 [Version]
-Development=5.6.4.0-dev
-Release=5.6.3.0-release
+Development=5.6.4.0-release
+Release=5.6.3.1-release

@@ -1390,12 +1390,12 @@ int main(int argc, char* argv[]) {
 				checkCoordinates(sharedData);
 			else if (active(localCopy)) {
 				bool startGo = (localCopy->mHighestFlagColour == FLAG_COLOUR_GREEN);
+
+				if (!greenFlagReported && (counter > 8000))
+					greenFlagReported = true;
 				
 				if (!running) {
 					countdown -= 1;
-
-					// if (!greenFlagReported && (countdown <= 0))
-					//	greenFlagReported = true;
 
 					running = (startGo || (countdown <= 0));
 				}

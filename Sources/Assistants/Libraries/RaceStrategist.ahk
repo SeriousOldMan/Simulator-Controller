@@ -1444,17 +1444,16 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	prepareSession(&settings, &data, formationLap?) {
+		local prepared := this.Prepared
 		local simulatorName, theStrategy, applicableStrategy, simulator, car, track, facts
 		local sessionType, sessionLength, duration, laps
 
 		facts := super.prepareSession(&settings, &data, formationLap?)
 
-		if (getMultiMapValue(data, "Stint Data", "Laps", 0) = 0)
+		if (!prepared && (getMultiMapValue(data, "Stint Data", "Laps", 0) = 0))
 			this.updateSessionValues({RaceInfo: false})
 
-		simulatorName := this.SettingsDatabase.getSimulatorName(this.Simulator)
-
-		if settings
+		if (!prepared && settings)
 			this.updateConfigurationValues({UseTalking: getMultiMapValue(settings, "Assistant.Strategist", "Voice.UseTalking", true)
 										  , UseTraffic: getMultiMapValue(settings, "Strategy Settings", "Traffic.Simulation", false)})
 
@@ -1471,7 +1470,7 @@ class RaceStrategist extends GridRaceAssistant {
 			car := theStrategy.Car
 			track := theStrategy.Track
 
-			if ((simulator = simulatorName) && (car = facts["Session.Car"]) && (track = facts["Session.Track"]))
+			if ((simulator = this.SettingsDatabase.getSimulatorName(this.Simulator)) && (car = facts["Session.Car"]) && (track = facts["Session.Track"]))
 				applicableStrategy := true
 
 			if applicableStrategy {
@@ -1513,26 +1512,23 @@ class RaceStrategist extends GridRaceAssistant {
 
 	startSession(settings, data) {
 		local configuration := this.Configuration
+		local facts := this.prepareSession(&settings, &data, false)
 		local raceEngineer := (ProcessExist("Race Engineer.exe") > 0)
-		local simulator, saveSettings, deprecated, telemetryDB, facts
-
-		facts := this.prepareSession(&settings, &data, false)
-
-		simulatorName := this.Simulator
+		local simulator, saveSettings, deprecated, telemetryDB
 
 		if raceEngineer
 			saveSettings := kNever
 		else {
-			deprecated := getMultiMapValue(configuration, "Race Engineer Shutdown", simulatorName . ".SaveSettings", kNever)
-			saveSettings := getMultiMapValue(configuration, "Race Assistant Shutdown", simulatorName . ".SaveSettings", deprecated)
+			deprecated := getMultiMapValue(configuration, "Race Engineer Shutdown", this.Simulator . ".SaveSettings", kNever)
+			saveSettings := getMultiMapValue(configuration, "Race Assistant Shutdown", this.Simulator . ".SaveSettings", deprecated)
 		}
 
-		this.updateConfigurationValues({LearningLaps: getMultiMapValue(configuration, "Race Strategist Analysis", simulatorName . ".LearningLaps", 1)
+		this.updateConfigurationValues({LearningLaps: getMultiMapValue(configuration, "Race Strategist Analysis", this.Simulator . ".LearningLaps", 1)
 									  , SessionReportsDatabase: getMultiMapValue(configuration, "Race Strategist Reports", "Database", false)
 									  , CollectTelemetry: this.collectTelemetryData()
-									  , SaveTelemetry: getMultiMapValue(configuration, "Race Strategist Shutdown", simulatorName . ".SaveTelemetry", kAlways)
-									  , SaveRaceReport: getMultiMapValue(configuration, "Race Strategist Shutdown", simulatorName . ".SaveRaceReport", kNever)
-									  , RaceReview: (getMultiMapValue(configuration, "Race Strategist Shutdown", simulatorName . ".RaceReview", "Yes") = "Yes")
+									  , SaveTelemetry: getMultiMapValue(configuration, "Race Strategist Shutdown", this.Simulator . ".SaveTelemetry", kAlways)
+									  , SaveRaceReport: getMultiMapValue(configuration, "Race Strategist Shutdown", this.Simulator . ".SaveRaceReport", kNever)
+									  , RaceReview: (getMultiMapValue(configuration, "Race Strategist Shutdown", this.Simulator . ".RaceReview", "Yes") = "Yes")
 									  , SaveSettings: saveSettings})
 
 

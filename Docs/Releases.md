@@ -1,3 +1,6 @@
+## 5.6.3.1-release 03/16/24
+  1. Fixed a critical bug in the Spotter for iRacing which prevented proper startup in some cases.
+
 ## 5.6.3.0-release 03/15/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

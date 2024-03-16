@@ -6065,7 +6065,7 @@ class RaceCenter extends ConfigurationItem {
 
 			lap.Stint := stint
 
-			tries := ((A_Index == count) ? ((isDebug() || (lap.Nr = 1)) ? 40 : 20) : 1)
+			tries := ((A_Index == count) ? ((isDebug() || (lap.Nr = 1)) ? 40 : 15) : 1)
 
 			while (tries > 0) {
 				rawData := this.Connector.GetLapValue(identifier, "Telemetry Data")
@@ -6174,7 +6174,7 @@ class RaceCenter extends ConfigurationItem {
 			lap.TyreSet := getMultiMapValue(data, "Car Data", "TyreSet", false)
 
 			try {
-				tries := ((A_Index == count) ? ((isDebug() || (lap.Nr = 1)) ? 40 : 20) : 1)
+				tries := ((A_Index == count) ? ((isDebug() || (lap.Nr = 1)) ? 40 : 15) : 1)
 
 				while (tries > 0) {
 					rawData := this.Connector.GetLapValue(identifier, "Positions Data")
@@ -10341,7 +10341,7 @@ class RaceCenter extends ConfigurationItem {
 					}
 
 					try {
-						tries := ((lap == lastLap) ? ((isDebug() || (lap = 1)) ? 40 : 20) : 1)
+						tries := ((lap == lastLap) ? ((isDebug() || (lap = 1)) ? 40 : 15) : 1)
 
 						while (tries > 0) {
 							standingsData := this.Connector.GetSessionLapValue(session, lap, "Race Strategist Race Standings")

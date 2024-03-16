@@ -917,20 +917,23 @@ class DrivingCoach extends GridRaceAssistant {
 	}
 
 	prepareSession(&settings, &data, formationLap := true) {
+		local prepared := this.Prepared
 		local announcements := false
 		local facts
 
-		if formationLap {
-			this.updateDynamicValues({KnowledgeBase: false
-									, OverallTime: 0, BestLapTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
-			this.updateSessionValues({Simulator: "", Car: "", Track: "", Session: kSessionFinished, SessionTime: false, Laps: Map(), Standings: []})
-		}
+		if !prepared {
+			if formationLap {
+				this.updateDynamicValues({KnowledgeBase: false
+										, OverallTime: 0, BestLapTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
+				this.updateSessionValues({Simulator: "", Car: "", Track: "", Session: kSessionFinished, SessionTime: false, Laps: Map(), Standings: []})
+			}
 
-		this.restartConversation()
+			this.restartConversation()
+		}
 
 		facts := super.prepareSession(&settings, &data, formationLap)
 
-		if settings {
+		if (!prepared && settings) {
 			this.updateConfigurationValues({UseTalking: getMultiMapValue(settings, "Assistant.Coach", "Voice.UseTalking", true)})
 
 			if (this.Session = kSessionPractice)

@@ -946,6 +946,10 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 			 && (getMultiMapValue(data, "Stint Data", "DriverSurname") = driverSurName))
 	}
 
+	hasPrepared(settings, data, count) {
+		return (count > 1)
+	}
+
 	prepareSession(settings, data) {
 		local simulator := getMultiMapValue(data, "Session Data", "Simulator", "Unknown")
 		local car := getMultiMapValue(data, "Session Data", "Car", "Unknown")

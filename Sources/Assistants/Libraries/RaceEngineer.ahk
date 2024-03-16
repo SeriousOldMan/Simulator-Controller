@@ -1426,10 +1426,11 @@ class RaceEngineer extends RaceAssistant {
 	}
 
 	prepareSession(&settings, &data, formationLap?) {
+		local prepared := this.Prepared
 		local announcements := false
 		local facts := super.prepareSession(&settings, &data, formationLap?)
 
-		if settings {
+		if (!prepared && settings) {
 			this.updateConfigurationValues({UseTalking: getMultiMapValue(settings, "Assistant.Engineer", "Voice.UseTalking", true)})
 
 			if (this.Session = kSessionPractice)

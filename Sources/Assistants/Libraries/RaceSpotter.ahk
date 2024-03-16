@@ -3003,26 +3003,24 @@ class RaceSpotter extends GridRaceAssistant {
 		return false
 	}
 
-	initializeAnnouncements(data) {
+	initializeAnnouncements() {
 		local configuration := this.Configuration
-		local simulator := getMultiMapValue(data, "Session Data", "Simulator", "Unknown")
-		local simulatorName := this.SettingsDatabase.getSimulatorName(simulator)
 		local announcements := CaseInsenseMap()
 		local ignore, key, default
 
 		for ignore, key in ["TacticalAdvices", "SideProximity", "RearProximity", "YellowFlags", "BlueFlags"
 						  , "PitWindow", "SessionInformation", "CutWarnings", "PenaltyInformation"
 						  , "SlowCars", "AccidentsAhead", "AccidentsBehind"]
-			announcements[key] := getMultiMapValue(configuration, "Race Spotter Announcements", simulatorName . "." . key, true)
+			announcements[key] := getMultiMapValue(configuration, "Race Spotter Announcements", this.Simulator . "." . key, true)
 
-		default := getMultiMapValue(configuration, "Race Spotter Announcements", simulatorName . ".PerformanceUpdates", 2)
-		default := getMultiMapValue(configuration, "Race Spotter Announcements", simulatorName . ".DistanceInformation", default)
+		default := getMultiMapValue(configuration, "Race Spotter Announcements", this.Simulator . ".PerformanceUpdates", 2)
+		default := getMultiMapValue(configuration, "Race Spotter Announcements", this.Simulator . ".DistanceInformation", default)
 
 		announcements["DeltaInformation"] := getMultiMapValue(configuration, "Race Spotter Announcements"
-																		   , simulatorName . ".DeltaInformation", default)
+																		   , this.Simulator . ".DeltaInformation", default)
 		announcements["DeltaInformationMethod"] := inList(["Static", "Dynamic", "Both"]
 														, getMultiMapValue(configuration, "Race Spotter Announcements"
-																						, simulatorName . ".DeltaInformationMethod", "Both"))
+																						, this.Simulator . ".DeltaInformationMethod", "Both"))
 
 		this.updateConfigurationValues({Announcements: announcements})
 	}
@@ -3041,94 +3039,94 @@ class RaceSpotter extends GridRaceAssistant {
 	}
 
 	prepareSession(&settings, &data, formationLap := true) {
+		local prepared := this.Prepared
 		local speaker, fragments
 		local facts, weather, airTemperature, trackTemperature, weatherNow, weather10Min, weather30Min, driver
 		local position, length, facts
 
 		facts := super.prepareSession(&settings, &data, formationLap)
 
-		if settings
-			this.updateConfigurationValues({UseTalking: getMultiMapValue(settings, "Assistant.Spotter", "Voice.UseTalking", true)})
+		if !prepared {
+			if settings
+				this.updateConfigurationValues({UseTalking: getMultiMapValue(settings, "Assistant.Spotter", "Voice.UseTalking", true)})
 
-		this.initializeAnnouncements(data)
+			this.initializeAnnouncements()
 
-		if (formationLap && this.Speaker) {
-			speaker := this.getSpeaker()
-			fragments := speaker.Fragments
+			if (formationLap && this.Speaker) {
+				speaker := this.getSpeaker()
+				fragments := speaker.Fragments
 
-			speaker.beginTalk()
+				speaker.beginTalk()
 
-			try {
-				speaker.speakPhrase("GreetingIntro")
+				try {
+					speaker.speakPhrase("GreetingIntro")
 
-				airTemperature := Round(getMultiMapValue(data, "Weather Data", "Temperature", 0))
-				trackTemperature := Round(getMultiMapValue(data, "Track Data", "Temperature", 0))
+					airTemperature := Round(getMultiMapValue(data, "Weather Data", "Temperature", 0))
+					trackTemperature := Round(getMultiMapValue(data, "Track Data", "Temperature", 0))
 
-				if (airTemperature = 0)
-					airTemperature := Round(getMultiMapValue(data, "Car Data", "AirTemperature", 0))
+					if (airTemperature = 0)
+						airTemperature := Round(getMultiMapValue(data, "Car Data", "AirTemperature", 0))
 
-				if (trackTemperature = 0)
-					trackTemperature := Round(getMultiMapValue(data, "Car Data", "RoadTemperature", 0))
+					if (trackTemperature = 0)
+						trackTemperature := Round(getMultiMapValue(data, "Car Data", "RoadTemperature", 0))
 
-				weatherNow := getMultiMapValue(data, "Weather Data", "Weather", "Dry")
-				weather10Min := getMultiMapValue(data, "Weather Data", "Weather10Min", "Dry")
-				weather30Min := getMultiMapValue(data, "Weather Data", "Weather30Min", "Dry")
+					weatherNow := getMultiMapValue(data, "Weather Data", "Weather", "Dry")
+					weather10Min := getMultiMapValue(data, "Weather Data", "Weather10Min", "Dry")
+					weather30Min := getMultiMapValue(data, "Weather Data", "Weather30Min", "Dry")
 
-				if (weatherNow = "Dry") {
-					if ((weather10Min = "Dry") || (weather30Min = "Dry"))
-						weather := fragments["GreetingDry"]
-					else
-						weather := fragments["GreetingDry2Wet"]
-				}
-				else {
-					if ((weather10Min = "Dry") || (weather30Min = "Dry"))
-						weather := fragments["GreetingWet2Dry"]
-					else
-						weather := fragments["GreetingWet"]
-				}
-
-				speaker.speakPhrase("GreetingWeather", {weather: weather
-													  , air: displayValue("Float", convertUnit("Temperature", airTemperature), 0)
-													  , track: displayValue("Float", convertUnit("Temperature", trackTemperature), 0)
-													  , unit: fragments[getUnit("Temperature")]})
-
-				if ((this.Session = kSessionRace) && (getMultiMapValue(data, "Position Data", "Car.Count", 0) > 0)) {
-					driver := getMultiMapValue(data, "Position Data", "Driver.Car", false)
-					position := this.getPosition(driver, "Overall", data)
-
-					if (driver && position && this.GridPosition)
-						speaker.speakPhrase("GreetingPosition", {position: position
-															   , overall: this.MultiClass[data] ? speaker.Fragments["Overall"] : ""})
-
-					if (getMultiMapValue(data, "Session Data", "SessionFormat", "Time") = "Time") {
-						length := Round(this.SessionDuration / 60000)
-
-						if (length = 0)
-							length := Round(getMultiMapValue(data, "Session Data", "SessionTimeRemaining", 0) / 60000)
-
-						if (length > 0)
-							speaker.speakPhrase("GreetingDuration", {minutes: length})
+					if (weatherNow = "Dry") {
+						if ((weather10Min = "Dry") || (weather30Min = "Dry"))
+							weather := fragments["GreetingDry"]
+						else
+							weather := fragments["GreetingDry2Wet"]
 					}
 					else {
-						length := this.SessionLaps
+						if ((weather10Min = "Dry") || (weather30Min = "Dry"))
+							weather := fragments["GreetingWet2Dry"]
+						else
+							weather := fragments["GreetingWet"]
+					}
 
-						if (length = 0)
-							length := getMultiMapValue(data, "Session Data", "SessionLapsRemaining", 0)
+					speaker.speakPhrase("GreetingWeather", {weather: weather
+														  , air: displayValue("Float", convertUnit("Temperature", airTemperature), 0)
+														  , track: displayValue("Float", convertUnit("Temperature", trackTemperature), 0)
+														  , unit: fragments[getUnit("Temperature")]})
 
-						if (length > 0)
-							speaker.speakPhrase("GreetingLaps", {laps: length})
+					if ((this.Session = kSessionRace) && (getMultiMapValue(data, "Position Data", "Car.Count", 0) > 0)) {
+						driver := getMultiMapValue(data, "Position Data", "Driver.Car", false)
+						position := this.getPosition(driver, "Overall", data)
+
+						if (driver && position && this.GridPosition)
+							speaker.speakPhrase("GreetingPosition", {position: position
+																   , overall: this.MultiClass[data] ? speaker.Fragments["Overall"] : ""})
+
+						if (getMultiMapValue(data, "Session Data", "SessionFormat", "Time") = "Time") {
+							length := Round(getMultiMapValue(data, "Session Data", "SessionTimeRemaining", 0) / 60000)
+
+							if (length > 0)
+								speaker.speakPhrase("GreetingDuration", {minutes: length})
+						}
+						else {
+							length := this.SessionLaps
+
+							if (length = 0)
+								length := getMultiMapValue(data, "Session Data", "SessionLapsRemaining", 0)
+
+							if (length > 0)
+								speaker.speakPhrase("GreetingLaps", {laps: length})
+						}
 					}
 				}
-			}
-			finally {
-				speaker.endTalk()
+				finally {
+					speaker.endTalk()
+				}
+
+				this.getSpeaker(true)
 			}
 
-			this.getSpeaker(true)
+			Task.startTask(ObjBindMethod(this, "startupSpotter", true), 1000)
+			Task.startTask(ObjBindMethod(this, "updateSessionValues", {Running: true}), 10000)
 		}
-
-		Task.startTask(ObjBindMethod(this, "startupSpotter", true), 1000)
-		Task.startTask(ObjBindMethod(this, "updateSessionValues", {Running: true}), 10000)
 
 		return facts
 	}
@@ -3146,12 +3144,8 @@ class RaceSpotter extends GridRaceAssistant {
 		if this.Debug[kDebugPositions]
 			deleteFile(kTempDirectory . "Race Spotter.positions")
 
-		if joined {
-			this.initializeAnnouncements(data)
-
-			if this.Speaker
-				this.getSpeaker().speakPhrase("GreetingIntro")
-		}
+		if (joined && this.Speaker)
+			this.getSpeaker().speakPhrase("GreetingIntro")
 
 		simulatorName := this.Simulator
 

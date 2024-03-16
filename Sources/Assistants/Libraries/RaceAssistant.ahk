@@ -3013,9 +3013,10 @@ class GridRaceAssistant extends RaceAssistant {
 	}
 
 	prepareSession(&settings, &data, formationLap := true) {
+		local prepared := this.Prepared
 		local facts := super.prepareSession(&settings, &data, formationLap)
 
-		this.initializeGridPosition(data, formationLap)
+		this.initializeGridPosition(data, !prepared && formationLap)
 
 		return facts
 	}

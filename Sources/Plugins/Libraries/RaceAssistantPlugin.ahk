@@ -59,6 +59,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	iRaceAssistantZombie := false
 
 	iRaceAssistantActive := false
+	iRaceAssistantPrepared := false
 
 	iNextSessionUpdate := false
 
@@ -625,6 +626,16 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		}
 	}
 
+	RaceAssistantPrepared {
+		Get {
+			return this.iRaceAssistantPrepared
+		}
+
+		Set {
+			return (this.iRaceAssistantPrepared := value)
+		}
+	}
+
 	RaceAssistantEnabled {
 		Get {
 			return this.iRaceAssistantEnabled
@@ -1188,12 +1199,14 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			if assistant.requireRaceAssistant() {
 				settings := assistant.prepareSettings(data)
 
-				assistant.prepareSession(settings, data)
+				if !assistant.hasPrepared(settings, data, this.LapRunning + 1)
+					assistant.prepareSession(settings, data)
 
 				if first {
 					first := false
 
-					RaceAssistantPlugin.Simulator.prepareSession(settings, data)
+					if !RaceAssistantPlugin.Simulator.hasPrepared(settings, data, this.LapRunning + 1)
+						RaceAssistantPlugin.Simulator.prepareSession(settings, data)
 				}
 			}
 	}
@@ -1560,43 +1573,6 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			return false
 	}
 
-	/*
-	static lastLap(data, &overLap) {
-		local driverCar := getMultiMapValue(data, "Position Data", "Driver.Car")
-		local sessionTimeRemaining, driverCar, time, running
-
-		overLap := 0
-
-		if (getMultiMapValue(data, "Session Data", "SessionFormat") = "Time") {
-			sessionTimeRemaining := getMultiMapValue(data, "Session Data", "SessionTimeRemaining", 0)
-
-			if (sessionTimeRemaining < (getMultiMapValue(data, "Position Data", "Car." . driverCar . ".Time", 0) * 2)) {
-				loop getMultiMapValue(data, "Position Data", "Car.Count")
-					if (getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Position") = 1) {
-						time := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Time")
-						running := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Lap.Running")
-
-						if ((sessionTimeRemaining - ((1 - running) * time)) <= 0) {
-							if (driverCar != A_Index)
-								if (getMultiMapValue(data, "Position Data", "Car." . driverCar . ".Lap.Running") > running)
-									overLap := 1
-
-							return true
-						}
-
-						break
-					}
-
-				return (sessionTimeRemaining <= 0)
-			}
-			else
-				return false
-		}
-		else
-			return (getMultiMapValue(data, "Session Data", "SessionLapsRemaining", 0) <= 0)
-	}
-	*/
-
 	activate() {
 		super.activate()
 
@@ -1882,6 +1858,15 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		}
 	}
 
+	hasPrepared(settings, data, count) {
+		local result := this.RaceAssistantPrepared
+
+		if (getMultiMapValue(data, "Position Data", "Car.Count", 0) > 0)
+			this.RaceAssistantPrepared := true
+
+		return result
+	}
+
 	prepareSession(settings, data) {
 		local dataFile, settingsFile
 
@@ -1945,7 +1930,8 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		if this.RaceAssistant {
 			this.RaceAssistant.finishSession(finalize)
 
-			 this.RaceAssistantActive := false
+			this.RaceAssistantActive := false
+			this.RaceAssistantPrepared := false
 
 			if shutdown
 				this.shutdownRaceAssistant()
@@ -2376,8 +2362,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 						RaceAssistantPlugin.WaitForShutdown[true] := false
 
-						if (RaceAssistantPlugin.LapRunning = 0)
-							RaceAssistantPlugin.prepareAssistantsSession(data)
+						RaceAssistantPlugin.prepareAssistantsSession(data)
 
 						RaceAssistantPlugin.sLapRunning := RaceAssistantPlugin.LapRunning + 1
 					}

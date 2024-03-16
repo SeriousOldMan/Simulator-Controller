@@ -233,7 +233,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 
 		super.prepareSession(settings, data)
 
-		if pid {
+		if (pid && !this.LapRunning) {
 			dataFile := (kTempDirectory . "Practice Lap 0.0.data")
 
 			writeMultiMap(dataFile, data)
@@ -317,7 +317,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 		local collectTelemetry, trafficAnalysis, ignore, session
 
 		settings := super.loadSettings(simulator, car, track, data, settings)
-		
+
 		if this.StartupSettings {
 			collectTelemetry := getMultiMapValue(this.StartupSettings, "Functions", "Telemetry Collection", kUndefined)
 

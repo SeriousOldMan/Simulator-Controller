@@ -1474,6 +1474,9 @@ class RaceSpotter extends GridRaceAssistant {
 		local situation, sessionDuration, lapTime, sessionEnding, minute, lastTemperature, stintLaps
 		local minute, rnd, phrase, bestLapTime, lastTopSpeed, ignore
 
+		if isDebug()
+			logMessage(kLogDebug, "SessionInformation: " . lastLap . ", " . regular . " Positions: " . (positions != false) . " Remaining: " . remainingSessionLaps . ", " . remainingStintLaps)
+
 		if ((remainingSessionLaps = kUndefined) || (remainingStintLaps = kUndefined))
 			return false
 
@@ -2648,6 +2651,9 @@ class RaceSpotter extends GridRaceAssistant {
 			if (lastLap > 1)
 				this.updatePositionInfos(lastLap, sector, positions)
 
+			if isDebug()
+				logMessage(kLogDebug, "UpdateDriver: " . lastLap . ", " . sector . " Driver: " . (this.DriverCar != false) . ", " . (this.DriverCar && this.DriverCar.InPit) . " Race: " . raceInfo)
+
 			if (this.DriverCar && !this.DriverCar.InPit && newSector) {
 				if raceInfo {
 					deltaInformation := this.Announcements["DeltaInformation"]
@@ -3397,6 +3403,9 @@ class RaceSpotter extends GridRaceAssistant {
 
 		if !this.MultiClass
 			hasGaps := this.adjustGaps(data, &gapAhead, &gapBehind)
+
+		if isDebug()
+			logMessage(kLogDebug, "UpdateLap: " . lapNumber . ", " . this.LastLap . " Sector: " . sector ", " . newSector)
 
 		if (lapNumber = this.LastLap) {
 			this.iPositions := this.computePositions(data, hasGaps ? gapAhead : false, hasGaps ? gapBehind : false)

@@ -1312,12 +1312,12 @@ int main(int argc, char* argv[])
 			checkCoordinates();
 		else if (active()) {
 			bool startGo = (gf->flag == AC_GREEN_FLAG);
+
+			if (!greenFlagReported && (counter > 8000))
+				greenFlagReported = true;
 			
 			if (!running) {
 				countdown -= 1;
-
-				// if (!greenFlagReported && ((countdown <= 0) || (pf->speedKmh >= 200)))
-				//	greenFlagReported = true;
 
 				running = (startGo || (countdown <= 0) || (pf->speedKmh >= 200));
 			}

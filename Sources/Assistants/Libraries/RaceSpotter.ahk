@@ -2868,7 +2868,7 @@ class RaceSpotter extends GridRaceAssistant {
 	greenFlag(arguments*) {
 		local speaker
 
-		if (this.Speaker[false] && (this.Session = kSessionRace) && this.Running)
+		if (this.Speaker[false] && (this.Session = kSessionRace) && this.Running && (this.KnowledgeBase.getValue("Lap", 0) = 0))
 			this.getSpeaker(true).speakPhrase("Green", false, false, "Green")
 	}
 

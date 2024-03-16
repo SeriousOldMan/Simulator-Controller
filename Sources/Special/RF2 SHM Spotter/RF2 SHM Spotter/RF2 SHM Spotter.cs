@@ -1657,12 +1657,12 @@ namespace RF2SHMSpotter {
 						{
 							bool startGo = (scoring.mScoringInfo.mGamePhase == (byte)rF2GamePhase.GreenFlag);
 
-							if (!running)
+                            if (!greenFlagReported && (counter > 8000))
+                            	greenFlagReported = true;
+
+                            if (!running)
 							{
 								countdown -= 1;
-
-								// if (!greenFlagReported && (countdown <= 0))
-								//	greenFlagReported = true;
 
 								if (startGo || (countdown <= 0))
 									running = true;

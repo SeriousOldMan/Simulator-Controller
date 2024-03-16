@@ -964,7 +964,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 		this.updateSessionValues({Standings: [], Laps: Map()})
 
-		this.initializeGridPosition(data)
+		; this.initializeGridPosition(data)
 
 		if this.Debug[kDebugKnowledgeBase]
 			this.dumpKnowledgeBase(this.KnowledgeBase)

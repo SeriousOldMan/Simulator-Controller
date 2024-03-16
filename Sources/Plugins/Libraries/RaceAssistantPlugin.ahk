@@ -365,7 +365,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				stateLap := getMultiMapValue(sessionState, "Session State", "Lap", false)
 				dataLap := getMultiMapValue(this.Data, "Stint Data", "Laps", false)
 
-				if (!dataLap || !stateLap || Abs(dataLap - stateLap) <= 5) {
+				if (!dataLap || !stateLap || (Abs(dataLap - stateLap) <= 5)) {
 					if (isDebug() && isLogLevel(kLogDebug))
 						showMessage("Restoring session state for " . raceAssistant.Plugin)
 
@@ -1334,7 +1334,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			if (assistant.requireRaceAssistant() && assistant.RaceAssistantActive)
 				assistant.restoreSessionState(data)
 			else if !assistant.RaceAssistantEnabled
-				assistant.clearSessionState(data)
+				assistant.clearSessionInfo(data)
 	}
 
 	static updateAssistantsSession(session := kUndefined) {
@@ -2128,7 +2128,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			RaceAssistantPlugin.RestoreSessionStateTask(this, data).start()
 	}
 
-	clearSessionState(data) {
+	clearSessionInfo(data) {
 		local teamServer := this.TeamServer
 
 		if (teamServer && teamServer.SessionActive && this.TeamSessionActive)

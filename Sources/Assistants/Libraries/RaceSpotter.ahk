@@ -3166,7 +3166,7 @@ class RaceSpotter extends GridRaceAssistant {
 								, EnoughData: false})
 
 		this.initializeHistory()
-		this.initializeGridPosition(data)
+		; this.initializeGridPosition(data)
 
 		this.startupSpotter()
 

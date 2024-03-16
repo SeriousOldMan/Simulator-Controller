@@ -3006,7 +3006,7 @@ class GridRaceAssistant extends RaceAssistant {
 		if isDebug()
 			logMessage(kLogDebug, "Grid Position: " . this.getPosition(driver, "Overall", data) . ", " . this.getPosition(driver, "Class", data) . "; Force: " . (force ? kTrue : kFalse) . "; Position: " . this.GridPosition)
 
-		if ((force || !this.GridPosition) && count && driver && (getMultiMapValue(data, "Stint Data", "Laps", 0) <= 1)) {
+		if ((force || !this.GridPosition) && count && driver) {
 			this.iOverallGridPosition := this.getPosition(driver, "Overall", data)
 			this.iClassGridPosition := this.getPosition(driver, "Class", data)
 		}
@@ -3049,16 +3049,15 @@ class GridRaceAssistant extends RaceAssistant {
 
 	updateLap(lapNumber, &data) {
 		local knowledgeBase := this.KnowledgeBase
-		local driver, lapValid, lapPenalty, result, noGrid
+		local noGrid := !this.GridPosition
+		local driver, lapValid, lapPenalty, result
 
 		if !isObject(data)
 			data := readMultiMap(data)
 
-		noGrid := !this.GridPosition
-
 		this.initializeGridPosition(data)
 
-		if this.GridPosition
+		if (noGrid && this.GridPosition)
 			knowledgeBase.setFact("Grid", lapNumber)
 
 		driver := getMultiMapValue(data, "Position Data", "Driver.Car", false)

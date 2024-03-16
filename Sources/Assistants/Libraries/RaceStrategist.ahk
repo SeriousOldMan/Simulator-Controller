@@ -1793,7 +1793,6 @@ class RaceStrategist extends GridRaceAssistant {
 		local driverForname := ""
 		local driverSurname := ""
 		local driverNickname := ""
-		local noGrid := !this.GridPosition
 		local knowledgeBase, compound, result, lap, simulator, car, track, frequency, curContinuation
 		local pitstop, prefix, validLap, lapState, weather, airTemperature, trackTemperature, compound, compoundColor
 		local fuelConsumption, fuelRemaining, lapTime, map, tc, antiBS, pressures, temperatures, wear, multiClass
@@ -1982,13 +1981,12 @@ class RaceStrategist extends GridRaceAssistant {
 
 	updateLap(lapNumber, &data) {
 		local knowledgeBase := this.KnowledgeBase
+		local noGrid := !this.GridPosition
 		local updateStrategy := false
 		local sector, result, valid
-		local simulator, car, track, noGrid
+		local simulator, car, track
 
 		static lastSector := 1
-
-		noGrid := !this.GridPosition
 
 		if !isObject(data)
 			data := readMultiMap(data)
@@ -2025,7 +2023,7 @@ class RaceStrategist extends GridRaceAssistant {
 		if (!this.RaceInfo || (this.RaceInfo["Cars"] = 0))
 			this.updateRaceInfo(this.createRaceData(data))
 
-		if (noGrid && this.GridPosition)
+		if (noGrid && this.GridPosition && (lapNumber <= 1))
 			this.saveStandingsData(lapNumber, simulator, car, track)
 
 		Task.startTask((*) => this.saveSessionInfo(lapNumber, simulator, car, track

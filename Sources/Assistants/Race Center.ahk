@@ -6732,7 +6732,7 @@ class RaceCenter extends ConfigurationItem {
 		local rawData
 
 		if this.LastLap {
-			rawData := this.Connector.GetLapValue(this.LastLap.Identifier, "Telemetry Update")
+			rawData := this.Connector.GetLapValue(this.LastLap.Identifier, "Data Update")
 
 			if (rawData && (rawData != "")) {
 				this.LastLap.Telemetry := rawData

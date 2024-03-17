@@ -1583,7 +1583,11 @@ int main(int argc, char* argv[])
 						lastFlagState = 0;
 					}
 				}
+				else
+					wait = TRUE;
 			}
+			else
+				wait = TRUE;
 		}
         
 		if (analyzeTelemetry)

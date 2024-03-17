@@ -2868,7 +2868,7 @@ class RaceSpotter extends GridRaceAssistant {
 	greenFlag(arguments*) {
 		local speaker
 
-		if (this.Speaker[false] && (this.Session = kSessionRace) && this.Running && (this.KnowledgeBase.getValue("Lap", 0) = 0))
+		if (this.Speaker[false] && (this.Session = kSessionRace) && this.Running && (!this.KnowledgeBase || this.KnowledgeBase.getValue("Lap", 0) <= 1))
 			this.getSpeaker(true).speakPhrase("Green", false, false, "Green")
 	}
 
@@ -3412,7 +3412,7 @@ class RaceSpotter extends GridRaceAssistant {
 		loop knowledgeBase.getValue("Car.Count") {
 			valid := knowledgeBase.getValue("Car." . A_Index . ".Lap.Running.Valid", kUndefined)
 
-			if (valid != kUndefined)
+			if (valid == false)
 				knowledgeBase.setFact("Car." . A_Index . ".Valid.Running", valid)
 		}
 

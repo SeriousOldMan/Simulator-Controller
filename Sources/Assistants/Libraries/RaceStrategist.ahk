@@ -2002,8 +2002,8 @@ class RaceStrategist extends GridRaceAssistant {
 		loop knowledgeBase.getValue("Car.Count") {
 			valid := knowledgeBase.getValue("Car." . A_Index . ".Lap.Running.Valid", kUndefined)
 
-			if (valid != kUndefined)
-				knowledgeBase.setFact("Car." . A_Index . ".Valid.Running", valid)
+			if (valid == false)
+				knowledgeBase.setFact("Car." . A_Index . ".Valid.Running", false)
 		}
 
 		if !this.MultiClass

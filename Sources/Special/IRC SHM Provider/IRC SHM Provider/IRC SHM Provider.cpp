@@ -609,6 +609,15 @@ void writePositions(const irsdk_header *header, const char* data)
 		itoa(atoi(playerCarIdx) + 1, carIdx1, 10);
 
 		printf("Driver.Car=%s\n", carIdx1);
+
+		char* trackPositions;
+		char* trackLocations;
+
+		if (!getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct"))
+			trackPositions = 0;
+
+		if (getRawDataValue(trackLocations, header, data, "CarIdxTrackSurface"))
+			trackLocations = 0;
 		
 		for (int i = 1; ; i++) {
 			itoa(i, posIdx, 10);
@@ -636,10 +645,17 @@ void writePositions(const irsdk_header *header, const char* data)
 
 				printf("Car.%s.Incidents=%s\n", carIdx1, result);
 
-				char* trackPositions;
-				
-				if (getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct"))
+				if (trackPositions)
 					printf("Car.%s.Lap.Running=%f\n", carIdx1, ((float*)trackPositions)[carIndex]);
+
+				if (trackLocations) {
+					irsdk_TrkLoc location = ((irsdk_TrkLoc*)trackLocations)[carIndex];
+
+					if (location == irsdk_OffTrack)
+						printf("Car.%s.Lap.Running.Valid=false\n", carIdx1);
+					else
+						printf("Car.%s.Lap.Running.Valid=true\n", carIdx1);
+				}
 
 				getYamlValue(result, sessionInfo, "DriverInfo:Drivers:CarIdx:{%s}CarScreenName:", carIdx);
 
@@ -929,8 +945,15 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 			printf("DriverNickname=%s\n", nickName);
 
 			char* trackPositions;
+			char* trackLocations;
 
-			if (getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct")) 
+			if (!getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct"))
+				trackPositions = 0;
+
+			if (!getRawDataValue(trackLocations, header, data, "CarIdxTrackSurface"))
+				trackLocations = 0;
+
+			if (trackPositions)
 				printf("Sector=%d\n", (int)min(3, 1 + floor(3 * ((float*)trackPositions)[atoi(playerCarIdx)])));
 
 			if (getDataValue(result, header, data, "PlayerCarPosition"))
@@ -939,9 +962,12 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 			printf("Laps=%s\n", itoa(laps, result, 10));
 
 			bool valid = true;
-			
-			// if (getDataValue(result, header, data, "LapDeltaToBestLap_OK"))
-			//	valid = (result > 0);
+
+			if (trackLocations) {
+				irsdk_TrkLoc location = ((irsdk_TrkLoc*)trackLocations)[atoi(playerCarIdx)];
+
+				valid = (location != irsdk_OffTrack);
+			}
 
 			printf("LapValid=%s\n", valid ? "true" : "false");
 
@@ -961,10 +987,15 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 			printf("StintTimeRemaining=%ld\n", timeRemaining);
 			printf("DriverTimeRemaining=%ld\n", timeRemaining);
 
-			if (getDataValue(result, header, data, "CarIdxTrackSurface"))
-				printf("InPit=%s\n", (atoi(result) == irsdk_InPitStall) ? "true" : "false");
+			if (trackLocations) {
+				irsdk_TrkLoc location = ((irsdk_TrkLoc*)trackLocations)[atoi(playerCarIdx)];
+				if (location == irsdk_InPitStall)
+					printf("InPit=true");
+				else
+					printf("InPit=false");
+			}
 			else
-				printf("InPit=false\n");
+				printf("InPit=false");
 
 			printf("[Track Data]\n");
 

@@ -1695,8 +1695,12 @@ namespace RF2SHMSpotter {
 
 									lastFlagState = 0;
 								}
-							}
+                            }
+                            else
+                                wait = true;
                         }
+                        else
+                            wait = true;
 
                         if (analyzeTelemetry)
                             Thread.Sleep(10);

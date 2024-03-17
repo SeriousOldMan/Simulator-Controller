@@ -1353,7 +1353,7 @@ int main(int argc, char* argv[])
 				}
 				else {
 					longitudinalRearDistance = 5;
-			
+
 					lastSituation = CLEAR;
 					carBehind = false;
 					carBehindLeft = false;
@@ -1363,7 +1363,11 @@ int main(int argc, char* argv[])
 					lastFlagState = 0;
 				}
 			}
+			else
+				wait = true;
 		}
+		else
+			wait = true;
 		
 		if (analyzeTelemetry)
 			Sleep(10);

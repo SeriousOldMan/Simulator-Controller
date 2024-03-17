@@ -629,6 +629,15 @@ void writePositions(std::ostringstream* output, const irsdk_header *header, cons
 
 		printLine(output, "Driver.Car=" + std::string(carIdx1));
 		
+		char* trackPositions;
+		char* trackLocations;
+
+		if (!getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct"))
+			trackPositions = 0;
+
+		if (getRawDataValue(trackLocations, header, data, "CarIdxTrackSurface"))
+			trackLocations = 0;
+
 		for (int i = 1; ; i++) {
 			itoa(i, posIdx, 10);
 			
@@ -655,10 +664,17 @@ void writePositions(std::ostringstream* output, const irsdk_header *header, cons
 
 				printLine(output, "Car." + std::string(carIdx1) + ".Incidents=" + std::string(result));
 
-				char* trackPositions;
-				
-				if (getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct"))
+				if (trackPositions)
 					printLine(output, "Car." + std::string(carIdx1) + ".Lap.Running=" + std::to_string(((float*)trackPositions)[carIndex]));
+
+				if (trackLocations) {
+					irsdk_TrkLoc location = ((irsdk_TrkLoc*)trackLocations)[carIndex];
+
+					if (location == irsdk_OffTrack)
+						printLine(output, "Car." + std::string(carIdx1) + ".Lap.Running.Valid=false");
+					else
+						printLine(output, "Car." + std::string(carIdx1) + ".Lap.Running.Valid=true");
+				}
 
 				getYamlValue(result, sessionInfo, "DriverInfo:Drivers:CarIdx:{%s}CarScreenName:", carIdx);
 
@@ -933,8 +949,15 @@ void writeData(std::ostringstream * output, const irsdk_header *header, const ch
 			printLine(output, "DriverNickname=" + std::string(nickName));
 
 			char* trackPositions;
+			char* trackLocations;
 
-			if (getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct")) 
+			if (!getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct"))
+				trackPositions = 0;
+
+			if (!getRawDataValue(trackLocations, header, data, "CarIdxTrackSurface"))
+				trackLocations = 0;
+
+			if (trackPositions)
 				printLine(output, "Sector=" + std::to_string((int)min(3, 1 + floor(3 * ((float*)trackPositions)[atoi(playerCarIdx)]))));
 
 			if (getDataValue(result, header, data, "PlayerCarPosition"))
@@ -944,8 +967,11 @@ void writeData(std::ostringstream * output, const irsdk_header *header, const ch
 
 			bool valid = true;
 			
-			// if (getDataValue(result, header, data, "LapDeltaToBestLap_OK"))
-			//	valid = (atoi(result) > 0);
+			if (trackLocations) {
+				irsdk_TrkLoc location = ((irsdk_TrkLoc*)trackLocations)[atoi(playerCarIdx)];
+
+				valid = (location != irsdk_OffTrack);
+			}
 
 			if (valid)
 				printLine(output, "LapValid=true");
@@ -968,8 +994,8 @@ void writeData(std::ostringstream * output, const irsdk_header *header, const ch
 			printLine(output, "StintTimeRemaining=" + std::to_string(timeRemaining));
 			printLine(output, "DriverTimeRemaining=" + std::to_string(timeRemaining));
 
-			if (getDataValue(result, header, data, "CarIdxTrackSurface")) {
-				if (atoi(result) == irsdk_InPitStall)
+			if (trackLocations) {
+				if (((irsdk_TrkLoc*)trackLocations)[atoi(playerCarIdx)] == irsdk_InPitStall)
 					printLine(output, "InPit=true");
 				else
 					printLine(output, "InPit=false");

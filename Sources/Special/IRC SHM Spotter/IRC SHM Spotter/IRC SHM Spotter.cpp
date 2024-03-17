@@ -1747,7 +1747,6 @@ int main(int argc, char* argv[])
 					else if (positionTrigger)
 						checkCoordinates(pHeader, g_data, trackLength);
 					else if (active(pHeader, g_data)) {
-
 						if (!greenFlagReported && (counter > 8000))
 							greenFlagReported = true;
 
@@ -1829,7 +1828,11 @@ int main(int argc, char* argv[])
 								Sleep(1000);
 							}
 						}
+						else
+							wait = true;
 					}
+					else
+						wait = true;
 				}
 				else
 					Sleep(1000);

@@ -574,7 +574,7 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 
 	itoa(getCurrentSessionID(sessionInfo), sessionID, 10);
 
-	float milliSeconds = GetTickCount() - lastTickCount;
+	long milliSeconds = GetTickCount() - lastTickCount;
 
 	if (milliSeconds < 10)
 		return false;
@@ -1837,6 +1837,9 @@ int main(int argc, char* argv[])
 				else
 					Sleep(1000);
 			}
+
+			if (g_data)
+				delete g_data;
 		}
 
 		if (analyzeTelemetry)

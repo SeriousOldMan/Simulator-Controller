@@ -1244,6 +1244,9 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 
 	strcpy_s(result, size, output.str().c_str());
 
+	if (g_data)
+		delete g_data;
+
 	return 0;
 }
 

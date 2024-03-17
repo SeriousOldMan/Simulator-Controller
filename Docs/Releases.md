@@ -1,3 +1,6 @@
+## 5.6.3.2-release 03/17/24
+  1. Fixed a critical bug in "Race Center" which caused standings information only being loaded for the starting driver.
+
 ## 5.6.3.1-release 03/16/24
   1. Fixed a critical bug in the Spotter for iRacing which prevented proper startup in some cases.
 

@@ -1,14 +1,14 @@
 [Development]
-Version=5.6.4.0-dev
-Target=5.6.4.0-release
-Date=03/16/2024
-Download=
-Changes=Fixed starting position for iRacing
+Version=5.6.3.2-release
+Target=5.6.3.2-release
+Date=03/17/2024
+Download=https://cutt.ly/uw2o3Euu;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.6.3.2-release.zip
+Changes=Fixed Fixed loading of standings in the "Race Center"
 Components=Media->5.6.1,Configuration->5.6.1,Utilities->5.4.8
 [Release]
-Version=5.6.3.1-release
-Date=03/16/2024
-Download=https://cutt.ly/Pw06N805;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.6.3.1-release.zip
+Version=5.6.3.2-release
+Date=03/17/2024
+Download=https://cutt.ly/uw2o3Euu;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.6.3.2-release.zip
 Changes=Added customizing for "Simulator Setup", Initial support for rain and track wetness for iRacing, Spotter informs about accidents and slow cars, Extended configuration for the Spotter in "Simulator Setup" and "Simulator Configuration", Extended announcements voice command for Spotter, New settings in the "Session Database" to define the distance for slow cars and accidents
 Components=Media->5.6.1,Configuration->5.6.1,Utilities->5.4.8
 [Components]
@@ -28,7 +28,7 @@ Utilities.5.4.8.Path=.
 Utilities.5.4.8.Content=Utilities
 Utilities.5.4.8.Download=https://www.dropbox.com/scl/fi/5nduffajjm3x6rhsxr1nk/Utilities-5.4.8.zip?rlkey=alrj8l2z205dd2vm9cu6hbsot&dl=1
 [Current]
-Type=Development
+Type=Release
 [Version]
-Development=5.6.4.0-release
-Release=5.6.3.1-release
+Development=5.6.3.2-release
+Release=5.6.3.2-release

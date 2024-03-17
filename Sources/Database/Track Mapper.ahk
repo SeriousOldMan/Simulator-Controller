@@ -207,7 +207,8 @@ createTrackMap(simulator, track, fileName) {
 			setMultiMapValue(trackMapperState, "Track Mapper", "Points", 0)
 
 			for ignore, coordinate in coordinates {
-				normalized[Round(coordinate[1] * 1000)] := [coordinate[2], coordinate[3]]
+				if (coordinate[1] != 0.0)
+					normalized[Round(coordinate[1] * 1000)] := [coordinate[2], coordinate[3]]
 
 				Sleep(1)
 

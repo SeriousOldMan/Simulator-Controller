@@ -3,7 +3,7 @@ Version=5.6.4.0-dev
 Target=5.6.4.0-release
 Date=03/17/2024
 Download=
-Changes=Fixed pitstop and pitlane detection for iRacing, Fixed green flag regression, Invalid laps for iRacing, Default for "Pitstop Tyre Service" is now recognized for iRacing, Fixed memory leak in iRacing connector
+Changes=Fixed pitstop and pitlane detection for iRacing, Fixed green flag regression, Invalid laps for iRacing, Default for "Pitstop Tyre Service" is now recognized for iRacing, Fixed memory leak in iRacing connector, Fixed Track Mapper for iRacing
 Components=Media->5.6.1,Configuration->5.6.1,Utilities->5.4.8
 [Release]
 Version=5.6.3.2-release

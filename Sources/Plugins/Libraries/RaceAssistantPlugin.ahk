@@ -1832,16 +1832,6 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		return settings
 	}
 
-	prepareSettings(data) {
-		local settings := this.loadSettings(getMultiMapValue(data, "Session Data", "Simulator")
-										  , getMultiMapValue(data, "Session Data", "Car")
-										  , getMultiMapValue(data, "Session Data", "Track"), data)
-
-		writeMultiMap(kTempDirectory . this.Plugin . ".settings", settings)
-
-		return settings
-	}
-
 	reloadSettings(settings) {
 		local settingsFileName := (kTempDirectory . this.Plugin . ".settings")
 		local simulator
@@ -1865,6 +1855,19 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			this.RaceAssistantPrepared := true
 
 		return result
+	}
+
+	prepareSettings(data) {
+		local settings := this.loadSettings(getMultiMapValue(data, "Session Data", "Simulator")
+										  , getMultiMapValue(data, "Session Data", "Car")
+										  , getMultiMapValue(data, "Session Data", "Track"), data)
+
+		if this.Simulator
+			settings := this.Simulator.prepareSettings(settings, data)
+
+		writeMultiMap(kTempDirectory . this.Plugin . ".settings", settings)
+
+		return settings
 	}
 
 	prepareSession(settings, data) {

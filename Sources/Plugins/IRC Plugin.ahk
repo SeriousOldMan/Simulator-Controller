@@ -211,6 +211,15 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 		return true
 	}
 
+	prepareSettings(settings, data) {
+		settings := super.prepareSettings(settings, data)
+
+		if (getMultiMapValue(settings, "Simulator.iRacing", "Pitstop.Service.Tyres", kUndefined) == kUndefined)
+			setMultiMapValue(settings, "Simulator.iRacing", "Pitstop.Service.Tyres", false)
+
+		return settings
+	}
+
 	prepareSession(settings, data) {
 		SessionDatabase.registerTrack(getMultiMapValue(data, "Session Data", "Simulator", "Unknown")
 									, getMultiMapValue(data, "Session Data", "Car", "Unknown")

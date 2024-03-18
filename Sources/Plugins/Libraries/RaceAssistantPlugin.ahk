@@ -1212,8 +1212,8 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	}
 
 	static acquireSessionData(&telemetryData, &positionsData, finished := false) {
-		if RaceAssitantPlugin.Simulator {
-			RaceAssitantPlugin.Simulator.acquireSessionData(&telemetryData, &positionsData, finished)
+		if RaceAssistantPlugin.Simulator {
+			RaceAssistantPlugin.Simulator.acquireSessionData(&telemetryData, &positionsData, finished)
 
 			data := newMultiMap()
 
@@ -1243,9 +1243,6 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		positionsData := newMultiMap()
 
 		setMultiMapValues(positionsData, "Position Data", getMultiMapValues(data, "Position Data"))
-
-		RaceAssistantPlugin.updateAssistantsTelemetryData(telemetryData)
-		RaceAssistantPlugin.updateAssistantsPositionsData(positionsData)
 
 		data := newMultiMap()
 

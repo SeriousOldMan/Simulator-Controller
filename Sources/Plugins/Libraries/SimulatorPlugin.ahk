@@ -1001,6 +1001,8 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 
 	startSession(settings, data) {
 		this.prepareSession(settings, data)
+
+		this.iHasPositionsData := (getMultiMapValue(data, "Position Data", "Car.Count", 0) > 0)
 	}
 
 	finishSession() {

@@ -608,9 +608,9 @@ namespace RF2SHMSpotter {
         class SlowCarInfo
         {
 			public int vehicle;
-			public int distance;
+			public long distance;
 
-			public SlowCarInfo(int vehicle, int distance)
+			public SlowCarInfo(int vehicle, long distance)
 			{
 				this.vehicle = vehicle;
 				this.distance = distance;
@@ -643,8 +643,8 @@ namespace RF2SHMSpotter {
 
 						if ((slot.count > 20) && (speed < (slot.speed / 2)))
 						{
-							int distanceAhead = (int)(((vehicle.mLapDist > playerScoring.mLapDist) ? vehicle.mLapDist
-																								   : (vehicle.mLapDist + scoring.mScoringInfo.mLapDist)) - playerScoring.mLapDist);
+							long distanceAhead = (long)(((vehicle.mLapDist > playerScoring.mLapDist) ? vehicle.mLapDist
+																								     : (vehicle.mLapDist + scoring.mScoringInfo.mLapDist)) - playerScoring.mLapDist);
 
 							if (distanceAhead < slowCarDistance)
 								slowCarsAhead.Add(new SlowCarInfo(i, distanceAhead));
@@ -654,8 +654,8 @@ namespace RF2SHMSpotter {
 								if (distanceAhead < aheadAccidentDistance)
 									accidentsAhead.Add(new SlowCarInfo(i, distanceAhead));
 
-								int distanceBehind = (int)(((vehicle.mLapDist < playerScoring.mLapDist) ? playerScoring.mLapDist
-																										: (playerScoring.mLapDist + scoring.mScoringInfo.mLapDist)) - vehicle.mLapDist);
+								long distanceBehind = (long)(((vehicle.mLapDist < playerScoring.mLapDist) ? playerScoring.mLapDist
+																										  : (playerScoring.mLapDist + scoring.mScoringInfo.mLapDist)) - vehicle.mLapDist);
 
 								if (distanceBehind < behindAccidentDistance)
 									accidentsBehind.Add(new SlowCarInfo(i, distanceBehind));
@@ -670,7 +670,7 @@ namespace RF2SHMSpotter {
 			{
 				if (cycle > nextAccidentAhead)
 				{
-					int distance = int.MaxValue;
+					long distance = long.MaxValue;
 
 					nextAccidentAhead = cycle + 400;
 					nextSlowCarAhead = cycle + 400;
@@ -691,7 +691,7 @@ namespace RF2SHMSpotter {
 			{
 				if (cycle > nextSlowCarAhead)
 				{
-					int distance = int.MaxValue;
+					long distance = long.MaxValue;
 
 					nextSlowCarAhead = cycle + 400;
 
@@ -711,7 +711,7 @@ namespace RF2SHMSpotter {
 			{
 				if (cycle > nextAccidentBehind)
 				{
-					int distance = int.MaxValue;
+					long distance = long.MaxValue;
 
 					nextAccidentBehind = cycle + 400;
 

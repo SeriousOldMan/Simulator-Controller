@@ -495,7 +495,7 @@ void updateIdealLine(int vehicleId, double running, double speed) {
 typedef struct
 {
 	int vehicle;
-	int distance;
+	long distance;
 } slow_car_info;
 
 slow_car_info accidentsAhead[10];
@@ -528,7 +528,7 @@ BOOL checkAccident() {
 
 			if ((slot->count > 20) && (speed < (slot->speed / 2)))
 			{
-				int distanceAhead = (int)(((carDistance > driverDistance) ? carDistance : (carDistance + map_buffer->layout_length)) - driverDistance);
+				long distanceAhead = (long)(((carDistance > driverDistance) ? carDistance : (carDistance + map_buffer->layout_length)) - driverDistance);
 
 				if ((distanceAhead < slowCarDistance) && (slowCarsAheadCount < 10)) {
 					slowCarsAhead[slowCarsAheadCount].vehicle = id;
@@ -546,7 +546,7 @@ BOOL checkAccident() {
 						accidentsAheadCount += 1;
 					}
 
-					int distanceBehind = (int)(((carDistance < driverDistance) ? driverDistance : (driverDistance + map_buffer->layout_length)) - carDistance);
+					long distanceBehind = (long)(((carDistance < driverDistance) ? driverDistance : (driverDistance + map_buffer->layout_length)) - carDistance);
 
 					if ((distanceBehind < behindAccidentDistance) && (accidentsBehindCount < 10)) {
 						accidentsBehind[accidentsBehindCount].vehicle = id;

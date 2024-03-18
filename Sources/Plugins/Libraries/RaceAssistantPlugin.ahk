@@ -1191,7 +1191,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		return activeAssistant
 	}
 
-	static prepareAssistantsSession(data) {
+	static prepareAssistantsSession(data, count) {
 		local first := true
 		local ignore, assistant, settings
 
@@ -1199,16 +1199,57 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			if assistant.requireRaceAssistant() {
 				settings := assistant.prepareSettings(data)
 
-				if !assistant.hasPrepared(settings, data, this.LapRunning + 1)
+				if !assistant.hasPrepared(settings, data, count)
 					assistant.prepareSession(settings, data)
 
 				if first {
 					first := false
 
-					if !RaceAssistantPlugin.Simulator.hasPrepared(settings, data, this.LapRunning + 1)
+					if !RaceAssistantPlugin.Simulator.hasPrepared(settings, data, count)
 						RaceAssistantPlugin.Simulator.prepareSession(settings, data)
 				}
 			}
+	}
+
+	static acquireSessionData(&telemetryData, &positionsData, finished := false) {
+		if RaceAssistantPlugin.Simulator {
+			RaceAssistantPlugin.Simulator.acquireSessionData(&telemetryData, &positionsData, finished)
+
+			data := newMultiMap()
+
+			setMultiMapValue(data, "System", "Time", A_TickCount)
+
+			RaceAssistantPlugin.updateAssistantsTelemetryData(telemetryData)
+			RaceAssistantPlugin.updateAssistantsPositionsData(positionsData)
+
+			addMultiMapValues(data, telemetryData)
+			addMultiMapValues(data, positionsData)
+
+			return data
+		}
+		else
+			return newMultiMap()
+	}
+
+	static readSessionData(fileName, &telemetryData, &positionsData) {
+		local data := readMultiMap(fileName)
+
+		setMultiMapValue(data, "System", "Time", A_TickCount)
+
+		telemetryData := data.Clone()
+
+		removeMultiMapValues(telemetryData, "Position Data")
+
+		positionsData := newMultiMap()
+
+		setMultiMapValues(positionsData, "Position Data", getMultiMapValues(data, "Position Data"))
+
+		data := newMultiMap()
+
+		addMultiMapValues(data, telemetryData)
+		addMultiMapValues(data, positionsData)
+
+		return data
 	}
 
 	static startAssistantsSession(data) {
@@ -2234,18 +2275,11 @@ class RaceAssistantPlugin extends ControllerPlugin {
 						ExitApp(0)
 				}
 
-				data := readMultiMap(RaceAssistantPlugin.ReplayDirectory . "Race Engineer Lap " . replayLap . "." . replayIndex . ".data")
-
-				telemetryData := data.Clone()
-
-				removeMultiMapValues(telemetryData, "Position Data")
-
-				positionsData := newMultiMap()
-
-				setMultiMapValues(positionsData, "Position Data", getMultiMapValues(data, "Position Data"))
+				data := RaceAssistantPlugin.readSessionData(RaceAssistantPlugin.ReplayDirectory . "Race Engineer Lap " . replayLap . "." . replayIndex . ".data"
+														  , &telemetryData, &positionsData)
 			}
 			else
-				data := RaceAssistantPlugin.Simulator.acquireSessionData(&telemetryData, &positionsData)
+				data := RaceAssistantPlugin.acquireSessionData(&telemetryData, &positionsData)
 
 			if isDebug() {
 				logMessage(kLogInfo, "Collect session data (Data Acquisition):" . (A_TickCount - splitTime) . " ms...")
@@ -2365,9 +2399,9 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 						RaceAssistantPlugin.WaitForShutdown[true] := false
 
-						RaceAssistantPlugin.prepareAssistantsSession(data)
-
 						RaceAssistantPlugin.sLapRunning := RaceAssistantPlugin.LapRunning + 1
+
+						RaceAssistantPlugin.prepareAssistantsSession(data, RaceAssistantPlugin.LapRunning)
 					}
 					else if (dataLastLap > 0) {
 						; Car has finished the first lap
@@ -2446,8 +2480,8 @@ class RaceAssistantPlugin extends ControllerPlugin {
 								  && (getMultiMapValue(data, "Session Data", "SessionLapsRemaining", 0) <= 0))
 								finished := true
 
-							if finished
-								data := RaceAssistantPlugin.Simulator.acquireSessionData(&telemetryData, &positionsData, true)
+							if (finished && !RaceAssistantPlugin.ReplayDirectory)
+								data := RaceAssistantPlugin.acquireSessionData(&telemetryData, &positionsData, true)
 						}
 
 						if firstLap {

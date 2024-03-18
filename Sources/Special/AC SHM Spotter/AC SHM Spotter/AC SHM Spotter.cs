@@ -641,9 +641,9 @@ namespace ACSHMSpotter {
         class SlowCarInfo
         {
             public int vehicle;
-            public int distance;
+            public long distance;
 
-            public SlowCarInfo(int vehicle, int distance)
+            public SlowCarInfo(int vehicle, long distance)
             {
                 this.vehicle = vehicle;
                 this.distance = distance;
@@ -680,8 +680,8 @@ namespace ACSHMSpotter {
 						if ((slot.count > 20) && (speed < (slot.speed / 2)))
 						{
 							double carLapDistance = car.splinePosition * staticInfo.TrackSPlineLength;
-							int distanceAhead = (int)(((carLapDistance > driverLapDistance) ? carLapDistance
-																							: (carLapDistance + staticInfo.TrackSPlineLength)) - driverLapDistance);
+							long distanceAhead = (long)(((carLapDistance > driverLapDistance) ? carLapDistance
+																							  : (carLapDistance + staticInfo.TrackSPlineLength)) - driverLapDistance);
 
 							if (distanceAhead < slowCarDistance)
 								slowCarsAhead.Add(new SlowCarInfo(i, distanceAhead));
@@ -691,8 +691,8 @@ namespace ACSHMSpotter {
 								if (distanceAhead < aheadAccidentDistance)
 									accidentsAhead.Add(new SlowCarInfo(i, distanceAhead));
 
-								int distanceBehind = (int)(((carLapDistance < driverLapDistance) ? driverLapDistance
-																								 : (driverLapDistance + staticInfo.TrackSPlineLength)) - carLapDistance);
+								long distanceBehind = (long)(((carLapDistance < driverLapDistance) ? driverLapDistance
+																								   : (driverLapDistance + staticInfo.TrackSPlineLength)) - carLapDistance);
 
 								if (distanceBehind < behindAccidentDistance)
 									accidentsBehind.Add(new SlowCarInfo(i, distanceBehind));
@@ -706,7 +706,7 @@ namespace ACSHMSpotter {
 				{
 					if (cycle > nextAccidentAhead)
 					{
-						int distance = int.MaxValue;
+						long distance = long.MaxValue;
 
 						nextAccidentAhead = cycle + 400;
 						nextSlowCarAhead = cycle + 400;
@@ -727,7 +727,7 @@ namespace ACSHMSpotter {
 				{
 					if (cycle > nextSlowCarAhead)
 					{
-						int distance = int.MaxValue;
+						long distance = long.MaxValue;
 
 						nextSlowCarAhead = cycle + 400;
 
@@ -747,7 +747,7 @@ namespace ACSHMSpotter {
 				{
 					if (cycle > nextAccidentBehind)
 					{
-						int distance = int.MaxValue;
+						long distance = long.MaxValue;
 
 						nextAccidentBehind = cycle + 400;
 

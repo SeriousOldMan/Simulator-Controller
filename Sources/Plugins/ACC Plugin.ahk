@@ -503,7 +503,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		if !this.iPositionsDataFuture
 			this.iPositionsDataFuture := ACCPlugin.PositionsDataFuture(this)
 
-		return super.acquireSessionData(&telemetryData, &positionsData, finished)
+		super.acquireSessionData(&telemetryData, &positionsData, finished)
 	}
 
 	acquirePositionsData(telemetryData, finished := false) {

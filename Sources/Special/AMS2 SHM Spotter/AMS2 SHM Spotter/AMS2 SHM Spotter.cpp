@@ -441,14 +441,14 @@ class SlowCarInfo
 {
 public:
 	int vehicle;
-	int distance;
+	long distance;
 
 public:
 	SlowCarInfo() :
 		vehicle(0),
 		distance(0) {}
 
-	SlowCarInfo(int v, int d) :
+	SlowCarInfo(int v, long d) :
 		vehicle(v),
 		distance(d) {}
 };
@@ -487,8 +487,8 @@ bool checkAccident(const SharedMemory* sharedData)
 
 				if ((slot.count > 20) && (speed < (slot.speed / 2)))
 				{
-					int distanceAhead = (int)(((vehicle.mCurrentLapDistance > driver.mCurrentLapDistance) ? vehicle.mCurrentLapDistance
-																										  : (vehicle.mCurrentLapDistance + sharedData->mTrackLength)) - driver.mCurrentLapDistance);
+					long distanceAhead = (long)(((vehicle.mCurrentLapDistance > driver.mCurrentLapDistance) ? vehicle.mCurrentLapDistance
+																										    : (vehicle.mCurrentLapDistance + sharedData->mTrackLength)) - driver.mCurrentLapDistance);
 
 					if (distanceAhead < slowCarDistance)
 						slowCarsAhead.push_back(SlowCarInfo(i, distanceAhead));
@@ -498,8 +498,8 @@ bool checkAccident(const SharedMemory* sharedData)
 						if (distanceAhead < aheadAccidentDistance)
 							accidentsAhead.push_back(SlowCarInfo(i, distanceAhead));
 
-						int distanceBehind = (int)(((vehicle.mCurrentLapDistance < driver.mCurrentLapDistance) ? driver.mCurrentLapDistance
-																											   : (driver.mCurrentLapDistance + sharedData->mTrackLength)) - vehicle.mCurrentLapDistance);
+						long distanceBehind = (long)(((vehicle.mCurrentLapDistance < driver.mCurrentLapDistance) ? driver.mCurrentLapDistance
+																											     : (driver.mCurrentLapDistance + sharedData->mTrackLength)) - vehicle.mCurrentLapDistance);
 
 						if (distanceBehind < behindAccidentDistance)
 							accidentsBehind.push_back(SlowCarInfo(i, distanceBehind));

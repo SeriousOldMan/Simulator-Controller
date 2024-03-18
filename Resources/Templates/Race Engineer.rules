@@ -934,21 +934,29 @@ preparePitstop(?pitstopNumber) <= setRefuelAmount(?pitstopNumber),
 								  requestRepairs(?pitstopNumber), requestDriver(?pitstopNumber)
 preparePitstop(?pitstopNumber) <= Call(finishPitstopSetup, ?pitstopNumber)
 
-setRefuelAmount(?pitstopNumber) <= Call(setPitstopRefuelAmount, ?pitstopNumber, !Pitstop.Planned.Fuel)
+setRefuelAmount(?pitstopNumber) <= !Session.Settings.Pitstop.Service.Refuel = true, !,
+								   Call(setPitstopRefuelAmount, ?pitstopNumber, !Pitstop.Planned.Fuel)
+setRefuelAmount(?)								   
 
-setTyreSet(?pitstopNumber) <= Call(setPitstopTyreSet, ?pitstopNumber,
+setTyreSet(?pitstopNumber) <= !Session.Settings.Pitstop.Service.Tyres = true, !,
+							  Call(setPitstopTyreSet, ?pitstopNumber,
 								   !Pitstop.Planned.Tyre.Compound, !Pitstop.Planned.Tyre.Compound.Color, !Pitstop.Planned.Tyre.Set)
+setTyreSet(?)
 								   
-setTyrePressures(?pitstopNumber) <= !Pitstop.Planned.Tyre.Compound = false, !
+setTyrePressures(?pitstopNumber) <= !Session.Settings.Pitstop.Service.Tyres = true, !Pitstop.Planned.Tyre.Compound = false, !
 setTyrePressures(?pitstopNumber) <=
+		!Session.Settings.Pitstop.Service.Tyres = true, !,
 		Call(setPitstopTyrePressures, ?pitstopNumber,
 									  !Pitstop.Planned.Tyre.Pressure.FL, !Pitstop.Planned.Tyre.Pressure.FR,
 									  !Pitstop.Planned.Tyre.Pressure.RL, !Pitstop.Planned.Tyre.Pressure.RR)
+setTyrePressures(?)
 
-requestRepairs(?pitstopNumber) <= Call(requestPitstopRepairs, ?pitstopNumber,
+requestRepairs(?pitstopNumber) <= !Session.Settings.Pitstop.Service.Repairs = true, !,
+								  Call(requestPitstopRepairs, ?pitstopNumber,
 															  !Pitstop.Planned.Repair.Suspension,
 															  !Pitstop.Planned.Repair.Bodywork,
 															  !Pitstop.Planned.Repair.Engine)
+requestRepairs(?)
 
 requestDriver(?pitstopNumber) <= Call(requestPitstopDriver, ?pitstopNumber, !Pitstop.Planned.Driver.Request)
 

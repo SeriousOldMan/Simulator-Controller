@@ -1001,6 +1001,8 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 
 	startSession(settings, data) {
 		this.prepareSession(settings, data)
+
+		this.iHasPositionsData := (getMultiMapValue(data, "Position Data", "Car.Count", 0) > 0)
 	}
 
 	finishSession() {
@@ -1165,10 +1167,21 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 
 	updatePositionsData(data) {
 		local count := getMultiMapValue(data, "Position Data", "Car.Count", 0)
+		local driver := getMultiMapValue(data, "Position Data", "Driver.Car", false)
 
 		loop count
 			setMultiMapValue(data, "Position Data", "Car." . A_Index . ".Nr"
 								 , StrReplace(getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Nr", ""), "`"", ""))
+
+		if (driver && (count > 0)) {
+			if (getMultiMapValue(data, "Position Data", "Car." . A_Index . ".InPitlane", false)
+			 && !getMultiMapValue(data, "Stint Data", "InPitlane", false))
+				setMultiMapValue(data, "Stint Data", "InPitlane", true)
+
+			if (getMultiMapValue(data, "Position Data", "Car." . A_Index . ".InPitlane", false)
+			 && !getMultiMapValue(data, "Stint Data", "InPitlane", false))
+				setMultiMapValue(data, "Stint Data", "InPitlane", true)
+		}
 
 		this.iHasPositionsData := (count > 0)
 	}
@@ -1301,33 +1314,8 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	acquireSessionData(&telemetryData, &positionsData, finished := false) {
-		local data := newMultiMap()
-		local section, values, driver
-
-		setMultiMapValue(data, "System", "Time", A_TickCount)
-
 		telemetryData := this.acquireTelemetryData()
 		positionsData := this.acquirePositionsData(telemetryData, finished)
-
-		RaceAssistantPlugin.updateAssistantsTelemetryData(telemetryData)
-		RaceAssistantPlugin.updateAssistantsPositionsData(positionsData)
-
-		addMultiMapValues(data, telemetryData)
-		addMultiMapValues(data, positionsData)
-
-		driver := getMultiMapValue(data, "Position Data", "Driver.Car", false)
-
-		if driver {
-			if (getMultiMapValue(data, "Position Data", "Car." . A_Index . ".InPitlane", false)
-			 && !getMultiMapValue(data, "Stint Data", "InPitlane", false))
-				setMultiMapValue(data, "Stint Data", "InPitlane", true)
-
-			if (getMultiMapValue(data, "Position Data", "Car." . A_Index . ".InPitlane", false)
-			 && !getMultiMapValue(data, "Stint Data", "InPitlane", false))
-				setMultiMapValue(data, "Stint Data", "InPitlane", true)
-		}
-
-		return data
 	}
 
 	readSessionData(options := "", protocol?) {

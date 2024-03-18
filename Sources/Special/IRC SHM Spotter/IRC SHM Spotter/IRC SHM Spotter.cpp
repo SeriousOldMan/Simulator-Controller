@@ -539,14 +539,14 @@ class SlowCarInfo
 {
 public:
 	int vehicle;
-	int distance;
+	long distance;
 
 public:
 	SlowCarInfo() :
 		vehicle(0),
 		distance(0) {}
 
-	SlowCarInfo(int v, int d) :
+	SlowCarInfo(int v, long d) :
 		vehicle(v),
 		distance(d) {}
 };
@@ -591,18 +591,14 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 
 				if (getYamlValue(carIdx, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:Position:{%s}CarIdx:", sessionID, posIdx)) {
 					int carIndex = atoi(carIdx);
-					char carIdx1[10];
-					float running = ((float*)trackPositions)[carIndex];
+					float running = min(1, max(0, ((float*)trackPositions)[carIndex]));
 					float speed;
-
-					running = ((1.0 < running) ? 1.0 : running);
-					running = ((0.0 > running) ? 0.0 : running);
 
 					if (first)
 						lastRunnings[carIndex] = running;
 					else if (milliSeconds < 200) {
 						if (running >= lastRunnings[carIndex])
-							speed = (((running - lastRunnings[carIndex]) * trackLength) / (milliSeconds / 1000.0f)) * 3.6f;
+							speed = (((running - lastRunnings[carIndex]) * trackLength) / ((float)milliSeconds / 1000.0f)) * 3.6f;
 						else
 							continue;
 
@@ -614,8 +610,8 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 
 							if ((slot.count > 20) && (speed < (slot.speed / 2)))
 							{
-								int distanceAhead = (int)(((running > driverRunning) ? (running * trackLength)
-																					 : ((running * trackLength) + trackLength)) - (driverRunning * trackLength));
+								long distanceAhead = (long)(((running > driverRunning) ? (running * trackLength)
+																					   : ((running * trackLength) + trackLength)) - (driverRunning * trackLength));
 
 								if (distanceAhead < slowCarDistance)
 									slowCarsAhead.push_back(SlowCarInfo(i, distanceAhead));
@@ -625,8 +621,8 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 									if (distanceAhead < aheadAccidentDistance)
 										accidentsAhead.push_back(SlowCarInfo(i, distanceAhead));
 
-									int distanceBehind = (int)(((running < driverRunning) ? (driverRunning * trackLength)
-																						  : ((driverRunning * trackLength) + trackLength)) - (running * trackLength));
+									long distanceBehind = (long)(((running < driverRunning) ? (driverRunning * trackLength)
+																						    : ((driverRunning * trackLength) + trackLength)) - (running * trackLength));
 
 									if (distanceBehind < behindAccidentDistance)
 										accidentsBehind.push_back(SlowCarInfo(i, distanceBehind));
@@ -652,7 +648,7 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 			nextSlowCarAhead = cycle + 400;
 
 			for (int i = 0; i < accidentsAhead.size(); i++)
-				distance = ((distance < accidentsAhead[i].distance) ? distance : accidentsAhead[i].distance);
+				distance = min(distance, accidentsAhead[i].distance);
 
 			if (distance > 100) {
 				char message[40] = "accidentAlert:Ahead;";
@@ -677,7 +673,7 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 			nextSlowCarAhead = cycle + 400;
 
 			for (int i = 0; i < slowCarsAhead.size(); i++)
-				distance = ((distance < slowCarsAhead[i].distance) ? distance : slowCarsAhead[i].distance);
+				distance = min(distance, slowCarsAhead[i].distance);
 
 			if (distance > 100) {
 				char message[40] = "slowCarAlert:";
@@ -702,7 +698,7 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 			nextAccidentBehind = cycle + 400;
 
 			for (int i = 0; i < accidentsBehind.size(); i++)
-				distance = ((distance < accidentsBehind[i].distance) ? distance : accidentsBehind[i].distance);
+				distance = min(distance, accidentsBehind[i].distance);
 
 			if (distance > 100) {
 				char message[40] = "accidentAlert:Behind;";

@@ -237,10 +237,10 @@ class MessageManager extends PeriodicTask {
 			}
 			catch Any as exception {
 				logError(exception)
-				
+
 				if isDevelopment()
 					logMessage(kLogWarn, "Waiting for file `"" . fileName . "`"...")
-				
+
 				return result
 			}
 
@@ -487,7 +487,7 @@ sendWindowMessage(target, category, data, request) {
 		return true
 	}
 	catch Any as exception {
-		logError(exception)
+		logError(exception, true)
 
 		return false
 	}
@@ -538,7 +538,7 @@ receiveWindowMessage(wParam, lParam, *) {
 			withProtection(ObjBindMethod(messageHandler, "call", category, data[2]))
 		}
 		catch Any as exception {
-			logError(exception)
+			logError(exception, true)
 		}
 	}
 	else

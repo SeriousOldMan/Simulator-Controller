@@ -60,7 +60,7 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	getPitstopActions(&allActions, &selectActions) {
-		allActions := CaseInsenseMap("NoRefuel", "No Refuel", "Refuel", "Refuel", "TyreChange", "Change Tyres", "TyreAllAround", "All Around"
+		allActions := CaseInsenseMap("NoRefuel", "No Refuel", "Refuel", "Refuel", "Change Tyres", "Tyre Compound", "TyreAllAround", "All Around"
 								   , "TyreFrontLeft", "Front Left", "TyreFrontRight", "Front Right", "TyreRearLeft", "Rear Left", "TyreRearRight", "Rear Right"
 								   , "RepairRequest", "Repair")
 
@@ -190,6 +190,9 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 			case "Change Tyres":
 				if this.openPitstopMFD("Tyre")
 					this.sendPitstopCommand("Pitstop", "Change", "Tyre Change", (action = kIncrease) ? "true" : "false")
+			case "Tyre Compound":
+				if this.openPitstopMFD("Tyre")
+					this.sendPitstopCommand("Pitstop", "Change", "Tyre Compound", Round(steps))
 			case "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right":
 				if this.openPitstopMFD("Tyre")
 					this.sendPitstopCommand("Pitstop", "Change", option, Round(steps * 0.1 * ((action = kIncrease) ? 1 : -1), 1))
@@ -285,8 +288,20 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
 		super.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
 
-		if this.openPitstopMFD("Tyre")
+		if this.openPitstopMFD("Tyre") {
 			this.sendPitstopCommand("Pitstop", "Set", "Tyre Change", compound ? "true" : "false")
+
+			if compound {
+				compound := this.tyreCompoundCode(compound, compoundColor)
+
+				if compound {
+					this.sendPitstopCommand("Pitstop", "Set", "Tyre Compound", compound)
+
+					if set
+						this.sendPitstopCommand("Pitstop", "Set", "Tyre Set", Round(set))
+				}
+			}
+		}
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {

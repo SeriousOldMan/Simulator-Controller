@@ -405,6 +405,10 @@ float getTyrePressure(const irsdk_header* header, const char* sessionInfo, const
 		return 0;
 }
 
+void setTyreCompound(int compound) {
+	irsdk_broadcastMsg(irsdk_BroadcastPitCommand, irsdk_PitCommand_TC, compound - 1);
+}
+
 void setTyrePressure(int command, float pressure) {
 	irsdk_broadcastMsg(irsdk_BroadcastPitCommand, command, (int)GetKpa(pressure));
 }
@@ -431,6 +435,8 @@ void pitstopSetValues(const irsdk_header* header, const char* data, const char* 
 		requestPitstopRepairs((strcmp(values, "true") == 0));
 	else if (strcmp(service, "Tyre Change") == 0)
 		requestPitstopTyreChange((strcmp(values, "true") == 0));
+	else if (strcmp(service, "Tyre Compound") == 0)
+		setTyreCompound(atoi(values));
 	else if (strcmp(service, "Tyre Pressure") == 0) {
 		float pressures[4];
 
@@ -454,6 +460,11 @@ void pitstopSetValues(const irsdk_header* header, const char* data, const char* 
 void changePitstopRefuelAmount(const irsdk_header* header, const char* data, float fuelDelta) {
 	if (fuelDelta != 0)
 		irsdk_broadcastMsg(irsdk_BroadcastPitCommand, irsdk_PitCommand_Fuel, (int)(getDataFloat(header, data, "PitSvFuel") + fuelDelta));
+}
+
+void changePitstopTyreCompound(const irsdk_header* header, const char* data, int offset) {
+	if (offset != 0)
+		irsdk_broadcastMsg(irsdk_BroadcastPitCommand, irsdk_PitCommand_TC, (int)(getDataFloat(header, data, "PitSvTireCompound") + offset));
 }
 
 void changePitstopTyrePressure(const irsdk_header* header, int command, const char* serviceFlag, float pressureDelta) {
@@ -496,6 +507,8 @@ void pitstopChangeValues(const irsdk_header* header, const char* data, const cha
 		requestPitstopRepairs((strcmp(values, "true") == 0));
 	else if (strcmp(service, "Tyre Change") == 0)
 		requestPitstopTyreChange((strcmp(values, "true") == 0));
+	else if (strcmp(service, "Tyre Compound") == 0)
+		changePitstopTyreCompound(header, data, atoi(values));
 	else if (strcmp(service, "All Around") == 0) {
 		changePitstopTyrePressure(header, "FL", atof(values));
 		changePitstopTyrePressure(header, "FR", atof(values));

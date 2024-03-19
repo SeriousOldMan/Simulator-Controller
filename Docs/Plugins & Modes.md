@@ -814,6 +814,7 @@ See the following table for the supported settings:
 | Refuel | Increment or decrement the refuel amount. Supports the additional increments argument. |
 | NoRefuel | Sets the refuel amount to zero, thereby skipping refueling. |
 | TyreChange | Toggles, whether tyres will be changed at the pitstop. |
+| TyreCompound | Cycles through the available tyre compounds. |
 | TyreAllAround | Change the pressure for all tyres at once. Supports the additional increments argument. |
 | TyreFrontLeft | Change the pressure for the front left tyre. Supports the additional increments argument. |
 | TyreFrontRight | Change the pressure for the front right tyre. Supports the additional increments argument. |

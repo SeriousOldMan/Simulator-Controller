@@ -9,6 +9,7 @@
 #include "SharedFileOut.h"
 #include <codecvt>
 #include <vector>
+#include <map>
 
 #pragma comment( lib, "winmm.lib" )
 
@@ -481,6 +482,51 @@ void updateIdealLine(int carIdx, double running, double speed) {
 		}
 }
 
+class TrackPosInfo {
+public:
+	int count = 1;
+
+	float speed;
+	float running;
+
+	TrackPosInfo(float s, float r) :
+		speed(s),
+		running(r) {}
+
+	void update(float s);
+};
+
+void TrackPosInfo::update(float s) {
+	count += 1;
+
+	speed = (speed * (count - 1) + speed) / count;
+}
+
+float driverPosX, driverPosY;
+std::map<std::string, int> trackMap;
+
+void initializeTrack(float trackLength, int driverIdx) {
+	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
+
+	driverPosX = gf->carCoordinates[driverIdx][0];
+	driverPosY = gf->carCoordinates[driverIdx][2];
+}
+
+void updateTrack(long delteMS, int driverIdx) {
+}
+
+bool trackReady() {
+	return false;
+}
+
+float getSpeed(long delteMS, int carIdx) {
+	return -1;
+}
+
+float getRunning(long delteMS, int carIdx) {
+	return -1;
+}
+
 class SlowCarInfo
 {
 public:
@@ -497,23 +543,13 @@ public:
 		distance(d) {}
 };
 
-float getSpeed(int carIdx) {
-	return -1;
-}
-
-float getRunning(int carIdx) {
-	return -1;
-}
-
 std::vector<SlowCarInfo> accidentsAhead;
 std::vector<SlowCarInfo> accidentsBehind;
 std::vector<SlowCarInfo> slowCarsAhead;
 
-bool checkAccident() {
-	accidentsAhead.resize(0);
-	accidentsBehind.resize(0);
-	slowCarsAhead.resize(0);
+long lastTickCount = 0;
 
+bool checkAccident() {
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 	SPageFileStatic* sf = (SPageFileStatic*)m_static.mapFileBuffer;
 
@@ -527,7 +563,33 @@ bool checkAccident() {
 			break;
 		}
 
-	float driverRunning = getRunning(carID);
+	bool first = (lastTickCount == 0);
+	long milliSeconds = GetTickCount() - lastTickCount;
+
+	if (first) {
+		initializeTrack(trackLength, carID);
+
+		lastTickCount += milliSeconds;
+
+		return false;
+	}
+	else if (trackReady()) {
+		updateTrack(milliSeconds, carID);
+
+		lastTickCount += milliSeconds;
+
+		return false;
+	}
+	else if (milliSeconds < 10)
+		return false;
+	else
+		lastTickCount += milliSeconds;
+
+	accidentsAhead.resize(0);
+	accidentsBehind.resize(0);
+	slowCarsAhead.resize(0);
+
+	float driverRunning = getRunning(milliSeconds, carID);
 
 	if (driverRunning >= 0) {
 		float driverDistance = driverRunning * trackLength;
@@ -536,10 +598,10 @@ bool checkAccident() {
 		{
 			for (int i = 0; i < gf->activeCars; i++)
 			{
-				double speed = getSpeed(i);
+				double speed = getSpeed(milliSeconds, i);
 
 				if (speed >= 0) {
-					double running = getRunning(i);
+					double running = getRunning(milliSeconds, i);
 
 					if (running >= 0) {
 						running = ((1.0 < running) ? 1.0 : running);
@@ -576,7 +638,15 @@ bool checkAccident() {
 				}
 			}
 		}
-		catch (...) {}
+		catch (const std::exception& ex) {
+			sendSpotterMessage(("internalError:" + std::string(ex.what())).c_str());
+		}
+		catch (const std::string& ex) {
+			sendSpotterMessage(("internalError:" + ex).c_str());
+		}
+		catch (...) {
+			sendSpotterMessage("internalError");
+		}
 	}
 
 	if (accidentsAhead.size() > 0)

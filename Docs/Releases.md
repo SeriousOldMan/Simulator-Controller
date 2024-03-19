@@ -2,12 +2,14 @@
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed a regression introduced with 5.6.3.2 which prevented the race start reported correctly in some situations.
-  4. A memory leak in the *iRacing* data connector has been fixed.
-  5. A rare bug has been fixed in the "Track Mapper", which prevented a track map to be calculated correctly, when one of the GPS coordinates were zero for the X value.
-  6. It is now detected correctly in *iRacing* whether the drivers car is in the pit for service.
-  7. It is also detected correctly in *iRacing* whether any car is in the pitlane.
-  8. Invalid laps for any driver are now detected for *iRacing*. But it depends on the data update frequency set in the "Session Database", whether this detection is reliable, since the iRacing API only signals an invalid lap as long as the car is off-track.
-  9. The default for the setting "Engineer: Tyre Service" is now used correctly for *iRacing*, where it is *False* (Off), since *iRacing* does not report valid hot tyre pressures most of the time.
+  4. Fixed a bug in the Spanish voice recognition.
+  5. Fixed periodic update of the track map in "Race Center".
+  6. A memory leak in the *iRacing* data connector has been fixed.
+  7. A rare bug has been fixed in the "Track Mapper", which prevented a track map to be calculated correctly, when one of the GPS coordinates were zero for the X value.
+  8. It is now detected correctly in *iRacing* whether the drivers car is in the pit for service.
+  9. It is also detected correctly in *iRacing* whether any car is in the pitlane.
+  10. Invalid laps for any driver are now detected for *iRacing*. But it depends on the data update frequency set in the "Session Database", whether this detection is reliable, since the iRacing API only signals an invalid lap as long as the car is off-track.
+  11. The default for the setting "Engineer: Tyre Service" is now used correctly for *iRacing*, where it is *False* (Off), since *iRacing* does not report valid hot tyre pressures most of the time.
 
 ## 5.6.3.2-release 03/17/24
   1. Fixed a critical bug in "Race Center" which caused standings information only being loaded for the starting driver.

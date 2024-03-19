@@ -10,6 +10,8 @@
 #include <codecvt>
 #include <vector>
 #include <map>
+#include <string>
+#include <thread>
 
 #pragma comment( lib, "winmm.lib" )
 
@@ -482,49 +484,129 @@ void updateIdealLine(int carIdx, double running, double speed) {
 		}
 }
 
-class TrackPosInfo {
+class TrackPart {
 public:
 	int count = 1;
 
-	float speed;
-	float running;
+	double speed;
+	float distance;
 
-	TrackPosInfo(float s, float r) :
+	TrackPart() :
+		speed(0),
+		distance(0) {}
+
+	TrackPart(float s, float d) :
 		speed(s),
-		running(r) {}
+		distance(d) {}
 
 	void update(float s);
 };
 
-void TrackPosInfo::update(float s) {
+void TrackPart::update(float s) {
 	count += 1;
 
 	speed = (speed * (count - 1) + speed) / count;
 }
 
-float driverPosX, driverPosY;
-std::map<std::string, int> trackMap;
+std::map<std::string, TrackPart> trackMap;
 
-void initializeTrack(float trackLength, int driverIdx) {
+float startPosX, startPosY, driverPosX, driverPosY, trackLength;
+int trackDriverIdx;
+bool trackReady = false;
+long lastTrackTickCount = 0;
+
+float lastCarCoordinates[60][2];
+
+void trackBuilder() {
+	while (!trackReady) {
+		long milliSeconds = GetTickCount() - lastTrackTickCount;
+
+		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
+
+		float newPosX = gf->carCoordinates[trackDriverIdx][0];
+		float newPosY = gf->carCoordinates[trackDriverIdx][2];
+		float distance = vectorLength(driverPosX - newPosX, driverPosY - newPosY);
+		float speed = (distance / ((float)milliSeconds / 1000.0f)) * 3.6f;
+
+		if ((speed > 80) || (distance > 20)) {
+			if (fabs(newPosX - startPosX) < 20.0 && fabs(newPosY - startPosY) < 20.0)
+				trackReady = true;
+			else {
+				string key = std::to_string(((int)(round(newPosX / 20) * 10 - 10))) + std::to_string(((int)(round(newPosX / 20) * 10 + 10))) +
+							 std::to_string(((int)(round(newPosY / 20) * 10 - 10))) + std::to_string(((int)(round(newPosY / 20) * 10 + 10)));
+
+				try {
+					trackMap.at(key).update(speed);
+				}
+				catch (std::out_of_range e) {
+					trackMap[key] = TrackPart(speed, trackLength + distance);
+				}
+
+				trackLength += distance;
+			}
+		}
+
+		lastTrackTickCount += milliSeconds;
+
+		Sleep(50);
+	}
+}
+
+void startTrackBuilder(int driverIdx) {
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
 	driverPosX = gf->carCoordinates[driverIdx][0];
 	driverPosY = gf->carCoordinates[driverIdx][2];
+
+	startPosX = driverPosX;
+	startPosY = driverPosY;
+
+	trackLength = 0;
+	trackDriverIdx = driverIdx;
+
+	lastTrackTickCount = GetTickCount();
+
+	for (int i = 0; i < 60; i++) {
+		lastCarCoordinates[i][0] = INT_MAX;
+		lastCarCoordinates[i][1] = INT_MAX;
+	}
+
+	std::thread(trackBuilder);
 }
 
-void updateTrack(long delteMS, int driverIdx) {
+float getDistance(int carIdx) {
+	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
+
+	float carPosX = gf->carCoordinates[carIdx][0];
+	float carPosY = gf->carCoordinates[carIdx][2];
+
+	string key = std::to_string(((int)(round(carPosX / 20) * 10 - 10))) + std::to_string(((int)(round(carPosX / 20) * 10 + 10))) +
+				 std::to_string(((int)(round(carPosY / 20) * 10 - 10))) + std::to_string(((int)(round(carPosY / 20) * 10 + 10)));
+
+	try {
+		return trackMap.at(key).distance;
+	}
+	catch (std::out_of_range e) {
+		return -1;
+	}
 }
 
-bool trackReady() {
-	return false;
-}
+float getSpeed(int carIdx, long deltaMS) {
+	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
-float getSpeed(long delteMS, int carIdx) {
-	return -1;
-}
+	float newPosX = gf->carCoordinates[carIdx][0];
+	float newPosY = gf->carCoordinates[carIdx][2];
 
-float getRunning(long delteMS, int carIdx) {
-	return -1;
+	float lastPosX = lastCarCoordinates[carIdx][0];
+	float lastPosY = lastCarCoordinates[carIdx][1];
+
+	lastCarCoordinates[carIdx][0] = newPosX;
+	lastCarCoordinates[carIdx][1] = newPosY;
+
+	if ((lastPosX != INT_MAX) || (lastPosY != INT_MAX))
+		return (vectorLength(lastPosX - newPosX, lastPosY - newPosY) / ((float)deltaMS / 1000.0f)) * 3.6f;
+	else
+		return -1;
 }
 
 class SlowCarInfo
@@ -553,7 +635,6 @@ bool checkAccident() {
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 	SPageFileStatic* sf = (SPageFileStatic*)m_static.mapFileBuffer;
 
-	float trackLength = sf->trackSPlineLength;
 	int carID = gf->playerCarID;
 
 	for (int i = 0; i < gf->activeCars; i++)
@@ -567,15 +648,13 @@ bool checkAccident() {
 	long milliSeconds = GetTickCount() - lastTickCount;
 
 	if (first) {
-		initializeTrack(trackLength, carID);
+		startTrackBuilder(carID);
 
 		lastTickCount += milliSeconds;
 
 		return false;
 	}
-	else if (trackReady()) {
-		updateTrack(milliSeconds, carID);
-
+	else if (!trackReady) {
 		lastTickCount += milliSeconds;
 
 		return false;
@@ -589,34 +668,30 @@ bool checkAccident() {
 	accidentsBehind.resize(0);
 	slowCarsAhead.resize(0);
 
-	float driverRunning = getRunning(milliSeconds, carID);
+	float driverDistance = getDistance(carID);
 
-	if (driverRunning >= 0) {
-		float driverDistance = driverRunning * trackLength;
-
+	if (driverDistance >= 0) {
 		try
 		{
 			for (int i = 0; i < gf->activeCars; i++)
 			{
-				double speed = getSpeed(milliSeconds, i);
+				double speed = getSpeed(i, milliSeconds);
 
 				if (speed >= 0) {
-					double running = getRunning(milliSeconds, i);
+					double distance = getDistance(i);
 
-					if (running >= 0) {
-						running = ((1.0 < running) ? 1.0 : running);
-						running = ((0.0 > running) ? 0.0 : running);
+					if (distance >= 0) {
+						distance = max(0, distance);
 
-						updateIdealLine(i, running, speed);
+						updateIdealLine(i, distance, speed);
 
 						if (i != carID)
 						{
-							IdealLine slot = idealLine[(int)std::round(running * 999)];
+							IdealLine slot = idealLine[(int)std::round(distance * 999)];
 
 							if ((slot.count > 20) && (speed < (slot.speed / 2)))
 							{
-								long distanceAhead = (long)((((running * trackLength) > driverDistance) ? (running * trackLength)
-																										: ((running * trackLength) + trackLength)) - driverDistance);
+								long distanceAhead = (long)(((distance > driverDistance) ? distance : (distance + trackLength)) - driverDistance);
 
 								if (distanceAhead < slowCarDistance)
 									slowCarsAhead.push_back(SlowCarInfo(i, distanceAhead));
@@ -626,8 +701,7 @@ bool checkAccident() {
 									if (distanceAhead < aheadAccidentDistance)
 										accidentsAhead.push_back(SlowCarInfo(i, distanceAhead));
 
-									long distanceBehind = (long)((((running * trackLength) < driverDistance) ? driverDistance
-																											 : (driverDistance + trackLength)) - (running * trackLength));
+									long distanceBehind = (long)(((distance < driverDistance) ? driverDistance : (driverDistance + trackLength)) - distance);
 
 									if (distanceBehind < behindAccidentDistance)
 										accidentsBehind.push_back(SlowCarInfo(i, distanceBehind));

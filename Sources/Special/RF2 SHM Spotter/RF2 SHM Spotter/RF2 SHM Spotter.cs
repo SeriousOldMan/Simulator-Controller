@@ -584,7 +584,7 @@ namespace RF2SHMSpotter {
 		void updateIdealLine(ref rF2VehicleScoring vehicle, double running, double speed) {
 			IdealLine slot = idealLine[(int)Math.Round(running * 999)];
 
-			if (slot.count < 1000)
+			if (slot.count < int.MaxValue)
 				if (slot.count == 0)
 				{
 					slot.count = 1;
@@ -641,7 +641,7 @@ namespace RF2SHMSpotter {
 					{
 						IdealLine slot = idealLine[(int)Math.Round(running * 999)];
 
-						if ((slot.count > 20) && (speed < (slot.speed / 2)))
+						if ((slot.count > 100) && (speed < (slot.speed / 2)))
 						{
 							long distanceAhead = (long)(((vehicle.mLapDist > playerScoring.mLapDist) ? vehicle.mLapDist
 																								     : (vehicle.mLapDist + scoring.mScoringInfo.mLapDist)) - playerScoring.mLapDist);
@@ -664,7 +664,9 @@ namespace RF2SHMSpotter {
 					}
 				}
 			}
-			catch (Exception e) { }
+			catch (Exception e) {
+				SendSpotterMessage("internalError:" + e.Message);
+			}
 
 			if (accidentsAhead.Count > 0)
 			{

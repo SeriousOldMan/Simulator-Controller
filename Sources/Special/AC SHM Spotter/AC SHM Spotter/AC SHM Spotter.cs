@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
+using System.Windows.Forms;
 
 namespace ACSHMSpotter {
 	enum AC_MEMORY_STATUS { DISCONNECTED, CONNECTING, CONNECTED }
@@ -617,7 +618,7 @@ namespace ACSHMSpotter {
         {
             IdealLine slot = idealLine[(int)Math.Round(running * 999)];
 
-            if (slot.count < 1000)
+            if (slot.count < int.MaxValue)
                 if (slot.count == 0)
                 {
                     slot.count = 1;
@@ -677,7 +678,7 @@ namespace ACSHMSpotter {
 
 						IdealLine slot = idealLine[(int)Math.Round(running * 999)];
 
-						if ((slot.count > 20) && (speed < (slot.speed / 2)))
+						if ((slot.count > 100) && (speed < (slot.speed / 2)))
 						{
 							double carLapDistance = car.splinePosition * staticInfo.TrackSPlineLength;
 							long distanceAhead = (long)(((carLapDistance > driverLapDistance) ? carLapDistance
@@ -700,7 +701,9 @@ namespace ACSHMSpotter {
 						}
 					}
 				}
-				catch (Exception e) { }
+				catch (Exception e) {
+                    SendSpotterMessage("internalError:" + e.Message);
+                }
 
 				if (accidentsAhead.Count > 0)
 				{

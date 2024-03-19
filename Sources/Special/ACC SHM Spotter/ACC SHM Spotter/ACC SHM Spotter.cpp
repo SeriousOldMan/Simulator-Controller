@@ -518,37 +518,48 @@ long lastTrackTickCount = 0;
 float lastCarCoordinates[60][2];
 
 void trackBuilder() {
-	while (!trackReady) {
-		long milliSeconds = GetTickCount() - lastTrackTickCount;
+	try {
+		while (!trackReady) {
+			long milliSeconds = GetTickCount() - lastTrackTickCount;
 
-		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
+			SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
-		float newPosX = gf->carCoordinates[trackDriverIdx][0];
-		float newPosY = gf->carCoordinates[trackDriverIdx][2];
-		float distance = vectorLength(driverPosX - newPosX, driverPosY - newPosY);
-		float speed = (distance / ((float)milliSeconds / 1000.0f)) * 3.6f;
+			float newPosX = gf->carCoordinates[trackDriverIdx][0];
+			float newPosY = gf->carCoordinates[trackDriverIdx][2];
+			float distance = vectorLength(driverPosX - newPosX, driverPosY - newPosY);
+			float speed = (distance / ((float)milliSeconds / 1000.0f)) * 3.6f;
 
-		if ((speed > 80) || (distance > 20)) {
-			if (fabs(newPosX - startPosX) < 20.0 && fabs(newPosY - startPosY) < 20.0)
-				trackReady = true;
-			else {
-				string key = std::to_string(((int)(round(newPosX / 20) * 10 - 10))) + std::to_string(((int)(round(newPosX / 20) * 10 + 10))) +
-							 std::to_string(((int)(round(newPosY / 20) * 10 - 10))) + std::to_string(((int)(round(newPosY / 20) * 10 + 10)));
+			if ((speed > 80) || (distance > 20)) {
+				if (fabs(newPosX - startPosX) < 20.0 && fabs(newPosY - startPosY) < 20.0)
+					trackReady = true;
+				else {
+					string key = std::to_string(((int)(round(newPosX / 20) * 10 - 10))) + std::to_string(((int)(round(newPosX / 20) * 10 + 10))) +
+								 std::to_string(((int)(round(newPosY / 20) * 10 - 10))) + std::to_string(((int)(round(newPosY / 20) * 10 + 10)));
 
-				try {
-					trackMap.at(key).update(speed);
+					try {
+						trackMap.at(key).update(speed);
+					}
+					catch (std::out_of_range e) {
+						trackMap[key] = TrackPart(speed, trackLength + distance);
+					}
+
+					trackLength += distance;
 				}
-				catch (std::out_of_range e) {
-					trackMap[key] = TrackPart(speed, trackLength + distance);
-				}
-
-				trackLength += distance;
 			}
+
+			lastTrackTickCount += milliSeconds;
+
+			Sleep(50);
 		}
-
-		lastTrackTickCount += milliSeconds;
-
-		Sleep(50);
+	}
+	catch (const std::exception& ex) {
+		sendSpotterMessage(("internalError:" + std::string(ex.what())).c_str());
+	}
+	catch (const std::string& ex) {
+		sendSpotterMessage(("internalError:" + ex).c_str());
+	}
+	catch (...) {
+		sendSpotterMessage("internalError");
 	}
 }
 

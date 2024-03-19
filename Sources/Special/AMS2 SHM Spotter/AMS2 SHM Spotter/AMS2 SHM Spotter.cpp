@@ -416,7 +416,7 @@ std::vector<IdealLine> idealLine;
 void updateIdealLine(ParticipantInfo vehicle, double running, double speed) {
 	IdealLine slot = idealLine[(int)std::round(running * 999)];
 
-	if (slot.count < 1000)
+	if (slot.count < INT_MAX)
 		if (slot.count == 0)
 		{
 			slot.count = 1;
@@ -485,7 +485,7 @@ bool checkAccident(const SharedMemory* sharedData)
 			{
 				IdealLine slot = idealLine[(int)std::round(running * 999)];
 
-				if ((slot.count > 20) && (speed < (slot.speed / 2)))
+				if ((slot.count > 100) && (speed < (slot.speed / 2)))
 				{
 					long distanceAhead = (long)(((vehicle.mCurrentLapDistance > driver.mCurrentLapDistance) ? vehicle.mCurrentLapDistance
 																										    : (vehicle.mCurrentLapDistance + sharedData->mTrackLength)) - driver.mCurrentLapDistance);
@@ -508,7 +508,15 @@ bool checkAccident(const SharedMemory* sharedData)
 			}
 		}
 	}
-	catch (...) {}
+	catch (const std::exception& ex) {
+		sendSpotterMessage(("internalError:" + std::string(ex.what())).c_str());
+	}
+	catch (const std::string& ex) {
+		sendSpotterMessage(("internalError:" + ex).c_str());
+	}
+	catch (...) {
+		sendSpotterMessage("internalError");
+	}
 
 	if (accidentsAhead.size() > 0)
 	{

@@ -8,6 +8,7 @@
   7. It is also detected correctly in *iRacing* whether any car is in the pitlane.
   8. Invalid laps for any driver are now detected for *iRacing*. But it depends on the data update frequency set in the "Session Database", whether this detection is reliable, since the iRacing API only signals an invalid lap as long as the car is off-track.
   9. The default for the setting "Engineer: Tyre Service" is now used correctly for *iRacing*, where it is *False* (Off), since *iRacing* does not report valid hot tyre pressures most of the time.
+  10. Accident and slow car detection by the Spotter is now also availabel for *Assetto Corsa Competizione*.
 
 ## 5.6.3.2-release 03/17/24
   1. Fixed a critical bug in "Race Center" which caused standings information only being loaded for the starting driver.

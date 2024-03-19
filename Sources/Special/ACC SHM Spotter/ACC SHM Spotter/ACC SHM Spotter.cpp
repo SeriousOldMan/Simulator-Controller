@@ -519,7 +519,7 @@ float lastCarCoordinates[60][2];
 
 void trackBuilder() {
 	try {
-		while (!trackReady) {
+		if (!trackReady) {
 			long milliSeconds = GetTickCount() - lastTrackTickCount;
 
 			SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
@@ -530,7 +530,7 @@ void trackBuilder() {
 			float speed = (distance / ((float)milliSeconds / 1000.0f)) * 3.6f;
 
 			if ((speed > 80) || (distance > 20)) {
-				if (fabs(newPosX - startPosX) < 20.0 && fabs(newPosY - startPosY) < 20.0)
+				if (fabs(newPosX - startPosX) < 10.0 && fabs(newPosY - startPosY) < 10.0 && trackMap.size() > 100)
 					trackReady = true;
 				else {
 					string key = std::to_string(((int)(round(newPosX / 20) * 10 - 10))) + std::to_string(((int)(round(newPosX / 20) * 10 + 10))) +
@@ -553,10 +553,10 @@ void trackBuilder() {
 		}
 	}
 	catch (const std::exception& ex) {
-		sendSpotterMessage(("internalError:" + std::string(ex.what())).c_str());
+		sendSpotterMessage("internalError:" + std::string(ex.what()));
 	}
 	catch (const std::string& ex) {
-		sendSpotterMessage(("internalError:" + ex).c_str());
+		sendSpotterMessage("internalError:" + ex);
 	}
 	catch (...) {
 		sendSpotterMessage("internalError");
@@ -581,8 +581,6 @@ void startTrackBuilder(int driverIdx) {
 		lastCarCoordinates[i][0] = INT_MAX;
 		lastCarCoordinates[i][1] = INT_MAX;
 	}
-
-	std::thread(trackBuilder);
 }
 
 float getDistance(int carIdx) {
@@ -666,6 +664,8 @@ bool checkAccident() {
 		return false;
 	}
 	else if (!trackReady) {
+		trackBuilder();
+
 		lastTickCount += milliSeconds;
 
 		return false;
@@ -724,10 +724,10 @@ bool checkAccident() {
 			}
 		}
 		catch (const std::exception& ex) {
-			sendSpotterMessage(("internalError:" + std::string(ex.what())).c_str());
+			sendSpotterMessage("internalError:" + std::string(ex.what()));
 		}
 		catch (const std::string& ex) {
-			sendSpotterMessage(("internalError:" + ex).c_str());
+			sendSpotterMessage("internalError:" + ex);
 		}
 		catch (...) {
 			sendSpotterMessage("internalError");

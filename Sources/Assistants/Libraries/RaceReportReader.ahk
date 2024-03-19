@@ -607,7 +607,7 @@ class RaceReportReader {
 ;;;-------------------------------------------------------------------------;;;
 
 extendedIsNull(value, allowZero := true) {
-	return (isNull(value) || (!allowZero && !value) || (value = "-") || (value = ""))
+	return (isNull(value) || (!allowZero && (value == 0)) || (value = "-") || (value = "") || !isNumber(value))
 }
 
 numberValue(value) {

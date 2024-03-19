@@ -3863,7 +3863,7 @@ class PracticeCenter extends ConfigurationItem {
 				loop carTimes.Length {
 					index := carTimes[A_Index][1]
 
-					if index {
+					if (index && tCars.Has(index) && tIDs.Has(index)) {
 						if cars
 							cars.Push(tCars[index])
 

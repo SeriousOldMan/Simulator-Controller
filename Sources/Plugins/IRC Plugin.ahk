@@ -60,7 +60,8 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	getPitstopActions(&allActions, &selectActions) {
-		allActions := CaseInsenseMap("NoRefuel", "No Refuel", "Refuel", "Refuel", "Change Tyres", "Tyre Compound", "TyreAllAround", "All Around"
+		allActions := CaseInsenseMap("NoRefuel", "No Refuel", "Refuel", "Refuel", "TyreChange", "Change Tyres", "TyreCompound", "Tyre Compound"
+								   , "TyreAllAround", "All Around"
 								   , "TyreFrontLeft", "Front Left", "TyreFrontRight", "Front Right", "TyreRearLeft", "Rear Left", "TyreRearRight", "Rear Right"
 								   , "RepairRequest", "Repair")
 
@@ -192,7 +193,7 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 					this.sendPitstopCommand("Pitstop", "Change", "Tyre Change", (action = kIncrease) ? "true" : "false")
 			case "Tyre Compound":
 				if this.openPitstopMFD("Tyre")
-					this.sendPitstopCommand("Pitstop", "Change", "Tyre Compound", Round(steps))
+					this.sendPitstopCommand("Pitstop", "Change", "Tyre Compound", (action = kIncrease) ? Abs(Round(steps)) : (-1 * Abs(Round(steps))))
 			case "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right":
 				if this.openPitstopMFD("Tyre")
 					this.sendPitstopCommand("Pitstop", "Change", option, Round(steps * 0.1 * ((action = kIncrease) ? 1 : -1), 1))

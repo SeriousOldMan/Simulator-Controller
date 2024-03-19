@@ -471,7 +471,7 @@ ideal_line idealLine[NumIdealLines];
 void updateIdealLine(int vehicleId, double running, double speed) {
 	ideal_line* slot = &idealLine[(int)round(running * 999)];
 
-	if (slot->count < 1000)
+	if (slot->count < INT_MAX)
 		if (slot->count == 0)
 		{
 			slot->count = 1;
@@ -526,7 +526,7 @@ BOOL checkAccident() {
 		if (id != playerIdx) {
 			ideal_line* slot = &idealLine[(int)round(running * 999)];
 
-			if ((slot->count > 20) && (speed < (slot->speed / 2)))
+			if ((slot->count > 100) && (speed < (slot->speed / 2)))
 			{
 				long distanceAhead = (long)(((carDistance > driverDistance) ? carDistance : (carDistance + map_buffer->layout_length)) - driverDistance);
 

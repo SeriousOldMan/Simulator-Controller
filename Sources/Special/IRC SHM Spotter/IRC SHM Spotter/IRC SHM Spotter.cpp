@@ -513,7 +513,7 @@ void updateIdealLine(const irsdk_header* header, const char* data, int carIndex,
 	float coordinateX;
 	float coordinateY;
 
-	if (slot.count < 1000)
+	if (slot.count < INT_MAX)
 		if (getCarCoordinates(header, data, carIndex, coordinateX, coordinateY))
 			if (slot.count == 0)
 			{
@@ -608,7 +608,7 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 						{
 							IdealLine slot = idealLine[(int)std::round(running * 999)];
 
-							if ((slot.count > 20) && (speed < (slot.speed / 2)))
+							if ((slot.count > 100) && (speed < (slot.speed / 2)))
 							{
 								long distanceAhead = (long)(((running > driverRunning) ? (running * trackLength)
 																					   : ((running * trackLength) + trackLength)) - (driverRunning * trackLength));
@@ -635,7 +635,15 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 					break;
 			}
 		}
-		catch (...) {}
+		catch (const std::exception& ex) {
+			sendSpotterMessage(("internalError:" + std::string(ex.what())).c_str());
+		}
+		catch (const std::string& ex) {
+			sendSpotterMessage(("internalError:" + ex).c_str());
+		}
+		catch (...) {
+			sendSpotterMessage("internalError");
+		}
 	}
 
 	if (accidentsAhead.size() > 0)

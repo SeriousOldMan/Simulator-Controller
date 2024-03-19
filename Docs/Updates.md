@@ -37,7 +37,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 5.6.4
 
-Nothing to do.
+Nothing to do for the update, but if you are using *iRacing* you may want to integrate the new "TyreCompound" action in your controller configuration. The best way to do this is to use the "Simulator Setup" simulator configuration page.
 
 ***
 

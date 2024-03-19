@@ -462,6 +462,7 @@ enum irsdk_PitCommandMode				// this only works when the driver is in the car
 	irsdk_PitCommand_ClearWS,			// Uncheck Clean the winshield checkbox
 	irsdk_PitCommand_ClearFR,			// Uncheck request a fast repair
 	irsdk_PitCommand_ClearFuel,			// Uncheck add fuel
+	irsdk_PitCommand_TC,				// Change tire compound
 };
 
 enum irsdk_TelemCommandMode				// You can call this any time, but telemtry only records when driver is in there car

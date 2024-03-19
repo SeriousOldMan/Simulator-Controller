@@ -2928,6 +2928,11 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 	}
 
+	internalError(arguments*) {
+		if isDebug()
+			showMessage("Internal error: " . values2String(A_Space, arguments*))
+	}
+
 	startupSpotter(forceShutdown := false) {
 		local pid := false
 		local code, exePath, trackData

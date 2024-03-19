@@ -444,7 +444,217 @@ bool checkPositions() {
 	return false;
 }
 
+class IdealLine
+{
+public:
+	int count = 0;
+
+	double speed = 0;
+	double posX = 0;
+	double posY = 0;
+};
+
+std::vector<IdealLine> idealLine;
+
+void updateIdealLine(int carIdx, double running, double speed) {
+	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
+	IdealLine slot = idealLine[(int)std::round(running * 999)];
+
+	if (slot.count < 1000)
+		if (slot.count == 0)
+		{
+			slot.count = 1;
+
+			slot.speed = speed;
+
+			slot.posX = gf->carCoordinates[carIdx][0];
+			slot.posY = gf->carCoordinates[carIdx][2];
+		}
+		else
+		{
+			slot.count += 1;
+
+			slot.speed = (slot.speed * (slot.count - 1) + speed) / slot.count;
+
+			slot.posX = ((slot.posX * (slot.count - 1)) + gf->carCoordinates[carIdx][0]) / slot.count;
+			slot.posY = ((slot.posY * (slot.count - 1)) + gf->carCoordinates[carIdx][2]) / slot.count;
+		}
+}
+
+class SlowCarInfo
+{
+public:
+	int vehicle;
+	long distance;
+
+public:
+	SlowCarInfo() :
+		vehicle(0),
+		distance(0) {}
+
+	SlowCarInfo(int v, long d) :
+		vehicle(v),
+		distance(d) {}
+};
+
+float getSpeed(int carIdx) {
+	return -1;
+}
+
+float getRunning(int carIdx) {
+	return -1;
+}
+
+std::vector<SlowCarInfo> accidentsAhead;
+std::vector<SlowCarInfo> accidentsBehind;
+std::vector<SlowCarInfo> slowCarsAhead;
+
 bool checkAccident() {
+	accidentsAhead.resize(0);
+	accidentsBehind.resize(0);
+	slowCarsAhead.resize(0);
+
+	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
+	SPageFileStatic* sf = (SPageFileStatic*)m_static.mapFileBuffer;
+
+	float trackLength = sf->trackSPlineLength;
+	int carID = gf->playerCarID;
+
+	for (int i = 0; i < gf->activeCars; i++)
+		if (gf->carID[i] == carID) {
+			carID = i;
+
+			break;
+		}
+
+	float driverRunning = getRunning(carID);
+
+	if (driverRunning >= 0) {
+		float driverDistance = driverRunning * trackLength;
+
+		try
+		{
+			for (int i = 0; i < gf->activeCars; i++)
+			{
+				double speed = getSpeed(i);
+
+				if (speed >= 0) {
+					double running = getRunning(i);
+
+					if (running >= 0) {
+						running = ((1.0 < running) ? 1.0 : running);
+						running = ((0.0 > running) ? 0.0 : running);
+
+						updateIdealLine(i, running, speed);
+
+						if (i != carID)
+						{
+							IdealLine slot = idealLine[(int)std::round(running * 999)];
+
+							if ((slot.count > 20) && (speed < (slot.speed / 2)))
+							{
+								long distanceAhead = (long)((((running * trackLength) > driverDistance) ? (running * trackLength)
+																										: ((running * trackLength) + trackLength)) - driverDistance);
+
+								if (distanceAhead < slowCarDistance)
+									slowCarsAhead.push_back(SlowCarInfo(i, distanceAhead));
+
+								if (speed < (slot.speed / 4))
+								{
+									if (distanceAhead < aheadAccidentDistance)
+										accidentsAhead.push_back(SlowCarInfo(i, distanceAhead));
+
+									long distanceBehind = (long)((((running * trackLength) < driverDistance) ? driverDistance
+																											 : (driverDistance + trackLength)) - (running * trackLength));
+
+									if (distanceBehind < behindAccidentDistance)
+										accidentsBehind.push_back(SlowCarInfo(i, distanceBehind));
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		catch (...) {}
+	}
+
+	if (accidentsAhead.size() > 0)
+	{
+		if (cycle > nextAccidentAhead)
+		{
+			long distance = LONG_MAX;
+
+			nextAccidentAhead = cycle + 400;
+			nextSlowCarAhead = cycle + 400;
+
+			for (int i = 0; i < accidentsAhead.size(); i++)
+				distance = ((distance < accidentsAhead[i].distance) ? distance : accidentsAhead[i].distance);
+
+			if (distance > 100) {
+				char message[40] = "accidentAlert:Ahead;";
+				char numBuffer[20];
+
+				sprintf_s(numBuffer, "%d", distance);
+				strcat_s(message, numBuffer);
+
+				sendSpotterMessage(message);
+
+				return true;
+			}
+		}
+	}
+
+	if (slowCarsAhead.size() > 0)
+	{
+		if (cycle > nextSlowCarAhead)
+		{
+			long distance = LONG_MAX;
+
+			nextSlowCarAhead = cycle + 400;
+
+			for (int i = 0; i < slowCarsAhead.size(); i++)
+				distance = ((distance < slowCarsAhead[i].distance) ? distance : slowCarsAhead[i].distance);
+
+			if (distance > 100) {
+				char message[40] = "slowCarAlert:";
+				char numBuffer[20];
+
+				sprintf_s(numBuffer, "%d", distance);
+				strcat_s(message, numBuffer);
+
+				sendSpotterMessage(message);
+
+				return true;
+			}
+		}
+	}
+
+	if (accidentsBehind.size() > 0)
+	{
+		if (cycle > nextAccidentBehind)
+		{
+			long distance = LONG_MAX;
+
+			nextAccidentBehind = cycle + 400;
+
+			for (int i = 0; i < accidentsBehind.size(); i++)
+				distance = ((distance < accidentsBehind[i].distance) ? distance : accidentsBehind[i].distance);
+
+			if (distance > 100) {
+				char message[40] = "accidentAlert:Behind;";
+				char numBuffer[20];
+
+				sprintf_s(numBuffer, "%d", distance);
+				strcat_s(message, numBuffer);
+
+				sendSpotterMessage(message);
+
+				return true;
+			}
+		}
+	}
+
 	return false;
 }
 
@@ -1227,6 +1437,11 @@ int main(int argc, char* argv[])
 
 	char* soundsDirectory = "";
 	char* audioDevice = "";
+
+	idealLine.reserve(1000);
+
+	for (int i = 0; i < 1000; i++)
+		idealLine.push_back(IdealLine());
 
 	if (argc > 1) {
 		calibrateTelemetry = (strcmp(argv[1], "-Calibrate") == 0);

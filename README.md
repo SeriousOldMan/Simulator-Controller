@@ -49,7 +49,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[5.6.4.0-dev](https://www.dropbox.com/scl/fi/tq53x1r934sfurpvmhcec/Simulator-Controller-5.6.4.0-dev.zip?rlkey=5pco39y7r4eu4m50kfuacunr9&dl=1) (Early build for 5.6.4. Changes: Fixed pitstop and pitlane detection for iRacing, Fixed green flag regression, Invalid laps for iRacing, Default for "Pitstop Tyre Service" is now recognized for iRacing, Fixed memory leak in iRacing connector, Fixed Track Mapper for iRacing, Changing tyre compounds support for iRacing, Fixed "Simulator Setup" support for "Le Mans Ultimate", Fixed spanish voice recognition, Fixed track map periodic update in "Race Center", Accident detection now also for ACC, "Practice Center" informs about unsaved data before starting a new session.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-564) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

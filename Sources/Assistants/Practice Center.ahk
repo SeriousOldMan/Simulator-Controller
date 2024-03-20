@@ -230,9 +230,11 @@ class PracticeCenter extends ConfigurationItem {
 		}
 
 		Close(*) {
+			local translator
+
 			if this.Closeable {
 				if (this.PracticeCenter.HasData && !this.PracticeCenter.SessionExported) {
-					local translator := translateMsgBoxButtons.Bind(["Yes", "No", "Cancel"])
+					translator := translateMsgBoxButtons.Bind(["Yes", "No", "Cancel"])
 
 					OnMessage(0x44, translator)
 					msgResult := withBlockedWindows(MsgBox, translate("Do you want to transfer your data to the session database before closing?"), translate("Export"), 262179)
@@ -1616,6 +1618,8 @@ class PracticeCenter extends ConfigurationItem {
 
 					return false
 				}
+				else
+					this.clearSession(true)
 			}
 
 			this.iSimulator := simulator
@@ -1663,6 +1667,8 @@ class PracticeCenter extends ConfigurationItem {
 
 					return false
 				}
+				else
+					this.clearSession(true)
 			}
 
 			this.iCar := car
@@ -1701,6 +1707,8 @@ class PracticeCenter extends ConfigurationItem {
 
 					return false
 				}
+				else
+					this.clearSession(true)
 			}
 
 			simulator := this.Simulator
@@ -4176,7 +4184,7 @@ class PracticeCenter extends ConfigurationItem {
 		this.pushTask(saveSessionAsync.Bind(copy))
 	}
 
-	clearSession() {
+	clearSession(wait := false) {
 		clearSessionAsync() {
 			this.initializeSession()
 
@@ -4185,7 +4193,10 @@ class PracticeCenter extends ConfigurationItem {
 			this.updateState()
 		}
 
-		this.pushTask(clearSessionAsync)
+		if wait
+			clearSessionAsync()
+		else
+			this.pushTask(clearSessionAsync)
 	}
 
 	loadDrivers() {
@@ -6843,19 +6854,35 @@ class PracticeCenter extends ConfigurationItem {
 	startSession(fileName) {
 		startSessionAsync() {
 			local data := readMultiMap(fileName)
+			local translator
 
 			try {
-				if (this.HasData && !this.SessionExported && (this.SessionMode != "Loaded"))
-					this.iSessionMode := "Finished"
-				else {
-					this.initializeSession(getMultiMapValue(data, "Session Data", "Session", "Practice"))
+				if (this.HasData && !this.SessionExported && (this.SessionMode != "Loaded")) {
+					translator := translateMsgBoxButtons.Bind(["Yes", "No", "Cancel"])
 
-					this.initializeSimulator(SessionDatabase.getSimulatorName(getMultiMapValue(data, "Session Data", "Simulator"))
-										   , getMultiMapValue(data, "Session Data", "Car")
-										   , getMultiMapValue(data, "Session Data", "Track"))
+					OnMessage(0x44, translator)
+					msgResult := withBlockedWindows(MsgBox, translate("You have unsaved data. Do you want to transfer it to the session database before starting a new session?"), translate("Export"), 262179)
+					OnMessage(0x44, translator, 0)
 
-					this.analyzeTelemetry()
+					if (msgResult = "Yes")
+						this.exportSession(true)
+
+					if (msgResult = "Cancel") {
+						this.iSessionMode := "Finished"
+
+						return
+					}
+
+					this.clearSession(true)
 				}
+
+				this.initializeSession(getMultiMapValue(data, "Session Data", "Session", "Practice"))
+
+				this.initializeSimulator(SessionDatabase.getSimulatorName(getMultiMapValue(data, "Session Data", "Simulator"))
+									   , getMultiMapValue(data, "Session Data", "Car")
+									   , getMultiMapValue(data, "Session Data", "Track"))
+
+				this.analyzeTelemetry()
 			}
 			finally {
 				deleteFile(fileName)
@@ -6875,7 +6902,7 @@ class PracticeCenter extends ConfigurationItem {
 						this.updateRunning(lapNumber, data)
 				}
 				else {
-					if (this.SessionMode && this.SessionMode != "Active")
+					if (this.SessionMode && !this.SessionActive)
 						return
 
 					if ((!this.LastLap && (lapNumber = 1)) || ((this.LastLap.Nr + 1) = lapNumber)) {

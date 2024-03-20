@@ -9,6 +9,9 @@
 #include "SharedFileOut.h"
 #include <codecvt>
 #include <vector>
+#include <map>
+#include <string>
+#include <thread>
 
 #pragma comment( lib, "winmm.lib" )
 
@@ -444,7 +447,481 @@ bool checkPositions() {
 	return false;
 }
 
+class IdealLine
+{
+public:
+	int count = 0;
+
+	double speed = 0;
+	double posX = 0;
+	double posY = 0;
+};
+
+std::vector<IdealLine> idealLine;
+
+void updateIdealLine(int carIdx, double running, double speed) {
+	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
+	IdealLine slot = idealLine[(int)std::round(running * 999)];
+
+	if (slot.count < INT_MAX)
+		if (slot.count == 0)
+		{
+			slot.count = 1;
+
+			slot.speed = speed;
+
+			slot.posX = gf->carCoordinates[carIdx][0];
+			slot.posY = gf->carCoordinates[carIdx][2];
+		}
+		else
+		{
+			slot.count += 1;
+
+			slot.speed = (slot.speed * (slot.count - 1) + speed) / slot.count;
+
+			slot.posX = ((slot.posX * (slot.count - 1)) + gf->carCoordinates[carIdx][0]) / slot.count;
+			slot.posY = ((slot.posY * (slot.count - 1)) + gf->carCoordinates[carIdx][2]) / slot.count;
+		}
+}
+
+class TrackPart {
+public:
+	int count;
+
+	double speed;
+	float distance;
+
+	TrackPart() :
+		count(0),
+		speed(0),
+		distance(0) {}
+
+	TrackPart(float s, float d) :
+		count(1),
+		speed(s),
+		distance(d) {}
+
+	void update(float s);
+};
+
+void TrackPart::update(float s) {
+	count += 1;
+
+	speed = (speed * (count - 1) + speed) / count;
+}
+
+std::map<std::string, TrackPart> trackMap;
+
+float startPosX, startPosY, driverPosX, driverPosY, trackLength;
+int trackDriverIdx;
+bool trackReady = false;
+long lastTrackTickCount = 0;
+
+float lastCarCoordinates[60][2];
+
+string trackFileName = "";
+
+void updateTrackMap() {
+	try {
+		if (!trackReady) {
+			long milliSeconds = GetTickCount() - lastTrackTickCount;
+
+			SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
+
+			float newPosX = gf->carCoordinates[trackDriverIdx][0];
+			float newPosY = gf->carCoordinates[trackDriverIdx][2];
+			float distance = vectorLength(driverPosX - newPosX, driverPosY - newPosY);
+			float speed = (distance / ((float)milliSeconds / 1000.0f)) * 3.6f;
+
+			if ((speed > 80) || (distance > 20)) {
+				if (fabs(newPosX - startPosX) < 10.0 && fabs(newPosY - startPosY) < 10.0 && trackMap.size() > 100) {
+					trackReady = true;
+
+					if (trackFileName != "") {
+						std::ofstream output;
+
+						output.open(trackFileName, std::ios::out | std::ios::app);
+
+						output << "========== Finished mapping track ==========" << std::endl;
+
+						output.close();
+					}
+				}
+				else {
+					string key = std::to_string(((int)(round(newPosX / 20) * 10 - 10))) + std::to_string(((int)(round(newPosX / 20) * 10 + 10))) +
+								 std::to_string(((int)(round(newPosY / 20) * 10 - 10))) + std::to_string(((int)(round(newPosY / 20) * 10 + 10)));
+
+					try {
+						trackMap.at(key).update(speed);
+					}
+					catch (std::out_of_range e) {
+						trackMap[key] = TrackPart(speed, trackLength + distance);
+					}
+
+					if (trackFileName != "") {
+						std::ofstream output;
+
+						output.open(trackFileName, std::ios::out | std::ios::app);
+
+						output << trackMap.size() << ": Distance: " << round(distance) << "; Speed: " << round(speed) << "; Key: " << key << std::endl;
+
+						output.close();
+					}
+
+					trackLength += distance;
+				}
+			}
+
+			lastTrackTickCount += milliSeconds;
+
+			Sleep(50);
+		}
+	}
+	catch (const std::exception& ex) {
+		sendSpotterMessage("internalError:" + std::string(ex.what()));
+	}
+	catch (const std::string& ex) {
+		sendSpotterMessage("internalError:" + ex);
+	}
+	catch (...) {
+		sendSpotterMessage("internalError");
+	}
+}
+
+void startTrackBuilder(int driverIdx) {
+	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
+
+	driverPosX = gf->carCoordinates[driverIdx][0];
+	driverPosY = gf->carCoordinates[driverIdx][2];
+
+	startPosX = driverPosX;
+	startPosY = driverPosY;
+
+	trackLength = 0;
+	trackDriverIdx = driverIdx;
+
+	lastTrackTickCount = GetTickCount();
+
+	for (int i = 0; i < 60; i++) {
+		lastCarCoordinates[i][0] = INT_MAX;
+		lastCarCoordinates[i][1] = INT_MAX;
+	}
+
+	if (trackFileName != "") {
+		std::ofstream output;
+
+		output.open(trackFileName, std::ios::out | std::ios::app);
+
+		output << "========== Start maapping track ==========" << std::endl;
+
+		output.close();
+	}
+}
+
+float getDistance(int carIdx) {
+	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
+
+	float carPosX = gf->carCoordinates[carIdx][0];
+	float carPosY = gf->carCoordinates[carIdx][2];
+
+	string key = std::to_string(((int)(round(carPosX / 20) * 10 - 10))) + std::to_string(((int)(round(carPosX / 20) * 10 + 10))) +
+				 std::to_string(((int)(round(carPosY / 20) * 10 - 10))) + std::to_string(((int)(round(carPosY / 20) * 10 + 10)));
+
+	try {
+		float distance = trackMap.at(key).distance;
+
+		if (trackFileName != "") {
+			std::ofstream output;
+
+			output.open(trackFileName, std::ios::out | std::ios::app);
+
+			output << "D";
+
+			output.close();
+		}
+
+		return distance;
+	}
+	catch (std::out_of_range e) {
+		if (trackFileName != "") {
+			std::ofstream output;
+
+			output.open(trackFileName, std::ios::out | std::ios::app);
+
+			output << "-";
+
+			output.close();
+		}
+
+		return -1;
+	}
+}
+
+float getSpeed(int carIdx, long deltaMS) {
+	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
+
+	float newPosX = gf->carCoordinates[carIdx][0];
+	float newPosY = gf->carCoordinates[carIdx][2];
+
+	float lastPosX = lastCarCoordinates[carIdx][0];
+	float lastPosY = lastCarCoordinates[carIdx][1];
+
+	lastCarCoordinates[carIdx][0] = newPosX;
+	lastCarCoordinates[carIdx][1] = newPosY;
+
+	if ((lastPosX != INT_MAX) || (lastPosY != INT_MAX)) {
+		return (vectorLength(lastPosX - newPosX, lastPosY - newPosY) / ((float)deltaMS / 1000.0f)) * 3.6f;
+
+		if (trackFileName != "") {
+			std::ofstream output;
+
+			output.open(trackFileName, std::ios::out | std::ios::app);
+
+			output << "S";
+
+			output.close();
+		}
+	}
+	else {
+		if (trackFileName != "") {
+			std::ofstream output;
+
+			output.open(trackFileName, std::ios::out | std::ios::app);
+
+			output << "-";
+
+			output.close();
+		}
+
+		return -1;
+	}
+}
+
+class SlowCarInfo
+{
+public:
+	int vehicle;
+	long distance;
+
+public:
+	SlowCarInfo() :
+		vehicle(0),
+		distance(0) {}
+
+	SlowCarInfo(int v, long d) :
+		vehicle(v),
+		distance(d) {}
+};
+
+std::vector<SlowCarInfo> accidentsAhead;
+std::vector<SlowCarInfo> accidentsBehind;
+std::vector<SlowCarInfo> slowCarsAhead;
+
+long lastTickCount = 0;
+
 bool checkAccident() {
+	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
+	SPageFileStatic* sf = (SPageFileStatic*)m_static.mapFileBuffer;
+
+	int carID = gf->playerCarID;
+
+	for (int i = 0; i < gf->activeCars; i++)
+		if (gf->carID[i] == carID) {
+			carID = i;
+
+			break;
+		}
+
+	bool first = (lastTickCount == 0);
+	long milliSeconds = GetTickCount() - lastTickCount;
+
+	if (first) {
+		startTrackBuilder(carID);
+
+		lastTickCount += milliSeconds;
+
+		return false;
+	}
+	else if (!trackReady) {
+		updateTrackMap();
+
+		lastTickCount += milliSeconds;
+
+		return false;
+	}
+	else if (milliSeconds < 10)
+		return false;
+	else
+		lastTickCount += milliSeconds;
+
+	accidentsAhead.resize(0);
+	accidentsBehind.resize(0);
+	slowCarsAhead.resize(0);
+
+	float driverDistance = getDistance(carID);
+
+	if (driverDistance >= 0) {
+		try
+		{
+			for (int i = 0; i < gf->activeCars; i++)
+			{
+				double speed = getSpeed(i, milliSeconds);
+
+				if (speed >= 0) {
+					double distance = getDistance(i);
+
+					if (distance >= 0) {
+						distance = max(0, distance);
+
+						updateIdealLine(i, distance, speed);
+
+						if (i != carID)
+						{
+							IdealLine slot = idealLine[(int)std::round(distance * 999)];
+
+							if ((slot.count > 20) && (speed < (slot.speed / 2)))
+							{
+								long distanceAhead = (long)(((distance > driverDistance) ? distance : (distance + trackLength)) - driverDistance);
+
+								if (distanceAhead < slowCarDistance) {
+									slowCarsAhead.push_back(SlowCarInfo(i, distanceAhead));
+
+									if (trackFileName != "") {
+										std::ofstream output;
+
+										output.open(trackFileName, std::ios::out | std::ios::app);
+
+										output << "Slow: " << i << "; Speed: " << round(speed) << "; Distance: " << round(distanceAhead) << std::endl;
+
+										output.close();
+									}
+								}
+
+								if (speed < (slot.speed / 4))
+								{
+									if (distanceAhead < aheadAccidentDistance) {
+										accidentsAhead.push_back(SlowCarInfo(i, distanceAhead));
+
+										if (trackFileName != "") {
+											std::ofstream output;
+
+											output.open(trackFileName, std::ios::out | std::ios::app);
+
+											output << "Accident Ahead: " << i << "; Speed: " << round(speed) << "; Distance: " << round(distanceAhead) << std::endl;
+
+											output.close();
+										}
+									}
+
+									long distanceBehind = (long)(((distance < driverDistance) ? driverDistance : (driverDistance + trackLength)) - distance);
+
+									if (distanceBehind < behindAccidentDistance) {
+										accidentsBehind.push_back(SlowCarInfo(i, distanceBehind));
+
+										if (trackFileName != "") {
+											std::ofstream output;
+
+											output.open(trackFileName, std::ios::out | std::ios::app);
+
+											output << "Accident Behind: " << i << "; Speed: " << round(speed) << "; Distance: " << round(distanceBehind) << std::endl;
+
+											output.close();
+										}
+									}
+								}	
+							}
+						}
+					}
+				}
+			}
+		}
+		catch (const std::exception& ex) {
+			sendSpotterMessage("internalError:" + std::string(ex.what()));
+		}
+		catch (const std::string& ex) {
+			sendSpotterMessage("internalError:" + ex);
+		}
+		catch (...) {
+			sendSpotterMessage("internalError");
+		}
+	}
+
+	if (accidentsAhead.size() > 0)
+	{
+		if (cycle > nextAccidentAhead)
+		{
+			long distance = LONG_MAX;
+
+			nextAccidentAhead = cycle + 400;
+			nextSlowCarAhead = cycle + 400;
+
+			for (int i = 0; i < accidentsAhead.size(); i++)
+				distance = ((distance < accidentsAhead[i].distance) ? distance : accidentsAhead[i].distance);
+
+			if (distance > 100) {
+				char message[40] = "accidentAlert:Ahead;";
+				char numBuffer[20];
+
+				sprintf_s(numBuffer, "%d", distance);
+				strcat_s(message, numBuffer);
+
+				sendSpotterMessage(message);
+
+				return true;
+			}
+		}
+	}
+
+	if (slowCarsAhead.size() > 0)
+	{
+		if (cycle > nextSlowCarAhead)
+		{
+			long distance = LONG_MAX;
+
+			nextSlowCarAhead = cycle + 400;
+
+			for (int i = 0; i < slowCarsAhead.size(); i++)
+				distance = ((distance < slowCarsAhead[i].distance) ? distance : slowCarsAhead[i].distance);
+
+			if (distance > 100) {
+				char message[40] = "slowCarAlert:";
+				char numBuffer[20];
+
+				sprintf_s(numBuffer, "%d", distance);
+				strcat_s(message, numBuffer);
+
+				sendSpotterMessage(message);
+
+				return true;
+			}
+		}
+	}
+
+	if (accidentsBehind.size() > 0)
+	{
+		if (cycle > nextAccidentBehind)
+		{
+			long distance = LONG_MAX;
+
+			nextAccidentBehind = cycle + 400;
+
+			for (int i = 0; i < accidentsBehind.size(); i++)
+				distance = ((distance < accidentsBehind[i].distance) ? distance : accidentsBehind[i].distance);
+
+			if (distance > 100) {
+				char message[40] = "accidentAlert:Behind;";
+				char numBuffer[20];
+
+				sprintf_s(numBuffer, "%d", distance);
+				strcat_s(message, numBuffer);
+
+				sendSpotterMessage(message);
+
+				return true;
+			}
+		}
+	}
+
 	return false;
 }
 
@@ -1228,6 +1705,11 @@ int main(int argc, char* argv[])
 	char* soundsDirectory = "";
 	char* audioDevice = "";
 
+	idealLine.reserve(1000);
+
+	for (int i = 0; i < 1000; i++)
+		idealLine.push_back(IdealLine());
+
 	if (argc > 1) {
 		calibrateTelemetry = (strcmp(argv[1], "-Calibrate") == 0);
 		analyzeTelemetry = calibrateTelemetry || (strcmp(argv[1], "-Analyze") == 0);
@@ -1282,6 +1764,9 @@ int main(int argc, char* argv[])
 
 			if (argc > 3)
 				slowCarDistance = atoi(argv[3]);
+
+			if (argc > 4)
+				trackFileName = argv[4];
 		}
 	}
 

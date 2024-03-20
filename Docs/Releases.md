@@ -1,7 +1,7 @@
 ## 5.6.4.0-release 03/22/24 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
-  3. Fixed a regression introduced with 5.6.3.2 which prevented the race start reported correctly in some situations.
+  3. Fixed a regression introduced with 5.6.3.2 which prevented the race start reported correctly by the Spotter in some situations.
   4. Fixed a bug in the Spanish voice recognition.
   5. Fixed periodic update of the track map in "Race Center".
   6. Fixed "Simulator Setup" to include *Le Mans Ultimate* on the simulation configuration page.
@@ -16,6 +16,8 @@
 	  - Support added in "Simulator Setup" to configure this action.
 	  - Stream Deck icon is available for the "TyreCompound" action.
 	  - The Race Engineer is fully aware of the configured tyre compounds for a given car.
+  14. "Practice Center" now informs about unsaved data before starting a new session.
+  15. Accident and slow car detection by the Spotter is now also available for *Assetto Corsa Competizione*.
   
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-564), if you are running *iRacing* and want to use the new "TyreCompound" action.
 

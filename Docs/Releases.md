@@ -16,6 +16,8 @@
 	  - Support added in "Simulator Setup" to configure this action.
 	  - Stream Deck icon is available for the "TyreCompound" action.
 	  - The Race Engineer is fully aware of the configured tyre compounds for a given car.
+  14. "Practice Center" now informs about unsaved data before starting a new session.
+  15. Accident and slow car detection by the Spotter is now also available for *Assetto Corsa Competizione*.
   
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-564), if you are running *iRacing* and want to use the new "TyreCompound" action.
 

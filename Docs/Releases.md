@@ -8,7 +8,7 @@
   7. A memory leak in the *iRacing* data connector has been fixed.
   8. A rare bug has been fixed in the "Track Mapper", which prevented a track map to be calculated correctly, when one of the GPS coordinates were zero for the X value.
   9. It is now detected correctly in *iRacing* whether the drivers car is in the pit for service.
-  10. It is also detected correctly in *iRacing* whether any car is in the pitlane.
+  10. It is also detected correctly in *iRacing* now whether any car is in the pitlane.
   11. Invalid laps for any driver are now detected for *iRacing*. But it depends on the data update frequency set in the "Session Database", whether this detection is reliable, since the iRacing API only signals an invalid lap as long as the car is off-track.
   12. The default for the setting "Engineer: Tyre Service" is now used correctly for *iRacing*, where it is *False* (Off), since *iRacing* does not report valid hot tyre pressures most of the time.
   13. Changing of tyre compounds are now supported during pitstops in *iRacing*:

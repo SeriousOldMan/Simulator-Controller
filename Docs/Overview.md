@@ -21,7 +21,7 @@ The documentation is devided into the following sections:
 	
   - [Using Simulator Controller](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller)
 
-    General information how to start and use the Simulator Controller and how to use the available runtime options.	You will also find information on how to use voice control and how to interact with the Race Assistants using.
+    General information how to start and use the Simulator Controller and how to use the available runtime options.	You will also find information on how to use voice control and how to interact with the Race Assistants.
 	
   - [Plugin & Modes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes)
 

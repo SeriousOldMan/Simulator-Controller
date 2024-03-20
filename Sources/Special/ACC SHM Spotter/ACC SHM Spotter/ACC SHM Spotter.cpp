@@ -628,9 +628,31 @@ float getDistance(int carIdx) {
 				 std::to_string(((int)(round(carPosY / 20) * 10 - 10))) + std::to_string(((int)(round(carPosY / 20) * 10 + 10)));
 
 	try {
-		return trackMap.at(key).distance;
+		float distance = trackMap.at(key).distance;
+
+		if (trackFileName != "") {
+			std::ofstream output;
+
+			output.open(trackFileName, std::ios::out | std::ios::app);
+
+			output << "D";
+
+			output.close();
+		}
+
+		return distance;
 	}
 	catch (std::out_of_range e) {
+		if (trackFileName != "") {
+			std::ofstream output;
+
+			output.open(trackFileName, std::ios::out | std::ios::app);
+
+			output << "-";
+
+			output.close();
+		}
+
 		return -1;
 	}
 }
@@ -647,10 +669,32 @@ float getSpeed(int carIdx, long deltaMS) {
 	lastCarCoordinates[carIdx][0] = newPosX;
 	lastCarCoordinates[carIdx][1] = newPosY;
 
-	if ((lastPosX != INT_MAX) || (lastPosY != INT_MAX))
+	if ((lastPosX != INT_MAX) || (lastPosY != INT_MAX)) {
 		return (vectorLength(lastPosX - newPosX, lastPosY - newPosY) / ((float)deltaMS / 1000.0f)) * 3.6f;
-	else
+
+		if (trackFileName != "") {
+			std::ofstream output;
+
+			output.open(trackFileName, std::ios::out | std::ios::app);
+
+			output << "S";
+
+			output.close();
+		}
+	}
+	else {
+		if (trackFileName != "") {
+			std::ofstream output;
+
+			output.open(trackFileName, std::ios::out | std::ios::app);
+
+			output << "-";
+
+			output.close();
+		}
+
 		return -1;
+	}
 }
 
 class SlowCarInfo

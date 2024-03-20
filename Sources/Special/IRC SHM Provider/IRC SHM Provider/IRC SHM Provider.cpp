@@ -874,7 +874,7 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 				timeRemaining = 3600000;
 			else {
 			*/
-			if (getDataValue(result, header, data, "SessionTimeRemain")) {
+			if ((sessionLaps == -1) && (getDataValue(result, header, data, "SessionTimeRemain"))) {
 				float time = atof(result);
 
 				if (time != -1)
@@ -883,25 +883,17 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 
 			if (timeRemaining == -1)
 				timeRemaining = getRemainingTime(sessionInfo, practice, sessionLaps, sessionTime, laps, lastTime, bestTime);
-			/*
-			}
-			*/
 
 			printf("SessionTimeRemaining=%ld\n", timeRemaining);
 
 			long lapsRemaining = -1;
 
-			/*
-			if (practice)
-				lapsRemaining = 30;
-			else {
-			*/
 			timeRemaining = -1;
 
-			if (getDataValue(result, header, data, "SessionLapsRemain"))
-				lapsRemaining = atoi(result);
+			// if (getDataValue(result, header, data, "SessionLapsRemain"))
+			//	lapsRemaining = atoi(result);
 
-			if ((lapsRemaining == -1) || (lapsRemaining == 32767)) {
+			if (sessionLaps == -1) {
 				long estTime = lastTime;
 
 				if ((estTime == 0) && getYamlValue(result, sessionInfo, "DriverInfo:DriverCarEstLapTime:"))
@@ -909,9 +901,8 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 
 				lapsRemaining = getRemainingLaps(sessionInfo, practice, sessionLaps, sessionTime, laps, estTime, bestTime);
 			}
-			/*
-			}
-			*/
+			else
+				lapsRemaining = sessionLaps - laps;
 
 			printf("SessionLapsRemaining=%ld\n", lapsRemaining);
 
@@ -991,7 +982,7 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 			printf("LapLastTime=%ld\n", lastTime);
 			printf("LapBestTime=%ld\n", bestTime);
 
-			if (getDataValue(result, header, data, "SessionTimeRemain")) {
+			if ((sessionLaps == -1) && (getDataValue(result, header, data, "SessionTimeRemain"))) {
 				float time = atof(result);
 
 				if (time != -1)

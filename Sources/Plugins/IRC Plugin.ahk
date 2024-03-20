@@ -339,10 +339,14 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 
 			if (carClass == kUndefined)
 				break
-			else if (Trim(carClass) != "")
-				setMultiMapValue(data, "Position Data", "Car." . A_Index . ".Class", Trim(carClass))
-			else
-				removeMultiMapValue(data, "Position Data", "Car." . A_Index . ".Class")
+			else {
+				carClass := Trim(carClass)
+
+				if (carClass != "")
+					setMultiMapValue(data, "Position Data", "Car." . A_Index . ".Class", carClass)
+				else
+					removeMultiMapValue(data, "Position Data", "Car." . A_Index . ".Class")
+			}
 		}
 	}
 }

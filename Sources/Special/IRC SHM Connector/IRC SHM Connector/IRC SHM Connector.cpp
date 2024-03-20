@@ -885,7 +885,7 @@ void writeData(std::ostringstream * output, const irsdk_header *header, const ch
 
 			long timeRemaining = -1;
 
-			if (getDataValue(result, header, data, "SessionTimeRemain")) {
+			if ((sessionLaps == -1) && (getDataValue(result, header, data, "SessionTimeRemain"))) {
 				float time = atof(result);
 
 				if (time != -1)
@@ -901,10 +901,10 @@ void writeData(std::ostringstream * output, const irsdk_header *header, const ch
 
 			timeRemaining = -1;
 
-			if (getDataValue(result, header, data, "SessionLapsRemain"))
-				lapsRemaining = atoi(result);
+			// if (getDataValue(result, header, data, "SessionLapsRemain"))
+			//	lapsRemaining = atoi(result);
 
-			if ((lapsRemaining == -1) || (lapsRemaining == 32767)) {
+			if (sessionLaps == -1) {
 				long estTime = lastTime;
 
 				if ((estTime == 0) && getYamlValue(result, sessionInfo, "DriverInfo:DriverCarEstLapTime:"))
@@ -912,6 +912,8 @@ void writeData(std::ostringstream * output, const irsdk_header *header, const ch
 
 				lapsRemaining = getRemainingLaps(sessionInfo, practice, sessionLaps, sessionTime, laps, estTime, bestTime);
 			}
+			else
+				lapsRemaining = sessionLaps - laps;
 			
 			printLine(output, "SessionLapsRemaining=" + std::to_string(lapsRemaining));
 
@@ -994,7 +996,7 @@ void writeData(std::ostringstream * output, const irsdk_header *header, const ch
 			printLine(output, "LapLastTime=" + std::to_string(lastTime));
 			printLine(output, "LapBestTime=" + std::to_string(bestTime));
 
-			if (getDataValue(result, header, data, "SessionTimeRemain")) {
+			if ((sessionLaps == -1) && (getDataValue(result, header, data, "SessionTimeRemain"))) {
 				float time = atof(result);
 
 				if (time != -1)

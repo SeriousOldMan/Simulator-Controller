@@ -11,7 +11,7 @@
   10. It is also detected correctly in *iRacing* whether any car is in the pitlane.
   11. Invalid laps for any driver are now detected for *iRacing*. But it depends on the data update frequency set in the "Session Database", whether this detection is reliable, since the iRacing API only signals an invalid lap as long as the car is off-track.
   12. The default for the setting "Engineer: Tyre Service" is now used correctly for *iRacing*, where it is *False* (Off), since *iRacing* does not report valid hot tyre pressures most of the time.
-  13. Changing of tyre compounds are now supported during pitstops in *iRacing*:
+  13. Changing of tyre compounds are now supported during pitstops in *iRacing* (depending on an upcoming iRacing patch):
       - New action "TyreCompound" for the ["IRC" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-irc).
 	  - Support added in "Simulator Setup" to configure this action.
 	  - Stream Deck icon is available for the "TyreCompound" action.

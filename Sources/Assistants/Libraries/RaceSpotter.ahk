@@ -2815,34 +2815,38 @@ class RaceSpotter extends GridRaceAssistant {
 	slowCarAlert(arguments*) {
 		local distance, side, speaker
 
-		if (this.Announcements["SlowCars"] && this.Speaker[false] && this.Running)
-			if (arguments.Length = 0)
-				this.getSpeaker(true).speakPhrase("SlowCarAhead", false, false, "SlowCarAhead")
-			else {
-				distance := (Round(arguments[1] / 50) * 50)
+		if (this.Announcements["SlowCars"] && this.Speaker[false] && this.Running) {
+			speaker := this.getSpeaker(true)
 
-				if (distance > 0) {
-					speaker := this.getSpeaker(true)
+			if !speaker.Speaking
+				if (arguments.Length = 0)
+					this.getSpeaker(true).speakPhrase("SlowCarAhead", false, false, "SlowCarAhead")
+				else {
+					distance := (Round(arguments[1] / 50) * 50)
 
-					if (arguments.Length > 1) {
-						side := arguments[2]
+					if (distance > 0) {
+						speaker := this.getSpeaker(true)
 
-						switch side, false {
-							case "Left":
-								side := string2Values(",", speaker.Fragments["Sides"])[1]
-							case "Right":
-								side := string2Values(",", speaker.Fragments["Sides"])[2]
-							default:
-								side := false
+						if (arguments.Length > 1) {
+							side := arguments[2]
+
+							switch side, false {
+								case "Left":
+									side := string2Values(",", speaker.Fragments["Sides"])[1]
+								case "Right":
+									side := string2Values(",", speaker.Fragments["Sides"])[2]
+								default:
+									side := false
+							}
 						}
-					}
-					else
-						side := false
+						else
+							side := false
 
-					speaker.speakPhrase(side ? "SlowCarAheadSide" : "SlowCarAheadDistance", {distance: Round(convertUnit("Length", distance))
-																						   , unit: speaker.Fragments[getUnit("Length")], side: side})
+						speaker.speakPhrase(side ? "SlowCarAheadSide" : "SlowCarAheadDistance", {distance: Round(convertUnit("Length", distance))
+																							   , unit: speaker.Fragments[getUnit("Length")], side: side})
+					}
 				}
-			}
+		}
 	}
 
 	accidentAlert(type, arguments*) {
@@ -2853,15 +2857,16 @@ class RaceSpotter extends GridRaceAssistant {
 			if (this.Announcements["Accidents" . type] && this.Speaker[false] && this.Running) {
 				speaker := this.getSpeaker(true)
 
-				if ((arguments.Length > 0) && (type = "Ahead")) {
-					distance := (Round(arguments[1] / 50) * 50)
+				if !speaker.Speaking
+					if ((arguments.Length > 0) && (type = "Ahead")) {
+						distance := (Round(arguments[1] / 50) * 50)
 
-					if (distance > 0)
-						speaker.speakPhrase("Accident" . type . "Distance", {distance: Round(convertUnit("Length", distance))
-																		   , unit: speaker.Fragments[getUnit("Length")]})
-				}
-				else
-					speaker.speakPhrase("Accident" . type, false, false, "Accident" . type)
+						if (distance > 0)
+							speaker.speakPhrase("Accident" . type . "Distance", {distance: Round(convertUnit("Length", distance))
+																			   , unit: speaker.Fragments[getUnit("Length")]})
+					}
+					else
+						speaker.speakPhrase("Accident" . type, false, false, "Accident" . type)
 			}
 	}
 
@@ -2939,7 +2944,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 	startupSpotter(forceShutdown := false) {
 		local pid := false
-		local code, exePath, trackData
+		local code, exePath, trackData, traceFile
 
 		if !this.iSpotterPID {
 			code := this.SettingsDatabase.getSimulatorCode(this.Simulator)
@@ -2951,11 +2956,15 @@ class RaceSpotter extends GridRaceAssistant {
 
 				trackData := this.SettingsDatabase.getTrackData(this.Simulator, this.Track)
 
+				if isDebug()
+					deleteFile(kTempDirectory . "Race Spotter.track")
+
 				try {
 					Run("`"" . exePath . "`" " . getMultiMapValue(this.Settings, "Assistant.Spotter", "Accident.Distance.Ahead.Threshold", 800) . A_Space
 											   . getMultiMapValue(this.Settings, "Assistant.Spotter", "Accident.Distance.Behind.Threshold", 500) . A_Space
 											   . getMultiMapValue(this.Settings, "Assistant.Spotter", "SlowCar.Distance.Ahead.Threshold", 500)
-											   . (trackData ? (" `"" . trackData . "`"") : "")
+											   . (trackData ? (" `"" . trackData . "`"") : "") . A_Space
+											   . (isDebug() ? (" `"" . kTempDirectory . "Race Spotter.track`"") : "")
 					  , kBinariesDirectory, "Hide", &pid)
 				}
 				catch Any as exception {

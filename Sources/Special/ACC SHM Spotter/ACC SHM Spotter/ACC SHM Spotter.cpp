@@ -463,7 +463,7 @@ void updateIdealLine(int carIdx, double running, double speed) {
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 	IdealLine slot = idealLine[(int)std::round(running * 999)];
 
-	if (slot.count < 1000)
+	if (slot.count < INT_MAX)
 		if (slot.count == 0)
 		{
 			slot.count = 1;
@@ -486,16 +486,18 @@ void updateIdealLine(int carIdx, double running, double speed) {
 
 class TrackPart {
 public:
-	int count = 1;
+	int count;
 
 	double speed;
 	float distance;
 
 	TrackPart() :
+		count(0),
 		speed(0),
 		distance(0) {}
 
 	TrackPart(float s, float d) :
+		count(1),
 		speed(s),
 		distance(d) {}
 
@@ -517,7 +519,9 @@ long lastTrackTickCount = 0;
 
 float lastCarCoordinates[60][2];
 
-void trackBuilder() {
+string trackFileName = "";
+
+void updateTrackMap() {
 	try {
 		if (!trackReady) {
 			long milliSeconds = GetTickCount() - lastTrackTickCount;
@@ -530,8 +534,19 @@ void trackBuilder() {
 			float speed = (distance / ((float)milliSeconds / 1000.0f)) * 3.6f;
 
 			if ((speed > 80) || (distance > 20)) {
-				if (fabs(newPosX - startPosX) < 10.0 && fabs(newPosY - startPosY) < 10.0 && trackMap.size() > 100)
+				if (fabs(newPosX - startPosX) < 10.0 && fabs(newPosY - startPosY) < 10.0 && trackMap.size() > 100) {
 					trackReady = true;
+
+					if (trackFileName != "") {
+						std::ofstream output;
+
+						output.open(trackFileName, std::ios::out | std::ios::app);
+
+						output << "========== Finished mapping track ==========" << std::endl;
+
+						output.close();
+					}
+				}
 				else {
 					string key = std::to_string(((int)(round(newPosX / 20) * 10 - 10))) + std::to_string(((int)(round(newPosX / 20) * 10 + 10))) +
 								 std::to_string(((int)(round(newPosY / 20) * 10 - 10))) + std::to_string(((int)(round(newPosY / 20) * 10 + 10)));
@@ -541,6 +556,16 @@ void trackBuilder() {
 					}
 					catch (std::out_of_range e) {
 						trackMap[key] = TrackPart(speed, trackLength + distance);
+					}
+
+					if (trackFileName != "") {
+						std::ofstream output;
+
+						output.open(trackFileName, std::ios::out | std::ios::app);
+
+						output << trackMap.size() << ": Distance: " << round(distance) << "; Speed: " << round(speed) << "; Key: " << key << std::endl;
+
+						output.close();
 					}
 
 					trackLength += distance;
@@ -580,6 +605,16 @@ void startTrackBuilder(int driverIdx) {
 	for (int i = 0; i < 60; i++) {
 		lastCarCoordinates[i][0] = INT_MAX;
 		lastCarCoordinates[i][1] = INT_MAX;
+	}
+
+	if (trackFileName != "") {
+		std::ofstream output;
+
+		output.open(trackFileName, std::ios::out | std::ios::app);
+
+		output << "========== Start maapping track ==========" << std::endl;
+
+		output.close();
 	}
 }
 
@@ -664,7 +699,7 @@ bool checkAccident() {
 		return false;
 	}
 	else if (!trackReady) {
-		trackBuilder();
+		updateTrackMap();
 
 		lastTickCount += milliSeconds;
 
@@ -704,19 +739,52 @@ bool checkAccident() {
 							{
 								long distanceAhead = (long)(((distance > driverDistance) ? distance : (distance + trackLength)) - driverDistance);
 
-								if (distanceAhead < slowCarDistance)
+								if (distanceAhead < slowCarDistance) {
 									slowCarsAhead.push_back(SlowCarInfo(i, distanceAhead));
+
+									if (trackFileName != "") {
+										std::ofstream output;
+
+										output.open(trackFileName, std::ios::out | std::ios::app);
+
+										output << "Slow: " << i << "; Speed: " << round(speed) << "; Distance: " << round(distanceAhead) << std::endl;
+
+										output.close();
+									}
+								}
 
 								if (speed < (slot.speed / 4))
 								{
-									if (distanceAhead < aheadAccidentDistance)
+									if (distanceAhead < aheadAccidentDistance) {
 										accidentsAhead.push_back(SlowCarInfo(i, distanceAhead));
+
+										if (trackFileName != "") {
+											std::ofstream output;
+
+											output.open(trackFileName, std::ios::out | std::ios::app);
+
+											output << "Accident Ahead: " << i << "; Speed: " << round(speed) << "; Distance: " << round(distanceAhead) << std::endl;
+
+											output.close();
+										}
+									}
 
 									long distanceBehind = (long)(((distance < driverDistance) ? driverDistance : (driverDistance + trackLength)) - distance);
 
-									if (distanceBehind < behindAccidentDistance)
+									if (distanceBehind < behindAccidentDistance) {
 										accidentsBehind.push_back(SlowCarInfo(i, distanceBehind));
-								}
+
+										if (trackFileName != "") {
+											std::ofstream output;
+
+											output.open(trackFileName, std::ios::out | std::ios::app);
+
+											output << "Accident Behind: " << i << "; Speed: " << round(speed) << "; Distance: " << round(distanceBehind) << std::endl;
+
+											output.close();
+										}
+									}
+								}	
 							}
 						}
 					}
@@ -1652,6 +1720,9 @@ int main(int argc, char* argv[])
 
 			if (argc > 3)
 				slowCarDistance = atoi(argv[3]);
+
+			if (argc > 4)
+				trackFileName = argv[4];
 		}
 	}
 

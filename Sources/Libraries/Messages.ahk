@@ -139,6 +139,12 @@ class MessageManager extends PeriodicTask {
 		}
 	}
 
+	Paused {
+		Get {
+			return this.iPaused
+		}
+	}
+
 	static MessageHandlers[key?] {
 		Get {
 			MessageManager.initializeMessageHandlers()
@@ -180,7 +186,7 @@ class MessageManager extends PeriodicTask {
 	}
 
 	static isPaused() {
-		return MessageManager.Instance.iPaused
+		return MessageManager.Instance.Paused
 	}
 
 	static pause() {
@@ -344,7 +350,7 @@ class MessageManager extends PeriodicTask {
 	run() {
 		local messages
 
-		if !this.iPaused {
+		if !this.Paused {
 			protectionOn()
 
 			try {

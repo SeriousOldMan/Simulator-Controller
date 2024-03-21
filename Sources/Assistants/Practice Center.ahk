@@ -6851,7 +6851,7 @@ class PracticeCenter extends ConfigurationItem {
 		this.pushTask(showLapDetailsAsync.Bind(lap))
 	}
 
-	startSession(fileName) {
+	startSession(fileName, wait := false) {
 		startSessionAsync() {
 			local data := readMultiMap(fileName)
 			local translator
@@ -6889,7 +6889,10 @@ class PracticeCenter extends ConfigurationItem {
 			}
 		}
 
-		this.pushTask(startSessionAsync)
+		if wait
+			startSessionAsync()
+		else
+			this.pushTask(startSessionAsync)
 	}
 
 	updateLap(lapNumber, fileName, update := false) {
@@ -6897,6 +6900,9 @@ class PracticeCenter extends ConfigurationItem {
 			local data := readMultiMap(fileName)
 
 			try {
+				if ((lapNumber = 1) && !update)
+					this.startSession(fileName, true)
+
 				if update {
 					if (this.SessionActive && (this.LastLap.Nr = lapNumber))
 						this.updateRunning(lapNumber, data)

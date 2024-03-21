@@ -1179,15 +1179,10 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 			setMultiMapValue(data, "Position Data", "Car." . A_Index . ".Nr", carNr)
 		}
 
-		if (driver && (count > 0)) {
-			if (getMultiMapValue(data, "Position Data", "Car." . A_Index . ".InPitlane", false)
+		if (driver && (count > 0))
+			if (getMultiMapValue(data, "Position Data", "Car." . driver . ".InPitlane", false)
 			 && !getMultiMapValue(data, "Stint Data", "InPitlane", false))
 				setMultiMapValue(data, "Stint Data", "InPitlane", true)
-
-			if (getMultiMapValue(data, "Position Data", "Car." . A_Index . ".InPitlane", false)
-			 && !getMultiMapValue(data, "Stint Data", "InPitlane", false))
-				setMultiMapValue(data, "Stint Data", "InPitlane", true)
-		}
 
 		this.iHasPositionsData := (count > 0)
 	}

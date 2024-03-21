@@ -545,7 +545,7 @@ void updateTrackMap() {
 
 						output.open(traceFileName, std::ios::out | std::ios::app);
 
-						output << "========== Finished mapping track ==========" << std::endl;
+						output << "========== Finished mapping track (" << trackLength << ") ==========" << std::endl;
 
 						output.close();
 					}
@@ -638,7 +638,7 @@ float getDistance(int carIdx) {
 
 			output.open(traceFileName, std::ios::out | std::ios::app);
 
-			output << "D";
+			output << "D " << distance << "; " << distance / trackLength << endl;
 
 			output.close();
 		}
@@ -646,16 +646,6 @@ float getDistance(int carIdx) {
 		return distance / trackLength;
 	}
 	catch (std::out_of_range e) {
-		if (traceFileName != "") {
-			std::ofstream output;
-
-			output.open(traceFileName, std::ios::out | std::ios::app);
-
-			output << "-";
-
-			output.close();
-		}
-
 		return -1;
 	}
 }
@@ -673,31 +663,22 @@ float getSpeed(int carIdx, long deltaMS) {
 	lastCarCoordinates[carIdx][1] = newPosY;
 
 	if ((lastPosX != INT_MAX) || (lastPosY != INT_MAX)) {
-		return (vectorLength(lastPosX - newPosX, lastPosY - newPosY) / ((float)deltaMS / 1000.0f)) * 3.6f;
+		float speed = (vectorLength(lastPosX - newPosX, lastPosY - newPosY) / ((float)deltaMS / 1000.0f)) * 3.6f;
 
 		if (traceFileName != "") {
 			std::ofstream output;
 
 			output.open(traceFileName, std::ios::out | std::ios::app);
 
-			output << "S";
+			output << "S " << speed << endl;
 
 			output.close();
 		}
+
+		return speed;
 	}
-	else {
-		if (traceFileName != "") {
-			std::ofstream output;
-
-			output.open(traceFileName, std::ios::out | std::ios::app);
-
-			output << "-";
-
-			output.close();
-		}
-
+	else
 		return -1;
-	}
 }
 
 class SlowCarInfo
@@ -777,9 +758,9 @@ bool checkAccident() {
 					double distance = getDistance(i);
 
 					if (distance >= 0) {
-						updateIdealLine(i, distance, speed);
-
 						distance = distance * trackLength;
+
+						updateIdealLine(i, distance, speed);
 						
 						if (i != carID)
 						{

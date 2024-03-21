@@ -629,12 +629,16 @@ void writePositions(const irsdk_header *header, const char* data)
 
 		char* trackPositions;
 		char* trackLocations;
+		char* carPositions;
 
 		if (!getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct"))
 			trackPositions = 0;
 
 		if (getRawDataValue(trackLocations, header, data, "CarIdxTrackSurface"))
 			trackLocations = 0;
+
+		if (getRawDataValue(carPositions, header, data, "CarIdxPosition"))
+			carPositions = 0;
 
 		int numStarters = 0;
 
@@ -655,7 +659,11 @@ void writePositions(const irsdk_header *header, const char* data)
 				getYamlValue(result, sessionInfo, "DriverInfo:Drivers:CarIdx:{%s}CarNumber:", carIdx);
 
 				printf("Car.%s.Nr=%s\n", carIdx1, result);
-				printf("Car.%s.Position=%s\n", carIdx1, posIdx);
+
+				if (carPositions)
+					printf("Car.%s.Position=%d\n", carIdx1, ((irsdk_TrkLoc*)trackLocations)[carIndex]);
+				else
+					printf("Car.%s.Position=%s\n", carIdx1, posIdx);
 
 				getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:CarIdx:{%s}LapsComplete:", sessionID, carIdx);
 

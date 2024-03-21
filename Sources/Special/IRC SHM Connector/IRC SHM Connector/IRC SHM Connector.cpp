@@ -644,12 +644,16 @@ void writePositions(std::ostringstream* output, const irsdk_header *header, cons
 		
 		char* trackPositions;
 		char* trackLocations;
+		char* carPositions;
 
 		if (!getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct"))
 			trackPositions = 0;
 
 		if (getRawDataValue(trackLocations, header, data, "CarIdxTrackSurface"))
 			trackLocations = 0;
+
+		if (getRawDataValue(carPositions, header, data, "CarIdxPosition"))
+			carPositions = 0;
 
 		int numStarters = 0;
 
@@ -670,7 +674,11 @@ void writePositions(std::ostringstream* output, const irsdk_header *header, cons
 				getYamlValue(result, sessionInfo, "DriverInfo:Drivers:CarIdx:{%s}CarNumber:", carIdx);
 
 				printLine(output, "Car." + std::string(carIdx1) + ".Nr=" + std::string(result));
-				printLine(output, "Car." + std::string(carIdx1) + ".Position=" + std::string(posIdx));
+
+				if (carPositions)
+					printLine(output, "Car." + std::string(carIdx1) + ".Position=" + std::to_string(((irsdk_TrkLoc*)trackLocations)[carIndex]));
+				else
+					printLine(output, "Car." + std::string(carIdx1) + ".Position=" + std::string(posIdx));
 
 				getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:CarIdx:{%s}LapsComplete:", sessionID, carIdx);
 

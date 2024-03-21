@@ -1007,12 +1007,12 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 			if (trackLocations) {
 				irsdk_TrkLoc location = ((irsdk_TrkLoc*)trackLocations)[atoi(playerCarIdx)];
 				if (location == irsdk_InPitStall)
-					printf("InPit=true");
+					printf("InPit=true\n");
 				else
-					printf("InPit=false");
+					printf("InPit=false\n");
 			}
 			else
-				printf("InPit=false");
+				printf("InPit=false\n");
 
 			printf("[Track Data]\n");
 

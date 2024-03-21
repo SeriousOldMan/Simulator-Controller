@@ -576,7 +576,7 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 
 	long milliSeconds = GetTickCount() - lastTickCount;
 
-	if (milliSeconds < 10)
+	if (milliSeconds < 50)
 		return false;
 
 	lastTickCount += milliSeconds;

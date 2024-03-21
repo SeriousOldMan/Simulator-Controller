@@ -6905,7 +6905,7 @@ class PracticeCenter extends ConfigurationItem {
 					if (this.SessionMode && !this.SessionActive)
 						return
 
-					if ((!this.LastLap && (lapNumber = 1)) || ((this.LastLap.Nr + 1) = lapNumber)) {
+					if ((!this.LastLap && (lapNumber = 1)) || (this.LastLap && ((this.LastLap.Nr + 1) = lapNumber))) {
 						this.iSessionMode := "Active"
 
 						this.addLap(lapNumber, data)

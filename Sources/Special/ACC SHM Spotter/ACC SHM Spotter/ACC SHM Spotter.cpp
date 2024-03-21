@@ -526,6 +526,9 @@ void updateTrackMap() {
 		if (!trackReady) {
 			long milliSeconds = GetTickCount() - lastTrackTickCount;
 
+			if (milliSeconds < 50)
+				return;
+
 			SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
 			float newPosX = gf->carCoordinates[trackDriverIdx][0];
@@ -791,7 +794,7 @@ bool checkAccident() {
 
 										output.open(trackFileName, std::ios::out | std::ios::app);
 
-										output << "Slow: " << i << "; Speed: " << round(speed) << "; Distance: " << round(distanceAhead) << std::endl;
+										output << endl << "Slow: " << i << "; Speed: " << round(speed) << "; Distance: " << round(distanceAhead) << std::endl;
 
 										output.close();
 									}
@@ -807,7 +810,7 @@ bool checkAccident() {
 
 											output.open(trackFileName, std::ios::out | std::ios::app);
 
-											output << "Accident Ahead: " << i << "; Speed: " << round(speed) << "; Distance: " << round(distanceAhead) << std::endl;
+											output << endl << "Accident Ahead: " << i << "; Speed: " << round(speed) << "; Distance: " << round(distanceAhead) << std::endl;
 
 											output.close();
 										}
@@ -823,7 +826,7 @@ bool checkAccident() {
 
 											output.open(trackFileName, std::ios::out | std::ios::app);
 
-											output << "Accident Behind: " << i << "; Speed: " << round(speed) << "; Distance: " << round(distanceBehind) << std::endl;
+											output << endl << "Accident Behind: " << i << "; Speed: " << round(speed) << "; Distance: " << round(distanceBehind) << std::endl;
 
 											output.close();
 										}

@@ -606,8 +606,12 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 					if (first)
 						lastRunnings[carIndex] = running;
 					else if (milliSeconds < 200) {
-						if (running >= lastRunnings[carIndex])
-							speed = (((running - lastRunnings[carIndex]) * trackLength) / ((float)milliSeconds / 1000.0f)) * 3.6f;
+						float lastRunning = lastRunnings[carIndex];
+						
+						lastRunnings[carIndex] = running;
+							
+						if (running >= lastRunning)
+							speed = (((running - lastRunning) * trackLength) / ((float)milliSeconds / 1000.0f)) * 3.6f;
 						else
 							continue;
 

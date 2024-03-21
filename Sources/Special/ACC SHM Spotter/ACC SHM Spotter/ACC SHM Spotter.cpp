@@ -758,13 +758,13 @@ bool checkAccident() {
 					double distance = getDistance(i);
 
 					if (distance >= 0) {
-						distance = distance * trackLength;
-
 						updateIdealLine(i, distance, speed);
 						
 						if (i != carID)
 						{
 							IdealLine slot = idealLine[min(999, (int)std::round(distance * 999))];
+
+							distance = distance * trackLength;
 
 							if ((slot.count > 20) && (speed < (slot.speed / 2)))
 							{

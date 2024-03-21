@@ -43,8 +43,9 @@ remainingStintLaps(?lap, ?remainingLaps) <= remainingStintLaps(?lap, Fuel, ?fuel
 remainingStintLaps(?lap, ?remainingLaps) <= remainingSessionLaps(?lap, ?remainingLaps)
 
 remainingStintLaps(?lap, Fuel, ?remainingLaps) <= remainingStintLaps(?lap, Fuel, ?remainingLaps, false)
-remainingStintLaps(?lap, Driver, ?remainingLaps) <= remainingStintTime(?stintTime), lapAvgTime(?lap, ?avgTime),
+remainingStintLaps(?lap, Driver, ?remainingLaps) <= !Session.Format = Time, remainingStintTime(?stintTime), lapAvgTime(?lap, ?avgTime),
 													?remainingLaps = ?stintTime / ?avgTime
+remainingStintLaps(?lap, Driver, !Session.Lap.Remaining) <= !Session.Format = Laps
 
 remainingStintLaps(?lap, Fuel, ?remainingLaps, true) <= lapRemainingFuel(?lap, ?temp), lapAvgConsumption(?lap, ?fuelPerLap),
 														safetyFuel(?fuelPerLap, ?safetyFuel), ?fuelLeft = ?temp - ?safetyFuel,

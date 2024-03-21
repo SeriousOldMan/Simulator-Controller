@@ -685,12 +685,10 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 
 		super.updatePositionsData(data)
 
-		loop {
+		loop getMultiMapValue(data, "Position Data", "Car.Count", 0) {
 			carID := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Car", kUndefined)
 
-			if (carID == kUndefined)
-				break
-			else {
+			if (carID != kUndefined) {
 				setMultiMapValue(data, "Position Data", "Car." . A_Index . ".Car", this.getCarName(carID))
 
 				setMultiMapValue(data, "Position Data", "Car." . A_Index . ".Class"

@@ -421,12 +421,10 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 		local duplicateNrs := false
 		local carRaw, carID, model, category, nr
 
-		loop {
+		loop getMultiMapValue(positionsData, "Position Data", "Car.Count", 0) {
 			carRaw := getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".CarRaw", kUndefined)
 
-			if (carRaw == kUndefined)
-				break
-			else {
+			if (carRaw != kUndefined) {
 				this.parseCarName(carRaw, &model, &nr, &category)
 
 				if model
@@ -447,12 +445,10 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 		}
 
 		if duplicateNrs
-			loop {
+			loop getMultiMapValue(positionsData, "Position Data", "Car.Count", 0) {
 				carID := getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".ID", kUndefined)
 
-				if (carID == kUndefined)
-					break
-				else
+				if (carID != kUndefined)
 					setMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Nr", carID)
 			}
 

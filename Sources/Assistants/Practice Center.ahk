@@ -1899,7 +1899,7 @@ class PracticeCenter extends ConfigurationItem {
 		local classes := CaseInsenseMap()
 		local class
 
-		loop getMultiMapValue(data, "Position Data", "Car.Count") {
+		loop getMultiMapValue(data, "Position Data", "Car.Count", 0) {
 			class := this.getClass(data, A_Index)
 
 			if !classes.Has(class)
@@ -1956,7 +1956,7 @@ class PracticeCenter extends ConfigurationItem {
 		if sorted {
 			positions := []
 
-			loop getMultiMapValue(data, "Position Data", "Car.Count")
+			loop getMultiMapValue(data, "Position Data", "Car.Count", 0)
 				if (!class || (class = this.getClass(data, A_Index)))
 					positions.Push(Array(A_Index, getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Position")))
 
@@ -1966,7 +1966,7 @@ class PracticeCenter extends ConfigurationItem {
 				classGrid.Push(position[1])
 		}
 		else
-			loop getMultiMapValue(data, "Position Data", "Car.Count")
+			loop getMultiMapValue(data, "Position Data", "Car.Count", 0)
 				if (!class || (class = this.getClass(data, A_Index)))
 					classGrid.Push(A_Index)
 
@@ -3230,7 +3230,7 @@ class PracticeCenter extends ConfigurationItem {
 
 		carIDs := CaseInsenseWeakMap()
 
-		loop getMultiMapValue(lap.Data, "Position Data", "Car.Count")
+		loop getMultiMapValue(lap.Data, "Position Data", "Car.Count", 0)
 			carIDs[A_Index] := getMultiMapValue(lap.Data, "Position Data", "Car." . A_Index . ".ID")
 
 		lap := lap.Nr
@@ -6851,7 +6851,7 @@ class PracticeCenter extends ConfigurationItem {
 		this.pushTask(showLapDetailsAsync.Bind(lap))
 	}
 
-	startSession(fileName) {
+	startSession(fileName, wait := false) {
 		startSessionAsync() {
 			local data := readMultiMap(fileName)
 			local translator
@@ -6889,7 +6889,10 @@ class PracticeCenter extends ConfigurationItem {
 			}
 		}
 
-		this.pushTask(startSessionAsync)
+		if wait
+			startSessionAsync()
+		else
+			this.pushTask(startSessionAsync)
 	}
 
 	updateLap(lapNumber, fileName, update := false) {
@@ -6897,6 +6900,9 @@ class PracticeCenter extends ConfigurationItem {
 			local data := readMultiMap(fileName)
 
 			try {
+				if ((lapNumber = 1) && !update)
+					this.startSession(fileName, true)
+
 				if update {
 					if (this.SessionActive && (this.LastLap.Nr = lapNumber))
 						this.updateRunning(lapNumber, data)
@@ -6905,7 +6911,7 @@ class PracticeCenter extends ConfigurationItem {
 					if (this.SessionMode && !this.SessionActive)
 						return
 
-					if ((!this.LastLap && (lapNumber = 1)) || ((this.LastLap.Nr + 1) = lapNumber)) {
+					if ((!this.LastLap && (lapNumber = 1)) || (this.LastLap && ((this.LastLap.Nr + 1) = lapNumber))) {
 						this.iSessionMode := "Active"
 
 						this.addLap(lapNumber, data)

@@ -447,7 +447,7 @@ void changePitstopRefuelAmount(const irsdk_header* header, const char* data, flo
 
 void changePitstopTyreCompound(const irsdk_header* header, const char* data, int offset) {
 	if (offset != 0)
-		irsdk_broadcastMsg(irsdk_BroadcastPitCommand, irsdk_PitCommand_TC, (int)(getDataFloat(header, data, "PitSvTireCompound") + offset));
+		irsdk_broadcastMsg(irsdk_BroadcastPitCommand, irsdk_PitCommand_TC, ((int)(getDataFloat(header, data, "PitSvTireCompound") + 1) + offset));
 }
 
 void changePitstopTyrePressure(const irsdk_header* header, int command, char* serviceFlag, float pressureDelta) {
@@ -622,40 +622,55 @@ void writePositions(const irsdk_header *header, const char* data)
 		char carIdx1[10];
 		
 		printf("[Position Data]\n");
-		
-		itoa(atoi(playerCarIdx) + 1, carIdx1, 10);
-
-		printf("Driver.Car=%s\n", carIdx1);
 
 		char* trackPositions;
 		char* trackLocations;
+		char* carPositions;
 
 		if (!getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct"))
 			trackPositions = 0;
 
 		if (getRawDataValue(trackLocations, header, data, "CarIdxTrackSurface"))
 			trackLocations = 0;
-		
-		for (int i = 1; ; i++) {
+
+		if (getRawDataValue(carPositions, header, data, "CarIdxPosition"))
+			carPositions = 0;
+
+		bool hasData = false;
+		int numStarters = 0;
+		int offset = 0;
+
+		if (getYamlValue(result, sessionInfo, "WeekendInfo:WeekendOptions:NumStarters:"))
+			numStarters = atoi(result);
+
+		printf("Car.Count=%d\n", numStarters);
+
+		for (int i = 1; i <= numStarters; i++) {
 			itoa(i, posIdx, 10);
-			
+
 			if (getYamlValue(carIdx, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:Position:{%s}CarIdx:", sessionID, posIdx)) {
+				hasData = true;
+
 				int carIndex = atoi(carIdx);
 				char carIdx1[10];
 
-				itoa(carIndex + 1, carIdx1, 10);
+				itoa(carIndex + 1 + offset, carIdx1, 10);
 
-				getYamlValue(result, sessionInfo, "DriverInfo:Drivers:CarIdx:{%s}CarNumber:", carIdx1);
+				getYamlValue(result, sessionInfo, "DriverInfo:Drivers:CarIdx:{%s}CarNumber:", carIdx);
 
 				printf("Car.%s.Nr=%s\n", carIdx1, result);
-				printf("Car.%s.Position=%s\n", carIdx1, posIdx);
+
+				if (carPositions)
+					printf("Car.%s.Position=%d\n", carIdx1, ((int*)carPositions)[carIndex]);
+				else
+					printf("Car.%s.Position=%s\n", carIdx1, posIdx);
 
 				getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:CarIdx:{%s}LapsComplete:", sessionID, carIdx);
 
 				printf("Car.%s.Laps=%s\n", carIdx1, result);
 
 				getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:CarIdx:{%s}LastTime:", sessionID, carIdx);
-				
+
 				printf("Car.%s.Time=%ld\n", carIdx1, (long)(normalize(atof(result)) * 1000));
 
 				getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:CarIdx:{%s}Incidents:", sessionID, carIdx);
@@ -697,13 +712,16 @@ void writePositions(const irsdk_header *header, const char* data)
 				if (getRawDataValue(pitLaneStates, header, data, "CarIdxOnPitRoad"))
 					printf("Car.%s.InPitLane=%s\n", carIdx1, ((bool*)pitLaneStates)[carIndex] ? "true" : "false");
 			}
-			else {
-				itoa(i - 1, posIdx, 10);
+			else
+				offset -= 1;
+		}
 
-				printf("Car.Count=%s\n", posIdx);
-				
-				break;
-			}
+		if (hasData) {
+			printf("Car.Count=%d\n", numStarters - offset);
+
+			itoa(atoi(playerCarIdx) + 1, carIdx1, 10);
+
+			printf("Driver.Car=%d\n" + atoi(playerCarIdx) + 1);
 		}
 	}
 }
@@ -998,12 +1016,12 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 			if (trackLocations) {
 				irsdk_TrkLoc location = ((irsdk_TrkLoc*)trackLocations)[atoi(playerCarIdx)];
 				if (location == irsdk_InPitStall)
-					printf("InPit=true");
+					printf("InPit=true\n");
 				else
-					printf("InPit=false");
+					printf("InPit=false\n");
 			}
 			else
-				printf("InPit=false");
+				printf("InPit=false\n");
 
 			printf("[Track Data]\n");
 
@@ -1057,7 +1075,12 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 
 			printf("Grip=%s\n", gripLevel);
 
-			for (int i = 1; ; i++) {
+			int numStarters = 0;
+
+			if (getYamlValue(result, sessionInfo, "WeekendInfo:WeekendOptions:NumStarters:"))
+				numStarters = atoi(result);
+
+			for (int i = 1; i <= numStarters; i++) {
 				char posIdx[10];
 				char carIdx[10];
 
@@ -1076,8 +1099,6 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 						printf("Car.%s.Position=%f,%f\n", carIdx1, coordinateX, coordinateY);
 					}
 				}
-				else
-					break;
 			}
 
 			printf("[Weather Data]\n");

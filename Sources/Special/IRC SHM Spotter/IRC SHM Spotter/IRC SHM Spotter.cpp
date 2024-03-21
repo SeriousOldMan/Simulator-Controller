@@ -427,8 +427,13 @@ bool checkPositions(const irsdk_header* header, const char* data, const int play
 			if (getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct") &&
 				getRawDataValue(pitLaneStates, header, data, "CarIdxOnPitRoad")) {
 				float playerRunning = ((float*)trackPositions)[playerCarIndex];
+				char result[60];
+				int numStarters = 0;
 
-				for (int i = 1; ; i++) {
+				if (getYamlValue(result, sessionInfo, "WeekendInfo:WeekendOptions:NumStarters:"))
+					numStarters = atoi(result);
+
+				for (int i = 1; i <= numStarters; i++) {
 					char posIdx[10];
 					char carIdx[10];
 
@@ -448,8 +453,6 @@ bool checkPositions(const irsdk_header* header, const char* data, const int play
 								}
 						}
 					}
-					else
-						break;
 				}
 			}
 		}
@@ -558,6 +561,8 @@ std::vector<SlowCarInfo> slowCarsAhead;
 long lastTickCount = 0;
 double lastRunnings[256];
 
+std::string traceFileName = "";
+
 bool checkAccident(const irsdk_header* header, const char* data, const int playerCarIndex, float trackLength)
 {
 	accidentsAhead.resize(0);
@@ -576,17 +581,21 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 
 	long milliSeconds = GetTickCount() - lastTickCount;
 
-	if (milliSeconds < 10)
+	if (milliSeconds < 50)
 		return false;
 
 	lastTickCount += milliSeconds;
 
 	if (getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct")) {
 		float driverRunning = ((float*)trackPositions)[playerCarIndex];
+		int numStarters = 0;
+
+		if (getYamlValue(result, sessionInfo, "WeekendInfo:WeekendOptions:NumStarters:"))
+			numStarters = atoi(result);
 
 		try
 		{
-			for (int i = 1; ; i++) {
+			for (int i = 1; i <= numStarters; i++) {
 				itoa(i, posIdx, 10);
 
 				if (getYamlValue(carIdx, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:Position:{%s}CarIdx:", sessionID, posIdx)) {
@@ -613,35 +622,96 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 								long distanceAhead = (long)(((running > driverRunning) ? (running * trackLength)
 																					   : ((running * trackLength) + trackLength)) - (driverRunning * trackLength));
 
-								if (distanceAhead < slowCarDistance)
+								if (distanceAhead < slowCarDistance) {
 									slowCarsAhead.push_back(SlowCarInfo(i, distanceAhead));
+
+									if (traceFileName != "") {
+										std::ofstream output;
+
+										output.open(traceFileName, std::ios::out | std::ios::app);
+
+										output << "Slow: " << i << "; Speed: " << round(speed) << "; Distance: " << round(distanceAhead) << std::endl;
+
+										output.close();
+									}
+								}
 
 								if (speed < (slot.speed / 4))
 								{
-									if (distanceAhead < aheadAccidentDistance)
+									if (distanceAhead < aheadAccidentDistance) {
 										accidentsAhead.push_back(SlowCarInfo(i, distanceAhead));
+
+										if (traceFileName != "") {
+											std::ofstream output;
+
+											output.open(traceFileName, std::ios::out | std::ios::app);
+
+											output << "Accident Ahead: " << i << "; Speed: " << round(speed) << "; Distance: " << round(distanceAhead) << std::endl;
+
+											output.close();
+										}
+									}
 
 									long distanceBehind = (long)(((running < driverRunning) ? (driverRunning * trackLength)
 																						    : ((driverRunning * trackLength) + trackLength)) - (running * trackLength));
 
-									if (distanceBehind < behindAccidentDistance)
+									if (distanceBehind < behindAccidentDistance) {
 										accidentsBehind.push_back(SlowCarInfo(i, distanceBehind));
+
+										if (traceFileName != "") {
+											std::ofstream output;
+
+											output.open(traceFileName, std::ios::out | std::ios::app);
+
+											output << "Accident Behind: " << i << "; Speed: " << round(speed) << "; Distance: " << round(distanceBehind) << std::endl;
+
+											output.close();
+										}
+									}
 								}
 							}
 						}
 					}
 				}
-				else
-					break;
 			}
 		}
 		catch (const std::exception& ex) {
+			if (traceFileName != "") {
+				std::ofstream output;
+
+				output.open(traceFileName, std::ios::out | std::ios::app);
+
+				output << std::endl << "Error: " << std::string(ex.what()) << std::endl;
+
+				output.close();
+			}
+
 			sendSpotterMessage(("internalError:" + std::string(ex.what())).c_str());
 		}
 		catch (const std::string& ex) {
+			if (traceFileName != "") {
+				std::ofstream output;
+
+				output.open(traceFileName, std::ios::out | std::ios::app);
+
+				output << std::endl << "Error: " << ex << std::endl;
+
+				output.close();
+			}
+
 			sendSpotterMessage(("internalError:" + ex).c_str());
 		}
 		catch (...) {
+			if (traceFileName != "") {
+				std::ofstream output;
+
+				output.open(traceFileName, std::ios::out | std::ios::app);
+
+				output << std::endl << "Error: Unknown" << std::endl;
+
+				output.close();
+			}
+
 			sendSpotterMessage("internalError");
 		}
 	}
@@ -1691,8 +1761,15 @@ int main(int argc, char* argv[])
 			if (argc > 3)
 				slowCarDistance = atoi(argv[3]);
 
-			if (argc > 4)
-				loadTrackCoordinates(argv[4]);
+			if (argc > 4) {
+				traceFileName = std::string(argv[4]);
+
+				if (traceFileName == "-")
+					traceFileName = "";
+
+				if (argc > 5)
+					loadTrackCoordinates(argv[5]);
+			}
 		}
 	}
 

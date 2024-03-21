@@ -464,7 +464,7 @@ void changePitstopRefuelAmount(const irsdk_header* header, const char* data, flo
 
 void changePitstopTyreCompound(const irsdk_header* header, const char* data, int offset) {
 	if (offset != 0)
-		irsdk_broadcastMsg(irsdk_BroadcastPitCommand, irsdk_PitCommand_TC, (int)(getDataFloat(header, data, "PitSvTireCompound") + offset));
+		irsdk_broadcastMsg(irsdk_BroadcastPitCommand, irsdk_PitCommand_TC, ((int)(getDataFloat(header, data, "PitSvTireCompound") + 1) + offset));
 }
 
 void changePitstopTyrePressure(const irsdk_header* header, int command, const char* serviceFlag, float pressureDelta) {
@@ -638,12 +638,9 @@ void writePositions(std::ostringstream* output, const irsdk_header *header, cons
 
 		printLine(output, "[Position Data]");
 		
-		itoa(atoi(playerCarIdx) + 1, carIdx1, 10);
-
-		printLine(output, "Driver.Car=" + std::string(carIdx1));
-		
 		char* trackPositions;
 		char* trackLocations;
+		char* carPositions;
 
 		if (!getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct"))
 			trackPositions = 0;
@@ -651,19 +648,35 @@ void writePositions(std::ostringstream* output, const irsdk_header *header, cons
 		if (getRawDataValue(trackLocations, header, data, "CarIdxTrackSurface"))
 			trackLocations = 0;
 
-		for (int i = 1; ; i++) {
+		if (getRawDataValue(carPositions, header, data, "CarIdxPosition"))
+			carPositions = 0;
+
+		int numStarters = 0;
+		bool hasData = false;
+		int offset = 0;
+
+		if (getYamlValue(result, sessionInfo, "WeekendInfo:WeekendOptions:NumStarters:"))
+			numStarters = atoi(result);
+
+		for (int i = 1; i <= numStarters; i++) {
 			itoa(i, posIdx, 10);
 			
 			if (getYamlValue(carIdx, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:Position:{%s}CarIdx:", sessionID, posIdx)) {
+				hasData = true;
+
 				int carIndex = atoi(carIdx);
 				char carIdx1[10];
 
-				itoa(carIndex + 1, carIdx1, 10);
+				itoa(carIndex + 1 + offset, carIdx1, 10);
 
-				getYamlValue(result, sessionInfo, "DriverInfo:Drivers:CarIdx:{%s}CarNumber:", carIdx1);
+				getYamlValue(result, sessionInfo, "DriverInfo:Drivers:CarIdx:{%s}CarNumber:", carIdx);
 
 				printLine(output, "Car." + std::string(carIdx1) + ".Nr=" + std::string(result));
-				printLine(output, "Car." + std::string(carIdx1) + ".Position=" + std::string(posIdx));
+
+				if (carPositions)
+					printLine(output, "Car." + std::string(carIdx1) + ".Position=" + std::to_string(((int*)carPositions)[carIndex]));
+				else
+					printLine(output, "Car." + std::string(carIdx1) + ".Position=" + std::string(posIdx));
 
 				getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:CarIdx:{%s}LapsComplete:", sessionID, carIdx);
 
@@ -713,13 +726,16 @@ void writePositions(std::ostringstream* output, const irsdk_header *header, cons
 				if (getRawDataValue(pitLaneStates, header, data, "CarIdxOnPitRoad"))
 					printLine(output, "Car." + std::string(carIdx1) + ".InPitLane=" + std::string(((bool*)pitLaneStates)[carIndex] ? "true" : "false"));
 			}
-			else {
-				itoa(i - 1, posIdx, 10);
+			else
+				offset -= 1;
+		}
 
-				printLine(output, "Car.Count=" + std::string(posIdx));
-				
-				break;
-			}
+		if (hasData) {
+			printLine(output, "Car.Count=" + std::to_string(numStarters - offset));
+
+			itoa(atoi(playerCarIdx) + 1, carIdx1, 10);
+
+			printLine(output, "Driver.Car=" + std::string(carIdx1));
 		}
 	}
 }
@@ -1070,7 +1086,12 @@ void writeData(std::ostringstream * output, const irsdk_header *header, const ch
 
 			printLine(output, "Grip=" + std::string(gripLevel));
 
-			for (int i = 1; ; i++) {
+			int numStarters = 0;
+
+			if (getYamlValue(result, sessionInfo, "WeekendInfo:WeekendOptions:NumStarters:"))
+				numStarters = atoi(result);
+
+			for (int i = 1; i <= numStarters; i++) {
 				char posIdx[10];
 				char carIdx[10];
 
@@ -1089,8 +1110,6 @@ void writeData(std::ostringstream * output, const irsdk_header *header, const ch
 						printLine(output, "Car." + std::string(carIdx1) + ".Position=" + std::to_string(coordinateX) + "," + std::to_string(coordinateY));
 					}
 				}
-				else
-					break;
 			}
 
 			printLine(output, "[Weather Data]");

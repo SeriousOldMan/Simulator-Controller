@@ -2654,7 +2654,7 @@ class GridRaceAssistant extends RaceAssistant {
 		if (data || !lastKnowledgeBase || (lastKnowledgebase != knowledgeBase) || !classes) {
 			classes := CaseInsenseMap()
 
-			loop (data ? getMultiMapValue(data, "Position Data", "Car.Count") : (knowledgeBase ? knowledgeBase.getValue("Car.Count") : 0))
+			loop (data ? getMultiMapValue(data, "Position Data", "Car.Count", 0) : (knowledgeBase ? knowledgeBase.getValue("Car.Count") : 0))
 				if (data || knowledgeBase.getValue("Car." . A_Index . ".Car", false)) {
 					class := this.getClass(A_Index, data)
 
@@ -2736,7 +2736,7 @@ class GridRaceAssistant extends RaceAssistant {
 				positions := []
 
 				if data {
-					loop getMultiMapValue(data, "Position Data", "Car.Count")
+					loop getMultiMapValue(data, "Position Data", "Car.Count", 0)
 						if (!class || (class = this.getClass(A_Index, data)))
 							positions.Push(Array(A_Index, getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Position")))
 				}
@@ -2753,7 +2753,7 @@ class GridRaceAssistant extends RaceAssistant {
 			}
 			else {
 				if data {
-					loop getMultiMapValue(data, "Position Data", "Car.Count")
+					loop getMultiMapValue(data, "Position Data", "Car.Count", 0)
 						if (!class || (class = this.getClass(A_Index, data)))
 							classGrid.Push(A_Index)
 				}
@@ -3000,7 +3000,7 @@ class GridRaceAssistant extends RaceAssistant {
 	}
 
 	initializeGridPosition(data, force := false) {
-		local count := getMultiMapValue(data, "Position Data", "Car.Count", false)
+		local count := getMultiMapValue(data, "Position Data", "Car.Count", 0)
 		local driver := getMultiMapValue(data, "Position Data", "Driver.Car", false)
 
 		if isDebug()

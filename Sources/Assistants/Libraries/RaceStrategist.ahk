@@ -1419,7 +1419,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 	createRaceData(data) {
 		local raceData := newMultiMap()
-		local carCount := getMultiMapValue(data, "Position Data", "Car.Count")
+		local carCount := getMultiMapValue(data, "Position Data", "Car.Count", 0)
 		local carCategory
 
 		setMultiMapValue(raceData, "Cars", "Count", carCount)

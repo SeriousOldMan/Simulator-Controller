@@ -651,16 +651,23 @@ void writePositions(std::ostringstream* output, const irsdk_header *header, cons
 		if (getRawDataValue(trackLocations, header, data, "CarIdxTrackSurface"))
 			trackLocations = 0;
 
-		for (int i = 1; ; i++) {
+		int numStarters = 0;
+
+		if (getYamlValue(result, sessionInfo, "WeekendInfo:WeekendOptions:NumStarters:"))
+			numStarters = atoi(result);
+
+		printLine(output, "Car.Count=" + std::to_string(numStarters));
+
+		for (int i = 1; i <= numStarters; i++) {
 			itoa(i, posIdx, 10);
 			
 			if (getYamlValue(carIdx, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:Position:{%s}CarIdx:", sessionID, posIdx)) {
 				int carIndex = atoi(carIdx);
 				char carIdx1[10];
 
-				itoa(carIndex + 1, carIdx1, 10);
+				itoa(i, carIdx1, 10);
 
-				getYamlValue(result, sessionInfo, "DriverInfo:Drivers:CarIdx:{%s}CarNumber:", carIdx1);
+				getYamlValue(result, sessionInfo, "DriverInfo:Drivers:CarIdx:{%s}CarNumber:", carIdx);
 
 				printLine(output, "Car." + std::string(carIdx1) + ".Nr=" + std::string(result));
 				printLine(output, "Car." + std::string(carIdx1) + ".Position=" + std::string(posIdx));
@@ -712,13 +719,6 @@ void writePositions(std::ostringstream* output, const irsdk_header *header, cons
 
 				if (getRawDataValue(pitLaneStates, header, data, "CarIdxOnPitRoad"))
 					printLine(output, "Car." + std::string(carIdx1) + ".InPitLane=" + std::string(((bool*)pitLaneStates)[carIndex] ? "true" : "false"));
-			}
-			else {
-				itoa(i - 1, posIdx, 10);
-
-				printLine(output, "Car.Count=" + std::string(posIdx));
-				
-				break;
 			}
 		}
 	}
@@ -1070,7 +1070,12 @@ void writeData(std::ostringstream * output, const irsdk_header *header, const ch
 
 			printLine(output, "Grip=" + std::string(gripLevel));
 
-			for (int i = 1; ; i++) {
+			int numStarters = 0;
+
+			if (getYamlValue(result, sessionInfo, "WeekendInfo:WeekendOptions:NumStarters:"))
+				numStarters = atoi(result);
+
+			for (int i = 1; i <= numStarters; i++) {
 				char posIdx[10];
 				char carIdx[10];
 
@@ -1089,8 +1094,6 @@ void writeData(std::ostringstream * output, const irsdk_header *header, const ch
 						printLine(output, "Car." + std::string(carIdx1) + ".Position=" + std::to_string(coordinateX) + "," + std::to_string(coordinateY));
 					}
 				}
-				else
-					break;
 			}
 
 			printLine(output, "[Weather Data]");

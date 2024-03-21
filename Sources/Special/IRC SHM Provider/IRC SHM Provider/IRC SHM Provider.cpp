@@ -635,17 +635,24 @@ void writePositions(const irsdk_header *header, const char* data)
 
 		if (getRawDataValue(trackLocations, header, data, "CarIdxTrackSurface"))
 			trackLocations = 0;
+
+		int numStarters = 0;
+
+		if (getYamlValue(result, sessionInfo, "WeekendInfo:WeekendOptions:NumStarters:"))
+			numStarters = atoi(result);
+
+		printf("Car.Count=%d\n", numStarters);
 		
-		for (int i = 1; ; i++) {
+		for (int i = 1; i <= numStarters; i++) {
 			itoa(i, posIdx, 10);
 			
 			if (getYamlValue(carIdx, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:Position:{%s}CarIdx:", sessionID, posIdx)) {
 				int carIndex = atoi(carIdx);
 				char carIdx1[10];
 
-				itoa(carIndex + 1, carIdx1, 10);
+				itoa(i, carIdx1, 10);
 
-				getYamlValue(result, sessionInfo, "DriverInfo:Drivers:CarIdx:{%s}CarNumber:", carIdx1);
+				getYamlValue(result, sessionInfo, "DriverInfo:Drivers:CarIdx:{%s}CarNumber:", carIdx);
 
 				printf("Car.%s.Nr=%s\n", carIdx1, result);
 				printf("Car.%s.Position=%s\n", carIdx1, posIdx);
@@ -696,13 +703,6 @@ void writePositions(const irsdk_header *header, const char* data)
 
 				if (getRawDataValue(pitLaneStates, header, data, "CarIdxOnPitRoad"))
 					printf("Car.%s.InPitLane=%s\n", carIdx1, ((bool*)pitLaneStates)[carIndex] ? "true" : "false");
-			}
-			else {
-				itoa(i - 1, posIdx, 10);
-
-				printf("Car.Count=%s\n", posIdx);
-				
-				break;
 			}
 		}
 	}
@@ -1057,7 +1057,12 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 
 			printf("Grip=%s\n", gripLevel);
 
-			for (int i = 1; ; i++) {
+			int numStarters = 0;
+
+			if (getYamlValue(result, sessionInfo, "WeekendInfo:WeekendOptions:NumStarters:"))
+				numStarters = atoi(result);
+
+			for (int i = 1; i <= numStarters; i++) {
 				char posIdx[10];
 				char carIdx[10];
 
@@ -1076,8 +1081,6 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 						printf("Car.%s.Position=%f,%f\n", carIdx1, coordinateX, coordinateY);
 					}
 				}
-				else
-					break;
 			}
 
 			printf("[Weather Data]\n");

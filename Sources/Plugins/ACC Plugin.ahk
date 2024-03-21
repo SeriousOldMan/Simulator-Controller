@@ -569,12 +569,10 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			driverCar := false
 			driverCarCandidate := false
 
-			loop {
+			loop getMultiMapValue(positionsData, "Position Data", "Car.Count", 0) {
 				carID := getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Car", kUndefined)
 
-				if (carID == kUndefined)
-					break
-				else {
+				if (carID != kUndefined) {
 					car := (carIDs.Has(carID) ? carIDs[carID] : ACCPlugin.kUnknown)
 
 					if ((car = ACCPlugin.kUnknown) && isDebug())
@@ -598,13 +596,12 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			}
 
 			if !driverCar
-				loop {
+				loop getMultiMapValue(positionsData, "Position Data", "Car.Count", 0) {
 					carID := getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Car", kUndefined)
 
-					if (carID == kUndefined)
-						break
-					else if (getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Position")
-						   = getMultiMapValue(telemetryData, "Stint Data", "Position", kUndefined)) {
+					if (carID != kUndefined)
+						if (getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Position")
+						  = getMultiMapValue(telemetryData, "Stint Data", "Position", kUndefined)) {
 						driverCar := A_Index
 
 						lastDriverCar := driverCar
@@ -668,12 +665,10 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			carCategories := getMultiMapValues(ACCPlugin.sCarData, "Car Categories")
 		}
 
-		loop {
+		loop getMultiMapValue(data, "Position Data", "Car.Count", 0) {
 			car := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Car", kUndefined)
 
-			if (car == kUndefined)
-				break
-			else
+			if (car != kUndefined)
 				setMultiMapValue(data, "Position Data", "Car." . A_Index . ".Class", carCategories.Has(car) ? carCategories[car] : ACCPlugin.kUnknown)
 		}
 	}

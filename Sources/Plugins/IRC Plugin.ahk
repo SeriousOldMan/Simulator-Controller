@@ -334,15 +334,17 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 
 		super.updatePositionsData(data)
 
-		loop {
+		loop getMultiMapValue(data, "Position Data", "Car.Count", 0) {
 			carClass := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Class", kUndefined)
 
-			if (carClass == kUndefined)
-				break
-			else if (Trim(carClass) != "")
-				setMultiMapValue(data, "Position Data", "Car." . A_Index . ".Class", Trim(carClass))
-			else
-				removeMultiMapValue(data, "Position Data", "Car." . A_Index . ".Class")
+			if (carClass != kUndefined) {
+				carClass := Trim(carClass)
+
+				if (carClass != "")
+					setMultiMapValue(data, "Position Data", "Car." . A_Index . ".Class", carClass)
+				else
+					removeMultiMapValue(data, "Position Data", "Car." . A_Index . ".Class")
+			}
 		}
 	}
 }

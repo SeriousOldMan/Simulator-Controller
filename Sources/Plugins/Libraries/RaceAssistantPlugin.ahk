@@ -1541,7 +1541,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 	static currentLap(data) {
 		if (RaceAssistantPlugin.Session == kSessionRace)
-			loop getMultiMapValue(data, "Position Data", "Car.Count")
+			loop getMultiMapValue(data, "Position Data", "Car.Count", 0)
 				if (getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Position") = 1)
 					return getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Laps", getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Lap"))
 
@@ -1571,7 +1571,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				leader := false
 				driver := false
 
-				loop getMultiMapValue(data, "Position Data", "Car.Count")
+				loop getMultiMapValue(data, "Position Data", "Car.Count", 0)
 					if (getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Position") = 1) {
 						time := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Time")
 						running := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Lap.Running")

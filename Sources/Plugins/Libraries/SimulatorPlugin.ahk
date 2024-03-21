@@ -1168,20 +1168,21 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	updatePositionsData(data) {
 		local count := getMultiMapValue(data, "Position Data", "Car.Count", 0)
 		local driver := getMultiMapValue(data, "Position Data", "Driver.Car", false)
+		local carNr
 
-		loop count
-			setMultiMapValue(data, "Position Data", "Car." . A_Index . ".Nr"
-								 , StrReplace(getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Nr", ""), "`"", ""))
+		loop count {
+			carNr := StrReplace(getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Nr", ""), "`"", "")
 
-		if (driver && (count > 0)) {
-			if (getMultiMapValue(data, "Position Data", "Car." . A_Index . ".InPitlane", false)
-			 && !getMultiMapValue(data, "Stint Data", "InPitlane", false))
-				setMultiMapValue(data, "Stint Data", "InPitlane", true)
+			if !IsAlnum(carNr)
+				carNr := "-"
 
-			if (getMultiMapValue(data, "Position Data", "Car." . A_Index . ".InPitlane", false)
-			 && !getMultiMapValue(data, "Stint Data", "InPitlane", false))
-				setMultiMapValue(data, "Stint Data", "InPitlane", true)
+			setMultiMapValue(data, "Position Data", "Car." . A_Index . ".Nr", carNr)
 		}
+
+		if (driver && (count > 0))
+			if (getMultiMapValue(data, "Position Data", "Car." . driver . ".InPitlane", false)
+			 && !getMultiMapValue(data, "Stint Data", "InPitlane", false))
+				setMultiMapValue(data, "Stint Data", "InPitlane", true)
 
 		this.iHasPositionsData := (count > 0)
 	}

@@ -2658,7 +2658,7 @@ class RaceCenter extends ConfigurationItem {
 		local classes := CaseInsenseMap()
 		local class
 
-		loop getMultiMapValue(data, "Position Data", "Car.Count") {
+		loop getMultiMapValue(data, "Position Data", "Car.Count", 0) {
 			class := this.getClass(data, A_Index)
 
 			if !classes.Has(class)
@@ -2715,7 +2715,7 @@ class RaceCenter extends ConfigurationItem {
 		if sorted {
 			positions := []
 
-			loop getMultiMapValue(data, "Position Data", "Car.Count")
+			loop getMultiMapValue(data, "Position Data", "Car.Count", 0)
 				if (!class || (class = this.getClass(data, A_Index)))
 					positions.Push(Array(A_Index, getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Position")))
 
@@ -2725,7 +2725,7 @@ class RaceCenter extends ConfigurationItem {
 				classGrid.Push(position[1])
 		}
 		else
-			loop getMultiMapValue(data, "Position Data", "Car.Count")
+			loop getMultiMapValue(data, "Position Data", "Car.Count", 0)
 				if (!class || (class = this.getClass(data, A_Index)))
 					classGrid.Push(A_Index)
 
@@ -9528,7 +9528,7 @@ class RaceCenter extends ConfigurationItem {
 						carIndices := CaseInsenseWeakMap()
 
 						if positions {
-							loop getMultiMapValue(positions, "Position Data", "Car.Count")
+							loop getMultiMapValue(positions, "Position Data", "Car.Count", 0)
 								carIndices[getMultiMapValue(positions, "Position Data", "Car." . A_Index . ".ID", A_Index)] := A_Index
 
 							driverIndex := getMultiMapValue(positions, "Position Data", "Driver.Car", 0)
@@ -10380,7 +10380,7 @@ class RaceCenter extends ConfigurationItem {
 
 							carIDs := CaseInsenseWeakMap()
 
-							loop getMultiMapValue(positions, "Position Data", "Car.Count")
+							loop getMultiMapValue(positions, "Position Data", "Car.Count", 0)
 								carIDs[A_Index] := getMultiMapValue(positions, "Position Data", "Car." . A_Index . ".ID")
 
 							sessionStore.add("Delta.Data"

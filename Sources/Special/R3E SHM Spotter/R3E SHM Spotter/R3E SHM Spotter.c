@@ -1507,8 +1507,9 @@ int main(int argc, char* argv[])
 			}
 		}
 		else {
-			if (argc > 1)
-				char* trackLength = argv[1];
+			if (argc > 1) {
+				// char* trackLength = argv[1];
+			}
 
 			if (argc > 2)
 				aheadAccidentDistance = atoi(argv[2]);

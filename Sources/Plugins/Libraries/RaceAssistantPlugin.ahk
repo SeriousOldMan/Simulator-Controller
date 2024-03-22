@@ -2399,9 +2399,9 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 						RaceAssistantPlugin.WaitForShutdown[true] := false
 
-						RaceAssistantPlugin.sLapRunning := RaceAssistantPlugin.LapRunning + 1
+						RaceAssistantPlugin.prepareAssistantsSession(data, RaceAssistantPlugin.LapRunning + 1)
 
-						RaceAssistantPlugin.prepareAssistantsSession(data, RaceAssistantPlugin.LapRunning)
+						RaceAssistantPlugin.sLapRunning := RaceAssistantPlugin.LapRunning + 1
 					}
 					else if (dataLastLap > 0) {
 						; Car has finished the first lap

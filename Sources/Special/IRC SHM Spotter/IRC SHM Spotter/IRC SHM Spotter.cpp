@@ -512,29 +512,29 @@ public:
 std::vector<IdealLine> idealLine;
 
 void updateIdealLine(const irsdk_header* header, const char* data, int carIndex, double running, double speed) {
-	IdealLine slot = idealLine[(int)std::round(running * 999)];
+	int index = (int)std::round(running * 999);
 	float coordinateX;
 	float coordinateY;
 
-	if (slot.count < INT_MAX)
+	if (idealLine[index].count < INT_MAX)
 		if (getCarCoordinates(header, data, carIndex, coordinateX, coordinateY))
-			if (slot.count == 0)
+			if (idealLine[index].count == 0)
 			{
-				slot.count = 1;
+				idealLine[index].count = 1;
 
-				slot.speed = speed;
+				idealLine[index].speed = speed;
 
-				slot.posX = coordinateX;
-				slot.posY = coordinateY;
+				idealLine[index].posX = coordinateX;
+				idealLine[index].posY = coordinateY;
 			}
 			else
 			{
-				slot.count += 1;
+				idealLine[index].count += 1;
 
-				slot.speed = (slot.speed * (slot.count - 1) + speed) / slot.count;
+				idealLine[index].speed = (idealLine[index].speed * (idealLine[index].count - 1) + speed) / idealLine[index].count;
 
-				slot.posX = ((slot.posX * (slot.count - 1)) + coordinateX) / slot.count;
-				slot.posY = ((slot.posY * (slot.count - 1)) + coordinateY) / slot.count;
+				idealLine[index].posX = ((idealLine[index].posX * (idealLine[index].count - 1)) + coordinateX) / idealLine[index].count;
+				idealLine[index].posY = ((idealLine[index].posY * (idealLine[index].count - 1)) + coordinateY) / idealLine[index].count;
 			}
 }
 

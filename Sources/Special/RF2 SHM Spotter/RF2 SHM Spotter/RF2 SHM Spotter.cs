@@ -1585,8 +1585,10 @@ namespace RF2SHMSpotter {
 			for (int i = 0; i < 1000; i++)
 				idealLine.Add(new IdealLine());
 
-            if (args.Length > 0)
-                string trackLength = args[0];
+			if (args.Length > 0)
+			{
+				string trackLength = args[0];
+			}
 
             if (args.Length > 1)
                 aheadAccidentDistance = int.Parse(args[1]);

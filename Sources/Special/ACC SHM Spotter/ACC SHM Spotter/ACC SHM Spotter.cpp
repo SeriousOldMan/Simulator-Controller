@@ -177,6 +177,7 @@ long nextBlueFlag = 0;
 int lastFlagState = 0;
 int waitYellowFlagState = 0;
 
+float trackLength = 4500;
 int aheadAccidentDistance = 800;
 int behindAccidentDistance = 500;
 int slowCarDistance = 500;
@@ -512,7 +513,7 @@ void TrackPart::update(float s) {
 
 std::map<std::string, TrackPart> trackMap;
 
-float startPosX, startPosY, driverPosX, driverPosY, trackLength;
+float startPosX, startPosY, driverPosX, driverPosY, mapTrackLength;
 int trackDriverIdx;
 bool trackReady = false;
 long lastTrackTickCount = 0;
@@ -545,22 +546,22 @@ void updateTrackMap() {
 
 						output.open(traceFileName, std::ios::out | std::ios::app);
 
-						output << "========== Finished mapping track (" << trackLength << ") ==========" << std::endl;
+						output << "========== Finished mapping track (" << mapTrackLength << ") ==========" << std::endl;
 
 						output.close();
 					}
 				}
 				else {
-					trackLength += distance;
+					mapTrackLength += distance;
 
-					string key = std::to_string(((long)(round(newPosX / 20) * 10 - 10))) + std::to_string(((long)(round(newPosX / 20) * 10 + 10))) +
-								 std::to_string(((long)(round(newPosY / 20) * 10 - 10))) + std::to_string(((long)(round(newPosY / 20) * 10 + 10)));
+					string key = std::to_string(((long)(round(newPosX / 10) * 10 - 10))) + std::to_string(((long)(round(newPosX / 10) * 10 + 10))) +
+								 std::to_string(((long)(round(newPosY / 10) * 10 - 10))) + std::to_string(((long)(round(newPosY / 10) * 10 + 10)));
 
 					try {
 						trackMap.at(key).update(speed);
 					}
 					catch (std::out_of_range e) {
-						trackMap[key] = TrackPart(speed, trackLength);
+						trackMap[key] = TrackPart(speed, mapTrackLength);
 					}
 
 					if (traceFileName != "") {
@@ -568,7 +569,7 @@ void updateTrackMap() {
 
 						output.open(traceFileName, std::ios::out | std::ios::app);
 
-						output << trackMap.size() << ": Track: " << trackLength << "; Distance: " << round(distance) << "; Speed: " << round(speed) << "; Key: " << key << std::endl;
+						output << trackMap.size() << ": Track: " << mapTrackLength << "; Distance: " << round(distance) << "; Speed: " << round(speed) << "; Key: " << key << std::endl;
 
 						output.close();
 					}
@@ -600,7 +601,7 @@ void startTrackBuilder(int driverIdx) {
 	startPosX = driverPosX;
 	startPosY = driverPosY;
 
-	trackLength = 0;
+	mapTrackLength = 0;
 	trackDriverIdx = driverIdx;
 
 	lastTrackTickCount = GetTickCount();
@@ -627,8 +628,8 @@ float getDistance(int carIdx) {
 	float carPosX = gf->carCoordinates[carIdx][0];
 	float carPosY = gf->carCoordinates[carIdx][2];
 
-	string key = std::to_string(((long)(round(carPosX / 20) * 10 - 10))) + std::to_string(((long)(round(carPosX / 20) * 10 + 10))) +
-				 std::to_string(((long)(round(carPosY / 20) * 10 - 10))) + std::to_string(((long)(round(carPosY / 20) * 10 + 10)));
+	string key = std::to_string(((long)(round(carPosX / 10) * 10 - 10))) + std::to_string(((long)(round(carPosX / 10) * 10 + 10))) +
+				 std::to_string(((long)(round(carPosY / 10) * 10 - 10))) + std::to_string(((long)(round(carPosY / 10) * 10 + 10)));
 
 	try {
 		float distance = trackMap.at(key).distance;
@@ -638,12 +639,12 @@ float getDistance(int carIdx) {
 
 			output.open(traceFileName, std::ios::out | std::ios::app);
 
-			output << "D " << distance << "; " << distance / trackLength << endl;
+			output << "D " << distance << "; " << distance / mapTrackLength << endl;
 
 			output.close();
 		}
 
-		return distance / trackLength;
+		return distance / mapTrackLength;
 	}
 	catch (std::out_of_range e) {
 		return -1;
@@ -705,9 +706,7 @@ long lastTickCount = 0;
 
 bool checkAccident() {
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
-	SPageFileStatic* sf = (SPageFileStatic*)m_static.mapFileBuffer;
 
-	float trackLength = sf->trackSPlineLength;
 	int carID = gf->playerCarID;
 
 	for (int i = 0; i < gf->activeCars; i++)
@@ -754,7 +753,7 @@ bool checkAccident() {
 			{
 				double speed = getSpeed(i, milliSeconds);
 
-				if (speed >= 0) {
+				if (speed >= 1) {
 					double distance = getDistance(i);
 
 					if (distance >= 0) {
@@ -766,7 +765,7 @@ bool checkAccident() {
 
 							distance = distance * trackLength;
 
-							if ((slot.count > 20) && (speed < (slot.speed / 2)))
+							if ((slot.count > 100) && (speed < (slot.speed / 2)))
 							{
 								long distanceAhead = (long)(((distance > driverDistance) ? distance : (distance + trackLength)) - driverDistance);
 
@@ -1774,16 +1773,19 @@ int main(int argc, char* argv[])
 		}
 		else {
 			if (argc > 1)
-				aheadAccidentDistance = atoi(argv[1]);
+				trackLength = atof(argv[1]);
 
 			if (argc > 2)
-				behindAccidentDistance = atoi(argv[2]);
+				aheadAccidentDistance = atoi(argv[2]);
 
 			if (argc > 3)
-				slowCarDistance = atoi(argv[3]);
+				behindAccidentDistance = atoi(argv[3]);
 
-			if (argc > 4) {
-				traceFileName = argv[4];
+			if (argc > 4)
+				slowCarDistance = atoi(argv[4]);
+
+			if (argc > 5) {
+				traceFileName = argv[5];
 
 				if (traceFileName == "-")
 					traceFileName = "";

@@ -1754,22 +1754,25 @@ int main(int argc, char* argv[])
 		}
 		else {
 			if (argc > 1)
-				aheadAccidentDistance = atoi(argv[1]);
-
+				char* trackLength = argv[1];
+			
 			if (argc > 2)
-				behindAccidentDistance = atoi(argv[2]);
+				aheadAccidentDistance = atoi(argv[2]);
 
 			if (argc > 3)
-				slowCarDistance = atoi(argv[3]);
+				behindAccidentDistance = atoi(argv[3]);
 
-			if (argc > 4) {
-				traceFileName = std::string(argv[4]);
+			if (argc > 4)
+				slowCarDistance = atoi(argv[4]);
+
+			if (argc > 5) {
+				traceFileName = std::string(argv[5]);
 
 				if (traceFileName == "-")
 					traceFileName = "";
 
-				if (argc > 5)
-					loadTrackCoordinates(argv[5]);
+				if (argc > 6)
+					loadTrackCoordinates(argv[6]);
 			}
 		}
 	}

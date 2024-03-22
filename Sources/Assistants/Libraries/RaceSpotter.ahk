@@ -2960,7 +2960,8 @@ class RaceSpotter extends GridRaceAssistant {
 					deleteFile(kTempDirectory . "Race Spotter.trace")
 
 				try {
-					Run("`"" . exePath . "`" " . getMultiMapValue(this.Settings, "Assistant.Spotter", "Accident.Distance.Ahead.Threshold", 800) . A_Space
+					Run("`"" . exePath . "`" " . this.TrackLength . A_Space
+											   . getMultiMapValue(this.Settings, "Assistant.Spotter", "Accident.Distance.Ahead.Threshold", 800) . A_Space
 											   . getMultiMapValue(this.Settings, "Assistant.Spotter", "Accident.Distance.Behind.Threshold", 500) . A_Space
 											   . getMultiMapValue(this.Settings, "Assistant.Spotter", "SlowCar.Distance.Ahead.Threshold", 500) . A_Space
 											   . (isDebug() ? ("`"" . kTempDirectory . "Race Spotter.trace`"") : "-")

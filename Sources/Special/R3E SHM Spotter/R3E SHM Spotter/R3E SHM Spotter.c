@@ -1508,13 +1508,16 @@ int main(int argc, char* argv[])
 		}
 		else {
 			if (argc > 1)
-				aheadAccidentDistance = atoi(argv[1]);
+				char* trackLength = argv[1];
 
 			if (argc > 2)
-				behindAccidentDistance = atoi(argv[2]);
+				aheadAccidentDistance = atoi(argv[2]);
 
 			if (argc > 3)
-				slowCarDistance = atoi(argv[3]);
+				behindAccidentDistance = atoi(argv[3]);
+
+			if (argc > 4)
+				slowCarDistance = atoi(argv[4]);
 		}
 	}
 

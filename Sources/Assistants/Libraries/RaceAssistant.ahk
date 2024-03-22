@@ -81,6 +81,8 @@ class RaceAssistant extends ConfigurationItem {
 	iPrepared := false
 	iKnowledgeBase := false
 
+	iTrackLength := 0
+
 	iSessionDuration := 0
 	iOverallTime := 0
 	iBestLapTime := 0
@@ -405,6 +407,12 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
+	TrackLength {
+		Get {
+			return this.iTrackLength
+		}
+	}
+
 	SessionDuration {
 		Get {
 			return this.iSessionDuration
@@ -585,6 +593,9 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	updateSessionValues(values) {
+		if values.HasProp("TrackLength")
+			this.iTrackLength := values.TrackLength
+
 		if values.HasProp("SessionDuration")
 			this.iSessionDuration := values.SessionDuration
 
@@ -618,6 +629,7 @@ class RaceAssistant extends ConfigurationItem {
 			if (this.Session == kSessionFinished) {
 				this.iTeamSession := false
 
+				this.iTrackLength := 0
 				this.iSessionDuration := 0
 				this.iSessionLaps := 0
 
@@ -1176,7 +1188,8 @@ class RaceAssistant extends ConfigurationItem {
 			}
 
 		if update
-			this.updateSessionValues({SessionDuration: duration * 1000, SessionLaps: laps, TeamSession: (getMultiMapValue(data, "Session Data", "Mode", "Solo") = "Team")})
+			this.updateSessionValues({TrackLength: getMultiMapValue(data, "Track Data", "Length", 0)
+									, SessionDuration: duration * 1000, SessionLaps: laps, TeamSession: (getMultiMapValue(data, "Session Data", "Mode", "Solo") = "Team")})
 	}
 
 	readSettings(simulator, car, track, &settings) {
@@ -1233,6 +1246,7 @@ class RaceAssistant extends ConfigurationItem {
 									   , getMultiMapValue(data, "Session Data", "Car", "")
 									   , getMultiMapValue(data, "Session Data", "Track", ""), &settings)
 					 , CaseInsenseMap("Session.Type", this.Session
+									, "Session.Track.Length", getMultiMapValue(data, "Track Data", "Length", 0)
 									, "Session.Time.Remaining", getDeprecatedValue(data, "Session Data", "Stint Data", "SessionTimeRemaining", 0)
 									, "Session.Lap.Remaining", getDeprecatedValue(data, "Session Data", "Stint Data", "SessionLapsRemaining", 0)
 									, "Session.Settings.Lap.Time.Adjust", this.AdjustLapTime
@@ -1298,7 +1312,8 @@ class RaceAssistant extends ConfigurationItem {
 
 		knowledgeBase.Facts.Facts := getMultiMapValues(state, "Session State")
 
-		this.updateSessionValues({SessionDuration: knowledgeBase.getValue("Session.Duration") * 1000
+		this.updateSessionValues({TrackLength: knowledgeBase.getValue("Session.Track.Length")
+								, SessionDuration: knowledgeBase.getValue("Session.Duration") * 1000
 								, SessionLaps: knowledgeBase.getValue("Session.Laps")})
 		this.updateDynamicValues({LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
 	}

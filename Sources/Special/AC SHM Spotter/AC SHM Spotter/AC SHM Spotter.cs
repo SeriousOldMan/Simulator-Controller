@@ -1477,13 +1477,16 @@ namespace ACSHMSpotter {
                 idealLine.Add(new IdealLine());
 
             if (args.Length > 0)
-                aheadAccidentDistance = int.Parse(args[0]);
+                string trackLength = args[0];
 
             if (args.Length > 1)
-                behindAccidentDistance = int.Parse(args[1]);
+                aheadAccidentDistance = int.Parse(args[1]);
 
             if (args.Length > 2)
-                slowCarDistance = int.Parse(args[2]);
+                behindAccidentDistance = int.Parse(args[2]);
+
+            if (args.Length > 3)
+                slowCarDistance = int.Parse(args[3]);
         }
 
         public void Run(bool mapTrack, bool positionTrigger, bool analyzeTelemetry)

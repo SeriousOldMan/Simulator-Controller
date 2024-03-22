@@ -464,7 +464,7 @@ void changePitstopRefuelAmount(const irsdk_header* header, const char* data, flo
 
 void changePitstopTyreCompound(const irsdk_header* header, const char* data, int offset) {
 	if (offset != 0)
-		irsdk_broadcastMsg(irsdk_BroadcastPitCommand, irsdk_PitCommand_TC, ((int)(getDataFloat(header, data, "PitSvTireCompound") + 1) + offset));
+		irsdk_broadcastMsg(irsdk_BroadcastPitCommand, irsdk_PitCommand_TC, (int)(getDataFloat(header, data, "PitSvTireCompound") + offset));
 }
 
 void changePitstopTyrePressure(const irsdk_header* header, int command, const char* serviceFlag, float pressureDelta) {
@@ -653,7 +653,9 @@ void writePositions(std::ostringstream* output, const irsdk_header *header, cons
 
 		int numStarters = 0;
 		bool hasData = false;
-		int offset = 0;
+		int index = 1;
+		int playerCarIndex = atoi(playerCarIdx);
+		int driverCarIndex;
 
 		if (getYamlValue(result, sessionInfo, "WeekendInfo:WeekendOptions:NumStarters:"))
 			numStarters = atoi(result);
@@ -667,7 +669,10 @@ void writePositions(std::ostringstream* output, const irsdk_header *header, cons
 				int carIndex = atoi(carIdx);
 				char carIdx1[10];
 
-				itoa(carIndex + 1 + offset, carIdx1, 10);
+				if (carIndex == playerCarIndex)
+					driverCarIndex = index;
+
+				itoa(index++, carIdx1, 10);
 
 				getYamlValue(result, sessionInfo, "DriverInfo:Drivers:CarIdx:{%s}CarNumber:", carIdx);
 
@@ -726,14 +731,12 @@ void writePositions(std::ostringstream* output, const irsdk_header *header, cons
 				if (getRawDataValue(pitLaneStates, header, data, "CarIdxOnPitRoad"))
 					printLine(output, "Car." + std::string(carIdx1) + ".InPitLane=" + std::string(((bool*)pitLaneStates)[carIndex] ? "true" : "false"));
 			}
-			else
-				offset -= 1;
 		}
 
 		if (hasData) {
-			printLine(output, "Car.Count=" + std::to_string(numStarters - offset));
+			printLine(output, "Car.Count=" + std::to_string(index - 1));
 
-			itoa(atoi(playerCarIdx) + 1, carIdx1, 10);
+			itoa(driverCarIndex, carIdx1, 10);
 
 			printLine(output, "Driver.Car=" + std::string(carIdx1));
 		}
@@ -1087,6 +1090,7 @@ void writeData(std::ostringstream * output, const irsdk_header *header, const ch
 			printLine(output, "Grip=" + std::string(gripLevel));
 
 			int numStarters = 0;
+			int index = 1;
 
 			if (getYamlValue(result, sessionInfo, "WeekendInfo:WeekendOptions:NumStarters:"))
 				numStarters = atoi(result);
@@ -1105,7 +1109,7 @@ void writeData(std::ostringstream * output, const irsdk_header *header, const ch
 					if (getCarCoordinates(header, data, carIndex, coordinateX, coordinateY)) {
 						char carIdx1[10];
 
-						itoa(carIndex + 1, carIdx1, 10);
+						itoa(index++, carIdx1, 10);
 
 						printLine(output, "Car." + std::string(carIdx1) + ".Position=" + std::to_string(coordinateX) + "," + std::to_string(coordinateY));
 					}
@@ -1136,7 +1140,7 @@ void writeData(std::ostringstream * output, const irsdk_header *header, const ch
 			
 			int id = atoi(sessionID);
 
-			printLine(output, "Driver.Car=" + std::string(playerCarIdx));
+			printLine(output, "Driver.CarIndex=" + std::string(playerCarIdx));
 
 			while (id >= 0) {
 				char session[32];

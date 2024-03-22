@@ -582,26 +582,26 @@ namespace RF2SHMSpotter {
         List<IdealLine> idealLine = new List<IdealLine>(1000);
 
 		void updateIdealLine(ref rF2VehicleScoring vehicle, double running, double speed) {
-			IdealLine slot = idealLine[(int)Math.Round(running * 999)];
+			int index = (int)Math.Round(running * 999);
 
-			if (slot.count < int.MaxValue)
-				if (slot.count == 0)
+			if (idealLine[index].count < int.MaxValue)
+				if (idealLine[index].count == 0)
 				{
-					slot.count = 1;
+					idealLine[index].count = 1;
 
-					slot.speed = speed;
+					idealLine[index].speed = speed;
 
-                    slot.posX = vehicle.mPos.x;
-                    slot.posY = vehicle.mPos.z;
+                    idealLine[index].posX = vehicle.mPos.x;
+                    idealLine[index].posY = vehicle.mPos.z;
                 }
 				else
 				{
-					slot.count += 1;
+					idealLine[index].count += 1;
 
-                    slot.speed = (slot.speed * (slot.count - 1) + speed) / slot.count;
+                    idealLine[index].speed = (idealLine[index].speed * (idealLine[index].count - 1) + speed) / idealLine[index].count;
 
-                    slot.posX = ((slot.posX * (slot.count - 1)) + vehicle.mPos.x) / slot.count;
-                    slot.posY = ((slot.posY * (slot.count - 1)) + vehicle.mPos.z) / slot.count;
+                    idealLine[index].posX = ((idealLine[index].posX * (idealLine[index].count - 1)) + vehicle.mPos.x) / idealLine[index].count;
+                    idealLine[index].posY = ((idealLine[index].posY * (idealLine[index].count - 1)) + vehicle.mPos.z) / idealLine[index].count;
                 }
 		}
 

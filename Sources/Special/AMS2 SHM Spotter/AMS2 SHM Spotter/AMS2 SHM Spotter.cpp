@@ -414,26 +414,26 @@ public:
 std::vector<IdealLine> idealLine;
 
 void updateIdealLine(ParticipantInfo vehicle, double running, double speed) {
-	IdealLine slot = idealLine[(int)std::round(running * 999)];
+	int index = (int)std::round(running * 999);
 
-	if (slot.count < INT_MAX)
-		if (slot.count == 0)
+	if (idealLine[index].count < INT_MAX)
+		if (idealLine[index].count == 0)
 		{
-			slot.count = 1;
+			idealLine[index].count = 1;
 
-			slot.speed = speed;
+			idealLine[index].speed = speed;
 
-			slot.posX = vehicle.mWorldPosition[VEC_X];
-			slot.posY = vehicle.mWorldPosition[VEC_Z];
+			idealLine[index].posX = vehicle.mWorldPosition[VEC_X];
+			idealLine[index].posY = vehicle.mWorldPosition[VEC_Z];
 		}
 		else
 		{
-			slot.count += 1;
+			idealLine[index].count += 1;
 
-			slot.speed = (slot.speed * (slot.count - 1) + speed) / slot.count;
+			idealLine[index].speed = (idealLine[index].speed * (idealLine[index].count - 1) + speed) / idealLine[index].count;
 
-			slot.posX = ((slot.posX * (slot.count - 1)) + vehicle.mWorldPosition[VEC_X]) / slot.count;
-			slot.posY = ((slot.posY * (slot.count - 1)) + vehicle.mWorldPosition[VEC_Z]) / slot.count;
+			idealLine[index].posX = ((idealLine[index].posX * (idealLine[index].count - 1)) + vehicle.mWorldPosition[VEC_X]) / idealLine[index].count;
+			idealLine[index].posY = ((idealLine[index].posY * (idealLine[index].count - 1)) + vehicle.mWorldPosition[VEC_Z]) / idealLine[index].count;
 		}
 }
 

@@ -461,26 +461,26 @@ std::vector<IdealLine> idealLine;
 
 void updateIdealLine(int carIdx, double running, double speed) {
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
-	IdealLine slot = idealLine[(int)std::round(running * 999)];
-
-	if (slot.count < INT_MAX)
-		if (slot.count == 0)
+	int index = (int)std::round(running * 999);
+	
+	if (idealLine[index].count < INT_MAX)
+		if (idealLine[index].count == 0)
 		{
-			slot.count = 1;
+			idealLine[index].count = 1;
 
-			slot.speed = speed;
+			idealLine[index].speed = speed;
 
-			slot.posX = gf->carCoordinates[carIdx][0];
-			slot.posY = gf->carCoordinates[carIdx][2];
+			idealLine[index].posX = gf->carCoordinates[carIdx][0];
+			idealLine[index].posY = gf->carCoordinates[carIdx][2];
 		}
 		else
 		{
-			slot.count += 1;
+			idealLine[index].count += 1;
 
-			slot.speed = (slot.speed * (slot.count - 1) + speed) / slot.count;
+			idealLine[index].speed = (idealLine[index].speed * (idealLine[index].count - 1) + speed) / idealLine[index].count;
 
-			slot.posX = ((slot.posX * (slot.count - 1)) + gf->carCoordinates[carIdx][0]) / slot.count;
-			slot.posY = ((slot.posY * (slot.count - 1)) + gf->carCoordinates[carIdx][2]) / slot.count;
+			idealLine[index].posX = ((idealLine[index].posX * (idealLine[index].count - 1)) + gf->carCoordinates[carIdx][0]) / idealLine[index].count;
+			idealLine[index].posY = ((idealLine[index].posY * (idealLine[index].count - 1)) + gf->carCoordinates[carIdx][2]) / idealLine[index].count;
 		}
 }
 
@@ -633,7 +633,6 @@ float getDistance(int carIdx) {
 	try {
 		float distance = trackMap.at(key).distance;
 
-		/*
 		if (traceFileName != "") {
 			std::ofstream output;
 
@@ -643,7 +642,6 @@ float getDistance(int carIdx) {
 
 			output.close();
 		}
-		*/
 
 		return distance / trackLength;
 	}
@@ -667,7 +665,6 @@ float getSpeed(int carIdx, long deltaMS) {
 	if ((lastPosX != INT_MAX) || (lastPosY != INT_MAX)) {
 		float speed = (vectorLength(lastPosX - newPosX, lastPosY - newPosY) / ((float)deltaMS / 1000.0f)) * 3.6f;
 
-		/*
 		if (traceFileName != "") {
 			std::ofstream output;
 
@@ -677,7 +674,6 @@ float getSpeed(int carIdx, long deltaMS) {
 
 			output.close();
 		}
-		*/
 
 		return speed;
 	}

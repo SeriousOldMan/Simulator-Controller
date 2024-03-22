@@ -616,26 +616,26 @@ namespace ACSHMSpotter {
 
         void updateIdealLine(ref AcCarInfo car, double running, double speed)
         {
-            IdealLine slot = idealLine[(int)Math.Round(running * 999)];
-
-            if (slot.count < int.MaxValue)
-                if (slot.count == 0)
+			int index = (int)Math.Round(running * 999);
+            
+            if (idealLine[index].count < int.MaxValue)
+                if (idealLine[index].count == 0)
                 {
-                    slot.count = 1;
+                    idealLine[index].count = 1;
 
-                    slot.speed = speed;
+                    idealLine[index].speed = speed;
 
-                    slot.posX = car.worldPosition.x;
-                    slot.posY = car.worldPosition.z;
+                    idealLine[index].posX = car.worldPosition.x;
+                    idealLine[index].posY = car.worldPosition.z;
                 }
                 else
                 {
-                    slot.count += 1;
+                    idealLine[index].count += 1;
 
-                    slot.speed = (slot.speed * (slot.count - 1) + speed) / slot.count;
+                    idealLine[index].speed = (idealLine[index].speed * (idealLine[index].count - 1) + speed) / idealLine[index].count;
 
-                    slot.posX = ((slot.posX * (slot.count - 1)) + car.worldPosition.x) / slot.count;
-                    slot.posY = ((slot.posY * (slot.count - 1)) + car.worldPosition.z) / slot.count;
+                    idealLine[index].posX = ((idealLine[index].posX * (idealLine[index].count - 1)) + car.worldPosition.x) / idealLine[index].count;
+                    idealLine[index].posY = ((idealLine[index].posY * (idealLine[index].count - 1)) + car.worldPosition.z) / idealLine[index].count;
                 }
         }
 

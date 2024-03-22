@@ -633,6 +633,7 @@ float getDistance(int carIdx) {
 	try {
 		float distance = trackMap.at(key).distance;
 
+		/*
 		if (traceFileName != "") {
 			std::ofstream output;
 
@@ -642,6 +643,7 @@ float getDistance(int carIdx) {
 
 			output.close();
 		}
+		*/
 
 		return distance / trackLength;
 	}
@@ -665,6 +667,7 @@ float getSpeed(int carIdx, long deltaMS) {
 	if ((lastPosX != INT_MAX) || (lastPosY != INT_MAX)) {
 		float speed = (vectorLength(lastPosX - newPosX, lastPosY - newPosY) / ((float)deltaMS / 1000.0f)) * 3.6f;
 
+		/*
 		if (traceFileName != "") {
 			std::ofstream output;
 
@@ -674,6 +677,7 @@ float getSpeed(int carIdx, long deltaMS) {
 
 			output.close();
 		}
+		*/
 
 		return speed;
 	}

@@ -600,16 +600,13 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 
 				if (getYamlValue(carIdx, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:Position:{%s}CarIdx:", sessionID, posIdx)) {
 					int carIndex = atoi(carIdx);
+					float lastRunning = lastRunnings[carIndex];
 					float running = min(1, max(0, ((float*)trackPositions)[carIndex]));
 					float speed;
-
-					if (first)
-						lastRunnings[carIndex] = running;
-					else if (milliSeconds < 200) {
-						float lastRunning = lastRunnings[carIndex];
 						
-						lastRunnings[carIndex] = running;
+					lastRunnings[carIndex] = running;
 							
+					if (!first && (milliSeconds < 200)) {
 						if (running >= lastRunning)
 							speed = (((running - lastRunning) * trackLength) / ((float)milliSeconds / 1000.0f)) * 3.6f;
 						else

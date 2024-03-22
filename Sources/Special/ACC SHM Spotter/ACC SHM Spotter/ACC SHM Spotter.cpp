@@ -554,8 +554,8 @@ void updateTrackMap() {
 				else {
 					mapTrackLength += distance;
 
-					string key = std::to_string(((long)(round(newPosX / 10) * 10 - 10))) + std::to_string(((long)(round(newPosX / 10) * 10 + 10))) +
-								 std::to_string(((long)(round(newPosY / 10) * 10 - 10))) + std::to_string(((long)(round(newPosY / 10) * 10 + 10)));
+					string key = std::to_string(((long)(round(newPosX / 20) * 10 - 10))) + std::to_string(((long)(round(newPosX / 20) * 10 + 10))) +
+								 std::to_string(((long)(round(newPosY / 20) * 10 - 10))) + std::to_string(((long)(round(newPosY / 20) * 10 + 10)));
 
 					try {
 						trackMap.at(key).update(speed);
@@ -628,12 +628,13 @@ float getDistance(int carIdx) {
 	float carPosX = gf->carCoordinates[carIdx][0];
 	float carPosY = gf->carCoordinates[carIdx][2];
 
-	string key = std::to_string(((long)(round(carPosX / 10) * 10 - 10))) + std::to_string(((long)(round(carPosX / 10) * 10 + 10))) +
-				 std::to_string(((long)(round(carPosY / 10) * 10 - 10))) + std::to_string(((long)(round(carPosY / 10) * 10 + 10)));
+	string key = std::to_string(((long)(round(carPosX / 20) * 10 - 10))) + std::to_string(((long)(round(carPosX / 20) * 10 + 10))) +
+				 std::to_string(((long)(round(carPosY / 20) * 10 - 10))) + std::to_string(((long)(round(carPosY / 20) * 10 + 10)));
 
 	try {
 		float distance = trackMap.at(key).distance;
 
+		/*
 		if (traceFileName != "") {
 			std::ofstream output;
 
@@ -643,6 +644,7 @@ float getDistance(int carIdx) {
 
 			output.close();
 		}
+		*/
 
 		return distance / mapTrackLength;
 	}
@@ -666,6 +668,7 @@ float getSpeed(int carIdx, long deltaMS) {
 	if ((lastPosX != INT_MAX) || (lastPosY != INT_MAX)) {
 		float speed = (vectorLength(lastPosX - newPosX, lastPosY - newPosY) / ((float)deltaMS / 1000.0f)) * 3.6f;
 
+		/*
 		if (traceFileName != "") {
 			std::ofstream output;
 
@@ -675,6 +678,7 @@ float getSpeed(int carIdx, long deltaMS) {
 
 			output.close();
 		}
+		*/
 
 		return speed;
 	}
@@ -733,7 +737,7 @@ bool checkAccident() {
 
 		return false;
 	}
-	else if (milliSeconds < 10)
+	else if (milliSeconds < 100)
 		return false;
 	else
 		lastTickCount += milliSeconds;
@@ -743,6 +747,16 @@ bool checkAccident() {
 	slowCarsAhead.resize(0);
 
 	float driverDistance = getDistance(carID);
+	
+	if (traceFileName != "") {
+		std::ofstream output;
+
+		output.open(traceFileName, std::ios::out | std::ios::app);
+
+		output << "D " << driverDistance << endl;
+
+		output.close();
+	}
 
 	if (driverDistance >= 0) {
 		try
@@ -783,7 +797,7 @@ bool checkAccident() {
 									}
 								}
 
-								if (speed < (slot.speed / 4))
+								if (speed < (slot.speed / 8))
 								{
 									if (distanceAhead < aheadAccidentDistance) {
 										accidentsAhead.push_back(SlowCarInfo(i, distanceAhead));

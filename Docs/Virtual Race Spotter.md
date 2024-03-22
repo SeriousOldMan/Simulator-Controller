@@ -158,7 +158,7 @@ As mentioned, each simulator is different. The Spotter will make as much out of 
 | Side Alert                      | Yes (1)       | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              |
 | Behind Alert                    | Yes           | Yes                        | Yes             | Yes (2) | Yes                        | Yes       | Yes            | Yes              |
 | Accidents Ahead (7)             | Yes           | Yes                        | Yes             | Yes (8) | Yes                        | Yes       | Yes            | Yes              |
-| Accidents Behind (7)            | Yes           | Yes                        | Yes             | Yes (8) | Yes                        | Yes       | Yes            | Yes              |
+| Accidents Behind (7) (10)       | Yes           | Yes                        | Yes             | Yes (8) | Yes                        | Yes       | Yes            | Yes              |
 | Slow Cars (7)                   | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              |
 | Yellow Flag                     | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              |
 | Full Course Yellow              | No            | No                         | No              | No      | No                         | No        | No             | No               |
@@ -193,6 +193,7 @@ As mentioned, each simulator is different. The Spotter will make as much out of 
 
 (9) iRacing has no information of number of cuts per lap in the available data. It is only detectable in a given point in time, whether the car is off track. It therefore depends on the data sampling frequency, how reliable the detection of track cuts is.
 
+(10) Only in a race session.
 ## Track Mapping
 
 Using the positions of the cars on the track, Elisa is able to create a map of any track in any simulator (except for *iRacing*, where a [different method](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#special-notes-about-track-mapping-in-iracing) is applied, since no coordinates are available in the API). A track map consists of two files which are stored in your local database. The first file with the ".map" extension contains the meta data of the track map and all way points (between 1000 and 1500 points for a typical race course).

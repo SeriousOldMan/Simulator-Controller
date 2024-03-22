@@ -493,7 +493,7 @@ bool checkAccident(const SharedMemory* sharedData)
 					if (distanceAhead < slowCarDistance)
 						slowCarsAhead.push_back(SlowCarInfo(i, distanceAhead));
 
-					if (speed < (slot.speed / 4))
+					if (speed < (slot.speed / 8))
 					{
 						if (distanceAhead < aheadAccidentDistance)
 							accidentsAhead.push_back(SlowCarInfo(i, distanceAhead));

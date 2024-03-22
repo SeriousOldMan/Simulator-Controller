@@ -581,7 +581,7 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 
 	long milliSeconds = GetTickCount() - lastTickCount;
 
-	if (milliSeconds < 50)
+	if (milliSeconds < 100)
 		return false;
 
 	lastTickCount += milliSeconds;
@@ -592,6 +592,11 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 
 		if (getYamlValue(result, sessionInfo, "WeekendInfo:WeekendOptions:NumStarters:"))
 			numStarters = atoi(result);
+		
+		char* pitLaneStates;
+
+		if (!getRawDataValue(pitLaneStates, header, data, "CarIdxOnPitRoad"))
+			pitLaneStates = 0;
 
 		try
 		{
@@ -603,10 +608,13 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 					float lastRunning = lastRunnings[carIndex];
 					float running = min(1, max(0, ((float*)trackPositions)[carIndex]));
 					float speed;
-						
+					
 					lastRunnings[carIndex] = running;
-							
+					
 					if (!first && (milliSeconds < 200)) {
+						if (((bool*)pitLaneStates)[carIndex])
+							continue;
+
 						if (running >= lastRunning)
 							speed = (((running - lastRunning) * trackLength) / ((float)milliSeconds / 1000.0f)) * 3.6f;
 						else
@@ -637,7 +645,7 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 									}
 								}
 
-								if (speed < (slot.speed / 4))
+								if (speed < (slot.speed / 8))
 								{
 									if (distanceAhead < aheadAccidentDistance) {
 										accidentsAhead.push_back(SlowCarInfo(i, distanceAhead));

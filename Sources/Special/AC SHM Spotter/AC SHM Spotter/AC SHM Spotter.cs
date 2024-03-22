@@ -687,7 +687,7 @@ namespace ACSHMSpotter {
 							if (distanceAhead < slowCarDistance)
 								slowCarsAhead.Add(new SlowCarInfo(i, distanceAhead));
 
-							if (speed < (slot.speed / 4))
+							if (speed < (slot.speed / 8))
 							{
 								if (distanceAhead < aheadAccidentDistance)
 									accidentsAhead.Add(new SlowCarInfo(i, distanceAhead));

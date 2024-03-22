@@ -640,7 +640,7 @@ void writePositions(const irsdk_header *header, const char* data)
 		int numStarters = 0;
 		int index = 1;
 		int playerCarIndex = atoi(playerCarIdx);
-		int driverCarIndex;
+		int driverCarIndex = 0;
 
 		if (getYamlValue(result, sessionInfo, "WeekendInfo:WeekendOptions:NumStarters:"))
 			numStarters = atoi(result);
@@ -842,7 +842,7 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 			bool practice = false;
 
 			if (getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}SessionType:", sessionID))
-				if (strstr(result, "Practice"))
+				if (strstr(result, "Practice") || strstr(result, "Warmup"))
 					practice = true;
 
 			if (!practice && sessionLaps > 0 && (long)(sessionLaps - laps) <= 0)

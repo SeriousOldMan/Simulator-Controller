@@ -537,7 +537,7 @@ BOOL checkAccident() {
 					slowCarsAheadCount += 1;
 				}
 
-				if (speed < (slot->speed / 4))
+				if (speed < (slot->speed / 8))
 				{
 					if ((distanceAhead < aheadAccidentDistance) && (accidentsAheadCount < 10)) {
 						accidentsAhead[accidentsAheadCount].vehicle = id;

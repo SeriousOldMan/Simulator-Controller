@@ -2815,7 +2815,7 @@ class RaceSpotter extends GridRaceAssistant {
 	slowCarAlert(arguments*) {
 		local distance, side, speaker
 
-		if (this.Announcements["SlowCars"] && this.Speaker[false] && this.Running) {
+		if (this.Announcements["SlowCars"] && this.Speaker[false] && this.Running && this.hasEnoughData(false)) {
 			speaker := this.getSpeaker(true)
 
 			if !speaker.Speaking
@@ -2854,7 +2854,7 @@ class RaceSpotter extends GridRaceAssistant {
 		local speaker
 
 		if ((type = "Ahead") || (this.Session = kSessionRace))
-			if (this.Announcements["Accidents" . type] && this.Speaker[false] && this.Running) {
+			if (this.Announcements["Accidents" . type] && this.Speaker[false] && this.Running && this.hasEnoughData(false)) {
 				speaker := this.getSpeaker(true)
 
 				if !speaker.Speaking

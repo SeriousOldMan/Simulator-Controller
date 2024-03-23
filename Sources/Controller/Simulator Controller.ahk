@@ -732,8 +732,6 @@ class SimulatorController extends ConfigurationItem {
 	startup() {
 		local ignore, function, fnController
 
-		this.iStarted := true
-
 		this.setModes()
 
 		for ignore, function in this.Functions
@@ -743,6 +741,8 @@ class SimulatorController extends ConfigurationItem {
 		for ignore, fnController in this.FunctionController[GuiFunctionController]
 			if fnController.VisibleDuration >= 9999
 				fnController.show()
+
+		this.iStarted := true
 	}
 
 	computeControllerModes() {

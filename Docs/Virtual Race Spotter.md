@@ -187,13 +187,14 @@ As mentioned, each simulator is different. The Spotter will make as much out of 
 
 (6) No detailed information for the concrete penalty available.
 
-(7) The distance ahead or behind, for which this is checked and reported can be defined in the [race settings] (https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database". Default is 800 meter for accidents ahead and 500 meter for slow cars and accidents behind.
+(7) The distance ahead or behind, for which this is checked and reported can be defined in the [race settings] (https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database". Default is 800 meter for accidents ahead and 500 meter for slow cars and accidents behind. The track spline will be learned during the initial laps, depending on the simulator. Therefore accident detection might not be available in this time.
 
 (8) The *iRacing* API does not provide any information about the current speed of all cars on the track, only for the drivers car. Since the crash detection is implemented using an integral over track distance and speed, the algorithm tries to learn the typical speed for each car over time. The detection is therefore not reliable during the first laps.
 
 (9) iRacing has no information of number of cuts per lap in the available data. It is only detectable in a given point in time, whether the car is off track. It therefore depends on the data sampling frequency, how reliable the detection of track cuts is.
 
 (10) Only in a race session.
+
 ## Track Mapping
 
 Using the positions of the cars on the track, Elisa is able to create a map of any track in any simulator (except for *iRacing*, where a [different method](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#special-notes-about-track-mapping-in-iracing) is applied, since no coordinates are available in the API). A track map consists of two files which are stored in your local database. The first file with the ".map" extension contains the meta data of the track map and all way points (between 1000 and 1500 points for a typical race course).

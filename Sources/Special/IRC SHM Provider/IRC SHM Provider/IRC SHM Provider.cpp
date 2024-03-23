@@ -988,7 +988,12 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 			if (getDataValue(result, header, data, "PlayerCarPosition"))
 				printf("Position=%d\n", atoi(result));
 			
-			printf("Laps=%s\n", itoa(laps, result, 10));
+			int raceLaps = laps;
+
+			// if (getDataValue(result, header, data, "RaceLaps"))
+			//	raceLaps = atoi(result);
+
+			printf("Laps=%s\n", itoa(raceLaps, result, 10));
 
 			bool valid = true;
 

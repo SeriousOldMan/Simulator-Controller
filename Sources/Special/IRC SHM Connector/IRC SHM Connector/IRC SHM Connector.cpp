@@ -997,7 +997,12 @@ void writeData(std::ostringstream * output, const irsdk_header *header, const ch
 			if (getDataValue(result, header, data, "PlayerCarPosition"))
 				printLine(output, "Position=" + std::string(result));
 
-			printLine(output, "Laps=" + std::string(itoa(laps, result, 10)));
+			int raceLaps = laps;
+
+			// if (getDataValue(result, header, data, "RaceLaps"))
+			//	raceLaps = atoi(result);
+
+			printLine(output, "Laps=" + std::string(itoa(raceLaps, result, 10)));
 
 			bool valid = true;
 			

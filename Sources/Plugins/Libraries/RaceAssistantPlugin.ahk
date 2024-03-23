@@ -37,6 +37,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	static sTeamServerWaitForShutdown := 0
 	static sInPit := false
 	static sFinish := false
+	static sSettings := CaseInsenseMap()
 
 	static sTeamServer := kUndefined
 	static sTeamSession := false
@@ -489,6 +490,16 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	WaitForShutdown[teamServer := false] {
 		Get {
 			return RaceAssistantPlugin.WaitForShutdown[teamServer]
+		}
+	}
+
+	static Settings[key?] {
+		Get {
+			return isSet(key) ? RaceAssistantPlugin.sSettings[key] : RaceAssistantPlugin.sSettings
+		}
+
+		Set {
+			return isSet(key) ? (RaceAssistantPlugin.sSettings[key] := value) : (RaceAssistantPlugin.sSettings := value)
 		}
 	}
 
@@ -1129,6 +1140,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		RaceAssistantPlugin.sLapRunning := 0
 		RaceAssistantPlugin.sInPit := false
 		RaceAssistantPlugin.sFinish := false
+		RaceAssistantPlugin.sSettings.Clear()
 	}
 
 	static requireRaceAssistants(simulator, car, track, weather) {
@@ -1191,13 +1203,25 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		return activeAssistant
 	}
 
+	static getSettings(assistant, data) {
+		local key := assistant.Plugin
+				   . getMultiMapValue(data, "Session Data", "Simulator") . getMultiMapValue(data, "Session Data", "Car")
+				   . getMultiMapValue(data, "Session Data", "Track") . getMultiMapValue(data, "Weather Data", "WeatherNow")
+		local settings
+
+		if RaceAssistantPlugin.Settings.Has(key)
+			return RaceAssistantPlugin.Settings[key]
+		else
+			return (RaceAssistantPlugin.Settings[key] := assistant.prepareSettings(data))
+	}
+
 	static prepareAssistantsSession(data, count) {
 		local first := true
 		local ignore, assistant, settings
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
 			if assistant.requireRaceAssistant() {
-				settings := assistant.prepareSettings(data)
+				settings := RaceAssistantPlugin.getSettings(assistant, data)
 
 				if !assistant.hasPrepared(settings, data, count)
 					assistant.prepareSession(settings, data)
@@ -1265,7 +1289,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 			for ignore, assistant in RaceAssistantPlugin.Assistants
 				if assistant.requireRaceAssistant() {
-					settings := assistant.prepareSettings(data)
+					settings := RaceAssistantPlugin.getSettings(assistant, data)
 
 					if first {
 						first := false

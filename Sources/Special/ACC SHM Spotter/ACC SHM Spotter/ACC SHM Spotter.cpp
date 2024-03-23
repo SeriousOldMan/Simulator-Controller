@@ -548,23 +548,28 @@ void updateTrackSpline() {
 						trackSplineLength += distance;
 
 						trackMap[key] = TrackSplinePoint(trackSplineLength);
+					}
+					else {
+						trackSplineLength = trackMap[key].distance;
 
-						if (traceFileName != "") {
-							minX = min(minX, (int)round(newPosX));
-							maxX = max(maxX, (int)round(newPosX));
-							minY = min(minY, (int)round(newPosX));
-							maxY = max(maxY, (int)round(newPosX));
+						distance = 0;
+					}
 
-							std::ofstream output;
+					lastTrackSplineTickCount += milliSeconds;
 
-							output.open(traceFileName, std::ios::out | std::ios::app);
+					if (traceFileName != "") {
+						minX = min(minX, (int)round(newPosX));
+						maxX = max(maxX, (int)round(newPosX));
+						minY = min(minY, (int)round(newPosX));
+						maxY = max(maxY, (int)round(newPosX));
 
-							output << trackMap.size() << ": Track: " << trackSplineLength << "; Distance: " << round(distance) << "; Key: " << key << std::endl;
+						std::ofstream output;
 
-							output.close();
-						}
+						output.open(traceFileName, std::ios::out | std::ios::app);
 
-						lastTrackSplineTickCount += milliSeconds;
+						output << trackMap.size() << ": Track: " << trackSplineLength << "; Distance: " << round(distance) << "; Key: " << key << std::endl;
+
+						output.close();
 					}
 				}
 			}
@@ -583,34 +588,44 @@ void updateTrackSpline() {
 	}
 }
 
-void startTrackBuilder(int driverIdx) {
+int baseLap = -1;
+
+boolean startTrackSplineBuilder(int driverIdx) {
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
-	referenceDriverPosX = gf->carCoordinates[driverIdx][0];
-	referenceDriverPosY = gf->carCoordinates[driverIdx][2];
+	if (baseLap == -1)
+		baseLap = gf->completedLaps + 1;
+	else if (baseLap <= gf->completedLaps) {
+		referenceDriverPosX = gf->carCoordinates[driverIdx][0];
+		referenceDriverPosY = gf->carCoordinates[driverIdx][2];
 
-	startPosX = referenceDriverPosX;
-	startPosY = referenceDriverPosY;
+		startPosX = referenceDriverPosX;
+		startPosY = referenceDriverPosY;
 
-	trackSplineLength = 0;
-	referenceDriverIdx = driverIdx;
+		trackSplineLength = 0;
+		referenceDriverIdx = driverIdx;
 
-	lastTrackSplineTickCount = GetTickCount();
+		lastTrackSplineTickCount = GetTickCount();
 
-	for (int i = 0; i < 60; i++) {
-		lastCarCoordinates[i][0] = INT_MAX;
-		lastCarCoordinates[i][1] = INT_MAX;
+		for (int i = 0; i < 60; i++) {
+			lastCarCoordinates[i][0] = INT_MAX;
+			lastCarCoordinates[i][1] = INT_MAX;
+		}
+
+		if (traceFileName != "") {
+			std::ofstream output;
+
+			output.open(traceFileName, std::ios::out | std::ios::app);
+
+			output << "========== Start maapping track ==========" << std::endl;
+
+			output.close();
+		}
+
+		return true;
 	}
 
-	if (traceFileName != "") {
-		std::ofstream output;
-
-		output.open(traceFileName, std::ios::out | std::ios::app);
-
-		output << "========== Start maapping track ==========" << std::endl;
-
-		output.close();
-	}
+	return false;
 }
 
 float getDistance(int carIdx) {
@@ -715,9 +730,8 @@ bool checkAccident() {
 	long milliSeconds = GetTickCount() - lastTickCount;
 
 	if (first) {
-		startTrackBuilder(carID);
-
-		lastTickCount += milliSeconds;
+		if (startTrackSplineBuilder(carID))
+			lastTickCount += milliSeconds;
 
 		return false;
 	}
@@ -788,7 +802,7 @@ bool checkAccident() {
 									}
 								}
 
-								if (speed < (slot.speed / 8))
+								if (speed < (slot.speed / 5))
 								{
 									if (distanceAhead < aheadAccidentDistance) {
 										accidentsAhead.push_back(SlowCarInfo(i, distanceAhead));

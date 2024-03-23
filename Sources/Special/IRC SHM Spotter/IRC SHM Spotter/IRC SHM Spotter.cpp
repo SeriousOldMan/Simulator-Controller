@@ -645,7 +645,7 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 									}
 								}
 
-								if (speed < (slot.speed / 8))
+								if (speed < (slot.speed / 5))
 								{
 									if (distanceAhead < aheadAccidentDistance) {
 										accidentsAhead.push_back(SlowCarInfo(i, distanceAhead));

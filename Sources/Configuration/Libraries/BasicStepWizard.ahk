@@ -54,15 +54,23 @@ class BasicStepWizard extends StepWizard {
 		}
 	}
 
-	Assistants {
+	Assistants[key?] {
 		Get {
-			return this.iAssistants
+			return (isSet(key) ? this.iAssistants[key] : this.iAssistants)
+		}
+
+		Set {
+			return (isSet(key) ? (this.iAssistants[key] := value) : (this.iAssistants := value))
 		}
 	}
 
-	Keys {
+	Keys[key?] {
 		Get {
-			return this.iKeys
+			return (isSet(key) ? this.iKeys[key] : this.iKeys)
+		}
+
+		Set {
+			return (isSet(key) ? (this.iKeys[key] := value) : (this.iKeys := value))
 		}
 	}
 

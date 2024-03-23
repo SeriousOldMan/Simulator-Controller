@@ -270,9 +270,13 @@ class ControllerList extends ConfigurationItemList {
 class FunctionsList extends ConfigurationItemList {
 	iFunctions := CaseInsenseMap()
 
-	Functions {
+	Functions[key?] {
 		Get {
-			return this.iFunctions
+			return (isSet(key) ? this.iFunctions[key] : this.iFunctions)
+		}
+
+		Set {
+			return (isSet(key) ? (this.iFunctions[key] := value) : (this.iFunctions := value))
 		}
 	}
 

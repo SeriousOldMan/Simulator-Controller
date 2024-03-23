@@ -145,7 +145,7 @@ class RaceAssistant extends ConfigurationItem {
 	class RaceVoiceManager extends VoiceManager {
 		iRaceAssistant := false
 
-		class Grammars extends MultiMap {
+		class VoiceGrammars extends MultiMap {
 			include(path, directory?) {
 				local fileName, include
 
@@ -211,9 +211,9 @@ class RaceAssistant extends ConfigurationItem {
 			if !FileExist(getFileName(fileName, kUserGrammarsDirectory, kGrammarsDirectory))
 				fileName := (prefix . "en")
 
-			grammars := readMultiMap(kGrammarsDirectory . fileName, RaceAssistant.RaceVoiceManager.Grammars)
+			grammars := readMultiMap(kGrammarsDirectory . fileName, RaceAssistant.RaceVoiceManager.VoiceGrammars)
 
-			addMultiMapValues(grammars, readMultiMap(kUserGrammarsDirectory . fileName, RaceAssistant.RaceVoiceManager.Grammars))
+			addMultiMapValues(grammars, readMultiMap(kUserGrammarsDirectory . fileName, RaceAssistant.RaceVoiceManager.VoiceGrammars))
 
 			return grammars
 		}

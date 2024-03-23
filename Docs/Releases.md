@@ -5,19 +5,20 @@
   4. Fixed a bug in the Spanish voice recognition.
   5. Fixed periodic update of the track map in "Race Center".
   6. Fixed "Simulator Setup" to include *Le Mans Ultimate* on the simulation configuration page.
-  7. A memory leak in the *iRacing* data connector has been fixed.
-  8. A rare bug has been fixed in the "Track Mapper", which prevented a track map to be calculated correctly, when one of the GPS coordinates were zero for the X value.
-  9. It is now detected correctly in *iRacing* whether the drivers car is in the pit for service.
-  10. It is also detected correctly in *iRacing* now whether any car is in the pitlane.
-  11. Invalid laps for any driver are now detected for *iRacing*. But it depends on the data update frequency set in the "Session Database", whether this detection is reliable, since the iRacing API only signals an invalid lap as long as the car is off-track.
-  12. The default for the setting "Engineer: Tyre Service" is now used correctly for *iRacing*, where it is *False* (Off), since *iRacing* does not report valid hot tyre pressures most of the time.
-  13. Changing of tyre compounds are now supported during pitstops in *iRacing*:
+  7. Fixed car positions in race reports as well as in "Race Center" and "Practice Center" for *iRacing* online races.
+  8. A memory leak in the *iRacing* data connector has been fixed.
+  9. A rare bug has been fixed in the "Track Mapper", which prevented a track map to be calculated correctly, when one of the GPS coordinates were zero for the X value.
+  10. It is now detected correctly in *iRacing* whether the drivers car is in the pit for service.
+  11. It is also detected correctly in *iRacing* now whether any car is in the pitlane.
+  12. Invalid laps for any driver are now detected for *iRacing*. But it depends on the data update frequency set in the "Session Database", whether this detection is reliable, since the iRacing API only signals an invalid lap as long as the car is off-track.
+  13. The default for the setting "Engineer: Tyre Service" is now used correctly for *iRacing*, where it is *False* (Off), since *iRacing* does not report valid hot tyre pressures most of the time.
+  14. Changing of tyre compounds are now supported during pitstops in *iRacing*:
       - New action "TyreCompound" for the ["IRC" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-irc).
 	  - Support added in "Simulator Setup" to configure this action.
 	  - Stream Deck icon is available for the "TyreCompound" action.
 	  - The Race Engineer is fully aware of the configured tyre compounds for a given car.
-  14. "Practice Center" now informs about unsaved data before starting a new session.
-  15. Accident and slow car detection by the Spotter is now also available for *Assetto Corsa Competizione*.
+  15. "Practice Center" now informs about unsaved data before starting a new session.
+  16. Accident and slow car detection by the Spotter is now also available for *Assetto Corsa Competizione*.
   
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-564), if you are running *iRacing* and want to use the new "TyreCompound" action.
 

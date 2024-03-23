@@ -559,9 +559,13 @@ class VoiceManager {
 		}
 	}
 
-	Grammars {
+	Grammars[key?] {
 		Get {
-			return this.iGrammars
+			return (isSet(key) ? this.iGrammars[key] : this.iGrammars)
+		}
+
+		Set {
+			return (isSet(key) ? (this.iGrammars[key] := value) : (this.iGrammars := value))
 		}
 	}
 

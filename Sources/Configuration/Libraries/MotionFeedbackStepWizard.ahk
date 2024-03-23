@@ -826,7 +826,9 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 
 		contextMenu.Add()
 
-		contextMenu.Add(translate("Set Effect Intensity Dial"), (*) => this.setEffectIntensityDial(preview, function, element[2], row, column))
+		menuItem := translate("Set Effect Intensity Dial")
+
+		contextMenu.Add(menuItem, (*) => this.setEffectIntensityDial(preview, function, element[2], row, column))
 
 		if ((functionType != k2WayToggleType) && (functionType != kDialType))
 			contextMenu.Disable(menuItem)

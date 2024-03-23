@@ -3983,12 +3983,12 @@ class RaceStrategist extends GridRaceAssistant {
 				carIndex := false
 
 				if slots {
-					key := ("!" . carID)
+					key := ("#" . carNr)
 
 					if slots.Has(key)
 						carIndex := slots[key]
 					else {
-						key := ("#" . carNr)
+						key := ("!" . carID)
 
 						if slots.Has(key)
 							carIndex := slots[key]
@@ -3996,12 +3996,12 @@ class RaceStrategist extends GridRaceAssistant {
 				}
 
 				if !carIndex {
-					key := ("!" . carID)
+					key := ("#" . carNr)
 
 					if raceInfo.Has(key)
 						carIndex := raceInfo[key]
 					else {
-						key := ("#" . carNr)
+						key := ("!" . carID)
 
 						if raceInfo.Has(key)
 							carIndex := raceInfo[key]

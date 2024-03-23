@@ -649,7 +649,7 @@ namespace RF2SHMSpotter {
 							if (distanceAhead < slowCarDistance)
 								slowCarsAhead.Add(new SlowCarInfo(i, distanceAhead));
 
-							if (speed < (slot.speed / 8))
+							if (speed < (slot.speed / 5))
 							{
 								if (distanceAhead < aheadAccidentDistance)
 									accidentsAhead.Add(new SlowCarInfo(i, distanceAhead));

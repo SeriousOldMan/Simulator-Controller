@@ -88,7 +88,7 @@ void dismiss(SMElement element)
 int sendStringMessage(HWND hWnd, int wParam, string msg) {
 	int result = 0;
 
-	if (hWnd > 0) {
+	if (hWnd) {
 		COPYDATASTRUCT cds;
 		cds.dwData = (256 * 'R' + 'S');
 		cds.cbData = sizeof(char) * (msg.length() + 1);
@@ -485,98 +485,94 @@ void updateIdealLine(int carIdx, double running, double speed) {
 		}
 }
 
-class TrackPart {
+class TrackSplinePoint {
 public:
-	int count;
-
-	double speed;
 	float distance;
 
-	TrackPart() :
-		count(0),
-		speed(0),
+	TrackSplinePoint() :
 		distance(0) {}
 
-	TrackPart(float s, float d) :
-		count(1),
-		speed(s),
+	TrackSplinePoint(float d) :
 		distance(d) {}
-
-	void update(float s);
 };
 
-void TrackPart::update(float s) {
-	count += 1;
+std::map<std::string, TrackSplinePoint> trackMap;
 
-	speed = (speed * (count - 1) + speed) / count;
-}
+float startPosX, startPosY, referenceDriverPosX, referenceDriverPosY, trackSplineLength;
+int referenceDriverIdx;
+bool trackSplineReady = false;
+long lastTrackSplineTickCount = 0;
 
-std::map<std::string, TrackPart> trackMap;
-
-float startPosX, startPosY, driverPosX, driverPosY, mapTrackLength;
-int trackDriverIdx;
-bool trackReady = false;
-long lastTrackTickCount = 0;
+int minX = INT_MAX;
+int maxX = INT_MIN;
+int minY = INT_MAX;
+int maxY = INT_MIN;
 
 float lastCarCoordinates[60][2];
 
 string traceFileName = "";
 
-void updateTrackMap() {
+void updateTrackSpline() {
 	try {
-		if (!trackReady) {
-			long milliSeconds = GetTickCount() - lastTrackTickCount;
+		if (!trackSplineReady) {
+			long milliSeconds = GetTickCount() - lastTrackSplineTickCount;
 
 			if (milliSeconds < 50)
 				return;
 
 			SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
-			float newPosX = gf->carCoordinates[trackDriverIdx][0];
-			float newPosY = gf->carCoordinates[trackDriverIdx][2];
-			double distance = vectorLength(driverPosX - newPosX, driverPosY - newPosY);
-			double speed = (distance / ((double)milliSeconds / 1000.0f)) * 3.6f;
-
-			if ((speed > 80) || (distance > 20)) {
-				if (fabs(newPosX - startPosX) < 10.0 && fabs(newPosY - startPosY) < 10.0 && trackMap.size() > 100) {
-					trackReady = true;
+			float newPosX = gf->carCoordinates[referenceDriverIdx][0];
+			float newPosY = gf->carCoordinates[referenceDriverIdx][2];
+			double distance = vectorLength(referenceDriverPosX - newPosX, referenceDriverPosY - newPosY);
+			
+			if (distance > 20) {
+				if (fabs(newPosX - startPosX) < 30.0 && fabs(newPosY - startPosY) < 30.0 && trackMap.size() > 100) {
+					trackSplineReady = true;
 
 					if (traceFileName != "") {
 						std::ofstream output;
 
 						output.open(traceFileName, std::ios::out | std::ios::app);
 
-						output << "========== Finished mapping track (" << mapTrackLength << ") ==========" << std::endl;
+						output << "========== Finished mapping track (" << trackSplineLength << ", " << maxX - minX << ", " << maxY - minY << ") ==========" << std::endl;
 
 						output.close();
 					}
 				}
 				else {
-					mapTrackLength += distance;
+					string key = std::to_string(((long)(round(newPosX / 20) * 10 - 5))) + std::to_string(((long)(round(newPosX / 20) * 10 + 5))) +
+								 std::to_string(((long)(round(newPosY / 20) * 10 - 5))) + std::to_string(((long)(round(newPosY / 20) * 10 + 5)));
 
-					string key = std::to_string(((long)(round(newPosX / 20) * 10 - 10))) + std::to_string(((long)(round(newPosX / 20) * 10 + 10))) +
-								 std::to_string(((long)(round(newPosY / 20) * 10 - 10))) + std::to_string(((long)(round(newPosY / 20) * 10 + 10)));
+					if (!trackMap.contains(key)) {
+						trackSplineLength += distance;
 
-					try {
-						trackMap.at(key).update(speed);
+						trackMap[key] = TrackSplinePoint(trackSplineLength);
 					}
-					catch (std::out_of_range e) {
-						trackMap[key] = TrackPart(speed, mapTrackLength);
+					else {
+						trackSplineLength = trackMap[key].distance;
+
+						distance = 0;
 					}
+
+					lastTrackSplineTickCount += milliSeconds;
 
 					if (traceFileName != "") {
+						minX = min(minX, (int)round(newPosX));
+						maxX = max(maxX, (int)round(newPosX));
+						minY = min(minY, (int)round(newPosX));
+						maxY = max(maxY, (int)round(newPosX));
+
 						std::ofstream output;
 
 						output.open(traceFileName, std::ios::out | std::ios::app);
 
-						output << trackMap.size() << ": Track: " << mapTrackLength << "; Distance: " << round(distance) << "; Speed: " << round(speed) << "; Key: " << key << std::endl;
+						output << trackMap.size() << ": Track: " << trackSplineLength << "; Distance: " << round(distance) << "; Key: " << key << std::endl;
 
 						output.close();
 					}
 				}
 			}
-
-			lastTrackTickCount += milliSeconds;
 
 			Sleep(50);
 		}
@@ -592,34 +588,44 @@ void updateTrackMap() {
 	}
 }
 
-void startTrackBuilder(int driverIdx) {
+int baseLap = -1;
+
+boolean startTrackSplineBuilder(int driverIdx) {
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
-	driverPosX = gf->carCoordinates[driverIdx][0];
-	driverPosY = gf->carCoordinates[driverIdx][2];
+	if (baseLap == -1)
+		baseLap = gf->completedLaps + 1;
+	else if (baseLap <= gf->completedLaps) {
+		referenceDriverPosX = gf->carCoordinates[driverIdx][0];
+		referenceDriverPosY = gf->carCoordinates[driverIdx][2];
 
-	startPosX = driverPosX;
-	startPosY = driverPosY;
+		startPosX = referenceDriverPosX;
+		startPosY = referenceDriverPosY;
 
-	mapTrackLength = 0;
-	trackDriverIdx = driverIdx;
+		trackSplineLength = 0;
+		referenceDriverIdx = driverIdx;
 
-	lastTrackTickCount = GetTickCount();
+		lastTrackSplineTickCount = GetTickCount();
 
-	for (int i = 0; i < 60; i++) {
-		lastCarCoordinates[i][0] = INT_MAX;
-		lastCarCoordinates[i][1] = INT_MAX;
+		for (int i = 0; i < 60; i++) {
+			lastCarCoordinates[i][0] = INT_MAX;
+			lastCarCoordinates[i][1] = INT_MAX;
+		}
+
+		if (traceFileName != "") {
+			std::ofstream output;
+
+			output.open(traceFileName, std::ios::out | std::ios::app);
+
+			output << "========== Start maapping track ==========" << std::endl;
+
+			output.close();
+		}
+
+		return true;
 	}
 
-	if (traceFileName != "") {
-		std::ofstream output;
-
-		output.open(traceFileName, std::ios::out | std::ios::app);
-
-		output << "========== Start maapping track ==========" << std::endl;
-
-		output.close();
-	}
+	return false;
 }
 
 float getDistance(int carIdx) {
@@ -628,8 +634,8 @@ float getDistance(int carIdx) {
 	float carPosX = gf->carCoordinates[carIdx][0];
 	float carPosY = gf->carCoordinates[carIdx][2];
 
-	string key = std::to_string(((long)(round(carPosX / 20) * 10 - 10))) + std::to_string(((long)(round(carPosX / 20) * 10 + 10))) +
-				 std::to_string(((long)(round(carPosY / 20) * 10 - 10))) + std::to_string(((long)(round(carPosY / 20) * 10 + 10)));
+	string key = std::to_string(((long)(round(carPosX / 20) * 10 - 5))) + std::to_string(((long)(round(carPosX / 20) * 10 + 5))) +
+				 std::to_string(((long)(round(carPosY / 20) * 10 - 5))) + std::to_string(((long)(round(carPosY / 20) * 10 + 5)));
 
 	try {
 		float distance = trackMap.at(key).distance;
@@ -640,13 +646,13 @@ float getDistance(int carIdx) {
 
 			output.open(traceFileName, std::ios::out | std::ios::app);
 
-			output << "D " << distance << "; " << distance / mapTrackLength << endl;
+			output << "D " << distance << "; " << distance / trackSplineLength << endl;
 
 			output.close();
 		}
 		*/
 
-		return distance / mapTrackLength;
+		return distance / trackSplineLength;
 	}
 	catch (std::out_of_range e) {
 		return -1;
@@ -724,14 +730,13 @@ bool checkAccident() {
 	long milliSeconds = GetTickCount() - lastTickCount;
 
 	if (first) {
-		startTrackBuilder(carID);
-
-		lastTickCount += milliSeconds;
+		if (startTrackSplineBuilder(carID))
+			lastTickCount += milliSeconds;
 
 		return false;
 	}
-	else if (!trackReady) {
-		updateTrackMap();
+	else if (!trackSplineReady) {
+		updateTrackSpline();
 
 		lastTickCount += milliSeconds;
 
@@ -797,7 +802,7 @@ bool checkAccident() {
 									}
 								}
 
-								if (speed < (slot.speed / 8))
+								if (speed < (slot.speed / 5))
 								{
 									if (distanceAhead < aheadAccidentDistance) {
 										accidentsAhead.push_back(SlowCarInfo(i, distanceAhead));
@@ -1732,8 +1737,8 @@ int main(int argc, char* argv[])
 	bool analyzeTelemetry = false;
 	bool positionTrigger = false;
 
-	char* soundsDirectory = "";
-	char* audioDevice = "";
+	char* soundsDirectory = 0;
+	char* audioDevice = 0;
 
 	idealLine.reserve(1000);
 
@@ -1819,7 +1824,7 @@ int main(int argc, char* argv[])
 		bool wait = true;
 
 		if (analyzeTelemetry) {
-			if (collectTelemetry(soundsDirectory, audioDevice, calibrateTelemetry)) {
+			if (collectTelemetry(soundsDirectory ? soundsDirectory : "", audioDevice ? audioDevice : "", calibrateTelemetry)) {
 				if (remainder(counter, 20) == 0)
 					writeTelemetry(calibrateTelemetry);
 			}

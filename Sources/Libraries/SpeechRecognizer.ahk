@@ -1117,9 +1117,9 @@ class Grammar {
 	class Choices {
 		iChoices := []
 
-		Choices {
+		Choices[key?] {
 			Get {
-				return this.iChoices
+				return (isSet(key) ? this.iChoices[key] : this.iChoices)
 			}
 		}
 
@@ -1429,9 +1429,9 @@ class GrammarGrammars {
 class GrammarChoices {
 	iChoices := []
 
-	Choices {
+	Choices[key?] {
 		Get {
-			return this.iChoices
+			return (isSet(key) ? this.iChoices[key] : this.iChoices)
 		}
 	}
 

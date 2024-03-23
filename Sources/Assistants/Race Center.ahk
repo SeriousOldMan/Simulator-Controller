@@ -306,8 +306,6 @@ class RaceCenter extends ConfigurationItem {
 
 	iStrategyViewer := false
 
-	iTasks := []
-
 	iPressuresRequest := false
 
 	class RaceCenterResizer extends Window.Resizer {

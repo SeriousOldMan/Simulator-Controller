@@ -43,8 +43,7 @@ class StreamDeck extends FunctionController {
 	iLabels := CaseInsenseMap()
 	iIcons := CaseInsenseMap()
 	iModes := CaseInsenseMap()
-	iSpecial := CaseInsenseMap()
-
+	
 	iConnector := false
 
 	iActions := CaseInsenseMap()

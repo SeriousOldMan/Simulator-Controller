@@ -249,9 +249,13 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
-	Options {
+	Options[key?] {
 		Get {
-			return (this.iOptions)
+			return (isSet(key) ? this.iOptions[key] : this.iOptions)
+		}
+		
+		Set {
+			return (isSet(key) ? (this.iOptions[key] := value) : (this.iOptions := value))
 		}
 	}
 
@@ -511,7 +515,7 @@ class RaceAssistant extends ConfigurationItem {
 
 		super.__New(configuration)
 
-		options := this.iOptions
+		options := this.Options
 
 		if (language != kUndefined) {
 			listener := ((speaker != false) ? listener : false)
@@ -553,7 +557,7 @@ class RaceAssistant extends ConfigurationItem {
 
 		super.loadFromConfiguration(configuration)
 
-		options := this.iOptions
+		options := this.Options
 
 		options["Language"] := getMultiMapValue(configuration, "Voice Control", "Language", getLanguage())
 		options["Synthesizer"] := getMultiMapValue(configuration, "Voice Control", "Synthesizer", getMultiMapValue(configuration, "Voice Control", "Service", "dotNET"))

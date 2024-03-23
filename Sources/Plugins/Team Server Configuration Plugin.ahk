@@ -59,6 +59,10 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 		Get {
 			return (isSet(key) ? this.iTeams[key] : this.iTeams)
 		}
+		
+		Set {
+			return (isSet(key) ? (this.iTeams[key] := value) : (this.iTeams := value))
+		}
 	}
 
 	SelectedTeam {
@@ -71,6 +75,10 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 		Get {
 			return (isSet(key) ? this.iDrivers[key] : this.iDrivers)
 		}
+		
+		Set {
+			return (isSet(key) ? (this.iDrivers[key] := value) : (this.iDrivers := value))
+		}
 	}
 
 	SelectedDriver {
@@ -82,6 +90,10 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 	Sessions[key?] {
 		Get {
 			return (isSet(key) ? this.iSessions[key] : this.iSessions)
+		}
+		
+		Set {
+			return (isSet(key) ? (this.iSessions[key] := value) : (this.iSessions := value))
 		}
 	}
 
@@ -917,9 +929,8 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 
 	addTeam(name) {
 		local identifier := this.Connector.CreateTeam(name)
-		local teams := this.Teams
-
-		teams[name] := identifier
+		
+		this.Teams[name] := identifier
 
 		this.loadTeams()
 		this.selectTeam(name)

@@ -51,9 +51,9 @@ class TriggerDetectorTask extends Task {
 		}
 	}
 
-	Joysticks {
+	Joysticks[key?] {
 		Get {
-			return this.iJoysticks
+			return (isSet(key) ? this.iJoysticks[key] : this.iJoysticks)
 		}
 	}
 

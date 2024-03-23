@@ -2090,7 +2090,7 @@ class ClicksHandler extends IntegerHandler {
 class EnumerationHandler extends SettingHandler {
 	iZero := 0
 	iIncrement := 1
-	iValuea := []
+	iValues := []
 
 	Zero {
 		Get {
@@ -2104,9 +2104,9 @@ class EnumerationHandler extends SettingHandler {
 		}
 	}
 
-	Values {
+	Values[key?] {
 		Get {
-			return this.iValues
+			return (isSet(key) ? this.iValues[key] : this.iValues)
 		}
 	}
 	__New(zero := 0, increment := 1, values*) {

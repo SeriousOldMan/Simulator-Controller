@@ -894,8 +894,6 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 
 	iWindow := false
 
-	iLanguages := []
-
 	iSynthesizerMode := false
 
 	iTopWidgets := []

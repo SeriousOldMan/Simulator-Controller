@@ -212,8 +212,6 @@ class PracticeCenter extends ConfigurationItem {
 	iSelectedDetailReport := false
 	iSelectedDetailHTML := false
 
-	iTasks := []
-
 	class PracticeCenterWindow extends Window {
 		iPracticeCenter := false
 

@@ -556,9 +556,9 @@ class SimulatorController extends ConfigurationItem {
 		}
 	}
 
-	ActiveModes {
+	ActiveModes[key?] {
 		Get {
-			return this.iActiveModes
+			return (isSet(key) ? this.iActiveModes[key] : this.iActiveModes)
 		}
 	}
 
@@ -1655,9 +1655,9 @@ class ControllerPlugin extends Plugin {
 		}
 	}
 
-	Actions {
+	Actions[key?] {
 		Get {
-			return this.iActions
+			return (isSet(key) ? this.iActions[key] : this.iActions)
 		}
 	}
 
@@ -1821,15 +1821,15 @@ class ControllerMode {
 		}
 	}
 
-	Actions {
+	Actions[key?] {
 		Get {
-			return this.iActions
+			return (isSet(key) ? this.iActions[key] : this.iActions)
 		}
 	}
 
-	FunctionController {
+	FunctionController[key?] {
 		Get {
-			return this.iFunctionController
+			return (isSet(key) ? this.iFunctionController[key] : this.iFunctionController)
 		}
 	}
 

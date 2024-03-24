@@ -790,7 +790,7 @@ bool checkAccident() {
 				if (i != carID) {
 					double speed = getSpeed(i, milliSeconds);
 
-					if (speed >= 1) {
+					if (speed >= 10) {
 						double distance = getDistance(i);
 
 						if (distance >= 0) {

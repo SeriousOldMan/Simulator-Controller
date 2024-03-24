@@ -475,36 +475,38 @@ bool checkAccident(const SharedMemory* sharedData)
 
 				ParticipantInfo vehicle = sharedData->mParticipantInfo[i];
 				double speed = sharedData->mSpeeds[i] * 3.6;
-				double running = std::abs(vehicle.mCurrentLapDistance / sharedData->mTrackLength);
-			
-				running = ((1.0 < running) ? 1.0 : running);
-				running = ((0.0 > running) ? 0.0 : running);
 
-				IdealLine slot = idealLine[(int)std::round(running * 999)];
+				if (speed >= 10) {
+					double running = std::abs(vehicle.mCurrentLapDistance / sharedData->mTrackLength);
 
-				if ((slot.count > 100) && (speed < (slot.speed / 2)))
-				{
-					long distanceAhead = (long)(((vehicle.mCurrentLapDistance > driver.mCurrentLapDistance) ? vehicle.mCurrentLapDistance
-																										    : (vehicle.mCurrentLapDistance + sharedData->mTrackLength)) - driver.mCurrentLapDistance);
+					running = ((1.0 < running) ? 1.0 : running);
+					running = ((0.0 > running) ? 0.0 : running);
 
-					if (distanceAhead < slowCarDistance)
-						slowCarsAhead.push_back(SlowCarInfo(i, distanceAhead));
+					IdealLine slot = idealLine[(int)std::round(running * 999)];
 
-					if (speed < (slot.speed / 5))
+					if ((slot.count > 100) && (speed < (slot.speed / 2)))
 					{
-						if (distanceAhead < aheadAccidentDistance)
-							accidentsAhead.push_back(SlowCarInfo(i, distanceAhead));
+						long distanceAhead = (long)(((vehicle.mCurrentLapDistance > driver.mCurrentLapDistance) ? vehicle.mCurrentLapDistance
+							: (vehicle.mCurrentLapDistance + sharedData->mTrackLength)) - driver.mCurrentLapDistance);
 
-						long distanceBehind = (long)(((vehicle.mCurrentLapDistance < driver.mCurrentLapDistance) ? driver.mCurrentLapDistance
-																											     : (driver.mCurrentLapDistance + sharedData->mTrackLength)) - vehicle.mCurrentLapDistance);
+						if (distanceAhead < slowCarDistance)
+							slowCarsAhead.push_back(SlowCarInfo(i, distanceAhead));
 
-						if (distanceBehind < behindAccidentDistance)
-							accidentsBehind.push_back(SlowCarInfo(i, distanceBehind));
+						if (speed < (slot.speed / 5))
+						{
+							if (distanceAhead < aheadAccidentDistance)
+								accidentsAhead.push_back(SlowCarInfo(i, distanceAhead));
+
+							long distanceBehind = (long)(((vehicle.mCurrentLapDistance < driver.mCurrentLapDistance) ? driver.mCurrentLapDistance
+								: (driver.mCurrentLapDistance + sharedData->mTrackLength)) - vehicle.mCurrentLapDistance);
+
+							if (distanceBehind < behindAccidentDistance)
+								accidentsBehind.push_back(SlowCarInfo(i, distanceBehind));
+						}
 					}
+					else
+						updateIdealLine(vehicle, running, speed);
 				}
-				else
-					updateIdealLine(vehicle, running, speed);
-
 			}
 	}
 	catch (const std::exception& ex) {

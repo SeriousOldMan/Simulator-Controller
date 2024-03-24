@@ -516,46 +516,49 @@ BOOL checkAccident() {
 				continue;
 
 			double speed = map_buffer->all_drivers_data_1[id].car_speed * 3.6;
-			double carDistance = map_buffer->all_drivers_data_1[id].lap_distance;
-			double running = fabs(carDistance / map_buffer->layout_length);
 
-			running = ((1.0 < running) ? 1.0 : running);
-			running = ((0.0 > running) ? 0.0 : running);
+			if (speed >= 10) {
+				double carDistance = map_buffer->all_drivers_data_1[id].lap_distance;
+				double running = fabs(carDistance / map_buffer->layout_length);
 
-			ideal_line* slot = &idealLine[(int)round(running * 999)];
+				running = ((1.0 < running) ? 1.0 : running);
+				running = ((0.0 > running) ? 0.0 : running);
 
-			if ((slot->count > 100) && (speed < (slot->speed / 2)))
-			{
-				long distanceAhead = (long)(((carDistance > driverDistance) ? carDistance : (carDistance + map_buffer->layout_length)) - driverDistance);
+				ideal_line* slot = &idealLine[(int)round(running * 999)];
 
-				if ((distanceAhead < slowCarDistance) && (slowCarsAheadCount < 10)) {
-					slowCarsAhead[slowCarsAheadCount].vehicle = id;
-					slowCarsAhead[slowCarsAheadCount].distance = distanceAhead;
-
-					slowCarsAheadCount += 1;
-				}
-
-				if (speed < (slot->speed / 5))
+				if ((slot->count > 100) && (speed < (slot->speed / 2)))
 				{
-					if ((distanceAhead < aheadAccidentDistance) && (accidentsAheadCount < 10)) {
-						accidentsAhead[accidentsAheadCount].vehicle = id;
-						accidentsAhead[accidentsAheadCount].distance = distanceAhead;
+					long distanceAhead = (long)(((carDistance > driverDistance) ? carDistance : (carDistance + map_buffer->layout_length)) - driverDistance);
 
-						accidentsAheadCount += 1;
+					if ((distanceAhead < slowCarDistance) && (slowCarsAheadCount < 10)) {
+						slowCarsAhead[slowCarsAheadCount].vehicle = id;
+						slowCarsAhead[slowCarsAheadCount].distance = distanceAhead;
+
+						slowCarsAheadCount += 1;
 					}
 
-					long distanceBehind = (long)(((carDistance < driverDistance) ? driverDistance : (driverDistance + map_buffer->layout_length)) - carDistance);
+					if (speed < (slot->speed / 5))
+					{
+						if ((distanceAhead < aheadAccidentDistance) && (accidentsAheadCount < 10)) {
+							accidentsAhead[accidentsAheadCount].vehicle = id;
+							accidentsAhead[accidentsAheadCount].distance = distanceAhead;
 
-					if ((distanceBehind < behindAccidentDistance) && (accidentsBehindCount < 10)) {
-						accidentsBehind[accidentsBehindCount].vehicle = id;
-						accidentsBehind[accidentsBehindCount].distance = distanceBehind;
+							accidentsAheadCount += 1;
+						}
 
-						accidentsBehindCount += 1;
+						long distanceBehind = (long)(((carDistance < driverDistance) ? driverDistance : (driverDistance + map_buffer->layout_length)) - carDistance);
+
+						if ((distanceBehind < behindAccidentDistance) && (accidentsBehindCount < 10)) {
+							accidentsBehind[accidentsBehindCount].vehicle = id;
+							accidentsBehind[accidentsBehindCount].distance = distanceBehind;
+
+							accidentsBehindCount += 1;
+						}
 					}
 				}
+				else
+					updateIdealLine(id, running, speed);
 			}
-			else
-				updateIdealLine(id, running, speed);
 		}
 	}
 	

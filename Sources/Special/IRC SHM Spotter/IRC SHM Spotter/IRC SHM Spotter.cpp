@@ -622,63 +622,65 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 							else
 								continue;
 
-							IdealLine slot = idealLine[(int)std::round(running * 999)];
+							if (speed >= 10) {
+								IdealLine slot = idealLine[(int)std::round(running * 999)];
 
-							if ((slot.count > 100) && (speed < (slot.speed / 2)))
-							{
-								long distanceAhead = (long)(((running > driverRunning) ? (running * trackLength)
-																					   : ((running * trackLength) + trackLength)) - (driverRunning * trackLength));
-
-								if (distanceAhead < slowCarDistance) {
-									slowCarsAhead.push_back(SlowCarInfo(i, distanceAhead));
-
-									if (traceFileName != "") {
-										std::ofstream output;
-
-										output.open(traceFileName, std::ios::out | std::ios::app);
-
-										output << "Slow: " << i << "; Speed: " << round(speed) << "; Distance: " << round(distanceAhead) << std::endl;
-
-										output.close();
-									}
-								}
-
-								if (speed < (slot.speed / 5))
+								if ((slot.count > 100) && (speed < (slot.speed / 2)))
 								{
-									if (distanceAhead < aheadAccidentDistance) {
-										accidentsAhead.push_back(SlowCarInfo(i, distanceAhead));
+									long distanceAhead = (long)(((running > driverRunning) ? (running * trackLength)
+										: ((running * trackLength) + trackLength)) - (driverRunning * trackLength));
+
+									if (distanceAhead < slowCarDistance) {
+										slowCarsAhead.push_back(SlowCarInfo(i, distanceAhead));
 
 										if (traceFileName != "") {
 											std::ofstream output;
 
 											output.open(traceFileName, std::ios::out | std::ios::app);
 
-											output << "Accident Ahead: " << i << "; Speed: " << round(speed) << "; Distance: " << round(distanceAhead) << std::endl;
+											output << "Slow: " << i << "; Speed: " << round(speed) << "; Distance: " << round(distanceAhead) << std::endl;
 
 											output.close();
 										}
 									}
 
-									long distanceBehind = (long)(((running < driverRunning) ? (driverRunning * trackLength)
-																						    : ((driverRunning * trackLength) + trackLength)) - (running * trackLength));
+									if (speed < (slot.speed / 5))
+									{
+										if (distanceAhead < aheadAccidentDistance) {
+											accidentsAhead.push_back(SlowCarInfo(i, distanceAhead));
 
-									if (distanceBehind < behindAccidentDistance) {
-										accidentsBehind.push_back(SlowCarInfo(i, distanceBehind));
+											if (traceFileName != "") {
+												std::ofstream output;
 
-										if (traceFileName != "") {
-											std::ofstream output;
+												output.open(traceFileName, std::ios::out | std::ios::app);
 
-											output.open(traceFileName, std::ios::out | std::ios::app);
+												output << "Accident Ahead: " << i << "; Speed: " << round(speed) << "; Distance: " << round(distanceAhead) << std::endl;
 
-											output << "Accident Behind: " << i << "; Speed: " << round(speed) << "; Distance: " << round(distanceBehind) << std::endl;
+												output.close();
+											}
+										}
 
-											output.close();
+										long distanceBehind = (long)(((running < driverRunning) ? (driverRunning * trackLength)
+											: ((driverRunning * trackLength) + trackLength)) - (running * trackLength));
+
+										if (distanceBehind < behindAccidentDistance) {
+											accidentsBehind.push_back(SlowCarInfo(i, distanceBehind));
+
+											if (traceFileName != "") {
+												std::ofstream output;
+
+												output.open(traceFileName, std::ios::out | std::ios::app);
+
+												output << "Accident Behind: " << i << "; Speed: " << round(speed) << "; Distance: " << round(distanceBehind) << std::endl;
+
+												output.close();
+											}
 										}
 									}
 								}
+								else
+									updateIdealLine(header, data, carIndex, running, speed);
 							}
-							else
-								updateIdealLine(header, data, carIndex, running, speed);
 						}
 					}
 				}

@@ -676,31 +676,34 @@ namespace ACSHMSpotter {
 							double running = Math.Max(0, Math.Min(1, car.splinePosition));
 							double speed = car.speedMS * 3.6;
 
-							IdealLine slot = idealLine[(int)Math.Round(running * 999)];
-
-							if ((slot.count > 100) && (speed < (slot.speed / 2)))
+							if (speed >= 10)
 							{
-								double carLapDistance = car.splinePosition * staticInfo.TrackSPlineLength;
-								long distanceAhead = (long)(((carLapDistance > driverLapDistance) ? carLapDistance
-																								  : (carLapDistance + staticInfo.TrackSPlineLength)) - driverLapDistance);
+								IdealLine slot = idealLine[(int)Math.Round(running * 999)];
 
-								if (distanceAhead < slowCarDistance)
-									slowCarsAhead.Add(new SlowCarInfo(i, distanceAhead));
-
-								if (speed < (slot.speed / 5))
+								if ((slot.count > 100) && (speed < (slot.speed / 2)))
 								{
-									if (distanceAhead < aheadAccidentDistance)
-										accidentsAhead.Add(new SlowCarInfo(i, distanceAhead));
+									double carLapDistance = car.splinePosition * staticInfo.TrackSPlineLength;
+									long distanceAhead = (long)(((carLapDistance > driverLapDistance) ? carLapDistance
+																									  : (carLapDistance + staticInfo.TrackSPlineLength)) - driverLapDistance);
 
-									long distanceBehind = (long)(((carLapDistance < driverLapDistance) ? driverLapDistance
-																									   : (driverLapDistance + staticInfo.TrackSPlineLength)) - carLapDistance);
+									if (distanceAhead < slowCarDistance)
+										slowCarsAhead.Add(new SlowCarInfo(i, distanceAhead));
 
-									if (distanceBehind < behindAccidentDistance)
-										accidentsBehind.Add(new SlowCarInfo(i, distanceBehind));
+									if (speed < (slot.speed / 5))
+									{
+										if (distanceAhead < aheadAccidentDistance)
+											accidentsAhead.Add(new SlowCarInfo(i, distanceAhead));
+
+										long distanceBehind = (long)(((carLapDistance < driverLapDistance) ? driverLapDistance
+																										   : (driverLapDistance + staticInfo.TrackSPlineLength)) - carLapDistance);
+
+										if (distanceBehind < behindAccidentDistance)
+											accidentsBehind.Add(new SlowCarInfo(i, distanceBehind));
+									}
 								}
+								else
+									updateIdealLine(ref car, running, speed);
 							}
-							else
-								updateIdealLine(ref car, running, speed);
 						}
                     }
 				}

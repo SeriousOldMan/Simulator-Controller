@@ -635,32 +635,36 @@ namespace RF2SHMSpotter {
 							continue;
 
 						double speed = vehicleSpeed(ref vehicle);
-						double running = Math.Max(0, Math.Min(1, Math.Abs(vehicle.mLapDist / scoring.mScoringInfo.mLapDist)));
 
-						IdealLine slot = idealLine[(int)Math.Round(running * 999)];
-
-						if ((slot.count > 100) && (speed < (slot.speed / 2)))
+						if (speed >= 10)
 						{
-							long distanceAhead = (long)(((vehicle.mLapDist > playerScoring.mLapDist) ? vehicle.mLapDist
-																								     : (vehicle.mLapDist + scoring.mScoringInfo.mLapDist)) - playerScoring.mLapDist);
+							double running = Math.Max(0, Math.Min(1, Math.Abs(vehicle.mLapDist / scoring.mScoringInfo.mLapDist)));
 
-							if (distanceAhead < slowCarDistance)
-								slowCarsAhead.Add(new SlowCarInfo(i, distanceAhead));
+							IdealLine slot = idealLine[(int)Math.Round(running * 999)];
 
-							if (speed < (slot.speed / 5))
+							if ((slot.count > 100) && (speed < (slot.speed / 2)))
 							{
-								if (distanceAhead < aheadAccidentDistance)
-									accidentsAhead.Add(new SlowCarInfo(i, distanceAhead));
+								long distanceAhead = (long)(((vehicle.mLapDist > playerScoring.mLapDist) ? vehicle.mLapDist
+																										 : (vehicle.mLapDist + scoring.mScoringInfo.mLapDist)) - playerScoring.mLapDist);
 
-								long distanceBehind = (long)(((vehicle.mLapDist < playerScoring.mLapDist) ? playerScoring.mLapDist
-																										  : (playerScoring.mLapDist + scoring.mScoringInfo.mLapDist)) - vehicle.mLapDist);
+								if (distanceAhead < slowCarDistance)
+									slowCarsAhead.Add(new SlowCarInfo(i, distanceAhead));
 
-								if (distanceBehind < behindAccidentDistance)
-									accidentsBehind.Add(new SlowCarInfo(i, distanceBehind));
+								if (speed < (slot.speed / 5))
+								{
+									if (distanceAhead < aheadAccidentDistance)
+										accidentsAhead.Add(new SlowCarInfo(i, distanceAhead));
+
+									long distanceBehind = (long)(((vehicle.mLapDist < playerScoring.mLapDist) ? playerScoring.mLapDist
+																											  : (playerScoring.mLapDist + scoring.mScoringInfo.mLapDist)) - vehicle.mLapDist);
+
+									if (distanceBehind < behindAccidentDistance)
+										accidentsBehind.Add(new SlowCarInfo(i, distanceBehind));
+								}
 							}
+							else
+								updateIdealLine(ref vehicle, running, speed);
 						}
-                        else
-                            updateIdealLine(ref vehicle, running, speed);
                     }
                 }
 			}

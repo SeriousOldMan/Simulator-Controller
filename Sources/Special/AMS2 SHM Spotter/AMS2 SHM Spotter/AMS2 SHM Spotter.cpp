@@ -489,9 +489,6 @@ bool checkAccident(const SharedMemory* sharedData)
 						long distanceAhead = (long)(((vehicle.mCurrentLapDistance > driver.mCurrentLapDistance) ? vehicle.mCurrentLapDistance
 							: (vehicle.mCurrentLapDistance + sharedData->mTrackLength)) - driver.mCurrentLapDistance);
 
-						if (distanceAhead < slowCarDistance)
-							slowCarsAhead.push_back(SlowCarInfo(i, distanceAhead));
-
 						if (speed < (slot.speed / 5))
 						{
 							if (distanceAhead < aheadAccidentDistance)
@@ -503,6 +500,8 @@ bool checkAccident(const SharedMemory* sharedData)
 							if (distanceBehind < behindAccidentDistance)
 								accidentsBehind.push_back(SlowCarInfo(i, distanceBehind));
 						}
+						else if (distanceAhead < slowCarDistance)
+							slowCarsAhead.push_back(SlowCarInfo(i, distanceAhead));
 					}
 					else
 						updateIdealLine(vehicle, running, speed);
@@ -528,9 +527,9 @@ bool checkAccident(const SharedMemory* sharedData)
 			for (int i = 0; i < accidentsAhead.size(); i++)
 				distance = ((distance < accidentsAhead[i].distance) ? distance : accidentsAhead[i].distance);
 
-			if (distance > 100) {
+			if (distance > 50) {
 				nextAccidentAhead = cycle + 400;
-				nextSlowCarAhead = cycle + 400;
+				nextSlowCarAhead = cycle + 200;
 
 				char message[40] = "accidentAlert:Ahead;";
 				char numBuffer[20];
@@ -555,7 +554,7 @@ bool checkAccident(const SharedMemory* sharedData)
 				distance = ((distance < slowCarsAhead[i].distance) ? distance : slowCarsAhead[i].distance);
 
 			if (distance > 100) {
-				nextSlowCarAhead = cycle + 400;
+				nextSlowCarAhead = cycle + 200;
 
 				char message[40] = "slowCarAlert:";
 				char numBuffer[20];
@@ -579,7 +578,7 @@ bool checkAccident(const SharedMemory* sharedData)
 			for (int i = 0; i < accidentsBehind.size(); i++)
 				distance = ((distance < accidentsBehind[i].distance) ? distance : accidentsBehind[i].distance);
 
-			if (distance > 100) {
+			if (distance > 50) {
 				nextAccidentBehind = cycle + 400;
 
 				char message[40] = "accidentAlert:Behind;";

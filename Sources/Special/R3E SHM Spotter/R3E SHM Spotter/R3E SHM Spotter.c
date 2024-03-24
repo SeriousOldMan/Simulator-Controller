@@ -530,13 +530,6 @@ BOOL checkAccident() {
 				{
 					long distanceAhead = (long)(((carDistance > driverDistance) ? carDistance : (carDistance + map_buffer->layout_length)) - driverDistance);
 
-					if ((distanceAhead < slowCarDistance) && (slowCarsAheadCount < 10)) {
-						slowCarsAhead[slowCarsAheadCount].vehicle = id;
-						slowCarsAhead[slowCarsAheadCount].distance = distanceAhead;
-
-						slowCarsAheadCount += 1;
-					}
-
 					if (speed < (slot->speed / 5))
 					{
 						if ((distanceAhead < aheadAccidentDistance) && (accidentsAheadCount < 10)) {
@@ -555,6 +548,12 @@ BOOL checkAccident() {
 							accidentsBehindCount += 1;
 						}
 					}
+					else if ((distanceAhead < slowCarDistance) && (slowCarsAheadCount < 10)) {
+						slowCarsAhead[slowCarsAheadCount].vehicle = id;
+						slowCarsAhead[slowCarsAheadCount].distance = distanceAhead;
+
+						slowCarsAheadCount += 1;
+					}
 				}
 				else
 					updateIdealLine(id, running, speed);
@@ -571,9 +570,9 @@ BOOL checkAccident() {
 			for (int i = 0; i < accidentsAheadCount; i++)
 				distance = ((distance < accidentsAhead[i].distance) ? distance : accidentsAhead[i].distance);
 
-			if (distance > 100) {
+			if (distance > 50) {
 				nextAccidentAhead = cycle + 400;
-				nextSlowCarAhead = cycle + 400;
+				nextSlowCarAhead = cycle + 200;
 
 				char message[40] = "accidentAlert:Ahead;";
 				char numBuffer[20];
@@ -598,7 +597,7 @@ BOOL checkAccident() {
 				distance = ((distance < slowCarsAhead[i].distance) ? distance : slowCarsAhead[i].distance);
 
 			if (distance > 100) {
-				nextSlowCarAhead = cycle + 400;
+				nextSlowCarAhead = cycle + 200;
 
 				char message[40] = "slowCarAlert:";
 				char numBuffer[20];
@@ -622,7 +621,7 @@ BOOL checkAccident() {
 			for (int i = 0; i < accidentsBehindCount; i++)
 				distance = ((distance < accidentsBehind[i].distance) ? distance : accidentsBehind[i].distance);
 
-			if (distance > 100) {
+			if (distance > 50) {
 				nextAccidentBehind = cycle + 400;
 
 				char message[40] = "accidentAlert:Behind;";

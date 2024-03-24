@@ -647,9 +647,6 @@ namespace RF2SHMSpotter {
 								long distanceAhead = (long)(((vehicle.mLapDist > playerScoring.mLapDist) ? vehicle.mLapDist
 																										 : (vehicle.mLapDist + scoring.mScoringInfo.mLapDist)) - playerScoring.mLapDist);
 
-								if (distanceAhead < slowCarDistance)
-									slowCarsAhead.Add(new SlowCarInfo(i, distanceAhead));
-
 								if (speed < (slot.speed / 5))
 								{
 									if (distanceAhead < aheadAccidentDistance)
@@ -661,6 +658,8 @@ namespace RF2SHMSpotter {
 									if (distanceBehind < behindAccidentDistance)
 										accidentsBehind.Add(new SlowCarInfo(i, distanceBehind));
 								}
+								else if (distanceAhead < slowCarDistance)
+									slowCarsAhead.Add(new SlowCarInfo(i, distanceAhead));
 							}
 							else
 								updateIdealLine(ref vehicle, running, speed);
@@ -681,10 +680,10 @@ namespace RF2SHMSpotter {
 					foreach (SlowCarInfo i in accidentsAhead)
 						distance = Math.Min(distance, i.distance);
 
-					if (distance > 100)
+					if (distance > 50)
                     {
                         nextAccidentAhead = cycle + 400;
-                        nextSlowCarAhead = cycle + 400;
+                        nextSlowCarAhead = cycle + 200;
 
                         SendSpotterMessage("accidentAlert:Ahead;" + distance);
 
@@ -704,7 +703,7 @@ namespace RF2SHMSpotter {
 
 					if (distance > 100)
                     {
-                        nextSlowCarAhead = cycle + 400;
+                        nextSlowCarAhead = cycle + 200;
 
                         SendSpotterMessage("slowCarAlert:" + distance);
 
@@ -722,7 +721,7 @@ namespace RF2SHMSpotter {
 					foreach (SlowCarInfo i in accidentsBehind)
 						distance = Math.Min(distance, i.distance);
 
-					if (distance > 100)
+					if (distance > 50)
                     {
                         nextAccidentBehind = cycle + 400;
 

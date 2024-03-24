@@ -630,20 +630,6 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 									long distanceAhead = (long)(((running > driverRunning) ? (running * trackLength)
 										: ((running * trackLength) + trackLength)) - (driverRunning * trackLength));
 
-									if (distanceAhead < slowCarDistance) {
-										slowCarsAhead.push_back(SlowCarInfo(i, distanceAhead));
-
-										if (traceFileName != "") {
-											std::ofstream output;
-
-											output.open(traceFileName, std::ios::out | std::ios::app);
-
-											output << "Slow: " << i << "; Speed: " << round(speed) << "; Distance: " << round(distanceAhead) << std::endl;
-
-											output.close();
-										}
-									}
-
 									if (speed < (slot.speed / 5))
 									{
 										if (distanceAhead < aheadAccidentDistance) {
@@ -675,6 +661,19 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 
 												output.close();
 											}
+										}
+									}
+									else if (distanceAhead < slowCarDistance) {
+										slowCarsAhead.push_back(SlowCarInfo(i, distanceAhead));
+
+										if (traceFileName != "") {
+											std::ofstream output;
+
+											output.open(traceFileName, std::ios::out | std::ios::app);
+
+											output << "Slow: " << i << "; Speed: " << round(speed) << "; Distance: " << round(distanceAhead) << std::endl;
+
+											output.close();
 										}
 									}
 								}
@@ -736,9 +735,9 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 			for (int i = 0; i < accidentsAhead.size(); i++)
 				distance = min(distance, accidentsAhead[i].distance);
 
-			if (distance > 100) {
+			if (distance > 50) {
 				nextAccidentAhead = cycle + 400;
-				nextSlowCarAhead = cycle + 400;
+				nextSlowCarAhead = cycle + 200;
 
 				char message[40] = "accidentAlert:Ahead;";
 				char numBuffer[20];
@@ -763,7 +762,7 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 				distance = min(distance, slowCarsAhead[i].distance);
 
 			if (distance > 100) {
-				nextSlowCarAhead = cycle + 400;
+				nextSlowCarAhead = cycle + 200;
 
 				char message[40] = "slowCarAlert:";
 				char numBuffer[20];
@@ -787,7 +786,7 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 			for (int i = 0; i < accidentsBehind.size(); i++)
 				distance = min(distance, accidentsBehind[i].distance);
 
-			if (distance > 100) {
+			if (distance > 50) {
 				nextAccidentBehind = cycle + 400;
 
 				char message[40] = "accidentAlert:Behind;";

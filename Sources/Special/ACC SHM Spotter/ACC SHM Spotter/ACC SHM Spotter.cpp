@@ -802,20 +802,6 @@ bool checkAccident() {
 
 								long distanceAhead = (long)(((distance > driverDistance) ? distance : (distance + trackLength)) - driverDistance);
 
-								if (distanceAhead < slowCarDistance) {
-									slowCarsAhead.push_back(SlowCarInfo(i, distanceAhead));
-
-									if (traceFileName != "") {
-										std::ofstream output;
-
-										output.open(traceFileName, std::ios::out | std::ios::app);
-
-										output << endl << "Slow: " << i << "; Speed: " << round(speed) << "; Distance: " << round(distanceAhead) << std::endl;
-
-										output.close();
-									}
-								}
-
 								if (speed < (slot.speed / 5))
 								{
 									if (distanceAhead < aheadAccidentDistance) {
@@ -846,6 +832,19 @@ bool checkAccident() {
 
 											output.close();
 										}
+									}
+								}
+								else if (distanceAhead < slowCarDistance) {
+									slowCarsAhead.push_back(SlowCarInfo(i, distanceAhead));
+
+									if (traceFileName != "") {
+										std::ofstream output;
+
+										output.open(traceFileName, std::ios::out | std::ios::app);
+
+										output << endl << "Slow: " << i << "; Speed: " << round(speed) << "; Distance: " << round(distanceAhead) << std::endl;
+
+										output.close();
 									}
 								}
 							}

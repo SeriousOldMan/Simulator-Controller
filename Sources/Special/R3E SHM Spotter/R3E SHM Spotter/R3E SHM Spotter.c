@@ -511,19 +511,17 @@ BOOL checkAccident() {
 	double driverDistance = map_buffer->all_drivers_data_1[playerIdx].lap_distance;
 
 	for (int id = 0; id < map_buffer->num_cars; id++) {
-		if (map_buffer->all_drivers_data_1[id].in_pitlane > 0)
-			continue;
-
-		double speed = map_buffer->all_drivers_data_1[id].car_speed * 3.6;
-		double carDistance = map_buffer->all_drivers_data_1[id].lap_distance;
-		double running = fabs(carDistance / map_buffer->layout_length);
-
-		running = ((1.0 < running) ? 1.0 : running);
-		running = ((0.0 > running) ? 0.0 : running);
-
-		updateIdealLine(id, running, speed);
-
 		if (id != playerIdx) {
+			if (map_buffer->all_drivers_data_1[id].in_pitlane > 0)
+				continue;
+
+			double speed = map_buffer->all_drivers_data_1[id].car_speed * 3.6;
+			double carDistance = map_buffer->all_drivers_data_1[id].lap_distance;
+			double running = fabs(carDistance / map_buffer->layout_length);
+
+			running = ((1.0 < running) ? 1.0 : running);
+			running = ((0.0 > running) ? 0.0 : running);
+
 			ideal_line* slot = &idealLine[(int)round(running * 999)];
 
 			if ((slot->count > 100) && (speed < (slot->speed / 2)))
@@ -556,6 +554,8 @@ BOOL checkAccident() {
 					}
 				}
 			}
+			else
+				updateIdealLine(id, running, speed);
 		}
 	}
 	
@@ -565,13 +565,13 @@ BOOL checkAccident() {
 		{
 			long distance = LONG_MAX;
 
-			nextAccidentAhead = cycle + 400;
-			nextSlowCarAhead = cycle + 400;
-
 			for (int i = 0; i < accidentsAheadCount; i++)
 				distance = ((distance < accidentsAhead[i].distance) ? distance : accidentsAhead[i].distance);
 
 			if (distance > 100) {
+				nextAccidentAhead = cycle + 400;
+				nextSlowCarAhead = cycle + 400;
+
 				char message[40] = "accidentAlert:Ahead;";
 				char numBuffer[20];
 
@@ -591,12 +591,12 @@ BOOL checkAccident() {
 		{
 			long distance = LONG_MAX;
 
-			nextSlowCarAhead = cycle + 400;
-
 			for (int i = 0; i < slowCarsAheadCount; i++)
 				distance = ((distance < slowCarsAhead[i].distance) ? distance : slowCarsAhead[i].distance);
 
 			if (distance > 100) {
+				nextSlowCarAhead = cycle + 400;
+
 				char message[40] = "slowCarAlert:";
 				char numBuffer[20];
 
@@ -616,12 +616,12 @@ BOOL checkAccident() {
 		{
 			long distance = LONG_MAX;
 
-			nextAccidentBehind = cycle + 400;
-
 			for (int i = 0; i < accidentsBehindCount; i++)
 				distance = ((distance < accidentsBehind[i].distance) ? distance : accidentsBehind[i].distance);
 
 			if (distance > 100) {
+				nextAccidentBehind = cycle + 400;
+
 				char message[40] = "accidentAlert:Behind;";
 				char numBuffer[20];
 

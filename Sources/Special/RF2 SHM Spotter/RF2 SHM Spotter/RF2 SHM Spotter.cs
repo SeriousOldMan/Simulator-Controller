@@ -628,17 +628,15 @@ namespace RF2SHMSpotter {
 				for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)
 				{
                     ref rF2VehicleScoring vehicle = ref scoring.mVehicles[i];
-                    
-					if (vehicle.mInPits != 0)
-						continue;
 
-					double speed = vehicleSpeed(ref vehicle);
-					double running = Math.Max(0, Math.Min(1, Math.Abs(vehicle.mLapDist / scoring.mScoringInfo.mLapDist)));
+                    if (vehicle.mIsPlayer != 1)
+                    {
+                        if (vehicle.mInPits != 0)
+							continue;
 
-					updateIdealLine(ref vehicle, running, speed);
+						double speed = vehicleSpeed(ref vehicle);
+						double running = Math.Max(0, Math.Min(1, Math.Abs(vehicle.mLapDist / scoring.mScoringInfo.mLapDist)));
 
-					if (vehicle.mIsPlayer != 1)
-					{
 						IdealLine slot = idealLine[(int)Math.Round(running * 999)];
 
 						if ((slot.count > 100) && (speed < (slot.speed / 2)))
@@ -661,8 +659,10 @@ namespace RF2SHMSpotter {
 									accidentsBehind.Add(new SlowCarInfo(i, distanceBehind));
 							}
 						}
-					}
-				}
+                        else
+                            updateIdealLine(ref vehicle, running, speed);
+                    }
+                }
 			}
 			catch (Exception e) {
 				SendSpotterMessage("internalError:" + e.Message);
@@ -674,15 +674,15 @@ namespace RF2SHMSpotter {
 				{
 					long distance = long.MaxValue;
 
-					nextAccidentAhead = cycle + 400;
-					nextSlowCarAhead = cycle + 400;
-
 					foreach (SlowCarInfo i in accidentsAhead)
 						distance = Math.Min(distance, i.distance);
 
 					if (distance > 100)
-					{
-						SendSpotterMessage("accidentAlert:Ahead;" + distance);
+                    {
+                        nextAccidentAhead = cycle + 400;
+                        nextSlowCarAhead = cycle + 400;
+
+                        SendSpotterMessage("accidentAlert:Ahead;" + distance);
 
 						return true;
 					}
@@ -695,14 +695,14 @@ namespace RF2SHMSpotter {
 				{
 					long distance = long.MaxValue;
 
-					nextSlowCarAhead = cycle + 400;
-
 					foreach (SlowCarInfo i in slowCarsAhead)
 						distance = Math.Min(distance, i.distance);
 
 					if (distance > 100)
-					{
-						SendSpotterMessage("slowCarAlert:" + distance);
+                    {
+                        nextSlowCarAhead = cycle + 400;
+
+                        SendSpotterMessage("slowCarAlert:" + distance);
 
 						return true;
 					}
@@ -715,14 +715,14 @@ namespace RF2SHMSpotter {
 				{
 					long distance = long.MaxValue;
 
-					nextAccidentBehind = cycle + 400;
-
 					foreach (SlowCarInfo i in accidentsBehind)
 						distance = Math.Min(distance, i.distance);
 
 					if (distance > 100)
-					{
-						SendSpotterMessage("accidentAlert:Behind;" + distance);
+                    {
+                        nextAccidentBehind = cycle + 400;
+
+                        SendSpotterMessage("accidentAlert:Behind;" + distance);
 
 						return true;
 					}

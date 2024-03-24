@@ -468,21 +468,18 @@ bool checkAccident(const SharedMemory* sharedData)
 		ParticipantInfo driver = sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex];
 
 		for (int i = 0; i < sharedData->mNumParticipants; i++)
-		{
-			if (sharedData->mPitModes[i] > PIT_MODE_NONE)
-				continue;
-
-			ParticipantInfo vehicle = sharedData->mParticipantInfo[i];
-			double speed = sharedData->mSpeeds[i] * 3.6;
-			double running = std::abs(vehicle.mCurrentLapDistance / sharedData->mTrackLength);
-			
-			running = ((1.0 < running) ? 1.0 : running);
-			running = ((0.0 > running) ? 0.0 : running);
-
-			updateIdealLine(vehicle, running, speed);
-
 			if (sharedData->mViewedParticipantIndex != i)
 			{
+				if (sharedData->mPitModes[i] > PIT_MODE_NONE)
+				continue;
+
+				ParticipantInfo vehicle = sharedData->mParticipantInfo[i];
+				double speed = sharedData->mSpeeds[i] * 3.6;
+				double running = std::abs(vehicle.mCurrentLapDistance / sharedData->mTrackLength);
+			
+				running = ((1.0 < running) ? 1.0 : running);
+				running = ((0.0 > running) ? 0.0 : running);
+
 				IdealLine slot = idealLine[(int)std::round(running * 999)];
 
 				if ((slot.count > 100) && (speed < (slot.speed / 2)))
@@ -505,8 +502,10 @@ bool checkAccident(const SharedMemory* sharedData)
 							accidentsBehind.push_back(SlowCarInfo(i, distanceBehind));
 					}
 				}
+				else
+					updateIdealLine(vehicle, running, speed);
+
 			}
-		}
 	}
 	catch (const std::exception& ex) {
 		sendSpotterMessage(("internalError:" + std::string(ex.what())).c_str());
@@ -524,13 +523,13 @@ bool checkAccident(const SharedMemory* sharedData)
 		{
 			long distance = LONG_MAX;
 
-			nextAccidentAhead = cycle + 400;
-			nextSlowCarAhead = cycle + 400;
-
 			for (int i = 0; i < accidentsAhead.size(); i++)
 				distance = ((distance < accidentsAhead[i].distance) ? distance : accidentsAhead[i].distance);
 
 			if (distance > 100) {
+				nextAccidentAhead = cycle + 400;
+				nextSlowCarAhead = cycle + 400;
+
 				char message[40] = "accidentAlert:Ahead;";
 				char numBuffer[20];
 
@@ -550,12 +549,12 @@ bool checkAccident(const SharedMemory* sharedData)
 		{
 			long distance = LONG_MAX;
 
-			nextSlowCarAhead = cycle + 400;
-
 			for (int i = 0; i < slowCarsAhead.size(); i++)
 				distance = ((distance < slowCarsAhead[i].distance) ? distance : slowCarsAhead[i].distance);
 
 			if (distance > 100) {
+				nextSlowCarAhead = cycle + 400;
+
 				char message[40] = "slowCarAlert:";
 				char numBuffer[20];
 
@@ -575,12 +574,12 @@ bool checkAccident(const SharedMemory* sharedData)
 		{
 			long distance = LONG_MAX;
 
-			nextAccidentBehind = cycle + 400;
-
 			for (int i = 0; i < accidentsBehind.size(); i++)
 				distance = ((distance < accidentsBehind[i].distance) ? distance : accidentsBehind[i].distance);
 
 			if (distance > 100) {
+				nextAccidentBehind = cycle + 400;
+
 				char message[40] = "accidentAlert:Behind;";
 				char numBuffer[20];
 

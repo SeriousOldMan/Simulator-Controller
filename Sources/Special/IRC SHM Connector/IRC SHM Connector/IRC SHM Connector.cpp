@@ -463,8 +463,14 @@ void changePitstopRefuelAmount(const irsdk_header* header, const char* data, flo
 }
 
 void changePitstopTyreCompound(const irsdk_header* header, const char* data, int offset) {
-	if (offset != 0)
-		irsdk_broadcastMsg(irsdk_BroadcastPitCommand, irsdk_PitCommand_TC, (int)(getDataFloat(header, data, "PitSvTireCompound") + offset));
+	if (offset != 0) {
+		int tc = getDataInt(header, data, "PitSvTireCompound");
+
+		irsdk_broadcastMsg(irsdk_BroadcastPitCommand, irsdk_PitCommand_TC, tc + offset);
+
+		if (getDataInt(header, data, "PitSvTireCompound") != tc + offset)
+			irsdk_broadcastMsg(irsdk_BroadcastPitCommand, irsdk_PitCommand_TC, tc + 1 + offset);
+	}
 }
 
 void changePitstopTyrePressure(const irsdk_header* header, int command, const char* serviceFlag, float pressureDelta) {

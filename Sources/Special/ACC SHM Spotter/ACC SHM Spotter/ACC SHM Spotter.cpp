@@ -907,13 +907,13 @@ bool checkAccident() {
 		{
 			long distance = LONG_MAX;
 
-			nextAccidentAhead = cycle + 400;
-			nextSlowCarAhead = cycle + 200;
-
 			for (int i = 0; i < accidentsAhead.size(); i++)
 				distance = ((distance < accidentsAhead[i].distance) ? distance : accidentsAhead[i].distance);
 
 			if (distance > 50) {
+				nextAccidentAhead = cycle + 400;
+				nextSlowCarAhead = cycle + 200;
+
 				char message[40] = "accidentAlert:Ahead;";
 				char numBuffer[20];
 
@@ -933,12 +933,12 @@ bool checkAccident() {
 		{
 			long distance = LONG_MAX;
 
-			nextSlowCarAhead = cycle + 200;
-
 			for (int i = 0; i < slowCarsAhead.size(); i++)
 				distance = ((distance < slowCarsAhead[i].distance) ? distance : slowCarsAhead[i].distance);
 
 			if (distance > 100) {
+				nextSlowCarAhead = cycle + 200;
+
 				char message[40] = "slowCarAlert:";
 				char numBuffer[20];
 
@@ -958,12 +958,12 @@ bool checkAccident() {
 		{
 			long distance = LONG_MAX;
 
-			nextAccidentBehind = cycle + 400;
-
 			for (int i = 0; i < accidentsBehind.size(); i++)
 				distance = ((distance < accidentsBehind[i].distance) ? distance : accidentsBehind[i].distance);
 
 			if (distance > 50) {
+				nextAccidentBehind = cycle + 400;
+
 				char message[40] = "accidentAlert:Behind;";
 				char numBuffer[20];
 

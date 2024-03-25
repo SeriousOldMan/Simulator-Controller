@@ -19,7 +19,8 @@
 	  - The Race Engineer is fully aware of the configured tyre compounds for a given car.
   15. "Practice Center" now informs about unsaved data before starting a new session.
   16. Accident and slow car detection by the Spotter is now also available for *Assetto Corsa Competizione*.
-  17. [Internal] Migrated to AHK version 2.0.12.
+  17. Updated car meta data for *RaceRoom Racing Experience* to the latest version.
+  18. [Internal] Migrated to AHK version 2.0.12.
   
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-564), if you are running *iRacing* and want to use the new "TyreCompound" action.
 

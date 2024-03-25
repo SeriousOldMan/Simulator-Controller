@@ -823,7 +823,7 @@ class RaceSpotter extends GridRaceAssistant {
 				local oldSpeaking := this.iIsSpeaking
 
 				if (this.VoiceManager.RaceAssistant.Session >= kSessionPractice) {
-					this.this.iIsSpeaking := true
+					this.iIsSpeaking := true
 
 					try {
 						super.speak(arguments*)
@@ -2804,19 +2804,9 @@ class RaceSpotter extends GridRaceAssistant {
 	}
 
 	proximityAlert(alert) {
-		local type
-
-		if (this.Speaker[false] && this.Running) {
-			if (InStr(alert, "Behind") == 1)
-				type := "Behind"
-			else
-				type := alert
-
-			if (((type != "Behind") && this.Announcements["SideProximity"]) || ((type = "Behind") && this.Announcements["RearProximity"]))
-				this.pushAlert(alert, false, false, alert)
-		}
-
-		return false
+		if (this.Speaker[false] && this.Running
+		 && ((!InStr(alert, "Behind") && this.Announcements["SideProximity"]) || (InStr(alert, "Behind") && this.Announcements["RearProximity"])))
+			this.pushAlert(alert, false, false, alert)
 	}
 
 	slowCarAlert(arguments*) {

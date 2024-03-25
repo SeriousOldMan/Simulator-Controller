@@ -655,14 +655,17 @@ namespace ACSHMSpotter {
         {
 			if (cars.numVehicles > 0)
 			{
-				List<SlowCarInfo> accidentsAhead = new List<SlowCarInfo>();
+                ref AcCarInfo driver = ref cars.cars[0];
+
+                if (driver.isCarInPitline + driver.isCarInPit > 0)
+                    return false;
+
+                List<SlowCarInfo> accidentsAhead = new List<SlowCarInfo>();
 				List<SlowCarInfo> accidentsBehind = new List<SlowCarInfo>();
 				List<SlowCarInfo> slowCarsAhead = new List<SlowCarInfo>();
-
-				ref AcCarInfo driver = ref cars.cars[0];
 				double driverLapDistance = driver.splinePosition * staticInfo.TrackSPlineLength;
 
-				try
+                try
 				{
 					for (int i = 1; i < cars.numVehicles; ++i)
 					{
@@ -673,12 +676,12 @@ namespace ACSHMSpotter {
 							if (car.isCarInPitline + car.isCarInPit > 0)
 								continue;
 
-							double running = Math.Max(0, Math.Min(1, car.splinePosition));
 							double speed = car.speedMS * 3.6;
 
-							if (speed >= 10)
+							if (speed >= 1)
 							{
-								IdealLine slot = idealLine[(int)Math.Round(running * 999)];
+                                double running = Math.Max(0, Math.Min(1, car.splinePosition));
+                                IdealLine slot = idealLine[(int)Math.Round(running * 999)];
 
 								if ((slot.count > 100) && (speed < (slot.speed / 2)))
 								{

@@ -508,6 +508,9 @@ BOOL checkAccident() {
 	int slowCarsAheadCount = 0;
 	int playerIdx = getPlayerIndex();
 
+	if (map_buffer->all_drivers_data_1[playerIdx].in_pitlane > 0)
+		return FALSE;
+
 	double driverDistance = map_buffer->all_drivers_data_1[playerIdx].lap_distance;
 
 	for (int id = 0; id < map_buffer->num_cars; id++) {
@@ -517,13 +520,9 @@ BOOL checkAccident() {
 
 			double speed = map_buffer->all_drivers_data_1[id].car_speed * 3.6;
 
-			if (speed >= 10) {
+			if (speed >= 1) {
 				double carDistance = map_buffer->all_drivers_data_1[id].lap_distance;
-				double running = fabs(carDistance / map_buffer->layout_length);
-
-				running = ((1.0 < running) ? 1.0 : running);
-				running = ((0.0 > running) ? 0.0 : running);
-
+				double running = max(0, min(1, fabs(carDistance / map_buffer->layout_length)));
 				ideal_line* slot = &idealLine[(int)round(running * 999)];
 
 				if ((slot->count > 100) && (speed < (slot->speed / 2)))

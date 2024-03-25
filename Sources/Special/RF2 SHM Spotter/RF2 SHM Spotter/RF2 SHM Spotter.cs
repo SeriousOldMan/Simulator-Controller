@@ -619,6 +619,9 @@ namespace RF2SHMSpotter {
 
         bool checkAccident(ref rF2VehicleScoring playerScoring)
         {
+            if (playerScoring.mInPits != 0)
+                return false;
+
             List<SlowCarInfo> accidentsAhead = new List<SlowCarInfo>();
             List<SlowCarInfo> accidentsBehind = new List<SlowCarInfo>();
             List<SlowCarInfo> slowCarsAhead = new List<SlowCarInfo>();
@@ -636,7 +639,7 @@ namespace RF2SHMSpotter {
 
 						double speed = vehicleSpeed(ref vehicle);
 
-						if (speed >= 10)
+						if (speed >= 1)
 						{
 							double running = Math.Max(0, Math.Min(1, Math.Abs(vehicle.mLapDist / scoring.mScoringInfo.mLapDist)));
 

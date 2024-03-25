@@ -459,29 +459,28 @@ std::vector<SlowCarInfo> slowCarsAhead;
 
 bool checkAccident(const SharedMemory* sharedData)
 {
+	if (sharedData->mPitModes[sharedData->mViewedParticipantIndex] > PIT_MODE_NONE)
+		return false;
+
 	accidentsAhead.resize(0);
 	accidentsBehind.resize(0);
 	slowCarsAhead.resize(0);
 
+	ParticipantInfo driver = sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex];
+
 	try
 	{
-		ParticipantInfo driver = sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex];
-
 		for (int i = 0; i < sharedData->mNumParticipants; i++)
 			if (sharedData->mViewedParticipantIndex != i)
 			{
 				if (sharedData->mPitModes[i] > PIT_MODE_NONE)
-				continue;
+					continue;
 
 				ParticipantInfo vehicle = sharedData->mParticipantInfo[i];
 				double speed = sharedData->mSpeeds[i] * 3.6;
 
-				if (speed >= 10) {
-					double running = std::abs(vehicle.mCurrentLapDistance / sharedData->mTrackLength);
-
-					running = ((1.0 < running) ? 1.0 : running);
-					running = ((0.0 > running) ? 0.0 : running);
-
+				if (speed >= 1) {
+					double running = max(0, min(1, std::abs(vehicle.mCurrentLapDistance / sharedData->mTrackLength)));
 					IdealLine slot = idealLine[(int)std::round(running * 999)];
 
 					if ((slot.count > 100) && (speed < (slot.speed / 2)))

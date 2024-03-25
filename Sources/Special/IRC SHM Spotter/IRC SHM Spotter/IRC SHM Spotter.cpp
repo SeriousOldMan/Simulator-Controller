@@ -559,7 +559,7 @@ std::vector<SlowCarInfo> accidentsBehind;
 std::vector<SlowCarInfo> slowCarsAhead;
 
 long lastTickCount = 0;
-double lastRunnings[256];
+double lastRunnings[512];
 
 std::string traceFileName = "";
 
@@ -581,10 +581,8 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 
 	long milliSeconds = GetTickCount() - lastTickCount;
 
-	if (milliSeconds < 100)
+	if (milliSeconds < 200)
 		return false;
-
-	lastTickCount += milliSeconds;
 
 	if (getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct")) {
 		float driverRunning = ((float*)trackPositions)[playerCarIndex];
@@ -597,8 +595,10 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 		if (!getRawDataValue(pitLaneStates, header, data, "CarIdxOnPitRoad"))
 			pitLaneStates = 0;
 
-		if (((bool*)pitLaneStates)[playerCarIndex])
+		if (pitLaneStates && ((bool*)pitLaneStates)[playerCarIndex])
 			return false;
+
+		lastTickCount += milliSeconds;
 
 		try
 		{
@@ -612,10 +612,10 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 					
 					lastRunnings[carIndex] = running;
 					
-					if (!first && (milliSeconds < 200) && (carIndex != playerCarIndex)) {
+					if (!first && (carIndex != playerCarIndex) && (lastRunning != 0)) {
 						float speed;
 
-						if (((bool*)pitLaneStates)[carIndex])
+						if (pitLaneStates && ((bool*)pitLaneStates)[carIndex])
 							continue;
 
 						if (running >= lastRunning)
@@ -1762,6 +1762,9 @@ int main(int argc, char* argv[])
 				positionTrigger = false;
 		}
 		else {
+			for (int i = 0; i < 512; ++i)
+				lastRunnings[i] = 0;
+
 			if (argc > 1)
 				char* trackLength = argv[1];
 			

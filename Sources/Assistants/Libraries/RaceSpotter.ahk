@@ -789,6 +789,7 @@ class RaceSpotter extends GridRaceAssistant {
 	iFocusedCar := false
 
 	iPendingAlerts := []
+	iAlertProcessing := false
 
 	iLastPenalty := false
 
@@ -819,14 +820,16 @@ class RaceSpotter extends GridRaceAssistant {
 			}
 
 			speak(arguments*) {
+				local oldSpeaking := this.iIsSpeaking
+
 				if (this.VoiceManager.RaceAssistant.Session >= kSessionPractice) {
-					this.Speaking := true
+					this.this.iIsSpeaking := true
 
 					try {
 						super.speak(arguments*)
 					}
 					finally {
-						this.Speaking := false
+						this.iIsSpeaking := oldSpeaking
 					}
 				}
 			}
@@ -2750,63 +2753,61 @@ class RaceSpotter extends GridRaceAssistant {
 		return false
 	}
 
-	proximityAlert(alert) {
-		local speaker, type, oldPriority, oldAlerting
+	pushAlert(alert, arguments*) {
+		if !this.superfluousAlert(alert) {
+			this.iPendingAlerts.Push(Array(alert, arguments*))
 
-		static alerting := false
+			Task.startTask(ObjBindMethod(this, "processAlerts", false)
+						 , (this.iAlertProcessing && this.getSpeaker(true).Speaking) ? 500 : 0, kHighPriority)
+		}
+	}
+
+	processAlerts() {
+		local speaker := this.getSpeaker(true)
+		local type, oldPriority, oldAlertProcessing
+
+		if (this.iAlertProcessing || speaker.Speaking)
+			if (this.iPendingAlerts.Length > 0) {
+				Task.CurrentTask.Sleep := 200
+
+				return Task.CurrentTask
+			}
+			else
+				return false
+
+		oldPriority := Task.block(kHighPriority)
+		oldAlertProcessing := this.iAlertProcessing
+
+		this.iAlertProcessing := true
+
+		speaker.Speaking := true
+
+		try {
+			while (this.iPendingAlerts.Length > 0)
+				speaker.speakPhrase(this.iPendingAlerts.RemoveAt(1)*)
+		}
+		finally {
+			speaker.Speaking := false
+
+			this.iAlertProcessing := oldAlertProcessing
+
+			Task.unblock(oldPriority)
+		}
+
+		return false
+	}
+
+	proximityAlert(alert) {
+		local type
 
 		if (this.Speaker[false] && this.Running) {
-			speaker := this.getSpeaker(true)
+			if (InStr(alert, "Behind") == 1)
+				type := "Behind"
+			else
+				type := alert
 
-			if alert {
-				if this.superfluousAlert(alert)
-					return
-				else
-					this.iPendingAlerts.Push(alert)
-
-				if (alerting || speaker.Speaking) {
-					if (this.iPendingAlerts.Length == 1)
-						Task.startTask(ObjBindMethod(this, "proximityAlert", false), 500, kHighPriority)
-
-					return
-				}
-			}
-			else if (alerting || speaker.Speaking)
-				if (this.iPendingAlerts.Length > 0) {
-					Task.CurrentTask.Sleep := 200
-
-					return Task.CurrentTask
-				}
-				else
-					return false
-
-			oldPriority := Task.block(kHighPriority)
-			oldAlerting := alerting
-
-			alerting := true
-
-			speaker.Speaking := true
-
-			try {
-				while (this.iPendingAlerts.Length > 0) {
-					alert := this.iPendingAlerts.RemoveAt(1)
-
-					if (InStr(alert, "Behind") == 1)
-						type := "Behind"
-					else
-						type := alert
-
-					if (((type != "Behind") && this.Announcements["SideProximity"]) || ((type = "Behind") && this.Announcements["RearProximity"]))
-						speaker.speakPhrase(alert, false, false, alert)
-				}
-			}
-			finally {
-				speaker.Speaking := false
-
-				alerting := oldAlerting
-
-				Task.unblock(oldPriority)
-			}
+			if (((type != "Behind") && this.Announcements["SideProximity"]) || ((type = "Behind") && this.Announcements["RearProximity"]))
+				this.pushAlert(alert, false, false, alert)
 		}
 
 		return false
@@ -2816,36 +2817,33 @@ class RaceSpotter extends GridRaceAssistant {
 		local distance, side, speaker
 
 		if (this.Announcements["SlowCars"] && this.Speaker[false] && this.Running && this.hasEnoughData(false)) {
-			speaker := this.getSpeaker(true)
+			if (arguments.Length = 0)
+				this.pushAlert("SlowCarAhead", false, false, "SlowCarAhead")
+			else {
+				distance := (Round(arguments[1] / 50) * 50)
 
-			if !speaker.Speaking
-				if (arguments.Length = 0)
-					this.getSpeaker(true).speakPhrase("SlowCarAhead", false, false, "SlowCarAhead")
-				else {
-					distance := (Round(arguments[1] / 50) * 50)
+				if (distance > 0) {
+					speaker := this.getSpeaker(true)
 
-					if (distance > 0) {
-						speaker := this.getSpeaker(true)
+					if (arguments.Length > 1) {
+						side := arguments[2]
 
-						if (arguments.Length > 1) {
-							side := arguments[2]
-
-							switch side, false {
-								case "Left":
-									side := string2Values(",", speaker.Fragments["Sides"])[1]
-								case "Right":
-									side := string2Values(",", speaker.Fragments["Sides"])[2]
-								default:
-									side := false
-							}
+						switch side, false {
+							case "Left":
+								side := string2Values(",", speaker.Fragments["Sides"])[1]
+							case "Right":
+								side := string2Values(",", speaker.Fragments["Sides"])[2]
+							default:
+								side := false
 						}
-						else
-							side := false
-
-						speaker.speakPhrase(side ? "SlowCarAheadSide" : "SlowCarAheadDistance", {distance: Round(convertUnit("Length", distance))
-																							   , unit: speaker.Fragments[getUnit("Length")], side: side})
 					}
+					else
+						side := false
+
+					this.pushAlert(side ? "SlowCarAheadSide" : "SlowCarAheadDistance", {distance: Round(convertUnit("Length", distance))
+																					  , unit: speaker.Fragments[getUnit("Length")], side: side})
 				}
+			}
 		}
 	}
 
@@ -2857,16 +2855,15 @@ class RaceSpotter extends GridRaceAssistant {
 			if (this.Announcements["Accidents" . type] && this.Speaker[false] && this.Running && this.hasEnoughData(false)) {
 				speaker := this.getSpeaker(true)
 
-				if !speaker.Speaking
-					if ((arguments.Length > 0) && (type = "Ahead")) {
-						distance := (Round(arguments[1] / 50) * 50)
+				if ((arguments.Length > 0) && (type = "Ahead")) {
+					distance := (Round(arguments[1] / 50) * 50)
 
-						if (distance > 0)
-							speaker.speakPhrase("Accident" . type . "Distance", {distance: Round(convertUnit("Length", distance))
-																			   , unit: speaker.Fragments[getUnit("Length")]})
-					}
-					else
-						speaker.speakPhrase("Accident" . type, false, false, "Accident" . type)
+					if (distance > 0)
+						this.pushAlert("Accident" . type . "Distance", {distance: Round(convertUnit("Length", distance))
+																	  , unit: speaker.Fragments[getUnit("Length")]})
+				}
+				else
+					this.pushAlert("Accident" . type, false, false, "Accident" . type)
 			}
 	}
 
@@ -2874,28 +2871,27 @@ class RaceSpotter extends GridRaceAssistant {
 		local speaker
 
 		if (this.Speaker[false] && (this.Session = kSessionRace) && this.Running && (!this.KnowledgeBase || this.KnowledgeBase.getValue("Lap", 0) <= 1))
-			this.getSpeaker(true).speakPhrase("Green", false, false, "Green")
+			this.pushAlert("Green", false, false, "Green")
 	}
 
 	yellowFlag(alert, arguments*) {
-		local speaker, sectors
+		local sectors
 
 		if (this.Announcements["YellowFlags"] && this.Speaker[false] && this.Running) {
-			speaker := this.getSpeaker(true)
-			sectors := string2Values(",", speaker.Fragments["Sectors"])
+			sectors := string2Values(",", this.getSpeaker(true).Fragments["Sectors"])
 
 			switch alert, false {
 				case "All":
-					speaker.speakPhrase("YellowAll", false, false, "YellowAll")
+					this.pushAlert("YellowAll", false, false, "YellowAll")
 				case "Sector":
 					if (arguments.Length > 1)
-						speaker.speakPhrase("YellowDistance", {sector: sectors[arguments[1]], distance: arguments[2]})
+						this.pushAlert("YellowDistance", {sector: sectors[arguments[1]], distance: arguments[2]})
 					else
-						speaker.speakPhrase("YellowSector", {sector: sectors[arguments[1]]})
+						this.pushAlert("YellowSector", {sector: sectors[arguments[1]]})
 				case "Clear":
-					speaker.speakPhrase("YellowClear", false, false, "YellowClear")
+					this.pushAlert("YellowClear", false, false, "YellowClear")
 				case "Ahead":
-					speaker.speakPhrase("YellowAhead", false, false, "YellowAhead")
+					this.pushAlert("YellowAhead", false, false, "YellowAhead")
 			}
 		}
 	}
@@ -2910,20 +2906,20 @@ class RaceSpotter extends GridRaceAssistant {
 				delta := Abs(positions[positions["StandingsBehind"]][10])
 
 				if (delta && (delta < 2000))
-					this.getSpeaker(true).speakPhrase("BlueForPosition", false, false, "BlueForPosition")
+					this.pushAlert("BlueForPosition", false, false, "BlueForPosition")
 				else
-					this.getSpeaker(true).speakPhrase("Blue", false, false, "Blue")
+					this.pushAlert("Blue", false, false, "Blue")
 			}
 			else
-				this.getSpeaker(true).speakPhrase("Blue", false, false, "Blue")
+				this.pushAlert("Blue", false, false, "Blue")
 	}
 
 	pitWindow(state) {
 		if (this.Announcements["PitWindow"] && this.Speaker[false] && (this.Session = kSessionRace) && this.Running)
 			if (state = "Open")
-				this.getSpeaker(true).speakPhrase("PitWindowOpen", false, false, "PitWindowOpen")
+				this.pushAlert("PitWindowOpen", false, false, "PitWindowOpen")
 			else if (state = "Closed")
-				this.getSpeaker(true).speakPhrase("PitWindowClosed", false, false, "PitWindowClosed")
+				this.pushAlert("PitWindowClosed", false, false, "PitWindowClosed")
 	}
 
 	speedUpdate(lastSpeed) {

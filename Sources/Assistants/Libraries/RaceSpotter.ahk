@@ -2757,20 +2757,26 @@ class RaceSpotter extends GridRaceAssistant {
 		if !this.superfluousAlert(alert) {
 			this.iPendingAlerts.Push(Array(alert, arguments*))
 
-			Task.startTask(ObjBindMethod(this, "processAlerts", false)
-						 , (this.iAlertProcessing && this.getSpeaker(true).Speaking) ? 500 : 0, kHighPriority)
+			this.processAlerts(false)
 		}
 	}
 
-	processAlerts() {
+	processAlerts(async := true) {
 		local speaker := this.getSpeaker(true)
 		local type, oldPriority, oldAlertProcessing
 
 		if (this.iAlertProcessing || speaker.Speaking)
 			if (this.iPendingAlerts.Length > 0) {
-				Task.CurrentTask.Sleep := 200
+				if async {
+					Task.CurrentTask.Sleep := 200
 
-				return Task.CurrentTask
+					return Task.CurrentTask
+				}
+				else {
+					Task.startTask(ObjBindMethod(this, "processAlerts"), 500, kHighPriority)
+
+					return false
+				}
 			}
 			else
 				return false

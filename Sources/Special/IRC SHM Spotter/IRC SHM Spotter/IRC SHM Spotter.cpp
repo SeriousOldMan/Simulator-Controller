@@ -559,7 +559,7 @@ std::vector<SlowCarInfo> accidentsBehind;
 std::vector<SlowCarInfo> slowCarsAhead;
 
 long lastTickCount = 0;
-double lastRunnings[256];
+double lastRunnings[512];
 
 std::string traceFileName = "";
 
@@ -581,22 +581,24 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 
 	long milliSeconds = GetTickCount() - lastTickCount;
 
-	if (milliSeconds < 100)
+	if (milliSeconds < 200)
 		return false;
-
-	lastTickCount += milliSeconds;
 
 	if (getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct")) {
 		float driverRunning = ((float*)trackPositions)[playerCarIndex];
 		int numStarters = 0;
+		char* pitLaneStates;
 
 		if (getYamlValue(result, sessionInfo, "WeekendInfo:WeekendOptions:NumStarters:"))
 			numStarters = atoi(result);
-		
-		char* pitLaneStates;
 
 		if (!getRawDataValue(pitLaneStates, header, data, "CarIdxOnPitRoad"))
 			pitLaneStates = 0;
+
+		if (pitLaneStates && ((bool*)pitLaneStates)[playerCarIndex])
+			return false;
+
+		lastTickCount += milliSeconds;
 
 		try
 		{
@@ -607,79 +609,77 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 					int carIndex = atoi(carIdx);
 					float lastRunning = lastRunnings[carIndex];
 					float running = min(1, max(0, ((float*)trackPositions)[carIndex]));
-					float speed;
 					
 					lastRunnings[carIndex] = running;
 					
-					if (!first && (milliSeconds < 200)) {
-						if (carIndex != playerCarIndex)
-						{
-							if (((bool*)pitLaneStates)[carIndex])
-								continue;
+					if (!first && (carIndex != playerCarIndex) && (lastRunning != 0)) {
+						float speed;
 
-							if (running >= lastRunning)
-								speed = (((running - lastRunning) * trackLength) / ((float)milliSeconds / 1000.0f)) * 3.6f;
-							else
-								continue;
+						if (pitLaneStates && ((bool*)pitLaneStates)[carIndex])
+							continue;
 
-							if (speed >= 10) {
-								IdealLine slot = idealLine[(int)std::round(running * 999)];
+						if (running >= lastRunning)
+							speed = (((running - lastRunning) * trackLength) / ((float)milliSeconds / 1000.0f)) * 3.6f;
+						else
+							continue;
 
-								if ((slot.count > 100) && (speed < (slot.speed / 2)))
+						if (speed >= 1) {
+							IdealLine slot = idealLine[(int)std::round(running * 999)];
+
+							if ((slot.count > 100) && (speed < (slot.speed / 2)))
+							{
+								long distanceAhead = (long)(((running > driverRunning) ? (running * trackLength)
+									: ((running * trackLength) + trackLength)) - (driverRunning * trackLength));
+
+								if (speed < (slot.speed / 5))
 								{
-									long distanceAhead = (long)(((running > driverRunning) ? (running * trackLength)
-										: ((running * trackLength) + trackLength)) - (driverRunning * trackLength));
-
-									if (speed < (slot.speed / 5))
-									{
-										if (distanceAhead < aheadAccidentDistance) {
-											accidentsAhead.push_back(SlowCarInfo(i, distanceAhead));
-
-											if (traceFileName != "") {
-												std::ofstream output;
-
-												output.open(traceFileName, std::ios::out | std::ios::app);
-
-												output << "Accident Ahead: " << i << "; Speed: " << round(speed) << "; Distance: " << round(distanceAhead) << std::endl;
-
-												output.close();
-											}
-										}
-
-										long distanceBehind = (long)(((running < driverRunning) ? (driverRunning * trackLength)
-											: ((driverRunning * trackLength) + trackLength)) - (running * trackLength));
-
-										if (distanceBehind < behindAccidentDistance) {
-											accidentsBehind.push_back(SlowCarInfo(i, distanceBehind));
-
-											if (traceFileName != "") {
-												std::ofstream output;
-
-												output.open(traceFileName, std::ios::out | std::ios::app);
-
-												output << "Accident Behind: " << i << "; Speed: " << round(speed) << "; Distance: " << round(distanceBehind) << std::endl;
-
-												output.close();
-											}
-										}
-									}
-									else if (distanceAhead < slowCarDistance) {
-										slowCarsAhead.push_back(SlowCarInfo(i, distanceAhead));
+									if (distanceAhead < aheadAccidentDistance) {
+										accidentsAhead.push_back(SlowCarInfo(i, distanceAhead));
 
 										if (traceFileName != "") {
 											std::ofstream output;
 
 											output.open(traceFileName, std::ios::out | std::ios::app);
 
-											output << "Slow: " << i << "; Speed: " << round(speed) << "; Distance: " << round(distanceAhead) << std::endl;
+											output << "Accident Ahead: " << i << "; Speed: " << round(speed) << "; Distance: " << round(distanceAhead) << std::endl;
+
+											output.close();
+										}
+									}
+
+									long distanceBehind = (long)(((running < driverRunning) ? (driverRunning * trackLength)
+										: ((driverRunning * trackLength) + trackLength)) - (running * trackLength));
+
+									if (distanceBehind < behindAccidentDistance) {
+										accidentsBehind.push_back(SlowCarInfo(i, distanceBehind));
+
+										if (traceFileName != "") {
+											std::ofstream output;
+
+											output.open(traceFileName, std::ios::out | std::ios::app);
+
+											output << "Accident Behind: " << i << "; Speed: " << round(speed) << "; Distance: " << round(distanceBehind) << std::endl;
 
 											output.close();
 										}
 									}
 								}
-								else
-									updateIdealLine(header, data, carIndex, running, speed);
+								else if (distanceAhead < slowCarDistance) {
+									slowCarsAhead.push_back(SlowCarInfo(i, distanceAhead));
+
+									if (traceFileName != "") {
+										std::ofstream output;
+
+										output.open(traceFileName, std::ios::out | std::ios::app);
+
+										output << "Slow: " << i << "; Speed: " << round(speed) << "; Distance: " << round(distanceAhead) << std::endl;
+
+										output.close();
+									}
+								}
 							}
+							else
+								updateIdealLine(header, data, carIndex, running, speed);
 						}
 					}
 				}
@@ -1762,6 +1762,9 @@ int main(int argc, char* argv[])
 				positionTrigger = false;
 		}
 		else {
+			for (int i = 0; i < 512; ++i)
+				lastRunnings[i] = 0;
+
 			if (argc > 1)
 				char* trackLength = argv[1];
 			

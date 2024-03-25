@@ -691,9 +691,9 @@ class PracticeCenter extends ConfigurationItem {
 		}
 	}
 
-	AvailableTyreCompounds {
+	AvailableTyreCompounds[key?] {
 		Get {
-			return this.iAvailableTyreCompounds
+			return (isSet(key) ? this.iAvailableTyreCompounds[key] : this.iAvailableTyreCompounds)
 		}
 	}
 
@@ -741,9 +741,9 @@ class PracticeCenter extends ConfigurationItem {
 		}
 	}
 
-	Drivers {
+	Drivers[key?] {
 		Get {
-			return this.iDrivers
+			return (isSet(key) ? this.iDrivers[key] : this.iDrivers)
 		}
 	}
 

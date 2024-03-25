@@ -2698,7 +2698,9 @@ class RaceSpotter extends GridRaceAssistant {
 			return false
 		}
 		else
-			return inList(this.iPendingAlerts, alert)
+			for ignore, candidate in this.iPendingAlerts
+				if (candidate[1] = alert)
+					return true
 	}
 
 	pendingAlerts(alerts, match := false) {
@@ -2707,12 +2709,13 @@ class RaceSpotter extends GridRaceAssistant {
 		for ignore, alert in alerts
 			if match {
 				for ignore, candidate in this.iPendingAlerts
-					if InStr(candidate, alert)
+					if InStr(candidate[1], alert)
 						return true
 			}
 			else
-				if inList(this.iPendingAlerts, alert)
-					return true
+				for ignore, candidate in this.iPendingAlerts
+					if (candidate[1] = alert)
+						return true
 
 		return false
 	}

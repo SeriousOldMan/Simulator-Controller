@@ -470,26 +470,26 @@ ideal_line idealLine[NumIdealLines];
 
 void updateIdealLine(int vehicleId, double running, double speed) {
 	ideal_line* slot = &idealLine[(int)round(running * 999)];
+	int count = slot->count;
 
-	if (slot->count < INT_MAX)
-		if (slot->count == 0)
-		{
-			slot->count = 1;
+	if (count == 0)
+	{
+		slot->count = 1;
 
-			slot->speed = speed;
+		slot->speed = speed;
 
-			slot->posX = map_buffer->all_drivers_data_1[vehicleId].position.x;
-			slot->posY = -map_buffer->all_drivers_data_1[vehicleId].position.z;
-		}
-		else
-		{
-			slot->count += 1;
+		slot->posX = map_buffer->all_drivers_data_1[vehicleId].position.x;
+		slot->posY = -map_buffer->all_drivers_data_1[vehicleId].position.z;
+	}
+	else if (slot->count < 1000)
+	{
+		slot->count += 1;
 
-			slot->speed = (slot->speed * (slot->count - 1) + speed) / slot->count;
+		slot->speed = ((slot->speed * count) + speed) / (count + 1);
 
-			slot->posX = ((slot->posX * (slot->count - 1)) + map_buffer->all_drivers_data_1[vehicleId].position.x) / slot->count;
-			slot->posY = ((slot->posY * (slot->count - 1)) + -map_buffer->all_drivers_data_1[vehicleId].position.z) / slot->count;
-		}
+		slot->posX = ((slot->posX * count) + map_buffer->all_drivers_data_1[vehicleId].position.x) / (count + 1);
+		slot->posY = ((slot->posY * count) + -map_buffer->all_drivers_data_1[vehicleId].position.z) / (count + 1);
+	}
 }
 
 typedef struct
@@ -525,7 +525,7 @@ BOOL checkAccident() {
 				double running = max(0, min(1, fabs(carDistance / map_buffer->layout_length)));
 				ideal_line* slot = &idealLine[(int)round(running * 999)];
 
-				if ((slot->count > 100) && (speed < (slot->speed / 2)))
+				if ((slot->count > 50) && (speed < (slot->speed / 2)))
 				{
 					long distanceAhead = (long)(((carDistance > driverDistance) ? carDistance : (carDistance + map_buffer->layout_length)) - driverDistance);
 

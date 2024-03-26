@@ -617,26 +617,26 @@ namespace ACSHMSpotter {
         void updateIdealLine(ref AcCarInfo car, double running, double speed)
         {
 			int index = (int)Math.Round(running * 999);
-            
-            if (idealLine[index].count < int.MaxValue)
-                if (idealLine[index].count == 0)
-                {
-                    idealLine[index].count = 1;
+			int count = idealLine[index].count;
 
-                    idealLine[index].speed = speed;
+            if (count == 0)
+            {
+                idealLine[index].count = 1;
 
-                    idealLine[index].posX = car.worldPosition.x;
-                    idealLine[index].posY = car.worldPosition.z;
-                }
-                else
-                {
-                    idealLine[index].count += 1;
+                idealLine[index].speed = speed;
 
-                    idealLine[index].speed = (idealLine[index].speed * (idealLine[index].count - 1) + speed) / idealLine[index].count;
+                idealLine[index].posX = car.worldPosition.x;
+                idealLine[index].posY = car.worldPosition.z;
+            }
+            else if (idealLine[index].count < 1000)
+			{
+                idealLine[index].count += 1;
 
-                    idealLine[index].posX = ((idealLine[index].posX * (idealLine[index].count - 1)) + car.worldPosition.x) / idealLine[index].count;
-                    idealLine[index].posY = ((idealLine[index].posY * (idealLine[index].count - 1)) + car.worldPosition.z) / idealLine[index].count;
-                }
+                idealLine[index].speed = ((idealLine[index].speed * count) + speed) / (count + 1);
+
+                idealLine[index].posX = ((idealLine[index].posX * count) + car.worldPosition.x) / (count + 1);
+                idealLine[index].posY = ((idealLine[index].posY * count) + car.worldPosition.z) / (count + 1);
+            }
         }
 
         class SlowCarInfo
@@ -657,7 +657,7 @@ namespace ACSHMSpotter {
 			{
                 ref AcCarInfo driver = ref cars.cars[0];
 
-                if (driver.isCarInPitline + driver.isCarInPit > 0)
+                if ((driver.isCarInPitline + driver.isCarInPit) > 0)
                     return false;
 
                 List<SlowCarInfo> accidentsAhead = new List<SlowCarInfo>();
@@ -683,7 +683,7 @@ namespace ACSHMSpotter {
                                 double running = Math.Max(0, Math.Min(1, car.splinePosition));
                                 IdealLine slot = idealLine[(int)Math.Round(running * 999)];
 
-								if ((slot.count > 100) && (speed < (slot.speed / 2)))
+								if ((slot.count > 50) && (speed < (slot.speed / 2)))
 								{
 									double carLapDistance = car.splinePosition * staticInfo.TrackSPlineLength;
 									long distanceAhead = (long)(((carLapDistance > driverLapDistance) ? carLapDistance

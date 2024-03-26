@@ -24,7 +24,7 @@ As described in the next section, Elisa will give you a lot of warnings and anno
 
 	[Please] No more *announcement* [please]
 
-As you might expect, the word "please" is optional. Available options for *announcement* are: "delta information", "tactical advice", "side alerts", "rear alerts", "blue flag warnings", "yellow flag warnings", "cut warnings" and "penalty information". After you have disabled one of the warnings (all are enabled or disabled by default according to your choices in the configuration, see below), you can reenable it with the following command:
+As you might expect, the word "please" is optional. Available options for *announcement* are: "delta information", "tactical advice", "side alerts", "rear alerts", "blue flag warnings", "yellow flag warnings", "cut warnings", "penalty information", "slow car warnings", "ahead accidents warnings"  and "behind accidents information". After you have disabled one of the warnings (all are enabled or disabled by default according to your choices in the configuration, see below), you can reenable it with the following command:
 
 	[Please] Give me *announcement* [please]
 

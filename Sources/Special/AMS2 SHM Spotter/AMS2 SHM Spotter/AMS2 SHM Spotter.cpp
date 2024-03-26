@@ -415,26 +415,26 @@ std::vector<IdealLine> idealLine;
 
 void updateIdealLine(ParticipantInfo vehicle, double running, double speed) {
 	int index = (int)std::round(running * 999);
+	int count = idealLine[index].count;
 
-	if (idealLine[index].count < INT_MAX)
-		if (idealLine[index].count == 0)
-		{
-			idealLine[index].count = 1;
+	if (count == 0)
+	{
+		idealLine[index].count = 1;
 
-			idealLine[index].speed = speed;
+		idealLine[index].speed = speed;
 
-			idealLine[index].posX = vehicle.mWorldPosition[VEC_X];
-			idealLine[index].posY = vehicle.mWorldPosition[VEC_Z];
-		}
-		else
-		{
-			idealLine[index].count += 1;
+		idealLine[index].posX = vehicle.mWorldPosition[VEC_X];
+		idealLine[index].posY = vehicle.mWorldPosition[VEC_Z];
+	}
+	else if (idealLine[index].count < 1000)
+	{
+		idealLine[index].count += 1;
 
-			idealLine[index].speed = (idealLine[index].speed * (idealLine[index].count - 1) + speed) / idealLine[index].count;
+		idealLine[index].speed = ((idealLine[index].speed * count) + speed) / (count + 1);
 
-			idealLine[index].posX = ((idealLine[index].posX * (idealLine[index].count - 1)) + vehicle.mWorldPosition[VEC_X]) / idealLine[index].count;
-			idealLine[index].posY = ((idealLine[index].posY * (idealLine[index].count - 1)) + vehicle.mWorldPosition[VEC_Z]) / idealLine[index].count;
-		}
+		idealLine[index].posX = ((idealLine[index].posX * count) + vehicle.mWorldPosition[VEC_X]) / (count + 1);
+		idealLine[index].posY = ((idealLine[index].posY * count) + vehicle.mWorldPosition[VEC_Z]) / (count + 1);
+	}
 }
 
 class SlowCarInfo
@@ -483,7 +483,7 @@ bool checkAccident(const SharedMemory* sharedData)
 					double running = max(0, min(1, std::abs(vehicle.mCurrentLapDistance / sharedData->mTrackLength)));
 					IdealLine slot = idealLine[(int)std::round(running * 999)];
 
-					if ((slot.count > 100) && (speed < (slot.speed / 2)))
+					if ((slot.count > 50) && (speed < (slot.speed / 2)))
 					{
 						long distanceAhead = (long)(((vehicle.mCurrentLapDistance > driver.mCurrentLapDistance) ? vehicle.mCurrentLapDistance
 							: (vehicle.mCurrentLapDistance + sharedData->mTrackLength)) - driver.mCurrentLapDistance);

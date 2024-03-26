@@ -1,7 +1,7 @@
 [Development]
 Version=5.6.4.0-alpha
 Target=5.6.4.0-release
-Date=03/25/2024
+Date=03/26/2024
 Download=https://www.dropbox.com/scl/fi/ufos2toxsj88cxw1xcm1j/Simulator-Controller-5.6.4.0-alpha.zip?rlkey=0fjdrwpqvw4rtv692ylqg1iuk&dl=1
 Changes=Fixed pitstop and pitlane detection for iRacing, Fixed green flag regression, Invalid laps for iRacing, Default for "Pitstop Tyre Service" is now recognized for iRacing, Fixed memory leak in iRacing connector, Fixed Track Mapper for iRacing, Changing tyre compounds support for iRacing, Fixed "Simulator Setup" support for "Le Mans Ultimate", Fixed spanish voice recognition, Fixed track map periodic update in "Race Center", Accident detection now also for ACC, "Practice Center" informs about unsaved data before starting a new session, Increased iRacing position data reliability, Migrated to AHK 2.0.12, Updated meta data for R3E
 Components=Media->5.6.1,Configuration->5.6.4,Utilities->5.4.8

@@ -583,26 +583,26 @@ namespace RF2SHMSpotter {
 
 		void updateIdealLine(ref rF2VehicleScoring vehicle, double running, double speed) {
 			int index = (int)Math.Round(running * 999);
+			int count = idealLine[index].count;
 
-			if (idealLine[index].count < int.MaxValue)
-				if (idealLine[index].count == 0)
-				{
-					idealLine[index].count = 1;
+			if (count == 0)
+			{
+				idealLine[index].count = 1;
 
-					idealLine[index].speed = speed;
+				idealLine[index].speed = speed;
 
-                    idealLine[index].posX = vehicle.mPos.x;
-                    idealLine[index].posY = vehicle.mPos.z;
-                }
-				else
-				{
-					idealLine[index].count += 1;
+                idealLine[index].posX = vehicle.mPos.x;
+                idealLine[index].posY = vehicle.mPos.z;
+            }
+			else if (idealLine[index].count < int.MaxValue)
+			{
+				idealLine[index].count += 1;
 
-                    idealLine[index].speed = (idealLine[index].speed * (idealLine[index].count - 1) + speed) / idealLine[index].count;
+                idealLine[index].speed = ((idealLine[index].speed * count) + speed) / (count + 1);
 
-                    idealLine[index].posX = ((idealLine[index].posX * (idealLine[index].count - 1)) + vehicle.mPos.x) / idealLine[index].count;
-                    idealLine[index].posY = ((idealLine[index].posY * (idealLine[index].count - 1)) + vehicle.mPos.z) / idealLine[index].count;
-                }
+                idealLine[index].posX = ((idealLine[index].posX * count) + vehicle.mPos.x) / (count + 1);
+                idealLine[index].posY = ((idealLine[index].posY * count) + vehicle.mPos.z) / (count + 1);
+            }
 		}
 
         class SlowCarInfo
@@ -645,7 +645,7 @@ namespace RF2SHMSpotter {
 
 							IdealLine slot = idealLine[(int)Math.Round(running * 999)];
 
-							if ((slot.count > 100) && (speed < (slot.speed / 2)))
+							if ((slot.count > 50) && (speed < (slot.speed / 2)))
 							{
 								long distanceAhead = (long)(((vehicle.mLapDist > playerScoring.mLapDist) ? vehicle.mLapDist
 																										 : (vehicle.mLapDist + scoring.mScoringInfo.mLapDist)) - playerScoring.mLapDist);

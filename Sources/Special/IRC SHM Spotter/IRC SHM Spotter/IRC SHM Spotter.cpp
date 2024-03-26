@@ -513,29 +513,29 @@ std::vector<IdealLine> idealLine;
 
 void updateIdealLine(const irsdk_header* header, const char* data, int carIndex, double running, double speed) {
 	int index = (int)std::round(running * 999);
+	int count = idealLine[index].count;
 	float coordinateX;
 	float coordinateY;
 
-	if (idealLine[index].count < INT_MAX)
-		if (getCarCoordinates(header, data, carIndex, coordinateX, coordinateY))
-			if (idealLine[index].count == 0)
-			{
-				idealLine[index].count = 1;
+	if (getCarCoordinates(header, data, carIndex, coordinateX, coordinateY))
+		if (count == 0)
+		{
+			idealLine[index].count = 1;
 
-				idealLine[index].speed = speed;
+			idealLine[index].speed = speed;
 
-				idealLine[index].posX = coordinateX;
-				idealLine[index].posY = coordinateY;
-			}
-			else
-			{
-				idealLine[index].count += 1;
+			idealLine[index].posX = coordinateX;
+			idealLine[index].posY = coordinateY;
+		}
+		else if (idealLine[index].count < 1000)
+		{
+			idealLine[index].count += 1;
 
-				idealLine[index].speed = (idealLine[index].speed * (idealLine[index].count - 1) + speed) / idealLine[index].count;
+			idealLine[index].speed = ((idealLine[index].speed * count) + speed) / (count + 1);
 
-				idealLine[index].posX = ((idealLine[index].posX * (idealLine[index].count - 1)) + coordinateX) / idealLine[index].count;
-				idealLine[index].posY = ((idealLine[index].posY * (idealLine[index].count - 1)) + coordinateY) / idealLine[index].count;
-			}
+			idealLine[index].posX = ((idealLine[index].posX * count) + coordinateX) / (count + 1);
+			idealLine[index].posY = ((idealLine[index].posY * count) + coordinateY) / (count + 1);
+		}
 }
 
 class SlowCarInfo
@@ -626,7 +626,7 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 						if (speed >= 1) {
 							IdealLine slot = idealLine[(int)std::round(running * 999)];
 
-							if ((slot.count > 100) && (speed < (slot.speed / 2)))
+							if ((slot.count > 50) && (speed < (slot.speed / 2)))
 							{
 								long distanceAhead = (long)(((running > driverRunning) ? (running * trackLength)
 									: ((running * trackLength) + trackLength)) - (driverRunning * trackLength));

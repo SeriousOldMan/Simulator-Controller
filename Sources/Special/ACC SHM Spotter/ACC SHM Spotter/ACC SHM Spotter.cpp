@@ -468,7 +468,9 @@ TrackSpline trackSpline1;
 TrackSpline trackSpline2;
 TrackSpline* buildTrackSpline = NULL;
 
-float startPosX, startPosY, referenceDriverPosX, referenceDriverPosY, buildTrackSplineLength;
+float startPosX, startPosY, referenceDriverPosX, referenceDriverPosY;
+float buildTrackSplineRunning, buildTrackSplineLength;
+
 int referenceDriverIdx;
 long lastTrackSplineUpdate = 0;
 
@@ -534,6 +536,9 @@ void updateTrackSpline() {
 			float newPosY = gf->carCoordinates[referenceDriverIdx][2];
 			double distance = vectorLength(referenceDriverPosX - newPosX, referenceDriverPosY - newPosY);
 			
+			referenceDriverPosX = newPosX;
+			referenceDriverPosY = newPosY;
+
 			if (distance > 2) {
 				if (fabs(newPosX - startPosX) < 20.0 && fabs(newPosY - startPosY) < 20.0 && buildTrackSpline->size() > 100) {
 					trackSplineBuilding = false;
@@ -546,9 +551,9 @@ void updateTrackSpline() {
 
 						updateLastCarCoordinates(true);
 
-						float lastDistance = 1.0;
+						float lastDistance = buildTrackSplineLength;
 
-						for (int i = (int)(buildTrackSpline->size() / 2); i >= 0; i -= 2) {
+						for (int i = (int)(buildTrackSpline->size() / 2) - 1; i >= 0; --i) {
 							TrackSplinePoint point = (*buildTrackSpline)[std::to_string(i)];
 
 							if (point.distance > lastDistance)
@@ -577,33 +582,32 @@ void updateTrackSpline() {
 					}
 				}
 				else {
-					float xPos = (long)round(newPosX / 2) * 2;
-					float yPos = (long)round(newPosY / 2) * 2;
-					string key = std::to_string(xPos - 2) + std::to_string(xPos + 2) + std::to_string(yPos - 2) + std::to_string(yPos + 2);
+					string key = std::to_string((long)round(newPosX / 10)) + std::to_string((long)round(newPosY / 10));
 
 					if (!buildTrackSpline->contains(key)) {
-						buildTrackSplineLength += distance;
+						buildTrackSplineRunning += distance;
+						buildTrackSplineLength = max(buildTrackSplineLength, buildTrackSplineRunning);
 
-						TrackSplinePoint point = TrackSplinePoint(key, buildTrackSplineLength);
+						TrackSplinePoint point = TrackSplinePoint(key, buildTrackSplineRunning);
 						int index = (int)(buildTrackSpline->size() / 2);
 
 						(*buildTrackSpline)[key] = point;
 						(*buildTrackSpline)[std::to_string(index)] = point;
 					}
 					else {
-						buildTrackSplineLength = (*buildTrackSpline)[key].distance;
+						buildTrackSplineRunning = (*buildTrackSpline)[key].distance;
 
 						distance = 0;
 					}
 
 					lastTrackSplineUpdate = GetTickCount();
 
-					if ((distance > 0) && (traceFileName != "")) {
-						minX = min(minX, (int)round(newPosX));
-						maxX = max(maxX, (int)round(newPosX));
-						minY = min(minY, (int)round(newPosX));
-						maxY = max(maxY, (int)round(newPosX));
+					minX = min(minX, (int)round(newPosX));
+					maxX = max(maxX, (int)round(newPosX));
+					minY = min(minY, (int)round(newPosX));
+					maxY = max(maxY, (int)round(newPosX));
 
+					if ((distance > 0) && (traceFileName != "")) {
 						std::ofstream output;
 
 						output.open(traceFileName, std::ios::out | std::ios::app);
@@ -639,19 +643,20 @@ bool startTrackSplineBuilder(int driverIdx) {
 	else if (baseLap <= gf->completedLaps) {
 		if (activeTrackSpline == &trackSpline1) {
 			trackSpline2.clear();
-			trackSpline2.reserve(1000);
+			trackSpline2.reserve(2000);
 
 			buildTrackSpline = &trackSpline2;
 		}
 		else {
 			trackSpline1.clear();
-			trackSpline1.reserve(1000);
+			trackSpline1.reserve(2000);
 
 			buildTrackSpline = &trackSpline1;
 		}
 
 		trackSplineBuilding = true;
 		buildTrackSplineLength = 0;
+		buildTrackSplineRunning = 0;
 
 		referenceDriverPosX = gf->carCoordinates[driverIdx][0];
 		referenceDriverPosY = gf->carCoordinates[driverIdx][2];
@@ -687,10 +692,8 @@ bool startTrackSplineBuilder(int driverIdx) {
 float getDistance(int carIdx) {
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
-	long xPos = (long)round(gf->carCoordinates[carIdx][0] / 2) * 2;
-	long yPos = (long)round(gf->carCoordinates[carIdx][2] / 2) * 2;
-
-	string key = std::to_string(xPos - 2) + std::to_string(xPos + 2) + std::to_string(yPos - 2) + std::to_string(yPos + 2);
+	string key = std::to_string((long)round(gf->carCoordinates[carIdx][0] / 10)) +
+				 std::to_string((long)round(gf->carCoordinates[carIdx][2] / 10));
 
 	if (activeTrackSpline->contains(key)) {
 		float distance = activeTrackSpline->at(key).distance;
@@ -724,6 +727,7 @@ float getSpeed(int carIdx, long deltaMS) {
 	if ((lastPosX != INT_MAX) || (lastPosY != INT_MAX)) {
 		float speed = (vectorLength(lastPosX - newPosX, lastPosY - newPosY) / ((float)deltaMS / 1000.0f)) * 3.6f;
 
+		/*
 		if (traceFileName != "") {
 			std::ofstream output;
 
@@ -733,6 +737,7 @@ float getSpeed(int carIdx, long deltaMS) {
 
 			output.close();
 		}
+		*/
 
 		return speed;
 	}
@@ -792,6 +797,7 @@ bool checkAccident() {
 		trackSplineBuilding = false;
 
 		baseLap = -1;
+		bestLapTime = LONG_MAX;
 
 		return false;
 	}
@@ -815,7 +821,7 @@ bool checkAccident() {
 
 	long milliSeconds = GetTickCount() - lastCarCoordinatesUpdate;
 
-	if (milliSeconds < 50)
+	if (milliSeconds < 100)
 		return false;
 	else if (milliSeconds > 200) {
 		updateLastCarCoordinates(false);

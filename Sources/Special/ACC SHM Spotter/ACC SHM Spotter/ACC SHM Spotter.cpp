@@ -689,7 +689,7 @@ bool startTrackSplineBuilder(int driverIdx) {
 	return false;
 }
 
-float getDistance(int carIdx) {
+float getRunning(int carIdx) {
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
 	string key = std::to_string((long)round(gf->carCoordinates[carIdx][0] / 10)) +
@@ -790,6 +790,25 @@ std::vector<SlowCarInfo> accidentsAhead;
 std::vector<SlowCarInfo> accidentsBehind;
 std::vector<SlowCarInfo> slowCarsAhead;
 
+double getAverageSpeed(double running) {
+	int index = (int)std::round(running * 999);
+	int count = 0;
+	double speed = 0;
+	
+	index = min(999, max(0, index));
+	
+	for (int i = max(0, index - 1); i <= min(999, index + 1); i++) {
+		IdealLine slot = idealLine[index];
+		
+		if (slot.count > 20) {
+			speed += slot.speed;
+			count += 1;
+		}
+	}
+	
+	return (count > 0) ? speed / count : -1;
+}
+
 bool checkAccident() {
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
@@ -833,7 +852,7 @@ bool checkAccident() {
 	accidentsBehind.resize(0);
 	slowCarsAhead.resize(0);
 
-	float driverDistance = getDistance(carID);
+	float driverDistance = getRunning(carID);
 	
 	if (traceFileName != "") {
 		std::ofstream output;
@@ -855,18 +874,18 @@ bool checkAccident() {
 					double speed = getSpeed(i, milliSeconds);
 
 					if (speed >= 10) {
-						double distance = getDistance(i);
+						double distance = getRunning(i);
 
 						if (distance >= 0) {
-							IdealLine slot = idealLine[min(999, (int)std::round(distance * 999))];
-
-							if ((slot.count > 50) && (speed < (slot.speed / 2)))
+							double avgSpeed = getAverageSpeed(distance);
+							
+							if ((avgSpeed >= 0) && (speed < (avgSpeed / 2)))
 							{
 								distance = distance * trackLength;
 
 								long distanceAhead = (long)(((distance > driverDistance) ? distance : (distance + trackLength)) - driverDistance);
 
-								if (speed < (slot.speed / 5))
+								if (speed < (avgSpeed / 5))
 								{
 									if (distanceAhead < aheadAccidentDistance) {
 										accidentsAhead.push_back(SlowCarInfo(i, distanceAhead));

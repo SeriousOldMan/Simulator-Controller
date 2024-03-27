@@ -637,10 +637,16 @@ namespace RF2SHMSpotter {
 			return (count > 0) ? speed / count : -1;
 		}
 
+		double bestLapTime = long.MaxValue;
+
         bool checkAccident(ref rF2VehicleScoring playerScoring)
         {
-            if (playerScoring.mInPits != 0)
-                return false;
+			if (playerScoring.mInPits != 0)
+			{
+				bestLapTime = long.MaxValue;
+
+				return false;
+			}
 
             List<SlowCarInfo> accidentsAhead = new List<SlowCarInfo>();
             List<SlowCarInfo> accidentsBehind = new List<SlowCarInfo>();
@@ -649,6 +655,14 @@ namespace RF2SHMSpotter {
             if (idealLine.Count == 0)
                 for (int i = 0; i < (scoring.mScoringInfo.mLapDist / 4); i++)
                     idealLine.Add(new IdealLine());
+
+            if ((playerScoring.mLastLapTime > 0) && ((playerScoring.mLastLapTime * 1.002) < bestLapTime))
+            {
+                bestLapTime = playerScoring.mLastLapTime;
+
+                for (int i = 0; i < idealLine.Count; i++)
+                    idealLine[i].count = 0;
+            }
 
             try
 			{

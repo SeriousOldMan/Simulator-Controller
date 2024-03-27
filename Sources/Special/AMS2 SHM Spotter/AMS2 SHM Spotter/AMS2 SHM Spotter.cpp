@@ -477,10 +477,15 @@ double getAverageSpeed(double running) {
 	return (count > 0) ? speed / count : -1;
 }
 
+float bestLapTime = LONG_MAX;
+
 bool checkAccident(const SharedMemory* sharedData)
 {
-	if (sharedData->mPitModes[sharedData->mViewedParticipantIndex] > PIT_MODE_NONE)
+	if (sharedData->mPitModes[sharedData->mViewedParticipantIndex] > PIT_MODE_NONE) {
+		bestLapTime = LONG_MAX;
+
 		return false;
+	}
 
 	if (idealLine.size() == 0)
 		for (int i = 0; i < (sharedData->mTrackLength / 4); i++)
@@ -491,6 +496,15 @@ bool checkAccident(const SharedMemory* sharedData)
 	slowCarsAhead.resize(0);
 
 	ParticipantInfo driver = sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex];
+	float lastLapTime = sharedData->mLastLapTimes[sharedData->mViewedParticipantIndex];
+
+	if ((lastLapTime > 0) && ((lastLapTime * 1.002) < bestLapTime))
+	{
+		bestLapTime = LONG_MAX;
+
+		for (int i = 0; i < idealLine.size(); i++)
+			idealLine[i].count = 0;
+	}
 
 	try
 	{

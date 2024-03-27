@@ -583,6 +583,8 @@ double lastRunnings[512];
 
 std::string traceFileName = "";
 
+long bestLapTime = LONG_MAX;
+
 bool checkAccident(const irsdk_header* header, const char* data, const int playerCarIndex, float trackLength)
 {
 	accidentsAhead.resize(0);
@@ -619,8 +621,27 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 		if (!getRawDataValue(pitLaneStates, header, data, "CarIdxOnPitRoad"))
 			pitLaneStates = 0;
 
-		if (pitLaneStates && ((bool*)pitLaneStates)[playerCarIndex])
+		if (pitLaneStates && ((bool*)pitLaneStates)[playerCarIndex]) {
+			bestLapTime = LONG_MAX;
+
 			return false;
+		}
+
+		long lastTime = 0;
+		char playerCarIdx[10] = "";
+
+		sprintf(playerCarIdx, "%d", playerCarIndex);
+		
+		if (getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:CarIdx:{%s}LastTime:", sessionID, playerCarIdx))
+			lastTime = (long)(normalize(atof(result)) * 1000);
+
+		if ((lastTime > 0) && ((lastTime * 1.002) < bestLapTime))
+		{
+			bestLapTime = lastTime;
+
+			for (int i = 0; i < idealLine.size(); i++)
+				idealLine[i].count = 0;
+		}
 
 		lastTickCount += milliSeconds;
 

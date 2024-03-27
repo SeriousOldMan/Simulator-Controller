@@ -524,6 +524,8 @@ double getAverageSpeed(double running) {
 	return (count > 0) ? speed / count : -1;
 }
 
+double bestLapTime = LONG_MAX;
+
 BOOL checkAccident() {
 	int accidentsAheadCount = 0;
 	int accidentsBehindCount = 0;
@@ -533,8 +535,19 @@ BOOL checkAccident() {
 	if (idealLineSize == 0)
 		idealLineSize = (int)min(NumIdealLines, map_buffer->layout_length / 4);
 
-	if (map_buffer->all_drivers_data_1[playerIdx].in_pitlane > 0)
+	if (map_buffer->all_drivers_data_1[playerIdx].in_pitlane > 0) {
+		bestLapTime = LONG_MAX;
+
 		return FALSE;
+	}
+
+	if ((map_buffer->lap_time_previous_self > 0) && ((map_buffer->lap_time_previous_self * 1.002) < bestLapTime))
+	{
+		bestLapTime = map_buffer->lap_time_previous_self;
+
+		for (int i = 0; i < idealLineSize; i++)
+			idealLine[i].count = 0;
+	}
 
 	double driverDistance = map_buffer->all_drivers_data_1[playerIdx].lap_distance;
 

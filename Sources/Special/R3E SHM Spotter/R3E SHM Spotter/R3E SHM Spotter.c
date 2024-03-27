@@ -458,7 +458,7 @@ BOOL checkPositions(int playerID) {
 	return FALSE;
 }
 
-#define NumIdealLines 1000
+#define NumIdealLines 10000
 typedef struct {
 	int count;
 
@@ -468,8 +468,10 @@ typedef struct {
 } ideal_line;
 ideal_line idealLine[NumIdealLines];
 
+int idealLineSize = 0;
+
 void updateIdealLine(int vehicleId, double running, double speed) {
-	ideal_line* slot = &idealLine[(int)round(running * 999)];
+	ideal_line* slot = &idealLine[(int)round(running * (idealLineSize - 1))];
 	int count = slot->count;
 
 	if (count == 0)
@@ -503,13 +505,14 @@ slow_car_info accidentsBehind[10];
 slow_car_info slowCarsAhead[10];
 
 double getAverageSpeed(double running) {
-	int index = (int)round(running * 999);
+	int last = (idealLineSize - 1);
+	int index = (int)round(running * last);
 	int count = 0;
 	double speed = 0;
 	
-	index = min(999, max(0, index));
+	index = min(last, max(0, index));
 	
-	for (int i = max(0, index - 1); i <= min(999, index + 1); i++) {
+	for (int i = max(0, index - 2); i <= min(last, index + 2); i++) {
 		ideal_line* slot = &idealLine[index];
 		
 		if (slot->count > 20) {
@@ -526,6 +529,9 @@ BOOL checkAccident() {
 	int accidentsBehindCount = 0;
 	int slowCarsAheadCount = 0;
 	int playerIdx = getPlayerIndex();
+
+	if (idealLineSize == 0)
+		idealLineSize = (int)min(NumIdealLines, map_buffer->layout_length / 4);
 
 	if (map_buffer->all_drivers_data_1[playerIdx].in_pitlane > 0)
 		return FALSE;

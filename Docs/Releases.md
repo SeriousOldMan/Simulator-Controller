@@ -20,14 +20,13 @@
   15. "Practice Center" now informs about unsaved data before starting a new session.
   16. Updated car meta data for *RaceRoom Racing Experience* to the latest version.
   17. [Accident and slow car detection](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#accident-detection-for-assetto-corsa-competizione) by the Spotter is now also available for *Assetto Corsa Competizione*.
-  18. Accident and slow car detection has been disabled by default in the configuration, as long as the feature is in a kind of Beta state. Please see the special note below.
-  19. [Internal] Migrated to AHK version 2.0.12.
+  18. [Internal] Migrated to AHK version 2.0.12.
 
-**Important:** The accident detection has seen many changes since its initial release with 5.6.3. The current algorithms rely heavily on learning the track layout, the ideal line and the typical speeds during the initial laps. Unfortunately, the initial laps also see many accidents in some races, which can lead to false positives further down the road. I have included additional code which tries to detect and correct this, but it does not work all the time yet. As said above, the feature is currently disabled by default. If you have enabled it, and you encounter many false warnings like "Slow car ahead in 200 meters." by the Spotter during a race, although there is no such slow car, you can then disable the warnings by using the voice command:
+**Important:** The accident detection has seen many changes since its initial release with 5.6.3. The current algorithms rely heavily on learning the track layout, the ideal line and the typical speeds during the initial laps. Unfortunately, the initial laps also see many accidents in some races, which can lead to false positives further down the road. I have included additional code which tries to detect and correct this, but it does not work all the time yet. If you encounter many false warnings like "Slow car ahead in 200 meters." by the Spotter during a race, although there is no such slow car, you can then disable the warnings by using the voice command:
 
 	No more *warning*, please.
 	
-Use one of "slow car warnings", "ahead accidents warnings", "behind accidents information" for *warning* as required. If this is not usable for you, you can also leave the accident warnings disabled completely in the configuration for important races for the moment.
+Use one of "slow car warnings", "ahead accidents warnings", "behind accidents information" for *warning* as required. If this is not usable for you, you can also disable the accident warnings completely in the configuration for important races for now.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-564), if you are running *iRacing* and want to use the new "TyreCompound" action.
 

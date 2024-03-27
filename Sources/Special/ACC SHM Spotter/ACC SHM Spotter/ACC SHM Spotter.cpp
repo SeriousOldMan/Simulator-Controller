@@ -749,7 +749,7 @@ float getSpeed(int carIdx, long deltaMS) {
 
 void updateIdealLine(int carIdx, double running, double speed) {
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
-	int index = (int)std::round(running * 999);
+	int index = (int)std::round(running * (idealLine.size() - 1));
 	int count = idealLine[index].count;
 
 	if (count == 0)
@@ -793,13 +793,14 @@ std::vector<SlowCarInfo> accidentsBehind;
 std::vector<SlowCarInfo> slowCarsAhead;
 
 double getAverageSpeed(double running) {
-	int index = (int)std::round(running * 999);
+	int last = (idealLine.size() - 1);
+	int index = (int)std::round(running * last);
 	int count = 0;
 	double speed = 0;
 	
-	index = min(999, max(0, index));
+	index = min(last, max(0, index));
 	
-	for (int i = max(0, index - 1); i <= min(999, index + 1); i++) {
+	for (int i = max(0, index - 2); i <= min(last, index + 2); i++) {
 		IdealLine slot = idealLine[index];
 		
 		if (slot.count > 20) {
@@ -831,6 +832,10 @@ bool checkAccident() {
 
 			break;
 		}
+
+	if (idealLine.size() == 0)
+		for (int i = 0; i < (trackLength / 4); i++)
+			idealLine.push_back(IdealLine());
 
 	if (trackSplineBuilding)
 		updateTrackSpline();
@@ -1842,9 +1847,6 @@ int main(int argc, char* argv[])
 	char* audioDevice = 0;
 
 	idealLine.reserve(1000);
-
-	for (int i = 0; i < 1000; i++)
-		idealLine.push_back(IdealLine());
 
 	if (argc > 1) {
 		calibrateTelemetry = (strcmp(argv[1], "-Calibrate") == 0);

@@ -185,7 +185,7 @@ class RaceSpotterConfigurator extends ConfiguratorPanel {
 			for ignore, key in ["SideProximity", "RearProximity", "YellowFlags", "BlueFlags"
 							  , "SessionInformation", "TacticalAdvices", "PitWindow", "CutWarnings", "PenaltyInformation"
 							  , "SlowCars", "AccidentsAhead", "AccidentsBehind"]
-				simulatorConfiguration[key] := getMultiMapValue(configuration, "Race Spotter Announcements", simulator . "." . key, inList(["SlowCars", "AccidentsAhead", "AccidentsBehind"], key) ? false : true)
+				simulatorConfiguration[key] := getMultiMapValue(configuration, "Race Spotter Announcements", simulator . "." . key, true)
 
 			default := getMultiMapValue(configuration, "Race Spotter Announcements", simulator . ".PerformanceUpdates", 2)
 			default := getMultiMapValue(configuration, "Race Spotter Announcements", simulator . ".DistanceInformation", default)

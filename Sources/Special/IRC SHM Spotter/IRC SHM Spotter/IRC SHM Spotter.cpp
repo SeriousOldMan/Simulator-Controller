@@ -319,7 +319,7 @@ bool getCarCoordinates(const irsdk_header* header, const char* data, const int c
 
 	if (hasTrackCoordinates) {
 		if (getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct")) {
-			int index = max(0, min((int)round(((float*)trackPositions)[carIdx] * 1000), 999));
+			int index = max(0, min((int)round(((float*)trackPositions)[carIdx] * 999), 999));
 
 			coordinateX = rXCoordinates[index];
 			coordinateY = rYCoordinates[index];
@@ -512,7 +512,7 @@ public:
 std::vector<IdealLine> idealLine;
 
 void updateIdealLine(const irsdk_header* header, const char* data, int carIndex, double running, double speed) {
-	int index = (int)std::round(running * 999);
+	int index = (int)std::round(running * (idealLine.size() - 1));
 	int count = idealLine[index].count;
 	float coordinateX;
 	float coordinateY;
@@ -559,13 +559,14 @@ std::vector<SlowCarInfo> accidentsBehind;
 std::vector<SlowCarInfo> slowCarsAhead;
 
 double getAverageSpeed(double running) {
-	int index = (int)std::round(running * 999);
+	int last = (idealLine.size() - 1);
+	int index = (int)std::round(running * last);
 	int count = 0;
 	double speed = 0;
 	
-	index = min(999, max(0, index));
+	index = min(last, max(0, index));
 	
-	for (int i = max(0, index - 1); i <= min(999, index + 1); i++) {
+	for (int i = max(0, index - 2); i <= min(last, index + 2); i++) {
 		IdealLine slot = idealLine[index];
 		
 		if (slot.count > 20) {
@@ -587,6 +588,10 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 	accidentsAhead.resize(0);
 	accidentsBehind.resize(0);
 	slowCarsAhead.resize(0);
+
+	if (idealLine.size() == 0)
+		for (int i = 0; i < (trackLength / 4); i++)
+			idealLine.push_back(IdealLine());
 
 	const char* sessionInfo = irsdk_getSessionInfoStr();
 	char result[64];
@@ -1698,9 +1703,6 @@ int main(int argc, char* argv[])
 	timeBeginPeriod(1);
 
 	idealLine.reserve(1000);
-
-	for (int i = 0; i < 1000; i++)
-		idealLine.push_back(IdealLine());
 
 	bool running = false;
 	int countdown = 1000;

@@ -616,7 +616,7 @@ namespace ACSHMSpotter {
 
         void updateIdealLine(ref AcCarInfo car, double running, double speed)
         {
-			int index = (int)Math.Round(running * 999);
+			int index = (int)Math.Round(running * (idealLine.Count - 1));
 			int count = idealLine[index].count;
 
             if (count == 0)
@@ -652,13 +652,14 @@ namespace ACSHMSpotter {
         }
 
 		double getAverageSpeed(double running) {
-			int index = (int)Math.Round(running * 999);
+			int last = idealLine.Count - 1;
+			int index = (int)Math.Round(running * last);
 			int count = 0;
 			double speed = 0;
 			
-			index = Math.Min(999, Math.Max(0, index));
+			index = Math.Min(last, Math.Max(0, index));
 			
-			for (int i = Math.Max(0, index - 1); i <= Math.Min(999, index + 1); i++) {
+			for (int i = Math.Max(0, index - 2); i <= Math.Min(last, index + 2); i++) {
 				IdealLine slot = idealLine[index];
 				
 				if (slot.count > 20) {
@@ -674,6 +675,10 @@ namespace ACSHMSpotter {
         {
 			if (cars.numVehicles > 0)
 			{
+				if (idealLine.Count == 0)
+					for (int i = 0; i < (staticInfo.TrackSPlineLength / 4); i++)
+						idealLine.Add(new IdealLine());
+
                 ref AcCarInfo driver = ref cars.cars[0];
 
                 if ((driver.isCarInPitline + driver.isCarInPit) > 0)
@@ -701,8 +706,7 @@ namespace ACSHMSpotter {
 							{
                                 double running = Math.Max(0, Math.Min(1, car.splinePosition));
 								double avgSpeed = getAverageSpeed(running);
-								
-                                IdealLine slot = idealLine[(int)Math.Round(running * 999)];
+								IdealLine slot = idealLine[(int)Math.Round(running * (idealLine.Count - 1))];
 
 								if ((avgSpeed >= 0) && (speed < (avgSpeed / 2)))
 								{
@@ -1502,10 +1506,7 @@ namespace ACSHMSpotter {
 
         public void initializeSpotter(string[] args)
         {
-            for (int i = 0; i < 1000; i++)
-                idealLine.Add(new IdealLine());
-
-			if (args.Length > 0)
+            if (args.Length > 0)
 			{
 				string trackLength = args[0];
 			}

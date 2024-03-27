@@ -539,7 +539,7 @@ void updateTrackSpline() {
 			referenceDriverPosX = newPosX;
 			referenceDriverPosY = newPosY;
 
-			if (distance > 2) {
+			if (distance > 0) {
 				if (fabs(newPosX - startPosX) < 20.0 && fabs(newPosY - startPosY) < 20.0 && buildTrackSpline->size() > 100) {
 					trackSplineBuilding = false;
 
@@ -854,7 +854,7 @@ bool checkAccident() {
 				if (i != carID) {
 					double speed = getSpeed(i, milliSeconds);
 
-					if (speed >= 10) {
+					if (speed >= 5) {
 						double distance = getDistance(i);
 
 						if (distance >= 0) {

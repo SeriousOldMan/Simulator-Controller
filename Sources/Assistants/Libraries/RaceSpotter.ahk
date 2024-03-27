@@ -1007,7 +1007,7 @@ class RaceSpotter extends GridRaceAssistant {
 		this.updateConfigurationValues({Announcements: {DeltaInformation: 2, TacticalAdvices: true
 													  , SideProximity: true, RearProximity: true
 													  , YellowFlags: true, BlueFlags: true, PitWindow: true
-													  , SlowCars: true, AccidentsAhead: true, AccidentsBehind: true
+													  , SlowCars: false, AccidentsAhead: false, AccidentsBehind: false
 													  , SessionInformation: true, CutWarnings: true, PenaltyInformation: true}})
 
 		OnExit(ObjBindMethod(this, "shutdownSpotter", true))
@@ -3022,7 +3022,8 @@ class RaceSpotter extends GridRaceAssistant {
 		for ignore, key in ["TacticalAdvices", "SideProximity", "RearProximity", "YellowFlags", "BlueFlags"
 						  , "PitWindow", "SessionInformation", "CutWarnings", "PenaltyInformation"
 						  , "SlowCars", "AccidentsAhead", "AccidentsBehind"]
-			announcements[key] := getMultiMapValue(configuration, "Race Spotter Announcements", this.Simulator . "." . key, true)
+			announcements[key] := getMultiMapValue(configuration, "Race Spotter Announcements", this.Simulator . "." . key
+												 , inList(["SlowCars", "AccidentsAhead", "AccidentsBehind"], key) ? false : true)
 
 		default := getMultiMapValue(configuration, "Race Spotter Announcements", this.Simulator . ".PerformanceUpdates", 2)
 		default := getMultiMapValue(configuration, "Race Spotter Announcements", this.Simulator . ".DistanceInformation", default)

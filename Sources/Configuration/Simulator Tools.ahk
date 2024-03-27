@@ -1663,6 +1663,27 @@ updateInstallationForV500() {
 	}
 }
 
+updateConfigurationForV564() {
+	local configuration, removedKeys, ignore, key, fileName
+
+	for ignore, fileName in [getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+						   , kHomeDirectory . "Setup\Race Spotter Configuration.ini"]
+		if FileExist(fileName) {
+			configuration := readMultiMap(fileName)
+
+			removedKeys := []
+
+			for key, ignore in getMultiMapValues(configuration, "Race Spotter Announcesment")
+				if inList(["SlowCars", "AccidentsAhead", "AccidentsBehind"], key)
+					removedKeys.Push(key)
+
+			for ignore, key in removedKeys
+				removeMultiMapValue(configuration, "Race Spotter Announcesment", key)
+
+			writeMultiMap(fileName, configuration)
+		}
+}
+
 updateConfigurationForV558() {
 	try {
 		deleteFile(kUserHomeDirectory . "Simulator Data\ACC\Car Data.ini")

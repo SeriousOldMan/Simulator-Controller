@@ -651,6 +651,25 @@ namespace ACSHMSpotter {
             }
         }
 
+		double getAverageSpeed(double running) {
+			int index = (int)Math.Round(running * 999);
+			int count = 0;
+			double speed = 0;
+			
+			index = Math.Min(999, Math.Max(0, index));
+			
+			for (int i = Math.Max(0, index - 1); i <= Math.Min(999, index + 1); i++) {
+				IdealLine slot = idealLine[index];
+				
+				if (slot.count > 20) {
+					speed += slot.speed;
+					count += 1;
+				}
+			}
+			
+			return (count > 0) ? speed / count : -1;
+		}
+
         bool checkAccident()
         {
 			if (cars.numVehicles > 0)
@@ -681,15 +700,17 @@ namespace ACSHMSpotter {
 							if (speed >= 1)
 							{
                                 double running = Math.Max(0, Math.Min(1, car.splinePosition));
+								double avgSpeed = getAverageSpeed(running);
+								
                                 IdealLine slot = idealLine[(int)Math.Round(running * 999)];
 
-								if ((slot.count > 50) && (speed < (slot.speed / 2)))
+								if ((avgSpeed >= 0) && (speed < (avgSpeed / 2)))
 								{
 									double carLapDistance = car.splinePosition * staticInfo.TrackSPlineLength;
 									long distanceAhead = (long)(((carLapDistance > driverLapDistance) ? carLapDistance
 																									  : (carLapDistance + staticInfo.TrackSPlineLength)) - driverLapDistance);
 
-									if (speed < (slot.speed / 5))
+									if (speed < (avgSpeed / 5))
 									{
 										if (distanceAhead < aheadAccidentDistance)
 											accidentsAhead.Add(new SlowCarInfo(i, distanceAhead));

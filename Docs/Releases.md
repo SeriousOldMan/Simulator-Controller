@@ -19,7 +19,7 @@
 	  - The Race Engineer is fully aware of the configured tyre compounds for a given car.
   15. "Practice Center" now informs about unsaved data before starting a new session.
   16. Updated car meta data for *RaceRoom Racing Experience* to the latest version.
-  17. Accident and slow car detection by the Spotter is now also available for *Assetto Corsa Competizione*.
+  17. [Accident and slow car detection](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#accident-detection-for-assetto-corsa-competizione) by the Spotter is now also available for *Assetto Corsa Competizione*.
   18. [Internal] Migrated to AHK version 2.0.12.
 
 **Important:** The accident detection has seen many changes since its initial release with 5.6.3. The algorithms used here rely heavily on learning the track layout, the ideal line and the typical speeds during the initial laps. Unfortunately, the initial laps also see many accidents in some races, which can lead to false positives further down the road. I have included additional code which tries to detect and correct this, but it does not work all the time yet. If you encounter many false warnings like "Slow car ahead in 200 meters." by the Spotter during a race, although there is no such slow car, you can disable the warnings by using the voice command:

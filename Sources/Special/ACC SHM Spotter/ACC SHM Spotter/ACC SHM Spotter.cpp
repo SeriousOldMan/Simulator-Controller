@@ -543,7 +543,7 @@ void updateTrackSpline() {
 				if (fabs(newPosX - startPosX) < 20.0 && fabs(newPosY - startPosY) < 20.0 && buildTrackSpline->size() > 100) {
 					trackSplineBuilding = false;
 
-					if ((gf->iLastTime > 0) && (gf->iLastTime < bestLapTime)) {
+					if ((gf->iLastTime > 0) && ((gf->iLastTime * 1.002) < bestLapTime)) {
 						bestLapTime = gf->iLastTime;
 
 						for (int i = 0; i < 1000; i++)

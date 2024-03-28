@@ -540,8 +540,6 @@ void updateTrackSpline() {
 			referenceDriverPosY = newPosY;
 
 			if (distance > 0) {
-				string key = std::to_string((long)round(newPosX / 10)) + "|" + std::to_string((long)round(newPosY / 10));
-
 				if (buildTrackSpline->size() > 100 && fabs(newPosX - startPosX) < 30.0 && fabs(newPosY - startPosY) < 30.0) {
 					trackSplineBuilding = false;
 

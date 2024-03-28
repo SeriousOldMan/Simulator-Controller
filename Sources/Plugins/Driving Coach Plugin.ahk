@@ -123,7 +123,7 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 
 	enableRaceAssistant(label := false, startup := false) {
 		startCoach() {
-			if (MessageManager.isPaused() || !SimulatorController.Instance.Started)
+			if !SimulatorController.Instance.Started
 				return Task.CurrentTask
 			else
 				this.requireRaceAssistant()

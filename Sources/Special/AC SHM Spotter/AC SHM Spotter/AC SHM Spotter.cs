@@ -616,7 +616,7 @@ namespace ACSHMSpotter {
 
         void updateIdealLine(ref AcCarInfo car, double running, double speed)
         {
-			int index = (int)Math.Round(running * 999);
+			int index = (int)Math.Round(running * (idealLine.Count - 1));
 			int count = idealLine[index].count;
 
             if (count == 0)
@@ -651,14 +651,51 @@ namespace ACSHMSpotter {
             }
         }
 
+		double getAverageSpeed(double running) {
+			int last = idealLine.Count - 1;
+			int index = (int)Math.Round(running * last);
+			int count = 0;
+			double speed = 0;
+			
+			index = Math.Min(last, Math.Max(0, index));
+			
+			for (int i = Math.Max(0, index - 2); i <= Math.Min(last, index + 2); i++) {
+				IdealLine slot = idealLine[index];
+				
+				if (slot.count > 20) {
+					speed += slot.speed;
+					count += 1;
+				}
+			}
+			
+			return (count > 0) ? speed / count : -1;
+		}
+		
+		int bestLapTime = int.MaxValue;
+
         bool checkAccident()
         {
 			if (cars.numVehicles > 0)
 			{
+				if (idealLine.Count == 0)
+					for (int i = 0; i < (staticInfo.TrackSPlineLength / 4); i++)
+						idealLine.Add(new IdealLine());
+
                 ref AcCarInfo driver = ref cars.cars[0];
 
-                if ((driver.isCarInPitline + driver.isCarInPit) > 0)
+                if ((driver.isCarInPitline + driver.isCarInPit) > 0) {
+					bestLapTime = int.MaxValue;
+					
                     return false;
+                }
+
+				if ((driver.lastLapTimeMS > 0) && ((driver.lastLapTimeMS * 1.002) < bestLapTime))
+				{
+					bestLapTime = driver.lastLapTimeMS;
+
+					for (int i = 0; i < idealLine.Count; i++)
+						idealLine[i].count = 0;
+				}
 
                 List<SlowCarInfo> accidentsAhead = new List<SlowCarInfo>();
 				List<SlowCarInfo> accidentsBehind = new List<SlowCarInfo>();
@@ -681,15 +718,16 @@ namespace ACSHMSpotter {
 							if (speed >= 1)
 							{
                                 double running = Math.Max(0, Math.Min(1, car.splinePosition));
-                                IdealLine slot = idealLine[(int)Math.Round(running * 999)];
+								double avgSpeed = getAverageSpeed(running);
+								IdealLine slot = idealLine[(int)Math.Round(running * (idealLine.Count - 1))];
 
-								if ((slot.count > 50) && (speed < (slot.speed / 2)))
+								if ((avgSpeed >= 0) && (speed < (avgSpeed / 2)))
 								{
 									double carLapDistance = car.splinePosition * staticInfo.TrackSPlineLength;
 									long distanceAhead = (long)(((carLapDistance > driverLapDistance) ? carLapDistance
 																									  : (carLapDistance + staticInfo.TrackSPlineLength)) - driverLapDistance);
 
-									if (speed < (slot.speed / 5))
+									if (speed < (avgSpeed / 5))
 									{
 										if (distanceAhead < aheadAccidentDistance)
 											accidentsAhead.Add(new SlowCarInfo(i, distanceAhead));
@@ -1481,10 +1519,7 @@ namespace ACSHMSpotter {
 
         public void initializeSpotter(string[] args)
         {
-            for (int i = 0; i < 1000; i++)
-                idealLine.Add(new IdealLine());
-
-			if (args.Length > 0)
+            if (args.Length > 0)
 			{
 				string trackLength = args[0];
 			}

@@ -2692,7 +2692,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 		if match {
 			for ignore, candidate in this.iPendingAlerts
-				if InStr(candidate, alert)
+				if InStr(candidate[1], alert)
 					return true
 
 			return false
@@ -2750,10 +2750,7 @@ class RaceSpotter extends GridRaceAssistant {
 	}
 
 	superfluousAlert(alert) {
-		if (InStr(alert, "Behind") && this.pendingAlerts(["Behind", "Left", "Right", "Three", "Clear"], true))
-			return true
-
-		return false
+		return (InStr(alert, "Behind") && this.pendingAlerts(["Behind", "Left", "Right", "Three", "Clear"], true))
 	}
 
 	pushAlert(alert, arguments*) {

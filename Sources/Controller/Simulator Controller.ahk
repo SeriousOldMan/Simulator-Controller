@@ -2256,20 +2256,19 @@ initializeSimulatorController() {
 
 startupSimulatorController() {
 	local controller := SimulatorController.Instance
-	local noStartup := ((A_Args.Length > 0) && (A_Args[1] = "-NoStartup"))
 
 	try {
-		if noStartup
+		if inList(A_Args, "-NoStartup") {
 			controller.writeControllerState()
+
+			ExitApp(0)
+		}
 		else
 			PeriodicTask(ObjBindMethod(controller, "writeControllerState", true), 0, kLowPriority).start()
 
 		controller.computeControllerModes()
 
 		controller.updateLastEvent()
-
-		if noStartup
-			ExitApp(0)
 
 		controller.startup()
 

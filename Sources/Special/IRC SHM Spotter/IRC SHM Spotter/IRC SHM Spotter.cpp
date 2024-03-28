@@ -319,7 +319,7 @@ bool getCarCoordinates(const irsdk_header* header, const char* data, const int c
 
 	if (hasTrackCoordinates) {
 		if (getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct")) {
-			int index = max(0, min((int)round(((float*)trackPositions)[carIdx] * 1000), 999));
+			int index = max(0, min((int)round(((float*)trackPositions)[carIdx] * 999), 999));
 
 			coordinateX = rXCoordinates[index];
 			coordinateY = rYCoordinates[index];
@@ -512,7 +512,7 @@ public:
 std::vector<IdealLine> idealLine;
 
 void updateIdealLine(const irsdk_header* header, const char* data, int carIndex, double running, double speed) {
-	int index = (int)std::round(running * 999);
+	int index = (int)std::round(running * (idealLine.size() - 1));
 	int count = idealLine[index].count;
 	float coordinateX;
 	float coordinateY;
@@ -558,16 +558,42 @@ std::vector<SlowCarInfo> accidentsAhead;
 std::vector<SlowCarInfo> accidentsBehind;
 std::vector<SlowCarInfo> slowCarsAhead;
 
+double getAverageSpeed(double running) {
+	int last = (idealLine.size() - 1);
+	int index = (int)std::round(running * last);
+	int count = 0;
+	double speed = 0;
+	
+	index = min(last, max(0, index));
+	
+	for (int i = max(0, index - 2); i <= min(last, index + 2); i++) {
+		IdealLine slot = idealLine[index];
+		
+		if (slot.count > 20) {
+			speed += slot.speed;
+			count += 1;
+		}
+	}
+	
+	return (count > 0) ? speed / count : -1;
+}
+
 long lastTickCount = 0;
 double lastRunnings[512];
 
 std::string traceFileName = "";
+
+long bestLapTime = LONG_MAX;
 
 bool checkAccident(const irsdk_header* header, const char* data, const int playerCarIndex, float trackLength)
 {
 	accidentsAhead.resize(0);
 	accidentsBehind.resize(0);
 	slowCarsAhead.resize(0);
+
+	if (idealLine.size() == 0)
+		for (int i = 0; i < (trackLength / 4); i++)
+			idealLine.push_back(IdealLine());
 
 	const char* sessionInfo = irsdk_getSessionInfoStr();
 	char result[64];
@@ -595,8 +621,27 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 		if (!getRawDataValue(pitLaneStates, header, data, "CarIdxOnPitRoad"))
 			pitLaneStates = 0;
 
-		if (pitLaneStates && ((bool*)pitLaneStates)[playerCarIndex])
+		if (pitLaneStates && ((bool*)pitLaneStates)[playerCarIndex]) {
+			bestLapTime = LONG_MAX;
+
 			return false;
+		}
+
+		long lastTime = 0;
+		char playerCarIdx[10] = "";
+
+		sprintf(playerCarIdx, "%d", playerCarIndex);
+		
+		if (getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:CarIdx:{%s}LastTime:", sessionID, playerCarIdx))
+			lastTime = (long)(normalize(atof(result)) * 1000);
+
+		if ((lastTime > 0) && ((lastTime * 1.002) < bestLapTime))
+		{
+			bestLapTime = lastTime;
+
+			for (int i = 0; i < idealLine.size(); i++)
+				idealLine[i].count = 0;
+		}
 
 		lastTickCount += milliSeconds;
 
@@ -624,14 +669,14 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 							continue;
 
 						if (speed >= 1) {
-							IdealLine slot = idealLine[(int)std::round(running * 999)];
-
-							if ((slot.count > 50) && (speed < (slot.speed / 2)))
+							float avgSpeed = getAverageSpeed(running);
+							
+							if ((avgSpeed >= 0) && (speed < (avgSpeed / 2)))
 							{
 								long distanceAhead = (long)(((running > driverRunning) ? (running * trackLength)
 									: ((running * trackLength) + trackLength)) - (driverRunning * trackLength));
 
-								if (speed < (slot.speed / 5))
+								if (speed < (avgSpeed / 5))
 								{
 									if (distanceAhead < aheadAccidentDistance) {
 										accidentsAhead.push_back(SlowCarInfo(i, distanceAhead));
@@ -1679,9 +1724,6 @@ int main(int argc, char* argv[])
 	timeBeginPeriod(1);
 
 	idealLine.reserve(1000);
-
-	for (int i = 0; i < 1000; i++)
-		idealLine.push_back(IdealLine());
 
 	bool running = false;
 	int countdown = 1000;

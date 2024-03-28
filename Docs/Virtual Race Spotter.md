@@ -187,13 +187,21 @@ As mentioned, each simulator is different. The Spotter will make as much out of 
 
 (6) No detailed information for the concrete penalty available.
 
-(7) The distance ahead or behind, for which this is checked and reported can be defined in the [race settings] (https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database". Default is 800 meter for accidents ahead and 500 meter for slow cars and accidents behind. The track spline will be learned during the initial laps, depending on the simulator. Therefore accident detection might not be available in this time.
+(7) The distance ahead or behind, for which this is checked and reported can be defined in the [race settings] (https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database". Default is 800 meter for accidents ahead and 500 meter for slow cars and accidents behind. The track spline will be learned during the initial laps, depending on the simulator. Therefore accident detection might not be available in this time. See also the special notes for *Assetto Corsa Competizione* below.
 
 (8) The *iRacing* API does not provide any information about the current speed of all cars on the track, only for the drivers car. Since the crash detection is implemented using an integral over track distance and speed, the algorithm tries to learn the typical speed for each car over time. The detection is therefore not reliable during the first laps.
 
 (9) iRacing has no information of number of cuts per lap in the available data. It is only detectable in a given point in time, whether the car is off track. It therefore depends on the data sampling frequency, how reliable the detection of track cuts is.
 
 (10) Only in a race session.
+
+##### Accident detection for *Assetto Corsa Competizione*
+
+The algorithms used for accident and slow car detection are based on learning the track layout, the ideal line and the typical speeds during the initial laps. Unfortunately, the initial laps also see many accidents in some races, which can lead to false positives further down the road. Additional code is included which tries to detect and correct this, but in some cases it cannot handle the situation. If you encounter many false warnings like "Slow car ahead in 200 meters." by the Spotter during a race, although there is no such slow car, you can disable the warnings by using the voice command:
+
+	No more *warning*, please.
+	
+Use one of "slow car warnings", "ahead accidents warnings", "behind accidents information" for *warning* as required. If this is not usable for you, for example, because you re not using voice control at all, you can also disable the accident warnings completely in the configuration.
 
 ## Track Mapping
 

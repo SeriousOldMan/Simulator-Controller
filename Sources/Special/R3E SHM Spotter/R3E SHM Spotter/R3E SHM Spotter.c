@@ -458,7 +458,7 @@ BOOL checkPositions(int playerID) {
 	return FALSE;
 }
 
-#define NumIdealLines 1000
+#define NumIdealLines 10000
 typedef struct {
 	int count;
 
@@ -468,8 +468,10 @@ typedef struct {
 } ideal_line;
 ideal_line idealLine[NumIdealLines];
 
+int idealLineSize = 0;
+
 void updateIdealLine(int vehicleId, double running, double speed) {
-	ideal_line* slot = &idealLine[(int)round(running * 999)];
+	ideal_line* slot = &idealLine[(int)round(running * (idealLineSize - 1))];
 	int count = slot->count;
 
 	if (count == 0)
@@ -502,14 +504,50 @@ slow_car_info accidentsAhead[10];
 slow_car_info accidentsBehind[10];
 slow_car_info slowCarsAhead[10];
 
+double getAverageSpeed(double running) {
+	int last = (idealLineSize - 1);
+	int index = (int)round(running * last);
+	int count = 0;
+	double speed = 0;
+	
+	index = min(last, max(0, index));
+	
+	for (int i = max(0, index - 2); i <= min(last, index + 2); i++) {
+		ideal_line* slot = &idealLine[index];
+		
+		if (slot->count > 20) {
+			speed += slot->speed;
+			count += 1;
+		}
+	}
+	
+	return (count > 0) ? speed / count : -1;
+}
+
+double bestLapTime = LONG_MAX;
+
 BOOL checkAccident() {
 	int accidentsAheadCount = 0;
 	int accidentsBehindCount = 0;
 	int slowCarsAheadCount = 0;
 	int playerIdx = getPlayerIndex();
 
-	if (map_buffer->all_drivers_data_1[playerIdx].in_pitlane > 0)
+	if (idealLineSize == 0)
+		idealLineSize = (int)min(NumIdealLines, map_buffer->layout_length / 4);
+
+	if (map_buffer->all_drivers_data_1[playerIdx].in_pitlane > 0) {
+		bestLapTime = LONG_MAX;
+
 		return FALSE;
+	}
+
+	if ((map_buffer->lap_time_previous_self > 0) && ((map_buffer->lap_time_previous_self * 1.002) < bestLapTime))
+	{
+		bestLapTime = map_buffer->lap_time_previous_self;
+
+		for (int i = 0; i < idealLineSize; i++)
+			idealLine[i].count = 0;
+	}
 
 	double driverDistance = map_buffer->all_drivers_data_1[playerIdx].lap_distance;
 
@@ -523,13 +561,13 @@ BOOL checkAccident() {
 			if (speed >= 1) {
 				double carDistance = map_buffer->all_drivers_data_1[id].lap_distance;
 				double running = max(0, min(1, fabs(carDistance / map_buffer->layout_length)));
-				ideal_line* slot = &idealLine[(int)round(running * 999)];
+				double avgSpeed = getAverageSpeed(running);
 
-				if ((slot->count > 50) && (speed < (slot->speed / 2)))
+				if ((avgSpeed >= 0) && (speed < (avgSpeed / 2)))
 				{
 					long distanceAhead = (long)(((carDistance > driverDistance) ? carDistance : (carDistance + map_buffer->layout_length)) - driverDistance);
 
-					if (speed < (slot->speed / 5))
+					if (speed < (avgSpeed / 5))
 					{
 						if ((distanceAhead < aheadAccidentDistance) && (accidentsAheadCount < 10)) {
 							accidentsAhead[accidentsAheadCount].vehicle = id;

@@ -546,7 +546,9 @@ void updateTrackSpline() {
 					if ((gf->iLastTime > 0) && ((gf->iLastTime * 1.002) < bestLapTime)) {
 						bestLapTime = gf->iLastTime;
 
-						for (int i = 0; i < 1000; i++)
+						int size = idealLine.size();
+
+						for (int i = 0; i < size; i++)
 							idealLine[i].count = 0;
 
 						updateLastCarCoordinates(true);

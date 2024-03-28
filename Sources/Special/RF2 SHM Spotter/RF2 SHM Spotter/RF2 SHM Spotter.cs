@@ -637,13 +637,13 @@ namespace RF2SHMSpotter {
 			return (count > 0) ? speed / count : -1;
 		}
 
-		double bestLapTime = long.MaxValue;
+		double bestLapTime = int.MaxValue;
 
         bool checkAccident(ref rF2VehicleScoring playerScoring)
         {
 			if (playerScoring.mInPits != 0)
 			{
-				bestLapTime = long.MaxValue;
+				bestLapTime = int.MaxValue;
 
 				return false;
 			}
@@ -652,9 +652,13 @@ namespace RF2SHMSpotter {
             List<SlowCarInfo> accidentsBehind = new List<SlowCarInfo>();
             List<SlowCarInfo> slowCarsAhead = new List<SlowCarInfo>();
 
-            if (idealLine.Count == 0)
-                for (int i = 0; i < (scoring.mScoringInfo.mLapDist / 4); i++)
-                    idealLine.Add(new IdealLine());
+			if (idealLine.Count == 0)
+			{
+				idealLine.Capacity = (int)(scoring.mScoringInfo.mLapDist / 4) + 1;
+
+				for (int i = 0; i < (scoring.mScoringInfo.mLapDist / 4); i++)
+					idealLine.Add(new IdealLine());
+			}
 
             if ((playerScoring.mLastLapTime > 0) && ((playerScoring.mLastLapTime * 1.002) < bestLapTime))
             {

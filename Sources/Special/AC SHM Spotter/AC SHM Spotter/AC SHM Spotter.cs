@@ -678,8 +678,12 @@ namespace ACSHMSpotter {
 			if (cars.numVehicles > 0)
 			{
 				if (idealLine.Count == 0)
+				{
+					idealLine.Capacity = (int)(staticInfo.TrackSPlineLength / 4) + 1;
+
 					for (int i = 0; i < (staticInfo.TrackSPlineLength / 4); i++)
 						idealLine.Add(new IdealLine());
+				}
 
                 ref AcCarInfo driver = ref cars.cars[0];
 

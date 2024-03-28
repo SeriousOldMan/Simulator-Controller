@@ -166,8 +166,11 @@ class ACCSetupEditor extends FileSetupEditor {
 		if (track && (track != true))
 			directory .= ("\" . track)
 
-		if this.Window
+		if this.Window {
+			this.Workbench.Window.Opt("-OwnDialogs")
+
 			this.Window.Opt("+OwnDialogs")
+		}
 		else
 			this.Workbench.Window.Opt("+OwnDialogs")
 
@@ -235,8 +238,11 @@ class ACCSetupComparator extends FileSetupComparator {
 		if (track && (track != true))
 			directory .= ("\" . track)
 
-		if this.Window
+		if this.Window {
+			this.Editor.Window.Opt("-OwnDialogs")
+
 			this.Window.Opt("+OwnDialogs")
+		}
 		else
 			this.Editor.Window.Opt("+OwnDialogs")
 

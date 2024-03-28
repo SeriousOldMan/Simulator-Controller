@@ -524,7 +524,7 @@ double getAverageSpeed(double running) {
 	return (count > 0) ? speed / count : -1;
 }
 
-double bestLapTime = LONG_MAX;
+double bestLapTime = INT_LEAST32_MAX;
 
 BOOL checkAccident() {
 	int accidentsAheadCount = 0;
@@ -536,7 +536,7 @@ BOOL checkAccident() {
 		idealLineSize = (int)min(NumIdealLines, map_buffer->layout_length / 4);
 
 	if (map_buffer->all_drivers_data_1[playerIdx].in_pitlane > 0) {
-		bestLapTime = LONG_MAX;
+		bestLapTime = INT_LEAST32_MAX;
 
 		return FALSE;
 	}

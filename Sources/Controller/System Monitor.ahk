@@ -51,7 +51,7 @@ global kStateIcons := CaseInsenseMap("Disabled", kIconsDirectory . "Black.ico"
 								   , "Active", kIconsDirectory . "Green.ico"
 								   , "Warning", kIconsDirectory . "Yellow.ico"
 								   , "Critical", kIconsDirectory . "Red.ico"
-								   , "Unknown", kIconsDirectory . "Empty.png")
+								   , "Unknown", kIconsDirectory . "Black.ico")
 
 
 ;;;-------------------------------------------------------------------------;;;

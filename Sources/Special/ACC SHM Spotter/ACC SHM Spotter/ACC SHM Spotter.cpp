@@ -464,12 +464,12 @@ public:
 
 typedef std::unordered_map<std::string, TrackSplinePoint> TrackSpline;
 
-TrackSpline trackSpline1;
-TrackSpline trackSpline2;
+TrackSpline trackSpline1 = TrackSpline();
+TrackSpline trackSpline2 = TrackSpline();
 TrackSpline* buildTrackSpline = NULL;
 
 float startPosX, startPosY, referenceDriverPosX, referenceDriverPosY;
-float buildTrackSplineRunning, buildTrackSplineLength;
+float buildTrackSplineRunning;
 
 int referenceDriverIdx;
 long lastTrackSplineUpdate = 0;
@@ -540,7 +540,9 @@ void updateTrackSpline() {
 			referenceDriverPosY = newPosY;
 
 			if (distance > 0) {
-				if (fabs(newPosX - startPosX) < 20.0 && fabs(newPosY - startPosY) < 20.0 && buildTrackSpline->size() > 100) {
+				string key = std::to_string((long)round(newPosX / 10)) + "|" + std::to_string((long)round(newPosY / 10));
+
+				if (buildTrackSpline->size() > 100 && fabs(newPosX - startPosX) < 30.0 && fabs(newPosY - startPosY) < 30.0) {
 					trackSplineBuilding = false;
 
 					if ((gf->iLastTime > 0) && ((gf->iLastTime * 1.002) < bestLapTime)) {
@@ -553,21 +555,23 @@ void updateTrackSpline() {
 
 						updateLastCarCoordinates(true);
 
-						float lastDistance = buildTrackSplineLength;
+						int last = (int)(buildTrackSpline->size() / 2) - 1;
 
-						for (int i = (int)(buildTrackSpline->size() / 2) - 1; i >= 0; --i) {
-							TrackSplinePoint point = (*buildTrackSpline)[std::to_string(i)];
+						buildTrackSplineRunning = 0;
 
-							if (point.distance > lastDistance)
+						for (int i = 0; i <= last; i++) {
+							TrackSplinePoint point = (*buildTrackSpline)["#" + std::to_string(i)];
+
+							if (point.distance < buildTrackSplineRunning)
 								buildTrackSpline->erase(point.key);
+							else
+								buildTrackSplineRunning = point.distance;
 
-							buildTrackSpline->erase(std::to_string(i));
-
-							lastDistance = point.distance;
+							buildTrackSpline->erase("#" + std::to_string(i));
 						}
 
 						activeTrackSpline = buildTrackSpline;
-						activeTrackSplineLength = buildTrackSplineLength;
+						activeTrackSplineLength = buildTrackSplineRunning;
 
 						trackSplineReady = true;
 						trackSplineBuilding = false;
@@ -577,24 +581,23 @@ void updateTrackSpline() {
 
 							output.open(traceFileName, std::ios::out | std::ios::app);
 
-							output << "========== Finished mapping track (" << buildTrackSplineLength << ", " << maxX - minX << ", " << maxY - minY << ") ==========" << std::endl;
+							output << "========== Finished mapping track (" << buildTrackSplineRunning << ", " << maxX - minX << ", " << maxY - minY << ") ==========" << std::endl;
 
 							output.close();
 						}
 					}
 				}
 				else {
-					string key = std::to_string((long)round(newPosX / 10)) + std::to_string((long)round(newPosY / 10));
+					string key = std::to_string((long)round(newPosX / 10)) + "|" + std::to_string((long)round(newPosY / 10));
 
 					if (!buildTrackSpline->contains(key)) {
 						buildTrackSplineRunning += distance;
-						buildTrackSplineLength = max(buildTrackSplineLength, buildTrackSplineRunning);
 
 						TrackSplinePoint point = TrackSplinePoint(key, buildTrackSplineRunning);
 						int index = (int)(buildTrackSpline->size() / 2);
 
 						(*buildTrackSpline)[key] = point;
-						(*buildTrackSpline)[std::to_string(index)] = point;
+						(*buildTrackSpline)["#" + std::to_string(index)] = point;
 					}
 					else {
 						buildTrackSplineRunning = (*buildTrackSpline)[key].distance;
@@ -615,15 +618,13 @@ void updateTrackSpline() {
 
 						output.open(traceFileName, std::ios::out | std::ios::app);
 
-						output << buildTrackSpline->size() << ": Track: " << buildTrackSplineLength << "; Distance: " << round(distance) << "; Key: " << key << std::endl;
+						output << buildTrackSpline->size() << ": Track: " << buildTrackSplineRunning << "; Distance: " << round(distance) << "; Key: " << key << std::endl;
 
 						output.close();
 					}
 					*/
 				}
 			}
-
-			Sleep(50);
 		}
 	}
 	catch (const std::exception& ex) {
@@ -645,7 +646,7 @@ bool startTrackSplineBuilder(int driverIdx) {
 	if (baseLap == -1)
 		baseLap = gf->completedLaps + 1;
 	else if (baseLap <= gf->completedLaps) {
-		if (activeTrackSpline == &trackSpline1) {
+		if ((int)activeTrackSpline == (int)&trackSpline1) {
 			trackSpline2.clear();
 			trackSpline2.reserve(2000);
 
@@ -659,7 +660,6 @@ bool startTrackSplineBuilder(int driverIdx) {
 		}
 
 		trackSplineBuilding = true;
-		buildTrackSplineLength = 0;
 		buildTrackSplineRunning = 0;
 
 		referenceDriverPosX = gf->carCoordinates[driverIdx][0];
@@ -682,7 +682,7 @@ bool startTrackSplineBuilder(int driverIdx) {
 
 			output.open(traceFileName, std::ios::out | std::ios::app);
 
-			output << "========== Start mapping track ==========" << std::endl;
+			output << "========== Start mapping track (" << (int)activeTrackSpline << ", " << (int)buildTrackSpline << ") ==========" << std::endl;
 
 			output.close();
 		}
@@ -696,7 +696,7 @@ bool startTrackSplineBuilder(int driverIdx) {
 float getRunning(int carIdx) {
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
-	string key = std::to_string((long)round(gf->carCoordinates[carIdx][0] / 10)) +
+	string key = std::to_string((long)round(gf->carCoordinates[carIdx][0] / 10)) + "|" +
 				 std::to_string((long)round(gf->carCoordinates[carIdx][2] / 10));
 
 	if (activeTrackSpline->contains(key)) {
@@ -802,14 +802,15 @@ double getAverageSpeed(double running) {
 	
 	index = min(last, max(0, index));
 	
-	for (int i = max(0, index - 2); i <= min(last, index + 2); i++) {
-		IdealLine slot = idealLine[index];
+	if (idealLine[index].count > 20)
+		for (int i = max(0, index - 2); i <= min(last, index + 2); i++) {
+			IdealLine slot = idealLine[i];
 		
-		if (slot.count > 20) {
-			speed += slot.speed;
-			count += 1;
+			if (slot.count > 20) {
+				speed += slot.speed;
+				count += 1;
+			}
 		}
-	}
 	
 	return (count > 0) ? speed / count : -1;
 }

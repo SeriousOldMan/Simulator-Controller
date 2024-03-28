@@ -24,9 +24,9 @@
 
 **Important:** The accident detection has seen many changes since its initial release with 5.6.3. The algorithms used here rely heavily on learning the track layout and the typical drivers speed during the initial laps. Unfortunately, the initial laps also see many accidents in some races, which can lead to false positives further down the road. I have included additional code which tries to detect and correct this, but it does not work all the time yet. If you encounter many false warnings of this type by the Spotter during a race, you can disable them by using the voice command:
 
-	No more [alert], please.
+	No more *warning*, please.
 	
-Use one of "slow car warnings", "ahead accidents warnings", "behind accidents information" for *[alert]* as required. If this is not usable for you, you can also disable the accident warnings completely in the configuration.
+Use one of "slow car warnings", "ahead accidents warnings", "behind accidents information" for *warning* as required. If this is not usable for you, you can also disable the accident warnings completely in the configuration.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-564), if you are running *iRacing* and want to use the new "TyreCompound" action.
 

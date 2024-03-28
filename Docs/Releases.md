@@ -1,4 +1,4 @@
-## 5.6.4.0-release 03/29/24 (planned)
+## 5.6.4.0-release 03/29/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed a regression introduced with 5.6.3.2 which prevented the race start reported correctly by the Spotter in some situations.

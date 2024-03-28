@@ -1010,7 +1010,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 								   , values2String("; ", translate("Started: ") . translate("Yes")
 													   , translate("Session: ") . translate("Waiting...")))
 				}
-				else if this.RaceAssistantActive {
+				else if (this.RaceAssistant && this.RaceAssistantActive) {
 					setMultiMapValue(configuration, "Race Assistants", this.Plugin, "Active")
 
 					setMultiMapValue(configuration, this.Plugin, "State", "Active")

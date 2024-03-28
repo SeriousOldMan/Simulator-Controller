@@ -670,19 +670,36 @@ namespace ACSHMSpotter {
 			
 			return (count > 0) ? speed / count : -1;
 		}
+		
+		int bestLapTime = int.MaxValue;
 
         bool checkAccident()
         {
 			if (cars.numVehicles > 0)
 			{
 				if (idealLine.Count == 0)
+				{
+					idealLine.Capacity = (int)(staticInfo.TrackSPlineLength / 4) + 1;
+
 					for (int i = 0; i < (staticInfo.TrackSPlineLength / 4); i++)
 						idealLine.Add(new IdealLine());
+				}
 
                 ref AcCarInfo driver = ref cars.cars[0];
 
-                if ((driver.isCarInPitline + driver.isCarInPit) > 0)
+                if ((driver.isCarInPitline + driver.isCarInPit) > 0) {
+					bestLapTime = int.MaxValue;
+					
                     return false;
+                }
+
+				if ((driver.lastLapTimeMS > 0) && ((driver.lastLapTimeMS * 1.002) < bestLapTime))
+				{
+					bestLapTime = driver.lastLapTimeMS;
+
+					for (int i = 0; i < idealLine.Count; i++)
+						idealLine[i].count = 0;
+				}
 
                 List<SlowCarInfo> accidentsAhead = new List<SlowCarInfo>();
 				List<SlowCarInfo> accidentsBehind = new List<SlowCarInfo>();

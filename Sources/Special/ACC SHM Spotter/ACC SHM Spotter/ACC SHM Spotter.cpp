@@ -546,9 +546,9 @@ void updateTrackSpline() {
 					if ((gf->iLastTime > 0) && ((gf->iLastTime * 1.002) < bestLapTime)) {
 						bestLapTime = gf->iLastTime;
 
-						int size = idealLine.size();
+						int length = idealLine.size();
 
-						for (int i = 0; i < size; i++)
+						for (int i = 0; i < length; i++)
 							idealLine[i].count = 0;
 
 						updateLastCarCoordinates(true);
@@ -835,9 +835,12 @@ bool checkAccident() {
 			break;
 		}
 
-	if (idealLine.size() == 0)
+	if (idealLine.size() == 0) {
+		idealLine.reserve(trackLength / 4);
+
 		for (int i = 0; i < (trackLength / 4); i++)
 			idealLine.push_back(IdealLine());
+	}
 
 	if (trackSplineBuilding)
 		updateTrackSpline();
@@ -857,9 +860,9 @@ bool checkAccident() {
 		return false;
 	}
 
-	accidentsAhead.resize(0);
-	accidentsBehind.resize(0);
-	slowCarsAhead.resize(0);
+	accidentsAhead.clear();
+	accidentsBehind.clear();
+	slowCarsAhead.clear();
 
 	float driverDistance = getRunning(carID);
 	
@@ -1847,8 +1850,6 @@ int main(int argc, char* argv[])
 
 	char* soundsDirectory = 0;
 	char* audioDevice = 0;
-
-	idealLine.reserve(1000);
 
 	if (argc > 1) {
 		calibrateTelemetry = (strcmp(argv[1], "-Calibrate") == 0);

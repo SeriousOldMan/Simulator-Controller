@@ -477,20 +477,39 @@ double getAverageSpeed(double running) {
 	return (count > 0) ? speed / count : -1;
 }
 
+double bestLapTime = INT_LEAST32_MAX;
+
 bool checkAccident(const SharedMemory* sharedData)
 {
-	if (sharedData->mPitModes[sharedData->mViewedParticipantIndex] > PIT_MODE_NONE)
-		return false;
+	if (sharedData->mPitModes[sharedData->mViewedParticipantIndex] > PIT_MODE_NONE) {
+		bestLapTime = LONG_MAX;
 
-	if (idealLine.size() == 0)
+		return false;
+	}
+
+	if (idealLine.size() == 0) {
+		idealLine.reserve(sharedData->mTrackLength / 4);
+
 		for (int i = 0; i < (sharedData->mTrackLength / 4); i++)
 			idealLine.push_back(IdealLine());
+	}
 
-	accidentsAhead.resize(0);
-	accidentsBehind.resize(0);
-	slowCarsAhead.resize(0);
+	accidentsAhead.clear();
+	accidentsBehind.clear();
+	slowCarsAhead.clear();
 
 	ParticipantInfo driver = sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex];
+	double lastLapTime = sharedData->mLastLapTimes[sharedData->mViewedParticipantIndex];
+
+	if ((lastLapTime > 0) && ((lastLapTime * 1.002) < bestLapTime))
+	{
+		bestLapTime = INT_LEAST32_MAX;
+
+		int length = idealLine.size();
+
+		for (int i = 0; i < length; i++)
+			idealLine[i].count = 0;
+	}
 
 	try
 	{
@@ -1298,8 +1317,6 @@ int main(int argc, char* argv[]) {
 
 	char* soundsDirectory = "";
 	char* audioDevice = "";
-
-	idealLine.reserve(1000);
 
 	if (argc > 1) {
 		calibrateTelemetry = (strcmp(argv[1], "-Calibrate") == 0);

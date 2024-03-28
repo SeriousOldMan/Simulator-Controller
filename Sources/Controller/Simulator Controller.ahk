@@ -457,6 +457,7 @@ class GuiFunctionController extends FunctionController {
 class SimulatorController extends ConfigurationItem {
 	iID := false
 
+	iState := "Foreground"
 	iStarted := false
 
 	iSettings := false
@@ -488,6 +489,16 @@ class SimulatorController extends ConfigurationItem {
 	Settings {
 		Get {
 			return this.iSettings
+		}
+	}
+
+	State {
+		Get {
+			return this.iState
+		}
+
+		Set {
+			return (this.iState := value)
 		}
 	}
 
@@ -1277,7 +1288,10 @@ class SimulatorController extends ConfigurationItem {
 								   , values2String(",", thePlugin.Simulators*), values2String(",", thePlugin.Modes[true]*)))
 				}
 
-				thePlugin.writePluginState(configuration)
+				if (this.State = "Foreground")
+					thePlugin.writePluginState(configuration)
+				else
+					setMultiMapValue(configuration, thePlugin.Plugin, "State", "Disabled")
 			}
 
 			setMultiMapValue(configuration, "Modules", "Plugins", values2String("|", getKeys(plugins)*))
@@ -2239,6 +2253,9 @@ initializeSimulatorController() {
 		finally {
 			protectionOff()
 		}
+
+		if inList(A_Args, "-NoStartup")
+			SimulatorController.Instance.State := "Background"
 
 		registerMessageHandler("Controller", functionMessageHandler)
 		registerMessageHandler("Voice", methodMessageHandler, SimulatorController.Instance)

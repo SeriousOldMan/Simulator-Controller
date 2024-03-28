@@ -82,7 +82,7 @@ class ButtonBoxPreview extends ControllerPreview {
 		local rowHeights := false
 		local columnWidths := false
 		local function, height, width, buttonBoxGui, vertical, row, rowHeight, rowDefinition
-		local horizontal, column, columnWidth, descriptor, label, labelWidth, labelHeight, descriptor, number
+		local horizontal, column, columnWidth, descriptor, label, labelName, labelWidth, labelHeight, descriptor, number
 		local image, imageWidth, imageHeight, x, y, labelHandle
 
 		contextMenu(window, control, item, isRightClick, x, y) {
@@ -143,11 +143,13 @@ class ButtonBoxPreview extends ControllerPreview {
 				descriptor := string2Values(",", descriptor)
 
 				if (descriptor.Length > 1) {
-					label := string2Values("x", getMultiMapValue(this.Configuration, "Labels", descriptor[2], ""))
+					labelName := descriptor[2]
+					label := string2Values("x", getMultiMapValue(this.Configuration, "Labels", labelName, ""))
 					labelWidth := label[1]
 					labelHeight := label[2]
 				}
 				else {
+					labelName := false
 					labelWidth := 0
 					labelHeight := 0
 				}
@@ -196,7 +198,7 @@ class ButtonBoxPreview extends ControllerPreview {
 						if !this.iLabels.Has(row)
 							this.iLabels[row] := CaseInsenseMap()
 
-						this.iLabels[row][column] := label
+						this.iLabels[row][column] := [labelName, label]
 					}
 				}
 
@@ -428,14 +430,27 @@ class ButtonBoxPreview extends ControllerPreview {
 		return false
 	}
 
-	setLabel(row, column, text) {
-		local rowLabels, label
+	hasLabel(row, column) {
+		local rowLabels
 
 		if this.iLabels.Has(row) {
 			rowLabels := this.iLabels[row]
 
 			if rowLabels.Has(column)
-				rowLabels[column].Text := text
+				return rowLabels[column][1]
+		}
+
+		return false
+	}
+
+	setLabel(row, column, text) {
+		local rowLabels
+
+		if this.iLabels.Has(row) {
+			rowLabels := this.iLabels[row]
+
+			if rowLabels.Has(column)
+				rowLabels[column][2].Text := text
 		}
 	}
 
@@ -527,8 +542,12 @@ class ButtonBoxPreview extends ControllerPreview {
 				labelMenu.Add(translate("Empty"), changeLabel.Bind(false))
 				labelMenu.Add()
 
-				for label, definition in LabelsList.Instance.getLabels()
+				for label, definition in LabelsList.Instance.getLabels() {
 					labelMenu.Add(label, changeLabel.Bind(label))
+
+					if (this.hasLabel(row, column) = label)
+						labelMenu.Check(label)
+				}
 
 				mainMenu.Add(translate("Label"), labelMenu)
 			}

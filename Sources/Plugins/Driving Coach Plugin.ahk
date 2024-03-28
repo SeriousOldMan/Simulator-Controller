@@ -89,24 +89,30 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 
 		if this.Active {
 			if this.RaceAssistantEnabled {
-				setMultiMapValue(configuration, "Race Assistants", this.Plugin, (this.iServiceState = "Available") ? "Active" : "Critical")
+				if this.RaceAssistant {
+					setMultiMapValue(configuration, "Race Assistants", this.Plugin, (this.iServiceState = "Available") ? "Active" : "Critical")
 
-				setMultiMapValue(configuration, this.Plugin, "State", (this.iServiceState = "Available") ? "Active" : "Critical")
+					setMultiMapValue(configuration, this.Plugin, "State", (this.iServiceState = "Available") ? "Active" : "Critical")
 
-				information := (translate("Started: ") . translate(this.RaceAssistant ? "Yes" : "No"))
+					information := (translate("Started: ") . translate(this.RaceAssistant ? "Yes" : "No"))
 
-				if (this.iServiceState = "Available") {
-					if !this.RaceAssistantSpeaker
-						information .= ("; " . translate("Silent: ") . translate("Yes"))
+					if (this.iServiceState = "Available") {
+						if !this.RaceAssistantSpeaker
+							information .= ("; " . translate("Silent: ") . translate("Yes"))
 
-					if this.RaceAssistantMuted
-						information .= ("; " . translate("Muted: ") . translate("Yes"))
+						if this.RaceAssistantMuted
+							information .= ("; " . translate("Muted: ") . translate("Yes"))
+					}
+					else if (InStr(this.iServiceState, "Error") = 1)
+						information .= ("; " . translate("Problem: ") . translate(string2Values(":", this.iServiceState)[2]))
+
+
+					setMultiMapValue(configuration, this.Plugin, "Information", information)
 				}
-				else if (InStr(this.iServiceState, "Error") = 1)
-					information .= ("; " . translate("Problem: ") . translate(string2Values(":", this.iServiceState)[2]))
-
-
-				setMultiMapValue(configuration, this.Plugin, "Information", information)
+				else {
+					setMultiMapValue(configuration, "Assistants", this.Plugin, "Passive")
+					setMultiMapValue(configuration, this.Plugin, "State", "Passive")
+				}
 			}
 			else
 				setMultiMapValue(configuration, this.Plugin, "State", "Disabled")
@@ -117,7 +123,7 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 
 	enableRaceAssistant(label := false, startup := false) {
 		startCoach() {
-			if MessageManager.isPaused()
+			if !SimulatorController.Instance.Started
 				return Task.CurrentTask
 			else
 				this.requireRaceAssistant()

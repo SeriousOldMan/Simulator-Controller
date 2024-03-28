@@ -566,14 +566,15 @@ double getAverageSpeed(double running) {
 	
 	index = min(last, max(0, index));
 	
-	for (int i = max(0, index - 2); i <= min(last, index + 2); i++) {
-		IdealLine slot = idealLine[index];
+	if (idealLine[index].count > 20)
+		for (int i = max(0, index - 2); i <= min(last, index + 2); i++) {
+			IdealLine slot = idealLine[i];
 		
-		if (slot.count > 20) {
-			speed += slot.speed;
-			count += 1;
+			if (slot.count > 20) {
+				speed += slot.speed;
+				count += 1;
+			}
 		}
-	}
 	
 	return (count > 0) ? speed / count : -1;
 }
@@ -587,13 +588,16 @@ long bestLapTime = LONG_MAX;
 
 bool checkAccident(const irsdk_header* header, const char* data, const int playerCarIndex, float trackLength)
 {
-	accidentsAhead.resize(0);
-	accidentsBehind.resize(0);
-	slowCarsAhead.resize(0);
+	accidentsAhead.clear();
+	accidentsBehind.clear();
+	slowCarsAhead.clear();
 
-	if (idealLine.size() == 0)
+	if (idealLine.size() == 0) {
+		idealLine.reserve(trackLength / 4);
+
 		for (int i = 0; i < (trackLength / 4); i++)
 			idealLine.push_back(IdealLine());
+	}
 
 	const char* sessionInfo = irsdk_getSessionInfoStr();
 	char result[64];
@@ -639,7 +643,9 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 		{
 			bestLapTime = lastTime;
 
-			for (int i = 0; i < idealLine.size(); i++)
+			int length = idealLine.size();
+
+			for (int i = 0; i < length; i++)
 				idealLine[i].count = 0;
 		}
 
@@ -1722,8 +1728,6 @@ int main(int argc, char* argv[])
 
 	// ask for 1ms timer so sleeps are more precise
 	timeBeginPeriod(1);
-
-	idealLine.reserve(1000);
 
 	bool running = false;
 	int countdown = 1000;

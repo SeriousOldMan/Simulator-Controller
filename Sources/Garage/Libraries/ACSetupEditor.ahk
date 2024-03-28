@@ -141,8 +141,11 @@ class ACSetupEditor extends FileSetupEditor {
 					break
 				}
 
-		if this.Window
+		if this.Window {
+			this.Workbench.Window.Opt("-OwnDialogs")
+
 			this.Window.Opt("+OwnDialogs")
+		}
 		else
 			this.Workbench.Window.Opt("+OwnDialogs")
 
@@ -215,8 +218,11 @@ class ACSetupComparator extends FileSetupComparator {
 					break
 				}
 
-		if this.Window
+		if this.Window {
+			this.Editor.Window.Opt("-OwnDialogs")
+
 			this.Window.Opt("+OwnDialogs")
+		}
 		else
 			this.Editor.Window.Opt("+OwnDialogs")
 

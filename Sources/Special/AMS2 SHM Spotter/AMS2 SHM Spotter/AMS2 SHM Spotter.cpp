@@ -465,14 +465,15 @@ double getAverageSpeed(double running) {
 	
 	index = min(last, max(0, index));
 	
-	for (int i = max(0, index - 2); i <= min(last, index + 2); i++) {
-		IdealLine slot = idealLine[index];
+	if (idealLine[index].count > 20)
+		for (int i = max(0, index - 2); i <= min(last, index + 2); i++) {
+			IdealLine slot = idealLine[i];
 		
-		if (slot.count > 20) {
-			speed += slot.speed;
-			count += 1;
+			if (slot.count > 20) {
+				speed += slot.speed;
+				count += 1;
+			}
 		}
-	}
 	
 	return (count > 0) ? speed / count : -1;
 }

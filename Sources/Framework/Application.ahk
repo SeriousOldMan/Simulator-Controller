@@ -496,10 +496,12 @@ if (!isDetachedInstallation() && !isDebug() && !inList(kBackgroundApps, StrSplit
 
 	requestShareSessionDatabaseConsent()
 
+	/*
 	if kLogStartup
 		logMessage(kLogOff, "Checking for news...")
 
 	checkForNews()
+	*/
 
 	if kLogStartup
 		logMessage(kLogOff, "Starting database synchronizer...")

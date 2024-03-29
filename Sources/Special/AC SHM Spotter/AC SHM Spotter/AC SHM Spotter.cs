@@ -658,15 +658,16 @@ namespace ACSHMSpotter {
 			double speed = 0;
 			
 			index = Math.Min(last, Math.Max(0, index));
-			
-			for (int i = Math.Max(0, index - 2); i <= Math.Min(last, index + 2); i++) {
-				IdealLine slot = idealLine[index];
+
+            if (idealLine[index].count > 20)
+                for (int i = Math.Max(0, index - 2); i <= Math.Min(last, index + 2); i++) {
+					IdealLine slot = idealLine[i];
 				
-				if (slot.count > 20) {
-					speed += slot.speed;
-					count += 1;
+					if (slot.count > 20) {
+						speed += slot.speed;
+						count += 1;
+					}
 				}
-			}
 			
 			return (count > 0) ? speed / count : -1;
 		}

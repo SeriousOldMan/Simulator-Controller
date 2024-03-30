@@ -482,8 +482,6 @@ int maxX = INT_MIN;
 int minY = INT_MAX;
 int maxY = INT_MIN;
 
-float lastCarCoordinates[60][2];
-
 string traceFileName = "";
 
 TrackSpline* activeTrackSpline = NULL;
@@ -503,25 +501,95 @@ public:
 
 std::vector<IdealLine> idealLine;
 
+class CarPosition {
+public:
+	long lastUpdate;
+
+	float posX;
+	float posY;
+
+	CarPosition() :
+		lastUpdate(0), posX(0), posY(0) {}
+
+	CarPosition(long lu, float x, float y) :
+		lastUpdate(lu),
+		posX(x),
+		posY(y) {}
+};
+
+std::unordered_map<int, CarPosition> lastCarCoordinates;
+
+long lastCarCoordinatesCount = 0;
 long lastCarCoordinatesUpdate = 0;
 
-inline void updateLastCarCoordinates(bool init) {
+inline bool getLastCarCoordinates(int carIndex, float* posX, float* posY) {
+	int carID = ((SPageFileGraphic*)m_graphics.mapFileBuffer)->carID[carIndex];
+
+	if (lastCarCoordinates.contains(carID) && (lastCarCoordinates[carID].lastUpdate == lastCarCoordinatesCount)) {
+		(*posX) = lastCarCoordinates[carID].posX;
+		(*posY) = lastCarCoordinates[carID].posY;
+
+		return true;
+	}
+	else
+		return false;
+}
+
+bool getLastCarCoordinates(int carIndex, long milliSeconds, float* speed) {
+	float lastX, lastY;
+
+	if (getLastCarCoordinates(carIndex, &lastX, &lastY)) {
+		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
+
+		float newPosX = gf->carCoordinates[carIndex][0];
+		float newPosY = gf->carCoordinates[carIndex][2];
+
+		(*speed) = (vectorLength(lastX - newPosX, lastY - newPosY) / ((float)milliSeconds / 1000.0f)) * 3.6f;
+
+		return true;
+	}
+	else
+		return false;
+}
+
+void updateLastCarCoordinates(bool init) {
 	lastCarCoordinatesUpdate = GetTickCount();
 
 	if (init) {
-		for (int i = 0; i < 60; i++) {
-			lastCarCoordinates[i][0] = INT_MAX;
-			lastCarCoordinates[i][1] = INT_MAX;
-		}
+		lastCarCoordinates.clear();
+		lastCarCoordinatesCount = 0;
 	}
 	else {
 		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
-		for (int i = 0; i < 60; i++) {
-			lastCarCoordinates[i][0] = gf->carCoordinates[i][0];
-			lastCarCoordinates[i][1] = gf->carCoordinates[i][2];
+		lastCarCoordinatesCount += 1;
+
+		for (int i = 0; i < gf->activeCars; i++) {
+			int carID = gf->carID[i];
+
+			if (lastCarCoordinates.contains(carID)) {
+				lastCarCoordinates[carID].lastUpdate = lastCarCoordinatesCount;
+				lastCarCoordinates[carID].posX = gf->carCoordinates[i][0];
+				lastCarCoordinates[carID].posY = gf->carCoordinates[i][2];
+			}
+			else
+				lastCarCoordinates[carID] = CarPosition(lastCarCoordinatesCount, gf->carCoordinates[i][0], gf->carCoordinates[i][2]);
 		}
 	}
+}
+
+inline bool hasValidCarCoordinates(long* milliSeconds) {
+	(*milliSeconds) = GetTickCount() - lastCarCoordinatesUpdate;
+
+	if ((*milliSeconds) < 100)
+		return false;
+	else if ((*milliSeconds) > 200) {
+		updateLastCarCoordinates(false);
+
+		return false;
+	}
+	else
+		return true;
 }
 
 void updateTrackSpline() {
@@ -718,17 +786,10 @@ float getRunning(int carIdx) {
 		return -1;
 }
 
-float getSpeed(int carIdx, long deltaMS) {
-	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
+inline float getSpeed(int carIdx, long milliSeconds) {
+	float speed;
 
-	float newPosX = gf->carCoordinates[carIdx][0];
-	float newPosY = gf->carCoordinates[carIdx][2];
-	float lastPosX = lastCarCoordinates[carIdx][0];
-	float lastPosY = lastCarCoordinates[carIdx][1];
-
-	if ((lastPosX != INT_MAX) || (lastPosY != INT_MAX)) {
-		float speed = (vectorLength(lastPosX - newPosX, lastPosY - newPosY) / ((float)deltaMS / 1000.0f)) * 3.6f;
-
+	if (getLastCarCoordinates(carIdx, milliSeconds, &speed)) {
 		/*
 		if (traceFileName != "") {
 			std::ofstream output;
@@ -849,15 +910,10 @@ bool checkAccident() {
 	if (!trackSplineReady)
 		return false;
 
-	long milliSeconds = GetTickCount() - lastCarCoordinatesUpdate;
+	long milliSeconds;
 
-	if (milliSeconds < 100)
+	if (!hasValidCarCoordinates(&milliSeconds))
 		return false;
-	else if (milliSeconds > 200) {
-		updateLastCarCoordinates(false);
-
-		return false;
-	}
 
 	accidentsAhead.clear();
 	accidentsBehind.clear();

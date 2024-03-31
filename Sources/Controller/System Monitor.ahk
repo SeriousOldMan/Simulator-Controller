@@ -62,6 +62,45 @@ global gStartupFinished := false
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                         Private Classes Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+class SystemMonitorResizer extends Window.Resizer {
+	iViewer := []
+	iRedraw := false
+
+	__New(window, viewer*) {
+		this.iViewer := viewer
+
+		super.__New(window)
+
+		Task.startTask(ObjBindMethod(this, "RedrawHTMLViewer"), 500, kLowPriority)
+	}
+
+	Redraw() {
+		this.iRedraw := true
+	}
+
+	RedrawHTMLViewer() {
+		if this.iRedraw {
+			local ignore, button
+
+			for ignore, button in ["LButton", "MButton", "RButton"]
+				if GetKeyState(button, "P")
+					return Task.CurrentTask
+
+			this.iRedraw := false
+
+			for ignore, viewer in this.iViewer
+				viewer.Resized()
+		}
+
+		return Task.CurrentTask
+	}
+}
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -1707,7 +1746,7 @@ systemMonitor(command := false, arguments*) {
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
 		simulationState := systemMonitorGui.Add("Picture", "x34 ys+73 w32 h32", kIconsDirectory . "Black.ico")
-		simulationDashboard := systemMonitorGui.Add("HTMLViewer", "x94 ys+46 w300 h95 Hidden")
+		simulationDashboard := systemMonitorGui.Add("HTMLViewer", "x94 ys+46 w300 h95 H:Grow(0.333333333) Hidden")
 
 		systemMonitorGui.SetFont("Italic", "Arial")
 		systemMonitorGui.Add("GroupBox", "x405 ys+28 w375 h9", translate("Race Assistants"))
@@ -1715,39 +1754,39 @@ systemMonitor(command := false, arguments*) {
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
 		assistantsState := systemMonitorGui.Add("Picture", "x415 ys+73 w32 h32", kIconsDirectory . "Black.ico")
-		assistantsDashboard := systemMonitorGui.Add("HTMLViewer", "x475 ys+46 w300 h95 Hidden")
+		assistantsDashboard := systemMonitorGui.Add("HTMLViewer", "x475 ys+46 w300 h95 H:Grow(0.333333333) Hidden")
 
 		systemMonitorGui.SetFont("Italic", "Arial")
-		systemMonitorGui.Add("GroupBox", "x24 ys+138 w375 h9", translate("Team Session"))
-		systemMonitorGui.Add("Text", "x160 yp+7 w230 0x10")
+		systemMonitorGui.Add("GroupBox", "x24 ys+138 w375 h9 Y:Move(0.333333333)", translate("Team Session"))
+		systemMonitorGui.Add("Text", "x160 yp+7 w230 0x10 Y:Move(0.333333333)")
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
-		sessionState := systemMonitorGui.Add("Picture", "x34 ys+183 w32 h32 vsessionState", kIconsDirectory . "Black.ico")
-		sessionDashboard := systemMonitorGui.Add("HTMLViewer", "x94 ys+156 w300 h95 Hidden")
+		sessionState := systemMonitorGui.Add("Picture", "x34 ys+183 w32 h32 Y:Move(0.333333333) vsessionState", kIconsDirectory . "Black.ico")
+		sessionDashboard := systemMonitorGui.Add("HTMLViewer", "x94 ys+156 w300 h95 Y:Move(0.333333333) H:Grow(0.333333333) Hidden")
 
 		systemMonitorGui.SetFont("Italic", "Arial")
-		systemMonitorGui.Add("GroupBox", "x405 ys+138 w375 h9", translate("Data Synchronization"))
-		systemMonitorGui.Add("Text", "x541 yp+7 w230 0x10")
+		systemMonitorGui.Add("GroupBox", "x405 ys+138 w375 h9 Y:Move(0.333333333)", translate("Data Synchronization"))
+		systemMonitorGui.Add("Text", "x541 yp+7 w230 0x10 Y:Move(0.333333333)")
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
-		dataState := systemMonitorGui.Add("Picture", "x415 ys+183 w32 h32 vdataState", kIconsDirectory . "Black.ico")
-		dataDashboard := systemMonitorGui.Add("HTMLViewer", "x475 ys+156 w300 h95 Hidden")
+		dataState := systemMonitorGui.Add("Picture", "x415 ys+183 w32 h32 Y:Move(0.333333333) vdataState", kIconsDirectory . "Black.ico")
+		dataDashboard := systemMonitorGui.Add("HTMLViewer", "x475 ys+156 w300 h95 Y:Move(0.333333333) H:Grow(0.333333333) Hidden")
 
 		systemMonitorGui.SetFont("Italic", "Arial")
-		systemMonitorGui.Add("GroupBox", "x24 ys+248 w375 h9", translate("Track Automation"))
-		systemMonitorGui.Add("Text", "x160 yp+7 w230 0x10")
+		systemMonitorGui.Add("GroupBox", "x24 ys+248 w375 h9 Y:Move(0.66)", translate("Track Automation"))
+		systemMonitorGui.Add("Text", "x160 yp+7 w230 0x10 Y:Move(0.66)")
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
-		automationState := systemMonitorGui.Add("Picture", "x34 ys+293 w32 h32 vautomationState", kIconsDirectory . "Black.ico")
-		automationDashboard := systemMonitorGui.Add("HTMLViewer", "x94 ys+266 w300 h95 Hidden")
+		automationState := systemMonitorGui.Add("Picture", "x34 ys+293 w32 h32 Y:Move(0.66) vautomationState", kIconsDirectory . "Black.ico")
+		automationDashboard := systemMonitorGui.Add("HTMLViewer", "x94 ys+266 w300 h95 Y:Move(0.66) H:Grow(0.333333333) Hidden")
 
 		systemMonitorGui.SetFont("Italic", "Arial")
-		systemMonitorGui.Add("GroupBox", "x405 ys+248 w375 h9", translate("Track Mapping"))
-		systemMonitorGui.Add("Text", "x541 yp+7 w230 0x10")
+		systemMonitorGui.Add("GroupBox", "x405 ys+248 w375 h9 Y:Move(0.66)", translate("Track Mapping"))
+		systemMonitorGui.Add("Text", "x541 yp+7 w230 0x10 Y:Move(0.66)")
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
-		mapperState := systemMonitorGui.Add("Picture", "x415 ys+293 w32 h32 vmapperState", kIconsDirectory . "Black.ico")
-		mapperDashboard := systemMonitorGui.Add("HTMLViewer", "x475 ys+266 w300 h95 Hidden")
+		mapperState := systemMonitorGui.Add("Picture", "x415 ys+293 w32 h32 Y:Move(0.66) vmapperState", kIconsDirectory . "Black.ico")
+		mapperDashboard := systemMonitorGui.Add("HTMLViewer", "x475 ys+266 w300 h95 Y:Move(0.66) H:Grow(0.333333333) Hidden")
 
 		monitorTabView.UseTab(2)
 
@@ -1833,6 +1872,9 @@ systemMonitor(command := false, arguments*) {
 
 		logLevelDropDown := systemMonitorGui.Add("DropDownList", "x689 yp-1 w91 Y:Move Choose" . chosen, collect(choices, translate))
 		logLevelDropDown.OnEvent("Change", chooseLogLevel)
+
+		systemMonitorGui.Add(SystemMonitorResizer(systemMonitorGui, simulationDashboard, assistantsDashBoard, sessionDashboard
+																  , dataDashboard, automationDashboard, mapperDashboard))
 
 		/*
 		monitorTabView.UseTab()

@@ -1,9 +1,9 @@
 [Development]
 Version=5.6.5.0-dev
 Target=5.6.5.0-release
-Date=03/30/2024
+Date=03/31/2024
 Download=
-Changes=ACC accident detection also for Big Grid sessions, Fixed rF2 pitstop settings transfer
+Changes=ACC accident detection also for Big Grid sessions, Fixed rF2 pitstop settings transfer, Resizing of dashboard widgets in "System Monitor", Fine-tuning accident detection
 Components=Media->5.6.1,Configuration->5.6.4,Utilities->5.4.8
 [Release]
 Version=5.6.4.0-release

@@ -357,10 +357,13 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 		}
 	}
 
-	shutdownTrackAutomation(force := false, *) {
+	shutdownTrackAutomation(force := false, arguments*) {
 		local pid := this.iAutomationPID
 		local processName, tries
 
+		if ((arguments.Length > 0) && inList(["Logoff", "Shutdown"], arguments[1]))
+			return false
+		
 		if pid {
 			ProcessClose(pid)
 
@@ -562,9 +565,12 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 		}
 	}
 
-	shutdownTrackMapper(force := false, *) {
+	shutdownTrackMapper(force := false, arguments*) {
 		local pid, processName, tries
 
+		if ((arguments.Length > 0) && inList(["Logoff", "Shutdown"], arguments[1]))
+			return false
+		
 		if (force || (this.iMapperPID && (this.iMapperPhase = "Collect"))) {
 			pid := this.iMapperPID
 

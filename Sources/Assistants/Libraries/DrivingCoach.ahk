@@ -882,7 +882,10 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 	}
 
-	stopTelemetryCollector(*) {
+	stopTelemetryCollector(arguments*) {
+		if ((arguments.Length > 0) && inList(["Logoff", "Shutdown"], arguments[1]))
+			return false
+			
 		this.stopTelemetryAnalyzer()
 
 		if this.iTelemetryCollector {

@@ -865,7 +865,7 @@ class SetupWorkbench extends ConfigurationItem {
 				else
 					SupportMenu.Uncheck(label)
 		}
-		
+
 		Task.startTask(setDebugAsync)
 	}
 
@@ -1429,7 +1429,7 @@ class SetupWorkbench extends ConfigurationItem {
 				writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 
 				if (track != true) {
-					track := inList(this.getTracks(this.SelectedSimulator, this.SelectedCar), track)
+					track := inList(this.getTracks(this.SelectedSimulator, this.SelectedCar), SessionDatabase.getTrackName(this.SelectedSimulator, track))
 
 					if !track
 						track := 1
@@ -2109,7 +2109,7 @@ class EnumerationHandler extends SettingHandler {
 			return (isSet(key) ? this.iValues[key] : this.iValues)
 		}
 	}
-	
+
 	__New(zero := 0, increment := 1, values*) {
 		this.iZero := zero
 		this.iIncrement := increment

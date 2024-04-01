@@ -2278,33 +2278,33 @@ addOwnerField(database, table, id) {
 	}
 }
 
-clearWearFields(database, table, id) {
-	local rows := database.Tables[table]
-	local changed, ignore, row, tyre, field
-
-	if (rows.Length > 0) {
-		changed := false
-
-		for ignore, row in rows
-			for ignore, tyre in ["Front.Left", "Front.Right", "Rear.Left", "Rear.Right"] {
-				field := ("Tyre.Wear." . tyre)
-
-				if (row.Has(field) && (row[field] = id)) {
-					row[field] := kNull
-
-					changed := true
-				}
-			}
-
-		if changed
-			database.changed(table)
-	}
-}
-
 updateConfigurationForV422() {
 	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
 	local userConfiguration := readMultiMap(userConfigurationFile)
 	local id, simulator, car, track, db, tyresDB
+
+	clearWearFields(database, table, id) {
+		local rows := database.Tables[table]
+		local changed, ignore, row, tyre, field
+
+		if (rows.Length > 0) {
+			changed := false
+
+			for ignore, row in rows
+				for ignore, tyre in ["Front.Left", "Front.Right", "Rear.Left", "Rear.Right"] {
+					field := ("Tyre.Wear." . tyre)
+
+					if (row.Has(field) && (row[field] = id)) {
+						row[field] := kNull
+
+						changed := true
+					}
+				}
+
+			if changed
+				database.changed(table)
+		}
+	}
 
 	if (getMultiMapValue(userConfiguration, "Assetto Corsa", "Window Title", false) = "Assetto Corsa Launcher") {
 		setMultiMapValue(userConfiguration, "Assetto Corsa", "Window Title", "ahk_exe acs.exe")

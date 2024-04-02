@@ -1,7 +1,7 @@
 [Development]
 Version=5.6.5.0-dev
 Target=5.6.5.0-release
-Date=04/01/2024
+Date=04/02/2024
 Download=
 Changes=ACC accident detection also for Big Grid sessions, Fixed rF2 pitstop settings transfer, Resizing of dashboard widgets in "System Monitor", Fine-tuning accident detection, Fixed track pre-selection in "Setup Workbench", Optimized system shutdown handling by the SC apps
 Components=Media->5.6.1,Configuration->5.6.4,Utilities->5.4.8

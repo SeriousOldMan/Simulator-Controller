@@ -494,12 +494,106 @@ class IdealLine
 public:
 	int count = 0;
 
-	double speed = 0;
-	double posX = 0;
-	double posY = 0;
+	std::vector<float> speeds;
+
+	float speed = 0;
+	float posX = 0;
+	float posY = 0;
+
+	float average() {
+		int length = speeds.size();
+		double average = 0;
+
+		for (int i = 0; i < length; ++i)
+			average += speeds[i];
+
+		return average / length;
+	}
+
+	float stdDeviation() {
+		int length = speeds.size();
+		float avg = average();
+		double sqrSum = 0;
+
+		for (int i = 0; i < length; ++i) {
+			float speed = speeds[i];
+
+			sqrSum += (speed - avg) * (speed - avg);
+		}
+
+		return sqrt(sqrSum / length);
+	}
+
+	void cleanup() {
+		int length = speeds.size();
+		float avg = average();
+		float stdDev = stdDeviation();
+		int i = 0;
+
+		while (i < length) {
+			float speed = speeds[i];
+
+			if (abs(speed - avg) > stdDev) {
+				speeds.erase(speeds.begin() + i);
+
+				length -= 1;
+			}
+			else
+				i += 1;
+		}
+
+		count = length;
+		speed = average();
+	}
+
+	void update(float s, float x, float y) {
+		if (count == 0)
+		{
+			speeds.reserve(1000);
+
+			speeds.push_back(speed);
+
+			count = 1;
+
+			speed = s;
+
+			posX = x;
+			posY = y;
+		}
+		else if (count < 1000)
+		{
+			count += 1;
+
+			speeds.push_back(speed);
+
+			speed = ((speed * count) + speed) / (count + 1);
+
+			posX = ((posX * count) + x) / (count + 1);
+			posY = ((posY * count) + y) / (count + 1);
+
+			if (speeds.size() % 100 == 0)
+				cleanup();
+		}
+	}
+
+	void clear() {
+		count = 0;
+
+		speeds.clear();
+		speeds.reserve(1000);
+
+		posX = 0;
+		posY = 0;
+	}
 };
 
 std::vector<IdealLine> idealLine;
+
+void updateIdealLine(int carIdx, double running, double speed) {
+	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
+
+	idealLine[(int)std::round(running * (idealLine.size() - 1))].update(speed, gf->carCoordinates[carIdx][0], gf->carCoordinates[carIdx][2]);
+}
 
 class CarPosition {
 public:
@@ -617,7 +711,7 @@ void updateTrackSpline() {
 						int length = idealLine.size();
 
 						for (int i = 0; i < length; i++)
-							idealLine[i].count = 0;
+							idealLine[i].clear();
 
 						updateLastCarCoordinates(true);
 
@@ -806,31 +900,6 @@ inline float getSpeed(int carIdx, long milliSeconds) {
 	}
 	else
 		return -1;
-}
-
-void updateIdealLine(int carIdx, double running, double speed) {
-	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
-	int index = (int)std::round(running * (idealLine.size() - 1));
-	int count = idealLine[index].count;
-
-	if (count == 0)
-	{
-		idealLine[index].count = 1;
-
-		idealLine[index].speed = speed;
-
-		idealLine[index].posX = gf->carCoordinates[carIdx][0];
-		idealLine[index].posY = gf->carCoordinates[carIdx][2];
-	}
-	else if (idealLine[index].count < 1000)
-	{
-		idealLine[index].count += 1;
-
-		idealLine[index].speed = ((idealLine[index].speed * count) + speed) / (count + 1);
-
-		idealLine[index].posX = ((idealLine[index].posX * count) + gf->carCoordinates[carIdx][0]) / (count + 1);
-		idealLine[index].posY = ((idealLine[index].posY * count) + gf->carCoordinates[carIdx][2]) / (count + 1);
-	}
 }
 
 class SlowCarInfo

@@ -229,7 +229,7 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups, downloadStrategie
 
 	try {
 		try {
-			DirDelete(kTempDirectory "Shared Database", 1)
+			DirDelete(kTempDirectory . "Shared Database", 1)
 		}
 		catch Any as exception {
 			logError(exception)

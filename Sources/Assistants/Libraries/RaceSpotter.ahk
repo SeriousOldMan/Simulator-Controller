@@ -2981,10 +2981,13 @@ class RaceSpotter extends GridRaceAssistant {
 		return false
 	}
 
-	shutdownSpotter(force := false, *) {
+	shutdownSpotter(force := false, arguments*) {
 		local pid := this.iSpotterPID
 		local processName, tries
 
+		if ((arguments.Length > 0) && inList(["Logoff", "Shutdown"], arguments[1]))
+			return false
+		
 		if pid {
 			ProcessClose(pid)
 

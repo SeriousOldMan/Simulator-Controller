@@ -425,7 +425,10 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	shutdownUDPClient(force := false, *) {
+	shutdownUDPClient(force := false, arguments*) {
+		if ((arguments.Length > 0) && inList(["Logoff", "Shutdown"], arguments[1]))
+			return false
+		
 		if ((this.UDPClient || force) && ProcessExist("ACC UDP Provider.exe")) {
 			loop 5 {
 				try {

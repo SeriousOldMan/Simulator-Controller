@@ -551,9 +551,12 @@ receiveWindowMessage(wParam, lParam, *) {
 		Task.startTask(ObjBindMethod(messageHandler, "call", category, data[2]))
 }
 
-stopMessageManager(*) {
+stopMessageManager(arguments*) {
 	local pid
 
+	if ((arguments.Length > 0) && inList(["Logoff", "Shutdown"], arguments[1]))
+			return false
+	
 	Task.removeTask(MessageManager.Instance)
 
 	pid := ProcessExist()

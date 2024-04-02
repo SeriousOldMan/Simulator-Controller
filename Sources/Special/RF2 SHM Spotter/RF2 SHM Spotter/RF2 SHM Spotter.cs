@@ -573,36 +573,109 @@ namespace RF2SHMSpotter {
         class IdealLine
 		{
 			public int count = 0;
-			
-			public double speed = 0;
-            public double posX = 0;
-            public double posY = 0;
+
+            List<float> speeds = new List<float>(1000);
+
+            public float speed = 0;
+            public float posX = 0;
+            public float posY = 0;
+
+            float average()
+            {
+                int length = speeds.Count;
+                double average = 0;
+
+                for (int i = 0; i < length; ++i)
+                    average += speeds[i];
+
+                return (float)(average / length);
+            }
+
+            float stdDeviation()
+            {
+                int length = speeds.Count;
+                float avg = average();
+                double sqrSum = 0;
+
+                for (int i = 0; i < length; ++i)
+                {
+                    float speed = speeds[i];
+
+                    sqrSum += (speed - avg) * (speed - avg);
+                }
+
+                return (float)Math.Sqrt(sqrSum / length);
+            }
+
+            void cleanup()
+            {
+                int length = speeds.Count;
+                float avg = average();
+                float stdDev = stdDeviation();
+                int i = 0;
+
+                while (i < length)
+                {
+                    float speed = speeds[i];
+
+                    if (Math.Abs(speed - avg) > stdDev)
+                    {
+                        speeds.Remove(i);
+
+                        length -= 1;
+                    }
+                    else
+                        i += 1;
+                }
+
+                count = length;
+                speed = average();
+            }
+
+            public void update(float s, float x, float y)
+            {
+                if (count == 0)
+                {
+                    count = 1;
+
+                    speeds.Add(s);
+
+                    speed = s;
+
+                    posX = x;
+                    posY = y;
+                }
+                else if (count < 1000)
+                {
+                    count += 1;
+
+                    speeds.Add(s);
+
+                    speed = ((speed * count) + speed) / (count + 1);
+
+                    posX = ((posX * count) + x) / (count + 1);
+                    posY = ((posY * count) + y) / (count + 1);
+
+                    if (speeds.Count % 100 == 0)
+                        cleanup();
+                }
+            }
+
+            public void clear()
+            {
+                count = 0;
+
+                speeds.Clear();
+
+                posX = 0;
+                posY = 0;
+            }
         }
 
         List<IdealLine> idealLine = new List<IdealLine>(1000);
 
 		void updateIdealLine(ref rF2VehicleScoring vehicle, double running, double speed) {
-			int index = (int)Math.Round(running * (idealLine.Count - 1));
-			int count = idealLine[index].count;
-
-			if (count == 0)
-			{
-				idealLine[index].count = 1;
-
-				idealLine[index].speed = speed;
-
-                idealLine[index].posX = vehicle.mPos.x;
-                idealLine[index].posY = vehicle.mPos.z;
-            }
-			else if (idealLine[index].count < int.MaxValue)
-			{
-				idealLine[index].count += 1;
-
-                idealLine[index].speed = ((idealLine[index].speed * count) + speed) / (count + 1);
-
-                idealLine[index].posX = ((idealLine[index].posX * count) + vehicle.mPos.x) / (count + 1);
-                idealLine[index].posY = ((idealLine[index].posY * count) + vehicle.mPos.z) / (count + 1);
-            }
+            idealLine[(int)Math.Round(running * (idealLine.Count - 1))].update((float)speed, (float)vehicle.mPos.x, (float)vehicle.mPos.z);
 		}
 
         class SlowCarInfo
@@ -666,7 +739,7 @@ namespace RF2SHMSpotter {
                 bestLapTime = playerScoring.mLastLapTime;
 
                 for (int i = 0; i < idealLine.Count; i++)
-                    idealLine[i].count = 0;
+                    idealLine[i].clear();
             }
 
             try

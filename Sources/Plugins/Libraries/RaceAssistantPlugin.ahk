@@ -719,18 +719,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		local openPracticeCenter, openRaceCenter, openStrategyWorkbench, importSetup
 		local assistantSpeaker, assistantListener, first, index
 
-		/*
-		deleteSettings(*) {
-			if !isDebug()
-				deleteFile(kTempDirectory . this.Plugin . ".settings")
-
-			return false
-		}
-		*/
-
 		super.__New(controller, name, configuration, register)
-
-		; OnExit(deleteSettings)
 
 		if (RaceAssistantPlugin.sTeamServer = kUndefined) {
 			for ignore, assistant in kRaceAssistants {

@@ -856,7 +856,10 @@ class TeamServerPlugin extends ControllerPlugin {
 		}
 	}
 
-	finishSession(*) {
+	finishSession(arguments*) {
+		if ((arguments.Length > 0) && inList(["Logoff", "Shutdown"], arguments[1]))
+			return false
+		
 		if this.TeamServerActive {
 			try {
 				if this.DriverActive {

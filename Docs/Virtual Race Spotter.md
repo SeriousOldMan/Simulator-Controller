@@ -54,27 +54,31 @@ The Spotter will give you critical and in most cases real time information about
 
    When a yellow flag has been raised, you will get a warning from Elisa. Typically, you will get information about the sector, which is under yellow and sometimes also the distance into the track, where the incident happend. You will get a special warning for full course yellow and Elisa will also information you, when the yellow phase hase ended and the track is green again.
 
-3. Blue Flag Warnings
+3. Accident and Slow Car Warnings
+
+   The Spotter learns the track layout and the typical speeds during the first laps of a session. This information is relearned after a pitstop or whenever you set a new best lap. When one or more cars are way off the typical speed, this will be handled as a danger on the track. Depending on the speed difference and the heading of the car, it may count as an accident or a slow car. The Spotter will inform you about the fact and the approximate distance to the car(s). The Spotter can also inform you about accidents behind you, since this may give you advantage.
+
+4. Blue Flag Warnings
 
    Once a lapping car appears behind, you will get a blue flag warning. This typically appears, when the faster car is less than 2 seconds behind. If there is also a direct opponent currently behind you, you will be informed about that as well, so that you can be cautios to not let this car pass together with the lapping car.
 
-4. Green Flag (Race Start) Alert
+5. Green Flag (Race Start) Alert
 
    The Spotter gives you a *push*, when the race has been started.
 
-5. Pit Window Information
+6. Pit Window Information
 
    Elisa will inform you when the timed window or the designated lap for a required pitstop arrived. Elisa will inform you also, when the pit closes again.
 
-6. Start Performance Summary
+7. Start Performance Summary
 
    You will get an update whether you gained or lost places during the start phase a few laps into the race.
 
-7. Best Lap Update
+8. Best Lap Update
 
    When ypu have scored a new personal best lap, you will get a notification.
 
-8. Delta Information
+9. Delta Information
 
    Elisa observes your direct opponents behind and in front of you and informs you, whether you can catch up the car in front or whether you need to pay attention to the car behind you. Please take a look at the dedicated section about [Opponent and Delta Information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#opponent-and-delta-information) down below for more detailed information.
    
@@ -88,31 +92,31 @@ The Spotter will give you critical and in most cases real time information about
    
      This method uses a complex traffic model and keeps track off all cars regarding their current position and specific deltas to your car. You will get much more information, for example, how much time you have lost on the car ahead during the last laps. But this model will fail in turbulent traffic situations especially in the beginning of the race or in sprint races with lots of fights and overtakes and you might get wrong deltas in those situations.
 
-9. Tactical Advices
+10. Tactical Advices
 
    The Virtual Race Spotter has been trained to detect several typical race situations and therefore can advise you how to best handle the corresponding situation. For example will Elisa analyze the laptime difference, when you will be shortly overtaken by another car and will tell you whether it will be possible for you to stay in the slipstream of this faster car. Other adivises will help you to handle faster lapped cars, protect your position by bringing a slower car between you and direct opponent which tries to attack you, and so on. The Race Spotter will learn to detect and handle more situations in the future.
 
-10. Cut warnings & penalty information
+11. Cut warnings & penalty information
 
     Depending on the available data from the simulator, you will be informed about track cuts and issued penalties by the Spotter.
 
-11. Weather Updates
+12. Weather Updates
 
     The Spotter will inform you when temperatures (both air and track) are rising or falling and will give you the new temperatures in degrees Celcius.
 
-12. Last Laps Announcement
+13. Last Laps Announcement
 
     You will get an announcement a few laps before the end of the race.
    
-13. Stint Timer Alert
+14. Stint Timer Alert
 
     During an endurance race, the Spotter will alert you, that the stint time is ending soon and will tell you the number of laps, which you can still go.
 
-14. Session Timer Information
+15. Session Timer Information
 
     When you are in a practice or qualifying session, the Spotter will issue a warning 30, 15 and 5 minutes before the end of the session.
 
-15. Half Time Notification
+16. Half Time Notification
 
     Exactly in the middle of the race, the Spotter will give you a couple of informations about the second half of the race, like your current position, the number of remaining minutes and laps, the number of laps which are possible using the remaining fuel, and so on.
 

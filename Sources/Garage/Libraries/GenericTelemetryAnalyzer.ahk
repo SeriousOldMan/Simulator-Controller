@@ -428,7 +428,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 
 		super.__New(workbench, simulator)
 
-		OnExit(ObjBindMethod(this, "stopTelemetryAnalyzer", true))
+		OnExit(ObjBindMethod(this, "stopTelemetryAnalyzer"))
 
 		if first {
 			GenericTelemetryAnalyzer.sAudioDevice := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Audio Settings.ini"), "Output", "Analyzer.AudioDevice", false)
@@ -592,9 +592,12 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 		return this.iTelemetryCollector
 	}
 
-	stopTelemetryAnalyzer(*) {
+	stopTelemetryAnalyzer(arguments*) {
 		local collector := this.iTelemetryCollector
-
+		
+		if ((arguments.Length > 0) && inList(["Logoff", "Shutdown"], arguments[1]))
+			return false
+		
 		if collector {
 			this.iLastHandling := collector.Handling
 

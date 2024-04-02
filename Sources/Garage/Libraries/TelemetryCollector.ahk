@@ -315,10 +315,13 @@ class TelemetryCollector {
 		}
 	}
 
-	stopTelemetryCollector(*) {
+	stopTelemetryCollector(arguments*) {
 		local pid := this.iCollectorPID
 		local tries
 
+		if ((arguments.Length > 0) && inList(["Logoff", "Shutdown"], arguments[1]))
+			return false
+		
 		if pid {
 			tries := 5
 

@@ -462,36 +462,102 @@ BOOL checkPositions(int playerID) {
 typedef struct {
 	int count;
 
-	double speed;
-	double posX;
-	double posY;
+	float speeds[1000];
+
+	float speed;
+	float posX;
+	float posY;
 } ideal_line;
 ideal_line idealLine[NumIdealLines];
 
 int idealLineSize = 0;
 
+float il_average(ideal_line* il) {
+	int length = il->count;
+	double average = 0;
+
+	for (int i = 0; i < length; ++i)
+		average += il->speeds[i];
+
+	return (float)(average / length);
+}
+
+float il_stdDeviation(ideal_line* il) {
+	int length = il->count;
+	float avg = il_average(il);
+	double sqrSum = 0;
+
+	for (int i = 0; i < length; ++i) {
+		float speed = il->speeds[i];
+
+		sqrSum += (speed - avg) * (speed - avg);
+	}
+
+	return (float)sqrt(sqrSum / length);
+}
+
+void il_cleanup(ideal_line* il) {
+	int length = il->count;
+	float avg = il_average(il);
+	float stdDev = il_stdDeviation(il);
+	int i = 0;
+
+	while (i < length) {
+		float speed = il->speeds[i];
+
+		if (fabs(speed - avg) > stdDev) {
+			for (int j = (i + 1); j < length; j++)
+				il->speeds[j - 1] = il->speeds[j];
+
+			length -= 1;
+		}
+		else
+			i += 1;
+	}
+
+	il->count = length;
+	il->speed = il_average(il);
+}
+
+void il_update(ideal_line* il, float s, float x, float y) {
+	if (il->count == 0)
+	{
+		il->speeds[0] = s;
+
+		il->count = 1;
+
+		il->speed = s;
+
+		il->posX = x;
+		il->posY = y;
+	}
+	else if (il->count < 1000)
+	{
+		il->speeds[il->count] = s;
+
+		il->count += 1;
+
+		il->speed = ((il->speed * il->count) + il->speed) / (il->count + 1);
+
+		il->posX = ((il->posX * il->count) + x) / (il->count + 1);
+		il->posY = ((il->posY * il->count) + y) / (il->count + 1);
+
+		if (il->count % 100 == 0)
+			il_cleanup(il);
+	}
+}
+
+void il_clear(ideal_line* il) {
+	il->count = 0;
+
+	il->posX = 0;
+	il->posY = 0;
+}
+
 void updateIdealLine(int vehicleId, double running, double speed) {
-	ideal_line* slot = &idealLine[(int)round(running * (idealLineSize - 1))];
-	int count = slot->count;
-
-	if (count == 0)
-	{
-		slot->count = 1;
-
-		slot->speed = speed;
-
-		slot->posX = map_buffer->all_drivers_data_1[vehicleId].position.x;
-		slot->posY = -map_buffer->all_drivers_data_1[vehicleId].position.z;
-	}
-	else if (slot->count < 1000)
-	{
-		slot->count += 1;
-
-		slot->speed = ((slot->speed * count) + speed) / (count + 1);
-
-		slot->posX = ((slot->posX * count) + map_buffer->all_drivers_data_1[vehicleId].position.x) / (count + 1);
-		slot->posY = ((slot->posY * count) + -map_buffer->all_drivers_data_1[vehicleId].position.z) / (count + 1);
-	}
+	il_update(&idealLine[(int)round(running * (idealLineSize - 1))], (float)speed,
+			  map_buffer->all_drivers_data_1[vehicleId].position.x,
+			  -map_buffer->all_drivers_data_1[vehicleId].position.z);
 }
 
 typedef struct
@@ -547,7 +613,7 @@ BOOL checkAccident() {
 		bestLapTime = map_buffer->lap_time_previous_self;
 
 		for (int i = 0; i < idealLineSize; i++)
-			idealLine[i].count = 0;
+			il_clear(&idealLine[i]);
 	}
 
 	double driverDistance = map_buffer->all_drivers_data_1[playerIdx].lap_distance;

@@ -49,7 +49,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[5.6.5.0-dev](https://www.dropbox.com/scl/fi/fjsrwe00b0bv4gc8b14c3/Simulator-Controller-5.6.5.0-dev.zip?rlkey=6i7szct6f42p549ggi1d5jt1o&dl=1) (Early build for 5.6.5. Changes: ACC accident detection also for Big Grid sessions, Fixed rF2 pitstop settings transfer, Resizing of dashboard widgets in "System Monitor", Fine-tuning accident detection, Fixed track pre-selection in "Setup Workbench", Optimized system shutdown handling by the SC apps.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-565) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

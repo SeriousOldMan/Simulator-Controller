@@ -542,7 +542,7 @@ void il_update(ideal_line* il, float s, float x, float y) {
 		il->posX = ((il->posX * il->count) + x) / (il->count + 1);
 		il->posY = ((il->posY * il->count) + y) / (il->count + 1);
 
-		if (il->count % 100 == 0)
+		if (il->count % 50 == 0 || (il->count > 20 && fabs(il->speed - s) > (il->speed / 10)))
 			il_cleanup(il);
 	}
 }

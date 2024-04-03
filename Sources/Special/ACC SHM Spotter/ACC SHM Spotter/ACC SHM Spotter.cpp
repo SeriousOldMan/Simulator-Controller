@@ -571,7 +571,7 @@ public:
 			posX = ((posX * count) + x) / (count + 1);
 			posY = ((posY * count) + y) / (count + 1);
 
-			if (speeds.size() % 100 == 0)
+			if (speeds.size() % 50 == 0 || (count > 20 && abs(speed - s) > (speed / 10)))
 				cleanup();
 		}
 	}

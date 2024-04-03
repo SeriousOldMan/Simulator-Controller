@@ -120,7 +120,7 @@ Please, note that all of this also applies to all other Virtual Race Assistants,
   
   2. *rFactor 2* and *Le Mans Ultimate*
   
-     You can find the plugin *rFactor2SharedMemoryMapPlugin64.dll* in *Utilities\Plugins* folder the Simulator Controller installation or you can load the [latest version](https://github.com/TheIronWolfModding/rF2SharedMemoryMapPlugin) from GitHub.
+     You can find the plugin *rFactor2SharedMemoryMapPlugin64.dll* in the *Utilities\Plugins* folder of the Simulator Controller installation folder or you can load the [latest version](https://github.com/TheIronWolfModding/rF2SharedMemoryMapPlugin) from GitHub.
 	 
 	 *rFactor 2*: Copy the DLL file to the *Bin64\Plugins* folder in the Steam installation directory of *rFactor 2*. You will have to enable this plugin in the *rFactor 2* settings afterwards.
 	 

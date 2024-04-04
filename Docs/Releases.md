@@ -1,4 +1,4 @@
-## 5.6.5.0-release 04/05/24 (planned)
+## 5.6.5.0-release 04/05/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed a bug in all applications sometime popping up a crash info dialog for a fraction of a second, when the PC is shutdown (Windows 11).

@@ -1,15 +1,15 @@
 [Development]
-Version=5.6.5.0-beta
+Version=5.6.5.0-release
 Target=5.6.5.0-release
-Date=04/04/2024
-Download=https://www.dropbox.com/scl/fi/ig6x4y9l84hzswlya1a4o/Simulator-Controller-5.6.5.0-beta.zip?rlkey=pyyyqr0hdo6e3i9a9o0glse9l&dl=1
+Date=04/05/2024
+Download=https://cutt.ly/iw8OtlPI;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.6.5.0-release.zip
 Changes=ACC accident detection also for Big Grid sessions, Fixed rF2 pitstop settings transfer, Resizing of dashboard widgets in "System Monitor", Fine-tuning accident detection, Fixed track pre-selection in "Setup Workbench", Optimized system shutdown handling by the SC apps, Error handling during system shutdown in the Stream Deck plugin
 Components=Media->5.6.1,Configuration->5.6.4,Utilities->5.4.8
 [Release]
-Version=5.6.4.0-release
-Date=03/29/2024
-Download=https://cutt.ly/Bw3ggKYy;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.6.4.0-release.zip
-Changes=Fixed pitstop and pitlane detection for iRacing, Fixed green flag regression, Invalid laps for iRacing, Default for "Pitstop Tyre Service" is now recognized for iRacing, Fixed memory leak in iRacing connector, Fixed Track Mapper for iRacing, Changing tyre compounds support for iRacing, Fixed "Simulator Setup" support for "Le Mans Ultimate", Fixed spanish voice recognition, Fixed track map periodic update in "Race Center", Accident detection now also for ACC, "Practice Center" informs about unsaved data before starting a new session, Increased iRacing position data reliability, Migrated to AHK 2.0.12, Updated meta data for R3E
+Version=5.6.5.0-release
+Date=04/05/2024
+Download=https://cutt.ly/iw8OtlPI;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.6.5.0-release.zip
+Changes=ACC accident detection also for Big Grid sessions, Fixed rF2 pitstop settings transfer, Resizing of dashboard widgets in "System Monitor", Fine-tuning accident detection, Fixed track pre-selection in "Setup Workbench", Optimized system shutdown handling by the SC apps, Error handling during system shutdown in the Stream Deck plugin
 Components=Media->5.6.1,Configuration->5.6.4,Utilities->5.4.8
 [Components]
 Media.5.6.1.Path=Resources
@@ -22,7 +22,7 @@ Utilities.5.4.8.Path=.
 Utilities.5.4.8.Content=Utilities
 Utilities.5.4.8.Download=https://www.dropbox.com/scl/fi/5nduffajjm3x6rhsxr1nk/Utilities-5.4.8.zip?rlkey=alrj8l2z205dd2vm9cu6hbsot&dl=1
 [Current]
-Type=Development
+Type=Release
 [Version]
-Development=5.6.5.0-beta
-Release=5.6.4.0-release
+Development=5.6.5.0-release
+Release=5.6.5.0-release

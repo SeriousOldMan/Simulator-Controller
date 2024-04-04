@@ -1,9 +1,9 @@
 [Development]
 Version=5.6.5.0-beta
 Target=5.6.5.0-release
-Date=04/03/2024
+Date=04/04/2024
 Download=https://www.dropbox.com/scl/fi/ig6x4y9l84hzswlya1a4o/Simulator-Controller-5.6.5.0-beta.zip?rlkey=pyyyqr0hdo6e3i9a9o0glse9l&dl=1
-Changes=ACC accident detection also for Big Grid sessions, Fixed rF2 pitstop settings transfer, Resizing of dashboard widgets in "System Monitor", Fine-tuning accident detection, Fixed track pre-selection in "Setup Workbench", Optimized system shutdown handling by the SC apps
+Changes=ACC accident detection also for Big Grid sessions, Fixed rF2 pitstop settings transfer, Resizing of dashboard widgets in "System Monitor", Fine-tuning accident detection, Fixed track pre-selection in "Setup Workbench", Optimized system shutdown handling by the SC apps, Error handling during system shutdown in the Stream Deck plugin
 Components=Media->5.6.1,Configuration->5.6.4,Utilities->5.4.8
 [Release]
 Version=5.6.4.0-release

@@ -1,4 +1,5 @@
 ﻿using BarRaider.SdTools;
+using CommandLine;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -54,25 +55,31 @@ namespace SimulatorControllerPlugin
     {
         private static void ServerThread() {
             while (true) {
-                NamedPipeServerStream pipeServer = new NamedPipeServerStream("scconnector", PipeDirection.InOut, 1);
-
-                int threadId = Thread.CurrentThread.ManagedThreadId;
-                
-                // Wait for a client to connect
-                pipeServer.WaitForConnection();
-                
                 try {
-                    StreamString ss = new StreamString(pipeServer);
+                    NamedPipeServerStream pipeServer = new NamedPipeServerStream("scconnector", PipeDirection.InOut, 1);
 
-                    string message = ss.ReadString();
+                    int threadId = Thread.CurrentThread.ManagedThreadId;
+                
+                    // Wait for a client to connect
+                    pipeServer.WaitForConnection();
+                
+                    try {
+                        StreamString ss = new StreamString(pipeServer);
 
-                    Program.ProcessMessage(message);
+                        string message = ss.ReadString();
+
+                        Program.ProcessMessage(message);
+                    }
+                    catch (IOException e) {
+                        Logger.Instance.LogMessage(TracingLevel.ERROR, "Error during message processing: " + e.Message);
+                    }
+
+                    pipeServer.Close();
                 }
-                catch (IOException e) {
+                catch (Exception e)
+                {
                     Logger.Instance.LogMessage(TracingLevel.ERROR, "Error during message processing: " + e.Message);
                 }
-
-                pipeServer.Close();
             }
         }
 
@@ -136,7 +143,13 @@ namespace SimulatorControllerPlugin
 
             new Thread(ServerThread).Start();
 
-            SDWrapper.Run(args);
+            try {
+                SDWrapper.Run(args);
+            }
+            catch (Exception e)
+            {
+                Logger.Instance.LogMessage(TracingLevel.ERROR, "Error during message processing: " + e.Message);
+            }
         }
     }
 }

@@ -2,12 +2,15 @@
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed a bug in all applications sometime popping up a crash info dialog for a fraction of a second, when the PC is shutdown (Windows 11).
-  4. A lot of fine-tuning for the accident detection to further reduce false positves. Statistical methods are now used to remove invalid data points.
-  5. Accident detection now also supports Big Grid sessions in *Assetto Corsa Competizione*.
-  6. The precision for the accident detection on very long tracks has been improved significantly (Nordschleife).
-  7. Fixed a recurring bug in the transfer of pitstop settings in *rFactor 2*.
-  8. The dashboard widgets on the first page of the "System Monitor" now resize correctly when the window is enlarged.
-  9. The automatic pre-selction of the last used track has been fixed for the "Setup Workbench".
+  4. Introduced special error handling in the Stream Deck plugin, that prevents crashing during Windows 11 system shutdown.
+  5. A lot of fine-tuning for the accident detection to further reduce false positves. Statistical methods are now used to remove invalid data points.
+  6. Accident detection now also supports Big Grid sessions in *Assetto Corsa Competizione*.
+  7. The precision for the accident detection on very long tracks has been improved significantly (Nordschleife).
+  8. Fixed a recurring bug in the transfer of pitstop settings in *rFactor 2*.
+  9. The dashboard widgets on the first page of the "System Monitor" now resize correctly when the window is enlarged.
+  10. The automatic pre-selction of the last used track has been fixed for the "Setup Workbench".
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-565), if you are using Stream Deck.
 
 ## 5.6.4.0-release 03/29/24
   1. Minor bugfixes, as always

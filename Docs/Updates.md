@@ -37,7 +37,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 5.6.5
 
-Nothing to do this time.
+It looks like the Windows 11 system shutdown timing changed a little bit, which caused occasional crashes of the Simulator Controller applications as well as the Stream Deck plugin. If you are using the Stream Deck integration, you may want to update the integration plugin, but it is only a cosmetical kind of fix.
 
 ***
 

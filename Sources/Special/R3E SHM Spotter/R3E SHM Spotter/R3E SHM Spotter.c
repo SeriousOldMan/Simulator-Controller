@@ -573,11 +573,12 @@ slow_car_info slowCarsAhead[10];
 double getAverageSpeed(double running) {
 	int last = (idealLineSize - 1);
 	int index = (int)round(running * last);
-	int count = 0;
-	double speed = 0;
+	// int count = 0;
+	// double speed = 0;
 	
 	index = min(last, max(0, index));
 	
+	/*
 	if ((&idealLine[index])->count > 20)
 		for (int i = max(0, index - 2); i <= min(last, index + 2); i++) {
 			ideal_line* slot = &idealLine[i];
@@ -589,6 +590,14 @@ double getAverageSpeed(double running) {
 		}
 	
 	return (count > 0) ? speed / count : -1;
+	*/
+
+	ideal_line* slot = &idealLine[index];
+
+	if (slot->count > 20)
+		return slot->speed;
+	else
+		return -1;
 }
 
 double bestLapTime = INT_LEAST32_MAX;

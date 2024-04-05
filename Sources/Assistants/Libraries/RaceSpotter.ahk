@@ -1082,7 +1082,7 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 	}
 
-	getCarIndicatorFragment(number, position) {
+	getCarIndicatorFragment(speaker, number, position) {
 		local indicator := getMultiMapValue(this.Settings, "Assistant.Spotter", "CarIndicator", "Position")
 
 		if ((indicator = "Position") && position)
@@ -1092,12 +1092,7 @@ class RaceSpotter extends GridRaceAssistant {
 		else if ((indicator = "Number") && number)
 			return substituteVariables(this.getSpeaker().Fragments["CarNumber"], {number: number})
 
-		if position
-			return substituteVariables(this.getSpeaker().Fragments["CarPosition"], {position: position})
-		else if number
-			return substituteVariables(this.getSpeaker().Fragments["CarNumber"], {number: number})
-		else
-			return ""
+		return super.getCarIndicatorFragment(speaker, number, position)
 	}
 
 	handleVoiceCommand(grammar, words) {
@@ -1853,7 +1848,7 @@ class RaceSpotter extends GridRaceAssistant {
 		local trackBehind := false
 		local leader := false
 		local focused := false
-		local situation, opponentType, driverPitstops, carPitstops, carInfo
+		local situation, opponentType, driverPitstops, carPitstops, carInfo, indicator
 		local driverPosition, driverLapTime, slowerCar, carNr, carPosition, delta, lapTimeDifference, key
 
 		if (this.hasEnoughData(false) && (lastLap > (this.BaseLap + 2))) {
@@ -2049,24 +2044,11 @@ class RaceSpotter extends GridRaceAssistant {
 								situation := false
 
 						if !situation {
-							if (((indicator = "Number") && carNr) || ((indicator = "Position") && carPosition)) {
-								this.TacticalAdvices["FasterThan"] := {Key: key, Lap: lastLap}
+							speaker.speakPhrase("FasterThan", {indicator: this.getCarIndicatorFragment(speaker, carNr, carPosition)
+															 , delta: speaker.number2Speech(delta, 1)
+															 , lapTime: speaker.number2Speech(lapTimeDifference, 1)})
 
-								speaker.speakPhrase("FasterThan", {indicator: this.getCarIndicatorFragment(speaker, carNr, carPosition)
-																 , delta: speaker.number2Speech(delta, 1)
-																 , lapTime: speaker.number2Speech(lapTimeDifference, 1)})
-
-								return true
-							}
-							else if ((situation = "Both") && carNr && carPosition) {
-								this.TacticalAdvices["FasterThan"] := {Key: key, Lap: lastLap}
-
-								speaker.speakPhrase("FasterThanBoth", {number: carNr, position: carPosition
-																	 , delta: speaker.number2Speech(delta, 1)
-																	 , lapTime: speaker.number2Speech(lapTimeDifference, 1)})
-
-								return true
-							}
+							return true
 						}
 					}
 				}

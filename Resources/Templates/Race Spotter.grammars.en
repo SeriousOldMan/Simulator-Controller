@@ -245,6 +245,8 @@ FocusProblem.2=Looks like the car %indicator% %number% had a problem. The last l
 FoucsProblem.3=The last lap of the car %indicator% %number% was very slow. There might be a problem.
 FasterThan.1=You have been %lapTime% seconds faster then the car %indicator% %number% during the last laps. Keep it up.
 FasterThan.2=Great, you are faster then the car %indicator% %number% by %lapTime% seconds. The car is %delta% seconds ahead of you.
+FasterThanBoth.1=You have been %lapTime% seconds faster then the car number %number% in P %position% during the last laps. Keep it up.
+FasterThanBoth.2=Great, you are faster then the car number %number% in P %position% by %lapTime% seconds. The car is %delta% seconds ahead of you.
 // Spotting //
 Right.1=Attention right.
 Right.2=Car on the right.

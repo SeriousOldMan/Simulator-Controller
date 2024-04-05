@@ -2031,24 +2031,25 @@ class RaceSpotter extends GridRaceAssistant {
 					if ((delta != 0) && (lapTimeDifference != 0)) {
 						key := (slowerCar.Nr . "|" . slowerCar.ID)
 						situation := (this.TacticalAdvices.Has("FasterThan") ? this.TacticalAdvices["FasterThan"] : false)
+						indicator := getMultiMapValue(this.Settings, "Assistant.Spotter", "CarIndicator", "Position")
 
-						if situation
-							if (situation.Key != key)
-								situation := false
-							else if ((situation.Lap + 5) <= lastLap)
-								situation := false
+						if (((indicator = "Number") && slowerCar.Nr) || ((indicator = "Position") && slowerCar.Position["Class"])) {
+							if situation
+								if (situation.Key != key)
+									situation := false
+								else if ((situation.Lap + 5) <= lastLap)
+									situation := false
 
-						if !situation {
-							this.TacticalAdvices["FasterThan"] := {Key: key, Lap: lastLap}
+							if !situation {
+								this.TacticalAdvices["FasterThan"] := {Key: key, Lap: lastLap}
 
-							indicator := getMultiMapValue(this.Settings, "Assistant.Spotter", "CarIndicator", "Position")
+								speaker.speakPhrase("FasterThan", {indicator: speaker.Fragments["Car" . indicator]
+																 , number: (indicator = "Number") ? slowerCar.Nr : slowerCar.Position["Class"]
+																 , delta: speaker.number2Speech(delta, 1)
+																 , lapTime: speaker.number2Speech(lapTimeDifference, 1)})
 
-							speaker.speakPhrase("FasterThan", {indicator: speaker.Fragments["Car" . indicator]
-															 , number: (indicator = "Number") ? slowerCar.Nr : slowerCar.Position["Class"]
-															 , delta: speaker.number2Speech(delta, 1)
-															 , lapTime: speaker.number2Speech(lapTimeDifference, 1)})
-
-							return true
+								return true
+							}
 						}
 					}
 				}
@@ -2987,7 +2988,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 		if ((arguments.Length > 0) && inList(["Logoff", "Shutdown"], arguments[1]))
 			return false
-		
+
 		if pid {
 			ProcessClose(pid)
 

@@ -215,6 +215,9 @@ class RaceAssistant extends ConfigurationItem {
 
 			addMultiMapValues(grammars, readMultiMap(kUserGrammarsDirectory . fileName, RaceAssistant.RaceVoiceManager.VoiceGrammars))
 
+			if isDebug()
+				writeMultiMap(kTempDirectory . fileName, grammars)
+
 			return grammars
 		}
 
@@ -253,7 +256,7 @@ class RaceAssistant extends ConfigurationItem {
 		Get {
 			return (isSet(key) ? this.iOptions[key] : this.iOptions)
 		}
-		
+
 		Set {
 			return (isSet(key) ? (this.iOptions[key] := value) : (this.iOptions := value))
 		}

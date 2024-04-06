@@ -719,6 +719,8 @@ namespace RF2SHMSpotter {
 
         bool checkAccident(ref rF2VehicleScoring playerScoring)
         {
+			bool accident = false;
+
 			if (playerScoring.mInPits != 0)
 			{
 				bestLapTime = int.MaxValue;
@@ -751,19 +753,18 @@ namespace RF2SHMSpotter {
 				for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)
 				{
                     ref rF2VehicleScoring vehicle = ref scoring.mVehicles[i];
+                    
+					if (vehicle.mInPits != 0)
+                        continue;
+
+                    double speed = vehicleSpeed(ref vehicle);
+                    double running = Math.Max(0, Math.Min(1, Math.Abs(vehicle.mLapDist / scoring.mScoringInfo.mLapDist)));
+                    double avgSpeed = getAverageSpeed(running);
 
                     if (vehicle.mIsPlayer != 1)
                     {
-                        if (vehicle.mInPits != 0)
-							continue;
-
-						double speed = vehicleSpeed(ref vehicle);
-
-						if (speed >= 1)
+                        if (speed >= 1)
 						{
-							double running = Math.Max(0, Math.Min(1, Math.Abs(vehicle.mLapDist / scoring.mScoringInfo.mLapDist)));
-							double avgSpeed = getAverageSpeed(running);
-
 							if ((avgSpeed >= 0) && (speed < (avgSpeed / 2)))
 							{
 								long distanceAhead = (long)(((vehicle.mLapDist > playerScoring.mLapDist) ? vehicle.mLapDist
@@ -787,69 +788,80 @@ namespace RF2SHMSpotter {
 								updateIdealLine(ref vehicle, running, speed);
 						}
                     }
+                    else
+                    {
+                        if (speed >= 5)
+                        {
+                            if ((avgSpeed >= 0) && (speed < (avgSpeed / 2)))
+                                accident = true;
+                        }
+                    }
                 }
 			}
 			catch (Exception e) {
 				SendSpotterMessage("internalError:" + e.Message);
 			}
 
-			if (accidentsAhead.Count > 0)
+			if (!accident)
 			{
-				if (cycle > nextAccidentAhead)
+				if (accidentsAhead.Count > 0)
 				{
-					long distance = long.MaxValue;
+					if (cycle > nextAccidentAhead)
+					{
+						long distance = long.MaxValue;
 
-					foreach (SlowCarInfo i in accidentsAhead)
-						distance = Math.Min(distance, i.distance);
+						foreach (SlowCarInfo i in accidentsAhead)
+							distance = Math.Min(distance, i.distance);
 
-					if (distance > 50)
-                    {
-                        nextAccidentAhead = cycle + 400;
-                        nextSlowCarAhead = cycle + 200;
+						if (distance > 50)
+						{
+							nextAccidentAhead = cycle + 400;
+							nextSlowCarAhead = cycle + 200;
 
-                        SendSpotterMessage("accidentAlert:Ahead;" + distance);
+							SendSpotterMessage("accidentAlert:Ahead;" + distance);
 
-						return true;
+							return true;
+						}
 					}
 				}
-			}
 
-			if (slowCarsAhead.Count > 0)
-			{
-				if (cycle > nextSlowCarAhead)
+				if (slowCarsAhead.Count > 0)
 				{
-					long distance = long.MaxValue;
+					if (cycle > nextSlowCarAhead)
+					{
+						long distance = long.MaxValue;
 
-					foreach (SlowCarInfo i in slowCarsAhead)
-						distance = Math.Min(distance, i.distance);
+						foreach (SlowCarInfo i in slowCarsAhead)
+							distance = Math.Min(distance, i.distance);
 
-					if (distance > 100)
-                    {
-                        nextSlowCarAhead = cycle + 200;
+						if (distance > 100)
+						{
+							nextSlowCarAhead = cycle + 200;
 
-                        SendSpotterMessage("slowCarAlert:" + distance);
+							SendSpotterMessage("slowCarAlert:" + distance);
 
-						return true;
+							return true;
+						}
 					}
 				}
-			}
 
-			if (accidentsBehind.Count > 0)
-			{
-				if (cycle > nextAccidentBehind)
+				if (accidentsBehind.Count > 0)
 				{
-					long distance = long.MaxValue;
+					if (cycle > nextAccidentBehind)
+					{
+						long distance = long.MaxValue;
 
-					foreach (SlowCarInfo i in accidentsBehind)
-						distance = Math.Min(distance, i.distance);
+						foreach (SlowCarInfo i in accidentsBehind)
+							distance = Math.Min(distance, i.distance);
 
-					if (distance > 50)
-                    {
-                        nextAccidentBehind = cycle + 400;
+						if (distance > 50)
+						{
+							nextAccidentBehind = cycle + 400;
 
-                        SendSpotterMessage("accidentAlert:Behind;" + distance);
+							SendSpotterMessage("accidentAlert:Behind;" + distance);
 
-						return true;
+							return true;
+						}
 					}
 				}
 			}

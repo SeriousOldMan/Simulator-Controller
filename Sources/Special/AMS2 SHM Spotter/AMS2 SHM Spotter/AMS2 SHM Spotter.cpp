@@ -554,6 +554,8 @@ double bestLapTime = INT_LEAST32_MAX;
 
 bool checkAccident(const SharedMemory* sharedData)
 {
+	bool accident = false;
+
 	if (sharedData->mPitModes[sharedData->mViewedParticipantIndex] > PIT_MODE_NONE) {
 		bestLapTime = LONG_MAX;
 
@@ -586,19 +588,18 @@ bool checkAccident(const SharedMemory* sharedData)
 
 	try
 	{
-		for (int i = 0; i < sharedData->mNumParticipants; i++)
+		for (int i = 0; i < sharedData->mNumParticipants; i++) {
+			if (sharedData->mPitModes[i] > PIT_MODE_NONE)
+				continue;
+
+			ParticipantInfo vehicle = sharedData->mParticipantInfo[i];
+			double speed = sharedData->mSpeeds[i] * 3.6;
+			double running = max(0, min(1, std::abs(vehicle.mCurrentLapDistance / sharedData->mTrackLength)));
+			double avgSpeed = getAverageSpeed(running);
+
 			if (sharedData->mViewedParticipantIndex != i)
 			{
-				if (sharedData->mPitModes[i] > PIT_MODE_NONE)
-					continue;
-
-				ParticipantInfo vehicle = sharedData->mParticipantInfo[i];
-				double speed = sharedData->mSpeeds[i] * 3.6;
-
 				if (speed >= 1) {
-					double running = max(0, min(1, std::abs(vehicle.mCurrentLapDistance / sharedData->mTrackLength)));
-					double avgSpeed = getAverageSpeed(running);
-
 					if ((avgSpeed >= 0) && (speed < (avgSpeed / 2)))
 					{
 						long distanceAhead = (long)(((vehicle.mCurrentLapDistance > driver.mCurrentLapDistance) ? vehicle.mCurrentLapDistance
@@ -622,6 +623,13 @@ bool checkAccident(const SharedMemory* sharedData)
 						updateIdealLine(vehicle, running, speed);
 				}
 			}
+			else {
+				if (speed >= 1) {
+					if ((avgSpeed >= 0) && (speed < (avgSpeed / 2)))
+						accident = true;
+				}
+			}
+		}
 	}
 	catch (const std::exception& ex) {
 		sendSpotterMessage(("internalError:" + std::string(ex.what())).c_str());
@@ -633,78 +641,80 @@ bool checkAccident(const SharedMemory* sharedData)
 		sendSpotterMessage("internalError");
 	}
 
-	if (accidentsAhead.size() > 0)
-	{
-		if (cycle > nextAccidentAhead)
+	if (!accident) {
+		if (accidentsAhead.size() > 0)
 		{
-			long distance = LONG_MAX;
+			if (cycle > nextAccidentAhead)
+			{
+				long distance = LONG_MAX;
 
-			for (int i = 0; i < accidentsAhead.size(); i++)
-				distance = ((distance < accidentsAhead[i].distance) ? distance : accidentsAhead[i].distance);
+				for (int i = 0; i < accidentsAhead.size(); i++)
+					distance = ((distance < accidentsAhead[i].distance) ? distance : accidentsAhead[i].distance);
 
-			if (distance > 50) {
-				nextAccidentAhead = cycle + 400;
-				nextSlowCarAhead = cycle + 200;
+				if (distance > 50) {
+					nextAccidentAhead = cycle + 400;
+					nextSlowCarAhead = cycle + 200;
 
-				char message[40] = "accidentAlert:Ahead;";
-				char numBuffer[20];
+					char message[40] = "accidentAlert:Ahead;";
+					char numBuffer[20];
 
-				sprintf_s(numBuffer, "%d", distance);
-				strcat_s(message, numBuffer);
+					sprintf_s(numBuffer, "%d", distance);
+					strcat_s(message, numBuffer);
 
-				sendSpotterMessage(message);
+					sendSpotterMessage(message);
 
-				return true;
+					return true;
+				}
 			}
 		}
-	}
 
-	if (slowCarsAhead.size() > 0)
-	{
-		if (cycle > nextSlowCarAhead)
+		if (slowCarsAhead.size() > 0)
 		{
-			long distance = LONG_MAX;
+			if (cycle > nextSlowCarAhead)
+			{
+				long distance = LONG_MAX;
 
-			for (int i = 0; i < slowCarsAhead.size(); i++)
-				distance = ((distance < slowCarsAhead[i].distance) ? distance : slowCarsAhead[i].distance);
+				for (int i = 0; i < slowCarsAhead.size(); i++)
+					distance = ((distance < slowCarsAhead[i].distance) ? distance : slowCarsAhead[i].distance);
 
-			if (distance > 100) {
-				nextSlowCarAhead = cycle + 200;
+				if (distance > 100) {
+					nextSlowCarAhead = cycle + 200;
 
-				char message[40] = "slowCarAlert:";
-				char numBuffer[20];
+					char message[40] = "slowCarAlert:";
+					char numBuffer[20];
 
-				sprintf_s(numBuffer, "%d", distance);
-				strcat_s(message, numBuffer);
+					sprintf_s(numBuffer, "%d", distance);
+					strcat_s(message, numBuffer);
 
-				sendSpotterMessage(message);
+					sendSpotterMessage(message);
 
-				return true;
+					return true;
+				}
 			}
 		}
-	}
 
-	if (accidentsBehind.size() > 0)
-	{
-		if (cycle > nextAccidentBehind)
+		if (accidentsBehind.size() > 0)
 		{
-			long distance = LONG_MAX;
+			if (cycle > nextAccidentBehind)
+			{
+				long distance = LONG_MAX;
 
-			for (int i = 0; i < accidentsBehind.size(); i++)
-				distance = ((distance < accidentsBehind[i].distance) ? distance : accidentsBehind[i].distance);
+				for (int i = 0; i < accidentsBehind.size(); i++)
+					distance = ((distance < accidentsBehind[i].distance) ? distance : accidentsBehind[i].distance);
 
-			if (distance > 50) {
-				nextAccidentBehind = cycle + 400;
+				if (distance > 50) {
+					nextAccidentBehind = cycle + 400;
 
-				char message[40] = "accidentAlert:Behind;";
-				char numBuffer[20];
+					char message[40] = "accidentAlert:Behind;";
+					char numBuffer[20];
 
-				sprintf_s(numBuffer, "%d", distance);
-				strcat_s(message, numBuffer);
+					sprintf_s(numBuffer, "%d", distance);
+					strcat_s(message, numBuffer);
 
-				sendSpotterMessage(message);
+					sendSpotterMessage(message);
 
-				return true;
+					return true;
+				}
 			}
 		}
 	}

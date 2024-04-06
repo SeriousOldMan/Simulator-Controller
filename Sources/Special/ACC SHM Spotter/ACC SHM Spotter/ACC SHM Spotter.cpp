@@ -884,7 +884,6 @@ inline float getSpeed(int carIdx, long milliSeconds) {
 	float speed;
 
 	if (getLastCarCoordinates(carIdx, milliSeconds, &speed)) {
-		/*
 		if (traceFileName != "") {
 			std::ofstream output;
 
@@ -894,7 +893,6 @@ inline float getSpeed(int carIdx, long milliSeconds) {
 
 			output.close();
 		}
-		*/
 
 		return speed;
 	}

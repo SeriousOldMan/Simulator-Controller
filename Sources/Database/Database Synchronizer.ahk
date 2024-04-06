@@ -249,14 +249,14 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups, downloadStrategie
 
 		writeMultiMap(kTempDirectory . "Database Synchronizer.state", configuration)
 
-		for ignore, fileName in ftpListFiles("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/htdocs/simulator-controller/database-downloads") {
+		for ignore, fileName in ftpListFiles("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/simulator-controller/database-downloads") {
 			SplitPath(fileName, , , , &databaseDirectory)
 
 			type := StrSplit(Trim(fileName), ".", "", 2)[1]
 
 			if ((type = (downloadPressures . downloadSetups . downloadStrategies)) || (type = (downloadPressures . downloadSetups))) {
 				if (SessionDatabase.DatabaseVersion != databaseDirectory) {
-					ftpDownload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/htdocs/simulator-controller/database-downloads/" . fileName, kTempDirectory . fileName)
+					ftpDownload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/simulator-controller/database-downloads/" . fileName, kTempDirectory . fileName)
 
 					try {
 						RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . kTempDirectory . fileName . "' -DestinationPath '" . kTempDirectory . "Shared Database' -Force", , "Hide")

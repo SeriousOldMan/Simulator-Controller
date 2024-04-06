@@ -2740,7 +2740,7 @@ class RaceSpotter extends GridRaceAssistant {
 	}
 
 	superfluousAlert(alert) {
-		return (InStr(alert, "Behind") && this.pendingAlerts(["Behind", "Left", "Right", "Three", "Clear"], true))
+		return ((InStr(alert, "Behind") && InStr(alert, "Accident")) && this.pendingAlerts(["Behind", "Left", "Right", "Three", "Clear"], true))
 	}
 
 	pushAlert(alert, arguments*) {

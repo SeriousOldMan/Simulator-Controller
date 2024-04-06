@@ -3,6 +3,7 @@
   2. Documentation updates here and there, as always
   3. Shared database synchronization is back to operation.
   4. The setting "Spotter: Car Indicator" in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database" has now a third choice "Both", which let the Spotter refer to a car by race number and current position at the same time.
+  5. Once again some tweaks for the accident detection and alerting by the Spotter.
 
 ## 5.6.5.0-release 04/05/24
   1. Minor bugfixes, as always

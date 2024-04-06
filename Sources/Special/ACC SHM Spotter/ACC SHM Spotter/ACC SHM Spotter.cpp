@@ -883,19 +883,8 @@ float getRunning(int carIdx) {
 inline float getSpeed(int carIdx, long milliSeconds) {
 	float speed;
 
-	if (getLastCarCoordinates(carIdx, milliSeconds, &speed)) {
-		if (traceFileName != "") {
-			std::ofstream output;
-
-			output.open(traceFileName, std::ios::out | std::ios::app);
-
-			output << "S (" << carIdx << "): " << speed << endl;
-
-			output.close();
-		}
-
+	if (getLastCarCoordinates(carIdx, milliSeconds, &speed))
 		return speed;
-	}
 	else
 		return -1;
 }
@@ -998,7 +987,7 @@ bool checkAccident() {
 
 		output.open(traceFileName, std::ios::out | std::ios::app);
 
-		output << "D " << driverRunning << endl;
+		output << "D (" << carID << "): " << driverRunning << endl;
 
 		output.close();
 	}
@@ -1012,6 +1001,16 @@ bool checkAccident() {
 				double speed = getSpeed(i, milliSeconds);
 				double running = getRunning(i);
 				double avgSpeed = getAverageSpeed(running);
+				
+				if (traceFileName != "") {
+					std::ofstream output;
+
+					output.open(traceFileName, std::ios::out | std::ios::app);
+
+					output << "S (" << i << "): " << running << "; " << speed << "; " << avgSpeed << endl;
+
+					output.close();
+				}
 
 				if (i != carID) {
 					if (speed >= 5) {

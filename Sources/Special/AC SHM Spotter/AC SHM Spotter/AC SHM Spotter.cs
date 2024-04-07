@@ -614,6 +614,11 @@ namespace ACSHMSpotter {
             public float posX = 0;
             public float posY = 0;
 
+			public float getSpeed()
+			{
+				return (count > 3) ? speed : -1;
+			}
+
             float average()
             {
                 int length = speeds.Count;
@@ -685,7 +690,7 @@ namespace ACSHMSpotter {
 
                     speeds.Add(s);
 
-                    speed = ((speed * count) + speed) / (count + 1);
+                    speed = ((speed * count) + s) / (count + 1);
 
                     posX = ((posX * count) + x) / (count + 1);
                     posY = ((posY * count) + y) / (count + 1);
@@ -744,10 +749,7 @@ namespace ACSHMSpotter {
             return (count > 0) ? speed / count : -1;
 			*/
 
-            if (idealLine[index].count > 20)
-                return idealLine[index].speed;
-            else
-                return -1;
+            return idealLine[index].getSpeed();
         }
 
         int bestLapTime = int.MaxValue;
@@ -808,7 +810,7 @@ namespace ACSHMSpotter {
 
 								if ((avgSpeed >= 0) && (speed < (avgSpeed / 2)))
 								{
-									double carLapDistance = car.splinePosition * staticInfo.TrackSPlineLength;
+									double carLapDistance = running * staticInfo.TrackSPlineLength;
 									long distanceAhead = (long)(((carLapDistance > driverLapDistance) ? carLapDistance
 																									  : (carLapDistance + staticInfo.TrackSPlineLength)) - driverLapDistance);
 

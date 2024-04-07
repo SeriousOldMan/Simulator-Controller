@@ -500,6 +500,10 @@ public:
 	float posX = 0;
 	float posY = 0;
 
+	inline float getSpeed() {
+		return (count > 3) ? speed : -1;
+	}
+
 	float average() {
 		int length = speeds.size();
 		double average = 0;
@@ -551,7 +555,7 @@ public:
 		{
 			speeds.reserve(1000);
 
-			speeds.push_back(speed);
+			speeds.push_back(s);
 
 			count = 1;
 
@@ -564,9 +568,9 @@ public:
 		{
 			count += 1;
 
-			speeds.push_back(speed);
+			speeds.push_back(s);
 
-			speed = ((speed * count) + speed) / (count + 1);
+			speed = ((speed * count) + s) / (count + 1);
 
 			posX = ((posX * count) + x) / (count + 1);
 			posY = ((posY * count) + y) / (count + 1);
@@ -674,8 +678,8 @@ void updateLastCarCoordinates(bool init) {
 
 inline bool hasValidCarCoordinates(long* milliSeconds) {
 	(*milliSeconds) = GetTickCount() - lastCarCoordinatesUpdate;
-
-	if ((*milliSeconds) < 100)
+	
+	if ((*milliSeconds) < 75)
 		return false;
 	else if ((*milliSeconds) > 200) {
 		updateLastCarCoordinates(false);
@@ -919,7 +923,7 @@ double getAverageSpeed(double running) {
 	
 	/*
 	if (idealLine[index].count > 20)
-		for (int i = max(0, index - 2); i <= min(last, index + 2); i++)
+		for (int i = max(0, index - 1); i <= min(last, index + 1); i++)
 			if (idealLine[i].count > 20) {
 				speed += idealLine[i].speed;
 				count += 1;
@@ -928,10 +932,7 @@ double getAverageSpeed(double running) {
 	return (count > 0) ? speed / count : -1;
 	*/
 
-	if (idealLine[index].count > 20)
-		return idealLine[index].speed;
-	else
-		return -1;
+	return idealLine[index].getSpeed();
 }
 
 bool checkAccident() {
@@ -1017,7 +1018,7 @@ bool checkAccident() {
 						if (running >= 0) {
 							if ((avgSpeed >= 0) && (speed < (avgSpeed / 2)))
 							{
-								float distance = distance * trackLength;
+								float distance = running * trackLength;
 
 								long distanceAhead = (long)(((distance > driverDistance) ? distance : (distance + trackLength)) - driverDistance);
 

@@ -412,6 +412,10 @@ public:
 	float posX = 0;
 	float posY = 0;
 
+	inline float getSpeed() {
+		return (count > 3) ? speed : -1;
+	}
+
 	float average() {
 		int length = speeds.size();
 		double average = 0;
@@ -463,7 +467,7 @@ public:
 		{
 			speeds.reserve(1000);
 
-			speeds.push_back(speed);
+			speeds.push_back(s);
 
 			count = 1;
 
@@ -476,9 +480,9 @@ public:
 		{
 			count += 1;
 
-			speeds.push_back(speed);
+			speeds.push_back(s);
 
-			speed = ((speed * count) + speed) / (count + 1);
+			speed = ((speed * count) + s) / (count + 1);
 
 			posX = ((posX * count) + x) / (count + 1);
 			posY = ((posY * count) + y) / (count + 1);
@@ -544,10 +548,7 @@ double getAverageSpeed(double running) {
 	return (count > 0) ? speed / count : -1;
 	*/
 
-	if (idealLine[index].count > 20)
-		return idealLine[index].speed;
-	else
-		return -1;
+	return idealLine[index].getSpeed();
 }
 
 double bestLapTime = INT_LEAST32_MAX;

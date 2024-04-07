@@ -472,6 +472,10 @@ ideal_line idealLine[NumIdealLines];
 
 int idealLineSize = 0;
 
+inline float il_get_speed(ideal_line* il) {
+	return (il->count > 3) ? il->speed : -1;
+}
+
 float il_average(ideal_line* il) {
 	int length = il->count;
 	double average = 0;
@@ -537,7 +541,7 @@ void il_update(ideal_line* il, float s, float x, float y) {
 
 		il->count += 1;
 
-		il->speed = ((il->speed * il->count) + il->speed) / (il->count + 1);
+		il->speed = ((il->speed * il->count) + s) / (il->count + 1);
 
 		il->posX = ((il->posX * il->count) + x) / (il->count + 1);
 		il->posY = ((il->posY * il->count) + y) / (il->count + 1);
@@ -592,12 +596,7 @@ double getAverageSpeed(double running) {
 	return (count > 0) ? speed / count : -1;
 	*/
 
-	ideal_line* slot = &idealLine[index];
-
-	if (slot->count > 20)
-		return slot->speed;
-	else
-		return -1;
+	return il_get_speed(&idealLine[index]);
 }
 
 double bestLapTime = INT_LEAST32_MAX;

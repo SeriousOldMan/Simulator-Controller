@@ -1310,7 +1310,7 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 	}
 
-	lastLap() {
+	finalLap() {
 		local knowledgeBase := this.KnowledgeBase
 		local sessionTimeRemaining, driverCar, running, time
 
@@ -1516,7 +1516,7 @@ class RaceSpotter extends GridRaceAssistant {
 						return true
 				}
 			}
-			else if this.lastLap() {
+			else if this.finalLap() {
 				situation := "LastLap"
 
 				if !this.SessionInfos.Has(situation) {

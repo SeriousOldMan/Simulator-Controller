@@ -876,6 +876,8 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			if this.StartupSettings
 				this.iRaceAssistantMuted := getMultiMapValue(this.StartupSettings, this.Plugin, "Muted", this.iRaceAssistantMuted)
 
+			deleteDirectory(kTempDirectory . "Race Assistant")
+
 			controller.registerPlugin(this)
 
 			registerMessageHandler(this.Plugin, methodMessageHandler, this)
@@ -1573,7 +1575,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			return false
 	}
 
-	static lastLap(data, &state) {
+	static finalLap(data, &state) {
 		local leader, driver, sessionTimeRemaining, driverCar, time, running
 
 		if (getMultiMapValue(data, "Session Data", "SessionFormat") = "Time") {
@@ -2233,13 +2235,17 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		local teamSessionActive := false
 		local startTime := A_TickCount
 		local splitTime := startTime
+		local lastLap := RaceAssistantPlugin.LastLap
 		local telemetryData, positionsData, data, dataLastLap
 		local testData, message, key, value, session, teamServer
-		local newLap, firstLap, ignore, assistant, hasAssistant, lastLap
+		local newLap, firstLap, ignore, assistant, hasAssistant, finalLap
 		local simulator, car, track, weather
 
 		static replayLap := false
 		static replayIndex := false
+		static collectorLastLap := 0
+		static collectorLapRunning := 0
+		static wasInactive := false
 
 		if (RaceAssistantPlugin.Finish = "Finished")
 			RaceAssistantPlugin.finishAssistantsSession()
@@ -2294,15 +2300,24 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			else
 				data := RaceAssistantPlugin.acquireSessionData(&telemetryData, &positionsData)
 
+			dataLastLap := getMultiMapValue(data, "Stint Data", "Laps", 0)
+
 			if isDebug() {
+				DirCreate(kTempDirectory . "Race Assistant")
+
+				if (dataLastLap != collectorLastLap)
+					collectorLapRunning := 0
+
+				collectorLastLap := dataLastLap
+
+				writeMultiMap(kTempDirectory . "Race Assistant\Lap " . dataLastLap . "." . ++collectorLapRunning . ".data", data)
+
 				logMessage(kLogInfo, "Collect session data (Data Acquisition):" . (A_TickCount - splitTime) . " ms...")
 
 				splitTime := A_TickCount
 			}
 
-			dataLastLap := getMultiMapValue(data, "Stint Data", "Laps", 0)
-
-			if (RaceAssistantPlugin.runningSession(data) && (RaceAssistantPlugin.LastLap == 0))
+			if (RaceAssistantPlugin.runningSession(data) && (lastLap == 0))
 				prepareSessionDatabase(data)
 
 			if (false && isDebug()) {
@@ -2329,8 +2344,8 @@ class RaceAssistantPlugin extends ControllerPlugin {
 					setMultiMapValue(data, "Session Data", "Session", "Race")
 
 					if (getMultiMapValue(data, "Session Data", "SessionFormat") = "Time") {
-						if (!RaceAssistantPlugin.Finish && RaceAssistantPlugin.lastLap(data, &lastLap))
-							RaceAssistantPlugin.sFinish := lastLap
+						if (!RaceAssistantPlugin.Finish && RaceAssistantPlugin.finalLap(data, &finalLap))
+							RaceAssistantPlugin.sFinish := finalLap
 
 						finished := false
 					}
@@ -2359,12 +2374,14 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				if !RaceAssistantPlugin.sessionActive(data) {
 					; Not in a supported session
 
+					wasInactive := true
+
 					RaceAssistantPlugin.finishAssistantsSession()
 
 					return
 				}
 
-				if ((dataLastLap < RaceAssistantPlugin.LastLap) || (RaceAssistantPlugin.Session != session)) {
+				if ((dataLastLap < lastLap) || (RaceAssistantPlugin.Session != session)) {
 					; Start of new session without finishing previous session first
 
 					if (RaceAssistantPlugin.Session != kSessionFinished) {
@@ -2420,7 +2437,10 @@ class RaceAssistantPlugin extends ControllerPlugin {
 						; Car has finished the first lap
 
 						if (dataLastLap > 1) {
-							if (RaceAssistantPlugin.LastLap == 0) {
+							if ((dataLastLap > (lastLap + 1)) && !wasInactive && RaceAssistantPlugin.LapRunning) {
+								; The lap counter jumped from 0 directly to a value greater than 1 - strange case, which sometimes happen in iRacing practice sessions
+							}
+							else if (lastLap == 0) {
 								; Missed the start of the session, might be a team session
 
 								teamSessionActive := RaceAssistantPlugin.connectTeamSession()
@@ -2441,7 +2461,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 								joinedSession := true
 							}
-							else if (RaceAssistantPlugin.LastLap < (dataLastLap - 1)) {
+							else if (lastLap < (dataLastLap - 1)) {
 								; Regained the car after a driver swap, stint
 
 								RaceAssistantPlugin.sStintStartTime := false
@@ -2460,16 +2480,18 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 								RaceAssistantPlugin.restoreAssistantsSessionState(data)
 							}
-							else ; (this.LastLap == (dataLastLap - 1))
-								if !RaceAssistantPlugin.driverActive(data)
-									return ; Oops, a different driver, might happen in some simulations after a pitstop
+
+							wasInactive := false
+
+							if !RaceAssistantPlugin.driverActive(data)
+								return ; Oops, a different driver, might happen in some simulations after a pitstop
 						}
 
-						if (!RaceAssistantPlugin.Finish && RaceAssistantPlugin.lastLap(data, &lastLap))
-							RaceAssistantPlugin.sFinish := lastLap
+						if (!RaceAssistantPlugin.Finish && RaceAssistantPlugin.finalLap(data, &finalLap))
+							RaceAssistantPlugin.sFinish := finalLap
 
-						newLap := (dataLastLap > RaceAssistantPlugin.LastLap)
-						firstLap := ((dataLastLap == 1) && newLap)
+						newLap := (dataLastLap > lastLap)
+						firstLap := ((lastLap == 0) && newLap)
 
 						if RaceAssistantPlugin.InPit {
 							RaceAssistantPlugin.sInPit := false

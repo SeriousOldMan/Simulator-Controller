@@ -49,7 +49,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[5.6.6.0-dev]() (Early build for 5.6.6. Changes: Fixed shared database synchronization, Added "Both" to "Spotter: Car Indicator" setting, Fixed iRacing practice session detection, "Car Indicator" setting also for the Stratgist.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-566) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

@@ -919,6 +919,19 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 	}
 
+	getCarIndicatorFragment(speaker, number, position) {
+		local indicator := getMultiMapValue(this.Settings, "Assistant.Strategist", "CarIndicator", "Position")
+
+		if ((indicator = "Position") && position)
+			return substituteVariables(this.getSpeaker().Fragments["CarPosition"], {position: position})
+		else if ((indicator = "Both") && number && position)
+			return substituteVariables(this.getSpeaker().Fragments["CarBoth"], {number: number, position: position})
+		else if ((indicator = "Number") && number)
+			return substituteVariables(this.getSpeaker().Fragments["CarNumber"], {number: number})
+
+		return super.getCarIndicatorFragment(speaker, number, position)
+	}
+
 	handleVoiceCommand(grammar, words) {
 		switch grammar, false {
 			case "LapsRemaining":

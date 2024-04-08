@@ -3,7 +3,7 @@ Version=5.6.6.0-dev
 Target=5.6.6.0-release
 Date=04/05/2024
 Download=
-Changes=Fixed shared database synchronization, Added "Both" to "Spotter: Car Indicator" setting
+Changes=Fixed shared database synchronization, Added "Both" to "Spotter: Car Indicator" setting, Fixed iRacing practice session detection, "Car Indicator" setting also for the Stratgist
 Components=Media->5.6.1,Configuration->5.6.4,Utilities->5.4.8
 [Release]
 Version=5.6.5.0-release

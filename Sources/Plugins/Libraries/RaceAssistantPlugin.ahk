@@ -2431,7 +2431,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 						RaceAssistantPlugin.prepareAssistantsSession(data, RaceAssistantPlugin.LapRunning + 1)
 
-						RaceAssistantPlugin.sLapRunning := RaceAssistantPlugin.LapRunning + 1
+						RaceAssistantPlugin.sLapRunning := (RaceAssistantPlugin.LapRunning + 1)
 					}
 					else if (dataLastLap > 0) {
 						; Car has finished the first lap
@@ -2569,7 +2569,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 							splitTime := A_TickCount
 						}
 
-						RaceAssistantPlugin.sLapRunning := RaceAssistantPlugin.LapRunning + 1
+						RaceAssistantPlugin.sLapRunning := (RaceAssistantPlugin.LapRunning + 1)
 
 						if newLap
 							RaceAssistantPlugin.addAssistantsLap(data, telemetryData, positionsData)

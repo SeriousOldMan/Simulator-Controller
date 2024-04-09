@@ -147,7 +147,10 @@ class TriggerDetectorContinuation extends Continuation {
 
 			buttonsDown := translate("Buttons Down:")
 
-			ToolTip(joy_name . " (#" joystickNumber "):`n" . axis_info . "`n" . buttonsDown . A_Space . buttons_down, , , 1)
+			if (Task.CurrentTask.Sleep > 0)
+				ToolTip(joy_name . " (#" joystickNumber "):`n" . axis_info . "`n" . buttonsDown . A_Space . buttons_down, , , 1)
+			else if (Random(1, 10) > 9)
+					ToolTip(joy_name . " (#" joystickNumber "):`n" . axis_info . "`n" . buttonsDown . A_Space . buttons_down, , , 1)
 
 			if found {
 				if this.Task.Callback {
@@ -161,7 +164,7 @@ class TriggerDetectorContinuation extends Continuation {
 					return TriggerDetectorContinuation(this.Task, 2000)
 			}
 
-			return TriggerDetectorContinuation(this.Task, 750)
+			return TriggerDetectorContinuation(this.Task, 0)
 		}
 		else {
 			this.stop()

@@ -1531,7 +1531,7 @@ class RaceAssistant extends ConfigurationItem {
 			}
 		}
 
-		if (lapNumber = 1)
+		if (lapNumber < 5)
 			if ((knowledgeBase.getValue("Session.Duration", 0) == 0) || (knowledgeBase.getValue("Session.Laps", 0) == 0))
 				this.initializeSessionFormat(knowledgeBase, this.Settings, data, lapTime)
 
@@ -1579,8 +1579,8 @@ class RaceAssistant extends ConfigurationItem {
 
 		knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.Remaining", Round(fuelRemaining, 2))
 
-		if (lapNumber == 1) {
-			this.updateDynamicValues({BaseLap: 1
+		if ((lapNumber < 5) && !this.BaseLap) {
+			this.updateDynamicValues({BaseLap: lapNumber
 									, LastFuelAmount: fuelRemaining, InitialFuelAmount: fuelRemaining, AvgFuelConsumption: 0})
 
 			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.AvgConsumption", 0)

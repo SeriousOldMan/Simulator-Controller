@@ -2,8 +2,8 @@
 Version=5.6.6.0-dev
 Target=5.6.6.0-release
 Date=04/09/2024
-Download=
-Changes=Fixed shared database synchronization, Added "Both" to "Spotter: Car Indicator" setting, Fixed iRacing practice session detection, "Car Indicator" setting also for the Stratgist, Increased trigger detection speed
+Download=https://www.dropbox.com/scl/fi/v7ryx3l89e18a7zbirwbt/Simulator-Controller-5.6.6.0-dev.zip?rlkey=17cosfow4e1t5k0ksjvg5769s&dl=1
+Changes=Fixed shared database synchronization, Added "Both" to "Spotter: Car Indicator" setting, Fixed iRacing practice session detection, "Car Indicator" setting also for the Stratgist, Increased trigger detection speed, Tweaked accident detection
 Components=Media->5.6.1,Configuration->5.6.4,Utilities->5.4.8
 [Release]
 Version=5.6.5.0-release

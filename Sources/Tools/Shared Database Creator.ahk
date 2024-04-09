@@ -252,14 +252,14 @@ downloadUserDatabases(directory) {
 		}
 	}
 
-	for ignore, fileName in ftpListFiles("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "simulator-controller/database-uploads") {
+	for ignore, fileName in ftpListFiles("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/simulator-controller/database-uploads") {
 		SplitPath(fileName, , , , &idName)
 
 		idName := StrReplace(idName, "Database.", "")
 
 		updateProgress("Downloading " . idName . "...")
 
-		ftpDownload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "simulator-controller/database-uploads/" . fileName, directory . fileName)
+		ftpDownload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/simulator-controller/database-uploads/" . fileName, directory . fileName)
 
 		updateProgress("Extracting " . idName . "...")
 
@@ -384,11 +384,11 @@ createSharedDatabases() {
 
 	showProgress({progress: (vProgressCount := vProgressCount + 2), color: "Green", title: "Uploading Community Content", message: "Cleaning remote repository..."})
 
-	ftpClearDirectory("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "simulator-controller/database-downloads")
-	ftpRemoveDirectory("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "simulator-controller", "database-downloads")
-	ftpCreateDirectory("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "simulator-controller", "database-downloads")
+	ftpClearDirectory("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/simulator-controller/database-downloads")
+	ftpRemoveDirectory("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/simulator-controller", "database-downloads")
+	ftpCreateDirectory("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/simulator-controller", "database-downloads")
 
-	for ignore, file in ftpListFiles("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "simulator-controller/database-downloads") {
+	for ignore, file in ftpListFiles("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/simulator-controller/database-downloads") {
 		deleteFile(A_Temp . "\clearRemoteDirectory.txt")
 
 		command := "
@@ -396,6 +396,7 @@ createSharedDatabases() {
 open ftpupload.net
 epiz_32854064
 d5NW1ps6jX6Lk
+cd htdocs
 cd simulator-controller
 cd database-downloads
 del %file%
@@ -423,7 +424,7 @@ quit
 
 		updateProgress("Uploading " . fileName . "...")
 
-		ftpUpload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", filePath, "simulator-controller/database-downloads/" . fileName)
+		ftpUpload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", filePath, "htdocs/simulator-controller/database-downloads/" . fileName)
 	}
 
 	showProgress({progress: 100, message: "Finished..."})

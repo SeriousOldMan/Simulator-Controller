@@ -31,6 +31,7 @@
 
 class RaceStrategist extends GridRaceAssistant {
 	iRaceInfo := false
+	iRaceInfoSaved := false
 
 	iOriginalStrategy := false
 	iStrategy := false
@@ -811,6 +812,7 @@ class RaceStrategist extends GridRaceAssistant {
 			this.iStrategyReported := false
 			this.iLastStrategyUpdate := 0
 			this.iRejectedStrategy := false
+			this.iRaceInfoSaved := false
 		}
 	}
 
@@ -917,6 +919,19 @@ class RaceStrategist extends GridRaceAssistant {
 
 			return super.getClass(car, data, strategistCategories)
 		}
+	}
+
+	getCarIndicatorFragment(speaker, number, position) {
+		local indicator := getMultiMapValue(this.Settings, "Assistant.Strategist", "CarIndicator", "Position")
+
+		if ((indicator = "Position") && position)
+			return substituteVariables(this.getSpeaker().Fragments["CarPosition"], {position: position})
+		else if ((indicator = "Both") && number && position)
+			return substituteVariables(this.getSpeaker().Fragments["CarBoth"], {number: number, position: position})
+		else if ((indicator = "Number") && number)
+			return substituteVariables(this.getSpeaker().Fragments["CarNumber"], {number: number})
+
+		return super.getCarIndicatorFragment(speaker, number, position)
 	}
 
 	handleVoiceCommand(grammar, words) {
@@ -1460,8 +1475,8 @@ class RaceStrategist extends GridRaceAssistant {
 		if (!this.RaceInfo || (isSet(formationLap) && formationLap))
 			this.updateRaceInfo(this.createRaceData(data))
 
-		if ((this.Session == kSessionRace) && (getMultiMapValue(data, "Stint Data", "Laps", 0) <= 1)
-										   && FileExist(kUserConfigDirectory . "Race.strategy")) {
+		if ((this.Session == kSessionRace) && (getMultiMapValue(data, "Stint Data", "Laps", 0) < 5)
+										   && FileExist(kUserConfigDirectory . "Race.strategy") && !this.Strategy) {
 			theStrategy := RaceStrategist.RaceStrategy(this, readMultiMap(kUserConfigDirectory . "Race.strategy"), SessionDatabase.ID, [], false)
 
 			applicableStrategy := false
@@ -2019,7 +2034,7 @@ class RaceStrategist extends GridRaceAssistant {
 		if (!this.RaceInfo || (this.RaceInfo["Cars"] = 0))
 			this.updateRaceInfo(this.createRaceData(data))
 
-		if (noGrid && this.GridPosition && (lapNumber <= 1))
+		if (noGrid && this.GridPosition && (lapNumber < 5))
 			this.saveStandingsData(lapNumber, simulator, car, track)
 
 		Task.startTask((*) => this.saveSessionInfo(lapNumber, simulator, car, track
@@ -3794,7 +3809,9 @@ class RaceStrategist extends GridRaceAssistant {
 			if ((driver == 0) || (carCount == 0))
 				return
 
-			if (lapNumber == 1) {
+			if ((lapNumber < 5) && !this.iRaceInfoSaved) {
+				this.iRaceInfoSaved := true
+
 				data := newMultiMap()
 
 				setMultiMapValue(data, "Session", "Time", this.SessionTime)

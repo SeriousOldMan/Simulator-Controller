@@ -500,6 +500,10 @@ public:
 	float posX = 0;
 	float posY = 0;
 
+	inline float getSpeed() {
+		return (count > 3) ? speed : -1;
+	}
+
 	float average() {
 		int length = speeds.size();
 		double average = 0;
@@ -551,7 +555,7 @@ public:
 		{
 			speeds.reserve(1000);
 
-			speeds.push_back(speed);
+			speeds.push_back(s);
 
 			count = 1;
 
@@ -564,9 +568,9 @@ public:
 		{
 			count += 1;
 
-			speeds.push_back(speed);
+			speeds.push_back(s);
 
-			speed = ((speed * count) + speed) / (count + 1);
+			speed = ((speed * count) + s) / (count + 1);
 
 			posX = ((posX * count) + x) / (count + 1);
 			posY = ((posY * count) + y) / (count + 1);
@@ -674,8 +678,8 @@ void updateLastCarCoordinates(bool init) {
 
 inline bool hasValidCarCoordinates(long* milliSeconds) {
 	(*milliSeconds) = GetTickCount() - lastCarCoordinatesUpdate;
-
-	if ((*milliSeconds) < 100)
+	
+	if ((*milliSeconds) < 75)
 		return false;
 	else if ((*milliSeconds) > 200) {
 		updateLastCarCoordinates(false);
@@ -883,21 +887,8 @@ float getRunning(int carIdx) {
 inline float getSpeed(int carIdx, long milliSeconds) {
 	float speed;
 
-	if (getLastCarCoordinates(carIdx, milliSeconds, &speed)) {
-		/*
-		if (traceFileName != "") {
-			std::ofstream output;
-
-			output.open(traceFileName, std::ios::out | std::ios::app);
-
-			output << "S (" << carIdx << "): " << speed << endl;
-
-			output.close();
-		}
-		*/
-
+	if (getLastCarCoordinates(carIdx, milliSeconds, &speed))
 		return speed;
-	}
 	else
 		return -1;
 }
@@ -930,21 +921,23 @@ double getAverageSpeed(double running) {
 	
 	index = min(last, max(0, index));
 	
+	/*
 	if (idealLine[index].count > 20)
-		for (int i = max(0, index - 2); i <= min(last, index + 2); i++) {
-			IdealLine slot = idealLine[i];
-		
-			if (slot.count > 20) {
-				speed += slot.speed;
+		for (int i = max(0, index - 1); i <= min(last, index + 1); i++)
+			if (idealLine[i].count > 20) {
+				speed += idealLine[i].speed;
 				count += 1;
 			}
-		}
 	
 	return (count > 0) ? speed / count : -1;
+	*/
+
+	return idealLine[index].getSpeed();
 }
 
 bool checkAccident() {
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
+	bool accident = false;
 
 	if (gf->isInPit || gf->isInPitLane) {
 		trackSplineBuilding = false;
@@ -988,36 +981,44 @@ bool checkAccident() {
 	accidentsBehind.clear();
 	slowCarsAhead.clear();
 
-	float driverDistance = getRunning(carID);
+	float driverRunning = getRunning(carID);
 	
 	if (traceFileName != "") {
 		std::ofstream output;
 
 		output.open(traceFileName, std::ios::out | std::ios::app);
 
-		output << "D " << driverDistance << endl;
+		output << "D (" << carID << "): " << driverRunning << endl;
 
 		output.close();
 	}
 
-	if (driverDistance >= 0) {
+	if (driverRunning >= 0) {
 		try
 		{
-			driverDistance = driverDistance * trackLength;
+			float driverDistance = driverRunning * trackLength;
 
-			for (int i = 0; i < gf->activeCars; i++)
+			for (int i = 0; i < gf->activeCars; i++) {
+				double speed = getSpeed(i, milliSeconds);
+				double running = getRunning(i);
+				double avgSpeed = getAverageSpeed(running);
+				
+				if (traceFileName != "") {
+					std::ofstream output;
+
+					output.open(traceFileName, std::ios::out | std::ios::app);
+
+					output << "S (" << i << "): " << running << "; " << speed << "; " << avgSpeed << endl;
+
+					output.close();
+				}
+
 				if (i != carID) {
-					double speed = getSpeed(i, milliSeconds);
-
 					if (speed >= 5) {
-						double distance = getRunning(i);
-
-						if (distance >= 0) {
-							double avgSpeed = getAverageSpeed(distance);
-							
+						if (running >= 0) {
 							if ((avgSpeed >= 0) && (speed < (avgSpeed / 2)))
 							{
-								distance = distance * trackLength;
+								float distance = running * trackLength;
 
 								long distanceAhead = (long)(((distance > driverDistance) ? distance : (distance + trackLength)) - driverDistance);
 
@@ -1068,10 +1069,17 @@ bool checkAccident() {
 								}
 							}
 							else
-								updateIdealLine(i, distance, speed);
+								updateIdealLine(i, running, speed);
 						}
 					}
 				}
+				else {
+					if (speed >= 5) {
+						if ((avgSpeed >= 0) && (speed < (avgSpeed / 2)))
+							accident = true;
+					}
+				}
+			}
 		}
 		catch (const std::exception& ex) {
 			if (traceFileName != "") {
@@ -1116,78 +1124,80 @@ bool checkAccident() {
 
 	updateLastCarCoordinates(false);
 
-	if (accidentsAhead.size() > 0)
-	{
-		if (cycle > nextAccidentAhead)
+	if (!accident) {
+		if (accidentsAhead.size() > 0)
 		{
-			long distance = LONG_MAX;
+			if (cycle > nextAccidentAhead)
+			{
+				long distance = LONG_MAX;
 
-			for (int i = 0; i < accidentsAhead.size(); i++)
-				distance = ((distance < accidentsAhead[i].distance) ? distance : accidentsAhead[i].distance);
+				for (int i = 0; i < accidentsAhead.size(); i++)
+					distance = ((distance < accidentsAhead[i].distance) ? distance : accidentsAhead[i].distance);
 
-			if (distance > 50) {
-				nextAccidentAhead = cycle + 400;
-				nextSlowCarAhead = cycle + 200;
+				if (distance > 50) {
+					nextAccidentAhead = cycle + 400;
+					nextSlowCarAhead = cycle + 200;
 
-				char message[40] = "accidentAlert:Ahead;";
-				char numBuffer[20];
+					char message[40] = "accidentAlert:Ahead;";
+					char numBuffer[20];
 
-				sprintf_s(numBuffer, "%d", distance);
-				strcat_s(message, numBuffer);
+					sprintf_s(numBuffer, "%d", distance);
+					strcat_s(message, numBuffer);
 
-				sendSpotterMessage(message);
+					sendSpotterMessage(message);
 
-				return true;
+					return true;
+				}
 			}
 		}
-	}
 
-	if (slowCarsAhead.size() > 0)
-	{
-		if (cycle > nextSlowCarAhead)
+		if (slowCarsAhead.size() > 0)
 		{
-			long distance = LONG_MAX;
+			if (cycle > nextSlowCarAhead)
+			{
+				long distance = LONG_MAX;
 
-			for (int i = 0; i < slowCarsAhead.size(); i++)
-				distance = ((distance < slowCarsAhead[i].distance) ? distance : slowCarsAhead[i].distance);
+				for (int i = 0; i < slowCarsAhead.size(); i++)
+					distance = ((distance < slowCarsAhead[i].distance) ? distance : slowCarsAhead[i].distance);
 
-			if (distance > 100) {
-				nextSlowCarAhead = cycle + 200;
+				if (distance > 100) {
+					nextSlowCarAhead = cycle + 200;
 
-				char message[40] = "slowCarAlert:";
-				char numBuffer[20];
+					char message[40] = "slowCarAlert:";
+					char numBuffer[20];
 
-				sprintf_s(numBuffer, "%d", distance);
-				strcat_s(message, numBuffer);
+					sprintf_s(numBuffer, "%d", distance);
+					strcat_s(message, numBuffer);
 
-				sendSpotterMessage(message);
+					sendSpotterMessage(message);
 
-				return true;
+					return true;
+				}
 			}
 		}
-	}
 
-	if (accidentsBehind.size() > 0)
-	{
-		if (cycle > nextAccidentBehind)
+		if (accidentsBehind.size() > 0)
 		{
-			long distance = LONG_MAX;
+			if (cycle > nextAccidentBehind)
+			{
+				long distance = LONG_MAX;
 
-			for (int i = 0; i < accidentsBehind.size(); i++)
-				distance = ((distance < accidentsBehind[i].distance) ? distance : accidentsBehind[i].distance);
+				for (int i = 0; i < accidentsBehind.size(); i++)
+					distance = ((distance < accidentsBehind[i].distance) ? distance : accidentsBehind[i].distance);
 
-			if (distance > 50) {
-				nextAccidentBehind = cycle + 400;
+				if (distance > 50) {
+					nextAccidentBehind = cycle + 400;
 
-				char message[40] = "accidentAlert:Behind;";
-				char numBuffer[20];
+					char message[40] = "accidentAlert:Behind;";
+					char numBuffer[20];
 
-				sprintf_s(numBuffer, "%d", distance);
-				strcat_s(message, numBuffer);
+					sprintf_s(numBuffer, "%d", distance);
+					strcat_s(message, numBuffer);
 
-				sendSpotterMessage(message);
+					sendSpotterMessage(message);
 
-				return true;
+					return true;
+				}
 			}
 		}
 	}

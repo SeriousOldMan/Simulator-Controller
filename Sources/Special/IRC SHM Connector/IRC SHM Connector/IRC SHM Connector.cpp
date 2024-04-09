@@ -863,7 +863,7 @@ void writeData(std::ostringstream * output, const irsdk_header *header, const ch
 			bool practice = false;
 
 			if (getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}SessionType:", sessionID))
-				if (strstr(result, "Practice") || strstr(result, "Warmup"))
+				if (strstr(result, "Practice") || strstr(result, "Warmup") || strstr(result, "Offline Testing"))
 					practice = true;
 
 			if (!practice && sessionLaps > 0 && (long)(sessionLaps - laps) <= 0)

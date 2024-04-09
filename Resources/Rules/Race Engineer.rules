@@ -184,7 +184,7 @@ nextDryTyreSet(?set, ?nextSet) <= ?nextSet = ?set + 1
 ;;;                         Pressure loss calculation                       ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Lap = 1] => (Prove: clearPressureLossCalibration(?Lap))
+{All: [?Lap < 5], {Prove: unbound?(!Tyre.Pressure.Reference.Lap)}} => (Prove: clearPressureLossCalibration(?Lap))
 
 clearPressureLossCalibration(?lap) <= ?calibrationLap = ?lap + !Session.Settings.Lap.Learning.Laps,
 									  Set(Tyre.Pressure.Reference.Lap, ?calibrationLap),

@@ -197,7 +197,7 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies) {
 			logError(exception)
 		}
 
-		ftpUpload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", kTempDirectory . "Shared Database\Database." . id . ".zip", "simulator-controller/database-uploads/Database." . id . ".zip")
+		ftpUpload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", kTempDirectory . "Shared Database\Database." . id . ".zip", "htdocs/simulator-controller/database-uploads/Database." . id . ".zip")
 
 		deleteDirectory(kTempDirectory . "Shared Database")
 		deleteFile(sessionDBPath . "UPLOAD")
@@ -249,14 +249,14 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups, downloadStrategie
 
 		writeMultiMap(kTempDirectory . "Database Synchronizer.state", configuration)
 
-		for ignore, fileName in ftpListFiles("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "simulator-controller/database-downloads") {
+		for ignore, fileName in ftpListFiles("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/simulator-controller/database-downloads") {
 			SplitPath(fileName, , , , &databaseDirectory)
 
 			type := StrSplit(Trim(fileName), ".", "", 2)[1]
 
 			if ((type = (downloadPressures . downloadSetups . downloadStrategies)) || (type = (downloadPressures . downloadSetups))) {
 				if (SessionDatabase.DatabaseVersion != databaseDirectory) {
-					ftpDownload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "simulator-controller/database-downloads/" . fileName, kTempDirectory . fileName)
+					ftpDownload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/simulator-controller/database-downloads/" . fileName, kTempDirectory . fileName)
 
 					try {
 						RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . kTempDirectory . fileName . "' -DestinationPath '" . kTempDirectory . "Shared Database' -Force", , "Hide")

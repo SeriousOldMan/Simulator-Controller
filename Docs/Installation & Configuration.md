@@ -370,7 +370,7 @@ Note: Additionally to this default configuration, you can specify the spoken and
 With the last option, you can configure a *Push-To-Talk* function for voice recognition, which will greatly enhance the voice recognition quality and will avoid almost all false positives, if you are not in a very quite environment. The argument to be entered in the field is a key code as defined in the AutoHotkey [key list](https://www.autohotkey.com/docs/KeyList.htm). For example, "LControl" defines the left control key on the keyboard, whereas "4Joy2" defines the second button on your 4th connected hardware controller.
 Using *Activation Command* you can supply a keyword or a complete phrase to focus the voice recognition framework to the commands you defined as voice commands for [controller actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-controller). The recognition language for this activation command will always be the one chosen by the language dropdown menu above. For more information on how to use multiple voice *communication partners*, see the [corresponding documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#voice-commands).
 
-Note: You can use the [Trigger Detector Tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#trigger-detector-tool) to find out, which button codes your connected controller actually use, by clicking the small button on the right side of the *Push-To-Talk* entry field. If you push a simple button on your external controller, the corresponding hotkey name will be inserted into the *Push-To-Talk* edit field.
+Note: You can use the [Trigger Detector Tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#trigger-detector-tool) to find out, which button codes your connected controller actually use, by clicking the small button on the right side of the *Push-To-Talk* entry field. If you push a simple button on your external controller or a single key on your keyboard, the corresponding hotkey name will be inserted into the *Push-To-Talk* edit field.
 
 #### Tab *Plugins*
 
@@ -517,7 +517,7 @@ Although you may call any globally defined function, you should use only the fol
 
 ##### Trigger Detector Tool
 
-This little tool will help you identifying the button numbers of your hardware controller. If you push the "Trigger..." button, a flying tool tip will apear next to your mouse cursor, which provide some information about your connected controller devices and the buttons or other triggers, that are currently being pushed there. To disable the tool tip, press the "Trigger..." button again or use the "ESC" key.
+This little tool will help you identifying the button numbers of your hardware controller. If you push the "Trigger..." button, a flying tool tip will apear next to your mouse cursor, which provide some information about your connected controller devices and the buttons or other triggers, that are currently being pushed there. You can also type a single key on the keyboard to display the correpsonding logical key name. To disable the tool tip, press the "Trigger..." button again or use the "ESC" key.
 
 #### Tab *Launchpad*
 

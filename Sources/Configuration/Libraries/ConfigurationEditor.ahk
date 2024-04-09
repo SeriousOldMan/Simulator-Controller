@@ -43,6 +43,10 @@ class TriggerDetectorTask extends Task {
 	}
 
 	Stopped {
+		Get {
+			return super.Stopped
+		}
+
 		Set {
 			if value
 				ToolTip(, , 1)
@@ -68,7 +72,7 @@ class TriggerDetectorTask extends Task {
 		local joyName
 
 		loop 16 { ; Query each joystick number to find out which ones exist.
-			joyName := (GetKeyState(A_Index . "JoyName") ? "D" : "U")
+			joyName := (GetKeyState(A_Index . "JoyName") ? "D" : "")
 
 			if (joyName != "")
 				joysticks.Push(A_Index)
@@ -90,6 +94,7 @@ class TriggerDetectorContinuation extends Continuation {
 	}
 
 	run() {
+		local key := false
 		local found, joysticks, joystickNumber, joy_buttons, joy_name, joy_state, buttons_down, joy_info
 		local axis_info, buttonsDown, callback
 
@@ -102,59 +107,76 @@ class TriggerDetectorContinuation extends Continuation {
 				return false
 			}
 
-			joysticks := this.Task.Joysticks
+			key := this.detectKey()
 
-			joystickNumber := joysticks[1]
+			if key {
+				if InStr(key, "Esc") {
+					this.stop()
 
-			joysticks.RemoveAt(1)
-			joysticks.Push(joystickNumber)
-
-			; SetFormat Float, 03  ; Omit decimal point from axis position percentages.
-
-			joy_buttons := GetKeyState(joystickNumber . "JoyButtons")
-			joy_name := GetKeyState(joystickNumber . "JoyName")
-			joy_info := GetKeyState(joystickNumber . "JoyInfo")
-
-			buttons_down := ""
-			buttons := []
-
-			loop joy_buttons {
-				if GetKeyState(joystickNumber . "joy" . A_Index) {
-					buttons_down := (buttons_down . A_Space . A_Index)
-
-					found := A_Index
+					return false
 				}
+
+				found := true
+
+				ToolTip(key, , , 1)
+			}
+			else {
+				joysticks := this.Task.Joysticks
+
+				loop joysticks.Length {
+					joystickNumber := joysticks[1]
+
+					joysticks.RemoveAt(1)
+					joysticks.Push(joystickNumber)
+
+					; SetFormat Float, 03  ; Omit decimal point from axis position percentages.
+
+					joy_buttons := GetKeyState(joystickNumber . "JoyButtons")
+					joy_name := GetKeyState(joystickNumber . "JoyName")
+					joy_info := GetKeyState(joystickNumber . "JoyInfo")
+
+					buttons_down := ""
+					buttons := []
+
+					loop joy_buttons {
+						if GetKeyState(joystickNumber . "joy" . A_Index) {
+							buttons_down := (buttons_down . A_Space . A_Index)
+
+							found := A_Index
+						}
+					}
+
+					axis_info := ("X" . (GetKeyState(joystickNumber . "JoyX") ? "D" : "U"))
+
+					axis_info := (axis_info . A_Space . A_Space . "Y" .  (GetKeyState(joystickNumber . "JoyY") ? "D" : "U"))
+
+					if InStr(joy_info, "Z")
+						axis_info := (axis_info . A_Space . A_Space . "Z" . (GetKeyState(joystickNumber . "JoyZ") ? "D" : "U"))
+
+					if InStr(joy_info, "R")
+						axis_info := (axis_info . A_Space . A_Space . "R" . (GetKeyState(joystickNumber . "JoyR") ? "D" : "U"))
+
+					if InStr(joy_info, "U")
+						axis_info := (axis_info . A_Space . A_Space . "U" . (GetKeyState(joystickNumber . "JoyU") ? "D" : "U"))
+
+					if InStr(joy_info, "V")
+						axis_info := (axis_info . "" . A_Space . "" . A_Space . "V" . (GetKeyState(joystickNumber "JoyV", ) ? "D" : "U"))
+
+					if InStr(joy_info, "P")
+						axis_info := (axis_info . A_Space . A_Space . "POV" . (GetKeyState(joystickNumber "JoyPOV") ? "D" : "U"))
+
+					buttonsDown := translate("Buttons Down:")
+				}
+
+				if found
+					ToolTip(joy_name . " (#" joystickNumber "):`n" . axis_info . "`n" . buttonsDown . A_Space . buttons_down, , , 1)
+				else
+					ToolTip(translate("Waiting..."), , , 1)
 			}
 
-			axis_info := ("X" . (GetKeyState(joystickNumber . "JoyX") ? "D" : "U"))
-
-			axis_info := (axis_info . A_Space . A_Space . "Y" .  (GetKeyState(joystickNumber . "JoyY") ? "D" : "U"))
-
-			if InStr(joy_info, "Z")
-				axis_info := (axis_info . A_Space . A_Space . "Z" . (GetKeyState(joystickNumber . "JoyZ") ? "D" : "U"))
-
-			if InStr(joy_info, "R")
-				axis_info := (axis_info . A_Space . A_Space . "R" . (GetKeyState(joystickNumber . "JoyR") ? "D" : "U"))
-
-			if InStr(joy_info, "U")
-				axis_info := (axis_info . A_Space . A_Space . "U" . (GetKeyState(joystickNumber . "JoyU") ? "D" : "U"))
-
-			if InStr(joy_info, "V")
-				axis_info := (axis_info . "" . A_Space . "" . A_Space . "V" . (GetKeyState(joystickNumber "JoyV", ) ? "D" : "U"))
-
-			if InStr(joy_info, "P")
-				axis_info := (axis_info . A_Space . A_Space . "POV" . (GetKeyState(joystickNumber "JoyPOV") ? "D" : "U"))
-
-			buttonsDown := translate("Buttons Down:")
-
-			if (Task.CurrentTask.Sleep > 0)
-				ToolTip(joy_name . " (#" joystickNumber "):`n" . axis_info . "`n" . buttonsDown . A_Space . buttons_down, , , 1)
-			else if (Random(1, 10) > 9)
-					ToolTip(joy_name . " (#" joystickNumber "):`n" . axis_info . "`n" . buttonsDown . A_Space . buttons_down, , , 1)
-
-			if found {
+			if found
 				if this.Task.Callback {
-					this.Task.Callback.Call(joystickNumber . "Joy" . found)
+					this.Task.Callback.Call(key ? key : (joystickNumber . "Joy" . found))
 
 					this.stop()
 
@@ -162,7 +184,6 @@ class TriggerDetectorContinuation extends Continuation {
 				}
 				else
 					return TriggerDetectorContinuation(this.Task, 2000)
-			}
 
 			return TriggerDetectorContinuation(this.Task, 0)
 		}
@@ -171,6 +192,29 @@ class TriggerDetectorContinuation extends Continuation {
 
 			return false
 		}
+	}
+
+	detectKey() {
+		local input := InputHook("T0.1")
+		local key
+
+		input.KeyOpt("{All}", "IE")
+
+		input.VisibleText := false
+		input.VisibleNonText := false
+
+		input.Start()
+
+		input.Wait(0.1)
+
+		key := input.EndKey
+
+		input.Stop()
+
+		if (key && (key != ""))
+			return key
+		else
+			return false
 	}
 }
 

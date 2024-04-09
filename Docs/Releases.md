@@ -6,7 +6,8 @@
   5. The setting "Car Indicator" is also available for the Strategist now.
   6. Once again some tweaks for the accident detection and alerting by the Spotter.
   7. *iRacing* practice sessions, were sometimes the lap counter jumps directly to lap 2, are now detected correctly.
-  8. The detection speed of controller trigger (buttons, dials, and so on) has been greatly increased.
+  8. Offline "Test Drives" are now treated as practice sessions in *iRacing*.
+  9. The detection speed of controller trigger (buttons, dials, and so on) has been greatly increased.
 
 ## 5.6.5.0-release 04/05/24
   1. Minor bugfixes, as always

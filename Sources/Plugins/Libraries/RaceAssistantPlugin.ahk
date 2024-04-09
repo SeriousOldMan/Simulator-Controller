@@ -1267,9 +1267,9 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		return data
 	}
 
-	static startAssistantsSession(data) {
+	static startAssistantsSession(data, force := false) {
 		local lap := getMultiMapValue(data, "Stint Data", "Laps", false)
-		local start := ((lap = 1) || RaceAssistantPlugin.TeamSessionActive)
+		local start := ((lap = 1) || force || RaceAssistantPlugin.TeamSessionActive)
 		local first := true
 		local ignore, assistant, settings
 
@@ -2236,6 +2236,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		local startTime := A_TickCount
 		local splitTime := startTime
 		local lastLap := RaceAssistantPlugin.LastLap
+		local skippedLap := false
 		local telemetryData, positionsData, data, dataLastLap
 		local testData, message, key, value, session, teamServer
 		local newLap, firstLap, ignore, assistant, hasAssistant, finalLap
@@ -2439,6 +2440,8 @@ class RaceAssistantPlugin extends ControllerPlugin {
 						if (dataLastLap > 1) {
 							if ((dataLastLap > (lastLap + 1)) && !wasInactive && RaceAssistantPlugin.LapRunning) {
 								; The lap counter jumped from 0 directly to a value greater than 1 - strange case, which sometimes happen in iRacing practice sessions
+
+								skippedLap := true
 							}
 							else if (lastLap == 0) {
 								; Missed the start of the session, might be a team session
@@ -2546,7 +2549,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 									logMessage(kLogWarn, translate("Cannot join the team session. Driver names in team session and in simulation do not match."))
 								}
 
-							RaceAssistantPlugin.startAssistantsSession(data)
+							RaceAssistantPlugin.startAssistantsSession(data, skippedLap)
 						}
 						else if joinedSession {
 							if RaceAssistantPlugin.TeamSessionActive {

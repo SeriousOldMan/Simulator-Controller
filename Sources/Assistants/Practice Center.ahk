@@ -2848,6 +2848,8 @@ class PracticeCenter extends ConfigurationItem {
 						}
 					}
 				}
+
+				this.modifyRun(newRun)
 			}
 		}
 		else if currentRun {

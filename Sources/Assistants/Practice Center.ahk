@@ -2413,7 +2413,7 @@ class PracticeCenter extends ConfigurationItem {
 		return (this.iWorking > 0)
 	}
 
-	initializeSession(session := "Practice") {
+	initializeSession(session := "Practice", full := true) {
 		local directory, reportDirectory
 
 		if (!this.SessionMode || this.SessionActive) {
@@ -2435,7 +2435,7 @@ class PracticeCenter extends ConfigurationItem {
 			this.iSessionMode := false
 			this.iSessionLoaded := false
 
-			this.initializeSession(session)
+			this.initializeSession(session, full)
 
 			return
 		}
@@ -2444,7 +2444,9 @@ class PracticeCenter extends ConfigurationItem {
 		this.iTyreCompounds := [normalizeCompound("Dry")]
 		this.iUsedTyreSets := WeakMap()
 
-		this.RunsListView.Delete()
+		if (full || this.LastLap || (this.RunsListView.GetCount() != 1))
+			this.RunsListView.Delete()
+
 		this.LapsListView.Delete()
 		this.TyreCompoundsListView.Delete()
 		this.UsedTyreSetsListView.Delete()
@@ -2466,7 +2468,9 @@ class PracticeCenter extends ConfigurationItem {
 
 		this.iDrivers := []
 
-		this.iRuns := CaseInsenseWeakMap()
+		if (full || (this.RunsListView.GetCount() != 1))
+			this.iRuns := CaseInsenseWeakMap()
+
 		this.iLaps := CaseInsenseWeakMap()
 
 		this.iRunning := Map()
@@ -2475,7 +2479,11 @@ class PracticeCenter extends ConfigurationItem {
 		this.iLastPitstopUpdate := false
 
 		this.iLastLap := false
-		this.iCurrentRun := false
+
+		if (this.Runs.Count = 1)
+			this.iCurrentRun := getValues(this.Runs)[1]
+		else
+			this.iCurrentRun := false
 
 		this.iTelemetryDatabase := false
 		this.iPressuresDatabase := false
@@ -2840,6 +2848,8 @@ class PracticeCenter extends ConfigurationItem {
 						}
 					}
 				}
+
+				this.modifyRun(newRun)
 			}
 		}
 		else if currentRun {
@@ -6874,7 +6884,7 @@ class PracticeCenter extends ConfigurationItem {
 					this.clearSession(true)
 				}
 
-				this.initializeSession(getMultiMapValue(data, "Session Data", "Session", "Practice"))
+				this.initializeSession(getMultiMapValue(data, "Session Data", "Session", "Practice"), false)
 
 				this.initializeSimulator(SessionDatabase.getSimulatorName(getMultiMapValue(data, "Session Data", "Simulator"))
 									   , getMultiMapValue(data, "Session Data", "Car")
@@ -6898,7 +6908,7 @@ class PracticeCenter extends ConfigurationItem {
 			local data := readMultiMap(fileName)
 
 			try {
-				if ((lapNumber = 1) && !update)
+				if (!this.LastLap && !update)
 					this.startSession(fileName, true)
 
 				if update {
@@ -6909,7 +6919,7 @@ class PracticeCenter extends ConfigurationItem {
 					if (this.SessionMode && !this.SessionActive)
 						return
 
-					if ((!this.LastLap && (lapNumber = 1)) || (this.LastLap && ((this.LastLap.Nr + 1) = lapNumber))) {
+					if (!this.LastLap || (this.LastLap && ((this.LastLap.Nr + 1) = lapNumber))) {
 						this.iSessionMode := "Active"
 
 						this.addLap(lapNumber, data)

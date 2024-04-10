@@ -2246,7 +2246,11 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		static replayIndex := false
 		static collectorLastLap := 0
 		static collectorLapRunning := 0
+
+		static isInactive := false
 		static wasInactive := false
+
+		wasInactive := isInactive
 
 		if (RaceAssistantPlugin.Finish = "Finished")
 			RaceAssistantPlugin.finishAssistantsSession()
@@ -2375,12 +2379,14 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				if !RaceAssistantPlugin.sessionActive(data) {
 					; Not in a supported session
 
-					wasInactive := true
+					isInactive := true
 
 					RaceAssistantPlugin.finishAssistantsSession()
 
 					return
 				}
+				else
+					isInactive := false
 
 				if ((dataLastLap < lastLap) || (RaceAssistantPlugin.Session != session)) {
 					; Start of new session without finishing previous session first
@@ -2483,8 +2489,6 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 								RaceAssistantPlugin.restoreAssistantsSessionState(data)
 							}
-
-							wasInactive := false
 
 							if !RaceAssistantPlugin.driverActive(data)
 								return ; Oops, a different driver, might happen in some simulations after a pitstop

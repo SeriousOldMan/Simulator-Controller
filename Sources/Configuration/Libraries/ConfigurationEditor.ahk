@@ -34,7 +34,14 @@ global kCancel := "cancel"
 
 class TriggerDetectorTask extends Task {
 	iCallback := false
+	iOptions := []
 	iJoysticks := []
+
+	Options {
+		Get {
+			return this.iOptions
+		}
+	}
 
 	CallBack {
 		Get {
@@ -43,6 +50,10 @@ class TriggerDetectorTask extends Task {
 	}
 
 	Stopped {
+		Get {
+			return super.Stopped
+		}
+
 		Set {
 			if value
 				ToolTip(, , 1)
@@ -57,7 +68,8 @@ class TriggerDetectorTask extends Task {
 		}
 	}
 
-	__New(callback, arguments*) {
+	__New(callback, options, arguments*) {
+		this.iOptions := options
 		this.iCallback := callback
 
 		super.__New(false, arguments*)
@@ -68,7 +80,7 @@ class TriggerDetectorTask extends Task {
 		local joyName
 
 		loop 16 { ; Query each joystick number to find out which ones exist.
-			joyName := (GetKeyState(A_Index . "JoyName") ? "D" : "U")
+			joyName := (GetKeyState(A_Index . "JoyName") ? "D" : "")
 
 			if (joyName != "")
 				joysticks.Push(A_Index)
@@ -90,6 +102,7 @@ class TriggerDetectorContinuation extends Continuation {
 	}
 
 	run() {
+		local key := false
 		local found, joysticks, joystickNumber, joy_buttons, joy_name, joy_state, buttons_down, joy_info
 		local axis_info, buttonsDown, callback
 
@@ -102,59 +115,77 @@ class TriggerDetectorContinuation extends Continuation {
 				return false
 			}
 
-			joysticks := this.Task.Joysticks
+			key := (inList(this.Task.Options, "Key") ? this.detectKey(inList(this.Task.Options, "Multi")) : false)
 
-			joystickNumber := joysticks[1]
+			if key {
+				if InStr(key, "Esc") {
+					this.stop()
 
-			joysticks.RemoveAt(1)
-			joysticks.Push(joystickNumber)
-
-			; SetFormat Float, 03  ; Omit decimal point from axis position percentages.
-
-			joy_buttons := GetKeyState(joystickNumber . "JoyButtons")
-			joy_name := GetKeyState(joystickNumber . "JoyName")
-			joy_info := GetKeyState(joystickNumber . "JoyInfo")
-
-			buttons_down := ""
-			buttons := []
-
-			loop joy_buttons {
-				if GetKeyState(joystickNumber . "joy" . A_Index) {
-					buttons_down := (buttons_down . A_Space . A_Index)
-
-					found := A_Index
+					return false
 				}
+
+				found := true
+
+				ToolTip(key, , , 1)
+			}
+			else if inList(this.Task.Options, "Joy") {
+				joysticks := this.Task.Joysticks
+
+				loop joysticks.Length {
+					joystickNumber := joysticks[1]
+
+					joysticks.RemoveAt(1)
+					joysticks.Push(joystickNumber)
+
+					; SetFormat Float, 03  ; Omit decimal point from axis position percentages.
+
+					joy_buttons := GetKeyState(joystickNumber . "JoyButtons")
+					joy_name := GetKeyState(joystickNumber . "JoyName")
+					joy_info := GetKeyState(joystickNumber . "JoyInfo")
+
+					buttons_down := ""
+					buttons := []
+
+					loop joy_buttons {
+						if GetKeyState(joystickNumber . "joy" . A_Index) {
+							buttons_down := (buttons_down . A_Space . A_Index)
+
+							found := A_Index
+						}
+					}
+
+					axis_info := ("X" . (GetKeyState(joystickNumber . "JoyX") ? "D" : "U"))
+
+					axis_info := (axis_info . A_Space . A_Space . "Y" .  (GetKeyState(joystickNumber . "JoyY") ? "D" : "U"))
+
+					if InStr(joy_info, "Z")
+						axis_info := (axis_info . A_Space . A_Space . "Z" . (GetKeyState(joystickNumber . "JoyZ") ? "D" : "U"))
+
+					if InStr(joy_info, "R")
+						axis_info := (axis_info . A_Space . A_Space . "R" . (GetKeyState(joystickNumber . "JoyR") ? "D" : "U"))
+
+					if InStr(joy_info, "U")
+						axis_info := (axis_info . A_Space . A_Space . "U" . (GetKeyState(joystickNumber . "JoyU") ? "D" : "U"))
+
+					if InStr(joy_info, "V")
+						axis_info := (axis_info . "" . A_Space . "" . A_Space . "V" . (GetKeyState(joystickNumber "JoyV", ) ? "D" : "U"))
+
+					if InStr(joy_info, "P")
+						axis_info := (axis_info . A_Space . A_Space . "POV" . (GetKeyState(joystickNumber "JoyPOV") ? "D" : "U"))
+
+					buttonsDown := translate("Buttons Down:")
+				}
+				until found
+
+				if found
+					ToolTip(joy_name . " (#" joystickNumber "):`n" . axis_info . "`n" . buttonsDown . A_Space . buttons_down, , , 1)
+				else
+					ToolTip(translate("Waiting..."), , , 1)
 			}
 
-			axis_info := ("X" . (GetKeyState(joystickNumber . "JoyX") ? "D" : "U"))
-
-			axis_info := (axis_info . A_Space . A_Space . "Y" .  (GetKeyState(joystickNumber . "JoyY") ? "D" : "U"))
-
-			if InStr(joy_info, "Z")
-				axis_info := (axis_info . A_Space . A_Space . "Z" . (GetKeyState(joystickNumber . "JoyZ") ? "D" : "U"))
-
-			if InStr(joy_info, "R")
-				axis_info := (axis_info . A_Space . A_Space . "R" . (GetKeyState(joystickNumber . "JoyR") ? "D" : "U"))
-
-			if InStr(joy_info, "U")
-				axis_info := (axis_info . A_Space . A_Space . "U" . (GetKeyState(joystickNumber . "JoyU") ? "D" : "U"))
-
-			if InStr(joy_info, "V")
-				axis_info := (axis_info . "" . A_Space . "" . A_Space . "V" . (GetKeyState(joystickNumber "JoyV", ) ? "D" : "U"))
-
-			if InStr(joy_info, "P")
-				axis_info := (axis_info . A_Space . A_Space . "POV" . (GetKeyState(joystickNumber "JoyPOV") ? "D" : "U"))
-
-			buttonsDown := translate("Buttons Down:")
-
-			if (Task.CurrentTask.Sleep > 0)
-				ToolTip(joy_name . " (#" joystickNumber "):`n" . axis_info . "`n" . buttonsDown . A_Space . buttons_down, , , 1)
-			else if (Random(1, 10) > 9)
-					ToolTip(joy_name . " (#" joystickNumber "):`n" . axis_info . "`n" . buttonsDown . A_Space . buttons_down, , , 1)
-
-			if found {
+			if found
 				if this.Task.Callback {
-					this.Task.Callback.Call(joystickNumber . "Joy" . found)
+					this.Task.Callback.Call(key ? key : (joystickNumber . "Joy" . found))
 
 					this.stop()
 
@@ -162,7 +193,6 @@ class TriggerDetectorContinuation extends Continuation {
 				}
 				else
 					return TriggerDetectorContinuation(this.Task, 2000)
-			}
 
 			return TriggerDetectorContinuation(this.Task, 0)
 		}
@@ -171,6 +201,118 @@ class TriggerDetectorContinuation extends Continuation {
 
 			return false
 		}
+	}
+
+	detectKey(multi) {
+		local input := InputHook("T0.1")
+		local key, expired
+
+		static lastTicks := false
+		static lastKeys := []
+
+		expired := (lastTicks ? ((A_TickCount - lastTicks) > 500) : false)
+
+		if !multi
+			lastKeys := []
+
+		input.KeyOpt("{All}", "IE")
+
+		input.VisibleText := false
+		input.VisibleNonText := false
+
+		input.Start()
+
+		input.Wait()
+
+		key := input.EndKey
+
+		input.Stop()
+
+		if (key && (key != ""))
+			if multi {
+				if !expired {
+					if (lastKeys.Length = 0)
+						lastTicks := A_TickCount
+
+					if !inList(lastKeys, key)
+						lastKeys.Push(key)
+				}
+			}
+			else
+				return key
+
+		if (multi && expired) {
+			lastTicks := false
+
+			if (lastKeys.Length > 0) {
+				key := this.createHotkey(lastKeys)
+
+				lastKeys := []
+
+				return key
+			}
+			else
+				return false
+		}
+
+		return false
+	}
+
+	createHotkey(keys) {
+		local baseKeys := []
+		local baseKey := kUndefined
+		local ignore, key, modifiers
+
+		loop 26
+			baseKeys.Push(Chr(Ord("a") + A_Index - 1))
+
+		loop 10 {
+			baseKeys.Push(String(A_Index - 1))
+			baseKeys.Push("Numpad" . (A_Index - 1))
+		}
+
+		loop 24
+			baseKeys.Push("F" . A_Index)
+
+		for ignore, key in ["Space", "BackSpace", "Tab", "Enter", "Up", "Down", "Left", "Right"
+						  , "Home", "End", "Delete", "Insert", "PgUp", "PgDn"]
+			baseKeys.Push(key)
+
+		for ignore, key in keys.Clone()
+			if inList(baseKeys, key) {
+				if (baseKey == kUndefined)
+					baseKey := key
+
+				keys := remove(keys, key)
+			}
+
+		if (baseKey != kUndefined) {
+			modifiers := ""
+
+			for ignore, key in keys
+				switch key, false {
+					case "LShift":
+						modifiers .= "<+"
+					case "RShift":
+						modifiers .= ">+"
+					case "LControl":
+						modifiers .= "<^"
+					case "RControl":
+						modifiers .= ">^"
+					case "LAlt":
+						modifiers .= "<!"
+					case "RAlt":
+						modifiers .= ">!"
+					case "AltGr":
+						modifiers .= "<^>!"
+					case "Win":
+						modifiers .= "#"
+				}
+
+			return (modifiers . baseKey)
+		}
+		else
+			return values2String(" & ", keys*)
 	}
 }
 
@@ -460,8 +602,8 @@ class ConfigurationEditor extends ConfigurationItem {
 		this.Window.Destroy()
 	}
 
-	toggleTriggerDetector(callback := false) {
-		triggerDetector(callback)
+	toggleTriggerDetector(callback := false, options?) {
+		triggerDetector(callback, options?)
 	}
 
 	getSimulators() {
@@ -474,7 +616,7 @@ class ConfigurationEditor extends ConfigurationItem {
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-triggerDetector(callback := false) {
+triggerDetector(callback := false, options := ["Joy", "Key"]) {
 	static detectorTask := false
 
 	if (callback = "Active")
@@ -489,7 +631,7 @@ triggerDetector(callback := false) {
 			detectorTask := false
 		}
 		else if (callback != "Stop") {
-			detectorTask := TriggerDetectorTask(callback, 100)
+			detectorTask := TriggerDetectorTask(callback, options, 100)
 
 			detectorTask.start()
 		}

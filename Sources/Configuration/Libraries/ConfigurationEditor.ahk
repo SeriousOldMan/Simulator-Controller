@@ -175,6 +175,7 @@ class TriggerDetectorContinuation extends Continuation {
 
 					buttonsDown := translate("Buttons Down:")
 				}
+				until found
 
 				if found
 					ToolTip(joy_name . " (#" joystickNumber "):`n" . axis_info . "`n" . buttonsDown . A_Space . buttons_down, , , 1)

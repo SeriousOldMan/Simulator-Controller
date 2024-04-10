@@ -34,12 +34,12 @@ global kCancel := "cancel"
 
 class TriggerDetectorTask extends Task {
 	iCallback := false
-	iModes := []
+	iOptions := []
 	iJoysticks := []
 
-	Modes {
+	Options {
 		Get {
-			return this.iModes
+			return this.iOptions
 		}
 	}
 
@@ -68,8 +68,8 @@ class TriggerDetectorTask extends Task {
 		}
 	}
 
-	__New(modes, callback, arguments*) {
-		this.iModes := modes
+	__New(callback, options, arguments*) {
+		this.iOptions := options
 		this.iCallback := callback
 
 		super.__New(false, arguments*)
@@ -115,7 +115,7 @@ class TriggerDetectorContinuation extends Continuation {
 				return false
 			}
 
-			key := (inList(this.Task.Modes, "Key") ? this.detectKey(inList(this.Task.Modes, "Multi")) : false)
+			key := (inList(this.Task.Options, "Key") ? this.detectKey(inList(this.Task.Options, "Multi")) : false)
 
 			if key {
 				if InStr(key, "Esc") {
@@ -128,7 +128,7 @@ class TriggerDetectorContinuation extends Continuation {
 
 				ToolTip(key, , , 1)
 			}
-			else if inList(this.Task.Modes, "Joy") {
+			else if inList(this.Task.Options, "Joy") {
 				joysticks := this.Task.Joysticks
 
 				loop joysticks.Length {
@@ -244,7 +244,7 @@ class TriggerDetectorContinuation extends Continuation {
 			lastTicks := false
 
 			if (lastKeys.Length > 0) {
-				key := values2String(" & ", lastKeys*)
+				key := this.createHotkey(lastKeys)
 
 				lastKeys := []
 
@@ -255,6 +255,63 @@ class TriggerDetectorContinuation extends Continuation {
 		}
 
 		return false
+	}
+
+	createHotkey(keys) {
+		local baseKeys := []
+		local baseKey := kUndefined
+		local ignore, key, modifiers
+
+		loop 26
+			baseKeys.Push(Chr(Ord("a") + A_Index - 1))
+
+		loop 10 {
+			baseKeys.Push(String(A_Index - 1))
+			baseKeys.Push("Numpad" . (A_Index - 1))
+		}
+
+		loop 24
+			baseKeys.Push("F" . A_Index)
+
+		for ignore, key in ["Space", "BackSpace", "Tab", "Enter", "Up", "Down", "Left", "Right"
+						  , "Home", "End", "Delete", "Insert", "PgUp", "PgDn"]
+			baseKeys.Push(key)
+
+		for ignore, key in keys.Clone()
+			if inList(baseKeys, key) {
+				if (baseKey == kUndefined)
+					baseKey := key
+
+				keys := remove(keys, key)
+			}
+
+		if (baseKey != kUndefined) {
+			modifiers := ""
+
+			for ignore, key in keys
+				switch key, false {
+					case "LShift":
+						modifiers .= "<+"
+					case "RShift":
+						modifiers .= ">+"
+					case "LControl":
+						modifiers .= "<^"
+					case "RControl":
+						modifiers .= ">^"
+					case "LAlt":
+						modifiers .= "<!"
+					case "RAlt":
+						modifiers .= ">!"
+					case "AltGr":
+						modifiers .= "<^>!"
+					case "Win":
+						modifiers .= "#"
+				}
+
+			return (modifiers . baseKey)
+		}
+		else
+			return values2String(" & ", keys*)
 	}
 }
 
@@ -544,8 +601,8 @@ class ConfigurationEditor extends ConfigurationItem {
 		this.Window.Destroy()
 	}
 
-	toggleTriggerDetector(callback := false) {
-		triggerDetector(callback)
+	toggleTriggerDetector(callback := false, options?) {
+		triggerDetector(callback, options?)
 	}
 
 	getSimulators() {
@@ -558,7 +615,7 @@ class ConfigurationEditor extends ConfigurationItem {
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-triggerDetector(callback := false) {
+triggerDetector(callback := false, options := ["Joy", "Key"]) {
 	static detectorTask := false
 
 	if (callback = "Active")
@@ -573,7 +630,7 @@ triggerDetector(callback := false) {
 			detectorTask := false
 		}
 		else if (callback != "Stop") {
-			detectorTask := TriggerDetectorTask(["Joy", "Key", "Mouse"], callback, 100)
+			detectorTask := TriggerDetectorTask(callback, options, 100)
 
 			detectorTask.start()
 		}

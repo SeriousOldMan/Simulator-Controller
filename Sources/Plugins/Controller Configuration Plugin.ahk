@@ -54,7 +54,7 @@ class ControllerConfigurator extends ConfiguratorPanel {
 			protectionOn()
 
 			try {
-				ConfigurationEditor.Instance.toggleTriggerDetector()
+				ConfigurationEditor.Instance.toggleTriggerDetector(false, ["Joy", "Key", "Multi"])
 			}
 			finally {
 				protectionOff()

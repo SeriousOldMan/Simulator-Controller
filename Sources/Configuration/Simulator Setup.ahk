@@ -2376,8 +2376,8 @@ class SetupWizard extends ConfiguratorPanel {
 		knowledgeBase.dumpRules()
 	}
 
-	toggleTriggerDetector(callback := false) {
-		triggerDetector(callback)
+	toggleTriggerDetector(callback := false, options?) {
+		triggerDetector(callback, options?)
 	}
 }
 

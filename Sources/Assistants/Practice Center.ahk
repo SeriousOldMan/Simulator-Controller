@@ -6898,7 +6898,7 @@ class PracticeCenter extends ConfigurationItem {
 			local data := readMultiMap(fileName)
 
 			try {
-				if ((lapNumber = 1) && !update)
+				if (!this.LastLap && !update)
 					this.startSession(fileName, true)
 
 				if update {
@@ -6909,7 +6909,7 @@ class PracticeCenter extends ConfigurationItem {
 					if (this.SessionMode && !this.SessionActive)
 						return
 
-					if ((!this.LastLap && (lapNumber = 1)) || (this.LastLap && ((this.LastLap.Nr + 1) = lapNumber))) {
+					if (!this.LastLap || (this.LastLap && ((this.LastLap.Nr + 1) = lapNumber))) {
 						this.iSessionMode := "Active"
 
 						this.addLap(lapNumber, data)

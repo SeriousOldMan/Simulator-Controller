@@ -745,8 +745,8 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		}
 	}
 
-	toggleTriggerDetector(callback := false) {
-		this.SetupWizard.toggleTriggerDetector(callback)
+	toggleTriggerDetector(callback := false, options?) {
+		this.SetupWizard.toggleTriggerDetector(callback, options?)
 	}
 
 	openFormatsEditor() {

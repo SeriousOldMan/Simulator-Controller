@@ -183,9 +183,14 @@ class TriggerDetectorContinuation extends Continuation {
 					ToolTip(translate("Waiting..."), , , 1)
 			}
 
-			if found
+			if found {
+				if !key
+					key := (joystickNumber . "Joy" . found)
+
+				A_Clipboard := key
+
 				if this.Task.Callback {
-					this.Task.Callback.Call(key ? key : (joystickNumber . "Joy" . found))
+					this.Task.Callback.Call(key)
 
 					this.stop()
 
@@ -193,6 +198,7 @@ class TriggerDetectorContinuation extends Continuation {
 				}
 				else
 					return TriggerDetectorContinuation(this.Task, 2000)
+			}
 
 			return TriggerDetectorContinuation(this.Task, 0)
 		}

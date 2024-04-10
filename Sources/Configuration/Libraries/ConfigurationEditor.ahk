@@ -34,7 +34,14 @@ global kCancel := "cancel"
 
 class TriggerDetectorTask extends Task {
 	iCallback := false
+	iModes := []
 	iJoysticks := []
+
+	Modes {
+		Get {
+			return this.iModes
+		}
+	}
 
 	CallBack {
 		Get {
@@ -61,7 +68,8 @@ class TriggerDetectorTask extends Task {
 		}
 	}
 
-	__New(callback, arguments*) {
+	__New(modes, callback, arguments*) {
+		this.iModes := modes
 		this.iCallback := callback
 
 		super.__New(false, arguments*)
@@ -107,7 +115,7 @@ class TriggerDetectorContinuation extends Continuation {
 				return false
 			}
 
-			key := this.detectKey()
+			key := (inList(this.Task.Modes, "Key") ? this.detectKey(inList(this.Task.Modes, "Multi")) : false)
 
 			if key {
 				if InStr(key, "Esc") {
@@ -120,7 +128,7 @@ class TriggerDetectorContinuation extends Continuation {
 
 				ToolTip(key, , , 1)
 			}
-			else {
+			else if inList(this.Task.Modes, "Joy") {
 				joysticks := this.Task.Joysticks
 
 				loop joysticks.Length {
@@ -194,9 +202,17 @@ class TriggerDetectorContinuation extends Continuation {
 		}
 	}
 
-	detectKey() {
+	detectKey(multi) {
 		local input := InputHook("T0.1")
-		local key
+		local key, expired
+
+		static lastTicks := false
+		static lastKeys := []
+
+		expired := (lastTicks ? ((A_TickCount - lastTicks) > 500) : false)
+
+		if !multi
+			lastKeys := []
 
 		input.KeyOpt("{All}", "IE")
 
@@ -205,16 +221,40 @@ class TriggerDetectorContinuation extends Continuation {
 
 		input.Start()
 
-		input.Wait(0.1)
+		input.Wait()
 
 		key := input.EndKey
 
 		input.Stop()
 
 		if (key && (key != ""))
-			return key
-		else
-			return false
+			if multi {
+				if !expired {
+					if (lastKeys.Length = 0)
+						lastTicks := A_TickCount
+
+					if !inList(lastKeys, key)
+						lastKeys.Push(key)
+				}
+			}
+			else
+				return key
+
+		if (multi && expired) {
+			lastTicks := false
+
+			if (lastKeys.Length > 0) {
+				key := values2String(" & ", lastKeys*)
+
+				lastKeys := []
+
+				return key
+			}
+			else
+				return false
+		}
+
+		return false
 	}
 }
 
@@ -533,7 +573,7 @@ triggerDetector(callback := false) {
 			detectorTask := false
 		}
 		else if (callback != "Stop") {
-			detectorTask := TriggerDetectorTask(callback, 100)
+			detectorTask := TriggerDetectorTask(["Joy", "Key", "Mouse"], callback, 100)
 
 			detectorTask.start()
 		}

@@ -1,4 +1,4 @@
-## 5.6.6.0-release 04/12/24 (planned)
+## 5.6.6.0-release 04/12/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Shared database synchronization is back to operation.
@@ -9,6 +9,9 @@
   8. Offline "Test Drives" are now treated as practice sessions in *iRacing*.
   9. The detection speed of controller trigger (buttons, dials, and so on) has been greatly increased. Dials are now also detected very reliable and fast.
   10. Key presses on the keyboard are now also detected during trigger detection in "Simulator Setup" and "Simulator Configuration".
+  11. The hotkey string (e.g. 2Joy7 or <^<!A) for a detected trigger is now placed in the clipboard for further usage.
+  12. The trigger detector tool is now also available when building [track automations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#track-automations).
+  13. Added "24H Nürburgring" to the track name file for *Assetto Corsa Competizione*.
 
 ## 5.6.5.0-release 04/05/24
   1. Minor bugfixes, as always

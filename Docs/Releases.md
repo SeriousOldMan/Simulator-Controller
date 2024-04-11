@@ -5,7 +5,7 @@
   4. The setting "Spotter: Car Indicator" in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database" has now a third choice "Both", which let the Spotter refer to a car by race number and current position at the same time.
   5. The setting "Car Indicator" is also available for the Strategist now.
   6. Once again some tweaks for the accident detection and alerting by the Spotter.
-  7. *iRacing* practice sessions, were sometimes the lap counter jumps directly to lap 2, are now detected correctly.
+  7. *iRacing* practice sessions, where sometimes the lap counter jumps directly to lap 2, are now detected correctly.
   8. Offline "Test Drives" are now treated as practice sessions in *iRacing*.
   9. The detection speed of controller trigger (buttons, dials, and so on) has been greatly increased. Dials are now also detected very reliable and fast.
   10. Key presses on the keyboard are now also detected during trigger detection in "Simulator Setup" and "Simulator Configuration".

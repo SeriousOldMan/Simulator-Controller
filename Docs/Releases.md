@@ -1,20 +1,23 @@
-## 5.6.6.0-release 04/12/24 (planned)
+## 5.6.6.0-release 04/12/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Shared database synchronization is back to operation.
   4. The setting "Spotter: Car Indicator" in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database" has now a third choice "Both", which let the Spotter refer to a car by race number and current position at the same time.
   5. The setting "Car Indicator" is also available for the Strategist now.
   6. Once again some tweaks for the accident detection and alerting by the Spotter.
-  7. *iRacing* practice sessions, were sometimes the lap counter jumps directly to lap 2, are now detected correctly.
+  7. *iRacing* practice sessions, where sometimes the lap counter jumps directly to lap 2, are now detected correctly.
   8. Offline "Test Drives" are now treated as practice sessions in *iRacing*.
   9. The detection speed of controller trigger (buttons, dials, and so on) has been greatly increased. Dials are now also detected very reliable and fast.
   10. Key presses on the keyboard are now also detected during trigger detection in "Simulator Setup" and "Simulator Configuration".
+  11. The hotkey string (e.g. 2Joy7 or <^<!A) for a detected trigger is now placed in the clipboard for further usage.
+  12. The Trigger Detector Tool is now also available when building [Track Automations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#track-automations).
+  13. Added "24H Nürburgring" to the track name file for *Assetto Corsa Competizione*.
 
 ## 5.6.5.0-release 04/05/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed a bug in all applications sometime popping up a crash info dialog for a fraction of a second, when the PC is shutdown (Windows 11).
-  4. Introduced special error handling in the Stream Deck plugin, that prevents crashing during Windows 11 system shutdown.
+  4. Introduced special error handling in the Stream Deck plugin, that can prevent crashing during Windows 11 system shutdown.
   5. A lot of fine-tuning for the accident detection to further reduce false positves. Statistical methods are now used to remove invalid data points.
   6. Accident detection now also supports Big Grid sessions in *Assetto Corsa Competizione*.
   7. The precision for the accident detection on very long tracks has been improved significantly (Nordschleife).

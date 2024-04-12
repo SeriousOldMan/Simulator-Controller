@@ -53,6 +53,13 @@ global kSetupNames := CaseInsenseMap("DQ", "Qualifying (Dry)", "DR", "Race (Dry)
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                   Private Constant Declaration Section                  ;;;
+;;;-------------------------------------------------------------------------;;;
+
+global gActionInfoEnabled := true
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                         Public Classes Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -1535,6 +1542,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local x, y, w, h
 
 		showActionInfo(*) {
+			global gActionInfoEnabled
+
 			local x, y, coordinateX, coordinateY, window
 
 			static currentAction := false
@@ -1555,7 +1564,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				ToolTip()
 			}
 
-			if (this.SelectedModule = "Automation") {
+			if ((this.SelectedModule = "Automation") && gActionInfoEnabled) {
 				MouseGetPos(&x, &y)
 
 				x := screen2Window(x)
@@ -4641,6 +4650,8 @@ copyFiles(source, destination) {
 }
 
 actionDialog(xOrCommand := false, y := false, action := false, *) {
+	global gActionInfoEnabled
+
 	local fileName, chosen, x, translator
 
 	static result := false
@@ -4651,6 +4662,17 @@ actionDialog(xOrCommand := false, y := false, action := false, *) {
 	static commandChooserButton
 
 	static actionDialogGui
+
+	toggleTriggerDetector(*) {
+		protectionOn()
+
+		try {
+			triggerDetector(false, ["Key", "Multi"])
+		}
+		finally {
+			protectionOff()
+		}
+	}
 
 	if (xOrCommand == kOk)
 		result := kOk
@@ -4709,8 +4731,9 @@ actionDialog(xOrCommand := false, y := false, action := false, *) {
 		commandChooserButton := actionDialogGui.Add("Button", "x247 yp w23 h23", translate("..."))
 		commandChooserButton.OnEvent("Click", actionDialog.Bind("Command"))
 
-		actionDialogGui.Add("Button", "x60 yp+35 w80 h23 Default", translate("Ok")).OnEvent("Click", actionDialog.Bind(kOk))
-		actionDialogGui.Add("Button", "x146 yp w80 h23", translate("&Cancel")).OnEvent("Click", actionDialog.Bind(kCancel))
+		actionDialogGui.Add("Button", "x16 yp+35 w80 h23 Y:Move", translate("Trigger...")).OnEvent("Click", toggleTriggerDetector)
+		actionDialogGui.Add("Button", "x104 yp w80 h23 Default", translate("Ok")).OnEvent("Click", actionDialog.Bind(kOk))
+		actionDialogGui.Add("Button", "x190 yp w80 h23", translate("&Cancel")).OnEvent("Click", actionDialog.Bind(kCancel))
 
 		x := (xOrCommand - 150)
 		y := (y - 35)
@@ -4718,6 +4741,10 @@ actionDialog(xOrCommand := false, y := false, action := false, *) {
 		actionDialog("Update")
 
 		actionDialogGui.Show("x" . x . " y" . y . " AutoSize")
+
+		gActionInfoEnabled := false
+
+		ToolTip()
 
 		while !result
 			Sleep(100)
@@ -4739,6 +4766,8 @@ actionDialog(xOrCommand := false, y := false, action := false, *) {
 		}
 		finally {
 			actionDialogGui.Destroy()
+
+			gActionInfoEnabled := true
 		}
 	}
 }

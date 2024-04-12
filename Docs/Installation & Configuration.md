@@ -519,6 +519,8 @@ Although you may call any globally defined function, you should use only the fol
 
 This little tool will help you identifying the button numbers of your hardware controller. If you push the "Trigger..." button, a flying tool tip will apear next to your mouse cursor, which provide some information about your connected controller devices and the buttons or other triggers, that are currently being pushed there. You can also type a single key on the keyboard to display the correpsonding logical key name. To disable the tool tip, press the "Trigger..." button again or use the "ESC" key.
 
+Once a valid trigger is detected, the corresponding info is show for 2 seconds in the tool tip. And the hotkey string for the trigger is placed in the clipboard for further usage.
+
 #### Tab *Launchpad*
 
 On the launchpad, you can define a list of type "Other" applications, that can be launched by a push of a button on your controller. The "Launch" mode, which belongs to the "System" plugin, will use this list to occupy as many buttons on your controller, as has been defined on the *Controller* tab.

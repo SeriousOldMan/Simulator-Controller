@@ -100,10 +100,17 @@ class ApplicationsStepWizard extends StepWizard {
 			OnMessage(0x44, translateSelectCancelButtons, 0)
 
 			if (fileName != "") {
+				if isDebug()
+					logMessage(kLogDebug, "Locating " . fileName . "...")
+
 				simulator := standardApplication(this.SetupWizard.Definition, ["Applications.Simulators"], fileName)
 
-				if simulator
+				if simulator {
+					if isDebug()
+						logMessage(kLogDebug, "Found " . simulator)
+
 					this.locateSimulator(simulator, fileName)
+				}
 			}
 		}
 

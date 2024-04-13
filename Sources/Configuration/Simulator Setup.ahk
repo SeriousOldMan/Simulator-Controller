@@ -1594,8 +1594,11 @@ class SetupWizard extends ConfiguratorPanel {
 		if check
 			executable := false
 
-		if (check || !installed) {
-			if (check && installed && FileExist(this.applicationPath(application)))
+		if isDebug()
+			logMessage(kLogDebug, "Locate: " . application . ", Installed: " . installed . ", Exist: " . FileExist(this.applicationPath(application)))
+
+		if (check || !installed || executable) {
+			if (check && installed && !executable && FileExist(this.applicationPath(application)))
 				return true
 
 			if !executable
@@ -1616,6 +1619,9 @@ class SetupWizard extends ConfiguratorPanel {
 				knowledgeBase.setFact("Application." . application . ".Path", executable)
 
 				applications := string2Values("###", knowledgeBase.getValue("Application.Installed", ""))
+
+				if isDebug()
+					logMessage(kLogDebug, "Applications: " . knowledgeBase.getValue("Application.Installed", ""))
 
 				if !inList(applications, application)
 					knowledgeBase.setFact("Application.Installed", values2String("###", concatenate(applications, [application])*))
@@ -3181,11 +3187,17 @@ standardApplication(definition, categories, executable) {
 
 	SplitPath(executable, &software)
 
+	if isDebug()
+		logMessage(kLogDebug, "Looking for " . software . "...")
+
 	for ignore, category in categories
 		for name, descriptor in getMultiMapValues(definition, category) {
 			descriptor := string2Values("|", descriptor)
 
 			SplitPath(descriptor[3], &candidate)
+
+			if isDebug()
+				logMessage(kLogDebug, "Candidate: " . candidate)
 
 			if (software = candidate)
 				return name

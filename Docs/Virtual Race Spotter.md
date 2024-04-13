@@ -276,7 +276,7 @@ Here you define, what should happen, when you arrive at this specific location o
 
    You can enter a list of keyboard commands that should be send to the simulator. Each keyboard command is a [keyboard command hotkey](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#hotkeys). Use the vertical bar to separate between the individual commands. In the example above, the following definition is used: "^!+t | ^!+t". Theis stands for "Control-Alt-T" (uppercase "T", because the "Shift" key is selected as well with the "+") pressed twice in a row.
    
-   Note: You can use the [Trigger Detector Tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#trigger-detector-tool) to find out, which hotkey string corresponds to given keyboard command. This hotkey string will be placed in the Clipboard and can be pasted to the input field after closing the trigger detector tool.
+   Note: You can use the [Trigger Detector Tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#trigger-detector-tool) to find out, which hotkey string corresponds to a given keyboard command. This hotkey string will be placed in the Clipboard and can be pasted to the input field after closing the trigger detector tool.
 
 2. Command
 

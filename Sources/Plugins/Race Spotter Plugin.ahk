@@ -363,7 +363,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 
 		if ((arguments.Length > 0) && inList(["Logoff", "Shutdown"], arguments[1]))
 			return false
-		
+
 		if pid {
 			ProcessClose(pid)
 
@@ -484,7 +484,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 			else if !this.iMapperPID {
 				simulatorName := sessionDB.getSimulatorName(simulator)
 
-				if (lap > getMultiMapValue(this.Configuration, "Race Spotter Analysis", simulatorName . ".LearningLaps", 1)) {
+				if true { ; (lap > getMultiMapValue(this.Configuration, "Race Spotter Analysis", simulatorName . ".LearningLaps", 1)) {
 					track := getMultiMapValue(data, "Session Data", "Track", false)
 
 					code := sessionDB.getSimulatorCode(simulator)
@@ -570,7 +570,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 
 		if ((arguments.Length > 0) && inList(["Logoff", "Shutdown"], arguments[1]))
 			return false
-		
+
 		if (force || (this.iMapperPID && (this.iMapperPhase = "Collect"))) {
 			pid := this.iMapperPID
 

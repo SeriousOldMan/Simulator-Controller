@@ -832,6 +832,10 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 
 				if (atoi(result))
 					paused = "true";
+				
+				if (getYamlValue(result, sessionInfo, "WeekendInfo:SimMode:"))
+					if (strcmp(result, "full") != 0)
+						paused = "true";
 			}
 			else
 				paused = "true";

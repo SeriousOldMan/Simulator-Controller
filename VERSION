@@ -3,7 +3,7 @@ Version=5.6.7.0-dev
 Target=5.6.7.0-release
 Date=04/13/2024
 Download=
-Changes=Added Debug code to detect localization problems for simulators, Display active startup profile in "Simulator Startup", Spotter starts track mapping after end of the first lap
+Changes=Added Debug code to detect localization problems for simulators, Display active startup profile in "Simulator Startup", Spotter starts track mapping after end of the first lap, Finished sessions will stay at least a week untouched on the Team Server
 Components=Media->5.6.1,Configuration->5.6.4,Utilities->5.4.8
 [Release]
 Version=5.6.6.0-release

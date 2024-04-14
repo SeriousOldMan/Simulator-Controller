@@ -1278,7 +1278,9 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			RaceAssistantPlugin.sStintStartTime := false
 			RaceAssistantPlugin.sFinish := false
 
-			for ignore, assistant in RaceAssistantPlugin.Assistants
+			for ignore, assistant in RaceAssistantPlugin.Assistants {
+				assistant.resetRaceAssistant()
+				
 				if assistant.requireRaceAssistant() {
 					settings := RaceAssistantPlugin.getSettings(assistant, data)
 
@@ -1293,6 +1295,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 					else
 						assistant.joinSession(settings, data)
 				}
+			}
 
 			if first {
 				RaceAssistantPlugin.Simulator.startSession(settings, data)
@@ -1403,7 +1406,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			if (assistant.requireRaceAssistant() && assistant.RaceAssistantActive)
 				assistant.restoreSessionState(data)
 			else if !assistant.RaceAssistantEnabled
-				assistant.clearSessionInfo(data)
+				assistant.clearSessionInfo()
 	}
 
 	static updateAssistantsSession(session := kUndefined) {
@@ -1786,6 +1789,10 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	createRaceAssistant(pid) {
 		return RaceAssistantPlugin.RemoteRaceAssistant(pid)
 	}
+	
+	resetRaceAssistant() {
+		this.clearSessionInfo()
+	}
 
 	requireRaceAssistant() {
 		local pid, options, exePath
@@ -1959,9 +1966,6 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				this.finishSession(false, false)
 			else
 				this.requireRaceAssistant()
-
-			if (teamServer && teamServer.SessionActive && this.TeamSessionActive)
-				teamServer.setSessionValue(this.Plugin . " Session Info", "")
 
 			if this.RaceAssistant {
 				settingsFile := (kTempDirectory . this.Plugin . ".settings")
@@ -2173,11 +2177,11 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			RaceAssistantPlugin.RestoreSessionStateTask(this, data).start()
 	}
 
-	clearSessionInfo(data) {
+	clearSessionInfo() {
 		local teamServer := this.TeamServer
 
 		if (teamServer && teamServer.SessionActive && this.TeamSessionActive)
-			teamServer.setSessionValue(this.Plugin . " Session Info", false)
+			teamServer.setSessionValue(this.Plugin . " Session Info", "")
 	}
 
 	savePitstopState(lapNumber, fileName) {

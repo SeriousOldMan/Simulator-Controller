@@ -860,7 +860,8 @@ namespace ACSHMSpotter {
 							if (distance > 50)
 							{
 								nextAccidentAhead = cycle + 400;
-								nextSlowCarAhead = cycle + 200;
+                                nextAccidentBehind = cycle + 200;
+                                nextSlowCarAhead = cycle + 200;
 
 								SendSpotterMessage("accidentAlert:Ahead;" + distance);
 
@@ -881,8 +882,9 @@ namespace ACSHMSpotter {
 							if (distance > 100)
 							{
 								nextSlowCarAhead = cycle + 200;
+                                nextAccidentBehind = cycle + 200;
 
-								SendSpotterMessage("slowCarAlert:" + distance);
+                                SendSpotterMessage("slowCarAlert:" + distance);
 
 								return true;
 							}

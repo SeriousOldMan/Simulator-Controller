@@ -1136,6 +1136,7 @@ bool checkAccident() {
 
 				if (distance > 50) {
 					nextAccidentAhead = cycle + 400;
+					nextAccidentBehind = cycle + 200;
 					nextSlowCarAhead = cycle + 200;
 
 					char message[40] = "accidentAlert:Ahead;";
@@ -1162,6 +1163,7 @@ bool checkAccident() {
 
 				if (distance > 100) {
 					nextSlowCarAhead = cycle + 200;
+					nextAccidentBehind = cycle + 200;
 
 					char message[40] = "slowCarAlert:";
 					char numBuffer[20];

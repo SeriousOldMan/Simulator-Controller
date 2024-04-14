@@ -2159,7 +2159,7 @@ class PracticeCenter extends ConfigurationItem {
 
 	updateSessionMenu() {
 		this.Control["sessionMenuDropDown"].Delete()
-		this.Control["sessionMenuDropDown"].Add(collect(["Session", "---------------------------------------------", "Clear...", "---------------------------------------------", "Load Session...", "Save Session", "Save a Copy...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Session Summary"], translate))
+		this.Control["sessionMenuDropDown"].Add(collect(["Session", "---------------------------------------------", "Clear...", "---------------------------------------------", "Load Session...", "Save Session...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Session Summary"], translate))
 
 		if !this.SessionExported
 			this.Control["sessionMenuDropDown"].Add(collect(["---------------------------------------------", "Export to Database..."], translate))
@@ -2222,22 +2222,7 @@ class PracticeCenter extends ConfigurationItem {
 					this.clearSession()
 			case 5: ; Load Session...
 				this.loadSession()
-			case 6: ; Save Session
-				if this.HasData {
-					if this.SessionActive
-						this.saveSession()
-					else {
-						OnMessage(0x44, translateOkButton)
-						withBlockedWindows(MsgBox, translate("You are not connected to an active session. Use `"Save a Copy...`" instead."), translate("Information"), 262192)
-						OnMessage(0x44, translateOkButton, 0)
-					}
-				}
-				else {
-					OnMessage(0x44, translateOkButton)
-					withBlockedWindows(MsgBox, translate("There is no session data to be saved."), translate("Information"), 262192)
-					OnMessage(0x44, translateOkButton, 0)
-				}
-			case 7: ; Save Session Copy...
+			case 6: ; Save Session...
 				if this.HasData
 					this.saveSession(true)
 				else {
@@ -2245,11 +2230,11 @@ class PracticeCenter extends ConfigurationItem {
 					withBlockedWindows(MsgBox, translate("There is no session data to be saved."), translate("Information"), 262192)
 					OnMessage(0x44, translateOkButton, 0)
 				}
-			case 9: ; Update Statistics
+			case 8: ; Update Statistics
 				this.updateStatistics()
-			case 11: ; Session Summary
+			case 10: ; Session Summary
 				this.showSessionSummary()
-			case 13: ; Export data
+			case 12: ; Export data
 				if (this.HasData && !this.SessionExported) {
 					OnMessage(0x44, translateYesNoButtons)
 					msgResult := withBlockedWindows(MsgBox, translate("Do you want to transfer the selected data to the session database? This is only possible once."), translate("Delete"), 262436)

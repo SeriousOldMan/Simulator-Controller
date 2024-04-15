@@ -328,7 +328,7 @@ systemMonitor(command := false, arguments*) {
 
 	local x, y, w, h, time, logLevel
 	local controllerState, databaseState, trackMapperState, sessionInfo, ignore, assistant, plugin, icons, modules, key, value
-	local icon, state, property, drivers, choices, chosen, settings, plugins
+	local icon, state, property, drivers, choices, chosen, settings, plugins, states, maxLap
 
 	local serverURLValue, serverTokenValue, serverDriverValue, serverTeamValue, serverSessionValue
 	local stintNrValue, stintLapValue, stintDriverValue
@@ -1658,9 +1658,19 @@ systemMonitor(command := false, arguments*) {
 
 		if (A_TickCount > nextSessionUpdate) {
 			sessionInfo := newMultiMap()
+			states := []
 
 			for ignore, assistant in kRaceAssistants
-				addMultiMapValues(sessionInfo, readMultiMap(kTempDirectory . assistant . " Session.state"))
+				states.Push(readMultiMap(kTempDirectory . assistant . " Session.state"))
+
+			maxLap := 0
+
+			for ignore, state in states
+				maxLap := Max(maxLap, getMultiMapValue(state, "Session", "Laps", 0))
+
+			for ignore, state in states
+				if (getMultiMapValue(state, "Session", "Laps", 0) = maxLap)
+					addMultiMapValues(sessionInfo, state)
 
 			updateSessionInfo(sessionInfo, sessionInfoWidgets, sessionInfoSize)
 

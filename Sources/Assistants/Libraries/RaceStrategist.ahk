@@ -1143,7 +1143,7 @@ class RaceStrategist extends GridRaceAssistant {
 		pitstopLap := this.KnowledgeBase.getValue("Strategy.Pitstop.Lap", false)
 
 		if (pitstopLap && ProcessExist("Race Engineer.exe"))
-			this.confirmNextPitstop(pitstopLap)
+			this.confirmNextPitstop(pitstopLap, true)
 	}
 
 	recommendStrategyRecognized(words) {
@@ -1193,7 +1193,7 @@ class RaceStrategist extends GridRaceAssistant {
 		this.recommendPitstop(lap)
 	}
 
-	confirmNextPitstop(pitstopLap) {
+	confirmNextPitstop(pitstopLap, confirm := false) {
 		local knowledgeBase := this.KnowledgeBase
 		local nextPitstop, refuel, tyreChange, tyreCompound, tyreCompoundColor
 
@@ -1208,7 +1208,7 @@ class RaceStrategist extends GridRaceAssistant {
 			if (knowledgeBase.getValue("Strategy.Pitstop.Count") > nextPitstop)
 				refuel := ("!" . refuel)
 
-			if this.confirmAction("Pitstop.Plan") {
+			if (confirm || this.confirmAction("Pitstop.Plan")) {
 				this.getSpeaker().speakPhrase("ConfirmInformEngineer", false, true)
 
 				this.setContinuation(ObjBindMethod(this, "planPitstop", pitstopLap, refuel, "!" . tyreChange, tyreCompound, tyreCompoundColor))

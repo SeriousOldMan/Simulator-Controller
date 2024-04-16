@@ -777,6 +777,9 @@ class RaceSpotter extends GridRaceAssistant {
 
 	iSessionDataActive := false
 
+	iDriverUpdateTime := 0
+	iNextDriverUpdate := 0
+
 	iLastDeltaInformationLap := 0
 	iPositionInfos := CaseInsenseMap()
 	iTacticalAdvices := CaseInsenseMap()
@@ -968,6 +971,12 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 	}
 
+	DriverUpdateTime {
+		Get {
+			return this.iDriverUpdateTime
+		}
+	}
+
 	TacticalAdvices[key?] {
 		Get {
 			return (isSet(key) ? this.iTacticalAdvices[key] : this.iTacticalAdvices)
@@ -1037,6 +1046,13 @@ class RaceSpotter extends GridRaceAssistant {
 
 	createVoiceManager(name, options) {
 		return RaceSpotter.SpotterVoiceManager(this, name, options)
+	}
+
+	updateConfigurationValues(values) {
+		super.updateConfigurationValues(values)
+
+		if values.HasProp("DriverUpdateTime")
+			this.iDriverUpdateTime := values.DriverUpdateTime
 	}
 
 	updateSessionValues(values) {
@@ -2633,7 +2649,7 @@ class RaceSpotter extends GridRaceAssistant {
 		return spoken
 	}
 
-	updateDriver(lastLap, sector, newSector, positions) {
+	updateDriver(lastLap, sector, update, newSector, positions) {
 		local raceInfo := (this.hasEnoughData(false) && (this.Session = kSessionRace) && (lastLap > 2))
 		local hadInfo := false
 		local deltaInformation
@@ -2647,8 +2663,8 @@ class RaceSpotter extends GridRaceAssistant {
 			if isDebug()
 				logMessage(kLogDebug, "UpdateDriver: " . lastLap . ", " . sector . " Driver: " . (this.DriverCar != false) . ", " . (this.DriverCar && this.DriverCar.InPit) . " Race: " . raceInfo)
 
-			if (this.DriverCar && !this.DriverCar.InPit && newSector) {
-				if raceInfo {
+			if (this.DriverCar && !this.DriverCar.InPit && update) {
+				if (raceInfo && newSector) {
 					deltaInformation := this.Announcements["DeltaInformation"]
 
 					if ((deltaInformation != "S") && (lastLap >= (this.iLastDeltaInformationLap + deltaInformation)))
@@ -3038,6 +3054,8 @@ class RaceSpotter extends GridRaceAssistant {
 		this.iLastDeltaInformationLap := 0
 		this.iLastPenalty := false
 
+		this.iNextDriverUpdate := (A_TickCount + this.DriverUpdateTime)
+
 		this.iBestTopSpeed := false
 		this.iLastTopSpeed := false
 	}
@@ -3163,6 +3181,7 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 
 		this.updateConfigurationValues({LearningLaps: getMultiMapValue(configuration, "Race Spotter Analysis", simulatorName . ".LearningLaps", 1)
+									  , DriverUpdateTime: (getMultiMapValue(configuration, "Race Spotter Announcements", simulatorName . ".DriverUpdateTime", 0) * 1000)
 									  , SaveSettings: saveSettings})
 
 		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(facts)
@@ -3361,7 +3380,6 @@ class RaceSpotter extends GridRaceAssistant {
 		local lastPenalty := knowledgeBase.getValue("Lap.Penalty", false)
 		local wasValid := knowledgeBase.getValue("Lap.Valid", true)
 		local lastWarnings := knowledgeBase.getValue("Lap.Warnings", 0)
-		local newSector := false
 		local hasGaps := false
 		local sector, result, valid, gapAhead, gapBehind
 		local simulator, car, track
@@ -3369,6 +3387,7 @@ class RaceSpotter extends GridRaceAssistant {
 		static lastLap := 0
 		static lastSector := -1
 		static sectorIndex := 1
+		static newSector := false
 
 		if (lapNumber > this.LastLap) {
 			this.updateDynamicValues({EnoughData: false})
@@ -3408,7 +3427,22 @@ class RaceSpotter extends GridRaceAssistant {
 		if (lapNumber = this.LastLap) {
 			this.iPositions := this.computePositions(data, hasGaps ? gapAhead : false, hasGaps ? gapBehind : false)
 
-			this.updateDriver(lapNumber, sector, newSector, this.Positions)
+			if this.DriverUpdateTime {
+				if (A_TickCount >= this.iNextDriverUpdate) {
+					this.updateDriver(lapNumber, sector, true, newSector, this.Positions)
+
+					this.iNextDriverUpdate := (A_TickCount + this.DriverUpdateTime)
+
+					newSector := false
+				}
+				else
+					this.updateDriver(lapNumber, sector, false, false, this.Positions)
+			}
+			else {
+				this.updateDriver(lapNumber, sector, true, newSector, this.Positions)
+
+				newSector := false
+			}
 		}
 
 		result := super.updateLap(lapNumber, &data)

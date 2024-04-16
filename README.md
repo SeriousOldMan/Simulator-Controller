@@ -49,7 +49,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[5.6.7.0-dev](https://www.dropbox.com/scl/fi/wuo27qsmf8ad6ertb30kn/Simulator-Controller-5.6.7.0-dev.zip?rlkey=yed1db9kexmo50lqdxf5866cf&dl=1) (Early build for 5.6.7. Changes: Added Debug code to detect localization problems for simulators, Display active startup profile in "Simulator Startup", Spotter starts track mapping after end of the first lap, Finished sessions will stay at least a week untouched on the Team Server, Removed "Save Session" from "Race Center" and "Practice Center", Accident detection tweaks, Better detection of active replay in iRacing, Fixed session info page in "System Monitor" when one or more Assistants are deactivated, Fixed "NextPitstop" action in autonomous mode.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-567) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

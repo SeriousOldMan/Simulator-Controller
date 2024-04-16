@@ -446,8 +446,28 @@ launchPad(command := false, arguments*) {
 	static icons
 
 	static launchPadGui
+	static startupButton
 
 	static closeCheckBox
+
+	getStartupProfile() {
+		local startupProfile := translate("Standard")
+
+		if FileExist(kUserConfigDirectory . "Startup.settings") {
+			if gStartupProfile {
+				profiles := loadStartupProfiles(gStartupProfile)
+				profile := getMultiMapValue(profiles, "Profiles", "Profile", false)
+
+				if (profile = gStartupProfile)
+					startupProfile := profile
+			}
+			else
+				startupProfile := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Startup.settings")
+												 , "Profiles", "Profile", startupProfile)
+		}
+
+		return startupProfile
+	}
 
 	closeAll(*) {
 		local msgResult
@@ -490,8 +510,13 @@ launchPad(command := false, arguments*) {
 		}
 
 		if configure {
-			if (startupProfilesEditor(launchPadGui) = "Startup")
+			if (startupProfilesEditor(launchPadGui) = "Startup") {
+				startupButton.Text := ("Startup`n" . getStartupProfile())
+
 				launchPad("Startup")
+			}
+			else
+				startupButton.Text := ("Startup`n" . getStartupProfile())
 		}
 		else
 			launchPad("Startup")
@@ -754,7 +779,8 @@ launchPad(command := false, arguments*) {
 		launchPadGui.Add("Picture", "xp+90 yp w60 h60 vRaceReports", kIconsDirectory . "Chart.ico").OnEvent("Click", launchApplication.Bind("RaceReports"))
 		; launchPadGui.Add("Picture", "xp+184 yp w60 h60 vSystemMonitor", kIconsDirectory . "Monitoring.ico").OnEvent("Click", launchApplication.Bind("SystemMonitor"))
 
-		launchPadGui.Add("Text", "x16 yp+64 w60 h23 Center", "Startup")
+		startupButton := launchPadGui.Add("Text", "x16 yp+64 w60 h23 Center", "Startup")
+
 		launchPadGui.Add("Text", "xp+90 yp w60 h40 Center", "Race Settings")
 		launchPadGui.Add("Text", "xp+74 yp w60 h40 Center", "Session Database")
 		launchPadGui.Add("Text", "xp+90 yp w60 h40 Center", "Practice Center")
@@ -787,6 +813,8 @@ launchPad(command := false, arguments*) {
 
 		launchPadGui.Add("Button", "x259 yp w80 h23 Default", translate("Close")).OnEvent("Click", closeLaunchPad)
 		launchPadGui.Add("Button", "x476 yp w100 h23", translate("Close All...")).OnEvent("Click", closeAll)
+
+		startupButton.Text := ("Startup`n" . getStartupProfile())
 
 		OnMessage(0x0200, showApplicationInfo)
 

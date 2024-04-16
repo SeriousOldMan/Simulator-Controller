@@ -431,7 +431,7 @@ Please see the following table for available information commands.
 | CarCupAhead | The Strategist will tell you the cup category of the car ahead of you. |
 | CarCupBehind | The Strategist will tell you the cup category of the car behind of you. |
 | StrategyOverview | As the name says, you will get a complete overview of the race strategy, as long as one has been defined in the "Strategy Workbench" and has been exported to be used in this session. |
-| NextPitstop | Cato tells you the lap, where the next pitstop according to the strategy has been planned. |
+| NextPitstop | Cato tells you the lap, where the next pitstop according to the strategy has been planned. The Strategist will also ask, whether the Engineer should be informed right away, even if the planned pitstop is still far in the future. |
 
 Note: All these commands are also available in most of the simulation plugins, either in the "Pitstop" mode or in the "Assistant" mode, depending on the configuration parameters.
 

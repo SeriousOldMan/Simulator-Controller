@@ -1,3 +1,16 @@
+## 5.6.7.0-release 04/19/24 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. Fixed a bug in "Simulator Setup", where simulator localization on the basic setup page did not work.
+  4. The "NextPitstop" action of the Race Strategist will ask for confirmation before instructing the Engineer even in full autonomous mode.
+  5. The active startup profile is now displayed below the startup button in "Simulator Startup".
+  6. The Spotter now starts track mapping immediately after the end of the first lap.
+  7. Finished sessions will stay at least a week untouched on the Team Server.
+  8. Removed "Save Session" from "Race Center" and "Practice Center", which was confusing to many users. You now always save a copy to your local hard drice.
+  9. And again some accident detection tweaks for the Spotter
+  10. Replays in iRacing will now pause the telemetry acquisition.
+  11. Fixed session info page in "System Monitor" when one or more Assistants are not active.
+
 ## 5.6.6.0-release 04/12/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

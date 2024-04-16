@@ -259,7 +259,7 @@ namespace TeamServer.Server {
 			await ObjectManager.Connection.QueryAsync<Session>(
 				@"
                     Select * From Sessions Where Finished = ? And FinishTime < ?
-                ", true, DateTime.Now.AddHours(1)).ContinueWith(t => t.Result.ForEach(s => {
+                ", true, DateTime.Now.AddDays(-7)).ContinueWith(t => t.Result.ForEach(s => {
 					DeleteSession(s);
 				}));
 		}
@@ -270,7 +270,7 @@ namespace TeamServer.Server {
 			await ObjectManager.Connection.QueryAsync<Session>(
 				@"
                     Select * From Sessions Where Finished = ? And FinishTime < ?
-                ", true, DateTime.Now.AddHours(1)).ContinueWith(t => t.Result.ForEach(s => {
+                ", true, DateTime.Now.AddDays(-7)).ContinueWith(t => t.Result.ForEach(s => {
 					foreach (Model.Attribute attribute in s.Attributes)
 						attribute.Delete();
 
@@ -290,8 +290,8 @@ namespace TeamServer.Server {
 
 			await ObjectManager.Connection.QueryAsync<Session>(
 				@"
-                    Select * From Sessions Where Finised = ? And FinishTime < ?
-                ", true, DateTime.Now.AddHours(1)).ContinueWith(t => t.Result.ForEach(s => {
+                    Select * From Sessions Where Finished = ? And FinishTime < ?
+                ", true, DateTime.Now.AddDays(-7)).ContinueWith(t => t.Result.ForEach(s => {
 					foreach (Stint stint in s.Stints)
 						stint.Delete();
 

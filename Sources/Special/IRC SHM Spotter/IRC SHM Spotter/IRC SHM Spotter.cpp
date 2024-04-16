@@ -874,6 +874,7 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 
 				if (distance > 50) {
 					nextAccidentAhead = cycle + 400;
+					nextAccidentBehind = cycle + 200;
 					nextSlowCarAhead = cycle + 200;
 
 					char message[40] = "accidentAlert:Ahead;";
@@ -900,6 +901,7 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 
 				if (distance > 100) {
 					nextSlowCarAhead = cycle + 200;
+					nextAccidentBehind = cycle + 200;
 
 					char message[40] = "slowCarAlert:";
 					char numBuffer[20];

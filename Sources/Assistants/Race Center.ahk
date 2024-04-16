@@ -3002,7 +3002,7 @@ class RaceCenter extends ConfigurationItem {
 		local synchronize := ((this.Synchronize && isNumber(this.Synchronize)) ? "(x) Synchronize" : "      Synchronize")
 
 		this.Control["sessionMenuDropDown"].Delete()
-		this.Control["sessionMenuDropDown"].Add(collect(["Session", "---------------------------------------------", "Connect", "Clear...", "---------------------------------------------", synchronize, "---------------------------------------------", "Select Team...", "---------------------------------------------", "Load Session...", "Save Session", "Save a Copy...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Race Summary", "Driver Statistics"], translate))
+		this.Control["sessionMenuDropDown"].Add(collect(["Session", "---------------------------------------------", "Connect", "Clear...", "---------------------------------------------", synchronize, "---------------------------------------------", "Select Team...", "---------------------------------------------", "Load Session...", "Save a Copy...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Race Summary", "Driver Statistics"], translate))
 
 		this.Control["sessionMenuDropDown"].Choose(1)
 	}
@@ -4514,22 +4514,7 @@ class RaceCenter extends ConfigurationItem {
 				this.manageTeam()
 			case 10: ; Load Session...
 				this.loadSession()
-			case 11: ; Save Session
-				if this.HasData {
-					if this.SessionActive
-						this.saveSession()
-					else {
-						OnMessage(0x44, translateOkButton)
-						withBlockedWindows(MsgBox, translate("You are not connected to an active session. Use `"Save a Copy...`" instead."), translate("Information"), 262192)
-						OnMessage(0x44, translateOkButton, 0)
-					}
-				}
-				else {
-					OnMessage(0x44, translateOkButton)
-					withBlockedWindows(MsgBox, translate("There is no session data to be saved."), translate("Information"), 262192)
-					OnMessage(0x44, translateOkButton, 0)
-				}
-			case 12: ; Save Session Copy...
+			case 11: ; Save Session Copy...
 				if this.HasData
 					this.saveSession(true)
 				else {
@@ -4537,11 +4522,11 @@ class RaceCenter extends ConfigurationItem {
 					withBlockedWindows(MsgBox, translate("There is no session data to be saved."), translate("Information"), 262192)
 					OnMessage(0x44, translateOkButton, 0)
 				}
-			case 14: ; Update Statistics
+			case 13: ; Update Statistics
 				this.updateStatistics()
-			case 16: ; Race Summary
+			case 15: ; Race Summary
 				this.showSessionSummary()
-			case 17: ; Driver Statistics
+			case 16: ; Driver Statistics
 				this.showDriverStatistics()
 		}
 

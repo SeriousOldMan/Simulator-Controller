@@ -160,7 +160,7 @@ class RaceSpotterConfigurator extends ConfiguratorPanel {
 		widget30 := window.Add("DropDownList", "x" . x1 . " yp-4 w70 W:Grow(0.1) Choose1 vpenaltyInformationDropDown Hidden", [translate("Off"), translate("On")])
 
 		widget31 := window.Add("Text", "x" . x0 . " yp+26 w120 h20 Section Hidden", translate("Opponent Info every"))
-		widget32 := window.Add("DropDownList", "x" . x1 . " yp-4 w70 W:Grow(0.1) Choose3 vdeltaInformationDropDown Hidden", [translate("Off"), translate("Sector"), translate("Lap"), translate("2 Laps"), translate("3 Laps"), translate("4 Laps")])
+		widget32 := window.Add("DropDownList", "x" . x1 . " yp-4 w70 W:Grow(0.1) Choose3 vdeltaInformationDropDown Hidden", [translate("Off"), translate("Always"), translate("Sector"), translate("Lap"), translate("2 Laps"), translate("3 Laps"), translate("4 Laps")])
 		widget33 := window.Add("DropDownList", "x" . x5 . " yp w70 X:Move(0.1) W:Grow(0.1) Choose1 vdeltaInformationMethodDropDown Hidden", [translate("Static"), translate("Dynamic"), translate("Both")])
 
 		widget34 := window.Add("Text", "x" . x0 . " yp+26 w120 h20 Section Hidden", translate("Tactical Advices"))
@@ -276,10 +276,12 @@ class RaceSpotterConfigurator extends ConfiguratorPanel {
 
 			if !configuration["DeltaInformation"]
 				this.Control["deltaInformationDropDown"].Choose(1)
-			else if (configuration["DeltaInformation"] = "S")
+			else if (configuration["DeltaInformation"] = "A")
 				this.Control["deltaInformationDropDown"].Choose(2)
+			else if (configuration["DeltaInformation"] = "S")
+				this.Control["deltaInformationDropDown"].Choose(3)
 			else
-				this.Control["deltaInformationDropDown"].Choose(configuration["DeltaInformation"] + 2)
+				this.Control["deltaInformationDropDown"].Choose(configuration["DeltaInformation"] + 3)
 
 			this.Control["deltaInformationMethodDropDown"].Choose(inList(["Static", "Dynamic", "Both"], configuration["DeltaInformationMethod"]))
 
@@ -314,9 +316,11 @@ class RaceSpotterConfigurator extends ConfiguratorPanel {
 			if (this.Control["deltaInformationDropDown"].Value == 1)
 				configuration["DeltaInformation"] := false
 			else if (this.Control["deltaInformationDropDown"].Value == 2)
+				configuration["DeltaInformation"] := "A"
+			else if (this.Control["deltaInformationDropDown"].Value == 3)
 				configuration["DeltaInformation"] := "S"
 			else
-				configuration["DeltaInformation"] := (this.Control["deltaInformationDropDown"].Value - 2)
+				configuration["DeltaInformation"] := (this.Control["deltaInformationDropDown"].Value - 3)
 
 			configuration["DeltaInformationMethod"] := ["Static", "Dynamic", "Both"][this.Control["deltaInformationMethodDropDown"].Value]
 

@@ -839,7 +839,9 @@ class SetupWizard extends ConfiguratorPanel {
 		}
 
 		if getWindowSize("Simulator Setup.Help", &w, &h)
-			helpWindow.Resize("Initialize", w, Max(h, helpWindow.MinHeight + 80))
+			helpWindow.Resize("Initialize", w, Max(h, helpWindow.MinHeight + 190))
+		else
+			helpWindow.Resize("Initialize", helpWindow.MinWidth, helpWindow.MinHeight + 190)
 
 		if getWindowPosition("Simulator Setup", &x, &y)
 			wizardWindow.Show("x" . x . " y" . y)
@@ -849,15 +851,14 @@ class SetupWizard extends ConfiguratorPanel {
 			wizardWindow.Show("x" . posX . " yCenter")
 		}
 
-		if getWindowSize("Simulator Setup", &w, &h) {
-			wizardWindow.Resize("Initialize", w, Max(h, wizardWindow.MinHeight + 80))
-
-			Sleep(500)
-
-			this.nextPage()
-		}
+		if getWindowSize("Simulator Setup", &w, &h)
+			wizardWindow.Resize("Initialize", w, Max(h, wizardWindow.MinHeight + 190))
 		else
-			this.nextPage()
+			wizardWindow.Resize("Initialize", wizardWindow.MinWidth, wizardWindow.MinHeight + 190)
+
+		Sleep(2000)
+
+		this.nextPage()
 
 		page := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini"), "Simulator Setup", "StartPage", 0)
 

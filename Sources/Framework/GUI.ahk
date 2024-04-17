@@ -755,14 +755,15 @@ class Window extends Gui {
 		}
 	}
 
-	MinWidth[resize := true] {
+	MinWidth[resize := true, restrict := true] {
 		Get {
 			return this.iMinWidth
 		}
 
 		Set {
 			try {
-				this.Opt("+MinSize" . value . "x" . this.MinHeight)
+				if restrict
+					this.Opt("+MinSize" . value . "x" . this.MinHeight)
 
 				return (this.iMinWidth := value)
 			}
@@ -773,14 +774,15 @@ class Window extends Gui {
 		}
 	}
 
-	MinHeight[resize := true] {
+	MinHeight[resize := true, restrict := true] {
 		Get {
 			return this.iMinHeight
 		}
 
 		Set {
 			try {
-				this.Opt("+MinSize" . this.MinWidth . "x" . value)
+				if restrict
+					this.Opt("+MinSize" . this.MinWidth . "x" . value)
 
 				return (this.iMinHeight := value)
 			}
@@ -791,7 +793,7 @@ class Window extends Gui {
 		}
 	}
 
-	MaxWidth[resize := true] {
+	MaxWidth[resize := true, restrict := true] {
 		Get {
 			return this.iMaxWidth
 		}
@@ -801,10 +803,11 @@ class Window extends Gui {
 				return (this.iMaxWidth := value)
 			}
 			finally {
-				if this.MaxWidth
-					this.Opt("+MaxSize" . this.MaxWidth . "x")
-				else
-					this.Opt("-MaxSize")
+				if restrict
+					if this.MaxWidth
+						this.Opt("+MaxSize" . this.MaxWidth . "x")
+					else
+						this.Opt("-MaxSize")
 
 				if resize
 					this.Resize("Auto", this.Width, this.Height)
@@ -812,7 +815,7 @@ class Window extends Gui {
 		}
 	}
 
-	MaxHeight[resize := true] {
+	MaxHeight[resize := true, restrict := true] {
 		Get {
 			return this.iMaxHeight
 		}
@@ -822,10 +825,11 @@ class Window extends Gui {
 				return (this.iMaxHeight := value)
 			}
 			finally {
-				if this.MaxHeight
-					this.Opt("+MaxSize" . "x" . this.MaxHeight)
-				else
-					this.Opt("-MaxSize")
+				if restrict
+					if this.MaxHeight
+						this.Opt("+MaxSize" . "x" . this.MaxHeight)
+					else
+						this.Opt("-MaxSize")
 
 				if resize
 					this.Resize("Auto", this.Width, this.Height)
@@ -1232,8 +1236,14 @@ class Window extends Gui {
 			}
 		}
 
-		if InStr(minMax, "Init")
+		if InStr(minMax, "Init") {
 			WinMove( , , width, height, this)
+
+			if InStr(minMax, "Restrict") {
+				this.MinWidth[false, false] := width
+				this.MinHeight[false, false] := height
+			}
+		}
 		else if this.Width {
 			if (this.Resizeable = "Deferred") {
 				if !resizeTask {

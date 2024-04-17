@@ -195,18 +195,6 @@ class SetupWizard extends ConfiguratorPanel {
 				super.DefineResizeRule(control, rule)
 		}
 
-		ControlsRestrictResize(&width, &height) {
-			local restricted := super.ControlsRestrictResize(&width, &height)
-
-			if (height < (this.MinHeight + 80)) {
-				height := (this.MinHeight + 80)
-
-				restricted := true
-			}
-
-			return restricted
-		}
-
 		Close(*) {
 			if (this.Closeable && this.SetupWizard.finishSetup(false))
 				ExitApp(0)
@@ -839,9 +827,9 @@ class SetupWizard extends ConfiguratorPanel {
 		}
 
 		if getWindowSize("Simulator Setup.Help", &w, &h)
-			helpWindow.Resize("Initialize", w, Max(h, helpWindow.MinHeight + 190))
+			helpWindow.Resize("Initialize", w, Max(h, helpWindow.OrigHeight + 190))
 		else
-			helpWindow.Resize("Initialize", helpWindow.MinWidth, helpWindow.MinHeight + 190)
+			helpWindow.Resize("Initialize", helpWindow.OrigWidth, helpWindow.OrigHeight + 190)
 
 		if getWindowPosition("Simulator Setup", &x, &y)
 			wizardWindow.Show("x" . x . " y" . y)
@@ -851,10 +839,12 @@ class SetupWizard extends ConfiguratorPanel {
 			wizardWindow.Show("x" . posX . " yCenter")
 		}
 
+		wizardWindow.MinHeight[false] := (wizardWindow.OrigHeight + 190)
+
 		if getWindowSize("Simulator Setup", &w, &h)
-			wizardWindow.Resize("Initialize", w, Max(h, wizardWindow.MinHeight + 190))
+			wizardWindow.Resize("Initialize", w, Max(h, wizardWindow.MinHeight))
 		else
-			wizardWindow.Resize("Initialize", wizardWindow.MinWidth, wizardWindow.MinHeight + 190)
+			wizardWindow.Resize("Initialize", wizardWindow.OrigWidth, wizardWindow.MinHeight)
 
 		Sleep(2000)
 

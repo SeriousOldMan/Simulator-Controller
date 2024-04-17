@@ -476,6 +476,9 @@ class Window extends Gui {
 	iCloseable := false
 	iResizeable := false
 
+	iOrigWidth := 0
+	iOrigHeight := 0
+
 	iMinWidth := 0
 	iMinHeight := 0
 	iMaxWidth := 0
@@ -755,6 +758,18 @@ class Window extends Gui {
 		}
 	}
 
+	OrigWidth {
+		Get {
+			return this.iOrigWidth
+		}
+	}
+
+	OrigHeight {
+		Get {
+			return this.iOrigHeight
+		}
+	}
+
 	MinWidth[resize := true, restrict := true] {
 		Get {
 			return this.iMinWidth
@@ -763,7 +778,7 @@ class Window extends Gui {
 		Set {
 			try {
 				if restrict
-					this.Opt("+MinSize" . value . "x" . this.MinHeight)
+					this.Opt("+MinSize" . value . "x" . (this.MinHeight - this.TitleBarHeight))
 
 				return (this.iMinWidth := value)
 			}
@@ -782,7 +797,7 @@ class Window extends Gui {
 		Set {
 			try {
 				if restrict
-					this.Opt("+MinSize" . this.MinWidth . "x" . value)
+					this.Opt("+MinSize" . this.MinWidth . "x" . (value - this.TitleBarHeight))
 
 				return (this.iMinHeight := value)
 			}
@@ -1064,7 +1079,7 @@ class Window extends Gui {
 			if (control.Visible && control.HasProp("Show"))
 				control.Show()
 
-		if !this.MinWidth {
+		if !this.OrigWidth {
 			WinGetClientPos(&x, &y, &cWidth, &cHeight, this)
 			WinGetPos(&x, &y, &width, &height, this)
 
@@ -1074,6 +1089,9 @@ class Window extends Gui {
 			cHeight := screen2Window(cHeight)
 
 			this.iTitleBarHeight := (height - cHeight)
+
+			this.iOrigWidth := width
+			this.iOrigHeight := height
 
 			this.iMinWidth := width
 			this.iMinHeight := height
@@ -1236,14 +1254,8 @@ class Window extends Gui {
 			}
 		}
 
-		if InStr(minMax, "Init") {
+		if InStr(minMax, "Init")
 			WinMove( , , width, height, this)
-
-			if InStr(minMax, "Restrict") {
-				this.MinWidth[false, false] := width
-				this.MinHeight[false, false] := height
-			}
-		}
 		else if this.Width {
 			if (this.Resizeable = "Deferred") {
 				if !resizeTask {
@@ -1258,8 +1270,8 @@ class Window extends Gui {
 	}
 
 	ControlsRestrictResize(&width, &height) {
-		local deltaWidth := (width - this.MinWidth)
-		local deltaHeight := (height - this.MinHeight)
+		local deltaWidth := (width - this.OrigWidth)
+		local deltaHeight := (height - this.OrigHeight)
 		local restricted := false
 		local ignore, resizer
 
@@ -1268,16 +1280,16 @@ class Window extends Gui {
 				restricted := true
 
 		if restricted {
-			width := (this.MinWidth + deltaWidth)
-			height := (this.MinHeight + deltaHeight)
+			width := (this.OrigWidth + deltaWidth)
+			height := (this.OrigHeight + deltaHeight)
 		}
 
 		return restricted
 	}
 
 	ControlsResize(width, height) {
-		local deltaWidth := (width - this.MinWidth)
-		local deltaHeight := (height - this.MinHeight)
+		local deltaWidth := (width - this.OrigWidth)
+		local deltaHeight := (height - this.OrigHeight)
 		local ignore, resizer
 
 		for ignore, resizer in this.Resizers

@@ -1663,6 +1663,20 @@ updateInstallationForV500() {
 	}
 }
 
+updateConfigurationForV567() {
+	local settings, ignore, prefix, key
+
+	if FileExist(kUserConfigDirectory . "Application Settings.ini") {
+		settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+		for ignore, prefix in ["Simulator Setup.", "Simulator Setup.Help."]
+			for ignore, key in ["X", "Y", "Height", "Width"]
+				removeMultiMapValue(settings, "Window Positions", prefix . key)
+
+		writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+	}
+}
+
 updateConfigurationForV564() {
 	local configuration, removedKeys, ignore, key, candidate, fileName
 

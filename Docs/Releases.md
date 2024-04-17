@@ -7,9 +7,10 @@
   6. The Spotter now starts track mapping immediately after the end of the first lap.
   7. Finished sessions will stay at least a week untouched on the Team Server.
   8. Removed "Save Session" from "Race Center" and "Practice Center", which was confusing to many users. You now always save a copy to your local hard drice.
-  9. And again some accident detection tweaks for the Spotter
+  9. Again some accident detection tweaks for the Spotter
   10. Replays in iRacing will now pause the telemetry acquisition.
-  11. Fixed session info page in "System Monitor" when one or more Assistants are not active.
+  11. The data on the session info page in the "System Monitor" will now be as correct as possible also in team races, even when one or more Assistants are not active for a given driver.
+  12. The frequency of information and advice callouts can now be configured for the Race Spotter. Please see the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-spotter) for more information.
 
 ## 5.6.6.0-release 04/12/24
   1. Minor bugfixes, as always

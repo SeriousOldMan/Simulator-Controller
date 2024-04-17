@@ -240,22 +240,22 @@ class ConfigurationEditor extends ConfigurationItem {
 
 		editorGui.SetFont("Norm", "Arial")
 
-		editorGui.Add("Button", "x232 y528 w80 h23 Y:Move X:Move Default", translate("Save")).OnEvent("Click", saveAndExit)
-		editorGui.Add("Button", "x320 y528 w80 h23 Y:Move X:Move", translate("&Cancel")).OnEvent("Click", cancelAndExit)
-		editorGui.Add("Button", "x408 y528 w77 h23 Y:Move X:Move", translate("&Apply")).OnEvent("Click", saveAndStay)
+		editorGui.Add("Button", "x232 y573 w80 h23 Y:Move X:Move Default", translate("Save")).OnEvent("Click", saveAndExit)
+		editorGui.Add("Button", "x320 y573 w80 h23 Y:Move X:Move", translate("&Cancel")).OnEvent("Click", cancelAndExit)
+		editorGui.Add("Button", "x408 y573 w77 h23 Y:Move X:Move", translate("&Apply")).OnEvent("Click", saveAndStay)
 
 		choices := ["Auto", "Manual"]
 		chosen := inList(choices, this.iSaveMode)
 
-		editorGui.Add("Text", "x8 y528 w55 h23 Y:Move +0x200", translate("Save"))
-		editorGui.Add("DropDownList", "x63 y528 w75 Y:Move Choose" . chosen . "  vsaveModeDropDown", collect(choices, translate)).OnEvent("Change", updateSaveMode)
+		editorGui.Add("Text", "x8 y573 w55 h23 Y:Move +0x200", translate("Save"))
+		editorGui.Add("DropDownList", "x63 y573 w75 Y:Move Choose" . chosen . "  vsaveModeDropDown", collect(choices, translate)).OnEvent("Change", updateSaveMode)
 
 		labels := []
 
 		for ignore, configurator in this.Configurators
 			labels.Push(configurator[1])
 
-		editorGui.Add("Tab3", "x8 y48 w478 h472 W:Grow H:Grow AltSubmit -Wrap vconfiguratorTabView", labels).OnEvent("Change", selectTab)
+		editorGui.Add("Tab3", "x8 y48 w478 h517 W:Grow H:Grow AltSubmit -Wrap vconfiguratorTabView", labels).OnEvent("Change", selectTab)
 
 		tab := 1
 

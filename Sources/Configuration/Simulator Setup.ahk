@@ -839,9 +839,9 @@ class SetupWizard extends ConfiguratorPanel {
 		}
 
 		if getWindowSize("Simulator Setup.Help", &w, &h)
-			helpWindow.Resize("Initialize", w, Max(h, helpWindow.MinHeight + 186))
+			helpWindow.Resize("Initialize", w, Max(h, helpWindow.MinHeight + 190))
 		else
-			helpWindow.Resize("Initialize", helpWindow.MinWidth, helpWindow.MinHeight + 186)
+			helpWindow.Resize("Initialize", helpWindow.MinWidth, helpWindow.MinHeight + 190)
 
 		if getWindowPosition("Simulator Setup", &x, &y)
 			wizardWindow.Show("x" . x . " y" . y)
@@ -852,9 +852,9 @@ class SetupWizard extends ConfiguratorPanel {
 		}
 
 		if getWindowSize("Simulator Setup", &w, &h)
-			wizardWindow.Resize("Initialize", w, Max(h, wizardWindow.MinHeight + 186))
+			wizardWindow.Resize("Initialize", w, Max(h, wizardWindow.MinHeight + 190))
 		else
-			wizardWindow.Resize("Initialize", wizardWindow.MinWidth, wizardWindow.MinHeight + 186)
+			wizardWindow.Resize("Initialize", wizardWindow.MinWidth, wizardWindow.MinHeight + 190)
 
 		Sleep(2000)
 

@@ -117,7 +117,7 @@ class RaceSpotterConfigurator extends ConfiguratorPanel {
 		window.SetFont("Norm", "Arial")
 		window.SetFont("Italic", "Arial")
 
-		widget42 := window.Add("GroupBox", "x" . x . " yp+40 w" . width . " h134 W:Grow Hidden", translate("Alerts"))
+		widget42 := window.Add("GroupBox", "x" . x . " yp+40 w" . width . " h154 W:Grow Hidden", translate("Alerts"))
 
 		window.SetFont("Norm", "Arial")
 
@@ -138,36 +138,36 @@ class RaceSpotterConfigurator extends ConfiguratorPanel {
 		widget40 := window.Add("Text", "x" . x0 . " yp+26 w120 h20 Section Hidden", translate("Slow Cars"))
 		widget41 := window.Add("DropDownList", "x" . x1 . " yp-4 w70 W:Grow(0.1) Choose1 vslowCarsDropDown Hidden", [translate("Off"), translate("On")])
 
+		widget25 := window.Add("Text", "x" . x0 . " yp+26 w120 h20 Section Hidden", translate("Cut Warnings"))
+		widget26 := window.Add("DropDownList", "x" . x1 . " yp-4 w70 W:Grow(0.1) Choose1 vcutWarningsDropDown Hidden", [translate("Off"), translate("On")])
+
 		window.SetFont("Norm", "Arial")
 		window.SetFont("Italic", "Arial")
 
-		widget16 := window.Add("GroupBox", "x" . x . " yp+40 w" . width . " h182 W:Grow Hidden", translate("Information && Advices"))
+		widget16 := window.Add("GroupBox", "x" . x . " yp+40 w" . width . " h162 W:Grow Hidden", translate("Information && Advices"))
 
 		window.SetFont("Norm", "Arial")
 
 		widget43 := window.Add("Text", "x" . x0 . " yp+17 w80 h23 +0x200 Hidden", translate("Frequency"))
 		widget44 := window.Add("Edit", "x" . x1 . " yp w40 h21 Number Limit3 vrspDriverUpdateTimeEdit Hidden")
 		widget45 := window.Add("UpDown", "x" . x2 . " yp w17 h21 Range10-999 Hidden", 2)
-		widget46 := window.Add("Text", "x" . x3 . " yp w" . w3 . " h23 +0x200 Hidden", translate("seconds betweeen callouts"))
+		widget46 := window.Add("Text", "x" . x3 . " yp w" . w3 . " h23 +0x200 Hidden", translate("seconds at least betweeen callouts"))
 
-		widget23 := window.Add("Text", "x" . x0 . " yp+31 w120 h20 Section Hidden", translate("Pit Window"))
-		widget24 := window.Add("DropDownList", "x" . x1 . " yp-4 w70 W:Grow(0.1) Choose1 vpitWindowDropDown Hidden", [translate("Off"), translate("On")])
-
-		widget25 := window.Add("Text", "x" . x0 . " yp+26 w120 h20 Section Hidden", translate("Cut Warnings"))
-		widget26 := window.Add("DropDownList", "x" . x1 . " yp-4 w70 W:Grow(0.1) Choose1 vcutWarningsDropDown Hidden", [translate("Off"), translate("On")])
-
-		widget27 := window.Add("Text", "x" . x0 . " yp+26 w120 h20 Section Hidden", translate("General Information"))
+		widget27 := window.Add("Text", "x" . x0 . " yp+31 w120 h20 Section Hidden", translate("General Information"))
 		widget28 := window.Add("DropDownList", "x" . x1 . " yp-4 w70 W:Grow(0.1) Choose1 vsessionInformationDropDown Hidden", [translate("Off"), translate("On")])
 
 		widget29 := window.Add("Text", "x" . x0 . " yp+26 w120 h20 Section Hidden", translate("Penalty Information"))
 		widget30 := window.Add("DropDownList", "x" . x1 . " yp-4 w70 W:Grow(0.1) Choose1 vpenaltyInformationDropDown Hidden", [translate("Off"), translate("On")])
 
-		widget31 := window.Add("Text", "x" . x0 . " yp+26 w120 h20 Section Hidden", translate("Opponent Infos every"))
+		widget31 := window.Add("Text", "x" . x0 . " yp+26 w120 h20 Section Hidden", translate("Opponent Info every"))
 		widget32 := window.Add("DropDownList", "x" . x1 . " yp-4 w70 W:Grow(0.1) Choose3 vdeltaInformationDropDown Hidden", [translate("Off"), translate("Sector"), translate("Lap"), translate("2 Laps"), translate("3 Laps"), translate("4 Laps")])
 		widget33 := window.Add("DropDownList", "x" . x5 . " yp w70 X:Move(0.1) W:Grow(0.1) Choose1 vdeltaInformationMethodDropDown Hidden", [translate("Static"), translate("Dynamic"), translate("Both")])
 
 		widget34 := window.Add("Text", "x" . x0 . " yp+26 w120 h20 Section Hidden", translate("Tactical Advices"))
 		widget35 := window.Add("DropDownList", "x" . x1 . " yp-4 w70 W:Grow(0.1) Choose1 vtacticalAdvicesDropDown Hidden", [translate("Off"), translate("On")])
+
+		widget23 := window.Add("Text", "x" . x0 . " yp+26 w120 h20 Section Hidden", translate("Pit Window"))
+		widget24 := window.Add("DropDownList", "x" . x1 . " yp-4 w70 W:Grow(0.1) Choose1 vpitWindowDropDown Hidden", [translate("Off"), translate("On")])
 
 		window.SetFont("Norm", "Arial")
 

@@ -1,4 +1,4 @@
-## 5.6.7.0-release 04/19/24 (planned)
+## 5.6.7.0-release 04/19/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed a bug in "Simulator Setup", where simulator localization on the basic setup page did not work.

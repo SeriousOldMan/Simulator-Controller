@@ -37,25 +37,23 @@ Here is a short video which shows how to configure Simulator Controller for the 
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [information about the update process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.
 
-[5.6.6.0-release](https://cutt.ly/Tw48WHAZ) (Changes: Fixed shared database synchronization, Added "Both" to "Spotter: Car Indicator" setting, Fixed iRacing practice session detection, "Car Indicator" setting also for the Stratgist, Increased trigger detection speed, Tweaked accident detection, Trigger detection now can also detect key presses on the keyboard, Trigger detector for track automations.)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-566) of this version and all the versions you might have skipped, before installing and using this version.
-
-##### Earlier release builds
-
-[5.6.5.0-release](https://cutt.ly/iw8OtlPI) (Changes: ACC accident detection also for Big Grid sessions, Fixed rF2 pitstop settings transfer, Resizing of dashboard widgets in "System Monitor", Fine-tuning accident detection, Fixed track pre-selection in "Setup Workbench", Optimized system shutdown handling by the SC apps.)
-
-[5.6.4.0-release](https://cutt.ly/Bw3ggKYy) (Changes: Fixed pitstop and pitlane detection for iRacing, Fixed green flag regression, Invalid laps for iRacing, Default for "Pitstop Tyre Service" is now recognized for iRacing, Fixed memory leak in iRacing connector, Fixed Track Mapper for iRacing, Changing tyre compounds support for iRacing, Fixed "Simulator Setup" support for "Le Mans Ultimate", Fixed spanish voice recognition, Fixed track map periodic update in "Race Center", Accident detection now also for ACC, "Practice Center" informs about unsaved data before starting a new session, Increased iRacing position data reliability, Migrated to AHK 2.0.12, Updated meta data for R3E.)
-
-#### Latest development build
-
-[5.6.7.0-alpha](https://www.dropbox.com/scl/fi/q4n0wt515a30v5e46c7ft/Simulator-Controller-5.6.7.0-alpha.zip?rlkey=ft8dziv6kbkfrr9rjif8l36tr&dl=1) (Test build for 5.6.7. Changes: Added Debug code to detect localization problems for simulators, Display active startup profile in "Simulator Startup", Spotter starts track mapping after end of the first lap, Finished sessions will stay at least a week untouched on the Team Server, Removed "Save Session" from "Race Center" and "Practice Center", Accident detection tweaks, Better detection of active replay in iRacing, Fixed session info page in "System Monitor" when one or more Assistants are deactivated, Fixed "NextPitstop" action in autonomous mode, Configuration for callout frequency of the Spotter, Updated UI layout of "Simulator Setup" and "Simulator Configuration".)
+[5.6.7.0-release](https://cutt.ly/xw5ayPd3) (Changes: Added Debug code to detect localization problems for simulators, Display active startup profile in "Simulator Startup", Spotter starts track mapping after end of the first lap, Finished sessions will stay at least a week untouched on the Team Server, Removed "Save Session" from "Race Center" and "Practice Center", Accident detection tweaks, Better detection of active replay in iRacing, Fixed session info page in "System Monitor" when one or more Assistants are deactivated, Fixed "NextPitstop" action in autonomous mode, Configuration for callout frequency of the Spotter, Updated UI layout of "Simulator Setup" and "Simulator Configuration".)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-567) of this version and all the versions you might have skipped, before installing and using this version.
 
+##### Earlier release builds
+
+[5.6.6.0-release](https://cutt.ly/Tw48WHAZ) (Changes: Fixed shared database synchronization, Added "Both" to "Spotter: Car Indicator" setting, Fixed iRacing practice session detection, "Car Indicator" setting also for the Stratgist, Increased trigger detection speed, Tweaked accident detection, Trigger detection now can also detect key presses on the keyboard, Trigger detector for track automations.)
+
+[5.6.5.0-release](https://cutt.ly/iw8OtlPI) (Changes: ACC accident detection also for Big Grid sessions, Fixed rF2 pitstop settings transfer, Resizing of dashboard widgets in "System Monitor", Fine-tuning accident detection, Fixed track pre-selection in "Setup Workbench", Optimized system shutdown handling by the SC apps.)
+
+#### Latest development build
+
+None for the moment...
+
 ### Documentation
 
-A very [extensive documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki) of roughly 400 pages will guide you through the configuration process and will help you to understand the inner concepts and all the functions & features of Simulator Controller. For developers, who want to create their own plugins, a complete [developers guide & reference](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts) is available as well.
+A very extensive [Documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki) of roughly 400 pages will guide you through the configuration process and will help you to understand the inner concepts and all the functions & features of Simulator Controller. For developers, who want to create their own plugins, a complete [developers guide & reference](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts) is available as well.
 
 The markdown files, the so to say source code of this documentation Wiki, can be found in the [Docs](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Docs) folder.
 

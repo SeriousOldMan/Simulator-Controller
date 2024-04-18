@@ -1366,40 +1366,44 @@ class RaceSpotter extends GridRaceAssistant {
 			if driver {
 				currentPosition := positions["Position.Class"]
 
-				speaker.beginTalk()
+				if ((currentPosition != startPosition) || (startPosition != this.getCars("Class").Length)) {
+					speaker.beginTalk()
 
-				try {
-					if (currentPosition = startPosition) {
-						speaker.speakPhrase("GoodStart")
+					try {
+						if (currentPosition = startPosition) {
+							speaker.speakPhrase("GoodStart")
 
-						if (currentPosition = 1)
-							speaker.speakPhrase("Leader")
-						else if (currentPosition <= 5)
-							speaker.speakPhrase("Position", {position: currentPosition})
+							if (currentPosition = 1)
+								speaker.speakPhrase("Leader")
+							else if (currentPosition <= 5)
+								speaker.speakPhrase("Position", {position: currentPosition})
+						}
+						else if (currentPosition < startPosition) {
+							speaker.speakPhrase("GreatStart")
+
+							if (currentPosition = 1)
+								speaker.speakPhrase("Leader")
+							else if (currentPosition <= 5)
+								speaker.speakPhrase("Position", {position: currentPosition})
+							else
+								speaker.speakPhrase("PositionsGained", {positions: Abs(currentPosition - startPosition)})
+						}
+						else if (currentPosition > startPosition) {
+							speaker.speakPhrase("BadStart")
+
+							speaker.speakPhrase("PositionsLost", {positions: Abs(currentPosition - startPosition)})
+
+							speaker.speakPhrase("Fight")
+						}
 					}
-					else if (currentPosition < startPosition) {
-						speaker.speakPhrase("GreatStart")
-
-						if (currentPosition = 1)
-							speaker.speakPhrase("Leader")
-						else if (currentPosition <= 5)
-							speaker.speakPhrase("Position", {position: currentPosition})
-						else
-							speaker.speakPhrase("PositionsGained", {positions: Abs(currentPosition - startPosition)})
+					finally {
+						speaker.endTalk()
 					}
-					else if (currentPosition > startPosition) {
-						speaker.speakPhrase("BadStart")
 
-						speaker.speakPhrase("PositionsLost", {positions: Abs(currentPosition - startPosition)})
-
-						speaker.speakPhrase("Fight")
-					}
+					return true
 				}
-				finally {
-					speaker.endTalk()
-				}
-
-				return true
+				else
+					return false
 			}
 			else
 				return false
@@ -2063,6 +2067,8 @@ class RaceSpotter extends GridRaceAssistant {
 							speaker.speakPhrase("FasterThan", {indicator: this.getCarIndicatorFragment(speaker, carNr, carPosition)
 															 , delta: speaker.number2Speech(delta, 1)
 															 , lapTime: speaker.number2Speech(lapTimeDifference, 1)})
+
+							this.TacticalAdvices["FasterThan"] := {Key: key, Lap: lastLap}
 
 							return true
 						}

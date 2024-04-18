@@ -64,7 +64,7 @@ class ControllerConfigurator extends ConfiguratorPanel {
 		this.ControllerList.createGui(editor, x, y, width, height)
 		this.FunctionsList.createGui(editor, x, y, width, height)
 
-		window.Add("Button", "x16 y490 w100 h23 Y:Move", translate("Trigger...")).OnEvent("Click", toggleTriggerDetector)
+		window.Add("Button", "x16 y530 w100 h23 Y:Move", translate("Trigger...")).OnEvent("Click", toggleTriggerDetector)
 	}
 
 	saveToConfiguration(configuration) {
@@ -310,44 +310,44 @@ class FunctionsList extends ConfigurationItemList {
 			Run("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions")
 		}
 
-		window.Add("ListView", "x16 y200 w457 h146 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr VfunctionsListView", collect(["Function", "Number", "Hotkey(s) & Action(s)"], translate))
+		window.Add("ListView", "x16 y200 w457 h186 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr VfunctionsListView", collect(["Function", "Number", "Hotkey(s) & Action(s)"], translate))
 
-		window.Add("Text", "x16 y356 w86 h23 Y:Move +0x200", translate("Function"))
-		window.Add("DropDownList", "x124 y356 w91 Y:Move Choose1 VfunctionTypeDropDown", collect(["1-way Toggle", "2-way Toggle", "Button", "Rotary", "Custom"], translate)).OnEvent("Change", updateFunctionEditorState)
-		window.Add("Edit", "x220 y356 w40 h21 Y:Move Number Limit3 VfunctionNumberEdit")
-		window.Add("UpDown", "Range1-999 x260 y356 w17 h21 Y:Move", 1)
+		window.Add("Text", "x16 y396 w86 h23 Y:Move +0x200", translate("Function"))
+		window.Add("DropDownList", "x124 y396 w91 Y:Move Choose1 VfunctionTypeDropDown", collect(["1-way Toggle", "2-way Toggle", "Button", "Rotary", "Custom"], translate)).OnEvent("Change", updateFunctionEditorState)
+		window.Add("Edit", "x220 y396 w40 h21 Y:Move Number Limit3 VfunctionNumberEdit")
+		window.Add("UpDown", "Range1-999 x260 y396 w17 h21 Y:Move", 1)
 
 		window.SetFont("Norm", "Arial")
 		window.SetFont("Italic", "Arial")
 
-		window.Add("GroupBox", "x16 y388 w457 h95 Y:Move W:Grow", translate("Bindings"))
+		window.Add("GroupBox", "x16 y428 w457 h95 Y:Move W:Grow", translate("Bindings"))
 
 		window.SetFont("Norm", "Arial")
 
-		window.Add("Text", "x124 y397 w160 h22 Y:Move X:Move(0.25) +0x200 +Center", translate("On or Increase"))
-		window.Add("Text", "x303 y397 w160 h22 Y:Move X:Move(0.75) +0x200 +Center", translate("Off or Decrease"))
+		window.Add("Text", "x124 y437 w160 h22 Y:Move X:Move(0.25) +0x200 +Center", translate("On or Increase"))
+		window.Add("Text", "x303 y437 w160 h22 Y:Move X:Move(0.75) +0x200 +Center", translate("Off or Decrease"))
 
 		window.SetFont("Underline", "Arial")
 
-		window.Add("Text", "x24 y420 w83 h23 Y:Move +0x200 c" . window.Theme.LinkColor, translate("Hotkey(s)")).OnEvent("Click", openHotkeysDocumentation)
+		window.Add("Text", "x24 y460 w83 h23 Y:Move +0x200 c" . window.Theme.LinkColor, translate("Hotkey(s)")).OnEvent("Click", openHotkeysDocumentation)
 
 		window.SetFont("Norm", "Arial")
 
-		window.Add("Edit", "x124 y420 w160 h21 Y:Move W:Grow(0.5) VfunctionOnHotkeysEdit")
-		window.Add("Edit", "x303 y420 w160 h21 Y:Move X:Move(0.5) W:Grow(0.5) VfunctionOffHotkeysEdit")
+		window.Add("Edit", "x124 y460 w160 h21 Y:Move W:Grow(0.5) VfunctionOnHotkeysEdit")
+		window.Add("Edit", "x303 y460 w160 h21 Y:Move X:Move(0.5) W:Grow(0.5) VfunctionOffHotkeysEdit")
 
 		window.SetFont("Underline", "Arial")
 
-		window.Add("Text", "x24 y448 w95 h27 Y:Move c" . window.Theme.LinkColor, translate("Action(s) (optional)")).OnEvent("Click", openActionsDocumentation)
+		window.Add("Text", "x24 y488 w95 h27 Y:Move c" . window.Theme.LinkColor, translate("Action(s) (optional)")).OnEvent("Click", openActionsDocumentation)
 
 		window.SetFont("Norm", "Arial")
 
-		window.Add("Edit", "x124 y444 w160 h21 Y:Move W:Grow(0.5) VfunctionOnActionEdit")
-		window.Add("Edit", "x303 y444 w160 h21 Y:Move X:Move(0.5) W:Grow(0.5) VfunctionOffActionEdit")
+		window.Add("Edit", "x124 y484 w160 h21 Y:Move W:Grow(0.5) VfunctionOnActionEdit")
+		window.Add("Edit", "x303 y484 w160 h21 Y:Move X:Move(0.5) W:Grow(0.5) VfunctionOffActionEdit")
 
-		window.Add("Button", "x264 y490 w46 h23 Y:Move X:Move VfunctionAddButton", translate("Add"))
-		window.Add("Button", "x312 y490 w50 h23 Y:Move X:Move Disabled VfunctionDeleteButton", translate("Delete"))
-		window.Add("Button", "x418 y490 w55 h23 Y:Move X:Move Disabled VfunctionUpdateButton", translate("&Save"))
+		window.Add("Button", "x264 y530 w46 h23 Y:Move X:Move VfunctionAddButton", translate("Add"))
+		window.Add("Button", "x312 y530 w50 h23 Y:Move X:Move Disabled VfunctionDeleteButton", translate("Delete"))
+		window.Add("Button", "x418 y530 w55 h23 Y:Move X:Move Disabled VfunctionUpdateButton", translate("&Save"))
 
 		this.initializeList(editor, window["functionsListView"], window["functionAddButton"], window["functionDeleteButton"], window["functionUpdateButton"])
 	}

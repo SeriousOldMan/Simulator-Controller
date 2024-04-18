@@ -85,46 +85,46 @@ class ApplicationsConfigurator extends ConfigurationItemList {
 			}
 		}
 
-		window.Add("ListView", "x16 y80 w457 h205 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr VapplicationsListView", collect(["Type", "Name", "Executable", "Window Title", "Working Directory"], translate))
+		window.Add("ListView", "x16 y80 w457 h245 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr VapplicationsListView", collect(["Type", "Name", "Executable", "Window Title", "Working Directory"], translate))
 
-		window.Add("Text", "x16 y295 w141 h23 Y:Move +0x200", translate("Name"))
-		window.Add("Edit", "x180 y295 w268 h21 Y:Move W:Grow VapplicationNameEdit")
+		window.Add("Text", "x16 y335 w141 h23 Y:Move +0x200", translate("Name"))
+		window.Add("Edit", "x180 y335 w268 h21 Y:Move W:Grow VapplicationNameEdit")
 
-		window.Add("Text", "x16 y319 w138 h23 Y:Move +0x200", translate("Executable"))
-		window.Add("Edit", "x180 y319 w268 h21 Y:Move W:Grow VapplicationExePathEdit")
-		window.Add("Button", "x451 y318 w23 h23 Y:Move X:Move", translate("...")).OnEvent("Click", chooseApplicationExePath)
+		window.Add("Text", "x16 y359 w138 h23 Y:Move +0x200", translate("Executable"))
+		window.Add("Edit", "x180 y359 w268 h21 Y:Move W:Grow VapplicationExePathEdit")
+		window.Add("Button", "x451 y358 w23 h23 Y:Move X:Move", translate("...")).OnEvent("Click", chooseApplicationExePath)
 
-		window.Add("Text", "x16 y343 w138 h23 Y:Move +0x200", translate("Working Directory (optional)"))
-		window.Add("Edit", "x180 y343 w268 h21 Y:Move W:Grow VapplicationWorkingDirectoryPathEdit")
-		window.Add("Button", "x451 y342 w23 h23 X:Move Y:Move", translate("...")).OnEvent("Click", chooseApplicationWorkingDirectoryPath)
+		window.Add("Text", "x16 y383 w138 h23 Y:Move +0x200", translate("Working Directory (optional)"))
+		window.Add("Edit", "x180 y383 w268 h21 Y:Move W:Grow VapplicationWorkingDirectoryPathEdit")
+		window.Add("Button", "x451 y382 w23 h23 X:Move Y:Move", translate("...")).OnEvent("Click", chooseApplicationWorkingDirectoryPath)
 
-		window.Add("Text", "x16 y367 w140 h23 Y:Move +0x200", translate("Window Title (optional)"))
+		window.Add("Text", "x16 y407 w140 h23 Y:Move +0x200", translate("Window Title (optional)"))
 
-		window.Add("Text", "x24 y385 w133 h23 Y:Move c" . window.Theme.TextColor["Disabled"], translate("(Use AHK WinTitle Syntax)"))
+		window.Add("Text", "x24 y425 w133 h23 Y:Move c" . window.Theme.TextColor["Disabled"], translate("(Use AHK WinTitle Syntax)"))
 
 		window.SetFont()
 
-		window.Add("Edit", "x180 y367 w268 h21 Y:Move W:Grow VapplicationWindowTitleEdit")
+		window.Add("Edit", "x180 y407 w268 h21 Y:Move W:Grow VapplicationWindowTitleEdit")
 
 		window.SetFont("Norm", "Arial")
 		window.SetFont("Italic", "Arial")
 
-		window.Add("GroupBox", "x16 y411 w458 h71 Y:Move W:Grow", translate("Function Hooks (optional)"))
+		window.Add("GroupBox", "x16 y451 w458 h71 Y:Move W:Grow", translate("Function Hooks (optional)"))
 
 		window.SetFont("Norm", "Arial")
 
-		window.Add("Text", "x20 y427 w136 h23 +0x200 Y:Move X:Move(0.16) +Center", translate("Startup"))
-		window.Add("Edit", "x20 y451 w136 h21 Y:Move W:Grow(0.33) VapplicationStartupEdit")
+		window.Add("Text", "x20 y467 w136 h23 +0x200 Y:Move X:Move(0.16) +Center", translate("Startup"))
+		window.Add("Edit", "x20 y491 w136 h21 Y:Move W:Grow(0.33) VapplicationStartupEdit")
 
-		window.Add("Text", "x177 y427 w136 h23 Y:Move X:Move(0.5) +0x200 +Center", translate("Shutdown "))
-		window.Add("Edit", "x177 y451 w136 h21 Y:Move X:Move(0.33) W:Grow(0.33) VapplicationShutdownEdit")
+		window.Add("Text", "x177 y467 w136 h23 Y:Move X:Move(0.5) +0x200 +Center", translate("Shutdown "))
+		window.Add("Edit", "x177 y491 w136 h21 Y:Move X:Move(0.33) W:Grow(0.33) VapplicationShutdownEdit")
 
-		window.Add("Text", "x334 y427 w136 h23 Y:Move X:Move(0.84) +0x200 +Center", translate("Running?"))
-		window.Add("Edit", "x334 y451 w136 h21 Y:Move X:Move(0.66) W:Grow(0.34) VapplicationIsRunningEdit")
+		window.Add("Text", "x334 y467 w136 h23 Y:Move X:Move(0.84) +0x200 +Center", translate("Running?"))
+		window.Add("Edit", "x334 y491 w136 h21 Y:Move X:Move(0.66) W:Grow(0.34) VapplicationIsRunningEdit")
 
-		window.Add("Button", "x264 y490 w46 h23 Y:Move X:Move VapplicationAddButton", translate("Add"))
-		window.Add("Button", "x312 y490 w50 h23 Y:Move X:Move Disabled VapplicationDeleteButton", translate("Delete"))
-		window.Add("Button", "x418 y490 w55 h23 Y:Move X:Move Disabled VapplicationUpdateButton", translate("&Save"))
+		window.Add("Button", "x264 y530 w46 h23 Y:Move X:Move VapplicationAddButton", translate("Add"))
+		window.Add("Button", "x312 y530 w50 h23 Y:Move X:Move Disabled VapplicationDeleteButton", translate("Delete"))
+		window.Add("Button", "x418 y530 w55 h23 Y:Move X:Move Disabled VapplicationUpdateButton", translate("&Save"))
 
 		this.initializeList(editor, window["applicationsListView"], window["applicationAddButton"], window["applicationDeleteButton"], window["applicationUpdateButton"])
 	}

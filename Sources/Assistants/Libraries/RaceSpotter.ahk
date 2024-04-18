@@ -2664,14 +2664,14 @@ class RaceSpotter extends GridRaceAssistant {
 				if isDebug()
 					logMessage(kLogDebug, "UpdateDriver: " . lastLap . ", " . sector . " Driver: " . (this.DriverCar != false) . ", " . (this.DriverCar && this.DriverCar.InPit) . " Race: " . raceInfo)
 
-				if (raceInfo && newSector) {
-					deltaInformation := this.Announcements["DeltaInformation"]
+				deltaInformation := this.Announcements["DeltaInformation"]
 
-					if ((deltaInformation != "S") && (lastLap >= (this.iLastDeltaInformationLap + deltaInformation)))
+				if (raceInfo && (newSector || (deltaInformation = "A"))) {
+					if (isNumber(deltaInformation) && (lastLap >= (this.iLastDeltaInformationLap + deltaInformation)))
 						this.iLastDeltaInformationLap := lastLap
 
 					hadInfo := this.deltaInformation(lastLap, sector, positions
-												   , (deltaInformation = "S") || (lastLap = this.iLastDeltaInformationLap)
+												   , (deltaInformation = "A") || (deltaInformation = "S") || (lastLap = this.iLastDeltaInformationLap)
 												   , this.Announcements["DeltaInformationMethod"])
 
 					if (hadInfo && (Random(1, 10) < 5))

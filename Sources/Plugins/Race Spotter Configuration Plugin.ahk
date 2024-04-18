@@ -112,18 +112,16 @@ class RaceSpotterConfigurator extends ConfiguratorPanel {
 		widget14.OnEvent("Change", validateRSPDampingFactor)
 		widget15 := window.Add("Text", "x" . x3 . " yp+2 w80 h20 Hidden", translate("p. Lap"))
 
+		x5 := x1 + 72
+
 		window.SetFont("Norm", "Arial")
 		window.SetFont("Italic", "Arial")
 
-		widget16 := window.Add("GroupBox", "x" . x . " yp+35 w" . width . " h278 W:Grow Hidden", translate("Announcements"))
+		widget42 := window.Add("GroupBox", "x" . x . " yp+40 w" . width . " h154 W:Grow Hidden", translate("Alerts"))
 
 		window.SetFont("Norm", "Arial")
 
-		x3 := x + 186
-		w3 := width - (x3 - x + 16) + 10
-		x5 := x1 + 72
-
-		widget17 := window.Add("Text", "x" . x0 . " yp+20 w120 h20 Section Hidden", translate("Side / Rear Proximity"))
+		widget17 := window.Add("Text", "x" . x0 . " yp+19 w120 h20 Section Hidden", translate("Side / Rear Proximity"))
 		widget18 := window.Add("DropDownList", "x" . x1 . " yp-4 w70 W:Grow(0.1) Choose1 vsideProximityDropDown Hidden", [translate("Off"), translate("On")])
 		widget19 := window.Add("DropDownList", "x" . x5 . " yp w70 X:Move(0.1) W:Grow(0.1) Choose1 vrearProximityDropDown Hidden", [translate("Off"), translate("On")])
 
@@ -140,28 +138,40 @@ class RaceSpotterConfigurator extends ConfiguratorPanel {
 		widget40 := window.Add("Text", "x" . x0 . " yp+26 w120 h20 Section Hidden", translate("Slow Cars"))
 		widget41 := window.Add("DropDownList", "x" . x1 . " yp-4 w70 W:Grow(0.1) Choose1 vslowCarsDropDown Hidden", [translate("Off"), translate("On")])
 
-		widget23 := window.Add("Text", "x" . x0 . " yp+26 w120 h20 Section Hidden", translate("Pit Window"))
-		widget24 := window.Add("DropDownList", "x" . x1 . " yp-4 w70 W:Grow(0.1) Choose1 vpitWindowDropDown Hidden", [translate("Off"), translate("On")])
-
 		widget25 := window.Add("Text", "x" . x0 . " yp+26 w120 h20 Section Hidden", translate("Cut Warnings"))
 		widget26 := window.Add("DropDownList", "x" . x1 . " yp-4 w70 W:Grow(0.1) Choose1 vcutWarningsDropDown Hidden", [translate("Off"), translate("On")])
 
-		widget27 := window.Add("Text", "x" . x0 . " yp+26 w120 h20 Section Hidden", translate("General Information"))
+		window.SetFont("Norm", "Arial")
+		window.SetFont("Italic", "Arial")
+
+		widget16 := window.Add("GroupBox", "x" . x . " yp+40 w" . width . " h162 W:Grow Hidden", translate("Information && Advices"))
+
+		window.SetFont("Norm", "Arial")
+
+		widget43 := window.Add("Text", "x" . x0 . " yp+17 w80 h23 +0x200 Hidden", translate("Frequency"))
+		widget44 := window.Add("Edit", "x" . x1 . " yp w40 h21 Number Limit3 vrspDriverUpdateTimeEdit Hidden")
+		widget45 := window.Add("UpDown", "x" . x2 . " yp w17 h21 Range10-999 Hidden", 2)
+		widget46 := window.Add("Text", "x" . x3 . " yp w" . w3 . " h23 +0x200 Hidden", translate("seconds at least betweeen callouts"))
+
+		widget27 := window.Add("Text", "x" . x0 . " yp+31 w120 h20 Section Hidden", translate("General Information"))
 		widget28 := window.Add("DropDownList", "x" . x1 . " yp-4 w70 W:Grow(0.1) Choose1 vsessionInformationDropDown Hidden", [translate("Off"), translate("On")])
 
 		widget29 := window.Add("Text", "x" . x0 . " yp+26 w120 h20 Section Hidden", translate("Penalty Information"))
 		widget30 := window.Add("DropDownList", "x" . x1 . " yp-4 w70 W:Grow(0.1) Choose1 vpenaltyInformationDropDown Hidden", [translate("Off"), translate("On")])
 
-		widget31 := window.Add("Text", "x" . x0 . " yp+26 w120 h20 Section Hidden", translate("Opponent Infos every"))
-		widget32 := window.Add("DropDownList", "x" . x1 . " yp-4 w70 W:Grow(0.1) Choose3 vdeltaInformationDropDown Hidden", [translate("Off"), translate("Sector"), translate("Lap"), translate("2 Laps"), translate("3 Laps"), translate("4 Laps")])
+		widget31 := window.Add("Text", "x" . x0 . " yp+26 w120 h20 Section Hidden", translate("Opponent Info every"))
+		widget32 := window.Add("DropDownList", "x" . x1 . " yp-4 w70 W:Grow(0.1) Choose3 vdeltaInformationDropDown Hidden", [translate("Off"), translate("Always"), translate("Sector"), translate("Lap"), translate("2 Laps"), translate("3 Laps"), translate("4 Laps")])
 		widget33 := window.Add("DropDownList", "x" . x5 . " yp w70 X:Move(0.1) W:Grow(0.1) Choose1 vdeltaInformationMethodDropDown Hidden", [translate("Static"), translate("Dynamic"), translate("Both")])
 
 		widget34 := window.Add("Text", "x" . x0 . " yp+26 w120 h20 Section Hidden", translate("Tactical Advices"))
 		widget35 := window.Add("DropDownList", "x" . x1 . " yp-4 w70 W:Grow(0.1) Choose1 vtacticalAdvicesDropDown Hidden", [translate("Off"), translate("On")])
 
+		widget23 := window.Add("Text", "x" . x0 . " yp+26 w120 h20 Section Hidden", translate("Pit Window"))
+		widget24 := window.Add("DropDownList", "x" . x1 . " yp-4 w70 W:Grow(0.1) Choose1 vpitWindowDropDown Hidden", [translate("Off"), translate("On")])
+
 		window.SetFont("Norm", "Arial")
 
-		loop 41
+		loop 46
 			editor.registerWidget(this, widget%A_Index%)
 
 		this.loadSimulatorConfiguration()
@@ -181,6 +191,8 @@ class RaceSpotterConfigurator extends ConfiguratorPanel {
 			simulatorConfiguration["LearningLaps"] := getMultiMapValue(configuration, "Race Spotter Analysis", simulator . ".LearningLaps", 1)
 			simulatorConfiguration["ConsideredHistoryLaps"] := getMultiMapValue(configuration, "Race Spotter Analysis", simulator . ".ConsideredHistoryLaps", 5)
 			simulatorConfiguration["HistoryLapsDamping"] := getMultiMapValue(configuration, "Race Spotter Analysis", simulator . ".HistoryLapsDamping", 0.2)
+
+			simulatorConfiguration["DriverUpdateTime"] := getMultiMapValue(configuration, "Race Spotter Announcements", simulator . ".DriverUpdateTime", 30)
 
 			for ignore, key in ["SideProximity", "RearProximity", "YellowFlags", "BlueFlags"
 							  , "SessionInformation", "TacticalAdvices", "PitWindow", "CutWarnings", "PenaltyInformation"
@@ -209,6 +221,8 @@ class RaceSpotterConfigurator extends ConfiguratorPanel {
 		for simulator, simulatorConfiguration in this.iSimulatorConfigurations {
 			for ignore, key in ["LearningLaps", "ConsideredHistoryLaps", "HistoryLapsDamping"]
 				setMultiMapValue(configuration, "Race Spotter Analysis", simulator . "." . key, simulatorConfiguration[key])
+
+			setMultiMapValue(configuration, "Race Spotter Announcements", simulator . ".DriverUpdateTime", simulatorConfiguration["DriverUpdateTime"])
 
 			for ignore, key in ["SideProximity", "RearProximity", "YellowFlags", "BlueFlags"
 							  , "SessionInformation", "DeltaInformation", "DeltaInformationMethod", "TacticalAdvices", "PitWindow"
@@ -247,6 +261,8 @@ class RaceSpotterConfigurator extends ConfiguratorPanel {
 			this.Control["rspDampingFactorEdit"].Text := displayValue("Float", configuration["HistoryLapsDamping"], 1)
 			this.Control["rspDampingFactorEdit"].ValidText := this.Control["rspDampingFactorEdit"].Text
 
+			this.Control["rspDriverUpdateTimeEdit"].Text := configuration["DriverUpdateTime"]
+
 			this.Control["sideProximityDropDown"].Choose(configuration["SideProximity"] + 1)
 			this.Control["rearProximityDropDown"].Choose(configuration["RearProximity"] + 1)
 			this.Control["yellowFlagsDropDown"].Choose(configuration["YellowFlags"] + 1)
@@ -260,10 +276,12 @@ class RaceSpotterConfigurator extends ConfiguratorPanel {
 
 			if !configuration["DeltaInformation"]
 				this.Control["deltaInformationDropDown"].Choose(1)
-			else if (configuration["DeltaInformation"] = "S")
+			else if (configuration["DeltaInformation"] = "A")
 				this.Control["deltaInformationDropDown"].Choose(2)
+			else if (configuration["DeltaInformation"] = "S")
+				this.Control["deltaInformationDropDown"].Choose(3)
 			else
-				this.Control["deltaInformationDropDown"].Choose(configuration["DeltaInformation"] + 2)
+				this.Control["deltaInformationDropDown"].Choose(configuration["DeltaInformation"] + 3)
 
 			this.Control["deltaInformationMethodDropDown"].Choose(inList(["Static", "Dynamic", "Both"], configuration["DeltaInformationMethod"]))
 
@@ -282,6 +300,8 @@ class RaceSpotterConfigurator extends ConfiguratorPanel {
 			configuration["ConsideredHistoryLaps"] := this.Control["rspLapsConsideredEdit"].Text
 			configuration["HistoryLapsDamping"] := internalValue("Float", this.Control["rspDampingFactorEdit"].Text)
 
+			configuration["DriverUpdateTime"] := this.Control["rspDriverUpdateTimeEdit"].Text
+
 			configuration["SideProximity"] := (this.Control["sideProximityDropDown"].Value - 1)
 			configuration["RearProximity"] := (this.Control["rearProximityDropDown"].Value - 1)
 			configuration["YellowFlags"] := (this.Control["yellowFlagsDropDown"].Value - 1)
@@ -296,9 +316,11 @@ class RaceSpotterConfigurator extends ConfiguratorPanel {
 			if (this.Control["deltaInformationDropDown"].Value == 1)
 				configuration["DeltaInformation"] := false
 			else if (this.Control["deltaInformationDropDown"].Value == 2)
+				configuration["DeltaInformation"] := "A"
+			else if (this.Control["deltaInformationDropDown"].Value == 3)
 				configuration["DeltaInformation"] := "S"
 			else
-				configuration["DeltaInformation"] := (this.Control["deltaInformationDropDown"].Value - 2)
+				configuration["DeltaInformation"] := (this.Control["deltaInformationDropDown"].Value - 3)
 
 			configuration["DeltaInformationMethod"] := ["Static", "Dynamic", "Both"][this.Control["deltaInformationMethodDropDown"].Value]
 
@@ -334,6 +356,7 @@ class RaceSpotterConfigurator extends ConfiguratorPanel {
 		for simulator, simulatorConfiguration in this.iSimulatorConfigurations
 			if (simulator != this.iCurrentSimulator)
 				for ignore, key in ["LearningLaps", "ConsideredHistoryLaps", "HistoryLapsDamping"
+								  , "DriverUpdateTime"
 								  , "SideProximity", "RearProximity", "YellowFlags", "BlueFlags"
 								  , "SessionInformation", "DeltaInformation", "DeltaInformationMethod", "TacticalAdvices", "PitWindow"
 								  , "CutWarnings", "PenaltyInformation"

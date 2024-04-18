@@ -25,22 +25,22 @@ class LaunchpadConfigurator extends ConfigurationItemList {
 	createGui(editor, x, y, width, height) {
 		local window := editor.Window
 
-		window.Add("ListView", "x16 y80 w457 h205 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr VlaunchpadListView", collect(["#", "Label", "Application"], translate))
+		window.Add("ListView", "x16 y80 w457 h245 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr VlaunchpadListView", collect(["#", "Label", "Application"], translate))
 
-		window.Add("Text", "x16 y295 w86 h23 Y:Move +0x200", translate("Button"))
-		window.Add("Text", "x95 y295 w23 h23 Y:Move +0x200", translate("#"))
-		window.Add("Edit", "x110 y295 w40 h21 Y:Move Number Limit3 VlaunchpadNumberEdit")
-		window.Add("UpDown", "Range1-999 x150 y295 w17 h21 Y:Move")
+		window.Add("Text", "x16 y335 w86 h23 Y:Move +0x200", translate("Button"))
+		window.Add("Text", "x95 y335 w23 h23 Y:Move +0x200", translate("#"))
+		window.Add("Edit", "x110 y335 w40 h21 Y:Move Number Limit3 VlaunchpadNumberEdit")
+		window.Add("UpDown", "Range1-999 x150 y335 w17 h21 Y:Move")
 
-		window.Add("Text", "x16 y319 w86 h23 Y:Move +0x200", translate("Label"))
-		window.Add("Edit", "x110 y319 w80 h21 Y:Move W:Grow(0.2) VlaunchpadLabelEdit")
+		window.Add("Text", "x16 y359 w86 h23 Y:Move +0x200", translate("Label"))
+		window.Add("Edit", "x110 y359 w80 h21 Y:Move W:Grow(0.2) VlaunchpadLabelEdit")
 
-		window.Add("Text", "x16 y343 w86 h23 Y:Move +0x200", translate("Application"))
-		window.Add("DropDownList", "x110 y343 w363 h21 R10 Y:Move W:Grow VlaunchpadApplicationDropDown")
+		window.Add("Text", "x16 y383 w86 h23 Y:Move +0x200", translate("Application"))
+		window.Add("DropDownList", "x110 y383 w363 h21 R10 Y:Move W:Grow VlaunchpadApplicationDropDown")
 
-		window.Add("Button", "x264 y490 w46 h23 Y:Move X:Move VlaunchpadAddButton", translate("Add"))
-		window.Add("Button", "x312 y490 w50 h23 Y:Move X:Move Disabled VlaunchpadDeleteButton", translate("Delete"))
-		window.Add("Button", "x418 y490 w55 h23 Y:Move X:Move Disabled VlaunchpadUpdateButton", translate("&Save"))
+		window.Add("Button", "x264 y530 w46 h23 Y:Move X:Move VlaunchpadAddButton", translate("Add"))
+		window.Add("Button", "x312 y530 w50 h23 Y:Move X:Move Disabled VlaunchpadDeleteButton", translate("Delete"))
+		window.Add("Button", "x418 y530 w55 h23 Y:Move X:Move Disabled VlaunchpadUpdateButton", translate("&Save"))
 
 		this.initializeList(editor, window["launchpadListView"], window["launchpadAddButton"], window["launchpadDeleteButton"], window["launchpadUpdateButton"])
 
@@ -154,7 +154,7 @@ class LaunchpadConfigurator extends ConfigurationItemList {
 			OnMessage(0x44, translateOkButton)
 			withBlockedWindows(MsgBox, translate("The button number of an existing application launcher may not be changed..."), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
-			
+
 			return false
 		}
 		else

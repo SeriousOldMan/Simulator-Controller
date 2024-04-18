@@ -204,7 +204,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		widget28.OnEvent("Change", chooseInstructions)
 
 		if (StrSplit(A_ScriptName, ".")[1] = "Simulator Configuration")
-			height := 140
+			height := 190
 		else
 			height := 65
 

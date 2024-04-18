@@ -12,6 +12,7 @@
   11. The data on the session info page in the "System Monitor" will now be as correct as possible also in team races, even when one or more Assistants are not active for a given driver.
   12. The frequency of information and advice callouts can now be configured for the Race Spotter. Please see the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-spotter) for more information.
   13. A new mode for the opponent information of the Spotter allows to get information not only at sector boundaries. Very useful for very long tracks like the Nordschleife, when used together with the aforementioned update frequency.
+  14. Adjusted some field and box sizes in "Simulator Setup" and "Simulator Configuration".
 
 ## 5.6.6.0-release 04/12/24
   1. Minor bugfixes, as always

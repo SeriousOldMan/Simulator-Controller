@@ -345,7 +345,7 @@ checkInstallation() {
 																		  , "Components", ""))
 		local error := false
 		local components := []
-		local component, version, type, ignore, part, path, destination
+		local component, version, type, ignore, part, path, destination, url, urlError
 
 		for component, version in string2Map(",", "->"
 										   , getMultiMapValue(packageInfo, getMultiMapValue(packageInfo, "Current", "Type")
@@ -356,33 +356,54 @@ checkInstallation() {
 					showProgress({progress: (gProgressCount += 2)
 								, message: translate("Downloading ") . component . translate(" files...")})
 
-					Download(getMultiMapValue(packageInfo, "Components", component . "." . version . ".Download"), A_Temp . "\Temp.zip")
+					urlError := "Package URL not defined..."
 
-					showProgress({progress: (gProgressCount += 2)
-								, message: translate("Extracting ") . component . translate(" files...")})
+					for ignore, url in string2Values(";", getMultiMapValue(packageInfo, "Components", component . "." . version . ".Download", "")) {
+						try {
+							Download(url, A_Temp . "\Temp.zip")
 
-					path := Trim(getMultiMapValue(packageInfo, "Components", component . "." . version . ".Path", ""))
+							urlError := false
+						}
+						catch Any as exception {
+							urlError := exception
 
-					if (path && (path != "") && (path != "."))
-						path := (packageLocation . "\" . path)
-					else
-						path := packageLocation
+							continue
+						}
 
-					if temporary {
-						destination := (A_Temp . "\SC-Component" . A_Index)
+						showProgress({progress: (gProgressCount += 2)
+									, message: translate("Extracting ") . component . translate(" files...")})
 
-						deleteFile(destination)
-						deletedirectory(destination)
+						path := Trim(getMultiMapValue(packageInfo, "Components", component . "." . version . ".Path", ""))
 
-						for ignore, part in string2Values(",", getMultiMapValue(installInfo, "Components", component . "." . version . ".Content"))
-							components.Push([path . "\" . part, destination . "\" . part])
+						if (path && (path != "") && (path != "."))
+							path := (packageLocation . "\" . path)
+						else
+							path := packageLocation
+
+						if temporary {
+							destination := (A_Temp . "\SC-Component" . A_Index)
+
+							deleteFile(destination)
+							deleteDirectory(destination)
+
+							for ignore, part in string2Values(",", getMultiMapValue(installInfo, "Components", component . "." . version . ".Content"))
+								components.Push([path . "\" . part, destination . "\" . part])
+						}
+						else
+							destination := path
+
+						RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\Temp.zip' -DestinationPath '" . destination . "' -Force", , "Hide")
+
+						showProgress({progress: (gProgressCount += 5)})
+
+						break
 					}
-					else
-						destination := path
 
-					RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\Temp.zip' -DestinationPath '" . destination . "' -Force", , "Hide")
+					if urlError {
+						logError(urlError, true)
 
-					showProgress({progress: (gProgressCount += 5)})
+						error := true
+					}
 				}
 				catch Any as exception {
 					logError(exception, true)

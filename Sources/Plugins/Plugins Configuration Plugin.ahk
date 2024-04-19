@@ -96,29 +96,29 @@ class PluginsConfigurator extends ConfigurationItemList {
 			}
 		}
 
-		window.Add("ListView", "x16 y80 w457 h205 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr VpluginsListView", collect(["Active?", "Plugin", "Simulator(s)", "Arguments"], translate))
+		window.Add("ListView", "x16 y80 w457 h245 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr VpluginsListView", collect(["Active?", "Plugin", "Simulator(s)", "Arguments"], translate))
 
-		window.Add("Text", "x16 y295 w86 h23 Y:Move +0x200", translate("Plugin"))
-		window.Add("Edit", "x110 y295 w154 h21 Y:Move W:Grow(0.2) VpluginEdit")
+		window.Add("Text", "x16 y335 w86 h23 Y:Move +0x200", translate("Plugin"))
+		window.Add("Edit", "x110 y335 w154 h21 Y:Move W:Grow(0.2) VpluginEdit")
 
-		window.Add("CheckBox", "x110 y319 w120 h23 Y:Move VpluginActivatedCheck", translate("Activated?"))
+		window.Add("CheckBox", "x110 y359 w120 h23 Y:Move VpluginActivatedCheck", translate("Activated?"))
 
-		window.Add("Text", "x16 y343 w89 h23 Y:Move +0x200", translate("Simulator(s)"))
-		window.Add("Edit", "x110 y343 w363 h21 Y:Move W:Grow(0.2) VpluginSimulatorsEdit")
+		window.Add("Text", "x16 y383 w89 h23 Y:Move +0x200", translate("Simulator(s)"))
+		window.Add("Edit", "x110 y383 w363 h21 Y:Move W:Grow(0.2) VpluginSimulatorsEdit")
 
 		window.SetFont("Underline", "Arial")
 
-		window.Add("Text", "x16 y368 w86 h23 +0x200 Y:Move c" . window.Theme.LinkColor, translate("Arguments")).OnEvent("Click", openPluginsModesDocumentation)
+		window.Add("Text", "x16 y408 w86 h23 +0x200 Y:Move c" . window.Theme.LinkColor, translate("Arguments")).OnEvent("Click", openPluginsModesDocumentation)
 
 		window.SetFont("Norm", "Arial")
 
-		window.Add("Edit", "x110 y368 w363 h113 Y:Move W:Grow VpluginArgumentsEdit")
+		window.Add("Edit", "x110 y408 w363 h113 Y:Move W:Grow VpluginArgumentsEdit")
 
-		window.Add("Button", "x16 y490 w140 h23 Y:Move ", translate("Edit Labels && Icons...")).OnEvent("Click", openActionsEditor)
+		window.Add("Button", "x16 y530 w140 h23 Y:Move ", translate("Edit Labels && Icons...")).OnEvent("Click", openActionsEditor)
 
-		window.Add("Button", "x264 y490 w46 h23 Y:Move X:Move VpluginAddButton", translate("Add"))
-		window.Add("Button", "x312 y490 w50 h23 Y:Move X:Move Disabled VpluginDeleteButton", translate("Delete"))
-		window.Add("Button", "x418 y490 w55 h23 Y:Move X:Move Disabled VpluginUpdateButton", translate("&Save"))
+		window.Add("Button", "x264 y530 w46 h23 Y:Move X:Move VpluginAddButton", translate("Add"))
+		window.Add("Button", "x312 y530 w50 h23 Y:Move X:Move Disabled VpluginDeleteButton", translate("Delete"))
+		window.Add("Button", "x418 y530 w55 h23 Y:Move X:Move Disabled VpluginUpdateButton", translate("&Save"))
 
 		this.initializeList(editor, window["pluginsListView"], window["pluginAddButton"], window["pluginDeleteButton"], window["pluginUpdateButton"])
 	}

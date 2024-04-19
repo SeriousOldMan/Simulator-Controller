@@ -59,7 +59,7 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 		Get {
 			return (isSet(key) ? this.iTeams[key] : this.iTeams)
 		}
-		
+
 		Set {
 			return (isSet(key) ? (this.iTeams[key] := value) : (this.iTeams := value))
 		}
@@ -75,7 +75,7 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 		Get {
 			return (isSet(key) ? this.iDrivers[key] : this.iDrivers)
 		}
-		
+
 		Set {
 			return (isSet(key) ? (this.iDrivers[key] := value) : (this.iDrivers := value))
 		}
@@ -91,7 +91,7 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 		Get {
 			return (isSet(key) ? this.iSessions[key] : this.iSessions)
 		}
-		
+
 		Set {
 			return (isSet(key) ? (this.iSessions[key] := value) : (this.iSessions := value))
 		}
@@ -438,7 +438,7 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 
 		window.SetFont("Italic", "Arial")
 
-		widget22 := window.Add("GroupBox", "x" . x . " yp+36 w" . width . " h214 H:Grow W:Grow Hidden", translate("Teams"))
+		widget22 := window.Add("GroupBox", "x" . x . " yp+36 w" . width . " h294 H:Grow W:Grow Hidden", translate("Teams"))
 
 		window.SetFont("Norm", "Arial")
 
@@ -477,7 +477,7 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 
 		widget33 := window.Add("Text", "x" . x0 . " yp+92 w90 h23 Y:Move(0.3) +0x200 Hidden", translate("Sessions"))
 
-		widget34 := window.Add("ListBox", "x" . x1 . " yp w" . w3 . " h72 AltSubmit Y:Move(0.3) H:Grow(0.7) W:Grow(0.5) vsessionListBox Hidden")
+		widget34 := window.Add("ListBox", "x" . x1 . " yp w" . w3 . " h152 AltSubmit Y:Move(0.3) H:Grow(0.7) W:Grow(0.5) vsessionListBox Hidden")
 		widget34.OnEvent("DoubleClick", selectSession)
 		widget34.OnEvent("Change", selectSession)
 
@@ -929,7 +929,7 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 
 	addTeam(name) {
 		local identifier := this.Connector.CreateTeam(name)
-		
+
 		this.Teams[name] := identifier
 
 		this.loadTeams()

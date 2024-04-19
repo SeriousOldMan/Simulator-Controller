@@ -1366,40 +1366,44 @@ class RaceSpotter extends GridRaceAssistant {
 			if driver {
 				currentPosition := positions["Position.Class"]
 
-				speaker.beginTalk()
+				if ((currentPosition != startPosition) || (startPosition != this.getCars("Class").Length)) {
+					speaker.beginTalk()
 
-				try {
-					if (currentPosition = startPosition) {
-						speaker.speakPhrase("GoodStart")
+					try {
+						if (currentPosition = startPosition) {
+							speaker.speakPhrase("GoodStart")
 
-						if (currentPosition = 1)
-							speaker.speakPhrase("Leader")
-						else if (currentPosition <= 5)
-							speaker.speakPhrase("Position", {position: currentPosition})
+							if (currentPosition = 1)
+								speaker.speakPhrase("Leader")
+							else if (currentPosition <= 5)
+								speaker.speakPhrase("Position", {position: currentPosition})
+						}
+						else if (currentPosition < startPosition) {
+							speaker.speakPhrase("GreatStart")
+
+							if (currentPosition = 1)
+								speaker.speakPhrase("Leader")
+							else if (currentPosition <= 5)
+								speaker.speakPhrase("Position", {position: currentPosition})
+							else
+								speaker.speakPhrase("PositionsGained", {positions: Abs(currentPosition - startPosition)})
+						}
+						else if (currentPosition > startPosition) {
+							speaker.speakPhrase("BadStart")
+
+							speaker.speakPhrase("PositionsLost", {positions: Abs(currentPosition - startPosition)})
+
+							speaker.speakPhrase("Fight")
+						}
 					}
-					else if (currentPosition < startPosition) {
-						speaker.speakPhrase("GreatStart")
-
-						if (currentPosition = 1)
-							speaker.speakPhrase("Leader")
-						else if (currentPosition <= 5)
-							speaker.speakPhrase("Position", {position: currentPosition})
-						else
-							speaker.speakPhrase("PositionsGained", {positions: Abs(currentPosition - startPosition)})
+					finally {
+						speaker.endTalk()
 					}
-					else if (currentPosition > startPosition) {
-						speaker.speakPhrase("BadStart")
 
-						speaker.speakPhrase("PositionsLost", {positions: Abs(currentPosition - startPosition)})
-
-						speaker.speakPhrase("Fight")
-					}
+					return true
 				}
-				finally {
-					speaker.endTalk()
-				}
-
-				return true
+				else
+					return false
 			}
 			else
 				return false
@@ -2064,6 +2068,8 @@ class RaceSpotter extends GridRaceAssistant {
 															 , delta: speaker.number2Speech(delta, 1)
 															 , lapTime: speaker.number2Speech(lapTimeDifference, 1)})
 
+							this.TacticalAdvices["FasterThan"] := {Key: key, Lap: lastLap}
+
 							return true
 						}
 					}
@@ -2660,18 +2666,18 @@ class RaceSpotter extends GridRaceAssistant {
 			if (lastLap > 1)
 				this.updatePositionInfos(lastLap, sector, positions)
 
-			if isDebug()
-				logMessage(kLogDebug, "UpdateDriver: " . lastLap . ", " . sector . " Driver: " . (this.DriverCar != false) . ", " . (this.DriverCar && this.DriverCar.InPit) . " Race: " . raceInfo)
-
 			if (this.DriverCar && !this.DriverCar.InPit && update) {
-				if (raceInfo && newSector) {
-					deltaInformation := this.Announcements["DeltaInformation"]
+				if isDebug()
+					logMessage(kLogDebug, "UpdateDriver: " . lastLap . ", " . sector . " Driver: " . (this.DriverCar != false) . ", " . (this.DriverCar && this.DriverCar.InPit) . " Race: " . raceInfo)
 
-					if ((deltaInformation != "S") && (lastLap >= (this.iLastDeltaInformationLap + deltaInformation)))
+				deltaInformation := this.Announcements["DeltaInformation"]
+
+				if (raceInfo && (newSector || (deltaInformation = "A"))) {
+					if (isNumber(deltaInformation) && (lastLap >= (this.iLastDeltaInformationLap + deltaInformation)))
 						this.iLastDeltaInformationLap := lastLap
 
 					hadInfo := this.deltaInformation(lastLap, sector, positions
-												   , (deltaInformation = "S") || (lastLap = this.iLastDeltaInformationLap)
+												   , (deltaInformation = "A") || (deltaInformation = "S") || (lastLap = this.iLastDeltaInformationLap)
 												   , this.Announcements["DeltaInformationMethod"])
 
 					if (hadInfo && (Random(1, 10) < 5))

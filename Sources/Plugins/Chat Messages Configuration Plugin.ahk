@@ -26,22 +26,22 @@ class ChatMessagesConfigurator extends ConfigurationItemList {
 	createGui(editor, x, y, width, height) {
 		local window := editor.Window
 
-		window.Add("ListView", "x16 y80 w457 h205 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr VchatMessagesListView", collect(["#", "Label", "Message"], translate))
+		window.Add("ListView", "x16 y80 w457 h245 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr VchatMessagesListView", collect(["#", "Label", "Message"], translate))
 
-		window.Add("Text", "x16 y295 w86 h23 Y:Move +0x200", translate("Button"))
-		window.Add("Text", "x95 y295 w23 h23 Y:Move +0x200", translate("#"))
-		window.Add("Edit", "x110 y295 w40 h21 Y:Move Number Limit3 VchatMessageNumberEdit")
-		window.Add("UpDown", "x150 y295 w17 h21 Y:Move Range1-999")
+		window.Add("Text", "x16 y335 w86 h23 Y:Move +0x200", translate("Button"))
+		window.Add("Text", "x95 y335 w23 h23 Y:Move +0x200", translate("#"))
+		window.Add("Edit", "x110 y335 w40 h21 Y:Move Number Limit3 VchatMessageNumberEdit")
+		window.Add("UpDown", "x150 y335 w17 h21 Y:Move Range1-999")
 
-		window.Add("Text", "x16 y319 w86 h23 Y:Move +0x200", translate("Label"))
-		window.Add("Edit", "x110 y319 w80 h21 Y:Move W:Grow(0.2) VchatMessageLabelEdit")
+		window.Add("Text", "x16 y359 w86 h23 Y:Move +0x200", translate("Label"))
+		window.Add("Edit", "x110 y359 w80 h21 Y:Move W:Grow(0.2) VchatMessageLabelEdit")
 
-		window.Add("Text", "x16 y343 w86 h23 Y:Move +0x200", translate("Message"))
-		window.Add("Edit", "x110 y343 w363 h21 Y:Move W:Grow VchatMessageMessageEdit")
+		window.Add("Text", "x16 y383 w86 h23 Y:Move +0x200", translate("Message"))
+		window.Add("Edit", "x110 y383 w363 h21 Y:Move W:Grow VchatMessageMessageEdit")
 
-		window.Add("Button", "x264 y490 w46 h23 Y:Move X:Move VchatMessageAddButton", translate("Add"))
-		window.Add("Button", "x312 y490 w50 h23 Y:Move X:Move Disabled VchatMessageDeleteButton", translate("Delete"))
-		window.Add("Button", "x418 y490 w55 h23 Y:Move X:Move Disabled VchatMessageUpdateButton", translate("&Save"))
+		window.Add("Button", "x264 y530 w46 h23 Y:Move X:Move VchatMessageAddButton", translate("Add"))
+		window.Add("Button", "x312 y530 w50 h23 Y:Move X:Move Disabled VchatMessageDeleteButton", translate("Delete"))
+		window.Add("Button", "x418 y530 w55 h23 Y:Move X:Move Disabled VchatMessageUpdateButton", translate("&Save"))
 
 		this.initializeList(editor, window["chatMessagesListView"], window["chatMessageAddButton"], window["chatMessageDeleteButton"], window["chatMessageUpdateButton"])
 	}

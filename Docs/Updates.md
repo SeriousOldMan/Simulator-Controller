@@ -37,7 +37,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 5.6.7
 
-Nothing to do this time.
+This release comes with a new version of the Team Server with a minor change. Although it will be compatible with the current release, I recommend updating your installation, if you are running your own Team Server. Database files are compatible.
 
 ***
 

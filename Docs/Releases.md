@@ -13,6 +13,9 @@
   12. The frequency of information and advice callouts can now be configured for the Race Spotter. Please see the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-spotter) for more information.
   13. A new mode for the opponent information of the Spotter allows to get information not only at sector boundaries. Very useful for very long tracks like the Nordschleife, when used together with the aforementioned update frequency.
   14. Adjusted some field and box sizes in "Simulator Setup" and "Simulator Configuration".
+  15. A small fix for the Team Server extends the life time of finished sessions.
+  
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-567), especially if you are running your own Team Server.
 
 ## 5.6.6.0-release 04/12/24
   1. Minor bugfixes, as always

@@ -1778,10 +1778,11 @@ class RaceEngineer extends RaceAssistant {
 			}
 		}
 
-		if (this.Speaker && (lastLap < (lapNumber - 2)) && (driverName(driverForname, driverSurname, driverNickname) != this.DriverFullName)) {
+		if ((lastLap < (lapNumber - 2)) && (driverName(driverForname, driverSurname, driverNickname) != this.DriverFullName)) {
 			this.iPitstopAdjustments := false
 
-			this.getSpeaker().speakPhrase("WelcomeBack")
+			if this.Speaker
+				this.getSpeaker().speakPhrase("WelcomeBack")
 		}
 
 		lastLap := lapNumber
@@ -2371,6 +2372,8 @@ class RaceEngineer extends RaceAssistant {
 					else
 						this.planPitstop(lastRequest*)
 			}
+			else if this.supportsPitstop()
+				this.planPitstop(lastRequest*)
 
 			forcedLap := false
 			lastRequest := []

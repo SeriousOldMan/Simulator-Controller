@@ -1745,6 +1745,10 @@ class RaceEngineer extends RaceAssistant {
 				if (getMultiMapValue(data, "Car Data", "EngineDamage", kUndefined) != kUndefined)
 					setMultiMapValue(sessionInfo, "Damage", "Engine", Round(getMultiMapValue(data, "Car Data", "EngineDamage"), 2))
 
+				setMultiMapValue(sessionInfo, "Damage", "Lap.Delta", Round(Max(knowledgeBase.getValue("Damage.Bodywork.Lap.Delta", 0)
+																			 , knowledgeBase.getValue("Damage.Suspension.Lap.Delta", 0)
+																			 , knowledgeBase.getValue("Damage.Engine.Lap.Delta", 0)), 1))
+
 				setMultiMapValue(sessionInfo, "Damage", "Time.Repairs", Round(knowledgeBase.getValue("Target.Time.Repairs", 0) / 1000))
 			}
 		}

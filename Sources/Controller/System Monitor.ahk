@@ -852,7 +852,10 @@ systemMonitor(command := false, arguments*) {
 			if ((engineDamage > 0) || isDebug())
 				html .= ("<tr><th class=`"th-std th-left`" colspan=`"2`">" . translate("Engine") . "</th><td class=`"td-wdg`">" . displayValue("Float", engineDamage, 1) . translate("%") . "</td></tr>")
 
-			html .= ("<tr><th class=`"th-std th-left`" colspan=`"2`">" . translate("Time Loss") . "</th><td class=`"td-wdg`">" . displayValue("Float", getMultiMapValue(sessionState, "Damage", "Time.Repairs", 0)) . translate(" Seconds") . "</td></tr>")
+			if ((getMultiMapValue(sessionState, "Damage", "Lap.Delta", kUndefined) != kUndefined) && (getMultiMapValue(sessionState, "Damage", "Lap.Delta") != 0))
+				html .= ("<tr><th class=`"th-std th-left`" colspan=`"2`">" . translate("Lap time delta") . "</th><td class=`"td-wdg`">" . displayValue("Float", getMultiMapValue(sessionState, "Damage", "Lap.Delta", 0), 1) . translate(" Seconds") . "</td></tr>")
+
+			html .= ("<tr><th class=`"th-std th-left`" colspan=`"2`">" . translate("Repair time") . "</th><td class=`"td-wdg`">" . displayValue("Float", getMultiMapValue(sessionState, "Damage", "Time.Repairs", 0), 1) . translate(" Seconds") . "</td></tr>")
 		}
 
 		html .= "</table>"
@@ -933,7 +936,7 @@ systemMonitor(command := false, arguments*) {
 															 . (getMultiMapValue(sessionState, "Pitstop", "Prepared") ? translate("Yes") : translate("No"))
 															 . "</td></tr>")
 
-				html .= ("<tr><th class=`"th-std th-left`">" . translate("Time Loss") . "</th><td class=`"td-wdg`" colspan=`"2`">" . (getMultiMapValue(sessionState, "Pitstop", "Planned.Time.Box") + getMultiMapValue(sessionState, "Pitstop", "Planned.Time.Pitlane")) . translate(" Seconds") . "</td></tr>")
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Loss of time") . "</th><td class=`"td-wdg`" colspan=`"2`">" . (getMultiMapValue(sessionState, "Pitstop", "Planned.Time.Box") + getMultiMapValue(sessionState, "Pitstop", "Planned.Time.Pitlane")) . translate(" Seconds") . "</td></tr>")
 			}
 			else {
 				html .= ("<tr><th class=`"th-std th-left`" colspan=`"3`"><div id=`"header`"><i>" . translate("Pitstop") . translate(" (") . translate("Forecast") . translate(")") . "</i></div></th></tr>")
@@ -962,7 +965,7 @@ systemMonitor(command := false, arguments*) {
 				else
 					html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyres") . "</th><td class=`"td-wdg`">" . translate("No") . "</td></tr>")
 
-				html .= ("<tr><th class=`"th-std th-left`">" . translate("Time Loss") . "</th><td class=`"td-wdg`" colspan=`"2`">" . (getMultiMapValue(sessionState, "Pitstop", "Target.Time.Box") + getMultiMapValue(sessionState, "Pitstop", "Target.Time.Pitlane")) . translate(" Seconds") . "</td></tr>")
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Loss of time") . "</th><td class=`"td-wdg`" colspan=`"2`">" . (getMultiMapValue(sessionState, "Pitstop", "Target.Time.Box") + getMultiMapValue(sessionState, "Pitstop", "Target.Time.Pitlane")) . translate(" Seconds") . "</td></tr>")
 			}
 		}
 		catch Any as exception {

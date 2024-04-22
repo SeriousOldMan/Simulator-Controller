@@ -11248,7 +11248,7 @@ class RaceCenter extends ConfigurationItem {
 		}
 
 		if (time != "")
-			html .= ("<tr><td><b>" . translate("Time Loss") . translate(":") . "</b></div></td><td>" . time . translate(" Seconds") . "</td></tr>")
+			html .= ("<tr><td><b>" . translate("Loss of time") . translate(":") . "</b></div></td><td>" . time . translate(" Seconds") . "</td></tr>")
 
 		if (pitstopData["Driver.Current"] != kNull)
 			html .= ("<tr><td><b>" . translate("Last Driver:") . "</b></div></td><td>" . pitstopData["Driver.Current"] . "</td></tr>")

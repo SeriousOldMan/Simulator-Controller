@@ -463,6 +463,7 @@ class IntegrationPlugin extends ControllerPlugin {
 
 		state["Engine"] := getMultiMapValue(sessionInfo, "Damage", "Engine", kNull)
 
+		state["LapDelta"] := getMultiMapValue(sessionInfo, "Damage", "Lap.Delta", kNull)
 		state["RepairTime"] := getMultiMapValue(sessionInfo, "Damage", "Time.Repairs", kNull)
 
 		return state

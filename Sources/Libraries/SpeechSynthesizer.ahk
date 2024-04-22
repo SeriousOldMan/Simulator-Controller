@@ -515,6 +515,9 @@ class SpeechSynthesizer {
 		if options
 			options := toMap(options)
 
+		if (Trim(Text) = "")
+			return
+
 		this.wait()
 
 		if (cache && (cache == true))

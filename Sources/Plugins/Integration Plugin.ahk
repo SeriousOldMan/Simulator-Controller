@@ -441,6 +441,33 @@ class IntegrationPlugin extends ControllerPlugin {
 		return state
 	}
 
+	createDamageState(sessionInfo) {
+		local state := Map()
+		local ignore, position, subState
+
+		static projection := Map("FL", "FrontLeft", "FR", "FrontRight", "RL", "RearLeft", "RR", "RearRight")
+
+		subState := Map()
+
+		for ignore, position in ["Front", "Rear", "Left", "Right", "All"]
+			subState[position] := getMultiMapValue(sessionInfo, "Damage", "Bodywork." . position, kNull)
+
+		state["Bodywork"] := subState
+
+		subState := Map()
+
+		for ignore, position in ["FL", "FR", "RL", "RR"]
+			subState[projection[position]] := getMultiMapValue(sessionInfo, "Damage", "Suspension." . position, kNull)
+
+		state["Suspension"] := subState
+
+		state["Engine"] := getMultiMapValue(sessionInfo, "Damage", "Engine", kNull)
+
+		state["RepairTime"] := getMultiMapValue(sessionInfo, "Damage", "Time.Repairs", kNull)
+
+		return state
+	}
+
 	updateControllerState(sessionState, controllerState) {
 		local assistantsState := Map()
 		local teamServerState := Map()
@@ -580,6 +607,7 @@ class IntegrationPlugin extends ControllerPlugin {
 							  , "Tyres", this.createTyresState(sessionInfo)
 							  , "Brakes", this.createBrakesState(sessionInfo)
 							  , "Strategy", this.createStrategyState(sessionInfo)
+							  , "Damage", this.createDamageState(sessionInfo)
 							  , "Pitstop", this.createPitstopState(sessionInfo)
 							  , "Standings", this.createStandingsState(sessionInfo))
 

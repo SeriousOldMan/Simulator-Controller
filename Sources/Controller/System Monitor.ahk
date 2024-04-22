@@ -388,6 +388,7 @@ systemMonitor(command := false, arguments*) {
 										 "Fuel", createFuelWidget,
 										 "Tyres", createTyresWidget,
 										 "Brakes", createBrakesWidget,
+										 "Damage", createDamageWidget,
 										 "Pitstop", createPitstopWidget,
 										 "Strategy", createStrategyWidget,
 										 "Standings", createStandingsWidget)
@@ -780,6 +781,78 @@ systemMonitor(command := false, arguments*) {
 			logError(exception)
 
 			html := "<table>"
+		}
+
+		html .= "</table>"
+
+		return html
+	}
+
+	createDamageWidget(sessionState) {
+		local html := "<table class=`"table-std`">"
+		local bodyworkDamage := []
+		local suspensionDamage := []
+		local engineDamage := getMultiMapValue(sessionState, "Damage", "Engine", 0)
+		local bodyworkDamageAll, bodyWorkDamageSum, suspensionDamageSum, ignore, index, position, header
+
+		static projection := Map("FL", translate("Front Left"), "FR", translate("Front Right"), "RL", translate("Rear Left"), "RR", translate("Rear Right"))
+
+		for ignore, position in ["Front", "Rear", "Left", "Right"]
+			bodyworkDamage.Push(getMultiMapValue(sessionState, "Damage", "Bodywork." . position, 0))
+
+		if isDebug()
+			while (bodyworkDamage.Length < 5)
+				bodyworkDamage.Push(0)
+
+		bodyworkDamageAll := getMultiMapValue(sessionState, "Damage", "Bodywork.All", 0)
+
+		for ignore, position in ["FL", "FR", "RL", "RR"]
+			bodyworkDamage.Push(getMultiMapValue(sessionState, "Damage", "Suspension." . position, 0))
+
+		if isDebug() {
+			while (bodyworkDamage.Length < 5)
+				bodyworkDamage.Push(0)
+
+			while (suspensionDamage.Length < 4)
+				suspensionDamage.Push(0)
+		}
+
+		html .= ("<tr><th class=`"th-std th-left`" colspan=`"3`"><div id=`"header`"><i>" . translate("Damage") . "</i></div></th></tr>")
+
+		bodyworkDamageSum := sum(bodyworkDamage)
+		suspensionDamageSum := sum(suspensionDamage)
+
+		if isDebug() {
+			if (bodyworkDamageSum = 0)
+				bodyworkDamageSum := 0.0000001
+
+			if (suspensionDamageSum = 0)
+				suspensionDamageSum := 0.0000001
+		}
+
+		if (!isDebug() && ((bodyWorkDamageSum + bodyworkDamageAll + suspensionDamageSum + engineDamage) = 0))
+			html .= ("<tr><td class=`"td-wdg`" colspan=`"3`">" . translate("No damage") . "</td></tr>")
+		else {
+			if ((bodyWorkDamageSum = 0) && bodyworkDamageAll)
+				html .= ("<tr><th class=`"th-std th-left`" colspan=`"2`">" . translate("Bodywork") . "</th><td class=`"td-wdg`">" . displayValue("Float", bodyworkDamageAll, 1) . translate("%") . "</td></tr>")
+			else if ((bodyWorkDamageSum > 0) || isDebug())
+				for index, position in ["Front", "Rear", "Left", "Right"] {
+					header := ((index = 1) ? translate("Bodywork (rel.)") : "")
+
+					html .= ("<tr><th class=`"th-std th-left`">" . header . "</th><th class=`"th-std th-left`">" . translate(position) . "</th><td class=`"td-wdg`">" . displayValue("Float", suspensionDamage[index] / suspensionDamageSum * 100, 1) . translate("%") . "</td></tr>")
+				}
+
+			if ((suspensionDamageSum > 0) || isDebug())
+				for index, position in ["FL", "FR", "RL", "RR"] {
+					header := ((index = 1) ? translate("Suspension (rel.)") : "")
+
+					html .= ("<tr><th class=`"th-std th-left`">" . header . "</th><th class=`"th-std th-left`">" . translate(projection[position]) . "</th><td class=`"td-wdg`">" . displayValue("Float", bodyworkDamage[index + 1] / bodyWorkDamageSum * 100, 1) . translate("%") . "</td></tr>")
+				}
+
+			if ((engineDamage > 0) || isDebug())
+				html .= ("<tr><th class=`"th-std th-left`" colspan=`"2`">" . translate("Engine") . "</th><td class=`"td-wdg`">" . displayValue("Float", engineDamage, 1) . translate("%") . "</td></tr>")
+
+			html .= ("<tr><th class=`"th-std th-left`" colspan=`"2`">" . translate("Time Loss") . "</th><td class=`"td-wdg`">" . displayValue("Float", getMultiMapValue(sessionState, "Damage", "Time.Repairs", 0)) . translate(" Seconds") . "</td></tr>")
 		}
 
 		html .= "</table>"

@@ -1666,6 +1666,7 @@ class RaceEngineer extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local sessionInfo := super.createSessionInfo(lapNumber, valid, data, simulator, car, track)
 		local planned, prepared, tyreCompound, lap
+		local bodyworkDamage, suspensionDamage, index, position
 
 		if knowledgeBase {
 			setMultiMapValue(sessionInfo, "Pitstop", "Target.Fuel.Amount", knowledgeBase.getValue("Fuel.Amount.Target", 0))
@@ -1724,6 +1725,28 @@ class RaceEngineer extends RaceAssistant {
 																					   , knowledgeBase.getValue("Tyre.Pressure.Target.FR", 0)
 																					   , knowledgeBase.getValue("Tyre.Pressure.Target.RL", 0)
 																					   , knowledgeBase.getValue("Tyre.Pressure.Target.RR", 0)))
+
+			if data {
+				bodyworkDamage := string2Values(",", getMultiMapValue(data, "Car Data", "BodyworkDamage", ""))
+				suspensionDamage := string2Values(",", getMultiMapValue(data, "Car Data", "SuspensionDamage", ""))
+
+				if (bodyWorkDamage.Length >= 5)
+					for index, position in ["Front", "Rear", "Left", "Right", "Center"] {
+						if (position = "Center")
+							position := "All"
+
+						setMultiMapValue(sessionInfo, "Damage", "Bodywork." . position, Round(bodyworkDamage[index], 2))
+					}
+
+				if (suspensionDamage.Length >= 4)
+					for index, position in ["FL", "FR", "RL", "RR"]
+						setMultiMapValue(sessionInfo, "Damage", "Suspension." . position, Round(suspensionDamage[index], 2))
+
+				if (getMultiMapValue(data, "Car Data", "EngineDamage", kUndefined) != kUndefined)
+					setMultiMapValue(sessionInfo, "Damage", "Engine", Round(getMultiMapValue(data, "Car Data", "EngineDamage"), 2))
+
+				setMultiMapValue(sessionInfo, "Damage", "Time.Repairs", Round(knowledgeBase.getValue("Target.Time.Repairs", 0) / 1000))
+			}
 		}
 
 		return sessionInfo
@@ -1767,6 +1790,8 @@ class RaceEngineer extends RaceAssistant {
 				for key, value in this.KnowledgeBase.Facts.Facts
 					if (InStr(key, "Pitstop") = 1)
 						setMultiMapValue(pitstopState, "Pitstop Pending", key, value)
+
+				setMultiMapValue(sessionInfo, "Pitstop Pending", "Target.Time.Repairs", Round(knowledgeBase.getValue("Target.Time.Repairs", 0) / 1000))
 
 				setMultiMapValues(pitstopState, "Pitstop Pending", getMultiMapValues(data, "Setup Data"), false)
 

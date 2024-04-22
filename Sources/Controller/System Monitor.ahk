@@ -807,7 +807,7 @@ systemMonitor(command := false, arguments*) {
 		bodyworkDamageAll := getMultiMapValue(sessionState, "Damage", "Bodywork.All", 0)
 
 		for ignore, position in ["FL", "FR", "RL", "RR"]
-			bodyworkDamage.Push(getMultiMapValue(sessionState, "Damage", "Suspension." . position, 0))
+			suspensionDamage.Push(getMultiMapValue(sessionState, "Damage", "Suspension." . position, 0))
 
 		if isDebug() {
 			while (bodyworkDamage.Length < 5)
@@ -839,14 +839,14 @@ systemMonitor(command := false, arguments*) {
 				for index, position in ["Front", "Rear", "Left", "Right"] {
 					header := ((index = 1) ? translate("Bodywork (rel.)") : "")
 
-					html .= ("<tr><th class=`"th-std th-left`">" . header . "</th><th class=`"th-std th-left`">" . translate(position) . "</th><td class=`"td-wdg`">" . displayValue("Float", suspensionDamage[index] / suspensionDamageSum * 100, 1) . translate("%") . "</td></tr>")
+					html .= ("<tr><th class=`"th-std th-left`">" . header . "</th><th class=`"th-std th-left`">" . translate(position) . "</th><td class=`"td-wdg`">" . displayValue("Float", bodyworkDamage[index] / bodyWorkDamageSum * 100, 1) . translate("%") . "</td></tr>")
 				}
 
 			if ((suspensionDamageSum > 0) || isDebug())
 				for index, position in ["FL", "FR", "RL", "RR"] {
 					header := ((index = 1) ? translate("Suspension (rel.)") : "")
 
-					html .= ("<tr><th class=`"th-std th-left`">" . header . "</th><th class=`"th-std th-left`">" . translate(projection[position]) . "</th><td class=`"td-wdg`">" . displayValue("Float", bodyworkDamage[index + 1] / bodyWorkDamageSum * 100, 1) . translate("%") . "</td></tr>")
+					html .= ("<tr><th class=`"th-std th-left`">" . header . "</th><th class=`"th-std th-left`">" . translate(projection[position]) . "</th><td class=`"td-wdg`">" . displayValue("Float", suspensionDamage[index] / suspensionDamageSum * 100, 1) . translate("%") . "</td></tr>")
 				}
 
 			if ((engineDamage > 0) || isDebug())

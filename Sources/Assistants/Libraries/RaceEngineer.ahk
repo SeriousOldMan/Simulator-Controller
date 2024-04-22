@@ -1791,7 +1791,7 @@ class RaceEngineer extends RaceAssistant {
 					if (InStr(key, "Pitstop") = 1)
 						setMultiMapValue(pitstopState, "Pitstop Pending", key, value)
 
-				setMultiMapValue(sessionInfo, "Pitstop Pending", "Target.Time.Repairs", Round(knowledgeBase.getValue("Target.Time.Repairs", 0) / 1000))
+				setMultiMapValue(pitstopState, "Pitstop Pending", "Target.Time.Repairs", Round(knowledgeBase.getValue("Target.Time.Repairs", 0) / 1000))
 
 				setMultiMapValues(pitstopState, "Pitstop Pending", getMultiMapValues(data, "Setup Data"), false)
 

@@ -411,16 +411,18 @@ updateEngineRepair(?lap) <= lapDamage(?lap, Engine, ?damage), Set(Damage.Engine,
 ;;; Computes the time potentially required for an upcoming pitstop.         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-priority: -20, {All: [?Lap], [?Fuel.Amount.Target], [?Tyre.Compound.Target]} => (Prove: updatePitstopTargetTime())
+priority: -20, {Any: [?Lap], [?Damage.Update.Bodywork], [?Damage.Update.Suspension], [?Damage.Update.Engine]} => (Prove: updatePitstopTargetTime())
 
-updatePitstopTargetTime() <= computeTargetDamages(?damages),
+updatePitstopTargetTime() <= bound?(!Fuel.Amount.Target), bound?(!Tyre.Compound.Target), !, computeTargetDamages(?damages),
 							 pitstopDeltaTime(!Lap, !Fuel.Amount.Target, !Tyre.Compound.Target, ?damages,
 											  ?targetServiceTime, ?targetRepairTime, ?pitlaneDelta),
 							 ?targetTime = ?targetServiceTime + ?targetRepairTime,
 							 Set(Target.Time.Box, ?targetTime), Set(Target.Time.Pitlane, ?pitlaneDelta), 
 							 Set(Target.Time.Service, ?targetServiceTime), Set(Target.Time.Repairs, ?targetRepairTime)
 
-computeTargetDamages(?damages) <= computeDamages([true, true, true], [!Damage.Bodywork, !Damage.Suspension, !Damage.Engine], ?damages)
+updatePitstopTargetTime() <= computeTargetDamages(?damages),
+							 pitstopDeltaTime(!Lap, 0, Dry, ?damages, ?, ?targetRepairTime, ?),
+							 Set(Target.Time.Repairs, ?targetRepairTime)
 
 
 ;;;-------------------------------------------------------------------------;;;

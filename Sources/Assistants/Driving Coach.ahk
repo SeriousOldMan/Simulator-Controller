@@ -85,10 +85,10 @@ startupDrivingCoach() {
 	local coachLogo := false
 	local coachLanguage := false
 	local coachSynthesizer := true
-	local coachSpeaker := false
+	local coachSpeaker := true
 	local coachSpeakerVocalics := false
 	local coachRecognizer := true
-	local coachListener := false
+	local coachListener := true
 	local coachMuted := false
 	local debug := false
 	local voiceServer, index, coach, label

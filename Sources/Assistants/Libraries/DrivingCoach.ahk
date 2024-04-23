@@ -18,6 +18,7 @@
 
 #Include "..\..\Libraries\JSON.ahk"
 #Include "..\..\Libraries\HTTP.ahk"
+#Include "..\..\Libraries\LLMConnector.ahk"
 #Include "RaceAssistant.ahk"
 #Include "..\..\Garage\Libraries\TelemetryCollector.ahk"
 #Include "..\..\Garage\Libraries\IRCTelemetryCollector.ahk"
@@ -42,433 +43,6 @@ class DrivingCoach extends GridRaceAssistant {
 	iTelemetryCollector := false
 
 	class CoachVoiceManager extends RaceAssistant.RaceVoiceManager {
-	}
-
-	class LLMConnector {
-		iCoach := false
-
-		iModel := false
-
-		iMaxTokens := 1024
-		iTemperature := 0.5
-
-		iHistory := []
-		iMaxHistory := 3
-
-		static Models {
-			Get {
-				return []
-			}
-		}
-
-		Models {
-			Get {
-				return DrivingCoach.LLMConnector.Models
-			}
-		}
-
-		Coach {
-			Get {
-				return this.iCoach
-			}
-		}
-
-		ConnectionState {
-			Get {
-				return this.Coach.ConnectionState
-			}
-
-			Set {
-				return (this.Coach.ConnectionState := value)
-			}
-		}
-
-		Model {
-			Get {
-				return this.iModel
-			}
-		}
-
-		Temperature {
-			Get {
-				return this.iTemperature
-			}
-
-			Set {
-				return (this.iTemperature := value)
-			}
-		}
-
-		MaxTokens {
-			Get {
-				return this.iMaxTokens
-			}
-
-			Set {
-				return (this.iMaxTokens := value)
-			}
-		}
-
-		History[key?] {
-			Get {
-				return (isSet(key) ? this.iHistory[key] : this.iHistory)
-			}
-		}
-
-		MaxHistory {
-			Get {
-				return this.iMaxHistory
-			}
-
-			Set {
-				return (this.iMaxHistory := value)
-			}
-		}
-
-		__New(coach, model) {
-			this.iCoach := coach
-			this.iModel := model
-		}
-
-		Restart() {
-			this.History.Length := 0
-		}
-
-		AddConversation(question, answer) {
-			this.History.Push([question, answer])
-
-			while (this.History.Length > this.MaxHistory)
-				this.History.RemoveAt(1)
-		}
-
-		Ask(question) {
-			throw "Virtual method LLMConnector.Ask must be implemented in a subclass..."
-		}
-	}
-
-	class HTTPConnector extends DrivingCoach.LLMConnector {
-		iServer := ""
-		iToken := ""
-
-		Server {
-			Get {
-				return this.iServer
-			}
-		}
-
-		Token {
-			Get {
-				return this.iToken
-			}
-		}
-
-		Model[external := false] {
-			Get {
-				if !external {
-					if inList(this.Models, super.Model)
-						return StrLower(StrReplace(this.iModel, A_Space, "-"))
-					else
-						return super.Model
-				}
-				else
-					return super.Model
-			}
-		}
-
-		Connect(server?, token?) {
-			this.iServer := (isSet(server) ? server : this.Server)
-			this.iToken := (isSet(token) ? token : this.Token)
-		}
-
-		AddConversation(question, answer) {
-			this.History.Push([question, answer])
-
-			while (this.History.Length > this.MaxHistory)
-				this.History.RemoveAt(1)
-		}
-
-		CreateServiceURL(server) {
-			return server
-		}
-
-		CreateHeaders(headers) {
-			if (Trim(this.Token) != "")
-				headers["Authorization"] := ("Bearer " . this.Token)
-
-			return headers
-		}
-
-		CreatePrompt(body) {
-			throw "Virtual method HTTPConnector.CreatePrompt must be implemented in a subclass..."
-		}
-
-		Ask(question) {
-			local coach := this.Coach
-			local speaker := coach.getSpeaker()
-			local headers := this.CreateHeaders(Map("Content-Type", "application/json"))
-			local body := this.CreatePrompt({model: this.Model, max_tokens: this.MaxTokens, temperature: this.Temperature}, question)
-
-			static first := true
-
-			body := JSON.print(body)
-
-			if isDebug() {
-				deleteFile(kTempDirectory . "Chat.request")
-
-				FileAppend(body, kTempDirectory . "Chat.request")
-			}
-
-			try {
-				answer := WinHttpRequest().POST(this.CreateServiceURL(this.Server), body, headers, {Object: true, Encoding: "UTF-8"})
-
-				if ((answer.Status >= 200) && (answer.Status < 300)) {
-					first := false
-
-					this.ConnectionState := "Active"
-
-					answer := answer.JSON
-				}
-				else if first {
-					first := false
-
-					throw ("Cannot connect to " . this.CreateServiceURL(this.Server) . "...")
-				}
-				else {
-					this.ConnectionState := "Error:Connection"
-
-					return false
-				}
-			}
-			catch Any as exception {
-				if this.Coach.RemoteHandler
-					this.Coach.RemoteHandler.serviceState("Error:Connection")
-
-				this.ConnectionState := "Error:Connection"
-
-				throw exception
-			}
-
-			if isDebug() {
-				deleteFile(kTempDirectory . "Chat.response")
-
-				FileAppend(JSON.print(answer), kTempDirectory . "Chat.response")
-			}
-
-			try {
-				answer := answer["choices"][1]["message"]["content"]
-
-				this.AddConversation(question, answer)
-
-				if this.Coach.RemoteHandler
-					this.Coach.RemoteHandler.serviceState("Available")
-
-				return answer
-			}
-			catch Any as exception {
-				if this.Coach.RemoteHandler
-					this.Coach.RemoteHandler.serviceState("Error:Answer")
-
-				throw exception
-			}
-		}
-	}
-
-	class OpenAIConnector extends DrivingCoach.HTTPConnector {
-		static Models {
-			Get {
-				return ["GPT 3.5", "GPT 3.5 turbo", "GPT 3.5 turbo 1106", "GPT 4", "GPT 4 32k", "GPT 4 1106 preview"]
-			}
-		}
-
-		Models {
-			Get {
-				return DrivingCoach.OpenAIConnector.Models
-			}
-		}
-
-		CreatePrompt(body, question) {
-			local coach := this.Coach
-			local messages := []
-			local ignore, instruction, conversation
-
-			addInstruction(instruction) {
-				instruction := coach.getInstruction(instruction)
-
-				if (instruction && (Trim(instruction) != ""))
-					messages.Push({role: "system", content: instruction})
-			}
-
-			for ignore, instruction in coach.Instructions[true]
-				addInstruction(instruction)
-
-			for ignore, conversation in this.History {
-				messages.Push({role: "user", content: conversation[1]})
-				messages.Push({role: "assistant", content: conversation[2]})
-			}
-
-			messages.Push({role: "user", content: question})
-
-			body.messages := messages
-
-			return body
-		}
-	}
-
-	class AzureConnector extends DrivingCoach.OpenAIConnector {
-		Models {
-			Get {
-				return ["GPT 3.5", "GPT 3.5 turbo", "GPT 4", "GPT 4 32k"]
-			}
-		}
-
-		Model[external := false] {
-			Get {
-				if !external
-					return StrReplace(super.Model[external], ".", "")
-				else
-					return super.Model[external]
-			}
-		}
-
-		CreateServiceURL(server) {
-			return substituteVariables(server, {model: this.Model})
-		}
-
-		CreateHeaders(headers) {
-			if (Trim(this.Token) != "")
-				headers["api-key"] := this.Token
-
-			return headers
-		}
-	}
-
-	class GPT4AllConnector extends DrivingCoach.HTTPConnector {
-		CreatePrompt(body, question) {
-			local coach := this.Coach
-			local prompt := ""
-			local ignore, instruction, conversation
-
-			addInstruction(instruction) {
-				instruction := coach.getInstruction(instruction)
-
-				if (instruction && (Trim(instruction) != "")) {
-					if (prompt = "")
-						prompt .= "### System:`n"
-
-					prompt .= (instruction . "`n")
-				}
-			}
-
-			for ignore, instruction in coach.Instructions[true]
-				addInstruction(instruction)
-
-			for ignore, conversation in this.History {
-				prompt .= ("### Human:`n" . conversation[1] . "`n")
-				prompt .= ("### Assistant:`n" . conversation[2] . "`n")
-			}
-
-			prompt .= ("### Human:`n" . question . "`n### Assistant:")
-
-			body.prompt := prompt
-
-			return body
-		}
-	}
-
-	class LLMRuntimeConnector extends DrivingCoach.LLMConnector {
-		CreatePrompt(question) {
-			local coach := this.Coach
-			local prompt := ""
-			local ignore, instruction, conversation
-
-			addInstruction(instruction) {
-				instruction := coach.getInstruction(instruction)
-
-				if (instruction && (Trim(instruction) != "")) {
-					if (prompt = "")
-						prompt .= "### System:`n"
-
-					prompt .= (instruction . "`n")
-				}
-			}
-
-			for ignore, instruction in coach.Instructions[true]
-				addInstruction(instruction)
-
-			for ignore, conversation in this.History {
-				prompt .= ("### Human:`n" . conversation[1] . "`n")
-				prompt .= ("### Assistant:`n" . conversation[2] . "`n")
-			}
-
-			prompt .= ("### Human:`n" . question . "`n### Assistant:")
-
-			return prompt
-		}
-
-		Ask(question) {
-			local coach := this.Coach
-			local speaker := coach.getSpeaker()
-			local prompt := this.CreatePrompt(question)
-			local answerFile := temporaryFileName("GPT4All", "answer")
-			local command, answer
-
-			static first := true
-
-			if isDebug() {
-				deleteFile(kTempDirectory . "Chat.request")
-
-				FileAppend(prompt, kTempDirectory . "Chat.request")
-			}
-
-			try {
-				prompt := StrReplace(StrReplace(prompt, "`"", "\`""), "`n", "\n")
-
-				command := (A_ComSpec . " /c `"`"" . kBinariesDirectory . "\LLM Runtime\LLM Runtime.exe`" `"" . this.Model . "`" `"" . prompt . "`" " . this.MaxTokens . A_Space . this.Temperature . " > `"" . answerFile . "`"`"")
-
-				RunWait(command, kBinariesDirectory . "\LLM Runtime", "Hide")
-			}
-			catch Any as exception {
-				if this.Coach.RemoteHandler
-					this.Coach.RemoteHandler.serviceState("Error:Connection")
-
-				this.ConnectionState := "Error:Connection"
-
-				throw exception
-			}
-
-			try {
-				answer := Trim(FileRead(answerFile, "`n"))
-
-				while ((StrLen(answer) > 0) && (SubStr(answer, 1, 1) = "`n"))
-					answer := SubStr(answer, 2)
-
-				deleteFile(answerFile)
-
-				if (answer = "")
-					throw "Empty answer received..."
-				else
-					this.ConnectionState := "Active"
-
-				if isDebug() {
-					deleteFile(kTempDirectory . "Chat.response")
-
-					FileAppend(answer, kTempDirectory . "Chat.response")
-				}
-
-				this.AddConversation(question, answer)
-
-				if this.Coach.RemoteHandler
-					this.Coach.RemoteHandler.serviceState("Available")
-
-				return answer
-			}
-			catch Any as exception {
-				if this.Coach.RemoteHandler
-					this.Coach.RemoteHandler.serviceState("Error:Answer")
-
-				throw exception
-			}
-		}
 	}
 
 	class DrivingCoachRemoteHandler extends RaceAssistant.RaceAssistantRemoteHandler {
@@ -634,6 +208,20 @@ class DrivingCoach extends GridRaceAssistant {
 			this.iStandings := values.Standings
 	}
 
+	connectorState(state, reason := false, arguments*) {
+		local oldState := this.ConnectionState
+
+		if (state = "Active")
+			this.ConnectionState := state
+		else if (state = "Error")
+			this.ConnectionState := (state . (reason ? (":" . reason) : ""))
+		else
+			this.ConnectionState := "Unknown"
+
+		if ((oldState != this.ConnectionState) && this.Coach.RemoteHandler)
+			this.Coach.RemoteHandler.serviceState((this.ConnectionState = "Active") ? "Available" : this.ConnectionState)
+	}
+
 	getInstruction(category) {
 		local knowledgeBase := this.KnowledgeBase
 		local settingsDB := this.SettingsDatabase
@@ -774,6 +362,10 @@ class DrivingCoach extends GridRaceAssistant {
 		return false
 	}
 
+	getInstructions() {
+		return collect(this.Instructions[true], ObjBindMethod(this, "getInstruction"))
+	}
+
 	startConversation() {
 		local service := this.Options["Driving Coach.Service"]
 		local ignore, instruction
@@ -787,10 +379,10 @@ class DrivingCoach extends GridRaceAssistant {
 				throw "Unsupported service detected in DrivingCoach.connect..."
 
 			if (service[1] = "LLM Runtime")
-				this.iConnector := DrivingCoach.LLMRuntimeConnector(this, this.Options["Driving Coach.Model"])
+				this.iConnector := LLMConnector.LLMRuntimeConnector(this, this.Options["Driving Coach.Model"])
 			else
 				try {
-					this.iConnector := DrivingCoach.%service[1]%Connector(this, this.Options["Driving Coach.Model"])
+					this.iConnector := LLMConnector.%service[1]%Connector(this, this.Options["Driving Coach.Model"])
 
 					this.Connector.Connect(service[2], service[3])
 
@@ -799,10 +391,7 @@ class DrivingCoach extends GridRaceAssistant {
 				catch Any as exception {
 					logError(exception)
 
-					if this.RemoteHandler
-						this.RemoteHandler.serviceState("Error:Configuration")
-
-					this.ConnectionState := "Error:Configuration"
+					this.connectorState("Error", "Configuration")
 
 					throw "Unsupported service detected in DrivingCoach.connect..."
 				}
@@ -831,7 +420,7 @@ class DrivingCoach extends GridRaceAssistant {
 		local answer := false
 		local ignore, part
 
-		static first := true
+		static report := true
 
 		try {
 			if (this.Speaker && this.Options["Driving Coach.Confirmation"] && (this.ConnectionState = "Active"))
@@ -842,30 +431,29 @@ class DrivingCoach extends GridRaceAssistant {
 
 			answer := this.Connector.Ask(text)
 
-			if !answer
-				if (this.Speaker && first) {
-					this.getSpeaker().speakPhrase("Later", false, false, false, {Noise: false})
+			if answer
+				report := true
+			else if (this.Speaker && report) {
+				this.getSpeaker().speakPhrase("Later", false, false, false, {Noise: false})
 
-					first := false
-				}
+				report := false
+			}
 		}
 		catch Any as exception {
-			if first {
+			if report {
 				if this.Speaker
 					this.getSpeaker().speakPhrase("Later", false, false, false, {Noise: false})
 
-				first := false
+				report := false
 
-				if (exception != "No answer from the GPT service...") {
-					logError(exception, true)
+				logError(exception, true)
 
-					logMessage(kLogCritical, substituteVariables(translate("Cannot connect to GPT service (%service%) - please check the configuration")
+				logMessage(kLogCritical, substituteVariables(translate("Cannot connect to GPT service (%service%) - please check the configuration")
 														   , {service: this.Options["Driving Coach.Service"]}))
 
-					showMessage(substituteVariables(translate("Cannot connect to GPT service (%service%) - please check the configuration...")
-												  , {service: this.Options["Driving Coach.Service"]})
-							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-				}
+				showMessage(substituteVariables(translate("Cannot connect to GPT service (%service%) - please check the configuration...")
+											  , {service: this.Options["Driving Coach.Service"]})
+						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
 		}
 
@@ -885,7 +473,7 @@ class DrivingCoach extends GridRaceAssistant {
 	stopTelemetryCollector(arguments*) {
 		if ((arguments.Length > 0) && inList(["Logoff", "Shutdown"], arguments[1]))
 			return false
-			
+
 		this.stopTelemetryAnalyzer()
 
 		if this.iTelemetryCollector {
@@ -979,16 +567,6 @@ class DrivingCoach extends GridRaceAssistant {
 	}
 
 	finishSession(shutdown := true) {
-		/*
-		this.updateDynamicValues({KnowledgeBase: false, Prepared: false
-								, OverallTime: 0, BestLapTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0
-								, EnoughData: false})
-		this.updateSessionValues({Simulator: "", Car: "", Track: "", Session: kSessionFinished, SessionTime: false, Laps: Map()})
-
-		this.stopTelemetryAnalyzer()
-		this.restartConversation()
-		*/
-
 		this.stopTelemetryAnalyzer()
 		this.updateDynamicValues({Prepared: false})
 	}
@@ -1049,13 +627,4 @@ class DrivingCoach extends GridRaceAssistant {
 
 		return result
 	}
-}
-
-
-;;;-------------------------------------------------------------------------;;;
-;;;                   Private Function Declaration Section                  ;;;
-;;;-------------------------------------------------------------------------;;;
-
-getTime(*) {
-	return A_Now
 }

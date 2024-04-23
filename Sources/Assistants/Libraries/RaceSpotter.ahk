@@ -3683,12 +3683,3 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 	}
 }
-
-
-;;;-------------------------------------------------------------------------;;;
-;;;                   Private Function Declaration Section                  ;;;
-;;;-------------------------------------------------------------------------;;;
-
-getTime(*) {
-	return A_Now
-}

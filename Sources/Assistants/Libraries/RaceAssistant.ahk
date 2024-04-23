@@ -3158,6 +3158,10 @@ compareClassPositions(c1, c2) {
 	return (pos1 > pos2)
 }
 
+getTime(*) {
+	return A_Now
+}
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;

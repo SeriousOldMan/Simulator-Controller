@@ -108,28 +108,28 @@ class LLMConnector {
 				this.Manager.connectorState("Active")
 
 				answer := answer.JSON
+
+				if isDebug() {
+					deleteFile(kTempDirectory . "Chat.response")
+
+					FileAppend(JSON.print(answer), kTempDirectory . "Chat.response")
+				}
+
+				try {
+					answer := answer["choices"][1]["message"]["content"]
+
+					this.AddConversation(question, answer)
+
+					return answer
+				}
+				catch Any as exception {
+					this.Manager.connectorState("Error", "Answer", answer)
+
+					return false
+				}
 			}
 			else {
 				this.Manager.connectorState("Error", "Connection", answer.Status)
-
-				return false
-			}
-
-			if isDebug() {
-				deleteFile(kTempDirectory . "Chat.response")
-
-				FileAppend(JSON.print(answer), kTempDirectory . "Chat.response")
-			}
-
-			try {
-				answer := answer["choices"][1]["message"]["content"]
-
-				this.AddConversation(question, answer)
-
-				return answer
-			}
-			catch Any as exception {
-				this.Manager.connectorState("Error", "Answer", answer)
 
 				return false
 			}

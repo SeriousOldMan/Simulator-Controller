@@ -49,7 +49,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[5.6.8.0-dev]() (Early build for 5.6.8. Changes: Changed appearance of checkable menu items, Added "Auto Clear" for the "Practice Center", Added "Auto Export" for the "Practice Center", New damage info component in "System Monitor", Exposed damage information in the "Session State.json" file, Migrated to AHK 2.0.13, Optimized inconsistent driver warning of the Spotter, New LLMConnector class library.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-568) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 
@@ -121,7 +123,11 @@ If you want to become a part of the small and very young Community for Simulator
 
 ### Main features
 
-  - Connect all your external controller, like Button Boxes, Stream Decks, and so on, to one single center of control
+Simulator Controller comes with a set of virtual Assistants to guide you throughout your races. To control the Assistants, you can use controllers like Button Boxes or interact with them directly in a natural voice dialog. In addition, several built-in applications assist you with setup and strategy development, or support you in monitoring and controlling your races and so on.
+
+#### Support for controllers and devices
+
+  - Connect all your external controllers, like Button Boxes, Stream Decks, and so on, to one single center of control
     - An unlimited number of layers of functions and actions, called modes, can be defined for your controller. Switch between modes simply by pushing a button or switch a toggle on your controller. Here is an example of several layers of functions and actions combined in five modes:
 	
 	![](./Docs/Images/Button%20Box%20Layout.jpg)

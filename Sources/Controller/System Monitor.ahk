@@ -807,7 +807,7 @@ systemMonitor(command := false, arguments*) {
 		bodyworkDamageAll := getMultiMapValue(sessionState, "Damage", "Bodywork.All", 0)
 
 		for ignore, position in ["FL", "FR", "RL", "RR"]
-			bodyworkDamage.Push(getMultiMapValue(sessionState, "Damage", "Suspension." . position, 0))
+			suspensionDamage.Push(getMultiMapValue(sessionState, "Damage", "Suspension." . position, 0))
 
 		if isDebug() {
 			while (bodyworkDamage.Length < 5)
@@ -839,20 +839,23 @@ systemMonitor(command := false, arguments*) {
 				for index, position in ["Front", "Rear", "Left", "Right"] {
 					header := ((index = 1) ? translate("Bodywork (rel.)") : "")
 
-					html .= ("<tr><th class=`"th-std th-left`">" . header . "</th><th class=`"th-std th-left`">" . translate(position) . "</th><td class=`"td-wdg`">" . displayValue("Float", suspensionDamage[index] / suspensionDamageSum * 100, 1) . translate("%") . "</td></tr>")
+					html .= ("<tr><th class=`"th-std th-left`">" . header . "</th><th class=`"th-std th-left`">" . translate(position) . "</th><td class=`"td-wdg`">" . displayValue("Float", bodyworkDamage[index] / bodyWorkDamageSum * 100, 1) . translate("%") . "</td></tr>")
 				}
 
 			if ((suspensionDamageSum > 0) || isDebug())
 				for index, position in ["FL", "FR", "RL", "RR"] {
 					header := ((index = 1) ? translate("Suspension (rel.)") : "")
 
-					html .= ("<tr><th class=`"th-std th-left`">" . header . "</th><th class=`"th-std th-left`">" . translate(projection[position]) . "</th><td class=`"td-wdg`">" . displayValue("Float", bodyworkDamage[index + 1] / bodyWorkDamageSum * 100, 1) . translate("%") . "</td></tr>")
+					html .= ("<tr><th class=`"th-std th-left`">" . header . "</th><th class=`"th-std th-left`">" . translate(projection[position]) . "</th><td class=`"td-wdg`">" . displayValue("Float", suspensionDamage[index] / suspensionDamageSum * 100, 1) . translate("%") . "</td></tr>")
 				}
 
 			if ((engineDamage > 0) || isDebug())
 				html .= ("<tr><th class=`"th-std th-left`" colspan=`"2`">" . translate("Engine") . "</th><td class=`"td-wdg`">" . displayValue("Float", engineDamage, 1) . translate("%") . "</td></tr>")
 
-			html .= ("<tr><th class=`"th-std th-left`" colspan=`"2`">" . translate("Time Loss") . "</th><td class=`"td-wdg`">" . displayValue("Float", getMultiMapValue(sessionState, "Damage", "Time.Repairs", 0)) . translate(" Seconds") . "</td></tr>")
+			if ((getMultiMapValue(sessionState, "Damage", "Lap.Delta", kUndefined) != kUndefined) && (getMultiMapValue(sessionState, "Damage", "Lap.Delta") != 0))
+				html .= ("<tr><th class=`"th-std th-left`" colspan=`"2`">" . translate("Lap time delta") . "</th><td class=`"td-wdg`">" . displayValue("Float", getMultiMapValue(sessionState, "Damage", "Lap.Delta", 0), 1) . translate(" Seconds") . "</td></tr>")
+
+			html .= ("<tr><th class=`"th-std th-left`" colspan=`"2`">" . translate("Repair time") . "</th><td class=`"td-wdg`">" . displayValue("Float", getMultiMapValue(sessionState, "Damage", "Time.Repairs", 0), 1) . translate(" Seconds") . "</td></tr>")
 		}
 
 		html .= "</table>"
@@ -933,7 +936,7 @@ systemMonitor(command := false, arguments*) {
 															 . (getMultiMapValue(sessionState, "Pitstop", "Prepared") ? translate("Yes") : translate("No"))
 															 . "</td></tr>")
 
-				html .= ("<tr><th class=`"th-std th-left`">" . translate("Time Loss") . "</th><td class=`"td-wdg`" colspan=`"2`">" . (getMultiMapValue(sessionState, "Pitstop", "Planned.Time.Box") + getMultiMapValue(sessionState, "Pitstop", "Planned.Time.Pitlane")) . translate(" Seconds") . "</td></tr>")
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Loss of time") . "</th><td class=`"td-wdg`" colspan=`"2`">" . (getMultiMapValue(sessionState, "Pitstop", "Planned.Time.Box") + getMultiMapValue(sessionState, "Pitstop", "Planned.Time.Pitlane")) . translate(" Seconds") . "</td></tr>")
 			}
 			else {
 				html .= ("<tr><th class=`"th-std th-left`" colspan=`"3`"><div id=`"header`"><i>" . translate("Pitstop") . translate(" (") . translate("Forecast") . translate(")") . "</i></div></th></tr>")
@@ -962,7 +965,7 @@ systemMonitor(command := false, arguments*) {
 				else
 					html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyres") . "</th><td class=`"td-wdg`">" . translate("No") . "</td></tr>")
 
-				html .= ("<tr><th class=`"th-std th-left`">" . translate("Time Loss") . "</th><td class=`"td-wdg`" colspan=`"2`">" . (getMultiMapValue(sessionState, "Pitstop", "Target.Time.Box") + getMultiMapValue(sessionState, "Pitstop", "Target.Time.Pitlane")) . translate(" Seconds") . "</td></tr>")
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Loss of time") . "</th><td class=`"td-wdg`" colspan=`"2`">" . (getMultiMapValue(sessionState, "Pitstop", "Target.Time.Box") + getMultiMapValue(sessionState, "Pitstop", "Target.Time.Pitlane")) . translate(" Seconds") . "</td></tr>")
 			}
 		}
 		catch Any as exception {

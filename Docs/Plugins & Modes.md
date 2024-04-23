@@ -1425,6 +1425,24 @@ The content of the JSON file looks like this (depending on the current situation
 			"Weather10Min": "Dry",
 			"Weather30Min": "Dry"
 		},
+		"Damage": {
+			"Bodywork": {
+				"Front": 0.0,
+				"Left": 0.34,
+				"Right": 0.0,
+				"Rear": 2.72,
+				"All": 3.06
+			}
+			"Suspension": {
+				"FrontLeft": 0.0,
+				"FrontRight": 0.0,
+				"RearLeft": 0.0,
+				"RearRight": 0.0
+			},
+			"Engine": 0.0,
+			"LapDelta": 0.3,
+			"RepairTime": 2.7
+		},
 		"Duration": {
 			"Format": "Time",
 			"SessionLapsLeft": 24,
@@ -1549,22 +1567,5 @@ The content of the JSON file looks like this (depending on the current situation
 				null
 			],
 			"TyreSet": 3
-		},
-		"Damage": {
-			"Bodywork": {
-				"Front": 0.0,
-				"Left": 0.34,
-				"Right": 0.0,
-				"Rear": 2.72,
-				"All": 3.06
-			}
-			"Suspension": {
-				"FrontLeft": 0.0,
-				"FrontRight": 0.0,
-				"RearLeft": 0.0,
-				"RearRight": 0.0
-			},
-			"Engine": 0.0,
-			"RepairTime": 2.7
 		}
 	}

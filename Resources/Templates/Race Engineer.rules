@@ -424,6 +424,8 @@ updatePitstopTargetTime() <= computeTargetDamages(?damages),
 							 pitstopDeltaTime(!Lap, 0, Dry, ?damages, ?, ?targetRepairTime, ?),
 							 Set(Target.Time.Repairs, ?targetRepairTime)
 
+computeTargetDamages(?damages) <= computeDamages([true, true, true], [!Damage.Bodywork, !Damage.Suspension, !Damage.Engine], ?damages)
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Damage Impact Analysis                         ;;;

@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[5.6.8.0-dev]() (Early build for 5.6.8. Changes: Changed appearance of checkable menu items, Added "Auto Clear" for the "Practice Center", Added "Auto Export" for the "Practice Center", New damage info component in "System Monitor", Exposed damage information in the "Session State.json" file, Migrated to AHK 2.0.13, Optimized inconsistent driver warning of the Spotter, New LLMConnector class library.)
+[5.6.8.0-dev](https://www.dropbox.com/scl/fi/izyp5fmmtiumui1f0bln2/Simulator-Controller-5.6.8.0-dev.zip?rlkey=w3pxvz4rf6tmdx29k2m2fp341&st=039ofdj8&dl=1) (Early build for 5.6.8. Changes: Changed appearance of checkable menu items, Added "Auto Clear" for the "Practice Center", Added "Auto Export" for the "Practice Center", New damage info component in "System Monitor", Exposed damage information in the "Session State.json" file, Migrated to AHK 2.0.13, Optimized inconsistent driver warning of the Spotter, New LLMConnector class library, Support logical key mapping of tools like Joy2Key.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-568) of this version and all the versions you might have skipped, before installing and using this version.
 

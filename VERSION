@@ -2,7 +2,7 @@
 Version=5.6.8.0-dev
 Target=5.6.8.0-release
 Date=04/24/2024
-Download=
+Download=https://www.dropbox.com/scl/fi/izyp5fmmtiumui1f0bln2/Simulator-Controller-5.6.8.0-dev.zip?rlkey=w3pxvz4rf6tmdx29k2m2fp341&st=039ofdj8&dl=1
 Changes=Changed appearance of checkable menu items, Added "Auto Clear" for the "Practice Center", Added "Auto Export" for the "Practice Center", New damage info component in "System Monitor", Exposed damage information in the "Session State.json" file, Migrated to AHK 2.0.13, Optimized inconsistent driver warning of the Spotter, New LLMConnector class library, Support logical key mapping of tools like Joy2Key
 Components=Media->5.6.1,Configuration->5.6.4,Utilities->5.4.8
 [Release]

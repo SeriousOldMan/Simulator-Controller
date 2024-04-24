@@ -386,7 +386,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 					this.Connector.Connect(service[2], service[3])
 
-					this.ConnectionState := "Active"
+					this.connectorState("Active")
 				}
 				catch Any as exception {
 					logError(exception)

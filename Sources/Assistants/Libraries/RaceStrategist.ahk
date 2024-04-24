@@ -4126,10 +4126,6 @@ class RaceStrategist extends GridRaceAssistant {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-getTime(*) {
-	return A_Now
-}
-
 updatePositions(context, futureLap) {
 	local knowledgeBase := context.KnowledgeBase
 	local cars := []

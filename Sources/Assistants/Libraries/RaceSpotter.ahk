@@ -1280,7 +1280,7 @@ class RaceSpotter extends GridRaceAssistant {
 										  , position.DeltaDifference[sector], position.LapTimeDifference[true]
 										  , position.isFaster(sector), position.closingIn(sector, 0.2), position.runningAway(sector, 0.3))
 
-				FileAppend(info "`n", kTempDirectory "Race Spotter.positions")
+				FileAppend(info . "`n", kTempDirectory . "Race Spotter.positions")
 			}
 
 			position.checkpoint(sector)
@@ -2386,7 +2386,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 					if (car.Incidents > 0)
 						speaker.speakPhrase("UnsafeDriverFront")
-					else if (car.InvalidLaps > 3)
+					else if ((car.InvalidLaps >= this.DriverCar.InvalidLaps) && (car.InvalidLaps > (car.LastLap / 10)))
 						speaker.speakPhrase("InconsistentDriverFront")
 					else
 						unsafe := false
@@ -2481,7 +2481,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 					if (car.Incidents > 0)
 						speaker.speakPhrase("UnsafeDriveBehind")
-					else if (car.InvalidLaps > 3)
+					else if ((car.InvalidLaps >= this.DriverCar.InvalidLaps) && (car.InvalidLaps > (car.LastLap / 10)))
 						speaker.speakPhrase("InconsistentDriverBehind")
 					else
 						unsafe := false
@@ -3682,13 +3682,4 @@ class RaceSpotter extends GridRaceAssistant {
 			this.finishSession()
 		}
 	}
-}
-
-
-;;;-------------------------------------------------------------------------;;;
-;;;                   Private Function Declaration Section                  ;;;
-;;;-------------------------------------------------------------------------;;;
-
-getTime(*) {
-	return A_Now
 }

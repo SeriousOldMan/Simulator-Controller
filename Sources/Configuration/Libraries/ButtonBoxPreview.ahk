@@ -479,7 +479,7 @@ class ButtonBoxPreview extends ControllerPreview {
 			this.PreviewManager.changeLabel(row, column, label)
 		}
 
-		if (GetKeyState("Ctrl", "P") && !isEmpty)
+		if (GetKeyState("Ctrl") && !isEmpty)
 			this.PreviewManager.changeControl(row, column, "__Number__", false)
 		else {
 			menuItem := (translate(element[1]) . translate(": ") . StrReplace(StrReplace(element[2], "`n", A_Space), "`r", "") . " (" . row . " x " . column . ")")

@@ -121,7 +121,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 			local chosenSetting := this.Instructions[true][window["dcInstructionsDropDown"].Value]
 			local setting, oldValue
 
-			for ignore, setting in (GetKeyState("Ctrl", "P") ? this.Instructions[true] : [chosenSetting]) {
+			for ignore, setting in (GetKeyState("Ctrl") ? this.Instructions[true] : [chosenSetting]) {
 				oldValue := this.Value[setting]
 
 				this.Value[setting] := ""

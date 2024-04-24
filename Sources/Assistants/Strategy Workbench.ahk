@@ -125,7 +125,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				local ignore, button
 
 				for ignore, button in ["LButton", "MButton", "RButton"]
-					if GetKeyState(button, "P")
+					if GetKeyState(button)
 						return Task.CurrentTask
 
 				this.iRedraw := false
@@ -2717,7 +2717,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				}
 			case 4: ; "Load from Settings..."
 				if (simulator && car && track) {
-					if GetKeyState("Ctrl", "P") {
+					if GetKeyState("Ctrl") {
 						directory := SessionDatabase.DatabasePath
 						simulatorCode := SessionDatabase.getSimulatorCode(simulator)
 
@@ -2953,7 +2953,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				else if (line > 11) {
 					validators := []
 
-					if GetKeyState("Ctrl", "P") {
+					if GetKeyState("Ctrl") {
 						index := 0
 
 						for ignore, fileName in getFileNames("*.rules", kResourcesDirectory . "Strategy\Validators\", kUserHomeDirectory . "Validators\") {
@@ -2998,11 +2998,11 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		switch line {
 			case 3: ; "Run Simulation"
-				selectStrategy := GetKeyState("Ctrl", "P")
+				selectStrategy := GetKeyState("Ctrl")
 
 				this.runSimulation()
 
-				if (selectStrategy && !GetKeyState("Escape", "P"))
+				if (selectStrategy && !GetKeyState("Escape"))
 					this.chooseSimulationMenu(5)
 			case 5: ; "Use as Strategy..."
 				strategy := this.SelectedScenario

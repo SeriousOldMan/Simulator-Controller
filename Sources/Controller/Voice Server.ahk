@@ -797,7 +797,7 @@ class VoiceServer extends ConfigurationItem {
 									   , "Voice", "Activation Speed", DllCall("GetDoubleClickTime"))
 
 		try
-			pressed := toggle ? down : GetKeyState(this.PushToTalk, "P")
+			pressed := toggle ? down : GetKeyState(this.PushToTalk)
 
 		if (pressed && !isPressed) {
 			lastDown := A_TickCount

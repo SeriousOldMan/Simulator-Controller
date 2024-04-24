@@ -1577,7 +1577,7 @@ showSelectorHint(state?) {
 	}
 	else
 		try {
-			if (GetKeyState("Esc", "P") || !ActionsStepWizard.CurrentActionsStep) {
+			if (GetKeyState("Esc") || !ActionsStepWizard.CurrentActionsStep) {
 				showSelectorHint(false)
 
 				if ActionsStepWizard.CurrentActionsStep {

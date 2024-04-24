@@ -794,7 +794,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		serverToken := settingsGui["serverTokenEdit"].Text
 
 		if connector {
-			if GetKeyState("Ctrl", "P") {
+			if GetKeyState("Ctrl") {
 				settingsGui.Block()
 
 				try {

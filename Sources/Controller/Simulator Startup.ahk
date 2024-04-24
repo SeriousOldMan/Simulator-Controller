@@ -477,7 +477,7 @@ launchPad(command := false, arguments*) {
 		OnMessage(0x44, translateYesNoButtons, 0)
 
 		if (msgResult = "Yes")
-			launchPad("Close All", GetKeyState("Ctrl", "P"))
+			launchPad("Close All", GetKeyState("Ctrl"))
 	}
 
 	closeOnStartup(*) {
@@ -489,7 +489,7 @@ launchPad(command := false, arguments*) {
 		local curCoordMode
 
 		if !configure
-			configure := GetKeyState("Ctrl", "P")
+			configure := GetKeyState("Ctrl")
 
 		if !configure {
 			launchPadGui["launchProfilesButton"].GetPos(&x, &y, &w, &h)
@@ -839,7 +839,7 @@ launchPad(command := false, arguments*) {
 closeLaunchPad(*) {
 	local msgResult
 
-	if GetKeyState("Ctrl", "P") {
+	if GetKeyState("Ctrl") {
 		OnMessage(0x44, translateYesNoButtons)
 		msgResult := withBlockedWindows(MsgBox, translate("Do you really want to close all currently running applications? Unsaved data might be lost."), translate("Modular Simulator Controller System"), 262436)
 		OnMessage(0x44, translateYesNoButtons, 0)
@@ -1492,7 +1492,7 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 
 		saveProfiles()
 
-		done := (GetKeyState("Ctrl", "P") ? "Startup" : kSave)
+		done := (GetKeyState("Ctrl") ? "Startup" : kSave)
 	}
 	else if (launchPadOrCommand == kCancel)
 		done := kCancel
@@ -1535,7 +1535,7 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 
 			profilesEditorGui.Opt("+OwnDialogs")
 
-			selected := GetKeyState("Ctrl", "P")
+			selected := GetKeyState("Ctrl")
 
 			if (selected && !selectedProfile)
 				return
@@ -1791,7 +1791,7 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 			serverToken := profilesEditorGui["profileServerTokenEdit"].Text
 
 			if connector {
-				if GetKeyState("Ctrl", "P") {
+				if GetKeyState("Ctrl") {
 					profilesEditorGui.Block()
 
 					try {
@@ -2198,7 +2198,7 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 			loop {
 				Sleep(200)
 
-				if GetKeyState("Ctrl", "P")
+				if GetKeyState("Ctrl")
 					profilesEditorGui["saveButton"].Text := translate("Startup")
 				else
 					profilesEditorGui["saveButton"].Text := translate("Save")
@@ -2410,7 +2410,7 @@ startSimulator() {
 	TraySetIcon(icon, "1")
 	A_IconTip := "Simulator Startup"
 
-	if (inList(A_Args, "-Unblock") || (GetKeyState("Ctrl", "P") && GetKeyState("Shift", "P")))
+	if (inList(A_Args, "-Unblock") || (GetKeyState("Ctrl") && GetKeyState("Shift")))
 		unblockExecutables()
 
 	startup := inList(A_Args, "-Startup")

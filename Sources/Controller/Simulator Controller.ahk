@@ -427,7 +427,7 @@ class GuiFunctionController extends FunctionController {
 			newX := winX
 			newY := winY
 
-			while GetKeyState("LButton", "P") {
+			while GetKeyState("LButton") {
 				MouseGetPos(&x, &y)
 
 				x := screen2Window(x)

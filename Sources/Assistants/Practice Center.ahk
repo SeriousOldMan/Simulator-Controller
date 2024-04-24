@@ -271,7 +271,7 @@ class PracticeCenter extends ConfigurationItem {
 				local ignore, button
 
 				for ignore, button in ["LButton", "MButton", "RButton"]
-					if GetKeyState(button, "P")
+					if GetKeyState(button)
 						return Task.CurrentTask
 
 				this.iRedraw := false

@@ -235,7 +235,7 @@ class SetupWizard extends ConfiguratorPanel {
 				local ignore, button, viewer
 
 				for ignore, button in ["LButton", "MButton", "RButton"]
-					if GetKeyState(button, "P")
+					if GetKeyState(button)
 						return Task.CurrentTask
 
 				this.iRedraw := false
@@ -2579,7 +2579,7 @@ class StartStepWizard extends StepWizard {
 				local ignore, button, audio, volume
 
 				for ignore, button in ["LButton", "MButton", "RButton"]
-					if GetKeyState(button, "P")
+					if GetKeyState(button)
 						return Task.CurrentTask
 
 				this.iRedraw := false

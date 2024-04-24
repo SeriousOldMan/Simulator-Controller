@@ -327,7 +327,7 @@ class RaceCenter extends ConfigurationItem {
 				local ignore, button
 
 				for ignore, button in ["LButton", "MButton", "RButton"]
-					if GetKeyState(button, "P")
+					if GetKeyState(button)
 						return Task.CurrentTask
 
 				this.iRedraw := false
@@ -2365,7 +2365,7 @@ class RaceCenter extends ConfigurationItem {
 			local window := this.Window
 			local token, connection, serverURLs, settings, chosen
 
-			if (!silent && GetKeyState("Ctrl", "P")) {
+			if (!silent && GetKeyState("Ctrl")) {
 				window.Block()
 
 				try {
@@ -4478,7 +4478,7 @@ class RaceCenter extends ConfigurationItem {
 					OnMessage(0x44, translateOkButton, 0)
 				}
 			case 6: ; Synchronize
-				if GetKeyState("Ctrl", "P") {
+				if GetKeyState("Ctrl") {
 					synchronizeMenu := Menu()
 
 					synchronizeMenu.Add(translate("Synchronize each..."), (*) => {})
@@ -4566,7 +4566,7 @@ class RaceCenter extends ConfigurationItem {
 
 		switch line {
 			case 3:
-				if GetKeyState("Ctrl", "P")
+				if GetKeyState("Ctrl")
 					this.selectStrategy(false)
 				else {
 					fileName := kUserConfigDirectory . "Race.strategy"
@@ -6058,7 +6058,7 @@ class RaceCenter extends ConfigurationItem {
 
 					this.showMessage(translate("Waiting for data"))
 
-					if ((tries <= 0) || GetKeyState("ESC", "P")) {
+					if ((tries <= 0) || GetKeyState("ESC")) {
 						this.showMessage(translate("Give up - use default values"))
 
 						newLaps.RemoveAt(lap.Nr, newLaps.Length - lap.Nr + 1)
@@ -6167,7 +6167,7 @@ class RaceCenter extends ConfigurationItem {
 
 						this.showMessage(translate("Waiting for data"))
 
-						if ((tries <= 0) || GetKeyState("ESC", "P")) {
+						if ((tries <= 0) || GetKeyState("ESC")) {
 							this.showMessage(translate("Give up - use default values"))
 
 							throw "No data..."
@@ -10334,7 +10334,7 @@ class RaceCenter extends ConfigurationItem {
 
 								this.showMessage(translate("Waiting for data"))
 
-								if ((tries <= 0) || GetKeyState("ESC", "P")) {
+								if ((tries <= 0) || GetKeyState("ESC")) {
 									this.showMessage(translate("Give up - use default values"))
 
 									throw "No data..."
@@ -12857,7 +12857,7 @@ startupRaceCenter() {
 
 		rCenter := RaceCenter(kSimulatorConfiguration, raceSettings)
 
-		if GetKeyState("Ctrl", "P")
+		if GetKeyState("Ctrl")
 			rCenter.iSynchronize := "Off"
 
 		rCenter.createGui(rCenter.Configuration)

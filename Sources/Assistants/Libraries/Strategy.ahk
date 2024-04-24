@@ -498,7 +498,7 @@ class StrategySimulation {
 
 		if (this.SessionType = "Duration")
 			for name, strategy in scenarios {
-				if (verbose && GetKeyState("Escape", "P"))
+				if (verbose && GetKeyState("Escape"))
 					throw StrategySimulation.CancelSimulation()
 
 				if verbose {
@@ -660,7 +660,7 @@ class StrategySimulation {
 		local name, strategy, message
 
 		for name, strategy in scenarios {
-			if (verbose && GetKeyState("Escape", "P"))
+			if (verbose && GetKeyState("Escape"))
 				throw StrategySimulation.CancelSimulation()
 
 			if this.validScenario(strategy) {
@@ -901,7 +901,7 @@ class VariationSimulation extends StrategySimulation {
 				loop { ; refuel
 					loop { ; tyreUsage
 						loop { ; tyreCompoundVariation
-							if (verbose && GetKeyState("Escape", "P"))
+							if (verbose && GetKeyState("Escape"))
 								throw StrategySimulation.CancelSimulation()
 
 							if useInitialConditions {
@@ -1283,7 +1283,7 @@ class TrafficSimulation extends StrategySimulation {
 					loop { ; refuel
 						loop { ; tyreUsage
 							loop { ; tyreCompoundVariation
-								if (verbose && GetKeyState("Escape", "P"))
+								if (verbose && GetKeyState("Escape"))
 									throw StrategySimulation.CancelSimulation()
 
 								if useInitialConditions {

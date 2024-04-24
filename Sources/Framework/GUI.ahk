@@ -1189,7 +1189,7 @@ class Window extends Gui {
 
 			if !synchronous {
 				for ignore, button in ["LButton", "MButton", "RButton"]
-					if GetKeyState(button, "P")
+					if GetKeyState(button)
 						return Task.CurrentTask
 
 				resizeTask := false
@@ -1379,7 +1379,7 @@ moveByMouse(window, descriptor := false, *) {
 		newX := winX
 		newY := winY
 
-		while GetKeyState("LButton", "P") {
+		while GetKeyState("LButton") {
 			MouseGetPos(&x, &y)
 
 			x := screen2Window(x)

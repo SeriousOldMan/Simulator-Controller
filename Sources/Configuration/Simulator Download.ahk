@@ -60,7 +60,7 @@ downloadSimulatorController() {
 				Sleep(1000)
 	}
 
-	cState := GetKeyState("Ctrl", "P")
+	cState := GetKeyState("Ctrl")
 
 	TraySetIcon(icon, "1")
 	A_IconTip := "Simulator Download"

@@ -796,7 +796,7 @@ showLaunchHint(state?) {
 	}
 	else
 		try {
-			if (GetKeyState("Esc", "P") || !GeneralStepWizard.CurrentGeneralStep) {
+			if (GetKeyState("Esc") || !GeneralStepWizard.CurrentGeneralStep) {
 				showLaunchHint(false)
 
 				if GeneralStepWizard.CurrentGeneralStep {

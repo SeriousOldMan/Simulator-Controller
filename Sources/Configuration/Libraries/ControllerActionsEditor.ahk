@@ -450,7 +450,7 @@ class PluginActionsList extends ConfigurationItemList {
 			local pictureFile
 
 			if this.CurrentItem
-				if GetKeyState("Ctrl", "P")
+				if GetKeyState("Ctrl")
 					deleteIcon()
 				else {
 					pictureFile := (this.CurrentIcon ? substituteVariables(this.CurrentIcon) : "")

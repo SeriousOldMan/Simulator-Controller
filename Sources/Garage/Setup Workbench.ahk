@@ -162,7 +162,7 @@ class SetupWorkbench extends ConfigurationItem {
 				local ignore, button
 
 				for ignore, button in ["LButton", "MButton", "RButton"]
-					if GetKeyState(button, "P")
+					if GetKeyState(button)
 						return Task.CurrentTask
 
 				this.iRedraw := false
@@ -620,7 +620,7 @@ class SetupWorkbench extends ConfigurationItem {
 			if (track = "*")
 				track := true
 
-			if !GetKeyState("Ctrl", "P")
+			if !GetKeyState("Ctrl")
 				this.clearCharacteristics()
 
 			this.Window.Block()
@@ -3420,7 +3420,7 @@ class FileSetupComparator extends SetupComparator {
 ;;;-------------------------------------------------------------------------;;;
 
 closeSetupWorkbench(*) {
-	if GetKeyState("Ctrl", "P")
+	if GetKeyState("Ctrl")
 		SetupWorkbench.Instance.saveState()
 
 	ExitApp(0)
@@ -3493,7 +3493,7 @@ startupSetupWorkbench() {
 
 		workbench.show()
 
-		if !GetKeyState("Ctrl", "P")
+		if !GetKeyState("Ctrl")
 			if simulator {
 				workbench.Window.Block()
 

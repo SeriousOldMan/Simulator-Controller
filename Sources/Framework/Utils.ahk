@@ -103,7 +103,7 @@ class TriggerDetectorContinuation extends Continuation {
 		if !this.Task.Stopped {
 			found := false
 
-			if GetKeyState("Esc", "P") {
+			if GetKeyState("Esc") {
 				this.stop()
 
 				return false
@@ -592,7 +592,7 @@ exitProcesses(title, message, silent := false, force := false, excludes := [], u
 			OnMessage(0x44, translator, 0)
 
 			if (msgResult = "Yes") {
-				if (GetKeyState("Ctrl", "P") && (force = "CANCEL"))
+				if (GetKeyState("Ctrl") && (force = "CANCEL"))
 					return true
 				else if !force
 					continue

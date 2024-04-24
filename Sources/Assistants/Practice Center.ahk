@@ -148,6 +148,9 @@ class PracticeCenter extends ConfigurationItem {
 	iSessionMode := false
 	iSessionExported := false
 
+	iAutoClear := false
+	iAutoExport := false
+
 	iDate := A_Now
 
 	iSession := "Practice"
@@ -232,17 +235,21 @@ class PracticeCenter extends ConfigurationItem {
 
 			if this.Closeable {
 				if (this.PracticeCenter.HasData && !this.PracticeCenter.SessionExported) {
-					translator := translateMsgBoxButtons.Bind(["Yes", "No", "Cancel"])
-
-					OnMessage(0x44, translator)
-					msgResult := withBlockedWindows(MsgBox, translate("Do you want to transfer your data to the session database before closing?"), translate("Export"), 262179)
-					OnMessage(0x44, translator, 0)
-
-					if (msgResult = "Yes")
+					if this.PracticeCenter.AutoExport
 						this.PracticeCenter.exportSession(true)
+					else {
+						translator := translateMsgBoxButtons.Bind(["Yes", "No", "Cancel"])
 
-					if (msgResult = "Cancel")
-						return true
+						OnMessage(0x44, translator)
+						msgResult := withBlockedWindows(MsgBox, translate("Do you want to transfer your data to the session database before closing?"), translate("Export"), 262179)
+						OnMessage(0x44, translator, 0)
+
+						if (msgResult = "Yes")
+							this.PracticeCenter.exportSession(true)
+
+						if (msgResult = "Cancel")
+							return true
+					}
 				}
 
 				return super.Close()
@@ -271,7 +278,7 @@ class PracticeCenter extends ConfigurationItem {
 				local ignore, button
 
 				for ignore, button in ["LButton", "MButton", "RButton"]
-					if GetKeyState(button, "P")
+					if GetKeyState(button)
 						return Task.CurrentTask
 
 				this.iRedraw := false
@@ -613,6 +620,26 @@ class PracticeCenter extends ConfigurationItem {
 		}
 	}
 
+	AutoClear {
+		Get {
+			return this.iAutoClear
+		}
+
+		Set {
+			return (this.iAutoClear := value)
+		}
+	}
+
+	AutoExport {
+		Get {
+			return this.iAutoExport
+		}
+
+		Set {
+			return (this.iAutoExport := value)
+		}
+	}
+
 	SessionExported {
 		Get {
 			return this.iSessionExported
@@ -933,6 +960,9 @@ class PracticeCenter extends ConfigurationItem {
 		this.iTrack := track
 
 		this.iSessionDirectory := (kTempDirectory . "Sessions\Practice\")
+
+		this.AutoClear := getMultiMapValue(settings, "Practice Center", "AutoClear", false)
+		this.AutoExport := getMultiMapValue(settings, "Practice Center", "AutoExport", false)
 
 		this.UseSessionData := getMultiMapValue(settings, "Practice Center", "UseSessionData", true)
 		this.UseTelemetryDatabase := getMultiMapValue(settings, "Practice Center", "UseTelemetryDatabase", false)
@@ -1607,17 +1637,21 @@ class PracticeCenter extends ConfigurationItem {
 
 		if (force || (simulator != this.Simulator)) {
 			if (!force && this.SessionActive && this.HasData && !this.SessionExported) {
-				OnMessage(0x44, translateYesNoButtons)
-				msgResult := withBlockedWindows(MsgBox, translate("You have unsaved data. Do you really want to continue?"), translate("Information"), 262436)
-				OnMessage(0x44, translateYesNoButtons, 0)
-
-				if (msgResult = "No") {
-					this.Control["simulatorDropDown"].Choose(inList(this.getAvailableSimulators(), this.Simulator))
-
-					return false
-				}
-				else
+				if this.AutoClear
 					this.clearSession(true)
+				else {
+					OnMessage(0x44, translateYesNoButtons)
+					msgResult := withBlockedWindows(MsgBox, translate("You have unsaved data. Do you really want to continue?"), translate("Information"), 262436)
+					OnMessage(0x44, translateYesNoButtons, 0)
+
+					if (msgResult = "No") {
+						this.Control["simulatorDropDown"].Choose(inList(this.getAvailableSimulators(), this.Simulator))
+
+						return false
+					}
+					else
+						this.clearSession(true)
+				}
 			}
 
 			this.iSimulator := simulator
@@ -1656,17 +1690,21 @@ class PracticeCenter extends ConfigurationItem {
 
 		if (force || (car != this.Car)) {
 			if (!force && this.SessionActive && this.HasData && !this.SessionExported) {
-				OnMessage(0x44, translateYesNoButtons)
-				msgResult := withBlockedWindows(MsgBox, translate("You have unsaved data. Do you really want to continue?"), translate("Information"), 262436)
-				OnMessage(0x44, translateYesNoButtons, 0)
-
-				if (msgResult = "No") {
-					this.Control["carDropDown"].Choose(inList(this.getAvailableCars(this.Simulator), this.Car))
-
-					return false
-				}
-				else
+				if this.AutoClear
 					this.clearSession(true)
+				else {
+					OnMessage(0x44, translateYesNoButtons)
+					msgResult := withBlockedWindows(MsgBox, translate("You have unsaved data. Do you really want to continue?"), translate("Information"), 262436)
+					OnMessage(0x44, translateYesNoButtons, 0)
+
+					if (msgResult = "No") {
+						this.Control["carDropDown"].Choose(inList(this.getAvailableCars(this.Simulator), this.Car))
+
+						return false
+					}
+					else
+						this.clearSession(true)
+				}
 			}
 
 			this.iCar := car
@@ -1696,17 +1734,21 @@ class PracticeCenter extends ConfigurationItem {
 
 		if (force || (track != this.Track)) {
 			if (!force && this.SessionActive && this.HasData && !this.SessionExported) {
-				OnMessage(0x44, translateYesNoButtons)
-				msgResult := withBlockedWindows(MsgBox, translate("You have unsaved data. Do you really want to continue?"), translate("Information"), 262436)
-				OnMessage(0x44, translateYesNoButtons, 0)
-
-				if (msgResult = "No") {
-					this.Control["trackDropDown"].Choose(inList(this.getAvailableTracks(simulator, car), this.Track))
-
-					return false
-				}
-				else
+				if this.AutoClear
 					this.clearSession(true)
+				else {
+					OnMessage(0x44, translateYesNoButtons)
+					msgResult := withBlockedWindows(MsgBox, translate("You have unsaved data. Do you really want to continue?"), translate("Information"), 262436)
+					OnMessage(0x44, translateYesNoButtons, 0)
+
+					if (msgResult = "No") {
+						this.Control["trackDropDown"].Choose(inList(this.getAvailableTracks(simulator, car), this.Track))
+
+						return false
+					}
+					else
+						this.clearSession(true)
+				}
 			}
 
 			simulator := this.Simulator
@@ -2158,8 +2200,11 @@ class PracticeCenter extends ConfigurationItem {
 	}
 
 	updateSessionMenu() {
+		local auto1 := ((this.AutoClear ? "[x] " : "[  ] ") . translate("Auto Clear"))
+		local auto2 := ((this.AutoExport ? "[x] " : "[  ] ") . translate("Auto Export"))
+
 		this.Control["sessionMenuDropDown"].Delete()
-		this.Control["sessionMenuDropDown"].Add(collect(["Session", "---------------------------------------------", "Clear...", "---------------------------------------------", "Load Session...", "Save Session...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Session Summary"], translate))
+		this.Control["sessionMenuDropDown"].Add(collect(["Session", "---------------------------------------------", auto1, auto2, "---------------------------------------------", "Clear...", "---------------------------------------------", "Load Session...", "Save Session...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Session Summary"], translate))
 
 		if !this.SessionExported
 			this.Control["sessionMenuDropDown"].Add(collect(["---------------------------------------------", "Export to Database..."], translate))
@@ -2168,8 +2213,8 @@ class PracticeCenter extends ConfigurationItem {
 	}
 
 	updateDataMenu() {
-		local use1 := (this.UseSessionData ? "(x) Use Session Data" : "      Use Session Data")
-		local use2 := (this.UseTelemetryDatabase ? "(x) Use Telemetry Database" : "      Use Telemetry Database")
+		local use1 := ((this.UseSessionData ? "[x] " : "[  ] ") . translate("Use Session Data"))
+		local use2 := ((this.UseTelemetryDatabase ? "[x] " : "[  ] ") . translate("Use Telemetry Database"))
 		local tyreCompounds := collect(this.AvailableTyreCompounds, translate)
 		local tyreCompound := translate(compound(this.TyreCompound["Data"], this.TyreCompoundColor["Data"]))
 		local weather := translate(this.Weather["Data"])
@@ -2179,10 +2224,10 @@ class PracticeCenter extends ConfigurationItem {
 		wConditions := weatherConditions.Clone()
 
 		loop wConditions.Length
-			wConditions[A_Index] := (((wConditions[A_Index] = weather) ? "(x) " : "      ") . wConditions[A_Index])
+			wConditions[A_Index] := (((wConditions[A_Index] = weather) ? "[x] " : "[  ] ") . wConditions[A_Index])
 
 		loop tyreCompounds.Length
-			tyreCompounds[A_Index] := (((tyreCompounds[A_Index] = tyreCompound) ? "(x) " : "      ") . tyreCompounds[A_Index])
+			tyreCompounds[A_Index] := (((tyreCompounds[A_Index] = tyreCompound) ? "[x] " : "[  ] ") . tyreCompounds[A_Index])
 
 		this.Control["dataMenuDropDown"].Delete()
 		this.Control["dataMenuDropDown"].Add(concatenate(collect(["Data", "---------------------------------------------"
@@ -2208,8 +2253,24 @@ class PracticeCenter extends ConfigurationItem {
 	chooseSessionMenu(line) {
 		local msgResult
 
+		updateSetting(setting, value) {
+			local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+			setMultiMapValue(settings, "Practice Center", setting, value)
+
+			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+		}
+
 		switch line {
-			case 3: ; Clear...
+			case 3: ; Auto Clear
+				this.AutoClear := !this.AutoClear
+
+				updateSetting("AutoClear", this.AutoClear)
+			case 4: ; Auto Export
+				this.AutoExport := !this.AutoExport
+
+				updateSetting("AutoExport", this.AutoExport)
+			case 6: ; Clear...
 				if this.SessionActive {
 					OnMessage(0x44, translateYesNoButtons)
 					msgResult := withBlockedWindows(MsgBox, translate("Do you really want to delete all data from the currently active session? This cannot be undone."), translate("Delete"), 262436)
@@ -2220,9 +2281,9 @@ class PracticeCenter extends ConfigurationItem {
 				}
 				else
 					this.clearSession()
-			case 5: ; Load Session...
+			case 8: ; Load Session...
 				this.loadSession()
-			case 6: ; Save Session...
+			case 9: ; Save Session...
 				if this.HasData
 					this.saveSession(true)
 				else {
@@ -2230,11 +2291,11 @@ class PracticeCenter extends ConfigurationItem {
 					withBlockedWindows(MsgBox, translate("There is no session data to be saved."), translate("Information"), 262192)
 					OnMessage(0x44, translateOkButton, 0)
 				}
-			case 8: ; Update Statistics
+			case 11: ; Update Statistics
 				this.updateStatistics()
-			case 10: ; Session Summary
+			case 13: ; Session Summary
 				this.showSessionSummary()
-			case 12: ; Export data
+			case 15: ; Export data
 				if (this.HasData && !this.SessionExported) {
 					OnMessage(0x44, translateYesNoButtons)
 					msgResult := withBlockedWindows(MsgBox, translate("Do you want to transfer the selected data to the session database? This is only possible once."), translate("Delete"), 262436)
@@ -6851,19 +6912,25 @@ class PracticeCenter extends ConfigurationItem {
 
 			try {
 				if (this.HasData && !this.SessionExported && (this.SessionMode != "Loaded")) {
-					translator := translateMsgBoxButtons.Bind(["Yes", "No", "Cancel"])
-
-					OnMessage(0x44, translator)
-					msgResult := withBlockedWindows(MsgBox, translate("You have unsaved data. Do you want to transfer it to the session database before starting a new session?"), translate("Export"), 262179)
-					OnMessage(0x44, translator, 0)
-
-					if (msgResult = "Yes")
+					if this.AutoExport
 						this.exportSession(true)
+					else if this.AutoClear
+						this.clearSession(true)
+					else {
+						translator := translateMsgBoxButtons.Bind(["Yes", "No", "Cancel"])
 
-					if (msgResult = "Cancel") {
-						this.iSessionMode := "Finished"
+						OnMessage(0x44, translator)
+						msgResult := withBlockedWindows(MsgBox, translate("You have unsaved data. Do you want to transfer it to the session database before starting a new session?"), translate("Export"), 262179)
+						OnMessage(0x44, translator, 0)
 
-						return
+						if (msgResult = "Yes")
+							this.exportSession(true)
+
+						if (msgResult = "Cancel") {
+							this.iSessionMode := "Finished"
+
+							return
+						}
 					}
 
 					this.clearSession(true)

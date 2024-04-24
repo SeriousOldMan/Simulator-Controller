@@ -847,7 +847,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	checkRestart() {
-		if GetKeyState("Ctrl", "P")
+		if GetKeyState("Ctrl")
 			throw "Restart"
 	}
 

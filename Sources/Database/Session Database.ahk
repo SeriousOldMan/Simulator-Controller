@@ -145,7 +145,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				local ignore, button
 
 				for ignore, button in ["LButton", "MButton", "RButton"]
-					if GetKeyState(button, "P")
+					if GetKeyState(button)
 						return Task.CurrentTask
 
 				this.iRedraw := false
@@ -811,7 +811,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				action := editor.findTrackAction(coordinateX, coordinateY)
 
 				if action {
-					if GetKeyState("Ctrl", "P") {
+					if GetKeyState("Ctrl") {
 						OnMessage(0x44, translateYesNoButtons)
 						msgResult := withBlockedWindows(MsgBox, translate("Do you really want to delete the selected action?"), translate("Delete"), 262436)
 						OnMessage(0x44, translateYesNoButtons, 0)
@@ -823,7 +823,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 						originalX := action.X
 						originalY := action.Y
 
-						while (GetKeyState("LButton", "P")) {
+						while (GetKeyState("LButton")) {
 							MouseGetPos(&x, &y)
 
 							x := screen2Window(x)
@@ -1033,7 +1033,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		exportSettings(*) {
 			local translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
-			local full := GetKeyState("Ctrl", "P")
+			local full := GetKeyState("Ctrl")
 			local folder
 
 			editor.Window.Opt("+OwnDialogs")
@@ -1043,7 +1043,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			OnMessage(0x44, translator, 0)
 
 			if (folder != "")
-				editor.exportSettings(folder . "\Export_" . A_Now, full || GetKeyState("Ctrl", "P"))
+				editor.exportSettings(folder . "\Export_" . A_Now, full || GetKeyState("Ctrl"))
 		}
 
 		importSettings(*) {
@@ -1114,7 +1114,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			persistent := false
 
-			if GetKeyState("Ctrl", "P") {
+			if GetKeyState("Ctrl") {
 				OnMessage(0x44, translateYesNoButtons)
 				msgResult := withBlockedWindows(MsgBox, translate("Do you really want to change the scope for all applications?"), translate("Modular Simulator Controller System"), 262436)
 				OnMessage(0x44, translateYesNoButtons, 0)
@@ -5400,7 +5400,7 @@ editSettings(editorOrCommand, arguments*) {
 			return
 		}
 
-		if GetKeyState("Ctrl", "P") {
+		if GetKeyState("Ctrl") {
 			settingsEditorGui.Block()
 
 			try {

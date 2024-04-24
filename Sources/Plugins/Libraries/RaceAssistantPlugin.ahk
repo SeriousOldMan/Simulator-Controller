@@ -1310,7 +1310,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	}
 
 	static finishAssistantsSession(shutdownAssistant := true, shutdownTeamSession := true) {
-		local restart := (GetKeyState("Shift", "P") && GetKeyState("Ctrl", "P"))
+		local restart := (GetKeyState("Shift") && GetKeyState("Ctrl"))
 		local session := this.Session
 		local finalizeAssistant := shutdownAssistant
 		local ignore, assistant
@@ -1760,7 +1760,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			this.iRaceAssistantEnabled := false
 
 			if this.RaceAssistant
-				this.finishSession(!(GetKeyState("Shift", "P") && GetKeyState("Ctrl", "P")))
+				this.finishSession(!(GetKeyState("Shift") && GetKeyState("Ctrl")))
 
 			this.updateTrayLabel(label, false)
 

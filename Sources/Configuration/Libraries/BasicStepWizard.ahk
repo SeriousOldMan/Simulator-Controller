@@ -148,8 +148,8 @@ class BasicStepWizard extends StepWizard {
 		chooseMethod(method, *) {
 			if (method = "Basic") {
 				/*
-				if (wizard.isBasicSetupAvailable() || GetKeyState("Ctrl", "P"))
-					this.BasicSetup := (GetKeyState("Ctrl", "P") ? "Force" : true)
+				if (wizard.isBasicSetupAvailable() || GetKeyState("Ctrl"))
+					this.BasicSetup := (GetKeyState("Ctrl") ? "Force" : true)
 				else
 					this.BasicSetup := false
 				*/
@@ -395,7 +395,7 @@ class BasicStepWizard extends StepWizard {
 		static installed := false
 
 		if (page = 2) {
-			fullInstall := (!installed && (!isDevelopment() || (GetKeyState("Ctrl", "P") && GetKeyState("Shift", "P"))))
+			fullInstall := (!installed && (!isDevelopment() || (GetKeyState("Ctrl") && GetKeyState("Shift"))))
 
 			wizard.selectModule("Voice Control", true, false)
 

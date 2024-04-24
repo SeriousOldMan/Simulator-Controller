@@ -20,11 +20,11 @@ copy "Virtual Race Strategist.md" ..\..\Controller.Wiki\Virtual-Race-Strategist.
 copy "Virtual Race Spotter.md" ..\..\Controller.Wiki\Virtual-Race-Spotter.md
 copy "Team Server.md" ..\..\Controller.Wiki\Team-Server.md
 copy "Setup Workbench.md" ..\..\Controller.Wiki\Setup-Workbench.md
-copy "Driving Coach Commands (EN).md" ..\..\Controller.Wiki\Drving-Coach-Commands-(EN).md
+copy "Driving Coach Commands (EN).md" ..\..\Controller.Wiki\Driving-Coach-Commands-(EN).md
 copy "Race Engineer Commands (EN).md" ..\..\Controller.Wiki\Race-Engineer-Commands-(EN).md
 copy "Race Strategist Commands (EN).md" ..\..\Controller.Wiki\Race-Strategist-Commands-(EN).md
 copy "Race Spotter Commands (EN).md" ..\..\Controller.Wiki\Race-Spotter-Commands-(EN).md
-copy "Driving Coach Commands (DE).md" ..\..\Controller.Wiki\Drving-Coach-Commands-(DE).md
+copy "Driving Coach Commands (DE).md" ..\..\Controller.Wiki\Driving-Coach-Commands-(DE).md
 copy "Race Engineer Commands (DE).md" ..\..\Controller.Wiki\Race-Engineer-Commands-(DE).md
 copy "Race Strategist Commands (DE).md" ..\..\Controller.Wiki\Race-Strategist-Commands-(DE).md
 copy "Race Spotter Commands (DE).md" ..\..\Controller.Wiki\Race-Spotter-Commands-(DE).md

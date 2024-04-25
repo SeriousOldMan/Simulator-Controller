@@ -1,15 +1,15 @@
 [Development]
-Version=5.6.8.0-dev
+Version=5.6.8.0-release
 Target=5.6.8.0-release
-Date=04/24/2024
-Download=https://www.dropbox.com/scl/fi/izyp5fmmtiumui1f0bln2/Simulator-Controller-5.6.8.0-dev.zip?rlkey=w3pxvz4rf6tmdx29k2m2fp341&st=039ofdj8&dl=1
+Date=04/26/2024
+Download=https://cutt.ly/2w6P0AvI;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.6.8.0-release.zip
 Changes=Changed appearance of checkable menu items, Added "Auto Clear" for the "Practice Center", Added "Auto Export" for the "Practice Center", New damage info component in "System Monitor", Exposed damage information in the "Session State.json" file, Migrated to AHK 2.0.13, Optimized inconsistent driver warning of the Spotter, New LLMConnector class library, Support logical key mapping of tools like Joy2Key
 Components=Media->5.6.1,Configuration->5.6.4,Utilities->5.4.8
 [Release]
-Version=5.6.7.0-release
-Date=04/19/2024
-Download=https://cutt.ly/xw5ayPd3;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.6.7.0-release.zip
-Changes=Added Debug code to detect localization problems for simulators, Display active startup profile in "Simulator Startup", Spotter starts track mapping after end of the first lap, Finished sessions will stay at least a week untouched on the Team Server, Removed "Save Session" from "Race Center" and "Practice Center", Accident detection tweaks, Better detection of active replay in iRacing, Fixed session info page in "System Monitor" when one or more Assistants are deactivated, Fixed "NextPitstop" action in autonomous mode, Configuration for callout frequency of the Spotter, Updated UI layout of "Simulator Setup" and "Simulator Configuration"
+Version=5.6.8.0-release
+Date=04/26/2024
+Download=https://cutt.ly/2w6P0AvI;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.6.8.0-release.zip
+Changes=Changed appearance of checkable menu items, Added "Auto Clear" for the "Practice Center", Added "Auto Export" for the "Practice Center", New damage info component in "System Monitor", Exposed damage information in the "Session State.json" file, Migrated to AHK 2.0.13, Optimized inconsistent driver warning of the Spotter, New LLMConnector class library, Support logical key mapping of tools
 Components=Media->5.6.1,Configuration->5.6.4,Utilities->5.4.8
 [Components]
 Media.5.6.1.Path=Resources
@@ -22,7 +22,7 @@ Utilities.5.4.8.Path=.
 Utilities.5.4.8.Content=Utilities
 Utilities.5.4.8.Download=https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+5.4.8.zip;https://www.dropbox.com/scl/fi/5nduffajjm3x6rhsxr1nk/Utilities-5.4.8.zip?rlkey=alrj8l2z205dd2vm9cu6hbsot&dl=1
 [Current]
-Type=Development
+Type=Release
 [Version]
-Development=5.6.8.0-dev
-Release=5.6.7.0-release
+Development=5.6.8.0-release
+Release=5.6.8.0-release

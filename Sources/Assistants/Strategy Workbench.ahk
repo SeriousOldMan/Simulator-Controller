@@ -1921,9 +1921,9 @@ class StrategyWorkbench extends ConfigurationItem {
 		local validators, ignore, fileName, validator
 
 		if this.FixedPitstops
-			settingsMenu.Push(translate("(x) Fixed Pitstops"))
+			settingsMenu.Push(translate("[x] Fixed Pitstops"))
 		else
-			settingsMenu.Push(translate("      Fixed Pitstops"))
+			settingsMenu.Push(translate("[  ] Fixed Pitstops"))
 
 		if (fileNames.Length > 0) {
 			settingsMenu.Push(translate("---------------------------------------------"))
@@ -1938,9 +1938,9 @@ class StrategyWorkbench extends ConfigurationItem {
 					validators.Push(validator)
 
 					if (validator = this.SelectedValidator)
-						settingsMenu.Push("(x) " . validator)
+						settingsMenu.Push("[x] " . validator)
 					else
-						settingsMenu.Push("      " . validator)
+						settingsMenu.Push("[  ] " . validator)
 				}
 			}
 		}

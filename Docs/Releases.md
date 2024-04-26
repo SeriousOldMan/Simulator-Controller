@@ -1,4 +1,4 @@
-## 5.6.8.0-release 04/26/24 (planned)
+## 5.6.8.0-release 04/26/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. The appearance of checkable menu items have been changed in many applications. It is now much more clear, wether a given menu item is a toggle switch.

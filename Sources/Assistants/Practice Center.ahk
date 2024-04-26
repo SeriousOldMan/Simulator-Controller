@@ -1421,8 +1421,8 @@ class PracticeCenter extends ConfigurationItem {
 		centerGui.SetFont("s8 Norm", "Arial")
 
 		centerGui.Add("DropDownList", "x195 yp-2 w180 Choose1 +0x200 vsessionMenuDropDown").OnEvent("Change", sessionMenu)
-		centerGui.Add("DropDownList", "x380 yp w180 Choose1 +0x200 vdataMenuDropDown").OnEvent("Change", dataMenu)
-		centerGui.Add("DropDownList", "x565 yp w180 Choose1 +0x200 vrunMenuDropDown").OnEvent("Change", runMenu)
+		centerGui.Add("DropDownList", "x380 yp w180 Choose1 +0x200 vrunMenuDropDown").OnEvent("Change", runMenu)
+		centerGui.Add("DropDownList", "x565 yp w180 Choose1 +0x200 vdataMenuDropDown").OnEvent("Change", dataMenu)
 
 		centerGui.SetFont("s8 Norm", "Arial")
 

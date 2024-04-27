@@ -292,8 +292,8 @@ AccidentAheadDistance.1=Attention, there is an accident in %distance% %unit%.
 AccidentAheadDistance.2=Accident ahead in %distance% %unit%.
 AccidentAheadDistance.3=Attention in %distance% %unit%, accident.
 AccidentBehind.1=There was an accident behind.
-AccidentBehind.2=Accident behind, this will give you some air.
-AccidentBehind.3=Behind was an accident. This will help us.
+AccidentBehind.2=Accident behind, this can give you some air.
+AccidentBehind.3=Behind was an accident. This may help us.
 // Flag Warnings //
 YellowFull.1=Full course yellow, full course yellow.
 YellowFull.2=Attention full course yellow.

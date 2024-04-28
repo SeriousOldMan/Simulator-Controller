@@ -1589,6 +1589,41 @@ class RaceSpotter extends GridRaceAssistant {
 				}
 			}
 
+		if (this.BestLapTime > 0) {
+			bestLapTime := Round(this.BestLapTime, 1)
+
+			if ((enoughData && (lastLap > (this.BaseLap + 2))) && (!this.SessionInfos.Has("BestLap") || (bestLapTime < this.SessionInfos["BestLap"]))) {
+				lapTime := (bestLapTime / 1000)
+
+				minute := Floor(lapTime / 60)
+
+				speaker.speakPhrase("BestLap", {time: speaker.number2Speech(lapTime, 1)
+											  , minute: minute, seconds: speaker.number2Speech((lapTime - (minute * 60)), 1)})
+
+				this.SessionInfos["BestLap"] := bestLapTime
+
+				return true
+			}
+			else
+				this.SessionInfos["BestLap"] := bestLapTime
+		}
+
+		if (this.LastTopSpeed > 0) {
+			lastTopSpeed := Round(convertUnit("Speed", this.LastTopSpeed))
+
+			if (!this.SessionInfos.Has("BestSpeed") || (lastTopSpeed > this.SessionInfos["BestSpeed"])) {
+				if (enoughData && (lastLap > (this.BaseLap + 2))) {
+					speaker.speakPhrase("BestSpeed", {speed: speaker.number2Speech(lastTopSpeed), unit: getUnit("Speed")})
+
+					this.SessionInfos["BestSpeed"] := lastTopSpeed
+
+					return true
+				}
+				else
+					this.SessionInfos["BestSpeed"] := lastTopSpeed
+			}
+		}
+
 		if (enoughData && (lastLap > (this.BaseLap + 2))) {
 			if ((remainingSessionLaps <= 3) && (Floor(remainingSessionLaps) > 1) && (this.Session = kSessionRace)) {
 				situation := "FinalLaps"
@@ -1615,37 +1650,6 @@ class RaceSpotter extends GridRaceAssistant {
 
 						return true
 					}
-				}
-			}
-
-			if (this.BestLapTime > 0) {
-				bestLapTime := Round(this.BestLapTime, 1)
-
-				if (!this.SessionInfos.Has("BestLap") || (bestLapTime < this.SessionInfos["BestLap"])) {
-					lapTime := (bestLapTime / 1000)
-
-					minute := Floor(lapTime / 60)
-
-					speaker.speakPhrase("BestLap", {time: speaker.number2Speech(lapTime, 1)
-												  , minute: minute, seconds: speaker.number2Speech((lapTime - (minute * 60)), 1)})
-
-					this.SessionInfos["BestLap"] := bestLapTime
-
-					return true
-				}
-				else
-					this.SessionInfos["BestLap"] := bestLapTime
-			}
-
-			if (this.LastTopSpeed > 0) {
-				lastTopSpeed := Round(convertUnit("Speed", this.LastTopSpeed))
-
-				if (!this.SessionInfos.Has("BestSpeed") || (lastTopSpeed > this.SessionInfos["BestSpeed"])) {
-					speaker.speakPhrase("BestSpeed", {speed: speaker.number2Speech(lastTopSpeed), unit: getUnit("Speed")})
-
-					this.SessionInfos["BestSpeed"] := lastTopSpeed
-
-					return true
 				}
 			}
 
@@ -2637,7 +2641,7 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 
 		if (!spoken && regular && ((method = kDeltaMethodStatic) || (method = kDeltaMethodBoth))) {
-			if (regular = "S")
+			if ((regular = "S") || (regular = "A"))
 				rnd := Random(1, 7)
 			else
 				rnd := Random(1, 9)
@@ -2651,6 +2655,8 @@ class RaceSpotter extends GridRaceAssistant {
 					spoken := this.standingsGapToBehind()
 				else if (focused && (rnd > 10))
 					spoken := this.focusGap()
+
+				spoken := false
 			}
 		}
 
@@ -2679,7 +2685,7 @@ class RaceSpotter extends GridRaceAssistant {
 						this.iLastDeltaInformationLap := lastLap
 
 					hadInfo := this.deltaInformation(lastLap, sector, positions
-												   , (deltaInformation = "A") || (deltaInformation = "S") || (lastLap = this.iLastDeltaInformationLap)
+												   , (deltaInformation = "A") ? "A" : ((deltaInformation = "S") ? "S" : (lastLap = this.iLastDeltaInformationLap))
 												   , this.Announcements["DeltaInformationMethod"])
 
 					if (hadInfo && (Random(1, 10) < 5))
@@ -2737,34 +2743,31 @@ class RaceSpotter extends GridRaceAssistant {
 	skipAlert(alert) {
 		if this.pendingAlerts(["AccidentAhead", "SlowCarAhead"], true)
 			return true
-		else if ((alert = "Hold") && this.pendingAlert("Clear", true))
-			return true
-		else if ((alert = "Left") && (this.pendingAlerts(["ClearAll", "ClearLeft", "Left", "Three"])))
-			return true
-		else if ((alert = "Right") && (this.pendingAlerts(["ClearAll", "ClearRight", "Right", "Three"])))
-			return true
-		else if ((alert = "Three") && this.pendingAlert("Clear", true))
-			return true
-		else if ((alert = "Side") && this.pendingAlert("Clear", true))
-			return true
-		else if ((alert = "ClearLeft") && this.pendingAlert("ClearLeft"))
-			return true
-		else if ((alert = "ClearRight") && this.pendingAlert("ClearRight"))
-			return true
-		else if (InStr(alert, "Clear") && this.pendingAlerts(["Left", "Right", "Three", "Side", "ClearAll"]))
-			return true
-		else if (InStr(alert, "Behind") && this.pendingAlerts(["Behind", "Left", "Right", "Three", "Clear"], true))
-			return true
-		else if (InStr(alert, "Yellow") && this.pendingAlert("YellowClear"))
-			return true
-		else if ((alert = "YellowClear") && this.pendingAlert("Yellow", true))
-			return true
+		else {
+			switch alert, false {
+				case "Hold":
+					return this.pendingAlert("Clear", true)
+				case "Left", "ClearLeft":
+					return this.pendingAlerts(["ClearAll", "ClearLeft", "Left", "Three"])
+				case "Right", "ClearRight":
+					return this.pendingAlerts(["ClearAll", "ClearRight", "Right", "Three"])
+				case "Three", "Side":
+					return this.pendingAlert("Clear", true)
+			}
 
-		return false
+			if (InStr(alert, "Clear") && this.pendingAlerts(["Left", "Right", "Three", "Side", "ClearAll"]))
+				return true
+			else if (InStr(alert, "Behind") && this.pendingAlerts(["Behind", "Left", "Right", "Three", "Clear"], true))
+				return true
+			else if (InStr(alert, "Yellow") && this.pendingAlert("Yellow", true))
+				return true
+
+			return false
+		}
 	}
 
 	superfluousAlert(alert) {
-		return ((InStr(alert, "Behind") && InStr(alert, "Accident")) && this.pendingAlerts(["Behind", "Left", "Right", "Three", "Clear"], true))
+		return (InStr(alert, "AccidentBehind") && this.pendingAlerts(["Behind", "Left", "Right", "Three", "Clear"], true))
 	}
 
 	pushAlert(alert, arguments*) {
@@ -3059,14 +3062,15 @@ class RaceSpotter extends GridRaceAssistant {
 
 	initializeSessionInfos(full := true) {
 		local sessionInfos := CaseInsenseMap()
-		local key, value
+		local key, value, ignore, candidate
 
 		static retainedInfos := ["StartSummary", "HalfTime", "BestLap", "BestSpeed"]
 
 		if !full {
 			for key, value in this.SessionInfos
-				if inList(retainedInfos, key)
-					sessionInfos[key] := value
+				for ignore, candidate in retainedInfos
+					if InStr(key, candidate)
+						sessionInfos[key] := value
 		}
 
 		this.SessionInfos := sessionInfos

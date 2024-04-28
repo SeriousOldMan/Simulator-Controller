@@ -1719,7 +1719,7 @@ class RaceSpotter extends GridRaceAssistant {
 				}
 			}
 
-			if (lastLap > 2) {
+			if (regular && (lastLap > 2)) {
 				this.getPositionInfos(&standingsAhead, &standingsBehind, &trackAhead, &trackBehind, &leader, &focused)
 
 				lapTime := false
@@ -1760,7 +1760,7 @@ class RaceSpotter extends GridRaceAssistant {
 						lapTime := false
 				}
 
-				if (!lapTime && regular && (this.Session == kSessionRace)) {
+				if (!lapTime && (this.Session == kSessionRace)) {
 					rnd := Random(1, 10)
 
 					if (rnd > 8) {
@@ -2655,8 +2655,6 @@ class RaceSpotter extends GridRaceAssistant {
 					spoken := this.standingsGapToBehind()
 				else if (focused && (rnd > 10))
 					spoken := this.focusGap()
-
-				spoken := false
 			}
 		}
 
@@ -2687,13 +2685,10 @@ class RaceSpotter extends GridRaceAssistant {
 					hadInfo := this.deltaInformation(lastLap, sector, positions
 												   , (deltaInformation = "A") ? "A" : ((deltaInformation = "S") ? "S" : (lastLap = this.iLastDeltaInformationLap))
 												   , this.Announcements["DeltaInformationMethod"])
-
-					if (hadInfo && (Random(1, 10) < 5))
-						hadInfo := false
 				}
 
-				if (sessionInfo && !hadInfo && this.Announcements["SessionInformation"]) {
-					hadInfo := this.sessionInformation(lastLap, sector, positions, true)
+				if this.Announcements["SessionInformation"] {
+					hadInfo := this.sessionInformation(lastLap, sector, positions, sessionInfo && !hadInfo)
 
 					if hadInfo
 						sessionInfo := false
@@ -2702,7 +2697,7 @@ class RaceSpotter extends GridRaceAssistant {
 					sessionInfo := true
 
 				if (!hadInfo && raceInfo && this.Announcements["TacticalAdvices"])
-					hadInfo := this.tacticalAdvice(lastLap, sector, positions, true)
+					this.tacticalAdvice(lastLap, sector, positions, true)
 			}
 		}
 	}

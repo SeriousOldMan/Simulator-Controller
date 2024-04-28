@@ -67,7 +67,7 @@ class CarInfo {
 	iInvalidLaps := 0
 	iIncidents := 0
 
-	iProblem := true
+	iProblem := false
 
 	Spotter {
 		Get {
@@ -2027,7 +2027,7 @@ class RaceSpotter extends GridRaceAssistant {
 				}
 			}
 
-			if (Random(1, 10) < 5) {
+			if (regular && (Random(1, 10) < 5)) {
 				driverPosition := this.DriverCar.Position["Class"]
 				driverLapTime := this.DriverCar.AvgLapTime
 				slowerCar := false
@@ -2696,8 +2696,8 @@ class RaceSpotter extends GridRaceAssistant {
 				else
 					sessionInfo := true
 
-				if (!hadInfo && raceInfo && this.Announcements["TacticalAdvices"])
-					this.tacticalAdvice(lastLap, sector, positions, true)
+				if (raceInfo && this.Announcements["TacticalAdvices"])
+					this.tacticalAdvice(lastLap, sector, positions, !hadInfo)
 			}
 		}
 	}

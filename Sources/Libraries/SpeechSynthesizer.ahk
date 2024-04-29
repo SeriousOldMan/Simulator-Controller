@@ -512,7 +512,7 @@ class SpeechSynthesizer {
 
 		static counter := 1
 
-		if options
+		if (options && !isInstance(options, Map))
 			options := toMap(options)
 
 		if (Trim(Text) = "")

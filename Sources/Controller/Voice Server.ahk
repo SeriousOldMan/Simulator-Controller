@@ -36,6 +36,7 @@
 #Include "..\Libraries\Messages.ahk"
 #Include "..\Libraries\SpeechSynthesizer.ahk"
 #Include "..\Libraries\SpeechRecognizer.ahk"
+#Include "..\Libraries\SpeechProcessor.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -117,11 +118,18 @@ class VoiceServer extends ConfigurationItem {
 		iVoiceCommands := CaseInsenseMap()
 
 		class ClientSpeechSynthesizer extends SpeechSynthesizer {
+			iParaphraser := false
 			iVoiceClient := false
 
 			Routing {
 				Get {
 					return this.VoiceClient.Routing
+				}
+			}
+
+			Paraphraser {
+				Get {
+					return this.iParaphraser
 				}
 			}
 
@@ -132,9 +140,32 @@ class VoiceServer extends ConfigurationItem {
 			}
 
 			__New(voiceClient, arguments*) {
+				local paraphraser := SpeechParaphraser(voiceClient.VoiceServer.Configuration)
+
+				if paraphraser.Model
+					this.iParaphraser := paraphraser
+
 				this.iVoiceClient := voiceClient
 
 				super.__New(arguments*)
+			}
+
+			speak(text, wait := true, cache := false, options := false) {
+				local paraphraser := this.Paraphraser
+
+				if paraphraser {
+					if options {
+						options := toMap(options)
+
+						if ((!options.Has("Paraphrase") || options["Paraphrase"])
+						 || (paraphraser.Language && !options.Has("Translate") || options["Tranlate"]))
+							text := paraphraser.paraphrase(text)
+					}
+					else
+						text := paraphraser.paraphrase(text)
+				}
+
+				super.speak(text, wait, cache, options)
 			}
 		}
 

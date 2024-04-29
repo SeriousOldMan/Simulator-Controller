@@ -121,6 +121,7 @@ class SpeechParaphraser extends ConfigurationItem {
 					throw "Unsupported service detected in SpeechParaphraser.startParaphraser..."
 				}
 
+			this.Connector.MaxHistory := 0
 			this.Connector.Temperature := this.Options["Temperature"]
 		}
 		else
@@ -133,14 +134,14 @@ class SpeechParaphraser extends ConfigurationItem {
 				if !this.Connector
 					this.startParaphraser()
 
-				instruction := "Rephrase the text after the three #"
+				instruction := "Rephrase the text after the three |"
 
 				if this.Language
 					instruction .= (" and translate it to " . this.Language)
 				else
 					instruction .= " and retain its original language"
 
-				instruction .= ". Do only answer with the new text. `n###`n"
+				instruction .= ". Do only answer with the new text. `n|||`n"
 
 				answer := this.Connector.Ask(instruction . text)
 

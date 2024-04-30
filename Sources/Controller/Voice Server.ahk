@@ -36,7 +36,7 @@
 #Include "..\Libraries\Messages.ahk"
 #Include "..\Libraries\SpeechSynthesizer.ahk"
 #Include "..\Libraries\SpeechRecognizer.ahk"
-#Include "..\Libraries\SpeechProcessor.ahk"
+#Include "..\Libraries\SpeechImprover.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -118,7 +118,7 @@ class VoiceServer extends ConfigurationItem {
 		iVoiceCommands := CaseInsenseMap()
 
 		class ClientSpeechSynthesizer extends SpeechSynthesizer {
-			iParaphraser := false
+			iImprover := false
 			iVoiceClient := false
 
 			Routing {
@@ -127,9 +127,9 @@ class VoiceServer extends ConfigurationItem {
 				}
 			}
 
-			Paraphraser {
+			Improver {
 				Get {
-					return this.iParaphraser
+					return this.iImprover
 				}
 			}
 
@@ -140,10 +140,10 @@ class VoiceServer extends ConfigurationItem {
 			}
 
 			__New(voiceClient, arguments*) {
-				local paraphraser := SpeechParaphraser(voiceClient.VoiceServer.Configuration)
+				local improver := SpeechImprover(voiceClient.VoiceServer.Configuration)
 
-				if paraphraser.Model
-					this.iParaphraser := paraphraser
+				if improver.Model
+					this.iImprover := improver
 
 				this.iVoiceClient := voiceClient
 
@@ -151,18 +151,17 @@ class VoiceServer extends ConfigurationItem {
 			}
 
 			speak(text, wait := true, cache := false, options := false) {
-				local paraphraser := this.Paraphraser
+				local improver := this.Improver
 
-				if paraphraser {
+				if improver {
 					if options {
 						options := toMap(options)
 
-						if ((!options.Has("Paraphrase") || options["Paraphrase"])
-						 || (paraphraser.Language && !options.Has("Translate") || options["Tranlate"]))
-							text := paraphraser.paraphrase(text)
+						text := improver.improve(text, {Rephrase: (!options.Has("Rephrase") || options["Rephrase"])
+													  , Translate: (improver.Language && !options.Has("Translate") || options["Tranlate"]))
 					}
 					else
-						text := paraphraser.paraphrase(text)
+						text := improver.improve(text)
 				}
 
 				super.speak(text, wait, cache, options)

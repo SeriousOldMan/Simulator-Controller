@@ -26,7 +26,7 @@
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class SpeechParaphraser extends ConfigurationItem {
+class SpeechRephraser extends ConfigurationItem {
 	iOptions := CaseInsenseMap()
 
 	iConnector := false
@@ -84,10 +84,10 @@ class SpeechParaphraser extends ConfigurationItem {
 
 		options := this.Options
 
-		options["Language"] := getMultiMapValue(configuration, "Voice Processing", "Paraphraser.Language", getMultiMapValue(configuration, "Paraphraser", "Language", this.Language))
-		options["Service"] := getMultiMapValue(configuration, "Voice Processing", "Paraphraser.Service", getMultiMapValue(configuration, "Paraphraser", "Service", false))
-		options["Model"] := getMultiMapValue(configuration, "Voice Processing", "Paraphraser.Model", getMultiMapValue(configuration, "Paraphraser", "Model", false))
-		options["Temperature"] := getMultiMapValue(configuration, "Voice Processing", "Paraphraser.Temperature", getMultiMapValue(configuration, "Paraphraser", "Temperature", 0.5))
+		options["Language"] := getMultiMapValue(configuration, "Voice Processing", "Rephraser.Language", getMultiMapValue(configuration, "Rephraser", "Language", this.Language))
+		options["Service"] := getMultiMapValue(configuration, "Voice Processing", "Rephraser.Service", getMultiMapValue(configuration, "Rephraser", "Service", false))
+		options["Model"] := getMultiMapValue(configuration, "Voice Processing", "Rephraser.Model", getMultiMapValue(configuration, "Rephraser", "Model", false))
+		options["Temperature"] := getMultiMapValue(configuration, "Voice Processing", "Rephraser.Temperature", getMultiMapValue(configuration, "Rephraser", "Temperature", 0.5))
 	}
 
 	getInstructions() {
@@ -97,7 +97,7 @@ class SpeechParaphraser extends ConfigurationItem {
 	connectorState(*) {
 	}
 
-	startParaphraser() {
+	startRephraser() {
 		local service := this.Options["Service"]
 		local ignore, instruction
 
@@ -105,7 +105,7 @@ class SpeechParaphraser extends ConfigurationItem {
 			service := string2Values("|", service)
 
 			if !inList(this.Providers, service[1])
-				throw "Unsupported service detected in SpeechParaphraser.startParaphraser..."
+				throw "Unsupported service detected in SpeechRephraser.startRephraser..."
 
 			if (service[1] = "LLM Runtime")
 				this.iConnector := LLMConnector.LLMRuntimeConnector(this, this.Options["Model"])
@@ -118,20 +118,20 @@ class SpeechParaphraser extends ConfigurationItem {
 				catch Any as exception {
 					logError(exception)
 
-					throw "Unsupported service detected in SpeechParaphraser.startParaphraser..."
+					throw "Unsupported service detected in SpeechRephraser.startRephraser..."
 				}
 
 			this.Connector.Temperature := this.Options["Temperature"]
 		}
 		else
-			throw "Unsupported service detected in SpeechParaphraser.startParaphraser..."
+			throw "Unsupported service detected in SpeechRephraser.startRephraser..."
 	}
 
-	paraphrase(text) {
+	rephrase(text) {
 		if this.Model {
 			try {
 				if !this.Connector
-					this.startParaphraser()
+					this.startRephraser()
 
 				instruction := "Rephrase the text after the three #"
 

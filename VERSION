@@ -1,9 +1,9 @@
 [Development]
 Version=5.6.9.0-dev
 Target=5.6.9.0-release
-Date=04/29/2024
+Date=04/30/2024
 Download=
-Changes=Added overtaking threshold gap for the Spotter, Rearranged info priority for the Spotter, New speech processor library for speech pre- and post-processing
+Changes=Added overtaking threshold gap for the Spotter, Rearranged info priority for the Spotter, New speech processor library for speech pre- and post-processing, Added speech post-processor configuration to "Simulator Setup"
 Components=Media->5.6.1,Configuration->5.6.4,Utilities->5.4.8
 [Release]
 Version=5.6.8.0-release

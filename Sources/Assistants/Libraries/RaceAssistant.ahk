@@ -188,7 +188,7 @@ class RaceAssistant extends ConfigurationItem {
 		__New(raceAssistant, name, options) {
 			this.iRaceAssistant := raceAssistant
 
-			super.__New(name, options)
+			super.__New(name, raceAssistant.Configuration, options)
 		}
 
 		getPhraseVariables(variables := false) {

@@ -21,6 +21,7 @@
 #Include "..\..\Libraries\Messages.ahk"
 #Include "..\..\Libraries\SpeechSynthesizer.ahk"
 #Include "..\..\Libraries\SpeechRecognizer.ahk"
+#Include "..\..\Libraries\SpeechImprover.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -37,7 +38,7 @@ global kDebugRecognitions := 4
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class VoiceManager {
+class VoiceManager extends ConfigurationItem {
 	iDebug := kDebugOff
 
 	iLanguage := "en"
@@ -210,6 +211,8 @@ class VoiceManager {
 		iFragments := CaseInsenseWeakMap()
 		iPhrases := CaseInsenseMap()
 
+		iImprover := false
+
 		iIsTalking := false
 		iText := ""
 		iFocus := false
@@ -223,6 +226,12 @@ class VoiceManager {
 		VoiceManager {
 			Get {
 				return this.iVoiceManager
+			}
+		}
+
+		Improver {
+			Get {
+				return this.iImprover
 			}
 		}
 
@@ -261,9 +270,18 @@ class VoiceManager {
 		}
 
 		__New(voiceManager, synthesizer, speaker, language, fragments, phrases) {
+			local improver
+
 			this.iVoiceManager := voiceManager
 			this.iFragments := fragments
 			this.iPhrases := phrases
+
+			if voiceManager.SpeakerImprover {
+				improver := SpeechImprover(voiceManager.SpeakerImprover, voiceManager.Configuration)
+
+				if improver.Model
+					this.iImprover := improver
+			}
 
 			super.__New(synthesizer, speaker, language)
 		}
@@ -290,7 +308,7 @@ class VoiceManager {
 		}
 
 		speak(text, focus := false, cache := false, options := false) {
-			local stopped
+			local improver, stopped
 
 			if this.Talking {
 				this.iText .= (A_Space . text)
@@ -303,6 +321,19 @@ class VoiceManager {
 				stopped := this.VoiceManager.stopListening()
 
 				try {
+					improver := this.Improver
+
+					if improver {
+						if options {
+							options := toMap(options)
+
+							text := improver.improve(text, {Rephrase: (!options.Has("Rephrase") || options["Rephrase"])
+														  , Translate: (improver.Language && !options.Has("Translate") || options["Tranlate"])})
+						}
+						else
+							text := improver.improve(text)
+					}
+
 					this.Speaking := true
 
 					try {
@@ -600,8 +631,10 @@ class VoiceManager {
 		}
 	}
 
-	__New(name, options) {
+	__New(name, configuration, options) {
 		this.iName := name
+
+		super.__New(configuration)
 
 		this.initialize(options)
 

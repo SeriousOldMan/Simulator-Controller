@@ -140,7 +140,7 @@ class VoiceServer extends ConfigurationItem {
 			}
 
 			__New(voiceClient, arguments*) {
-				local improver := SpeechImprover(voiceClient.VoiceServer.Configuration)
+				local improver := SpeechImprover(voiceClient.Routing, voiceClient.VoiceServer.Configuration)
 
 				if improver.Model
 					this.iImprover := improver
@@ -158,7 +158,7 @@ class VoiceServer extends ConfigurationItem {
 						options := toMap(options)
 
 						text := improver.improve(text, {Rephrase: (!options.Has("Rephrase") || options["Rephrase"])
-													  , Translate: (improver.Language && !options.Has("Translate") || options["Tranlate"]))
+													  , Translate: (improver.Language && !options.Has("Translate") || options["Tranlate"])})
 					}
 					else
 						text := improver.improve(text)

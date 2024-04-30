@@ -327,8 +327,8 @@ class VoiceManager extends ConfigurationItem {
 						if options {
 							options := toMap(options)
 
-							text := improver.improve(text, {Rephrase: (!options.Has("Rephrase") || options["Rephrase"])
-														  , Translate: (improver.Language && !options.Has("Translate") || options["Tranlate"])})
+							text := improver.improve(text, Map("Rephrase", (!options.Has("Rephrase") || options["Rephrase"])
+															 , "Translate", (improver.Language && !options.Has("Translate") || options["Tranlate"])))
 						}
 						else
 							text := improver.improve(text)

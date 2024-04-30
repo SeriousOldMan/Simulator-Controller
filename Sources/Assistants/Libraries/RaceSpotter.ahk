@@ -812,6 +812,12 @@ class RaceSpotter extends GridRaceAssistant {
 				}
 			}
 
+			Improver {
+				Get {
+					return false
+				}
+			}
+
 			Speaking {
 				Get {
 					return (this.iIsSpeaking || super.Speaking)

@@ -140,6 +140,9 @@ class SpeechImprover extends ConfigurationItem {
 
 		if this.Model {
 			if options {
+				if !isInstance(options, Map)
+					options := toMap(options)
+
 				rephrase := (!options.Has("Rephrase") || options["Rephrase"])
 				translate := (this.Language && !options.Has("Translate") || options["Tranlate"])
 			}

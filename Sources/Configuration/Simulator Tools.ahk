@@ -3025,25 +3025,30 @@ runBuildTargets(&buildProgress) {
 
 				options := " /base `"" . kAHKDirectory . "v2\AutoHotkey64.exe`""
 
-				if (gTargetConfiguration = "Production") {
-					SplitPath(targetSource, , &sourceDirectory)
+				loop 2 {
+					if (gTargetConfiguration = "Production") {
+						SplitPath(targetSource, , &sourceDirectory)
 
-					sourceCode := FileRead(targetSource)
+						sourceCode := FileRead(targetSource)
 
-					sourceCode := StrReplace(sourceCode, ";@SC-IF %configuration% == Development`r`n#Include `"..\Framework\Development.ahk`"`r`n;@SC-EndIF", "")
+						sourceCode := StrReplace(sourceCode, ";@SC-IF %configuration% == Development`r`n#Include `"..\Framework\Development.ahk`"`r`n;@SC-EndIF", "")
 
-					sourceCode := StrReplace(sourceCode, ";@SC #Include `"..\Framework\Production.ahk`"", "#Include `"..\Framework\Production.ahk`"")
+						sourceCode := StrReplace(sourceCode, ";@SC #Include `"..\Framework\Production.ahk`"", "#Include `"..\Framework\Production.ahk`"")
 
-					deleteFile(sourceDirectory . "\compile.ahk")
+						deleteFile(sourceDirectory . "\compile.ahk")
 
-					FileAppend(sourceCode, sourceDirectory . "\compile.ahk")
+						FileAppend(sourceCode, sourceDirectory . "\compile.ahk")
 
-					result := RunWait(kCompiler . options . " /in `"" . sourceDirectory . "\compile.ahk" . "`"")
+						result := RunWait(kCompiler . options . " /in `"" . sourceDirectory . "\compile.ahk" . "`"")
 
-					deleteFile(sourceDirectory . "\compile.ahk")
+						deleteFile(sourceDirectory . "\compile.ahk")
+					}
+					else
+						result := RunWait(kCompiler . options . " /in `"" . targetSource . "`"")
+
+					if !result
+						break
 				}
-				else
-					result := RunWait(kCompiler . options . " /in `"" . targetSource . "`"")
 			}
 			catch Any as exception {
 				logMessage(kLogCritical, translate("Cannot compile ") . targetSource . translate(" - source file or AHK Compiler (") . kCompiler . translate(") not found"))

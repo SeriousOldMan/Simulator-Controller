@@ -87,6 +87,7 @@ startupRaceSpotter() {
 	local spotterSynthesizer := true
 	local spotterSpeaker := false
 	local spotterSpeakerVocalics := false
+	local spotterSpeakerImprover := false
 	local spotterRecognizer := true
 	local spotterListener := false
 	local spotterMuted := false
@@ -122,6 +123,9 @@ startupRaceSpotter() {
 				index += 2
 			case "-SpeakerVocalics":
 				spotterSpeakerVocalics := A_Args[index + 1]
+				index += 2
+			case "-SpeakerImprover":
+				spotterSpeakerImprover := A_Args[index + 1]
 				index += 2
 			case "-Recognizer":
 				spotterRecognizer := A_Args[index + 1]
@@ -159,7 +163,7 @@ startupRaceSpotter() {
 	spotter := RaceSpotter(kSimulatorConfiguration
 						 , remotePID ? RaceSpotter.RaceSpotterRemoteHandler(remotePID) : false
 						 , spotterName, spotterLanguage
-						 , spotterSynthesizer, spotterSpeaker, spotterSpeakerVocalics
+						 , spotterSynthesizer, spotterSpeaker, spotterSpeakerVocalics, spotterSpeakerImprover
 						 , spotterRecognizer, spotterListener, spotterMuted, voiceServer)
 
 	RaceSpotter.Instance := spotter

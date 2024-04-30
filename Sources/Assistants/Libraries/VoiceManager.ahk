@@ -49,6 +49,7 @@ class VoiceManager {
 	iSpeakerVolume := 100
 	iSpeakerPitch := 0
 	iSpeakerSpeed := 0
+	iSpeakerImprover := false
 
 	iMuted := false
 
@@ -559,6 +560,12 @@ class VoiceManager {
 		}
 	}
 
+	SpeakerImprover {
+		Get {
+			return this.iSpeakerImprover
+		}
+	}
+
 	Grammars[key?] {
 		Get {
 			return (isSet(key) ? this.iGrammars[key] : this.iGrammars)
@@ -613,7 +620,7 @@ class VoiceManager {
 	shutdownVoiceManager(arguments*) {
 		if ((arguments.Length > 0) && inList(["Logoff", "Shutdown"], arguments[1]))
 			return false
-		
+
 		if (this.VoiceServer && this.iSpeechSynthesizer)
 			messageSend(kFileMessage, "Voice", "unregisterVoiceClient:" . values2String(";", this.Name, ProcessExist()), this.VoiceServer)
 
@@ -656,6 +663,9 @@ class VoiceManager {
 
 		if options.Has("SpeakerSpeed")
 			this.iSpeakerSpeed := options["SpeakerSpeed"]
+
+		if options.Has("Improver")
+			this.iSpeakerImprover := options["Improver"]
 
 		if options.Has("Recognizer")
 			this.iRecognizer := options["Recognizer"]
@@ -873,6 +883,7 @@ class VoiceManager {
 																					, this.Language, this.Synthesizer, this.Speaker
 																					, this.Recognizer, this.Listener
 																					, this.SpeakerVolume, this.SpeakerPitch, this.SpeakerSpeed
+																					, this.SpeakerImprover
 																					, mode)
 										, this.VoiceServer)
 

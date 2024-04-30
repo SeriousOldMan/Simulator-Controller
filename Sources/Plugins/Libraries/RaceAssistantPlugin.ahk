@@ -52,6 +52,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	iRaceAssistantSynthesizer := false
 	iRaceAssistantSpeaker := false
 	iRaceAssistantSpeakerVocalics := false
+	iRaceAssistantSpeakerImprover := false
 	iRaceAssistantRecognizer := false
 	iRaceAssistantListener := false
 	iRaceAssistantMuted := false
@@ -695,6 +696,12 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		}
 	}
 
+	RaceAssistantSpeakerImprover {
+		Get {
+			return this.iRaceAssistantSpeakerImprover
+		}
+	}
+
 	RaceAssistantRecognizer {
 		Get {
 			return this.iRaceAssistantRecognizer
@@ -861,6 +868,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 				if assistantSpeaker {
 					this.iRaceAssistantSpeakerVocalics := this.getArgumentValue("raceAssistantSpeakerVocalics", false)
+					this.iRaceAssistantSpeakerImprover := this.getArgumentValue("raceAssistantSpeakerImprover", false)
 
 					this.iRaceAssistantRecognizer := this.getArgumentValue("raceAssistantRecognizer", false)
 
@@ -1280,7 +1288,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 			for ignore, assistant in RaceAssistantPlugin.Assistants {
 				assistant.resetRaceAssistant()
-				
+
 				if assistant.requireRaceAssistant() {
 					settings := RaceAssistantPlugin.getSettings(assistant, data)
 
@@ -1789,7 +1797,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	createRaceAssistant(pid) {
 		return RaceAssistantPlugin.RemoteRaceAssistant(pid)
 	}
-	
+
 	resetRaceAssistant() {
 		this.clearSessionInfo()
 	}
@@ -1823,6 +1831,9 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 					if this.RaceAssistantSpeakerVocalics
 						options .= " -SpeakerVocalics `"" . this.RaceAssistantSpeakerVocalics . "`""
+
+					if this.RaceAssistantSpeakerImprover
+						options .= " -SpeakerImprover `"" . this.RaceAssistantSpeakerImprover . "`""
 
 					if this.RaceAssistantRecognizer
 						options .= " -Recognizer `"" . this.RaceAssistantRecognizer . "`""

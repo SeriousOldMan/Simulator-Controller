@@ -152,8 +152,10 @@ class DrivingCoach extends GridRaceAssistant {
 	}
 
 	__New(configuration, remoteHandler, name := false, language := kUndefined
-		, synthesizer := false, speaker := false, vocalics := false, recognizer := false, listener := false, muted := false, voiceServer := false) {
-		super.__New(configuration, "Driving Coach", remoteHandler, name, language, synthesizer, speaker, vocalics, recognizer, listener, muted, voiceServer)
+		, synthesizer := false, speaker := false, vocalics := false, improver := false
+		, recognizer := false, listener := false, muted := false, voiceServer := false) {
+		super.__New(configuration, "Driving Coach", remoteHandler, name, language, synthesizer, speaker, vocalics, improver
+												  , recognizer, listener, muted, voiceServer)
 
 		this.updateConfigurationValues({Announcements: {SessionInformation: true, StintInformation: false, HandlingInformation: false}})
 
@@ -460,7 +462,7 @@ class DrivingCoach extends GridRaceAssistant {
 		if answer {
 			if this.Speaker
 				if this.VoiceManager.UseTalking
-					this.getSpeaker().speak(answer, false, false, {Noise: false, Paraphrase: false})
+					this.getSpeaker().speak(answer, false, false, {Noise: false, Rephrase: false})
 				else
 					for ignore, part in string2Values(". ", answer)
 						this.getSpeaker().speak(part . ".", false, false, {Noise: false, Click: (A_Index = 1)})

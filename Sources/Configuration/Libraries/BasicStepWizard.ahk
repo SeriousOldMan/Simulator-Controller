@@ -199,6 +199,10 @@ class BasicStepWizard extends StepWizard {
 			this.editSynthesizer(assistant)
 		}
 
+		editImprover(assistant, *) {
+			this.editImprover(assistant)
+		}
+
 		updateP2T(*) {
 			if (window["basicPushToTalkModeDropDown"].Value = 3) {
 				window["basicPushToTalkEdit"].Enabled := false
@@ -314,10 +318,13 @@ class BasicStepWizard extends StepWizard {
 		widget43 := window.Add("Edit", "xp+114 yp w96 VbasicDCNameEdit Hidden", "Aiden")
 		widget44 := window.Add("DropDownList", "xp+98 yp w96 VbasicDCLanguageDropDown Hidden")
 		widget44.OnEvent("Change", loadVoice.Bind("Driving Coach"))
-		widget45 := window.Add("DropDownList", "xp+98 yp w333 W:Grow VbasicDCVoiceDropDown Hidden")
-		widget46 := window.Add("Button", "xp+335 yp-1 w23 h23 X:Move vbasicDCSettingsButton Hidden")
+		widget45 := window.Add("DropDownList", "xp+98 yp w309 W:Grow VbasicDCVoiceDropDown Hidden")
+		widget46 := window.Add("Button", "xp+311 yp-1 w23 h23 X:Move vbasicDCSettingsButton Hidden")
 		widget46.OnEvent("Click", editSynthesizer.Bind("Driving Coach"))
 		setButtonIcon(widget46, kIconsDirectory . "General Settings.ico", 1)
+		widget47 := window.Add("Button", "xp+24 yp w23 h23 X:Move vbasicDCImproverButton Hidden")
+		widget47.OnEvent("Click", editImprover.Bind("Driving Coach"))
+		setButtonIcon(widget47, kIconsDirectory . "Improver.ico", 1, "L4 T4 R4 B4")
 
 		widget14 := window.Add("CheckBox", "x" . x . " yp+24 w16 h23 vbasicREEnabledCheck Hidden" . (wizard.isModuleSelected("Race Engineer") ? " Checked" : ""))
 		widget14.OnEvent("Click", updateAssistant.Bind("Race Engineer"))
@@ -325,10 +332,13 @@ class BasicStepWizard extends StepWizard {
 		widget16 := window.Add("Edit", "xp+114 yp w96 VbasicRENameEdit Hidden", "Jona")
 		widget17 := window.Add("DropDownList", "xp+98 yp w96 VbasicRELanguageDropDown Hidden")
 		widget17.OnEvent("Change", loadVoice.Bind("Race Engineer"))
-		widget18 := window.Add("DropDownList", "xp+98 yp w333 W:Grow VbasicREVoiceDropDown Hidden")
-		widget19 := window.Add("Button", "xp+335 yp-1 w23 h23 X:Move vbasicRESettingsButton Hidden")
+		widget18 := window.Add("DropDownList", "xp+98 yp w309 W:Grow VbasicREVoiceDropDown Hidden")
+		widget19 := window.Add("Button", "xp+311 yp-1 w23 h23 X:Move vbasicRESettingsButton Hidden")
 		widget19.OnEvent("Click", editSynthesizer.Bind("Race Engineer"))
 		setButtonIcon(widget19, kIconsDirectory . "General Settings.ico", 1)
+		widget48 := window.Add("Button", "xp+24 yp w23 h23 X:Move vbasicREImproverButton Hidden")
+		widget48.OnEvent("Click", editImprover.Bind("Race Engineer"))
+		setButtonIcon(widget48, kIconsDirectory . "Improver.ico", 1, "L4 T4 R4 B4")
 
 		widget20 := window.Add("CheckBox", "x" . x . " yp+24 w16 h23 vbasicRSEnabledCheck Hidden" . (wizard.isModuleSelected("Race Strategist") ? " Checked" : ""))
 		widget20.OnEvent("Click", updateAssistant.Bind("Race Strategist"))
@@ -336,10 +346,13 @@ class BasicStepWizard extends StepWizard {
 		widget22 := window.Add("Edit", "xp+114 yp w96 VbasicRSNameEdit Hidden", "Khato")
 		widget23 := window.Add("DropDownList", "xp+98 yp w96 VbasicRSLanguageDropDown Hidden")
 		widget23.OnEvent("Change", loadVoice.Bind("Race Strategist"))
-		widget24 := window.Add("DropDownList", "xp+98 yp w333 W:Grow VbasicRSVoiceDropDown Hidden")
-		widget25 := window.Add("Button", "xp+335 yp-1 w23 h23 X:Move vbasicRSSettingsButton Hidden")
+		widget24 := window.Add("DropDownList", "xp+98 yp w309 W:Grow VbasicRSVoiceDropDown Hidden")
+		widget25 := window.Add("Button", "xp+311 yp-1 w23 h23 X:Move vbasicRSSettingsButton Hidden")
 		widget25.OnEvent("Click", editSynthesizer.Bind("Race Strategist"))
 		setButtonIcon(widget25, kIconsDirectory . "General Settings.ico", 1)
+		widget49 := window.Add("Button", "xp+24 yp w23 h23 X:Move vbasicRSImproverButton Hidden")
+		widget49.OnEvent("Click", editImprover.Bind("Race Strategist"))
+		setButtonIcon(widget49, kIconsDirectory . "Improver.ico", 1, "L4 T4 R4 B4")
 
 		widget26 := window.Add("CheckBox", "x" . x . " yp+24 w16 h23 vbasicRSPEnabledCheck Hidden" . (wizard.isModuleSelected("Race Spotter") ? " Checked" : ""))
 		widget26.OnEvent("Click", updateAssistant.Bind("Race Spotter"))
@@ -347,10 +360,13 @@ class BasicStepWizard extends StepWizard {
 		widget28 := window.Add("Edit", "xp+114 yp w96 VbasicRSPNameEdit Hidden", "Elisa")
 		widget29 := window.Add("DropDownList", "xp+98 yp w96 VbasicRSPLanguageDropDown Hidden")
 		widget29.OnEvent("Change", loadVoice.Bind("Race Spotter"))
-		widget30 := window.Add("DropDownList", "xp+98 yp w333 W:Grow VbasicRSPVoiceDropDown Hidden")
-		widget31 := window.Add("Button", "xp+335 yp-1 w23 h23 X:Move vbasicRSPSettingsButton Hidden")
+		widget30 := window.Add("DropDownList", "xp+98 yp w309 W:Grow VbasicRSPVoiceDropDown Hidden")
+		widget31 := window.Add("Button", "xp+311 yp-1 w23 h23 X:Move vbasicRSPSettingsButton Hidden")
 		widget31.OnEvent("Click", editSynthesizer.Bind("Race Spotter"))
 		setButtonIcon(widget31, kIconsDirectory . "General Settings.ico", 1)
+		widget50 := window.Add("Button", "xp+24 yp w23 h23 X:Move vbasicRSPImproverButton Hidden")
+		widget50.OnEvent("Click", editImprover.Bind("Race Spotter"))
+		setButtonIcon(widget50, kIconsDirectory . "Improver.ico", 1, "L4 T4 R4 B4")
 
 		widget36 := window.Add("HTMLViewer", "x" . x . " yp+30 w" . width . " h95 W:Grow H:Grow(0.8) Hidden")
 
@@ -366,7 +382,7 @@ class BasicStepWizard extends StepWizard {
 		setButtonIcon(widget37, kResourcesDirectory . "\Setup\Images\Finish Line.png", 1, "w80 h53")
 		widget37.OnEvent("Click", finishSetup)
 
-		loop 46
+		loop 50
 			this.registerWidget(2, widget%A_Index%)
 	}
 
@@ -439,6 +455,8 @@ class BasicStepWizard extends StepWizard {
 		super.showPage(page)
 
 		if (page = 2) {
+			this.Control["basicDCImproverButton"].Enabled := false
+
 			if (this.Control["basicPushToTalkModeDropDown"].Value = 3) {
 				this.Control["basicPushToTalkEdit"].Enabled := false
 				this.Control["basicPushToTalkEdit"].Value := ""
@@ -583,11 +601,24 @@ class BasicStepWizard extends StepWizard {
 			return false
 	}
 
+	assistantImprover(assistant, editor := true) {
+		local improver
+
+		if this.SetupWizard.isModuleSelected("Voice Control") {
+			improver := this.SetupWizard.getModuleValue(assistant, "Improver", this.assistantDefaults(assistant).Improver)
+
+			return (improver ? (isInstance(improver, Map) ? improver : string2Map("|||", "--->>>", improver)) : false)
+		}
+		else
+			return false
+	}
+
 	assistantSetup(assistant, editor := true) {
 		return {Enabled: this.assistantEnabled(assistant, editor), Name: this.assistantName(assistant, editor)
 			  , Language: this.assistantLanguage(assistant, editor), Synthesizer: this.assistantSynthesizer(assistant, editor)
 			  , Voice: this.assistantVoice(assistant, editor)
-			  , Volume: this.assistantVolume(assistant), Pitch: this.assistantPitch(assistant), Speed: this.assistantSpeed(assistant)}
+			  , Volume: this.assistantVolume(assistant), Pitch: this.assistantPitch(assistant), Speed: this.assistantSpeed(assistant)
+			  , Improver: this.assistantImprover(assistant)}
 	}
 
 	assistantDefaults(assistant) {
@@ -595,7 +626,7 @@ class BasicStepWizard extends StepWizard {
 		local defaults := {}
 		local ignore, key
 
-		for ignore, key in ["Name", "Synthesizer", "Voice", "Volume", "Pitch", "Speed"]
+		for ignore, key in ["Name", "Synthesizer", "Voice", "Volume", "Pitch", "Speed", "Improver"]
 			defaults.%key% := getMultiMapValue(wizard.Definition, "Setup.Basic", "Basic.Defaults." . assistant . "." . key)
 
 		return defaults
@@ -796,6 +827,12 @@ class BasicStepWizard extends StepWizard {
 
 			for ignore, value in ["Name", "Language", "Synthesizer", "Voice", "Volume", "Pitch", "Speed"]
 				wizard.setModuleValue(assistant, value, assistantSetups.%key%.%value%, false)
+
+			if assistantSetups.%key%.HasProp("Improver")
+				wizard.setModuleValue(assistant, "Improver"
+									, assistantSetups.%key%.Improver ? map2String("|||", "--->>>", assistantSetups.%key%.Improver) : false, false)
+			else
+				wizard.setModuleValue(assistant, "Improver", false, false)
 		}
 
 		setMultiMapValue(voiceConfiguration, "Voice Control", "Language", getLanguage())
@@ -879,6 +916,47 @@ class BasicStepWizard extends StepWizard {
 				wizard.setModuleValue(assistant, "Volume", getMultiMapValue(configuration, "Voice Control", "SpeakerVolume"))
 				wizard.setModuleValue(assistant, "Pitch", getMultiMapValue(configuration, "Voice Control", "SpeakerPitch"))
 				wizard.setModuleValue(assistant, "Speed", getMultiMapValue(configuration, "Voice Control", "SpeakerSpeed"))
+
+				this.loadAssistant(assistant)
+			}
+		}
+		finally {
+			window.Unblock()
+		}
+	}
+
+	editImprover(assistant) {
+		local wizard := this.SetupWizard
+		local window := this.Window
+		local configuration, setup
+
+		window.Block()
+
+		try {
+			this.saveSetup()
+
+			configuration := newMultiMap()
+
+			setup := this.assistantSetup(assistant)
+
+			setMultiMapValues(configuration, "Voice Improver", getMultiMapValues(kSimulatorConfiguration, "Voice Improver"), false)
+
+			if (setup.HasProp("Improver") && setup.Improver) {
+				; setMultiMapValue(configuration, "Voice Improver", assistant . ".Language", setup.Language)
+				setMultiMapValue(configuration, "Voice Improver", assistant . ".Service", setup.Improver["Service"])
+				setMultiMapValue(configuration, "Voice Improver", assistant . ".Model", setup.Improver["Model"])
+				setMultiMapValue(configuration, "Voice Improver", assistant . ".Temperature", setup.Improver["Temperature"])
+			}
+
+			configuration := VoiceImproverEditor(this, assistant, configuration).editImprover(window)
+
+			if configuration {
+				improver := Map("Language", getMultiMapValue(configuration, "Voice Improver", assistant . ".Language", false)
+							  , "Service", getMultiMapValue(configuration, "Voice Improver", assistant . ".Service")
+						      , "Model", getMultiMapValue(configuration, "Voice Improver", assistant . ".Model")
+						      , "Temperature", getMultiMapValue(configuration, "Voice Improver", assistant . ".Temperature"))
+
+				wizard.setModuleValue(assistant, "Improver", map2String("|||", "--->>>", improver))
 
 				this.loadAssistant(assistant)
 			}
@@ -1648,6 +1726,362 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 		}
 	}
 }
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; VoiceImproverEditor                                                     ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class VoiceImproverEditor extends ConfiguratorPanel {
+	iResult := false
+
+	iStepWizard := false
+	iAssistant := false
+
+	iWindow := false
+
+	iProviderConfigurations := CaseInsenseMap()
+	iCurrentProvider := false
+
+	StepWizard {
+		Get {
+			return this.iStepWizard
+		}
+	}
+
+	Assistant {
+		Get {
+			return this.iAssistant
+		}
+	}
+
+	Window {
+		Get {
+			return this.iWindow
+		}
+	}
+
+	Providers {
+		Get {
+			return ["OpenAI", "Azure", "GPT4All", "LLM Runtime"]
+		}
+	}
+
+	Models[provider] {
+		Get {
+			if (provider = "OpenAI")
+				return ["GPT 3.5 turbo 1106", "GPT 4", "GPT 4 32k", "GPT 4 1106 preview"]
+			else if (provider = "Azure")
+				return ["GPT 3.5", "GPT 3.5 turbo", "GPT 4", "GPT 4 32k"]
+			else
+				return []
+		}
+	}
+
+	__New(stepWizard, assistant, configuration := false) {
+		this.iAssistant := assistant
+		this.iStepWizard := stepWizard
+
+		super.__New(configuration)
+	}
+
+	createGui(configuration) {
+		local choices := []
+		local chosen := 0
+		local x := 8
+		local width := 460
+		local editorGui, x0, x1, x2, w1, w2, x3, w3, x4, w4
+		local x0, x1, x2, x3, x4, x5, x6, w1, w2, w3, w4, lineX, lineW
+
+		validateTemperature(*) {
+			local field := this.Control["viTemperatureEdit"]
+			local value := field.Text
+
+			if (!isInteger(value) || (value < 0) || (value > 100)) {
+				field.Text := (field.HasProp("ValidText") ? field.ValidText : "")
+
+				loop 10
+					SendInput("{Right}")
+			}
+			else
+				field.ValidText := field.Text
+		}
+
+		chooseProvider(*) {
+			this.saveProviderConfiguration()
+
+			this.loadProviderConfiguration(editorGui["viProviderDropDown"].Text)
+
+			this.updateState()
+		}
+
+		editorGui := Window({Descriptor: "Improver Editor", Options: "0x400000"}, "")
+
+		this.iWindow := editorGui
+
+		editorGui.SetFont("Bold", "Arial")
+
+		editorGui.Add("Text", "w468 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(editorGui, "Improver Editor"))
+
+		editorGui.SetFont("Norm", "Arial")
+
+		editorGui.Add("Documentation", "x178 YP+20 w128 H:Center Center", translate("Speech Improver")
+					, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control")
+
+		editorGui.SetFont("Norm", "Arial")
+
+		editorGui.Add("Text", "x8 yp+30 w468 W:Grow 0x10")
+
+		x0 := x + 8
+		x1 := x + 132
+		x2 := x + 172
+		x3 := x + 176
+
+		w1 := width - (x1 - x + 8)
+		w3 := width - (x3 - x + 16) + 10
+
+		w2 := w1 - 24
+		x4 := x1 + w2 + 1
+
+		w4 := w1 - 24
+		x6 := x1 + w4 + 1
+
+		editorGui.SetFont("Italic", "Arial")
+		widget1 := editorGui.Add("Text", "x" . x0 . " yp+10 w105 h23", translate("Service "))
+		widget2 := editorGui.Add("Text", "x100 yp+7 w" . (width + 8 - 100) . " 0x10 W:Grow")
+		editorGui.SetFont("Norm", "Arial")
+
+		widget3 := editorGui.Add("Text", "x" . x0 . " yp+20 w105 h23 +0x200", translate("Provider / URL"))
+
+		widget4 := editorGui.Add("DropDownList", "x" . x1 . " yp w100 Choose1 vviProviderDropDown", this.Providers)
+		widget4.OnEvent("Change", chooseProvider)
+
+		widget5 := editorGui.Add("Edit", "x" . (x1 + 102) . " yp w" . (w1 - 102) . " h23 vviServiceURLEdit")
+
+		widget6 := editorGui.Add("Text", "x" . x0 . " yp+24 w105 h23 +0x200", translate("Service Key"))
+		widget7 := editorGui.Add("Edit", "x" . x1 . " yp w" . w1 . " h23 vviServiceKeyEdit")
+
+		widget8 := editorGui.Add("Text", "x" . x0 . " yp+30 w105 h23 +0x200", translate("Model"))
+		widget9 := editorGui.Add("ComboBox", "x" . x1 . " yp w" . (w1 - 64) . " vviModelDropDown")
+
+		editorGui.SetFont("Italic", "Arial")
+		widget12 := editorGui.Add("Text", "x" . x0 . " yp+40 w105 h23", translate("Personality"))
+		widget13 := editorGui.Add("Text", "x100 yp+7 w" . (width + 8 - 100) . " 0x10 W:Grow")
+		editorGui.SetFont("Norm", "Arial")
+
+		widget14 := editorGui.Add("Text", "x" . x0 . " yp+20 w105 h23 +0x200", translate("Creativity"))
+		widget15 := editorGui.Add("Edit", "x" . x1 . " yp w60 Number Limit3 vviTemperatureEdit")
+		widget15.OnEvent("Change", validateTemperature)
+		widget16 := editorGui.Add("UpDown", "x" . x1 . " yp w60 h23 Range0-100")
+		widget17 := editorGui.Add("Text", "x" . (x1 + 65) . " yp w100 h23 +0x200", translate("%"))
+
+		editorGui.Add("Text", "x8 yp+35 w468 W:Grow 0x10")
+
+		editorGui.Add("Button", "x160 yp+10 w80 h23 Default", translate("Ok")).OnEvent("Click", (*) => this.iResult := kOk)
+		editorGui.Add("Button", "x246 yp w80 h23", translate("&Cancel")).OnEvent("Click", (*) => this.iResult := kCancel)
+	}
+
+	loadModels(provider, model) {
+		local index
+
+		this.Control["viModelDropDown"].Delete()
+		this.Control["viModelDropDown"].Add(this.Models[provider])
+
+		if model {
+			index := inList(this.Models[provider], model)
+
+			if !index {
+				this.Control["viModelDropDown"].Add([model])
+				this.Control["viModelDropDown"].Choose(this.Models[provider].Length + 1)
+			}
+			else
+				this.Control["viModelDropDown"].Choose(index)
+		}
+		else
+			this.Control["viModelDropDown"].Choose(inList(this.Models[provider], "GPT 3.5 turbo 1106"))
+	}
+
+	loadFromConfiguration(configuration) {
+		local service, ignore, provider, setting, providerConfiguration
+
+		static defaults := CaseInsenseWeakMap("ServiceURL", false, "Model", false, "Temperature", 0.5)
+
+		super.loadFromConfiguration(configuration)
+
+		service := getMultiMapValue(configuration, "Voice Improver", this.Assistant . ".Service", false)
+
+		if !service
+			this.iCurrentProvider := "OpenAI"
+		else
+			this.iCurrentProvider := string2Values("|", service)[1]
+
+		for ignore, provider in this.Providers {
+			providerConfiguration := CaseInsenseMap()
+
+			if (provider = this.iCurrentProvider) {
+				providerConfiguration["Model"] := getMultiMapValue(configuration, "Voice Improver", this.Assistant . ".Model", "")
+				providerConfiguration["Temperature"] := getMultiMapValue(configuration, "Voice Improver", this.Assistant . ".Temperature", 0.5)
+
+				if (provider = "LLM Runtime") {
+					providerConfiguration["ServiceURL"] := ""
+					providerConfiguration["ServiceKey"] := ""
+				}
+				else {
+					providerConfiguration["ServiceURL"] := string2Values("|", service)[2]
+					providerConfiguration["ServiceKey"] := string2Values("|", service)[3]
+				}
+			}
+			else {
+				for ignore, setting in ["ServiceURL", "ServiceKey", "Model"]
+					providerConfiguration[setting] := getMultiMapValue(configuration, "Voice Improver", provider . "." . setting, defaults[setting])
+
+				if !providerConfiguration["ServiceURL"]
+					switch provider, false {
+						case "OpenAI":
+							providerConfiguration["ServiceURL"] := "https://api.openai.com/v1/chat/completions"
+						case "Azure":
+							providerConfiguration["ServiceURL"] := "__YOUR_AZURE_OPENAI_ENDPOINT__/openai/deployments/%model%/chat/completions?api-version=2023-05-15"
+						case "GPT4All":
+							providerConfiguration["ServiceURL"] := "http://localhost:4891/v1"
+							providerConfiguration["ServiceKey"] := "Any text will do the job"
+						case "LLM Runtime":
+							providerConfiguration["ServiceURL"] := ""
+							providerConfiguration["ServiceKey"] := ""
+					}
+
+				if ((providerConfiguration["Model"] = "") && inList(this.Models[provider], "GPT 3.5 turbo 1106"))
+					providerConfiguration["Model"] := "GPT 3.5 turbo 1106"
+
+				for ignore, setting in ["Temperature"]
+					providerConfiguration[setting] := getMultiMapValue(configuration, "Voice Improver", provider . "." . setting, defaults[setting])
+			}
+
+			this.iProviderConfigurations[provider] := providerConfiguration
+		}
+	}
+
+	saveToConfiguration(configuration) {
+		local provider, value
+
+		super.saveToConfiguration(configuration)
+
+		this.saveProviderConfiguration()
+
+		for ignore, provider in this.Providers {
+			providerConfiguration := this.iProviderConfigurations[provider]
+
+			for ignore, setting in ["ServiceURL", "ServiceKey", "Model"]
+				setMultiMapValue(configuration, "Voice Improver", provider . "." . setting, providerConfiguration[setting])
+
+			for ignore, setting in ["Temperature"] {
+				setMultiMapValue(configuration, "Voice Improver", provider . "." . setting, providerConfiguration[setting])
+
+				if (provider = this.iCurrentProvider)
+					setMultiMapValue(configuration, "Voice Improver", this.Assistant . "." . setting, providerConfiguration[setting])
+			}
+		}
+
+		provider := this.iCurrentProvider
+		providerConfiguration := this.iProviderConfigurations[provider]
+
+		for ignore, setting in ["Model"]
+			setMultiMapValue(configuration, "Voice Improver", this.Assistant . "." . setting, providerConfiguration[setting])
+
+		if (provider = "LLM Runtime")
+			setMultiMapValue(configuration, "Voice Improver", this.Assistant . ".Service", provider)
+		else
+			setMultiMapValue(configuration, "Voice Improver", this.Assistant . ".Service"
+										  , values2String("|", provider, Trim(providerConfiguration["ServiceURL"])
+																	   , Trim(providerConfiguration["ServiceKey"])))
+	}
+
+	loadProviderConfiguration(provider := false) {
+		local configuration
+
+		if provider
+			this.Control["viProviderDropDown"].Choose(inList(this.Providers, provider))
+
+		this.iCurrentProvider := this.Control["viProviderDropDown"].Text
+
+		if this.iProviderConfigurations.Has(this.iCurrentProvider)
+			configuration := this.iProviderConfigurations[this.iCurrentProvider]
+
+		for ignore, setting in ["ServiceURL", "ServiceKey"]
+			this.Control["vi" . setting . "Edit"].Text := configuration[setting]
+
+		if ((provider = "GPT4All") && (Trim(this.Control["viServiceKeyEdit"].Text) = "")
+								   && (Trim(this.Control["viServiceURLEdit"].Text) = "http://localhost:4891/v1"))
+			this.Control["viServiceKeyEdit"].Text := "Any text will do the job"
+
+		this.Control["viTemperatureEdit"].Text := Round(configuration["Temperature"] * 100)
+
+		this.loadModels(this.iCurrentProvider, configuration["Model"])
+	}
+
+	saveProviderConfiguration() {
+		local providerConfiguration := this.iProviderConfigurations[this.iCurrentProvider]
+		local value, ignore, setting
+
+		providerConfiguration["ServiceURL"] := Trim(this.Control["viServiceURLEdit"].Text)
+		providerConfiguration["ServiceKey"] := Trim(this.Control["viServiceKeyEdit"].Text)
+
+		value := this.Control["viModelDropDown"].Text
+
+		providerConfiguration["Model"] := ((Trim(value) != "") ? Trim(value) : false)
+
+		providerConfiguration["Temperature"] := Round(this.Control["viTemperatureEdit"].Text / 100, 2)
+	}
+
+	loadConfigurator(configuration, simulators := false) {
+		this.loadFromConfiguration(configuration)
+
+		this.loadProviderConfiguration(this.iCurrentProvider)
+
+		this.updateState()
+	}
+
+	editImprover(owner := false) {
+		local window, x, y, w, h, configuration
+
+		this.createGui(this.Configuration)
+
+		window := this.Window
+
+		if owner
+			window.Opt("+Owner" . owner.Hwnd)
+
+		if getWindowPosition("Improver Editor", &x, &y)
+			window.Show("x" . x . " y" . y)
+		else
+			window.Show()
+
+		this.loadConfigurator(this.Configuration)
+
+		loop
+			Sleep(200)
+		until this.iResult
+
+		try {
+			if (this.iResult = kOk) {
+				configuration := newMultiMap()
+
+				this.saveToConfiguration(configuration)
+
+				return configuration
+			}
+			else
+				return false
+		}
+		finally {
+			window.Destroy()
+		}
+	}
+
+	updateState() {
+		this.Control["viServiceURLEdit"].Enabled := (this.Control["viProviderDropDown"].Text != "LLM Runtime")
+		this.Control["viServiceKeyEdit"].Enabled := (this.Control["viProviderDropDown"].Text != "LLM Runtime")
+	}
+}
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;

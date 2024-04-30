@@ -66,7 +66,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 	saveToConfiguration(configuration) {
 		local wizard := this.SetupWizard
 		local assistantActive := false
-		local function, action, ignore, assistant, assistantConfiguration, section, subConfiguration, arguments, voice
+		local function, action, ignore, assistant, assistantConfiguration, section, subConfiguration, arguments, voice, improver
 		local actions
 
 		super.saveToConfiguration(configuration)
@@ -140,6 +140,18 @@ class AssistantsStepWizard extends ActionsStepWizard {
 						arguments .= ("; raceAssistantSpeakerVocalics: " . values2String(",", wizard.getModuleValue(assistant, "Volume", "*")
 																							, wizard.getModuleValue(assistant, "Pitch", "*")
 																							, wizard.getModuleValue(assistant, "Speed", "*")))
+
+					improver := wizard.getModuleValue(assistant, "Improver", false)
+
+					if improver {
+						improver := string2Map("|||", "--->>>", improver)
+
+						arguments .= ("; raceAssistantSpeakerImprover: " . assistant)
+
+						setMultiMapValue(configuration, "Voice Improver", assistant . ".Service", improver["Service"])
+						setMultiMapValue(configuration, "Voice Improver", assistant . ".Model", improver["Model"])
+						setMultiMapValue(configuration, "Voice Improver", assistant . ".Temperature", improver["Temperature"])
+					}
 				}
 				else
 					arguments .= "; raceAssistantSpeaker: Off"

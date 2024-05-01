@@ -719,6 +719,9 @@ namespace RF2SHMSpotter {
 
 		double bestLapTime = int.MaxValue;
 
+		int completedLaps = 0;
+		int numAccidents = 0;
+
         bool checkAccident(ref rF2VehicleScoring playerScoring)
         {
 			bool accident = false;
@@ -749,6 +752,16 @@ namespace RF2SHMSpotter {
                 for (int i = 0; i < idealLine.Count; i++)
                     idealLine[i].clear();
             }
+	
+			if (playerScoring.mTotalLaps > completedLaps) {
+				if (numAccidents >= (scoring.mScoringInfo.mLapDist / 4)) {
+					for (int i = 0; i < idealLine.Count; i++)
+						idealLine[i].clear();
+				}
+				
+				completedLaps = playerScoring.mTotalLaps;
+				numAccidents = 0;
+			}
 
             try
 			{
@@ -822,6 +835,8 @@ namespace RF2SHMSpotter {
                             nextSlowCarAhead = cycle + 200;
 
 							SendSpotterMessage("accidentAlert:Ahead;" + distance);
+							
+							numAccidents += 1;
 
 							return true;
 						}
@@ -843,6 +858,8 @@ namespace RF2SHMSpotter {
                             nextAccidentBehind = cycle + 200;
 
                             SendSpotterMessage("slowCarAlert:" + distance);
+							
+							numAccidents += 1;
 
 							return true;
 						}
@@ -863,6 +880,8 @@ namespace RF2SHMSpotter {
 							nextAccidentBehind = cycle + 400;
 
 							SendSpotterMessage("accidentAlert:Behind;" + distance);
+							
+							numAccidents += 1;
 
 							return true;
 						}
@@ -1305,12 +1324,15 @@ namespace RF2SHMSpotter {
 
 				int completedLaps = playerScoring.mTotalLaps;
 
-				if (lastCompletedLaps != completedLaps)
+				if (lastCompletedLaps != completedLaps) {
+					lastCompletedLaps = completedLaps;
+					
 					while (true)
 						if (cornerDynamicsList[0].CompletedLaps < completedLaps - 2)
 							cornerDynamicsList.RemoveAt(0);
 						else
 							break;
+				}
 			}
 
             return true;

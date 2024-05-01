@@ -709,7 +709,7 @@ void updateTrackSpline() {
 				if (buildTrackSpline->size() > 100 && fabs(newPosX - startPosX) < 30.0 && fabs(newPosY - startPosY) < 30.0) {
 					trackSplineBuilding = false;
 
-					if ((gf->iLastTime > 0) && ((gf->iLastTime * 1.002) < bestLapTime)) {
+					if (!trackSplineReady || ((gf->iLastTime > 0) && ((gf->iLastTime * 1.002) < bestLapTime))) {
 						bestLapTime = gf->iLastTime;
 
 						int length = idealLine.size();
@@ -752,7 +752,7 @@ void updateTrackSpline() {
 					}
 				}
 				else {
-					string key = std::to_string((long)round(newPosX / 10)) + "|" + std::to_string((long)round(newPosY / 10));
+					string key = std::to_string((long)round(newPosX / 5)) + "|" + std::to_string((long)round(newPosY / 5));
 
 					if (!buildTrackSpline->contains(key)) {
 						buildTrackSplineRunning += distance;
@@ -860,8 +860,8 @@ bool startTrackSplineBuilder(int driverIdx) {
 float getRunning(int carIdx) {
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
-	string key = std::to_string((long)round(gf->carCoordinates[carIdx][0] / 10)) + "|" +
-				 std::to_string((long)round(gf->carCoordinates[carIdx][2] / 10));
+	string key = std::to_string((long)round(gf->carCoordinates[carIdx][0] / 5)) + "|" +
+				 std::to_string((long)round(gf->carCoordinates[carIdx][2] / 5));
 
 	if (activeTrackSpline->contains(key)) {
 		float distance = activeTrackSpline->at(key).distance;
@@ -935,10 +935,13 @@ double getAverageSpeed(double running) {
 	return idealLine[index].getSpeed();
 }
 
+int completedLaps = 0;
+int numAccidents = 0;
+
 bool checkAccident() {
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 	bool accident = false;
-
+	
 	if (gf->isInPit || gf->isInPitLane) {
 		trackSplineBuilding = false;
 
@@ -946,6 +949,25 @@ bool checkAccident() {
 		bestLapTime = LONG_MAX;
 
 		return false;
+	}
+	
+	if (gf->completedLaps > completedLaps) {
+		if (numAccidents >= (trackLength / 4)) {
+			trackSplineBuilding = false;
+			trackSplineReady = false;
+
+			int length = idealLine.size();
+
+			for (int i = 0; i < length; i++)
+				idealLine[i].clear();
+
+			updateLastCarCoordinates(true);
+			
+			return false;
+		}
+		
+		completedLaps = gf->completedLaps;
+		numAccidents = 0;
 	}
 
 	int carID = gf->playerCarID;
@@ -1146,7 +1168,9 @@ bool checkAccident() {
 					strcat_s(message, numBuffer);
 
 					sendSpotterMessage(message);
-
+					
+					numAccidents += 1;
+					
 					return true;
 				}
 			}
@@ -1172,6 +1196,8 @@ bool checkAccident() {
 					strcat_s(message, numBuffer);
 
 					sendSpotterMessage(message);
+					
+					numAccidents += 1;
 
 					return true;
 				}
@@ -1197,6 +1223,8 @@ bool checkAccident() {
 					strcat_s(message, numBuffer);
 
 					sendSpotterMessage(message);
+					
+					numAccidents += 1;
 
 					return true;
 				}

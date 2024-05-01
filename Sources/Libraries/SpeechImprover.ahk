@@ -53,6 +53,12 @@ class SpeechImprover extends ConfigurationItem {
 		}
 	}
 
+	Code {
+		Get {
+			return this.Options["Code"]
+		}
+	}
+
 	Language {
 		Get {
 			return this.Options["Language"]
@@ -78,10 +84,27 @@ class SpeechImprover extends ConfigurationItem {
 	}
 
 	__New(descriptor, configuration, language := false) {
+		local allLanguages, index
+
 		this.Options["Descriptor"] := descriptor
 		this.Options["Language"] := language
 
 		super.__New(configuration)
+
+		if this.Language {
+			allLanguages := availableLanguages()
+
+			if allLanguages.Has(this.Language) {
+				this.Options["Code"] := this.Language
+				this.Options["Language"] := allLanguages[this.Language]
+			}
+			else if inList(getValues(allLanguages), this.Language)
+				this.Options["Code"] := getKeys(allLanguages)[inList(getValues(allLanguages), this.Language)]
+			else
+				this.Options["Code"] := false
+		}
+		else
+			this.Options["Code"] := false
 	}
 
 	loadFromConfiguration(configuration) {
@@ -135,35 +158,42 @@ class SpeechImprover extends ConfigurationItem {
 	}
 
 	improve(text, options := false) {
-		local rephrase := true
-		local translate := (this.Language != false)
+		local doRephrase, doTranslate, code, language
 
 		if this.Model {
+			code := this.Code
+			language := this.Language
+			doRephrase := true
+			doTranslate := (language != false)
+
 			if options {
 				if !isInstance(options, Map)
 					options := toMap(options)
 
-				rephrase := (!options.Has("Rephrase") || options["Rephrase"])
-				translate := (this.Language && !options.Has("Translate") || options["Tranlate"])
+				doRephrase := (!options.Has("Rephrase") || options["Rephrase"])
+				doTranslate := (language && (!options.Has("Translate") || options["Translate"]))
+
+				if options.Has("Language")
+					code := options["Language"]
 			}
 
-			if (rephrase || translate) {
+			if (doRephrase || doTranslate) {
 				try {
 					if !this.Connector
 						this.startImprover()
 
-					if rephrase {
-						instruction := "Rephrase the text after the three |"
+					if doRephrase {
+						instruction := translate("Rephrase the text after the three |", code)
 
-						if translate
-							instruction .= (" and translate it to " . this.Language)
-						else
-							instruction .= " and retain its original language"
+						if doTranslate
+							instruction .= (translate(" and translate it to ", code) . language)
+						else if (this.Code && (this.Code != code))
+							instruction .= translate(" and retain its original language", code)
 					}
 					else
-						instruction := ("Translate the text after the three | to " . this.Language)
+						instruction := (translate("Translate the text after the three | to ", code) . language)
 
-					instruction .= ". Do only answer with the new text. `n|||`n"
+					instruction .= (translate(". Do only answer with the new text.", code) . " `n|||`n")
 
 					answer := this.Connector.Ask(instruction . text)
 

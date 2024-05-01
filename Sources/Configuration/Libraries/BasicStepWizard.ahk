@@ -953,8 +953,7 @@ class BasicStepWizard extends StepWizard {
 			if configuration {
 				writeMultiMap(kUserHomeDirectory . "Setup\Voice Improver Configuration.ini", configuration)
 
-				improver := Map("Language", getMultiMapValue(configuration, "Voice Improver", assistant . ".Language", false)
-							  , "Service", getMultiMapValue(configuration, "Voice Improver", assistant . ".Service")
+				improver := Map("Service", getMultiMapValue(configuration, "Voice Improver", assistant . ".Service")
 						      , "Model", getMultiMapValue(configuration, "Voice Improver", assistant . ".Model")
 						      , "Temperature", getMultiMapValue(configuration, "Voice Improver", assistant . ".Temperature"))
 

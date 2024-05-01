@@ -158,7 +158,7 @@ class VoiceServer extends ConfigurationItem {
 			speak(text, wait := true, cache := false, options := false) {
 				local improver := this.Improver
 
-				if improver {
+				if (improver && (Random(1, 10) > 5)) {
 					if options {
 						options := toMap(options)
 

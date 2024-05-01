@@ -372,6 +372,20 @@ Using *Activation Command* you can supply a keyword or a complete phrase to focu
 
 Note: You can use the [Trigger Detector Tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#trigger-detector-tool) to find out, which button codes your connected controller actually use, by clicking the small button on the right side of the *Push-To-Talk* entry field. If you push a simple button on your external controller or a single key on your keyboard, the corresponding hotkey name will be inserted into the *Push-To-Talk* edit field.
 
+##### Speech improvement using AI
+
+The voice recognition for all Assistants, except the Driving Coach is normally pattern-based. [Here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Engineer-Commands-(EN)) you can find a documentation for the definition of the recognized commands of the Race Engineer, for example, and similar documentation is available for the other Assistants as well. The speech output of all Assistants is also prep-programmed with several different phrases for each message, to create at least a little variation.
+
+Said this, it is clear, that the interaction with the Assistants, will not feel absolutely natural. But using the latest development in AI with LLMs (aka large language model) it became possible to improve the speech capabilities of the Assistants even further. Whenever you see a small button with an icon which looks like a small rocket, you configure AI pre- and post-processing for voice control and speech output.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%207%20Speech%20Improvement.JPG)
+
+Please take a look at the documentation for the [Driving Coach](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#installation) for a description of the different provider which can be configured here.
+
+The initial implementation will be used to create more variations in the speech output of the Assistants. This is done by using a GPT to rephrase one of the pre-defined phrases. Using the creativity setting, you can define, who *strong* the rephrasing will be. According to my tests, 50% will create some variation without altering the original sense of the message.
+
+Note: Using a GPT service like OpenAI may impose some costs, and running an LLM locally on your PC will require a very powerful system, especially when doing this while on the track. Therefore, configuring speech improvement is fully optional.
+
 #### Tab *Plugins*
 
 In this tab you can configure the plugins currently in use by the Simulator Controller.

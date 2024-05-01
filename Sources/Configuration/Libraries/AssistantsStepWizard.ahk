@@ -71,6 +71,10 @@ class AssistantsStepWizard extends ActionsStepWizard {
 
 		super.saveToConfiguration(configuration)
 
+		setMultiMapValues(configuration, "Voice Improver"
+									   , getMultiMapValues(readMultiMap(kUserHomeDirectory . "Setup\Voice Improver Configuration.ini")
+														 , "Voice Improver"), false)
+
 		for ignore, assistant in this.Definition
 			if wizard.isModuleSelected(assistant) {
 				assistantActive := true

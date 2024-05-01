@@ -21,6 +21,7 @@
 #Include "..\..\Libraries\Messages.ahk"
 #Include "..\..\Libraries\SpeechSynthesizer.ahk"
 #Include "..\..\Libraries\SpeechRecognizer.ahk"
+#Include "..\..\Libraries\SpeechImprover.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -37,7 +38,7 @@ global kDebugRecognitions := 4
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class VoiceManager {
+class VoiceManager extends ConfigurationItem {
 	iDebug := kDebugOff
 
 	iLanguage := "en"
@@ -49,6 +50,7 @@ class VoiceManager {
 	iSpeakerVolume := 100
 	iSpeakerPitch := 0
 	iSpeakerSpeed := 0
+	iSpeakerImprover := false
 
 	iMuted := false
 
@@ -209,6 +211,8 @@ class VoiceManager {
 		iFragments := CaseInsenseWeakMap()
 		iPhrases := CaseInsenseMap()
 
+		iImprover := false
+
 		iIsTalking := false
 		iText := ""
 		iFocus := false
@@ -222,6 +226,12 @@ class VoiceManager {
 		VoiceManager {
 			Get {
 				return this.iVoiceManager
+			}
+		}
+
+		Improver {
+			Get {
+				return this.iImprover
 			}
 		}
 
@@ -260,9 +270,18 @@ class VoiceManager {
 		}
 
 		__New(voiceManager, synthesizer, speaker, language, fragments, phrases) {
+			local improver
+
 			this.iVoiceManager := voiceManager
 			this.iFragments := fragments
 			this.iPhrases := phrases
+
+			if voiceManager.SpeakerImprover {
+				improver := SpeechImprover(voiceManager.SpeakerImprover, voiceManager.Configuration)
+
+				if improver.Model
+					this.iImprover := improver
+			}
 
 			super.__New(synthesizer, speaker, language)
 		}
@@ -289,7 +308,7 @@ class VoiceManager {
 		}
 
 		speak(text, focus := false, cache := false, options := false) {
-			local stopped
+			local improver, stopped
 
 			if this.Talking {
 				this.iText .= (A_Space . text)
@@ -302,6 +321,20 @@ class VoiceManager {
 				stopped := this.VoiceManager.stopListening()
 
 				try {
+					improver := this.Improver
+
+					if (improver && (Random(1, 10) > 5)) {
+						if options {
+							options := toMap(options)
+
+							text := improver.improve(text, Map("Language", this.VoiceManager.Language
+															 , "Rephrase", (!options.Has("Rephrase") || options["Rephrase"])
+															 , "Translate", (improver.Language && !options.Has("Translate") || options["Tranlate"])))
+						}
+						else
+							text := improver.improve(text, Map("Language", this.VoiceManager.Language))
+					}
+
 					this.Speaking := true
 
 					try {
@@ -559,6 +592,12 @@ class VoiceManager {
 		}
 	}
 
+	SpeakerImprover {
+		Get {
+			return this.iSpeakerImprover
+		}
+	}
+
 	Grammars[key?] {
 		Get {
 			return (isSet(key) ? this.iGrammars[key] : this.iGrammars)
@@ -593,8 +632,10 @@ class VoiceManager {
 		}
 	}
 
-	__New(name, options) {
+	__New(name, configuration, options) {
 		this.iName := name
+
+		super.__New(configuration)
 
 		this.initialize(options)
 
@@ -613,7 +654,7 @@ class VoiceManager {
 	shutdownVoiceManager(arguments*) {
 		if ((arguments.Length > 0) && inList(["Logoff", "Shutdown"], arguments[1]))
 			return false
-		
+
 		if (this.VoiceServer && this.iSpeechSynthesizer)
 			messageSend(kFileMessage, "Voice", "unregisterVoiceClient:" . values2String(";", this.Name, ProcessExist()), this.VoiceServer)
 
@@ -656,6 +697,9 @@ class VoiceManager {
 
 		if options.Has("SpeakerSpeed")
 			this.iSpeakerSpeed := options["SpeakerSpeed"]
+
+		if options.Has("Improver")
+			this.iSpeakerImprover := options["Improver"]
 
 		if options.Has("Recognizer")
 			this.iRecognizer := options["Recognizer"]
@@ -873,6 +917,7 @@ class VoiceManager {
 																					, this.Language, this.Synthesizer, this.Speaker
 																					, this.Recognizer, this.Listener
 																					, this.SpeakerVolume, this.SpeakerPitch, this.SpeakerSpeed
+																					, this.SpeakerImprover
 																					, mode)
 										, this.VoiceServer)
 

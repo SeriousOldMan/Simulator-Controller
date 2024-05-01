@@ -98,6 +98,7 @@ class VoiceServer extends ConfigurationItem {
 		iSpeakerVolume := 100
 		iSpeakerPitch := 0
 		iSpeakerSpeed := 0
+		iSpeakerImprover := false
 		iRecognizer := "Desktop"
 		iListener := false
 
@@ -140,10 +141,14 @@ class VoiceServer extends ConfigurationItem {
 			}
 
 			__New(voiceClient, arguments*) {
-				local improver := SpeechImprover(voiceClient.VoiceServer.Configuration)
+				local improver
 
-				if improver.Model
-					this.iImprover := improver
+				if voiceClient.SpeakerImprover {
+					improver := SpeechImprover(voiceClient.SpeakerImprover, voiceClient.VoiceServer.Configuration)
+
+					if improver.Model
+						this.iImprover := improver
+				}
 
 				this.iVoiceClient := voiceClient
 
@@ -153,15 +158,16 @@ class VoiceServer extends ConfigurationItem {
 			speak(text, wait := true, cache := false, options := false) {
 				local improver := this.Improver
 
-				if improver {
+				if (improver && (Random(1, 10) > 5)) {
 					if options {
 						options := toMap(options)
 
-						text := improver.improve(text, {Rephrase: (!options.Has("Rephrase") || options["Rephrase"])
-													  , Translate: (improver.Language && !options.Has("Translate") || options["Tranlate"]))
+						text := improver.improve(text, Map("Language", this.VoiceClient.Language
+														 , "Rephrase", (!options.Has("Rephrase") || options["Rephrase"])
+														 , "Translate", (improver.Language && !options.Has("Translate") || options["Tranlate"])))
 					}
 					else
-						text := improver.improve(text)
+						text := improver.improve(text, Map("Language", this.VoiceClient.Language))
 				}
 
 				super.speak(text, wait, cache, options)
@@ -294,6 +300,12 @@ class VoiceServer extends ConfigurationItem {
 			}
 		}
 
+		SpeakerImprover {
+			Get {
+				return this.iSpeakerImprover
+			}
+		}
+
 		ActivationCallback {
 			Get {
 				return this.iActivationCallback
@@ -366,7 +378,8 @@ class VoiceServer extends ConfigurationItem {
 
 		__New(voiceServer, descriptor, routing, pid
 			, language, synthesizer, speaker, recognizer, listener
-			, speakerVolume, speakerPitch, speakerSpeed, activationCallback, deactivationCallback, recognizerMode) {
+			, speakerVolume, speakerPitch, speakerSpeed, speakerImprover
+			, activationCallback, deactivationCallback, recognizerMode) {
 			this.iVoiceServer := voiceServer
 			this.iDescriptor := descriptor
 			this.iRouting := routing
@@ -380,6 +393,7 @@ class VoiceServer extends ConfigurationItem {
 			this.iSpeakerVolume := speakerVolume
 			this.iSpeakerPitch := speakerPitch
 			this.iSpeakerSpeed := speakerSpeed
+			this.iSpeakerImprover := speakerImprover
 			this.iActivationCallback := activationCallback
 			this.iDeactivationCallback := deactivationCallback
 		}
@@ -1085,6 +1099,7 @@ class VoiceServer extends ConfigurationItem {
 					  , activationCommand := false, activationCallback := false, deactivationCallback := false, language := false
 					  , synthesizer := true, speaker := true, recognizer := false, listener := false
 					  , speakerVolume := kUndefined, speakerPitch := kUndefined, speakerSpeed := kUndefined
+					  , speakerImprover := false
 					  , recognizerMode := "Grammar") {
 		local grammar, client, nextCharIndex, theDescriptor, ignore, voiceClient, clientRecognizer
 
@@ -1120,7 +1135,7 @@ class VoiceServer extends ConfigurationItem {
 		if (client && (this.ActiveVoiceClient == client))
 			this.deactivateVoiceClient(descriptor)
 
-		client := VoiceServer.VoiceClient(this, descriptor, routing, pid, language, synthesizer, speaker, recognizer, listener, speakerVolume, speakerPitch, speakerSpeed, activationCallback, deactivationCallback, recognizerMode)
+		client := VoiceServer.VoiceClient(this, descriptor, routing, pid, language, synthesizer, speaker, recognizer, listener, speakerVolume, speakerPitch, speakerSpeed, speakerImprover, activationCallback, deactivationCallback, recognizerMode)
 
 		this.VoiceClients[descriptor] := client
 

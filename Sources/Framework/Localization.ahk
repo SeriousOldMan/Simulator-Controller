@@ -583,11 +583,18 @@ translate(string, targetLanguageCode := false) {
 
 	static currentLanguageCode := "en"
 	static translations := false
+	static cachedTranslations := CaseInsenseMap()
 
 	if (targetLanguageCode && (targetLanguageCode = "en"))
 		return string
 	else if (targetLanguageCode && (targetLanguageCode != gTargetLanguageCode)) {
-		theTranslations := readTranslations(targetLanguageCode)
+		if (cachedTranslations.Has(targetLanguageCode))
+			theTranslations := cachedTranslations[targetLanguageCode]
+		else {
+			theTranslations := readTranslations(targetLanguageCode)
+
+			cachedTranslations[targetLanguageCode] := theTranslations
+		}
 
 		if theTranslations.Has(string) {
 			translation := theTranslations[string]
@@ -600,6 +607,8 @@ translate(string, targetLanguageCode := false) {
 	else if (gTargetLanguageCode != "en") {
 		if (gTargetLanguageCode != currentLanguageCode) {
 			currentLanguageCode := gTargetLanguageCode
+
+			cachedTranslations := CaseInsenseMap()
 
 			translations := readTranslations(currentLanguageCode)
 		}

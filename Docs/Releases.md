@@ -1,3 +1,11 @@
+## 5.6.9.0-release 05/03/24 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. The new setting "Spotter: Threshold for Overtaking car ahead" in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database" can be used to specify the time gap to a car ahead or behind, in which the Spotter does not issue any additional information about your opponent. This can prevent the Spotter telling you to overtake, while you are actually started doing exactly that.
+  4. Rearranged the priority of a couple of information announcements of the Spotter to make them more relevant and timely.
+  5. "Simulator Setup" now supports configuration of LLM-based post-prcessing and rephrasing of voice messages issued by the Assistants. This is the first step in a series of enhancements for the Engineer, the Strategist and the Spotter using GPT technology. All this enhancements will be optional, since they either require a very powerful PC to run an LLM locally or you must buy some computing time from companies like OpenAI. Although very inexpensive, this also not for everybody. Please take a look at the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#speech-improvement-using-ai).
+  6. [Developer] Added a first GPT-based speech post-processor in preparation for the new Assistant GPT architecture. This post processor uses an LLM to randomly rephrase each message issued by the Assistants to bring in more variations. It can also be used to translate between different languages as long as the used LLM supports this.
+
 ## 5.6.8.0-release 04/26/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
@@ -25,6 +33,9 @@
   12. The frequency of information and advice callouts can now be configured for the Race Spotter. Please see the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-spotter) for more information.
   13. A new mode for the opponent information of the Spotter allows to get information not only at sector boundaries. Very useful for very long tracks like the Nordschleife, when used together with the aforementioned update frequency.
   14. Adjusted some field and box sizes in "Simulator Setup" and "Simulator Configuration".
+  15. A small fix for the Team Server extends the life time of finished sessions.
+  
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-567), especially if you are running your own Team Server.
 
 ## 5.6.6.0-release 04/12/24
   1. Minor bugfixes, as always

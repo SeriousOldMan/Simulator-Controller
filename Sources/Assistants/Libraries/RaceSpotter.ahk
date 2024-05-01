@@ -67,7 +67,7 @@ class CarInfo {
 	iInvalidLaps := 0
 	iIncidents := 0
 
-	iProblem := true
+	iProblem := false
 
 	Spotter {
 		Get {
@@ -812,6 +812,12 @@ class RaceSpotter extends GridRaceAssistant {
 				}
 			}
 
+			Improver {
+				Get {
+					return false
+				}
+			}
+
 			Speaking {
 				Get {
 					return (this.iIsSpeaking || super.Speaking)
@@ -1010,8 +1016,10 @@ class RaceSpotter extends GridRaceAssistant {
 	}
 
 	__New(configuration, remoteHandler, name := false, language := kUndefined
-		, synthesizer := false, speaker := false, vocalics := false, recognizer := false, listener := false, muted := false, voiceServer := false) {
-		super.__New(configuration, "Race Spotter", remoteHandler, name, language, synthesizer, speaker, vocalics, recognizer, listener, muted, voiceServer)
+		, synthesizer := false, speaker := false, vocalics := false, improver := false
+		, recognizer := false, listener := false, muted := false, voiceServer := false) {
+		super.__New(configuration, "Race Spotter", remoteHandler, name, language, synthesizer, speaker, vocalics, improver
+												 , recognizer, listener, muted, voiceServer)
 
 		this.updateConfigurationValues({Announcements: {DeltaInformation: 2, TacticalAdvices: true
 													  , SideProximity: true, RearProximity: true
@@ -1589,6 +1597,41 @@ class RaceSpotter extends GridRaceAssistant {
 				}
 			}
 
+		if (this.BestLapTime > 0) {
+			bestLapTime := Round(this.BestLapTime, 1)
+
+			if ((enoughData && (lastLap > (this.BaseLap + 2))) && (!this.SessionInfos.Has("BestLap") || (bestLapTime < this.SessionInfos["BestLap"]))) {
+				lapTime := (bestLapTime / 1000)
+
+				minute := Floor(lapTime / 60)
+
+				speaker.speakPhrase("BestLap", {time: speaker.number2Speech(lapTime, 1)
+											  , minute: minute, seconds: speaker.number2Speech((lapTime - (minute * 60)), 1)})
+
+				this.SessionInfos["BestLap"] := bestLapTime
+
+				return true
+			}
+			else
+				this.SessionInfos["BestLap"] := bestLapTime
+		}
+
+		if (this.LastTopSpeed > 0) {
+			lastTopSpeed := Round(convertUnit("Speed", this.LastTopSpeed))
+
+			if (!this.SessionInfos.Has("BestSpeed") || (lastTopSpeed > this.SessionInfos["BestSpeed"])) {
+				if (enoughData && (lastLap > (this.BaseLap + 2))) {
+					speaker.speakPhrase("BestSpeed", {speed: speaker.number2Speech(lastTopSpeed), unit: getUnit("Speed")})
+
+					this.SessionInfos["BestSpeed"] := lastTopSpeed
+
+					return true
+				}
+				else
+					this.SessionInfos["BestSpeed"] := lastTopSpeed
+			}
+		}
+
 		if (enoughData && (lastLap > (this.BaseLap + 2))) {
 			if ((remainingSessionLaps <= 3) && (Floor(remainingSessionLaps) > 1) && (this.Session = kSessionRace)) {
 				situation := "FinalLaps"
@@ -1615,37 +1658,6 @@ class RaceSpotter extends GridRaceAssistant {
 
 						return true
 					}
-				}
-			}
-
-			if (this.BestLapTime > 0) {
-				bestLapTime := Round(this.BestLapTime, 1)
-
-				if (!this.SessionInfos.Has("BestLap") || (bestLapTime < this.SessionInfos["BestLap"])) {
-					lapTime := (bestLapTime / 1000)
-
-					minute := Floor(lapTime / 60)
-
-					speaker.speakPhrase("BestLap", {time: speaker.number2Speech(lapTime, 1)
-												  , minute: minute, seconds: speaker.number2Speech((lapTime - (minute * 60)), 1)})
-
-					this.SessionInfos["BestLap"] := bestLapTime
-
-					return true
-				}
-				else
-					this.SessionInfos["BestLap"] := bestLapTime
-			}
-
-			if (this.LastTopSpeed > 0) {
-				lastTopSpeed := Round(convertUnit("Speed", this.LastTopSpeed))
-
-				if (!this.SessionInfos.Has("BestSpeed") || (lastTopSpeed > this.SessionInfos["BestSpeed"])) {
-					speaker.speakPhrase("BestSpeed", {speed: speaker.number2Speech(lastTopSpeed), unit: getUnit("Speed")})
-
-					this.SessionInfos["BestSpeed"] := lastTopSpeed
-
-					return true
 				}
 			}
 
@@ -1715,7 +1727,7 @@ class RaceSpotter extends GridRaceAssistant {
 				}
 			}
 
-			if (lastLap > 2) {
+			if (regular && (lastLap > 2)) {
 				this.getPositionInfos(&standingsAhead, &standingsBehind, &trackAhead, &trackBehind, &leader, &focused)
 
 				lapTime := false
@@ -1756,7 +1768,7 @@ class RaceSpotter extends GridRaceAssistant {
 						lapTime := false
 				}
 
-				if (!lapTime && regular && (this.Session == kSessionRace)) {
+				if (!lapTime && (this.Session == kSessionRace)) {
 					rnd := Random(1, 10)
 
 					if (rnd > 8) {
@@ -1963,52 +1975,50 @@ class RaceSpotter extends GridRaceAssistant {
 				}
 			}
 
-			if (InStr(sector, "1") != 1) {
-				opponentType := (trackBehind ? trackBehind.OpponentType[sector] : false)
+			opponentType := (trackBehind ? trackBehind.OpponentType[sector] : false)
 
-				if (regular && trackBehind && trackBehind.hasGap(sector) && !trackBehind.Car.InPit
-				 && trackBehind.isFaster(sector) && trackBehind.inRange(sector, true)) {
-					if (standingsBehind && (trackBehind != standingsBehind)
-					 && standingsBehind.hasGap(sector) && standingsBehind.inDelta(sector, 4.0)
-					 && standingsBehind.isFaster(sector) && (opponentType = "LapDown")) {
-						situation := ("ProtectFaster " . trackBehind.Car.ID . A_Space . standingsBehind.Car.ID)
+			if (regular && trackBehind && trackBehind.hasGap(sector) && !trackBehind.Car.InPit
+			 && trackBehind.isFaster(sector) && trackBehind.inRange(sector, true)) {
+				if (standingsBehind && (trackBehind != standingsBehind)
+				 && standingsBehind.hasGap(sector) && standingsBehind.inDelta(sector, 4.0)
+				 && standingsBehind.isFaster(sector) && (opponentType = "LapDown")) {
+					situation := ("ProtectFaster " . trackBehind.Car.ID . A_Space . standingsBehind.Car.ID)
 
-						if !this.TacticalAdvices.Has(situation) {
-							this.TacticalAdvices[situation] := true
+					if !this.TacticalAdvices.Has(situation) {
+						this.TacticalAdvices[situation] := true
 
-							speaker.speakPhrase("ProtectFaster")
+						speaker.speakPhrase("ProtectFaster")
 
-							return true
-						}
+						return true
 					}
-					else if (((opponentType = "LapDown") || (opponentType = "LapUp"))
-						  && trackBehind.isFaster(sector, 1)) {
-						situation := (opponentType . "Faster " . trackBehind.Car.ID)
+				}
+				else if (((opponentType = "LapDown") || (opponentType = "LapUp"))
+					  && trackBehind.isFaster(sector, 1)) {
+					situation := (opponentType . "Faster " . trackBehind.Car.ID)
 
-						if !this.TacticalAdvices.Has(situation) {
-							this.TacticalAdvices[situation] := true
+					if !this.TacticalAdvices.Has(situation) {
+						this.TacticalAdvices[situation] := true
 
-							speaker.beginTalk()
+						speaker.beginTalk()
 
-							try {
-								speaker.speakPhrase(opponentType . "Faster")
+						try {
+							speaker.speakPhrase(opponentType . "Faster")
 
-								driverPitstops := this.DriverCar.Pitstops.Length
-								carPitstops := trackBehind.Car.Pitstops.Length
+							driverPitstops := this.DriverCar.Pitstops.Length
+							carPitstops := trackBehind.Car.Pitstops.Length
 
-								if ((driverPitstops < carPitstops) && (opponentType = "LapDown"))
-									speaker.speakPhrase("MorePitstops", {conjunction: speaker.Fragments["But"], pitstops: carPitstops - driverPitstops})
-								else if ((driverPitstops > carPitstops) && (opponentType = "LapUp"))
-									speaker.speakPhrase("LessPitstops", {conjunction: speaker.Fragments["But"], pitstops: driverPitstops - carPitstops})
-								else
-									speaker.speakPhrase("Slipstream")
-							}
-							finally {
-								speaker.endTalk()
-							}
-
-							return true
+							if ((driverPitstops < carPitstops) && (opponentType = "LapDown"))
+								speaker.speakPhrase("MorePitstops", {conjunction: speaker.Fragments["But"], pitstops: carPitstops - driverPitstops})
+							else if ((driverPitstops > carPitstops) && (opponentType = "LapUp"))
+								speaker.speakPhrase("LessPitstops", {conjunction: speaker.Fragments["But"], pitstops: driverPitstops - carPitstops})
+							else
+								speaker.speakPhrase("Slipstream")
 						}
+						finally {
+							speaker.endTalk()
+						}
+
+						return true
 					}
 				}
 			}
@@ -2025,7 +2035,7 @@ class RaceSpotter extends GridRaceAssistant {
 				}
 			}
 
-			if (Random(1, 10) < 5) {
+			if (regular && (Random(1, 10) < 5)) {
 				driverPosition := this.DriverCar.Position["Class"]
 				driverLapTime := this.DriverCar.AvgLapTime
 				slowerCar := false
@@ -2273,6 +2283,7 @@ class RaceSpotter extends GridRaceAssistant {
 		static behindAttackThreshold := false
 		static behindGainThreshold := false
 		static behindLostThreshold := false
+		static overtakeThreshold := false
 		static frontGapMin := false
 		static frontGapMax := false
 		static behindGapMin := false
@@ -2289,6 +2300,7 @@ class RaceSpotter extends GridRaceAssistant {
 			behindAttackThreshold := getDeprecatedValue(settings, "Assistant.Spotter", "Spotter Settings", "Behind.Attack.Threshold", 0.8)
 			behindLostThreshold := getDeprecatedValue(settings, "Assistant.Spotter", "Spotter Settings", "Behind.Lost.Threshold", 0.3)
 			behindGainThreshold := getDeprecatedValue(settings, "Assistant.Spotter", "Spotter Settings", "Behind.Gain.Threshold", 1.5)
+			overtakeThreshold := getDeprecatedValue(settings, "Assistant.Spotter", "Spotter Settings", "Overtake.Threshold", 0.3)
 			frontGapMin := getMultiMapValue(settings, "Assistant.Spotter", "Front.Observe.Range.Min", 2)
 			frontGapMax := getMultiMapValue(settings, "Assistant.Spotter", "Front.Observe.Range.Max", 3600)
 			behindGapMin := getMultiMapValue(settings, "Assistant.Spotter", "Behind.Observe.Range.Min", 2)
@@ -2320,9 +2332,10 @@ class RaceSpotter extends GridRaceAssistant {
 			driverPitstops := this.DriverCar.Pitstops.Length
 			opponentType := (trackAhead ? trackAhead.OpponentType[sector] : false)
 
-			if ((InStr(sector, "1") != 1) && trackAhead && (trackAhead != standingsAhead) && trackAhead.hasGap(sector)
+			if (trackAhead && (trackAhead != standingsAhead) && trackAhead.hasGap(sector)
 			 && (opponentType != "Position") && !trackAhead.Car.InPit
 			 && trackAhead.inRange(sector, true, (opponentType = "LapDown") ? lapDownRangeThreshold : lapUpRangeThreshold)
+			 && !trackAhead.inRange(sector, true, overtakeThreshold)
 			 && !trackAhead.isFaster(sector) && !trackAhead.runningAway(sector, frontGainThreshold)
 			 && !trackAhead.Reported) {
 				carPitstops := trackAhead.Car.Pitstops.Length
@@ -2373,7 +2386,8 @@ class RaceSpotter extends GridRaceAssistant {
 					FileAppend(info, kTempDirectory . "Race Spotter.positions")
 				}
 
-				if ((delta <= frontAttackThreshold) && !standingsAhead.isFaster(sector) && !standingsAhead.Reported) {
+				if ((delta <= frontAttackThreshold) && !standingsAhead.isFaster(sector) && !standingsAhead.Reported
+													&& !standingsAhead.inRange(sector, true, overtakeThreshold)) {
 					speaker.speakPhrase("GotHim", {delta: speaker.number2Speech(delta, 1)
 												 , gained: speaker.number2Speech(deltaDifference, 1)
 												 , lapTime: speaker.number2Speech(lapTimeDifference, 1)})
@@ -2635,7 +2649,7 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 
 		if (!spoken && regular && ((method = kDeltaMethodStatic) || (method = kDeltaMethodBoth))) {
-			if (regular = "S")
+			if ((regular = "S") || (regular = "A"))
 				rnd := Random(1, 7)
 			else
 				rnd := Random(1, 9)
@@ -2677,15 +2691,12 @@ class RaceSpotter extends GridRaceAssistant {
 						this.iLastDeltaInformationLap := lastLap
 
 					hadInfo := this.deltaInformation(lastLap, sector, positions
-												   , (deltaInformation = "A") || (deltaInformation = "S") || (lastLap = this.iLastDeltaInformationLap)
+												   , (deltaInformation = "A") ? "A" : ((deltaInformation = "S") ? "S" : (lastLap = this.iLastDeltaInformationLap))
 												   , this.Announcements["DeltaInformationMethod"])
-
-					if (hadInfo && (Random(1, 10) < 5))
-						hadInfo := false
 				}
 
-				if (sessionInfo && !hadInfo && this.Announcements["SessionInformation"]) {
-					hadInfo := this.sessionInformation(lastLap, sector, positions, true)
+				if this.Announcements["SessionInformation"] {
+					hadInfo := this.sessionInformation(lastLap, sector, positions, sessionInfo && !hadInfo)
 
 					if hadInfo
 						sessionInfo := false
@@ -2693,8 +2704,8 @@ class RaceSpotter extends GridRaceAssistant {
 				else
 					sessionInfo := true
 
-				if (!hadInfo && raceInfo && this.Announcements["TacticalAdvices"])
-					hadInfo := this.tacticalAdvice(lastLap, sector, positions, true)
+				if (raceInfo && this.Announcements["TacticalAdvices"])
+					this.tacticalAdvice(lastLap, sector, positions, !hadInfo)
 			}
 		}
 	}
@@ -2735,34 +2746,31 @@ class RaceSpotter extends GridRaceAssistant {
 	skipAlert(alert) {
 		if this.pendingAlerts(["AccidentAhead", "SlowCarAhead"], true)
 			return true
-		else if ((alert = "Hold") && this.pendingAlert("Clear", true))
-			return true
-		else if ((alert = "Left") && (this.pendingAlerts(["ClearAll", "ClearLeft", "Left", "Three"])))
-			return true
-		else if ((alert = "Right") && (this.pendingAlerts(["ClearAll", "ClearRight", "Right", "Three"])))
-			return true
-		else if ((alert = "Three") && this.pendingAlert("Clear", true))
-			return true
-		else if ((alert = "Side") && this.pendingAlert("Clear", true))
-			return true
-		else if ((alert = "ClearLeft") && this.pendingAlert("ClearLeft"))
-			return true
-		else if ((alert = "ClearRight") && this.pendingAlert("ClearRight"))
-			return true
-		else if (InStr(alert, "Clear") && this.pendingAlerts(["Left", "Right", "Three", "Side", "ClearAll"]))
-			return true
-		else if (InStr(alert, "Behind") && this.pendingAlerts(["Behind", "Left", "Right", "Three", "Clear"], true))
-			return true
-		else if (InStr(alert, "Yellow") && this.pendingAlert("YellowClear"))
-			return true
-		else if ((alert = "YellowClear") && this.pendingAlert("Yellow", true))
-			return true
+		else {
+			switch alert, false {
+				case "Hold":
+					return this.pendingAlert("Clear", true)
+				case "Left", "ClearLeft":
+					return this.pendingAlerts(["ClearAll", "ClearLeft", "Left", "Three"])
+				case "Right", "ClearRight":
+					return this.pendingAlerts(["ClearAll", "ClearRight", "Right", "Three"])
+				case "Three", "Side":
+					return this.pendingAlert("Clear", true)
+			}
 
-		return false
+			if (InStr(alert, "Clear") && this.pendingAlerts(["Left", "Right", "Three", "Side", "ClearAll"]))
+				return true
+			else if (InStr(alert, "Behind") && this.pendingAlerts(["Behind", "Left", "Right", "Three", "Clear"], true))
+				return true
+			else if (InStr(alert, "Yellow") && this.pendingAlert("Yellow", true))
+				return true
+
+			return false
+		}
 	}
 
 	superfluousAlert(alert) {
-		return ((InStr(alert, "Behind") && InStr(alert, "Accident")) && this.pendingAlerts(["Behind", "Left", "Right", "Three", "Clear"], true))
+		return (InStr(alert, "AccidentBehind") && this.pendingAlerts(["Behind", "Left", "Right", "Three", "Clear"], true))
 	}
 
 	pushAlert(alert, arguments*) {
@@ -3051,14 +3059,35 @@ class RaceSpotter extends GridRaceAssistant {
 		this.updateConfigurationValues({Announcements: announcements})
 	}
 
-	initializeHistory() {
+	initializeTacticalAdvices(full := true) {
+		this.TacticalAdvices := CaseInsenseMap()
+	}
+
+	initializeSessionInfos(full := true) {
+		local sessionInfos := CaseInsenseMap()
+		local key, value, ignore, candidate
+
+		static retainedInfos := ["StartSummary", "HalfTime", "BestLap", "BestSpeed"]
+
+		if !full {
+			for key, value in this.SessionInfos
+				for ignore, candidate in retainedInfos
+					if InStr(key, candidate)
+						sessionInfos[key] := value
+		}
+
+		this.SessionInfos := sessionInfos
+	}
+
+	initializeHistory(full := true) {
 		this.iDriverCar := false
 		this.OtherCars := CaseInsenseMap()
 		this.PositionInfos := CaseInsenseMap()
-		this.TacticalAdvices := CaseInsenseMap()
-		this.SessionInfos := CaseInsenseMap()
 		this.iLastDeltaInformationLap := 0
 		this.iLastPenalty := false
+
+		this.initializeTacticalAdvices(full)
+		this.initializeSessionInfos(full)
 
 		this.iNextDriverUpdate := (A_TickCount + this.DriverUpdateTime)
 
@@ -3362,7 +3391,7 @@ class RaceSpotter extends GridRaceAssistant {
 		lastPitstop := knowledgeBase.getValue("Pitstop.Last", false)
 
 		if (lastPitstop && (Abs(lapNumber - lastPitstop) <= 2))
-			this.initializeHistory()
+			this.initializeHistory(false)
 
 		if this.Speaker[false]
 			if (!this.Announcements["PenaltyInformation"] || !this.penaltyInformation(lapNumber, getMultiMapValue(data, "Stint Data", "Sector", 0), lastPenalty))
@@ -3659,7 +3688,7 @@ class RaceSpotter extends GridRaceAssistant {
 	}
 
 	executePitstop(lapNumber) {
-		this.initializeHistory()
+		this.initializeHistory(false)
 
 		return super.executePitstop(lapNumber)
 	}

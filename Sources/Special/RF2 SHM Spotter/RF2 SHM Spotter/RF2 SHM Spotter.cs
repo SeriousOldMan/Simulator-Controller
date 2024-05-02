@@ -754,7 +754,7 @@ namespace RF2SHMSpotter {
             }
 	
 			if (playerScoring.mTotalLaps > completedLaps) {
-				if (numAccidents >= (scoring.mScoringInfo.mLapDist / 4)) {
+				if (numAccidents >= (scoring.mScoringInfo.mLapDist / 1000)) {
 					for (int i = 0; i < idealLine.Count; i++)
 						idealLine[i].clear();
 				}

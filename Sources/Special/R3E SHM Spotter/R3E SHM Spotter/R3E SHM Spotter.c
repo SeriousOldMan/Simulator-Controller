@@ -629,7 +629,7 @@ BOOL checkAccident() {
 	}
 	
 	if (map_buffer->completed_laps > completedLaps) {
-		if (numAccidents >= (map_buffer->layout_length / 4)) {
+		if (numAccidents >= (map_buffer->layout_length / 1000)) {
 			for (int i = 0; i < idealLineSize; i++)
 				il_clear(&idealLine[i]);
 		}

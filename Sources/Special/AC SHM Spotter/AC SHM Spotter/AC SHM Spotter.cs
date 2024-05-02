@@ -788,7 +788,7 @@ namespace ACSHMSpotter {
 				}
 	
 				if (graphics.CompletedLaps > completedLaps) {
-					if (numAccidents >= (staticInfo.TrackSPlineLength / 4)) {
+					if (numAccidents >= (staticInfo.TrackSPlineLength / 1000)) {
 						for (int i = 0; i < idealLine.Count; i++)
 							idealLine[i].clear();
 					}

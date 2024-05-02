@@ -952,18 +952,11 @@ bool checkAccident() {
 	}
 	
 	if (gf->completedLaps > completedLaps) {
-		if (numAccidents >= (trackLength / 4)) {
-			trackSplineBuilding = false;
-			trackSplineReady = false;
-
+		if (numAccidents >= (trackLength / 1000)) {
 			int length = idealLine.size();
 
 			for (int i = 0; i < length; i++)
 				idealLine[i].clear();
-
-			updateLastCarCoordinates(true);
-			
-			return false;
 		}
 		
 		completedLaps = gf->completedLaps;

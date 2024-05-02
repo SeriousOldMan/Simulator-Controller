@@ -736,7 +736,7 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 		int carLaps = *((int*)rawValue);
 	
 		if (carLaps > completedLaps) {
-			if (numAccidents >= (trackLength / 4)) {
+			if (numAccidents >= (trackLength / 1000)) {
 				int length = idealLine.size();
 
 				for (int i = 0; i < length; i++)

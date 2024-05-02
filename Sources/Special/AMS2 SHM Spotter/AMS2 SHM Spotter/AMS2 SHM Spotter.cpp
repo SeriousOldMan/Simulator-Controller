@@ -591,7 +591,7 @@ bool checkAccident(const SharedMemory* sharedData)
 	}
 	
 	if (sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mLapsCompleted > completedLaps) {
-		if (numAccidents >= (sharedData->mTrackLength / 4)) {
+		if (numAccidents >= (sharedData->mTrackLength / 1000)) {
 			int length = idealLine.size();
 
 			for (int i = 0; i < length; i++)

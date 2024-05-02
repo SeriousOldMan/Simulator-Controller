@@ -37,7 +37,9 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 5.7.0
 
-Everything handled automatically.
+The former referenced OpenAI model "GPT 3.5 turbo 1106" has been deprecated by OpenAI. It is still supported, but the newer GPT 3.5 turbo version is better and even cheaper. You may want to upgrade your model reference in the Driving Coach configuration.
+
+You can check always the latest models and their pricing on [the pricing page](https://openai.com/api/pricing) of the OpenAI website.
 
 ***
 

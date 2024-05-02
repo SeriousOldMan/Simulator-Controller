@@ -1770,7 +1770,7 @@ class VoiceImproverEditor extends ConfiguratorPanel {
 	Models[provider] {
 		Get {
 			if (provider = "OpenAI")
-				return ["GPT 3.5 turbo 1106", "GPT 4", "GPT 4 32k", "GPT 4 1106 preview"]
+				return ["GPT 3.5 turbo", "GPT 4", "GPT 4 32k", "GPT 4 turbo"]
 			else if (provider = "Azure")
 				return ["GPT 3.5", "GPT 3.5 turbo", "GPT 4", "GPT 4 32k"]
 			else
@@ -1900,7 +1900,7 @@ class VoiceImproverEditor extends ConfiguratorPanel {
 				this.Control["viModelDropDown"].Choose(index)
 		}
 		else if provider
-			this.Control["viModelDropDown"].Choose(inList(this.Models[provider], "GPT 3.5 turbo 1106"))
+			this.Control["viModelDropDown"].Choose(inList(this.Models[provider], "GPT 3.5 turbo"))
 	}
 
 	loadFromConfiguration(configuration) {
@@ -1948,8 +1948,8 @@ class VoiceImproverEditor extends ConfiguratorPanel {
 							providerConfiguration["ServiceKey"] := ""
 					}
 
-				if ((providerConfiguration["Model"] = "") && inList(this.Models[provider], "GPT 3.5 turbo 1106"))
-					providerConfiguration["Model"] := "GPT 3.5 turbo 1106"
+				if ((providerConfiguration["Model"] = "") && inList(this.Models[provider], "GPT 3.5 turbo"))
+					providerConfiguration["Model"] := "GPT 3.5 turbo"
 
 				for ignore, setting in ["Temperature"]
 					providerConfiguration[setting] := getMultiMapValue(configuration, "Voice Improver", provider . "." . setting, defaults[setting])

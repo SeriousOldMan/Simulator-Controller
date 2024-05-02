@@ -754,6 +754,9 @@ namespace ACSHMSpotter {
 
         int bestLapTime = int.MaxValue;
 
+		int completedLaps = 0;
+		int numAccidents = 0;
+
         bool checkAccident()
         {
 			bool accident = false;
@@ -782,6 +785,16 @@ namespace ACSHMSpotter {
 
 					for (int i = 0; i < idealLine.Count; i++)
 						idealLine[i].clear();
+				}
+	
+				if (graphics.CompletedLaps > completedLaps) {
+					if (numAccidents >= (staticInfo.TrackSPlineLength / 1000)) {
+						for (int i = 0; i < idealLine.Count; i++)
+							idealLine[i].clear();
+					}
+					
+					completedLaps = graphics.CompletedLaps;
+					numAccidents = 0;
 				}
 
                 List<SlowCarInfo> accidentsAhead = new List<SlowCarInfo>();
@@ -864,6 +877,8 @@ namespace ACSHMSpotter {
                                 nextSlowCarAhead = cycle + 200;
 
 								SendSpotterMessage("accidentAlert:Ahead;" + distance);
+								
+								numAccidents += 1;
 
 								return true;
 							}
@@ -885,6 +900,8 @@ namespace ACSHMSpotter {
                                 nextAccidentBehind = cycle + 200;
 
                                 SendSpotterMessage("slowCarAlert:" + distance);
+								
+								numAccidents += 1;
 
 								return true;
 							}
@@ -905,6 +922,8 @@ namespace ACSHMSpotter {
 								nextAccidentBehind = cycle + 400;
 
 								SendSpotterMessage("accidentAlert:Behind;" + distance);
+								
+								numAccidents += 1;
 
 								return true;
 							}
@@ -1229,12 +1248,15 @@ namespace ACSHMSpotter {
 
 				int completedLaps = graphics.CompletedLaps;
 
-				if (lastCompletedLaps != completedLaps)
+				if (lastCompletedLaps != completedLaps) {
+					lastCompletedLaps = completedLaps;
+					
 					while (true)
 						if (cornerDynamicsList[0].CompletedLaps < completedLaps - 2)
 							cornerDynamicsList.RemoveAt(0);
 						else
 							break;
+				}
 			}
 
 			return true;

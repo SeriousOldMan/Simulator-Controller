@@ -661,6 +661,9 @@ std::string traceFileName = "";
 
 long bestLapTime = LONG_MAX;
 
+int completedLaps = 0;
+int numAccidents = 0;
+
 bool checkAccident(const irsdk_header* header, const char* data, const int playerCarIndex, float trackLength)
 {
 	bool accident = false;
@@ -724,6 +727,24 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 
 			for (int i = 0; i < length; i++)
 				idealLine[i].clear();
+		}
+	
+		char* rawValue;
+		
+		getRawDataValue(rawValue, header, data, "Lap");
+
+		int carLaps = *((int*)rawValue);
+	
+		if (carLaps > completedLaps) {
+			if (numAccidents >= (trackLength / 1000)) {
+				int length = idealLine.size();
+
+				for (int i = 0; i < length; i++)
+					idealLine[i].clear();
+			}
+			
+			completedLaps = carLaps;
+			numAccidents = 0;
 		}
 
 		lastTickCount += milliSeconds;
@@ -884,6 +905,8 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 					strcat_s(message, numBuffer);
 
 					sendSpotterMessage(message);
+					
+					numAccidents += 1;
 
 					return true;
 				}
@@ -910,6 +933,8 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 					strcat_s(message, numBuffer);
 
 					sendSpotterMessage(message);
+					
+					numAccidents += 1;
 
 					return true;
 				}
@@ -935,6 +960,8 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 					strcat_s(message, numBuffer);
 
 					sendSpotterMessage(message);
+					
+					numAccidents += 1;
 
 					return true;
 				}

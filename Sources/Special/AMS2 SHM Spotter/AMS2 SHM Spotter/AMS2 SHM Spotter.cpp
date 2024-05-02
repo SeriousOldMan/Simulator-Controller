@@ -553,6 +553,9 @@ double getAverageSpeed(double running) {
 
 double bestLapTime = INT_LEAST32_MAX;
 
+int completedLaps = 0;
+int numAccidents = 0;
+
 bool checkAccident(const SharedMemory* sharedData)
 {
 	bool accident = false;
@@ -585,6 +588,18 @@ bool checkAccident(const SharedMemory* sharedData)
 
 		for (int i = 0; i < length; i++)
 			idealLine[i].clear();
+	}
+	
+	if (sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mLapsCompleted > completedLaps) {
+		if (numAccidents >= (sharedData->mTrackLength / 1000)) {
+			int length = idealLine.size();
+
+			for (int i = 0; i < length; i++)
+				idealLine[i].clear();
+		}
+		
+		completedLaps = sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mLapsCompleted;
+		numAccidents = 0;
 	}
 
 	try
@@ -664,6 +679,8 @@ bool checkAccident(const SharedMemory* sharedData)
 					strcat_s(message, numBuffer);
 
 					sendSpotterMessage(message);
+					
+					numAccidents += 1;
 
 					return true;
 				}
@@ -690,6 +707,8 @@ bool checkAccident(const SharedMemory* sharedData)
 					strcat_s(message, numBuffer);
 
 					sendSpotterMessage(message);
+					
+					numAccidents += 1;
 
 					return true;
 				}
@@ -715,6 +734,8 @@ bool checkAccident(const SharedMemory* sharedData)
 					strcat_s(message, numBuffer);
 
 					sendSpotterMessage(message);
+					
+					numAccidents += 1;
 
 					return true;
 				}

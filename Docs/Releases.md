@@ -1,4 +1,4 @@
-## 5.6.9.0-release 05/03/24 (planned)
+## 5.7.0.0-release 05/03/24 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. The new setting "Spotter: Threshold for Overtaking car ahead" in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database" can be used to specify the time gap to a car ahead or behind, in which the Spotter does not issue any additional information about your opponent. This can prevent the Spotter telling you to overtake, while you are actually started doing exactly that.

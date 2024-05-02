@@ -382,9 +382,9 @@ Said this, it is clear, that the interaction with the Assistants, will not feel 
 
 Please take a look at the documentation for the [Driving Coach](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#installation) for a description of the different provider which can be configured here.
 
-The initial implementation will be used to create more variations in the speech output of the Assistants. This is done by using a GPT to rephrase one of the pre-defined phrases. Using the creativity setting, you can define, who *strong* the rephrasing will be. According to my tests, 50% will create some variation without altering the original sense of the message.
+The initial implementation will be used to create more variations in the speech output of the Assistants. This is done by using a GPT to rephrase one of the pre-defined phrases. Using the creativity setting, you can define, who *strong* the rephrasing will be. According to my tests, a value of 50% will create some intersting variation without altering the original sense of the message. Please note, that there are messages, especially the urgent alerts of the Spotter, which are time-critical. Those messages will never be send to the AI for rephrasing.
 
-Note: Using a GPT service like OpenAI may impose some costs, and running an LLM locally on your PC will require a very powerful system, especially when doing this while on the track. Therefore, configuring speech improvement is fully optional.
+Important: Using a GPT service like OpenAI may impose some costs, and running an LLM locally on your PC will require a very powerful system, especially when doing this while on the track. Therefore, configuring speech improvement is fully optional.
 
 #### Tab *Plugins*
 

@@ -154,6 +154,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 
 						setMultiMapValue(configuration, "Speech Improver", assistant . ".Service", improver["Service"])
 						setMultiMapValue(configuration, "Speech Improver", assistant . ".Model", improver["Model"])
+						setMultiMapValue(configuration, "Speech Improver", assistant . ".Probability", improver["Probability"])
 						setMultiMapValue(configuration, "Speech Improver", assistant . ".Temperature", improver["Temperature"])
 					}
 				}

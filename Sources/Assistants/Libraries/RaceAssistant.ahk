@@ -571,7 +571,7 @@ class RaceAssistant extends ConfigurationItem {
 		options["Vocalics"] := Array(getMultiMapValue(configuration, "Voice Control", "SpeakerVolume", 100)
 								   , getMultiMapValue(configuration, "Voice Control", "SpeakerPitch", 0)
 								   , getMultiMapValue(configuration, "Voice Control", "SpeakerSpeed", 0))
-		options["Improver"] := ((getMultiMapValue(configuration, "Voice Improver", this.AssistantType . ".Model", kUndefined) =! kUndefined) ? this.AssistantType : false)
+		options["Improver"] := ((getMultiMapValue(configuration, "Speech Improver", this.AssistantType . ".Model", kUndefined) =! kUndefined) ? this.AssistantType : false)
 		options["Recognizer"] := getMultiMapValue(configuration, "Voice Control", "Recognizer", "Desktop")
 		options["Listener"] := getMultiMapValue(configuration, "Voice Control", "Listener", false)
 		options["PushToTalk"] := getMultiMapValue(configuration, "Voice Control", "PushToTalk", false)

@@ -71,9 +71,9 @@ class AssistantsStepWizard extends ActionsStepWizard {
 
 		super.saveToConfiguration(configuration)
 
-		setMultiMapValues(configuration, "Voice Improver"
-									   , getMultiMapValues(readMultiMap(kUserHomeDirectory . "Setup\Voice Improver Configuration.ini")
-														 , "Voice Improver"), false)
+		setMultiMapValues(configuration, "Speech Improver"
+									   , getMultiMapValues(readMultiMap(kUserHomeDirectory . "Setup\Speech Improver Configuration.ini")
+														 , "Speech Improver"), false)
 
 		for ignore, assistant in this.Definition
 			if wizard.isModuleSelected(assistant) {
@@ -152,9 +152,9 @@ class AssistantsStepWizard extends ActionsStepWizard {
 
 						arguments .= ("; raceAssistantSpeakerImprover: " . assistant)
 
-						setMultiMapValue(configuration, "Voice Improver", assistant . ".Service", improver["Service"])
-						setMultiMapValue(configuration, "Voice Improver", assistant . ".Model", improver["Model"])
-						setMultiMapValue(configuration, "Voice Improver", assistant . ".Temperature", improver["Temperature"])
+						setMultiMapValue(configuration, "Speech Improver", assistant . ".Service", improver["Service"])
+						setMultiMapValue(configuration, "Speech Improver", assistant . ".Model", improver["Model"])
+						setMultiMapValue(configuration, "Speech Improver", assistant . ".Temperature", improver["Temperature"])
 					}
 				}
 				else

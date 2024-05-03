@@ -71,6 +71,12 @@ class SpeechImprover extends ConfigurationItem {
 		}
 	}
 
+	Probability {
+		Get {
+			return this.Options["Probability"]
+		}
+	}
+
 	Temperature {
 		Get {
 			return this.Options["Temperature"]
@@ -113,10 +119,11 @@ class SpeechImprover extends ConfigurationItem {
 
 		super.loadFromConfiguration(configuration)
 
-		options["Language"] := getMultiMapValue(configuration, "Voice Improver", descriptor . ".Language", this.Language)
-		options["Service"] := getMultiMapValue(configuration, "Voice Improver", descriptor . ".Service", false)
-		options["Model"] := getMultiMapValue(configuration, "Voice Improver", descriptor . ".Model", false)
-		options["Temperature"] := getMultiMapValue(configuration, "Voice Improver", descriptor . ".Temperature", 0.5)
+		options["Language"] := getMultiMapValue(configuration, "Speech Improver", descriptor . ".Language", this.Language)
+		options["Service"] := getMultiMapValue(configuration, "Speech Improver", descriptor . ".Service", false)
+		options["Model"] := getMultiMapValue(configuration, "Speech Improver", descriptor . ".Model", false)
+		options["Probability"] := getMultiMapValue(configuration, "Speech Improver", descriptor . ".Probability", 0.5)
+		options["Temperature"] := getMultiMapValue(configuration, "Speech Improver", descriptor . ".Temperature", 0.5)
 	}
 
 	getInstructions() {
@@ -170,17 +177,17 @@ class SpeechImprover extends ConfigurationItem {
 				if !isInstance(options, Map)
 					options := toMap(options)
 
-				doRephrase := (!options.Has("Rephrase") || options["Rephrase"])
+				doRephrase := ((Random(1, 10) <= (10 * this.Probability)) && (!options.Has("Rephrase") || options["Rephrase"]))
 				doTranslate := (language && (!options.Has("Translate") || options["Translate"]))
-
-				if options.Has("Language")
-					code := options["Language"]
 			}
 
 			if (doRephrase || doTranslate) {
 				try {
 					if !this.Connector
 						this.startImprover()
+
+					if options.Has("Language")
+						code := options["Language"]
 
 					if doRephrase {
 						instruction := translate("Rephrase the text after the three |", code)

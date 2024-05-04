@@ -200,7 +200,7 @@ class SpeechImprover extends ConfigurationItem {
 					else
 						instruction := (translate("Translate the text after the three | to ", code) . language)
 
-					instruction .= (translate(". The context is racing and motorsports. Do only answer with the new text.", code) . " `n|||`n")
+					instruction .= (translate(". The text comes from radio communication in motorsport. Do only answer with the new text.", code) . " `n|||`n")
 
 					answer := this.Connector.Ask(instruction . text)
 

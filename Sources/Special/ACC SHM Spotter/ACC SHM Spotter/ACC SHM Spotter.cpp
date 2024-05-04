@@ -914,25 +914,15 @@ std::vector<SlowCarInfo> accidentsBehind;
 std::vector<SlowCarInfo> slowCarsAhead;
 
 double getAverageSpeed(double running) {
-	int last = (idealLine.size() - 1);
-	int index = (int)std::round(running * last);
-	int count = 0;
-	double speed = 0;
+	int index = (int)std::round(running * (idealLine.size() - 1));
 	
-	index = min(last, max(0, index));
-	
-	/*
-	if (idealLine[index].count > 20)
-		for (int i = max(0, index - 1); i <= min(last, index + 1); i++)
-			if (idealLine[i].count > 20) {
-				speed += idealLine[i].speed;
-				count += 1;
-			}
-	
-	return (count > 0) ? speed / count : -1;
-	*/
+	return idealLine[min(last, max(0, index))].getSpeed();
+}
 
-	return idealLine[index].getSpeed();
+void clearAverageSpeed(double running) {
+	int index = (int)std::round(running * (idealLine.size() - 1));
+	
+	idealLine[min(last, max(0, index))].clear();
 }
 
 int completedLaps = 0;
@@ -1016,23 +1006,26 @@ bool checkAccident() {
 			for (int i = 0; i < gf->activeCars; i++) {
 				double speed = getSpeed(i, milliSeconds);
 				double running = getRunning(i);
-				double avgSpeed = getAverageSpeed(running);
 				
-				if (traceFileName != "") {
-					std::ofstream output;
-
-					output.open(traceFileName, std::ios::out | std::ios::app);
-
-					output << "S (" << i << "): " << running << "; " << speed << "; " << avgSpeed << endl;
-
-					output.close();
-				}
-
 				if (i != carID) {
 					if (speed >= 5) {
-						if (running >= 0) {
+						if (running >= 0) {				
+							double avgSpeed = getAverageSpeed(running);
+				
+							if (traceFileName != "") {
+								std::ofstream output;
+
+								output.open(traceFileName, std::ios::out | std::ios::app);
+
+								output << "S (" << i << "): " << running << "; " << speed << "; " << avgSpeed << endl;
+
+								output.close();
+							}
+
 							if ((avgSpeed >= 0) && (speed < (avgSpeed / 2)))
 							{
+								clearAverageSpeed(running);
+								
 								float distance = running * trackLength;
 
 								long distanceAhead = (long)(((distance > driverDistance) ? distance : (distance + trackLength)) - driverDistance);

@@ -396,7 +396,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				data := teamServer.getSessionValue(this.RaceAssistant.Plugin . A_Space . type)
 
 				if (!data || (data = ""))
-					throw "No data..."
+					return false
 				else
 					return parseMultiMap(data)
 			}

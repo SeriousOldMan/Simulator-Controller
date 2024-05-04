@@ -695,29 +695,23 @@ namespace RF2SHMSpotter {
 			}
         }
 
-		double getAverageSpeed(double running) {
-			int last = (idealLine.Count - 1);
+        double getAverageSpeed(double running)
+        {
+            int last = (idealLine.Count - 1);
             int index = (int)Math.Round(running * last);
-			int count = 0;
-			double speed = 0;
-			
-			index = Math.Min(last, Math.Max(0, index));
 
-            /*
-            if (idealLine[index].count > 20)
-                for (int i = Math.Max(0, index - 2); i <= Math.Min(last, index + 2); i++)
-					if (idealLine[i].count > 20) {
-						speed += idealLine[i].speed;
-						count += 1;
-					}
-
-            return (count > 0) ? speed / count : -1;
-			*/
-
-            return idealLine[index].getSpeed();
+            return idealLine[Math.Min(last, Math.Max(0, index))].getSpeed();
         }
 
-		double bestLapTime = int.MaxValue;
+        void clearAverageSpeed(double running)
+        {
+            int last = (idealLine.Count - 1);
+            int index = (int)Math.Round(running * last);
+
+            idealLine[Math.Min(last, Math.Max(0, index))].clear();
+        }
+
+        double bestLapTime = int.MaxValue;
 
 		int completedLaps = 0;
 		int numAccidents = 0;
@@ -785,7 +779,9 @@ namespace RF2SHMSpotter {
 								long distanceAhead = (long)(((vehicle.mLapDist > playerScoring.mLapDist) ? vehicle.mLapDist
 																										 : (vehicle.mLapDist + scoring.mScoringInfo.mLapDist)) - playerScoring.mLapDist);
 
-								if (speed < (avgSpeed / 5))
+                                clearAverageSpeed(running);
+
+                                if (speed < (avgSpeed / 5))
 								{
 									if (distanceAhead < aheadAccidentDistance)
 										accidentsAhead.Add(new SlowCarInfo(i, distanceAhead));

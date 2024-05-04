@@ -913,14 +913,16 @@ std::vector<SlowCarInfo> accidentsAhead;
 std::vector<SlowCarInfo> accidentsBehind;
 std::vector<SlowCarInfo> slowCarsAhead;
 
-double getAverageSpeed(double running) {
-	int index = (int)std::round(running * (idealLine.size() - 1));
+inline double getAverageSpeed(double running) {
+	int last = (idealLine.size() - 1);
+	int index = (int)std::round(running * last);
 	
 	return idealLine[min(last, max(0, index))].getSpeed();
 }
 
-void clearAverageSpeed(double running) {
-	int index = (int)std::round(running * (idealLine.size() - 1));
+inline void clearAverageSpeed(double running) {
+	int last = (idealLine.size() - 1);
+	int index = (int)std::round(running * last);
 	
 	idealLine[min(last, max(0, index))].clear();
 }
@@ -1006,11 +1008,12 @@ bool checkAccident() {
 			for (int i = 0; i < gf->activeCars; i++) {
 				double speed = getSpeed(i, milliSeconds);
 				double running = getRunning(i);
+				double avgSpeed = -1;
 				
 				if (i != carID) {
 					if (speed >= 5) {
 						if (running >= 0) {				
-							double avgSpeed = getAverageSpeed(running);
+							avgSpeed = getAverageSpeed(running);
 				
 							if (traceFileName != "") {
 								std::ofstream output;

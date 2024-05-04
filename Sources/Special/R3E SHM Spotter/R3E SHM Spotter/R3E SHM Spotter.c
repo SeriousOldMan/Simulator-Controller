@@ -574,29 +574,28 @@ slow_car_info accidentsAhead[10];
 slow_car_info accidentsBehind[10];
 slow_car_info slowCarsAhead[10];
 
-double getAverageSpeed(double running) {
+inline double getAverageSpeed(double running) {
 	int last = (idealLineSize - 1);
-	int index = (int)round(running * last);
-	// int count = 0;
-	// double speed = 0;
-	
-	index = min(last, max(0, index));
-	
-	/*
-	if ((&idealLine[index])->count > 20)
-		for (int i = max(0, index - 2); i <= min(last, index + 2); i++) {
-			ideal_line* slot = &idealLine[i];
-		
-			if (slot->count > 20) {
-				speed += slot->speed;
-				count += 1;
-			}
-		}
-	
-	return (count > 0) ? speed / count : -1;
-	*/
+	int index = min(last, max(0, (int)round(running * last)));
 
 	return il_get_speed(&idealLine[index]);
+}
+
+inline void clearAverageSpeed(double running) {
+	int last = (idealLineSize - 1);
+	int index = min(last, max(0, (int)round(running * last)));
+
+	il_clear(&idealLine[index]);
+	
+	index -= 1;
+	
+	if (index >= 0)
+		il_clear(&idealLine[index]);
+	
+	index += 2;
+	
+	if (index <= last)
+		il_clear(&idealLine[index]);
 }
 
 double bestLapTime = INT_LEAST32_MAX;
@@ -655,6 +654,8 @@ BOOL checkAccident() {
 				{
 					long distanceAhead = (long)(((carDistance > driverDistance) ? carDistance : (carDistance + map_buffer->layout_length)) - driverDistance);
 
+					clearAverageSpeed(running);
+					
 					if (speed < (avgSpeed / 5))
 					{
 						if ((distanceAhead < aheadAccidentDistance) && (accidentsAheadCount < 10)) {

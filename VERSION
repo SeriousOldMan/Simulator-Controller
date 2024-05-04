@@ -1,9 +1,9 @@
 [Development]
 Version=5.7.1.0-dev
 Target=5.7.1.0-release
-Date=05/03/2024
+Date=05/04/2024
 Download=
-Changes=Fixed saving of probability setting for speech improver
+Changes=Fixed saving of probability setting for speech improver, Improved meta data for speech improver, Tweaking for accident detection
 Components=Media->5.6.1,Configuration->5.6.4,Utilities->5.4.8
 [Release]
 Version=5.7.0.0-release

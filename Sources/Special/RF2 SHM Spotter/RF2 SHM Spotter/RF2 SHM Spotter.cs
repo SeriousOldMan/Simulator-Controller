@@ -698,17 +698,27 @@ namespace RF2SHMSpotter {
         double getAverageSpeed(double running)
         {
             int last = (idealLine.Count - 1);
-            int index = (int)Math.Round(running * last);
+            int index = Math.Min(last, Math.Max(0, (int)Math.Round(running * last)));
 
-            return idealLine[Math.Min(last, Math.Max(0, index))].getSpeed();
+            return idealLine[index].getSpeed();
         }
 
         void clearAverageSpeed(double running)
         {
             int last = (idealLine.Count - 1);
-            int index = (int)Math.Round(running * last);
+            int index = Math.Min(last, Math.Max(0, (int)Math.Round(running * last)));
 
-            idealLine[Math.Min(last, Math.Max(0, index))].clear();
+            idealLine[index].clear();
+			
+			index -= 1;
+			
+			if (index >= 0)
+				idealLine[index].clear();
+			
+			index += 2;
+			
+			if (index <= last)
+				idealLine[index].clear();
         }
 
         double bestLapTime = int.MaxValue;

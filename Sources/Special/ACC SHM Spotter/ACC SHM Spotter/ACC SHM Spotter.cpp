@@ -915,16 +915,26 @@ std::vector<SlowCarInfo> slowCarsAhead;
 
 inline double getAverageSpeed(double running) {
 	int last = (idealLine.size() - 1);
-	int index = (int)std::round(running * last);
+	int index = min(last, max(0, (int)std::round(running * last)));
 	
-	return idealLine[min(last, max(0, index))].getSpeed();
+	return idealLine[index].getSpeed();
 }
 
 inline void clearAverageSpeed(double running) {
 	int last = (idealLine.size() - 1);
-	int index = (int)std::round(running * last);
+	int index = min(last, max(0, (int)std::round(running * last)));
 	
-	idealLine[min(last, max(0, index))].clear();
+	idealLine[index].clear();
+			
+	index -= 1;
+	
+	if (index >= 0)
+		idealLine[index].clear();
+	
+	index += 2;
+	
+	if (index <= last)
+		idealLine[index].clear();
 }
 
 int completedLaps = 0;

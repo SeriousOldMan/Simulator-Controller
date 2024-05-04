@@ -2061,9 +2061,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 						}
 				}
 
-			data := printMultiMap(data)
-
-			FileAppend(data, dataFile, "UTF-16")
+			FileAppend(printMultiMap(data), dataFile, "UTF-16")
 
 			this.RaceAssistant.performPitstop(lapNumber, dataFile)
 		}

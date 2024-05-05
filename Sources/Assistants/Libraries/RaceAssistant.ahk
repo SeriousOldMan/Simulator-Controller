@@ -1289,6 +1289,18 @@ class RaceAssistant extends ConfigurationItem {
 	restoreSessionState(settingsFile, stateFile) {
 		local sessionState, sessionSettings
 
+		if isDebug()
+
+		if isDebug() {
+			logMessage(kLogCritical, "Restoring session state for " . this.AssistantType . "...")
+
+			if (!settingsFile || (readMultiMap(settingsFile).Count = 0))
+				logMessage(kLogCritical, "Session settings are empty for " . this.AssistantType . "...")
+
+			if (!stateFile || (readMultiMap(stateFile).Count = 0))
+				logMessage(kLogCritical, "Session state is empty for " . this.AssistantType . "...")
+		}
+
 		if stateFile {
 			sessionState := readMultiMap(stateFile)
 
@@ -1740,8 +1752,9 @@ class RaceAssistant extends ConfigurationItem {
 		local settingsFile, stateFile
 
 		if this.RemoteHandler {
-			logMessage(kLogWarn, translate("Saving session state for ") . this.AssistantType)
-			
+			if isDebug()
+				logMessage(kLogCritical, "Saving session state for " . this.AssistantType . "...")
+
 			settingsFile := temporaryFileName(this.AssistantType, "settings")
 			stateFile := temporaryFileName(this.AssistantType, "state")
 

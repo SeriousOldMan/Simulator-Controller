@@ -1740,6 +1740,8 @@ class RaceAssistant extends ConfigurationItem {
 		local settingsFile, stateFile
 
 		if this.RemoteHandler {
+			logMessage(kLogWarn, translate("Saving session state for ") . this.AssistantType)
+			
 			settingsFile := temporaryFileName(this.AssistantType, "settings")
 			stateFile := temporaryFileName(this.AssistantType, "state")
 

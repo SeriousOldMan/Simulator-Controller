@@ -2169,9 +2169,17 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 		this.Simulator.saveSessionState(&settings, &state)
 
+		if (!settings || (settings.Count = 0))
+			logMessage(kLogCritical, translate("Session settings are empty in driver swap..."))
+
+		if (!state || (state.Count = 0))
+			logMessage(kLogCritical, translate("Session state is empty in driver swap..."))
+
 		if (teamServer && this.TeamSessionActive) {
 			if (isDebug() && isLogLevel(kLogDebug))
 				showMessage("Saving session state for " . this.Plugin)
+
+			logMessage(kLogWarn, translate("Saving session state for ") . this.Plugin)
 
 			if settings
 				teamServer.setSessionValue(this.Plugin . " Settings", printMultiMap(settings))

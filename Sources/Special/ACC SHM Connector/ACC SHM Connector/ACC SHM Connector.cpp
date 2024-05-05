@@ -356,7 +356,7 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 		printData(&output, "StintTimeRemaining", gf->DriverStintTimeLeft < 0 ? timeLeft : gf->DriverStintTimeLeft);
 		printData(&output, "DriverTimeRemaining", gf->DriverStintTotalTimeLeft < 0 ? timeLeft : gf->DriverStintTotalTimeLeft);
 
-		printData(&output, "InPitLane", gf->isInPit ? "true" : "false");
+		printData(&output, "InPitLane", (gf->isInPit || gf->isInPitLane) ? "true" : "false");
 		printData(&output, "InPit", gf->isInPit ? "true" : "false");
 	
 		output << "[Track Data]" << endl;

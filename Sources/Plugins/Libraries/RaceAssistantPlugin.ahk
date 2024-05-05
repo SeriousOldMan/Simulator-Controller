@@ -2480,7 +2480,8 @@ class RaceAssistantPlugin extends ControllerPlugin {
 						; Car has finished the first lap
 
 						if (dataLastLap > 1) {
-							if ((dataLastLap > (lastLap + 1)) && !wasInactive && RaceAssistantPlugin.LapRunning) {
+							if ((dataLastLap > (lastLap + 1)) && !wasInactive && RaceAssistantPlugin.LapRunning
+							 && (SessionDatabase.getSimulatorName(simulator) = "iRacing") && (session = kSessionPractice)) {
 								; The lap counter jumped from 0 directly to a value greater than 1 - strange case, which sometimes happen in iRacing practice sessions
 
 								skippedLap := true

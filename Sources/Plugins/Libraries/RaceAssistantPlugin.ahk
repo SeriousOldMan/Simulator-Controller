@@ -2268,7 +2268,6 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	static collectSessionData() {
 		local finished := false
 		local joinedSession := false
-		local reenteredSession := false
 		local teamSessionActive := false
 		local startTime := A_TickCount
 		local splitTime := startTime
@@ -2530,8 +2529,6 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 							if !RaceAssistantPlugin.driverActive(data)
 								return ; Oops, a different driver, might happen in some simulations after a pitstop
-
-							reenteredSession := true
 						}
 
 						if (!RaceAssistantPlugin.Finish && RaceAssistantPlugin.finalLap(data, &finalLap))
@@ -2566,9 +2563,9 @@ class RaceAssistantPlugin extends ControllerPlugin {
 								data := RaceAssistantPlugin.acquireSessionData(&telemetryData, &positionsData, true)
 						}
 
-						if (joinedSession || reenteredSession) {
+						if joinedSession {
 							if RaceAssistantPlugin.TeamSessionActive {
-								if joinedSession {
+								if firstLap {
 									RaceAssistantPlugin.TeamServer.joinSession(getMultiMapValue(data, "Session Data", "Simulator")
 																			 , getMultiMapValue(data, "Session Data", "Car")
 																			 , getMultiMapValue(data, "Session Data", "Track")

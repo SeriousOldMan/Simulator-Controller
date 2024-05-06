@@ -2268,6 +2268,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	static collectSessionData() {
 		local finished := false
 		local joinedSession := false
+		local reenteredSession := false
 		local teamSessionActive := false
 		local startTime := A_TickCount
 		local splitTime := startTime
@@ -2529,13 +2530,12 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 							if !RaceAssistantPlugin.driverActive(data)
 								return ; Oops, a different driver, might happen in some simulations after a pitstop
+
+							reenteredSession := true
 						}
 
 						if (!RaceAssistantPlugin.Finish && RaceAssistantPlugin.finalLap(data, &finalLap))
 							RaceAssistantPlugin.sFinish := finalLap
-
-						newLap := (dataLastLap > lastLap)
-						firstLap := ((lastLap == 0) && newLap)
 
 						if RaceAssistantPlugin.InPit {
 							RaceAssistantPlugin.sInPit := false
@@ -2545,6 +2545,9 @@ class RaceAssistantPlugin extends ControllerPlugin {
 							if (RaceAssistantPlugin.TeamSessionActive && RaceAssistantPlugin.driverActive(data))
 								RaceAssistantPlugin.TeamServer.addStint(dataLastLap)
 						}
+
+						newLap := (dataLastLap > lastLap)
+						firstLap := ((lastLap == 0) && newLap)
 
 						if newLap {
 							if !RaceAssistantPlugin.sStintStartTime
@@ -2563,7 +2566,23 @@ class RaceAssistantPlugin extends ControllerPlugin {
 								data := RaceAssistantPlugin.acquireSessionData(&telemetryData, &positionsData, true)
 						}
 
-						if firstLap {
+						if (joinedSession || reenteredSession) {
+							if RaceAssistantPlugin.TeamSessionActive {
+								if joinedSession {
+									RaceAssistantPlugin.TeamServer.joinSession(getMultiMapValue(data, "Session Data", "Simulator")
+																			 , getMultiMapValue(data, "Session Data", "Car")
+																			 , getMultiMapValue(data, "Session Data", "Track")
+																			 , dataLastLap)
+
+									RaceAssistantPlugin.startAssistantsSession(data)
+								}
+
+								RaceAssistantPlugin.restoreAssistantsSessionState(data)
+							}
+							else
+								RaceAssistantPlugin.startAssistantsSession(data)
+						}
+						else if firstLap {
 							if RaceAssistantPlugin.connectTeamSession()
 								if RaceAssistantPlugin.driverActive(data) {
 									teamServer := RaceAssistantPlugin.TeamServer
@@ -2591,20 +2610,6 @@ class RaceAssistantPlugin extends ControllerPlugin {
 								}
 
 							RaceAssistantPlugin.startAssistantsSession(data, skippedLap)
-						}
-						else if joinedSession {
-							if RaceAssistantPlugin.TeamSessionActive {
-								RaceAssistantPlugin.TeamServer.joinSession(getMultiMapValue(data, "Session Data", "Simulator")
-																		 , getMultiMapValue(data, "Session Data", "Car")
-																		 , getMultiMapValue(data, "Session Data", "Track")
-																		 , dataLastLap)
-
-								RaceAssistantPlugin.startAssistantsSession(data)
-
-								RaceAssistantPlugin.restoreAssistantsSessionState(data)
-							}
-							else
-								RaceAssistantPlugin.startAssistantsSession(data)
 						}
 
 						if isDebug() {

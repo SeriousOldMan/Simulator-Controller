@@ -164,6 +164,14 @@ class SpeechImprover extends ConfigurationItem {
 			throw "Unsupported service detected in SpeechImprover.startImprover..."
 	}
 
+	setChoices(name, choices) {
+		this.iChoices[name] := this.newChoices(choices)
+	}
+
+	setGrammar(name, grammar) {
+		this.iGrammars[name] := this.newGrammer(grammar)
+	}
+
 	improve(text, options := false) {
 		local doRephrase, doTranslate, code, language
 
@@ -217,5 +225,9 @@ class SpeechImprover extends ConfigurationItem {
 		}
 		else
 			return text
+	}
+
+	recognize(text, &arguments?) {
+		return false
 	}
 }

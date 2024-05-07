@@ -951,7 +951,7 @@ class BasicStepWizard extends StepWizard {
 			if (setup.HasProp("SpeakerImprover") && setup.SpeakerImprover) {
 				setMultiMapValue(configuration, "Speech Improver", assistant . ".Service", setup.SpeakerImprover["Service"])
 				setMultiMapValue(configuration, "Speech Improver", assistant . ".Model", setup.SpeakerImprover["Model"])
-				setMultiMapValue(configuration, "Speech Improver", assistant . ".Probabilitty", setup.SpeakerImprover["Probability"])
+				setMultiMapValue(configuration, "Speech Improver", assistant . ".Probability", setup.SpeakerImprover["Probability"])
 				setMultiMapValue(configuration, "Speech Improver", assistant . ".Temperature", setup.SpeakerImprover["Temperature"])
 			}
 

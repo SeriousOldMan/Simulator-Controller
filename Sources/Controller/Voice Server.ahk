@@ -162,12 +162,12 @@ class VoiceServer extends ConfigurationItem {
 					if options {
 						options := toMap(options)
 
-						text := improver.improve(text, Map("Language", this.VoiceClient.Language
-														 , "Rephrase", (!options.Has("Rephrase") || options["Rephrase"])
-														 , "Translate", (improver.Language && !options.Has("Translate") || options["Tranlate"])))
+						text := improver.speak(text, Map("Language", this.VoiceClient.Language
+													   , "Rephrase", (!options.Has("Rephrase") || options["Rephrase"])
+													   , "Translate", (improver.Language && !options.Has("Translate") || options["Tranlate"])))
 					}
 					else
-						text := improver.improve(text, Map("Language", this.VoiceClient.Language))
+						text := improver.speak(text, Map("Language", this.VoiceClient.Language))
 				}
 
 				super.speak(text, wait, cache, options)
@@ -1135,7 +1135,8 @@ class VoiceServer extends ConfigurationItem {
 		if (client && (this.ActiveVoiceClient == client))
 			this.deactivateVoiceClient(descriptor)
 
-		client := VoiceServer.VoiceClient(this, descriptor, routing, pid, language, synthesizer, speaker, recognizer, listener, speakerVolume, speakerPitch, speakerSpeed, speakerImprover, activationCallback, deactivationCallback, recognizerMode)
+		client := VoiceServer.VoiceClient(this, descriptor, routing, pid, language, synthesizer, speaker, recognizer, listener
+											  , speakerVolume, speakerPitch, speakerSpeed, speakerImprover, activationCallback, deactivationCallback, recognizerMode)
 
 		this.VoiceClients[descriptor] := client
 

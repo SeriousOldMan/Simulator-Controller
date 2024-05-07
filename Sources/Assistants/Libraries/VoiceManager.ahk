@@ -327,12 +327,12 @@ class VoiceManager extends ConfigurationItem {
 						if options {
 							options := toMap(options)
 
-							text := improver.improve(text, Map("Language", this.VoiceManager.Language
-															 , "Rephrase", (!options.Has("Rephrase") || options["Rephrase"])
-															 , "Translate", (improver.Language && !options.Has("Translate") || options["Tranlate"])))
+							text := improver.speak(text, Map("Language", this.VoiceManager.Language
+														   , "Rephrase", (!options.Has("Rephrase") || options["Rephrase"])
+														   , "Translate", (improver.Language && !options.Has("Translate") || options["Tranlate"])))
 						}
 						else
-							text := improver.improve(text, Map("Language", this.VoiceManager.Language))
+							text := improver.speak(text, Map("Language", this.VoiceManager.Language))
 					}
 
 					this.Speaking := true
@@ -1083,15 +1083,15 @@ class VoiceManager extends ConfigurationItem {
 
 		this.iRecognizerMode := mode
 
-		for name, choices in getMultiMapValues(grammars, "Choices")
+		for name, choices in getMultiMapValues(grammars, "Choices") {
 			compilerRecognizer.setChoices(name, choices)
 
-		for name, choices in getMultiMapValues(grammars, "Choices")
 			if spRecognizer
 				spRecognizer.setChoices(name, choices)
 			else
 				messageSend(kFileMessage, "Voice", "registerChoices:" . values2String(";", this.Name, name, string2Values(",", StrReplace(choices, ";", ","))*)
 										, this.VoiceServer)
+		}
 
 		for grammar, definition in getMultiMapValues(grammars, "Listener Grammars") {
 			definition := substituteVariables(definition, {name: this.Name})

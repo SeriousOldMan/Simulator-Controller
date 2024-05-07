@@ -20,6 +20,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "LLMConnector.ahk"
+#Include "SpeechRecognizer.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -30,6 +31,11 @@ class SpeechImprover extends ConfigurationItem {
 	iOptions := CaseInsenseMap()
 
 	iConnector := false
+
+	iCompiler := SpeechRecognizer("Compiler")
+
+	iChoices := CaseInsenseMap()
+	iGrammars := CaseInsenseMap()
 
 	Options[key?] {
 		Get {
@@ -80,6 +86,24 @@ class SpeechImprover extends ConfigurationItem {
 	Temperature {
 		Get {
 			return this.Options["Temperature"]
+		}
+	}
+
+	Compiler {
+		Get {
+			return this.iCompiler
+		}
+	}
+
+	Choices[name?] {
+		Get {
+			return (isSet(name) ? this.iChoices[name] : this.iChoices)
+		}
+	}
+
+	Grammars[name?] {
+		Get {
+			return (isSet(name) ? this.iGrammars[name] : this.iGrammars)
 		}
 	}
 
@@ -164,8 +188,43 @@ class SpeechImprover extends ConfigurationItem {
 			throw "Unsupported service detected in SpeechImprover.startImprover..."
 	}
 
-	improve(text, options := false) {
-		local doRephrase, doTranslate, code, language
+	setChoices(name, choices) {
+		this.iChoices[name] := choices
+
+		this.Compiler.setChoices(name, choices)
+	}
+
+	setGrammar(name, grammar) {
+		try {
+			this.iGrammars[name] := this.createGrammar(this.Compiler.compileGrammar(grammar))
+		}
+		catch Any as exception {
+			logError(exception, true)
+
+			logMessage(kLogCritical, translate("Error while registering voice command `"") . grammar . translate("`" - please check the configuration"))
+
+			showMessage(substituteVariables(translate("Cannot register voice command `"%command%`" - please check the configuration..."), {command: grammar})
+					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+		}
+	}
+
+	createGrammar(grammar) {
+		return grammar.Phrases
+	}
+
+	speak(text, options := false) {
+		local doRephrase, doTranslate, code, language, fileName, languageInstructions, instruction
+
+		static instructions := false
+
+		if !instructions
+			for code, language in availableLanguages() {
+				languageInstructions := readMultiMap(kTranslationsDirectory . "Speech Improver.instructions." . code)
+
+				addMultiMapValues(languageInstructions, readMultiMap(kUserTranslationsDirectory . "Speech Improver.instructions." . code))
+
+				instructions[code] := languageInstructions
+			}
 
 		if this.Model {
 			code := this.Code
@@ -189,20 +248,16 @@ class SpeechImprover extends ConfigurationItem {
 					if options.Has("Language")
 						code := options["Language"]
 
-					if doRephrase {
-						instruction := translate("Rephrase the text after the three |", code)
-
-						if doTranslate
-							instruction .= (translate(" and translate it to ", code) . language)
-						else if (this.Code && (this.Code != code))
-							instruction .= translate(" and retain its original language", code)
-					}
+					if (doRephrase && doTranslate)
+						instruction := "RephraseTranslate"
+					else if doTranslate
+						instruction := "Translate"
 					else
-						instruction := (translate("Translate the text after the three | to ", code) . language)
+						instruction := "Rephrase"
 
-					instruction .= (translate(". The text comes from radio communication in motorsport. Do only answer with the new text.", code) . " `n|||`n")
-
-					answer := this.Connector.Ask(instruction . text)
+					answer := this.Connector.Ask(substituteVariables(getMultiMapValue(instructions[instructions.Has(code) ? code: "EN"]
+																					, "Speaker.Instructions", instruction)
+																   , {language: language ? language : "", text: text}))
 
 					return (answer ? answer : text)
 				}
@@ -217,5 +272,9 @@ class SpeechImprover extends ConfigurationItem {
 		}
 		else
 			return text
+	}
+
+	listen(text, &arguments?) {
+		return false
 	}
 }

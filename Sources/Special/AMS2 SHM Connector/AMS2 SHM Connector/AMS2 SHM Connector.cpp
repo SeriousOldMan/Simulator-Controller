@@ -222,72 +222,6 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 	bool writeStandings = (getArgument(request, "Standings") != "");
 	bool writeTelemetry = !writeStandings;
 
-	if (writeStandings) {
-		printLine(&output, "[Position Data]");
-
-		if (fileHandle == NULL) {
-			printLine(&output, "Active=false");
-
-			strcpy_s(result, size, output.str().c_str());
-
-			return 1;
-		}
-
-		if (fileHandle == NULL) {
-			printLine(&output, "Active=false");
-			printLine(&output, "Car.Count=0");
-			printLine(&output, "Driver.Car=0");
-		}
-		else {
-			printLine(&output, "Car.Count=", localCopy->mNumParticipants);
-			printLine(&output, "Driver.Car=", localCopy->mViewedParticipantIndex + 1);
-			
-			for (int i = 1; i <= localCopy->mNumParticipants; ++i) {
-				ParticipantInfo vehicle = localCopy->mParticipantInfo[i - 1];
-
-				print(&output, "Car.", i); printLine(&output, ".Nr=", i);
-				print(&output, "Car.", i); printLine(&output, ".Class=", localCopy->mCarClassNames[i - 1]);
-				print(&output, "Car.", i); printLine(&output, ".Position=", (long)vehicle.mRacePosition);
-				print(&output, "Car.", i); printLine(&output, ".Laps=", (long)vehicle.mLapsCompleted);
-				print(&output, "Car.", i); printLine(&output, ".Lap.Running=", vehicle.mCurrentLapDistance / localCopy->mTrackLength);
-				print(&output, "Car.", i); printLine(&output, ".Lap.Running.Valid=", localCopy->mLapsInvalidated[i - 1] ? "false" : "true");
-				print(&output, "Car.", i); printLine(&output, ".Time=", (long)(localCopy->mLastLapTimes[i - 1] * 1000));
-				print(&output, "Car.", i); print(&output, ".Time.Sectors=");
-				print(&output, (long)(localCopy->mCurrentSector1Times[i - 1] * 1000)); print(&output, ",");
-				print(&output, (long)(localCopy->mCurrentSector2Times[i - 1] * 1000)); print(&output, ",");
-				print(&output, (long)(localCopy->mCurrentSector3Times[i - 1] * 1000)); printLine(&output);
-												
-				print(&output, "Car.", i); printLine(&output, ".Car=", localCopy->mCarNames[i - 1]);
-
-				char* name = (char*)vehicle.mName;
-
-				if (strchr((char*)name, ' ')) {
-					char forName[100];
-					char surName[100];
-					char nickName[3];
-
-					size_t length = strcspn(name, " ");
-
-					substring(name, forName, 0, length);
-					substring(name, surName, length + 1, strlen(name) - length - 1);
-					nickName[0] = forName[0], nickName[1] = surName[0], nickName[2] = '\0';
-
-					print(&output, "Car.", i); printLine(&output, ".Driver.Forname=", forName);
-					print(&output, "Car.", i); printLine(&output, ".Driver.Surname=", surName);
-					print(&output, "Car.", i); printLine(&output, ".Driver.Nickname=", nickName);
-				}
-				else {
-					print(&output, "Car.", i); printLine(&output, ".Driver.Forname=", name);
-					print(&output, "Car.", i); printLine(&output, ".Driver.Surname=", "");
-					print(&output, "Car.", i); printLine(&output, ".Driver.Nickname=", "");
-				}
-
-				print(&output, "Car.", i); printLine(&output, ".InPitLane=", localCopy->mPitModes[i - 1] > PIT_MODE_NONE ? "true" : "false");
-				print(&output, "Car.", i); printLine(&output, ".InPit=", localCopy->mPitModes[i - 1] > PIT_MODE_IN_PIT ? "true" : "false");
-			}
-		}
-	}
-
 	if (writeTelemetry) {
 		printLine(&output, "[Session Data]");
 
@@ -470,6 +404,72 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 		printLine(&output, "Weather=", weather);
 		printLine(&output, "Weather10Min=", weather);
 		printLine(&output, "Weather30Min=", weather);
+	}
+
+	if (writeStandings) {
+		printLine(&output, "[Position Data]");
+
+		if (fileHandle == NULL) {
+			printLine(&output, "Active=false");
+
+			strcpy_s(result, size, output.str().c_str());
+
+			return 1;
+		}
+
+		if (fileHandle == NULL) {
+			printLine(&output, "Active=false");
+			printLine(&output, "Car.Count=0");
+			printLine(&output, "Driver.Car=0");
+		}
+		else {
+			printLine(&output, "Car.Count=", localCopy->mNumParticipants);
+			printLine(&output, "Driver.Car=", localCopy->mViewedParticipantIndex + 1);
+
+			for (int i = 1; i <= localCopy->mNumParticipants; ++i) {
+				ParticipantInfo vehicle = localCopy->mParticipantInfo[i - 1];
+
+				print(&output, "Car.", i); printLine(&output, ".Nr=", i);
+				print(&output, "Car.", i); printLine(&output, ".Class=", localCopy->mCarClassNames[i - 1]);
+				print(&output, "Car.", i); printLine(&output, ".Position=", (long)vehicle.mRacePosition);
+				print(&output, "Car.", i); printLine(&output, ".Laps=", (long)vehicle.mLapsCompleted);
+				print(&output, "Car.", i); printLine(&output, ".Lap.Running=", vehicle.mCurrentLapDistance / localCopy->mTrackLength);
+				print(&output, "Car.", i); printLine(&output, ".Lap.Running.Valid=", localCopy->mLapsInvalidated[i - 1] ? "false" : "true");
+				print(&output, "Car.", i); printLine(&output, ".Time=", (long)(localCopy->mLastLapTimes[i - 1] * 1000));
+				print(&output, "Car.", i); print(&output, ".Time.Sectors=");
+				print(&output, (long)(localCopy->mCurrentSector1Times[i - 1] * 1000)); print(&output, ",");
+				print(&output, (long)(localCopy->mCurrentSector2Times[i - 1] * 1000)); print(&output, ",");
+				print(&output, (long)(localCopy->mCurrentSector3Times[i - 1] * 1000)); printLine(&output);
+
+				print(&output, "Car.", i); printLine(&output, ".Car=", localCopy->mCarNames[i - 1]);
+
+				char* name = (char*)vehicle.mName;
+
+				if (strchr((char*)name, ' ')) {
+					char forName[100];
+					char surName[100];
+					char nickName[3];
+
+					size_t length = strcspn(name, " ");
+
+					substring(name, forName, 0, length);
+					substring(name, surName, length + 1, strlen(name) - length - 1);
+					nickName[0] = forName[0], nickName[1] = surName[0], nickName[2] = '\0';
+
+					print(&output, "Car.", i); printLine(&output, ".Driver.Forname=", forName);
+					print(&output, "Car.", i); printLine(&output, ".Driver.Surname=", surName);
+					print(&output, "Car.", i); printLine(&output, ".Driver.Nickname=", nickName);
+				}
+				else {
+					print(&output, "Car.", i); printLine(&output, ".Driver.Forname=", name);
+					print(&output, "Car.", i); printLine(&output, ".Driver.Surname=", "");
+					print(&output, "Car.", i); printLine(&output, ".Driver.Nickname=", "");
+				}
+
+				print(&output, "Car.", i); printLine(&output, ".InPitLane=", localCopy->mPitModes[i - 1] > PIT_MODE_NONE ? "true" : "false");
+				print(&output, "Car.", i); printLine(&output, ".InPit=", localCopy->mPitModes[i - 1] > PIT_MODE_IN_PIT ? "true" : "false");
+			}
+		}
 	}
 
 	strcpy_s(result, size, output.str().c_str());

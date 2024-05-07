@@ -1083,15 +1083,15 @@ class VoiceManager extends ConfigurationItem {
 
 		this.iRecognizerMode := mode
 
-		for name, choices in getMultiMapValues(grammars, "Choices")
+		for name, choices in getMultiMapValues(grammars, "Choices") {
 			compilerRecognizer.setChoices(name, choices)
 
-		for name, choices in getMultiMapValues(grammars, "Choices")
 			if spRecognizer
 				spRecognizer.setChoices(name, choices)
 			else
 				messageSend(kFileMessage, "Voice", "registerChoices:" . values2String(";", this.Name, name, string2Values(",", StrReplace(choices, ";", ","))*)
 										, this.VoiceServer)
+		}
 
 		for grammar, definition in getMultiMapValues(grammars, "Listener Grammars") {
 			definition := substituteVariables(definition, {name: this.Name})

@@ -20,6 +20,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "LLMConnector.ahk"
+#Include "SpeechRecognizer.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -30,6 +31,11 @@ class SpeechImprover extends ConfigurationItem {
 	iOptions := CaseInsenseMap()
 
 	iConnector := false
+
+	iCompiler := SpeechRecognizer("Compiler")
+
+	iChoices := CaseInsenseMap()
+	iGrammars := CaseInsenseMap()
 
 	Options[key?] {
 		Get {
@@ -80,6 +86,24 @@ class SpeechImprover extends ConfigurationItem {
 	Temperature {
 		Get {
 			return this.Options["Temperature"]
+		}
+	}
+
+	Compiler {
+		Get {
+			return this.iCompiler
+		}
+	}
+
+	Choices[name?] {
+		Get {
+			return (isSet(name) ? this.iChoices[name] : this.iChoices)
+		}
+	}
+
+	Grammars[name?] {
+		Get {
+			return (isSet(name) ? this.iGrammars[name] : this.iGrammars)
 		}
 	}
 
@@ -165,11 +189,27 @@ class SpeechImprover extends ConfigurationItem {
 	}
 
 	setChoices(name, choices) {
-		this.iChoices[name] := this.newChoices(choices)
+		this.iChoices[name] := choices
+
+		this.Compiler.setChoices(name, choices)
 	}
 
 	setGrammar(name, grammar) {
-		this.iGrammars[name] := this.newGrammer(grammar)
+		try {
+			this.iGrammars[name] := this.createGrammar(this.Compiler.compileGrammar(grammar))
+		}
+		catch Any as exception {
+			logError(exception, true)
+
+			logMessage(kLogCritical, translate("Error while registering voice command `"") . grammar . translate("`" - please check the configuration"))
+
+			showMessage(substituteVariables(translate("Cannot register voice command `"%command%`" - please check the configuration..."), {command: grammar})
+					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+		}
+	}
+
+	createGrammar(grammar) {
+		return grammar.Phrases
 	}
 
 	speak(text, options := false) {

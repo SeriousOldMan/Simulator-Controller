@@ -37,8 +37,9 @@ global kBuildConfiguration := "Production"
 
 class TestRaceStrategist extends RaceStrategist {
 	__New(configuration, settings, remoteHandler := false, name := false, language := kUndefined
-		, service := false, speaker := false, recognizer := false, listener := false, voiceServer := false) {
-		super.__New(configuration, remoteHandler, name, language, service, speaker, false, recognizer, listener, voiceServer)
+		, synthesizer := false, speaker := false, vocalics := false, improver := false
+		, recognizer := false, listener := false, muted := false, voiceServer := false) {
+		super.__New(configuration, remoteHandler, name, language, synthesizer, speaker, vocalics, improver, recognizer, listener, muted, voiceServer)
 
 		this.updateConfigurationValues({Settings: settings})
 
@@ -403,7 +404,7 @@ if !GetKeyState("Ctrl") {
 else {
 	raceNr := 15
 	strategist := TestRaceStrategist(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Strategist.settings")
-								   , RaceStrategist.RaceStrategistRemoteHandler(0), "Khato", "DE", true, true, true, true)
+								   , RaceStrategist.RaceStrategistRemoteHandler(0), "Khato", "DE", true, true, false, false, true, true)
 
 	strategist.VoiceManager.setDebug(kDebugGrammars, false)
 

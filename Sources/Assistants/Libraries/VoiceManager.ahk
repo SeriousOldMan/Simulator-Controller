@@ -327,12 +327,12 @@ class VoiceManager extends ConfigurationItem {
 						if options {
 							options := toMap(options)
 
-							text := improver.improve(text, Map("Language", this.VoiceManager.Language
-															 , "Rephrase", (!options.Has("Rephrase") || options["Rephrase"])
-															 , "Translate", (improver.Language && !options.Has("Translate") || options["Tranlate"])))
+							text := improver.speak(text, Map("Language", this.VoiceManager.Language
+														   , "Rephrase", (!options.Has("Rephrase") || options["Rephrase"])
+														   , "Translate", (improver.Language && !options.Has("Translate") || options["Tranlate"])))
 						}
 						else
-							text := improver.improve(text, Map("Language", this.VoiceManager.Language))
+							text := improver.speak(text, Map("Language", this.VoiceManager.Language))
 					}
 
 					this.Speaking := true

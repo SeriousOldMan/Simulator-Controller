@@ -164,7 +164,7 @@ class SpeechImprover extends ConfigurationItem {
 			throw "Unsupported service detected in SpeechImprover.startImprover..."
 	}
 
-	improve(text, options := false) {
+	speak(text, options := false) {
 		local doRephrase, doTranslate, code, language, fileName, languageInstructions, instruction
 
 		static instructions := false
@@ -200,9 +200,6 @@ class SpeechImprover extends ConfigurationItem {
 					if options.Has("Language")
 						code := options["Language"]
 
-					if !instructions.Has(code)
-						code := "EN"
-
 					if (doRephrase && doTranslate)
 						instruction := "RephraseTranslate"
 					else if doTranslate
@@ -210,7 +207,8 @@ class SpeechImprover extends ConfigurationItem {
 					else
 						instruction := "Rephrase"
 
-					answer := this.Connector.Ask(substituteVariables(getMultiMapValue(instructions[code], "Improver.Instructions", instruction)
+					answer := this.Connector.Ask(substituteVariables(getMultiMapValue(instructions[instructions.Has(code) ? code: "EN"]
+																					, "Speaker.Instructions", instruction)
 																   , {language: language ? language : "", text: text}))
 
 					return (answer ? answer : text)

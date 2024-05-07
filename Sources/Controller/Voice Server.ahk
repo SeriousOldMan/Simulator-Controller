@@ -162,12 +162,12 @@ class VoiceServer extends ConfigurationItem {
 					if options {
 						options := toMap(options)
 
-						text := improver.improve(text, Map("Language", this.VoiceClient.Language
-														 , "Rephrase", (!options.Has("Rephrase") || options["Rephrase"])
-														 , "Translate", (improver.Language && !options.Has("Translate") || options["Tranlate"])))
+						text := improver.speak(text, Map("Language", this.VoiceClient.Language
+													   , "Rephrase", (!options.Has("Rephrase") || options["Rephrase"])
+													   , "Translate", (improver.Language && !options.Has("Translate") || options["Tranlate"])))
 					}
 					else
-						text := improver.improve(text, Map("Language", this.VoiceClient.Language))
+						text := improver.speak(text, Map("Language", this.VoiceClient.Language))
 				}
 
 				super.speak(text, wait, cache, options)

@@ -571,7 +571,7 @@ class RaceAssistant extends ConfigurationItem {
 		options["Vocalics"] := Array(getMultiMapValue(configuration, "Voice Control", "SpeakerVolume", 100)
 								   , getMultiMapValue(configuration, "Voice Control", "SpeakerPitch", 0)
 								   , getMultiMapValue(configuration, "Voice Control", "SpeakerSpeed", 0))
-		options["Improver"] := ((getMultiMapValue(configuration, "Voice Improver", this.AssistantType . ".Model", kUndefined) =! kUndefined) ? this.AssistantType : false)
+		options["Improver"] := ((getMultiMapValue(configuration, "Speech Improver", this.AssistantType . ".Model", kUndefined) =! kUndefined) ? this.AssistantType : false)
 		options["Recognizer"] := getMultiMapValue(configuration, "Voice Control", "Recognizer", "Desktop")
 		options["Listener"] := getMultiMapValue(configuration, "Voice Control", "Listener", false)
 		options["PushToTalk"] := getMultiMapValue(configuration, "Voice Control", "PushToTalk", false)
@@ -1289,6 +1289,18 @@ class RaceAssistant extends ConfigurationItem {
 	restoreSessionState(settingsFile, stateFile) {
 		local sessionState, sessionSettings
 
+		if isDebug()
+
+		if isDebug() {
+			logMessage(kLogCritical, "Restoring session state for " . this.AssistantType . "...")
+
+			if (!settingsFile || (readMultiMap(settingsFile).Count = 0))
+				logMessage(kLogCritical, "Session settings are empty for " . this.AssistantType . "...")
+
+			if (!stateFile || (readMultiMap(stateFile).Count = 0))
+				logMessage(kLogCritical, "Session state is empty for " . this.AssistantType . "...")
+		}
+
 		if stateFile {
 			sessionState := readMultiMap(stateFile)
 
@@ -1740,6 +1752,9 @@ class RaceAssistant extends ConfigurationItem {
 		local settingsFile, stateFile
 
 		if this.RemoteHandler {
+			if isDebug()
+				logMessage(kLogCritical, "Saving session state for " . this.AssistantType . "...")
+
 			settingsFile := temporaryFileName(this.AssistantType, "settings")
 			stateFile := temporaryFileName(this.AssistantType, "state")
 

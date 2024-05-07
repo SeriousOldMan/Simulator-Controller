@@ -709,7 +709,7 @@ void updateTrackSpline() {
 				if (buildTrackSpline->size() > 100 && fabs(newPosX - startPosX) < 30.0 && fabs(newPosY - startPosY) < 30.0) {
 					trackSplineBuilding = false;
 
-					if ((gf->iLastTime > 0) && ((gf->iLastTime * 1.002) < bestLapTime)) {
+					if (!trackSplineReady || ((gf->iLastTime > 0) && ((gf->iLastTime * 1.002) < bestLapTime))) {
 						bestLapTime = gf->iLastTime;
 
 						int length = idealLine.size();
@@ -752,7 +752,7 @@ void updateTrackSpline() {
 					}
 				}
 				else {
-					string key = std::to_string((long)round(newPosX / 10)) + "|" + std::to_string((long)round(newPosY / 10));
+					string key = std::to_string((long)round(newPosX / 5)) + "|" + std::to_string((long)round(newPosY / 5));
 
 					if (!buildTrackSpline->contains(key)) {
 						buildTrackSplineRunning += distance;
@@ -860,8 +860,8 @@ bool startTrackSplineBuilder(int driverIdx) {
 float getRunning(int carIdx) {
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
-	string key = std::to_string((long)round(gf->carCoordinates[carIdx][0] / 10)) + "|" +
-				 std::to_string((long)round(gf->carCoordinates[carIdx][2] / 10));
+	string key = std::to_string((long)round(gf->carCoordinates[carIdx][0] / 5)) + "|" +
+				 std::to_string((long)round(gf->carCoordinates[carIdx][2] / 5));
 
 	if (activeTrackSpline->contains(key)) {
 		float distance = activeTrackSpline->at(key).distance;
@@ -913,32 +913,37 @@ std::vector<SlowCarInfo> accidentsAhead;
 std::vector<SlowCarInfo> accidentsBehind;
 std::vector<SlowCarInfo> slowCarsAhead;
 
-double getAverageSpeed(double running) {
+inline double getAverageSpeed(double running) {
 	int last = (idealLine.size() - 1);
-	int index = (int)std::round(running * last);
-	int count = 0;
-	double speed = 0;
+	int index = min(last, max(0, (int)std::round(running * last)));
 	
-	index = min(last, max(0, index));
-	
-	/*
-	if (idealLine[index].count > 20)
-		for (int i = max(0, index - 1); i <= min(last, index + 1); i++)
-			if (idealLine[i].count > 20) {
-				speed += idealLine[i].speed;
-				count += 1;
-			}
-	
-	return (count > 0) ? speed / count : -1;
-	*/
-
 	return idealLine[index].getSpeed();
 }
+
+inline void clearAverageSpeed(double running) {
+	int last = (idealLine.size() - 1);
+	int index = min(last, max(0, (int)std::round(running * last)));
+	
+	idealLine[index].clear();
+			
+	index -= 1;
+	
+	if (index >= 0)
+		idealLine[index].clear();
+	
+	index += 2;
+	
+	if (index <= last)
+		idealLine[index].clear();
+}
+
+int completedLaps = 0;
+int numAccidents = 0;
 
 bool checkAccident() {
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 	bool accident = false;
-
+	
 	if (gf->isInPit || gf->isInPitLane) {
 		trackSplineBuilding = false;
 
@@ -946,6 +951,18 @@ bool checkAccident() {
 		bestLapTime = LONG_MAX;
 
 		return false;
+	}
+	
+	if (gf->completedLaps > completedLaps) {
+		if (numAccidents >= (trackLength / 1000)) {
+			int length = idealLine.size();
+
+			for (int i = 0; i < length; i++)
+				idealLine[i].clear();
+		}
+		
+		completedLaps = gf->completedLaps;
+		numAccidents = 0;
 	}
 
 	int carID = gf->playerCarID;
@@ -1001,23 +1018,27 @@ bool checkAccident() {
 			for (int i = 0; i < gf->activeCars; i++) {
 				double speed = getSpeed(i, milliSeconds);
 				double running = getRunning(i);
-				double avgSpeed = getAverageSpeed(running);
+				double avgSpeed = -1;
 				
-				if (traceFileName != "") {
-					std::ofstream output;
-
-					output.open(traceFileName, std::ios::out | std::ios::app);
-
-					output << "S (" << i << "): " << running << "; " << speed << "; " << avgSpeed << endl;
-
-					output.close();
-				}
-
 				if (i != carID) {
 					if (speed >= 5) {
-						if (running >= 0) {
+						if (running >= 0) {				
+							avgSpeed = getAverageSpeed(running);
+				
+							if (traceFileName != "") {
+								std::ofstream output;
+
+								output.open(traceFileName, std::ios::out | std::ios::app);
+
+								output << "S (" << i << "): " << running << "; " << speed << "; " << avgSpeed << endl;
+
+								output.close();
+							}
+
 							if ((avgSpeed >= 0) && (speed < (avgSpeed / 2)))
 							{
+								clearAverageSpeed(running);
+								
 								float distance = running * trackLength;
 
 								long distanceAhead = (long)(((distance > driverDistance) ? distance : (distance + trackLength)) - driverDistance);
@@ -1146,7 +1167,9 @@ bool checkAccident() {
 					strcat_s(message, numBuffer);
 
 					sendSpotterMessage(message);
-
+					
+					numAccidents += 1;
+					
 					return true;
 				}
 			}
@@ -1172,6 +1195,8 @@ bool checkAccident() {
 					strcat_s(message, numBuffer);
 
 					sendSpotterMessage(message);
+					
+					numAccidents += 1;
 
 					return true;
 				}
@@ -1197,6 +1222,8 @@ bool checkAccident() {
 					strcat_s(message, numBuffer);
 
 					sendSpotterMessage(message);
+					
+					numAccidents += 1;
 
 					return true;
 				}

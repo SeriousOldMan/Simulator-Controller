@@ -414,8 +414,6 @@ class RaceEngineerPlugin extends RaceAssistantPlugin {
 		super.performPitstop(lapNumber, options)
 
 		this.iPitstopPending := false
-
-		RaceAssistantPlugin.CollectorTask.Sleep := 10000
 	}
 
 	pitstopOptionChanged(option, verbose, values*) {
@@ -431,16 +429,12 @@ class RaceEngineerPlugin extends RaceAssistantPlugin {
 		this.iPitstopPending := true
 
 		this.Simulator.pitstopPrepared(pitstopNumber)
-
-		RaceAssistantPlugin.CollectorTask.Sleep := 5000
 	}
 
 	pitstopFinished(pitstopNumber) {
 		this.iPitstopPending := false
 
 		this.Simulator.pitstopFinished(pitstopNumber)
-
-		RaceAssistantPlugin.CollectorTask.Sleep := 10000
 	}
 
 	updateTyreSet(pitstopNumber, driver, laps, compound, compoundColor, set, flWear, frWear, rlWear, rrWear) {

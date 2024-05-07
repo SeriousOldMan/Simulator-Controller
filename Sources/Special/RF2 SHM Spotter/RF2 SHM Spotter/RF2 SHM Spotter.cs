@@ -695,29 +695,36 @@ namespace RF2SHMSpotter {
 			}
         }
 
-		double getAverageSpeed(double running) {
-			int last = (idealLine.Count - 1);
-            int index = (int)Math.Round(running * last);
-			int count = 0;
-			double speed = 0;
-			
-			index = Math.Min(last, Math.Max(0, index));
-
-            /*
-            if (idealLine[index].count > 20)
-                for (int i = Math.Max(0, index - 2); i <= Math.Min(last, index + 2); i++)
-					if (idealLine[i].count > 20) {
-						speed += idealLine[i].speed;
-						count += 1;
-					}
-
-            return (count > 0) ? speed / count : -1;
-			*/
+        double getAverageSpeed(double running)
+        {
+            int last = (idealLine.Count - 1);
+            int index = Math.Min(last, Math.Max(0, (int)Math.Round(running * last)));
 
             return idealLine[index].getSpeed();
         }
 
-		double bestLapTime = int.MaxValue;
+        void clearAverageSpeed(double running)
+        {
+            int last = (idealLine.Count - 1);
+            int index = Math.Min(last, Math.Max(0, (int)Math.Round(running * last)));
+
+            idealLine[index].clear();
+			
+			index -= 1;
+			
+			if (index >= 0)
+				idealLine[index].clear();
+			
+			index += 2;
+			
+			if (index <= last)
+				idealLine[index].clear();
+        }
+
+        double bestLapTime = int.MaxValue;
+
+		int completedLaps = 0;
+		int numAccidents = 0;
 
         bool checkAccident(ref rF2VehicleScoring playerScoring)
         {
@@ -749,6 +756,16 @@ namespace RF2SHMSpotter {
                 for (int i = 0; i < idealLine.Count; i++)
                     idealLine[i].clear();
             }
+	
+			if (playerScoring.mTotalLaps > completedLaps) {
+				if (numAccidents >= (scoring.mScoringInfo.mLapDist / 1000)) {
+					for (int i = 0; i < idealLine.Count; i++)
+						idealLine[i].clear();
+				}
+				
+				completedLaps = playerScoring.mTotalLaps;
+				numAccidents = 0;
+			}
 
             try
 			{
@@ -772,7 +789,9 @@ namespace RF2SHMSpotter {
 								long distanceAhead = (long)(((vehicle.mLapDist > playerScoring.mLapDist) ? vehicle.mLapDist
 																										 : (vehicle.mLapDist + scoring.mScoringInfo.mLapDist)) - playerScoring.mLapDist);
 
-								if (speed < (avgSpeed / 5))
+                                clearAverageSpeed(running);
+
+                                if (speed < (avgSpeed / 5))
 								{
 									if (distanceAhead < aheadAccidentDistance)
 										accidentsAhead.Add(new SlowCarInfo(i, distanceAhead));
@@ -822,6 +841,8 @@ namespace RF2SHMSpotter {
                             nextSlowCarAhead = cycle + 200;
 
 							SendSpotterMessage("accidentAlert:Ahead;" + distance);
+							
+							numAccidents += 1;
 
 							return true;
 						}
@@ -843,6 +864,8 @@ namespace RF2SHMSpotter {
                             nextAccidentBehind = cycle + 200;
 
                             SendSpotterMessage("slowCarAlert:" + distance);
+							
+							numAccidents += 1;
 
 							return true;
 						}
@@ -863,6 +886,8 @@ namespace RF2SHMSpotter {
 							nextAccidentBehind = cycle + 400;
 
 							SendSpotterMessage("accidentAlert:Behind;" + distance);
+							
+							numAccidents += 1;
 
 							return true;
 						}
@@ -1305,12 +1330,15 @@ namespace RF2SHMSpotter {
 
 				int completedLaps = playerScoring.mTotalLaps;
 
-				if (lastCompletedLaps != completedLaps)
+				if (lastCompletedLaps != completedLaps) {
+					lastCompletedLaps = completedLaps;
+					
 					while (true)
 						if (cornerDynamicsList[0].CompletedLaps < completedLaps - 2)
 							cornerDynamicsList.RemoveAt(0);
 						else
 							break;
+				}
 			}
 
             return true;

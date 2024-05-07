@@ -97,9 +97,9 @@ class LLMConnector {
 			body := JSON.print(body)
 
 			if isDebug() {
-				deleteFile(kTempDirectory . "Chat.request")
+				deleteFile(kTempDirectory . "LLM.request")
 
-				FileAppend(body, kTempDirectory . "Chat.request")
+				FileAppend(body, kTempDirectory . "LLM.request")
 			}
 
 			answer := WinHttpRequest().POST(this.CreateServiceURL(this.Server), body, headers, {Object: true, Encoding: "UTF-8"})
@@ -110,9 +110,9 @@ class LLMConnector {
 				answer := answer.JSON
 
 				if isDebug() {
-					deleteFile(kTempDirectory . "Chat.response")
+					deleteFile(kTempDirectory . "LLM.response")
 
-					FileAppend(JSON.print(answer), kTempDirectory . "Chat.response")
+					FileAppend(JSON.print(answer), kTempDirectory . "LLM.response")
 				}
 
 				try {
@@ -139,7 +139,7 @@ class LLMConnector {
 	class OpenAIConnector extends LLMConnector.HTTPConnector {
 		Models {
 			Get {
-				return ["GPT 3.5", "GPT 3.5 turbo", "GPT 3.5 turbo 1106", "GPT 4", "GPT 4 32k", "GPT 4 1106 preview"]
+				return ["GPT 3.5 turbo", "GPT 4", "GPT 4 32k", "GPT 4 turbo"]
 			}
 		}
 
@@ -256,9 +256,9 @@ class LLMConnector {
 			local command, answer
 
 			if isDebug() {
-				deleteFile(kTempDirectory . "Chat.request")
+				deleteFile(kTempDirectory . "LLM.request")
 
-				FileAppend(prompt, kTempDirectory . "Chat.request")
+				FileAppend(prompt, kTempDirectory . "LLM.request")
 			}
 
 			try {
@@ -286,9 +286,9 @@ class LLMConnector {
 					throw "Empty answer received..."
 
 				if isDebug() {
-					deleteFile(kTempDirectory . "Chat.response")
+					deleteFile(kTempDirectory . "LLM.response")
 
-					FileAppend(answer, kTempDirectory . "Chat.response")
+					FileAppend(answer, kTempDirectory . "LLM.response")
 				}
 
 				this.AddConversation(question, answer)

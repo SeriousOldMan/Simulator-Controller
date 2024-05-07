@@ -529,29 +529,34 @@ std::vector<SlowCarInfo> accidentsAhead;
 std::vector<SlowCarInfo> accidentsBehind;
 std::vector<SlowCarInfo> slowCarsAhead;
 
-double getAverageSpeed(double running) {
+inline double getAverageSpeed(double running) {
 	int last = (idealLine.size() - 1);
-	int index = (int)std::round(running * last);
-	int count = 0;
-	double speed = 0;
-	
-	index = min(last, max(0, index));
-	
-	/*
-	if (idealLine[index].count > 20)
-		for (int i = max(0, index - 2); i <= min(last, index + 2); i++)
-			if (idealLine[i].count > 20) {
-				speed += idealLine[i].speed;
-				count += 1;
-			}
-
-	return (count > 0) ? speed / count : -1;
-	*/
+	int index = min(last, max(0, (int)std::round(running * last)));
 
 	return idealLine[index].getSpeed();
 }
 
+inline void clearAverageSpeed(double running) {
+	int last = (idealLine.size() - 1);
+	int index = min(last, max(0, (int)std::round(running * last)));
+
+	idealLine[index].clear();
+	
+	index -= 1;
+	
+	if (index >= 0)
+		idealLine[index].clear();
+	
+	index += 2;
+	
+	if (index <= last)
+		idealLine[index].clear();
+}
+
 double bestLapTime = INT_LEAST32_MAX;
+
+int completedLaps = 0;
+int numAccidents = 0;
 
 bool checkAccident(const SharedMemory* sharedData)
 {
@@ -586,6 +591,18 @@ bool checkAccident(const SharedMemory* sharedData)
 		for (int i = 0; i < length; i++)
 			idealLine[i].clear();
 	}
+	
+	if (sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mLapsCompleted > completedLaps) {
+		if (numAccidents >= (sharedData->mTrackLength / 1000)) {
+			int length = idealLine.size();
+
+			for (int i = 0; i < length; i++)
+				idealLine[i].clear();
+		}
+		
+		completedLaps = sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mLapsCompleted;
+		numAccidents = 0;
+	}
 
 	try
 	{
@@ -605,6 +622,8 @@ bool checkAccident(const SharedMemory* sharedData)
 					{
 						long distanceAhead = (long)(((vehicle.mCurrentLapDistance > driver.mCurrentLapDistance) ? vehicle.mCurrentLapDistance
 							: (vehicle.mCurrentLapDistance + sharedData->mTrackLength)) - driver.mCurrentLapDistance);
+
+						clearAverageSpeed(running);
 
 						if (speed < (avgSpeed / 5))
 						{
@@ -664,6 +683,8 @@ bool checkAccident(const SharedMemory* sharedData)
 					strcat_s(message, numBuffer);
 
 					sendSpotterMessage(message);
+					
+					numAccidents += 1;
 
 					return true;
 				}
@@ -690,6 +711,8 @@ bool checkAccident(const SharedMemory* sharedData)
 					strcat_s(message, numBuffer);
 
 					sendSpotterMessage(message);
+					
+					numAccidents += 1;
 
 					return true;
 				}
@@ -715,6 +738,8 @@ bool checkAccident(const SharedMemory* sharedData)
 					strcat_s(message, numBuffer);
 
 					sendSpotterMessage(message);
+					
+					numAccidents += 1;
 
 					return true;
 				}

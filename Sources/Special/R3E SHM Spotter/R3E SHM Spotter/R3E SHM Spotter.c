@@ -574,32 +574,34 @@ slow_car_info accidentsAhead[10];
 slow_car_info accidentsBehind[10];
 slow_car_info slowCarsAhead[10];
 
-double getAverageSpeed(double running) {
+inline double getAverageSpeed(double running) {
 	int last = (idealLineSize - 1);
-	int index = (int)round(running * last);
-	// int count = 0;
-	// double speed = 0;
-	
-	index = min(last, max(0, index));
-	
-	/*
-	if ((&idealLine[index])->count > 20)
-		for (int i = max(0, index - 2); i <= min(last, index + 2); i++) {
-			ideal_line* slot = &idealLine[i];
-		
-			if (slot->count > 20) {
-				speed += slot->speed;
-				count += 1;
-			}
-		}
-	
-	return (count > 0) ? speed / count : -1;
-	*/
+	int index = min(last, max(0, (int)round(running * last)));
 
 	return il_get_speed(&idealLine[index]);
 }
 
+inline void clearAverageSpeed(double running) {
+	int last = (idealLineSize - 1);
+	int index = min(last, max(0, (int)round(running * last)));
+
+	il_clear(&idealLine[index]);
+	
+	index -= 1;
+	
+	if (index >= 0)
+		il_clear(&idealLine[index]);
+	
+	index += 2;
+	
+	if (index <= last)
+		il_clear(&idealLine[index]);
+}
+
 double bestLapTime = INT_LEAST32_MAX;
+
+int completedLaps = 0;
+int numAccidents = 0;
 
 BOOL checkAccident() {
 	int accidentsAheadCount = 0;
@@ -624,6 +626,16 @@ BOOL checkAccident() {
 		for (int i = 0; i < idealLineSize; i++)
 			il_clear(&idealLine[i]);
 	}
+	
+	if (map_buffer->completed_laps > completedLaps) {
+		if (numAccidents >= (map_buffer->layout_length / 1000)) {
+			for (int i = 0; i < idealLineSize; i++)
+				il_clear(&idealLine[i]);
+		}
+		
+		completedLaps = map_buffer->completed_laps;
+		numAccidents = 0;
+	}
 
 	double driverDistance = map_buffer->all_drivers_data_1[playerIdx].lap_distance;
 
@@ -642,6 +654,8 @@ BOOL checkAccident() {
 				{
 					long distanceAhead = (long)(((carDistance > driverDistance) ? carDistance : (carDistance + map_buffer->layout_length)) - driverDistance);
 
+					clearAverageSpeed(running);
+					
 					if (speed < (avgSpeed / 5))
 					{
 						if ((distanceAhead < aheadAccidentDistance) && (accidentsAheadCount < 10)) {
@@ -701,6 +715,8 @@ BOOL checkAccident() {
 					strcat_s(message, 40, numBuffer);
 
 					sendSpotterMessage(message);
+					
+					numAccidents += 1;
 
 					return TRUE;
 				}
@@ -727,6 +743,8 @@ BOOL checkAccident() {
 					strcat_s(message, 40, numBuffer);
 
 					sendSpotterMessage(message);
+					
+					numAccidents += 1;
 
 					return TRUE;
 				}
@@ -752,6 +770,8 @@ BOOL checkAccident() {
 					strcat_s(message, 40, numBuffer);
 
 					sendSpotterMessage(message);
+					
+					numAccidents += 1;
 
 					return TRUE;
 				}
@@ -1087,11 +1107,11 @@ corner_dynamics* firstCornerDynamics(int* index) {
 	return nextCornerDynamics(index);
 }
 
-void clearCornerDynamics(int completedLaps) {
+void clearCornerDynamics(int lastLap) {
 	int index;
 
 	for (corner_dynamics* corner = firstCornerDynamics(&index); corner != NULL; corner = nextCornerDynamics(&index))
-		if (corner->completedLaps < completedLaps - 1)
+		if (corner->completedLaps < lastLap - 1)
 			corner->speed = 0;
 }
 
@@ -1245,10 +1265,11 @@ BOOL collectTelemetry(char* soundsDirectory, char* audioDevice, BOOL calibrate) 
 
 		appendCornerDynamics(&cd);
 
-		int completedLaps = map_buffer->completed_laps;
-
-		if (lastCompletedLaps != completedLaps)
-			clearCornerDynamics(map_buffer->completed_laps);
+		if (lastCompletedLaps != map_buffer->completed_laps) {
+			lastCompletedLaps = map_buffer->completed_laps;
+			
+			clearCornerDynamics(lastCompletedLaps);
+		}
 	}
 
 	return TRUE;

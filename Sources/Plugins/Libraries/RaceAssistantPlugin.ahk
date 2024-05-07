@@ -369,8 +369,12 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				dataLap := getMultiMapValue(this.Data, "Stint Data", "Laps", false)
 
 				if (!dataLap || !stateLap || (Abs(dataLap - stateLap) <= 5)) {
-					if (isDebug() && isLogLevel(kLogDebug))
-						showMessage("Restoring session state for " . raceAssistant.Plugin)
+					if isDebug() {
+						if isLogLevel(kLogDebug)
+							showMessage("Restoring session state for " . raceAssistant.Plugin)
+
+						logMessage(kLogCritical, "Restoring session state for " . raceAssistant.Plugin . "...")
+					}
 
 					raceAssistant.Simulator.restoreSessionState(&sessionSettings, &sessionState)
 
@@ -396,7 +400,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				data := teamServer.getSessionValue(this.RaceAssistant.Plugin . A_Space . type)
 
 				if (!data || (data = ""))
-					throw "No data..."
+					return false
 				else
 					return parseMultiMap(data)
 			}
@@ -2061,9 +2065,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 						}
 				}
 
-			data := printMultiMap(data)
-
-			FileAppend(data, dataFile, "UTF-16")
+			FileAppend(printMultiMap(data), dataFile, "UTF-16")
 
 			this.RaceAssistant.performPitstop(lapNumber, dataFile)
 		}
@@ -2171,9 +2173,21 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 		this.Simulator.saveSessionState(&settings, &state)
 
+		if isDebug() {
+			if (!settings || (settings.Count = 0))
+				logMessage(kLogCritical, "Session settings are empty for " . this.Plugin . "...")
+
+			if (!state || (state.Count = 0))
+				logMessage(kLogCritical, "Session state is empty for " . this.Plugin . "...")
+		}
+
 		if (teamServer && this.TeamSessionActive) {
-			if (isDebug() && isLogLevel(kLogDebug))
-				showMessage("Saving session state for " . this.Plugin)
+			if isDebug() {
+				if isLogLevel(kLogDebug)
+					showMessage("Saving session state for " . this.Plugin)
+
+				logMessage(kLogCritical, "Saving session state for " . this.Plugin . "...")
+			}
 
 			if settings
 				teamServer.setSessionValue(this.Plugin . " Settings", printMultiMap(settings))
@@ -2184,7 +2198,14 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	}
 
 	restoreSessionState(data) {
-		if (this.RaceAssistant && this.TeamSessionActive)
+		if isDebug() {
+			if isLogLevel(kLogDebug)
+				showMessage("Start session state restoring for " . this.Plugin)
+
+			logMessage(kLogCritical, "Start session state restoring for " . this.Plugin . "...")
+		}
+
+		if (this.RaceAssistant && this.TeamServer && this.TeamSessionActive)
 			RaceAssistantPlugin.RestoreSessionStateTask(this, data).start()
 	}
 
@@ -2459,7 +2480,8 @@ class RaceAssistantPlugin extends ControllerPlugin {
 						; Car has finished the first lap
 
 						if (dataLastLap > 1) {
-							if ((dataLastLap > (lastLap + 1)) && !wasInactive && RaceAssistantPlugin.LapRunning) {
+							if ((dataLastLap > (lastLap + 1)) && !wasInactive && RaceAssistantPlugin.LapRunning
+							 && (SessionDatabase.getSimulatorName(simulator) = "iRacing") && (session = kSessionPractice)) {
 								; The lap counter jumped from 0 directly to a value greater than 1 - strange case, which sometimes happen in iRacing practice sessions
 
 								skippedLap := true
@@ -2512,9 +2534,6 @@ class RaceAssistantPlugin extends ControllerPlugin {
 						if (!RaceAssistantPlugin.Finish && RaceAssistantPlugin.finalLap(data, &finalLap))
 							RaceAssistantPlugin.sFinish := finalLap
 
-						newLap := (dataLastLap > lastLap)
-						firstLap := ((lastLap == 0) && newLap)
-
 						if RaceAssistantPlugin.InPit {
 							RaceAssistantPlugin.sInPit := false
 
@@ -2523,6 +2542,9 @@ class RaceAssistantPlugin extends ControllerPlugin {
 							if (RaceAssistantPlugin.TeamSessionActive && RaceAssistantPlugin.driverActive(data))
 								RaceAssistantPlugin.TeamServer.addStint(dataLastLap)
 						}
+
+						newLap := (dataLastLap > lastLap)
+						firstLap := ((lastLap == 0) && newLap)
 
 						if newLap {
 							if !RaceAssistantPlugin.sStintStartTime
@@ -2541,7 +2563,23 @@ class RaceAssistantPlugin extends ControllerPlugin {
 								data := RaceAssistantPlugin.acquireSessionData(&telemetryData, &positionsData, true)
 						}
 
-						if firstLap {
+						if joinedSession {
+							if RaceAssistantPlugin.TeamSessionActive {
+								if firstLap {
+									RaceAssistantPlugin.TeamServer.joinSession(getMultiMapValue(data, "Session Data", "Simulator")
+																			 , getMultiMapValue(data, "Session Data", "Car")
+																			 , getMultiMapValue(data, "Session Data", "Track")
+																			 , dataLastLap)
+
+									RaceAssistantPlugin.startAssistantsSession(data)
+								}
+
+								RaceAssistantPlugin.restoreAssistantsSessionState(data)
+							}
+							else
+								RaceAssistantPlugin.startAssistantsSession(data)
+						}
+						else if firstLap {
 							if RaceAssistantPlugin.connectTeamSession()
 								if RaceAssistantPlugin.driverActive(data) {
 									teamServer := RaceAssistantPlugin.TeamServer
@@ -2569,20 +2607,6 @@ class RaceAssistantPlugin extends ControllerPlugin {
 								}
 
 							RaceAssistantPlugin.startAssistantsSession(data, skippedLap)
-						}
-						else if joinedSession {
-							if RaceAssistantPlugin.TeamSessionActive {
-								RaceAssistantPlugin.TeamServer.joinSession(getMultiMapValue(data, "Session Data", "Simulator")
-																		 , getMultiMapValue(data, "Session Data", "Car")
-																		 , getMultiMapValue(data, "Session Data", "Track")
-																		 , dataLastLap)
-
-								RaceAssistantPlugin.startAssistantsSession(data)
-
-								RaceAssistantPlugin.restoreAssistantsSessionState(data)
-							}
-							else
-								RaceAssistantPlugin.startAssistantsSession(data)
 						}
 
 						if isDebug() {

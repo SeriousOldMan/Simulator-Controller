@@ -1,15 +1,15 @@
 [Development]
-Version=5.6.9.0-dev
-Target=5.6.9.0-release
-Date=04/30/2024
+Version=5.7.1.0-dev
+Target=5.7.1.0-release
+Date=05/06/2024
 Download=
-Changes=Added overtaking threshold gap for the Spotter, Rearranged info priority for the Spotter, New speech processor library for speech pre- and post-processing, Added speech post-processor configuration to "Simulator Setup"
+Changes=Fixed saving of probability setting for speech improver, Improved meta data for speech improver, Tweaking for accident detection, Tweaked damage lap delta calculation
 Components=Media->5.6.1,Configuration->5.6.4,Utilities->5.4.8
 [Release]
-Version=5.6.8.0-release
-Date=04/26/2024
-Download=https://cutt.ly/2w6P0AvI;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.6.8.0-release.zip
-Changes=Changed appearance of checkable menu items, Added "Auto Clear" for the "Practice Center", Added "Auto Export" for the "Practice Center", New damage info component in "System Monitor", Exposed damage information in the "Session State.json" file, Migrated to AHK 2.0.13, Optimized inconsistent driver warning of the Spotter, New LLMConnector class library, Support logical key mapping of tools
+Version=5.7.0.1-release
+Date=05/05/2024
+Download=https://cutt.ly/CewdIMsf;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.7.0.1-release.zip
+Changes=Added overtaking threshold gap for the Spotter, Rearranged info priority for the Spotter, New speech processor library for speech pre- and post-processing, Added speech post-processor configuration to "Simulator Setup", Fine-tuning of accident detection for extreme braking zones, Updated OpenAI model defaults
 Components=Media->5.6.1,Configuration->5.6.4,Utilities->5.4.8
 [Components]
 Media.5.6.1.Path=Resources
@@ -24,5 +24,5 @@ Utilities.5.4.8.Download=https://simulatorcontroller.s3.eu-central-1.amazonaws.c
 [Current]
 Type=Development
 [Version]
-Development=5.6.9.0-dev
-Release=5.6.8.0-release
+Development=5.7.1.0-dev
+Release=5.7.0.1-release

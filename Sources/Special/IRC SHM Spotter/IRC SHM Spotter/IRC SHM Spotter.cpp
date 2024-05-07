@@ -632,26 +632,28 @@ std::vector<SlowCarInfo> accidentsAhead;
 std::vector<SlowCarInfo> accidentsBehind;
 std::vector<SlowCarInfo> slowCarsAhead;
 
-double getAverageSpeed(double running) {
+inline double getAverageSpeed(double running) {
 	int last = (idealLine.size() - 1);
-	int index = (int)std::round(running * last);
-	int count = 0;
-	double speed = 0;
-	
-	index = min(last, max(0, index));
-	
-	/*
-	if (idealLine[index].count > 20)
-		for (int i = max(0, index - 2); i <= min(last, index + 2); i++)
-			if (idealLine[i].count > 20) {
-				speed += idealLine[i].speed;
-				count += 1;
-			}
-
-	return (count > 0) ? speed / count : -1;
-	*/
+	int index = min(last, max(0, (int)std::round(running * last)));
 
 	return idealLine[index].getSpeed();
+}
+
+inline void clearAverageSpeed(double running) {
+	int last = (idealLine.size() - 1);
+	int index = min(last, max(0, (int)std::round(running * last)));
+
+	idealLine[index].clear();
+	
+	index -= 1;
+	
+	if (index >= 0)
+		idealLine[index].clear();
+	
+	index += 2;
+	
+	if (index <= last)
+		idealLine[index].clear();
 }
 
 long lastTickCount = 0;
@@ -660,6 +662,9 @@ double lastRunnings[512];
 std::string traceFileName = "";
 
 long bestLapTime = LONG_MAX;
+
+int completedLaps = 0;
+int numAccidents = 0;
 
 bool checkAccident(const irsdk_header* header, const char* data, const int playerCarIndex, float trackLength)
 {
@@ -725,6 +730,24 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 			for (int i = 0; i < length; i++)
 				idealLine[i].clear();
 		}
+	
+		char* rawValue;
+		
+		getRawDataValue(rawValue, header, data, "Lap");
+
+		int carLaps = *((int*)rawValue);
+	
+		if (carLaps > completedLaps) {
+			if (numAccidents >= (trackLength / 1000)) {
+				int length = idealLine.size();
+
+				for (int i = 0; i < length; i++)
+					idealLine[i].clear();
+			}
+			
+			completedLaps = carLaps;
+			numAccidents = 0;
+		}
 
 		lastTickCount += milliSeconds;
 
@@ -759,6 +782,8 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 								{
 									long distanceAhead = (long)(((running > driverRunning) ? (running * trackLength)
 																						   : ((running * trackLength) + trackLength)) - (driverRunning * trackLength));
+
+									clearAverageSpeed(running);
 
 									if (speed < (avgSpeed / 5))
 									{
@@ -884,6 +909,8 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 					strcat_s(message, numBuffer);
 
 					sendSpotterMessage(message);
+					
+					numAccidents += 1;
 
 					return true;
 				}
@@ -910,6 +937,8 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 					strcat_s(message, numBuffer);
 
 					sendSpotterMessage(message);
+					
+					numAccidents += 1;
 
 					return true;
 				}
@@ -935,6 +964,8 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 					strcat_s(message, numBuffer);
 
 					sendSpotterMessage(message);
+					
+					numAccidents += 1;
 
 					return true;
 				}

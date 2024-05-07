@@ -27,7 +27,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 	Models[provider] {
 		Get {
 			if (provider = "OpenAI")
-				return ["GPT 3.5 turbo 1106", "GPT 4", "GPT 4 32k", "GPT 4 1106 preview"]
+				return ["GPT 3.5 turbo", "GPT 4", "GPT 4 32k", "GPT 4 turbo"]
 			else if (provider = "Azure")
 				return ["GPT 3.5", "GPT 3.5 turbo", "GPT 4", "GPT 4 32k"]
 			else
@@ -236,7 +236,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 				this.Control["dcModelDropDown"].Choose(index)
 		}
 		else
-			this.Control["dcModelDropDown"].Choose(inList(this.Models[provider], "GPT 3.5 turbo 1106"))
+			this.Control["dcModelDropDown"].Choose(inList(this.Models[provider], "GPT 3.5 turbo"))
 	}
 
 	initializeInstructions(provider, model, setting, edit := false) {
@@ -310,8 +310,8 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 						providerConfiguration["ServiceKey"] := ""
 				}
 
-			if ((providerConfiguration["Model"] = "") && inList(this.Models[provider], "GPT 3.5 turbo 1106"))
-				providerConfiguration["Model"] := "GPT 3.5 turbo 1106"
+			if ((providerConfiguration["Model"] = "") && inList(this.Models[provider], "GPT 3.5 turbo"))
+				providerConfiguration["Model"] := "GPT 3.5 turbo"
 
 			for ignore, setting in concatenate(["Temperature", "MaxHistory", "Confirmation"], this.Instructions)
 				if getMultiMapValue(configuration, "Driving Coach Personality", provider . "." . setting . ".Active", true)

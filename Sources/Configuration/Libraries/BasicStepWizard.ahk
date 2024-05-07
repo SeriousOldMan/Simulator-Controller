@@ -607,7 +607,14 @@ class BasicStepWizard extends StepWizard {
 		if this.SetupWizard.isModuleSelected("Voice Control") {
 			improver := this.SetupWizard.getModuleValue(assistant, "Improver", this.assistantDefaults(assistant).Improver)
 
-			return (improver ? (isInstance(improver, Map) ? improver : string2Map("|||", "--->>>", improver)) : false)
+			if improver {
+				improver := (isInstance(improver, Map) ? improver : string2Map("|||", "--->>>", improver))
+
+				if !improver.Has("Probability")
+					improver["Probability"] := 0.5
+			}
+
+			return (improver ? improver : false)
 		}
 		else
 			return false
@@ -935,26 +942,29 @@ class BasicStepWizard extends StepWizard {
 		try {
 			this.saveSetup()
 
-			configuration := newMultiMap()
+			configuration := readMultiMap(kUserHomeDirectory . "Setup\Speech Improver Configuration.ini")
+
+			setMultiMapValues(configuration, "Speech Improver", getMultiMapValues(kSimulatorConfiguration, "Speech Improver"), false)
 
 			setup := this.assistantSetup(assistant)
 
-			setMultiMapValues(configuration, "Voice Improver", getMultiMapValues(kSimulatorConfiguration, "Voice Improver"), false)
-
 			if (setup.HasProp("Improver") && setup.Improver) {
-				; setMultiMapValue(configuration, "Voice Improver", assistant . ".Language", setup.Language)
-				setMultiMapValue(configuration, "Voice Improver", assistant . ".Service", setup.Improver["Service"])
-				setMultiMapValue(configuration, "Voice Improver", assistant . ".Model", setup.Improver["Model"])
-				setMultiMapValue(configuration, "Voice Improver", assistant . ".Temperature", setup.Improver["Temperature"])
+				; setMultiMapValue(configuration, "Speech Improver", assistant . ".Language", setup.Language)
+				setMultiMapValue(configuration, "Speech Improver", assistant . ".Service", setup.Improver["Service"])
+				setMultiMapValue(configuration, "Speech Improver", assistant . ".Model", setup.Improver["Model"])
+				setMultiMapValue(configuration, "Speech Improver", assistant . ".Probabilitty", setup.Improver["Probability"])
+				setMultiMapValue(configuration, "Speech Improver", assistant . ".Temperature", setup.Improver["Temperature"])
 			}
 
 			configuration := VoiceImproverEditor(this, assistant, configuration).editImprover(window)
 
 			if configuration {
-				improver := Map("Language", getMultiMapValue(configuration, "Voice Improver", assistant . ".Language", false)
-							  , "Service", getMultiMapValue(configuration, "Voice Improver", assistant . ".Service")
-						      , "Model", getMultiMapValue(configuration, "Voice Improver", assistant . ".Model")
-						      , "Temperature", getMultiMapValue(configuration, "Voice Improver", assistant . ".Temperature"))
+				writeMultiMap(kUserHomeDirectory . "Setup\Speech Improver Configuration.ini", configuration)
+
+				improver := Map("Service", getMultiMapValue(configuration, "Speech Improver", assistant . ".Service")
+						      , "Model", getMultiMapValue(configuration, "Speech Improver", assistant . ".Model")
+						      , "Probability", getMultiMapValue(configuration, "Speech Improver", assistant . ".Probability")
+							  , "Temperature", getMultiMapValue(configuration, "Speech Improver", assistant . ".Temperature"))
 
 				wizard.setModuleValue(assistant, "Improver", map2String("|||", "--->>>", improver))
 
@@ -1769,7 +1779,7 @@ class VoiceImproverEditor extends ConfiguratorPanel {
 	Models[provider] {
 		Get {
 			if (provider = "OpenAI")
-				return ["GPT 3.5 turbo 1106", "GPT 4", "GPT 4 32k", "GPT 4 1106 preview"]
+				return ["GPT 3.5 turbo", "GPT 4", "GPT 4 32k", "GPT 4 turbo"]
 			else if (provider = "Azure")
 				return ["GPT 3.5", "GPT 3.5 turbo", "GPT 4", "GPT 4 32k"]
 			else
@@ -1792,9 +1802,11 @@ class VoiceImproverEditor extends ConfiguratorPanel {
 		local editorGui, x0, x1, x2, w1, w2, x3, w3, x4, w4
 		local x0, x1, x2, x3, x4, x5, x6, w1, w2, w3, w4, lineX, lineW
 
-		validateTemperature(*) {
-			local field := this.Control["viTemperatureEdit"]
-			local value := field.Text
+		validatePercentage(field, *) {
+			local value
+
+			field := this.Control[field]
+			value := field.Text
 
 			if (!isInteger(value) || (value < 0) || (value > 100)) {
 				field.Text := (field.HasProp("ValidText") ? field.ValidText : "")
@@ -1852,7 +1864,7 @@ class VoiceImproverEditor extends ConfiguratorPanel {
 
 		widget3 := editorGui.Add("Text", "x" . x0 . " yp+20 w105 h23 +0x200", translate("Provider / URL"))
 
-		widget4 := editorGui.Add("DropDownList", "x" . x1 . " yp w100 Choose1 vviProviderDropDown", this.Providers)
+		widget4 := editorGui.Add("DropDownList", "x" . x1 . " yp w100 Choose1 vviProviderDropDown", concatenate([translate("None")], this.Providers))
 		widget4.OnEvent("Change", chooseProvider)
 
 		widget5 := editorGui.Add("Edit", "x" . (x1 + 102) . " yp w" . (w1 - 102) . " h23 vviServiceURLEdit")
@@ -1864,15 +1876,22 @@ class VoiceImproverEditor extends ConfiguratorPanel {
 		widget9 := editorGui.Add("ComboBox", "x" . x1 . " yp w" . (w1 - 64) . " vviModelDropDown")
 
 		editorGui.SetFont("Italic", "Arial")
-		widget12 := editorGui.Add("Text", "x" . x0 . " yp+40 w105 h23", translate("Personality"))
+		widget12 := editorGui.Add("Text", "x" . x0 . " yp+40 w105 h23", translate("Variation"))
 		widget13 := editorGui.Add("Text", "x100 yp+7 w" . (width + 8 - 100) . " 0x10 W:Grow")
 		editorGui.SetFont("Norm", "Arial")
 
-		widget14 := editorGui.Add("Text", "x" . x0 . " yp+20 w105 h23 +0x200", translate("Creativity"))
-		widget15 := editorGui.Add("Edit", "x" . x1 . " yp w60 Number Limit3 vviTemperatureEdit")
-		widget15.OnEvent("Change", validateTemperature)
+
+		widget14 := editorGui.Add("Text", "x" . x0 . " yp+20 w105 h23 +0x200", translate("Probability"))
+		widget15 := editorGui.Add("Edit", "x" . x1 . " yp w60 Number Limit3 vviProbabilityEdit")
+		widget15.OnEvent("Change", validatePercentage.Bind("viProbabilityEdit"))
 		widget16 := editorGui.Add("UpDown", "x" . x1 . " yp w60 h23 Range0-100")
 		widget17 := editorGui.Add("Text", "x" . (x1 + 65) . " yp w100 h23 +0x200", translate("%"))
+
+		widget18 := editorGui.Add("Text", "x" . x0 . " yp+24 w105 h23 +0x200", translate("Creativity"))
+		widget19 := editorGui.Add("Edit", "x" . x1 . " yp w60 Number Limit3 vviTemperatureEdit")
+		widget19.OnEvent("Change", validatePercentage.Bind("viTemperatureEdit"))
+		widget20 := editorGui.Add("UpDown", "x" . x1 . " yp w60 h23 Range0-100")
+		widget21 := editorGui.Add("Text", "x" . (x1 + 65) . " yp w100 h23 +0x200", translate("%"))
 
 		editorGui.Add("Text", "x8 yp+35 w468 W:Grow 0x10")
 
@@ -1884,7 +1903,9 @@ class VoiceImproverEditor extends ConfiguratorPanel {
 		local index
 
 		this.Control["viModelDropDown"].Delete()
-		this.Control["viModelDropDown"].Add(this.Models[provider])
+
+		if provider
+			this.Control["viModelDropDown"].Add(this.Models[provider])
 
 		if model {
 			index := inList(this.Models[provider], model)
@@ -1896,30 +1917,28 @@ class VoiceImproverEditor extends ConfiguratorPanel {
 			else
 				this.Control["viModelDropDown"].Choose(index)
 		}
-		else
-			this.Control["viModelDropDown"].Choose(inList(this.Models[provider], "GPT 3.5 turbo 1106"))
+		else if provider
+			this.Control["viModelDropDown"].Choose(inList(this.Models[provider], "GPT 3.5 turbo"))
 	}
 
 	loadFromConfiguration(configuration) {
 		local service, ignore, provider, setting, providerConfiguration
 
-		static defaults := CaseInsenseWeakMap("ServiceURL", false, "Model", false, "Temperature", 0.5)
+		static defaults := CaseInsenseWeakMap("ServiceURL", false, "Model", "", "Temperature", 0.5, "Probability", 0.5)
 
 		super.loadFromConfiguration(configuration)
 
-		service := getMultiMapValue(configuration, "Voice Improver", this.Assistant . ".Service", false)
+		service := getMultiMapValue(configuration, "Speech Improver", this.Assistant . ".Service", false)
 
-		if !service
-			this.iCurrentProvider := "OpenAI"
-		else
-			this.iCurrentProvider := string2Values("|", service)[1]
+		this.iCurrentProvider := (service ? string2Values("|", service)[1] : false)
 
 		for ignore, provider in this.Providers {
 			providerConfiguration := CaseInsenseMap()
 
 			if (provider = this.iCurrentProvider) {
-				providerConfiguration["Model"] := getMultiMapValue(configuration, "Voice Improver", this.Assistant . ".Model", "")
-				providerConfiguration["Temperature"] := getMultiMapValue(configuration, "Voice Improver", this.Assistant . ".Temperature", 0.5)
+				providerConfiguration["Model"] := getMultiMapValue(configuration, "Speech Improver", this.Assistant . ".Model", defaults["Model"])
+				providerConfiguration["Probability"] := getMultiMapValue(configuration, "Speech Improver", this.Assistant . ".Probability", defaults["Probability"])
+				providerConfiguration["Temperature"] := getMultiMapValue(configuration, "Speech Improver", this.Assistant . ".Temperature", defaults["Temperature"])
 
 				if (provider = "LLM Runtime") {
 					providerConfiguration["ServiceURL"] := ""
@@ -1932,7 +1951,7 @@ class VoiceImproverEditor extends ConfiguratorPanel {
 			}
 			else {
 				for ignore, setting in ["ServiceURL", "ServiceKey", "Model"]
-					providerConfiguration[setting] := getMultiMapValue(configuration, "Voice Improver", provider . "." . setting, defaults[setting])
+					providerConfiguration[setting] := getMultiMapValue(configuration, "Speech Improver", provider . "." . setting, defaults[setting])
 
 				if !providerConfiguration["ServiceURL"]
 					switch provider, false {
@@ -1948,11 +1967,11 @@ class VoiceImproverEditor extends ConfiguratorPanel {
 							providerConfiguration["ServiceKey"] := ""
 					}
 
-				if ((providerConfiguration["Model"] = "") && inList(this.Models[provider], "GPT 3.5 turbo 1106"))
-					providerConfiguration["Model"] := "GPT 3.5 turbo 1106"
+				if ((providerConfiguration["Model"] = "") && inList(this.Models[provider], "GPT 3.5 turbo"))
+					providerConfiguration["Model"] := "GPT 3.5 turbo"
 
-				for ignore, setting in ["Temperature"]
-					providerConfiguration[setting] := getMultiMapValue(configuration, "Voice Improver", provider . "." . setting, defaults[setting])
+				for ignore, setting in ["Probability", "Temperature"]
+					providerConfiguration[setting] := getMultiMapValue(configuration, "Speech Improver", provider . "." . setting, defaults[setting])
 			}
 
 			this.iProviderConfigurations[provider] := providerConfiguration
@@ -1970,65 +1989,85 @@ class VoiceImproverEditor extends ConfiguratorPanel {
 			providerConfiguration := this.iProviderConfigurations[provider]
 
 			for ignore, setting in ["ServiceURL", "ServiceKey", "Model"]
-				setMultiMapValue(configuration, "Voice Improver", provider . "." . setting, providerConfiguration[setting])
+				setMultiMapValue(configuration, "Speech Improver", provider . "." . setting, providerConfiguration[setting])
 
-			for ignore, setting in ["Temperature"] {
-				setMultiMapValue(configuration, "Voice Improver", provider . "." . setting, providerConfiguration[setting])
+			for ignore, setting in ["Probability", "Temperature"] {
+				setMultiMapValue(configuration, "Speech Improver", provider . "." . setting, providerConfiguration[setting])
 
 				if (provider = this.iCurrentProvider)
-					setMultiMapValue(configuration, "Voice Improver", this.Assistant . "." . setting, providerConfiguration[setting])
+					setMultiMapValue(configuration, "Speech Improver", this.Assistant . "." . setting, providerConfiguration[setting])
 			}
 		}
 
 		provider := this.iCurrentProvider
-		providerConfiguration := this.iProviderConfigurations[provider]
 
-		for ignore, setting in ["Model"]
-			setMultiMapValue(configuration, "Voice Improver", this.Assistant . "." . setting, providerConfiguration[setting])
+		if provider {
+			providerConfiguration := this.iProviderConfigurations[provider]
 
-		if (provider = "LLM Runtime")
-			setMultiMapValue(configuration, "Voice Improver", this.Assistant . ".Service", provider)
-		else
-			setMultiMapValue(configuration, "Voice Improver", this.Assistant . ".Service"
-										  , values2String("|", provider, Trim(providerConfiguration["ServiceURL"])
-																	   , Trim(providerConfiguration["ServiceKey"])))
+			for ignore, setting in ["Model"]
+				setMultiMapValue(configuration, "Speech Improver", this.Assistant . "." . setting, providerConfiguration[setting])
+
+			if (provider = "LLM Runtime")
+				setMultiMapValue(configuration, "Speech Improver", this.Assistant . ".Service", provider)
+			else
+				setMultiMapValue(configuration, "Speech Improver", this.Assistant . ".Service"
+											  , values2String("|", provider, Trim(providerConfiguration["ServiceURL"])
+																		   , Trim(providerConfiguration["ServiceKey"])))
+		}
+		else {
+			setMultiMapValue(configuration, "Speech Improver", this.Assistant . ".Model", false)
+			setMultiMapValue(configuration, "Speech Improver", this.Assistant . ".Service", false)
+			setMultiMapValue(configuration, "Speech Improver", this.Assistant . ".Probability", false)
+			setMultiMapValue(configuration, "Speech Improver", this.Assistant . ".Temperature", false)
+		}
 	}
 
-	loadProviderConfiguration(provider := false) {
+	loadProviderConfiguration(provider) {
 		local configuration
 
-		if provider
-			this.Control["viProviderDropDown"].Choose(inList(this.Providers, provider))
+		this.Control["viProviderDropDown"].Choose(inList(this.Providers, provider) + 1)
 
-		this.iCurrentProvider := this.Control["viProviderDropDown"].Text
+		if (this.Control["viProviderDropDown"].Value = 1) {
+			this.iCurrentProvider := false
 
-		if this.iProviderConfigurations.Has(this.iCurrentProvider)
-			configuration := this.iProviderConfigurations[this.iCurrentProvider]
+			for ignore, setting in ["ServiceURL", "ServiceKey", "Probability", "Temperature"]
+				this.Control["vi" . setting . "Edit"].Text := ""
+		}
+		else {
+			this.iCurrentProvider := this.Control["viProviderDropDown"].Text
 
-		for ignore, setting in ["ServiceURL", "ServiceKey"]
-			this.Control["vi" . setting . "Edit"].Text := configuration[setting]
+			if this.iProviderConfigurations.Has(this.iCurrentProvider)
+				configuration := this.iProviderConfigurations[this.iCurrentProvider]
 
-		if ((provider = "GPT4All") && (Trim(this.Control["viServiceKeyEdit"].Text) = "")
-								   && (Trim(this.Control["viServiceURLEdit"].Text) = "http://localhost:4891/v1"))
-			this.Control["viServiceKeyEdit"].Text := "Any text will do the job"
+			for ignore, setting in ["ServiceURL", "ServiceKey"]
+				this.Control["vi" . setting . "Edit"].Text := configuration[setting]
 
-		this.Control["viTemperatureEdit"].Text := Round(configuration["Temperature"] * 100)
+			if ((provider = "GPT4All") && (Trim(this.Control["viServiceKeyEdit"].Text) = "")
+									   && (Trim(this.Control["viServiceURLEdit"].Text) = "http://localhost:4891/v1"))
+				this.Control["viServiceKeyEdit"].Text := "Any text will do the job"
 
-		this.loadModels(this.iCurrentProvider, configuration["Model"])
+			this.Control["viProbabilityEdit"].Text := Round(configuration["Probability"] * 100)
+			this.Control["viTemperatureEdit"].Text := Round(configuration["Temperature"] * 100)
+		}
+
+		this.loadModels(this.iCurrentProvider, (this.iCurrentProvider ? configuration["Model"] : false))
 	}
 
 	saveProviderConfiguration() {
-		local providerConfiguration := this.iProviderConfigurations[this.iCurrentProvider]
-		local value, ignore, setting
+		if this.iCurrentProvider {
+			local providerConfiguration := this.iProviderConfigurations[this.iCurrentProvider]
+			local value, ignore, setting
 
-		providerConfiguration["ServiceURL"] := Trim(this.Control["viServiceURLEdit"].Text)
-		providerConfiguration["ServiceKey"] := Trim(this.Control["viServiceKeyEdit"].Text)
+			providerConfiguration["ServiceURL"] := Trim(this.Control["viServiceURLEdit"].Text)
+			providerConfiguration["ServiceKey"] := Trim(this.Control["viServiceKeyEdit"].Text)
 
-		value := this.Control["viModelDropDown"].Text
+			value := this.Control["viModelDropDown"].Text
 
-		providerConfiguration["Model"] := ((Trim(value) != "") ? Trim(value) : false)
+			providerConfiguration["Model"] := ((Trim(value) != "") ? Trim(value) : false)
 
-		providerConfiguration["Temperature"] := Round(this.Control["viTemperatureEdit"].Text / 100, 2)
+			providerConfiguration["Probability"] := Round(this.Control["viProbabilityEdit"].Text / 100, 2)
+			providerConfiguration["Temperature"] := Round(this.Control["viTemperatureEdit"].Text / 100, 2)
+		}
 	}
 
 	loadConfigurator(configuration, simulators := false) {
@@ -2077,8 +2116,22 @@ class VoiceImproverEditor extends ConfiguratorPanel {
 	}
 
 	updateState() {
-		this.Control["viServiceURLEdit"].Enabled := (this.Control["viProviderDropDown"].Text != "LLM Runtime")
-		this.Control["viServiceKeyEdit"].Enabled := (this.Control["viProviderDropDown"].Text != "LLM Runtime")
+		local ignore, setting
+
+		if this.iCurrentProvider {
+			this.Control["viServiceURLEdit"].Enabled := (this.Control["viProviderDropDown"].Text != "LLM Runtime")
+			this.Control["viServiceKeyEdit"].Enabled := (this.Control["viProviderDropDown"].Text != "LLM Runtime")
+
+			this.Control["viProbabilityEdit"].Enabled := true
+			this.Control["viTemperatureEdit"].Enabled := true
+			this.Control["viModelDropDown"].Enabled := true
+		}
+		else {
+			for ignore, setting in ["ServiceURL", "ServiceKey", "Probability", "Temperature"]
+				this.Control["vi" . setting . "Edit"].Enabled := false
+
+			this.Control["viModelDropDown"].Enabled := false
+		}
 	}
 }
 

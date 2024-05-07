@@ -153,9 +153,18 @@ class AssistantsStepWizard extends ActionsStepWizard {
 
 						arguments .= ("; raceAssistantSpeakerImprover: " . assistant)
 
+						if !speakerImprover.Has("Speaker")
+							speakerImprover["Speaker"] := true
+
+						if !speakerImprover.Has("SpeakerProbability")
+							speakerImprover["SpeakerProbability"] := (speakerImprover.Has("Probability") ? speakerImprover["Probability"] : 0.5)
+
+						if !speakerImprover.Has("SpeakerTemperature")
+							speakerImprover["SpeakerTemperature"] := (speakerImprover.Has("Temperature") ? speakerImprover["Temperature"] : 0.5)
+
 						setMultiMapValue(configuration, "Speech Improver", assistant . ".Service", speakerImprover["Service"])
 						setMultiMapValue(configuration, "Speech Improver", assistant . ".Model", speakerImprover["Model"])
-						
+
 						setMultiMapValue(configuration, "Speech Improver", assistant . ".Speaker", speakerImprover["Speaker"])
 						setMultiMapValue(configuration, "Speech Improver", assistant . ".SpeakerProbability", speakerImprover["SpeakerProbability"])
 						setMultiMapValue(configuration, "Speech Improver", assistant . ".SpeakerTemperature", speakerImprover["SpeakerTemperature"])
@@ -170,7 +179,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 
 						setMultiMapValue(configuration, "Speech Improver", assistant . ".Service", listenerImprover["Service"])
 						setMultiMapValue(configuration, "Speech Improver", assistant . ".Model", listenerImprover["Model"])
-						
+
 						setMultiMapValue(configuration, "Speech Improver", assistant . ".Listener", listenerImprover["Listener"])
 						setMultiMapValue(configuration, "Speech Improver", assistant . ".ListenerMode", listenerImprover["ListenerMode"])
 						setMultiMapValue(configuration, "Speech Improver", assistant . ".ListenerTemperature", listenerImprover["ListenerTemperature"])

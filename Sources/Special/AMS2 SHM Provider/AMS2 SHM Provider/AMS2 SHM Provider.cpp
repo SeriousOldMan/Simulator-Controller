@@ -150,72 +150,6 @@ int main(int argc, char* argv[]) {
 	bool writeStandings = ((argc > 1) && (getArgument(argv[1], "Standings") != ""));
 	bool writeTelemetry = !writeStandings;
 
-	writeTelemetry = true;
-	writeStandings = true;
-
-	if (writeStandings) {
-		printf("[Position Data]\n");
-
-		if (fileHandle == NULL) {
-			printf("Active=false\n");
-
-			return 1;
-		}
-
-		if (fileHandle == NULL) {
-			printf("Active=false\n");
-			printf("Car.Count=0\n");
-			printf("Driver.Car=0\n");
-		}
-		else {
-			printf("Car.Count=%d\n", localCopy->mNumParticipants);
-			printf("Driver.Car=%d\n", localCopy->mViewedParticipantIndex + 1);
-
-			for (int i = 1; i <= localCopy->mNumParticipants; ++i) {
-				ParticipantInfo vehicle = localCopy->mParticipantInfo[i - 1];
-
-				printf("Car.%d.Nr=%d\n", i, i);
-				printf("Car.%d.Class=%s\n", i, localCopy->mCarClassNames[i - 1]);
-				printf("Car.%d.Position=%d\n", i, vehicle.mRacePosition);
-				printf("Car.%d.Laps=%d\n", i, vehicle.mLapsCompleted);
-				printf("Car.%d.Lap.Running=%f\n", i, vehicle.mCurrentLapDistance / localCopy->mTrackLength);
-				printf("Car.%d.Lap.Running.Valid=%s\n", i, localCopy->mLapsInvalidated[i - 1] ? "false" : "true");
-				printf("Car.%d.Time=%ld\n", i, (long)(localCopy->mLastLapTimes[i - 1] * 1000));
-				printf("Car.%d.Time.Sectors=%ld,%ld,%ld\n", i, (long)(localCopy->mCurrentSector1Times[i - 1] * 1000),
-															   (long)(localCopy->mCurrentSector2Times[i - 1] * 1000),
-															   (long)(localCopy->mCurrentSector3Times[i - 1] * 1000));
-															   	
-				printf("Car.%d.Car=%s\n", i, localCopy->mCarNames[i - 1]);
-
-				char* name = (char*)vehicle.mName;
-
-				if (strchr((char*)name, ' ')) {
-					char forName[100];
-					char surName[100];
-					char nickName[3];
-
-					size_t length = strcspn(name, " ");
-
-					substring(name, forName, 0, length);
-					substring(name, surName, length + 1, strlen(name) - length - 1);
-					nickName[0] = forName[0], nickName[1] = surName[0], nickName[2] = '\0';
-
-					printf("Car.%d.Driver.Forname=%s\n", i, forName);
-					printf("Car.%d.Driver.Surname=%s\n", i, surName);
-					printf("Car.%d.Driver.Nickname=%s\n", i, nickName);
-				}
-				else {
-					printf("Car.%d.Driver.Forname=%s\n", i, name);
-					printf("Car.%d.Driver.Surname=%s\n", i, "");
-					printf("Car.%d.Driver.Nickname=%s\n", i, "");
-				}
-
-				printf("Car.%d.InPitLane=%s\n", i, localCopy->mPitModes[i - 1] > PIT_MODE_NONE ? "true" : "false");
-				printf("Car.%d.InPit=%s\n", i, localCopy->mPitModes[i - 1] > PIT_MODE_IN_PIT ? "true" : "false");
-			}
-		}
-	}
-
 	if (writeTelemetry) {
 		printf("[Session Data]\n");
 
@@ -417,6 +351,69 @@ int main(int argc, char* argv[]) {
 		printf("Weather=%s\n", weather);
 		printf("Weather10Min=%s\n", weather);
 		printf("Weather30Min=%s\n", weather);
+	}
+
+	if (writeStandings) {
+		printf("[Position Data]\n");
+
+		if (fileHandle == NULL) {
+			printf("Active=false\n");
+
+			return 1;
+		}
+
+		if (fileHandle == NULL) {
+			printf("Active=false\n");
+			printf("Car.Count=0\n");
+			printf("Driver.Car=0\n");
+		}
+		else {
+			printf("Car.Count=%d\n", localCopy->mNumParticipants);
+			printf("Driver.Car=%d\n", localCopy->mViewedParticipantIndex + 1);
+
+			for (int i = 1; i <= localCopy->mNumParticipants; ++i) {
+				ParticipantInfo vehicle = localCopy->mParticipantInfo[i - 1];
+
+				printf("Car.%d.Nr=%d\n", i, i);
+				printf("Car.%d.Class=%s\n", i, localCopy->mCarClassNames[i - 1]);
+				printf("Car.%d.Position=%d\n", i, vehicle.mRacePosition);
+				printf("Car.%d.Laps=%d\n", i, vehicle.mLapsCompleted);
+				printf("Car.%d.Lap.Running=%f\n", i, vehicle.mCurrentLapDistance / localCopy->mTrackLength);
+				printf("Car.%d.Lap.Running.Valid=%s\n", i, localCopy->mLapsInvalidated[i - 1] ? "false" : "true");
+				printf("Car.%d.Time=%ld\n", i, (long)(localCopy->mLastLapTimes[i - 1] * 1000));
+				printf("Car.%d.Time.Sectors=%ld,%ld,%ld\n", i, (long)(localCopy->mCurrentSector1Times[i - 1] * 1000),
+					(long)(localCopy->mCurrentSector2Times[i - 1] * 1000),
+					(long)(localCopy->mCurrentSector3Times[i - 1] * 1000));
+
+				printf("Car.%d.Car=%s\n", i, localCopy->mCarNames[i - 1]);
+
+				char* name = (char*)vehicle.mName;
+
+				if (strchr((char*)name, ' ')) {
+					char forName[100];
+					char surName[100];
+					char nickName[3];
+
+					size_t length = strcspn(name, " ");
+
+					substring(name, forName, 0, length);
+					substring(name, surName, length + 1, strlen(name) - length - 1);
+					nickName[0] = forName[0], nickName[1] = surName[0], nickName[2] = '\0';
+
+					printf("Car.%d.Driver.Forname=%s\n", i, forName);
+					printf("Car.%d.Driver.Surname=%s\n", i, surName);
+					printf("Car.%d.Driver.Nickname=%s\n", i, nickName);
+				}
+				else {
+					printf("Car.%d.Driver.Forname=%s\n", i, name);
+					printf("Car.%d.Driver.Surname=%s\n", i, "");
+					printf("Car.%d.Driver.Nickname=%s\n", i, "");
+				}
+
+				printf("Car.%d.InPitLane=%s\n", i, localCopy->mPitModes[i - 1] > PIT_MODE_NONE ? "true" : "false");
+				printf("Car.%d.InPit=%s\n", i, localCopy->mPitModes[i - 1] > PIT_MODE_IN_PIT ? "true" : "false");
+			}
+		}
 	}
 
 	//------------------------------------------------------------------------------

@@ -77,15 +77,33 @@ class SpeechImprover extends ConfigurationItem {
 		}
 	}
 
-	Probability {
+	Speaker {
 		Get {
-			return this.Options["Probability"]
+			return this.Options["Speaker"]
 		}
 	}
 
-	Temperature {
+	SpeakerProbability {
 		Get {
-			return this.Options["Temperature"]
+			return this.Options["SpeakerProbability"]
+		}
+	}
+
+	Listener {
+		Get {
+			return this.Options["Listener"]
+		}
+	}
+
+	ListenerMode {
+		Get {
+			return this.Options["ListenerMode"]
+		}
+	}
+
+	Temperature[type := "Speaker"] {
+		Get {
+			return this.Options[(type = "Speaker") ? "SpeakerTemperature" : "ListenerTemperature"]
 		}
 	}
 
@@ -146,8 +164,16 @@ class SpeechImprover extends ConfigurationItem {
 		options["Language"] := getMultiMapValue(configuration, "Speech Improver", descriptor . ".Language", this.Language)
 		options["Service"] := getMultiMapValue(configuration, "Speech Improver", descriptor . ".Service", false)
 		options["Model"] := getMultiMapValue(configuration, "Speech Improver", descriptor . ".Model", false)
-		options["Probability"] := getMultiMapValue(configuration, "Speech Improver", descriptor . ".Probability", 0.5)
-		options["Temperature"] := getMultiMapValue(configuration, "Speech Improver", descriptor . ".Temperature", 0.5)
+
+		options["Speaker"] := getMultiMapValue(configuration, "Speech Improver", descriptor . ".Speaker", true)
+		options["SpeakerProbability"] := getMultiMapValue(configuration, "Speech Improver", descriptor . ".SpeakerProbability"
+														, getMultiMapValue(configuration, "Speech Improver", descriptor . ".Probability", 0.5))
+		options["SpeakerTemperature"] := getMultiMapValue(configuration, "Speech Improver", descriptor . ".SpeakerTemperature"
+														, getMultiMapValue(configuration, "Speech Improver", descriptor . ".Temperature", 0.5))
+
+		options["Listener"] := getMultiMapValue(configuration, "Speech Improver", descriptor . ".Listener", false)
+		options["ListenerMode"] := getMultiMapValue(configuration, "Speech Improver", descriptor . ".ListenerMode", "Unknown")
+		options["ListenerTemperature"] := getMultiMapValue(configuration, "Speech Improver", descriptor . ".ListenerTemperature", 0.2)
 	}
 
 	getInstructions() {
@@ -182,7 +208,6 @@ class SpeechImprover extends ConfigurationItem {
 				}
 
 			this.Connector.MaxHistory := 0
-			this.Connector.Temperature := this.Options["Temperature"]
 		}
 		else
 			throw "Unsupported service detected in SpeechImprover.startImprover..."
@@ -226,17 +251,19 @@ class SpeechImprover extends ConfigurationItem {
 				instructions[code] := languageInstructions
 			}
 
-		if this.Model {
+		if (this.Model && this.Speaker) {
 			code := this.Code
 			language := this.Language
 			doRephrase := true
 			doTranslate := (language != false)
 
+			this.Connector.Temperature := this.Temperature["Speaker"]
+
 			if options {
 				if !isInstance(options, Map)
 					options := toMap(options)
 
-				doRephrase := ((Random(1, 10) <= (10 * this.Probability)) && (!options.Has("Rephrase") || options["Rephrase"]))
+				doRephrase := ((Random(1, 10) <= (10 * this.SpeakerProbability)) && (!options.Has("Rephrase") || options["Rephrase"]))
 				doTranslate := (language && (!options.Has("Translate") || options["Translate"]))
 			}
 

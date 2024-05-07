@@ -173,7 +173,18 @@ class SpeechImprover extends ConfigurationItem {
 	}
 
 	improve(text, options := false) {
-		local doRephrase, doTranslate, code, language
+		local doRephrase, doTranslate, code, language, fileName, languageInstructions, instruction
+
+		static instructions := false
+
+		if !instructions
+			for code, language in availableLanguages() {
+				languageInstructions := readMultiMap(kTranslationsDirectory . "Speech Improver.instructions." . code)
+
+				addMultiMapValues(languageInstructions, readMultiMap(kUserTranslationsDirectory . "Speech Improver.instructions." . code))
+
+				instructions[code] := languageInstructions
+			}
 
 		if this.Model {
 			code := this.Code
@@ -197,20 +208,18 @@ class SpeechImprover extends ConfigurationItem {
 					if options.Has("Language")
 						code := options["Language"]
 
-					if doRephrase {
-						instruction := translate("Rephrase the text after the three |", code)
+					if !instructions.Has(code)
+						code := "EN"
 
-						if doTranslate
-							instruction .= (translate(" and translate it to ", code) . language)
-						else if (this.Code && (this.Code != code))
-							instruction .= translate(" and retain its original language", code)
-					}
+					if (doRephrase && doTranslate)
+						instruction := "RephraseTranslate"
+					else if doTranslate
+						instruction := "Translate"
 					else
-						instruction := (translate("Translate the text after the three | to ", code) . language)
+						instruction := "Rephrase"
 
-					instruction .= (translate(". The text comes from radio communication in motorsport. Do only answer with the new text.", code) . " `n|||`n")
-
-					answer := this.Connector.Ask(instruction . text)
+					answer := this.Connector.Ask(substituteVariables(getMultiMapValue(instructions[code], "Improver.Instructions", instruction)
+																   , {language: language ? language : "", text: text}))
 
 					return (answer ? answer : text)
 				}

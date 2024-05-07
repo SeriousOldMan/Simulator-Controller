@@ -1135,7 +1135,8 @@ class VoiceServer extends ConfigurationItem {
 		if (client && (this.ActiveVoiceClient == client))
 			this.deactivateVoiceClient(descriptor)
 
-		client := VoiceServer.VoiceClient(this, descriptor, routing, pid, language, synthesizer, speaker, recognizer, listener, speakerVolume, speakerPitch, speakerSpeed, speakerImprover, activationCallback, deactivationCallback, recognizerMode)
+		client := VoiceServer.VoiceClient(this, descriptor, routing, pid, language, synthesizer, speaker, recognizer, listener
+											  , speakerVolume, speakerPitch, speakerSpeed, speakerImprover, activationCallback, deactivationCallback, recognizerMode)
 
 		this.VoiceClients[descriptor] := client
 

@@ -601,20 +601,20 @@ class BasicStepWizard extends StepWizard {
 			return false
 	}
 
-	assistantImprover(assistant, editor := true) {
-		local improver
+	assistantSpeakerImprover(assistant, editor := true) {
+		local speakerImprover
 
 		if this.SetupWizard.isModuleSelected("Voice Control") {
-			improver := this.SetupWizard.getModuleValue(assistant, "Improver", this.assistantDefaults(assistant).Improver)
+			speakerImprover := this.SetupWizard.getModuleValue(assistant, "Speaker Improver", this.SetupWizard.getModuleValue(assistant, "Improver", this.assistantDefaults(assistant).SpeakerImprover))
 
-			if improver {
-				improver := (isInstance(improver, Map) ? improver : string2Map("|||", "--->>>", improver))
+			if speakerImprover {
+				speakerImprover := (isInstance(speakerImprover, Map) ? speakerImprover : string2Map("|||", "--->>>", speakerImprover))
 
-				if !improver.Has("Probability")
-					improver["Probability"] := 0.5
+				if !speakerImprover.Has("Probability")
+					speakerImprover["Probability"] := 0.5
 			}
 
-			return (improver ? improver : false)
+			return (speakerImprover ? speakerImprover : false)
 		}
 		else
 			return false
@@ -625,7 +625,7 @@ class BasicStepWizard extends StepWizard {
 			  , Language: this.assistantLanguage(assistant, editor), Synthesizer: this.assistantSynthesizer(assistant, editor)
 			  , Voice: this.assistantVoice(assistant, editor)
 			  , Volume: this.assistantVolume(assistant), Pitch: this.assistantPitch(assistant), Speed: this.assistantSpeed(assistant)
-			  , Improver: this.assistantImprover(assistant)}
+			  , SpeakerImprover: this.assistantSpeakerImprover(assistant)}
 	}
 
 	assistantDefaults(assistant) {
@@ -633,8 +633,8 @@ class BasicStepWizard extends StepWizard {
 		local defaults := {}
 		local ignore, key
 
-		for ignore, key in ["Name", "Synthesizer", "Voice", "Volume", "Pitch", "Speed", "Improver"]
-			defaults.%key% := getMultiMapValue(wizard.Definition, "Setup.Basic", "Basic.Defaults." . assistant . "." . key)
+		for ignore, key in ["Name", "Synthesizer", "Voice", "Volume", "Pitch", "Speed", "SpeakerImprover"]
+			defaults.%key% := getMultiMapValue(wizard.Definition, "Setup.Basic", "Basic.Defaults." . assistant . "." . key, false)
 
 		return defaults
 	}
@@ -835,11 +835,11 @@ class BasicStepWizard extends StepWizard {
 			for ignore, value in ["Name", "Language", "Synthesizer", "Voice", "Volume", "Pitch", "Speed"]
 				wizard.setModuleValue(assistant, value, assistantSetups.%key%.%value%, false)
 
-			if assistantSetups.%key%.HasProp("Improver")
-				wizard.setModuleValue(assistant, "Improver"
-									, assistantSetups.%key%.Improver ? map2String("|||", "--->>>", assistantSetups.%key%.Improver) : false, false)
+			if assistantSetups.%key%.HasProp("SpeakerImprover")
+				wizard.setModuleValue(assistant, "Speaker Improver"
+									, assistantSetups.%key%.SpeakerImprover ? map2String("|||", "--->>>", assistantSetups.%key%.SpeakerImprover) : false, false)
 			else
-				wizard.setModuleValue(assistant, "Improver", false, false)
+				wizard.setModuleValue(assistant, "Speaker Improver", false, false)
 		}
 
 		setMultiMapValue(voiceConfiguration, "Voice Control", "Language", getLanguage())
@@ -935,7 +935,7 @@ class BasicStepWizard extends StepWizard {
 	editImprover(assistant) {
 		local wizard := this.SetupWizard
 		local window := this.Window
-		local configuration, setup
+		local configuration, setup, speakerImprover
 
 		window.Block()
 
@@ -948,12 +948,11 @@ class BasicStepWizard extends StepWizard {
 
 			setup := this.assistantSetup(assistant)
 
-			if (setup.HasProp("Improver") && setup.Improver) {
-				; setMultiMapValue(configuration, "Speech Improver", assistant . ".Language", setup.Language)
-				setMultiMapValue(configuration, "Speech Improver", assistant . ".Service", setup.Improver["Service"])
-				setMultiMapValue(configuration, "Speech Improver", assistant . ".Model", setup.Improver["Model"])
-				setMultiMapValue(configuration, "Speech Improver", assistant . ".Probabilitty", setup.Improver["Probability"])
-				setMultiMapValue(configuration, "Speech Improver", assistant . ".Temperature", setup.Improver["Temperature"])
+			if (setup.HasProp("SpeakerImprover") && setup.SpeakerImprover) {
+				setMultiMapValue(configuration, "Speech Improver", assistant . ".Service", setup.SpeakerImprover["Service"])
+				setMultiMapValue(configuration, "Speech Improver", assistant . ".Model", setup.SpeakerImprover["Model"])
+				setMultiMapValue(configuration, "Speech Improver", assistant . ".Probabilitty", setup.SpeakerImprover["Probability"])
+				setMultiMapValue(configuration, "Speech Improver", assistant . ".Temperature", setup.SpeakerImprover["Temperature"])
 			}
 
 			configuration := VoiceImproverEditor(this, assistant, configuration).editImprover(window)
@@ -961,12 +960,12 @@ class BasicStepWizard extends StepWizard {
 			if configuration {
 				writeMultiMap(kUserHomeDirectory . "Setup\Speech Improver Configuration.ini", configuration)
 
-				improver := Map("Service", getMultiMapValue(configuration, "Speech Improver", assistant . ".Service")
-						      , "Model", getMultiMapValue(configuration, "Speech Improver", assistant . ".Model")
-						      , "Probability", getMultiMapValue(configuration, "Speech Improver", assistant . ".Probability")
-							  , "Temperature", getMultiMapValue(configuration, "Speech Improver", assistant . ".Temperature"))
+				speakerImprover := Map("Service", getMultiMapValue(configuration, "Speech Improver", assistant . ".Service")
+									 , "Model", getMultiMapValue(configuration, "Speech Improver", assistant . ".Model")
+									 , "Probability", getMultiMapValue(configuration, "Speech Improver", assistant . ".Probability")
+									 , "Temperature", getMultiMapValue(configuration, "Speech Improver", assistant . ".Temperature"))
 
-				wizard.setModuleValue(assistant, "Improver", map2String("|||", "--->>>", improver))
+				wizard.setModuleValue(assistant, "Speaker Improver", map2String("|||", "--->>>", speakerImprover))
 
 				this.loadAssistant(assistant)
 			}

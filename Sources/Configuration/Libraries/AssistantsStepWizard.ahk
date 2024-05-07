@@ -66,7 +66,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 	saveToConfiguration(configuration) {
 		local wizard := this.SetupWizard
 		local assistantActive := false
-		local function, action, ignore, assistant, assistantConfiguration, section, subConfiguration, arguments, voice, improver
+		local function, action, ignore, assistant, assistantConfiguration, section, subConfiguration, arguments, voice, speakerImprover
 		local actions
 
 		super.saveToConfiguration(configuration)
@@ -145,17 +145,17 @@ class AssistantsStepWizard extends ActionsStepWizard {
 																							, wizard.getModuleValue(assistant, "Pitch", "*")
 																							, wizard.getModuleValue(assistant, "Speed", "*")))
 
-					improver := wizard.getModuleValue(assistant, "Improver", false)
+					speakerImprover := wizard.getModuleValue(assistant, "Speaker Improver", wizard.getModuleValue(assistant, "Improver", false))
 
-					if improver {
-						improver := string2Map("|||", "--->>>", improver)
+					if speakerImprover {
+						speakerImprover := string2Map("|||", "--->>>", speakerImprover)
 
 						arguments .= ("; raceAssistantSpeakerImprover: " . assistant)
 
-						setMultiMapValue(configuration, "Speech Improver", assistant . ".Service", improver["Service"])
-						setMultiMapValue(configuration, "Speech Improver", assistant . ".Model", improver["Model"])
-						setMultiMapValue(configuration, "Speech Improver", assistant . ".Probability", improver["Probability"])
-						setMultiMapValue(configuration, "Speech Improver", assistant . ".Temperature", improver["Temperature"])
+						setMultiMapValue(configuration, "Speech Improver", assistant . ".Service", speakerImprover["Service"])
+						setMultiMapValue(configuration, "Speech Improver", assistant . ".Model", speakerImprover["Model"])
+						setMultiMapValue(configuration, "Speech Improver", assistant . ".Probability", speakerImprover["Probability"])
+						setMultiMapValue(configuration, "Speech Improver", assistant . ".Temperature", speakerImprover["Temperature"])
 					}
 				}
 				else

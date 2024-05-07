@@ -775,9 +775,9 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	__New(configuration, remoteHandler, name := false, language := kUndefined
-		, synthesizer := false, speaker := false, vocalics := false, improver := false
+		, synthesizer := false, speaker := false, vocalics := false, speakerImprover := false
 		, recognizer := false, listener := false, muted := false, voiceServer := false) {
-		super.__New(configuration, "Race Strategist", remoteHandler, name, language, synthesizer, speaker, vocalics, improver
+		super.__New(configuration, "Race Strategist", remoteHandler, name, language, synthesizer, speaker, vocalics, speakerImprover
 													, recognizer, listener, muted, voiceServer)
 
 		this.updateConfigurationValues({Announcements: {WeatherUpdate: true, StrategySummary: true, StrategyUpdate: true, StrategyPitstop: false}})

@@ -55,6 +55,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	iRaceAssistantSpeakerImprover := false
 	iRaceAssistantRecognizer := false
 	iRaceAssistantListener := false
+	iRaceAssistantListenerImprover := false
 	iRaceAssistantMuted := false
 
 	iRaceAssistant := false
@@ -369,8 +370,12 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				dataLap := getMultiMapValue(this.Data, "Stint Data", "Laps", false)
 
 				if (!dataLap || !stateLap || (Abs(dataLap - stateLap) <= 5)) {
-					if (isDebug() && isLogLevel(kLogDebug))
-						showMessage("Restoring session state for " . raceAssistant.Plugin)
+					if isDebug() {
+						if isLogLevel(kLogDebug)
+							showMessage("Restoring session state for " . raceAssistant.Plugin)
+
+						logMessage(kLogCritical, "Restoring session state for " . raceAssistant.Plugin . "...")
+					}
 
 					raceAssistant.Simulator.restoreSessionState(&sessionSettings, &sessionState)
 
@@ -396,7 +401,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				data := teamServer.getSessionValue(this.RaceAssistant.Plugin . A_Space . type)
 
 				if (!data || (data = ""))
-					throw "No data..."
+					return false
 				else
 					return parseMultiMap(data)
 			}
@@ -714,6 +719,12 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		}
 	}
 
+	RaceAssistantListenerImprover {
+		Get {
+			return this.iRaceAssistantListenerImprover
+		}
+	}
+
 	RaceAssistantMuted {
 		Get {
 			return this.iRaceAssistantMuted
@@ -874,8 +885,10 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 					assistantListener := this.getArgumentValue("raceAssistantListener", false)
 
-					if ((assistantListener != false) && (assistantListener != kFalse) && (assistantListener != "Off"))
+					if ((assistantListener != false) && (assistantListener != kFalse) && (assistantListener != "Off")) {
+						this.iRaceAssistantListenerImprover := this.getArgumentValue("raceAssistantListenerImprover", false)
 						this.iRaceAssistantListener := (((assistantListener = kTrue) || (assistantListener = "On")) ? true : assistantListener)
+					}
 				}
 			}
 
@@ -1841,6 +1854,9 @@ class RaceAssistantPlugin extends ControllerPlugin {
 					if this.RaceAssistantListener
 						options .= " -Listener `"" . this.RaceAssistantListener . "`""
 
+					if this.RaceAssistantListenerImprover
+						options .= " -ListenerImprover `"" . this.RaceAssistantListenerImprover . "`""
+
 					if this.RaceAssistantMuted
 						options .= " -Muted"
 
@@ -2061,9 +2077,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 						}
 				}
 
-			data := printMultiMap(data)
-
-			FileAppend(data, dataFile, "UTF-16")
+			FileAppend(printMultiMap(data), dataFile, "UTF-16")
 
 			this.RaceAssistant.performPitstop(lapNumber, dataFile)
 		}
@@ -2171,9 +2185,21 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 		this.Simulator.saveSessionState(&settings, &state)
 
+		if isDebug() {
+			if (!settings || (settings.Count = 0))
+				logMessage(kLogCritical, "Session settings are empty for " . this.Plugin . "...")
+
+			if (!state || (state.Count = 0))
+				logMessage(kLogCritical, "Session state is empty for " . this.Plugin . "...")
+		}
+
 		if (teamServer && this.TeamSessionActive) {
-			if (isDebug() && isLogLevel(kLogDebug))
-				showMessage("Saving session state for " . this.Plugin)
+			if isDebug() {
+				if isLogLevel(kLogDebug)
+					showMessage("Saving session state for " . this.Plugin)
+
+				logMessage(kLogCritical, "Saving session state for " . this.Plugin . "...")
+			}
 
 			if settings
 				teamServer.setSessionValue(this.Plugin . " Settings", printMultiMap(settings))
@@ -2184,7 +2210,14 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	}
 
 	restoreSessionState(data) {
-		if (this.RaceAssistant && this.TeamSessionActive)
+		if isDebug() {
+			if isLogLevel(kLogDebug)
+				showMessage("Start session state restoring for " . this.Plugin)
+
+			logMessage(kLogCritical, "Start session state restoring for " . this.Plugin . "...")
+		}
+
+		if (this.RaceAssistant && this.TeamServer && this.TeamSessionActive)
 			RaceAssistantPlugin.RestoreSessionStateTask(this, data).start()
 	}
 

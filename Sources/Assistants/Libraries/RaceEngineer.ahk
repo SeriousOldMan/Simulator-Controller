@@ -133,10 +133,10 @@ class RaceEngineer extends RaceAssistant {
 	}
 
 	__New(configuration, remoteHandler := false, name := false, language := kUndefined
-		, synthesizer := false, speaker := false, vocalics := false, improver := false
-		, recognizer := false, listener := false, muted := false, voiceServer := false) {
-		super.__New(configuration, "Race Engineer", remoteHandler, name, language, synthesizer, speaker, vocalics, improver
-												  , recognizer, listener, muted, voiceServer)
+		, synthesizer := false, speaker := false, vocalics := false, speakerImprover := false
+		, recognizer := false, listener := false, listenerImprover := false, muted := false, voiceServer := false) {
+		super.__New(configuration, "Race Engineer", remoteHandler, name, language, synthesizer, speaker, vocalics, speakerImprover
+												  , recognizer, listener, listenerImprover, muted, voiceServer)
 
 		this.updateConfigurationValues({Announcements: {FuelWarning: true, DamageReporting: true, DamageAnalysis: true, PressureReporting: true, WeatherUpdate: true}})
 	}
@@ -494,7 +494,8 @@ class RaceEngineer extends RaceAssistant {
 
 				speaker.speakPhrase("Tyre" . suffix, {value: value
 													, unit: (unit = "Pressure") ? fragments[getUnit("Pressure")]
-																				: (fragments["Degrees"] . A_Space . fragments[getUnit("Temperature")])})
+																				: (fragments["Degrees"] . A_Space . fragments[getUnit("Temperature")])
+													, delta: "", by: ""})
 			}
 		}
 		finally {
@@ -2099,7 +2100,7 @@ class RaceEngineer extends RaceAssistant {
 		local force := false
 		local result, pitstopNumber, speaker, fragments, fuel, lap, correctedFuel, targetFuel
 		local correctedTyres, compound, color, incrementFL, incrementFR, incrementRL, incrementRR, pressureCorrection
-		local temperatureDelta, debug, tyre, tyreType, lostPressure, deviationThreshold
+		local temperatureDelta, debug, tyre, tyreType, lostPressure, deviationThreshold, ignore, suffix
 
 		this.clearContinuation()
 
@@ -2238,10 +2239,10 @@ class RaceEngineer extends RaceAssistant {
 				}
 
 				compound := knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound", false)
+				color := knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound.Color", false)
 
 				if ((options == true) || (options.HasProp("Compound") && options.Compound)) {
 					if compound {
-						color := knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound.Color")
 						tyreSet := knowledgeBase.getValue("Pitstop.Planned.Tyre.Set", false)
 
 						if (compound = "Dry")
@@ -2268,21 +2269,21 @@ class RaceEngineer extends RaceAssistant {
 					if (debug || (incrementFL != 0) || (incrementFR != 0) || (incrementRL != 0) || (incrementRR != 0) || (tyrePressures != kUndefined))
 						speaker.speakPhrase("NewPressures")
 
-					if (debug || (incrementFL != 0) || (tyrePressures != kUndefined))
-						speaker.speakPhrase("TyreFL", {value: speaker.number2Speech(convertUnit("Pressure", knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL")))
-													 , unit: fragments[getUnit("Pressure")]})
-
-					if (debug || (incrementFR != 0) || (tyrePressures != kUndefined))
-						speaker.speakPhrase("TyreFR", {value: speaker.number2Speech(convertUnit("Pressure", knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR")))
-													 , unit: fragments[getUnit("Pressure")]})
-
-					if (debug || (incrementRL != 0) || (tyrePressures != kUndefined))
-						speaker.speakPhrase("TyreRL", {value: speaker.number2Speech(convertUnit("Pressure", knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL")))
-													 , unit: fragments[getUnit("Pressure")]})
-
-					if (debug || (incrementRR != 0) || (tyrePressures != kUndefined))
-						speaker.speakPhrase("TyreRR", {value: speaker.number2Speech(convertUnit("Pressure", knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR")))
-													 , unit: fragments[getUnit("Pressure")]})
+					if ((knowledgeBase.getValue("Tyre.Compound") != compound) || (knowledgeBase.getValue("Tyre.Compound.Color") != color)) {
+						for ignore, suffix in ["FL", "FR", "RL", "RR"]
+							if (debug || (increment%suffix% != 0) || (tyrePressures != kUndefined))
+								speaker.speakPhrase("Tyre" . suffix
+												  , {value: speaker.number2Speech(convertUnit("Pressure", knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure." . suffix)))
+												   , unit: fragments[getUnit("Pressure")], delta: "", by: ""})
+					}
+					else
+						for ignore, suffix in ["FL", "FR", "RL", "RR"]
+							if (debug || (increment%suffix% != 0) || (tyrePressures != kUndefined))
+								speaker.speakPhrase("Tyre" . suffix
+												  , {value: speaker.number2Speech(convertUnit("Pressure", Round(Abs(increment%suffix%), 1)))
+												   , unit: fragments[getUnit("Pressure")]
+												   , delta: fragments[(increment%suffix% > 0) ? "Increased" : "Decreased"]
+												   , by: fragments["By"]})
 
 					pressureCorrection := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.Correction", 0), 1)
 
@@ -3032,7 +3033,7 @@ class RaceEngineer extends RaceAssistant {
 			this.RemoteHandler.pitstopPrepared(pitstopNumber)
 
 			if this.Speaker
-				this.getSpeaker().speakPhrase("CallToPit")
+				Task.startTask(() => this.getSpeaker().speakPhrase("CallToPit"), 10000)
 		}
 	}
 

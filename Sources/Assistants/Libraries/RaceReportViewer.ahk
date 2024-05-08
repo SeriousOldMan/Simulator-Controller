@@ -392,22 +392,26 @@ class RaceReportViewer extends RaceReportReader {
 				nr := cars[A_Index][1]
 
 				if (getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Car", kNotInitialized) != kNotInitialized) {
-					if !classes.Has(class)
-						classes[class] := [Array(A_Index, result)]
+					if ((drivers.Length > 0) && (drivers[1].Length >= A_Index)) {
+						if !classes.Has(class)
+							classes[class] := [Array(A_Index, result)]
+						else
+							classes[class].Push(Array(A_Index, result))
+
+						driver := StrReplace(drivers[1][A_Index], "'", "\'")
+
+						if (categories && (categories[1][A_Index] != "Unknown"))
+							driver .= (translate(" [") . translate(categories[1][A_Index]) . translate("]"))
+
+						rows.Push(Array("'" . class . "'", (hasAlphaNr ? ("'" . nr . "'") : nr)
+									  , "'" . StrReplace(SessionDatabase.getCarName(simulator, cars[A_Index][2]), "'", "\'") . "'", "'" . driver . "'"
+									  , "'" . RaceReportViewer.lapTimeDisplayValue(min) . "'"
+									  , "'" . RaceReportViewer.lapTimeDisplayValue(avg) . "'", result, result))
+
+						rowClasses.Push(class)
+					}
 					else
-						classes[class].Push(Array(A_Index, result))
-
-					driver := StrReplace(drivers[1][A_Index], "'", "\'")
-
-					if (categories && (categories[1][A_Index] != "Unknown"))
-						driver .= (translate(" [") . translate(categories[1][A_Index]) . translate("]"))
-
-					rows.Push(Array("'" . class . "'", (hasAlphaNr ? ("'" . nr . "'") : nr)
-								  , "'" . StrReplace(SessionDatabase.getCarName(simulator, cars[A_Index][2]), "'", "\'") . "'", "'" . driver . "'"
-								  , "'" . RaceReportViewer.lapTimeDisplayValue(min) . "'"
-								  , "'" . RaceReportViewer.lapTimeDisplayValue(avg) . "'", result, result))
-
-					rowClasses.Push(class)
+						invalids += 1
 				}
 				else
 					invalids += 1

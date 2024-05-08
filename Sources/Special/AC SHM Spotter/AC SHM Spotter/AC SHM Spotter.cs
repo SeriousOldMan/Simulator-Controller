@@ -730,26 +730,30 @@ namespace ACSHMSpotter {
             }
         }
 
-		double getAverageSpeed(double running) {
-			int last = idealLine.Count - 1;
-			int index = (int)Math.Round(running * last);
-			int count = 0;
-			double speed = 0;
-			
-			index = Math.Min(last, Math.Max(0, index));
-
-            /*
-            if (idealLine[index].count > 20)
-                for (int i = Math.Max(0, index - 2); i <= Math.Min(last, index + 2); i++)
-					if (idealLine[i].count > 20) {
-						speed += idealLine[i].speed;
-						count += 1;
-					}
-
-            return (count > 0) ? speed / count : -1;
-			*/
+        double getAverageSpeed(double running)
+        {
+            int last = idealLine.Count - 1;
+            int index = Math.Min(last, Math.Max(0, (int)Math.Round(running * last)));
 
             return idealLine[index].getSpeed();
+        }
+
+        void clearAverageSpeed(double running)
+        {
+            int last = idealLine.Count - 1;
+            int index = Math.Min(last, Math.Max(0, (int)Math.Round(running * last)));
+
+            idealLine[index].clear();
+			
+			index -= 1;
+			
+			if (index >= 0)
+				idealLine[index].clear();
+			
+			index += 2;
+			
+			if (index <= last)
+				idealLine[index].clear();
         }
 
         int bestLapTime = int.MaxValue;
@@ -826,6 +830,8 @@ namespace ACSHMSpotter {
 									double carLapDistance = running * staticInfo.TrackSPlineLength;
 									long distanceAhead = (long)(((carLapDistance > driverLapDistance) ? carLapDistance
 																									  : (carLapDistance + staticInfo.TrackSPlineLength)) - driverLapDistance);
+
+									clearAverageSpeed(running);
 
 									if (speed < (avgSpeed / 5))
 									{

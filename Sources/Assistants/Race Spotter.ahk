@@ -90,6 +90,7 @@ startupRaceSpotter() {
 	local spotterSpeakerImprover := false
 	local spotterRecognizer := true
 	local spotterListener := false
+	local spotterListenerImprover := false
 	local spotterMuted := false
 	local debug := false
 	local voiceServer, index, spotter, label
@@ -133,6 +134,9 @@ startupRaceSpotter() {
 			case "-Listener":
 				spotterListener := A_Args[index + 1]
 				index += 2
+			case "-ListenerImprover":
+				spotterListenerImprover := A_Args[index + 1]
+				index += 2
 			case "-Muted":
 				spotterMuted := true
 				index += 1
@@ -164,7 +168,7 @@ startupRaceSpotter() {
 						 , remotePID ? RaceSpotter.RaceSpotterRemoteHandler(remotePID) : false
 						 , spotterName, spotterLanguage
 						 , spotterSynthesizer, spotterSpeaker, spotterSpeakerVocalics, spotterSpeakerImprover
-						 , spotterRecognizer, spotterListener, spotterMuted, voiceServer)
+						 , spotterRecognizer, spotterListener, spotterListenerImprover, spotterMuted, voiceServer)
 
 	RaceSpotter.Instance := spotter
 

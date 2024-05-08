@@ -90,6 +90,7 @@ startupDrivingCoach() {
 	local coachSpeakerImprover := false
 	local coachRecognizer := true
 	local coachListener := true
+	local coachListenerImprover := false
 	local coachMuted := false
 	local debug := false
 	local voiceServer, index, coach, label
@@ -133,6 +134,9 @@ startupDrivingCoach() {
 			case "-Listener":
 				coachListener := A_Args[index + 1]
 				index += 2
+			case "-ListenerImprover":
+				coachListenerImprover := A_Args[index + 1]
+				index += 2
 			case "-Muted":
 				coachMuted := true
 				index += 1
@@ -164,7 +168,7 @@ startupDrivingCoach() {
 						, remotePID ? DrivingCoach.DrivingCoachRemoteHandler(remotePID) : false
 						, coachName, coachLanguage
 						, coachSynthesizer, coachSpeaker, coachSpeakerVocalics, coachSpeakerImprover
-						, coachRecognizer, coachListener, coachMuted, voiceServer)
+						, coachRecognizer, coachListener, coachListenerImprover, coachMuted, voiceServer)
 
 	DrivingCoach.Instance := coach
 

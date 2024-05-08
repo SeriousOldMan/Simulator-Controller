@@ -66,8 +66,8 @@ class AssistantsStepWizard extends ActionsStepWizard {
 	saveToConfiguration(configuration) {
 		local wizard := this.SetupWizard
 		local assistantActive := false
-		local function, action, ignore, assistant, assistantConfiguration, section, subConfiguration, arguments, voice, improver
-		local actions
+		local function, action, ignore, assistant, assistantConfiguration, section, subConfiguration, arguments, voice, actions
+		local speakerImprover, listenerImprover
 
 		super.saveToConfiguration(configuration)
 
@@ -145,17 +145,47 @@ class AssistantsStepWizard extends ActionsStepWizard {
 																							, wizard.getModuleValue(assistant, "Pitch", "*")
 																							, wizard.getModuleValue(assistant, "Speed", "*")))
 
-					improver := wizard.getModuleValue(assistant, "Improver", false)
+					speakerImprover := wizard.getModuleValue(assistant, "Speaker Improver", wizard.getModuleValue(assistant, "Improver", false))
+					listenerImprover := wizard.getModuleValue(assistant, "Listener Improver", false)
 
-					if improver {
-						improver := string2Map("|||", "--->>>", improver)
+					if speakerImprover {
+						speakerImprover := string2Map("|||", "--->>>", speakerImprover)
 
 						arguments .= ("; raceAssistantSpeakerImprover: " . assistant)
 
-						setMultiMapValue(configuration, "Speech Improver", assistant . ".Service", improver["Service"])
-						setMultiMapValue(configuration, "Speech Improver", assistant . ".Model", improver["Model"])
-						setMultiMapValue(configuration, "Speech Improver", assistant . ".Temperature", improver["Temperature"])
+						if !speakerImprover.Has("Speaker")
+							speakerImprover["Speaker"] := true
+
+						if !speakerImprover.Has("SpeakerProbability")
+							speakerImprover["SpeakerProbability"] := (speakerImprover.Has("Probability") ? speakerImprover["Probability"] : 0.5)
+
+						if !speakerImprover.Has("SpeakerTemperature")
+							speakerImprover["SpeakerTemperature"] := (speakerImprover.Has("Temperature") ? speakerImprover["Temperature"] : 0.5)
+
+						setMultiMapValue(configuration, "Speech Improver", assistant . ".Service", speakerImprover["Service"])
+						setMultiMapValue(configuration, "Speech Improver", assistant . ".Model", speakerImprover["Model"])
+
+						setMultiMapValue(configuration, "Speech Improver", assistant . ".Speaker", speakerImprover["Speaker"])
+						setMultiMapValue(configuration, "Speech Improver", assistant . ".SpeakerProbability", speakerImprover["SpeakerProbability"])
+						setMultiMapValue(configuration, "Speech Improver", assistant . ".SpeakerTemperature", speakerImprover["SpeakerTemperature"])
 					}
+					else if listenerImprover
+						setMultiMapValue(configuration, "Speech Improver", assistant . ".Speaker", false)
+
+					if listenerImprover {
+						listenerImprover := string2Map("|||", "--->>>", listenerImprover)
+
+						arguments .= ("; raceAssistantListenerImprover: " . assistant)
+
+						setMultiMapValue(configuration, "Speech Improver", assistant . ".Service", listenerImprover["Service"])
+						setMultiMapValue(configuration, "Speech Improver", assistant . ".Model", listenerImprover["Model"])
+
+						setMultiMapValue(configuration, "Speech Improver", assistant . ".Listener", listenerImprover["Listener"])
+						setMultiMapValue(configuration, "Speech Improver", assistant . ".ListenerMode", listenerImprover["ListenerMode"])
+						setMultiMapValue(configuration, "Speech Improver", assistant . ".ListenerTemperature", listenerImprover["ListenerTemperature"])
+					}
+					else if speakerImprover
+						setMultiMapValue(configuration, "Speech Improver", assistant . ".Listener", false)
 				}
 				else
 					arguments .= "; raceAssistantSpeaker: Off"

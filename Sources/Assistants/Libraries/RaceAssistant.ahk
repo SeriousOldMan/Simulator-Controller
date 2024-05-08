@@ -499,8 +499,8 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	__New(configuration, assistantType, remoteHandler, name := false, language := kUndefined
-		, synthesizer := false, speaker := false, vocalics := false, improver := false
-		, recognizer := false, listener := false, muted := false, voiceServer := false) {
+		, synthesizer := false, speaker := false, vocalics := false, speakerImprover := false
+		, recognizer := false, listener := false, listenerImprover := false, muted := false, voiceServer := false) {
 		global kUnknown
 
 		local userName := SessionDatabase.getUserName()
@@ -541,7 +541,8 @@ class RaceAssistant extends ConfigurationItem {
 				options["Vocalics"] := vocalics
 			}
 
-			options["Improver"] := ((improver == true) ? options["Improver"] : improver)
+			options["SpeakerImprover"] := ((speakerImprover == true) ? options["SpeakerImprover"] : speakerImprover)
+			options["ListenerImprover"] := ((listenerImprover == true) ? options["ListenerImprover"] : listenerImprover)
 		}
 
 		this.iVoiceManager := this.createVoiceManager(name, options)
@@ -571,11 +572,20 @@ class RaceAssistant extends ConfigurationItem {
 		options["Vocalics"] := Array(getMultiMapValue(configuration, "Voice Control", "SpeakerVolume", 100)
 								   , getMultiMapValue(configuration, "Voice Control", "SpeakerPitch", 0)
 								   , getMultiMapValue(configuration, "Voice Control", "SpeakerSpeed", 0))
-		options["Improver"] := ((getMultiMapValue(configuration, "Speech Improver", this.AssistantType . ".Model", kUndefined) =! kUndefined) ? this.AssistantType : false)
 		options["Recognizer"] := getMultiMapValue(configuration, "Voice Control", "Recognizer", "Desktop")
 		options["Listener"] := getMultiMapValue(configuration, "Voice Control", "Listener", false)
 		options["PushToTalk"] := getMultiMapValue(configuration, "Voice Control", "PushToTalk", false)
 		options["PushToTalkMode"] := getMultiMapValue(configuration, "Voice Control", "PushToTalkMode", "Hold")
+
+		if getMultiMapValue(configuration, "Speech Improver", this.AssistantType . ".Speaker", true)
+			options["SpeakerImprover"] := ((getMultiMapValue(configuration, "Speech Improver", this.AssistantType . ".Model", kUndefined) != kUndefined) ? this.AssistantType : false)
+		else
+			options["SpeakerImprover"] := false
+
+		if getMultiMapValue(configuration, "Speech Improver", this.AssistantType . ".Listener", true)
+			options["ListenerImprover"] := ((getMultiMapValue(configuration, "Speech Improver", this.AssistantType . ".Model", kUndefined) != kUndefined) ? this.AssistantType : false)
+		else
+			options["ListenerImprover"] := false
 	}
 
 	createVoiceManager(name, options) {
@@ -1289,6 +1299,18 @@ class RaceAssistant extends ConfigurationItem {
 	restoreSessionState(settingsFile, stateFile) {
 		local sessionState, sessionSettings
 
+		if isDebug()
+
+		if isDebug() {
+			logMessage(kLogCritical, "Restoring session state for " . this.AssistantType . "...")
+
+			if (!settingsFile || (readMultiMap(settingsFile).Count = 0))
+				logMessage(kLogCritical, "Session settings are empty for " . this.AssistantType . "...")
+
+			if (!stateFile || (readMultiMap(stateFile).Count = 0))
+				logMessage(kLogCritical, "Session state is empty for " . this.AssistantType . "...")
+		}
+
 		if stateFile {
 			sessionState := readMultiMap(stateFile)
 
@@ -1740,6 +1762,9 @@ class RaceAssistant extends ConfigurationItem {
 		local settingsFile, stateFile
 
 		if this.RemoteHandler {
+			if isDebug()
+				logMessage(kLogCritical, "Saving session state for " . this.AssistantType . "...")
+
 			settingsFile := temporaryFileName(this.AssistantType, "settings")
 			stateFile := temporaryFileName(this.AssistantType, "state")
 

@@ -632,26 +632,28 @@ std::vector<SlowCarInfo> accidentsAhead;
 std::vector<SlowCarInfo> accidentsBehind;
 std::vector<SlowCarInfo> slowCarsAhead;
 
-double getAverageSpeed(double running) {
+inline double getAverageSpeed(double running) {
 	int last = (idealLine.size() - 1);
-	int index = (int)std::round(running * last);
-	int count = 0;
-	double speed = 0;
-	
-	index = min(last, max(0, index));
-	
-	/*
-	if (idealLine[index].count > 20)
-		for (int i = max(0, index - 2); i <= min(last, index + 2); i++)
-			if (idealLine[i].count > 20) {
-				speed += idealLine[i].speed;
-				count += 1;
-			}
-
-	return (count > 0) ? speed / count : -1;
-	*/
+	int index = min(last, max(0, (int)std::round(running * last)));
 
 	return idealLine[index].getSpeed();
+}
+
+inline void clearAverageSpeed(double running) {
+	int last = (idealLine.size() - 1);
+	int index = min(last, max(0, (int)std::round(running * last)));
+
+	idealLine[index].clear();
+	
+	index -= 1;
+	
+	if (index >= 0)
+		idealLine[index].clear();
+	
+	index += 2;
+	
+	if (index <= last)
+		idealLine[index].clear();
 }
 
 long lastTickCount = 0;
@@ -780,6 +782,8 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 								{
 									long distanceAhead = (long)(((running > driverRunning) ? (running * trackLength)
 																						   : ((running * trackLength) + trackLength)) - (driverRunning * trackLength));
+
+									clearAverageSpeed(running);
 
 									if (speed < (avgSpeed / 5))
 									{

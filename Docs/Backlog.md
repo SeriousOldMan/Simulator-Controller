@@ -11,11 +11,10 @@
   2. Support for new and also historic simulators
 
 #### Assistants
-  1. (Optional) support for an LLM-based pipeline for voice recognition and voice output
-  2. Overhaul (shortening) of Assistant phrases
-  3. More (configurable) verbosity for the Spotter, for example earlier announcements of cars approaching from behind (depending on the distance of the car behind)
-  4. Controller action and voice command to enable/disable data collection
-  5. Better answers by the Strategist, when a pitstop cannot be recommended
+  1. Overhaul (shortening) of Assistant phrases
+  2. More (configurable) verbosity for the Spotter, for example earlier announcements of cars approaching from behind (depending on the distance of the car behind)
+  3. Controller action and voice command to enable/disable data collection
+  4. Better answers by the Strategist, when a pitstop cannot be recommended
 
 #### Race Center
   1. Change hot target pressures for the next pitstop.

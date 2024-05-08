@@ -20,6 +20,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "LLMConnector.ahk"
+#Include "SpeechRecognizer.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -30,6 +31,11 @@ class SpeechImprover extends ConfigurationItem {
 	iOptions := CaseInsenseMap()
 
 	iConnector := false
+
+	iCompiler := SpeechRecognizer("Compiler")
+
+	iChoices := CaseInsenseMap()
+	iGrammars := CaseInsenseMap()
 
 	Options[key?] {
 		Get {
@@ -71,15 +77,51 @@ class SpeechImprover extends ConfigurationItem {
 		}
 	}
 
-	Probability {
+	Speaker {
 		Get {
-			return this.Options["Probability"]
+			return this.Options["Speaker"]
 		}
 	}
 
-	Temperature {
+	SpeakerProbability {
 		Get {
-			return this.Options["Temperature"]
+			return this.Options["SpeakerProbability"]
+		}
+	}
+
+	Listener {
+		Get {
+			return this.Options["Listener"]
+		}
+	}
+
+	ListenerMode {
+		Get {
+			return this.Options["ListenerMode"]
+		}
+	}
+
+	Temperature[type := "Speaker"] {
+		Get {
+			return this.Options[(type = "Speaker") ? "SpeakerTemperature" : "ListenerTemperature"]
+		}
+	}
+
+	Compiler {
+		Get {
+			return this.iCompiler
+		}
+	}
+
+	Choices[name?] {
+		Get {
+			return (isSet(name) ? this.iChoices[name] : this.iChoices)
+		}
+	}
+
+	Grammars[name?] {
+		Get {
+			return (isSet(name) ? this.iGrammars[name] : this.iGrammars)
 		}
 	}
 
@@ -122,8 +164,16 @@ class SpeechImprover extends ConfigurationItem {
 		options["Language"] := getMultiMapValue(configuration, "Speech Improver", descriptor . ".Language", this.Language)
 		options["Service"] := getMultiMapValue(configuration, "Speech Improver", descriptor . ".Service", false)
 		options["Model"] := getMultiMapValue(configuration, "Speech Improver", descriptor . ".Model", false)
-		options["Probability"] := getMultiMapValue(configuration, "Speech Improver", descriptor . ".Probability", 0.5)
-		options["Temperature"] := getMultiMapValue(configuration, "Speech Improver", descriptor . ".Temperature", 0.5)
+
+		options["Speaker"] := getMultiMapValue(configuration, "Speech Improver", descriptor . ".Speaker", true)
+		options["SpeakerProbability"] := getMultiMapValue(configuration, "Speech Improver", descriptor . ".SpeakerProbability"
+														, getMultiMapValue(configuration, "Speech Improver", descriptor . ".Probability", 0.5))
+		options["SpeakerTemperature"] := getMultiMapValue(configuration, "Speech Improver", descriptor . ".SpeakerTemperature"
+														, getMultiMapValue(configuration, "Speech Improver", descriptor . ".Temperature", 0.5))
+
+		options["Listener"] := getMultiMapValue(configuration, "Speech Improver", descriptor . ".Listener", false)
+		options["ListenerMode"] := getMultiMapValue(configuration, "Speech Improver", descriptor . ".ListenerMode", "Unknown")
+		options["ListenerTemperature"] := getMultiMapValue(configuration, "Speech Improver", descriptor . ".ListenerTemperature", 0.2)
 	}
 
 	getInstructions() {
@@ -158,16 +208,49 @@ class SpeechImprover extends ConfigurationItem {
 				}
 
 			this.Connector.MaxHistory := 0
-			this.Connector.Temperature := this.Options["Temperature"]
 		}
 		else
 			throw "Unsupported service detected in SpeechImprover.startImprover..."
 	}
 
-	improve(text, options := false) {
-		local doRephrase, doTranslate, code, language
+	setChoices(name, choices) {
+		this.iChoices[name] := choices
 
-		if this.Model {
+		this.Compiler.setChoices(name, choices)
+	}
+
+	setGrammar(name, grammar) {
+		try {
+			this.iGrammars[name] := this.Compiler.compileGrammar(grammar)
+		}
+		catch Any as exception {
+			logError(exception, true)
+
+			logMessage(kLogCritical, translate("Error while registering voice command `"") . grammar . translate("`" - please check the configuration"))
+
+			showMessage(substituteVariables(translate("Cannot register voice command `"%command%`" - please check the configuration..."), {command: grammar})
+					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+		}
+	}
+
+	speak(text, options := false) {
+		local doRephrase, doTranslate, code, language, fileName, languageInstructions, instruction
+
+		static instructions := false
+
+		if !instructions {
+			instructions := CaseInsenseMap()
+
+			for code, language in availableLanguages() {
+				languageInstructions := readMultiMap(kTranslationsDirectory . "Speech Improver.instructions." . code)
+
+				addMultiMapValues(languageInstructions, readMultiMap(kUserTranslationsDirectory . "Speech Improver.instructions." . code))
+
+				instructions[code] := languageInstructions
+			}
+		}
+
+		if (this.Model && this.Speaker) {
 			code := this.Code
 			language := this.Language
 			doRephrase := true
@@ -177,7 +260,7 @@ class SpeechImprover extends ConfigurationItem {
 				if !isInstance(options, Map)
 					options := toMap(options)
 
-				doRephrase := ((Random(1, 10) <= (10 * this.Probability)) && (!options.Has("Rephrase") || options["Rephrase"]))
+				doRephrase := ((Random(1, 10) <= (10 * this.SpeakerProbability)) && (!options.Has("Rephrase") || options["Rephrase"]))
 				doTranslate := (language && (!options.Has("Translate") || options["Translate"]))
 			}
 
@@ -186,25 +269,103 @@ class SpeechImprover extends ConfigurationItem {
 					if !this.Connector
 						this.startImprover()
 
+					this.Connector.Temperature := this.Temperature["Speaker"]
+
 					if options.Has("Language")
 						code := options["Language"]
 
-					if doRephrase {
-						instruction := translate("Rephrase the text after the three |", code)
-
-						if doTranslate
-							instruction .= (translate(" and translate it to ", code) . language)
-						else if (this.Code && (this.Code != code))
-							instruction .= translate(" and retain its original language", code)
-					}
+					if (doRephrase && doTranslate)
+						instruction := "RephraseTranslate"
+					else if doTranslate
+						instruction := "Translate"
 					else
-						instruction := (translate("Translate the text after the three | to ", code) . language)
+						instruction := "Rephrase"
 
-					instruction .= (translate(". The context is racing and motorsports. Do only answer with the new text.", code) . " `n|||`n")
+					instruction := substituteVariables(getMultiMapValue(instructions[instructions.Has(code) ? code : "EN"]
+																	  , "Speaker.Instructions", instruction)
+													 , {language: language ? language : "", text: text})
 
-					answer := this.Connector.Ask(instruction . text)
+					answer := this.Connector.Ask(instruction)
 
 					return (answer ? answer : text)
+				}
+				catch Any as exception {
+					logError(exception)
+
+					return text
+				}
+			}
+			else
+				return text
+		}
+		else
+			return text
+	}
+
+	listen(text, options := false) {
+		local doRecognize, code, language, fileName, languageInstructions, instruction
+		local ignore, phrase, name, grammar, phrases
+
+		static instructions := false
+		static commands := false
+
+		if !instructions {
+			instructions := CaseInsenseMap()
+
+			for code, language in availableLanguages() {
+				languageInstructions := readMultiMap(kTranslationsDirectory . "Speech Improver.instructions." . code)
+
+				addMultiMapValues(languageInstructions, readMultiMap(kUserTranslationsDirectory . "Speech Improver.instructions." . code))
+
+				instructions[code] := languageInstructions
+			}
+		}
+
+		if !commands {
+			commands := []
+
+			for name, grammar in this.Grammars {
+				phrases := []
+
+				for ignore, phrase in grammar.Phrases
+					if (A_Index > 5)
+						break
+					else
+						phrases.Push(phrase)
+
+				commands.Push(name . "=" . values2String(", ", phrases*))
+			}
+
+			commands := values2String("`n", commands*)
+		}
+
+		if (this.Model && this.Listener) {
+			code := this.Code
+			doRecognize := true
+
+			if options {
+				if !isInstance(options, Map)
+					options := toMap(options)
+
+				doRecognize := (!options.Has("Recognize") || options["Recognize"])
+			}
+
+			if doRecognize {
+				try {
+					if !this.Connector
+						this.startImprover()
+
+					this.Connector.Temperature := this.Temperature["Listener"]
+
+					instruction := "Recognize"
+
+					instruction := substituteVariables(getMultiMapValue(instructions[instructions.Has(code) ? code : "EN"]
+																	  , "Listener.Instructions", instruction)
+													 , {commands: commands, text: text})
+
+					answer := this.Connector.Ask(instruction)
+
+					return ((!answer || (answer = "Unknown")) ? text : answer)
 				}
 				catch Any as exception {
 					logError(exception)

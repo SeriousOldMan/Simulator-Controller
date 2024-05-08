@@ -698,8 +698,8 @@ class VoiceManager extends ConfigurationItem {
 		if options.Has("SpeakerSpeed")
 			this.iSpeakerSpeed := options["SpeakerSpeed"]
 
-		if options.Has("Improver")
-			this.iSpeakerImprover := options["Improver"]
+		if options.Has("SpeakerImprover")
+			this.iSpeakerImprover := options["SpeakerImprover"]
 
 		if options.Has("Recognizer")
 			this.iRecognizer := options["Recognizer"]

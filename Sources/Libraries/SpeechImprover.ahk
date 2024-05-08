@@ -335,7 +335,7 @@ class SpeechImprover extends ConfigurationItem {
 			commands := values2String("`n", commands*)
 		}
 
-		if (this.Model && this.Speaker) {
+		if (this.Model && this.Listener) {
 			code := this.Code
 			doRecognize := true
 

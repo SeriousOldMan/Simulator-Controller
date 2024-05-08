@@ -1,5 +1,5 @@
 ## 5.7.0.1-release 05/05/24
-  1. Hopefully fixed a critical bug for Team Server / "Race Center", which prevented transfer of sessioon state from one driver to the other when Assistants are set to silent in the startup settings.
+  1. Hopefully fixed a critical bug for Team Server / "Race Center", which prevented transfer of session state from one driver to the other when Assistants are set to silent in the startup settings.
   
 ## 5.7.0.0-release 05/03/24
   1. Minor bugfixes, as always

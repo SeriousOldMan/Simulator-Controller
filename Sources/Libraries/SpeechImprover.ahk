@@ -301,7 +301,76 @@ class SpeechImprover extends ConfigurationItem {
 			return text
 	}
 
-	listen(text, &arguments?) {
-		return false
+	listen(text, options := false) {
+		local doRecognize, code, language, fileName, languageInstructions, instruction
+		local ignore, phrase, name, grammar, phrases
+
+		static instructions := false
+		static commands := false
+
+		if !instructions
+			for code, language in availableLanguages() {
+				languageInstructions := readMultiMap(kTranslationsDirectory . "Speech Improver.instructions." . code)
+
+				addMultiMapValues(languageInstructions, readMultiMap(kUserTranslationsDirectory . "Speech Improver.instructions." . code))
+
+				instructions[code] := languageInstructions
+			}
+
+		if !commands {
+			commands := []
+
+			for name, grammar in this.Grammars {
+				phrases := []
+
+				for ignore, phrase in grammar.Phrases
+					if (A_Index > 5)
+						break
+					else
+						phrases.Push(phrase)
+
+				commands.Push(name . "=" . values2String(", ", phrases*))
+			}
+
+			commands := values2String("`n", commands*)
+		}
+
+		if (this.Model && this.Speaker) {
+			code := this.Code
+			doRecognize := true
+
+			this.Connector.Temperature := this.Temperature["Listener"]
+
+			if options {
+				if !isInstance(options, Map)
+					options := toMap(options)
+
+				doRecognize := (!options.Has("Recognize") || options["Recognize"])
+			}
+
+			if doRecognize {
+				try {
+					if !this.Connector
+						this.startImprover()
+
+					instruction := "Recognize"
+
+					answer := this.Connector.Ask(substituteVariables(getMultiMapValue(instructions[instructions.Has(code) ? code: "EN"]
+																					, "Listener.Instructions", instruction)
+																   , {commands: commands, text: text}))
+
+					return ((!answer || (answer = "Unknown")) ? text : answer)
+				}
+				catch Any as exception {
+					logError(exception)
+
+					return text
+				}
+			}
+			else
+				return text
+		}
+		else
+			return text
 	}
 }

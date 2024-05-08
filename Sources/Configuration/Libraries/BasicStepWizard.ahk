@@ -1923,7 +1923,7 @@ class VoiceImproverEditor extends ConfiguratorPanel {
 		widget9 := editorGui.Add("ComboBox", "x" . x1 . " yp w" . (w1 - 64) . " vviModelDropDown")
 
 		editorGui.SetFont("Italic", "Arial")
-		widget12 := editorGui.Add("Checkbox", "x" . x0 . " yp+36 w105 h23 vviSpeakerCheck", translate("Variation"))
+		widget12 := editorGui.Add("Checkbox", "x" . x0 . " yp+36 w105 h23 vviSpeakerCheck", translate("Rephrasing"))
 		widget12.OnEvent("Click", (*) => this.updateState())
 		widget13 := editorGui.Add("Text", "x100 yp+11 w" . (width + 8 - 100) . " 0x10 W:Grow")
 		editorGui.SetFont("Norm", "Arial")
@@ -1941,7 +1941,7 @@ class VoiceImproverEditor extends ConfiguratorPanel {
 		widget21 := editorGui.Add("Text", "x" . (x1 + 65) . " yp w100 h23 +0x200", translate("%"))
 
 		editorGui.SetFont("Italic", "Arial")
-		widget22 := editorGui.Add("Checkbox", "x" . x0 . " yp+36 w105 h23 vviListenerCheck", translate("Recognition"))
+		widget22 := editorGui.Add("Checkbox", "x" . x0 . " yp+36 w105 h23 vviListenerCheck", translate("Understanding"))
 		widget22.OnEvent("Click", (*) => this.updateState())
 		widget23 := editorGui.Add("Text", "x100 yp+11 w" . (width + 8 - 100) . " 0x10 W:Grow")
 		editorGui.SetFont("Norm", "Arial")

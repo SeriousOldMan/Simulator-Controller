@@ -391,6 +391,8 @@ Two type of improvements are available at the moment:
 	 Grammar: [{Check, Please check} {the brake wear, the brake wear at the moment}, Tell me {the brake wear, the brake wear at the moment}]
 	  
 	 A valid command that will be recognized for the pattern, will be: "Check the brake wear". When using the GPT-based semantically mapping, a command like: "We should check the brakes" will also be understood.
+	 
+	 Note: Using the semantic *Understanding* improvement may only be usable in conjunction with voice recognition methods, that are cabable to recognize continuous, unstructured text. This is true for Google and Azure voice recognition, but not for the builtin voice recognition of Windows, which only work reliable for pattern-based recognition.
 
 Important: Using a GPT service like OpenAI may impose some costs, and running an LLM locally on your PC will require a very powerful system, especially when doing this while on the track. Therefore, configuring speech improvement is fully optional.
 

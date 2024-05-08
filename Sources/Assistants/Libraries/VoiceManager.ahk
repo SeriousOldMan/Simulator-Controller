@@ -58,6 +58,8 @@ class VoiceManager extends ConfigurationItem {
 	iListener := false
 	iListenerImprover := false
 
+	iImprover := false
+
 	iRecognizerMode := "Grammar"
 
 	iVoiceServer := false
@@ -280,7 +282,7 @@ class VoiceManager extends ConfigurationItem {
 			if voiceManager.SpeakerImprover {
 				improver := SpeechImprover(voiceManager.SpeakerImprover, voiceManager.Configuration)
 
-				if improver.Model
+				if (improver.Model && improver.Speaker)
 					this.iImprover := improver
 			}
 
@@ -390,6 +392,8 @@ class VoiceManager extends ConfigurationItem {
 	class LocalRecognizer extends SpeechRecognizer {
 		iVoiceManager := false
 
+		iImprover := false
+
 		Routing {
 			Get {
 				return this.VoiceManager.Routing
@@ -402,8 +406,23 @@ class VoiceManager extends ConfigurationItem {
 			}
 		}
 
+		Improver {
+			Get {
+				return this.iImprover
+			}
+		}
+
 		__New(voiceManager, arguments*) {
+			local improver
+
 			this.iVoiceManager := voiceManager
+
+			if voiceManager.ListenerImprover {
+				improver := SpeechImprover(voiceManager.ListenerImprover, voiceManager.Configuration, voiceManager.Language)
+
+				if (improver.Model && improver.Listener)
+					this.iImprover := improver
+			}
 
 			super.__New(arguments*)
 		}
@@ -412,8 +431,17 @@ class VoiceManager extends ConfigurationItem {
 			this.VoiceManager.raiseTextRecognized("Text", text)
 		}
 
+		splitText(text) {
+			local improver := this.Improver
+
+			if (improver && (improver.ListenerMode = "Always"))
+				text := improver.listen(text)
+
+			return super.splitText(text)
+		}
+
 		unknownRecognized(&text) {
-			local improver := this.VoiceManager.ListenerImprover
+			local improver := this.Improver
 			local alternateText
 
 			if (improver && (improver.ListenerMode = "Unknown")) {
@@ -592,6 +620,21 @@ class VoiceManager extends ConfigurationItem {
 		}
 	}
 
+	Improver {
+		Get {
+			local improver
+
+			if (this.ListenerImprover && !this.iImprover) {
+				improver := SpeechImprover(this.ListenerImprover, this.Configuration, this.Language)
+
+				if (improver.Model && improver.Listener)
+					this.iImprover := improver
+			}
+
+			return this.iImprover
+		}
+	}
+
 	Listening {
 		Get {
 			return this.iIsListening
@@ -733,9 +776,6 @@ class VoiceManager extends ConfigurationItem {
 
 		if options.Has("ListenerImprover") {
 			this.iListenerImprover := options["ListenerImprover"]
-
-			if this.ListenerImprover
-				this.iListenerImprover := SpeechImprover(this.ListenerImprover, this.Configuration, this.Language)
 		}
 
 		if options.Has("PushToTalk")
@@ -948,7 +988,7 @@ class VoiceManager extends ConfigurationItem {
 																					, this.Language, this.Synthesizer, this.Speaker
 																					, this.Recognizer, this.Listener
 																					, this.SpeakerVolume, this.SpeakerPitch, this.SpeakerSpeed
-																					, this.SpeakerImprover
+																					, this.SpeakerImprover, this.ListenerImprover
 																					, mode)
 										, this.VoiceServer)
 
@@ -1373,13 +1413,13 @@ class VoiceManager extends ConfigurationItem {
 
 		try {
 			if (this.iRecognizerMode = "Mixed") {
-				if (this.ListenerImprover && (this.ListenerImprover.ListenerMode = "Always"))
-					matchText := this.ListenerImprover.recognize(matchText)
+				if (this.Improver && (this.Improver.ListenerMode = "Always"))
+					matchText := this.Improver.recognize(matchText)
 
 				recognizedGrammar := this.matchCommand(matchText, &words)
 
-				if (this.ListenerImprover && !recognizedGrammar && (this.ListenerImprover.ListenerMode = "Unknown")) {
-					matchText := this.ListenerImprover.recognize(matchText)
+				if (this.Improver && !recognizedGrammar && (this.Improver.ListenerMode = "Unknown")) {
+					matchText := this.Improver.recognize(matchText)
 
 					recognizedGrammar := this.matchCommand(matchText, &words)
 				}

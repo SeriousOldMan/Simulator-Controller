@@ -284,6 +284,7 @@ class SpeechImprover extends ConfigurationItem {
 					instruction := substituteVariables(getMultiMapValue(instructions[instructions.Has(code) ? code : "EN"]
 																	  , "Speaker.Instructions", instruction)
 													 , {language: language ? language : "", text: text})
+
 					answer := this.Connector.Ask(instruction)
 
 					return (answer ? answer : text)

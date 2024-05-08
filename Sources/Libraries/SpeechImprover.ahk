@@ -37,6 +37,8 @@ class SpeechImprover extends ConfigurationItem {
 	iChoices := CaseInsenseMap()
 	iGrammars := CaseInsenseMap()
 
+	iCommands := false
+
 	Options[key?] {
 		Get {
 			return (isSet(key) ? this.iOptions[key] : this.iOptions)
@@ -110,6 +112,12 @@ class SpeechImprover extends ConfigurationItem {
 	Compiler {
 		Get {
 			return this.iCompiler
+		}
+	}
+
+	Commands {
+		Get {
+			return this.iCommands
 		}
 	}
 
@@ -303,11 +311,11 @@ class SpeechImprover extends ConfigurationItem {
 	}
 
 	listen(text, options := false) {
+		local commands := this.Commands
 		local doRecognize, code, language, fileName, languageInstructions, instruction
 		local phrase, name, grammar, phrases, candidates, numCandidates
 
 		static instructions := false
-		static commands := false
 
 		if !instructions {
 			instructions := CaseInsenseMap()
@@ -352,6 +360,8 @@ class SpeechImprover extends ConfigurationItem {
 			}
 
 			commands := values2String("`n", commands*)
+
+			this.iCommands := commands
 		}
 
 		if (this.Model && this.Listener) {

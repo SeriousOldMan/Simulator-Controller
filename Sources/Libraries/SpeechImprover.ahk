@@ -221,7 +221,7 @@ class SpeechImprover extends ConfigurationItem {
 
 	setGrammar(name, grammar) {
 		try {
-			this.iGrammars[name] := this.createGrammar(this.Compiler.compileGrammar(grammar))
+			this.iGrammars[name] := this.Compiler.compileGrammar(grammar)
 		}
 		catch Any as exception {
 			logError(exception, true)
@@ -233,16 +233,14 @@ class SpeechImprover extends ConfigurationItem {
 		}
 	}
 
-	createGrammar(grammar) {
-		return grammar.Phrases
-	}
-
 	speak(text, options := false) {
 		local doRephrase, doTranslate, code, language, fileName, languageInstructions, instruction
 
 		static instructions := false
 
-		if !instructions
+		if !instructions {
+			instructions := CaseInsenseMap()
+
 			for code, language in availableLanguages() {
 				languageInstructions := readMultiMap(kTranslationsDirectory . "Speech Improver.instructions." . code)
 
@@ -250,14 +248,13 @@ class SpeechImprover extends ConfigurationItem {
 
 				instructions[code] := languageInstructions
 			}
+		}
 
 		if (this.Model && this.Speaker) {
 			code := this.Code
 			language := this.Language
 			doRephrase := true
 			doTranslate := (language != false)
-
-			this.Connector.Temperature := this.Temperature["Speaker"]
 
 			if options {
 				if !isInstance(options, Map)
@@ -272,6 +269,8 @@ class SpeechImprover extends ConfigurationItem {
 					if !this.Connector
 						this.startImprover()
 
+					this.Connector.Temperature := this.Temperature["Speaker"]
+
 					if options.Has("Language")
 						code := options["Language"]
 
@@ -282,9 +281,10 @@ class SpeechImprover extends ConfigurationItem {
 					else
 						instruction := "Rephrase"
 
-					answer := this.Connector.Ask(substituteVariables(getMultiMapValue(instructions[instructions.Has(code) ? code: "EN"]
-																					, "Speaker.Instructions", instruction)
-																   , {language: language ? language : "", text: text}))
+					instruction := substituteVariables(getMultiMapValue(instructions[instructions.Has(code) ? code : "EN"]
+																	  , "Speaker.Instructions", instruction)
+													 , {language: language ? language : "", text: text})
+					answer := this.Connector.Ask(instruction)
 
 					return (answer ? answer : text)
 				}
@@ -308,7 +308,9 @@ class SpeechImprover extends ConfigurationItem {
 		static instructions := false
 		static commands := false
 
-		if !instructions
+		if !instructions {
+			instructions := CaseInsenseMap()
+
 			for code, language in availableLanguages() {
 				languageInstructions := readMultiMap(kTranslationsDirectory . "Speech Improver.instructions." . code)
 
@@ -316,6 +318,7 @@ class SpeechImprover extends ConfigurationItem {
 
 				instructions[code] := languageInstructions
 			}
+		}
 
 		if !commands {
 			commands := []
@@ -339,8 +342,6 @@ class SpeechImprover extends ConfigurationItem {
 			code := this.Code
 			doRecognize := true
 
-			this.Connector.Temperature := this.Temperature["Listener"]
-
 			if options {
 				if !isInstance(options, Map)
 					options := toMap(options)
@@ -353,11 +354,15 @@ class SpeechImprover extends ConfigurationItem {
 					if !this.Connector
 						this.startImprover()
 
+					this.Connector.Temperature := this.Temperature["Listener"]
+
 					instruction := "Recognize"
 
-					answer := this.Connector.Ask(substituteVariables(getMultiMapValue(instructions[instructions.Has(code) ? code: "EN"]
-																					, "Listener.Instructions", instruction)
-																   , {commands: commands, text: text}))
+					instruction := substituteVariables(getMultiMapValue(instructions[instructions.Has(code) ? code : "EN"]
+																	  , "Listener.Instructions", instruction)
+													 , {commands: commands, text: text})
+
+					answer := this.Connector.Ask(instruction)
 
 					return ((!answer || (answer = "Unknown")) ? text : answer)
 				}

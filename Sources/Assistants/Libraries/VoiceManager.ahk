@@ -411,6 +411,23 @@ class VoiceManager extends ConfigurationItem {
 		textRecognized(text) {
 			this.VoiceManager.raiseTextRecognized("Text", text)
 		}
+
+		unknownRecognized(&text) {
+			local improver := this.VoiceManager.ListenerImprover
+			local alternateText
+
+			if (improver && (improver.ListenerMode = "Unknown")) {
+				alternateText := improver.listen(text)
+
+				if (alternateText != text) {
+					text := alternateText
+
+					return true
+				}
+			}
+
+			return super.unknownRecognized(&text)
+		}
 	}
 
 	class VoiceContinuation {
@@ -571,7 +588,7 @@ class VoiceManager extends ConfigurationItem {
 
 	ListenerImprover {
 		Get {
-			return this.iLstenerImprover
+			return this.iListenerImprover
 		}
 	}
 
@@ -1093,12 +1110,16 @@ class VoiceManager extends ConfigurationItem {
 		local grammars := this.getGrammars(language)
 		local mode := getMultiMapValue(grammars, "Configuration", "Recognizer", "Grammar")
 		local compilerRecognizer := SpeechRecognizer("Compiler", true, this.Language, false, "Text")
+		local improver := this.ListenerImprover
 		local grammar, definition, name, choices, nextCharIndex
 
 		this.iRecognizerMode := mode
 
 		for name, choices in getMultiMapValues(grammars, "Choices") {
 			compilerRecognizer.setChoices(name, choices)
+
+			if improver
+				improver.setChoices(name, choices)
 
 			if spRecognizer
 				spRecognizer.setChoices(name, choices)
@@ -1109,6 +1130,9 @@ class VoiceManager extends ConfigurationItem {
 
 		for grammar, definition in getMultiMapValues(grammars, "Listener Grammars") {
 			definition := substituteVariables(definition, {name: this.Name})
+
+			if improver
+				improver.setGrammar(grammar, definition)
 
 			if (mode = "Mixed") {
 				if !compilerRecognizer {

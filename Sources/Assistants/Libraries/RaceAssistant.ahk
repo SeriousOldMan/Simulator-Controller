@@ -572,12 +572,20 @@ class RaceAssistant extends ConfigurationItem {
 		options["Vocalics"] := Array(getMultiMapValue(configuration, "Voice Control", "SpeakerVolume", 100)
 								   , getMultiMapValue(configuration, "Voice Control", "SpeakerPitch", 0)
 								   , getMultiMapValue(configuration, "Voice Control", "SpeakerSpeed", 0))
-		options["SpeakerImprover"] := (((getMultiMapValue(configuration, "Speech Improver", this.AssistantType . ".Model", kUndefined) =! kUndefined) ? this.AssistantType : false) && getMultiMapValue(configuration, "Speech Improver", this.AssistantType . ".Speaker", true))
 		options["Recognizer"] := getMultiMapValue(configuration, "Voice Control", "Recognizer", "Desktop")
 		options["Listener"] := getMultiMapValue(configuration, "Voice Control", "Listener", false)
-		options["ListenerImprover"] := (((getMultiMapValue(configuration, "Speech Improver", this.AssistantType . ".Model", kUndefined) =! kUndefined) ? this.AssistantType : false) && getMultiMapValue(configuration, "Speech Improver", this.AssistantType . ".Listener", false))
 		options["PushToTalk"] := getMultiMapValue(configuration, "Voice Control", "PushToTalk", false)
 		options["PushToTalkMode"] := getMultiMapValue(configuration, "Voice Control", "PushToTalkMode", "Hold")
+
+		if getMultiMapValue(configuration, "Speech Improver", this.AssistantType . ".Speaker", true)
+			options["SpeakerImprover"] := ((getMultiMapValue(configuration, "Speech Improver", this.AssistantType . ".Model", kUndefined) != kUndefined) ? this.AssistantType : false)
+		else
+			options["SpeakerImprover"] := false
+
+		if getMultiMapValue(configuration, "Speech Improver", this.AssistantType . ".Listener", true)
+			options["ListenerImprover"] := ((getMultiMapValue(configuration, "Speech Improver", this.AssistantType . ".Model", kUndefined) != kUndefined) ? this.AssistantType : false)
+		else
+			options["ListenerImprover"] := false
 	}
 
 	createVoiceManager(name, options) {

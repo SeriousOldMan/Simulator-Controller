@@ -1150,7 +1150,7 @@ class VoiceManager extends ConfigurationItem {
 		local grammars := this.getGrammars(language)
 		local mode := getMultiMapValue(grammars, "Configuration", "Recognizer", "Grammar")
 		local compilerRecognizer := SpeechRecognizer("Compiler", true, this.Language, false, "Text")
-		local improver := this.ListenerImprover
+		local improver := this.Improver
 		local grammar, definition, name, choices, nextCharIndex
 
 		this.iRecognizerMode := mode
@@ -1161,8 +1161,12 @@ class VoiceManager extends ConfigurationItem {
 			if improver
 				improver.setChoices(name, choices)
 
-			if spRecognizer
+			if spRecognizer {
 				spRecognizer.setChoices(name, choices)
+
+				if spRecognizer.Improver
+					spRecognizer.Improver.setChoices(name, choices)
+			}
 			else
 				messageSend(kFileMessage, "Voice", "registerChoices:" . values2String(";", this.Name, name, string2Values(",", StrReplace(choices, ";", ","))*)
 										, this.VoiceServer)
@@ -1173,6 +1177,9 @@ class VoiceManager extends ConfigurationItem {
 
 			if improver
 				improver.setGrammar(grammar, definition)
+
+			if (spRecognizer && spRecognizer.Improver)
+				spRecognizer.Improver.setGrammar(grammar, definition)
 
 			if (mode = "Mixed") {
 				if !compilerRecognizer {

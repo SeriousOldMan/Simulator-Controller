@@ -780,20 +780,9 @@ class SpeechRecognizer {
 		return bestMatch
 	}
 
-	textRecognized(text) {
-	}
-
-	_onGrammarCallback(name, wordArr) {
-		if (this.iMode = "Text")
-			this.textRecognized(values2String(A_Space, this.getWords(wordArr)*))
-		else
-			this._grammarCallbacks[name].Call(name, this.getWords(wordArr))
-	}
-
-	_onTextCallback(text) {
-		local words, ignore, name, grammar, rating, index, literal, bestRating, bestMatch, callback, handler
-
-		words := string2Values(A_Space, text)
+	splitText(text) {
+		local words := string2Values(A_Space, text)
+		local index, literal
 
 		for index, literal in words {
 			literal := StrReplace(literal, ".", "")
@@ -805,51 +794,69 @@ class SpeechRecognizer {
 			words[index] := literal
 		}
 
-		for ignore, handler in this._recognitionHandlers
-			if handler[2].Call(handler[1], words*)
-				return
+		return words
+	}
 
+	textRecognized(text) {
+	}
+
+	unknownRecognized(&text) {
+		if this._grammars.Has("?")
+			callback := this._grammars["?"].Callback.Call("?", this.splitText(text))
+
+		return false
+	}
+
+	_onGrammarCallback(name, wordArr) {
 		if (this.iMode = "Text")
-			this.textRecognized(text)
-		else if true {
-			bestRating := 0
-			bestMatch := false
+			this.textRecognized(values2String(A_Space, this.getWords(wordArr)*))
+		else
+			this._grammarCallbacks[name].Call(name, this.getWords(wordArr))
+	}
 
-			for ignore, grammar in this._grammars {
-				rating := this.match(text, grammar.Grammar)
+	_onTextCallback(text) {
+		local words, ignore, name, grammar, rating, bestRating, bestMatch, handler
 
-				if (rating > bestRating) {
-					bestRating := rating
-					bestMatch := grammar
-				}
-			}
+		loop 2 {
+			words := this.splitText(text)
 
-			if bestMatch {
-				callback := bestMatch.Callback
-
-				callback.Call(bestMatch.Name, words)
-			}
-			else if this._grammars.Has("?") {
-				callback := this._grammars["?"].Callback
-
-				callback.Call("?", words)
-			}
-		}
-		else {
-			for name, grammar in this._grammars
-				if grammar.Grammar.match(words) {
-					callback := grammar.Callback
-
-					callback.Call(name, words)
-
+			for ignore, handler in this._recognitionHandlers
+				if handler[2].Call(handler[1], words*)
 					return
+
+			if (this.iMode = "Text")
+				this.textRecognized(text)
+			else if true {
+				bestRating := 0
+				bestMatch := false
+
+				for ignore, grammar in this._grammars {
+					rating := this.match(text, grammar.Grammar)
+
+					if (rating > bestRating) {
+						bestRating := rating
+						bestMatch := grammar
+					}
 				}
 
-			if this._grammars.Has("?") {
-				callback := this._grammars["?"].Callback
-
-				callback.Call("?", words)
+				if bestMatch
+					bestMatch.Callback.Call(bestMatch.Name, words)
+				else if this.unknownRecognized(&text)
+					continue
 			}
+			else {
+				for name, grammar in this._grammars
+					if grammar.Grammar.match(words) {
+						grammar.Callback.Call(name, words)
+
+						return
+					}
+
+				if this.unknownRecognized(&text)
+					continue
+			}
+
+			break
 		}
 	}
 

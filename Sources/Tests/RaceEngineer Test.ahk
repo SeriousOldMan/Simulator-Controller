@@ -61,8 +61,8 @@ global vPitstopRepairEngine := kNotInitialized
 
 class TestRaceEngineer extends RaceEngineer {
 	__New(configuration, settings, remoteHandler := false, name := false, language := kUndefined, synthesizer := false, speaker := false, vocalics := false, speakerImprover := false
-		, recognizer := false, listener := false, muted := false, voiceServer := false) {
-		super.__New(configuration, remoteHandler, name, language, synthesizer, speaker, vocalics, speakerImprover, recognizer, listener, muted, voiceServer)
+		, recognizer := false, listener := false, listenerImprover := false, muted := false, voiceServer := false) {
+		super.__New(configuration, remoteHandler, name, language, synthesizer, speaker, vocalics, speakerImprover, recognizer, listener, listenerImprover, muted, voiceServer)
 
 		this.updateConfigurationValues({Settings: settings})
 
@@ -1056,7 +1056,7 @@ else {
 	raceNr := (GetKeyState("Alt") ? 18 : ((GetKeyState("Shift") ? 2 : 1)))
 
 	engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Engineer.settings")
-							   , TestPitStopHandler(), "Jona", "EN", true, true, false, false, true, true)
+							   , TestPitStopHandler(), "Jona", "EN", true, true, false, true, true, true, true)
 
 	engineer.VoiceManager.setDebug(kDebugGrammars, false)
 

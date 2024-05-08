@@ -38,8 +38,8 @@ global kBuildConfiguration := "Production"
 class TestRaceStrategist extends RaceStrategist {
 	__New(configuration, settings, remoteHandler := false, name := false, language := kUndefined
 		, synthesizer := false, speaker := false, vocalics := false, speakerImprover := false
-		, recognizer := false, listener := false, muted := false, voiceServer := false) {
-		super.__New(configuration, remoteHandler, name, language, synthesizer, speaker, vocalics, speakerImprover, recognizer, listener, muted, voiceServer)
+		, recognizer := false, listener := false, listenerImprover := false, muted := false, voiceServer := false) {
+		super.__New(configuration, remoteHandler, name, language, synthesizer, speaker, vocalics, speakerImprover, recognizer, listener, listenerImprover, muted, voiceServer)
 
 		this.updateConfigurationValues({Settings: settings})
 

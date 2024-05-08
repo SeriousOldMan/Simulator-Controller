@@ -56,6 +56,7 @@ class VoiceManager extends ConfigurationItem {
 
 	iRecognizer := "Desktop"
 	iListener := false
+	iListenerImprover := false
 
 	iRecognizerMode := "Grammar"
 
@@ -568,6 +569,12 @@ class VoiceManager extends ConfigurationItem {
 		}
 	}
 
+	ListenerImprover {
+		Get {
+			return this.iLstenerImprover
+		}
+	}
+
 	Listening {
 		Get {
 			return this.iIsListening
@@ -698,14 +705,21 @@ class VoiceManager extends ConfigurationItem {
 		if options.Has("SpeakerSpeed")
 			this.iSpeakerSpeed := options["SpeakerSpeed"]
 
-		if options.Has("Improver")
-			this.iSpeakerImprover := options["Improver"]
+		if options.Has("SpeakerImprover")
+			this.iSpeakerImprover := options["SpeakerImprover"]
 
 		if options.Has("Recognizer")
 			this.iRecognizer := options["Recognizer"]
 
 		if options.Has("Listener")
 			this.iListener := options["Listener"]
+
+		if options.Has("ListenerImprover") {
+			this.iListenerImprover := options["ListenerImprover"]
+
+			if this.ListenerImprover
+				this.iListenerImprover := SpeechImprover(this.ListenerImprover, this.Configuration, this.Language)
+		}
 
 		if options.Has("PushToTalk")
 			this.iPushToTalk := options["PushToTalk"]
@@ -1325,6 +1339,7 @@ class VoiceManager extends ConfigurationItem {
 	}
 
 	textRecognized(grammar, text, remote := false) {
+		local matchText := text
 		local words, recognizedGrammar
 
 		if (this.Debug[kDebugRecognitions] && !remote)
@@ -1333,7 +1348,20 @@ class VoiceManager extends ConfigurationItem {
 		protectionOn()
 
 		try {
-			recognizedGrammar := ((this.iRecognizerMode = "Mixed") ? this.matchCommand(text, &words) : "")
+			if (this.iRecognizerMode = "Mixed") {
+				if (this.ListenerImprover && (this.ListenerImprover.ListenerMode = "Always"))
+					matchText := this.ListenerImprover.recognize(matchText)
+
+				recognizedGrammar := this.matchCommand(matchText, &words)
+
+				if (this.ListenerImprover && !recognizedGrammar && (this.ListenerImprover.ListenerMode = "Unknown")) {
+					matchText := this.ListenerImprover.recognize(matchText)
+
+					recognizedGrammar := this.matchCommand(matchText, &words)
+				}
+			}
+			else
+				recognizedGrammar := false
 
 			if recognizedGrammar
 				this.handleVoiceCommand(recognizedGrammar, words)

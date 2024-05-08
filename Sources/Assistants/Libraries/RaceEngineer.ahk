@@ -3032,7 +3032,7 @@ class RaceEngineer extends RaceAssistant {
 			this.RemoteHandler.pitstopPrepared(pitstopNumber)
 
 			if this.Speaker
-				this.getSpeaker().speakPhrase("CallToPit")
+				Task.startTask(() => this.getSpeaker().speakPhrase("CallToPit"), 10000)
 		}
 	}
 

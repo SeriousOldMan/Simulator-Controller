@@ -78,7 +78,7 @@ class DrivingCoach extends GridRaceAssistant {
 		Get {
 			if isSet(type) {
 				if (type == true)
-					return ["Character", "Simulation", "Session", "Stint", "Handling"]
+					return ["Character", "Simulation", "Session", "Stint", "Telemetry", "Handling"]
 				else
 					return (this.iInstructions.Has(type) ? this.iInstructions[type] : false)
 			}
@@ -229,9 +229,10 @@ class DrivingCoach extends GridRaceAssistant {
 		local settingsDB := this.SettingsDatabase
 		local simulator, car, track, position, hasSectorTimes, laps, lapData, ignore, carData, standingsData
 		local collector, issues, handling, ignore, type, speed, where, issue, index
-
+		local key, value, text
+		
 		static sessions := false
-
+		
 		if !sessions {
 			sessions := ["Other", "Practice", "Qualifying", "Race"]
 
@@ -331,6 +332,15 @@ class DrivingCoach extends GridRaceAssistant {
 						return substituteVariables(this.Instructions["Stint"], {lap: knowledgeBase.getValue("Lap"), position: position, carNumber: this.getNr()
 																			  , laps: lapData, standings: standingsData})
 					}
+				}
+			case "Telemetry":
+				if knowledgeBase {
+					text := ""
+
+					for key, value in this.Facts
+						text .= (key . " = " . value . "`n")
+				
+					return substituteVariables(this.Instructions["Telemetry"], {telemetry: text})
 				}
 			case "Handling":
 				if (knowledgeBase && this.Announcements["HandlingInformation"]) {

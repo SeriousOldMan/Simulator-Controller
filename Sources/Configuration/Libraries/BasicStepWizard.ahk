@@ -1928,7 +1928,7 @@ class VoiceImproverEditor extends ConfiguratorPanel {
 		widget13 := editorGui.Add("Text", "x100 yp+11 w" . (width + 8 - 100) . " 0x10 W:Grow")
 		editorGui.SetFont("Norm", "Arial")
 
-		widget14 := editorGui.Add("Text", "x" . x0 . " yp+20 w105 h23 +0x200", translate("Probability"))
+		widget14 := editorGui.Add("Text", "x" . x0 . " yp+20 w105 h23 +0x200", translate("Activation"))
 		widget15 := editorGui.Add("Edit", "x" . x1 . " yp w60 Number Limit3 vviSpeakerProbabilityEdit")
 		widget15.OnEvent("Change", validatePercentage.Bind("viSpeakerProbabilityEdit"))
 		widget16 := editorGui.Add("UpDown", "x" . x1 . " yp w60 h23 Range0-100")

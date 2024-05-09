@@ -392,7 +392,7 @@ Two type of improvements are available at the moment:
 	  
 	 A valid command that will be recognized for the pattern, will be: "Check the brake wear". When using the GPT-based semantically mapping, a command like: "We should check the brakes" will also be understood.
 	 
-	 There are two methods available, both with their pros and cons. "Always" means, that the LLM is always asked to interpret the given command, whereas "Unknown" means, that it is only used, when the pattern-based voice recognition cannot identify the command. The later will result in way less calls to the LLM and therefore will probably reduce costs and - even more important - will be better in terms of responsiveness, if you are already quite familar with the command patterns.
+	 There are two *Activation* methods available, both with their pros and cons. "Always" means, that the LLM is always asked to interpret the given command, whereas "Unrecognized" means, that it is only used, when the pattern-based voice recognition cannot identify the command. The later will result in less calls to the LLM and therefore will probably reduce costs and - even more important - will be better in terms of responsiveness, if you are already quite familar with the command patterns.
 	 
 	 Note: Using the semantic *Understanding* improvement may only be usable in conjunction with voice recognition methods, that are cabable to recognize continuous, unstructured text. This is true for Google and Azure voice recognition, but not for the builtin voice recognition of Windows, which only work reliable for pattern-based recognition.
 

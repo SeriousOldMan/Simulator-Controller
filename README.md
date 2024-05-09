@@ -155,7 +155,9 @@ Simulator Controller comes with a set of virtual Assistants to guide you through
 
 Simulator Controller offers a virtual pit crew based on an AI powered chatbot engine. At the heart of this engine is hybrid rule engine coupled with voice recognition and voice synthesis. A rule engine is very suitable for the tasks of a typical pit crew, since all actions are event based and use big amounts of data.
 
-According to the maturity scale of *attractive.ai* (one of several hundreds maturity models that can be found on the net), the Race Assistants of Simulator Controller are at level 2.5. The observe your racing, can give recommendations and take responsibilty for certain tasks like strategy management and pitstop planning and preparation.
+You can communicate with the Race Assistants using voice and natural language. Voice commands are pattern-based, but an optional integration of GPT-based speech processing will make the interaction very natural.
+
+According to the maturity scale of *attractive.ai* (one of several hundreds maturity models that can be found on the net), the Race Assistants of Simulator Controller are between level 2.5 and 3.0. They observe your racing, can give recommendations and take responsibilty for certain tasks like strategy management and pitstop planning and preparation.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/AI%20Maturity%20Levels.png)
 

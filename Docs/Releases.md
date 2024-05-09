@@ -15,6 +15,9 @@
       - Assetto Corsa Competizione
         - Ford Mustang GT3
 
+## 5.7.0.2-release 05/06/24
+  1. Second and most probably final fix for the Team Server / "Race Center" bug mentioned below.
+  
 ## 5.7.0.1-release 05/05/24
   1. Hopefully fixed a critical bug for Team Server / "Race Center", which prevented transfer of session state from one driver to the other when Assistants are set to silent in the startup settings.
   

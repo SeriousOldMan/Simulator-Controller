@@ -25,4 +25,4 @@ Utilities.5.4.8.Download=https://simulatorcontroller.s3.eu-central-1.amazonaws.c
 Type=Release
 [Version]
 Development=5.7.1.0-release
-Release=5.7.1.0-release
+Release=5.7.0.2-release

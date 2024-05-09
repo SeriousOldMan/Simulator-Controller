@@ -1,9 +1,9 @@
 [Development]
-Version=5.7.1.0-dev
+Version=5.7.1.0-beta
 Target=5.7.1.0-release
 Date=05/09/2024
-Download=https://www.dropbox.com/scl/fi/mzskefim3mc6oxq3toxbr/Simulator-Controller-5.7.1.0-dev.zip?rlkey=bgoc3tx6r7maxtuh788q3ux4l&st=fs0i03xp&dl=1
-Changes=Fixed saving of probability setting for speech improver, Improved meta data for speech improver, Tweaking for accident detection, Tweaked damage lap delta calculation, Introduced configuration files for speech improver LLM instructions, Full support for listen improver, Fixed a couple of Strategist commands, Deferred call to pit info of Engineer, Engineeer now informs about pressure changes incrementally if tyre compound is unchanged, Added Ford Mustang for ACC, Updated to AHK 2.0.14
+Download=https://www.dropbox.com/scl/fi/6u5980fbs83pqof1tzf7x/Simulator-Controller-5.7.1.0-beta.zip?rlkey=snn8ujwyw5z7qzt2axa2kyfv1&st=10cl5t87&dl=1
+Changes=Fixed saving of probability setting for speech improver, Improved meta data for speech improver, Tweaking for accident detection, Tweaked damage lap delta calculation, Introduced configuration files for speech improver LLM instructions, Full support for listen improver, Fixed a couple of Strategist commands, Deferred call to pit info of Engineer, Engineeer now informs about pressure changes incrementally if tyre compound is unchanged, Added Ford Mustang for ACC, New car models for Setup Workbench, Updated to AHK 2.0.14
 Components=Media->5.6.1,Configuration->5.6.4,Utilities->5.4.8
 [Release]
 Version=5.7.0.1-release
@@ -24,5 +24,5 @@ Utilities.5.4.8.Download=https://simulatorcontroller.s3.eu-central-1.amazonaws.c
 [Current]
 Type=Development
 [Version]
-Development=5.7.1.0-dev
+Development=5.7.1.0-beta
 Release=5.7.0.1-release

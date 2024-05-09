@@ -1,4 +1,4 @@
-## 5.7.1.0-release 05/10/24
+## 5.7.1.0-release 05/10/24 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed saving of probability setting for rephrasing for the speech improver

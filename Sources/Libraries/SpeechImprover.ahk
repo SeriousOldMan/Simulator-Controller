@@ -37,6 +37,8 @@ class SpeechImprover extends ConfigurationItem {
 	iChoices := CaseInsenseMap()
 	iGrammars := CaseInsenseMap()
 
+	iCommands := false
+
 	Options[key?] {
 		Get {
 			return (isSet(key) ? this.iOptions[key] : this.iOptions)
@@ -110,6 +112,12 @@ class SpeechImprover extends ConfigurationItem {
 	Compiler {
 		Get {
 			return this.iCompiler
+		}
+	}
+
+	Commands {
+		Get {
+			return this.iCommands
 		}
 	}
 
@@ -303,11 +311,11 @@ class SpeechImprover extends ConfigurationItem {
 	}
 
 	listen(text, options := false) {
+		local commands := this.Commands
 		local doRecognize, code, language, fileName, languageInstructions, instruction
-		local ignore, phrase, name, grammar, phrases
+		local phrase, name, grammar, phrases, candidates, numCandidates
 
 		static instructions := false
-		static commands := false
 
 		if !instructions {
 			instructions := CaseInsenseMap()
@@ -325,18 +333,35 @@ class SpeechImprover extends ConfigurationItem {
 			commands := []
 
 			for name, grammar in this.Grammars {
-				phrases := []
+				candidates := grammar.Phrases
+				numCandidates := candidates.Length
 
-				for ignore, phrase in grammar.Phrases
-					if (A_Index > 5)
-						break
+				if (numCandidates > 0) {
+					phrases := []
+
+					if (numCandidates > 10) {
+						loop {
+							phrase := candidates[Max(1, Min(numCandidates, Random(1, numCandidates)))]
+
+							if !inList(phrases, phrase)
+								phrases.Push(phrase)
+						}
+						until ((phrases.Length = numCandidates) || (phrases.Length = 5))
+					}
 					else
-						phrases.Push(phrase)
+						for ignore, phrase in candidates
+							if (A_Index > 5)
+								break
+							else
+								phrases.Push(phrase)
 
-				commands.Push(name . "=" . values2String(", ", phrases*))
+					commands.Push(name . "=" . values2String(", ", phrases*))
+				}
 			}
 
 			commands := values2String("`n", commands*)
+
+			this.iCommands := commands
 		}
 
 		if (this.Model && this.Listener) {

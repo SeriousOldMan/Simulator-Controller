@@ -564,6 +564,9 @@ class VoiceServer extends ConfigurationItem {
 			local recognizer := this.SpeechRecognizer[true]
 
 			recognizer.setChoices(name, values2String(",", choices*))
+
+			if recognizer.Improver
+				recognizer.Improver.setChoices(name, choices)
 		}
 
 		registerVoiceCommand(grammar, command, callback) {
@@ -597,8 +600,13 @@ class VoiceServer extends ConfigurationItem {
 				}
 				else if (this.RecognizerMode = "Text")
 					throw "Listener grammars are not supported in continuous text recognition..."
-				else if !recognizer.loadGrammar(grammar, recognizer.compileGrammar(command), ObjBindMethod(this.VoiceServer, "recognizeVoiceCommand", this))
-					throw "Recognizer not running..."
+				else {
+					if !recognizer.loadGrammar(grammar, recognizer.compileGrammar(command), ObjBindMethod(this.VoiceServer, "recognizeVoiceCommand", this))
+						throw "Recognizer not running..."
+
+					if recognizer.Improver
+						recognizer.Improver.setGrammar(grammar, command)
+				}
 
 				this.VoiceCommands[grammar] := Array(command, callback)
 			}

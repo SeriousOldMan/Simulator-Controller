@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[5.7.1.0-dev](https://www.dropbox.com/scl/fi/mzskefim3mc6oxq3toxbr/Simulator-Controller-5.7.1.0-dev.zip?rlkey=bgoc3tx6r7maxtuh788q3ux4l&st=fs0i03xp&dl=1) (Early build for 5.7.1. Changes: Fixed saving of probability setting for speech improver, Improved meta data for speech improver, Tweaking for accident detection, Tweaked damage lap delta calculation, Introduced configuration files for speech improver LLM instructions, Full support for listen improver, Fixed a couple of Strategist commands, Deferred call to pit info of Engineer, Engineeer now informs about pressure changes incrementally if tyre compound is unchanged, Added Ford Mustang for ACC, Updated to AHK 2.0.14.)
+[5.7.1.0-beta](https://www.dropbox.com/scl/fi/6u5980fbs83pqof1tzf7x/Simulator-Controller-5.7.1.0-beta.zip?rlkey=snn8ujwyw5z7qzt2axa2kyfv1&st=10cl5t87&dl=1) (Test build for 5.7.1. Changes: Fixed saving of probability setting for speech improver, Improved meta data for speech improver, Tweaking for accident detection, Tweaked damage lap delta calculation, Introduced configuration files for speech improver LLM instructions, Full support for listen improver, Fixed a couple of Strategist commands, Deferred call to pit info of Engineer, Engineeer now informs about pressure changes incrementally if tyre compound is unchanged, Added Ford Mustang for ACC, New car models for Setup Workbench, Updated to AHK 2.0.14.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-571) of this version and all the versions you might have skipped, before installing and using this version.
 
@@ -155,7 +155,9 @@ Simulator Controller comes with a set of virtual Assistants to guide you through
 
 Simulator Controller offers a virtual pit crew based on an AI powered chatbot engine. At the heart of this engine is hybrid rule engine coupled with voice recognition and voice synthesis. A rule engine is very suitable for the tasks of a typical pit crew, since all actions are event based and use big amounts of data.
 
-According to the maturity scale of *attractive.ai* (one of several hundreds maturity models that can be found on the net), the Race Assistants of Simulator Controller are at level 2.5. The observe your racing, can give recommendations and take responsibilty for certain tasks like strategy management and pitstop planning and preparation.
+You can communicate with the Race Assistants using voice and natural language. Voice commands are pattern-based, but an optional integration of GPT-based speech processing will make the interaction very natural.
+
+According to the maturity scale of *attractive.ai* (one of several hundreds maturity models that can be found on the net), the Race Assistants of Simulator Controller are between level 2.5 and 3.0. They observe your racing, can give recommendations and take responsibilty for certain tasks like strategy management and pitstop planning and preparation.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/AI%20Maturity%20Levels.png)
 

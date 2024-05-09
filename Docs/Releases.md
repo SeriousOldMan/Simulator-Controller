@@ -1,4 +1,4 @@
-## 5.7.1.0-release 05/10/24
+## 5.7.1.0-release 05/10/24 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed saving of probability setting for rephrasing for the speech improver
@@ -11,6 +11,9 @@
   10. Added new Ford Mustang for *Assetto Corsa Competizione*.
   11. The AI-based speech improvement for the Assistants now also support semantic understanding of comannds, for which no pattern has been defined in the grammars of the Assistant. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#speech-improvement-using-ai) of the speech improver for more information. The configuration of the speech improvement is available on the "Basic" setup page of "Simulator Setup".
   12. [Internal] Migrated to AHK 2.0.14.
+  13. New car models for "Setup Workbench":
+      - Assetto Corsa Competizione
+        - Ford Mustang GT3
 
 ## 5.7.0.2-release 05/06/24
   1. Second and most probably final fix for the Team Server / "Race Center" bug mentioned below.

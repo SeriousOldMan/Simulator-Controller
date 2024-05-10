@@ -784,8 +784,18 @@ class RaceAssistant extends ConfigurationItem {
 					if (InStr(key, skipped) == 1)
 						skip := true
 
-				if !skip
+				if !skip {
+					switch key, false {
+						case "Session.Simulator":
+							value := SessionDatabase.getSimulatorName(value)
+						case "Session.Car":
+							value := SessionDatabase.getCarName(knowledgeBase.getValue("Session.Simulator"), value)
+						case "Session.Track":
+							value := SessionDatabase.getTrackName(knowledgeBase.getValue("Session.Simulator"), value)
+					}
+
 					text .= (key . " = " . value . "`n")
+				}
 			}
 
 		return text

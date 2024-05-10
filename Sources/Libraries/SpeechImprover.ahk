@@ -32,6 +32,8 @@ class SpeechImprover extends ConfigurationItem {
 
 	iConnector := false
 
+	iMode := false
+
 	iCompiler := SpeechRecognizer("Compiler")
 
 	iChoices := CaseInsenseMap()
@@ -478,18 +480,19 @@ class SpeechImprover extends ConfigurationItem {
 
 					instruction := "Talk"
 
-					if variables {
-						variables.question := question
+					if variables
 						variables.language := (language ? language : "")
-					}
 					else
-						variables := {question: question, language: language ? language : ""}
+						variables := {language: language ? language : ""}
 
-					instruction := substituteVariables(getMultiMapValue(instructions[instructions.Has(code) ? code : "EN"]
-																	  , "Conversation.Instructions", instruction)
-													 , variables)
+					instruction := instructions[instructions.Has(code) ? code : "EN"]
 
-					answer := this.Connector.Ask(instruction)
+					answer := this.Connector.Ask(question, [substituteVariables(getMultiMapValue(instruction
+																							   , "Conversation.Instructions", "Character")
+																			  , variables)
+														  , substituteVariables(getMultiMapValue(instruction
+																							   , "Conversation.Instructions", "Telemetry")
+																			  , variables)])
 
 					return (answer ? answer : false)
 				}

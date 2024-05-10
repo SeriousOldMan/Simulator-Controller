@@ -86,13 +86,13 @@ class LLMConnector {
 			return headers
 		}
 
-		CreatePrompt(body) {
+		CreatePrompt(body, instructions, question) {
 			throw "Virtual method HTTPConnector.CreatePrompt must be implemented in a subclass..."
 		}
 
-		Ask(question) {
+		Ask(question, instructions := false) {
 			local headers := this.CreateHeaders(Map("Content-Type", "application/json"))
-			local body := this.CreatePrompt({model: this.Model, max_tokens: this.MaxTokens, temperature: this.Temperature}, question)
+			local body := this.CreatePrompt({model: this.Model, max_tokens: this.MaxTokens, temperature: this.Temperature}, instructions ? instructions : this.GetInstructions(), question)
 
 			body := JSON.print(body)
 
@@ -143,7 +143,7 @@ class LLMConnector {
 			}
 		}
 
-		CreatePrompt(body, question) {
+		CreatePrompt(body, instructions, question) {
 			local messages := []
 			local ignore, instruction, conversation
 
@@ -152,7 +152,7 @@ class LLMConnector {
 					messages.Push({role: "system", content: instruction})
 			}
 
-			do(this.GetInstructions(), addInstruction)
+			do(instructions, addInstruction)
 
 			for ignore, conversation in this.History {
 				messages.Push({role: "user", content: conversation[1]})
@@ -196,7 +196,7 @@ class LLMConnector {
 	}
 
 	class GPT4AllConnector extends LLMConnector.HTTPConnector {
-		CreatePrompt(body, question) {
+		CreatePrompt(body, instructions, question) {
 			local prompt := ""
 			local ignore, instruction, conversation
 
@@ -209,7 +209,7 @@ class LLMConnector {
 				}
 			}
 
-			do(this.GetInstructions(), addInstruction)
+			do(instructions, addInstruction)
 
 			for ignore, conversation in this.History {
 				prompt .= ("### Human:`n" . conversation[1] . "`n")
@@ -225,7 +225,7 @@ class LLMConnector {
 	}
 
 	class LLMRuntimeConnector extends LLMConnector {
-		CreatePrompt(question) {
+		CreatePrompt(instructions, question) {
 			local prompt := ""
 			local ignore, instruction, conversation
 
@@ -238,7 +238,7 @@ class LLMConnector {
 				}
 			}
 
-			do(this.GetInstructions(), addInstruction)
+			do(instructions, addInstruction)
 
 			for ignore, conversation in this.History {
 				prompt .= ("### Human:`n" . conversation[1] . "`n")
@@ -250,8 +250,8 @@ class LLMConnector {
 			return prompt
 		}
 
-		Ask(question) {
-			local prompt := this.CreatePrompt(question)
+		Ask(question, instructions := false) {
+			local prompt := this.CreatePrompt(instructions ? instructions : this.GetInstructions(), question)
 			local answerFile := temporaryFileName("LLMRuntime", "answer")
 			local command, answer
 
@@ -377,7 +377,7 @@ class LLMConnector {
 			this.History.RemoveAt(1)
 	}
 
-	Ask(question) {
+	Ask(question, instructions := false) {
 		throw "Virtual method LLMConnector.Ask must be implemented in a subclass..."
 	}
 }

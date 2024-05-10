@@ -91,6 +91,7 @@ startupDrivingCoach() {
 	local coachRecognizer := true
 	local coachListener := true
 	local coachListenerImprover := false
+	local coachConversationImprover := false
 	local coachMuted := false
 	local debug := false
 	local voiceServer, index, coach, label
@@ -137,6 +138,9 @@ startupDrivingCoach() {
 			case "-ListenerImprover":
 				coachListenerImprover := A_Args[index + 1]
 				index += 2
+			case "-ConversationImprover":
+				coachConversationImprover := A_Args[index + 1]
+				index += 2
 			case "-Muted":
 				coachMuted := true
 				index += 1
@@ -167,7 +171,7 @@ startupDrivingCoach() {
 	coach := DrivingCoach(kSimulatorConfiguration
 						, remotePID ? DrivingCoach.DrivingCoachRemoteHandler(remotePID) : false
 						, coachName, coachLanguage
-						, coachSynthesizer, coachSpeaker, coachSpeakerVocalics, coachSpeakerImprover
+						, coachSynthesizer, coachSpeaker, coachSpeakerVocalics, coachSpeakerImprover, coachConversationImprover
 						, coachRecognizer, coachListener, coachListenerImprover, coachMuted, voiceServer)
 
 	DrivingCoach.Instance := coach

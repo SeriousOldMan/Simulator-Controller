@@ -91,6 +91,7 @@ startupRaceEngineer() {
 	local engineerRecognizer := true
 	local engineerListener := false
 	local engineerListenerImprover := false
+	local engineerConversationImprover := false
 	local engineerMuted := false
 	local debug := false
 	local voiceServer, index, engineer, label
@@ -137,6 +138,9 @@ startupRaceEngineer() {
 			case "-ListenerImprover":
 				engineerListenerImprover := A_Args[index + 1]
 				index += 2
+			case "-ConversationImprover":
+				engineerConversationImprover := A_Args[index + 1]
+				index += 2
 			case "-Muted":
 				engineerMuted := true
 				index += 1
@@ -167,7 +171,7 @@ startupRaceEngineer() {
 	engineer := RaceEngineer(kSimulatorConfiguration
 						   , remotePID ? RaceEngineer.RaceEngineerRemoteHandler(remotePID) : false
 						   , engineerName, engineerLanguage
-						   , engineerSynthesizer, engineerSpeaker, engineerSpeakerVocalics, engineerSpeakerImprover
+						   , engineerSynthesizer, engineerSpeaker, engineerSpeakerVocalics, engineerSpeakerImprover, engineerConversationImprover
 						   , engineerRecognizer, engineerListener, engineerListenerImprover, engineerMuted, voiceServer)
 
 	RaceEngineer.Instance := engineer

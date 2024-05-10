@@ -56,6 +56,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	iRaceAssistantRecognizer := false
 	iRaceAssistantListener := false
 	iRaceAssistantListenerImprover := false
+	iRaceAssistantConversationImprover := false
 	iRaceAssistantMuted := false
 
 	iRaceAssistant := false
@@ -725,6 +726,12 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		}
 	}
 
+	RaceAssistantConversationImprover {
+		Get {
+			return this.iRaceAssistantConversationImprover
+		}
+	}
+
 	RaceAssistantMuted {
 		Get {
 			return this.iRaceAssistantMuted
@@ -887,6 +894,8 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 					if ((assistantListener != false) && (assistantListener != kFalse) && (assistantListener != "Off")) {
 						this.iRaceAssistantListenerImprover := this.getArgumentValue("raceAssistantListenerImprover", false)
+						this.iRaceAssistantConversationImprover := this.getArgumentValue("raceAssistantConversationImprover", false)
+						
 						this.iRaceAssistantListener := (((assistantListener = kTrue) || (assistantListener = "On")) ? true : assistantListener)
 					}
 				}
@@ -1856,6 +1865,9 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 					if this.RaceAssistantListenerImprover
 						options .= " -ListenerImprover `"" . this.RaceAssistantListenerImprover . "`""
+
+					if this.RaceAssistantConversationImprover
+						options .= " -ConversationImprover `"" . this.RaceAssistantConversationImprover . "`""
 
 					if this.RaceAssistantMuted
 						options .= " -Muted"

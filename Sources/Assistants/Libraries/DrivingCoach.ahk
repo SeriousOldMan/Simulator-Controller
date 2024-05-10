@@ -153,9 +153,9 @@ class DrivingCoach extends GridRaceAssistant {
 
 	__New(configuration, remoteHandler, name := false, language := kUndefined
 		, synthesizer := false, speaker := false, vocalics := false, speakerImprover := false
-		, recognizer := false, listener := false, listenerImprover := false, muted := false, voiceServer := false) {
+		, recognizer := false, listener := false, listenerImprover := false, conversationImprover := false, muted := false, voiceServer := false) {
 		super.__New(configuration, "Driving Coach", remoteHandler, name, language, synthesizer, speaker, vocalics, speakerImprover
-												  , recognizer, listener, listenerImprover, muted, voiceServer)
+												  , recognizer, listener, listenerImprover, conversationImprover, muted, voiceServer)
 
 		this.updateConfigurationValues({Announcements: {SessionInformation: true, StintInformation: false, HandlingInformation: false}})
 
@@ -334,16 +334,9 @@ class DrivingCoach extends GridRaceAssistant {
 					}
 				}
 			case "Telemetry":
-				if knowledgeBase {
-					text := ""
-
-					for key, value in this.Facts
-						for ignore, filter in ["Car", "Standings", "Position"]
-							if (InStr(key, filter) != 1)
-								text .= (key . " = " . value . "`n")
-
-					return substituteVariables(this.Instructions["Telemetry"], {telemetry: text})
-				}
+				if knowledgeBase
+					return substituteVariables(this.Instructions["Telemetry"]
+											 , {telemetry: this.createTelemetryData(["Car", "Standings", "Position"])})
 			case "Handling":
 				if (knowledgeBase && this.Announcements["HandlingInformation"]) {
 					collector := this.iTelemetryCollector

@@ -134,9 +134,9 @@ class RaceEngineer extends RaceAssistant {
 
 	__New(configuration, remoteHandler := false, name := false, language := kUndefined
 		, synthesizer := false, speaker := false, vocalics := false, speakerImprover := false
-		, recognizer := false, listener := false, listenerImprover := false, muted := false, voiceServer := false) {
+		, recognizer := false, listener := false, listenerImprover := false, conversationImprover := false, muted := false, voiceServer := false) {
 		super.__New(configuration, "Race Engineer", remoteHandler, name, language, synthesizer, speaker, vocalics, speakerImprover
-												  , recognizer, listener, listenerImprover, muted, voiceServer)
+												  , recognizer, listener, listenerImprover, conversationImprover, muted, voiceServer)
 
 		this.updateConfigurationValues({Announcements: {FuelWarning: true, DamageReporting: true, DamageAnalysis: true, PressureReporting: true, WeatherUpdate: true}})
 	}
@@ -348,6 +348,10 @@ class RaceEngineer extends RaceAssistant {
 			default:
 				super.handleVoiceCommand(grammar, words)
 		}
+	}
+
+	createTelemetryData() {
+		return super.createTelemetryData(["Car", "Standings", "Position"])
 	}
 
 	requestInformation(category, arguments*) {

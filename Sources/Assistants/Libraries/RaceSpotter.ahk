@@ -1017,9 +1017,9 @@ class RaceSpotter extends GridRaceAssistant {
 
 	__New(configuration, remoteHandler, name := false, language := kUndefined
 		, synthesizer := false, speaker := false, vocalics := false, speakerImprover := false
-		, recognizer := false, listener := false, listenerImprover := false, muted := false, voiceServer := false) {
+		, recognizer := false, listener := false, listenerImprover := false, conversationImprover := false, muted := false, voiceServer := false) {
 		super.__New(configuration, "Race Spotter", remoteHandler, name, language, synthesizer, speaker, vocalics, speakerImprover
-												 , recognizer, listener, listenerImprover, muted, voiceServer)
+												 , recognizer, listener, listenerImprover, conversationImprover, muted, voiceServer)
 
 		this.updateConfigurationValues({Announcements: {DeltaInformation: 2, TacticalAdvices: true
 													  , SideProximity: true, RearProximity: true
@@ -1128,6 +1128,10 @@ class RaceSpotter extends GridRaceAssistant {
 			default:
 				super.handleVoiceCommand(grammar, words)
 		}
+	}
+
+	createTelemetryData() {
+		return super.createTelemetryData(["Car"])
 	}
 
 	focusCarRecognized(words) {

@@ -67,7 +67,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 		local wizard := this.SetupWizard
 		local assistantActive := false
 		local function, action, ignore, assistant, assistantConfiguration, section, subConfiguration, arguments, voice, actions
-		local speakerImprover, listenerImprover
+		local speakerImprover, listenerImprover, conversationImprover
 
 		super.saveToConfiguration(configuration)
 
@@ -147,6 +147,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 
 					speakerImprover := wizard.getModuleValue(assistant, "Speaker Improver", wizard.getModuleValue(assistant, "Improver", false))
 					listenerImprover := wizard.getModuleValue(assistant, "Listener Improver", false)
+					conversationImprover := wizard.getModuleValue(assistant, "Conversation Improver", false)
 
 					if speakerImprover {
 						speakerImprover := string2Map("|||", "--->>>", speakerImprover)
@@ -186,6 +187,30 @@ class AssistantsStepWizard extends ActionsStepWizard {
 					}
 					else if speakerImprover
 						setMultiMapValue(configuration, "Speech Improver", assistant . ".Listener", false)
+
+					if conversationImprover {
+						conversationImprover := string2Map("|||", "--->>>", conversationImprover)
+
+						arguments .= ("; raceAssistantConversationImprover: " . assistant)
+
+						if !conversationImprover.Has("Conversation")
+							conversationImprover["Conversation"] := false
+
+						if !conversationImprover.Has("ConversationTemperature")
+							conversationImprover["ConversationTemperature"] := 0.5
+
+						if !conversationImprover.Has("ConversationMaxHistory")
+							conversationImprover["ConversationMaxHistory"] := 3
+
+						setMultiMapValue(configuration, "Speech Improver", assistant . ".Service", speakerImprover["Service"])
+						setMultiMapValue(configuration, "Speech Improver", assistant . ".Model", speakerImprover["Model"])
+
+						setMultiMapValue(configuration, "Speech Improver", assistant . ".Conversation", speakerImprover["Conversation"])
+						setMultiMapValue(configuration, "Speech Improver", assistant . ".ConversationMaxHistory", speakerImprover["ConversationMaxHistory"])
+						setMultiMapValue(configuration, "Speech Improver", assistant . ".ConversationTemperature", speakerImprover["ConversationTemperature"])
+					}
+					else
+						setMultiMapValue(configuration, "Speech Improver", assistant . ".Conversation", false)
 				}
 				else
 					arguments .= "; raceAssistantSpeaker: Off"

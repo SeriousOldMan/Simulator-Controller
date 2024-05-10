@@ -773,7 +773,7 @@ class RaceAssistant extends ConfigurationItem {
 
 	createTelemetryData(filter := []) {
 		local text := ""
-		local key, value, ignore, skip, skipped
+		local key, value, ignore, filter, skip
 
 		for key, value in this.Facts {
 			skip := false

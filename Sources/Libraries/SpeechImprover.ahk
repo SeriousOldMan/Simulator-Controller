@@ -79,6 +79,12 @@ class SpeechImprover extends ConfigurationItem {
 		}
 	}
 
+	Temperature[type := "Speaker"] {
+		Get {
+			return this.Options[(type = "Speaker") ? "SpeakerTemperature" : ((type = "Listener") ? "ListenerTemperature" : "ConversationTemperature")]
+		}
+	}
+
 	Speaker {
 		Get {
 			return this.Options["Speaker"]
@@ -103,9 +109,15 @@ class SpeechImprover extends ConfigurationItem {
 		}
 	}
 
-	Temperature[type := "Speaker"] {
+	Conversation {
 		Get {
-			return this.Options[(type = "Speaker") ? "SpeakerTemperature" : "ListenerTemperature"]
+			return this.Options["Conversation"]
+		}
+	}
+
+	ConversationMaxHistory {
+		Get {
+			return this.Options["ConversationMaxHistory"]
 		}
 	}
 
@@ -182,6 +194,10 @@ class SpeechImprover extends ConfigurationItem {
 		options["Listener"] := getMultiMapValue(configuration, "Speech Improver", descriptor . ".Listener", false)
 		options["ListenerMode"] := getMultiMapValue(configuration, "Speech Improver", descriptor . ".ListenerMode", "Unknown")
 		options["ListenerTemperature"] := getMultiMapValue(configuration, "Speech Improver", descriptor . ".ListenerTemperature", 0.2)
+
+		options["Conversation"] := getMultiMapValue(configuration, "Speech Improver", descriptor . ".Conversation", false)
+		options["ConversationMaxHistory"] := getMultiMapValue(configuration, "Speech Improver", descriptor . ".ConversationMaxHistory", 3)
+		options["ConversationTemperature"] := getMultiMapValue(configuration, "Speech Improver", descriptor . ".ConversationTemperature", 0.2)
 	}
 
 	getInstructions() {
@@ -215,7 +231,10 @@ class SpeechImprover extends ConfigurationItem {
 					throw "Unsupported service detected in SpeechImprover.startImprover..."
 				}
 
-			this.Connector.MaxHistory := 0
+			if this.Conversation
+				this.Connector.MaxHistory := this.ConversationMaxHistory
+			else
+				this.Connector.MaxHistory := 0
 		}
 		else
 			throw "Unsupported service detected in SpeechImprover.startImprover..."
@@ -400,6 +419,79 @@ class SpeechImprover extends ConfigurationItem {
 			}
 			else
 				return text
+		}
+		else
+			return text
+	}
+
+	talk(question, options := false) {
+		local variables := false
+		local doTalk, code, language, fileName, languageInstructions, instruction, variables
+
+		static instructions := false
+
+		if !instructions {
+			instructions := CaseInsenseMap()
+
+			for code, language in availableLanguages() {
+				languageInstructions := readMultiMap(kTranslationsDirectory . "Speech Improver.instructions." . code)
+
+				addMultiMapValues(languageInstructions, readMultiMap(kUserTranslationsDirectory . "Speech Conversation.instructions." . code))
+
+				instructions[code] := languageInstructions
+			}
+		}
+
+		if (this.Model && this.Conversation) {
+			code := this.Code
+			language := this.Language
+			doTalk := true
+
+			if options {
+				if !isInstance(options, Map)
+					options := toMap(options)
+
+				doTalk := (!options.Has("Talk") || options["Talk"])
+
+				if options.Has("Variables")
+					variables := options["Variables"]
+			}
+
+			if doTalk {
+				try {
+					if !this.Connector
+						this.startImprover()
+
+					this.Connector.Temperature := this.Temperature["Speaker"]
+
+					if options.Has("Language")
+						code := options["Language"]
+
+					instruction := "Talk"
+
+					if variables {
+						variables.question := question
+						variables.language := (language ? language : "")
+					}
+					else
+						variables := {question: question, language: language ? language : ""}
+
+					instruction := substituteVariables(getMultiMapValue(instructions[instructions.Has(code) ? code : "EN"]
+																	  , "Conversation.Instructions", instruction)
+													 , variables)
+
+					answer := this.Connector.Ask(instruction)
+
+					return (answer ? answer : false)
+				}
+				catch Any as exception {
+					logError(exception)
+
+					return false
+				}
+			}
+			else
+				return false
 		}
 		else
 			return text

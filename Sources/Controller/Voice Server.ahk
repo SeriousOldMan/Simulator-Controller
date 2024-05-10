@@ -239,6 +239,9 @@ class VoiceServer extends ConfigurationItem {
 					}
 				}
 
+				if this.Grammars.Has("?")
+					this.VoiceClient.VoiceServer.unknownRecognized(this.VoiceClient, text)
+
 				return super.unknownRecognized(&text)
 			}
 		}
@@ -1457,6 +1460,16 @@ class VoiceServer extends ConfigurationItem {
 
 		if this.Debug[kDebugRecognitions]
 			showMessage("Text recognized: " . text, false, "Information.png", 5000)
+
+		messageSend(kFileMessage, "Voice", descriptor[2] . ":" . values2String(";", "Text", descriptor[1], StrReplace(text, ";", ","))
+								, voiceClient.PID)
+	}
+
+	unknownRecognized(voiceClient, text) {
+		local descriptor := voiceClient.VoiceCommands["Text"]
+
+		if this.Debug[kDebugRecognitions]
+			showMessage("Text not recognized: " . text, false, "Information.png", 5000)
 
 		messageSend(kFileMessage, "Voice", descriptor[2] . ":" . values2String(";", "Text", descriptor[1], StrReplace(text, ";", ","))
 								, voiceClient.PID)

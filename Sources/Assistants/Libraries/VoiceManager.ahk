@@ -454,6 +454,9 @@ class VoiceManager extends ConfigurationItem {
 				}
 			}
 
+			if this.Grammars.Has("?")
+				this.VoiceManager.unknownRecognized(text)
+
 			return super.unknownRecognized(&text)
 		}
 	}
@@ -1249,6 +1252,10 @@ class VoiceManager extends ConfigurationItem {
 				messageSend(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, "?", "[Unknown]", "remoteCommandRecognized")
 										, this.VoiceServer)
 		}
+	}
+
+	unknownRecognized(text) {
+		this.raiseTextRecognized("Text", text)
 	}
 
 	raisePhraseRecognized(grammar, words) {

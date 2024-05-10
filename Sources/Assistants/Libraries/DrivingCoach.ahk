@@ -229,10 +229,10 @@ class DrivingCoach extends GridRaceAssistant {
 		local settingsDB := this.SettingsDatabase
 		local simulator, car, track, position, hasSectorTimes, laps, lapData, ignore, carData, standingsData
 		local collector, issues, handling, ignore, type, speed, where, issue, index
-		local key, value, text
-		
+		local key, value, text, filter
+
 		static sessions := false
-		
+
 		if !sessions {
 			sessions := ["Other", "Practice", "Qualifying", "Race"]
 
@@ -338,8 +338,10 @@ class DrivingCoach extends GridRaceAssistant {
 					text := ""
 
 					for key, value in this.Facts
-						text .= (key . " = " . value . "`n")
-				
+						for ignore, filter in ["Car", "Standings", "Position"]
+							if (InStr(key, filter) != 1)
+								text .= (key . " = " . value . "`n")
+
 					return substituteVariables(this.Instructions["Telemetry"], {telemetry: text})
 				}
 			case "Handling":

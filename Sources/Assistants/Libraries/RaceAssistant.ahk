@@ -751,6 +751,11 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	handleVoiceText(grammar, text) {
+		if (grammar = "Text") {
+			if this.VoiceManager.Grammars.Has("?")
+				this.getSpeaker().speakPhrase("Repeat")
+		}
+
 		throw "Unknown grammar `"" . grammar . "`" detected in RaceAssistant.handleVoiceText...."
 	}
 

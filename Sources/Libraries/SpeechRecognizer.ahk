@@ -233,9 +233,13 @@ class SpeechRecognizer {
 		}
 	}
 
-	Grammars {
+	Grammars[name?] {
 		Get {
-			return this._grammars
+			return (isSet(name) ? this._grammars[name] : this._grammars)
+		}
+
+		Set {
+			return (isSet(name) ? (this._grammars[name] := value) : (this._grammars := value))
 		}
 	}
 
@@ -714,14 +718,14 @@ class SpeechRecognizer {
 
 			theGrammar := {Name: name, Grammar: theGrammar, Callback: callback}
 
-			this._grammars[name] := theGrammar
+			this.Grammars[name] := theGrammar
 
 			return theGrammar
 		}
 		else if this.Instance {
 			Task.startTask(prepareGrammar.Bind(name, theGrammar), 1000, kLowPriority)
 
-			this._grammars[name] := {Name: name, Grammar: theGrammar, Callback: callback}
+			this.Grammars[name] := {Name: name, Grammar: theGrammar, Callback: callback}
 
 			return this.Instance.LoadGrammar(theGrammar, name, this._onGrammarCallback.Bind(this))
 		}
@@ -801,8 +805,8 @@ class SpeechRecognizer {
 	}
 
 	unknownRecognized(&text) {
-		if this._grammars.Has("?")
-			callback := this._grammars["?"].Callback.Call("?", this.splitText(text))
+		if this.Grammars.Has("?")
+			callback := this.Grammars["?"].Callback.Call("?", this.splitText(text))
 
 		return false
 	}
@@ -830,7 +834,7 @@ class SpeechRecognizer {
 				bestRating := 0
 				bestMatch := false
 
-				for ignore, grammar in this._grammars {
+				for ignore, grammar in this.Grammars {
 					rating := this.match(text, grammar.Grammar)
 
 					if (rating > bestRating) {
@@ -845,7 +849,7 @@ class SpeechRecognizer {
 					continue
 			}
 			else {
-				for name, grammar in this._grammars
+				for name, grammar in this.Grammars
 					if grammar.Grammar.match(words) {
 						grammar.Callback.Call(name, words)
 

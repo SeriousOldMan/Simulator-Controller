@@ -332,7 +332,7 @@ class VoiceManager extends ConfigurationItem {
 
 							text := improver.speak(text, Map("Language", this.VoiceManager.Language
 														   , "Rephrase", (!options.Has("Rephrase") || options["Rephrase"])
-														   , "Translate", (improver.Language && !options.Has("Translate") || options["Tranlate"])))
+														   , "Translate", (improver.Language && (!options.Has("Translate") || options["Tranlate"]))))
 						}
 						else
 							text := improver.speak(text, Map("Language", this.VoiceManager.Language))
@@ -456,7 +456,7 @@ class VoiceManager extends ConfigurationItem {
 
 			if this.Grammars.Has("?") {
 				this.VoiceManager.unknownRecognized(text)
-				
+
 				return false
 			}
 			else

@@ -1072,6 +1072,7 @@ else {
 				engineer.addLap(A_Index, &data)
 
 				if (A_Index = 3) {
+					MsgBox "Stop"
 					engineer.planPitstop()
 					engineer.preparePitstop()
 				}

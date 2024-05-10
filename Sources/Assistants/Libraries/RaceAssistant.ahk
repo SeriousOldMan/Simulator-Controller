@@ -808,7 +808,7 @@ class RaceAssistant extends ConfigurationItem {
 																 , telemetry: this.createTelemetryData()}))
 
 				if text {
-					this.getSpeaker().speak(text)
+					this.getSpeaker().speak(text, false, false, {Rephrase: false})
 
 					return
 				}

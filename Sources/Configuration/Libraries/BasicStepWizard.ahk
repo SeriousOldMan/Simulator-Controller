@@ -199,8 +199,8 @@ class BasicStepWizard extends StepWizard {
 			this.editSynthesizer(assistant)
 		}
 
-		editImprover(assistant, *) {
-			this.editImprover(assistant)
+		editBooster(assistant, *) {
+			this.editBooster(assistant)
 		}
 
 		updateP2T(*) {
@@ -322,9 +322,9 @@ class BasicStepWizard extends StepWizard {
 		widget46 := window.Add("Button", "xp+311 yp-1 w23 h23 X:Move vbasicDCSettingsButton Hidden")
 		widget46.OnEvent("Click", editSynthesizer.Bind("Driving Coach"))
 		setButtonIcon(widget46, kIconsDirectory . "General Settings.ico", 1)
-		widget47 := window.Add("Button", "xp+24 yp w23 h23 X:Move vbasicDCImproverButton Hidden")
-		widget47.OnEvent("Click", editImprover.Bind("Driving Coach"))
-		setButtonIcon(widget47, kIconsDirectory . "Improver.ico", 1, "L4 T4 R4 B4")
+		widget47 := window.Add("Button", "xp+24 yp w23 h23 X:Move vbasicDCBoosterButton Hidden")
+		widget47.OnEvent("Click", editBooster.Bind("Driving Coach"))
+		setButtonIcon(widget47, kIconsDirectory . "Booster.ico", 1, "L4 T4 R4 B4")
 
 		widget14 := window.Add("CheckBox", "x" . x . " yp+24 w16 h23 vbasicREEnabledCheck Hidden" . (wizard.isModuleSelected("Race Engineer") ? " Checked" : ""))
 		widget14.OnEvent("Click", updateAssistant.Bind("Race Engineer"))
@@ -336,9 +336,9 @@ class BasicStepWizard extends StepWizard {
 		widget19 := window.Add("Button", "xp+311 yp-1 w23 h23 X:Move vbasicRESettingsButton Hidden")
 		widget19.OnEvent("Click", editSynthesizer.Bind("Race Engineer"))
 		setButtonIcon(widget19, kIconsDirectory . "General Settings.ico", 1)
-		widget48 := window.Add("Button", "xp+24 yp w23 h23 X:Move vbasicREImproverButton Hidden")
-		widget48.OnEvent("Click", editImprover.Bind("Race Engineer"))
-		setButtonIcon(widget48, kIconsDirectory . "Improver.ico", 1, "L4 T4 R4 B4")
+		widget48 := window.Add("Button", "xp+24 yp w23 h23 X:Move vbasicREBoosterButton Hidden")
+		widget48.OnEvent("Click", editBooster.Bind("Race Engineer"))
+		setButtonIcon(widget48, kIconsDirectory . "Booster.ico", 1, "L4 T4 R4 B4")
 
 		widget20 := window.Add("CheckBox", "x" . x . " yp+24 w16 h23 vbasicRSEnabledCheck Hidden" . (wizard.isModuleSelected("Race Strategist") ? " Checked" : ""))
 		widget20.OnEvent("Click", updateAssistant.Bind("Race Strategist"))
@@ -350,9 +350,9 @@ class BasicStepWizard extends StepWizard {
 		widget25 := window.Add("Button", "xp+311 yp-1 w23 h23 X:Move vbasicRSSettingsButton Hidden")
 		widget25.OnEvent("Click", editSynthesizer.Bind("Race Strategist"))
 		setButtonIcon(widget25, kIconsDirectory . "General Settings.ico", 1)
-		widget49 := window.Add("Button", "xp+24 yp w23 h23 X:Move vbasicRSImproverButton Hidden")
-		widget49.OnEvent("Click", editImprover.Bind("Race Strategist"))
-		setButtonIcon(widget49, kIconsDirectory . "Improver.ico", 1, "L4 T4 R4 B4")
+		widget49 := window.Add("Button", "xp+24 yp w23 h23 X:Move vbasicRSBoosterButton Hidden")
+		widget49.OnEvent("Click", editBooster.Bind("Race Strategist"))
+		setButtonIcon(widget49, kIconsDirectory . "Booster.ico", 1, "L4 T4 R4 B4")
 
 		widget26 := window.Add("CheckBox", "x" . x . " yp+24 w16 h23 vbasicRSPEnabledCheck Hidden" . (wizard.isModuleSelected("Race Spotter") ? " Checked" : ""))
 		widget26.OnEvent("Click", updateAssistant.Bind("Race Spotter"))
@@ -364,9 +364,9 @@ class BasicStepWizard extends StepWizard {
 		widget31 := window.Add("Button", "xp+311 yp-1 w23 h23 X:Move vbasicRSPSettingsButton Hidden")
 		widget31.OnEvent("Click", editSynthesizer.Bind("Race Spotter"))
 		setButtonIcon(widget31, kIconsDirectory . "General Settings.ico", 1)
-		widget50 := window.Add("Button", "xp+24 yp w23 h23 X:Move vbasicRSPImproverButton Hidden")
-		widget50.OnEvent("Click", editImprover.Bind("Race Spotter"))
-		setButtonIcon(widget50, kIconsDirectory . "Improver.ico", 1, "L4 T4 R4 B4")
+		widget50 := window.Add("Button", "xp+24 yp w23 h23 X:Move vbasicRSPBoosterButton Hidden")
+		widget50.OnEvent("Click", editBooster.Bind("Race Spotter"))
+		setButtonIcon(widget50, kIconsDirectory . "Booster.ico", 1, "L4 T4 R4 B4")
 
 		widget36 := window.Add("HTMLViewer", "x" . x . " yp+30 w" . width . " h95 W:Grow H:Grow(0.8) Hidden")
 
@@ -455,7 +455,7 @@ class BasicStepWizard extends StepWizard {
 		super.showPage(page)
 
 		if (page = 2) {
-			this.Control["basicDCImproverButton"].Enabled := false
+			this.Control["basicDCBoosterButton"].Enabled := false
 
 			if (this.Control["basicPushToTalkModeDropDown"].Value = 3) {
 				this.Control["basicPushToTalkEdit"].Enabled := false
@@ -601,56 +601,56 @@ class BasicStepWizard extends StepWizard {
 			return false
 	}
 
-	assistantSpeakerImprover(assistant, editor := true) {
-		local speakerImprover
+	assistantSpeakerBooster(assistant, editor := true) {
+		local speakerBooster
 
 		if this.SetupWizard.isModuleSelected("Voice Control") {
-			speakerImprover := this.SetupWizard.getModuleValue(assistant, "Speaker Improver", this.SetupWizard.getModuleValue(assistant, "Improver", this.assistantDefaults(assistant).SpeakerImprover))
+			speakerBooster := this.SetupWizard.getModuleValue(assistant, "Speaker Booster", this.SetupWizard.getModuleValue(assistant, "Booster", this.assistantDefaults(assistant).SpeakerBooster))
 
-			if speakerImprover {
-				speakerImprover := (isInstance(speakerImprover, Map) ? speakerImprover : string2Map("|||", "--->>>", speakerImprover))
+			if speakerBooster {
+				speakerBooster := (isInstance(speakerBooster, Map) ? speakerBooster : string2Map("|||", "--->>>", speakerBooster))
 
-				if !speakerImprover.Has("Speaker")
-					speakerImprover["Speaker"] := true
+				if !speakerBooster.Has("Speaker")
+					speakerBooster["Speaker"] := true
 
-				if !speakerImprover.Has("SpeakerProbability")
-					speakerImprover["SpeakerProbability"] := (speakerImprover.Has("Probability") ? speakerImprover["Probability"] : 0.5)
+				if !speakerBooster.Has("SpeakerProbability")
+					speakerBooster["SpeakerProbability"] := (speakerBooster.Has("Probability") ? speakerBooster["Probability"] : 0.5)
 
-				if !speakerImprover.Has("SpeakerTemperature")
-					speakerImprover["SpeakerTemperature"] := (speakerImprover.Has("Temperature") ? speakerImprover["Temperature"] : 0.5)
+				if !speakerBooster.Has("SpeakerTemperature")
+					speakerBooster["SpeakerTemperature"] := (speakerBooster.Has("Temperature") ? speakerBooster["Temperature"] : 0.5)
 			}
 
-			return (speakerImprover ? speakerImprover : false)
+			return (speakerBooster ? speakerBooster : false)
 		}
 		else
 			return false
 	}
 
-	assistantListenerImprover(assistant, editor := true) {
-		local listenerImprover
+	assistantListenerBooster(assistant, editor := true) {
+		local listenerBooster
 
 		if this.SetupWizard.isModuleSelected("Voice Control") {
-			listenerImprover := this.SetupWizard.getModuleValue(assistant, "Listener Improver", this.assistantDefaults(assistant).ListenerImprover)
+			listenerBooster := this.SetupWizard.getModuleValue(assistant, "Listener Booster", this.assistantDefaults(assistant).ListenerBooster)
 
-			if listenerImprover
-				listenerImprover := (isInstance(listenerImprover, Map) ? listenerImprover : string2Map("|||", "--->>>", listenerImprover))
+			if listenerBooster
+				listenerBooster := (isInstance(listenerBooster, Map) ? listenerBooster : string2Map("|||", "--->>>", listenerBooster))
 
-			return (listenerImprover ? listenerImprover : false)
+			return (listenerBooster ? listenerBooster : false)
 		}
 		else
 			return false
 	}
 
-	assistantConversationImprover(assistant, editor := true) {
-		local conversationImprover
+	assistantConversationBooster(assistant, editor := true) {
+		local conversationBooster
 
 		if this.SetupWizard.isModuleSelected("Voice Control") {
-			conversationImprover := this.SetupWizard.getModuleValue(assistant, "Conversation Improver", this.assistantDefaults(assistant).ConversationImprover)
+			conversationBooster := this.SetupWizard.getModuleValue(assistant, "Conversation Booster", this.assistantDefaults(assistant).ConversationBooster)
 
-			if conversationImprover
-				conversationImprover := (isInstance(conversationImprover, Map) ? conversationImprover : string2Map("|||", "--->>>", conversationImprover))
+			if conversationBooster
+				conversationBooster := (isInstance(conversationBooster, Map) ? conversationBooster : string2Map("|||", "--->>>", conversationBooster))
 
-			return (conversationImprover ? conversationImprover : false)
+			return (conversationBooster ? conversationBooster : false)
 		}
 		else
 			return false
@@ -661,9 +661,9 @@ class BasicStepWizard extends StepWizard {
 			  , Language: this.assistantLanguage(assistant, editor), Synthesizer: this.assistantSynthesizer(assistant, editor)
 			  , Voice: this.assistantVoice(assistant, editor)
 			  , Volume: this.assistantVolume(assistant), Pitch: this.assistantPitch(assistant), Speed: this.assistantSpeed(assistant)
-			  , SpeakerImprover: this.assistantSpeakerImprover(assistant)
-			  , ListenerImprover: this.assistantListenerImprover(assistant)
-			  , ConversationImprover: this.assistantConversationImprover(assistant)}
+			  , SpeakerBooster: this.assistantSpeakerBooster(assistant)
+			  , ListenerBooster: this.assistantListenerBooster(assistant)
+			  , ConversationBooster: this.assistantConversationBooster(assistant)}
 	}
 
 	assistantDefaults(assistant) {
@@ -672,7 +672,7 @@ class BasicStepWizard extends StepWizard {
 		local ignore, key
 
 		for ignore, key in ["Name", "Synthesizer", "Voice", "Volume", "Pitch", "Speed"
-						  , "SpeakerImprover", "ListenerImprover", "ConversationImprover"]
+						  , "SpeakerBooster", "ListenerBooster", "ConversationBooster"]
 			defaults.%key% := getMultiMapValue(wizard.Definition, "Setup.Basic", "Basic.Defaults." . assistant . "." . key, false)
 
 		return defaults
@@ -874,23 +874,23 @@ class BasicStepWizard extends StepWizard {
 			for ignore, value in ["Name", "Language", "Synthesizer", "Voice", "Volume", "Pitch", "Speed"]
 				wizard.setModuleValue(assistant, value, assistantSetups.%key%.%value%, false)
 
-			if assistantSetups.%key%.HasProp("SpeakerImprover")
-				wizard.setModuleValue(assistant, "Speaker Improver"
-									, assistantSetups.%key%.SpeakerImprover ? map2String("|||", "--->>>", assistantSetups.%key%.SpeakerImprover) : false, false)
+			if assistantSetups.%key%.HasProp("SpeakerBooster")
+				wizard.setModuleValue(assistant, "Speaker Booster"
+									, assistantSetups.%key%.SpeakerBooster ? map2String("|||", "--->>>", assistantSetups.%key%.SpeakerBooster) : false, false)
 			else
-				wizard.setModuleValue(assistant, "Speaker Improver", false, false)
+				wizard.setModuleValue(assistant, "Speaker Booster", false, false)
 
-			if assistantSetups.%key%.HasProp("ListenerImprover")
-				wizard.setModuleValue(assistant, "Listener Improver"
-									, assistantSetups.%key%.ListenerImprover ? map2String("|||", "--->>>", assistantSetups.%key%.ListenerImprover) : false, false)
+			if assistantSetups.%key%.HasProp("ListenerBooster")
+				wizard.setModuleValue(assistant, "Listener Booster"
+									, assistantSetups.%key%.ListenerBooster ? map2String("|||", "--->>>", assistantSetups.%key%.ListenerBooster) : false, false)
 			else
-				wizard.setModuleValue(assistant, "Listener Improver", false, false)
+				wizard.setModuleValue(assistant, "Listener Booster", false, false)
 
-			if assistantSetups.%key%.HasProp("ConversationImprover")
-				wizard.setModuleValue(assistant, "Conversation Improver"
-									, assistantSetups.%key%.ConversationImprover ? map2String("|||", "--->>>", assistantSetups.%key%.ConversationImprover) : false, false)
+			if assistantSetups.%key%.HasProp("ConversationBooster")
+				wizard.setModuleValue(assistant, "Conversation Booster"
+									, assistantSetups.%key%.ConversationBooster ? map2String("|||", "--->>>", assistantSetups.%key%.ConversationBooster) : false, false)
 			else
-				wizard.setModuleValue(assistant, "Conversation Improver", false, false)
+				wizard.setModuleValue(assistant, "Conversation Booster", false, false)
 		}
 
 		setMultiMapValue(voiceConfiguration, "Voice Control", "Language", getLanguage())
@@ -983,74 +983,74 @@ class BasicStepWizard extends StepWizard {
 		}
 	}
 
-	editImprover(assistant) {
+	editBooster(assistant) {
 		local wizard := this.SetupWizard
 		local window := this.Window
-		local configuration, setup, speakerImprover, listenerImprover, conversationImprover
+		local configuration, setup, speakerBooster, listenerBooster, conversationBooster
 
 		window.Block()
 
 		try {
 			this.saveSetup()
 
-			configuration := readMultiMap(kUserHomeDirectory . "Setup\Speech Improver Configuration.ini")
+			configuration := readMultiMap(kUserHomeDirectory . "Setup\Assistant Booster Configuration.ini")
 
-			setMultiMapValues(configuration, "Speech Improver", getMultiMapValues(kSimulatorConfiguration, "Speech Improver"), false)
+			setMultiMapValues(configuration, "Assistant Booster", getMultiMapValues(kSimulatorConfiguration, "Assistant Booster"), false)
 
 			setup := this.assistantSetup(assistant)
 
-			if (setup.HasProp("SpeakerImprover") && setup.SpeakerImprover) {
-				setMultiMapValue(configuration, "Speech Improver", assistant . ".Service", setup.SpeakerImprover["Service"])
-				setMultiMapValue(configuration, "Speech Improver", assistant . ".Model", setup.SpeakerImprover["Model"])
-				setMultiMapValue(configuration, "Speech Improver", assistant . ".Speaker", setup.SpeakerImprover["Speaker"])
-				setMultiMapValue(configuration, "Speech Improver", assistant . ".SpeakerProbability", setup.SpeakerImprover["SpeakerProbability"])
-				setMultiMapValue(configuration, "Speech Improver", assistant . ".SpeakerTemperature", setup.SpeakerImprover["SpeakerTemperature"])
+			if (setup.HasProp("SpeakerBooster") && setup.SpeakerBooster) {
+				setMultiMapValue(configuration, "Assistant Booster", assistant . ".Service", setup.SpeakerBooster["Service"])
+				setMultiMapValue(configuration, "Assistant Booster", assistant . ".Model", setup.SpeakerBooster["Model"])
+				setMultiMapValue(configuration, "Assistant Booster", assistant . ".Speaker", setup.SpeakerBooster["Speaker"])
+				setMultiMapValue(configuration, "Assistant Booster", assistant . ".SpeakerProbability", setup.SpeakerBooster["SpeakerProbability"])
+				setMultiMapValue(configuration, "Assistant Booster", assistant . ".SpeakerTemperature", setup.SpeakerBooster["SpeakerTemperature"])
 			}
 
-			if (setup.HasProp("ListenerImprover") && setup.ListenerImprover) {
-				setMultiMapValue(configuration, "Speech Improver", assistant . ".Service", setup.ListenerImprover["Service"])
-				setMultiMapValue(configuration, "Speech Improver", assistant . ".Model", setup.ListenerImprover["Model"])
-				setMultiMapValue(configuration, "Speech Improver", assistant . ".Listener", setup.ListenerImprover["Listener"])
-				setMultiMapValue(configuration, "Speech Improver", assistant . ".ListenerMode", setup.ListenerImprover["ListenerMode"])
-				setMultiMapValue(configuration, "Speech Improver", assistant . ".ListenerTemperature", setup.ListenerImprover["ListenerTemperature"])
+			if (setup.HasProp("ListenerBooster") && setup.ListenerBooster) {
+				setMultiMapValue(configuration, "Assistant Booster", assistant . ".Service", setup.ListenerBooster["Service"])
+				setMultiMapValue(configuration, "Assistant Booster", assistant . ".Model", setup.ListenerBooster["Model"])
+				setMultiMapValue(configuration, "Assistant Booster", assistant . ".Listener", setup.ListenerBooster["Listener"])
+				setMultiMapValue(configuration, "Assistant Booster", assistant . ".ListenerMode", setup.ListenerBooster["ListenerMode"])
+				setMultiMapValue(configuration, "Assistant Booster", assistant . ".ListenerTemperature", setup.ListenerBooster["ListenerTemperature"])
 			}
 
-			if (setup.HasProp("ConversationImprover") && setup.ConversationImprover) {
-				setMultiMapValue(configuration, "Speech Improver", assistant . ".Service", setup.ConversationImprover["Service"])
-				setMultiMapValue(configuration, "Speech Improver", assistant . ".Model", setup.ConversationImprover["Model"])
-				setMultiMapValue(configuration, "Speech Improver", assistant . ".Conversation", setup.ConversationImprover["Conversation"])
-				setMultiMapValue(configuration, "Speech Improver", assistant . ".ConversationMaxHistory", setup.ConversationImprover["ConversationMaxHistory"])
-				setMultiMapValue(configuration, "Speech Improver", assistant . ".ConversationTemperature", setup.ConversationImprover["ConversationTemperature"])
+			if (setup.HasProp("ConversationBooster") && setup.ConversationBooster) {
+				setMultiMapValue(configuration, "Assistant Booster", assistant . ".Service", setup.ConversationBooster["Service"])
+				setMultiMapValue(configuration, "Assistant Booster", assistant . ".Model", setup.ConversationBooster["Model"])
+				setMultiMapValue(configuration, "Assistant Booster", assistant . ".Conversation", setup.ConversationBooster["Conversation"])
+				setMultiMapValue(configuration, "Assistant Booster", assistant . ".ConversationMaxHistory", setup.ConversationBooster["ConversationMaxHistory"])
+				setMultiMapValue(configuration, "Assistant Booster", assistant . ".ConversationTemperature", setup.ConversationBooster["ConversationTemperature"])
 			}
 
-			configuration := VoiceImproverEditor(this, assistant, configuration).editImprover(window)
+			configuration := VoiceBoosterEditor(this, assistant, configuration).editBooster(window)
 
 			if configuration {
-				writeMultiMap(kUserHomeDirectory . "Setup\Speech Improver Configuration.ini", configuration)
+				writeMultiMap(kUserHomeDirectory . "Setup\Assistant Booster Configuration.ini", configuration)
 
-				speakerImprover := Map("Service", getMultiMapValue(configuration, "Speech Improver", assistant . ".Service")
-									 , "Model", getMultiMapValue(configuration, "Speech Improver", assistant . ".Model")
-									 , "Speaker", getMultiMapValue(configuration, "Speech Improver", assistant . ".Speaker")
-									 , "SpeakerProbability", getMultiMapValue(configuration, "Speech Improver", assistant . ".SpeakerProbability"), "SpeakerProbability", getMultiMapValue(configuration, "Speech Improver", assistant . ".SpeakerProbability")
-									 , "SpeakerTemperature", getMultiMapValue(configuration, "Speech Improver", assistant . ".SpeakerTemperature"))
+				speakerBooster := Map("Service", getMultiMapValue(configuration, "Assistant Booster", assistant . ".Service")
+									 , "Model", getMultiMapValue(configuration, "Assistant Booster", assistant . ".Model")
+									 , "Speaker", getMultiMapValue(configuration, "Assistant Booster", assistant . ".Speaker")
+									 , "SpeakerProbability", getMultiMapValue(configuration, "Assistant Booster", assistant . ".SpeakerProbability"), "SpeakerProbability", getMultiMapValue(configuration, "Assistant Booster", assistant . ".SpeakerProbability")
+									 , "SpeakerTemperature", getMultiMapValue(configuration, "Assistant Booster", assistant . ".SpeakerTemperature"))
 
-				wizard.setModuleValue(assistant, "Speaker Improver", map2String("|||", "--->>>", speakerImprover))
+				wizard.setModuleValue(assistant, "Speaker Booster", map2String("|||", "--->>>", speakerBooster))
 
-				listenerImprover := Map("Service", getMultiMapValue(configuration, "Speech Improver", assistant . ".Service")
-									  , "Model", getMultiMapValue(configuration, "Speech Improver", assistant . ".Model")
-									  , "Listener", getMultiMapValue(configuration, "Speech Improver", assistant . ".Listener")
-									  , "ListenerMode", getMultiMapValue(configuration, "Speech Improver", assistant . ".ListenerMode")
-									  , "ListenerTemperature", getMultiMapValue(configuration, "Speech Improver", assistant . ".ListenerTemperature"))
+				listenerBooster := Map("Service", getMultiMapValue(configuration, "Assistant Booster", assistant . ".Service")
+									  , "Model", getMultiMapValue(configuration, "Assistant Booster", assistant . ".Model")
+									  , "Listener", getMultiMapValue(configuration, "Assistant Booster", assistant . ".Listener")
+									  , "ListenerMode", getMultiMapValue(configuration, "Assistant Booster", assistant . ".ListenerMode")
+									  , "ListenerTemperature", getMultiMapValue(configuration, "Assistant Booster", assistant . ".ListenerTemperature"))
 
-				wizard.setModuleValue(assistant, "Listener Improver", map2String("|||", "--->>>", listenerImprover))
+				wizard.setModuleValue(assistant, "Listener Booster", map2String("|||", "--->>>", listenerBooster))
 
-				conversationImprover := Map("Service", getMultiMapValue(configuration, "Speech Improver", assistant . ".Service")
-										  , "Model", getMultiMapValue(configuration, "Speech Improver", assistant . ".Model")
-										  , "Conversation", getMultiMapValue(configuration, "Speech Improver", assistant . ".Conversation")
-										  , "ConversationMaxHistory", getMultiMapValue(configuration, "Speech Improver", assistant . ".ConversationMaxHistory")
-										  , "ConversationTemperature", getMultiMapValue(configuration, "Speech Improver", assistant . ".ConversationTemperature"))
+				conversationBooster := Map("Service", getMultiMapValue(configuration, "Assistant Booster", assistant . ".Service")
+										  , "Model", getMultiMapValue(configuration, "Assistant Booster", assistant . ".Model")
+										  , "Conversation", getMultiMapValue(configuration, "Assistant Booster", assistant . ".Conversation")
+										  , "ConversationMaxHistory", getMultiMapValue(configuration, "Assistant Booster", assistant . ".ConversationMaxHistory")
+										  , "ConversationTemperature", getMultiMapValue(configuration, "Assistant Booster", assistant . ".ConversationTemperature"))
 
-				wizard.setModuleValue(assistant, "Conversation Improver", map2String("|||", "--->>>", conversationImprover))
+				wizard.setModuleValue(assistant, "Conversation Booster", map2String("|||", "--->>>", conversationBooster))
 
 				this.loadAssistant(assistant)
 			}
@@ -1822,10 +1822,10 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; VoiceImproverEditor                                                     ;;;
+;;; VoiceBoosterEditor                                                     ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class VoiceImproverEditor extends ConfiguratorPanel {
+class VoiceBoosterEditor extends ConfiguratorPanel {
 	iResult := false
 
 	iStepWizard := false
@@ -1926,17 +1926,17 @@ class VoiceImproverEditor extends ConfiguratorPanel {
 			this.updateState()
 		}
 
-		editorGui := Window({Descriptor: "Improver Editor", Options: "0x400000"}, "")
+		editorGui := Window({Descriptor: "Booster Editor", Options: "0x400000"}, "")
 
 		this.iWindow := editorGui
 
 		editorGui.SetFont("Bold", "Arial")
 
-		editorGui.Add("Text", "w468 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(editorGui, "Improver Editor"))
+		editorGui.Add("Text", "w468 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(editorGui, "Booster Editor"))
 
 		editorGui.SetFont("Norm", "Arial")
 
-		editorGui.Add("Documentation", "x178 YP+20 w128 H:Center Center", translate("Speech Improver")
+		editorGui.Add("Documentation", "x178 YP+20 w128 H:Center Center", translate("Assistant Booster")
 					, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control")
 
 		editorGui.SetFont("Norm", "Arial")
@@ -2067,7 +2067,7 @@ class VoiceImproverEditor extends ConfiguratorPanel {
 
 		super.loadFromConfiguration(configuration)
 
-		service := getMultiMapValue(configuration, "Speech Improver", this.Assistant . ".Service", false)
+		service := getMultiMapValue(configuration, "Assistant Booster", this.Assistant . ".Service", false)
 
 		this.iCurrentProvider := (service ? string2Values("|", service)[1] : false)
 
@@ -2075,20 +2075,20 @@ class VoiceImproverEditor extends ConfiguratorPanel {
 			providerConfiguration := CaseInsenseMap()
 
 			if (provider = this.iCurrentProvider) {
-				providerConfiguration["Model"] := getMultiMapValue(configuration, "Speech Improver", this.Assistant . ".Model", defaults["Model"])
-				providerConfiguration["MaxTokens"] := getMultiMapValue(configuration, "Speech Improver", this.Assistant . ".MaxTokens", defaults["MaxTokens"])
+				providerConfiguration["Model"] := getMultiMapValue(configuration, "Assistant Booster", this.Assistant . ".Model", defaults["Model"])
+				providerConfiguration["MaxTokens"] := getMultiMapValue(configuration, "Assistant Booster", this.Assistant . ".MaxTokens", defaults["MaxTokens"])
 
-				providerConfiguration["Speaker"] := getMultiMapValue(configuration, "Speech Improver", this.Assistant . ".Speaker", defaults["Speaker"])
-				providerConfiguration["SpeakerProbability"] := getMultiMapValue(configuration, "Speech Improver", this.Assistant . ".SpeakerProbability", defaults["SpeakerProbability"])
-				providerConfiguration["SpeakerTemperature"] := getMultiMapValue(configuration, "Speech Improver", this.Assistant . ".SpeakerTemperature", defaults["SpeakerTemperature"])
+				providerConfiguration["Speaker"] := getMultiMapValue(configuration, "Assistant Booster", this.Assistant . ".Speaker", defaults["Speaker"])
+				providerConfiguration["SpeakerProbability"] := getMultiMapValue(configuration, "Assistant Booster", this.Assistant . ".SpeakerProbability", defaults["SpeakerProbability"])
+				providerConfiguration["SpeakerTemperature"] := getMultiMapValue(configuration, "Assistant Booster", this.Assistant . ".SpeakerTemperature", defaults["SpeakerTemperature"])
 
-				providerConfiguration["Listener"] := getMultiMapValue(configuration, "Speech Improver", this.Assistant . ".Listener", defaults["Listener"])
-				providerConfiguration["ListenerMode"] := ["Always", "Unknown"][2 - (getMultiMapValue(configuration, "Speech Improver", this.Assistant . ".ListenerMode", defaults["ListenerMode"]) = "Always")]
-				providerConfiguration["ListenerTemperature"] := getMultiMapValue(configuration, "Speech Improver", this.Assistant . ".ListenerTemperature", defaults["ListenerTemperature"])
+				providerConfiguration["Listener"] := getMultiMapValue(configuration, "Assistant Booster", this.Assistant . ".Listener", defaults["Listener"])
+				providerConfiguration["ListenerMode"] := ["Always", "Unknown"][2 - (getMultiMapValue(configuration, "Assistant Booster", this.Assistant . ".ListenerMode", defaults["ListenerMode"]) = "Always")]
+				providerConfiguration["ListenerTemperature"] := getMultiMapValue(configuration, "Assistant Booster", this.Assistant . ".ListenerTemperature", defaults["ListenerTemperature"])
 
-				providerConfiguration["Conversation"] := getMultiMapValue(configuration, "Speech Improver", this.Assistant . ".Conversation", defaults["Conversation"])
-				providerConfiguration["ConversationMaxHistory"] := getMultiMapValue(configuration, "Speech Improver", this.Assistant . ".ConversationMaxHistory", defaults["ConversationMaxHistory"])
-				providerConfiguration["ConversationTemperature"] := getMultiMapValue(configuration, "Speech Improver", this.Assistant . ".ConversationTemperature", defaults["ConversationTemperature"])
+				providerConfiguration["Conversation"] := getMultiMapValue(configuration, "Assistant Booster", this.Assistant . ".Conversation", defaults["Conversation"])
+				providerConfiguration["ConversationMaxHistory"] := getMultiMapValue(configuration, "Assistant Booster", this.Assistant . ".ConversationMaxHistory", defaults["ConversationMaxHistory"])
+				providerConfiguration["ConversationTemperature"] := getMultiMapValue(configuration, "Assistant Booster", this.Assistant . ".ConversationTemperature", defaults["ConversationTemperature"])
 
 				if (provider = "LLM Runtime") {
 					providerConfiguration["ServiceURL"] := ""
@@ -2101,7 +2101,7 @@ class VoiceImproverEditor extends ConfiguratorPanel {
 			}
 			else {
 				for ignore, setting in ["ServiceURL", "ServiceKey", "Model", "MaxTokens"]
-					providerConfiguration[setting] := getMultiMapValue(configuration, "Speech Improver", provider . "." . setting, defaults[setting])
+					providerConfiguration[setting] := getMultiMapValue(configuration, "Assistant Booster", provider . "." . setting, defaults[setting])
 
 				if !providerConfiguration["ServiceURL"]
 					switch provider, false {
@@ -2123,7 +2123,7 @@ class VoiceImproverEditor extends ConfiguratorPanel {
 				for ignore, setting in ["Speaker", "SpeakerProbability", "SpeakerTemperature"
 									  , "Listener", "ListenerMode", "ListenerTemperature"
 									  , "Conversation", "ConversationMaxHistory", "ConversationTemperature"]
-					providerConfiguration[setting] := getMultiMapValue(configuration, "Speech Improver", provider . "." . setting, defaults[setting])
+					providerConfiguration[setting] := getMultiMapValue(configuration, "Assistant Booster", provider . "." . setting, defaults[setting])
 			}
 
 			this.iProviderConfigurations[provider] := providerConfiguration
@@ -2141,15 +2141,15 @@ class VoiceImproverEditor extends ConfiguratorPanel {
 			providerConfiguration := this.iProviderConfigurations[provider]
 
 			for ignore, setting in ["ServiceURL", "ServiceKey", "Model", "MaxTokens"]
-				setMultiMapValue(configuration, "Speech Improver", provider . "." . setting, providerConfiguration[setting])
+				setMultiMapValue(configuration, "Assistant Booster", provider . "." . setting, providerConfiguration[setting])
 
 			for ignore, setting in ["Speaker", "SpeakerProbability", "SpeakerTemperature"
 								  , "Listener", "ListenerMode", "ListenerTemperature"
 								  , "Conversation", "ConversationMaxHistory", "ConversationTemperature"] {
-				setMultiMapValue(configuration, "Speech Improver", provider . "." . setting, providerConfiguration[setting])
+				setMultiMapValue(configuration, "Assistant Booster", provider . "." . setting, providerConfiguration[setting])
 
 				if (provider = this.iCurrentProvider)
-					setMultiMapValue(configuration, "Speech Improver", this.Assistant . "." . setting, providerConfiguration[setting])
+					setMultiMapValue(configuration, "Assistant Booster", this.Assistant . "." . setting, providerConfiguration[setting])
 			}
 		}
 
@@ -2159,20 +2159,20 @@ class VoiceImproverEditor extends ConfiguratorPanel {
 			providerConfiguration := this.iProviderConfigurations[provider]
 
 			for ignore, setting in ["Model", "MaxTokens"]
-				setMultiMapValue(configuration, "Speech Improver", this.Assistant . "." . setting, providerConfiguration[setting])
+				setMultiMapValue(configuration, "Assistant Booster", this.Assistant . "." . setting, providerConfiguration[setting])
 
 			if (provider = "LLM Runtime")
-				setMultiMapValue(configuration, "Speech Improver", this.Assistant . ".Service", provider)
+				setMultiMapValue(configuration, "Assistant Booster", this.Assistant . ".Service", provider)
 			else
-				setMultiMapValue(configuration, "Speech Improver", this.Assistant . ".Service"
+				setMultiMapValue(configuration, "Assistant Booster", this.Assistant . ".Service"
 											  , values2String("|", provider, Trim(providerConfiguration["ServiceURL"])
 																		   , Trim(providerConfiguration["ServiceKey"])))
 		}
 		else {
-			setMultiMapValue(configuration, "Speech Improver", this.Assistant . ".Model", false)
-			setMultiMapValue(configuration, "Speech Improver", this.Assistant . ".Service", false)
-			setMultiMapValue(configuration, "Speech Improver", this.Assistant . ".SpeakerProbability", false)
-			setMultiMapValue(configuration, "Speech Improver", this.Assistant . ".SpeakerTemperature", false)
+			setMultiMapValue(configuration, "Assistant Booster", this.Assistant . ".Model", false)
+			setMultiMapValue(configuration, "Assistant Booster", this.Assistant . ".Service", false)
+			setMultiMapValue(configuration, "Assistant Booster", this.Assistant . ".SpeakerProbability", false)
+			setMultiMapValue(configuration, "Assistant Booster", this.Assistant . ".SpeakerTemperature", false)
 		}
 	}
 
@@ -2277,7 +2277,7 @@ class VoiceImproverEditor extends ConfiguratorPanel {
 		this.updateState()
 	}
 
-	editImprover(owner := false) {
+	editBooster(owner := false) {
 		local window, x, y, w, h, configuration
 
 		this.createGui(this.Configuration)
@@ -2287,7 +2287,7 @@ class VoiceImproverEditor extends ConfiguratorPanel {
 		if owner
 			window.Opt("+Owner" . owner.Hwnd)
 
-		if getWindowPosition("Improver Editor", &x, &y)
+		if getWindowPosition("Booster Editor", &x, &y)
 			window.Show("x" . x . " y" . y)
 		else
 			window.Show()
@@ -2334,6 +2334,7 @@ class VoiceImproverEditor extends ConfiguratorPanel {
 
 			this.Control["viSpeakerCheck"].Enabled := false
 			this.Control["viListenerCheck"].Enabled := false
+			this.Control["viConversationCheck"].Enabled := false
 			this.Control["viSpeakerCheck"].Value := 0
 			this.Control["viListenerCheck"].Value := 0
 			this.Control["viConversationCheck"].Value := 0

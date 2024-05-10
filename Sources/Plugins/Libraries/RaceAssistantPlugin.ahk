@@ -52,11 +52,11 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	iRaceAssistantSynthesizer := false
 	iRaceAssistantSpeaker := false
 	iRaceAssistantSpeakerVocalics := false
-	iRaceAssistantSpeakerImprover := false
+	iRaceAssistantSpeakerBooster := false
 	iRaceAssistantRecognizer := false
 	iRaceAssistantListener := false
-	iRaceAssistantListenerImprover := false
-	iRaceAssistantConversationImprover := false
+	iRaceAssistantListenerBooster := false
+	iRaceAssistantConversationBooster := false
 	iRaceAssistantMuted := false
 
 	iRaceAssistant := false
@@ -702,9 +702,9 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		}
 	}
 
-	RaceAssistantSpeakerImprover {
+	RaceAssistantSpeakerBooster {
 		Get {
-			return this.iRaceAssistantSpeakerImprover
+			return this.iRaceAssistantSpeakerBooster
 		}
 	}
 
@@ -720,15 +720,15 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		}
 	}
 
-	RaceAssistantListenerImprover {
+	RaceAssistantListenerBooster {
 		Get {
-			return this.iRaceAssistantListenerImprover
+			return this.iRaceAssistantListenerBooster
 		}
 	}
 
-	RaceAssistantConversationImprover {
+	RaceAssistantConversationBooster {
 		Get {
-			return this.iRaceAssistantConversationImprover
+			return this.iRaceAssistantConversationBooster
 		}
 	}
 
@@ -886,15 +886,15 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 				if assistantSpeaker {
 					this.iRaceAssistantSpeakerVocalics := this.getArgumentValue("raceAssistantSpeakerVocalics", false)
-					this.iRaceAssistantSpeakerImprover := this.getArgumentValue("raceAssistantSpeakerImprover", false)
+					this.iRaceAssistantSpeakerBooster := this.getArgumentValue("raceAssistantSpeakerBooster", false)
 
 					this.iRaceAssistantRecognizer := this.getArgumentValue("raceAssistantRecognizer", false)
 
 					assistantListener := this.getArgumentValue("raceAssistantListener", false)
 
 					if ((assistantListener != false) && (assistantListener != kFalse) && (assistantListener != "Off")) {
-						this.iRaceAssistantListenerImprover := this.getArgumentValue("raceAssistantListenerImprover", false)
-						this.iRaceAssistantConversationImprover := this.getArgumentValue("raceAssistantConversationImprover", false)
+						this.iRaceAssistantListenerBooster := this.getArgumentValue("raceAssistantListenerBooster", false)
+						this.iRaceAssistantConversationBooster := this.getArgumentValue("raceAssistantConversationBooster", false)
 						
 						this.iRaceAssistantListener := (((assistantListener = kTrue) || (assistantListener = "On")) ? true : assistantListener)
 					}
@@ -1854,8 +1854,8 @@ class RaceAssistantPlugin extends ControllerPlugin {
 					if this.RaceAssistantSpeakerVocalics
 						options .= " -SpeakerVocalics `"" . this.RaceAssistantSpeakerVocalics . "`""
 
-					if this.RaceAssistantSpeakerImprover
-						options .= " -SpeakerImprover `"" . this.RaceAssistantSpeakerImprover . "`""
+					if this.RaceAssistantSpeakerBooster
+						options .= " -SpeakerBooster `"" . this.RaceAssistantSpeakerBooster . "`""
 
 					if this.RaceAssistantRecognizer
 						options .= " -Recognizer `"" . this.RaceAssistantRecognizer . "`""
@@ -1863,11 +1863,11 @@ class RaceAssistantPlugin extends ControllerPlugin {
 					if this.RaceAssistantListener
 						options .= " -Listener `"" . this.RaceAssistantListener . "`""
 
-					if this.RaceAssistantListenerImprover
-						options .= " -ListenerImprover `"" . this.RaceAssistantListenerImprover . "`""
+					if this.RaceAssistantListenerBooster
+						options .= " -ListenerBooster `"" . this.RaceAssistantListenerBooster . "`""
 
-					if this.RaceAssistantConversationImprover
-						options .= " -ConversationImprover `"" . this.RaceAssistantConversationImprover . "`""
+					if this.RaceAssistantConversationBooster
+						options .= " -ConversationBooster `"" . this.RaceAssistantConversationBooster . "`""
 
 					if this.RaceAssistantMuted
 						options .= " -Muted"

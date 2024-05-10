@@ -87,11 +87,11 @@ startupRaceEngineer() {
 	local engineerSynthesizer := true
 	local engineerSpeaker := false
 	local engineerSpeakerVocalics := false
-	local engineerSpeakerImprover := false
+	local engineerSpeakerBooster := false
 	local engineerRecognizer := true
 	local engineerListener := false
-	local engineerListenerImprover := false
-	local engineerConversationImprover := false
+	local engineerListenerBooster := false
+	local engineerConversationBooster := false
 	local engineerMuted := false
 	local debug := false
 	local voiceServer, index, engineer, label
@@ -126,8 +126,8 @@ startupRaceEngineer() {
 			case "-SpeakerVocalics":
 				engineerSpeakerVocalics := A_Args[index + 1]
 				index += 2
-			case "-SpeakerImprover":
-				engineerSpeakerImprover := A_Args[index + 1]
+			case "-SpeakerBooster":
+				engineerSpeakerBooster := A_Args[index + 1]
 				index += 2
 			case "-Recognizer":
 				engineerRecognizer := A_Args[index + 1]
@@ -135,11 +135,11 @@ startupRaceEngineer() {
 			case "-Listener":
 				engineerListener := A_Args[index + 1]
 				index += 2
-			case "-ListenerImprover":
-				engineerListenerImprover := A_Args[index + 1]
+			case "-ListenerBooster":
+				engineerListenerBooster := A_Args[index + 1]
 				index += 2
-			case "-ConversationImprover":
-				engineerConversationImprover := A_Args[index + 1]
+			case "-ConversationBooster":
+				engineerConversationBooster := A_Args[index + 1]
 				index += 2
 			case "-Muted":
 				engineerMuted := true
@@ -171,8 +171,8 @@ startupRaceEngineer() {
 	engineer := RaceEngineer(kSimulatorConfiguration
 						   , remotePID ? RaceEngineer.RaceEngineerRemoteHandler(remotePID) : false
 						   , engineerName, engineerLanguage
-						   , engineerSynthesizer, engineerSpeaker, engineerSpeakerVocalics, engineerSpeakerImprover, engineerConversationImprover
-						   , engineerRecognizer, engineerListener, engineerListenerImprover, engineerMuted, voiceServer)
+						   , engineerSynthesizer, engineerSpeaker, engineerSpeakerVocalics, engineerSpeakerBooster, engineerConversationBooster
+						   , engineerRecognizer, engineerListener, engineerListenerBooster, engineerMuted, voiceServer)
 
 	RaceEngineer.Instance := engineer
 

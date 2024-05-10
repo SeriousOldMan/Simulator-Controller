@@ -1,15 +1,15 @@
 ## 5.7.1.0-release 05/10/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
-  3. Fixed saving of probability setting for rephrasing for the speech improver
-  4. Improved meta data handling for speech improver. All instructions to the LLM are now kept in an instructions file and can be modified or extended by the user.
+  3. Fixed saving of probability setting for rephrasing for the Assistant Booster.
+  4. Improved meta data handling for Assistant Booster. All instructions to the LLM are now kept in an instructions file and can be modified or extended by the user.
   5. Once again some tweaking for accident detection by the Spotter.
   6. Tweaked lap time delta calculation after collecting damage.
   7. Fixed a couple of Strategist command patterns.
   8. Deferred the call to pit by the Engineer, so that it is not issued, before the pitstop settings has been set up.
   9. The Engineeer now informs about pressure changes incrementally if tyre compound is unchanged.
   10. Added new Ford Mustang for *Assetto Corsa Competizione*.
-  11. The AI-based speech improvement for the Assistants now also support semantic understanding of comannds, for which no pattern has been defined in the grammars of the Assistant. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#speech-improvement-using-ai) of the speech improver for more information. The configuration of the speech improvement is available on the "Basic" setup page of "Simulator Setup".
+  11. The AI-based booster for the Assistants now also support semantic understanding of comannds, for which no pattern has been defined in the grammars of the Assistant. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-assistant-conversation-using-ai) of the Assistant Booster for more information. The configuration of the speech improvement is available on the "Basic" setup page of "Simulator Setup".
   12. [Internal] Migrated to AHK 2.0.14.
   13. New car models for "Setup Workbench":
       - Assetto Corsa Competizione
@@ -28,7 +28,7 @@
   4. Rearranged the priority of a couple of information announcements of the Spotter to make them more relevant and timely.
   5. Fine-tuning for some edge cases in the accident detection on tracks with extreme braking zones.
   6. The default models for OpenAI has been updated, since OpenAi introduced new models (always difficult to keep up with them). This relates to the Driving Coach configuration and also to the new speech improvement capabilities (see next topic). You may want to review your choice and update your model reference to the newest version, since they might even be cheaper.
-  7. "Simulator Setup" now supports configuration of LLM-based post-prcessing and rephrasing of voice messages issued by the Assistants. This is the first step in a series of enhancements for the Engineer, the Strategist and the Spotter using GPT technology. All this enhancements will be optional, since they either require a very powerful PC to run an LLM locally or you must buy some computing time from companies like OpenAI. Although very inexpensive, this is also not for everybody. Please take a look at the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#speech-improvement-using-ai).
+  7. "Simulator Setup" now supports configuration of LLM-based post-prcessing and rephrasing of voice messages issued by the Assistants. This is the first step in a series of enhancements for the Engineer, the Strategist and the Spotter using GPT technology. All this enhancements will be optional, since they either require a very powerful PC to run an LLM locally or you must buy some computing time from companies like OpenAI. Although very inexpensive, this is also not for everybody. Please take a look at the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-assistant-conversation-using-ai).
   8. [Developer] Added a first GPT-based speech post-processor in preparation for the new Assistant GPT architecture. This post processor uses an LLM to randomly rephrase each message issued by the Assistants to bring in more variations. It can also be used to translate between different languages as long as the used LLM supports this.
   
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-570), especially if you have configured and are using the Driving Coach.

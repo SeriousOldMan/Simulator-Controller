@@ -531,7 +531,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		super.saveToConfiguration(configuration)
 
-		setMultiMapValues(configuration, "Speech Improver", getMultiMapValues(this.Configuration, "Speech Improver"), false)
+		setMultiMapValues(configuration, "Assistant Booster", getMultiMapValues(this.Configuration, "Assistant Booster"), false)
 
 		setMultiMapValue(configuration, "Voice Control", "Language", this.getCurrentLanguage())
 

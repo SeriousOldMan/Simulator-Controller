@@ -1,8 +1,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Speech Improver                 ;;;
+;;;   Modular Simulator Controller System - Assistant Booster               ;;;
 ;;;                                                                         ;;;
-;;;   Provides several GPT-based Pre- and Postprocessors for speech output  ;;;
-;;;   and voice recognition.                                                ;;;
+;;;   Provides several GPT-based Pre- and Postprocessors for speech output, ;;;
+;;;   voice recognition and conversation.                                   ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2024) Creative Commons - BY-NC-SA                        ;;;
@@ -12,34 +12,25 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Framework\Framework.ahk"
+#Include "..\..\Framework\Framework.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Local Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "LLMConnector.ahk"
-#Include "SpeechRecognizer.ahk"
+#Include "..\..\Libraries\LLMConnector.ahk"
+#Include "..\..\Libraries\SpeechRecognizer.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class SpeechImprover extends ConfigurationItem {
+class AsssistantBooster extends ConfigurationItem {
 	iOptions := CaseInsenseMap()
 
 	iConnector := false
-
-	iMode := false
-
-	iCompiler := SpeechRecognizer("Compiler")
-
-	iChoices := CaseInsenseMap()
-	iGrammars := CaseInsenseMap()
-
-	iCommands := false
 
 	Options[key?] {
 		Get {
@@ -87,69 +78,15 @@ class SpeechImprover extends ConfigurationItem {
 		}
 	}
 
-	Temperature[type := "Speaker"] {
+	Temperature {
 		Get {
-			return this.Options[(type = "Speaker") ? "SpeakerTemperature" : ((type = "Listener") ? "ListenerTemperature" : "ConversationTemperature")]
+			return this.Options["Temperature"]
 		}
 	}
 
-	Speaker {
+	Active {
 		Get {
-			return this.Options["Speaker"]
-		}
-	}
-
-	SpeakerProbability {
-		Get {
-			return this.Options["SpeakerProbability"]
-		}
-	}
-
-	Listener {
-		Get {
-			return this.Options["Listener"]
-		}
-	}
-
-	ListenerMode {
-		Get {
-			return this.Options["ListenerMode"]
-		}
-	}
-
-	Conversation {
-		Get {
-			return this.Options["Conversation"]
-		}
-	}
-
-	ConversationMaxHistory {
-		Get {
-			return this.Options["ConversationMaxHistory"]
-		}
-	}
-
-	Compiler {
-		Get {
-			return this.iCompiler
-		}
-	}
-
-	Commands {
-		Get {
-			return this.iCommands
-		}
-	}
-
-	Choices[name?] {
-		Get {
-			return (isSet(name) ? this.iChoices[name] : this.iChoices)
-		}
-	}
-
-	Grammars[name?] {
-		Get {
-			return (isSet(name) ? this.iGrammars[name] : this.iGrammars)
+			return this.Options["Active"]
 		}
 	}
 
@@ -189,24 +126,10 @@ class SpeechImprover extends ConfigurationItem {
 
 		super.loadFromConfiguration(configuration)
 
-		options["Language"] := getMultiMapValue(configuration, "Speech Improver", descriptor . ".Language", this.Language)
-		options["Service"] := getMultiMapValue(configuration, "Speech Improver", descriptor . ".Service", false)
-		options["Model"] := getMultiMapValue(configuration, "Speech Improver", descriptor . ".Model", false)
-		options["MaxTokens"] := getMultiMapValue(configuration, "Speech Improver", descriptor . ".MaxTokens", 1024)
-
-		options["Speaker"] := getMultiMapValue(configuration, "Speech Improver", descriptor . ".Speaker", true)
-		options["SpeakerProbability"] := getMultiMapValue(configuration, "Speech Improver", descriptor . ".SpeakerProbability"
-														, getMultiMapValue(configuration, "Speech Improver", descriptor . ".Probability", 0.5))
-		options["SpeakerTemperature"] := getMultiMapValue(configuration, "Speech Improver", descriptor . ".SpeakerTemperature"
-														, getMultiMapValue(configuration, "Speech Improver", descriptor . ".Temperature", 0.5))
-
-		options["Listener"] := getMultiMapValue(configuration, "Speech Improver", descriptor . ".Listener", false)
-		options["ListenerMode"] := getMultiMapValue(configuration, "Speech Improver", descriptor . ".ListenerMode", "Unknown")
-		options["ListenerTemperature"] := getMultiMapValue(configuration, "Speech Improver", descriptor . ".ListenerTemperature", 0.2)
-
-		options["Conversation"] := getMultiMapValue(configuration, "Speech Improver", descriptor . ".Conversation", false)
-		options["ConversationMaxHistory"] := getMultiMapValue(configuration, "Speech Improver", descriptor . ".ConversationMaxHistory", 3)
-		options["ConversationTemperature"] := getMultiMapValue(configuration, "Speech Improver", descriptor . ".ConversationTemperature", 0.2)
+		options["Language"] := getMultiMapValue(configuration, "Assistant Booster", descriptor . ".Language", this.Language)
+		options["Service"] := getMultiMapValue(configuration, "Assistant Booster", descriptor . ".Service", false)
+		options["Model"] := getMultiMapValue(configuration, "Assistant Booster", descriptor . ".Model", false)
+		options["MaxTokens"] := getMultiMapValue(configuration, "Assistant Booster", descriptor . ".MaxTokens", 1024)
 	}
 
 	getInstructions() {
@@ -216,7 +139,7 @@ class SpeechImprover extends ConfigurationItem {
 	connectorState(*) {
 	}
 
-	startImprover() {
+	startBooster() {
 		local service := this.Options["Service"]
 		local ignore, instruction
 
@@ -224,7 +147,7 @@ class SpeechImprover extends ConfigurationItem {
 			service := string2Values("|", service)
 
 			if !inList(this.Providers, service[1])
-				throw "Unsupported service detected in SpeechImprover.startImprover..."
+				throw "Unsupported service detected in AsssistantBooster.startBooster..."
 
 			if (service[1] = "LLM Runtime")
 				this.iConnector := LLMConnector.LLMRuntimeConnector(this, this.Options["Model"])
@@ -237,38 +160,35 @@ class SpeechImprover extends ConfigurationItem {
 				catch Any as exception {
 					logError(exception)
 
-					throw "Unsupported service detected in SpeechImprover.startImprover..."
+					throw "Unsupported service detected in AsssistantBooster.startBooster..."
 				}
 
 			this.Connector.MaxTokens := this.MaxTokens
-
-			if this.Conversation
-				this.Connector.MaxHistory := this.ConversationMaxHistory
-			else
-				this.Connector.MaxHistory := 0
+			this.Connector.MaxHistory := 0
 		}
 		else
-			throw "Unsupported service detected in SpeechImprover.startImprover..."
+			throw "Unsupported service detected in AsssistantBooster.startBooster..."
+	}
+}
+
+class SpeechBooster extends AsssistantBooster {
+	Probability {
+		Get {
+			return this.Options["Probability"]
+		}
 	}
 
-	setChoices(name, choices) {
-		this.iChoices[name] := choices
+	loadFromConfiguration(configuration) {
+		local descriptor := this.Descriptor
+		local options := this.Options
 
-		this.Compiler.setChoices(name, choices)
-	}
+		super.loadFromConfiguration(configuration)
 
-	setGrammar(name, grammar) {
-		try {
-			this.iGrammars[name] := this.Compiler.compileGrammar(grammar)
-		}
-		catch Any as exception {
-			logError(exception, true)
-
-			logMessage(kLogCritical, translate("Error while registering voice command `"") . grammar . translate("`" - please check the configuration"))
-
-			showMessage(substituteVariables(translate("Cannot register voice command `"%command%`" - please check the configuration..."), {command: grammar})
-					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-		}
+		options["Active"] := getMultiMapValue(configuration, "Assistant Booster", descriptor . ".Speaker", true)
+		options["Probability"] := getMultiMapValue(configuration, "Assistant Booster", descriptor . ".SpeakerProbability"
+														, getMultiMapValue(configuration, "Assistant Booster", descriptor . ".Probability", 0.5))
+		options["Temperature"] := getMultiMapValue(configuration, "Assistant Booster", descriptor . ".SpeakerTemperature"
+												 , getMultiMapValue(configuration, "Assistant Booster", descriptor . ".Temperature", 0.5))
 	}
 
 	speak(text, options := false) {
@@ -280,15 +200,15 @@ class SpeechImprover extends ConfigurationItem {
 			instructions := CaseInsenseMap()
 
 			for code, language in availableLanguages() {
-				languageInstructions := readMultiMap(kTranslationsDirectory . "Speech Improver.instructions." . code)
+				languageInstructions := readMultiMap(kTranslationsDirectory . "Assistant Booster.instructions." . code)
 
-				addMultiMapValues(languageInstructions, readMultiMap(kUserTranslationsDirectory . "Speech Improver.instructions." . code))
+				addMultiMapValues(languageInstructions, readMultiMap(kUserTranslationsDirectory . "Assistant Booster.instructions." . code))
 
 				instructions[code] := languageInstructions
 			}
 		}
 
-		if (this.Model && this.Speaker) {
+		if (this.Model && this.Active) {
 			code := this.Code
 			language := this.Language
 			doRephrase := true
@@ -298,16 +218,16 @@ class SpeechImprover extends ConfigurationItem {
 				if !isInstance(options, Map)
 					options := toMap(options)
 
-				doRephrase := ((Random(1, 10) <= (10 * this.SpeakerProbability)) && (!options.Has("Rephrase") || options["Rephrase"]))
+				doRephrase := ((Random(1, 10) <= (10 * this.Probability)) && (!options.Has("Rephrase") || options["Rephrase"]))
 				doTranslate := (language && (!options.Has("Translate") || options["Translate"]))
 			}
 
 			if (doRephrase || doTranslate) {
 				try {
 					if !this.Connector
-						this.startImprover()
+						this.startBooster()
 
-					this.Connector.Temperature := this.Temperature["Speaker"]
+					this.Connector.Temperature := this.Temperature
 
 					if options.Has("Language")
 						code := options["Language"]
@@ -339,6 +259,76 @@ class SpeechImprover extends ConfigurationItem {
 		else
 			return text
 	}
+}
+
+class RecognitionBooster extends AsssistantBooster {
+	iCompiler := SpeechRecognizer("Compiler")
+
+	iChoices := CaseInsenseMap()
+	iGrammars := CaseInsenseMap()
+
+	iCommands := false
+
+	Mode {
+		Get {
+			return this.Options["Mode"]
+		}
+	}
+
+	Compiler {
+		Get {
+			return this.iCompiler
+		}
+	}
+
+	Commands {
+		Get {
+			return this.iCommands
+		}
+	}
+
+	Choices[name?] {
+		Get {
+			return (isSet(name) ? this.iChoices[name] : this.iChoices)
+		}
+	}
+
+	Grammars[name?] {
+		Get {
+			return (isSet(name) ? this.iGrammars[name] : this.iGrammars)
+		}
+	}
+
+	loadFromConfiguration(configuration) {
+		local descriptor := this.Descriptor
+		local options := this.Options
+
+		super.loadFromConfiguration(configuration)
+
+		options["Active"] := getMultiMapValue(configuration, "Assistant Booster", descriptor . ".Listener", false)
+		options["Mode"] := getMultiMapValue(configuration, "Assistant Booster", descriptor . ".ListenerMode", "Unknown")
+		options["Temperature"] := getMultiMapValue(configuration, "Assistant Booster", descriptor . ".Temperature", 0.2)
+	}
+
+	setChoices(name, choices) {
+		this.iChoices[name] := choices
+
+		this.Compiler.setChoices(name, choices)
+	}
+
+	setGrammar(name, grammar) {
+		try {
+			this.iGrammars[name] := this.Compiler.compileGrammar(grammar)
+		}
+		catch Any as exception {
+			logError(exception, true)
+
+			logMessage(kLogCritical, translate("Error while registering voice command `"") . grammar . translate("`" - please check the configuration"))
+
+			showMessage(substituteVariables(translate("Cannot register voice command `"%command%`" - please check the configuration..."), {command: grammar})
+					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+		}
+	}
 
 	listen(text, options := false) {
 		local commands := this.Commands
@@ -351,9 +341,9 @@ class SpeechImprover extends ConfigurationItem {
 			instructions := CaseInsenseMap()
 
 			for code, language in availableLanguages() {
-				languageInstructions := readMultiMap(kTranslationsDirectory . "Speech Improver.instructions." . code)
+				languageInstructions := readMultiMap(kTranslationsDirectory . "Assistant Booster.instructions." . code)
 
-				addMultiMapValues(languageInstructions, readMultiMap(kUserTranslationsDirectory . "Speech Improver.instructions." . code))
+				addMultiMapValues(languageInstructions, readMultiMap(kUserTranslationsDirectory . "Assistant Booster.instructions." . code))
 
 				instructions[code] := languageInstructions
 			}
@@ -394,7 +384,7 @@ class SpeechImprover extends ConfigurationItem {
 			this.iCommands := commands
 		}
 
-		if (this.Model && this.Listener) {
+		if (this.Model && this.Active) {
 			code := this.Code
 			doRecognize := true
 
@@ -408,9 +398,9 @@ class SpeechImprover extends ConfigurationItem {
 			if doRecognize {
 				try {
 					if !this.Connector
-						this.startImprover()
+						this.startBooster()
 
-					this.Connector.Temperature := this.Temperature["Listener"]
+					this.Connector.Temperature := this.Temperature
 
 					instruction := "Recognize"
 
@@ -434,6 +424,32 @@ class SpeechImprover extends ConfigurationItem {
 		else
 			return text
 	}
+}
+
+class ConversationBooster extends AsssistantBooster {
+	MaxHistory {
+		Get {
+			return this.Options["MaxHistory"]
+		}
+	}
+
+	loadFromConfiguration(configuration) {
+		local descriptor := this.Descriptor
+		local options := this.Options
+
+		super.loadFromConfiguration(configuration)
+
+		options["Active"] := getMultiMapValue(configuration, "Assistant Booster", descriptor . ".Conversation", false)
+		options["MaxHistory"] := getMultiMapValue(configuration, "Assistant Booster", descriptor . ".ConversationMaxHistory", 3)
+		options["Temperature"] := getMultiMapValue(configuration, "Assistant Booster", descriptor . ".ConversationTemperature", 0.2)
+	}
+
+	startBooster() {
+		super.startBooster()
+
+		if (this.Connector && this.Active)
+			this.Connector.MaxHistory := this.MaxHistory
+	}
 
 	talk(question, options := false) {
 		local variables := false
@@ -445,15 +461,15 @@ class SpeechImprover extends ConfigurationItem {
 			instructions := CaseInsenseMap()
 
 			for code, language in availableLanguages() {
-				languageInstructions := readMultiMap(kTranslationsDirectory . "Speech Improver.instructions." . code)
+				languageInstructions := readMultiMap(kTranslationsDirectory . "Assistant Booster.instructions." . code)
 
-				addMultiMapValues(languageInstructions, readMultiMap(kUserTranslationsDirectory . "Speech Conversation.instructions." . code))
+				addMultiMapValues(languageInstructions, readMultiMap(kUserTranslationsDirectory . "Assistant Booster.instructions." . code))
 
 				instructions[code] := languageInstructions
 			}
 		}
 
-		if (this.Model && this.Conversation) {
+		if (this.Model && this.Active) {
 			code := this.Code
 			language := this.Language
 			doTalk := true
@@ -471,9 +487,9 @@ class SpeechImprover extends ConfigurationItem {
 			if doTalk {
 				try {
 					if !this.Connector
-						this.startImprover()
+						this.startBooster()
 
-					this.Connector.Temperature := this.Temperature["Speaker"]
+					this.Connector.Temperature := this.Temperature
 
 					if options.Has("Language")
 						code := options["Language"]

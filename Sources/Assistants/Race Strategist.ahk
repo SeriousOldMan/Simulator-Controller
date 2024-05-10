@@ -87,11 +87,11 @@ startupRaceStrategist() {
 	local strategistSynthesizer := true
 	local strategistSpeaker := false
 	local strategistSpeakerVocalics := false
-	local strategistSpeakerImprover := false
+	local strategistSpeakerBooster := false
 	local strategistRecognizer := true
 	local strategistListener := false
-	local strategistListenerImprover := false
-	local strategistConversationImprover := false
+	local strategistListenerBooster := false
+	local strategistConversationBooster := false
 	local strategistMuted := false
 	local debug := false
 	local voiceServer, index, strategist, label
@@ -126,8 +126,8 @@ startupRaceStrategist() {
 			case "-SpeakerVocalics":
 				strategistSpeakerVocalics := A_Args[index + 1]
 				index += 2
-			case "-SpeakerImprover":
-				strategistSpeakerImprover := A_Args[index + 1]
+			case "-SpeakerBooster":
+				strategistSpeakerBooster := A_Args[index + 1]
 				index += 2
 			case "-Recognizer":
 				strategistRecognizer := A_Args[index + 1]
@@ -135,11 +135,11 @@ startupRaceStrategist() {
 			case "-Listener":
 				strategistListener := A_Args[index + 1]
 				index += 2
-			case "-ListenerImprover":
-				strategistListenerImprover := A_Args[index + 1]
+			case "-ListenerBooster":
+				strategistListenerBooster := A_Args[index + 1]
 				index += 2
-			case "-ConversationImprover":
-				strategistConversationImprover := A_Args[index + 1]
+			case "-ConversationBooster":
+				strategistConversationBooster := A_Args[index + 1]
 				index += 2
 			case "-Muted":
 				strategistMuted := true
@@ -171,8 +171,8 @@ startupRaceStrategist() {
 	strategist := RaceStrategist(kSimulatorConfiguration
 							   , remotePID ? RaceStrategist.RaceStrategistRemoteHandler(remotePID) : false
 							   , strategistName, strategistLanguage
-							   , strategistSynthesizer, strategistSpeaker, strategistSpeakerVocalics, strategistSpeakerImprover
-							   , strategistRecognizer, strategistListener, strategistListenerImprover, strategistConversationImprover
+							   , strategistSynthesizer, strategistSpeaker, strategistSpeakerVocalics, strategistSpeakerBooster
+							   , strategistRecognizer, strategistListener, strategistListenerBooster, strategistConversationBooster
 							   ,strategistMuted, voiceServer)
 
 	RaceStrategist.Instance := strategist

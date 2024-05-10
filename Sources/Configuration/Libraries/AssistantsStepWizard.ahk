@@ -67,13 +67,13 @@ class AssistantsStepWizard extends ActionsStepWizard {
 		local wizard := this.SetupWizard
 		local assistantActive := false
 		local function, action, ignore, assistant, assistantConfiguration, section, subConfiguration, arguments, voice, actions
-		local speakerImprover, listenerImprover, conversationImprover
+		local speakerBooster, listenerBooster, conversationBooster
 
 		super.saveToConfiguration(configuration)
 
-		setMultiMapValues(configuration, "Speech Improver"
-									   , getMultiMapValues(readMultiMap(kUserHomeDirectory . "Setup\Speech Improver Configuration.ini")
-														 , "Speech Improver"), false)
+		setMultiMapValues(configuration, "Assistant Booster"
+									   , getMultiMapValues(readMultiMap(kUserHomeDirectory . "Setup\Assistant Booster Configuration.ini")
+														 , "Assistant Booster"), false)
 
 		for ignore, assistant in this.Definition
 			if wizard.isModuleSelected(assistant) {
@@ -145,72 +145,72 @@ class AssistantsStepWizard extends ActionsStepWizard {
 																							, wizard.getModuleValue(assistant, "Pitch", "*")
 																							, wizard.getModuleValue(assistant, "Speed", "*")))
 
-					speakerImprover := wizard.getModuleValue(assistant, "Speaker Improver", wizard.getModuleValue(assistant, "Improver", false))
-					listenerImprover := wizard.getModuleValue(assistant, "Listener Improver", false)
-					conversationImprover := wizard.getModuleValue(assistant, "Conversation Improver", false)
+					speakerBooster := wizard.getModuleValue(assistant, "Speaker Booster", wizard.getModuleValue(assistant, "Booster", false))
+					listenerBooster := wizard.getModuleValue(assistant, "Listener Booster", false)
+					conversationBooster := wizard.getModuleValue(assistant, "Conversation Booster", false)
 
-					if speakerImprover {
-						speakerImprover := string2Map("|||", "--->>>", speakerImprover)
+					if speakerBooster {
+						speakerBooster := string2Map("|||", "--->>>", speakerBooster)
 
-						arguments .= ("; raceAssistantSpeakerImprover: " . assistant)
+						arguments .= ("; raceAssistantSpeakerBooster: " . assistant)
 
-						if !speakerImprover.Has("Speaker")
-							speakerImprover["Speaker"] := true
+						if !speakerBooster.Has("Speaker")
+							speakerBooster["Speaker"] := true
 
-						if !speakerImprover.Has("SpeakerProbability")
-							speakerImprover["SpeakerProbability"] := (speakerImprover.Has("Probability") ? speakerImprover["Probability"] : 0.5)
+						if !speakerBooster.Has("SpeakerProbability")
+							speakerBooster["SpeakerProbability"] := (speakerBooster.Has("Probability") ? speakerBooster["Probability"] : 0.5)
 
-						if !speakerImprover.Has("SpeakerTemperature")
-							speakerImprover["SpeakerTemperature"] := (speakerImprover.Has("Temperature") ? speakerImprover["Temperature"] : 0.5)
+						if !speakerBooster.Has("SpeakerTemperature")
+							speakerBooster["SpeakerTemperature"] := (speakerBooster.Has("Temperature") ? speakerBooster["Temperature"] : 0.5)
 
-						setMultiMapValue(configuration, "Speech Improver", assistant . ".Service", speakerImprover["Service"])
-						setMultiMapValue(configuration, "Speech Improver", assistant . ".Model", speakerImprover["Model"])
+						setMultiMapValue(configuration, "Assistant Booster", assistant . ".Service", speakerBooster["Service"])
+						setMultiMapValue(configuration, "Assistant Booster", assistant . ".Model", speakerBooster["Model"])
 
-						setMultiMapValue(configuration, "Speech Improver", assistant . ".Speaker", speakerImprover["Speaker"])
-						setMultiMapValue(configuration, "Speech Improver", assistant . ".SpeakerProbability", speakerImprover["SpeakerProbability"])
-						setMultiMapValue(configuration, "Speech Improver", assistant . ".SpeakerTemperature", speakerImprover["SpeakerTemperature"])
+						setMultiMapValue(configuration, "Assistant Booster", assistant . ".Speaker", speakerBooster["Speaker"])
+						setMultiMapValue(configuration, "Assistant Booster", assistant . ".SpeakerProbability", speakerBooster["SpeakerProbability"])
+						setMultiMapValue(configuration, "Assistant Booster", assistant . ".SpeakerTemperature", speakerBooster["SpeakerTemperature"])
 					}
-					else if listenerImprover
-						setMultiMapValue(configuration, "Speech Improver", assistant . ".Speaker", false)
+					else if listenerBooster
+						setMultiMapValue(configuration, "Assistant Booster", assistant . ".Speaker", false)
 
-					if listenerImprover {
-						listenerImprover := string2Map("|||", "--->>>", listenerImprover)
+					if listenerBooster {
+						listenerBooster := string2Map("|||", "--->>>", listenerBooster)
 
-						arguments .= ("; raceAssistantListenerImprover: " . assistant)
+						arguments .= ("; raceAssistantListenerBooster: " . assistant)
 
-						setMultiMapValue(configuration, "Speech Improver", assistant . ".Service", listenerImprover["Service"])
-						setMultiMapValue(configuration, "Speech Improver", assistant . ".Model", listenerImprover["Model"])
+						setMultiMapValue(configuration, "Assistant Booster", assistant . ".Service", listenerBooster["Service"])
+						setMultiMapValue(configuration, "Assistant Booster", assistant . ".Model", listenerBooster["Model"])
 
-						setMultiMapValue(configuration, "Speech Improver", assistant . ".Listener", listenerImprover["Listener"])
-						setMultiMapValue(configuration, "Speech Improver", assistant . ".ListenerMode", listenerImprover["ListenerMode"])
-						setMultiMapValue(configuration, "Speech Improver", assistant . ".ListenerTemperature", listenerImprover["ListenerTemperature"])
+						setMultiMapValue(configuration, "Assistant Booster", assistant . ".Listener", listenerBooster["Listener"])
+						setMultiMapValue(configuration, "Assistant Booster", assistant . ".ListenerMode", listenerBooster["ListenerMode"])
+						setMultiMapValue(configuration, "Assistant Booster", assistant . ".ListenerTemperature", listenerBooster["ListenerTemperature"])
 					}
-					else if speakerImprover
-						setMultiMapValue(configuration, "Speech Improver", assistant . ".Listener", false)
+					else if speakerBooster
+						setMultiMapValue(configuration, "Assistant Booster", assistant . ".Listener", false)
 
-					if conversationImprover {
-						conversationImprover := string2Map("|||", "--->>>", conversationImprover)
+					if conversationBooster {
+						conversationBooster := string2Map("|||", "--->>>", conversationBooster)
 
-						arguments .= ("; raceAssistantConversationImprover: " . assistant)
+						arguments .= ("; raceAssistantConversationBooster: " . assistant)
 
-						if !conversationImprover.Has("Conversation")
-							conversationImprover["Conversation"] := false
+						if !conversationBooster.Has("Conversation")
+							conversationBooster["Conversation"] := false
 
-						if !conversationImprover.Has("ConversationTemperature")
-							conversationImprover["ConversationTemperature"] := 0.5
+						if !conversationBooster.Has("ConversationTemperature")
+							conversationBooster["ConversationTemperature"] := 0.5
 
-						if !conversationImprover.Has("ConversationMaxHistory")
-							conversationImprover["ConversationMaxHistory"] := 3
+						if !conversationBooster.Has("ConversationMaxHistory")
+							conversationBooster["ConversationMaxHistory"] := 3
 
-						setMultiMapValue(configuration, "Speech Improver", assistant . ".Service", conversationImprover["Service"])
-						setMultiMapValue(configuration, "Speech Improver", assistant . ".Model", conversationImprover["Model"])
+						setMultiMapValue(configuration, "Assistant Booster", assistant . ".Service", conversationBooster["Service"])
+						setMultiMapValue(configuration, "Assistant Booster", assistant . ".Model", conversationBooster["Model"])
 
-						setMultiMapValue(configuration, "Speech Improver", assistant . ".Conversation", conversationImprover["Conversation"])
-						setMultiMapValue(configuration, "Speech Improver", assistant . ".ConversationMaxHistory", conversationImprover["ConversationMaxHistory"])
-						setMultiMapValue(configuration, "Speech Improver", assistant . ".ConversationTemperature", conversationImprover["ConversationTemperature"])
+						setMultiMapValue(configuration, "Assistant Booster", assistant . ".Conversation", conversationBooster["Conversation"])
+						setMultiMapValue(configuration, "Assistant Booster", assistant . ".ConversationMaxHistory", conversationBooster["ConversationMaxHistory"])
+						setMultiMapValue(configuration, "Assistant Booster", assistant . ".ConversationTemperature", conversationBooster["ConversationTemperature"])
 					}
 					else
-						setMultiMapValue(configuration, "Speech Improver", assistant . ".Conversation", false)
+						setMultiMapValue(configuration, "Assistant Booster", assistant . ".Conversation", false)
 				}
 				else
 					arguments .= "; raceAssistantSpeaker: Off"

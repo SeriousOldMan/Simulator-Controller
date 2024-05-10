@@ -87,11 +87,11 @@ startupDrivingCoach() {
 	local coachSynthesizer := true
 	local coachSpeaker := true
 	local coachSpeakerVocalics := false
-	local coachSpeakerImprover := false
+	local coachSpeakerBooster := false
 	local coachRecognizer := true
 	local coachListener := true
-	local coachListenerImprover := false
-	local coachConversationImprover := false
+	local coachListenerBooster := false
+	local coachConversationBooster := false
 	local coachMuted := false
 	local debug := false
 	local voiceServer, index, coach, label
@@ -126,8 +126,8 @@ startupDrivingCoach() {
 			case "-SpeakerVocalics":
 				coachSpeakerVocalics := A_Args[index + 1]
 				index += 2
-			case "-SpeakerImprover":
-				coachSpeakerImprover := A_Args[index + 1]
+			case "-SpeakerBooster":
+				coachSpeakerBooster := A_Args[index + 1]
 				index += 2
 			case "-Recognizer":
 				coachRecognizer := A_Args[index + 1]
@@ -135,11 +135,11 @@ startupDrivingCoach() {
 			case "-Listener":
 				coachListener := A_Args[index + 1]
 				index += 2
-			case "-ListenerImprover":
-				coachListenerImprover := A_Args[index + 1]
+			case "-ListenerBooster":
+				coachListenerBooster := A_Args[index + 1]
 				index += 2
-			case "-ConversationImprover":
-				coachConversationImprover := A_Args[index + 1]
+			case "-ConversationBooster":
+				coachConversationBooster := A_Args[index + 1]
 				index += 2
 			case "-Muted":
 				coachMuted := true
@@ -171,8 +171,8 @@ startupDrivingCoach() {
 	coach := DrivingCoach(kSimulatorConfiguration
 						, remotePID ? DrivingCoach.DrivingCoachRemoteHandler(remotePID) : false
 						, coachName, coachLanguage
-						, coachSynthesizer, coachSpeaker, coachSpeakerVocalics, coachSpeakerImprover, coachConversationImprover
-						, coachRecognizer, coachListener, coachListenerImprover, coachMuted, voiceServer)
+						, coachSynthesizer, coachSpeaker, coachSpeakerVocalics, coachSpeakerBooster, coachConversationBooster
+						, coachRecognizer, coachListener, coachListenerBooster, coachMuted, voiceServer)
 
 	DrivingCoach.Instance := coach
 

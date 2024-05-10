@@ -152,10 +152,10 @@ class DrivingCoach extends GridRaceAssistant {
 	}
 
 	__New(configuration, remoteHandler, name := false, language := kUndefined
-		, synthesizer := false, speaker := false, vocalics := false, speakerImprover := false
-		, recognizer := false, listener := false, listenerImprover := false, conversationImprover := false, muted := false, voiceServer := false) {
-		super.__New(configuration, "Driving Coach", remoteHandler, name, language, synthesizer, speaker, vocalics, speakerImprover
-												  , recognizer, listener, listenerImprover, conversationImprover, muted, voiceServer)
+		, synthesizer := false, speaker := false, vocalics := false, speakerBooster := false
+		, recognizer := false, listener := false, listenerBooster := false, conversationBooster := false, muted := false, voiceServer := false) {
+		super.__New(configuration, "Driving Coach", remoteHandler, name, language, synthesizer, speaker, vocalics, speakerBooster
+												  , recognizer, listener, listenerBooster, conversationBooster, muted, voiceServer)
 
 		this.updateConfigurationValues({Announcements: {SessionInformation: true, StintInformation: false, HandlingInformation: false}})
 

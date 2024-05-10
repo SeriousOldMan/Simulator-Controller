@@ -372,7 +372,7 @@ Using *Activation Command* you can supply a keyword or a complete phrase to focu
 
 Note: You can use the [Trigger Detector Tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#trigger-detector-tool) to find out, which button codes your connected controller actually use, by clicking the small button on the right side of the *Push-To-Talk* entry field. If you push a simple button on your external controller or a single key on your keyboard, the corresponding hotkey name will be inserted into the *Push-To-Talk* edit field.
 
-##### Speech improvement using AI
+##### Boosting Assistant conversation using AI
 
 The voice recognition for all Assistants, except the Driving Coach is normally pattern-based. [Here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Engineer-Commands-(EN)) you can find a documentation for the definition of the recognized commands of the Race Engineer, for example, and similar documentation is available for the other Assistants as well. The speech output of all Assistants is also prep-programmed with several different phrases for each message, to create at least a little variation.
 
@@ -382,7 +382,7 @@ Said this, it is clear, that the interaction with the Assistants, will not feel 
 
 Please take a look at the documentation for the [Driving Coach](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#installation) for a description of the different provider which can be configured here.
 
-Two type of improvements are available at the moment:
+Several boosters are available at the moment:
 
   1. More variations in the speech output of the Assistants will be created, if *Rephrasing* is activated. This is done by using a GPT to rephrase one of the pre-defined phrases. The *Activation* setting defines the probability, with which the rephrasing happens (and thereby how many calls to the GPT service will be done) and using the *Creativity* setting, you can define, how *strong* the rephrasing will be. According to my tests, a value of 50% will create some intersting variation without altering the original sense of the message. Please note, that there are messages, especially the urgent alerts of the Spotter, which are time-critical. Those messages will never be send to the AI for rephrasing.
 
@@ -394,8 +394,10 @@ Two type of improvements are available at the moment:
 	 
 	 There are two *Activation* methods available, both with their pros and cons. "Always" means, that the LLM is always asked to interpret the given command, whereas "Unrecognized" means, that it is only used, when the pattern-based voice recognition cannot identify the command. The later will result in less calls to the LLM and therefore will probably reduce costs and - even more important - will be better in terms of responsiveness, if you are already quite familar with the command patterns.
 	 
-	 Note: Using the semantic *Understanding* improvement may only be usable in conjunction with voice recognition methods, that are cabable to recognize continuous, unstructured text. This is true for Google and Azure voice recognition, but not for the builtin voice recognition of Windows, which only work reliable for pattern-based recognition.
+	 Note: Using the semantic *Understanding* booster may only be usable in conjunction with voice recognition methods, that are cabable to recognize continuous, unstructured text. This is true for Google and Azure voice recognition, but not for the builtin voice recognition of Windows, which only work reliable for pattern-based recognition.
 
+  3. Normally an Assistant will tell you that he didn't understand you, when none of the defined commands has matched the spoken command. Using the *Conversation* booster a special mode can be activated, that will redirect all non-recognized commands to an LLM for interpretation and processing. This LLM will have full access to the knowledebase of the Assistant and will therefore be able to run a knowledgeable conversation with you.
+  
 Important: Using a GPT service like OpenAI may impose some costs, and running an LLM locally on your PC will require a very powerful system, especially when doing this while on the track. Therefore, configuring speech improvement is fully optional.
 
 #### Tab *Plugins*

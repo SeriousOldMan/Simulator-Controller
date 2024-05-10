@@ -21,7 +21,7 @@
 #Include "..\..\Libraries\Messages.ahk"
 #Include "..\..\Libraries\SpeechSynthesizer.ahk"
 #Include "..\..\Libraries\SpeechRecognizer.ahk"
-#Include "..\..\Libraries\SpeechImprover.ahk"
+#Include "AssistantBooster.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -50,15 +50,15 @@ class VoiceManager extends ConfigurationItem {
 	iSpeakerVolume := 100
 	iSpeakerPitch := 0
 	iSpeakerSpeed := 0
-	iSpeakerImprover := false
+	iSpeakerBooster := false
 
 	iMuted := false
 
 	iRecognizer := "Desktop"
 	iListener := false
-	iListenerImprover := false
+	iListenerBooster := false
 
-	iImprover := false
+	iBooster := false
 
 	iRecognizerMode := "Grammar"
 
@@ -214,7 +214,7 @@ class VoiceManager extends ConfigurationItem {
 		iFragments := CaseInsenseWeakMap()
 		iPhrases := CaseInsenseMap()
 
-		iImprover := false
+		iBooster := false
 
 		iIsTalking := false
 		iText := ""
@@ -232,9 +232,9 @@ class VoiceManager extends ConfigurationItem {
 			}
 		}
 
-		Improver {
+		Booster {
 			Get {
-				return this.iImprover
+				return this.iBooster
 			}
 		}
 
@@ -273,17 +273,17 @@ class VoiceManager extends ConfigurationItem {
 		}
 
 		__New(voiceManager, synthesizer, speaker, language, fragments, phrases) {
-			local improver
+			local booster
 
 			this.iVoiceManager := voiceManager
 			this.iFragments := fragments
 			this.iPhrases := phrases
 
-			if voiceManager.SpeakerImprover {
-				improver := SpeechImprover(voiceManager.SpeakerImprover, voiceManager.Configuration)
+			if voiceManager.SpeakerBooster {
+				booster := SpeechBooster(voiceManager.SpeakerBooster, voiceManager.Configuration)
 
-				if (improver.Model && improver.Speaker)
-					this.iImprover := improver
+				if (booster.Model && booster.Active)
+					this.iBooster := booster
 			}
 
 			super.__New(synthesizer, speaker, language)
@@ -311,7 +311,7 @@ class VoiceManager extends ConfigurationItem {
 		}
 
 		speak(text, focus := false, cache := false, options := false) {
-			local improver, stopped
+			local booster, stopped
 
 			if this.Talking {
 				this.iText .= (A_Space . text)
@@ -324,18 +324,18 @@ class VoiceManager extends ConfigurationItem {
 				stopped := this.VoiceManager.stopListening()
 
 				try {
-					improver := this.Improver
+					booster := this.Booster
 
-					if improver {
+					if booster {
 						if options {
 							options := toMap(options)
 
-							text := improver.speak(text, Map("Language", this.VoiceManager.Language
-														   , "Rephrase", (!options.Has("Rephrase") || options["Rephrase"])
-														   , "Translate", (improver.Language && (!options.Has("Translate") || options["Tranlate"]))))
+							text := booster.speak(text, Map("Language", this.VoiceManager.Language
+														  , "Rephrase", (!options.Has("Rephrase") || options["Rephrase"])
+														  , "Translate", (booster.Language && (!options.Has("Translate") || options["Tranlate"]))))
 						}
 						else
-							text := improver.speak(text, Map("Language", this.VoiceManager.Language))
+							text := booster.speak(text, Map("Language", this.VoiceManager.Language))
 					}
 
 					this.Speaking := true
@@ -392,7 +392,7 @@ class VoiceManager extends ConfigurationItem {
 	class LocalRecognizer extends SpeechRecognizer {
 		iVoiceManager := false
 
-		iImprover := false
+		iBooster := false
 
 		Routing {
 			Get {
@@ -406,22 +406,22 @@ class VoiceManager extends ConfigurationItem {
 			}
 		}
 
-		Improver {
+		Booster {
 			Get {
-				return this.iImprover
+				return this.iBooster
 			}
 		}
 
 		__New(voiceManager, arguments*) {
-			local improver
+			local booster
 
 			this.iVoiceManager := voiceManager
 
-			if voiceManager.ListenerImprover {
-				improver := SpeechImprover(voiceManager.ListenerImprover, voiceManager.Configuration, voiceManager.Language)
+			if voiceManager.ListenerBooster {
+				booster := RecognitionBooster(voiceManager.ListenerBooster, voiceManager.Configuration, voiceManager.Language)
 
-				if (improver.Model && improver.Listener)
-					this.iImprover := improver
+				if (booster.Model && booster.Active)
+					this.iBooster := booster
 			}
 
 			super.__New(arguments*)
@@ -432,20 +432,20 @@ class VoiceManager extends ConfigurationItem {
 		}
 
 		splitText(text) {
-			local improver := this.Improver
+			local booster := this.Booster
 
-			if (improver && (improver.ListenerMode = "Always"))
-				text := improver.listen(text)
+			if (booster && (booster.Mode = "Always"))
+				text := booster.recognize(text)
 
 			return super.splitText(text)
 		}
 
 		unknownRecognized(&text) {
-			local improver := this.Improver
+			local booster := this.Booster
 			local alternateText
 
-			if (improver && (improver.ListenerMode = "Unknown")) {
-				alternateText := improver.listen(text)
+			if (booster && (booster.Mode = "Unknown")) {
+				alternateText := booster.recognize(text)
 
 				if (alternateText != text) {
 					text := alternateText
@@ -620,24 +620,24 @@ class VoiceManager extends ConfigurationItem {
 		}
 	}
 
-	ListenerImprover {
+	ListenerBooster {
 		Get {
-			return this.iListenerImprover
+			return this.iListenerBooster
 		}
 	}
 
-	Improver {
+	Booster {
 		Get {
-			local improver
+			local booster
 
-			if (this.ListenerImprover && !this.iImprover) {
-				improver := SpeechImprover(this.ListenerImprover, this.Configuration, this.Language)
+			if (this.ListenerBooster && !this.iBooster) {
+				booster := RecognizerBooster(this.ListenerBooster, this.Configuration, this.Language)
 
-				if (improver.Model && improver.Listener)
-					this.iImprover := improver
+				if (booster.Model && booster.Active)
+					this.iBooster := booster
 			}
 
-			return this.iImprover
+			return this.iBooster
 		}
 	}
 
@@ -665,9 +665,9 @@ class VoiceManager extends ConfigurationItem {
 		}
 	}
 
-	SpeakerImprover {
+	SpeakerBooster {
 		Get {
-			return this.iSpeakerImprover
+			return this.iSpeakerBooster
 		}
 	}
 
@@ -771,8 +771,8 @@ class VoiceManager extends ConfigurationItem {
 		if options.Has("SpeakerSpeed")
 			this.iSpeakerSpeed := options["SpeakerSpeed"]
 
-		if options.Has("SpeakerImprover")
-			this.iSpeakerImprover := options["SpeakerImprover"]
+		if options.Has("SpeakerBooster")
+			this.iSpeakerBooster := options["SpeakerBooster"]
 
 		if options.Has("Recognizer")
 			this.iRecognizer := options["Recognizer"]
@@ -780,8 +780,8 @@ class VoiceManager extends ConfigurationItem {
 		if options.Has("Listener")
 			this.iListener := options["Listener"]
 
-		if options.Has("ListenerImprover") {
-			this.iListenerImprover := options["ListenerImprover"]
+		if options.Has("ListenerBooster") {
+			this.iListenerBooster := options["ListenerBooster"]
 		}
 
 		if options.Has("PushToTalk")
@@ -994,7 +994,7 @@ class VoiceManager extends ConfigurationItem {
 																					, this.Language, this.Synthesizer, this.Speaker
 																					, this.Recognizer, this.Listener
 																					, this.SpeakerVolume, this.SpeakerPitch, this.SpeakerSpeed
-																					, this.SpeakerImprover, this.ListenerImprover
+																					, this.SpeakerBooster, this.ListenerBooster
 																					, mode)
 										, this.VoiceServer)
 
@@ -1156,7 +1156,7 @@ class VoiceManager extends ConfigurationItem {
 		local grammars := this.getGrammars(language)
 		local mode := getMultiMapValue(grammars, "Configuration", "Recognizer", "Grammar")
 		local compilerRecognizer := SpeechRecognizer("Compiler", true, this.Language, false, "Text")
-		local improver := this.Improver
+		local booster := this.Booster
 		local grammar, definition, name, choices, nextCharIndex
 
 		this.iRecognizerMode := mode
@@ -1164,14 +1164,14 @@ class VoiceManager extends ConfigurationItem {
 		for name, choices in getMultiMapValues(grammars, "Choices") {
 			compilerRecognizer.setChoices(name, choices)
 
-			if improver
-				improver.setChoices(name, choices)
+			if booster
+				booster.setChoices(name, choices)
 
 			if spRecognizer {
 				spRecognizer.setChoices(name, choices)
 
-				if spRecognizer.Improver
-					spRecognizer.Improver.setChoices(name, choices)
+				if spRecognizer.Booster
+					spRecognizer.Booster.setChoices(name, choices)
 			}
 			else
 				messageSend(kFileMessage, "Voice", "registerChoices:" . values2String(";", this.Name, name, string2Values(",", StrReplace(choices, ";", ","))*)
@@ -1181,11 +1181,11 @@ class VoiceManager extends ConfigurationItem {
 		for grammar, definition in getMultiMapValues(grammars, "Listener Grammars") {
 			definition := substituteVariables(definition, {name: this.Name})
 
-			if improver
-				improver.setGrammar(grammar, definition)
+			if booster
+				booster.setGrammar(grammar, definition)
 
-			if (spRecognizer && spRecognizer.Improver)
-				spRecognizer.Improver.setGrammar(grammar, definition)
+			if (spRecognizer && spRecognizer.Booster)
+				spRecognizer.Booster.setGrammar(grammar, definition)
 
 			if (mode = "Mixed") {
 				if !compilerRecognizer {
@@ -1430,13 +1430,13 @@ class VoiceManager extends ConfigurationItem {
 
 		try {
 			if (this.iRecognizerMode = "Mixed") {
-				if (this.Improver && (this.Improver.ListenerMode = "Always"))
-					matchText := this.Improver.recognize(matchText)
+				if (this.Booster && (this.Booster.Mode = "Always"))
+					matchText := this.Booster.recognize(matchText)
 
 				recognizedGrammar := this.matchCommand(matchText, &words)
 
-				if (this.Improver && !recognizedGrammar && (this.Improver.ListenerMode = "Unknown")) {
-					matchText := this.Improver.recognize(matchText)
+				if (this.Booster && !recognizedGrammar && (this.Booster.Mode = "Unknown")) {
+					matchText := this.Booster.recognize(matchText)
 
 					recognizedGrammar := this.matchCommand(matchText, &words)
 				}

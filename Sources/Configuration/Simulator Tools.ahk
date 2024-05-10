@@ -1684,6 +1684,42 @@ updateInstallationForV500() {
 	}
 }
 
+updateConfigurationForV572() {
+	local text, configuration
+
+	if FileExist(kUserHomeDirectory . "Setup\Speech Improver Configuration.ini") {
+		FileMove(kUserHomeDirectory . "Setup\Speech Improver Configuration.ini", kUserHomeDirectory . "Setup\Assistant Booster Configuration.ini", 1)
+
+		text := FileRead(kUserHomeDirectory . "Setup\Assistant Booster Configuration.ini", "`n")
+
+		text := StrReplace(text, "Speech Improver", "Assistant Booster")
+
+		deleteFile(kUserHomeDirectory . "Setup\Assistant Booster Configuration.ini")
+
+		FileAppend(text, kUserHomeDirectory . "Setup\Assistant Booster Configuration.ini", "UTF-16")
+	}
+
+	if FileExist(kUserHomeDirectory . "Setup\Setup.data") {
+		text := FileRead(kUserHomeDirectory . "Setup\Setup.data", "`n")
+
+		text := StrReplace(text, "Improver", "Booster")
+
+		deleteFile(kUserHomeDirectory . "Setup\Setup.data")
+
+		FileAppend(text, kUserHomeDirectory . "Setup\Setup.data", "UTF-16")
+	}
+
+	if FileExist(getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)) {
+		configuration := readMultiMap(kSimulatorConfigurationFile)
+
+		setMultiMapValues(configuration, "Assistant Booster", getMultiMapValues(configuration, "Speech Improver"))
+
+		removeMultiMapValues(configuration, "Speech Improver")
+
+		writeMultiMap(kSimulatorConfigurationFile, configuration)
+	}
+}
+
 updateConfigurationForV567() {
 	local settings, ignore, prefix, key
 

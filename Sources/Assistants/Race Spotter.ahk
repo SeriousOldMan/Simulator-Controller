@@ -87,11 +87,11 @@ startupRaceSpotter() {
 	local spotterSynthesizer := true
 	local spotterSpeaker := false
 	local spotterSpeakerVocalics := false
-	local spotterSpeakerImprover := false
+	local spotterSpeakerBooster := false
 	local spotterRecognizer := true
 	local spotterListener := false
-	local spotterListenerImprover := false
-	local spotterConversationImprover := false
+	local spotterListenerBooster := false
+	local spotterConversationBooster := false
 	local spotterMuted := false
 	local debug := false
 	local voiceServer, index, spotter, label
@@ -126,8 +126,8 @@ startupRaceSpotter() {
 			case "-SpeakerVocalics":
 				spotterSpeakerVocalics := A_Args[index + 1]
 				index += 2
-			case "-SpeakerImprover":
-				spotterSpeakerImprover := A_Args[index + 1]
+			case "-SpeakerBooster":
+				spotterSpeakerBooster := A_Args[index + 1]
 				index += 2
 			case "-Recognizer":
 				spotterRecognizer := A_Args[index + 1]
@@ -135,11 +135,11 @@ startupRaceSpotter() {
 			case "-Listener":
 				spotterListener := A_Args[index + 1]
 				index += 2
-			case "-ListenerImprover":
-				spotterListenerImprover := A_Args[index + 1]
+			case "-ListenerBooster":
+				spotterListenerBooster := A_Args[index + 1]
 				index += 2
-			case "-ConversationImprover":
-				spotterConversationImprover := A_Args[index + 1]
+			case "-ConversationBooster":
+				spotterConversationBooster := A_Args[index + 1]
 				index += 2
 			case "-Muted":
 				spotterMuted := true
@@ -171,8 +171,8 @@ startupRaceSpotter() {
 	spotter := RaceSpotter(kSimulatorConfiguration
 						 , remotePID ? RaceSpotter.RaceSpotterRemoteHandler(remotePID) : false
 						 , spotterName, spotterLanguage
-						 , spotterSynthesizer, spotterSpeaker, spotterSpeakerVocalics, spotterSpeakerImprover, spotterConversationImprover
-						 , spotterRecognizer, spotterListener, spotterListenerImprover, spotterMuted, voiceServer)
+						 , spotterSynthesizer, spotterSpeaker, spotterSpeakerVocalics, spotterSpeakerBooster, spotterConversationBooster
+						 , spotterRecognizer, spotterListener, spotterListenerBooster, spotterMuted, voiceServer)
 
 	RaceSpotter.Instance := spotter
 

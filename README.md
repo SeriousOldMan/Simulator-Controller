@@ -37,15 +37,15 @@ Here is a short video which shows how to configure Simulator Controller for the 
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [information about the update process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.
 
-[5.7.0.1-release](https://cutt.ly/CewdIMsf) (Changes: Added overtaking threshold gap for the Spotter, Rearranged info priority for the Spotter, New speech processor library for speech pre- and post-processing, Added speech post-processor configuration to "Simulator Setup", Fine-tuning of accident detection for extreme braking zones, Updated OpenAI model defaults.)
+[5.7.1.0-release](https://cutt.ly/heequ5tX) (Changes: Fixed saving of probability setting for speech improver, Improved meta data for speech improver, Tweaking for accident detection, Tweaked damage lap delta calculation, Introduced configuration files for speech improver LLM instructions, Full support for listen improver, Fixed a couple of Strategist commands, Deferred call to pit info of Engineer, Engineeer now informs about pressure changes incrementally if tyre compound is unchanged, Added Ford Mustang for ACC, New car models for Setup Workbench, Updated to AHK 2.0.14.)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-570) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-571) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[5.6.8.0-release](https://cutt.ly/2w6P0AvI) (Changes: Changed appearance of checkable menu items, Added "Auto Clear" for the "Practice Center", Added "Auto Export" for the "Practice Center", New damage info component in "System Monitor", Exposed damage information in the "Session State.json" file, Migrated to AHK 2.0.13, Optimized inconsistent driver warning of the Spotter, New LLMConnector class library, Support logical key mapping of tools like Joy2Key.)
+[5.7.0.2-release](https://cutt.ly/dewxk1pI) (Changes: Added overtaking threshold gap for the Spotter, Rearranged info priority for the Spotter, New speech processor library for speech pre- and post-processing, Added speech post-processor configuration to "Simulator Setup", Fine-tuning of accident detection for extreme braking zones, Updated OpenAI model defaults.)
 
-[5.6.7.0-release](https://cutt.ly/xw5ayPd3) (Changes: Added Debug code to detect localization problems for simulators, Display active startup profile in "Simulator Startup", Spotter starts track mapping after end of the first lap, Finished sessions will stay at least a week untouched on the Team Server, Removed "Save Session" from "Race Center" and "Practice Center", Accident detection tweaks, Better detection of active replay in iRacing, Fixed session info page in "System Monitor" when one or more Assistants are deactivated, Fixed "NextPitstop" action in autonomous mode, Configuration for callout frequency of the Spotter, Updated UI layout of "Simulator Setup" and "Simulator Configuration".)
+[5.6.8.0-release](https://cutt.ly/2w6P0AvI) (Changes: Changed appearance of checkable menu items, Added "Auto Clear" for the "Practice Center", Added "Auto Export" for the "Practice Center", New damage info component in "System Monitor", Exposed damage information in the "Session State.json" file, Migrated to AHK 2.0.13, Optimized inconsistent driver warning of the Spotter, New LLMConnector class library, Support logical key mapping of tools like Joy2Key.)
 
 #### Latest development build
 
@@ -153,7 +153,9 @@ Simulator Controller comes with a set of virtual Assistants to guide you through
 
 Simulator Controller offers a virtual pit crew based on an AI powered chatbot engine. At the heart of this engine is hybrid rule engine coupled with voice recognition and voice synthesis. A rule engine is very suitable for the tasks of a typical pit crew, since all actions are event based and use big amounts of data.
 
-According to the maturity scale of *attractive.ai* (one of several hundreds maturity models that can be found on the net), the Race Assistants of Simulator Controller are at level 2.5. The observe your racing, can give recommendations and take responsibilty for certain tasks like strategy management and pitstop planning and preparation.
+You can communicate with the Race Assistants using voice and natural language. Voice commands are pattern-based, but an optional integration of GPT-based speech processing will make the interaction very natural.
+
+According to the maturity scale of *attractive.ai* (one of several hundreds maturity models that can be found on the net), the Race Assistants of Simulator Controller are between level 2.5 and 3.0. They observe your racing, can give recommendations and take responsibilty for certain tasks like strategy management and pitstop planning and preparation.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/AI%20Maturity%20Levels.png)
 

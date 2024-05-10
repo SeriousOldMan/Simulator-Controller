@@ -1,15 +1,15 @@
 [Development]
 Version=5.7.2.0-dev
 Target=5.7.2.0-release
-Date=05/09/2024
+Date=05/10/2024
 Download=
 Changes=New instruction for the Driving Coach
 Components=Media->5.6.1,Configuration->5.6.4,Utilities->5.4.8
 [Release]
-Version=5.7.0.1-release
-Date=05/05/2024
-Download=https://cutt.ly/CewdIMsf;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.7.0.1-release.zip
-Changes=Added overtaking threshold gap for the Spotter, Rearranged info priority for the Spotter, New speech processor library for speech pre- and post-processing, Added speech post-processor configuration to "Simulator Setup", Fine-tuning of accident detection for extreme braking zones, Updated OpenAI model defaults
+Version=5.7.1.0-release
+Date=05/10/2024
+Download=https://cutt.ly/heequ5tX;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.7.1.0-release.zip
+Changes=Fixed saving of probability setting for speech improver, Improved meta data for speech improver, Tweaking for accident detection, Tweaked damage lap delta calculation, Introduced configuration files for speech improver LLM instructions, Full support for listen improver, Fixed a couple of Strategist commands, Deferred call to pit info of Engineer, Engineeer now informs about pressure changes incrementally if tyre compound is unchanged, Added Ford Mustang for ACC, New car models for Setup Workbench, Updated to AHK 2.0.14
 Components=Media->5.6.1,Configuration->5.6.4,Utilities->5.4.8
 [Components]
 Media.5.6.1.Path=Resources
@@ -25,4 +25,4 @@ Utilities.5.4.8.Download=https://simulatorcontroller.s3.eu-central-1.amazonaws.c
 Type=Development
 [Version]
 Development=5.7.2.0-dev
-Release=5.7.0.1-release
+Release=5.7.1.0-release

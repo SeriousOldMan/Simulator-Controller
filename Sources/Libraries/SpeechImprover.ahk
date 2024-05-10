@@ -494,6 +494,6 @@ class SpeechImprover extends ConfigurationItem {
 				return false
 		}
 		else
-			return text
+			return false
 	}
 }

@@ -772,19 +772,21 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	createTelemetryData(filter := []) {
+		local knowledgeBase := this.KnowledgeBase
 		local text := ""
 		local key, value, ignore, skip, skipped
 
-		for key, value in this.Facts {
-			skip := false
+		if knowledgeBase
+			for key, value in knowledgeBase.Facts.Facts {
+				skip := false
 
-			for ignore, skipped in filter
-				if (InStr(key, skipped) == 1)
-					skip := true
+				for ignore, skipped in filter
+					if (InStr(key, skipped) == 1)
+						skip := true
 
-			if !skip
-				text .= (key . " = " . value . "`n")
-		}
+				if !skip
+					text .= (key . " = " . value . "`n")
+			}
 
 		return text
 	}

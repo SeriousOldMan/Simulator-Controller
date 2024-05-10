@@ -276,7 +276,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 	loadFromConfiguration(configuration) {
 		local service, ignore, provider, setting, providerConfiguration
 
-		static defaults := CaseInsenseWeakMap("ServiceURL", false, "Model", false, "MaxTokens", 512
+		static defaults := CaseInsenseWeakMap("ServiceURL", false, "Model", false, "MaxTokens", 1024
 											, "MaxHistory", 5, "Temperature", 0.5, "Confirmation", true)
 
 		super.loadFromConfiguration(configuration)

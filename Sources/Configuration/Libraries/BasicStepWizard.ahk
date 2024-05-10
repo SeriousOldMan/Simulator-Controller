@@ -1904,6 +1904,20 @@ class VoiceImproverEditor extends ConfiguratorPanel {
 			this.updateState()
 		}
 
+		validateTokens(*) {
+			local field := this.Control["viMaxTokensEdit"]
+			local value := field.Text
+
+			if (!isInteger(value) || (value < 32)) {
+				field.Text := (field.HasProp("ValidText") ? field.ValidText : "200")
+
+				loop 10
+					SendInput("{Right}")
+			}
+			else
+				field.ValidText := field.Text
+		}
+
 		chooseProvider(*) {
 			this.saveProviderConfiguration()
 
@@ -1958,8 +1972,11 @@ class VoiceImproverEditor extends ConfiguratorPanel {
 		widget6 := editorGui.Add("Text", "x" . x0 . " yp+24 w105 h23 +0x200", translate("Service Key"))
 		widget7 := editorGui.Add("Edit", "x" . x1 . " yp w" . w1 . " h23 vviServiceKeyEdit")
 
-		widget8 := editorGui.Add("Text", "x" . x0 . " yp+30 w105 h23 +0x200", translate("Model"))
+		widget8 := editorGui.Add("Text", "x" . x0 . " yp+30 w105 h23 +0x200", translate("Model / # Tokens"))
 		widget9 := editorGui.Add("ComboBox", "x" . x1 . " yp w" . (w1 - 64) . " vviModelDropDown")
+		widget10 := editorGui.Add("Edit", "x" . (x1 + (w1 - 60)) . " yp-1 w60 h23 Number vviMaxTokensEdit")
+		widget10.OnEvent("Change", validateTokens)
+		widget11 := editorGui.Add("UpDown", "x" . (x1 + (w1 - 60)) . " yp w60 h23 Range32-2048")
 
 		editorGui.SetFont("Italic", "Arial")
 		widget12 := editorGui.Add("Checkbox", "x" . x0 . " yp+36 w105 h23 vviSpeakerCheck", translate("Rephrasing"))
@@ -2043,7 +2060,7 @@ class VoiceImproverEditor extends ConfiguratorPanel {
 	loadFromConfiguration(configuration) {
 		local service, ignore, provider, setting, providerConfiguration
 
-		static defaults := CaseInsenseWeakMap("ServiceURL", false, "Model", ""
+		static defaults := CaseInsenseWeakMap("ServiceURL", false, "Model", "", "MaxTokens", 1024
 											, "Speaker", true, "SpeakerTemperature", 0.5, "SpeakerProbability", 0.5
 											, "Listener", false, "ListenerMode", "Unknown", "ListenerTemperature", 0.5
 											, "Conversation", false, "ConversationMaxHistory", 3, "ConversationTemperature", 0.5)
@@ -2059,6 +2076,7 @@ class VoiceImproverEditor extends ConfiguratorPanel {
 
 			if (provider = this.iCurrentProvider) {
 				providerConfiguration["Model"] := getMultiMapValue(configuration, "Speech Improver", this.Assistant . ".Model", defaults["Model"])
+				providerConfiguration["MaxTokens"] := getMultiMapValue(configuration, "Speech Improver", this.Assistant . ".MaxTokens", defaults["MaxTokens"])
 
 				providerConfiguration["Speaker"] := getMultiMapValue(configuration, "Speech Improver", this.Assistant . ".Speaker", defaults["Speaker"])
 				providerConfiguration["SpeakerProbability"] := getMultiMapValue(configuration, "Speech Improver", this.Assistant . ".SpeakerProbability", defaults["SpeakerProbability"])
@@ -2082,7 +2100,7 @@ class VoiceImproverEditor extends ConfiguratorPanel {
 				}
 			}
 			else {
-				for ignore, setting in ["ServiceURL", "ServiceKey", "Model"]
+				for ignore, setting in ["ServiceURL", "ServiceKey", "Model", "MaxTokens"]
 					providerConfiguration[setting] := getMultiMapValue(configuration, "Speech Improver", provider . "." . setting, defaults[setting])
 
 				if !providerConfiguration["ServiceURL"]
@@ -2122,7 +2140,7 @@ class VoiceImproverEditor extends ConfiguratorPanel {
 		for ignore, provider in this.Providers {
 			providerConfiguration := this.iProviderConfigurations[provider]
 
-			for ignore, setting in ["ServiceURL", "ServiceKey", "Model"]
+			for ignore, setting in ["ServiceURL", "ServiceKey", "Model", "MaxTokens"]
 				setMultiMapValue(configuration, "Speech Improver", provider . "." . setting, providerConfiguration[setting])
 
 			for ignore, setting in ["Speaker", "SpeakerProbability", "SpeakerTemperature"
@@ -2140,7 +2158,7 @@ class VoiceImproverEditor extends ConfiguratorPanel {
 		if provider {
 			providerConfiguration := this.iProviderConfigurations[provider]
 
-			for ignore, setting in ["Model"]
+			for ignore, setting in ["Model", "MaxTokens"]
 				setMultiMapValue(configuration, "Speech Improver", this.Assistant . "." . setting, providerConfiguration[setting])
 
 			if (provider = "LLM Runtime")
@@ -2166,7 +2184,7 @@ class VoiceImproverEditor extends ConfiguratorPanel {
 		if (this.Control["viProviderDropDown"].Value = 1) {
 			this.iCurrentProvider := false
 
-			for ignore, setting in ["ServiceURL", "ServiceKey", "SpeakerProbability", "SpeakerTemperature", "ListenerTemperature", "ConversationMaxHistory", "ConversationTemperature"]
+			for ignore, setting in ["ServiceURL", "ServiceKey", "MaxTokens", "SpeakerProbability", "SpeakerTemperature", "ListenerTemperature", "ConversationMaxHistory", "ConversationTemperature"]
 				this.Control["vi" . setting . "Edit"].Text := ""
 
 			for ignore, setting in ["Speaker", "Listener", "Conversation"]
@@ -2180,7 +2198,7 @@ class VoiceImproverEditor extends ConfiguratorPanel {
 			if this.iProviderConfigurations.Has(this.iCurrentProvider)
 				configuration := this.iProviderConfigurations[this.iCurrentProvider]
 
-			for ignore, setting in ["ServiceURL", "ServiceKey"]
+			for ignore, setting in ["ServiceURL", "ServiceKey", "MaxTokens"]
 				this.Control["vi" . setting . "Edit"].Text := configuration[setting]
 
 			if ((provider = "GPT4All") && (Trim(this.Control["viServiceKeyEdit"].Text) = "")
@@ -2214,6 +2232,7 @@ class VoiceImproverEditor extends ConfiguratorPanel {
 			value := this.Control["viModelDropDown"].Text
 
 			providerConfiguration["Model"] := ((Trim(value) != "") ? Trim(value) : false)
+			providerConfiguration["MaxTokens"] := this.Control["viMaxTokensEdit"].Text
 
 			if (this.Control["viSpeakerCheck"].Value = 1) {
 				providerConfiguration["Speaker"] := true
@@ -2307,6 +2326,7 @@ class VoiceImproverEditor extends ConfiguratorPanel {
 			this.Control["viConversationCheck"].Enabled := true
 
 			this.Control["viModelDropDown"].Enabled := true
+			this.Control["viMaxTokensEdit"].Enabled := true
 		}
 		else {
 			for ignore, setting in ["ServiceURL", "ServiceKey"]
@@ -2319,6 +2339,7 @@ class VoiceImproverEditor extends ConfiguratorPanel {
 			this.Control["viConversationCheck"].Value := 0
 
 			this.Control["viModelDropDown"].Enabled := false
+			this.Control["viMaxTokensEdit"].Enabled := false
 		}
 
 		if (this.Control["viSpeakerCheck"].Value = 0) {

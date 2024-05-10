@@ -79,6 +79,12 @@ class SpeechImprover extends ConfigurationItem {
 		}
 	}
 
+	MaxTokens {
+		Get {
+			return this.Options["MaxTokens"]
+		}
+	}
+
 	Temperature[type := "Speaker"] {
 		Get {
 			return this.Options[(type = "Speaker") ? "SpeakerTemperature" : ((type = "Listener") ? "ListenerTemperature" : "ConversationTemperature")]
@@ -184,6 +190,7 @@ class SpeechImprover extends ConfigurationItem {
 		options["Language"] := getMultiMapValue(configuration, "Speech Improver", descriptor . ".Language", this.Language)
 		options["Service"] := getMultiMapValue(configuration, "Speech Improver", descriptor . ".Service", false)
 		options["Model"] := getMultiMapValue(configuration, "Speech Improver", descriptor . ".Model", false)
+		options["MaxTokens"] := getMultiMapValue(configuration, "Speech Improver", descriptor . ".MaxTokens", 1024)
 
 		options["Speaker"] := getMultiMapValue(configuration, "Speech Improver", descriptor . ".Speaker", true)
 		options["SpeakerProbability"] := getMultiMapValue(configuration, "Speech Improver", descriptor . ".SpeakerProbability"
@@ -230,6 +237,8 @@ class SpeechImprover extends ConfigurationItem {
 
 					throw "Unsupported service detected in SpeechImprover.startImprover..."
 				}
+
+			this.Connector.MaxTokens := this.MaxTokens
 
 			if this.Conversation
 				this.Connector.MaxHistory := this.ConversationMaxHistory

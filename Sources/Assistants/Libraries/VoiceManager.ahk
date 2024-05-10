@@ -454,10 +454,13 @@ class VoiceManager extends ConfigurationItem {
 				}
 			}
 
-			if this.Grammars.Has("?")
+			if this.Grammars.Has("?") {
 				this.VoiceManager.unknownRecognized(text)
-
-			return super.unknownRecognized(&text)
+				
+				return false
+			}
+			else
+				return super.unknownRecognized(&text)
 		}
 	}
 

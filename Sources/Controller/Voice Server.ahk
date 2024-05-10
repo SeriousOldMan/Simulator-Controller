@@ -239,10 +239,13 @@ class VoiceServer extends ConfigurationItem {
 					}
 				}
 
-				if this.Grammars.Has("?")
+				if this.Grammars.Has("?") {
 					this.VoiceClient.VoiceServer.unknownRecognized(this.VoiceClient, text)
-
-				return super.unknownRecognized(&text)
+					
+					return false
+				}
+				else
+					return super.unknownRecognized(&text)
 			}
 		}
 

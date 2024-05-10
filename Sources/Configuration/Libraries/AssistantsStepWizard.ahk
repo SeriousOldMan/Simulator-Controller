@@ -202,12 +202,12 @@ class AssistantsStepWizard extends ActionsStepWizard {
 						if !conversationImprover.Has("ConversationMaxHistory")
 							conversationImprover["ConversationMaxHistory"] := 3
 
-						setMultiMapValue(configuration, "Speech Improver", assistant . ".Service", speakerImprover["Service"])
-						setMultiMapValue(configuration, "Speech Improver", assistant . ".Model", speakerImprover["Model"])
+						setMultiMapValue(configuration, "Speech Improver", assistant . ".Service", conversationImprover["Service"])
+						setMultiMapValue(configuration, "Speech Improver", assistant . ".Model", conversationImprover["Model"])
 
-						setMultiMapValue(configuration, "Speech Improver", assistant . ".Conversation", speakerImprover["Conversation"])
-						setMultiMapValue(configuration, "Speech Improver", assistant . ".ConversationMaxHistory", speakerImprover["ConversationMaxHistory"])
-						setMultiMapValue(configuration, "Speech Improver", assistant . ".ConversationTemperature", speakerImprover["ConversationTemperature"])
+						setMultiMapValue(configuration, "Speech Improver", assistant . ".Conversation", conversationImprover["Conversation"])
+						setMultiMapValue(configuration, "Speech Improver", assistant . ".ConversationMaxHistory", conversationImprover["ConversationMaxHistory"])
+						setMultiMapValue(configuration, "Speech Improver", assistant . ".ConversationTemperature", conversationImprover["ConversationTemperature"])
 					}
 					else
 						setMultiMapValue(configuration, "Speech Improver", assistant . ".Conversation", false)

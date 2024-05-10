@@ -641,13 +641,29 @@ class BasicStepWizard extends StepWizard {
 			return false
 	}
 
+	assistantConversationImprover(assistant, editor := true) {
+		local conversationImprover
+
+		if this.SetupWizard.isModuleSelected("Voice Control") {
+			conversationImprover := this.SetupWizard.getModuleValue(assistant, "Conversation Improver", this.assistantDefaults(assistant).ConversationImprover)
+
+			if conversationImprover
+				conversationImprover := (isInstance(conversationImprover, Map) ? conversationImprover : string2Map("|||", "--->>>", conversationImprover))
+
+			return (conversationImprover ? conversationImprover : false)
+		}
+		else
+			return false
+	}
+
 	assistantSetup(assistant, editor := true) {
 		return {Enabled: this.assistantEnabled(assistant, editor), Name: this.assistantName(assistant, editor)
 			  , Language: this.assistantLanguage(assistant, editor), Synthesizer: this.assistantSynthesizer(assistant, editor)
 			  , Voice: this.assistantVoice(assistant, editor)
 			  , Volume: this.assistantVolume(assistant), Pitch: this.assistantPitch(assistant), Speed: this.assistantSpeed(assistant)
 			  , SpeakerImprover: this.assistantSpeakerImprover(assistant)
-			  , ListenerImprover: this.assistantListenerImprover(assistant)}
+			  , ListenerImprover: this.assistantListenerImprover(assistant)
+			  , ConversationImprover: this.assistantConversationImprover(assistant)}
 	}
 
 	assistantDefaults(assistant) {
@@ -655,7 +671,8 @@ class BasicStepWizard extends StepWizard {
 		local defaults := {}
 		local ignore, key
 
-		for ignore, key in ["Name", "Synthesizer", "Voice", "Volume", "Pitch", "Speed", "SpeakerImprover", "ListenerImprover"]
+		for ignore, key in ["Name", "Synthesizer", "Voice", "Volume", "Pitch", "Speed"
+						  , "SpeakerImprover", "ListenerImprover", "ConversationImprover"]
 			defaults.%key% := getMultiMapValue(wizard.Definition, "Setup.Basic", "Basic.Defaults." . assistant . "." . key, false)
 
 		return defaults
@@ -868,6 +885,12 @@ class BasicStepWizard extends StepWizard {
 									, assistantSetups.%key%.ListenerImprover ? map2String("|||", "--->>>", assistantSetups.%key%.ListenerImprover) : false, false)
 			else
 				wizard.setModuleValue(assistant, "Listener Improver", false, false)
+
+			if assistantSetups.%key%.HasProp("ConversationImprover")
+				wizard.setModuleValue(assistant, "Conversation Improver"
+									, assistantSetups.%key%.ConversationImprover ? map2String("|||", "--->>>", assistantSetups.%key%.ConversationImprover) : false, false)
+			else
+				wizard.setModuleValue(assistant, "Conversation Improver", false, false)
 		}
 
 		setMultiMapValue(voiceConfiguration, "Voice Control", "Language", getLanguage())
@@ -963,7 +986,7 @@ class BasicStepWizard extends StepWizard {
 	editImprover(assistant) {
 		local wizard := this.SetupWizard
 		local window := this.Window
-		local configuration, setup, speakerImprover, listenerImprover
+		local configuration, setup, speakerImprover, listenerImprover, conversationImprover
 
 		window.Block()
 
@@ -992,6 +1015,14 @@ class BasicStepWizard extends StepWizard {
 				setMultiMapValue(configuration, "Speech Improver", assistant . ".ListenerTemperature", setup.ListenerImprover["ListenerTemperature"])
 			}
 
+			if (setup.HasProp("ConversationImprover") && setup.ConversationImprover) {
+				setMultiMapValue(configuration, "Speech Improver", assistant . ".Service", setup.ConversationImprover["Service"])
+				setMultiMapValue(configuration, "Speech Improver", assistant . ".Model", setup.ConversationImprover["Model"])
+				setMultiMapValue(configuration, "Speech Improver", assistant . ".Conversation", setup.ConversationImprover["Conversation"])
+				setMultiMapValue(configuration, "Speech Improver", assistant . ".ConversationMaxHistory", setup.ConversationImprover["ConversationMaxHistory"])
+				setMultiMapValue(configuration, "Speech Improver", assistant . ".ConversationTemperature", setup.ConversationImprover["ConversationTemperature"])
+			}
+
 			configuration := VoiceImproverEditor(this, assistant, configuration).editImprover(window)
 
 			if configuration {
@@ -1012,6 +1043,14 @@ class BasicStepWizard extends StepWizard {
 									  , "ListenerTemperature", getMultiMapValue(configuration, "Speech Improver", assistant . ".ListenerTemperature"))
 
 				wizard.setModuleValue(assistant, "Listener Improver", map2String("|||", "--->>>", listenerImprover))
+
+				conversationImprover := Map("Service", getMultiMapValue(configuration, "Speech Improver", assistant . ".Service")
+										  , "Model", getMultiMapValue(configuration, "Speech Improver", assistant . ".Model")
+										  , "Conversation", getMultiMapValue(configuration, "Speech Improver", assistant . ".Conversation")
+										  , "ConversationMaxHistory", getMultiMapValue(configuration, "Speech Improver", assistant . ".ConversationMaxHistory")
+										  , "ConversationTemperature", getMultiMapValue(configuration, "Speech Improver", assistant . ".ConversationTemperature"))
+
+				wizard.setModuleValue(assistant, "Conversation Improver", map2String("|||", "--->>>", conversationImprover))
 
 				this.loadAssistant(assistant)
 			}
@@ -1956,6 +1995,23 @@ class VoiceImproverEditor extends ConfiguratorPanel {
 		widget28 := editorGui.Add("UpDown", "x" . x1 . " yp w60 h23 Range0-100")
 		widget29 := editorGui.Add("Text", "x" . (x1 + 65) . " yp w100 h23 +0x200", translate("%"))
 
+		editorGui.SetFont("Italic", "Arial")
+		widget30 := editorGui.Add("Checkbox", "x" . x0 . " yp+36 w105 h23 vviConversationCheck", translate("Conversation"))
+		widget30.OnEvent("Click", (*) => this.updateState())
+		widget31 := editorGui.Add("Text", "x100 yp+11 w" . (width + 8 - 100) . " 0x10 W:Grow")
+		editorGui.SetFont("Norm", "Arial")
+
+		widget32 := editorGui.Add("Text", "x" . x0 . " yp+24 w105 h23 +0x200", translate("Memory"))
+		widget33 := editorGui.Add("Edit", "x" . x1 . " yp w60 h23 Number Limit2 vviConversationMaxHistoryEdit")
+		widget34 := editorGui.Add("UpDown", "x" . x1 . " yp w60 h23 Range1-10")
+		widget35 := editorGui.Add("Text", "x" . (x1 + 65) . " yp w100 h23 +0x200", translate("Conversations"))
+
+		widget36 := editorGui.Add("Text", "x" . x0 . " yp+24 w105 h23 +0x200", translate("Creativity"))
+		widget37 := editorGui.Add("Edit", "x" . x1 . " yp w60 Number Limit3 vviConversationTemperatureEdit")
+		widget37.OnEvent("Change", validatePercentage.Bind("viConversationTemperatureEdit"))
+		widget38 := editorGui.Add("UpDown", "x" . x1 . " yp w60 h23 Range0-100")
+		widget39 := editorGui.Add("Text", "x" . (x1 + 65) . " yp w100 h23 +0x200", translate("%"))
+
 		editorGui.Add("Text", "x8 yp+35 w468 W:Grow 0x10")
 
 		editorGui.Add("Button", "x160 yp+10 w80 h23 Default", translate("Ok")).OnEvent("Click", (*) => this.iResult := kOk)
@@ -1989,7 +2045,8 @@ class VoiceImproverEditor extends ConfiguratorPanel {
 
 		static defaults := CaseInsenseWeakMap("ServiceURL", false, "Model", ""
 											, "Speaker", true, "SpeakerTemperature", 0.5, "SpeakerProbability", 0.5
-											, "Listener", false, "ListenerMode", "Unknown", "ListenerTemperature", 0.5)
+											, "Listener", false, "ListenerMode", "Unknown", "ListenerTemperature", 0.5
+											, "Conversation", false, "ConversationMaxHistory", 3, "ConversationTemperature", 0.5)
 
 		super.loadFromConfiguration(configuration)
 
@@ -2010,6 +2067,10 @@ class VoiceImproverEditor extends ConfiguratorPanel {
 				providerConfiguration["Listener"] := getMultiMapValue(configuration, "Speech Improver", this.Assistant . ".Listener", defaults["Listener"])
 				providerConfiguration["ListenerMode"] := ["Always", "Unknown"][2 - (getMultiMapValue(configuration, "Speech Improver", this.Assistant . ".ListenerMode", defaults["ListenerMode"]) = "Always")]
 				providerConfiguration["ListenerTemperature"] := getMultiMapValue(configuration, "Speech Improver", this.Assistant . ".ListenerTemperature", defaults["ListenerTemperature"])
+
+				providerConfiguration["Conversation"] := getMultiMapValue(configuration, "Speech Improver", this.Assistant . ".Conversation", defaults["Conversation"])
+				providerConfiguration["ConversationMaxHistory"] := getMultiMapValue(configuration, "Speech Improver", this.Assistant . ".ConversationMaxHistory", defaults["ConversationMaxHistory"])
+				providerConfiguration["ConversationTemperature"] := getMultiMapValue(configuration, "Speech Improver", this.Assistant . ".ConversationTemperature", defaults["ConversationTemperature"])
 
 				if (provider = "LLM Runtime") {
 					providerConfiguration["ServiceURL"] := ""
@@ -2042,7 +2103,8 @@ class VoiceImproverEditor extends ConfiguratorPanel {
 					providerConfiguration["Model"] := "GPT 3.5 turbo"
 
 				for ignore, setting in ["Speaker", "SpeakerProbability", "SpeakerTemperature"
-									  , "Listener", "ListenerMode", "ListenerTemperature"]
+									  , "Listener", "ListenerMode", "ListenerTemperature"
+									  , "Conversation", "ConversationMaxHistory", "ConversationTemperature"]
 					providerConfiguration[setting] := getMultiMapValue(configuration, "Speech Improver", provider . "." . setting, defaults[setting])
 			}
 
@@ -2064,7 +2126,8 @@ class VoiceImproverEditor extends ConfiguratorPanel {
 				setMultiMapValue(configuration, "Speech Improver", provider . "." . setting, providerConfiguration[setting])
 
 			for ignore, setting in ["Speaker", "SpeakerProbability", "SpeakerTemperature"
-								  , "Listener", "ListenerMode", "ListenerTemperature"] {
+								  , "Listener", "ListenerMode", "ListenerTemperature"
+								  , "Conversation", "ConversationMaxHistory", "ConversationTemperature"] {
 				setMultiMapValue(configuration, "Speech Improver", provider . "." . setting, providerConfiguration[setting])
 
 				if (provider = this.iCurrentProvider)
@@ -2103,10 +2166,10 @@ class VoiceImproverEditor extends ConfiguratorPanel {
 		if (this.Control["viProviderDropDown"].Value = 1) {
 			this.iCurrentProvider := false
 
-			for ignore, setting in ["ServiceURL", "ServiceKey", "SpeakerProbability", "SpeakerTemperature", "ListenerTemperature"]
+			for ignore, setting in ["ServiceURL", "ServiceKey", "SpeakerProbability", "SpeakerTemperature", "ListenerTemperature", "ConversationMaxHistory", "ConversationTemperature"]
 				this.Control["vi" . setting . "Edit"].Text := ""
 
-			for ignore, setting in ["Speaker", "Listener"]
+			for ignore, setting in ["Speaker", "Listener", "Conversation"]
 				this.Control["vi" . setting . "Check"].Value := 0
 
 			this.Control["viListenerModeDropDown"].Choose(0)
@@ -2124,7 +2187,7 @@ class VoiceImproverEditor extends ConfiguratorPanel {
 									   && (Trim(this.Control["viServiceURLEdit"].Text) = "http://localhost:4891/v1"))
 				this.Control["viServiceKeyEdit"].Text := "Any text will do the job"
 
-			for ignore, setting in ["Speaker", "Listener"]
+			for ignore, setting in ["Speaker", "Listener", "Conversation"]
 				this.Control["vi" . setting . "Check"].Value := configuration[setting]
 
 			this.Control["viSpeakerProbabilityEdit"].Text := (isNumber(configuration["SpeakerProbability"]) ? Round(configuration["SpeakerProbability"] * 100) : "")
@@ -2132,6 +2195,9 @@ class VoiceImproverEditor extends ConfiguratorPanel {
 
 			this.Control["viListenerModeDropDown"].Choose(2 - (configuration["ListenerMode"] = "Always"))
 			this.Control["viListenerTemperatureEdit"].Text := (isNumber(configuration["ListenerTemperature"]) ? Round(configuration["ListenerTemperature"] * 100) : "")
+
+			this.Control["viConversationMaxHistoryEdit"].Text := configuration["ConversationMaxHistory"]
+			this.Control["viConversationTemperatureEdit"].Text := (isNumber(configuration["ConversationTemperature"]) ? Round(configuration["ConversationTemperature"] * 100) : "")
 		}
 
 		this.loadModels(this.iCurrentProvider, (this.iCurrentProvider ? configuration["Model"] : false))
@@ -2169,6 +2235,17 @@ class VoiceImproverEditor extends ConfiguratorPanel {
 				providerConfiguration["Listener"] := false
 				providerConfiguration["ListenerMode"] := ""
 				providerConfiguration["ListenerTemperature"] := ""
+			}
+
+			if (this.Control["viConversationCheck"].Value = 1) {
+				providerConfiguration["Conversation"] := true
+				providerConfiguration["ConversationMaxHistory"] := this.Control["viConversationMaxHistoryEdit"].Text
+				providerConfiguration["ConversationTemperature"] := Round(this.Control["viConversationTemperatureEdit"].Text / 100, 2)
+			}
+			else {
+				providerConfiguration["Conversation"] := false
+				providerConfiguration["ConversationMaxHistory"] := ""
+				providerConfiguration["ConversationTemperature"] := ""
 			}
 		}
 	}
@@ -2227,19 +2304,19 @@ class VoiceImproverEditor extends ConfiguratorPanel {
 
 			this.Control["viSpeakerCheck"].Enabled := true
 			this.Control["viListenerCheck"].Enabled := true
+			this.Control["viConversationCheck"].Enabled := true
 
-			this.Control["viSpeakerProbabilityEdit"].Enabled := true
-			this.Control["viSpeakerTemperatureEdit"].Enabled := true
 			this.Control["viModelDropDown"].Enabled := true
 		}
 		else {
-			for ignore, setting in ["ServiceURL", "ServiceKey", "SpeakerProbability", "SpeakerTemperature"]
+			for ignore, setting in ["ServiceURL", "ServiceKey"]
 				this.Control["vi" . setting . "Edit"].Enabled := false
 
 			this.Control["viSpeakerCheck"].Enabled := false
 			this.Control["viListenerCheck"].Enabled := false
 			this.Control["viSpeakerCheck"].Value := 0
 			this.Control["viListenerCheck"].Value := 0
+			this.Control["viConversationCheck"].Value := 0
 
 			this.Control["viModelDropDown"].Enabled := false
 		}
@@ -2276,6 +2353,23 @@ class VoiceImproverEditor extends ConfiguratorPanel {
 
 			if (this.Control["viListenerTemperatureEdit"].Text = "")
 				this.Control["viListenerTemperatureEdit"].Text := 50
+		}
+
+		if (this.Control["viConversationCheck"].Value = 0) {
+			this.Control["viConversationMaxHistoryEdit"].Enabled := false
+			this.Control["viConversationTemperatureEdit"].Enabled := false
+			this.Control["viConversationMaxHistoryEdit"].Text := ""
+			this.Control["viConversationTemperatureEdit"].Text := ""
+		}
+		else {
+			this.Control["viConversationMaxHistoryEdit"].Enabled := true
+			this.Control["viConversationTemperatureEdit"].Enabled := true
+
+			if (this.Control["viConversationMaxHistoryEdit"].Text = "")
+				this.Control["viConversationMaxHistoryEdit"].Text := 3
+
+			if (this.Control["viConversationTemperatureEdit"].Text = "")
+				this.Control["viConversationTemperatureEdit"].Text := 50
 		}
 	}
 }

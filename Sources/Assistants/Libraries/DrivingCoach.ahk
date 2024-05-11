@@ -336,7 +336,7 @@ class DrivingCoach extends GridRaceAssistant {
 			case "Telemetry":
 				if knowledgeBase
 					return substituteVariables(this.Instructions["Telemetry"]
-											 , {telemetry: this.createTelemetryData(["Car", "Standings", "Position"])})
+											 , {telemetry: this.createTelemetryData({exclude: ["Car", "Standings", "Position"]})})
 			case "Handling":
 				if (knowledgeBase && this.Announcements["HandlingInformation"]) {
 					collector := this.iTelemetryCollector

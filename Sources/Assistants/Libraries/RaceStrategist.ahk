@@ -1012,7 +1012,7 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	createTelemetryData() {
-		return super.createTelemetryData(["Car"])
+		return super.createTelemetryData({exclude: ["Car"]})
 	}
 
 	requestInformation(category, arguments*) {

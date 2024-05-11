@@ -771,18 +771,52 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
-	createTelemetryData(filter := []) {
+	createTelemetryData(options := false) {
 		local knowledgeBase := this.KnowledgeBase
 		local text := ""
-		local key, value, ignore, skip, skipped
+		local filter := false
+		local key, value, ignore, candidate, skip, excludes, includes, include
 
-		if knowledgeBase
+		if knowledgeBase {
+			if options {
+				excludes := (options.HasProp("exclude") ? options.exclude : false)
+				includes := (options.HasProp("include") ? options.include : false)
+
+				if options.HasProp("filter")
+					filter := options.filter
+			}
+			else {
+				excludes := false
+				includes := false
+			}
+
 			for key, value in knowledgeBase.Facts.Facts {
 				skip := false
 
-				for ignore, skipped in filter
-					if (InStr(key, skipped) == 1)
+				if includes {
+					include := false
+
+					for ignore, candidate in includes
+						if (InStr(key, candidate) == 1) {
+							include := true
+
+							break
+						}
+
+					if !include
 						skip := true
+				}
+
+				if (excludes && !skip)
+					for ignore, candidate in excludes
+						if (InStr(key, candidate) == 1) {
+							skip := true
+
+							break
+						}
+
+				if (filter && !skip && !filter.Call(key, value))
+					skip := true
 
 				if !skip {
 					switch key, false {
@@ -797,6 +831,7 @@ class RaceAssistant extends ConfigurationItem {
 					text .= (key . " = " . value . "`n")
 				}
 			}
+		}
 
 		return text
 	}

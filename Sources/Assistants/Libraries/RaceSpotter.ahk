@@ -1131,7 +1131,7 @@ class RaceSpotter extends GridRaceAssistant {
 	}
 
 	createTelemetryData() {
-		return super.createTelemetryData(["Car"])
+		return super.createTelemetryData({exclude: ["Car"]})
 	}
 
 	focusCarRecognized(words) {

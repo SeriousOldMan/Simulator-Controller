@@ -351,7 +351,7 @@ class RaceEngineer extends RaceAssistant {
 	}
 
 	createTelemetryData() {
-		return super.createTelemetryData(["Car", "Standings", "Position"])
+		return super.createTelemetryData({exclude: ["Car", "Standings", "Position"]})
 	}
 
 	requestInformation(category, arguments*) {

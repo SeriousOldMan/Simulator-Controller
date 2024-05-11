@@ -372,11 +372,11 @@ Using *Activation Command* you can supply a keyword or a complete phrase to focu
 
 Note: You can use the [Trigger Detector Tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#trigger-detector-tool) to find out, which button codes your connected controller actually use, by clicking the small button on the right side of the *Push-To-Talk* entry field. If you push a simple button on your external controller or a single key on your keyboard, the corresponding hotkey name will be inserted into the *Push-To-Talk* edit field.
 
-##### Boosting Assistant conversation using AI
+##### Boosting conversation with an LLM
 
-The voice recognition for all Assistants, except the Driving Coach is normally pattern-based. [Here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Engineer-Commands-(EN)) you can find a documentation for the definition of the recognized commands of the Race Engineer, for example, and similar documentation is available for the other Assistants as well. The speech output of all Assistants is also prep-programmed with several different phrases for each message, to create at least a little variation.
+The voice recognition for all Assistants except the Driving Coach is normally pattern-based. [Here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Engineer-Commands-(EN)), for example, you can find a documentation for the definition of the recognized commands of the Race Engineer and similar documentation is available for the other Assistants as well. The speech output of all Assistants is also prep-programmed with several different phrases for each message, to create at least a little variation.
 
-Said this, it is clear, that the interaction with the Assistants, will not feel absolutely natural. But using the latest development in AI with LLMs (aka large language model) it became possible to improve the speech capabilities of the Assistants even further. Whenever you see a small button with an icon which looks like a small rocket, you configure AI pre- and post-processing for voice control and speech output.
+Said this, it is clear, that the interaction with the Assistants, although already impressive, will not feel absolutely natural in most cases. But using the latest development in AI with LLMs (aka large language model) it became possible to improve the conversation capabilities of the Assistants even further. Whenever you see a small button with an icon which looks like a launching space rocket, you can configure AI pre- and post-processing for voice recognition, speech output and general conversation.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%207%20Speech%20Improvement.JPG)
 
@@ -398,7 +398,7 @@ Several boosters are available at the moment:
 
   3. Normally an Assistant will tell you that he didn't understand you, when none of the defined commands has matched the spoken command. Using the *Conversation* booster a special mode can be activated, that will redirect all non-recognized commands to an LLM for interpretation and processing. This LLM will have full access to the knowledebase of the Assistant and will therefore be able to run a knowledgeable conversation with you.
   
-Important: Using a GPT service like OpenAI may impose some costs, and running an LLM locally on your PC will require a very powerful system, especially when doing this while on the track. Therefore, configuring speech improvement is fully optional.
+Important: Using a GPT service like OpenAI may impose some costs, and running an LLM locally on your PC will require a very powerful system, especially when doing this while on the track. Therefore, configuring conversation booster is fully optional.
 
 #### Tab *Plugins*
 

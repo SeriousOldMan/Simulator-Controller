@@ -1936,7 +1936,7 @@ class VoiceBoosterEditor extends ConfiguratorPanel {
 
 		editorGui.SetFont("Norm", "Arial")
 
-		editorGui.Add("Documentation", "x178 YP+20 w128 H:Center Center", translate("Assistant Booster")
+		editorGui.Add("Documentation", "x178 YP+20 w128 H:Center Center", translate("Conversation Booster")
 					, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control")
 
 		editorGui.SetFont("Norm", "Arial")

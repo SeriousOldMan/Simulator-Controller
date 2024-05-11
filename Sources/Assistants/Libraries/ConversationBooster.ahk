@@ -1,5 +1,5 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Assistant Booster               ;;;
+;;;   Modular Simulator Controller System - Conversation Booster            ;;;
 ;;;                                                                         ;;;
 ;;;   Provides several GPT-based Pre- and Postprocessors for speech output, ;;;
 ;;;   voice recognition and conversation.                                   ;;;
@@ -27,7 +27,7 @@
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class AsssistantBooster extends ConfigurationItem {
+class ConversationBooster extends ConfigurationItem {
 	iOptions := CaseInsenseMap()
 
 	iConnector := false
@@ -126,10 +126,10 @@ class AsssistantBooster extends ConfigurationItem {
 
 		super.loadFromConfiguration(configuration)
 
-		options["Language"] := getMultiMapValue(configuration, "Assistant Booster", descriptor . ".Language", this.Language)
-		options["Service"] := getMultiMapValue(configuration, "Assistant Booster", descriptor . ".Service", false)
-		options["Model"] := getMultiMapValue(configuration, "Assistant Booster", descriptor . ".Model", false)
-		options["MaxTokens"] := getMultiMapValue(configuration, "Assistant Booster", descriptor . ".MaxTokens", 1024)
+		options["Language"] := getMultiMapValue(configuration, "Conversation Booster", descriptor . ".Language", this.Language)
+		options["Service"] := getMultiMapValue(configuration, "Conversation Booster", descriptor . ".Service", false)
+		options["Model"] := getMultiMapValue(configuration, "Conversation Booster", descriptor . ".Model", false)
+		options["MaxTokens"] := getMultiMapValue(configuration, "Conversation Booster", descriptor . ".MaxTokens", 1024)
 	}
 
 	getInstructions() {
@@ -147,7 +147,7 @@ class AsssistantBooster extends ConfigurationItem {
 			service := string2Values("|", service)
 
 			if !inList(this.Providers, service[1])
-				throw "Unsupported service detected in AsssistantBooster.startBooster..."
+				throw "Unsupported service detected in ConversationBooster.startBooster..."
 
 			if (service[1] = "LLM Runtime")
 				this.iConnector := LLMConnector.LLMRuntimeConnector(this, this.Options["Model"])
@@ -160,18 +160,18 @@ class AsssistantBooster extends ConfigurationItem {
 				catch Any as exception {
 					logError(exception)
 
-					throw "Unsupported service detected in AsssistantBooster.startBooster..."
+					throw "Unsupported service detected in ConversationBooster.startBooster..."
 				}
 
 			this.Connector.MaxTokens := this.MaxTokens
 			this.Connector.MaxHistory := 0
 		}
 		else
-			throw "Unsupported service detected in AsssistantBooster.startBooster..."
+			throw "Unsupported service detected in ConversationBooster.startBooster..."
 	}
 }
 
-class SpeechBooster extends AsssistantBooster {
+class SpeechBooster extends ConversationBooster {
 	Probability {
 		Get {
 			return this.Options["Probability"]
@@ -184,11 +184,11 @@ class SpeechBooster extends AsssistantBooster {
 
 		super.loadFromConfiguration(configuration)
 
-		options["Active"] := getMultiMapValue(configuration, "Assistant Booster", descriptor . ".Speaker", true)
-		options["Probability"] := getMultiMapValue(configuration, "Assistant Booster", descriptor . ".SpeakerProbability"
-														, getMultiMapValue(configuration, "Assistant Booster", descriptor . ".Probability", 0.5))
-		options["Temperature"] := getMultiMapValue(configuration, "Assistant Booster", descriptor . ".SpeakerTemperature"
-												 , getMultiMapValue(configuration, "Assistant Booster", descriptor . ".Temperature", 0.5))
+		options["Active"] := getMultiMapValue(configuration, "Conversation Booster", descriptor . ".Speaker", true)
+		options["Probability"] := getMultiMapValue(configuration, "Conversation Booster", descriptor . ".SpeakerProbability"
+																, getMultiMapValue(configuration, "Conversation Booster", descriptor . ".Probability", 0.5))
+		options["Temperature"] := getMultiMapValue(configuration, "Conversation Booster", descriptor . ".SpeakerTemperature"
+																, getMultiMapValue(configuration, "Conversation Booster", descriptor . ".Temperature", 0.5))
 	}
 
 	speak(text, options := false) {
@@ -200,9 +200,9 @@ class SpeechBooster extends AsssistantBooster {
 			instructions := CaseInsenseMap()
 
 			for code, language in availableLanguages() {
-				languageInstructions := readMultiMap(kTranslationsDirectory . "Assistant Booster.instructions." . code)
+				languageInstructions := readMultiMap(kTranslationsDirectory . "Conversation Booster.instructions." . code)
 
-				addMultiMapValues(languageInstructions, readMultiMap(kUserTranslationsDirectory . "Assistant Booster.instructions." . code))
+				addMultiMapValues(languageInstructions, readMultiMap(kUserTranslationsDirectory . "Conversation Booster.instructions." . code))
 
 				instructions[code] := languageInstructions
 			}
@@ -261,7 +261,7 @@ class SpeechBooster extends AsssistantBooster {
 	}
 }
 
-class RecognitionBooster extends AsssistantBooster {
+class RecognitionBooster extends ConversationBooster {
 	iCompiler := SpeechRecognizer("Compiler")
 
 	iChoices := CaseInsenseMap()
@@ -305,9 +305,9 @@ class RecognitionBooster extends AsssistantBooster {
 
 		super.loadFromConfiguration(configuration)
 
-		options["Active"] := getMultiMapValue(configuration, "Assistant Booster", descriptor . ".Listener", false)
-		options["Mode"] := getMultiMapValue(configuration, "Assistant Booster", descriptor . ".ListenerMode", "Unknown")
-		options["Temperature"] := getMultiMapValue(configuration, "Assistant Booster", descriptor . ".Temperature", 0.2)
+		options["Active"] := getMultiMapValue(configuration, "Conversation Booster", descriptor . ".Listener", false)
+		options["Mode"] := getMultiMapValue(configuration, "Conversation Booster", descriptor . ".ListenerMode", "Unknown")
+		options["Temperature"] := getMultiMapValue(configuration, "Conversation Booster", descriptor . ".Temperature", 0.2)
 	}
 
 	setChoices(name, choices) {
@@ -330,7 +330,7 @@ class RecognitionBooster extends AsssistantBooster {
 		}
 	}
 
-	listen(text, options := false) {
+	recognize(text, options := false) {
 		local commands := this.Commands
 		local doRecognize, code, language, fileName, languageInstructions, instruction
 		local phrase, name, grammar, phrases, candidates, numCandidates
@@ -341,9 +341,9 @@ class RecognitionBooster extends AsssistantBooster {
 			instructions := CaseInsenseMap()
 
 			for code, language in availableLanguages() {
-				languageInstructions := readMultiMap(kTranslationsDirectory . "Assistant Booster.instructions." . code)
+				languageInstructions := readMultiMap(kTranslationsDirectory . "Conversation Booster.instructions." . code)
 
-				addMultiMapValues(languageInstructions, readMultiMap(kUserTranslationsDirectory . "Assistant Booster.instructions." . code))
+				addMultiMapValues(languageInstructions, readMultiMap(kUserTranslationsDirectory . "Conversation Booster.instructions." . code))
 
 				instructions[code] := languageInstructions
 			}
@@ -426,7 +426,7 @@ class RecognitionBooster extends AsssistantBooster {
 	}
 }
 
-class ConversationBooster extends AsssistantBooster {
+class ChatBooster extends ConversationBooster {
 	MaxHistory {
 		Get {
 			return this.Options["MaxHistory"]
@@ -439,9 +439,9 @@ class ConversationBooster extends AsssistantBooster {
 
 		super.loadFromConfiguration(configuration)
 
-		options["Active"] := getMultiMapValue(configuration, "Assistant Booster", descriptor . ".Conversation", false)
-		options["MaxHistory"] := getMultiMapValue(configuration, "Assistant Booster", descriptor . ".ConversationMaxHistory", 3)
-		options["Temperature"] := getMultiMapValue(configuration, "Assistant Booster", descriptor . ".ConversationTemperature", 0.2)
+		options["Active"] := getMultiMapValue(configuration, "Conversation Booster", descriptor . ".Conversation", false)
+		options["MaxHistory"] := getMultiMapValue(configuration, "Conversation Booster", descriptor . ".ConversationMaxHistory", 3)
+		options["Temperature"] := getMultiMapValue(configuration, "Conversation Booster", descriptor . ".ConversationTemperature", 0.2)
 	}
 
 	startBooster() {
@@ -461,9 +461,9 @@ class ConversationBooster extends AsssistantBooster {
 			instructions := CaseInsenseMap()
 
 			for code, language in availableLanguages() {
-				languageInstructions := readMultiMap(kTranslationsDirectory . "Assistant Booster.instructions." . code)
+				languageInstructions := readMultiMap(kTranslationsDirectory . "Conversation Booster.instructions." . code)
 
-				addMultiMapValues(languageInstructions, readMultiMap(kUserTranslationsDirectory . "Assistant Booster.instructions." . code))
+				addMultiMapValues(languageInstructions, readMultiMap(kUserTranslationsDirectory . "Conversation Booster.instructions." . code))
 
 				instructions[code] := languageInstructions
 			}

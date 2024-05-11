@@ -173,7 +173,7 @@ startupRaceStrategist() {
 							   , strategistName, strategistLanguage
 							   , strategistSynthesizer, strategistSpeaker, strategistSpeakerVocalics, strategistSpeakerBooster
 							   , strategistRecognizer, strategistListener, strategistListenerBooster, strategistConversationBooster
-							   ,strategistMuted, voiceServer)
+							   , strategistMuted, voiceServer)
 
 	RaceStrategist.Instance := strategist
 

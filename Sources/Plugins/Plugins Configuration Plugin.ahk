@@ -10,6 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\Configuration\Libraries\ControllerActionsEditor.ahk"
+#Include "..\Configuration\Libraries\ConversationBoosterEditor.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -99,16 +100,20 @@ class PluginsConfigurator extends ConfigurationItemList {
 		window.Add("ListView", "x16 y80 w457 h245 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr VpluginsListView", collect(["Active?", "Plugin", "Simulator(s)", "Arguments"], translate))
 
 		window.Add("Text", "x16 y335 w86 h23 Y:Move +0x200", translate("Plugin"))
-		window.Add("Edit", "x110 y335 w154 h21 Y:Move W:Grow(0.2) VpluginEdit")
+		window.Add("Edit", "x110 y335 w154 h21 Y:Move W:Grow(0.2) VpluginEdit").OnEvent("Change", (*) => this.updateState())
 
 		window.Add("CheckBox", "x110 y359 w120 h23 Y:Move VpluginActivatedCheck", translate("Activated?"))
 
 		window.Add("Text", "x16 y383 w89 h23 Y:Move +0x200", translate("Simulator(s)"))
 		window.Add("Edit", "x110 y383 w363 h21 Y:Move W:Grow(0.2) VpluginSimulatorsEdit")
 
+		widget1 := window.Add("Button", "x450 y383 w23 h23 X:Move Y:Move vpluginBoosterButton")
+		widget1.OnEvent("Click", (*) => this.editBooster())
+		setButtonIcon(widget1, kIconsDirectory . "Booster.ico", 1, "L4 T4 R4 B4")
+
 		window.SetFont("Underline", "Arial")
 
-		window.Add("Text", "x16 y408 w86 h23 +0x200 Y:Move c" . window.Theme.LinkColor, translate("Arguments")).OnEvent("Click", openPluginsModesDocumentation)
+		window.Add("Text", "x16 y408 w80 h23 +0x200 Y:Move c" . window.Theme.LinkColor, translate("Arguments")).OnEvent("Click", openPluginsModesDocumentation)
 
 		window.SetFont("Norm", "Arial")
 
@@ -165,6 +170,11 @@ class PluginsConfigurator extends ConfigurationItemList {
 			this.Control["pluginActivatedCheck"].Enabled := true
 			this.Control["pluginSimulatorsEdit"].Enabled := true
 		}
+
+		if inList(remove(kRaceAssistants, "Driving Coach"), this.Control["pluginEdit"].Text)
+			this.Control["pluginBoosterButton"].Enabled := true
+		else
+			this.Control["pluginBoosterButton"].Enabled := false
 	}
 
 	loadList(items) {
@@ -249,6 +259,92 @@ class PluginsConfigurator extends ConfigurationItemList {
 			OnMessage(0x44, translateOkButton, 0)
 
 			return false
+		}
+	}
+
+	editBooster() {
+		local assistant := this.Control["pluginEdit"].Text
+		local window := this.Window
+		local configuration, setup, speakerBooster, listenerBooster, conversationBooster
+
+		if !inList(kRaceAssistants, assistant)
+			return
+
+		window.Block()
+
+		try {
+			/*
+			this.saveSetup()
+
+			configuration := readMultiMap(kUserHomeDirectory . "Setup\Conversation Booster Configuration.ini")
+
+			setMultiMapValues(configuration, "Conversation Booster", getMultiMapValues(kSimulatorConfiguration, "Conversation Booster"), false)
+
+			setup := this.assistantSetup(assistant)
+
+			if (setup.HasProp("SpeakerBooster") && setup.SpeakerBooster) {
+				setMultiMapValue(configuration, "Conversation Booster", assistant . ".Service", setup.SpeakerBooster["Service"])
+				setMultiMapValue(configuration, "Conversation Booster", assistant . ".Model", setup.SpeakerBooster["Model"])
+				setMultiMapValue(configuration, "Conversation Booster", assistant . ".Speaker", setup.SpeakerBooster["Speaker"])
+				setMultiMapValue(configuration, "Conversation Booster", assistant . ".SpeakerProbability", setup.SpeakerBooster["SpeakerProbability"])
+				setMultiMapValue(configuration, "Conversation Booster", assistant . ".SpeakerTemperature", setup.SpeakerBooster["SpeakerTemperature"])
+			}
+
+			if (setup.HasProp("ListenerBooster") && setup.ListenerBooster) {
+				setMultiMapValue(configuration, "Conversation Booster", assistant . ".Service", setup.ListenerBooster["Service"])
+				setMultiMapValue(configuration, "Conversation Booster", assistant . ".Model", setup.ListenerBooster["Model"])
+				setMultiMapValue(configuration, "Conversation Booster", assistant . ".Listener", setup.ListenerBooster["Listener"])
+				setMultiMapValue(configuration, "Conversation Booster", assistant . ".ListenerMode", setup.ListenerBooster["ListenerMode"])
+				setMultiMapValue(configuration, "Conversation Booster", assistant . ".ListenerTemperature", setup.ListenerBooster["ListenerTemperature"])
+			}
+
+			if (setup.HasProp("ConversationBooster") && setup.ConversationBooster) {
+				setMultiMapValue(configuration, "Conversation Booster", assistant . ".Service", setup.ConversationBooster["Service"])
+				setMultiMapValue(configuration, "Conversation Booster", assistant . ".Model", setup.ConversationBooster["Model"])
+				setMultiMapValue(configuration, "Conversation Booster", assistant . ".Conversation", setup.ConversationBooster["Conversation"])
+				setMultiMapValue(configuration, "Conversation Booster", assistant . ".ConversationMaxHistory", setup.ConversationBooster["ConversationMaxHistory"])
+				setMultiMapValue(configuration, "Conversation Booster", assistant . ".ConversationTemperature", setup.ConversationBooster["ConversationTemperature"])
+			}
+			*/
+
+			configuration := newMultiMap()
+
+			configuration := ConversationBoosterEditor(assistant, configuration).editBooster(window)
+
+			/*
+			if configuration {
+				writeMultiMap(kUserHomeDirectory . "Setup\Conversation Booster Configuration.ini", configuration)
+
+				speakerBooster := Map("Service", getMultiMapValue(configuration, "Conversation Booster", assistant . ".Service")
+									 , "Model", getMultiMapValue(configuration, "Conversation Booster", assistant . ".Model")
+									 , "Speaker", getMultiMapValue(configuration, "Conversation Booster", assistant . ".Speaker")
+									 , "SpeakerProbability", getMultiMapValue(configuration, "Conversation Booster", assistant . ".SpeakerProbability"), "SpeakerProbability", getMultiMapValue(configuration, "Conversation Booster", assistant . ".SpeakerProbability")
+									 , "SpeakerTemperature", getMultiMapValue(configuration, "Conversation Booster", assistant . ".SpeakerTemperature"))
+
+				wizard.setModuleValue(assistant, "Speaker Booster", map2String("|||", "--->>>", speakerBooster))
+
+				listenerBooster := Map("Service", getMultiMapValue(configuration, "Conversation Booster", assistant . ".Service")
+									  , "Model", getMultiMapValue(configuration, "Conversation Booster", assistant . ".Model")
+									  , "Listener", getMultiMapValue(configuration, "Conversation Booster", assistant . ".Listener")
+									  , "ListenerMode", getMultiMapValue(configuration, "Conversation Booster", assistant . ".ListenerMode")
+									  , "ListenerTemperature", getMultiMapValue(configuration, "Conversation Booster", assistant . ".ListenerTemperature"))
+
+				wizard.setModuleValue(assistant, "Listener Booster", map2String("|||", "--->>>", listenerBooster))
+
+				conversationBooster := Map("Service", getMultiMapValue(configuration, "Conversation Booster", assistant . ".Service")
+										  , "Model", getMultiMapValue(configuration, "Conversation Booster", assistant . ".Model")
+										  , "Conversation", getMultiMapValue(configuration, "Conversation Booster", assistant . ".Conversation")
+										  , "ConversationMaxHistory", getMultiMapValue(configuration, "Conversation Booster", assistant . ".ConversationMaxHistory")
+										  , "ConversationTemperature", getMultiMapValue(configuration, "Conversation Booster", assistant . ".ConversationTemperature"))
+
+				wizard.setModuleValue(assistant, "Conversation Booster", map2String("|||", "--->>>", conversationBooster))
+
+				this.loadAssistant(assistant)
+			}
+			*/
+		}
+		finally {
+			window.Unblock()
 		}
 	}
 }

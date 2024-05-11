@@ -3,7 +3,7 @@ Version=5.7.2.0-dev
 Target=5.7.2.0-release
 Date=05/11/2024
 Download=
-Changes=New telemetry instruction for the Driving Coach, General conversation capability for all Assistants using GPT technology, Fixed installation of French language pack
+Changes=New telemetry instruction for the Driving Coach, General conversation capability for all Assistants using GPT technology, Fixed installation of French language pack, Conversation Booster configuration integrated in "Simulator Configuration"
 Components=Media->5.6.1,Configuration->5.6.4,Utilities->5.4.8
 [Release]
 Version=5.7.1.0-release

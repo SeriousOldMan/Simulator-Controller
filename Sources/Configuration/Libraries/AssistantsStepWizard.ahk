@@ -152,8 +152,6 @@ class AssistantsStepWizard extends ActionsStepWizard {
 					if speakerBooster {
 						speakerBooster := string2Map("|||", "--->>>", speakerBooster)
 
-						arguments .= ("; raceAssistantSpeakerBooster: " . assistant)
-
 						if !speakerBooster.Has("Speaker")
 							speakerBooster["Speaker"] := true
 
@@ -162,6 +160,9 @@ class AssistantsStepWizard extends ActionsStepWizard {
 
 						if !speakerBooster.Has("SpeakerTemperature")
 							speakerBooster["SpeakerTemperature"] := (speakerBooster.Has("Temperature") ? speakerBooster["Temperature"] : 0.5)
+
+						if speakerBooster["Speaker"]
+							arguments .= ("; raceAssistantSpeakerBooster: " . assistant)
 
 						setMultiMapValue(configuration, "Conversation Booster", assistant . ".Service", speakerBooster["Service"])
 						setMultiMapValue(configuration, "Conversation Booster", assistant . ".Model", speakerBooster["Model"])
@@ -176,7 +177,17 @@ class AssistantsStepWizard extends ActionsStepWizard {
 					if listenerBooster {
 						listenerBooster := string2Map("|||", "--->>>", listenerBooster)
 
-						arguments .= ("; raceAssistantListenerBooster: " . assistant)
+						if !listenerBooster.Has("Listener")
+							listenerBooster["Listener"] := false
+
+						if !listenerBooster.Has("ListenerMode")
+							listenerBooster["ListenerMode"] := "Unknown"
+
+						if !listenerBooster.Has("ListenerTemperature")
+							listenerBooster["ListenerTemperature"] := 0.5
+
+						if listenerBooster["Listener"]
+							arguments .= ("; raceAssistantListenerBooster: " . assistant)
 
 						setMultiMapValue(configuration, "Conversation Booster", assistant . ".Service", listenerBooster["Service"])
 						setMultiMapValue(configuration, "Conversation Booster", assistant . ".Model", listenerBooster["Model"])
@@ -191,8 +202,6 @@ class AssistantsStepWizard extends ActionsStepWizard {
 					if conversationBooster {
 						conversationBooster := string2Map("|||", "--->>>", conversationBooster)
 
-						arguments .= ("; raceAssistantConversationBooster: " . assistant)
-
 						if !conversationBooster.Has("Conversation")
 							conversationBooster["Conversation"] := false
 
@@ -201,6 +210,9 @@ class AssistantsStepWizard extends ActionsStepWizard {
 
 						if !conversationBooster.Has("ConversationMaxHistory")
 							conversationBooster["ConversationMaxHistory"] := 3
+
+						if conversationBooster["Conversation"]
+							arguments .= ("; raceAssistantConversationBooster: " . assistant)
 
 						setMultiMapValue(configuration, "Conversation Booster", assistant . ".Service", conversationBooster["Service"])
 						setMultiMapValue(configuration, "Conversation Booster", assistant . ".Model", conversationBooster["Model"])

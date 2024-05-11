@@ -531,8 +531,6 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		super.saveToConfiguration(configuration)
 
-		setMultiMapValues(configuration, "Conversation Booster", getMultiMapValues(this.Configuration, "Conversation Booster"), false)
-
 		setMultiMapValue(configuration, "Voice Control", "Language", this.getCurrentLanguage())
 
 		if (windowsSpeaker = translate("Random"))

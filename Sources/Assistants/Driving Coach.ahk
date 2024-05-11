@@ -171,8 +171,8 @@ startupDrivingCoach() {
 	coach := DrivingCoach(kSimulatorConfiguration
 						, remotePID ? DrivingCoach.DrivingCoachRemoteHandler(remotePID) : false
 						, coachName, coachLanguage
-						, coachSynthesizer, coachSpeaker, coachSpeakerVocalics, coachSpeakerBooster, coachConversationBooster
-						, coachRecognizer, coachListener, coachListenerBooster, coachMuted, voiceServer)
+						, coachSynthesizer, coachSpeaker, coachSpeakerVocalics, coachSpeakerBooster
+						, coachRecognizer, coachListener, coachListenerBooster, coachConversationBooster, coachMuted, voiceServer)
 
 	DrivingCoach.Instance := coach
 

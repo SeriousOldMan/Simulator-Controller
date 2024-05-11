@@ -993,62 +993,62 @@ class BasicStepWizard extends StepWizard {
 		try {
 			this.saveSetup()
 
-			configuration := readMultiMap(kUserHomeDirectory . "Setup\Assistant Booster Configuration.ini")
+			configuration := readMultiMap(kUserHomeDirectory . "Setup\Conversation Booster Configuration.ini")
 
-			setMultiMapValues(configuration, "Assistant Booster", getMultiMapValues(kSimulatorConfiguration, "Assistant Booster"), false)
+			setMultiMapValues(configuration, "Conversation Booster", getMultiMapValues(kSimulatorConfiguration, "Conversation Booster"), false)
 
 			setup := this.assistantSetup(assistant)
 
 			if (setup.HasProp("SpeakerBooster") && setup.SpeakerBooster) {
-				setMultiMapValue(configuration, "Assistant Booster", assistant . ".Service", setup.SpeakerBooster["Service"])
-				setMultiMapValue(configuration, "Assistant Booster", assistant . ".Model", setup.SpeakerBooster["Model"])
-				setMultiMapValue(configuration, "Assistant Booster", assistant . ".Speaker", setup.SpeakerBooster["Speaker"])
-				setMultiMapValue(configuration, "Assistant Booster", assistant . ".SpeakerProbability", setup.SpeakerBooster["SpeakerProbability"])
-				setMultiMapValue(configuration, "Assistant Booster", assistant . ".SpeakerTemperature", setup.SpeakerBooster["SpeakerTemperature"])
+				setMultiMapValue(configuration, "Conversation Booster", assistant . ".Service", setup.SpeakerBooster["Service"])
+				setMultiMapValue(configuration, "Conversation Booster", assistant . ".Model", setup.SpeakerBooster["Model"])
+				setMultiMapValue(configuration, "Conversation Booster", assistant . ".Speaker", setup.SpeakerBooster["Speaker"])
+				setMultiMapValue(configuration, "Conversation Booster", assistant . ".SpeakerProbability", setup.SpeakerBooster["SpeakerProbability"])
+				setMultiMapValue(configuration, "Conversation Booster", assistant . ".SpeakerTemperature", setup.SpeakerBooster["SpeakerTemperature"])
 			}
 
 			if (setup.HasProp("ListenerBooster") && setup.ListenerBooster) {
-				setMultiMapValue(configuration, "Assistant Booster", assistant . ".Service", setup.ListenerBooster["Service"])
-				setMultiMapValue(configuration, "Assistant Booster", assistant . ".Model", setup.ListenerBooster["Model"])
-				setMultiMapValue(configuration, "Assistant Booster", assistant . ".Listener", setup.ListenerBooster["Listener"])
-				setMultiMapValue(configuration, "Assistant Booster", assistant . ".ListenerMode", setup.ListenerBooster["ListenerMode"])
-				setMultiMapValue(configuration, "Assistant Booster", assistant . ".ListenerTemperature", setup.ListenerBooster["ListenerTemperature"])
+				setMultiMapValue(configuration, "Conversation Booster", assistant . ".Service", setup.ListenerBooster["Service"])
+				setMultiMapValue(configuration, "Conversation Booster", assistant . ".Model", setup.ListenerBooster["Model"])
+				setMultiMapValue(configuration, "Conversation Booster", assistant . ".Listener", setup.ListenerBooster["Listener"])
+				setMultiMapValue(configuration, "Conversation Booster", assistant . ".ListenerMode", setup.ListenerBooster["ListenerMode"])
+				setMultiMapValue(configuration, "Conversation Booster", assistant . ".ListenerTemperature", setup.ListenerBooster["ListenerTemperature"])
 			}
 
 			if (setup.HasProp("ConversationBooster") && setup.ConversationBooster) {
-				setMultiMapValue(configuration, "Assistant Booster", assistant . ".Service", setup.ConversationBooster["Service"])
-				setMultiMapValue(configuration, "Assistant Booster", assistant . ".Model", setup.ConversationBooster["Model"])
-				setMultiMapValue(configuration, "Assistant Booster", assistant . ".Conversation", setup.ConversationBooster["Conversation"])
-				setMultiMapValue(configuration, "Assistant Booster", assistant . ".ConversationMaxHistory", setup.ConversationBooster["ConversationMaxHistory"])
-				setMultiMapValue(configuration, "Assistant Booster", assistant . ".ConversationTemperature", setup.ConversationBooster["ConversationTemperature"])
+				setMultiMapValue(configuration, "Conversation Booster", assistant . ".Service", setup.ConversationBooster["Service"])
+				setMultiMapValue(configuration, "Conversation Booster", assistant . ".Model", setup.ConversationBooster["Model"])
+				setMultiMapValue(configuration, "Conversation Booster", assistant . ".Conversation", setup.ConversationBooster["Conversation"])
+				setMultiMapValue(configuration, "Conversation Booster", assistant . ".ConversationMaxHistory", setup.ConversationBooster["ConversationMaxHistory"])
+				setMultiMapValue(configuration, "Conversation Booster", assistant . ".ConversationTemperature", setup.ConversationBooster["ConversationTemperature"])
 			}
 
 			configuration := VoiceBoosterEditor(this, assistant, configuration).editBooster(window)
 
 			if configuration {
-				writeMultiMap(kUserHomeDirectory . "Setup\Assistant Booster Configuration.ini", configuration)
+				writeMultiMap(kUserHomeDirectory . "Setup\Conversation Booster Configuration.ini", configuration)
 
-				speakerBooster := Map("Service", getMultiMapValue(configuration, "Assistant Booster", assistant . ".Service")
-									 , "Model", getMultiMapValue(configuration, "Assistant Booster", assistant . ".Model")
-									 , "Speaker", getMultiMapValue(configuration, "Assistant Booster", assistant . ".Speaker")
-									 , "SpeakerProbability", getMultiMapValue(configuration, "Assistant Booster", assistant . ".SpeakerProbability"), "SpeakerProbability", getMultiMapValue(configuration, "Assistant Booster", assistant . ".SpeakerProbability")
-									 , "SpeakerTemperature", getMultiMapValue(configuration, "Assistant Booster", assistant . ".SpeakerTemperature"))
+				speakerBooster := Map("Service", getMultiMapValue(configuration, "Conversation Booster", assistant . ".Service")
+									 , "Model", getMultiMapValue(configuration, "Conversation Booster", assistant . ".Model")
+									 , "Speaker", getMultiMapValue(configuration, "Conversation Booster", assistant . ".Speaker")
+									 , "SpeakerProbability", getMultiMapValue(configuration, "Conversation Booster", assistant . ".SpeakerProbability"), "SpeakerProbability", getMultiMapValue(configuration, "Conversation Booster", assistant . ".SpeakerProbability")
+									 , "SpeakerTemperature", getMultiMapValue(configuration, "Conversation Booster", assistant . ".SpeakerTemperature"))
 
 				wizard.setModuleValue(assistant, "Speaker Booster", map2String("|||", "--->>>", speakerBooster))
 
-				listenerBooster := Map("Service", getMultiMapValue(configuration, "Assistant Booster", assistant . ".Service")
-									  , "Model", getMultiMapValue(configuration, "Assistant Booster", assistant . ".Model")
-									  , "Listener", getMultiMapValue(configuration, "Assistant Booster", assistant . ".Listener")
-									  , "ListenerMode", getMultiMapValue(configuration, "Assistant Booster", assistant . ".ListenerMode")
-									  , "ListenerTemperature", getMultiMapValue(configuration, "Assistant Booster", assistant . ".ListenerTemperature"))
+				listenerBooster := Map("Service", getMultiMapValue(configuration, "Conversation Booster", assistant . ".Service")
+									  , "Model", getMultiMapValue(configuration, "Conversation Booster", assistant . ".Model")
+									  , "Listener", getMultiMapValue(configuration, "Conversation Booster", assistant . ".Listener")
+									  , "ListenerMode", getMultiMapValue(configuration, "Conversation Booster", assistant . ".ListenerMode")
+									  , "ListenerTemperature", getMultiMapValue(configuration, "Conversation Booster", assistant . ".ListenerTemperature"))
 
 				wizard.setModuleValue(assistant, "Listener Booster", map2String("|||", "--->>>", listenerBooster))
 
-				conversationBooster := Map("Service", getMultiMapValue(configuration, "Assistant Booster", assistant . ".Service")
-										  , "Model", getMultiMapValue(configuration, "Assistant Booster", assistant . ".Model")
-										  , "Conversation", getMultiMapValue(configuration, "Assistant Booster", assistant . ".Conversation")
-										  , "ConversationMaxHistory", getMultiMapValue(configuration, "Assistant Booster", assistant . ".ConversationMaxHistory")
-										  , "ConversationTemperature", getMultiMapValue(configuration, "Assistant Booster", assistant . ".ConversationTemperature"))
+				conversationBooster := Map("Service", getMultiMapValue(configuration, "Conversation Booster", assistant . ".Service")
+										  , "Model", getMultiMapValue(configuration, "Conversation Booster", assistant . ".Model")
+										  , "Conversation", getMultiMapValue(configuration, "Conversation Booster", assistant . ".Conversation")
+										  , "ConversationMaxHistory", getMultiMapValue(configuration, "Conversation Booster", assistant . ".ConversationMaxHistory")
+										  , "ConversationTemperature", getMultiMapValue(configuration, "Conversation Booster", assistant . ".ConversationTemperature"))
 
 				wizard.setModuleValue(assistant, "Conversation Booster", map2String("|||", "--->>>", conversationBooster))
 
@@ -2067,7 +2067,7 @@ class VoiceBoosterEditor extends ConfiguratorPanel {
 
 		super.loadFromConfiguration(configuration)
 
-		service := getMultiMapValue(configuration, "Assistant Booster", this.Assistant . ".Service", false)
+		service := getMultiMapValue(configuration, "Conversation Booster", this.Assistant . ".Service", false)
 
 		this.iCurrentProvider := (service ? string2Values("|", service)[1] : false)
 
@@ -2075,20 +2075,20 @@ class VoiceBoosterEditor extends ConfiguratorPanel {
 			providerConfiguration := CaseInsenseMap()
 
 			if (provider = this.iCurrentProvider) {
-				providerConfiguration["Model"] := getMultiMapValue(configuration, "Assistant Booster", this.Assistant . ".Model", defaults["Model"])
-				providerConfiguration["MaxTokens"] := getMultiMapValue(configuration, "Assistant Booster", this.Assistant . ".MaxTokens", defaults["MaxTokens"])
+				providerConfiguration["Model"] := getMultiMapValue(configuration, "Conversation Booster", this.Assistant . ".Model", defaults["Model"])
+				providerConfiguration["MaxTokens"] := getMultiMapValue(configuration, "Conversation Booster", this.Assistant . ".MaxTokens", defaults["MaxTokens"])
 
-				providerConfiguration["Speaker"] := getMultiMapValue(configuration, "Assistant Booster", this.Assistant . ".Speaker", defaults["Speaker"])
-				providerConfiguration["SpeakerProbability"] := getMultiMapValue(configuration, "Assistant Booster", this.Assistant . ".SpeakerProbability", defaults["SpeakerProbability"])
-				providerConfiguration["SpeakerTemperature"] := getMultiMapValue(configuration, "Assistant Booster", this.Assistant . ".SpeakerTemperature", defaults["SpeakerTemperature"])
+				providerConfiguration["Speaker"] := getMultiMapValue(configuration, "Conversation Booster", this.Assistant . ".Speaker", defaults["Speaker"])
+				providerConfiguration["SpeakerProbability"] := getMultiMapValue(configuration, "Conversation Booster", this.Assistant . ".SpeakerProbability", defaults["SpeakerProbability"])
+				providerConfiguration["SpeakerTemperature"] := getMultiMapValue(configuration, "Conversation Booster", this.Assistant . ".SpeakerTemperature", defaults["SpeakerTemperature"])
 
-				providerConfiguration["Listener"] := getMultiMapValue(configuration, "Assistant Booster", this.Assistant . ".Listener", defaults["Listener"])
-				providerConfiguration["ListenerMode"] := ["Always", "Unknown"][2 - (getMultiMapValue(configuration, "Assistant Booster", this.Assistant . ".ListenerMode", defaults["ListenerMode"]) = "Always")]
-				providerConfiguration["ListenerTemperature"] := getMultiMapValue(configuration, "Assistant Booster", this.Assistant . ".ListenerTemperature", defaults["ListenerTemperature"])
+				providerConfiguration["Listener"] := getMultiMapValue(configuration, "Conversation Booster", this.Assistant . ".Listener", defaults["Listener"])
+				providerConfiguration["ListenerMode"] := ["Always", "Unknown"][2 - (getMultiMapValue(configuration, "Conversation Booster", this.Assistant . ".ListenerMode", defaults["ListenerMode"]) = "Always")]
+				providerConfiguration["ListenerTemperature"] := getMultiMapValue(configuration, "Conversation Booster", this.Assistant . ".ListenerTemperature", defaults["ListenerTemperature"])
 
-				providerConfiguration["Conversation"] := getMultiMapValue(configuration, "Assistant Booster", this.Assistant . ".Conversation", defaults["Conversation"])
-				providerConfiguration["ConversationMaxHistory"] := getMultiMapValue(configuration, "Assistant Booster", this.Assistant . ".ConversationMaxHistory", defaults["ConversationMaxHistory"])
-				providerConfiguration["ConversationTemperature"] := getMultiMapValue(configuration, "Assistant Booster", this.Assistant . ".ConversationTemperature", defaults["ConversationTemperature"])
+				providerConfiguration["Conversation"] := getMultiMapValue(configuration, "Conversation Booster", this.Assistant . ".Conversation", defaults["Conversation"])
+				providerConfiguration["ConversationMaxHistory"] := getMultiMapValue(configuration, "Conversation Booster", this.Assistant . ".ConversationMaxHistory", defaults["ConversationMaxHistory"])
+				providerConfiguration["ConversationTemperature"] := getMultiMapValue(configuration, "Conversation Booster", this.Assistant . ".ConversationTemperature", defaults["ConversationTemperature"])
 
 				if (provider = "LLM Runtime") {
 					providerConfiguration["ServiceURL"] := ""
@@ -2101,7 +2101,7 @@ class VoiceBoosterEditor extends ConfiguratorPanel {
 			}
 			else {
 				for ignore, setting in ["ServiceURL", "ServiceKey", "Model", "MaxTokens"]
-					providerConfiguration[setting] := getMultiMapValue(configuration, "Assistant Booster", provider . "." . setting, defaults[setting])
+					providerConfiguration[setting] := getMultiMapValue(configuration, "Conversation Booster", provider . "." . setting, defaults[setting])
 
 				if !providerConfiguration["ServiceURL"]
 					switch provider, false {
@@ -2123,7 +2123,7 @@ class VoiceBoosterEditor extends ConfiguratorPanel {
 				for ignore, setting in ["Speaker", "SpeakerProbability", "SpeakerTemperature"
 									  , "Listener", "ListenerMode", "ListenerTemperature"
 									  , "Conversation", "ConversationMaxHistory", "ConversationTemperature"]
-					providerConfiguration[setting] := getMultiMapValue(configuration, "Assistant Booster", provider . "." . setting, defaults[setting])
+					providerConfiguration[setting] := getMultiMapValue(configuration, "Conversation Booster", provider . "." . setting, defaults[setting])
 			}
 
 			this.iProviderConfigurations[provider] := providerConfiguration
@@ -2141,15 +2141,15 @@ class VoiceBoosterEditor extends ConfiguratorPanel {
 			providerConfiguration := this.iProviderConfigurations[provider]
 
 			for ignore, setting in ["ServiceURL", "ServiceKey", "Model", "MaxTokens"]
-				setMultiMapValue(configuration, "Assistant Booster", provider . "." . setting, providerConfiguration[setting])
+				setMultiMapValue(configuration, "Conversation Booster", provider . "." . setting, providerConfiguration[setting])
 
 			for ignore, setting in ["Speaker", "SpeakerProbability", "SpeakerTemperature"
 								  , "Listener", "ListenerMode", "ListenerTemperature"
 								  , "Conversation", "ConversationMaxHistory", "ConversationTemperature"] {
-				setMultiMapValue(configuration, "Assistant Booster", provider . "." . setting, providerConfiguration[setting])
+				setMultiMapValue(configuration, "Conversation Booster", provider . "." . setting, providerConfiguration[setting])
 
 				if (provider = this.iCurrentProvider)
-					setMultiMapValue(configuration, "Assistant Booster", this.Assistant . "." . setting, providerConfiguration[setting])
+					setMultiMapValue(configuration, "Conversation Booster", this.Assistant . "." . setting, providerConfiguration[setting])
 			}
 		}
 
@@ -2159,20 +2159,20 @@ class VoiceBoosterEditor extends ConfiguratorPanel {
 			providerConfiguration := this.iProviderConfigurations[provider]
 
 			for ignore, setting in ["Model", "MaxTokens"]
-				setMultiMapValue(configuration, "Assistant Booster", this.Assistant . "." . setting, providerConfiguration[setting])
+				setMultiMapValue(configuration, "Conversation Booster", this.Assistant . "." . setting, providerConfiguration[setting])
 
 			if (provider = "LLM Runtime")
-				setMultiMapValue(configuration, "Assistant Booster", this.Assistant . ".Service", provider)
+				setMultiMapValue(configuration, "Conversation Booster", this.Assistant . ".Service", provider)
 			else
-				setMultiMapValue(configuration, "Assistant Booster", this.Assistant . ".Service"
+				setMultiMapValue(configuration, "Conversation Booster", this.Assistant . ".Service"
 											  , values2String("|", provider, Trim(providerConfiguration["ServiceURL"])
 																		   , Trim(providerConfiguration["ServiceKey"])))
 		}
 		else {
-			setMultiMapValue(configuration, "Assistant Booster", this.Assistant . ".Model", false)
-			setMultiMapValue(configuration, "Assistant Booster", this.Assistant . ".Service", false)
-			setMultiMapValue(configuration, "Assistant Booster", this.Assistant . ".SpeakerProbability", false)
-			setMultiMapValue(configuration, "Assistant Booster", this.Assistant . ".SpeakerTemperature", false)
+			setMultiMapValue(configuration, "Conversation Booster", this.Assistant . ".Model", false)
+			setMultiMapValue(configuration, "Conversation Booster", this.Assistant . ".Service", false)
+			setMultiMapValue(configuration, "Conversation Booster", this.Assistant . ".SpeakerProbability", false)
+			setMultiMapValue(configuration, "Conversation Booster", this.Assistant . ".SpeakerTemperature", false)
 		}
 	}
 

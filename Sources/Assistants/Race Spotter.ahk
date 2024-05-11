@@ -171,8 +171,8 @@ startupRaceSpotter() {
 	spotter := RaceSpotter(kSimulatorConfiguration
 						 , remotePID ? RaceSpotter.RaceSpotterRemoteHandler(remotePID) : false
 						 , spotterName, spotterLanguage
-						 , spotterSynthesizer, spotterSpeaker, spotterSpeakerVocalics, spotterSpeakerBooster, spotterConversationBooster
-						 , spotterRecognizer, spotterListener, spotterListenerBooster, spotterMuted, voiceServer)
+						 , spotterSynthesizer, spotterSpeaker, spotterSpeakerVocalics, spotterSpeakerBooster
+						 , spotterRecognizer, spotterListener, spotterListenerBooster, spotterConversationBooster, spotterMuted, voiceServer)
 
 	RaceSpotter.Instance := spotter
 

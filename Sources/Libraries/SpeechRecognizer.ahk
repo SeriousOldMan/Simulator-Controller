@@ -370,13 +370,15 @@ class SpeechRecognizer {
 
 				this.setChoices("Digit", choices)
 			}
-			else {
+			else if ((engine = "Server") || (engine = "Desktop")) {
 				instance := CLR_LoadLibrary(dllFile).CreateInstance("Speech.MicrosoftSpeechRecognizer")
 
 				this.Instance := instance
 
 				instance.SetEngine(engine)
 			}
+			else
+				throw Exception("Unsupported engine detected in SpeechRecognizer.__New...")
 
 			this.setMode(mode)
 

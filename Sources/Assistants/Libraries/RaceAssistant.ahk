@@ -565,7 +565,7 @@ class RaceAssistant extends ConfigurationItem {
 		writeMultiMap(kTempDirectory . assistantType . ".state", configuration)
 
 		if (this.Listener && options["ConversationBooster"]) {
-			booster := ConversationBooster(options["ConversationBooster"], this.Configuration, this.VoiceManager.Language)
+			booster := ChatBooster(options["ConversationBooster"], this.Configuration, this.VoiceManager.Language)
 
 			if (booster.Model && booster.Active)
 				this.iBooster := booster
@@ -593,18 +593,18 @@ class RaceAssistant extends ConfigurationItem {
 		options["PushToTalk"] := getMultiMapValue(configuration, "Voice Control", "PushToTalk", false)
 		options["PushToTalkMode"] := getMultiMapValue(configuration, "Voice Control", "PushToTalkMode", "Hold")
 
-		if getMultiMapValue(configuration, "Assistant Booster", this.AssistantType . ".Speaker", true)
-			options["SpeakerBooster"] := ((getMultiMapValue(configuration, "Assistant Booster", this.AssistantType . ".Model", kUndefined) != kUndefined) ? this.AssistantType : false)
+		if getMultiMapValue(configuration, "Conversation Booster", this.AssistantType . ".Speaker", true)
+			options["SpeakerBooster"] := ((getMultiMapValue(configuration, "Conversation Booster", this.AssistantType . ".Model", kUndefined) != kUndefined) ? this.AssistantType : false)
 		else
 			options["SpeakerBooster"] := false
 
-		if getMultiMapValue(configuration, "Assistant Booster", this.AssistantType . ".Listener", true)
-			options["ListenerBooster"] := ((getMultiMapValue(configuration, "Assistant Booster", this.AssistantType . ".Model", kUndefined) != kUndefined) ? this.AssistantType : false)
+		if getMultiMapValue(configuration, "Conversation Booster", this.AssistantType . ".Listener", true)
+			options["ListenerBooster"] := ((getMultiMapValue(configuration, "Conversation Booster", this.AssistantType . ".Model", kUndefined) != kUndefined) ? this.AssistantType : false)
 		else
 			options["ListenerBooster"] := false
 
-		if getMultiMapValue(configuration, "Assistant Booster", this.AssistantType . ".Conversation", true)
-			options["ConversationBooster"] := ((getMultiMapValue(configuration, "Assistant Booster", this.AssistantType . ".Model", kUndefined) != kUndefined) ? this.AssistantType : false)
+		if getMultiMapValue(configuration, "Conversation Booster", this.AssistantType . ".Conversation", true)
+			options["ConversationBooster"] := ((getMultiMapValue(configuration, "Conversation Booster", this.AssistantType . ".Model", kUndefined) != kUndefined) ? this.AssistantType : false)
 		else
 			options["ConversationBooster"] := false
 	}
@@ -840,7 +840,7 @@ class RaceAssistant extends ConfigurationItem {
 		if (grammar = "Text") {
 			if this.Booster {
 				text := this.Booster.talk(text, Map("Variables", {assistant: this.AssistantType, name: this.VoiceManager.Name
-																 , telemetry: this.createTelemetryData()}))
+																, telemetry: this.createTelemetryData()}))
 
 				if text {
 					this.getSpeaker().speak(text, false, false, {Rephrase: false})

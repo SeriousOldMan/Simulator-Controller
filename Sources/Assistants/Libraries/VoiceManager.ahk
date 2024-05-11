@@ -21,7 +21,7 @@
 #Include "..\..\Libraries\Messages.ahk"
 #Include "..\..\Libraries\SpeechSynthesizer.ahk"
 #Include "..\..\Libraries\SpeechRecognizer.ahk"
-#Include "AssistantBooster.ahk"
+#Include "ConversationBooster.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -631,7 +631,7 @@ class VoiceManager extends ConfigurationItem {
 			local booster
 
 			if (this.ListenerBooster && !this.iBooster) {
-				booster := RecognizerBooster(this.ListenerBooster, this.Configuration, this.Language)
+				booster := RecognitionBooster(this.ListenerBooster, this.Configuration, this.Language)
 
 				if (booster.Model && booster.Active)
 					this.iBooster := booster
@@ -1244,12 +1244,11 @@ class VoiceManager extends ConfigurationItem {
 				}
 		}
 
-		if (mode != "Grammar") {
-			if !spRecognizer
-				messageSend(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, "Text", "*", "remoteTextRecognized")
-										, this.VoiceServer)
-		}
-		else {
+		if !spRecognizer
+			messageSend(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, "Text", "*", "remoteTextRecognized")
+									, this.VoiceServer)
+
+		if (mode = "Grammar") {
 			if spRecognizer {
 				try {
 					spRecognizer.loadGrammar("?", spRecognizer.compileGrammar("[Unknown]"), ObjBindMethod(this, "raisePhraseRecognized"))
@@ -1258,9 +1257,12 @@ class VoiceManager extends ConfigurationItem {
 					logError(exception, true)
 				}
 			}
-			else
+			else {
+				this.Grammars["?"] := compilerRecognizer.compileGrammar("[Unknown]")
+
 				messageSend(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, "?", "[Unknown]", "remoteCommandRecognized")
 										, this.VoiceServer)
+			}
 		}
 	}
 

@@ -1685,18 +1685,18 @@ updateInstallationForV500() {
 }
 
 updateConfigurationForV572() {
-	local text, configuration
+	local text, configuration, values
 
 	if FileExist(kUserHomeDirectory . "Setup\Speech Improver Configuration.ini") {
-		FileMove(kUserHomeDirectory . "Setup\Speech Improver Configuration.ini", kUserHomeDirectory . "Setup\Assistant Booster Configuration.ini", 1)
+		FileMove(kUserHomeDirectory . "Setup\Speech Improver Configuration.ini", kUserHomeDirectory . "Setup\Conversation Booster Configuration.ini", 1)
 
-		text := FileRead(kUserHomeDirectory . "Setup\Assistant Booster Configuration.ini", "`n")
+		text := FileRead(kUserHomeDirectory . "Setup\Conversation Booster Configuration.ini", "`n")
 
-		text := StrReplace(text, "Speech Improver", "Assistant Booster")
+		text := StrReplace(text, "Speech Improver", "Conversation Booster")
 
-		deleteFile(kUserHomeDirectory . "Setup\Assistant Booster Configuration.ini")
+		deleteFile(kUserHomeDirectory . "Setup\Conversation Booster Configuration.ini")
 
-		FileAppend(text, kUserHomeDirectory . "Setup\Assistant Booster Configuration.ini", "UTF-16")
+		FileAppend(text, kUserHomeDirectory . "Setup\Conversation Booster Configuration.ini", "UTF-16")
 	}
 
 	if FileExist(kUserHomeDirectory . "Setup\Setup.data") {
@@ -1712,11 +1712,23 @@ updateConfigurationForV572() {
 	if FileExist(getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)) {
 		configuration := readMultiMap(kSimulatorConfigurationFile)
 
-		setMultiMapValues(configuration, "Assistant Booster", getMultiMapValues(configuration, "Speech Improver"))
+		values := getMultiMapValues(configuration, "Speech Improver")
 
-		removeMultiMapValues(configuration, "Speech Improver")
+		if (values.Count > 0) {
+			setMultiMapValues(configuration, "Conversation Booster", values)
 
-		writeMultiMap(kSimulatorConfigurationFile, configuration)
+			removeMultiMapValues(configuration, "Speech Improver")
+
+			writeMultiMap(kSimulatorConfigurationFile, configuration)
+		}
+
+		text := FileRead(kUserConfigDirectory . kSimulatorConfigurationFile, "`n")
+
+		text := StrReplace(text, "Improver", "Booster")
+
+		deleteFile(kUserConfigDirectory . kSimulatorConfigurationFile)
+
+		FileAppend(text, kUserConfigDirectory . kSimulatorConfigurationFile, "UTF-16")
 	}
 }
 

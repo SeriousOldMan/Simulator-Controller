@@ -171,8 +171,8 @@ startupRaceEngineer() {
 	engineer := RaceEngineer(kSimulatorConfiguration
 						   , remotePID ? RaceEngineer.RaceEngineerRemoteHandler(remotePID) : false
 						   , engineerName, engineerLanguage
-						   , engineerSynthesizer, engineerSpeaker, engineerSpeakerVocalics, engineerSpeakerBooster, engineerConversationBooster
-						   , engineerRecognizer, engineerListener, engineerListenerBooster, engineerMuted, voiceServer)
+						   , engineerSynthesizer, engineerSpeaker, engineerSpeakerVocalics, engineerSpeakerBooster
+						   , engineerRecognizer, engineerListener, engineerListenerBooster, engineerConversationBooster, engineerMuted, voiceServer)
 
 	RaceEngineer.Instance := engineer
 

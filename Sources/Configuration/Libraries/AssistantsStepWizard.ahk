@@ -71,9 +71,9 @@ class AssistantsStepWizard extends ActionsStepWizard {
 
 		super.saveToConfiguration(configuration)
 
-		setMultiMapValues(configuration, "Assistant Booster"
-									   , getMultiMapValues(readMultiMap(kUserHomeDirectory . "Setup\Assistant Booster Configuration.ini")
-														 , "Assistant Booster"), false)
+		setMultiMapValues(configuration, "Conversation Booster"
+									   , getMultiMapValues(readMultiMap(kUserHomeDirectory . "Setup\Conversation Booster Configuration.ini")
+														 , "Conversation Booster"), false)
 
 		for ignore, assistant in this.Definition
 			if wizard.isModuleSelected(assistant) {
@@ -163,30 +163,30 @@ class AssistantsStepWizard extends ActionsStepWizard {
 						if !speakerBooster.Has("SpeakerTemperature")
 							speakerBooster["SpeakerTemperature"] := (speakerBooster.Has("Temperature") ? speakerBooster["Temperature"] : 0.5)
 
-						setMultiMapValue(configuration, "Assistant Booster", assistant . ".Service", speakerBooster["Service"])
-						setMultiMapValue(configuration, "Assistant Booster", assistant . ".Model", speakerBooster["Model"])
+						setMultiMapValue(configuration, "Conversation Booster", assistant . ".Service", speakerBooster["Service"])
+						setMultiMapValue(configuration, "Conversation Booster", assistant . ".Model", speakerBooster["Model"])
 
-						setMultiMapValue(configuration, "Assistant Booster", assistant . ".Speaker", speakerBooster["Speaker"])
-						setMultiMapValue(configuration, "Assistant Booster", assistant . ".SpeakerProbability", speakerBooster["SpeakerProbability"])
-						setMultiMapValue(configuration, "Assistant Booster", assistant . ".SpeakerTemperature", speakerBooster["SpeakerTemperature"])
+						setMultiMapValue(configuration, "Conversation Booster", assistant . ".Speaker", speakerBooster["Speaker"])
+						setMultiMapValue(configuration, "Conversation Booster", assistant . ".SpeakerProbability", speakerBooster["SpeakerProbability"])
+						setMultiMapValue(configuration, "Conversation Booster", assistant . ".SpeakerTemperature", speakerBooster["SpeakerTemperature"])
 					}
 					else if listenerBooster
-						setMultiMapValue(configuration, "Assistant Booster", assistant . ".Speaker", false)
+						setMultiMapValue(configuration, "Conversation Booster", assistant . ".Speaker", false)
 
 					if listenerBooster {
 						listenerBooster := string2Map("|||", "--->>>", listenerBooster)
 
 						arguments .= ("; raceAssistantListenerBooster: " . assistant)
 
-						setMultiMapValue(configuration, "Assistant Booster", assistant . ".Service", listenerBooster["Service"])
-						setMultiMapValue(configuration, "Assistant Booster", assistant . ".Model", listenerBooster["Model"])
+						setMultiMapValue(configuration, "Conversation Booster", assistant . ".Service", listenerBooster["Service"])
+						setMultiMapValue(configuration, "Conversation Booster", assistant . ".Model", listenerBooster["Model"])
 
-						setMultiMapValue(configuration, "Assistant Booster", assistant . ".Listener", listenerBooster["Listener"])
-						setMultiMapValue(configuration, "Assistant Booster", assistant . ".ListenerMode", listenerBooster["ListenerMode"])
-						setMultiMapValue(configuration, "Assistant Booster", assistant . ".ListenerTemperature", listenerBooster["ListenerTemperature"])
+						setMultiMapValue(configuration, "Conversation Booster", assistant . ".Listener", listenerBooster["Listener"])
+						setMultiMapValue(configuration, "Conversation Booster", assistant . ".ListenerMode", listenerBooster["ListenerMode"])
+						setMultiMapValue(configuration, "Conversation Booster", assistant . ".ListenerTemperature", listenerBooster["ListenerTemperature"])
 					}
 					else if speakerBooster
-						setMultiMapValue(configuration, "Assistant Booster", assistant . ".Listener", false)
+						setMultiMapValue(configuration, "Conversation Booster", assistant . ".Listener", false)
 
 					if conversationBooster {
 						conversationBooster := string2Map("|||", "--->>>", conversationBooster)
@@ -202,15 +202,15 @@ class AssistantsStepWizard extends ActionsStepWizard {
 						if !conversationBooster.Has("ConversationMaxHistory")
 							conversationBooster["ConversationMaxHistory"] := 3
 
-						setMultiMapValue(configuration, "Assistant Booster", assistant . ".Service", conversationBooster["Service"])
-						setMultiMapValue(configuration, "Assistant Booster", assistant . ".Model", conversationBooster["Model"])
+						setMultiMapValue(configuration, "Conversation Booster", assistant . ".Service", conversationBooster["Service"])
+						setMultiMapValue(configuration, "Conversation Booster", assistant . ".Model", conversationBooster["Model"])
 
-						setMultiMapValue(configuration, "Assistant Booster", assistant . ".Conversation", conversationBooster["Conversation"])
-						setMultiMapValue(configuration, "Assistant Booster", assistant . ".ConversationMaxHistory", conversationBooster["ConversationMaxHistory"])
-						setMultiMapValue(configuration, "Assistant Booster", assistant . ".ConversationTemperature", conversationBooster["ConversationTemperature"])
+						setMultiMapValue(configuration, "Conversation Booster", assistant . ".Conversation", conversationBooster["Conversation"])
+						setMultiMapValue(configuration, "Conversation Booster", assistant . ".ConversationMaxHistory", conversationBooster["ConversationMaxHistory"])
+						setMultiMapValue(configuration, "Conversation Booster", assistant . ".ConversationTemperature", conversationBooster["ConversationTemperature"])
 					}
 					else
-						setMultiMapValue(configuration, "Assistant Booster", assistant . ".Conversation", false)
+						setMultiMapValue(configuration, "Conversation Booster", assistant . ".Conversation", false)
 				}
 				else
 					arguments .= "; raceAssistantSpeaker: Off"

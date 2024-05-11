@@ -21,6 +21,8 @@
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class PluginsConfigurator extends ConfigurationItemList {
+	iConversationBoosterConfiguration := false
+
 	Plugins {
 		Get {
 			local result := []
@@ -130,6 +132,10 @@ class PluginsConfigurator extends ConfigurationItemList {
 
 		for name, arguments in getMultiMapValues(configuration, "Plugins")
 			this.ItemList.Push(Plugin(name, configuration))
+
+		this.iConversationBoosterConfiguration := newMultiMap()
+
+		setMultiMapValues(this.iConversationBoosterConfiguration, "Conversation Booster", getMultiMapValues(configuration, "Conversation Booster"))
 	}
 
 	saveToConfiguration(configuration) {
@@ -139,6 +145,8 @@ class PluginsConfigurator extends ConfigurationItemList {
 
 		for ignore, thePlugin in this.ItemList
 			thePlugin.saveToConfiguration(configuration)
+
+		addMultiMapValues(configuration, "Conversation Booster", this.iConversationBoosterConfiguration)
 	}
 
 	updateState() {

@@ -194,6 +194,10 @@ As you can see here, each phrase provides different alternative sentences. Varia
 
 I strongly recommed to memorize the phrases in the language you use to interact with Jona. You will always find the current version of the grammar files as actually used by the software in the *Resources\Grammars* folder of the Simulator Controller distribution. Or you can take a look at the files in the [Resources\Grammars directory on GitHub](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Resources/Grammars), for example the German version [Race Engineer.grammars.de](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Grammars/Race%20Engineer.grammars.de).
 
+#### Boosting conversation capabilities using an LLM
+
+Beside the builtin pattern-based voice recognition and the speech capabilities based on predefined phrases as described above, it is optionally possible to connect Jona to a GPT service like OpenAI or a locally hosted LLM, to dramatacilly improve the quality in conversation with the Assistant. When the conversation booster is configured (see [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-withh-an-llm) for more information about the necessary configuration steps), the full knowledge about the car state will be supllied to the LLM.
+
 ### Enabling and disabling specific warnings and announcements
 
 Jona will give you a lot of information about fuel level, damages after an accident, and so on. You may disable these warnings individually by using a special voice command:

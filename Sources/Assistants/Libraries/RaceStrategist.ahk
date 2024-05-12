@@ -1011,10 +1011,6 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 	}
 
-	createTelemetryData() {
-		return super.createTelemetryData({exclude: ["Car"]})
-	}
-
 	requestInformation(category, arguments*) {
 		switch category, false {
 			case "LapsRemaining":

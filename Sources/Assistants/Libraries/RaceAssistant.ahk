@@ -2094,6 +2094,10 @@ class GridRaceAssistant extends RaceAssistant {
 		}
 	}
 
+	createTelemetryData() {
+		return super.createTelemetryData({exclude: ["Car"]})
+	}
+
 	requestInformation(category, arguments*) {
 		switch category, false {
 			case "Position":

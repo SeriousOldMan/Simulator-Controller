@@ -18,6 +18,10 @@ The same principles as [described for Jona](https://github.com/SeriousOldMan/Sim
 
 I strongly recommed to memorize the phrases in the language you use to interact with Elisa. You will always find the current version of the grammar files as actually used by the software in the *Resources\Grammars* folder of the Simulator Controller distribution. Or you can take a look at the files in the [*Resources\Grammars* directory on GitHub](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Resources/Grammars), for example the German version [Race Spotter.grammars.de](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Grammars/Race%20Spotter.grammars.de).
 
+#### Boosting conversation capabilities using an LLM
+
+Beside the builtin pattern-based voice recognition and the speech capabilities based on predefined phrases as described above, it is optionally possible to connect Elisa to a GPT service like OpenAI or a locally hosted LLM, to dramatacilly improve the quality in conversation with the Assistant. When th conversation booster is configured (see [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-withh-an-llm) for more information about the necessary configuration steps), the full knowledge about the the car state, the drivers performance and the current standings will be supllied to the LLM.
+
 ### Enabling and disabling specific warnings and announcements
 
 As described in the next section, Elisa will give you a lot of warnings and announcements about traffic and the overall race situation. You may disable these announcements by using a special voice command:

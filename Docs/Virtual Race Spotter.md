@@ -20,7 +20,7 @@ I strongly recommed to memorize the phrases in the language you use to interact 
 
 #### Boosting conversation capabilities using an LLM
 
-Beside the builtin pattern-based voice recognition and the speech capabilities based on predefined phrases as described above, it is optionally possible to connect Elisa to a GPT service like OpenAI or a locally hosted LLM, to dramatacilly improve the quality in conversation with the Assistant. When th conversation booster is configured (see [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm) for more information about the necessary configuration steps), the full knowledge about the the car state, the drivers performance and the current standings will be supllied to the LLM.
+Beside the builtin pattern-based voice recognition and the speech capabilities based on predefined phrases as described above, it is optionally possible to connect Elisa to a GPT service like OpenAI or a locally hosted LLM, to dramatacilly improve the quality in conversation with the Assistant. When th conversation booster is configured (see [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm) for more information about the necessary configuration steps), the full knowledge about the the car state, the drivers performance and the current standings will be supllied to the LLM. This includes only basic telemetry data and no pitstop information. The standings information includes a history of the last laps and gap and lap time information for the most important opponents.
 
 ### Enabling and disabling specific warnings and announcements
 

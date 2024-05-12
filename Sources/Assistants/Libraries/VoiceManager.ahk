@@ -434,7 +434,7 @@ class VoiceManager extends ConfigurationItem {
 			local booster := this.Booster
 
 			if (booster && (booster.Mode = "Always"))
-				text := booster.recognize(text, Map("Language", this.VoiceManager.Language))
+				text := booster.recognize(text)
 
 			return super.splitText(text)
 		}
@@ -444,7 +444,7 @@ class VoiceManager extends ConfigurationItem {
 			local alternateText
 
 			if (booster && (booster.Mode = "Unknown")) {
-				alternateText := booster.recognize(text, Map("Language", this.VoiceManager.Language))
+				alternateText := booster.recognize(text)
 
 				if (alternateText != text) {
 					text := alternateText
@@ -1431,12 +1431,12 @@ class VoiceManager extends ConfigurationItem {
 		try {
 			if (this.iRecognizerMode = "Mixed") {
 				if (this.Booster && (this.Booster.Mode = "Always"))
-					matchText := this.Booster.recognize(matchText, Map("Language", this.Language))
+					matchText := this.Booster.recognize(matchText)
 
 				recognizedGrammar := this.matchCommand(matchText, &words)
 
 				if (this.Booster && !recognizedGrammar && (this.Booster.Mode = "Unknown")) {
-					matchText := this.Booster.recognize(matchText, Map("Language", this.Language))
+					matchText := this.Booster.recognize(matchText)
 
 					recognizedGrammar := this.matchCommand(matchText, &words)
 				}

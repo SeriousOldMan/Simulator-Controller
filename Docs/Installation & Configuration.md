@@ -396,7 +396,16 @@ Several boosters are available at the moment:
 	 
 	 Note: Using the semantic *Understanding* booster may only be usable in conjunction with voice recognition methods, that are cabable to recognize continuous, unstructured text. This is true for Google and Azure voice recognition, but not for the builtin voice recognition of Windows, which only work reliable for pattern-based recognition.
 
-  3. Normally an Assistant will tell you that he didn't understand you, when none of the defined commands has matched the spoken command. Using the *Conversation* booster a special mode can be activated, that will redirect all non-recognized commands to an LLM for interpretation and processing. This LLM will have full access to the knowledebase of the Assistant and will therefore be able to run a knowledgeable conversation with you.
+  3. Normally an Assistant will tell you that he didn't understand you, when none of the defined commands has matched the spoken command. Using the *Conversation* booster a special mode can be activated, that will redirect all non-recognized commands to an LLM for interpretation and processing. This LLM will have full access to the knowledebase of the Assistant and will therefore be able to run a knowledgeable conversation with you. The following table lists the type of knowledge, that will be available to a specific Assistant:
+     
+     | Assistant        | Knowledge (1) |
+     | ---------------- | ------------- |
+	 | Race Engineer    | Telemetry data incl. tyre pressures, tyre temeperatures, tyre wear, brake temperatures, brake wear, fuel level, fuel consumption, damage, and so on. When a pitstop is planned, the plan is available and the pitstop history is also available. |
+	 | Race Strategist  | Same as Race Engineer plus current standings incl. a history of the last laps and gap and lap time information for the most important opponents. |
+	 | Race Spotter     | Basic telemetry data and no pitstop information. But includes current standings incl. a history of the last laps and gap and lap time information for the most important opponents. |
+	 | Driving Coach    | Beside the [instructions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-driving-coach) that can be configured for the Driving Coach in general, the full set of telemetry data available to the Race Engineer is available to the Driving Coach as well. |
+
+     (1) Depending on the availabilty of the data by the current simulator.
   
 Important: Using a GPT service like OpenAI may impose some costs, and running an LLM locally on your PC will require a very powerful system, especially when doing this while on the track. Therefore, configuring conversation booster is fully optional.
 
@@ -408,7 +417,7 @@ In this tab you can configure the plugins currently in use by the Simulator Cont
 
 Beside temporarily deactivating a plugin and all its modes, you can define a comma separated list of simulator names. This will restrict the modes of the plugin to only be available, when these simulators are running. The most important field here is the *Arguments* field. Here you can supply values for all the configuration parameters of the given plugin. The format is like this: "parameter1: value11, value12, value13; parameter2: value21, value22; ...". Please take a look at the [plugin reference](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes) for an in depth explanation of all the parameters of the bundled plugins.
 
-A special editor is available by clicking on the small button with the launching rocket icon, when you have selected a plugin for one of the Race Assistants. This editor allows you to link a GPT service to this Assistant which can dramatically improve the conversation experience with the Assistant. Please see the separate [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-withh-an-llm) for more information about the conversation booster.
+A special editor is available by clicking on the small button with the launching rocket icon, when you have selected a plugin for one of the Race Assistants. This editor allows you to link a GPT service to this Assistant which can dramatically improve the conversation experience with the Assistant. Please see the separate [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm) for more information about the conversation booster.
 
 Last but not least, you will find an "Edit Labels & Icons..." button in the lower left corner of this tab. Pressing this button will open a special editor, which allows you to configure the language specific labels and icons for all controller actions. You will find more information on this in the [chapter on controller layout configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#action-labels--icons).
 

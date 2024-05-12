@@ -771,7 +771,7 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
-	createTelemetryData(options := false) {
+	createTelemetryInfo(options := false) {
 		local knowledgeBase := this.KnowledgeBase
 		local text := ""
 		local filter := false
@@ -840,7 +840,7 @@ class RaceAssistant extends ConfigurationItem {
 		if (grammar = "Text") {
 			if this.Booster {
 				text := this.Booster.talk(text, Map("Variables", {assistant: this.AssistantType, name: this.VoiceManager.Name
-																, telemetry: this.createTelemetryData()}))
+																, telemetry: this.createTelemetryInfo()}))
 
 				if text {
 					this.getSpeaker().speak(text, false, false, {Rephrase: false})
@@ -2094,8 +2094,8 @@ class GridRaceAssistant extends RaceAssistant {
 		}
 	}
 
-	createTelemetryData() {
-		return super.createTelemetryData({exclude: ["Car"]})
+	createTelemetryInfo() {
+		return super.createTelemetryInfo({exclude: ["Car"]})
 	}
 
 	requestInformation(category, arguments*) {

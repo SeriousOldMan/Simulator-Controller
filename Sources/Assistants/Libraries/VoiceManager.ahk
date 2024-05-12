@@ -280,7 +280,7 @@ class VoiceManager extends ConfigurationItem {
 			this.iPhrases := phrases
 
 			if voiceManager.SpeakerBooster {
-				booster := SpeechBooster(voiceManager.SpeakerBooster, voiceManager.Configuration)
+				booster := SpeechBooster(voiceManager.SpeakerBooster, voiceManager.Configuration, this.VoiceManager.Language)
 
 				if (booster.Model && booster.Active)
 					this.iBooster := booster
@@ -330,12 +330,11 @@ class VoiceManager extends ConfigurationItem {
 						if options {
 							options := toMap(options)
 
-							text := booster.speak(text, Map("Language", this.VoiceManager.Language
-														  , "Rephrase", (!options.Has("Rephrase") || options["Rephrase"])
+							text := booster.speak(text, Map("Rephrase", (!options.Has("Rephrase") || options["Rephrase"])
 														  , "Translate", (booster.Language && (!options.Has("Translate") || options["Tranlate"]))))
 						}
 						else
-							text := booster.speak(text, Map("Language", this.VoiceManager.Language))
+							text := booster.speak(text)
 					}
 
 					this.Speaking := true
@@ -1249,6 +1248,8 @@ class VoiceManager extends ConfigurationItem {
 									, this.VoiceServer)
 
 		if (mode = "Grammar") {
+			this.Grammars["?"] := compilerRecognizer.compileGrammar("[Unknown]")
+
 			if spRecognizer {
 				try {
 					spRecognizer.loadGrammar("?", spRecognizer.compileGrammar("[Unknown]"), ObjBindMethod(this, "raisePhraseRecognized"))
@@ -1257,12 +1258,9 @@ class VoiceManager extends ConfigurationItem {
 					logError(exception, true)
 				}
 			}
-			else {
-				this.Grammars["?"] := compilerRecognizer.compileGrammar("[Unknown]")
-
+			else
 				messageSend(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, "?", "[Unknown]", "remoteCommandRecognized")
 										, this.VoiceServer)
-			}
 		}
 	}
 

@@ -407,7 +407,7 @@ Several boosters are available at the moment:
 
      (1) Depending on the availabilty of the data by the current simulator.
   
-Important: Using a GPT service like OpenAI may impose some costs, and running an LLM locally on your PC will require a very powerful system, especially when doing this while on the track. Therefore, configuring conversation booster is fully optional.
+Important: Using a GPT service like OpenAI may impose some costs, and running an LLM locally on your PC will require a very powerful system, especially when doing this while on the track. Therefore, configuring a conversation booster is fully optional.
 
 #### Tab *Plugins*
 

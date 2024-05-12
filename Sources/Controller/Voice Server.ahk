@@ -220,7 +220,7 @@ class VoiceServer extends ConfigurationItem {
 				local booster := this.Booster
 
 				if (booster && (booster.Mode = "Always"))
-					text := booster.recognize(text)
+					text := booster.recognize(text, Map("Language", this.VoiceClient.Language))
 
 				return super.splitText(text)
 			}
@@ -230,7 +230,7 @@ class VoiceServer extends ConfigurationItem {
 				local alternateText
 
 				if (booster && (booster.Mode = "Unknown")) {
-					alternateText := booster.recognize(text)
+					alternateText := booster.recognize(text, Map("Language", this.VoiceClient.Language))
 
 					if (alternateText != text) {
 						text := alternateText

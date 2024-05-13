@@ -21,7 +21,7 @@
 #Include "..\..\Libraries\Messages.ahk"
 #Include "..\..\Libraries\SpeechSynthesizer.ahk"
 #Include "..\..\Libraries\SpeechRecognizer.ahk"
-#Include "GPTBooster.ahk"
+#Include "LLMBooster.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;

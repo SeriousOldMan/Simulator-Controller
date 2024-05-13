@@ -1,5 +1,5 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - GPT Booster                     ;;;
+;;;   Modular Simulator Controller System - LLM Booster                     ;;;
 ;;;                                                                         ;;;
 ;;;   Provides several GPT-based Pre- and Postprocessors for speech output, ;;;
 ;;;   voice recognition and conversation.                                   ;;;

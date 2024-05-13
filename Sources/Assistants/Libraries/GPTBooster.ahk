@@ -80,7 +80,7 @@ class GPTBooster extends ConfigurationItem {
 
 		options["Service"] := getMultiMapValue(configuration, "Conversation Booster", descriptor . ".Service", false)
 		options["Model"] := getMultiMapValue(configuration, "Conversation Booster", descriptor . ".Model", false)
-		options["MaxTokens"] := getMultiMapValue(configuration, "Conversation Booster", descriptor . ".MaxTokens", 1024)
+		options["MaxTokens"] := getMultiMapValue(configuration, "Conversation Booster", descriptor . ".MaxTokens", 2048)
 	}
 
 	startBooster() {

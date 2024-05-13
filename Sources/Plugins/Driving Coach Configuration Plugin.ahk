@@ -177,7 +177,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		widget12 := window.Add("ComboBox", "x" . x1 . " yp w" . (w1 - 64) . " vdcModelDropDown Hidden")
 		widget13 := window.Add("Edit", "x" . (x1 + (w1 - 60)) . " yp-1 w60 h23 Number vdcMaxTokensEdit Hidden")
 		widget13.OnEvent("Change", validateTokens)
-		widget14 := window.Add("UpDown", "x" . (x1 + (w1 - 60)) . " yp w60 h23 Range32-2048 Hidden")
+		widget14 := window.Add("UpDown", "x" . (x1 + (w1 - 60)) . " yp w60 h23 Range32-131072 Hidden")
 
 		window.SetFont("Italic", "Arial")
 		widget15 := window.Add("Text", "x" . x0 . " yp+40 w105 h23 Hidden", translate("Personality"))
@@ -276,7 +276,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 	loadFromConfiguration(configuration) {
 		local service, ignore, provider, setting, providerConfiguration
 
-		static defaults := CaseInsenseWeakMap("ServiceURL", false, "Model", false, "MaxTokens", 1024
+		static defaults := CaseInsenseWeakMap("ServiceURL", false, "Model", false, "MaxTokens", 2048
 											, "MaxHistory", 5, "Temperature", 0.5, "Confirmation", true)
 
 		super.loadFromConfiguration(configuration)

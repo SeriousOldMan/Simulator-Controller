@@ -274,6 +274,7 @@ class PluginsConfigurator extends ConfigurationItemList {
 		local assistant := this.Control["pluginEdit"].Text
 		local window := this.Window
 		local configuration, speakerBooster, listenerBooster, conversationBooster, thePlugin
+		local ignore, otherAssistant, key, value
 
 		if !inList(kRaceAssistants, assistant)
 			return
@@ -290,6 +291,12 @@ class PluginsConfigurator extends ConfigurationItemList {
 					thePlugin.removeArgument("raceAssistantSpeakerBooster")
 					thePlugin.removeArgument("raceAssistantListenerBooster")
 					thePlugin.removeArgument("raceAssistantConversationBooster")
+
+					for ignore, otherAssistant in kRaceAssistants
+						if (otherAssistant != assistant)
+							for key, value in getMultiMapValues(this.iConversationBoosterConfiguration, "Conversation Booster")
+								if (InStr(key, otherAssistant) = 1)
+									setMultiMapValue(configuration, "Conversation Booster", key, value)
 
 					this.iConversationBoosterConfiguration := configuration
 

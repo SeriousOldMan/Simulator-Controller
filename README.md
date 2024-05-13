@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[5.7.2.0-dev](https://cutt.ly/7eePpLge) (Early build for 5.7.2. Changes: New telemetry instruction for the Driving Coach, General conversation capability for all Assistants using GPT technology, Fixed installation of French language pack, Conversation Booster configuration integrated in "Simulator Configuration".)
+[5.7.2.0-dev](https://cutt.ly/7eePpLge) (Early build for 5.7.2. Changes: New telemetry instruction for the Driving Coach, General conversation capability for all Assistants using GPT technology, Fixed installation of French language pack, Conversation Booster configuration integrated in "Simulator Configuration", Added "Mistral AI" as GPT service provider.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-572) of this version and all the versions you might have skipped, before installing and using this version.
 

@@ -70,7 +70,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 	Providers {
 		Get {
-			return ["OpenAI", "Azure", "GPT4All", "LLM Runtime"]
+			return LLMConnector.Providers
 		}
 	}
 
@@ -389,7 +389,7 @@ class DrivingCoach extends GridRaceAssistant {
 				this.iConnector := LLMConnector.LLMRuntimeConnector(this, this.Options["Driving Coach.Model"])
 			else
 				try {
-					this.iConnector := LLMConnector.%service[1]%Connector(this, this.Options["Driving Coach.Model"])
+					this.iConnector := LLMConnector.%StrReplace(service[1], A_Space, "")%Connector(this, this.Options["Driving Coach.Model"])
 
 					this.Connector.Connect(service[2], service[3])
 

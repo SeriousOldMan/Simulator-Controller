@@ -50,6 +50,18 @@ class LLMConnector {
 			}
 		}
 
+		static Models {
+			Get {
+				return []
+			}
+		}
+
+		Models {
+			Get {
+				return LLMConnector.HTTPConnector.Models
+			}
+		}
+
 		Model[external := false] {
 			Get {
 				if !external {
@@ -137,10 +149,22 @@ class LLMConnector {
 	}
 
 	class OpenAIConnector extends LLMConnector.HTTPConnector {
-		Models {
+		static Models {
 			Get {
 				return ["GPT 3.5 turbo", "GPT 4", "GPT 4 32k", "GPT 4 turbo"]
 			}
+		}
+
+		Models {
+			Get {
+				return LLMConnector.OpenAIConnector.Models
+			}
+		}
+
+		static GetDefaults(&serviceURL, &serviceKey, &model) {
+			serviceURL := "https://api.openai.com/v1/chat/completions"
+			serviceKey := ""
+			model := "GPT 3.5 turbo"
 		}
 
 		CreatePrompt(body, instructions, question) {
@@ -168,9 +192,15 @@ class LLMConnector {
 	}
 
 	class AzureConnector extends LLMConnector.OpenAIConnector {
+		static Models {
+			Get {
+				return ["GPT 3.5", "GPT 3.5 turbo", "GPT 4", "GPT 4 32k", "GPT 4 turbo"]
+			}
+		}
+
 		Models {
 			Get {
-				return ["GPT 3.5", "GPT 3.5 turbo", "GPT 4", "GPT 4 32k"]
+				return LLMConnector.AzureConnector.Models
 			}
 		}
 
@@ -181,6 +211,12 @@ class LLMConnector {
 				else
 					return super.Model[external]
 			}
+		}
+
+		static GetDefaults(&serviceURL, &serviceKey, &model) {
+			serviceURL := "__YOUR_AZURE_OPENAI_ENDPOINT__/openai/deployments/%model%/chat/completions?api-version=2023-05-15"
+			serviceKey := ""
+			model := "GPT 3.5 turbo"
 		}
 
 		CreateServiceURL(server) {
@@ -195,7 +231,56 @@ class LLMConnector {
 		}
 	}
 
+	class MistralAIConnector extends LLMConnector.HTTPConnector {
+		static Models {
+			Get {
+				return ["Open Mistral 7b", "Open Mixtral 8x7b", "Open Mixtral 8x22b", "Mistral Small Latest", "Mistral Medium Latest", "Mistral Large Latest"]
+			}
+		}
+
+		Models {
+			Get {
+				return LLMConnector.MistralAIConnector.Models
+			}
+		}
+
+		static GetDefaults(&serviceURL, &serviceKey, &model) {
+			serviceURL := "https://api.mistral.ai/v1/chat/completions"
+			serviceKey := ""
+			model := "Open Mixtral 8x22b"
+		}
+
+		CreatePrompt(body, instructions, question) {
+			local messages := []
+			local ignore, instruction, conversation
+
+			addInstruction(instruction) {
+				if (instruction && (Trim(instruction) != ""))
+					messages.Push({role: "system", content: instruction})
+			}
+
+			do(instructions, addInstruction)
+
+			for ignore, conversation in this.History {
+				messages.Push({role: "user", content: conversation[1]})
+				messages.Push({role: "assistant", content: conversation[2]})
+			}
+
+			messages.Push({role: "user", content: question})
+
+			body.messages := messages
+
+			return body
+		}
+	}
+
 	class GPT4AllConnector extends LLMConnector.HTTPConnector {
+		static GetDefaults(&serviceURL, &serviceKey, &model) {
+			serviceURL := "http://localhost:4891/v1"
+			serviceKey := "Any text will do the job"
+			model := ""
+		}
+
 		CreatePrompt(body, instructions, question) {
 			local prompt := ""
 			local ignore, instruction, conversation
@@ -309,9 +394,21 @@ class LLMConnector {
 		}
 	}
 
-	Models {
+	static Providers {
+		Get {
+			return ["OpenAI", "Azure", "Mistral AI", "GPT4All", "LLM Runtime"]
+		}
+	}
+
+	static Models {
 		Get {
 			return []
+		}
+	}
+
+	Models {
+		Get {
+			return LLMConnector.Models
 		}
 	}
 
@@ -360,6 +457,12 @@ class LLMConnector {
 	__New(manager, model) {
 		this.iManager := manager
 		this.iModel := model
+	}
+
+	static GetDefaults(&serviceURL, &serviceKey, &model) {
+		serviceURL := ""
+		serviceKey := ""
+		model := ((this.Models.Length > 0) ? this.Models[1] : "")
 	}
 
 	Restart() {

@@ -44,7 +44,7 @@ class GPTBooster extends ConfigurationItem {
 
 	Providers {
 		Get {
-			return ["OpenAI", "Azure", "GPT4All", "LLM Runtime"]
+			return LLMConnector.Providers
 		}
 	}
 
@@ -97,7 +97,7 @@ class GPTBooster extends ConfigurationItem {
 				this.iConnector := LLMConnector.LLMRuntimeConnector(this, this.Options["Model"])
 			else
 				try {
-					this.iConnector := LLMConnector.%service[1]%Connector(this, this.Options["Model"])
+					this.iConnector := LLMConnector.%StrReplace(service[1], A_Space, "")%Connector(this, this.Options["Model"])
 
 					this.Connector.Connect(service[2], service[3])
 				}

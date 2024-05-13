@@ -403,13 +403,13 @@ Several boosters are available at the moment:
      | Assistant        | Knowledge (1) |
      | ---------------- | ------------- |
 	 | Race Engineer    | Telemetry data incl. tyre pressures, tyre temeperatures, tyre wear, brake temperatures, brake wear, fuel level, fuel consumption, damage, and so on. When a pitstop is planned, the plan is available and the pitstop history is also available. |
-	 | Race Strategist  | Same as Race Engineer plus current standings incl. a history of the last laps and gap and lap time information for the most important opponents. |
-	 | Race Spotter     | Basic telemetry data and no pitstop information. But includes current standings incl. a history of the last laps and gap and lap time information for the most important opponents. |
+	 | Race Strategist  | Same as Race Engineer plus current position incl. a history of the last laps and gap and lap time information for the most important opponents. |
+	 | Race Spotter     | Basic telemetry data and no pitstop information. But includes current position incl. a history of the last laps and gap and lap time information for the most important opponents. |
 	 | Driving Coach    | Beside the [instructions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-driving-coach) that can be configured for the Driving Coach in general, the full set of telemetry data available to the Race Engineer is available to the Driving Coach as well. |
 
      (1) Depending on the availabilty of the data by the current simulator.
 	 
-	 Since the complete knowledgebase will be supplied to the LLM for matching, a context window of at least 64k tokens is required for this booster, at least, when used for the Strategist or the Spotter. Even with GPT 4, this may result in model timeouts. Time will cure this problem. The knowledgebase of the Engineer is much smaller and can be used with a context window of 4k tokens.
+	 Since the large parts of the knowledgebase will be supplied to the LLM for matching, a context window of at least 4k tokens is required for this booster. Full standings history isn't possible at the moment, since this will flood the input context are of the LLM, at least for the *smaller* models like GPT 3.5, Mistral 7b, and so on. Time will cure this problem, and I will update the capabilities of the integration, when more capable models become available. For the time being, the position data is available for the most recent laps and also the gaps for the most important opponents are passed to the LLM (for Strategist and Spotter).
   
 Important: Using a GPT service like OpenAI may impose some costs, and running an LLM locally on your PC will require a very powerful system, especially when doing this while on the track. Therefore, configuring a conversation booster is fully optional.
 

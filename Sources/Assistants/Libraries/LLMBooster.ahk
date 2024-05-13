@@ -241,7 +241,7 @@ class SpeechBooster extends ConversationBooster {
 					options := toMap(options)
 
 				doRephrase := ((Random(1, 10) <= (10 * this.Probability)) && (!options.Has("Rephrase") || options["Rephrase"]))
-				doTranslate := (language && (!options.Has("Translate") || options["Translate"]))
+				doTranslate := (options.Has("Translate") && options["Translate"])
 			}
 
 			if (doRephrase || doTranslate) {

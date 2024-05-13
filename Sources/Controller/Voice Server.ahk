@@ -164,7 +164,7 @@ class VoiceServer extends ConfigurationItem {
 						options := toMap(options)
 
 						text := booster.speak(text, Map("Rephrase", (!options.Has("Rephrase") || options["Rephrase"])
-													  , "Translate", (booster.Language && (!options.Has("Translate") || options["Tranlate"]))))
+													  , "Translate", (options.Has("Translate") && options["Tranlate"])))
 					}
 					else
 						text := booster.speak(text)

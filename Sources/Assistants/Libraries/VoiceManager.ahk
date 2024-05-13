@@ -21,7 +21,7 @@
 #Include "..\..\Libraries\Messages.ahk"
 #Include "..\..\Libraries\SpeechSynthesizer.ahk"
 #Include "..\..\Libraries\SpeechRecognizer.ahk"
-#Include "ConversationBooster.ahk"
+#Include "LLMBooster.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -280,7 +280,7 @@ class VoiceManager extends ConfigurationItem {
 			this.iPhrases := phrases
 
 			if voiceManager.SpeakerBooster {
-				booster := SpeechBooster(voiceManager.SpeakerBooster, voiceManager.Configuration)
+				booster := SpeechBooster(voiceManager.SpeakerBooster, voiceManager.Configuration, this.VoiceManager.Language)
 
 				if (booster.Model && booster.Active)
 					this.iBooster := booster
@@ -330,12 +330,11 @@ class VoiceManager extends ConfigurationItem {
 						if options {
 							options := toMap(options)
 
-							text := booster.speak(text, Map("Language", this.VoiceManager.Language
-														  , "Rephrase", (!options.Has("Rephrase") || options["Rephrase"])
-														  , "Translate", (booster.Language && (!options.Has("Translate") || options["Tranlate"]))))
+							text := booster.speak(text, Map("Rephrase", (!options.Has("Rephrase") || options["Rephrase"])
+														  , "Translate", (options.Has("Translate") && options["Tranlate"])))
 						}
 						else
-							text := booster.speak(text, Map("Language", this.VoiceManager.Language))
+							text := booster.speak(text)
 					}
 
 					this.Speaking := true
@@ -435,7 +434,7 @@ class VoiceManager extends ConfigurationItem {
 			local booster := this.Booster
 
 			if (booster && (booster.Mode = "Always"))
-				text := booster.recognize(text, Map("Language", this.VoiceManager.Language))
+				text := booster.recognize(text)
 
 			return super.splitText(text)
 		}
@@ -445,7 +444,7 @@ class VoiceManager extends ConfigurationItem {
 			local alternateText
 
 			if (booster && (booster.Mode = "Unknown")) {
-				alternateText := booster.recognize(text, Map("Language", this.VoiceManager.Language))
+				alternateText := booster.recognize(text)
 
 				if (alternateText != text) {
 					text := alternateText
@@ -1249,6 +1248,8 @@ class VoiceManager extends ConfigurationItem {
 									, this.VoiceServer)
 
 		if (mode = "Grammar") {
+			this.Grammars["?"] := compilerRecognizer.compileGrammar("[Unknown]")
+
 			if spRecognizer {
 				try {
 					spRecognizer.loadGrammar("?", spRecognizer.compileGrammar("[Unknown]"), ObjBindMethod(this, "raisePhraseRecognized"))
@@ -1257,12 +1258,9 @@ class VoiceManager extends ConfigurationItem {
 					logError(exception, true)
 				}
 			}
-			else {
-				this.Grammars["?"] := compilerRecognizer.compileGrammar("[Unknown]")
-
+			else
 				messageSend(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, "?", "[Unknown]", "remoteCommandRecognized")
 										, this.VoiceServer)
-			}
 		}
 	}
 
@@ -1433,12 +1431,12 @@ class VoiceManager extends ConfigurationItem {
 		try {
 			if (this.iRecognizerMode = "Mixed") {
 				if (this.Booster && (this.Booster.Mode = "Always"))
-					matchText := this.Booster.recognize(matchText, Map("Language", this.Language))
+					matchText := this.Booster.recognize(matchText)
 
 				recognizedGrammar := this.matchCommand(matchText, &words)
 
 				if (this.Booster && !recognizedGrammar && (this.Booster.Mode = "Unknown")) {
-					matchText := this.Booster.recognize(matchText, Map("Language", this.Language))
+					matchText := this.Booster.recognize(matchText)
 
 					recognizedGrammar := this.matchCommand(matchText, &words)
 				}

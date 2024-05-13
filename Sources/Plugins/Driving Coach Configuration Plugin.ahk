@@ -7,6 +7,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                          Local Include Section                          ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include "..\Libraries\LLMConnector.ahk"
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -20,18 +27,18 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 
 	Providers {
 		Get {
-			return ["OpenAI", "Azure", "GPT4All", "LLM Runtime"]
+			return LLMConnector.Providers
 		}
 	}
 
 	Models[provider] {
 		Get {
-			if (provider = "OpenAI")
-				return ["GPT 3.5 turbo", "GPT 4", "GPT 4 32k", "GPT 4 turbo"]
-			else if (provider = "Azure")
-				return ["GPT 3.5", "GPT 3.5 turbo", "GPT 4", "GPT 4 32k"]
-			else
+			try {
+				return LLMConnector.%StrReplace(provider, A_Space, "")%Connector.Models
+			}
+			catch Any {
 				return []
+			}
 		}
 	}
 
@@ -177,7 +184,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		widget12 := window.Add("ComboBox", "x" . x1 . " yp w" . (w1 - 64) . " vdcModelDropDown Hidden")
 		widget13 := window.Add("Edit", "x" . (x1 + (w1 - 60)) . " yp-1 w60 h23 Number vdcMaxTokensEdit Hidden")
 		widget13.OnEvent("Change", validateTokens)
-		widget14 := window.Add("UpDown", "x" . (x1 + (w1 - 60)) . " yp w60 h23 Range32-2048 Hidden")
+		widget14 := window.Add("UpDown", "x" . (x1 + (w1 - 60)) . " yp w60 h23 Range32-131072 Hidden")
 
 		window.SetFont("Italic", "Arial")
 		widget15 := window.Add("Text", "x" . x0 . " yp+40 w105 h23 Hidden", translate("Personality"))
@@ -220,7 +227,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 	}
 
 	loadModels(provider, model) {
-		local index
+		local index, serviceURL, serviceKey
 
 		this.Control["dcModelDropDown"].Delete()
 		this.Control["dcModelDropDown"].Add(this.Models[provider])
@@ -235,8 +242,21 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 			else
 				this.Control["dcModelDropDown"].Choose(index)
 		}
-		else
-			this.Control["dcModelDropDown"].Choose(inList(this.Models[provider], "GPT 3.5 turbo"))
+		else if provider {
+			try {
+				LLMConnector.%StrReplace(provider, A_Space, "")%Connector.GetDefaults(&serviceURL, &serviceKey, &model)
+			}
+			catch Any {
+				serviceURL := ""
+				serviceKey := ""
+				model := ""
+			}
+
+			if inList(this.Models[provider], model)
+				this.Control["dcModelDropDown"].Choose(inList(this.Models[provider], model))
+			else if (this.Models[provider].Length > 0)
+				this.Control["dcModelDropDown"].Choose(1)
+		}
 	}
 
 	initializeInstructions(provider, model, setting, edit := false) {
@@ -275,8 +295,9 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 
 	loadFromConfiguration(configuration) {
 		local service, ignore, provider, setting, providerConfiguration
+		local serviceURL, serviceKey, model
 
-		static defaults := CaseInsenseWeakMap("ServiceURL", false, "Model", false, "MaxTokens", 1024
+		static defaults := CaseInsenseWeakMap("ServiceURL", false, "Model", false, "MaxTokens", 2048
 											, "MaxHistory", 5, "Temperature", 0.5, "Confirmation", true)
 
 		super.loadFromConfiguration(configuration)
@@ -296,22 +317,23 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 			for ignore, setting in ["ServiceURL", "ServiceKey", "Model", "MaxTokens"]
 				providerConfiguration[setting] := getMultiMapValue(configuration, "Driving Coach Service", provider . "." . setting, defaults[setting])
 
-			if !providerConfiguration["ServiceURL"]
-				switch provider, false {
-					case "OpenAI":
-						providerConfiguration["ServiceURL"] := "https://api.openai.com/v1/chat/completions"
-					case "Azure":
-						providerConfiguration["ServiceURL"] := "__YOUR_AZURE_OPENAI_ENDPOINT__/openai/deployments/%model%/chat/completions?api-version=2023-05-15"
-					case "GPT4All":
-						providerConfiguration["ServiceURL"] := "http://localhost:4891/v1"
-						providerConfiguration["ServiceKey"] := "Any text will do the job"
-					case "LLM Runtime":
-						providerConfiguration["ServiceURL"] := ""
-						providerConfiguration["ServiceKey"] := ""
-				}
+			try {
+				LLMConnector.%StrReplace(provider, A_Space, "")%Connector.GetDefaults(&serviceURL, &serviceKey, &model)
+			}
+			catch Any {
+				serviceURL := ""
+				serviceKey := ""
+				model := ""
+			}
 
-			if ((providerConfiguration["Model"] = "") && inList(this.Models[provider], "GPT 3.5 turbo"))
-				providerConfiguration["Model"] := "GPT 3.5 turbo"
+			if !providerConfiguration["ServiceURL"]
+				providerConfiguration["ServiceURL"] := serviceURL
+
+			if !providerConfiguration["ServiceKey"]
+				providerConfiguration["ServiceKey"] := serviceKey
+
+			if (providerConfiguration["Model"] = "")
+				providerConfiguration["Model"] := model
 
 			for ignore, setting in concatenate(["Temperature", "MaxHistory", "Confirmation"], this.Instructions)
 				if getMultiMapValue(configuration, "Driving Coach Personality", provider . "." . setting . ".Active", true)

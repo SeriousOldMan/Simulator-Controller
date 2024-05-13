@@ -78,6 +78,10 @@ The same principles as [described for Jona](https://github.com/SeriousOldMan/Sim
 
 I strongly recommed to memorize the phrases in the language you use to interact with Cato. You will always find the current version of the grammar files as actually used by the software in the *Resources\Grammars* folder of the Simulator Controller distribution. Or you can take a look at the files in the [*Resources\Grammars* directory on GitHub](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Resources/Grammars), for example the German version [Race Strategist.grammars.de](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Grammars/Race%20Strategist.grammars.de).
 
+#### Boosting conversation capabilities using an LLM
+
+Beside the builtin pattern-based voice recognition and the speech capabilities based on predefined phrases as described above, it is optionally possible to connect Cato to a GPT service like OpenAI or a locally hosted LLM, to dramatacilly improve the quality in conversation with the Assistant. When the conversation booster is configured (see [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm) for more information about the necessary configuration steps), the full knowledge about the the car state and the drivers performance will be supplied to the LLM. In detail, this includes tyre pressures, tyre temeperatures, tyre wear, fuel level, fuel consumption, and so on. When a pitstop is planned, the plan is available and the pitstop history is also available. The position information includes a history of the last laps and gap and lap time information for the most important opponents are provided.
+
 ### Enabling and disabling specific warnings and announcements
 
 Cato can give you information about the weather development and might recommend a strategy change. You may disable this warning by using a special voice command:

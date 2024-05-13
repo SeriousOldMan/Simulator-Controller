@@ -20,6 +20,7 @@
 #Include "..\..\Libraries\Task.ahk"
 #Include "..\..\Libraries\RuleEngine.ahk"
 #Include "VoiceManager.ahk"
+#Include "LLMBooster.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\..\Database\Libraries\SettingsDatabase.ahk"
 #Include "..\..\Database\Libraries\TyresDatabase.ahk"
@@ -771,7 +772,7 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
-	createTelemetryData(options := false) {
+	createTelemetryInfo(options := false) {
 		local knowledgeBase := this.KnowledgeBase
 		local text := ""
 		local filter := false
@@ -837,13 +838,19 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	handleVoiceText(grammar, text) {
+		local ignore, part
+
 		if (grammar = "Text") {
 			if this.Booster {
-				text := this.Booster.talk(text, Map("Variables", {assistant: this.AssistantType, name: this.VoiceManager.Name
-																, telemetry: this.createTelemetryData()}))
+				text := this.Booster.ask(text, Map("Variables", {assistant: this.AssistantType, name: this.VoiceManager.Name
+															   , telemetry: this.createTelemetryInfo()}))
 
 				if text {
-					this.getSpeaker().speak(text, false, false, {Rephrase: false})
+					if this.VoiceManager.UseTalking
+						this.getSpeaker().speak(text, false, false, {Noise: false, Rephrase: false})
+					else
+						for ignore, part in string2Values(". ", text)
+							this.getSpeaker().speak(part . ".", false, false, {Rephrase: false, Click: (A_Index = 1)})
 
 					return
 				}
@@ -2094,6 +2101,10 @@ class GridRaceAssistant extends RaceAssistant {
 		}
 	}
 
+	createTelemetryInfo() {
+		return super.createTelemetryInfo({exclude: ["Car", "Standings"]})
+	}
+
 	requestInformation(category, arguments*) {
 		switch category, false {
 			case "Position":
@@ -3193,6 +3204,9 @@ class GridRaceAssistant extends RaceAssistant {
 			data := readMultiMap(data)
 
 		driver := getMultiMapValue(data, "Position Data", "Driver.Car", false)
+
+		this.KnowledgeBase.addFact("Lap." . lapNumber . ".Position.Overall", this.getPosition(false, "Overall", data))
+		this.KnowledgeBase.addFact("Lap." . lapNumber . ".Position.Class", this.getPosition(false, "Class", data))
 
 		lapValid := getMultiMapValue(data, "Stint Data", "LapValid", true)
 		lapPenalty := getMultiMapValue(data, "Stint Data", "Penalty", false)

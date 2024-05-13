@@ -6,6 +6,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                          Local Include Section                          ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include "..\..\Libraries\LLMConnector.ahk"
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -51,18 +58,18 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 
 	Providers {
 		Get {
-			return ["OpenAI", "Azure", "GPT4All", "LLM Runtime"]
+			return LLMConnector.Providers
 		}
 	}
 
 	Models[provider] {
 		Get {
-			if (provider = "OpenAI")
-				return ["GPT 3.5 turbo", "GPT 4", "GPT 4 32k", "GPT 4 turbo"]
-			else if (provider = "Azure")
-				return ["GPT 3.5", "GPT 3.5 turbo", "GPT 4", "GPT 4 32k"]
-			else
+			try {
+				return LLMConnector.%StrReplace(provider, A_Space, "")%Connector.Models
+			}
+			catch Any {
 				return []
+			}
 		}
 	}
 
@@ -131,7 +138,7 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 		editorGui.SetFont("Norm", "Arial")
 
 		editorGui.Add("Documentation", "x178 YP+20 w128 H:Center Center", translate("Conversation Booster")
-					, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control")
+					, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm")
 
 		editorGui.SetFont("Norm", "Arial")
 
@@ -170,7 +177,7 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 		widget9 := editorGui.Add("ComboBox", "x" . x1 . " yp w" . (w1 - 64) . " vviModelDropDown")
 		widget10 := editorGui.Add("Edit", "x" . (x1 + (w1 - 60)) . " yp-1 w60 h23 Number vviMaxTokensEdit")
 		widget10.OnEvent("Change", validateTokens)
-		widget11 := editorGui.Add("UpDown", "x" . (x1 + (w1 - 60)) . " yp w60 h23 Range32-2048")
+		widget11 := editorGui.Add("UpDown", "x" . (x1 + (w1 - 60)) . " yp w60 h23 Range32-131072")
 
 		editorGui.SetFont("Italic", "Arial")
 		widget12 := editorGui.Add("Checkbox", "x" . x0 . " yp+36 w105 h23 vviSpeakerCheck", translate("Rephrasing"))
@@ -230,7 +237,7 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 	}
 
 	loadModels(provider, model) {
-		local index
+		local index, serviceURL, serviceKey
 
 		this.Control["viModelDropDown"].Delete()
 
@@ -247,14 +254,28 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 			else
 				this.Control["viModelDropDown"].Choose(index)
 		}
-		else if provider
-			this.Control["viModelDropDown"].Choose(inList(this.Models[provider], "GPT 3.5 turbo"))
+		else if provider {
+			try {
+				LLMConnector.%StrReplace(provider, A_Space, "")%Connector.GetDefaults(&serviceURL, &serviceKey, &model)
+			}
+			catch Any {
+				serviceURL := ""
+				serviceKey := ""
+				model := ""
+			}
+
+			if inList(this.Models[provider], model)
+				this.Control["viModelDropDown"].Choose(inList(this.Models[provider], model))
+			else if (this.Models[provider].Length > 0)
+				this.Control["viModelDropDown"].Choose(1)
+		}
 	}
 
 	loadFromConfiguration(configuration) {
 		local service, ignore, provider, setting, providerConfiguration
+		local serviceURL, serviceKey, model
 
-		static defaults := CaseInsenseWeakMap("ServiceURL", false, "Model", "", "MaxTokens", 1024
+		static defaults := CaseInsenseWeakMap("ServiceURL", false, "Model", "", "MaxTokens", 2048
 											, "Speaker", true, "SpeakerTemperature", 0.5, "SpeakerProbability", 0.5
 											, "Listener", false, "ListenerMode", "Unknown", "ListenerTemperature", 0.5
 											, "Conversation", false, "ConversationMaxHistory", 3, "ConversationTemperature", 0.5)
@@ -297,22 +318,23 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 				for ignore, setting in ["ServiceURL", "ServiceKey", "Model", "MaxTokens"]
 					providerConfiguration[setting] := getMultiMapValue(configuration, "Conversation Booster", provider . "." . setting, defaults[setting])
 
-				if !providerConfiguration["ServiceURL"]
-					switch provider, false {
-						case "OpenAI":
-							providerConfiguration["ServiceURL"] := "https://api.openai.com/v1/chat/completions"
-						case "Azure":
-							providerConfiguration["ServiceURL"] := "__YOUR_AZURE_OPENAI_ENDPOINT__/openai/deployments/%model%/chat/completions?api-version=2023-05-15"
-						case "GPT4All":
-							providerConfiguration["ServiceURL"] := "http://localhost:4891/v1"
-							providerConfiguration["ServiceKey"] := "Any text will do the job"
-						case "LLM Runtime":
-							providerConfiguration["ServiceURL"] := ""
-							providerConfiguration["ServiceKey"] := ""
-					}
+				try {
+					LLMConnector.%StrReplace(provider, A_Space, "")%Connector.GetDefaults(&serviceURL, &serviceKey, &model)
+				}
+				catch Any {
+					serviceURL := ""
+					serviceKey := ""
+					model := ""
+				}
 
-				if ((providerConfiguration["Model"] = "") && inList(this.Models[provider], "GPT 3.5 turbo"))
-					providerConfiguration["Model"] := "GPT 3.5 turbo"
+				if !providerConfiguration["ServiceURL"]
+					providerConfiguration["ServiceURL"] := serviceURL
+
+				if !providerConfiguration["ServiceKey"]
+					providerConfiguration["ServiceKey"] := serviceKey
+
+				if (providerConfiguration["Model"] = "")
+					providerConfiguration["Model"] := model
 
 				for ignore, setting in ["Speaker", "SpeakerProbability", "SpeakerTemperature"
 									  , "Listener", "ListenerMode", "ListenerTemperature"

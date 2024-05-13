@@ -1,5 +1,5 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Conversation Booster            ;;;
+;;;   Modular Simulator Controller System - LLM Booster                     ;;;
 ;;;                                                                         ;;;
 ;;;   Provides several GPT-based Pre- and Postprocessors for speech output, ;;;
 ;;;   voice recognition and conversation.                                   ;;;
@@ -27,7 +27,7 @@
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class ConversationBooster extends ConfigurationItem {
+class GPTBooster extends ConfigurationItem {
 	iOptions := CaseInsenseMap()
 
 	iConnector := false
@@ -44,25 +44,13 @@ class ConversationBooster extends ConfigurationItem {
 
 	Providers {
 		Get {
-			return ["OpenAI", "Azure", "GPT4All", "LLM Runtime"]
+			return LLMConnector.Providers
 		}
 	}
 
 	Descriptor {
 		Get {
-			return this.Options["Descriptor"]
-		}
-	}
-
-	Code {
-		Get {
-			return this.Options["Code"]
-		}
-	}
-
-	Language {
-		Get {
-			return this.Options["Language"]
+			throw "Virtual property GPTBooster.Descriptor must be implemented in a subclass..."
 		}
 	}
 
@@ -78,9 +66,58 @@ class ConversationBooster extends ConfigurationItem {
 		}
 	}
 
-	Temperature {
+	Connector {
 		Get {
-			return this.Options["Temperature"]
+			return this.iConnector
+		}
+	}
+
+	loadFromConfiguration(configuration) {
+		local descriptor := this.Descriptor
+		local options := this.Options
+
+		super.loadFromConfiguration(configuration)
+
+		options["Service"] := getMultiMapValue(configuration, "Conversation Booster", descriptor . ".Service", false)
+		options["Model"] := getMultiMapValue(configuration, "Conversation Booster", descriptor . ".Model", false)
+		options["MaxTokens"] := getMultiMapValue(configuration, "Conversation Booster", descriptor . ".MaxTokens", 2048)
+	}
+
+	startBooster() {
+		local service := this.Options["Service"]
+		local ignore, instruction
+
+		if service {
+			service := string2Values("|", service)
+
+			if !inList(this.Providers, service[1])
+				throw "Unsupported service detected in GPTBooster.startBooster..."
+
+			if (service[1] = "LLM Runtime")
+				this.iConnector := LLMConnector.LLMRuntimeConnector(this, this.Options["Model"])
+			else
+				try {
+					this.iConnector := LLMConnector.%StrReplace(service[1], A_Space, "")%Connector(this, this.Options["Model"])
+
+					this.Connector.Connect(service[2], service[3])
+				}
+				catch Any as exception {
+					logError(exception)
+
+					throw "Unsupported service detected in GPTBooster.startBooster..."
+				}
+
+			this.Connector.MaxTokens := this.MaxTokens
+		}
+		else
+			throw "Unsupported service detected in GPTBooster.startBooster..."
+	}
+}
+
+class ConversationBooster extends GPTBooster {
+	Descriptor {
+		Get {
+			return this.Options["Descriptor"]
 		}
 	}
 
@@ -90,9 +127,21 @@ class ConversationBooster extends ConfigurationItem {
 		}
 	}
 
-	Connector {
+	Code {
 		Get {
-			return this.iConnector
+			return this.Options["Code"]
+		}
+	}
+
+	Language {
+		Get {
+			return this.Options["Language"]
+		}
+	}
+
+	Temperature {
+		Get {
+			return this.Options["Temperature"]
 		}
 	}
 
@@ -127,9 +176,6 @@ class ConversationBooster extends ConfigurationItem {
 		super.loadFromConfiguration(configuration)
 
 		options["Language"] := getMultiMapValue(configuration, "Conversation Booster", descriptor . ".Language", this.Language)
-		options["Service"] := getMultiMapValue(configuration, "Conversation Booster", descriptor . ".Service", false)
-		options["Model"] := getMultiMapValue(configuration, "Conversation Booster", descriptor . ".Model", false)
-		options["MaxTokens"] := getMultiMapValue(configuration, "Conversation Booster", descriptor . ".MaxTokens", 1024)
 	}
 
 	getInstructions() {
@@ -140,34 +186,10 @@ class ConversationBooster extends ConfigurationItem {
 	}
 
 	startBooster() {
-		local service := this.Options["Service"]
-		local ignore, instruction
+		super.startBooster()
 
-		if service {
-			service := string2Values("|", service)
-
-			if !inList(this.Providers, service[1])
-				throw "Unsupported service detected in ConversationBooster.startBooster..."
-
-			if (service[1] = "LLM Runtime")
-				this.iConnector := LLMConnector.LLMRuntimeConnector(this, this.Options["Model"])
-			else
-				try {
-					this.iConnector := LLMConnector.%service[1]%Connector(this, this.Options["Model"])
-
-					this.Connector.Connect(service[2], service[3])
-				}
-				catch Any as exception {
-					logError(exception)
-
-					throw "Unsupported service detected in ConversationBooster.startBooster..."
-				}
-
-			this.Connector.MaxTokens := this.MaxTokens
+		if this.Connector
 			this.Connector.MaxHistory := 0
-		}
-		else
-			throw "Unsupported service detected in ConversationBooster.startBooster..."
 	}
 }
 
@@ -219,7 +241,7 @@ class SpeechBooster extends ConversationBooster {
 					options := toMap(options)
 
 				doRephrase := ((Random(1, 10) <= (10 * this.Probability)) && (!options.Has("Rephrase") || options["Rephrase"]))
-				doTranslate := (language && (!options.Has("Translate") || options["Translate"]))
+				doTranslate := (options.Has("Translate") && options["Translate"])
 			}
 
 			if (doRephrase || doTranslate) {
@@ -451,7 +473,7 @@ class ChatBooster extends ConversationBooster {
 			this.Connector.MaxHistory := this.MaxHistory
 	}
 
-	talk(question, options := false) {
+	ask(question, options := false) {
 		local variables := false
 		local doTalk, code, language, fileName, languageInstructions, instruction, variables
 

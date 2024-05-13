@@ -70,7 +70,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 	Providers {
 		Get {
-			return ["OpenAI", "Azure", "GPT4All", "LLM Runtime"]
+			return LLMConnector.Providers
 		}
 	}
 
@@ -178,7 +178,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 		options["Driving Coach.Service"] := getMultiMapValue(configuration, "Driving Coach Service", "Service", getMultiMapValue(configuration, "Driving Coach", "Service", false))
 		options["Driving Coach.Model"] := getMultiMapValue(configuration, "Driving Coach Service", "Model", false)
-		options["Driving Coach.MaxTokens"] := getMultiMapValue(configuration, "Driving Coach Service", "MaxTokens", 1024)
+		options["Driving Coach.MaxTokens"] := getMultiMapValue(configuration, "Driving Coach Service", "MaxTokens", 2048)
 		options["Driving Coach.Temperature"] := getMultiMapValue(configuration, "Driving Coach Personality", "Temperature", 0.5)
 		options["Driving Coach.MaxHistory"] := getMultiMapValue(configuration, "Driving Coach Personality", "MaxHistory", 3)
 		options["Driving Coach.Confirmation"] := getMultiMapValue(configuration, "Driving Coach Personality", "Confirmation", true)
@@ -336,7 +336,7 @@ class DrivingCoach extends GridRaceAssistant {
 			case "Telemetry":
 				if knowledgeBase
 					return substituteVariables(this.Instructions["Telemetry"]
-											 , {telemetry: this.createTelemetryData({exclude: ["Car", "Standings", "Position"]})})
+											 , {telemetry: this.createTelemetryInfo({exclude: ["Car", "Standings", "Position"]})})
 			case "Handling":
 				if (knowledgeBase && this.Announcements["HandlingInformation"]) {
 					collector := this.iTelemetryCollector
@@ -389,7 +389,7 @@ class DrivingCoach extends GridRaceAssistant {
 				this.iConnector := LLMConnector.LLMRuntimeConnector(this, this.Options["Driving Coach.Model"])
 			else
 				try {
-					this.iConnector := LLMConnector.%service[1]%Connector(this, this.Options["Driving Coach.Model"])
+					this.iConnector := LLMConnector.%StrReplace(service[1], A_Space, "")%Connector(this, this.Options["Driving Coach.Model"])
 
 					this.Connector.Connect(service[2], service[3])
 
@@ -470,7 +470,7 @@ class DrivingCoach extends GridRaceAssistant {
 					this.getSpeaker().speak(answer, false, false, {Noise: false, Rephrase: false})
 				else
 					for ignore, part in string2Values(". ", answer)
-						this.getSpeaker().speak(part . ".", false, false, {Noise: false, Click: (A_Index = 1)})
+						this.getSpeaker().speak(part . ".", false, false, {Noise: false, Rephrase: false, Click: (A_Index = 1)})
 
 			if this.Transcript
 				FileAppend(translate("-- Driver --------") . "`n`n" . text . "`n`n" . translate("-- Coach ---------") . "`n`n" . answer . "`n`n", this.Transcript, "UTF-16")

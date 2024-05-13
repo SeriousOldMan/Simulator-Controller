@@ -36,7 +36,7 @@
 #Include "..\Libraries\Messages.ahk"
 #Include "..\Libraries\SpeechSynthesizer.ahk"
 #Include "..\Libraries\SpeechRecognizer.ahk"
-#Include "..\Assistants\Libraries\ConversationBooster.ahk"
+#Include "..\Assistants\Libraries\LLMBooster.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -145,7 +145,7 @@ class VoiceServer extends ConfigurationItem {
 				local booster
 
 				if voiceClient.SpeakerBooster {
-					booster := SpeechBooster(voiceClient.SpeakerBooster, voiceClient.VoiceServer.Configuration)
+					booster := SpeechBooster(voiceClient.SpeakerBooster, voiceClient.VoiceServer.Configuration, this.VoiceClient.Language)
 
 					if (booster.Model && booster.Active)
 						this.iBooster := booster
@@ -163,12 +163,11 @@ class VoiceServer extends ConfigurationItem {
 					if options {
 						options := toMap(options)
 
-						text := booster.speak(text, Map("Language", this.VoiceClient.Language
-													  , "Rephrase", (!options.Has("Rephrase") || options["Rephrase"])
-													  , "Translate", (booster.Language && (!options.Has("Translate") || options["Tranlate"]))))
+						text := booster.speak(text, Map("Rephrase", (!options.Has("Rephrase") || options["Rephrase"])
+													  , "Translate", (options.Has("Translate") && options["Tranlate"])))
 					}
 					else
-						text := booster.speak(text, Map("Language", this.VoiceClient.Language))
+						text := booster.speak(text)
 				}
 
 				super.speak(text, wait, cache, options)
@@ -220,7 +219,7 @@ class VoiceServer extends ConfigurationItem {
 				local booster := this.Booster
 
 				if (booster && (booster.Mode = "Always"))
-					text := booster.recognize(text, Map("Language", this.VoiceClient.Language))
+					text := booster.recognize(text)
 
 				return super.splitText(text)
 			}
@@ -230,7 +229,7 @@ class VoiceServer extends ConfigurationItem {
 				local alternateText
 
 				if (booster && (booster.Mode = "Unknown")) {
-					alternateText := booster.recognize(text, Map("Language", this.VoiceClient.Language))
+					alternateText := booster.recognize(text)
 
 					if (alternateText != text) {
 						text := alternateText

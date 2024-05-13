@@ -2101,8 +2101,16 @@ class GridRaceAssistant extends RaceAssistant {
 		}
 	}
 
-	createTelemetryInfo() {
-		return super.createTelemetryInfo({exclude: ["Car", "Standings"]})
+	createTelemetryInfo(options := false) {
+		if !options
+			options := {}
+		
+		if options.HasProp("exclude")
+			options.exclude := concatenate(options.exclude, ["Car", "Standings"])
+		else
+			options.exclude := ["Car", "Standings"]
+		
+		return super.createTelemetryInfo(options)
 	}
 
 	requestInformation(category, arguments*) {

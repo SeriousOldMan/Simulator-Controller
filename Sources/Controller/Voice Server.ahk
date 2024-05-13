@@ -145,7 +145,7 @@ class VoiceServer extends ConfigurationItem {
 				local booster
 
 				if voiceClient.SpeakerBooster {
-					booster := SpeechBooster(voiceClient.SpeakerBooster, voiceClient.VoiceServer.Configuration, this.VoiceClient.Language)
+					booster := SpeechBooster(voiceClient.SpeakerBooster, voiceClient.VoiceServer.Configuration, voiceClient.Language)
 
 					if (booster.Model && booster.Active)
 						this.iBooster := booster

@@ -3078,7 +3078,10 @@ class PracticeCenter extends ConfigurationItem {
 		lap.RemainingStintTime := getMultiMapValue(data, "Stint Data", "StintTimeRemaining", "-")
 
 		if (lap.RemainingStintTime != "-")
-			lap.RemainingStintTime := Round(lap.RemainingStintTime / 1000)
+			if (lap.RemainingDriverTime != "-")
+				lap.RemainingStintTime := Min(lap.RemainingDriverTime, Round(lap.RemainingStintTime / 1000))
+			else
+				lap.RemainingStintTime := Round(lap.RemainingStintTime / 1000)
 
 		lap.Map := getMultiMapValue(data, "Car Data", "Map", "n/a")
 		lap.TC := getMultiMapValue(data, "Car Data", "TC", "n/a")

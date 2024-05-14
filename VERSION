@@ -1,8 +1,8 @@
 [Development]
-Version=5.7.2.0-dev
+Version=5.7.2.0-alpha
 Target=5.7.2.0-release
 Date=05/14/2024
-Download=https://cutt.ly/7eePpLge;https://www.dropbox.com/scl/fi/9qq9vpetiwl3n0enn1n9d/Simulator-Controller-5.7.2.0-dev.zip?rlkey=9xn06ki8w6cvrrqghx3dmf76c&st=27mdusmx&dl=1
+Download=https://www.dropbox.com/scl/fi/svzys7b76vu2jv1rhv49y/Simulator-Controller-5.7.2.0-alpha.zip?rlkey=0sw147evinbz5yu1lcqhhkar7&st=vibfsjvc&dl=1
 Changes=New telemetry instruction for the Driving Coach, General conversation capability for all Assistants using GPT technology, Fixed installation of French language pack, Conversation Booster configuration integrated in "Simulator Configuration", Added "Mistral AI" as GPT service provider, Added "GPT-4o" model entry, Fixed stint timer if larger than driver time
 Components=Media->5.6.1,Configuration->5.6.4,Utilities->5.4.8
 [Release]
@@ -24,5 +24,5 @@ Utilities.5.4.8.Download=https://simulatorcontroller.s3.eu-central-1.amazonaws.c
 [Current]
 Type=Development
 [Version]
-Development=5.7.2.0-dev
+Development=5.7.2.0-alpha
 Release=5.7.1.0-release

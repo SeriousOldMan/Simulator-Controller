@@ -151,7 +151,7 @@ class LLMConnector {
 	class OpenAIConnector extends LLMConnector.HTTPConnector {
 		static Models {
 			Get {
-				return ["GPT 3.5 turbo", "GPT 4", "GPT 4 32k", "GPT 4 turbo"]
+				return ["GPT 3.5 turbo", "GPT 4", "GPT 4 32k", "GPT 4 turbo", "GPT 4o"]
 			}
 		}
 

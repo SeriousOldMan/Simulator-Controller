@@ -242,6 +242,9 @@ class SpeechBooster extends ConversationBooster {
 
 				doRephrase := ((Random(1, 10) <= (10 * this.Probability)) && (!options.Has("Rephrase") || options["Rephrase"]))
 				doTranslate := (options.Has("Translate") && options["Translate"])
+
+				if options.Has("Language")
+					code := options["Language"]
 			}
 
 			if (doRephrase || doTranslate) {
@@ -250,9 +253,6 @@ class SpeechBooster extends ConversationBooster {
 						this.startBooster()
 
 					this.Connector.Temperature := this.Temperature
-
-					if options.Has("Language")
-						code := options["Language"]
 
 					if (doRephrase && doTranslate)
 						instruction := "RephraseTranslate"
@@ -504,6 +504,9 @@ class ChatBooster extends ConversationBooster {
 
 				if options.Has("Variables")
 					variables := options["Variables"]
+
+				if options.Has("Language")
+					code := options["Language"]
 			}
 
 			if doTalk {
@@ -512,9 +515,6 @@ class ChatBooster extends ConversationBooster {
 						this.startBooster()
 
 					this.Connector.Temperature := this.Temperature
-
-					if options.Has("Language")
-						code := options["Language"]
 
 					instruction := "Talk"
 

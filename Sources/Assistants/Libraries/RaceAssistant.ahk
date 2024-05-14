@@ -1480,7 +1480,7 @@ class RaceAssistant extends ConfigurationItem {
 	createSessionInfo(lapNumber, valid, data, simulator, car, track) {
 		local knowledgeBase := this.KnowledgeBase
 		local sessionInfo := newMultiMap()
-		local tyreWear, brakeWear, duration
+		local tyreWear, brakeWear, duration, driverTime
 
 		static sessionTypes
 
@@ -1516,8 +1516,12 @@ class RaceAssistant extends ConfigurationItem {
 			setMultiMapValue(sessionInfo, "Stint", "Laps", lapNumber - this.BaseLap + 1)
 			setMultiMapValue(sessionInfo, "Stint", "Laps.Remaining.Fuel", Floor(knowledgeBase.getValue("Lap.Remaining.Fuel", 0)))
 			setMultiMapValue(sessionInfo, "Stint", "Laps.Remaining.Stint", Floor(knowledgeBase.getValue("Lap.Remaining.Stint", 0)))
-			setMultiMapValue(sessionInfo, "Stint", "Time.Remaining.Stint", Round(getMultiMapValue(data, "Stint Data", "StintTimeRemaining") / 1000))
-			setMultiMapValue(sessionInfo, "Stint", "Time.Remaining.Driver", Round(getMultiMapValue(data, "Stint Data", "DriverTimeRemaining") / 1000))
+			
+			driverTime := Round(getMultiMapValue(data, "Stint Data", "DriverTimeRemaining") / 1000)
+			
+			setMultiMapValue(sessionInfo, "Stint", "Time.Remaining.Stint", Min(driverTime, Round(getMultiMapValue(data, "Stint Data", "StintTimeRemaining") / 1000)))
+			setMultiMapValue(sessionInfo, "Stint", "Time.Remaining.Driver", driverTime)
+			
 			setMultiMapValue(sessionInfo, "Stint", "Lap.Time.Last", Round(getMultiMapValue(data, "Stint Data", "LapLastTime", 0) / 1000, 1))
 			setMultiMapValue(sessionInfo, "Stint", "Lap.Time.Best", Round(getMultiMapValue(data, "Stint Data", "LapBestTime", 0) / 1000, 1))
 
@@ -2101,8 +2105,16 @@ class GridRaceAssistant extends RaceAssistant {
 		}
 	}
 
-	createTelemetryInfo() {
-		return super.createTelemetryInfo({exclude: ["Car", "Standings"]})
+	createTelemetryInfo(options := false) {
+		if !options
+			options := {}
+		
+		if options.HasProp("exclude")
+			options.exclude := concatenate(options.exclude, ["Car", "Standings"])
+		else
+			options.exclude := ["Car", "Standings"]
+		
+		return super.createTelemetryInfo(options)
 	}
 
 	requestInformation(category, arguments*) {

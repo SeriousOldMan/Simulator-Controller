@@ -415,6 +415,8 @@ Several boosters are available at the moment:
   
 Important: Using a GPT service like OpenAI may impose some costs, and running an LLM locally on your PC will require a very powerful system, especially when doing this while on the track. Therefore, configuring a conversation booster is fully optional.
 
+Disclaimer: Large Language Models like ChatGPT, although incredible impressive, are still under heavy development. Therefore it depends on the quality and capabilities of the model, if the Assistant will react like expected. And in most cases, the support for non-English languages is quite limited. I recommend to use the conversation booster only for English-speaking Assistants for the time being.
+
 #### Tab *Plugins*
 
 In this tab you can configure the plugins currently in use by the Simulator Controller.

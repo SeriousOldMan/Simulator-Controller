@@ -57,7 +57,9 @@ remainingStintTime(?lap, ?remainingTime) <= remainingStintLaps(?lap, Driver, ?re
 											?remainingTime < ?sessionTime, !
 remainingStintTime(?lap, ?remainingTime) <= remainingSessionTime(?lap, ?remainingTime)
 											
-remainingStintTime(?stintTime) <= Get(Driver.Time.Stint.Remaining, ?stintTime)
+remainingStintTime(?stintTime) <= Get(Driver.Time.Stint.Remaining, ?stintTime), Get(Driver.Time.Remaining, ?driverTime),
+								  ?stintTime =< ?driverTime, !
+remainingStintTime(!Driver.Time.Remaining)
 
 safetyFuel(?avgConsumption, ?safetyFuel, true) <= safetyFuel(?avgConsumption, ?safetyFuel)
 safetyFuel(?avgConsumption, ?safetyFuel, false) <= ?safetyFuel = ?avgConsumption + !Session.Settings.Fuel.SafetyMargin

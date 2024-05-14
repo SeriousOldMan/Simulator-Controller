@@ -43,7 +43,7 @@ global kProperInstallation := true
 loadSimulatorConfiguration() {
 	global kSimulatorConfiguration, kVersion, kDatabaseDirectory, kAHKDirectory, kMSBuildDirectory, kNirCmd, kSox, kSilentMode
 
-	local packageInfo, type, pid, path
+	local packageInfo, type, pid, path, argIndex
 
 	if kLogStartup
 		logMessage(kLogOff, "Loading configuration...")
@@ -82,14 +82,23 @@ loadSimulatorConfiguration() {
 	if kLogStartup
 		logMessage(kLogOff, "Checking downloadable component versions...")
 
-	kSimulatorConfiguration := readMultiMap(kConfigDirectory . "Simulator Configuration.ini")
-
-	addMultiMapValues(kSimulatorConfiguration, readMultiMap(kSimulatorConfigurationFile))
-
-	if !FileExist(getFileName(kSimulatorConfigurationFile, kUserConfigDirectory))
-		setLanguage(getSystemLanguage())
-	else
+	argIndex := inList(A_Args, "-Configuration")
+	
+	if argIndex {
+		kSimulatorConfiguration := readMultiMap(A_Args[argIndex + 1])
+		
 		setLanguage(getMultiMapValue(kSimulatorConfiguration, "Configuration", "Language", getSystemLanguage()))
+	}
+	else {
+		kSimulatorConfiguration := readMultiMap(kConfigDirectory . "Simulator Configuration.ini")
+
+		addMultiMapValues(kSimulatorConfiguration, readMultiMap(kSimulatorConfigurationFile))
+
+		if !FileExist(getFileName(kSimulatorConfigurationFile, kUserConfigDirectory))
+			setLanguage(getSystemLanguage())
+		else
+			setLanguage(getMultiMapValue(kSimulatorConfiguration, "Configuration", "Language", getSystemLanguage()))
+	}
 
 	packageInfo := readMultiMap(kHomeDirectory . "VERSION")
 	type := getMultiMapValue(packageInfo, "Current", "Type", false)

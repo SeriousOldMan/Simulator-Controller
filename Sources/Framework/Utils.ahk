@@ -11,6 +11,7 @@
 
 #Include "Constants.ahk"
 #Include "Variables.ahk"
+#Include "Configuration.ahk"
 #Include "Debug.ahk"
 #Include "MultiMap.ahk"
 #Include "Files.ahk"
@@ -640,5 +641,27 @@ triggerDetector(callback := false, options := ["Joy", "Key"]) {
 
 			detectorTask.start()
 		}
+	}
+}
+
+testAssistants(configurator, assistants := kRaceAssistants) {
+	local configuration := configurator.getSimulatorConfiguration()
+	local configurationFile := temporaryFileName("Simulator Configuration", "ini")
+	local thePlugin, ignore, assistant, name
+
+	writeMultiMap(configurationFile, configuration)
+
+	Run(kBinariesDirectory . "Voice Server.exe -Debug true -Configuration `"" . configurationFile . "`"")
+
+	Sleep(2000)
+
+	language := getMultiMapValue(configuration, "Voice Control", "Language", getLanguage())
+
+	for ignore, assistant in assistants {
+		thePlugin := Plugin(assistant, configuration)
+
+		name := thePlugin.getArgumentValue("raceAssistantName", false)
+
+		Run(kBinariesDirectory . assistant . ".exe -Debug true -Configuration `"" . configurationFile . "`" -Speaker true -Listener true -Language " . language . " -Name " . name . " -Logo true")
 	}
 }

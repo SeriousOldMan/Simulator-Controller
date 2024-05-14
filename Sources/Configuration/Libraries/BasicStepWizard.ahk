@@ -283,7 +283,10 @@ class BasicStepWizard extends StepWizard {
 		setButtonIcon(widget9, kIconsDirectory . "Key.ico", 1)
 		widget10 := window.Add("DropDownList", "xp+24 yp w96 Choose1 VbasicPushToTalkModeDropDown Hidden", collect(["Hold & Talk", "Press & Talk", "Custom"], translate))
 		widget10.OnEvent("Change", updateP2T)
-		widget11 := window.Add("Edit", "xp+98 yp w96 h21 VbasicPushToTalkEdit Hidden")
+		widget51 := window.Add("Button", "xp+99 yp w23 h23 Hidden")
+		widget51.OnEvent("Click", (*) => this.testPushToTalk())
+		setButtonIcon(widget51, kIconsDirectory . "Start.ico", 1)
+		widget11 := window.Add("Edit", "xp+24 yp w72 h21 VbasicPushToTalkEdit Hidden")
 
 		window.SetFont("Bold", "Arial")
 
@@ -383,7 +386,7 @@ class BasicStepWizard extends StepWizard {
 		setButtonIcon(widget37, kResourcesDirectory . "\Setup\Images\Finish Line.png", 1, "w80 h53")
 		widget37.OnEvent("Click", finishSetup)
 
-		loop 50
+		loop 51
 			this.registerWidget(2, widget%A_Index%)
 	}
 
@@ -508,6 +511,10 @@ class BasicStepWizard extends StepWizard {
 			this.Control["basic" . key . "NameEdit"].Enabled := enabled
 			this.Control["basic" . key . "SettingsButton"].Enabled := enabled
 		}
+	}
+
+	testPushToTalk() {
+		testAssistants(this.SetupWizard, ["Race Engineer", "Race Strategist"])
 	}
 
 	assistantEnabled(assistant, editor := true) {
@@ -1213,7 +1220,7 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 		widget4 := editorGui.Add("DropDownList", "x" . (x1 + 24) . " yp w" . (w1 - 24) . " W:Grow VbasicWindowsSpeakerDropDown Hidden", voices)
 
 		widget17 := editorGui.Add("Button", "x" . x1 . " yp w23 h23 Default")
-		widget17.OnEvent("Click", (*) => this.test())
+		widget17.OnEvent("Click", (*) => this.testSpeaker())
 		setButtonIcon(widget17, kIconsDirectory . "Start.ico", 1, "L4 T4 R4 B4")
 
 		widget5 := editorGui.Add("Text", "x" . x0 . " ys+24 w110 h23 +0x200 VbasicWindowsSpeakerVolumeLabel Hidden", translate("Level"))
@@ -1245,7 +1252,7 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 		widget16 := editorGui.Add("DropDownList", "x" . (x1 + 24) . " yp w" . (w1 - 24) . " W:Grow VbasicAzureSpeakerDropDown Hidden", voices)
 
 		widget18 := editorGui.Add("Button", "x" . x1 . " yp w23 h23 Default")
-		widget18.OnEvent("Click", (*) => this.test())
+		widget18.OnEvent("Click", (*) => this.testSpeaker())
 		setButtonIcon(widget18, kIconsDirectory . "Start.ico", 1, "L4 T4 R4 B4")
 
 		editorGui.Add("Text", "x8 yp+106 w388 W:Grow 0x10")
@@ -1270,7 +1277,7 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 		widget23 := editorGui.Add("DropDownList", "x" . (x1 + 24) . " yp w" . (w1 - 24) . " W:Grow VbasicGoogleSpeakerDropDown Hidden", voices)
 
 		widget24 := editorGui.Add("Button", "x" . x1 . " yp w23 h23 Default Hidden")
-		widget24.OnEvent("Click", (*) => this.test())
+		widget24.OnEvent("Click", (*) => this.testSpeaker())
 		setButtonIcon(widget24, kIconsDirectory . "Start.ico", 1, "L4 T4 R4 B4")
 
 		this.iGoogleSynthesizerWidgets := [[editorGui["basicGoogleAPIKeyFileLabel"], editorGui["basicGoogleAPIKeyFileEdit"], widget21]
@@ -1790,7 +1797,7 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 			}
 	}
 
-	test() {
+	testSpeaker() {
 		global kSimulatorConfiguration
 
 		local configuration := newMultiMap()

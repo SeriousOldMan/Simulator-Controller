@@ -286,7 +286,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		x3 := x1 + w2 + 2
 		x4 := x2 + (24 * 3) + 8
-		w4 := width - (x4 - x)
+		w4 := width - (x4 - x) - 24
 		x5 := x3 + 24
 
 		widget1 := window.Add("Text", "x" . x . " y" . y . " w110 h23 +0x200 Hidden", translate("Language"))
@@ -309,7 +309,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		widget6 := window.Add("DropDownList", "x" . (x1 + 24) . " yp w" . (w1 - 24) . " W:Grow VwindowsSpeakerDropDown Hidden", voices)
 
 		widget32 := window.Add("Button", "x" . x1 . " yp w23 h23 Default Hidden")
-		widget32.OnEvent("Click", (*) => this.test())
+		widget32.OnEvent("Click", (*) => this.testSpeaker())
 		setButtonIcon(widget32, kIconsDirectory . "Start.ico", 1, "L4 T4 R4 B4")
 
 		widget7 := window.Add("Text", "x" . x . " ys+24 w110 h23 +0x200 VwindowsSpeakerVolumeLabel Hidden", translate("Level"))
@@ -365,15 +365,19 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		widget22 := window.Add("Text", "x" . x . " yp+24 w110 h23 +0x200 VpushToTalkLabel Hidden", translate("P2T / Activation"))
 		widget34 := window.Add("DropDownList", "x" . x1 . " yp w96 Choose1 VpushToTalkModeDropDown Hidden", collect(["Hold & Talk", "Press & Talk", "Custom"], translate))
 		widget34.OnEvent("Change", updateP2T)
-		widget23 := window.Add("Edit", "xp+100 yp w64 h21 VpushToTalkEdit Hidden")
-		widget24 := window.Add("Button", "xp+66 yp-1 w23 h23 VpushToTalkButton Hidden")
+		widget24 := window.Add("Button", "xp+98 yp-1 w23 h23 VpushToTalkButton Hidden")
 		widget24.OnEvent("Click", getPTTHotkey)
 		setButtonIcon(widget24, kIconsDirectory . "Key.ico", 1)
-		widget25 := window.Add("Edit", "x" . x4 . " yp+1 w" . w4 . " h21 W:Grow VactivationCommandEdit Hidden")
+		widget41 := window.Add("Button", "xp+24 yp w23 h23 VpushToTalkTestButton Hidden")
+		widget41.OnEvent("Click", (*) => this.testPushToTalk())
+		setButtonIcon(widget41, kIconsDirectory . "Start.ico", 1)
+		widget23 := window.Add("Edit", "xp+24 yp+1 w64 h21 VpushToTalkEdit Hidden")
+		widget25 := window.Add("Edit", "x" . (x4 + 24) . " yp w" . w4 . " h21 W:Grow VactivationCommandEdit Hidden")
 
 		this.iBottomWidgets := [[window["listenerLabel"], window["listenerDropDown"]]
 							  , [window["pushToTalkLabel"], window["pushToTalkModeDropDown"]
-							   , window["pushToTalkEdit"], window["pushToTalkButton"], window["activationCommandEdit"]]]
+							   , window["pushToTalkEdit"], window["pushToTalkButton"], window["pushToTalkTestButton"]
+							   , window["activationCommandEdit"]]]
 		this.iOtherWidgets := [[window["windowsSpeakerVolumeLabel"], window["speakerVolumeSlider"]]
 							 , [window["windowsSpeakerPitchLabel"], window["speakerPitchSlider"]]
 							 , [window["windowsSpeakerSpeedLabel"], window["speakerSpeedSlider"]]
@@ -382,7 +386,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 							 , [window["voiceRecognizerLabel"], window["voiceRecognizerDropDown"]]
 							 , [window["listenerLabel"], window["listenerDropDown"]]
 							 , [window["pushToTalkLabel"], window["pushToTalkModeDropDown"]
-							  , window["pushToTalkEdit"], window["pushToTalkButton"], window["activationCommandEdit"]]]
+							  , window["pushToTalkEdit"], window["pushToTalkButton"], window["pushToTalkTestButton"]
+							  , window["activationCommandEdit"]]]
 
 		widget26 := window.Add("Text", "x" . x . " ys+24 w140 h23 +0x200 VazureSubscriptionKeyLabel Hidden", translate("Subscription Key"))
 		widget27 := window.Add("Edit", "x" . x1 . " yp w" . w1 . " h21 W:Grow VazureSubscriptionKeyEdit Hidden")
@@ -398,7 +403,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		widget31 := window.Add("DropDownList", "x" . (x1 + 24) . " yp w" . (w1 - 24) . " W:Grow VazureSpeakerDropDown Hidden", voices)
 
 		widget33 := window.Add("Button", "x" . x1 . " yp w23 h23 Default Hidden")
-		widget33.OnEvent("Click", (*) => this.test())
+		widget33.OnEvent("Click", (*) => this.testSpeaker())
 		setButtonIcon(widget33, kIconsDirectory . "Start.ico", 1, "L4 T4 R4 B4")
 
 		this.iAzureSynthesizerWidgets := [[window["azureSubscriptionKeyLabel"], window["azureSubscriptionKeyEdit"]]
@@ -420,7 +425,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		widget39 := window.Add("DropDownList", "x" . (x1 + 24) . " yp w" . (w1 - 24) . " W:Grow VgoogleSpeakerDropDown Hidden", voices)
 
 		widget40 := window.Add("Button", "x" . x1 . " yp w23 h23 Default Hidden")
-		widget40.OnEvent("Click", (*) => this.test())
+		widget40.OnEvent("Click", (*) => this.testSpeaker())
 		setButtonIcon(widget40, kIconsDirectory . "Start.ico", 1, "L4 T4 R4 B4")
 
 		this.iGoogleSynthesizerWidgets := [[window["googleAPIKeyFileLabel"], window["googleAPIKeyFileEdit"], widget37]
@@ -429,7 +434,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		this.updateLanguage(false)
 
-		loop 40
+		loop 41
 			editor.registerWidget(this, widget%A_Index%)
 
 		this.hideControls(this.iTopWidgets)
@@ -1357,13 +1362,16 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			}
 	}
 
-	test() {
+	testPushToTalk() {
+		testAssistants(this.Editor, ["Race Engineer", "Race Strategist"])
+	}
+
+	testSpeaker() {
 		global kSimulatorConfiguration
 
-		local configuration := newMultiMap()
+		local configuration := this.Editor.getSimulatorConfiguration()
 		local synthesizer, language, voice, curSimulatorConfiguration
 
-		this.Editor.saveToConfiguration(configuration)
 		this.saveToConfiguration(configuration)
 
 		curSimulatorConfiguration := kSimulatorConfiguration

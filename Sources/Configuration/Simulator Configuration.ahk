@@ -543,10 +543,8 @@ startupSimulatorConfiguration() {
 	saveConfiguration(configurationFile, editor) {
 		global kSimulatorConfiguration
 
-		local configuration := newMultiMap()
+		local configuration := editor.getSimulatorConfiguration()
 		local startupLink, startupExe
-
-		editor.saveToConfiguration(configuration)
 
 		writeMultiMap(configurationFile, configuration)
 

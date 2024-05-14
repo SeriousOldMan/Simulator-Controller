@@ -173,6 +173,14 @@ class ConfigurationEditor extends ConfigurationItem {
 		ConfigurationEditor.Instance := this
 	}
 
+	getSimulatorConfiguration() {
+		local configuration := newMultiMap()
+
+		this.saveToConfiguration(configuration)
+
+		return configuration
+	}
+
 	registerConfigurator(label, configurator, documentation := false) {
 		this.Configurators.Push(Array(label, configurator, documentation))
 	}

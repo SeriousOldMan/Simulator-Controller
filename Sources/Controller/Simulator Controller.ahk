@@ -2250,7 +2250,7 @@ initializeSimulatorController() {
 		protectionOn()
 
 		try {
-			SimulatorController(configuration, settings, voice)
+			SimulatorController(kSimulatorConfiguration, settings, voice)
 		}
 		finally {
 			protectionOff()

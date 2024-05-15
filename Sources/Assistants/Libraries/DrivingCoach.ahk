@@ -220,8 +220,8 @@ class DrivingCoach extends GridRaceAssistant {
 		else
 			this.ConnectionState := "Unknown"
 
-		if ((oldState != this.ConnectionState) && this.Coach.RemoteHandler)
-			this.Coach.RemoteHandler.serviceState((this.ConnectionState = "Active") ? "Available" : this.ConnectionState)
+		if ((oldState != this.ConnectionState) && this.RemoteHandler)
+			this.RemoteHandler.serviceState((this.ConnectionState = "Active") ? "Available" : this.ConnectionState)
 	}
 
 	getInstruction(category) {

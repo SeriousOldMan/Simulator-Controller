@@ -396,7 +396,7 @@ class LLMConnector {
 
 	static Providers {
 		Get {
-			return ["OpenAI", "Azure", "Mistral AI", "GPT4All", "LLM Runtime"]
+			return ["OpenAI", "Mistral AI", "Azure", "GPT4All", "LLM Runtime"]
 		}
 	}
 

@@ -10,6 +10,8 @@
   9. Configuration of the conversation booster is now also possible using "Simulator Configuration". See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) for more information.
   10. *Mistral AI* has been added to the list of supported GPT service providers.
   11. Added "GPT-4o" to the list of OpenAI models.
+  12. The pitstop component on the session info page of "System Monitor" now also displays the relative tyre pressure increment values for the next pitstop.
+  13. [Developer] Add information about tyre pressure increment values to the "Session State.json" file.
 
 ## 5.7.1.0-release 05/10/24
   1. Minor bugfixes, as always

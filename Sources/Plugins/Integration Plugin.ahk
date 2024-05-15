@@ -352,6 +352,10 @@ class IntegrationPlugin extends ControllerPlugin {
 										 , convertUnit("Pressure", getMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Pressure.FR"))
 										 , convertUnit("Pressure", getMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Pressure.RL"))
 										 , convertUnit("Pressure", getMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Pressure.RR"))]
+				state["TyrePressureIncrements"] := [convertUnit("Pressure", getMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Pressure.FL.Increment"))
+												  , convertUnit("Pressure", getMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Pressure.FR.Increment"))
+												  , convertUnit("Pressure", getMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Pressure.RL.Increment"))
+										          , convertUnit("Pressure", getMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Pressure.RR.Increment"))]
 			}
 			else {
 				state["TyreCompound"] := kNull
@@ -389,11 +393,16 @@ class IntegrationPlugin extends ControllerPlugin {
 										 , convertUnit("Pressure", getMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Pressure.FR"))
 										 , convertUnit("Pressure", getMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Pressure.RL"))
 										 , convertUnit("Pressure", getMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Pressure.RR"))]
+				state["TyrePressureIncrements"] := [convertUnit("Pressure", getMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Pressure.FL.Increment"))
+												  , convertUnit("Pressure", getMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Pressure.FR.Increment"))
+												  , convertUnit("Pressure", getMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Pressure.RL.Increment"))
+										          , convertUnit("Pressure", getMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Pressure.RR.Increment"))]
 			}
 			else {
 				state["TyreCompound"] := kNull
 				state["TyreSet"] := kNull
 				state["TyrePressures"] := [kNull, kNull, kNull, kNull]
+				state["TyrePressureIncrements"] := [kNull, kNull, kNull, kNull]
 			}
 		}
 		else {
@@ -403,6 +412,7 @@ class IntegrationPlugin extends ControllerPlugin {
 			state["TyreCompound"] := kNull
 			state["TyreSet"] := kNull
 			state["TyrePressures"] := [kNull, kNull, kNull, kNull]
+			state["TyrePressureIncrements"] := [kNull, kNull, kNull, kNull]
 			state["Repairs"] := kNull
 			state["Prepared"] := kNull
 		}

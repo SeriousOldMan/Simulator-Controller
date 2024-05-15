@@ -514,7 +514,7 @@ class BasicStepWizard extends StepWizard {
 	}
 
 	testPushToTalk() {
-		testAssistants(this.SetupWizard, ["Race Engineer", "Race Strategist"])
+		testAssistants(this.SetupWizard, ["Race Engineer", "Race Strategist"], GetKeyState("Ctrl"))
 	}
 
 	assistantEnabled(assistant, editor := true) {

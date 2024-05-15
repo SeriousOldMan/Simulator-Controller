@@ -644,7 +644,7 @@ triggerDetector(callback := false, options := ["Joy", "Key"]) {
 	}
 }
 
-testAssistants(configurator, assistants := kRaceAssistants) {
+testAssistants(configurator, assistants := kRaceAssistants, booster := false) {
 	local configuration := configurator.getSimulatorConfiguration()
 	local configurationFile := temporaryFileName("Simulator Configuration", "ini")
 	local thePlugin, ignore, assistant, options, parameter, value
@@ -682,6 +682,19 @@ testAssistants(configurator, assistants := kRaceAssistants) {
 
 				options .= (" -" . parameter . " `"" . value . "`"")
 			}
+
+		if booster
+			for ignore, parameter in ["SpeakerBooster", "ListenerBooster", "ConversationBooster"]
+				if thePlugin.hasArgument("raceAssistant" . parameter) {
+					value := thePlugin.getArgumentValue("raceAssistant" . parameter)
+
+					if ((value = "On") || (value = kTrue))
+						value := true
+					else if ((value = "Off") || (value = kFalse))
+						value := false
+
+					options .= (" -" . parameter . " `"" . value . "`"")
+				}
 
 		Run(kBinariesDirectory . assistant . ".exe -Logo true -Debug true -Configuration `"" . configurationFile . "`"" . options)
 	}

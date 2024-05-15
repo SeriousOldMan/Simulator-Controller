@@ -2241,12 +2241,6 @@ initializeSimulatorController() {
 
 		voice := (argIndex ? A_Args[argIndex + 1] : ProcessExist("Voice Server.exe"))
 
-		/*
-		argIndex := inList(A_Args, "-Configuration")
-
-		configuration := (argIndex ? readMultiMap(A_Args[argIndex + 1]) : kSimulatorConfiguration)
-		*/
-
 		protectionOn()
 
 		try {

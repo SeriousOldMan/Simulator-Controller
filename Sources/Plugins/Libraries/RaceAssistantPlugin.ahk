@@ -895,7 +895,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 					if ((assistantListener != false) && (assistantListener != kFalse) && (assistantListener != "Off")) {
 						this.iRaceAssistantListenerBooster := this.getArgumentValue("raceAssistantListenerBooster", false)
 						this.iRaceAssistantConversationBooster := this.getArgumentValue("raceAssistantConversationBooster", false)
-						
+
 						this.iRaceAssistantListener := (((assistantListener = kTrue) || (assistantListener = "On")) ? true : assistantListener)
 					}
 				}
@@ -1825,7 +1825,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	}
 
 	requireRaceAssistant() {
-		local pid, options, exePath
+		local pid, options, ignore, parameter, exePath
 
 		if this.RaceAssistantEnabled {
 			if !this.RaceAssistant {
@@ -1836,46 +1836,18 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 					options := " -Remote " . pid
 
-					if this.RaceAssistantName
-						options .= " -Name `"" . this.RaceAssistantName . "`""
-
-					if this.RaceAssistantLogo
-						options .= " -Logo `"" . this.RaceAssistantLogo . "`""
-
-					if this.RaceAssistantLanguage
-						options .= " -Language `"" . this.RaceAssistantLanguage . "`""
-
-					if this.RaceAssistantSynthesizer
-						options .= " -Synthesizer `"" . this.RaceAssistantSynthesizer . "`""
-
-					if this.RaceAssistantSpeaker
-						options .= " -Speaker `"" . this.RaceAssistantSpeaker . "`""
-
-					if this.RaceAssistantSpeakerVocalics
-						options .= " -SpeakerVocalics `"" . this.RaceAssistantSpeakerVocalics . "`""
-
-					if this.RaceAssistantSpeakerBooster
-						options .= " -SpeakerBooster `"" . this.RaceAssistantSpeakerBooster . "`""
-
-					if this.RaceAssistantRecognizer
-						options .= " -Recognizer `"" . this.RaceAssistantRecognizer . "`""
-
-					if this.RaceAssistantListener
-						options .= " -Listener `"" . this.RaceAssistantListener . "`""
-
-					if this.RaceAssistantListenerBooster
-						options .= " -ListenerBooster `"" . this.RaceAssistantListenerBooster . "`""
-
-					if this.RaceAssistantConversationBooster
-						options .= " -ConversationBooster `"" . this.RaceAssistantConversationBooster . "`""
+					for ignore, parameter in ["Name", "Logo", "Language", "Synthesizer", "Speaker", "SpeakerVocalics", "Recognizer", "Listener"
+											, "SpeakerBooster", "ListenerBooster", "ConversationBooster"]
+						if this.RaceAssistant%parameter%
+							options .= (" -" . parameter . " `"" . this.RaceAssistant%parameter% . "`"")
 
 					if this.RaceAssistantMuted
 						options .= " -Muted"
 
 					if this.Controller.VoiceServer
-						options .= " -Voice `"" . this.Controller.VoiceServer . "`""
+						options .= (" -Voice `"" . this.Controller.VoiceServer . "`"")
 
-					exePath := "`"" . kBinariesDirectory . this.Plugin . ".exe`"" . options
+					exePath := ("`"" . kBinariesDirectory . this.Plugin . ".exe`"" . options)
 
 					Run(exePath, kBinariesDirectory, , &pid)
 

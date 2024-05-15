@@ -647,9 +647,18 @@ triggerDetector(callback := false, options := ["Joy", "Key"]) {
 testAssistants(configurator, assistants := kRaceAssistants) {
 	local configuration := configurator.getSimulatorConfiguration()
 	local configurationFile := temporaryFileName("Simulator Configuration", "ini")
-	local thePlugin, ignore, assistant, name
+	local thePlugin, ignore, assistant, options, parameter, value
+
+	deleteConfiguration(*) {
+		deleteFile(configurationFile)
+
+		return false
+	}
 
 	writeMultiMap(configurationFile, configuration)
+
+	if !isDebug()
+		OnExit(deleteConfiguration)
 
 	Run(kBinariesDirectory . "Voice Server.exe -Debug true -Configuration `"" . configurationFile . "`"")
 
@@ -660,8 +669,20 @@ testAssistants(configurator, assistants := kRaceAssistants) {
 	for ignore, assistant in assistants {
 		thePlugin := Plugin(assistant, configuration)
 
-		name := thePlugin.getArgumentValue("raceAssistantName", false)
+		options := ""
 
-		Run(kBinariesDirectory . assistant . ".exe -Debug true -Configuration `"" . configurationFile . "`" -Speaker true -Listener true -Language " . language . " -Name " . name . " -Logo true")
+		for ignore, parameter in ["Name", "Language", "Synthesizer", "Speaker", "SpeakerVocalics", "Recognizer", "Listener"]
+			if thePlugin.hasArgument("raceAssistant" . parameter) {
+				value := thePlugin.getArgumentValue("raceAssistant" . parameter)
+
+				if ((value = "On") || (value = kTrue))
+					value := true
+				else if ((value = "Off") || (value = kFalse))
+					value := false
+
+				options .= (" -" . parameter . " `"" . value . "`"")
+			}
+
+		Run(kBinariesDirectory . assistant . ".exe -Logo true -Debug true -Configuration `"" . configurationFile . "`"" . options)
 	}
 }

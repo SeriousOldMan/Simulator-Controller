@@ -883,13 +883,15 @@ class SpeechSynthesizer {
 	}
 
 	computeVoice(voice, language, randomize := true) {
+		local availableVoices := []
 		local voices := this.Voices
-		local availableVoices, count, locale, ignore, candidate
+		local count, locale, ignore, candidate
 
 		if (this.Synthesizer = "Windows") {
-			if ((voice == true) && language) {
+			if language
 				availableVoices := this.Voices[language]
 
+			if ((voice == true) && language) {
 				count := availableVoices.Length
 
 				if (count == 0)
@@ -899,11 +901,9 @@ class SpeechSynthesizer {
 				else
 					voice := availableVoices[1]
 			}
-			else
-				voices := this.Voices
 		}
 		else if ((this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure") || (this.Synthesizer = "Google")) {
-			if ((voice == true) && language) {
+			if language {
 				availableVoices := []
 
 				for ignore, candidate in voices {
@@ -913,7 +913,9 @@ class SpeechSynthesizer {
 					if (InStr(locale, language) == 1)
 						availableVoices.Push(candidate)
 				}
+			}
 
+			if ((voice == true) && language) {
 				count := availableVoices.Length
 
 				if (count == 0)
@@ -925,13 +927,24 @@ class SpeechSynthesizer {
 			}
 		}
 
-		if (voice && (voice != true))
-			voice := inList(voices, voice)
+		if (availableVoices.Length > 0) {
+			if (voice && (voice != true))
+				voice := inList(availableVoices, voice)
 
-		if !voice
-			voice := 1
+			if !voice
+				voice := 1
 
-		return (voices.Has(voice) ? voices[voice] : "")
+			return (availableVoices.Has(voice) ? availableVoices[voice] : "")
+		}
+		else {
+			if (voice && (voice != true))
+				voice := inList(voices, voice)
+
+			if !voice
+				voice := 1
+
+			return (voices.Has(voice) ? voices[voice] : "")
+		}
 	}
 
 	setVoice(language, name) {

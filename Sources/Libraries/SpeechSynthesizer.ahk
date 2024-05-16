@@ -907,8 +907,7 @@ class SpeechSynthesizer {
 				availableVoices := []
 
 				for ignore, candidate in voices {
-					voice := string2Values("(", candidate)
-					locale := StrReplace(voice[2], ")", "")
+					locale := StrReplace(string2Values("(", candidate)[2], ")", "")
 
 					if (InStr(locale, language) == 1)
 						availableVoices.Push(candidate)
@@ -927,24 +926,18 @@ class SpeechSynthesizer {
 			}
 		}
 
-		if (availableVoices.Length > 0) {
-			if (voice && (voice != true))
-				voice := inList(availableVoices, voice)
+		if (availableVoices.Length > 0)
+			if (voice && (voice != true) && inList(availableVoices, voice))
+				return voice
 
-			if !voice
-				voice := 1
-
-			return (availableVoices.Has(voice) ? availableVoices[voice] : "")
+		if (voices.Length > 0) {
+			if (voice && (voice != true) && inList(voices, voice))
+				return voice
+			else
+				return voices[1]
 		}
-		else {
-			if (voice && (voice != true))
-				voice := inList(voices, voice)
-
-			if !voice
-				voice := 1
-
-			return (voices.Has(voice) ? voices[voice] : "")
-		}
+		else
+			return ""
 	}
 
 	setVoice(language, name) {

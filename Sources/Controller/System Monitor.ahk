@@ -917,11 +917,27 @@ systemMonitor(command := false, arguments*) {
 						html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyre Set") . "</th><td class=`"td-wdg`" colspan=`"2`">" . tyreSet . "</td></tr>")
 
 					html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Pressures") . "</th><td class=`"td-wdg`" style=`"text-align: right`">"
-						   . displayValue("Float", convertUnit("Pressure", getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Pressure.FL"))) . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
-						   . displayValue("Float", convertUnit("Pressure", getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Pressure.FR"))) . "</td></tr>")
+						   . displayValue("Float", convertUnit("Pressure", getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Pressure.FL")))
+						   . translate(" (")
+						   . displayValue("Float", convertUnit("Pressure", getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Pressure.FL.Increment")))
+						   . translate(")")
+						   . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
+						   . displayValue("Float", convertUnit("Pressure", getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Pressure.FR")))
+						   . translate(" (")
+						   . displayValue("Float", convertUnit("Pressure", getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Pressure.FR.Increment")))
+						   . translate(")")
+						   . "</td></tr>")
 					html .= ("<tr><td class=`"td-wdg`" style=`"text-align: right`">"
-						   . displayValue("Float", convertUnit("Pressure", getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Pressure.RL"))) . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
-						   . displayValue("Float", convertUnit("Pressure", getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Pressure.RR"))) . "</td></tr>")
+						   . displayValue("Float", convertUnit("Pressure", getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Pressure.RL")))
+						   . translate(" (")
+						   . displayValue("Float", convertUnit("Pressure", getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Pressure.RL.Increment")))
+						   . translate(")")
+						   . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
+						   . displayValue("Float", convertUnit("Pressure", getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Pressure.RR")))
+						   . translate(" (")
+						   . displayValue("Float", convertUnit("Pressure", getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Pressure.RR.Increment")))
+						   . translate(")")
+						   . "</td></tr>")
 				}
 				else
 					html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyres") . "</th><td class=`"td-wdg`">" . translate("No") . "</td></tr>")
@@ -956,11 +972,27 @@ systemMonitor(command := false, arguments*) {
 						html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyre Set") . "</th><td class=`"td-wdg`" colspan=`"2`">" . tyreSet . "</td></tr>")
 
 					html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Pressures") . "</th><td class=`"td-wdg`" style=`"text-align: right`">"
-						   . displayValue("Float", convertUnit("Pressure", getMultiMapValue(sessionState, "Pitstop", "Target.Tyre.Pressure.FL"))) . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
-						   . displayValue("Float", convertUnit("Pressure", getMultiMapValue(sessionState, "Pitstop", "Target.Tyre.Pressure.FR"))) . "</td></tr>")
+						   . displayValue("Float", convertUnit("Pressure", getMultiMapValue(sessionState, "Pitstop", "Target.Tyre.Pressure.FL")))
+						   . translate(" (")
+						   . displayValue("Float", convertUnit("Pressure", getMultiMapValue(sessionState, "Pitstop", "Target.Tyre.Pressure.FL.Increment")))
+						   . translate(")")
+						   . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
+						   . displayValue("Float", convertUnit("Pressure", getMultiMapValue(sessionState, "Pitstop", "Target.Tyre.Pressure.FR")))
+						   . translate(" (")
+						   . displayValue("Float", convertUnit("Pressure", getMultiMapValue(sessionState, "Pitstop", "Target.Tyre.Pressure.FR.Increment")))
+						   . translate(")")
+						   . "</td></tr>")
 					html .= ("<tr><td class=`"td-wdg`" style=`"text-align: right`">"
-						   . displayValue("Float", convertUnit("Pressure", getMultiMapValue(sessionState, "Pitstop", "Target.Tyre.Pressure.RL"))) . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
-						   . displayValue("Float", convertUnit("Pressure", getMultiMapValue(sessionState, "Pitstop", "Target.Tyre.Pressure.RL"))) . "</td></tr>")
+						   . displayValue("Float", convertUnit("Pressure", getMultiMapValue(sessionState, "Pitstop", "Target.Tyre.Pressure.RL")))
+						   . translate(" (")
+						   . displayValue("Float", convertUnit("Pressure", getMultiMapValue(sessionState, "Pitstop", "Target.Tyre.Pressure.RL.Increment")))
+						   . translate(")")
+						   . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
+						   . displayValue("Float", convertUnit("Pressure", getMultiMapValue(sessionState, "Pitstop", "Target.Tyre.Pressure.RR")))
+						   . translate(" (")
+						   . displayValue("Float", convertUnit("Pressure", getMultiMapValue(sessionState, "Pitstop", "Target.Tyre.Pressure.RR.Increment")))
+						   . translate(")")
+						   . "</td></tr>")
 				}
 				else
 					html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyres") . "</th><td class=`"td-wdg`">" . translate("No") . "</td></tr>")

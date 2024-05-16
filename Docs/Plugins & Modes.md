@@ -1482,6 +1482,7 @@ The content of the JSON file looks like this (depending on the current situation
 				24.4,
 				24.3
 			],
+			"TyrePressureIncrements": [0.2, 0.1, -0.3, -0.2],
 			"TyreSet": 2
 		},
 		"Session": {

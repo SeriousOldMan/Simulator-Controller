@@ -1172,7 +1172,7 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 			}
 		}
 
-		editorGui := Window({Descriptor: "Synthesizer Editor", Options: "0x400000"}, "")
+		editorGui := Window({Descriptor: "Synthesizer Editor", Options: "0x400000"})
 
 		this.iWindow := editorGui
 

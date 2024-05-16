@@ -1527,7 +1527,7 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 			}
 		}
 
-		reportSettingsGui := Window({Options: "0x400000"}, "")
+		reportSettingsGui := Window({Options: "0x400000"}, translate("Settings"))
 
 		reportSettingsGui.Opt("+Owner" . raceReport.Window.Hwnd)
 

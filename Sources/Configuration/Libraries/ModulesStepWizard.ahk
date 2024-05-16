@@ -601,7 +601,7 @@ class DownloadablePreset extends NamedPreset {
 			}
 		}
 
-		dlcGui := Window({Descriptor: "DLC Manager", Options: "0x400000"}, "")
+		dlcGui := Window({Descriptor: "DLC Manager", Options: "0x400000"})
 
 		this.iWindow := dlcGui
 

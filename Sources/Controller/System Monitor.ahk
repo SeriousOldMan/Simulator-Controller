@@ -243,7 +243,7 @@ editSettings(settingsOrCommand, arguments*) {
 
 		result := false
 
-		settingsGui := Window({Descriptor: "System Monitor.Settings", Options: "0x400000"}, "")
+		settingsGui := Window({Descriptor: "System Monitor.Settings", Options: "0x400000"}, translate("Settings"))
 
 		settingsGui.SetFont("s10 Bold", "Arial")
 

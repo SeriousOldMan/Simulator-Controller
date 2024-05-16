@@ -127,7 +127,7 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 			this.updateState()
 		}
 
-		editorGui := Window({Descriptor: "Booster Editor", Options: "0x400000"}, "")
+		editorGui := Window({Descriptor: "Booster Editor", Options: "0x400000"})
 
 		this.iWindow := editorGui
 

@@ -2235,7 +2235,7 @@ loginDialog(connectorOrCommand := false, teamServerURL := false, owner := false,
 	else {
 		result := false
 
-		loginGui := Window({Options: "0x400000"}, "")
+		loginGui := Window({Options: "0x400000"}, translate("Team Server"))
 
 		loginGui.SetFont("Norm", "Arial")
 

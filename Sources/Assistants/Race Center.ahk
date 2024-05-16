@@ -12619,7 +12619,7 @@ pitstopSettings(raceCenterOrCommand := false, arguments*) {
 				WinActivate(settingsGui)
 		}
 		else {
-			settingsGui := Window({Descriptor: "Race Center.Pitstop Settings", Options: "0x400000"}, "")
+			settingsGui := Window({Descriptor: "Race Center.Pitstop Settings", Options: "0x400000"})
 
 			settingsGui.SetFont("s10 Bold", "Arial")
 
@@ -12674,7 +12674,7 @@ loginDialog(connectorOrCommand := false, teamServerURL := false, owner := false,
 	else {
 		result := false
 
-		loginGui := Window({Options: "0x400000"}, "")
+		loginGui := Window({Options: "0x400000"}, translate("Team Server"))
 
 		loginGui.SetFont("Norm", "Arial")
 

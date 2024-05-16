@@ -12,7 +12,7 @@
   11. Added "GPT-4o" to the list of OpenAI models.
   12. The pitstop component on the session info page of "System Monitor" now also displays the relative tyre pressure increment values for the next pitstop.
   13. [Internal] Migrated to AHK 2.0.15.
-  14. [Developer] Add information about tyre pressure increment values to the "Session State.json" file.
+  14. [Developer] Add information about tyre pressure increment values to the ["Session State.json"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) file.
 
 ## 5.7.1.0-release 05/10/24
   1. Minor bugfixes, as always

@@ -4706,7 +4706,7 @@ actionDialog(xOrCommand := false, y := false, action := false, *) {
 	else {
 		result := false
 
-		actionDialogGui := Window({Options: "0x400000"}, "")
+		actionDialogGui := Window({Options: "0x400000"}, translate("Action"))
 
 		actionDialogGui.SetFont("Norm", "Arial")
 
@@ -5582,7 +5582,7 @@ editSettings(editorOrCommand, arguments*) {
 			serverUpdateEdit := ""
 		}
 
-		settingsEditorGui := Window({Descriptor: "Session Database.Settings", Options: "0x400000"}, "")
+		settingsEditorGui := Window({Descriptor: "Session Database.Settings", Options: "0x400000"}, translate("Settings"))
 
 		settingsEditorGui.SetFont("s10 Bold", "Arial")
 
@@ -5858,7 +5858,7 @@ loginDialog(connectorOrCommand := false, teamServerURL := false, owner := false,
 	else {
 		result := false
 
-		loginGui := Window({Options: "0x400000"}, "")
+		loginGui := Window({Options: "0x400000"}, translate("Team Server"))
 
 		loginGui.SetFont("Norm", "Arial")
 

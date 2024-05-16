@@ -192,7 +192,7 @@ installOptions(options, *) {
 	else {
 		result := false
 
-		installGui := Window({Options: "0x400000"}, "")
+		installGui := Window({Options: "0x400000"}, translate("Install"))
 
 		installGui.SetFont("Bold", "Arial")
 
@@ -284,7 +284,7 @@ uninstallOptions(options, *) {
 	else {
 		result := false
 
-		uninstallGui := Window({Options: "0x400000"}, "")
+		uninstallGui := Window({Options: "0x400000"}, translate("Install"))
 
 		uninstallGui.SetFont("Bold", "Arial")
 
@@ -1199,7 +1199,7 @@ viewBuildLog(fileName, title := "", x := "Center", y := "Center", width := 800, 
 
 	innerWidth := width - 16
 
-	buildLogGui := Window({Options: "0x400000"}, "")
+	buildLogGui := Window({Options: "0x400000"})
 
 	buildLogGui.SetFont("s10 Bold", "Arial")
 

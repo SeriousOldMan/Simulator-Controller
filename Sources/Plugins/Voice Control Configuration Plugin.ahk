@@ -1416,7 +1416,7 @@ editSoundProcessing(editorOrCommand := false, settings := false, *) {
 	else {
 		result := false
 
-		editorGui := Window({Options: "0x400000"}, "")
+		editorGui := Window({Options: "0x400000"}, translate("Post Processing"))
 
 		editorGui.SetFont("Norm", "Arial")
 

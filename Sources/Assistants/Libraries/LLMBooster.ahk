@@ -27,7 +27,7 @@
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class GPTBooster extends ConfigurationItem {
+class LLMBooster extends ConfigurationItem {
 	iOptions := CaseInsenseMap()
 
 	iConnector := false
@@ -50,7 +50,7 @@ class GPTBooster extends ConfigurationItem {
 
 	Descriptor {
 		Get {
-			throw "Virtual property GPTBooster.Descriptor must be implemented in a subclass..."
+			throw "Virtual property LLMBooster.Descriptor must be implemented in a subclass..."
 		}
 	}
 
@@ -91,7 +91,7 @@ class GPTBooster extends ConfigurationItem {
 			service := string2Values("|", service)
 
 			if !inList(this.Providers, service[1])
-				throw "Unsupported service detected in GPTBooster.startBooster..."
+				throw "Unsupported service detected in LLMBooster.startBooster..."
 
 			if (service[1] = "LLM Runtime")
 				this.iConnector := LLMConnector.LLMRuntimeConnector(this, this.Options["Model"])
@@ -104,17 +104,17 @@ class GPTBooster extends ConfigurationItem {
 				catch Any as exception {
 					logError(exception)
 
-					throw "Unsupported service detected in GPTBooster.startBooster..."
+					throw "Unsupported service detected in LLMBooster.startBooster..."
 				}
 
 			this.Connector.MaxTokens := this.MaxTokens
 		}
 		else
-			throw "Unsupported service detected in GPTBooster.startBooster..."
+			throw "Unsupported service detected in LLMBooster.startBooster..."
 	}
 }
 
-class ConversationBooster extends GPTBooster {
+class ConversationBooster extends LLMBooster {
 	Descriptor {
 		Get {
 			return this.Options["Descriptor"]
@@ -214,6 +214,7 @@ class SpeechBooster extends ConversationBooster {
 	}
 
 	speak(text, options := false) {
+		local variables := false
 		local doRephrase, doTranslate, code, language, fileName, languageInstructions, instruction
 
 		static instructions := false
@@ -243,6 +244,9 @@ class SpeechBooster extends ConversationBooster {
 				doRephrase := ((Random(1, 10) <= (10 * this.Probability)) && (!options.Has("Rephrase") || options["Rephrase"]))
 				doTranslate := (options.Has("Translate") && options["Translate"])
 
+				if options.Has("Variables")
+					variables := options["Variables"]
+
 				if options.Has("Language")
 					code := options["Language"]
 			}
@@ -261,9 +265,16 @@ class SpeechBooster extends ConversationBooster {
 					else
 						instruction := "Rephrase"
 
+					if variables {
+						variables.language := (language ? language : "")
+						variables.text := text
+					}
+					else
+						variables := {language: language ? language : "", text: text}
+
 					instruction := substituteVariables(getMultiMapValue(instructions[instructions.Has(code) ? code : "EN"]
 																	  , "Speaker.Instructions", instruction)
-													 , {language: language ? language : "", text: text})
+													 , variables)
 
 					answer := this.Connector.Ask(instruction)
 

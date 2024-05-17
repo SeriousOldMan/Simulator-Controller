@@ -127,6 +127,9 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 			this.updateState()
 		}
 
+		editInstructions(type, *) {
+		}
+
 		editorGui := Window({Descriptor: "Booster Editor", Options: "0x400000"})
 
 		this.iWindow := editorGui
@@ -191,6 +194,9 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 		widget16 := editorGui.Add("UpDown", "x" . x1 . " yp w60 h23 Range0-100")
 		widget17 := editorGui.Add("Text", "x" . (x1 + 65) . " yp w100 h23 +0x200", translate("%"))
 
+		widget40 := editorGui.Add("Button", "x" . (width + 8 - 100) . " yp w100 h23 X:Move", translate("Instructions..."))
+		widget40.OnEvent("Click", editInstructions.Bind("Speaker"))
+
 		widget18 := editorGui.Add("Text", "x" . x0 . " yp+24 w105 h23 +0x200", translate("Creativity"))
 		widget19 := editorGui.Add("Edit", "x" . x1 . " yp w60 Number Limit3 vviSpeakerTemperatureEdit")
 		widget19.OnEvent("Change", validatePercentage.Bind("viSpeakerTemperatureEdit"))
@@ -206,6 +212,9 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 		widget24 := editorGui.Add("Text", "x" . x0 . " yp+20 w105 h23 +0x200", translate("Activation"))
 		widget25:= editorGui.Add("DropDownList", "x" . x1 . " yp w100 Choose1 vviListenerModeDropDown", collect(["Always", "Unrecognized"], translate))
 		widget25.OnEvent("Change", (*) => this.updateState())
+
+		widget41 := editorGui.Add("Button", "x" . (width + 8 - 100) . " yp w100 h23 X:Move", translate("Instructions..."))
+		widget41.OnEvent("Click", editInstructions.Bind("Listener"))
 
 		widget26 := editorGui.Add("Text", "x" . x0 . " yp+24 w105 h23 +0x200", translate("Creativity"))
 		widget27 := editorGui.Add("Edit", "x" . x1 . " yp w60 Number Limit3 vviListenerTemperatureEdit")
@@ -223,6 +232,9 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 		widget33 := editorGui.Add("Edit", "x" . x1 . " yp w60 h23 Number Limit2 vviConversationMaxHistoryEdit")
 		widget34 := editorGui.Add("UpDown", "x" . x1 . " yp w60 h23 Range1-10")
 		widget35 := editorGui.Add("Text", "x" . (x1 + 65) . " yp w100 h23 +0x200", translate("Conversations"))
+
+		widget42 := editorGui.Add("Button", "x" . (width + 8 - 100) . " yp w100 h23 X:Move", translate("Instructions..."))
+		widget42.OnEvent("Click", editInstructions.Bind("Conversation"))
 
 		widget36 := editorGui.Add("Text", "x" . x0 . " yp+24 w105 h23 +0x200", translate("Creativity"))
 		widget37 := editorGui.Add("Edit", "x" . x1 . " yp w60 Number Limit3 vviConversationTemperatureEdit")

@@ -777,6 +777,10 @@ class RaceAssistant extends ConfigurationItem {
 		local text := ""
 		local filter := false
 		local key, value, ignore, candidate, skip, excludes, includes, include
+		local pattern, replacement
+
+		static replacements := Map(".FL", ".Front.Left", ".FR", ".Front.Right"
+								 , ".RL", ".Rear.Left", ".RR", ".Rear.Right")
 
 		if knowledgeBase {
 			if options {
@@ -828,6 +832,9 @@ class RaceAssistant extends ConfigurationItem {
 						case "Session.Track":
 							value := SessionDatabase.getTrackName(knowledgeBase.getValue("Session.Simulator"), value)
 					}
+
+					for pattern, replacement in replacements
+						key := StrReplace(key, pattern, replacement)
 
 					text .= (key . " = " . value . "`n")
 				}

@@ -44,6 +44,8 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 	iProviderConfigurations := CaseInsenseMap()
 	iCurrentProvider := false
 
+	iInstructions := newMultiMap()
+
 	Assistant {
 		Get {
 			return this.iAssistant
@@ -127,7 +129,8 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 			this.updateState()
 		}
 
-		editInstructions(type, *) {
+		editInstructions(type, title, *) {
+			this.editInstructions(type, title)
 		}
 
 		editorGui := Window({Descriptor: "Booster Editor", Options: "0x400000"})
@@ -194,8 +197,8 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 		widget16 := editorGui.Add("UpDown", "x" . x1 . " yp w60 h23 Range0-100")
 		widget17 := editorGui.Add("Text", "x" . (x1 + 65) . " yp w100 h23 +0x200", translate("%"))
 
-		widget40 := editorGui.Add("Button", "x" . (width + 8 - 100) . " yp w100 h23 X:Move", translate("Instructions..."))
-		widget40.OnEvent("Click", editInstructions.Bind("Speaker"))
+		widget40 := editorGui.Add("Button", "x" . (width + 8 - 100) . " yp w100 h23 X:Move vviSpeakerInstructionsButton", translate("Instructions..."))
+		widget40.OnEvent("Click", editInstructions.Bind("Speaker", translate("Rephrasing")))
 
 		widget18 := editorGui.Add("Text", "x" . x0 . " yp+24 w105 h23 +0x200", translate("Creativity"))
 		widget19 := editorGui.Add("Edit", "x" . x1 . " yp w60 Number Limit3 vviSpeakerTemperatureEdit")
@@ -213,8 +216,8 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 		widget25:= editorGui.Add("DropDownList", "x" . x1 . " yp w100 Choose1 vviListenerModeDropDown", collect(["Always", "Unrecognized"], translate))
 		widget25.OnEvent("Change", (*) => this.updateState())
 
-		widget41 := editorGui.Add("Button", "x" . (width + 8 - 100) . " yp w100 h23 X:Move", translate("Instructions..."))
-		widget41.OnEvent("Click", editInstructions.Bind("Listener"))
+		widget41 := editorGui.Add("Button", "x" . (width + 8 - 100) . " yp w100 h23 X:Move vviListenerInstructionsButton", translate("Instructions..."))
+		widget41.OnEvent("Click", editInstructions.Bind("Listener", translate("Understanding")))
 
 		widget26 := editorGui.Add("Text", "x" . x0 . " yp+24 w105 h23 +0x200", translate("Creativity"))
 		widget27 := editorGui.Add("Edit", "x" . x1 . " yp w60 Number Limit3 vviListenerTemperatureEdit")
@@ -233,8 +236,8 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 		widget34 := editorGui.Add("UpDown", "x" . x1 . " yp w60 h23 Range1-10")
 		widget35 := editorGui.Add("Text", "x" . (x1 + 65) . " yp w100 h23 +0x200", translate("Conversations"))
 
-		widget42 := editorGui.Add("Button", "x" . (width + 8 - 100) . " yp w100 h23 X:Move", translate("Instructions..."))
-		widget42.OnEvent("Click", editInstructions.Bind("Conversation"))
+		widget42 := editorGui.Add("Button", "x" . (width + 8 - 100) . " yp w100 h23 X:Move vviConversationInstructionsButton", translate("Instructions..."))
+		widget42.OnEvent("Click", editInstructions.Bind("Conversation", translate("Conversation")))
 
 		widget36 := editorGui.Add("Text", "x" . x0 . " yp+24 w105 h23 +0x200", translate("Creativity"))
 		widget37 := editorGui.Add("Edit", "x" . x1 . " yp w60 Number Limit3 vviConversationTemperatureEdit")
@@ -364,6 +367,8 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 		super.saveToConfiguration(configuration)
 
 		this.saveProviderConfiguration()
+
+		addMultiMapValues(configuration, this.iInstructions)
 
 		for ignore, provider in this.Providers {
 			providerConfiguration := this.iProviderConfigurations[provider]
@@ -576,6 +581,7 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 			this.Control["viSpeakerTemperatureEdit"].Enabled := false
 			this.Control["viSpeakerProbabilityEdit"].Text := ""
 			this.Control["viSpeakerTemperatureEdit"].Text := ""
+			this.Control["viSpeakerInstructionsButton"].Enabled := false
 		}
 		else {
 			this.Control["viSpeakerProbabilityEdit"].Enabled := true
@@ -586,6 +592,8 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 
 			if (this.Control["viSpeakerTemperatureEdit"].Text = "")
 				this.Control["viSpeakerTemperatureEdit"].Text := 50
+
+			this.Control["viSpeakerInstructionsButton"].Enabled := true
 		}
 
 		if (this.Control["viListenerCheck"].Value = 0) {
@@ -593,6 +601,7 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 			this.Control["viListenerTemperatureEdit"].Enabled := false
 			this.Control["viListenerModeDropDown"].Choose(0)
 			this.Control["viListenerTemperatureEdit"].Text := ""
+			this.Control["viListenerInstructionsButton"].Enabled := false
 		}
 		else {
 			this.Control["viListenerModeDropDown"].Enabled := true
@@ -603,6 +612,8 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 
 			if (this.Control["viListenerTemperatureEdit"].Text = "")
 				this.Control["viListenerTemperatureEdit"].Text := 50
+
+			this.Control["viListenerInstructionsButton"].Enabled := true
 		}
 
 		if (this.Control["viConversationCheck"].Value = 0) {
@@ -610,6 +621,7 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 			this.Control["viConversationTemperatureEdit"].Enabled := false
 			this.Control["viConversationMaxHistoryEdit"].Text := ""
 			this.Control["viConversationTemperatureEdit"].Text := ""
+			this.Control["viConversationInstructionsButton"].Enabled := false
 		}
 		else {
 			this.Control["viConversationMaxHistoryEdit"].Enabled := true
@@ -620,6 +632,161 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 
 			if (this.Control["viConversationTemperatureEdit"].Text = "")
 				this.Control["viConversationTemperatureEdit"].Text := 50
+
+			this.Control["viConversationInstructionsButton"].Enabled := true
+		}
+	}
+
+	getOriginalInstruction(language, type, key) {
+		return getMultiMapValue(this.getInstructions(type, true), "Conversation Booster", "Instructions." . type . "." . key . "." . language, "")
+	}
+
+	getInstructions(type, builtin := false) {
+		local instructions := newMultiMap()
+		local key, value, ignore, directory, configuration, language
+
+		for ignore, directory in [kTranslationsDirectory, kUserTranslationsDirectory]
+			loop Files (directory . "Conversation Booster.instructions.*") {
+				SplitPath A_LoopFilePath, , , &language
+
+				for key, value in getMultiMapValues(readMultiMap(A_LoopFilePath), type . ".Instructions")
+					setMultiMapValue(instructions, "Conversation Booster", "Instructions." . type . "." . key . "." . language, value)
+			}
+
+		if !builtin
+			for ignore, configuration in [this.Configuration, this.iInstructions]
+				for key, value in getMultiMapValues(configuration, "Conversation Booster")
+					if (InStr(key, "Instructions." . type) = 1)
+						setMultiMapValue(instructions, "Conversation Booster", key, value)
+
+		return instructions
+	}
+
+	setInstructions(type, instructions) {
+		addMultiMapValues(this.iInstructions, instructions)
+	}
+
+	editInstructions(type, title) {
+		local window := this.Window
+		local instructions
+
+		window.Block()
+
+		try {
+			instructions := editInstructions(this, title, this.getInstructions(type), window)
+
+			if instructions
+				this.setInstructions(type, instructions)
+		}
+		finally {
+			window.Unblock()
+		}
+	}
+}
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                        Private Functions Section                        ;;;
+;;;-------------------------------------------------------------------------;;;
+
+editInstructions(editorOrCommand, title := false, originalInstructions := false, owner := false) {
+	local choices, key, value, descriptor, reloadAll
+
+	static editor, instructions, instructionsGui, result, instructionEdit
+
+	rephrase(key) {
+		if (key = "RephraseTranslate")
+			return "Rephrase & Translate"
+		else
+			return key
+	}
+
+	if (editorOrCommand == kOk)
+		result := kOk
+	else if (editorOrCommand == kCancel)
+		result := kCancel
+	else if (editorOrCommand == "Reload") {
+		reloadALL := GetKeyState("Ctrl")
+
+		for key, value in getMultiMapValues(instructions, "Conversation Booster")
+			if (reloadAll || (instructionsGui["instructionsDropDown"].Value = A_Index)) {
+				descriptor := ConfigurationItem.splitDescriptor(key)
+
+				setMultiMapValues(instructions, "Conversation Booster", key, value)
+
+				instructionsGui["instructionEdit"].Value := editor.getOriginalInstruction(descriptor[4], descriptor[2], descriptor[3])
+
+				if !reloadAll
+					break
+			}
+	}
+	else if (editorOrCommand == "Load") {
+		for key, value in getMultiMapValues(instructions, "Conversation Booster")
+			if (instructionsGui["instructionsDropDown"].Value = A_Index) {
+				instructionsGui["instructionEdit"].Value := value
+
+				break
+			}
+	}
+	else if (editorOrCommand == "Update") {
+		for key, value in getMultiMapValues(instructions, "Conversation Booster")
+			if (instructionsGui["instructionsDropDown"].Value = A_Index) {
+				setMultiMapValue(instructions, "Conversation Booster", key, instructionsGui["instructionEdit"].Value)
+
+				break
+			}
+	}
+	else {
+		editor := editorOrCommand
+		result := false
+
+		instructions := originalInstructions.Clone()
+
+		instructionsGui := Window({Options: "0x400000"}, title)
+
+		instructionsGui.SetFont("Norm", "Arial")
+
+		choices := []
+
+		for key, value in getMultiMapValues(instructions, "Conversation Booster") {
+			key := ConfigurationItem.splitDescriptor(key)
+
+			choices.Push(translate(rephrase(key[3])) . translate(" (") . StrUpper(key[4]) . translate(")"))
+		}
+
+		instructionsGui.Add("Text", "x16 y16 w90 h23 +0x200", translate("Instructions"))
+		instructionsGui.Add("DropDownList", "x110 yp w180 vinstructionsDropDown", choices).OnEvent("Change", (*) => editInstructions("Load"))
+
+		widget1 := instructionsGui.Add("Button", "x447 yp w23 h23")
+		widget1.OnEvent("Click", (*) => editInstructions("Reload"))
+		setButtonIcon(widget1, kIconsDirectory . "Renew.ico", 1)
+
+		instructionEdit := instructionsGui.Add("Edit", "x110 yp+24 w360 h200 Multi vinstructionEdit")
+		instructionEdit.OnEvent("Change", (*) => editInstructions("Update"))
+
+		instructionsGui.Add("Button", "x160 yp+210 w80 h23 Default", translate("Ok")).OnEvent("Click", editInstructions.Bind(kOk))
+		instructionsGui.Add("Button", "x246 yp w80 h23", translate("&Cancel")).OnEvent("Click", editInstructions.Bind(kCancel))
+
+		instructionsGui.Opt("+Owner" . owner.Hwnd)
+
+		instructionsGui.Show("AutoSize Center")
+
+		instructionsGui["instructionsDropDown"].Choose(1)
+
+		editInstructions("Load")
+
+		while !result
+			Sleep(100)
+
+		try {
+			if (result == kCancel)
+				return false
+			else if (result == kOk) {
+				return instructions
+			}
+		}
+		finally {
+			instructionsGui.Destroy()
 		}
 	}
 }

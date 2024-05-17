@@ -413,7 +413,8 @@ Several boosters are available at the moment:
      (1) Depending on the availabilty of the data by the current simulator.
 	 
 	 Since large parts of the knowledgebase of the Assistants will be supplied to the LLM for matching, a context window of at least 4k tokens is required for this booster. Full standings history isn't possible at the moment, since this will flood the input context area of the LLM, at least for the *smaller* models like GPT 3.5, Mistral 7b, and so on. Time will cure this problem, and I will update the capabilities of the integration, when more capable models become available. For the time being, the position data is available for the most recent laps and also the gaps for the most important opponents are passed to the LLM (for Strategist and Spotter).
-  
+
+For each of the above conversation boosters, you can edit the instructions that are send to the LLM by clicking on the button labeled "Instructions...". A new window will open, where you can edit all related instructions for each of the supported languages. Whenever you want to restore the original instruction, you can do this by clicking on the small button with the recylce
 Important: Using a GPT service like OpenAI may impose some costs, and running an LLM locally on your PC will require a very powerful system, especially when doing this while on the track. Therefore, configuring a conversation booster is fully optional.
 
 Disclaimer: Large Language Models like ChatGPT, although incredible impressive, are still under heavy development. Therefore it depends on the quality and capabilities of the model, if the Assistant will react like expected. And in most cases, the support for non-English languages is quite limited. I recommend to use the conversation booster only for English-speaking Assistants for the time being.
@@ -593,7 +594,13 @@ The [Virtual Driving Coach](https://github.com/SeriousOldMan/Simulator-Controlle
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%2012.JPG)
 
-Currently three providers are supported - "OpenAI", for which you have to register an [API account](https://openai.com) at OpenAI (it will need a little payment, but $5 will be enough for months of usage, believe me), "Azure", which will provide many models of OpenAI as well, and "GPT4ALL", which can be run locally (but unfortunately not side by side with a running simulator on todays hardware). Please not, that you **must** supply an API key for the "OpenAI" service, otherwise the coach will tell you all the time, that it is currently busy. For "GPT4All", no authentification is required, but you must enable the local API server in the settings. Please follow the instructions [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#installation) to register with the different GPT providers and get access to your secret API key.
+Several providers are supported: For "OpenAI" you have to register an [API account](https://openai.com) at OpenAI (it will need a little payment, but $5 will be enough for months of usage, believe me). "Azure" will provide many models of OpenAI as well, but is normally not available to private persons. Almost similar is the provider for "Mistral AI", which uses the same HTTPS-based API connection. In any case, you **must** supply an API key for the service, otherwise the Coach will tell you all the time, that it is currently busy.
+
+For "GPT4All", no authentification is required, but you must enable the local API server in the settings. Please follow the instructions [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#installation) to register with the different GPT providers and get access to your secret API key.
+
+Last, but not least, you can also use a local "LLM Runtime", which executes the LLM on your local PC. In this case, you have to supply a file path pointing to the model file in *GGUF* format.
+
+Please note, that "GPT4All" and "LLM Runtime" require a very powerful system and will also use a lot of resources on your GPU. So this will be no option in most cases (at least for the time being), especially when running it side by side to a running simulator.
 
 It is very important to choose the right LLM (aka large language model) for your coach. For "OpenAI", I recommend using "GPT 3.5 turbo". It is cheap (a typical conversation lasting around 30 minutes will cost not more than 2 cents), and it has very extensive knowledge about racing. Future extensions to the Driving Coach, especially telemetry data integration, might utilize the extended capabilities of "GPT 4", though. "GPT4All" provide a variety of different models from different sources. Therefore you will have to conduct some experiments, which model works best for you.
 

@@ -32,6 +32,8 @@ class LLMBooster extends ConfigurationItem {
 
 	iConnector := false
 
+	iInstructions := false
+
 	Options[key?] {
 		Get {
 			return (isSet(key) ? this.iOptions[key] : this.iOptions)
@@ -69,6 +71,49 @@ class LLMBooster extends ConfigurationItem {
 	Connector {
 		Get {
 			return this.iConnector
+		}
+	}
+
+	Instructions[language?] {
+		Get {
+			local instructions, ignore, instrLanguage, directory, key, value
+
+			if !this.iInstructions {
+				instructions := CaseInsenseMap()
+
+				for ignore, directory in [kTranslationsDirectory, kUserTranslationsDirectory]
+					loop Files (directory . "Conversation Booster.instructions.*") {
+						SplitPath A_LoopFilePath, , , &instrLanguage
+
+						if !instructions.Has(instrLanguage)
+							instructions[instrLanguage] := newMultiMap()
+
+						addMultiMapValues(instructions[instrLanguage], readMultiMap(A_LoopFilePath))
+					}
+
+				for key, value in getMultiMapValues(this.Configuration, "Conversation Booster")
+					if (InStr(key, "Instructions.") = 1) {
+						key := ConfigurationItem.splitDescriptor(key)
+
+						instrLanguage := key[4]
+
+						if !instructions.Has(instrLanguage)
+							instructions[instrLanguage] := newMultiMap()
+
+						setMultiMapValue(instructions[instrLanguage], key[2] . ".Instructions", key[3], value)
+					}
+
+				this.iInstructions := instructions
+			}
+
+			if isSet(language) {
+				if this.iInstructions.Has(language)
+					return this.iInstructions[language]
+				else
+					return newMultiMap()
+			}
+			else
+				return this.iInstructions
 		}
 	}
 
@@ -217,20 +262,6 @@ class SpeechBooster extends ConversationBooster {
 		local variables := false
 		local doRephrase, doTranslate, code, language, fileName, languageInstructions, instruction
 
-		static instructions := false
-
-		if !instructions {
-			instructions := CaseInsenseMap()
-
-			for code, language in availableLanguages() {
-				languageInstructions := readMultiMap(kTranslationsDirectory . "Conversation Booster.instructions." . code)
-
-				addMultiMapValues(languageInstructions, readMultiMap(kUserTranslationsDirectory . "Conversation Booster.instructions." . code))
-
-				instructions[code] := languageInstructions
-			}
-		}
-
 		if (this.Model && this.Active) {
 			code := this.Code
 			language := this.Language
@@ -272,9 +303,7 @@ class SpeechBooster extends ConversationBooster {
 					else
 						variables := {language: language ? language : "", text: text}
 
-					instruction := substituteVariables(getMultiMapValue(instructions[instructions.Has(code) ? code : "EN"]
-																	  , "Speaker.Instructions", instruction)
-													 , variables)
+					instruction := substituteVariables(getMultiMapValue(this.Instructions[code], "Speaker.Instructions", instruction), variables)
 
 					answer := this.Connector.Ask(instruction)
 
@@ -368,20 +397,6 @@ class RecognitionBooster extends ConversationBooster {
 		local doRecognize, code, language, fileName, languageInstructions, instruction
 		local phrase, name, grammar, phrases, candidates, numCandidates
 
-		static instructions := false
-
-		if !instructions {
-			instructions := CaseInsenseMap()
-
-			for code, language in availableLanguages() {
-				languageInstructions := readMultiMap(kTranslationsDirectory . "Conversation Booster.instructions." . code)
-
-				addMultiMapValues(languageInstructions, readMultiMap(kUserTranslationsDirectory . "Conversation Booster.instructions." . code))
-
-				instructions[code] := languageInstructions
-			}
-		}
-
 		if !commands {
 			commands := []
 
@@ -437,8 +452,7 @@ class RecognitionBooster extends ConversationBooster {
 
 					instruction := "Recognize"
 
-					instruction := substituteVariables(getMultiMapValue(instructions[instructions.Has(code) ? code : "EN"]
-																	  , "Listener.Instructions", instruction)
+					instruction := substituteVariables(getMultiMapValue(this.Instructions[code], "Listener.Instructions", instruction)
 													 , {commands: commands, text: text})
 
 					answer := this.Connector.Ask(instruction)
@@ -488,20 +502,6 @@ class ChatBooster extends ConversationBooster {
 		local variables := false
 		local doTalk, code, language, fileName, languageInstructions, instruction, variables
 
-		static instructions := false
-
-		if !instructions {
-			instructions := CaseInsenseMap()
-
-			for code, language in availableLanguages() {
-				languageInstructions := readMultiMap(kTranslationsDirectory . "Conversation Booster.instructions." . code)
-
-				addMultiMapValues(languageInstructions, readMultiMap(kUserTranslationsDirectory . "Conversation Booster.instructions." . code))
-
-				instructions[code] := languageInstructions
-			}
-		}
-
 		if (this.Model && this.Active) {
 			code := this.Code
 			language := this.Language
@@ -534,7 +534,7 @@ class ChatBooster extends ConversationBooster {
 					else
 						variables := {language: language ? language : ""}
 
-					instruction := instructions[instructions.Has(code) ? code : "EN"]
+					instruction := this.Instructions[code]
 
 					answer := this.Connector.Ask(question, [substituteVariables(getMultiMapValue(instruction
 																							   , "Conversation.Instructions", "Character")

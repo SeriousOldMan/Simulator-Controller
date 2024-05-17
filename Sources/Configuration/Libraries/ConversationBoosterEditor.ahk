@@ -712,9 +712,12 @@ editInstructions(editorOrCommand, title := false, originalInstructions := false,
 			if (reloadAll || (instructionsGui["instructionsDropDown"].Value = A_Index)) {
 				descriptor := ConfigurationItem.splitDescriptor(key)
 
-				setMultiMapValues(instructions, "Conversation Booster", key, value)
+				value := editor.getOriginalInstruction(descriptor[4], descriptor[2], descriptor[3])
 
-				instructionsGui["instructionEdit"].Value := editor.getOriginalInstruction(descriptor[4], descriptor[2], descriptor[3])
+				setMultiMapValue(instructions, "Conversation Booster", key, value)
+
+				if (instructionsGui["instructionsDropDown"].Value = A_Index)
+					instructionsGui["instructionEdit"].Value := value
 
 				if !reloadAll
 					break

@@ -2999,7 +2999,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	updateSessionMenu() {
-		local synchronize := ((this.Synchronize && isNumber(this.Synchronize)) ? "(x) Synchronize" : "      Synchronize")
+		local synchronize := (((this.Synchronize && isNumber(this.Synchronize)) ? translate("[x]") : translate("[  ]")) . A_Space . translate("Synchronize"))
 
 		this.Control["sessionMenuDropDown"].Delete()
 		this.Control["sessionMenuDropDown"].Add(collect(["Session", "---------------------------------------------", "Connect", "Clear...", "---------------------------------------------", synchronize, "---------------------------------------------", "Select Team...", "---------------------------------------------", "Load Session...", "Save a Copy...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Race Summary", "Driver Statistics"], translate))
@@ -3012,10 +3012,10 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	updateStrategyMenu() {
-		local use1 := (this.UseSessionData ? "(x) Use Session Data" : "      Use Session Data")
-		local use2 := (this.UseTelemetryDatabase ? "(x) Use Telemetry Database" : "      Use Telemetry Database")
-		local use3 := (this.UseCurrentMap ? "(x) Keep current Map" : "      Keep current Map")
-		local use4 := (this.UseTraffic ? "(x) Analyze Traffic" : "      Analyze Traffic")
+		local use1 := ((this.UseSessionData ? translate("[x]") : translate("[  ]")) . A_Space . translate("Use Session Data"))
+		local use2 := ((this.UseTelemetryDatabase ? translate("[x]") : translate("[  ]")) . A_Space . translate("Use Telemetry Database"))
+		local use3 := ((this.UseCurrentMap ? translate("[x]") : translate("[  ]")) . A_Space . translate("Keep current Map"))
+		local use4 := ((this.UseTraffic ? translate("[x]") : translate("[  ]")) . A_Space . translate("Analyze Traffic"))
 
 		this.Control["strategyMenuDropDown"].Delete()
 		this.Control["strategyMenuDropDown"].Add(collect(["Strategy", "---------------------------------------------", "Load current Race Strategy", "Load Strategy...", "Save Strategy...", "---------------------------------------------", "Strategy Summary", "---------------------------------------------", use1, use2, use3, use4, "---------------------------------------------", "Adjust Strategy (Simulation)", "---------------------------------------------", "Release Strategy", "Discard Strategy", "---------------------------------------------", "Instruct Strategist"], translate))
@@ -3029,10 +3029,10 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	updatePitstopMenu() {
-		local correct1 := ((this.TyrePressureMode = "Reference") ? "(x) Adjust Pressures (Reference)" : "      Adjust Pressures (Reference)")
-		local correct2 := ((this.TyrePressureMode = "Relative") ? "(x) Adjust Pressures (Relative)" : "      Adjust Pressures (Relative)")
-		local correct3 := (this.CorrectPressureLoss ? "(x) Correct pressure loss" : "      Correct pressure loss")
-		local correct4 := (this.SelectTyreSet ? "(x) Select tyre set" : "      Select tyre set")
+		local correct1 := (((this.TyrePressureMode = "Reference") ? translate("[x]") : translate("[  ]")) . A_Space . translate("Adjust Pressures (Reference)"))
+		local correct2 := (((this.TyrePressureMode = "Relative") ? translate("[x]") : translate("[  ]")) . A_Space . translate("Adjust Pressures (Relative)"))
+		local correct3 := ((this.CorrectPressureLoss ? translate("[x]") : translate("[  ]")) . A_Space . translate("Correct pressure loss"))
+		local correct4 := ((this.SelectTyreSet ? translate("[x]") : translate("[  ]")) . A_Space . translate("Select tyre set"))
 
 		this.Control["pitstopMenuDropDown"].Delete()
 		this.Control["pitstopMenuDropDown"].Add(collect(["Pitstop", "---------------------------------------------", "Select Team...", "---------------------------------------------", "Initialize from Session", "Load from Database...", "---------------------------------------------", "Save Setups", "Clear Setups...", "Import Setups...", "Export Setups...", "---------------------------------------------", "Setups Summary", "Pitstops Summary", "---------------------------------------------", correct1, correct2, correct3, correct4, "---------------------------------------------", "Instruct Engineer"], translate))

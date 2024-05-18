@@ -3,7 +3,7 @@ Version=5.7.3.0-dev
 Target=5.7.3.0-release
 Date=05/18/2024
 Download=
-Changes=New editor for conversation booster instructions, Updated conversation booster instructions for more domain specifity, Fixed translations of checkable menu items, Fixed tyre pressures for prepared pitstops in session info (introduced with 5.7.2)
+Changes=New editor for conversation booster instructions, Updated conversation booster instructions for more domain specifity, Fixed translations of checkable menu items, Fixed tyre pressures for prepared pitstops in session info (introduced with 5.7.2), Updated instructions for Driver Coach, Optimized Team Server timeout handling
 Components=Media->5.6.1,Configuration->5.6.4,Utilities->5.4.8
 [Release]
 Version=5.7.2.0-release

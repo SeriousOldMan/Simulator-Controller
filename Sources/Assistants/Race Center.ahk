@@ -5999,6 +5999,7 @@ class RaceCenter extends ConfigurationItem {
 				stint.Penalties := 0
 				stint.Weather := "-"
 				stint.Compound := "-"
+				stint.TyreSet := false
 				stint.StartPosition := "-"
 				stint.EndPosition := "-"
 				stint.AvgLaptime := "-"

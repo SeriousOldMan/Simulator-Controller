@@ -536,18 +536,21 @@ class RaceEngineerPlugin extends RaceAssistantPlugin {
 				lastStint := false
 				driverID := kNull
 
-				loop teamServer.getCurrentLap(session)
+				loop teamServer.getCurrentLap(session, 1)
 					try {
-						stint := teamServer.getLapStint(A_Index, session)
+						stint := teamServer.getLapStint(A_Index, session, 1)
 						newStint := (stint != lastStint)
 
 						if newStint {
-							lastStint := stint
+							driverID := teamServer.getStintValue(stint, "ID", session, 1)
 
-							driverID := teamServer.getStintValue(stint, "ID", session)
+							if !driverID
+								continue
+
+							lastStint := stint
 						}
 
-						lapPressures := teamServer.getLapValue(A_Index, this.Plugin . " Pressures", session)
+						lapPressures := teamServer.getLapValue(A_Index, this.Plugin . " Pressures", session, 1)
 
 						if (!lapPressures || (lapPressures == ""))
 							continue

@@ -641,7 +641,7 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 		return getMultiMapValue(this.getInstructions(type, true), "Conversation Booster", "Instructions." . type . "." . key . "." . language, "")
 	}
 
-	getInstructions(type, builtin := false) {
+	getInstructions(type, original := false) {
 		local instructions := newMultiMap()
 		local key, value, ignore, directory, configuration, language
 
@@ -653,7 +653,7 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 					setMultiMapValue(instructions, "Conversation Booster", "Instructions." . type . "." . key . "." . language, value)
 			}
 
-		if !builtin
+		if !original
 			for ignore, configuration in [this.Configuration, this.iInstructions]
 				for key, value in getMultiMapValues(configuration, "Conversation Booster")
 					if (InStr(key, "Instructions." . type) = 1)

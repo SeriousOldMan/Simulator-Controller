@@ -64,6 +64,7 @@ class CarInfo {
 	iTrackAheadDelta := false
 	iTrackBehindDelta := false
 
+	iValid := true
 	iInvalidLaps := 0
 	iIncidents := 0
 
@@ -289,6 +290,12 @@ class CarInfo {
 		}
 	}
 
+	Valid {
+		Get {
+			return this.iValid
+		}
+	}
+
 	InvalidLaps {
 		Get {
 			return this.iInvalidLaps
@@ -335,7 +342,7 @@ class CarInfo {
 
 	update(driver, overallPosition, classPosition, lastLap, sector, lapTime, sectorTimes
 		 , delta, trackAheadDelta, trackBehindDelta
-		 , validLap, invalidLaps, incidents, inPit) {
+		 , validLap, invalid, invalidLaps, incidents, inPit) {
 		local avgLapTime := this.AvgLapTime
 		local pitted := (inPit || this.hasPitted(lastLap))
 		local valid := true
@@ -377,6 +384,7 @@ class CarInfo {
 		this.iOverallPosition := overallPosition
 		this.iClassPosition := classPosition
 		this.iLastLap := lastLap
+		this.iValid := !invalid
 		this.iInvalidLaps := invalidLaps
 		this.iIncidents := incidents
 
@@ -1256,7 +1264,7 @@ class RaceSpotter extends GridRaceAssistant {
 				if !cInfo.update(car[4], car[5], car[6], carLaps, sector
 							   , Round(car[9] / 1000, 1), car[18]
 							   , Round(car[10] / 1000, 1), Round(car[11] / 1000, 1), Round(car[12] / 1000, 1)
-							   , car[13], (carLaps - car[14]), car[15], car[16])
+							   , car[13], car[19], (carLaps - car[14]), car[15], car[16])
 					if ((A_Index != driver) && this.PositionInfos.Has(cInfo.ID))
 						this.PositionInfos[cInfo.ID].reset(sector, true, true)
 			}
@@ -1884,11 +1892,71 @@ class RaceSpotter extends GridRaceAssistant {
 		local trackBehind := false
 		local leader := false
 		local focused := false
+		local hasPositions := false
 		local situation, opponentType, driverPitstops, carPitstops, carInfo, indicator
 		local driverPosition, driverLapTime, slowerCar, carNr, carPosition, delta, lapTimeDifference, key
 
-		if (this.hasEnoughData(false) && (lastLap > (this.BaseLap + 2))) {
+		if (this.Session = kSessionQualification) {
 			this.getPositionInfos(&standingsAhead, &standingsBehind, &trackAhead, &trackBehind, &leader, &focused, true)
+
+			hasPositions := true
+
+			if (trackAhead && trackAhead.inRange(sector, true) && !trackAhead.isFaster(sector)) {
+				if (trackAhead.Car.Valid && this.DriverCar.Valid) {
+					situation := ("AheadValid " . trackAhead.Car.ID . A_Space . lastLap)
+
+					if !this.TacticalAdvices.Has(situation) {
+						this.TacticalAdvices[situation] := true
+
+						speaker.speakPhrase("AheadValid")
+
+						return true
+					}
+				}
+
+				if (!trackAhead.Car.Valid && this.DriverCar.Valid) {
+					situation := ("AheadInvalid " . trackAhead.Car.ID . A_Space . lastLap)
+
+					if !this.TacticalAdvices.Has(situation) {
+						this.TacticalAdvices[situation] := true
+
+						speaker.speakPhrase("AheadInvalid")
+
+						return true
+					}
+				}
+			}
+
+			if (trackBehind && trackBehind.inRange(sector, true)) {
+				if (trackBehind.Car.Valid && !this.DriverCar.Valid) {
+					situation := ("BehindValid " . trackBehind.Car.ID . A_Space . lastLap)
+
+					if !this.TacticalAdvices.Has(situation) {
+						this.TacticalAdvices[situation] := true
+
+						speaker.speakPhrase("BehindValid")
+
+						return true
+					}
+				}
+
+				if (!trackBehind.Car.Valid && !this.DriverCar.Valid && trackBehind.isFaster(sector)) {
+					situation := ("BehindInvalid " . trackBehind.Car.ID . A_Space . lastLap)
+
+					if !this.TacticalAdvices.Has(situation) {
+						this.TacticalAdvices[situation] := true
+
+						speaker.speakPhrase("BehindInvalid")
+
+						return true
+					}
+				}
+			}
+		}
+
+		if (this.hasEnoughData(false) && (lastLap > (this.BaseLap + 2))) {
+			if !hasPositions
+				this.getPositionInfos(&standingsAhead, &standingsBehind, &trackAhead, &trackBehind, &leader, &focused, true)
 
 			if (standingsAhead && (standingsAhead != leader)) {
 				situation := ("AheadPitting " . standingsAhead.Car.ID . A_Space . standingsAhead.Car.LastLap)
@@ -3630,7 +3698,8 @@ class RaceSpotter extends GridRaceAssistant {
 											   , getMultiMapValue(data, "Position Data", prefix . ".Incidents", 0)
 											   , inPit
 											   , getMultiMapValue(data, "Position Data", prefix . ".ID", carIndex)
-											   , sectorTimes)
+											   , sectorTimes
+											   , !getMultiMapValue(data, "Position Data", prefix . ".Lap.Running.Valid", true))
 
 					if (class = this.getClass(carIndex, data)) {
 						if (carClassPosition = 1)

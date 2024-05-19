@@ -245,6 +245,14 @@ FocusProblem.2=Looks like the car %indicator% had a problem. The last lap was qu
 FoucsProblem.3=The last lap of the car %indicator% was very slow. There might be a problem.
 FasterThan.1=You have been %lapTime% seconds faster then the car %indicator% during the last laps. Keep it up.
 FasterThan.2=Great, you are faster then the car %indicator% by %lapTime% seconds. The car is %delta% seconds ahead of you.
+AheadValid.1=The car ahead is on a valid lap.
+AheadValid.2=The car in front of you is on a fast lap.
+AheadInvalid.1=The car ahead is not on a valid lap. You can safely pass.
+AheadInvalid.2=The car ahead in front of you is not on a valid lap. He must let you pass.
+BehindValid.1=The car behind you is on a fast lap. You should let him pass.
+BehindValid.2=The car in the mirror is on a timed lap. Stay away from the racing line.
+BehindInvalid.1=The car behind you is not on a timed lap.
+BehindInvalid.2=The car in your mirror is not on a valid lap.
 // Spotting //
 Right.1=Attention right.
 Right.2=Car on the right.

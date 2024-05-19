@@ -543,7 +543,7 @@ class ChatBooster extends ConversationBooster {
 																							   , "Conversation.Instructions", "Telemetry")
 																			  , variables)])
 
-					return (answer ? answer : false)
+					return (answer ? StrReplace(answer, "**", "") : false)
 				}
 				catch Any as exception {
 					logError(exception)

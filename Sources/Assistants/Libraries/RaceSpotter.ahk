@@ -811,6 +811,7 @@ class RaceSpotter extends GridRaceAssistant {
 		iFastSpeechSynthesizer := false
 
 		class FastSpeaker extends VoiceManager.LocalSpeaker {
+			iIsBoostable := false
 			iIsSpeaking := false
 			iSpotter := false
 
@@ -822,7 +823,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 			Booster {
 				Get {
-					return false
+					return (this.iIsBoostable ? false : super.Booster)
 				}
 			}
 
@@ -836,17 +837,20 @@ class RaceSpotter extends GridRaceAssistant {
 				}
 			}
 
-			speak(arguments*) {
+			speak(text, focus := false, cache := false, options := false) {
+				local oldBoostable := this.iIsBoostable
 				local oldSpeaking := this.iIsSpeaking
 
 				if (this.VoiceManager.RaceAssistant.Session >= kSessionPractice) {
+					this.iIsBoostable := !cache
 					this.iIsSpeaking := true
 
 					try {
-						super.speak(arguments*)
+						super.speak(text, focus, cache, options)
 					}
 					finally {
 						this.iIsSpeaking := oldSpeaking
+						this.iIsBoostable := oldBoostable
 					}
 				}
 			}

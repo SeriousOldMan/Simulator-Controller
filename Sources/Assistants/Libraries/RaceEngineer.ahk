@@ -1512,7 +1512,7 @@ class RaceEngineer extends RaceAssistant {
 			try {
 				speaker.speakPhrase("GreetingEngineer")
 
-				if ProcessExist("Race Strategist.exe") {
+				if ((this.Session = kSessionRace) && ProcessExist("Race Strategist.exe")) {
 					strategistPlugin := Plugin("Race Strategist", kSimulatorConfiguration)
 					strategistName := strategistPlugin.getArgumentValue("raceAssistantName", false)
 

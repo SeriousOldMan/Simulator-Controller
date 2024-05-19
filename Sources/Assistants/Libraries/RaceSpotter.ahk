@@ -1892,16 +1892,13 @@ class RaceSpotter extends GridRaceAssistant {
 		local trackBehind := false
 		local leader := false
 		local focused := false
-		local hasPositions := false
 		local situation, opponentType, driverPitstops, carPitstops, carInfo, indicator
 		local driverPosition, driverLapTime, slowerCar, carNr, carPosition, delta, lapTimeDifference, key
 
 		if (this.Session = kSessionQualification) {
-			this.getPositionInfos(&standingsAhead, &standingsBehind, &trackAhead, &trackBehind, &leader, &focused, true)
+			this.getPositionInfos(&standingsAhead, &standingsBehind, &trackAhead, &trackBehind, &leader, &focused)
 
-			hasPositions := true
-
-			if (trackAhead && trackAhead.inRange(sector, true) && !trackAhead.isFaster(sector)) {
+			if (trackAhead && trackAhead.inRange(sector, true)) {
 				if (trackAhead.Car.Valid && this.DriverCar.Valid) {
 					situation := ("AheadValid " . trackAhead.Car.ID . A_Space . lastLap)
 
@@ -1940,7 +1937,7 @@ class RaceSpotter extends GridRaceAssistant {
 					}
 				}
 
-				if (!trackBehind.Car.Valid && !this.DriverCar.Valid && trackBehind.isFaster(sector)) {
+				if (!trackBehind.Car.Valid && !this.DriverCar.Valid) {
 					situation := ("BehindInvalid " . trackBehind.Car.ID . A_Space . lastLap)
 
 					if !this.TacticalAdvices.Has(situation) {
@@ -1954,9 +1951,8 @@ class RaceSpotter extends GridRaceAssistant {
 			}
 		}
 
-		if (this.hasEnoughData(false) && (lastLap > (this.BaseLap + 2))) {
-			if !hasPositions
-				this.getPositionInfos(&standingsAhead, &standingsBehind, &trackAhead, &trackBehind, &leader, &focused, true)
+		if (this.hasEnoughData(false) && (this.Session = kSessionRace) && (lastLap > (this.BaseLap + 2))) {
+			this.getPositionInfos(&standingsAhead, &standingsBehind, &trackAhead, &trackBehind, &leader, &focused, true)
 
 			if (standingsAhead && (standingsAhead != leader)) {
 				situation := ("AheadPitting " . standingsAhead.Car.ID . A_Space . standingsAhead.Car.LastLap)
@@ -2749,7 +2745,7 @@ class RaceSpotter extends GridRaceAssistant {
 		static sessionInfo := true
 
 		if this.Speaker[false] {
-			if (lastLap > 1)
+			if ((lastLap > 1) || (this.Session = kSessionQualification))
 				this.updatePositionInfos(lastLap, sector, positions)
 
 			if (this.DriverCar && !this.DriverCar.InPit && update) {
@@ -2776,7 +2772,7 @@ class RaceSpotter extends GridRaceAssistant {
 				else
 					sessionInfo := true
 
-				if (raceInfo && this.Announcements["TacticalAdvices"])
+				if this.Announcements["TacticalAdvices"]
 					this.tacticalAdvice(lastLap, sector, positions, !hadInfo)
 			}
 		}
@@ -2990,7 +2986,7 @@ class RaceSpotter extends GridRaceAssistant {
 		local delta
 
 		if (this.Announcements["BlueFlags"] && this.Speaker[false] && this.Running)
-			if (positions.Has("StandingsBehind") && positions.Has(positions["StandingsBehind"])) {
+			if ((this.Session = kSessionRace) && positions.Has("StandingsBehind") && positions.Has(positions["StandingsBehind"])) {
 				delta := Abs(positions[positions["StandingsBehind"]][10])
 
 				if (delta && (delta < 2000))

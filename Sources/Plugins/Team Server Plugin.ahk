@@ -740,11 +740,11 @@ class TeamServerPlugin extends ControllerPlugin {
 				driver := this.Connector.GetStintDriver(stint)
 
 				if !this.iCachedObjects.Has(driver)
-					this.iCachedObjects[driver] := this.Connector.GetDriver(driver)
+					this.iCachedObjects[driver] := this.parseObject(this.Connector.GetDriver(driver))
 
 				driver := this.iCachedObjects[driver]
 
-				return driverName(driver.ForName, driver.SurName, driver.NickName)
+				return driverName(driver["ForName"], driver["SurName"], driver["NickName"])
 			}
 			catch Any as exception {
 				this.LastMessage := (translate("Error while fetching stint data (Session: ") . session . translate(", Stint: ") . stint

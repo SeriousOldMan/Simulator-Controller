@@ -2282,7 +2282,8 @@ class RaceEngineer extends RaceAssistant {
 					if (debug || (incrementFL != 0) || (incrementFR != 0) || (incrementRL != 0) || (incrementRR != 0) || (tyrePressures != kUndefined))
 						speaker.speakPhrase("NewPressures")
 
-					if ((knowledgeBase.getValue("Tyre.Compound") != compound) || (knowledgeBase.getValue("Tyre.Compound.Color") != color)) {
+					if ((knowledgeBase.getValue("Tyre.Compound") != compound) || (knowledgeBase.getValue("Tyre.Compound.Color") != color)
+																			  || (tyrePressures != kUndefined)) {
 						for ignore, suffix in ["FL", "FR", "RL", "RR"]
 							if (debug || (increment%suffix% != 0) || (tyrePressures != kUndefined))
 								speaker.speakPhrase("Tyre" . suffix

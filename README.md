@@ -113,6 +113,8 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 
 26. [Strategy Development Revisited again](https://youtu.be/rCnYFTLX2L4) - This video will take another look at the "Strategy Workbench" and demonstrates a couple of new options, which allow you to create very special strategies.
 
+27. [Connecting Assistants to GPT](https://youtu.be/4tq-2bnEIXE) - We introduce the new GPT-based conversation booster for the Assistants. Using this booster you can create a very life-like communication with the Assistants.
+
 This list will be extended from time to time to cover new functionalities.
 
 ### Discord Community

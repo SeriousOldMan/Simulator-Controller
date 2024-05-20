@@ -823,7 +823,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 			Booster {
 				Get {
-					return (this.iIsBoostable ? false : super.Booster)
+					return (this.iIsBoostable ? super.Booster : false)
 				}
 			}
 

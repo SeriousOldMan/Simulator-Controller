@@ -1239,7 +1239,7 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 							 , [editorGui["basicWindowsSpeakerSpeedLabel"], editorGui["basicSpeakerSpeedSlider"]]]
 
 		widget11 := editorGui.Add("Text", "x" . x0 . " ys+24 w140 h23 +0x200 VbasicAzureSubscriptionKeyLabel Hidden", translate("Subscription Key"))
-		widget12 := editorGui.Add("Edit", "x" . x1 . " yp w" . w1 . " h21 W:Grow VbasicAzureSubscriptionKeyEdit Hidden")
+		widget12 := editorGui.Add("Edit", "x" . x1 . " yp w" . w1 . " h21 Password W:Grow VbasicAzureSubscriptionKeyEdit Hidden")
 		widget12.OnEvent("Change", updateAzureVoices)
 
 		widget13 := editorGui.Add("Text", "x" . x0 . " yp+24 w140 h23 +0x200 VbasicAzureTokenIssuerLabel Hidden", translate("Token Issuer Endpoint"))
@@ -1265,7 +1265,7 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 										, [editorGui["basicAzureSpeakerLabel"], editorGui["basicAzureSpeakerDropDown"], widget18]]
 
 		widget19 := editorGui.Add("Text", "x" . x0 . " ys+24 w140 h23 +0x200 VbasicGoogleAPIKeyFileLabel Hidden", translate("API Key"))
-		widget20 := editorGui.Add("Edit", "x" . x1 . " yp w" . (w1 - 24) . " h21 W:Grow VbasicGoogleAPIKeyFileEdit Hidden")
+		widget20 := editorGui.Add("Edit", "x" . x1 . " yp w" . (w1 - 24) . " h21 Password W:Grow VbasicGoogleAPIKeyFileEdit Hidden")
 		widget20.OnEvent("Change", updateGoogleVoices)
 
 		widget21 := editorGui.Add("Button", "x" . (x1 + w1 - 23) . " yp w23 h23 X:Move Disabled VbasicGoogleAPIKeyFilePathButton Hidden", translate("..."))

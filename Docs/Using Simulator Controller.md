@@ -152,7 +152,7 @@ Note: If you want "Simulator Startup" to use a specific startup profile independ
 
 ### Team Management
 
-When the Team Server has been included in the configuration a small cog wheel icon will appear in the lower left corner of the "Race Center" application button. You can open a special editor for the team manager by either exactly hitting the small cog wheel icon in the "Race Center" button or by holding down the Control key while clicking on the "Race Center" button. The following window appears:
+When the Team Server has been included in the configuration a small cog wheel icon will appear in the lower left corner of the "Race Center" application button. You can open a special window for the team manager by either exactly hitting the small cog wheel icon in the "Race Center" button or by holding down the Control key while clicking on the "Race Center" button. The following window appears:
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Team%20Management.JPG)
 

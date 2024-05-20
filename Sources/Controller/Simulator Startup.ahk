@@ -2555,9 +2555,7 @@ startSimulator() {
 		else {
 			showSplashScreen("Logo")
 
-			Sleep(2000)
-
-			hideSplashScreen()
+			Task.startTask(hideSplashScreen, 2000)
 
 			while launchPad()
 				ignore := 1

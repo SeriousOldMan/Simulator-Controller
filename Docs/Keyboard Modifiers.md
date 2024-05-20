@@ -41,6 +41,7 @@ Many applications of Simulator Controller provide a couple of modifier keys for 
 | | Simulator startup | Alt | When clicking *Startup* (green triangle) in "Simulator Startup" while holding the Alt key, the the currently selected simulator will be started automatically. |
 | | Editing startup profiles | Control | Holding down the control key when clicking the "Save" button in the startup profiles editor will save the profiles and start Simulator Controller in one step. |
 | | Exporting startup profiles | Control | Holding down the control key when clicking the "Download" button in the startup profiles editor will only include the currently selected profile in the export file. |
+| | Simulator startup | Control | When clicking *Race Center* in "Simulator Startup" while holding the Control key, the editor for the team management will open up, even when the small cog wheel icon was not hit. |
 | | Exiting "Simulator Startup" | Control | When closing "Simulator Startup" and the Control key is pressed, you will be asked, whether you want to exit all other applications of "Simulator Controller" as well. |
 | | Unblocking executables | Control + Shift | If you hold down Control together with the Shift key while starting "Simulator Startup", the application will try to acquire Admin privileges and will unblock all executables. |
 | Simulator Tools | Running system build | Control | Only relevant for developers. If you hold down the Control key when starting "Simulator Tools", a window will pop up, where you can enable or disable individual build rules. |

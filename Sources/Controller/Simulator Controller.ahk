@@ -2237,6 +2237,9 @@ initializeSimulatorController() {
 		else
 			updateTrayMessageState(settings)
 
+		if inList(A_Args, "-Debug")
+			setDebug(true)
+
 		argIndex := inList(A_Args, "-Voice")
 
 		voice := (argIndex ? A_Args[argIndex + 1] : ProcessExist("Voice Server.exe"))

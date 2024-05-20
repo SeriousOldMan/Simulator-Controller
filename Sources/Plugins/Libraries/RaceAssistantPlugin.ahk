@@ -2328,7 +2328,12 @@ class RaceAssistantPlugin extends ControllerPlugin {
 					replayIndex := 1
 
 					if !FileExist(RaceAssistantPlugin.ReplayDirectory . "Race Engineer Lap " . replayLap . "." . replayIndex . ".data")
-						ExitApp(0)
+						if isDebug() {
+							loop
+								Sleep(1000)
+						}
+						else
+							ExitApp(0)
 				}
 
 				data := RaceAssistantPlugin.readSessionData(RaceAssistantPlugin.ReplayDirectory . "Race Engineer Lap " . replayLap . "." . replayIndex . ".data"

@@ -2200,8 +2200,8 @@ class PracticeCenter extends ConfigurationItem {
 	}
 
 	updateSessionMenu() {
-		local auto1 := ((this.AutoClear ? "[x] " : "[  ] ") . translate("Auto Clear"))
-		local auto2 := ((this.AutoExport ? "[x] " : "[  ] ") . translate("Auto Export"))
+		local auto1 := ((this.AutoClear ? translate("[x]") : translate("[  ]")) . A_Space . translate("Auto Clear"))
+		local auto2 := ((this.AutoExport ? translate("[x]") : translate("[  ]")) . A_Space . translate("Auto Export"))
 
 		this.Control["sessionMenuDropDown"].Delete()
 		this.Control["sessionMenuDropDown"].Add(collect(["Session", "---------------------------------------------", auto1, auto2, "---------------------------------------------", "Clear...", "---------------------------------------------", "Load Session...", "Save Session...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Session Summary"], translate))
@@ -2213,8 +2213,8 @@ class PracticeCenter extends ConfigurationItem {
 	}
 
 	updateDataMenu() {
-		local use1 := ((this.UseSessionData ? "[x] " : "[  ] ") . translate("Use Session Data"))
-		local use2 := ((this.UseTelemetryDatabase ? "[x] " : "[  ] ") . translate("Use Telemetry Database"))
+		local use1 := ((this.UseSessionData ? translate("[x]") : translate("[  ]")) . A_Space . translate("Use Session Data"))
+		local use2 := ((this.UseTelemetryDatabase ? translate("[x]") : translate("[  ]")) . A_Space . translate("Use Telemetry Database"))
 		local tyreCompounds := collect(this.AvailableTyreCompounds, translate)
 		local tyreCompound := translate(compound(this.TyreCompound["Data"], this.TyreCompoundColor["Data"]))
 		local weather := translate(this.Weather["Data"])
@@ -2224,10 +2224,10 @@ class PracticeCenter extends ConfigurationItem {
 		wConditions := weatherConditions.Clone()
 
 		loop wConditions.Length
-			wConditions[A_Index] := (((wConditions[A_Index] = weather) ? "[x] " : "[  ] ") . wConditions[A_Index])
+			wConditions[A_Index] := (((wConditions[A_Index] = weather) ? translate("[x]") : translate("[  ]")) . A_Space . wConditions[A_Index])
 
 		loop tyreCompounds.Length
-			tyreCompounds[A_Index] := (((tyreCompounds[A_Index] = tyreCompound) ? "[x] " : "[  ] ") . tyreCompounds[A_Index])
+			tyreCompounds[A_Index] := (((tyreCompounds[A_Index] = tyreCompound) ? translate("[x]") : translate("[  ]")) . A_Space . tyreCompounds[A_Index])
 
 		this.Control["dataMenuDropDown"].Delete()
 		this.Control["dataMenuDropDown"].Add(concatenate(collect(["Data", "---------------------------------------------"

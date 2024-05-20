@@ -1512,7 +1512,7 @@ class RaceEngineer extends RaceAssistant {
 			try {
 				speaker.speakPhrase("GreetingEngineer")
 
-				if ProcessExist("Race Strategist.exe") {
+				if ((this.Session = kSessionRace) && ProcessExist("Race Strategist.exe")) {
 					strategistPlugin := Plugin("Race Strategist", kSimulatorConfiguration)
 					strategistName := strategistPlugin.getArgumentValue("raceAssistantName", false)
 
@@ -1718,6 +1718,11 @@ class RaceEngineer extends RaceAssistant {
 				if tyreCompound {
 					setMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Compound.Color", knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound.Color", false))
 					setMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Set", knowledgeBase.getValue("Pitstop.Planned.Tyre.Set", 0))
+
+					setMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Pressure.FL", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL", 0), 1))
+					setMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Pressure.FR", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR", 0), 1))
+					setMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Pressure.RL", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL", 0), 1))
+					setMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Pressure.RR", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR", 0), 1))
 
 					setMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Pressure.FL.Increment", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL.Increment", 0), 1))
 					setMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Pressure.FR.Increment", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR.Increment", 0), 1))

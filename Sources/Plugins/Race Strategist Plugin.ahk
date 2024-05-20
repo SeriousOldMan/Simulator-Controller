@@ -380,18 +380,21 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 			lastStint := false
 			driverID := kNull
 
-			loop teamServer.getCurrentLap(session) {
+			loop teamServer.getCurrentLap(session, 1) {
 				try {
 					stint := teamServer.getLapStint(A_Index, session)
 					newStint := (stint != lastStint)
 
 					if newStint {
-						lastStint := stint
+						driverID := teamServer.getStintValue(stint, "ID", session, 1)
 
-						driverID := teamServer.getStintValue(stint, "ID", session)
+						if !driverID
+							continue
+
+						lastStint := stint
 					}
 
-					telemetryData := teamServer.getLapValue(A_Index, this.Plugin . " Telemetry", session)
+					telemetryData := teamServer.getLapValue(A_Index, this.Plugin . " Telemetry", session, 1)
 
 					if (!telemetryData || (telemetryData == ""))
 						continue
@@ -628,7 +631,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 				DirCreate(kTempDirectory . "Race Report")
 
 				try {
-					raceInfo := teamServer.getLapValue(1, this.Plugin . " Race Info", session)
+					raceInfo := teamServer.getLapValue(1, this.Plugin . " Race Info", session, 1)
 
 					if (!raceInfo || (raceInfo == ""))
 						return
@@ -644,9 +647,9 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 				count := 0
 				pitstops := false
 
-				loop teamServer.getCurrentLap(session) {
+				loop teamServer.getCurrentLap(session, 1) {
 					try {
-						lapData := teamServer.getLapValue(A_Index, this.Plugin . " Race Lap", session)
+						lapData := teamServer.getLapValue(A_Index, this.Plugin . " Race Lap", session, 1)
 
 						if (lapData && (lapData != "")) {
 							lapData := parseMultiMap(lapData)

@@ -42,6 +42,7 @@
 #Include "..\Libraries\Messages.ahk"
 #Include "..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\Configuration\Libraries\SettingsEditor.ahk"
+#Include "..\Configuration\Libraries\TeamManagementPanel.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -65,6 +66,24 @@ global gStartupProfile := false
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+class TeamManagerOwner {
+	iWindow := false
+
+	Window {
+		Get {
+			return this.iWindow
+		}
+	}
+
+	__New(window) {
+		this.iWindow := window
+	}
+
+	registerWidget(panel, widget) {
+		widget.Visible := true
+	}
+}
 
 class StartupWindow extends Window {
 	__New() {
@@ -437,7 +456,7 @@ closeApplication(application) {
 launchPad(command := false, arguments*) {
 	global kSimulatorConfiguration
 
-	local ignore, application, startupConfig, x, y, settingsButton, name, options, lastModified
+	local ignore, application, startupConfig, x, y, settingsButton, name, options, lastModified, hasTeamServer
 
 	static result := false
 
@@ -520,6 +539,37 @@ launchPad(command := false, arguments*) {
 		}
 		else
 			launchPad("Startup")
+	}
+
+	teamManager(configure, *) {
+		local x, y, w, h, mX, mY
+		local curCoordMode
+
+		if !configure
+			configure := GetKeyState("Ctrl")
+
+		if !configure {
+			launchPadGui["teamManagerButton"].GetPos(&x, &y, &w, &h)
+
+			curCoordMode := A_CoordModeMouse
+
+			CoordMode("Mouse", "Client")
+
+			try {
+				MouseGetPos(&mX, &mY)
+			}
+			finally {
+				CoordMode("Mouse", curCoordMode)
+			}
+
+			if ((mX >= x) && (mX <= (x + w)) && (mY >= y) && (mY <= (y + h)))
+				configure := true
+		}
+
+		if configure
+			teamManagerEditor(launchPadGui)
+		else
+			launchApplication("RaceCenter")
 	}
 
 	launchApplication(application, *) {
@@ -672,6 +722,8 @@ launchPad(command := false, arguments*) {
 			launchPad(kClose)
 	}
 	else {
+		availableFunctions(getControllerState(true, true), &hasTeamServer)
+
 		startupConfig := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
 		removeMultiMapValue(startupConfig, "Simulator", "Simulator")
@@ -773,10 +825,22 @@ launchPad(command := false, arguments*) {
 		launchPadGui.Add("Picture", "xp+90 yp w60 h60 vPracticeCenter", kIconsDirectory . "Practice.ico").OnEvent("Click", launchApplication.Bind("PracticeCenter"))
 		launchPadGui.Add("Picture", "xp+74 yp w60 h60 vStrategyWorkbench", kIconsDirectory . "Workbench.ico").OnEvent("Click", launchApplication.Bind("StrategyWorkbench"))
 
-		launchPadGui.Add("Picture", "xp+74 yp w60 h60 vRaceCenter", kIconsDirectory . "Console.ico").OnEvent("Click", launchApplication.Bind("RaceCenter"))
+		widget := launchPadGui.Add("Picture", "xp+74 yp w60 h60 vRaceCenter", kIconsDirectory . "Console.ico")
 
+		if hasTeamServer {
+			widget.OnEvent("Click", teamManager.Bind(false))
 
-		launchPadGui.Add("Picture", "xp+90 yp w60 h60 vRaceReports", kIconsDirectory . "Chart.ico").OnEvent("Click", launchApplication.Bind("RaceReports"))
+			widget := launchPadGui.Add("Picture", "xp+4 yp+43 w14 h14 BackgroundTrans vteamManagerButton", kIconsDirectory . "General Settings White.ico")
+			widget.OnEvent("Click", teamManager.Bind(true))
+
+			launchPadGui.Add("Picture", "xp+86 yp-43 w60 h60 vRaceReports", kIconsDirectory . "Chart.ico").OnEvent("Click", launchApplication.Bind("RaceReports"))
+		}
+		else {
+			widget.OnEvent("Click", launchApplication.Bind("RaceCenter"))
+
+			launchPadGui.Add("Picture", "xp+90 yp w60 h60 vRaceReports", kIconsDirectory . "Chart.ico").OnEvent("Click", launchApplication.Bind("RaceReports"))
+		}
+
 		; launchPadGui.Add("Picture", "xp+184 yp w60 h60 vSystemMonitor", kIconsDirectory . "Monitoring.ico").OnEvent("Click", launchApplication.Bind("SystemMonitor"))
 
 		startupButton := launchPadGui.Add("Text", "x16 yp+64 w60 h23 Center", "Startup")
@@ -2056,7 +2120,7 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 
 		profilesEditorGui.SetFont("Bold", "Arial")
 
-		profilesEditorGui.Add("Text", "w408 Center H:Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(profilesEditorGui, "Startup Profiles"))
+		profilesEditorGui.Add("Text", "w408 Center H:Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(profilesEditorGui, "Simulator Startup.Profiles"))
 
 		profilesEditorGui.SetFont("Norm", "Arial")
 
@@ -2215,6 +2279,69 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 			keepAliveTask.stop()
 
 		return ((done = "Startup") ? done : (done = kSave))
+	}
+}
+
+teamManagerEditor(launchPadOrCommand, arguments*) {
+	static done := false
+	static teamManagerGui
+	static teamManagerPanel
+
+	if (launchPadOrCommand == kClose)
+		done := kClose
+	else if (launchPadOrCommand = "Update State") {
+	}
+	else {
+		done := false
+
+		teamManagerGui := Window({Descriptor: "Simulator Startup.Team Management", Options: "ToolWindow 0x400000"})
+
+		teamManagerGui.SetFont("Bold", "Arial")
+
+		teamManagerGui.Add("Text", "w508 Center H:Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(teamManagerGui, "Simulator Startup.Team Management"))
+
+		teamManagerGui.SetFont("Norm", "Arial")
+
+		teamManagerGui.Add("Documentation", "x174 YP+20 w178 Center H:Center", translate("Team Management")
+						 , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#team-management")
+
+		teamManagerGui.Add("Text", "x8 yp+26 w508 0x10")
+
+		teamManagerPanel := TeamManagementPanel(TeamManagerOwner(teamManagerGui), kSimulatorConfiguration)
+
+		teamManagerPanel.createGui(teamManagerPanel.Editor, 8, 64, 508, 500)
+
+		Task.startTask(() => teamManagerPanel.connect(true, true), 2000, kLowPriority)
+
+		teamManagerGui.Add("Text", "x8 y545 w508 0x10")
+
+		teamManagerGui.Add("Button", "Default X220 YP+10 w80 vsaveButton", translate("Close")).OnEvent("Click", teamManagerEditor.Bind(kClose))
+
+		teamManagerEditor("Update State")
+
+		teamManagerGui.Opt("+Owner" . launchPadOrCommand.Hwnd)
+
+		launchPadOrCommand.Block()
+
+		try {
+			if getWindowPosition("Simulator Startup.Team Management", &x, &y)
+				teamManagerGui.Show("x" . x . " y" . y)
+			else
+				teamManagerGui.Show()
+
+			loop
+				Sleep(200)
+			until done
+
+			teamManagerPanel.saveToConfiguration()
+
+			teamManagerGui.Destroy()
+		}
+		finally {
+			launchPadOrCommand.Unblock()
+
+			teamManagerPanel.disconnect()
+		}
 	}
 }
 
@@ -2428,9 +2555,7 @@ startSimulator() {
 		else {
 			showSplashScreen("Logo")
 
-			Sleep(2000)
-
-			hideSplashScreen()
+			Task.startTask(hideSplashScreen, 2000)
 
 			while launchPad()
 				ignore := 1

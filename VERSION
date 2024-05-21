@@ -1,9 +1,9 @@
 [Development]
-Version=5.7.2.0-release
-Target=5.7.2.0-release
-Date=05/17/2024
-Download=https://cutt.ly/WernMqnq;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.7.2.0-release.zip
-Changes=New telemetry instruction for the Driving Coach, General conversation capability for all Assistants using GPT technology, Fixed installation of French language pack, Conversation Booster configuration integrated in "Simulator Configuration", Added "Mistral AI" as GPT service provider, Added "GPT-4o" model entry, Fixed stint timer if larger than driver time, Test mode for Push-To-Talk, Added tyre pressure increments to session info page, Added tyre pressure increments to "Session State.json", Migrated to AHK 2.0.15
+Version=5.7.3.0-dev
+Target=5.7.3.0-release
+Date=05/21/2024
+Download=https://www.dropbox.com/scl/fi/1qxsqqs1wvlq6r7q8w36x/Simulator-Controller-5.7.3.0-dev.zip?rlkey=zbegqtfjr63p9807qgnkahbzu&st=muw8jw49&dl=1
+Changes=New editor for conversation booster instructions, Updated conversation booster instructions for more domain specifity, Fixed translations of checkable menu items, Fixed tyre pressures for prepared pitstops in session info (introduced with 5.7.2), Updated instructions for Driver Coach, Optimized Team Server timeout handling, Spotter announces valid and invalid laps of other cars in qualification, Rephrasing booster now also for many Spooter phrases, Team Management editor in "Simulator Startup", Fixed tyre pressure announcements in team sessions
 Components=Media->5.6.1,Configuration->5.6.4,Utilities->5.4.8
 [Release]
 Version=5.7.2.0-release
@@ -22,7 +22,7 @@ Utilities.5.4.8.Path=.
 Utilities.5.4.8.Content=Utilities
 Utilities.5.4.8.Download=https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+5.4.8.zip;https://www.dropbox.com/scl/fi/5nduffajjm3x6rhsxr1nk/Utilities-5.4.8.zip?rlkey=alrj8l2z205dd2vm9cu6hbsot&dl=1
 [Current]
-Type=Release
+Type=Development
 [Version]
-Development=5.7.2.0-release
+Development=5.7.3.0-dev
 Release=5.7.2.0-release

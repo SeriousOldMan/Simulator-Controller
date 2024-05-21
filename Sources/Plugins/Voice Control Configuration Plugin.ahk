@@ -390,7 +390,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 							  , window["activationCommandEdit"]]]
 
 		widget26 := window.Add("Text", "x" . x . " ys+24 w140 h23 +0x200 VazureSubscriptionKeyLabel Hidden", translate("Subscription Key"))
-		widget27 := window.Add("Edit", "x" . x1 . " yp w" . w1 . " h21 W:Grow VazureSubscriptionKeyEdit Hidden")
+		widget27 := window.Add("Edit", "x" . x1 . " yp w" . w1 . " h21 Password W:Grow VazureSubscriptionKeyEdit Hidden")
 		widget27.OnEvent("Change", updateAzureVoices)
 
 		widget28 := window.Add("Text", "x" . x . " yp+24 w140 h23 +0x200 VazureTokenIssuerLabel Hidden", translate("Token Issuer Endpoint"))
@@ -413,7 +413,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 									   , [window["azureTokenIssuerLabel"], window["azureTokenIssuerEdit"]]]
 
 		widget35 := window.Add("Text", "x" . x . " ys+24 w140 h23 +0x200 VgoogleAPIKeyFileLabel Hidden", translate("API Key"))
-		widget36 := window.Add("Edit", "x" . x1 . " yp w" . (w1 - 24) . " h21 W:Grow VgoogleAPIKeyFileEdit Hidden")
+		widget36 := window.Add("Edit", "x" . x1 . " yp w" . (w1 - 24) . " h21 Password W:Grow VgoogleAPIKeyFileEdit Hidden")
 		widget36.OnEvent("Change", updateGoogleVoices)
 
 		widget37 := window.Add("Button", "x" . (x1 + w1 - 23) . " yp w23 h23 X:Move VgoogleAPIKeyFilePathButton Hidden", translate("..."))

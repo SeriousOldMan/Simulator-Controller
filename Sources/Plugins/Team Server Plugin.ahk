@@ -740,11 +740,11 @@ class TeamServerPlugin extends ControllerPlugin {
 				driver := this.Connector.GetStintDriver(stint)
 
 				if !this.iCachedObjects.Has(driver)
-					this.iCachedObjects[driver] := this.Connector.GetDriver(driver)
+					this.iCachedObjects[driver] := this.parseObject(this.Connector.GetDriver(driver))
 
 				driver := this.iCachedObjects[driver]
 
-				return driverName(driver.ForName, driver.SurName, driver.NickName)
+				return driverName(driver["ForName"], driver["SurName"], driver["NickName"])
 			}
 			catch Any as exception {
 				this.LastMessage := (translate("Error while fetching stint data (Session: ") . session . translate(", Stint: ") . stint
@@ -805,7 +805,7 @@ class TeamServerPlugin extends ControllerPlugin {
 		return (this.iDriverNickName ? this.iDriverNickName : "")
 	}
 
-	startSession(simulator, car, track, duration) {
+	startSession(simulator, car, track, duration, retries := 20, wait := 2000) {
 		if this.SessionActive
 			this.leaveSession()
 
@@ -817,7 +817,7 @@ class TeamServerPlugin extends ControllerPlugin {
 				this.iLapData := CaseInsenseMap("Telemetry", CaseInsenseMap(), "Positions", CaseInsenseMap())
 				this.iSimulator := simulator
 
-				loop 20
+				loop retries
 					try {
 						this.Connector.StartSession(this.Session, duration, car, track)
 
@@ -834,10 +834,10 @@ class TeamServerPlugin extends ControllerPlugin {
 						break
 					}
 					catch Any as exception {
-						if (A_Index = 20)
+						if (A_Index = retries)
 							throw exception
 						else
-							Sleep(2000)
+							Sleep(wait)
 					}
 			}
 			catch Any as exception {
@@ -859,7 +859,7 @@ class TeamServerPlugin extends ControllerPlugin {
 	finishSession(arguments*) {
 		if ((arguments.Length > 0) && inList(["Logoff", "Shutdown"], arguments[1]))
 			return false
-		
+
 		if this.TeamServerActive {
 			try {
 				if this.DriverActive {
@@ -938,12 +938,12 @@ class TeamServerPlugin extends ControllerPlugin {
 		}
 	}
 
-	getCurrentDriver() {
+	getCurrentDriver(retries := 5, wait := 2000) {
 		local driver
 
 		if this.SessionActive {
 			try {
-				loop 5
+				loop retries
 					try {
 						driver := this.Connector.GetSessionDriver(this.Session)
 
@@ -953,10 +953,10 @@ class TeamServerPlugin extends ControllerPlugin {
 						return driver
 					}
 					catch Any as exception {
-						if (A_Index = 5)
+						if (A_Index = retries)
 							throw exception
 						else
-							Sleep(2000)
+							Sleep(wait)
 					}
 			}
 			catch Any as exception {
@@ -974,12 +974,12 @@ class TeamServerPlugin extends ControllerPlugin {
 			return false
 	}
 
-	getSessionValue(name, default := kUndefined) {
+	getSessionValue(name, default := kUndefined, retries := 5, wait := 2000) {
 		local value
 
 		if this.SessionActive {
 			try {
-				loop 5
+				loop retries
 					try {
 						value := this.Connector.GetSessionValue(this.Session, name)
 
@@ -992,10 +992,10 @@ class TeamServerPlugin extends ControllerPlugin {
 						return value
 					}
 					catch Any as exception {
-						if (A_Index = 5)
+						if (A_Index = retries)
 							throw exception
 						else
-							Sleep(2000)
+							Sleep(wait)
 					}
 			}
 			catch Any as exception {
@@ -1011,13 +1011,13 @@ class TeamServerPlugin extends ControllerPlugin {
 		return ((default != kUndefined) ? default : false)
 	}
 
-	setSessionValue(name, value) {
+	setSessionValue(name, value, retries := 5, wait := 2000) {
 		if this.SessionActive {
 			try {
 				if (isDebug() && isLogLevel(kLogDebug))
 					showMessage("Saving session value: " . name . " => " . value)
 
-				loop 5
+				loop retries
 					try {
 						if (!value || (value == "")) {
 							this.Connector.DeleteSessionValue(this.Session, name)
@@ -1035,10 +1035,10 @@ class TeamServerPlugin extends ControllerPlugin {
 						break
 					}
 					catch Any as exception {
-						if (A_Index = 5)
+						if (A_Index = retries)
 							throw exception
 						else
-							Sleep(2000)
+							Sleep(wait)
 					}
 			}
 			catch Any as exception {
@@ -1052,7 +1052,7 @@ class TeamServerPlugin extends ControllerPlugin {
 		}
 	}
 
-	getStintValue(stint, name, session := false) {
+	getStintValue(stint, name, session := false, retries := 5, wait := 2000) {
 		local value
 
 		if (!session && this.SessionActive)
@@ -1060,7 +1060,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 		if session {
 			try {
-				loop 5
+				loop retries
 					try {
 						if isInteger(stint)
 							value := this.Connector.GetSessionStintValue(session, stint, name)
@@ -1076,10 +1076,10 @@ class TeamServerPlugin extends ControllerPlugin {
 						return value
 					}
 					catch Any as exception {
-						if (A_Index = 5)
+						if (A_Index = retries)
 							throw exception
 						else
-							Sleep(2000)
+							Sleep(wait)
 					}
 			}
 			catch Any as exception {
@@ -1095,7 +1095,7 @@ class TeamServerPlugin extends ControllerPlugin {
 		return false
 	}
 
-	setStintValue(stint, name, value, session := false) {
+	setStintValue(stint, name, value, session := false, retries := 5, wait := 2000) {
 		if (!session && this.SessionActive)
 			session := this.Session
 
@@ -1104,7 +1104,7 @@ class TeamServerPlugin extends ControllerPlugin {
 				if (isDebug() && isLogLevel(kLogDebug))
 					showMessage("Saving value for stint " . stint . ": " . name . " => " . value)
 
-				loop 5
+				loop retries
 					try {
 						if (!value || (value == "")) {
 							if isInteger(stint)
@@ -1125,10 +1125,10 @@ class TeamServerPlugin extends ControllerPlugin {
 						break
 					}
 					catch Any as exception {
-						if (A_Index = 5)
+						if (A_Index = retries)
 							throw exception
 						else
-							Sleep(2000)
+							Sleep(wait)
 					}
 			}
 			catch Any as exception {
@@ -1142,13 +1142,13 @@ class TeamServerPlugin extends ControllerPlugin {
 		}
 	}
 
-	getStintSession(stint, session := false) {
+	getStintSession(stint, session := false, retries := 5, wait := 2000) {
 		if (!session && this.SessionActive)
 			session := this.Session
 
 		if session {
 			try {
-				loop 5
+				loop retries
 					try {
 						if isInteger(stint)
 							stint := this.Connector.GetSessionStint(session, stint)
@@ -1156,10 +1156,10 @@ class TeamServerPlugin extends ControllerPlugin {
 						return this.Connector.GetStintSession(stint)
 					}
 					catch Any as exception {
-						if (A_Index = 5)
+						if (A_Index = retries)
 							throw exception
 						else
-							Sleep(2000)
+							Sleep(wait)
 					}
 			}
 			catch Any as exception {
@@ -1175,7 +1175,7 @@ class TeamServerPlugin extends ControllerPlugin {
 		return false
 	}
 
-	getCurrentLap(session := false) {
+	getCurrentLap(session := false, retries := 5, wait := 2000) {
 		local lap, lapNr
 
 		if (!session && this.SessionActive)
@@ -1183,7 +1183,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 		if session {
 			try {
-				loop 5
+				loop retries
 					try {
 						lap := this.Connector.GetSessionLastLap(session)
 
@@ -1202,10 +1202,10 @@ class TeamServerPlugin extends ControllerPlugin {
 							return false
 					}
 					catch Any as exception {
-						if (A_Index = 5)
+						if (A_Index = retries)
 							throw exception
 						else
-							Sleep(2000)
+							Sleep(wait)
 					}
 			}
 			catch Any as exception {
@@ -1221,7 +1221,7 @@ class TeamServerPlugin extends ControllerPlugin {
 		return false
 	}
 
-	getLapStint(lap, session := false) {
+	getLapStint(lap, session := false, retries := 5, wait := 2000) {
 		if (!session && this.SessionActive)
 			session := this.Session
 
@@ -1230,7 +1230,7 @@ class TeamServerPlugin extends ControllerPlugin {
 				if (lap = kNull)
 					throw "Not a valid lap..."
 
-				loop 5
+				loop retries
 					try {
 						if isInteger(lap)
 							lap := this.Connector.GetSessionLap(session, lap)
@@ -1238,10 +1238,10 @@ class TeamServerPlugin extends ControllerPlugin {
 						return this.Connector.GetLapStint(lap)
 					}
 					catch Any as exception {
-						if (A_Index = 5)
+						if (A_Index = retries)
 							throw exception
 						else
-							Sleep(2000)
+							Sleep(wait)
 					}
 			}
 			catch Any as exception {
@@ -1257,7 +1257,7 @@ class TeamServerPlugin extends ControllerPlugin {
 		return false
 	}
 
-	getLapValue(lap, name, session := false) {
+	getLapValue(lap, name, session := false, retries := 5, wait := 2000) {
 		local value
 
 		if (!session && this.SessionActive)
@@ -1268,7 +1268,7 @@ class TeamServerPlugin extends ControllerPlugin {
 				if (lap = kNull)
 					throw "Not a valid lap..."
 
-				loop 5
+				loop retries
 					try {
 						if isInteger(lap)
 							value := this.Connector.GetSessionLapValue(session, lap, name)
@@ -1284,10 +1284,10 @@ class TeamServerPlugin extends ControllerPlugin {
 						return value
 					}
 					catch Any as exception {
-						if (A_Index = 5)
+						if (A_Index = retries)
 							throw exception
 						else
-							Sleep(2000)
+							Sleep(wait)
 					}
 			}
 			catch Any as exception {
@@ -1303,7 +1303,7 @@ class TeamServerPlugin extends ControllerPlugin {
 		return false
 	}
 
-	setLapValue(lap, name, value, session := false) {
+	setLapValue(lap, name, value, session := false, retries := 5, wait := 2000) {
 		if (!session && this.SessionActive)
 			session := this.Session
 
@@ -1312,7 +1312,7 @@ class TeamServerPlugin extends ControllerPlugin {
 				if (isDebug() && isLogLevel(kLogDebug))
 					showMessage("Saving value for lap " . lap . ": " . name . " => " . value)
 
-				loop 5
+				loop retries
 					try {
 						if (!value || (value == "")) {
 							if isInteger(lap)
@@ -1336,10 +1336,10 @@ class TeamServerPlugin extends ControllerPlugin {
 						break
 					}
 					catch Any as exception {
-						if (A_Index = 5)
+						if (A_Index = retries)
 							throw exception
 						else
-							Sleep(2000)
+							Sleep(wait)
 					}
 			}
 			catch Any as exception {
@@ -1353,7 +1353,7 @@ class TeamServerPlugin extends ControllerPlugin {
 		}
 	}
 
-	addStint(lapNumber) {
+	addStint(lapNumber, retries := 20, wait := 2000) {
 		local stint
 
 		if this.TeamServerActive {
@@ -1364,7 +1364,7 @@ class TeamServerPlugin extends ControllerPlugin {
 				if (isDebug() && isLogLevel(kLogDebug))
 					showMessage("Updating stint in lap " . lapNumber . " for team session")
 
-				loop 20
+				loop retries
 					try {
 						stint := this.Connector.StartStint(this.Session, this.Driver, lapNumber)
 
@@ -1374,10 +1374,10 @@ class TeamServerPlugin extends ControllerPlugin {
 						break
 					}
 					catch Any as exception {
-						if (A_Index = 20)
+						if (A_Index = retries)
 							throw exception
 						else
-							Sleep(2000)
+							Sleep(wait)
 					}
 
 				return stint
@@ -1395,7 +1395,7 @@ class TeamServerPlugin extends ControllerPlugin {
 		}
 	}
 
-	addLap(lapNumber, telemetryData, positionsData) {
+	addLap(lapNumber, telemetryData, positionsData, retries := 10, wait := 2000) {
 		local driverForName, driverSurName, driverNickName, stint, simulator, car, track, lap
 
 		if this.TeamServerActive {
@@ -1413,7 +1413,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 				stint := false
 
-				loop 10
+				loop retries
 					try {
 						if !this.SessionActive {
 							simulator := getMultiMapValue(telemetryData, "Session Data", "Simulator", "Unknown")
@@ -1448,10 +1448,10 @@ class TeamServerPlugin extends ControllerPlugin {
 						break
 					}
 					catch Any as exception {
-						if (A_Index = 10)
+						if (A_Index = retries)
 							throw exception
 						else
-							Sleep(2000)
+							Sleep(wait)
 					}
 
 				if (positionsData && (positionsData.Count > 0) && !this.iLapData["Positions"].Has(lapNumber)) {

@@ -1,3 +1,19 @@
+## 5.7.3.0-release 05/24/24 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. The translations for checkable menu items has been fixed in several applications.
+  4. The cold target tyre pressure information in the pitstop component on the session info page in "System Monitor" has been fixed. This bug was introduced with the 5.7.2.
+  5. The announcement of chosen tyre pressures by the Engineer in team sessions has been fixed. This bug was introduced with the 5.7.2.
+  6. The handling of remote server timeouts has been improved in team sessions. The applications like "Race Center" do not wait anymore in cases of non-important data.
+  7. The Spotter now informs you during qualification whether the car before or behind you is on a valid or on an invalid lap.
+  8. It is now possible to configure the instructions for the different GPT-based conversation boosters. Please take a look at the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm) for more information.
+  9. The default instructions for the conversation boosters has been extended to include more personality and domain specific behaviour.
+  10. Many more announcements and messages by the Spotter can now be rephrased by the conversation booster. Only very urgent messages like proximity alerts are excluded, because of the additional latency introduced when calling a GPT service.
+  11. The default "Character" instruction for the Driving Coach has been updated. If you are using the Driving Coach, you may want to revert to the default instruction in this case.
+  12. It is now possible to manage teams, driver and sessions directly from "Simulator Startup", if you are using the Team Server. Please see the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#team-management) for more information.
+  
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-570), especially if you have configured and are using the Driving Coach.
+
 ## 5.7.2.0-release 05/17/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

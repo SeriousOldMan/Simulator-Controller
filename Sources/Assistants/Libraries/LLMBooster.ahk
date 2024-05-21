@@ -27,10 +27,12 @@
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class GPTBooster extends ConfigurationItem {
+class LLMBooster extends ConfigurationItem {
 	iOptions := CaseInsenseMap()
 
 	iConnector := false
+
+	iInstructions := false
 
 	Options[key?] {
 		Get {
@@ -50,7 +52,7 @@ class GPTBooster extends ConfigurationItem {
 
 	Descriptor {
 		Get {
-			throw "Virtual property GPTBooster.Descriptor must be implemented in a subclass..."
+			throw "Virtual property LLMBooster.Descriptor must be implemented in a subclass..."
 		}
 	}
 
@@ -69,6 +71,49 @@ class GPTBooster extends ConfigurationItem {
 	Connector {
 		Get {
 			return this.iConnector
+		}
+	}
+
+	Instructions[language?] {
+		Get {
+			local instructions, ignore, instrLanguage, directory, key, value
+
+			if !this.iInstructions {
+				instructions := CaseInsenseMap()
+
+				for ignore, directory in [kTranslationsDirectory, kUserTranslationsDirectory]
+					loop Files (directory . "Conversation Booster.instructions.*") {
+						SplitPath A_LoopFilePath, , , &instrLanguage
+
+						if !instructions.Has(instrLanguage)
+							instructions[instrLanguage] := newMultiMap()
+
+						addMultiMapValues(instructions[instrLanguage], readMultiMap(A_LoopFilePath))
+					}
+
+				for key, value in getMultiMapValues(this.Configuration, "Conversation Booster")
+					if (InStr(key, "Instructions.") = 1) {
+						key := ConfigurationItem.splitDescriptor(key)
+
+						instrLanguage := key[4]
+
+						if !instructions.Has(instrLanguage)
+							instructions[instrLanguage] := newMultiMap()
+
+						setMultiMapValue(instructions[instrLanguage], key[2] . ".Instructions", key[3], value)
+					}
+
+				this.iInstructions := instructions
+			}
+
+			if isSet(language) {
+				if this.iInstructions.Has(language)
+					return this.iInstructions[language]
+				else
+					return newMultiMap()
+			}
+			else
+				return this.iInstructions
 		}
 	}
 
@@ -91,7 +136,7 @@ class GPTBooster extends ConfigurationItem {
 			service := string2Values("|", service)
 
 			if !inList(this.Providers, service[1])
-				throw "Unsupported service detected in GPTBooster.startBooster..."
+				throw "Unsupported service detected in LLMBooster.startBooster..."
 
 			if (service[1] = "LLM Runtime")
 				this.iConnector := LLMConnector.LLMRuntimeConnector(this, this.Options["Model"])
@@ -104,17 +149,17 @@ class GPTBooster extends ConfigurationItem {
 				catch Any as exception {
 					logError(exception)
 
-					throw "Unsupported service detected in GPTBooster.startBooster..."
+					throw "Unsupported service detected in LLMBooster.startBooster..."
 				}
 
 			this.Connector.MaxTokens := this.MaxTokens
 		}
 		else
-			throw "Unsupported service detected in GPTBooster.startBooster..."
+			throw "Unsupported service detected in LLMBooster.startBooster..."
 	}
 }
 
-class ConversationBooster extends GPTBooster {
+class ConversationBooster extends LLMBooster {
 	Descriptor {
 		Get {
 			return this.Options["Descriptor"]
@@ -214,21 +259,8 @@ class SpeechBooster extends ConversationBooster {
 	}
 
 	speak(text, options := false) {
+		local variables := false
 		local doRephrase, doTranslate, code, language, fileName, languageInstructions, instruction
-
-		static instructions := false
-
-		if !instructions {
-			instructions := CaseInsenseMap()
-
-			for code, language in availableLanguages() {
-				languageInstructions := readMultiMap(kTranslationsDirectory . "Conversation Booster.instructions." . code)
-
-				addMultiMapValues(languageInstructions, readMultiMap(kUserTranslationsDirectory . "Conversation Booster.instructions." . code))
-
-				instructions[code] := languageInstructions
-			}
-		}
 
 		if (this.Model && this.Active) {
 			code := this.Code
@@ -242,6 +274,9 @@ class SpeechBooster extends ConversationBooster {
 
 				doRephrase := ((Random(1, 10) <= (10 * this.Probability)) && (!options.Has("Rephrase") || options["Rephrase"]))
 				doTranslate := (options.Has("Translate") && options["Translate"])
+
+				if options.Has("Variables")
+					variables := options["Variables"]
 
 				if options.Has("Language")
 					code := options["Language"]
@@ -261,9 +296,14 @@ class SpeechBooster extends ConversationBooster {
 					else
 						instruction := "Rephrase"
 
-					instruction := substituteVariables(getMultiMapValue(instructions[instructions.Has(code) ? code : "EN"]
-																	  , "Speaker.Instructions", instruction)
-													 , {language: language ? language : "", text: text})
+					if variables {
+						variables.language := (language ? language : "")
+						variables.text := text
+					}
+					else
+						variables := {language: language ? language : "", text: text}
+
+					instruction := substituteVariables(getMultiMapValue(this.Instructions[code], "Speaker.Instructions", instruction), variables)
 
 					answer := this.Connector.Ask(instruction)
 
@@ -357,20 +397,6 @@ class RecognitionBooster extends ConversationBooster {
 		local doRecognize, code, language, fileName, languageInstructions, instruction
 		local phrase, name, grammar, phrases, candidates, numCandidates
 
-		static instructions := false
-
-		if !instructions {
-			instructions := CaseInsenseMap()
-
-			for code, language in availableLanguages() {
-				languageInstructions := readMultiMap(kTranslationsDirectory . "Conversation Booster.instructions." . code)
-
-				addMultiMapValues(languageInstructions, readMultiMap(kUserTranslationsDirectory . "Conversation Booster.instructions." . code))
-
-				instructions[code] := languageInstructions
-			}
-		}
-
 		if !commands {
 			commands := []
 
@@ -426,8 +452,7 @@ class RecognitionBooster extends ConversationBooster {
 
 					instruction := "Recognize"
 
-					instruction := substituteVariables(getMultiMapValue(instructions[instructions.Has(code) ? code : "EN"]
-																	  , "Listener.Instructions", instruction)
+					instruction := substituteVariables(getMultiMapValue(this.Instructions[code], "Listener.Instructions", instruction)
 													 , {commands: commands, text: text})
 
 					answer := this.Connector.Ask(instruction)
@@ -477,20 +502,6 @@ class ChatBooster extends ConversationBooster {
 		local variables := false
 		local doTalk, code, language, fileName, languageInstructions, instruction, variables
 
-		static instructions := false
-
-		if !instructions {
-			instructions := CaseInsenseMap()
-
-			for code, language in availableLanguages() {
-				languageInstructions := readMultiMap(kTranslationsDirectory . "Conversation Booster.instructions." . code)
-
-				addMultiMapValues(languageInstructions, readMultiMap(kUserTranslationsDirectory . "Conversation Booster.instructions." . code))
-
-				instructions[code] := languageInstructions
-			}
-		}
-
 		if (this.Model && this.Active) {
 			code := this.Code
 			language := this.Language
@@ -523,7 +534,7 @@ class ChatBooster extends ConversationBooster {
 					else
 						variables := {language: language ? language : ""}
 
-					instruction := instructions[instructions.Has(code) ? code : "EN"]
+					instruction := this.Instructions[code]
 
 					answer := this.Connector.Ask(question, [substituteVariables(getMultiMapValue(instruction
 																							   , "Conversation.Instructions", "Character")
@@ -532,7 +543,7 @@ class ChatBooster extends ConversationBooster {
 																							   , "Conversation.Instructions", "Telemetry")
 																			  , variables)])
 
-					return (answer ? answer : false)
+					return (answer ? StrReplace(answer, "**", "") : false)
 				}
 				catch Any as exception {
 					logError(exception)

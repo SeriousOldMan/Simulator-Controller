@@ -934,10 +934,10 @@ class SpeechSynthesizer {
 			if (voice && (voice != true) && inList(voices, voice))
 				return voice
 			else
-				return voices[1]
+				return ((availableVoices.Length > 0) ? availableVoices[1] : voices[1])
 		}
 		else
-			return ""
+			return ((availableVoices.Length > 0) ? availableVoices[1] : "")
 	}
 
 	setVoice(language, name) {

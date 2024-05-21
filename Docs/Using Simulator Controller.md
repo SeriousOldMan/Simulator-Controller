@@ -150,7 +150,15 @@ Finally, if you are ready to start, choose the profile you want to start with an
 
 Note: If you want "Simulator Startup" to use a specific startup profile independent from what is chosen in the configuration of the startup profiles, you can run "Simulator Startup.exe" with the "-Startup [Profile]" option, where *[Profile]* is the name of the profile you want to use (possibly enclosed in quotes). This is especially helpful together with the "-NoLaunchPad" option, when running "Simulator Startup" from a Stream Deck, for example.
 
-### Managing common team settings
+### Team Management
+
+When the Team Server has been included in the configuration a small cog wheel icon will appear in the lower left corner of the "Race Center" application button. You can open a special window for the team manager by either exactly hitting the small cog wheel icon in the "Race Center" button or by holding down the Control key while clicking on the "Race Center" button. The following window appears:
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Team%20Management.JPG)
+
+If you have the team manager credentials for a Team Server, you can manage your teams, drivers and sessions using this dialog. The available functionality is identical to the ["Team Server" tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-team-server) in the "Simulator Configuration" application. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#managing-teams) for more information, how to manage teams.
+
+#### Managing common team settings
 
 In many cases all drivers in a given team want to share the same configuration. And in many cases, there is a member of the team, who took the role of the team manager. He will prepare races, configure the [Team Server](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server) and will have the deepest understanding of Simulator Controller in his team. This team manager can prepare a package for all his team mates which can be imported by every driver using a [special preset](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#presets--special-configurations) in "Simulator Setup". This package must be a folder, which can contain the following components:
 

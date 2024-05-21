@@ -331,10 +331,11 @@ class VoiceManager extends ConfigurationItem {
 							options := toMap(options)
 
 							text := booster.speak(text, Map("Rephrase", (!options.Has("Rephrase") || options["Rephrase"])
-														  , "Translate", (options.Has("Translate") && options["Tranlate"])))
+														  , "Translate", (options.Has("Translate") && options["Tranlate"])
+														  , "Variables", {assistant: this.VoiceManager.Routing}))
 						}
 						else
-							text := booster.speak(text)
+							text := booster.speak(text, Map("Variables", {assistant: this.VoiceManager.Routing}))
 					}
 
 					this.Speaking := true

@@ -36,7 +36,7 @@
 #Include "..\Libraries\Messages.ahk"
 #Include "..\Libraries\SpeechSynthesizer.ahk"
 #Include "..\Libraries\SpeechRecognizer.ahk"
-#Include "..\Assistants\Libraries\LLMBooster.ahk"
+#Include "..\Assistants\Libraries\ConversationBooster.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;

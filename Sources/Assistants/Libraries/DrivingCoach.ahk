@@ -33,6 +33,8 @@ class DrivingCoach extends GridRaceAssistant {
 	iConnector := false
 	iConnectionState := "Active"
 
+	iTemplates := false
+
 	iInstructions := CaseInsenseWeakMap()
 
 	iLaps := Map()
@@ -71,6 +73,39 @@ class DrivingCoach extends GridRaceAssistant {
 	Providers {
 		Get {
 			return LLMConnector.Providers
+		}
+	}
+
+	Templates[language?] {
+		Get {
+			local templates, fileName, code, ignore
+
+			if !this.iTemplates {
+				templates := CaseInsenseMap()
+
+				for code, ignore in availableLanguages() {
+					fileName := getFileName("Driving Coach.instructions." . code, kTranslationsDirectory)
+
+					if FileExist(fileName) {
+						templates[code] := readMultiMap(fileName)
+
+						fileName := getFileName("Driving Coach.instructions." . code, kUserTranslationsDirectory)
+
+						if FileExist(fileName)
+							addMultiMapValues(templates[code], readMultiMap(fileName))
+					}
+					else {
+						fileName := getFileName("Driving Coach.instructions." . code, kUserTranslationsDirectory)
+
+						if FileExist(fileName)
+							templates[code] := readMultiMap(fileName)
+					}
+				}
+
+				this.iTemplates := templates
+			}
+
+			return (isSet(language) ? this.iTemplates[language] : this.iTemplates)
 		}
 	}
 
@@ -184,7 +219,10 @@ class DrivingCoach extends GridRaceAssistant {
 		options["Driving Coach.Confirmation"] := getMultiMapValue(configuration, "Driving Coach Personality", "Confirmation", true)
 
 		for ignore, instruction in this.Instructions[true]
-			options["Driving Coach.Instructions." . instruction] := getMultiMapValue(configuration, "Driving Coach Personality", "Instructions." . instruction, false)
+			if (getMultiMapValue(configuration, "Driving Coach Personality", "Instructions." . instruction, kUndefined) != kUndefined)
+				options["Driving Coach.Instructions." . instruction] := getMultiMapValue(configuration, "Driving Coach Personality", "Instructions." . instruction, false)
+			else
+				options["Driving Coach.Instructions." . instruction] := getMultiMapValue(this.Templates[options["Language"]], "Instructions", instruction)
 
 		laps := InStr(options["Driving Coach.Instructions.Stint"], "%laps:")
 

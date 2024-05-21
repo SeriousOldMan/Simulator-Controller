@@ -49,7 +49,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[5.7.3.0-dev]() (Early build for 5.7.3. Changes: New editor for conversation booster instructions, Updated conversation booster instructions for more domain specifity, Fixed translations of checkable menu items, Fixed tyre pressures for prepared pitstops in session info (introduced with 5.7.2), Updated instructions for Driver Coach, Optimized Team Server timeout handling, Spotter announces valid and invalid laps of other cars in qualification, Rephrasing booster now also for many Spooter phrases, Team Management editor in "Simulator Startup", Fixed tyre pressure announcements in team sessions.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-573) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

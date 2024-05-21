@@ -148,25 +148,7 @@ class LLMConnector {
 		}
 	}
 
-	class OpenAIConnector extends LLMConnector.HTTPConnector {
-		static Models {
-			Get {
-				return ["GPT 3.5 turbo", "GPT 4", "GPT 4 32k", "GPT 4 turbo", "GPT 4o"]
-			}
-		}
-
-		Models {
-			Get {
-				return LLMConnector.OpenAIConnector.Models
-			}
-		}
-
-		static GetDefaults(&serviceURL, &serviceKey, &model) {
-			serviceURL := "https://api.openai.com/v1/chat/completions"
-			serviceKey := ""
-			model := "GPT 3.5 turbo"
-		}
-
+	class InstructionConnector extends LLMConnector.HTTPConnector {
 		CreatePrompt(body, instructions, question) {
 			local messages := []
 			local ignore, instruction, conversation
@@ -188,6 +170,26 @@ class LLMConnector {
 			body.messages := messages
 
 			return body
+		}
+	}
+
+	class OpenAIConnector extends LLMConnector.InstructionConnector {
+		static Models {
+			Get {
+				return ["GPT 3.5 turbo", "GPT 4", "GPT 4 32k", "GPT 4 turbo", "GPT 4o"]
+			}
+		}
+
+		Models {
+			Get {
+				return LLMConnector.OpenAIConnector.Models
+			}
+		}
+
+		static GetDefaults(&serviceURL, &serviceKey, &model) {
+			serviceURL := "https://api.openai.com/v1/chat/completions"
+			serviceKey := ""
+			model := "GPT 3.5 turbo"
 		}
 	}
 
@@ -231,7 +233,7 @@ class LLMConnector {
 		}
 	}
 
-	class MistralAIConnector extends LLMConnector.HTTPConnector {
+	class MistralAIConnector extends LLMConnector.InstructionConnector {
 		static Models {
 			Get {
 				return ["Open Mistral 7b", "Open Mixtral 8x7b", "Open Mixtral 8x22b", "Mistral Small Latest", "Mistral Medium Latest", "Mistral Large Latest"]
@@ -249,28 +251,25 @@ class LLMConnector {
 			serviceKey := ""
 			model := "Open Mixtral 8x22b"
 		}
+	}
 
-		CreatePrompt(body, instructions, question) {
-			local messages := []
-			local ignore, instruction, conversation
-
-			addInstruction(instruction) {
-				if (instruction && (Trim(instruction) != ""))
-					messages.Push({role: "system", content: instruction})
+	class OpenRouterConnector extends LLMConnector.InstructionConnector {
+		static Models {
+			Get {
+				return []
 			}
+		}
 
-			do(instructions, addInstruction)
-
-			for ignore, conversation in this.History {
-				messages.Push({role: "user", content: conversation[1]})
-				messages.Push({role: "assistant", content: conversation[2]})
+		Models {
+			Get {
+				return LLMConnector.OpenRouterConnector.Models
 			}
+		}
 
-			messages.Push({role: "user", content: question})
-
-			body.messages := messages
-
-			return body
+		static GetDefaults(&serviceURL, &serviceKey, &model) {
+			serviceURL := "https://openrouter.ai/api/v1/chat/completions"
+			serviceKey := ""
+			model := ""
 		}
 	}
 
@@ -396,7 +395,7 @@ class LLMConnector {
 
 	static Providers {
 		Get {
-			return ["OpenAI", "Mistral AI", "Azure", "GPT4All", "LLM Runtime"]
+			return ["OpenAI", "Mistral AI", "Azure", "OpenRouter", "GPT4All", "LLM Runtime"]
 		}
 	}
 

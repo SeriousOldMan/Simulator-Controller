@@ -12,6 +12,7 @@
   11. Many more announcements and messages by the Spotter can now be rephrased by the conversation booster. Only very urgent messages like proximity alerts are excluded, because of the additional latency introduced when calling a GPT service.
   12. The default "Character" instruction for the Driving Coach has been updated. If you are using the Driving Coach, you may want to revert to the default instruction in this case.
   13. It is now possible to manage teams, driver and sessions directly from "Simulator Startup", if you are using the Team Server. Please see the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#team-management) for more information.
+  14. *OpenRouter* has been added to the list of supported GPT service providers.
   
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-570), especially if you have configured and are using the Driving Coach.
 

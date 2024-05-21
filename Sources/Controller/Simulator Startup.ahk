@@ -2315,7 +2315,7 @@ teamManagerEditor(launchPadOrCommand, arguments*) {
 
 		teamManagerGui.Add("Text", "x8 y545 w508 0x10")
 
-		teamManagerGui.Add("Button", "Default X220 YP+10 w80 vsaveButton", translate("Close")).OnEvent("Click", teamManagerEditor.Bind(kClose))
+		teamManagerGui.Add("Button", "X220 YP+10 w80", translate("Close")).OnEvent("Click", teamManagerEditor.Bind(kClose))
 
 		teamManagerEditor("Update State")
 

@@ -395,17 +395,17 @@ class TeamManagementPanel extends ConfiguratorPanel {
 
 		widget5 := window.Add("Text", "x" . x0 . " yp+10 w90 h23 +0x200 Hidden", translate("Server URL"))
 		widget6 := window.Add("ComboBox", "x" . x1 . " yp+1 w" . w4 . " W:Grow Choose" . chosen . " VteamServerURLEdit Hidden", serverURLs)
-		widget7 := window.Add("Button", "x" . x4 . " yp-1 w23 h23 X:Move Center +0x200  Hidden")
+		widget7 := window.Add("Button", "x" . x4 . " yp-1 w23 h23 X:Move Center +0x200 Hidden")
 		widget7.OnEvent("Click", copyURL)
 		setButtonIcon(widget7, kIconsDirectory . "Copy.ico", 1, "L4 T4 R4 B4")
 
 		widget8 := window.Add("Text", "x" . x0 . " yp+23 w90 h23 +0x200 Hidden", translate("Login Credentials"))
 		widget9 := window.Add("Edit", "x" . x1 . " yp+1 w" . w3 . " h21 W:Grow(0.5) VteamServerNameEdit Hidden", this.Value["teamServerName"])
 		widget10 := window.Add("Edit", "x" . x3 . " yp w" . w3 . " h21 X:Move(0.5) W:Grow(0.5) Password VteamServerPasswordEdit Hidden")
-		widget11 := window.Add("Button", "x" . x2 . " yp-1 w23 h23 Center +0x200  Hidden")
+		widget11 := window.Add("Button", "x" . x2 . " yp-1 w23 h23 Default Center +0x200 Hidden")
 		widget11.OnEvent("Click", teamServerLogin)
 		setButtonIcon(widget11, kIconsDirectory . "Authorize.ico", 1, "L4 T4 R4 B4")
-		widget12 := window.Add("Button", "x" . x5 . " yp-1 w23 h23 X:Move Center +0x200 vchangePasswordButton  Hidden")
+		widget12 := window.Add("Button", "x" . x5 . " yp-1 w23 h23 X:Move Center +0x200 vchangePasswordButton Hidden")
 		widget12.OnEvent("Click", changePassword)
 		setButtonIcon(widget12, kIconsDirectory . "Pencil.ico", 1, "L4 T4 R4 B4")
 
@@ -417,16 +417,16 @@ class TeamManagementPanel extends ConfiguratorPanel {
 		widget15 := window.Add("Text", "x" . x0 . " yp+31 w90 h23 +0x200 Hidden", translate("Session Token"))
 
 		widget16 := window.Add("Edit", "x" . x1 . " yp-1 w" . w4 . " h21 W:Grow ReadOnly VteamServerSessionTokenEdit Hidden", this.Value["teamServerSessionToken"])
-		widget17 := window.Add("Button", "x" . x4 . " yp w23 h23 X:Move Center +0x200  Hidden")
+		widget17 := window.Add("Button", "x" . x4 . " yp w23 h23 X:Move Center +0x200 vcopySessionTokenButton Hidden")
 		widget17.OnEvent("Click", copySessionToken)
 		setButtonIcon(widget17, kIconsDirectory . "Copy.ico", 1, "L4 T4 R4 B4")
 
 		widget18 := window.Add("Text", "x" . x0 . " yp+26 w90 h23 +0x200 Hidden", translate("Data Token"))
 		widget19 := window.Add("Edit", "x" . x1 . " yp-1 w" . w4 . " h21 W:Grow ReadOnly VteamServerDataTokenEdit Hidden", this.Value["teamServerDataToken"])
-		widget20 := window.Add("Button", "x" . x4 . " yp w23 h23 X:Move Center +0x200  Hidden")
+		widget20 := window.Add("Button", "x" . x4 . " yp w23 h23 X:Move Center +0x200 vcopyDataTokenButton Hidden")
 		widget20.OnEvent("Click", copyDataToken)
 		setButtonIcon(widget20, kIconsDirectory . "Copy.ico", 1, "L4 T4 R4 B4")
-		widget21 := window.Add("Button", "x" . x2 . " yp-1 w23 h23 Center +0x200 vrenewDataTokenButton  Hidden")
+		widget21 := window.Add("Button", "x" . x2 . " yp-1 w23 h23 Center +0x200 vrenewDataTokenButton Hidden")
 		widget21.OnEvent("Click", renewDataToken)
 		setButtonIcon(widget21, kIconsDirectory . "Renew.ico", 1, "L4 T4 R4 B4")
 
@@ -667,12 +667,15 @@ class TeamManagementPanel extends ConfiguratorPanel {
 		this.Control["deleteSessionButton"].Enabled := false
 		this.Control["editSessionButton"].Enabled := false
 
+		this.Control["copySessionTokenButton"].Enabled := false
+
 		if ((Trim(this.Control["teamServerURLEdit"].Text) = "") || (Trim(this.Control["teamServerNameEdit"].Text) = "")) {
 			this.Control["teamServerSessionTokenEdit"].Text := ""
 			this.Control["teamServerDataTokenEdit"].Text := ""
 		}
 
 		if this.Token {
+			this.Control["copySessionTokenButton"].Enabled := true
 			this.Control["changePasswordButton"].Enabled := true
 			this.Control["addTeamButton"].Enabled := true
 
@@ -695,10 +698,14 @@ class TeamManagementPanel extends ConfiguratorPanel {
 			}
 		}
 
-		if (this.Control["teamServerDataTokenEdit"].Text != "")
+		if (this.Control["teamServerDataTokenEdit"].Text != "") {
+			this.Control["copyDataTokenButton"].Enabled := true
 			this.Control["renewDataTokenButton"].Enabled := true
-		else
+		}
+		else {
+			this.Control["copyDataTokenButton"].Enabled := false
 			this.Control["renewDataTokenButton"].Enabled := false
+		}
 	}
 
 	parseObject(properties) {

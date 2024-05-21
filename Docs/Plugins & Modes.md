@@ -636,11 +636,11 @@ Note: For convenience, all commands available for the *assistantCommands* parame
 
 Simulator Controller must *understand* the current choices and the available settings in the Pitstop MFD, before any changes can be made automatically. There are two different methods available for this task:
 
-  1. The first method does not need any special preparation from your side. It uses a kind of fuzzy option walk, where the cursor in the Pitstop MFD jumps wildly around and it looks like that the settings are changed randomly. But in the end, everything will be dialed as expected. The *learned* structure will be kept in memory for the next 60 seconds, plenty of time for all changes using your Button Box or by the Race Engineer. After this period, the *learning* walk will happen again, since it might be possible, that you changed something in between without the *knowledge* of Simulator Controller. This method is used by default from now on, but you might take a look at the second method below.
+  1. The first method does not need any special preparation from your side. It uses a kind of fuzzy option walk, where the cursor in the Pitstop MFD jumps wildly around and it looks like that the settings are changed randomly. But in the end, everything will be dialed as expected. The *learned* structure will be kept in memory for the next 60 seconds, plenty of time for all changes using your Button Box or by the Race Engineer. After this period, the *learning* walk will happen again, since it might be possible that you changed something in between without the *knowledge* of Simulator Controller. This method is used by default from now on and is **strongly** recommended, but you might take a look at the second method below.
   
-  It is possible in very rare situations or when you have accidently interfered using the keyboard yourself, while the option walk is running, that the search for the current pitstop settings get stucked in an endless loop. Press and hold Control in this case will restart the process.
+  It is possible in very rare situations or when you have accidently interfered using the keyboard yourself, while the option walk is running, that the search for the current pitstop settings get stucked in an endless loop. Holding down the Control key will restart the process in this case.
   
-  2. The drawback of the approach using the option walk, is that the jumping cursor might be a little irritating. Therefore a second method is available, which has been available a long time before the option walk. But this method, which uses image recognition to detect the structure and the current choices of the Pitstop MFD, might need a special preparation from your side.
+  2. [Deprecated] The drawback of the approach using the option walk, is that the jumping cursor might be a little bit irritating. Therefore a second method is available, which has been around for a long time before the option walk. But this method, which uses image recognition to detect the structure and the current choices of the Pitstop MFD, might need a special preparation from your side.
 
      In order to *understand* the Pitstop MFD state of *Assetto Corsa Competizione*, Simulator Controller searches for small picture elements in the graphics of the game window. 
 
@@ -658,7 +658,7 @@ Simulator Controller must *understand* the current choices and the available set
 
      Last note: On our Discord server (https://discord.gg/5N8JrNr48H), there is a small tool in the channel #tools-and-fixes available, with which you can test, whether all your pictures can be be found.
 
-If you have come so far in your reading and still want to use the image recognition method, because the jumping cursor disturbes you to much, you must do the following: Open the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--session-database) and insert and check the setting "Pitstop: Image Search" for the *Assetto Corsa Competizione* simulator.
+If you have come so far in your reading and still want to use the image recognition method, because the jumping cursor disturbes you to much, you must do the following: Open the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--session-database) and insert and check the setting "Pitstop: Image Search" for the *Assetto Corsa Competizione* simulator. And, of course, you have to create all search images.
 
 ## Plugin *AC*
 

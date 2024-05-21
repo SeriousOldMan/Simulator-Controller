@@ -286,6 +286,16 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 		}
 	}
 
+	normalizeConfiguration(configuration) {
+		local ignore, type, section, values, key, value
+
+		for ignore, type in ["Speaker", "Listener", "Conversation"]
+			for section, values in this.getInstructions(type, true)
+				for key, value in values
+					if (getMultiMapValue(configuration, section, key) = value)
+						removeMultiMapValue(configuration, section, key)
+	}
+
 	loadFromConfiguration(configuration) {
 		local service, ignore, provider, setting, providerConfiguration
 		local serviceURL, serviceKey, model
@@ -369,6 +379,8 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 		this.saveProviderConfiguration()
 
 		addMultiMapValues(configuration, this.iInstructions)
+
+		this.normalizeConfiguration(configuration)
 
 		for ignore, provider in this.Providers {
 			providerConfiguration := this.iProviderConfigurations[provider]

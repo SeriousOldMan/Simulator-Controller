@@ -277,6 +277,8 @@ class RaceCenter extends ConfigurationItem {
 	iLapsListView := false
 	iPitstopsListView := false
 
+	iPitstopStints := []
+
 	iSelectedSetup := false
 	iSelectedPlanStint := false
 
@@ -2850,7 +2852,7 @@ class RaceCenter extends ConfigurationItem {
 				hasPitstops := false
 		}
 
-		if (hasPitstops || this.SetupsListView.GetCount())
+		if (hasPitstops || this.SetupsListView.GetCount() || this.Laps.Has(1))
 			window["copyPressuresButton"].Enabled := true
 		else
 			window["copyPressuresButton"].Enabled := false
@@ -4311,6 +4313,8 @@ class RaceCenter extends ConfigurationItem {
 			if (this.PitstopsListView.GetNext(A_Index - 1, "C") != A_Index) {
 				this.PitstopsListView.Delete(A_Index)
 
+				this.iPitstopStints.RemoveAt(A_Index)
+
 				break
 			}
 
@@ -4360,6 +4364,8 @@ class RaceCenter extends ConfigurationItem {
 		this.PitstopsListView.Add("", this.PitstopsListView.GetCount() + 1, pitstopLap, displayNullValue(nextDriver), displayFuel
 									, (tyreCompound = "-") ? tyreCompound : translate(compound(tyreCompound, tyreCompoundColor)), (tyreSet != 0) ? tyreSet : "-"
 									, displayPressures, this.computeRepairs(repairBodywork, repairSuspension, repairEngine))
+
+		this.iPitstopStints.Push(this.CurrentStint.Nr)
 
 		this.PitstopsListView.ModifyCol()
 
@@ -5034,7 +5040,7 @@ class RaceCenter extends ConfigurationItem {
 		local sessionStore := this.SessionStore
 		local stint := this.Stints[stintNr]
 		local lap := stint.Laps[1]
-		local pressureTable, pressures, pressure, theCompound, pitstop
+		local pressureTable, pressures, pressure, theCompound, pitstop, candidate, index
 
 		driver := stint.Driver
 		tyrePressures := false
@@ -5096,41 +5102,45 @@ class RaceCenter extends ConfigurationItem {
 						break
 					}
 				}
-				else {
-					if (this.PitstopsListView.GetCount() >= (stintNr - 1)) {
-						theCompound := this.PitstopsListView.GetText(stintNr - 1, 5)
+				else
+					for ignore, candidate in reverse(this.iPitstopStints)
+						if (candidate = (stintNr - 1)) {
+							index := (this.iPitstopStints.Length - A_Index + 1)
 
-						if (theCompound != "-") {
-							if !tyreSet {
-								tyreSet := this.PitstopsListView.GetText(stintNr - 1, 6)
+							if index {
+								theCompound := this.PitstopsListView.GetText(index, 5)
 
-								if (tyreSet = "-")
-									tyreSet := 0
+								if (theCompound != "-") {
+									if !tyreSet {
+										tyreSet := this.PitstopsListView.GetText(index, 6)
+
+										if (tyreSet = "-")
+											tyreSet := 0
+									}
+
+									pressures := this.PitstopsListView.GetText(index, 7)
+
+									tyrePressures := string2Values(", ", pressures)
+
+									loop 4 {
+										pressure := tyrePressures[A_Index]
+
+										if isNumber(pressure)
+											tyrePressures[A_Index] := convertUnit("Pressure", internalValue("Float", pressure), false)
+									}
+
+									break
+								}
+								else if !carryOver {
+									tyreCompound := false
+									tyreCompoundColor := false
+									tyreSet := false
+									tyrePressures := false
+
+									break
+								}
 							}
-
-							pressures := this.PitstopsListView.GetText(stintNr - 1, 7)
-
-							tyrePressures := string2Values(", ", pressures)
-
-							loop 4 {
-								pressure := tyrePressures[A_Index]
-
-								if isNumber(pressure)
-									tyrePressures[A_Index] := convertUnit("Pressure", internalValue("Float", pressure), false)
-							}
-
-							break
 						}
-						else if !carryOver {
-							tyreCompound := false
-							tyreCompoundColor := false
-							tyreSet := false
-							tyrePressures := false
-
-							break
-						}
-					}
-				}
 			}
 
 			stintNr -= 1
@@ -5797,6 +5807,8 @@ class RaceCenter extends ConfigurationItem {
 		this.LapsListView.Delete()
 
 		this.PitstopsListView.Delete()
+
+		this.iPitstopStints := []
 
 		this.Control["driverDropDown"].Delete()
 
@@ -7219,6 +7231,8 @@ class RaceCenter extends ConfigurationItem {
 							if (this.PitstopsListView.GetNext(A_Index - 1, "C") != A_Index) {
 								this.PitstopsListView.Delete(A_Index)
 
+								this.iPitstopStints.RemoveAt(A_Index)
+
 								break
 							}
 
@@ -7226,6 +7240,13 @@ class RaceCenter extends ConfigurationItem {
 														 , (tyreCompound = "-") ? tyreCompound : translate(compound(tyreCompound, tyreCompoundColor))
 														 , ((tyreSet = 0) ? "-" : tyreSet), displayPressures
 														 , this.computeRepairs(repairBodywork, repairSuspension, repairEngine))
+
+						if this.Laps.Has(lap)
+							stint := this.Laps[lap].Stint
+						else
+							stint := this.CurrentStint
+
+						this.iPitstopStints.Push(stint.Nr)
 
 						pressures := string2Values(",", pressures)
 
@@ -7246,18 +7267,14 @@ class RaceCenter extends ConfigurationItem {
 
 						sessionStore.remove("Pitstop.Data", {Status: "Planned"}, always.Bind(true))
 
-						if this.Laps.Has(lap)
-							stint := this.Laps[lap].Stint
-						else
-							stint := this.CurrentStint
-
 						sessionStore.add("Pitstop.Data"
 									   , Database.Row("Lap", lap, "Fuel", fuel, "Tyre.Compound", tyreCompound, "Tyre.Compound.Color", tyreCompoundColor, "Tyre.Set", tyreSet
 													, "Tyre.Pressure.Cold.Front.Left", pressures[1], "Tyre.Pressure.Cold.Front.Right", pressures[2]
 													, "Tyre.Pressure.Cold.Rear.Left", pressures[3], "Tyre.Pressure.Cold.Rear.Right", pressures[4]
 													, "Repair.Bodywork", repairBodywork, "Repair.Suspension", repairSuspension, "Repair.Engine", repairEngine
 													, "Driver.Current", currentDriver, "Driver.Next", nextDriver, "Status", "Performed"
-													, "Stint", stint.Nr + 1, "Time.Service", serviceTime, "Time.Repairs", repairsTime, "Time.Pitlane", pitlaneTime))
+													, "Stint", (lap <= 1) ? stint.Nr : (stint.Nr + 1)
+													, "Time.Service", serviceTime, "Time.Repairs", repairsTime, "Time.Pitlane", pitlaneTime))
 
 						this.iPendingPitstop := false
 
@@ -7269,6 +7286,8 @@ class RaceCenter extends ConfigurationItem {
 						break
 					else {
 						this.PitstopsListView.Add("Check", nextStop, "-", "-", "-", "-", "-", "-, -, -, -", this.computeRepairs(false, false, false))
+
+						this.iPitstopStints.Push(false)
 
 						sessionStore.add("Pitstop.Data"
 									   , Database.Row("Lap", "-", "Fuel", "-", "Tyre.Compound", "-", "Tyre.Compound.Color", false, "Tyre.Set", "-"
@@ -7303,6 +7322,8 @@ class RaceCenter extends ConfigurationItem {
 					loop this.PitstopsListView.GetCount()
 						if (this.PitstopsListView.GetNext(A_Index - 1, "C") != A_Index) {
 							this.PitstopsListView.Delete(A_Index)
+
+							this.iPitstopStints.RemoveAt(A_Index)
 
 							hasPlanned := true
 
@@ -7395,6 +7416,8 @@ class RaceCenter extends ConfigurationItem {
 						this.PitstopsListView.Add("", this.PitstopsListView.GetCount() + 1, (lap = "-") ? "-" : (lap + 1), displayNullValue(nextDriver), displayFuel
 													, (tyreCompound = "-") ? tyreCompound : translate(compound(tyreCompound, tyreCompoundColor)), ((tyreSet = 0) ? "-" : tyreSet)
 													, displayPressures, this.computeRepairs(repairBodywork, repairSuspension, repairEngine))
+
+						this.iPitstopStints.Push(this.CurrentStint.Nr)
 
 						pressures := string2Values(",", pressures)
 
@@ -8868,7 +8891,7 @@ class RaceCenter extends ConfigurationItem {
 
 	loadPitstops() {
 		local ignore, pitstop, repairBodywork, repairSuspension, repairEngine, pressures, pressure
-		local tyreCompound, tyreCompoundColor, tyreSet, fuel
+		local tyreCompound, tyreCompoundColor, tyreSet, fuel, stint
 
 		for ignore, pitstop in this.SessionStore.Tables["Pitstop.Data"] {
 			repairBodywork := pitstop["Repair.Bodywork"]
@@ -8906,6 +8929,15 @@ class RaceCenter extends ConfigurationItem {
 									, (pitstop["Lap"] = "-") ? "-" : (pitstop["Lap"] + 1), displayNullValue(pitstop["Driver.Next"]), fuel
 									, (tyreCompound = "-") ? tyreCompound : translate(compound(tyreCompound, tyreCompoundColor)), (tyreSet = 0) ? "-" : tyreSet
 									, values2String(", ", pressures*), this.computeRepairs(repairBodywork, repairSuspension, repairEngine))
+
+			stint := pitstop["Stint"]
+
+			if ((stint = "-") || (stint == false) || (stint = kNull))
+				stint := 1
+			else if (stint > 1)
+				stint -= 1
+
+			this.iPitstopStints(stint)
 		}
 
 		this.PitstopsListView.ModifyCol()

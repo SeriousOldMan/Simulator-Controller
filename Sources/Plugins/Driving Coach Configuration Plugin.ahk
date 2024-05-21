@@ -25,6 +25,8 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 	iProviderConfigurations := CaseInsenseMap()
 	iCurrentProvider := false
 
+	iTemplates := false
+
 	Providers {
 		Get {
 			return LLMConnector.Providers
@@ -39,6 +41,39 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 			catch Any {
 				return []
 			}
+		}
+	}
+
+	Templates[language?] {
+		Get {
+			local templates, fileName, code, ignore
+
+			if !this.iTemplates {
+				templates := CaseInsenseMap()
+
+				for code, ignore in availableLanguages() {
+					fileName := getFileName("Driving Coach.instructions." . code, kTranslationsDirectory)
+
+					if FileExist(fileName) {
+						templates[code] := readMultiMap(fileName)
+
+						fileName := getFileName("Driving Coach.instructions." . code, kUserTranslationsDirectory)
+
+						if FileExist(fileName)
+							addMultiMapValues(templates[code], readMultiMap(fileName))
+					}
+					else {
+						fileName := getFileName("Driving Coach.instructions." . code, kUserTranslationsDirectory)
+
+						if FileExist(fileName)
+							templates[code] := readMultiMap(fileName)
+					}
+				}
+
+				this.iTemplates := templates
+			}
+
+			return (isSet(language) ? this.iTemplates[language] : this.iTemplates)
 		}
 	}
 
@@ -263,19 +298,6 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		local providerConfiguration := this.iProviderConfigurations[provider]
 		local language, value, instructions
 
-		static templates := false
-
-		if !templates {
-			templates := CaseInsenseMap()
-
-			for code, language in availableLanguages() {
-				fileName := getFileName("Driving Coach.instructions." . code, kUserTranslationsDirectory, kTranslationsDirectory)
-
-				if FileExist(fileName)
-					templates[code] := readMultiMap(fileName)
-			}
-		}
-
 		value := (edit ? this.Value[setting] : providerConfiguration[setting])
 
 		if (value = "") {
@@ -287,9 +309,37 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 				language := getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Language", getLanguage())
 
 			if edit
-				this.Value[setting] := getMultiMapValue(templates[templates.Has(language) ? language : "EN"], "Instructions", StrReplace(setting, "Instructions.", ""))
+				this.Value[setting] := getMultiMapValue(this.Templates[this.Templates.Has(language) ? language : "EN"], "Instructions", StrReplace(setting, "Instructions.", ""))
 			else
-				providerConfiguration[setting] := getMultiMapValue(templates[templates.Has(language) ? language : "EN"], "Instructions", StrReplace(setting, "Instructions.", ""))
+				providerConfiguration[setting] := getMultiMapValue(this.Templates[this.Templates.Has(language) ? language : "EN"], "Instructions", StrReplace(setting, "Instructions.", ""))
+		}
+	}
+
+	normalizeConfiguration(configuration) {
+		local language, ignore, provider, setting, providerConfiguration, template, instruction
+
+		if isSet(SetupWizard)
+			language := SetupWizard.Instance.getModuleValue("Driving Coach", "Language", getLanguage())
+		else if isSet(VoiceControlConfigurator)
+			language := VoiceControlConfigurator.Instance.getCurrentLanguage()
+		else
+			language := getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Language", getLanguage())
+
+		for ignore, provider in this.Providers {
+			providerConfiguration := this.iProviderConfigurations[provider]
+
+			for ignore, setting in this.Instructions {
+				template := this.Templates[this.Templates.Has(language) ? language : "EN"]
+
+				if (getMultiMapValue(configuration, "Driving Coach Personality", provider . "." . setting)
+				  = getMultiMapValue(template, "Instructions", StrReplace(setting, "Instructions.", "")))
+					removeMultiMapValue(configuration, "Driving Coach Personality", provider . "." . setting)
+
+				if (provider = this.iCurrentProvider)
+					if (getMultiMapValue(configuration, "Driving Coach Personality", setting)
+					  = getMultiMapValue(template, "Instructions", StrReplace(setting, "Instructions.", "")))
+						removeMultiMapValue(configuration, "Driving Coach Personality", setting)
+			}
 		}
 	}
 
@@ -393,6 +443,8 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 			setMultiMapValue(configuration, "Driving Coach Service", "Service"
 										  , values2String("|", provider, Trim(providerConfiguration["ServiceURL"])
 																	   , Trim(providerConfiguration["ServiceKey"])))
+
+		this.normalizeConfiguration(configuration)
 	}
 
 	loadProviderConfiguration(provider := false) {

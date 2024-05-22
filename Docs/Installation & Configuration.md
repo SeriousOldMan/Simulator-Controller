@@ -669,7 +669,7 @@ Below you will find the groups *Alerts* and *Information & Advices*. There you c
 
 Good to know: The little button on the right side of the Simulator dropdown menu lets you replicate the current settings for the chosen simulator to all other simulators.
 
-#### Tab *Team Server*
+#### Tab *Team Management*
 
 The elements on this tab allows you to connect to any currently running *Team Server*, for which you possess a valid connection URI and valid login credentials. You can manage your teams, your drivers and your sessions. You can also create access tokens for your team members to use during your team sessions. 
 

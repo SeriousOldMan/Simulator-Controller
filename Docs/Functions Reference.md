@@ -7,7 +7,7 @@ Starts a protected section of code. Calls to protectionOn() may be nested.
 #### *protectionOff()*
 Finishes a protected section of code. Only if the outermost section has been finished, the current thread becomes interruptable again.
 
-#### *withProtection(function :: TypeUnion(String, FuncObj), #rest params)*
+#### *withProtection(function :: Func, #rest params)*
 Convenience function to call a given function with supplied parameters in a protected section.
 
 ***
@@ -90,7 +90,10 @@ Returns a freshly allocated list containing all the elements contained in the su
 #### *reverse(list :: Array)*
 Returns a freshly allocated list containing all the elements of the supplied list in reversed order.
 
-#### *map(list :: Array, function :: TypeUnion(String, FuncObj))*
+#### *choose(list :: Array, predicate :: Func)*
+Returns a new list with all elements for which *predicate* is *true*, while preserving the order of elements.
+
+#### *collect(list :: Array, function :: Func)*
 Returns a new list with the result of *function* applied to each element in *list*, while preserving the order of elements.
 
 #### *remove(list :: Array, object :: Any)*
@@ -99,7 +102,7 @@ Returns a new list with all occurencies of *object* removed from the original li
 #### *removeDuplicates(list :: Array)*
 Returns a new list with all duplicate values removed.
 
-#### *do(list :: Array, function :: TypeUnion(String, FuncObj))*
+#### *do(list :: Array, function :: Func)*
 Applies the given function to each element in *list* in the order of elements without collecting the results.
 
 #### *getKeys(map :: Map)*
@@ -162,7 +165,7 @@ Deletes the directory with the given name incl. all current content. Returns *tr
 ## Process Communication ([Messages.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Libraries/Messages.ahk))
 Messages may be used to communicate between different processes. In Simulator Controller, the startup application sends events to the controller application to start all components configured for the Simulator Controller, to play and stop a startup song and so on.
 
-#### *registerMesssageHandler(category :: String, handler :: TypeUnion(String, FuncObj), object :: Object := false)*
+#### *registerMesssageHandler(category :: String, handler :: Func, object :: Object := false)*
 Registers a message handler function for the given category. When *object* is not supplied, a message handler is supplied the category and the transmitted message as arguments and typically looks like this:
 
 	handleStartupMessages(category, data) {
@@ -282,7 +285,7 @@ Returns the currently active display format for the given format type, which is 
 #### *setFormat(type :: OneOf("Float", "Time"), format :: String)*
 Sets the display format for the given format type. *format* must be one of "#.##" or "#,##" for numbers or one of "[H:]M:S.##" or "[H:]M:S,##" for time values.
 
-#### *withFormat(type :: OneOf("Float", "Time"), format :: String, function :: TypeUnion(String, FuncObj), #rest params)*
+#### *withFormat(type :: OneOf("Float", "Time"), format :: String, function :: Func, #rest params)*
 Calls a given function with supplied parameters while the supplied format choice is active. *format* must be one of "#.##" or "#,##" for numbers or one of "[H:]M:S.##" or "[H:]M:S,##" for time values.
 
 #### *displayValue(type :: OneOf("Float", "Time"), value :: Number, ...)*
@@ -340,7 +343,7 @@ Important: This function is deprecated and will be removed in a future version o
 #### *hideSplash()*
 Closes the current splash window. Note: If the splash window had been opened using *showSplashScreen*, use *hideSplashScreen* instead.
 
-#### *showSplashScreen(splashScreen :: String, songHandler :: TypeUnion(String, FuncObj) := false, alwaysOnTop :: Boolean := true)*
+#### *showSplashScreen(splashScreen :: String, songHandler :: Func := false, alwaysOnTop :: Boolean := true)*
 Splash Screens are a collection of pictures or a GIF animation possibly combined with a sound file. They are maintained by the [themes editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#themes-editor). *showSplashScreen* opens a splash window according to the themes definition. If *songHandler* is not provided, a default handler will be used, but the song will stop playing, if the current splash window is closed.
 
 #### *hideSplashScreen()*

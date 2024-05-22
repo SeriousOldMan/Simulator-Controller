@@ -408,7 +408,8 @@ class DrivingCoach extends GridRaceAssistant {
 	}
 
 	getInstructions() {
-		return collect(this.Instructions[true], ObjBindMethod(this, "getInstruction"))
+		return choose(collect(this.Instructions[true], ObjBindMethod(this, "getInstruction"))
+					, (instruction) => (instruction && (Trim(instruction) != "")))
 	}
 
 	startConversation() {

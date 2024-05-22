@@ -41,6 +41,7 @@ Release 5.6.1=Release 5.6.0 -> updatePluginsForV561, updateStreamDeckIconPreset,
 Release 5.6.4=Release 5.6.1 -> updateStreamDeckIconPreset, updateActionLabels, updateActionIcons
 Release 5.6.7=Release 5.6.4 -> updateConfigurationForV567
 Release 5.7.2=Release 5.6.7 -> updateConfigurationForV572
+Release 5.7.3=Release 5.7.2 -> updateConfigurationForV573
 [Cleanup]
 Binaries Folder=%kBinariesDirectory%
 Logs Folder=%kLogsDirectory%

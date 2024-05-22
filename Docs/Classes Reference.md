@@ -392,7 +392,7 @@ Makes the main editor window invisble, which might be useful, when a specialized
 #### *close()*
 Called at the end, after all modifications had been saved (by calling the inherited method [saveToConfiguration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#savetoconfigurationconfiguration--configurationmap)), to finally close and destroy the editor window.
 
-#### *toggleKeyDetector(callback :: TypeUnion(String, FuncObj) := false)*
+#### *toggleKeyDetector(callback :: Func := false)*
 Calling *toggleKeyDetector* enables or disables a special tool to detect buttons and dials on connected hardware controlles. A small tooltip will follow the mouse and display information as long as these controls are activated. If you supply the *callback*, it will be called with the first pressed control in AutoHotkey [hotkey syntax](https://www.autohotkey.com/docs/KeyList.htm) and the key detector tool will be deactivated automatically.
 
 ***

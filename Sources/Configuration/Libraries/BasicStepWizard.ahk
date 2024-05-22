@@ -845,7 +845,7 @@ class BasicStepWizard extends StepWizard {
 		local name
 
 		loop {
-			row := listView.GetNext(row,"C")
+			row := listView.GetNext(row, "C")
 
 			if row {
 				name := listView.GetText(row, 1)

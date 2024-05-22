@@ -62,11 +62,11 @@ Whenever a new version of Simulator Controller is released, there might be chang
 
 ## Managing teams
 
-You manage your teams using the "Simulator Configuration" application. You will find everything you need on the "Team Management" tab on the far right of the tab header.
+You manage your teams using the corresponding dialog in "Simulator Startup".
 
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%2010.JPG)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Team%20Management.JPG)
 
-Good to know: The same functionality is available in "Simulator Startup". See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#team-management) for more information.
+Please take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#team-management) for information how to bring up ths dialog.
 
 In the first field, you select a folder, where dynamic session data will be stored, when you and your team mates will use the "Race Center" during the session. If you don't supply a special directory here, the data will be stored in the temporary folder in the *Simulator Controller\Temp* folder, which is located in your user *Documents* folder and might therefore be lost at the end of the session. Please see the documentation for "Race Center" down below for more information on data handling.
 

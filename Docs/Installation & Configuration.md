@@ -675,11 +675,13 @@ The elements on this tab allows you to connect to any currently running *Team Se
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%2010.JPG)
 
+Good to know: The same functionality is now available in "Simulator Startup". See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#team-management) for more information. The use of the *Team Management* tab in "Simulator Configuration" is therefore deprecated and the tab might be removed in a future version of Simulator Controller.
+
 The details about the installation, configuration and usage of the *Team Server*, and also about the team administration task in general can be found in the [dedicated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server) for the *Team Server*.
 
 #### Going deeper into the rabbit hole
 
-After creating the general configuration using "Simulator Setup" or "Simulator Configuration", Simulator Controller will be already ready to race. But there are many more settings to customize the behaviour of Simulator Controller available in the [session database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--session-database). These settings can be created for specific combinations of a simulator and a car and even track, thereby giving you great flexibility for the best possible experience. But there is a downside, you have to learn all these settings. Don't worry, all settings have a reasonable default, so you can start right away. Here is the documentation about all [available Race Settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings).
+After creating the general configuration using "Simulator Setup" or "Simulator Configuration", Simulator Controller will be already ready to race. But there are many more settings to customize the behaviour of Simulator Controller available in the [session database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--session-database). These settings can be created for specific combinations of a simulator and a car and even track, thereby giving you great flexibility for the best possible experience. But there is a downside, you have to learn all these settings. Don't worry, all settings have a reasonable default, so you can start right away. Here is the documentation about all [available Race Settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings).
 
 #### Special configuration options for optimizing overall performance
 

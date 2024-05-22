@@ -1684,6 +1684,21 @@ updateInstallationForV500() {
 	}
 }
 
+updateConfigurationForV573() {
+	local ignore, fileName
+
+	for ignore, fileName in [getFileName(kSimulatorConfigurationFile, kUserConfigDirectory), kUserHomeDirectory . "Setup\Driving Coach Configuration.ini"]
+		if FileExist(fileName) {
+			configuration := readMultiMap(fileName)
+
+			for ignore, provider in ["OpenAI.", "Azure.", "GPT4All.", "LLM Runtime.", "Mistral AI.", ""]
+				for ignore, instruction in ["Character", "Simulation", "Session", "Stint", "Handling", "Telemetry"]
+					removeMultiMapValue(configuration, "Driving Coach Personality", provider . "Instructions." . instruction)
+
+			writeMultiMap(fileName, configuration)
+		}
+}
+
 updateConfigurationForV572() {
 	local text, configuration, values
 

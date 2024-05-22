@@ -1665,7 +1665,7 @@ class SetupWizard extends ConfiguratorPanel {
 				task.start()
 
 				try {
-					this.Steps["Applications"].updateAvailableApplications(true)
+					this.Steps["Applications"].updateAvailableApplications("Check")
 
 					Sleep(1000)
 				}

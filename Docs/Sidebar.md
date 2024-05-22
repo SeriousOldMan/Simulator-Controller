@@ -23,7 +23,7 @@
 	- [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-engineer)
 	- [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-strategist)
 	- [Race Spotter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-spotter)
-	- [Team Server](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-team-server)
+	- [Team Management](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-team-management)
 	- [Optimzing performance](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration)
   - [Splash Screen Editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#splash-screen-editor)
   - [Translations Editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#translations-editor)

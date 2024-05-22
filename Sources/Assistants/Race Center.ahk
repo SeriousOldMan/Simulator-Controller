@@ -8937,7 +8937,7 @@ class RaceCenter extends ConfigurationItem {
 			else if (stint > 1)
 				stint -= 1
 
-			this.iPitstopStints(stint)
+			this.iPitstopStints.Push(stint)
 		}
 
 		this.PitstopsListView.ModifyCol()

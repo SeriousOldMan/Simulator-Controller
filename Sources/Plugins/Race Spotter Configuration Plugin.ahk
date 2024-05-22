@@ -151,7 +151,7 @@ class RaceSpotterConfigurator extends ConfiguratorPanel {
 		widget43 := window.Add("Text", "x" . x0 . " yp+17 w80 h23 +0x200 Hidden", translate("Frequency"))
 		widget44 := window.Add("Edit", "x" . x1 . " yp w40 h21 Number Limit3 vrspDriverUpdateTimeEdit Hidden")
 		widget45 := window.Add("UpDown", "x" . x2 . " yp w17 h21 Range10-999 Hidden", 2)
-		widget46 := window.Add("Text", "x" . x3 . " yp w" . w3 . " h23 +0x200 Hidden", translate("seconds at least betweeen callouts"))
+		widget46 := window.Add("Text", "x" . x3 . " yp w" . w3 . " h23 +0x200 Hidden", translate("seconds at least between callouts"))
 
 		widget27 := window.Add("Text", "x" . x0 . " yp+31 w120 h20 Section Hidden", translate("General Information"))
 		widget28 := window.Add("DropDownList", "x" . x1 . " yp-4 w70 W:Grow(0.1) Choose1 vsessionInformationDropDown Hidden", [translate("Off"), translate("On")])

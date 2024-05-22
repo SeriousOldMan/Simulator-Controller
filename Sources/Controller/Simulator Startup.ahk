@@ -1688,7 +1688,9 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 				else
 					lastModified := false
 
-				RunWait(kBinariesDirectory . "Simulator Configuration.exe -Team")
+				; RunWait(kBinariesDirectory . "Simulator Configuration.exe -Team")
+
+				teamManagerEditor(profilesEditorGui)
 
 				if (FileExist(kUserConfigDirectory . "Team Server.ini") && (!lastModified || (lastModified != FileGetTime(kUserConfigDirectory . "Team Server.ini", "M")))) {
 					profile := profiles[selectedProfile - 1]
@@ -2282,14 +2284,14 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 	}
 }
 
-teamManagerEditor(launchPadOrCommand, arguments*) {
+teamManagerEditor(ownerOrCommand, arguments*) {
 	static done := false
 	static teamManagerGui
 	static teamManagerPanel
 
-	if (launchPadOrCommand == kClose)
+	if (ownerOrCommand == kClose)
 		done := kClose
-	else if (launchPadOrCommand = "Update State") {
+	else if (ownerOrCommand = "Update State") {
 	}
 	else {
 		done := false
@@ -2319,9 +2321,9 @@ teamManagerEditor(launchPadOrCommand, arguments*) {
 
 		teamManagerEditor("Update State")
 
-		teamManagerGui.Opt("+Owner" . launchPadOrCommand.Hwnd)
+		teamManagerGui.Opt("+Owner" . ownerOrCommand.Hwnd)
 
-		launchPadOrCommand.Block()
+		ownerOrCommand.Block()
 
 		try {
 			if getWindowPosition("Simulator Startup.Team Management", &x, &y)
@@ -2338,7 +2340,7 @@ teamManagerEditor(launchPadOrCommand, arguments*) {
 			teamManagerGui.Destroy()
 		}
 		finally {
-			launchPadOrCommand.Unblock()
+			ownerOrCommand.Unblock()
 
 			teamManagerPanel.disconnect()
 		}

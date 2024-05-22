@@ -75,8 +75,8 @@ initializeTeamServerConfigurator() {
 		editor := ConfigurationEditor.Instance
 		configurator := TeamServerConfigurator(editor, editor.Configuration)
 
-		editor.registerConfigurator(translate("Team Server"), configurator
-								  , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-team-server")
+		editor.registerConfigurator(translate("Team Management"), configurator
+								  , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-team-management")
 
 		if inList(A_Args, "-Team")
 			Task.startTask(launchTeam, 2000)

@@ -62,7 +62,7 @@ Whenever a new version of Simulator Controller is released, there might be chang
 
 ## Managing teams
 
-You manage your teams using the "Simulator Configuration" application. You will find everything you need on the "Team Server" tab on the far right of the tab header.
+You manage your teams using the "Simulator Configuration" application. You will find everything you need on the "Team Management" tab on the far right of the tab header.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%2010.JPG)
 

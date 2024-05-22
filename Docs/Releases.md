@@ -11,10 +11,11 @@
   10. It is now possible to configure the instructions for the different GPT-based conversation boosters. Please take a look at the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm) for more information.
   11. The default instructions for the conversation boosters has been extended to include more personality and domain specific behaviour.
   12. Many more announcements and messages by the Spotter can now be rephrased by the conversation booster. Only very urgent messages like proximity alerts are excluded, because of the additional latency introduced when calling a GPT service.
-  13. The default "Character" instruction for the Driving Coach has been updated. Therefoe all instructions will be resetto their defaults. This is only necessary this time, see next item.
-  14. A method has been introduced, that checks whether you are using the default instructions for an LLM, so that you don't need to update them, when a change happened in the distribution package.
+  13. The default "Character" instruction for the Driving Coach has been updated. Therefoe all instructions will be reset to their defaults. This is only necessary this time, see next item.
+  14. A method has been introduced, that checks whether you are using the default instructions for an LLM, so that you don't need to update them, when they have changed in the distribution package.
   15. It is now possible to manage teams, driver and sessions directly from "Simulator Startup", if you are using the Team Server. Please see the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#team-management) for more information.
-  16. *OpenRouter* has been added to the list of supported GPT service providers.
+  16. Renamed the "Team Server" tab in "Simulator Configuration" to "Team Management". Using this tab is not necessary anymore and it will eventually be removed, since the functionality is now provided from within "Simulator Startup".
+  17. *OpenRouter* has been added to the list of supported GPT service providers.
   
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-570), especially if you have configured and are using the Driving Coach.
 
@@ -2251,7 +2252,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. New server based solution for team endurace races. See the all [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server) for more information.
-     a. New ["Team Server" tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-team-server) in "Simulator Configuration" for managing your Teams, Drivers and Sessions.
+     a. New ["Team MAnagement" tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-team-management) in "Simulator Configuration" for managing your Teams, Drivers and Sessions.
 	 b. New ["Team" tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tab-team) in "Race Settings" for all team member to configure their role in a team session.
   4. The new "Team Server" plugin as well as the "Race Engineer" and the "Race Strategist" plugins now allow to specify the initial operation state without supplying a function to be triggered from a hardware controller.
   5. Major bug fixes in "Simulator Setup"

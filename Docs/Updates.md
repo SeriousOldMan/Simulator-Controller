@@ -37,7 +37,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 5.7.3
 
-The "Character" instruction for the driving coach has been updated. If you are using the Driving Coach, please go to the configuration and reload the default instruction.
+The "Character" instruction for the driving coach has been updated and all instructions have been set to their defaults again. If you are using the Driving Coach and have changed the instructions, please go to the configuration and update them again.
 
 ## Release 5.7.2
 

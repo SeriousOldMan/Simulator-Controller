@@ -14,10 +14,7 @@ Components=Media->5.6.1,Configuration->5.7.3,Utilities->5.4.8
 [Components]
 Media.5.6.1.Path=Resources
 Media.5.6.1.Content=Splash Media
-Media.5.6.1.Download=https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Media+5.6.1.zip;https://www.dropbox.com/scl/fi/3c56fjdvdd4od5t7rsuc9/Media-5.6.1.zip?rlkey=x0icl05jy05nn886due4dsblv&dl=1
-Configuration.5.6.4.Path=Resources
-Configuration.5.6.4.Content=Setup
-Configuration.5.6.4.Download=https://www.dropbox.com/scl/fi/186kqtwvswpxlj1xbm7ci/Configuration-5.6.4.zip?rlkey=ea4rw83hmsbiozurzli84tbgl&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+5.6.4.zip
+Media.5.6.1.Download=https://www.dropbox.com/scl/fi/3c56fjdvdd4od5t7rsuc9/Media-5.6.1.zip?rlkey=x0icl05jy05nn886due4dsblv&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Media+5.6.1.zip
 Configuration.5.7.3.Path=Resources
 Configuration.5.7.3.Content=Setup
 Configuration.5.7.3.Download=https://www.dropbox.com/scl/fi/vad78ma29ynq32hxufpej/Configuration-5.7.3.zip?rlkey=2526f002rsdkb0w6rwl8t1w0r&st=jlw8tjwg&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+5.7.3.zip

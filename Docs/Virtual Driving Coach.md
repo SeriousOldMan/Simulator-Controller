@@ -115,7 +115,7 @@ Very similar to OpenAI. Create an account on [Mistral AI](https://console.mistra
 
 ### OpenRouter
 
-[OpenRouter](https://openrouter.ai) is a kind of gateway and hosting environment for many models of different providers, even many source LLMs are available here. You have to buy a few credits (5$ at least) [here](https://openrouter.ai/credits), before you can use the service. After you have create an API key and configured it as described above, you have access to a long list of different models.
+[OpenRouter](https://openrouter.ai) is a kind of gateway and hosting environment for many models of different providers, even many source LLMs are available here. It has become my favorite provider in the sense of a one-stop-shop for LLM access. You have to buy a few credits (5$ at least) [here](https://openrouter.ai/credits), before you can use the service. Then create an API key in your user account and include it in the configuration as described above. The last step is to choose the model you want to use from the very long list [here](https://openrouter.ai/models). There are even models available, which do not create any costs when called through the API, like the "meta-llama/llama-3-8b-instruct:free". But as mentioned above, the performance and domain knowledge might not meet your expectations.
 
 ### GPT4All
 

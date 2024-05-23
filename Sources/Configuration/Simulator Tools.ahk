@@ -1687,7 +1687,7 @@ updateInstallationForV500() {
 }
 
 updateConfigurationForV573() {
-	local ignore, fileName
+	local ignore, fileName, configuration, provider, instruction
 
 	for ignore, fileName in [getFileName(kSimulatorConfigurationFile, kUserConfigDirectory), kUserHomeDirectory . "Setup\Driving Coach Configuration.ini"]
 		if FileExist(fileName) {

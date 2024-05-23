@@ -1282,7 +1282,8 @@ class VoiceManager extends ConfigurationItem {
 	}
 
 	localTextRecognized(grammar, text) {
-		this.textRecognized(grammar, text)
+		if (Trim(text) != "")
+			this.textRecognized(grammar, text)
 	}
 
 	remoteActivationRecognized(words*) {
@@ -1299,7 +1300,8 @@ class VoiceManager extends ConfigurationItem {
 	}
 
 	remoteTextRecognized(grammar, command, text) {
-		this.textRecognized(grammar, text, true)
+		if (Trim(text) != "")
+			this.textRecognized(grammar, text, true)
 	}
 
 	matchCommand(text, &words) {

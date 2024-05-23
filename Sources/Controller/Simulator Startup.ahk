@@ -1688,8 +1688,6 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 				else
 					lastModified := false
 
-				; RunWait(kBinariesDirectory . "Simulator Configuration.exe -Team")
-
 				teamManagerEditor(profilesEditorGui)
 
 				if (FileExist(kUserConfigDirectory . "Team Server.ini") && (!lastModified || (lastModified != FileGetTime(kUserConfigDirectory . "Team Server.ini", "M")))) {

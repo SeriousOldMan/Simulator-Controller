@@ -872,6 +872,7 @@ class BasicStepWizard extends StepWizard {
 		local assistantSetups := {}
 		local languageCode := "en"
 		local code, language, ignore, key, value, assistant
+		local uiLanguage, startWithWindows, silentMode
 
 		for key, assistant in this.Assistants
 			assistantSetups.%key% := this.assistantSetup(assistant)
@@ -926,7 +927,9 @@ class BasicStepWizard extends StepWizard {
 				break
 			}
 
-		wizard.setGeneralConfiguration(languageCode, true, false)
+		wizard.getGeneralConfiguration(&uiLanguage, &startWithWindows, &silentMode)
+
+		wizard.setGeneralConfiguration(languageCode, startWithWindows, silentMode)
 
 		wizard.updateState()
 	}

@@ -345,11 +345,13 @@ checkInstallation() {
 																		  , "Components", ""))
 		local error := false
 		local components := []
-		local component, version, type, ignore, part, path, destination, url, urlError
+		local component, version, type, ignore, part, path, destination, url, urlError, componentNr
 
 		for component, version in string2Map(",", "->"
 										   , getMultiMapValue(packageInfo, getMultiMapValue(packageInfo, "Current", "Type")
 																		 , "Components", "")) {
+			componentNr := A_Index
+
 			if ((packageLocation = installLocation) || !installedComponents.Has(component)
 													|| (VerCompare(version, installedComponents[component]) > 0)) {
 				try {
@@ -381,7 +383,7 @@ checkInstallation() {
 							path := packageLocation
 
 						if temporary {
-							destination := (A_Temp . "\SC-Component" . A_Index)
+							destination := (A_Temp . "\SC-Component" . componentNr)
 
 							deleteFile(destination)
 							deleteDirectory(destination)

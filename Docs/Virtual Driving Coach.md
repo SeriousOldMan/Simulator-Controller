@@ -141,7 +141,7 @@ Below you find all instruction categories and the supported variables:
 
 | Instruction | What              | Description |
 |-------------|-------------------|-------------|
-| Character   | Scope             | This instruction is used always and must define the profession and the personality of the Driving Coach. You can also give general instructions like "Keep your answers short and precise". The default instruction creates a driving coach specialized in car handling and car physics. |
+| Character   | Scope             | This instruction is used always and must define the profession and the personality of the Driving Coach. You can also include general instructions like "Keep your answers short and precise". The default instruction creates a driving coach specialized in car handling and car physics. |
 |             | %name%            | %name% will be replaced with the configured name of the Driving Coach.          |
 | Simulation  | Scope             | This instruction is supplied, when an active simulation is detected.            |
 |             | %simulator%       | The name of the used simulator.                                                 |
@@ -158,6 +158,8 @@ Below you find all instruction categories and the supported variables:
 |             | %position%        | Your position in your class at the end of the last lap.                         |
 |             | %laps%            | This variable is substituted with a CSV table of your performance during the last laps. This table contains columns for your position (overall and class) as well as the lap time and sector times. You can define the number of laps to be reported by defining the variable as %laps:5%, for example. |
 |             | %standings%       | This variable is replaced with a CSV table containing the current standings sorted by overall position. This table contains columns for the race number, class, position (overall and class) as well as the lap time and sector times. |
+| Telemetry   | Scope             | This instruction is used to supply the current content of the knowledgebase (mainly telemetry information) to the LLM. |
+|             | %telemetry%       | A table consisting of key / value pairs separated by an equal sign. All variable names (keys) are *speaking*, so that the LLM can derive their meanings. Example: "Tyre.Pressure.Target.Front.Left = 24.8" - this specifies the current target pressure for the front left tyre when the tyre will be changed at a pitstop. |
 | Handling    | Scope             | This instruction is used only when handling problems had been detected in the telemetry. See the chapter below about detecting handling problems and discussin them with Aiden. |
 |             | %handling%        | An enumeration of all detected handing problems. See the [dedicated chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#detecting-and-discussing-handling-problems) below for more information. |
 

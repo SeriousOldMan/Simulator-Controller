@@ -1,4 +1,4 @@
-## 5.7.3.0-release 05/24/24 (planned)
+## 5.7.3.0-release 05/24/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. The translations for checkable menu items has been fixed in several applications.
@@ -9,7 +9,7 @@
   8. The handling of remote server timeouts has been improved in team sessions. The applications like "Race Center" do not wait anymore in cases of non-important data.
   9. The Spotter now informs you during qualification whether the car before or behind you is on a valid or on an invalid lap.
   10. It is now possible to configure the instructions for the different GPT-based conversation boosters. Please take a look at the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm) for more information.
-  11. The default instructions for the conversation boosters has been extended to include more personality and domain specific behaviour.
+  11. The default instructions for the conversation boosters has been extended to include more personality and domain specific behaviour. A full overview for all supported instructions can be found [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm).
   12. Many more announcements and messages by the Spotter can now be rephrased by the conversation booster. Only very urgent messages like proximity alerts are excluded, because of the additional latency introduced when calling a GPT service.
   13. The default "Character" instruction for the Driving Coach has been updated. Therefoe all instructions will be reset to their defaults. This is only necessary this time, see next item.
   14. A method has been introduced, that checks whether you are using the default instructions for an LLM, so that you don't need to update them, when they have changed in the distribution package.

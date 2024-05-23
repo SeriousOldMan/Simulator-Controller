@@ -416,6 +416,35 @@ Several boosters are available at the moment:
 
 For each of the above conversation boosters, you can edit the instructions that are send to the LLM by clicking on the button labeled "Instructions...". A new window will open, where you can edit all related instructions for each of the supported languages. Whenever you want to restore the original instruction, you can do this by clicking on the small button with the "Reload" icon.
 
+Below you find all instruction categories and the supported variables:
+
+| Booster        | Instruction (1)   | What              | Description |
+|----------------|-------------------|-------------------|-------------|
+| Rephrasing     | Rephrase          | Scope             | This instruction is used when a given phrase by an Assistant should be rephrased without changing its language. |
+|                |                   | %assistant%       | The type or role of the current Assistant, for example "Race Engineer". |
+|                |                   | %text%            | The text or phrase, which should be rephrased. |
+|                | RephraseTranslate | Scope             | This instruction is used when a given phrase by an Assistant should be rephrased and then translated to a different language. |
+|                |                   | %assistant%       | The type or role of the current Assistant, for example "Race Engineer". |
+|                |                   | %language%        | This variable specifies the target language, for example "French", in which the resulting phrase should be formulated. |
+|                |                   | %text%            | The text or phrase, which should be rephrased and then translated. |
+|                | Translate         | Scope             | This instruction is used when a given phrase by an Assistant should only be translated without changing the wording. |
+|                |                   | %assistant%       | The type or role of the current Assistant, for example "Race Engineer". |
+|                |                   | %language%        | This variable specifies the target language, for example "French", for the resulting phrase. |
+|                |                   | %text%            | The text or phrase, which should be translated. |
+| Understanding  | Recognize         | Scope             | This instruction is used when a voice command has been recognized, which cannot be mapped to one of the predefined command patterns. |
+|                |                   | %assistant%       | The type or role of the current Assistant, for example "Race Engineer". |
+|                |                   | %commands%        | A table of examples for all predefined commands, so that the LLM can match the unrecognized command to one of those examples. Each line consist of a command name followed by an equal sign and a number of examples for the command. Example: "Yes=Yes thank you, Yes of course, Yes please". The LLM should the return the name of the command or "Unknown", if no match was possible. |
+|                |                   | %text%            | The text of the command that should be identified. |
+| Conversation   | Character         | Scope             | This instruction is used when a voice command has been recognized, which cannot be mapped to one of the predefined command patterns, even after using the LLM to map the command semantically. It is assumed that the user wants a free conversation with the LLM. This instruction then defines the profession and the personality of the Assistant. You can also include general instructions like "Keep your answers short and precise", and so on. |
+|                |                   | %assistant%       | The type or role of the current Assistant, for example "Race Engineer". |
+|                |                   | %name%            | Specifies the name of the Assistant. |
+|                | Telemetry         | Scope             | This instruction is used to supply the current content of the knowledgebase (mainly telemetry information) to the LLM. |
+|                |                   | %telemetry%       | A table consisting of key / value pairs separated by an equal sign. All variable names (keys) are *speaking*, so that the LLM can derive their meanings. Example: "Tyre.Pressure.Target.Front.Left = 24.8" - this specifies the current target pressure for the front left tyre when the tyre will be changed at a pitstop. |
+
+##### Notes
+
+(1) Each phrase is available in different languages, for example "Rephrase (DE)" for the German version.
+
 Important: Using a GPT service like OpenAI may impose some costs, and running an LLM locally on your PC will require a very powerful system, especially when doing this while on the track. Therefore, configuring a conversation booster is fully optional.
 
 Disclaimer: Large Language Models like ChatGPT, although incredible impressive, are still under heavy development. Therefore it depends on the quality and capabilities of the model, if the Assistant will react like expected. And in most cases, the support for non-English languages is quite limited. I recommend to use the conversation booster only for English-speaking Assistants for the time being.

@@ -92,7 +92,9 @@ Ultimately, analyze the specific race circumstances, consult with your team, and
 
 ## Installation
 
-Installation requires you to choose one of the supported large language model providers. The most capable current LLMs (aka large language models) are provided by the company OpenAI, as you probably know. OpenAI provides an HTTP API to connect to these models. This comes with some costs, but these are negligible. I accumulated costs of about 20 Cent at the time of this writing and I have run hours of interactions already. Most OpenAI LLMs are also available in the Azure cloud, in the end a matter of taste which one to use. And there is also an open GPT runtime platform, which can host a vast variety of LLMs developed by universities or less knwon companies. This runtime, named GPT4All, is free and the models can be run on your local PC. But be aware that running an LLM locally on your PC is a very demanding taks and will not be possible in parallel to a running simulation, even if your GPU has enough memory.
+Installation requires you to choose one of the supported large language model providers. The most capable current LLMs (aka large language models) are provided by the company OpenAI, as you probably know. OpenAI provides an HTTP API to connect to these models. This comes with some costs, but these are negligible. I accumulated costs of about 20 Cent at the time of this writing and I have run hours of interactions already. Most OpenAI LLMs are also available in the Azure cloud, in the end a matter of taste which one to use. Another inetersting provider is Mistral AI, the European alternative to OpenAI. Or you can use OpenRouter, which provides access to many models of different providers, or even from the Open Source. And there is also an open GPT runtime platform, which can host a vast variety of LLMs developed by universities or less knwon companies. This runtime, named GPT4All, is free and the models can be run on your local PC. But be aware that running an LLM locally on your PC is a very demanding taks and will not be possible in parallel to a running simulation, even if your GPU has enough memory.
+
+The performance and - even more important - the knowledge about the motorsport domain varies between different models. I have made good experience with "GPT 3.5 turbo" and "GPT 4 turbo" from OpenAI, as well as with "Open Mixtral 8x22b" from Mistral AI. Models from the Open Source are a bit more restricted, but "Wizard 1.2", for example, makes a decent job. In the end, you may want to experiment by yourself, but I recommend "GPT 3.5 turbo" as a starting point at the time of this writing. Using LLMs for non-English conversation is a different story. In this case, you will notice, that models from the Open Source will not deliver good results in most cases.
 
 ### OpenAI
 
@@ -106,6 +108,14 @@ When you have chosen OpenAI, which I recommend, you will have to create an accou
 ### Azure
 
 Thanks to the intensive collaboration between OpenAI and Microsoft, many OpenAI models are also available on the Azure Cloud. The performance is a little better, the cost is a little higher. In order to gain access to OpenAI models in the Azure Cloud, an entry must be made in the Azure Console, but this is usually approved. After approval you can get an communication endpoint and API key which then must be used in the configuration of the Virtual Driving Coach. You also must note down your Azure service endpoint, which must be inserted in the "Service URL" field in the configuration.
+
+### Mistral AI
+
+Very similar to OpenAI. Create an account on [Mistral AI](https://console.mistral.ai/). You will have to register your credit card, but you will only be charged for usage, which is very, very cheap for the Open Weight models. Then create an API key and include it in the configuration as described above. I recommend using the Open Mixtral 8x22b model for the start, which has the best price / performance ratio.
+
+### OpenRouter
+
+[OpenRouter](https://openrouter.ai) is a kind of gateway and hosting environment for many models of different providers, even many source LLMs are available here. You have to buy a few credits (5$ at least) [here](https://openrouter.ai/credits), before you can use the service. After you have create an API key and configured it as described above, you have access to a long list of different models.
 
 ### GPT4All
 

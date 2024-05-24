@@ -18,7 +18,7 @@
   17. A method has been introduced, that checks whether you are using the default instructions for an LLM, so that you don't need to update them, when they have changed in the distribution package.
   18. It is now possible to manage teams, driver and sessions directly from "Simulator Startup", if you are using the Team Server. Please see the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#team-management) for more information.
   19. Renamed the "Team Server" tab in "Simulator Configuration" to "Team Management". Using this tab is not necessary anymore and it will eventually be removed, since the functionality is now provided from within "Simulator Startup".
-  20. *OpenRouter* has been added to the list of supported GPT service providers.
+  20. [*OpenRouter*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#openrouter) has been added to the list of supported GPT service providers.
   21. The documentation has been updated to cover the [configuration requirements](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#installation) for the added GPT providers.
   
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-570), especially if you have configured and are using the Driving Coach.
@@ -33,7 +33,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   7. The default context window size for an LLM has been increased to 2k tokens in the Driving Coach configuration.
   8. The next feature of the AI-based booster for the Assistants now integrates a general conversation capability. Every voice command, that cannot be matched against the list of predefined, pattern-based commands, will be forwarded to the GPT service for a general conversation. The LLM has full access to the knowledgebase of the Assistant, incl. telemetry data, standings and position data, and so on. The exact knowledge will vary with the type of the Assistant (Engineer, Strategist, ...). See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm) for more information.
   9. Configuration of the conversation booster is now also possible using "Simulator Configuration". See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) for more information.
-  10. *Mistral AI* has been added to the list of supported GPT service providers.
+  10. [*Mistral AI*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#mistral-ai) has been added to the list of supported GPT service providers.
   11. Added "GPT-4o" to the list of OpenAI models.
   12. The pitstop component on the session info page of "System Monitor" now also displays the relative tyre pressure increment values for the next pitstop.
   13. [Internal] Migrated to AHK 2.0.15.

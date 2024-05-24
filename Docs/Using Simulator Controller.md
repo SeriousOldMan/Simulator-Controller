@@ -156,7 +156,7 @@ When the Team Server has been included in the configuration a small cog wheel ic
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Team%20Management.JPG)
 
-If you have the team manager credentials for a Team Server, you can manage your teams, drivers and sessions using this dialog. The available functionality is identical to the ["Team Management" tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-team-management) in the "Simulator Configuration" application. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#managing-teams) for more information, how to manage teams.
+If you have the team manager credentials for a Team Server, you can manage your teams, drivers and sessions using this dialog. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#managing-teams) for more information, how to manage teams.
 
 #### Managing common team settings
 

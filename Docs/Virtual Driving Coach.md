@@ -92,7 +92,9 @@ Ultimately, analyze the specific race circumstances, consult with your team, and
 
 ## Installation
 
-Installation requires you to choose one of the supported large language model providers. The most capable current LLMs (aka large language models) are provided by the company OpenAI, as you probably know. OpenAI provides an HTTP API to connect to these models. This comes with some costs, but these are negligible. I accumulated costs of about 20 Cent at the time of this writing and I have run hours of interactions already. Most OpenAI LLMs are also available in the Azure cloud, in the end a matter of taste which one to use. And there is also an open GPT runtime platform, which can host a vast variety of LLMs developed by universities or less knwon companies. This runtime, named GPT4All, is free and the models can be run on your local PC. But be aware that running an LLM locally on your PC is a very demanding taks and will not be possible in parallel to a running simulation, even if your GPU has enough memory.
+Installation requires you to choose one of the supported large language model providers. The most capable current LLMs (aka large language models) are provided by the company OpenAI, as you probably know. OpenAI provides an HTTP API to connect to these models. This comes with some costs, but these are negligible. I accumulated costs of about 20 Cent at the time of this writing and I have run hours of interactions already. Most OpenAI LLMs are also available in the Azure cloud, in the end a matter of taste which one to use. Another inetersting provider is Mistral AI, the European alternative to OpenAI. Or you can use OpenRouter, which provides access to many models of different providers, or even from the Open Source. And there is also an open GPT runtime platform, which can host a vast variety of LLMs developed by universities or less knwon companies. This runtime, named GPT4All, is free and the models can be run on your local PC. But be aware that running an LLM locally on your PC is a very demanding taks and will not be possible in parallel to a running simulation, even if your GPU has enough memory.
+
+The performance and - even more important - the knowledge about the motorsport domain varies between different models. I have made good experience with "GPT 3.5 turbo" and "GPT 4 turbo" from OpenAI, as well as with "Open Mixtral 8x22b" from Mistral AI. Models from the Open Source are a bit more restricted, but "Wizard 1.2", for example, makes a decent job. In the end, you may want to experiment by yourself, but I recommend "GPT 3.5 turbo" as a starting point at the time of this writing. Using LLMs for non-English conversation is a different story. In this case, you will notice, that models from the Open Source will not deliver good results in most cases.
 
 ### OpenAI
 
@@ -106,6 +108,14 @@ When you have chosen OpenAI, which I recommend, you will have to create an accou
 ### Azure
 
 Thanks to the intensive collaboration between OpenAI and Microsoft, many OpenAI models are also available on the Azure Cloud. The performance is a little better, the cost is a little higher. In order to gain access to OpenAI models in the Azure Cloud, an entry must be made in the Azure Console, but this is usually approved. After approval you can get an communication endpoint and API key which then must be used in the configuration of the Virtual Driving Coach. You also must note down your Azure service endpoint, which must be inserted in the "Service URL" field in the configuration.
+
+### Mistral AI
+
+Very similar to OpenAI. Create an account on [Mistral AI](https://console.mistral.ai/). You will have to register your credit card, but you will only be charged for usage, which is very, very cheap for the Open Weight models. Then create an API key and include it in the configuration as described above. I recommend using the Open Mixtral 8x22b model for the start, which has the best price / performance ratio.
+
+### OpenRouter
+
+[OpenRouter](https://openrouter.ai) is a kind of gateway and hosting environment for many models of different providers, even many source LLMs are available here. It has become my favorite provider in the sense of a one-stop-shop for LLM access. You have to buy a few credits (5$ at least) [here](https://openrouter.ai/credits), before you can use the service. Then create an API key in your user account and include it in the configuration as described above. The last step is to choose the model you want to use from the very long list [here](https://openrouter.ai/models). There are even models available, which do not create any costs when called through the API, like the "meta-llama/llama-3-8b-instruct:free". But as mentioned above, the performance and domain knowledge might not meet your expectations.
 
 ### GPT4All
 
@@ -141,7 +151,7 @@ Below you find all instruction categories and the supported variables:
 
 | Instruction | What              | Description |
 |-------------|-------------------|-------------|
-| Character   | Scope             | This instruction is used always and must define the profession and the personality of the Driving Coach. You can also give general instructions like "Keep your answers short and precise". The default instruction creates a driving coach specialized in car handling and car physics. |
+| Character   | Scope             | This instruction is used always and must define the profession and the personality of the Driving Coach. You can also include general instructions like "Keep your answers short and precise". The default instruction creates a driving coach specialized in car handling and car physics. |
 |             | %name%            | %name% will be replaced with the configured name of the Driving Coach.          |
 | Simulation  | Scope             | This instruction is supplied, when an active simulation is detected.            |
 |             | %simulator%       | The name of the used simulator.                                                 |
@@ -158,6 +168,8 @@ Below you find all instruction categories and the supported variables:
 |             | %position%        | Your position in your class at the end of the last lap.                         |
 |             | %laps%            | This variable is substituted with a CSV table of your performance during the last laps. This table contains columns for your position (overall and class) as well as the lap time and sector times. You can define the number of laps to be reported by defining the variable as %laps:5%, for example. |
 |             | %standings%       | This variable is replaced with a CSV table containing the current standings sorted by overall position. This table contains columns for the race number, class, position (overall and class) as well as the lap time and sector times. |
+| Telemetry   | Scope             | This instruction is used to supply the current content of the knowledgebase (mainly telemetry information) to the LLM. |
+|             | %telemetry%       | A table consisting of key / value pairs separated by an equal sign. All variable names (keys) are *speaking*, so that the LLM can derive their meanings. Example: "Tyre.Pressure.Target.Front.Left = 24.8" - this specifies the current target pressure for the front left tyre when the tyre will be changed at a pitstop. |
 | Handling    | Scope             | This instruction is used only when handling problems had been detected in the telemetry. See the chapter below about detecting handling problems and discussin them with Aiden. |
 |             | %handling%        | An enumeration of all detected handing problems. See the [dedicated chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#detecting-and-discussing-handling-problems) below for more information. |
 

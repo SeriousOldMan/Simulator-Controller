@@ -381,7 +381,7 @@ Said this, it is clear, that the interaction with the Assistants, although alrea
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%207%20Speech%20Improvement.JPG)
 
-Please take a look at the documentation for the [Driving Coach](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#installation) for a description of the different provider which can be configured here.
+Please take a look at the documentation for the [Driving Coach](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#installation) for a description of the different providers and LLMs which can be configured here.
 
 Several boosters are available at the moment:
 
@@ -415,6 +415,35 @@ Several boosters are available at the moment:
 	 Since large parts of the knowledgebase of the Assistants will be supplied to the LLM for matching, a context window of at least 4k tokens is required for this booster. Full standings history isn't possible at the moment, since this will flood the input context area of the LLM, at least for the *smaller* models like GPT 3.5, Mistral 7b, and so on. Time will cure this problem, and I will update the capabilities of the integration, when more capable models become available. For the time being, the position data is available for the most recent laps and also the gaps for the most important opponents are passed to the LLM (for Strategist and Spotter).
 
 For each of the above conversation boosters, you can edit the instructions that are send to the LLM by clicking on the button labeled "Instructions...". A new window will open, where you can edit all related instructions for each of the supported languages. Whenever you want to restore the original instruction, you can do this by clicking on the small button with the "Reload" icon.
+
+Below you find all instruction categories and the supported variables:
+
+| Booster        | Instruction (1)   | What              | Description |
+|----------------|-------------------|-------------------|-------------|
+| Rephrasing     | Rephrase          | Scope             | This instruction is used when a given phrase by an Assistant should be rephrased without changing its language. |
+|                |                   | %assistant%       | The type or role of the current Assistant, for example "Race Engineer". |
+|                |                   | %text%            | The text or phrase, which should be rephrased. |
+|                | RephraseTranslate | Scope             | This instruction is used when a given phrase by an Assistant should be rephrased and then translated to a different language. |
+|                |                   | %assistant%       | The type or role of the current Assistant, for example "Race Engineer". |
+|                |                   | %language%        | This variable specifies the target language, for example "French", in which the resulting phrase should be formulated. |
+|                |                   | %text%            | The text or phrase, which should be rephrased and then translated. |
+|                | Translate         | Scope             | This instruction is used when a given phrase by an Assistant should only be translated without changing the wording. |
+|                |                   | %assistant%       | The type or role of the current Assistant, for example "Race Engineer". |
+|                |                   | %language%        | This variable specifies the target language, for example "French", for the resulting phrase. |
+|                |                   | %text%            | The text or phrase, which should be translated. |
+| Understanding  | Recognize         | Scope             | This instruction is used when a voice command has been recognized, which cannot be mapped to one of the predefined command patterns. |
+|                |                   | %assistant%       | The type or role of the current Assistant, for example "Race Engineer". |
+|                |                   | %commands%        | A table of examples for all predefined commands, so that the LLM can match the unrecognized command to one of those examples. Each line consist of a command name followed by an equal sign and a number of examples for the command. Example: "Yes=Yes thank you, Yes of course, Yes please". The LLM should the return the name of the command or "Unknown", if no match was possible. |
+|                |                   | %text%            | The text of the command that should be identified. |
+| Conversation   | Character         | Scope             | This instruction is used when a voice command has been recognized, which cannot be mapped to one of the predefined command patterns, even after using the LLM to map the command semantically. It is assumed that the user wants a free conversation with the LLM. This instruction then defines the profession and the personality of the Assistant. You can also include general instructions like "Keep your answers short and precise", and so on. |
+|                |                   | %assistant%       | The type or role of the current Assistant, for example "Race Engineer". |
+|                |                   | %name%            | Specifies the name of the Assistant. |
+|                | Telemetry         | Scope             | This instruction is used to supply the current content of the knowledgebase (mainly telemetry information) to the LLM. |
+|                |                   | %telemetry%       | A table consisting of key / value pairs separated by an equal sign. All variable names (keys) are *speaking*, so that the LLM can derive their meanings. Example: "Tyre.Pressure.Target.Front.Left = 24.8" - this specifies the current target pressure for the front left tyre when the tyre will be changed at a pitstop. |
+
+##### Notes
+
+(1) Each phrase is available in different languages, for example "Rephrase (DE)" for the German version.
 
 Important: Using a GPT service like OpenAI may impose some costs, and running an LLM locally on your PC will require a very powerful system, especially when doing this while on the track. Therefore, configuring a conversation booster is fully optional.
 
@@ -675,11 +704,13 @@ The elements on this tab allows you to connect to any currently running *Team Se
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%2010.JPG)
 
+Good to know: The same functionality is now available in "Simulator Startup". See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#team-management) for more information. The use of the *Team Management* tab in "Simulator Configuration" is therefore deprecated and the tab might be removed in a future version of Simulator Controller.
+
 The details about the installation, configuration and usage of the *Team Server*, and also about the team administration task in general can be found in the [dedicated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server) for the *Team Server*.
 
 #### Going deeper into the rabbit hole
 
-After creating the general configuration using "Simulator Setup" or "Simulator Configuration", Simulator Controller will be already ready to race. But there are many more settings to customize the behaviour of Simulator Controller available in the [session database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--session-database). These settings can be created for specific combinations of a simulator and a car and even track, thereby giving you great flexibility for the best possible experience. But there is a downside, you have to learn all these settings. Don't worry, all settings have a reasonable default, so you can start right away. Here is the documentation about all [available Race Settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings).
+After creating the general configuration using "Simulator Setup" or "Simulator Configuration", Simulator Controller will be already ready to race. But there are many more settings to customize the behaviour of Simulator Controller available in the [session database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--session-database). These settings can be created for specific combinations of a simulator and a car and even track, thereby giving you great flexibility for the best possible experience. But there is a downside, you have to learn all these settings. Don't worry, all settings have a reasonable default, so you can start right away. Here is the documentation about all [available Race Settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings).
 
 #### Special configuration options for optimizing overall performance
 

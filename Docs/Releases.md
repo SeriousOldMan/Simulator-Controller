@@ -1,21 +1,25 @@
-## 5.7.3.0-release 05/24/24 (planned)
+## 5.7.3.0-release 05/24/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. The translations for checkable menu items has been fixed in several applications.
-  4. The cold target tyre pressure information in the pitstop component on the session info page in "System Monitor" has been fixed. This bug was introduced with the 5.7.2.
-  5. The announcement of chosen tyre pressures by the Engineer in team sessions has been fixed. This bug was introduced with the 5.7.2.
-  6. Fixed unwanted automatic re-enabling of simulators and applications by "Simulator Setup".
-  7. Fixed an edge case in "Race Center", where pitstop settings initialization failed after an unplanned pitstop had become necessary after a start incident.
-  8. The handling of remote server timeouts has been improved in team sessions. The applications like "Race Center" do not wait anymore in cases of non-important data.
-  9. The Spotter now informs you during qualification whether the car before or behind you is on a valid or on an invalid lap.
-  10. It is now possible to configure the instructions for the different GPT-based conversation boosters. Please take a look at the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm) for more information.
-  11. The default instructions for the conversation boosters has been extended to include more personality and domain specific behaviour.
-  12. Many more announcements and messages by the Spotter can now be rephrased by the conversation booster. Only very urgent messages like proximity alerts are excluded, because of the additional latency introduced when calling a GPT service.
-  13. The default "Character" instruction for the Driving Coach has been updated. Therefoe all instructions will be reset to their defaults. This is only necessary this time, see next item.
-  14. A method has been introduced, that checks whether you are using the default instructions for an LLM, so that you don't need to update them, when they have changed in the distribution package.
-  15. It is now possible to manage teams, driver and sessions directly from "Simulator Startup", if you are using the Team Server. Please see the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#team-management) for more information.
-  16. Renamed the "Team Server" tab in "Simulator Configuration" to "Team Management". Using this tab is not necessary anymore and it will eventually be removed, since the functionality is now provided from within "Simulator Startup".
-  17. *OpenRouter* has been added to the list of supported GPT service providers.
+  4. Several translation errors for the Spanish language has been fixed.
+  5. The cold target tyre pressure information in the pitstop component on the session info page in "System Monitor" has been fixed. This bug was introduced with the 5.7.2.
+  6. The announcement of chosen tyre pressures by the Engineer in team sessions has been fixed. This bug was introduced with the 5.7.2.
+  7. Fixed unwanted automatic re-enabling of simulators and applications by "Simulator Setup" when using the Basic configuration step.
+  8. Fixed unwanted automatic re-enabling of "Start with WIndows" by "Simulator Setup" when using the Basic configuration step.
+  9. Fixed an edge case in "Race Center", where pitstop settings initialization failed after an unplanned pitstop had become necessary after a start incident.
+  10. The handling of remote server timeouts has been improved in team sessions. The applications like "Race Center" do not wait anymore in cases of non-important data.
+  11. Pressing *Push-To-Talk* without saying anything no longer triggers an "I don't understand, please repeat" answer by the Assistants, as long as you are using Azure or Google for voice recognition.
+  12. The Spotter now informs you during qualification whether the car before or behind you is on a valid or on an invalid lap.
+  13. It is now possible to configure the instructions for the different GPT-based conversation boosters. Please take a look at the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm) for more information.
+  14. The default instructions for the conversation boosters has been extended to include more personality and domain specific behaviour. A full overview for all supported instructions can be found [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm).
+  15. Many more announcements and messages by the Spotter can now be rephrased by the conversation booster. Only very urgent messages like proximity alerts are excluded, because of the additional latency introduced when calling a GPT service.
+  16. The default "Character" instruction for the Driving Coach has been updated. Therefoe all instructions will be reset to their defaults. This is only necessary this time, see next item.
+  17. A method has been introduced, that checks whether you are using the default instructions for an LLM, so that you don't need to update them, when they have changed in the distribution package.
+  18. It is now possible to manage teams, driver and sessions directly from "Simulator Startup", if you are using the Team Server. Please see the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#team-management) for more information.
+  19. Renamed the "Team Server" tab in "Simulator Configuration" to "Team Management". Using this tab is not necessary anymore and it will eventually be removed, since the functionality is now provided from within "Simulator Startup".
+  20. *OpenRouter* has been added to the list of supported GPT service providers.
+  21. The documentation has been updated to cover the [configuration requirements](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#installation) for the added GPT providers.
   
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-570), especially if you have configured and are using the Driving Coach.
 

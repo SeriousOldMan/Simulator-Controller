@@ -1,31 +1,28 @@
 [Development]
-Version=5.7.3.0-beta
+Version=5.7.3.0-release
 Target=5.7.3.0-release
-Date=05/22/2024
-Download=https://www.dropbox.com/scl/fi/zjftxpqflm4r258o89wlf/Simulator-Controller-5.7.3.0-beta.zip?rlkey=k5uiml1cc2ru4xyc1dpg2tdbl&st=wuft28zb&dl=1
+Date=05/24/2024
+Download=https://cutt.ly/WetJjOCc;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.7.3.0-release.zip
 Changes=New editor for conversation booster instructions, Updated conversation booster instructions for more domain specifity, Fixed translations of checkable menu items, Fixed tyre pressures for prepared pitstops in session info (introduced with 5.7.2), Updated instructions for Driver Coach, Optimized Team Server timeout handling, Spotter announces valid and invalid laps of other cars in qualification, Rephrasing booster now also for many Spooter phrases, Team Management editor in "Simulator Startup", Fixed tyre pressure announcements in team sessions, Fixed pitstop initialization in "Race Center" in case of lap 1 pitstops, Added support for OpenRouter AI as GPT service provider, Fixed unwanted re-enabling of simulators and applications by "Simulator Setup"
 Components=Media->5.6.1,Configuration->5.7.3,Utilities->5.4.8
 [Release]
-Version=5.7.2.0-release
-Date=05/17/2024
-Download=https://cutt.ly/WernMqnq;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.7.2.0-release.zip
-Changes=New telemetry instruction for the Driving Coach, General conversation capability for all Assistants using GPT technology, Fixed installation of French language pack, Conversation Booster configuration integrated in "Simulator Configuration", Added "Mistral AI" as GPT service provider, Added "GPT-4o" model entry, Fixed stint timer if larger than driver time, Test mode for Push-To-Talk, Added tyre pressure increments to session info page, Added tyre pressure increments to "Session State.json", Migrated to AHK 2.0.15
-Components=Media->5.6.1,Configuration->5.6.4,Utilities->5.4.8
+Version=5.7.3.0-release
+Date=05/24/2024
+Download=https://cutt.ly/WetJjOCc;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.7.3.0-release.zip
+Changes=New editor for conversation booster instructions, Updated conversation booster instructions for more domain specifity, Fixed translations of checkable menu items, Fixed tyre pressures for prepared pitstops in session info (introduced with 5.7.2), Updated instructions for Driver Coach, Optimized Team Server timeout handling, Spotter announces valid and invalid laps of other cars in qualification, Rephrasing booster now also for many Spooter phrases, Team Management editor in "Simulator Startup", Fixed tyre pressure announcements in team sessions, Fixed pitstop initialization in "Race Center" in case of lap 1 pitstops, Added support for OpenRouter AI as GPT service provider, Fixed unwanted re-enabling of simulators and applications by "Simulator Setup"
+Components=Media->5.6.1,Configuration->5.7.3,Utilities->5.4.8
 [Components]
 Media.5.6.1.Path=Resources
 Media.5.6.1.Content=Splash Media
-Media.5.6.1.Download=https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Media+5.6.1.zip;https://www.dropbox.com/scl/fi/3c56fjdvdd4od5t7rsuc9/Media-5.6.1.zip?rlkey=x0icl05jy05nn886due4dsblv&dl=1
-Configuration.5.6.4.Path=Resources
-Configuration.5.6.4.Content=Setup
-Configuration.5.6.4.Download=https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+5.6.4.zip;https://www.dropbox.com/scl/fi/186kqtwvswpxlj1xbm7ci/Configuration-5.6.4.zip?rlkey=ea4rw83hmsbiozurzli84tbgl&dl=1
+Media.5.6.1.Download=https://www.dropbox.com/scl/fi/3c56fjdvdd4od5t7rsuc9/Media-5.6.1.zip?rlkey=x0icl05jy05nn886due4dsblv&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Media+5.6.1.zip
 Configuration.5.7.3.Path=Resources
 Configuration.5.7.3.Content=Setup
-Configuration.5.7.3.Download=https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+5.7.3.zip;https://www.dropbox.com/scl/fi/vad78ma29ynq32hxufpej/Configuration-5.7.3.zip?rlkey=2526f002rsdkb0w6rwl8t1w0r&st=jlw8tjwg&dl=1
+Configuration.5.7.3.Download=https://www.dropbox.com/scl/fi/vad78ma29ynq32hxufpej/Configuration-5.7.3.zip?rlkey=2526f002rsdkb0w6rwl8t1w0r&st=jlw8tjwg&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+5.7.3.zip
 Utilities.5.4.8.Path=.
 Utilities.5.4.8.Content=Utilities
-Utilities.5.4.8.Download=https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+5.4.8.zip;https://www.dropbox.com/scl/fi/5nduffajjm3x6rhsxr1nk/Utilities-5.4.8.zip?rlkey=alrj8l2z205dd2vm9cu6hbsot&dl=1
+Utilities.5.4.8.Download=https://www.dropbox.com/scl/fi/5nduffajjm3x6rhsxr1nk/Utilities-5.4.8.zip?rlkey=alrj8l2z205dd2vm9cu6hbsot&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+5.4.8.zip
 [Current]
-Type=Development
+Type=Release
 [Version]
-Development=5.7.3.0-beta
-Release=5.7.2.0-release
+Development=5.7.3.0-release
+Release=5.7.3.0-release

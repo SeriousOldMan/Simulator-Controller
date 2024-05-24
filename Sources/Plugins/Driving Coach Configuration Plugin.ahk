@@ -461,9 +461,11 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		for ignore, setting in ["ServiceURL", "ServiceKey", "MaxTokens", "MaxHistory"]
 			this.Control["dc" . setting . "Edit"].Text := configuration[setting]
 
-		if ((provider = "GPT4All") && (Trim(this.Control["dcServiceKeyEdit"].Text) = "")
-								   && (Trim(this.Control["dcServiceURLEdit"].Text) = "http://localhost:4891/v1"))
+		if ((provider = "GPT4All") && (Trim(this.Control["dcServiceKeyEdit"].Text) = ""))
 			this.Control["dcServiceKeyEdit"].Text := "Any text will do the job"
+
+		if ((provider = "Ollama") && (Trim(this.Control["dcServiceKeyEdit"].Text) = ""))
+			this.Control["dcServiceKeyEdit"].Text := "Ollama"
 
 		this.Control["dcTemperatureEdit"].Text := Round(configuration["Temperature"] * 100)
 
@@ -516,7 +518,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 
 	updateState() {
 		this.Control["dcServiceURLEdit"].Enabled := (this.Control["dcProviderDropDown"].Text != "LLM Runtime")
-		this.Control["dcServiceKeyEdit"].Enabled := (this.Control["dcProviderDropDown"].Text != "LLM Runtime")
+		this.Control["dcServiceKeyEdit"].Enabled := !inList(["GPT4All", "Ollama", "LLM Runtime"], this.Control["dcProviderDropDown"].Text)
 	}
 }
 

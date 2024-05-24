@@ -273,6 +273,26 @@ class LLMConnector {
 		}
 	}
 
+	class OllamaConnector extends LLMConnector.InstructionConnector {
+		static Models {
+			Get {
+				return []
+			}
+		}
+
+		Models {
+			Get {
+				return LLMConnector.OllamaConnector.Models
+			}
+		}
+
+		static GetDefaults(&serviceURL, &serviceKey, &model) {
+			serviceURL := "http://localhost:11434/v1/chat/completions"
+			serviceKey := "ollma"
+			model := ""
+		}
+	}
+
 	class GPT4AllConnector extends LLMConnector.HTTPConnector {
 		static GetDefaults(&serviceURL, &serviceKey, &model) {
 			serviceURL := "http://localhost:4891/v1"
@@ -395,7 +415,7 @@ class LLMConnector {
 
 	static Providers {
 		Get {
-			return ["OpenAI", "Mistral AI", "Azure", "OpenRouter", "GPT4All", "LLM Runtime"]
+			return ["OpenAI", "Mistral AI", "Azure", "OpenRouter", "GPT4All", "Ollama", "LLM Runtime"]
 		}
 	}
 

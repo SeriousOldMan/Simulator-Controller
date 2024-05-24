@@ -125,6 +125,12 @@ Please be aware, that running a GPT4All locally puts heavy load on your PC and c
 
 IMPORTANT: At the time of this writing, the integrated REST API of the GPT4All chat client is under heavy development and cannot be considered final or even stable. If you have issues establishing a connection to the local GPT4All HTTP server, take a look at this [article on GitHub](https://github.com/nomic-ai/gpt4all/issues/934). As an alternative, you can either setup a dedicated API server for GPT4All, even on a different machine, if you are a seasoned developer, or you check out the next option.
 
+### Ollama
+
+Ollama is a free GPT server, which can be run anywhere, including your local PC. It can be downloaded from the [Ollama webiste](https://ollama.com/) for different operating systems incl. Windows. The websste also provides downloads for several LLMs, but you can also use models from other sources.
+
+Documentation for installation and setup can be found on the [Github page](https://github.com/ollama/ollama). Although Ollama is a very powerful solution for setting up your own LLM server, it requires a lot of technical skills and is therefore not for everyone. For a more simple and easy-to-use solution see the next section.
+
 ### LLM Runtime
 
 This one implements an embedded runtime engine for large language models. You do not even have to install GPT4All on your PC, for example, everything is already integrated into Simulator Controller. You only have to download one of the LLMs from the [GPT4All website](https://gpt4all.io/index.html) or from another source. I recommend here also the model *Wizard 1.2* (["wizardlm-13b-v1.2.Q4_0.gguf"](https://gpt4all.io/models/gguf/wizardlm-13b-v1.2.Q4_0.gguf)), which is a very good allround model. Another very good model at the time of this writing is *Hermes* (["nous-hermes-llama2-13b.Q4_0.gguf"](https://gpt4all.io/models/gguf/nous-hermes-llama2-13b.Q4_0.gguf)). Both models consume up to 16GB of RAM, so you need to have at least 32 GB RAM in your machine. There are also some smaller models available on the GPT4All website, but theier knowledge about our domain is very limited. In fact you can use any model in the GGUF format supported by the Llama runtime, not only the models provided on the GPT4All website, so also take a look what's available at the [Hugging Face website](https://huggingface.co/), the largest community for AI development world wide. Once you have selected and download a model, enter the full path to the model file into the "Model" field and your done.

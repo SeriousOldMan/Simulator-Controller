@@ -446,9 +446,11 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 			for ignore, setting in ["ServiceURL", "ServiceKey", "MaxTokens"]
 				this.Control["vi" . setting . "Edit"].Text := configuration[setting]
 
-			if ((provider = "GPT4All") && (Trim(this.Control["viServiceKeyEdit"].Text) = "")
-									   && (Trim(this.Control["viServiceURLEdit"].Text) = "http://localhost:4891/v1"))
+			if ((provider = "GPT4All") && (Trim(this.Control["viServiceKeyEdit"].Text) = ""))
 				this.Control["viServiceKeyEdit"].Text := "Any text will do the job"
+
+			if ((provider = "Ollama") && (Trim(this.Control["viServiceKeyEdit"].Text) = ""))
+				this.Control["viServiceKeyEdit"].Text := "Ollama"
 
 			for ignore, setting in ["Speaker", "Listener", "Conversation"]
 				this.Control["vi" . setting . "Check"].Value := configuration[setting]
@@ -564,7 +566,7 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 
 		if this.iCurrentProvider {
 			this.Control["viServiceURLEdit"].Enabled := (this.Control["viProviderDropDown"].Text != "LLM Runtime")
-			this.Control["viServiceKeyEdit"].Enabled := (this.Control["viProviderDropDown"].Text != "LLM Runtime")
+			this.Control["viServiceKeyEdit"].Enabled := !inList(["GPT4All", "Ollama", "LLM Runtime"], this.Control["dcProviderDropDown"].Text)
 
 			this.Control["viSpeakerCheck"].Enabled := true
 			this.Control["viListenerCheck"].Enabled := true

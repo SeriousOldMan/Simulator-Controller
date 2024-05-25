@@ -566,7 +566,7 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 
 		if this.iCurrentProvider {
 			this.Control["viServiceURLEdit"].Enabled := (this.Control["viProviderDropDown"].Text != "LLM Runtime")
-			this.Control["viServiceKeyEdit"].Enabled := !inList(["GPT4All", "Ollama", "LLM Runtime"], this.Control["dcProviderDropDown"].Text)
+			this.Control["viServiceKeyEdit"].Enabled := !inList(["GPT4All", "Ollama", "LLM Runtime"], this.Control["viProviderDropDown"].Text)
 
 			this.Control["viSpeakerCheck"].Enabled := true
 			this.Control["viListenerCheck"].Enabled := true

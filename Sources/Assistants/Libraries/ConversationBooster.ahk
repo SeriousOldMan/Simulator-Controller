@@ -307,7 +307,10 @@ class SpeechBooster extends ConversationBooster {
 
 					answer := this.Connector.Ask(instruction)
 
-					return (answer ? answer : text)
+					if answer
+						answer := Trim(StrReplace(StrReplace(answer, "**", ""), "|||", ""))
+
+					return ((answer && (answer != "")) ? answer : text)
 				}
 				catch Any as exception {
 					logError(exception)
@@ -457,7 +460,10 @@ class RecognitionBooster extends ConversationBooster {
 
 					answer := this.Connector.Ask(instruction)
 
-					return ((!answer || (answer = "Unknown")) ? text : answer)
+					if answer
+						answer := Trim(StrReplace(StrReplace(answer, "**", ""), "|||", ""))
+
+					return ((!answer || (answer = "Unknown") || (answer = "")) ? text : answer)
 				}
 				catch Any as exception {
 					logError(exception)
@@ -543,7 +549,10 @@ class ChatBooster extends ConversationBooster {
 																							   , "Conversation.Instructions", "Telemetry")
 																			  , variables)])
 
-					return (answer ? StrReplace(answer, "**", "") : false)
+					if answer
+						answer := Trim(StrReplace(StrReplace(answer, "**", ""), "|||", ""))
+
+					return ((answer && (answer != "")) ? answer : false)
 				}
 				catch Any as exception {
 					logError(exception)

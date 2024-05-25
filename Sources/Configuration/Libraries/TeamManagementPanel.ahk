@@ -1000,7 +1000,10 @@ class TeamManagementPanel extends ConfiguratorPanel {
 
 		parts := string2Values(A_Space, newName)
 
-		this.Connector.UpdateDriver(this.Drivers[oldName], "ForName=" . parts[1] . "`n" . "SurName=" . parts[2] . "`n" . "NickName=" . StrReplace(StrReplace(parts[3], "(", ""), ")", ""))
+		if (parts.Length > 2)
+			this.Connector.UpdateDriver(this.Drivers[oldName], "ForName=" . parts[1] . "`n" . "SurName=" . parts[2] . "`n" . "NickName=" . StrReplace(StrReplace(parts[3], "(", ""), ")", ""))
+		else
+			this.Connector.UpdateDriver(this.Drivers[oldName], "ForName=" . parts[1] . "`n" . "SurName=`n" . "NickName=" . StrReplace(StrReplace(parts[2], "(", ""), ")", ""))
 
 		this.loadDrivers()
 		this.selectDriver(newName)

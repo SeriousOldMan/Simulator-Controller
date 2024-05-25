@@ -236,6 +236,10 @@ class ConversationBooster extends LLMBooster {
 		if this.Connector
 			this.Connector.MaxHistory := 0
 	}
+
+	normalizeAnswer(answer) {
+		return Trim(StrReplace(StrReplace(answer, "*", ""), "|||", ""), " `t`r`n")
+	}
 }
 
 class SpeechBooster extends ConversationBooster {
@@ -308,7 +312,7 @@ class SpeechBooster extends ConversationBooster {
 					answer := this.Connector.Ask(instruction)
 
 					if answer
-						answer := Trim(StrReplace(StrReplace(answer, "**", ""), "|||", ""))
+						answer := this.normalizeAnswer(answer)
 
 					return ((answer && (answer != "")) ? answer : text)
 				}
@@ -461,7 +465,7 @@ class RecognitionBooster extends ConversationBooster {
 					answer := this.Connector.Ask(instruction)
 
 					if answer
-						answer := Trim(StrReplace(StrReplace(answer, "**", ""), "|||", ""))
+						answer := this.normalizeAnswer(answer)
 
 					return ((!answer || (answer = "Unknown") || (answer = "")) ? text : answer)
 				}
@@ -550,7 +554,7 @@ class ChatBooster extends ConversationBooster {
 																			  , variables)])
 
 					if answer
-						answer := Trim(StrReplace(StrReplace(answer, "**", ""), "|||", ""))
+						answer := this.normalizeAnswer(answer)
 
 					return ((answer && (answer != "")) ? answer : false)
 				}

@@ -467,11 +467,6 @@ class RaceEngineer extends RaceAssistant {
 		try {
 			lap := knowledgeBase.getValue("Lap")
 
-			if (unit == "Pressure")
-				speaker.speakPhrase("Pressures", {type: forSetup ? fragments["Setup"] : (forCold ? fragments["Cold"] : "")})
-			else
-				speaker.speakPhrase("Temperatures")
-
 			if forSetup {
 				compound := knowledgeBase.getValue("Tyre.Compound", "Dry")
 				setupPressures := []
@@ -483,6 +478,26 @@ class RaceEngineer extends RaceAssistant {
 					setupPressures.Push(resultSet ? resultSet.getValue(goal.Arguments[3]).toString() : 0)
 				}
 			}
+
+			if (unit = "Pressure") {
+				if ((forSetup && (setupPressures[1] = 0))
+				 || (forCold && (knowledgeBase.getValue("Tyre.Pressure.Target.FL", kUndefined) = kUndefined))
+				 || (knowledgeBase.getValue("Lap." . lap . ".Tyre.Pressure.FL", kUndefined) = kUndefined)) {
+					 speaker.speakPhrase("NoData")
+
+					 return
+				}
+			}
+			else if (knowledgeBase.getValue("Lap." . lap . ".Tyre.Temperature.FL", kUndefined) = kUndefined) {
+				speaker.speakPhrase("NoData")
+
+				return
+			}
+
+			if (unit == "Pressure")
+				speaker.speakPhrase("Pressures", {type: forSetup ? fragments["Setup"] : (forCold ? fragments["Cold"] : "")})
+			else
+				speaker.speakPhrase("Temperatures")
 
 			for index, suffix in ["FL", "FR", "RL", "RR"] {
 				if (unit = "Pressure") {
@@ -518,7 +533,7 @@ class RaceEngineer extends RaceAssistant {
 			return
 
 		if (flWear == kUndefined)
-			speaker.speakPhrase("NoWear")
+			speaker.speakPhrase("NoData")
 		else {
 			frWear := knowledgeBase.getValue("Lap." . lap . ".Tyre.Wear.FR")
 			rlWear := knowledgeBase.getValue("Lap." . lap . ".Tyre.Wear.RL")
@@ -552,28 +567,32 @@ class RaceEngineer extends RaceAssistant {
 		if !this.hasEnoughData()
 			return
 
-		speaker.beginTalk()
+		lap := knowledgeBase.getValue("Lap")
 
-		try {
-			lap := knowledgeBase.getValue("Lap")
+		if isNumber(knowledgeBase.getValue("Lap." . lap . ".Brake.Temperature.FL", kUndefined)) {
+			speaker.beginTalk()
 
-			speaker.speakPhrase("Temperatures")
+			try {
+				speaker.speakPhrase("Temperatures")
 
-			speaker.speakPhrase("BrakeFL", {value: speaker.number2Speech(convertUnit("Temperature", knowledgeBase.getValue("Lap." . lap . ".Brake.Temperature.FL")), 0)
-										  , unit: (fragments["Degrees"] . A_Space . fragments[getUnit("Temperature")])})
+				speaker.speakPhrase("BrakeFL", {value: speaker.number2Speech(convertUnit("Temperature", knowledgeBase.getValue("Lap." . lap . ".Brake.Temperature.FL")), 0)
+											  , unit: (fragments["Degrees"] . A_Space . fragments[getUnit("Temperature")])})
 
-			speaker.speakPhrase("BrakeFR", {value: speaker.number2Speech(convertUnit("Temperature", knowledgeBase.getValue("Lap." . lap . ".Brake.Temperature.FR")), 0)
-										  , unit: (fragments["Degrees"] . A_Space . fragments[getUnit("Temperature")])})
+				speaker.speakPhrase("BrakeFR", {value: speaker.number2Speech(convertUnit("Temperature", knowledgeBase.getValue("Lap." . lap . ".Brake.Temperature.FR")), 0)
+											  , unit: (fragments["Degrees"] . A_Space . fragments[getUnit("Temperature")])})
 
-			speaker.speakPhrase("BrakeRL", {value: speaker.number2Speech(convertUnit("Temperature", knowledgeBase.getValue("Lap." . lap . ".Brake.Temperature.RL")), 0)
-										  , unit: (fragments["Degrees"] . A_Space . fragments[getUnit("Temperature")])})
+				speaker.speakPhrase("BrakeRL", {value: speaker.number2Speech(convertUnit("Temperature", knowledgeBase.getValue("Lap." . lap . ".Brake.Temperature.RL")), 0)
+											  , unit: (fragments["Degrees"] . A_Space . fragments[getUnit("Temperature")])})
 
-			speaker.speakPhrase("BrakeRR", {value: speaker.number2Speech(convertUnit("Temperature", knowledgeBase.getValue("Lap." . lap . ".Brake.Temperature.RR")), 0)
-										  , unit: (fragments["Degrees"] . A_Space . fragments[getUnit("Temperature")])})
+				speaker.speakPhrase("BrakeRR", {value: speaker.number2Speech(convertUnit("Temperature", knowledgeBase.getValue("Lap." . lap . ".Brake.Temperature.RR")), 0)
+											  , unit: (fragments["Degrees"] . A_Space . fragments[getUnit("Temperature")])})
+			}
+			finally {
+				speaker.endTalk()
+			}
 		}
-		finally {
-			speaker.endTalk()
-		}
+		else
+			speaker.speakPhrase("NoData")
 	}
 
 	brakeWearRecognized(words) {
@@ -587,7 +606,7 @@ class RaceEngineer extends RaceAssistant {
 			return
 
 		if (flWear == kUndefined)
-			speaker.speakPhrase("NoWear")
+			speaker.speakPhrase("NoData")
 		else {
 			frWear := knowledgeBase.getValue("Lap." . lap . ".Brake.Wear.FR")
 			rlWear := knowledgeBase.getValue("Lap." . lap . ".Brake.Wear.RL")

@@ -218,9 +218,14 @@ class VoiceServer extends ConfigurationItem {
 
 			splitText(text) {
 				local booster := this.Booster
+				local alternateText
 
-				if (booster && (booster.Mode = "Always"))
-					text := booster.recognize(text)
+				if (booster && (booster.Mode = "Always")) {
+					alternateText := booster.recognize(text)
+
+					if (alternateText && (alternateText != ""))
+						text := alternateText
+				}
 
 				return super.splitText(text)
 			}
@@ -232,7 +237,7 @@ class VoiceServer extends ConfigurationItem {
 				if (booster && (booster.Mode = "Unknown")) {
 					alternateText := booster.recognize(text)
 
-					if (alternateText != text) {
+					if (alternateText && (alternateText != "") && (alternateText != text)) {
 						text := alternateText
 
 						return true

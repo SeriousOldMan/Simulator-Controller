@@ -149,7 +149,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 			if this.RaceAssistant
 				setMultiMapValue(configuration, "Race Assistants", this.Plugin, "Active")
 
-			if this.TrackAutomationEnabled {
+			if (this.RaceAssistant && this.TrackAutomationEnabled) {
 				simulator := this.Simulator
 
 				if (simulator && simulator.Track) {

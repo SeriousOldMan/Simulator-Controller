@@ -467,7 +467,7 @@ class RecognitionBooster extends ConversationBooster {
 					if answer
 						answer := this.normalizeAnswer(answer)
 
-					return ((!answer || (answer = "Unknown") || (answer = "")) ? text : answer)
+					return ((!answer || (answer = "Unknown") || (answer = "") || InStr(answer, "=")) ? text : answer)
 				}
 				catch Any as exception {
 					logError(exception)

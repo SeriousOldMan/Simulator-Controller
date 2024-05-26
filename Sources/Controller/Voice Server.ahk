@@ -244,12 +244,10 @@ class VoiceServer extends ConfigurationItem {
 					}
 				}
 
-				if this.Grammars.Has("?") {
-					if this.VoiceClient.VoiceServer.unknownRecognized(this.VoiceClient, text)
-						return false
-				}
-
-				return super.unknownRecognized(&text)
+				if this.Grammars.Has("?")
+					return !this.VoiceClient.VoiceServer.unknownRecognized(this.VoiceClient, text)
+				else
+					return super.unknownRecognized(&text)
 			}
 		}
 

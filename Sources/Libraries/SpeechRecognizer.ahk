@@ -808,7 +808,7 @@ class SpeechRecognizer {
 
 	unknownRecognized(&text) {
 		if this.Grammars.Has("?")
-			callback := this.Grammars["?"].Callback.Call("?", this.splitText(text))
+			this.Grammars["?"].Callback.Call("?", isSet(text) ? this.splitText(text) : ["Unknown"])
 
 		return false
 	}
@@ -823,6 +823,9 @@ class SpeechRecognizer {
 	_onTextCallback(text) {
 		local words, ignore, name, grammar, rating, bestRating, bestMatch, handler
 
+		if (Trim(text) = "")
+			return
+
 		loop 2 {
 			words := this.splitText(text)
 
@@ -830,8 +833,11 @@ class SpeechRecognizer {
 				if handler[2].Call(handler[1], words*)
 					return
 
-			if (this.iMode = "Text")
+			if (this.iMode = "Text") {
 				this.textRecognized(text)
+
+				return
+			}
 			else if true {
 				bestRating := 0
 				bestMatch := false
@@ -845,12 +851,13 @@ class SpeechRecognizer {
 					}
 				}
 
-				if bestMatch
+				if bestMatch {
 					bestMatch.Callback.Call(bestMatch.Name, words)
-				else if this.unknownRecognized(&text)
-					continue
+
+					return
+				}
 			}
-			else {
+			else
 				for name, grammar in this.Grammars
 					if grammar.Grammar.match(words) {
 						grammar.Callback.Call(name, words)
@@ -858,11 +865,8 @@ class SpeechRecognizer {
 						return
 					}
 
-				if this.unknownRecognized(&text)
-					continue
-			}
-
-			break
+			if !this.unknownRecognized(&text)
+				return
 		}
 	}
 

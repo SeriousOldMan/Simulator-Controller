@@ -173,6 +173,9 @@ class LLMConnector {
 		}
 	}
 
+	class GenericConnector extends LLMConnector.InstructionConnector {
+	}
+
 	class OpenAIConnector extends LLMConnector.InstructionConnector {
 		static Models {
 			Get {
@@ -415,7 +418,7 @@ class LLMConnector {
 
 	static Providers {
 		Get {
-			return ["OpenAI", "Mistral AI", "Azure", "OpenRouter", "GPT4All", "Ollama", "LLM Runtime"]
+			return ["Generic", "OpenAI", "Mistral AI", "Azure", "OpenRouter", "Ollama", "GPT4All", "LLM Runtime"]
 		}
 	}
 

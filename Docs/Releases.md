@@ -6,6 +6,7 @@
   5. The conversation booster no longer consume a voice command, when invoked GPT service does not returned a valid result.
   6. LLMs aometimes use markdown syntax in their answers. Most of this syntactical elements are now removed, so that they do not interfere with the spoken words.
   7. [*Ollama*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#ollama) has been added to the list of supported GPT service providers. This is a GPT server, which can be installed on the local PC.
+  8. A [*Generic*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#generic) GPT service provider is now also available. This supports and HTTP based GPT service, which implements the OpenAI JSON protocol.
   
 ## 5.7.3.0-release 05/24/24
   1. Minor bugfixes, as always

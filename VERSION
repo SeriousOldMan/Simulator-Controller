@@ -1,9 +1,9 @@
 [Development]
 Version=5.7.4.0-dev
 Target=5.7.4.0-release
-Date=05/27/2024
+Date=05/29/2024
 Download=
-Changes=Added support for Ollama, Added support for generic GPT service provider, Bugfixes for conversation booster, Fixed P2T without saying anything, Increased compatibility with silly LLMs
+Changes=Added support for Ollama, Added support for generic GPT service provider, Bugfixes for conversation booster, Fixed P2T without saying anything, Increased compatibility with silly LLMs, Load models from GPT service provider
 Components=Media->5.6.1,Configuration->5.7.3,Utilities->5.4.8
 [Release]
 Version=5.7.3.0-release

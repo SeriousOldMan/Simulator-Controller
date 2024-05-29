@@ -1686,6 +1686,32 @@ updateInstallationForV500() {
 	}
 }
 
+updateConfigurationForV574() {
+	local ignore, fileName, configuration, modified
+
+	for ignore, fileName in [getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+						   , kUserHomeDirectory . "Setup\Driving Coach Configuration.ini", kUserHomeDirectory . "Setup\Conversation Booster Configuration.ini"]
+		if FileExist(fileName) {
+			configuration := readMultiMap(fileName)
+			modified := false
+
+			if (getMultiMapValue(configuration, "Driving Coach Service", "GPT4All.ServiceURL") = "http://localhost:4891/v1") {
+				setMultiMapValue(configuration, "Driving Coach Service", "GPT4All.ServiceURL", "http://localhost:4891/v1/chat/completions")
+
+				modified := true
+			}
+
+			if (getMultiMapValue(configuration, "Conversation Booster", "GPT4All.ServiceURL") = "http://localhost:4891/v1") {
+				setMultiMapValue(configuration, "Conversation Booster", "GPT4All.ServiceURL", "http://localhost:4891/v1/chat/completions")
+
+				modified := true
+			}
+
+			if modified
+				writeMultiMap(fileName, configuration)
+		}
+}
+
 updateConfigurationForV573() {
 	local ignore, fileName, configuration, provider, instruction
 

@@ -65,7 +65,7 @@ class LLMConnector {
 		Model[external := false] {
 			Get {
 				if !external {
-					if inList(this.Models, super.Model)
+					if inList(this.base.Models, super.Model)
 						return StrLower(StrReplace(super.Model, A_Space, "-"))
 					else
 						return super.Model
@@ -158,6 +158,10 @@ class LLMConnector {
 			}
 		}
 
+		CreateModelsURL(server) {
+			return StrReplace(this.CreateServiceURL(server), "chat/completions", "models")
+		}
+
 		CreatePrompt(body, instructions, question) {
 			local messages := []
 			local ignore, instruction, conversation
@@ -181,21 +185,22 @@ class LLMConnector {
 			return body
 		}
 
-		LoadModels() {
+		ParseModels(response) {
 			local result := []
+
+			for ignore, element in response["data"]
+				result.Push(element["id"])
+
+			return result
+		}
+
+		LoadModels() {
 			local models, ignore, element
 
 			try {
-				models := WinHttpRequest().GET(StrReplace(this.CreateServiceURL(this.Server)
-											 , "chat/completions", "models"), "", this.CreateHeaders()
-											 , {Encoding: "UTF-8"}).JSON
-
-				for ignore, element in models["data"]
-					result.Push(element["id"])
-
-				return result
+				return this.ParseModels(WinHttpRequest().GET(this.CreateModelsURL(this.Server), "", this.CreateHeaders(), {Encoding: "UTF-8"}).JSON)
 			}
-			catch Any {
+			catch Any as exception {
 				return []
 			}
 		}
@@ -301,14 +306,27 @@ class LLMConnector {
 
 		static GetDefaults(&serviceURL, &serviceKey, &model) {
 			serviceURL := "http://localhost:11434/v1/chat/completions"
-			serviceKey := "ollma"
+			serviceKey := "ollama"
 			model := ""
+		}
+
+		CreateModelsURL(server) {
+			return StrReplace(this.CreateServiceURL(server), "v1/chat/completions", "api/tags")
+		}
+
+		ParseModels(response) {
+			local result := []
+
+			for ignore, element in response["models"]
+				result.Push(element["name"])
+
+			return result
 		}
 	}
 
 	class GPT4AllConnector extends LLMConnector.HTTPConnector {
 		static GetDefaults(&serviceURL, &serviceKey, &model) {
-			serviceURL := "http://localhost:4891/v1"
+			serviceURL := "http://localhost:4891/v1/chat/completions"
 			serviceKey := "Any text will do the job"
 			model := ""
 		}

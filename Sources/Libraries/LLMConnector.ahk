@@ -131,7 +131,14 @@ class LLMConnector {
 				}
 
 				try {
-					answer := answer["choices"][1]["message"]["content"]
+					answer := answer["choices"][1]
+
+					if answer.Has("message")
+						answer := answer["message"]["content"]
+					else if answer.Has("text")
+						answer := answer["text"]
+					else
+						throw "Unknown answer format detected..."
 
 					this.AddConversation(question, answer)
 

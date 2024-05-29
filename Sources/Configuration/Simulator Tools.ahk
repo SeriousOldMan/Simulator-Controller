@@ -1696,13 +1696,13 @@ updateConfigurationForV574() {
 			modified := false
 
 			if (getMultiMapValue(configuration, "Driving Coach Service", "GPT4All.ServiceURL") = "http://localhost:4891/v1") {
-				setMultiMapValue(configuration, "Driving Coach Service", "GPT4All.ServiceURL", "http://localhost:4891/v1/chat/completions")
+				setMultiMapValue(configuration, "Driving Coach Service", "GPT4All.ServiceURL", "http://localhost:4891/v1/completions")
 
 				modified := true
 			}
 
 			if (getMultiMapValue(configuration, "Conversation Booster", "GPT4All.ServiceURL") = "http://localhost:4891/v1") {
-				setMultiMapValue(configuration, "Conversation Booster", "GPT4All.ServiceURL", "http://localhost:4891/v1/chat/completions")
+				setMultiMapValue(configuration, "Conversation Booster", "GPT4All.ServiceURL", "http://localhost:4891/v1/completions")
 
 				modified := true
 			}

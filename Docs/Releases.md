@@ -1,13 +1,14 @@
 ## 5.7.4.0-release 05/31/24 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
-  3. Added support for single word driver names in Team Server and all management applications.
-  4. The Assistants no longer react, when the *Push-To-Talk* button was pressed, but nothing was said.
-  5. The conversation booster no longer consume a voice command, when the invoked GPT service does not returned a valid result.
-  6. LLMs aometimes use markdown syntax in their answers. Most of this syntactical elements are now removed, so that they do not interfere with the spoken words.
-  7. [*Ollama*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#ollama) has been added to the list of supported GPT service providers. This is a GPT server, which can be installed on the local PC.
-  8. A [*Generic*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#generic) GPT service provider is now also available. This supports HTTP based GPT services, which implements the OpenAI JSON protocol.
-  9. The list of available LLMs is now automatically loaded from a GPT service provider (if supported) in the configuration dialogs.
+  3. Fixed default service URL for GPT4All.
+  4. Added support for single word driver names in Team Server and all management applications.
+  5. The Assistants no longer react, when the *Push-To-Talk* button was pressed, but nothing was said.
+  6. The conversation booster no longer consume a voice command, when the invoked GPT service does not returned a valid result.
+  7. LLMs aometimes use markdown syntax in their answers. Most of this syntactical elements are now removed, so that they do not interfere with the spoken words.
+  8. [*Ollama*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#ollama) has been added to the list of supported GPT service providers. This is a GPT server, which can be installed on the local PC.
+  9. A [*Generic*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#generic) GPT service provider is now also available. This supports HTTP based GPT services, which implements the OpenAI JSON protocol.
+  10. The list of available LLMs is now automatically loaded from a GPT service provider (if supported) in the configuration dialogs.
   
 ## 5.7.3.0-release 05/24/24
   1. Minor bugfixes, as always

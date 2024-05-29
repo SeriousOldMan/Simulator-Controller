@@ -504,7 +504,7 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 
 		if answer {
-			answer := StrReplace(answer, "**", "")
+			answer := StrReplace(answer, "*", "")
 
 			if this.Speaker
 				if this.VoiceManager.UseTalking

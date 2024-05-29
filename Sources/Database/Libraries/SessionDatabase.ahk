@@ -1992,7 +1992,6 @@ parseDriverName(fullName, &forName, &surName, &nickName) {
 		forName := ""
 		surName := ""
 	}
-
 }
 
 driverName(forName, surName, nickName) {

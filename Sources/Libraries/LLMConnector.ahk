@@ -91,7 +91,10 @@ class LLMConnector {
 			return server
 		}
 
-		CreateHeaders(headers) {
+		CreateHeaders(headers?) {
+			if !isSet(headers)
+				headers := Map()
+
 			if (Trim(this.Token) != "")
 				headers["Authorization"] := ("Bearer " . this.Token)
 
@@ -148,7 +151,13 @@ class LLMConnector {
 		}
 	}
 
-	class InstructionConnector extends LLMConnector.HTTPConnector {
+	class APIConnector extends LLMConnector.HTTPConnector {
+		Models {
+			Get {
+				return this.LoadModels()
+			}
+		}
+
 		CreatePrompt(body, instructions, question) {
 			local messages := []
 			local ignore, instruction, conversation
@@ -171,9 +180,31 @@ class LLMConnector {
 
 			return body
 		}
+
+		LoadModels() {
+			local result := []
+			local models, ignore, element
+
+			try {
+				models := WinHttpRequest().GET(StrReplace(this.CreateServiceURL(this.Server)
+											 , "chat/completions", "models"), "", this.CreateHeaders()
+											 , {Encoding: "UTF-8"}).JSON
+
+				for ignore, element in models["data"]
+					result.Push(element["id"])
+
+				return result
+			}
+			catch Any {
+				return []
+			}
+		}
 	}
 
-	class OpenAIConnector extends LLMConnector.InstructionConnector {
+	class GenericConnector extends LLMConnector.APIConnector {
+	}
+
+	class OpenAIConnector extends LLMConnector.APIConnector {
 		static Models {
 			Get {
 				return ["GPT 3.5 turbo", "GPT 4", "GPT 4 32k", "GPT 4 turbo", "GPT 4o"]
@@ -182,7 +213,7 @@ class LLMConnector {
 
 		Models {
 			Get {
-				return LLMConnector.OpenAIConnector.Models
+				return choose(super.Models, (m) => (InStr(m, "gpt") = 1))
 			}
 		}
 
@@ -202,7 +233,7 @@ class LLMConnector {
 
 		Models {
 			Get {
-				return LLMConnector.AzureConnector.Models
+				return choose(super.Models, (m) => (InStr(m, "gpt") = 1))
 			}
 		}
 
@@ -233,16 +264,10 @@ class LLMConnector {
 		}
 	}
 
-	class MistralAIConnector extends LLMConnector.InstructionConnector {
+	class MistralAIConnector extends LLMConnector.APIConnector {
 		static Models {
 			Get {
 				return ["Open Mistral 7b", "Open Mixtral 8x7b", "Open Mixtral 8x22b", "Mistral Small Latest", "Mistral Medium Latest", "Mistral Large Latest"]
-			}
-		}
-
-		Models {
-			Get {
-				return LLMConnector.MistralAIConnector.Models
 			}
 		}
 
@@ -253,22 +278,30 @@ class LLMConnector {
 		}
 	}
 
-	class OpenRouterConnector extends LLMConnector.InstructionConnector {
+	class OpenRouterConnector extends LLMConnector.APIConnector {
 		static Models {
 			Get {
 				return []
 			}
 		}
 
-		Models {
+		static GetDefaults(&serviceURL, &serviceKey, &model) {
+			serviceURL := "https://openrouter.ai/api/v1/chat/completions"
+			serviceKey := ""
+			model := ""
+		}
+	}
+
+	class OllamaConnector extends LLMConnector.APIConnector {
+		static Models {
 			Get {
-				return LLMConnector.OpenRouterConnector.Models
+				return []
 			}
 		}
 
 		static GetDefaults(&serviceURL, &serviceKey, &model) {
-			serviceURL := "https://openrouter.ai/api/v1/chat/completions"
-			serviceKey := ""
+			serviceURL := "http://localhost:11434/v1/chat/completions"
+			serviceKey := "ollma"
 			model := ""
 		}
 	}
@@ -395,7 +428,7 @@ class LLMConnector {
 
 	static Providers {
 		Get {
-			return ["OpenAI", "Mistral AI", "Azure", "OpenRouter", "GPT4All", "LLM Runtime"]
+			return ["Generic", "OpenAI", "Mistral AI", "Azure", "OpenRouter", "Ollama", "GPT4All", "LLM Runtime"]
 		}
 	}
 

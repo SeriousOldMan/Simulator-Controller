@@ -133,6 +133,21 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 			this.editInstructions(type, title)
 		}
 
+		loadModels(*) {
+			local provider := this.iCurrentProvider
+			local configuration
+
+			if provider {
+				configuration := this.iProviderConfigurations[provider]
+
+				this.loadModels(provider, this.Control["viServiceURLEdit"].Text
+										, this.Control["viServiceKeyEdit"].Text
+										, this.Control["viModelDropDown"].Text)
+			}
+			else
+				this.loadModels(false)
+		}
+
 		editorGui := Window({Descriptor: "Booster Editor", Options: "0x400000"})
 
 		this.iWindow := editorGui
@@ -175,9 +190,11 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 		widget4.OnEvent("Change", chooseProvider)
 
 		widget5 := editorGui.Add("Edit", "x" . (x1 + 102) . " yp w" . (w1 - 102) . " h23 vviServiceURLEdit")
+		widget5.OnEvent("Change", loadModels)
 
 		widget6 := editorGui.Add("Text", "x" . x0 . " yp+24 w105 h23 +0x200", translate("Service Key"))
 		widget7 := editorGui.Add("Edit", "x" . x1 . " yp w" . w1 . " h23 Password vviServiceKeyEdit")
+		widget7.OnEvent("Change", loadModels)
 
 		widget8 := editorGui.Add("Text", "x" . x0 . " yp+30 w105 h23 +0x200", translate("Model / # Tokens"))
 		widget9 := editorGui.Add("ComboBox", "x" . x1 . " yp w" . (w1 - 64) . " vviModelDropDown")
@@ -251,39 +268,49 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 		editorGui.Add("Button", "x246 yp w80 h23", translate("&Cancel")).OnEvent("Click", (*) => this.iResult := kCancel)
 	}
 
-	loadModels(provider, model) {
-		local index, serviceURL, serviceKey
+	loadModels(provider, serviceURL := false, serviceKey := false, model := false) {
+		local connector, index, models
 
-		this.Control["viModelDropDown"].Delete()
+		if provider {
+			try {
+				connector := LLMConnector.%StrReplace(provider, A_Space, "")%Connector(this, model)
 
-		if provider
-			this.Control["viModelDropDown"].Add(this.Models[provider])
+				if isInstance(connector, LLMConnector.APIConnector) {
+					connector.Connect(serviceURL, serviceKey)
+
+					models := connector.Models
+				}
+				else
+					models := this.Models[provider]
+			}
+			catch Any as exception {
+				models := this.Models[provider]
+			}
+		}
+		else
+			models := []
 
 		if model {
-			index := inList(this.Models[provider], model)
+			index := inList(models, model)
 
 			if !index {
-				this.Control["viModelDropDown"].Add([model])
-				this.Control["viModelDropDown"].Choose(this.Models[provider].Length + 1)
-			}
-			else
-				this.Control["viModelDropDown"].Choose(index)
-		}
-		else if provider {
-			try {
-				LLMConnector.%StrReplace(provider, A_Space, "")%Connector.GetDefaults(&serviceURL, &serviceKey, &model)
-			}
-			catch Any {
-				serviceURL := ""
-				serviceKey := ""
-				model := ""
+				index := inList(models, StrReplace(model, A_Space, "-"))
+
+				if index
+					model := models[index]
 			}
 
-			if inList(this.Models[provider], model)
-				this.Control["viModelDropDown"].Choose(inList(this.Models[provider], model))
-			else if (this.Models[provider].Length > 0)
-				this.Control["viModelDropDown"].Choose(1)
+			if !index
+				models := concatenate(models, [model])
 		}
+
+		this.Control["viModelDropDown"].Delete()
+		this.Control["viModelDropDown"].Add(models)
+
+		if model
+			this.Control["viModelDropDown"].Choose(inList(models, model))
+		else
+			this.Control["viModelDropDown"].Choose((models.Length > 0) ? 1 : 0)
 	}
 
 	normalizeConfiguration(configuration) {
@@ -446,9 +473,11 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 			for ignore, setting in ["ServiceURL", "ServiceKey", "MaxTokens"]
 				this.Control["vi" . setting . "Edit"].Text := configuration[setting]
 
-			if ((provider = "GPT4All") && (Trim(this.Control["viServiceKeyEdit"].Text) = "")
-									   && (Trim(this.Control["viServiceURLEdit"].Text) = "http://localhost:4891/v1"))
+			if ((provider = "GPT4All") && (Trim(this.Control["viServiceKeyEdit"].Text) = ""))
 				this.Control["viServiceKeyEdit"].Text := "Any text will do the job"
+
+			if ((provider = "Ollama") && (Trim(this.Control["viServiceKeyEdit"].Text) = ""))
+				this.Control["viServiceKeyEdit"].Text := "Ollama"
 
 			for ignore, setting in ["Speaker", "Listener", "Conversation"]
 				this.Control["vi" . setting . "Check"].Value := configuration[setting]
@@ -463,7 +492,12 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 			this.Control["viConversationTemperatureEdit"].Text := (isNumber(configuration["ConversationTemperature"]) ? Round(configuration["ConversationTemperature"] * 100) : "")
 		}
 
-		this.loadModels(this.iCurrentProvider, (this.iCurrentProvider ? configuration["Model"] : false))
+		if this.iCurrentProvider
+			this.loadModels(this.iCurrentProvider, configuration["ServiceURL"]
+												 , configuration["ServiceKey"]
+												 , configuration["Model"])
+		else
+			this.loadModels(false)
 	}
 
 	saveProviderConfiguration() {
@@ -564,7 +598,7 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 
 		if this.iCurrentProvider {
 			this.Control["viServiceURLEdit"].Enabled := (this.Control["viProviderDropDown"].Text != "LLM Runtime")
-			this.Control["viServiceKeyEdit"].Enabled := (this.Control["viProviderDropDown"].Text != "LLM Runtime")
+			this.Control["viServiceKeyEdit"].Enabled := !inList(["GPT4All", "Ollama", "LLM Runtime"], this.Control["viProviderDropDown"].Text)
 
 			this.Control["viSpeakerCheck"].Enabled := true
 			this.Control["viListenerCheck"].Enabled := true

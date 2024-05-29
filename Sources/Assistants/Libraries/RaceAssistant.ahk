@@ -862,12 +862,12 @@ class RaceAssistant extends ConfigurationItem {
 					return
 				}
 			}
+		}
 
-			if this.VoiceManager.Grammars.Has("?") {
-				this.getSpeaker().speakPhrase("Repeat")
+		if this.VoiceManager.Grammars.Has("?") {
+			this.getSpeaker().speakPhrase("Repeat")
 
-				return
-			}
+			return
 		}
 
 		throw "Unknown grammar `"" . grammar . "`" detected in RaceAssistant.handleVoiceText...."

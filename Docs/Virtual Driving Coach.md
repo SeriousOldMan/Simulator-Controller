@@ -96,6 +96,10 @@ Installation requires you to choose one of the supported large language model pr
 
 The performance and - even more important - the knowledge about the motorsport domain varies between different models. I have made good experience with "GPT 3.5 turbo" and "GPT 4 turbo" from OpenAI, as well as with "Open Mixtral 8x22b" from Mistral AI. Models from the Open Source are a bit more restricted, but "Wizard 1.2", for example, makes a decent job. In the end, you may want to experiment by yourself, but I recommend "GPT 3.5 turbo" as a starting point at the time of this writing. Using LLMs for non-English conversation is a different story. In this case, you will notice, that models from the Open Source will not deliver good results in most cases.
 
+### Generic
+
+This one supports any GPT service provider, which implements the JSON-based instruction protocol defined by OpenAI (see next entry).
+
 ### OpenAI
 
 When you have chosen OpenAI, which I recommend, you will have to create an account on [OpenAI](https://openai.com). You will have to invest a couple of bucks to charge up your account - $5 will be more than enough. Follow these steps:
@@ -116,6 +120,12 @@ Very similar to OpenAI. Create an account on [Mistral AI](https://console.mistra
 ### OpenRouter
 
 [OpenRouter](https://openrouter.ai) is a kind of gateway and hosting environment for many models of different providers, even many source LLMs are available here. It has become my favorite provider in the sense of a one-stop-shop for LLM access. You have to buy a few credits (5$ at least) [here](https://openrouter.ai/credits), before you can use the service. Then create an API key in your user account and include it in the configuration as described above. The last step is to choose the model you want to use from the very long list [here](https://openrouter.ai/models). There are even models available, which do not create any costs when called through the API, like the "meta-llama/llama-3-8b-instruct:free". But as mentioned above, the performance and domain knowledge might not meet your expectations.
+
+### Ollama
+
+Ollama is a free GPT server, which can be run anywhere, including your local PC. It can be downloaded from the [Ollama webiste](https://ollama.com/) for different operating systems incl. Windows. The websste also provides downloads for several LLMs, but you can also use models from other sources.
+
+Documentation for installation and setup can be found on the [Github page](https://github.com/ollama/ollama). Although Ollama is a very powerful solution for setting up your own LLM server, it requires a lot of technical skills and is therefore not for everyone. For a more simple and easy-to-use solution see the next section.
 
 ### GPT4All
 

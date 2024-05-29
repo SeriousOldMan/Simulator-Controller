@@ -433,9 +433,14 @@ class VoiceManager extends ConfigurationItem {
 
 		splitText(text) {
 			local booster := this.Booster
+			local alternateText
 
-			if (booster && (booster.Mode = "Always"))
-				text := booster.recognize(text)
+			if (booster && (booster.Mode = "Always")) {
+				alternateText := booster.recognize(text)
+
+				if (alternateText && (alternateText != ""))
+					text := alternateText
+			}
 
 			return super.splitText(text)
 		}
@@ -447,7 +452,7 @@ class VoiceManager extends ConfigurationItem {
 			if (booster && (booster.Mode = "Unknown")) {
 				alternateText := booster.recognize(text)
 
-				if (alternateText != text) {
+				if (alternateText && (alternateText != "") && (alternateText != text)) {
 					text := alternateText
 
 					return true
@@ -1424,7 +1429,7 @@ class VoiceManager extends ConfigurationItem {
 
 	textRecognized(grammar, text, remote := false) {
 		local matchText := text
-		local words, recognizedGrammar
+		local alternateText, words, recognizedGrammar
 
 		if (this.Debug[kDebugRecognitions] && !remote)
 			showMessage("Text recognized: " . text)
@@ -1433,13 +1438,20 @@ class VoiceManager extends ConfigurationItem {
 
 		try {
 			if (this.iRecognizerMode = "Mixed") {
-				if (this.Booster && (this.Booster.Mode = "Always"))
-					matchText := this.Booster.recognize(matchText)
+				if (this.Booster && (this.Booster.Mode = "Always")) {
+					alternateText := this.Booster.recognize(matchText)
+
+					if (alternateText && (alternateText != ""))
+						matchText := alternateText
+				}
 
 				recognizedGrammar := this.matchCommand(matchText, &words)
 
 				if (this.Booster && !recognizedGrammar && (this.Booster.Mode = "Unknown")) {
-					matchText := this.Booster.recognize(matchText)
+					alternateText := this.Booster.recognize(matchText)
+
+					if (alternateText && (alternateText != ""))
+						matchText := alternateText
 
 					recognizedGrammar := this.matchCommand(matchText, &words)
 				}

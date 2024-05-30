@@ -1,15 +1,15 @@
 [Development]
-Version=5.7.4.0-alpha
+Version=5.7.4.0-release
 Target=5.7.4.0-release
-Date=05/30/2024
-Download=https://www.dropbox.com/scl/fi/lm7aejobfug5zrw52kvea/Simulator-Controller-5.7.4.0-alpha.zip?rlkey=gk3lgotfrkk2torh67nofn0za&st=504dm7yk&dl=1
+Date=05/31/2024
+Download=https://cutt.ly/zeuyg6aJ;https://www.dropbox.com/scl/fi/07bgg8pbn1ivtmb2dq3yl/Simulator-Controller-5.7.4.0-release.zip?rlkey=d7vtmlaynqtodly4ka1mhxnid&st=pyzobqz5&dl=1
 Changes=Added support for Ollama, Added support for generic GPT service provider, Bugfixes for conversation booster, Fixed P2T without saying anything, Increased compatibility with silly LLMs, Load models from GPT service provider, Migrated to AHK 2.0.16
 Components=Media->5.6.1,Configuration->5.7.3,Utilities->5.4.8
 [Release]
-Version=5.7.3.0-release
-Date=05/24/2024
-Download=https://cutt.ly/WetJjOCc;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.7.3.0-release.zip
-Changes=New editor for conversation booster instructions, Updated conversation booster instructions for more domain specifity, Fixed translations of checkable menu items, Fixed tyre pressures for prepared pitstops in session info (introduced with 5.7.2), Updated instructions for Driver Coach, Optimized Team Server timeout handling, Spotter announces valid and invalid laps of other cars in qualification, Rephrasing booster now also for many Spooter phrases, Team Management editor in "Simulator Startup", Fixed tyre pressure announcements in team sessions, Fixed pitstop initialization in "Race Center" in case of lap 1 pitstops, Added support for OpenRouter AI as GPT service provider, Fixed unwanted re-enabling of simulators and applications by "Simulator Setup"
+Version=5.7.4.0-release
+Date=05/31/2024
+Download=https://cutt.ly/zeuyg6aJ;https://www.dropbox.com/scl/fi/07bgg8pbn1ivtmb2dq3yl/Simulator-Controller-5.7.4.0-release.zip?rlkey=d7vtmlaynqtodly4ka1mhxnid&st=pyzobqz5&dl=1
+Changes=Added support for Ollama, Added support for generic GPT service provider, Bugfixes for conversation booster, Fixed P2T without saying anything, Increased compatibility with silly LLMs, Load models from GPT service provider, Migrated to AHK 2.0.16
 Components=Media->5.6.1,Configuration->5.7.3,Utilities->5.4.8
 [Components]
 Media.5.6.1.Path=Resources
@@ -22,7 +22,7 @@ Utilities.5.4.8.Path=.
 Utilities.5.4.8.Content=Utilities
 Utilities.5.4.8.Download=https://www.dropbox.com/scl/fi/5nduffajjm3x6rhsxr1nk/Utilities-5.4.8.zip?rlkey=alrj8l2z205dd2vm9cu6hbsot&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+5.4.8.zip
 [Current]
-Type=Development
+Type=Release
 [Version]
-Development=5.7.4.0-alpha
-Release=5.7.3.0-release
+Development=5.7.4.0-release
+Release=5.7.4.0-release

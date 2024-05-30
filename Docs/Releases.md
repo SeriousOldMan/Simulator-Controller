@@ -1,4 +1,4 @@
-## 5.7.4.0-release 05/31/24 (planned)
+## 5.7.4.0-release 05/31/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Added support for single word driver names in Team Server and all management applications.

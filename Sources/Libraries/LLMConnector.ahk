@@ -117,7 +117,7 @@ class LLMConnector {
 				FileAppend(body, kTempDirectory . "LLM.request")
 			}
 
-			answer := WinHttpRequest().POST(this.CreateServiceURL(this.Server), body, headers, {Object: true, Encoding: "UTF-8"})
+			answer := WinHttpRequest({Timeouts: [0, 60000, 30000, 60000]}).POST(this.CreateServiceURL(this.Server), body, headers, {Object: true, Encoding: "UTF-8"})
 
 			if ((answer.Status >= 200) && (answer.Status < 300)) {
 				this.Manager.connectorState("Active")
@@ -291,12 +291,6 @@ class LLMConnector {
 	}
 
 	class OpenRouterConnector extends LLMConnector.APIConnector {
-		static Models {
-			Get {
-				return []
-			}
-		}
-
 		static GetDefaults(&serviceURL, &serviceKey, &model) {
 			serviceURL := "https://openrouter.ai/api/v1/chat/completions"
 			serviceKey := ""
@@ -305,12 +299,6 @@ class LLMConnector {
 	}
 
 	class OllamaConnector extends LLMConnector.APIConnector {
-		static Models {
-			Get {
-				return []
-			}
-		}
-
 		static GetDefaults(&serviceURL, &serviceKey, &model) {
 			serviceURL := "http://localhost:11434/v1/chat/completions"
 			serviceKey := "ollama"
@@ -331,38 +319,11 @@ class LLMConnector {
 		}
 	}
 
-	class GPT4AllConnector extends LLMConnector.HTTPConnector {
+	class GPT4AllConnector extends LLMConnector.APIConnector {
 		static GetDefaults(&serviceURL, &serviceKey, &model) {
 			serviceURL := "http://localhost:4891/v1/chat/completions"
 			serviceKey := "Any text will do the job"
 			model := ""
-		}
-
-		CreatePrompt(body, instructions, question) {
-			local prompt := ""
-			local ignore, instruction, conversation
-
-			addInstruction(instruction) {
-				if (instruction && (Trim(instruction) != "")) {
-					if (prompt = "")
-						prompt .= "### System:`n"
-
-					prompt .= (instruction . "`n")
-				}
-			}
-
-			do(instructions, addInstruction)
-
-			for ignore, conversation in this.History {
-				prompt .= ("### Human:`n" . conversation[1] . "`n")
-				prompt .= ("### Assistant:`n" . conversation[2] . "`n")
-			}
-
-			prompt .= ("### Human:`n" . question . "`n### Assistant:")
-
-			body.prompt := prompt
-
-			return body
 		}
 	}
 

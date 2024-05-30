@@ -57,6 +57,9 @@ class WinHTTPRequest extends WinHttpRequest._Call {
 
         if (options.HasProp("UA")) ; UserAgentString
             this.whr.Option[0] := options.UA
+
+        if (options.HasProp("Timeouts"))
+            this.SetTimeouts(options.Timeouts*)
     }
 
     __Delete() {
@@ -113,6 +116,13 @@ class WinHTTPRequest extends WinHttpRequest._Call {
         }
 
         return result
+    }
+
+    SetTimeouts(resolve := 0, connect := 60000, send := 30000, receive := 30000) {
+        if (!this.whr)
+            throw "Internal error detected in WinHTTPRequest.SetTimeouts..."
+
+        this.whr.SetTimeouts(resolve, connect, send, receive)
     }
 
     Request(method, url, body := "", headers := false, options := false) {

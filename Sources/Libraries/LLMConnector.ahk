@@ -291,12 +291,6 @@ class LLMConnector {
 	}
 
 	class OpenRouterConnector extends LLMConnector.APIConnector {
-		static Models {
-			Get {
-				return []
-			}
-		}
-
 		static GetDefaults(&serviceURL, &serviceKey, &model) {
 			serviceURL := "https://openrouter.ai/api/v1/chat/completions"
 			serviceKey := ""
@@ -305,12 +299,6 @@ class LLMConnector {
 	}
 
 	class OllamaConnector extends LLMConnector.APIConnector {
-		static Models {
-			Get {
-				return []
-			}
-		}
-
 		static GetDefaults(&serviceURL, &serviceKey, &model) {
 			serviceURL := "http://localhost:11434/v1/chat/completions"
 			serviceKey := "ollama"
@@ -331,6 +319,15 @@ class LLMConnector {
 		}
 	}
 
+	class GPT4AllConnector extends LLMConnector.APIConnector {
+		static GetDefaults(&serviceURL, &serviceKey, &model) {
+			serviceURL := "http://localhost:4891/v1/chat/completions"
+			serviceKey := "Any text will do the job"
+			model := ""
+		}
+	}
+
+	/*
 	class GPT4AllConnector extends LLMConnector.HTTPConnector {
 		static GetDefaults(&serviceURL, &serviceKey, &model) {
 			serviceURL := "http://localhost:4891/v1/chat/completions"
@@ -365,6 +362,7 @@ class LLMConnector {
 			return body
 		}
 	}
+	*/
 
 	class LLMRuntimeConnector extends LLMConnector {
 		CreatePrompt(instructions, question) {

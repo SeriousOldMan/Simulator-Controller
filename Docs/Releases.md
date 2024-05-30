@@ -4,12 +4,13 @@
   3. Added support for single word driver names in Team Server and all management applications.
   4. The Assistants no longer react, when the *Push-To-Talk* button was pressed, but nothing was said.
   5. Fixed default service URL for GPT4All.
-  6. Adopted GPT4All 2.8 API. SHould be running stable now in all situations.
+  6. Adopted *GPT4All* 2.8 API. Should be running stable now in all situations.
   7. The conversation booster no longer consume a voice command, when the invoked GPT service does not returned a valid result.
   8. LLMs aometimes use markdown syntax in their answers. Most of this syntactical elements are now removed, so that they do not interfere with the spoken words.
   9. [*Ollama*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#ollama) has been added to the list of supported GPT service providers. This is a GPT server, which can be installed on the local PC.
   10. A [*Generic*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#generic) GPT service provider is now also available. This supports HTTP based GPT services, which implements the OpenAI JSON protocol.
   11. The list of available LLMs is now automatically loaded from a GPT service provider (if supported) in the configuration dialogs.
+  12. [Internal] Migrated to AHK 2.0.16.
   
 ## 5.7.3.0-release 05/24/24
   1. Minor bugfixes, as always

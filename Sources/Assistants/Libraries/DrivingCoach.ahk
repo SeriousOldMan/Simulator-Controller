@@ -113,7 +113,7 @@ class DrivingCoach extends GridRaceAssistant {
 		Get {
 			if isSet(type) {
 				if (type == true)
-					return ["Character", "Simulation", "Session", "Stint", "Telemetry", "Handling"]
+					return ["Character", "Simulation", "Session", "Stint", "Knowledge", "Handling"]
 				else
 					return (this.iInstructions.Has(type) ? this.iInstructions[type] : false)
 			}
@@ -371,10 +371,9 @@ class DrivingCoach extends GridRaceAssistant {
 																			  , laps: lapData, standings: standingsData})
 					}
 				}
-			case "Telemetry":
+			case "Knowledge":
 				if knowledgeBase
-					return substituteVariables(this.Instructions["Telemetry"]
-											 , {telemetry: this.createTelemetryInfo({exclude: ["Car", "Standings", "Position"]})})
+					return substituteVariables(this.Instructions["Knowledge"], {knowledge: JSON.print(this.getKnowledge())})
 			case "Handling":
 				if (knowledgeBase && this.Announcements["HandlingInformation"]) {
 					collector := this.iTelemetryCollector

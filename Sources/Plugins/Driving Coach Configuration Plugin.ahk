@@ -82,7 +82,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 			if qualified
 				return ["Instructions.Character", "Instructions.Simulation", "Instructions.Session", "Instructions.Stint", "Instructions.Telemetry", "Instructions.Handling"]
 			else
-				return ["Character", "Simulation", "Session", "Stint", "Telemetry", "Handling"]
+				return ["Character", "Simulation", "Session", "Stint", "Knowledge", "Handling"]
 		}
 	}
 

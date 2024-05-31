@@ -350,8 +350,37 @@ class RaceEngineer extends RaceAssistant {
 		}
 	}
 
-	createTelemetryInfo() {
-		return super.createTelemetryInfo({exclude: ["Car", "Standings", "Position"]})
+	getKnowledge() {
+		local knowledge := super.getKnowledge()
+
+
+/*
+
+			setMultiMapValue(sessionInfo, "Tyres", "Set", getMultiMapValue(data, "Car Data", "TyreSet", false))
+			setMultiMapValue(sessionInfo, "Tyres", "Pressures", getMultiMapValue(data, "Car Data", "TyrePressure", ""))
+			setMultiMapValue(sessionInfo, "Tyres", "Pressures.Hot", getMultiMapValue(data, "Car Data", "TyrePressure", ""))
+			setMultiMapValue(sessionInfo, "Tyres", "Temperatures", getMultiMapValue(data, "Car Data", "TyreTemperature", ""))
+
+			tyreWear := getMultiMapValue(data, "Car Data", "TyreWear", "")
+
+			if (tyreWear != "") {
+				tyreWear := string2Values(",", tyreWear)
+
+				setMultiMapValue(sessionInfo, "Tyres", "Wear", values2String(",", Round(tyreWear[1]), Round(tyreWear[2]), Round(tyreWear[3]), Round(tyreWear[4])))
+			}
+
+			setMultiMapValue(sessionInfo, "Brakes", "Temperatures", getMultiMapValue(data, "Car Data", "BrakeTemperature", ""))
+
+			brakeWear := getMultiMapValue(data, "Car Data", "BrakeWear", "")
+
+			if (brakeWear != "") {
+				brakeWear := string2Values(",", brakeWear)
+
+				setMultiMapValue(sessionInfo, "Brakes", "Wear", values2String(",", Round(brakeWear[1]), Round(brakeWear[2]), Round(brakeWear[3]), Round(brakeWear[4])))
+			}
+*/
+
+		return knowledge
 	}
 
 	requestInformation(category, arguments*) {

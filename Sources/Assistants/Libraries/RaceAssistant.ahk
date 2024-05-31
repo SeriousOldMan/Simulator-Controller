@@ -801,7 +801,6 @@ class RaceAssistant extends ConfigurationItem {
 									, "RemainingLaps", Ceil(knowledgeBase.getValue("Lap.Remaining.Session", 0))
 									, "RemainingTime", (Round(knowledgeBase.getValue("Session.Time.Remaining") / 1000) . " seconds"))
 					 , "Stint", Map("Driver", this.DriverFullName
-								  , "Position", knowledgeBase.getValue("Position", 0)
 								  , "Lap", (lapNumber + 1)
 								  , "RemainingTime", (Round(Min(knowledgeBase.getValue("Driver.Time.Remaining"), knowledgeBase.getValue("Driver.Time.Stint.Remaining")) / 1000) . " Seconds"))
 					 , "Fuel", Map("Capacity", (knowledgeBase.getValue("Session.Settings.Fuel.Max") . " Liter")
@@ -2101,8 +2100,9 @@ class GridRaceAssistant extends RaceAssistant {
 
 		getCar(car) {
 			return Map("Nr", knowledgeBase.getValue("Car." . car . ".Nr", false)
-					 , "LapTime", (Round(knowledgeBase.getValue("Car." . car . ".Time", 0) / 1000, 1) . " Seconds")
 					 , "Laps", knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap", 0))
+					 , "Position", this.getPosition(car, "Class")
+					 , "LapTime", (Round(knowledgeBase.getValue("Car." . car . ".Time", 0) / 1000, 1) . " Seconds")
 					 , "Delta", (Round(knowledgeBase.getValue("Position.Standings.Class.Leader.Delta", 0) / 1000, 1) . " Seconds")
 					 , "InPit", (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false)))
 		}
@@ -2110,6 +2110,9 @@ class GridRaceAssistant extends RaceAssistant {
 		if knowledgeBase {
 			position := this.getPosition()
 			classPosition := (this.MultiClass ? this.getPosition(false, "Class") : position)
+
+			knowledge["Stint"]["OverallPosition", position]
+			knowledge["Stint"]["ClassPosition", classPosition]
 
 			positions := Map("OverallPosition", position, "ClassPosition", classPosition)
 

@@ -42,6 +42,7 @@ Release 5.6.4=Release 5.6.1 -> updateStreamDeckIconPreset, updateActionLabels, u
 Release 5.6.7=Release 5.6.4 -> updateConfigurationForV567
 Release 5.7.2=Release 5.6.7 -> updateConfigurationForV572
 Release 5.7.3=Release 5.7.2 -> updateConfigurationForV573
+Release 5.7.4=Release 5.7.3 -> updateConfigurationForV574
 [Cleanup]
 Binaries Folder=%kBinariesDirectory%
 Logs Folder=%kLogsDirectory%

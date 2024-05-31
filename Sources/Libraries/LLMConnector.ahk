@@ -65,7 +65,7 @@ class LLMConnector {
 		Model[external := false] {
 			Get {
 				if !external {
-					if inList(this.Models, super.Model)
+					if inList(this.base.Models, super.Model)
 						return StrLower(StrReplace(super.Model, A_Space, "-"))
 					else
 						return super.Model
@@ -117,7 +117,7 @@ class LLMConnector {
 				FileAppend(body, kTempDirectory . "LLM.request")
 			}
 
-			answer := WinHttpRequest().POST(this.CreateServiceURL(this.Server), body, headers, {Object: true, Encoding: "UTF-8"})
+			answer := WinHttpRequest({Timeouts: [0, 60000, 30000, 60000]}).POST(this.CreateServiceURL(this.Server), body, headers, {Object: true, Encoding: "UTF-8"})
 
 			if ((answer.Status >= 200) && (answer.Status < 300)) {
 				this.Manager.connectorState("Active")
@@ -131,7 +131,14 @@ class LLMConnector {
 				}
 
 				try {
-					answer := answer["choices"][1]["message"]["content"]
+					answer := answer["choices"][1]
+
+					if answer.Has("message")
+						answer := answer["message"]["content"]
+					else if answer.Has("text")
+						answer := answer["text"]
+					else
+						throw "Unknown answer format detected..."
 
 					this.AddConversation(question, answer)
 
@@ -158,6 +165,10 @@ class LLMConnector {
 			}
 		}
 
+		CreateModelsURL(server) {
+			return StrReplace(this.CreateServiceURL(server), "chat/completions", "models")
+		}
+
 		CreatePrompt(body, instructions, question) {
 			local messages := []
 			local ignore, instruction, conversation
@@ -181,21 +192,22 @@ class LLMConnector {
 			return body
 		}
 
-		LoadModels() {
+		ParseModels(response) {
 			local result := []
+
+			for ignore, element in response["data"]
+				result.Push(element["id"])
+
+			return result
+		}
+
+		LoadModels() {
 			local models, ignore, element
 
 			try {
-				models := WinHttpRequest().GET(StrReplace(this.CreateServiceURL(this.Server)
-											 , "chat/completions", "models"), "", this.CreateHeaders()
-											 , {Encoding: "UTF-8"}).JSON
-
-				for ignore, element in models["data"]
-					result.Push(element["id"])
-
-				return result
+				return this.ParseModels(WinHttpRequest().GET(this.CreateModelsURL(this.Server), "", this.CreateHeaders(), {Encoding: "UTF-8"}).JSON)
 			}
-			catch Any {
+			catch Any as exception {
 				return []
 			}
 		}
@@ -279,26 +291,6 @@ class LLMConnector {
 	}
 
 	class OpenRouterConnector extends LLMConnector.APIConnector {
-		static Models {
-			Get {
-				return []
-			}
-		}
-
-		static GetDefaults(&serviceURL, &serviceKey, &model) {
-			serviceURL := "https://openrouter.ai/api/v1/chat/completions"
-			serviceKey := ""
-			model := ""
-		}
-	}
-
-	class OllamaConnector extends LLMConnector.APIConnector {
-		static Models {
-			Get {
-				return []
-			}
-		}
-
 		static GetDefaults(&serviceURL, &serviceKey, &model) {
 			serviceURL := "http://localhost:11434/v1/chat/completions"
 			serviceKey := "ollma"
@@ -306,38 +298,32 @@ class LLMConnector {
 		}
 	}
 
-	class GPT4AllConnector extends LLMConnector.HTTPConnector {
+	class OllamaConnector extends LLMConnector.APIConnector {
 		static GetDefaults(&serviceURL, &serviceKey, &model) {
-			serviceURL := "http://localhost:4891/v1"
-			serviceKey := "Any text will do the job"
+			serviceURL := "http://localhost:11434/v1/chat/completions"
+			serviceKey := "ollama"
 			model := ""
 		}
 
-		CreatePrompt(body, instructions, question) {
-			local prompt := ""
-			local ignore, instruction, conversation
+		CreateModelsURL(server) {
+			return StrReplace(this.CreateServiceURL(server), "v1/chat/completions", "api/tags")
+		}
 
-			addInstruction(instruction) {
-				if (instruction && (Trim(instruction) != "")) {
-					if (prompt = "")
-						prompt .= "### System:`n"
+		ParseModels(response) {
+			local result := []
 
-					prompt .= (instruction . "`n")
-				}
-			}
+			for ignore, element in response["models"]
+				result.Push(element["name"])
 
-			do(instructions, addInstruction)
+			return result
+		}
+	}
 
-			for ignore, conversation in this.History {
-				prompt .= ("### Human:`n" . conversation[1] . "`n")
-				prompt .= ("### Assistant:`n" . conversation[2] . "`n")
-			}
-
-			prompt .= ("### Human:`n" . question . "`n### Assistant:")
-
-			body.prompt := prompt
-
-			return body
+	class GPT4AllConnector extends LLMConnector.APIConnector {
+		static GetDefaults(&serviceURL, &serviceKey, &model) {
+			serviceURL := "http://localhost:4891/v1/chat/completions"
+			serviceKey := "Any text will do the job"
+			model := ""
 		}
 	}
 

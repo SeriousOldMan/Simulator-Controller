@@ -351,12 +351,17 @@ class RaceEngineer extends RaceAssistant {
 	}
 
 	getKnowledge() {
+		local knowledgeBase := this.KnowledgeBase
 		local knowledge := super.getKnowledge()
+		local lapNumber, tyres, brakes
 
+		if (knowledge && knowledgeBase) {
+			lapNumber := knowledgeBase.getValue("Lap", 0)
+			tyres := knowledge["Tyres"]
 
-/*
+			tyres["Set"] := knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Set", false)
 
-			setMultiMapValue(sessionInfo, "Tyres", "Set", getMultiMapValue(data, "Car Data", "TyreSet", false))
+			/*
 			setMultiMapValue(sessionInfo, "Tyres", "Pressures", getMultiMapValue(data, "Car Data", "TyrePressure", ""))
 			setMultiMapValue(sessionInfo, "Tyres", "Pressures.Hot", getMultiMapValue(data, "Car Data", "TyrePressure", ""))
 			setMultiMapValue(sessionInfo, "Tyres", "Temperatures", getMultiMapValue(data, "Car Data", "TyreTemperature", ""))
@@ -378,7 +383,8 @@ class RaceEngineer extends RaceAssistant {
 
 				setMultiMapValue(sessionInfo, "Brakes", "Wear", values2String(",", Round(brakeWear[1]), Round(brakeWear[2]), Round(brakeWear[3]), Round(brakeWear[4])))
 			}
-*/
+			*/
+		}
 
 		return knowledge
 	}

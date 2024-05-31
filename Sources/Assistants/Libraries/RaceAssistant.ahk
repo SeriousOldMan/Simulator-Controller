@@ -2104,7 +2104,7 @@ class GridRaceAssistant extends RaceAssistant {
 					 , "Position", this.getPosition(car, "Class")
 					 , "LapTime", (Round(knowledgeBase.getValue("Car." . car . ".Time", 0) / 1000, 1) . " Seconds")
 					 , "Delta", (Round(knowledgeBase.getValue("Position.Standings.Class.Leader.Delta", 0) / 1000, 1) . " Seconds")
-					 , "InPit", (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false)))
+					 , "InPit", (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false)) ? kTrue : kFalse)
 		}
 
 		if knowledgeBase {

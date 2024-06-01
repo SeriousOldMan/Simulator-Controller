@@ -796,6 +796,7 @@ class RaceAssistant extends ConfigurationItem {
 			return Map("Session", Map("Simulator", this.SettingsDatabase.getSimulatorName(this.Simulator)
 									, "Car", this.SettingsDatabase.getCarName(this.Simulator, this.Car)
 									, "Track", this.SettingsDatabase.getTrackName(this.Simulator, this.Track)
+									, "TrackLength", (this.TrackLength . " Meters")
 									, "Type", sessionTypes[this.Session]
 									, "Format", knowledgeBase.getValue("Session.Format", "Time")
 									, "RemainingLaps", Ceil(knowledgeBase.getValue("Lap.Remaining.Session", 0))
@@ -825,7 +826,7 @@ class RaceAssistant extends ConfigurationItem {
 		if (grammar = "Text") {
 			if this.Booster {
 				text := this.Booster.ask(text, Map("Variables", {assistant: this.AssistantType, name: this.VoiceManager.Name
-															   , knowledge: JSON.print(this.getKnowledge())}))
+															   , knowledge: JSON.print(this.getKnowledge(), "  ")}))
 
 				if text {
 					if this.VoiceManager.UseTalking
@@ -2108,11 +2109,14 @@ class GridRaceAssistant extends RaceAssistant {
 							   , "Laps", knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap", 0))
 							   , "OverallPosition", this.getPosition(car, "Overall")
 							   , "ClassPosition", this.getPosition(car, "Class")
+							   , "DistanceIntoTrack", ((this.getRunning(car) * this.TrackLength) . " Meters")
 							   , "LapTime", (Round(knowledgeBase.getValue("Car." . car . ".Time", 0) / 1000, 1) . " Seconds")
 							   , "InPit", (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false)) ? kTrue : kFalse)
 
 			if isSet(type)
 				carData["Delta"] := (Round(knowledgeBase.getValue("Position.Standings.Class." . type . ".Delta", 0) / 1000, 1) . " Seconds")
+			else
+				carData["Delta"] := (Round(this.getDelta(car) / 1000, 1) . " Seconds")
 
 			return carData
 		}
@@ -3049,6 +3053,13 @@ class GridRaceAssistant extends RaceAssistant {
 			return getMultiMapValue(data, "Position Data", "Car." . car . ".Position", car)
 		else
 			return (knowledgeBase ? knowledgeBase.getValue("Car." . car . ".Position", car) : 0)
+	}
+
+	getRunning(car, data := false) {
+		if data
+			return getMultiMapValue(data, "Position Data", "Car." . car . ".Lap.Running")
+		else
+			return this.KnowledgeBase.getValue("Car." . car . ".Lap.Running")
 	}
 
 	getDelta(car, data := false) {

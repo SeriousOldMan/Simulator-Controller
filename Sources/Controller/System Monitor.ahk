@@ -914,7 +914,7 @@ systemMonitor(command := false, arguments*) {
 
 				tyreCompound := getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Compound")
 
-				if tyreCompound {
+				if (tyreCompound && (tyreCompound != "-")) {
 					tyreCompound := translate(compound(tyreCompound, getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Compound.Color")))
 
 					html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyres") . "</th><td class=`"td-wdg`" colspan=`"2`">" . tyreCompound . "</td></tr>")
@@ -953,7 +953,7 @@ systemMonitor(command := false, arguments*) {
 
 				tyreCompound := getMultiMapValue(sessionState, "Pitstop", "Target.Tyre.Compound")
 
-				if tyreCompound {
+				if (tyreCompound && (tyreCompound != "-")) {
 					tyreCompound := translate(normalizeCompound(tyreCompound))
 
 					html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyres") . "</th><td class=`"td-wdg`" colspan=`"2`">" . tyreCompound . "</td></tr>")

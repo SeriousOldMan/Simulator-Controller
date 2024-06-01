@@ -1883,10 +1883,14 @@ class RaceEngineer extends RaceAssistant {
 		if knowledgeBase {
 			setMultiMapValue(sessionInfo, "Pitstop", "Target.Fuel.Amount", knowledgeBase.getValue("Fuel.Amount.Target", 0))
 
-			if knowledgeBase.getValue("Tyre.Compound.Target", false)
-				setMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Compound"
-											, compound(knowledgeBase.getValue("Tyre.Compound.Target")
-													 , knowledgeBase.getValue("Tyre.Compound.Color.Target")))
+			if knowledgeBase.getValue("Tyre.Compound.Target", false) {
+				if knowledgeBase.getValue("Tyre.Compound.Color.Target", false)
+					setMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Compound"
+												, compound(knowledgeBase.getValue("Tyre.Compound.Target")
+														 , knowledgeBase.getValue("Tyre.Compound.Color.Target")))
+				else
+					setMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Compound", knowledgeBase.getValue("Tyre.Compound.Target"))
+			}
 			else
 				setMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Compound", "-")
 

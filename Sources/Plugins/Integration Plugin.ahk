@@ -339,7 +339,7 @@ class IntegrationPlugin extends ControllerPlugin {
 
 			tyreCompound := getMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Compound")
 
-			if tyreCompound {
+			if (tyreCompound && (tyreCompound != "-")) {
 				tyreCompound := translate(compound(tyreCompound, getMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Compound.Color")))
 
 				state["TyreCompound"] := tyreCompound
@@ -380,8 +380,8 @@ class IntegrationPlugin extends ControllerPlugin {
 
 			tyreCompound := getMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Compound")
 
-			if tyreCompound {
-				tyreCompound := translate(compound(tyreCompound, getMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Compound.Color")))
+			if (tyreCompound && (tyreCompound != "-")) {
+				tyreCompound := translate(normalizeCompound(tyreCompound))
 
 				state["TyreCompound"] := tyreCompound
 

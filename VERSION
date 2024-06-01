@@ -1,7 +1,7 @@
 [Development]
 Version=5.7.5.0-dev
 Target=5.7.5.0-release
-Date=05/31/2024
+Date=06/01/2024
 Download=
 Changes=New "Knowledge" instruction for Driving Coach and Conversation Booster
 Components=Media->5.6.1,Configuration->5.7.3,Utilities->5.4.8

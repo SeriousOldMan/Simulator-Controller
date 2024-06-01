@@ -1,3 +1,10 @@
+## 5.7.5.0-release 06/07/24 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. The "Telemetry" instruction has been removed for both the Driving Coach and the Conversation Booster. It has been substituted by the new "Knowledge" instruction. This instruction provides the knowledge of a given Assistant now in JSON format to the LLM, which results in a much better understanding of the state of the car, strategy, standings and other important information by the LLM.
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-575), especially if you have configured and are using the Driving Coach.
+
 ## 5.7.4.0-release 05/31/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
@@ -36,7 +43,7 @@
   20. [*OpenRouter*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#openrouter) has been added to the list of supported GPT service providers.
   21. The documentation has been updated to cover the [configuration requirements](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#installation) for the added GPT providers.
   
-Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-570), especially if you have configured and are using the Driving Coach.
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-573), especially if you have configured and are using the Driving Coach.
 
 ## 5.7.2.0-release 05/17/24
   1. Minor bugfixes, as always

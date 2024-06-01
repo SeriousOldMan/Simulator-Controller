@@ -1011,6 +1011,38 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 	}
 
+	getKnowledge() {
+		local knowledgeBase := this.KnowledgeBase
+		local knowledge := super.getKnowledge()
+		local strategy, nextPitstop, pitstop
+
+		if (knowledgeBase && knowledgeBase.getValue("Strategy.Name", false)) {
+			strategy := Map("NumPitstops", knowledgeBase.getValue("Strategy.Pitstop.Count"))
+
+			knowledge["Strategy"] := strategy
+
+			nextPitstop := knowledgeBase.getValue("Strategy.Pitstop.Next", false)
+
+			if nextPitstop {
+				pitstop := Map("Nr", nextPitstop
+							 , "Lap", (knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Lap") + 1)
+							 , "Refuel", (Round(knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Fuel.Amount"), 1) . " Liters"))
+
+				if knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Change", false) {
+					pitstop["TyreChange"] := kTrue
+					pitstop["TyreCompound"] := compound(knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Compound")
+													  , knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Compound.Color"))
+				}
+				else
+					pitstop["TyreChange"] := kFalse
+
+				strategy["NextPitstop"] := pitstop
+			}
+		}
+
+		return knowledge
+	}
+
 	requestInformation(category, arguments*) {
 		switch category, false {
 			case "LapsRemaining":

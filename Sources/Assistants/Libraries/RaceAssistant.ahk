@@ -2098,12 +2098,12 @@ class GridRaceAssistant extends RaceAssistant {
 		local knowledge := super.getKnowledge()
 		local positions, position, classPosition, car
 
-		getCar(car) {
+		getCar(car, type) {
 			return Map("Nr", knowledgeBase.getValue("Car." . car . ".Nr", false)
 					 , "Laps", knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap", 0))
 					 , "Position", this.getPosition(car, "Class")
 					 , "LapTime", (Round(knowledgeBase.getValue("Car." . car . ".Time", 0) / 1000, 1) . " Seconds")
-					 , "Delta", (Round(knowledgeBase.getValue("Position.Standings.Class.Leader.Delta", 0) / 1000, 1) . " Seconds")
+					 , "Delta", (Round(knowledgeBase.getValue("Position.Standings.Class." . type . ".Delta", 0) / 1000, 1) . " Seconds")
 					 , "InPit", (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false)) ? kTrue : kFalse)
 		}
 
@@ -2111,8 +2111,8 @@ class GridRaceAssistant extends RaceAssistant {
 			position := this.getPosition()
 			classPosition := (this.MultiClass ? this.getPosition(false, "Class") : position)
 
-			knowledge["Stint"]["OverallPosition", position]
-			knowledge["Stint"]["ClassPosition", classPosition]
+			knowledge["Stint"]["OverallPosition"] := position
+			knowledge["Stint"]["ClassPosition"] := classPosition
 
 			positions := Map("OverallPosition", position, "ClassPosition", classPosition)
 
@@ -2122,19 +2122,19 @@ class GridRaceAssistant extends RaceAssistant {
 				car := knowledgeBase.getValue("Position.Standings.Class.Leader.Car", 0)
 
 				if car
-					positions["Leader"] := getCar(car)
+					positions["Leader"] := getCar(car, "Leader")
 
 				car := knowledgeBase.getValue("Position.Standings.Class.Ahead.Car", false)
 
 				if car
-					positions["Ahead"] := getCar(car)
+					positions["Ahead"] := getCar(car, "Ahead")
 			}
 
 			if (this.getPosition(false, "Class") != this.getCars("Class").Length) {
 				car := knowledgeBase.getValue("Position.Standings.Class.Behind.Car")
 
 				if car
-					positions["Behind"] := getCar(car)
+					positions["Behind"] := getCar(car, "Behind")
 			}
 		}
 

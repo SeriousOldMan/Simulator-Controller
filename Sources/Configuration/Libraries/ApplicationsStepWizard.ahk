@@ -66,7 +66,18 @@ class ApplicationsStepWizard extends StepWizard {
 				}
 
 		for ignore, theApplication in wizard.installedApplications()
-			if !inList(stdApplications, theApplication) {
+			if (!inList(stdApplications, theApplication) && wizard.isApplicationInstalled(theApplication) && wizard.isApplicationSelected(theApplication)) {
+				descriptor := getApplicationDescriptor(theApplication)
+
+				exePath := wizard.applicationPath(theApplication)
+
+				if !exePath
+					exePath := ""
+
+				SplitPath(exePath, , &workingDirectory)
+
+				Application(theApplication, false, exePath, workingDirectory).saveToConfiguration(configuration)
+
 				if !groups.Has("Other")
 					groups["Other"] := []
 

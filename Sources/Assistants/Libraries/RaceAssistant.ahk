@@ -2096,15 +2096,25 @@ class GridRaceAssistant extends RaceAssistant {
 	getKnowledge() {
 		local knowledgeBase := this.KnowledgeBase
 		local knowledge := super.getKnowledge()
+		local driver := knowledgeBase.getValue("Driver.Car", false)
+		local standingsData := CaseInsenseWeakMap()
+		local standings := []
+		local keys, ignore, car, carData, sectorTimes
 		local positions, position, classPosition, car
 
-		getCar(car, type) {
-			return Map("Nr", knowledgeBase.getValue("Car." . car . ".Nr", false)
-					 , "Laps", knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap", 0))
-					 , "Position", this.getPosition(car, "Class")
-					 , "LapTime", (Round(knowledgeBase.getValue("Car." . car . ".Time", 0) / 1000, 1) . " Seconds")
-					 , "Delta", (Round(knowledgeBase.getValue("Position.Standings.Class." . type . ".Delta", 0) / 1000, 1) . " Seconds")
-					 , "InPit", (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false)) ? kTrue : kFalse)
+		getCar(car, type?) {
+			local carData := Map("Nr", this.getNr(car)
+							   , "Class", this.getClass(car)
+							   , "Laps", knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap", 0))
+							   , "OverallPosition", this.getPosition(car, "Overall")
+							   , "ClassPosition", this.getPosition(car, "Class")
+							   , "LapTime", (Round(knowledgeBase.getValue("Car." . car . ".Time", 0) / 1000, 1) . " Seconds")
+							   , "InPit", (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false)) ? kTrue : kFalse)
+
+			if isSet(type)
+				carData["Delta"] := (Round(knowledgeBase.getValue("Position.Standings.Class." . type . ".Delta", 0) / 1000, 1) . " Seconds")
+
+			return carData
 		}
 
 		if knowledgeBase {
@@ -2136,6 +2146,31 @@ class GridRaceAssistant extends RaceAssistant {
 				if car
 					positions["Behind"] := getCar(car, "Behind")
 			}
+		}
+
+		if driver {
+			for ignore, car in this.getCars() {
+				sectorTimes := this.getSectorTimes(car)
+
+				if sectorTimes {
+					sectorTimes := sectorTimes.Clone()
+
+					loop sectorTimes.Length
+						sectorTimes[A_Index] := Round(sectorTimes[A_Index] / 1000, 1)
+				}
+				else
+					sectorTimes := false
+
+				carData := getCar(car)
+
+				standingsData[carData["OverallPosition"]] := carData
+			}
+
+			loop standingsData.Count
+				if standingsData.Has(A_Index)
+					standings.Push(standingsData[A_Index])
+
+			knowledge["Standings"] := standings
 		}
 
 		return knowledge

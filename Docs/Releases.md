@@ -1,7 +1,7 @@
 ## 5.7.5.0-release 06/07/24 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
-  3. The "Telemetry" instruction has been removed for both the Driving Coach and the Conversation Booster. It has been substituted by the new "Knowledge" instruction. This instruction provides the knowledge of a given Assistant now in JSON format to the LLM, which results in a much better understanding of the state of the car, strategy, standings and other important information by the LLM.
+  3. The "Telemetry" instruction has been removed for both the Driving Coach and the Conversation Booster. It has been substituted by the new "Knowledge" instruction. This instruction provides the knowledge of a given Assistant now in JSON format to the LLM, which results in a much better understanding of the state of the car, strategy, standings and other important information by the LLM. The [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#instructions) has been updated accordingly.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-575), especially if you have configured and are using the Driving Coach.
 

@@ -1,9 +1,9 @@
 [Development]
-Version=5.7.4.0-release
-Target=5.7.4.0-release
-Date=05/31/2024
-Download=https://cutt.ly/zeuyg6aJ;https://www.dropbox.com/scl/fi/07bgg8pbn1ivtmb2dq3yl/Simulator-Controller-5.7.4.0-release.zip?rlkey=d7vtmlaynqtodly4ka1mhxnid&st=pyzobqz5&dl=1
-Changes=Added support for Ollama, Added support for generic GPT service provider, Bugfixes for conversation booster, Fixed P2T without saying anything, Increased compatibility with silly LLMs, Load models from GPT service provider, Migrated to AHK 2.0.16
+Version=5.7.5.0-dev
+Target=5.7.5.0-release
+Date=06/01/2024
+Download=
+Changes=Fixed locating of additional apps and tools in "Simulator Setup"
 Components=Media->5.6.1,Configuration->5.7.3,Utilities->5.4.8
 [Release]
 Version=5.7.4.0-release

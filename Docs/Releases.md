@@ -1,3 +1,8 @@
+## 5.7.5.0-release 06/07/24 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. Fixed a bug in "Simulator Setup", which prevented additional software to be located in the "Applications" step.
+
 ## 5.7.4.0-release 05/31/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

@@ -129,7 +129,7 @@ class ApplicationsStepWizard extends StepWizard {
 				if application
 					this.locateApplication(application, fileName)
 				else {
-					SplitPath(file, , , , &application)
+					SplitPath(fileName, , , , &application)
 
 					this.locateApplication(application, fileName)
 				}

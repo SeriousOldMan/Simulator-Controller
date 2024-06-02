@@ -1686,6 +1686,18 @@ updateInstallationForV500() {
 	}
 }
 
+updateConfigurationForV575() {
+	local data, count
+
+	if FileExist(kUserHomeDirectory . "Setup\Setup.data") {
+		data := readMultiMap(kUserHomeDirectory . "Setup\Setup.data")
+
+		setMultiMapValue(data, "Setup", "Software.RealHeadMotion.Requested", "OPTIONAL")
+
+		writeMultiMap(kUserHomeDirectory . "Setup\Setup.data", data)
+	}
+}
+
 updateConfigurationForV574() {
 	local ignore, fileName, configuration, modified
 
@@ -2030,6 +2042,7 @@ updateConfigurationForV500() {
 
 updateConfigurationForV463() {
 	local text
+
 	if FileExist(kUserHomeDirectory . "Setup\Setup.data") {
 		text := FileRead(kUserHomeDirectory . "Setup\Setup.data", "`n")
 

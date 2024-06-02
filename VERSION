@@ -1,9 +1,9 @@
 [Development]
 Version=5.7.5.0-dev
 Target=5.7.5.0-release
-Date=06/01/2024
+Date=06/02/2024
 Download=
-Changes=New "Knowledge" instruction for Driving Coach and Conversation Booster, Added tyre compound to tyres info widget in "System Monitor", Added tyre compound to "Tyres" object in "Session State.json" file
+Changes=Fixed locating of additional apps and tools in "Simulator Setup", New "Knowledge" instruction for Driving Coach and Conversation Booster, Added tyre compound to tyres info widget in "System Monitor", Added tyre compound to "Tyres" object in "Session State.json" file
 Components=Media->5.6.1,Configuration->5.7.3,Utilities->5.4.8
 [Release]
 Version=5.7.4.0-release

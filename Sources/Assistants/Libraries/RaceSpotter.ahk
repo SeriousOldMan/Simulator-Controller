@@ -1142,8 +1142,8 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 	}
 
-	createTelemetryInfo() {
-		return super.createTelemetryInfo({exclude: ["Car", "Pitstop"]})
+	getKnowledge(options := false) {
+		return super.getKnowledge(options)
 	}
 
 	focusCarRecognized(words) {

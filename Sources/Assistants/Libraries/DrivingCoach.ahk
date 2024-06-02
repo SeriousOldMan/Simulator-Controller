@@ -113,7 +113,7 @@ class DrivingCoach extends GridRaceAssistant {
 		Get {
 			if isSet(type) {
 				if (type == true)
-					return ["Character", "Simulation", "Session", "Stint", "Telemetry", "Handling"]
+					return ["Character", "Simulation", "Session", "Stint", "Knowledge", "Handling"]
 				else
 					return (this.iInstructions.Has(type) ? this.iInstructions[type] : false)
 			}
@@ -262,6 +262,17 @@ class DrivingCoach extends GridRaceAssistant {
 			this.RemoteHandler.serviceState((this.ConnectionState = "Active") ? "Available" : this.ConnectionState)
 	}
 
+	getKnowledge(options := false) {
+		if !options
+			options := {exclude: ["Standings", "Positions"]}
+		else if !options.Has("exclude")
+			options.exclude := ["Standings", "Positions"]
+		else
+			options.concatenate(options.exclude, ["Standings", "Positions"])
+
+		return super.getKnowledge(options)
+	}
+
 	getInstruction(category) {
 		local knowledgeBase := this.KnowledgeBase
 		local settingsDB := this.SettingsDatabase
@@ -371,10 +382,9 @@ class DrivingCoach extends GridRaceAssistant {
 																			  , laps: lapData, standings: standingsData})
 					}
 				}
-			case "Telemetry":
+			case "Knowledge":
 				if knowledgeBase
-					return substituteVariables(this.Instructions["Telemetry"]
-											 , {telemetry: this.createTelemetryInfo({exclude: ["Car", "Standings", "Position"]})})
+					return substituteVariables(this.Instructions["Knowledge"], {knowledge: JSON.print(this.getKnowledge(), "  ")})
 			case "Handling":
 				if (knowledgeBase && this.Announcements["HandlingInformation"]) {
 					collector := this.iTelemetryCollector

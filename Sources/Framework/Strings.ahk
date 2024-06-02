@@ -35,6 +35,8 @@ substituteString(text, pattern, replacement) {
 substituteVariables(text, values := false) {
 	local result := text
 	local startPos := 1
+	local isMap := isInstance(values, Map)
+	local isObject := isInstance(values, Object)
 	local variable, startPos, endPos, value
 
 	loop {
@@ -49,9 +51,9 @@ substituteVariables(text, values := false) {
 				if endPos {
 					variable := Trim(SubStr(result, startPos, endPos - startPos))
 
-					if isInstance(values, Map)
+					if isMap
 						value := (values && values.Has(variable)) ? values[variable] : %variable%
-					else if isInstance(values, Object)
+					else if isObject
 						value := (values && values.HasProp(variable)) ? values.%variable% : %variable%
 					else
 						value := %variable%

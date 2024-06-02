@@ -51,8 +51,10 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 
 	saveToConfiguration(configuration) {
 		local wizard := this.SetupWizard
+		local launchApplications := []
+		local stdApplications := []
 		local application, function, path, directory, voiceControlConfiguration, ignore, section, subConfiguration
-		local modeSelectors, arguments, launchApplications, descriptor, label, language, startWithWindows, silentMode
+		local modeSelectors, arguments, descriptor, label, language, startWithWindows, silentMode
 		local values, key, value, excludes
 
 		super.saveToConfiguration(configuration)
@@ -100,11 +102,11 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		if (modeSelectors.Length > 0)
 			arguments := ("modeSelector: " . values2String(A_Space, modeSelectors*))
 
-		launchApplications := []
-
 		for ignore, section in string2Values(",", this.Definition[3])
 			for application, descriptor in getMultiMapValues(wizard.Definition, section) {
 				if wizard.isApplicationSelected(application) {
+					stdApplications.Push(application)
+
 					function := wizard.getLaunchApplicationFunction(application)
 
 					if (function && (function != "")) {
@@ -115,6 +117,20 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 
 						launchApplications.Push("`"" . label . "`" `"" . application . "`" " . function)
 					}
+				}
+			}
+
+		for ignore, application in wizard.installedApplications()
+			if (!inList(stdApplications, application) && wizard.isApplicationSelected(application)) {
+				function := wizard.getLaunchApplicationFunction(application)
+
+				if (function && (function != "")) {
+					label := wizard.getLaunchApplicationLabel(application)
+
+					if (label = "")
+						label := application
+
+					launchApplications.Push("`"" . label . "`" `"" . application . "`" " . function)
 				}
 			}
 
@@ -336,6 +352,10 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 			super.registerWidget(page, widget)
 	}
 
+	getSimulatorConfiguration() {
+		return this.SetupWizard.getSimulatorConfiguration()
+	}
+
 	startSetup(new) {
 		local wizard, uiLanguage, startWithWindows, silentMode, voiceControlConfiguration
 
@@ -505,6 +525,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 
 	loadApplications(load := false) {
 		local wizard := this.SetupWizard
+		local stdApplications := []
 		local application, function, row, column, ignore, section, application, descriptor
 
 		if load
@@ -518,6 +539,8 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		for ignore, section in string2Values(",", this.Definition[3])
 			for application, descriptor in getMultiMapValues(wizard.Definition, section) {
 				if wizard.isApplicationSelected(application) {
+					stdApplications.Push(application)
+
 					if load {
 						function := wizard.getLaunchApplicationFunction(application)
 
@@ -530,6 +553,21 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 					else
 						this.iLaunchApplicationsListView.Add("", application, "", "")
 				}
+			}
+
+		for ignore, application in wizard.installedApplications()
+			if (!inList(stdApplications, application) && wizard.isApplicationSelected(application)) {
+				if load {
+					function := wizard.getLaunchApplicationFunction(application)
+
+					if (function && (function != ""))
+						this.iLaunchApplications[application] := Array(wizard.getLaunchApplicationLabel(application), function)
+				}
+
+				if this.iLaunchApplications.Has(application)
+					this.iLaunchApplicationsListView.Add("", application, this.iLaunchApplications[application][1], this.iLaunchApplications[application][2])
+				else
+					this.iLaunchApplicationsListView.Add("", application, "", "")
 			}
 
 		this.loadControllerLabels()
@@ -547,6 +585,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		local wizard := this.SetupWizard
 		local row := false
 		local column := false
+		local stdApplications := []
 		local function, action, ignore, preview, section, application, descriptor, label
 
 		super.loadControllerLabels()
@@ -555,6 +594,8 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 			for ignore, section in string2Values(",", this.Definition[3])
 				for application, descriptor in getMultiMapValues(wizard.Definition, section)
 					if wizard.isApplicationSelected(application) {
+						stdApplications.Push(application)
+
 						if this.iLaunchApplications.Has(application) {
 							function := this.iLaunchApplications[application][2]
 
@@ -571,6 +612,24 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 						}
 					}
 		}
+
+		for ignore, application in wizard.installedApplications()
+			if (!inList(stdApplications, application) && wizard.isApplicationSelected(application)) {
+				if this.iLaunchApplications.Has(application) {
+					function := this.iLaunchApplications[application][2]
+
+					if (function && (function != "")) {
+						label := this.iLaunchApplications[application][1]
+
+						for ignore, preview in this.ControllerPreviews
+							if preview.findFunction(function, &row, &column) {
+								preview.setLabel(row, column, (label != "") ? label : application)
+
+								break
+							}
+					}
+				}
+			}
 	}
 
 	addModeSelector(preview, function, control, row, column) {

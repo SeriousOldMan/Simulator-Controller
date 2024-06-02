@@ -350,8 +350,199 @@ class RaceEngineer extends RaceAssistant {
 		}
 	}
 
-	createTelemetryInfo() {
-		return super.createTelemetryInfo({exclude: ["Car", "Standings", "Position"]})
+	getKnowledge(options := false) {
+		local knowledgeBase := this.KnowledgeBase
+		local knowledge := super.getKnowledge(options)
+		local psi := " PSI"
+		local celsius := " Celsius"
+		local percent := " %"
+		local seconds := " Seconds"
+		local lapNumber, tyres, brakes, tyreCompound, tyreType, setupPressures, ignore, tyreType, goal, resultSet
+		local bodyworkDamage, suspensionDamage, engineDamage, bodyworkDamageSum, suspensionDamageSum
+
+		getPitstopForecast() {
+			local pitstop := Map("Refuel", (Round(knowledgeBase.getValue("Fuel.Amount.Target", 0), 1) . " Liters")
+							   , "TyreChange", (knowledgeBase.getValue("Tyre.Compound.Target", false) ? kTrue : kFalse)
+							   , "Repairs", (knowledgeBase.getValue("Target.Time.Repairs", 0) ? kTrue : kFalse)
+							   , "Status", "Forecast")
+
+			if (pitstop["TyreChange"] = kTrue) {
+				pitstop["TyreCompound"] := compound(knowledgeBase.getValue("Tyre.Compound.Target")
+												  , knowledgeBase.getValue("Tyre.Compound.Color.Target"))
+
+				if (knowledgeBase.getValue("Tyre.Set.Target", 0) != 0)
+					pitstop["TyreSet"] := knowledgeBase.getValue("Tyre.Set.Target")
+
+				pitstop["TyrePressures"]
+					:= Map("FrontLeft", (Round(knowledgeBase.getValue("Tyre.Pressure.Target.FL", 0), 1) . psi)
+						 , "FrontRight", (Round(knowledgeBase.getValue("Tyre.Pressure.Target.FR", 0), 1) . psi)
+						 , "RearLeft", (Round(knowledgeBase.getValue("Tyre.Pressure.Target.RL", 0), 1) . psi)
+						 , "RearRight", (Round(knowledgeBase.getValue("Tyre.Pressure.Target.RR", 0), 1) . psi))
+			}
+
+			return pitstop
+		}
+
+		getPitstopPlanned() {
+			local lap := knowledgeBase.getValue("Pitstop.Planned.Lap", false)
+			local repairs := (knowledgeBase.getValue("Pitstop.Planned.Repair.Bodywork", false)
+						   && knowledgeBase.getValue("Pitstop.Planned.Repair.Suspension", false)
+						   && knowledgeBase.getValue("Pitstop.Planned.Repair.Engine", false))
+			local pitstop := Map("Nr", knowledgeBase.getValue("Pitstop.Planned.Nr")
+							   , "Refuel", (Round(knowledgeBase.getValue("Pitstop.Planned.Fuel", 0), 1) . " Liters")
+							   , "TyreChange", (knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound", false) ? kTrue : kFalse)
+							   , "Repairs", (repairs ? kTrue : kFalse)
+							   , "Status", (this.hasPreparedPitstop() ? "Prepared" : "Planned"))
+
+			if lap
+				pitstop["Lap"] := lap + 1
+
+			if (pitstop["TyreChange"] = kTrue) {
+				pitstop["TyreCompound"] := compound(knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound")
+												  , knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound.Color"))
+
+				if (knowledgeBase.getValue("Pitstop.Planned.Tyre.Set", 0) != 0)
+					pitstop["TyreSet"] := knowledgeBase.getValue("Pitstop.Planned.Tyre.Set")
+
+				pitstop["TyrePressures"]
+					:= Map("FrontLeft", (Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL", 0), 1) . psi)
+						 , "FrontRight", (Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR", 0), 1) . psi)
+						 , "RearLeft", (Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL", 0), 1) . psi)
+						 , "RearRight", (Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR", 0), 1) . psi))
+			}
+
+			return pitstop
+		}
+
+		if (knowledge && knowledgeBase) {
+			lapNumber := knowledgeBase.getValue("Lap", 0)
+
+			if this.activeTopic(options, "Tyres") {
+				tyres := knowledge["Tyres"]
+
+				tyreCompound := compound(tyres["Compound"])
+
+				setupPressures := []
+
+				for ignore, tyreType in ["FL", "FR", "RL", "RR"] {
+					goal := RuleCompiler().compileGoal("lastPressure(" . tyreCompound . ", " . tyreType . ", ?pressure)")
+					resultSet := knowledgeBase.prove(goal)
+
+					setupPressures.Push(resultSet ? Round(resultSet.getValue(goal.Arguments[3]).toString(), 1) : 0)
+				}
+
+				if (tyreCompound = "Intermediate")
+					tyreCompound := "Wet"
+
+				tyres["Pressures"]
+					:= Map("Current", Map("FrontLeft", (knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Pressure.FL") . psi)
+										, "FrontRight", (knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Pressure.FR") . psi)
+										, "RearLeft", (knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Pressure.RL") . psi)
+										, "RearRight", (knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Pressure.RR") . psi))
+						 , "Ideal", Map("FrontLeft", (knowledgeBase.getValue("Session.Settings.Tyre." . tyreCompound . ".Pressure.Target.FL") . psi)
+									  , "FrontRight", (knowledgeBase.getValue("Session.Settings.Tyre." . tyreCompound . ".Pressure.Target.FR") . psi)
+									  , "RearLeft", (knowledgeBase.getValue("Session.Settings.Tyre." . tyreCompound . ".Pressure.Target.RL") . psi)
+									  , "RearRight", (knowledgeBase.getValue("Session.Settings.Tyre." . tyreCompound . ".Pressure.Target.RR") . psi))
+						 , "Setup", Map("FrontLeft", (setupPressures[1] . psi), "FrontRight", (setupPressures[2] . psi)
+									  , "RearLeft", (setupPressures[3] . psi), "RearRight", (setupPressures[4] . psi)))
+
+				if (knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Wear.FL", kUndefined) != kUndefined)
+					tyres["Wear"] := Map("FrontLeft", (knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Wear.FL") . percent)
+									   , "FrontRight", (knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Wear.FR") . percent)
+									   , "RearLeft", (knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Wear.RL") . percent)
+									   , "RearRight", (knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Wear.RR") . percent))
+
+				tyres["Temperatures"]
+					:= Map("Current", Map("FrontLeft", (knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Temperature.FL") . celsius)
+										, "FrontRight", (knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Temperature.FR") . celsius)
+										, "RearLeft", (knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Temperature.RL") . celsius)
+										, "RearRight", (knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Temperature.RR") . celsius)))
+			}
+
+			if this.activeTopic(options, "Brakes") {
+				if (knowledgeBase.getValue("Lap." . lapNumber . ".Brake.Temperature.FL", kUndefined) != kUndefined)
+					knowledge["Brakes"]
+						:= Map("Temperatures", Map("FrontLeft", (knowledgeBase.getValue("Lap." . lapNumber . ".Brake.Temperature.FL") . celsius)
+												 , "FrontRight", (knowledgeBase.getValue("Lap." . lapNumber . ".Brake.Temperature.FR") . celsius)
+												 , "RearLeft", (knowledgeBase.getValue("Lap." . lapNumber . ".Brake.Temperature.RL") . celsius)
+												 , "RearRight", (knowledgeBase.getValue("Lap." . lapNumber . ".Brake.Temperature.RR") . celsius)))
+
+				if (knowledgeBase.getValue("Lap." . lapNumber . ".Brake.Wear.FL", kUndefined) != kUndefined) {
+					if !knowledge.Has("Brakes")
+						knowledge["Brakes"] := Map()
+
+					knowledge["Brakes"]["Wear"]
+						:= Map("FrontLeft", (knowledgeBase.getValue("Lap." . lapNumber . ".Brake.Wear.FL") . percent)
+							 , "FrontRight", (knowledgeBase.getValue("Lap." . lapNumber . ".Brake.Wear.FR") . percent)
+							 , "RearLeft", (knowledgeBase.getValue("Lap." . lapNumber . ".Brake.Wear.RL") . percent)
+							 , "RearRight", (knowledgeBase.getValue("Lap." . lapNumber . ".Brake.Wear.RR") . percent))
+				}
+			}
+
+			if this.activeTopic(options, "Damage") {
+				if (knowledgeBase.getValue("Lap." . lapNumber . ".Damage.Bodywork.Front", kUndefined) != kUndefined)
+					bodyworkDamage := [knowledgeBase.getValue("Lap." . lapNumber . ".Damage.Bodywork.Front")
+									 , knowledgeBase.getValue("Lap." . lapNumber . ".Damage.Bodywork.Rear")
+									 , knowledgeBase.getValue("Lap." . lapNumber . ".Damage.Bodywork.Left")
+									 , knowledgeBase.getValue("Lap." . lapNumber . ".Damage.Bodywork.Right")]
+				else
+					bodyworkDamage := []
+
+				bodyworkDamageSum := sum(bodyworkDamage)
+
+				if (bodyworkDamageSum > 0)
+					knowledge["Damage"]
+						:= Map("Bodywork", Map("Front", (Round(bodyworkDamage[1] / bodyWorkDamageSum * 100, 1) . percent)
+											 , "Rear", (Round(bodyworkDamage[2] / bodyWorkDamageSum * 100, 1) . percent)
+											 , "Left", (Round(bodyworkDamage[3] / bodyWorkDamageSum * 100, 1) . percent)
+											 , "Right", (Round(bodyworkDamage[4] / bodyWorkDamageSum * 100, 1) . percent)))
+
+				if (knowledgeBase.getValue("Lap." . lapNumber . ".Damage.Suspension.FL", kUndefined) != kUndefined)
+					suspensionDamage := [knowledgeBase.getValue("Lap." . lapNumber . ".Damage.Suspension.FL")
+									   , knowledgeBase.getValue("Lap." . lapNumber . ".Damage.Suspension.FR")
+									   , knowledgeBase.getValue("Lap." . lapNumber . ".Damage.Suspension.RL")
+									   , knowledgeBase.getValue("Lap." . lapNumber . ".Damage.Suspension.RR")]
+				else
+					suspensionDamage := []
+
+				suspensionDamageSum := sum(suspensionDamage)
+
+				if (suspensionDamageSum > 0) {
+					if !knowledge.Has("Damage")
+						knowledge["Damage"] := Map()
+
+					knowledge["Damage"]["Suspension"]
+						:= Map("Suspension", Map("FrontLeft", (Round(suspensionDamage[1] / suspensionDamageSum * 100, 1) . percent)
+											   , "FrontRight", (Round(suspensionDamage[2] / suspensionDamageSum * 100, 1) . percent)
+											   , "RearLeft", (Round(suspensionDamage[3] / suspensionDamageSum * 100, 1) . percent)
+											   , "RearRight", (Round(suspensionDamage[4] / suspensionDamageSum * 100, 1) . percent)))
+				}
+
+				if ((knowledgeBase.getValue("Lap." . lapNumber . ".Damage.Engine", kUndefined) != kUndefined)
+				 && (knowledgeBase.getValue("Lap." . lapNumber . ".Damage.Engine") > 0)) {
+					if !knowledge.Has("Damage")
+						knowledge["Damage"] := Map()
+
+					knowledge["Damage"]["Engine"] := (knowledgeBase.getValue("Lap." . lapNumber . ".Damage.Engine") . percent)
+				}
+
+				if knowledge.Has("Damage") {
+					knowledge["Damage"]["LapTimeLoss"] := (Round(Max(knowledgeBase.getValue("Damage.Bodywork.Lap.Delta", 0)
+																   , knowledgeBase.getValue("Damage.Suspension.Lap.Delta", 0)
+																   , knowledgeBase.getValue("Damage.Engine.Lap.Delta", 0)), 1) . seconds)
+
+					knowledge["Damage"]["RepairTime"] := (Round(knowledgeBase.getValue("Target.Time.Repairs", 0) / 1000) . seconds)
+				}
+			}
+
+			if this.activeTopic(options, "Pitstop")
+				if (this.hasPlannedPitstop() || this.hasPreparedPitstop())
+					knowledge["Pitstop"] := getPitstopPlanned()
+				else
+					knowledge["Pitstop"] := getPitstopForecast()
+		}
+
+		return knowledge
 	}
 
 	requestInformation(category, arguments*) {
@@ -1696,7 +1887,18 @@ class RaceEngineer extends RaceAssistant {
 
 		if knowledgeBase {
 			setMultiMapValue(sessionInfo, "Pitstop", "Target.Fuel.Amount", knowledgeBase.getValue("Fuel.Amount.Target", 0))
-			setMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Compound", knowledgeBase.getValue("Tyre.Compound.Target", "-"))
+
+			if knowledgeBase.getValue("Tyre.Compound.Target", false) {
+				if knowledgeBase.getValue("Tyre.Compound.Color.Target", false)
+					setMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Compound"
+												, compound(knowledgeBase.getValue("Tyre.Compound.Target")
+														 , knowledgeBase.getValue("Tyre.Compound.Color.Target")))
+				else
+					setMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Compound", knowledgeBase.getValue("Tyre.Compound.Target"))
+			}
+			else
+				setMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Compound", "-")
+
 			setMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Pressure.FL", Round(knowledgeBase.getValue("Tyre.Pressure.Target.FL", 0), 1))
 			setMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Pressure.FR", Round(knowledgeBase.getValue("Tyre.Pressure.Target.FR", 0), 1))
 			setMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Pressure.RL", Round(knowledgeBase.getValue("Tyre.Pressure.Target.RL", 0), 1))
@@ -1714,7 +1916,7 @@ class RaceEngineer extends RaceAssistant {
 			planned := this.hasPlannedPitstop()
 			prepared := this.hasPreparedPitstop()
 
-			if (this.hasPlannedPitstop() || prepared) {
+			if (planned || prepared) {
 				lap := knowledgeBase.getValue("Pitstop.Planned.Lap", false)
 
 				if lap

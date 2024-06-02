@@ -103,6 +103,12 @@ class RaceAssistant extends ConfigurationItem {
 	iSettingsDatabase := false
 	iSaveSettings := kNever
 
+	class VariablesMap extends CaseInsenseWeakMap {
+		has(*) {
+			return true
+		}
+	}
+
 	class RaceAssistantRemoteHandler {
 		iEvent := false
 		iRemotePID := false
@@ -772,76 +778,68 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
-	createTelemetryInfo(options := false) {
-		local knowledgeBase := this.KnowledgeBase
-		local text := ""
-		local filter := false
-		local key, value, ignore, candidate, skip, excludes, includes, include
-		local pattern, replacement
+	activeTopic(options, topic) {
+		return (!options || !options.Has("exclude") || !inList(options["exlude"], topic))
+	}
 
-		static replacements := Map(".FL", ".Front.Left", ".FR", ".Front.Right"
-								 , ".RL", ".Rear.Left", ".RR", ".Rear.Right")
+	getKnowledge(options := false) {
+		local knowledgeBase := this.KnowledgeBase
+		local knowledge := Map()
+		local lapNumber, tyreSet
+
+		static sessionTypes
+
+		if !isSet(sessionTypes) {
+			sessionTypes := Map(kSessionPractice, "Practice", kSessionQualification, "Qualification", kSessionRace, "Race", kSessionOther, "Other")
+
+			sessionTypes.Default := "Other"
+		}
 
 		if knowledgeBase {
-			if options {
-				excludes := (options.HasProp("exclude") ? options.exclude : false)
-				includes := (options.HasProp("include") ? options.include : false)
+			lapNumber := knowledgeBase.getValue("Lap", 0)
 
-				if options.HasProp("filter")
-					filter := options.filter
-			}
-			else {
-				excludes := false
-				includes := false
-			}
+			if this.activeTopic(options, "Session")
+				knowledge["Session"] := Map("Simulator", this.SettingsDatabase.getSimulatorName(this.Simulator)
+										  , "Car", this.SettingsDatabase.getCarName(this.Simulator, this.Car)
+										  , "Track", this.SettingsDatabase.getTrackName(this.Simulator, this.Track)
+										  , "TrackLength", (this.TrackLength . " Meters")
+										  , "Type", sessionTypes[this.Session]
+										  , "Format", knowledgeBase.getValue("Session.Format", "Time")
+										  , "RemainingLaps", Ceil(knowledgeBase.getValue("Lap.Remaining.Session", 0))
+										  , "RemainingTime", (Round(knowledgeBase.getValue("Session.Time.Remaining") / 1000) . " seconds"))
 
-			for key, value in knowledgeBase.Facts.Facts {
-				skip := false
+			if this.activeTopic(options, "Stint")
+				knowledge["Stint"] := Map("Driver", this.DriverFullName
+										, "Lap", (lapNumber + 1)
+										, "RemainingTime", (Round(Min(knowledgeBase.getValue("Driver.Time.Remaining"), knowledgeBase.getValue("Driver.Time.Stint.Remaining")) / 1000) . " Seconds"))
 
-				if includes {
-					include := false
+			if this.activeTopic(options, "Fuel")
+				knowledge["Fuel"] := Map("Capacity", (knowledgeBase.getValue("Session.Settings.Fuel.Max") . " Liter")
+									   , "Remaining", (Round(knowledgeBase.getValue("Lap." . lapNumber . ".Fuel.Remaining", 0), 1) . " Liter")
+									   , "Consumption", (Round(knowledgeBase.getValue("Lap." . lapNumber . ".Fuel.AvgConsumption", 0), 1)  . " Liter"))
 
-					for ignore, candidate in includes
-						if (InStr(key, candidate) == 1) {
-							include := true
+			if this.activeTopic(options, "Weather")
+				knowledge["Weather"] := Map("Now", knowledgeBase.getValue("Weather.Weather.Now")
+										  , "10Min", knowledgeBase.getValue("Weather.Weather.10Min")
+										  , "30Min", knowledgeBase.getValue("Weather.Weather.30Min")
+										  , "Temperature", (knowledgeBase.getValue("Weather.Temperature.Air") . " Celsius"))
 
-							break
-						}
+			if this.activeTopic(options, "Track")
+				knowledge["Track"] := Map("Temperature", (knowledgeBase.getValue("Track.Temperature") . " Celsius")
+										, "Grip", knowledgeBase.getValue("Track.Grip"))
 
-					if !include
-						skip := true
-				}
+			if this.activeTopic(options, "Tyres") {
+				knowledge["Tyres"] := Map("Compound", compound(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound")
+															 , knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.Color")))
 
-				if (excludes && !skip)
-					for ignore, candidate in excludes
-						if (InStr(key, candidate) == 1) {
-							skip := true
+				tyreSet := knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Set", kUndefined)
 
-							break
-						}
-
-				if (filter && !skip && !filter.Call(key, value))
-					skip := true
-
-				if !skip {
-					switch key, false {
-						case "Session.Simulator":
-							value := SessionDatabase.getSimulatorName(value)
-						case "Session.Car":
-							value := SessionDatabase.getCarName(knowledgeBase.getValue("Session.Simulator"), value)
-						case "Session.Track":
-							value := SessionDatabase.getTrackName(knowledgeBase.getValue("Session.Simulator"), value)
-					}
-
-					for pattern, replacement in replacements
-						key := StrReplace(key, pattern, replacement)
-
-					text .= (key . " = " . value . "`n")
-				}
+				if ((tyreSet != kUndefined) && (tyreSet != 0))
+					knowledge["Tyres"]["TyreSet"] := knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Set")
 			}
 		}
 
-		return text
+		return knowledge
 	}
 
 	handleVoiceText(grammar, text) {
@@ -850,7 +848,7 @@ class RaceAssistant extends ConfigurationItem {
 		if (grammar = "Text") {
 			if this.Booster {
 				text := this.Booster.ask(text, Map("Variables", {assistant: this.AssistantType, name: this.VoiceManager.Name
-															   , telemetry: this.createTelemetryInfo()}))
+															   , knowledge: JSON.print(this.getKnowledge(), "  ")}))
 
 				if text {
 					if this.VoiceManager.UseTalking
@@ -1540,6 +1538,9 @@ class RaceAssistant extends ConfigurationItem {
 			setMultiMapValue(sessionInfo, "Track", "Temperature", Round(getMultiMapValue(data, "Track Data", "Temperature", 0), 1))
 			setMultiMapValue(sessionInfo, "Track", "Grip", getMultiMapValue(data, "Track Data", "Grip", "Optimum"))
 
+			setMultiMapValue(sessionInfo, "Tyres", "Compound"
+										, compound(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound")
+												 , knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.Color")))
 			setMultiMapValue(sessionInfo, "Tyres", "Set", getMultiMapValue(data, "Car Data", "TyreSet", false))
 			setMultiMapValue(sessionInfo, "Tyres", "Pressures", getMultiMapValue(data, "Car Data", "TyrePressure", ""))
 			setMultiMapValue(sessionInfo, "Tyres", "Pressures.Hot", getMultiMapValue(data, "Car Data", "TyrePressure", ""))
@@ -1667,6 +1668,9 @@ class RaceAssistant extends ConfigurationItem {
 		knowledgeBase.setFact("Weather.Weather.Now", weatherNow)
 		knowledgeBase.setFact("Weather.Weather.10Min", weather10Min)
 		knowledgeBase.setFact("Weather.Weather.30Min", weather30Min)
+
+		knowledgeBase.setFact("Track.Temperature", trackTemperature)
+		knowledgeBase.setFact("Track.Grip", getMultiMapValue(data, "Track Data", "Grip", "Green"))
 
 		lapTime := getMultiMapValue(data, "Stint Data", "LapLastTime", 0)
 
@@ -2112,16 +2116,94 @@ class GridRaceAssistant extends RaceAssistant {
 		}
 	}
 
-	createTelemetryInfo(options := false) {
-		if !options
-			options := {}
+	getKnowledge(options := false) {
+		local knowledgeBase := this.KnowledgeBase
+		local knowledge := super.getKnowledge(options)
+		local driver := knowledgeBase.getValue("Driver.Car", false)
+		local standingsData := CaseInsenseWeakMap()
+		local standings := []
+		local keys, ignore, car, carData, sectorTimes
+		local positions, position, classPosition, car
 
-		if options.HasProp("exclude")
-			options.exclude := concatenate(options.exclude, ["Car", "Standings"])
-		else
-			options.exclude := ["Car", "Standings"]
+		getCar(car, type?) {
+			local carData := Map("Nr", this.getNr(car)
+							   , "Class", this.getClass(car)
+							   , "Laps", knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap", 0))
+							   , "OverallPosition", this.getPosition(car, "Overall")
+							   , "ClassPosition", this.getPosition(car, "Class")
+							   , "DistanceIntoTrack", (Round(this.getRunning(car) * this.TrackLength) . " Meters")
+							   , "LapTime", (Round(knowledgeBase.getValue("Car." . car . ".Time", 0) / 1000, 1) . " Seconds")
+							   , "InPit", (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false)) ? kTrue : kFalse)
 
-		return super.createTelemetryInfo(options)
+			if isSet(type)
+				carData["Delta"] := (Round(knowledgeBase.getValue("Position.Standings.Class." . type . ".Delta", 0) / 1000, 1) . " Seconds")
+			else
+				carData["Delta"] := (Round(this.getDelta(car) / 1000, 1) . " Seconds")
+
+			return carData
+		}
+
+		if knowledgeBase {
+			position := this.getPosition()
+			classPosition := (this.MultiClass ? this.getPosition(false, "Class") : position)
+
+			if this.activeTopic(options, "Stint") {
+				knowledge["Stint"]["OverallPosition"] := position
+				knowledge["Stint"]["ClassPosition"] := classPosition
+			}
+
+			if this.activeTopic(options, "Positions") {
+				positions := Map("OverallPosition", position, "ClassPosition", classPosition)
+
+				knowledge["Positions"] := positions
+
+				if (classPosition != 1) {
+					car := knowledgeBase.getValue("Position.Standings.Class.Leader.Car", 0)
+
+					if car
+						positions["Leader"] := getCar(car, "Leader")
+
+					car := knowledgeBase.getValue("Position.Standings.Class.Ahead.Car", false)
+
+					if car
+						positions["Ahead"] := getCar(car, "Ahead")
+				}
+
+				if (this.getPosition(false, "Class") != this.getCars("Class").Length) {
+					car := knowledgeBase.getValue("Position.Standings.Class.Behind.Car")
+
+					if car
+						positions["Behind"] := getCar(car, "Behind")
+				}
+			}
+		}
+
+		if (this.activeTopic(options, "Standings") && driver) {
+			for ignore, car in this.getCars() {
+				sectorTimes := this.getSectorTimes(car)
+
+				if sectorTimes {
+					sectorTimes := sectorTimes.Clone()
+
+					loop sectorTimes.Length
+						sectorTimes[A_Index] := Round(sectorTimes[A_Index] / 1000, 1)
+				}
+				else
+					sectorTimes := false
+
+				carData := getCar(car)
+
+				standingsData[carData["OverallPosition"]] := carData
+			}
+
+			loop standingsData.Count
+				if standingsData.Has(A_Index)
+					standings.Push(standingsData[A_Index])
+
+			knowledge["Standings"] := standings
+		}
+
+		return knowledge
 	}
 
 	requestInformation(category, arguments*) {
@@ -2997,6 +3079,13 @@ class GridRaceAssistant extends RaceAssistant {
 			return getMultiMapValue(data, "Position Data", "Car." . car . ".Position", car)
 		else
 			return (knowledgeBase ? knowledgeBase.getValue("Car." . car . ".Position", car) : 0)
+	}
+
+	getRunning(car, data := false) {
+		if data
+			return getMultiMapValue(data, "Position Data", "Car." . car . ".Lap.Running")
+		else
+			return this.KnowledgeBase.getValue("Car." . car . ".Lap.Running")
 	}
 
 	getDelta(car, data := false) {

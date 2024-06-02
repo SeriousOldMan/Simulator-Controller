@@ -1576,6 +1576,7 @@ The content of the JSON file looks like this (depending on the current situation
 				null,
 				null
 			],
+			"TyreCompound": "Dry (M)"
 			"TyreSet": 3
 		}
 	}

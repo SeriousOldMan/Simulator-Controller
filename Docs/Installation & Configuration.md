@@ -438,8 +438,8 @@ Below you find all instruction categories and the supported variables:
 | Conversation   | Character         | Scope             | This instruction is used when a voice command has been recognized, which cannot be mapped to one of the predefined command patterns, even after using the LLM to map the command semantically. It is assumed that the user wants a free conversation with the LLM. This instruction then defines the profession and the personality of the Assistant. You can also include general instructions like "Keep your answers short and precise", and so on. |
 |                |                   | %assistant%       | The type or role of the current Assistant, for example "Race Engineer". |
 |                |                   | %name%            | Specifies the name of the Assistant. |
-|                | Telemetry         | Scope             | This instruction is used to supply the current content of the knowledgebase (mainly telemetry information) to the LLM. |
-|                |                   | %telemetry%       | A table consisting of key / value pairs separated by an equal sign. All variable names (keys) are *speaking*, so that the LLM can derive their meanings. Example: "Tyre.Pressure.Target.Front.Left = 24.8" - this specifies the current target pressure for the front left tyre when the tyre will be changed at a pitstop. |
+|                | Knowledge         | Scope             | This instruction is used to supply the current content of the knowledgebase to the LLM. The content of the knowledgebase depends on the type of the Assistant. |
+|                |                   | %knowledge%       | This variable is substituted with the content of the knowledgebase in a self-explaining JSON format. |
 
 ##### Notes
 

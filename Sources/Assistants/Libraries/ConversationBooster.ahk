@@ -553,7 +553,7 @@ class ChatBooster extends ConversationBooster {
 																							   , "Conversation.Instructions", "Character")
 																			  , variables)
 														  , substituteVariables(getMultiMapValue(instruction
-																							   , "Conversation.Instructions", "Telemetry")
+																							   , "Conversation.Instructions", "Knowledge")
 																			  , variables)])
 
 					if answer

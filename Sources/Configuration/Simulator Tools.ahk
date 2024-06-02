@@ -1686,6 +1686,18 @@ updateInstallationForV500() {
 	}
 }
 
+updateConfigurationForV575() {
+	local data, count
+
+	if FileExist(kUserHomeDirectory . "Setup\Setup.data") {
+		data := readMultiMap(kUserHomeDirectory . "Setup\Setup.data")
+
+		setMultiMapValue(data, "Setup", "Software.RealHeadMotion.Requested", "OPTIONAL")
+
+		writeMultiMap(kUserHomeDirectory . "Setup\Setup.data", data)
+	}
+}
+
 updateConfigurationForV574() {
 	local ignore, fileName, configuration, modified
 
@@ -2028,8 +2040,10 @@ updateConfigurationForV500() {
 	deleteDirectory(kUserHomeDirectory . "Advisor")
 }
 
+/*
 updateConfigurationForV463() {
 	local text
+
 	if FileExist(kUserHomeDirectory . "Setup\Setup.data") {
 		text := FileRead(kUserHomeDirectory . "Setup\Setup.data", "`n")
 
@@ -2240,7 +2254,6 @@ updateConfigurationForV425() {
 				FileAppend(text, A_LoopFilePath . "\Settings.CSV")
 			}
 		}
-
 }
 
 updateConfigurationForV424() {
@@ -2508,6 +2521,7 @@ updateConfigurationForV402() {
 updateConfigurationForV400() {
 	deleteFile(kDatabaseDirectory . "User\UPLOAD")
 }
+*/
 
 updatePluginsForV561() {
 	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
@@ -2594,6 +2608,7 @@ updatePluginsForV5091() {
 	}
 }
 
+/*
 updatePluginsForV426() {
 	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
 	local userConfiguration := readMultiMap(userConfigurationFile)
@@ -2665,6 +2680,7 @@ updatePluginsForV402() {
 		writeMultiMap(userConfigurationFile, userConfiguration)
 	}
 }
+*/
 
 updateToV400() {
 	OnMessage(0x44, translateOkButton)

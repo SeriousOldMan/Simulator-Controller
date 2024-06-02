@@ -608,6 +608,8 @@ systemMonitor(command := false, arguments*) {
 			html .= "<table class=`"table-std`">"
 			html .= ("<tr><th class=`"th-std th-left`" colspan=`"3`"><div id=`"header`"><i>" . translate("Tyres") . "</i></div></th></tr>")
 
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Compound") . "</th><td class=`"td-wdg`" colspan=`"2`">" . translate(getMultiMapValue(sessionState, "Tyres", "Compound")) . "</td></tr>")
+
 			tyreSet := getMultiMapValue(sessionState, "Tyres", "Set", false)
 
 			if tyreSet

@@ -200,6 +200,8 @@ class IntegrationPlugin extends ControllerPlugin {
 		else
 			state["Wear"] := [kNull, kNull, kNull, kNull]
 
+		state["TyreCompound"] := translate(getMultiMapValue(sessionInfo, "Tyres", "Compound", "-"))
+
 		tyreSet := getMultiMapValue(sessionInfo, "Tyres", "Set", false)
 
 		state["TyreSet"] := (tyreSet ? tyreSet : kNull)

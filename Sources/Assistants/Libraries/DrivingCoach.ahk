@@ -262,6 +262,17 @@ class DrivingCoach extends GridRaceAssistant {
 			this.RemoteHandler.serviceState((this.ConnectionState = "Active") ? "Available" : this.ConnectionState)
 	}
 
+	getKnowledge(options := false) {
+		if !options
+			options := {exclude: ["Standings", "Positions"]}
+		else if !options.Has("exclude")
+			options.exclude := ["Standings", "Positions"]
+		else
+			options.concatenate(options.exclude, ["Standings", "Positions"])
+
+		return super.getKnowledge(options)
+	}
+
 	getInstruction(category) {
 		local knowledgeBase := this.KnowledgeBase
 		local settingsDB := this.SettingsDatabase

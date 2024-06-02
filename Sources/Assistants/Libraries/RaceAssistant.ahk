@@ -778,9 +778,14 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
-	getKnowledge() {
+	activeTopic(options, topic) {
+		return (!options || !options.Has("exclude") || !inList(options["exlude"], topic))
+	}
+
+	getKnowledge(options := false) {
 		local knowledgeBase := this.KnowledgeBase
-		local knowledge, lapNumber
+		local knowledge := Map()
+		local lapNumber, tyreSet
 
 		static sessionTypes
 
@@ -793,31 +798,48 @@ class RaceAssistant extends ConfigurationItem {
 		if knowledgeBase {
 			lapNumber := knowledgeBase.getValue("Lap", 0)
 
-			return Map("Session", Map("Simulator", this.SettingsDatabase.getSimulatorName(this.Simulator)
-									, "Car", this.SettingsDatabase.getCarName(this.Simulator, this.Car)
-									, "Track", this.SettingsDatabase.getTrackName(this.Simulator, this.Track)
-									, "TrackLength", (this.TrackLength . " Meters")
-									, "Type", sessionTypes[this.Session]
-									, "Format", knowledgeBase.getValue("Session.Format", "Time")
-									, "RemainingLaps", Ceil(knowledgeBase.getValue("Lap.Remaining.Session", 0))
-									, "RemainingTime", (Round(knowledgeBase.getValue("Session.Time.Remaining") / 1000) . " seconds"))
-					 , "Stint", Map("Driver", this.DriverFullName
-								  , "Lap", (lapNumber + 1)
-								  , "RemainingTime", (Round(Min(knowledgeBase.getValue("Driver.Time.Remaining"), knowledgeBase.getValue("Driver.Time.Stint.Remaining")) / 1000) . " Seconds"))
-					 , "Fuel", Map("Capacity", (knowledgeBase.getValue("Session.Settings.Fuel.Max") . " Liter")
-								 , "Remaining", (Round(knowledgeBase.getValue("Lap." . lapNumber . ".Fuel.Remaining", 0), 1) . " Liter")
-								 , "Consumption", (Round(knowledgeBase.getValue("Lap." . lapNumber . ".Fuel.AvgConsumption", 0), 1)  . " Liter"))
-					 , "Weather", Map("Now", knowledgeBase.getValue("Weather.Weather.Now")
-									, "10Min", knowledgeBase.getValue("Weather.Weather.10Min")
-									, "30Min", knowledgeBase.getValue("Weather.Weather.30Min")
-									, "Temperature", (knowledgeBase.getValue("Weather.Temperature.Air") . " Celsius"))
-					 , "Track", Map("Temperature", (knowledgeBase.getValue("Track.Temperature") . " Celsius")
-								  , "Grip", knowledgeBase.getValue("Track.Grip"))
-					 , "Tyres", Map("Compound", compound(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound")
-													   , knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.Color"))))
+			if this.activeTopic(options, "Session")
+				knowledge["Session"] := Map("Simulator", this.SettingsDatabase.getSimulatorName(this.Simulator)
+										  , "Car", this.SettingsDatabase.getCarName(this.Simulator, this.Car)
+										  , "Track", this.SettingsDatabase.getTrackName(this.Simulator, this.Track)
+										  , "TrackLength", (this.TrackLength . " Meters")
+										  , "Type", sessionTypes[this.Session]
+										  , "Format", knowledgeBase.getValue("Session.Format", "Time")
+										  , "RemainingLaps", Ceil(knowledgeBase.getValue("Lap.Remaining.Session", 0))
+										  , "RemainingTime", (Round(knowledgeBase.getValue("Session.Time.Remaining") / 1000) . " seconds"))
+
+			if this.activeTopic(options, "Stint")
+				knowledge["Stint"] := Map("Driver", this.DriverFullName
+										, "Lap", (lapNumber + 1)
+										, "RemainingTime", (Round(Min(knowledgeBase.getValue("Driver.Time.Remaining"), knowledgeBase.getValue("Driver.Time.Stint.Remaining")) / 1000) . " Seconds"))
+
+			if this.activeTopic(options, "Fuel")
+				knowledge["Fuel"] := Map("Capacity", (knowledgeBase.getValue("Session.Settings.Fuel.Max") . " Liter")
+									   , "Remaining", (Round(knowledgeBase.getValue("Lap." . lapNumber . ".Fuel.Remaining", 0), 1) . " Liter")
+									   , "Consumption", (Round(knowledgeBase.getValue("Lap." . lapNumber . ".Fuel.AvgConsumption", 0), 1)  . " Liter"))
+
+			if this.activeTopic(options, "Weather")
+				knowledge["Weather"] := Map("Now", knowledgeBase.getValue("Weather.Weather.Now")
+										  , "10Min", knowledgeBase.getValue("Weather.Weather.10Min")
+										  , "30Min", knowledgeBase.getValue("Weather.Weather.30Min")
+										  , "Temperature", (knowledgeBase.getValue("Weather.Temperature.Air") . " Celsius"))
+
+			if this.activeTopic(options, "Track")
+				knowledge["Track"] := Map("Temperature", (knowledgeBase.getValue("Track.Temperature") . " Celsius")
+										, "Grip", knowledgeBase.getValue("Track.Grip"))
+
+			if this.activeTopic(options, "Tyres") {
+				knowledge["Tyres"] := Map("Compound", compound(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound")
+															 , knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.Color")))
+
+				tyreSet := knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Set", kUndefined)
+
+				if ((tyreSet != kUndefined) && (tyreSet != 0))
+					knowledge["Tyres"]["TyreSet"] := knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Set")
+			}
 		}
-		else
-			return Map()
+
+		return knowledge
 	}
 
 	handleVoiceText(grammar, text) {
@@ -2094,9 +2116,9 @@ class GridRaceAssistant extends RaceAssistant {
 		}
 	}
 
-	getKnowledge() {
+	getKnowledge(options := false) {
 		local knowledgeBase := this.KnowledgeBase
-		local knowledge := super.getKnowledge()
+		local knowledge := super.getKnowledge(options)
 		local driver := knowledgeBase.getValue("Driver.Car", false)
 		local standingsData := CaseInsenseWeakMap()
 		local standings := []
@@ -2125,34 +2147,38 @@ class GridRaceAssistant extends RaceAssistant {
 			position := this.getPosition()
 			classPosition := (this.MultiClass ? this.getPosition(false, "Class") : position)
 
-			knowledge["Stint"]["OverallPosition"] := position
-			knowledge["Stint"]["ClassPosition"] := classPosition
-
-			positions := Map("OverallPosition", position, "ClassPosition", classPosition)
-
-			knowledge["Positions"] := positions
-
-			if (classPosition != 1) {
-				car := knowledgeBase.getValue("Position.Standings.Class.Leader.Car", 0)
-
-				if car
-					positions["Leader"] := getCar(car, "Leader")
-
-				car := knowledgeBase.getValue("Position.Standings.Class.Ahead.Car", false)
-
-				if car
-					positions["Ahead"] := getCar(car, "Ahead")
+			if this.activeTopic(options, "Stint") {
+				knowledge["Stint"]["OverallPosition"] := position
+				knowledge["Stint"]["ClassPosition"] := classPosition
 			}
 
-			if (this.getPosition(false, "Class") != this.getCars("Class").Length) {
-				car := knowledgeBase.getValue("Position.Standings.Class.Behind.Car")
+			if this.activeTopic(options, "Positions") {
+				positions := Map("OverallPosition", position, "ClassPosition", classPosition)
 
-				if car
-					positions["Behind"] := getCar(car, "Behind")
+				knowledge["Positions"] := positions
+
+				if (classPosition != 1) {
+					car := knowledgeBase.getValue("Position.Standings.Class.Leader.Car", 0)
+
+					if car
+						positions["Leader"] := getCar(car, "Leader")
+
+					car := knowledgeBase.getValue("Position.Standings.Class.Ahead.Car", false)
+
+					if car
+						positions["Ahead"] := getCar(car, "Ahead")
+				}
+
+				if (this.getPosition(false, "Class") != this.getCars("Class").Length) {
+					car := knowledgeBase.getValue("Position.Standings.Class.Behind.Car")
+
+					if car
+						positions["Behind"] := getCar(car, "Behind")
+				}
 			}
 		}
 
-		if driver {
+		if (this.activeTopic(options, "Standings") && driver) {
 			for ignore, car in this.getCars() {
 				sectorTimes := this.getSectorTimes(car)
 

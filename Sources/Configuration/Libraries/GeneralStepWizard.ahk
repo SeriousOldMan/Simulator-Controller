@@ -352,6 +352,10 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 			super.registerWidget(page, widget)
 	}
 
+	getSimulatorConfiguration() {
+		return this.SetupWizard.getSimulatorConfiguration()
+	}
+
 	startSetup(new) {
 		local wizard, uiLanguage, startWithWindows, silentMode, voiceControlConfiguration
 

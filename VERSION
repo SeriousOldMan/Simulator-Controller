@@ -1,9 +1,9 @@
 [Development]
 Version=5.7.5.0-dev
 Target=5.7.5.0-release
-Date=06/01/2024
+Date=06/02/2024
 Download=
-Changes=Fixed locating of additional apps and tools in "Simulator Setup", Removed "Voice Macro" from the list of standard software in "Simulator Setup", Added "Real Head Motion" to the list of standard software in "Simulator Setup"
+Changes=Fixed locating of additional apps and tools in "Simulator Setup", Removed "Voice Macro" from the list of standard software in "Simulator Setup", Added "Real Head Motion" to the list of standard software in "Simulator Setup", Automatic updates from versions prior to 5.0.0 are no longer possible
 Components=Media->5.6.1,Configuration->5.7.5,Utilities->5.4.8
 [Release]
 Version=5.7.4.0-release

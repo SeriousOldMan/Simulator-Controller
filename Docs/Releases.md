@@ -5,6 +5,7 @@
   4. Cleanup of the additional software supported in "Simulator Setup":
      - Removed "Voice Macro", since it was needed anymore for a long time now.
 	 - Added "Real Head Motion" as optional software, since it is one of the most useful extensions for *Assetto Corsa Competizione*.
+  5. Automatic updates from versions prior to 5.0.0 are no longer supported.
 
 ## 5.7.4.0-release 05/31/24
   1. Minor bugfixes, as always

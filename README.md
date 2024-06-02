@@ -49,9 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[5.7.4.0-alpha](https://www.dropbox.com/scl/fi/lm7aejobfug5zrw52kvea/Simulator-Controller-5.7.4.0-alpha.zip?rlkey=gk3lgotfrkk2torh67nofn0za&st=504dm7yk&dl=1) (Test build for 5.7.4. Changes: Added support for Ollama, Added support for generic GPT service provider, Bugfixes for conversation booster, Fixed P2T without saying anything, Increased compatibility with silly LLMs, Load models from GPT service provider.)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-574) of this version and all the versions you might have skipped, before installing and using this version.
+None for the moment...
 
 ### Documentation
 

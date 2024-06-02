@@ -49,7 +49,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[5.7.5.0-dev](https://www.dropbox.com/scl/fi/8zgwc1yuv01gjy36d8hv1/Simulator-Controller-5.7.5.0-dev.zip?rlkey=84p291r0vdutu1nbv98kmumn6&st=rvex15fu&dl=1) (Early build for 5.7.5. Changes: Fixed locating of additional apps and tools in "Simulator Setup", Removed "Voice Macro" from the list of standard software in "Simulator Setup", Added "Real Head Motion" to the list of standard software in "Simulator Setup", Automatic updates from versions prior to 5.0.0 are no longer possible, Fixed voice test button in "Simulator Setup", New "Knowledge" instruction for Driving Coach and Conversation Booster, Added tyre compound to tyres info widget in "System Monitor", Added tyre compound to "Tyres" object in "Session State.json" file.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-575) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

@@ -9,7 +9,8 @@
   6. Automatic updates from versions prior to 5.0.0 are no longer supported.
   7. Added mounted tyre compound to tyres info component in "System Monitor".
   8. The "Telemetry" instruction has been removed for both the Driving Coach and the Conversation Booster. It has been substituted by the new "Knowledge" instruction. This instruction provides the knowledge of a given Assistant now in JSON format to the LLM, which results in a much better understanding of the state of the car, strategy, standings and other important information by the LLM. The [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#instructions) has been updated accordingly.
-  9. [Developer] Added mounted tyre compound to the ["Session State.json"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) file.
+  9. The Spotter now also provides his knowledge about all opponents and the current race situation to the connected LLM, if a "Conversation" bosster has been configured.
+  10. [Developer] Added mounted tyre compound to the ["Session State.json"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) file.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-575), especially if you have configured and are using the Driving Coach.
 

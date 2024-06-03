@@ -786,7 +786,7 @@ class SpeechRecognizer {
 		return bestMatch
 	}
 
-	splitText(text) {
+	splitText(&text) {
 		local words := string2Values(A_Space, text)
 		local index, literal
 
@@ -827,7 +827,7 @@ class SpeechRecognizer {
 			return
 
 		loop 2 {
-			words := this.splitText(text)
+			words := this.splitText(&text)
 
 			for ignore, handler in this._recognitionHandlers
 				if handler[2].Call(handler[1], words*)

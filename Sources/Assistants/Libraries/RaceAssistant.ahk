@@ -411,6 +411,14 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
+	Knowledge {
+		Get {
+			static knowledge := ["Session", "Stint", "Fuel", "Weather", "Track", "Tyres"]
+
+			return knowledge
+		}
+	}
+
 	EnoughData {
 		Get {
 			return this.iEnoughData
@@ -779,7 +787,26 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	activeTopic(options, topic) {
-		return (!options || !options.Has("exclude") || !inList(options["exlude"], topic))
+		local active
+
+		if options {
+			active := true
+
+			if options.Has("include")
+				active := inList(options["include"], topic)
+			else
+				active := inList(this.Knowledge, topic)
+
+			if (active && options.Has("exclude"))
+				active := !inList(options["exclude"], topic)
+
+			if (active && options.Has("filter"))
+				active := options["filter"].Call(topic)
+
+			return active
+		}
+		else
+			return inList(this.Knowledge, topic)
 	}
 
 	getKnowledge(options := false) {
@@ -2034,6 +2061,14 @@ class GridRaceAssistant extends RaceAssistant {
 		}
 	}
 
+	Knowledge {
+		Get {
+			static knowledge := concatenate(super.Knowledge, ["Positions", "Standings"])
+
+			return knowledge
+		}
+	}
+
 	Pitstops[id?] {
 		Get {
 			if isSet(id) {
@@ -2133,6 +2168,7 @@ class GridRaceAssistant extends RaceAssistant {
 							   , "ClassPosition", this.getPosition(car, "Class")
 							   , "DistanceIntoTrack", (Round(this.getRunning(car) * this.TrackLength) . " Meters")
 							   , "LapTime", (Round(knowledgeBase.getValue("Car." . car . ".Time", 0) / 1000, 1) . " Seconds")
+							   , "NumPitstops", this.Pitstops[knowledgeBase.getValue("Car." . car . ".ID")].Length
 							   , "InPit", (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false)) ? kTrue : kFalse)
 
 			if isSet(type)

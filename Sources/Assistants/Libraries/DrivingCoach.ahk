@@ -57,6 +57,14 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 	}
 
+	Knowledge {
+		Get {
+			static knowledge := choose(super.Knowledge, (t) => !inList(["Standings", "Positions"], t))
+
+			return knowledge
+		}
+	}
+
 	CollectorClass {
 		Get {
 			switch SessionDatabase.getSimulatorCode(this.Simulator), false {
@@ -260,17 +268,6 @@ class DrivingCoach extends GridRaceAssistant {
 
 		if ((oldState != this.ConnectionState) && this.RemoteHandler)
 			this.RemoteHandler.serviceState((this.ConnectionState = "Active") ? "Available" : this.ConnectionState)
-	}
-
-	getKnowledge(options := false) {
-		if !options
-			options := {exclude: ["Standings", "Positions"]}
-		else if !options.Has("exclude")
-			options.exclude := ["Standings", "Positions"]
-		else
-			options.exclude := concatenate(options.exclude, ["Standings", "Positions"])
-
-		return super.getKnowledge(options)
 	}
 
 	getInstruction(category) {

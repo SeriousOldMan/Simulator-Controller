@@ -696,6 +696,14 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 	}
 
+	Knowledge {
+		Get {
+			static knowledge := concatenate(super.Knowledge, ["Strategy"])
+
+			return knowledge
+		}
+	}
+
 	RaceInfo[key?] {
 		Get {
 			return (isSet(key) ? this.iRaceInfo[key] : this.iRaceInfo)

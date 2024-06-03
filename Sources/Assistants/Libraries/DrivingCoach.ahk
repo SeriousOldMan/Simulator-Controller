@@ -268,7 +268,7 @@ class DrivingCoach extends GridRaceAssistant {
 		else if !options.Has("exclude")
 			options.exclude := ["Standings", "Positions"]
 		else
-			options.concatenate(options.exclude, ["Standings", "Positions"])
+			options.exclude := concatenate(options.exclude, ["Standings", "Positions"])
 
 		return super.getKnowledge(options)
 	}

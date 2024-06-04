@@ -1,9 +1,9 @@
 [Development]
 Version=5.7.5.0-dev
 Target=5.7.5.0-release
-Date=06/03/2024
+Date=06/04/2024
 Download=https://www.dropbox.com/scl/fi/8zgwc1yuv01gjy36d8hv1/Simulator-Controller-5.7.5.0-dev.zip?rlkey=84p291r0vdutu1nbv98kmumn6&st=rvex15fu&dl=1
-Changes=Fixed locating of additional apps and tools in "Simulator Setup", Removed "Voice Macro" from the list of standard software in "Simulator Setup", Added "Real Head Motion" to the list of standard software in "Simulator Setup", Automatic updates from versions prior to 5.0.0 are no longer possible, Fixed voice test button in "Simulator Setup", New "Knowledge" instruction for Driving Coach and Conversation Booster, Added tyre compound to tyres info widget in "System Monitor", Added tyre compound to "Tyres" object in "Session State.json" file, Fixed recognition activation mode "Always" in Conversation Booster
+Changes=Fixed locating of additional apps and tools in "Simulator Setup", Removed "Voice Macro" from the list of standard software in "Simulator Setup", Added "Real Head Motion" to the list of standard software in "Simulator Setup", Automatic updates from versions prior to 5.0.0 are no longer possible, Fixed voice test button in "Simulator Setup", New "Knowledge" instruction for Driving Coach and Conversation Booster, Added tyre compound to tyres info widget in "System Monitor", Added tyre compound to "Tyres" object in "Session State.json" file, Fixed recognition activation mode "Always" in Conversation Booster, New voice command for car specific pitstop information
 Components=Media->5.6.1,Configuration->5.7.5,Utilities->5.4.8
 [Release]
 Version=5.7.4.0-release

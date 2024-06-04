@@ -2146,6 +2146,8 @@ class GridRaceAssistant extends RaceAssistant {
 				this.carCupAheadRecognized(words)
 			case "CarCupBehind":
 				this.carCupBehindRecognized(words)
+			case "FocusPitstops":
+				this.focusPitstopsRecognized(words)
 			default:
 				super.handleVoiceCommand(grammar, words)
 		}
@@ -2907,6 +2909,34 @@ class GridRaceAssistant extends RaceAssistant {
 		}
 		else
 			this.getSpeaker().speakPhrase("NoTrackGap")
+	}
+
+	focusPitstopsRecognized(words) {
+		local knowledgeBase := this.KnowledgeBase
+		local speaker := this.getSpeaker()
+		local car := knowledgebase.getValue("Driver.Car", kUndefined)
+		local number, numPitstops
+
+		if !this.hasEnoughData()
+			return
+
+		if ((car == kUndefined) || (car == 0))
+			this.getSpeaker().speakPhrase("Later")
+		else {
+			car := this.getCarNumber(words, &number)
+
+			if car {
+				numPitstops := this.Pitstops[knowledgeBase.getValue("Car." . car . ".ID")].Length
+
+				speaker.speakPhrase((numPitstops = 0) ? "NoFocusPitstops" : "FocusPitstops"
+								  , {indicator: this.getCarIndicatorFragment(speaker, number, knowledgeBase.getValue("Car." . car . ".Position", false))
+								   , pitstops: numPitstops})
+			}
+			else if number
+				speaker.speakPhrase("NoFocusCar", {number: number})
+			else
+				speaker.speakPhrase("Repeat")
+		}
 	}
 
 	savePitstopState(state := false) {

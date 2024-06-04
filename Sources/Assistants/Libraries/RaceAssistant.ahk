@@ -527,7 +527,7 @@ class RaceAssistant extends ConfigurationItem {
 		global kUnknown
 
 		local userName := SessionDatabase.getUserName()
-		local options, forName, ignore, booster
+		local options, forName, ignore, booster, functions
 
 		if !kUnknown
 			kUnknown := translate("Unknown")
@@ -580,7 +580,31 @@ class RaceAssistant extends ConfigurationItem {
 		writeMultiMap(kTempDirectory . assistantType . ".state", configuration)
 
 		if (this.Listener && options["ConversationBooster"]) {
-			booster := ChatBooster(options["ConversationBooster"], this.Configuration, this.VoiceManager.Language)
+			/*
+			functions := "
+			(
+				[{
+					"name": "planPitstop",
+					"description": "Ask the Engineer to plan and prepare the next pitstop",
+					"parameters": {
+						"type": "object",
+						"properties": {
+							"lap": {
+								"type": "integer",
+								"description": "The lap at which the car has to come to the pit"
+							}
+						},
+						"required": ["lap"]
+					}
+				}]
+			)"
+
+			functions := JSON.parse(functions)
+			*/
+
+			functions := []
+
+			booster := ChatBooster(options["ConversationBooster"], this.Configuration, functions, this.VoiceManager.Language)
 
 			if (booster.Model && booster.Active)
 				this.iBooster := booster

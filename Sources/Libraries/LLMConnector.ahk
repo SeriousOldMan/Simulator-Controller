@@ -159,9 +159,21 @@ class LLMConnector {
 	}
 
 	class APIConnector extends LLMConnector.HTTPConnector {
+		iTools := []
+
 		Models {
 			Get {
 				return this.LoadModels()
+			}
+		}
+
+		Tools {
+			Get {
+				return this.iTools
+			}
+
+			Set {
+				return (this.iTools := value)
 			}
 		}
 
@@ -186,6 +198,9 @@ class LLMConnector {
 			}
 
 			messages.Push({role: "user", content: question})
+
+			if this.Tools.Length
+				body.tools := this.Tools
 
 			body.messages := messages
 

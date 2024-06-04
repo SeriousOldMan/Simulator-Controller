@@ -487,10 +487,25 @@ class RecognitionBooster extends ConversationBooster {
 }
 
 class ChatBooster extends ConversationBooster {
+	iFunctions := []
+
 	MaxHistory {
 		Get {
 			return this.Options["MaxHistory"]
 		}
+	}
+
+	Functions {
+		Get {
+			return this.iFunctions
+		}
+	}
+
+	__New(descriptor, configuration, functions?, language := false) {
+		if isSet(functions)
+			this.iFunctions := functions
+
+		super.__New(descriptor, configuration, language)
 	}
 
 	loadFromConfiguration(configuration) {
@@ -507,8 +522,12 @@ class ChatBooster extends ConversationBooster {
 	startBooster() {
 		super.startBooster()
 
-		if (this.Connector && this.Active)
-			this.Connector.MaxHistory := this.MaxHistory
+		if this.Connector {
+			if this.Active
+				this.Connector.MaxHistory := this.MaxHistory
+
+			this.Connector.Tools := collect(this.Functions, (f) => Map("type", "function", "function", f))
+		}
 	}
 
 	ask(question, options := false) {
@@ -572,5 +591,17 @@ class ChatBooster extends ConversationBooster {
 		}
 		else
 			return false
+	}
+}
+
+class AgentBooster extends ChatBooster {
+	__New(descriptor, configuration, functions, language := false) {
+		this.iFunctions := functions
+
+		super.__New(descriptor, configuration, language)
+	}
+
+	startBooster() {
+		super.startBooster()
 	}
 }

@@ -434,10 +434,8 @@ else {
 
 						if (lap = 2)
 							strategist.callRecommendFullCourseYellow()
-						else if (lap = 9) {
-							msgbox 2
+						else if (lap = 9)
 							strategist.callRecommendFullCourseYellow()
-						}
 					}
 					else
 						strategist.updateLap(lap, &data)

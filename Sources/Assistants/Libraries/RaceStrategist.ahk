@@ -1025,7 +1025,7 @@ class RaceStrategist extends GridRaceAssistant {
 		local strategy, nextPitstop, pitstop, pitstops
 
 		if knowledgeBase {
-			if knowledgeBase.getValue("Strategy.Name", false) && this.activeTopic(options, "Strategy")) {
+			if (knowledgeBase.getValue("Strategy.Name", false) && this.activeTopic(options, "Strategy")) {
 				strategy := Map("NumPitstops", knowledgeBase.getValue("Strategy.Pitstop.Count"))
 
 				knowledge["Strategy"] := strategy

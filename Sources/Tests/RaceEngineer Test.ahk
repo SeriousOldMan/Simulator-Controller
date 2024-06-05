@@ -1076,9 +1076,8 @@ else {
 					engineer.preparePitstop()
 				}
 
-				if (A_Index = 4) {
+				if (A_Index = 4)
 					engineer.performPitstop()
-				}
 
 				if engineer.Debug[kDebugKnowledgeBase]
 					engineer.dumpKnowledgeBase(engineer.KnowledgeBase)

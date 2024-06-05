@@ -104,7 +104,7 @@ class RaceEngineer extends RaceAssistant {
 
 	Knowledge {
 		Get {
-			static knowledge := concatenate(super.Knowledge, ["Brakes", "Damage", "Pitstop"])
+			static knowledge := concatenate(super.Knowledge, ["Brakes", "Damage", "Pitstop", "Pitstops"])
 
 			return knowledge
 		}
@@ -366,7 +366,7 @@ class RaceEngineer extends RaceAssistant {
 		local percent := " %"
 		local seconds := " Seconds"
 		local lapNumber, tyres, brakes, tyreCompound, tyreType, setupPressures, ignore, tyreType, goal, resultSet
-		local bodyworkDamage, suspensionDamage, engineDamage, bodyworkDamageSum, suspensionDamageSum
+		local bodyworkDamage, suspensionDamage, engineDamage, bodyworkDamageSum, suspensionDamageSum, pitstops
 
 		getPitstopForecast() {
 			local pitstop := Map("Refuel", (Round(knowledgeBase.getValue("Fuel.Amount.Target", 0), 1) . " Liters")
@@ -394,8 +394,8 @@ class RaceEngineer extends RaceAssistant {
 		getPitstopPlanned() {
 			local lap := knowledgeBase.getValue("Pitstop.Planned.Lap", false)
 			local repairs := (knowledgeBase.getValue("Pitstop.Planned.Repair.Bodywork", false)
-						   && knowledgeBase.getValue("Pitstop.Planned.Repair.Suspension", false)
-						   && knowledgeBase.getValue("Pitstop.Planned.Repair.Engine", false))
+						   || knowledgeBase.getValue("Pitstop.Planned.Repair.Suspension", false)
+						   || knowledgeBase.getValue("Pitstop.Planned.Repair.Engine", false))
 			local pitstop := Map("Nr", knowledgeBase.getValue("Pitstop.Planned.Nr")
 							   , "Refuel", (Round(knowledgeBase.getValue("Pitstop.Planned.Fuel", 0), 1) . " Liters")
 							   , "TyreChange", (knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound", false) ? kTrue : kFalse)
@@ -417,6 +417,35 @@ class RaceEngineer extends RaceAssistant {
 						 , "FrontRight", (Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR", 0), 1) . psi)
 						 , "RearLeft", (Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL", 0), 1) . psi)
 						 , "RearRight", (Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR", 0), 1) . psi))
+			}
+
+			return pitstop
+		}
+
+		getPastPitstop(nr) {
+			local repairs := (knowledgeBase.getValue("Pitstop." . nr . ".Repair.Bodywork", false)
+						   || knowledgeBase.getValue("Pitstop." . nr . ".Repair.Suspension", false)
+						   || knowledgeBase.getValue("Pitstop." . nr . ".Repair.Engine", false))
+			local pitstop := Map("Nr", nr
+							   , "AirTemperature", (Round(knowledgeBase.getValue("Pitstop." . nr . ".Temperature.Air"), 1) . celsius)
+							   , "TrackTemperature", (Round(knowledgeBase.getValue("Pitstop." . nr . ".Temperature.Track"), 1) . celsius)
+							   , "Lap", knowledgeBase.getValue("Pitstop." . nr . ".Lap")
+							   , "Refuel", (Round(knowledgeBase.getValue("Pitstop." . nr . ".Fuel"), 1) . " Liters")
+							   , "TyreChange", (knowledgeBase.getValue("Pitstop." . nr . ".Tyre.Compound", false) ? kTrue : kFalse)
+							   , "Repairs", (repairs ? kTrue : kFalse))
+
+			if (pitstop["TyreChange"] = kTrue) {
+				pitstop["TyreCompound"] := compound(knowledgeBase.getValue("Pitstop." . nr . ".Tyre.Compound")
+												  , knowledgeBase.getValue("Pitstop." . nr . ".Tyre.Compound.Color"))
+
+				if (knowledgeBase.getValue("Pitstop." . nr . ".Tyre.Set", 0) != 0)
+					pitstop["TyreSet"] := knowledgeBase.getValue("Pitstop." . nr . ".Tyre.Set")
+
+				pitstop["TyrePressures"]
+					:= Map("FrontLeft", (Round(knowledgeBase.getValue("Pitstop." . nr . ".Tyre.Pressure.FL", 0), 1) . psi)
+						 , "FrontRight", (Round(knowledgeBase.getValue("Pitstop." . nr . ".Tyre.Pressure.FR", 0), 1) . psi)
+						 , "RearLeft", (Round(knowledgeBase.getValue("Pitstop." . nr . ".Tyre.Pressure.RL", 0), 1) . psi)
+						 , "RearRight", (Round(knowledgeBase.getValue("Pitstop." . nr . ".Tyre.Pressure.RR", 0), 1) . psi))
 			}
 
 			return pitstop
@@ -548,6 +577,17 @@ class RaceEngineer extends RaceAssistant {
 					knowledge["Pitstop"] := getPitstopPlanned()
 				else
 					knowledge["Pitstop"] := getPitstopForecast()
+
+
+			if this.activeTopic(options, "Pitstops") {
+				pitstops := []
+
+				loop knowledgeBase.getValue("Pitstop.Last", 0)
+					if (knowledgeBase.getValue("Pitstop." . A_Index . ".Lap", kUndefined) != kUndefined)
+						pitstops.Push(getPastPitstop(A_Index))
+
+				knowledge["Pitstops"] := pitstops
+			}
 		}
 
 		return knowledge

@@ -113,12 +113,12 @@ toMap(candidate, class := Map) {
 	if !isInstance(candidate, class) {
 		local result := class()
 
-		if !isInstance(candidate, Map) {
+		if isInstance(candidate, String)
+			result := string2Map("|", "->", candidate)
+		else if !isInstance(candidate, Map) {
 			for key, value in candidate.OwnProps()
 				result[key] := value
 		}
-		else if isInstance(candidate, String)
-			result := string2Map("|", "->", candidate)
 		else {
 			for key, value in candidate
 				result[key] := value

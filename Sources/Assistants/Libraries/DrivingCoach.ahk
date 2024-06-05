@@ -418,6 +418,10 @@ class DrivingCoach extends GridRaceAssistant {
 		return choose(collect(this.Instructions[true], ObjBindMethod(this, "getInstruction"))
 					, (instruction) => (instruction && (Trim(instruction) != "")))
 	}
+	
+	getTools() {
+		return []
+	}
 
 	startConversation() {
 		local service := this.Options["Driving Coach.Service"]

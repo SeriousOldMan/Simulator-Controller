@@ -580,31 +580,8 @@ class RaceAssistant extends ConfigurationItem {
 		writeMultiMap(kTempDirectory . assistantType . ".state", configuration)
 
 		if (this.Listener && options["ConversationBooster"]) {
-			/*
-			functions := "
-			(
-				[{
-					"name": "planPitstop",
-					"description": "Ask the Engineer to plan and prepare the next pitstop",
-					"parameters": {
-						"type": "object",
-						"properties": {
-							"lap": {
-								"type": "integer",
-								"description": "The lap at which the car has to come to the pit"
-							}
-						},
-						"required": ["lap"]
-					}
-				}]
-			)"
-
-			functions := JSON.parse(functions)
-			*/
-
-			functions := []
-
-			booster := ChatBooster(options["ConversationBooster"], this.Configuration, functions, this.VoiceManager.Language)
+			booster := ChatBooster(options["ConversationBooster"], this.Configuration
+								 , this.createConversationTools(), this.VoiceManager.Language)
 
 			if (booster.Model && booster.Active)
 				this.iBooster := booster
@@ -650,6 +627,10 @@ class RaceAssistant extends ConfigurationItem {
 
 	createVoiceManager(name, options) {
 		return RaceAssistant.RaceVoiceManager(this, name, options)
+	}
+
+	createConversationTools() {
+		return []
 	}
 
 	updateConfigurationValues(values) {
@@ -902,11 +883,12 @@ class RaceAssistant extends ConfigurationItem {
 															   , knowledge: JSON.print(this.getKnowledge(), "  ")}))
 
 				if text {
-					if this.VoiceManager.UseTalking
-						this.getSpeaker().speak(text, false, false, {Noise: false, Rephrase: false})
-					else
-						for ignore, part in string2Values(". ", text)
-							this.getSpeaker().speak(part . ".", false, false, {Rephrase: false, Click: (A_Index = 1)})
+					if (text != true)
+						if this.VoiceManager.UseTalking
+							this.getSpeaker().speak(text, false, false, {Noise: false, Rephrase: false})
+						else
+							for ignore, part in string2Values(". ", text)
+								this.getSpeaker().speak(part . ".", false, false, {Rephrase: false, Click: (A_Index = 1)})
 
 					return
 				}

@@ -19,8 +19,13 @@ toObject(candidate, class := Object) {
 	if !isInstance(candidate, class) {
 		local result := class()
 
-		for key, value in candidate
-			result.%key% := value
+		if isInstance(candidate, Map) {
+			for key, value in candidate
+				result.%key% := value
+		}
+		else
+			for key, value in candidate.OwnProps()
+				result.%key% := value
 
 		return result
 	}

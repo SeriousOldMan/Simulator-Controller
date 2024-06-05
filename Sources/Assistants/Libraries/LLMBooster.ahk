@@ -227,6 +227,10 @@ class ConversationBooster extends LLMBooster {
 		return []
 	}
 
+	getTools() {
+		return []
+	}
+
 	connectorState(*) {
 	}
 
@@ -487,7 +491,7 @@ class RecognitionBooster extends ConversationBooster {
 }
 
 class ChatBooster extends ConversationBooster {
-	iFunctions := []
+	iTools := []
 
 	MaxHistory {
 		Get {
@@ -495,15 +499,14 @@ class ChatBooster extends ConversationBooster {
 		}
 	}
 
-	Functions {
+	Tools {
 		Get {
-			return this.iFunctions
+			return this.iTools
 		}
 	}
 
-	__New(descriptor, configuration, functions?, language := false) {
-		if isSet(functions)
-			this.iFunctions := functions
+	__New(descriptor, configuration, tools := [], language := false) {
+		this.iTools := tools
 
 		super.__New(descriptor, configuration, language)
 	}
@@ -522,12 +525,8 @@ class ChatBooster extends ConversationBooster {
 	startBooster() {
 		super.startBooster()
 
-		if this.Connector {
-			if this.Active
-				this.Connector.MaxHistory := this.MaxHistory
-
-			this.Connector.Tools := collect(this.Functions, (f) => Map("type", "function", "function", f))
-		}
+		if (this.Connector && this.Active)
+			this.Connector.MaxHistory := this.MaxHistory
 	}
 
 	ask(question, options := false) {
@@ -573,9 +572,10 @@ class ChatBooster extends ConversationBooster {
 																			  , variables)
 														  , substituteVariables(getMultiMapValue(instruction
 																							   , "Conversation.Instructions", "Knowledge")
-																			  , variables)])
+																			  , variables)]
+														 , this.Tools)
 
-					if answer
+					if (answer && (answer != true))
 						answer := this.normalizeAnswer(answer)
 
 					return ((answer && (answer != "")) ? answer : false)

@@ -402,7 +402,7 @@ if !GetKeyState("Ctrl") {
 	withBlockedWindows(MsgBox, "Full run took " . (A_TickCount - startTime) . " ms")
 }
 else {
-	raceNr := 17
+	raceNr := 15
 	strategist := TestRaceStrategist(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Strategist.settings")
 								   , RaceStrategist.RaceStrategistRemoteHandler(0), "Khato", "EN", true, true, false, true, true, true, true, true)
 

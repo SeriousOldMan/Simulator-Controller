@@ -102,6 +102,14 @@ class RaceEngineer extends RaceAssistant {
 		}
 	}
 
+	Knowledge {
+		Get {
+			static knowledge := concatenate(super.Knowledge, ["Brakes", "Damage", "Pitstop"])
+
+			return knowledge
+		}
+	}
+
 	AdjustLapTime {
 		Get {
 			return this.iAdjustLapTime

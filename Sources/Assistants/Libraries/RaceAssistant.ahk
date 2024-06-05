@@ -20,7 +20,7 @@
 #Include "..\..\Libraries\Task.ahk"
 #Include "..\..\Libraries\RuleEngine.ahk"
 #Include "VoiceManager.ahk"
-#Include "ConversationBooster.ahk"
+#Include "LLMBooster.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\..\Database\Libraries\SettingsDatabase.ahk"
 #Include "..\..\Database\Libraries\TyresDatabase.ahk"
@@ -411,6 +411,14 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
+	Knowledge {
+		Get {
+			static knowledge := ["Session", "Stint", "Fuel", "Weather", "Track", "Tyres"]
+
+			return knowledge
+		}
+	}
+
 	EnoughData {
 		Get {
 			return this.iEnoughData
@@ -779,7 +787,26 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	activeTopic(options, topic) {
-		return (!options || !options.Has("exclude") || !inList(options["exlude"], topic))
+		local active
+
+		if options {
+			active := true
+
+			if options.Has("include")
+				active := inList(options["include"], topic)
+			else
+				active := inList(this.Knowledge, topic)
+
+			if (active && options.Has("exclude"))
+				active := !inList(options["exclude"], topic)
+
+			if (active && options.Has("filter"))
+				active := options["filter"].Call(topic)
+
+			return active
+		}
+		else
+			return inList(this.Knowledge, topic)
 	}
 
 	getKnowledge(options := false) {
@@ -2034,6 +2061,14 @@ class GridRaceAssistant extends RaceAssistant {
 		}
 	}
 
+	Knowledge {
+		Get {
+			static knowledge := concatenate(super.Knowledge, ["Positions", "Standings"])
+
+			return knowledge
+		}
+	}
+
 	Pitstops[id?] {
 		Get {
 			if isSet(id) {
@@ -2111,6 +2146,8 @@ class GridRaceAssistant extends RaceAssistant {
 				this.carCupAheadRecognized(words)
 			case "CarCupBehind":
 				this.carCupBehindRecognized(words)
+			case "FocusPitstops":
+				this.focusPitstopsRecognized(words)
 			default:
 				super.handleVoiceCommand(grammar, words)
 		}
@@ -2133,6 +2170,7 @@ class GridRaceAssistant extends RaceAssistant {
 							   , "ClassPosition", this.getPosition(car, "Class")
 							   , "DistanceIntoTrack", (Round(this.getRunning(car) * this.TrackLength) . " Meters")
 							   , "LapTime", (Round(knowledgeBase.getValue("Car." . car . ".Time", 0) / 1000, 1) . " Seconds")
+							   , "NumPitstops", this.Pitstops[knowledgeBase.getValue("Car." . car . ".ID")].Length
 							   , "InPit", (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false)) ? kTrue : kFalse)
 
 			if isSet(type)
@@ -2871,6 +2909,34 @@ class GridRaceAssistant extends RaceAssistant {
 		}
 		else
 			this.getSpeaker().speakPhrase("NoTrackGap")
+	}
+
+	focusPitstopsRecognized(words) {
+		local knowledgeBase := this.KnowledgeBase
+		local speaker := this.getSpeaker()
+		local car := knowledgebase.getValue("Driver.Car", kUndefined)
+		local number, numPitstops
+
+		if !this.hasEnoughData()
+			return
+
+		if ((car == kUndefined) || (car == 0))
+			this.getSpeaker().speakPhrase("Later")
+		else {
+			car := this.getCarNumber(words, &number)
+
+			if car {
+				numPitstops := this.Pitstops[knowledgeBase.getValue("Car." . car . ".ID")].Length
+
+				speaker.speakPhrase((numPitstops = 0) ? "NoFocusPitstops" : "FocusPitstops"
+								  , {indicator: this.getCarIndicatorFragment(speaker, number, knowledgeBase.getValue("Car." . car . ".Position", false))
+								   , pitstops: numPitstops})
+			}
+			else if number
+				speaker.speakPhrase("NoFocusCar", {number: number})
+			else
+				speaker.speakPhrase("Repeat")
+		}
 	}
 
 	savePitstopState(state := false) {

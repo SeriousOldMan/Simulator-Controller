@@ -1142,10 +1142,6 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 	}
 
-	getKnowledge(options := false) {
-		return super.getKnowledge(options)
-	}
-
 	focusCarRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker := this.getSpeaker()

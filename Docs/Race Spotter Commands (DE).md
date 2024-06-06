@@ -109,6 +109,8 @@ Mir=mir, mir bitte
 	
 	[(KannstDu) (Mir) die Anzahl der {Wagen, Fahrzeuge} {durchgeben, durchgeben die noch auf der Strecke sind, durchgeben die noch in der Session sind, durchgeben die noch aktiv sind}, Wie viele {Wagen, Fahrzeuge} {sind, sind noch} {aktiv, auf der Strecke, in der Session}]
 	
+	[(KannstDu) (Mir) sagen wie {oft, oft der} {Wagen, Wagen Nummer, Nummer} (Number) {schon in, in} der Box war, Wie viele Boxenstopps {hat, hat der} {Wagen, Wagen Nummer, Nummer} (Number), Wie oft {war, war der} {Wagen, Wagen Nummer, Nummer} (Number) {schon in, in} der Box]
+	
 	[(KannstDu) (Mir) mehr Informationen {zu, zur, zum} {Wagen, Wagen Nummer, Nummer} (Number) geben, (KannstDu) {Wagen, Wagen Nummer, Nummer} (Number) beobachten]
 	
 	[Bitte gib mir keine weiteren Informationen zu {car, car number, number} (Number) mehr, Keine weiteren Informationen zu {car, car number, number} (Number) mehr bitte]

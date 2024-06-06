@@ -1,5 +1,5 @@
 [Development]
-Version=5.7.5.0-alpha
+Version=5.7.5.0-rc1
 Target=5.7.5.0-release
 Date=06/06/2024
 Download=https://www.dropbox.com/scl/fi/iq05jnuuqh5b5vm161chk/Simulator-Controller-5.7.5.0-alpha.zip?rlkey=58h9qw7edof9vyauw78q570m0&st=jvhzcgbh&dl=1
@@ -27,5 +27,5 @@ Utilities.5.4.8.Download=https://www.dropbox.com/scl/fi/5nduffajjm3x6rhsxr1nk/Ut
 [Current]
 Type=Development
 [Version]
-Development=5.7.5.0-alpha
+Development=5.7.5.0-rc1
 Release=5.7.4.0-release

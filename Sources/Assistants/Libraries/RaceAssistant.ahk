@@ -19,6 +19,7 @@
 #Include "..\..\Libraries\JSON.ahk"
 #Include "..\..\Libraries\Task.ahk"
 #Include "..\..\Libraries\RuleEngine.ahk"
+#Include "..\..\Libraries\LLMConnector.ahk"
 #Include "VoiceManager.ahk"
 #Include "LLMBooster.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
@@ -527,7 +528,7 @@ class RaceAssistant extends ConfigurationItem {
 		global kUnknown
 
 		local userName := SessionDatabase.getUserName()
-		local options, forName, ignore, booster, functions
+		local options, forName, ignore, booster
 
 		if !kUnknown
 			kUnknown := translate("Unknown")
@@ -735,6 +736,20 @@ class RaceAssistant extends ConfigurationItem {
 
 		if values.HasProp("EnoughData")
 			this.iEnoughData := values.EnoughData
+	}
+
+	confirmCommand(enoughData := true) {
+		this.clearContinuation()
+
+		if (enoughData && !this.hasEnoughData())
+			return
+
+		this.getSpeaker().speakPhrase("Confirm")
+
+		Task.yield()
+
+		loop 10
+			Sleep(500)
 	}
 
 	handleVoiceCommand(grammar, words) {

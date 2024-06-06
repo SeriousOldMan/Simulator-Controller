@@ -230,7 +230,7 @@ class LLMConnector {
 
 		Ask(question, instructions := false, tools := false) {
 			local headers := this.CreateHeaders(Map("Content-Type", "application/json"))
-			local body
+			local body := {model: this.Model, max_tokens: this.MaxTokens, temperature: this.Temperature}
 
 			if !instructions
 				instructions := this.GetInstructions()
@@ -238,9 +238,10 @@ class LLMConnector {
 			if !tools
 				tools := this.GetTools()
 
-			body := JSON.print(this.CreatePrompt({model: this.Model, max_tokens: this.MaxTokens
-												, temperature: this.Temperature}
-											   , instructions, tools, question))
+			; if (tools.Length > 0)
+			;	body.tool_choice := "any"
+
+			body := JSON.print(this.CreatePrompt(body, instructions, tools, question))
 
 			if isDebug() {
 				deleteFile(kTempDirectory . "LLM.request")
@@ -271,14 +272,18 @@ class LLMConnector {
 							if answer.Has("content") {
 								answer := answer["content"]
 
-								if (answer = kNull)
+								if ((answer = kNull) || (Trim(answer) = ""))
 									answer := true
 							}
 							else
 								answer := true
 						}
-						else if answer.Has("content")
-							answer := ["content"]
+						else if answer.Has("content") {
+							answer := answer["content"]
+
+							if ((answer = kNull) || (Trim(answer) = ""))
+								answer := false
+						}
 						else
 							answer := false
 					}
@@ -350,25 +355,43 @@ class LLMConnector {
 			if parameter.Enumeration
 				descriptor.Enum := parameter.Enumeration
 
+			if InStr(this.Model, "Command")
+				descriptor.required := (parameter.Required ? kTrue : kFalse)
+
 			return descriptor
 		}
 
-		CreateFunction(function) {
+		CreateParameters(function, &required?) {
 			local parameters := {}
-			local required := []
 			local ignore, parameter
+
+			if isSet(required)
+				required := []
 
 			for ignore, parameter in function.Parameters {
 				parameters.%parameter.Name% := this.CreateParameter(parameter)
 
-				if parameter.Required
+				if (parameter.Required && isSet(required))
 					required.Push(parameter.Name)
 			}
 
-			return {type: "function"
-				  , function: {name: function.Name
-							 , description: function.Description
-							 , parameters: {type: "object", properties: parameters, required: required}}}
+			return parameters
+		}
+
+		CreateFunction(function) {
+			local required := []
+			local parameters := this.CreateParameters(function, &required)
+
+			if InStr(this.Model, "Command")
+				return {name: function.Name, description: function.Description
+					  , parameter_definitions: parameters}
+			else if InStr(this.Model, "Claude")
+				return {name: function.Name, description: function.Description
+					  , input_schema: {type: "object", properties: parameters, required: required}}
+			else
+				return {type: "function"
+					  , function: {name: function.Name, description: function.Description
+								 , parameters: {type: "object", properties: parameters, required: required}}}
 		}
 
 		CreateTool(tool) {
@@ -430,7 +453,7 @@ class LLMConnector {
 		}
 
 		ProcessToolCalls(tools, message) {
-			if message.Has("tool_calls") {
+			if (message.Has("tool_calls") && isInstance(message["tool_calls"], Array)) {
 				do(message["tool_calls"], ObjBindMethod(this, "CallTool", tools))
 
 				return true

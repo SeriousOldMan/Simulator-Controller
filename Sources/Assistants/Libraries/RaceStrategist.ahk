@@ -19,6 +19,7 @@
 #Include "..\..\Libraries\Task.ahk"
 #Include "..\..\Libraries\RuleEngine.ahk"
 #Include "..\..\Libraries\Database.ahk"
+#Include "..\..\Libraries\LLMConnector.ahk"
 #Include "RaceAssistant.ahk"
 #Include "Strategy.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
@@ -959,64 +960,64 @@ class RaceStrategist extends GridRaceAssistant {
 			case "NextPitstop":
 				this.nextPitstopRecognized(words)
 			case "StrategyRecommend":
-				this.clearContinuation()
-
-				if !this.hasEnoughData()
-					return
-
-				this.getSpeaker().speakPhrase("Confirm")
-
-				Task.yield()
-
-				loop 10
-					Sleep(500)
+				this.confirmCommand()
 
 				this.recommendStrategyRecognized(words)
 			case "FCYRecommend":
-				this.clearContinuation()
-
-				if !this.hasEnoughData()
-					return
-
-				this.getSpeaker().speakPhrase("Confirm")
-
-				Task.yield()
-
-				loop 10
-					Sleep(500)
+				this.confirmCommand()
 
 				this.fullCourseYellowRecognized(words)
 			case "PitstopRecommend":
-				this.clearContinuation()
-
-				if !this.hasEnoughData()
-					return
-
-				this.getSpeaker().speakPhrase("Confirm")
-
-				Task.yield()
-
-				loop 10
-					Sleep(500)
+				this.confirmCommand()
 
 				this.recommendPitstopRecognized(words)
 			case "PitstopSimulate":
-				this.clearContinuation()
-
-				if !this.hasEnoughData()
-					return
-
-				this.getSpeaker().speakPhrase("Confirm")
-
-				Task.yield()
-
-				loop 10
-					Sleep(500)
+				this.confirmCommand()
 
 				this.simulatePitstopRecognized(words)
 			default:
 				super.handleVoiceCommand(grammar, words)
 		}
+	}
+
+	createConversationTools() {
+		local strategyTools
+
+		planPitstop(targetLap := false) {
+			this.confirmCommand(false)
+
+			if isDebug()
+				showMessage("LLM -> planPitstop(" . targetLap . ")")
+
+			this.planPitstop(targetLap)
+		}
+
+		simulatePitstop(targetLap := false) {
+			this.confirmCommand(false)
+
+			if isDebug()
+				showMessage("LLM -> simulatePitstop(" . targetLap . ")")
+
+			this.recommendPitstop(targetLap)
+		}
+
+		updateStrategy() {
+			this.confirmCommand()
+
+			if isDebug()
+				showMessage("LLM -> updateStrategy()")
+
+			this.recommendStrategy()
+		}
+
+		return concatenate(super.createConversationTools()
+						 , [LLMTool.Function("planPitstop", "Ask the Engineer to plan a pitstop."
+										   , [LLMTool.Function.Parameter("lap", "The planned lap for the car to come to the pit.", "Integer", false, false)]
+										   , planPitstop),
+						 , LLMTool.Function("simulatePitstop", "Simulates the outcome of an upcoming pitstop. The traffic situation after the pitstop will be evaluated and the target lap will be optimized, if an undercut is possible."
+										  , [LLMTool.Function.Parameter("lap", "The initial target lap for the upcoming pitstop.", "Integer", false, false)]
+										  , simulatePitstop)
+						 , LLMTool.Function("updateStrategy", "Trigger a recalculation of the current race strategy.", [], updateStrategy)])
 	}
 
 	getKnowledge(options := false) {
@@ -3560,43 +3561,19 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	callRecommendPitstop(lapNumber := false) {
-		this.clearContinuation()
-
-		if this.Speaker
-			this.getSpeaker().speakPhrase("Confirm")
-
-		Task.yield()
-
-		loop 10
-			Sleep(500)
+		this.confirmCommand(false)
 
 		this.recommendPitstop(lapNumber)
 	}
 
 	callRecommendStrategy() {
-		this.clearContinuation()
-
-		if this.Speaker
-			this.getSpeaker().speakPhrase("Confirm")
-
-		Task.yield()
-
-		loop 10
-			Sleep(500)
+		this.confirmCommand(false)
 
 		this.recommendStrategy()
 	}
 
 	callRecommendFullCourseYellow() {
-		this.clearContinuation()
-
-		if this.Speaker
-			this.getSpeaker().speakPhrase("Confirm")
-
-		Task.yield()
-
-		loop 10
-			Sleep(500)
+		this.confirmCommand(false)
 
 		this.recommendStrategy({FullCourseYellow: true})
 	}

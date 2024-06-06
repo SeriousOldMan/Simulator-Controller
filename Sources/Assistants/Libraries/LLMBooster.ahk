@@ -529,6 +529,10 @@ class ChatBooster extends ConversationBooster {
 			this.Connector.MaxHistory := this.MaxHistory
 	}
 
+	getTools() {
+		return this.Tools
+	}
+
 	ask(question, options := false) {
 		local variables := false
 		local doTalk, code, language, fileName, languageInstructions, instruction, variables

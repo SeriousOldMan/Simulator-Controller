@@ -18,6 +18,7 @@
 
 #Include "..\..\Libraries\Task.ahk"
 #Include "..\..\Libraries\RuleEngine.ahk"
+#Include "..\..\Libraries\LLMConnector.ahk"
 #Include "RaceAssistant.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
 
@@ -243,12 +244,7 @@ class RaceEngineer extends RaceAssistant {
 					this.setContinuation(ObjBindMethod(this, "planPitstopRecognized", words))
 				}
 				else {
-					this.getSpeaker().speakPhrase("Confirm")
-
-					Task.yield()
-
-					loop 10
-						Sleep(500)
+					this.confirmCommand(false)
 
 					this.planPitstopRecognized(words)
 				}
@@ -279,12 +275,7 @@ class RaceEngineer extends RaceAssistant {
 						this.driverSwapRecognized(words)
 				}
 				else {
-					this.getSpeaker().speakPhrase("Confirm")
-
-					Task.yield()
-
-					loop 10
-						Sleep(500)
+					this.confirmCommand(false)
 
 					this.driverSwapRecognized(words)
 				}
@@ -356,6 +347,33 @@ class RaceEngineer extends RaceAssistant {
 			default:
 				super.handleVoiceCommand(grammar, words)
 		}
+	}
+
+	createConversationTools() {
+		local strategyTools
+
+		planPitstop(targetLap?, refuelAmount?, changeTyres?, repairs?) {
+			this.confirmCommand(false)
+
+			if isDebug()
+				showMessage("LLM -> planPitstop(" . targetLap . ")")
+
+			repairs := (isSet(repairs) ? repairs : kUndefined)
+
+			this.planPitstop(isSet(targetLap) ? targetLap : kUndefined
+						   , isSet(refuelAmount) ? ("!" . refuelAmount) : kUndefined
+						   , isSet(changeTyres) ? ("!" . changeTyres) : kUndefined
+						   , kUndefined, kUndefined, kUndefined, kUndefined
+						   , repairs, repairs, repairs)
+		}
+
+		return concatenate(super.createConversationTools()
+						 , [LLMTool.Function("planPitstop", "Create a plan for the next pitstop."
+										   , [LLMTool.Function.Parameter("lap", "The planned lap for the car to come to the pit.", "Integer", false, true)
+										   ,  LLMTool.Function.Parameter("refuel", "The amount of fuel to be filled into the car.", "Integer", false, true)
+										   ,  LLMTool.Function.Parameter("changeTyres", "Indicates whether new tyres should be mounted.", "Boolean", false, true)
+										   ,  LLMTool.Function.Parameter("repairDamages", "Indicates whether all damages should be repaired.", "Boolean", false, true)]
+										   , planPitstop)])
 	}
 
 	getKnowledge(options := false) {
@@ -839,12 +857,7 @@ class RaceEngineer extends RaceAssistant {
 	}
 
 	preparePitstopRecognized(words) {
-		this.getSpeaker().speakPhrase("Confirm")
-
-		Task.yield()
-
-		loop 10
-			Sleep(500)
+		this.confirmCommand(false)
 
 		this.preparePitstop()
 	}
@@ -2340,6 +2353,8 @@ class RaceEngineer extends RaceAssistant {
 		local options := ((optionsOrLap = kUndefined) ? true : optionsOrLap)
 		local plannedLap := false
 		local force := false
+		local forceRefuel := false
+		local forceTyreChange := false
 		local result, pitstopNumber, speaker, fragments, fuel, lap, correctedFuel, targetFuel
 		local correctedTyres, compound, color, incrementFL, incrementFR, incrementRL, incrementRR, pressureCorrection
 		local temperatureDelta, debug, tyre, tyreType, lostPressure, deviationThreshold, ignore, suffix
@@ -2383,8 +2398,11 @@ class RaceEngineer extends RaceAssistant {
 		correctedFuel := false
 
 		if (refuelAmount != kUndefined) {
-			if (InStr(refuelAmount, "!") = 1)
+			if (InStr(refuelAmount, "!") = 1) {
 				knowledgeBase.addFact("Pitstop.Plan.Fuel.Amount", SubStr(refuelAmount, 2) + 0)
+
+				forceRefuel := true
+			}
 			else {
 				targetFuel := knowledgeBase.getValue("Fuel.Amount.Target", false)
 
@@ -2407,6 +2425,8 @@ class RaceEngineer extends RaceAssistant {
 				changeTyres := (SubStr(changeTyres, 2) + 0)
 
 				knowledgeBase.addFact("Pitstop.Plan.Tyre.Change", changeTyres)
+
+				forceTyreChange := true
 			}
 			else {
 				if (changeTyres != (knowledgeBase.getValue("Tyre.Compound.Target", false) != false)) {
@@ -2472,7 +2492,7 @@ class RaceEngineer extends RaceAssistant {
 					fuel := knowledgeBase.getValue("Pitstop.Planned.Fuel", 0)
 
 					if (fuel == 0)
-						speaker.speakPhrase("NoRefuel")
+						speaker.speakPhrase(forceRefuel ? "NoRefuel" : "NoRefuelLap")
 					else
 						speaker.speakPhrase("Refuel", {fuel: speaker.number2Speech(convertUnit("Volume", fuel), 1), unit: fragments[getUnit("Volume")]})
 
@@ -2493,7 +2513,7 @@ class RaceEngineer extends RaceAssistant {
 							speaker.speakPhrase(!tyreSet ? "WetTyresNoSet" : "WetTyres", {compound: fragments[compound . "Tyre"], color: color, set: tyreSet})
 					}
 					else {
-						if (knowledgeBase.getValue("Lap.Remaining.Stint", 0) > 5)
+						if (forceTyreChange || (knowledgeBase.getValue("Lap.Remaining.Stint", 0) > 5))
 							speaker.speakPhrase("NoTyreChange")
 						else
 							speaker.speakPhrase("NoTyreChangeLap")
@@ -2936,14 +2956,8 @@ class RaceEngineer extends RaceAssistant {
 		this.clearContinuation()
 
 		if (lap == kUndefined) {
-			if confirm {
-				this.getSpeaker().speakPhrase("Confirm")
-
-				Task.yield()
-
-				loop 10
-					Sleep(500)
-			}
+			if confirm
+				this.confirmCommand(false)
 
 			this.planPitstop()
 		}
@@ -2989,14 +3003,8 @@ class RaceEngineer extends RaceAssistant {
 		this.clearContinuation()
 
 		if (lap == kUndefined) {
-			if confirm {
-				this.getSpeaker().speakPhrase("Confirm")
-
-				Task.yield()
-
-				loop 10
-					Sleep(500)
-			}
+			if confirm
+				this.confirmCommand(false)
 
 			this.planDriverSwap()
 		}
@@ -3012,13 +3020,7 @@ class RaceEngineer extends RaceAssistant {
 				this.getSpeaker().speakPhrase("NoPitstop")
 		}
 		else {
-			if this.Speaker
-				this.getSpeaker().speakPhrase("Confirm")
-
-			Task.yield()
-
-			loop 10
-				Sleep(500)
+			this.confirmCommand(false)
 
 			if lap
 				this.preparePitstop(lap)

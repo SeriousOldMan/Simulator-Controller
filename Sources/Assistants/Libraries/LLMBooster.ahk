@@ -501,7 +501,7 @@ class ChatBooster extends ConversationBooster {
 
 	Tools {
 		Get {
-			return this.iTools
+			return (this.Options["Actions"] ? this.iTools : [])
 		}
 	}
 
@@ -520,6 +520,7 @@ class ChatBooster extends ConversationBooster {
 		options["Active"] := getMultiMapValue(configuration, "Conversation Booster", descriptor . ".Conversation", false)
 		options["MaxHistory"] := getMultiMapValue(configuration, "Conversation Booster", descriptor . ".ConversationMaxHistory", 3)
 		options["Temperature"] := getMultiMapValue(configuration, "Conversation Booster", descriptor . ".ConversationTemperature", 0.2)
+		options["Actions"] := getMultiMapValue(configuration, "Conversation Booster", descriptor . ".ConversationActions", false)
 	}
 
 	startBooster() {
@@ -595,17 +596,5 @@ class ChatBooster extends ConversationBooster {
 		}
 		else
 			return false
-	}
-}
-
-class AgentBooster extends ChatBooster {
-	__New(descriptor, configuration, functions, language := false) {
-		this.iFunctions := functions
-
-		super.__New(descriptor, configuration, language)
-	}
-
-	startBooster() {
-		super.startBooster()
 	}
 }

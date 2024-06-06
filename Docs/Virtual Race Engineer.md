@@ -206,7 +206,7 @@ The LLM may be able to trigger actions as a result of a conversation. This is ac
   - Mistral Small, Mistral Large and Mixtral 8x22b from *Mistral AI*
   - Command-R by *Cohere*
   - Claude3 by *Anthropic*
-  - Several Open Source models, such as Open Hermes, but with varying degree of support
+  - Several Open Source models, such as Open Hermes, also support tools but with a varying degree of reliability
 
 The following table shows you the actions, that might be triggered by the LLM during a conversation with the Strategist:
 

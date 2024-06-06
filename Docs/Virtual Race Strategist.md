@@ -84,13 +84,13 @@ Beside the builtin pattern-based voice recognition and the speech capabilities b
 
 ##### Trigger actions from conversation
 
-The LLM may be able to trigger actions as a result of a conversation. This is achieved by the so-called tool interface of the LLM. Tools are supported at the time of this writing by the following models:
+An LLM may be able to trigger actions as a result of a conversation. This is achieved by the so-called tool interface of the LLM. Tools are supported at the time of this writing by the following models:
 
   - GPT 3.5 and above from *OpenAI*
   - Mistral Small, Mistral Large and Mixtral 8x22b from *Mistral AI*
   - Command-R by *Cohere*
   - Claude3 by *Anthropic*
-  - Several Open Source models, such as Open Hermes, but with varying degree of support
+  - Several Open Source models, such as Open Hermes, also support tools but with a varying degree of reliability
 
 The following table shows you the actions, that might be triggered by the LLM during a conversation with the Strategist:
 
@@ -102,7 +102,7 @@ The following table shows you the actions, that might be triggered by the LLM du
 
 As you might expect, it depends on the data available in the knowledge base, whether the LLM will decide to trigger this action or not. If the LLM refuses to do so, you still have all the traditional voice commands and the controller actions at your disposal.
 
-IMPORTANT: When action handling is enabled, it might be necessary to disable the "Recognition" booster or at least set the "Creativity" to a very low value. Otherwise the "Recognition" booster might detect a command pattern, which will match to a pre-defined voice command, thereby preventing the LLM from crating a custom action plan.
+IMPORTANT: When action handling is enabled, it might be necessary to disable the "Recognition" booster or at least set the "Creativity" to a very low value. Otherwise the "Recognition" booster might detect a command pattern, which will match to a predefined voice command, thereby preventing the LLM from crating a custom action plan.
 
 ### Enabling and disabling specific warnings and announcements
 

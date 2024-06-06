@@ -1,23 +1,20 @@
 [Development]
-Version=5.7.5.0-rc1
+Version=5.7.5.0-release
 Target=5.7.5.0-release
-Date=06/06/2024
-Download=https://www.dropbox.com/scl/fi/iq05jnuuqh5b5vm161chk/Simulator-Controller-5.7.5.0-alpha.zip?rlkey=58h9qw7edof9vyauw78q570m0&st=jvhzcgbh&dl=1
+Date=06/07/2024
+Download=https://cutt.ly/keiTVgvM;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.7.5.0-release.zip
 Changes=Fixed locating of additional apps and tools in "Simulator Setup", Removed "Voice Macro" from the list of standard software in "Simulator Setup", Added "Real Head Motion" to the list of standard software in "Simulator Setup", Automatic updates from versions prior to 5.0.0 are no longer possible, Fixed voice test button in "Simulator Setup", New "Knowledge" instruction for Driving Coach and Conversation Booster, Added tyre compound to tyres info widget in "System Monitor", Added tyre compound to "Tyres" object in "Session State.json" file, Fixed recognition activation mode "Always" in Conversation Booster, New voice command for car specific pitstop information, Migrated to AHK 2.0.17
 Components=Media->5.6.1,Configuration->5.7.5,Utilities->5.4.8
 [Release]
-Version=5.7.4.0-release
-Date=05/31/2024
-Download=https://cutt.ly/zeuyg6aJ;https://www.dropbox.com/scl/fi/07bgg8pbn1ivtmb2dq3yl/Simulator-Controller-5.7.4.0-release.zip?rlkey=d7vtmlaynqtodly4ka1mhxnid&st=pyzobqz5&dl=1
-Changes=Added support for Ollama, Added support for generic GPT service provider, Bugfixes for conversation booster, Fixed P2T without saying anything, Increased compatibility with silly LLMs, Load models from GPT service provider, Migrated to AHK 2.0.16
-Components=Media->5.6.1,Configuration->5.7.3,Utilities->5.4.8
+Version=5.7.5.0-release
+Date=06/07/2024
+Download=https://cutt.ly/keiTVgvM;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.7.5.0-release.zip
+Changes=Fixed locating of additional apps and tools in "Simulator Setup", Removed "Voice Macro" from the list of standard software in "Simulator Setup", Added "Real Head Motion" to the list of standard software in "Simulator Setup", Automatic updates from versions prior to 5.0.0 are no longer possible, Fixed voice test button in "Simulator Setup", New "Knowledge" instruction for Driving Coach and Conversation Booster, Added tyre compound to tyres info widget in "System Monitor", Added tyre compound to "Tyres" object in "Session State.json" file, Fixed recognition activation mode "Always" in Conversation Booster, New voice command for car specific pitstop information, Migrated to AHK 2.0.17
+Components=Media->5.6.1,Configuration->5.7.5,Utilities->5.4.8
 [Components]
 Media.5.6.1.Path=Resources
 Media.5.6.1.Content=Splash Media
 Media.5.6.1.Download=https://www.dropbox.com/scl/fi/3c56fjdvdd4od5t7rsuc9/Media-5.6.1.zip?rlkey=x0icl05jy05nn886due4dsblv&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Media+5.6.1.zip
-Configuration.5.7.3.Path=Resources
-Configuration.5.7.3.Content=Setup
-Configuration.5.7.3.Download=https://www.dropbox.com/scl/fi/vad78ma29ynq32hxufpej/Configuration-5.7.3.zip?rlkey=2526f002rsdkb0w6rwl8t1w0r&st=jlw8tjwg&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+5.7.3.zip
 Configuration.5.7.5.Path=Resources
 Configuration.5.7.5.Content=Setup
 Configuration.5.7.5.Download=https://www.dropbox.com/scl/fi/l382lwe5ev6tzp3u0dyey/Configuration-5.7.5.zip?rlkey=vvej8tvno3eih7319fft2nae3&st=ficbsxr8&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+5.7.5.zip
@@ -25,7 +22,7 @@ Utilities.5.4.8.Path=.
 Utilities.5.4.8.Content=Utilities
 Utilities.5.4.8.Download=https://www.dropbox.com/scl/fi/5nduffajjm3x6rhsxr1nk/Utilities-5.4.8.zip?rlkey=alrj8l2z205dd2vm9cu6hbsot&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+5.4.8.zip
 [Current]
-Type=Development
+Type=Release
 [Version]
-Development=5.7.5.0-rc1
-Release=5.7.4.0-release
+Development=5.7.5.0-release
+Release=5.7.5.0-release

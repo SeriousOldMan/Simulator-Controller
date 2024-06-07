@@ -19,6 +19,7 @@
 #Include "..\..\Libraries\Task.ahk"
 #Include "..\..\Libraries\Math.ahk"
 #Include "..\..\Libraries\RuleEngine.ahk"
+#Include "..\..\Libraries\LLMConnector.ahk"
 #Include "RaceAssistant.ahk"
 
 

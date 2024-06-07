@@ -198,6 +198,28 @@ I strongly recommed to memorize the phrases in the language you use to interact 
 
 Beside the builtin pattern-based voice recognition and the speech capabilities based on predefined phrases as described above, it is optionally possible to connect Jona to a GPT service like OpenAI or a locally hosted LLM, to dramatacilly improve the quality in conversation with the Assistant. When the conversation booster is configured (see [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm) for more information about the necessary configuration steps), the full knowledge about the car state will be supllied to the LLM. In detail, this includes tyre pressures, tyre temeperatures, tyre wear, brake temperatures, brake wear, fuel level, fuel consumption, damage, and so on. When a pitstop is planned, the plan is available and the pitstop history is also available.
 
+##### Trigger actions from conversation
+
+The LLM may be able to trigger actions as a result of a conversation. This is achieved by the so-called tool interface of the LLM. Tools are supported at the time of this writing by the following models:
+
+  - GPT 3.5 and above from *OpenAI*
+  - Mistral Small, Mistral Large and Mixtral 8x22b from *Mistral AI*
+  - Claude3 by *Anthropic* (via *OpenRouter*)
+  - Command-R+ by *Cohere* (via *OpenRouter*, but not working properly yet)
+  - Some Open Source models, such as Open Hermes, also support tools but with a varying degree of reliability
+
+Please note that calling actions is currently only available when using *OpenAI*, *Mistral AI* or *OpenRouter* are used as GPT service providers.
+
+The following table shows you the actions, that might be triggered by the LLM during a conversation with the Strategist:
+
+| Action                 | Parameter(s)      | Example(s) |
+|------------------------|-------------------|------------|
+| Pitstop Planning       | 1. [Optional] lap 2. [Optional] refuelAmount 3. [Optional] changeTyres 4. [Optional] repairDamage | "We must pit for repairs. Can you create a plan without refueling and without tyre change?" |
+
+As you might expect, it depends on the data available in the knowledge base, whether the LLM will decide to trigger this action or not. If the LLM refuses to do so, you still have all the traditional voice commands and the controller actions at your disposal.
+
+IMPORTANT: When action handling is enabled, it might be necessary to disable the "Recognition" booster or at least set the "Creativity" to a very low value. Otherwise the "Recognition" booster might detect a command pattern, which will match to a pre-defined voice command, thereby preventing the LLM from crating a custom action plan.
+
 ### Enabling and disabling specific warnings and announcements
 
 Jona will give you a lot of information about fuel level, damages after an accident, and so on. You may disable these warnings individually by using a special voice command:

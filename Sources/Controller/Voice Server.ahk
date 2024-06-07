@@ -216,25 +216,25 @@ class VoiceServer extends ConfigurationItem {
 				this.VoiceClient.VoiceServer.recognizeText(this.VoiceClient, text)
 			}
 
-			splitText(&text) {
+			parseText(&text, rephrase := false) {
 				local booster := this.Booster
 				local alternateText
 
-				if (booster && (booster.Mode = "Always")) {
+				if (booster && rephrase && (booster.Mode = "Always")) {
 					alternateText := booster.recognize(text)
 
 					if (alternateText && (alternateText != ""))
 						text := alternateText
 				}
 
-				return super.splitText(&text)
+				return super.parseText(&text)
 			}
 
-			unknownRecognized(&text) {
+			unknownRecognized(&text, rephrase := false) {
 				local booster := this.Booster
 				local alternateText
 
-				if (booster && (booster.Mode = "Unknown")) {
+				if (booster && rephrase && (booster.Mode = "Unknown")) {
 					alternateText := booster.recognize(text)
 
 					if (alternateText && (alternateText != "") && (alternateText != text)) {

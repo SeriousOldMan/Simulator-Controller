@@ -24,6 +24,121 @@
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+class LLMTool {
+	iName := ""
+	iDescription := ""
+
+	class Function extends LLMTool {
+		iParameters := []
+
+		iCallable := false
+
+		class Parameter {
+			iName := ""
+			iDescription := ""
+
+			iType := "object"
+			iEnumeration := false
+			iRequired := true
+
+			iReader := (v) => v
+
+			Name {
+				Get {
+					return this.iName
+				}
+			}
+
+			Description {
+				Get {
+					return this.iDescription
+				}
+			}
+
+			Type {
+				Get {
+					return this.iType
+				}
+			}
+
+			Enumeration {
+				Get {
+					return this.iEnumeration
+				}
+			}
+
+			Required {
+				Get {
+					return this.iRequired
+				}
+			}
+
+			Reader {
+				Get {
+					return this.iReader
+				}
+			}
+
+			__New(name, description, type, enumeration := false, required := true, reader := (v) => v) {
+				this.iName := name
+				this.iDescription := description
+				this.iType := StrLower(type)
+				this.iEnumeration := enumeration
+				this.iRequired := required
+				this.iReader := reader
+			}
+		}
+
+		Type {
+			Get {
+				return "function"
+			}
+		}
+
+		Parameters {
+			Get {
+				return this.iParameters
+			}
+		}
+
+		Callable {
+			Get {
+				return this.iCallable
+			}
+		}
+
+		__New(name, description, parameters, callable) {
+			this.iParameters := parameters
+			this.iCallable := callable
+
+			super.__New(name, description)
+		}
+	}
+
+	Type {
+		Get {
+			throw "Virtual property LLTool.Type must be implemeneted in a subclass..."
+		}
+	}
+
+	Name {
+		Get {
+			return this.iName
+		}
+	}
+
+	Description {
+		Get {
+			return this.iDescription
+		}
+	}
+
+	__New(name, description) {
+		this.iName := name
+		this.iDescription := description
+	}
+}
+
 class LLMConnector {
 	iManager := false
 	iModel := false
@@ -101,15 +216,38 @@ class LLMConnector {
 			return headers
 		}
 
-		CreatePrompt(body, instructions, question) {
+		CreatePrompt(body, instructions, tools, question) {
 			throw "Virtual method HTTPConnector.CreatePrompt must be implemented in a subclass..."
 		}
 
-		Ask(question, instructions := false) {
-			local headers := this.CreateHeaders(Map("Content-Type", "application/json"))
-			local body := this.CreatePrompt({model: this.Model, max_tokens: this.MaxTokens, temperature: this.Temperature}, instructions ? instructions : this.GetInstructions(), question)
+		CreateTools(body, tools) {
+			throw "Virtual method HTTPConnector.CreateTools must be implemented in a subclass..."
+		}
 
-			body := JSON.print(body)
+		ProcessToolCalls(tools, message) {
+			return false
+		}
+
+		Ask(question, instructions := false, tools := false) {
+			local headers := this.CreateHeaders(Map("Content-Type", "application/json"))
+			local body := {model: this.Model, max_tokens: this.MaxTokens, temperature: this.Temperature}
+
+			if !instructions
+				instructions := this.GetInstructions()
+
+			if !tools
+				tools := this.GetTools()
+
+			/*
+			if InStr(this.Model, "Claude")
+				if (tools.Length > 0)
+					body.tool_choice := {type: "auto"}
+			*/
+
+			if isDebug()
+				body := JSON.print(this.CreatePrompt(body, instructions, tools, question), "  ")
+			else
+				body := JSON.print(this.CreatePrompt(body, instructions, tools, question))
 
 			if isDebug() {
 				deleteFile(kTempDirectory . "LLM.request")
@@ -133,14 +271,35 @@ class LLMConnector {
 				try {
 					answer := answer["choices"][1]
 
-					if answer.Has("message")
-						answer := answer["message"]["content"]
+					if answer.Has("message") {
+						answer := answer["message"]
+
+						if this.ProcessToolCalls(tools, answer) {
+							if answer.Has("content") {
+								answer := answer["content"]
+
+								if ((answer = kNull) || (Trim(answer) = ""))
+									answer := true
+							}
+							else
+								answer := true
+						}
+						else if answer.Has("content") {
+							answer := answer["content"]
+
+							if ((answer = kNull) || (Trim(answer) = ""))
+								answer := false
+						}
+						else
+							answer := false
+					}
 					else if answer.Has("text")
 						answer := answer["text"]
 					else
 						throw "Unknown answer format detected..."
 
-					this.AddConversation(question, answer)
+					if (answer && (answer != true))
+						this.AddConversation(question, answer)
 
 					return answer
 				}
@@ -169,7 +328,7 @@ class LLMConnector {
 			return StrReplace(this.CreateServiceURL(server), "chat/completions", "models")
 		}
 
-		CreatePrompt(body, instructions, question) {
+		CreatePrompt(body, instructions, tools, question) {
 			local messages := []
 			local ignore, instruction, conversation
 
@@ -189,7 +348,128 @@ class LLMConnector {
 
 			body.messages := messages
 
+			if (tools.Length > 0)
+				body := this.CreateTools(body, tools)
+
 			return body
+		}
+
+		CreateParameter(parameter) {
+			Local descriptor := {description: parameter.Description
+							   , type: parameter.Type}
+
+			if parameter.Enumeration
+				descriptor.Enum := parameter.Enumeration
+
+			/*
+			if InStr(this.Model, "Command")
+				descriptor.required := (parameter.Required ? kTrue : kFalse)
+			*/
+
+			return descriptor
+		}
+
+		CreateParameters(function, &required?) {
+			local parameters := {}
+			local ignore, parameter
+
+			if isSet(required)
+				required := []
+
+			for ignore, parameter in function.Parameters {
+				parameters.%parameter.Name% := this.CreateParameter(parameter)
+
+				if (parameter.Required && isSet(required))
+					required.Push(parameter.Name)
+			}
+
+			return parameters
+		}
+
+		CreateFunction(function) {
+			local required := []
+			local parameters := this.CreateParameters(function, &required)
+
+			/*
+			if (!isInstance(this, LLMConnector.OpenRouterConnector) && InStr(this.Model, "Command"))
+				return {name: function.Name, description: function.Description
+					  , parameter_definitions: parameters}
+			else if (!isInstance(this, LLMConnector.OpenRouterConnector) && InStr(this.Model, "Claude"))
+				return {name: function.Name, description: function.Description
+					  , input_schema: {type: "object", properties: parameters, required: required}}
+			else
+			*/
+				return {type: "function"
+					  , function: {name: function.Name, description: function.Description
+								 , parameters: {type: "object", properties: parameters, required: required}}}
+		}
+
+		CreateTool(tool) {
+			if (tool.Type = "function")
+				return this.CreateFunction(tool)
+			else
+				throw "Unsupported tool type detected in LLMConnector.APIConnector.CreateTool..."
+		}
+
+		CreateTools(body, tools) {
+			body.tools := collect(tools, ObjBindMethod(this, "CreateTool"))
+
+			return body
+		}
+
+		CallTool(tools, tool) {
+			local name, arguments, ignore, candidate, argument
+
+			getArguments(function, arguments) {
+				local result := []
+				local ignore, paramater, name, argument, value
+
+				for ignore, parameter in function.Parameters {
+					value := kUndefined
+
+					for name, argument in arguments
+						if (name = parameter.Name) {
+							value := parameter.Reader.Call(argument)
+
+							break
+						}
+
+					result.Push((value = kUndefined) ? unset : value)
+				}
+
+				return result
+			}
+
+			if tool.Has("function") {
+				tool := tool["function"]
+				name := tool["name"]
+
+				for ignore, candidate in tools
+					if (candidate.Name = name) {
+						arguments := tool["arguments"]
+
+						if isInstance(arguments, String)
+							arguments := JSON.parse(arguments)
+
+						arguments := toMap(arguments)
+
+						candidate.Callable.Call(getArguments(candidate, arguments)*)
+
+						break
+					}
+			}
+			else
+				throw "Unsupported tool type detected in LLMConnector.APIConnector.CallTool..."
+		}
+
+		ProcessToolCalls(tools, message) {
+			if (message.Has("tool_calls") && isInstance(message["tool_calls"], Array)) {
+				do(message["tool_calls"], ObjBindMethod(this, "CallTool", tools))
+
+				return true
+			}
+			else
+				return false
 		}
 
 		ParseModels(response) {
@@ -328,7 +608,7 @@ class LLMConnector {
 	}
 
 	class LLMRuntimeConnector extends LLMConnector {
-		CreatePrompt(instructions, question) {
+		CreatePrompt(instructions, tools, question) {
 			local prompt := ""
 			local ignore, instruction, conversation
 
@@ -353,8 +633,10 @@ class LLMConnector {
 			return prompt
 		}
 
-		Ask(question, instructions := false) {
-			local prompt := this.CreatePrompt(instructions ? instructions : this.GetInstructions(), question)
+		Ask(question, instructions := false, tools := false) {
+			local prompt := this.CreatePrompt(instructions ? instructions : this.GetInstructions()
+											, tools ? tools : this.GetTools()
+											, question)
 			local answerFile := temporaryFileName("LLMRuntime", "answer")
 			local command, answer
 
@@ -489,6 +771,10 @@ class LLMConnector {
 
 	GetInstructions() {
 		return this.Manager.getInstructions()
+	}
+
+	GetTools() {
+		return this.Manager.getTools()
 	}
 
 	AddConversation(question, answer) {

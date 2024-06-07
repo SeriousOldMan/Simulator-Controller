@@ -227,6 +227,10 @@ class ConversationBooster extends LLMBooster {
 		return []
 	}
 
+	getTools() {
+		return []
+	}
+
 	connectorState(*) {
 	}
 
@@ -317,7 +321,7 @@ class SpeechBooster extends ConversationBooster {
 					return ((answer && (answer != "")) ? answer : text)
 				}
 				catch Any as exception {
-					logError(exception)
+					logError(exception, true)
 
 					return text
 				}
@@ -473,7 +477,7 @@ class RecognitionBooster extends ConversationBooster {
 						return string2Values("->", answer)[2]
 				}
 				catch Any as exception {
-					logError(exception)
+					logError(exception, true)
 
 					return text
 				}
@@ -487,10 +491,24 @@ class RecognitionBooster extends ConversationBooster {
 }
 
 class ChatBooster extends ConversationBooster {
+	iTools := []
+
 	MaxHistory {
 		Get {
 			return this.Options["MaxHistory"]
 		}
+	}
+
+	Tools {
+		Get {
+			return (this.Options["Actions"] ? this.iTools : [])
+		}
+	}
+
+	__New(descriptor, configuration, tools := [], language := false) {
+		this.iTools := tools
+
+		super.__New(descriptor, configuration, language)
 	}
 
 	loadFromConfiguration(configuration) {
@@ -502,6 +520,7 @@ class ChatBooster extends ConversationBooster {
 		options["Active"] := getMultiMapValue(configuration, "Conversation Booster", descriptor . ".Conversation", false)
 		options["MaxHistory"] := getMultiMapValue(configuration, "Conversation Booster", descriptor . ".ConversationMaxHistory", 3)
 		options["Temperature"] := getMultiMapValue(configuration, "Conversation Booster", descriptor . ".ConversationTemperature", 0.2)
+		options["Actions"] := getMultiMapValue(configuration, "Conversation Booster", descriptor . ".ConversationActions", false)
 	}
 
 	startBooster() {
@@ -509,6 +528,10 @@ class ChatBooster extends ConversationBooster {
 
 		if (this.Connector && this.Active)
 			this.Connector.MaxHistory := this.MaxHistory
+	}
+
+	getTools() {
+		return this.Tools
 	}
 
 	ask(question, options := false) {
@@ -554,15 +577,16 @@ class ChatBooster extends ConversationBooster {
 																			  , variables)
 														  , substituteVariables(getMultiMapValue(instruction
 																							   , "Conversation.Instructions", "Knowledge")
-																			  , variables)])
+																			  , variables)]
+														 , this.Tools)
 
-					if answer
+					if (answer && (answer != true))
 						answer := this.normalizeAnswer(answer)
 
 					return ((answer && (answer != "")) ? answer : false)
 				}
 				catch Any as exception {
-					logError(exception)
+					logError(exception, true)
 
 					return false
 				}

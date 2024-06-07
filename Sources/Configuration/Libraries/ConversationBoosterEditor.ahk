@@ -262,6 +262,9 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 		widget38 := editorGui.Add("UpDown", "x" . x1 . " yp w60 h23 Range0-100")
 		widget39 := editorGui.Add("Text", "x" . (x1 + 65) . " yp w100 h23 +0x200", translate("%"))
 
+		widget40 := editorGui.Add("Text", "x" . x0 . " yp+24 w105 h23 +0x200", translate("Actions"))
+		widget41 := editorGui.Add("DropDownList", "x" . x1 . " yp w60 vviConversationActionsDropdown", collect(["No", "Yes"], translate))
+
 		editorGui.Add("Text", "x8 yp+35 w468 W:Grow 0x10")
 
 		editorGui.Add("Button", "x160 yp+10 w80 h23 Default", translate("Ok")).OnEvent("Click", (*) => this.iResult := kOk)
@@ -330,7 +333,8 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 		static defaults := CaseInsenseWeakMap("ServiceURL", false, "Model", "", "MaxTokens", 2048
 											, "Speaker", true, "SpeakerTemperature", 0.5, "SpeakerProbability", 0.5
 											, "Listener", false, "ListenerMode", "Unknown", "ListenerTemperature", 0.5
-											, "Conversation", false, "ConversationMaxHistory", 3, "ConversationTemperature", 0.5)
+											, "Conversation", false, "ConversationMaxHistory", 3, "ConversationTemperature", 0.5
+											, "ConversationActions", false)
 
 		super.loadFromConfiguration(configuration)
 
@@ -356,6 +360,7 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 				providerConfiguration["Conversation"] := getMultiMapValue(configuration, "Conversation Booster", this.Assistant . ".Conversation", defaults["Conversation"])
 				providerConfiguration["ConversationMaxHistory"] := getMultiMapValue(configuration, "Conversation Booster", this.Assistant . ".ConversationMaxHistory", defaults["ConversationMaxHistory"])
 				providerConfiguration["ConversationTemperature"] := getMultiMapValue(configuration, "Conversation Booster", this.Assistant . ".ConversationTemperature", defaults["ConversationTemperature"])
+				providerConfiguration["ConversationActions"] := getMultiMapValue(configuration, "Conversation Booster", this.Assistant . ".ConversationActions", defaults["ConversationActions"])
 
 				if (provider = "LLM Runtime") {
 					providerConfiguration["ServiceURL"] := ""
@@ -390,7 +395,7 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 
 				for ignore, setting in ["Speaker", "SpeakerProbability", "SpeakerTemperature"
 									  , "Listener", "ListenerMode", "ListenerTemperature"
-									  , "Conversation", "ConversationMaxHistory", "ConversationTemperature"]
+									  , "Conversation", "ConversationMaxHistory", "ConversationTemperature", "ConversationActions"]
 					providerConfiguration[setting] := getMultiMapValue(configuration, "Conversation Booster", provider . "." . setting, defaults[setting])
 			}
 
@@ -417,7 +422,7 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 
 			for ignore, setting in ["Speaker", "SpeakerProbability", "SpeakerTemperature"
 								  , "Listener", "ListenerMode", "ListenerTemperature"
-								  , "Conversation", "ConversationMaxHistory", "ConversationTemperature"] {
+								  , "Conversation", "ConversationMaxHistory", "ConversationTemperature", "ConversationActions"] {
 				setMultiMapValue(configuration, "Conversation Booster", provider . "." . setting, providerConfiguration[setting])
 
 				if (provider = this.iCurrentProvider)
@@ -456,7 +461,7 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 		if (this.Control["viProviderDropDown"].Value = 1) {
 			this.iCurrentProvider := false
 
-			for ignore, setting in ["ServiceURL", "ServiceKey", "MaxTokens", "SpeakerProbability", "SpeakerTemperature", "ListenerTemperature", "ConversationMaxHistory", "ConversationTemperature"]
+			for ignore, setting in ["ServiceURL", "ServiceKey", "MaxTokens", "SpeakerProbability", "SpeakerTemperature", "ListenerTemperature", "ConversationMaxHistory", "ConversationTemperature", "ConversationActions"]
 				this.Control["vi" . setting . "Edit"].Text := ""
 
 			for ignore, setting in ["Speaker", "Listener", "Conversation"]
@@ -490,6 +495,7 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 
 			this.Control["viConversationMaxHistoryEdit"].Text := configuration["ConversationMaxHistory"]
 			this.Control["viConversationTemperatureEdit"].Text := (isNumber(configuration["ConversationTemperature"]) ? Round(configuration["ConversationTemperature"] * 100) : "")
+			this.Control["viConversationActionsDropDown"].Choose(1 + (configuration["ConversationActions"] != false))
 		}
 
 		if this.iCurrentProvider
@@ -539,11 +545,13 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 				providerConfiguration["Conversation"] := true
 				providerConfiguration["ConversationMaxHistory"] := this.Control["viConversationMaxHistoryEdit"].Text
 				providerConfiguration["ConversationTemperature"] := Round(this.Control["viConversationTemperatureEdit"].Text / 100, 2)
+				providerConfiguration["ConversationActions"] := (this.Control["viConversationActionsDropDown"].Value = 2)
 			}
 			else {
 				providerConfiguration["Conversation"] := false
 				providerConfiguration["ConversationMaxHistory"] := ""
 				providerConfiguration["ConversationTemperature"] := ""
+				providerConfiguration["ConversationActions"] := false
 			}
 		}
 	}
@@ -665,19 +673,25 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 		if (this.Control["viConversationCheck"].Value = 0) {
 			this.Control["viConversationMaxHistoryEdit"].Enabled := false
 			this.Control["viConversationTemperatureEdit"].Enabled := false
+			this.Control["viConversationActionsDropDown"].Enabled := false
 			this.Control["viConversationMaxHistoryEdit"].Text := ""
 			this.Control["viConversationTemperatureEdit"].Text := ""
+			this.Control["viConversationActionsDropDown"].Choose(0)
 			this.Control["viConversationInstructionsButton"].Enabled := false
 		}
 		else {
 			this.Control["viConversationMaxHistoryEdit"].Enabled := true
 			this.Control["viConversationTemperatureEdit"].Enabled := true
+			this.Control["viConversationActionsDropDown"].Enabled := true
 
 			if (this.Control["viConversationMaxHistoryEdit"].Text = "")
 				this.Control["viConversationMaxHistoryEdit"].Text := 3
 
 			if (this.Control["viConversationTemperatureEdit"].Text = "")
 				this.Control["viConversationTemperatureEdit"].Text := 50
+
+			if (this.Control["viConversationActionsDropDown"].Value = 0)
+				this.Control["viConversationActionsDropDown"].Choose(1)
 
 			this.Control["viConversationInstructionsButton"].Enabled := true
 		}

@@ -82,6 +82,30 @@ I strongly recommed to memorize the phrases in the language you use to interact 
 
 Beside the builtin pattern-based voice recognition and the speech capabilities based on predefined phrases as described above, it is optionally possible to connect Cato to a GPT service like OpenAI or a locally hosted LLM, to dramatacilly improve the quality in conversation with the Assistant. When the conversation booster is configured (see [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm) for more information about the necessary configuration steps), the full knowledge about the the car state and the drivers performance will be supplied to the LLM. In detail, this includes tyre pressures, tyre temeperatures, tyre wear, fuel level, fuel consumption, and so on. When a pitstop is planned, the plan is available and the pitstop history is also available. The position information includes a history of the last laps and gap and lap time information for the most important opponents are provided.
 
+##### Trigger actions from conversation
+
+An LLM may be able to trigger actions as a result of a conversation. This is achieved by the so-called tool interface of the LLM. Tools are supported at the time of this writing by the following models:
+
+  - GPT 3.5 and above from *OpenAI*
+  - Mistral Small, Mistral Large and Mixtral 8x22b from *Mistral AI*
+  - Claude3 by *Anthropic* (via *OpenRouter*)
+  - Command-R+ by *Cohere* (via *OpenRouter*, but not working properly yet)
+  - Some Open Source models, such as Open Hermes, also support tools but with a varying degree of reliability
+
+Please note that calling actions is currently only available when using *OpenAI*, *Mistral AI* or *OpenRouter* are used as GPT service providers.
+
+The following table shows you the actions, that might be triggered by the LLM during a conversation with the Strategist:
+
+| Action                 | Parameter(s)      | Example(s) |
+|------------------------|----------------|------------|
+| Pitstop Simulation     | [Optional] lap | "What do you think? Can we go for an undercut in lap 7?" or "Can we get some clean air when we pit earlier?" |
+| Pitstop Planning       | [Optional] lap | "Can you ask the Engineer to create a pitstop plan for the next lap?" |
+| Strategy Recalculation | -              |"Can you check whether we can skip the last pitstop now, if we use a fuel saving map from now on?" |
+
+As you might expect, it depends on the data available in the knowledge base, whether the LLM will decide to trigger this action or not. If the LLM refuses to do so, you still have all the traditional voice commands and the controller actions at your disposal.
+
+IMPORTANT: When action handling is enabled, it might be necessary to disable the "Recognition" booster or at least set the "Creativity" to a very low value. Otherwise the "Recognition" booster might detect a command pattern, which will match to a predefined voice command, thereby preventing the LLM from crating a custom action plan.
+
 ### Enabling and disabling specific warnings and announcements
 
 Cato can give you information about the weather development and might recommend a strategy change. You may disable this warning by using a special voice command:

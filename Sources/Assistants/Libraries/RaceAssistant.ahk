@@ -19,6 +19,7 @@
 #Include "..\..\Libraries\JSON.ahk"
 #Include "..\..\Libraries\Task.ahk"
 #Include "..\..\Libraries\RuleEngine.ahk"
+#Include "..\..\Libraries\LLMConnector.ahk"
 #Include "VoiceManager.ahk"
 #Include "LLMBooster.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
@@ -580,7 +581,8 @@ class RaceAssistant extends ConfigurationItem {
 		writeMultiMap(kTempDirectory . assistantType . ".state", configuration)
 
 		if (this.Listener && options["ConversationBooster"]) {
-			booster := ChatBooster(options["ConversationBooster"], this.Configuration, this.VoiceManager.Language)
+			booster := ChatBooster(options["ConversationBooster"], this.Configuration
+								 , this.createConversationTools(), this.VoiceManager.Language)
 
 			if (booster.Model && booster.Active)
 				this.iBooster := booster
@@ -626,6 +628,10 @@ class RaceAssistant extends ConfigurationItem {
 
 	createVoiceManager(name, options) {
 		return RaceAssistant.RaceVoiceManager(this, name, options)
+	}
+
+	createConversationTools() {
+		return []
 	}
 
 	updateConfigurationValues(values) {
@@ -730,6 +736,20 @@ class RaceAssistant extends ConfigurationItem {
 
 		if values.HasProp("EnoughData")
 			this.iEnoughData := values.EnoughData
+	}
+
+	confirmCommand(enoughData := true) {
+		this.clearContinuation()
+
+		if (enoughData && !this.hasEnoughData())
+			return
+
+		this.getSpeaker().speakPhrase("Confirm")
+
+		Task.yield()
+
+		loop 10
+			Sleep(500)
 	}
 
 	handleVoiceCommand(grammar, words) {
@@ -875,14 +895,15 @@ class RaceAssistant extends ConfigurationItem {
 		if (grammar = "Text") {
 			if this.Booster {
 				text := this.Booster.ask(text, Map("Variables", {assistant: this.AssistantType, name: this.VoiceManager.Name
-															   , knowledge: JSON.print(this.getKnowledge(), "  ")}))
+															   , knowledge: JSON.print(this.getKnowledge())}))
 
 				if text {
-					if this.VoiceManager.UseTalking
-						this.getSpeaker().speak(text, false, false, {Noise: false, Rephrase: false})
-					else
-						for ignore, part in string2Values(". ", text)
-							this.getSpeaker().speak(part . ".", false, false, {Rephrase: false, Click: (A_Index = 1)})
+					if (text != true)
+						if this.VoiceManager.UseTalking
+							this.getSpeaker().speak(text, false, false, {Noise: false, Rephrase: false})
+						else
+							for ignore, part in string2Values(". ", text)
+								this.getSpeaker().speak(part . ".", false, false, {Rephrase: false, Click: (A_Index = 1)})
 
 					return
 				}

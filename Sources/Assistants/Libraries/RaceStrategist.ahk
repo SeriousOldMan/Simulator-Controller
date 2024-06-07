@@ -1012,10 +1012,10 @@ class RaceStrategist extends GridRaceAssistant {
 
 		return concatenate(super.createConversationTools()
 						 , [LLMTool.Function("planPitstop", "Ask the Engineer to plan a pitstop."
-										   , [LLMTool.Function.Parameter("lap", "The planned lap for the car to come to the pit.", "Integer", false, true)]
+										   , [LLMTool.Function.Parameter("lap", "The planned lap for the car to come to the pit.", "Integer", false, false)]
 										   , planPitstop),
 						 , LLMTool.Function("simulatePitstop", "Simulates the outcome of an upcoming pitstop. The traffic situation after the pitstop will be evaluated and the target lap will be optimized, if an undercut is possible."
-										  , [LLMTool.Function.Parameter("lap", "The initial target lap for the upcoming pitstop.", "Integer", false, true)]
+										  , [LLMTool.Function.Parameter("lap", "The initial target lap for the upcoming pitstop.", "Integer", false, false)]
 										  , simulatePitstop)
 						 , LLMTool.Function("updateStrategy", "Trigger a recalculation of the current race strategy.", [], updateStrategy)])
 	}
@@ -1249,7 +1249,7 @@ class RaceStrategist extends GridRaceAssistant {
 		this.recommendPitstop(lap)
 	}
 
-	confirmNextPitstop(pitstopLap, force := false) {
+	confirmNextPitstop(pitstopLap, confirm := false) {
 		local knowledgeBase := this.KnowledgeBase
 		local nextPitstop, refuel, tyreChange, tyreCompound, tyreCompoundColor
 
@@ -1264,7 +1264,7 @@ class RaceStrategist extends GridRaceAssistant {
 			if (knowledgeBase.getValue("Strategy.Pitstop.Count") > nextPitstop)
 				refuel := ("!" . refuel)
 
-			if (force || this.confirmAction("Pitstop.Plan")) {
+			if (confirm || this.confirmAction("Pitstop.Plan")) {
 				this.getSpeaker().speakPhrase("ConfirmInformEngineer", false, true)
 
 				this.setContinuation(ObjBindMethod(this, "planPitstop", pitstopLap, refuel, "!" . tyreChange, tyreCompound, tyreCompoundColor))
@@ -3383,13 +3383,9 @@ class RaceStrategist extends GridRaceAssistant {
 			if (hasEngineer && strategyLap) {
 				speaker.speakPhrase("PitstopLap", {lap: (Max(strategyLap, lastLap) + 1)})
 
-				if this.confirmAction("Pitstop.Plan") {
-					speaker.speakPhrase("ConfirmInformEngineer", false, true)
+				speaker.speakPhrase("ConfirmInformEngineer", false, true)
 
-					this.setContinuation(ObjBindMethod(this, "planPitstop", strategyLap, refuel, tyreChange, tyreCompound, tyreCompoundColor))
-				}
-				else
-					this.planPitstop(strategyLap, refuel, tyreChange, tyreCompound, tyreCompoundColor)
+				this.setContinuation(ObjBindMethod(this, "planPitstop", strategyLap, refuel, tyreChange, tyreCompound, tyreCompoundColor))
 			}
 			else
 				speaker.speakPhrase("NoPlannedPitstop")
@@ -3412,13 +3408,13 @@ class RaceStrategist extends GridRaceAssistant {
 
 					if hasEngineer
 						this.setContinuation(RaceStrategist.ExplainPitstopContinuation(this, plannedLap, pitstopOptions
-																					 , ObjBindMethod(this, "explainPitstopRecommendation", plannedLap, pitstopOptions)
+																					 , ObjBindMethod(this, "explainPitstopRecommendation", plannedLap, pitstopOptions, true)
 																					 , false, "Okay"))
 					else
 						this.setContinuation(ObjBindMethod(this, "explainPitstopRecommendation", plannedLap))
 				}
 				else if hasEngineer
-					this.explainPitstopRecommendation(plannedLap, pitstopOptions)
+					this.explainPitstopRecommendation(plannedLap, pitstopOptions, true)
 				else
 					this.explainPitstopRecommendation(plannedLap)
 			}
@@ -3460,7 +3456,7 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 	}
 
-	explainPitstopRecommendation(plannedLap, pitstopOptions := []) {
+	explainPitstopRecommendation(plannedLap, pitstopOptions := [], confirm := false) {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker := this.getSpeaker()
 		local position := knowledgeBase.getValue("Pitstop.Strategy.Position", false)
@@ -3504,7 +3500,7 @@ class RaceStrategist extends GridRaceAssistant {
 			}
 
 			if ProcessExist("Race Engineer.exe")
-				if this.confirmAction("Pitstop.Plan") {
+				if (confirm || this.confirmAction("Pitstop.Plan")) {
 					speaker.speakPhrase("ConfirmInformEngineer", false, true)
 
 					this.setContinuation(ObjBindMethod(this, "planPitstop", plannedLap, pitstopOptions*))

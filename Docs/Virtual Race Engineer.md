@@ -204,9 +204,11 @@ The LLM may be able to trigger actions as a result of a conversation. This is ac
 
   - GPT 3.5 and above from *OpenAI*
   - Mistral Small, Mistral Large and Mixtral 8x22b from *Mistral AI*
-  - Command-R by *Cohere*
-  - Claude3 by *Anthropic*
-  - Several Open Source models, such as Open Hermes, also support tools but with a varying degree of reliability
+  - Claude3 by *Anthropic* (via *OpenRouter*)
+  - Command-R+ by *Cohere* (via *OpenRouter*, but not working properly yet)
+  - Some Open Source models, such as Open Hermes, also support tools but with a varying degree of reliability
+
+Please note that calling actions is currently only available when using *OpenAI*, *Mistral AI* or *OpenRouter* are used as GPT service providers.
 
 The following table shows you the actions, that might be triggered by the LLM during a conversation with the Strategist:
 

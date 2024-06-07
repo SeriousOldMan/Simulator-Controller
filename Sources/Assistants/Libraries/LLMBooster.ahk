@@ -321,7 +321,7 @@ class SpeechBooster extends ConversationBooster {
 					return ((answer && (answer != "")) ? answer : text)
 				}
 				catch Any as exception {
-					logError(exception)
+					logError(exception, true)
 
 					return text
 				}
@@ -477,7 +477,7 @@ class RecognitionBooster extends ConversationBooster {
 						return string2Values("->", answer)[2]
 				}
 				catch Any as exception {
-					logError(exception)
+					logError(exception, true)
 
 					return text
 				}
@@ -586,7 +586,7 @@ class ChatBooster extends ConversationBooster {
 					return ((answer && (answer != "")) ? answer : false)
 				}
 				catch Any as exception {
-					logError(exception)
+					logError(exception, true)
 
 					return false
 				}

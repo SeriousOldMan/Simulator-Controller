@@ -895,7 +895,7 @@ class RaceAssistant extends ConfigurationItem {
 		if (grammar = "Text") {
 			if this.Booster {
 				text := this.Booster.ask(text, Map("Variables", {assistant: this.AssistantType, name: this.VoiceManager.Name
-															   , knowledge: JSON.print(this.getKnowledge(), "  ")}))
+															   , knowledge: JSON.print(this.getKnowledge())}))
 
 				if text {
 					if (text != true)

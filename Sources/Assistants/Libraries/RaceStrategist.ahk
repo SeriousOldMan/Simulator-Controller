@@ -1012,10 +1012,10 @@ class RaceStrategist extends GridRaceAssistant {
 
 		return concatenate(super.createConversationTools()
 						 , [LLMTool.Function("planPitstop", "Ask the Engineer to plan a pitstop."
-										   , [LLMTool.Function.Parameter("lap", "The planned lap for the car to come to the pit.", "Integer", false, false)]
+										   , [LLMTool.Function.Parameter("lap", "The planned lap for the car to come to the pit.", "Integer", false, true)]
 										   , planPitstop),
 						 , LLMTool.Function("simulatePitstop", "Simulates the outcome of an upcoming pitstop. The traffic situation after the pitstop will be evaluated and the target lap will be optimized, if an undercut is possible."
-										  , [LLMTool.Function.Parameter("lap", "The initial target lap for the upcoming pitstop.", "Integer", false, false)]
+										  , [LLMTool.Function.Parameter("lap", "The initial target lap for the upcoming pitstop.", "Integer", false, true)]
 										  , simulatePitstop)
 						 , LLMTool.Function("updateStrategy", "Trigger a recalculation of the current race strategy.", [], updateStrategy)])
 	}

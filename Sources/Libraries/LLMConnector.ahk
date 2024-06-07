@@ -238,10 +238,16 @@ class LLMConnector {
 			if !tools
 				tools := this.GetTools()
 
-			; if (tools.Length > 0)
-			;	body.tool_choice := "any"
+			/*
+			if InStr(this.Model, "Claude")
+				if (tools.Length > 0)
+					body.tool_choice := {type: "auto"}
+			*/
 
-			body := JSON.print(this.CreatePrompt(body, instructions, tools, question))
+			if isDebug()
+				body := JSON.print(this.CreatePrompt(body, instructions, tools, question), "  ")
+			else
+				body := JSON.print(this.CreatePrompt(body, instructions, tools, question))
 
 			if isDebug() {
 				deleteFile(kTempDirectory . "LLM.request")
@@ -355,8 +361,10 @@ class LLMConnector {
 			if parameter.Enumeration
 				descriptor.Enum := parameter.Enumeration
 
+			/*
 			if InStr(this.Model, "Command")
 				descriptor.required := (parameter.Required ? kTrue : kFalse)
+			*/
 
 			return descriptor
 		}
@@ -382,13 +390,15 @@ class LLMConnector {
 			local required := []
 			local parameters := this.CreateParameters(function, &required)
 
-			if InStr(this.Model, "Command")
+			/*
+			if (!isInstance(this, LLMConnector.OpenRouterConnector) && InStr(this.Model, "Command"))
 				return {name: function.Name, description: function.Description
 					  , parameter_definitions: parameters}
-			else if InStr(this.Model, "Claude")
+			else if (!isInstance(this, LLMConnector.OpenRouterConnector) && InStr(this.Model, "Claude"))
 				return {name: function.Name, description: function.Description
 					  , input_schema: {type: "object", properties: parameters, required: required}}
 			else
+			*/
 				return {type: "function"
 					  , function: {name: function.Name, description: function.Description
 								 , parameters: {type: "object", properties: parameters, required: required}}}

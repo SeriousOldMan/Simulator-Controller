@@ -786,7 +786,7 @@ class SpeechRecognizer {
 		return bestMatch
 	}
 
-	splitText(&text, rephrase := true) {
+	parseText(&text, rephrase := false) {
 		local words := string2Values(A_Space, text)
 		local index, literal
 
@@ -806,9 +806,9 @@ class SpeechRecognizer {
 	textRecognized(text) {
 	}
 
-	unknownRecognized(&text) {
+	unknownRecognized(&text, rephrase := false) {
 		if this.Grammars.Has("?")
-			this.Grammars["?"].Callback.Call("?", this.splitText(text, false))
+			this.Grammars["?"].Callback.Call("?", this.parseText(&text))
 
 		return false
 	}
@@ -828,7 +828,7 @@ class SpeechRecognizer {
 			return
 
 		loop 2 {
-			words := this.splitText(&text)
+			words := this.parseText(&text, (A_Index = 1))
 
 			for ignore, handler in this._recognitionHandlers
 				if handler[2].Call(handler[1], words*)

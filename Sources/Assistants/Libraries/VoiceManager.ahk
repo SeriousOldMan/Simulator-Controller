@@ -431,18 +431,18 @@ class VoiceManager extends ConfigurationItem {
 			this.VoiceManager.raiseTextRecognized("Text", text)
 		}
 
-		splitText(&text, rephrase := true) {
+		parseText(&text, rephrase := false) {
 			local booster := this.Booster
 			local alternateText
 
-			if (booster && rephrase %% (booster.Mode = "Always")) {
+			if (booster && rephrase && (booster.Mode = "Always")) {
 				alternateText := booster.recognize(text)
 
 				if (alternateText && (alternateText != ""))
 					text := alternateText
 			}
 
-			return super.splitText(&text)
+			return super.parseText(&text)
 		}
 
 		unknownRecognized(&text, rephrase := false) {

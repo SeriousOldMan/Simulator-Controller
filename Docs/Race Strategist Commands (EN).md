@@ -116,6 +116,8 @@ Announcements=weather warnings
 	[(TellMe) the {current lap, lap} times, (WhatAre) the {current lap, lap} times]
 	
 	[(TellMe) the number of {cars, cars on the track, cars in the session, active cars, cars still active}, (WhatAre) the number of {cars, cars on the track, cars in the session}, How many cars {are, are still} {active, on the track, in the session}]
+	
+	[(TellMe) how often {the car, the car number, number} (Number) {was, have been} in the pits, How many pitstops has {car, car number, number} (Number), How often has been {car, car number, number} (Number) in the pits]
 
 3. Pitstop
 

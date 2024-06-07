@@ -405,9 +405,9 @@ Several boosters are available at the moment:
      
      | Assistant        | Knowledge (1) |
      | ---------------- | ------------- |
-	 | Race Engineer    | Telemetry data incl. tyre pressures, tyre temeperatures, tyre wear, brake temperatures, brake wear, fuel level, fuel consumption, damage, and so on. When a pitstop is planned, the plan is available and the pitstop history is also available. |
-	 | Race Strategist  | Same as Race Engineer plus current position incl. a history of the last laps and gap and lap time information for the most important opponents. |
-	 | Race Spotter     | Basic telemetry data and no pitstop information. But includes current position incl. a history of the last laps and gap and lap time information for the most important opponents. |
+	 | Race Engineer    | Telemetry data incl. tyre pressures, tyre temeperatures, tyre wear, brake temperatures, brake wear, fuel level, fuel consumption, damage, and so on. Full pitstop history is included and when a pitstop is planned, the plan is available otherwise a forecast of the next pitstop will be part of the knowledge. |
+	 | Race Strategist  | Basic telemetry data but no detailed information about tyres, brakes and car damage. A reduced pitstop history is available as well as full information about the active strategy. Current position incl. detailed standings with gap and lap time information for all opponents is also available. |
+	 | Race Spotter     | Basic telemetry data and no pitstop information. But current position incl. detailed standings with gap and lap time information for all opponents is also available. |
 	 | Driving Coach    | Beside the [instructions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-driving-coach) that can be configured for the Driving Coach in general, the full set of telemetry data available to the Race Engineer is available to the Driving Coach as well. |
 
      (1) Depending on the availabilty of the data by the current simulator.
@@ -438,8 +438,8 @@ Below you find all instruction categories and the supported variables:
 | Conversation   | Character         | Scope             | This instruction is used when a voice command has been recognized, which cannot be mapped to one of the predefined command patterns, even after using the LLM to map the command semantically. It is assumed that the user wants a free conversation with the LLM. This instruction then defines the profession and the personality of the Assistant. You can also include general instructions like "Keep your answers short and precise", and so on. |
 |                |                   | %assistant%       | The type or role of the current Assistant, for example "Race Engineer". |
 |                |                   | %name%            | Specifies the name of the Assistant. |
-|                | Telemetry         | Scope             | This instruction is used to supply the current content of the knowledgebase (mainly telemetry information) to the LLM. |
-|                |                   | %telemetry%       | A table consisting of key / value pairs separated by an equal sign. All variable names (keys) are *speaking*, so that the LLM can derive their meanings. Example: "Tyre.Pressure.Target.Front.Left = 24.8" - this specifies the current target pressure for the front left tyre when the tyre will be changed at a pitstop. |
+|                | Knowledge         | Scope             | This instruction is used to supply the current content of the knowledgebase to the LLM. The content of the knowledgebase depends on the type of the Assistant. |
+|                |                   | %knowledge%       | This variable is substituted with the content of the knowledgebase in a self-explaining JSON format. |
 
 ##### Notes
 

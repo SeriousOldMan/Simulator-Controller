@@ -1,12 +1,22 @@
-## 5.7.5.0-release 06/07/24 (planned)
+## 5.7.5.0-release 06/07/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed a bug in "Simulator Setup", which prevented additional software to be located in the "Applications" step.
   4. Fixed voice test button on the main voice control page in "Simulator Setup".
-  5. Cleanup of the additional software supported in "Simulator Setup":
+  5. Fixed the "Always" activation mode in "Recognition" conversation booster.
+  6. Cleanup of the additional software supported in "Simulator Setup":
      - Removed "Voice Macro", since it was needed anymore for a long time now.
 	 - Added "Real Head Motion" as optional software, since it is one of the most useful extensions for *Assetto Corsa Competizione*.
-  6. Automatic updates from versions prior to 5.0.0 are no longer supported.
+  7. Automatic updates from versions prior to 5.0.0 are no longer supported.
+  8. Added mounted tyre compound to tyres info component in "System Monitor".
+  9. The "Telemetry" instruction has been removed for both the Driving Coach and the Conversation Booster. It has been substituted by the new "Knowledge" instruction. This instruction provides the knowledge of a given Assistant now in JSON format to the LLM, which results in a much better understanding of the state of the car, strategy, standings and other important information by the LLM. The [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm) has been updated accordingly.
+  10. The Engineer will provide full pitstop history to the LLM. Questions like: "What were the ambient temperatures at the third pitstop and what tyre pressures did we use then?" will be possible now.
+  11. The Spotter now also provides his knowledge about all opponents and the current race situation to the connected LLM, if a "Conversation" bosster has been configured.
+  12. The Strategist and the Spotter learned a new [voice command](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Strategist-Commands-(EN)). With this you can ask, how often an opponent has been to the pits already.
+  13. [Internal] Migrated to AHK 2.0.17.
+  14. [Developer] Added mounted tyre compound to the ["Session State.json"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) file.
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-575), especially if you have configured and are using the Driving Coach.
 
 ## 5.7.4.0-release 05/31/24
   1. Minor bugfixes, as always
@@ -46,7 +56,7 @@
   20. [*OpenRouter*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#openrouter) has been added to the list of supported GPT service providers.
   21. The documentation has been updated to cover the [configuration requirements](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#installation) for the added GPT providers.
   
-Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-570), especially if you have configured and are using the Driving Coach.
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-573), especially if you have configured and are using the Driving Coach.
 
 ## 5.7.2.0-release 05/17/24
   1. Minor bugfixes, as always

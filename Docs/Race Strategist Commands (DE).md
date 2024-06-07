@@ -116,6 +116,8 @@ Announcements=Wetterwarnungen
 	[(KannstDu) (Mir) die {Rundenzeiten, Zeiten} {durchgeben, sagen}, {Gib, Sag} (Mir) die {Rundenzeiten, Zeiten}, Wie sind die {Rundenzeiten, Zeiten}, Welche {Rundenzeiten, Zeiten} fahren wir]
 	
 	[(KannstDu) (Mir) die Anzahl der {Wagen, Fahrzeuge} {durchgeben, durchgeben die noch auf der Strecke sind, durchgeben die noch in der Session sind, durchgeben die noch aktiv sind}, Wie viele {Wagen, Fahrzeuge} {sind, sind noch} {aktiv, auf der Strecke, in der Session}]
+	
+	[(KannstDu) (Mir) sagen wie {oft, oft der} {Wagen, Wagen Nummer, Nummer} (Number) {schon in, in} der Box war, Wie viele Boxenstopps {hat, hat der} {Wagen, Wagen Nummer, Nummer} (Number), Wie oft {war, war der} {Wagen, Wagen Nummer, Nummer} (Number) {schon in, in} der Box]
 
 3.  Boxenstopp
 

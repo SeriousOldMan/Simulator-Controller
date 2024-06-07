@@ -1,5 +1,5 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Conversation Booster            ;;;
+;;;   Modular Simulator Controller System - LLM Booster                     ;;;
 ;;;                                                                         ;;;
 ;;;   Provides several GPT-based Pre- and Postprocessors for speech output, ;;;
 ;;;   voice recognition and conversation.                                   ;;;
@@ -553,7 +553,7 @@ class ChatBooster extends ConversationBooster {
 																							   , "Conversation.Instructions", "Character")
 																			  , variables)
 														  , substituteVariables(getMultiMapValue(instruction
-																							   , "Conversation.Instructions", "Telemetry")
+																							   , "Conversation.Instructions", "Knowledge")
 																			  , variables)])
 
 					if answer

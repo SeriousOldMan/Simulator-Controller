@@ -623,21 +623,10 @@ changeProtection(up, protect := false, block := false) {
 }
 
 initializeTasks() {
-	schedule := ObjBindMethod(Task, "schedule", kLowPriority)
-
-	SetTimer(schedule, Task.sLow)
-
-	schedule := ObjBindMethod(Task, "schedule", kNormalPriority)
-
-	SetTimer(schedule, Task.sNormal)
-
-	schedule := ObjBindMethod(Task, "schedule", kHighPriority)
-
-	SetTimer(schedule, Task.sHigh)
-
-	schedule := ObjBindMethod(Task, "schedule", kInterruptPriority)
-
-	SetTimer(schedule, Task.sInterrupt)
+	SetTimer(ObjBindMethod(Task, "schedule", kLowPriority), Task.sLow)
+	SetTimer(ObjBindMethod(Task, "schedule", kNormalPriority), Task.sNormal)
+	SetTimer(ObjBindMethod(Task, "schedule", kHighPriority), Task.sHigh)
+	SetTimer(ObjBindMethod(Task, "schedule", kInterruptPriority), Task.sInterrupt)
 }
 
 

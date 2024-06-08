@@ -2106,16 +2106,19 @@ class RaceSpotter extends GridRaceAssistant {
 
 			if (regular && (Random(1, 10) < 5)) {
 				driverPosition := this.DriverCar.Position["Class"]
+				driverClass := this.DriverCar.Class
 				driverLapTime := this.DriverCar.AvgLapTime
 				slowerCar := false
 
 				for ignore, carInfo in this.OtherCars {
-					carPosition := carInfo.Position["Class"]
+					if (carInfo.Car.Class = driverClass) {
+						carPosition := carInfo.Position["Class"]
 
-					if ((carPosition < driverPosition) && (carInfo.AvgLapTime > driverLapTime))
-						if (!slowerCar || (carPosition < slowerCar.Position["Class"]))
-							if ((carInfo.AvgLapTime - driverLapTime) < 0.5)
-								slowerCar := carInfo
+						if ((carPosition < driverPosition) && (carInfo.AvgLapTime > driverLapTime))
+							if (!slowerCar || (carPosition < slowerCar.Position["Class"]))
+								if ((carInfo.AvgLapTime - driverLapTime) < 0.5)
+									slowerCar := carInfo
+							}
 				}
 
 				if slowerCar

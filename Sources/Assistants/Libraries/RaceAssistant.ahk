@@ -581,8 +581,7 @@ class RaceAssistant extends ConfigurationItem {
 		writeMultiMap(kTempDirectory . assistantType . ".state", configuration)
 
 		if (this.Listener && options["ConversationBooster"]) {
-			booster := ChatBooster(options["ConversationBooster"], this.Configuration
-								 , this.createConversationTools(), this.VoiceManager.Language)
+			booster := ChatBooster(this, options["ConversationBooster"], this.Configuration, this.VoiceManager.Language)
 
 			if (booster.Model && booster.Active)
 				this.iBooster := booster
@@ -804,6 +803,15 @@ class RaceAssistant extends ConfigurationItem {
 			default:
 				throw "Unknown grammar `"" . grammar . "`" detected in RaceAssistant.handleVoiceCommand...."
 		}
+	}
+
+	getTools() {
+		static tools := false
+
+		if !tools
+			tools := this.createConversationTools()
+
+		return tools
 	}
 
 	activeTopic(options, topic) {

@@ -1,3 +1,14 @@
+## 5.7.6.0-release 06/07/24 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. Fixed the lap time comparison information of the Spotter in multiclass races. A bug resulted in a comparison of cars from different classes which resulted in very confusing information.
+  4. The default instructions of the Conversation Booster has been updated again to improve conversation quality further. Please see the Update Notes, if you have modified these instructions.
+  5. The LLMs used to boost the conversation capabilities of the Assistants are now allowed to activate some actions as a result of your interaction. A few actions already have been defined for the [Enginer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#trigger-actions-from-conversation) and the [Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#trigger-actions-from-conversation) with more to come in the next releases.
+  
+     Please note, that *Actions* are not active by default, but must be explicitly activated in the configuration.
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-576), when you have configured the Conversation Booster for the Assistants.
+
 ## 5.7.5.0-release 06/07/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

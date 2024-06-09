@@ -35,6 +35,16 @@ Although the code, that handles all the update tasks, is integrated into *Simula
 
 Note: Some of you might want to have more control. No problem. All the files in the *Simulator Controller\Config*, *Simulator Controller\Translations*, *Simulator Controller\Grammars*, *Simulator Controller\Rules* and other folders are human readable and using a text editor and some *Diff* tool, you can do everything the automated procedure does on its own. But be sure to make a backup copy of all the files, just for the peace of mind. Attention: These files use a two-byte character set, so be sure to use an editor that can handle this.
 
+## Release 5.7.6
+
+Two things for you to look at with this release:
+
+1. The Conversation Booster instructions have changed with this release. If you have modified the instructions, you will have to revert them back to original and integrate your modifications back again.
+
+2. The "Conversation" booster now as an option to allow the LLM to activate some predefined actions. The default is "Off", since you may want to test it before using it in a race. Go to the Conversation Booster configuration for each Assistant, if you want to enable it.
+
+***
+
 ## Release 5.7.5
 
 The "Telemetry" instruction for both the Driving Coach and the Conversation Booster has been substitued by the "Knowledge" instruction. If you have changed the "Telemetry" instruction, you may want to integrate your additions into the "Knowledge" instruction.

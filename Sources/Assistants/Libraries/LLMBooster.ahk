@@ -304,16 +304,14 @@ class SpeechBooster extends ConversationBooster {
 					else
 						instruction := "Rephrase"
 
-					if variables {
+					if variables
 						variables.language := (language ? language : "")
-						variables.text := text
-					}
 					else
-						variables := {language: language ? language : "", text: text}
+						variables := {language: language ? language : ""}
 
-					instruction := substituteVariables(getMultiMapValue(this.Instructions[code], "Speaker.Instructions", instruction), variables)
-
-					answer := this.Connector.Ask(instruction)
+					answer := this.Connector.Ask(text, [substituteVariables(getMultiMapValue(this.Instructions[code], "Speaker.Instructions"
+																													, instruction)
+																		  , variables)])
 
 					if answer
 						answer := this.normalizeAnswer(answer)
@@ -461,12 +459,9 @@ class RecognitionBooster extends ConversationBooster {
 
 					this.Connector.Temperature := this.Temperature
 
-					instruction := "Recognize"
-
-					instruction := substituteVariables(getMultiMapValue(this.Instructions[code], "Listener.Instructions", instruction)
-													 , {commands: commands, text: text})
-
-					answer := this.Connector.Ask(instruction)
+					answer := this.Connector.Ask(text, [substituteVariables(getMultiMapValue(this.Instructions[code], "Listener.Instructions"
+																													, "Recognize")
+																		  , {commands: commands})])
 
 					if answer
 						answer := this.normalizeAnswer(answer)
@@ -491,7 +486,7 @@ class RecognitionBooster extends ConversationBooster {
 }
 
 class ChatBooster extends ConversationBooster {
-	iTools := []
+	iManager := false
 
 	MaxHistory {
 		Get {
@@ -499,14 +494,14 @@ class ChatBooster extends ConversationBooster {
 		}
 	}
 
-	Tools {
+	Manager {
 		Get {
-			return (this.Options["Actions"] ? this.iTools : [])
+			return this.iManager
 		}
 	}
 
-	__New(descriptor, configuration, tools := [], language := false) {
-		this.iTools := tools
+	__New(manager, descriptor, configuration, language := false) {
+		this.iManager := manager
 
 		super.__New(descriptor, configuration, language)
 	}
@@ -531,7 +526,7 @@ class ChatBooster extends ConversationBooster {
 	}
 
 	getTools() {
-		return this.Tools
+		return (this.Options["Actions"] ? this.Manager.getTools() : [])
 	}
 
 	ask(question, options := false) {
@@ -577,8 +572,7 @@ class ChatBooster extends ConversationBooster {
 																			  , variables)
 														  , substituteVariables(getMultiMapValue(instruction
 																							   , "Conversation.Instructions", "Knowledge")
-																			  , variables)]
-														 , this.Tools)
+																			  , variables)])
 
 					if (answer && (answer != true))
 						answer := this.normalizeAnswer(answer)

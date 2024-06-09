@@ -456,7 +456,7 @@ closeApplication(application) {
 launchPad(command := false, arguments*) {
 	global kSimulatorConfiguration
 
-	local ignore, application, startupConfig, x, y, settingsButton, name, options, lastModified, hasTeamServer
+	local ignore, application, startupConfig, x, y, settingsButton, name, options, lastModified, hasTeamServer, restart
 
 	static result := false
 
@@ -679,13 +679,14 @@ launchPad(command := false, arguments*) {
 			WinActivate("ahk_exe " . application)
 		else {
 			startupConfig := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+			restart := inList(["Simulator Setup.exe", "Simulator Configuration.exe"], application)
 
 			if (getMultiMapValue(startupConfig, "Simulator", "Simulator", kUndefined) != kUndefined)
 				application .= (" -Simulator `"" . getMultiMapValue(startupConfig, "Simulator", "Simulator") . "`""
 							  . " -Car `"" . getMultiMapValue(startupConfig, "Simulator", "Car") . "`""
 							  . " -Track `"" . getMultiMapValue(startupConfig, "Simulator", "Track") . "`"")
 
-			if inList(["Simulator Setup.exe", "Simulator Configuration.exe"], application) {
+			if restart {
 				launchPadGui.Block()
 
 				try {

@@ -585,8 +585,7 @@ class RaceAssistant extends ConfigurationItem {
 		writeMultiMap(kTempDirectory . assistantType . ".state", configuration)
 
 		if (this.Listener && options["ConversationBooster"]) {
-			booster := ChatBooster(options["ConversationBooster"], this.Configuration
-								 , this.createConversationTools(), this.VoiceManager.Language)
+			booster := ChatBooster(this, options["ConversationBooster"], this.Configuration, this.VoiceManager.Language)
 
 			if (booster.Model && booster.Active)
 				this.iBooster := booster
@@ -807,80 +806,11 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
-	createConversationTools() {
-		local configuration := readMultiMap(kResourcesDirectory . "Actions\" . this.AssistantType . ".actions")
-		local tools := []
-		local ignore, action, definition, parameters, parameter, enumeration, handler
+	getTools() {
+		static tools := false
 
-		callMethod(method, enoughData, confirm, arguments*) {
-			this.confirmCommand(enoughData, confirm)
-
-			if isDebug()
-				showMessage("LLM -> this." . method . "(...)")
-
-			this.%method%(arguments*)
-		}
-
-		callFunction(function, enoughData, confirm, arguments*) {
-			this.confirmCommand(enoughData, confirm)
-
-			if isDebug()
-				showMessage("LLM -> " . function . "(...)")
-
-			%function%(arguments*)
-		}
-
-		callController(function, enoughData, confirm, arguments*) {
-			if this.RemoteHandler {
-				this.confirmCommand(enoughData, confirm)
-
-				if isDebug()
-					showMessage("LLM -> Controller:" . function . "(...)")
-
-				this.RemoteHandler.customAction(function, arguments*)
-			}
-		}
-
-		addMultiMapValues(configuration, readMultiMap(kUserHomeDirectory . "Actions\" . this.AssistantType . ".actions"))
-
-		for ignore, action in string2Values(",", getMultiMapValue(configuration, "Actions", "Active", "")) {
-			definition := getMultiMapValue(configuration, "User", action, false)
-
-			if !definition
-				definition := getMultiMapValue(configuration, "Builtin", action, false)
-
-			if definition {
-				definition := string2Values("|", definition)
-				parameters := []
-
-				loop definition[5] {
-					parameter := string2Values("|", getMultiMapValue(configuration, "Parameters", action . "." . A_Index, ""))
-
-					if (parameter.Length >= 5) {
-						enumeration := string2Values(",", parameter[3])
-
-						if (enumeration.Length = 0)
-							enumeration := false
-
-						parameters.Push(LLMTool.Function.Parameter(parameter[1], parameter[5], parameter[2], enumeration, parameter[4]))
-					}
-				}
-
-				switch definition[1], false {
-					case "Method":
-						handler := callMethod.Bind(definition[2], definition[3], definition[4])
-					case "Function":
-						handler := callFunction.Bind(definition[2], definition[3], definition[4])
-					case "Controller":
-						handler := callController.Bind(definition[2], definition[3], definition[4])
-					default:
-						handler := false
-				}
-
-				if handler
-					tools.Push(LLMTool.Function(action, definition[6], parameters, handler))
-			}
-		}
+		if !tools
+			tools := this.createConversationTools()
 
 		return tools
 	}
@@ -1257,6 +1187,84 @@ class RaceAssistant extends ConfigurationItem {
 
 	clearContinuation() {
 		this.VoiceManager.clearContinuation()
+	}
+
+	createConversationTools() {
+		local configuration := readMultiMap(kResourcesDirectory . "Actions\" . this.AssistantType . ".actions")
+		local tools := []
+		local ignore, action, definition, parameters, parameter, enumeration, handler
+
+		callMethod(method, enoughData, confirm, arguments*) {
+			this.confirmCommand(enoughData, confirm)
+
+			if isDebug()
+				showMessage("LLM -> this." . method . "(...)")
+
+			this.%method%(arguments*)
+		}
+
+		callFunction(function, enoughData, confirm, arguments*) {
+			this.confirmCommand(enoughData, confirm)
+
+			if isDebug()
+				showMessage("LLM -> " . function . "(...)")
+
+			%function%(arguments*)
+		}
+
+		callController(function, enoughData, confirm, arguments*) {
+			if this.RemoteHandler {
+				this.confirmCommand(enoughData, confirm)
+
+				if isDebug()
+					showMessage("LLM -> Controller:" . function . "(...)")
+
+				this.RemoteHandler.customAction(function, arguments*)
+			}
+		}
+
+		addMultiMapValues(configuration, readMultiMap(kUserHomeDirectory . "Actions\" . this.AssistantType . ".actions"))
+
+		for ignore, action in string2Values(",", getMultiMapValue(configuration, "Actions", "Active", "")) {
+			definition := getMultiMapValue(configuration, "User", action, false)
+
+			if !definition
+				definition := getMultiMapValue(configuration, "Builtin", action, false)
+
+			if definition {
+				definition := string2Values("|", definition)
+				parameters := []
+
+				loop definition[5] {
+					parameter := string2Values("|", getMultiMapValue(configuration, "Parameters", action . "." . A_Index, ""))
+
+					if (parameter.Length >= 5) {
+						enumeration := string2Values(",", parameter[3])
+
+						if (enumeration.Length = 0)
+							enumeration := false
+
+						parameters.Push(LLMTool.Function.Parameter(parameter[1], parameter[5], parameter[2], enumeration, parameter[4]))
+					}
+				}
+
+				switch definition[1], false {
+					case "Method":
+						handler := callMethod.Bind(definition[2], definition[3], definition[4])
+					case "Function":
+						handler := callFunction.Bind(definition[2], definition[3], definition[4])
+					case "Controller":
+						handler := callController.Bind(definition[2], definition[3], definition[4])
+					default:
+						handler := false
+				}
+
+				if handler
+					tools.Push(LLMTool.Function(action, definition[6], parameters, handler))
+			}
+		}
+
+		return tools
 	}
 
 	createKnowledgeBase(facts := false) {

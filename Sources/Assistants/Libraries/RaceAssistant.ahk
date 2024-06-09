@@ -1192,6 +1192,8 @@ class RaceAssistant extends ConfigurationItem {
 	createConversationTools() {
 		local configuration := readMultiMap(kResourcesDirectory . "Actions\" . this.AssistantType . ".actions")
 		local tools := []
+		local loadedRules := CaseInsenseMap()
+		local activationIndex := 1
 		local ignore, action, definition, parameters, parameter, enumeration, handler
 
 		callMethod(method, enoughData, confirm, arguments*) {
@@ -1212,14 +1214,65 @@ class RaceAssistant extends ConfigurationItem {
 			%function%(arguments*)
 		}
 
-		callController(function, enoughData, confirm, arguments*) {
+		callRules(ruleFileName, enoughData, confirm, activation, parameters, arguments*) {
+			local knowledgeBase := this.KnowledgeBase
+			local rules, ignore, rule, productions, reductions, index, parameter
+
+			if knowledgeBase {
+				this.confirmCommand(enoughData, confirm)
+
+				if !loadedRules.Has(ruleFileName) {
+					rules := FileRead(getFileName(ruleFileName, kUserHomeDirectory . "Actions\", kResourcesDirectory . "Actions\"))
+
+					rules := substituteVariables(rules, {activation: "__Activation." . activationIndex})
+
+					productions := false
+					reductions := false
+
+					RuleCompiler().compileRules(rules, &productions, &reductions)
+
+					for ignore, rule in productions
+						knowledgeBase.addRule(rule)
+
+					for ignore, rule in reductions
+						knowledgeBase.addRule(rule)
+
+					loadedRules[ruleFileName] := ("__Activation." . activationIndex++)
+				}
+			}
+
+			knowledgeBase.setFact(loadedRules[ruleFileName], true)
+
+			for index, parameter in parameters
+				try {
+					knowledgeBase.setFact(parameter.Name, arguments[index])
+				}
+				catch UnsetItemError {
+					knowledgeBase.clearFact(parameter.Name)
+				}
+
+			knowledgeBase.produce()
+		}
+
+		callControllerMethod(method, enoughData, confirm, arguments*) {
+			if this.RemoteHandler {
+				this.confirmCommand(enoughData, confirm)
+
+				if isDebug()
+					showMessage("LLM -> Controller." . method . "(...)")
+
+				this.RemoteHandler.customAction("Method", method, arguments*)
+			}
+		}
+
+		callControllerFunction(function, enoughData, confirm, arguments*) {
 			if this.RemoteHandler {
 				this.confirmCommand(enoughData, confirm)
 
 				if isDebug()
 					showMessage("LLM -> Controller:" . function . "(...)")
 
-				this.RemoteHandler.customAction(function, arguments*)
+				this.RemoteHandler.customAction("Function", function, arguments*)
 			}
 		}
 
@@ -1231,36 +1284,50 @@ class RaceAssistant extends ConfigurationItem {
 			if !definition
 				definition := getMultiMapValue(configuration, "Builtin", action, false)
 
-			if definition {
-				definition := string2Values("|", definition)
-				parameters := []
+			try {
+				if definition {
+					definition := string2Values("|", definition)
+					parameters := []
 
-				loop definition[5] {
-					parameter := string2Values("|", getMultiMapValue(configuration, "Parameters", action . "." . A_Index, ""))
+					loop definition[5] {
+						parameter := string2Values("|", getMultiMapValue(configuration, "Parameters", action . "." . A_Index, ""))
 
-					if (parameter.Length >= 5) {
-						enumeration := string2Values(",", parameter[3])
+						if (parameter.Length >= 5) {
+							enumeration := string2Values(",", parameter[3])
 
-						if (enumeration.Length = 0)
-							enumeration := false
+							if (enumeration.Length = 0)
+								enumeration := false
 
-						parameters.Push(LLMTool.Function.Parameter(parameter[1], parameter[5], parameter[2], enumeration, parameter[4]))
+							parameters.Push(LLMTool.Function.Parameter(parameter[1], parameter[5], parameter[2], enumeration, parameter[4]))
+						}
 					}
-				}
 
-				switch definition[1], false {
-					case "Method":
-						handler := callMethod.Bind(definition[2], definition[3], definition[4])
-					case "Function":
-						handler := callFunction.Bind(definition[2], definition[3], definition[4])
-					case "Controller":
-						handler := callController.Bind(definition[2], definition[3], definition[4])
-					default:
-						handler := false
-				}
+					switch definition[1], false {
+						case "Assistant.Method":
+							handler := callMethod.Bind(definition[2], definition[3], definition[4])
+						case "Assistant.Function":
+							handler := callFunction.Bind(definition[2], definition[3], definition[4])
+						case "Assistant.Rule":
+							handler := callRules.Bind(getMultiMapValue(configuration, "Rules", action . ".Rules")
+													, definition[3], definition[4]
+													, getMultiMapValue(configuration, "Rules", action . ".Activation")
+													, parameters)
+						case "Controller.Method":
+							handler := callControllerMethod.Bind(definition[2], definition[3], definition[4])
+						case "Controller.Fuction":
+							handler := callControllerFunction.Bind(definition[2], definition[3], definition[4])
+						default:
+							throw "Unknown action type (" definition[1] . ") detected in RaceAssistant.createConversationTools..."
+					}
 
-				if handler
-					tools.Push(LLMTool.Function(action, definition[6], parameters, handler))
+					if handler
+						tools.Push(LLMTool.Function(action, definition[6], parameters, handler))
+				}
+				else
+					throw "Unknown action (" action . ") detected in RaceAssistant.createConversationTools..."
+			}
+			catch Any as exception {
+				logError(exception, true)
 			}
 		}
 
@@ -3611,7 +3678,7 @@ callController(choicePoint, function, arguments*) {
 	local remoteHandler := choicePoint.KnowledgeBase.RaceAssistant.RemoteHandler
 
 	if remoteHandler
-		remoteHandler.customAction(function, retrieveArguments(choicePoint, arguments, true)*)
+		remoteHandler.customAction("Function", function, retrieveArguments(choicePoint, arguments, true)*)
 }
 
 

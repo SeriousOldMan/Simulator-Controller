@@ -2205,7 +2205,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			RaceAssistantPlugin.RestoreSessionStateTask(this, data).start()
 	}
 
-	customAction(function, arguments*) {
+	customAction(type, function, arguments*) {
 		local callArguments := []
 		local ignore, argument
 
@@ -2213,7 +2213,10 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			callArguments.Push((argument = kUndefined) ? unset : argument)
 
 		try {
-			%function%(callArguments*)
+			if (type = "Function")
+				%function%(callArguments*)
+			else
+				this.Controller.%function%(callArguments*)
 		}
 		catch Any as exception {
 			logError(exception, true)

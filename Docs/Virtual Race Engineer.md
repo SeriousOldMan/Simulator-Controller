@@ -215,6 +215,9 @@ The following table shows you the actions, that might be triggered by the LLM du
 | Action                 | Parameter(s)      | Example(s) |
 |------------------------|-------------------|------------|
 | Pitstop Planning       | 1. [Optional] lap 2. [Optional] refuelAmount 3. [Optional] changeTyres 4. [Optional] repairDamage | "We must pit for repairs. Can you create a plan without refueling and without tyre change?" |
+| Pitstop Clearance      | -                 | "I have changed my mind, the pitstop is no longer needed." |
+
+Please note, that beside reacting to the phrase as shown in the examples above, the LLM might decide to take the action according to the current situation and based on the current data. So always be alerted, if the LLM gets active on its own.
 
 As you might expect, it depends on the data available in the knowledge base, whether the LLM will decide to trigger this action or not. If the LLM refuses to do so, you still have all the traditional voice commands and the controller actions at your disposal.
 

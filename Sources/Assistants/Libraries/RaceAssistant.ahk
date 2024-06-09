@@ -749,7 +749,7 @@ class RaceAssistant extends ConfigurationItem {
 		Task.yield()
 
 		loop 10
-			Sleep(500)
+			Sleep(confirm ? 500 : 10)
 	}
 
 	handleVoiceCommand(grammar, words) {
@@ -1194,7 +1194,7 @@ class RaceAssistant extends ConfigurationItem {
 		local tools := []
 		local loadedRules := CaseInsenseMap()
 		local activationIndex := 1
-		local ignore, action, definition, parameters, parameter, enumeration, handler
+		local ignore, action, definition, parameters, parameter, enumeration, handler, enoughData, confirm
 
 		callMethod(method, enoughData, confirm, arguments*) {
 			this.confirmCommand(enoughData, confirm)
@@ -1214,9 +1214,11 @@ class RaceAssistant extends ConfigurationItem {
 			%function%(arguments*)
 		}
 
-		callRules(ruleFileName, enoughData, confirm, activation, parameters, arguments*) {
+		callRules(ruleFileName, enoughData, confirm, parameters, arguments*) {
 			local knowledgeBase := this.KnowledgeBase
 			local rules, ignore, rule, productions, reductions, index, parameter
+
+			static activationIndex := 1
 
 			if knowledgeBase {
 				this.confirmCommand(enoughData, confirm)
@@ -1252,6 +1254,8 @@ class RaceAssistant extends ConfigurationItem {
 				}
 
 			knowledgeBase.produce()
+
+			knowledgeBase.clearFact(loadedRules[ruleFileName])
 		}
 
 		callControllerMethod(method, enoughData, confirm, arguments*) {
@@ -1302,20 +1306,20 @@ class RaceAssistant extends ConfigurationItem {
 						}
 					}
 
+					enoughData := ((definition[3] = kTrue) ? kTrue : ((definition[3] = kFalse) ? false : definition[3]))
+					confirm := ((definition[4] = kTrue) ? kTrue : ((definition[4] = kFalse) ? false : definition[4]))
+
 					switch definition[1], false {
 						case "Assistant.Method":
-							handler := callMethod.Bind(definition[2], definition[3], definition[4])
+							handler := callMethod.Bind(definition[2], enoughData, confirm)
 						case "Assistant.Function":
-							handler := callFunction.Bind(definition[2], definition[3], definition[4])
+							handler := callFunction.Bind(definition[2], enoughData, confirm)
 						case "Assistant.Rule":
-							handler := callRules.Bind(getMultiMapValue(configuration, "Rules", action . ".Rules")
-													, definition[3], definition[4]
-													, getMultiMapValue(configuration, "Rules", action . ".Activation")
-													, parameters)
+							handler := callRules.Bind(definition[2], enoughData, confirm, parameters)
 						case "Controller.Method":
-							handler := callControllerMethod.Bind(definition[2], definition[3], definition[4])
+							handler := callControllerMethod.Bind(definition[2], enoughData, confirm)
 						case "Controller.Fuction":
-							handler := callControllerFunction.Bind(definition[2], definition[3], definition[4])
+							handler := callControllerFunction.Bind(definition[2], enoughData, confirm)
 						default:
 							throw "Unknown action type (" definition[1] . ") detected in RaceAssistant.createConversationTools..."
 					}
@@ -3665,7 +3669,16 @@ getTime(*) {
 	return A_Now
 }
 
-callAssistant(choicePoint, function, arguments*) {
+callAssistant(choicePoint, method, arguments*) {
+	try {
+		choicePoint.KnowledgeBase.RaceAssistant.%method%(retrieveArguments(choicePoint, arguments)*)
+	}
+	catch Any as exception {
+		logError(exception, true)
+	}
+}
+
+callFunction(choicePoint, function, arguments*) {
 	try {
 		%function%(retrieveArguments(choicePoint, arguments)*)
 	}
@@ -3679,6 +3692,21 @@ callController(choicePoint, function, arguments*) {
 
 	if remoteHandler
 		remoteHandler.customAction("Function", function, retrieveArguments(choicePoint, arguments, true)*)
+}
+
+askAssistant(choicePoint, question) {
+	choicePoint.KnowledgeBase.RaceAssistant.handleVoiceText("TEXT", question)
+}
+
+speakAssistant(choicePoint, message) {
+	local assistant := choicePoint.KnowledgeBase.RaceAssistant
+	local ignore, part
+
+	if assistant.VoiceManager.UseTalking
+		assistant.getSpeaker().speak(message, false, false, {Noise: false, Rephrase: false})
+	else
+		for ignore, part in string2Values(". ", message)
+			assistant.getSpeaker().speak(part . ".", false, false, {Rephrase: false, Click: (A_Index = 1)})
 }
 
 

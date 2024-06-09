@@ -1,9 +1,9 @@
 [Development]
 Version=5.7.6.0-dev
 Target=5.7.6.0-release
-Date=06/08/2024
+Date=06/09/2024
 Download=
-Changes=Integrate predefined actions in an LLM conversation, Restructured Conversation Booster instructions, Fixed FasterThan information of the Spotter for multi class
+Changes=Integrate predefined actions in an LLM conversation, Added action definition files in user home directory, Restructured Conversation Booster instructions, Fixed FasterThan information of the Spotter for multi class
 Components=Media->5.6.1,Configuration->5.7.5,Utilities->5.4.8
 [Release]
 Version=5.7.5.0-release

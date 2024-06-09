@@ -6,6 +6,7 @@
   5. The LLMs used to boost the conversation capabilities of the Assistants are now allowed to activate some actions as a result of your interaction. A few actions already have been defined for the [Enginer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#trigger-actions-from-conversation) and the [Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#trigger-actions-from-conversation) with more to come in the next releases.
   
      Please note, that *Actions* are not active by default, but must be explicitly activated in the configuration.
+  6. Action definition files are customizeable in the [Documents]\Simulator Controller\Actions folder.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-576), when you have configured the Conversation Booster for the Assistants.
 

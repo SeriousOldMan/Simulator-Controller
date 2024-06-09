@@ -83,10 +83,10 @@ loadSimulatorConfiguration() {
 		logMessage(kLogOff, "Checking downloadable component versions...")
 
 	argIndex := inList(A_Args, "-Configuration")
-	
+
 	if argIndex {
 		kSimulatorConfiguration := readMultiMap(A_Args[argIndex + 1])
-		
+
 		setLanguage(getMultiMapValue(kSimulatorConfiguration, "Configuration", "Language", getSystemLanguage()))
 	}
 	else {
@@ -245,6 +245,7 @@ initializeEnvironment() {
 
 	DirCreate(A_MyDocuments . "\Simulator Controller")
 	DirCreate(kUserHomeDirectory . "Config")
+	DirCreate(kUserHomeDirectory . "Actions")
 	DirCreate(kUserHomeDirectory . "Rules")
 	DirCreate(kUserHomeDirectory . "Garage")
 	DirCreate(kUserHomeDirectory . "Garage\Definitions")

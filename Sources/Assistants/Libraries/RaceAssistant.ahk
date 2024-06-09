@@ -1194,7 +1194,7 @@ class RaceAssistant extends ConfigurationItem {
 		local tools := []
 		local loadedRules := CaseInsenseMap()
 		local activationIndex := 1
-		local ignore, action, definition, parameters, parameter, enumeration, handler, enoughData, confirm
+		local ignore, action, definition, parameters, parameter, enumeration, handler, enoughData, confirm, required
 
 		callMethod(method, enoughData, confirm, arguments*) {
 			this.confirmCommand(enoughData, confirm)
@@ -1302,7 +1302,9 @@ class RaceAssistant extends ConfigurationItem {
 							if (enumeration.Length = 0)
 								enumeration := false
 
-							parameters.Push(LLMTool.Function.Parameter(parameter[1], parameter[5], parameter[2], enumeration, parameter[4]))
+							required := ((parameter[4] = kTrue) ? kTrue : ((parameter[4] = kFalse) ? false : parameter[4]))
+
+							parameters.Push(LLMTool.Function.Parameter(parameter[1], parameter[5], parameter[2], enumeration, required))
 						}
 					}
 

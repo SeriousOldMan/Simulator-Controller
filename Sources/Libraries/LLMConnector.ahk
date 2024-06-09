@@ -43,6 +43,17 @@ class LLMTool {
 
 			iReader := (v) => v
 
+			Descriptor {
+				Get {
+					local descriptor := {description: this.Description, type: this.Type}
+
+					if this.Enumeration
+						descriptor.Enum := this.Enumeration
+
+					return descriptor
+				}
+			}
+
 			Name {
 				Get {
 					return this.iName
@@ -89,6 +100,25 @@ class LLMTool {
 			}
 		}
 
+		Descriptor {
+			Get {
+				local required := []
+				local parameters := {}
+				local ignore, parameter
+
+				for ignore, parameter in this.Parameters {
+					parameters.%parameter.Name% := parameter.Descriptor
+
+					if parameter.Required
+						required.Push(parameter.Name)
+				}
+
+				return {type: "function"
+					  , function: {name: this.Name, description: this.Description
+								 , parameters: {type: "object", properties: parameters, required: required}}}
+			}
+		}
+
 		Type {
 			Get {
 				return "function"
@@ -115,6 +145,12 @@ class LLMTool {
 		}
 	}
 
+	Descriptor {
+		Get {
+			throw "Virtual property LLTool.Descriptor must be implemeneted in a subclass..."
+		}
+	}
+
 	Type {
 		Get {
 			throw "Virtual property LLTool.Type must be implemeneted in a subclass..."
@@ -130,6 +166,12 @@ class LLMTool {
 	Description {
 		Get {
 			return this.iDescription
+		}
+	}
+
+	JSON {
+		Get {
+			return JSON.print(this.Descriptor, "  ")
 		}
 	}
 
@@ -354,65 +396,8 @@ class LLMConnector {
 			return body
 		}
 
-		CreateParameter(parameter) {
-			Local descriptor := {description: parameter.Description
-							   , type: parameter.Type}
-
-			if parameter.Enumeration
-				descriptor.Enum := parameter.Enumeration
-
-			/*
-			if InStr(this.Model, "Command")
-				descriptor.required := (parameter.Required ? kTrue : kFalse)
-			*/
-
-			return descriptor
-		}
-
-		CreateParameters(function, &required?) {
-			local parameters := {}
-			local ignore, parameter
-
-			if isSet(required)
-				required := []
-
-			for ignore, parameter in function.Parameters {
-				parameters.%parameter.Name% := this.CreateParameter(parameter)
-
-				if (parameter.Required && isSet(required))
-					required.Push(parameter.Name)
-			}
-
-			return parameters
-		}
-
-		CreateFunction(function) {
-			local required := []
-			local parameters := this.CreateParameters(function, &required)
-
-			/*
-			if (!isInstance(this, LLMConnector.OpenRouterConnector) && InStr(this.Model, "Command"))
-				return {name: function.Name, description: function.Description
-					  , parameter_definitions: parameters}
-			else if (!isInstance(this, LLMConnector.OpenRouterConnector) && InStr(this.Model, "Claude"))
-				return {name: function.Name, description: function.Description
-					  , input_schema: {type: "object", properties: parameters, required: required}}
-			else
-			*/
-				return {type: "function"
-					  , function: {name: function.Name, description: function.Description
-								 , parameters: {type: "object", properties: parameters, required: required}}}
-		}
-
-		CreateTool(tool) {
-			if (tool.Type = "function")
-				return this.CreateFunction(tool)
-			else
-				throw "Unsupported tool type detected in LLMConnector.APIConnector.CreateTool..."
-		}
-
 		CreateTools(body, tools) {
-			body.tools := collect(tools, ObjBindMethod(this, "CreateTool"))
+			body.tools := collect(tools, (t) => t.Descriptor)
 
 			return body
 		}

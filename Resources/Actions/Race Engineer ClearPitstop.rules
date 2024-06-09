@@ -1,1 +1,2 @@
-[?%activation%] => (Set: Pitstop.Clear, !Lap), (Prove: Assistant.Speak("Okay!"))
+[?%activation%] => (Set: Pitstop.Clear, !Lap),
+				   (Prove: Assistant.Speak("Okay!"))

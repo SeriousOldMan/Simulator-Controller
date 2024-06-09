@@ -349,31 +349,14 @@ class RaceEngineer extends RaceAssistant {
 		}
 	}
 
-	createConversationTools() {
-		local strategyTools
+	planPitstopAction(targetLap?, refuelAmount?, changeTyres?, repairs?) {
+		repairs := (isSet(repairs) ? repairs : kUndefined)
 
-		planPitstop(targetLap?, refuelAmount?, changeTyres?, repairs?) {
-			this.confirmCommand(false)
-
-			if isDebug()
-				showMessage("LLM -> planPitstop(" . targetLap . ")")
-
-			repairs := (isSet(repairs) ? repairs : kUndefined)
-
-			this.planPitstop(isSet(targetLap) ? targetLap : kUndefined
-						   , isSet(refuelAmount) ? ("!" . refuelAmount) : kUndefined
-						   , isSet(changeTyres) ? ("!" . changeTyres) : kUndefined
-						   , kUndefined, kUndefined, kUndefined, kUndefined
-						   , repairs, repairs, repairs)
-		}
-
-		return concatenate(super.createConversationTools()
-						 , [LLMTool.Function("planPitstop", "Create a plan for the next pitstop."
-										   , [LLMTool.Function.Parameter("lap", "The planned lap for the car to come to the pit.", "Integer", false, true)
-										   ,  LLMTool.Function.Parameter("refuel", "The amount of fuel to be filled into the car.", "Integer", false, true)
-										   ,  LLMTool.Function.Parameter("changeTyres", "Indicates whether new tyres should be mounted.", "Boolean", false, true)
-										   ,  LLMTool.Function.Parameter("repairDamages", "Indicates whether all damages should be repaired.", "Boolean", false, true)]
-										   , planPitstop)])
+		this.planPitstop(isSet(targetLap) ? targetLap : kUndefined
+					   , isSet(refuelAmount) ? ("!" . refuelAmount) : kUndefined
+					   , isSet(changeTyres) ? ("!" . changeTyres) : kUndefined
+					   , kUndefined, kUndefined, kUndefined, kUndefined
+					   , repairs, repairs, repairs)
 	}
 
 	getKnowledge(options := false) {

@@ -980,46 +980,6 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 	}
 
-	createConversationTools() {
-		local strategyTools
-
-		planPitstop(targetLap := false) {
-			this.confirmCommand(false)
-
-			if isDebug()
-				showMessage("LLM -> planPitstop(" . targetLap . ")")
-
-			this.planPitstop(targetLap)
-		}
-
-		simulatePitstop(targetLap := false) {
-			this.confirmCommand(false)
-
-			if isDebug()
-				showMessage("LLM -> simulatePitstop(" . targetLap . ")")
-
-			this.recommendPitstop(targetLap)
-		}
-
-		updateStrategy() {
-			this.confirmCommand()
-
-			if isDebug()
-				showMessage("LLM -> updateStrategy()")
-
-			this.recommendStrategy()
-		}
-
-		return concatenate(super.createConversationTools()
-						 , [LLMTool.Function("planPitstop", "Ask the Engineer to plan a pitstop."
-										   , [LLMTool.Function.Parameter("lap", "The planned lap for the car to come to the pit.", "Integer", false, false)]
-										   , planPitstop),
-						 , LLMTool.Function("simulatePitstop", "Simulates the outcome of an upcoming pitstop. The traffic situation after the pitstop will be evaluated and the target lap will be optimized, if an undercut is possible."
-										  , [LLMTool.Function.Parameter("lap", "The initial target lap for the upcoming pitstop.", "Integer", false, false)]
-										  , simulatePitstop)
-						 , LLMTool.Function("updateStrategy", "Trigger a recalculation of the current race strategy.", [], updateStrategy)])
-	}
-
 	getKnowledge(options := false) {
 		local knowledgeBase := this.KnowledgeBase
 		local knowledge := super.getKnowledge(options)

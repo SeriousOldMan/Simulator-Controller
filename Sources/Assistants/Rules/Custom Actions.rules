@@ -1,0 +1,24 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;   Modular Simulator Controller System - Custom Actions                  ;;;
+;;;                                                                         ;;;
+;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
+;;;   License:    (2024) Creative Commons - BY-NC-SA                        ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;-------------------------------------------------------------------------;;;
+;;;                            Public Rules Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+Call:Assistant(?function, ?p1) <= Call(callAssistant, ?function, ?p1)
+Call:Assistant(?function, ?p1, ?p2) <= Call(callAssistant, ?function, ?p1, ?p2)
+Call:Assistant(?function, ?p1, ?p2, ?p3) <= Call(callAssistant, ?function, ?p1, ?p2, ?p3)
+Call:Assistant(?function, ?p1, ?p2, ?p3, ?p4) <= Call(callAssistant, ?function, ?p1, ?p2, ?p3, ?p4)
+Call:Assistant(?function, ?p1, ?p2, ?p3, ?p4, ?p5) <= Call(callAssistant, ?function, ?p1, ?p2, ?p3, ?p4, ?p5)
+Call:Assistant(?function, ?p1, ?p2, ?p3, ?p4, ?p5, ?p6) <= Call(callAssistant, ?function, ?p1, ?p2, ?p3, ?p4, ?p5, ?p6)
+
+Call:Controller(?function, ?p1) <= Call(callController, ?function, ?p1)
+Call:Controller(?function, ?p1, ?p2) <= Call(callController, ?function, ?p1, ?p2)
+Call:Controller(?function, ?p1, ?p2, ?p3) <= Call(callController, ?function, ?p1, ?p2, ?p3)
+Call:Controller(?function, ?p1, ?p2, ?p3, ?p4) <= Call(callController, ?function, ?p1, ?p2, ?p3, ?p4)
+Call:Controller(?function, ?p1, ?p2, ?p3, ?p4, ?p5) <= Call(callController, ?function, ?p1, ?p2, ?p3, ?p4, ?p5)
+Call:Controller(?function, ?p1, ?p2, ?p3, ?p4, ?p5, ?p6) <= Call(callController, ?function, ?p1, ?p2, ?p3, ?p4, ?p5, ?p6)

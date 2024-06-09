@@ -2205,6 +2205,21 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			RaceAssistantPlugin.RestoreSessionStateTask(this, data).start()
 	}
 
+	customAction(function, arguments*) {
+		local callArguments := []
+		local ignore, argument
+
+		for ignore, argument in arguments
+			callArguments.Push((argument = kUndefined) ? unset : argument)
+
+		try {
+			%function%(callArguments*)
+		}
+		catch Any as exception {
+			logError(exception, true)
+		}
+	}
+
 	clearSessionInfo() {
 		local teamServer := this.TeamServer
 

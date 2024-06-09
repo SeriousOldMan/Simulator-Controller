@@ -150,6 +150,10 @@ class RaceAssistant extends ConfigurationItem {
 		saveSessionInfo(arguments*) {
 			this.callRemote("saveSessionInfo", arguments*)
 		}
+
+		customAction(arguments*) {
+			this.callRemote("customAction", arguments*)
+		}
 	}
 
 	class RaceVoiceManager extends VoiceManager {
@@ -630,10 +634,6 @@ class RaceAssistant extends ConfigurationItem {
 		return RaceAssistant.RaceVoiceManager(this, name, options)
 	}
 
-	createConversationTools() {
-		return []
-	}
-
 	updateConfigurationValues(values) {
 		if values.HasProp("Settings") {
 			this.iSettings := values.Settings
@@ -738,13 +738,14 @@ class RaceAssistant extends ConfigurationItem {
 			this.iEnoughData := values.EnoughData
 	}
 
-	confirmCommand(enoughData := true) {
+	confirmCommand(enoughData := true, confirm := true) {
 		this.clearContinuation()
 
 		if (enoughData && !this.hasEnoughData())
 			return
 
-		this.getSpeaker().speakPhrase("Confirm")
+		if confirm
+			this.getSpeaker().speakPhrase("Confirm")
 
 		Task.yield()
 
@@ -804,6 +805,84 @@ class RaceAssistant extends ConfigurationItem {
 			default:
 				throw "Unknown grammar `"" . grammar . "`" detected in RaceAssistant.handleVoiceCommand...."
 		}
+	}
+
+	createConversationTools() {
+		local configuration := readMultiMap(kResourcesDirectory . "Actions\" . this.AssistantType . ".actions")
+		local tools := []
+		local ignore, action, definition, parameters, parameter, enumeration, handler
+
+		callMethod(method, enoughData, confirm, arguments*) {
+			this.confirmCommand(enoughData, confirm)
+
+			if isDebug()
+				showMessage("LLM -> this." . method . "(...)")
+
+			this.%method%(arguments*)
+		}
+
+		callFunction(function, enoughData, confirm, arguments*) {
+			this.confirmCommand(enoughData, confirm)
+
+			if isDebug()
+				showMessage("LLM -> " . function . "(...)")
+
+			%function%(arguments*)
+		}
+
+		callController(function, enoughData, confirm, arguments*) {
+			if this.RemoteHandler {
+				this.confirmCommand(enoughData, confirm)
+
+				if isDebug()
+					showMessage("LLM -> Controller:" . function . "(...)")
+
+				this.RemoteHandler.customAction(function, arguments*)
+			}
+		}
+
+		addMultiMapValues(configuration, readMultiMap(kUserHomeDirectory . "Actions\" . this.AssistantType . ".actions"))
+
+		for ignore, action in string2Values(",", getMultiMapValue(configuration, "Actions", "Active", "")) {
+			definition := getMultiMapValue(configuration, "User", action, false)
+
+			if !definition
+				definition := getMultiMapValue(configuration, "Builtin", action, false)
+
+			if definition {
+				definition := string2Values("|", definition)
+				parameters := []
+
+				loop definition[5] {
+					parameter := string2Values("|", getMultiMapValue(configuration, "Parameters", action . "." . A_Index, ""))
+
+					if (parameter.Length >= 5) {
+						enumeration := string2Values(",", parameter[3])
+
+						if (enumeration.Length = 0)
+							enumeration := false
+
+						parameters.Push(LLMTool.Function.Parameter(parameter[1], parameter[5], parameter[2], enumeration, parameter[4]))
+					}
+				}
+
+				switch definition[1], false {
+					case "Method":
+						handler := callMethod.Bind(definition[2], definition[3], definition[4])
+					case "Function":
+						handler := callFunction.Bind(definition[2], definition[3], definition[4])
+					case "Controller":
+						handler := callController.Bind(definition[2], definition[3], definition[4])
+					default:
+						handler := false
+				}
+
+				if handler
+					tools.Push(LLMTool.Function(action, definition[6], parameters, handler))
+			}
+		}
+
+		return tools
 	}
 
 	activeTopic(options, topic) {
@@ -1190,6 +1269,12 @@ class RaceAssistant extends ConfigurationItem {
 		reductions := false
 
 		compiler.compileRules(rules, &productions, &reductions)
+
+		if this.Booster {
+			rules := FileRead(getFileName("Custom Actions.rules", kUserRulesDirectory, kRulesDirectory))
+
+			compiler.compileRules(rules, &productions, &reductions)
+		}
 
 		engine := RuleEngine(productions, reductions, facts)
 
@@ -3505,6 +3590,22 @@ getTime(*) {
 	return A_Now
 }
 
+callAssistant(choicePoint, function, arguments*) {
+	try {
+		%function%(retrieveArguments(choicePoint, arguments)*)
+	}
+	catch Any as exception {
+		logError(exception, true)
+	}
+}
+
+callController(choicePoint, function, arguments*) {
+	local remoteHandler := choicePoint.KnowledgeBase.RaceAssistant.RemoteHandler
+
+	if remoteHandler
+		remoteHandler.customAction(function, retrieveArguments(choicePoint, arguments, true)*)
+}
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
@@ -3525,4 +3626,20 @@ matchFragment(words, fragment) {
 	}
 
 	return (score / fragmentWords.Length)
+}
+
+retrieveArguments(choicePoint, arguments, remote := false) {
+	local result := []
+	local resultSet := choicePoint.ResultSet
+
+	for ignore, argument in arguments {
+		argument := argument.getValue(resultSet, argument)
+
+		if (isInstance(argument, Variable) || argument.isUnbound(resultSet))
+			result.Push(!remote ? unset : kUndefined)
+		else
+			result.Push(argument.toString(resultSet))
+	}
+
+	return result
 }

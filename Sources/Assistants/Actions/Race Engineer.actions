@@ -1,0 +1,9 @@
+[Actions]
+Active=planPitstop
+[Builtin]
+planPitstop=Method|planPitstopAction|false|true|4|Create a plan for the next pitstop.
+[Parameters]
+planPitstop.1=targetLap|Integer||false|The planned lap for the car to come to the pit.
+planPitstop.2=refuel|String||false|The amount of fuel to be filled into the car.
+planPitstop.3=changeTyres|Boolean||false|Indicates whether new tyres should be mounted.
+planPitstop.4=repairs|Boolean||false|Indicates whether all damages should be repaired.

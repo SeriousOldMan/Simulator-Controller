@@ -960,19 +960,23 @@ class RaceStrategist extends GridRaceAssistant {
 			case "NextPitstop":
 				this.nextPitstopRecognized(words)
 			case "StrategyRecommend":
-				this.confirmCommand()
+				if !this.confirmCommand()
+					return
 
 				this.recommendStrategyRecognized(words)
 			case "FCYRecommend":
-				this.confirmCommand()
+				if !this.confirmCommand()
+					return
 
 				this.fullCourseYellowRecognized(words)
 			case "PitstopRecommend":
-				this.confirmCommand()
+				if !this.confirmCommand()
+					return
 
 				this.recommendPitstopRecognized(words)
 			case "PitstopSimulate":
-				this.confirmCommand()
+				if !this.confirmCommand()
+					return
 
 				this.simulatePitstopRecognized(words)
 			default:
@@ -3530,19 +3534,22 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	callRecommendPitstop(lapNumber := false) {
-		this.confirmCommand(false)
+		if !this.confirmCommand(false)
+			return
 
 		this.recommendPitstop(lapNumber)
 	}
 
 	callRecommendStrategy() {
-		this.confirmCommand(false)
+		if !this.confirmCommand(false)
+			return
 
 		this.recommendStrategy()
 	}
 
 	callRecommendFullCourseYellow() {
-		this.confirmCommand(false)
+		if !this.confirmCommand(false)
+			return
 
 		this.recommendStrategy({FullCourseYellow: true})
 	}

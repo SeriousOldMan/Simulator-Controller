@@ -741,7 +741,7 @@ class RaceAssistant extends ConfigurationItem {
 		this.clearContinuation()
 
 		if (enoughData && !this.hasEnoughData())
-			return
+			return false
 
 		if confirm
 			this.getSpeaker().speakPhrase("Confirm")
@@ -750,6 +750,8 @@ class RaceAssistant extends ConfigurationItem {
 
 		loop 10
 			Sleep(confirm ? 500 : 10)
+
+		return true
 	}
 
 	handleVoiceCommand(grammar, words) {
@@ -1197,7 +1199,8 @@ class RaceAssistant extends ConfigurationItem {
 		local ignore, action, definition, parameters, parameter, enumeration, handler, enoughData, confirm, required
 
 		callMethod(method, enoughData, confirm, arguments*) {
-			this.confirmCommand(enoughData, confirm)
+			if !this.confirmCommand(enoughData, confirm)
+				return
 
 			if isDebug()
 				showMessage("LLM -> this." . method . "(...)")
@@ -1206,7 +1209,8 @@ class RaceAssistant extends ConfigurationItem {
 		}
 
 		callFunction(function, enoughData, confirm, arguments*) {
-			this.confirmCommand(enoughData, confirm)
+			if !this.confirmCommand(enoughData, confirm)
+				return
 
 			if isDebug()
 				showMessage("LLM -> " . function . "(...)")
@@ -1221,7 +1225,8 @@ class RaceAssistant extends ConfigurationItem {
 			static activationIndex := 1
 
 			if knowledgeBase {
-				this.confirmCommand(enoughData, confirm)
+				if !this.confirmCommand(enoughData, confirm)
+					return
 
 				if !loadedRules.Has(ruleFileName) {
 					rules := FileRead(getFileName(ruleFileName, kUserHomeDirectory . "Actions\", kResourcesDirectory . "Actions\"))
@@ -1256,11 +1261,15 @@ class RaceAssistant extends ConfigurationItem {
 			knowledgeBase.produce()
 
 			knowledgeBase.clearFact(loadedRules[ruleFileName])
+
+			if this.Debug[kDebugKnowledgeBase]
+				this.dumpKnowledgeBase(knowledgeBase)
 		}
 
 		callControllerMethod(method, enoughData, confirm, arguments*) {
 			if this.RemoteHandler {
-				this.confirmCommand(enoughData, confirm)
+				if !this.confirmCommand(enoughData, confirm)
+					return
 
 				if isDebug()
 					showMessage("LLM -> Controller." . method . "(...)")
@@ -1271,7 +1280,8 @@ class RaceAssistant extends ConfigurationItem {
 
 		callControllerFunction(function, enoughData, confirm, arguments*) {
 			if this.RemoteHandler {
-				this.confirmCommand(enoughData, confirm)
+				if !this.confirmCommand(enoughData, confirm)
+					return
 
 				if isDebug()
 					showMessage("LLM -> Controller:" . function . "(...)")

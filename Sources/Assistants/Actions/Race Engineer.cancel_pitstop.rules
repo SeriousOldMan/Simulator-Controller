@@ -1,0 +1,5 @@
+; Sets the trigger for full cleanup of the last pitstop plan.
+; After that, the driver request is confirmed.
+
+[?%activation%] => (Set: Pitstop.Clear, !Lap),
+				   (Prove: Assistant.Speak("Okay!"))

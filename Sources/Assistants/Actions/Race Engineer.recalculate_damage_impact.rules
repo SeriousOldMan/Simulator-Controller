@@ -1,0 +1,10 @@
+; Resets the calculated damage impact for Bodywork, Suspension and Engine damage,
+; thereby triggering a full recalculation.
+
+[?%activation%] => (Prove: resetDamage([Bodywork, Suspension, Engine])), (Clear: Damage.Reported)
+
+resetDamage([])
+resetDamage([?damageType | ?moreDamageTypes]) <= resetDamage(?damageType), resetDamage(?moreDamageTypes)
+
+resetDamage(?damageType) <= Clear(Damage, ?damageType), Clear(Damage, ?damageType, Lap.Delta),
+							Clear(Damage.Repair, ?damageType, Target), Clear(Damage, ?damageType, Reported)

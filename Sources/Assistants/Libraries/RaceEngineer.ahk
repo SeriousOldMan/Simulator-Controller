@@ -244,7 +244,8 @@ class RaceEngineer extends RaceAssistant {
 					this.setContinuation(ObjBindMethod(this, "planPitstopRecognized", words))
 				}
 				else {
-					this.confirmCommand(false)
+					if !this.confirmCommand(false)
+						return
 
 					this.planPitstopRecognized(words)
 				}
@@ -275,7 +276,8 @@ class RaceEngineer extends RaceAssistant {
 						this.driverSwapRecognized(words)
 				}
 				else {
-					this.confirmCommand(false)
+					if !this.confirmCommand(false)
+						return
 
 					this.driverSwapRecognized(words)
 				}
@@ -880,7 +882,8 @@ class RaceEngineer extends RaceAssistant {
 	}
 
 	preparePitstopRecognized(words) {
-		this.confirmCommand(false)
+		if !this.confirmCommand(false)
+			return
 
 		this.preparePitstop()
 	}
@@ -2980,7 +2983,8 @@ class RaceEngineer extends RaceAssistant {
 
 		if (lap == kUndefined) {
 			if confirm
-				this.confirmCommand(false)
+				if !this.confirmCommand(false)
+					return
 
 			this.planPitstop()
 		}
@@ -3027,7 +3031,8 @@ class RaceEngineer extends RaceAssistant {
 
 		if (lap == kUndefined) {
 			if confirm
-				this.confirmCommand(false)
+				if !this.confirmCommand(false)
+					return
 
 			this.planDriverSwap()
 		}
@@ -3043,7 +3048,8 @@ class RaceEngineer extends RaceAssistant {
 				this.getSpeaker().speakPhrase("NoPitstop")
 		}
 		else {
-			this.confirmCommand(false)
+			if !this.confirmCommand(false)
+				return
 
 			if lap
 				this.preparePitstop(lap)

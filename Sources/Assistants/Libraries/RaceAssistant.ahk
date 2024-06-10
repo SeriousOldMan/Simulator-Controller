@@ -3712,13 +3712,19 @@ askAssistant(choicePoint, question) {
 
 speakAssistant(choicePoint, message) {
 	local assistant := choicePoint.KnowledgeBase.RaceAssistant
-	local ignore, part
+	local speaker, ignore, part
 
-	if assistant.VoiceManager.UseTalking
-		assistant.getSpeaker().speak(message, false, false, {Noise: false, Rephrase: false})
-	else
-		for ignore, part in string2Values(". ", message)
-			assistant.getSpeaker().speak(part . ".", false, false, {Rephrase: false, Click: (A_Index = 1)})
+	if assistant.Speaker[true] {
+		speaker := assistant.getSpeaker()
+
+		if speaker.Phrases.Has(message)
+			speaker.speakPhrase(message)
+		else if assistant.VoiceManager.UseTalking
+			speaker.speak(message, false, false, {Noise: false, Rephrase: false})
+		else
+			for ignore, part in string2Values(". ", message)
+				speaker.speak(part . ".", false, false, {Rephrase: false, Click: (A_Index = 1)})
+	}
 }
 
 

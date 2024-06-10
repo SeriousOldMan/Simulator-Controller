@@ -94,7 +94,7 @@ An LLM may be able to trigger actions as a result of a conversation. This is ach
 
 Please note that calling actions is currently only available when using *OpenAI*, *Mistral AI* or *OpenRouter* are used as GPT service providers.
 
-The following table shows you the actions, that might be triggered by the LLM during a conversation with the Strategist:
+The following table shows you the predefined actions, that might be triggered by the LLM during a conversation with the Strategist:
 
 | Action                 | Parameter(s)      | Example(s) |
 |------------------------|----------------|------------|
@@ -102,9 +102,9 @@ The following table shows you the actions, that might be triggered by the LLM du
 | Pitstop Planning       | [Optional] lap | "Can you ask the Engineer to create a pitstop plan for the next lap?" |
 | Strategy Recalculation | -              |"Can you check whether we can skip the last pitstop now, if we use a fuel saving map from now on?" |
 
-Please note, that beside reacting to the phrase as shown in the examples above, the LLM might decide to take the action according to the current situation and based on the current data. So always be alerted, if the LLM gets active on its own.
+As you can see, you can define new voice commands by defining a corresponding action, that can be triggered by the LLM. But that is only one part of the story. Please note, that beside reacting to the phrase as shown in the examples above, the LLM might decide to take the action on its own according to the current situation and based on the current data. So always be alerted, if the LLM gets active unexpectedly.
 
-As you might expect, it depends on the data available in the knowledge base, whether the LLM will decide to trigger this action or not. If the LLM refuses to do so, you still have all the traditional voice commands and the controller actions at your disposal.
+That said, it depends on the data available in the knowledge base, whether the LLM will decide to trigger this action or not. If the LLM refuses to do so, you still have all the traditional voice commands and the controller actions at your disposal.
 
 IMPORTANT: When action handling is enabled, it might be necessary to disable the "Recognition" booster or at least set the "Creativity" to a very low value. Otherwise the "Recognition" booster might detect a command pattern, which will match to a predefined voice command, thereby preventing the LLM from crating a custom action plan.
 

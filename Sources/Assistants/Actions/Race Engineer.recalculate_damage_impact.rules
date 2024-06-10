@@ -1,11 +1,15 @@
 ; Resets the calculated damage impact for Bodywork, Suspension and Engine damage,
 ; thereby triggering a full recalculation.
 
-[?%activation%] => (Prove: resetDamage([Bodywork, Suspension, Engine])),
-				   (Clear: Damage.Analysis.Reported), (Set: Damage.Reported, !Lap)
+{All: [?%activation%], {Any: [?Damage.Bodywork], [?Damage.Suspension], [?Damage.Engine]}} =>
+		(Prove: resetDamage([Bodywork, Suspension, Engine])), (Clear: Damage.Analysis.Reported)
 
 resetDamage([])
-resetDamage([?damageType | ?moreDamageTypes]) <= resetDamage(?damageType), resetDamage(?moreDamageTypes)
+resetDamage([?damageType | ?damageTypes]) <= resetDamage(?damageType), resetDamage(?damageTypes)
 
 resetDamage(?damageType) <= Clear(Damage, ?damageType), Clear(Damage.Repair, ?damageType, Target),
-							Set(Damage.Update, ?damageType, !Lap), Set(Damage, ?damageType, Reported, !Lap)
+							clearDamageReferenceLaps(!Lap, ?damageType)
+
+clearDamageReferenceLaps(0, ?) <= !
+clearDamageReferenceLaps(?lap, ?damageType) <= Clear(Lap, ?lap, Damage, ?damageType, Lap.Reference),
+											   ?nLap = ?lap - 1, clearDamageReferenceLaps(?nLap)

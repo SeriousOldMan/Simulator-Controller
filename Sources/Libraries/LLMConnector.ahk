@@ -88,9 +88,16 @@ class LLMTool {
 				Get {
 					return this.iReader
 				}
+
+				Set {
+					return (this.iReader := value)
+				}
 			}
 
 			__New(name, description, type, enumeration := false, required := true, reader := (v) => v) {
+				if (enumeration && (enumeration.Length = 0))
+					enumeration := false
+
 				this.iName := name
 				this.iDescription := description
 				this.iType := StrLower(type)
@@ -135,19 +142,42 @@ class LLMTool {
 			Get {
 				return this.iCallable
 			}
+
+			Set {
+				return (this.iCallable := false)
+			}
 		}
 
-		__New(name, description, parameters, callable) {
+		__New(name, description, parameters, callable := false) {
 			this.iParameters := parameters
 			this.iCallable := callable
 
 			super.__New(name, description)
 		}
+
+		static FromDescriptor(descriptor) {
+			local parameters := []
+			local required := []
+			local name, parameter
+
+			if !isObject(descriptor)
+				descriptor := JSON.parse(descriptor)
+
+			if descriptor["function"].Has("parameters") {
+				if descriptor["function"]["parameters"].Has("required")
+					required := descriptor["function"]["parameters"]["required"]
+
+				for name, parameter in descriptor["function"]["parameters"]["properties"]
+					parameters.Push(LLMTool.Function.Parameter(name, parameter["description"], parameter["type"],  parameter["enumeration"], inList(required, name)))
+			}
+
+			return LLMTool.Function(descriptor["function"]["name"], descriptor["function"]["description"], parameters)
+		}
 	}
 
 	Descriptor {
 		Get {
-			throw "Virtual property LLTool.Descriptor must be implemeneted in a subclass..."
+			throw "Virtual property LLMTool.Descriptor must be implemeneted in a subclass..."
 		}
 	}
 
@@ -178,6 +208,18 @@ class LLMTool {
 	__New(name, description) {
 		this.iName := name
 		this.iDescription := description
+	}
+
+	static FromDescriptor(descriptor) {
+		if !isObject(descriptor)
+			descriptor := JSON.parse(descriptor)
+
+		if isInstance(descriptor, Array)
+			return collect(descriptor, ObjBindMethod(this, "FromDescriptor"))
+		else if (descriptor["type"] = "function")
+			return LLMTool.Function.FromDescriptor(descriptor)
+		else
+			throw "Unknown tool type detected in LLMTool.FromDescriptor..."
 	}
 }
 

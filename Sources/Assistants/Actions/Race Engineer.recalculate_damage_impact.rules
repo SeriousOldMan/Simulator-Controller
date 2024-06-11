@@ -7,8 +7,7 @@
 resetDamage([])
 resetDamage([?damageType | ?damageTypes]) <= resetDamage(?damageType), resetDamage(?damageTypes)											 
 
-resetDamage(?damageType) <= Get(Damage, ?damageType, ?damage), ?damage > 0,
-							Clear(Damage, ?damageType), Clear(Damage.Repair, ?damageType, Target),
+resetDamage(?damageType) <= Get(Damage, ?damageType, ?damage), ?damage > 0, Clear(Damage.Repair, ?damageType, Target),
 							Set(Damage, ?damageType, Reported, !Lap), clearDamageReferenceLaps(!Lap, ?damageType)
 
 clearDamageReferenceLaps(0, ?) <= !

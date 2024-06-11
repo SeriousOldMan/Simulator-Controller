@@ -1220,7 +1220,7 @@ class RaceAssistant extends ConfigurationItem {
 
 		callRules(ruleFileName, enoughData, confirm, parameters, arguments*) {
 			local knowledgeBase := this.KnowledgeBase
-			local rules, ignore, rule, productions, reductions, index, parameter
+			local rules, ignore, rule, productions, reductions, index, parameter, names, variables
 
 			static activationIndex := 1
 
@@ -1231,7 +1231,19 @@ class RaceAssistant extends ConfigurationItem {
 				if !loadedRules.Has(ruleFileName) {
 					rules := FileRead(getFileName(ruleFileName, kUserHomeDirectory . "Actions\", kResourcesDirectory . "Actions\"))
 
-					rules := substituteVariables(rules, {activation: "__Activation." . activationIndex})
+					variables := CaseInsenseMap("activation", "__Activation." . activationIndex)
+					names := CaseInsenseMap()
+
+					for ignore, parameter in parameters {
+						try {
+							variables[paramater.Name] := ("__Parameter" . A_Index)
+							names[parameter.Name] := ("__Parameter" . A_Index)
+						}
+						catch Any as exception {
+							logError(exception, true)
+						}
+
+					rules := substituteVariables(rules, variables)
 
 					productions := false
 					reductions := false
@@ -1244,23 +1256,25 @@ class RaceAssistant extends ConfigurationItem {
 					for ignore, rule in reductions
 						knowledgeBase.addRule(rule)
 
-					loadedRules[ruleFileName] := ("__Activation." . activationIndex++)
+					loadedRules[ruleFileName] := [("__Activation." . activationIndex++), names]
 				}
 			}
 
-			knowledgeBase.setFact(loadedRules[ruleFileName], true)
+			knowledgeBase.setFact(loadedRules[ruleFileName][1], true)
+
+			names := loadedRules[ruleFileName][2]
 
 			for index, parameter in parameters
 				try {
-					knowledgeBase.setFact(parameter.Name, arguments[index])
+					knowledgeBase.setFact(names[parameter.Name], arguments[index])
 				}
 				catch UnsetItemError {
-					knowledgeBase.clearFact(parameter.Name)
+					knowledgeBase.clearFact(names[parameter.Name])
 				}
 
 			knowledgeBase.produce()
 
-			knowledgeBase.clearFact(loadedRules[ruleFileName])
+			knowledgeBase.clearFact(loadedRules[ruleFileName][1])
 
 			if this.Debug[kDebugKnowledgeBase]
 				this.dumpKnowledgeBase(knowledgeBase)

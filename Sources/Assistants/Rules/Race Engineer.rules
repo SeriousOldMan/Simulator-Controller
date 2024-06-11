@@ -506,18 +506,19 @@ priority: -5, {All: [?Lap], [?Damage.Reported],
 
 reportAnalysis(?, ?, ?) <= recentPitstopLap(!Lap), !, fail
 
-reportAnalysis(?sDelta, ?bDelta, ?eDelta) <= unbound?(?sDelta), unbound?(?eDelta), reportAnalysis(0, ?bDelta, 0), !
-reportAnalysis(?sDelta, ?bDelta, ?eDelta) <= unbound?(?sDelta), unbound?(?bDelta), reportAnalysis(0, 0, ?eDelta), !
-reportAnalysis(?sDelta, ?bDelta, ?eDelta) <= unbound?(?bDelta), unbound?(?eDelta), reportAnalysis(?sDelta, 0, 0), !
+reportAnalysis(?sDelta, ?bDelta, ?eDelta) <= unbound?(?sDelta), unbound?(?eDelta), reportLapDelta(0, ?bDelta, 0), !
+reportAnalysis(?sDelta, ?bDelta, ?eDelta) <= unbound?(?sDelta), unbound?(?bDelta), reportLapDelta(0, 0, ?eDelta), !
+reportAnalysis(?sDelta, ?bDelta, ?eDelta) <= unbound?(?bDelta), unbound?(?eDelta), reportLapDelta(?sDelta, 0, 0), !
+reportAnalysis(?sDelta, ?bDelta, ?eDelta) <= unbound?(?sDelta), reportLapDelta(0, ?bDelta, ?eDelta), !
+reportAnalysis(?sDelta, ?bDelta, ?eDelta) <= unbound?(?bDelta), reportLapDelta(?sDelta, 0, ?eDelta), !
+reportAnalysis(?sDelta, ?bDelta, ?eDelta) <= unbound?(?eDelta), reportLapDelta(?sDelta, ?bDelta, 0), !
+reportAnalysis(?sDelta, ?bDelta, ?eDelta) <= reportLapDelta(?sDelta, ?bDelta, ?eDelta)
 
-reportAnalysis(?sDelta, ?bDelta, ?eDelta) <= unbound?(?sDelta), reportAnalysis(0, ?bDelta, ?eDelta), !
-reportAnalysis(?sDelta, ?bDelta, ?eDelta) <= unbound?(?bDelta), reportAnalysis(?sDelta, 0, ?eDelta), !
-reportAnalysis(?sDelta, ?bDelta, ?eDelta) <= unbound?(?eDelta), reportAnalysis(?sDelta, ?bDelta, 0), !
-
-reportAnalysis(?sDelta, ?bDelta, ?eDelta) <= ?temp = !Damage.Reported + !Session.Settings.Damage.Analysis.Laps, !Lap > ?temp,
-											 max(?sDelta, ?bDelta, ?tDelta), max(?tDelta, ?eDelta, ?delta),
-											 remainingStintLaps(!Lap, ?stintLaps), ?lostTime = ?stintLaps * ?delta,
-											 reportDamageAnalysis(?lostTime, ?stintLaps, ?delta)
+reportLapDelta(?sDelta, ?bDelta, ?eDelta) <=
+		?temp = !Damage.Reported + !Session.Settings.Damage.Analysis.Laps, !Lap > ?temp,
+		max(?sDelta, ?bDelta, ?tDelta), max(?tDelta, ?eDelta, ?delta),
+		remainingStintLaps(!Lap, ?stintLaps), ?lostTime = ?stintLaps * ?delta,
+		reportDamageAnalysis(?lostTime, ?stintLaps, ?delta)
 
 reportDamageAnalysis(?lostTime, ?stintLaps, ?delta) <= >=(?lostTime, !Session.Settings.Pitstop.Delta),
 													   Call(reportDamageAnalysis, true, ?stintLaps, ?delta),

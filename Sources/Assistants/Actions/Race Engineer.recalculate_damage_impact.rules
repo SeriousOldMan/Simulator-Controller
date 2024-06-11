@@ -2,14 +2,15 @@
 ; thereby triggering a full recalculation.
 
 {All: [?%activation%], {Any: [?Damage.Bodywork], [?Damage.Suspension], [?Damage.Engine]}} =>
-		(Prove: resetDamage([Bodywork, Suspension, Engine])), (Clear: Damage.Analysis.Reported)
+		(Prove: resetDamage([Bodywork, Suspension, Engine])), (Clear: Damage.Analysis.Reported), (Clear: %activation%)
 
 resetDamage([])
-resetDamage([?damageType | ?damageTypes]) <= resetDamage(?damageType), resetDamage(?damageTypes)
+resetDamage([?damageType | ?damageTypes]) <= resetDamage(?damageType), resetDamage(?damageTypes)											 
 
-resetDamage(?damageType) <= Clear(Damage, ?damageType), Clear(Damage.Repair, ?damageType, Target),
-							clearDamageReferenceLaps(!Lap, ?damageType)
+resetDamage(?damageType) <= Get(Damage, ?damageType, ?damage), ?damage > 0,
+							Clear(Damage, ?damageType), Clear(Damage.Repair, ?damageType, Target),
+							Set(Damage, ?damageType, Reported, !Lap), clearDamageReferenceLaps(!Lap, ?damageType)
 
 clearDamageReferenceLaps(0, ?) <= !
 clearDamageReferenceLaps(?lap, ?damageType) <= Clear(Lap, ?lap, Damage, ?damageType, Lap.Reference),
-											   ?nLap = ?lap - 1, clearDamageReferenceLaps(?nLap)
+											   ?nLap = ?lap - 1, clearDamageReferenceLaps(?nLap, ?damageType)

@@ -775,6 +775,7 @@ class ActionsEditor {
 	iResult := false
 
 	iActionsListView := false
+	iParametersListView := false
 	iScriptEditor := false
 
 	iActions := []
@@ -798,9 +799,21 @@ class ActionsEditor {
 		}
 	}
 
+	Control[name] {
+		Get {
+			return this.Window[name]
+		}
+	}
+
 	ActionsListView {
 		Get {
 			return this.iActionsListView
+		}
+	}
+
+	ParametersListView {
+		Get {
+			return this.iParametersListView
 		}
 	}
 
@@ -837,38 +850,59 @@ class ActionsEditor {
 			this.selectAction(line ? this.Actions[line] : false)
 		}
 
+		chooseParameter(listView, line, *) {
+		}
+
 		editorGui := Window({Descriptor: "Actions Editor", Resizeable: true, Options: "0x400000"})
 
 		this.iWindow := editorGui
 
 		editorGui.SetFont("Bold", "Arial")
 
-		editorGui.Add("Text", "w468 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(editorGui, "Actions Editor"))
+		editorGui.Add("Text", "w768 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(editorGui, "Actions Editor"))
 
 		editorGui.SetFont("Norm", "Arial")
 
-		editorGui.Add("Documentation", "x178 YP+20 w128 H:Center Center", translate("Conversation Actions")
+		editorGui.Add("Documentation", "x328 YP+20 w128 H:Center Center", translate("Conversation Actions")
 					, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm")
 
 		editorGui.SetFont("Norm", "Arial")
 
-		editorGui.Add("Text", "x8 yp+30 w468 W:Grow 0x10")
+		editorGui.Add("Text", "x8 yp+30 w768 W:Grow 0x10")
 
-		this.iActionsListView := editorGui.Add("ListView", "x16 y+10 w452 h140 W:Grow H:Grow(0.5) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Action", "Description"], translate))
+		this.iActionsListView := editorGui.Add("ListView", "x16 y+10 w752 h140 W:Grow H:Grow(0.25) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Action", "Description"], translate))
 		this.iActionsListView.OnEvent("Click", chooseAction)
 		this.iActionsListView.OnEvent("DoubleClick", chooseAction)
 		this.iActionsListView.OnEvent("ItemSelect", chooseAction)
 
-		editorGui.SetFont("Norm", "Cascadia Code")
+		editorGui.Add("Text", "x16 yp+145 w90 h23 +0x200 Section Y:Move(0.25)", translate("Action"))
+		editorGui.Add("DropDownList", "x110 yp w127 Y:Move(0.25) vactionTypeDropDown", collect(["Assistant Method", "Assistant Function", "Assistant Rule", "Controller Method", "Controller Function"], translate)).OnEvent("Change", (*) => this.updateState())
+		editorGui.Add("Edit", "x241 yp h23 w177 Y:Move(0.25) vactionNameEdit")
 
-		this.iScriptEditor := editorGui.Add("Edit", "x16 yp+145 w452 h140 T4 W:Grow Y:Move(0.5) H:Grow(0.5)")
+		editorGui.Add("Text", "x16 yp+28 w90 h23 +0x200 Y:Move(0.25)", translate("Description"))
+		editorGui.Add("Edit", "x110 yp h96 w308 Y:Move(0.25) vactionDescriptionEdit")
 
-		editorGui.Add("Text", "x8 yp+150 w468 Y:Move W:Grow 0x10")
+		editorGui.Add("Text", "x16 yp+100 w90 h23 +0x200 Y:Move(0.25)", translate("Learning Phase"))
+		editorGui.Add("DropDownList", "x110 yp w90 Y:Move(0.25) vactionInitializationDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", (*) => this.updateState())
+
+		editorGui.Add("Text", "x16 yp+24 w90 h23 +0x200 Y:Move(0.25)", translate("Confirmation"))
+		editorGui.Add("DropDownList", "x110 yp w90 Y:Move(0.25) vactionConfirmationDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", (*) => this.updateState())
+
+		editorGui.SetFont("Norm", "Courier New")
+
+		this.iScriptEditor := editorGui.Add("Edit", "x16 yp+28 w752 h140 T14 WantTab W:Grow Y:Move(0.25) H:Grow(0.75)")
+
+		editorGui.Add("Text", "x8 yp+150 w768 Y:Move W:Grow 0x10")
 
 		editorGui.SetFont("Norm", "Arial")
 
-		editorGui.Add("Button", "x160 yp+10 w80 h23 Default X:Move(0.5) Y:Move", translate("Ok")).OnEvent("Click", (*) => this.iResult := kOk)
-		editorGui.Add("Button", "x246 yp w80 h23 X:Move(0.5) Y:Move", translate("&Cancel")).OnEvent("Click", (*) => this.iResult := kCancel)
+		editorGui.Add("Button", "x310 yp+10 w80 h23 Default X:Move(0.5) Y:Move", translate("Ok")).OnEvent("Click", (*) => this.iResult := kOk)
+		editorGui.Add("Button", "x396 yp w80 h23 X:Move(0.5) Y:Move", translate("&Cancel")).OnEvent("Click", (*) => this.iResult := kCancel)
+
+		this.iParametersListView := editorGui.Add("ListView", "x430 ys+28 w338 h96 W:Grow H:Grow(0.25) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Parameter", "Description"], translate))
+		this.iParametersListView.OnEvent("Click", chooseParameter)
+		this.iParametersListView.OnEvent("DoubleClick", chooseParameter)
+		this.iParametersListView.OnEvent("ItemSelect", chooseParameter)
 
 		this.updateState()
 	}
@@ -910,14 +944,39 @@ class ActionsEditor {
 
 	updateState() {
 		if this.SelectedAction {
-			if this.SelectedAction.Builtin
+			if this.SelectedAction.Builtin {
 				this.ScriptEditor.Opt("+ReadOnly")
-			else
+
+				this.Control["actionNameEdit"].Opt("+ReadOnly")
+				this.Control["actionDescriptionEdit"].Opt("+ReadOnly")
+				this.Control["actionTypeDropDown"].Enabled := false
+				this.Control["actionInitializationDropDown"].Enabled := false
+				this.Control["actionConfirmationDropDown"].Enabled := false
+			}
+			else {
 				this.ScriptEditor.Opt("-ReadOnly")
+
+				this.Control["actionNameEdit"].Opt("-ReadOnly")
+				this.Control["actionDescriptionEdit"].Opt("-ReadOnly")
+				this.Control["actionTypeDropDown"].Enabled := true
+				this.Control["actionInitializationDropDown"].Enabled := true
+				this.Control["actionConfirmationDropDown"].Enabled := true
+			}
 		}
 		else {
 			this.ScriptEditor.Text := ""
+			this.Control["actionNameEdit"].Text := ""
+			this.Control["actionDescriptionEdit"].Text := ""
+			this.Control["actionTypeDropDown"].Choose(0)
+			this.Control["actionInitializationDropDown"].Choose(0)
+			this.Control["actionConfirmationDropDown"].Choose(0)
+
 			this.ScriptEditor.Opt("+ReadOnly")
+			this.Control["actionNameEdit"].Opt("+ReadOnly")
+			this.Control["actionDescriptionEdit"].Opt("+ReadOnly")
+			this.Control["actionTypeDropDown"].Enabled := false
+			this.Control["actionInitializationDropDown"].Enabled := false
+			this.Control["actionConfirmationDropDown"].Enabled := false
 		}
 
 	}
@@ -926,21 +985,48 @@ class ActionsEditor {
 		if this.SelectedAction
 			this.saveAction(this.SelectedAction)
 
-		if action {
-			this.iSelectedAction := action
+		this.iSelectedAction := action
 
-			this.loadAction(action)
-		}
+		this.loadAction(action)
 
 		this.updateState()
 	}
 
 	loadAction(action) {
-		if (action.Type = "Assistant.Rule")
-			this.ScriptEditor.Text := FileRead(getFileName(action.Definition, kUserHomeDirectory . "Actions\"
-																			, kResourcesDirectory . "Actions\"))
-		else
+		local ignore, parameter
+
+		this.ParametersListView.Delete()
+
+		if action {
+			this.Control["actionNameEdit"].Text := action.Name
+			this.Control["actionTypeDropDown"].Choose(inList(["Assistant.Method", "Assistant.Function", "Assistant.Rule", "Controller.Method", "Controller.Function"], action.Type))
+			this.Control["actionDescriptionEdit"].Text := action.Description
+			this.Control["actionInitializationDropDown"].Choose(1 + (!action.Initialized ? 1 : 0))
+			this.Control["actionConfirmationDropDown"].Choose(1 + (!action.Confirm ? 1 : 0))
+
+			if (action.Type = "Assistant.Rule")
+				this.ScriptEditor.Text := FileRead(getFileName(action.Definition, kUserHomeDirectory . "Actions\"
+																				, kResourcesDirectory . "Actions\"))
+			else
+				this.ScriptEditor.Text := ""
+
+			for ignore, parameter in action.Parameters
+				this.ParametersListView.Add("", parameter.Name, parameter.Description)
+
+			this.ParametersListView.ModifyCol()
+
+			loop this.ParametersListView.GetCount("Col")
+				this.ParametersListView.ModifyCol(A_Index, "AutoHdr")
+		}
+		else {
+			this.Control["actionNameEdit"].Text := ""
+			this.Control["actionTypeDropDown"].Choose(0)
+			this.Control["actionDescriptionEdit"].Text := ""
+			this.Control["actionInitializationDropDown"].Choose(0)
+			this.Control["actionConfirmationDropDown"].Choose(0)
+
 			this.ScriptEditor.Text := ""
+		}
 
 		this.updateState()
 	}
@@ -970,7 +1056,8 @@ class ActionsEditor {
 
 				this.Actions.Push({Name: action, Type: descriptor[1], Definition: descriptor[2]
 								 , Description: descriptor[6], Parameters: parameters, Builtin: (type = "Builtin")
-								 , Initialized: descriptor[3], Confirm: descriptor[4]})
+								 , Initialized: ((descriptor[3] = kTrue) ? true : ((descriptor[3] = kFalse) ? false : descriptor[3]))
+								 , Confirm: ((descriptor[4] = kTrue) ? true : ((descriptor[4] = kFalse) ? false : descriptor[4]))})
 			}
 
 		active := string2Values(",", getMultiMapValue(configuration, "Actions", "Active", ""))

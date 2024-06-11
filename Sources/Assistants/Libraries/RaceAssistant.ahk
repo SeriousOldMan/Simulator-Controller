@@ -1318,8 +1318,8 @@ class RaceAssistant extends ConfigurationItem {
 						}
 					}
 
-					enoughData := ((definition[3] = kTrue) ? kTrue : ((definition[3] = kFalse) ? false : definition[3]))
-					confirm := ((definition[4] = kTrue) ? kTrue : ((definition[4] = kFalse) ? false : definition[4]))
+					enoughData := ((definition[3] = kTrue) ? true : ((definition[3] = kFalse) ? false : definition[3]))
+					confirm := ((definition[4] = kTrue) ? true : ((definition[4] = kFalse) ? false : definition[4]))
 
 					switch definition[1], false {
 						case "Assistant.Method":

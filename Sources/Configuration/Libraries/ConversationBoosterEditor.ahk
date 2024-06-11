@@ -134,6 +134,7 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 		}
 
 		editActions(*) {
+			this.editActions(this.Assistant)
 		}
 
 		loadModels(*) {
@@ -750,6 +751,242 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 		finally {
 			window.Unblock()
 		}
+	}
+
+	editActions(assistant) {
+		local window := this.Window
+		local actions
+
+		window.Block()
+
+		try {
+			actions := ActionsEditor(this).editActions(window)
+		}
+		finally {
+			window.Unblock()
+		}
+	}
+}
+
+class ActionsEditor {
+	iEditor := false
+
+	iWindow := false
+	iResult := false
+
+	iActionsListView := false
+	iScriptEditor := false
+
+	iActions := []
+	iSelectedAction := false
+
+	Editor {
+		Get {
+			return this.iEditor
+		}
+	}
+
+	Assistant {
+		Get {
+			return this.Editor.Assistant
+		}
+	}
+
+	Window {
+		Get {
+			return this.iWindow
+		}
+	}
+
+	ActionsListView {
+		Get {
+			return this.iActionsListView
+		}
+	}
+
+	ScriptEditor {
+		Get {
+			return this.iScriptEditor
+		}
+	}
+
+	Actions[key?] {
+		Get {
+			return (isSet(key) ? this.iActions[key] : this.iActions)
+		}
+
+		Set {
+			return (isSet(key) ? (this.iActions[key] := value) : (this.iActions := value))
+		}
+	}
+
+	SelectedAction {
+		Get {
+			return this.iSelectedAction
+		}
+	}
+
+	__New(editor) {
+		this.iEditor := editor
+	}
+
+	createGui() {
+		local editorGui
+
+		chooseAction(listView, line, *) {
+			this.selectAction(line ? this.Actions[line] : false)
+		}
+
+		editorGui := Window({Descriptor: "Actions Editor", Resizeable: true, Options: "0x400000"})
+
+		this.iWindow := editorGui
+
+		editorGui.SetFont("Bold", "Arial")
+
+		editorGui.Add("Text", "w468 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(editorGui, "Actions Editor"))
+
+		editorGui.SetFont("Norm", "Arial")
+
+		editorGui.Add("Documentation", "x178 YP+20 w128 H:Center Center", translate("Conversation Actions")
+					, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm")
+
+		editorGui.SetFont("Norm", "Arial")
+
+		editorGui.Add("Text", "x8 yp+30 w468 W:Grow 0x10")
+
+		this.iActionsListView := editorGui.Add("ListView", "x16 y+10 w452 h140 W:Grow H:Grow(0.5) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Action", "Description"], translate))
+		this.iActionsListView.OnEvent("Click", chooseAction)
+		this.iActionsListView.OnEvent("DoubleClick", chooseAction)
+		this.iActionsListView.OnEvent("ItemSelect", chooseAction)
+
+		editorGui.SetFont("Norm", "Cascadia Code")
+
+		this.iScriptEditor := editorGui.Add("Edit", "x16 yp+145 w452 h140 T4 W:Grow Y:Move(0.5) H:Grow(0.5)")
+
+		editorGui.Add("Text", "x8 yp+150 w468 Y:Move W:Grow 0x10")
+
+		editorGui.SetFont("Norm", "Arial")
+
+		editorGui.Add("Button", "x160 yp+10 w80 h23 Default X:Move(0.5) Y:Move", translate("Ok")).OnEvent("Click", (*) => this.iResult := kOk)
+		editorGui.Add("Button", "x246 yp w80 h23 X:Move(0.5) Y:Move", translate("&Cancel")).OnEvent("Click", (*) => this.iResult := kCancel)
+
+		this.updateState()
+	}
+
+	editActions(owner := false) {
+		local window, x, y, w, h
+
+		this.createGui()
+
+		window := this.Window
+
+		if owner
+			window.Opt("+Owner" . owner.Hwnd)
+
+		if getWindowPosition("Actions Editor", &x, &y)
+			window.Show("x" . x . " y" . y)
+		else
+			window.Show()
+
+		if getWindowSize("Actions Editor", &w, &h)
+			window.Resize("Initialize", w, h)
+
+		this.loadActions()
+
+		loop
+			Sleep(200)
+		until this.iResult
+
+		try {
+			if (this.iResult = kOk)
+				return this.saveActions()
+			else
+				return false
+		}
+		finally {
+			window.Destroy()
+		}
+	}
+
+	updateState() {
+		if this.SelectedAction {
+			if this.SelectedAction.Builtin
+				this.ScriptEditor.Opt("+ReadOnly")
+			else
+				this.ScriptEditor.Opt("-ReadOnly")
+		}
+		else {
+			this.ScriptEditor.Text := ""
+			this.ScriptEditor.Opt("+ReadOnly")
+		}
+
+	}
+
+	selectAction(action) {
+		if this.SelectedAction
+			this.saveAction(this.SelectedAction)
+
+		if action {
+			this.iSelectedAction := action
+
+			this.loadAction(action)
+		}
+
+		this.updateState()
+	}
+
+	loadAction(action) {
+		if (action.Type = "Assistant.Rule")
+			this.ScriptEditor.Text := FileRead(getFileName(action.Definition, kUserHomeDirectory . "Actions\"
+																			, kResourcesDirectory . "Actions\"))
+		else
+			this.ScriptEditor.Text := ""
+
+		this.updateState()
+	}
+
+	saveAction(action) {
+	}
+
+	loadActions() {
+		local configuration := readMultiMap(kResourcesDirectory . "Actions\" . this.Assistant . ".actions")
+		local actions := []
+		local active, ignore, type, action, descriptor, parameters
+
+		addMultiMapValues(configuration, readMultiMap(kUserHomeDirectory . "Actions\" . this.Assistant . ".actions"))
+
+		for ignore, type in ["Builtin", "Custom"]
+			for action, descriptor in getMultiMapValues(configuration, type) {
+				descriptor := string2Values("|", descriptor)
+
+				parameters := []
+
+				loop descriptor[5] {
+					parameter := string2Values("|", getMultiMapValue(configuration, "Parameters", ConfigurationItem.descriptor(action, A_Index)))
+
+					parameters.Push({Name: parameter[1], Type: parameter[2], Enumeration: string2Values(",", parameter[3])
+								   , Required: parameter[4], Description: parameter[5]})
+				}
+
+				this.Actions.Push({Name: action, Type: descriptor[1], Definition: descriptor[2]
+								 , Description: descriptor[6], Parameters: parameters, Builtin: (type = "Builtin")
+								 , Initialized: descriptor[3], Confirm: descriptor[4]})
+			}
+
+		active := string2Values(",", getMultiMapValue(configuration, "Actions", "Active", ""))
+
+		this.ActionsListView.Delete()
+
+		for ignore, action in this.Actions
+			this.ActionsListView.Add("", action.Name, action.Description)
+
+		this.ActionsListView.ModifyCol()
+
+		loop this.ActionsListView.GetCount("Col")
+			this.ActionsListView.ModifyCol(A_Index, "AutoHdr")
+	}
+
+	saveActions() {
 	}
 }
 

@@ -2111,7 +2111,7 @@ class RaceSpotter extends GridRaceAssistant {
 				slowerCar := false
 
 				for ignore, carInfo in this.OtherCars {
-					if (carInfo.Car.Class = driverClass) {
+					if (carInfo.Class = driverClass) {
 						carPosition := carInfo.Position["Class"]
 
 						if ((carPosition < driverPosition) && (carInfo.AvgLapTime > driverLapTime))

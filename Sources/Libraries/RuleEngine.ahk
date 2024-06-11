@@ -4978,12 +4978,14 @@ builtin1(choicePoint, function, operand1, operand2) {
 }
 
 unbound(choicePoint, operand1) {
-	if isInstance(operand1, Variable)
-		return (operand1.getValue(choicePoint.ResultSet, operand1) = operand1)
+	local value := operand1.getValue(choicePoint.ResultSet, operand1)
+
+	if (value.toString(choicePoint.ResultSet) = kNotInitialized)
+		return true
+	else if isInstance(operand1, Variable)
+		return ((value = operand1) || (value = operand1.RootVariable))
 	else if isInstance(operand1, Fact)
 		return (operand1.getValue(choicePoint.ResultSet.KnowledgeBase.Facts) = kNotInitialized)
-	else
-		return (operand1.toString(choicePoint.ResultSet) = kNotInitialized)
 }
 
 append(choicePoint, arguments*) {

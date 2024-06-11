@@ -1,9 +1,9 @@
 [Actions]
-Active=planPitstop,simulatePitstop,updateStrategy
+Active=plan_pitstop,simulate_pitstop,update_strategy
 [Builtin]
-planPitstop=Assistant.Method|planPitstop|false|true|1|Ask the Engineer to plan a pitstop.
-simulatePitstop=Assistant.Method|recommendPitstop|false|true|1|Simulates the outcome of an upcoming pitstop. The traffic situation after the pitstop will be evaluated and the target lap will be optimized, if an undercut is possible.
-updateStrategy=Assistant.Method|recommendStrategy|true|true|0|Trigger a recalculation of the current race strategy.
+plan_pitstop=Assistant.Method|planPitstop|false|true|1|Ask the Engineer to plan a pitstop.
+simulate_pitstop=Assistant.Method|recommendPitstop|false|true|1|Simulates the outcome of an upcoming pitstop. The traffic situation after the pitstop will be evaluated and the target lap will be optimized, if an undercut is possible.
+update_strategy=Assistant.Method|recommendStrategy|true|true|0|Trigger a recalculation of the current race strategy.
 [Parameters]
-planPitstop.1=targetLap|Integer||false|The planned lap for the car to come to the pit.
-simulatePitstop.1=targetLap|Integer||false|The planned lap for the car to come to the pit.
+plan_pitstop.1=targetLap|Integer||false|The planned lap for the car to come to the pit.
+simulate_pitstop.1=targetLap|Integer||false|The planned lap for the car to come to the pit.

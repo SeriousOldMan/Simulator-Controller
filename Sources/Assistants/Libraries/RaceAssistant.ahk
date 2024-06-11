@@ -741,7 +741,7 @@ class RaceAssistant extends ConfigurationItem {
 		this.clearContinuation()
 
 		if (enoughData && !this.hasEnoughData())
-			return
+			return false
 
 		if confirm
 			this.getSpeaker().speakPhrase("Confirm")
@@ -750,6 +750,8 @@ class RaceAssistant extends ConfigurationItem {
 
 		loop 10
 			Sleep(confirm ? 500 : 10)
+
+		return true
 	}
 
 	handleVoiceCommand(grammar, words) {
@@ -1194,10 +1196,11 @@ class RaceAssistant extends ConfigurationItem {
 		local tools := []
 		local loadedRules := CaseInsenseMap()
 		local activationIndex := 1
-		local ignore, action, definition, parameters, parameter, enumeration, handler, enoughData, confirm
+		local ignore, action, definition, parameters, parameter, enumeration, handler, enoughData, confirm, required
 
 		callMethod(method, enoughData, confirm, arguments*) {
-			this.confirmCommand(enoughData, confirm)
+			if !this.confirmCommand(enoughData, confirm)
+				return
 
 			if isDebug()
 				showMessage("LLM -> this." . method . "(...)")
@@ -1206,7 +1209,8 @@ class RaceAssistant extends ConfigurationItem {
 		}
 
 		callFunction(function, enoughData, confirm, arguments*) {
-			this.confirmCommand(enoughData, confirm)
+			if !this.confirmCommand(enoughData, confirm)
+				return
 
 			if isDebug()
 				showMessage("LLM -> " . function . "(...)")
@@ -1221,7 +1225,8 @@ class RaceAssistant extends ConfigurationItem {
 			static activationIndex := 1
 
 			if knowledgeBase {
-				this.confirmCommand(enoughData, confirm)
+				if !this.confirmCommand(enoughData, confirm)
+					return
 
 				if !loadedRules.Has(ruleFileName) {
 					rules := FileRead(getFileName(ruleFileName, kUserHomeDirectory . "Actions\", kResourcesDirectory . "Actions\"))
@@ -1256,11 +1261,15 @@ class RaceAssistant extends ConfigurationItem {
 			knowledgeBase.produce()
 
 			knowledgeBase.clearFact(loadedRules[ruleFileName])
+
+			if this.Debug[kDebugKnowledgeBase]
+				this.dumpKnowledgeBase(knowledgeBase)
 		}
 
 		callControllerMethod(method, enoughData, confirm, arguments*) {
 			if this.RemoteHandler {
-				this.confirmCommand(enoughData, confirm)
+				if !this.confirmCommand(enoughData, confirm)
+					return
 
 				if isDebug()
 					showMessage("LLM -> Controller." . method . "(...)")
@@ -1271,7 +1280,8 @@ class RaceAssistant extends ConfigurationItem {
 
 		callControllerFunction(function, enoughData, confirm, arguments*) {
 			if this.RemoteHandler {
-				this.confirmCommand(enoughData, confirm)
+				if !this.confirmCommand(enoughData, confirm)
+					return
 
 				if isDebug()
 					showMessage("LLM -> Controller:" . function . "(...)")
@@ -1302,7 +1312,9 @@ class RaceAssistant extends ConfigurationItem {
 							if (enumeration.Length = 0)
 								enumeration := false
 
-							parameters.Push(LLMTool.Function.Parameter(parameter[1], parameter[5], parameter[2], enumeration, parameter[4]))
+							required := ((parameter[4] = kTrue) ? kTrue : ((parameter[4] = kFalse) ? false : parameter[4]))
+
+							parameters.Push(LLMTool.Function.Parameter(parameter[1], parameter[5], parameter[2], enumeration, required))
 						}
 					}
 
@@ -3700,13 +3712,19 @@ askAssistant(choicePoint, question) {
 
 speakAssistant(choicePoint, message) {
 	local assistant := choicePoint.KnowledgeBase.RaceAssistant
-	local ignore, part
+	local speaker, ignore, part
 
-	if assistant.VoiceManager.UseTalking
-		assistant.getSpeaker().speak(message, false, false, {Noise: false, Rephrase: false})
-	else
-		for ignore, part in string2Values(". ", message)
-			assistant.getSpeaker().speak(part . ".", false, false, {Rephrase: false, Click: (A_Index = 1)})
+	if assistant.Speaker[true] {
+		speaker := assistant.getSpeaker()
+
+		if speaker.Phrases.Has(message)
+			speaker.speakPhrase(message)
+		else if assistant.VoiceManager.UseTalking
+			speaker.speak(message, false, false, {Noise: false, Rephrase: false})
+		else
+			for ignore, part in string2Values(". ", message)
+				speaker.speak(part . ".", false, false, {Rephrase: false, Click: (A_Index = 1)})
+	}
 }
 
 

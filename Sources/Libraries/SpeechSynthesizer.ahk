@@ -887,6 +887,13 @@ class SpeechSynthesizer {
 		local voices := this.Voices
 		local count, locale, ignore, candidate
 
+		if InStr(voice, "(") {
+			locale := StrReplace(string2Values("(", voice)[2], ")", "")
+
+			if (InStr(locale, language) != 1)
+				voice := false
+		}
+
 		if (this.Synthesizer = "Windows") {
 			if language
 				availableVoices := this.Voices[language]

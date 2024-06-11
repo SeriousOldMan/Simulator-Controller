@@ -133,6 +133,9 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 			this.editInstructions(type, title)
 		}
 
+		editActions(*) {
+		}
+
 		loadModels(*) {
 			local provider := this.iCurrentProvider
 			local configuration
@@ -264,6 +267,10 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 
 		widget40 := editorGui.Add("Text", "x" . x0 . " yp+24 w105 h23 +0x200", translate("Actions"))
 		widget41 := editorGui.Add("DropDownList", "x" . x1 . " yp w60 vviConversationActionsDropdown", collect(["No", "Yes"], translate))
+		widget41.OnEvent("Change", (*) => this.updateState())
+		widget42 := editorGui.Add("Button", "x" . (x1 + 61) . " yp-1 w23 h23 X:Move Center +0x200 vviConversationIEditActionsButton")
+		widget42.OnEvent("Click", editActions)
+		setButtonIcon(widget42, kIconsDirectory . "Pencil.ico", 1, "L4 T4 R4 B4")
 
 		editorGui.Add("Text", "x8 yp+35 w468 W:Grow 0x10")
 
@@ -674,6 +681,7 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 			this.Control["viConversationMaxHistoryEdit"].Enabled := false
 			this.Control["viConversationTemperatureEdit"].Enabled := false
 			this.Control["viConversationActionsDropDown"].Enabled := false
+			this.Control["viConversationIEditActionsButton"].Enabled := false
 			this.Control["viConversationMaxHistoryEdit"].Text := ""
 			this.Control["viConversationTemperatureEdit"].Text := ""
 			this.Control["viConversationActionsDropDown"].Choose(0)
@@ -694,6 +702,7 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 				this.Control["viConversationActionsDropDown"].Choose(1)
 
 			this.Control["viConversationInstructionsButton"].Enabled := true
+			this.Control["viConversationIEditActionsButton"].Enabled := (this.Control["viConversationActionsDropDown"].Value = 2)
 		}
 	}
 

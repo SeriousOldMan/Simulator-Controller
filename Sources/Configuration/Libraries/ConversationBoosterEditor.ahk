@@ -881,7 +881,7 @@ class ActionsEditor {
 		editorGui.SetFont("Norm", "Arial")
 
 		editorGui.Add("Documentation", "x368 YP+20 w128 H:Center Center", translate("Conversation Actions")
-					, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm")
+					, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#managing-conversation-actions")
 
 		editorGui.SetFont("Norm", "Arial")
 

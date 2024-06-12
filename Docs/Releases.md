@@ -3,10 +3,11 @@
   2. Documentation updates here and there, as always
   3. Fixed the lap time comparison information of the Spotter in multiclass races. A bug resulted in a comparison of cars from different classes which resulted in very confusing information.
   4. The default instructions of the Conversation Booster has been updated again to improve conversation quality further. Please see the Update Notes, if you have modified these instructions.
-  5. The LLMs used to boost the conversation capabilities of the Assistants are now allowed to trigger some actions as a result of your interaction. A few actions already have been defined for the [Enginer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#trigger-actions-from-conversation) and the [Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#trigger-actions-from-conversation) with more to come in the next releases. Using actions, it is possible to define new voice commands, but the LLMs are also allowed to trigger the actions based on the current situation and data conestellation.
+  5. The LLMs used to boost the conversation capabilities of the Assistants are now allowed to trigger some actions as a result of your interaction. A few actions already have been defined for the [Enginer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#trigger-actions-from-conversation) and the [Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#trigger-actions-from-conversation) with more to come in the next releases. Using actions, it is possible to define new voice commands, but the LLMs are also allowed to trigger the actions based on the current situation and data constellation.
   
-     Please note, that *Actions* are not active by default, but must be explicitly activated in the configuration.
+     Please note, that using *Actions* is not enabled by default, but must be explicitly activated in the configuration.
   6. Action definition files are customizeable in the [Documents]\Simulator Controller\Actions folder.
+  7. An editor has been implemented to enable or disable the predefined conversation actions and even define your own ones. But this will require a very deep knowledge of the inner workings of Simulator Controller and the Assistants. You have been warned. Please see the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm) for more information.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-576), when you have configured the Conversation Booster for the Assistants.
 

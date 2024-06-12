@@ -94,6 +94,8 @@ An LLM may be able to trigger actions as a result of a conversation. This is ach
 
 Please note that calling actions is currently only available when using *OpenAI*, *Mistral AI* or *OpenRouter* are used as GPT service providers.
 
+There are some predefined actions available for the Strategist, which come with the standard installation and you can define your own actions. But this will require a very deep knowledge of the inner workings of Simulator Controller and the Assistants. You have been warned. If you want to try this, check out the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm) for the "Conversation" booster.
+
 The following table shows you the predefined actions, that might be triggered by the LLM during a conversation with the Strategist:
 
 | Action                 | Parameter(s)      | Example(s) |

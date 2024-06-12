@@ -214,7 +214,7 @@ The following table shows you the predefined actions, that might be triggered by
 
 | Action                      | Parameter(s)      | Example(s) |
 |-----------------------------|-------------------|------------|
-| Pitstop Planning            | 1. [Optional] lap 2. [Optional] refuelAmount 3. [Optional] changeTyres 4. [Optional] repairDamage | "We must pit for repairs. Can you create a plan without refueling and without tyre change?" |
+| Pitstop Planning            | 1. [Optional] lap<br>2. [Optional] refuelAmount<br>3. [Optional] changeTyres<br>4. [Optional] repairDamage | "We must pit for repairs. Can you create a plan without refueling and without tyre change?" |
 | Pitstop Clearance           | -                 | "I have changed my mind, the pitstop is no longer needed." |
 | Damage Impact Recalculation | -                 | "Can you recalculate the time loss caused by the damage?" |
 

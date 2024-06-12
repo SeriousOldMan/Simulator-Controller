@@ -1232,7 +1232,7 @@ class RaceAssistant extends ConfigurationItem {
 					variables := CaseInsenseMap("activation", "__" . action . ".A")
 					names := CaseInsenseMap()
 
-					for ignore, parameter in parameters {
+					for ignore, parameter in parameters
 						try {
 							names[parameter.Name] := variables[paramater.Name] := ("__" . action . ".P" . A_Index)
 						}
@@ -1304,7 +1304,7 @@ class RaceAssistant extends ConfigurationItem {
 		addMultiMapValues(configuration, readMultiMap(kUserHomeDirectory . "Actions\" . this.AssistantType . ".actions"))
 
 		for ignore, action in string2Values(",", getMultiMapValue(configuration, "Actions", "Active", "")) {
-			definition := getMultiMapValue(configuration, "User", action, false)
+			definition := getMultiMapValue(configuration, "Custom", action, false)
 
 			if !definition
 				definition := getMultiMapValue(configuration, "Builtin", action, false)

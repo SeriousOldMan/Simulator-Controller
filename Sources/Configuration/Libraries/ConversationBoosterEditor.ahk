@@ -10,6 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\..\Libraries\LLMConnector.ahk"
+#Include "..\..\Libraries\RuleEngine.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -24,6 +25,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\..\Libraries\SpeechSynthesizer.ahk"
+#Include "ConfigurationEditor.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -885,12 +887,17 @@ class ActionsEditor {
 
 		editorGui.Add("Text", "x8 yp+30 w848 W:Grow 0x10")
 
-		this.iActionsListView := editorGui.Add("ListView", "x16 y+10 w832 h140 W:Grow H:Grow(0.25) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Action", "Description"], translate))
+		this.iActionsListView := editorGui.Add("ListView", "x16 y+10 w832 h140 W:Grow H:Grow(0.25) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Action", "Active", "Description"], translate))
 		this.iActionsListView.OnEvent("Click", chooseAction)
 		this.iActionsListView.OnEvent("DoubleClick", chooseAction)
-		this.iActionsListView.OnEvent("ItemSelect", chooseAction)
 
-		editorGui.Add("Text", "x16 yp+145 w90 h23 +0x200 Section Y:Move(0.25)", translate("Action"))
+		editorGui.Add("Button", "x800 yp+142 w23 h23 Center +0x200 vaddActionButton").OnEvent("Click", (*) => this.addAction())
+		setButtonIcon(editorGui["addActionButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
+		editorGui.Add("Button", "x824 yp w23 h23 Center +0x200 vdeleteActionButton").OnEvent("Click", (*) => this.deleteAction())
+		setButtonIcon(editorGui["deleteActionButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
+
+		editorGui.Add("Text", "x16 yp+28 w70 h23 +0x200 Section Y:Move(0.25)", translate("Action"))
+		editorGui.Add("CheckBox", "x90 yp h23 w23 Y:Move(0.25) vactionActiveCheck")
 		editorGui.Add("DropDownList", "x110 yp w127 Y:Move(0.25) vactionTypeDropDown", collect(["Assistant Method", "Assistant Function", "Assistant Rule", "Controller Method", "Controller Function"], translate)).OnEvent("Change", (*) => this.updateState())
 		editorGui.Add("Edit", "x241 yp h23 w177 Y:Move(0.25) vactionNameEdit")
 
@@ -922,15 +929,19 @@ class ActionsEditor {
 		this.iParametersListView := editorGui.Add("ListView", "x430 ys w418 h96 W:Grow H:Grow(0.25) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Parameter", "Description"], translate))
 		this.iParametersListView.OnEvent("Click", chooseParameter)
 		this.iParametersListView.OnEvent("DoubleClick", chooseParameter)
-		this.iParametersListView.OnEvent("ItemSelect", chooseParameter)
 
-		editorGui.Add("Text", "x430 yp+100 w90 h23 +0x200 Y:Move(0.25)", translate("Name / Type"))
+		editorGui.Add("Button", "x800 yp+100 w23 h23 Center +0x200 vaddParameterButton").OnEvent("Click", (*) => this.addParameter())
+		setButtonIcon(editorGui["addParameterButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
+		editorGui.Add("Button", "x824 yp w23 h23 Center +0x200 vdeleteParameterButton").OnEvent("Click", (*) => this.deleteParameter())
+		setButtonIcon(editorGui["deleteParameterButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
+
+		editorGui.Add("Text", "x430 yp+28 w90 h23 +0x200 Y:Move(0.25)", translate("Name / Type"))
 		editorGui.Add("Edit", "x536 yp h23 w127 Y:Move(0.25) vparameterNameEdit")
 		editorGui.Add("DropDownList", "x665 yp w90 Y:Move(0.25) vparameterTypeDropDown", collect(["String", "Integer", "Boolean"], translate)).OnEvent("Change", (*) => this.updateState())
 		editorGui.Add("DropDownList", "x758 yp w90 Y:Move(0.25) vparameterOptionalDropDown", collect(["Required", "Optional"], translate)).OnEvent("Change", (*) => this.updateState())
 
 		editorGui.Add("Text", "x430 yp+24 w90 h23 +0x200 Y:Move(0.25)", translate("Description"))
-		editorGui.Add("Edit", "x536 yp h50 w312 Y:Move(0.25) W:Grow vparameterDescriptionEdit")
+		editorGui.Add("Edit", "x536 yp h23 w312 Y:Move(0.25) W:Grow vparameterDescriptionEdit")
 
 		this.updateState()
 	}
@@ -955,15 +966,23 @@ class ActionsEditor {
 
 		this.loadActions()
 
-		loop
-			Sleep(200)
-		until this.iResult
-
 		try {
-			if (this.iResult = kOk)
-				return this.saveActions()
-			else
-				return false
+			loop {
+				loop
+					Sleep(200)
+				until this.iResult
+
+				if (this.iResult = kOk) {
+					this.iResult := this.saveActions()
+
+					if this.iResult
+						return this.iResult
+					else
+						this.iResult := false
+				}
+				else
+					return false
+			}
 		}
 		finally {
 			window.Destroy()
@@ -973,8 +992,17 @@ class ActionsEditor {
 	updateState() {
 		local type
 
+		this.Control["addActionButton"].Enabled := true
+
 		if this.SelectedAction {
+			this.Control["actionActiveCheck"].Enabled := true
+
 			if this.SelectedAction.Builtin {
+				this.Control["addParameterButton"].Enabled := false
+				this.Control["deleteParameterButton"].Enabled := false
+
+				this.Control["deleteActionButton"].Enabled := false
+
 				this.ScriptEditor.Opt("+ReadOnly")
 				this.CallableField[2].Enabled := false
 
@@ -985,6 +1013,10 @@ class ActionsEditor {
 				this.Control["actionConfirmationDropDown"].Enabled := false
 			}
 			else {
+				this.Control["deleteActionButton"].Enabled := true
+				this.Control["addParameterButton"].Enabled := true
+				this.Control["deleteParameterButton"].Enabled := (this.SelectedParameter != false)
+
 				this.ScriptEditor.Opt("-ReadOnly")
 				this.CallableField[2].Enabled := true
 
@@ -1014,10 +1046,15 @@ class ActionsEditor {
 			}
 		}
 		else {
+			this.Control["deleteActionButton"].Enabled := false
+			this.Control["addParameterButton"].Enabled := false
+			this.Control["deleteParameterButton"].Enabled := false
+
 			this.ScriptEditor.Text := ""
 			this.CallableField[2].Text := ""
 			this.Control["actionNameEdit"].Text := ""
 			this.Control["actionDescriptionEdit"].Text := ""
+			this.Control["actionActiveCheck"].Value := 0
 			this.Control["actionTypeDropDown"].Choose(0)
 			this.Control["actionInitializationDropDown"].Choose(0)
 			this.Control["actionConfirmationDropDown"].Choose(0)
@@ -1028,6 +1065,7 @@ class ActionsEditor {
 			this.CallableField[2].Visible := false
 			this.Control["actionNameEdit"].Enabled := false
 			this.Control["actionDescriptionEdit"].Enabled := false
+			this.Control["actionActiveCheck"].Enabled := false
 			this.Control["actionTypeDropDown"].Enabled := false
 			this.Control["actionInitializationDropDown"].Enabled := false
 			this.Control["actionConfirmationDropDown"].Enabled := false
@@ -1064,12 +1102,15 @@ class ActionsEditor {
 		if (force || (this.SelectedAction != action)) {
 			if (save && this.SelectedAction)
 				if !this.saveAction(this.SelectedAction) {
-					this.ActionsListView.Modify(inList(this.Actions, action), "Select Vis")
+					this.ActionsListView.Modify(inList(this.Actions, this.SelectedAction), "Select Vis")
 
 					return
 				}
 
 			this.iSelectedAction := action
+
+			if action
+				this.ActionsListView.Modify(inList(this.Actions, action), "Select Vis")
 
 			this.loadAction(action)
 
@@ -1081,17 +1122,50 @@ class ActionsEditor {
 		if (force || (this.SelectedParameter != parameter)) {
 			if (save && this.SelectedParameter)
 				if !this.saveParameter(this.SelectedParameter) {
-					this.ParametersListView.Modify(inList(this.SelectedAction.Paramaters, parameter), "Select Vis")
+					this.ParametersListView.Modify(inList(this.SelectedAction.Paramaters, this.SelectedParameter), "Select Vis")
 
 					return
 				}
 
 			this.iSelectedParameter := parameter
 
+			if parameter
+				this.ParametersListView.Modify(inList(this.SelectedAction.Parameters, parameter), "Select Vis")
+
 			this.loadParameter(parameter)
 
 			this.updateState()
 		}
+	}
+
+	addAction() {
+		local action
+
+		if this.SelectedAction
+			if !this.saveAction(this.SelectedAction) {
+				this.ActionsListView.Modify(inList(this.Actions, this.SelectedAction), "Select Vis")
+
+				return
+			}
+
+		action := {Name: "", Type: "Controller.Function", Active: true, Description: "", Parameters: []
+				 , Builtin: false, Initialized: true, Confirm: true, Definition: ""}
+
+		this.Actions.Push(action)
+
+		this.ActionsListView.Add("", "", translate("x"), "")
+
+		this.selectAction(action, true, false)
+	}
+
+	deleteAction() {
+		local index := inList(this.Actions, this.SelectedAction)
+
+		this.ActionsListView.Delete(index)
+
+		this.Actions.RemoveAt(index)
+
+		this.selectAction(false, true, false)
 	}
 
 	loadAction(action) {
@@ -1103,13 +1177,13 @@ class ActionsEditor {
 		if action {
 			this.Control["actionNameEdit"].Text := action.Name
 			this.Control["actionTypeDropDown"].Choose(inList(["Assistant.Method", "Assistant.Function", "Assistant.Rule", "Controller.Method", "Controller.Function"], action.Type))
+			this.Control["actionActiveCheck"].Value := !!action.Active
 			this.Control["actionDescriptionEdit"].Text := action.Description
 			this.Control["actionInitializationDropDown"].Choose(1 + (!action.Initialized ? 1 : 0))
 			this.Control["actionConfirmationDropDown"].Choose(1 + (!action.Confirm ? 1 : 0))
 
 			if (action.Type = "Assistant.Rule") {
-				this.ScriptEditor.Text := FileRead(getFileName(action.Definition, kUserHomeDirectory . "Actions\"
-																				, kResourcesDirectory . "Actions\"))
+				this.ScriptEditor.Text := action.Script
 
 				this.CallableField[2].Text := ""
 			}
@@ -1130,6 +1204,7 @@ class ActionsEditor {
 		else {
 			this.Control["actionNameEdit"].Text := ""
 			this.Control["actionTypeDropDown"].Choose(0)
+			this.Control["actionActiveCheck"].Value := 0
 			this.Control["actionDescriptionEdit"].Text := ""
 			this.Control["actionInitializationDropDown"].Choose(0)
 			this.Control["actionConfirmationDropDown"].Choose(0)
@@ -1141,11 +1216,82 @@ class ActionsEditor {
 	}
 
 	saveAction(action) {
+		local valid := true
+		local name := this.Control["actionNameEdit"].Text
+		local ignore, other, type
+
 		if this.SelectedParameter
 			if !this.saveParameter(this.SelectedParameter)
 				return false
 
-		return true
+		if (Trim(name) = "")
+			valid := false
+
+		for ignore, other in this.Actions
+			if ((other != action) && (name = other.Name))
+				valid := false
+
+		type := ["Assistant.Method", "Assistant.Function", "Assistant.Rule", "Controller.Method", "Controller.Function"][this.Control["actionTypeDropDown"].Value]
+
+		if (type = "Assistant.Rule")
+			try {
+				RuleCompiler().compileRules(this.ScriptEditor.Text, &ignore := false, &ignore := false)
+			}
+			catch Any {
+				valid := false
+			}
+
+		if valid {
+			action.Name := name
+			action.Active := Trim(this.Control["actionActiveCheck"].Value)
+			action.Description := Trim(this.Control["actionDescriptionEdit"].Text)
+			action.Type := type
+			action.Initialized := (this.Control["actionInitializationDropDown"].Value = 1)
+			action.Confirm := (this.Control["actionConfirmationDropDown"].Value = 1)
+
+			if (action.Type = "Assistant.Rule")
+				action.Script := this.ScriptEditor.Text
+			else
+				action.Definition := this.CallableField[2].Text
+
+			this.ActionsListView.Modify(inList(this.Actions, action), "", action.Name, action.Active ? translate("x") : "", action.Description)
+		}
+		else {
+			OnMessage(0x44, translateOkButton)
+			withBlockedWindows(MsgBox, translate("Invalid values detected - please correct..."), translate("Error"), 262160)
+			OnMessage(0x44, translateOkButton, 0)
+		}
+
+		return valid
+	}
+
+	addParameter() {
+		local parameter
+
+		if this.SelectedParameter
+			if !this.saveParameter(this.SelectedParameter) {
+				this.ParametersListView.Modify(inList(this.SelectedAction.Parameters, this.SelectedParameter), "Select Vis")
+
+				return
+			}
+
+		parameter := {Name: "", Type: "String", Enumeration: [], Required: false, Description: ""}
+
+		this.SelectedAction.Parameters.Push(parameter)
+
+		this.ParametersListView.Add("", "", "")
+
+		this.selectParameter(parameter, true, false)
+	}
+
+	deleteParameter() {
+		local index := inList(this.SelectedAction.Parameters, this.SelectedParameter)
+
+		this.ParametersListView.Delete(index)
+
+		this.SelectedAction.Parameters.RemoveAt(index)
+
+		this.selectParameter(false, true, false)
 	}
 
 	loadParameter(parameter) {
@@ -1166,15 +1312,42 @@ class ActionsEditor {
 	}
 
 	saveParameter(parameter) {
-		return true
+		local valid := true
+		local name := this.Control["parameterNameEdit"].Text
+		local ignore, other
+
+		if (Trim(name) = "")
+			valid := false
+
+		for ignore, other in this.SelectedAction.Parameters
+			if ((other != parameter) && (name = other.Name))
+				valid := false
+
+		if valid {
+			parameter.Name := name
+			parameter.Description := Trim(this.Control["parameterDescriptionEdit"].Text)
+			parameter.Type := ["String", "Integer", "Boolean"][this.Control["parameterTypeDropDown"].Value]
+			parameter.Required := (this.Control["parameterOptionalDropDown"].Value = 1)
+
+			this.ParametersListView.Modify(inList(this.SelectedAction.Parameters, parameter), "", parameter.Name, parameter.Description)
+		}
+		else {
+			OnMessage(0x44, translateOkButton)
+			withBlockedWindows(MsgBox, translate("Invalid values detected - please correct..."), translate("Error"), 262160)
+			OnMessage(0x44, translateOkButton, 0)
+		}
+
+		return valid
 	}
 
 	loadActions() {
 		local configuration := readMultiMap(kResourcesDirectory . "Actions\" . this.Assistant . ".actions")
 		local actions := []
-		local active, ignore, type, action, descriptor, parameters
+		local active, ignore, type, action, descriptor, parameters, theAction
 
 		addMultiMapValues(configuration, readMultiMap(kUserHomeDirectory . "Actions\" . this.Assistant . ".actions"))
+
+		active := string2Values(",", getMultiMapValue(configuration, "Actions", "Active", ""))
 
 		for ignore, type in ["Builtin", "Custom"]
 			for action, descriptor in getMultiMapValues(configuration, type) {
@@ -1190,18 +1363,25 @@ class ActionsEditor {
 								   , Description: parameter[5]})
 				}
 
-				this.Actions.Push({Name: action, Type: descriptor[1], Definition: descriptor[2]
-								 , Description: descriptor[6], Parameters: parameters, Builtin: (type = "Builtin")
-								 , Initialized: ((descriptor[3] = kTrue) ? true : ((descriptor[3] = kFalse) ? false : descriptor[3]))
-								 , Confirm: ((descriptor[4] = kTrue) ? true : ((descriptor[4] = kFalse) ? false : descriptor[4]))})
-			}
+				theAction := {Name: action, Active: inList(active, action), Type: descriptor[1], Definition: descriptor[2]
+							, Description: descriptor[6], Parameters: parameters, Builtin: (type = "Builtin")
+							, Initialized: ((descriptor[3] = kTrue) ? true : ((descriptor[3] = kFalse) ? false : descriptor[3]))
+							, Confirm: ((descriptor[4] = kTrue) ? true : ((descriptor[4] = kFalse) ? false : descriptor[4]))}
 
-		active := string2Values(",", getMultiMapValue(configuration, "Actions", "Active", ""))
+				if (theAction.Type = "Assistant.Rule") {
+					theAction.Script := FileRead(getFileName(this.Assistant . "." . theAction.Name . ".rules"
+														   , kResourcesDirectory . "Actions\", kUserHomeDirectory . "Actions\"))
+
+					theAction.Definition := ""
+				}
+
+				this.Actions.Push(theAction)
+			}
 
 		this.ActionsListView.Delete()
 
 		for ignore, action in this.Actions
-			this.ActionsListView.Add("", action.Name, action.Description)
+			this.ActionsListView.Add("", action.Name, action.Active ? translate("x") : "", action.Description)
 
 		this.ActionsListView.ModifyCol()
 
@@ -1210,6 +1390,48 @@ class ActionsEditor {
 	}
 
 	saveActions() {
+		local active := []
+		local configuration, ignore, action, index, parameter
+
+		if this.SelectedAction
+			if !this.saveAction(this.SelectedAction) {
+				this.ActionsListView.Modify(inList(this.Actions, this.SelectedAction), "Select Vis")
+
+				return false
+			}
+
+		configuration := newMultiMap()
+
+		for ignore, action in this.Actions {
+			if action.Active
+				active.Push(action.Name)
+
+			if !action.Builtin {
+				if (action.Type = "Assistant.Rule") {
+					action.Definition := (this.Assistant . "." . action.Name . ".rules")
+
+					deleteFile(kUserHomeDirectory . "Actions\" . action.Definition)
+
+					FileAppend(action.Script, kUserHomeDirectory . "Actions\" . action.Definition)
+				}
+
+				setMultiMapValue(configuration, "Custom", action.Name
+											  , values2String("|", action.Type, action.Definition, action.Initialized
+																 , action.Confirm, action.Parameters.Length, action.Description))
+
+				for index, parameter in action.Parameters
+					setMultiMapValue(configuration, "Parameters", action.Name . "." . index
+												  , values2String("|", parameter.Name, parameter.Type
+																	 , values2String(",", parameter.Enumeration*)
+																	 , parameter.Required, parameter.Description))
+			}
+		}
+
+		setMultiMapValue(configuration, "Actions", "Active", values2String(",", active*))
+
+		writeMultiMap(kUserHomeDirectory . "Actions\" . this.Assistant . ".actions", configuration)
+
+		return true
 	}
 }
 

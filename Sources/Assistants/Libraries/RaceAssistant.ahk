@@ -1218,11 +1218,9 @@ class RaceAssistant extends ConfigurationItem {
 			%function%(arguments*)
 		}
 
-		callRules(ruleFileName, enoughData, confirm, parameters, arguments*) {
+		callRule(action, ruleFileName, enoughData, confirm, parameters, arguments*) {
 			local knowledgeBase := this.KnowledgeBase
 			local rules, ignore, rule, productions, reductions, index, parameter, names, variables
-
-			static activationIndex := 1
 
 			if knowledgeBase {
 				if !this.confirmCommand(enoughData, confirm)
@@ -1231,13 +1229,12 @@ class RaceAssistant extends ConfigurationItem {
 				if !loadedRules.Has(ruleFileName) {
 					rules := FileRead(getFileName(ruleFileName, kUserHomeDirectory . "Actions\", kResourcesDirectory . "Actions\"))
 
-					variables := CaseInsenseMap("activation", "__Activation." . activationIndex)
+					variables := CaseInsenseMap("activation", "__" . action . ".A")
 					names := CaseInsenseMap()
 
 					for ignore, parameter in parameters {
 						try {
-							variables[paramater.Name] := ("__Parameter" . A_Index)
-							names[parameter.Name] := ("__Parameter" . A_Index)
+							names[parameter.Name] := variables[paramater.Name] := ("__" . action . ".P" . A_Index)
 						}
 						catch Any as exception {
 							logError(exception, true)
@@ -1256,7 +1253,7 @@ class RaceAssistant extends ConfigurationItem {
 					for ignore, rule in reductions
 						knowledgeBase.addRule(rule)
 
-					loadedRules[ruleFileName] := [("__Activation." . activationIndex++), names]
+					loadedRules[ruleFileName] := [("__" . action . ".A"), names]
 				}
 			}
 
@@ -1341,7 +1338,7 @@ class RaceAssistant extends ConfigurationItem {
 						case "Assistant.Function":
 							handler := callFunction.Bind(definition[2], enoughData, confirm)
 						case "Assistant.Rule":
-							handler := callRules.Bind(definition[2], enoughData, confirm, parameters)
+							handler := callRule.Bind(action, definition[2], enoughData, confirm, parameters)
 						case "Controller.Method":
 							handler := callControllerMethod.Bind(definition[2], enoughData, confirm)
 						case "Controller.Fuction":

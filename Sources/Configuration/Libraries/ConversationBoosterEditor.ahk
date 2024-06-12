@@ -781,6 +781,7 @@ class ActionsEditor {
 
 	iActions := []
 	iSelectedAction := false
+	iSelectedParameter := false
 
 	Editor {
 		Get {
@@ -846,6 +847,12 @@ class ActionsEditor {
 		}
 	}
 
+	SelectedParameter {
+		Get {
+			return this.iSelectedParameter
+		}
+	}
+
 	__New(editor) {
 		this.iEditor := editor
 	}
@@ -858,6 +865,7 @@ class ActionsEditor {
 		}
 
 		chooseParameter(listView, line, *) {
+			this.selectParameter(line ? this.SelectedAction.Parameters[line] : false)
 		}
 
 		editorGui := Window({Descriptor: "Actions Editor", Resizeable: true, Options: "0x400000"})
@@ -968,26 +976,29 @@ class ActionsEditor {
 		if this.SelectedAction {
 			if this.SelectedAction.Builtin {
 				this.ScriptEditor.Opt("+ReadOnly")
-				this.CallableField[2].Opt("+ReadOnly")
+				this.CallableField[2].Enabled := false
 
-				this.Control["actionNameEdit"].Opt("+ReadOnly")
-				this.Control["actionDescriptionEdit"].Opt("+ReadOnly")
+				this.Control["actionNameEdit"].Enabled := false
+				this.Control["actionDescriptionEdit"].Enabled := false
 				this.Control["actionTypeDropDown"].Enabled := false
 				this.Control["actionInitializationDropDown"].Enabled := false
 				this.Control["actionConfirmationDropDown"].Enabled := false
 			}
 			else {
 				this.ScriptEditor.Opt("-ReadOnly")
-				this.CallableField[2].Opt("-ReadOnly")
+				this.CallableField[2].Enabled := true
 
-				this.Control["actionNameEdit"].Opt("-ReadOnly")
-				this.Control["actionDescriptionEdit"].Opt("-ReadOnly")
+				this.Control["actionNameEdit"].Enabled := true
+				this.Control["actionDescriptionEdit"].Enabled := true
 				this.Control["actionTypeDropDown"].Enabled := true
 				this.Control["actionInitializationDropDown"].Enabled := true
 				this.Control["actionConfirmationDropDown"].Enabled := true
 			}
 
-			type := ["Method", "Function", "Rule", "Method", "Function"][this.Control["actionTypeDropDown"].Value]
+			if (this.Control["actionTypeDropDown"].Value != 0)
+				type := ["Method", "Function", "Rule", "Method", "Function"][this.Control["actionTypeDropDown"].Value]
+			else
+				type := "Rule"
 
 			if (type = "Rule") {
 				this.ScriptEditor.Visible := true
@@ -1015,30 +1026,79 @@ class ActionsEditor {
 			this.ScriptEditor.Visible := true
 			this.CallableField[1].Visible := false
 			this.CallableField[2].Visible := false
-			this.Control["actionNameEdit"].Opt("+ReadOnly")
-			this.Control["actionDescriptionEdit"].Opt("+ReadOnly")
+			this.Control["actionNameEdit"].Enabled := false
+			this.Control["actionDescriptionEdit"].Enabled := false
 			this.Control["actionTypeDropDown"].Enabled := false
 			this.Control["actionInitializationDropDown"].Enabled := false
 			this.Control["actionConfirmationDropDown"].Enabled := false
 		}
 
+		if this.SelectedParameter {
+			if this.SelectedAction.Builtin {
+				this.Control["parameterNameEdit"].Enabled := false
+				this.Control["parameterDescriptionEdit"].Enabled := false
+				this.Control["parameterTypeDropDown"].Enabled := false
+				this.Control["parameterOptionalDropDown"].Enabled := false
+			}
+			else {
+				this.Control["parameterNameEdit"].Enabled := true
+				this.Control["parameterDescriptionEdit"].Enabled := true
+				this.Control["parameterTypeDropDown"].Enabled := true
+				this.Control["parameterOptionalDropDown"].Enabled := true
+			}
+		}
+		else {
+			this.Control["parameterNameEdit"].Text := ""
+			this.Control["parameterDescriptionEdit"].Text := ""
+			this.Control["parameterTypeDropDown"].Choose(0)
+			this.Control["parameterOptionalDropDown"].Choose(0)
+
+			this.Control["parameterNameEdit"].Enabled := false
+			this.Control["parameterDescriptionEdit"].Enabled := false
+			this.Control["parameterTypeDropDown"].Enabled := false
+			this.Control["parameterOptionalDropDown"].Enabled := false
+		}
 	}
 
-	selectAction(action) {
-		if this.SelectedAction
-			this.saveAction(this.SelectedAction)
+	selectAction(action, force := false, save := true) {
+		if (force || (this.SelectedAction != action)) {
+			if (save && this.SelectedAction)
+				if !this.saveAction(this.SelectedAction) {
+					this.ActionsListView.Modify(inList(this.Actions, action), "Select Vis")
 
-		this.iSelectedAction := action
+					return
+				}
 
-		this.loadAction(action)
+			this.iSelectedAction := action
 
-		this.updateState()
+			this.loadAction(action)
+
+			this.updateState()
+		}
+	}
+
+	selectParameter(parameter, force := false, save := true) {
+		if (force || (this.SelectedParameter != parameter)) {
+			if (save && this.SelectedParameter)
+				if !this.saveParameter(this.SelectedParameter) {
+					this.ParametersListView.Modify(inList(this.SelectedAction.Paramaters, parameter), "Select Vis")
+
+					return
+				}
+
+			this.iSelectedParameter := parameter
+
+			this.loadParameter(parameter)
+
+			this.updateState()
+		}
 	}
 
 	loadAction(action) {
 		local ignore, parameter
 
 		this.ParametersListView.Delete()
+		this.selectParameter(false, true, false)
 
 		if action {
 			this.Control["actionNameEdit"].Text := action.Name
@@ -1081,6 +1141,32 @@ class ActionsEditor {
 	}
 
 	saveAction(action) {
+		if this.SelectedParameter
+			if !this.saveParameter(this.SelectedParameter)
+				return false
+
+		return true
+	}
+
+	loadParameter(parameter) {
+		if parameter {
+			this.Control["parameterNameEdit"].Text := parameter.Name
+			this.Control["parameterTypeDropDown"].Choose(inList(["String", "Integer", "Boolean"], parameter.Type))
+			this.Control["parameterDescriptionEdit"].Text := parameter.Description
+			this.Control["parameterOptionalDropDown"].Choose(1 + (!parameter.Required ? 1 : 0))
+		}
+		else {
+			this.Control["parameterNameEdit"].Text := ""
+			this.Control["parameterTypeDropDown"].Choose(0)
+			this.Control["parameterDescriptionEdit"].Text := ""
+			this.Control["parameterOptionalDropDown"].Choose(0)
+		}
+
+		this.updateState()
+	}
+
+	saveParameter(parameter) {
+		return true
 	}
 
 	loadActions() {
@@ -1100,7 +1186,8 @@ class ActionsEditor {
 					parameter := string2Values("|", getMultiMapValue(configuration, "Parameters", ConfigurationItem.descriptor(action, A_Index)))
 
 					parameters.Push({Name: parameter[1], Type: parameter[2], Enumeration: string2Values(",", parameter[3])
-								   , Required: parameter[4], Description: parameter[5]})
+								   , Required: ((parameter[4] = kTrue) ? true : ((parameter[4] = kFalse) ? false : parameter[4]))
+								   , Description: parameter[5]})
 				}
 
 				this.Actions.Push({Name: action, Type: descriptor[1], Definition: descriptor[2]

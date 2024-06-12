@@ -271,7 +271,7 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 		widget40 := editorGui.Add("Text", "x" . x0 . " yp+24 w105 h23 +0x200", translate("Actions"))
 		widget41 := editorGui.Add("DropDownList", "x" . x1 . " yp w60 vviConversationActionsDropdown", collect(["No", "Yes"], translate))
 		widget41.OnEvent("Change", (*) => this.updateState())
-		widget42 := editorGui.Add("Button", "x" . (x1 + 61) . " yp-1 w23 h23 X:Move Center +0x200 vviConversationIEditActionsButton")
+		widget42 := editorGui.Add("Button", "x" . (x1 + 61) . " yp-1 w23 h23 X:Move Center +0x200 vviConversationEditActionsButton")
 		widget42.OnEvent("Click", editActions)
 		setButtonIcon(widget42, kIconsDirectory . "Pencil.ico", 1, "L4 T4 R4 B4")
 
@@ -684,7 +684,7 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 			this.Control["viConversationMaxHistoryEdit"].Enabled := false
 			this.Control["viConversationTemperatureEdit"].Enabled := false
 			this.Control["viConversationActionsDropDown"].Enabled := false
-			this.Control["viConversationIEditActionsButton"].Enabled := false
+			this.Control["viConversationEditActionsButton"].Enabled := false
 			this.Control["viConversationMaxHistoryEdit"].Text := ""
 			this.Control["viConversationTemperatureEdit"].Text := ""
 			this.Control["viConversationActionsDropDown"].Choose(0)
@@ -705,7 +705,7 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 				this.Control["viConversationActionsDropDown"].Choose(1)
 
 			this.Control["viConversationInstructionsButton"].Enabled := true
-			this.Control["viConversationIEditActionsButton"].Enabled := (this.Control["viConversationActionsDropDown"].Value = 2)
+			this.Control["viConversationEditActionsButton"].Enabled := (this.Control["viConversationActionsDropDown"].Value = 2)
 		}
 	}
 
@@ -881,7 +881,7 @@ class ActionsEditor {
 		editorGui.SetFont("Norm", "Arial")
 
 		editorGui.Add("Documentation", "x368 YP+20 w128 H:Center Center", translate("Conversation Actions")
-					, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm")
+					, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#managing-conversation-actions")
 
 		editorGui.SetFont("Norm", "Arial")
 
@@ -891,18 +891,18 @@ class ActionsEditor {
 		this.iActionsListView.OnEvent("Click", chooseAction)
 		this.iActionsListView.OnEvent("DoubleClick", chooseAction)
 
-		editorGui.Add("Button", "x800 yp+142 w23 h23 Center +0x200 vaddActionButton").OnEvent("Click", (*) => this.addAction())
+		editorGui.Add("Button", "x800 yp+142 w23 h23 Center +0x200 X:Move Y:Move(0.25) vaddActionButton").OnEvent("Click", (*) => this.addAction())
 		setButtonIcon(editorGui["addActionButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
-		editorGui.Add("Button", "x824 yp w23 h23 Center +0x200 vdeleteActionButton").OnEvent("Click", (*) => this.deleteAction())
+		editorGui.Add("Button", "x824 yp w23 h23 Center +0x200 X:Move Y:Move(0.25) vdeleteActionButton").OnEvent("Click", (*) => this.deleteAction())
 		setButtonIcon(editorGui["deleteActionButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 
 		editorGui.Add("Text", "x16 yp+28 w70 h23 +0x200 Section Y:Move(0.25)", translate("Action"))
 		editorGui.Add("CheckBox", "x90 yp h23 w23 Y:Move(0.25) vactionActiveCheck")
-		editorGui.Add("DropDownList", "x110 yp w127 Y:Move(0.25) vactionTypeDropDown", collect(["Assistant Method", "Assistant Function", "Assistant Rule", "Controller Method", "Controller Function"], translate)).OnEvent("Change", (*) => this.updateState())
-		editorGui.Add("Edit", "x241 yp h23 w177 Y:Move(0.25) vactionNameEdit")
+		editorGui.Add("DropDownList", "x110 yp w127 Y:Move(0.25) vactionTypeDropDown", collect(["Assistant Method", "Assistant Rule", "Controller Method", "Controller Function"], translate)).OnEvent("Change", (*) => this.updateState())
+		editorGui.Add("Edit", "x241 yp h23 w177 W:Grow(0.34) Y:Move(0.25) vactionNameEdit")
 
 		editorGui.Add("Text", "x16 yp+28 w90 h23 +0x200 Y:Move(0.25)", translate("Description"))
-		editorGui.Add("Edit", "x110 yp h96 w308 Y:Move(0.25) vactionDescriptionEdit")
+		editorGui.Add("Edit", "x110 yp h96 w308 W:Grow(0.34) Y:Move(0.25) vactionDescriptionEdit")
 
 		editorGui.Add("Text", "x16 yp+100 w90 h23 +0x200 Y:Move(0.25)", translate("Learning Phase"))
 		editorGui.Add("DropDownList", "x110 yp w90 Y:Move(0.25) vactionInitializationDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", (*) => this.updateState())
@@ -926,22 +926,22 @@ class ActionsEditor {
 		editorGui.Add("Button", "x350 yp+10 w80 h23 Default X:Move(0.5) Y:Move", translate("Ok")).OnEvent("Click", (*) => this.iResult := kOk)
 		editorGui.Add("Button", "x436 yp w80 h23 X:Move(0.5) Y:Move", translate("&Cancel")).OnEvent("Click", (*) => this.iResult := kCancel)
 
-		this.iParametersListView := editorGui.Add("ListView", "x430 ys w418 h96 W:Grow H:Grow(0.25) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Parameter", "Description"], translate))
+		this.iParametersListView := editorGui.Add("ListView", "x430 ys w418 h96 X:Move(0.34) W:Grow(0.66) Y:Move(0.25) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Parameter", "Description"], translate))
 		this.iParametersListView.OnEvent("Click", chooseParameter)
 		this.iParametersListView.OnEvent("DoubleClick", chooseParameter)
 
-		editorGui.Add("Button", "x800 yp+100 w23 h23 Center +0x200 vaddParameterButton").OnEvent("Click", (*) => this.addParameter())
+		editorGui.Add("Button", "x800 yp+100 w23 h23 Center +0x200 X:Move Y:Move(0.25) vaddParameterButton").OnEvent("Click", (*) => this.addParameter())
 		setButtonIcon(editorGui["addParameterButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
-		editorGui.Add("Button", "x824 yp w23 h23 Center +0x200 vdeleteParameterButton").OnEvent("Click", (*) => this.deleteParameter())
+		editorGui.Add("Button", "x824 yp w23 h23 Center +0x200 X:Move Y:Move(0.25) vdeleteParameterButton").OnEvent("Click", (*) => this.deleteParameter())
 		setButtonIcon(editorGui["deleteParameterButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 
-		editorGui.Add("Text", "x430 yp+28 w90 h23 +0x200 Y:Move(0.25)", translate("Name / Type"))
-		editorGui.Add("Edit", "x536 yp h23 w127 Y:Move(0.25) vparameterNameEdit")
-		editorGui.Add("DropDownList", "x665 yp w90 Y:Move(0.25) vparameterTypeDropDown", collect(["String", "Integer", "Boolean"], translate)).OnEvent("Change", (*) => this.updateState())
-		editorGui.Add("DropDownList", "x758 yp w90 Y:Move(0.25) vparameterOptionalDropDown", collect(["Required", "Optional"], translate)).OnEvent("Change", (*) => this.updateState())
+		editorGui.Add("Text", "x430 yp+28 w90 h23 +0x200 X:Move(0.34) Y:Move(0.25)", translate("Name / Type"))
+		editorGui.Add("Edit", "x536 yp h23 w127 Y:Move(0.25) X:Move(0.34) vparameterNameEdit")
+		editorGui.Add("DropDownList", "x665 yp w90 Y:Move(0.25) X:Move(0.34) vparameterTypeDropDown", collect(["String", "Integer", "Boolean"], translate)).OnEvent("Change", (*) => this.updateState())
+		editorGui.Add("DropDownList", "x758 yp w90 Y:Move(0.25) X:Move(0.34) vparameterOptionalDropDown", collect(["Required", "Optional"], translate)).OnEvent("Change", (*) => this.updateState())
 
-		editorGui.Add("Text", "x430 yp+24 w90 h23 +0x200 Y:Move(0.25)", translate("Description"))
-		editorGui.Add("Edit", "x536 yp h23 w312 Y:Move(0.25) W:Grow vparameterDescriptionEdit")
+		editorGui.Add("Text", "x430 yp+24 w90 h23 +0x200 Y:Move(0.25) X:Move(0.34)", translate("Description"))
+		editorGui.Add("Edit", "x536 yp h23 w312 Y:Move(0.25) X:Move(0.34) W:Grow(0.66) vparameterDescriptionEdit")
 
 		this.updateState()
 	}
@@ -1028,7 +1028,7 @@ class ActionsEditor {
 			}
 
 			if (this.Control["actionTypeDropDown"].Value != 0)
-				type := ["Method", "Function", "Rule", "Method", "Function"][this.Control["actionTypeDropDown"].Value]
+				type := ["Method", "Rule", "Method", "Function"][this.Control["actionTypeDropDown"].Value]
 			else
 				type := "Rule"
 
@@ -1176,7 +1176,7 @@ class ActionsEditor {
 
 		if action {
 			this.Control["actionNameEdit"].Text := action.Name
-			this.Control["actionTypeDropDown"].Choose(inList(["Assistant.Method", "Assistant.Function", "Assistant.Rule", "Controller.Method", "Controller.Function"], action.Type))
+			this.Control["actionTypeDropDown"].Choose(inList(["Assistant.Method", "Assistant.Rule", "Controller.Method", "Controller.Function"], action.Type))
 			this.Control["actionActiveCheck"].Value := !!action.Active
 			this.Control["actionDescriptionEdit"].Text := action.Description
 			this.Control["actionInitializationDropDown"].Choose(1 + (!action.Initialized ? 1 : 0))
@@ -1231,7 +1231,7 @@ class ActionsEditor {
 			if ((other != action) && (name = other.Name))
 				valid := false
 
-		type := ["Assistant.Method", "Assistant.Function", "Assistant.Rule", "Controller.Method", "Controller.Function"][this.Control["actionTypeDropDown"].Value]
+		type := ["Assistant.Method", "Assistant.Rule", "Controller.Method", "Controller.Function"][this.Control["actionTypeDropDown"].Value]
 
 		if (type = "Assistant.Rule")
 			try {

@@ -457,7 +457,67 @@ A special editor is provided to manage the conversation actions for a given Assi
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%207%20Speech%20Actions.JPG)
 
-You can enable or disable individual predefined actions using the checkbox on the left of the action name. And you can define your own actions with a click on the "+" button. But this requires a very deep understanding of the architecture of Simulator Controller and the Assistants as well as a very good understanding on how LLMs call tools and functions. Therefore I suggest a personal training, if you want to use this.
+You can enable or disable individual predefined actions using the checkbox on the left of the action name. And you can define your own actions with a click on the "+" button. But this requires a very deep understanding of the architecture of Simulator Controller and the Assistants as well as an excellent understanding of how LLMs call tools and functions. This is far beyond the scope of this documentation, but I try to give a brief introduction.
+
+1. When an LLM is activated, it is possible to provide a couple for function descriptions to the LLM. *OpenAI* has defined the quasi-standard for a function description as part of their API in JSON format.
+
+		{
+			"type": "function",
+			"function": {
+				"name": "get_current_temperature",
+				"description": "Get the current temperature for a specific location",
+				"parameters": {
+					"type": "object",
+					"properties": {
+						"location": {
+							"type": "string",
+							"description": "The city and state, e.g., San Francisco, CA"
+						},
+						"unit": {
+							"type": "string",
+							"enum": ["Celsius", "Fahrenheit"],
+							"description": "The temperature unit to use. Infer this from the user's location."
+						}
+					},
+					"required": ["location", "unit"]
+				}
+			}
+		}
+
+2. With the editor shown above you can create all parts of the function definitions you want to provide to the LLM using a simple user interface.
+
+3. When the LLM decides to call such a function, it returns a special response which indicates the function(s) to be called together with values for at least all required parameters. You can now decide what to do, when the logical function is called by the LLM. Five different types of actions are available:
+
+   | Action Type | Description |
+   |-------------|-------------|
+   | Assistant Method | A method of the corresponding object which represents the given Race Assistant is called. The arguments for the logical function are passed to the method in the order of their definition. |
+   | Assistant Rule | The supplied rules are loaded into the rule engine of the given Race Assistant. These rules have full access to the knowledge base and all other rules of this Assistant.<br><br>All arguments supplied by the LLM are created as facts in the knowledge base for the time of the execution. Please use enclosing percentage signs to reference the arguments. Example: %location%<br><br>A special fact named %activation% will be set as well, which can be used to trigger rules, when no other fact is suitable. |
+   | Controller Method | A method of the single instance of the *SimulatorController* class is called in the process "Simulator Controller.exe". The arguments for the logical function are passed to the method in the order of their definition. |
+   | Controller Function | A global function is called in the process "Simulator Controller.exe". The arguments for the logical function are passed to the method in the order of their definition. Good candidates are the controller action functions, which are provided by the different plugins. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) for a complete overview. |
+
+4. The most versatile *Action Type* is obviously "Assistant Rule", since it allows you to do almost anything, but it requires very good programming skills in the area of logical programming languages like Prolog and forward chaining production rule systems. You may take a look at the rule sets of the Race Engineer to learn the language.
+
+   When defining your rules, you can use the following predicates to connect to the given Assistant or even the "Simulator Controller.exe" process:
+   
+   - Assistant.Call(method, p1, p2, ...)
+   
+     Invokes the *method* on the instance of the Race Assistant class with some arguments. Up to 6 arguments are supported.
+	 
+   - Assistant.Speak(phrase)
+   
+	 Outputs the given phrase using the voice of the given Race Assistant. *phrase* can be the label of a predefined phrase from the grammar definition of the Assistant.
+	 
+   - Assistant.Ask(question)
+   
+     Asks the given Race Assistant a question or give a command. The result will be the same, as if the question or the command has been given by voice input.
+	 
+   - Controller.Call(method, p1, p2, ...)
+   
+     Invokes the *method* on the instance of the *SimulatorController* class in the process "Simulator Controller.exe". with some arguments. Up to 6 arguments are supported.
+	 
+   - Function.Call(function, p1, p2, ...)
+   
+     Invokes the global *function* in the process "Simulator Controller.exe". with some arguments. Up to 6 arguments are supported.
 
 #### Tab *Plugins*
 

@@ -1234,7 +1234,7 @@ class RaceAssistant extends ConfigurationItem {
 
 					for ignore, parameter in parameters
 						try {
-							names[parameter.Name] := variables[paramater.Name] := ("__" . action . ".P" . A_Index)
+							names[parameter.Name] := variables[parameter.Name] := ("__" . action . ".P" . A_Index)
 						}
 						catch Any as exception {
 							logError(exception, true)
@@ -1335,13 +1335,11 @@ class RaceAssistant extends ConfigurationItem {
 					switch definition[1], false {
 						case "Assistant.Method":
 							handler := callMethod.Bind(definition[2], enoughData, confirm)
-						case "Assistant.Function":
-							handler := callFunction.Bind(definition[2], enoughData, confirm)
 						case "Assistant.Rule":
 							handler := callRule.Bind(action, definition[2], enoughData, confirm, parameters)
 						case "Controller.Method":
 							handler := callControllerMethod.Bind(definition[2], enoughData, confirm)
-						case "Controller.Fuction":
+						case "Controller.Function":
 							handler := callControllerFunction.Bind(definition[2], enoughData, confirm)
 						default:
 							throw "Unknown action type (" definition[1] . ") detected in RaceAssistant.createConversationTools..."
@@ -3703,18 +3701,18 @@ callAssistant(choicePoint, method, arguments*) {
 
 callFunction(choicePoint, function, arguments*) {
 	try {
-		%function%(retrieveArguments(choicePoint, arguments)*)
+		remoteHandler.customAction("Function", function, retrieveArguments(choicePoint, arguments, true)*)
 	}
 	catch Any as exception {
 		logError(exception, true)
 	}
 }
 
-callController(choicePoint, function, arguments*) {
+callController(choicePoint, method, arguments*) {
 	local remoteHandler := choicePoint.KnowledgeBase.RaceAssistant.RemoteHandler
 
 	if remoteHandler
-		remoteHandler.customAction("Function", function, retrieveArguments(choicePoint, arguments, true)*)
+		remoteHandler.customAction("Method", method, retrieveArguments(choicePoint, arguments, true)*)
 }
 
 askAssistant(choicePoint, question) {

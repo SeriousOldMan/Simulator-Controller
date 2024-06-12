@@ -1232,7 +1232,7 @@ class RaceAssistant extends ConfigurationItem {
 					variables := CaseInsenseMap("activation", "__" . action . ".A")
 					names := CaseInsenseMap()
 
-					for ignore, parameter in parameters {
+					for ignore, parameter in parameters
 						try {
 							names[parameter.Name] := variables[paramater.Name] := ("__" . action . ".P" . A_Index)
 						}

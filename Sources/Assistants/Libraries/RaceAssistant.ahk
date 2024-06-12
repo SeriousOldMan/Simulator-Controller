@@ -1234,7 +1234,7 @@ class RaceAssistant extends ConfigurationItem {
 
 					for ignore, parameter in parameters
 						try {
-							names[parameter.Name] := variables[paramater.Name] := ("__" . action . ".P" . A_Index)
+							names[parameter.Name] := variables[parameter.Name] := ("__" . action . ".P" . A_Index)
 						}
 						catch Any as exception {
 							logError(exception, true)

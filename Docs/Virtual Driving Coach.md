@@ -183,7 +183,7 @@ Below you find all instruction categories and the supported variables:
 
 As said, all instructions can be modified in the configuration. You can even clear a complete instruction, if you want (and don't want to dicuss the corresponding information with Aiden). I do not recommend to clear the "Character" instruction, though.
 
-IMPORTANT: Depending on the configuration, especially the chosen model and also the "# Tokens", you may encounter problems with very complex input, for example a longer race with many recorded handling issues. In this case, Aiden will refuse to give you answer with a stupic excuse. That means, that the GPT service returned with an error code, typically meaning that the input area of the LLM was too small. Never happened for me with the GPT-4 model with "# MaxTokens" set to 2048, though, but happened a couple of times using the *smaller* models.
+IMPORTANT: Depending on the configuration, especially the chosen model and also the "# Tokens", you may encounter problems with very complex input, for example a longer race with many recorded handling issues. In this case, Aiden will refuse to give you answer with a stupic excuse. That means, that the GPT service returned with an error code, typically meaning that the input area of the LLM was too small. Never happened for me with the GPT-4 model with "# Tokens" set to 2048, though, but happened a couple of times using the *smaller* models.
 
 ## Interacting with Aiden
 

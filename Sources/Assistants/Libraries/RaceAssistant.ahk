@@ -3699,14 +3699,16 @@ callAssistant(choicePoint, method, arguments*) {
 	}
 }
 
+Assistant_Call := callAssistant
+
 callFunction(choicePoint, function, arguments*) {
-	try {
+	local remoteHandler := choicePoint.KnowledgeBase.RaceAssistant.RemoteHandler
+
+	if remoteHandler
 		remoteHandler.customAction("Function", function, retrieveArguments(choicePoint, arguments, true)*)
-	}
-	catch Any as exception {
-		logError(exception, true)
-	}
 }
+
+Function_Call := callFunction
 
 callController(choicePoint, method, arguments*) {
 	local remoteHandler := choicePoint.KnowledgeBase.RaceAssistant.RemoteHandler
@@ -3715,9 +3717,13 @@ callController(choicePoint, method, arguments*) {
 		remoteHandler.customAction("Method", method, retrieveArguments(choicePoint, arguments, true)*)
 }
 
+Controller_Call := callController
+
 askAssistant(choicePoint, question) {
-	choicePoint.KnowledgeBase.RaceAssistant.handleVoiceText("TEXT", question)
+	choicePoint.KnowledgeBase.RaceAssistant.VoiceManager.recognize(question)
 }
+
+Assistant_Ask := askAssistant
 
 speakAssistant(choicePoint, message) {
 	local assistant := choicePoint.KnowledgeBase.RaceAssistant
@@ -3735,6 +3741,8 @@ speakAssistant(choicePoint, message) {
 				speaker.speak(part . ".", false, false, {Rephrase: false, Click: (A_Index = 1)})
 	}
 }
+
+Assistant_Speak := speakAssistant
 
 
 ;;;-------------------------------------------------------------------------;;;

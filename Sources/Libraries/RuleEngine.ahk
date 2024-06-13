@@ -779,6 +779,8 @@ class CallAction extends Action {
 		else
 			function := this.Function[facts]
 
+		function := StrReplace(function, ".", "_")
+
 		arguments := []
 
 		for ignore, argument in this.Arguments
@@ -2500,6 +2502,8 @@ class CallChoicePoint extends ChoicePoint {
 
 		if builtin
 			function := kBuiltinFunctions[inList(kBuiltinFunctors, function)]
+
+		function := StrReplace(function, ".", "_")
 
 		try {
 			return %function%(this, values*)

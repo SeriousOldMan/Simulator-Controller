@@ -649,6 +649,10 @@ class VoiceServer extends ConfigurationItem {
 				messageSend(kFileMessage, "Voice", this.DeactivationCallback, this.PID)
 		}
 
+		recognize(text) {
+			this.SpeechRecognizer.recognize(text)
+		}
+
 		recognizeVoiceCommand(grammar, words) {
 			if this.VoiceCommands.Has(grammar)
 				this.VoiceServer.recognizeVoiceCommand(this, grammar, words)
@@ -1364,6 +1368,13 @@ class VoiceServer extends ConfigurationItem {
 		}
 		else
 			return false
+	}
+
+	recognize(descriptor, text) {
+		local voiceClient := (this.VoiceClients.Has(descriptor) ? this.VoiceClients[descriptor] : false)
+
+		if voiceClient
+			voiceClient.recognize(text)
 	}
 
 	recognizeActivation(descriptor, grammar, words*) {

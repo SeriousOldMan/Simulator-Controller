@@ -178,7 +178,7 @@ Replace *X* with the number of the page you want to jump to on startup. As an al
 
 #### Presets & Special Configurations
 
-"Simulator Setup" provides a selection of presets for otherwise time-consuming configuration steps. These are mostly pre-configured layouts for Button Boxes and Stream Decks. Even if you do not find your particular layout here, it might be even helpful to start with one of these preconfigured layouts instead of starting from scratch. Simply select the one that fits best.
+"Simulator Setup" provides a selection of presets for otherwise time-consuming configuration steps. These are mostly preconfigured layouts for Button Boxes and Stream Decks. Even if you do not find your particular layout here, it might be even helpful to start with one of these preconfigured layouts instead of starting from scratch. Simply select the one that fits best.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Setup%203.JPG)
 
@@ -375,15 +375,15 @@ Note: You can use the [Trigger Detector Tool](https://github.com/SeriousOldMan/S
 
 ##### Boosting conversation with an LLM
 
-The voice recognition for all Assistants except the Driving Coach is normally pattern-based. [Here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Engineer-Commands-(EN)), for example, you can find a documentation for the definition of the recognized commands of the Race Engineer and similar documentation is available for the other Assistants as well. The speech output of all Assistants is also prep-programmed with several different phrases for each message, to create at least a little variation.
+The voice recognition for all Assistants except the Driving Coach is normally pattern-based. [Here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Engineer-Commands-(EN)), for example, you can find a documentation for the definition of the recognized commands of the Race Engineer and similar documentation is available for the other Assistants as well. The speech output of all Assistants is also preprogrammed with several different phrases for each message, to create at least a little variation.
 
-Said this, it is clear, that the interaction with the Assistants, although already impressive, will not feel absolutely natural in most cases. But using the latest development in AI with LLMs (aka large language model) it became possible to improve the conversation capabilities of the Assistants even further. Whenever you see a small button with an icon which looks like a launching space rocket, you can configure AI pre- and post-processing for voice recognition, speech output and general conversation.
+Said this, it is clear, that the interaction with the Assistants, although already impressive, will not feel absolutely natural in many cases. But using the latest development in AI with LLMs (aka large language model) it became possible to improve the conversation capabilities of the Assistants even further. Whenever you see a small button with an icon which looks like a launching space rocket, you can configure AI pre- and post-processing for voice recognition, speech output and general conversation.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%207%20Speech%20Improvement.JPG)
 
-Please take a look at the documentation for the [Driving Coach](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#installation) for a description of the different providers and LLMs which can be configured here.
+IMPORTANT: All this is optional. The Race Assistants will do their job really good even without being connected to an LLM. Therefore I recommend to use this feature not before everything else has been configured and is fully functional.
 
-IMPORTANT: All this is optional. The Race Assistants will do their job also without being connected to an LLM. Therefore I recommend to use this feature not before everything else is being configured and fully functional.
+Please take a look at the documentation for the [Driving Coach](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#installation) for a description of the different providers and LLMs which can be configured here.
 
 Several boosters are available at the moment:
 
@@ -449,46 +449,50 @@ Below you find all instruction categories and the supported variables:
 
 (1) Each phrase is available in different languages, for example "Rephrase (DE)" for the German version.
 
-Important: Using a GPT service like OpenAI may impose some costs, and running an LLM locally on your PC will require a very powerful system, especially when doing this while on the track. Therefore, configuring a conversation booster is fully optional.
+Important: Using a GPT service like OpenAI may create some costs, and running an LLM locally on your PC will require a very powerful system, especially when doing this while on the track. As already said, extending the capabilities of the Assistants with an LLM is fully optional.
 
 Disclaimer: Large Language Models, although incredible impressive, are still under heavy development. Therefore it depends on the quality and capabilities of the model, whether the Assistant will react like expected. And in most cases, the support for non-English languages is quite limited. I recommend to use the conversation booster only for English-speaking Assistants for the time being. Beside that, you will get good results for the *Rephrasing* booster with almost any model, whereas for the *Conversation* booster you will need one of the big boys like GPT 3.5 and above for decent results. The requirements in terms of language understanding is somewhat in between for the *Recognition* booster. You will have to invest some time experimenting with different models, but that is part of the the fun.
 
 ##### Managing conversation actions
 
-A special editor is provided to manage the conversation actions for a given Assistant. To open this editor, click on the small button with the "Pencil" icon on the right of the "Actions" drop down menu.
+A special editor is provided to manage the conversation actions for a given Assistant. A conversation action allows the LLM not only to react with a message to your request, but also to trigger some predefined functions. There are several builtin actions available for the different assistants, but you can also define your own ones.
+
+To open this editor, click on the small button with the "Pencil" icon on the right of the "Actions" drop down menu.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%207%20Speech%20Actions.JPG)
 
-You can enable or disable individual predefined actions using the checkbox on the left of the action name. And you can define your own actions with a click on the "+" button. But this requires a very deep understanding of the architecture of Simulator Controller and the Assistants as well as an excellent understanding of how LLMs call tools and functions. This is far beyond the scope of this documentation, but I try to give a brief introduction.
+You can enable or disable individual predefined actions using the checkbox on the left of the action name. And you can define your own actions with a click on the "+" button. But this requires a very detailed understanding of the architecture and inner workings of Simulator Controller and the Assistants as well as an excellent understanding of LLMs and how they call tools and functions. This is far beyond the scope of this documentation, but I try to give a brief introduction.
 
-1. When an LLM is activated, it is possible to provide a couple for function descriptions to the LLM. *OpenAI* has defined the quasi-standard for a function description as part of their API in JSON format.
+1. When an LLM is activated, it is possible to provide a list of function descriptions to the LLM. *OpenAI* has defined the quasi-standard for the function description in JSON format as part of their API:
 
-		{
-			"type": "function",
-			"function": {
-				"name": "get_current_temperature",
-				"description": "Get the current temperature for a specific location",
-				"parameters": {
-					"type": "object",
-					"properties": {
-						"location": {
-							"type": "string",
-							"description": "The city and state, e.g., San Francisco, CA"
-						},
-						"unit": {
-							"type": "string",
-							"enum": ["Celsius", "Fahrenheit"],
-							"description": "The temperature unit to use. Infer this from the user's location."
-						}
-					},
-					"required": ["location", "unit"]
-				}
-			}
-		}
+	   {
+		   "type": "function",
+		   "function": {
+			   "name": "get_current_temperature",
+			   "description": "Get the current temperature for a specific location",
+			   "parameters": {
+				   "type": "object",
+				   "properties": {
+					   "location": {
+						   "type": "string",
+						   "description": "The city and state, e.g., San Francisco, CA"
+					   },
+					   "unit": {
+						   "type": "string",
+						   "enum": ["Celsius", "Fahrenheit"],
+						   "description": "The temperature unit to use. Infer this from the user's location."
+					   }
+				   },
+				   "required": ["location", "unit"]
+			   }
+		   }
+	   }
 
-2. With the editor shown above you can create all parts of the function definitions you want to provide to the LLM using a simple user interface.
+   This format is used by many other GPT service providers as well. Every LLM, that *understands* this type of function description, will be able to trigger conversation actions, when used as a conversation booster. The editor for the conversation actions shown above is for the most part a graphical user interface for this type of function definitions. But it also let you define how to react to a *function call* by the LLM (see next item).
+   
+   Note: The description of a function and each of their parameters is very important, since these are used by the LLM to *understand* when and how to invoke the function. It may require several iterations and different formulations until the LLM reacts as desired. 
 
-3. When the LLM decides to call such a function, it returns a special response which indicates the function(s) to be called together with values for at least all required parameters. You can now decide what to do, when the logical function is called by the LLM. Five different types of actions are available:
+2. When the LLM decides to call such a function, it returns a special response which indicates the function(s) to be called together with values for at least all required parameters. You can now decide what to do, when the logical function is called by the LLM. Five different types of actions are available:
 
    | Action Type | Description |
    |-------------|-------------|
@@ -497,7 +501,7 @@ You can enable or disable individual predefined actions using the checkbox on th
    | Controller Method | A method of the single instance of the *SimulatorController* class is called in the process "Simulator Controller.exe". The arguments for the logical function are passed to the method in the order of their definition. |
    | Controller Function | A global function is called in the process "Simulator Controller.exe". The arguments for the logical function are passed to the method in the order of their definition. Good candidates are the controller action functions, which are provided by the different plugins. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) for a complete overview. |
 
-4. The most versatile *Action Type* is obviously "Assistant Rule", since it allows you to do almost anything, but it requires very good programming skills in the area of logical programming languages like Prolog and forward chaining production rule systems. You may take a look at the rule sets of the Race Assistants to learn the language. They can be found in the *Resources\Rules* folder in the program folder of Simulator Controller. Start with "Race Engineer.rules".
+3. The most versatile *Action Type* is obviously the "Assistant Rule", since it allows you to do almost anything, but it requires very good programming skills in the area of logical programming languages like Prolog and forward chaining production rule systems. Simulator Controller comes with a builtin hybrid rule engine, which has been created exclusivly with the requirements of intelligent agents in mind. The Race Assistants have been implemented using this rule engine, but other applications of Simulator Controller are using it as well. You may take a look at the rule sets of the Race Assistants to learn the language. They can be found in the *Resources\Rules* folder in the program folder of Simulator Controller. Start with "Race Engineer.rules".
 
    When defining your rules, you can use the following predicates to connect to the given Assistant or even the "Simulator Controller.exe" process:
    
@@ -520,6 +524,16 @@ You can enable or disable individual predefined actions using the checkbox on th
    - Function.Call(function, p1, p2, ...)
    
      Invokes the global *function* in the process "Simulator Controller.exe". with some arguments. Up to 6 arguments are supported.
+
+   You use this predicates in backward chaining rules directly. Example:
+   
+	   estimateTrackWetness() <= calculateTrackWetness(), Assistant.Speak("It will be too wet. I will come up with a new strategy."), Assistant.Call(planPitstop)
+	   
+   In forward chaining rules, the syntax is a bit different:
+   
+	   [?Track.Grip = Wet] => (Prove: Assistant.Speak("It will be too wet. I will come up with a new strategy.")), (Prove: Assistant.Call(planPitstop))
+
+As you can see, defining individual conversation actions is really an expert topic and therefore nothing for the casual user. If you want use this feature, I can offer a personal introduction and coaching as part of the Patreon membership.
 
 #### Tab *Plugins*
 

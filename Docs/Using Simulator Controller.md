@@ -160,7 +160,7 @@ If you have the team manager credentials for a Team Server, you can manage your 
 
 #### Managing common team settings
 
-In many cases all drivers in a given team want to share the same configuration. And in many cases, there is a member of the team, who took the role of the team manager. He will prepare races, configure the [Team Server](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server) and will have the deepest understanding of Simulator Controller in his team. This team manager can prepare a package for all his team mates which can be imported by every driver using a [special preset](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#presets--special-configurations) in "Simulator Setup". This package must be a folder, which can contain the following components:
+In many cases all drivers in a given team want to share the same configuration. And in many cases, there is a member of the team, who took the role of the team manager. He will prepare races, configure the [Team Server](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server) and will have the best understanding of Simulator Controller in his team. This team manager can prepare a package for all his team mates which can be imported by every driver using a [special preset](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#presets--special-configurations) in "Simulator Setup". This package must be a folder, which can contain the following components:
 
 1. *Startup.settings*
 

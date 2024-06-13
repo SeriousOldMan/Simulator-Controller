@@ -7,9 +7,9 @@
   
      Please note, that using *Actions* is not enabled by default, but must be explicitly activated in the configuration.
   6. Action definition files are customizeable in the [Documents]\Simulator Controller\Actions folder.
-  7. An editor has been implemented to enable or disable the predefined conversation actions and even define your own ones. But this will require a very deep knowledge of the inner workings of Simulator Controller and the Assistants. You have been warned. Please see the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#managing-conversation-actions) for more information.
+  7. An editor has been implemented to enable or disable the predefined conversation actions and even define your own ones. But this will require extensive knowledge of the inner workings of Simulator Controller and the Assistants and also a very good understanding how LLMs work. You have been warned. Please see the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#managing-conversation-actions) for more information.
 
-Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-576), when you have configured the Conversation Booster for the Assistants.
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-576), if you have configured the Conversation Booster for the Assistants.
 
 ## 5.7.5.0-release 06/07/24
   1. Minor bugfixes, as always

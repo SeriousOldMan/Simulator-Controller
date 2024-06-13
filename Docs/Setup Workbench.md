@@ -343,7 +343,7 @@ Now you can alter the set of settings handled by the "Setup Workbench". You can 
 		[?Speed.Corner.Fast.Correction != 0] =>
 			(Prove: changeSetting(Aero.Diffusor.Height, -1, ?Speed.Corner.Fast.Correction))
 
-Note: Beside given these definitions for a specific car, you can also use similar definitions when introducing a complete new simulator as described below. And, using the same approach, you can modify the characteristics handled by "Simulator Workbench" for a given car or for a complete simulator. But to do this, you must have a deep understanding of the rules set, which derives setup recommendations on behalf of reported handlind problems.
+Note: Beside given these definitions for a specific car, you can also use similar definitions when introducing a complete new simulator as described below. And, using the same approach, you can modify the characteristics handled by "Simulator Workbench" for a given car or for a complete simulator. But to do this, you must have an extensive understanding of the rules set, which derives setup recommendations on behalf of reported handlind problems.
 
 If you want the new setting to be available in the Setup Editor as well, you will have to define the mapping for the setting.
 

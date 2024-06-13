@@ -383,6 +383,8 @@ Said this, it is clear, that the interaction with the Assistants, although alrea
 
 Please take a look at the documentation for the [Driving Coach](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#installation) for a description of the different providers and LLMs which can be configured here.
 
+IMPORTANT: All this is optional. The Race Assistants will do their job also without being connected to an LLM. Therefore I recommend to use this feature not before everything else is being configured and fully functional.
+
 Several boosters are available at the moment:
 
   1. More variations in the speech output of the Assistants will be created, if *Rephrasing* is activated. This is done by using a GPT to rephrase one of the predefined phrases. The *Activation* setting defines the probability, with which the rephrasing happens (and thereby how many calls to the GPT service will be done) and using the *Creativity* setting, you can define, how *strong* the rephrasing will be. According to my tests, a value of 50% will create some intersting variation without altering the original sense of the message. Please note, that there are messages, especially the urgent alerts of the Spotter, which are time-critical. Those messages will never be send to the AI for rephrasing.
@@ -495,7 +497,7 @@ You can enable or disable individual predefined actions using the checkbox on th
    | Controller Method | A method of the single instance of the *SimulatorController* class is called in the process "Simulator Controller.exe". The arguments for the logical function are passed to the method in the order of their definition. |
    | Controller Function | A global function is called in the process "Simulator Controller.exe". The arguments for the logical function are passed to the method in the order of their definition. Good candidates are the controller action functions, which are provided by the different plugins. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) for a complete overview. |
 
-4. The most versatile *Action Type* is obviously "Assistant Rule", since it allows you to do almost anything, but it requires very good programming skills in the area of logical programming languages like Prolog and forward chaining production rule systems. You may take a look at the rule sets of the Race Engineer to learn the language.
+4. The most versatile *Action Type* is obviously "Assistant Rule", since it allows you to do almost anything, but it requires very good programming skills in the area of logical programming languages like Prolog and forward chaining production rule systems. You may take a look at the rule sets of the Race Assistants to learn the language. They can be found in the *Resources\Rules* folder in the program folder of Simulator Controller. Start with "Race Engineer.rules".
 
    When defining your rules, you can use the following predicates to connect to the given Assistant or even the "Simulator Controller.exe" process:
    

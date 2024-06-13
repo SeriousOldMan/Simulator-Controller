@@ -14,6 +14,7 @@
   - [Configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration)
     - [General](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-general)
     - [Voice Control](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control)
+	  - [Boosting with an LLM](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm)
     - [Plugins](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins)
     - [Applications](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-applications)
     - [Controller](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-controller)

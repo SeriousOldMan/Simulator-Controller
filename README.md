@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[5.7.6.0-dev](https://www.dropbox.com/scl/fi/g1utwdih2qffgtcru2wzi/Simulator-Controller-5.7.6.0-dev.zip?rlkey=x9a26uu63epdytvpav52p7qse&st=tvb6nbac&dl=1) (Early build for 5.7.6. Changes: Integrate predefined actions in an LLM conversation, Added action definition files in user home directory, Added an custom action editor to the Conversation Booster, Restructured Conversation Booster instructions, Fixed FasterThan information of the Spotter for multi class.)
+[5.7.6.0-beta](https://www.dropbox.com/scl/fi/kgbr572mnjls5fqq3xf3o/Simulator-Controller-5.7.6.0-beta.zip?rlkey=vtsqb7k98q8qcr2wesq7ztly1&st=59ydfkl3&dl=1) (Test build for 5.7.6. Changes: Integrate predefined actions in an LLM conversation, Added action definition files in user home directory, Added an custom action editor to the Conversation Booster, Restructured Conversation Booster instructions, Fixed FasterThan information of the Spotter for multi class.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-576) of this version and all the versions you might have skipped, before installing and using this version.
 

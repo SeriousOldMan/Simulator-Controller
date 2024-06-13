@@ -1555,7 +1555,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.SetFont("Norm", "Arial")
 		workbenchGui.SetFont("Italic", "Arial")
 
-		workbenchGui.Add("GroupBox", "x24 ys+34 w143 h181", translate("Electronics"))
+		workbenchGui.Add("GroupBox", "x24 ys+34 w143 h181 H:Grow(0.8)", translate("Electronics"))
 
 		workbenchGui.SetFont("Norm", "Arial")
 
@@ -1580,7 +1580,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.SetFont("Italic", "Arial")
 
-		workbenchGui.Add("GroupBox", "x178 ys+34 w174 h181", translate("Tyres"))
+		workbenchGui.Add("GroupBox", "x178 ys+34 w174 h181 H:Grow(0.8)", translate("Tyres"))
 
 		workbenchGui.SetFont("Norm", "Arial")
 
@@ -1623,11 +1623,11 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.SetFont("Italic", "Arial")
 
-		workbenchGui.Add("GroupBox", "x363 ys+34 w233 h181", translate("Pitstops"))
+		workbenchGui.Add("GroupBox", "x363 ys+34 w233 h181 H:Grow(0.8)", translate("Pitstops"))
 
 		workbenchGui.SetFont("Norm", "Arial")
 
-		this.iPitstopListView := workbenchGui.Add("ListView", "x" . x . " yp+21 w216 h148 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Lap", "Driver", "Fuel", "Tyres", "Map"], translate))
+		this.iPitstopListView := workbenchGui.Add("ListView", "x" . x . " yp+21 w216 h148 H:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Lap", "Driver", "Fuel", "Tyres", "Map"], translate))
 		this.iPitstopListView.OnEvent("Click", noSelect)
 		this.iPitstopListView.OnEvent("DoubleClick", noSelect)
 

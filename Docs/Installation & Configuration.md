@@ -490,6 +490,8 @@ You can enable or disable individual predefined actions using the checkbox on th
 
    This format is used by many other GPT service providers as well. Every LLM, that *understands* this type of function description, will be able to trigger conversation actions, when used as a conversation booster. The editor for the conversation actions shown above is for the most part a graphical user interface for this type of function definitions. But it also let you define how to react to a *function call* by the LLM (see next item).
    
+   Additionally to all the information required by the LLM function definition you can specify whether the corresponding action will be available during the learning phase of the Assistant and whether the Assistant will acknowledge your request like it is done with the builtin voice command. This should be enabled for all conversation actions you want to trigger by a corresponding question or command and should be disabled for all functions you expect the LLM to call automatically whenever needed.
+   
    Note: The description of a function and each of their parameters is very important, since these are used by the LLM to *understand* when and how to invoke the function. It may require several iterations and different formulations until the LLM reacts as desired. 
 
 2. When the LLM decides to call such a function, it returns a special response which indicates the function(s) to be called together with values for at least all required parameters. You can now decide what to do, when the logical function is called by the LLM. Five different types of actions are available:
@@ -716,7 +718,7 @@ For "GPT4All", no authentification is required, but you must enable the local AP
 
 Last, but not least, you can also use a local "LLM Runtime", which executes the LLM on your local PC. In this case, you have to supply a file path pointing to the model file in *GGUF* format.
 
-Please note, that "GPT4All" and "LLM Runtime" require a very powerful system and will also use a lot of resources on your GPU. So this will be no option in most cases (at least for the time being), especially when running it side by side to a running simulator.
+Please note, that "Ollama", "GPT4All" and "LLM Runtime" require a very powerful system and will also use a lot of resources on your GPU. So this will be no option in most cases (at least for the time being), especially when running it side by side to a running simulator.
 
 It is very important to choose the right LLM (aka large language model) for your coach. For "OpenAI", I recommend using "GPT 3.5 turbo". It is cheap (a typical conversation lasting around 30 minutes will cost not more than 2 cents), and it has very extensive knowledge about racing. Future extensions to the Driving Coach, especially telemetry data integration, might utilize the extended capabilities of "GPT 4", though. "GPT4All" provide a variety of different models from different sources. Therefore you will have to conduct some experiments, which model works best for you.
 
@@ -726,7 +728,7 @@ Creating these instructions is an art by itself and there are vasts amount of in
 
 A very important setting is the Conversation Memory. You can specify, how many recent conversations will be memorized, so that you can refer to topics mentioned in previous conversations. Please not, that a larger memory will make your conversations with Aiden more natural, but it will take a little bit longer to generate an answer and, depending on the provider, it may cost a little bit more.
 
-You can also specify how long the answers of the Driving Coach can get ("# MaxTokens" - as a rule of thumb divide this number by 4 and you will get the maximum number of words in English), and you can also specify, how *creative* the answers will be.
+You can also specify how long the answers of the Driving Coach can get ("# Tokens" - as a rule of thumb divide this number by 4 and you will get the maximum number of words in English), and you can also specify, how *creative* the answers will be.
 
 The "Confirmation" choice allows you to specify, whether the Assistant will give you a short notice, when it has recognized a question or a command before the actual answer is computed. This can be very helpful in cases, where the underlying model or the GPT service provider is very slow, so that you know, that you have been understood.
 

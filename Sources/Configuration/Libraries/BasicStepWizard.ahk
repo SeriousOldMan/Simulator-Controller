@@ -1032,6 +1032,7 @@ class BasicStepWizard extends StepWizard {
 				setMultiMapValue(configuration, "Conversation Booster", assistant . ".Conversation", setup.ConversationBooster["Conversation"])
 				setMultiMapValue(configuration, "Conversation Booster", assistant . ".ConversationMaxHistory", setup.ConversationBooster["ConversationMaxHistory"])
 				setMultiMapValue(configuration, "Conversation Booster", assistant . ".ConversationTemperature", setup.ConversationBooster["ConversationTemperature"])
+				setMultiMapValue(configuration, "Conversation Booster", assistant . ".ConversationActions", setup.ConversationBooster["ConversationActions"])
 			}
 
 			configuration := ConversationBoosterEditor(assistant, configuration).editBooster(window)
@@ -1059,7 +1060,8 @@ class BasicStepWizard extends StepWizard {
 										  , "Model", getMultiMapValue(configuration, "Conversation Booster", assistant . ".Model")
 										  , "Conversation", getMultiMapValue(configuration, "Conversation Booster", assistant . ".Conversation")
 										  , "ConversationMaxHistory", getMultiMapValue(configuration, "Conversation Booster", assistant . ".ConversationMaxHistory")
-										  , "ConversationTemperature", getMultiMapValue(configuration, "Conversation Booster", assistant . ".ConversationTemperature"))
+										  , "ConversationTemperature", getMultiMapValue(configuration, "Conversation Booster", assistant . ".ConversationTemperature")
+										  , "ConversationActions", getMultiMapValue(configuration, "Conversation Booster", assistant . ".ConversationActions"))
 
 				wizard.setModuleValue(assistant, "Conversation Booster", map2String("|||", "--->>>", conversationBooster))
 

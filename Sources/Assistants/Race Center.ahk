@@ -1573,7 +1573,7 @@ class RaceCenter extends ConfigurationItem {
 																			, centerGui["setupBasePressureFREdit"].Text
 																			, centerGui["setupBasePressureRLEdit"].Text
 																			, centerGui["setupBasePressureRREdit"].Text)
-														, centerGui["setupNotesEdit"].Text)
+														, centerGui["setupNotesEdit"].Value)
 				}
 
 				if (center.SelectedDetailReport = "Setups")

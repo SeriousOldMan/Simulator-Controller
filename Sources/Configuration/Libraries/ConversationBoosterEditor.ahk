@@ -913,7 +913,7 @@ class ActionsEditor {
 		editorGui.Add("DropDownList", "x110 yp w90 Y:Move(0.25) vactionConfirmationDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", (*) => this.updateState())
 
 		this.iCallableField := [editorGui.Add("Text", "x16 yp+28 w90 h23 +0x200 Y:Move(0.25)", translate("Call"))
-							  , editorGui.Add("Edit", "x110 yp w308 h23 Y:Move(0.25)")]
+							  , editorGui.Add("Edit", "x110 yp w308 h46 W:Grow(0.34) Y:Move(0.25)")]
 
 		editorGui.SetFont("Norm", "Courier New")
 
@@ -1263,7 +1263,7 @@ class ActionsEditor {
 			if (action.Type = "Assistant.Rule")
 				action.Script := this.ScriptEditor.Text
 			else
-				action.Definition := this.CallableField[2].Text
+				action.Definition := this.CallableField[2].Value
 
 			this.ActionsListView.Modify(inList(this.Actions, action), "", action.Name, action.Active ? translate("x") : "", action.Description)
 		}

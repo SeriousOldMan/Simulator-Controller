@@ -405,7 +405,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 
 		updateNotes(*) {
-			editor.updateNotes(editor.Control["notesEdit"].Text)
+			editor.updateNotes(editor.Control["notesEdit"].Value)
 		}
 
 		navSetting(listView, line, selected) {

@@ -1308,7 +1308,7 @@ class PracticeCenter extends ConfigurationItem {
 			local row := center.RunsListView.GetNext()
 
 			if row
-				this.Runs[center.RunsListView.GetText(row, 1)].Notes := centerGui["runNotesEdit"].Text
+				this.Runs[center.RunsListView.GetText(row, 1)].Notes := centerGui["runNotesEdit"].Value
 		}
 
 		centerGui := PracticeCenter.PracticeCenterWindow(this)

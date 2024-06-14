@@ -3690,37 +3690,54 @@ getTime(*) {
 	return A_Now
 }
 
-callAssistant(choicePoint, method, arguments*) {
+callAssistant(context, method, arguments*) {
 	try {
-		choicePoint.KnowledgeBase.RaceAssistant.%method%(retrieveArguments(choicePoint, arguments)*)
+		context.KnowledgeBase.RaceAssistant.%method%(normalizeArguments(arguments)*)
 	}
 	catch Any as exception {
 		logError(exception, true)
 	}
+
+	return true
 }
 
-callFunction(choicePoint, function, arguments*) {
-	try {
-		remoteHandler.customAction("Function", function, retrieveArguments(choicePoint, arguments, true)*)
-	}
-	catch Any as exception {
-		logError(exception, true)
-	}
-}
+Assistant_Call := callAssistant
 
-callController(choicePoint, method, arguments*) {
-	local remoteHandler := choicePoint.KnowledgeBase.RaceAssistant.RemoteHandler
+callFunction(context, function, arguments*) {
+	local remoteHandler := context.KnowledgeBase.RaceAssistant.RemoteHandler
 
 	if remoteHandler
-		remoteHandler.customAction("Method", method, retrieveArguments(choicePoint, arguments, true)*)
+		remoteHandler.customAction("Function", function, normalizeArguments(arguments, true)*)
+
+	return true
 }
 
-askAssistant(choicePoint, question) {
-	choicePoint.KnowledgeBase.RaceAssistant.handleVoiceText("TEXT", question)
+Function_Call := callFunction
+
+callController(context, method, arguments*) {
+	local remoteHandler := context.KnowledgeBase.RaceAssistant.RemoteHandler
+
+	if remoteHandler
+		remoteHandler.customAction("Method", method, normalizeArguments(arguments, true)*)
+
+	return true
 }
 
-speakAssistant(choicePoint, message) {
-	local assistant := choicePoint.KnowledgeBase.RaceAssistant
+Controller_Call := callController
+
+askAssistant(context, question) {
+	local assistant := context.KnowledgeBase.RaceAssistant
+
+	if assistant.Listener
+		assistant.VoiceManager.recognize(question)
+
+	return true
+}
+
+Assistant_Ask := askAssistant
+
+speakAssistant(context, message) {
+	local assistant := context.KnowledgeBase.RaceAssistant
 	local speaker, ignore, part
 
 	if assistant.Speaker[true] {
@@ -3734,7 +3751,11 @@ speakAssistant(choicePoint, message) {
 			for ignore, part in string2Values(". ", message)
 				speaker.speak(part . ".", false, false, {Rephrase: false, Click: (A_Index = 1)})
 	}
+
+	return true
 }
+
+Assistant_Speak := speakAssistant
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -3758,18 +3779,23 @@ matchFragment(words, fragment) {
 	return (score / fragmentWords.Length)
 }
 
-retrieveArguments(choicePoint, arguments, remote := false) {
+normalizeArguments(arguments, remote := false) {
 	local result := []
-	local resultSet := choicePoint.ResultSet
+	local ignore, argument
 
-	for ignore, argument in arguments {
-		argument := argument.getValue(resultSet, argument)
-
-		if (isInstance(argument, Variable) || argument.isUnbound(resultSet))
+	for ignore, argument in arguments
+		if (argument = kNotInitialized)
 			result.Push(!remote ? unset : kUndefined)
 		else
-			result.Push(argument.toString(resultSet))
-	}
+			try {
+				if ((InStr(argument, "?") = 1) || (InStr(argument, "!") = 1))
+					result.Push(!remote ? unset : kUndefined)
+				else
+					result.Push(argument)
+			}
+			catch Any {
+				result.Push(argument)
+			}
 
 	return result
 }

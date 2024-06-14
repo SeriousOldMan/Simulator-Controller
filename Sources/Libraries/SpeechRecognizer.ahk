@@ -739,6 +739,10 @@ class SpeechRecognizer {
 		return GrammarCompiler(this).compileGrammar(text)
 	}
 
+	recognize(text) {
+		this._onTextCallback(text)
+	}
+
 	allMatches(string, minRating, maxRating, strings*) {
 		local ratings := []
 		local index, value, rating

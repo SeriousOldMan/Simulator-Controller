@@ -1413,6 +1413,13 @@ class VoiceManager extends ConfigurationItem {
 			return false
 	}
 
+	recognize(text) {
+		if this.VoiceServer
+			messageSend(kFileMessage, "Voice", "recognize:" . values2String(";", this.VoiceManager.Name, text), this.VoiceServer)
+		else
+			this.iSpeechRecognizer.recognize(text)
+	}
+
 	phraseRecognized(grammar, words, remote := false) {
 		if (this.Debug[kDebugRecognitions] && !remote)
 			showMessage("Command phrase recognized: " . grammar . " => " . values2String(A_Space, words*))

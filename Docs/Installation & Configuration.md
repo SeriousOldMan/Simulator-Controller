@@ -533,7 +533,7 @@ You can enable or disable individual predefined actions using the checkbox on th
 	   
    In forward chaining rules, the syntax is a bit different:
    
-	   [?Track.Grip = Wet] => (Prove: Assistant.Speak("It will be too wet. I will come up with a new strategy.")), (Prove: Assistant.Call(planPitstop))
+	   [?Track.Grip = Wet] => (Call: Assistant.Speak("It will be too wet. I will come up with a new strategy.")), (Call: Assistant.Call(planPitstop))
 
 As you can see, defining individual conversation actions is really an expert topic and therefore nothing for the casual user. If you want use this feature, I can offer a personal introduction and coaching as part of the Patreon membership.
 

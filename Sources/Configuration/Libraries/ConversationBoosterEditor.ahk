@@ -1227,12 +1227,18 @@ class ActionsEditor {
 			if !this.saveParameter(this.SelectedParameter)
 				return false
 
-		if (Trim(name) = "")
+		if (Trim(name) = "") {
+			errorMessage .= ("`n" . translate("Error: ") . "Name cannot be empty...")
+
 			valid := false
+		}
 
 		for ignore, other in this.Actions
-			if ((other != action) && (name = other.Name))
+			if ((other != action) && (name = other.Name)) {
+				errorMessage .= ("`n" . translate("Error: ") . "Name must be unique...")
+
 				valid := false
+			}
 
 		type := ["Assistant.Method", "Assistant.Rule", "Controller.Method", "Controller.Function"][this.Control["actionTypeDropDown"].Value]
 
@@ -1241,7 +1247,7 @@ class ActionsEditor {
 				RuleCompiler().compileRules(this.ScriptEditor.Text, &ignore := false, &ignore := false)
 			}
 			catch Any as exception {
-				errorMessage := ("`n`n" . translate("Error: ") . (isObject(exception) ? exception.Message : exception))
+				errorMessage .= ("`n" . translate("Error: ") . (isObject(exception) ? exception.Message : exception))
 
 				valid := false
 			}
@@ -1262,6 +1268,9 @@ class ActionsEditor {
 			this.ActionsListView.Modify(inList(this.Actions, action), "", action.Name, action.Active ? translate("x") : "", action.Description)
 		}
 		else {
+			if (StrLen(errorMessage) > 0)
+				errorMessage := ("`n" . errorMessage)
+
 			OnMessage(0x44, translateOkButton)
 			withBlockedWindows(MsgBox, translate("Invalid values detected - please correct...") . errorMessage, translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
@@ -1319,14 +1328,21 @@ class ActionsEditor {
 	saveParameter(parameter) {
 		local valid := true
 		local name := this.Control["parameterNameEdit"].Text
+		local errorMessage := ""
 		local ignore, other
 
-		if (Trim(name) = "")
+		if (Trim(name) = "") {
+			errorMessage .= ("`n" . translate("Error: ") . "Name cannot be empty...")
+
 			valid := false
+		}
 
 		for ignore, other in this.SelectedAction.Parameters
-			if ((other != parameter) && (name = other.Name))
+			if ((other != parameter) && (name = other.Name)) {
+				errorMessage .= ("`n" . translate("Error: ") . "Name must be unique...")
+
 				valid := false
+			}
 
 		if valid {
 			parameter.Name := name
@@ -1337,8 +1353,11 @@ class ActionsEditor {
 			this.ParametersListView.Modify(inList(this.SelectedAction.Parameters, parameter), "", parameter.Name, parameter.Description)
 		}
 		else {
+			if (StrLen(errorMessage) > 0)
+				errorMessage := ("`n" . errorMessage)
+
 			OnMessage(0x44, translateOkButton)
-			withBlockedWindows(MsgBox, translate("Invalid values detected - please correct..."), translate("Error"), 262160)
+			withBlockedWindows(MsgBox, translate("Invalid values detected - please correct...") . errorMessage, translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
 		}
 

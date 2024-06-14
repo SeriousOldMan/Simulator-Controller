@@ -1198,12 +1198,35 @@ class RaceAssistant extends ConfigurationItem {
 		local activationIndex := 1
 		local ignore, action, definition, parameters, parameter, enumeration, handler, enoughData, confirm, required
 
+		normalizeCall(&function, &arguments) {
+			local index, argument
+
+			if InStr(function, "(") {
+				function := StrSplit(Trim(function), "(", " `t", 2)
+
+				arguments := concatenate(string2Values(",", SubStr(function[2], 1, StrLen(function[2]) - 1)), arguments)
+
+				for index, argument in arguments {
+					if (argument = kTrue)
+						arguments[index] := true
+					else if (argument = kFalse)
+						arguments[index] := false
+					else if ((InStr(argument, "`"") = 1) && (StrLen(argument) > 1) && (SubStr(argument, StrLen(argument)) = "`""))
+						arguments[index] := SubStr(argument, 2, StrLen(argument) - 2)
+				}
+
+				function := function[1]
+			}
+		}
+
 		callMethod(method, enoughData, confirm, arguments*) {
 			if !this.confirmCommand(enoughData, confirm)
 				return
 
+			normalizeCall(&method, &arguments)
+
 			if isDebug()
-				showMessage("LLM -> this." . method . "(...)")
+				showMessage("LLM -> this." . method . "(" .  values2String(", ", arguments*) . ")")
 
 			this.%method%(arguments*)
 		}
@@ -1212,8 +1235,10 @@ class RaceAssistant extends ConfigurationItem {
 			if !this.confirmCommand(enoughData, confirm)
 				return
 
+			normalizeCall(&function, &arguments)
+
 			if isDebug()
-				showMessage("LLM -> " . function . "(...)")
+				showMessage("LLM -> " . function . "(" .  values2String(", ", arguments*) . ")")
 
 			%function%(arguments*)
 		}
@@ -1282,8 +1307,10 @@ class RaceAssistant extends ConfigurationItem {
 				if !this.confirmCommand(enoughData, confirm)
 					return
 
+				normalizeCall(&method, &arguments)
+
 				if isDebug()
-					showMessage("LLM -> Controller." . method . "(...)")
+					showMessage("LLM -> Controller." . method . "(" .  values2String(", ", arguments*) . ")")
 
 				this.RemoteHandler.customAction("Method", method, arguments*)
 			}
@@ -1294,8 +1321,10 @@ class RaceAssistant extends ConfigurationItem {
 				if !this.confirmCommand(enoughData, confirm)
 					return
 
+				normalizeCall(&function, &arguments)
+
 				if isDebug()
-					showMessage("LLM -> Controller:" . function . "(...)")
+					showMessage("LLM -> Controller:" . function . "(" .  values2String(", ", arguments*) . ")")
 
 				this.RemoteHandler.customAction("Function", function, arguments*)
 			}

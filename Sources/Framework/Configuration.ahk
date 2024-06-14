@@ -647,6 +647,8 @@ class Function extends ConfigurationItem {
 						arguments[index] := true
 					else if (argument = kFalse)
 						arguments[index] := false
+					else if ((InStr(argument, "`"") = 1) && (StrLen(argument) > 1) && (SubStr(argument, StrLen(argument)) = "`""))
+						arguments[index] := SubStr(argument, 2, StrLen(argument) - 2)
 				}
 
 				actions.Push(Array(action, arguments))

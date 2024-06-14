@@ -3,7 +3,7 @@ Version=5.7.7.0-dev
 Target=5.7.7.0-release
 Date=06/14/2024
 Download=
-Changes=Translation fixes for Spanish and French, Optimized error messages in conversation actions editor
+Changes=Translation fixes for Spanish and French, Optimized error messages in conversation actions editor, Allow bound arguments in conversation actions
 Components=Media->5.6.1,Configuration->5.7.5,Utilities->5.4.8
 [Release]
 Version=5.7.6.0-release

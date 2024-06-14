@@ -271,7 +271,7 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 		widget39 := editorGui.Add("Text", "x" . (x1 + 65) . " yp w100 h23 +0x200", translate("%"))
 
 		widget40 := editorGui.Add("Text", "x" . x0 . " yp+24 w105 h23 +0x200", translate("Actions"))
-		widget41 := editorGui.Add("DropDownList", "x" . x1 . " yp w60 vviConversationActionsDropdown", collect(["No", "Yes"], translate))
+		widget41 := editorGui.Add("DropDownList", "x" . x1 . " yp w60 vviConversationActionsDropdown", collect(["Yes", "No"], translate))
 		widget41.OnEvent("Change", (*) => this.updateState())
 		widget42 := editorGui.Add("Button", "x" . (x1 + 61) . " yp-1 w23 h23 X:Move Center +0x200 vviConversationEditActionsButton")
 		widget42.OnEvent("Click", editActions)
@@ -473,12 +473,13 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 		if (this.Control["viProviderDropDown"].Value = 1) {
 			this.iCurrentProvider := false
 
-			for ignore, setting in ["ServiceURL", "ServiceKey", "MaxTokens", "SpeakerProbability", "SpeakerTemperature", "ListenerTemperature", "ConversationMaxHistory", "ConversationTemperature", "ConversationActions"]
+			for ignore, setting in ["ServiceURL", "ServiceKey", "MaxTokens", "SpeakerProbability", "SpeakerTemperature", "ListenerTemperature", "ConversationMaxHistory", "ConversationTemperature"]
 				this.Control["vi" . setting . "Edit"].Text := ""
 
 			for ignore, setting in ["Speaker", "Listener", "Conversation"]
 				this.Control["vi" . setting . "Check"].Value := 0
 
+			this.Control["viConversationActionsDropDown"].Choose(0)
 			this.Control["viListenerModeDropDown"].Choose(0)
 		}
 		else {
@@ -507,7 +508,7 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 
 			this.Control["viConversationMaxHistoryEdit"].Text := configuration["ConversationMaxHistory"]
 			this.Control["viConversationTemperatureEdit"].Text := (isNumber(configuration["ConversationTemperature"]) ? Round(configuration["ConversationTemperature"] * 100) : "")
-			this.Control["viConversationActionsDropDown"].Choose(1 + (configuration["ConversationActions"] != false))
+			this.Control["viConversationActionsDropDown"].Choose(1 + (configuration["ConversationActions"] = false))
 		}
 
 		if this.iCurrentProvider
@@ -557,7 +558,7 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 				providerConfiguration["Conversation"] := true
 				providerConfiguration["ConversationMaxHistory"] := this.Control["viConversationMaxHistoryEdit"].Text
 				providerConfiguration["ConversationTemperature"] := Round(this.Control["viConversationTemperatureEdit"].Text / 100, 2)
-				providerConfiguration["ConversationActions"] := (this.Control["viConversationActionsDropDown"].Value = 2)
+				providerConfiguration["ConversationActions"] := (this.Control["viConversationActionsDropDown"].Value = 1)
 			}
 			else {
 				providerConfiguration["Conversation"] := false
@@ -704,10 +705,10 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 				this.Control["viConversationTemperatureEdit"].Text := 50
 
 			if (this.Control["viConversationActionsDropDown"].Value = 0)
-				this.Control["viConversationActionsDropDown"].Choose(1)
+				this.Control["viConversationActionsDropDown"].Choose(2)
 
 			this.Control["viConversationInstructionsButton"].Enabled := true
-			this.Control["viConversationEditActionsButton"].Enabled := (this.Control["viConversationActionsDropDown"].Value = 2)
+			this.Control["viConversationEditActionsButton"].Enabled := (this.Control["viConversationActionsDropDown"].Value = 1)
 		}
 	}
 

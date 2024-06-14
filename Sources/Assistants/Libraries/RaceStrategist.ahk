@@ -917,7 +917,7 @@ class RaceStrategist extends GridRaceAssistant {
 			return super.getClass(car, data, categories)
 		else {
 			if !strategistCategories
-				switch getMultiMapValue(this.Settings, "Assistant.Strategist", "CarCategories", "Classes") {
+				switch getMultiMapValue(this.Settings, "Assistant.Strategist", "CarCategories", "Classes"), false {
 					case "All":
 						strategistCategories := ["Class", "Cup"]
 					case "Classes":
@@ -1680,7 +1680,7 @@ class RaceStrategist extends GridRaceAssistant {
 		if this.RemoteHandler {
 			this.setContinuation(RaceStrategist.RaceReviewContinuation(this, ObjBindMethod(this, "finishSession", shutdown, false)))
 
-			switch getMultiMapValue(this.Settings, "Assistant.Strategist", "CarCategories", "Classes") {
+			switch getMultiMapValue(this.Settings, "Assistant.Strategist", "CarCategories", "Classes"), false {
 				case "All":
 					categories := ["Class", "Cup"]
 				case "Classes":

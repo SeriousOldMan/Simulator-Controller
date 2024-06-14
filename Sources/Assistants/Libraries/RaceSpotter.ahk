@@ -1104,7 +1104,7 @@ class RaceSpotter extends GridRaceAssistant {
 			return super.getClass(car, data, categories)
 		else {
 			if !spotterCategories
-				switch getMultiMapValue(this.Settings, "Assistant.Spotter", "CarCategories", "Classes") {
+				switch getMultiMapValue(this.Settings, "Assistant.Spotter", "CarCategories", "Classes"), false {
 					case "All":
 						spotterCategories := ["Class", "Cup"]
 					case "Classes":

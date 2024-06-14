@@ -25,6 +25,8 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\..\Libraries\SpeechSynthesizer.ahk"
+#Include "..\..\Libraries\LLMConnector.ahk"
+#Include "..\..\Libraries\JSON.ahk"
 #Include "ConfigurationEditor.ahk"
 
 
@@ -923,7 +925,7 @@ class ActionsEditor {
 
 		editorGui.SetFont("Norm", "Arial")
 
-		editorGui.Add("Button", "x350 yp+10 w80 h23 Default X:Move(0.5) Y:Move", translate("Ok")).OnEvent("Click", (*) => this.iResult := kOk)
+		editorGui.Add("Button", "x350 yp+10 w80 h23 Default X:Move(0.5) Y:Move", translate("Ok")).OnEvent("Click", (*) => GetKeyState("Ctrl") ? this.showActions() : this.iResult := kOk)
 		editorGui.Add("Button", "x436 yp w80 h23 X:Move(0.5) Y:Move", translate("&Cancel")).OnEvent("Click", (*) => this.iResult := kCancel)
 
 		this.iParametersListView := editorGui.Add("ListView", "x430 ys w418 h96 X:Move(0.34) W:Grow(0.66) Y:Move(0.25) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Parameter", "Description"], translate))
@@ -1122,7 +1124,7 @@ class ActionsEditor {
 		if (force || (this.SelectedParameter != parameter)) {
 			if (save && this.SelectedParameter)
 				if !this.saveParameter(this.SelectedParameter) {
-					this.ParametersListView.Modify(inList(this.SelectedAction.Paramaters, this.SelectedParameter), "Select Vis")
+					this.ParametersListView.Modify(inList(this.SelectedAction.Parameters, this.SelectedParameter), "Select Vis")
 
 					return
 				}
@@ -1218,6 +1220,7 @@ class ActionsEditor {
 	saveAction(action) {
 		local valid := true
 		local name := this.Control["actionNameEdit"].Text
+		local errorMessage := ""
 		local ignore, other, type
 
 		if this.SelectedParameter
@@ -1237,7 +1240,9 @@ class ActionsEditor {
 			try {
 				RuleCompiler().compileRules(this.ScriptEditor.Text, &ignore := false, &ignore := false)
 			}
-			catch Any {
+			catch Any as exception {
+				errorMessage := ("`n`n" . translate("Error: ") . (isObject(exception) ? exception.Message : exception))
+
 				valid := false
 			}
 
@@ -1258,7 +1263,7 @@ class ActionsEditor {
 		}
 		else {
 			OnMessage(0x44, translateOkButton)
-			withBlockedWindows(MsgBox, translate("Invalid values detected - please correct..."), translate("Error"), 262160)
+			withBlockedWindows(MsgBox, translate("Invalid values detected - please correct...") . errorMessage, translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
 		}
 
@@ -1340,6 +1345,37 @@ class ActionsEditor {
 		return valid
 	}
 
+	showActions() {
+		local actions := []
+		local ignore, action, index, parameter, parameters
+
+		if this.SelectedAction
+			if !this.saveAction(this.SelectedAction) {
+				this.ActionsListView.Modify(inList(this.Actions, this.SelectedAction), "Select Vis")
+
+				return false
+			}
+
+		for ignore, action in this.Actions {
+			if action.Active {
+				parameters := []
+
+				for ignore, parameter in action.Parameters
+					parameters.Push(LLMTool.Function.Parameter(parameter.Name, parameter.Type
+															 , values2String(",", parameter.Enumeration*)
+															 , parameter.Required, parameter.Description))
+
+				actions.Push(LLMTool.Function(action.Name, action.Description, parameters))
+			}
+		}
+
+		deleteFile(kTempDirectory . "LLM Actions.json")
+
+		FileAppend(JSON.print(collect(actions, (action) => action.Descriptor), "`t"), kTempDirectory . "LLM Actions.json")
+
+		Run("notepad.exe `"" . kTempDirectory . "LLM Actions.json`"")
+	}
+
 	loadActions() {
 		local configuration := readMultiMap(kResourcesDirectory . "Actions\" . this.Assistant . ".actions")
 		local actions := []
@@ -1389,7 +1425,7 @@ class ActionsEditor {
 			this.ActionsListView.ModifyCol(A_Index, "AutoHdr")
 	}
 
-	saveActions() {
+	saveActions(save := true) {
 		local active := []
 		local configuration, ignore, action, index, parameter
 
@@ -1407,7 +1443,7 @@ class ActionsEditor {
 				active.Push(action.Name)
 
 			if !action.Builtin {
-				if (action.Type = "Assistant.Rule") {
+				if (save && (action.Type = "Assistant.Rule")) {
 					action.Definition := (this.Assistant . "." . action.Name . ".rules")
 
 					deleteFile(kUserHomeDirectory . "Actions\" . action.Definition)
@@ -1429,9 +1465,10 @@ class ActionsEditor {
 
 		setMultiMapValue(configuration, "Actions", "Active", values2String(",", active*))
 
-		writeMultiMap(kUserHomeDirectory . "Actions\" . this.Assistant . ".actions", configuration)
+		if save
+			writeMultiMap(kUserHomeDirectory . "Actions\" . this.Assistant . ".actions", configuration)
 
-		return true
+		return configuration
 	}
 }
 

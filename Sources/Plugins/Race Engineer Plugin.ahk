@@ -539,56 +539,59 @@ class RaceEngineerPlugin extends RaceAssistantPlugin {
 				loop teamServer.getCurrentLap(session, 1)
 					try {
 						stint := teamServer.getLapStint(A_Index, session, 1)
-						newStint := (stint != lastStint)
 
-						if newStint {
-							driverID := teamServer.getStintValue(stint, "ID", session, 1)
+						if (stint && (stint != "")) {
+							newStint := (stint != lastStint)
 
-							if !driverID
-								continue
+							if newStint {
+								driverID := teamServer.getStintValue(stint, "ID", session, 1)
 
-							lastStint := stint
-						}
-
-						lapPressures := teamServer.getLapValue(A_Index, this.Plugin . " Pressures", session, 1)
-
-						if (!lapPressures || (lapPressures == ""))
-							continue
-
-						lapPressures := string2Values(";", lapPressures)
-
-						if (newStint && driverID) {
-							driverName := teamServer.getStintDriverName(stint)
-
-							if driverName
-								tyresDB.registerDriver(lapPressures[1], driverID, driverName)
-						}
-
-						if first {
-							if !tyresDB.lock(lapPressures[1], lapPressures[2], lapPressures[3], false) {
-								Sleep(200)
-
-								if (tries-- <= 0)
-									return
-								else
+								if !driverID
 									continue
+
+								lastStint := stint
 							}
 
-							first := false
-						}
+							lapPressures := teamServer.getLapValue(A_Index, this.Plugin . " Pressures", session, 1)
 
-						coldPressures := string2Values(",", lapPressures[9])
-						hotPressures := string2Values(",", lapPressures[10])
+							if (!lapPressures || (lapPressures == ""))
+								continue
 
-						if (isNumber(coldPressures[1]) && isNumber(hotPressures[1])) {
-							pressureLosses := string2Values(",", lapPressures[11])
+							lapPressures := string2Values(";", lapPressures)
 
-							if isNumber(pressureLosses[1])
-								loop 4
-									coldPressures[A_Index] -= pressureLosses[A_Index]
+							if (newStint && driverID) {
+								driverName := teamServer.getStintDriverName(stint)
 
-							tyresDB.updatePressures(lapPressures[1], lapPressures[2], lapPressures[3], lapPressures[4], lapPressures[5], lapPressures[6]
-												  , lapPressures[7], lapPressures[8], coldPressures, hotPressures, false, driverID)
+								if driverName
+									tyresDB.registerDriver(lapPressures[1], driverID, driverName)
+							}
+
+							if first {
+								if !tyresDB.lock(lapPressures[1], lapPressures[2], lapPressures[3], false) {
+									Sleep(200)
+
+									if (tries-- <= 0)
+										return
+									else
+										continue
+								}
+
+								first := false
+							}
+
+							coldPressures := string2Values(",", lapPressures[9])
+							hotPressures := string2Values(",", lapPressures[10])
+
+							if (isNumber(coldPressures[1]) && isNumber(hotPressures[1])) {
+								pressureLosses := string2Values(",", lapPressures[11])
+
+								if isNumber(pressureLosses[1])
+									loop 4
+										coldPressures[A_Index] -= pressureLosses[A_Index]
+
+								tyresDB.updatePressures(lapPressures[1], lapPressures[2], lapPressures[3], lapPressures[4], lapPressures[5], lapPressures[6]
+													  , lapPressures[7], lapPressures[8], coldPressures, hotPressures, false, driverID)
+							}
 						}
 					}
 					catch Any as exception {

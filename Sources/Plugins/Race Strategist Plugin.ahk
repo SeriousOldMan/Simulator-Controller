@@ -382,61 +382,64 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 
 			loop teamServer.getCurrentLap(session, 1) {
 				try {
-					stint := teamServer.getLapStint(A_Index, session)
-					newStint := (stint != lastStint)
+					stint := teamServer.getLapStint(A_Index, session, 1)
 
-					if newStint {
-						driverID := teamServer.getStintValue(stint, "ID", session, 1)
+					if (stint && (stint != "")) {
+						newStint := (stint != lastStint)
 
-						if !driverID
+						if newStint {
+							driverID := teamServer.getStintValue(stint, "ID", session, 1)
+
+							if !driverID
+								continue
+
+							lastStint := stint
+						}
+
+						telemetryData := teamServer.getLapValue(A_Index, this.Plugin . " Telemetry", session, 1)
+
+						if (!telemetryData || (telemetryData == ""))
 							continue
 
-						lastStint := stint
-					}
+						telemetryData := string2Values(";", telemetryData)
 
-					telemetryData := teamServer.getLapValue(A_Index, this.Plugin . " Telemetry", session, 1)
+						if !telemetryDB
+							telemetryDB := TelemetryDatabase(telemetryData[1], telemetryData[2], telemetryData[3])
 
-					if (!telemetryData || (telemetryData == ""))
-						continue
+						if (newStint && driverID) {
+							driverName := teamServer.getStintDriverName(stint)
 
-					telemetryData := string2Values(";", telemetryData)
-
-					if !telemetryDB
-						telemetryDB := TelemetryDatabase(telemetryData[1], telemetryData[2], telemetryData[3])
-
-					if (newStint && driverID) {
-						driverName := teamServer.getStintDriverName(stint)
-
-						if driverName
-							telemetryDB.registerDriver(telemetryData[1], driverID, driverName)
-					}
-
-					pitstop := telemetryData[10]
-
-					if ((runningLap > 2) && pitstop)
-						runningLap := 0
-
-					runningLap += 1
-
-					if (!pitstop && (telemetryData[21] = "Valid")) {
-						pressures := string2Values(",", telemetryData[16])
-						temperatures := string2Values(",", telemetryData[17])
-						wear := string2Values(",", telemetryData[18])
-
-						try {
-							telemetryDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15]
-														 , telemetryData[11], telemetryData[12], telemetryData[13], telemetryData[7], telemetryData[8]
-														 , telemetryData[9], driverID, telemetryData.Has(19) ? telemetryData[19] : false)
-
-							telemetryDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15], runningLap
-												   , pressures[1], pressures[2], pressures[4], pressures[4]
-												   , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
-												   , wear[1], wear[2], wear[3], wear[4]
-												   , telemetryData[7], telemetryData[8], telemetryData[9], driverID
-												   , telemetryData.Has(20) ? telemetryData[20] : false)
+							if driverName
+								telemetryDB.registerDriver(telemetryData[1], driverID, driverName)
 						}
-						catch Any as exception {
-							logError(exception)
+
+						pitstop := telemetryData[10]
+
+						if ((runningLap > 2) && pitstop)
+							runningLap := 0
+
+						runningLap += 1
+
+						if (!pitstop && (telemetryData[21] = "Valid")) {
+							pressures := string2Values(",", telemetryData[16])
+							temperatures := string2Values(",", telemetryData[17])
+							wear := string2Values(",", telemetryData[18])
+
+							try {
+								telemetryDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15]
+															 , telemetryData[11], telemetryData[12], telemetryData[13], telemetryData[7], telemetryData[8]
+															 , telemetryData[9], driverID, telemetryData.Has(19) ? telemetryData[19] : false)
+
+								telemetryDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15], runningLap
+													   , pressures[1], pressures[2], pressures[4], pressures[4]
+													   , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
+													   , wear[1], wear[2], wear[3], wear[4]
+													   , telemetryData[7], telemetryData[8], telemetryData[9], driverID
+													   , telemetryData.Has(20) ? telemetryData[20] : false)
+							}
+							catch Any as exception {
+								logError(exception)
+							}
 						}
 					}
 				}

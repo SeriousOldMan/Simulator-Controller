@@ -191,9 +191,15 @@ class TeamServerPlugin extends ControllerPlugin {
 		}
 	}
 
-	Connected {
+	Connected[logical := false] {
 		Get {
-			return (this.Connection != false)
+			return ((this.Connection != false) && (logical || !this.Stalled))
+		}
+	}
+
+	Stalled {
+		Get {
+			return (this.State.Has("Stalled") ? this.State["Stalled"] : false)
 		}
 	}
 
@@ -214,12 +220,6 @@ class TeamServerPlugin extends ControllerPlugin {
 
 		Set {
 			return (isSet(key) ? (this.iState[key] := value) : (this.iState := value))
-		}
-	}
-
-	Stalled {
-		Get {
-			return (this.State.Has("Stalled") ? this.State["Stalled"] : false)
 		}
 	}
 
@@ -491,7 +491,7 @@ class TeamServerPlugin extends ControllerPlugin {
 		if this.Active {
 			if this.TeamServerEnabled {
 				if this.Connected {
-					if (this.Stalled || this.LastMessage) {
+					if this.LastMessage {
 						setMultiMapValue(configuration, this.Plugin, "State", "Critical")
 
 						setMultiMapValue(configuration, this.Plugin, "Information", translate("Message: ") . this.LastMessage)
@@ -649,7 +649,7 @@ class TeamServerPlugin extends ControllerPlugin {
 	tryConnect() {
 		local settings, serverURL, serverToken, teamIdentifier, driverIdentifier, sessionIdentifier
 
-		if !this.Connected {
+		if !this.Connected[true] {
 			settings := readMultiMap(getFileName("Race.settings", kUserConfigDirectory))
 
 			serverURL := getMultiMapValue(settings, "Team Settings", "Server.URL", "")
@@ -687,7 +687,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 		this.keepAlive()
 
-		if this.Connected {
+		if this.Connected[true] {
 			if isLogLevel(kLogInfo)
 				logMessage(kLogInfo, translate("Connected to the Team Server (URL: ") . serverURL . translate(", Token: ") . serverToken
 								   . translate(", Team: ") . team . translate(", Driver: ") . driver . translate(", Session: ") . session . translate(")"))
@@ -701,7 +701,7 @@ class TeamServerPlugin extends ControllerPlugin {
 			A_IconTip := (string2Values(".", A_ScriptName)[1] . translate(" (Team: ") . this.Team[true] . translate(")"))
 		}
 
-		return (this.Connected && this.Team && this.Driver && this.Session)
+		return (this.Connected[true] && this.Team && this.Driver && this.Session)
 	}
 
 	disconnect(leave := true, disconnect := false) {
@@ -764,7 +764,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 		if (!this.iDriverForName && (ignore || this.TeamServerActive)) {
 			try {
-				if !this.iCachedObjects.Has(this.Driver)
+				if (this.Connected && !this.iCachedObjects.Has(this.Driver))
 					this.iCachedObjects[this.Driver] := this.parseObject(this.Connector.GetDriver(this.Driver))
 
 				driver := this.iCachedObjects[this.Driver]
@@ -1492,10 +1492,17 @@ class TeamServerPlugin extends ControllerPlugin {
 
 		if (this.Connector && this.ServerURL && this.ServerToken) {
 			try {
-				if this.Connection
-					this.State["Stalled"] := !this.Connector.KeepAlive(this.Connection)
+				if this.Connected[true]
+					try {
+						this.State["Stalled"] := !this.Connector.KeepAlive(this.Connection)
+					}
+					catch Any as exception {
+						logError(exception)
 
-				if (!this.Connection || this.State["Stalled"]) {
+						this.State["Stalled"] := true
+					}
+
+				if !this.Connected {
 					if (!initialized && this.ServerURL && this.ServerToken) {
 						this.Connector.Initialize(this.ServerURL, this.ServerToken)
 
@@ -1525,10 +1532,10 @@ class TeamServerPlugin extends ControllerPlugin {
 																	  , this.DriverNickName[true])
 														   , "Driver", this.Session)
 
-					if connection {
-						this.State["ServerURL"] := this.ServerURL
-						this.State["SessionToken"] := this.ServerToken
+					this.State["ServerURL"] := this.ServerURL
+					this.State["SessionToken"] := this.ServerToken
 
+					if connection {
 						try {
 							if !this.iCachedObjects.Has(this.Team)
 								this.iCachedObjects[this.Team] := this.parseObject(this.Connector.GetTeam(this.Team))
@@ -1580,10 +1587,6 @@ class TeamServerPlugin extends ControllerPlugin {
 							this.iConnection := connection
 						}
 					}
-					else {
-						this.State["ServerURL"] := this.ServerURL
-						this.State["SessionToken"] := this.ServerToken
-					}
 
 					this.State["Stalled"] := false
 				}
@@ -1627,7 +1630,7 @@ class TeamServerPlugin extends ControllerPlugin {
 			keepAliveTask.start()
 		}
 		else if keepAliveTask
-			keepAliveTask.Sleep := ((this.Connection && !this.Stalled) ? 60000 : 10000)
+			keepAliveTask.Sleep := (this.Connected ? 60000 : 1000)
 
 		return false
 	}

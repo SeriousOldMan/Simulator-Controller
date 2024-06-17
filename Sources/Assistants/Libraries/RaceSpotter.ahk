@@ -1161,20 +1161,6 @@ class RaceSpotter extends GridRaceAssistant {
 			this.getSpeaker().speakPhrase("Okay")
 	}
 
-	resetReferenceTrack() {
-		loop 5
-			try {
-				FileAppend("Check", kTempDirectory . "Race Spotter.sem")
-
-				break
-			}
-			catch Any as exception {
-				logError(exception)
-
-				Sleep(Random(1, 10) * 10)
-			}
-	}
-
 	focusCarRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker := this.getSpeaker()
@@ -3819,4 +3805,25 @@ class RaceSpotter extends GridRaceAssistant {
 			this.finishSession()
 		}
 	}
+}
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                  Internal Function Declaration Section                  ;;;
+;;;-------------------------------------------------------------------------;;;
+
+resetReferenceTrack(context) {
+	loop 5
+		try {
+			FileAppend("Check", kTempDirectory . "Race Spotter.sem")
+
+			break
+		}
+		catch Any as exception {
+			logError(exception)
+
+			Sleep(Random(1, 10) * 10)
+		}
+
+	return true
 }

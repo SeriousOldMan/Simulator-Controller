@@ -4118,7 +4118,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                   Private Function Declaration Section                  ;;;
+;;;                  Internal Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 updatePositions(context, futureLap) {

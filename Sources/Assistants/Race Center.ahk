@@ -4423,7 +4423,8 @@ class RaceCenter extends ConfigurationItem {
 		}
 	}
 
-	planDriverSwap(lap := false, repairBodywork := true, repairSuspension := true, repairEngine := true) {
+	planDriverSwap(lap := false, refuelAmount := kUndefined, tyreChange := kUndefined
+							   , repairBodywork := true, repairSuspension := true, repairEngine := true) {
 		local pitstopPlan
 		local pitstopLap, pitstopDriver, pitstopRefuel, pitstopTyreCompound, pitstopTyreCompoundColor, pitstopTyreSet
 		local pitstopPressureFL, pitstopPressureFR, pitstopPressureRL, pitstopPressureRR, pitstopRepairs
@@ -4443,6 +4444,12 @@ class RaceCenter extends ConfigurationItem {
 					pitstopRepairs.Push("Engine")
 
 				this.initializePitstopFromSession(lap, true, &pitstopLap, &pitstopDriver, &pitstopRefuel, &pitstopTyreSetup)
+
+				if (refuelAmount != kUndefined)
+					pitstopRefuel := refuelAmount
+
+				if ((tyreChange != kUndefined) && !tyreChange)
+					pitstopTyreSetup := [false, false, false, false, false, false, false]
 
 				pitstopPlan := this.createPitstopPlan(true, pitstopLap, pitstopDriver, pitstopRefuel,
 															pitstopTyreSetup[1], pitstopTyreSetup[2], pitstopTyreSetup[3]

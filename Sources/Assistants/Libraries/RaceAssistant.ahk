@@ -1221,6 +1221,16 @@ class RaceAssistant extends ConfigurationItem {
 			}
 		}
 
+		printArguments(arguments) {
+			arguments := arguments.Clone()
+
+			loop arguments.Length
+				if !arguments.Has(A_Index)
+					arguments[A_Index] := ""
+
+			return values2String(", ", arguments*)
+		}
+
 		callMethod(method, enoughData, confirm, arguments*) {
 			local ignore, methodArguments
 
@@ -1231,7 +1241,7 @@ class RaceAssistant extends ConfigurationItem {
 				normalizeCall(&method, &methodArguments := arguments)
 
 				if isDebug()
-					showMessage("LLM -> this." . method . "(" .  values2String(", ", methodArguments*) . ")")
+					showMessage("LLM -> this." . method . "(" .  printArguments(methodArguments) . ")")
 
 				this.%method%(methodArguments*)
 			}
@@ -1307,7 +1317,7 @@ class RaceAssistant extends ConfigurationItem {
 					normalizeCall(&method, &methodArguments := arguments)
 
 					if isDebug()
-						showMessage("LLM -> Controller." . method . "(" .  values2String(", ", methodArguments*) . ")")
+						showMessage("LLM -> Controller." . method . "(" .  printArguments(methodArguments) . ")")
 
 					this.RemoteHandler.customAction("Method", method, methodArguments*)
 				}
@@ -1324,7 +1334,7 @@ class RaceAssistant extends ConfigurationItem {
 					normalizeCall(&function, &functionArguments := arguments)
 
 					if isDebug()
-						showMessage("LLM -> Controller:" . function . "(" .  values2String(", ", functionArguments*) . ")")
+						showMessage("LLM -> Controller:" . function . "(" .  printArguments(functionArguments) . ")")
 
 					this.RemoteHandler.customAction("Function", function, functionArguments*)
 				}

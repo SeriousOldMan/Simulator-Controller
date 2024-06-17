@@ -4274,7 +4274,8 @@ class RaceCenter extends ConfigurationItem {
 		if pitstopTyreCompound {
 			setMultiMapValue(pitstopPlan, "Pitstop", "Tyre.Change", true)
 
-			if ((pitstopTyreSet = "") || (pitstopTyreSet = "-"))
+			if (((SessionDatabase.getSimulatorCode(this.Simulator) = "ACC") && (pitstopTyreCompound = "Wet"))
+			 || ((pitstopTyreSet = "") || (pitstopTyreSet = "-")))
 				pitstopTyreSet := false
 
 			setMultiMapValue(pitstopPlan, "Pitstop", "Tyre.Set", pitstopTyreSet)

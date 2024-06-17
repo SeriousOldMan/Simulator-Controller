@@ -726,6 +726,8 @@ namespace RF2SHMSpotter {
 		int completedLaps = 0;
 		int numAccidents = 0;
 
+		string semFileName = "";
+
         bool checkAccident(ref rF2VehicleScoring playerScoring)
         {
 			bool accident = false;
@@ -752,6 +754,14 @@ namespace RF2SHMSpotter {
             if ((playerScoring.mLastLapTime > 0) && ((playerScoring.mLastLapTime * 1.002) < bestLapTime))
             {
                 bestLapTime = playerScoring.mLastLapTime;
+
+                for (int i = 0; i < idealLine.Count; i++)
+                    idealLine[i].clear();
+            }
+
+			if (System.IO.File.Exists(semFileName))
+			{
+				System.IO.File.Delete(semFileName);
 
                 for (int i = 0; i < idealLine.Count; i++)
                     idealLine[i].clear();
@@ -1764,6 +1774,9 @@ namespace RF2SHMSpotter {
 
             if (args.Length > 3)
                 slowCarDistance = int.Parse(args[3]);
+
+            if (args.Length > 4)
+                semFileName = args[4];
         }
 
         bool started = false;

@@ -666,6 +666,20 @@ long bestLapTime = LONG_MAX;
 int completedLaps = 0;
 int numAccidents = 0;
 
+std::string semFileName = "";
+
+bool fileExists(std::string name) {
+	FILE* file;
+
+	if (file = fopen(name.c_str(), "r")) {
+		fclose(file);
+
+		return true;
+	}
+	else
+		return false;
+}
+
 bool checkAccident(const irsdk_header* header, const char* data, const int playerCarIndex, float trackLength)
 {
 	bool accident = false;
@@ -724,6 +738,16 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 		if ((lastTime > 0) && ((lastTime * 1.002) < bestLapTime))
 		{
 			bestLapTime = lastTime;
+
+			int length = idealLine.size();
+
+			for (int i = 0; i < length; i++)
+				idealLine[i].clear();
+		}
+
+		if (semFileName != "" && fileExists(semFileName))
+		{
+			std::remove(semFileName.c_str());
 
 			int length = idealLine.size();
 
@@ -1943,15 +1967,18 @@ int main(int argc, char* argv[])
 			if (argc > 4)
 				slowCarDistance = atoi(argv[4]);
 
-			if (argc > 5) {
-				traceFileName = std::string(argv[5]);
+			if (argc > 5)
+				semFileName = std::string(argv[5]);
+
+			if (argc > 6) {
+				traceFileName = std::string(argv[6]);
 
 				if (traceFileName == "-")
 					traceFileName = "";
-
-				if (argc > 6)
-					loadTrackCoordinates(argv[6]);
 			}
+
+			if (argc > 7)
+				loadTrackCoordinates(argv[7]);
 		}
 	}
 

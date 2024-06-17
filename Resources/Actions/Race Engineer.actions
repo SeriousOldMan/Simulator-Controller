@@ -9,4 +9,4 @@ plan_pitstop.1=targetLap|Integer||false|The planned lap for the car to come to t
 plan_pitstop.2=refuel|String||false|The amount of fuel to be filled into the car.
 plan_pitstop.3=changeTyres|Boolean||false|Indicates whether new tyres should be mounted.
 plan_pitstop.4=repairs|Boolean||false|Indicates whether all damages should be repaired.
-plan_pitstop.5=driverSwap|Boolean||false|Indicates in a team race whether the next driver according to the stint plan shoulöd take the car.
+plan_pitstop.5=driverSwap|Boolean||false|Indicates in a team race whether the next driver according to the stint plan should take the car.

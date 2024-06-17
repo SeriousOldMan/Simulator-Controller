@@ -1,0 +1,5 @@
+; Resets the reference speeds around the track used by the
+; accident detection.
+
+[?%activation%] => (Call: Assistant.Call(resetReferenceTrack)),
+				   (Prove: Assistant.Speak("Okay"))

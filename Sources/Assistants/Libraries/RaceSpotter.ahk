@@ -1156,9 +1156,12 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 
 		this.DriverCar.reset(true)
+
+		if Speaker[true]
+			this.getSpeaker().speakPhrase("Okay")
 	}
 
-	resetAccidentDetectionAction() {
+	resetReferenceTrack() {
 		loop 5
 			try {
 				FileAppend("Check", kTempDirectory . "Race Spotter.sem")

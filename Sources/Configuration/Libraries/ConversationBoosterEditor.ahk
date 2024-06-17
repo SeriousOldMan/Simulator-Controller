@@ -25,6 +25,8 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\..\Libraries\SpeechSynthesizer.ahk"
+#Include "..\..\Libraries\LLMConnector.ahk"
+#Include "..\..\Libraries\JSON.ahk"
 #Include "ConfigurationEditor.ahk"
 
 
@@ -269,7 +271,7 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 		widget39 := editorGui.Add("Text", "x" . (x1 + 65) . " yp w100 h23 +0x200", translate("%"))
 
 		widget40 := editorGui.Add("Text", "x" . x0 . " yp+24 w105 h23 +0x200", translate("Actions"))
-		widget41 := editorGui.Add("DropDownList", "x" . x1 . " yp w60 vviConversationActionsDropdown", collect(["No", "Yes"], translate))
+		widget41 := editorGui.Add("DropDownList", "x" . x1 . " yp w60 vviConversationActionsDropdown", collect(["Yes", "No"], translate))
 		widget41.OnEvent("Change", (*) => this.updateState())
 		widget42 := editorGui.Add("Button", "x" . (x1 + 61) . " yp-1 w23 h23 X:Move Center +0x200 vviConversationEditActionsButton")
 		widget42.OnEvent("Click", editActions)
@@ -471,12 +473,13 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 		if (this.Control["viProviderDropDown"].Value = 1) {
 			this.iCurrentProvider := false
 
-			for ignore, setting in ["ServiceURL", "ServiceKey", "MaxTokens", "SpeakerProbability", "SpeakerTemperature", "ListenerTemperature", "ConversationMaxHistory", "ConversationTemperature", "ConversationActions"]
+			for ignore, setting in ["ServiceURL", "ServiceKey", "MaxTokens", "SpeakerProbability", "SpeakerTemperature", "ListenerTemperature", "ConversationMaxHistory", "ConversationTemperature"]
 				this.Control["vi" . setting . "Edit"].Text := ""
 
 			for ignore, setting in ["Speaker", "Listener", "Conversation"]
 				this.Control["vi" . setting . "Check"].Value := 0
 
+			this.Control["viConversationActionsDropDown"].Choose(0)
 			this.Control["viListenerModeDropDown"].Choose(0)
 		}
 		else {
@@ -505,7 +508,7 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 
 			this.Control["viConversationMaxHistoryEdit"].Text := configuration["ConversationMaxHistory"]
 			this.Control["viConversationTemperatureEdit"].Text := (isNumber(configuration["ConversationTemperature"]) ? Round(configuration["ConversationTemperature"] * 100) : "")
-			this.Control["viConversationActionsDropDown"].Choose(1 + (configuration["ConversationActions"] != false))
+			this.Control["viConversationActionsDropDown"].Choose(1 + (configuration["ConversationActions"] = false))
 		}
 
 		if this.iCurrentProvider
@@ -555,7 +558,7 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 				providerConfiguration["Conversation"] := true
 				providerConfiguration["ConversationMaxHistory"] := this.Control["viConversationMaxHistoryEdit"].Text
 				providerConfiguration["ConversationTemperature"] := Round(this.Control["viConversationTemperatureEdit"].Text / 100, 2)
-				providerConfiguration["ConversationActions"] := (this.Control["viConversationActionsDropDown"].Value = 2)
+				providerConfiguration["ConversationActions"] := (this.Control["viConversationActionsDropDown"].Value = 1)
 			}
 			else {
 				providerConfiguration["Conversation"] := false
@@ -702,10 +705,10 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 				this.Control["viConversationTemperatureEdit"].Text := 50
 
 			if (this.Control["viConversationActionsDropDown"].Value = 0)
-				this.Control["viConversationActionsDropDown"].Choose(1)
+				this.Control["viConversationActionsDropDown"].Choose(2)
 
 			this.Control["viConversationInstructionsButton"].Enabled := true
-			this.Control["viConversationEditActionsButton"].Enabled := (this.Control["viConversationActionsDropDown"].Value = 2)
+			this.Control["viConversationEditActionsButton"].Enabled := (this.Control["viConversationActionsDropDown"].Value = 1)
 		}
 	}
 
@@ -911,7 +914,7 @@ class ActionsEditor {
 		editorGui.Add("DropDownList", "x110 yp w90 Y:Move(0.25) vactionConfirmationDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", (*) => this.updateState())
 
 		this.iCallableField := [editorGui.Add("Text", "x16 yp+28 w90 h23 +0x200 Y:Move(0.25)", translate("Call"))
-							  , editorGui.Add("Edit", "x110 yp w308 h23 Y:Move(0.25)")]
+							  , editorGui.Add("Edit", "x110 yp w308 h46 W:Grow(0.34) Y:Move(0.25)")]
 
 		editorGui.SetFont("Norm", "Courier New")
 
@@ -923,7 +926,7 @@ class ActionsEditor {
 
 		editorGui.SetFont("Norm", "Arial")
 
-		editorGui.Add("Button", "x350 yp+10 w80 h23 Default X:Move(0.5) Y:Move", translate("Ok")).OnEvent("Click", (*) => this.iResult := kOk)
+		editorGui.Add("Button", "x350 yp+10 w80 h23 Default X:Move(0.5) Y:Move", translate("Ok")).OnEvent("Click", (*) => GetKeyState("Ctrl") ? this.showActions() : this.iResult := kOk)
 		editorGui.Add("Button", "x436 yp w80 h23 X:Move(0.5) Y:Move", translate("&Cancel")).OnEvent("Click", (*) => this.iResult := kCancel)
 
 		this.iParametersListView := editorGui.Add("ListView", "x430 ys w418 h96 X:Move(0.34) W:Grow(0.66) Y:Move(0.25) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Parameter", "Description"], translate))
@@ -1122,7 +1125,7 @@ class ActionsEditor {
 		if (force || (this.SelectedParameter != parameter)) {
 			if (save && this.SelectedParameter)
 				if !this.saveParameter(this.SelectedParameter) {
-					this.ParametersListView.Modify(inList(this.SelectedAction.Paramaters, this.SelectedParameter), "Select Vis")
+					this.ParametersListView.Modify(inList(this.SelectedAction.Parameters, this.SelectedParameter), "Select Vis")
 
 					return
 				}
@@ -1218,18 +1221,25 @@ class ActionsEditor {
 	saveAction(action) {
 		local valid := true
 		local name := this.Control["actionNameEdit"].Text
+		local errorMessage := ""
 		local ignore, other, type
 
 		if this.SelectedParameter
 			if !this.saveParameter(this.SelectedParameter)
 				return false
 
-		if (Trim(name) = "")
+		if (Trim(name) = "") {
+			errorMessage .= ("`n" . translate("Error: ") . "Name cannot be empty...")
+
 			valid := false
+		}
 
 		for ignore, other in this.Actions
-			if ((other != action) && (name = other.Name))
+			if ((other != action) && (name = other.Name)) {
+				errorMessage .= ("`n" . translate("Error: ") . "Name must be unique...")
+
 				valid := false
+			}
 
 		type := ["Assistant.Method", "Assistant.Rule", "Controller.Method", "Controller.Function"][this.Control["actionTypeDropDown"].Value]
 
@@ -1237,7 +1247,9 @@ class ActionsEditor {
 			try {
 				RuleCompiler().compileRules(this.ScriptEditor.Text, &ignore := false, &ignore := false)
 			}
-			catch Any {
+			catch Any as exception {
+				errorMessage .= ("`n" . translate("Error: ") . (isObject(exception) ? exception.Message : exception))
+
 				valid := false
 			}
 
@@ -1252,13 +1264,16 @@ class ActionsEditor {
 			if (action.Type = "Assistant.Rule")
 				action.Script := this.ScriptEditor.Text
 			else
-				action.Definition := this.CallableField[2].Text
+				action.Definition := this.CallableField[2].Value
 
 			this.ActionsListView.Modify(inList(this.Actions, action), "", action.Name, action.Active ? translate("x") : "", action.Description)
 		}
 		else {
+			if (StrLen(errorMessage) > 0)
+				errorMessage := ("`n" . errorMessage)
+
 			OnMessage(0x44, translateOkButton)
-			withBlockedWindows(MsgBox, translate("Invalid values detected - please correct..."), translate("Error"), 262160)
+			withBlockedWindows(MsgBox, translate("Invalid values detected - please correct...") . errorMessage, translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
 		}
 
@@ -1314,14 +1329,21 @@ class ActionsEditor {
 	saveParameter(parameter) {
 		local valid := true
 		local name := this.Control["parameterNameEdit"].Text
+		local errorMessage := ""
 		local ignore, other
 
-		if (Trim(name) = "")
+		if (Trim(name) = "") {
+			errorMessage .= ("`n" . translate("Error: ") . "Name cannot be empty...")
+
 			valid := false
+		}
 
 		for ignore, other in this.SelectedAction.Parameters
-			if ((other != parameter) && (name = other.Name))
+			if ((other != parameter) && (name = other.Name)) {
+				errorMessage .= ("`n" . translate("Error: ") . "Name must be unique...")
+
 				valid := false
+			}
 
 		if valid {
 			parameter.Name := name
@@ -1332,12 +1354,46 @@ class ActionsEditor {
 			this.ParametersListView.Modify(inList(this.SelectedAction.Parameters, parameter), "", parameter.Name, parameter.Description)
 		}
 		else {
+			if (StrLen(errorMessage) > 0)
+				errorMessage := ("`n" . errorMessage)
+
 			OnMessage(0x44, translateOkButton)
-			withBlockedWindows(MsgBox, translate("Invalid values detected - please correct..."), translate("Error"), 262160)
+			withBlockedWindows(MsgBox, translate("Invalid values detected - please correct...") . errorMessage, translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
 		}
 
 		return valid
+	}
+
+	showActions() {
+		local actions := []
+		local ignore, action, index, parameter, parameters
+
+		if this.SelectedAction
+			if !this.saveAction(this.SelectedAction) {
+				this.ActionsListView.Modify(inList(this.Actions, this.SelectedAction), "Select Vis")
+
+				return false
+			}
+
+		for ignore, action in this.Actions {
+			if action.Active {
+				parameters := []
+
+				for ignore, parameter in action.Parameters
+					parameters.Push(LLMTool.Function.Parameter(parameter.Name, parameter.Type
+															 , values2String(",", parameter.Enumeration*)
+															 , parameter.Required, parameter.Description))
+
+				actions.Push(LLMTool.Function(action.Name, action.Description, parameters))
+			}
+		}
+
+		deleteFile(kTempDirectory . "LLM Actions.json")
+
+		FileAppend(JSON.print(collect(actions, (action) => action.Descriptor), "`t"), kTempDirectory . "LLM Actions.json")
+
+		Run("notepad.exe `"" . kTempDirectory . "LLM Actions.json`"")
 	}
 
 	loadActions() {
@@ -1389,7 +1445,7 @@ class ActionsEditor {
 			this.ActionsListView.ModifyCol(A_Index, "AutoHdr")
 	}
 
-	saveActions() {
+	saveActions(save := true) {
 		local active := []
 		local configuration, ignore, action, index, parameter
 
@@ -1407,7 +1463,7 @@ class ActionsEditor {
 				active.Push(action.Name)
 
 			if !action.Builtin {
-				if (action.Type = "Assistant.Rule") {
+				if (save && (action.Type = "Assistant.Rule")) {
 					action.Definition := (this.Assistant . "." . action.Name . ".rules")
 
 					deleteFile(kUserHomeDirectory . "Actions\" . action.Definition)
@@ -1429,9 +1485,10 @@ class ActionsEditor {
 
 		setMultiMapValue(configuration, "Actions", "Active", values2String(",", active*))
 
-		writeMultiMap(kUserHomeDirectory . "Actions\" . this.Assistant . ".actions", configuration)
+		if save
+			writeMultiMap(kUserHomeDirectory . "Actions\" . this.Assistant . ".actions", configuration)
 
-		return true
+		return configuration
 	}
 }
 

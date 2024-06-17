@@ -351,14 +351,20 @@ class RaceEngineer extends RaceAssistant {
 		}
 	}
 
-	planPitstopAction(targetLap?, refuelAmount?, changeTyres?, repairs?) {
+	planPitstopAction(targetLap?, refuelAmount?, changeTyres?, repairs?, driverSwap?) {
 		repairs := (isSet(repairs) ? repairs : kUndefined)
 
-		this.planPitstop(isSet(targetLap) ? targetLap : kUndefined
-					   , isSet(refuelAmount) ? ("!" . refuelAmount) : kUndefined
-					   , isSet(changeTyres) ? ("!" . changeTyres) : kUndefined
-					   , kUndefined, kUndefined, kUndefined, kUndefined
-					   , repairs, repairs, repairs)
+		if (isSet(driverSwap) && driverSwap)
+			this.planDriverSwap("?" . (isSet(targetLap) ? targetLap : false)
+							  , isSet(refuelAmount) ? refuelAmount : kUndefined
+							  , isSet(changeTyres) ? changeTyres : kUndefined
+							  , repairs, repairs, repairs)
+		else
+			this.planPitstop(isSet(targetLap) ? targetLap : kUndefined
+						   , isSet(refuelAmount) ? ("!" . refuelAmount) : kUndefined
+						   , isSet(changeTyres) ? ("!" . changeTyres) : kUndefined
+						   , kUndefined, kUndefined, kUndefined, kUndefined
+						   , repairs, repairs, repairs)
 	}
 
 	getKnowledge(options := false) {
@@ -2661,7 +2667,7 @@ class RaceEngineer extends RaceAssistant {
 				if (lap = kUndefined) {
 					lastRequest := []
 
-					this.RemoteHandler.planDriverSwap(false, repairBodywork, repairSuspension, repairEngine)
+					this.RemoteHandler.planDriverSwap(false, kUndefined, kUndefined, repairBodywork, repairSuspension, repairEngine)
 				}
 				else {
 					if (InStr(lap, "!") = 1) {
@@ -2672,7 +2678,7 @@ class RaceEngineer extends RaceAssistant {
 
 					lastRequest := Array(lap)
 
-					this.RemoteHandler.planDriverSwap(lap, repairBodywork, repairSuspension, repairEngine)
+					this.RemoteHandler.planDriverSwap(lap, kUndefined, kUndefined, repairBodywork, repairSuspension, repairEngine)
 				}
 			}
 		}
@@ -2710,8 +2716,19 @@ class RaceEngineer extends RaceAssistant {
 				repairSuspension := knowledgeBase.getValue("Damage.Repair.Suspension.Target", false)
 				repairEngine := knowledgeBase.getValue("Damage.Repair.Engine.Target", false)
 
-				this.RemoteHandler.planDriverSwap(lap, repairBodywork, repairSuspension, repairEngine)
+				this.RemoteHandler.planDriverSwap(lap, kUndefined, kUndefined, repairBodywork, repairSuspension, repairEngine)
 			}
+		}
+		else if (InStr(lap, "?") = 1) {
+			lap := SubStr(lap, 2)
+
+			forcedLap := lap
+			lastRequest := Array(lap, arguments[1], arguments[2]
+							   , kUndefined, kUndefined, kUndefined, kUndefined
+							   , arguments[3], arguments[4], arguments[5])
+
+			if this.RemoteHandler
+				this.RemoteHandler.planDriverSwap(lap, arguments*)
 		}
 		else {
 			this.planPitstop(forcedLap ? forcedLap : lap, arguments*)

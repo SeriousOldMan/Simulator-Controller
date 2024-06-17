@@ -1198,24 +1198,53 @@ class RaceAssistant extends ConfigurationItem {
 		local activationIndex := 1
 		local ignore, action, definition, parameters, parameter, enumeration, handler, enoughData, confirm, required
 
-		callMethod(method, enoughData, confirm, arguments*) {
-			if !this.confirmCommand(enoughData, confirm)
-				return
+		normalizeCall(&function, &arguments) {
+			local index, argument
 
-			if isDebug()
-				showMessage("LLM -> this." . method . "(...)")
+			if InStr(function, "(") {
+				function := StrSplit(Trim(function), "(", " `t", 2)
 
-			this.%method%(arguments*)
+				arguments := concatenate(string2Values(",", SubStr(function[2], 1, StrLen(function[2]) - 1)), arguments)
+
+				for index, argument in arguments {
+					argument := Trim(argument, " `t`n")
+
+					if (argument = kTrue)
+						arguments[index] := true
+					else if (argument = kFalse)
+						arguments[index] := false
+					else if ((InStr(argument, "`"") = 1) && (StrLen(argument) > 1) && (SubStr(argument, StrLen(argument)) = "`""))
+						arguments[index] := SubStr(argument, 2, StrLen(argument) - 2)
+				}
+
+				function := Trim(function[1], " `t`n")
+			}
 		}
 
-		callFunction(function, enoughData, confirm, arguments*) {
+		printArguments(arguments) {
+			arguments := arguments.Clone()
+
+			loop arguments.Length
+				if !arguments.Has(A_Index)
+					arguments[A_Index] := ""
+
+			return values2String(", ", arguments*)
+		}
+
+		callMethod(method, enoughData, confirm, arguments*) {
+			local ignore, methodArguments
+
 			if !this.confirmCommand(enoughData, confirm)
 				return
 
-			if isDebug()
-				showMessage("LLM -> " . function . "(...)")
+			for ignore, method in StrSplit(method, "`n") {
+				normalizeCall(&method, &methodArguments := arguments)
 
-			%function%(arguments*)
+				if isDebug()
+					showMessage("LLM -> this." . method . "(" .  printArguments(methodArguments) . ")")
+
+				this.%method%(methodArguments*)
+			}
 		}
 
 		callRule(action, ruleFileName, enoughData, confirm, parameters, arguments*) {
@@ -1278,27 +1307,37 @@ class RaceAssistant extends ConfigurationItem {
 		}
 
 		callControllerMethod(method, enoughData, confirm, arguments*) {
-			if this.RemoteHandler {
-				if !this.confirmCommand(enoughData, confirm)
-					return
+			local ignore, methodArguments
 
-				if isDebug()
-					showMessage("LLM -> Controller." . method . "(...)")
+			if this.RemoteHandler
+				for ignore, method in StrSplit(method, "`n") {
+					if !this.confirmCommand(enoughData, confirm)
+						return
 
-				this.RemoteHandler.customAction("Method", method, arguments*)
-			}
+					normalizeCall(&method, &methodArguments := arguments)
+
+					if isDebug()
+						showMessage("LLM -> Controller." . method . "(" .  printArguments(methodArguments) . ")")
+
+					this.RemoteHandler.customAction("Method", method, methodArguments*)
+				}
 		}
 
 		callControllerFunction(function, enoughData, confirm, arguments*) {
-			if this.RemoteHandler {
-				if !this.confirmCommand(enoughData, confirm)
-					return
+			local ignore, functionArguments
 
-				if isDebug()
-					showMessage("LLM -> Controller:" . function . "(...)")
+			if this.RemoteHandler
+				for ignore, function in StrSplit(function, "`n") {
+					if !this.confirmCommand(enoughData, confirm)
+						return
 
-				this.RemoteHandler.customAction("Function", function, arguments*)
-			}
+					normalizeCall(&function, &functionArguments := arguments)
+
+					if isDebug()
+						showMessage("LLM -> Controller:" . function . "(" .  printArguments(functionArguments) . ")")
+
+					this.RemoteHandler.customAction("Function", function, functionArguments*)
+				}
 		}
 
 		addMultiMapValues(configuration, readMultiMap(kUserHomeDirectory . "Actions\" . this.AssistantType . ".actions"))

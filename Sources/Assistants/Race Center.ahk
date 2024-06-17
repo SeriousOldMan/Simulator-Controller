@@ -1573,7 +1573,7 @@ class RaceCenter extends ConfigurationItem {
 																			, centerGui["setupBasePressureFREdit"].Text
 																			, centerGui["setupBasePressureRLEdit"].Text
 																			, centerGui["setupBasePressureRREdit"].Text)
-														, centerGui["setupNotesEdit"].Text)
+														, centerGui["setupNotesEdit"].Value)
 				}
 
 				if (center.SelectedDetailReport = "Setups")
@@ -4274,7 +4274,8 @@ class RaceCenter extends ConfigurationItem {
 		if pitstopTyreCompound {
 			setMultiMapValue(pitstopPlan, "Pitstop", "Tyre.Change", true)
 
-			if ((pitstopTyreSet = "") || (pitstopTyreSet = "-"))
+			if (((SessionDatabase.getSimulatorCode(this.Simulator) = "ACC") && (pitstopTyreCompound = "Wet"))
+			 || ((pitstopTyreSet = "") || (pitstopTyreSet = "-")))
 				pitstopTyreSet := false
 
 			setMultiMapValue(pitstopPlan, "Pitstop", "Tyre.Set", pitstopTyreSet)
@@ -4422,7 +4423,8 @@ class RaceCenter extends ConfigurationItem {
 		}
 	}
 
-	planDriverSwap(lap := false, repairBodywork := true, repairSuspension := true, repairEngine := true) {
+	planDriverSwap(lap := false, refuelAmount := kUndefined, tyreChange := kUndefined
+							   , repairBodywork := true, repairSuspension := true, repairEngine := true) {
 		local pitstopPlan
 		local pitstopLap, pitstopDriver, pitstopRefuel, pitstopTyreCompound, pitstopTyreCompoundColor, pitstopTyreSet
 		local pitstopPressureFL, pitstopPressureFR, pitstopPressureRL, pitstopPressureRR, pitstopRepairs
@@ -4442,6 +4444,12 @@ class RaceCenter extends ConfigurationItem {
 					pitstopRepairs.Push("Engine")
 
 				this.initializePitstopFromSession(lap, true, &pitstopLap, &pitstopDriver, &pitstopRefuel, &pitstopTyreSetup)
+
+				if (refuelAmount != kUndefined)
+					pitstopRefuel := refuelAmount
+
+				if ((tyreChange != kUndefined) && !tyreChange)
+					pitstopTyreSetup := [false, false, false, false, false, false, false]
 
 				pitstopPlan := this.createPitstopPlan(true, pitstopLap, pitstopDriver, pitstopRefuel,
 															pitstopTyreSetup[1], pitstopTyreSetup[2], pitstopTyreSetup[3]
@@ -4497,7 +4505,7 @@ class RaceCenter extends ConfigurationItem {
 					if (!this.Synchronize || (this.Synchronize = "Off"))
 						synchronizeMenu.Check(translate("Off"))
 
-					for ignore, seconds in [4, 5, 6, 8, 10, 12, 14, 16, 20, 25, 30, 40, 50, 60] {
+					for ignore, seconds in [1, 2, 3, 4, 5, 6, 8, 10, 12, 14, 16, 20, 25, 30, 40, 50, 60] {
 						setSynchronize(seconds, *) {
 							this.iSynchronize := seconds
 						}
@@ -10391,7 +10399,7 @@ class RaceCenter extends ConfigurationItem {
 						standingsData := newMultiMap()
 					}
 
-					if (standingsData.Count > 0) {
+					if ((standingsData.Count > 0) && this.Laps[lap].HasProp("Positions")) {
 						positions := this.Laps[lap].Positions
 
 						if (positions && (positions != "")) {

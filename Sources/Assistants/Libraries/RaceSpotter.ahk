@@ -323,9 +323,15 @@ class CarInfo {
 		this.iClass := class
 	}
 
-	reset() {
+	reset(full := false) {
 		this.iDeltas := CaseInsenseMap()
 		this.iLastDeltas := CaseInsenseMap()
+
+		if full {
+			iLapTimes := []
+			iSectorTimes := [[], [], []]
+			iBestLapTime := false
+		}
 	}
 
 	hasPitted(lap) {
@@ -1104,7 +1110,7 @@ class RaceSpotter extends GridRaceAssistant {
 			return super.getClass(car, data, categories)
 		else {
 			if !spotterCategories
-				switch getMultiMapValue(this.Settings, "Assistant.Spotter", "CarCategories", "Classes") {
+				switch getMultiMapValue(this.Settings, "Assistant.Spotter", "CarCategories", "Classes"), false {
 					case "All":
 						spotterCategories := ["Class", "Cup"]
 					case "Classes":
@@ -1141,6 +1147,15 @@ class RaceSpotter extends GridRaceAssistant {
 			default:
 				super.handleVoiceCommand(grammar, words)
 		}
+	}
+
+	resetDeltasAction() {
+		for ignore, positionInfo in this.PositionInfos {
+			positionInfo.reset(true, true, true)
+			positionInfo.Car.reset(true)
+		}
+
+		this.DriverCar.reset(true)
 	}
 
 	focusCarRecognized(words) {

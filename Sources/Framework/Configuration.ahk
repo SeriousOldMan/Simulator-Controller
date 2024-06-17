@@ -640,13 +640,17 @@ class Function extends ConfigurationItem {
 				action := StrSplit(action, "(", " `t", 2)
 
 				arguments := string2Values(",", SubStr(action[2], 1, StrLen(action[2]) - 1))
-				action := action[1]
+				action := Trim(action[1], " `t`n")
 
 				for index, argument in arguments {
+					argument := Trim(argument, " `t`n")
+
 					if (argument = kTrue)
 						arguments[index] := true
 					else if (argument = kFalse)
 						arguments[index] := false
+					else if ((InStr(argument, "`"") = 1) && (StrLen(argument) > 1) && (SubStr(argument, StrLen(argument)) = "`""))
+						arguments[index] := SubStr(argument, 2, StrLen(argument) - 2)
 				}
 
 				actions.Push(Array(action, arguments))

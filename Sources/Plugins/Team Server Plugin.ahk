@@ -191,9 +191,15 @@ class TeamServerPlugin extends ControllerPlugin {
 		}
 	}
 
-	Connected {
+	Connected[logical := false] {
 		Get {
-			return (this.Connection != false)
+			return ((this.Connection != false) && (logical || !this.Stalled))
+		}
+	}
+
+	Stalled {
+		Get {
+			return (this.State.Has("Stalled") ? this.State["Stalled"] : false)
 		}
 	}
 
@@ -214,12 +220,6 @@ class TeamServerPlugin extends ControllerPlugin {
 
 		Set {
 			return (isSet(key) ? (this.iState[key] := value) : (this.iState := value))
-		}
-	}
-
-	Stalled {
-		Get {
-			return (this.State.Has("Stalled") ? this.State["Stalled"] : false)
 		}
 	}
 
@@ -491,7 +491,7 @@ class TeamServerPlugin extends ControllerPlugin {
 		if this.Active {
 			if this.TeamServerEnabled {
 				if this.Connected {
-					if (this.Stalled || this.LastMessage) {
+					if this.LastMessage {
 						setMultiMapValue(configuration, this.Plugin, "State", "Critical")
 
 						setMultiMapValue(configuration, this.Plugin, "Information", translate("Message: ") . this.LastMessage)
@@ -649,7 +649,7 @@ class TeamServerPlugin extends ControllerPlugin {
 	tryConnect() {
 		local settings, serverURL, serverToken, teamIdentifier, driverIdentifier, sessionIdentifier
 
-		if !this.Connected {
+		if !this.Connected[true] {
 			settings := readMultiMap(getFileName("Race.settings", kUserConfigDirectory))
 
 			serverURL := getMultiMapValue(settings, "Team Settings", "Server.URL", "")
@@ -687,7 +687,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 		this.keepAlive()
 
-		if this.Connected {
+		if this.Connected[true] {
 			if isLogLevel(kLogInfo)
 				logMessage(kLogInfo, translate("Connected to the Team Server (URL: ") . serverURL . translate(", Token: ") . serverToken
 								   . translate(", Team: ") . team . translate(", Driver: ") . driver . translate(", Session: ") . session . translate(")"))
@@ -701,7 +701,7 @@ class TeamServerPlugin extends ControllerPlugin {
 			A_IconTip := (string2Values(".", A_ScriptName)[1] . translate(" (Team: ") . this.Team[true] . translate(")"))
 		}
 
-		return (this.Connected && this.Team && this.Driver && this.Session)
+		return (this.Connected[true] && this.Team && this.Driver && this.Session)
 	}
 
 	disconnect(leave := true, disconnect := false) {
@@ -764,7 +764,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 		if (!this.iDriverForName && (ignore || this.TeamServerActive)) {
 			try {
-				if !this.iCachedObjects.Has(this.Driver)
+				if (this.Connected && !this.iCachedObjects.Has(this.Driver))
 					this.iCachedObjects[this.Driver] := this.parseObject(this.Connector.GetDriver(this.Driver))
 
 				driver := this.iCachedObjects[this.Driver]
@@ -805,7 +805,9 @@ class TeamServerPlugin extends ControllerPlugin {
 		return (this.iDriverNickName ? this.iDriverNickName : "")
 	}
 
-	startSession(simulator, car, track, duration, retries := 20, wait := 2000) {
+	startSession(simulator, car, track, duration, retries := 20, wait := 500) {
+		local waitUntil := (A_TickCount + (wait * retries))
+
 		if this.SessionActive
 			this.leaveSession()
 
@@ -834,7 +836,7 @@ class TeamServerPlugin extends ControllerPlugin {
 						break
 					}
 					catch Any as exception {
-						if (A_Index = retries)
+						if ((A_Index = retries) || (A_TickCount > waitUntil))
 							throw exception
 						else
 							Sleep(wait)
@@ -938,8 +940,10 @@ class TeamServerPlugin extends ControllerPlugin {
 		}
 	}
 
-	getCurrentDriver(retries := 5, wait := 2000) {
+	getCurrentDriver(retries := 5, wait := 100) {
+		local waitUntil := (A_TickCount + (wait * retries))
 		local driver
+
 
 		if this.SessionActive {
 			try {
@@ -953,7 +957,7 @@ class TeamServerPlugin extends ControllerPlugin {
 						return driver
 					}
 					catch Any as exception {
-						if (A_Index = retries)
+						if ((A_Index = retries) || (A_TickCount > waitUntil))
 							throw exception
 						else
 							Sleep(wait)
@@ -974,7 +978,8 @@ class TeamServerPlugin extends ControllerPlugin {
 			return false
 	}
 
-	getSessionValue(name, default := kUndefined, retries := 5, wait := 2000) {
+	getSessionValue(name, default := kUndefined, retries := 5, wait := 100) {
+		local waitUntil := (A_TickCount + (wait * retries))
 		local value
 
 		if this.SessionActive {
@@ -992,7 +997,7 @@ class TeamServerPlugin extends ControllerPlugin {
 						return value
 					}
 					catch Any as exception {
-						if (A_Index = retries)
+						if ((A_Index = retries) || (A_TickCount > waitUntil))
 							throw exception
 						else
 							Sleep(wait)
@@ -1011,7 +1016,9 @@ class TeamServerPlugin extends ControllerPlugin {
 		return ((default != kUndefined) ? default : false)
 	}
 
-	setSessionValue(name, value, retries := 5, wait := 2000) {
+	setSessionValue(name, value, retries := 5, wait := 100) {
+		local waitUntil := (A_TickCount + (wait * retries))
+
 		if this.SessionActive {
 			try {
 				if (isDebug() && isLogLevel(kLogDebug))
@@ -1035,7 +1042,7 @@ class TeamServerPlugin extends ControllerPlugin {
 						break
 					}
 					catch Any as exception {
-						if (A_Index = retries)
+						if ((A_Index = retries) || (A_TickCount > waitUntil))
 							throw exception
 						else
 							Sleep(wait)
@@ -1052,7 +1059,8 @@ class TeamServerPlugin extends ControllerPlugin {
 		}
 	}
 
-	getStintValue(stint, name, session := false, retries := 5, wait := 2000) {
+	getStintValue(stint, name, session := false, retries := 5, wait := 100) {
+		local waitUntil := (A_TickCount + (wait * retries))
 		local value
 
 		if (!session && this.SessionActive)
@@ -1076,7 +1084,7 @@ class TeamServerPlugin extends ControllerPlugin {
 						return value
 					}
 					catch Any as exception {
-						if (A_Index = retries)
+						if ((A_Index = retries) || (A_TickCount > waitUntil))
 							throw exception
 						else
 							Sleep(wait)
@@ -1095,7 +1103,9 @@ class TeamServerPlugin extends ControllerPlugin {
 		return false
 	}
 
-	setStintValue(stint, name, value, session := false, retries := 5, wait := 2000) {
+	setStintValue(stint, name, value, session := false, retries := 5, wait := 100) {
+		local waitUntil := (A_TickCount + (wait * retries))
+
 		if (!session && this.SessionActive)
 			session := this.Session
 
@@ -1125,7 +1135,7 @@ class TeamServerPlugin extends ControllerPlugin {
 						break
 					}
 					catch Any as exception {
-						if (A_Index = retries)
+						if ((A_Index = retries) || (A_TickCount > waitUntil))
 							throw exception
 						else
 							Sleep(wait)
@@ -1142,7 +1152,9 @@ class TeamServerPlugin extends ControllerPlugin {
 		}
 	}
 
-	getStintSession(stint, session := false, retries := 5, wait := 2000) {
+	getStintSession(stint, session := false, retries := 5, wait := 100) {
+		local waitUntil := (A_TickCount + (wait * retries))
+
 		if (!session && this.SessionActive)
 			session := this.Session
 
@@ -1156,7 +1168,7 @@ class TeamServerPlugin extends ControllerPlugin {
 						return this.Connector.GetStintSession(stint)
 					}
 					catch Any as exception {
-						if (A_Index = retries)
+						if ((A_Index = retries) || (A_TickCount > waitUntil))
 							throw exception
 						else
 							Sleep(wait)
@@ -1175,7 +1187,8 @@ class TeamServerPlugin extends ControllerPlugin {
 		return false
 	}
 
-	getCurrentLap(session := false, retries := 5, wait := 2000) {
+	getCurrentLap(session := false, retries := 5, wait := 100) {
+		local waitUntil := (A_TickCount + (wait * retries))
 		local lap, lapNr
 
 		if (!session && this.SessionActive)
@@ -1202,7 +1215,7 @@ class TeamServerPlugin extends ControllerPlugin {
 							return false
 					}
 					catch Any as exception {
-						if (A_Index = retries)
+						if ((A_Index = retries) || (A_TickCount > waitUntil))
 							throw exception
 						else
 							Sleep(wait)
@@ -1221,7 +1234,9 @@ class TeamServerPlugin extends ControllerPlugin {
 		return false
 	}
 
-	getLapStint(lap, session := false, retries := 5, wait := 2000) {
+	getLapStint(lap, session := false, retries := 5, wait := 100) {
+		local waitUntil := (A_TickCount + (wait * retries))
+
 		if (!session && this.SessionActive)
 			session := this.Session
 
@@ -1238,7 +1253,7 @@ class TeamServerPlugin extends ControllerPlugin {
 						return this.Connector.GetLapStint(lap)
 					}
 					catch Any as exception {
-						if (A_Index = retries)
+						if ((A_Index = retries) || (A_TickCount > waitUntil))
 							throw exception
 						else
 							Sleep(wait)
@@ -1257,7 +1272,8 @@ class TeamServerPlugin extends ControllerPlugin {
 		return false
 	}
 
-	getLapValue(lap, name, session := false, retries := 5, wait := 2000) {
+	getLapValue(lap, name, session := false, retries := 5, wait := 100) {
+		local waitUntil := (A_TickCount + (wait * retries))
 		local value
 
 		if (!session && this.SessionActive)
@@ -1284,7 +1300,7 @@ class TeamServerPlugin extends ControllerPlugin {
 						return value
 					}
 					catch Any as exception {
-						if (A_Index = retries)
+						if ((A_Index = retries) || (A_TickCount > waitUntil))
 							throw exception
 						else
 							Sleep(wait)
@@ -1303,7 +1319,9 @@ class TeamServerPlugin extends ControllerPlugin {
 		return false
 	}
 
-	setLapValue(lap, name, value, session := false, retries := 5, wait := 2000) {
+	setLapValue(lap, name, value, session := false, retries := 5, wait := 100) {
+		local waitUntil := (A_TickCount + (wait * retries))
+
 		if (!session && this.SessionActive)
 			session := this.Session
 
@@ -1336,7 +1354,7 @@ class TeamServerPlugin extends ControllerPlugin {
 						break
 					}
 					catch Any as exception {
-						if (A_Index = retries)
+						if ((A_Index = retries) || (A_TickCount > waitUntil))
 							throw exception
 						else
 							Sleep(wait)
@@ -1353,7 +1371,8 @@ class TeamServerPlugin extends ControllerPlugin {
 		}
 	}
 
-	addStint(lapNumber, retries := 20, wait := 2000) {
+	addStint(lapNumber, retries := 20, wait := 500) {
+		local waitUntil := (A_TickCount + (wait * retries))
 		local stint
 
 		if this.TeamServerActive {
@@ -1374,7 +1393,7 @@ class TeamServerPlugin extends ControllerPlugin {
 						break
 					}
 					catch Any as exception {
-						if (A_Index = retries)
+						if ((A_Index = retries) || (A_TickCount > waitUntil))
 							throw exception
 						else
 							Sleep(wait)
@@ -1395,7 +1414,8 @@ class TeamServerPlugin extends ControllerPlugin {
 		}
 	}
 
-	addLap(lapNumber, telemetryData, positionsData, retries := 10, wait := 2000) {
+	addLap(lapNumber, telemetryData, positionsData, retries := 10, wait := 500) {
+		local waitUntil := (A_TickCount + (wait * retries))
 		local driverForName, driverSurName, driverNickName, stint, simulator, car, track, lap
 
 		if this.TeamServerActive {
@@ -1448,7 +1468,7 @@ class TeamServerPlugin extends ControllerPlugin {
 						break
 					}
 					catch Any as exception {
-						if (A_Index = retries)
+						if ((A_Index = retries) || (A_TickCount > waitUntil))
 							throw exception
 						else
 							Sleep(wait)
@@ -1492,10 +1512,17 @@ class TeamServerPlugin extends ControllerPlugin {
 
 		if (this.Connector && this.ServerURL && this.ServerToken) {
 			try {
-				if this.Connection
-					this.State["Stalled"] := !this.Connector.KeepAlive(this.Connection)
+				if this.Connected[true]
+					try {
+						this.State["Stalled"] := !this.Connector.KeepAlive(this.Connection)
+					}
+					catch Any as exception {
+						logError(exception)
 
-				if (!this.Connection || this.State["Stalled"]) {
+						this.State["Stalled"] := true
+					}
+
+				if !this.Connected {
 					if (!initialized && this.ServerURL && this.ServerToken) {
 						this.Connector.Initialize(this.ServerURL, this.ServerToken)
 
@@ -1525,10 +1552,10 @@ class TeamServerPlugin extends ControllerPlugin {
 																	  , this.DriverNickName[true])
 														   , "Driver", this.Session)
 
-					if connection {
-						this.State["ServerURL"] := this.ServerURL
-						this.State["SessionToken"] := this.ServerToken
+					this.State["ServerURL"] := this.ServerURL
+					this.State["SessionToken"] := this.ServerToken
 
+					if connection {
 						try {
 							if !this.iCachedObjects.Has(this.Team)
 								this.iCachedObjects[this.Team] := this.parseObject(this.Connector.GetTeam(this.Team))
@@ -1580,10 +1607,6 @@ class TeamServerPlugin extends ControllerPlugin {
 							this.iConnection := connection
 						}
 					}
-					else {
-						this.State["ServerURL"] := this.ServerURL
-						this.State["SessionToken"] := this.ServerToken
-					}
 
 					this.State["Stalled"] := false
 				}
@@ -1627,7 +1650,7 @@ class TeamServerPlugin extends ControllerPlugin {
 			keepAliveTask.start()
 		}
 		else if keepAliveTask
-			keepAliveTask.Sleep := ((this.Connection && !this.Stalled) ? 60000 : 10000)
+			keepAliveTask.Sleep := (this.Connected ? 60000 : 1000)
 
 		return false
 	}

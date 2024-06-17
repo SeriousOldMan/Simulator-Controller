@@ -22,6 +22,32 @@ I strongly recommed to memorize the phrases in the language you use to interact 
 
 Beside the builtin pattern-based voice recognition and the speech capabilities based on predefined phrases as described above, it is optionally possible to connect Elisa to a GPT service like OpenAI or a locally hosted LLM, to dramatacilly improve the quality in conversation with the Assistant. When the conversation booster is configured (see [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm) for more information about the necessary configuration steps), the full knowledge about the the car state and the drivers performance will be supplied to the LLM. This includes only basic telemetry data and no pitstop information. The position information includes a history of the last laps and gap and lap time information for the most important opponents are provided.
 
+##### Trigger actions from conversation
+
+The LLM may be able to trigger actions as a result of a conversation. This is achieved by the so-called tool interface of the LLM. Tools are supported at the time of this writing by the following models:
+
+  - GPT 3.5 and above from *OpenAI*
+  - Mistral Small, Mistral Large and Mixtral 8x22b from *Mistral AI*
+  - Claude3 by *Anthropic* (via *OpenRouter*)
+  - Command-R+ by *Cohere* (via *OpenRouter*, but not working properly yet)
+  - Some Open Source models, such as Open Hermes, also support tools but with a varying degree of reliability
+
+Please note that calling actions is currently only available when using *OpenAI*, *Mistral AI* or *OpenRouter* are used as GPT service providers.
+
+The following table shows you the predefined actions, that might be triggered by the LLM during a conversation with the Strategist:
+
+| Action       | Parameter(s) | Example(s) |
+|--------------|--------------|------------|
+| Reset Deltas | -            | "Can you reset the delta information for all cars?" |
+
+As you can see, you can define new voice commands by defining a corresponding action, that can be triggered by the LLM. But that is only one part of the story. Please note, that beside reacting to the phrase as shown in the examples above, the LLM might decide to take the action on its own according to the current situation and based on the current data. So always be alerted, if the LLM gets active unexpectedly.
+
+There are some predefined actions available for the Strategist, which come with the standard installation and you can define your own actions. But this will require a very deep knowledge of the inner workings of Simulator Controller and the Assistants. You have been warned. If you want to try this, check out the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm) for the "Conversation" booster.
+
+That said, it depends on the data available in the knowledge base, whether the LLM will decide to trigger this action or not. If the LLM refuses to do so, you still have all the traditional voice commands and the controller actions at your disposal.
+
+IMPORTANT: When action handling is enabled, it might be necessary to disable the "Recognition" booster or at least set the "Creativity" to a very low value. Otherwise the "Recognition" booster might detect a command pattern, which will match to a pre-defined voice command, thereby preventing the LLM from crating a custom action plan.
+
 ### Enabling and disabling specific warnings and announcements
 
 As described in the next section, Elisa will give you a lot of warnings and announcements about traffic and the overall race situation. You may disable these announcements by using a special voice command:

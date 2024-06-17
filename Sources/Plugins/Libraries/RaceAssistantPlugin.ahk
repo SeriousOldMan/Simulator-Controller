@@ -927,7 +927,6 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			if !FileExist(RaceAssistantPlugin.sReplayDirectory)
 				RaceAssistantPlugin.sReplayDirectory := false
 
-
 			RaceAssistantPlugin.sCollectorTask
 				:= PeriodicTask(ObjBindMethod(RaceAssistantPlugin, "collectSessionData"), 1000, kHighPriority)
 
@@ -1117,7 +1116,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			if this.StartupSettings
 				sessionIdentifier := getMultiMapValue(this.StartupSettings, "Team Session", "Session.Identifier", sessionIdentifier)
 
-			if !teamServer.Connected {
+			if !teamServer.Connected[true] {
 				serverURL := getMultiMapValue(settings, "Team Settings", "Server.URL", "")
 				accessToken := getMultiMapValue(settings, "Team Settings", "Server.Token", "")
 				teamIdentifier := getMultiMapValue(settings, "Team Settings", "Team.Identifier", false)
@@ -1208,7 +1207,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			try {
 				wait := settingsDB.readSettingValue(simulator, car, track, weather, "Assistant", "Session.Data.Frequency", 10)
 
-				if (teamServer && teamServer.Connected)
+				if (teamServer && teamServer.Connected[true])
 					wait := Max(wait, getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
 																  , "Team Server", "Update Frequency", 10))
 
@@ -1303,6 +1302,16 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		local first := true
 		local ignore, assistant, settings
 
+		startOther() {
+			RaceAssistantPlugin.Simulator.startSession(settings, data)
+
+			if (this.TeamServer && this.TeamServer.Connected[true])
+				RaceAssistantPlugin.CollectorTask.Sleep
+					:= Max(RaceAssistantPlugin.CollectorTask.Sleep
+						 , (getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+																   , "Team Server", "Update Frequency", 10) * 1000))
+		}
+
 		if RaceAssistantPlugin.Simulator {
 			RaceAssistantPlugin.sSession := RaceAssistantPlugin.getSession(data)
 			RaceAssistantPlugin.sStintStartTime := false
@@ -1317,7 +1326,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 					if first {
 						first := false
 
-						RaceAssistantPlugin.Simulator.startSession(settings, data)
+						startOther()
 					}
 
 					if start
@@ -1327,15 +1336,8 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				}
 			}
 
-			if first {
-				RaceAssistantPlugin.Simulator.startSession(settings, data)
-
-				if (this.TeamServer && this.TeamServer.Connected)
-					RaceAssistantPlugin.CollectorTask.Sleep
-						:= Max(RaceAssistantPlugin.CollectorTask.Sleep
-							 , getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
-																	   , "Team Server", "Update Frequency", 10) * 1000)
-			}
+			if first
+				startOther()
 		}
 	}
 
@@ -1961,7 +1963,6 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	}
 
 	startSession(settings, data) {
-		local teamServer := this.TeamServer
 		local code, assistant, settingsFile, dataFile
 
 		if this.Simulator {

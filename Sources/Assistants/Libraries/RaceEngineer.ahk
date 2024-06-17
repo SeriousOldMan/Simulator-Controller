@@ -2719,13 +2719,13 @@ class RaceEngineer extends RaceAssistant {
 				this.RemoteHandler.planDriverSwap(lap, kUndefined, kUndefined, repairBodywork, repairSuspension, repairEngine)
 			}
 		}
-		else if if (InStr(lap, "?") = 1) {
+		else if (InStr(lap, "?") = 1) {
 			lap := SubStr(lap, 2)
 
 			forcedLap := lap
-			lastRequest := concatenate(Array(lap), arguments[1], arguments[2]
-									 , kUndefined, kUndefined, kUndefined, kUndefined
-									 , arguments[3], arguments[4], arguments[5])
+			lastRequest := Array(lap, arguments[1], arguments[2]
+							   , kUndefined, kUndefined, kUndefined, kUndefined
+							   , arguments[3], arguments[4], arguments[5])
 
 			if this.RemoteHandler
 				this.RemoteHandler.planDriverSwap(lap, arguments*)

@@ -9,7 +9,7 @@ Components=Media->5.6.1,Configuration->5.7.5,Utilities->5.4.8
 Version=5.7.6.0-release
 Date=06/14/2024
 Download=https://cutt.ly/HeoNJPQQ;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.7.6.0-release.zip
-Changes=Integrate predefined actions in an LLM conversation, Added action definition files in user home directory, Added an custom action editor to the Conversation Booster, Restructured Conversation Booster instructions, Fixed FasterThan information of the Spotter for multi class
+Changes=Integrate predefined actions in an LLM conversation, Added action definition files in user home directory, Added an custom action editor to the Conversation Booster, Restructured Conversation Booster instructions, Fixed FasterThan information of the Spotter for multi class, Reset deltas action for Spotter
 Components=Media->5.6.1,Configuration->5.7.5,Utilities->5.4.8
 [Components]
 Media.5.6.1.Path=Resources

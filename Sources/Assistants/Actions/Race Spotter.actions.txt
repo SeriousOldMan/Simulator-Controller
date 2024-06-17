@@ -1,0 +1,4 @@
+[Actions]
+Active=reset_deltas
+[Builtin]
+reset_deltas=Assistant.Method|resetDeltasAction|true|true|0|Reset the lap times, sector times and delta history for all cars on the track.

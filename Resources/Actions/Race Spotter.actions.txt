@@ -1,4 +1,5 @@
 [Actions]
-Active=reset_deltas
+Active=reset_deltas,reset_accident_detectio
 [Builtin]
 reset_deltas=Assistant.Method|resetDeltasAction|true|true|0|Reset the lap times, sector times and delta history for all cars on the track.
+reset_accident_detection=Assistant.Method|resetAccidentDetectionAction|true|true|0|Resets the accident and slow car detection by clearing and recalculating the reference speeds around the track.

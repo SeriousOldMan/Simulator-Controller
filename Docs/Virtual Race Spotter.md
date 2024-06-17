@@ -36,9 +36,10 @@ Please note that calling actions is currently only available when using *OpenAI*
 
 The following table shows you the predefined actions, that might be triggered by the LLM during a conversation with the Strategist:
 
-| Action       | Parameter(s) | Example(s) |
-|--------------|--------------|------------|
-| Reset Deltas | -            | "Can you reset the delta information for all cars?" |
+| Action                   | Parameter(s) | Example(s) |
+|--------------------------|--------------|------------|
+| Reset Deltas             | -            | "Can you reset the delta information for all cars?" |
+| Reset Accident Detection | -            | "There are false positives for accidents and slow cars on the track. Please correct that." |
 
 As you can see, you can define new voice commands by defining a corresponding action, that can be triggered by the LLM. But that is only one part of the story. Please note, that beside reacting to the phrase as shown in the examples above, the LLM might decide to take the action on its own according to the current situation and based on the current data. So always be alerted, if the LLM gets active unexpectedly.
 

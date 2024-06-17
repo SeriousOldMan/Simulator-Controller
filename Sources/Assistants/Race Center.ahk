@@ -4498,7 +4498,7 @@ class RaceCenter extends ConfigurationItem {
 					if (!this.Synchronize || (this.Synchronize = "Off"))
 						synchronizeMenu.Check(translate("Off"))
 
-					for ignore, seconds in [4, 5, 6, 8, 10, 12, 14, 16, 20, 25, 30, 40, 50, 60] {
+					for ignore, seconds in [1, 2, 3, 4, 5, 6, 8, 10, 12, 14, 16, 20, 25, 30, 40, 50, 60] {
 						setSynchronize(seconds, *) {
 							this.iSynchronize := seconds
 						}
@@ -10392,7 +10392,7 @@ class RaceCenter extends ConfigurationItem {
 						standingsData := newMultiMap()
 					}
 
-					if (standingsData.Count > 0) {
+					if ((standingsData.Count > 0) && this.Laps[lap].HasProp("Positions")) {
 						positions := this.Laps[lap].Positions
 
 						if (positions && (positions != "")) {

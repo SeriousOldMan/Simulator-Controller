@@ -3061,14 +3061,14 @@ class RaceSpotter extends GridRaceAssistant {
 				if isDebug()
 					deleteFile(kTempDirectory . "Race Spotter.trace")
 
-				deleteFile(kTempDirectory . "Race Spotter.sem")
+				deleteFile(kTempDirectory . "Race Spotter.semaphore")
 
 				try {
 					Run("`"" . exePath . "`" " . this.TrackLength . A_Space
 											   . getMultiMapValue(this.Settings, "Assistant.Spotter", "Accident.Distance.Ahead.Threshold", 800) . A_Space
 											   . getMultiMapValue(this.Settings, "Assistant.Spotter", "Accident.Distance.Behind.Threshold", 500) . A_Space
 											   . getMultiMapValue(this.Settings, "Assistant.Spotter", "SlowCar.Distance.Ahead.Threshold", 500) . A_Space
-											   . ("`"" . kTempDirectory . "Race Spotter.sem`"") . A_Space
+											   . ("`"" . kTempDirectory . "Race Spotter.semaphore`"") . A_Space
 											   . (isDebug() ? ("`"" . kTempDirectory . "Race Spotter.trace`"") : "-")
 											   . (trackData ? (" `"" . trackData . "`"") : "")
 					  , kBinariesDirectory, "Hide", &pid)

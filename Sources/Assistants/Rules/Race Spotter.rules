@@ -109,7 +109,7 @@ updatePitstopLap(?lap) <= Set(Pitstop.1.Lap, ?lap), Set(Pitstop.Last, 1)
 ;;; Resets the reference speed of the different cars around the track.      ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Track.Reset = !Lap] => (Call: resetReferenceTrack), (Clear: Track.Reset)
+[?Track.Reset = ?Lap] => (Call: resetReferenceTrack()), (Clear: Track.Reset)
 
 
 ;;;-------------------------------------------------------------------------;;;

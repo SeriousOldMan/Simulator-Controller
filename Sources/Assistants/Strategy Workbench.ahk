@@ -1968,10 +1968,14 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	showStrategyInfo(strategy) {
+		this.StrategyViewer.showStrategyInfo(strategy)
+
+		this.showStrategyPlot(strategy)
+	}
+
+	showStrategyPlot(strategy) {
 		local html, drawChartFunction, chartID, width, before, after
 		local timeSeries, lapSeries, fuelSeries, tyreSeries
-
-		this.StrategyViewer.showStrategyInfo(strategy)
 
 		if strategy {
 			before := "
@@ -2021,8 +2025,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		else {
 			html := substituteVariables("<html><body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>", {backColor: this.Window.AltBackColor})
 
-			if (this.Control["chartTypeDropDown"].Value = 2)
-				this.showStrategyChart(html)
+			this.showStrategyChart(html)
 		}
 	}
 
@@ -3642,6 +3645,8 @@ class StrategyWorkbench extends ConfigurationItem {
 				this.Control["simSessionResultResult"].Text := strategy.getSessionLaps()
 			else
 				this.Control["simSessionResultResult"].Text := Ceil(strategy.getSessionDuration())
+
+			this.showStrategyPlot(strategy)
 		}
 		else {
 			this.Control["simNumPitstopResult"].Text := ""
@@ -3649,6 +3654,8 @@ class StrategyWorkbench extends ConfigurationItem {
 			; this.Control["simConsumedFuelResult"].Text := ""
 			this.Control["simPitlaneSecondsResult"].Text := ""
 			this.Control["simSessionResultResult"].Text := ""
+
+			this.showStrategyPlot(false)
 		}
 
 		this.iSelectedScenario := strategy

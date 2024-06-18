@@ -534,8 +534,6 @@ The mode "Chat" binds all the configured chat messages to buttons on your contro
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%205.JPG)
 
-In addition to trigger a chat message from your controller hardware, you can trigger them using *VoiceMacro* by voice commands as well. Please see the *VoiceMacro* profile, which is supplied in the *Profiles* folder in the installation folder of Simulator Controller. And also take a look at the [Release 2.0](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-20) update documentation on how to setup *VoiceMacro* to get the best best possible voice recognition results.
-
 ### Mode *Pitstop*
 
 Starting with Release 2.0, all pitstop settings of *Assetto Corsa Competizione* can be controlled by this plugin. The simulator dependent mode *Pitstop* may configure all or a subset of the pitstop settings on your hardware controller, which might be more ergonomic than typing on the keyboard during driving. 

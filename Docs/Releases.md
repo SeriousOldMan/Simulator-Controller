@@ -11,6 +11,7 @@
 	 - Syntax errors in rule definitions are now reported using rule reference and character position.
 	 - Constant arguments are now allowed for function and method calls. Example: trigger("!w") for a function call on the Controller that enables the wind screen wiper.
 	 - Multiple consecutive function or method calls can now be defined for one single conversation action.
+	 - Hold down the Control key while clicking on "Ok" button will not leave the editor, but instead will show you the API tool definitino in JSON format.
   9. The ["Plan Pitstop" conversation action](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#trigger-actions-from-conversation) for the Race Engineer now lso allows to call for a driver swap in team races.
   10. Two [predefined conversation actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#trigger-actions-from-conversation) for the Spotter are now available:
       - The LLM can decide to reset and recalculate the delta and lap time history for all cars.

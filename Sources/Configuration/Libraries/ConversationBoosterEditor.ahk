@@ -914,7 +914,7 @@ class ActionsEditor {
 		editorGui.Add("DropDownList", "x110 yp w90 Y:Move(0.25) vactionConfirmationDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", (*) => this.updateState())
 
 		this.iCallableField := [editorGui.Add("Text", "x16 yp+28 w90 h23 +0x200 Y:Move(0.25)", translate("Call"))
-							  , editorGui.Add("Edit", "x110 yp w308 h46 W:Grow(0.34) Y:Move(0.25)")]
+							  , editorGui.Add("Edit", "x110 yp w308 h140 H:Grow(0.75) W:Grow(0.34) Y:Move(0.25)")]
 
 		editorGui.SetFont("Norm", "Courier New")
 
@@ -1045,7 +1045,7 @@ class ActionsEditor {
 				this.CallableField[1].Visible := true
 				this.CallableField[2].Visible := true
 
-				this.CallableField[1].Text := translate(type)
+				this.CallableField[1].Text := translate(type . "(s)")
 			}
 		}
 		else {

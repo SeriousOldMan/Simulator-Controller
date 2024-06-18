@@ -453,7 +453,7 @@ class BasicStepWizard extends StepWizard {
 
 			this.loadSetup(!fullInstall)
 
-			; this.BasicSetup := false
+			this.BasicSetup := false
 		}
 
 		super.showPage(page)

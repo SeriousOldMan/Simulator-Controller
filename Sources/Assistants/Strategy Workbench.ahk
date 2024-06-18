@@ -133,7 +133,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				workbench.StrategyViewer.StrategyViewer.Resized()
 				workbench.ChartViewer.Resized()
 
-				workbench.showStrategyInfo(workbench.SelectedStrategy)
+				workbench.showStrategyInfo(workbench.SelectedStrategy, false)
 
 				if (workbench.Control["chartSourceDropDown"].Value = 1)
 					workbench.loadChart(["Scatter", "Bar", "Bubble", "Line"][workbench.Control["chartTypeDropDown"].Value])
@@ -1967,10 +1967,10 @@ class StrategyWorkbench extends ConfigurationItem {
 		return this.StrategyViewer.createConsumablesChart(strategy, width, height, timeSeries, lapSeries, fuelSeries, tyreSeries, &drawChartFunction, &chartID)
 	}
 
-	showStrategyInfo(strategy) {
+	showStrategyInfo(strategy, plot := true) {
 		this.StrategyViewer.showStrategyInfo(strategy)
 
-		if strategy
+		if (strategy && plot)
 			this.showStrategyPlot(strategy)
 	}
 

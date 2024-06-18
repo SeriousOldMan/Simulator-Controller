@@ -526,7 +526,7 @@ class SetupWizard extends ConfiguratorPanel {
 			this.addPatchFile("Configuration", "%kUserHomeDirectory%Setup\Configuration Patch.ini")
 		}
 		else
-			this.BasicSetup := false
+			this.BasicSetup := true ; false
 
 		showProgress({progress: ++this.ProgressCount, message: translate("Starting AI Kernel...")})
 
@@ -1652,7 +1652,9 @@ class SetupWizard extends ConfiguratorPanel {
 	}
 
 	isBasicSetupAvailable() {
-		return (this.isModuleSelected("Voice Control") && (this.loadPresets().Length = 0))
+		; return (this.isModuleSelected("Voice Control") && (this.loadPresets().Length = 0))
+
+		return this.isModuleSelected("Voice Control")
 	}
 
 	installSoftware() {

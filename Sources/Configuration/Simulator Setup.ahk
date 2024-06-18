@@ -2726,16 +2726,18 @@ class StartStepWizard extends StepWizard {
 
 		this.iImageViewer := false
 
-		volume := fadeOut()
+		if substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Start", "Start.Audio", false)) {
+			volume := fadeOut()
 
-		try {
-			SoundPlay("NonExistent.avi")
-		}
-		catch Any as exception {
-			logError(exception, false, false)
-		}
+			try {
+				SoundPlay("NonExistent.avi")
+			}
+			catch Any as exception {
+				logError(exception, false, false)
+			}
 
-		resetVolume(volume)
+			resetVolume(volume)
+		}
 	}
 
 	showPage(page) {
@@ -2760,7 +2762,7 @@ class StartStepWizard extends StepWizard {
 	hidePage(page) {
 		local volume
 
-		if (page == 1) {
+		if ((page == 1) && substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Start", "Start.Audio", false))) {
 			volume := fadeOut()
 
 			try {

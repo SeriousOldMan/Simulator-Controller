@@ -460,7 +460,7 @@ class RaceEngineer extends RaceAssistant {
 			return pitstop
 		}
 
-		if (knowledge && knowledgeBase) {
+		if knowledgeBase {
 			lapNumber := knowledgeBase.getValue("Lap", 0)
 
 			if this.activeTopic(options, "Tyres") {

@@ -1,0 +1,4 @@
+; Resets the reference speeds around the track used by the
+; accident detection.
+
+[?%activation%] => (Set: Track.Reset, !Lap), (Call: Assistant.Speak("Roger"))

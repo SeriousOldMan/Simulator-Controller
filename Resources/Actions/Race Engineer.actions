@@ -6,7 +6,7 @@ cancel_pitstop=Assistant.Rule|Race Engineer.cancel_pitstop.rules|false|false|0|C
 recalculate_damage_impact=Assistant.Rule|Race Engineer.recalculate_damage_impact.rules|false|true|0|Resets the damage impact calculation and then starts a full recalculation of the time loss caused by the damage.
 [Parameters]
 plan_pitstop.1=targetLap|Integer||false|The planned lap for the car to come to the pit.
-plan_pitstop.2=refuel|String||false|The amount of fuel to be filled into the car.
+plan_pitstop.2=refuelAmount|String||false|The amount of fuel to be filled into the car.
 plan_pitstop.3=changeTyres|Boolean||false|Indicates whether new tyres should be mounted.
-plan_pitstop.4=repairs|Boolean||false|Indicates whether all damages should be repaired.
-plan_pitstop.5=driverSwap|Boolean||false|Indicates in a team race whether the next driver according to the stint plan shoulöd take the car.
+plan_pitstop.4=repairDamage|Boolean||false|Indicates whether all damages should be repaired.
+plan_pitstop.5=swapDriver|Boolean||false|Indicates in a team race whether the next driver according to the stint plan should take the car.

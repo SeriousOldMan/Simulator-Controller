@@ -1156,6 +1156,9 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 
 		this.DriverCar.reset(true)
+
+		if Speaker[true]
+			this.getSpeaker().speakPhrase("Okay")
 	}
 
 	focusCarRecognized(words) {
@@ -3058,11 +3061,14 @@ class RaceSpotter extends GridRaceAssistant {
 				if isDebug()
 					deleteFile(kTempDirectory . "Race Spotter.trace")
 
+				deleteFile(kTempDirectory . "Race Spotter.semaphore")
+
 				try {
 					Run("`"" . exePath . "`" " . this.TrackLength . A_Space
 											   . getMultiMapValue(this.Settings, "Assistant.Spotter", "Accident.Distance.Ahead.Threshold", 800) . A_Space
 											   . getMultiMapValue(this.Settings, "Assistant.Spotter", "Accident.Distance.Behind.Threshold", 500) . A_Space
 											   . getMultiMapValue(this.Settings, "Assistant.Spotter", "SlowCar.Distance.Ahead.Threshold", 500) . A_Space
+											   . ("`"" . kTempDirectory . "Race Spotter.semaphore`"") . A_Space
 											   . (isDebug() ? ("`"" . kTempDirectory . "Race Spotter.trace`"") : "-")
 											   . (trackData ? (" `"" . trackData . "`"") : "")
 					  , kBinariesDirectory, "Hide", &pid)
@@ -3799,4 +3805,25 @@ class RaceSpotter extends GridRaceAssistant {
 			this.finishSession()
 		}
 	}
+}
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                  Internal Function Declaration Section                  ;;;
+;;;-------------------------------------------------------------------------;;;
+
+resetReferenceTrack(context) {
+	loop 5
+		try {
+			FileAppend("Reset", kTempDirectory . "Race Spotter.semaphore")
+
+			break
+		}
+		catch Any as exception {
+			logError(exception)
+
+			Sleep(Random(1, 10) * 10)
+		}
+
+	return true
 }

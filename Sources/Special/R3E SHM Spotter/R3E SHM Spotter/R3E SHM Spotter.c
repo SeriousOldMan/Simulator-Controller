@@ -603,6 +603,20 @@ double bestLapTime = INT_LEAST32_MAX;
 int completedLaps = 0;
 int numAccidents = 0;
 
+char* semFileName = "";
+
+BOOL fileExists(char* name) {
+	FILE* file;
+
+	if (!fopen_s(&file, name, "r")) {
+		fclose(file);
+
+		return TRUE;
+	}
+	else
+		return FALSE;
+}
+
 BOOL checkAccident() {
 	int accidentsAheadCount = 0;
 	int accidentsBehindCount = 0;
@@ -622,6 +636,14 @@ BOOL checkAccident() {
 	if ((map_buffer->lap_time_previous_self > 0) && ((map_buffer->lap_time_previous_self * 1.002) < bestLapTime))
 	{
 		bestLapTime = map_buffer->lap_time_previous_self;
+
+		for (int i = 0; i < idealLineSize; i++)
+			il_clear(&idealLine[i]);
+	}
+
+	if ((strlen(semFileName) > 0) && fileExists(semFileName))
+	{
+		remove(semFileName);
 
 		for (int i = 0; i < idealLineSize; i++)
 			il_clear(&idealLine[i]);
@@ -1664,6 +1686,9 @@ int main(int argc, char* argv[])
 
 			if (argc > 4)
 				slowCarDistance = atoi(argv[4]);
+
+			if (argc > 5)
+				semFileName = argv[5];
 		}
 	}
 

@@ -37,6 +37,14 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;; Set this to the lap number where you want to reset the reference speed  ;;;
+;;; of the different cars around the track.                                 ;;;
+;;;-------------------------------------------------------------------------;;;
+
+; [?Track.Reset] => ...
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;; "Cleanup" can be set to remove unnecessary knowledge from the memory.   ;;;
 ;;; Set "Cleanup" to "Laps" to remove all recent laps, that are outside the ;;;
 ;;; the statistical window. This is done automatically after a pitstop.     ;;;
@@ -93,6 +101,15 @@ priority: -20, [?Pitstop.Lap] => (Clear: Pitstop.Lap)
 updatePitstopLap(?lap) <= Get(Pitstop.Last, ?last), Get(Pitstop, ?last, Lap, ?lap), !
 updatePitstopLap(?lap) <= Get(Pitstop.Last, ?last), ?next = ?last + 1, Set(Pitstop, ?next, Lap, ?lap), Set(Pitstop.Last, ?next), !
 updatePitstopLap(?lap) <= Set(Pitstop.1.Lap, ?lap), Set(Pitstop.Last, 1)
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                              Track Reference                            ;;;
+;;;                                                                         ;;;
+;;; Resets the reference speed of the different cars around the track.      ;;;
+;;;-------------------------------------------------------------------------;;;
+
+[?Track.Reset = ?Lap] => (Call: resetReferenceTrack()), (Clear: Track.Reset)
 
 
 ;;;-------------------------------------------------------------------------;;;

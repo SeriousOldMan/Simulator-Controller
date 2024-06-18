@@ -940,6 +940,20 @@ inline void clearAverageSpeed(double running) {
 int completedLaps = 0;
 int numAccidents = 0;
 
+string semFileName = "";
+
+bool fileExists(std::string name) {
+	FILE* file;
+
+	if (!fopen_s(&file, name.c_str(), "r")) {
+		fclose(file);
+
+		return true;
+	}
+	else
+		return false;
+}
+
 bool checkAccident() {
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 	bool accident = false;
@@ -981,8 +995,21 @@ bool checkAccident() {
 			idealLine.push_back(IdealLine());
 	}
 
-	if (trackSplineBuilding)
-		updateTrackSpline();
+	if (trackSplineBuilding) {
+		if ((strlen(semFileName.c_str()) > 0) && fileExists(semFileName))
+		{
+			std::remove(semFileName.c_str());
+
+			int length = idealLine.size();
+
+			for (int i = 0; i < length; i++)
+				idealLine[i].clear();
+
+			startTrackSplineBuilder(carID);
+		}
+		else
+			updateTrackSpline();
+	}
 	else
 		startTrackSplineBuilder(carID);
 
@@ -2072,8 +2099,11 @@ int main(int argc, char* argv[])
 			if (argc > 4)
 				slowCarDistance = atoi(argv[4]);
 
-			if (argc > 5) {
-				traceFileName = argv[5];
+			if (argc > 5)
+				semFileName = argv[5];
+
+			if (argc > 6) {
+				traceFileName = argv[6];
 
 				if (traceFileName == "-")
 					traceFileName = "";

@@ -214,15 +214,15 @@ The following table shows you the predefined actions, that might be triggered by
 
 | Action                      | Parameter(s)      | Example(s) |
 |-----------------------------|-------------------|------------|
-| Pitstop Planning            | 1. [Optional] lap<br>2. [Optional] refuelAmount<br>3. [Optional] changeTyres<br>4. [Optional] repairDamage | "We must pit for repairs. Can you create a plan without refueling and without tyre change?" |
+| Pitstop Planning            | 1. [Optional] targetLap<br>2. [Optional] refuelAmount<br>3. [Optional] changeTyres<br>4. [Optional] repairDamage<br>5. [Optional] swapDriver | "We must pit for repairs. Can you create a plan without refueling and without tyre change?" |
 | Pitstop Clearance           | -                 | "I have changed my mind, the pitstop is no longer needed." |
 | Damage Impact Recalculation | -                 | "Can you recalculate the time loss caused by the damage?" |
 
 As you can see, you can define new voice commands by defining a corresponding action, that can be triggered by the LLM. But that is only one part of the story. Please note, that beside reacting to the phrase as shown in the examples above, the LLM might decide to take the action on its own according to the current situation and based on the current data. So always be alerted, if the LLM gets active unexpectedly.
 
-There are some predefined actions available for the Strategist, which come with the standard installation and you can define your own actions. But this will require a very deep knowledge of the inner workings of Simulator Controller and the Assistants. You have been warned. If you want to try this, check out the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm) for the "Conversation" booster.
+That said, it depends on the available data in the knowledge base, whether the LLM will decide to trigger this action or not. If the LLM refuses to do so, you still have all the traditional voice commands and the controller actions at your disposal.
 
-That said, it depends on the data available in the knowledge base, whether the LLM will decide to trigger this action or not. If the LLM refuses to do so, you still have all the traditional voice commands and the controller actions at your disposal.
+Beside the predefined actions for the Engineer, which come with the standard installation as listed above, you can also define your own actions. But this will require a very deep knowledge of the inner workings of Simulator Controller and the Assistants. You have been warned. If you want to try this, check out the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm) for the "Conversation" booster.
 
 IMPORTANT: When action handling is enabled, it might be necessary to disable the "Recognition" booster or at least set the "Creativity" to a very low value. Otherwise the "Recognition" booster might detect a command pattern, which will match to a pre-defined voice command, thereby preventing the LLM from crating a custom action plan.
 

@@ -3367,7 +3367,7 @@ class RaceEngineer extends RaceAssistant {
 }
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                   Private Function Declaration Section                  ;;;
+;;;                  Internal Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 lowFuelWarning(context, remainingLaps) {

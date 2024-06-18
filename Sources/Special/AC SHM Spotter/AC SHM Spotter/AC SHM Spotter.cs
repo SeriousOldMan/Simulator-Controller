@@ -761,6 +761,8 @@ namespace ACSHMSpotter {
 		int completedLaps = 0;
 		int numAccidents = 0;
 
+		string semFileName = "";
+
         bool checkAccident()
         {
 			bool accident = false;
@@ -789,9 +791,17 @@ namespace ACSHMSpotter {
 
 					for (int i = 0; i < idealLine.Count; i++)
 						idealLine[i].clear();
-				}
-	
-				if (graphics.CompletedLaps > completedLaps) {
+                }
+
+                if (System.IO.File.Exists(semFileName))
+                {
+                    System.IO.File.Delete(semFileName);
+
+                    for (int i = 0; i < idealLine.Count; i++)
+                        idealLine[i].clear();
+                }
+
+                if (graphics.CompletedLaps > completedLaps) {
 					if (numAccidents >= (staticInfo.TrackSPlineLength / 1000)) {
 						for (int i = 0; i < idealLine.Count; i++)
 							idealLine[i].clear();
@@ -1660,6 +1670,9 @@ namespace ACSHMSpotter {
 
             if (args.Length > 3)
                 slowCarDistance = int.Parse(args[3]);
+
+            if (args.Length > 4)
+                semFileName = args[4];
         }
 
         public void Run(bool mapTrack, bool positionTrigger, bool analyzeTelemetry)

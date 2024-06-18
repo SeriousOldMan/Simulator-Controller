@@ -2,4 +2,4 @@
 ; After that, the driver request is acknowledged.
 
 [?%activation%] => (Set: Pitstop.Clear, !Lap),
-				   (Prove: Assistant.Speak("Okay"))
+				   (Call: Assistant.Speak("Okay"))

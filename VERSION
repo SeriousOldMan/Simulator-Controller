@@ -2,7 +2,7 @@
 Version=5.7.7.0-dev
 Target=5.7.7.0-release
 Date=06/18/2024
-Download=
+Download=https://cutt.ly/gepZCuY7;https://www.dropbox.com/scl/fi/gis60zk2i0bbqmu4n6l6p/Simulator-Controller-5.7.7.0-dev.zip?rlkey=zlz31za1ru92v52w6kxinu0ed&st=j726s2ck&dl=1
 Changes=Translation fixes for Spanish and French, Optimized error messages in conversation actions editor, Allow bound arguments in conversation actions, Allow multiple function calls in conversation actions, Fixed saving of Actions setting, Increased resiliense against unstable Team Server instances, Driver swap can be initiated from pitstop action, Reset accident detection action, Show strategy plot for uncommited strategies, Basic setup is always default in "Simulator Setup"
 Components=Media->5.6.1,Configuration->5.7.5,Utilities->5.4.8
 [Release]

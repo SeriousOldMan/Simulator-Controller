@@ -1970,7 +1970,8 @@ class StrategyWorkbench extends ConfigurationItem {
 	showStrategyInfo(strategy) {
 		this.StrategyViewer.showStrategyInfo(strategy)
 
-		this.showStrategyPlot(strategy)
+		if strategy
+			this.showStrategyPlot(strategy)
 	}
 
 	showStrategyPlot(strategy) {

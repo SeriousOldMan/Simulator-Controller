@@ -1,3 +1,21 @@
+## 5.7.7.0-release 06/21/24 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. Several errors in the translations for Spanish and for French has been fixed.
+  4. The resilience of the "Race Center" and the driver connection has been increased for unstable Team Server situations.
+  5. The consumption graph will now also be shown in the "Strategy Workbench" for *work-in-progress* strategies.
+  6. The "Basic" setup page is now always preselected in "Simulator Setup".
+  7. A bug has been fixed that prevented the saving of the "Actions" choice in the Conversation Booster dialog.
+  8. Several enhacements for the conversation actions editor:
+     - More error messages for missing or wrong information.
+	 - Syntax errors in rule definitions are now reported using rule reference and character position.
+	 - Constant arguments are now allowed for function and method calls. Example: trigger("!w") for a function call on the Controller that enables the wind screen wiper.
+	 - Multiple consecutive function or method calls can now be defined for one single conversation action.
+  9. The ["Plan Pitstop" conversation action](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#trigger-actions-from-conversation) for the Race Engineer now lso allows to call for a driver swap in team races.
+  10. There are now two [predefined conversation actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#trigger-actions-from-conversation) for the Spotter:
+      - The LLM can decide to reset and recalculate the delta and lap time history for all cars.
+	  - And you can ask the LLM to reset the reference speed data of all cars around the track, when too many false positives for accidents and slow cars are given.
+
 ## 5.7.6.0-release 06/14/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

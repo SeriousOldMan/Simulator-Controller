@@ -49,7 +49,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[5.7.7.0-dev](https://cutt.ly/gepZCuY7) (Early build for 5.7.7. Changes: Translation fixes for Spanish and French, Optimized error messages in conversation actions editor, Allow bound arguments in conversation actions, Allow multiple function calls in conversation actions, Fixed saving of Actions setting, Increased resiliense against unstable Team Server instances, Driver swap can be initiated from pitstop action, Reset accident detection action, Show strategy plot for uncommited strategies, Basic setup is always default in "Simulator Setup".)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-577) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

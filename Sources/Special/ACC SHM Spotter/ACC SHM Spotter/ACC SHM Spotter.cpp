@@ -945,14 +945,13 @@ string semFileName = "";
 bool fileExists(std::string name) {
 	FILE* file;
 
-	if (fopen_s(&file, name.c_str(), "r")) {
+	if (!fopen_s(&file, name.c_str(), "r")) {
 		fclose(file);
 
 		return true;
 	}
-	else {
+	else
 		return false;
-	}
 }
 
 bool checkAccident() {
@@ -997,7 +996,7 @@ bool checkAccident() {
 	}
 
 	if (trackSplineBuilding) {
-		if (semFileName != "" && fileExists(semFileName))
+		if ((strlen(semFileName.c_str()) > 0) && fileExists(semFileName))
 		{
 			std::remove(semFileName.c_str());
 
@@ -2100,9 +2099,8 @@ int main(int argc, char* argv[])
 			if (argc > 4)
 				slowCarDistance = atoi(argv[4]);
 
-			if (argc > 5) {
+			if (argc > 5)
 				semFileName = argv[5];
-			}
 
 			if (argc > 6) {
 				traceFileName = argv[6];

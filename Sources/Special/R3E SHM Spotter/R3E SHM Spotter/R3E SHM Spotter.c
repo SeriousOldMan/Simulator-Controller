@@ -608,14 +608,13 @@ char* semFileName = "";
 BOOL fileExists(char* name) {
 	FILE* file;
 
-	if (fopen_s(&file, name, "r")) {
+	if (!fopen_s(&file, name, "r")) {
 		fclose(file);
 
 		return TRUE;
 	}
-	else {
+	else
 		return FALSE;
-	}
 }
 
 BOOL checkAccident() {
@@ -642,7 +641,7 @@ BOOL checkAccident() {
 			il_clear(&idealLine[i]);
 	}
 
-	if (strlen(semFileName) > 0 && fileExists(semFileName))
+	if ((strlen(semFileName) > 0) && fileExists(semFileName))
 	{
 		remove(semFileName);
 

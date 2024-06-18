@@ -3815,7 +3815,7 @@ class RaceSpotter extends GridRaceAssistant {
 resetReferenceTrack(context) {
 	loop 5
 		try {
-			FileAppend("Check", kTempDirectory . "Race Spotter.sem")
+			FileAppend("Reset", kTempDirectory . "Race Spotter.semaphore")
 
 			break
 		}

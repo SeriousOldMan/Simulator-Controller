@@ -671,7 +671,7 @@ std::string semFileName = "";
 bool fileExists(std::string name) {
 	FILE* file;
 
-	if (file = fopen(name.c_str(), "r")) {
+	if (!fopen_s(&file, name.c_str(), "r")) {
 		fclose(file);
 
 		return true;
@@ -745,7 +745,7 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 				idealLine[i].clear();
 		}
 
-		if (semFileName != "" && fileExists(semFileName))
+		if ((strlen(semFileName.c_str()) > 0) && fileExists(semFileName))
 		{
 			std::remove(semFileName.c_str());
 

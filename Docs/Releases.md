@@ -17,7 +17,7 @@
   11. Two [predefined conversation actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#trigger-actions-from-conversation) for the Spotter are now available:
       - The LLM can decide to reset and recalculate the delta and lap time history for all cars.
 	  - And you can ask the LLM to reset the reference speed data of all cars around the track, when too many false positives for accidents and slow cars are given.
-  12. [Expert only] All definition files for "Simulator Setup" can be *overwritten* in *Simulator Controller\Setup\Definitions* folder which is located in your user *Documents* folder. This can be used to introduce new bundled applications or to replace the startup video, just to name two examples.
+  12. [Expert only] All definition files for "Simulator Setup" can be *overwritten* in the *Simulator Controller\Setup\Definitions* folder which is located in your user *Documents* folder. This can be used to introduce new bundled applications or to replace the startup video, just to name two examples.
 
 ## 5.7.6.0-release 06/14/24
   1. Minor bugfixes, as always

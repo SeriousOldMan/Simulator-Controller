@@ -102,7 +102,7 @@ class LLMTool {
 				this.iDescription := description
 				this.iType := StrLower(type)
 				this.iEnumeration := enumeration
-				this.iRequired := required
+				this.iRequired := ((required = kTrue) ? kTrue : ((required = kFalse) ? false : required))
 				this.iReader := reader
 			}
 		}

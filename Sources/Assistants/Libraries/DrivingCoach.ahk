@@ -44,6 +44,8 @@ class DrivingCoach extends GridRaceAssistant {
 
 	iTelemetryCollector := false
 
+	iTranscript := false
+
 	class CoachVoiceManager extends RaceAssistant.RaceVoiceManager {
 	}
 
@@ -418,7 +420,7 @@ class DrivingCoach extends GridRaceAssistant {
 		return choose(collect(this.Instructions[true], ObjBindMethod(this, "getInstruction"))
 					, (instruction) => (instruction && (Trim(instruction) != "")))
 	}
-	
+
 	getTools() {
 		return []
 	}
